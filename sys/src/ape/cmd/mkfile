@@ -1,0 +1,50 @@
+APE=/sys/src/ape
+<$APE/config
+
+TARG=basename\
+	dirname\
+	kill\
+	uname
+
+DIRS=\
+	diff\
+	expr\
+	make\
+	patch\
+	pdksh\
+	sed\
+
+BIN=$APEBIN
+</sys/src/cmd/mkmany
+
+CFLAGS=-c -D_POSIX_SOURCE
+
+all:V:	$DIRS
+
+install:V:	install.dir install.rc
+
+installall:V:	installall.dir
+
+clean:V:	clean.dir
+
+nuke:V:		nuke.dir
+
+%.dir:V:
+	for (i in $DIRS) @{
+		cd $i
+		echo '----'$i'----'
+		mk $stem
+	}
+
+$DIRS:V:
+	for (i in $target) @{
+		cd $i
+		echo '----'$i'----'
+		mk all
+	}
+
+$BIN/%: %.rc
+	cp -x $stem.rc $BIN/$stem
+
+install.rc:V: $BIN/psh
+
