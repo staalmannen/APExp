@@ -4,6 +4,7 @@ APE=/sys/src/ape
 LIB=/$objtype/lib/ape/libbsd.a
 OFILES=\
 	accept.$O\
+	arc4random.$O\
 	bcopy.$O\
 	bind.$O\
 	connect.$O\
@@ -19,6 +20,7 @@ OFILES=\
 	getopt.$O\
 	getpeername.$O\
 	getprotobyname.$O\
+	getprogname.$O\
 	getservbyaddr.$O\
 	getservbyname.$O\
 	getsockname.$O\
@@ -41,6 +43,7 @@ OFILES=\
 	send.$O\
 	sendto.$O\
 	setlinebuf.$O\
+	setprogname.$O\
 	shutdown.$O\
 	_sock_ingetaddr.$O\
 	_sock_ipattr.$O\

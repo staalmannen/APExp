@@ -147,6 +147,8 @@ extern char	*gai_strerror(int);
 #define NI_NUMERICSCOPE	0x0010	/* For IPv6 addresses, the numeric form of the scope identifier is returned
 				   instead of its name. */
 #define NI_DGRAM	0x0020	/* Indicates that the service is a datagram service (SOCK_DGRAM). */
+#define NI_MAXHOST	1025
+#define NI_MAXSERV	32
 
 /* Error values for `getaddrinfo' and `getnameinfo' functions.  */
 #define EAI_BADFLAGS	  -1	/* Invalid value for `ai_flags' field */

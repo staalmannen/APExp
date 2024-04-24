@@ -496,6 +496,7 @@ setsource(char *name, int fd, char *str)
 	s->inp = s->inb;
 	s->inl = s->inp+len;
 	s->inl[0] = s->inl[1] = s->inl[2] = s->inl[3] = EOFC;
+	s->pos = NINCLUDE; /* outside of include dirs */
 	return s;
 }
 

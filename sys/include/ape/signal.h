@@ -37,11 +37,12 @@ typedef int sig_atomic_t;
 #define SIGTSTP	18	/* interactive stop */
 #define SIGTTIN	19	/* read from ctl tty by member of background */
 #define SIGTTOU	20	/* write to ctl tty by member of background */
-#define SIGVTALRM 21 /* virtual alarm clock */
-#define SIGPROF 22  /* profiling alarm clock */
+#define SIGWINCH 21	/* window size changes */
+#define SIGVTALRM 22 /* virtual alarm clock */
+#define SIGPROF 23  /* profiling alarm clock */
 
 #ifdef _BSD_EXTENSION
-#define NSIG 23
+#define NSIG 24
 #endif
 
 #ifdef __cplusplus
@@ -65,6 +66,10 @@ struct sigaction {
 };
 /* values for sa_flags */
 #define SA_NOCLDSTOP	1
+#define SA_ONSTACK	2
+#define SA_RESETHAND	3
+#define SA_RESTART	4
+#define SA_RESTORER	5
 
 /* first argument to sigprocmask */
 #define SIG_BLOCK	1
