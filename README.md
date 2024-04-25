@@ -48,8 +48,9 @@ the most capable web browser available on Plan9.
 
 
 At this moment, just imported the latest 9front APE sources from git [x]
-In addition, the patch from @lufia [x1, x2] to build libressl and curl (introduces
-pthread, include_next cpp support, etc) has been applied to the sources.
+In addition, several patches from @lufia [x1, x2] to build libressl and curl
+(introduces pthread, include_next cpp support, etc) has been applied to the
+sources.
 
 
 **References**
@@ -60,7 +61,7 @@ pthread, include_next cpp support, etc) has been applied to the sources.
 
 [3] https://wiki.9front.org/porting
 
-[4] < link to youtube talk or IWP9 2024 paper >
+[4] https://www.youtube.com/watch?v=zPd20UMOL7g
 
 [5] https://hv.diva-portal.org/smash/get/diva2:1821484/FULLTEXT01.pdf
 
@@ -70,4 +71,4 @@ pthread, include_next cpp support, etc) has been applied to the sources.
 
 [x1] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52adaf.squirrel@mx.sdf.org/
 
-[x2] https://github.com/lufia/plan9
+[x2] https://github.com/lufia/plan9/pulls

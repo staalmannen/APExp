@@ -2,8 +2,10 @@ APE=/sys/src/ape
 <$APE/config
 
 TARG=basename\
+	cut\
 	dirname\
 	kill\
+	printf\
 	uname
 
 DIRS=\

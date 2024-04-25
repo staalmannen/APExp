@@ -51,6 +51,7 @@
  *	-p		use standard cpp ANSI preprocessor (not on windows)
  *	-s		print structure offsets (with -a or -aa)
  *	-t		print type trees
+ *	-u		enable implicit conversion between type* and utype*
  *	-v		verbose printing
  *	-w		print warnings
  *	-x

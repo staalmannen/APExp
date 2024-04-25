@@ -1,0 +1,81 @@
+</$objtype/mkfile
+
+YTARG=`{ls | sed -n '/\.y$/s/\.y$//p'}
+TARG=$YTARG `{ls | sed -n '/^cp\.c$/d; /^yacc\.c$/d; /\.c$/s/\.c$//p'}
+HFILES=/$objtype/include/u.h /sys/include/libc.h /sys/include/bio.h
+
+BIN=/$objtype/bin
+LDFLAGS=
+YFLAGS=-d
+
+PCONLY=vmx
+POWERLESS=dtracy  # until someone fixes the build for power
+NOMK=$NOMK test `{~ $objtype (386 amd64) || echo $PCONLY} `{~ $objtype power && echo $POWERLESS}
+DIRS=`{echo */mkfile | sed 's,/mkfile *,\n,g' | grep -v '-e^'^('' $NOMK)^'$'}
+
+usage:VQ:
+	echo 'usage: mk all, all.cpus, cmds, $O.$cmd'
+	echo '	install, install.cpus, $cmd.install, $cmd.install.cpus'
+	echo '	clean, nuke'
+
+%.c %.tab.h:D: %.y
+	yacc $YFLAGS -o $stem.c -s $stem $stem.y
+
+%.$O: $HFILES
+
+%.$O: %.c
+	$CC $CFLAGS $stem.c
+
+$O.%: %.$O
+	$LD $LDFLAGS -o $target $stem.$O
+
+$BIN/%: $O.%
+	cp $O.$stem $target
+
+$BIN/cp: $O.cp
+	`{if(~ $objtype $cputype) echo ./$O.cp; if not echo cp} $prereq $target
+
+$BIN/init: $O.init  # hack, install location is not target
+	cp $O.init /$objtype/init
+
+%.acid: %.c $HFILES
+	$CC $CFLAGS -a $stem.c >$target
+
+%.cpus:V:
+	for(objtype in $CPUS) mk $MKFLAGS $stem
+
+%.dirs:V:
+	for(i in $DIRS) @{
+		cd $i
+		echo mk $i
+		mk $MKFLAGS $stem
+	}
+
+%.tests:V:
+	@{cd test && mk $MKFLAGS $stem}
+
+cmds:V: $O.cp $O.yacc ${TARG:%=$O.%}
+
+all:V: cmds
+	mk $MKFLAGS all.dirs
+
+%.install:V: $BIN/%
+
+install:V: cp.install
+	mk $MKFLAGS yacc.install
+	mk $MKFLAGS $TARG.install
+	mk $MKFLAGS install.dirs
+
+installall:V: install.cpus
+
+cleancmds:V:
+	rm -f *.[$OS] [$OS].* y.tab.? y.debug y.output $YTARG.c *.tab.h
+
+clean:V: cleancmds clean.dirs clean.tests
+
+nuke:V: cleancmds nuke.dirs
+	rm -f *.acid
+
+test.dirs test.tests:V: cmds
+
+test:VQ: test.dirs test.tests

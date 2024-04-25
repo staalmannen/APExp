@@ -960,10 +960,21 @@ sametype(Type *t1, Type *t2)
 	return rsametype(t1, t2, 5, 1);
 }
 
+long	typesign[] =
+{
+	BCHAR|BUCHAR,
+	BSHORT|BUSHORT,
+	BINT|BUINT,
+	BLONG|BULONG,
+	BVLONG|BUVLONG,
+	0,
+};
+
 int
 rsametype(Type *t1, Type *t2, int n, int f)
 {
 	int et;
+	long b1, b2, *p;
 
 	n--;
 	for(;;) {
@@ -1034,6 +1045,16 @@ rsametype(Type *t1, Type *t2, int n, int f)
 				return 1;
 			if(t2 != T && t2->etype == TVOID)
 				return 1;
+		if(debug['u'] && et == TIND) {
+			b1 = b2 = ~0;
+			if(t1 != T)
+				b1 = 1L<<t1->etype;
+			if(t2 != T)
+				b2 = 1L<<t2->etype;
+			for(p = typesign; *p; p++)
+				if(((b1|b2) & ~*p) == 0)
+					return 1;
+		}
 		}
 	}
 }
