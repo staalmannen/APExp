@@ -24,6 +24,18 @@ OFILES=\
 	utfrrune.$O\
 	utfrune.$O\
 	utfutf.$O\
+	/*wchar*/\
+	fwide.$O\
+	mbrlen.$O\
+	mbrtowc.$O\
+	mbsinit.$O\
+	mbsrtowcs.$O\
+	wcrtomb.$O\
+	wcsrtombs.$O\
+	wcswidth.$O\
+	wctrans.$O\
+	wctype.$O\
+	wcwidth.$O\
 
 HFILES=\
 	/sys/include/ape/utf.h\
