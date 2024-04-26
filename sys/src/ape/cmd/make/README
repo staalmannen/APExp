@@ -1,0 +1,21 @@
+This port is basically simply an update from Andrey's 3.81 port of gmake
+config.h directly copied from that port
+
+Some differences are:
+
+* This package installs "make" at /$objtype/bin/ape/
+* the package version is 3.82
+* the manfile has changed name from "make" to "gmake"
+* unused files are trimmed away to make a lighter and easier-to-understand package.
+
+Source code changes:
+
+All source code changes clearly commented in the source and normally a small reversion back to how it looked in the Plan9 port of 3.81.
+
+function.c needed to be edited slightly due to typedef differences.
+implicit.c needed to be edited slightly
+job.c needed to be edited slightly
+main.c needed to be edited slightly
+Andrey's config.h was somewhat manually edited
+
+read.c and remake.c got some Plan9-specific ifdefs

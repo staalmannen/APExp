@@ -51,6 +51,7 @@ At this moment, just imported the latest 9front APE sources from git [x]
 In addition, several patches from @lufia [x1, x2] to build libressl and curl
 (introduces pthread, include_next cpp support, etc) has been applied to the
 sources.
+- APE make has been replaced by a port of GNU make (version 3.82)
 
 
 **References**

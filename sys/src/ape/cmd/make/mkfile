@@ -2,25 +2,61 @@ APE=/sys/src/ape
 <$APE/config
 
 TARG=make
-OFILES=ident.$O\
-	main.$O\
-	doname.$O\
-	dosys.$O\
-	gram.$O\
-	misc.$O\
-	files.$O\
-
-HFILES=defs.h
-YFILES=gram.y
+OFILES=	alloca.$O\
+		ar.$O\
+		arscan.$O\
+		commands.$O\
+		default.$O\
+		dir.$O\
+		expand.$O\
+		file.$O\
+		function.$O\
+		getloadavg.$O\
+		getopt.$O\
+		getopt1.$O\
+		hash.$O\
+		implicit.$O\
+		job.$O\
+		main.$O\
+		misc.$O\
+		read.$O\
+		remake.$O\
+		remote-stub.$O\
+		rule.$O\
+		signame.$O\
+		strcache.$O\
+		variable.$O\
+		version.$O\
+		vpath.$O\
+		glob.$O\
+		fnmatch.$O
 
 BIN=$APEBIN
 </sys/src/cmd/mkone
 
-CFLAGS=-c -DSHELLCOM'="/bin/sh"'
-YFLAGS=-S
+GMAKESRC=../../../external/gmake
 
-gram.c:	y.tab.c
-	mv $prereq $target
+CC=pcc
+LD=pcc
+CFLAGS=-c -p -B -I. -I$GMAKESRC -I$GMAKESRC/glob -DPLAN9 -DHAVE_CONFIG_H \
+	-D_LIMITS_EXTENSION -DHAVE_SYS_RESOURCE_H -DHAVE_STRCASECMP -DHAVE_STRNCASECMP \
+	-DHAVE_SETLOCALE -DHAVE_FILENO -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_RESEARCH_SOURCE \
+	-D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION
 
-nuke clean:V:
-	rm -f *.[$OS] [$OS].out y.tab.? y.debug y.output $TARG gram.c
+
+
+glob.$O: glob/glob.c
+	$CC $CFLAGS $GMAKESRC/glob/glob.c
+
+fnmatch.$O: glob/fnmatch.c
+	$CC $CFLAGS $GMAKESRC/glob/fnmatch.c
+
+clean:V:
+	rm -f [$OS].* *.[$OS] $CLEANFILES
+
+nuke:V:
+	rm -f *.[$OS] y.tab.? y.debug y.output [$OS].$TARG $TARG
+	rm -f /sys/man/1/gmake
+
+install:V:
+	cp gmake.1 /sys/man/1/gmake
