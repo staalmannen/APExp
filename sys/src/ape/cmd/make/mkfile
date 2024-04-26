@@ -44,6 +44,8 @@ CFLAGS=-c -p -B -I. -I$GMAKESRC -I$GMAKESRC/glob -DPLAN9 -DHAVE_CONFIG_H \
 	-D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION
 
 
+%.$O: $GMAKESRC/%.c
+	$CC $CFLAGS $GMAKESRC/$stem.c
 
 glob.$O: glob/glob.c
 	$CC $CFLAGS $GMAKESRC/glob/glob.c
