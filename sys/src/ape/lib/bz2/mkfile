@@ -25,7 +25,9 @@ HFILES=\
 
 </sys/src/cmd/mksyslib
 
-CFLAGS=-c -D_POSIX_SOURCE
+BZSOURCE=../../../external/bzip2
 
-%.$O: /sys/src/cmd/bzip2/lib/%.c
-	$CC $CFLAGS /sys/src/cmd/bzip2/lib/$stem.c
+CFLAGS=-c -$BZSOURCE/lib -D_POSIX_SOURCE
+
+%.$O: $BZSOURCE/lib/%.c
+	$CC $CFLAGS $BZSOURCE/lib/$stem.c

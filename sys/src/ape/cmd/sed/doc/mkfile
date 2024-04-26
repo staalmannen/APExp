@@ -1,0 +1,20 @@
+</$objtype/mkfile
+
+GSEDSRC=../../../../external/gsed
+
+default:VQ:
+	;
+
+install:VQ:
+	;
+
+clean:VQ:
+	;
+
+nuke:VQ:
+	rm -f /sys/man/1/gsed
+	;
+
+install:V:
+	cp $GSEDSRC/doc/sed.1 /sys/man/1/gsed
+

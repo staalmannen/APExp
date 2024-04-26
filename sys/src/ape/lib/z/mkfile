@@ -36,10 +36,12 @@ CLEANFILES=$TOOLS
 
 </sys/src/cmd/mksyslib
 
-CFLAGS=-c -D_POSIX_SOURCE -D_C99_SNPRINTF_EXTENSION
+ZSOURCE=../../../external/zlib
 
-%.$O: /sys/src/cmd/gs/zlib/%.c
-	$CC $CFLAGS /sys/src/cmd/gs/zlib/$stem.c
+CFLAGS=-c -I$ZSOURCE -D_POSIX_SOURCE -D_C99_SNPRINTF_EXTENSION
+
+%.$O: $ZSOURCE/%.c
+	$CC $CFLAGS $ZSOURCE/$stem.c
 
 $O.%: %.$O $LIB
 	$LD -o $target $prereq

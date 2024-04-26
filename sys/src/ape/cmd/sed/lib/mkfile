@@ -1,0 +1,51 @@
+</$objtype/mkfile
+LIB=libsed.a$O
+OFILES=	alloca.$O\
+		btowc.$O\
+		dirname.$O\
+		error.$O\
+		exitfail.$O\
+		getdelim.$O\
+		getline.$O\
+		getopt.$O\
+		getopt1.$O\
+		localcharset.$O
+		lstat.$O\
+		mbrlen.$O\
+		mbrtowc.$O\
+		mbsinit.$O\
+		mkstemp.$O\
+		obstack.$O\
+		quote.$O\
+		quotearg.$O\
+		regex.$O\
+		rename.$O\
+		strerror.$O\
+		stripslash.$O\
+		strndup.$O\
+		strnlen.$O\
+		tempname.$O\
+		wcrtomb.$O\
+		wctob.$O\
+		xmalloc.$O\
+		xstrndup.$O\
+		basename.$O\
+		strverscmp.$O\
+		xalloc-die.$O
+
+<../../../../cmd/mklib
+
+GSEDSRC=../../../../external/gsed
+
+CC=pcc
+LD=pcc
+CFLAGS=-c -I.. -I$GSEDSRC/lib -B -D_POSIX_SOURCE -D_SUSV2_SOURCE \
+	-D_EXPERIMENTAL_SOURCE -D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION -DHAVE_CONFIG_H \
+	-DPLAN9 -DHAVE_ISBLANK -DHAVE_WCTYPE_H -DHAVE_ISWCTYPE -DHAVE_CALLOC 
+
+%.$O: $GSEDSRC/lib/%.c
+	$CC $CFLAGS $GSEDSRC/lib/$stem.c
+
+nuke:V:
+	mk clean
+	rm -f $LIB

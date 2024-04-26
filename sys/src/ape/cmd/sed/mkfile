@@ -1,13 +1,20 @@
-APE=/sys/src/ape
-<$APE/config
+</$objtype/mkfile
 
-TARG=sed
-OFILES=sed0.$O\
-	sed1.$O
+DIRS=lib sed doc
 
-HFILES=sed.h
+all:V:
+	for (i in $DIRS)
+		@{ cd $i; mk }
 
-BIN=$APEBIN
-</sys/src/cmd/mkone
+install:V:
+	for (i in $DIRS)
+		@{ cd $i; mk $target }
 
-CFLAGS=-c -D_POSIX_SOURCE
+clean:V:
+	for (i in $DIRS)
+		@{ cd $i; mk $target }
+
+nuke:V:
+	for (i in $DIRS)
+		@{ cd $i; mk $target }
+

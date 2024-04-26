@@ -1,4 +1,4 @@
-APE=/sys/src/ape
+APE=../..
 <$APE/config
 
 TARG=make
@@ -31,8 +31,8 @@ OFILES=	alloca.$O\
 		glob.$O\
 		fnmatch.$O
 
-BIN=$APEBIN
-</sys/src/cmd/mkone
+BIN=/$objtype/bin/ape
+<../../../cmd/mkone
 
 GMAKESRC=../../../external/gmake
 
@@ -61,4 +61,4 @@ nuke:V:
 	rm -f /sys/man/1/gmake
 
 install:V:
-	cp gmake.1 /sys/man/1/gmake
+	cp $GMAKESRC/gmake.1 /sys/man/1/gmake
