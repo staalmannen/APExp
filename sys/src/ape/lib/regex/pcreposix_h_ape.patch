@@ -1,0 +1,12 @@
+--- pcreposix.h	2020-06-23 12:22:35.663974035 +0200
++++ pcreposix.h_ape	2020-06-26 09:50:28.087451310 +0200
+@@ -4,6 +4,9 @@
+ 
+ #ifndef _PCREPOSIX_H
+ #define _PCREPOSIX_H
++/* libpcreposix depends on libpcre */
++#pragma lib "/$M/lib/ape/libpcre.a"
++#pragma lib "/$M/lib/ape/libpcreposix.a"
+ 
+ /* This is the header for the POSIX wrapper interface to the PCRE Perl-
+ Compatible Regular Expression library. It defines the things POSIX says should

@@ -1,0 +1,4 @@
+#!/bin/sh
+
+exec /$objtype/bin/gnu/gawk "$@"
+

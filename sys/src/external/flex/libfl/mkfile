@@ -1,0 +1,13 @@
+</$objtype/mkfile
+LIB=/$objtype/lib/ape/libfl.a
+OFILES=libmain.$O libyywrap.$O 
+
+</sys/src/cmd/mksyslib
+
+CC=pcc
+LD=pcc
+CFLAGS=-c 
+
+nuke:V:
+	mk clean
+	rm -f $LIB

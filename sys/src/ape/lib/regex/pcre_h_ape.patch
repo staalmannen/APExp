@@ -1,0 +1,10 @@
+--- pcre.h.in	2020-06-23 12:22:35.633973607 +0200
++++ pcre.h.in_ape	2020-06-26 09:55:13.902271033 +0200
+@@ -38,6 +38,7 @@
+ 
+ #ifndef _PCRE_H
+ #define _PCRE_H
++#pragma lib "/$M/lib/ape/libpcre.a"
+ 
+ /* The current PCRE version information. */
+ 

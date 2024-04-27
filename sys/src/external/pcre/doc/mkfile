@@ -1,0 +1,81 @@
+</$objtype/mkfile
+
+MAN1=\
+	pcregrep\
+	pcretest\
+	pcre-config
+
+MAN3=\
+	pcre16\
+	pcre32\
+	pcreapi\
+	pcrebuild\
+	pcrecallout\
+	pcrecompat\
+	pcrecpp\
+	pcredemo\
+	pcrejit\
+	pcrelimits\
+	pcrematching\
+	pcrepartial\
+	pcrepattern\
+	pcreperform\
+	pcreposix\
+	pcreprecompile\
+	pcresample\
+	pcrestack\
+	pcresyntax\
+	pcreunicode\
+	pcre\
+	pcre_assign_jit_stack\
+	pcre_compile2\
+	pcre_compile\
+	pcre_config\
+	pcre_copy_named_substring\
+	pcre_copy_substring\
+	pcre_dfa_exec\
+	pcre_exec\
+	pcre_free_study\
+	pcre_free_substring\
+	pcre_free_substring_list\
+	pcre_fullinfo\
+	pcre_get_named_substring\
+	pcre_get_stringnumber\
+	pcre_get_stringtable_entries\
+	pcre_get_substring\
+	pcre_get_substring_list\
+	pcre_jit_exec\
+	pcre_jit_stack_alloc\
+	pcre_jit_stack_free\
+	pcre_maketables\
+	pcre_pattern_to_host_byte_order\
+	pcre_refcount\
+	pcre_study\
+	pcre_utf16_to_host_byte_order\
+	pcre_utf32_to_host_byte_order\
+	pcre_version
+
+
+
+default:VQ:
+	;
+
+install:VQ:
+	;
+
+clean:VQ:
+	;
+
+nuke:VQ:
+	for (i in $MAN1)
+		@{ rm -f /sys/man/1/$i }
+	for (i in $MAN3) 
+		@{ rm -f /sys/man/3/$i }
+
+install:V:
+	for (i in $MAN1)
+		@{ cp $i.1 /sys/man/1/$i }
+	for (i in $MAN3) 
+		@{ cp $i.3 /sys/man/3/$i }
+
+

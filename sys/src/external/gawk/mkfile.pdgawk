@@ -1,0 +1,270 @@
+</$objtype/mkfile
+TARG=pdgawk
+OFILES=array.$O builtin.$O dfa.$O eval_p.$O ext.$O field.$O floatcomp.$O gawkmisc.$O \
+	getopt.$O getopt1.$O io.$O msg.$O node.$O profile_p.$O re.$O regex.$O replace.$O \
+	version.$O awkgram.$O main.$O random.$O 
+BIN=/$objtype/bin/gnu
+
+</sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS=-c -I. -I/sys/include/ape -I/386/include/ape -I./missing_d -DPLAN9 -DGAWK \
+	-D_POSIX_SOURCE -D_SUSV2_SOURCE -D_C99_SNPRINTF_EXTENSION -D_BSD_EXTENSION \
+	-D_REENTRANT_SOURCE -D_EXPERIMENTAL_SOURCE -DHAVE_SOCK_OPTS -DHAVE_CONFIG_H \
+	-DGETGROUPS_NOT_STANDARD -DHAVE_STDINT_H -DHAVE_MKTIME -DHAVE_WCHAR_H -DHAVE_WCTYPE_H \
+	-DHAVE_STDBOOL_H 
+
+missing_d/setenv.$O: /sys/include/ape/errno.h /sys/include/ape/string.h /sys/include/ape/stdlib.h \
+	/sys/include/ape/stddef.h 
+missing_d/getaddrinfo.$O: missing_d/getaddrinfo.h /sys/include/ape/arpa/inet.h \
+	/sys/include/ape/netinet/in.h /sys/include/ape/netdb.h /sys/include/ape/sys/socket.h \
+	/sys/include/ape/sys/types.h 
+profile.$O: /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h \
+	regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h /sys/include/ape/string.h \
+	protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/fcntl.h /sys/include/ape/inttypes.h \
+	/sys/include/ape/stdint.h /sys/include/ape/inttypes.h /386/include/ape/float.h \
+	/sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h /sys/include/ape/stddef.h \
+	/sys/include/ape/time.h /sys/include/ape/signal.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stddef.h /sys/include/ape/stdlib.h /sys/include/ape/bsd.h \
+	/sys/include/ape/stddef.h /sys/include/ape/string.h /sys/include/ape/stddef.h \
+	/sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h /sys/include/ape/ctype.h \
+	/sys/include/ape/limits.h /sys/include/ape/assert.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h /386/include/ape/stdarg.h /sys/include/ape/stdio.h \
+	custom.h config.h awk.h 
+eval.$O: /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h \
+	regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h /sys/include/ape/string.h \
+	protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/fcntl.h /sys/include/ape/inttypes.h \
+	/sys/include/ape/stdint.h /sys/include/ape/inttypes.h /386/include/ape/float.h \
+	/sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h /sys/include/ape/stddef.h \
+	/sys/include/ape/time.h /sys/include/ape/signal.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stddef.h /sys/include/ape/stdlib.h /sys/include/ape/bsd.h \
+	/sys/include/ape/stddef.h /sys/include/ape/string.h /sys/include/ape/stddef.h \
+	/sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h /sys/include/ape/ctype.h \
+	/sys/include/ape/limits.h /sys/include/ape/assert.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h /386/include/ape/stdarg.h /sys/include/ape/stdio.h \
+	custom.h config.h awk.h 
+random.$O: /sys/include/ape/sys/time.h random.h /sys/include/ape/unistd.h /sys/include/ape/stdlib.h \
+	/sys/include/ape/stdio.h /sys/include/ape/fcntl.h custom.h config.h 
+main.$O: /sys/include/ape/ctype.h getopt.h /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h \
+	/sys/include/ape/string.h protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/sys/types.h /sys/include/ape/fcntl.h \
+	/sys/include/ape/inttypes.h /sys/include/ape/stdint.h /sys/include/ape/inttypes.h \
+	/386/include/ape/float.h /sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h \
+	/sys/include/ape/stddef.h /sys/include/ape/time.h /sys/include/ape/signal.h \
+	/386/include/ape/stdarg.h /sys/include/ape/stddef.h /sys/include/ape/stdlib.h \
+	/sys/include/ape/bsd.h /sys/include/ape/stddef.h /sys/include/ape/string.h \
+	/sys/include/ape/stddef.h /sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h \
+	/sys/include/ape/ctype.h /sys/include/ape/limits.h /sys/include/ape/assert.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/stddef.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stdio.h custom.h config.h awk.h 
+awkgram.$O: /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h \
+	regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h /sys/include/ape/string.h \
+	protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/fcntl.h /sys/include/ape/inttypes.h \
+	/sys/include/ape/stdint.h /sys/include/ape/inttypes.h /386/include/ape/float.h \
+	/sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h /sys/include/ape/stddef.h \
+	/sys/include/ape/time.h /sys/include/ape/signal.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stddef.h /sys/include/ape/stdlib.h /sys/include/ape/bsd.h \
+	/sys/include/ape/stddef.h /sys/include/ape/string.h /sys/include/ape/stddef.h \
+	/sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h /sys/include/ape/ctype.h \
+	/sys/include/ape/limits.h /sys/include/ape/assert.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h /386/include/ape/stdarg.h /sys/include/ape/stdio.h \
+	custom.h config.h awk.h 
+version.$O: custom.h config.h 
+replace.$O: /sys/include/ape/errno.h /sys/include/ape/string.h /sys/include/ape/stdlib.h \
+	/sys/include/ape/stddef.h missing_d/setenv.c missing_d/usleep.c missing_d/getaddrinfo.h \
+	/sys/include/ape/arpa/inet.h /sys/include/ape/netinet/in.h /sys/include/ape/netdb.h \
+	/sys/include/ape/sys/socket.h /sys/include/ape/sys/types.h missing_d/getaddrinfo.c \
+	/sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h \
+	regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h /sys/include/ape/string.h \
+	protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/fcntl.h /sys/include/ape/inttypes.h \
+	/sys/include/ape/stdint.h /sys/include/ape/inttypes.h /386/include/ape/float.h \
+	/sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h /sys/include/ape/stddef.h \
+	/sys/include/ape/time.h /sys/include/ape/signal.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stddef.h /sys/include/ape/stdlib.h /sys/include/ape/bsd.h \
+	/sys/include/ape/stddef.h /sys/include/ape/string.h /sys/include/ape/stddef.h \
+	/sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h /sys/include/ape/ctype.h \
+	/sys/include/ape/limits.h /sys/include/ape/assert.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h /386/include/ape/stdarg.h /sys/include/ape/stdio.h \
+	custom.h config.h awk.h custom.h config.h 
+regex.$O: regexec.c regcomp.c regex_internal.c /sys/include/ape/stdlib.h mbsupport.h \
+	/sys/include/ape/inttypes.h /sys/include/ape/stdint.h /sys/include/ape/stdbool.h \
+	/sys/include/ape/wchar.h /sys/include/ape/ctype.h /sys/include/ape/stdlib.h \
+	/sys/include/ape/wctype.h /sys/include/ape/stdio.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stdlib.h /sys/include/ape/inttypes.h /sys/include/ape/wchar.h \
+	/sys/include/ape/locale.h /sys/include/ape/string.h /sys/include/ape/stdlib.h \
+	/sys/include/ape/stdio.h /sys/include/ape/ctype.h /sys/include/ape/assert.h \
+	regex_internal.h regex.h /sys/include/ape/limits.h custom.h config.h 
+re.$O: /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h \
+	regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h /sys/include/ape/string.h \
+	protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/fcntl.h /sys/include/ape/inttypes.h \
+	/sys/include/ape/stdint.h /sys/include/ape/inttypes.h /386/include/ape/float.h \
+	/sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h /sys/include/ape/stddef.h \
+	/sys/include/ape/time.h /sys/include/ape/signal.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stddef.h /sys/include/ape/stdlib.h /sys/include/ape/bsd.h \
+	/sys/include/ape/stddef.h /sys/include/ape/string.h /sys/include/ape/stddef.h \
+	/sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h /sys/include/ape/ctype.h \
+	/sys/include/ape/limits.h /sys/include/ape/assert.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h /386/include/ape/stdarg.h /sys/include/ape/stdio.h \
+	custom.h config.h awk.h 
+profile_p.$O: /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h \
+	regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h /sys/include/ape/string.h \
+	protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/fcntl.h /sys/include/ape/inttypes.h \
+	/sys/include/ape/stdint.h /sys/include/ape/inttypes.h /386/include/ape/float.h \
+	/sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h /sys/include/ape/stddef.h \
+	/sys/include/ape/time.h /sys/include/ape/signal.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stddef.h /sys/include/ape/stdlib.h /sys/include/ape/bsd.h \
+	/sys/include/ape/stddef.h /sys/include/ape/string.h /sys/include/ape/stddef.h \
+	/sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h /sys/include/ape/ctype.h \
+	/sys/include/ape/limits.h /sys/include/ape/assert.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h /386/include/ape/stdarg.h /sys/include/ape/stdio.h \
+	custom.h config.h awk.h profile.c 
+node.$O: /386/include/ape/math.h /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h \
+	/sys/include/ape/string.h protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/sys/types.h /sys/include/ape/fcntl.h \
+	/sys/include/ape/inttypes.h /sys/include/ape/stdint.h /sys/include/ape/inttypes.h \
+	/386/include/ape/float.h /sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h \
+	/sys/include/ape/stddef.h /sys/include/ape/time.h /sys/include/ape/signal.h \
+	/386/include/ape/stdarg.h /sys/include/ape/stddef.h /sys/include/ape/stdlib.h \
+	/sys/include/ape/bsd.h /sys/include/ape/stddef.h /sys/include/ape/string.h \
+	/sys/include/ape/stddef.h /sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h \
+	/sys/include/ape/ctype.h /sys/include/ape/limits.h /sys/include/ape/assert.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/stddef.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stdio.h custom.h config.h awk.h 
+msg.$O: /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h \
+	regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h /sys/include/ape/string.h \
+	protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/fcntl.h /sys/include/ape/inttypes.h \
+	/sys/include/ape/stdint.h /sys/include/ape/inttypes.h /386/include/ape/float.h \
+	/sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h /sys/include/ape/stddef.h \
+	/sys/include/ape/time.h /sys/include/ape/signal.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stddef.h /sys/include/ape/stdlib.h /sys/include/ape/bsd.h \
+	/sys/include/ape/stddef.h /sys/include/ape/string.h /sys/include/ape/stddef.h \
+	/sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h /sys/include/ape/ctype.h \
+	/sys/include/ape/limits.h /sys/include/ape/assert.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h /386/include/ape/stdarg.h /sys/include/ape/stdio.h \
+	custom.h config.h awk.h 
+io.$O: /sys/include/ape/limits.h missing_d/getaddrinfo.h /sys/include/ape/netdb.h \
+	/sys/include/ape/arpa/inet.h /sys/include/ape/netinet/in.h /sys/include/ape/sys/socket.h \
+	/sys/include/ape/termios.h /sys/include/ape/sys/param.h /sys/include/ape/sys/wait.h \
+	dfa.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h regex.h /sys/include/ape/bsd.h \
+	/sys/include/ape/unistd.h /sys/include/ape/string.h protos.h /sys/include/ape/stdlib.h \
+	/sys/include/ape/sys/stat.h /sys/include/ape/sys/types.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/fcntl.h /sys/include/ape/inttypes.h /sys/include/ape/stdint.h \
+	/sys/include/ape/inttypes.h /386/include/ape/float.h /sys/include/ape/stdlib.h \
+	mbsupport.h /sys/include/ape/errno.h /sys/include/ape/stddef.h /sys/include/ape/time.h \
+	/sys/include/ape/signal.h /386/include/ape/stdarg.h /sys/include/ape/stddef.h \
+	/sys/include/ape/stdlib.h /sys/include/ape/bsd.h /sys/include/ape/stddef.h \
+	/sys/include/ape/string.h /sys/include/ape/stddef.h /sys/include/ape/locale.h \
+	gettext.h /sys/include/ape/setjmp.h /sys/include/ape/ctype.h /sys/include/ape/limits.h \
+	/sys/include/ape/assert.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h \
+	/386/include/ape/stdarg.h /sys/include/ape/stdio.h custom.h config.h awk.h 
+getopt1.$O: /sys/include/ape/stdio.h getopt_int.h /sys/include/ape/ctype.h getopt.h \
+	custom.h config.h 
+getopt.$O: getopt_int.h /sys/include/ape/ctype.h getopt.h gettext.h /sys/include/ape/string.h \
+	/sys/include/ape/stdio.h custom.h config.h 
+gawkmisc.$O: /sys/include/ape/fcntl.h /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h \
+	/sys/include/ape/string.h protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/sys/types.h /sys/include/ape/fcntl.h \
+	/sys/include/ape/inttypes.h /sys/include/ape/stdint.h /sys/include/ape/inttypes.h \
+	/386/include/ape/float.h /sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h \
+	/sys/include/ape/stddef.h /sys/include/ape/time.h /sys/include/ape/signal.h \
+	/386/include/ape/stdarg.h /sys/include/ape/stddef.h /sys/include/ape/stdlib.h \
+	/sys/include/ape/bsd.h /sys/include/ape/stddef.h /sys/include/ape/string.h \
+	/sys/include/ape/stddef.h /sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h \
+	/sys/include/ape/ctype.h /sys/include/ape/limits.h /sys/include/ape/assert.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/stddef.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stdio.h custom.h config.h awk.h 
+floatcomp.$O: /386/include/ape/math.h /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h \
+	/sys/include/ape/string.h protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/sys/types.h /sys/include/ape/fcntl.h \
+	/sys/include/ape/inttypes.h /sys/include/ape/stdint.h /sys/include/ape/inttypes.h \
+	/386/include/ape/float.h /sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h \
+	/sys/include/ape/stddef.h /sys/include/ape/time.h /sys/include/ape/signal.h \
+	/386/include/ape/stdarg.h /sys/include/ape/stddef.h /sys/include/ape/stdlib.h \
+	/sys/include/ape/bsd.h /sys/include/ape/stddef.h /sys/include/ape/string.h \
+	/sys/include/ape/stddef.h /sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h \
+	/sys/include/ape/ctype.h /sys/include/ape/limits.h /sys/include/ape/assert.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/stddef.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stdio.h custom.h config.h awk.h 
+field.$O: /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h \
+	regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h /sys/include/ape/string.h \
+	protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/fcntl.h /sys/include/ape/inttypes.h \
+	/sys/include/ape/stdint.h /sys/include/ape/inttypes.h /386/include/ape/float.h \
+	/sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h /sys/include/ape/stddef.h \
+	/sys/include/ape/time.h /sys/include/ape/signal.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stddef.h /sys/include/ape/stdlib.h /sys/include/ape/bsd.h \
+	/sys/include/ape/stddef.h /sys/include/ape/string.h /sys/include/ape/stddef.h \
+	/sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h /sys/include/ape/ctype.h \
+	/sys/include/ape/limits.h /sys/include/ape/assert.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h /386/include/ape/stdarg.h /sys/include/ape/stdio.h \
+	custom.h config.h awk.h 
+ext.$O: /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h \
+	regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h /sys/include/ape/string.h \
+	protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/fcntl.h /sys/include/ape/inttypes.h \
+	/sys/include/ape/stdint.h /sys/include/ape/inttypes.h /386/include/ape/float.h \
+	/sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h /sys/include/ape/stddef.h \
+	/sys/include/ape/time.h /sys/include/ape/signal.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stddef.h /sys/include/ape/stdlib.h /sys/include/ape/bsd.h \
+	/sys/include/ape/stddef.h /sys/include/ape/string.h /sys/include/ape/stddef.h \
+	/sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h /sys/include/ape/ctype.h \
+	/sys/include/ape/limits.h /sys/include/ape/assert.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h /386/include/ape/stdarg.h /sys/include/ape/stdio.h \
+	custom.h config.h awk.h 
+eval_p.$O: /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h \
+	regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h /sys/include/ape/string.h \
+	protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/fcntl.h /sys/include/ape/inttypes.h \
+	/sys/include/ape/stdint.h /sys/include/ape/inttypes.h /386/include/ape/float.h \
+	/sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h /sys/include/ape/stddef.h \
+	/sys/include/ape/time.h /sys/include/ape/signal.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stddef.h /sys/include/ape/stdlib.h /sys/include/ape/bsd.h \
+	/sys/include/ape/stddef.h /sys/include/ape/string.h /sys/include/ape/stddef.h \
+	/sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h /sys/include/ape/ctype.h \
+	/sys/include/ape/limits.h /sys/include/ape/assert.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h /386/include/ape/stdarg.h /sys/include/ape/stdio.h \
+	custom.h config.h awk.h eval.c 
+dfa.$O: /sys/include/ape/errno.h /sys/include/ape/stddef.h xalloc.h dfa.h regex.h \
+	/sys/include/ape/stdlib.h mbsupport.h gettext.h /sys/include/ape/locale.h \
+	/sys/include/ape/string.h /sys/include/ape/limits.h /sys/include/ape/stdlib.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/stdio.h /sys/include/ape/ctype.h \
+	/sys/include/ape/assert.h custom.h config.h 
+builtin.$O: floatmagic.h random.h /386/include/ape/math.h /sys/include/ape/fcntl.h \
+	/sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h \
+	regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h /sys/include/ape/string.h \
+	protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/fcntl.h /sys/include/ape/inttypes.h \
+	/sys/include/ape/stdint.h /sys/include/ape/inttypes.h /386/include/ape/float.h \
+	/sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h /sys/include/ape/stddef.h \
+	/sys/include/ape/time.h /sys/include/ape/signal.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stddef.h /sys/include/ape/stdlib.h /sys/include/ape/bsd.h \
+	/sys/include/ape/stddef.h /sys/include/ape/string.h /sys/include/ape/stddef.h \
+	/sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h /sys/include/ape/ctype.h \
+	/sys/include/ape/limits.h /sys/include/ape/assert.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h /386/include/ape/stdarg.h /sys/include/ape/stdio.h \
+	custom.h config.h awk.h 
+array.$O: /sys/include/ape/sys/wait.h dfa.h /sys/include/ape/sys/types.h /sys/include/ape/stddef.h \
+	regex.h /sys/include/ape/bsd.h /sys/include/ape/unistd.h /sys/include/ape/string.h \
+	protos.h /sys/include/ape/stdlib.h /sys/include/ape/sys/stat.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/sys/types.h /sys/include/ape/fcntl.h /sys/include/ape/inttypes.h \
+	/sys/include/ape/stdint.h /sys/include/ape/inttypes.h /386/include/ape/float.h \
+	/sys/include/ape/stdlib.h mbsupport.h /sys/include/ape/errno.h /sys/include/ape/stddef.h \
+	/sys/include/ape/time.h /sys/include/ape/signal.h /386/include/ape/stdarg.h \
+	/sys/include/ape/stddef.h /sys/include/ape/stdlib.h /sys/include/ape/bsd.h \
+	/sys/include/ape/stddef.h /sys/include/ape/string.h /sys/include/ape/stddef.h \
+	/sys/include/ape/locale.h gettext.h /sys/include/ape/setjmp.h /sys/include/ape/ctype.h \
+	/sys/include/ape/limits.h /sys/include/ape/assert.h /sys/include/ape/sys/types.h \
+	/sys/include/ape/stddef.h /386/include/ape/stdarg.h /sys/include/ape/stdio.h \
+	custom.h config.h awk.h 

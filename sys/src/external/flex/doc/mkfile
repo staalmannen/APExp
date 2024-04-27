@@ -1,0 +1,17 @@
+</$objtype/mkfile
+default:VQ:
+	;
+
+install:VQ:
+	;
+
+clean:VQ:
+	;
+
+nuke:VQ:
+	rm -f /sys/man/1ape/flex
+	;
+
+install:V:
+	cp flex.1 /sys/man/1ape/flex
+

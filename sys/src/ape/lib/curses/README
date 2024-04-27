@@ -1,0 +1,6 @@
+PDCursesMod has Plan9 support upstream. Some important differences
+with the APExp imported curses is that we know that we have additional
+dependencies (for example WCHAR shim compatibility) and we can enable
+experimental things (for example color modes).
+
+The major changes will be in the mkfiles

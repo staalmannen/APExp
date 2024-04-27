@@ -1,0 +1,26 @@
+</$objtype/mkfile
+TARG=flex
+OFILES=buf.$O ccl.$O dfa.$O ecs.$O filter.$O gen.$O main.$O misc.$O nfa.$O options.$O \
+	parse.$O regex.$O scan.$O scanflags.$O scanopt.$O skel.$O sym.$O tables.$O \
+	tables_shared.$O tblcmp.$O yylex.$O 
+BIN=/$objtype/bin/ape
+HFILES=flexdef.h 
+
+</sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS=-c -I. -I/sys/include/ape -I/$objtype/include/ape -B -D_POSIX_SOURCE -D_SUSV2_SOURCE \
+	-D_BSD_EXTENSION -DHAVE_CONFIG_H -DHAVE_ASSERT_H -DHAVE_STRCASECMP 
+
+yylex.$O: parse.h /sys/include/ape/ctype.h 
+tables.$O: tables.h 
+scanopt.$O: scanopt.h 
+scan.$O: /sys/include/ape/unistd.h parse.h /sys/include/ape/stdlib.h /sys/include/ape/errno.h \
+	/sys/include/ape/string.h /sys/include/ape/stdio.h 
+parse.$O: /sys/include/ape/stddef.h tables.h 
+options.$O: options.h 
+misc.$O: tables.h 
+main.$O: tables.h scanopt.h options.h version.h 
+gen.$O: tables.h 
+dfa.$O: tables_shared.h tables.h 

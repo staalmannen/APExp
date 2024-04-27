@@ -1,0 +1,12 @@
+These two source files should actually be used to build two libraries:
+
+libfl.a and libfl_pic.a
+
+The major difference between the two is that the second is compiled with -fPIC option. As far as I know, pcc does not accept this option anyway...
+
+Need to read up on it though.
+At the moment only libfl.a is built and if libfl_pic.a is needed the closest would probably be to copy and rename libfl.a.
+
+mkmk -s libfl -a > mkfile
+
+mkfile edited so that libfl.a is made

@@ -1,0 +1,12 @@
+# Package Information for pkg-config
+
+prefix=/sys
+exec_prefix=/386
+libdir=/386/lib/ape
+includedir=/sys/include/ape
+
+Name: libpcrecpp
+Description: PCRECPP - C++ wrapper for PCRE
+Version: 8.43-RC1
+Libs: -L${libdir} -lpcre -lpcrecpp
+Cflags: -I${includedir} -DPCRE_STATIC

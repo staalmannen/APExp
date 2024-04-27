@@ -1,0 +1,92 @@
+NOTES ON COLOR PAIR HANDLING
+
+   This is a description of the (slightly convoluted) methods used
+for maintaining the color pair table in 'color.c'.  It is of interest
+only if you are attempting to puzzle out some of the odder code in
+that file.  If you're simply using the PDCursesMod library,  the
+inner works are irrelevant to you.  You can safely treat color pair
+management as a black box.
+
+   In theory,  we can have up to 2^20 = 1048576 color pairs (if the
+default 64-bit chtypes are used).  This is limited to 4096 pairs with
+32-bit chtypes and narrow-character builds,  or 256 pairs with 32-bit
+chtypes and wide-character builds.  ncurses,  PDCurses,  and other
+curses implementations will support yet other numbers of pairs.
+
+  In practice,  it's rare for a curses/PDCursesMod program to use
+more than a few color pairs.  The 'mbrot',  'testcurs' and 'picsview'
+demos provide somewhat contrived examples of the use of hundreds or
+thousands of color pairs.
+
+   The color pair table (SP->atrtab) is dynamically reallocated to be
+the power of two greater than or equal to the highest allocated index.
+Allocate pair 37,  and it will be reallocated to have 64 entries,  plus
+an extra 'dummy' entry.  (The color palette is similarly allocated
+dynamically;  see 'pdccolor.c' in the 'common' directory.)  For almost
+all programs,  this will result in only a small allocation.
+
+   Complexities arose when the ncurses extensions alloc_pair( ),
+find_pair( ),  and free_pair( )  were added.  If alloc_pair( ) is
+called and we don't already have a pair allocated with that foreground
+and background,  we need to find an available free pair.  If no pairs
+are free (we have used all available color pairs),  the 'oldest' pair
+allocated is used.
+
+   At first,  this was done in a simple way.  Each color pair had a
+'count' (basically an 'age') parameter.  We would find a pair by
+scanning linearly through the color table.  If we didn't find one,
+we'd scan linearly for an unused pair.  If that didn't work,  and the
+color pair table was already at its maximum size,  we'd scan linearly
+for the oldest pair and use that.  You could be looking at three
+scans of a table of a million entries.
+
+   The first improvement was to add a doubly-linked list of used
+color pairs, and another one of unused ('free') color pairs.  Pair 0
+is always used and is the head node for the 'used' list;  the dummy
+entry at the end is always free and is the head node for the 'free'
+list.  So we avoid the extra bookkeeping involved with empty lists.
+
+   With this,  the dummy entry will point us to an available free node.
+The linked list of 'used' color pairs will point us to the oldest used
+pair.  So the scan for a free pair and the scan for the 'oldest' pair
+are not needed.
+
+HASH TABLE FOR FINDING PAIRS
+
+   The remaining performance issue involves find_pair( ).  We need a
+reasonably quick way,  given a foreground and background index,  to
+locate a color pair that uses that foreground and background.  (Or to
+recognize that no such pair is currently allocated.)  ncurses uses the
+tsearch/tfind/tdelete family of functions for this purpose.  However,
+this isn't necessarily available on Windows,  DOS,  and OS/2.  And it's
+arguably overkill.  The only operations we need are "do we have this pair",
+"add this pair",  and "free this pair".  We don't need to run through
+pairs in order,  or any of the other things trees would let us do.  We
+need good speed on average,  but not an upper bound per search.
+
+   So PDCursesMod maintains a hash table for this purpose.  The
+foreground and background indices are hashed using _hash_color_pair( ),
+and we then probe the hash table looking for the color pair index (if
+we're "freeing" that pair,  possibly for re-use);  or for an available
+entry (if we're setting that pair);  or for any existing color pair that
+uses that foreground and background (if we're in find_pair( )).
+
+   Hash tables are seldom used if deletions are involved,  but they can
+be (and are here).  The code uses a 'lazy deletion' scheme,
+
+https://en.wikipedia.org/wiki/Lazy_deletion
+
+   Deleted entries are set to a 'deleted' value,  which is _not_ the
+same as saying they are 'free'.  When searching for a value,  you only
+stop when running into an actually 'free' slot. In adding a value to
+the table,  a 'deleted' slot can be used.
+
+   Changing a color pair that's already been allocated therefore involves
+deleting the old pair and then allocating the new pair.  After enough
+of this,  your table will have a mix of allocated,  'deleted',  and
+'free' slots.  When less than 20% or 25% of slots are 'free',  performance
+will start to drop a bit and the table is rebuilt.
+
+   Hash table collisions are handled by probing for an available
+entry using a hybrid linear/triangular numbers scheme.  See
+https://www.projectpluto.com/hashing.htm for details.
