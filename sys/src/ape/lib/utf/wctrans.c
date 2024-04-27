@@ -1,4 +1,4 @@
-#include "../wctype.h"
+#include <wctype.h>
 #include <string.h>
 
 wctrans_t wctrans(const char *class)

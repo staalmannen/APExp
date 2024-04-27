@@ -21,7 +21,7 @@
  */
 /*	Sccsid @(#)wctype.c	1.2 (gritter) 9/28/04	*/
 
-#include "../wctype.h"
+#include <wctype.h>
 #include <string.h>
 
 #define	thistype(s)	if (strcmp((#s), property) == 0) { \

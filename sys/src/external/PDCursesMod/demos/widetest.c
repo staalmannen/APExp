@@ -23,9 +23,9 @@ int main( const int argc, const char *argv[])
 
 int main( const int argc, const char *argv[])
 {
-    const wchar_t *precomposed_string = L"\xc5ngstrom Pi\xf1" L"ata Fa\xe7"
+    const wchar_t *precomposed_string = (const wchar_t *) L"\xc5ngstrom Pi\xf1" L"ata Fa\xe7"
                L"ade \xc6sop caf\xe9 No\xebl c\xf4te (precomposed)";
-    const wchar_t *combining_string = L"A\x30angstrom\x327\x302 Pin\x303" L"ata Fac\x327"
+    const wchar_t *combining_string = (const wchar_t *) L"A\x30angstrom\x327\x302 Pin\x303" L"ata Fac\x327"
 #ifdef _WIN32
                L"ade \xc6sop cafe\x301 Noe\x308l co\x302te \xd834\xdd1e (combining)";
 #else
@@ -51,7 +51,7 @@ int main( const int argc, const char *argv[])
     mvaddstr( 8, 2, "here is that both lines should look the same.  (On some systems,");
     mvaddstr( 9, 2, "font rendering will make them not _exactly_ the same.  But they");
     mvaddstr( 10, 2, "should be recognizably similar.)");
-    mvaddwstr( 12, 2, L"One character _should_ differ.  The 'm' in '\xc5ngstrom' has a");
+    mvaddwstr( 12, 2, (const wchar_t *) L"One character _should_ differ.  The 'm' in '\xc5ngstrom' has a");
     mvaddstr( 13, 2, "cedilla and circumflex,  to test display of more than one added");
     mvaddstr( 14, 2, "combining character.  Hit a key to continue.");
     mvaddstr( 16, 2, "Also,  the 'treble clef' symbol (Unicode U+1D11E) is added to the");

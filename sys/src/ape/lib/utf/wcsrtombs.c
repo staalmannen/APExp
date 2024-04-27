@@ -1,4 +1,4 @@
-#include "../wchar.h"
+#include <wchar.h>
 
 size_t wcsrtombs(char * s, const wchar_t ** ws, size_t n, mbstate_t * st)
 {

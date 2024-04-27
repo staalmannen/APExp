@@ -293,7 +293,7 @@ int main( int argc, char **argv)
             mvaddstr( 16, 41, "Standout text");
             attroff( A_STANDOUT);
 #ifdef HAVE_WIDE
-            mvaddwstr( 3, COL1, L"'N\xf3rm\xe4\x142' text,  bu\x163 w\xee\x1e0b\xea");
+            mvaddwstr( 3, COL1, (const wchar_t *) L"'N\xf3rm\xe4\x142' text, bu\x163 w\xee\x1e0b\xea");
 #endif
             attron( A_BLINK);
             sprintf( buff, "Blink %s", on_off_text( term_attrs( ) & WA_BLINK));
@@ -313,7 +313,7 @@ int main( int argc, char **argv)
             attron( A_UNDERLINE);
 #ifdef HAVE_WIDE
             mvaddstr( 1, COL2, "Underlined");
-            addwstr( L"WideUnder");
+            addwstr( (const wchar_t *) L"WideUnder");
 #endif
 #ifdef A_ITALIC
             attrset( COLOR_PAIR( 1) | A_UNDERLINE | A_ITALIC);

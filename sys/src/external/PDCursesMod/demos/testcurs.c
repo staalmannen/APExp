@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
 #ifdef __PDCURSESMOD__
 #ifdef PDC_VER_MAJOR   /* so far only seen in 4.0+ */
-    PDC_set_resize_limits( 20, 50, 70, 200);
+//    PDC_set_resize_limits( 20, 50, 70, 200);
 #endif
 #endif
 
@@ -155,8 +155,8 @@ int main(int argc, char *argv[])
                         if( sscanf( argv[i] + 2, "%d,%d,%d,%d",
                                        &min_lines, &max_lines,
                                        &min_cols, &max_cols) == 4)
-                            PDC_set_resize_limits( min_lines, max_lines,
-                                                   min_cols, max_cols);
+//                            PDC_set_resize_limits( min_lines, max_lines,
+//                                                   min_cols, max_cols);
                     }
                     break;
 #endif
@@ -1299,7 +1299,7 @@ void acsTest(WINDOW *win)
     /* Spanish, Russian, Greek, Georgian, fullwidth, combining */
 
         tmarg += n_rows * 2;
-        mvaddwstr(tmarg, COLS / 8 - 5, L"Espa\xf1ol");
+        mvaddwstr(tmarg, COLS / 8 - 5, (const wchar_t *) L"Espa\xf1ol");
         mvaddwstr(tmarg, 3 * (COLS / 8) - 5, russian);
         mvaddwstr(tmarg, 5 * (COLS / 8) - 5, greek);
         mvaddwstr(tmarg, 7 * (COLS / 8) - 5, georgian);

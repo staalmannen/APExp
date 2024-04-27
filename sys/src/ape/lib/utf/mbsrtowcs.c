@@ -1,5 +1,5 @@
 #include <stdint.h>
-#include "../wchar.h"
+#include <wchar.h>
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>

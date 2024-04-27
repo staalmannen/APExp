@@ -52,7 +52,9 @@ OFILES=\
 	pdckbd.$O\
 	pdcscrn.$O\
 	pdcsetsc.$O\
-	pdcutil.$O
+	pdcutil.$O\
+# common\
+	pdccolor.$O
 
 HFILES=\
 	/sys/include/ape/curses.h\
@@ -67,23 +69,27 @@ UPDATE=\
 
 </sys/src/cmd/mksyslib
 
+CURSRC=../../../external/PDCursesMod
+
 CC=pcc
 LD=pcc
-CFLAGS= -c -I. -I.. -D_POSIX_SOURCE -D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION \
--DHAVE_VSNPRINTF -DHAVE_GETTIMEOFDAY
+CFLAGS= -c -I$CURSRC -I$CURSRC/plan9 -I$CURSRC/common -D_POSIX_SOURCE -D_BSD_EXTENSION \
+-D_C99_SNPRINTF_EXTENSION -DHAVE_VSNPRINTF -DHAVE_GETTIMEOFDAY -DPDC_FORCE_UTF8
 
-%.$O: ../pdcurses/%.c
-	$CC $CFLAGS ../pdcurses/$stem.c
+%.$O: $CURSRC/pdcurses/%.c
+	$CC $CFLAGS $CURSRC/pdcurses/$stem.c
 
-%.$O: %.c
-	$CC $CFLAGS $stem.c
+%.$O: $CURSRC/plan9/%.c
+	$CC $CFLAGS $CURSRC/plan9/$stem.c
 
+pdccolor.$O: $CURSRC/common/pdccolor.c
+	$CC $CFLAGS $CURSRC/common/pdccolor.c
 
 install:V:
-	cp ../curses.h /sys/include/ape/curses.h
+	cp $CURSRC/curses.h /sys/include/ape/curses.h
 	ape/patch /sys/include/ape/curses.h <header.patch
-	cp ../panel.h /sys/include/ape/panel.h
-	cp ../term.h /sys/include/ape/term.h
+	cp $CURSRC/panel.h /sys/include/ape/panel.h
+	cp $CURSRC/term.h /sys/include/ape/term.h
     cp libcurses.a /$objtype/lib/ape/libcurses.a
 
 demos:V:
@@ -96,6 +102,7 @@ clean:V:
 		mk -f mkfile_demo clean
 	}
 	rm -f *.[$OS]
+	rm -f libcurses.a
 
 nuke:V:
 	rm -f $LIB

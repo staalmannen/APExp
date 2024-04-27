@@ -27,7 +27,7 @@ HFILES=\
 
 BZSOURCE=../../../external/bzip2
 
-CFLAGS=-c -$BZSOURCE/lib -D_POSIX_SOURCE
+CFLAGS=-c -I$BZSOURCE/lib -D_POSIX_SOURCE
 
 %.$O: $BZSOURCE/lib/%.c
 	$CC $CFLAGS $BZSOURCE/lib/$stem.c

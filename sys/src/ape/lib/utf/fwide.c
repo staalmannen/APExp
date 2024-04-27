@@ -1,4 +1,4 @@
-#include "../wchar.h"
+#include <wchar.h>
 #include <stdio.h>
 
 int fwide(FILE *f, int mode)

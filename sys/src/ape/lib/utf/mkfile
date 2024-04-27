@@ -24,7 +24,7 @@ OFILES=\
 	utfrrune.$O\
 	utfrune.$O\
 	utfutf.$O\
-	/*wchar*/\
+#	/*wchar*/\
 	fwide.$O\
 	mbrlen.$O\
 	mbrtowc.$O\

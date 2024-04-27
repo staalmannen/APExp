@@ -1,4 +1,4 @@
-#include "../wchar.h"
+#include <wchar.h>
 
 int wcswidth(const wchar_t *wcs, size_t n)
 {

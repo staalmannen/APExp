@@ -1,4 +1,4 @@
-#include "../wchar.h"
+#include <wchar.h>
 
 int mbsinit(const mbstate_t *st)
 {
