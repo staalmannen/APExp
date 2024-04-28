@@ -171,7 +171,7 @@
 //#define HAVE_REALPATH 1
 
 /* Define if <signal.h> defines the SA_RESTART constant. */
-//#define HAVE_SA_RESTART 1
+#define HAVE_SA_RESTART 1
 
 /* Define to 1 if you have the `setegid' function. */
 #define HAVE_SETEGID 1

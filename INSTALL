@@ -1,0 +1,10 @@
+APExp is not meant to be copied to the file system root, but rather to be built
+from your local check out. The installed files and headers will overwrite your 
+existing APE, but you will still have your original APE source code.
+
+Copying APExp to / will lead to some problems, for example will 
+sys/src/cmd/mkfile overwrite /sys/src/cmd/mkfile, which will mess up building 
+the rest of the programs in that directory.
+
+The aim is to have a top level mkfile that handles building and installation
+(currently TODO).

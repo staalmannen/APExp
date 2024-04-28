@@ -1,7 +1,8 @@
 </$objtype/mkfile
 LIB=libsed.a$O
+#disable all wchar objects and use libwtf / libutf
 OFILES=	alloca.$O\
-		btowc.$O\
+#		btowc.$O\
 		dirname.$O\
 		error.$O\
 		exitfail.$O\
@@ -9,11 +10,11 @@ OFILES=	alloca.$O\
 		getline.$O\
 		getopt.$O\
 		getopt1.$O\
-		localcharset.$O
+		localcharset.$O\
 		lstat.$O\
-		mbrlen.$O\
-		mbrtowc.$O\
-		mbsinit.$O\
+#		mbrlen.$O\
+#		mbrtowc.$O\
+#		mbsinit.$O\
 		mkstemp.$O\
 		obstack.$O\
 		quote.$O\
@@ -25,8 +26,8 @@ OFILES=	alloca.$O\
 		strndup.$O\
 		strnlen.$O\
 		tempname.$O\
-		wcrtomb.$O\
-		wctob.$O\
+#		wcrtomb.$O\
+#		wctob.$O\
 		xmalloc.$O\
 		xstrndup.$O\
 		basename.$O\

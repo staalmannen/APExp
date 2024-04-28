@@ -1,47 +1,26 @@
 </$objtype/mkfile
-DIRS=doc 
+TARG=grep
+OFILES=pcregrep.$O 
+LIB=/$objtype/lib/ape/libpcre.a /$objtype/lib/ape/libpcreposix.a
+BIN=/$objtype/bin/ape
+HFILES=/sys/include/ape/pcre.h config.h
 
-all:V:
-	mk -f mkfile.libpcre
-	mk -f mkfile.libpcreposix
-	mk -f mkfile.pcregrep
-	mv $O.out $O.pcregrep
-	mk -f mkfile.pcretest
-	for (i in $DIRS)
-		@{ cd $i; mk }
+</sys/src/cmd/mkone
+
+PCRESRC=../../../external/pcre
+
+CC=pcc
+LD=pcc
+CFLAGS=-c -I. -I$PCRESRC -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_RESEARCH_SOURCE -D_REENTRANT_SOURCE \
+	-D_BSD_EXTENSION -D_NET_EXTENSION -D_LIMITS_EXTENSION -D_C99_SNPRINTF_EXTENSION \
+	-D_REGEXP_EXTENSION -DHAVE_SOCK_OPTS -DHAVE_CONFIG_H 
+
+pcregrep.$O: $PCRESRC/pcregrep.c
+	$CC $CFLAGS $PCRESRC/pcregrep.c
+
 
 install:V:
-	mk -f mkfile.libpcre $target
-	mk -f mkfile.libpcreposix $target
-	mk -f mkfile.pcregrep $target
-	mv $O.out $O.pcregrep
-	mk -f mkfile.pcretest $target
-	for (i in $DIRS)
-		@{ cd $i; mk $target }
-	mkdir -p /$objtype/lib/ape/pkgconfig
-	cp libpcre.pc  /$objtype/lib/ape/pkgconfig/
-	cp libpcreposix.pc  /$objtype/lib/ape/pkgconfig/
-	chmod +x pcre-config
-	cp pcre-config /rc/bin/ape
-
-clean:V:
-	mk -f mkfile.libpcre $target
-	mk -f mkfile.libpcreposix $target
-	mk -f mkfile.pcregrep $target
-	rm -f $O.pcregrep
-	mk -f mkfile.pcretest $target
-	for (i in $DIRS)
-		@{ cd $i; mk $target }
-
-nuke:V:
-	mk -f mkfile.libpcre $target
-	mk -f mkfile.libpcreposix $target
-	mk -f mkfile.pcregrep $target
-	rm -f $O.pcregrep
-	mk -f mkfile.pcretest $target
-	for (i in $DIRS)
-		@{ cd $i; mk $target }
-	rm -f /$objtype/lib/ape/pkgconfig/libpcre.pc
-	rm -f /$objtype/lib/ape/pkgconfig/libpcreposix.pc
-	rm -f /rc/bin/ape/pcre-config
+	rm -f /rc/bin/ape/grep
+	cp egrep.rc /rc/bin/ape/egrep
+	cp fgrep.rc /rc/bin/ape/fgrep
 

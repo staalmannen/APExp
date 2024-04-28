@@ -1,0 +1,12 @@
+The aim is to make a top level mkfile to handle building and installation of
+APExp. We also need to change paths to relative for things included in APExp,
+and to absolute for things pointing towards the host system source tree
+which are not included in APExp. Taken together, this should enable APExp
+to be relatively free-standing.
+
+Several 3rd party applications have been imported to replace some custom APE
+implementations of UNIX commands. Several of these are old ports, and one
+task will be to update those ports.
+
+Everything that enhances POSIX compatibility is welcome in APExp. We might
+thus integrate more 3rd party content in the future.
