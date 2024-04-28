@@ -1,0 +1,70 @@
+The "gawk" package actually builds and installs the following binaries:
+
+gawk, pgawk, igawk, dgawk - and usually a symlink "awk" to "gawk"
+The "symlink" is solved by a script in /rc/bin/gnu.
+igawk is a shell script.
+
+making multiple almost identical targets in one mkfile is not supported by the mkmk script, so a slightly different approach is used, where a manual generation of a mkfile is tried.
+
+From Makefile, one can see that 
+
+base_sources = array.c awk.h awkgram.y builtin.c custom.h dfa.c dfa.h ext.c field.c floatcomp.c floatmagic.h gawkmisc.c getopt.c getopt.h getopt1.c getopt_int.h gettext.h io.c mbsupport.h main.c msg.c node.c protos.h random.c random.h re.c regex.c regex.h replace.c version.c xalloc.h
+
+gawk_sources = $(base_sources) eval.c profile.c
+
+pdgawk_sources = $(base_sources) eval_p.c profile_p.c
+
+dgawk_sources = $(base_sources) eval_d.c profile.c cmd.h command.y debug.c
+
+==Generation of mkfiles ==
+
+fixed trailing garbage in getopt.h
+
+== master ==
+this is a custom mkfile to build all 3 destination binaries and still provide flexibility for building each binary.
+
+mk options:
+
+install:V:
+	mkdir -p /sys/lib/gnu/awk
+	cp awklib/eg/lib/*.awk /sys/lib/gnu/awk/
+	cp awklib/eg/prog/igawk.sh /rc/bin/gnu/igawk
+	chmod +x /rc/bin/gnu/igawk
+	cp gawk.rc /rc/bin/gnu/awk
+	chmod +x /rc/bin/gnu/awk
+	cp gawk.rc /rc/bin/ape/gawk
+	chmod +x /rc/bin/ape/gawk
+	mkdir -p /sys/man/1gnu
+	cp doc/gawk.1 /sys/man/1gnu/gawk
+	cp doc/igawk.1 /sys/man/1gnu/igawk
+
+nuke:V:
+	rm -rf /sys/lib/gnu/awk
+	rm -f /rc/bin/gnu/awk
+	rm -f /rc/bin/ape/gawk
+	rm -f /rc/bin/gnu/igawk
+	rm -f /sys/man/1gnu/gawk
+	rm -f /sys/man/1gnu/igawk
+
+mkfile saved as mkfile.master, which is copied to "mkfile"
+see that one for details.
+
+=== gawk ===
+
+mkmk -o gawk -I. -I/sys/include/ape -I/$objtype/include/ape -I./missing_d -DPLAN9 -DGAWK -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_C99_SNPRINTF_EXTENSION -D_BSD_EXTENSION -D_REENTRANT_SOURCE -D_EXPERIMENTAL_SOURCE -DHAVE_SOCK_OPTS -DHAVE_CONFIG_H -DGETGROUPS_NOT_STANDARD -x missing_d/getaddrinfo.c -x missing_d/usleep.c -x missing_d/setenv.c -x posix/gawkmisc.c -x awkgram.y -x command.c -x regcomp.c -x regexec.c -x regex_internal.c -x awklib -x README_d -x doc -x extension -x missing_d -x posix -x test -x eval_p.c -x profile_p.c -x eval_d.c -x command.y -x debug.c > mkfile.gawk
+
+mkfile saved as mkfile.gawk
+
+== pdgawk ==
+
+mkmk -o pdgawk -I. -I/sys/include/ape -I/$objtype/include/ape -I./missing_d -DPLAN9 -DGAWK -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_C99_SNPRINTF_EXTENSION -D_BSD_EXTENSION -D_REENTRANT_SOURCE -D_EXPERIMENTAL_SOURCE -DHAVE_SOCK_OPTS -DHAVE_CONFIG_H -DGETGROUPS_NOT_STANDARD -x missing_d/getaddrinfo.c -x missing_d/usleep.c -x missing_d/setenv.c -x posix/gawkmisc.c -x awkgram.y -x command.c -x regcomp.c -x regexec.c -x regex_internal.c -x awklib -x README_d -x doc -x extension -x missing_d -x posix -x test -x vms -x eval.c -x profile.c -x eval_d.c -x command.y -x debug.c > mkfile.pdgawk
+
+destination changed to /$objtype/bin/gnu
+mkfile saved as mkfile.pdgawk
+
+== dgawk ==
+
+mkmk -o dgawk -I. -I/sys/include/ape -I/$objtype/include/ape -I./missing_d -DPLAN9 -DGAWK -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_C99_SNPRINTF_EXTENSION -D_BSD_EXTENSION -D_REENTRANT_SOURCE -D_EXPERIMENTAL_SOURCE -DHAVE_SOCK_OPTS -DHAVE_CONFIG_H -DGETGROUPS_NOT_STANDARD -x missing_d/getaddrinfo.c -x missing_d/usleep.c -x missing_d/setenv.c -x posix/gawkmisc.c -x awkgram.y -x regcomp.c -x regexec.c -x regex_internal.c -x awklib -x .deps -x README_d -x doc -x extension -x missing_d -x posix -x test -x vms -x eval.c -x eval_p.c -x profile_p.c -x command.y > mkfile.dgawk
+
+destination changed to /$objtype/bin/gnu
+mkfile saved as mkfile.dgawk

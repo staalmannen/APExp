@@ -1,0 +1,21 @@
+</$objtype/mkfile
+LIB=/$objtype/lib/ape/libfl.a
+
+
+OFILES=	libmain.$O\
+		libyywrap.$O 
+
+</sys/src/cmd/mksyslib
+
+FLEXSRC=../../../../external/flex
+
+%.$O: $FLEXSRC/libfl/%.c
+	$CC $CFLAGS $FLEXSRC/libfl/$stem.c
+
+CC=pcc
+LD=pcc
+CFLAGS=-c 
+
+nuke:V:
+	mk clean
+	rm -f $LIB
