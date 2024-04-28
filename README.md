@@ -1,15 +1,6 @@
 # APExp
 Plan9 (9front) APE with experimental patches (a.k.a APExp)
 
-===============================
-
-***WARNING : I have recently imported lots of code (old ports) that need to 
-be integrated. Do not expect APExp to be completely buildable until this 
-warning has been removed. I will also make a release snapshot when 
-everything is done.***
-
-==============================
-
 **Abstract**
 
 
