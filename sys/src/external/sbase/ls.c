@@ -14,7 +14,7 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "utf.h"
+#include <utf.h>
 #include "util.h"
 
 struct entry {

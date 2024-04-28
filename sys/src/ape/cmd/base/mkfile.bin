@@ -1,0 +1,29 @@
+APE=/sys/src/ape
+<$APE/config
+
+LIB=libutil.a$O
+TARG=	cut\
+		ls\
+		xargs
+
+BIN=$APEBIN
+</sys/src/cmd/mkmany
+
+SBASESRC=../../../external/sbase
+
+CC=pcc
+LD=pcc
+
+CPPFLAGS =\
+	-D_DEFAULT_SOURCE \
+	-D_NETBSD_SOURCE \
+	-D_BSD_SOURCE \
+	-D_XOPEN_SOURCE=700 \
+	-D_FILE_OFFSET_BITS=64
+
+CFLAGS=-c $CPPFLAGS -I$SBASESRC -D_POSIX_SOURCE -D_BSD_EXTENSION
+
+%.$O: $SBASESRC/%.c
+	$CC $CFLAGS $SBASESRC/$stem.c
+
+

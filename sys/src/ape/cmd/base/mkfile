@@ -1,18 +1,16 @@
-APE=/sys/src/ape
-<$APE/config
+</$objtype/mkfile
+MKFILES= lib bin
 
-TARG=
+install:V:
+	for (i in $MKFILES)
+		@{ rm -f $O.*; mk -f mkfile.$i $target; rm -f $O.* }
 
-BIN=$APEBIN
-</sys/src/cmd/mkmany
+clean:V:
+	for (i in $MKFILES)
+		@{ rm -f $O.*; mk -f mkfile.$i $target; rm -f $O.* }
 
-SBASESRC=../../../external/sbase
-
-CC=pcc
-LD=pcc
-CFLAGS=-c -D_POSIX_SOURCE
-
-%.$O: $SBASESRC/%.c
-	$CC $CFLAGS $SBASESRC/$stem.c
+nuke:V:
+	for (i in $MKFILES)
+		@{ mk -f mkfile.$i $target }
 
 

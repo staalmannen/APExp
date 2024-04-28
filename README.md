@@ -72,3 +72,10 @@ sources.
 [x1] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52adaf.squirrel@mx.sdf.org/
 
 [x2] https://github.com/lufia/plan9/pulls
+
+
+
+***Post scriptum***
+The unofficial mascot of the project is the [Rabbit of Caerbannog](https://en.wikipedia.org/wiki/Rabbit_of_Caerbannog),
+which fits both with the bunny theme of Glenda and the Monty Python Holy Grail reference and "killing knights".
+
