@@ -2,15 +2,16 @@ APE=/sys/src/ape
 <$APE/config
 
 TARG=basename\
-	cut\
 	dirname\
 	kill\
 	printf\
 	uname
 
 DIRS=\
+	awk\
 	diff\
 	expr\
+	lex\
 	make\
 	patch\
 	pdksh\

@@ -1,24 +1,17 @@
 </$objtype/mkfile
-MKFILES=gawk pdgawk dgawk 
+MKFILES=gawk pdgawk dgawk
 
-all:V:
-	for (i in $MKFILES)
-		@{ rm -f $O.out; mk -f mkfile.$i; rm -f $O.out }
+GAWKSRC=../../../external/gawk
 
 install:V:
 	for (i in $MKFILES)
 		@{ rm -f $O.out; mk -f mkfile.$i $target; rm -f $O.out }
-	mkdir -p /sys/lib/gnu/awk
-	cp awklib/eg/lib/*.awk /sys/lib/gnu/awk/
-	cp awklib/eg/prog/igawk.sh /rc/bin/gnu/igawk
-	chmod +x /rc/bin/gnu/igawk
-	cp gawk.rc /rc/bin/gnu/awk
-	chmod +x /rc/bin/gnu/awk
-	cp gawk.rc /rc/bin/ape/gawk
-	chmod +x /rc/bin/ape/gawk
-	mkdir -p /sys/man/1gnu
-	cp doc/gawk.1 /sys/man/1gnu/gawk
-	cp doc/igawk.1 /sys/man/1gnu/igawk
+	mkdir -p /sys/lib/ape/awk
+	cp $GAWKSRC/eg/lib/*.awk /sys/lib/ape/awk/
+	cp $GAWKSRC/eg/prog/igawk.sh /rc/bin/ape/igawk
+	chmod +x /rc/bin/ape/igawk
+	cp $GAWKSRC/gawk.1 /sys/man/1/gawk
+	cp $GAWKSRC/igawk.1 /sys/man/1/igawk
 
 clean:V:
 	for (i in $MKFILES)
@@ -27,10 +20,8 @@ clean:V:
 nuke:V:
 	for (i in $MKFILES)
 		@{ mk -f mkfile.$i $target }
-	rm -rf /sys/lib/gnu/awk
-	rm -f /rc/bin/gnu/awk
-	rm -f /rc/bin/ape/gawk
-	rm -f /rc/bin/gnu/igawk
-	rm -f /sys/man/1gnu/gawk
-	rm -f /sys/man/1gnu/igawk
+	rm -rf /sys/lib/ape/awk
+	rm -f /rc/bin/ape/igawk
+	rm -f /sys/man/1/gawk
+	rm -f /sys/man/1/igawk
 

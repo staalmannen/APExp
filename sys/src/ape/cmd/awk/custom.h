@@ -33,52 +33,7 @@
 
 /* for Plan9 by Jens Staal */
 #ifdef PLAN9
-#define DEFPATH "/sys/lib/gnu/awk"
+#define DEFPATH "/sys/lib/ape/awk"
 #endif
 
 
-/* for VMS POSIX, from Pat Rankin, rankin@pactechdata.com */
-#ifdef VMS_POSIX
-#undef VMS
-#include "vms/redirect.h"
-#endif
-
-/* For QNX, based on submission from Michael Hunter, mphunter@qnx.com */
-#ifdef __QNX__
-#define GETPGRP_VOID	1
-#endif
-
-/* For MacOS X, which is almost BSD Unix */
-#ifdef __APPLE__
-#define HAVE_MKTIME	1
-#endif
-
-/* For ULTRIX 4.3 */
-#ifdef ultrix
-#define HAVE_MKTIME     1
-#define GETGROUPS_NOT_STANDARD	1
-#endif
-
-/* For whiny users */
-#ifdef USE_INCLUDED_STRFTIME
-#undef HAVE_STRFTIME
-#endif
-
-/* For HP/UX with gcc */
-#if defined(hpux) || defined(_HPUX_SOURCE)
-#undef HAVE_TZSET
-#define HAVE_TZSET 1
-#define _TZSET 1
-#endif
-
-/* For z/OS, from Dave Pitts */
-#ifdef ZOS_USS
-#undef HAVE_DLFCN_H
-#undef HAVE_SYS_PARAM_H
-#undef HAVE_MCHECK_H
-#undef HAVE_SETENV
-#define setenv zos_setenv
-#define unsetenv zos_unsetenv
-extern int setenv(const char *name, const char *value, int rewrite);
-extern int unsetenv(const char *name);
-#endif

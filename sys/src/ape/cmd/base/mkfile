@@ -1,0 +1,18 @@
+APE=/sys/src/ape
+<$APE/config
+
+TARG=
+
+BIN=$APEBIN
+</sys/src/cmd/mkmany
+
+SBASESRC=../../../external/sbase
+
+CC=pcc
+LD=pcc
+CFLAGS=-c -D_POSIX_SOURCE
+
+%.$O: $SBASESRC/%.c
+	$CC $CFLAGS $SBASESRC/$stem.c
+
+
