@@ -123,7 +123,7 @@ int main(int argc, char *argv[])
 
 #ifdef __PDCURSESMOD__
 #ifdef PDC_VER_MAJOR   /* so far only seen in 4.0+ */
-//    PDC_set_resize_limits( 20, 50, 70, 200);
+    PDC_set_resize_limits( 20, 50, 70, 200);
 #endif
 #endif
 
@@ -155,8 +155,8 @@ int main(int argc, char *argv[])
                         if( sscanf( argv[i] + 2, "%d,%d,%d,%d",
                                        &min_lines, &max_lines,
                                        &min_cols, &max_cols) == 4)
-//                            PDC_set_resize_limits( min_lines, max_lines,
-//                                                   min_cols, max_cols);
+                            PDC_set_resize_limits( min_lines, max_lines,
+                                                   min_cols, max_cols);
                     }
                     break;
 #endif

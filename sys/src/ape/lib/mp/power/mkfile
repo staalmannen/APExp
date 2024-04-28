@@ -11,7 +11,7 @@ SFILES=\
 
 HFILES=\
 	/sys/include/ape/mp.h\
-	../../../../libmp/port/dat.h
+	/sys/src/libmp/port/dat.h
 
 OFILES=${SFILES:%.s=%.$O}
 
@@ -21,5 +21,5 @@ UPDATE=mkfile\
 
 </sys/src/cmd/mksyslib
 
-%.$O:	../../../../libmp/power/%.s
-	$AS ../../../../libmp/power/$stem.s
+%.$O:	/sys/src/libmp/power/%.s
+	$AS /sys/src/libmp/power/$stem.s

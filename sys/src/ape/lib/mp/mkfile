@@ -33,14 +33,14 @@ everything:V:
 	}
 	rm -f */*.[$OS]
 
-test.$O: ../../../libmp/test.c /sys/include/ape/mp.h ../../../libmp/port/dat.h
-	$CC -c -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../9 -I../../../libmp/port ../../../libmp/test.c
+test.$O: /sys/src/libmp/test.c /sys/include/ape/mp.h /sys/src/libmp/port/dat.h
+	$CC -c -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../9 -I/sys/src/libmp/port /sys/src/libmp/test.c
 
 $O.test: test.$O /$objtype/lib/ape/libmp.a
 	$LD -o $O.test test.$O
 
-bigtest.$O: ../../../libmp/bigtest.c /sys/include/ape/mp.h ../../../libmp/port/dat.h
-	$CC -c -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../9 -I../../../libmp/port ../../../libmp/bigtest.c
+bigtest.$O: /sys/src/libmp/bigtest.c /sys/include/ape/mp.h /sys/src/libmp/port/dat.h
+	$CC -c -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../9 -I/sys/src/libmp/port /sys/src/libmp/bigtest.c
 
 $O.bigtest: bigtest.$O /$objtype/lib/ape/libmp.a
 	$LD -o $O.bigtest bigtest.$O

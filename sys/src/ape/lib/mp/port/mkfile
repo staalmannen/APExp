@@ -50,12 +50,12 @@ ALLOFILES=${FILES:%=%.$O}
 # cull things in the per-machine directories from this list
 OFILES=	`{rfork en; \
 	if(~ $objtype spim) objtype=mips; \
-	bind -a ../../../../libmp/$objtype ../$objtype; \
-	rc ../../../../libmp/port/reduce $O $objtype $ALLOFILES}
+	bind -a /sys/src/libmp/$objtype ../$objtype; \
+	rc /sys/src/libmp/port/reduce $O $objtype $ALLOFILES}
 
 HFILES=\
 	/sys/include/ape/mp.h\
-	../../../../libmp/port/dat.h\
+	/sys/src/libmp/port/dat.h\
 
 CFILES=${FILES:%=%.c}
 
@@ -68,5 +68,5 @@ UPDATE=\
 
 CFLAGS=-TVwc -+ -D_POSIX_SOURCE -D_PLAN9_SOURCE -I. -I../../9
 
-%.$O:	../../../../libmp/port/%.c
-	$CC $CFLAGS ../../../../libmp/port/$stem.c
+%.$O:	/sys/src/libmp/port/%.c
+	$CC $CFLAGS /sys/src/libmp/port/$stem.c

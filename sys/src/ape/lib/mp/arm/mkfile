@@ -7,7 +7,7 @@ SFILES=mpvecdigmuladd.s mpvecdigmulsub.s mpvecadd.s mpvecsub.s
 
 HFILES=\
 	/sys/include/ape/mp.h\
-	../../../../libmp/port/dat.h
+	/sys/src/libmp/port/dat.h
 
 OFILES=${SFILES:%.s=%.$O}
 
@@ -17,5 +17,5 @@ UPDATE=mkfile\
 
 </sys/src/cmd/mksyslib
 
-%.$O:	../../../../libmp/arm/%.s
-	$AS ../../../../libmp/arm/$stem.s
+%.$O:	/sys/src/libmp/arm/%.s
+	$AS /sys/src/libmp/arm/$stem.s
