@@ -24,8 +24,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#include "awk.h"
-#include "math.h"
+#include <awk.h>
+#include <math.h>
 
 static int is_ieee_magic_val(const char *val);
 static AWKNUM get_ieee_magic_val(const char *val);

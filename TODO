@@ -9,4 +9,4 @@ implementations of UNIX commands. Several of these are old ports, and one
 task will be to update those ports.
 
 Everything that enhances POSIX compatibility is welcome in APExp. We might
-thus integrate more 3rd party content in the future.
+thus integrate more 3rd party content in the future. Suggestions are welcome

@@ -51,6 +51,13 @@ In addition, several patches from @lufia [x1, x2] to build libressl and curl
 (introduces pthread, include_next cpp support, etc) has been applied to the
 sources.
 - APE make has been replaced by a port of GNU make (version 3.82)
+- APE sed has been replaced by a port of GNU sed (version 4.2.1)
+- APE grep has been replaced by pcregrep (version 8.43-RC12018-06-25 )
+- system awk has been replaced by GNU awk (version 4.0.0) as ape/awk
+- system yacc has been replaced by byacc (version 20111219) as ape/yacc
+- system lex has been replaced by flex (version 2.5.35) as ape/lex
+
+Many of these are old ports and will hopefully be replaced by more up-to-date ports soon.
 
 
 **References**
@@ -76,6 +83,7 @@ sources.
 
 
 ***Post scriptum***
+
 The unofficial mascot of the project is the [Rabbit of Caerbannog](https://en.wikipedia.org/wiki/Rabbit_of_Caerbannog),
 which fits both with the bunny theme of Glenda and the Monty Python Holy Grail reference and "killing knights".
 

@@ -7,11 +7,11 @@ install:V:
 	for (i in $MKFILES)
 		@{ rm -f $O.out; mk -f mkfile.$i $target; rm -f $O.out }
 	mkdir -p /sys/lib/ape/awk
-	cp $GAWKSRC/eg/lib/*.awk /sys/lib/ape/awk/
-	cp $GAWKSRC/eg/prog/igawk.sh /rc/bin/ape/igawk
+	cp $GAWKSRC/awklib/eg/lib/*.awk /sys/lib/ape/awk/
+	cp $GAWKSRC/awklib/eg/prog/igawk.sh /rc/bin/ape/igawk
 	chmod +x /rc/bin/ape/igawk
-	cp $GAWKSRC/gawk.1 /sys/man/1/gawk
-	cp $GAWKSRC/igawk.1 /sys/man/1/igawk
+	cp $GAWKSRC/doc/gawk.1 /sys/man/1/gawk
+	cp $GAWKSRC/doc/igawk.1 /sys/man/1/igawk
 
 clean:V:
 	for (i in $MKFILES)
