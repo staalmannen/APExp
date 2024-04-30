@@ -1,5 +1,5 @@
 </$objtype/mkfile
-MKFILES= lib bin
+MKFILES= libutil libutf bin
 
 install:V:
 	for (i in $MKFILES)

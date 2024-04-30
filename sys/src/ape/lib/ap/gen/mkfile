@@ -39,11 +39,13 @@ ALLOFILES=\
 	strcoll.$O\
 	strcpy.$O\
 	strcspn.$O\
+	strdup.$O\
 	strftime.$O\
 	strlen.$O\
 	strncat.$O\
 	strncmp.$O\
 	strncpy.$O\
+	strndup.$O\
 	strnlen.$O\
 	strpbrk.$O\
 	strrchr.$O\
@@ -57,7 +59,6 @@ ALLOFILES=\
 	strtoull.$O\
 	strxfrm.$O\
 	toupper.$O\
-	strdup.$O\
 
 # cull things in the per-machine directories from this list
 OFILES=	`{rc ./reduce $O $objtype $ALLOFILES}

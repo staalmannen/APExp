@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "text.h"
-#include <utf.h>
+#include "utf.h"
 #include "util.h"
 
 typedef struct Range {
