@@ -25,6 +25,7 @@ OFILES=\
 	getservbyname.$O\
 	getsockname.$O\
 	gettimeofday.$O\
+	gnu_getopt.$O\
 	in6_addr.$O\
 	inet_addr.$O\
 	inet_aton.$O\

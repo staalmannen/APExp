@@ -1,0 +1,21 @@
+APE=/sys/src/ape
+<$APE/config
+
+LIB=/$objtype/lib/ape/libintl.a
+
+OFILES=\
+	libintl.O$
+
+</sys/src/cmd/mksyslib
+
+GETTEXTSRC=../../../external/gettext-tiny
+
+CFLAGS=-c -IGETTEXTSRC -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_BSD_EXTENSION
+
+install:V:
+	cp GETTEXTSRC/include/libintl.h /sys/include/ape/
+
+%.$O: $GETTEXTSRC/libintl/%.c
+	$CC $CFLAGS $GETTEXTSRC/libintl/$stem.c
+
+

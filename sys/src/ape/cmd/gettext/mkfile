@@ -1,0 +1,38 @@
+</$objtype/mkfile
+TARG=	msgfmt\
+		msgmerge
+
+PARSEROBJS =	poparser.$O\
+				StringEscape.$O
+
+LIB=/$objtype/lib/ape/libintl.a
+BIN=/$objtype/bin/ape
+HFILES=/sys/include/ape/libintl.h
+
+</sys/src/cmd/mkmany
+
+GETTEXTSRC=../../../external/gettext-tiny
+
+CC=pcc
+LD=pcc
+CFLAGS=-c -I$GETTEXTSRC/src -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_BSD_EXTENSION
+
+%.$O: $GETTEXTSRC/src/%.c
+	$CC $CFLAGS $GETTEXTSRC/src/$stem.c
+
+$O.msgfmt:V: msgfmt.$O $PARSEROBJS
+	$LD -o $target $prereq
+
+$O.msgmerge:V: msgfmt.$O $PARSEROBJS
+	$LD -o $target $prereq
+
+install:V:
+	cp $GETTEXTSRC/src/xgettext.sh /rc/bin/ape/xgettext
+	chmod +x /rc/bin/ape/xgettext
+	cat $GETTEXTSRC/src/autopoint.in | sed 's,@datadir@,/sys/lib/ape,' > /rc/bin/ape/autopoint
+	chmod +x /rc/bin/ape/autopoint
+	mkdir -p /sys/lib/ape/m4
+	dircp $GETTEXTSRC/m4 /sys/lib/ape/m4
+	mkdir -p /sys/lib/ape/data
+	dircp $GETTEXTSRC/data /sys/lib/ape/data
+
