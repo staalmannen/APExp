@@ -1,9 +1,16 @@
 </$objtype/mkfile
-MKFILES= libutil libutf bin
+LIBMKFILES= libutil libutf
+MKFILES= $LIBMKFILES bin
+
+default:V:
+	for (i in $LIBMKFILES)
+		@{ mk -f mkfile.$i }
+	mk -f mkfile.bin all
 
 install:V:
-	for (i in $MKFILES)
-		@{ rm -f $O.*; mk -f mkfile.$i $target; rm -f $O.* }
+	for (i in $LIBMKFILES)
+		@{ mk -f mkfile.$i }
+	mk -f mkfile.bin install
 
 clean:V:
 	for (i in $MKFILES)

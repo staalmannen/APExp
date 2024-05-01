@@ -1,5 +1,5 @@
 </$objtype/mkfile
-TARG=grep
+TARG=pcregrep
 OFILES=pcregrep.$O 
 LIB=/$objtype/lib/ape/libpcre.a /$objtype/lib/ape/libpcreposix.a
 BIN=/$objtype/bin/ape
@@ -19,8 +19,4 @@ pcregrep.$O: $PCRESRC/pcregrep.c
 	$CC $CFLAGS $PCRESRC/pcregrep.c
 
 
-install:V:
-	rm -f /rc/bin/ape/grep
-	cp egrep.rc /rc/bin/ape/egrep
-	cp fgrep.rc /rc/bin/ape/fgrep
 

@@ -81,6 +81,7 @@ extern int fclose(FILE *);
 extern int fflush(FILE *);
 extern FILE *fopen(const char *, const char *);
 extern FILE *freopen(const char *, const char *, FILE *);
+extern FILE *fmemopen(void *, size_t, const char *);
 extern void setbuf(FILE *, char *);
 extern int setvbuf(FILE *, char *, int, size_t);
 extern int fprintf(FILE *, const char *, ...);

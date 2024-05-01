@@ -3,10 +3,17 @@ APE=/sys/src/ape
 
 LIB=libutil.a$O libutf.a$O
 TARG=	cut\
+		false\
+#		find\
+		grep\
 		ls\
-		xargs
+		true\
+		tsort\
+#		which\
+		xargs\
+		yes
 
-BIN=$APEBIN
+BIN=/$objtype/bin/ape
 </sys/src/cmd/mkmany
 
 SBASESRC=../../../external/sbase
@@ -21,10 +28,28 @@ CPPFLAGS =\
 	-D_XOPEN_SOURCE=700 \
 	-D_FILE_OFFSET_BITS=64
 
-CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil -D_POSIX_SOURCE -D_BSD_EXTENSION \
+CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil -I$SBASESRC/../gnulib -D_POSIX_SOURCE -D_BSD_EXTENSION \
 		-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE -DS_ISVTX=S_IROTH -DS_ISSOCK=S_ISFIFO 
 
 %.$O: $SBASESRC/%.c
 	$CC $CFLAGS $SBASESRC/$stem.c
 
-
+install:V:
+	mk -f mkfile.bin all
+	for (i in $TARG)
+		@{ cp $O.$i $BIN/$i }
+	cp $SBASESRC/cut.1 /sys/man/1/cut
+	cp $SBASESRC/false.1 /sys/man/1/false
+	cp $SBASESRC/find.1 /sys/man/1/find
+	cp $SBASESRC/true.1 /sys/man/1/true
+	cp $SBASESRC/tsort.1 /sys/man/1/tsort
+	cp $SBASESRC/which.1 /sys/man/1/which
+	cp $SBASESRC/xargs.1 /sys/man/1/xargs
+	cp $SBASESRC/yes.1 /sys/man/1/yes
+	mkdir -p /sys/man/1ape
+	cp $SBASESRC/ls.1 /sys/man/1ape/ls
+	rm -f /rc/bin/ape/ls
+	cp $SBASESRC/grep.1 /sys/man/1ape/grep
+	rm -f /rc/bin/ape/grep
+	cp egrep.rc /rc/bin/ape/egrep
+	cp fgrep.rc /rc/bin/ape/fgrep

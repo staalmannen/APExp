@@ -19,6 +19,7 @@ OFILES=\
 	fgetpos.$O\
 	fgets.$O\
 	fileno.$O\
+	fmemopen.$O\
 	fopen.$O\
 	fprintf.$O\
 	fputc.$O\
