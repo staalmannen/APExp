@@ -7,8 +7,7 @@ Here's a brief description of the status of these commands.
 
 EXECUTION ENVIRONMENT UTILITIES
 
-awk	Plan 9 awk.
-	system() uses rc instead of sh.
+awk	Plan 9 awk replaced by GNU awk (gawk)
 
 basename POSIX conforming
 
@@ -46,7 +45,7 @@ cp	Plan 9 cp.
 	no -R and -r (recursive), -i (interactive), -p (preserve) options
 	nonstandard -z option
 
-cut	not implemented
+cut	ported from sbase
 
 date	Plan 9 date.
 	no format option
@@ -70,7 +69,7 @@ env	not implemented
 
 expr	V10 expr (seems to be like POSIX)
 
-false	POSIX conforming
+false	POSIX conforming, from sbase
 
 find	not implemented
 
@@ -80,9 +79,7 @@ getconf	not implemented
 
 getopts	not implemented
 
-grep	script calling Plan 9 grep -G
-	s means q, should mean forget nonexistent files
-	nonstandard 1,b,L,q options
+grep 	from sbase
 
 head	not implemented
 
@@ -127,7 +124,7 @@ pax	implemented
 
 pr	Plan 9 pr
 
-printf	not implemented
+printf	POSIX compliant
 
 pwd	Plan 9 pwd
 
@@ -138,7 +135,7 @@ rm	Plan 9 rm
 rmdir	script
 	no -p option
 
-sed	v10 sed
+sed	replaced by GNU sed
 
 sh	ksh93 -- POSIX compliant
 
@@ -166,7 +163,7 @@ SOFTWARE DEVELOPMENT UTILITIES (OPTIONAL)
 
 ar	script to call Plan9 ar, after arg conversion
 
-make	V10 make
+make	replaced by GNU make
 
 strip	not implemented
 
@@ -174,9 +171,9 @@ C LANGUAGE DEVELOPMENT UTILITIES OPTION
 
 c89	script to APE environment cc (also avaiable as cc)
 
-lex	Plan 9 lex
+lex		Plan 9 lex replaced by Flex
 
-yacc	script to Plan 9 yacc
+yacc	Plan 9 yacc replaced by byacc
 
 General Bugs:
 The environment variables LANG, LC_ALL,

@@ -1,26 +1,23 @@
 APE=/sys/src/ape
 <$APE/config
 
-TARG=basename\
-	dirname\
-	kill\
-	printf\
-	uname
-
 DIRS=\
 	awk\
+	base\
 	diff\
 	expr\
+#	gettext\
 	lex\
 	make\
 	patch\
+	pax\
+	pcregrep\
 	pdksh\
 	sed\
+	yacc
 
 BIN=$APEBIN
 </sys/src/cmd/mkmany
-
-CFLAGS=-c -D_POSIX_SOURCE
 
 all:V:	$DIRS
 
@@ -46,8 +43,4 @@ $DIRS:V:
 		mk all
 	}
 
-$BIN/%: %.rc
-	cp -x $stem.rc $BIN/$stem
-
-install.rc:V: $BIN/psh
 

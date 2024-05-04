@@ -36,10 +36,7 @@ OFILES=	concat.$O\
 		strsep.$O\
 		strtonum.$O\
 		unescape.$O\
-		writeall.$O\
-#	from gnulib\
-		getline.$O\
-		getdelim.$O
+		writeall.$O
 
 </sys/src/cmd/mklib
 
@@ -60,9 +57,6 @@ CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil -D_POSIX_SOURCE -D_BSD_EXTEN
 
 %.$O: $SBASESRC/libutil/%.c
 	$CC $CFLAGS $SBASESRC/libutil/$stem.c
-
-%.$O: $SBASESRC/../gnulib/%.c
-	$CC $CFLAGS $SBASESRC/../gnulib/$stem.c
 
 nuke:V:
 	mk clean

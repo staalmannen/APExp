@@ -20,6 +20,8 @@ OFILES=\
 	fgets.$O\
 	fileno.$O\
 	fmemopen.$O\
+	getdelim.$O\
+	getline.$O\
 	fopen.$O\
 	fprintf.$O\
 	fputc.$O\

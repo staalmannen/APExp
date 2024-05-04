@@ -81,7 +81,9 @@ extern int fclose(FILE *);
 extern int fflush(FILE *);
 extern FILE *fopen(const char *, const char *);
 extern FILE *freopen(const char *, const char *, FILE *);
-extern FILE *fmemopen(void *, size_t, const char *);
+extern FILE *fmemopen(void *, size_t, const char *); /*added from ... */
+extern ssize_t getdelim(char **restrict, size_t *restrict, int, FILE *restrict); /* from gnulib */
+extern ssize_t getline (char **restrict, size_t *restrict, FILE *restrict); /* from gnulib */
 extern void setbuf(FILE *, char *);
 extern int setvbuf(FILE *, char *, int, size_t);
 extern int fprintf(FILE *, const char *, ...);

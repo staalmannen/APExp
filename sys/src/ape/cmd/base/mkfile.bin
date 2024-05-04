@@ -2,7 +2,15 @@ APE=/sys/src/ape
 <$APE/config
 
 LIB=libutil.a$O libutf.a$O
-TARG=	cut\
+TARG= \
+# APE\
+		basename\
+		dirname\
+		kill\
+		printf\
+		uname\
+# sbase\
+		cut\
 		false\
 #		find\
 		grep\
@@ -21,6 +29,8 @@ SBASESRC=../../../external/sbase
 CC=pcc
 LD=pcc
 
+CFLAGS=-c -D_POSIX_SOURCE
+
 CPPFLAGS =\
 	-D_DEFAULT_SOURCE \
 	-D_NETBSD_SOURCE \
@@ -28,11 +38,14 @@ CPPFLAGS =\
 	-D_XOPEN_SOURCE=700 \
 	-D_FILE_OFFSET_BITS=64
 
-CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil -I$SBASESRC/../gnulib -D_POSIX_SOURCE -D_BSD_EXTENSION \
+SBASE_CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil -I$SBASESRC/../gnulib -D_POSIX_SOURCE -D_BSD_EXTENSION \
 		-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE -DS_ISVTX=S_IROTH -DS_ISSOCK=S_ISFIFO 
 
 %.$O: $SBASESRC/%.c
-	$CC $CFLAGS $SBASESRC/$stem.c
+	$CC $SBASE_CFLAGS $SBASESRC/$stem.c
+
+%.$O: %.c
+	$CC $CFLAGS $stem.c
 
 install:V:
 	mk -f mkfile.bin all
@@ -53,3 +66,5 @@ install:V:
 	rm -f /rc/bin/ape/grep
 	cp egrep.rc /rc/bin/ape/egrep
 	cp fgrep.rc /rc/bin/ape/fgrep
+	cp psh.rc /rc/bin/ape/psh
+	chmod +x /rc/bin/ape/*
