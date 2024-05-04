@@ -1,0 +1,26 @@
+</$objtype/mkfile
+LIB=/$objtype/lib/ape/libiconv.a
+
+OFILES=	\
+# lib\
+		iconv.$O\
+
+</sys/src/cmd/mksyslib
+
+ICONVSRC=../../../external/libiconv
+
+CC=pcc
+LD=pcc
+CFLAGS=-c -I. -I$ICONVSRC/lib \
+		-D_POSIX_SOURCE -DPLAN9
+
+%.$O: $ICONVSRC/lib/%.c
+	$CC $CFLAGS $ICONVSRC/lib/$stem.c
+
+install:V:
+	cp iconv.h /sys/include/ape/
+
+nuke:V:
+	mk clean
+	rm -f $LIB
+
