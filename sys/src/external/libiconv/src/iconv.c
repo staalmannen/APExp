@@ -8,7 +8,7 @@
 
 #include <dirent.h>
 #include <fcntl.h>
-#include <sys/mman.h>
+//#include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdint.h>
@@ -98,8 +98,8 @@ static int find_charmap(const char *name)
 
 static int find_charset(const char *name)
 {
-	const unsigned char *s;
-	for (s=charsets; *s<0xff && strcasecmp(s+1, name); s+=strlen(s)+1);
+	const char *s;
+	for (s= (const char *) charsets; *s<0xff && strcasecmp(s+1, name); s+=strlen(s)+1);
 	return *s;
 }
 
@@ -125,7 +125,7 @@ int iconv_close(iconv_t cd)
 	return 0;
 }
 
-static inline wchar_t get_16(const unsigned char *s, int endian)
+static inline wchar_t get_16(char *s, int endian)
 {
 	endian &= 1;
 	return s[endian]<<8 | s[endian^1];
@@ -205,7 +205,7 @@ static inline int utf8seq_is_illegal(char *s, int n)
 	        (*(s+2) >= 0xBE) && (*(s+2) <= 0xBF));
 }
 
-static inline int utf8dec_wchar(wchar_t *c, unsigned char *in, size_t inb)
+static inline int utf8dec_wchar(wchar_t *c, char *in, size_t inb)
 {
 	int i;
 	int n = -1;
@@ -371,7 +371,7 @@ size_t iconv(iconv_t cd, char **in, size_t *inb, char **out, size_t *outb)
 			default:
 				goto badf;
 			}
-			c = get_16(map + 4 + 2*c, 0);
+			c = get_16( (char *) map + 4 + 2*c, 0);
 			if (c == 0xffff) goto ilseq;
 			goto charok;
 		}
@@ -413,14 +413,14 @@ charok:
 		case UTF_16LE:
 			if (c < 0x10000) {
 				if (*outb < 2) goto toobig;
-				put_16(*out, c, to);
+				put_16((unsigned char *) out, c, to);
 				*out += 2;
 				*outb -= 2;
 				break;
 			}
 			if (*outb < 4) goto toobig;
-			put_16(*out, (c>>10)|0xd800, to);
-			put_16(*out + 2, (c&0x3ff)|0xdc00, to);
+			put_16((unsigned char *) out, (c>>10)|0xd800, to);
+			put_16((unsigned char *) out + 2, (c&0x3ff)|0xdc00, to);
 			*out += 4;
 			*outb -= 4;
 			break;

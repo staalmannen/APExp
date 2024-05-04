@@ -7,20 +7,26 @@ OFILES=	\
 
 </sys/src/cmd/mksyslib
 
-ICONVSRC=../../../external/libiconv
+ICONVSRC=../../../external/libiconv/src
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I. -I$ICONVSRC/lib \
+CFLAGS=-c -I. -I$ICONVSRC/lib -DEILSEQ=68 \
 		-D_POSIX_SOURCE -DPLAN9
 
-%.$O: $ICONVSRC/lib/%.c
-	$CC $CFLAGS $ICONVSRC/lib/$stem.c
+%.$O: $ICONVSRC/%.c
+	$CC $CFLAGS $ICONVSRC/$stem.c
 
 install:V:
 	cp iconv.h /sys/include/ape/
+	cp charmaps.h /sys/include/ape/
+	mkdir -p /sys/include/ape/charmaps
+	dircp $ICONVSRC/include/charmaps /sys/include/ape/charmaps
 
 nuke:V:
 	mk clean
 	rm -f $LIB
+	rm /sys/include/ape/iconv.h
+	rm /sys/include/ape/charmaps.h
+	rm -rf /sys/include/ape/charmaps
 
