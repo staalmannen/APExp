@@ -31,7 +31,8 @@ install:V:
 	cp $O.msgfmt $BIN/msgfmt
 	cp $O.msgmerge $BIN/msgmerge
 	cp $GETTEXTSRC/src/xgettext.sh /rc/bin/ape/xgettext
-	chmod +x /rc/bin/ape/xgettext
+	cat $GETTEXTSRC/src/autopoint.in | sed 's,@datadir@,/sys/lib/ape,' > /rc/bin/ape/autopoint
+	chmod +x /rc/bin/ape/*
 	mkdir -p /sys/lib/ape/m4
 	dircp $GETTEXTSRC/m4 /sys/lib/ape/m4
 	mkdir -p /sys/lib/ape/data

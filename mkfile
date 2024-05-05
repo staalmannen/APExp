@@ -22,7 +22,7 @@ all:V:
 
 install:V:
 	for (i in $_ARCHS)
-		@{ cp $i/*.h /$i/ }
+		@{ cp $i/include/ape/*.h /$i/include/ape/ }
 	dircp sys/include/ape /sys/include/ape
 	dircp rc/bin/ape /rc/bin/ape
 	for (i in $DIRS)
