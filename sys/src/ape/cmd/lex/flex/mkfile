@@ -3,7 +3,9 @@ TARG=lex
 BIN=/$objtype/bin/ape
 LIB=/$objtype/lib/ape/libfl.a
 
-OFILES=	buf.$O\
+OFILES=	\
+	#src\
+		buf.$O\
 		ccl.$O\
 		dfa.$O\
 		ecs.$O\
@@ -23,19 +25,24 @@ OFILES=	buf.$O\
 		tables.$O\
 		tables_shared.$O\
 		tblcmp.$O\
-		yylex.$O
-
+		yylex.$O\
+	#lib\
+		malloc.$O\
+		realloc.$O
 
 
 </sys/src/cmd/mkone
 
 FLEXSRC=../../../../external/flex
 
-%.$O: $FLEXSRC/flex/%.c
-	$CC $CFLAGS $FLEXSRC/flex/$stem.c
+%.$O: $FLEXSRC/src/%.c
+	$CC $CFLAGS $FLEXSRC/src/$stem.c
+
+%.$O: $FLEXSRC/lib/%.c
+	$CC $CFLAGS $FLEXSRC/lib/$stem.c
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I. -I$FLEXSRC/flex -B -D_POSIX_SOURCE -D_SUSV2_SOURCE \
-	-D_BSD_EXTENSION -DHAVE_CONFIG_H -DHAVE_ASSERT_H -DHAVE_STRCASECMP 
+CFLAGS=-c -I. -I$FLEXSRC/flex/src -B -D_POSIX_SOURCE -D_SUSV2_SOURCE \
+	-D_BSD_EXTENSION -DHAVE_CONFIG_H 
 

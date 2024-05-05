@@ -24,13 +24,13 @@
 #define PACKAGE_NAME "the fast lexical analyser generator"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "the fast lexical analyser generator 2.5.35"
+#define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "flex"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "2.5.35"
+#define PACKAGE_VERSION "2.6.4"
 
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be
@@ -41,7 +41,7 @@
 /* #undef STACK_DIRECTION */
 
 /* Version number of package */
-#define VERSION "2.5.35"
+#define VERSION "2.6.4"
 
 /* Define to 1 if `lex' declares `yytext' as a `char *' by default, not a
    `char[]'. */

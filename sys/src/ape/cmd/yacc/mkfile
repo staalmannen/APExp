@@ -2,6 +2,7 @@
 TARG=yacc
 BIN=/$objtype/bin/ape
 HFILES=config.h
+LIB=/$objtype/lib/ape/libap.a /$objtype/lib/ape/libutf.a
 OFILES=	closure.$O\
 		error.$O\
 		graph.$O\

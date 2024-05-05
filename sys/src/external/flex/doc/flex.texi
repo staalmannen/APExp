@@ -1,8 +1,8 @@
 \input texinfo.tex @c -*-texinfo-*-
 @c %**start of header
 @setfilename flex.info
-@settitle Lexical Analysis With Flex
 @include version.texi
+@settitle Lexical Analysis With Flex, for Flex @value{VERSION}
 @set authors Vern Paxson, Will Estes and John Millaway
 @c  "Macro Hooks" index
 @defindex hk
@@ -19,8 +19,8 @@
 The flex manual is placed under the same licensing conditions as the
 rest of flex:
 
-Copyright @copyright{} 2001, 2002, 2003, 2004, 2005, 2006, 2007 The Flex
-Project.
+Copyright @copyright{} 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2012
+The Flex Project.
 
 Copyright @copyright{} 1990, 1997 The Regents of the University of California.
 All rights reserved.
@@ -58,7 +58,7 @@ PURPOSE.
 @end copying
 
 @titlepage
-@title @value{title}
+@title Lexical Analysis with Flex
 @subtitle Edition @value{EDITION}, @value{UPDATED}
 @author @value{authors}
 @page
@@ -296,8 +296,7 @@ Indices
 @cindex reporting bugs
 
 If you find a bug in @code{flex}, please report it using
-the SourceForge Bug Tracking facilities which can be found on
-@url{http://sourceforge.net/projects/flex,flex's SourceForge Page}.
+GitHub's issue tracking facility at @url{https://github.com/westes/flex/issues/}
 
 @node Introduction, Simple Examples, Reporting Bugs, Top
 @chapter Introduction
@@ -354,7 +353,8 @@ Here's another simple example:
     .       ++num_chars;
 
     %%
-    main()
+
+    int main()
             {
             yylex();
             printf( "# of lines = %d, # of chars = %d\n",
@@ -382,7 +382,7 @@ A somewhat more complicated example:
 
     %{
     /* need this for the call to atof() below */
-    #include math.h>
+    #include <math.h>
     %}
 
     DIGIT    [0-9]
@@ -408,7 +408,7 @@ A somewhat more complicated example:
 
     "+"|"-"|"*"|"/"   printf( "An operator: %s\n", yytext );
 
-    "{"[\^{}}\n]*"}"     /* eat up one-line comments */
+    "{"[^{}\n]*"}"     /* eat up one-line comments */
 
     [ \t\n]+          /* eat up whitespace */
 
@@ -416,9 +416,7 @@ A somewhat more complicated example:
 
     %%
 
-    main( argc, argv )
-    int argc;
-    char **argv;
+    int main( int argc, char **argv )
         {
         ++argv, --argc;  /* skip over program name */
         if ( argc > 0 )
@@ -896,7 +894,7 @@ And to match a sequence of zero or more repetitions of @samp{foo} and
 @cindex character classes in patterns
 In addition to characters and ranges of characters, character classes
 can also contain @dfn{character class expressions}.  These are
-expressions enclosed inside @samp{[}: and @samp{:]} delimiters (which
+expressions enclosed inside @samp{[:} and @samp{:]} delimiters (which
 themselves must appear between the @samp{[} and @samp{]} of the
 character class. Other elements may occur inside the character class,
 too).  The valid expressions are:
@@ -1405,7 +1403,7 @@ example, the following is one way to eat up C comments:
 @verbatim
     %%
     "/*"        {
-                register int c;
+                int c;
 
                 for ( ; ; )
                     {
@@ -1439,12 +1437,12 @@ avoid a name clash with the @code{C++} stream by the name of
 @code{input}.)
 
 @cindex flushing the internal buffer
-@cindex YY_FLUSH_BUFFER()
-@code{YY_FLUSH_BUFFER()} flushes the scanner's internal buffer so that
+@cindex YY_FLUSH_BUFFER
+@code{YY_FLUSH_BUFFER;} flushes the scanner's internal buffer so that
 the next time the scanner attempts to match a token, it will first
 refill the buffer using @code{YY_INPUT()} (@pxref{Generated Scanner}).
 This action is a special case of the more general
-@code{yy_flush_buffer()} function, described below (@pxref{Multiple
+@code{yy_flush_buffer;} function, described below (@pxref{Multiple
 Input Buffers})
 
 @cindex yyterminate()
@@ -1493,15 +1491,14 @@ the scanning routine using a K&R-style/non-prototyped function
 declaration, you must terminate the definition with a semi-colon (;).
 
 @code{flex} generates @samp{C99} function definitions by
-default. However flex does have the ability to generate obsolete, er,
-@samp{traditional}, function definitions. This is to support
+default. Flex used to have the ability to generate obsolete, er,
+@samp{traditional}, function definitions. This was to support
 bootstrapping gcc on old systems.  Unfortunately, traditional
 definitions prevent us from using any standard data types smaller than
-int (such as short, char, or bool) as function arguments.  For this
-reason, future versions of @code{flex} may generate standard C99 code
-only, leaving K&R-style functions to the historians.  Currently, if you
-do @strong{not} want @samp{C99} definitions, then you must use 
-@code{%option noansi-definitions}.
+int (such as short, char, or bool) as function arguments.  Furthermore,
+traditional definitions support added extra complexity in the skeleton file.
+For this reason, current versions of @code{flex} generate standard C99 code
+only, leaving K&R-style functions to the historians.
 
 @cindex stdin, default for yyin
 @cindex yyin
@@ -1576,8 +1573,8 @@ condition remains unchanged; it does @emph{not} revert to
 @code{INITIAL}.
 
 @cindex yywrap, default for
-@cindex nowrap, %option
-@cindex %option nowrap
+@cindex noyywrap, %option
+@cindex %option noyywrapp
 If you do not supply your own version of @code{yywrap()}, then you must
 either use @code{%option noyywrap} (in which case the scanner behaves as
 though @code{yywrap()} returned 1), or you must link with @samp{-lfl} to
@@ -1602,7 +1599,6 @@ Any rule whose pattern is prefixed with @samp{<sc>} will only be active
 when the scanner is in the @dfn{start condition} named @code{sc}.  For
 example,
 
-@c proofread edit stopped here
 @example
 @verbatim
     <STRING>[^"]*        { /* eat up the string body ... */
@@ -1757,7 +1753,7 @@ treat it as a single token, the floating-point number @samp{123.456}:
     %%
     expect-floats        BEGIN(expect);
 
-    <expect>[0-9]+@samp{.}[0-9]+      {
+    <expect>[0-9]+.[0-9]+      {
                 printf( "found a float, = %f\n",
                         atof( yytext ) );
                 }
@@ -1935,9 +1931,9 @@ condition @dfn{scope}.  A start condition scope is begun with:
 @end verbatim
 @end example
 
-where @code{SCs} is a list of one or more start conditions.  Inside the
+where @code{<SCs>} is a list of one or more start conditions.  Inside the
 start condition scope, every rule automatically has the prefix
-@code{SCs>} applied to it, until a @samp{@}} which matches the initial
+@code{<SCs>} applied to it, until a @samp{@}} which matches the initial
 @samp{@{}.  So, for example,
 
 @cindex extended scope of start conditions
@@ -2186,7 +2182,7 @@ manages its own input buffer stack manually (instead of letting flex do it).
             }
 
     <<EOF>> {
-            if ( --include_stack_ptr  0 )
+            if ( --include_stack_ptr == 0 )
                 {
                 yyterminate();
                 }
@@ -2863,19 +2859,13 @@ calls @code{yylex()} again).
 @opindex ---option-ansi-definitions
 @opindex ansi-definitions
 @item --ansi-definitions, @code{%option ansi-definitions}
-instruct flex to generate ANSI C99 definitions for functions.
-This option is enabled by default.
-If @code{%option noansi-definitions} is specified, then the obsolete style
-is generated.
+Deprecated, ignored
 
 @anchor{option-ansi-prototypes}
 @opindex ---option-ansi-prototypes
 @opindex ansi-prototypes
 @item --ansi-prototypes, @code{%option ansi-prototypes}
-instructs flex to generate ANSI C99 prototypes for functions. 
-This option is enabled by default.
-If @code{noansi-prototypes} is specified, then
-prototypes will have empty parameter lists.
+Deprecated, ignored
 
 @anchor{option-bison-bridge}
 @opindex ---bison-bridge
@@ -3402,7 +3392,7 @@ which degrade performance.  These are, from most expensive to least:
     %option interactive
     %option always-interactive
 
-    @samp{^} beginning-of-line operator
+    ^ beginning-of-line operator
     yymore()
 @end verbatim
 @end example
@@ -3766,8 +3756,7 @@ defaults to generating the scanner to the file @file{lex.yy.cc} instead
 of @file{lex.yy.c}.  The generated scanner includes the header file
 @file{FlexLexer.h}, which defines the interface to two C++ classes.
 
-The first class,
-@code{FlexLexer},
+The first class in @file{FlexLexer.h}, @code{FlexLexer},
 provides an abstract base class defining the general scanner class
 interface.  It provides the following member functions:
 
@@ -3801,10 +3790,10 @@ returns the current setting of the debugging flag.
 
 Also provided are member functions equivalent to
 @code{yy_switch_to_buffer()}, @code{yy_create_buffer()} (though the
-first argument is an @code{istream*} object pointer and not a
+first argument is an @code{istream&} object reference and not a
 @code{FILE*)}, @code{yy_flush_buffer()}, @code{yy_delete_buffer()}, and
-@code{yyrestart()} (again, the first argument is a @code{istream*}
-object pointer).
+@code{yyrestart()} (again, the first argument is a @code{istream&}
+object reference).
 
 @tindex yyFlexLexer (C++ only)
 @tindex FlexLexer (C++ only)
@@ -3815,9 +3804,12 @@ additional member functions:
 @table @code
 @findex yyFlexLexer constructor (C++ only)
 @item yyFlexLexer( istream* arg_yyin = 0, ostream* arg_yyout = 0 )
+@item yyFlexLexer( istream& arg_yyin, ostream& arg_yyout )
 constructs a @code{yyFlexLexer} object using the given streams for input
 and output.  If not specified, the streams default to @code{cin} and
-@code{cout}, respectively.
+@code{cout}, respectively.  @code{yyFlexLexer} does not take ownership of
+its stream arguments.  It's up to the user to ensure the streams pointed
+to remain alive at least as long as the @code{yyFlexLexer} instance.
 
 @findex yylex (C++ version)
 @item virtual int yylex()
@@ -3834,11 +3826,13 @@ instead of @code{yyFlexLexer}.  In this case, rather than generating
 
 @findex switch_streams (C++ only)
 @item virtual void switch_streams(istream* new_in = 0, ostream* new_out = 0)
+@item virtual void switch_streams(istream& new_in, ostream& new_out)
 reassigns @code{yyin} to @code{new_in} (if non-null) and @code{yyout} to
 @code{new_out} (if non-null), deleting the previous input buffer if
 @code{yyin} is reassigned.
 
 @item int yylex( istream* new_in, ostream* new_out = 0 )
+@item int yylex( istream& new_in, ostream& new_out )
 first switches the input streams via @code{switch_streams( new_in,
 new_out )} and then returns the value of @code{yylex()}.
 @end table
@@ -3887,11 +3881,15 @@ Here is an example of a simple C++ scanner:
 @cindex C++ scanners, use of
 @example
 @verbatim
-        // An example of using the flex C++ scanner class.
+     // An example of using the flex C++ scanner class.
 
     %{
+    #include <iostream>
+    using namespace std;
     int mylineno = 0;
     %}
+
+    %option noyywrap c++
 
     string  \"[^\n"]+\"
 
@@ -3916,7 +3914,7 @@ Here is an example of a simple C++ scanner:
                 if(c == '\n')
                     ++mylineno;
 
-                else if(c == @samp{*})
+                else if(c == '*')
                     {
                     if((c = yyinput()) == '/')
                         break;
@@ -3926,23 +3924,26 @@ Here is an example of a simple C++ scanner:
                 }
             }
 
-    {number}  cout  "number "  YYText()  '\n';
+    {number}  cout << "number " << YYText() << '\n';
 
     \n        mylineno++;
 
-    {name}    cout  "name "  YYText()  '\n';
+    {name}    cout << "name " << YYText() << '\n';
 
-    {string}  cout  "string "  YYText()  '\n';
+    {string}  cout << "string " << YYText() << '\n';
 
     %%
 
+	// This include is required if main() is an another source file.
+	//#include <FlexLexer.h>
+
     int main( int /* argc */, char** /* argv */ )
-        {
-        @code{flex}Lexer* lexer = new yyFlexLexer;
+    {
+        FlexLexer* lexer = new yyFlexLexer;
         while(lexer->yylex() != 0)
             ;
         return 0;
-        }
+    }
 @end verbatim
 @end example
 
@@ -4271,7 +4272,7 @@ it when done:
 
         yylex_init(&scanner);
 
-        while ((tok=yylex()) > 0)
+        while ((tok=yylex(scanner)) > 0)
             printf("tok=%d  yytext=%s\n", tok, yyget_text(scanner));
 
         yylex_destroy(scanner);
@@ -4565,7 +4566,7 @@ called again, you may get the following message:
 @cindex error messages, end of buffer missed
 @example
 @verbatim
-    fatal @code{flex} scanner internal error--end of buffer missed
+    fatal flex scanner internal error--end of buffer missed
 @end verbatim
 @end example
 
@@ -4809,7 +4810,7 @@ to change this in the near future, but we reserve the right to do so if we ever 
 API. 
 
 @item 64kb for the REJECT state. This will only be allocated if you use REJECT.
-The size is the large enough to hold the same number of states as characters in the input buffer. If you override the size of the
+The size is  large enough to hold the same number of states as characters in the input buffer. If you override the size of the
 input buffer (via @code{YY_BUF_SIZE}), then you automatically override the size of this buffer as well.
 
 @item 100 bytes for the start condition stack.
@@ -4908,8 +4909,10 @@ custom allocator through @code{yyextra}.
 %option reentrant
 
 /* Initialize the allocator. */
+%{
 #define YY_EXTRA_TYPE  struct allocator*
 #define YY_USER_INIT  yyextra = allocator_create();
+%}
 
 %%
 .|\n   ;
@@ -5083,8 +5086,8 @@ indexed by name, as described below. The file format is as follows:
                 +-------------------------------+
         Table 1 | uint16          td_id;        |
                 | uint16          td_flags;     |
-                | uint32          td_lolen;     |
                 | uint32          td_hilen;     |
+                | uint32          td_lolen;     |
                 | void            td_data[];    |
                 | uint8           td_pad64[];   |
                 +-------------------------------+
@@ -5203,11 +5206,6 @@ two integers. There is no padding between struct elements or between structs.
 The type of each member is determined by the @code{YYTD_DATA*} bits.
 @end table
 
-@item td_lolen
-Specifies the number of elements in the lowest dimension array. If this is
-a one-dimensional array, then it is simply the number of elements in this array.
-The element size is determined by the @code{td_flags} field.
-
 @item td_hilen
 If @code{td_hilen} is non-zero, then the data is a two-dimensional array.
 Otherwise, the data is a one-dimensional array. @code{td_hilen} contains the
@@ -5221,11 +5219,16 @@ by the @code{td_flags} field.  It is possible for both @code{td_lolen} and
 array, and no data is loaded, i.e., this table is simply skipped. Flex does not
 currently generate tables of zero length.
 
+@item td_lolen
+Specifies the number of elements in the lowest dimension array. If this is
+a one-dimensional array, then it is simply the number of elements in this array.
+The element size is determined by the @code{td_flags} field.
+
 @item td_data[]
 The table data. This array may be a one- or two-dimensional array, of type
 @code{int8}, @code{int16}, @code{int32}, @code{struct yy_trans_info}, or
 @code{struct yy_trans_info*},  depending upon the values in the
-@code{td_flags}, @code{td_lolen}, and @code{td_hilen} fields.
+@code{td_flags}, @code{td_hilen}, and @code{td_lolen} fields.
 
 @item td_pad64[]
 Zero or more NULL bytes, padding the entire table to the next 64-bit boundary as
@@ -8428,7 +8431,7 @@ in your scanner.
 @code{0[xX][[:xdigit:]]+}
 
 @item C99 octal constant
-@code{0[0123456]*}
+@code{0[01234567]*}
 
 @item C99 floating point constant
 @verbatim
@@ -8515,24 +8518,36 @@ more efficient when used with automatic line number processing. @xref{option-yyl
 @table @asis
 
 @item IPv4 Address
-@code{(([[:digit:]]@{1,3@}".")@{3@}([[:digit:]]@{1,3@}))}
+@verbatim
+dec-octet     [0-9]|[1-9][0-9]|1[0-9][0-9]|2[0-4][0-9]|25[0-5]
+IPv4address   {dec-octet}\.{dec-octet}\.{dec-octet}\.{dec-octet}
+@end verbatim
 
 @item IPv6 Address
 @verbatim
-hex4         ([[:xdigit:]]{1,4})
-hexseq       ({hex4}(:{hex4}*))
-hexpart      ({hexseq}|({hexseq}::({hexseq}?))|::{hexseq})
-IPv6address  ({hexpart}(":"{IPv4address})?)
+h16           [0-9A-Fa-f]{1,4}
+ls32          {h16}:{h16}|{IPv4address}
+IPv6address   ({h16}:){6}{ls32}|
+              ::({h16}:){5}{ls32}|
+              ({h16})?::({h16}:){4}{ls32}|
+              (({h16}:){0,1}{h16})?::({h16}:){3}{ls32}|
+              (({h16}:){0,2}{h16})?::({h16}:){2}{ls32}|
+              (({h16}:){0,3}{h16})?::{h16}:{ls32}|
+              (({h16}:){0,4}{h16})?::{ls32}|
+              (({h16}:){0,5}{h16})?::{h16}|
+              (({h16}:){0,6}{h16})?::
 @end verbatim
 
-See RFC2373 for details.
+See @uref{http://www.ietf.org/rfc/rfc2373.txt, RFC 2373} for details.
+Note that you have to fold the definition of @code{IPv6address} into one
+line and that it also matches the ``unspecified address'' ``::''.
 
 @item URI
 @code{(([^:/?#]+):)?("//"([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?}
 
-This pattern is nearly useless, since it allows just about any character to
-appear in a URI, including spaces and control characters.  See RFC2396 for
-details.
+This pattern is nearly useless, since it allows just about any character
+to appear in a URI, including spaces and control characters.  See
+@uref{http://www.ietf.org/rfc/rfc2396.txt, RFC 2396} for details.
 
 @end table
 

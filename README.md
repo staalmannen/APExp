@@ -54,8 +54,8 @@ sources.
 - APE sed has been replaced by a port of GNU sed (version 4.2.1)
 - APE grep has been replaced by pcregrep (version 8.43-RC12018-06-25 )
 - system awk has been replaced by GNU awk (version 4.0.0) as ape/awk
-- system yacc has been replaced by byacc (version 20111219) as ape/yacc
-- system lex has been replaced by flex (version 2.5.35) as ape/lex
+- system yacc has been replaced by byacc (version 20240109) as ape/yacc
+- system lex has been replaced by flex (version 2.6.4) as ape/lex
 
 Many of these are old ports and will hopefully be replaced by more up-to-date ports soon.
 

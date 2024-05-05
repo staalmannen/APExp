@@ -9,8 +9,8 @@ OFILES=	libmain.$O\
 
 FLEXSRC=../../../../external/flex
 
-%.$O: $FLEXSRC/libfl/%.c
-	$CC $CFLAGS $FLEXSRC/libfl/$stem.c
+%.$O: $FLEXSRC/src/%.c
+	$CC $CFLAGS $FLEXSRC/src/$stem.c
 
 CC=pcc
 LD=pcc
