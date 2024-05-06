@@ -52,107 +52,7 @@ sure both macros are undefined; an emulation function will then be used. */
    EBCDIC_NL25, the adjustment of NEWLINE is automatic. */
 /* #undef EBCDIC_NL25 */
 
-/* Define to 1 if you have the `bcopy' function. */
-#define HAVE_BCOPY 1
-
-/* Define to 1 if you have the <bits/type_traits.h> header file. */
-/* #undef HAVE_BITS_TYPE_TRAITS_H */
-
-/* Define to 1 if you have the <bzlib.h> header file. */
-#define HAVE_BZLIB_H 1
-
-/* Define to 1 if you have the <dirent.h> header file. */
-#define HAVE_DIRENT_H 1
-
-/* Define to 1 if you have the <dlfcn.h> header file. */
-/* #undef HAVE_DLFCN_H */
-
-/* Define to 1 if you have the <editline/readline.h> header file. */
-/* #undef HAVE_EDITLINE_READLINE_H */
-
-/* Define to 1 if you have the <edit/readline/readline.h> header file. */
-/* #undef HAVE_EDIT_READLINE_READLINE_H */
-
-/* Define to 1 if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H 1
-
-/* Define to 1 if you have the <limits.h> header file. */
-#define HAVE_LIMITS_H 1
-
-/* Define to 1 if the system has the type `long long'. */
-/* #undef HAVE_LONG_LONG */
-
-/* Define to 1 if you have the `memmove' function. */
-#define HAVE_MEMMOVE 1
-
-/* Define to 1 if you have the <memory.h> header file. */
-/* #undef HAVE_MEMORY_H */
-
-/* Define if you have POSIX threads libraries and header files. */
-/* #undef HAVE_PTHREAD */
-
-/* Have PTHREAD_PRIO_INHERIT. */
-/* #undef HAVE_PTHREAD_PRIO_INHERIT */
-
-/* Define to 1 if you have the <readline/history.h> header file. */
-/* #undef HAVE_READLINE_HISTORY_H */
-
-/* Define to 1 if you have the <readline/readline.h> header file. */
-/* #undef HAVE_READLINE_READLINE_H */
-
-/* Define to 1 if you have the <stdint.h> header file. */
-#define HAVE_STDINT_H 1
-
-/* Define to 1 if you have the <stdlib.h> header file. */
-#define HAVE_STDLIB_H 1
-
-/* Define to 1 if you have the `strerror' function. */
-#define HAVE_STRERROR 1
-
-/* Define to 1 if you have the <string> header file. */
-/* #undef HAVE_STRING */
-
-/* Define to 1 if you have the <strings.h> header file. */
-/* #undef HAVE_STRINGS_H */
-
-/* Define to 1 if you have the <string.h> header file. */
-#define HAVE_STRING_H 1
-
-/* Define to 1 if you have `strtoimax'. */
-/* #undef HAVE_STRTOIMAX */
-
-/* Define to 1 if you have `strtoll'. */
-/* #undef HAVE_STRTOLL */
-
-/* Define to 1 if you have `strtoq'. */
-/* #undef HAVE_STRTOQ */
-
-/* Define to 1 if you have the <sys/stat.h> header file. */
-#define HAVE_SYS_STAT_H 1
-
-/* Define to 1 if you have the <sys/types.h> header file. */
-#define HAVE_SYS_TYPES_H 1
-
-/* Define to 1 if you have the <type_traits.h> header file. */
-/* #undef HAVE_TYPE_TRAITS_H */
-
-/* Define to 1 if you have the <unistd.h> header file. */
-#define HAVE_UNISTD_H 1
-
-/* Define to 1 if the system has the type `unsigned long long'. */
-/* #undef HAVE_UNSIGNED_LONG_LONG */
-
-/* Define to 1 if the compiler supports simple visibility declarations. */
-#define HAVE_VISIBILITY 0
-
-/* Define to 1 if you have the <windows.h> header file. */
-/* #undef HAVE_WINDOWS_H */
-
-/* Define to 1 if you have the <zlib.h> header file. */
-#define HAVE_ZLIB_H 1
-
-/* Define to 1 if you have `_strtoi64'. */
-/* #undef HAVE__STRTOI64 */
+#include "/sys/include/ape/config.h"
 
 /* The value of LINK_SIZE determines the number of bytes used to store links
    as offsets within the compiled regex. The default is 2, which allows for
@@ -221,7 +121,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define PACKAGE_NAME "PCRE"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "PCRE 8.43-RC1"
+#define PACKAGE_STRING "PCRE 8.43"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "pcre"
@@ -230,7 +130,7 @@ sure both macros are undefined; an emulation function will then be used. */
 #define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "8.43-RC1"
+#define PACKAGE_VERSION "8.43"
 
 /* The value of PARENS_NEST_LIMIT specifies the maximum depth of nested
    parentheses (of any kind) in a pattern. This limits the amount of system
@@ -335,14 +235,6 @@ sure both macros are undefined; an emulation function will then be used. */
 /* #undef SUPPORT_VALGRIND */
 
 /* Version number of package */
-#define VERSION "8.43-RC1"
+#define VERSION "8.43"
 
-/* Define to empty if `const' does not conform to ANSI C. */
-/* #undef const */
 
-/* Define to the type of a signed integer type of width exactly 64 bits if
-   such a type exists and the standard includes do not define it. */
-/* #undef int64_t */
-
-/* Define to `unsigned int' if <sys/types.h> does not define. */
-/* #undef size_t */
