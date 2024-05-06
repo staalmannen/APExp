@@ -1,3 +1,16 @@
+%{
+
+#ifdef YYBISON
+#define YYSTYPE int
+#define YYLEX_PARAM &yylval
+#define YYLEX_DECL() yylex(YYSTYPE *yylval)
+#define YYERROR_DECL() yyerror(const char *s)
+int YYLEX_DECL();
+static void YYERROR_DECL();
+#endif
+
+%}
+
 %%
 S: error
 %%
@@ -6,7 +19,6 @@ S: error
 
 #ifdef YYBYACC
 extern int YYLEX_DECL();
-static void YYERROR_DECL();
 #endif
 
 int

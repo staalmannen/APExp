@@ -1,9 +1,16 @@
+%token-table
+
 %{
 # include <stdio.h>
 # include <ctype.h>
 
 int regs[26];
 int base;
+
+#ifdef YYBISON
+int yylex(void);
+static void yyerror(const char *s);
+#endif
 
 %}
 
@@ -64,7 +71,6 @@ number:  DIGIT
 
 #ifdef YYBYACC
 extern int YYLEX_DECL();
-static void YYERROR_DECL();
 #endif
 
 int
@@ -83,7 +89,8 @@ yyerror(const char *s)
 }
 
 int
-yylex(void) {
+yylex(void)
+{
 	/* lexical analysis routine */
 	/* returns LETTER for a lower case letter, yylval = 0 through 25 */
 	/* return DIGIT for a digit, yylval = 0 through 9 */

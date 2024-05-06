@@ -1,10 +1,22 @@
-/* $Id: grammar.y,v 1.3 2010/11/23 01:28:47 tom Exp $
+/* $Id: grammar.y,v 1.7 2020/03/30 23:55:49 tom Exp $
  *
  * yacc grammar for C function prototype generator
  * This was derived from the grammar in Appendix A of
  * "The C Programming Language" by Kernighan and Ritchie.
  */
 %expect 1
+%{
+#ifdef YYBISON
+#include <stdlib.h>
+#define YYSTYPE_IS_DECLARED
+#define yyerror yaccError
+#endif
+
+#if defined(YYBISON) || !defined(YYBYACC)
+static void yyerror(const char *s);
+#endif
+%}
+
 %token <text> '(' '*' '&'
 	/* identifiers that are not reserved words */
 	T_IDENTIFIER T_TYPEDEF_NAME T_DEFINE_NAME
@@ -82,6 +94,7 @@
 
 /* #include "cproto.h" */
 #define MAX_TEXT_SIZE 1024
+#define TEXT_LEN (MAX_TEXT_SIZE / 2 - 3)
 
 /* Prototype styles */
 #if OPT_LINTLIBRARY
@@ -267,8 +280,6 @@ extern void track_in        (void);
 extern boolean file_comments;
 extern FuncDefStyle func_style;
 extern char base_file[];
-
-#define YYMAXDEPTH 150
 
 extern	int	yylex (void);
 
@@ -669,19 +680,19 @@ struct_or_union_specifier
 	{
 	    char *s;
 	    if ((s = implied_typedef()) == 0)
-	        (void)sprintf(s = buf, "%s %s", $1.text, $2.text);
+	        (void)sprintf(s = buf, "%.*s %.*s", TEXT_LEN, $1.text, TEXT_LEN, $2.text);
 	    new_decl_spec(&$$, s, $1.begin, DS_NONE);
 	}
 	| struct_or_union braces
 	{
 	    char *s;
 	    if ((s = implied_typedef()) == 0)
-		(void)sprintf(s = buf, "%s {}", $1.text);
+		(void)sprintf(s = buf, "%.*s {}", TEXT_LEN, $1.text);
 	    new_decl_spec(&$$, s, $1.begin, DS_NONE);
 	}
 	| struct_or_union any_id
 	{
-	    (void)sprintf(buf, "%s %s", $1.text, $2.text);
+	    (void)sprintf(buf, "%.*s %.*s", TEXT_LEN, $1.text, TEXT_LEN, $2.text);
 	    new_decl_spec(&$$, buf, $1.begin, DS_NONE);
 	}
 	;
@@ -734,19 +745,19 @@ enum_specifier
 	{
 	    char *s;
 	    if ((s = implied_typedef()) == 0)
-		(void)sprintf(s = buf, "enum %s", $2.text);
+		(void)sprintf(s = buf, "enum %.*s", TEXT_LEN, $2.text);
 	    new_decl_spec(&$$, s, $1.begin, DS_NONE);
 	}
 	| enumeration braces
 	{
 	    char *s;
 	    if ((s = implied_typedef()) == 0)
-		(void)sprintf(s = buf, "%s {}", $1.text);
+		(void)sprintf(s = buf, "%.*s {}", TEXT_LEN, $1.text);
 	    new_decl_spec(&$$, s, $1.begin, DS_NONE);
 	}
 	| enumeration any_id
 	{
-	    (void)sprintf(buf, "enum %s", $2.text);
+	    (void)sprintf(buf, "enum %.*s", TEXT_LEN, $2.text);
 	    new_decl_spec(&$$, buf, $1.begin, DS_NONE);
 	}
 	;
@@ -768,7 +779,7 @@ declarator
 	: pointer direct_declarator
 	{
 	    $$ = $2;
-	    (void)sprintf(buf, "%s%s", $1.text, $$->text);
+	    (void)sprintf(buf, "%.*s%.*s", TEXT_LEN, $1.text, TEXT_LEN, $$->text);
 	    free($$->text);
 	    $$->text = xstrdup(buf);
 	    $$->begin = $1.begin;
@@ -785,7 +796,7 @@ direct_declarator
 	| '(' declarator ')'
 	{
 	    $$ = $2;
-	    (void)sprintf(buf, "(%s)", $$->text);
+	    (void)sprintf(buf, "(%.*s)", TEXT_LEN, $$->text);
 	    free($$->text);
 	    $$->text = xstrdup(buf);
 	    $$->begin = $1.begin;
@@ -793,7 +804,7 @@ direct_declarator
 	| direct_declarator T_BRACKETS
 	{
 	    $$ = $1;
-	    (void)sprintf(buf, "%s%s", $$->text, $2.text);
+	    (void)sprintf(buf, "%.*s%.*s", TEXT_LEN, $$->text, TEXT_LEN, $2.text);
 	    free($$->text);
 	    $$->text = xstrdup(buf);
 	}
@@ -818,12 +829,12 @@ direct_declarator
 pointer
 	: '*' opt_type_qualifiers
 	{
-	    (void)sprintf($$.text, "*%s", $2.text);
+	    (void)sprintf($$.text, "*%.*s", TEXT_LEN, $2.text);
 	    $$.begin = $1.begin;
 	}
 	| '*' opt_type_qualifiers pointer
 	{
-	    (void)sprintf($$.text, "*%s%s", $2.text, $3.text);
+	    (void)sprintf($$.text, "*%.*s%.*s", TEXT_LEN, $2.text, TEXT_LEN, $3.text);
 	    $$.begin = $1.begin;
 	}
 	;
@@ -846,7 +857,7 @@ type_qualifier_list
 	}
 	| type_qualifier_list type_qualifier
 	{
-	    (void)sprintf($$.text, "%s%s ", $1.text, $2.text);
+	    (void)sprintf($$.text, "%.*s%.*s ", TEXT_LEN, $1.text, TEXT_LEN, $2.text);
 	    $$.begin = $1.begin;
 	    free($2.text);
 	}
@@ -921,7 +932,7 @@ identifier_or_ref
 		$$ = $2;
 	    } else
 #endif
-		(void)sprintf($$.text, "&%s", $2.text);
+		(void)sprintf($$.text, "&%.*s", TEXT_LEN, $2.text);
 	    $$.begin = $1.begin;
 	}
 	;
@@ -934,7 +945,7 @@ abs_declarator
 	| pointer direct_abs_declarator
 	{
 	    $$ = $2;
-	    (void)sprintf(buf, "%s%s", $1.text, $$->text);
+	    (void)sprintf(buf, "%.*s%.*s", TEXT_LEN, $1.text, TEXT_LEN, $$->text);
 	    free($$->text);
 	    $$->text = xstrdup(buf);
 	    $$->begin = $1.begin;
@@ -946,7 +957,7 @@ direct_abs_declarator
 	: '(' abs_declarator ')'
 	{
 	    $$ = $2;
-	    (void)sprintf(buf, "(%s)", $$->text);
+	    (void)sprintf(buf, "(%.*s)", TEXT_LEN, $$->text);
 	    free($$->text);
 	    $$->text = xstrdup(buf);
 	    $$->begin = $1.begin;
@@ -954,7 +965,7 @@ direct_abs_declarator
 	| direct_abs_declarator T_BRACKETS
 	{
 	    $$ = $1;
-	    (void)sprintf(buf, "%s%s", $$->text, $2.text);
+	    (void)sprintf(buf, "%.*s%.*s", TEXT_LEN, $$->text, TEXT_LEN, $2.text);
 	    free($$->text);
 	    $$->text = xstrdup(buf);
 	}
@@ -1017,7 +1028,7 @@ extern char *yytext;
 extern FILE *yyin, *yyout;
 
 static int curly;			/* number of curly brace nesting levels */
-static int ly_count;			/* number of occurances of %% */
+static int ly_count;			/* number of occurrences of %% */
 static int inc_depth;			/* include nesting level */
 static SymbolTable *included_files;	/* files already included */
 static int yy_start = 0;		/* start state number */

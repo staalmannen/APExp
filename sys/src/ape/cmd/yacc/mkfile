@@ -1,7 +1,7 @@
 </$objtype/mkfile
 TARG=yacc
 BIN=/$objtype/bin/ape
-HFILES=defs.h config.h 
+HFILES=config.h
 OFILES=	closure.$O\
 		error.$O\
 		graph.$O\
@@ -9,9 +9,10 @@ OFILES=	closure.$O\
 		lr0.$O\
 		main.$O\
 		mkpar.$O\
+		mstring.$O\
 		output.$O\
 		reader.$O\
-		skeleton.$O\
+		btyaccpar.$O\
 		symtab.$O\
 		verbose.$O\
 		warshall.$O 
@@ -24,12 +25,12 @@ YACCSRC=../../../external/byacc
 CC=pcc
 LD=pcc
 CFLAGS=-c -I. -I$YACCSRC -B -D_POSIX_SOURCE -D_SUSV2_SOURCE \
-	-D_BSD_EXTENSION -DHAVE_CONFIG_H 
+	-D_BSD_EXTENSION -DHAVE_CONFIG_H -DYYPATCH=20240109
 
 
 %.$O: $YACCSRC/%.c
 	$CC $CFLAGS $YACCSRC/$stem.c
 
 install:V:
-	cp $YACCSRC/byacc.1 /sys/man/1/byacc
+	cp $YACCSRC/yacc.1 /sys/man/1/byacc
 

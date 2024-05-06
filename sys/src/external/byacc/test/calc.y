@@ -5,6 +5,9 @@
 int regs[26];
 int base;
 
+extern int yylex(void);
+static void yyerror(const char *s);
+
 %}
 
 %start list
@@ -61,11 +64,6 @@ number:  DIGIT
       ;
 
 %% /* start of programs */
-
-#ifdef YYBYACC
-extern int YYLEX_DECL();
-static void YYERROR_DECL();
-#endif
 
 int
 main (void)

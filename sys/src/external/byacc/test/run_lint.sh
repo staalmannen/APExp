@@ -1,5 +1,5 @@
 #!/bin/sh
-# $Id: run_lint.sh,v 1.1 2010/06/08 09:00:58 tom Exp $
+# $Id: run_lint.sh,v 1.5 2022/11/06 20:56:42 tom Exp $
 # vi:ts=4 sw=4:
 
 # run lint on each of the ".c" files in the test directory
@@ -13,8 +13,17 @@ else
 	TEST_DIR=.
 fi
 
-echo '** '`date`
-for i in ${TEST_DIR}/*.c
+: "${FGREP:=grep -F}"
+ifBTYACC=`$FGREP -l 'define YYBTYACC' config.h > /dev/null; test $? != 0; echo $?`
+
+if test "$ifBTYACC" = 0; then
+	REF_DIR=${TEST_DIR}/yacc
+else
+	REF_DIR=${TEST_DIR}/btyacc
+fi
+
+echo "** `date`"
+for i in ${REF_DIR}/*.c
 do
-	make -f $PROG_DIR/makefile lint C_FILES=$i srcdir=$PROG_DIR
+	make -f $PROG_DIR/makefile lint C_FILES="$i" srcdir="$PROG_DIR"
 done

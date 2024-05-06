@@ -16,6 +16,9 @@ INTERVAL;
 INTERVAL vmul(double, double, INTERVAL);
 INTERVAL vdiv(double, double, INTERVAL);
 
+extern int yylex(void);
+static void yyerror(const char *s);
+
 int dcheck(INTERVAL);
 
 double dreg[26];
@@ -172,11 +175,6 @@ vexp	: dexp
 
 %%	/* beginning of subroutines section */
 
-#ifdef YYBYACC
-extern int YYLEX_DECL();
-static void YYERROR_DECL();
-#endif
-
 #define BSZ 50			/* buffer size for floating point numbers */
 
 	/* lexical analysis */
@@ -216,7 +214,7 @@ yylex(void)
 	for (; (cp - buf) < BSZ; ++cp, c = getchar())
 	{
 
-	    *cp = c;
+	    *cp = (char) c;
 	    if (isdigit(c))
 		continue;
 	    if (c == '.')

@@ -1,4 +1,4 @@
-/* $Id: symtab.c,v 1.9 2010/11/24 15:12:29 tom Exp $ */
+/* $Id: symtab.c,v 1.11 2014/03/26 00:17:09 Tom.Shields Exp $ */
 
 #include "defs.h"
 
@@ -33,13 +33,13 @@ make_bucket(const char *name)
 
     assert(name != 0);
 
-    bp = (bucket *)MALLOC(sizeof(bucket));
+    bp = TMALLOC(bucket, 1);
     NO_SPACE(bp);
 
     bp->link = 0;
     bp->next = 0;
 
-    bp->name = MALLOC(strlen(name) + 1);
+    bp->name = TMALLOC(char, strlen(name) + 1);
     NO_SPACE(bp->name);
 
     bp->tag = 0;
@@ -48,6 +48,12 @@ make_bucket(const char *name)
     bp->prec = 0;
     bp->class = UNKNOWN;
     bp->assoc = TOKEN;
+#if defined(YYBTYACC)
+    bp->args = -1;
+    bp->argnames = 0;
+    bp->argtags = 0;
+    bp->destructor = 0;
+#endif
     strcpy(bp->name, name);
 
     return (bp);
@@ -82,7 +88,7 @@ create_symbol_table(void)
     int i;
     bucket *bp;
 
-    symbol_table = (bucket **)MALLOC(TABLE_SIZE * sizeof(bucket *));
+    symbol_table = TMALLOC(bucket *, TABLE_SIZE);
     NO_SPACE(symbol_table);
 
     for (i = 0; i < TABLE_SIZE; i++)

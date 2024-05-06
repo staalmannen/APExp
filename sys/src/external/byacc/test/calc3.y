@@ -9,6 +9,15 @@
 # include <stdio.h>
 # include <ctype.h>
 
+#ifdef YYBISON
+#define YYSTYPE int
+#define YYLEX_PARAM base
+#define YYLEX_DECL() yylex(YYSTYPE *yylval, int *YYLEX_PARAM)
+#define YYERROR_DECL() yyerror(int regs[26], int *base, const char *s)
+int YYLEX_DECL();
+static void YYERROR_DECL();
+#endif
+
 %}
 
 %start list
@@ -68,7 +77,6 @@ number:  DIGIT
 
 #ifdef YYBYACC
 extern int YYLEX_DECL();
-static void YYERROR_DECL();
 #endif
 
 int
@@ -83,9 +91,13 @@ main (void)
     return 0;
 }
 
+#define UNUSED(x) ((void)(x))
+
 static void
 YYERROR_DECL()
 {
+    UNUSED(regs); /* %parse-param regs is not actually used here */
+    UNUSED(base); /* %parse-param base is not actually used here */
     fprintf(stderr, "%s\n", s);
 }
 
