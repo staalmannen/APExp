@@ -1,0 +1,39 @@
+</$objtype/mkfile
+TARG=m4
+OFILES=\
+	#src\
+		builtin.$O\
+		debug.$O\
+		eval.$O\
+		format.$O\
+		freeze.$O\
+		input.$O\
+		m4.$O\
+		macro.$O\
+		output.$O\
+		path.$O\
+		symtab.$O\
+	#lib\
+		c-ctype.$O
+
+
+#LIB=
+BIN=/$objtype/bin/ape
+HFILES=config.h
+
+</sys/src/cmd/mkone
+
+M4SRC=../../../external/m4
+
+CC=pcc
+LD=pcc
+CFLAGS=-c -I. -I$M4SRC/src  -I$M4SRC/lib -DHAVE_CONFIG_H 
+
+%.$O: $M4SRC/src/%.c
+	$CC $CFLAGS $M4SRC/src/$stem.c
+
+%.$O: $M4SRC/lib/%.c
+	$CC $CFLAGS $M4SRC/lib/$stem.c
+
+
+
