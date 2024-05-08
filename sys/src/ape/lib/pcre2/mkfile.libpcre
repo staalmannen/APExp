@@ -1,0 +1,60 @@
+</$objtype/mkfile
+LIB=libpcre2.a
+
+OFILES=
+	#src\
+		pcre2_auto_possess.$O\
+		pcre2_chkdint.$O\
+		pcre2_compile.$O\
+		pcre2_config.$O\
+		pcre2_context.$O\
+		pcre2_convert.$O\
+		pcre2_dfa_match.$O\
+		pcre2_error.$O\
+		pcre2_extuni.$O\
+		pcre2_find_bracket.$O\
+		pcre2_internal.$O\
+		pcre2_intmodedep.$O\
+		pcre2_jit_compile.$O\
+		pcre2_maketables.$O\
+		pcre2_match.$O\
+		pcre2_match_data.$O\
+		pcre2_newline.$O\
+		pcre2_ord2utf.$O\
+		pcre2_pattern_info.$O\
+		pcre2_script_run.$O\
+		pcre2_serialize.$O\
+		pcre2_string_utils.$O\
+		pcre2_study.$O\
+		pcre2_substitute.$O\
+		pcre2_substring.$O\
+		pcre2_tables.$O\
+		pcre2_ucd.$O\
+		pcre2_valid_utf.$O\
+		pcre2_xclass.$O
+
+HFILES= config.h
+
+</sys/src/cmd/mksyslib
+
+PCRESRC=../../../external/pcre2
+
+CC=pcc
+LD=pcc
+# Normally are 8, 16 and 32 libraries made.
+# We are only using UTF-8 so width=8 should be enough
+CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=8
+
+%.$O: $PCRESRC/src/%.c
+	$CC $CFLAGS $PCRESRC/src/$stem.c
+
+install:V:
+	cp libpcre2.a /$objtype/lib/ape/libpcre2.a
+	cp pcre2.h /sys/include/ape/
+
+nuke:V:
+	mk clean
+	rm -f $LIB
+	rm -f /$objtype/lib/ape/libpcre2.a
+	rm -f /sys/include/ape/pcre2.h
+

@@ -5,3 +5,8 @@
 #if !defined(BYTE_ORDER) && defined(LITTLE_ENDIAN)
 #define	BYTE_ORDER	LITTLE_ENDIAN
 #endif
+
+#ifndef __i386__
+#define __i386__ 1
+#endif
+

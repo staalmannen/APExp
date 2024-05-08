@@ -361,10 +361,10 @@ struct symbol
 {
   struct symbol *stack; /* pushdef stack */
   struct symbol *next; /* hash bucket chain */
-  bool_bitfield traced : 1;
-  bool_bitfield macro_args : 1;
-  bool_bitfield blind_no_args : 1;
-  bool_bitfield deleted : 1;
+  bool_bitfield traced;
+  bool_bitfield macro_args;
+  bool_bitfield blind_no_args;
+  bool_bitfield deleted;
   int pending_expansions;
 
   size_t hash;
@@ -406,9 +406,9 @@ extern void call_macro (symbol *, int, token_data **, struct obstack *);
 struct builtin
 {
   const char *name;
-  bool_bitfield gnu_extension : 1;
-  bool_bitfield groks_macro_args : 1;
-  bool_bitfield blind_if_no_args : 1;
+  bool_bitfield gnu_extension;
+  bool_bitfield groks_macro_args;
+  bool_bitfield blind_if_no_args;
   builtin_func *func;
 };
 

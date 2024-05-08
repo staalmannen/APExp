@@ -1,0 +1,36 @@
+</$objtype/mkfile
+
+PCRESRC=../../../external/pcre2
+DIRS=doc 
+
+install:V:
+	mk -f mkfile.libpcre $target
+	mk -f mkfile.libpcreposix $target
+	for (i in $DIRS)
+		@{ cd $i; mk $target }
+	pcre2-config /rc/bin/ape
+
+installall:V:
+	mk -f mkfile.libpcre install
+	mk -f mkfile.libpcreposix install
+	for (i in $DIRS)
+		@{ cd $i; mk install }
+	cp pcre2-config /rc/bin/ape
+
+clean:V:
+	mk -f mkfile.libpcre $target
+	mk -f mkfile.libpcreposix $target
+	mk -f mkfile.pcretest $target
+	for (i in $DIRS)
+		@{ cd $i; mk $target }
+
+nuke:V:
+	mk -f mkfile.libpcre $target
+	mk -f mkfile.libpcreposix $target
+	mk -f mkfile.pcretest $target
+	for (i in $DIRS)
+		@{ cd $i; mk $target }
+	rm -f /rc/bin/ape/pcre2-config
+
+test:V:
+	mk -f mkfile.pcretest

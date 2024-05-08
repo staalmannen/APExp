@@ -90,9 +90,9 @@ struct input_block
       struct
         {
           FILE *fp;                  /* input file handle */
-          bool_bitfield end : 1;     /* true if peek has seen EOF */
-          bool_bitfield close : 1;   /* true if we should close file on pop */
-          bool_bitfield advance : 1; /* track previous start_of_input_line */
+          bool_bitfield end;     /* true if peek has seen EOF */
+          bool_bitfield close;   /* true if we should close file on pop */
+          bool_bitfield advance; /* track previous start_of_input_line */
         }
         u_f;    /* INPUT_FILE */
       builtin_func *func;       /* pointer to macro's function */

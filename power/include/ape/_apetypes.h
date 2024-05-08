@@ -5,3 +5,8 @@
 #if !defined(BYTE_ORDER) && defined(LITTLE_ENDIAN)
 #define	BYTE_ORDER	BIG_ENDIAN
 #endif
+
+#ifndef __powerpc__
+#define __powerpc__ 1
+#endif
+

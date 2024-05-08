@@ -5,3 +5,7 @@
 #if !defined(BYTE_ORDER) && defined(LITTLE_ENDIAN)
 #define	BYTE_ORDER	BIG_ENDIAN
 #endif
+
+#ifndef __sparc__
+#define __sparc__ 1
+#endif

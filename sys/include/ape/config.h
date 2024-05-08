@@ -1,11 +1,13 @@
-
 #define PLAN9
+#include <_apetypes.h> /* for architecture-specific stuff */
 
 /* Define if the system does not provide POSIX.1 features except
    with this defined.  */
+#ifndef _POSIX_1_SOURCE
 #define _POSIX_1_SOURCE 2
+#endif
 
-/* Define if you need to in order for stat and other things to work.  */
+/* Activate all extensions because why not?  */
 #ifndef _POSIX_SOURCE
 #define _POSIX_SOURCE 1
 #endif
@@ -14,13 +16,39 @@
 #define _BSD_EXTENSION 1
 #endif
 
+#ifndef D_SUSV2_SOURCE
+#define D_SUSV2_SOURCE 1
+#endif
+
 #ifndef _RESEARCH_SOURCE
 #define _RESEARCH_SOURCE 1
+#endif
+
+#ifndef _PLAN9_SOURCE
+#define _PLAN9_SOURCE 1
 #endif
 
 #ifndef _LIMITS_EXTENSION
 #define _LIMITS_EXTENSION 1
 #endif
+
+#ifndef _NET_EXTENSION
+#define _NET_EXTENSION 1
+#endif
+
+#ifndef _C99_SNPRINTF_EXTENSION
+#define _C99_SNPRINTF_EXTENSION 1
+#endif
+
+#ifndef _REGEXP_EXTENSION
+#define _REGEXP_EXTENSION 1
+#endif
+
+#ifndef _REENTRANT_SOURCE
+#define _REENTRANT_SOURCE 1
+#endif
+
+/* typical config.h stuff stolen from various application-specific generated config.h */
 
 /* Define to 1 if using `alloca.c'. */
 #define C_ALLOCA 1
@@ -163,6 +191,12 @@
 
 /* Define if you have the dup2 function.  */
 #define HAVE_DUP2 1
+
+/* Define to 1 if you have the <editline/readline.h> header file. TODO */
+/* #undef HAVE_EDITLINE_READLINE_H */
+
+/* Define to 1 if you have the <edit/readline/readline.h> header file. TODO*/
+/* #undef HAVE_EDIT_READLINE_READLINE_H */
 
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
@@ -308,6 +342,9 @@
 /* Define if you have POSIX threads libraries and header files. */
 #define HAVE_PTHREAD 1
 
+/* Have PTHREAD_PRIO_INHERIT. */
+/* #undef HAVE_PTHREAD_PRIO_INHERIT */
+
 /* Define to 1 if you have the <pthread.h> header file. */
 #define HAVE_PTHREAD_H 1
 
@@ -317,6 +354,15 @@
 
 /* Define if the 'realloc' function is POSIX compliant. */
 #define HAVE_REALLOC_POSIX 1
+
+/* Define to 1 if you have the <readline.h> header file. */
+/* #undef HAVE_READLINE_H */
+
+/* Define to 1 if you have the <readline/history.h> header file. */
+/* #undef HAVE_READLINE_HISTORY_H */
+
+/* Define to 1 if you have the <readline/readline.h> header file. */
+/* #undef HAVE_READLINE_READLINE_H */
 
 /* Define to 1 if you have the `readlink' function. */
 #define HAVE_READLINK 1
@@ -359,6 +405,9 @@
 
 /* we have sockets on this system */
 #define HAVE_SOCKETS 1
+
+/* have sock opts */
+#define HAVE_SOCK_OPTS 1
 
 /* Define to 1 if you have the <stdarg.h> header file. */
 #define HAVE_STDARG_H 1
@@ -617,7 +666,7 @@
 
 
 
-/* gnulib and C compatibility stuff */
+/* gnulib, compiler and C compatibility stuff */
 
 
 

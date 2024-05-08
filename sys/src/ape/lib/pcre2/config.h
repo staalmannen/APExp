@@ -1,6 +1,7 @@
 /* src/config.h.  Generated from config.h.in by configure.  */
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
+#include "/sys/include/ape/config.h"
 
 /* PCRE2 is written in Standard C, but there are a few non-standard things it
 can cope with, allowing it to run on SunOS4 and other "close to standard"
@@ -53,110 +54,6 @@ sure both macros are undefined; an emulation function will then be used. */
    LF does in an ASCII/Unicode environment. */
 /* #undef EBCDIC_NL25 */
 
-/* Define this if your compiler supports __attribute__((uninitialized)) */
-#define HAVE_ATTRIBUTE_UNINITIALIZED 1
-
-/* Define to 1 if you have the 'bcopy' function. */
-#define HAVE_BCOPY 1
-
-/* Define this if your compiler provides __builtin_mul_overflow() */
-#define HAVE_BUILTIN_MUL_OVERFLOW 1
-
-/* Define to 1 if you have the <bzlib.h> header file. */
-#define HAVE_BZLIB_H 1
-
-/* Define to 1 if you have the <dirent.h> header file. */
-#define HAVE_DIRENT_H 1
-
-/* Define to 1 if you have the <dlfcn.h> header file. */
-#define HAVE_DLFCN_H 1
-
-/* Define to 1 if you have the <editline/readline.h> header file. */
-/* #undef HAVE_EDITLINE_READLINE_H */
-
-/* Define to 1 if you have the <edit/readline/readline.h> header file. */
-/* #undef HAVE_EDIT_READLINE_READLINE_H */
-
-/* Define to 1 if you have the <inttypes.h> header file. */
-#define HAVE_INTTYPES_H 1
-
-/* Define to 1 if you have the <limits.h> header file. */
-#define HAVE_LIMITS_H 1
-
-/* Define to 1 if you have the 'memfd_create' function. */
-#define HAVE_MEMFD_CREATE 1
-
-/* Define to 1 if you have the 'memmove' function. */
-#define HAVE_MEMMOVE 1
-
-/* Define to 1 if you have the <minix/config.h> header file. */
-/* #undef HAVE_MINIX_CONFIG_H */
-
-/* Define to 1 if you have the 'mkostemp' function. */
-#define HAVE_MKOSTEMP 1
-
-/* Define if you have POSIX threads libraries and header files. */
-/* #undef HAVE_PTHREAD */
-
-/* Have PTHREAD_PRIO_INHERIT. */
-/* #undef HAVE_PTHREAD_PRIO_INHERIT */
-
-/* Define to 1 if you have the <readline.h> header file. */
-/* #undef HAVE_READLINE_H */
-
-/* Define to 1 if you have the <readline/history.h> header file. */
-/* #undef HAVE_READLINE_HISTORY_H */
-
-/* Define to 1 if you have the <readline/readline.h> header file. */
-/* #undef HAVE_READLINE_READLINE_H */
-
-/* Define to 1 if you have the `realpath' function. */
-#define HAVE_REALPATH 1
-
-/* Define to 1 if you have the 'secure_getenv' function. */
-#define HAVE_SECURE_GETENV 1
-
-/* Define to 1 if you have the <stdint.h> header file. */
-#define HAVE_STDINT_H 1
-
-/* Define to 1 if you have the <stdio.h> header file. */
-#define HAVE_STDIO_H 1
-
-/* Define to 1 if you have the <stdlib.h> header file. */
-#define HAVE_STDLIB_H 1
-
-/* Define to 1 if you have the 'strerror' function. */
-#define HAVE_STRERROR 1
-
-/* Define to 1 if you have the <strings.h> header file. */
-#define HAVE_STRINGS_H 1
-
-/* Define to 1 if you have the <string.h> header file. */
-#define HAVE_STRING_H 1
-
-/* Define to 1 if you have the <sys/stat.h> header file. */
-#define HAVE_SYS_STAT_H 1
-
-/* Define to 1 if you have the <sys/types.h> header file. */
-#define HAVE_SYS_TYPES_H 1
-
-/* Define to 1 if you have the <sys/wait.h> header file. */
-#define HAVE_SYS_WAIT_H 1
-
-/* Define to 1 if you have the <unistd.h> header file. */
-#define HAVE_UNISTD_H 1
-
-/* Define to 1 if the compiler supports simple visibility declarations. */
-#define HAVE_VISIBILITY 1
-
-/* Define to 1 if you have the <wchar.h> header file. */
-#define HAVE_WCHAR_H 1
-
-/* Define to 1 if you have the <windows.h> header file. */
-/* #undef HAVE_WINDOWS_H */
-
-/* Define to 1 if you have the <zlib.h> header file. */
-#define HAVE_ZLIB_H 1
 
 /* This limits the amount of memory that may be used while matching a pattern.
    It applies to both pcre2_match() and pcre2_dfa_match(). It does not apply
@@ -261,7 +158,7 @@ sure both macros are undefined; an emulation function will then be used. */
 /* #undef PCRE2_DEBUG */
 
 /* to make a symbol visible */
-#define PCRE2_EXPORT __attribute__ ((visibility ("default")))
+#define PCRE2_EXPORT
 
 
 /* If you are compiling for a system other than a Unix-like system or
@@ -287,11 +184,6 @@ sure both macros are undefined; an emulation function will then be used. */
    executable memory allocator in JIT. Note that this will have no effect
    unless SUPPORT_JIT is also defined. */
 /* #undef SLJIT_PROT_EXECUTABLE_ALLOCATOR */
-
-/* Define to 1 if all of the C89 standard headers exist (not just the ones
-   required in a freestanding environment). This macro is provided for
-   backward compatibility; new code need not use it. */
-#define STDC_HEADERS 1
 
 /* Define to any value to enable differential fuzzing support. */
 /* #undef SUPPORT_DIFF_FUZZ */
@@ -338,7 +230,7 @@ sure both macros are undefined; an emulation function will then be used. */
    will work even in an EBCDIC environment, but it is incompatible with the
    EBCDIC macro. That is, PCRE2 can support *either* EBCDIC code *or*
    ASCII/Unicode, but not both at once. */
-#define SUPPORT_UNICODE /**/
+#define SUPPORT_UNICODE 9
 
 /* Define to any value for valgrind support to find invalid memory reads. */
 /* #undef SUPPORT_VALGRIND */
@@ -438,24 +330,4 @@ sure both macros are undefined; an emulation function will then be used. */
 /* Version number of package */
 #define VERSION "10.43"
 
-/* Number of bits in a file offset, on hosts where this is settable. */
-/* #undef _FILE_OFFSET_BITS */
 
-/* Define to 1 on platforms where this makes off_t a 64-bit type. */
-/* #undef _LARGE_FILES */
-
-/* Number of bits in time_t, on hosts where this is settable. */
-/* #undef _TIME_BITS */
-
-/* Define to 1 on platforms where this makes time_t a 64-bit type. */
-/* #undef __MINGW_USE_VC2005_COMPAT */
-
-/* Define to empty if 'const' does not conform to ANSI C. */
-/* #undef const */
-
-/* Define to the type of a signed integer type of width exactly 64 bits if
-   such a type exists and the standard includes do not define it. */
-/* #undef int64_t */
-
-/* Define as 'unsigned int' if <stddef.h> doesn't define. */
-/* #undef size_t */

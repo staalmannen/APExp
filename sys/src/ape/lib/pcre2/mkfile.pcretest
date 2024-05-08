@@ -1,0 +1,16 @@
+</$objtype/mkfile
+TARG=pcre2test
+OFILES=pcre2test.$O
+LIB=/$objtype/lib/ape/libpcre2.a /$objtype/lib/ape/libpcre2posix.a
+BIN=/$objtype/bin/ape
+
+</sys/src/cmd/mkone
+
+PCRESRC=../../../external/pcre2
+
+CC=pcc
+LD=pcc
+CFLAGS=-c -I. -DHAVE_CONFIG_H
+
+%.$O: $PCRESRC/src/%.c
+	$CC $CFLAGS $PCRESRC/src/$stem.c
