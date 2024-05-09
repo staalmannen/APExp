@@ -1,22 +1,26 @@
 </$objtype/mkfile
-TARG=pcregrep
-OFILES=pcregrep.$O 
-LIB=/$objtype/lib/ape/libpcre.a /$objtype/lib/ape/libpcreposix.a
+TARG=pcre2grep
+OFILES=pcre2grep.$O 
+LIB=/$objtype/lib/ape/libpcre2.a /$objtype/lib/ape/libpcre2posix.a
 BIN=/$objtype/bin/ape
-HFILES=/sys/include/ape/pcre.h config.h
+HFILES=/sys/include/ape/pcre2.h config.h
 
 </sys/src/cmd/mkone
 
-PCRESRC=../../../external/pcre
+PCRESRC=../../../external/pcre2
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I. -I$PCRESRC -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_RESEARCH_SOURCE -D_REENTRANT_SOURCE \
-	-D_BSD_EXTENSION -D_NET_EXTENSION -D_LIMITS_EXTENSION -D_C99_SNPRINTF_EXTENSION \
-	-D_REGEXP_EXTENSION -DHAVE_SOCK_OPTS -DHAVE_CONFIG_H 
+CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H 
 
-pcregrep.$O: $PCRESRC/pcregrep.c
-	$CC $CFLAGS $PCRESRC/pcregrep.c
+pcre2grep.$O: $PCRESRC/src/pcre2grep.c
+	$CC $CFLAGS $PCRESRC/src/pcre2grep.c
+
+install:V:
+	cp $O.out $BIN/pcre2grep
+	cp $O.out $BIN/grep
+	cp egrep /rc/bin/ape/
+	cp fgrep /rc/bin/ape/
 
 
 

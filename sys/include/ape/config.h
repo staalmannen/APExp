@@ -12,6 +12,10 @@
 #define _POSIX_SOURCE 1
 #endif
 
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 1
+#endif
+
 #ifndef _BSD_EXTENSION
 #define _BSD_EXTENSION 1
 #endif
@@ -50,14 +54,8 @@
 
 /* typical config.h stuff stolen from various application-specific generated config.h */
 
-/* Define to 1 if using `alloca.c'. */
-#define C_ALLOCA 1
-
-/* Define to 1 if using `getloadavg.c'. */
-#define C_GETLOADAVG 1
-
 /* Define if dup2() preserves the close-on-exec flag (ultrix does this) */
-//#define DUP2_BROKEN 1
+#define DUP2_BROKEN 1
 
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
@@ -65,12 +63,6 @@
 
 /* Define to 1 if you have the `alarm' function. */
 #define HAVE_ALARM 1
-
-/* Define to 1 if you have 'alloca', as a function or macro. */
-#define HAVE_ALLOCA 1
-
-/* Define to 1 if <alloca.h> works. */
-#define HAVE_ALLOCA_H 1
 
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #define HAVE_ARPA_INET_H 1
@@ -702,7 +694,8 @@
 #define _GL_ATTRIBUTE_SENTINEL(pos) /* nothing */
 #define _GL_ATTRIBUTE_UNUSED /* nothing */
 #define _GL_UNUSED_LABEL /* nothing */
-#define restrict /* nothing */
+//#define restrict /* nothing */
+#define const /* nothing */
 #define _Restrict /* nothing */
 #define __restrict__ /* nothing */
 #define _UC_RESTRICT /* nothing */

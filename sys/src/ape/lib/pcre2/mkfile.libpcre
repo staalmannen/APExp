@@ -1,9 +1,10 @@
 </$objtype/mkfile
 LIB=libpcre2.a
-
-OFILES=
+HFILES= config.h
+OFILES=\
 	#src\
 		pcre2_auto_possess.$O\
+		pcre2_chartables.$O\
 		pcre2_chkdint.$O\
 		pcre2_compile.$O\
 		pcre2_config.$O\
@@ -13,8 +14,6 @@ OFILES=
 		pcre2_error.$O\
 		pcre2_extuni.$O\
 		pcre2_find_bracket.$O\
-		pcre2_internal.$O\
-		pcre2_intmodedep.$O\
 		pcre2_jit_compile.$O\
 		pcre2_maketables.$O\
 		pcre2_match.$O\
@@ -31,9 +30,8 @@ OFILES=
 		pcre2_tables.$O\
 		pcre2_ucd.$O\
 		pcre2_valid_utf.$O\
-		pcre2_xclass.$O
+		pcre2_xclass.$O\
 
-HFILES= config.h
 
 </sys/src/cmd/mksyslib
 

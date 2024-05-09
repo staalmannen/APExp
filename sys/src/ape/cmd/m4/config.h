@@ -3,15 +3,19 @@
 
 #include "/sys/include/ape/config.h"
 
+#define O_BINARY 0
+#define PTRDIFF_MAX INT_MAX
+extern char *strsignal(int);
+
+#define GNULIB_NL_LANGINFO 1
+#define GNULIB_XALLOC 1
+
 /* CPU and C ABI indicator */
 /* moved to /$objtype/include/ape/_apetypes.h */
 
 /* Define if you wish *printf() functions that have a safe handling of
    non-IEEE-754 'long double' values. */
 #define CHECK_PRINTF_SAFE 1
-
-/* Define to 1 if using 'alloca.c'. */
-/* #undef C_ALLOCA */
 
 /* Define as the bit index in the word where to find bit 0 of the exponent of
    'double'. */

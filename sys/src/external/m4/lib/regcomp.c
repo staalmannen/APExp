@@ -17,6 +17,9 @@
    License along with the GNU C Library; if not, see
    <https://www.gnu.org/licenses/>.  */
 
+#include "regex.h"
+#include "regex_internal.h"
+
 #ifdef _LIBC
 # include <locale/weight.h>
 #endif
@@ -103,13 +106,13 @@ static reg_errcode_t build_charclass (RE_TRANSLATE_TYPE trans,
 #else  /* not RE_ENABLE_I18N */
 static reg_errcode_t build_equiv_class (bitset_t sbcset,
 					const unsigned char *name);
-static reg_errcode_t build_charclass (RE_TRANSLATE_TYPE trans,
+static reg_errcode_t build_charclass (unsigned char *trans,
 				      bitset_t sbcset,
 				      const char *class_name,
 				      reg_syntax_t syntax);
 #endif /* not RE_ENABLE_I18N */
 static bin_tree_t *build_charclass_op (re_dfa_t *dfa,
-				       RE_TRANSLATE_TYPE trans,
+				       unsigned char *trans,
 				       const char *class_name,
 				       const char *extra,
 				       bool non_match, reg_errcode_t *err);
@@ -240,7 +243,9 @@ weak_alias (__re_compile_pattern, re_compile_pattern)
    syntax, so it can be changed between regex compilations.  */
 /* This has no initializer because initialized variables in Emacs
    become read-only after dumping.  */
-reg_syntax_t re_syntax_options;
+#undef reg_syntax_t
+#define reg_syntax_t unsigned long
+//reg_syntax_t re_syntax_options;
 
 
 /* Specify the precise syntax of regexps for compilation.  This provides
@@ -250,8 +255,7 @@ reg_syntax_t re_syntax_options;
    The argument SYNTAX is a bit mask comprised of the various bits
    defined in regex.h.  We return the old syntax.  */
 
-reg_syntax_t
-re_set_syntax (reg_syntax_t syntax)
+reg_syntax_t re_set_syntax (reg_syntax_t syntax)
 {
   reg_syntax_t ret = re_syntax_options;
 

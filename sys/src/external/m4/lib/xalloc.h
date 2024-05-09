@@ -26,6 +26,8 @@
 # include "intprops.h"
 #endif
 
+extern void *reallocarray(void *, size_t, size_t);
+
 #ifndef _GL_INLINE_HEADER_BEGIN
  #error "Please include config.h first."
 #endif

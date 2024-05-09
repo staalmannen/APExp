@@ -50,12 +50,22 @@ At this moment, just imported the latest 9front APE sources from git [x]
 In addition, several patches from @lufia [x1, x2] to build libressl and curl
 (introduces pthread, include_next cpp support, etc) has been applied to the
 sources.
+- wchar.h/wctype.h provided by the thin "libwtf", integrated in libutf
+- curses.h, term.h, panel.h provided by PDCursesMod (built with wchar)
+- regex.h provided by pcre2 (pcre2posix, version 10.432024-02-16)
+- iconv.h provided by minimal iconv from OpenWrt
+- gettext utilities + libintl provided by gettext-tiny from OpenWrt
+- OpenBSD sys/queue.h copied from suckless sbase
+- getopt.h with gnu getopt_long from NetBSD, imported to libbsd
+- strings.h shim pointing to bsd.h
+- stdio.h : added fmemopen from tuxpaint, getdelim/getline from gnulib
 - APE make has been replaced by a port of GNU make (version 3.82)
 - APE sed has been replaced by a port of GNU sed (version 4.2.1)
-- APE grep has been replaced by pcregrep (version 8.43-RC12018-06-25 )
+- APE grep has been replaced by pcre2grep (version 10.432024-02-16 )
 - system awk has been replaced by GNU awk (version 4.0.0) as ape/awk
 - system yacc has been replaced by byacc (version 20240109) as ape/yacc
 - system lex has been replaced by flex (version 2.6.4) as ape/lex
+- the utilities "ls", have been built from suckless sbase under ape
 
 Many of these are old ports and will hopefully be replaced by more up-to-date ports soon.
 

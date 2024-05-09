@@ -1,5 +1,6 @@
 </$objtype/mkfile
 TARG=m4
+LIB=/$objtype/lib/ape/libbsd.a
 OFILES=\
 	#src\
 		builtin.$O\
@@ -14,7 +15,16 @@ OFILES=\
 		path.$O\
 		symtab.$O\
 	#lib\
-		c-ctype.$O
+		c-ctype.$O\
+		nl_langinfo.$O\
+		reallocarray.$O\
+		regcomp.$O\
+		strsignal.$O\
+		xalloc-die.$O\
+		xmalloc.$O\
+		xmalloca.$O\
+		xprintf.$O\
+		xstrndup.$O
 
 
 #LIB=
@@ -27,7 +37,8 @@ M4SRC=../../../external/m4
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I. -I$M4SRC/src  -I$M4SRC/lib -DHAVE_CONFIG_H 
+CFLAGS=-c -I. -I$M4SRC/src  -I$M4SRC/lib -DHAVE_CONFIG_H  -Doption=gnu_option\
+	-DSA_NODEFER=0 -D__USE_GNU -D_REGEX_LARGE_OFFSETS
 
 %.$O: $M4SRC/src/%.c
 	$CC $CFLAGS $M4SRC/src/$stem.c

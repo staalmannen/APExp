@@ -1,36 +1,136 @@
 </$objtype/mkfile
 
 PCRESRC=../../../external/pcre2
-DIRS=doc 
+
+MAN1=\
+		pcre2-config\
+		pcre2grep\
+		pcre2test
+
+MAN3=\
+		pcre2\
+		pcre2_callout_enumerate\
+		pcre2_code_copy\
+		pcre2_code_copy_with_tables\
+		pcre2_code_free\
+		pcre2_compile\
+		pcre2_compile_context_copy\
+		pcre2_compile_context_create\
+		pcre2_compile_context_free\
+		pcre2_config\
+		pcre2_convert_context_copy\
+		pcre2_convert_context_create\
+		pcre2_convert_context_free\
+		pcre2_converted_pattern_free\
+		pcre2_dfa_match\
+		pcre2_general_context_copy\
+		pcre2_general_context_create\
+		pcre2_general_context_free\
+		pcre2_get_error_message\
+		pcre2_get_mark\
+		pcre2_get_match_data_heapframes_size\
+		pcre2_get_match_data_size\
+		pcre2_get_ovector_count\
+		pcre2_get_ovector_pointer\
+		pcre2_get_startchar\
+		pcre2_jit_compile\
+		pcre2_jit_match\
+		pcre2_jit_stack_assign\
+		pcre2_jit_stack_create\
+		pcre2_jit_stack_free\
+		pcre2_maketables\
+		pcre2_maketables_free\
+		pcre2_match\
+		pcre2_match_context_copy\
+		pcre2_match_context_create\
+		pcre2_match_context_free\
+		pcre2_match_data_create\
+		pcre2_match_data_create_from_pattern\
+		pcre2_match_data_free\
+		pcre2_pattern_convert\
+		pcre2_pattern_info\
+		pcre2_serialize_decode\
+		pcre2_serialize_encode\
+		pcre2_serialize_free\
+		pcre2_serialize_get_number_of_codes\
+		pcre2_set_bsr\
+		pcre2_set_callout\
+		pcre2_set_character_tables\
+		pcre2_set_compile_extra_options\
+		pcre2_set_compile_recursion_guard\
+		pcre2_set_depth_limit\
+		pcre2_set_glob_escape\
+		pcre2_set_glob_separator\
+		pcre2_set_heap_limit\
+		pcre2_set_match_limit\
+		pcre2_set_max_pattern_length\
+		pcre2_set_max_varlookbehind\
+		pcre2_set_newline\
+		pcre2_set_offset_limit\
+		pcre2_set_parens_nest_limit\
+		pcre2_set_recursion_limit\
+		pcre2_set_recursion_memory_management\
+		pcre2_set_substitute_callout\
+		pcre2_substitute\
+		pcre2_substring_copy_byname\
+		pcre2_substring_copy_bynumber\
+		pcre2_substring_free\
+		pcre2_substring_get_byname\
+		pcre2_substring_get_bynumber\
+		pcre2_substring_length_byname\
+		pcre2_substring_length_bynumber\
+		pcre2_substring_list_free\
+		pcre2_substring_list_get\
+		pcre2_substring_nametable_scan\
+		pcre2_substring_number_from_name\
+		pcre2api\
+		pcre2build\
+		pcre2callout\
+		pcre2compat\
+		pcre2convert\
+		pcre2demo\
+		pcre2jit\
+		pcre2limits\
+		pcre2matching\
+		pcre2partial\
+		pcre2pattern\
+		pcre2perform\
+		pcre2posix\
+		pcre2sample\
+		pcre2serialize\
+		pcre2syntax\
+		pcre2unicode
+
+default:V:
+	mk -f mkfile.libpcre
+	mk -f mkfile.libpcreposix
 
 install:V:
 	mk -f mkfile.libpcre $target
 	mk -f mkfile.libpcreposix $target
-	for (i in $DIRS)
-		@{ cd $i; mk $target }
 	pcre2-config /rc/bin/ape
+	for (i in $MAN1)
+		@{ cd $PCRESRC/doc; cp $i.1 /sys/man/1/$i }
+	for (i in $MAN3) 
+		@{ cd $PCRESRC/doc; cp $i.3 /sys/man/3/$i }
 
 installall:V:
 	mk -f mkfile.libpcre install
 	mk -f mkfile.libpcreposix install
-	for (i in $DIRS)
-		@{ cd $i; mk install }
 	cp pcre2-config /rc/bin/ape
+	for (i in $MAN1)
+		@{ cd $PCRESRC/doc; cp $i.1 /sys/man/1/$i }
+	for (i in $MAN3) 
+		@{ cd $PCRESRC/doc; cp $i.3 /sys/man/3/$i }
 
 clean:V:
 	mk -f mkfile.libpcre $target
 	mk -f mkfile.libpcreposix $target
-	mk -f mkfile.pcretest $target
-	for (i in $DIRS)
-		@{ cd $i; mk $target }
+	rm *.a
 
 nuke:V:
 	mk -f mkfile.libpcre $target
 	mk -f mkfile.libpcreposix $target
 	mk -f mkfile.pcretest $target
-	for (i in $DIRS)
-		@{ cd $i; mk $target }
 	rm -f /rc/bin/ape/pcre2-config
 
-test:V:
-	mk -f mkfile.pcretest

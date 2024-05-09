@@ -179,6 +179,7 @@
    The POSIX-compatible implementation uses a possibly-wider type.
    The name 'Idx' is three letters to minimize the hassle of
    reindenting a lot of regex code that formerly used 'int'.  */
+#define regoff_t int
 typedef regoff_t Idx;
 #ifdef _REGEX_LARGE_OFFSETS
 # define IDX_MAX SSIZE_MAX
@@ -187,6 +188,7 @@ typedef regoff_t Idx;
 #endif
 
 /* A hash value, suitable for computing hash tables.  */
+#define __re_size_t size_t
 typedef __re_size_t re_hashval_t;
 
 /* An integer used to represent a set of bits.  It must be unsigned,
@@ -408,7 +410,7 @@ struct re_string_t
      the beginning of the input string.  */
   unsigned int tip_context;
   /* The translation passed as a part of an argument of re_compile_pattern.  */
-  RE_TRANSLATE_TYPE trans;
+  unsigned char *trans;
   /* Copy of re_dfa_t's word_char.  */
   re_const_bitset_ptr_t word_char;
   /* true if REG_ICASE.  */

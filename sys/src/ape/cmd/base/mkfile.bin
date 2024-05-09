@@ -13,7 +13,6 @@ TARG= \
 		cut\
 		false\
 #		find\
-		grep\
 		ls\
 		true\
 		tsort\
@@ -62,9 +61,5 @@ install:V:
 	mkdir -p /sys/man/1ape
 	cp $SBASESRC/ls.1 /sys/man/1ape/ls
 	rm -f /rc/bin/ape/ls
-	cp $SBASESRC/grep.1 /sys/man/1ape/grep
-	rm -f /rc/bin/ape/grep
-	cp egrep.rc /rc/bin/ape/egrep
-	cp fgrep.rc /rc/bin/ape/fgrep
 	cp psh.rc /rc/bin/ape/psh
 	chmod +x /rc/bin/ape/*
