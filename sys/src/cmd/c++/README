@@ -1,0 +1,17 @@
+
+This is a port of Cfront to plan9.
+
+The status of this port is described in the file status.ms
+
+The only the following four files clash with those
+in the plan9 distribution. The changes only add rules
+for building C++ source.
+
+	/sys/src/cmd/mklib
+	/sys/src/cmd/mkmany
+	/sys/src/cmd/mkone
+	/sys/src/cmd/mksyslib
+
+The modified versions of these files are held in
+/sys/src/c++/sys_src_cmd/
+

@@ -1,0 +1,22 @@
+BUILTINS=
+</$objtype/mkfile
+NPROC=3
+
+n = Task Wait recTask Server
+x = ${n:%=$O.%}
+
+all:	$x
+	$O.Task 10
+	$O.recTask 10
+	$O.Server
+	$O.Wait
+
+%.$O:	%.c
+	c++/$CC -I. $stem.c
+
+$O.%:	%.$O
+	c++/$LD -o $target $stem.$O -ltask
+
+clean:V:
+	rm -f *.[$OS] [$OS].*
+

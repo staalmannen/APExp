@@ -1,0 +1,19 @@
+BUILTINS=
+</$objtype/mkfile
+<../c++mkfile
+
+$O.sz:V:
+	szal | sort > $O.sz
+
+install:V: $O.sz
+	cp $O.sz /sys/lib/c++/$O.sz
+
+installall:V:
+	for(objtype in $CPUS)
+		mk install
+
+clean:V:
+	rm -f *.[$OS] [$OS].sz y.tab.?
+
+nuke:V: clean
+

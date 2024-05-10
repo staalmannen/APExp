@@ -1,0 +1,12 @@
+#!/bin/rc
+
+echo '/* Generated file, do not edit */'
+echo
+echo 'static char *Syslimits[] = {'
+
+awk '
+	$1 == "#define" 		{ printf("\t\"%s\",\n", $2); }
+	$1 == "#" && $2 == "define"	{ printf("\t\"%s\",\n", $3); }
+	' $1
+
+echo '};'

@@ -1,0 +1,21 @@
+</$objtype/mkfile
+
+CFLAGS=-c -B -D_POSIX_SOURCE -D_BSD_EXTENSION -I ../demangle
+CC=pcc
+TARG=ptcomp ptlink
+BIN=/$objtype/bin/c++
+
+</sys/src/cmd/mkmany
+
+$O.ptcomp: ptcomp.$O ptutil.$O
+
+$O.ptlink: ptlink.$O ptutil.$O dem.$O
+
+ptutil.$O:	ptutil.c pt.h
+
+ptcomp.$O: ptcomp.c pt.h
+
+ptlink.$O:	ptlink.c pt.h ../demangle/dem.h
+
+dem.$O: ../demangle/dem.c
+	$CC $CFLAGS -o $target $prereq

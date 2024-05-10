@@ -1,0 +1,735 @@
+Only in .: 5.out
+Only in /n/hugo/sys/src/cmd/mkmk: 9port
+Only in .: diff
+Only in .: expr.5
+diff /n/hugo/sys/src/cmd/mkmk/expr.c ./expr.c
+33,34c33,34
+< static vlong factor(int ign);
+< static vlong query(int ign);
+---
+> static int factor(int ign);
+> static int query(int ign);
+65,66c65,66
+< static vlong
+< defined(int ign)
+---
+> static int
+> defined(char *request, int ign)
+87c87
+< 		experr("missing brace in #if defined()\n");
+---
+> 		experr("missing brace in #if %s()\n", request);
+98c98
+< static vlong
+---
+> static int
+114,115c114,115
+< 	if(strcmp(name, "defined") == 0)
+< 		return defined(ign);
+---
+> 	if(strcmp(name, "defined") == 0 || strcmp(name, "__builtin_uaddl_overflow") == 0)
+> 		return defined(name, ign);
+124c124
+< 	return strtoll(val, nil, 0);
+---
+> 	return strtol(val, nil, 0);
+130c130
+< static vlong
+---
+> static int
+133,134c133
+< 	int c;
+< 	vlong val;
+---
+> 	int val, c;
+155c154
+< static vlong
+---
+> static int
+158c157
+< 	vlong vl, vr, n;
+---
+> 	int vl, vr, n;
+182c181
+< static vlong
+---
+> static int
+185,186c184
+< 	int c;
+< 	vlong vl, vr;
+---
+> 	int c, vl, vr;
+192c190
+< 		switch(c){
+---
+> 		switch (c){
+211c209
+< static vlong
+---
+> static int
+214c212
+< 	vlong c, vl, vr;
+---
+> 	int c, vl, vr;
+232c230
+< static vlong
+---
+> static int
+235c233
+< 	vlong vl, vr, c;
+---
+> 	int vl, vr, c;
+256c254
+< static vlong
+---
+> static int
+259,260c257
+< 	vlong n, val;
+< 	int c, neg, uns, lng, base;
+---
+> 	int n;
+262,266c259,265
+< 	uns = 0;
+< 	lng = 0;
+< 	neg = 0;
+< 	val = 0;
+< 	base = 10;
+---
+> 	/*
+> 	 * I cheat and don't use getch() here, strtol()'s 
+> 	 * parsing is correct and I make too many mistakes
+> 	 */
+> 	n = strtol(nxtch, &nxtch, 0);
+> 	while(*nxtch == 'u' || *nxtch == 'l' || *nxtch == 'L')
+> 		nxtch++;
+268,331c267
+< 	c = skipws();
+< 	if (c == '-'){
+< 		neg = 1;
+< 		c = getch();
+< 	}
+< 	if (c == '+')
+< 		c = getch();
+< 	if(c == '0'){
+< 		base = 8;
+< 		c = getch();
+< 	}
+< 	if(base == 8 && (c == 'x' || c == 'X')){
+< 		base = 16;
+< 		c = getch();
+< 	}
+< 
+< 	while(c != 0){
+< 		if(isdigit(c))
+< 			n = c - '0';
+< 		else
+< 		if(isalpha(c))
+< 			n = (tolower(c) - 'a') + 10;
+< 		else
+< 			break;
+< 
+< 		if(n >= base)
+< 			break;
+< 
+< 		val *= base;
+< 		val += n;
+< 		c = getch();
+< 	}
+< 
+< 	while(c != 0){
+< 		if(c == 'u' || c == 'U')
+< 			uns++;
+< 		else
+< 		if(c == 'l' || c == 'L')
+< 			lng++;
+< 		else
+< 			break;
+< 		c = getch();
+< 
+< 	}			
+< 	ungetch();
+< 
+< 	if(neg)
+< 		val = -val;
+< 
+< 	switch(lng){
+< 	case 0:
+< 		val &= 0xffff;
+< 		break;
+< 	case 1:
+< 		val += 0xffffffff;
+< 		break;
+< 	case 2:
+< 		break;
+< 	default:
+< 		experr("%d too many 'L' flags in number\n", lng);
+< 	}
+< 
+< 	return val;
+< 
+---
+> 	return n;
+338c274
+< static vlong
+---
+> static int
+341a278
+> 	int value;
+343d279
+< 	vlong value;
+408c344
+< static vlong
+---
+> static int
+411c347
+< 	vlong val;
+---
+> 	int val;
+434c370
+< 	switch(c1){
+---
+> 	switch (c1){
+465c401
+< static vlong
+---
+> static int
+468,469c404
+< 	int op;
+< 	vlong vl, vr;
+---
+> 	int vl, vr, eqrel;
+472c407
+< 	while((op = geteqrel()) != -1){
+---
+> 	while((eqrel = geteqrel()) != -1){
+475c410
+< 		switch(op){
+---
+> 		switch (eqrel){
+502c437
+< static vlong
+---
+> static int
+505,506c440
+< 	int c;
+< 	vlong val;
+---
+> 	int val, c;
+523c457
+< static vlong
+---
+> static int
+526c460
+< 	vlong vl, vr;
+---
+> 	int vl, vr;
+544c478
+< static vlong
+---
+> static int
+547c481
+< 	vlong vl, vr;
+---
+> 	int vl, vr;
+566c500
+< static vlong
+---
+> static int
+569c503
+< 	vlong tst, val;
+---
+> 	int tst, rc;
+578c512
+< 		val = query(ign);
+---
+> 		rc = query(ign);
+588c522
+< 		val = query(ign);
+---
+> 		rc = query(ign);
+591c525
+< 	return val;
+---
+> 	return rc;
+596a531
+> 	int rc;
+598d532
+< 	vlong val;
+605c539
+< 	val = query(ign);
+---
+> 	rc = query(ign);
+607c541
+< 		return val;
+---
+> 		return rc;
+609c543
+< 	fprint(2, "%s: %s:%d '%c%s' trailing garbage after expression\n",
+---
+> 	fprint(2, "%s: %s:%d '%c' '%s' trailing garbage after expression\n",
+611c545
+< 	return val;
+---
+> 	return rc;
+Only in .: hints.5
+Only in .: misc.5
+diff /n/hugo/sys/src/cmd/mkmk/mkfile ./mkfile
+27a28
+> 
+Only in .: mkmk.5
+diff /n/hugo/sys/src/cmd/mkmk/mkmk.c ./mkmk.c
+11,14c11,14
+< int Debug = 0;			/* debug */
+< int Wrap = Defwrap;		/* word wrap collumn */
+< Biobuf *op;			/* output */
+< List *Incdir = nil;		/* -I args from command line */
+---
+> int Debug = 0;				/* debug */
+> int Wrap = Defwrap;			/* word wrap collumn */
+> Biobuf *op;					/* output */
+> List *Incdir = nil;			/* -I args from command line */
+16,17c16,17
+< char Objletter;			/* Object letter */
+< int Autoconf = 0;		/* generate a config.h and fill with defines */
+---
+> char Objletter;				/* Object letter */
+> int Autoconf = 0;			/* generate a config.h and fill with defines */
+74c74
+< dumpdeps(Depend *dep, int depth)
+---
+> dumpdeps(Biobuf *bp, Depend *dep, int depth)
+79c79
+< 		fprint(2, "%*.s%-20s \n", depth, "", d->file->name);
+---
+> 		Bprint(bp, "%*.s%-20s \n", depth, "", d->file->name);
+81c81
+< 			dumpdeps(d->child, depth +4);
+---
+> 			dumpdeps(bp, d->child, depth +4);
+86c86
+< dumpfiles(void)
+---
+> dumpfiles(Biobuf *bp)
+88a89,99
+> 	int len, n;
+> 	char *Type[] = {
+> 		[Tunk]	"unknown",
+> 		[Thdr]	"header",
+> 		[Tsrc]	"source",
+> 		[Tyacc]	"yacc",
+> 		[Tlex]	"lex",
+> 		[Tman1]	"man1",
+> 		[Tman3]	"man3",
+> 		[Tdir]	"dir",
+> 	};
+89a101,110
+> 	len = 0;
+> 	for(f = Files; f; f = f->next){
+> 		n = strlen(f->name);
+> 		if(n > len)
+> 			len = n;
+> 	}
+> 
+> 	Bprint(bp, "%*s  %-6s %-6s %-10s %s\n",
+> 		-len, "file", "refs", "reads", "type",  "is global");
+> 
+91,92c112,113
+< 		fprint(2, "%-20s %-4d %-4d %s\n", 
+< 			f->name, f->ref, f->type, (f->global)? "y": "n");
+---
+> 		Bprint(bp, "%*s  %-6d %-6d %-10s %s\n", 
+> 			-len, f->name, f->ref, f->reads, Type[f->type], (f->global)? "y": "n");
+119,120d139
+< 		if(c->child)
+< 			prdeps(colp, isglobal, c->child);
+122d140
+< 		c->file->ref++;
+133,135d150
+< 		if(! issrc(d->file))
+< 			continue;
+< 
+137,141c152
+< 		for(c = d->child; c; c = c->next)
+< 			if(! c->file->global){
+< 				found = 1;
+< 				break;
+< 			}
+---
+> fprint(2, "depend %s\n", d->file->name);
+142a154,167
+> 		switch(d->file->type){
+> 		case Thdr:
+> 		case Tsrc:
+> 		case Tyacc:
+> 		case Tlex:
+> 			for(c = d->child; c; c = c->next)
+> 				if(!c->file->sysdir && !c->file->global){
+> 					found = 1;
+> 					break;
+> 				}
+> 			break;
+> 		}
+> 
+> 
+145c170,173
+< 			wrap(&col, "%t.$O: ", d->file->name);
+---
+> 			if(issrc(d->file))
+> 				wrap(&col, "%t.$O: ", d->file->name);
+> 			else
+> 				wrap(&col, "%s: ", d->file->name);
+147c175
+< 			Bprint(op, "\n");
+---
+> 			Bprint(op, "\n\n");
+270a299
+> 
+274,275c303,304
+< 	int col, found, nsrc, n;
+< 	Depend *d, *c, *d1, *c1;
+---
+> 	int col, found, num;
+> 	File *f;
+277a307
+> 	num = 0;
+280,286c310,313
+< 	/* count number of source files */
+< 	nsrc = 0;
+< 	for(d = Dep; d; d = d->next)
+< 		if(issrc(d->file))
+< 			nsrc++;
+< 	if(nsrc == 0)
+< 		return;
+---
+> 	for(f = Files; f; f = f->next)
+> 		if(!f->sysdir && f->ref > 0)
+> 			num++;
+> 	num = (num*PercentInc)/100;
+288,290c315,319
+< 	/* find the first source file */
+< 	for(d = Dep; d; d = d->next)
+< 		if(issrc(d->file))
+---
+> 	for(f = Files; f; f = f->next){
+> 		if(Debug)
+> 			fprint(2, "h %s %d/%d\n", f->name, f->ref, num);
+> 		if(!f->sysdir && f->ref >= num || f->ref > NumberInc){
+> 			found = 1;
+291a321,322
+> 		}
+> 	}
+293,294c324,325
+< 	/* for each child of this source file */
+< 	for(c = d->child; c; c = c->next){
+---
+> 	if(! found)
+> 		return;
+296,321c327,331
+< 		/* local headers only */
+< 		if(c->file->sysdir)
+< 			continue;
+< 		n = 0;
+< 
+< 		/* for each source file */
+< 		for(d1 = Dep; d1; d1 = d1->next){
+< 			if(! issrc(d1->file))
+< 				continue;
+< 	
+< 			/* check that this header is included by them also */
+< 			for(c1 = d1->child; c1; c1 = c1->next)
+< 				if(strcmp(c->file->name, c1->file->name) == 0){
+< 					n++;
+< 					break;
+< 				}
+< 			}
+<  		//print("# HFILES: file=%s refs=%d/%d\n", c->file->name, n, nsrc);
+< 		if((double)n / (double)nsrc > Most){
+< 			if(!found){
+< 				wrap(&col, "HFILES=");
+< 				found = 1;
+< 			}
+< 			wrap(&col, "%s ", c->file->name);
+< 			prdeps(&col, 1, c->child);
+< 			c->file->global = 1;
+---
+> 	wrap(&col, "HFILES=");
+> 	for(f = Files; f; f = f->next)
+> 		if(!f->sysdir && f->ref >= num){
+> 			f->global = 1;
+> 			wrap(&col, "%s ", f->name);
+323,326c333,334
+< 	}
+< 	if(found)
+< 		Bprint(op, "\n");
+< }
+---
+> 	wrap(&col, "\n");
+> }		
+327a336
+> 
+665c674
+< doscan(Depend **dep, char *file, Lang *l, char *efile, int eline)
+---
+> doscan(Depend **dep, File *f, Lang *l, char *efile, int eline)
+671,673c680
+< 	if(clonedep(dep, file) != -1){
+< 		if(Debug)
+< 			fprint(2, "skipped: clone %s\n", file);
+---
+> 	if(clonedep(dep, f->name) != -1)
+675d681
+< 	}
+678,679c684,685
+< 		fprint(2, "%s: %s:%d too many nested includes, skipping file\n",
+< 			argv0, efile, eline);
+---
+> 		fprint(2, "%s: %s:%d - %s too many nested includes, skipping file\n",
+> 			argv0, efile, eline, f->name);
+686c692
+< 	if((s->bp = Bopen(file, OREAD)) == nil){
+---
+> 	if((s->bp = Bopen(f->name, OREAD)) == nil){
+692c698
+< 	s->file = file;
+---
+> 	s->file = f->name;
+694a701
+> 	f->reads++;
+732c739
+< 	if(line == -1 && !issrc(f))	/* don't scan headers unless they are included */
+---
+> 	if(line == -1 && !issrc(f))				/* don't scan headers unless they are included */
+737c744
+< 		if((rc = doscan(&d->child, f->name, l, file, line)) != -1)
+---
+> 		if((rc = doscan(&d->child, f, l, file, line)) != -1)
+827c834
+< 	Biobuf bout;
+---
+> 	Biobuf bout, berr;
+969,974c976,984
+< 		fprint(2, "\nvariable             value\n");
+< 		dumpvars();
+< 		fprint(2, "\nfile                 refs type global\n");
+< 		dumpfiles();
+< 		fprint(2, "\nsource dependencies...\n");
+< 		dumpdeps(Dep, 0);
+---
+> 		Binit(&berr, 2, OWRITE);
+> 		Bprint(&berr, "\n");
+> 		dumpfiles(&berr);
+> 		Bprint(&berr, "\n");
+> 		dumpvars(&berr);
+> 		Bprint(&berr, "\n");
+> 		Bprint(&berr, "Dependencies\n");
+> 		dumpdeps(&berr, Dep, 0);
+> 		Bterm(&berr);
+diff /n/hugo/sys/src/cmd/mkmk/mkmk.h ./mkmk.h
+2,7c2,9
+< /*
+<  * Most controls the fraction of source files that a header file must be
+<  * included in for it to appear in HFILES= rather than have an explicit
+<  * dependency
+<  */
+< #define Most		0.66
+---
+> enum {
+> 	/*
+> 	 * Most controls the fraction of source files that include a header
+> 	 * for it to be moved into the HFILES= list, rather than have an explicit
+> 	 * dependency.
+> 	 */
+> 	PercentInc = 10,		/* percentage of source files that reference this header */
+> 	NumberInc = 8,			/* number of source files that reference this header */
+9,15c11,17
+< /*
+<  * Default collumn to wrap file lists at, 78 gives wide but short mkfiles,
+<  * some people prefer a value of 1 which gives one file name per line
+<  * and thus long, narrow mkfiles.
+<  * A command line option can override this anyway.
+<  */
+< #define Defwrap		78
+---
+> 	/*
+> 	 * Default collumn to wrap file lists at, 78 gives wide but short mkfiles,
+> 	 * some people prefer a value of 1 which gives one file name per line
+> 	 * and thus long, narrow mkfiles.
+> 	 * A command line option can override this anyway.
+> 	 */
+> 	Defwrap = 78,
+17,21c19,23
+< /*
+<  * Catch self-referential dependencies, stop recuring at this depth,
+<  * ANSI requires at least 15, GCC imposes a limit of 200.
+<  */
+< #define Maxdepth	16
+---
+> 	/*
+> 	 * To catch recursive includes, stop recuring at this depth,
+> 	 * ANSI requires at least 15, GCC imposes a (silly) limit of 200.
+> 	 */
+> 	Maxdepth = 16,
+23,27c25,30
+< /*
+<  * max nesting depth of #if, #ifdef, #ifndef statments, ANSI
+<  * requires 4095.
+<  */
+< #define Ifstack	4096
+---
+> 	/*
+> 	 * max nesting depth of #if, #ifdef, #ifndef statments, ANSI
+> 	 * requires 4095.
+> 	 */
+> 	Ifstack = 4096,
+> };
+28a32
+> 
+30,37c34,41
+< 	Tunk = 0,		/* unknown file type */
+< 	Thdr,			/* header file */
+< 	Tsrc,			/* general source */
+< 	Tyacc,			/* yacc source */
+< 	Tlex,			/* lex source */
+< 	Tman1,			/* man page, command */
+< 	Tman3,			/* man page, library */
+< 	Tdir			/* directory */
+---
+> 	Tunk = 0,				/* unknown file type */
+> 	Thdr,					/* header file */
+> 	Tsrc,					/* general source */
+> 	Tyacc,					/* yacc source */
+> 	Tlex,					/* lex source */
+> 	Tman1,					/* man page, command */
+> 	Tman3,					/* man page, library */
+> 	Tdir					/* directory */
+41c45
+< struct File {			/* files we are interested in */
+---
+> struct File {				/* files we are interested in */
+43,47c47,52
+< 	char *name;		/* file name */
+< 	int ref;		/* reference count for missed source files */
+< 	int type;		/* enum above */
+< 	int sysdir;		/* a "system" header file */
+< 	int global;		/* this dependency is handled in HFILES= */
+---
+> 	char *name;				/* file name */
+> 	int ref;				/* reference count for missed source files */
+> 	int type;				/* enum above */
+> 	int sysdir;				/* a "system" header file */
+> 	int reads;				/* number of times this file was read */
+> 	int global;				/* this dependency is handled in HFILES= */
+51,54c56,59
+< struct Depend {			/* dependency graph */
+< 	Depend *next;		/* next on list */
+< 	File *file;		/* real file info */
+< 	Depend *child;		/* dependent file(s) */
+---
+> struct Depend {				/* dependency graph */
+> 	Depend *next;			/* next on list */
+> 	File *file;				/* real file info */
+> 	Depend *child;			/* dependent file(s) */
+58c63
+< struct List {			/* general name list */
+---
+> struct List {				/* general name list */
+64c69
+< struct Symb {			/* preprocessor symbol */
+---
+> struct Symb {				/* preprocessor symbol */
+66,67c71,72
+< 	char *name;		/* name */
+< 	char *val;		/* value */
+---
+> 	char *name;				/* name */
+> 	char *val;				/* value */
+71,78c76,83
+< struct State {			/* pre-processor parser state */
+< 	Biobuf *bp;		/* include file */
+< 	int line;		/* current line for debug */
+< 	char *file;		/* current file for debug */
+< 	Depend **dep;		/* dependency list to attach any includes to */
+< 	List *langincdirs;	/* language specific include directories */
+< 	int stk[Ifstack];	/* #ifdef/#if state stack */
+< 	int sp;			/* stack pointer */
+---
+> struct State {				/* pre-processor parser state */
+> 	Biobuf *bp;				/* include file */
+> 	int line;				/* current line for debug */
+> 	char *file;				/* current file for debug */
+> 	Depend **dep;			/* dependency list to attach any includes to */
+> 	List *langincdirs;		/* language specific include directories */
+> 	int stk[Ifstack];		/* #ifdef/#if state stack */
+> 	int sp;					/* stack pointer */
+83,85c88,90
+< 	char *ext;		/* file name extension */
+< 	int type;		/* type *enum above */
+< 	List **incdirp;		/* system include dirs to check */
+---
+> 	char *ext;				/* file name extension */
+> 	int type;				/* type *enum above */
+> 	List **incdirp;			/* system include dirs to check */
+89,98c94,103
+< extern Biobuf *op;
+< extern int Debug;
+< extern int Wrap;
+< extern List *Lochints;
+< extern List *Glbhints;
+< extern List *Incdir;
+< extern List *Pragmalib;
+< extern char *Objname;
+< extern char Objletter;
+< extern int Autoconf;
+---
+> extern Biobuf *op;			/* output file */
+> extern int Debug;			/* enable debugging */
+> extern int Wrap;			/* column to wrap lines at */
+> extern List *Lochints;		/* local hints */
+> extern List *Glbhints;		/* global hints */
+> extern List *Incdir;		/* include dir */
+> extern List *Pragmalib;		/* #pragma lib info extracted from source */
+> extern char *Objname;		/* output object file name */
+> extern char Objletter;		/* Object file letter on plan9 */
+> extern int Autoconf;		/* read config.h */
+112c117
+< extern void dumpvars(void);
+---
+> extern void dumpvars(Biobuf *bp);
+diff /n/hugo/sys/src/cmd/mkmk/mkobjtab.rc ./mkobjtab.rc
+17c17,18
+< 		printf("\t{ \"%s\", ''%s'' },\n", tolower(name), substr(letter, 1, 1));
+---
+> 		sub("\\?", "", letter);
+> 		printf("\t{ \"%s\", ''%s'' },\n", tolower(name), letter);
+Only in .: nm.5
+Only in .: objtab.h
+Only in .: parse_cpp.5
+Only in .: parse_f77.5
+Only in .: syms.5
+diff /n/hugo/sys/src/cmd/mkmk/syms.c ./syms.c
+74c74
+< dumpvars(void)
+---
+> dumpvars(Biobuf *bp)
+76d75
+< 	int h;
+77a77
+> 	int h, n, len;
+78a79
+> 	len = 0;
+79a81,89
+> 		for(s = Symtab[h]; s; s = s->next){
+> 			n = strlen(s->name);
+> 			if(n > len)
+> 				len = n;
+> 		}
+> 
+> 	Bprint(bp, "%*s  %s\n", -len, "variable", "value");
+> 
+> 	for(h = 0; h < Nhash; h++)
+81c91
+< 			fprint(2, "%-20s %s\n", s->name, s->val);
+---
+> 			Bprint(bp, "%*s  %s\n", -len, s->name, s->val);
+Only in .: syslimits.h
+Only in .: words

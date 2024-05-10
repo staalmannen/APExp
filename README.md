@@ -46,7 +46,10 @@ the most capable web browser available on Plan9.
 **Modifications made to APE**
 
 
-At this moment, just imported the latest 9front APE sources from git [x]
+***Libraries and headers***
+
+
+Imported the latest 9front APE sources from git [x] (date: )
 In addition, several patches from @lufia [x1, x2] to build libressl and curl
 (introduces pthread, include_next cpp support, etc) has been applied to the
 sources.
@@ -59,13 +62,24 @@ sources.
 - getopt.h with gnu getopt_long from NetBSD, imported to libbsd
 - strings.h shim pointing to bsd.h
 - stdio.h : added fmemopen from tuxpaint, getdelim/getline from gnulib
+
+
+***Utilities***
+
+
 - APE make has been replaced by a port of GNU make (version 3.82)
 - APE sed has been replaced by a port of GNU sed (version 4.2.1)
 - APE grep has been replaced by pcre2grep (version 10.432024-02-16 )
 - system awk has been replaced by GNU awk (version 4.0.0) as ape/awk
 - system yacc has been replaced by byacc (version 20240109) as ape/yacc
 - system lex has been replaced by flex (version 2.6.4) as ape/lex
-- the utilities "ls", have been built from suckless sbase under ape
+- the utilities "cut", "ls", "true", "tsort", "xargs" and "yes" have been built from suckless sbase under ape
+- steve's mkmk (/n/sources/contrib) imported to APExp
+- copied the last plan9 cfront (c++) port from fgb (/n/sources/contrib)
+- copied the remove-bitfields script from lufia's port of git to plan9
+- copied "head", "which", and "printenv" rc scripts from steve (/n/sources/contrib)
+- copied and modified "config" rc script from fgb (/n/sources/contrib)
+
 
 Many of these are old ports and will hopefully be replaced by more up-to-date ports soon.
 

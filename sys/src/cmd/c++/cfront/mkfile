@@ -1,0 +1,62 @@
+</$objtype/mkfile
+
+OFILES=Bits.$O alloc.$O block.$O dcl.$O dcl2.$O dcl3.$O \
+	dcl4.$O del.$O discrim.$O error.$O expand.$O expr.$O \
+	expr2.$O expr3.$O find.$O hash.$O lalex.$O lex.$O \
+	main.$O norm2.$O print.$O print2.$O repr.$O \
+	simpl.$O simpl2.$O size.$O table.$O template.$O \
+	tree_copy.$O tree_walk.$O typ.$O typ2.$O norm.$O y-tab.$O 
+TARG=cfront
+CLD=$LD
+LD=c++/$LD
+BIN=/$objtype/bin/c++
+CFLAGS=-FV
+</sys/src/cmd/mkone
+
+
+y-tab.C: gram.y oldyacc 
+	oldyacc -o y-tab.C gram.y
+
+oldyacc: yacc.c
+	$CC $prereq
+	$CLD -o $target yacc.8
+
+clean:V:
+	rm -f *.[S$O] [S$O].out oldyacc y-tab.C
+
+$OFILES:	cfront.h token.h typedef.h
+
+alloc.$O:	alloc.C template.h Block.h cfront.h size.h token.h typedef.h
+Bits.$O:	Bits.C Bits.h Block.h
+block.$O:	block.C Block.h cfront.h token.h typedef.h
+dcl.$O:		dcl.C size.h cfront.h token.h typedef.h
+dcl2.$O:	dcl2.C size.h Bits.h Block.h cfront.h overload.h token.h typedef.h
+dcl3.$O:	dcl3.C size.h template.h Block.h cfront.h token.h typedef.h
+dcl4.$O:	dcl4.C size.h template.h Block.h cfront.h token.h typedef.h
+del.$O:		del.C cfront.h token.h typedef.h
+discrim.$O:	discrim.C cfront.h node_classes.h token.h typedef.h
+error.$O:	error.C size.h template.h Block.h cfront.h token.h typedef.h
+expand.$O:	expand.C cfront.h token.h typedef.h
+expr.$O:	expr.C size.h cfront.h token.h typedef.h
+expr2.$O:	expr2.C size.h overload.h template.h Bits.h Block.h cfront.h token.h typedef.h
+expr3.$O:	expr3.C size.h Block.h template.h overload.h Bits.h cfront.h token.h typedef.h
+find.$O:	find.C template.h Block.h cfront.h token.h typedef.h
+hash.$O:	hash.C hash.h
+lalex.$O:	lalex.C yystype.h template.h Block.h cfront.h token.h typedef.h tqueue.h
+lex.$O:		lex.C size.h Block.h tqueue.h yystype.h template.h cfront.h token.h typedef.h
+main.$O:	main.C template.h Block.h cfront.h size.h token.h typedef.h
+norm.$O:	norm.C size.h template.h Block.h cfront.h token.h typedef.h
+norm2.$O:	norm2.C size.h cfront.h token.h typedef.h
+print.$O:	print.C cfront.h token.h typedef.h
+print2.$O:	print2.C template.h Block.h cfront.h token.h typedef.h
+repr.$O:	repr.C cfront.h token.h typedef.h
+simpl.$O:	simpl.C size.h cfront.h token.h typedef.h
+simpl2.$O:	simpl2.C size.h cfront.h token.h typedef.h
+size.$O:	size.C size.h cfront.h token.h typedef.h
+table.$O:	table.C cfront.h size.h token.h typedef.h
+template.$O:	template.C template.h Block.h cfront.h hash.h node_classes.h token.h typedef.h tree_copy.h		tree_walk.h
+tree_copy.$O:	tree_copy.C cfront.h hash.h node_classes.h token.h typedef.h tree_copy.h tree_walk.h
+tree_walk.$O:	tree_walk.C node_classes.h cfront.h hash.h token.h typedef.h tree_walk.h
+typ.$O:		typ.C size.h cfront.h token.h typedef.h
+typ2.$O:	typ2.C size.h template.h Block.h cfront.h token.h typedef.h
+y-tab.$O:	size.h template.h tqueue.h Block.h cfront.h token.h typedef.h

@@ -1,0 +1,23 @@
+BUILTINS=
+NPROC=3
+</$objtype/mkfile
+
+c = frame.c
+s = label.s
+v = ${c:%.c=%.v} ${s:%.s=%.v}
+
+%.v:	%.c
+	c++/vc -I.. $stem.c
+%.v:	../task.h label.h
+
+%.v:	%.s
+	va $stem.s
+
+../libtask.a:	$v
+	ar vu $target $prereq
+
+install:V:
+	cp label.h/$objtype/include/c++
+
+clean:V:
+	rm -f *.[$OS] [$OS].out y.tab.?

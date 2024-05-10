@@ -1,0 +1,7 @@
+#!/bin/rc
+
+touch norm.C
+
+mk 'CFLAGS=-FV -DDBG -DVL'
+
+cpp '-D__cplusplus=1' -N -+ -D_POSIX_SOURCE -I/386/include/c++ -I/sys/include/c++ -I/386/include/ape -I/sys/include/ape junk.c | 8.out +D+F+F+F+F +L +x/sys/lib/c++/8.sz +a0 +fnorm.C | grep -v '^#' | grep longlong

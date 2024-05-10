@@ -1,0 +1,8 @@
+</$objtype/mkfile
+
+CFLAGS=-FV
+LIB=/$objtype/lib/c++/libC.a
+OFILES=_arr_map.$O _delete.$O _handler.$O _main.$O \
+	_new.$O _vec.$O placenew.$O 
+
+</sys/src/cmd/mksyslib

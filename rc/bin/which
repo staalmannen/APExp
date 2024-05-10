@@ -1,0 +1,23 @@
+#!/bin/rc
+# which file will this command envoke
+
+rfork e
+
+if (~ $#* 0){
+	echo 'usage: which file...'
+	exit 'usage'
+}
+
+for(dir in $path){
+	if(~ $dir /bin){
+		{ for (nsdir in `{ns | awk '$NF == "/bin" {print dir, $(NF -1)}'}){
+			if (test -f $nsdir/$1)
+				echo $nsdir/$1
+		} } | tail -r
+	}
+	if(! ~ $dir /bin){
+		if (test -f $dir/$1)
+			echo $dir/$1
+	}
+}
+

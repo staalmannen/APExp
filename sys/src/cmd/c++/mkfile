@@ -1,0 +1,50 @@
+PKG=c++
+
+BUILTINS=
+</$objtype/mkfile
+<c++mkfile
+
+dirs=`{ls -l | sed '/sys_src_cmd/d; /^d/!d; /cfront$/d; s/.* //'} cfront
+install:V:
+	for(i in $dirs) @{
+		cd $i
+		mk install
+	}
+
+installall:V:
+	for(objtype in $CPUS)
+		mk install
+
+# make c++ for the new Plan 9 architecture $objtype.
+#  if you are really motivated, port the task library
+#  this needs to be done for the 68020 and 386 as well
+newmachine:V:
+	mkdir /$objtype/bin/c++ /$objtype/lib/c++ /$objtype/include/c++
+	echo 'CCS=' $CCS $CC > c++mkfile
+	echo 'LDS=' $LDS $LD >> c++mkfile
+	echo 'CPUS=' $CPUS $objtype >> c++mkfile
+	echo "$objtype", "$CC", "$LD", "$O", "$O.out", >> cc/machines.h
+	{
+		echo 'case *'$LD
+		echo '	O='$O
+		echo '	objtype='$objtype
+	} >> ld/machines
+	for(i in $dirs) @{
+		cd $i
+		mk install
+	}
+
+clean:V:
+	for(i in $dirs) @{
+		cd $i
+		mk clean
+	}
+
+nuke:V:
+	for(i in $dirs) @{
+		cd $i
+		mk nuke
+	}
+
+pkg:V: nuke
+	tar cv /sys/src/c++ /386/bin/c++ /sys/man/1/c++ /sys/include/c++ /sys/lib/c++ /386/lib/c++ | bzip2 > $home/pkg/$PKG.tbz

@@ -1,0 +1,5 @@
+
+main()
+{
+	long long longlong;
+}

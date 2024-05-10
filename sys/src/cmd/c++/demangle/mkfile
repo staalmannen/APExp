@@ -1,0 +1,11 @@
+</$objtype/mkfile
+
+CFLAGS=-c -B -DDEM_MAIN -I.
+CC=pcc
+TARG=c++filt
+OFILES=dem.$O
+BIN=/$objtype/bin/c++
+
+</sys/src/cmd/mkone
+
+c++filt: dem.c dem.h

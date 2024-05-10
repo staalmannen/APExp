@@ -1,0 +1,22 @@
+BUILTINS=
+</$objtype/mkfile
+<../c++mkfile
+
+install:V:	ld
+	for(i in $LDS)
+		 cp ld /$objtype/bin/c++/$i
+
+installall:V:
+	for(objtype in $CPUS)
+		mk install
+
+#
+# mk newmachine in .. adds an entry to machines
+#
+ld:	ldprog machines
+	awk '$1!="@include" {print $0}
+		$1=="@include" {while(getline <"machines" > 0) print $0}' ldprog > ld
+clean:V:
+	rm -f *.[$OS] [$OS].out y.tab.?
+
+nuke:V: clean

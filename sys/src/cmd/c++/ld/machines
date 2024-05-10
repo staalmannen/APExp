@@ -1,0 +1,15 @@
+case *vl
+	O=v
+	objtype=mips
+case *2l
+	O=2
+	objtype=68020
+case *8l
+	O=8
+	objtype=386
+case *kl
+	O=k
+	objtype=sparc
+case *zl
+	O=z
+	objtype=hobbit

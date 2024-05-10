@@ -1,0 +1,11 @@
+386	- sys sys
+	bin	- sys sys
+		mkmk	- sys sys
+sys	- sys sys
+	man	- sys sys
+		1	- sys sys
+			mkmk	- sys sys
+	src	- sys sys
+		cmd	- sys sys
+			mkmk		- sys sys
+				+	- sys sys

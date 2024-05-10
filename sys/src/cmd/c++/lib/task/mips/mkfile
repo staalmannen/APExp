@@ -1,0 +1,30 @@
+BUILTINS=
+NPROC=3
+</$objtype/mkfile
+
+c = frame.c
+s = label.s
+o = ${c:%.c=%.$O} ${s:%.s=%.$O}
+l = ../libtask.a
+lo= ${o:%=$l(%)}
+
+%.v:	%.c
+	c++/$CC -I.. $stem.c
+%.v:	../task.h label.h
+
+%.v:	%.s
+	$AS $stem.s
+
+lib:V:	$l
+$l(%.$O):N:	%.$O
+$l:	$lo
+	names=`{membername $newprereq}
+	ar vu $target $names
+	rm $names
+
+install:V: $o
+	ar vu /$objtype/lib/c++/libtask.a $o
+	cp label.h /$objtype/include/c++
+
+clean:V:
+	rm -f *.[$OS] [$OS].out y.tab.?

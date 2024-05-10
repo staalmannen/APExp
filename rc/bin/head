@@ -1,0 +1,15 @@
+#!/bin/rc
+
+n=10q
+if (~ $1 -*){
+	n = `{echo $1 | sed 's/-([0-9]*)/\1q/'}
+	shift;
+}
+
+if (! ~ $#* 0){
+	for (i in $*)
+		sed $n $i
+}
+if not{
+	sed $n
+}

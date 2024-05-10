@@ -1,0 +1,22 @@
+#!/bin/rc
+
+echo '/* Generated file, do not edit */'
+echo
+echo 'static struct {'
+echo '	char *name;'
+echo '	char letter;'
+echo '} Objtab[] = {'
+
+awk '
+	$1 ~ "Obj.*" && $(NF-1) != "retired" &&  $NF == "*/" {
+		name = $1;
+		sub("^Obj", "", name);
+		sub(",$", "", name);
+		letter = $(NF -1);
+		sub("^\.", "", letter);
+		sub("\\?", "", letter);
+		printf("\t{ \"%s\", ''%s'' },\n", tolower(name), letter);
+	} 
+' $*
+
+echo '};'

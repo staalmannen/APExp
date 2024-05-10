@@ -1,0 +1,28 @@
+</$objtype/mkfile
+
+TARG=mkmk
+OFILES=mkmk.$O syms.$O hints.$O parse_f77.$O parse_cpp.$O expr.$O misc.$O nm.$O
+BIN=/$objtype/bin
+CFLAGS=-p
+CLEANFILES=objtab.h syslimits.h
+HFILES=objtab.h syslimits.h
+
+</sys/src/cmd/mkone
+
+test:V: install 
+	9port/pax
+	9port/cvs
+	9port/patch
+
+syslimits.h: mksyslimits.rc /sys/include/ape/sys/limits.h
+	mksyslimits.rc  /sys/include/ape/sys/limits.h > syslimits.h
+
+objtab.h: mkobjtab.rc /sys/include/mach.h
+	mkobjtab.rc  /sys/include/mach.h > objtab.h
+
+install:V:
+	cp $TARG.man /sys/man/1/$TARG
+
+pkg:V: nuke
+	tar cv `{pwd} | bzip2 > $home/pkg/$TARG.tbz
+

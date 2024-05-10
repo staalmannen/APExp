@@ -1,0 +1,3 @@
+CCS= vc 2c kc 8c
+LDS= vl 2l kl 8l
+CPUS= mips 68020 sparc 386

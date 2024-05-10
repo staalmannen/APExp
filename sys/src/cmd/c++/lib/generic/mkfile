@@ -1,0 +1,8 @@
+</$objtype/mkfile
+
+CFLAGS=-FV -I.
+LIB=/$objtype/lib/c++/libC.a
+OFILES=generic.$O
+
+</sys/src/cmd/mksyslib
+

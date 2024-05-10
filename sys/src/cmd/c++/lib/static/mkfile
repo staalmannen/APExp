@@ -1,0 +1,7 @@
+</$objtype/mkfile
+
+LIB=/$objtype/lib/c++/libC.a
+OFILES=_ctor.$O _dtor.$O pure.$O
+
+</sys/src/cmd/mksyslib
+

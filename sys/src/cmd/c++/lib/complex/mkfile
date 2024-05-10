@@ -1,0 +1,9 @@
+</$objtype/mkfile
+
+CFLAGS=-FV
+LIB=/$objtype/lib/c++/libC.a
+OFILES=abs.$O arg.$O cos.$O error.$O exp.$O io.$O \
+	log.$O oper.$O polar.$O pow.$O sin.$O sqrt.$O 
+
+</sys/src/cmd/mksyslib
+

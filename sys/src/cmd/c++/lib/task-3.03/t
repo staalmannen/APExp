@@ -1,0 +1,617 @@
+1,6c1,4
+< /*ident	"@(#)cls4:lib/task/task/task.c	1.8" */
+< /*******************************************************************************
+<  
+< C++ source for the C++ Language System, Release 3.0.  This product
+< is a new release of the original cfront developed in the computer
+< science research center of AT&T Bell Laboratories.
+---
+> /*ident	"@(#)C++env:lib/task/task/task.c	1.6" */
+> /**************************************************************************
+> 			Copyright (c) 1984 AT&T
+> 	  		  All Rights Reserved  	
+8,10c6,9
+< Copyright (c) 1993  UNIX System Laboratories, Inc.
+< Copyright (c) 1991, 1992 AT&T and UNIX System Laboratories, Inc.
+< Copyright (c) 1984, 1989, 1990 AT&T.  All Rights Reserved.
+---
+> 	THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE OF AT&T
+> 	
+> 	The copyright notice above does not evidence any   	
+> 	actual or intended publication of such source code.
+12,14c11,16
+< THIS IS UNPUBLISHED PROPRIETARY SOURCE CODE of AT&T and UNIX System
+< Laboratories, Inc.  The copyright notice above does not evidence
+< any actual or intended publication of such source code.
+---
+> *****************************************************************************/
+> // this file now assumes that the stack grows down;
+> // make another if the stack grows up, or split this
+> // into pieces such that one piece knows about stack growing
+> // and the other doesn't.
+> // DO NOT JUST USE IFDEFS!!!!
+16,17d17
+< *******************************************************************************/
+< 
+19d18
+< #include "hw_stack.h"
+20a20
+> #include <stdlib.h>
+22,23c22,26
+< task* task::txsk_chxin = 0;
+< team* task::team_to_delete = 0;
+---
+> #ifdef uts
+> enum {SIZE = 2048};
+> #else
+> enum {SIZE = 750};
+> #endif
+25c28,30
+< #define ABSV(x) ( (x) > 0 ? (x) : -(x) )
+---
+> // align stack if needed
+> #define ALIGN(stack)	((ulong *)((long)(stack) & ~(sizeof(double) - 1)))
+> enum { UNTOUCHED = 052525 };	/* value considered never used */
+27c32
+< const int NEW_CHILD = 1;
+---
+> typedef unsigned long ulong;
+29,34d33
+< int _hwm;
+< 
+< HW_REGS New_task_regs;   /* hardware regs for activating new child
+< 			  * in task::task frame
+< 			  */
+< 
+38c37
+< friend class task;
+---
+> friend task;
+40,44c39,43
+< 	task*	got_stack;
+< 	int*	stack;
+< 	int	size;	// of the stack
+< 	team(task*, int =0);	// stacksize == zero ==> using the main stack
+< 	~team() { delete stack; }
+---
+> 	task	*got_stack;
+> 	ulong	*stack;
+> 	ulong	*stackend;	// of the stack
+> 	team(task*, int);	// stacksize == 0 ==> using the main stack
+> 	~team() { delete stackend; }
+46a46,50
+> int _hwm;
+> static ulong *stack_base;
+> static int stackdown;		// does the stack grow down or up?
+> static task *running;		// task on the current stack
+> 
+50,56c54,65
+< 	if (size = stacksize) {
+< 		stack = new int[stacksize];
+< 		while (stack == 0) object::task_error(E_STORE, (object*)0);
+< 		if (_hwm) {
+< 			for (int x = 0; x < stacksize; x++) {
+< 				stack[x] = UNTOUCHED;
+< 			}
+---
+> 	if (stacksize) {
+> 		stack = new ulong[stacksize];
+> 		stackend = ALIGN(stack + stacksize - 1);
+> 		while (stack == 0)
+> 			object::task_error(E_STORE, (object*)0);
+> 		if (_hwm)
+> 			for (ulong *x = stack; x <= stackend; x++)
+> 				*x = UNTOUCHED;
+> 		if (stackdown) {
+> 			ulong *t = stack;
+> 			stack = stackend;
+> 			stackend = t;
+57a67,69
+> 	} else {
+> 		stackend = 0;
+> 		stack = stack_base;
+61,64c73,74
+< 
+< static void
+< usemainstack()
+< /* fudge to allow simple stack overflow check */
+---
+> /* called from _main to set __main__base */
+> void __task__init()
+66c76,83
+< 	int* sp = TOP();
+---
+> 	// get args for main
+> 	// main => _main => __task__init
+> 	Label m;
+> 	setlabel(&m);
+> 	stack_base = stackbase(m);
+> 	stackdown = (ulong)stack_base > m.sp;
+> 	new task("main");	// fire up a main task
+> }
+68,85c85,98
+< 	if (_hwm) {
+< 		/* WARNING:  This function used to declare an array of
+< 		 * SIZE+100 and set each element to UNTOUCHED instead
+< 		 * of using the following method.  But then when compilers
+< 		 * inlined this function it caused each new task's stack
+< 		 * to overflow on initialization, because the task::task
+< 		 * stack frame was SIZE+100 larger.
+< 		 */
+< 
+< 		// start with next word after "sp"
+< 		for (int i = 2; i < SIZE+100; i++) {
+< 			*(STACK_LAST_WORD_P(sp, i)) = UNTOUCHED;
+< 		}
+< 	} else {
+< #ifndef i386
+< 		*(STACK_LAST_WORD_P(sp, 0)) = 0;
+< #endif
+< 	}
+---
+> Label
+> task::copy_task(Label top, ulong *base, ulong *stack)
+> {
+> 	ulong *stop = (ulong *)top.sp;
+> 	if (base == stop)
+> 		task_error(E_STACK, this);
+> 	if (stackdown)
+> 		while (base > stop)
+> 			*stack-- = *base--;
+> 	else
+> 		while (base < stop)
+> 			*stack++ = *base++;
+> 	*stack = *base;
+> 	return movelabel(top, (ulong)stack);
+88,93c101,102
+< void 
+< copy_stack(register int* f, register int c, register int* t)
+< /*
+< 	copy c words down from f to t
+< 	do NOT attempt to copy "copy_stack"'s own stackframe
+< */
+---
+> void
+> task::swapjmp()
+95c104,109
+< 	COPY_STACK(f,c,t);
+---
+> 	if (t_savearea)
+> 		delete t_savearea;
+> 	t_savearea = 0;
+> 	t_size = 0;
+> 	t_team->got_stack = this;
+> 	gotolabel(1, &t_env);
+98,104c112,113
+< /* swap_stack copies contents of parent stack (starting at pa_fp)
+<  * to child stack.  Adjusts pointers in saved ta_fp frame of child stack 
+<  * (to point to places in child stack).
+<  * Returns distance from parent stack to child stack.
+<  */
+< int
+< task::swap_stack(int* ta_fp, int* pa_fp)
+---
+> void
+> task::doswap(task *on, int ischild)
+106,108c115,129
+< 	int size = ACTIVE_STK_SZ(pa_fp, TOP());
+< 	if (size > t_stacksize) {
+< 		task_error(E_STACK, this);
+---
+> 	// make sure we have enough room to work
+> 	// if we are running on the stack we want to swap
+> 	if (running == on) {
+> 		Label m;
+> 	
+> 		setlabel(&m);
+> 		ulong *t = argbase(m);
+> 		ulong sz = stackdown
+> 			? (ulong)t_team->stack - (ulong)t
+> 			: (ulong)t - (ulong)t_team->stack;
+> 		// recursive call to increase the size of this stack
+> 		if (sz <= t_size) {
+> 			doswap(on, ischild);
+> 			abort();
+> 		}
+110,118c131,140
+< 	copy_stack(pa_fp, size, t_basep);
+< 	/* distance from old stack to new */
+< 	register int distance = pa_fp - t_basep;
+< 	/* now doctor the new frame */
+< #if defined(vax) || defined(PROC_3B)
+< 	OLD_AP(ta_fp - distance) = int((int*)OLD_AP(ta_fp) - distance);
+< #endif
+< 	OLD_FP(ta_fp - distance) = int((int*)OLD_FP(ta_fp) - distance);
+< 	return distance;
+---
+> 	on->t_size += sizeof(double);
+> 	on->t_savearea = new char[on->t_size];
+> 	on->t_save = stackdown
+> 		? on->t_savearea + on->t_size - sizeof(ulong)
+> 		: on->t_savearea + sizeof(double) - sizeof(ulong);
+> 	on->t_save = (char *)ALIGN(on->t_save);
+> 	on->t_env = copy_task(on->t_env, t_team->stack, (ulong *)on->t_save);
+> 	if (!ischild)
+> 		t_env = copy_task(t_env, (ulong *)t_save, t_team->stack);
+> 	swapjmp();
+120c142
+< inline
+---
+> 
+122c144
+< task::settrap()
+---
+> task::swap(int ischild)
+124,127c146,155
+< 	if (t_team->size) {	// Don't set trap for main task
+< 		t_trap = *(STACK_LAST_WORD_P(
+< 				STACK_BASE(t_team->stack, t_stacksize),
+< 				t_team->size));
+---
+> 	task *on = on = t_team->got_stack;
+> 	if (this != on) {
+> 		if (ischild)
+> 			t_size = stackdown
+> 				? (ulong)t_team->stack - t_env.sp
+> 				: t_env.sp - (ulong)t_team->stack;
+> 		on->t_size = stackdown
+> 			? (ulong)t_team->stack - on->t_env.sp
+> 			: (ulong)on->t_env.sp - (ulong)t_team->stack;
+> 		doswap(on, ischild);
+128a157
+> 	swapjmp();
+133c162
+< task::checktrap()
+---
+> task::settrap()
+135,141c164,165
+< 	if (t_team->size	// Don't test for main task
+< 	    && t_trap != *(STACK_LAST_WORD_P(
+< 				STACK_BASE(t_team->stack, t_stacksize),
+< 				t_team->size))) {
+< 		task_error(E_STACK, this);
+< 	}
+< 
+---
+> 	if (t_team->stackend)	// Don't set trap for main task
+> 		t_trap = *t_team->stackend;
+144,149d167
+< extern "C" {
+< 	/* swap and sswap are assembly language functions */
+< extern task* swap(task*, task*, int, int);
+< extern task* sswap(task*, task*, task*, int, int);
+< }
+< 
+152,170c170
+< task::restore(task* running, int is_new_child)
+< /*
+<  *	Call assembly function swap or sswap to do a task switch.
+<  *	Swap suspends "running" task by saving current hardware state (fp, etc)
+<  *	in running->t_framep, etc.,
+<  *	and makes "this" task run after suspension by returning from the frame
+<  *	denoted by "t_framep."
+<  *	
+<  *	swap does a normal return--must be the last thing called here.
+<  *	swap for a new child task will not return through restore,
+<  *	but will return from task::task().
+<  *
+<  *	sswap saves running's hw state, copies out the target stack,
+<  *	copies in to_run's stack from the save area before "swap"ing
+<  *	It is equivalent to two "copystack"s in the middle of "swap".
+<  *	sswap for a new child copies out the parent stack, but does not need
+<  *	to restore hw_state of child--it's already in place, and 
+<  *	WILL return through restore, unlike swap.
+<  */
+---
+> task::checktrap()
+172,195c172,174
+< 	task* prevOnStack;
+< 	// running might have been TERMINATED
+< 	int is_terminated = 0;
+< 	if ((running == 0) || (running->s_state == TERMINATED)) {
+< 		is_terminated = 1;
+< 	} else {
+< 		running->checktrap();
+< 	}
+< 
+< 	if ((t_mode == SHARED) && this != (prevOnStack = t_team->got_stack)){
+< 		t_team->got_stack = this;    // assuming sswap will get space.
+< 		sswap(running, prevOnStack, this, is_new_child, is_terminated);
+< 	}
+< 	else  {	// DEDICATED or (SHARED && this already on target stack)
+< 		swap(running, this, is_new_child, is_terminated);
+< 	}
+< 	//sswap and swap for old task return here.
+< 	// This code is not needed for a new child, because a terminated
+< 	// parent cannot create a new child.
+< 	if (team_to_delete) {
+< 		delete team_to_delete;
+< 		team_to_delete = 0;
+< 	}
+< 	// WARNING!  No new code here.
+---
+> 	// Don't test for main task
+> 	if (t_team->stackend && t_trap != *t_team->stackend)
+> 		task_error(E_STACK, this);
+210,218c189
+< 	register task* running;
+< 
+< 	register int* ta_fp = (int*)FP();	    // fp for task::task()
+< 	register int* ta_ap = (int*)AP();	    // ap for task::task()
+< 	register int* de_fp = (int*)OLD_FP(ta_fp);  // fp for ctor of class 
+< 						    // derived from class task
+< 	register int* de_ap = (int*)OLD_AP(ta_fp);
+< 	register int* pa_fp = (int*)OLD_FP(de_fp);  // parent fp
+< 						    // (caller of derived ctor)
+---
+> 	running = thxstxsk;
+221a193,194
+> 	t_savearea = 0;
+> 	t_size = 0;
+226d198
+< 	th = this;	/* fudged return value -- "returned" from swap */
+228,248c200,202
+< 	switch ((int)thxstxsk) {
+< 	case 0:
+< 		/* initialize task system by creating "main" task */
+< 		thxstxsk = (task*) 1;
+< 		thxstxsk = new task("main");
+< 		break;
+< 	case 1:
+< 		/*	create "main" task	*/
+< 		usemainstack();		/* ensure that store is allocated */
+< 		//set base pointer assuming a static task (Interrupt_alerter)
+< 		//at this point stack has 6 frames for:
+< 		//main, _main, <static ctor>, Int::Int, task::task, task::task
+< 		//NOTE:  This sets basep to be the fp saved in _main's stack
+< 		//frame (fp for main).  Depending on layout, may not include
+< 		//main's save area.  This shouldn't matter.
+< #ifdef i386
+< 		t_basep = (int*)OLD_FP((int*)OLD_FP(pa_fp));
+< #else
+< 		t_basep = (int*)OLD_FP((int*)OLD_FP((int*)OLD_FP(pa_fp)));
+< #endif
+< 		t_team = new team(this);	/* don't allocate stack */
+---
+> 	if (thxstxsk == 0) {		// called from __task__init()
+> 		// create "main" task
+> 		t_team = new team(this, 0);	/* don't allocate stack */
+249a204
+> 		thxstxsk = this;
+252,255c207,208
+< 	// thxstxsk is parent task
+< 	/* return pointer to "child" */
+< 	thxstxsk->th = this;
+< 	thxstxsk->insert(0,this);
+---
+> 	// schedule this task to run now
+> 	thxstxsk->insert(0, this);
+259,261c212
+< 		{
+< 		t_team = new team(this,t_stacksize);
+< 		t_basep = STACK_BASE(t_team->stack, t_stacksize);
+---
+> 		t_team = new team(this, t_stacksize);
+263,268c214,216
+< 		// initialize child's stack
+< 		int distance = swap_stack(ta_fp, pa_fp);
+< 		// save hardware state of this frame in "this" (child)
+< 		t_framep = ta_fp - distance;
+< 		t_ap = ta_ap - distance;
+< 		settrap();
+---
+> 		if (setlabel(&thxstxsk->t_env) == 0) {
+> 			// child; returns first
+> 			Label child = upframe(thxstxsk->t_env);
+270,283c218,221
+< 		// save all current and saved hw regs in New_task_regs,
+< 		// so when child begins execution, it will have hw regs
+< 		// as the derived constructor had them set.
+< 		SAVE_CHILD_REGS(&New_task_regs);
+< 
+< 		thxstxsk->fudge_return(ta_fp);
+< 		running = thxstxsk;	// running = parent
+< 		thxstxsk = this;
+< 		restore(running, NEW_CHILD);	// no return for child; 
+< 						// parent will return
+< 		// Needed on some machines to reset sp on fudged stack
+< 		FUDGE_SP(de_ap, de_fp);  // Can't access arguments on 3B now
+< 					 // (except arg1, implicit "this")
+< 		return;		// On 68k, return through fudge_sp()
+---
+> 			thxstxsk = this;
+> 			child = copy_task(child, argbase(child), t_team->stack);
+> 			settrap();
+> 			gotolabel((long)this, &child);
+284a223,224
+> 		break;
+> 
+287d226
+< 		t_basep = pa_fp;
+290,303c229,237
+< 		t_framep = ta_fp;
+< 		t_ap = ta_ap;
+< 		settrap();
+< 		running = thxstxsk;	// running == parent
+< 		thxstxsk = this;
+< 		restore(running, NEW_CHILD);	// both parent & child will
+< 						// return
+< 		if (running == thxstxsk) {	// parent
+< 			running->fudge_return(ta_fp);
+< 			// Needed on some machines to reset sp on fudged stack
+< 			FUDGE_SP(de_ap, de_fp);  // Can't access arguments
+< 						 // on 3B now (except arg1,
+< 					 	 // implicit "this")
+< 			// On 68k, parent returns through fudge_sp()
+---
+> 		if (setlabel(&thxstxsk->t_env) == 0) {
+> 			// child; return first
+> 			if (setlabel(&t_env) == 0)
+> 				swap(1);
+> 			// ok, now we are really running;
+> 			thxstxsk = this;
+> 			Label child = upframe(t_env);
+> 			settrap();
+> 			gotolabel((long)this, &child);
+305c239
+< 		return;
+---
+> 		break;
+308a243,251
+> 
+> 	// parent
+> 	if (team_to_delete) {
+> 		delete team_to_delete;
+> 		team_to_delete = 0;
+> 	}
+> 	/* return this to function that called the derived constructor */
+> 	Label me = upframe(upframe(thxstxsk->t_env));
+> 	gotolabel((long)this, &me);
+314c257
+< 	task* running = thxstxsk;
+---
+> 	running = thxstxsk;
+316c259,272
+< 	restore(running);
+---
+> 	if (running && running->s_state != TERMINATED)
+> 		running->checktrap();
+> 
+> 	// NOTE -- need to do shared here
+> 	if (running == 0 || setlabel(&running->t_env) == 0) {
+> 		if (t_mode == SHARED)
+> 			swap(0);
+> 		else
+> 			gotolabel(1, &this->t_env);
+> 	}
+> 	if (team_to_delete) {
+> 		delete team_to_delete;
+> 		team_to_delete = 0;
+> 	}
+360a317,318
+> 	if (t_savearea)
+> 		delete t_savearea;
+431c389
+< 		printf("task\n");
+---
+> 		fprintf(stderr, "task\n");
+436c394
+< 	printf("task %s ",ns);
+---
+> 	fprintf(stderr, "task %s ",ns);
+438c396
+< 		printf("(is thistask, %s) ", ss);
+---
+> 		fprintf(stderr, "(is thistask, %s) ", ss);
+440c398
+< 		printf("(%s) ",ss);
+---
+> 		fprintf(stderr, "(%s) ",ss);
+442,443c400,401
+< 		printf("(state==%d CORRUPTED) ",s_state);
+< 	printf("\tthis = %x:\n", this);
+---
+> 		fprintf(stderr, "(state==%d CORRUPTED) ",s_state);
+> 	fprintf(stderr, "\tthis = %x:\n", this);
+448c406
+< 		printf("\tmode=%s t_alert=%x t_next=%x",
+---
+> 		fprintf(stderr, "\tmode=%s t_alert=%x t_next=%x",
+450c408
+< 		printf((s_state==TERMINATED) ? " result=%d\n" : " s_time=%d\n", s_time);
+---
+> 		fprintf(stderr, (s_state==TERMINATED) ? " result=%d\n" : " s_time=%d\n", s_time);
+454c412,414
+< 		printf("\tstack: ");
+---
+> 		fprintf(stderr, "\tstack: ");
+> 		fprintf(stderr, "stack=0x%x, stackend=0x%x, ",
+> 			t_team->stack, t_team->stackend);
+456c416,435
+< 			printf("deleted.  ");
+---
+> 			fprintf(stderr, "deleted.  ");
+> 			if (_hwm)
+> 				fprintf(stderr, "hwm size=%d", t_size);
+> 			fprintf(stderr, "\n");
+> 		} else {
+> 			fprintf(stderr, "\tsizes:\t");
+> 			ulong *top;
+> 			if (this==thxstxsk) {	// figure out real current size
+> 				Label m;
+> 
+> 				setlabel(&m);
+> 				top = (ulong *)m.sp;
+> 			} else		// approximate at last switch
+> 				top = (ulong *)t_env.sp;
+> 			ulong sz = stackdown ? (ulong)t_team->stack - (ulong)top
+> 					: (ulong)top - (ulong)t_team->stack;
+> 			if (t_mode == SHARED)
+> 				sz = t_size;
+> 			fprintf(stderr, "max=%d, current=%d", t_stacksize, sz);
+> 			int my_hwm;
+458,459c437,438
+< 				printf("hwm size=%d, ", t_size);
+< 				printf("hwm address=%x",STACK_LAST_WORD_P(t_basep,t_size));
+---
+> 				my_hwm = curr_hwm();
+> 				fprintf(stderr, ", hwm=%d", my_hwm);
+461c440,446
+< 			printf("\n");
+---
+> 			fprintf(stderr, "\n\t\taddresses:\t");
+> 			fprintf(stderr, "top of stack=0x%x", top);
+> 			if (_hwm)
+> 				fprintf(stderr, ", hwm=0x%x",
+> 					stackdown ? t_team->stack - my_hwm
+> 					: t_team->stack + my_hwm);
+> 			fprintf(stderr, "\n");
+463,483d447
+< 		else {
+< 			register int* b = t_basep;
+< 			printf("\tsizes:\t");
+< 			register int sz;
+< 			if (this==thxstxsk) { // figure out real current size
+< 				sz = ACTIVE_STK_SZ(b,TOP());
+< 			} else {	// approximate at last switch
+< 				sz = t_mode==DEDICATED ?
+< 					ACTIVE_STK_SZ(b,t_framep) : t_size;
+< 			}
+< 			printf("max=%d, current=%d",t_stacksize, sz);
+< 			if (_hwm) printf(", hwm=%d",curr_hwm());
+< 			printf("\n\t\taddresses:\t");
+< 			printf("t_basep=%x, t_framep=%x\n",b,t_framep);
+< 			printf("\t\t\t\tmax=%x",
+< 				STACK_LAST_WORD_P(b,t_stacksize));
+< 			printf(", current=%x", STACK_LAST_WORD_P(b,sz));
+< 			if (_hwm) printf(", hwm=%x",
+< 				STACK_LAST_WORD_P(b, curr_hwm()));
+< 			printf("\n");
+< 		}
+494c458
+< 			printf("\nChain of all tasks:\n");
+---
+> 			fprintf(stderr, "\nChain of all tasks:\n");
+497c461
+< 			printf("Next task on chain of all tasks is:\n");
+---
+> 			fprintf(stderr, "Next task on chain of all tasks is:\n");
+508,511c472,480
+< 	int* b = t_basep;
+< 	int i;
+< 	for (i=t_team->size; 0<i && *(STACK_LAST_WORD_P(b,i))==UNTOUCHED; i--) ;
+< 	return i;
+---
+> 	ulong *b = t_team->stackend;
+> 	ulong *e = t_team->stack;
+> 	if (stackdown)
+> 		while (b < e && *b == UNTOUCHED)
+> 			b++;
+> 	else
+> 		while (b > e && *b == UNTOUCHED)
+> 			b--;
+> 	return stackdown ? e - b : b - e;
+555c524
+< Interrupt_alerter	interrupt_alerter;
+---
+> // not on plan 9 yet Interrupt_alerter	interrupt_alerter;
