@@ -1,0 +1,10 @@
+name: objc
+origin: objc/objc
+version: 3.3.12
+arch: freebsd:10:x86:32
+maintainer: stes@telenet.be
+prefix: /usr/local
+licenselogic: single
+flatsize: 3
+comment: Portable Object Compiler
+

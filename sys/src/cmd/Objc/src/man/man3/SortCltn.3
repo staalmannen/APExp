@@ -1,0 +1,1430 @@
+.TH "sortcltn" 3 "Mar 12, 2023"
+.SH SortCltn
+.PP
+.B
+Inherits from:
+
+Cltn
+.SH Class Description
+.PP
+.B
+SortCltn
+(alias 
+.B
+SortedCollection
+) instances are groups of objects that are kept in sorted order in a tree (by default, the first object is the smallest with respect to 
+.B
+compare:
+)\&.  Inserting and searching objects in such a sorted collection can be faster than using, say an 
+.B
+OrdCltn
+object collection\&.
+.SH Creating An Instance
+.PP
+The method 
+.B
+new
+creates an instance that sorts its elements with respect to 
+.B
+compare:
+\&.  The method 
+.B
+newDictCompare
+sends 
+.B
+dictCompare:
+messages to compare pairs of elements\&.  Finally, the method 
+.B
+sortBy::
+creates a SortCltn that will sort its contents with respect to an arbitrary Block\&.
+.SH Adding Objects
+.PP
+Normally, you insert an object with the 
+.B
+add:
+method\&.  This method allows you to add an object to the collection, even when it is equal to an element in the collection (when the comparison method returns zero; because you can use a different method than 
+.B
+compare:
+, this doesn\&'t necessarily mean that 
+.B
+isEqual:
+returns YES)\&.
+.PP
+You can also choose not to add duplicate entries\&.  The 
+.B
+addNTest:
+method adds if the object was absent and returns a value that can be used to test whether the object was found or not\&. The 
+.B
+filter:
+method frees a new entry when it\&'s a duplicate\&.  The 
+.B
+replace:
+method always replaces duplicates (returning the object that was previously in the collection)\&.
+.SH Sorting collections 
+.PP
+One use of 
+.B
+SortCltn
+instances, is to sort collections of objects\&.  For example,
+.RS 3
+
+aSortCltn = [[SortCltn new] addAll:aCltn];
+.br
+
+.RE
+.PP
+will sequence of the contents of 
+.I
+aCltn
+and will add the members of the collection to a new SortCltn instance\&.  This is equivalent to sorting the collection\&.  To obtain a sorted 
+.B
+OrdCltn
+instance (as opposed to a 
+.B
+SortCltn
+), simply convert back like this,
+.RS 3
+
+aCltn = [[OrdCltn new] addAll:aSortCltn];
+.br
+
+.RE
+.PP
+To filter out duplicate entries, it\&'s also possible to insert a Set instance in the conversion process\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* new
+.br
+* new:
+.br
+* newDictCompare
+.br
+* sortBy:
+.br
+* sortBlock:
+.br
+* newCmpSel:
+.br
+* with:
+.br
+* with:with:
+.br
+* add:
+.br
+* copy
+.br
+* deepCopy
+.br
+* emptyYourself
+.br
+* freeContents
+.br
+* free
+.RE
+.PP 
+.B
+Interrogation
+.RS 3
+.br
+* size
+.br
+* isEmpty
+.br
+* eachElement
+.RE
+.PP 
+.B
+Comparing
+.RS 3
+.br
+* hash
+.br
+* isEqual:
+.RE
+.PP 
+.B
+Adding
+.RS 3
+.br
+* add:
+.br
+* addNTest:
+.br
+* filter:
+.br
+* replace:
+.RE
+.PP 
+.B
+Removing
+.RS 3
+.br
+* remove:
+.RE
+.PP 
+.B
+Testing Contents
+.RS 3
+.br
+* includesAllOf:
+.br
+* includesAnyOf:
+.RE
+.PP 
+.B
+Adding and Removing Contents
+.RS 3
+.br
+* addAll:
+.br
+* addContentsOf:
+.br
+* addContentsTo:
+.br
+* removeAll:
+.br
+* removeContentsFrom:
+.br
+* removeContentsOf:
+.RE
+.PP 
+.B
+Combining
+.RS 3
+.br
+* intersection:
+.br
+* union:
+.br
+* difference:
+.RE
+.PP 
+.B
+Converting
+.RS 3
+.br
+* asSet
+.br
+* asOrdCltn
+.RE
+.PP 
+.B
+Using Blocks
+.RS 3
+.br
+* detect:
+.br
+* detect:ifNone:
+.br
+* select:
+.br
+* reject:
+.br
+* collect:
+.br
+* count:
+.RE
+.PP 
+.B
+Making elements perform
+.RS 3
+.br
+* elementsPerform:
+.br
+* elementsPerform:with:
+.br
+* elementsPerform:with:with:
+.br
+* elementsPerform:with:with:with:
+.RE
+.PP 
+.B
+Do Blocks
+.RS 3
+.br
+* do:
+.br
+* do:until:
+.RE
+.PP 
+.B
+Locating
+.RS 3
+.br
+* find:
+.br
+* contains:
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.PP 
+.B
+Archiving
+.RS 3
+.br
+* fileOutOn:
+.br
+* fileInFrom:
+.RE
+.SH Methods
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+Returns a new instance that sorts its contents with respect to 
+.B
+compare:
+\&.
+.PP 
+new:
+.RS 1
++
+.B
+new
+:(unsigned)
+.I
+n
+.RE
+.PP
+For this class, this method does not differ from 
+.B
+new
+\&.
+.PP 
+newDictCompare
+.RS 1
++
+.B
+newDictCompare
+.RE
+.PP
+Returns a new instance that sorts its contents with respect to 
+.B
+dictCompare:
+\&.
+.PP 
+sortBy:
+.RS 1
++
+.B
+sortBy
+:
+.I
+sortBlock
+.RE
+.PP
+Returns a new instance that sorts its contents with respect to 
+.I
+sortBlock
+\&.  This block should take two objects 
+.I
+a
+and 
+.I
+b
+as argument, and return a positive value if 
+.I
+a
+is greater than 
+.I
+b
+, or zero if 
+.I
+a
+and 
+.I
+b
+are equal, and a negative value if 
+.I
+a
+is less than 
+.I
+b
+\&.
+.RS 3
+
+id c;
+.br
+int r;
+.br
+c = [SortCltn sortBy:{ :a:b | [a compare:b] }];
+.br
+
+.RE
+.PP 
+sortBlock:
+.RS 1
++
+.B
+sortBlock
+:
+.I
+sortBlock
+.RE
+.PP
+Same as 
+.B
+sortBy:
+\&.
+.PP
+.B
+Note:
+
+There is a SortedCollection method with a similar name in 
+.I
+Squeak
+\&.
+.PP 
+newCmpSel:
+.RS 1
++
+.B
+newCmpSel
+:(SEL)
+.I
+aSel
+.RE
+.PP
+For backwards compatibility only\&.  
+.B
+sortBy:
+provides a more powerful mechanism to sort given an arbitrary sort block\&.
+.PP 
+with:
+.RS 1
++
+.B
+with
+:(int)
+.I
+nArgs,\&.\&.\&.
+.RE
+.PP
+Returns a new object with 
+.I
+nArgs
+elements\&.  For example,
+.RS 3
+
+id aCltn = [OrdCltn with:2,anObject,otherObject];
+.br
+
+.RE
+.PP
+creates a collection and adds 
+.I
+anObject
+and 
+.I
+otherObject
+to it\&.  In a similar way, 
+.B
+Set
+or 
+.B
+SortCltn
+instances can be created like this\&.
+.PP 
+with:with:
+.RS 1
++
+.B
+with
+:
+.I
+firstObject
+.B
+with
+:
+.I
+nextObject
+.RE
+.PP
+This method is equivalent to 
+.B
+with:
+2,
+.I
+firstObject
+,
+.I
+nextObject
+\&. 
+.PP 
+add:
+.RS 1
++
+.B
+add
+:
+.I
+firstObject
+.RE
+.PP
+This method is equivalent to 
+.B
+with:
+1,
+.I
+firstObject
+\&. 
+.PP
+This (factory) method has the same name as the instance method 
+.B
+add:
+and can be used as follows, in circumstances when the user does not want to allocate a collection unless it is actually used :
+.RS 3
+
+aCltn = [ (aCltn)?aCltn:OrdCltn add:myObject ];
+.br
+
+.RE
+.PP
+This shows that creation of the collection is delayed until it is actually needed\&.  If the collection already exists, objects are simply added, using the instance method 
+.B
+add:
+\&.
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Returns a new copy of the object (without copying the elements)\&.
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+Returns a new copy of the object\&.  The elements in the new copy are deep copies of the elements in the original object\&.
+.PP 
+emptyYourself
+.RS 1
+-
+.B
+emptyYourself
+.RE
+.PP
+Empties all the members of the object (without freeing them)\&.  Returns the receiver\&.
+.PP 
+freeContents
+.RS 1
+-
+.B
+freeContents
+.RE
+.PP
+Removes and frees the contents of the object, but doesn\&'t free the object itself\&.  Returns the receiver\&.
+.PP 
+free
+.RS 1
+-
+.B
+free
+.RE
+.PP
+Frees the object, but not its contents\&.  Returns 
+.B
+nil
+\&.  Do :
+.RS 3
+
+aSort = [[aSort freeContents] free];
+.br
+
+.RE
+.PP
+if you want to free the object and its contents\&.
+.PP 
+size
+.RS 1
+- (
+unsigned
+)
+.B
+size
+.RE
+.PP
+Returns the number of elements in the object\&.
+.PP 
+isEmpty
+.RS 1
+- (
+BOOL
+)
+.B
+isEmpty
+.RE
+.PP
+Whether the number of elements is equal to zero\&.
+.PP 
+eachElement
+.RS 1
+-
+.B
+eachElement
+.RE
+.PP
+Returns a sequence of sorted elements\&.  The first element in the sequence is the smallest with respect to the ordering\&.
+.RS 3
+
+aSeq = [aSort eachElement];
+.br
+while ((anElement = [aSeq next])) {
+.br
+/* do something */
+.br
+}
+.br
+aSeq = [aSeq free];
+.br
+
+.RE
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a hash value based on the receiver\&'s address and the results of sending the 
+.B
+hash
+message to the contents\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+aSort
+.RE
+.PP
+Returns YES if 
+.I
+aSort
+is an 
+.B
+SortCltn
+instance, and if each member of its contents responds affirmatively to the message 
+.B
+isEqual:
+when compared to the corresponding member of the receiver\&'s contents\&.
+.PP 
+add:
+.RS 1
+-
+.B
+add
+:
+.I
+anObject
+.RE
+.PP
+Adds 
+.I
+anObject
+to the receiver, keeping the contents of the object sorted\&.  Duplicate entries are allowed\&.  Returns the receiver\&.
+.PP 
+addNTest:
+.RS 1
+-
+.B
+addNTest
+:
+.I
+anObject
+.RE
+.PP
+Adds 
+.I
+anObject
+if it was not previously in the set\&.  Returns 
+.I
+anObject
+if the addition takes place, otherwise returns 
+.B
+nil
+\&.
+.PP 
+filter:
+.RS 1
+-
+.B
+filter
+:
+.I
+anObject
+.RE
+.PP
+If 
+.I
+anObject
+compares equally to some object in the contents of the receiver, then 
+.I
+anObject
+is freed, and the matching object is returned\&.  Otherwise, 
+.I
+anObject
+is added and returned\&.
+.PP 
+replace:
+.RS 1
+-
+.B
+replace
+:
+.I
+anObject
+.RE
+.PP
+If a matching object is found, then 
+.I
+anObject
+replaces that object, and the matching object is returned\&.  If there is no matching object, 
+.I
+anObject
+is added to the receiver, and 
+.B
+nil
+is returned\&.
+.PP 
+remove:
+.RS 1
+-
+.B
+remove
+:
+.I
+oldObject
+.RE
+.PP
+Removes 
+.I
+oldObject
+or the element that matches (when the compare method returns zero)\&.  Returns the removed entry, or 
+.B
+nil
+if there is no matching entry\&.
+.PP
+.B
+Note:
+
+Not implemented
+.PP 
+includesAllOf:
+.RS 1
+- (
+BOOL
+)
+.B
+includesAllOf
+:
+.I
+aCltn
+.RE
+.PP
+Answer whether all the elements of 
+.I
+aCltn
+are in the receiver, by sending 
+.B
+includes:
+for each individual element\&.
+.PP 
+includesAnyOf:
+.RS 1
+- (
+BOOL
+)
+.B
+includesAnyOf
+:
+.I
+aCltn
+.RE
+.PP
+Answer whether any element of 
+.I
+aCltn
+is in the receiver, by sending 
+.B
+includes:
+for each individual element\&.
+.PP 
+addAll:
+.RS 1
+-
+.B
+addAll
+:
+.I
+aCltn
+.RE
+.PP
+Adds each member of 
+.I
+aCltn
+to the receiver\&.  If 
+.I
+aCltn
+is 
+.B
+nil
+, no action is taken\&.  The argument 
+.I
+aCltn
+need not be a collection, so long as it responds to 
+.B
+eachElement
+in the same way as collections do\&.  Returns the receiver\&.
+.PP
+.B
+Note:
+
+If 
+.I
+aCltn
+is the same object as the receiver, a 
+.B
+addYourself
+message is sent to the object\&.
+.PP 
+addContentsOf:
+.RS 1
+-
+.B
+addContentsOf
+:
+.I
+aCltn
+.RE
+.PP
+This method is equivalent to 
+.B
+addAll:
+and is provided for Stepstone ICpak101 compatibility\&.
+.PP 
+addContentsTo:
+.RS 1
+-
+.B
+addContentsTo
+:
+.I
+aCltn
+.RE
+.PP
+This method is equivalent to 
+.B
+addAll:
+, but with argument and receiver interchanged, and is provided for Stepstone ICpak101 compatibility\&.
+.PP 
+removeAll:
+.RS 1
+-
+.B
+removeAll
+:
+.I
+aCltn
+.RE
+.PP
+Removes all of the members of 
+.I
+aCltn
+from the receiver\&. The argument 
+.I
+aCltn
+need not be a collection, as long as it responds to 
+.B
+eachElement
+as collections do\&.  Returns the receiver\&. 
+.PP
+.B
+Note:
+
+If 
+.I
+aCltn
+is the same object as the receiver, it empties itself using 
+.B
+emptyYourself
+and returns the receiver\&.
+.PP 
+removeContentsFrom:
+.RS 1
+-
+.B
+removeContentsFrom
+:
+.I
+aCltn
+.RE
+.PP
+This method is equivalent to 
+.B
+removeAll:
+, and is provided for compatibility with Stepstone ICpak101\&.
+.PP 
+removeContentsOf:
+.RS 1
+-
+.B
+removeContentsOf
+:
+.I
+aCltn
+.RE
+.PP
+This method is equivalent to 
+.B
+removeAll:
+, and is provided for compatibility with Stepstone ICpak101\&.
+.PP 
+intersection:
+.RS 1
+-
+.B
+intersection
+:
+.I
+bag
+.RE
+.PP
+Returns a new Collection which is the intersection of the receiver and 
+.I
+bag
+\&.  The new Collection contains only those elements that were in both the receiver and 
+.I
+bag
+\&.  The argument 
+.I
+bag
+need not be an actual 
+.B
+Set
+or 
+.B
+Bag
+instance, as long as it implements 
+.B
+find:
+as Sets do\&.
+.PP 
+union:
+.RS 1
+-
+.B
+union
+:
+.I
+bag
+.RE
+.PP
+Returns a new Collection which is the union of the receiver and 
+.I
+bag
+\&.  The new Collection returned has all the elements from both the receiver and 
+.I
+bag
+\&.  The argument 
+.I
+bag
+need not be an actual 
+.B
+Set
+or 
+.B
+Bag
+instance, as long as it implements 
+.B
+eachElement:
+as Sets and Bags do\&.
+.PP 
+difference:
+.RS 1
+-
+.B
+difference
+:
+.I
+bag
+.RE
+.PP
+Returns a new Collection which is the difference of the receiver and 
+.I
+bag
+\&.  The new Collection returned has only those elements in the receiver that are not in 
+.I
+bag
+\&.
+.PP 
+asSet
+.RS 1
+-
+.B
+asSet
+.RE
+.PP
+Creates a 
+.B
+Set
+instance and adds the contents of the object to the set\&.
+.PP 
+asOrdCltn
+.RS 1
+-
+.B
+asOrdCltn
+.RE
+.PP
+Creates a 
+.B
+OrdCltn
+instance and adds the contents of the object to the set\&.
+.PP 
+detect:
+.RS 1
+-
+.B
+detect
+:
+.I
+aBlock
+.RE
+.PP
+This message returns the first element in the receiver for which 
+.I
+aBlock
+evaluates to something that is non-nil \&.  For example, the following :
+.RS 3
+
+[ aCltn detect: { :each | [each isEqual:anObject] } ];
+.br
+
+.RE
+.PP
+Returns 
+.B
+nil
+if there\&'s no element for which 
+.I
+aBlock
+evaluates to something that non-nil\&.
+.PP 
+detect:ifNone:
+.RS 1
+-
+.B
+detect
+:
+.I
+aBlock
+.B
+ifNone
+:
+.I
+noneBlock
+.RE
+.PP
+This message returns the first element in the receiver for which 
+.I
+aBlock
+evaluates to something that is non-nil\&.
+.PP
+Evaluates 
+.I
+noneBlock
+if there\&'s no element for which 
+.I
+aBlock
+evaluates to something that is non-nil, and returns the return value of that block\&.  For example,
+.RS 3
+
+[ aCltn detect: { :e | [e isEqual:anObject]} ifNone: {anObject} ];
+.br
+
+.RE
+.PP 
+select:
+.RS 1
+-
+.B
+select
+:
+.I
+testBlock
+.RE
+.PP
+This message will return a subset of the receiver containing all elements for which 
+.I
+testBlock
+evaluates to an Object that is non-nil\&.  For example,
+.RS 3
+
+[ aCltn select: { :each | [each isEqual:anObject] } ];
+.br
+
+.RE
+.PP
+Returns a new empty instance of the same class as the receiver, if there\&'s no element for which 
+.I
+testBlock
+evaluates to something that is non-nil\&. 
+.PP 
+reject:
+.RS 1
+-
+.B
+reject
+:
+.I
+testBlock
+.RE
+.PP
+Complement of 
+.B
+select:
+.PP
+This message will return a subset of the receiver containing all elements for which 
+.I
+testBlock
+evaluates to nil\&.  For example,
+.RS 3
+
+[ aCltn reject: { :each | [each isEqual:anObject] } ];
+.br
+
+.RE
+.PP
+Returns a new empty instance of the same class as the receiver, if there\&'s no element for which 
+.I
+testBlock
+evaluates to nil\&.
+.PP 
+collect:
+.RS 1
+-
+.B
+collect
+:
+.I
+transformBlock
+.RE
+.PP
+This message creates and returns a new collection of the same size and type as the receiver\&. The elements are the result of performing 
+.I
+transformBlock
+on each element in the receiver (elements for which the Block would return 
+.B
+nil
+are filtered out)\&.
+.PP 
+count:
+.RS 1
+- (
+unsigned
+)
+.B
+count
+:
+.I
+aBlock
+.RE
+.PP
+Evaluate 
+.I
+aBlock
+with each of the receiver\&'s elements as the argument\&.  Return the number that answered a non-
+.B
+nil
+value\&.
+.PP 
+elementsPerform:
+.RS 1
+-
+.B
+elementsPerform
+:(SEL)
+.I
+aSelector
+.RE
+.PP
+Send 
+.I
+aSelector
+to all objects in the collection, starting from the object at offset 
+.I
+0
+\&.  For Stepstone compatibility\&.  Producer uses this\&.
+.PP 
+elementsPerform:with:
+.RS 1
+-
+.B
+elementsPerform
+:(SEL)
+.I
+aSelector
+.B
+with
+:
+.I
+anObject
+.RE
+.PP
+Send 
+.I
+aSelector
+to all objects in the collection, starting from the object at offset 
+.I
+0
+\&.  For Stepstone compatibility\&.  Producer uses this\&.
+.PP 
+elementsPerform:with:with:
+.RS 1
+-
+.B
+elementsPerform
+:(SEL)
+.I
+aSelector
+.B
+with
+:
+.I
+anObject
+.B
+with
+:
+.I
+otherObject
+.RE
+.PP
+Send 
+.I
+aSelector
+to all objects in the collection, starting from the object at offset 
+.I
+0
+\&.  For Stepstone compatibility\&.  Producer uses this\&.
+.PP 
+elementsPerform:with:with:with:
+.RS 1
+-
+.B
+elementsPerform
+:(SEL)
+.I
+aSelector
+.B
+with
+:
+.I
+anObject
+.B
+with
+:
+.I
+otherObject
+.B
+with
+:
+.I
+thirdObj
+.RE
+.PP
+Send 
+.I
+aSelector
+to all objects in the collection, starting from the object at offset 
+.I
+0
+\&.  For Stepstone compatibility\&.  ICpak201 uses this\&.
+.PP 
+do:
+.RS 1
+-
+.B
+do
+:
+.I
+aBlock
+.RE
+.PP
+Evaluates 
+.I
+aBlock
+for each element in the collection and returns 
+.B
+self
+\&.  
+.I
+aBlock
+must be a block taking one object (element) as argument; the return value of the block is ignored by this method\&.
+.PP
+Often, the Block would, as a side-effect, modify a variable, as in:
+.RS 3
+
+int count = 0;
+.br
+[contents do: { :what | if (what == anObject) count++; }];
+.br
+
+.RE
+.PP 
+do:until:
+.RS 1
+-
+.B
+do
+:
+.I
+aBlock
+.B
+until
+:(BOOL*)
+.I
+flag
+.RE
+.PP
+Evaluates 
+.I
+aBlock
+for each element in the collection, or until the variable pointed to by 
+.I
+flag
+becomes true, and returns 
+.B
+self
+\&.  
+.I
+aBlock
+must be a block taking one object (element) as argument; the return value of the block is ignored by this method\&.
+.PP
+Typically the Block will modify the variable 
+.I
+flag
+when some condition holds:
+.RS 3
+
+BOOL found = NO;
+.br
+[contents do:{ :what | if (what == findObject) found=YES;} until:&found];
+.br
+if (found) { \&.\&.\&. }
+.br
+
+.RE
+.PP 
+find:
+.RS 1
+-
+.B
+find
+:
+.I
+anObject
+.RE
+.PP
+Returns any element in the receiver which 
+.B
+isEqual:
+to 
+.I
+anObject
+\&.  Otherwise, returns 
+.B
+nil
+\&.
+.PP 
+contains:
+.RS 1
+- (
+BOOL
+)
+.B
+contains
+:
+.I
+anObject
+.RE
+.PP
+Returns YES if the receiver contains 
+.I
+anObject
+\&.  Otherwise, returns NO\&.  Implementation is in terms of the receiver\&'s 
+.B
+find:
+method\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints a comma separated list of the objects in the set by sending each individual object a 
+.B
+printOn:
+message\&.  Returns the receiver\&.
+.PP 
+fileOutOn:
+.RS 1
+-
+.B
+fileOutOn
+:
+.I
+aFiler
+.RE
+.PP
+Writes the tree and all its elements to 
+.I
+aFiler
+\&.  Returns the receiver\&.
+.PP 
+fileInFrom:
+.RS 1
+-
+.B
+fileInFrom
+:
+.I
+aFiler
+.RE
+.PP
+Reads the tree and all its elements from 
+.I
+aFiler
+\&.  Returns the receiver\&.

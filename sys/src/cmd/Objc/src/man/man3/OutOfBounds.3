@@ -1,0 +1,62 @@
+.TH "outofbnd" 3 "Mar 12, 2023"
+.SH OutOfBounds
+.PP
+.B
+Inherits from:
+
+Exception
+.PP
+.B
+Maturity Index:
+
+Experimental
+.SH Class Description
+.PP
+This is a subclass to signal 
+.I
+out of bounds
+occurrences\&.  Messages that return an object at an indicated offset, can signal this 
+.B
+Exception
+if the offset was out of bounds\&.
+.SH Method types
+.SH Methods
+.PP 
+size
+.RS 1
+- (
+unsigned
+)
+.B
+size
+.RE
+.PP 
+at:
+.RS 1
+-
+.B
+at
+:(unsigned)
+.I
+n
+.RE
+.PP 
+new:
+.RS 1
++
+.B
+new
+:(unsigned)
+.I
+n
+.RE
+.PP 
+new:
+.RS 1
+-
+.B
+new
+:(unsigned)
+.I
+n
+.RE

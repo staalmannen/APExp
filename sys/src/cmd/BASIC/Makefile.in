@@ -1,0 +1,188 @@
+prefix          = @prefix@
+exec_prefix     = @exec_prefix@
+BINDIR          = @bindir@
+LIBDIR          = @libdir@
+datarootdir     = @datarootdir@
+DATADIR         = @datadir@
+MANDIR          = @mandir@
+STRIP           = @STRIP@
+CC              = @CC@
+CXX             = @CXX@
+CFLAGS          = @CFLAGS@
+CXXFLAGS        = @CXXFLAGS@
+LDFLAGS         = @LDFLAGS@
+INSTALL         = @INSTALL@
+BSHELL          = @BSHELL@
+GTK3            = @GTK3@
+TK              = @TK@
+FLTK            = @FLTK@
+LEGACY          = @LEGACY@
+
+all : clean bacon bacongui-gtk3 bacongui-fltk bacongui-tk bacongui-legacy
+	@echo "Run 'make install' or 'sudo make install' to install BaCon on your system."
+
+bacon :
+	@if [ -n "$(LDFLAGS)" ]; then \
+		$(BSHELL) ./bacon.sh -c "$(CC)" -o "$(CFLAGS)" -l "$(LDFLAGS)" -d build bacon.bac; \
+	else \
+		$(BSHELL) ./bacon.sh -c "$(CC)" -o "$(CFLAGS)" -d build bacon.bac; \
+	fi;
+	$(STRIP) build/bacon
+
+bacongui-gtk3 :
+	@if [ $(GTK3) = 'true' ]; then \
+		build/bacon -c "$(CC)" -o "$(CFLAGS)" -o -DDATA_PATH='\"$(DESTDIR)$(DATADIR)\"' -l "-L. $(LDFLAGS)" -d build gui/bacongui-gtk3.bac; \
+		$(STRIP) build/bacongui-gtk3; \
+	else \
+		echo "Skipping BaConGUI for GTK3."; \
+	fi;
+
+bacongui-tk :
+	@if [ $(TK) = 'true' ]; then \
+		build/bacon -c "$(CC)" -o "$(CFLAGS)" -o -DDATA_PATH='\"$(DESTDIR)$(DATADIR)\"' -l "-L. $(LDFLAGS)" -d build gui/bacongui-tk.bac; \
+		$(STRIP) build/bacongui-tk; \
+	else \
+		echo "Skipping BaConGUI for TK."; \
+	fi;
+
+bacongui-fltk :
+	@if [ $(FLTK) = 'true' -a -n "$(CXX)" ]; then \
+		build/bacon -c "$(CXX)" -o "$(CXXFLAGS)" -o -DDATA_PATH='\"$(DESTDIR)$(DATADIR)\"' -l "-L. $(LDFLAGS)" -d build-cpp gui/bacongui-fltk.bac; \
+		$(STRIP) build-cpp/bacongui-fltk; \
+	else \
+		echo "Skipping BaConGUI for FLTK."; \
+	fi;
+
+bacongui-legacy :
+	@if [ $(LEGACY) = 'true' ]; then \
+		build/bacon -c "$(CC)" -o "$(CFLAGS)" -o -DDATA_PATH='\"$(DESTDIR)$(DATADIR)\"' -l "-L. $(LDFLAGS)" -d build gui/bacongui-legacy.bac; \
+		$(STRIP) build/bacongui-legacy; \
+	else \
+		echo "Skipping legacy BaConGUI."; \
+	fi;
+
+install :
+	mkdir -p $(DESTDIR)$(BINDIR)
+	mkdir -p $(DESTDIR)$(DATADIR)/applications
+	$(INSTALL) bacon.sh $(DESTDIR)$(BINDIR)
+	$(INSTALL) build/bacon $(DESTDIR)$(BINDIR)
+	@if [ $(GTK3) = 'true' ]; then \
+		$(INSTALL) build/bacongui-gtk3 $(DESTDIR)$(BINDIR)/bacongui-gtk3; \
+		echo $(INSTALL) build/bacongui-gtk3 $(DESTDIR)$(BINDIR)/bacongui-gtk3; \
+		mkdir -p $(DESTDIR)/usr/share/gtksourceview-4/language-specs; \
+		echo mkdir -p $(DESTDIR)/usr/share/gtksourceview-4/language-specs; \
+		$(INSTALL) syntax/bacon.lang $(DESTDIR)/usr/share/gtksourceview-4/language-specs/bacon.lang; \
+		echo $(INSTALL) syntax/bacon.lang $(DESTDIR)/usr/share/gtksourceview-4/language-specs/bacon.lang; \
+		$(INSTALL) -m 644 desktop/bacongui-gtk3.desktop $(DESTDIR)$(DATADIR)/applications; \
+		echo $(INSTALL) -m 644 desktop/bacongui-gtk3.desktop $(DESTDIR)$(DATADIR)/applications; \
+		rm -f $(DESTDIR)$(DATADIR)/applications/bacongui-gtk.desktop; \
+	fi;
+	@if [ $(TK) = 'true' ]; then \
+		$(INSTALL) build/bacongui-tk $(DESTDIR)$(BINDIR)/bacongui-tk; \
+		echo $(INSTALL) build/bacongui-tk $(DESTDIR)$(BINDIR)/bacongui-tk; \
+		$(INSTALL) -m 644 desktop/bacongui-tk.desktop $(DESTDIR)$(DATADIR)/applications; \
+		echo $(INSTALL) -m 644 desktop/bacongui-tk.desktop $(DESTDIR)$(DATADIR)/applications; \
+	fi;
+	@if [ $(FLTK) = "true" -a -n "$(CXX)" ]; then \
+		$(INSTALL) build-cpp/bacongui-fltk $(DESTDIR)$(BINDIR); \
+		echo $(INSTALL) build-cpp/bacongui-fltk $(DESTDIR)$(BINDIR); \
+		$(INSTALL) -m 644 desktop/bacongui-fltk.desktop $(DESTDIR)$(DATADIR)/applications; \
+		echo $(INSTALL) -m 644 desktop/bacongui-fltk.desktop $(DESTDIR)$(DATADIR)/applications; \
+	fi;
+	@if [ $(LEGACY) = 'true' ]; then \
+		$(INSTALL) build/bacongui-legacy $(DESTDIR)$(BINDIR)/bacongui-legacy; \
+		echo $(INSTALL) build/bacongui-legacy $(DESTDIR)$(BINDIR)/bacongui-legacy; \
+		mkdir -p $(DESTDIR)/usr/share/gtksourceview-2.0/language-specs; \
+		echo mkdir -p $(DESTDIR)/usr/share/gtksourceview-2.0/language-specs; \
+		$(INSTALL) syntax/bacon.lang $(DESTDIR)/usr/share/gtksourceview-2.0/language-specs/bacon.lang; \
+		echo $(INSTALL) syntax/bacon.lang $(DESTDIR)/usr/share/gtksourceview-2.0/language-specs/bacon.lang; \
+		mkdir -p $(DESTDIR)/usr/share/gtksourceview-3.0/language-specs; \
+		echo mkdir -p $(DESTDIR)/usr/share/gtksourceview-3.0/language-specs; \
+		$(INSTALL) syntax/bacon.lang $(DESTDIR)/usr/share/gtksourceview-3.0/language-specs/bacon.lang; \
+		echo $(INSTALL) syntax/bacon.lang $(DESTDIR)/usr/share/gtksourceview-3.0/language-specs/bacon.lang; \
+		$(INSTALL) -m 644 desktop/bacongui-legacy.desktop $(DESTDIR)$(DATADIR)/applications; \
+		echo $(INSTALL) -m 644 desktop/bacongui-legacy.desktop $(DESTDIR)$(DATADIR)/applications; \
+		rm -f $(DESTDIR)$(DATADIR)/applications/bacongui-gtk.desktop; \
+	fi;
+	@if [ $(LEGACY) = 'true' -o $(GTK3) = 'true' ]; then \
+		mkdir -p $(DESTDIR)/usr/share/icons/hicolor/scalable/apps; \
+		echo mkdir -p $(DESTDIR)/usr/share/icons/hicolor/scalable/apps; \
+		$(INSTALL) -m 644 icons/BaCon.png $(DESTDIR)/usr/share/icons/hicolor/scalable/apps/bacon.png; \
+		echo $(INSTALL) -m 644 icons/BaCon.png $(DESTDIR)/usr/share/icons/hicolor/scalable/apps/bacon.png; \
+		gtk-update-icon-cache; \
+		echo gtk-update-icon-cache; \
+		update-icon-caches /usr/share/icons/hicolor/* 2>/dev/null; \
+		echo 'update-icon-caches /usr/share/icons/hicolor/*'; \
+	fi;
+	mkdir -p $(DESTDIR)$(DATADIR)/pixmaps
+	$(INSTALL) -m 644 icons/BaCon.png $(DESTDIR)$(DATADIR)/pixmaps
+	$(INSTALL) -m 644 icons/BaCon.xbm $(DESTDIR)$(DATADIR)/pixmaps
+	$(INSTALL) -m 644 icons/BaCon24.png $(DESTDIR)$(DATADIR)/pixmaps
+	$(INSTALL) -m 644 icons/BaConEyes.png $(DESTDIR)$(DATADIR)/pixmaps
+	$(INSTALL) -m 644 icons/BaConStrip.png $(DESTDIR)$(DATADIR)/pixmaps
+	$(INSTALL) -m 644 icons/BaConLegacy.png $(DESTDIR)$(DATADIR)/pixmaps
+	@if [ -d $(DESTDIR)/usr/share ]; then \
+		mkdir -p $(DESTDIR)/usr/share/enscript/hl; \
+		echo mkdir -p $(DESTDIR)/usr/share/enscript/hl; \
+		$(INSTALL) -m 644 syntax/bacon.st $(DESTDIR)/usr/share/enscript/hl; \
+		echo $(INSTALL) -m 644 syntax/bacon.st $(DESTDIR)/usr/share/enscript/hl; \
+	fi;
+	mkdir -p $(DESTDIR)$(DATADIR)/BaCon
+	$(INSTALL) -m 644 LICENSE.txt $(DESTDIR)$(DATADIR)/BaCon
+	mkdir -p $(DESTDIR)$(DATADIR)/BaCon/syntax
+	$(INSTALL) -m 644 syntax/lower.m4 $(DESTDIR)$(DATADIR)/BaCon/syntax
+	$(INSTALL) -m 644 syntax/upper.m4 $(DESTDIR)$(DATADIR)/BaCon/syntax
+	$(INSTALL) -m 644 syntax/bacon.vim $(DESTDIR)$(DATADIR)/BaCon/syntax
+	$(INSTALL) -m 644 syntax/bacon.lang $(DESTDIR)$(DATADIR)/BaCon/syntax
+	mkdir -p $(DESTDIR)$(MANDIR)/man1
+	$(INSTALL) -m 644 documentation/bacon.1 $(DESTDIR)$(MANDIR)/man1
+	mkdir -p $(DESTDIR)$(DATADIR)/BaCon/documentation
+	$(INSTALL) -m 644 documentation/documentation.txt $(DESTDIR)$(DATADIR)/BaCon/documentation
+	$(INSTALL) -m 644 documentation/documentation.html $(DESTDIR)$(DATADIR)/BaCon/documentation
+	$(INSTALL) -m 644 documentation/doc_index.html $(DESTDIR)$(DATADIR)/BaCon/documentation
+	$(INSTALL) -m 644 documentation/doc_frame.html $(DESTDIR)$(DATADIR)/BaCon/documentation
+
+uninstall :
+	rm -f $(DESTDIR)$(BINDIR)/bacon
+	rm -f $(DESTDIR)$(BINDIR)/bacongui-gtk3
+	rm -f $(DESTDIR)$(BINDIR)/bacongui-tk
+	rm -f $(DESTDIR)$(BINDIR)/bacongui-fltk
+	rm -f $(DESTDIR)$(BINDIR)/bacongui-legacy
+	rm -f $(DESTDIR)$(BINDIR)/bacon.sh
+	rm -f $(DESTDIR)$(MANDIR)/man1/bacon.1
+	rm -f $(DESTDIR)$(DATADIR)/applications/bacongui-gtk3.desktop
+	rm -f $(DESTDIR)$(DATADIR)/applications/bacongui-fltk.desktop
+	rm -f $(DESTDIR)$(DATADIR)/applications/bacongui-tk.desktop
+	rm -f $(DESTDIR)$(DATADIR)/applications/bacongui-legacy.desktop
+	rm -f $(DESTDIR)$(DATADIR)/applications/bacongui-gtk.desktop
+	rm -f $(DESTDIR)$(DATADIR)/pixmaps/BaCon.png
+	rm -f $(DESTDIR)$(DATADIR)/pixmaps/BaCon.xbm
+	rm -f $(DESTDIR)$(DATADIR)/pixmaps/BaCon24.png
+	rm -f $(DESTDIR)$(DATADIR)/pixmaps/BaConEyes.png
+	rm -f $(DESTDIR)$(DATADIR)/pixmaps/BaConLegacy.png
+	rm -f $(DESTDIR)/usr/share/enscript/hl/bacon.st
+	rm -f $(DESTDIR)/usr/share/icons/hicolor/scalable/apps/bacon.png
+	rm -f $(DESTDIR)$(DATADIR)/BaCon/LICENSE.txt
+	rm -f $(DESTDIR)$(DATADIR)/BaCon/syntax/lower.m4
+	rm -f $(DESTDIR)$(DATADIR)/BaCon/syntax/upper.m4
+	rm -f $(DESTDIR)$(DATADIR)/BaCon/syntax/bacon.vim
+	rm -f $(DESTDIR)$(DATADIR)/BaCon/syntax/bacon.lang
+	rm -f $(DESTDIR)$(DATADIR)/BaCon/documentation/documentation.txt
+	rm -f $(DESTDIR)$(DATADIR)/BaCon/documentation/documentation.html
+	rm -f $(DESTDIR)$(DATADIR)/BaCon/documentation/doc_index.html
+	rm -f $(DESTDIR)$(DATADIR)/BaCon/documentation/doc_frame.html
+
+clean :
+	rm -f build/* build-cpp/*
+
+delete :
+	rm -rf autom4te.cache
+	rm -f build/* build-cpp/* config.log config.status Makefile configure~
+	rm -rf BUILD
+	rm -rf BUILDROOT
+	rm -rf RPMS
+	rm -rf SOURCES
+	rm -rf SPECS
+	rm -rf SRPMS
+	rm -rf build
+	rm -rf build-cpp

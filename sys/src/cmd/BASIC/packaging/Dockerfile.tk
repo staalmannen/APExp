@@ -1,0 +1,35 @@
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+#
+# Works with Alpine Linux 3.18. Go into the source directory and create the Docker image with:
+#
+#   $ cp packaging/Dockerfile.tk Dockerfile
+#   $ docker build -t bacon .
+#
+# To run the BaCon TK editor:
+#   $ xhost +local:
+#   $ docker run --rm --volume $(pwd):/tmp --user "$(id -u):$(id -g)" -it -v /tmp/.X11-unix:/tmp/.X11-unix -e DISPLAY=unix$DISPLAY bacon:latest bacongui-tk
+#
+# Thanks to BaCon forum member Joe for sorting out how to run the GUI versions from a container and keep the container small.
+#
+# ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+FROM alpine:latest
+
+RUN apk update
+RUN apk add build-base musl-fts-dev zsh flex indent openssl-libs-static openssl-dev pcre-dev xterm tcl-dev tk-dev font-dejavu
+
+COPY . /usr/src/bacon
+WORKDIR /usr/src/bacon
+
+RUN ./configure --enable-gui-tk
+RUN make
+RUN make install
+
+RUN rm -rf /var/cache/apk/*
+
+WORKDIR /tmp
+
+ENV HOME="/tmp"
+
+# Default user on most Linux versions
+USER 1000:1000

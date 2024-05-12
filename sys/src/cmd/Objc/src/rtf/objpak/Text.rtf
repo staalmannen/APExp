@@ -1,0 +1,318 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Portable Object Compiler (c) 1997,98,99,2003.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Text\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} Object\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Maturity Index:}} Experimental\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 The {\b Text} class associates to a {\b String} instance a {\b RunArray}.  The runs for a string, consist of string segments that have the same text attributes, such as font, boldface, fontsize etc.\fs16\
+\
+\f0\fs28\li2200 \fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- new\
+	- new:\
+	- str:\
+	- sprintf:\
+	- fromString:\
+	- string:attribute:\
+	- copy\
+	- free\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Comparison}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- hash\
+	- isEqual:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Accessing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- string\
+	- runs\
+	- str\
+	- size\
+	- charAt:\
+	- charAt:put:\
+	- at:insert:\
+	- at:insert:count:\
+	- deleteFrom:to:\
+	- concat:\
+	- concatSTR:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Emphasis}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- allBold\
+	- makeBoldFrom:to:\
+	- addAttribute:\
+	- addAttribute:from:to:\
+	- attributesAt:\
+	- runLengthFor:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Format Conversions}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- asString\
+	- asText\
+	- asParagraph\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printOn:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 new\f0\b0\
+\f0\fs28\li2500 +{\b new}\fs16\
+\
+\f0\fs28\li2200 Creates an instance whose value is set to the empty string.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 new:\f0\b0\
+\f0\fs28\li2500 +{\b new}:(unsigned){\i nChars}\fs16\
+\
+\f0\fs28\li2200 Creates an instance whose value is set to the empty string, can hold at least {\i nChars} without having to expand.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 str:\f0\b0\
+\f0\fs28\li2500 +{\b str}:(STR){\i aString}\fs16\
+\
+\f0\fs28\li2200 Creates an instance whose value is set to a copy of {\i aString}.  If {\i aString} is NULL, creates an instance whose value is set to the empty string. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 sprintf:\f0\b0\
+\f0\fs28\li2500 +{\b sprintf}:(STR){\i format,...}\fs16\
+\
+\f0\fs28\li2200 Returns a new instace initialized just as the standard C library {\i sprintf()}.  See the documentation on {\i sprintf()} for the formats and variable declarations.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 fromString:\f0\b0\
+\f0\fs28\li2500 +{\b fromString}:{\i aString}\fs16\
+\
+\f0\fs28\li2200 Creates an instance whose value is set to {\i aString}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 string:attribute:\f0\b0\
+\f0\fs28\li2500 +{\b string}:{\i aString}{\b attribute}:{\i attrib}\fs16\
+\
+\f0\fs28\li2200 Creates an instance whose value is set to {\i aString} and then sends itself an {\f2 addAttribute:} message.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 copy\f0\b0\
+\f0\fs28\li2500 -{\b copy}\fs16\
+\
+\f0\fs28\li2200 Returns a copy of the receiver with its internal C string copied as well.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 free\f0\b0\
+\f0\fs28\li2500 -{\b free}\fs16\
+\
+\f0\fs28\li2200 Frees the receiver and its internal C string as well.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hash\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b hash}\fs16\
+\
+\f0\fs28\li2200 Returns a hash value based upon the contents of the string held in the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEqual}:{\i aStr}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the string and runarray contained by {\i aStr} is equal to the contents of the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 string\f0\b0\
+\f0\fs28\li2500 -{\b string}\fs16\
+\
+\f0\fs28\li2200 Returns the String instance for this Text object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 runs\f0\b0\
+\f0\fs28\li2500 -{\b runs}\fs16\
+\
+\f0\fs28\li2200 Returns the RunArray instance for this Text object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 str\f0\b0\
+\f0\fs28\li2500 - (STR){\b str}\fs16\
+\
+\f0\fs28\li2200 Returns a pointer to the NULL-terminated C string stored in the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 size\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b size}\fs16\
+\
+\f0\fs28\li2200 Returns the size of the String instance for this Text object.  The following all return the same value :\fs16\
+\
+\f2\fs24\li2800 [text size];\
+[[text string] size];\
+[[text runs] size];\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 charAt:\f0\b0\
+\f0\fs28\li2500 - (char){\b charAt}:(unsigned){\i anOffset}\fs16\
+\
+\f0\fs28\li2200 Returns the character at {\i anOffset} or {\b zero} if {\i anOffset} is greater than the length of the C string.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 charAt:put:\f0\b0\
+\f0\fs28\li2500 - (char){\b charAt}:(unsigned){\i anOffset}{\b put}:(char){\i aChar}\fs16\
+\
+\f0\fs28\li2200 Replaces the character at {\i anOffset} with {\i aChar} and returns the old character which was in that location.  Returns {\b zero} if {\i anOffset} is greater than the length of the C string.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 at:insert:\f0\b0\
+\f0\fs28\li2500 -{\b at}:(unsigned){\i anOffset}{\b insert}:{\i aString}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 at:insert:count:\f0\b0\
+\f0\fs28\li2500 -{\b at}:(unsigned){\i anOffset}{\b insert}:(char*){\i aString}{\b count}:(int){\i size}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deleteFrom:to:\f0\b0\
+\f0\fs28\li2500 -{\b deleteFrom}:(unsigned){\i p}{\b to}:(unsigned){\i q}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 concat:\f0\b0\
+\f0\fs28\li2500 -{\b concat}:{\i b}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 concatSTR:\f0\b0\
+\f0\fs28\li2500 -{\b concatSTR}:(STR){\i b}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 allBold\f0\b0\
+\f0\fs28\li2500 -{\b allBold}\fs16\
+\
+\f0\fs28\li2200 This message is equivalent to,\fs16\
+\
+\f2\fs24\li2800 [self makeBoldFrom:0 to:[self size] - 1].\
+\f0\fs16\
+\f0\fs28\li2200 Returns {\b self} (the text object).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 makeBoldFrom:to:\f0\b0\
+\f0\fs28\li2500 -{\b makeBoldFrom}:(unsigned){\i p}{\b to}:(unsigned){\i q}\fs16\
+\
+\f0\fs28\li2200 Adds a boldface {\b TextAttribute} for the characters from index {\i p} to {\i q} (including the characters at offset {\i p} and {\i q}).  A boldface attribute has {\f2 emphasiscode} equal to 1.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 addAttribute:\f0\b0\
+\f0\fs28\li2500 -{\b addAttribute}:{\i attribute}\fs16\
+\
+\f0\fs28\li2200 This message is equivalent to,\fs16\
+\
+\f2\fs24\li2800 [self addAttribute:attribute from:0 to:[self size] - 1].\
+\f0\fs16\
+\f0\fs28\li2200 Returns {\b self} (the text object).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 addAttribute:from:to:\f0\b0\
+\f0\fs28\li2500 -{\b addAttribute}:{\i attribute}{\b from}:(unsigned){\i p}{\b to}:(unsigned){\i q}\fs16\
+\
+\f0\fs28\li2200 Adds {\i attribute} to the string segments between {\i p} and {\i q}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 attributesAt:\f0\b0\
+\f0\fs28\li2500 -{\b attributesAt}:(unsigned){\i i}\fs16\
+\
+\f0\fs28\li2200 Returns an {\b OrdCltn} of TextAttribute instances for the character at index {\i i}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 runLengthFor:\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b runLengthFor}:(unsigned){\i i}\fs16\
+\
+\f0\fs28\li2200 Returns the number of remaining characters in the string segment to which the character at position {\i i} belongs.  If {\i i} is the first character of a run, this method returns the size of the run.  Otherwise it returns the size minus the index of character in the run.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asString\f0\b0\
+\f0\fs28\li2500 -{\b asString}\fs16\
+\
+\f0\fs28\li2200 Equivalent to {\f2 string}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asText\f0\b0\
+\f0\fs28\li2500 -{\b asText}\fs16\
+\
+\f0\fs28\li2200 Returns the object itself.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asParagraph\f0\b0\
+\f0\fs28\li2500 -{\b asParagraph}\fs16\
+\
+\f0\fs28\li2200 Returns a paragraph for this text object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Prints the Text for the string contained by this instance.  Returns the receiver.\fs16\
+\
+\fs16\
+\
+\
+}

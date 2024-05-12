@@ -1,0 +1,645 @@
+<HTML>
+<TITLE>polynom Specification Sheet</TITLE>
+<H1>polynom Specification Sheet</H1>
+
+<HR>
+Computer Algebra Kit (c) 1993,2000,14 by Comp.Alg.Objects.  All Rights Reserved.<P>
+<H1>Polynomial</H1>
+<B>Inherits from:</B> CAObject<P>
+<B>Maturity Index:</B> Relatively mature<P>
+<H2>Class Description</H2>
+Polynomials are sums of products of <I>scalar</I> objects and <I>symbols</I> raised to small, non-negative integer <I>exponents</I>.  The scalars and symbols can be arbitrary Computer Algebra Kit objects.  Polynomial supports arithmetic over floating-point scalars, or elements of a field (see <B>inField</B>), or scalars that are elements of an integral domain (see <B>inIntegralDomain</B>).<P>
+<H2>Representations</H2>
+All together, the Polynomial object presents eight different representations for polynomial arithmetic.  A <I>recursive</I> polynomial is a sum of <I>terms</I>, where each term consists of a <I>coefficient</I>, that is either a scalar object or again a polynomial, multiplied by a symbol raised to an exponent (see <B>Term</B>).  An <I>expanded</I> polynomial is a sum of <I>monomials</I>, each monomial consists of a <I>scalar</I> multiplied by a product of terms (see <B>Monomial</B>).  If the polynomial is <I>variable dense</I>, the collection of possible symbols is fixed and symbols raised to the exponent zero are internally stored; if the polynomial is <I>variable sparse</I>, it's not defined a priori what symbols are allowed to occur in the polynomial.   A polynomial can be either <I>degree dense</I> or <I>degree sparse</I>.  If the polynomial is degree dense, terms or monomials can have a zero coefficient, otherwise the polynomial is internally stored as a linked list of non-zero terms or monomials.<P>
+As an example, consider the recursive polynomial in two variables (2 <I>x</I>^2 + 1) <I>y</I>^3 + <I>x</I> <I>y</I>; it's a sum of two terms.  The same polynomial in expanded representation is the sum of three monomials : 2 <I>x</I>^2 <I>y</I>^3 + <I>y</I>^3 + <I>x</I> <I>y</I>.<P>
+Not all representations are implemented.  Some representations (notably the variable sparse ones) are implemented in Objective C, and can already be used, but may be slow.  The following table summarizes the current state of implementation of Polynomial :<P>
+<UL>
+<LI>variable sparse, recursive and degree sparse : temporary implementation</LI>
+<LI>variable sparse, recursive and degree dense  : not implemented</LI>
+<LI>variable dense, recursive and degree sparse  : implemented over objects, integers and integers modulo a small prime</LI>
+<LI>variable dense, recursive and degree dense   : implemented over objects, integers and integers modulo a small prime</LI>
+<LI>variable sparse, expanded and degree sparse  : temporary implementation</LI>
+<LI>variable sparse, expanded and degree dense   : not implemented</LI>
+<LI>variable dense, expanded and degree sparse   : implemented over objects, integers and integers modulo a small prime</LI>
+<LI>variable dense, expanded and degree dense    : not implemented</LI>
+</UL>
+Depending on the type of algorithm you're implementing or using, a different representation is preferred.  The variable dense representation for polynomials of 'high' degree in 'few' variables.  The variable sparse representation for polynomials of 'small' degree in 'many' variables.  Degree dense polynomials over finite fields perform well in factorization problems.  Degree sparse polynomials are preferred when there are many zero coefficients in the polynomial.  The expanded representation is used in the computation of Groebner bases, recursive polynomials are preferred for greatest common divisors, resultants etc.<P>
+<H2>Symbols and Variable Ordering</H2>
+<B>Note:</B> Symbols can be arbitrary objects.  Any object that implements <B>isEqual:</B>, and for variable sparse polynomials, <B>compare:</B>, will serve (in the variable dense case it's not necessary to compare symbols because the ordering is fixed by the collection of symbols).  We always refer to the objects in question as <I>symbols</I>, even when they are not instances of the <B>Symbol</B> class.  <P>
+For a variable dense polynomial, the collection of symbols is fixed when the monomial is created; you can't insert terms in a different symbol.  In the variable sparse case, the collection of symbols is dynamically adapted as you insert terms, but is kept sorted alphabetically.  Note that in the variable dense case, the collection of symbols contains the actual set of symbols (those that actually occur in the polynomial with nonzero exponent) as a <I>subset</I>.   See the documentation on <B>symbols</B>.  The variable ordering imposed by the collection of symbols is called <I>lexicographic</I> (currently the variable ordering is always lexicographic).  Note that in the variable dense case, the lexicographic order need not be alphabetical. <P>
+<H2>Accessing Terms and Monomials in a Polynomial</H2>
+The methods <B>eachTerm</B>, <B>removeTerm</B> and <B>insertTerm:</B> apply to recursive polynomials.  For example, to obtain a collection of <I>non-zero</I> terms from a polynomial : <P>
+<BLOCKQUOTE><PRE>
+while (aTerm = [aRecursivePolynomial removeTerm]) [aCollection add:aTerm];
+</PRE></BLOCKQUOTE>
+If the polynomial is variable sparse, the coefficients of the terms are either scalar objects or again variable sparse polynomials and each symbol can be different.  If the polynomial is variable dense, all symbols of all terms are equal, and the coefficients are either all scalar objects or again all variable dense polynomials.  In a degree dense polynomial, the coefficients of the terms can be zero; <B>eachTerm</B> might in effect return a zero term.  It never does so for a degree sparse polynomial.<P>
+The methods <B>eachMonomial</B>, <B>removeMonomial</B> and <B>insertMonomial:</B> apply to polynomials in expanded representation.  For example, to obtain a collection of monomials from a polynomial : <P>
+<BLOCKQUOTE><PRE>
+aSequence = [anExpandedPolynomial eachMonomial];
+while (aMonomial = [aSequence next]) [aCollection add:aMonomial];
+</PRE></BLOCKQUOTE>
+The coefficients of the monomials are scalar objects.  If the polynomial is variable sparse, the monomials are too.  For degree dense polynomials <B>eachMonomial</B> also returns monomials with a zero coefficient.  The leading monomial, returned by <B>removeMonomial</B> is never zero.<P>
+<H2>Greatest Common Divisors</H2>
+There is an implementation of an algorithm to compute the GCD of (multivariate) polynomials.  For univariate polynomials over a field, the Euclidean algorithm is being used.  See <B>gcd:</B> for more details.<P>
+<H2>Counting Real Roots</H2>
+Polynomial implements for univariate polynomials with coefficients taken from an ordered domain (such as the integers) an algorithm to count the (total) number of real roots of the polynomial.  See the documentation on <B>numRealRoots</B>.<P>
+<H2>Factorization</H2>
+Polynomial implements a method to factor a polynomial into its squarefree parts, over fields or integral domains (zero or non-zero characteristic).  See <B>factorSquareFree</B> for more details.  There is also an implementation of an algorithm to factor a polynomial over a finite field into its irreducible factors.  See the documentation on <B>factor</B>.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#4">scalar:</A></LI>
+<LI><A HREF="#5">copy</A></LI>
+<LI><A HREF="#6">deepCopy</A></LI>
+<LI><A HREF="#13">empty</A></LI>
+</UL>
+<H3><B>Identity</B></H3>
+<UL>
+<LI><A HREF="#23">scalarZero</A></LI>
+<LI><A HREF="#24">termZero</A></LI>
+<LI><A HREF="#25">monomialZero</A></LI>
+<LI><A HREF="#152">hash</A></LI>
+<LI><A HREF="#153">isEqual:</A></LI>
+<LI><A HREF="#28">isRecursive</A></LI>
+<LI><A HREF="#29">isExpanded</A></LI>
+<LI><A HREF="#30">isVariableSparse</A></LI>
+<LI><A HREF="#31">isVariableDense</A></LI>
+<LI><A HREF="#32">isDegreeDense</A></LI>
+<LI><A HREF="#33">isDegreeSparse</A></LI>
+<LI><A HREF="#34">isUnivariate</A></LI>
+<LI><A HREF="#35">inUnivariateDomain</A></LI>
+<LI><A HREF="#36">isMultivariate</A></LI>
+</UL>
+<H3><B>Coercion</B></H3>
+<UL>
+<LI><A HREF="#37">intValue</A></LI>
+<LI><A HREF="#38">intValue:</A></LI>
+<LI><A HREF="#39">floatValue</A></LI>
+<LI><A HREF="#40">floatValue:</A></LI>
+<LI><A HREF="#41">asScalar</A></LI>
+<LI><A HREF="#43">asSymbol</A></LI>
+<LI><A HREF="#45">asTerm</A></LI>
+<LI><A HREF="#46">asMonomial</A></LI>
+<LI><A HREF="#48">asCoefficient</A></LI>
+<LI><A HREF="#49">asNumerical</A></LI>
+<LI><A HREF="#50">asModp:</A></LI>
+</UL>
+<H3><B>Symbols and Variables</B></H3>
+<UL>
+<LI><A HREF="#55">symbols</A></LI>
+</UL>
+<H3><B>Degree and Order</B></H3>
+<UL>
+<LI><A HREF="#57">degree</A></LI>
+<LI><A HREF="#58">order</A></LI>
+</UL>
+<H3><B>Number of Terms and Monomials</B></H3>
+<UL>
+<LI><A HREF="#59">numTerms</A></LI>
+<LI><A HREF="#60">numMonomials</A></LI>
+</UL>
+<H3><B>Removing and Inserting</B></H3>
+<UL>
+<LI><A HREF="#62">removeTerm</A></LI>
+<LI><A HREF="#63">insertTerm:</A></LI>
+<LI><A HREF="#64">removeMonomial</A></LI>
+<LI><A HREF="#65">insertMonomial:</A></LI>
+</UL>
+<H3><B>Sequences</B></H3>
+<UL>
+<LI><A HREF="#68">eachTerm</A></LI>
+<LI><A HREF="#69">eachMonomial</A></LI>
+<LI><A HREF="#70">eachSequence</A></LI>
+<LI><A HREF="#73">eachScalar</A></LI>
+<LI><A HREF="#74">eachCoefficient</A></LI>
+</UL>
+<H3><B>Representation</B></H3>
+<UL>
+<LI><A HREF="#76">makeDegreeDense</A></LI>
+<LI><A HREF="#77">makeDegreeSparse</A></LI>
+<LI><A HREF="#78">makeRecursive</A></LI>
+<LI><A HREF="#79">makeExpanded</A></LI>
+<LI><A HREF="#80">makeVariableSparse</A></LI>
+<LI><A HREF="#81">makeVariableDense</A></LI>
+<LI><A HREF="#82">collect:</A></LI>
+</UL>
+<H3><B>Leading Term or Monomial</B></H3>
+<UL>
+<LI><A HREF="#83">leadingTerm</A></LI>
+<LI><A HREF="#84">leadingCoefficient</A></LI>
+<LI><A HREF="#85">leadingSign</A></LI>
+<LI><A HREF="#86">leadingMonomial</A></LI>
+<LI><A HREF="#87">leadingScalar</A></LI>
+</UL>
+<H3><B>Monic Polynomials</B></H3>
+<UL>
+<LI><A HREF="#88">isMonic</A></LI>
+<LI><A HREF="#89">notMonic</A></LI>
+<LI><A HREF="#90">makeMonic</A></LI>
+</UL>
+<H3><B>Addition</B></H3>
+<UL>
+<LI><A HREF="#91">zero</A></LI>
+<LI><A HREF="#155">isZero</A></LI>
+<LI><A HREF="#157">isOpposite:</A></LI>
+<LI><A HREF="#159">negate</A></LI>
+<LI><A HREF="#161">double</A></LI>
+<LI><A HREF="#163">add:</A></LI>
+<LI><A HREF="#164">subtract:</A></LI>
+<LI><A HREF="#92">addScalar:</A></LI>
+<LI><A HREF="#93">subtractScalar:</A></LI>
+</UL>
+<H3><B>Multiplication</B></H3>
+<UL>
+<LI><A HREF="#94">one</A></LI>
+<LI><A HREF="#95">isOne</A></LI>
+<LI><A HREF="#96">isMinusOne</A></LI>
+<LI><A HREF="#97">multiply:</A></LI>
+<LI><A HREF="#98">square</A></LI>
+<LI><A HREF="#99">inverse</A></LI>
+<LI><A HREF="#165">multiplyScalar:</A></LI>
+<LI><A HREF="#166">divideScalar:</A></LI>
+<LI><A HREF="#170">multiplyCoefficient:</A></LI>
+<LI><A HREF="#171">divideCoefficient:</A></LI>
+<LI><A HREF="#175">multiplyTerm:</A></LI>
+<LI><A HREF="#176">divideTerm:</A></LI>
+<LI><A HREF="#179">multiplyMonomial:</A></LI>
+<LI><A HREF="#180">divideMonomial:</A></LI>
+</UL>
+<H3><B>Polynomial Division</B></H3>
+<UL>
+<LI><A HREF="#101">remainder:quotient:</A></LI>
+<LI><A HREF="#102">divide:</A></LI>
+</UL>
+<H3><B>Pseudo Division</B></H3>
+<UL>
+<LI><A HREF="#111">pseudoRemainder:quotient:</A></LI>
+<LI><A HREF="#112">pseudoRemainder:</A></LI>
+</UL>
+<H3><B>Contents and Primitive Parts</B></H3>
+<UL>
+<LI><A HREF="#115">content</A></LI>
+<LI><A HREF="#116">divideContent</A></LI>
+<LI><A HREF="#117">coefficientContent</A></LI>
+<LI><A HREF="#118">divideCoefficientContent</A></LI>
+<LI><A HREF="#119">termContent</A></LI>
+<LI><A HREF="#120">monomialContent</A></LI>
+</UL>
+<H3><B>Resultant and Greatest Common Divisor</B></H3>
+<UL>
+<LI><A HREF="#186">gcd:</A></LI>
+<LI><A HREF="#187">resultant:</A></LI>
+<LI><A HREF="#188">resultant:wrt:</A></LI>
+<LI><A HREF="#189">discriminant</A></LI>
+</UL>
+<H3><B>Counting Real Roots</B></H3>
+<UL>
+<LI><A HREF="#193">numRealRoots</A></LI>
+<LI><A HREF="#194">varRealRoots:</A></LI>
+</UL>
+<H3><B>Factoring</B></H3>
+<UL>
+<LI><A HREF="#195">isSquareFree</A></LI>
+<LI><A HREF="#199">factorSquareFree</A></LI>
+</UL>
+<H3><B>Truncation</B></H3>
+<UL>
+<LI><A HREF="#122">truncateAtDegree:</A></LI>
+</UL>
+<H3><B>Characteristic</B></H3>
+<UL>
+<LI><A HREF="#123">frobenius</A></LI>
+<LI><A HREF="#124">frobeniusInverse</A></LI>
+</UL>
+<H3><B>Evaluation and Substitution</B></H3>
+<UL>
+<LI><A HREF="#125">evaluate:</A></LI>
+<LI><A HREF="#126">evaluate:at:</A></LI>
+<LI><A HREF="#127">evaluateAll:</A></LI>
+<LI><A HREF="#130">substitute:</A></LI>
+<LI><A HREF="#131">substitute:by:</A></LI>
+<LI><A HREF="#132">substituteAll:</A></LI>
+</UL>
+<H3><B>Derivation and Integration</B></H3>
+<UL>
+<LI><A HREF="#133">derive</A></LI>
+<LI><A HREF="#134">deriveWrt:</A></LI>
+<LI><A HREF="#135">integrate</A></LI>
+<LI><A HREF="#136">integrateWrt:</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#137">printsLeadingSign</A></LI>
+<LI><A HREF="#138">printsSum</A></LI>
+<LI><A HREF="#139">printsProduct</A></LI>
+<LI><A HREF="#140">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="4">scalar:</A></H3>
+<BLOCKQUOTE>+<B>scalar</B>:<I>aScalar</I></BLOCKQUOTE>
+Creates and returns a polynomial in the recursive, variable sparse and degree sparse representation, containing the scalar object <I>aScalar</I>.<P>
+<H3><A NAME="5">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Makes a copy of all the terms or monomials of the polynomial.  The original polynomial and the copy don't share any terms or monomials.<P>
+<H3><A NAME="6">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+Makes a full independent copy of the polynomial by copying all terms or monomials and by sending <B>deepCopy</B> messages to the scalar objects.  The original polynomial and the copy don't share any scalars, terms or monomials.<P>
+<H3><A NAME="13">empty</A></H3>
+<BLOCKQUOTE>-<B>empty</B></BLOCKQUOTE>
+Returns a new empty polynomial i.e. a polynomial that is equal to zero and not a copy of another polynomial.  The representation of the new polynomial is the same as the representation of the object that received the message.<P>
+<H3><A NAME="23">scalarZero</A></H3>
+<BLOCKQUOTE>-<B>scalarZero</B></BLOCKQUOTE>
+Returns the zero (base) scalar element.<P>
+<H3><A NAME="24">termZero</A></H3>
+<BLOCKQUOTE>-<B>termZero</B></BLOCKQUOTE>
+Returns the zero term for a recursive polynomial.  In the variable dense case, you may depend upon the fact that the symbol of this term is set to the main symbol of the polynomial (the exponent is set to one).<P>
+<H3><A NAME="25">monomialZero</A></H3>
+<BLOCKQUOTE>-<B>monomialZero</B></BLOCKQUOTE>
+Returns the zero monomial for an expanded polynomial.<P>
+<H3><A NAME="152">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a small integer that is the same for objects that are equal (in the sense of <B>isEqual:</B>).<P>
+<H3><A NAME="153">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>b</I></BLOCKQUOTE>
+Whether the two objects are equal.  Returns YES if the objects are pointer equal.<P>
+<H3><A NAME="28">isRecursive</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isRecursive</B></BLOCKQUOTE>
+Returns YES if the polynomial is in recursive representation.  Implies that the polynomial is not in expanded representation.<P>
+<H3><A NAME="29">isExpanded</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isExpanded</B></BLOCKQUOTE>
+Returns YES if the polynomial is in expanded representation.  Implies that the polynomial is not in recursive representation.<P>
+<H3><A NAME="30">isVariableSparse</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isVariableSparse</B></BLOCKQUOTE>
+Returns YES if the polynomial is variable sparse.  Implies that the polynomial is not variable dense.<P>
+<H3><A NAME="31">isVariableDense</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isVariableDense</B></BLOCKQUOTE>
+Returns YES if the polynomial is variable dense.  Implies that the polynomial is not variable sparse.<P>
+<H3><A NAME="32">isDegreeDense</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isDegreeDense</B></BLOCKQUOTE>
+Returns YES if the polynomial is degree dense.  Implies that the polynomial is not degree sparse.<P>
+<H3><A NAME="33">isDegreeSparse</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isDegreeSparse</B></BLOCKQUOTE>
+Returns YES if the polynomial is degree sparse.  Implies that the polynomial is not degree dense.<P>
+<H3><A NAME="34">isUnivariate</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isUnivariate</B></BLOCKQUOTE>
+Whether the number of symbols equals one.<P>
+<H3><A NAME="35">inUnivariateDomain</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>inUnivariateDomain</B></BLOCKQUOTE>
+Whether the polynomial is variable dense and the number of symbols equals one.<P>
+<H3><A NAME="36">isMultivariate</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isMultivariate</B></BLOCKQUOTE>
+<H3><A NAME="37">intValue</A></H3>
+<BLOCKQUOTE>- (int)<B>intValue</B></BLOCKQUOTE>
+Returns zero if the polynomial is zero.  If the polynomial consists of a single term or monomial, returns the int value of that object.  Otherwise generates an error.<P>
+<H3><A NAME="38">intValue:</A></H3>
+<BLOCKQUOTE>-<B>intValue</B>:(int)<I>aValue</I></BLOCKQUOTE>
+Returns a polynomial (of the same representation as the polynomial that receives the message) with value equal to <I>aValue</I>.<P>
+<H3><A NAME="39">floatValue</A></H3>
+<BLOCKQUOTE>- (float)<B>floatValue</B></BLOCKQUOTE>
+Returns zero if the polynomial is zero.  If the polynomial consists of a single term or monomial, returns the float value of that object.  Otherwise generates an error.<P>
+<H3><A NAME="40">floatValue:</A></H3>
+<BLOCKQUOTE>-<B>floatValue</B>:(float)<I>aValue</I></BLOCKQUOTE>
+Returns a polynomial (of the same representation as the polynomial that receives the message) with value equal to <I>aValue</I>.<P>
+<H3><A NAME="41">asScalar</A></H3>
+<BLOCKQUOTE>-<B>asScalar</B></BLOCKQUOTE>
+If the polynomial consists of just one term or monomial that is a scalar, this method returns a copy of the scalar.  Otherwise it returns <B>nil</B>.<P>
+<H3><A NAME="43">asSymbol</A></H3>
+<BLOCKQUOTE>-<B>asSymbol</B></BLOCKQUOTE>
+If the polynomial consists of a single symbol (with exponent one and coefficient one), this method returns a copy of the symbol.  Otherwise it returns <B>nil</B>.  The method returns <B>nil</B> if the polynomial is a scalar that is a symbol...<P>
+<H3><A NAME="45">asTerm</A></H3>
+<BLOCKQUOTE>-<B>asTerm</B></BLOCKQUOTE>
+Returns, for a recursive polynomial that consists of a single term, a copy of that term.  Returns <B>nil</B> if the polynomial is zero (not considered to be a term) or a polynomial that consists of two or more terms.<P>
+<H3><A NAME="46">asMonomial</A></H3>
+<BLOCKQUOTE>-<B>asMonomial</B></BLOCKQUOTE>
+Returns, for an expanded polynomial that consists of a single monomial, a copy of that monomial.  Returns <B>nil</B> if the polynomial is zero (not considered to be a monomial) or a polynomial that consists of two or more monomials.<P>
+<H3><A NAME="48">asCoefficient</A></H3>
+<BLOCKQUOTE>-<B>asCoefficient</B></BLOCKQUOTE>
+This method applies only to recursive polynomials.  If the polynomial is a term, this method returns a copy of its coefficient.  Otherwise it returns <B>nil</B>.<P>
+<H3><A NAME="49">asNumerical</A></H3>
+<BLOCKQUOTE>-<B>asNumerical</B></BLOCKQUOTE>
+Returns a numerical polynomial, ie. a polynomial in the same representation as the original polynomial but with the scalars are replaced by their numerical value.  For example, for a polynomial with integer coefficients, this method returns a polynomial with floating-point objects as coefficients.<P>
+<H3><A NAME="50">asModp:</A></H3>
+<BLOCKQUOTE>-<B>asModp</B>:(unsigned short)<I>p</I></BLOCKQUOTE>
+Returns a new polynomial, of the same representation as the original polynomial, but with the scalars replaced by their value modulo <I>p</I>, a small prime number.<P>
+<H3><A NAME="55">symbols</A></H3>
+<BLOCKQUOTE>-<B>symbols</B></BLOCKQUOTE>
+Returns a collection of symbols.  If the polynomial is variable dense, beware that some symbols may occur with a zero exponent in the polynomial.  If the polynomial is variable sparse, this method returns an alphabetically sorted collection of all the symbols that occur in the polynomial with non-zero exponent.  Don' modify the collection returned by this method; do not attempt to insert new symbols, or change their order.<P>
+<H3><A NAME="57">degree</A></H3>
+<BLOCKQUOTE>- (int)<B>degree</B></BLOCKQUOTE>
+For a recursive polynomial, returns the maximum of the exponents of the terms.  For an expanded polynomial, returns the maximum of the degrees of the monomials (the method first checks whether the variable order is degree or reverse degree compatible, because if it is, the maximum is not really computed).  Returns minus one if the polynomial is equal to zero.<P>
+<H3><A NAME="58">order</A></H3>
+<BLOCKQUOTE>- (int)<B>order</B></BLOCKQUOTE>
+For a recursive polynomial, returns the minimum of the exponents of the terms.  For an expanded polynomial, returns the minimum of the degrees of the monomials (the method first checks whether the variable order is degree or reverse degree compatible, because if it is, the minimum is not really computed).  Returns minus one if the polynomial is equal to zero.<P>
+<B>See also:</B> termContent, monomialContent<P>
+<H3><A NAME="59">numTerms</A></H3>
+<BLOCKQUOTE>- (int)<B>numTerms</B></BLOCKQUOTE>
+Returns the number of nonzero terms in the polynomial.  Returns zero if the polynomial is equal to zero.  In the case of a degree dense polynomial, the actual number of terms (including zero terms) can be obtained as the number of members of the associated sequence, or, for a univariate polynomial, as the degree of the polynomial plus one.<P>
+<H3><A NAME="60">numMonomials</A></H3>
+<BLOCKQUOTE>- (int)<B>numMonomials</B></BLOCKQUOTE>
+Returns the number of a non-zero monomials in the polynomial.  Returns zero if the polynomial is equal to zero.  In the case of a degree dense polynomial, the actual number of monomials (including zero monomials) can be obtained as the number of members of the associated sequence.<P>
+<H3><A NAME="62">removeTerm</A></H3>
+<BLOCKQUOTE>-<B>removeTerm</B></BLOCKQUOTE>
+Removes (and returns) the leading non-zero term of the polynomial.  Returns <B>nil</B> if the polynomial is equal to zero.  The polynomial must be in recursive representation, but may be either degree sparse or degree dense, variable sparse or variable dense.  To remove a term, the polynomial may not be a copy of another polynomial.<P>
+If the polynomial is variable dense, the coefficient of the term is either a scalar, or a variable dense polynomial in a variable less.  If the polynomial is variable sparse, the coefficient of the term is the same kind of variable sparse polynomial as the original ie., there is no difference between coefficient domain and polynomial domain in the variable sparse case.<P>
+If the polynomial is degree dense, this method cannot be used to obtain the zero terms in the polynomial (because the leading term is defined as the first non-zero term in the sequence of terms).  The method <B>eachTerm</B> returns all terms, including zero terms.<P>
+<H3><A NAME="63">insertTerm:</A></H3>
+<BLOCKQUOTE>-<B>insertTerm</B>:<I>aTerm</I></BLOCKQUOTE>
+Inserts <I>aTerm</I> into the recursive polynomial and returns <B>self</B>.  If the polynomial already contains a term with the same exponent, then the coefficients of the terms are added together.  Otherwise, <I>aTerm</I> is inserted in the collection of terms.  In any case, after insertion, <I>aTerm</I> belongs to the polynomial.  To insert a term, the polynomial may not be a copy of another polynomial.<P>
+As always, if the exponent of the term is zero, the symbol of the term must be <B>nil</B>.  If the polynomial is variable sparse, the coefficient of the term must be either a scalar object or a &lt;&lt;non-scalar&gt;&gt; variable sparse polynomial.  In the variable dense case, the symbol of the term must be equal to the main symbol of the variable dense polynomial; the coefficient domain of the polynomial must match the coefficient of the term; it may be either a scalar object or a variable dense polynomial.<P>
+If the polynomial is degree sparse, insertion is fast at head or tail of the linked list of terms.  If the polynomial is degree dense, the array of coefficients is automatically expanded to make room for new terms.  Therefore, it's better to insert terms of higher degree before terms of smaller degree in the degree dense case.<P>
+<H3><A NAME="64">removeMonomial</A></H3>
+<BLOCKQUOTE>-<B>removeMonomial</B></BLOCKQUOTE>
+Removes the leading monomial of the polynomial.  Returns <B>nil</B> if the polynomial is equal to zero.  The polynomial may be variable sparse or variable dense, degree sparse or degree dense, but must be in expanded representation.  To remove a monomial, the polynomial may not be a copy of another polynomial.<P>
+<H3><A NAME="65">insertMonomial:</A></H3>
+<BLOCKQUOTE>-<B>insertMonomial</B>:<I>aMonomial</I></BLOCKQUOTE>
+Inserts <I>aMonomial</I> into the expanded polynomial and returns <B>self</B>.  If the polynomial already contains a monomial with the same terms, then the scalars of the monomials are added together.  Otherwise, <I>aMonomial</I> is inserted in the collection of monomials.  In any case, after insertion, <I>aMonomial</I> belongs to the polynomial.  The polynomial may not be a copy of another polynomial.<P>
+<H3><A NAME="68">eachTerm</A></H3>
+<BLOCKQUOTE>-<B>eachTerm</B></BLOCKQUOTE>
+Returns, for a recursive polynomial, a sequence of terms. You may not modify the terms in the sequence or alter the polynomial in any other way while sequencing over its contents.  A zero polynomial is represented by an empty sequence.  If the polynomial is variable dense, all the terms in the sequence have the same symbol; if it is variable sparse, the symbols may be different.  The terms are ordered with decreasing exponents (and in the variable sparse case, with respect to the symbols).  The first member of the sequence is the leading term of the polynomial; this term is never equal to zero.  If the polynomial is degree sparse, the sequence doesn't contain any terms with zero coefficient.  If the polynomial is degree dense, the sequence also contains the terms with zero coefficient (unlike <B>removeTerm</B>).<P>
+<B>See also:</B> CASequence<P>
+<H3><A NAME="69">eachMonomial</A></H3>
+<BLOCKQUOTE>-<B>eachMonomial</B></BLOCKQUOTE>
+Like <B>eachTerm</B> but for expanded polynomial; returns a sequence of monomials.  A zero polynomial is represented by an empty sequence.  If the polynomial is variable dense, all the monomials in the sequence are variable dense; they are variable sparse if the polynomial is variable sparse.  The monomials are ordered with respect to Monomials <B>compareTerms:</B> method.  The first member of the sequence is the leading monomial of the polynomial; it's never equal to zero.  If the polynomial is degree sparse, the sequence doesn't contain any monomials with zero coefficient.  If the polynomial is degree dense, the sequence also contains the monomials with zero coefficient (unlike <B>removeMonomial</B>).<P>
+<B>See also:</B> CASequence<P>
+<H3><A NAME="70">eachSequence</A></H3>
+<BLOCKQUOTE>-<B>eachSequence</B></BLOCKQUOTE>
+<B>Note:</B> Not implemented.<P>
+Returns, for recursive or expanded polynomials, a sequence whose members are either monomials or again sequences.  At the deepest level of recursion the members of this sequence are <I>monomials</I>, even for recursive polynomials.<P>
+The following example shows how to access the leading monomial of a recursive, non-zero polynomial (such a polynomial is <I>not</I> a sum of monomials) :<P>
+<BLOCKQUOTE><PRE>
+aSequence = [aRecursivePolynomial eachSequence];
+aMember   = [aSequence firstElement];
+while ([aMember isKindOfSequence]) aMember = [aMember firstElement];
+printf("leading monomial is %s",[aMember str]);
+</PRE></BLOCKQUOTE>
+<H3><A NAME="73">eachScalar</A></H3>
+<BLOCKQUOTE>-<B>eachScalar</B></BLOCKQUOTE>
+Returns a sequence of the scalar objects in the polynomial.  If the polynomial is in expanded representation, this sequence contains the scalars of the monomials in the polynomial.  If it is recursive, then the sequence contains the (base) scalars in the polynomial.<P>
+<B>Note:</B> The sequence returned by this method doesn't respond to <B>at:</B> messages.<P>
+<H3><A NAME="74">eachCoefficient</A></H3>
+<BLOCKQUOTE>-<B>eachCoefficient</B></BLOCKQUOTE>
+Returns, for a recursive and variable dense polynomial, a sequence of the coefficients of the terms in the polynomial.<P>
+<H3><A NAME="76">makeDegreeDense</A></H3>
+<BLOCKQUOTE>-<B>makeDegreeDense</B></BLOCKQUOTE>
+If the polynomial is degree dense, this method merely returns a copy of <B>self</B>.  Otherwise, it creates a new degree dense polynomial and converts the polynomial into this new representation (making copies of the terms or monomials of the polynomial).   The resulting polynomial may be recursive, expanded, variable sparse or variable dense, depending on the representation of the original polynomial.<P>
+<H3><A NAME="77">makeDegreeSparse</A></H3>
+<BLOCKQUOTE>-<B>makeDegreeSparse</B></BLOCKQUOTE>
+If the polynomial is degree sparse, this method merely returns a copy of <B>self</B>.  Otherwise, it creates a new degree sparse polynomial and converts the polynomial into this new representation (making copies of the terms or monomials of the polynomial).   The resulting polynomial may be recursive, expanded, variable sparse or variable dense, depending on the representation of the original polynomial.<P>
+<H3><A NAME="78">makeRecursive</A></H3>
+<BLOCKQUOTE>-<B>makeRecursive</B></BLOCKQUOTE>
+Returns, for an expanded polynomial, a new polynomial over the same domain of scalars and with the same value, but in the recursive representation.  The polynomial may be degree dense or degree sparse, variable sparse or variable dense.<P>
+<H3><A NAME="79">makeExpanded</A></H3>
+<BLOCKQUOTE>-<B>makeExpanded</B></BLOCKQUOTE>
+Returns, for a recursive polynomial, a new polynomial over the same domain of scalars and with the same value, but in the expanded representation.  The polynomial may be degree dense or degree sparse, variable sparse or variable dense.<P>
+<H3><A NAME="80">makeVariableSparse</A></H3>
+<BLOCKQUOTE>-<B>makeVariableSparse</B></BLOCKQUOTE>
+Returns, for a variable dense polynomial, a new polynomial over the same domain of scalars and with the same value, but in the variable sparse representation.  The polynomial may be degree dense or degree sparse, recursive or expanded.<P>
+<H3><A NAME="81">makeVariableDense</A></H3>
+<BLOCKQUOTE>-<B>makeVariableDense</B></BLOCKQUOTE>
+Returns, for a variable sparse or variable dense polynomial, a new polynomial over the same domain of scalars and with the same value, but in the variable dense representation.  The polynomial may be degree dense or degree sparse, recursive or expanded.  This method invokes <B>collect:</B>.<P>
+<B>See also:</B> collect<P>
+<H3><A NAME="82">collect:</A></H3>
+<BLOCKQUOTE>-<B>collect</B>:<I>symbols</I></BLOCKQUOTE>
+<B>Note:</B> &lt;&lt;The case of <I>symbols</I> a collection with less members than the number of variables of the polynomial is not yet implemented.  Currenlty <I>symbols</I> must contain the same number, or more symbols than the original polynomial&gt;&gt;<P>
+Returns, for a variable sparse or variable dense polynomial, a new variable dense polynomial in the symbols indicated by the collection <I>symbols</I>.  The collection must contain at least one symbol.  The original polynomial may be degree dense or degree sparse, recursive or expanded, and the resulting polynomial will be of the same representation.<P>
+The following examples show how to convert a variable sparse polynomial into variable dense representation, how to convert two variable sparse polynomials into the <I>same</I> variable dense representation, and finally how to change the variable order of a variable dense polynomial :<P>
+<BLOCKQUOTE><PRE>
+{
+    dense = [sparse collect:[sparse symbols]];
+}
+
+</PRE></BLOCKQUOTE>
+<BLOCKQUOTE><PRE>
+{
+    symbols = [[a symbols] union:[b symbols]];
+    c = [a collect:symbols];
+    d = [b collect:symbols];
+}
+
+</PRE></BLOCKQUOTE>
+<BLOCKQUOTE><PRE>
+{
+    symbols = [[b symbols] copy];
+    /* ... do something with "symbols" here... */
+    d = [b collect:symbols];
+}
+
+</PRE></BLOCKQUOTE>
+<H3><A NAME="83">leadingTerm</A></H3>
+<BLOCKQUOTE>-<B>leadingTerm</B></BLOCKQUOTE>
+Returns the leading term of the (recursive) polynomial.  Returns <B>nil</B> if the polynomial is equal to zero. <P>
+<H3><A NAME="84">leadingCoefficient</A></H3>
+<BLOCKQUOTE>-<B>leadingCoefficient</B></BLOCKQUOTE>
+Returns the leading coefficient of the (recursive) polynomial.  Returns <B>nil</B> if the polynomial is equal to zero.  <P>
+<H3><A NAME="85">leadingSign</A></H3>
+<BLOCKQUOTE>- (int)<B>leadingSign</B></BLOCKQUOTE>
+For a recursive polynomial, returns the sign of the leading coefficient.  For a polynomial in expanded representation, returns the sign of the leading scalar.  Returns zero if the polynomial is equal to zero.<P>
+<H3><A NAME="86">leadingMonomial</A></H3>
+<BLOCKQUOTE>-<B>leadingMonomial</B></BLOCKQUOTE>
+Returns the leading monomial of the polynomial (in expanded representation).  Returns <B>nil</B> if the polynomial is equal to zero.  <P>
+<H3><A NAME="87">leadingScalar</A></H3>
+<BLOCKQUOTE>-<B>leadingScalar</B></BLOCKQUOTE>
+Returns the scalar of the leading monomial of the polynomial.  Returns <B>nil</B> if the polynomial is equal to zero.<P>
+<H3><A NAME="88">isMonic</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isMonic</B></BLOCKQUOTE>
+For a recursive polynomial, returns YES if the leading coefficient of the polynomial is equal to one.  For an expanded polynomial, tests whether the leading scalar is equal to one.  It follows that the same polynomial <I>x</I> <I>y</I> + 1 is monic in expanded representation, but is <I>not</I> monic in recursive representation (because the leading coefficient is <I>x</I>).  The method returns NO if the polynomial is equal to zero.  <P>
+<H3><A NAME="89">notMonic</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>notMonic</B></BLOCKQUOTE>
+Whether <B>isMonic</B> returns NO.<P>
+<H3><A NAME="90">makeMonic</A></H3>
+<BLOCKQUOTE>-<B>makeMonic</B></BLOCKQUOTE>
+<H3><A NAME="91">zero</A></H3>
+<BLOCKQUOTE>-<B>zero</B></BLOCKQUOTE>
+Returns a copy of the zero polynomial (same representation as polynomial that receives the message).  The only difference with <B>empty</B> is that the latter method creates a new object, while this method just returns a copy of an already existing object.  For example, it's not possible to insert terms in the polynomial returned by <B>zero</B>.<P>
+<B>See also:</B> empty<P>
+<H3><A NAME="155">isZero</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isZero</B></BLOCKQUOTE>
+Whether the object is equal to zero.<P>
+<H3><A NAME="157">isOpposite:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOpposite</B>:<I>b</I></BLOCKQUOTE>
+Whether the object is the opposite of <I>b</I>.<P>
+<H3><A NAME="159">negate</A></H3>
+<BLOCKQUOTE>-<B>negate</B></BLOCKQUOTE>
+Returns the opposite of the object.<P>
+<H3><A NAME="161">double</A></H3>
+<BLOCKQUOTE>-<B>double</B></BLOCKQUOTE>
+Returns a new object, equal to the object multiplied by two i.e., added to itself.<P>
+<H3><A NAME="163">add:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>b</I></BLOCKQUOTE>
+Adds <I>b</I> to the object.  Returns a new object.<P>
+<H3><A NAME="164">subtract:</A></H3>
+<BLOCKQUOTE>-<B>subtract</B>:<I>b</I></BLOCKQUOTE>
+Subtracts <I>b</I> from the object.  Returns a new object.<P>
+<H3><A NAME="92">addScalar:</A></H3>
+<BLOCKQUOTE>-<B>addScalar</B>:<I>s</I></BLOCKQUOTE>
+Returns a new polynomial; adds the (base) scalar <I>s</I> to the original polynomial.<P>
+<H3><A NAME="93">subtractScalar:</A></H3>
+<BLOCKQUOTE>-<B>subtractScalar</B>:<I>s</I></BLOCKQUOTE>
+Returns a new polynomial; subtracts the (base) scalar <I>s</I> to the original polynomial.<P>
+<H3><A NAME="94">one</A></H3>
+<BLOCKQUOTE>-<B>one</B></BLOCKQUOTE>
+Returns a copy of the unity polynomial (same representation as polynomial that receives the message). <P>
+<H3><A NAME="95">isOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOne</B></BLOCKQUOTE>
+Whether the polynomial is equal to one.<P>
+<H3><A NAME="96">isMinusOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isMinusOne</B></BLOCKQUOTE>
+Whether the polynomial is equal to minus one.<P>
+<H3><A NAME="97">multiply:</A></H3>
+<BLOCKQUOTE>-<B>multiply</B>:<I>b</I></BLOCKQUOTE>
+Returns a new polynomial.  Computes the product of the polynomials by the classical polynomial multiplication algorithm, except if the polynomials are equal in which case the method invokes <B>square</B>.<P>
+<H3><A NAME="98">square</A></H3>
+<BLOCKQUOTE>-<B>square</B></BLOCKQUOTE>
+Returns a new polynomial.  Computes the square of the polynomial by the classical polynomial multiplication algorithm using symmetry.<P>
+<H3><A NAME="99">inverse</A></H3>
+<BLOCKQUOTE>-<B>inverse</B></BLOCKQUOTE>
+Returns a new polynomial that is the inverse of the polynomial, or <B>nil</B> if the polynomial cannot be inverted.  A polynomial over a field or integral domain can be inverted if and only if it consists of a single term that is invertible.<P>
+<H3><A NAME="165">multiplyScalar:</A></H3>
+<BLOCKQUOTE>-<B>multiplyScalar</B>:<I>s</I></BLOCKQUOTE>
+Multiplies by the scalar <I>s</I>.  Returns a new object.<P>
+<H3><A NAME="166">divideScalar:</A></H3>
+<BLOCKQUOTE>-<B>divideScalar</B>:<I>s</I></BLOCKQUOTE>
+Exact division by the scalar <I>s</I>.  Returns a new object, or <B>nil</B> if the division is not exact.<P>
+<H3><A NAME="170">multiplyCoefficient:</A></H3>
+<BLOCKQUOTE>-<B>multiplyCoefficient</B>:<I>aCoefficient</I></BLOCKQUOTE>
+Multiplies the (recursive and variable dense) polynomial by <I>aCoefficient</I> and returns a new object.  What <I>aCoefficient</I> means, depends on the representation of the polynomial.  If it is variable dense and univariate, then <I>aCoefficient</I> must be a scalar object.  If it is variable dense and multivariate, then <I>aCoefficient</I> must be again a variable dense polynomial in a variable less.   The method is <I>not</I> implemented in the variable sparse case; you can use <B>multiplyScalar:</B> or <B>multiply:</B> for these polynomials.<P>
+<H3><A NAME="171">divideCoefficient:</A></H3>
+<BLOCKQUOTE>-<B>divideCoefficient</B>:<I>aCoefficient</I></BLOCKQUOTE>
+Exact division of the (recursive and variable dense) polynomial by <I>aCoefficient</I>; returns a new object or <B>nil</B> if the division is not exact or if it fails.  If the polynomial is univariate, then <I>aCoefficient</I> must be a scalar object.  If it is multivariate, then <I>aCoefficient</I> must be again a variable dense polynomial in a variable less.   The method is not implemented in the variable sparse case; there you can use <B>divideScalar:</B> or <B>divide:</B>.<P>
+<H3><A NAME="175">multiplyTerm:</A></H3>
+<BLOCKQUOTE>-<B>multiplyTerm</B>:<I>aTerm</I></BLOCKQUOTE>
+Multiplies the (recursive) polynomial by the term <I>aTerm</I>; returns a new object.  This method is implemented for both variable sparse and variable dense <I>recursive</I> polynomials.  In the variable dense case, the symbol of the term must be equal to the main symbol of the polynomial and the coefficient classes must match.  In the variable sparse case, the only requirement is that the domain of scalars of the term and the polynomial are equal.<P>
+<H3><A NAME="176">divideTerm:</A></H3>
+<BLOCKQUOTE>-<B>divideTerm</B>:<I>aTerm</I></BLOCKQUOTE>
+(Exact) Division of the polynomial by <I>aTerm</I>; returns a new polynomial.  The division fails (and this method returns <B>nil</B>) if one of the terms of the polynomial is not divisible by <I>aTerm</I>.  This method is implemented for both variable sparse and variable dense <I>recursive</I> polynomials.  In the variable dense case, the symbol of the term must be equal to the main symbol of the polynomial and the coefficient classes must match.  In the variable sparse case, the only requirement is that the domain of scalars of the term and the polynomial are equal (and for the division not to fail, that the symbol of the term is less than or equal to the symbols of each term of the polynomial).<P>
+<H3><A NAME="179">multiplyMonomial:</A></H3>
+<BLOCKQUOTE>-<B>multiplyMonomial</B>:<I>s</I></BLOCKQUOTE>
+Multiplies by the monomial <I>s</I>.  Returns a new object.<P>
+<H3><A NAME="180">divideMonomial:</A></H3>
+<BLOCKQUOTE>-<B>divideMonomial</B>:<I>s</I></BLOCKQUOTE>
+Exact division by the monomial <I>s</I>.  Returns a new object, or <B>nil</B> if the division is not exact.<P>
+<H3><A NAME="101">remainder:quotient:</A></H3>
+<BLOCKQUOTE>-<B>remainder</B>:<I>b</I><B>quotient</B>:(id *)<I>q</I></BLOCKQUOTE>
+Returns new polynomials <I>R</I> and, by reference, <I>Q</I> such that <I>self</I> = <I>Q b</I> + <I>R</I>.  If <I>q</I> is a NULL pointer, the quotient <I>Q</I> is not computed.  Returns <B>nil</B> (and sets the value pointed to by <I>q</I> to <B>nil</B>) if the polynomial division fails.<P>
+<BLOCKQUOTE><PRE>
+id q,r;
+
+r = [self remainder:b quotient:&amp;q];
+	
+/* do something with r and q */
+	
+</PRE></BLOCKQUOTE>
+If the polynomials are variable sparse, they are converted into variable dense representation.  The division algorithm itself, works for univariate and multivariate variable dense polynomials, in recursive or expanded representation, over fields or integral domains.  However, in the multivariate case, a non-zero remainder need not be unique.  In the case of division of polynomials with coefficients in an integral domain (such as the integers), the division possibly fails when a coefficient division fails; it is still possible to do a pseudo-division.  See <B>pseudoRemainder:quotient:</B> for more details.<P>
+<H3><A NAME="102">divide:</A></H3>
+<BLOCKQUOTE>-<B>divide</B>:<I>b</I></BLOCKQUOTE>
+Returns the exact quotient (a new polynomial) of the polynomial division.  Returns <B>nil</B> if the polynomial division fails or if the division was not exact (if there was a non-zero remainder).  The polynomial may be expanded or recursive.<P>
+<H3><A NAME="111">pseudoRemainder:quotient:</A></H3>
+<BLOCKQUOTE>-<B>pseudoRemainder</B>:<I>b</I><B>quotient</B>:(id *)<I>q</I></BLOCKQUOTE>
+If the polynomials are variable sparse or expanded, they are temporarily converted into variable dense and recursive representation for this operation.  If <I>n</I> and <I>m</I> are the degrees of <B>self</B> and <I>b</I> respectively, and if <I>c</I> is the leading coefficient of <I>b</I>, than this method computes the pseudo-remainder <I>R</I> and, if <I>q</I> is not a NULL pointer, the pseudo-quotient <I>Q</I> such that <I>c</I>^(n-m+1) <I>self</I> = <I>Q b</I> + <I>R</I>.  Returns <B>nil</B> if the pseudo-division fails.<P>
+<H3><A NAME="112">pseudoRemainder:</A></H3>
+<BLOCKQUOTE>-<B>pseudoRemainder</B>:<I>b</I></BLOCKQUOTE>
+Computes the pseudo-remainder of the polynomials by invoking <B>pseudoRemainder:quotient:</B> with a NULL argument.<P>
+<H3><A NAME="115">content</A></H3>
+<BLOCKQUOTE>-<B>content</B></BLOCKQUOTE>
+Returns the content of the sequence of scalars of the polynomial (the greatest common divisor of the scalars in the polynomial); the result is a new scalar object.  If the polynomial is zero, this method returns <B>nil</B>.<P>
+<H3><A NAME="116">divideContent</A></H3>
+<BLOCKQUOTE>-<B>divideContent</B></BLOCKQUOTE>
+If the polynomial is zero, this method returns a copy of itself.  Otherwise, this method returns the quotient (a new polynomial) on division by the scalar returned by <B>content</B>.<P>
+<H3><A NAME="117">coefficientContent</A></H3>
+<BLOCKQUOTE>-<B>coefficientContent</B></BLOCKQUOTE>
+Returns for a variable dense and recursive polynomial, the greatest common divisor of the coefficients (not scalars) of the polynomial.  If the polynomial is equal to zero, this method returns <B>nil</B>.<P>
+<H3><A NAME="118">divideCoefficientContent</A></H3>
+<BLOCKQUOTE>-<B>divideCoefficientContent</B></BLOCKQUOTE>
+If the polynomial is zero, this method returns a copy of itself.  Otherwise, this method returns the quotient (a new polynomial) on division by the coefficient returned by <B>coefficientContent</B>.<P>
+<H3><A NAME="119">termContent</A></H3>
+<BLOCKQUOTE>-<B>termContent</B></BLOCKQUOTE>
+Returns for a variable dense and recursive polynomial, the <I>monic</I> greatest common divisor of the terms of the polynomial.  In other words, this method returns the main symbol of the polynomial raised to the <B>order</B> of the polynomial. <P>
+<B>See also:</B> order<P>
+<H3><A NAME="120">monomialContent</A></H3>
+<BLOCKQUOTE>-<B>monomialContent</B></BLOCKQUOTE>
+Returns the greatest common divisor (a monic monomial) of the monomials in an expanded polynomial.  If the polynomial is equal to zero, this method returns <B>nil</B>.<P>
+<H3><A NAME="186">gcd:</A></H3>
+<BLOCKQUOTE>-<B>gcd</B>:<I>b</I></BLOCKQUOTE>
+Returns a new polynomial that is the gcd of the polynomials.  For recursive and variable dense polynomials over a field, the method computes the <I>monic</I> gcd of the polynomials by the euclidean algorithm.  Over an integral domain, the method computes the <I>primitive</I> gcd by the improved subresultant algorithm.  Expanded or variable dense polynomials are temporarily converted into recursive and variable dense representation (and the resulting gcd is converted back into the original representation).<P>
+<H3><A NAME="187">resultant:</A></H3>
+<BLOCKQUOTE>-<B>resultant</B>:<I>b</I></BLOCKQUOTE>
+Returns the resultant of the pair of two recursive and variable dense polynomials.  The result is a new object that is taken from the coefficient domain i.e., it is either a polynomial in a variable less than the argument polynomials, or it is a scalar.<P>
+<H3><A NAME="188">resultant:wrt:</A></H3>
+<BLOCKQUOTE>-<B>resultant</B>:<I>b</I><B>wrt</B>:(STR)<I>aSymbol</I></BLOCKQUOTE>
+Returns the resultant of the pair of polynomials with respect to the variable named <I>aSymbol</I>.<P>
+<H3><A NAME="189">discriminant</A></H3>
+<BLOCKQUOTE>-<B>discriminant</B></BLOCKQUOTE>
+Returns the discriminant of the polynomial i.e. the resultant of the polynomial and its derivative.<P>
+<B>Note:</B> This is actually the discriminant up to a scalar.  Scalar factor will change in future.<P>
+<H3><A NAME="193">numRealRoots</A></H3>
+<BLOCKQUOTE>- (int)<B>numRealRoots</B></BLOCKQUOTE>
+Returns the number of real roots of a univariate and variable dense polynomial, using Sturm's algorithm over any ordered integral domain or field.  A univariate variable sparse polynomial is temporarily converted into variable dense representation.<P>
+<H3><A NAME="194">varRealRoots:</A></H3>
+<BLOCKQUOTE>- (int)<B>varRealRoots</B>:<I>g</I></BLOCKQUOTE>
+Returns the variation of real roots over the polynomial <I>g</I>.<P>
+<H3><A NAME="195">isSquareFree</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isSquareFree</B></BLOCKQUOTE>
+Returns YES if the polynomial is squarefree i.e., if the polynomial and its derivative are coprime.<P>
+<H3><A NAME="199">factorSquareFree</A></H3>
+<BLOCKQUOTE>-<B>factorSquareFree</B></BLOCKQUOTE>
+Factors a recursive and variable dense polynomial into a product of squarefree factors.  Returns a new collection of term objects; each term consists of a (base) scalar object, the squarefree factor and a positive integral exponent.  If the scalars are taken from a field, the factors are made monic; for an integral domain, the factors are made primitive.  The algorithm works in the case of zero and non-zero characteristic.  If the polynomial is expanded or variable sparse, the method temporarily converts it into recursive and variable dense representation.  The factors of the polynomial are made expanded or variable sparse again.<P>
+<H3><A NAME="122">truncateAtDegree:</A></H3>
+<BLOCKQUOTE>-<B>truncateAtDegree</B>:(int)<I>d</I></BLOCKQUOTE>
+Drops terms or monomials of degree greater than <I>d</I>.  Returns a new polynomial.<P>
+<H3><A NAME="123">frobenius</A></H3>
+<BLOCKQUOTE>-<B>frobenius</B></BLOCKQUOTE>
+Returns a new polynomial that is the image of the polynomial under the frobenius map by sending <B>frobenius</B> messages to each term or monomial.<P>
+<H3><A NAME="124">frobeniusInverse</A></H3>
+<BLOCKQUOTE>-<B>frobeniusInverse</B></BLOCKQUOTE>
+Returns a new polynomial that is the image of the polynomial under the inverse of the frobenius map by sending <B>frobeniusInverse</B> messages to each term or monomial.  Returns <B>nil</B> if the polynomial is not the image of a polynomial under the frobenius map.<P>
+<H3><A NAME="125">evaluate:</A></H3>
+<BLOCKQUOTE>-<B>evaluate</B>:<I>aScalar</I></BLOCKQUOTE>
+<B>Note:</B> Not implemented.<P>
+Replaces the main variable of the polynomial by <I>aScalar</I>, and if the polynomial is univariate, returns a scalar object.  If the polynomial is not univariate, it must be recursive and variable dense and the method returns again a recursive and variable dense polynomial in a variable less (ie. a coefficient object), obtained by replacing the main variable by <I>aScalar</I>.<P>
+<H3><A NAME="126">evaluate:at:</A></H3>
+<BLOCKQUOTE>-<B>evaluate</B>:(STR)<I>aSymbol</I><B>at</B>:<I>aScalar</I></BLOCKQUOTE>
+<B>Note:</B> Not implemented.<P>
+Returns a new polynomial object, obtained by replacing the variable named <I>aSymbol</I> by <I>aScalar</I>.<P>
+<H3><A NAME="127">evaluateAll:</A></H3>
+<BLOCKQUOTE>-<B>evaluateAll</B>:<I>cltnOfScalars</I></BLOCKQUOTE>
+Returns a new scalar object, obtained by replacing all variables of the polynomial by the scalar objects in the collection <I>cltnOfScalars</I> i.e., the first member in the collection returned by <B>variables</B> is replaced by the first member in <I>cltnOfScalars</I> and so on.  Variable sparse or expanded polynomials are temporarily converted into recursive and variable dense representation by this method.<P>
+<H3><A NAME="130">substitute:</A></H3>
+<BLOCKQUOTE>-<B>substitute</B>:<I>aPolynomial</I></BLOCKQUOTE>
+Returns a new (variable dense) polynomial, obtained by replacing the main variable of a variable dense polynomial by <I>aPolynomial</I>.<P>
+<H3><A NAME="131">substitute:by:</A></H3>
+<BLOCKQUOTE>-<B>substitute</B>:(STR)<I>aSymbol</I><B>by</B>:<I>aPolynomial</I></BLOCKQUOTE>
+Returns a new polynomial, obtained by replacing the variable named <I>aSymbol</I> by <I>aPolynomial</I>.  Implemented for recursive and variable sparse polynomials only.<P>
+<H3><A NAME="132">substituteAll:</A></H3>
+<BLOCKQUOTE>-<B>substituteAll</B>:<I>cltnOfPolynomials</I></BLOCKQUOTE>
+<B>Note:</B> Not implemented.<P>
+Returns a new polynomial, obtained by replacing all variables simultaneously by the polynomials in the collection<I>cltnOfPolynomials</I>.<P>
+Change of Variables - Permuting (Swapping) Variables = substituteAll <P>
+<H3><A NAME="133">derive</A></H3>
+<BLOCKQUOTE>-<B>derive</B></BLOCKQUOTE>
+Returns the derivative of a variable dense polynomial with respect to the main variable (the last member in the collection returned by <B>variables</B>).<P>
+<H3><A NAME="134">deriveWrt:</A></H3>
+<BLOCKQUOTE>-<B>deriveWrt</B>:(STR)<I>aSymbol</I></BLOCKQUOTE>
+<B>Note:</B> Not implemented.<P>
+Returns the derivative of the polynomial with respect to the variable named <I>aSymbol</I>.  For example, to integrate a polynomial with respect to <I>x</I> : <P>
+<BLOCKQUOTE><PRE>
+pdx = [p deriveWrt:"x"];
+</PRE></BLOCKQUOTE>
+<H3><A NAME="135">integrate</A></H3>
+<BLOCKQUOTE>-<B>integrate</B></BLOCKQUOTE>
+Integrates a variable dense polynomial with respect to the main variable (the last member in the collection returned by <B>variables</B>).  Because the resulting polynomial is a polynomial over the same domain of scalars as the integrandum, this operation might fail and returns <B>nil</B> if the scalars are not taken from a field.<P>
+<H3><A NAME="136">integrateWrt:</A></H3>
+<BLOCKQUOTE>-<B>integrateWrt</B>:(STR)<I>aSymbol</I></BLOCKQUOTE>
+<B>Note:</B> Not implemented.<P>
+Integrates the polynomial with respect to the variable named <I>aSymbol</I>. <P>
+<H3><A NAME="137">printsLeadingSign</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsLeadingSign</B></BLOCKQUOTE>
+Whether the polynomial prints a leading minus sign.<P>
+<H3><A NAME="138">printsSum</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsSum</B></BLOCKQUOTE>
+Whether the polynomial prints multiple terms or monomials separated by a plus or minus signs.<P>
+<H3><A NAME="139">printsProduct</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsProduct</B></BLOCKQUOTE>
+Whether the polynomial prints a single product.<P>
+<H3><A NAME="140">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints the polynomial, by sending <B>printOn:</B> messages to the terms or monomials.<P>

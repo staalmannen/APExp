@@ -1,0 +1,883 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Portable Object Compiler (c) 1997,2023.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Object\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 None.  (Object is the root class).\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 {\b Object} is the superclass of all classes.  Methods implemented here are inherited by all Objective C classes.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Indexed Variables\b0\f0\fs16\
+\
+\f0\fs28\li2200 The Portable Object Compiler does not support indexed variables (variable sized objects).  It is best to store data of variable size, by using a pointer to the data, instead of placing the data in the object itself.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Limits \b0\f0\fs16\
+\
+\f0\fs28\li2200 The Portable Object Compiler stores the size of instances of subclasses of {\b Object} in a {\i short} C integer, so it's better to use a pointer to large blocks of data, as opposed to placing the data in the object itself (as an instance variable).\fs16\
+\
+\f0\fs28\li2200 The number of instance methods and class methods that a class can have, is also limited by the size of C {\i short} integer (depends on the target platform).\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Factory Initialization}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- initialize\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creating, Copying and Freeing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- new\
+	- copy\
+	- deepCopy\
+	- free\
+	- release\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Identity}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- self\
+	- yourself\
+	- class\
+	- superclass\
+	- superClass\
+	- class\
+	- superclass\
+	- superClass\
+	- name\
+	- name\
+	- findClass:\
+	- findSel:\
+	- selOfSTR:\
+	- idOfSTR:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Comparing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- hash\
+	- isEqual:\
+	- str\
+	- size\
+	- isEqual:\
+	- isSame:\
+	- notEqual:\
+	- notSame:\
+	- compare:\
+	- invertCompare:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Responding to Methods}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- respondsTo:\
+	- isMemberOf:\
+	- isKindOf:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Object Tables}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- someInstance\
+	- nextInstance\
+	- become:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Class Management}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- subclasses\
+	- poseAs:\
+	- addMethodsTo:\
+	- subclass:\
+	- subclass:::\
+	- load\
+	- unload\
+	- inheritsFrom:\
+	- isSubclassOf:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Error Handling}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- subclassResponsibility\
+	- subclassResponsibility:\
+	- notImplemented\
+	- notImplemented:\
+	- shouldNotImplement\
+	- shouldNotImplement:\
+	- shouldNotImplement:from:\
+	- error:\
+	- halt:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Unknown Messages}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- doesNotRecognize:\
+	- doesNotUnderstand:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Method Lookup}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- methodFor:\
+	- instanceMethodFor:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Method Performing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- perform:\
+	- perform:with:\
+	- perform:with:with:\
+	- perform:with:with:with:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- print\
+	- print\
+	- printLine\
+	- show\
+	- printOn:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Version}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- objcrtRevision\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Archiving}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- readFrom:\
+	- storeOn:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b AsciiFiler Methods}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- fileOutOn:\
+	- fileInFrom:\
+	- fileInFrom:\
+	- fileOut:type:\
+	- fileIn:type:\
+	- awake\
+	- awakeFrom:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 initialize\f0\b0\
+\f0\fs28\li2500 +{\b initialize}\fs16\
+\
+\f0\fs28\li2200 Every class in the application, receives an {\f2 initialize} message when the program starts.  By default this method doesn't do anything.  It can be overridden to do class initialization.\fs16\
+\
+\f0\fs28\li2200 Note that all classes are guarantueed to receive {\f2 initialize}, before any other message is sent.  Other runtimes differ with ours in this respect, that {\f2 initialize} is sometimes sent to a class, just before an instance of that particular class is being used (as opposed to all classes receiving {\f2 initialize}, before any instance receives a message).\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} In some runtimes, the equivalent functionality is called {\f2 +load} instead of {\f2 +initialize}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 new\f0\b0\
+\f0\fs28\li2500 +{\b new}\fs16\
+\
+\f0\fs28\li2200 Factory method to create and return a new instance of the class.  The default implementation clears (zeroes) the memory for instance variables and initializes the {\i isa} pointer.\fs16\
+\
+\f0\fs28\li2200 On systems that allow to recover from a failed memory allocation call, {\f2 new} might raise an exception that can be handled with {\f2 ifOutOfMemory:}.  The default handler for this exception aborts the process.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 copy\f0\b0\
+\f0\fs28\li2500 -{\b copy}\fs16\
+\
+\f0\fs28\li2200 Should return a copy of the object.  The difference with {\f2 deepCopy} is, that this copy might share pointers etc. with the receiver of the message.  By default, {\f2 copy} just makes a byte copy of the memory for instance variables.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deepCopy\f0\b0\
+\f0\fs28\li2500 -{\b deepCopy}\fs16\
+\
+\f0\fs28\li2200 Should return a {\i deep copy} of the object.  Usually this means a copy that doesn't share objects with the original object and that can be {\f2 free}'ed independently.  By default, {\f2 deepCopy} just makes a byte copy of the memory for instance variables.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 free\f0\b0\
+\f0\fs28\li2500 -{\b free}\fs16\
+\
+\f0\fs28\li2200 Sets the {\b isa} pointer for this instance to {\b nil}, frees the memory for the instance, and returns {\b nil}.\fs16\
+\
+\f0\fs28\li2200 When compiling with the -gc option, the memory for the instance is not being freed.  The garbage collector takes cares of this.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} This method is implemented as {\f2 shouldNotImplement} when using reference counted memory management.  This is so that the user doesn't accidentally sends {\f2 free} messages that interfere with the reference counted memory management.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 release\f0\b0\
+\f0\fs28\li2500 -{\b release}\fs16\
+\
+\f0\fs28\li2200 Message that is automatically sent to object when using the reference count compiler option.  Should free the memory for the instance, and returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 self\f0\b0\
+\f0\fs28\li2500 -{\b self}\fs16\
+\
+\f0\fs28\li2200 Method that does nothing, except for returning {\b self}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 yourself\f0\b0\
+\f0\fs28\li2500 -{\b yourself}\fs16\
+\
+\f0\fs28\li2200 Method that does nothing, except for returning {\b self}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 class\f0\b0\
+\f0\fs28\li2500 -{\b class}\fs16\
+\
+\f0\fs28\li2200 Returns the class object for the receiver's class.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} + class\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 superclass\f0\b0\
+\f0\fs28\li2500 -{\b superclass}\fs16\
+\
+\f0\fs28\li2200 Returns the superclass object for the receiver's class.  For GNU compatibility.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} + superclass\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 superClass\f0\b0\
+\f0\fs28\li2500 -{\b superClass}\fs16\
+\
+\f0\fs28\li2200 Same as {\f2 superclass}.  For Stepstone compatibility.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 class\f0\b0\
+\f0\fs28\li2500 +{\b class}\fs16\
+\
+\f0\fs28\li2200 Traditionally, the {\i class} of a class does NOT return the metaclass, but rather {\b self} (that, it, the class itself).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 superclass\f0\b0\
+\f0\fs28\li2500 +{\b superclass}\fs16\
+\
+\f0\fs28\li2200 For GNU compatibility.  Returns the superclass of this factory (which is another factory object), or {\b nil} for the root.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 superClass\f0\b0\
+\f0\fs28\li2500 +{\b superClass}\fs16\
+\
+\f0\fs28\li2200 Same as {\f2 superclass}, but for Stepstone compatibility.  Returns the superclass of this factory (which is another factory object), or {\b nil} for the root.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 name\f0\b0\
+\f0\fs28\li2500 - (STR){\b name}\fs16\
+\
+\f0\fs28\li2200 Returns the name of the object; implemented by default to return the name of the object's class.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 name\f0\b0\
+\f0\fs28\li2500 + (STR){\b name}\fs16\
+\
+\f0\fs28\li2200 Returns the name of the class.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 findClass:\f0\b0\
+\f0\fs28\li2500 -{\b findClass}:(STR){\i name}\fs16\
+\
+\f0\fs28\li2200 Returns the id of a Class name, if that class has been linked in this executable image, otherwise returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 findSel:\f0\b0\
+\f0\fs28\li2500 - (SEL){\b findSel}:(STR){\i name}\fs16\
+\
+\f0\fs28\li2200 Returns the selector (uniqued string) of the string {\i name}.  Returns NULL if {\i name} is not in the selector table.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 selOfSTR:\f0\b0\
+\f0\fs28\li2500 - (SEL){\b selOfSTR}:(STR){\i name}\fs16\
+\
+\f0\fs28\li2200 Same as {\f2 findSel:}, but raises an exception if the selector is not found.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 idOfSTR:\f0\b0\
+\f0\fs28\li2500 -{\b idOfSTR}:(STR){\i aClassName}\fs16\
+\
+\f0\fs28\li2200 Same as {\f2 findClass:} , but raises an exception if the class is not found.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hash\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b hash}\fs16\
+\
+\f0\fs28\li2200 Returns a small integer value derived from the object, that should be equal for two objects for which {\f2 isEqual:} returns YES.  By default, returns the pointer address of the object as an unsigned integer.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEqual}:{\i anObject}\fs16\
+\
+\f0\fs28\li2200 Should return YES if the receiver is equal to {\i anObject}.  By default, compares the pointer addresses of the two objects.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 str\f0\b0\
+\f0\fs28\li2500 - (STR){\b str}\fs16\
+\
+\f0\fs28\li2200 Returns the name of the object; implemented by default to return the name of the object's class.  The String subclass overrides this method to return its contents.  The method {\f2 isEqual:} of the String class is implemented in terms of {\f2 str}, and String instances can therefore be compared with arbitrary objects.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 size\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b size}\fs16\
+\
+\f0\fs28\li2200 Returns the number of other objects that this object contains.  Returns 0 by default, but the Collection subclasses override this method to return the size of their contents.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 + (BOOL){\b isEqual}:{\i anObject}\fs16\
+\
+\f0\fs28\li2200 Tests whether two class objects are the same.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isSame:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isSame}:{\i anObject}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the pointer addresses of the two objects are equal.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b notEqual}:{\i anObject}\fs16\
+\
+\f0\fs28\li2200 Whether {\f2 isEqual:} returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notSame:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b notSame}:{\i anObject}\fs16\
+\
+\f0\fs28\li2200 Whether {\f2 isSame:} returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 compare:\f0\b0\
+\f0\fs28\li2500 - (int){\b compare}:{\i anObject}\fs16\
+\
+\f0\fs28\li2200 Should return an integer which is less than, equal to, or greater than zero, if the receiver is less than, equal to, or greater than {\i anObject}.  The return value is called the method's comparison value.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 invertCompare:\f0\b0\
+\f0\fs28\li2500 - (int){\b invertCompare}:{\i anObject}\fs16\
+\
+\f0\fs28\li2200 This method simply inverts the return value of {\f2 compare:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 respondsTo:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b respondsTo}:(SEL){\i aSelector}\fs16\
+\
+\f0\fs28\li2200 Test whether the class implements a certain method.  Returns YES if the class itself, or one of its superclasses, implements the method, otherwise NO.  The method does {\i not} generate an error if the class does not implement the method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isMemberOf:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isMemberOf}:{\i aClass}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the receiver is an instance of {\i aClass}, but NO if it's an instance of some subclass of {\i aClass}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isKindOf:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isKindOf}:{\i aClass}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the receiver is an instance of {\i aClass} or an instance from some subclass of {\i aClass}.  If the receiver is a class, returns YES if {\i aClass} is the rootclass ({\b Object}) and NO otherwise.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} For portability, this method always needs to be used as follows:\fs16\
+\
+\f2\fs24\li2800 [ foo isKindOf:(id) [Classname class] ];\
+\f0\fs16\
+\f0\fs28\li2200 The reason is that some compilers do not allow class names as expressions, so the class must be obtained by sending a {\f2 class} message.   In addition, some compilers have a {\f2 isKindOf:} method that takes an {\i id} argument, but the return value of {\f2 self} or {\f2 class} can be SHR for those compilers.  Therefore, it's necessary to cast the return value to {\i id} (to avoid compiler warnings).\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} +inheritsFrom:, -isMemberOf:\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 someInstance\f0\b0\
+\f0\fs28\li2500 +{\b someInstance}\fs16\
+\
+\f0\fs28\li2200 Returns the first instance in an enumeration of instances, or {\b nil} when there is no instance.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Works only when using the -otb compiler switch.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 nextInstance\f0\b0\
+\f0\fs28\li2500 -{\b nextInstance}\fs16\
+\
+\f0\fs28\li2200 Returns the next instance in the enumeration of instances of a class, or {\b nil} when there are no more instances.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Works only when using the -otb compiler switch.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 become:\f0\b0\
+\f0\fs28\li2500 -{\b become}:{\i other}\fs16\
+\
+\f0\fs28\li2200 Swaps pointers for the receiver of the message and the argument.  All variables that used to point to the receiver, now point to the argument, and vice-versa.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Works only when using the -otb compiler switch.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subclasses\f0\b0\
+\f0\fs28\li2500 +{\b subclasses}\fs16\
+\
+\f0\fs28\li2200 Returns a {\b OrdCltn} of direct subclasses of the class that receives the message.  If the class has no subclasses, then this method returns an empty {\b OrdCltn} (not {\b nil}).  The class itself is not considered subclass of itself.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} This method is Portable Object Compiler only.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} +class, +superclass, +inheritsFrom:\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 poseAs:\f0\b0\
+\f0\fs28\li2500 +{\b poseAs}:{\i superClass}\fs16\
+\
+\f0\fs28\li2200 The {\f2 poseAs:} method permits to modify a supplied {\i superClass} (for which, for example, no source code is available) by substituting a direct subclass of {\i superClass}.  It is normally used inside {\f2 +initialize}, but the Portable Object Compiler allows {\f2 poseAs:} to be used anywhere in the program.\fs16\
+\
+\f2\fs24\li2800 + initialize \{ [self poseAs:[Set self]]; return self; \}\
+\f0\fs16\
+\f0\fs28\li2200 The example shows how the {\f2 initialize} of some subclass, called for example {\b SubSet}, can substitute {\b SubSet} for {\b Set}.  Methods defined in {\b SubSet} override those defined in the superclass, and new methods from {\b SubSet}, will appear to have come from the {\b Set} class.\fs16\
+\
+\f0\fs28\li2200 When performing a {\f2 poseAs:}, the following rules must be followed:\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+	- The posing class must be an immediate subclass of the class that it is to impersonate.\
+	- The posing class may define or redefine only methods.\
+	- Specifically, the posing class may NOT add any new instance variables.\
+\pard\fs16\
+\
+\f0\fs28\li2200 The Portable Object Compiler implementation of {\f2 poseAs:} differs from some other runtimes, since it allows {\f2 poseAs:} to happen, even after messages have been sent to instances of posing or impersonated class.\fs16\
+\
+\f0\fs28\li2200 Implementation details:\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+	- poseAs: patches the superclass pointer of all subclasses (other than the posing class) that inherit from {\i superClass}\
+	- poseAs: changes the name of {\i superClass} by prefixing the name with  _%\
+	- findClass: for the name of {\i superClass} will return the posing subclass.\
+\pard\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} All Objective-C compilers provide this functionality (sometimes with restrictions on when the method can be called)\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 addMethodsTo:\f0\b0\
+\f0\fs28\li2500 +{\b addMethodsTo}:{\i superClass}\fs16\
+\
+\f0\fs28\li2200 The {\f2 addMethodsTo:} method permits to modify a supplied {\i superClass} (for which, for example, no source code is available) by adding the (instance and factory) methods of a direct subclass, to {\i superClass}.  It is normally used inside {\f2 +initialize}, but the Portable Object Compiler allows {\f2 addMethodsTo:} to be used anywhere in the program.\fs16\
+\
+\f0\fs28\li2200 The same restrictions apply as for {\f2 poseAs:} : the subclass needs to be a direct subclass of {\i superClass} and it may not add instance variables.  However, unlike {\f2 poseAs:}, the subclass will not be substituted for the {\i superClass} for purposes as {\f2 fileIn:} etc.  Also, (unlike {\f2 poseAs:}) when the subclass adds a method to the {\i superClass} that was overridden from the {\i superClass}, then this method will not replace the method of the {\i superClass}.\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+\pard\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Portable Object Compiler only.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subclass:\f0\b0\
+\f0\fs28\li2500 +{\b subclass}:(STR){\i name}\fs16\
+\
+\f0\fs28\li2200 Method to dynamically subclass a class.  Returns a new class object, which is still unregistered.  With the methods {\f2 load} and {\f2 unload}, one can add or remove the class to the runtime, such that methods like {\f2 findClass:} will also return this new class.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Portable Object Compiler only.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subclass:::\f0\b0\
+\f0\fs28\li2500 +{\b subclass}:(STR){\i name}:(int){\i ivars}:(int){\i cvars}\fs16\
+\
+\f0\fs28\li2200 Method to dynamically subclass a class.  Returns a new class object, which is still unregistered.  With the methods {\f2 load} and {\f2 unload}, one can add or remove the class to the runtime, such that methods like {\f2 findClass:} will also return this new class.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Portable Object Compiler only.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 load\f0\b0\
+\f0\fs28\li2500 +{\b load}\fs16\
+\
+\f0\fs28\li2200 This method adds a dynamically created class to the runtime.  The class will appear to methods such as {\f2 findClass:} or {\f2 findSel:} (for any selectors of methods of the class).\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Portable Object Compiler only.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 unload\f0\b0\
+\f0\fs28\li2500 +{\b unload}\fs16\
+\
+\f0\fs28\li2200 This method removes a dynamically created class from the runtime.  The class will appear to be unavailable to methods such as {\f2 findClass:}, after removing the class by an {\f2 unload} message.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Portable Object Compiler only.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inheritsFrom:\f0\b0\
+\f0\fs28\li2500 + (BOOL){\b inheritsFrom}:{\i aClass}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the receiving class is a subclass (direct or not) from {\i aClass}.  Returns NO if the receiver is {\i aClass} itself, e.g. :\fs16\
+\
+\f2\fs24\li2800 - (BOOL)isKindOf:c \{ return (isa==c) || [isa inheritsFrom:aClass]; \}\
+\f0\fs16\
+\f0\fs28\li2200 {\b {\f1 Note:}} For compatibility with Squeak.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isSubclassOf:\f0\b0\
+\f0\fs28\li2500 + (BOOL){\b isSubclassOf}:{\i aClass}\fs16\
+\
+\f0\fs28\li2200 Equivalent to {\f2 inheritsFrom:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subclassResponsibility\f0\b0\
+\f0\fs28\li2500 -{\b subclassResponsibility}\fs16\
+\
+\f0\fs28\li2200 Used in classes to indicate that the functionality is assumed to be implemented by a subclass, as in:\fs16\
+\
+\f2\fs24\li2800 - foo \{ [self subclassResponsibility]; \}\
+\f0\fs16\
+\f0\fs28\li2200 If the subclass does not implement the method, then an error message is generated.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subclassResponsibility:\f0\b0\
+\f0\fs28\li2500 -{\b subclassResponsibility}:(SEL){\i aSelector}\fs16\
+\
+\f0\fs28\li2200 For Stepstone compatibility.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notImplemented\f0\b0\
+\f0\fs28\li2500 -{\b notImplemented}\fs16\
+\
+\f0\fs28\li2200 Method to indicate that a method is temporarily not implemented : \fs16\
+\
+\f2\fs24\li2800 -foo \{ [self notImplemented]; \}\
+\f0\fs16\
+\f0\fs28\li2200 When designing a class, the method {\f2 notImplemented} can be used to implement stubs for the methods that make up the class.  When the design phase is finished, the actual implementation can begin.  If later, by accident, not all functionality is properly implemented, the method {\f2 notImplemented} will help finding this.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notImplemented:\f0\b0\
+\f0\fs28\li2500 -{\b notImplemented}:(SEL){\i aSelector}\fs16\
+\
+\f0\fs28\li2200 For Stepstone compatibility.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 shouldNotImplement\f0\b0\
+\f0\fs28\li2500 -{\b shouldNotImplement}\fs16\
+\
+\f0\fs28\li2200 This is the opposite of {\f2 subclassResponsibility} and a stronger form of {\f2 notImplemented} : {\f2 shouldNotImplement} should be used, when the class is not supposed to implement some method, i.e. when the method is not appropriate for the class and its subclasses.\fs16\
+\
+\f0\fs28\li2200 An abstract superclass, called {\i MyClass} for example, can use this method to indicate that subclasses should not send (or be sent) a {\f2 new} message, but that they are supposed to send some other method (such as {\f2 foo:} perhaps) :\fs16\
+\
+\f2\fs24\li2800 +new \{ [self shouldNotImplement]; \}\
++foo:aBar \{ self = [super new];bar = aBar; return self; \}\
+\f0\fs16\
+\f0\fs28\li2200 This announces that {\f2 new}, which would otherwise have been inherited from the root class, is not an appropriate way to create an instance of a subclass of MyClass.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 shouldNotImplement:\f0\b0\
+\f0\fs28\li2500 -{\b shouldNotImplement}:(SEL){\i aSelector}\fs16\
+\
+\f0\fs28\li2200 Method for Stepstone compatibility.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 shouldNotImplement:from:\f0\b0\
+\f0\fs28\li2500 -{\b shouldNotImplement}:(SEL){\i aSelector}{\b from}:{\i superClass}\fs16\
+\
+\f0\fs28\li2200 Method for Stepstone compatibility.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 error:\f0\b0\
+\f0\fs28\li2500 -{\b error}:(STR){\i format,...}\fs16\
+\
+\f0\fs28\li2200 Generate an error message.  Takes a format string in the style of the C library function {\i printf}, with a variable number of arguments.  Returns {\b self}.\fs16\
+\
+\f0\fs28\li2200 This method is present in most runtimes, but it was reimplemented in the Portable Object Compiler, so that the error can be {\i caught}, using the Block instance method {\f2 ifError:}.  Traditionally, the method {\f2 error:} simply aborts the process, and the default error handler in our implementation does the same thing.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 halt:\f0\b0\
+\f0\fs28\li2500 -{\b halt}:{\i message}\fs16\
+\
+\f0\fs28\li2200 This method is equivalent to the {\f2 error:} method but takes an object as argument.\fs16\
+\
+\f0\fs28\li2200 The halt method pops an error handler from the stack of handlers, as maintained by {\f2 ifError:}.  The handler is evaluated with the message and the receiver of the {\f2 halt:} message, as arguments.  If the handler returns, it is pushed again on the stack.  If there were no handlers on the stack, the default error handler is used instead, as returned by {\f2 errorHandler}.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Portable Object Compiler specific\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 doesNotRecognize:\f0\b0\
+\f0\fs28\li2500 -{\b doesNotRecognize}:(SEL){\i aSelector}\fs16\
+\
+\f0\fs28\li2200 Automatically sent by the {\i runtime} when the class does not implement {\i aSelector}.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} The Portable Object Compiler offers a generalization of this method, called {\f2 doesNotUnderstand:}.  The {\f2 doesNotRecognize:} method is sent {\i via} {\f2 doesNotUnderstand:} and not directly by the messenger.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} doesNotUnderstand:\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 doesNotUnderstand:\f0\b0\
+\f0\fs28\li2500 -{\b doesNotUnderstand}:{\i aMessage}\fs16\
+\
+\f0\fs28\li2200 This method is sent by the messenger when a message is sent to an object, that is not implemented by that object.  The default implementation is,\fs16\
+\
+\f2\fs24\li2800 [self doesNotRecognize:[aMessage selector]];\
+\f0\fs16\
+\f0\fs28\li2200 which means that code that was overriding {\f2 doesNotRecognize:} to do forwarding of (unary) messages can continue to work.\fs16\
+\
+\f0\fs28\li2200 However, the new (Portable Object Compiler specific) {\f2 doesNotUnderstand:} method, together with the {\b Message} class,  provides a way of forwarding messages with arbitrary return values and arguments.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} Message Class\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 methodFor:\f0\b0\
+\f0\fs28\li2500 - (IMP){\b methodFor}:(SEL){\i aSelector}\fs16\
+\
+\f0\fs28\li2200 Returns a function implementation pointer for {\i aSelector}.  Returns a pointer to an error handling function if the object does not respond to {\i aSelector}.\fs16\
+\
+\f0\fs28\li2200 Use of this method for reasons of performance, is not encouraged, because by repeatedly using the resulting function pointer, one is bypassing (the benefits of) dynamic binding.\fs16\
+\
+\f0\fs28\li2200 A good use of {\f2 methodFor:} however, is, because this method is supported by various runtimes, to send a message in a runtime independent, portable way, without using runtime specific functions (such as _imp(), _msg(), objc_msg_Send() etc. which have, unlike {\f2 methodFor:} non-standard names) :\fs16\
+\
+\f2\fs24\li2800 ((int (*) (id,id,BOOL))[object methodFor:selector])(object,arg,flag);\
+\f0\fs16\
+\f0\fs28\li2200 The same thing can be achieved by using the _imp() function immediately but using the {\f2 methodFor:} message is the preferred API.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 instanceMethodFor:\f0\b0\
+\f0\fs28\li2500 + (IMP){\b instanceMethodFor}:(SEL){\i aSelector}\fs16\
+\
+\f0\fs28\li2200 Returns a function implementation pointer for {\i aSelector}.  Returns a pointer to an error handling function if the object does not respond to {\i aSelector}.\fs16\
+\
+\f0\fs28\li2200 Use of this method is not encouraged, because by using the resulting function pointer, one is bypassing (the benefits of) dynamic binding.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 perform:\f0\b0\
+\f0\fs28\li2500 -{\b perform}:(SEL){\i aSelector}\fs16\
+\
+\f0\fs28\li2200 Returns the value that would result when sending {\i aSelector} to the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 perform:with:\f0\b0\
+\f0\fs28\li2500 -{\b perform}:(SEL){\i aSelector}{\b with}:{\i anObject}\fs16\
+\
+\f0\fs28\li2200 Returns the value that would result when sending {\i aSelector} to the receiver with a single argument {\i anObject}.  The following are equivalent :\fs16\
+\
+\f2\fs24\li2800 [aReceiver perform:@selector(do:) with:anObject];\
+\f0\fs16\
+\f0\fs28\li2200 and\fs16\
+\
+\f2\fs24\li2800 [aReceiver do:anObject];\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 perform:with:with:\f0\b0\
+\f0\fs28\li2500 -{\b perform}:(SEL){\i aSelector}{\b with}:{\i anObject}{\b with}:{\i otherObject}\fs16\
+\
+\f0\fs28\li2200 Returns the value that would result when sending {\i aSelector} to the receiver with arguments {\i anObject} and {\i otherObject}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 perform:with:with:with:\f0\b0\
+\f0\fs28\li2500 -{\b perform}:(SEL){\i aSelector}{\b with}:{\i anObject}{\b with}:{\i otherObject}{\b with}:{\i thirdObj}\fs16\
+\
+\f0\fs28\li2200 Returns the value that would result when sending {\i aSelector} to the receiver with arguments {\i anObject} and {\i otherObject}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 print\f0\b0\
+\f0\fs28\li2500 -{\b print}\fs16\
+\
+\f0\fs28\li2200 Prints the object to the {\i stdout} and returns {\b self}.  Implemented as,\fs16\
+\
+\f2\fs24\li2800 return [self printOn:stdout]; \
+\f0\fs16\
+\f0\fs28\li2200 meaning that if you implement {\f2 printOn:}, then this method will work.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 print\f0\b0\
+\f0\fs28\li2500 +{\b print}\fs16\
+\
+\f0\fs28\li2200 Factory method to print the name of the class to the {\i stdout} and to return {\b self}.  \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printLine\f0\b0\
+\f0\fs28\li2500 -{\b printLine}\fs16\
+\
+\f0\fs28\li2200 Prints the object (in the sense of {\f2 print}) and then a newline.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 show\f0\b0\
+\f0\fs28\li2500 -{\b show}\fs16\
+\
+\f0\fs28\li2200 Displays the object on the {\i stderr}, by using Filer code, and returns {\b self}.  Because it is implemented in terms of Filer code, this method is completely unrelated to the {\b print} method, although that the goal in both cases is to print a symbolic representation of the object.\fs16\
+\
+\f0\fs28\li2200 This method is extremely useful for debugging.  The compiler automatically implements Filer methods, so this method {\i dumps} instance variables of the object in a symbolic format, without the programmer having to implement debug/printing routines.\fs16\
+\
+\f0\fs28\li2200 Method for Stepstone compatibility.  Used in Producer code.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i anIOD}\fs16\
+\
+\f0\fs28\li2200 Should print the object to {\i anIOD}, which is of type {\b IOD} (defined as an {\i input output device}, a {\b FILE} pointer, to be used with standard I/O).  Should return the receiver.  By default, the method prints nothing.\fs16\
+\
+\f0\fs28\li2200 This is the method to override in subclasses to make {\f2 print}, {\f2 printLine} etc. to work.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 objcrtRevision\f0\b0\
+\f0\fs28\li2500 + (STR){\b objcrtRevision}\fs16\
+\
+\f0\fs28\li2200 Returns the version string of the runtime being used.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 readFrom:\f0\b0\
+\f0\fs28\li2500 +{\b readFrom}:(STR){\i aFileName}\fs16\
+\
+\f0\fs28\li2200 Activates the object stored in the file {\i aFileName}.  The object will in all respects be functional, as it was before being stored.  Works by indirectly calling {\i fileIn()}.  The class AsciiFiler must be linked into the application for this method to work.\fs16\
+\
+\f0\fs28\li2200 This message can be sent to any factory object without regard of the class of the object being read in.  In other words, if file {\i foo} contains a saved instance of a {\b OrdCltn}, then\fs16\
+\
+\f2\fs24\li2800 id myCollection = [Object readFrom:"foo"];\
+\f0\fs16\
+\f0\fs28\li2200 will work, ie. the receiver doesn't need to be {\b OrdCltn}.  Returns {\b nil} on failure.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 storeOn:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b storeOn}:(STR){\i aFileName}\fs16\
+\
+\f0\fs28\li2200 Stores the receiver to a file named {\i aFileName}, in a format such that the object can then be activated later, using the {\f2 readFrom:} method.  Works by indirectly calling the function {\i storeOn()}.  The class AsciiFiler must be linked into the application for this method to work\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 fileOutOn:\f0\b0\
+\f0\fs28\li2500 -{\b fileOutOn}:{\i aFiler}\fs16\
+\
+\f0\fs28\li2200 Writes the receiver on {\i aFiler}. This is the method that a subclass will override to do it own processing, if the default implementation, which automatically writes out all instance variables of type {\i id}, does not suffice.\fs16\
+\
+\f0\fs28\li2200 This method will be invoked twice by the Filer class, during archiving.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 fileInFrom:\f0\b0\
+\f0\fs28\li2500 +{\b fileInFrom}:{\i aFiler}\fs16\
+\
+\f0\fs28\li2200 Creates a new instance of the class, files in the instance from {\i aFiler} (by sending the new object a {\f2 fileInFrom:}) message, and returns the new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 fileInFrom:\f0\b0\
+\f0\fs28\li2500 -{\b fileInFrom}:{\i aFiler}\fs16\
+\
+\f0\fs28\li2200 Reads the receiver from {\i aFiler}. The default implementation automatically reads in instance variables of type {\i id}.  This method must be overridden to match {\f2 fileOutFor:}, if that method was implemented by the subclass.\fs16\
+\
+\f0\fs28\li2200 One should realize that, at the time this method is invoked, not all objects are guarantueed to be in a usable state.  This is only true once the filer starts sending {\f2 awakeFrom:} messages.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 fileOut:type:\f0\b0\
+\f0\fs28\li2500 -{\b fileOut}:(void *){\i value}{\b type}:(char){\i typeDesc}\fs16\
+\
+\f0\fs28\li2200 Method to be implemented by Filer class.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 fileIn:type:\f0\b0\
+\f0\fs28\li2500 -{\b fileIn}:(void *){\i value}{\b type}:(char){\i typeDesc}\fs16\
+\
+\f0\fs28\li2200 Method to be implemented by Filer class.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 awake\f0\b0\
+\f0\fs28\li2500 -{\b awake}\fs16\
+\
+\f0\fs28\li2200 This message is sent to every object when it is filed in, after all the objects it references are in a usable state.  The default implementation simply returns self.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 awakeFrom:\f0\b0\
+\f0\fs28\li2500 -{\b awakeFrom}:{\i aFiler}\fs16\
+\
+\f0\fs28\li2200 Allows the receiver to do some cleanup work after an object has been filed in.  It is a generalization of the old {\f2 -awake} method.  The difference is that this method passes {\i aFiler} as an argument.  The default implementation is to send the {\f2 awake} message.\fs16\
+\
+\fs16\
+\
+\
+}

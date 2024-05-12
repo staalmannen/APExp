@@ -1,0 +1,13 @@
+objc|-----handy-ruler----------------------------------------------------------|
+objc: objc 3.3.11 Portable Object Compiler  
+objc:  
+objc: The Portable Object Compiler, a language and a runtime library for 
+objc: producing C programs that operate by the runtime conventions of 
+objc: Smalltalk 80 in a UNIX environment, as described in Brad Cox's book on 
+objc: Objective-C. The precompiler is backed by a library which supports 
+objc: Smalltalk 80's interpretatation of messaging; binding of a message to 
+objc: its target routine is done at run time.  
+objc: 
+objc: 
+objc: https://sourceforge.net/projects/objc
+

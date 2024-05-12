@@ -1,0 +1,410 @@
+<HTML>
+<TITLE>ordcltn Specification Sheet</TITLE>
+<H1>ordcltn Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 1997,98,99,2003.  All Rights Reserved.<P>
+<H1>OrdCltn</H1>
+<B>Inherits from:</B> Cltn<P>
+<H2>Class Description</H2>
+<B>OrdCltn</B> (alias <B>OrderedCollection</B>) instances are ordered collections of objects : you can access, add or remove elements at a specified offset in the array of elements.  <B>OrdCltn</B> takes care of the memory allocation issues to hold the objects.<P>
+There can be no <B>nil</B> entries between the first (at offset 0) and last  elements (at <B>size</B> minus one).  For this reason, all methods that add objects refuse to add <B>nil</B>'s.  When entries are added or removed, the offsets of the remaining entries change.<P>
+Offsets into collections are traditionally unsigned integers.  Methods that return an offset, e.g., <B>offsetOf:</B> and <B>lastOffset</B> return a value of (unsigned)-1 to indicate that an object has not been found.<P>
+There are many methods for adding or inserting members into a collection.  Although members may be added at any point in the collection, they are generally added at the end using <B>add:</B>.<P>
+A member may be searched for using either the <B>find:</B> or <B>findMatching:</B> method.  In the first case, the member in the collection must be an exact match.  In the second case, the member must match in the sense of the <B>isEqual:</B> method.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#0">new</A></LI>
+<LI><A HREF="#1">new:</A></LI>
+<LI><A HREF="#50">with:</A></LI>
+<LI><A HREF="#51">with:with:</A></LI>
+<LI><A HREF="#52">add:</A></LI>
+<LI><A HREF="#2">copy</A></LI>
+<LI><A HREF="#3">deepCopy</A></LI>
+<LI><A HREF="#4">emptyYourself</A></LI>
+<LI><A HREF="#5">freeContents</A></LI>
+<LI><A HREF="#7">free</A></LI>
+</UL>
+<H3><B>Interrogation</B></H3>
+<UL>
+<LI><A HREF="#10">size</A></LI>
+<LI><A HREF="#11">isEmpty</A></LI>
+<LI><A HREF="#12">lastOffset</A></LI>
+<LI><A HREF="#13">eachElement</A></LI>
+<LI><A HREF="#14">firstElement</A></LI>
+<LI><A HREF="#15">lastElement</A></LI>
+</UL>
+<H3><B>Comparing</B></H3>
+<UL>
+<LI><A HREF="#17">isEqual:</A></LI>
+</UL>
+<H3><B>Adding</B></H3>
+<UL>
+<LI><A HREF="#18">add:</A></LI>
+<LI><A HREF="#20">addFirst:</A></LI>
+<LI><A HREF="#21">addLast:</A></LI>
+<LI><A HREF="#22">addIfAbsent:</A></LI>
+<LI><A HREF="#23">addIfAbsentMatching:</A></LI>
+</UL>
+<H3><B>Insertion</B></H3>
+<UL>
+<LI><A HREF="#24">at:insert:</A></LI>
+<LI><A HREF="#26">insert:after:</A></LI>
+<LI><A HREF="#27">insert:before:</A></LI>
+</UL>
+<H3><B>Relative Accessing</B></H3>
+<UL>
+<LI><A HREF="#28">after:</A></LI>
+<LI><A HREF="#29">before:</A></LI>
+<LI><A HREF="#30">at:</A></LI>
+<LI><A HREF="#31">at:put:</A></LI>
+</UL>
+<H3><B>Removing</B></H3>
+<UL>
+<LI><A HREF="#32">removeFirst</A></LI>
+<LI><A HREF="#33">removeLast</A></LI>
+<LI><A HREF="#34">removeAt:</A></LI>
+<LI><A HREF="#35">removeAtIndex:</A></LI>
+<LI><A HREF="#36">remove:</A></LI>
+<LI><A HREF="#37">remove:ifAbsent:</A></LI>
+</UL>
+<H3><B>Testing Contents</B></H3>
+<UL>
+<LI><A HREF="#53">includesAllOf:</A></LI>
+<LI><A HREF="#54">includesAnyOf:</A></LI>
+</UL>
+<H3><B>Adding and Removing Contents</B></H3>
+<UL>
+<LI><A HREF="#55">addAll:</A></LI>
+<LI><A HREF="#56">addContentsOf:</A></LI>
+<LI><A HREF="#57">addContentsTo:</A></LI>
+<LI><A HREF="#58">removeAll:</A></LI>
+<LI><A HREF="#59">removeContentsFrom:</A></LI>
+<LI><A HREF="#60">removeContentsOf:</A></LI>
+</UL>
+<H3><B>Combining</B></H3>
+<UL>
+<LI><A HREF="#61">intersection:</A></LI>
+<LI><A HREF="#62">union:</A></LI>
+<LI><A HREF="#63">difference:</A></LI>
+</UL>
+<H3><B>Converting</B></H3>
+<UL>
+<LI><A HREF="#64">asSet</A></LI>
+<LI><A HREF="#65">asOrdCltn</A></LI>
+</UL>
+<H3><B>Using Blocks</B></H3>
+<UL>
+<LI><A HREF="#66">detect:</A></LI>
+<LI><A HREF="#67">detect:ifNone:</A></LI>
+<LI><A HREF="#68">select:</A></LI>
+<LI><A HREF="#69">reject:</A></LI>
+<LI><A HREF="#70">collect:</A></LI>
+<LI><A HREF="#71">count:</A></LI>
+</UL>
+<H3><B>Making elements perform</B></H3>
+<UL>
+<LI><A HREF="#72">elementsPerform:</A></LI>
+<LI><A HREF="#73">elementsPerform:with:</A></LI>
+<LI><A HREF="#74">elementsPerform:with:with:</A></LI>
+<LI><A HREF="#75">elementsPerform:with:with:with:</A></LI>
+</UL>
+<H3><B>Do Blocks</B></H3>
+<UL>
+<LI><A HREF="#38">do:</A></LI>
+<LI><A HREF="#39">do:until:</A></LI>
+<LI><A HREF="#40">reverseDo:</A></LI>
+</UL>
+<H3><B>Locating</B></H3>
+<UL>
+<LI><A HREF="#41">find:</A></LI>
+<LI><A HREF="#42">findMatching:</A></LI>
+<LI><A HREF="#43">includes:</A></LI>
+<LI><A HREF="#44">findSTR:</A></LI>
+<LI><A HREF="#45">contains:</A></LI>
+<LI><A HREF="#46">offsetOf:</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#47">printOn:</A></LI>
+</UL>
+<H3><B>Archiving</B></H3>
+<UL>
+<LI><A HREF="#48">fileOutOn:</A></LI>
+<LI><A HREF="#49">fileInFrom:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">new</A></H3>
+<BLOCKQUOTE>+<B>new</B></BLOCKQUOTE>
+Returns a new empty collection.<P>
+<H3><A NAME="1">new:</A></H3>
+<BLOCKQUOTE>+<B>new</B>:(unsigned)<I>n</I></BLOCKQUOTE>
+Returns a new empty collection, which can hold at least <I>n</I> elements without having to expand.<P>
+<H3><A NAME="50">with:</A></H3>
+<BLOCKQUOTE>+<B>with</B>:(int)<I>nArgs,...</I></BLOCKQUOTE>
+Returns a new object with <I>nArgs</I> elements.  For example,<P>
+<BLOCKQUOTE><PRE>
+id aCltn = [OrdCltn with:2,anObject,otherObject];
+</PRE></BLOCKQUOTE>
+creates a collection and adds <I>anObject</I> and <I>otherObject</I> to it.  In a similar way, <B>Set</B> or <B>SortCltn</B> instances can be created like this.<P>
+<H3><A NAME="51">with:with:</A></H3>
+<BLOCKQUOTE>+<B>with</B>:<I>firstObject</I><B>with</B>:<I>nextObject</I></BLOCKQUOTE>
+This method is equivalent to <B>with:</B> 2,<I>firstObject</I>,<I>nextObject</I>. <P>
+<H3><A NAME="52">add:</A></H3>
+<BLOCKQUOTE>+<B>add</B>:<I>firstObject</I></BLOCKQUOTE>
+This method is equivalent to <B>with:</B> 1,<I>firstObject</I>. <P>
+This (factory) method has the same name as the instance method <B>add:</B> and can be used as follows, in circumstances when the user does not want to allocate a collection unless it is actually used :<P>
+<BLOCKQUOTE><PRE>
+aCltn = [ (aCltn)?aCltn:OrdCltn add:myObject ];
+</PRE></BLOCKQUOTE>
+This shows that creation of the collection is delayed until it is actually needed.  If the collection already exists, objects are simply added, using the instance method <B>add:</B>.<P>
+<H3><A NAME="2">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Returns a new copy of the collection.<P>
+<H3><A NAME="3">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+Returns a new copy of the collection.  The members in the new collection are deep copies of the members in the original collection.<P>
+<H3><A NAME="4">emptyYourself</A></H3>
+<BLOCKQUOTE>-<B>emptyYourself</B></BLOCKQUOTE>
+Removes all the members of the collection (without freeing them).  Returns the receiver.<P>
+<H3><A NAME="5">freeContents</A></H3>
+<BLOCKQUOTE>-<B>freeContents</B></BLOCKQUOTE>
+Removes and frees all the members of the receiver, but doesn't free the receiver itself.  Returns the receiver.<P>
+<H3><A NAME="7">free</A></H3>
+<BLOCKQUOTE>-<B>free</B></BLOCKQUOTE>
+Frees the collection, but not its contents.  Returns <B>nil</B>.  Do :<P>
+<BLOCKQUOTE><PRE>
+aCltn = [[aCltn freeContents] free];
+</PRE></BLOCKQUOTE>
+if you want to free the collection and its contents.<P>
+<H3><A NAME="10">size</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>size</B></BLOCKQUOTE>
+Returns the number of objects in the collection.<P>
+<H3><A NAME="11">isEmpty</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEmpty</B></BLOCKQUOTE>
+Whether the number of objects in the collection is equal to zero.<P>
+<H3><A NAME="12">lastOffset</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>lastOffset</B></BLOCKQUOTE>
+Returns the offset of the last element.  If there are no elements it returns (unsigned)-1.<P>
+<H3><A NAME="13">eachElement</A></H3>
+<BLOCKQUOTE>-<B>eachElement</B></BLOCKQUOTE>
+Returns a sequence of the elements in the collection.<P>
+<BLOCKQUOTE><PRE>
+aSeq = [aCltn eachElement];
+while ((anElement = [aSeq next])) {
+    /* do something */
+}
+aSeq = [aSeq free];
+</PRE></BLOCKQUOTE>
+<H3><A NAME="14">firstElement</A></H3>
+<BLOCKQUOTE>-<B>firstElement</B></BLOCKQUOTE>
+Returns the first element in the collection.  If there are no elements, returns <B>nil</B>.<P>
+<H3><A NAME="15">lastElement</A></H3>
+<BLOCKQUOTE>-<B>lastElement</B></BLOCKQUOTE>
+Returns the last element in the collection.  If there are no elements, returns <B>nil</B>.<P>
+<H3><A NAME="17">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>aCltn</I></BLOCKQUOTE>
+Returns YES if <I>aCltn</I> is a collection, and if each member of its contents responds affirmatively to the message <B>isEqual:</B> when compared to the corresponding member of the receiver's contents.<P>
+<H3><A NAME="18">add:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>anObject</I></BLOCKQUOTE>
+Adds <I>anObject</I> to the collection as the last element and returns the receiver.<P>
+<H3><A NAME="20">addFirst:</A></H3>
+<BLOCKQUOTE>-<B>addFirst</B>:<I>newObject</I></BLOCKQUOTE>
+Adds <I>newObject</I> as the first (zero-th) element of the collection.  Returns the receiver.  Any elements at this offset or higher are relocated to the next higher offset to make room.<P>
+<H3><A NAME="21">addLast:</A></H3>
+<BLOCKQUOTE>-<B>addLast</B>:<I>newObject</I></BLOCKQUOTE>
+Identical to the <B>add:</B> method.<P>
+<H3><A NAME="22">addIfAbsent:</A></H3>
+<BLOCKQUOTE>-<B>addIfAbsent</B>:<I>anObject</I></BLOCKQUOTE>
+Adds <I>anObject</I> to the collection only if the collection does not have that same object, i.e., one that is pointer equal.  Returns the receiver.<P>
+<H3><A NAME="23">addIfAbsentMatching:</A></H3>
+<BLOCKQUOTE>-<B>addIfAbsentMatching</B>:<I>anObject</I></BLOCKQUOTE>
+Adds <I>anObject</I> to the collection only if the collection does not have a matching object, i.e., one that is <B>isEqual:</B>.  Returns the receiver.<P>
+<H3><A NAME="24">at:insert:</A></H3>
+<BLOCKQUOTE>-<B>at</B>:(unsigned )<I>anOffset</I><B>insert</B>:<I>anObject</I></BLOCKQUOTE>
+Inserts <I>anObject</I> at offset <I>anOffset</I> and returns the receiver.  Any elements at this offset or higher are relocated to the next higher offet to make room.<P>
+If <I>anOffset</I> is greater than the size of the collection, an <B>OutOfBounds</B> exception is signalled.  The default handler aborts the process.<P>
+<H3><A NAME="26">insert:after:</A></H3>
+<BLOCKQUOTE>-<B>insert</B>:<I>newObject</I><B>after</B>:<I>oldObject</I></BLOCKQUOTE>
+Searches for <I>oldObject</I> in the collection, and inserts <I>newObject</I> after <I>oldObject</I>, moving later elements if necessary to make room.  Returns the receiver.<P>
+If <I>oldObject</I> is not in the collection, a <I>Could not find object.</I> exception is raised.  The default handler aborts the process.<P>
+<H3><A NAME="27">insert:before:</A></H3>
+<BLOCKQUOTE>-<B>insert</B>:<I>newObject</I><B>before</B>:<I>oldObject</I></BLOCKQUOTE>
+First searches for <I>oldObject</I> in the collection, and inserts the <I>newObject</I> before <I>oldObject</I>.  Returns the receiver.<P>
+If <I>oldObject</I> is not in the collection, a <I>Could not find object</I> exception is raised.  The default handler aborts the process.<P>
+<H3><A NAME="28">after:</A></H3>
+<BLOCKQUOTE>-<B>after</B>:<I>anObject</I></BLOCKQUOTE>
+Searches for <I>anObject</I> in the collection and, if found, returns the next object.  If <I>anObject</I> is the last element in the array, returns <B>nil</B>. <P>
+If <I>anObject</I> is not in the collection, a <I>Could not find object</I> exception is raised.  The default handler aborts the process.<P>
+<H3><A NAME="29">before:</A></H3>
+<BLOCKQUOTE>-<B>before</B>:<I>anObject</I></BLOCKQUOTE>
+Searches for <I>anObject</I> in the collection and, if found, returns the object before it.  If <I>anObject</I> is the first element in the array, returns <B>nil</B>.<P>
+If <I>anObject</I> is not in the collection, a <I>Could not find object</I> exception is raised.  The default handler aborts the process.<P>
+<H3><A NAME="30">at:</A></H3>
+<BLOCKQUOTE>-<B>at</B>:(unsigned )<I>anOffset</I></BLOCKQUOTE>
+Returns the object at <I>anOffset</I>.  The first object is at offset 0 and the last object is at <B>size</B> minus one.<P>
+If <I>offset</I> is greater than the last offset in the collection, an <B>OutOfBounds</B> exception is signalled.  The default handler aborts the process.<P>
+<H3><A NAME="31">at:put:</A></H3>
+<BLOCKQUOTE>-<B>at</B>:(unsigned )<I>anOffset</I><B>put</B>:<I>anObject</I></BLOCKQUOTE>
+Replaces the object at <I>anOffset</I> with <I>anObject</I> and returns the old member at <I>anOffset</I>.  Signals an <B>OutOfBounds</B> exception if <I>anOffset</I> is greater than the size of the collection.  Returns <B>nil</B> if <I>anObject</I> is <B>nil</B>.<P>
+<H3><A NAME="32">removeFirst</A></H3>
+<BLOCKQUOTE>-<B>removeFirst</B></BLOCKQUOTE>
+Removes the first element.  Returns that element or <B>nil</B> if there are no elements.<P>
+<H3><A NAME="33">removeLast</A></H3>
+<BLOCKQUOTE>-<B>removeLast</B></BLOCKQUOTE>
+Removes the last element.  Returns that element or <B>nil</B> if there are no elements.<P>
+<H3><A NAME="34">removeAt:</A></H3>
+<BLOCKQUOTE>-<B>removeAt</B>:(unsigned )<I>anOffset</I></BLOCKQUOTE>
+Removes the object at <I>anOffset</I>.  When an object is removed, the remaining elements are adjusted so that there are no <B>nil</B> entries between the first and last element.  This adjustment shrinks the collection and changes the offset of the entries.  Returns the object removed.<P>
+<B>Note:</B> Method name for ICpak101 compatibility.<P>
+<H3><A NAME="35">removeAtIndex:</A></H3>
+<BLOCKQUOTE>-<B>removeAtIndex</B>:(unsigned )<I>anOffset</I></BLOCKQUOTE>
+Same as <B>removeAt:</B>.  Method name for Smalltalk compatibility.<P>
+<H3><A NAME="36">remove:</A></H3>
+<BLOCKQUOTE>-<B>remove</B>:<I>oldObject</I></BLOCKQUOTE>
+Removes <I>oldObject</I> from the collection if <I>oldObject</I> is found, and returns <I>oldObject</I>.  Otherwise returns <B>nil</B>.<P>
+<B>Note:</B> The <B>remove:</B> method of the OrdCltn class is implemented to remove an exact match.  The Set class uses a match in the sense of <B>isEqual:</B> instead. <P>
+<H3><A NAME="37">remove:ifAbsent:</A></H3>
+<BLOCKQUOTE>-<B>remove</B>:<I>oldObject</I><B>ifAbsent</B>:<I>exceptionBlock</I></BLOCKQUOTE>
+Removes <I>oldObject</I> from the collection if <I>oldObject</I> is found, and returns <I>oldObject</I>.  Otherwise evaluates <I>exceptionBlock</I> and returns its return value.  For example, the method <B>remove:</B> is equivalent to the following :<P>
+<BLOCKQUOTE><PRE>
+[ aCltn remove: oldObject ifAbsent: { nil } ];
+</PRE></BLOCKQUOTE>
+<B>Note:</B> The <B>remove:</B> method of the OrdCltn class is implemented to remove an exact match.  The Set class uses a match in the sense of <B>isEqual:</B> instead. <P>
+<H3><A NAME="53">includesAllOf:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>includesAllOf</B>:<I>aCltn</I></BLOCKQUOTE>
+Answer whether all the elements of <I>aCltn</I> are in the receiver, by sending <B>includes:</B> for each individual element.<P>
+<H3><A NAME="54">includesAnyOf:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>includesAnyOf</B>:<I>aCltn</I></BLOCKQUOTE>
+Answer whether any element of <I>aCltn</I> is in the receiver, by sending <B>includes:</B> for each individual element.<P>
+<H3><A NAME="55">addAll:</A></H3>
+<BLOCKQUOTE>-<B>addAll</B>:<I>aCltn</I></BLOCKQUOTE>
+Adds each member of <I>aCltn</I> to the receiver.  If <I>aCltn</I> is <B>nil</B>, no action is taken.  The argument <I>aCltn</I> need not be a collection, so long as it responds to <B>eachElement</B> in the same way as collections do.  Returns the receiver.<P>
+<B>Note:</B> If <I>aCltn</I> is the same object as the receiver, a <B>addYourself</B> message is sent to the object.<P>
+<H3><A NAME="56">addContentsOf:</A></H3>
+<BLOCKQUOTE>-<B>addContentsOf</B>:<I>aCltn</I></BLOCKQUOTE>
+This method is equivalent to <B>addAll:</B> and is provided for Stepstone ICpak101 compatibility.<P>
+<H3><A NAME="57">addContentsTo:</A></H3>
+<BLOCKQUOTE>-<B>addContentsTo</B>:<I>aCltn</I></BLOCKQUOTE>
+This method is equivalent to <B>addAll:</B>, but with argument and receiver interchanged, and is provided for Stepstone ICpak101 compatibility.<P>
+<H3><A NAME="58">removeAll:</A></H3>
+<BLOCKQUOTE>-<B>removeAll</B>:<I>aCltn</I></BLOCKQUOTE>
+Removes all of the members of <I>aCltn</I> from the receiver. The argument <I>aCltn</I> need not be a collection, as long as it responds to <B>eachElement</B> as collections do.  Returns the receiver. <P>
+<B>Note:</B> If <I>aCltn</I> is the same object as the receiver, it empties itself using <B>emptyYourself</B> and returns the receiver.<P>
+<H3><A NAME="59">removeContentsFrom:</A></H3>
+<BLOCKQUOTE>-<B>removeContentsFrom</B>:<I>aCltn</I></BLOCKQUOTE>
+This method is equivalent to <B>removeAll:</B>, and is provided for compatibility with Stepstone ICpak101.<P>
+<H3><A NAME="60">removeContentsOf:</A></H3>
+<BLOCKQUOTE>-<B>removeContentsOf</B>:<I>aCltn</I></BLOCKQUOTE>
+This method is equivalent to <B>removeAll:</B>, and is provided for compatibility with Stepstone ICpak101.<P>
+<H3><A NAME="61">intersection:</A></H3>
+<BLOCKQUOTE>-<B>intersection</B>:<I>bag</I></BLOCKQUOTE>
+Returns a new Collection which is the intersection of the receiver and <I>bag</I>.  The new Collection contains only those elements that were in both the receiver and <I>bag</I>.  The argument <I>bag</I> need not be an actual <B>Set</B> or <B>Bag</B> instance, as long as it implements <B>find:</B> as Sets do.<P>
+<H3><A NAME="62">union:</A></H3>
+<BLOCKQUOTE>-<B>union</B>:<I>bag</I></BLOCKQUOTE>
+Returns a new Collection which is the union of the receiver and <I>bag</I>.  The new Collection returned has all the elements from both the receiver and <I>bag</I>.  The argument <I>bag</I> need not be an actual <B>Set</B> or <B>Bag</B> instance, as long as it implements <B>eachElement:</B> as Sets and Bags do.<P>
+<H3><A NAME="63">difference:</A></H3>
+<BLOCKQUOTE>-<B>difference</B>:<I>bag</I></BLOCKQUOTE>
+Returns a new Collection which is the difference of the receiver and <I>bag</I>.  The new Collection returned has only those elements in the receiver that are not in <I>bag</I>.<P>
+<H3><A NAME="64">asSet</A></H3>
+<BLOCKQUOTE>-<B>asSet</B></BLOCKQUOTE>
+Creates a <B>Set</B> instance and adds the contents of the object to the set.<P>
+<H3><A NAME="65">asOrdCltn</A></H3>
+<BLOCKQUOTE>-<B>asOrdCltn</B></BLOCKQUOTE>
+Creates a <B>OrdCltn</B> instance and adds the contents of the object to the set.<P>
+<H3><A NAME="66">detect:</A></H3>
+<BLOCKQUOTE>-<B>detect</B>:<I>aBlock</I></BLOCKQUOTE>
+This message returns the first element in the receiver for which <I>aBlock</I> evaluates to something that is non-nil .  For example, the following :<P>
+<BLOCKQUOTE><PRE>
+[ aCltn detect: { :each | [each isEqual:anObject] } ];
+</PRE></BLOCKQUOTE>
+Returns <B>nil</B> if there's no element for which <I>aBlock</I> evaluates to something that non-nil.<P>
+<H3><A NAME="67">detect:ifNone:</A></H3>
+<BLOCKQUOTE>-<B>detect</B>:<I>aBlock</I><B>ifNone</B>:<I>noneBlock</I></BLOCKQUOTE>
+This message returns the first element in the receiver for which <I>aBlock</I> evaluates to something that is non-nil.<P>
+Evaluates <I>noneBlock</I> if there's no element for which <I>aBlock</I> evaluates to something that is non-nil, and returns the return value of that block.  For example,<P>
+<BLOCKQUOTE><PRE>
+[ aCltn detect: { :e | [e isEqual:anObject]} ifNone: {anObject} ];
+</PRE></BLOCKQUOTE>
+<H3><A NAME="68">select:</A></H3>
+<BLOCKQUOTE>-<B>select</B>:<I>testBlock</I></BLOCKQUOTE>
+This message will return a subset of the receiver containing all elements for which <I>testBlock</I> evaluates to an Object that is non-nil.  For example,<P>
+<BLOCKQUOTE><PRE>
+[ aCltn select: { :each | [each isEqual:anObject] } ];
+</PRE></BLOCKQUOTE>
+Returns a new empty instance of the same class as the receiver, if there's no element for which <I>testBlock</I> evaluates to something that is non-nil. <P>
+<H3><A NAME="69">reject:</A></H3>
+<BLOCKQUOTE>-<B>reject</B>:<I>testBlock</I></BLOCKQUOTE>
+Complement of <B>select:</B><P>
+This message will return a subset of the receiver containing all elements for which <I>testBlock</I> evaluates to nil.  For example,<P>
+<BLOCKQUOTE><PRE>
+[ aCltn reject: { :each | [each isEqual:anObject] } ];
+</PRE></BLOCKQUOTE>
+Returns a new empty instance of the same class as the receiver, if there's no element for which <I>testBlock</I> evaluates to nil.<P>
+<H3><A NAME="70">collect:</A></H3>
+<BLOCKQUOTE>-<B>collect</B>:<I>transformBlock</I></BLOCKQUOTE>
+This message creates and returns a new collection of the same size and type as the receiver. The elements are the result of performing <I>transformBlock</I> on each element in the receiver (elements for which the Block would return <B>nil</B> are filtered out).<P>
+<H3><A NAME="71">count:</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>count</B>:<I>aBlock</I></BLOCKQUOTE>
+Evaluate <I>aBlock</I> with each of the receiver's elements as the argument.  Return the number that answered a non-<B>nil</B> value.<P>
+<H3><A NAME="72">elementsPerform:</A></H3>
+<BLOCKQUOTE>-<B>elementsPerform</B>:(SEL)<I>aSelector</I></BLOCKQUOTE>
+Send <I>aSelector</I> to all objects in the collection, starting from the object at offset <I>0</I>.  For Stepstone compatibility.  Producer uses this.<P>
+<H3><A NAME="73">elementsPerform:with:</A></H3>
+<BLOCKQUOTE>-<B>elementsPerform</B>:(SEL)<I>aSelector</I><B>with</B>:<I>anObject</I></BLOCKQUOTE>
+Send <I>aSelector</I> to all objects in the collection, starting from the object at offset <I>0</I>.  For Stepstone compatibility.  Producer uses this.<P>
+<H3><A NAME="74">elementsPerform:with:with:</A></H3>
+<BLOCKQUOTE>-<B>elementsPerform</B>:(SEL)<I>aSelector</I><B>with</B>:<I>anObject</I><B>with</B>:<I>otherObject</I></BLOCKQUOTE>
+Send <I>aSelector</I> to all objects in the collection, starting from the object at offset <I>0</I>.  For Stepstone compatibility.  Producer uses this.<P>
+<H3><A NAME="75">elementsPerform:with:with:with:</A></H3>
+<BLOCKQUOTE>-<B>elementsPerform</B>:(SEL)<I>aSelector</I><B>with</B>:<I>anObject</I><B>with</B>:<I>otherObject</I><B>with</B>:<I>thirdObj</I></BLOCKQUOTE>
+Send <I>aSelector</I> to all objects in the collection, starting from the object at offset <I>0</I>.  For Stepstone compatibility.  ICpak201 uses this.<P>
+<H3><A NAME="38">do:</A></H3>
+<BLOCKQUOTE>-<B>do</B>:<I>aBlock</I></BLOCKQUOTE>
+Evaluates <I>aBlock</I> for each element in the collection and returns <B>self</B>.  <I>aBlock</I> must be a block taking one object (element) as argument; the return value of the block is ignored by this method.<P>
+Often, the Block would, as a side-effect, modify a variable, as in:<P>
+<BLOCKQUOTE><PRE>
+int count = 0;
+[contents do: { :what | if (what == anObject) count++; }];
+</PRE></BLOCKQUOTE>
+<H3><A NAME="39">do:until:</A></H3>
+<BLOCKQUOTE>-<B>do</B>:<I>aBlock</I><B>until</B>:(BOOL*)<I>flag</I></BLOCKQUOTE>
+Evaluates <I>aBlock</I> for each element in the collection, or until the variable pointed to by <I>flag</I> becomes true, and returns <B>self</B>.  <I>aBlock</I> must be a block taking one object (element) as argument; the return value of the block is ignored by this method.<P>
+Typically the Block will modify the variable <I>flag</I> when some condition holds:<P>
+<BLOCKQUOTE><PRE>
+BOOL found = NO;
+[contents do:{ :what | if (what == findObject) found=YES;} until:&amp;found];
+if (found) { ... }
+</PRE></BLOCKQUOTE>
+<H3><A NAME="40">reverseDo:</A></H3>
+<BLOCKQUOTE>-<B>reverseDo</B>:<I>aBlock</I></BLOCKQUOTE>
+Like <B>do:</B> but specific to <B>OrdCltn</B> : works from the element at the last offset towards the element at offset 0.<P>
+<H3><A NAME="41">find:</A></H3>
+<BLOCKQUOTE>-<B>find</B>:<I>anObject</I></BLOCKQUOTE>
+Returns the first member which is the same as <I>anObject</I>, i.e., which is pointer equal.  If none is found, returns <B>nil</B>.<P>
+<H3><A NAME="42">findMatching:</A></H3>
+<BLOCKQUOTE>-<B>findMatching</B>:<I>anObject</I></BLOCKQUOTE>
+Returns the first member which matches <I>anObject</I>, i.e., using <B>isEqual:</B> for comparison.  If none is found, returns <B>nil</B>.<P>
+<H3><A NAME="43">includes:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>includes</B>:<I>anObject</I></BLOCKQUOTE>
+This method returns YES if <I>anObject</I> is in the collection (in the sense of <B>isEqual:</B>).  It has therefore the same semantics as <B>includes:</B> of the <B>Set</B> class.<P>
+<H3><A NAME="44">findSTR:</A></H3>
+<BLOCKQUOTE>-<B>findSTR</B>:(STR )<I>aString</I></BLOCKQUOTE>
+Returns the first member whose string contents matches <I>aString</I>, using the <B>isEqualSTR:</B> method for comparison.  If none is found, returns <B>nil</B>.<P>
+<H3><A NAME="45">contains:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>contains</B>:<I>anObject</I></BLOCKQUOTE>
+Returns YES if the receiver contains <I>anObject</I>.  Otherwise, returns NO.  Implementation is in terms of the receiver's <B>find:</B> method (which uses <B>isSame</B>, not <B>isEqual:</B>).<P>
+<B>Note:</B> To get the behavior of the method <B>contains:</B> of the Set class (which uses <B>isEqual:</B>), use <B>findMatching:</B> or <B>includes:</B>.<P>
+<H3><A NAME="46">offsetOf:</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>offsetOf</B>:<I>anObject</I></BLOCKQUOTE>
+Searches for <I>anObject</I> in the contents and returns the offset of the <B>first</B> pointer equal object it finds.  Otherwise, returns (unsigned)-1.  If <I>anObject</I> is <B>nil</B>, also returns (unsigned)-1.<P>
+<H3><A NAME="47">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints a list of the objects in the objects by sending each individual object a <B>printOn:</B> message.  Returns the receiver.<P>
+<H3><A NAME="48">fileOutOn:</A></H3>
+<BLOCKQUOTE>-<B>fileOutOn</B>:<I>aFiler</I></BLOCKQUOTE>
+Writes the collection on <I>aFiler</I>.  Returns the receiver.<P>
+<H3><A NAME="49">fileInFrom:</A></H3>
+<BLOCKQUOTE>-<B>fileInFrom</B>:<I>aFiler</I></BLOCKQUOTE>
+Reads a string object from <I>aFiler</I>.  Returns the receiver.<P>

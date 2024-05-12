@@ -1,0 +1,72 @@
+
+#
+# Portable Object Compiler
+# $Id: Makefile.mpw,v 1.3 2003/10/12 10:01:34 stes Exp $
+#
+
+#
+#  Makefile for Macintosh MPW
+#
+
+OBJC=objc
+LINK=MWLinkPPC -xm library
+DBG_MFLAGS=-q -g
+OPT_MFLAGS=-q -d NDEBUG
+LIBDIR="{OBJCDIR}:lib"
+IFLAGS=-noI -i ::objcrt
+MFLAGS={OPT_MFLAGS}
+
+LIBRARY=objpak.o
+
+OBJFILES= ¶
+	ascfiler.o ¶
+	  notfound.o ¶
+	  outofbnd.o ¶
+	  badvers.o ¶
+	  unknownt.o ¶
+	  typeinc.o ¶
+	cltn.o ¶
+	  ordcltn.o ¶
+	  sortcltn.o ¶
+	  set.o ¶
+	  bag.o ¶
+	  stack.o ¶
+	  runarray.o ¶
+        dictnary.o ¶
+        rectangl.o ¶
+	sequence.o ¶
+	array.o ¶
+	  idarray.o ¶
+	  intarray.o ¶
+	  ocstring.o ¶
+	point.o ¶
+	assoc.o ¶
+	objgraph.o ¶
+	cltnseq.o ¶
+	keyseq.o ¶
+	valueseq.o ¶
+	setseq.o ¶
+	bagseq.o ¶
+	txtattr.o ¶
+	octext.o ¶
+	txtstyle.o ¶
+	paragrph.o ¶
+	treeseq.o
+
+{LIBRARY} Ä {OBJFILES}
+	{LINK} {OBJFILES} -o {LIBRARY}
+
+.o Ä .m
+	{OBJC} -c {DepDir}{Default}.m {MFLAGS} {IFLAGS} -o {Targ}
+
+bootstrap Ä
+	Duplicate {LIBRARY} {LIBDIR}
+
+cleantmp Ä
+	Delete Å.P
+	Delete Å.c
+	Delete Å.i
+
+clean Ä cleantmp
+	Delete {OBJFILES}
+	Delete {LIBRARY}

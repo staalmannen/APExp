@@ -1,0 +1,79 @@
+!
+! Portable Object Compiler
+!
+! Makefile for OpenVMS make (like MMS, MMK)
+!
+
+.OBJ.OLB  :
+    @ If F$Search("$(MMS$TARGET)") .EQS. "" Then $(LIBR)/Create $(MMS$TARGET)
+    $(LIBR) $(LIBRFLAGS) $(MMS$TARGET) $(MMS$SOURCE)
+    @ If "$(MMS_DELETE_OBJECT)" Then Delete $(MMS$SOURCE);*
+
+.SUFFIXES : .M
+.M.OBJ    :
+    $(OBJC) $(OBJCFLAGS) $(MMS$SOURCE)
+OBJC  	    = OBJC
+OBJCFLAGS   = 
+
+LINK	    = LINK
+LINKFLAGS   = /EXEC=$(MMS$TARGET)
+
+.FIRST
+    @ Define  OC_INCLUDE_DIRECTORY [--.INCLUDE.OBJCRT]
+
+!
+!
+!
+
+*    : -
+ objpak.olb
+	@ continue
+
+OBJS =	-
+-
+ OBJPAK(ascfiler),-
+ OBJPAK(notfound),-
+ OBJPAK(outofbnd),-
+ OBJPAK(unknownt),-
+ OBJPAK(badvers),-
+ OBJPAK(typeinc),-
+ OBJPAK(cltn)    ,-
+ OBJPAK(ordcltn) ,-
+ OBJPAK(sortcltn),-
+ OBJPAK(set)     ,-
+ OBJPAK(bag)     ,-
+ OBJPAK(stack)   ,-
+ OBJPAK(runarray),-
+ OBJPAK(dictnary),-
+ OBJPAK(sequence),-
+ OBJPAK(array)   ,-
+ OBJPAK(ocstring),-
+ OBJPAK(idarray) ,-
+ OBJPAK(intarray),-
+ OBJPAK(rectangl),-
+ OBJPAK(point)   ,-
+ OBJPAK(assoc)   ,-
+ OBJPAK(objgraph),-
+ OBJPAK(cltnseq) ,-
+ OBJPAK(keyseq)  ,-
+ OBJPAK(valueseq),-
+ OBJPAK(setseq)  ,-
+ OBJPAK(bagseq)  ,-
+ OBJPAK(treeseq) ,-
+ OBJPAK(octext)  ,-
+ OBJPAK(txtstyle),-
+ OBJPAK(paragrph),-
+ OBJPAK(txtattr) 
+
+objpak.olb  : -
+ $(OBJS)
+    @ continue
+
+cleantmp    : 
+    - Delete *.i;*
+    - Delete *.c;*
+
+clean       : -
+ cleantmp
+    - Delete *.obj;*
+    - Delete *.olb;*

@@ -1,0 +1,17 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@
+
+INSTALLDIR=/home/stes/src/objc-3.3.41/debian/objc/usr
+BINDIR=/home/stes/src/objc-3.3.41/debian/objc/usr/bin
+HDRDIR=/home/stes/src/objc-3.3.41/debian/objc/usr/include
+LIBDIR=/home/stes/src/objc-3.3.41/debian/objc/usr/lib
+MANDIR=/home/stes/src/objc-3.3.41/debian/objc/usr/share/man
+
+override_dh_auto_configure:
+	dh_auto_configure -- LEX="flex --nounistd"
+
+override_dh_auto_install:
+	$(MAKE) INSTALLDIR=$(INSTALLDIR) BINDIR=$(BINDIR) LIBDIR=$(LIBDIR) HDRDIR=$(HDRDIR) MANDIR=$(MANDIR) install
+

@@ -1,0 +1,62 @@
+!
+! Portable Object Compiler
+!
+! Makefile for OpenVMS make (like MMS, MMK)
+!
+
+.OBJ.OLB  :
+    @ If F$Search("$(MMS$TARGET)") .EQS. "" Then $(LIBR)/Create $(MMS$TARGET)
+    $(LIBR) $(LIBRFLAGS) $(MMS$TARGET) $(MMS$SOURCE)
+    @ If "$(MMS_DELETE_OBJECT)" Then Delete $(MMS$SOURCE);*
+
+.SUFFIXES : .M
+.M.OBJ    :
+    $(OBJC) $(OBJCFLAGS) $(MMS$SOURCE)
+OBJC  	    = OBJC
+OBJCFLAGS   = 
+
+.SUFFIXES : .LM
+.LM.OBJ   :
+    $(FLEX) $(FLEXFLAGS) $(MMS$SOURCE)
+    $(OBJC) $(OBJCFLAGS) $(MMS$SOURCE_NAME).M
+FLEX  	    = FLEX
+FLEXFLAGS   = "-o$(MMS$TARGET_NAME).M"
+
+.SUFFIXES : .YM
+.YM.OBJ   :
+    $(YACC) $(YACCFLAGS) $(MMS$SOURCE)
+    @ Copy          Y_TAB.H YACC.H
+    @ Copy YACC.VMS,Y_TAB.C YACC.M
+    @ Delete Y_TAB.*;*
+    $(OBJC) $(OBJCFLAGS) YACC.M
+YACC  	    = BISON
+YACCFLAGS   = /FIXED/DEFINES
+
+LINK	    = LINK
+LINKFLAGS   = /EXEC=$(MMS$TARGET)
+
+.FIRST
+    @ Define  OC_INCLUDE_DIRECTORY [--.INCLUDE.OBJCRT],[--.INCLUDE.OBJPAK],[-.OCLIB]/NOLOG
+    @ Set Command/Replace GNU_BISON:[000000]BISON
+
+BOOTLIBS    = [-.OCLIB]OCLIB/LIB,[-.OBJPAK]OBJPAK/LIB,[-.OBJCRT]OBJCRT/LIB
+
+!
+!
+!
+
+default     : OBJC1
+    @ continue
+
+OBJC1       : objc1.obj, yacc.obj, lex.obj, lexfiltr.obj
+    Link objc1.obj, yacc.obj,lex.obj,$(BOOTLIBS)
+
+cleantmp    : 
+    - Delete *.i;*
+    - Delete *.c;*
+    - Delete yacc.m;*,yacc.h;*,lex.m;*
+
+clean       : -
+ cleantmp
+    - Delete *.obj;*
+    - Delete *.exe;*

@@ -1,0 +1,62 @@
+.TH "badvers" 3 "Mar 12, 2023"
+.SH BadVersion
+.PP
+.B
+Inherits from:
+
+Exception
+.PP
+.B
+Maturity Index:
+
+Experimental
+.SH Class Description
+.PP
+This is a subclass to signal that an specific version was excepted (
+.I
+goodVersion
+) and another version (
+.I
+badVersion
+) was encountered, specifically by the 
+.B
+AsciiFiler
+class\&.  The 
+.B
+AsciiFiler
+class signals this exception if a version check fails\&.
+.SH Method types
+.SH Methods
+.PP 
+goodVersion
+.RS 1
+- (
+int
+)
+.B
+goodVersion
+.RE
+.PP 
+badVersion
+.RS 1
+- (
+int
+)
+.B
+badVersion
+.RE
+.PP 
+goodVersion:badVersion:
+.RS 1
+-
+.B
+goodVersion
+:(int)
+.I
+g
+.B
+badVersion
+:(int)
+.I
+b
+.RE

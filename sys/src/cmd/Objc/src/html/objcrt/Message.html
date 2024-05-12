@@ -1,0 +1,54 @@
+<HTML>
+<TITLE>Message Specification Sheet</TITLE>
+<H1>Message Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 1998,2023.  All Rights Reserved.<P>
+<H1>Message</H1>
+<B>Inherits from:</B> Object<P>
+<B>Maturity Index:</B> Experimental<P>
+<H2>Class Description</H2>
+Message instances are used for forwarding Objective-C messages.  When an object doesn't respond to a message, the <B>doesNotUnderstand:</B> method is invoked, with an argument that is an instance of this class :<P>
+<BLOCKQUOTE><PRE>
+- doesNotUnderstand:msg
+  {
+    [msg sentTo:someObject];
+    return self;
+  }
+
+</PRE></BLOCKQUOTE>
+The user may override <B>-doesNotUnderstand:</B> to send a <B>sentTo:</B> message, which will forward the message to <I>someObject</I>.  If <I>someObject</I> doesn't respond to the message, it will receive a <B>doesNotUnderstand:</B> message, and so on.<P>
+<B>Note:</B> To forward class (factory) methods, override the class method <B>+doesNotUnderstand:</B>.<P>
+Also see Object's <B>doesNotUnderstand:</B> method for more details.<P>
+<H2>Method types</H2>
+<H3><B>Creating Messages</B></H3>
+<UL>
+<LI><A HREF="#2">selector:dispatch:args:</A></LI>
+</UL>
+<H3><B>Querying Messages</B></H3>
+<UL>
+<LI><A HREF="#3">selector</A></LI>
+</UL>
+<H3><B>Sending Messages</B></H3>
+<UL>
+<LI><A HREF="#5">sentTo:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="2">selector:dispatch:args:</A></H3>
+<BLOCKQUOTE>+<B>selector</B>:(SEL)<I>s</I><B>dispatch</B>:(ARGIMP)<I>d</I><B>args</B>:(void *)<I>a</I></BLOCKQUOTE>
+Creates a Message instance with the indicated selector name and pointer to argument structure.  The argument structure for a message consists of return value of the method (if not void), followed by the arguments of the method :<P>
+<BLOCKQUOTE><PRE>
+struct {
+  int ret;
+  int a;
+  double d;
+}
+</PRE></BLOCKQUOTE>
+The above structure corresponds to a method such as (int)foo:(int)a bar:(double)d.<P>
+The <I>dispatch</I> argument is a (compiler generated) function that decodes the arguments from the argument structure, and dispatches the messages.<P>
+<H3><A NAME="3">selector</A></H3>
+<BLOCKQUOTE>- (SEL)<B>selector</B></BLOCKQUOTE>
+Returns the selector for this message.<P>
+<H3><A NAME="5">sentTo:</A></H3>
+<BLOCKQUOTE>-<B>sentTo</B>:<I>receiver</I></BLOCKQUOTE>
+Forwards the message to <I>receiver</I> (if it's not <B>nil</B>) and returns the message itself (<I>self</I>), not the return value of the message that was forwarded to <I>receiver</I>.  The latter return value is associated to the Message instance, so that it can be returned to the sender of the message that caused a <B>doesNotUnderstand:</B> message to be sent.<P>

@@ -1,0 +1,38 @@
+.TH "array" 3 "Mar 12, 2023"
+.SH Array
+.PP
+.B
+Inherits from:
+
+Object
+.SH Class Description
+.PP
+This is an abstract superclass for Array classes, classes that provide some methods like 
+.B
+at:
+or 
+.B
+charAt:
+for indexing their contents, which are elements of some particular C type\&.  A typical example is the 
+.B
+String
+class\&.
+.PP
+This abstract class is useful for implementing functionality, that is inherited by such classes as:
+.RS 3
+.br
+* IdArray
+.br
+* String (ByteArray)
+.br
+* IntArray
+.RE
+.PP
+In addition, this class is necessary for compatibility with Stepstone\&'s ICpak101\&.
+.PP
+.B
+Note:
+
+Because the Portable Object Compiler doesn\&'t provide any API for indexed variables, our Array classes, although interface compatible with those of ICpak101, do not allocate their contents as indexed variables\&.
+.SH Method types
+.SH Methods

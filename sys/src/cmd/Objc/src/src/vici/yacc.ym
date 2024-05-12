@@ -1,0 +1,977 @@
+
+/*
+ * Copyright (c) 1997,98,99 David Stes.
+ *
+ * $Id: yacc.ym,v 1.1.1.1 2000/06/07 21:09:26 stes Exp $
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published 
+ * by the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ */
+
+%{
+
+#include "config.h"
+#include <stdlib.h>
+#include <assert.h>
+#include <string.h>
+
+#ifndef __OBJECT_INCLUDED__
+#define __OBJECT_INCLUDED__
+#include <stdio.h> /* FILE */
+#include "Object.h" /* Stepstone Object.h assumes #import */
+#endif
+
+#include <ocstring.h>
+#include <ordcltn.h>
+#include <options.h>
+#include <node.h>
+#include <util.h>
+
+/* VICI commands */
+
+#include "cmd.h"
+#include "run.h"
+#include "load.h"
+#include "quit.h"
+#include "list.h"
+
+#if 0
+/* breaks compile wcc386 */
+int yyerror(char*);
+int yylex() ;
+#endif
+
+%}
+
+%start vici
+
+%token identifier constant stringcomp builtinfun typeword
+%token storageclass typequal externlang
+
+%token cppdirect 
+/* cppdirectives such as c pragmas. unlike poc 1.x we handle this in 2.x */
+/* at the yacc level (instead of dealing with it in the linetag code) */
+/* theoretically, this limits where unrecognized #pragma's may appear */
+ 
+%token enumkeyw structkeyw ifkeyw elsekeyw whilekeyw dokeyw forkeyw
+%token switchkeyw casekeyw
+%token defaultkeyw breakkeyw continuekeyw returnkeyw gotokeyw
+%token asmkeyw sizeofop typeofop
+%token ellipsis
+%token assignop equalop relop shift plusplus logand logor arrow
+
+/* VICI commands */
+
+%token viload virun viprint vilist vibreak vibacktrace viquit
+%token visetargs visetcflags vihelp viecho
+%token vistep vinext vicontinue vishell vimake
+
+/* Objective C */
+
+%token atdefs atselector atinterface atend atencode atrequires 
+%token blockbegin
+
+/* compiler specific */
+%token gnuextension attributekeyw
+
+/* precedence (lowest to highest) */
+%left ','  /* a,b,c -> (a,b),c */
+%right '=' /* a=b=c -> a=(b=c) */
+%right ifkeyw elsekeyw
+%right assignop
+%right '?' ':'
+%left logor 
+%left logand 
+%left '|'
+%left '^'
+%left '&'
+%left equalop
+%left relop
+%left shift
+%left '+' '-'
+%left '*' '%' '/'
+%right '!' '~' sizeofop typeofop unary plusplus 
+%left arrow '.'
+%left hyperunary
+%left '(' '[' ')' ']'
+
+%%
+
+abstrdecl : pointer
+     { $$ = $1; }
+  | abstrdeclx
+     { $$ = $1; }
+  | pointer abstrdeclx 
+     { $$ = mkstardecl($1,$2); }
+  | gnuattribdecl abstrdecl
+     { $$ = mkprefixdecl($1,$2); }
+  ;
+
+msabstrdecl : abstrdecl
+     { $$ = $1; }
+  | typequallist abstrdecl 
+     { $$ = mkprecdecl($1,$2); /* (void (__cdecl *)(void)) */ }
+  ;
+
+abstrdeclx : '(' msabstrdecl ')'
+     { $$ = mkprecdecl(nil,$2); }
+  | '[' optconstantexpr ']'
+     { $$ = mkarraydecl(nil,$2); }
+  | abstrdeclx '[' optconstantexpr ']'
+     { $$ = mkarraydecl($1,$3); }
+  | abstrdeclx '(' optparmdeflist ')' 
+     { $$ = mkfundecl($1,$3); }
+  | abstrdeclx gnuattribdecl
+     { $$ = mkpostfixdecl($1,$2); }
+  | abstrdeclx asmstring
+     { $$ = mkpostfixdecl($1,$2); }
+  ;
+
+andexpr : equalopexpr
+     { $$ = $1; }
+  | andexpr '&' equalopexpr
+     { $$ = mkbinexpr($1,"&",$3); }
+  ;
+
+anyword : identifier | storageclass | typespec | typequal
+     { $$ = $1; }
+  ;
+
+asmstring : asmkeyw '(' stringchain ')'
+     { $$ = mkbuiltincall($1,mklist(nil,mkconstexpr(nil,$3))); }
+  ;
+
+asmops : /* empty */
+     { $$ = nil; }
+  | asmop
+     { $$ = mklist(nil,$1); }
+  | asmops ',' asmop
+     { $$ = mklist($1,$3); }
+  ;
+
+asmop : stringchain '(' expr ')'
+     { $$ = mkasmop($1,$3); }
+  ;
+
+asmclobbers : stringchain
+     { $$ = mklist(nil,$1); }
+  | asmclobbers ',' stringchain
+     { $$ = mklist($1,$3); }
+  ;
+
+assignexpr : condexpr
+     { $$ = $1; }
+  | castexpr assignop assignexpr
+     { $$ = mkassignexpr($1,[$2 strCopy],$3); }
+  | castexpr '='
+     { okblock=1; }
+    assignexpr
+     { okblock=0; $$ = mkassignexpr($1,"=",$4); }
+  ;
+
+atbegin : atinterface 
+     { $$ = $1; }
+  | '=' /* = and =: for Objective-C 3.x class definitions */
+     { $$ = nil; }
+  ;
+
+gnuattriblist : gnuattrib
+     { $$ = mklist(nil,$1); }
+  | gnuattriblist ',' gnuattrib
+     { $$ = mklist($1,$3); }
+  ;
+
+blockexpr : blockbegin '}'  /* blockbegin == '{' */
+     { $$ = mkblockexpr($1,nil,nil,nil,nil,$2); }
+  | blockbegin blockparms '|' expr '}'
+     { $$ = mkblockexpr($1,$2,nil,nil,$4,$5); }
+  | blockbegin blockparms '|' stmtlist '}'
+     { $$ = mkblockexpr($1,$2,nil,$4,nil,$5); }
+  | blockbegin blockparms '|' stmtlist expr '}'
+     { $$ = mkblockexpr($1,$2,nil,$4,$5,$6); }
+  | blockbegin blockparms '|' datadeflist '}'
+     { $$ = mkblockexpr($1,$2,$4,nil,nil,$5); }
+  | blockbegin blockparms '|' datadeflist stmtlist '}'
+     { $$ = mkblockexpr($1,$2,$4,$5,nil,$6); }
+  | blockbegin blockparms '|' datadeflist stmtlist expr '}'
+     { $$ = mkblockexpr($1,$2,$4,$5,$6,$7); }
+  | blockbegin expr '}' 
+     { $$ = mkblockexpr($1,nil,nil,nil,$2,$3); }
+  | blockbegin stmtlist '}' 
+     { $$ = mkblockexpr($1,nil,nil,$2,nil,$3); }
+  | blockbegin stmtlist expr '}' 
+     { $$ = mkblockexpr($1,nil,nil,$2,$3,$4); }
+  | blockbegin datadeflist '}' 
+     { $$ = mkblockexpr($1,nil,$2,nil,nil,$3); }
+  | blockbegin datadeflist stmtlist '}' 
+     { $$ = mkblockexpr($1,nil,$2,$3,nil,$4); }
+  | blockbegin datadeflist stmtlist expr '}' 
+     { $$ = mkblockexpr($1,nil,$2,$3,$4,$5); }
+  ;
+
+blockparms : ':' identifier
+     { $$ = mklist(nil,$2); }
+  | blockparms ':' identifier
+     { $$ = mklist($1,$3); }
+  ;
+
+builtinfunarg : typename /* as in builtin_isfloat(type) */
+     { $$ = $1; }
+  | assignexpr
+     { $$ = $1; }
+  ;
+
+builtinfunargs : builtinfunarg
+     { $$ = mklist(nil,$1); }
+  | builtinfunargs ',' builtinfunarg
+     { $$ = mklist($1,$3); }
+  ;
+
+caretexpr : andexpr
+     { $$ = $1; }
+  | caretexpr '^' andexpr
+     { $$ = mkbinexpr($1,"^",$3); }
+  ;
+
+castexpr : unaryexpr
+     { $$ = $1; }
+  | '(' typename ')' castexpr %prec unary
+     { $$ = mkcastexpr($2,$4); }
+  | '(' typename ')' '{' initializerlist '}' %prec unary
+     { $$ = mkcastexpr($2,mklistexpr($4,$5,$6)); /* GNU constructor expr */ }
+  | '(' typename ')' '{' initializerlist ',' '}' %prec unary
+     { $$ = mkcastexpr($2,mklistexpr($4,$5,$7)); }
+  ;
+
+classdef : atbegin identifier ivardef
+     { $$ = mkclassdef($1,$2,nil,$3,nil); }
+  | atbegin identifier ivardef ':' ivardef
+     { $$ = mkclassdef($1,$2,nil,$3,$5); }
+  | atbegin identifier
+     { $$ = mkclassdef($1,$2,nil,nil,nil); }
+  | atbegin identifier ':' identifier 
+     { $$ = mkclassdef($1,$2,$4,nil,nil); }
+  | atbegin identifier ':' identifier ivardef 
+     { $$ = mkclassdef($1,$2,$4,$5,nil); }
+  | atbegin identifier ':' identifier ivardef  ':' ivardef
+     { $$ = mkclassdef($1,$2,$4,$5,$7); }
+  ;
+
+compoundstmt : '{' '}'
+     { $$ = mkcompstmt($1,nil,nil,$2); }
+  | '{' stmtlist '}'
+     { $$ = mkcompstmt($1,nil,$2,$3); }
+  | '{' datadeflist '}'
+     { $$ = mkcompstmt($1,$2,nil,$3); }
+  | '{' datadeflist stmtlist '}'
+     { $$ = mkcompstmt($1,$2,$3,$4); }
+  ;
+
+condexpr : logorexpr
+     { $$ = $1; }
+  | logorexpr '?' expr ':' condexpr
+     { $$ = mkcondexpr($1,$3,$5); }
+  | logorexpr '?' ':' condexpr
+     { $$ = mkcondexpr($1,nil,$4); }
+  ;
+
+constantexpr : condexpr
+     { $$ = $1; }
+  ;
+
+datadef : datadefspecs ';'  /* id a,b; or id foo(id z); */
+     { $$ = mkdatadef(nil,$1,nil,nil); }
+  | datadefx ';'
+     { $$ = $1; }
+  | cppdirect
+     { $$ = $1; }
+  | requiresclause /* Objective C 3.3 */
+     { $$ = $1; }
+  ;
+
+datadeflist : datadef
+     { $$ = mklist(nil,$1); }
+  | datadeflist datadef
+     { $$ = mklist($1,$2); }
+  ;
+
+datadefspecs : storageclass
+     { $$ = mklist(nil,$1); }
+  | datadefspecs storageclass 
+     { $$ = mklist($1,$2); }
+  | typespec
+     { $$ = mklist(nil,$1); }
+  | datadefspecs typespec 
+     { $$ = mklist($1,$2); }
+  | externlang
+     { $$ = mklist(nil,$1); /* o_cplus case */ }
+  ;
+
+datadefx : datadefspecs decl
+     { datadefokblock(nil,$1,$2); }
+    optinitializer 
+     { okblock=0;$$ = mkdatadef(nil,$1,$2,$4); }
+  | datadefx ',' decl
+     { datadefokblock($1,nil,$3); }
+    optinitializer
+     { okblock=0;$$ = mkdatadef($1,nil,$3,$5); }
+  ;
+
+decl : declx
+     { $$ = $1; }
+  | pointer declx
+     { $$ = mkstardecl($1,$2); }
+  | gnuattribdecl decl
+     { $$ = mkprefixdecl($1,$2); }
+  ;
+
+declx : identifier
+     { $$ = mkdecl($1); }
+  | '(' decl ')'
+     { $$ = mkprecdecl(nil,$2); }
+  | '(' typequallist decl ')'
+     { $$ = mkprecdecl($2,$3); }
+  | declx '[' optconstantexpr ']'
+     { $$ = mkarraydecl($1,$3); }
+  | declx '(' optparmdeflist ')'
+     { $$ = mkfundecl($1,$3); }
+  | declx gnuattribdecl
+     { $$ = mkpostfixdecl($1,$2); }
+  | declx asmstring
+     { $$ = mkpostfixdecl($1,$2); }
+  ;
+
+encodeexpr : atencode '(' typename ')'
+     { $$ = mkencodeexpr($3); }
+  ;
+
+equalopexpr : relopexpr
+     { $$ = $1; }
+  | relopexpr equalop relopexpr
+     { $$ = mkrelexpr($1,[$2 strCopy],$3); }
+  ;
+
+enumspec : enumkeyw identifier '{' enumlist '}'
+     { $$ = mkenumspec($1,$2,$3,$4,$5); } 
+  | enumkeyw identifier '{' enumlist ',' '}'
+     { $$ = mkenumspec($1,$2,$3,$4,$6); }
+  | enumkeyw '{' enumlist '}'
+     { $$ = mkenumspec($1,nil,$2,$3,$4); }
+  | enumkeyw '{' enumlist ',' '}'
+     { $$ = mkenumspec($1,nil,$2,$3,$5); }
+  | enumkeyw identifier
+     { $$ = mkenumspec($1,$2,nil,nil,nil); }
+  ;
+
+enumlist : enumerator
+     { $$ = mklist(nil,$1); }
+  | enumlist enumerator
+     { $$ = mklist($1,$2); }
+  | enumlist ',' enumerator
+     { $$ = mklist($1,$3); }
+  ;
+
+enumerator : identifier
+     { $$ = mkenumerator($1,nil); }
+  | identifier '=' constantexpr
+     { $$ = mkenumerator($1,$3); }
+  | cppdirect
+     { $$ = $1; }
+  ;
+
+expr : assignexpr
+     { $$ = $1; }
+  | expr ',' assignexpr
+     { $$ = mkcommaexpr($1,$3); }
+  ;
+
+exprlist : assignexpr
+     { $$ = mklist(nil,$1); }
+  | exprlist ',' assignexpr
+     { $$ = mklist($1,$3); }
+  ;
+
+extdef : fundef
+     { $$ = $1; }
+  | datadef
+     { $$ = $1; }
+  | classdef
+     { $$ = $1; }
+  | methoddef
+     { $$ = $1; }
+  | atend
+     { $$ = nil;finclassdef(); }
+  | ';'
+     { gc(';');$$ = nil; }
+  | gnuasmstmt /* gcc allows asm() at toplevel */
+     { $$ = $1; }
+  | externlangblock  
+     { $$ = nil; }
+  ;
+
+externlangblock : externlang '{' '}'
+     { [$1 gen];[$2 gen];[$3 gen]; }
+  | externlang '{' 
+     { [$1 gen];[$2 gen]; /* to support CC or g++ as C compiler */ }
+    translunit '}' 
+     { [$5 gen]; }
+  ;
+
+funbody : /* id a,b; {} */
+    compoundstmt  
+     { $$ = mkfunbody(nil,$1); }
+  | datadeflist compoundstmt  
+     { $$ = mkfunbody($1,$2); }
+  ;
+
+fundef : decl /* f(id z) {} */
+     { declarefun(nil,$1); }
+    funbody 
+     { $$ = mkfundef(nil,$1,$3); }
+  | datadefspecs decl /* id f(id z) {} */
+     { declarefun($1,$2); }
+    funbody
+     { $$ = mkfundef($1,$2,$4); }
+  ;
+
+/* gcc stuff like : asm ("addextend %2,%1": "=dm" (x), "0" (y), "g" (*x)) */
+
+gnuasmstmt : asmkeyw opttypequal '(' expr ')' ';'
+    { $$ = mkasmstmt($1,$2,$4,nil,nil,nil); } 
+  | asmkeyw opttypequal '(' expr ':' asmops ')' ';'
+    { $$ = mkasmstmt($1,$2,$4,$6,nil,nil); } 
+  | asmkeyw opttypequal '(' expr ':' asmops ':' asmops ')' ';'
+    { $$ = mkasmstmt($1,$2,$4,$6,$8,nil); } 
+  | asmkeyw opttypequal '(' expr ':' asmops ':' asmops ':' asmclobbers ')' ';'
+    { $$ = mkasmstmt($1,$2,$4,$6,$8,$10); } 
+  ;
+
+gnuattribdecl : attributekeyw '(' '(' gnuattriblist ')' ')'
+    { $$ = mkgnuattribdecl($1,$4); } 
+
+gnuattrib : /* empty */
+    { $$ = mkgnuattrib(nil,nil); }
+  | anyword
+    { $$ = mkgnuattrib($1,nil); }
+  | anyword '(' exprlist ')'
+    { $$ = mkgnuattrib($1,$3); }
+  ;
+
+initializer : assignexpr
+    { $$ = $1; }
+  | identifier ':' assignexpr
+     { $$ = mklabeledstmt($1,$3); }
+  | '.' identifier assignexpr
+     { $$ = mklabeledstmt($2,$3); }
+  | '{' initializerlist '}'
+    { $$ = mklistexpr($1,$2,$3); }
+  | '{' initializerlist ',' '}'
+    { $$ = mklistexpr($1,$2,$4); }
+  ;
+
+initializerlist : initializer
+     { $$ = mklist(nil,$1); }
+  | initializerlist ',' initializer
+     { $$ = mklist($1,$3); }
+  ;
+
+identifiers : identifier
+     { $$ = mklist(nil,$1); }
+  | identifiers ',' identifier
+     { $$ = mklist($1,$3); }
+  ;
+
+ivardef : '{' '}'
+     { $$ = nil; }
+  | '{' componentdeflist '}'
+     { $$ = $2; }
+  ;
+
+keywarglist : keywarg
+     { $$ = mklist(nil,$1); }
+  | keywarglist keywarg
+     { $$ = mklist($1,$2); }
+  ;
+
+keywarg : unaryselector ':' {okblock=1;} expr
+    { okblock=0;$$ = mkkeywarg($1,$4); }
+  | ':' {okblock=1;} expr
+    { okblock=0;$$ = mkkeywarg(nil,$3); }
+  ;
+
+keywdecl : unaryselector ':' identifier
+    { $$ = mkkeywdecl($1,nil,$3); }
+  | unaryselector ':' '(' typename ')' identifier
+    { $$ = mkkeywdecl($1,$4,$6); }
+  | ':' identifier
+    { $$ = mkkeywdecl(nil,nil,$2); }
+  | ':' '(' typename ')' identifier
+    { $$ = mkkeywdecl(nil,$3,$5); }
+  ;
+
+keywselector : keywdecl
+     { $$ = mklist(nil,$1); }
+  | keywselector keywdecl
+     { $$ = mklist($1,$2); }
+  ;
+
+logandexpr : orexpr
+     { $$ = $1; }
+  | logandexpr logand orexpr
+     { $$ = mkbinexpr($1,"&&",$3); }
+  ;
+
+logorexpr : logandexpr
+     { $$ = $1; }
+  | logorexpr logor logandexpr
+     { $$ = mkbinexpr($1,"||",$3); }
+  ;
+
+methoddef : '+' methodproto ';'
+     { $$ = nil;declaremeth(YES,$2); }
+  | '-' methodproto ';'
+     { $$ = nil;declaremeth(NO,$2); }
+  | '+' methodproto
+     { declaremeth(YES,$2); }
+    compoundstmt
+     { $$ = mkmethdef(YES,$2,$4); }
+  | '-' methodproto
+     { declaremeth(NO,$2); }
+    compoundstmt
+     { $$ = mkmethdef(NO,$2,$4); }
+  ;
+
+methodproto : '(' typename ')' unaryselector
+     { $$ = mkmethproto($2,$4,nil,NO); }
+  | '(' typename ')' keywselector
+     { $$ = mkmethproto($2,nil,$4,NO); }
+  | '(' typename ')' keywselector ',' ellipsis
+     { $$ = mkmethproto($2,nil,$4,YES); }
+  | unaryselector
+     { $$ = mkmethproto(nil,$1,nil,NO); }
+  | keywselector
+     { $$ = mkmethproto(nil,nil,$1,NO); }
+  | keywselector ',' ellipsis /* +sprintf:(char*)format,... */
+     { $$ = mkmethproto(nil,nil,$1,YES); }
+  ;
+
+msgargs : unaryselector
+     { $$ = mkmethproto(nil,$1,nil,NO); }
+  | keywarglist
+     { $$ = mkmethproto(nil,nil,$1,NO); }
+  ;
+
+msgexpr : '[' {okblock=1;} expr {okblock=0;} msgargs ']'
+     { $$ = mkmesgexpr($3,$5); }
+  ;
+
+optbuiltinfunargs : /* empty */
+     { $$ = nil; }
+  | builtinfunargs
+     { $$ = $1; }
+  ;
+
+optexpr : /* empty */
+     { $$ = nil; }
+  | expr
+     { $$ = $1; }
+  ;
+
+optexprlist : /* empty */
+     { $$ = nil; }
+  | exprlist
+     { $$ = $1; }
+  ;
+
+optconstantexpr : /* empty */
+     { $$ = nil; }
+  | constantexpr
+     { $$ = $1; }
+  ;
+
+optinitializer : /* empty */
+     { $$ = nil; }
+  | '=' initializer
+     { $$ = $2; }
+  ;
+
+opttypequal : /* empty */
+     { $$ = nil; }
+  | typequal
+     { $$ = $1; }
+  ;
+
+optparmdeflist : /* empty */
+     { $$ = nil; }
+  | ellipsis
+     { $$ = mkparmdeflist(nil,nil,YES); }
+  | identifiers
+     { $$ = mkparmdeflist($1,nil,NO); }
+  | parmdeflist
+     { $$ = mkparmdeflist(nil,$1,NO); }
+  | parmdeflist ',' ellipsis
+     { $$ = mkparmdeflist(nil,$1,YES); }
+  ;
+
+orexpr : caretexpr
+     { $$ = $1; }
+  | orexpr '|' caretexpr
+     { $$ = mkbinexpr($1,"|",$3); }
+  ;
+
+plusexpr : timesexpr
+     { $$ = $1; }
+  | plusexpr '+' timesexpr
+     { $$ = mkbinexpr($1,"+",$3); }
+  | plusexpr '-' timesexpr
+     { $$ = mkbinexpr($1,"-",$3); }
+  ;
+
+ppiname : identifier
+     { $$ = $1; }
+  ;
+
+ppinamelist : ppiname
+     { $$ = nil; /* ignored */ }
+  | ppinamelist ',' ppiname
+     { $$ = nil; /* ignored */ }
+  ;
+
+primaryexpr : identifier
+     { $$ = mkidentexpr($1); }
+  | constant
+     { $$ = mkconstexpr($1,nil); }
+  | stringchain
+     { $$ = mkconstexpr(nil,$1); }
+  | ellipsis
+     { $$ = mkconstexpr($1,nil); /* Unixware cc, Tendra tcc */ }
+  | '(' expr ')'
+     { $$ = mkprecexpr($2); }
+  | '(' compoundstmt ')' /* gnu braced group ({ ... }) */
+     { $$ = mkbracedgroup($2); }
+  | primaryexpr '[' expr ']' %prec hyperunary
+     { $$ = mkindexexpr($1,$3); }
+  | primaryexpr '(' optexprlist ')' %prec hyperunary
+     { $$ = mkfuncall($1,$3); }
+  | primaryexpr '(' compoundstmt ')' %prec hyperunary
+     { $$ = mkpostfixexpr($1,mkprecexpr($3)); }
+  | primaryexpr '.' identifier
+     { $$ = mkdotexpr($1,$3); }
+  | primaryexpr '.' typeword
+     { $$ = mkdotexpr($1,$3); }
+  | primaryexpr arrow identifier
+     { $$ = mkarrowexpr($1,$3); }
+  | primaryexpr arrow typeword
+     { $$ = mkarrowexpr($1,$3); }
+  | primaryexpr plusplus
+     { $$ = mkpostfixexpr($1,$2); }
+  | blockexpr
+     { $$ = $1; }
+  | msgexpr
+     { $$ = $1; }
+  | selectorexpr 
+     { $$ = $1; }
+  | encodeexpr
+     { $$ = $1; }
+  ;
+
+parmdeflist : parmdef
+     { $$ = mklist(nil,$1); }
+  | parmdeflist ',' parmdef
+     { $$ = mklist($1,$3); }
+  ;
+
+parmdef : typespeclist
+     { $$ = mkparmdef(nil,$1,nil); }
+  | storageclass typespeclist
+     { $$ = mkparmdef($1,$2,nil); }
+  | typespeclist abstrdecl  /* unsigned char*  */
+     { $$ = mkparmdef(nil,$1,$2); }
+  | storageclass typespeclist abstrdecl
+     { $$ = mkparmdef($1,$2,$3); }
+  | typespeclist decl   /* unsigned char*c */
+     { $$ = mkparmdef(nil,$1,$2); }
+  | storageclass typespeclist decl
+     { $$ = mkparmdef($1,$2,$3); }
+  ;
+
+pointer : '*'
+     { $$ = mkpointer(nil,nil); }
+  | '*' typespeclist
+     { $$ = mkpointer($2,nil); }
+  | '*' pointer
+     { $$ = mkpointer(nil,$2); }
+  | '*' typespeclist pointer
+     { $$ = mkpointer($2,$3); }
+  ;
+
+relopexpr : shiftexpr
+     { $$ = $1; }
+  | relopexpr relop shiftexpr
+     { $$ = mkrelexpr($1,[$2 strCopy],$3); }
+  ;
+
+requiresclause : atrequires ppinamelist ';'
+     { warn("ignoring @requires"); }
+  ;
+
+reservedword : enumkeyw  | structkeyw | ifkeyw | elsekeyw | whilekeyw
+  | dokeyw | forkeyw | switchkeyw | casekeyw | defaultkeyw | breakkeyw
+  | continuekeyw | returnkeyw | gotokeyw | asmkeyw | sizeofop
+  | typequal
+     { $$ = $1; }
+  ;
+
+selectorarg : unaryselector
+     { $$ = mkselarg(nil,$1,0); }
+  | selectorarg ':' /* add:: */ 
+     { $$ = mkselarg($1,nil,1); }
+  | selectorarg unaryselector ':' /* add:modulo: */
+     { $$ = mkselarg($1,$2,1); }
+  ;
+
+selectorexpr : atselector '(' selectorarg ')'
+     { $$ = mkselectorexpr($3); }
+  ;
+
+shiftexpr : plusexpr
+     { $$ = $1; }
+  | plusexpr shift plusexpr
+     { $$ = mkbinexpr($1,[$2 strCopy],$3); }
+  ;
+
+structspec : structkeyw identifier '{' componentdeflist '}'
+     { $$ = mkstructspec($1,$2,$3,$4,$5); }
+  | structkeyw typeword '{' componentdeflist '}'
+     { $$ = mkstructspec($1,$2,$3,$4,$5); }
+  | structkeyw '{' componentdeflist '}'
+     { $$ = mkstructspec($1,nil,$2,$3,$4); }
+  | structkeyw identifier
+     { $$ = mkstructspec($1,$2,nil,nil,nil); }
+  | structkeyw typeword
+     { $$ = mkstructspec($1,$2,nil,nil,nil); }
+  ;
+
+componentdeflist : componentdef
+     { $$ = mklist(nil,$1); }
+  | componentdeflist componentdef
+     { $$ = mklist($1,$2); }
+  | atdefs '(' identifier ')'
+     { $$ = atdefsaddall(nil,$3); }
+  | componentdeflist atdefs '(' identifier ')'
+     { $$ = atdefsaddall($1,$4); }
+  ;
+
+componentdef : componentdefx ';'
+     { $$ = $1; }
+  | typespeclist ';'
+     { $$ = mkcomponentdef(nil,$1,nil); }
+  | cppdirect
+     { $$ = $1; }
+  ;
+
+componentdefx : typespeclist bitfielddecl
+     { $$ = mkcomponentdef(nil,$1,$2); }
+  | componentdefx ',' bitfielddecl
+     { $$ = mkcomponentdef($1,nil,$3); }
+  ;
+
+bitfielddecl : decl
+     { $$ = $1; }
+  | ':' constantexpr
+     { $$ = mkbitfielddecl(nil,$2); }
+  | decl ':' constantexpr
+     { $$ = mkbitfielddecl($1,$3); }
+  ;
+
+stmt : optexpr ';'
+     { $$ = mkexprstmt($1); }
+  | compoundstmt 
+     { $$ = $1; }
+  | identifier ':' stmt
+     { $$ = mklabeledstmt($1,$3); }
+  | casekeyw constantexpr ':' stmt
+     { $$ = mkcasestmt($1,$2,$4); }
+  | defaultkeyw ':' stmt
+     { $$ = mkdefaultstmt($1,$3); }
+  | ifkeyw '(' expr ')' stmt %prec ifkeyw
+     { $$ = mkifstmt($1,$3,$5); }
+  | ifkeyw '(' expr ')' stmt elsekeyw stmt 
+     { $$ = mkifelsestmt($1,$3,$5,$6,$7); }
+  | switchkeyw '(' expr ')' stmt 
+     { $$ = mkswitchstmt($1,$3,$5); }
+  | whilekeyw '(' expr ')' stmt
+     { $$ = mkwhilestmt($1,$3,$5); }
+  | dokeyw stmt whilekeyw '(' expr ')' ';'
+     { $$ = mkdostmt($1,$2,$3,$5); }
+  | forkeyw '(' optexpr ';' optexpr ';' optexpr ')' stmt
+     { $$ = mkforstmt($1,$3,$5,$7,$9); }
+  | gotokeyw identifier ';'
+     { $$ = mkgotostmt($1,$2); }
+  | continuekeyw ';'
+     { $$ = mkcontinuestmt($1); }
+  | breakkeyw ';'
+     { $$ = mkbreakstmt($1); }
+  | returnkeyw ';'
+     { $$ = mkreturnstmt($1,nil); }
+  | returnkeyw expr ';'
+     { $$ = mkreturnstmt($1,$2); }
+  | gnuasmstmt
+     { $$ = $1; }
+  | cppdirect
+     { $$ = $1; }
+  ;
+
+stmtlist : stmt
+     { $$ = mklist(nil,$1); }
+  | stmtlist stmt
+     { $$ = mklist($1,$2); }
+  ;
+
+stringchain : stringcomp /* string continuation */
+     { $$ = mklist(nil,$1); }
+  | stringchain stringcomp
+     { $$ = mklist($1,$2); }
+  ;
+
+timesexpr : castexpr
+     { $$ = $1; }
+  | timesexpr '*' castexpr
+     { $$ = mkbinexpr($1,"*",$3); }
+  | timesexpr '/' castexpr
+     { $$ = mkbinexpr($1,"/",$3); }
+  | timesexpr '%' castexpr
+     { $$ = mkbinexpr($1,"%",$3); }
+  ;
+
+vici : translunit
+     { $$ = $1; }
+  | vicicmd
+     { [vicicmds add:$1]; }
+  | vici vicicmd
+     { [vicicmds add:$2]; }
+  ;
+
+vicicmd : viload stringcomp
+     { $$ = [$1 what:$2]; }
+  | vishell stringcomp
+     { $$ = [$1 what:$2]; }
+  | viecho stringcomp
+     { $$ = [$1 what:$2]; }
+  | vibreak stringcomp
+     { $$ = [$1 what:$2]; }
+  | viprint expr
+     { $$ = $1; }
+  | vimake
+     { $$ = $1; }
+  | vihelp
+     { $$ = $1; }
+  | vibacktrace
+     { $$ = $1; }
+  | vicontinue
+     { $$ = $1; }
+  | vilist stringcomp
+     { $$ = [$1 what:$2]; }
+  | vistep
+     { $$ = $1; }
+  | vinext
+     { $$ = $1; }
+  | virun
+     { $$ = $1; }
+  | visetcflags stringcomp
+     { $$ = $1; }
+  | vicisetargs
+     { $$ = $1; }
+  | viquit
+     { $$ = $1; }
+  ;
+
+vicisetargs : visetargs stringcomp
+     { $$ = [$1 add:$2]; }
+  | vicisetargs stringcomp
+     { $$ = [$1 add:$2]; }
+  ;
+
+translunit : extdef
+     { procextdef($1); }
+  | translunit extdef
+     { procextdef($2); }
+  ;
+
+typename : typespeclist /* unsigned char */
+     { $$ = mktypename($1,nil); }
+  | typespeclist abstrdecl /* unsigned char* */
+     { $$ = mktypename($1,$2); }
+  ;
+
+typespec : typeword
+     { $$ = $1; }
+  | typequal
+     { $$ = $1; }
+  | structspec
+     { $$ = $1; }
+  | enumspec
+     { $$ = $1; }
+  | gnuextension
+     { $$ = $1; }
+  | typeofop '(' expr ')'
+     { $$ = mktypeof($1,$3); }
+  ;
+
+typespeclist : typespec
+     { $$ = mklist(nil,$1); }
+  | typespeclist typespec
+     { $$ = mklist($1,$2); }
+  ;
+
+typequallist : typequal
+     { $$ = mklist(nil,$1); }
+  | typequallist typequal
+     { $$ = mklist($1,$2); }
+  ;
+
+unaryexpr : primaryexpr
+     { $$ = $1; }
+  | plusplus castexpr %prec unary
+     { $$ = mkunaryexpr([$1 strCopy],$2); }
+  | unary castexpr %prec unary
+     { $$ = mkunaryexpr([$1 strCopy],$2); }
+  | '!' castexpr %prec unary
+     { $$ = mkunaryexpr("!",$2); }
+  | '~' castexpr %prec unary
+     { $$ = mkunaryexpr("~",$2); }
+  | '&' castexpr %prec unary
+     { $$ = mkaddressof($2); }
+  | '*' castexpr %prec unary
+     { $$ = mkdereference($2); }
+  | '+' castexpr %prec unary
+     { $$ = mkunaryexpr("+",$2); }
+  | '-' castexpr %prec unary
+     { $$ = mkunaryexpr("-",$2); }
+  | sizeofop unaryexpr %prec unary
+     { $$ = mksizeof($2); }
+  | sizeofop '(' typename ')' %prec hyperunary
+     { $$ = mkbuiltincall($1,mklist(nil,$3)); }
+  | builtinfun '(' optbuiltinfunargs ')' %prec hyperunary
+     { $$ = mkbuiltincall($1,$3); }
+  | gnuextension castexpr %prec unary
+     { $$ = mkunaryexpr([$1 strCopy],$2); }
+  ;
+
+unaryselector : identifier | reservedword | typeword | builtinfun
+  ;
+
+%%
+

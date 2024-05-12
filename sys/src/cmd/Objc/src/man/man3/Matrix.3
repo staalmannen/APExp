@@ -1,0 +1,1400 @@
+.TH "matrix" 3 "Mar 12, 2023"
+.SH Matrix
+.PP
+.B
+Inherits from:
+
+CAObject
+.PP
+.B
+Maturity Index:
+
+Relatively mature
+.SH Class Description
+.PP
+A matrix consists of a number of 
+.I
+scalars
+ordered in 
+.I
+rows
+\&.  The rows are vector objects; the scalar objects can be arbitrary Computer Algebra Kit objects, but they currently have to be either floating-point, elements of a field (see 
+.B
+inField
+) or elements of an integral domain (see 
+.B
+inIntegralDomain
+)\&.
+.PP
+There are methods to access, insert and remove rows and 
+.I
+columns
+\&.  Columns are collection objects of scalars (not vector objects)\&.  It\&'s also possible to place or replace a scalar directly at a position given by a row and column index\&.  See the documentation on 
+.B
+eachSequence
+to access the scalar at a given row and column index\&.
+.PP
+.B
+Note:
+
+Matrix objects are meant for computational tasks\&.  They are no substitute for a List or Collection object, and sometimes, e\&.g\&. for frequent random access, it\&'s indeed better to work with a collection of collections than with a Matrix object\&.
+.SH Method types
+.PP 
+.B
+Special Matrices
+.RS 3
+.br
+* diagonal:
+.br
+* circulant:
+.br
+* companion:
+.br
+* hankel::
+.br
+* toeplitz::
+.br
+* hilbert:
+.RE
+.PP 
+.B
+Creation
+.RS 3
+.br
+* scalar:numRows:numColumns:
+.br
+* copy
+.br
+* deepCopy
+.br
+* emptyVector
+.RE
+.PP 
+.B
+Identity
+.RS 3
+.br
+* scalarZero
+.br
+* rows
+.br
+* numRows
+.br
+* numColumns
+.br
+* isEqual:
+.br
+* hash
+.br
+* isDiagonal
+.br
+* isSymmetric
+.br
+* isAntiSymmetric
+.RE
+.PP 
+.B
+Insertion
+.RS 3
+.br
+* insertRow:
+.br
+* insertRow:at:
+.br
+* insertColumn:
+.br
+* insertColumn:at:
+.RE
+.PP 
+.B
+Removing
+.RS 3
+.br
+* removeRow
+.br
+* removeRowAt:
+.br
+* removeColumn
+.br
+* removeColumnAt:
+.RE
+.PP 
+.B
+Place and Replace
+.RS 3
+.br
+* placeScalar:at::
+.br
+* replaceScalarAt::with:
+.RE
+.PP 
+.B
+Coercion
+.RS 3
+.br
+* asNumerical
+.br
+* asModp:
+.br
+* onCommonDenominator:
+.RE
+.PP 
+.B
+Accessing Rows and Scalars
+.RS 3
+.br
+* rowAt:
+.br
+* eachRow
+.br
+* eachScalar
+.br
+* eachSequence
+.br
+* floatValueAt::
+.RE
+.PP 
+.B
+Addition
+.RS 3
+.br
+* zero
+.br
+* negate
+.br
+* double
+.br
+* add:
+.br
+* subtract:
+.br
+* addScalar:
+.br
+* subtractScalar:
+.RE
+.PP 
+.B
+Multiplication
+.RS 3
+.br
+* one
+.br
+* square
+.br
+* multiply:
+.br
+* multiplyVector:
+.RE
+.PP 
+.B
+Scalar Multiplication
+.RS 3
+.br
+* multiplyScalar:
+.br
+* divideScalar:
+.RE
+.PP 
+.B
+Transposing
+.RS 3
+.br
+* transpose
+.RE
+.PP 
+.B
+Gaussian Elimination
+.RS 3
+.br
+* determinant
+.br
+* solveVector:
+.br
+* inverse
+.br
+* divide:
+.br
+* rank
+.br
+* nullity
+.br
+* kernel
+.br
+* image
+.RE
+.PP 
+.B
+Trace Methods
+.RS 3
+.br
+* trace
+.br
+* adjoint
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+diagonal:
+.RS 1
++
+.B
+diagonal
+:
+.I
+cltnOfScalars
+.RE
+.PP
+Creates a new, square matrix with the objects in 
+.I
+cltnOfScalars
+on the diagonal\&. 
+.PP 
+circulant:
+.RS 1
++
+.B
+circulant
+:
+.I
+cltnOfScalars
+.RE
+.PP
+Creates a new 
+.I
+n
+by 
+.I
+n
+circulant matrix for a collection of 
+.I
+n
+scalar objects\&. 
+.PP 
+companion:
+.RS 1
++
+.B
+companion
+:
+.I
+cltnOfScalars
+.RE
+.PP
+Creates a new 
+.I
+n
+by 
+.I
+n
+companion matrix for a collection of 
+.I
+n
+scalar objects\&. 
+.PP 
+hankel::
+.RS 1
++
+.B
+hankel
+:
+.I
+rowScalars
+:
+.I
+colScalars
+.RE
+.PP
+Creates a new rectangualr Hankel matrix, a matrix with 
+.I
+n
++ 1 rows and 
+.I
+m
+columns if 
+.I
+rowScalars
+has 
+.I
+m
+and 
+.I
+colScalars
+
+.I
+n
+members\&.
+.PP 
+toeplitz::
+.RS 1
++
+.B
+toeplitz
+:
+.I
+rowScalars
+:
+.I
+colScalars
+.RE
+.PP
+Creates a new rectangualr Toeplitz matrix, a matrix with 
+.I
+n
+rows and 
+.I
+m
++ 1 columns if 
+.I
+rowScalars
+has 
+.I
+m
+and 
+.I
+colScalars
+
+.I
+n
+members\&.
+.PP 
+hilbert:
+.RS 1
++
+.B
+hilbert
+:(int)
+.I
+n
+.RE
+.PP
+Creates a new Hilbert matrix over the rational numbers\&.  The element at position 
+.I
+i
+, 
+.I
+j
+is 
+.I
+1 / (i+j+1)
+\&.
+.PP 
+scalar:numRows:numColumns:
+.RS 1
++
+.B
+scalar
+:
+.I
+aScalar
+.B
+numRows
+:(int)
+.I
+numRows
+.B
+numColumns
+:(int)
+.I
+numColumns
+.RE
+.PP
+Creates a new 
+.I
+numRows
+by 
+.I
+numColumns
+matrix with zero elements, and with copies of 
+.I
+aScalar
+on the diagonal\&.  For example, the 5 by 5 identity matrix over the polynomials with integer coefficients is created like this :
+.RS 3
+
+aPolynomial = [Polynomial new];
+.br
+aMatrix     = [Matrix scalar:aPolynomial numRows:5 numColumns:5];
+.br
+
+.RE
+.PP
+.B
+See also:
+
+- one
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Returns a new copy of the original; the rows are also copies of the original rows, not just new references\&.
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+Makes a fully independent copy of the matrix\&.
+.PP 
+emptyVector
+.RS 1
+-
+.B
+emptyVector
+.RE
+.PP
+Returns a new empty vector\&.
+.PP 
+scalarZero
+.RS 1
+-
+.B
+scalarZero
+.RE
+.PP
+Returns the zero scalar element\&. 
+.PP 
+rows
+.RS 1
+-
+.B
+rows
+.RE
+.PP
+Returns the collection of row vectors; the first row is the first member of this collection\&. 
+.PP 
+numRows
+.RS 1
+- (
+int
+)
+.B
+numRows
+.RE
+.PP
+Returns the number of rows in the matrix, or zero if there are no rows in the matrix\&.  If 
+.B
+numRows
+is equal to zero, 
+.B
+numColumns
+is zero too, but not vice-versa\&.
+.PP 
+numColumns
+.RS 1
+- (
+int
+)
+.B
+numColumns
+.RE
+.PP
+Returns the number of columns in the matrix, or zero if there are no columns in the matrix\&.  Note that if 
+.B
+numColumns
+is equal to zero, it\&'s still possible that 
+.B
+numRows
+is 
+.I
+not
+equal to zero; in other words, if there are no columns in the matrix, there can be empty vectors as rows\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+aMatrix
+.RE
+.PP
+Returns YES if the matrices have the same number of rows and columns and if the scalars are equal\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a small integer that is the same for matrices that are equal (in the sense of 
+.B
+isEqual:
+)\&.
+.PP 
+isDiagonal
+.RS 1
+- (
+BOOL
+)
+.B
+isDiagonal
+.RE
+.PP
+Returns YES if all scalars that are not on the diagonal of the matrix, are zero\&.
+.PP 
+isSymmetric
+.RS 1
+- (
+BOOL
+)
+.B
+isSymmetric
+.RE
+.PP
+Returns YES if the scalar at position 
+.I
+i
+,
+.I
+j
+is equal to the scalar at 
+.I
+j
+,
+.I
+i
+\&.
+.PP 
+isAntiSymmetric
+.RS 1
+- (
+BOOL
+)
+.B
+isAntiSymmetric
+.RE
+.PP
+Returns YES if the scalar at position 
+.I
+i
+,
+.I
+j
+is the opposite of the scalar at 
+.I
+j
+,
+.I
+i
+\&.
+.PP 
+insertRow:
+.RS 1
+-
+.B
+insertRow
+:
+.I
+aVector
+.RE
+.PP
+Inserts 
+.I
+aVector
+as last row in the collection of rows and returns 
+.B
+self
+\&.  The vector belongs after insertion to the matrix, and is not necessarily copied\&.  If there were already rows in the matrix, the vector must contain the same number of scalars\&.  To insert rows, the reference count of the matrix should be equal to one\&.
+.PP 
+insertRow:at:
+.RS 1
+-
+.B
+insertRow
+:
+.I
+aVector
+.B
+at
+:(int)
+.I
+i
+.RE
+.PP
+Similar to 
+.B
+insertRow:
+but inserts at position 
+.I
+i
+\&.  If 
+.I
+i
+is equal to the number of rows, this method is identical to 
+.B
+insertRow:
+\&.  If 
+.I
+i
+is equal to zero, this method inserts the vector as first row in the matrix\&.
+.PP 
+insertColumn:
+.RS 1
+-
+.B
+insertColumn
+:
+.I
+aCollection
+.RE
+.PP
+Inserts 
+.I
+aCollection
+in the matrix as first column and returns 
+.B
+self
+\&.  The collection and its members belong after insertion to the matrix, and are not necessarily copied\&.  The number of rows of the matrix should be equal to the number of scalars in the collection, and the reference count of the matrix should be equal to one\&.
+.PP 
+insertColumn:at:
+.RS 1
+-
+.B
+insertColumn
+:
+.I
+aCollection
+.B
+at
+:(int)
+.I
+i
+.RE
+.PP
+Similar to 
+.B
+insertColumn:
+but inserts at position 
+.I
+i
+\&.  If 
+.I
+i
+is equal to zero, this method is identical to 
+.B
+insertColumn:
+\&.  If 
+.I
+i
+is equal to the number of columns, this method inserts the collection as last column in the matrix\&.
+.PP 
+removeRow
+.RS 1
+-
+.B
+removeRow
+.RE
+.PP
+Removes (and returns) the last row of the matrix\&.  Returns 
+.B
+nil
+if there are no rows in the matrix\&.  This can be used in the following way :
+.RS 3
+
+while (row = [matrix removeRow]) { /* do something with row */ }
+.br
+
+.RE
+.PP
+To remove a row, the reference count of the matrix must be equal to one\&.
+.PP 
+removeRowAt:
+.RS 1
+-
+.B
+removeRowAt
+:(int)
+.I
+i
+.RE
+.PP
+Similar to 
+.B
+removeRow
+, but removes the 
+.I
+i
+-th row\&.  If 
+.I
+i
+is equal the number of rows minus one, this method is identical to 
+.B
+removeRow
+\&.  If 
+.I
+i
+is equal to zero, then the method removes the first row of the matrix\&.  It\&'s an error to use an illegal index 
+.I
+i
+or to attempt to remove a row from a matrix whose reference count is not equal to one\&.
+.PP 
+removeColumn
+.RS 1
+-
+.B
+removeColumn
+.RE
+.PP
+Removes (and returns) the first column of the matrix\&.  The column is a collection of scalars, not a vector object\&.  Returns 
+.B
+nil
+if there are no columns in the matrix\&.  This can be used in the following way :
+.RS 3
+
+while (column = [matrix removeColumn]) { /* do something with column */ }
+.br
+
+.RE
+.PP
+The reference count of the matrix must be equal to one\&.
+.PP 
+removeColumnAt:
+.RS 1
+-
+.B
+removeColumnAt
+:(int)
+.I
+i
+.RE
+.PP
+Similar to 
+.B
+removeColumn
+, but removes the 
+.I
+i
+-th column\&.  If 
+.I
+i
+is equal to zero, this method is identical to 
+.B
+removeColumn
+\&.  If 
+.I
+i
+is equal to the number of columns minus one, then the method removes the last column in the matrix\&.  It\&'s an error to use an illegal index 
+.I
+i
+or to attempt to remove a column from a matrix whose reference count is not equal to one\&.
+.PP 
+placeScalar:at::
+.RS 1
+-
+.B
+placeScalar
+:
+.I
+aScalar
+.B
+at
+:(int)
+.I
+i
+:(int)
+.I
+j
+.RE
+.PP
+Frees the scalar at position 
+.I
+i
+,
+.I
+j
+and replaces it by the scalar object 
+.I
+aScalar
+\&.  Returns 
+.B
+self
+\&.
+.PP
+The scalar 
+.I
+aScalar
+belongs, after placing, to the receiving matrix object; it is not necessarily copied\&.  It is an error to use illegal indices 
+.I
+i
+and 
+.I
+j
+or to attempt to place a scalar in a matrix whose reference count is not equal to one\&.
+.PP 
+replaceScalarAt::with:
+.RS 1
+-
+.B
+replaceScalarAt
+:(int)
+.I
+i
+:(int)
+.I
+j
+.B
+with
+:
+.I
+aScalar
+.RE
+.PP
+Similar to 
+.B
+placeScalar::at:
+but returns the scalar at position 
+.I
+i
+,
+.I
+j
+after replacing it by 
+.I
+aScalar
+\&.
+.PP 
+asNumerical
+.RS 1
+-
+.B
+asNumerical
+.RE
+.PP
+Returns a new matrix, whose scalars are the numerical value of the scalars of the original matrix\&.  For a matrix with integer scalars, this method returns a matrix with floating-point scalars\&.
+.PP 
+asModp:
+.RS 1
+-
+.B
+asModp
+:(unsigned short)
+.I
+p
+.RE
+.PP
+Returns a new matrix, whose scalars are the value of the scalars of the original matrix mod 
+.I
+p
+\&.  For a matrix with integer scalars, this method returns a matrix with IntegerModp scalars\&.
+.PP 
+onCommonDenominator:
+.RS 1
+-
+.B
+onCommonDenominator
+:(id *)
+.I
+denominator
+.RE
+.PP
+Puts a matrix with fractional scalars on a common denominator\&.  Returns a new matrix with integral scalars, and, by reference, the common denominator of the scalars in the matrix (the least common multiple of the denominators of the fractions in the matrix)\&.
+.PP 
+rowAt:
+.RS 1
+-
+.B
+rowAt
+:(int)
+.I
+i
+.RE
+.PP
+Returns the 
+.I
+i
+-th row of the matrix\&.  The following example is equivalent to using 
+.B
+eachRow
+and sequencing over the rows :
+.RS 3
+
+int i;
+.br
+for(i=0;i<[aMatrix numRows];i++) {
+.br
+id aRow = [aMatrix rowAt:i];
+.br
+/* do something with aRow */
+.br
+}
+.br
+
+.RE
+.PP 
+eachRow
+.RS 1
+-
+.B
+eachRow
+.RE
+.PP
+Returns a new sequence of the rows of the matrix\&.  You cannot add or remove rows, or alter in any other way the matrix, until you\&'re done with the sequence object (the sequence contains a reference to the rows of the matrix)\&.  The 
+.I
+i
+-th member in this sequence is the 
+.I
+i
+-th row of the matrix\&.  The following example is equivalent to using 
+.B
+rowAt:
+for indices between 0 and 
+.B
+numRows
+:
+.RS 3
+
+id aRow,aSequence;
+.br
+aSequence = [aMatrix eachRow];
+.br
+while (aRow = [aSequence next]) {
+.br
+/* do something with aRow */
+.br
+}
+.br
+
+.RE
+.PP 
+eachScalar
+.RS 1
+-
+.B
+eachScalar
+.RE
+.PP
+Returns a new sequence of scalars, obtained by concatenating the sequences of scalars of all row vectors of the matrix\&.  If the matrix contains 
+.I
+m
+rows and 
+.I
+n
+columns, then the sequence contains 
+.I
+m
+times 
+.I
+n
+members\&.  You cannot add or remove scalars, or alter in any other way the matrix, until you\&'re done with the sequence object (the sequence contains a reference to the matrix)\&.
+.PP
+.B
+Note:
+
+The sequence returned by this method cannot be accessed through an index\&.  It doesn\&'t implement the 
+.B
+at:
+and 
+.B
+toElementAt:
+methods\&.
+.PP 
+eachSequence
+.RS 1
+-
+.B
+eachSequence
+.RE
+.PP
+Returns a new sequence of sequences of scalars\&.  You cannot add or remove scalars, or alter in any other way the matrix, until you\&'re done with the sequence object (the sequence contains a reference to the matrix)\&.  The following example shows how to access the 
+.I
+i
+-th sequence of scalars, and in that sequence, the 
+.I
+j
+-th scalar object :
+.RS 3
+
+aSequence = [aMatrix eachSequence];
+.br
+aScalar   = [[aSequence at:i] at:j];
+.br
+
+.br
+/* do something here with aScalar */
+.br
+
+.br
+
+.RE
+.PP 
+floatValueAt::
+.RS 1
+- (
+float
+)
+.B
+floatValueAt
+:(int)
+.I
+i
+:(int)
+.I
+j
+.RE
+.PP
+Returns the 
+.B
+floatValue
+of the scalar at row index 
+.I
+i
+and column index 
+.I
+j
+\&.
+.PP 
+zero
+.RS 1
+-
+.B
+zero
+.RE
+.PP
+Returns a zero matrix of the same dimensions as the matrix that receives the message\&.
+.PP 
+negate
+.RS 1
+-
+.B
+negate
+.RE
+.PP
+Negates the matrix row by row\&.
+.PP 
+double
+.RS 1
+-
+.B
+double
+.RE
+.PP
+Returns a new matrix equal to the matrix multiplied by two\&.  Multiplies the matrix row by row by two\&.
+.PP 
+add:
+.RS 1
+-
+.B
+add
+:
+.I
+b
+.RE
+.PP
+Returns a new matrix equal to the sum of the two matrices\&.  Adds the matrices row by row together\&.
+.PP 
+subtract:
+.RS 1
+-
+.B
+subtract
+:
+.I
+b
+.RE
+.PP
+Returns a new matrix equal to the difference of the two matrices\&.  Subtracts the matrices row by row from each other\&.
+.PP 
+addScalar:
+.RS 1
+-
+.B
+addScalar
+:
+.I
+s
+.RE
+.PP
+Adds the scalar 
+.I
+s
+to the diagonal of the matrix\&.  Returns a new object\&.
+.PP 
+subtractScalar:
+.RS 1
+-
+.B
+subtractScalar
+:
+.I
+s
+.RE
+.PP
+Subtracts the scalar 
+.I
+s
+from the diagonal of the matrix\&.  Returns a new object\&.
+.PP 
+one
+.RS 1
+-
+.B
+one
+.RE
+.PP
+Returns the (right) unity matrix of the same dimensions as the matrix that receives the message\&.
+.PP 
+square
+.RS 1
+-
+.B
+square
+.RE
+.PP
+Multiplies the (square) matrix by itself\&.
+.PP 
+multiply:
+.RS 1
+-
+.B
+multiply
+:
+.I
+b
+.RE
+.PP
+Returns the product 
+.I
+self b
+\&.  The number of columns of 
+.I
+self
+must match the number of rows of 
+.I
+b
+\&.
+.PP 
+multiplyVector:
+.RS 1
+-
+.B
+multiplyVector
+:
+.I
+aColumn
+.RE
+.PP
+Returns a new vector, the product of the matrix by a column vector object\&.  The number of rows of the matrix must match the number of scalars in the vector\&.
+.PP 
+multiplyScalar:
+.RS 1
+-
+.B
+multiplyScalar
+:
+.I
+b
+.RE
+.PP
+Returns the matrix multiplied (to the right) by the scalar 
+.I
+b
+\&.
+.PP 
+divideScalar:
+.RS 1
+-
+.B
+divideScalar
+:
+.I
+b
+.RE
+.PP
+Returns the matrix divided by the scalar 
+.I
+b
+\&.  Returns 
+.B
+nil
+if the division was not exact for some scalar in the matrix\&.
+.PP 
+transpose
+.RS 1
+-
+.B
+transpose
+.RE
+.PP
+Returns the transposed of the matrix (a new matrix object)\&.  If the matrix has 
+.I
+m
+rows and 
+.I
+n
+columns, the transposed matrix has 
+.I
+n
+rows and 
+.I
+m
+columns\&.
+.PP 
+determinant
+.RS 1
+-
+.B
+determinant
+.RE
+.PP
+Computes the determinant of the square matrix\&.  Returns a new scalar object\&.
+.PP
+For fields of fractions, the method will extract a common denominator for the scalars, and compute the determinant over the associated integral domain\&.  For fields that are not fields of fractions, the method computes the determinant by Gaussian elimination taking inverses of leading non-zero elements\&.  For matrices over an integral domain, the determinant is computed by the Bareiss method\&.
+.PP
+.B
+Note:
+
+You can\&'t compute a determinant over the floating-point numbers yet\&.
+.PP 
+solveVector:
+.RS 1
+-
+.B
+solveVector
+:
+.I
+y
+.RE
+.PP
+Returns a vector 
+.I
+x
+that is the solution of the linear equation 
+.I
+A x = y
+with 
+.I
+A
+the (non-singular) matrix and 
+.I
+y
+a column vector object\&.
+.PP
+The method works over fields and integral domains, but in the latter case, the method looks for an integral (and primitive i\&.e\&., common gcd divided out) solution only\&.  It will give an error message if the solution requires the construction of the field of fractions\&.
+.PP 
+inverse
+.RS 1
+-
+.B
+inverse
+.RE
+.PP
+Returns the inverse of the matrix (a new matrix object)\&.  The matrix must be square; if it is singular (determinant equal to zero), the method returns 
+.B
+nil
+\&.  Implemented as a special case of 
+.B
+divide:
+, which computes 
+.I
+A B^-1
+\&.
+.PP 
+divide:
+.RS 1
+-
+.B
+divide
+:
+.I
+b
+.RE
+.PP
+Returns a new matrix, equal to the matrix multiplied to the right by the inverse of the matrix 
+.I
+b
+\&.
+.PP
+.B
+Note:
+
+Currently matrix inversion only works over a field (by Gaussian elimination)\&.
+.PP 
+rank
+.RS 1
+- (
+int
+)
+.B
+rank
+.RE
+.PP
+Returns the dimension of the image of the matrix, without computing the image vectors themselves\&.  Works currently only over a field\&.
+.PP 
+nullity
+.RS 1
+- (
+int
+)
+.B
+nullity
+.RE
+.PP
+Returns the dimension of the kernel (nullspace) of the matrix, without computing the kernel itself\&.  By the dimension theorem, the nullity of the matrix is the number of columns minus the rank of the matrix\&.
+.PP 
+kernel
+.RS 1
+-
+.B
+kernel
+.RE
+.PP
+Returns the kernel (or nullspace) of the matrix as a collection of columns; each column is a vector object\&.  Works currently only over a field\&.
+.PP 
+image
+.RS 1
+-
+.B
+image
+.RE
+.PP
+Returns the image of the matrix as a collection of columns; each column is a vector object\&.  Works currently only over a field\&.
+.PP 
+trace
+.RS 1
+-
+.B
+trace
+.RE
+.PP
+Returns a new scalar object, the trace of the square matrix, ie\&. the sum of the scalars on the diagonal of the matrix\&.
+.PP 
+adjoint
+.RS 1
+-
+.B
+adjoint
+.RE
+.PP
+Returns a new matrix, the adjoint of the matrix computed through repeated trace computations (ie\&. the Faddeev-Leverrier method)\&.  If the characteristic of the scalars is non-zero, it must be larger than the number of rows in the matrix\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints, between braces, a comma separated list of the rows\&.  Sends 
+.B
+printOn:
+messages to the scalars in the matrix\&.

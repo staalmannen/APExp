@@ -1,0 +1,3452 @@
+'  ____         ____
+' | __ )  __ _ / ___|___  _ __
+' |  _ \ / _` | |   / _ \| '_ \
+' | |_) | (_| | |__| (_) | | | |   --= A BaCon GUI BASIC-to-C converter =--
+' |____/ \__,_|\____\___/|_| |_|
+'
+' Peter van Eerten - March 2009/February 2021. License: MIT License.
+'
+'----------------------------------------------------------------------------------------------
+' CREDITS to all people of the BaCon forum. Without them BaCon would not be as it is now.
+'----------------------------------------------------------------------------------------------
+'
+' Terminal execution string suggestions ('@' means the program and its arguments):
+'
+'	(1) xterm -sb -geometry 132x40 -e '@; read'
+'	(2) rxvt -geometry 132x40 -e /bin/bash -c '@; read'
+'	(3) gnome-terminal --geometry 132x40 -e "/bin/bash -c '@; read'"
+'	(4) lxterminal --geometry=80x20 --command="/bin/bash -c 'time @; read'"
+'	(5) konsole --noclose --vt_sz 80x25 -e @
+'	(6) xfce4-terminal --geometry 132x40 -e "/bin/bash -c '@; read'"
+'	(7) MacOSX: mrxvt -hold 1 -e @
+'	(8) MacOSX: open @
+'
+'----------------------------------------------------------------------------------------------
+' GLOBAL INITIALIZATIONS
+'----------------------------------------------------------------------------------------------
+
+' Lower bound of array starts with 1
+OPTION BASE 1
+
+' Prevent parse errors
+OPTION COLLAPSE TRUE
+
+' We will be using memory streams
+OPTION MEMSTREAM TRUE
+
+' Location of documentation
+CONST g_DOC_LOCATION$ = GETENVIRON$("HOME") & "/.bacon/"
+
+' GTK version
+IF FILEEXISTS(GETENVIRON$("HOME") & "/.bacon/use.gtk3") THEN
+	Gtk_Version$ = "gtk3"
+ELSE
+	Gtk_Version$ = "gtk2"
+ENDIF
+
+' Global to define '$', '%' and '#'-replacement
+CONST g_STRINGSIGN$ = "__b2c__string_var"
+CONST g_LONGSIGN$ = "__b2c__long_var"
+CONST g_FLOATSIGN$ = "__b2c__float_var"
+
+' Global BaCon shell temp file definition
+CONST g_BACONSHELL$ = "/scratchpad.bac"
+
+' Our numerical environment is POSIX
+SETENVIRON "LC_NUMERIC", "POSIX"
+
+'------------------------------------------------------------------------------------------------------------
+
+CONST GDK_SHIFT_MASK = 1 << 0
+CONST GDK_CONTROL_MASK = 1 << 2
+CONST GTK_RESPONSE_ACCEPT = -3
+CONST GTK_RESPONSE_OK = -5
+CONST GTK_RESPONSE_CANCEL = -6
+CONST GTK_RESPONSE_YES = -8
+CONST GTK_RESPONSE_NO = -9
+CONST GTK_RESPONSE_APPLY = -10
+CONST GTK_WIN_POS_MOUSE = 2
+CONST GTK_WIN_POS_CENTER_ON_PARENT = 4
+CONST GTK_DIALOG_DESTROY_WITH_PARENT = 2
+CONST GTK_MESSAGE_INFO = 0
+CONST GTK_MESSAGE_WARNING = 1
+CONST GTK_MESSAGE_ERROR = 3
+CONST GTK_BUTTONS_CLOSE = 2
+CONST GTK_BUTTONS_YES_NO = 4
+CONST GTK_WRAP_NONE = 0
+CONST GTK_WRAP_WORD = 2
+CONST GTK_STATE_NORMAL = 0
+CONST GTK_ACCEL_VISIBLE = 1
+CONST GTK_WINDOW_TOPLEVEL = 0
+CONST GTK_WINDOW_POPUP = 1
+CONST GTK_POLICY_AUTOMATIC = 1
+CONST GTK_SHADOW_ETCHED_IN = 3
+CONST GTK_ICON_SIZE_MENU = 1
+CONST GTK_ICON_SIZE_DIALOG = 6
+CONST GTK_RELIEF_NONE = 2
+CONST GTK_ORIENTATION_VERTICAL = 1
+CONST GTK_STYLE_PROVIDER_PRIORITY_USER = 800
+
+' Memory size for GtkIter
+CONST DEFAULT_WIDGET_SIZE = 96
+
+' The notebook can have maximum pages
+CONST MAXPAGES = 100
+
+CONST DEFTITLE$ = "BaConGUI GTK"
+
+' Global ClipBoard object
+DECLARE ClipBoard
+
+' Hold widgets for the notebook
+RECORD nbook[MAXPAGES]
+	LOCAL view, buffer, label, button, child
+	LOCAL title$
+END RECORD
+
+' Height of the context info
+CONST G_INFO_HEIGHT = 150
+
+' Allow icons in buttons - for now intentionally commented as some Linux distros have issues with 'gconftool-2'
+'IF LEN(EXEC$("which gconftool-2 2>/dev/null")) THEN SYSTEM "gconftool-2 --type boolean --set /desktop/gnome/interface/buttons_have_icons 1"
+
+' Check if settings directory exists
+IF NOT(FILEEXISTS(g_DOC_LOCATION$)) THEN MAKEDIR g_DOC_LOCATION$
+
+' Copy docs from default installation if they are not there
+IF NOT(FILEEXISTS(g_DOC_LOCATION$ & "doc_frame.html")) THEN
+	COPY CONCAT$(DATA_PATH, "/BaCon/documentation/documentation.txt") TO g_DOC_LOCATION$ & "documentation.txt"
+	COPY CONCAT$(DATA_PATH, "/BaCon/documentation/documentation.html") TO g_DOC_LOCATION$ & "documentation.html"
+	COPY CONCAT$(DATA_PATH, "/BaCon/documentation/doc_index.html") TO g_DOC_LOCATION$ & "doc_index.html"
+	COPY CONCAT$(DATA_PATH, "/BaCon/documentation/doc_frame.html") TO g_DOC_LOCATION$ & "doc_frame.html"
+ENDIF
+
+CONST MAX_LIB_SEQ = 9999
+
+' Check which GTK version we are using
+WHILE CMDLINE("g:") >= 0
+	IF ARGUMENT$ = "tk3" THEN Gtk_Version$ = "gtk3"
+WEND
+
+' Where to put the syntaxfile
+IF Gtk_Version$ = "gtk2" THEN
+	LET Config_Path$ = "/.local/share/gtksourceview-2.0/language-specs"
+ELSE
+	LET Config_Path$ = "/.local/share/gtksourceview-3.0/language-specs"
+ENDIF
+
+' Find libraries and import symbols
+CALL Find_GtkSource_Library
+CALL Find_Gtk_Library
+CALL Find_Gdk_Library
+CALL Find_Gobject_Library
+CALL Find_Gdkpixbuf_Library
+CALL Find_Pango_Library
+CALL Find_Webkit_Library
+
+' Check if syntax file exists
+IF NOT(FILEEXISTS(GETENVIRON$("HOME") & Config_Path$ & "/bacon.lang")) THEN
+	MAKEDIR GETENVIRON$("HOME") & Config_Path$
+	COPY CONCAT$(DATA_PATH, "/BaCon/syntax/bacon.lang") TO GETENVIRON$("HOME") & Config_Path$ & "/bacon.lang"
+ENDIF
+
+' Do not forget to RESET the ERROR variable after all those erroneous IMPORT probing when running in TRAP LOCAL mode
+ERROR = 0
+
+' Associative array to keep context info
+DECLARE ctx_info$ ASSOC STRING
+
+' Run the GUI
+CALL Build_Gui
+
+'------------------------------------------------------------------------------------------------------------
+
+' Let's get the GTK library
+SUB Find_Gtk_Library
+
+	LOCAL lib$
+	LOCAL sequence = -1
+
+	CATCH GOTO Redo_Import
+
+	IF INSTR(OS$, "Darwin") THEN
+		lib$ = "/opt/local/lib/libgtk-x11-2.0.0.dylib"
+		IF NOT(FILEEXISTS(lib$)) THEN
+			lib$ = "/Library/Frameworks/Gtk.framework/Libraries/libgtk-quartz-2.0.0.dylib"
+		END IF
+	END IF
+
+	LABEL Redo_Import
+		INCR sequence
+		IF sequence >= MAX_LIB_SEQ THEN GOTO Print_Error
+		IF NOT(INSTR(lib$, "dylib")) THEN
+			IF Gtk_Version$ = "gtk2" THEN
+				lib$ = "libgtk-x11-2.0.so." & STR$(sequence)
+			ELSE
+				lib$ = "libgtk-3.so." & STR$(sequence)
+			ENDIF
+		ENDIF
+		IMPORT "gtk_init(int*,void*)" FROM lib$ TYPE void
+
+	IMPORT "gtk_accel_group_new" FROM lib$ TYPE long
+	IMPORT "gtk_adjustment_set_value(long,double)" FROM lib$ TYPE void
+	IMPORT "gtk_box_pack_end(long,long,int,int,int)" FROM lib$ TYPE void
+	IMPORT "gtk_box_pack_start(long,long,int,int,int)" FROM lib$ TYPE void
+	IMPORT "gtk_button_new" FROM lib$ TYPE long
+	IMPORT "gtk_button_new_from_stock(char*)" FROM lib$ TYPE long
+	IMPORT "gtk_button_set_focus_on_click(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_button_set_relief(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_check_button_new_with_label(char*)" FROM lib$ TYPE long
+	IMPORT "gtk_check_menu_item_get_active(long)" FROM lib$ TYPE int
+	IMPORT "gtk_check_menu_item_set_active(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_check_menu_item_new_with_mnemonic(char*)" FROM lib$ TYPE long
+	IMPORT "gtk_check_version(int,int,int)" FROM lib$ TYPE char* ALIAS gtk_check_version$
+	IMPORT "gtk_clipboard_get(long)" FROM lib$ TYPE long
+	IMPORT "gtk_color_selection_dialog_new(char*)" FROM lib$ TYPE long
+	IMPORT "gtk_color_selection_get_current_color(long,long)" FROM lib$ TYPE void
+	IF Gtk_Version$ = "gtk3" THEN
+		IMPORT "gtk_color_selection_dialog_get_color_selection(long)" FROM lib$ TYPE long
+		IMPORT "gtk_color_selection_get_current_rgba(long,long)" FROM lib$ TYPE void
+	ENDIF
+	IMPORT "gtk_color_selection_palette_from_string(char*,long,long)" FROM lib$ TYPE int
+	IMPORT "gtk_color_selection_palette_to_string(long,int)" FROM lib$ TYPE char*
+	IMPORT "gtk_color_selection_set_current_color(long,long)" FROM lib$ TYPE void
+	IF Gtk_Version$ = "gtk2" THEN
+		IMPORT "gtk_combo_box_append_text(long,char*)" FROM lib$ TYPE void
+		IMPORT "gtk_combo_box_get_active_text(long)" FROM lib$ TYPE char*
+		IMPORT "gtk_combo_box_new_text" FROM lib$ TYPE long
+	ELSE
+		IMPORT "gtk_combo_box_text_append_text(long,char*)" FROM lib$ TYPE void
+		ALIAS "gtk_combo_box_text_append_text" TO "gtk_combo_box_append_text"
+		IMPORT "gtk_combo_box_text_get_active_text(long)" FROM lib$ TYPE char*
+		ALIAS "gtk_combo_box_text_get_active_text" TO "gtk_combo_box_get_active_text"
+		IMPORT "gtk_combo_box_text_new" FROM lib$ TYPE long
+		ALIAS "gtk_combo_box_text_new" TO "gtk_combo_box_new_text"
+	ENDIF
+	IMPORT "gtk_combo_box_set_active(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_container_add(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_container_set_border_width(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_dialog_run(long)" FROM lib$ TYPE int
+	IMPORT "gtk_dialog_set_default_response(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_entry_get_text(long)" FROM lib$ TYPE char*
+	IMPORT "gtk_entry_set_text(long,char*)" FROM lib$ TYPE void
+	IMPORT "gtk_entry_new" FROM lib$ TYPE long
+	IMPORT "gtk_events_pending" FROM lib$ TYPE int
+	IMPORT "gtk_file_chooser_add_filter(long,long)" FROM lib$ TYPE long
+	IMPORT "gtk_file_chooser_dialog_new(char*,long,int,char*,...)" FROM lib$ TYPE long
+	IMPORT "gtk_file_chooser_get_filename(long)" FROM lib$ TYPE char*
+	IMPORT "gtk_file_chooser_set_filename(long,char*)" FROM lib$ TYPE int
+	IMPORT "gtk_file_filter_add_pattern(long,char*)" FROM lib$ TYPE long
+	IMPORT "gtk_file_filter_new" FROM lib$ TYPE long
+	IMPORT "gtk_file_filter_set_name(long,char*)" FROM lib$ TYPE void
+	IMPORT "gtk_font_selection_dialog_get_font_name(long)" FROM lib$ TYPE char*
+	IMPORT "gtk_font_selection_dialog_new(char*)" FROM lib$ TYPE long
+	IMPORT "gtk_font_selection_dialog_set_font_name(long,char*)" FROM lib$ TYPE int
+	IMPORT "gtk_frame_new(char*)" FROM lib$ TYPE long
+	IMPORT "gtk_hbox_new(int,int)" FROM lib$ TYPE long
+	IMPORT "gtk_hseparator_new" FROM lib$ TYPE long
+	IMPORT "gtk_vseparator_new" FROM lib$ TYPE long
+	IMPORT "gtk_icon_size_lookup(int,long,long)" FROM lib$ TYPE int
+	IMPORT "gtk_image_new_from_file(char*)" FROM lib$ TYPE long
+	IMPORT "gtk_image_new_from_stock(char*,int)" FROM lib$ TYPE long
+	IMPORT "gtk_label_new(char*)" FROM lib$ TYPE long
+	IMPORT "gtk_label_get_text(long)" FROM lib$ TYPE char*
+	IMPORT "gtk_label_set_markup(long,char*)" FROM lib$ TYPE void
+	IMPORT "gtk_label_set_text(long,char*)" FROM lib$ TYPE void
+	IMPORT "gtk_main" FROM lib$ TYPE void
+	IMPORT "gtk_main_iteration_do(int)" FROM lib$ TYPE int
+	IMPORT "gtk_menu_bar_new" FROM lib$ TYPE long
+	IMPORT "gtk_menu_item_new" FROM lib$ TYPE long
+	IMPORT "gtk_menu_item_new_with_mnemonic(char*)" FROM lib$ TYPE long
+	IMPORT "gtk_menu_item_new_with_label(char*)" FROM lib$ TYPE long
+	IMPORT "gtk_menu_item_set_submenu(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_menu_new" FROM lib$ TYPE long
+	IMPORT "gtk_menu_popup(long,long,long,void*,void*,int,int)" FROM lib$ TYPE void
+	IMPORT "gtk_menu_shell_append(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_message_dialog_new(long,int,int,int,char*,...)" FROM lib$ TYPE long
+	IMPORT "gtk_misc_set_alignment(long,float,float)" FROM lib$ TYPE void
+	IMPORT "gtk_notebook_append_page(long,long,long)" FROM lib$ TYPE int
+	IMPORT "gtk_notebook_get_current_page(long)" FROM lib$ TYPE int
+	IMPORT "gtk_notebook_get_n_pages(long)" FROM lib$ TYPE int
+	IMPORT "gtk_notebook_get_nth_page (long,int)" FROM lib$ TYPE long
+	IMPORT "gtk_notebook_new" FROM lib$ TYPE long
+	IMPORT "gtk_notebook_remove_page(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_notebook_set_current_page(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_notebook_set_scrollable(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_notebook_set_tab_reorderable(long,long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_progress_bar_new" FROM lib$ TYPE long
+	IMPORT "gtk_progress_bar_set_fraction(long,double)" FROM lib$ TYPE void
+	IMPORT "gtk_progress_bar_set_text(long,char*)" FROM lib$ TYPE void
+	IMPORT "gtk_radio_button_new_with_label_from_widget(long,char*)" FROM lib$ TYPE long
+	IMPORT "gtk_rc_parse_string(char*)" FROM lib$ TYPE void
+	IMPORT "gtk_rc_reset_styles(long)" FROM lib$ TYPE void
+	IMPORT "gtk_scrolled_window_add_with_viewport(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_scrolled_window_get_hadjustment(long)" FROM lib$ TYPE long
+	IMPORT "gtk_scrolled_window_get_hscrollbar(long)" FROM lib$ TYPE long
+	IMPORT "gtk_scrolled_window_get_vadjustment(long)" FROM lib$ TYPE long
+	IMPORT "gtk_scrolled_window_get_vscrollbar(long)" FROM lib$ TYPE long
+	IMPORT "gtk_scrolled_window_new(long,long)" FROM lib$ TYPE long
+	IMPORT "gtk_scrolled_window_set_policy(long,int,int)" FROM lib$ TYPE void
+	IMPORT "gtk_scrolled_window_set_shadow_type(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_settings_get_default" FROM lib$ TYPE long
+	IMPORT "gtk_show_about_dialog(long,char*,...)" FROM lib$ TYPE void
+	IMPORT "gtk_statusbar_get_context_id(long,char*)" FROM lib$ TYPE int
+	IMPORT "gtk_statusbar_new" FROM lib$ TYPE long
+	IMPORT "gtk_statusbar_pop(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_statusbar_push(long,int,char*)" FROM lib$ TYPE int
+	IF Gtk_Version$ = "gtk2" THEN IMPORT "gtk_statusbar_set_has_resize_grip(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_tearoff_menu_item_new(void)" FROM lib$ TYPE long
+	IMPORT "gtk_text_buffer_copy_clipboard(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_create_mark(long,char*,long,int)" FROM lib$ TYPE long
+	IMPORT "gtk_text_buffer_cut_clipboard(long,long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_delete(long,long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_delete_mark(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_get_bounds(long,long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_get_end_iter(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_get_has_selection(long)" FROM lib$ TYPE int
+	IMPORT "gtk_text_buffer_get_insert(long)" FROM lib$ TYPE long
+	IMPORT "gtk_text_buffer_get_iter_at_line(long,long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_get_iter_at_mark(long,long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_get_iter_at_offset(long,long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_get_line_count(long)" FROM lib$ TYPE int
+	IMPORT "gtk_text_buffer_get_selection_bound(long)" FROM lib$ TYPE long
+	IMPORT "gtk_text_buffer_get_selection_bounds(long,long,long)" FROM lib$ TYPE long
+	IMPORT "gtk_text_buffer_get_start_iter(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_get_text(long,long,long,int)" FROM lib$ TYPE char*
+	IMPORT "gtk_text_buffer_insert(long,long,char*,int)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_new(long)" FROM lib$ TYPE long
+	IMPORT "gtk_text_buffer_paste_clipboard(long,long,void*,int)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_place_cursor(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_select_range(long,long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_text_buffer_set_text(long,char*,int)" FROM lib$ TYPE void
+	IMPORT "gtk_text_iter_backward_word_start(long)" FROM lib$ TYPE int
+	IMPORT "gtk_text_iter_ends_word(long)" FROM lib$ TYPE int
+	IMPORT "gtk_text_iter_forward_search(long,char*,int,long,long,void*)" FROM lib$ TYPE int
+	IMPORT "gtk_text_iter_forward_find_char(long,void*,void*,void*)" FROM lib$ TYPE int
+	IMPORT "gtk_text_iter_inside_word(long)" FROM lib$ TYPE int
+	IMPORT "gtk_text_iter_starts_word(long)" FROM lib$ TYPE int
+	IMPORT "gtk_text_iter_get_line(long)" FROM lib$ TYPE int
+	IMPORT "gtk_text_iter_get_line_offset(long)" FROM lib$ TYPE int
+	IMPORT "gtk_text_iter_set_line(long, int)" FROM lib$ TYPE void
+	IMPORT "gtk_text_iter_set_line_offset(long, int)" FROM lib$ TYPE void
+	IMPORT "gtk_text_view_buffer_to_window_coords(long,int,int,int,long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_text_view_get_iter_location(long,long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_text_view_new_with_buffer(long)" FROM lib$ TYPE long
+	IMPORT "gtk_text_view_scroll_mark_onscreen(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_text_view_scroll_to_mark(long,long,double,int,double,double)" FROM lib$ TYPE void
+	IMPORT "gtk_text_view_set_editable(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_text_view_set_pixels_above_lines(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_text_view_set_wrap_mode(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_toggle_button_get_active(long)" FROM lib$ TYPE int
+	IMPORT "gtk_toggle_button_set_active(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_separator_tool_item_new(void)" FROM lib$ TYPE long
+	IMPORT "gtk_toolbar_insert(long,long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_toolbar_new(void)" FROM lib$ TYPE long
+	IMPORT "gtk_tool_button_new(long,char*)" FROM lib$ TYPE long
+	IMPORT "gtk_tool_button_new_from_stock(char*)" FROM lib$ TYPE long
+	IMPORT "gtk_tool_button_set_icon_widget(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_vbox_new(int,int)" FROM lib$ TYPE long
+	IMPORT "gtk_widget_add_accelerator(long,char*,long,int,int,int)" FROM lib$ TYPE void
+	IMPORT "gtk_widget_destroy(long)" FROM lib$ TYPE void
+	IMPORT "gtk_widget_get_parent(long)" FROM lib$ TYPE long
+	IMPORT "gtk_widget_get_visible(long)" FROM lib$ TYPE int
+	IMPORT "gtk_widget_grab_focus(long)" FROM lib$ TYPE void
+	IMPORT "gtk_widget_hide(long)" FROM lib$ TYPE void
+	IMPORT "gtk_widget_hide_on_delete(long)" FROM lib$ TYPE int
+	IF Gtk_Version$ = "gtk2" THEN
+		IMPORT "gtk_widget_modify_base(long,int,long)" FROM lib$ TYPE void
+	ELSE
+		IMPORT "gdk_rgba_to_string(long)" FROM lib$ TYPE char*
+		IMPORT "gtk_css_provider_new(void)" FROM lib$ TYPE long
+		IMPORT "gtk_css_provider_load_from_data(long, char*, int, void*)" FROM lib$ TYPE char
+		IMPORT "gtk_widget_get_style_context(long)" FROM lib$ TYPE long
+		IMPORT "gtk_style_context_add_provider(long, long, int)" FROM lib$ TYPE void
+	ENDIF
+	IMPORT "gtk_widget_modify_bg(long,int,long)" FROM lib$ TYPE void
+	IMPORT "gtk_widget_modify_font(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_widget_set_name(long,char*)" FROM lib$ TYPE void
+	IMPORT "gtk_widget_set_sensitive(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_widget_set_size_request(long,int,int)" FROM lib$ TYPE void
+	IMPORT "gtk_widget_set_tooltip_text(long,char*)" FROM lib$ TYPE void
+	IMPORT "gtk_widget_show_all(long)" FROM lib$ TYPE void
+	IMPORT "gtk_widget_translate_coordinates(long,long,int,int,long,long)" FROM lib$ TYPE int
+	IMPORT "gtk_window_add_accel_group(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_window_get_position(long,long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_window_get_size(long,long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_window_get_title(long)" FROM lib$ TYPE char*
+	IMPORT "gtk_window_move(long,int,int)" FROM lib$ TYPE void
+	IMPORT "gtk_window_new(int)" FROM lib$ TYPE long
+	IMPORT "gtk_window_present(long)" FROM lib$ TYPE void
+	IMPORT "gtk_window_set_default_size(long,int,int)" FROM lib$ TYPE void
+	IMPORT "gtk_window_set_icon_name(long,char*)" FROM lib$ TYPE void
+	IMPORT "gtk_window_set_icon_from_file(long,char*,void*)" FROM lib$ TYPE void
+	IMPORT "gtk_window_set_position(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_window_set_resizable(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_window_set_title(long,char*)" FROM lib$ TYPE void
+	IMPORT "gtk_window_set_transient_for(long,long)" FROM lib$ TYPE void
+
+	EXIT SUB
+
+	LABEL Print_Error
+		EPRINT "Gtk library for '" & Gtk_Version$ & "' not found! Exiting..."
+		END
+
+ENDSUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Let's get the GtkSource library
+SUB Find_GtkSource_Library
+
+	LOCAL lib$
+	LOCAL sequence = -1
+
+	CATCH GOTO Redo_Import
+
+	IF INSTR(OS$, "Darwin") THEN
+		lib$ = "/opt/local/lib/libgtksourceview-2.0.0.dylib"
+		IF NOT(FILEEXISTS(lib$)) THEN
+			lib$ = "/Library/Frameworks/Gtk.framework/Libraries/libgtksourceview-2.0.0.dylib"
+		END IF
+	END IF
+
+	LABEL Redo_Import
+		INCR sequence
+		IF sequence = MAX_LIB_SEQ THEN
+			GOSUB Print_Error
+			sequence = 0
+		ENDIF
+		IF NOT(INSTR(lib$, "dylib")) THEN
+			IF Gtk_Version$ = "gtk2" THEN
+				lib$ = "libgtksourceview-2.0.so." & STR$(sequence)
+			ELSE
+				lib$ = "libgtksourceview-3.0.so." & STR$(sequence)
+			ENDIF
+		ENDIF
+		IMPORT "gtk_source_buffer_new_with_language(long)" FROM lib$ TYPE long
+
+	IMPORT "gtk_source_buffer_can_redo(long)" FROM lib$ TYPE int
+	IMPORT "gtk_source_buffer_can_undo(long)" FROM lib$ TYPE int
+	IMPORT "gtk_source_buffer_set_highlight_matching_brackets(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_source_buffer_redo(long)" FROM lib$ TYPE void
+	IMPORT "gtk_source_buffer_undo(long)" FROM lib$ TYPE void
+	IMPORT "gtk_source_language_manager_get_default" FROM lib$ TYPE long
+	IMPORT "gtk_source_language_manager_get_language(long,char*)" FROM lib$ TYPE long
+	IMPORT "gtk_source_view_get_tab_width(long)" FROM lib$ TYPE int
+	IMPORT "gtk_source_view_new_with_buffer(long)" FROM lib$ TYPE long
+	IMPORT "gtk_source_view_set_auto_indent(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_source_view_get_highlight_current_line(long)" FROM lib$ TYPE int
+	IMPORT "gtk_source_view_set_highlight_current_line(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_source_view_set_show_line_numbers(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_source_view_set_tab_width(long,int)" FROM lib$ TYPE void
+	IMPORT "gtk_source_style_scheme_manager_get_scheme_ids(long)" FROM lib$ TYPE const char* const*
+	IMPORT "gtk_source_style_scheme_manager_get_default(void)" FROM lib$ TYPE long
+	IMPORT "gtk_source_style_scheme_manager_get_scheme(long,char*)" FROM lib$ TYPE long
+	IMPORT "gtk_source_buffer_set_style_scheme(long,long)" FROM lib$ TYPE void
+	IMPORT "gtk_source_buffer_get_style_scheme(long)" FROM lib$ TYPE long
+	IMPORT "gtk_source_style_scheme_get_id(long)" FROM lib$ TYPE char* ALIAS gtk_source_style_scheme_get_id$
+
+	EXIT SUB
+
+	LABEL Print_Error
+		IF Gtk_Version$ = "gtk2" THEN
+			EPRINT "GtkSourceView library for '" & Gtk_Version$ & "' not found! Trying GTK3..."
+			Gtk_Version$ = "gtk3"
+			Config_Path$ = "/.local/share/gtksourceview-3.0/language-specs"
+			RETURN
+		ELSE
+			EPRINT "GtkSourceView library for '" & Gtk_Version$ & "' not found! Exiting..."
+			END
+		ENDIF
+
+ENDSUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Let's get the Gdk library
+SUB Find_Gdk_Library
+
+	LOCAL lib$
+	LOCAL sequence = -1
+
+	CATCH GOTO Redo_Import
+
+	IF INSTR(OS$, "Darwin") THEN
+		lib$ = "/opt/local/lib/libgdk-x11-2.0.0.dylib"
+		IF NOT(FILEEXISTS(lib$)) THEN
+			lib$ = "/Library/Frameworks/Gtk.framework/Libraries/libgdk-quartz-2.0.0.dylib"
+		END IF
+	END IF
+
+	LABEL Redo_Import
+		INCR sequence
+		IF sequence = MAX_LIB_SEQ THEN GOTO Print_Error
+		IF NOT(INSTR(lib$, "dylib")) THEN
+			IF Gtk_Version$ = "gtk2" THEN
+				lib$ = "libgdk-x11-2.0.so." & STR$(sequence)
+			ELSE
+				lib$ = "libgdk-3.so." & STR$(sequence)
+			ENDIF
+		ENDIF
+		IMPORT "gdk_atom_intern(char*,int)" FROM lib$ TYPE long
+
+	IMPORT "gdk_color_parse(char*,long)" FROM lib$ TYPE int
+	IMPORT "gdk_keyval_from_name(char*)" FROM lib$ TYPE int
+	IMPORT "gdk_screen_get_default" FROM lib$ TYPE long
+	IMPORT "gdk_screen_height(long)" FROM lib$ TYPE int
+	IMPORT "gdk_window_at_pointer(long,long)" FROM lib$ TYPE long
+	IMPORT "gdk_window_get_pointer(long,long,long,long)" FROM lib$ TYPE long
+
+	GLOBAL RECORD GdkRect
+		LOCAL x, y, w, h TYPE int
+	END RECORD
+
+	EXIT SUB
+
+	LABEL Print_Error
+		EPRINT "Gdk library not found!"
+		END
+
+ENDSUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Let's get the GtkObject library
+SUB Find_Gobject_Library
+
+	LOCAL lib$
+	LOCAL sequence = -1
+
+	CATCH GOTO Redo_Import
+
+	IF INSTR(OS$, "Darwin") THEN
+		lib$ = "/opt/local/lib/libgobject-2.0.0.dylib"
+		IF NOT(FILEEXISTS(lib$)) THEN
+			lib$ = "/Library/Frameworks/Glib.framework/Libraries/libgobject-2.0.0.dylib"
+		END IF
+	END IF
+
+	LABEL Redo_Import
+		INCR sequence
+		IF sequence = MAX_LIB_SEQ THEN GOTO Print_Error
+		IF NOT(INSTR(lib$, "dylib")) THEN lib$ = "libgobject-2.0.so." & STR$(sequence)
+		IMPORT "g_signal_connect_data(long,char*,void*,long,long,int)" FROM lib$ TYPE void
+
+	IMPORT "g_object_get(long,char*,...)" FROM lib$ TYPE void
+	IMPORT "g_object_set(long,char*,...)" FROM lib$ TYPE void
+
+	EXIT SUB
+
+	LABEL Print_Error
+		EPRINT "Gobject library not found!"
+		END
+
+ENDSUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Let's get the GtkObject library
+SUB Find_Gdkpixbuf_Library
+
+	LOCAL lib$
+	LOCAL sequence = -1
+
+	CATCH GOTO Redo_Import
+
+	IF INSTR(OS$, "Darwin") THEN
+		lib$ = "/opt/local/lib/libgdk_pixbuf-2.0.0.dylib"
+		IF NOT(FILEEXISTS(lib$)) THEN
+			lib$ = "/Library/Frameworks/Glib.framework/Libraries/libgdk_pixbuf-2.0.0.dylib"
+		END IF
+	END IF
+
+	LABEL Redo_Import
+		INCR sequence
+		IF sequence = MAX_LIB_SEQ THEN GOTO Print_Error
+		IF NOT(INSTR(lib$, "dylib")) THEN lib$ = "libgdk_pixbuf-2.0.so." & STR$(sequence)
+		IMPORT "gdk_pixbuf_new_from_file(char*,void*)" FROM lib$ TYPE void*
+
+	EXIT SUB
+
+	LABEL Print_Error
+		EPRINT "Gdkpixbuf library not found!"
+		END
+
+ENDSUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Let's get the Pango library
+SUB Find_Pango_Library
+
+	LOCAL lib$
+	LOCAL sequence = -1
+
+	CATCH GOTO Redo_Import
+
+	IF INSTR(OS$, "Darwin") THEN
+		lib$ = "/opt/local/lib/libpango-1.0.0.dylib"
+		IF NOT(FILEEXISTS(lib$)) THEN
+			lib$ = "/Library/Frameworks/Gtk.framework/Libraries/libpango-1.0.0.dylib"
+		END IF
+	END IF
+
+	LABEL Redo_Import
+		INCR sequence
+		IF sequence = MAX_LIB_SEQ THEN GOTO Print_Error
+		IF NOT(INSTR(lib$, "dylib")) THEN lib$ = "libpango-1.0.so." & STR$(sequence)
+		IMPORT "pango_font_description_from_string(char*)" FROM lib$ TYPE long
+
+	IMPORT "pango_font_description_free(long)" FROM lib$ TYPE void
+
+	EXIT SUB
+
+	LABEL Print_Error
+		EPRINT "Pango library not found!"
+		END
+
+ENDSUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Let's get the Webkit library
+SUB Find_Webkit_Library
+
+	LOCAL lib$, name$
+	LOCAL sequence = -1
+
+	IF Gtk_Version$ = "gtk2" THEN
+		name$ = "libwebkitgtk-1.0.so."
+	ELSE
+		name$ = "libwebkitgtk-3.0.so."
+	ENDIF
+	CATCH GOTO Redo_Import
+
+	g_LIBGTKWEBKIT = 1
+
+	IF INSTR(OS$, "Darwin") THEN
+		lib$ = "/opt/local/lib/libwebkitgtk-1.0.dylib"
+		IF NOT(FILEEXISTS(lib$)) THEN
+			lib$ = "/Library/Frameworks/Gtk.framework/Libraries/libwebkitgtk-quartz-1.0.dylib"
+		END IF
+	END IF
+
+	LABEL Redo_Import
+		INCR sequence
+		IF sequence = MAX_LIB_SEQ THEN
+			IF name$ = "libwebkitgtk-3.0.so." THEN
+				EPRINT "Webkit library for '" & Gtk_Version$ & "' not found! Trying 'webkit2gtk'..."
+				name$ = "libwebkit2gtk-4.0.so."
+				sequence = 0
+			ELSE
+				GOTO Print_Error
+			ENDIF
+		ENDIF
+		IF NOT(INSTR(lib$, "dylib")) THEN
+			lib$ = name$ & STR$(sequence)
+		ENDIF
+		IMPORT "webkit_web_view_new(void)" FROM lib$ TYPE long
+
+	IMPORT "webkit_web_view_load_uri(long,char*)" FROM lib$ TYPE void
+	IMPORT "webkit_web_view_set_settings(long,long)" FROM lib$ TYPE void
+	IF name$ = "libwebkit2gtk-4.0.so." THEN
+		IMPORT "webkit_settings_new(void)" FROM lib$ TYPE long
+		ALIAS "webkit_web_settings_new" TO "webkit_settings_new"
+	ELSE
+		IMPORT "webkit_web_settings_new(void)" FROM lib$ TYPE long
+	ENDIF
+
+	EXIT SUB
+
+	LABEL Print_Error
+		EPRINT "Warning: no suitable webkit library found!"
+		EPRINT "Please install the 'links' browser or set your favorite HTML viewer in the environment variable 'DEFAULTBROWSER' to view the documentation."
+		g_LIBGTKWEBKIT = 0
+
+ENDSUB
+
+'------------------------------------------------------------------------------------------------------------
+
+FUNCTION Update_Syntaxfile(NUMBER use_gui)
+
+	LOCAL dat$, total$, home$
+	LOCAL syntaxfile TYPE FILE*
+
+	' Update GUI
+	IF use_gui THEN CALL SYNC
+
+	home$ = GETENVIRON$("HOME")
+
+	' Fetch the latest syntaxfile
+	CALL Download_File$("http://www.basic-converter.org/bacon.lang", use_gui) TO total$
+
+	IF LEN(total$) > 0 THEN
+		' Create directories
+		MAKEDIR home$ & Config_Path$
+
+		' Save syntax file from BaCon website to correct location
+		SAVE MID$(total$, INSTR(total$, "<?xml")) TO home$ & Config_Path$ & "/bacon.lang"
+
+		RETURN TRUE
+	ELSE
+		RETURN FALSE
+	END IF
+
+END FUNCTION
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Load_Defaults
+
+	LOCAL txt$, name$, cc$, option$, lib$, inc$, mystyle$
+	LOCAL value, gdkcol, colselect, page, gdkrgba, style, desc, css, ctx
+	LOCAL amount TYPE int
+	LOCAL settings TYPE FILE*
+
+	IF FILEEXISTS(GETENVIRON$("HOME") & "/.bacon/settings.cfg") THEN
+		OPEN GETENVIRON$("HOME") & "/.bacon/settings.cfg" FOR READING AS settings
+
+		page = gtk_notebook_get_current_page(g_Notebook)
+
+		REPEAT
+			READLN txt$ FROM settings
+			SELECT HEAD$(txt$, 1)
+				CASE "indent"
+					value = VAL(LAST$(txt$, 1))
+					gtk_source_view_set_auto_indent(nbook[page].view, value)
+					gtk_check_menu_item_set_active(indent_menu, value)
+				CASE "linenr"
+					value = VAL(LAST$(txt$, 1))
+					gtk_source_view_set_show_line_numbers(nbook[page].view, value)
+					gtk_check_menu_item_set_active(linenr_menu, value)
+				CASE "wrap"
+					value = VAL(LAST$(txt$, 1))
+					gtk_text_view_set_wrap_mode(nbook[page].view, value)
+					gtk_check_menu_item_set_active(wrap_menu, value)
+				CASE "savepage"
+					value = VAL(LAST$(txt$, 1))
+					gtk_check_menu_item_set_active(page_menu, value)
+				CASE "font"
+					name$ = LAST$(txt$, 1)
+					gtk_font_selection_dialog_set_font_name(g_Font_dialog, name$)
+					desc = pango_font_description_from_string(name$)
+					gtk_widget_modify_font(nbook[page].view, desc)
+					gtk_widget_modify_font(g_Test_view1, desc)
+					pango_font_description_free(desc)
+				CASE "color"
+					name$ = LAST$(txt$, 1)
+					IF Gtk_Version$ = "gtk2" THEN
+						g_object_get(g_Color_dialog, "color-selection", ADDRESS(colselect), NULL)
+					ELSE
+						colselect = gtk_color_selection_dialog_get_color_selection(g_Color_dialog)
+					ENDIF
+					gdkcol = MEMORY(DEFAULT_WIDGET_SIZE)
+					blabla = gtk_color_selection_palette_from_string(name$, ADDRESS(gdkcol), ADDRESS(amount))
+					gtk_color_selection_set_current_color(colselect, gdkcol)
+					IF Gtk_Version$ = "gtk2" THEN
+						gtk_widget_modify_base(nbook[page].view, GTK_STATE_NORMAL, gdkcol)
+					ELSE
+						mystyle$ = "text { background-color: " & name$ & "; }"
+						css = gtk_css_provider_new()
+						gtk_css_provider_load_from_data(css, mystyle$, LEN(mystyle$), NULL)
+						ctx = gtk_widget_get_style_context(nbook[page].view)
+						gtk_style_context_add_provider(ctx, css, GTK_STYLE_PROVIDER_PRIORITY_USER)
+					ENDIF
+					FREE gdkcol
+				CASE "scheme"
+					name$ = LAST$(txt$, 1)
+					style = gtk_source_style_scheme_manager_get_scheme(g_Scheme_Manager, name$)
+					gtk_source_buffer_set_style_scheme(nbook[page].buffer, style)
+				CASE "shell"
+					name$ = LAST$(txt$, 1)
+					gtk_entry_set_text(g_Shell_entry1, IIF$(LEN(name$)>0, name$, ""))
+				CASE "compiler"
+					cc$ = LAST$(txt$, 1)
+					gtk_entry_set_text(g_Compiler_entry, IIF$(LEN(cc$)>0, cc$, ""))
+				CASE "options"
+					option$ = LAST$(txt$, 1)
+					gtk_entry_set_text(g_Options_entry, IIF$(LEN(option$)>0, option$, ""))
+				CASE "libraries"
+					lib$ = LAST$(txt$, 1)
+					gtk_entry_set_text(g_Flags_entry, IIF$(LEN(lib$)>0, lib$, ""))
+				CASE "includes"
+					inc$ = LAST$(txt$, 1)
+					gtk_entry_set_text(g_Inc_entry, IIF$(LEN(inc$)>0, inc$, ""))
+				CASE "tmpdir"
+					lib$ = LAST$(txt$, 1)
+					gtk_entry_set_text(g_Tmpdir_entry, IIF$(LEN(lib$)>0, lib$, ""))
+				CASE "window_size"
+					name$ = LAST$(txt$, 1)
+					gtk_window_set_default_size(g_Win, VAL(LEFT$(name$, INSTR(name$, "x")-1)), VAL(MID$(name$, INSTR(name$, "x")+1)))
+			ENDSELECT
+		UNTIL ENDFILE(settings)
+		CLOSE FILE settings
+	ELSE
+		' No config file found, first start
+		gtk_entry_set_text(g_Shell_entry1, "xterm -sb -geometry 132x40 -e '@; read'")
+
+		gtk_entry_set_text(g_Compiler_entry, "cc")
+
+		style = gtk_source_style_scheme_manager_get_scheme(g_Scheme_Manager, "classic")
+		gtk_source_buffer_set_style_scheme(nbook[page].buffer, style)
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Load_Files_Into_GUI
+
+	LOCAL name$, txt$
+	LOCAL value
+	LOCAL settings TYPE FILE*
+
+	IF FILEEXISTS(GETENVIRON$("HOME") & "/.bacon/settings.cfg") THEN
+
+		OPEN GETENVIRON$("HOME") & "/.bacon/settings.cfg" FOR READING AS settings
+
+		REPEAT
+			READLN txt$ FROM settings
+
+			IF LEFT$(txt$, 8) = "savepage" THEN
+				value = VAL(MID$(txt$, INSTR(txt$, " ")+1))
+				gtk_check_menu_item_set_active(page_menu, value)
+			END IF
+			IF LEFT$(txt$, 4) = "file" AND gtk_check_menu_item_get_active(page_menu) THEN
+				name$ = MID$(txt$, INSTR(txt$, " ")+1)
+				IF FILEEXISTS(name$) THEN
+					CALL Create_Page
+					CALL Load_File(name$, TRUE)
+					gtk_label_set_text(g_File_Label, "File size: " & STR$(FILELEN(name$)) & " bytes  ")
+				END IF
+			END IF
+		UNTIL ENDFILE(settings)
+
+		CLOSE FILE settings
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Save_Defaults(NUMBER save_files_also)
+
+	' String by reference needed for dialogs
+	LOCAL ptr1, ptr2 TYPE STRING
+	LOCAL colselect, gdkcol, x, xsize, ysize
+	LOCAL settings TYPE FILE*
+
+	' Temporary p$ for WRITELN
+	LOCAL p$
+
+	OPEN GETENVIRON$("HOME") & "/.bacon/settings.cfg" FOR WRITING AS settings
+
+	IF gtk_check_menu_item_get_active(indent_menu) THEN WRITELN "indent 1" TO settings
+	ELSE WRITELN "indent 0" TO settings
+
+	IF gtk_check_menu_item_get_active(linenr_menu) THEN WRITELN "linenr 1" TO settings
+	ELSE WRITELN "linenr 0" TO settings
+
+	IF gtk_check_menu_item_get_active(wrap_menu) THEN WRITELN "wrap 2" TO settings
+	ELSE WRITELN "wrap 0" TO settings
+
+	IF gtk_check_menu_item_get_active(page_menu) THEN WRITELN "savepage 1" TO settings
+	ELSE WRITELN "savepage 0" TO settings
+
+	ptr1 = gtk_font_selection_dialog_get_font_name(g_Font_dialog) : p$ = ptr1
+	WRITELN "font ", p$ TO settings
+
+	IF Gtk_Version$ = "gtk2" THEN
+		g_object_get(g_Color_dialog, "color-selection", ADDRESS(colselect), NULL)
+	ELSE
+		colselect = gtk_color_selection_dialog_get_color_selection(g_Color_dialog)
+	ENDIF
+	gdkcol = MEMORY(DEFAULT_WIDGET_SIZE)
+	gtk_color_selection_get_current_color(colselect, gdkcol)
+	ptr2 = gtk_color_selection_palette_to_string(gdkcol, 1) : p$ = ptr2
+
+	WRITELN "color ", p$ TO settings
+	FREE gdkcol
+
+	gtk_window_get_size(g_Win, ADDRESS(xsize), ADDRESS(ysize))
+	WRITELN "window_size ", xsize, "x", ysize TO settings
+
+	p$ = gtk_entry_get_text(g_Shell_entry1)
+	WRITELN "shell ", p$ TO settings
+
+	p$ = gtk_entry_get_text(g_Compiler_entry)
+	WRITELN "compiler ", p$ TO settings
+
+	p$ = gtk_entry_get_text(g_Options_entry)
+	WRITELN "options ", p$ TO settings
+
+	p$ = gtk_entry_get_text(g_Flags_entry)
+	WRITELN "libraries ", p$ TO settings
+
+	p$ = gtk_entry_get_text(g_Inc_entry)
+	WRITELN "includes ", p$ TO settings
+
+	p$ = gtk_entry_get_text(g_Tmpdir_entry)
+	WRITELN "tmpdir ", p$ TO settings
+
+	p$ = gtk_source_style_scheme_get_id$(gtk_source_buffer_get_style_scheme(nbook[0].buffer))
+	WRITELN "scheme ", p$ TO settings
+
+	' Save current pages
+	IF save_files_also = TRUE AND gtk_check_menu_item_get_active(page_menu) THEN
+		FOR x = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+			IF LEN(nbook[x].title$) > 0 THEN WRITELN "file ", nbook[x].title$ TO settings
+		NEXT
+	END IF
+
+	CLOSE FILE settings
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+FUNCTION Get_Contents$
+
+	LOCAL iter1, iter2, page
+	LOCAL text$
+
+	iter1 = MEMORY(DEFAULT_WIDGET_SIZE)
+	iter2 = MEMORY(DEFAULT_WIDGET_SIZE)
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+	gtk_text_buffer_get_bounds(nbook[page].buffer, iter1, iter2)
+	text$ = gtk_text_buffer_get_text(nbook[page].buffer, iter1, iter2, 1)
+
+	FREE iter1, iter2
+
+	RETURN text$
+
+END FUNCTION
+
+'------------------------------------------------------------------------------------------------------------
+
+' Update statusbar with message
+SUB Statusbar_Msg(STRING txt)
+
+	gtk_statusbar_pop(g_Statusbar, g_Msgcid)
+	gtk_statusbar_push(g_Statusbar, g_Msgcid, txt)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Callback for OPEN file
+SUB Open_File
+
+	LOCAL page
+	LOCAL title$
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+
+	IF page >= 0 THEN
+		title$ = gtk_label_get_text(nbook[page].label)
+
+		IF LEFT$(title$, 1) = "*" AND NOT(g_OPEN_PAGE) THEN
+			IF Run_Dialog(GTK_MESSAGE_WARNING, GTK_BUTTONS_YES_NO, "Save program '" & MID$(title$, 3) & "' ?", -1) = GTK_RESPONSE_YES THEN
+				CALL Save_File
+			END IF
+		END IF
+	END IF
+
+	gtk_widget_show_all(g_File_dialog)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Callback to hide a widget from "clicked" signal
+SUB Hide_Dialog(NUMBER widget, NUMBER dialog)
+
+	gtk_widget_hide(dialog)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Activate_Button(NUMBER widget, NUMBER button)
+
+	gtk_widget_grab_focus(button)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Load_File(STRING name$, NUMBER as_file)
+
+	LOCAL buffer, filelen, iter, page
+	LOCAL str$
+
+	iter = MEMORY(DEFAULT_WIDGET_SIZE)
+
+	' Get current page
+	page = gtk_notebook_get_current_page(g_Notebook)
+
+	IF as_file THEN
+		filelen = FILELEN(name$)
+
+		IF filelen > 0 THEN
+			buffer = MEMORY(filelen)
+
+			OPEN name$ FOR READING AS fh
+			GETBYTE buffer FROM fh SIZE filelen
+			CLOSE FILE fh
+
+			OPEN buffer FOR MEMORY AS str$
+			gtk_text_buffer_set_text(nbook[page].buffer, str$, -1)
+			CLOSE MEMORY str$
+
+			FREE buffer
+
+			' Remove last CR from buffer
+			gtk_text_buffer_get_end_iter(nbook[page].buffer, iter)
+		END IF
+
+		gtk_label_set_text(nbook[page].label, MID$(name$, INSTRREV(name$, "/")+1) )
+		nbook[page].title$ = name$
+		Statusbar_Msg("File '" & name$ & "' loaded successfully.")
+	ELSE
+		gtk_text_buffer_set_text(nbook[page].buffer, name$, -1)
+
+		' Remove last CR from buffer
+		gtk_text_buffer_get_end_iter(nbook[page].buffer, iter)
+
+		gtk_label_set_text(nbook[page].label, "* New" )
+		nbook[page].title$ = ""
+		Statusbar_Msg("Data loaded successfully.")
+	END IF
+
+	' Put cursor to the beginning of the file
+	gtk_text_buffer_get_start_iter(nbook[page].buffer, iter)
+	gtk_text_buffer_place_cursor(nbook[page].buffer, iter)
+
+	FREE iter
+
+	Save_Defaults(TRUE)
+
+	IF FILEEXISTS(nbook[page].title$) THEN gtk_label_set_text(g_File_Label, "File size: " & STR$(FILELEN(nbook[page].title$)) & " bytes  ")
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Handle dialog actions
+SUB Handle_Open_Dialog(NUMBER widget, int action)
+
+	LOCAL name TYPE STRING
+	LOCAL response
+
+	IF action = GTK_RESPONSE_ACCEPT THEN
+		gtk_widget_hide(g_File_dialog)
+		name = gtk_file_chooser_get_filename(g_File_dialog)
+		IF g_OPEN_PAGE THEN
+			CALL Create_Page
+			g_OPEN_PAGE = FALSE
+		END IF
+		Load_File(name, TRUE)
+		FREE name
+	ELIF action = GTK_RESPONSE_APPLY THEN
+		name = gtk_file_chooser_get_filename(g_File_dialog)
+		response = Run_Dialog(GTK_MESSAGE_WARNING, GTK_BUTTONS_YES_NO, "Delete file '" & name & "'?", -1)
+		IF response = GTK_RESPONSE_YES THEN
+			DELETE FILE name
+		END IF
+		FREE name
+	ELSE
+		gtk_widget_hide(g_File_dialog)
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Callback for SAVE file
+SUB Save_File
+
+	LOCAL page, response
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+
+	IF LEN(nbook[page].title$) > 0 THEN
+		SAVE Get_Contents$() TO nbook[page].title$
+
+		gtk_label_set_text(nbook[page].label, MID$(nbook[page].title$, INSTRREV(nbook[page].title$, "/")+1) )
+		Statusbar_Msg("Current code saved to '" & nbook[page].title$ & "'.")
+	ELSE
+		response = gtk_dialog_run(g_Save_dialog)
+	END IF
+
+	Save_Defaults(TRUE)
+
+	IF FILEEXISTS(nbook[page].title$) THEN gtk_label_set_text(g_File_Label, "File size: " & STR$(FILELEN(nbook[page].title$)) & " bytes  ")
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Callback for SAVE AS
+SUB Save_Fileas
+
+	LOCAL page
+	LOCAL title$
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+
+	IF LEN(nbook[page].title$) > 0 THEN
+		IF LEFT$(nbook[page].title$, 2) = "* " THEN
+			title$ = MID$(nbook[page].title$, 3)
+		ELSE
+			title$ = nbook[page].title$
+		END IF
+		gtk_file_chooser_set_filename(g_Save_dialog, title$)
+	END IF
+
+	gtk_widget_show_all(g_Save_dialog)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Export_File
+
+	LOCAL page
+	LOCAL html$
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+
+	IF LEN(nbook[page].title$) > 0 THEN
+		IF ISTRUE(LEN(EXEC$("which enscript 2>/dev/null"))) THEN
+			html$ = REPLACE$(EXEC$("enscript --color --style=emacs --language=html --highlight=bacon --title=" & BASENAME$(nbook[page].title$) & " " & nbook[page].title$ & " -p - 2>/dev/null"), CHR$(9), SPC$(4))
+			OPEN nbook[page].title$ & ".html" FOR WRITING AS sourcefile
+			WRITELN REPLACE$(html$, nbook[page].title$, BASENAME$(nbook[page].title$)) TO sourcefile
+			CLOSE FILE sourcefile
+			Statusbar_Msg("Current code saved to '" & nbook[page].title$ & ".html'.")
+			CALL Run_Dialog(GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, NL$ & "Created HTML file '" & BASENAME$(nbook[page].title$) & ".html'.", -1)
+		ELSE
+			CALL Run_Dialog(GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, NL$ & "The 'enscript' utility was not found on your system!", -1)
+		ENDIF
+	ENDIF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Handle SAVE AS dialog actions
+SUB Handle_Save_Dialog(NUMBER widget, int action)
+
+	LOCAL page
+	LOCAL response TYPE int
+
+	' Define by reference
+	LOCAL name TYPE STRING
+
+	gtk_widget_hide(g_Save_dialog)
+
+	IF action = GTK_RESPONSE_ACCEPT THEN
+		name = gtk_file_chooser_get_filename(widget)
+
+		IF FILEEXISTS(name) THEN
+			response = Run_Dialog(GTK_MESSAGE_WARNING, GTK_BUTTONS_YES_NO, "Overwrite existing '" & MID$(name, INSTRREV(name, "/")+1) & "'?", -1)
+		ELSE
+			response = GTK_RESPONSE_YES
+		END IF
+
+		IF response = GTK_RESPONSE_YES THEN
+			OPEN name FOR WRITING AS sourcefile
+			WRITELN Get_Contents$() TO sourcefile
+			CLOSE FILE sourcefile
+
+			page = gtk_notebook_get_current_page(g_Notebook)
+
+			gtk_label_set_text(nbook[page].label, MID$(name, INSTRREV(name, "/")+1) )
+			Statusbar_Msg("Current code saved to '" & name & "'.")
+
+			nbook[page].title$ = name
+		ELSE
+			Statusbar_Msg("Save cancelled.")
+		END IF
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Set_Indent
+
+	LOCAL x
+
+	FOR x = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+		gtk_source_view_set_auto_indent(nbook[x].view, gtk_check_menu_item_get_active(indent_menu))
+	NEXT
+
+	Save_Defaults(FALSE)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Set_Linenr
+
+	LOCAL x
+
+	FOR x = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+		gtk_source_view_set_show_line_numbers(nbook[x].view, gtk_check_menu_item_get_active(linenr_menu))
+	NEXT
+
+	Save_Defaults(FALSE)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' At each keystroke set title to 'changed'
+SUB Set_Changed
+
+	LOCAL title$
+	LOCAL page
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+	title$ = gtk_label_get_text(nbook[page].label)
+
+	IF LEFT$(title$, 1) <> "*" THEN
+		gtk_label_set_text(nbook[page].label, "* " & title$ )
+	END IF
+
+	CALL Run_Info(0)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Init_Info
+
+	LOCAL doc TYPE FILE*
+	LOCAL txt$, line$, key$
+
+	' Prepare context info
+	IF FILEEXISTS(g_DOC_LOCATION$ & "documentation.txt") THEN
+		OPEN g_DOC_LOCATION$ & "documentation.txt" FOR READING AS doc
+		REPEAT
+			READLN txt$ FROM doc
+		UNTIL INSTR(txt$, "Overview of BaCon statements and functions")
+		' Start of doc
+		REPEAT
+			READLN txt$ FROM doc
+		UNTIL LEFT$(txt$, 2) = "  "
+		txt$ = REPLACE$(CHOP$(txt$), "&", "&amp;")
+		txt$ = REPLACE$(txt$, "<", "&lt;")
+		txt$ = REPLACE$(txt$, ">", "&gt;")
+		' Needed for spaces in statements like DEF FN
+		key$ = txt$
+		IF INSTR(txt$, CHR$(32)) THEN txt$ = LEFT$(txt$, INSTR(txt$, CHR$(32))-1)
+		' Create body of doc
+		WHILE TRUE
+			ctx_info$(txt$) = "<b>" & key$ & "</b>" & NL$ & "<small>"
+			WHILE TRUE
+				READLN line$ FROM doc
+				IF LEFT$(line$, 2) = "  " AND MID$(line$, 3, 1) <> " " THEN BREAK
+				IF INSTR(line$, "Appendix") THEN BREAK 2
+				line$ = REPLACE$(line$, "&", "&amp;")
+				line$ = REPLACE$(line$, "<", "&lt;")
+				line$ = REPLACE$(line$, ">", "&gt;")
+				ctx_info$(txt$) = ctx_info$(txt$) & line$ & NL$
+			WEND
+			' Get rid of last NL and finalize small
+			ctx_info$(txt$) = CHOP$(ctx_info$(txt$)) & "</small>"
+			txt$ = CHOP$(line$)
+			' Needed for spaces in statements like DEF FN
+			key$ = txt$
+			IF INSTR(txt$, CHR$(32)) THEN txt$ = LEFT$(txt$, INSTR(txt$, CHR$(32))-1)
+		WEND
+		ctx_info$(txt$) = CHOP$(ctx_info$(txt$)) & "</small>"
+		CLOSE FILE doc
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+' Help function to recognize a BaCon function name ending with '$'
+
+FUNCTION End_Word(int ch, data) TYPE int
+
+	IF ch <> 36 AND NOT(REGEX(CHR$(ch), "[[:alnum:]]")) THEN RETURN TRUE
+
+	RETURN FALSE
+
+END FUNCTION
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Run_Info(NUMBER which)
+
+	LOCAL page, pos, start_iter, end_iter, xpos, ypos, xwin, ywin, adj, xrel, yrel, buffer, view, win
+	LOCAL txt$
+
+	IF which = 0 THEN
+		page = gtk_notebook_get_current_page(g_Notebook)
+		buffer = nbook[page].buffer
+		view = nbook[page].view
+		win = g_Win
+	ELSE
+		buffer = g_Test_buffer1
+		view = g_Test_view1
+		win = g_Test
+	ENDIF
+
+	IF gtk_check_menu_item_get_active(context_menu) THEN
+		' Check if cached documentation exists, if not get it
+		IF NOT(FILEEXISTS(g_DOC_LOCATION$ & "documentation.txt")) THEN CALL Get_Docu
+
+		g_object_get(buffer, "cursor-position", ADDRESS(pos), NULL)
+
+		start_iter = MEMORY(DEFAULT_WIDGET_SIZE)
+		gtk_text_buffer_get_iter_at_offset(buffer, start_iter, pos)
+
+		end_iter = MEMORY(DEFAULT_WIDGET_SIZE)
+		gtk_text_buffer_get_iter_at_offset(buffer, end_iter, pos)
+
+		' Determine position of context help window
+		IF gtk_text_iter_inside_word(start_iter) OR gtk_text_iter_ends_word(start_iter) THEN
+			IF NOT(gtk_text_iter_starts_word(start_iter)) THEN gtk_text_iter_backward_word_start(start_iter)
+			' Goto end of word
+			gtk_text_iter_forward_find_char(end_iter, (void*)End_Word, NULL, NULL)
+			' Get text
+			txt$ = UCASE$(gtk_text_buffer_get_text(buffer, start_iter, end_iter, 1))
+			IF LEN(ctx_info$(txt$)) > 0 THEN
+				gtk_label_set_markup(g_Inf_Label, ctx_info$(txt$))
+				' Get location for popup window
+				gtk_text_view_get_iter_location(view, end_iter, ADDRESS(GdkRect))
+				gtk_text_view_buffer_to_window_coords(view, 1, GdkRect.x, GdkRect.y, ADDRESS(xpos), ADDRESS(ypos))
+				gtk_widget_translate_coordinates(view, win, xpos, ypos, ADDRESS(xrel), ADDRESS(yrel))
+				gtk_window_get_position(win, ADDRESS(xwin), ADDRESS(ywin))
+				IF ywin+ypos > gdk_screen_height(gdk_screen_get_default())/2 THEN
+					gtk_window_move(g_Info, xwin+xrel+5, ywin+yrel+2*GdkRect.h-G_INFO_HEIGHT)
+				ELSE
+					gtk_window_move(g_Info, xwin+xrel+5, ywin+yrel+2*GdkRect.h)
+				FI
+				adj = gtk_scrolled_window_get_hadjustment(g_Scroll)
+				gtk_adjustment_set_value(adj, 0.0)
+				adj = gtk_scrolled_window_get_vadjustment(g_Scroll)
+				gtk_adjustment_set_value(adj, 0.0)
+				gtk_window_present(g_Info)
+			ELSE
+				gtk_widget_hide(g_Info)
+			END IF
+		ELSE
+			gtk_widget_hide(g_Info)
+		END IF
+
+		FREE end_iter, start_iter
+	ELSE
+		gtk_widget_hide(g_Info)
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+FUNCTION Hide_Context
+
+	gtk_widget_hide(g_Info)
+
+	RETURN FALSE
+
+END FUNCTION
+
+'------------------------------------------------------------------------------------------------------------
+
+FUNCTION Cursor_Changed(NUMBER widget, NUMBER event, NUMBER type)
+
+	LOCAL view, page, start_iter, curs_iter, mark, pos
+	LOCAL text$
+
+	start_iter = MEMORY(DEFAULT_WIDGET_SIZE)
+	curs_iter = MEMORY(DEFAULT_WIDGET_SIZE)
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+	IF page = -1 THEN EXIT SUB
+
+	view = nbook[page].view
+
+	IF gtk_source_view_get_highlight_current_line(view) THEN gtk_source_view_set_highlight_current_line(view, 0)
+
+	' Cursor position
+	mark = gtk_text_buffer_get_insert(nbook[page].buffer)
+	gtk_text_buffer_get_iter_at_mark(nbook[page].buffer, curs_iter, mark)
+	gtk_text_buffer_get_iter_at_mark(nbook[page].buffer, start_iter, mark)
+	gtk_text_iter_set_line_offset(start_iter, 0)
+
+	' Count tabs
+	text$ = gtk_text_buffer_get_text(nbook[page].buffer, start_iter, curs_iter, 0)
+	width = gtk_source_view_get_tab_width(view)-1
+
+	pos = gtk_text_iter_get_line_offset(curs_iter)
+	gtk_label_set_text(g_Status_Label, "Column: " & STR$(pos+1+COUNT(text$, 9)*width) & "   ")
+
+	FREE start_iter, curs_iter
+
+	Run_Info(type)
+
+	IF FILEEXISTS(nbook[page].title$) THEN
+		gtk_label_set_text(g_File_Label, "File size: " & STR$(FILELEN(nbook[page].title$)) & " bytes  ")
+	ELSE
+		gtk_label_set_text(g_File_Label, "File size: 0 bytes  ")
+	ENDIF
+
+	CALL Statusbar_Msg("File name: " & nbook[page].title$)
+
+	RETURN FALSE
+
+ENDFUNCTION
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Set_Wrapmode
+
+	LOCAL x
+
+	IF gtk_check_menu_item_get_active(wrap_menu) THEN
+		FOR x = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+			gtk_text_view_set_wrap_mode(nbook[x].view, GTK_WRAP_WORD)
+		NEXT
+	ELSE
+		FOR x = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+			gtk_text_view_set_wrap_mode(nbook[x].view, GTK_WRAP_NONE)
+		NEXT
+	ENDIF
+
+	Save_Defaults(FALSE)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Handle FONT selection
+SUB Handle_Font_Dialog(NUMBER widget, int action)
+
+	LOCAL name TYPE STRING
+	LOCAL desc, x
+
+	IF action = GTK_RESPONSE_CANCEL OR action = GTK_RESPONSE_OK THEN gtk_widget_hide(g_Font_dialog)
+
+	IF action = GTK_RESPONSE_OK OR action = GTK_RESPONSE_APPLY THEN
+		name = gtk_font_selection_dialog_get_font_name(g_Font_dialog)
+		desc = pango_font_description_from_string(name)
+
+		FOR x = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+			gtk_widget_modify_font(nbook[x].view, desc)
+			gtk_widget_modify_font(g_Test_view1, desc)
+		NEXT
+
+		pango_font_description_free(desc)
+		Statusbar_Msg("Font has been changed to '" & name & "'.")
+
+		Save_Defaults(FALSE)
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Handle COLOR selection
+SUB Handle_Color_Dialog(NUMBER widget, int action)
+
+	LOCAL colselect, gdkcol, npage, gdkrgba, css, ctx
+	LOCAL mystyle$, color$
+
+	gtk_widget_hide(g_Color_dialog)
+
+	IF action = GTK_RESPONSE_OK THEN
+		IF Gtk_Version$ = "gtk2" THEN
+			g_object_get(g_Color_dialog, "color-selection", ADDRESS(colselect), NULL)
+			gdkcol = MEMORY(DEFAULT_WIDGET_SIZE)
+			gtk_color_selection_get_current_color(colselect, gdkcol)
+			FOR npage = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+				gtk_widget_modify_base(nbook[npage].view, GTK_STATE_NORMAL, gdkcol)
+			NEXT
+			FREE gdkcol
+		ELSE
+			colselect = gtk_color_selection_dialog_get_color_selection(g_Color_dialog)
+			gdkrgba = MEMORY(DEFAULT_WIDGET_SIZE)
+			gtk_color_selection_get_current_rgba(colselect, gdkrgba)
+			color$ = gdk_rgba_to_string(gdkrgba)
+			mystyle$ = "text { background-color: " & color$ & "; }"
+			css = gtk_css_provider_new()
+			gtk_css_provider_load_from_data(css, mystyle$, LEN(mystyle$), NULL)
+			FOR npage = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+				ctx = gtk_widget_get_style_context(nbook[npage].view)
+				gtk_style_context_add_provider(ctx, css, GTK_STYLE_PROVIDER_PRIORITY_USER)
+			NEXT
+			FREE gdkrgba
+		ENDIF
+		Statusbar_Msg("Color was successfully changed.")
+		Save_Defaults(FALSE)
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Handle PRINT selection
+SUB Handle_Print_Dialog(NUMBER widget)
+
+	LOCAL page
+	LOCAL command$
+
+	gtk_widget_hide(g_Print_dialog)
+
+	CALL Save_File
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+	command$ = gtk_combo_box_get_active_text(g_Print_combo)
+
+	IF LEN(command$) = 0 OR command$ = "No printing system found" THEN
+		CALL Run_Dialog(GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "Unable to print document!\n\nNo printing system available.", -1)
+	ELSE
+		IF ISTRUE(LEN(EXEC$("which enscript 2>/dev/null"))) THEN
+			IF gtk_toggle_button_get_active(g_Print_check2) THEN command$ = command$ & " --landscape"
+			IF gtk_toggle_button_get_active(g_Print_check3) THEN command$ = command$ & " --media=A4"
+			ELSE command$ = command$ & " --media=letter"
+			IF gtk_toggle_button_get_active(g_Print_check5) THEN command$ = command$ & " --line-numbers"
+			IF INSTR(command$, "PDF") THEN
+				Statusbar_Msg("Creating PDF file '" & nbook[page].title$ & ".pdf'.")
+				SYSTEM "enscript --color --tabsize=4 --no-header --style=emacs --highlight=bacon " & MID$(command$, INSTR(command$, "PDF")+1) & " " & nbook[page].title$ & " -p - 2>/dev/null | ps2pdf - " & nbook[page].title$ & ".pdf 2>/dev/null"
+			ELSE
+				Statusbar_Msg("Sending PostScript to printer '" & LEFT$(command$, INSTR(command$, " ")-1) & "'.")
+				SYSTEM "enscript --color --tabsize=4 --no-header --style=emacs --highlight=bacon " & nbook[page].title$ & " -d " & command$ & " >/dev/null 2>&1"
+			FI
+		ELIF ISTRUE(LEN(EXEC$("which lp 2>/dev/null"))) THEN
+			IF gtk_toggle_button_get_active(g_Print_check2) THEN command$ = command$ & " -o landscape"
+			IF gtk_toggle_button_get_active(g_Print_check3) THEN command$ = command$ & " -o media=A4"
+			ELSE command$ = command$ & " -o media=letter"
+			Statusbar_Msg("Sending plain text to printer '" & LEFT$(command$, INSTR(command$, " ")-1) & "'.")
+			IF gtk_toggle_button_get_active(g_Print_check5) THEN
+				SYSTEM "cat -n " & nbook[page].title$ & " | lp -d " & command$
+			ELSE
+				SYSTEM "lp -d " & command$ & " " & nbook[page].title$
+			ENDIF
+		ENDIF
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Update syntax file
+SUB Get_Syntax
+
+	IF Update_Syntaxfile(1) THEN CALL Run_Dialog(GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "The BaCon language file was updated successfully!\n\n\tRestart the GUI to activate the changes.", -1)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Update documentation file
+SUB Get_Docu
+
+	LOCAL doc TYPE FILE*
+	LOCAL total$
+
+	total$ = Download_File$("http://www.basic-converter.org/documentation.txt", TRUE)
+
+	IF LEN(total$) > 0 THEN
+		SAVE total$ TO g_DOC_LOCATION$ & "documentation.txt"
+		CALL Init_Info
+
+		total$ = Download_File$("http://www.basic-converter.org/documentation.html", TRUE)
+
+		' Save documentation
+		IF LEN(total$) > 0 THEN
+			SAVE total$ TO g_DOC_LOCATION$ & "documentation.html"
+			SAVE Download_File$("http://www.basic-converter.org/doc_frame.html", TRUE) TO g_DOC_LOCATION$ & "doc_frame.html"
+			SAVE Download_File$("http://www.basic-converter.org/doc_index.html", TRUE) TO g_DOC_LOCATION$ & "doc_index.html"
+			CALL Run_Dialog(GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "\nThe documentation was updated successfully!", -1)
+		ELSE
+			CALL Run_Dialog(GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE, "The documentation could not be retrieved.\n\n\tPlease try again later.", -1)
+		END IF
+	ELSE
+		CALL Run_Dialog(GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE, "The documentation could not be retrieved.\n\n\tPlease try again later.", -1)
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Info dialog
+SUB Show_Info
+
+	LOCAL gtk$, icon$
+
+	LOCAL icon = NULL TYPE static void*
+
+	gtk$ = IIF$(Gtk_Version$ = "gtk2", "2.x", "3.x")
+
+	IF icon = NULL THEN
+		IF FILEEXISTS(CONCAT$(DATA_PATH, "/pixmaps/BaCon.png")) THEN
+			icon = gdk_pixbuf_new_from_file(CONCAT$(DATA_PATH, "/pixmaps/BaCon.png"), NULL)
+		ENDIF
+	ENDIF
+
+	gtk_show_about_dialog(g_Win, "program-name", DEFTITLE$, "version", VERSION$, "copyright", "(c) Peter van Eerten", "logo", icon, \
+		"comments", "GUI version of BaCon using GtkSourceView " & gtk$ & "." & NL$ & "Converted by " & COMPILED_BY_WHICH_BACON$ & ".", \
+		"website", "http://www.basic-converter.org/", "website-label", "BaCon website", NULL)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Show_Context_Info
+
+	IF gtk_check_menu_item_get_active(context_menu) THEN
+		Statusbar_Msg("Enabling context information.")
+	ELSE
+		Statusbar_Msg("Disabling context information.")
+	ENDIF
+
+ENDSUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Cut_Text
+
+	LOCAL page
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+	gtk_text_buffer_cut_clipboard(nbook[page].buffer, g_ClipBoard, 1)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Copy_Text
+
+	LOCAL page
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+	gtk_text_buffer_copy_clipboard(nbook[page].buffer, g_ClipBoard)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Paste_Text
+
+	LOCAL page
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+	gtk_text_buffer_paste_clipboard(nbook[page].buffer, g_ClipBoard, NULL, 1)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Undo_Action
+
+	LOCAL page, mark
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+	IF gtk_source_buffer_can_undo(nbook[page].buffer) THEN gtk_source_buffer_undo(nbook[page].buffer)
+
+	mark = gtk_text_buffer_get_insert(nbook[page].buffer)
+	gtk_text_view_scroll_mark_onscreen(nbook[page].view, mark)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Redo_Action
+
+	LOCAL page, mark
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+	IF gtk_source_buffer_can_redo(nbook[page].buffer) THEN gtk_source_buffer_redo(nbook[page].buffer)
+
+	mark = gtk_text_buffer_get_insert(nbook[page].buffer)
+	gtk_text_view_scroll_mark_onscreen(nbook[page].view, mark)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Select_All
+
+	LOCAL page, start_iter, end_iter
+
+	start_iter = MEMORY(DEFAULT_WIDGET_SIZE)
+	end_iter = MEMORY(DEFAULT_WIDGET_SIZE)
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+
+	gtk_text_buffer_get_bounds(nbook[page].buffer, start_iter, end_iter)
+
+	gtk_text_buffer_select_range(nbook[page].buffer, start_iter, end_iter)
+
+	FREE start_iter, end_iter
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Close_Tab(NUMBER widget, NUMBER flag)
+
+	LOCAL title$
+	LOCAL page, x
+
+	IF flag THEN
+		FOR x = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+			IF nbook[x].button = widget THEN
+				page = x
+				BREAK
+			END IF
+		NEXT
+	ELSE
+		page = gtk_notebook_get_current_page(g_Notebook)
+	END IF
+
+	IF page >= 0 THEN
+
+		title$ = gtk_label_get_text(nbook[page].label)
+
+		IF LEFT$(title$, 1) = "*" THEN
+			IF  Run_Dialog(GTK_MESSAGE_WARNING, GTK_BUTTONS_YES_NO, "Save program '" & MID$(title$, 2) & "' ?", -1) = GTK_RESPONSE_YES THEN
+				Save_File
+			END IF
+		END IF
+
+		gtk_notebook_remove_page(g_Notebook, page)
+
+		' Scroll record array
+		FOR x = page TO gtk_notebook_get_n_pages(g_Notebook)-1
+			nbook[x].view = nbook[x+1].view
+			nbook[x].buffer = nbook[x+1].buffer
+			nbook[x].label = nbook[x+1].label
+			nbook[x].button = nbook[x+1].button
+			nbook[x].child = nbook[x+1].child
+			nbook[x].title$ = nbook[x+1].title$
+		NEXT
+	END IF
+
+	' If there are no tabs, disable some of the menus
+	IF gtk_notebook_get_n_pages(g_Notebook) = 0 THEN
+		gtk_widget_set_sensitive(file_menu, FALSE)
+		gtk_widget_set_sensitive(save_menu, FALSE)
+		gtk_widget_set_sensitive(saveas_menu, FALSE)
+		gtk_widget_set_sensitive(export_menu, FALSE)
+		gtk_widget_set_sensitive(print_menu, FALSE)
+		gtk_widget_set_sensitive(closetab_menu, FALSE)
+		gtk_widget_set_sensitive(cut_menu, FALSE)
+		gtk_widget_set_sensitive(copy_menu, FALSE)
+		gtk_widget_set_sensitive(paste_menu, FALSE)
+		gtk_widget_set_sensitive(select_menu, FALSE)
+		gtk_widget_set_sensitive(undo_menu, FALSE)
+		gtk_widget_set_sensitive(redo_menu, FALSE)
+		gtk_widget_set_sensitive(find_menu, FALSE)
+		gtk_widget_set_sensitive(indent_menu, FALSE)
+		gtk_widget_set_sensitive(linenr_menu, FALSE)
+		gtk_widget_set_sensitive(wrap_menu, FALSE)
+		gtk_widget_set_sensitive(page_menu, FALSE)
+		gtk_widget_set_sensitive(context_menu, FALSE)
+		gtk_widget_set_sensitive(apply_menu, FALSE)
+		gtk_widget_set_sensitive(font_menu, FALSE)
+		gtk_widget_set_sensitive(color_menu, FALSE)
+		gtk_widget_set_sensitive(theme_menu, FALSE)
+		gtk_widget_set_sensitive(spacing_menu, FALSE)
+		gtk_widget_set_sensitive(conv_menu, FALSE)
+		gtk_widget_set_sensitive(exec_menu, FALSE)
+		gtk_widget_set_sensitive(test_menu, FALSE)
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Callback for exit
+SUB Exit_Prog
+
+	Save_Defaults(TRUE)
+
+	REPEAT
+		Close_Tab(0, 0)
+	UNTIL gtk_notebook_get_n_pages(g_Notebook) = 0
+
+	' Use normal 'exit' as 'gtk_exit()' is deprecated
+	END
+
+ENDSUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Create_Page
+
+	LOCAL lm, lang, buffer, view, scrolled, label, hbox, button, image, gtksettings, xicon, yicon, range
+	LOCAL page TYPE int
+
+	' Create language manager
+	lm = gtk_source_language_manager_get_default()
+
+	' Define language
+	lang = gtk_source_language_manager_get_language(lm, "bacon")
+
+	' Setup buffer and viewer using BaCon as language
+	buffer = gtk_source_buffer_new_with_language(lang)
+	g_signal_connect_data(buffer, "changed", (void*)Set_Changed, 0, 0, 0)
+	gtk_source_buffer_set_highlight_matching_brackets(buffer, 1)
+	view = gtk_source_view_new_with_buffer(buffer)
+	g_signal_connect_data(view, "key-release-event", (void*)Cursor_Changed, 0, 0, 0)
+	g_signal_connect_data(view, "button-release-event", (void*)Cursor_Changed, 0, 0, 0)
+	g_signal_connect_data(view, "move-cursor", (void*)Cursor_Changed, 0, 0, 0)
+	g_signal_connect_data(view, "focus-out-event", (void*)Hide_Context, 0, 0, 0)
+
+	' Tab space to 4 characters
+	gtk_source_view_set_tab_width(view, 4)
+
+	' Create scrolled window
+	scrolled = gtk_scrolled_window_new(0, 0)
+	gtk_scrolled_window_set_policy(scrolled, 1, 1)
+	gtk_scrolled_window_set_shadow_type(scrolled, 3)
+	range = gtk_scrolled_window_get_hscrollbar(scrolled)
+	g_signal_connect_data(range, "value-changed", (void*)Hide_Context, 0, 0, 0)
+	range = gtk_scrolled_window_get_vscrollbar(scrolled)
+	g_signal_connect_data(range, "value-changed", (void*)Hide_Context, 0, 0, 0)
+	gtk_container_add(scrolled, view)
+
+	' Create the tab, a ridiculous amount of code needed for the 'x' on the tab
+	hbox = gtk_hbox_new(0, 10)
+	label = gtk_label_new("New ")
+	image = gtk_image_new_from_stock("gtk-close", GTK_ICON_SIZE_MENU)
+	gtk_icon_size_lookup(GTK_ICON_SIZE_MENU, ADDRESS(xicon), ADDRESS(yicon))
+	button = gtk_button_new()
+	gtk_widget_set_name(button, STR$(button))
+	gtk_button_set_relief(button, GTK_RELIEF_NONE)
+	gtk_button_set_focus_on_click(button, FALSE)
+	gtk_widget_set_size_request(button, xicon, yicon)
+	gtk_container_add(button, image)
+	g_signal_connect_data(button, "clicked", (void*)Close_Tab, 1, 0, 0)
+	gtk_box_pack_start(hbox, label, 0, 0, 0)
+	gtk_box_pack_start(hbox, button, 0, 0, 0)
+	gtksettings = gtk_settings_get_default()
+	gtk_rc_parse_string("style \"baconstyle\" { xthickness = 0 }")
+	gtk_rc_parse_string("style \"baconstyle\" { ythickness = 0 }")
+	gtk_rc_parse_string("widget \"*.*." & STR$(button) & "*\" style \"baconstyle\"")
+	gtk_rc_reset_styles(gtksettings)
+	gtk_widget_show_all(hbox)
+	page = gtk_notebook_append_page(g_Notebook, scrolled, hbox)
+
+	' Store new widgets
+	nbook[page].view = view
+	nbook[page].buffer = buffer
+	nbook[page].label = label
+	nbook[page].button = button
+	nbook[page].child = scrolled
+	nbook[page].title$ = ""
+
+	' Set new tab as active
+	gtk_widget_show_all(g_Notebook)
+	gtk_notebook_set_current_page(g_Notebook, page)
+	gtk_notebook_set_tab_reorderable(g_Notebook, scrolled, TRUE)
+
+	IF gtk_notebook_get_n_pages(g_Notebook) = 1 THEN
+		gtk_widget_set_sensitive(file_menu, TRUE)
+		gtk_widget_set_sensitive(print_menu, TRUE)
+		gtk_widget_set_sensitive(save_menu, TRUE)
+		gtk_widget_set_sensitive(saveas_menu, TRUE)
+		gtk_widget_set_sensitive(export_menu, TRUE)
+		gtk_widget_set_sensitive(closetab_menu, TRUE)
+		gtk_widget_set_sensitive(cut_menu, TRUE)
+		gtk_widget_set_sensitive(copy_menu, TRUE)
+		gtk_widget_set_sensitive(paste_menu, TRUE)
+		gtk_widget_set_sensitive(select_menu, TRUE)
+		gtk_widget_set_sensitive(undo_menu, TRUE)
+		gtk_widget_set_sensitive(redo_menu, TRUE)
+		gtk_widget_set_sensitive(find_menu, TRUE)
+		gtk_widget_set_sensitive(indent_menu, TRUE)
+		gtk_widget_set_sensitive(linenr_menu, TRUE)
+		gtk_widget_set_sensitive(wrap_menu, TRUE)
+		gtk_widget_set_sensitive(page_menu, TRUE)
+		gtk_widget_set_sensitive(context_menu, TRUE)
+		gtk_widget_set_sensitive(apply_menu, TRUE)
+		gtk_widget_set_sensitive(font_menu, TRUE)
+		gtk_widget_set_sensitive(color_menu, TRUE)
+		gtk_widget_set_sensitive(theme_menu, TRUE)
+		gtk_widget_set_sensitive(spacing_menu, TRUE)
+		gtk_widget_set_sensitive(conv_menu, TRUE)
+		gtk_widget_set_sensitive(exec_menu, TRUE)
+		gtk_widget_set_sensitive(test_menu, TRUE)
+	END IF
+
+	gtk_widget_grab_focus(view)
+
+	' Get the default settings for the new page
+	CALL Load_Defaults()
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Reorder_Tabs
+
+	LOCAL x, y
+
+	RECORD tmpbook[MAXPAGES]
+		LOCAL view, buffer, label, child, button
+		LOCAL title$
+	END RECORD
+
+	' Make a copy
+	FOR x = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+		tmpbook[x].view = nbook[x].view
+		tmpbook[x].buffer = nbook[x].buffer
+		tmpbook[x].label = nbook[x].label
+		tmpbook[x].button = nbook[x].button
+		tmpbook[x].child = nbook[x].child
+		tmpbook[x].title$ = nbook[x].title$
+	NEXT
+
+	' Check order
+	FOR x = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+		FOR y = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+			IF tmpbook[x].child = gtk_notebook_get_nth_page(g_Notebook, y) THEN
+				nbook[y].view = tmpbook[x].view
+				nbook[y].buffer = tmpbook[x].buffer
+				nbook[y].label = tmpbook[x].label
+				nbook[y].button = tmpbook[x].button
+				nbook[y].child = tmpbook[x].child
+				nbook[y].title$ = tmpbook[x].title$
+				BREAK
+			END IF
+		NEXT
+	NEXT
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Open_Page
+
+	g_OPEN_PAGE = TRUE
+	Open_File
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Start_Find
+
+	gtk_widget_show_all(g_Find)
+	gtk_widget_grab_focus(g_Find_entry)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Action to find term and scroll text_view to that place
+SUB Find_Term(NUMBER widget, NUMBER replace)
+
+	LOCAL iter, start_iter, end_iter, page, result, mark
+	LOCAL text$
+
+	text$ = gtk_entry_get_text(g_Find_entry)
+	page = gtk_notebook_get_current_page(g_Notebook)
+
+	iter = MEMORY(DEFAULT_WIDGET_SIZE)
+	start_iter = MEMORY(DEFAULT_WIDGET_SIZE)
+	end_iter = MEMORY(DEFAULT_WIDGET_SIZE)
+
+	' If there is a selection move cursor behind it
+	IF gtk_text_buffer_get_has_selection(nbook[page].buffer) THEN
+		' Replace action
+		IF replace THEN
+			gtk_text_buffer_get_selection_bounds(nbook[page].buffer, start_iter, end_iter)
+			gtk_text_buffer_delete(nbook[page].buffer, start_iter, end_iter)
+			gtk_text_buffer_insert(nbook[page].buffer, start_iter, gtk_entry_get_text(g_Repl_entry), -1)
+		ELSE
+			mark = gtk_text_buffer_get_selection_bound(nbook[page].buffer)
+			gtk_text_buffer_get_iter_at_mark(nbook[page].buffer, iter, mark)
+			gtk_text_buffer_place_cursor(nbook[page].buffer, iter)
+		END IF
+	END IF
+
+	LABEL repeat
+
+	mark = gtk_text_buffer_get_insert(nbook[page].buffer)
+	gtk_text_buffer_get_iter_at_mark(nbook[page].buffer, iter, mark)
+
+	result = gtk_text_iter_forward_search(iter, text$, 0, start_iter, end_iter, NULL)
+
+	IF NOT(result) THEN
+		IF Run_Dialog(GTK_MESSAGE_INFO, GTK_BUTTONS_YES_NO, NL$ & "Term '" & text$ & "' not found! Restart from top?", -1) = GTK_RESPONSE_YES THEN
+			gtk_text_buffer_get_start_iter(nbook[page].buffer, iter)
+			gtk_text_buffer_place_cursor(nbook[page].buffer, iter)
+			GOTO repeat
+		END IF
+	ELSE
+		' Find action
+		gtk_text_buffer_select_range(nbook[page].buffer, start_iter, end_iter)
+		mark = gtk_text_buffer_get_selection_bound(nbook[page].buffer)
+		gtk_text_view_scroll_to_mark(nbook[page].view, mark, 0, 1, 0.5, 0.5)
+	END IF
+
+	FREE iter, start_iter, end_iter
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+FUNCTION Show_Popup
+
+	LOCAL gdkwin, mask
+	LOCAL x, y TYPE int
+
+	gdkwin = gdk_window_at_pointer(ADDRESS(x), ADDRESS(y))
+	gdk_window_get_pointer(gdkwin, ADDRESS(x), ADDRESS(y), ADDRESS(mask))
+
+	' Only right mouse button should activate popup
+	IF (mask & (1 << 10)) THEN
+		gtk_menu_popup(g_Cmenu, 0, 0, NULL, NULL, 3, 0)
+		RETURN TRUE
+	END IF
+
+	' If other button is pressed, resume default event handling
+	RETURN FALSE
+
+END FUNCTION
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Show_Dialog(NUMBER widget, NUMBER data)
+
+	gtk_widget_show_all(data)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Handle_Help
+
+	LOCAL total$, tmp$, browser$
+	LOCAL data
+
+	' Get environment variable or use MacOSX
+	IF INSTR(OS$, "Darwin") THEN
+		browser$ = "open -a Safari"
+	ELSE
+		IF NOT(g_LIBGTKWEBKIT) THEN
+			browser$ = GETENVIRON$("DEFAULTBROWSER")
+			IF NOT(LEN(browser$)) THEN
+				IF LEN(EXEC$("which links2 2>/dev/null")) THEN
+					browser$ = "links2 -g -mode 1280x700"
+				ELIF LEN(EXEC$("which links 2>/dev/null")) THEN
+					browser$ = "links -g -mode 1280x700"
+				ENDIF
+			ENDIF
+		ENDIF
+	END IF
+
+	' Only fetch documentation if we have means to look at it
+	IF g_LIBGTKWEBKIT OR LEN(EXEC$("which " & browser$ & " 2>/dev/null")) OR LEN(EXEC$("which firefox 2>/dev/null")) THEN
+
+		' Check if cached documentation exists, if not get it
+		IF NOT(FILEEXISTS(g_DOC_LOCATION$ & "doc_frame.html")) THEN CALL Get_Docu
+
+		' Choose HTML renderer
+		IF LEN(EXEC$("which " & browser$ & " 2>/dev/null")) THEN
+			SYSTEM browser$ & " " & g_DOC_LOCATION$ & "doc_frame.html" & " &"
+		ELIF g_LIBGTKWEBKIT THEN
+			IF gtk_widget_get_visible(g_Html_widget) THEN
+				gtk_window_present(g_Html)
+			ELSE
+				webkit_web_view_load_uri(g_Html_widget, "file://" & g_DOC_LOCATION$ & "doc_frame.html")
+				gtk_widget_show_all(g_Html)
+			ENDIF
+		ELSE
+			IF INSTR(OS$, "Darwin") THEN
+				SYSTEM browser$ & " " & g_DOC_LOCATION$ & "doc_frame.html" & " &"
+			ELSE
+				SYSTEM "firefox -new-tab " & g_DOC_LOCATION$ & "doc_frame.html" & " &"
+			END IF
+		END IF
+	ELSE
+		CALL Run_Dialog(GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE, "Unable to display BaCon help! Please set the environment variable DEFAULTBROWSER to a valid HTML viewer.", -1)
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Set_Spacing(NUMBER widget, int height)
+
+	LOCAL x
+
+	FOR x = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+		gtk_text_view_set_pixels_above_lines(nbook[x].view, height)
+	NEXT
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Set_Scheme(NUMBER widget, char* scheme)
+
+	LOCAL style, x
+
+	style = gtk_source_style_scheme_manager_get_scheme(g_Scheme_Manager, scheme)
+
+	FOR x = 0 TO gtk_notebook_get_n_pages(g_Notebook)-1
+		gtk_source_buffer_set_style_scheme(nbook[x].buffer, style)
+	NEXT
+
+END SUB
+
+'----------------------------------------------------------------------------------------------
+
+SUB Apply_Indentation
+
+	LOCAL txt$, data$, line$, result$, str$
+	LOCAL myposition, nextposition, label_active, page, mark, iter, lineno, wrap_active
+
+	iter = MEMORY(DEFAULT_WIDGET_SIZE)
+
+	' Save position
+	page = gtk_notebook_get_current_page(g_Notebook)
+	mark = gtk_text_buffer_get_insert(nbook[page].buffer)
+	gtk_text_buffer_get_iter_at_mark(nbook[page].buffer, iter, mark)
+	lineno = gtk_text_iter_get_line(iter)
+	FREE iter
+
+	txt$ = Get_Contents$() & CHR$(10)
+
+	WHILE LEN(txt$) > 0
+
+		line$ = ""
+		WHILE TRUE
+			data$ = LEFT$(txt$, INSTR(txt$, CHR$(10)))
+			txt$ = MID$(txt$, INSTR(txt$, CHR$(10))+1)
+			' Cleanup the line by chopping off TAB, space, NL, CR
+			line$ = line$ & CHOP$(data$)
+			' If there is a multiline statement, add a NL and a TAB
+			IF RIGHT$(line$, 1) = "\\" THEN line$ = line$ & CHR$(10) & CHR$(9)
+			ELSE BREAK
+		WEND
+
+		' Set my current position
+		myposition = nextposition
+
+		' Handle LABEL indentation
+		IF LEN(line$) = 0 AND label_active THEN
+			label_active = FALSE
+			DECR myposition
+			nextposition = myposition
+		FI
+
+		' Current line backwards indentation
+		IF REGEX(line$, "^(CASE|UNTIL)[ \\t]|^(DEFAULT|FI|NEXT|WEND|DONE)|^ELSE$|^ELIF.+THEN$|^END.+") THEN
+			' End with value should not indent backwards
+			IF NOT(REGEX(line$, "^END.+[0-9]+")) THEN DECR myposition
+			' Extra step back with ENDSELECT
+			IF REGEX(line$, "SELECT$") THEN DECR myposition
+			' Tab not out of screen?
+			IF myposition < 0 THEN myposition = 0
+			nextposition = myposition
+		ENDIF
+
+		' Next line indentation
+		IF REGEX(line$, "^(CASE|ENUM|FOR|FUNCTION|FUNC|GLOBAL RECORD|LABEL|RECORD|SELECT|SUB|WHILE|DOTIMES|WITH)[ \\t]|^(DEFAULT|REPEAT|USEC|USEH|DO$)|^IF.+THEN$|^ELIF.+THEN$|^ELSE$") THEN
+			INCR nextposition
+			' The CASE right after SELECT should indent extra
+			IF REGEX(line$, "^SELECT") THEN INCR nextposition
+			' Set flag if we are in a LABEL
+			IF LEFT$(line$, 5) = "LABEL" THEN label_active = TRUE
+		FI
+
+		' Wrapped text
+		IF RIGHT$(line$, 2) = CHR$(32) & CHR$(92) AND NOT(REGEX(line$, "^(REM|')")) THEN
+			IF NOT(wrap_active) THEN INCR nextposition
+			wrap_active = TRUE
+		ELSE
+			IF wrap_active THEN DECR nextposition
+			wrap_active = FALSE
+		ENDIF
+
+		' Put result to total string
+		IF LEN(line$) THEN
+			FOR str$ IN line$ STEP CHR$(10)
+				result$ = result$ & TAB$(myposition) & str$ & CHR$(10)
+			NEXT
+		ELSE
+			result$ = result$ & CHR$(10)
+		FI
+	WEND
+
+	' Reload indented code
+	gtk_text_buffer_set_text(nbook[page].buffer, CHOP$(result$), -1)
+
+	Statusbar_Msg("Applied standard indentation.")
+
+	' Scroll to cursor
+	iter = MEMORY(DEFAULT_WIDGET_SIZE)
+	gtk_text_buffer_get_start_iter(nbook[page].buffer, iter)
+	gtk_text_iter_set_line(iter, lineno)
+	gtk_text_buffer_place_cursor(nbook[page].buffer, iter)
+	mark = gtk_text_buffer_get_insert(nbook[page].buffer)
+	gtk_text_view_scroll_to_mark(nbook[page].view, mark, 0, TRUE, 0.0, 0.5)
+	FREE iter
+
+END SUB
+
+'----------------------------------------------------------------------------------------------
+' Download a file like "http://www.basic-converter.org/prog.bac"
+
+FUNCTION Download_File$(STRING name$, NUMBER use_gui)
+
+	LOCAL total$, dat$, head$, proxy$, unpw$
+	LOCAL mynet
+	LOCAL recdata, size, length TYPE FLOATING
+
+	CATCH GOTO network_error
+
+	' Rip off HTTP protocol name if it is there
+	IF LEFT$(CHOP$(name$), 7) = "http://" THEN name$ = MID$(CHOP$(name$), 8)
+
+	' Get environment variable for proxy
+	proxy$ = GETENVIRON$("HTTP_PROXY")
+	IF LEN(proxy$) = 0 THEN proxy$ = GETENVIRON$("http_proxy")
+
+	' Parse proxy settings
+	IF LEN(proxy$) THEN
+		IF LEFT$(proxy$, 7) <> "http://" THEN
+			IF use_gui THEN
+				CALL Run_Dialog(GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE, "System error: proxy '" & proxy$ & "' not supported! Redefine to default HTTP proxy or undefine.", -1)
+			ELSE
+				EPRINT "System error: proxy '", proxy$, "' not supported! Redefine to default HTTP proxy or undefine."
+			END IF
+			GOTO finish
+		ENDIF
+
+		proxy$ = MID$(proxy$, 8)
+		IF TALLY(proxy$, "@") THEN
+			unpw$ = B64ENC$(TOKEN$(proxy$, 1, "@"))
+			proxy$ = TOKEN$(proxy$, 2, "@")
+		ENDIF
+
+		' Setup TCP connection on defined port
+		OPEN proxy$ FOR NETWORK AS mynet
+
+		SEND "CONNECT " & TOKEN$(name$, 1, "/") & ":80 HTTP/1.1" & "\r\n" TO mynet
+		IF LEN(unpw$) THEN SEND "Proxy-Authorization: Basic " & B64ENC$(unpw$) & "\r\n" TO mynet
+		SEND "\r\n" TO mynet
+
+		' Return should be OK
+		RECEIVE dat$ FROM mynet
+		IF NOT(TALLY(dat$, " 200 ")) THEN
+			IF use_gui THEN
+				CALL Run_Dialog(GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE, "System error: proxy '" & proxy$ & "' returns error: " & dat$, -1)
+			ELSE
+				EPRINT "System error: proxy '", proxy$, "' returns error: " & dat$
+			END IF
+			GOTO finish
+		ENDIF
+	ELSE
+		' Open TCP connection on port 80
+		OPEN TOKEN$(name$, 1, "/") & ":80" FOR NETWORK AS mynet
+	ENDIF
+
+	' Get some metadata
+	SEND "HEAD /" & MID$(name$, INSTR(name$, "/")+1) & " HTTP/1.1\r\nHost: " & TOKEN$(name$, 1, "/") & "\r\n\r\n" TO mynet
+
+	RECEIVE head$ FROM mynet
+
+	' Get the filesize from the HTTP header
+	IF NOT(INSTR(head$, "Content-Length:")) THEN
+		IF use_gui THEN
+			CALL Run_Dialog(GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE, "System error: file '" & name$ & "' not found! Check URL and try again.", -1)
+		ELSE
+			EPRINT "System error: file '", name$, "' not found! Check URL and try again."
+		END IF
+		GOTO finish
+	END IF
+
+	dat$ = MID$(head$, INSTR(head$, "Content-Length:")+15)
+	length = VAL(LEFT$(dat$, INSTR(dat$, NL$)))
+
+	' Set progress dialog
+	IF use_gui THEN
+		gtk_window_set_title(g_Progress, MID$(name$, INSTRREV(name$, "/")+1))
+		gtk_progress_bar_set_fraction(g_Progressbar, 0.0)
+		gtk_widget_show_all(g_Progress): CALL SYNC
+	END IF
+
+	' As long as there is data, get it
+	SEND "GET /" & MID$(name$, INSTR(name$, "/")+1) & " HTTP/1.1\r\nHost: " & TOKEN$(name$, 1, "/") & "\r\n\r\n" TO mynet
+	WHILE WAIT(mynet, 2000)
+		RECEIVE dat$ FROM mynet CHUNK 128 SIZE size
+		IF size = 0 THEN BREAK
+		IF use_gui THEN
+			' Update progressbar
+			INCR recdata, size
+			gtk_progress_bar_set_text(g_Progressbar, STR$(INT(recdata/(length+LEN(head$))*100.0) ) & "%" )
+			gtk_progress_bar_set_fraction(g_Progressbar, (double)recdata/(length+LEN(head$)))
+			CALL SYNC
+		END IF
+		total$ = total$ & dat$
+	WEND
+	CLOSE NETWORK mynet
+
+	IF use_gui THEN
+		gtk_widget_hide(g_Progress)
+		CALL SYNC
+	END IF
+
+	' Rip off HTTP headers
+	total$ = MID$(total$, INSTR(total$, "\r\n\r\n")+4)
+
+	' Check amount of data
+	IF LEN(total$) != length THEN
+		IF use_gui THEN
+			CALL Run_Dialog(GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE, "WARNING: file http://'" & name$ & "' could not be downloaded probably due to a timeout. Try again later.", -1)
+		ELSE
+			EPRINT "WARNING: file http://", name$, " could not be downloaded probably due to a timeout. Try again later."
+		END IF
+		total$ = ""
+	END IF
+
+	LABEL finish
+		RETURN total$
+
+	' Something happened in setting up the connection
+	LABEL network_error
+		IF use_gui THEN
+			CALL Run_Dialog(GTK_MESSAGE_WARNING, GTK_BUTTONS_CLOSE, "System error: the site http://'" & LEFT$(name$, INSTR(name$, "/")-1) & ", is not reachable! Try again later.", -1)
+		ELSE
+			EPRINT "System error: the site http://", LEFT$(name$, INSTR(name$, "/")-1), " is not reachable! Try again later."
+		END IF
+		CATCH RESET
+		CLOSE NETWORK mynet
+		RETURN ""
+
+END FUNCTION
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Build_Gui
+
+	LOCAL bacamount, x, size, sep1, sep2, sep3, sep4, sep5, sep6, sep7, sep8, sep9, sep10, sep11, sep12, sep14, sep15, sep16, sep17, sep18, sep19, sep20, sep21, sep22, sep23
+	LOCAL menubar, fmenu, ftear, fmenu_item, emenu, etear, emenu_item, omenu, otear, omenu_item, comenu, cotear, comenu_item, hmenu, htear, hmenu_item
+	LOCAL options_vbox, options_hbox1, options_hbox2, options_hbox3, options_hbox4, options_hbox5, options_hbox7, range
+	LOCAL options_cancel, options_close, compiler_label, flags_label, options_label, inc_label, tmpdir_label
+	LOCAL test_execute, test_close, test_vbox, test_hbox, test_label1, lm, lang
+	LOCAL test_scrolled1, cnewtab_menu, copentab_menu, cclosetab_menu, file_filter1, file_filter2, scrolled, help_menu
+	LOCAL vbox, accel_group, accel2_group, find_ok, find_get, find_repl, find_vbox, find_hbox1, find_hbox2, find_hbox3, find_label1, find_label2
+	LOCAL compiling_image, compiling_label, compiling_hbox, col, toolbar, toolbutton, statusbar, statusbar2, status_hbox, b_image
+	LOCAL print_ok, print_cancel, print_vbox, print_vbox1, print_vbox2, print_hbox1, print_hbox2
+	LOCAL file$, info$, line$
+	LOCAL sub_menu_pix, sub_menu_theme, menu_pix, menu_theme, cur_page
+	LOCAL scheme_ids TYPE const char* const*
+
+	' Prepare context info
+	IF FILEEXISTS(g_DOC_LOCATION$ & "documentation.txt") THEN Init_Info
+
+	' Initialize GTK
+	gtk_init(0, 0)
+
+	' Check version
+	IF Gtk_Version$ = "gtk2" THEN
+		IF LEN(gtk_check_version$(2, 14, 0)) > 0 THEN
+			EPRINT "Warning! BaCon needs GTK 2.14.0 to run properly: ", gtk_check_version$(2, 14, 0)
+			EPRINT "Some functions may not be available."
+		ENDIF
+	ELSE
+		IF LEN(gtk_check_version$(3, 0, 0)) > 0 THEN
+			EPRINT "Warning! BaCon needs GTK 3.0.0 or higher to run properly: ", gtk_check_version$(3, 0, 0)
+			EPRINT "Some functions may not be available."
+		END IF
+	END IF
+
+	' Define main window
+	g_Win = gtk_window_new(GTK_WINDOW_TOPLEVEL)
+	gtk_window_set_title(g_Win, DEFTITLE$ & " - " & VERSION$)
+	gtk_window_set_position(g_Win, 1)
+	IF FILEEXISTS(CONCAT$(DATA_PATH, "/pixmaps/BaCon.png")) THEN
+		gtk_window_set_icon_from_file(g_Win, CONCAT$(DATA_PATH, "/pixmaps/BaCon.png"), NULL)
+	ELSE
+		gtk_window_set_icon_name(g_Win, "gtk-edit")
+	ENDIF
+
+	' Define callback when deleting window
+	g_signal_connect_data(g_Win, "delete-event", (void*)Exit_Prog, 0, 0, 0)
+
+	' Create filefilters
+	file_filter1 = gtk_file_filter_new()
+	gtk_file_filter_set_name(file_filter1, "BaCon source files (*.bac)")
+	gtk_file_filter_add_pattern(file_filter1, "*.bac")
+	file_filter2 = gtk_file_filter_new()
+	gtk_file_filter_set_name(file_filter2, "All files (*)")
+	gtk_file_filter_add_pattern(file_filter2, "*")
+
+	' Create FILE OPEN
+	g_File_dialog = gtk_file_chooser_dialog_new("Open file...", g_Win, 0, "gtk-cancel", GTK_RESPONSE_CANCEL, "gtk-open", GTK_RESPONSE_ACCEPT, NULL)
+	gtk_window_set_transient_for(g_File_dialog, g_Win)
+	gtk_window_set_position(g_File_dialog, GTK_WIN_POS_CENTER_ON_PARENT)
+	gtk_window_set_default_size(g_File_dialog, 300, 300)
+	gtk_window_set_icon_name(g_File_dialog, "gtk-open")
+	g_signal_connect_data(g_File_dialog, "delete-event", (void*)gtk_widget_hide_on_delete, 0, 0, 0)
+	g_signal_connect_data(g_File_dialog, "response", (void*)Handle_Open_Dialog, 0, 0, 0)
+	gtk_file_chooser_add_filter(g_File_dialog, file_filter1)
+	gtk_file_chooser_add_filter(g_File_dialog, file_filter2)
+
+	' Create SAVE AS
+	g_Save_dialog = gtk_file_chooser_dialog_new("Save file as...", g_Win, 1, "gtk-cancel", GTK_RESPONSE_CANCEL, "gtk-save", GTK_RESPONSE_ACCEPT, NULL)
+	gtk_window_set_transient_for(g_Save_dialog, g_Win)
+	gtk_window_set_position(g_Save_dialog, GTK_WIN_POS_CENTER_ON_PARENT)
+	gtk_window_set_default_size(g_Save_dialog, 300, 300)
+	gtk_window_set_icon_name(g_Save_dialog, "gtk-save-as")
+	g_signal_connect_data(g_Save_dialog, "delete-event", (void*)gtk_widget_hide_on_delete, 0, 0, 0)
+	g_signal_connect_data(g_Save_dialog, "response", (void*)Handle_Save_Dialog, 0, 0, 0)
+	gtk_file_chooser_add_filter(g_Save_dialog, file_filter1)
+	gtk_file_chooser_add_filter(g_Save_dialog, file_filter2)
+
+	' Create FONT SELECTION
+	g_Font_dialog = gtk_font_selection_dialog_new("Select font...")
+	gtk_font_selection_dialog_set_font_name(g_Font_dialog, "Sans 10")
+	gtk_window_set_transient_for(g_Font_dialog, g_Win)
+	gtk_window_set_position(g_Font_dialog, GTK_WIN_POS_CENTER_ON_PARENT)
+	gtk_window_set_default_size(g_Font_dialog, 300, 300)
+	gtk_window_set_icon_name(g_Font_dialog, "gtk-preferences")
+	g_signal_connect_data(g_Font_dialog, "delete-event", (void*)gtk_widget_hide_on_delete, 0, 0, 0)
+	g_signal_connect_data(g_Font_dialog, "response", (void*)Handle_Font_Dialog, 0, 0, 0)
+
+	' Create COLOR SELECTION
+	g_Color_dialog = gtk_color_selection_dialog_new("Select color...")
+	gtk_window_set_transient_for(g_Color_dialog, g_Win)
+	gtk_window_set_position(g_Color_dialog, GTK_WIN_POS_CENTER_ON_PARENT)
+	gtk_window_set_default_size(g_Color_dialog, 300, 300)
+	gtk_window_set_icon_name(g_Color_dialog, "gtk-color-picker")
+	g_signal_connect_data(g_Color_dialog, "delete-event", (void*)gtk_widget_hide_on_delete, 0, 0, 0)
+	g_signal_connect_data(g_Color_dialog, "response", (void*)Handle_Color_Dialog, 0, 0, 0)
+
+	' Create PRINT dialog
+	g_Print_dialog = gtk_window_new(GTK_WINDOW_TOPLEVEL)
+	gtk_window_set_title(g_Print_dialog, "Print BaCon program")
+	gtk_window_set_transient_for(g_Print_dialog, g_Win)
+	gtk_window_set_position(g_Print_dialog, GTK_WIN_POS_CENTER_ON_PARENT)
+	gtk_window_set_icon_name(g_Print_dialog, "gtk-print")
+	g_Print_combo = gtk_combo_box_new_text()
+	IF ISFALSE(LEN(EXEC$("which lpstat 2>/dev/null"))) THEN
+		gtk_combo_box_append_text(g_Print_combo, "No printing system found")
+	ELSE
+		IF ISTRUE(LEN(EXEC$("which enscript 2>/dev/null"))) AND ISTRUE(LEN(EXEC$("which ps2pdf 2>/dev/null"))) THEN gtk_combo_box_append_text(g_Print_combo, "PDF")
+		info$ = EXEC$("lpstat -a 2>/dev/null")
+		SPLIT info$ BY NL$ TO printer$ SIZE bacamount
+		IF bacamount > 0 THEN
+			FOR x = 1 TO bacamount
+				SPLIT printer$[x] BY " " TO item$ SIZE size
+				gtk_combo_box_append_text(g_Print_combo, item$[1])
+			NEXT
+		ELSE
+			gtk_combo_box_append_text(g_Print_combo, "")
+		END IF
+	ENDIF
+	gtk_combo_box_set_active(g_Print_combo, 0)
+	g_Print_check1 = gtk_radio_button_new_with_label_from_widget(0, "Portrait")
+	g_Print_check2 = gtk_radio_button_new_with_label_from_widget(g_Print_check1, "Landscape")
+	g_Print_check3 = gtk_radio_button_new_with_label_from_widget(0, "Size A4")
+	g_Print_check4 = gtk_radio_button_new_with_label_from_widget(g_Print_check3, "Size letter")
+	g_Print_check5 = gtk_check_button_new_with_label("Include source code line numbers")
+	print_ok = gtk_button_new_from_stock("gtk-print")
+	print_cancel = gtk_button_new_from_stock("gtk-cancel")
+	sep16 = gtk_hseparator_new()
+	sep22 = gtk_vseparator_new()
+	print_vbox = gtk_vbox_new(0, 0)
+	print_vbox1 = gtk_vbox_new(0, 0)
+	print_vbox2 = gtk_vbox_new(0, 0)
+	gtk_box_pack_start(print_vbox1, g_Print_check1, 0, 0, 1)
+	gtk_box_pack_start(print_vbox1, g_Print_check2, 0, 0, 1)
+	gtk_box_pack_start(print_vbox2, g_Print_check3, 0, 0, 1)
+	gtk_box_pack_start(print_vbox2, g_Print_check4, 0, 0, 1)
+	gtk_container_set_border_width(print_vbox1, 5)
+	gtk_container_set_border_width(print_vbox2, 5)
+	print_hbox2 = gtk_hbox_new(0, 0)
+	gtk_box_pack_start(print_hbox2, print_vbox1, 0, 0, 1)
+	gtk_box_pack_start(print_hbox2, sep22, 0, 0, 1)
+	gtk_box_pack_start(print_hbox2, print_vbox2, 0, 0, 1)
+	print_hbox1 = gtk_hbox_new(0, 0)
+	gtk_box_pack_start(print_vbox, g_Print_combo, 0, 0, 1)
+	gtk_box_pack_start(print_vbox, print_hbox2, 0, 0, 1)
+	gtk_box_pack_end(print_hbox1, print_ok, 0, 0, 1)
+	gtk_box_pack_start(print_hbox1, print_cancel, 0, 0, 1)
+	gtk_box_pack_start(print_vbox, sep16, 0, 0, 1)
+	gtk_box_pack_start(print_vbox, g_Print_check5, 0, 0, 1)
+	gtk_box_pack_start(print_vbox, print_hbox1, 0, 0, 1)
+	gtk_container_add(g_Print_dialog, print_vbox)
+	g_signal_connect_data(print_cancel, "clicked", (void*)Hide_Dialog, g_Print_dialog, 0, 0)
+	g_signal_connect_data(print_ok, "clicked", (void*)Handle_Print_Dialog, 0, 0, 0)
+	g_signal_connect_data(g_Print_dialog, "delete-event", (void*)gtk_widget_hide_on_delete, 0, 0, 0)
+
+	' Define the global clipboard
+	g_ClipBoard = gtk_clipboard_get(gdk_atom_intern("CLIPBOARD", 0))
+
+	' Create menubar
+	menubar = gtk_menu_bar_new()
+	g_signal_connect_data(menubar, "button-press-event", (void*)Hide_Context, 0, 0, 0)
+
+	' Create FILE submenu
+	fmenu = gtk_menu_new()
+	ftear = gtk_tearoff_menu_item_new()
+	file_menu = gtk_menu_item_new_with_mnemonic("_Open...")
+	save_menu = gtk_menu_item_new_with_mnemonic("_Save")
+	saveas_menu = gtk_menu_item_new_with_mnemonic("S_ave as...")
+	sep1 = gtk_menu_item_new()
+	print_menu = gtk_menu_item_new_with_mnemonic("_Print...")
+	sep15 = gtk_menu_item_new()
+	export_menu = gtk_menu_item_new_with_mnemonic("E_xport to HTML")
+	sep23 = gtk_menu_item_new()
+	newtab_menu = gtk_menu_item_new_with_mnemonic("_New tab")
+	opentab_menu = gtk_menu_item_new_with_mnemonic("O_pen tab...")
+	closetab_menu = gtk_menu_item_new_with_mnemonic("_Close tab")
+	sep5 = gtk_menu_item_new()
+	exit_menu = gtk_menu_item_new_with_mnemonic("_Quit")
+	gtk_menu_shell_append(fmenu, ftear)
+	gtk_menu_shell_append(fmenu, file_menu)
+	gtk_menu_shell_append(fmenu, save_menu)
+	gtk_menu_shell_append(fmenu, saveas_menu)
+	gtk_menu_shell_append(fmenu, sep1)
+	gtk_menu_shell_append(fmenu, print_menu)
+	gtk_menu_shell_append(fmenu, sep15)
+	gtk_menu_shell_append(fmenu, export_menu)
+	gtk_menu_shell_append(fmenu, sep23)
+	gtk_menu_shell_append(fmenu, newtab_menu)
+	gtk_menu_shell_append(fmenu, opentab_menu)
+	gtk_menu_shell_append(fmenu, closetab_menu)
+	gtk_menu_shell_append(fmenu, sep5)
+	gtk_menu_shell_append(fmenu, exit_menu)
+	fmenu_item = gtk_menu_item_new_with_mnemonic("_File")
+	gtk_menu_item_set_submenu(fmenu_item, fmenu)
+	gtk_menu_shell_append(menubar, fmenu_item)
+
+	' Create EDIT submenu
+	emenu = gtk_menu_new()
+	etear = gtk_tearoff_menu_item_new()
+	cut_menu = gtk_menu_item_new_with_mnemonic("_Cut")
+	copy_menu = gtk_menu_item_new_with_mnemonic("C_opy")
+	paste_menu = gtk_menu_item_new_with_mnemonic("_Paste")
+	sep4 = gtk_menu_item_new()
+	undo_menu = gtk_menu_item_new_with_mnemonic("_Undo")
+	redo_menu = gtk_menu_item_new_with_mnemonic("_Redo")
+	sep6 = gtk_menu_item_new()
+	select_menu = gtk_menu_item_new_with_mnemonic("_Select all")
+	sep7 = gtk_menu_item_new()
+	find_menu = gtk_menu_item_new_with_mnemonic("_Find...")
+	gtk_menu_shell_append(emenu, etear)
+	gtk_menu_shell_append(emenu, cut_menu)
+	gtk_menu_shell_append(emenu, copy_menu)
+	gtk_menu_shell_append(emenu, paste_menu)
+	gtk_menu_shell_append(emenu, sep4)
+	gtk_menu_shell_append(emenu, undo_menu)
+	gtk_menu_shell_append(emenu, redo_menu)
+	gtk_menu_shell_append(emenu, sep6)
+	gtk_menu_shell_append(emenu, select_menu)
+	gtk_menu_shell_append(emenu, sep7)
+	gtk_menu_shell_append(emenu, find_menu)
+	emenu_item = gtk_menu_item_new_with_mnemonic("_Edit")
+	gtk_menu_item_set_submenu(emenu_item, emenu)
+	gtk_menu_shell_append(menubar, emenu_item)
+
+	' Create OPTIONS submenu
+	omenu = gtk_menu_new()
+	otear = gtk_tearoff_menu_item_new()
+	indent_menu = gtk_check_menu_item_new_with_mnemonic("_Auto indent")
+	linenr_menu = gtk_check_menu_item_new_with_mnemonic("_Line numbers")
+	wrap_menu = gtk_check_menu_item_new_with_mnemonic("_Wrap lines")
+	page_menu = gtk_check_menu_item_new_with_mnemonic("_Restore tabs")
+	context_menu = gtk_check_menu_item_new_with_mnemonic("_Context info")
+	g_signal_connect_data(context_menu, "activate", (void*)Show_Context_Info, 0, 0, 0)
+	sep21 = gtk_menu_item_new()
+	apply_menu = gtk_menu_item_new_with_mnemonic("A_pply indentation")
+	sep2 = gtk_menu_item_new()
+	font_menu = gtk_menu_item_new_with_mnemonic("_Select font...")
+	color_menu = gtk_menu_item_new_with_mnemonic("_Background color...")
+	theme_menu = gtk_menu_item_new_with_mnemonic("Select _theme")
+	spacing_menu = gtk_menu_item_new_with_mnemonic("L_ine spacing")
+	sep3 = gtk_menu_item_new()
+	syntax_menu = gtk_menu_item_new_with_mnemonic("_Update syntaxfile...")
+	doc_menu = gtk_menu_item_new_with_mnemonic("Update _documentation...")
+	gtk_menu_shell_append(omenu, otear)
+	gtk_menu_shell_append(omenu, indent_menu)
+	gtk_menu_shell_append(omenu, linenr_menu)
+	gtk_menu_shell_append(omenu, wrap_menu)
+	gtk_menu_shell_append(omenu, page_menu)
+	gtk_menu_shell_append(omenu, sep21)
+	gtk_menu_shell_append(omenu, context_menu)
+	gtk_menu_shell_append(omenu, apply_menu)
+	gtk_menu_shell_append(omenu, sep2)
+	gtk_menu_shell_append(omenu, font_menu)
+	gtk_menu_shell_append(omenu, color_menu)
+	gtk_menu_shell_append(omenu, theme_menu)
+	gtk_menu_shell_append(omenu, spacing_menu)
+	gtk_menu_shell_append(omenu, sep3)
+	gtk_menu_shell_append(omenu, syntax_menu)
+	gtk_menu_shell_append(omenu, doc_menu)
+	omenu_item = gtk_menu_item_new_with_mnemonic("_Options")
+	gtk_menu_item_set_submenu(omenu_item, omenu)
+
+	sub_menu_pix = gtk_menu_new()
+	FOR x = 0 TO 5
+		menu_pix = gtk_menu_item_new_with_label(STR$(x) & " pixels")
+		gtk_menu_shell_append(sub_menu_pix, menu_pix)
+		g_signal_connect_data(menu_pix, "activate", (void*)Set_Spacing, x, 0, 0)
+	NEXT
+	gtk_menu_item_set_submenu(spacing_menu, sub_menu_pix)
+
+	g_Scheme_Manager = gtk_source_style_scheme_manager_get_default()
+	scheme_ids = gtk_source_style_scheme_manager_get_scheme_ids(g_Scheme_Manager)
+	sub_menu_theme = gtk_menu_new()
+	WHILE *scheme_ids <> NULL
+		menu_theme = gtk_menu_item_new_with_label((char *)*scheme_ids)
+		gtk_menu_shell_append(sub_menu_theme, menu_theme)
+		g_signal_connect_data(menu_theme, "activate", (void*)Set_Scheme, (long)*scheme_ids, 0, 0)
+		INCR scheme_ids
+	WEND
+	gtk_menu_item_set_submenu(theme_menu, sub_menu_theme)
+
+	gtk_menu_shell_append(menubar, omenu_item)
+
+	' Create CONVERT menu
+	comenu = gtk_menu_new()
+	cotear = gtk_tearoff_menu_item_new()
+	conv_menu = gtk_menu_item_new_with_mnemonic("_Convert...")
+	exec_menu = gtk_menu_item_new_with_mnemonic("_Execute...")
+	sep12 = gtk_menu_item_new()
+	test_menu = gtk_menu_item_new_with_mnemonic("_BaCon Scratchpad...")
+	gtk_menu_shell_append(comenu, cotear)
+	gtk_menu_shell_append(comenu, conv_menu)
+	gtk_menu_shell_append(comenu, exec_menu)
+	gtk_menu_shell_append(comenu, sep12)
+	gtk_menu_shell_append(comenu, test_menu)
+	comenu_item = gtk_menu_item_new_with_mnemonic("_Tools")
+	gtk_menu_item_set_submenu(comenu_item, comenu)
+	gtk_menu_shell_append(menubar, comenu_item)
+
+	' Create HELP submenu
+	hmenu = gtk_menu_new()
+	htear = gtk_tearoff_menu_item_new()
+	help_menu = gtk_menu_item_new_with_mnemonic("_Documentation")
+	about_menu = gtk_menu_item_new_with_mnemonic("_About...")
+	gtk_menu_shell_append(hmenu, htear)
+	gtk_menu_shell_append(hmenu, help_menu)
+	gtk_menu_shell_append(hmenu, about_menu)
+	hmenu_item = gtk_menu_item_new_with_mnemonic("_Help")
+	gtk_menu_item_set_submenu(hmenu_item, hmenu)
+	gtk_menu_shell_append(menubar, hmenu_item)
+
+	' Create FIND dialog
+	g_Find = gtk_window_new(GTK_WINDOW_TOPLEVEL)
+	gtk_window_set_title(g_Find, "Find and replace")
+	gtk_window_set_transient_for(g_Find, g_Win)
+	gtk_window_set_position(g_Find, GTK_WIN_POS_CENTER_ON_PARENT)
+	gtk_window_set_default_size(g_Find, 350, -1)
+	gtk_window_set_icon_name(g_Find, "gtk-find")
+	find_label1 = gtk_label_new("Find:")
+	g_Find_entry = gtk_entry_new()
+	gtk_widget_set_size_request(find_label1, 80, -1)
+	gtk_misc_set_alignment(find_label1, 1.0, 0.5)
+	find_label2 = gtk_label_new("Replace:")
+	g_Repl_entry = gtk_entry_new()
+	gtk_widget_set_size_request(find_label2, 80, -1)
+	gtk_misc_set_alignment(find_label2, 1.0, 0.5)
+	sep11 = gtk_hseparator_new()
+	find_ok = gtk_button_new_from_stock("gtk-close")
+	find_get = gtk_button_new_from_stock("gtk-find")
+	find_repl = gtk_button_new_from_stock("gtk-find-and-replace")
+	find_vbox = gtk_vbox_new(0, 0)
+	find_hbox1 = gtk_hbox_new(0, 0)
+	find_hbox2 = gtk_hbox_new(0, 0)
+	find_hbox3 = gtk_hbox_new(0, 0)
+	gtk_box_pack_start(find_hbox2, find_label1, 0, 0, 1)
+	gtk_box_pack_end(find_hbox2, g_Find_entry, 1, 1, 1)
+	gtk_box_pack_start(find_hbox3, find_label2, 0, 0, 1)
+	gtk_box_pack_end(find_hbox3, g_Repl_entry, 1, 1, 1)
+	gtk_box_pack_start(find_vbox, find_hbox2, 0, 0, 1)
+	gtk_box_pack_start(find_vbox, find_hbox3, 0, 0, 1)
+	gtk_box_pack_start(find_vbox, sep11, 0, 0, 1)
+	gtk_box_pack_end(find_hbox1, find_get, 0, 0, 1)
+	gtk_box_pack_end(find_hbox1, find_repl, 0, 0, 1)
+	gtk_box_pack_end(find_hbox1, find_ok, 0, 0, 1)
+	gtk_box_pack_start(find_vbox, find_hbox1, 0, 0, 1)
+	gtk_container_add(g_Find, find_vbox)
+	g_signal_connect_data(find_ok, "clicked", (void*)Hide_Dialog, g_Find, 0, 0)
+	g_signal_connect_data(find_get, "clicked", (void*)Find_Term, 0, 0, 0)
+	g_signal_connect_data(g_Find_entry, "activate", (void*)Find_Term, 0, 0, 0)
+	g_signal_connect_data(find_repl, "clicked", (void*)Find_Term, 1, 0, 0)
+	g_signal_connect_data(g_Find, "delete-event", (void*)gtk_widget_hide_on_delete, 0, 0, 0)
+
+	' Create progress dialog for conversion
+	g_Progress = gtk_window_new(GTK_WINDOW_TOPLEVEL)
+	gtk_window_set_transient_for(g_Progress, g_Win)
+	gtk_window_set_position(g_Progress, GTK_WIN_POS_CENTER_ON_PARENT)
+	gtk_widget_set_size_request(g_Progress, 350, -1)
+	gtk_window_set_resizable(g_Progress, 0)
+	gtk_window_set_icon_name(g_Progress, "gtk-convert")
+	g_Progressbar = gtk_progress_bar_new()
+	gtk_container_add(g_Progress, g_Progressbar)
+	g_signal_connect_data(g_Progress, "delete-event", (void*)gtk_widget_hide_on_delete, 0, 0, 0)
+	g_object_set(g_Progressbar, "show-text", TRUE, NULL)
+
+	' Create OPTIONS dialog
+	g_Options = gtk_window_new(GTK_WINDOW_TOPLEVEL)
+	gtk_window_set_title(g_Options, "Conversion options")
+	gtk_window_set_transient_for(g_Options, g_Win)
+	gtk_window_set_position(g_Options, GTK_WIN_POS_CENTER_ON_PARENT)
+	gtk_window_set_resizable(g_Options, 0)
+	gtk_window_set_icon_name(g_Options, "gtk-preferences")
+	compiler_label = gtk_label_new("C compiler:")
+	gtk_misc_set_alignment(compiler_label, 1.0, 0.5)
+	g_Compiler_entry = gtk_entry_new()
+	gtk_entry_set_text(g_Compiler_entry, "cc")
+	flags_label = gtk_label_new("Libraries:")
+	gtk_misc_set_alignment(flags_label, 1.0, 0.5)
+	g_Flags_entry = gtk_entry_new()
+	options_label = gtk_label_new("Options:")
+	gtk_misc_set_alignment(options_label, 1.0, 0.5)
+	g_Options_entry = gtk_entry_new()
+	inc_label = gtk_label_new("Include files:")
+	gtk_misc_set_alignment(inc_label, 1.0, 0.5)
+	g_Inc_entry = gtk_entry_new()
+	tmpdir_label = gtk_label_new("Temp dir:")
+	gtk_misc_set_alignment(tmpdir_label, 1.0, 0.5)
+	g_Tmpdir_entry = gtk_entry_new()
+	gtk_entry_set_text(g_Tmpdir_entry, "/tmp")
+	sep8 = gtk_hseparator_new()
+	g_So_check = gtk_check_button_new_with_label("Create Shared Object")
+	g_Con_check = gtk_check_button_new_with_label("Do not compile, only convert")
+	g_Cpp_check = gtk_check_button_new_with_label("Invoke C Preprocessor")
+	g_Pre_check = gtk_check_button_new_with_label("Preserve temporary files")
+	g_Gettext_check = gtk_check_button_new_with_label("Extract gettext strings")
+	g_Lcase_check = gtk_check_button_new_with_label("Allow lowercase")
+	g_Suppress_semantic = gtk_check_button_new_with_label("Suppress semantic warnings")
+	sep9 = gtk_hseparator_new()
+	options_close = gtk_button_new_from_stock("gtk-convert")
+	options_cancel = gtk_button_new_from_stock("gtk-cancel")
+	options_vbox = gtk_vbox_new(0, 0)
+	options_hbox1 = gtk_hbox_new(0, 0)
+	gtk_box_pack_start(options_hbox1, compiler_label, 1, 1, 1)
+	gtk_box_pack_end(options_hbox1, g_Compiler_entry, 0, 0, 1)
+	options_hbox2 = gtk_hbox_new(0, 0)
+	gtk_box_pack_start(options_hbox2, flags_label, 1, 1, 1)
+	gtk_box_pack_end(options_hbox2, g_Flags_entry, 0, 0, 1)
+	options_hbox3 = gtk_hbox_new(0, 0)
+	gtk_box_pack_start(options_hbox3, options_label, 1, 1, 1)
+	gtk_box_pack_end(options_hbox3, g_Options_entry, 0, 0, 1)
+	options_hbox4 = gtk_hbox_new(0, 0)
+	gtk_box_pack_start(options_hbox4, inc_label, 1, 1, 1)
+	gtk_box_pack_end(options_hbox4, g_Inc_entry, 0, 0, 1)
+	options_hbox5 = gtk_hbox_new(0, 0)
+	gtk_box_pack_start(options_hbox5, tmpdir_label, 1, 1, 1)
+	gtk_box_pack_end(options_hbox5, g_Tmpdir_entry, 0, 0, 1)
+	options_hbox7 = gtk_hbox_new(0, 0)
+	gtk_box_pack_start(options_hbox7, options_cancel, 0, 0, 1)
+	gtk_box_pack_end(options_hbox7, options_close, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, options_hbox1, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, options_hbox2, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, options_hbox3, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, options_hbox4, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, options_hbox5, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, sep8, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, g_So_check, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, g_Con_check, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, g_Cpp_check, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, g_Pre_check, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, g_Gettext_check, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, g_Lcase_check, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, g_Suppress_semantic, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, sep9, 0, 0, 1)
+	gtk_box_pack_start(options_vbox, options_hbox7, 0, 0, 1)
+	gtk_container_add(g_Options, options_vbox)
+	g_signal_connect_data(options_cancel, "clicked", (void*)Hide_Dialog, g_Options, 0, 0)
+	g_signal_connect_data(options_close, "clicked", (void*)Convert_Source, g_Options, 0, 0)
+	g_signal_connect_data(g_Options, "delete-event", (void*)gtk_widget_hide_on_delete, 0, 0, 0)
+	g_signal_connect_data(g_Options, "hide", (void*)Activate_Button, options_close, 0, 0)
+	gtk_widget_grab_focus(options_close)
+
+	' Create "Compiling now..." dialog
+	g_Compiling = gtk_window_new(GTK_WINDOW_TOPLEVEL)
+	gtk_window_set_title(g_Compiling, "Informational")
+	gtk_window_set_transient_for(g_Compiling, g_Win)
+	gtk_window_set_position(g_Compiling, GTK_WIN_POS_CENTER_ON_PARENT)
+	gtk_window_set_resizable(g_Compiling, 0)
+	gtk_window_set_icon_name(g_Compiling, "gtk-preferences")
+	compiling_image = gtk_image_new_from_stock("gtk-dialog-info", GTK_ICON_SIZE_DIALOG)
+	compiling_label = gtk_label_new("Converting and compiling, please wait...")
+	compiling_hbox = gtk_hbox_new(0, 10)
+	gtk_box_pack_start(compiling_hbox, compiling_image, 0, 0, 5)
+	gtk_box_pack_start(compiling_hbox, compiling_label, 0, 0, 5)
+	gtk_container_add(g_Compiling, compiling_hbox)
+
+	' Create EXECUTE dialog
+	g_Execute = gtk_window_new(GTK_WINDOW_TOPLEVEL)
+	gtk_window_set_title(g_Execute, "Execute options")
+	gtk_window_set_transient_for(g_Execute, g_Win)
+	gtk_window_set_position(g_Execute, GTK_WIN_POS_CENTER_ON_PARENT)
+	gtk_window_set_default_size(g_Execute, 540, -1)
+	gtk_window_set_icon_name(g_Execute, "gtk-preferences")
+	gui_radio = gtk_radio_button_new_with_label_from_widget(0, "GUI application")
+	con_radio = gtk_radio_button_new_with_label_from_widget(gui_radio, "Console application")
+	g_Shell_label1 = gtk_label_new("Default shell:")
+	gtk_widget_set_size_request(g_Shell_label1, 120, -1)
+	gtk_misc_set_alignment(g_Shell_label1, 1.0, 0.5)
+	g_Shell_entry1 = gtk_entry_new()
+	gtk_entry_set_text(g_Shell_entry1, "xterm -hold -sb -geometry 132x40 -e @")
+	g_Shell_label2 = gtk_label_new("Arguments:")
+	gtk_widget_set_size_request(g_Shell_label2, 120, -1)
+	gtk_misc_set_alignment(g_Shell_label2, 1.0, 0.5)
+	g_Shell_entry2 = gtk_entry_new()
+	CALL Disable_Console
+	sep10 = gtk_hseparator_new()
+	exec_close = gtk_button_new_from_stock("gtk-execute")
+	exec_cancel = gtk_button_new_from_stock("gtk-cancel")
+	execute_vbox = gtk_vbox_new(0, 0)
+	execute_hbox1 = gtk_hbox_new(0, 0)
+	gtk_box_pack_start(execute_hbox1, g_Shell_label1, 0, 0, 1)
+	gtk_box_pack_end(execute_hbox1, g_Shell_entry1, 1, 1, 1)
+	execute_hbox3 = gtk_hbox_new(0, 0)
+	gtk_box_pack_start(execute_hbox3, g_Shell_label2, 0, 0, 1)
+	gtk_box_pack_end(execute_hbox3, g_Shell_entry2, 1, 1, 1)
+	execute_hbox2 = gtk_hbox_new(0, 0)
+	gtk_box_pack_start(execute_hbox2, exec_cancel, 0, 0, 1)
+	gtk_box_pack_end(execute_hbox2, exec_close, 0, 0, 1)
+	gtk_box_pack_start(execute_vbox, gui_radio, 0, 0, 1)
+	gtk_box_pack_start(execute_vbox, con_radio, 0, 0, 1)
+	gtk_box_pack_start(execute_vbox, execute_hbox1, 0, 0, 1)
+	gtk_box_pack_start(execute_vbox, execute_hbox3, 0, 0, 1)
+	gtk_box_pack_start(execute_vbox, sep10, 0, 0, 1)
+	gtk_box_pack_start(execute_vbox, execute_hbox2, 0, 0, 1)
+	gtk_container_add(g_Execute, execute_vbox)
+	g_signal_connect_data(gui_radio, "clicked", (void*)Disable_Console, 0, 0, 0)
+	g_signal_connect_data(con_radio, "clicked", (void*)Enable_Console, 0, 0, 0)
+	g_signal_connect_data(exec_cancel, "clicked", (void*)Hide_Dialog, g_Execute, 0, 0)
+	g_signal_connect_data(exec_close, "clicked", (void*)Execute_Binary, g_Execute, 0, 0)
+	g_signal_connect_data(g_Shell_entry1, "activate", (void*)Execute_Binary, g_Execute, 0, 0)
+	g_signal_connect_data(g_Shell_entry2, "activate", (void*)Execute_Binary, g_Execute, 0, 0)
+	g_signal_connect_data(g_Execute, "delete-event", (void*)gtk_widget_hide_on_delete, 0, 0, 0)
+	g_signal_connect_data(g_Execute, "hide", (void*)Activate_Button, exec_close, 0, 0)
+	gtk_toggle_button_set_active(con_radio, 1)
+	gtk_widget_grab_focus(exec_close)
+
+	' Create TEST dialog
+	g_Test = gtk_window_new(GTK_WINDOW_TOPLEVEL)
+	gtk_window_set_title(g_Test, "BaCon Scratchpad")
+	gtk_window_set_transient_for(g_Test, g_Win)
+	gtk_window_set_position(g_Test, GTK_WIN_POS_CENTER_ON_PARENT)
+	gtk_window_set_default_size(g_Test, 750, 550)
+	gtk_window_set_icon_name(g_Test, "gtk-preferences")
+	test_label1 = gtk_frame_new(" Input test code ")
+	lm = gtk_source_language_manager_get_default()
+	lang = gtk_source_language_manager_get_language(lm, "bacon")
+	g_Test_buffer1 = gtk_source_buffer_new_with_language(lang)
+	gtk_source_buffer_set_highlight_matching_brackets(g_Test_buffer1, 1)
+	g_Test_view1 = gtk_source_view_new_with_buffer(g_Test_buffer1)
+	g_signal_connect_data(g_Test_view1, "key-release-event", (void*)Cursor_Changed, 1, 0, 0)
+	g_signal_connect_data(g_Test_view1, "button-release-event", (void*)Cursor_Changed, 1, 0, 0)
+	g_signal_connect_data(g_Test_view1, "focus-out-event", (void*)Hide_Context, 0, 0, 0)
+	' Tab space to 4 characters
+	gtk_source_view_set_tab_width(g_Test_view1, 4)
+	' Create scrolled window
+	test_scrolled1 = gtk_scrolled_window_new(0, 0)
+	gtk_scrolled_window_set_policy(test_scrolled1, GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC)
+	gtk_scrolled_window_set_shadow_type(test_scrolled1, GTK_SHADOW_ETCHED_IN)
+	range = gtk_scrolled_window_get_hscrollbar(test_scrolled1)
+	g_signal_connect_data(range, "value-changed", (void*)Hide_Context, 0, 0, 0)
+	range = gtk_scrolled_window_get_vscrollbar(test_scrolled1)
+	g_signal_connect_data(range, "value-changed", (void*)Hide_Context, 0, 0, 0)
+	gtk_container_add(test_scrolled1, g_Test_view1)
+	gtk_text_view_set_editable(g_Test_view1, TRUE)
+	gtk_text_view_set_wrap_mode(g_Test_view1, GTK_WRAP_WORD)
+	gtk_container_set_border_width(test_scrolled1, 5)
+	gtk_container_add(test_label1, test_scrolled1)
+	test_execute = gtk_button_new_from_stock("gtk-execute")
+	test_close = gtk_button_new_from_stock("gtk-close")
+	test_vbox = gtk_vbox_new(0, 0)
+	test_hbox = gtk_hbox_new(0, 0)
+	gtk_box_pack_end(test_hbox, test_close, 0, 0, 1)
+	gtk_box_pack_start(test_hbox, test_execute, 0, 0, 1)
+	gtk_box_pack_start(test_vbox, test_label1, 1, 1, 1)
+	gtk_box_pack_start(test_vbox, test_hbox, 0, 0, 1)
+	gtk_container_add(g_Test, test_vbox)
+	g_signal_connect_data(test_execute, "clicked", (void*)Execute_Line, 0, 0, 0)
+	g_signal_connect_data(test_close, "clicked", (void*)Hide_Dialog, g_Test, 0, 0)
+	g_signal_connect_data(g_Test, "delete-event", (void*)gtk_widget_hide_on_delete, 0, 0, 0)
+
+	' Create info dialog
+	g_Info = gtk_window_new(GTK_WINDOW_POPUP)
+	gtk_window_set_default_size(g_Info, 470, G_INFO_HEIGHT)
+	g_Scroll = gtk_scrolled_window_new(0, 0)
+	gtk_scrolled_window_set_policy(g_Scroll, 1, 1)
+	gtk_scrolled_window_set_shadow_type(g_Scroll, 0)
+	gtk_container_add(g_Info, g_Scroll)
+	g_Inf_Label = gtk_label_new(NULL)
+	gtk_misc_set_alignment(g_Inf_Label, 0.0, 0.0)
+	gtk_scrolled_window_add_with_viewport(g_Scroll, g_Inf_Label)
+	col = MEMORY(DEFAULT_WIDGET_SIZE)
+	gdk_color_parse("#ffff00", col)
+	gtk_widget_modify_bg(gtk_widget_get_parent(g_Inf_Label), 0, col)
+	FREE col
+	gtk_widget_show_all(g_Scroll)
+
+	' Create dialog for HTML help
+	g_Html = gtk_window_new(GTK_WINDOW_TOPLEVEL)
+	gtk_window_set_title(g_Html, "HTML Help")
+	gtk_window_set_position(g_Html, GTK_WIN_POS_MOUSE)
+	gtk_window_set_default_size(g_Html, 1280, 650)
+	gtk_window_set_icon_name(g_Html, "gtk-help")
+	IF g_LIBGTKWEBKIT THEN
+		g_Html_widget = webkit_web_view_new()
+		webkit_settings = webkit_web_settings_new()
+		g_object_set(webkit_settings, "user-agent", "BaCon docviewer", "enable-plugins", FALSE, "enable-dns-prefetching", FALSE, NULL)
+		webkit_web_view_set_settings(g_Html_widget, webkit_settings)
+		gtk_container_add(g_Html, g_Html_widget)
+	END IF
+	g_signal_connect_data(g_Html, "delete-event", (void*)gtk_widget_hide_on_delete, 0, 0, 0)
+
+	' Create contextmenu
+	g_Cmenu = gtk_menu_new()
+	cnewtab_menu = gtk_menu_item_new_with_mnemonic("New tab")
+	copentab_menu = gtk_menu_item_new_with_mnemonic("Open tab...")
+	cclosetab_menu = gtk_menu_item_new_with_mnemonic("Close tab")
+	gtk_menu_shell_append(g_Cmenu, cnewtab_menu)
+	gtk_menu_shell_append(g_Cmenu, copentab_menu)
+	gtk_menu_shell_append(g_Cmenu, cclosetab_menu)
+	g_signal_connect_data(cnewtab_menu, "activate", (void*)Create_Page, 0, 0, 0)
+	g_signal_connect_data(copentab_menu, "activate", (void*)Open_Page, 0, 0, 0)
+	g_signal_connect_data(cclosetab_menu, "activate", (void*)Close_Tab, 0, 0, 0)
+	gtk_widget_show_all(g_Cmenu)
+
+	' Create notebook
+	g_Notebook = gtk_notebook_new()
+	g_signal_connect_data(g_Notebook, "button-press-event", (void*)Show_Popup, 0, 0, 0)
+	g_signal_connect_data(g_Notebook, "page-reordered", (void*)Reorder_Tabs, 0, 0, 0)
+	gtk_notebook_set_scrollable(g_Notebook, TRUE)
+
+	' Create statusbars
+	g_Statusbar = gtk_statusbar_new()
+	IF Gtk_Version$ = "gtk2" THEN gtk_statusbar_set_has_resize_grip(g_Statusbar, 0)
+	g_Msgcid = gtk_statusbar_get_context_id(g_Statusbar, "bacon")
+	gtk_statusbar_push(g_Statusbar, g_Msgcid, "Compiled with BaCon " & VERSION$)
+	statusbar = gtk_statusbar_new()
+	g_Status_Label = gtk_label_new("Column: 1   ")
+	gtk_misc_set_alignment(g_Status_Label, 1.0, 0.5)
+	gtk_container_add(statusbar, g_Status_Label)
+	statusbar2 = gtk_statusbar_new()
+	IF Gtk_Version$ = "gtk2" THEN gtk_statusbar_set_has_resize_grip(statusbar2, 0)
+	g_File_Label = gtk_label_new("File size: 0 bytes  ")
+	gtk_misc_set_alignment(g_File_Label, 1.0, 0.5)
+	gtk_widget_set_size_request(g_File_Label, 140, -1)
+	gtk_container_add(statusbar2, g_File_Label)
+	status_hbox = gtk_hbox_new(0, 1)
+	gtk_box_pack_start(status_hbox, g_Statusbar, 1, 1, 1)
+	gtk_box_pack_start(status_hbox, statusbar2, 0, 1, 1)
+	gtk_box_pack_start(status_hbox, statusbar, 0, 0, 1)
+
+	' Toolbar
+	toolbar = gtk_toolbar_new()
+	toolbutton = gtk_tool_button_new_from_stock("gtk-new")
+	g_signal_connect_data(toolbutton, "clicked", (void*)Create_Page, 0, 0, 0)
+	gtk_widget_set_tooltip_text(toolbutton, "New BaCon program")
+	gtk_toolbar_insert(toolbar, toolbutton, -1)
+	toolbutton = gtk_tool_button_new_from_stock("gtk-open")
+	g_signal_connect_data(toolbutton, "clicked", (void*)Open_File, 0, 0, 0)
+	gtk_widget_set_tooltip_text(toolbutton, "Open BaCon program")
+	gtk_toolbar_insert(toolbar, toolbutton, -1)
+	toolbutton = gtk_tool_button_new_from_stock("gtk-save")
+	g_signal_connect_data(toolbutton, "clicked", (void*)Save_File, 0, 0, 0)
+	gtk_widget_set_tooltip_text(toolbutton, "Save BaCon program")
+	gtk_toolbar_insert(toolbar, toolbutton, -1)
+	toolbutton = gtk_tool_button_new_from_stock("gtk-save-as")
+	g_signal_connect_data(toolbutton, "clicked", (void*)Save_Fileas, 0, 0, 0)
+	gtk_widget_set_tooltip_text(toolbutton, "Save BaCon program as...")
+	gtk_toolbar_insert(toolbar, toolbutton, -1)
+	sep18 = gtk_separator_tool_item_new()
+	gtk_toolbar_insert(toolbar, sep18, -1)
+	toolbutton = gtk_tool_button_new_from_stock("gtk-undo")
+	g_signal_connect_data(toolbutton, "clicked", (void*)Undo_Action, 0, 0, 0)
+	gtk_widget_set_tooltip_text(toolbutton, "Undo last action")
+	gtk_toolbar_insert(toolbar, toolbutton, -1)
+	toolbutton = gtk_tool_button_new_from_stock("gtk-redo")
+	g_signal_connect_data(toolbutton, "clicked", (void*)Redo_Action, 0, 0, 0)
+	gtk_widget_set_tooltip_text(toolbutton, "Redo action")
+	gtk_toolbar_insert(toolbar, toolbutton, -1)
+	sep17 = gtk_separator_tool_item_new()
+	gtk_toolbar_insert(toolbar, sep17, -1)
+	toolbutton = gtk_tool_button_new_from_stock("gtk-cut")
+	g_signal_connect_data(toolbutton, "clicked", (void*)Cut_Text, 0, 0, 0)
+	gtk_widget_set_tooltip_text(toolbutton, "Cut text")
+	gtk_toolbar_insert(toolbar, toolbutton, -1)
+	toolbutton = gtk_tool_button_new_from_stock("gtk-copy")
+	g_signal_connect_data(toolbutton, "clicked", (void*)Copy_Text, 0, 0, 0)
+	gtk_widget_set_tooltip_text(toolbutton, "Copy text")
+	gtk_toolbar_insert(toolbar, toolbutton, -1)
+	toolbutton = gtk_tool_button_new_from_stock("gtk-paste")
+	g_signal_connect_data(toolbutton, "clicked", (void*)Paste_Text, 0, 0, 0)
+	gtk_widget_set_tooltip_text(toolbutton, "Paste text")
+	gtk_toolbar_insert(toolbar, toolbutton, -1)
+	sep19 = gtk_separator_tool_item_new()
+	gtk_toolbar_insert(toolbar, sep19, -1)
+	toolbutton = gtk_tool_button_new_from_stock("gtk-convert")
+	g_signal_connect_data(toolbutton, "clicked", (void*)Show_Dialog, g_Options, 0, 0)
+	gtk_widget_set_tooltip_text(toolbutton, "Start conversion")
+	gtk_toolbar_insert(toolbar, toolbutton, -1)
+	toolbutton = gtk_tool_button_new_from_stock("gtk-execute")
+	g_signal_connect_data(toolbutton, "clicked", (void*)Show_Dialog, g_Execute, 0, 0)
+	gtk_widget_set_tooltip_text(toolbutton, "Execute BaCon program")
+	gtk_toolbar_insert(toolbar, toolbutton, -1)
+	IF FILEEXISTS(CONCAT$(DATA_PATH, "/pixmaps/BaCon24.png")) THEN
+		toolbutton = gtk_tool_button_new(0,"Scratchpad")
+		b_image = gtk_image_new_from_file(CONCAT$(DATA_PATH, "/pixmaps/BaCon24.png"))
+		gtk_tool_button_set_icon_widget(toolbutton, b_image)
+	ELSE
+		toolbutton = gtk_tool_button_new_from_stock("BaCon.png")
+	ENDIF
+	g_signal_connect_data(toolbutton, "clicked", (void*)Show_Dialog, g_Test, 0, 0)
+	gtk_widget_set_tooltip_text(toolbutton, "BaCon Scratchpad")
+	gtk_toolbar_insert(toolbar, toolbutton, -1)
+	sep20 = gtk_separator_tool_item_new()
+	gtk_toolbar_insert(toolbar, sep20, -1)
+	toolbutton = gtk_tool_button_new_from_stock("gtk-help")
+	g_signal_connect_data(toolbutton, "clicked", (void*)Handle_Help, 0, 0, 0)
+	gtk_widget_set_tooltip_text(toolbutton, "Show help")
+	gtk_toolbar_insert(toolbar, toolbutton, -1)
+
+	' See if files were saved in a previous session and load them
+	Load_Files_Into_GUI
+
+	' Get filenames from arguments
+	IF LEN(ARGUMENT$) THEN
+		IF LEFT$(ARGUMENT$, 7) = "http://" THEN
+			file$ = Download_File$(ARGUMENT$, FALSE)
+			IF LEN(file$) > 0 THEN
+				Create_Page
+				Load_File(file$, FALSE)
+			END IF
+		ELSE
+			IF NOT(FILEEXISTS(ARGUMENT$)) THEN
+				CALL Run_Dialog(GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "Cannot find file '" & ARGUMENT$ & "'!", -1)
+			ELSE
+				Create_Page
+				Load_File(ARGUMENT$, TRUE)
+			END IF
+		END IF
+	END IF
+
+	' Nothing loaded? Then simply create new page
+	IF gtk_notebook_get_n_pages(g_Notebook) = 0 THEN Create_Page
+	g_signal_connect_data(g_Notebook, "switch-page", (void*)Cursor_Changed, 0, 0, 1)
+
+	' Setup vbox
+	vbox = gtk_vbox_new(0, 0)
+	gtk_box_pack_start(vbox, menubar, 0, 0, 0)
+	gtk_box_pack_start(vbox, toolbar, 0, 0, 0)
+	gtk_box_pack_start(vbox, g_Notebook, 1, 1, 2)
+	gtk_box_pack_start(vbox, status_hbox, 0, 0, 1)
+
+	' Finalize GUI
+	gtk_container_add(g_Win, vbox)
+	gtk_widget_show_all(g_Win)
+
+	' Define some accelerator keys
+	accel_group = gtk_accel_group_new()
+	gtk_window_add_accel_group(g_Win, accel_group)
+	gtk_widget_add_accelerator(file_menu, "activate", accel_group, gdk_keyval_from_name("o"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(save_menu, "activate", accel_group, gdk_keyval_from_name("s"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(saveas_menu, "activate", accel_group, gdk_keyval_from_name("s"), GDK_CONTROL_MASK|GDK_SHIFT_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(export_menu, "activate", accel_group, gdk_keyval_from_name("h"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(print_menu, "activate", accel_group, gdk_keyval_from_name("p"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(newtab_menu, "activate", accel_group, gdk_keyval_from_name("n"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(opentab_menu, "activate", accel_group, gdk_keyval_from_name("n"), GDK_CONTROL_MASK|GDK_SHIFT_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(closetab_menu, "activate", accel_group, gdk_keyval_from_name("t"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(exit_menu, "activate", accel_group, gdk_keyval_from_name("q"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(cut_menu, "activate", accel_group, gdk_keyval_from_name("x"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(copy_menu, "activate", accel_group, gdk_keyval_from_name("c"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(paste_menu, "activate", accel_group, gdk_keyval_from_name("v"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(undo_menu, "activate", accel_group, gdk_keyval_from_name("z"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(redo_menu, "activate", accel_group, gdk_keyval_from_name("r"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(select_menu, "activate", accel_group, gdk_keyval_from_name("a"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(find_menu, "activate", accel_group, gdk_keyval_from_name("f"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(context_menu, "activate", accel_group, gdk_keyval_from_name("i"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(apply_menu, "activate", accel_group, gdk_keyval_from_name("m"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(conv_menu, "activate", accel_group, gdk_keyval_from_name("b"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(exec_menu, "activate", accel_group, gdk_keyval_from_name("e"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	gtk_widget_add_accelerator(test_menu, "activate", accel_group, gdk_keyval_from_name("w"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+	accel2_group = gtk_accel_group_new()
+	gtk_window_add_accel_group(g_Test, accel2_group)
+	gtk_widget_add_accelerator(context_menu, "activate", accel2_group, gdk_keyval_from_name("i"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+
+	' Callbacks for the menu items
+	g_signal_connect_data(file_menu, "activate", (void*)Open_File, 0, 0, 0)
+	g_signal_connect_data(save_menu, "activate", (void*)Save_File, 0, 0, 0)
+	g_signal_connect_data(saveas_menu, "activate", (void*)Save_Fileas, 0, 0, 0)
+	g_signal_connect_data(export_menu, "activate", (void*)Export_File, 0, 0, 0)
+	g_signal_connect_data(newtab_menu, "activate", (void*)Create_Page, 0, 0, 0)
+	g_signal_connect_data(opentab_menu, "activate", (void*)Open_Page, 0, 0, 0)
+	g_signal_connect_data(closetab_menu, "activate", (void*)Close_Tab, 0, 0, 0)
+	g_signal_connect_data(exit_menu, "activate", (void*)Exit_Prog, 0, 0, 0)
+	g_signal_connect_data(cut_menu, "activate", (void*)Cut_Text, 0, 0, 0)
+	g_signal_connect_data(copy_menu, "activate", (void*)Copy_Text, 0, 0, 0)
+	g_signal_connect_data(paste_menu, "activate", (void*)Paste_Text, 0, 0, 0)
+	g_signal_connect_data(undo_menu, "activate", (void*)Undo_Action, 0, 0, 0)
+	g_signal_connect_data(redo_menu, "activate", (void*)Redo_Action, 0, 0, 0)
+	g_signal_connect_data(select_menu, "activate", (void*)Select_All, 0, 0, 0)
+	g_signal_connect_data(find_menu, "activate", (void*)Start_Find, 0, 0, 0)
+	g_signal_connect_data(indent_menu, "activate", (void*)Set_Indent, 0, 0, 0)
+	g_signal_connect_data(linenr_menu, "activate", (void*)Set_Linenr, 0, 0, 0)
+	g_signal_connect_data(wrap_menu, "activate", (void*)Set_Wrapmode, 0, 0, 0)
+	g_signal_connect_data(apply_menu, "activate", (void*)Apply_Indentation, 0, 0, 0)
+	g_signal_connect_data(font_menu, "activate", (void*)Show_Dialog, g_Font_dialog, 0, 0)
+	g_signal_connect_data(color_menu, "activate", (void*)Show_Dialog, g_Color_dialog, 0, 0)
+	g_signal_connect_data(syntax_menu, "activate", (void*)Get_Syntax, 0, 0, 0)
+	g_signal_connect_data(doc_menu, "activate", (void*)Get_Docu, 0, 0, 0)
+	g_signal_connect_data(conv_menu, "activate", (void*)Show_Dialog, g_Options, 0, 0)
+	g_signal_connect_data(exec_menu, "activate", (void*)Show_Dialog, g_Execute, 0, 0)
+	g_signal_connect_data(test_menu, "activate", (void*)Show_Dialog, g_Test, 0, 0)
+	g_signal_connect_data(print_menu, "activate", (void*)Show_Dialog, g_Print_dialog, 0, 0)
+	g_signal_connect_data(help_menu, "activate", (void*)Handle_Help, 0, 0, 0)
+	g_signal_connect_data(about_menu, "activate", (void*)Show_Info, 0, 0, 0)
+
+	' Flag for Open_Tab
+	g_OPEN_PAGE = FALSE
+
+	' Set focus to current page
+	cur_page = gtk_notebook_get_current_page(g_Notebook)
+	gtk_widget_grab_focus(nbook[cur_page].view)
+
+	'Endless mainloop
+	gtk_main
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+FUNCTION SYNC
+
+	WHILE gtk_events_pending() DO
+		gtk_main_iteration_do(FALSE)
+	WEND
+
+	RETURN FALSE
+
+END FUNCTION
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Disable_Console
+
+	gtk_widget_set_sensitive(g_Shell_label1, FALSE)
+	gtk_widget_set_sensitive(g_Shell_entry1, FALSE)
+	gtk_widget_set_sensitive(g_Shell_label2, FALSE)
+	gtk_widget_set_sensitive(g_Shell_entry2, FALSE)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Enable_Console
+
+	gtk_widget_set_sensitive(g_Shell_label1, TRUE)
+	gtk_widget_set_sensitive(g_Shell_entry1, TRUE)
+	gtk_widget_set_sensitive(g_Shell_label2, TRUE)
+	gtk_widget_set_sensitive(g_Shell_entry2, TRUE)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+FUNCTION Check_Dir$
+
+	LOCAL arg$
+
+	arg$ = gtk_entry_get_text(g_Tmpdir_entry)
+
+	IF LEN(arg$) = 0 THEN arg$ = "."
+
+	IF NOT(FILEEXISTS(arg$)) THEN MAKEDIR arg$
+
+	IF NOT(FILEEXISTS(arg$)) THEN
+		CALL Run_Dialog(GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "System error: temporary directory '" & arg$ & "' does not exist!", -1)
+		EXIT SUB
+	END IF
+
+	RETURN arg$
+
+END FUNCTION
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Convert_Source(NUMBER widget, NUMBER data)
+
+	LOCAL arg$, item$, cc$, lib$, opt$, inc$, tmp$, arc$, param$, log$, mak$, name$, bin$
+	LOCAL set, page, buffer, view, iter, mark, linenr
+
+	page = gtk_notebook_get_current_page(g_Notebook)
+
+	' Get all the settings
+	arg$ = gtk_entry_get_text(g_Compiler_entry)
+	IF LEN(arg$) THEN
+		IF ISTRUE(LEN(EXEC$("which " & arg$ & " 2>/dev/null"))) THEN
+			cc$ = " -c " & arg$
+		ELSE
+			CALL Run_Dialog(GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "System error: compiler '" & arg$ & "' not found!", -1)
+			EXIT SUB
+		ENDIF
+	ELSE
+		CALL Run_Dialog(GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "System error: no compiler provided!", -1)
+		EXIT SUB
+	ENDIF
+
+	arg$ = gtk_entry_get_text(g_Flags_entry)
+	WHILE INSTR(arg$, "`")
+		lib$ = lib$ & " `" & INBETWEEN$(arg$, "`", "`", 2) & "`"
+		arg$ = OUTBETWEEN$(arg$, "`", "`", 2)
+	WEND
+	FOR item$ IN arg$
+		lib$ = lib$ & " -l " & item$
+	NEXT
+
+	arg$ = gtk_entry_get_text(g_Options_entry)
+	WHILE INSTR(arg$, "`")
+		opt$ = opt$ & " `" & INBETWEEN$(arg$, "`", "`", 2) & "`"
+		arg$ = OUTBETWEEN$(arg$, "`", "`", 2)
+	WEND
+	FOR item$ IN arg$
+		opt$ = opt$ & " -o " & item$
+	NEXT
+
+	arg$ = gtk_entry_get_text(g_Inc_entry)
+	FOR item$ IN arg$
+		inc$ = inc$ & " -i " & item$
+	NEXT
+
+	param$ = " -q"
+
+	set = gtk_toggle_button_get_active(g_So_check)
+	IF set THEN param$ = param$ & " -f"
+
+	set = gtk_toggle_button_get_active(g_Con_check)
+	IF set THEN param$ = param$ & " -n"
+
+	set = gtk_toggle_button_get_active(g_Cpp_check)
+	IF set THEN param$ = param$ & " -j"
+
+	set = gtk_toggle_button_get_active(g_Pre_check)
+	IF set THEN param$ = param$ & " -p"
+
+	set = gtk_toggle_button_get_active(g_Gettext_check)
+	IF set THEN param$ = param$ & " -x"
+
+	set = gtk_toggle_button_get_active(g_Lcase_check)
+	IF set THEN param$ = param$ & " -z"
+
+	set = gtk_toggle_button_get_active(g_Suppress_semantic)
+	IF set THEN param$ = param$ & " -s"
+
+	arg$ = Check_Dir$()
+
+	' Save the code
+	IF NOT(data) THEN
+		name$ = arg$ & g_BACONSHELL$
+	ELSE
+		CALL Save_File
+		name$ = nbook[page].title$
+		IF LEN(name$) = 0 THEN
+			EXIT SUB
+		ENDIF
+	ENDIF
+
+	IF arg$ <> "." THEN
+		tmp$ = " -d " & arg$
+		log$ = CHOP$(arg$) & "/bacon.log"
+		IF data THEN
+			mak$ = CHOP$(arg$) & "/" & BASENAME$(nbook[page].title$) & ".log"
+		ELSE
+			mak$ = CHOP$(arg$) & "/scratchpad.log"
+		ENDIF
+	ELSE
+		IF data THEN
+			tmp$ = " -d " & DIRNAME$(nbook[page].title$)
+			log$ = DIRNAME$(nbook[page].title$) & "/bacon.log"
+			mak$ = DIRNAME$(nbook[page].title$) & "/" & BASENAME$(nbook[page].title$) & ".log"
+		ELSE
+			tmp$ = " -d ."
+			log$ = "./bacon.log"
+			mak$ = "./scratchpad.log"
+		ENDIF
+	FI
+
+	IF TOKEN$(tmp$, 2) = "." THEN
+		bin$ = DIRNAME$(name$) & "/" & BASENAME$(name$, 1)
+	ELSE
+		bin$ = TOKEN$(tmp$, 2) & "/" & BASENAME$(name$, 1)
+	FI
+
+	gtk_widget_hide(g_Options)
+	gtk_widget_show_all(g_Compiling)
+	CALL SYNC
+
+	IF FILEEXISTS(bin$) AND FILETYPE(bin$) = 1 THEN DELETE FILE bin$
+	SYSTEM "bacon -y " & cc$ & param$ & lib$ & opt$ & inc$ & tmp$ & arc$ & " " & name$ & ">/dev/null 2>" & log$
+
+	gtk_widget_hide(g_Compiling)
+
+	IF NOT(FILEEXISTS(log$)) THEN
+		CALL Run_Dialog(GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, NL$ & "Compiler logging not available! Please provide a correct 'temp dir'.", -1)
+	ELIF FILELEN(log$) > 0 THEN
+		arg$ = HEAD$(CHOP$(LOAD$(log$)), 1, NL$)
+		linenr = VAL(TOKEN$(arg$, 2, ":"))
+		buffer = nbook[page].buffer
+		view = nbook[page].view
+		iter = MEMORY(DEFAULT_WIDGET_SIZE)
+		gtk_text_buffer_get_iter_at_line(buffer, iter, linenr-1)
+		mark = gtk_text_buffer_create_mark(buffer, "mark", iter, 0)
+		gtk_text_view_scroll_to_mark(view, mark, 0, 1, 0.5, 0.5)
+		gtk_text_buffer_place_cursor(buffer, iter)
+		gtk_source_view_set_highlight_current_line(view, 1)
+		gtk_text_buffer_delete_mark(buffer, mark)
+		FREE iter
+		IF NOT(FILEEXISTS(bin$)) THEN
+			CALL Run_Dialog(GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, NL$ & LOAD$(log$), -1)
+			EXIT SUB
+		ELSE
+			IF Run_Dialog(GTK_MESSAGE_INFO, GTK_BUTTONS_YES_NO, NL$ & LOAD$(log$) & NL$ & "Execute?", -1) = GTK_RESPONSE_NO THEN EXIT SUB
+		ENDIF
+	ELIF FILEEXISTS(mak$) AND FILELEN(mak$) THEN
+		IF NOT(FILEEXISTS(bin$)) THEN
+			CALL Run_Dialog(GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, NL$ & HEAD$(LOAD$(mak$), 16, NL$), -1)
+			EXIT SUB
+		ELSE
+			IF Run_Dialog(GTK_MESSAGE_INFO, GTK_BUTTONS_YES_NO, NL$ & HEAD$(LOAD$(mak$), 16, NL$) & NL$ & "Execute?", -1) = GTK_RESPONSE_NO THEN EXIT SUB
+		ENDIF
+	ENDIF
+
+	IF FILEEXISTS(log$) THEN DELETE FILE log$
+
+	IF NOT(data) THEN
+		CALL Execute_Binary(0, -1)
+	ELSE
+		gtk_widget_show_all(g_Execute)
+	ENDIF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Execute_Binary(NUMBER widget, NUMBER dialog)
+
+	LOCAL cmd$, arg$, file$, path$, dir$
+	LOCAL page
+
+	IF dialog > 0 THEN
+		gtk_widget_hide(dialog):SYNC
+		page = gtk_notebook_get_current_page(g_Notebook)
+		file$ = BASENAME$(nbook[page].title$)
+		dir$ = gtk_entry_get_text(g_Tmpdir_entry)
+		IF NOT(LEN(dir$)) OR CHOP$(dir$) = "." THEN dir$ = DIRNAME$(nbook[page].title$)
+		' Escape spaces in filename
+		path$ = REPLACE$(dir$ & "/" & file$, CHR$(32), CHR$(92) & CHR$(32) )
+	ELSE
+		arg$ = Check_Dir$()
+		path$ = arg$ & g_BACONSHELL$
+	ENDIF
+
+	' Get binary name
+	path$ = LEFT$(path$, INSTRREV(path$, ".")-1)
+
+	IF gtk_toggle_button_get_active(con_radio) THEN
+		arg$ = gtk_entry_get_text(g_Shell_entry2)
+		arg$ = REPLACE$(arg$, CHR$(34), CHR$(92) & CHR$(34) )
+		cmd$ = gtk_entry_get_text(g_Shell_entry1)
+		cmd$ = REPLACE$(cmd$, "@", path$ & " " & arg$ )
+	ELSE
+		cmd$ = path$
+	END IF
+
+	IF FILEEXISTS(path$) THEN
+		SYSTEM cmd$ & " &"
+	ELSE
+		CALL Run_Dialog(GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "System error: executable '" & BASENAME$(path$, 1) & "' does not exist!", -1)
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Execute_Line(NUMBER widget, NUMBER statement)
+
+	LOCAL tmpdir$, cmd$, file$
+	LOCAL iter1, iter2
+
+	' Save to tempdir
+	tmpdir$ = Check_Dir$()
+
+	iter1 = MEMORY(DEFAULT_WIDGET_SIZE)
+	iter2 = MEMORY(DEFAULT_WIDGET_SIZE)
+
+	gtk_text_buffer_get_bounds(g_Test_buffer1, iter1, iter2)
+	cmd$ = gtk_text_buffer_get_text(g_Test_buffer1, iter1, iter2, 1)
+
+	SAVE cmd$ TO tmpdir$ & g_BACONSHELL$
+
+	FREE iter1, iter2
+
+	' Compile, Run
+	CALL Convert_Source(0, 0)
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+FUNCTION Run_Dialog(NUMBER type, NUMBER buttons, STRING message$, NUMBER line)
+
+	LOCAL dialog, response, buffer, view, mark, iter, page
+
+	IF line > 0 THEN
+		page = gtk_notebook_get_current_page(g_Notebook)
+		buffer = nbook[page].buffer
+		view = nbook[page].view
+
+		iter = MEMORY(DEFAULT_WIDGET_SIZE)
+
+		gtk_text_buffer_get_iter_at_line(buffer, iter, line-1)
+		mark = gtk_text_buffer_create_mark(buffer, "mark", iter, 0)
+		gtk_text_view_scroll_to_mark(view, mark, 0, 1, 0.5, 0.5)
+		gtk_text_buffer_place_cursor(buffer, iter)
+		gtk_source_view_set_highlight_current_line(view, 1)
+		gtk_text_buffer_delete_mark(buffer, mark)
+
+		FREE iter
+	END IF
+
+	dialog = gtk_message_dialog_new(g_Win, GTK_DIALOG_DESTROY_WITH_PARENT, type, buttons, "%s", message$, NULL)
+	gtk_window_set_transient_for(dialog, g_Win)
+	gtk_window_set_position(dialog, GTK_WIN_POS_CENTER_ON_PARENT)
+	IF buttons = GTK_BUTTONS_YES_NO THEN gtk_dialog_set_default_response(dialog, GTK_RESPONSE_YES)
+
+	SELECT type
+		CASE GTK_MESSAGE_ERROR
+			gtk_window_set_title(dialog, "Error")
+			gtk_window_set_icon_name(dialog, "gtk-dialog-error")
+		CASE GTK_MESSAGE_WARNING
+			gtk_window_set_title(dialog, "Warning")
+			gtk_window_set_icon_name(dialog, "gtk-dialog-warning")
+		CASE GTK_MESSAGE_INFO
+			gtk_window_set_title(dialog, "Informational")
+			gtk_window_set_icon_name(dialog, "gtk-dialog-info")
+		DEFAULT
+			gtk_window_set_title(dialog, "Message")
+			gtk_window_set_icon_name(dialog, "gtk-about")
+	END SELECT
+
+	response = gtk_dialog_run(dialog)
+	gtk_widget_destroy(dialog)
+
+	RETURN response
+
+END FUNCTION

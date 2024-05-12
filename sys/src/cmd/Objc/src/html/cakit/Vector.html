@@ -1,0 +1,194 @@
+<HTML>
+<TITLE>vector Specification Sheet</TITLE>
+<H1>vector Specification Sheet</H1>
+
+<HR>
+Computer Algebra Kit (c) 1993,00 by Comp.Alg.Objects.  All Rights Reserved.<P>
+<H1>Vector</H1>
+<B>Inherits from:</B> CAObject<P>
+<B>Maturity Index:</B> Relatively mature<P>
+<H2>Class Description</H2>
+A vector consists of a number of <I>scalars</I> that can be arbitrary Computer Algebra Kit objects, but they currently have to be either floating-point or elements of a field (see <B>inField</B>) or elements of an integral domain (see <B>inIntegralDomain</B>).<P>
+There are methods to access, insert and remove scalars.  It's also possible to place or replace a scalar directly at a given index.  See the documentation on <B>eachScalar</B> to access the scalar at a given index.<P>
+<B>Note:</B> Vector objects are meant for computational tasks.  They are no substitute for List or Collection objects, that are better suited for the purpose of storing objects.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#1">collection:</A></LI>
+<LI><A HREF="#4">scalarZero:numScalars:</A></LI>
+<LI><A HREF="#5">copy</A></LI>
+<LI><A HREF="#6">deepCopy</A></LI>
+</UL>
+<H3><B>Identity</B></H3>
+<UL>
+<LI><A HREF="#13">scalarZero</A></LI>
+<LI><A HREF="#14">numScalars</A></LI>
+<LI><A HREF="#40">hash</A></LI>
+<LI><A HREF="#41">isEqual:</A></LI>
+</UL>
+<H3><B>Insertion Scalars</B></H3>
+<UL>
+<LI><A HREF="#16">insertScalar:</A></LI>
+<LI><A HREF="#17">insertScalar:at:</A></LI>
+</UL>
+<H3><B>Removing Scalars</B></H3>
+<UL>
+<LI><A HREF="#18">removeScalar</A></LI>
+<LI><A HREF="#19">removeScalarAt:</A></LI>
+</UL>
+<H3><B>Placing and Replacing</B></H3>
+<UL>
+<LI><A HREF="#20">placeScalar:at:</A></LI>
+<LI><A HREF="#21">replaceScalarAt:with:</A></LI>
+<LI><A HREF="#22">asCollection</A></LI>
+<LI><A HREF="#23">asNumerical</A></LI>
+<LI><A HREF="#24">asModp:</A></LI>
+<LI><A HREF="#26">onCommonDenominator:</A></LI>
+</UL>
+<H3><B>Accessing Scalars</B></H3>
+<UL>
+<LI><A HREF="#29">eachScalar</A></LI>
+<LI><A HREF="#30">floatValueAt:</A></LI>
+<LI><A HREF="#31">intValueAt:</A></LI>
+</UL>
+<H3><B>Addition</B></H3>
+<UL>
+<LI><A HREF="#32">zero</A></LI>
+<LI><A HREF="#43">isZero</A></LI>
+<LI><A HREF="#45">isOpposite:</A></LI>
+<LI><A HREF="#47">negate</A></LI>
+<LI><A HREF="#49">double</A></LI>
+<LI><A HREF="#51">add:</A></LI>
+<LI><A HREF="#52">subtract:</A></LI>
+<LI><A HREF="#33">addScalar:at:</A></LI>
+<LI><A HREF="#34">subtractScalar:at:</A></LI>
+</UL>
+<H3><B>Scalar Multiplication</B></H3>
+<UL>
+<LI><A HREF="#53">multiplyScalar:</A></LI>
+<LI><A HREF="#54">divideScalar:</A></LI>
+</UL>
+<H3><B>Multiplication</B></H3>
+<UL>
+<LI><A HREF="#35">dotSquare</A></LI>
+<LI><A HREF="#36">dotMultiply:</A></LI>
+<LI><A HREF="#37">multiplyLeftMatrix:</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#39">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="1">collection:</A></H3>
+<BLOCKQUOTE>+<B>collection</B>:<I>aCltn</I></BLOCKQUOTE>
+Creates a vector containing references to the scalars from <I>aCltn</I>.  The collection must not be empty.<P>
+<H3><A NAME="4">scalarZero:numScalars:</A></H3>
+<BLOCKQUOTE>+<B>scalarZero</B>:<I>aScalarZero</I><B>numScalars</B>:(int)<I>numScalars</I></BLOCKQUOTE>
+Creates a new vector with <I>numScalars</I> zero scalars.<P>
+<H3><A NAME="5">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Returns a new vector. <P>
+<H3><A NAME="6">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+Returns a new vector.  Sends <B>deepCopy</B> messages to the scalars in the vector.<P>
+<H3><A NAME="13">scalarZero</A></H3>
+<BLOCKQUOTE>-<B>scalarZero</B></BLOCKQUOTE>
+Returns the zero scalar element. <P>
+<H3><A NAME="14">numScalars</A></H3>
+<BLOCKQUOTE>- (int)<B>numScalars</B></BLOCKQUOTE>
+Returns the number of scalar objects in the vector.  Returns 0 if the vector is empty.  The first scalar in the vector is at index 0, the last scalar at <I>numScalars</I> minus one.<P>
+<H3><A NAME="40">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a small integer that is the same for objects that are equal (in the sense of <B>isEqual:</B>).<P>
+<H3><A NAME="41">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>b</I></BLOCKQUOTE>
+Whether the two objects are equal.  Returns YES if the objects are pointer equal.<P>
+<H3><A NAME="16">insertScalar:</A></H3>
+<BLOCKQUOTE>-<B>insertScalar</B>:<I>aScalar</I></BLOCKQUOTE>
+Inserts <I>aScalar</I> as first entry and returns <B>self</B>.  The object <I>aScalar</I> belongs to the vector after insertion, and is not necessarily copied.  To insert a scalar, the reference count of the vector should be equal to one.<P>
+<H3><A NAME="17">insertScalar:at:</A></H3>
+<BLOCKQUOTE>-<B>insertScalar</B>:<I>aScalar</I><B>at</B>:(int)<I>i</I></BLOCKQUOTE>
+Inserts <I>aScalar</I> as i-th entry and returns <B>self</B>.  The object <I>aScalar</I> belongs to the vector after insertion, and is not necessarily copied.  If <I>i</I> is equal to zero, this method is identical to <B>-insertScalar:</B>.  If <I>i</I> is equal to <B>numScalars</B>, this method inserts the scalar as last element.<P>
+<H3><A NAME="18">removeScalar</A></H3>
+<BLOCKQUOTE>-<B>removeScalar</B></BLOCKQUOTE>
+Removes (and returns) the first scalar in the vector (the scalar at index 0).  Returns <B>nil</B> if there were no more elements left.  This can be used in the following way :<P>
+<BLOCKQUOTE><PRE>
+while ((c = [vector removeScalar])) { /* do something with c */ }
+</PRE></BLOCKQUOTE>
+To remove a scalar, the reference count of the vector should be equal to one.<P>
+<H3><A NAME="19">removeScalarAt:</A></H3>
+<BLOCKQUOTE>-<B>removeScalarAt</B>:(int)<I>i</I></BLOCKQUOTE>
+Removes and returns the i-th scalar in the vector.  If <I>i</I> is zero, this method is identical to <B>removeScalar</B>.  Unlike <B>removeScalar</B>, which returns <B>nil</B> if there are no more scalars in the vector, this method generates an error message if you attempt to remove a scalar at an illegal index.<P>
+<H3><A NAME="20">placeScalar:at:</A></H3>
+<BLOCKQUOTE>-<B>placeScalar</B>:<I>aScalar</I><B>at</B>:(int)<I>i</I></BLOCKQUOTE>
+Frees the scalar at position <I>i</I> and replaces it by the scalar object <I>aScalar</I>.  Returns <B>self</B>.  The scalar <I>aScalar</I> belongs to the receiving vector object; it is not necessarily copied.  This is similar to List's -addObject: method.  It is an error to use an illegal index <I>i</I> or to attempt to set a scalar in a vector whose reference count is not equal to one.<P>
+<H3><A NAME="21">replaceScalarAt:with:</A></H3>
+<BLOCKQUOTE>-<B>replaceScalarAt</B>:(int)<I>i</I><B>with</B>:<I>aScalar</I></BLOCKQUOTE>
+Similar to <B>placeScalar:at:</B> but returns the scalar at position <I>i</I> after replacing it by <I>aScalar</I>.  It is an error to use an illegal index <I>i</I> or to attempt to replace a scalar in a vector whose reference count is not equal to one.<P>
+<H3><A NAME="22">asCollection</A></H3>
+<BLOCKQUOTE>-<B>asCollection</B></BLOCKQUOTE>
+Returns a new collection containing new references to the scalars in the vector.<P>
+<H3><A NAME="23">asNumerical</A></H3>
+<BLOCKQUOTE>-<B>asNumerical</B></BLOCKQUOTE>
+Returns a new vector, whose scalars are the numerical value of the scalars of the original vector.<P>
+<H3><A NAME="24">asModp:</A></H3>
+<BLOCKQUOTE>-<B>asModp</B>:(unsigned short)<I>p</I></BLOCKQUOTE>
+Returns a new vector, whose scalars are the value of the scalars of the original vector mod <I>p</I>.<P>
+<H3><A NAME="26">onCommonDenominator:</A></H3>
+<BLOCKQUOTE>-<B>onCommonDenominator</B>:(id *)<I>denominator</I></BLOCKQUOTE>
+Puts a vector with fractional scalars on a common denominator.  Returns a new vector with integral scalars, and, by reference, the common denominator of the scalars in the vector.<P>
+<H3><A NAME="29">eachScalar</A></H3>
+<BLOCKQUOTE>-<B>eachScalar</B></BLOCKQUOTE>
+Returns a new sequence object that gives access to the scalars of the vector.<P>
+<H3><A NAME="30">floatValueAt:</A></H3>
+<BLOCKQUOTE>- (float)<B>floatValueAt</B>:(int)<I>i</I></BLOCKQUOTE>
+Returns the <B>floatValue</B> of the scalar at the <I>i</I>-th position.<P>
+<H3><A NAME="31">intValueAt:</A></H3>
+<BLOCKQUOTE>- (int)<B>intValueAt</B>:(int)<I>i</I></BLOCKQUOTE>
+Returns the <B>intValue</B> of the scalar at the <I>i</I>-th position.<P>
+<H3><A NAME="32">zero</A></H3>
+<BLOCKQUOTE>-<B>zero</B></BLOCKQUOTE>
+Returns a vector of the same dimension as the object that receives the message, but all filled with zero scalars.<P>
+<H3><A NAME="43">isZero</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isZero</B></BLOCKQUOTE>
+Whether the object is equal to zero.<P>
+<H3><A NAME="45">isOpposite:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOpposite</B>:<I>b</I></BLOCKQUOTE>
+Whether the object is the opposite of <I>b</I>.<P>
+<H3><A NAME="47">negate</A></H3>
+<BLOCKQUOTE>-<B>negate</B></BLOCKQUOTE>
+Returns the opposite of the object.<P>
+<H3><A NAME="49">double</A></H3>
+<BLOCKQUOTE>-<B>double</B></BLOCKQUOTE>
+Returns a new object, equal to the object multiplied by two i.e., added to itself.<P>
+<H3><A NAME="51">add:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>b</I></BLOCKQUOTE>
+Adds <I>b</I> to the object.  Returns a new object.<P>
+<H3><A NAME="52">subtract:</A></H3>
+<BLOCKQUOTE>-<B>subtract</B>:<I>b</I></BLOCKQUOTE>
+Subtracts <I>b</I> from the object.  Returns a new object.<P>
+<H3><A NAME="33">addScalar:at:</A></H3>
+<BLOCKQUOTE>-<B>addScalar</B>:<I>s</I><B>at</B>:(int)<I>i</I></BLOCKQUOTE>
+Returns a <B>new</B> vector.  Adds <I>s</I> to the scalar at position <I>i</I>, and replaces the scalar by the sum.  <I>i</I> must be between 0 and the number of scalars in the vector.  This method is <I>not</I> an insertion method.<P>
+<B>See also:</B> insertScalar:at:, replaceScalar:at:<P>
+<H3><A NAME="34">subtractScalar:at:</A></H3>
+<BLOCKQUOTE>-<B>subtractScalar</B>:<I>s</I><B>at</B>:(int)<I>i</I></BLOCKQUOTE>
+Returns a <B>new</B> vector.  Subtracts <I>s</I> from the scalar at position <I>i</I>.  <I>i</I> must be between 0 and the number of scalars in the vector.  This method is <I>not</I> an insertion method.<P>
+<H3><A NAME="53">multiplyScalar:</A></H3>
+<BLOCKQUOTE>-<B>multiplyScalar</B>:<I>s</I></BLOCKQUOTE>
+Multiplies by the scalar <I>s</I>.  Returns a new object.<P>
+<H3><A NAME="54">divideScalar:</A></H3>
+<BLOCKQUOTE>-<B>divideScalar</B>:<I>s</I></BLOCKQUOTE>
+Exact division by the scalar <I>s</I>.  Returns a new object, or <B>nil</B> if the division is not exact.<P>
+<H3><A NAME="35">dotSquare</A></H3>
+<BLOCKQUOTE>-<B>dotSquare</B></BLOCKQUOTE>
+Returns a new scalar product, the dot product of the vector by itself, defined as the sum of squares of the scalars in the vector.<P>
+<H3><A NAME="36">dotMultiply:</A></H3>
+<BLOCKQUOTE>-<B>dotMultiply</B>:<I>aVector</I></BLOCKQUOTE>
+Returns a new scalar product, the dot product of the vector <I>self</I> by <I>aVector</I>, defined as the sum of the products of the scalars in the vectors.<P>
+<H3><A NAME="37">multiplyLeftMatrix:</A></H3>
+<BLOCKQUOTE>-<B>multiplyLeftMatrix</B>:<I>aMatrix</I></BLOCKQUOTE>
+Returns a new vector, the product of <I>aMatrix</I> by the column vector <I>self</I>.<P>
+<H3><A NAME="39">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints, between braces, a comma separated list of the scalars (by sending   <B>printOn:</B> messages to the scalars).<P>

@@ -1,0 +1,327 @@
+.TH "intarray" 3 "Mar 12, 2023"
+.SH IntArray
+.PP
+.B
+Inherits from:
+
+Array
+.SH Class Description
+.PP
+.B
+IntArray
+instances are used to hold regular, small, C integers (of type 
+.B
+int
+)\&.  This class is somewhat similar to 
+.B
+String
+, the difference being that a String is an Array of bytes, while this class provides a somewhat similar API to 
+.I
+strings of int
+\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* new
+.br
+* new:
+.br
+* with:
+.br
+* copy
+.br
+* deepCopy
+.br
+* free
+.RE
+.PP 
+.B
+Interrogation
+.RS 3
+.br
+* size
+.br
+* intAt:
+.br
+* intAt:put:
+.RE
+.PP 
+.B
+Resizing
+.RS 3
+.br
+* capacity
+.br
+* capacity:
+.br
+* packContents
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.PP 
+.B
+Archiving
+.RS 3
+.br
+* fileOutOn:
+.br
+* fileInFrom:
+.RE
+.SH Methods
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+Creates an instance whose value is set to the empty array\&.
+.PP 
+new:
+.RS 1
++
+.B
+new
+:(unsigned)
+.I
+n
+.RE
+.PP
+Creates an instance of 
+.I
+n
+zeroes\&.
+.PP 
+with:
+.RS 1
++
+.B
+with
+:(int)
+.I
+nArgs,\&.\&.\&.
+.RE
+.PP
+Creates an instance of 
+.I
+nArgs
+objects, using a variable number of 
+.I
+int
+arguments\&.
+.RS 3
+
+id myArray = [IntArray with:3,0,1,2];
+.br
+
+.RE
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Returns a copy of the receiver with its internal C array copied as well\&.
+.PP
+.B
+See also:
+
+- strCopy
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+For this class, this method acts as 
+.B
+copy
+\&.
+.PP 
+free
+.RS 1
+-
+.B
+free
+.RE
+.PP
+Frees the receiver and its internal C array as well\&.
+.PP 
+size
+.RS 1
+- (
+unsigned
+)
+.B
+size
+.RE
+.PP
+Returns the number of integers in the array\&.  For this class, 
+.B
+size
+is equivalent to 
+.B
+capacity
+\&.
+.PP 
+intAt:
+.RS 1
+- (
+int
+)
+.B
+intAt
+:(unsigned)
+.I
+anOffset
+.RE
+.PP
+Returns the integer at 
+.I
+anOffset
+or signals the 
+.B
+OutOutBounds
+exception if 
+.I
+anOffset
+is greater than the length of the C array\&.
+.PP 
+intAt:put:
+.RS 1
+- (
+int
+)
+.B
+intAt
+:(unsigned)
+.I
+anOffset
+.B
+put
+:(int)
+.I
+anInt
+.RE
+.PP
+Replaces the integer at 
+.I
+anOffset
+with 
+.I
+anInt
+and returns the old integer which was in that location\&.  Generates an out of bounds exception if 
+.I
+anOffset
+is greater than the length of the array\&.
+.PP 
+capacity
+.RS 1
+- (
+unsigned
+)
+.B
+capacity
+.RE
+.PP
+Returns the number of integers in the array\&.  For this class, 
+.B
+capacity
+is equivalent to 
+.B
+size
+\&.
+.PP 
+capacity:
+.RS 1
+-
+.B
+capacity
+:(unsigned)
+.I
+nSlots
+.RE
+.PP
+Changes the capacity to 
+.I
+nSlots
+\&.  If 
+.I
+nSlots
+is larger than the current capacity, the memory added at the end will be zero-filled\&.  If 
+.I
+nSlots
+is less than the current capacity, the array is truncated\&.
+.PP 
+packContents
+.RS 1
+-
+.B
+packContents
+.RE
+.PP
+Removes zero elements while preserving the order of elements in the 
+.B
+IntArray
+\&.  Used to eliminate the \&'hole\&' left by a 
+.B
+at:put:
+message with a zero argument\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints the array to 
+.I
+aFile
+without appending a newline\&.  Returns the receiver\&.
+.PP 
+fileOutOn:
+.RS 1
+-
+.B
+fileOutOn
+:
+.I
+aFiler
+.RE
+.PP
+Writes the array on 
+.I
+aFiler
+\&.  Returns the receiver\&.
+.PP 
+fileInFrom:
+.RS 1
+-
+.B
+fileInFrom
+:
+.I
+aFiler
+.RE
+.PP
+Reads a array object from 
+.I
+aFiler
+\&.  Returns the receiver\&.

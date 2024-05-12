@@ -1,0 +1,27 @@
+.ds ]W "Portable Object Compiler
+.de q
+``\\$1''\\$2
+..
+.TH cvtimport 1 "Mar 7, 1998"
+.SH NAME
+cvtimport \- Convert import to include utility
+.SH SYNOPSIS
+.B cvtimport [-c]
+foo.h bar.m ...
+.SH DESCRIPTION
+.B cvtimport
+is a utility (implemented as an awk(1) script) that converts #import preprocessor directives in Objective\-C headers (or source files), to #include directives.  Also, unless given the \-c option, it converts //-style comments to traditional C comments (/* ... */).  The utility works
+.B inplace
+on the files that are specified on the command line, but makes a backup of the original file.
+
+.IP "\fB\-c\fP"
+
+Do not change //\-style comments to /* */ style comments.
+
+.SH FILES
+.ta \w'SomethingWiderThanAllItems\ \ 'u
+foo.m	converted
+foo.m~	backup 
+.SH "SEE ALSO"
+objc(1)
+

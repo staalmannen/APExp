@@ -1,0 +1,150 @@
+!
+! Portable Object Compiler
+!
+! Makefile for OpenVMS make (like MMS, MMK)
+!
+
+.OBJ.OLB :
+    @ If F$Search("$(MMS$TARGET)") .EQS. "" Then $(LIBR)/Create $(MMS$TARGET)
+    $(LIBR) $(LIBRFLAGS) $(MMS$TARGET) $(MMS$SOURCE)
+
+.C.OBJ   :
+    $(CC) $(CFLAGS) $(MMS$SOURCE)
+CC  	    = CC
+CFLAGS	    = /NOLIST/OBJECT=$(MMS$TARGET_NAME)
+
+LINK	    = LINK
+LINKFLAGS   = /EXEC=$(MMS$TARGET)
+
+!
+!
+!
+
+ALL  : -
+ objc1.exe	
+	@ continue
+
+OBJS =	-
+-
+ OBJC1(pointer)	,-
+ OBJC1(compdef)	,-
+ OBJC1(exprstmt),-
+ OBJC1(dfltstmt),-
+ OBJC1(namedecl),-
+ OBJC1(structsp),-
+ OBJC1(Message)	,-
+ OBJC1(trlunit)	,-
+ OBJC1(gasmstmt),-
+ OBJC1(dasmstmt),-
+ OBJC1(contstmt),-
+ OBJC1(setseq)	,-
+ OBJC1(method)	,-
+ OBJC1(enumtor)	,-
+ OBJC1(keyseq)	,-
+ OBJC1(sizeof)	,-
+ OBJC1(typeof)	,-
+ OBJC1(lblstmt)	,-
+ OBJC1(arydecl)	,-
+ OBJC1(dotxpr)	,-
+ OBJC1(set)	,-
+ OBJC1(stclass)	,-
+ OBJC1(assoc)	,-
+ OBJC1(pfixxpr)	,-
+ OBJC1(casestmt),-
+ OBJC1(constxpr),-
+ OBJC1(condxpr)	,-
+ OBJC1(precdecl),-
+ OBJC1(ordcltn)	,-
+ OBJC1(idarray)	,-
+ OBJC1(identxpr),-
+ OBJC1(assign)	,-
+ OBJC1(precxpr)	,-
+ OBJC1(Object)	,-
+ OBJC1(classdef),-
+ OBJC1(initdecl),-
+ OBJC1(dictnary),-
+ OBJC1(selector),-
+ OBJC1(fundef)	,-
+ OBJC1(options)	,-
+ OBJC1(funcall)	,-
+ OBJC1(expr)	,-
+ OBJC1(keywxpr)	,-
+ OBJC1(node)	,-
+ OBJC1(valueseq),-
+ OBJC1(btincall),-
+ OBJC1(Block)	,-
+ OBJC1(ifstmt)	,-
+ OBJC1(unyxpr)	,-
+ OBJC1(parmdef)	,-
+ OBJC1(util)	,-
+ OBJC1(cltnseq)	,-
+ OBJC1(array)	,-
+ OBJC1(forstmt)	,-
+ OBJC1(deref)	,-
+ OBJC1(binxpr)	,-
+ OBJC1(ocstring),-
+ OBJC1(objcrt)	,-
+ OBJC1(datadef)	,-
+ OBJC1(gasmop)	,-
+ OBJC1(dostmt)	,-
+ OBJC1(gattrib)	,-
+ OBJC1(arrowxpr),-
+ OBJC1(cppdirec),-
+ OBJC1(keywdecl),-
+ OBJC1(ascfiler),-
+ OBJC1(relxpr)	,-
+ OBJC1(gatrdecl),-
+ OBJC1(switstmt),-
+ OBJC1(funbody)	,-
+ OBJC1(rtrnstmt),-
+ OBJC1(listxpr)	,-
+ OBJC1(whilstmt),-
+ OBJC1(type)	,-
+ OBJC1(fundecl)	,-
+ OBJC1(def)	,-
+ OBJC1(globdef)	,-
+ OBJC1(stkframe),-
+ OBJC1(var),-
+ OBJC1(aryvar),-
+ OBJC1(scalar),-
+ OBJC1(parmlist),-
+ OBJC1(commaxpr),-
+ OBJC1(stardecl),-
+ OBJC1(gotostmt),-
+ OBJC1(indexxpr),-
+ OBJC1(addrof)	,-
+ OBJC1(selxpr)	,-
+ OBJC1(sequence),-
+ OBJC1(stmt)	,-
+ OBJC1(msgxpr)	,-
+ OBJC1(methdef)	,-
+ OBJC1(compstmt),-
+ OBJC1(decl)	,-
+ OBJC1(symbol)	,-
+ OBJC1(blockxpr),-
+ OBJC1(enumsp)	,-
+ OBJC1(bflddecl),-
+ OBJC1(castxpr)	,-
+ OBJC1(lex)	,-
+ OBJC1(lexfiltr),-
+ OBJC1(yacc)	,-
+ OBJC1(cltn)	,-
+ OBJC1(pfixdecl)
+
+OBJC1_LIBR = -
+ objc1.olb
+
+OBJC1_OBJS = -
+ _objc1.obj	,-
+ objc1.obj	
+
+objc1.olb  : -
+ $(OBJS)
+    @ continue
+
+objc1.exe	: -
+ $(OBJC1_OBJS)	,-
+ $(OBJC1_LIBR)
+    @ Target = F$Edit("$(MMS$TARGET)","lowercase")
+    @ Write SYS$OUTPUT "Linking ''Target'"
+    @ $(LINK)$(LINKFLAGS) $(OBJC1_OBJS),$(OBJC1_LIBR)/LIBRARY

@@ -1,0 +1,463 @@
+
+/* 
+ * VICI Copyright (c) 1999 David Stes
+ *
+ * $Id: vici.m.in,v 1.1.1.1 2000/06/07 21:09:26 stes Exp $
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published 
+ * by the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ */
+
+#include "config.h"
+
+#include <string.h>		/* strtok */
+#include <stdlib.h>		/* getenv */
+#include <assert.h>
+#include <signal.h>
+
+#ifndef __OBJECT_INCLUDED__
+#define __OBJECT_INCLUDED__
+#include <stdio.h> /* FILE */
+#include "Object.h" 
+#include "Block.h" 
+#endif
+#include <ocstring.h>
+#include <ordcltn.h>
+#include <sequence.h>
+#include <node.h>
+#include <trlunit.h>
+#include <options.h>
+#include <util.h>
+#include <symbol.h>
+#include <expr.h>
+
+#include "breakpt.h"
+
+#include "cmd.h"
+#include "load.h"
+
+int o_debug;
+
+void printversion()
+{
+   fprintf(vistdout,"@NAME@\n");
+   exit (0);
+}
+
+void printcopyright()
+{
+   fprintf(vistdout,"VICI Objective-C Interpreter - @NAME@\n");
+   fprintf(vistdout,"Copyright (c) 1999,2000 David Stes.  Distributed under the terms of the GNU GPL.\n");
+}
+
+void unknownoption(char* arg)
+{
+  STR msg = "%s: unknown option %s\n";
+  STR name = (o_cplus) ? "objcpls1" : "vici";
+  fprintf(vistdout, msg, name, arg);
+  exit(1);
+}
+
+void badarg(id option,id arg)
+{
+  STR msg = "%s: illegal argument %s for %s\n";
+  STR name = (o_cplus) ? "objcpls1" : "vici";
+  fprintf(vistdout, msg, name, [arg str], [option str]);
+  exit(1);
+}
+
+BOOL isoption(char* s)
+{
+  return s != NULL && s[0] == '-';
+}
+
+id optionstok(id aCltn, char *s)
+{
+  char *p;
+  char *delims = " \t\n\r";
+  id buffer = [String str:s];
+
+  p = strtok([buffer str], delims);
+
+  while (p != NULL) {
+    [aCltn add:[String str:p]];
+    p = strtok(NULL, delims);
+  }
+
+  return aCltn;
+}
+
+id optsfromfile(id aCltn, FILE * f)
+{
+  char buf[BUFSIZ + 1];
+
+  while (!feof(f)) {
+    if (fgets(buf, BUFSIZ, f)) {
+      /* this works 'cause strtok also deletes \n */
+      optionstok(aCltn, buf);
+    }
+  }
+
+  return aCltn;
+}
+
+/* this is mostly for MS-DOS cmd line length limitations */
+
+id optsnamed(id aCltn, STR s)
+{
+  STR t;
+  FILE *f;
+
+  /* maybe there's such an environment variable */
+  if ((t = getenv(s)))
+    return optionstok(aCltn, t);
+
+  /* maybe there's such a file */
+  if ((f = fopen(s, "r"))) {
+    aCltn = optsfromfile(aCltn, f);
+    fclose(f);
+    return aCltn;
+  }
+  /* nope */
+  return nil;
+}
+
+id cmdlineopts(int argc, char *argv[])
+{
+  int i;
+  id aCltn = [OrdCltn new];
+
+  for (i = 1; i < argc; i++) {
+    [aCltn add:[String str:argv[i]]];
+  }
+
+  return aCltn;
+}
+
+/*
+ * Filename for first line tag output (source filename)
+ * (which we want to be file.m instead of file.P)
+ */
+
+int setfilename(id option, id args)
+{
+  id arg = [args next];
+  char *t = [arg str];
+
+  if (isoption(t)) badarg(option, arg);
+  o_srcfilename = t;
+
+  return 0;
+}
+
+int setinitcall(id option, id args)
+{
+  id arg = [args next];
+  char *t = [arg str];
+
+  if (isoption(t)) badarg(option, arg);
+  o_initcall = t;
+
+  return 0;
+}
+
+int setmainfun(id option, id args)
+{
+  id arg = [args next];
+  if (isoption([arg str])) badarg(option, arg);
+  o_mainfun = [arg str];
+  return 0;
+}
+
+int setbind(id option, id args)
+{
+  id arg = [args next];
+  if (isoption([arg str])) badarg(option, arg);
+  o_bind = [arg str];
+  return 0;
+}
+
+/*
+ * Make line max settable (works only for identifiers now).
+ */
+
+int setlinemax(id option, id args)
+{
+  id arg = [args next];
+  if (isoption([arg str])) badarg(option, arg);
+  o_linemax = [arg asInt];
+  return 0;
+}
+
+/*
+ * @ filename is understood to take options from "filename"
+ * Maybe we should also allow @filename (without space)
+ */
+
+void setoptions(id aCltn);
+
+int setoptsfromfile(id option, id args)
+{
+  id arg = [args next];
+
+  if (isoption([arg str])) badarg(option, arg);
+  setoptions(optsnamed([OrdCltn new], [arg str]));
+  return 0;
+}
+
+
+int addbuiltintype(id option, id args)
+{
+  id arg = [args next];
+  if (isoption([arg str])) badarg(option, arg);
+  definebuiltintype([arg str]);
+  return 0;
+}
+
+int addbuiltinfun(id option, id args)
+{
+  id arg = [args next];
+  if (isoption([arg str])) badarg(option, arg);
+  definebuiltinfun([arg str]);
+  return 0;
+}
+
+void setoptions(id aCltn)
+{
+  id args, s;
+  int filecount = 0;		/* optional inFile and outFile */
+  BOOL checkoption = YES;	/* YES if filename can't begin with a dash */
+
+  args = [aCltn eachElement];
+
+  while ((s = [args next])) {
+    char *t = [s str];
+    if (!strcmp(t,"-quiet")) {
+      ++o_quiet;
+    } else if (!strcmp(t,"-z")) {
+      ++o_outputcode; 
+    } else if (!strcmp(t,"@")) {
+      setoptsfromfile(s, args);
+    } else if (!strcmp(t,"-u")) {
+      o_buffered=0;
+    } else if (!strcmp(t,"-version")||!strcmp(t,"--version")) {
+      o_version++;
+    } else if (!strcmp(t,"-otb")) {
+      o_otb++;
+      o_shareddata = 0;
+    } else if (!strcmp(t,"-gnu")) {
+      o_gnu++;
+    } else if (!strcmp(t,"-vms")) {
+      o_vms++;
+    } else if (!strcmp(t,"-refcnt")) {
+      o_refcnt++;
+    } else if (!strcmp(t,"-noasm")) {
+      o_enableasm = 0;
+    } else if (!strcmp(t,"-nolonglong")) {
+      o_llkeyw = 0;
+    } else if (!strcmp(t,"-msdos")) {
+      o_msdos++;
+    } else if (!strcmp(t,"-watcom")) {
+      o_watcom++;
+    } else if (!strcmp(t,"-comments")) {
+      o_comments++;
+    } else if (!strcmp(t,"-ibmvac")) {
+      o_ibmvac++;
+    } else if (!strcmp(t,"-noSelTbl")) {
+      o_seltranslation = 0;
+    } else if (!strcmp(t,"-noCategories")) {
+      o_categories = 0;
+    } else if (!strcmp(t,"-noBlocks")) {
+      o_blocks = 0;
+    } else if (!strcmp(t,"-st80")) {
+      o_st80++;
+      o_nolinetags++;
+      o_outputcode = 0; /* no C code */
+    } else if (!strcmp(t,"-fwd")) {
+      o_fwd++;
+    } else if (!strcmp(t,"-noSelPtr")) {
+      o_selptr = 0;
+    } else if (!strcmp(t,"-noFwd")) {
+      o_fwd = 0;
+    } else if (!strcmp(t,"-noCache")) {
+      o_cache = 0;
+    } else if (!strcmp(t,"-noFiler")) {
+      o_filer = 0;
+    } else if (!strcmp(t,"-noSelfAssign")) {
+      o_selfassign = 0;
+    } else if (!strcmp(t,"-noNilRcvr")) {
+      o_nilrcvr = 0;
+    } else if (!strcmp(t,"-objc")) {
+      o_gencode = 0;
+    } else if (!strcmp(t,"-cplus")) {
+      o_cplus++;
+    } else if (!strcmp(t,"-inlinecache")) {
+      o_inlinecache++;
+    } else if (!strcmp(t,"-refBind")) {
+      o_refbind++;
+    } else if (!strcmp(t,"-export")) {
+      setbind(s, args);
+    } else if (!strcmp(t,"-dllexport")) {
+      o_bind = "__declspec(dllexport)";
+    } else if (!strcmp(t,"-traditional")) {		/* ignore */
+    } else if (!strcmp(t,"-filename")) {
+      setfilename(s, args);
+    } else if (!strcmp(t,"-longlinetag")) {		/* compatib. */
+    } else if (!strcmp(t,"-shortTags")) {
+      o_tagformat = "# %d \"%s\"\n";
+    } else if (!strcmp(t,"-init")) {
+      setinitcall(s, args);
+    } else if (!strcmp(t,"-noShared")) {
+      o_shareddata = 0;
+    } else if (!strcmp(t,"-main")) {
+      setmainfun(s, args);
+    } else if (!strcmp(t,"-linemax")) {
+      setlinemax(s, args);
+    } else if (!strcmp(t,"-builtinfunction")) {
+      addbuiltinfun(s, args);
+    } else if (!strcmp(t,"-builtintype")) {
+      addbuiltintype(s, args);
+    } else if (!strcmp(t,"-nolinetags")) {
+      o_nolinetags++;
+    } else if (!strcmp(t,"-oneperfile")) {
+      o_oneperfile++;
+    } else if (!strcmp(t,"-w")) {
+      o_warnings = 0;
+    } else if (!strcmp(t,"-wClassUsedAsType")) {
+      o_warnclasstype = 0;
+    } else if (!strcmp(t,"-wMissing")) {
+      o_warnmissingmethods = 0;
+    } else if (!strcmp(t,"-wTypeConflict")) {
+      o_warntypeconflict = 0;
+    } else if (!strcmp(t,"-wLocalInstance")) {
+      o_warnlocalnst = 0;
+    } else if (!strcmp(t,"-wUndefinedMethod")) {
+      o_warnundefined = 0;
+    } else if (!strcmp(t,"-wInterfaceNotFound")) {
+      o_warnnotfound = 0;
+    } else if (!strcmp(t,"-WLex")) {
+      o_warnlex++;
+    } else if (!strcmp(t,"-WFwd")) {
+      o_warnfwd++;
+    } else if (!strcmp(t,"-postlink")) {
+      o_postlink++;
+    } else if (!strcmp(t,"-checkbindfunction")) {
+      o_checkbind++;
+    } else if (!strcmp(t,"-debugInfo")) {
+      o_debuginfo++;
+    } else if (!strcmp(t,"-ppi")) {
+      o_ppi++;
+    } else if (!strcmp(t,"-d")) {
+      o_debug++;
+    } else if (!strcmp(t,"-")) {
+      checkoption = 0;
+    } else if (checkoption && isoption(t)) {
+      unknownoption(t);
+    } else if (filecount == 0) {
+      o_infile = t;
+      filecount++;
+    } else if (filecount == 1) {
+      o_outfile = t;
+      filecount++;
+    } else {
+      unknownoption(t);
+    }
+  }
+}
+
+void openinfile(void)
+{
+  if (o_infile) {
+    yyin = openfile(o_infile, "r");
+  } else {
+    /* stdin */
+  }
+}
+
+void closeinfile(void)
+{
+  if (o_infile) {
+    fclose(yyin);
+  } else {
+    /* stdin */
+  }
+}
+
+void openoutfile(void)
+{
+  if (o_outfile) {
+    gfile = openfile(o_outfile,"w");
+  } else {
+    gfile = stdout; /* direct output to this stream */
+  }
+
+  /* for debugging output (-u unbuf option) */
+  if (!o_buffered) setbuf(gfile,NULL);
+}
+
+void closeoutfile(void)
+{
+  if (o_outfile) fclose(gfile);
+}
+
+void dovicifile(void)
+{
+  FILE *f;
+  if ((f = fopen("vicifile","r"))) docmdf(f);
+}
+
+void huphandler(int signo)
+{
+  noCacheFlag++;
+  [Object error:"Caught signal %d",signo];
+  noCacheFlag--;
+}
+
+int main(int argc, char *argv[])
+{
+  id bkpt;
+  bkpt = [Breakpoint new];
+
+  o_mainfun = "main";
+  [Load stdmods];
+
+  defoptions();
+  setoptions(cmdlineopts(argc, argv));
+  o_gnu ++;
+  if (o_version) printversion();
+  if (!o_quiet) printcopyright();
+
+  dovicifile();
+
+  if (!o_debug) [Block errorHandler:{
+      :msg :rcv |
+      fprintf(vistdout,"\n");
+      fprintf(vistdout,"-ifError: %s: %s\n",[rcv name],[msg str]);
+      fprintf(vistdout,"\n");
+      fprintf(vistdout,"Type backtrace (bt) for more info ...\n");
+      fprintf(vistdout,"\n");
+      [bkpt readcmds];
+  }];
+
+  signal(SIGHUP,huphandler);
+  signal(SIGINT,huphandler);
+  signal(SIGPIPE,huphandler);
+  signal(SIGTERM,huphandler);
+
+  while (1) [bkpt readcmds];
+
+  return 0;
+}
+

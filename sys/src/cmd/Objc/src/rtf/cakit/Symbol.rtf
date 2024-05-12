@@ -1,0 +1,149 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Computer Algebra Kit (c) 1993,00 by Comp.Alg.Objects.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Symbol\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} CAObject\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 Maturity Index : Relatively Mature\fs16\
+\
+\f0\fs28\li2200 For symbols created with the factory method {\f2 str:}, the first character of the {\f2 str} of the symbol object must be a letter.  Subsequent characters can be letters or digits.  Whitespace or control characters are not allowed.\fs16\
+\
+\f0\fs28\li2200 Using the factory method {\f2 chars:count:}, it's possible to use arbitrary C strings as the value of the symbol; in this case {\b Symbol} just acts like a regular Objective C String class.  If you intend to use the object as a mathematical symbol, it's not advised to do this as you might incorrectly interpret spaces etc. as mathematical operators.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- str:\
+	- chars:count:\
+	- copy\
+	- deepCopy\
+	- release\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Identity}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- str\
+	- str:\
+	- hash\
+	- isEqual:\
+	- compare:\
+	- isLetter\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printOn:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 str:\f0\b0\
+\f0\fs28\li2500 +{\b str}:(STR){\i aString}\fs16\
+\
+\f0\fs28\li2200 Creates a new symbol, and sets its value to a copy of {\i aString}.  Returns {\b nil} if {\i aString} is not suited as value for a symbol (when the first letter is not a letter, for instance).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 chars:count:\f0\b0\
+\f0\fs28\li2500 +{\b chars}:(STR){\i aBuffer}{\b count}:(int){\i numChars}\fs16\
+\
+\f0\fs28\li2200 Creates a new symbol, and sets its value to a copy of the first {\i numChars} characters of {\i aBuffer}.  For this method, there are no restrictions on the C string being used.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 copy\f0\b0\
+\f0\fs28\li2500 -{\b copy}\fs16\
+\
+\f0\fs28\li2200 Returns a new symbol object.  Copies the string.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deepCopy\f0\b0\
+\f0\fs28\li2500 -{\b deepCopy}\fs16\
+\
+\f0\fs28\li2200 Equivalent to {\b copy}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 release\f0\b0\
+\f0\fs28\li2500 -{\b release}\fs16\
+\
+\f0\fs28\li2200 Frees the memory for the string value.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 str\f0\b0\
+\f0\fs28\li2500 - (STR){\b str}\fs16\
+\
+\f0\fs28\li2200 Returns the string value of the symbol.  The first character is a letter, subsequent characters can be alphanumeric.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 str:\f0\b0\
+\f0\fs28\li2500 -{\b str}:(STR){\i aString}\fs16\
+\
+\f0\fs28\li2200 Creates a new symbol, and sets its value to a copy of {\i aString}.  Returns {\b nil} if {\i aString} is not suited as value for a symbol.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hash\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b hash}\fs16\
+\
+\f0\fs28\li2200 Returns a hash value based upon the string.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEqual}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the str's of both objects are equal.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 compare:\f0\b0\
+\f0\fs28\li2500 - (int){\b compare}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Compares the str's of both objects.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isLetter\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isLetter}\fs16\
+\
+\f0\fs28\li2200 Whether the symbol consists of just one character (and hence, is a letter, not a digit).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Prints the symbol to {\i aFile}. \fs16\
+\
+\fs16\
+\
+\
+}

@@ -1,0 +1,176 @@
+<HTML>
+<TITLE>fraction Specification Sheet</TITLE>
+<H1>fraction Specification Sheet</H1>
+
+<HR>
+Computer Algebra Kit (c) 1993,2000,14 by Comp.Alg.Objects.  All Rights Reserved.<P>
+<H1>Fraction</H1>
+<B>Inherits from:</B> CAObject<P>
+<B>Maturity Index:</B> Relatively immature<P>
+<H2>Class Description</H2>
+Fraction objects consist of a <I>numerator</I> object divided by a <I>denominator</I> object.   The numerators and denominators can be arbitrary Computer Algebra Kit objects, but the current implementation has been tested only in the case of <I>total</I> fractions i.e., numerators and denominators are taken as elements of the same set.  For example, a fraction of two integers is a rational number; a fraction of two polynomials is a rational function.<P>
+<H2>Canonical Form</H2>
+The arithmetical operations on fractions assume that the fractions are in a simplified (canonical) form, and produce, as result, a fraction in canonical form.  In the case of the integers, or any ordered, integral domain (see <B>inIntegralDomain</B> and <B>inOrderedSet</B>), the numerator and denominator are kept coprime (common gcd is divided out) and the denominator is kept positive.  For example, the fraction minus one, is represented as (-1)/1, and never as 1/(-1).  In the case of an unordered, integral domain, such as polynomials over the integers or over a field, the denominator and numerator are also coprime, and the leading unit of the denominator is equal to one (over fields, this means that the denominator is kept monic, see <B>leadingUnit</B>). For example, the fraction minus <I>x</I> is represented over <B>Z</B> mod 3 as (2 <I>x</I>)/1 and not as <I>x</I>/2.  Finally, for rational functions with floating-point coefficients, no gcd is computed, but the denominator of the fraction is kept monic.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#2">totalFraction:</A></LI>
+<LI><A HREF="#4">numerator:denominator:</A></LI>
+<LI><A HREF="#5">copy</A></LI>
+<LI><A HREF="#7">deepCopy</A></LI>
+</UL>
+<H3><B>Identity</B></H3>
+<UL>
+<LI><A HREF="#13">numerator</A></LI>
+<LI><A HREF="#14">denominator</A></LI>
+<LI><A HREF="#15">hash</A></LI>
+<LI><A HREF="#16">isEqual:</A></LI>
+<LI><A HREF="#17">compare:</A></LI>
+</UL>
+<H3><B>Coercion</B></H3>
+<UL>
+<LI><A HREF="#18">asNumerical</A></LI>
+<LI><A HREF="#19">asModp:</A></LI>
+<LI><A HREF="#20">asIntegral</A></LI>
+</UL>
+<H3><B>Addition</B></H3>
+<UL>
+<LI><A HREF="#21">zero</A></LI>
+<LI><A HREF="#22">isZero</A></LI>
+<LI><A HREF="#23">isOpposite:</A></LI>
+<LI><A HREF="#24">negate</A></LI>
+<LI><A HREF="#25">double</A></LI>
+<LI><A HREF="#26">add:</A></LI>
+<LI><A HREF="#27">subtract:</A></LI>
+</UL>
+<H3><B>Multiplication</B></H3>
+<UL>
+<LI><A HREF="#28">one</A></LI>
+<LI><A HREF="#29">isOne</A></LI>
+<LI><A HREF="#30">isMinusOne</A></LI>
+<LI><A HREF="#31">square</A></LI>
+<LI><A HREF="#32">inverse</A></LI>
+<LI><A HREF="#33">multiply:</A></LI>
+<LI><A HREF="#34">divide:</A></LI>
+<LI><A HREF="#35">power:</A></LI>
+</UL>
+<H3><B>Multiplication by Int Value</B></H3>
+<UL>
+<LI><A HREF="#36">intValue:</A></LI>
+<LI><A HREF="#37">intValue</A></LI>
+<LI><A HREF="#38">multiplyIntValue:</A></LI>
+<LI><A HREF="#39">divideIntValue:</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#40">printsLeadingSign</A></LI>
+<LI><A HREF="#41">printsSum</A></LI>
+<LI><A HREF="#42">printsProduct</A></LI>
+<LI><A HREF="#43">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="2">totalFraction:</A></H3>
+<BLOCKQUOTE>+<B>totalFraction</B>:<I>aNumerator</I></BLOCKQUOTE>
+Returns a new fraction with numerator set to <I>aNumerator</I> and denominator set to the element one for <I>aNumerator</I>.<P>
+<H3><A NAME="4">numerator:denominator:</A></H3>
+<BLOCKQUOTE>+<B>numerator</B>:<I>aNumerator</I><B>denominator</B>:<I>aDenominator</I></BLOCKQUOTE>
+Returns a new fraction with numerator set to <I>aNumerator</I> and denominator set to <I>aDenominator</I>. <P>
+<H3><A NAME="5">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Returns a new copy of the fraction.<P>
+<H3><A NAME="7">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+Returns a new copy of the fraction; sends <B>deepCopy</B> messages to denominator and numerator.<P>
+<H3><A NAME="13">numerator</A></H3>
+<BLOCKQUOTE>-<B>numerator</B></BLOCKQUOTE>
+Returns <I>a</I> for a fraction <I>a</I>/<I>b</I>. <P>
+<H3><A NAME="14">denominator</A></H3>
+<BLOCKQUOTE>-<B>denominator</B></BLOCKQUOTE>
+Returns <I>b</I> for a fraction <I>a</I>/<I>b</I>. <P>
+<H3><A NAME="15">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a small integer that is the same for fractions that are equal in the sense of <B>isEqual:</B>.<P>
+<H3><A NAME="16">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>b</I></BLOCKQUOTE>
+Two fractions are equal if they are pointer equal, or if their numerators and denominators are equal.  If the numerators and denominators are coprime, but not ordered, the method returns YES if numerators and denominators are opposite to each other.  If the fraction is not in canonical form, it is verified that the difference of the two fractions is zero.<P>
+<H3><A NAME="17">compare:</A></H3>
+<BLOCKQUOTE>- (int)<B>compare</B>:<I>b</I></BLOCKQUOTE>
+Compares the fractions by comparing the products of numerators and denominators.<P>
+<H3><A NAME="18">asNumerical</A></H3>
+<BLOCKQUOTE>-<B>asNumerical</B></BLOCKQUOTE>
+Returns the numerical value of the fraction.  Attempts to divide the numerical value of the numerator and denominator.<P>
+<H3><A NAME="19">asModp:</A></H3>
+<BLOCKQUOTE>-<B>asModp</B>:(unsigned short)<I>p</I></BLOCKQUOTE>
+Returns the value of the fraction modulo <I>p</I>.  Attempts to divide the values of the numerator and denominator.  If the division fails, the method generates an error message.<P>
+<H3><A NAME="20">asIntegral</A></H3>
+<BLOCKQUOTE>-<B>asIntegral</B></BLOCKQUOTE>
+Returns, if the denominator of the fraction is equal to one, a new reference to the numerator.  Otherwise, the method generates an error message.<P>
+<H3><A NAME="21">zero</A></H3>
+<BLOCKQUOTE>-<B>zero</B></BLOCKQUOTE>
+Returns a new fraction with numerator equal to zero.<P>
+<H3><A NAME="22">isZero</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isZero</B></BLOCKQUOTE>
+Whether the numerator of the fraction is equal to zero.<P>
+<H3><A NAME="23">isOpposite:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOpposite</B>:<I>b</I></BLOCKQUOTE>
+Two fractions are opposite if their numerators are opposite and the denominators are equal.  However, if the numerators and denominators are coprime, but not ordered, the method returns YES if the numerators are equal and the denominators are opposite to each other.  If the fraction is not in canonical form, it is verified that the sum of the two fractions is zero.<P>
+<H3><A NAME="24">negate</A></H3>
+<BLOCKQUOTE>-<B>negate</B></BLOCKQUOTE>
+Returns a new fraction, the opposite of <B>self</B> by negating the numerator.<P>
+<H3><A NAME="25">double</A></H3>
+<BLOCKQUOTE>-<B>double</B></BLOCKQUOTE>
+Returns a new fraction, the double of <B>self</B> by doubling the numerator.<P>
+<H3><A NAME="26">add:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>b</I></BLOCKQUOTE>
+Returns a new fraction, the sum of <B>self</B> and <I>b</I>.  The method first handles some special cases and then distinguishes between the case that both fractions have a common denominator or not.<P>
+<H3><A NAME="27">subtract:</A></H3>
+<BLOCKQUOTE>-<B>subtract</B>:<I>b</I></BLOCKQUOTE>
+Returns a new fraction, the difference of <B>self</B> and <I>b</I>.  The method first handles some special cases and then distinguishes between the case that both fractions have a common denominator or not.<P>
+<H3><A NAME="28">one</A></H3>
+<BLOCKQUOTE>-<B>one</B></BLOCKQUOTE>
+Returns a new fraction with numerator equal to one.<P>
+<H3><A NAME="29">isOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOne</B></BLOCKQUOTE>
+Whether the numerator is equal to the denominator.<P>
+<H3><A NAME="30">isMinusOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isMinusOne</B></BLOCKQUOTE>
+Whether the numerator is the opposite of the denominator.<P>
+<H3><A NAME="31">square</A></H3>
+<BLOCKQUOTE>-<B>square</B></BLOCKQUOTE>
+Returns a new fraction; squares numerator and denominator.<P>
+<H3><A NAME="32">inverse</A></H3>
+<BLOCKQUOTE>-<B>inverse</B></BLOCKQUOTE>
+Returns the inverse of the fraction; interchanges, in the case of a total fraction, denominator and numerator.<P>
+<H3><A NAME="33">multiply:</A></H3>
+<BLOCKQUOTE>-<B>multiply</B>:<I>b</I></BLOCKQUOTE>
+Returns a new fraction; multiplies the numerators and the denominators together.<P>
+<H3><A NAME="34">divide:</A></H3>
+<BLOCKQUOTE>-<B>divide</B>:<I>b</I></BLOCKQUOTE>
+Returns a new fraction by multiplying the fraction by the inverse of <I>b</I>.<P>
+<H3><A NAME="35">power:</A></H3>
+<BLOCKQUOTE>-<B>power</B>:(int)<I>n</I></BLOCKQUOTE>
+Returns a new fraction; raises numerator and denominator to the <I>n</I>-th power.<P>
+<H3><A NAME="36">intValue:</A></H3>
+<BLOCKQUOTE>-<B>intValue</B>:(int)<I>intValue</I></BLOCKQUOTE>
+Creates a fraction with numerator equal to <I>intValue</I> and denominator one.<P>
+<H3><A NAME="37">intValue</A></H3>
+<BLOCKQUOTE>- (int)<B>intValue</B></BLOCKQUOTE>
+Returns intValue of numerator divided by intValue of denominator.<P>
+<H3><A NAME="38">multiplyIntValue:</A></H3>
+<BLOCKQUOTE>-<B>multiplyIntValue</B>:(int)<I>intValue</I></BLOCKQUOTE>
+Returns a new fraction by multiplying the numerator by <I>intValue</I>.<P>
+<H3><A NAME="39">divideIntValue:</A></H3>
+<BLOCKQUOTE>-<B>divideIntValue</B>:(int)<I>intValue</I></BLOCKQUOTE>
+Returns a new fraction by multiplying the denominator by <I>intValue</I>.<P>
+<H3><A NAME="40">printsLeadingSign</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsLeadingSign</B></BLOCKQUOTE>
+Whether the fraction prints a leading minus sign.<P>
+<H3><A NAME="41">printsSum</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsSum</B></BLOCKQUOTE>
+Whether the fraction prints as a sum.<P>
+<H3><A NAME="42">printsProduct</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsProduct</B></BLOCKQUOTE>
+Whether the fraction prints as a product.<P>
+<H3><A NAME="43">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints the fraction to <I>aFile</I> by sending <B>printOn:</B> messages to numerator and denominator.<P>

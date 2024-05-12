@@ -1,0 +1,473 @@
+.TH "intmodp" 3 "Mar 12, 2023"
+.SH IntegerModp
+.PP
+.B
+Inherits from:
+
+CAObject
+.PP
+.B
+Maturity Index:
+
+Relatively immature
+.SH Class Description
+.PP
+Instances are integers modulo a small, prime number, the 
+.I
+modulus
+of the object\&.  The modulus can currently not be equal to two; it must be equal to or less than USHRT_MAX_PRIME (the largest prime number that fits in an 
+.B
+unsigned short
+word, as defined in the header file cakit/IntegerModp\&.h)\&.  Objects belong to the same class in the sense of 
+.B
+sameClass:
+iff\&. the moduli are equal\&.
+.PP
+Every integer mod 
+.I
+p
+keeps its own copy of the modulus; you don\&'t need to set a global modulus\&.  As a consequence, it is possible to do multiple calculations modulo a different prime, even concurrenlty\&.
+.PP
+IntegerModp is the prototype, in the Computer Algebra Kit, of a 
+.I
+field
+i\&.e\&., a structure where each (nonzero) element has a multiplicative inverse (see 
+.B
+inField
+and 
+.B
+inverse
+)\&.  Matrix (in Gaussian elimination) and Polynomial (in polynomial division) take advantage of the field structure of scalars, such as integers mod p\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* modulus:
+.br
+* int:modulus:
+.RE
+.PP 
+.B
+Identity
+.RS 3
+.br
+* hash
+.br
+* isEqual:
+.br
+* modulus
+.br
+* intValue
+.br
+* intValue:
+.RE
+.PP 
+.B
+Addition
+.RS 3
+.br
+* zero
+.br
+* isZero
+.br
+* isOpposite:
+.br
+* negate
+.br
+* double
+.br
+* add:
+.br
+* subtract:
+.RE
+.PP 
+.B
+Multiplication
+.RS 3
+.br
+* one
+.br
+* minusOne
+.br
+* isOne
+.br
+* isMinusOne
+.br
+* square
+.br
+* multiply:
+.br
+* inverse
+.br
+* divide:
+.RE
+.PP 
+.B
+Characteristic
+.RS 3
+.br
+* characteristic
+.br
+* frobenius
+.br
+* frobeniusInverse
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printsLeadingSign
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+modulus:
+.RS 1
++
+.B
+modulus
+:(unsigned short)
+.I
+aPrime
+.RE
+.PP
+Creates a new object, equal to zero, with modulus equal to 
+.I
+aPrime
+\&.  The modulus must be a prime number less than or equal to USHRT_MAX_PRIME\&.
+.PP 
+int:modulus:
+.RS 1
++
+.B
+int
+:(int)
+.I
+intValue
+.B
+modulus
+:(unsigned short)
+.I
+aPrime
+.RE
+.PP
+Creates a new object with modulus equal to 
+.I
+aPrime
+\&.  The value of the object is equal to 
+.I
+intValue
+mod 
+.I
+aPrime
+\&.  The modulus must be a prime number less than or equal to USHRT_MAX_PRIME\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a small integer that is the same for objects that are equal (in the sense of 
+.B
+isEqual:
+)\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+b
+.RE
+.PP 
+modulus
+.RS 1
+- (
+unsigned short
+)
+.B
+modulus
+.RE
+.PP
+Returns the modulus, a prime number equal to or less than USHRT_MAX_PRIME\&.
+.PP 
+intValue
+.RS 1
+- (
+int
+)
+.B
+intValue
+.RE
+.PP
+Returns a representant of the modular number in the range [0,modulus[\&.
+.PP 
+intValue:
+.RS 1
+-
+.B
+intValue
+:(int)
+.I
+aValue
+.RE
+.PP
+Returns a new object for 
+.I
+aValue
+, modulo the modulus of the receiving object\&.  
+.PP 
+zero
+.RS 1
+-
+.B
+zero
+.RE
+.PP 
+isZero
+.RS 1
+- (
+BOOL
+)
+.B
+isZero
+.RE
+.PP
+Whether the object is equal to zero\&.
+.PP 
+isOpposite:
+.RS 1
+- (
+BOOL
+)
+.B
+isOpposite
+:
+.I
+b
+.RE
+.PP
+Whether the object is the opposite of 
+.I
+b
+\&.
+.PP 
+negate
+.RS 1
+-
+.B
+negate
+.RE
+.PP
+Returns the opposite of the object\&.
+.PP 
+double
+.RS 1
+-
+.B
+double
+.RE
+.PP
+Returns a new object, equal to the object multiplied by two i\&.e\&., added to itself\&.
+.PP 
+add:
+.RS 1
+-
+.B
+add
+:
+.I
+b
+.RE
+.PP
+Adds 
+.I
+b
+to the object\&.  Returns a new object\&.
+.PP 
+subtract:
+.RS 1
+-
+.B
+subtract
+:
+.I
+b
+.RE
+.PP
+Subtracts 
+.I
+b
+from the object\&.  Returns a new object\&.
+.PP 
+one
+.RS 1
+-
+.B
+one
+.RE
+.PP 
+minusOne
+.RS 1
+-
+.B
+minusOne
+.RE
+.PP 
+isOne
+.RS 1
+- (
+BOOL
+)
+.B
+isOne
+.RE
+.PP
+Whether the object is equal to one\&.
+.PP 
+isMinusOne
+.RS 1
+- (
+BOOL
+)
+.B
+isMinusOne
+.RE
+.PP
+Whether the object is equal to minus one\&.
+.PP 
+square
+.RS 1
+-
+.B
+square
+.RE
+.PP
+Returns the square of the object i\&.e\&., a new object equal to the original object multiplied by itself\&.
+.PP 
+multiply:
+.RS 1
+-
+.B
+multiply
+:
+.I
+b
+.RE
+.PP
+Returns a new object, the product of the object multiplied (to the right) by 
+.I
+b
+\&.  If the objects are pointer equal, this method is equivalent to 
+.B
+square
+\&.
+.PP 
+inverse
+.RS 1
+-
+.B
+inverse
+.RE
+.PP
+Returns the multiplicative inverse of the object (returns a new object)\&.  Returns 
+.B
+nil
+if the object is equal to zero or cannot be inverted\&.
+.PP 
+divide:
+.RS 1
+-
+.B
+divide
+:
+.I
+b
+.RE
+.PP
+Multiplies the object by the inverse of 
+.I
+b
+\&.  Returns 
+.B
+nil
+if 
+.I
+b
+is zero (has no inverse)\&.
+.PP 
+characteristic
+.RS 1
+- (
+int
+)
+.B
+characteristic
+.RE
+.PP
+Returns the modulus of the object\&.
+.PP 
+frobenius
+.RS 1
+-
+.B
+frobenius
+.RE
+.PP
+Simply returns a new reference to the object itself, since the 
+.I
+p
+-th power of an integer modulo 
+.I
+p
+is equal to that integer\&.
+.PP 
+frobeniusInverse
+.RS 1
+-
+.B
+frobeniusInverse
+.RE
+.PP
+Simply returns a new reference to the object itself, since the 
+.I
+p
+-th power of an integer modulo 
+.I
+p
+is equal to that integer\&.  This method also returns zero for the zero object\&.
+.PP 
+printsLeadingSign
+.RS 1
+- (
+BOOL
+)
+.B
+printsLeadingSign
+.RE
+.PP
+Returns NO, because representants are taken positive for printing\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints a (nonnegative) representant of the integer modulo p\&.

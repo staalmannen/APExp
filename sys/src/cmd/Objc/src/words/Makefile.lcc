@@ -1,0 +1,48 @@
+
+#
+# Portable Object Compiler
+#
+
+#
+# This Makefile should work with LCC make.
+#
+
+LEX=flex
+LEXYYC=lexyy.c
+RM=del
+CP=copy
+OBJC=objc
+DBG_MFLAGS=-q -g
+OPT_MFLAGS=-q -DNDEBUG
+
+MFLAGS = $(DBG_MFLAGS) -inlinecache -postlink -retain
+
+PROGRAM=words.exe
+OBJFILES = token.obj words.obj
+
+.SUFFIXES: .m .lm
+
+.m.obj:
+	$(OBJC) -c $*.m $(MFLAGS)
+
+.lm.obj:
+	$(LEX) $*.lm
+	-$(CP) $(LEXYYC) $*.m
+	$(OBJC) -c $(MFLAGS) $(IFLAGS) $*.m
+	-$(RM) $*.m
+
+$(PROGRAM) : $(OBJFILES)
+	$(OBJC) $(MFLAGS) $(OBJFILES) -o $(PROGRAM)
+
+cleantmp : 
+	-$(RM) *.P
+	-$(RM) *.c
+	-$(RM) *.i
+
+clean : cleantmp
+	-$(RM) *.obj
+	-$(RM) $(PROGRAM)
+
+distclean : clean
+	-$(RM) Makefile 
+

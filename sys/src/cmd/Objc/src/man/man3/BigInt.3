@@ -1,0 +1,1130 @@
+.TH "integer" 3 "Mar 12, 2023"
+.SH BigInt
+.PP
+.B
+Inherits from:
+
+CAObject
+.PP
+.B
+Maturity Index:
+
+Relatively mature
+.SH Class Description
+.PP
+An integer (alias 
+.B
+BigInt
+) is an array of digits, each digit is a value of type DIGIT declared as 
+.B
+unsigned short int
+\&.  So, abstractly, the integer is expressed base USHRT_MAX + 1, which is a power of two\&. (USHRT_MAX is defined in the ANSI header file limits\&.h)  The most significant (or 
+.I
+leading
+) digit is never zero; the 
+.I
+last
+digit is the least significant digit of the integer\&.  There are methods to count, access, insert or remove digits\&.  Besides the normal elementary arithmetical operations, Integer also supports multiplication, division etc\&. by digits\&.  For input and output, integers are in decimal representation\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* new
+.br
+* str:
+.br
+* int:
+.br
+* factorial:
+.br
+* fibonacci:
+.br
+* copy
+.br
+* deepCopy
+.br
+* release
+.RE
+.PP 
+.B
+Identity
+.RS 3
+.br
+* hash
+.br
+* isEqual:
+.br
+* numDigits
+.br
+* isDigit
+.RE
+.PP 
+.B
+Inserting and Removing Digits
+.RS 3
+.br
+* insertDigit:
+.br
+* removeDigit
+.RE
+.PP 
+.B
+Accessing Digits
+.RS 3
+.br
+* digitAt:
+.br
+* lastDigit
+.br
+* leadingDigit
+.RE
+.PP 
+.B
+String Value
+.RS 3
+.br
+* str
+.br
+* str:
+.RE
+.PP 
+.B
+Coercion
+.RS 3
+.br
+* asNumerical
+.br
+* asModp:
+.br
+* digitValue
+.br
+* digitValue:
+.br
+* ulongValue
+.br
+* ulongValue:
+.br
+* intValue
+.br
+* intValue:
+.br
+* doubleValue
+.br
+* floatValue
+.RE
+.PP 
+.B
+Comparing
+.RS 3
+.br
+* sign
+.br
+* compare:
+.RE
+.PP 
+.B
+Addition
+.RS 3
+.br
+* zero
+.br
+* isZero
+.br
+* isOpposite:
+.br
+* negate
+.br
+* double
+.br
+* add:
+.br
+* subtract:
+.br
+* addDigit:
+.br
+* subtractDigit:
+.RE
+.PP 
+.B
+Multiplication
+.RS 3
+.br
+* one
+.br
+* minusOne
+.br
+* isOne
+.br
+* isMinusOne
+.br
+* square
+.br
+* multiply:
+.br
+* multiplyDigit:
+.br
+* inverse
+.RE
+.PP 
+.B
+Division
+.RS 3
+.br
+* divide:
+.br
+* divideDigit:
+.br
+* quotientDigit:
+.br
+* remainder:quotient:
+.br
+* quotientDigit:remainder:
+.br
+* remainderDigit:
+.RE
+.PP 
+.B
+Parity
+.RS 3
+.br
+* isEven
+.br
+* isOdd
+.RE
+.PP 
+.B
+Greatest Common Divisor
+.RS 3
+.br
+* gcd:
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printsLeadingSign
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+Returns a new integer equal to zero\&.  The instance method 
+.B
+zero
+returns a shared, zero integer object\&. 
+.PP
+.B
+See also:
+
+- zero
+.PP 
+str:
+.RS 1
++
+.B
+str
+:(STR)
+.I
+aString
+.RE
+.PP
+Returns a new integer from the decimal representation 
+.I
+aString
+, or returns 
+.B
+nil
+if 
+.I
+aString
+doesn\&'t contain decimal characters (with optional unary minus sign)\&.
+.PP 
+int:
+.RS 1
++
+.B
+int
+:(int)
+.I
+intValue
+.RE
+.PP
+Returns a new integer with value equal to 
+.I
+intValue
+\&.
+.PP 
+factorial:
+.RS 1
++
+.B
+factorial
+:(int)
+.I
+n
+.RE
+.PP
+Returns a new integer object that is the 
+.I
+n
+-th factorial\&.
+.PP 
+fibonacci:
+.RS 1
++
+.B
+fibonacci
+:(int)
+.I
+n
+.RE
+.PP
+Returns a new object that is the 
+.I
+n
+-th Fibonacci number\&. (Not implemented)\&.
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Makes a copy of the digits\&.
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+For integer objects, deepCopy is equivalent to 
+.B
+copy
+\&.
+.PP 
+release
+.RS 1
+-
+.B
+release
+.RE
+.PP
+Frees the array of digits of the integer object\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a small integer that is the same for objects that are equal (in the sense of 
+.B
+isEqual:
+)\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+b
+.RE
+.PP 
+numDigits
+.RS 1
+- (
+int
+)
+.B
+numDigits
+.RE
+.PP
+Returns the number of DIGIT\&'s in the integer\&.  Returns zero if the integer is zero\&.  The leading digit of an integer is at position numDigits minus one\&.
+.PP 
+isDigit
+.RS 1
+- (
+BOOL
+)
+.B
+isDigit
+.RE
+.PP
+Whether the integer consists of a single digit\&.  If the integer is zero, this method returns NO\&.  The method ignores the sign of the integer\&.
+.PP
+.B
+See also:
+
+digitValue
+.PP 
+insertDigit:
+.RS 1
+-
+.B
+insertDigit
+:(DIGIT)
+.I
+d
+.RE
+.PP
+Inserts 
+.I
+d
+as last digit, shifting the other digits one position up\&.  The method doesn\&'t insert anything if both the integer and 
+.I
+d
+are equal to zero\&. 
+.PP 
+removeDigit
+.RS 1
+- (
+DIGIT
+)
+.B
+removeDigit
+.RE
+.PP
+Removes and returns the last digit, shifting the other digits one position down\&.  The method returns zero if the integer is equal to zero\&. 
+.PP 
+digitAt:
+.RS 1
+- (
+DIGIT
+)
+.B
+digitAt
+:(int)
+.I
+i
+.RE
+.PP
+Returns the digit at position 
+.I
+i
+\&.  The leading digit is position numDigits minus one\&.  The last digit is at position zero\&.  Returns 0 if the index is less than zero or equal to or greater than numDigits\&.
+.PP 
+lastDigit
+.RS 1
+- (
+DIGIT
+)
+.B
+lastDigit
+.RE
+.PP
+Returns the least significant digit of the integer, the digit at position 0\&.  Returns 0 if the integer is zero\&.
+.PP 
+leadingDigit
+.RS 1
+- (
+DIGIT
+)
+.B
+leadingDigit
+.RE
+.PP
+Returns the most significant digit of the integer, the digit at position numDigits minus one\&.  The leading digit of a nonzero integer is never zero\&.  The method returns 0 if the integer is zero\&.
+.PP 
+str
+.RS 1
+- (
+STR
+)
+.B
+str
+.RE
+.PP
+Returns the decimal representation of the integer as a NULL-terminated string of characters\&.  The string is automatically disposed off when freeing the integer, or when modifying the integer with methods that work destructively on the integer such as 
+.B
+removeDigit
+or 
+.B
+insertDigit:
+\&.
+.PP 
+str:
+.RS 1
+-
+.B
+str
+:(STR)
+.I
+aString
+.RE
+.PP
+Returns a new integer from the decimal representation 
+.I
+aString
+, or returns 
+.B
+nil
+if 
+.I
+aString
+doesn\&'t contain decimal characters (with optional unary minus sign)\&.
+.PP 
+asNumerical
+.RS 1
+-
+.B
+asNumerical
+.RE
+.PP
+Returns a new instance of the 
+.B
+Float
+class whose float value is equal to that of the integer\&.
+.PP
+.B
+See also:
+
+floatValue
+.PP 
+asModp:
+.RS 1
+-
+.B
+asModp
+:(unsigned short)
+.I
+p
+.RE
+.PP
+Returns a new instance of the 
+.B
+IntegerModp
+class whose value is equal to that of the integer modulo 
+.I
+p
+(with 
+.I
+p
+a small prime number)\&.  Negative integers are mapped to the opposite (mod 
+.I
+p
+) of their absolute value\&.
+.PP
+.B
+See also:
+
+IntegerModp
+.PP 
+digitValue
+.RS 1
+- (
+DIGIT
+)
+.B
+digitValue
+.RE
+.PP
+Equivalent to 
+.B
+lastDigit
+\&.  This method ignores the sign of the integer i\&.e\&., for a negative integer that consists of just one digit, it returns the absolute value of the integer\&.
+.PP 
+digitValue:
+.RS 1
+-
+.B
+digitValue
+:(DIGIT)
+.I
+aValue
+.RE
+.PP
+Returns a new (positive) integer object, with value equal to 
+.I
+aValue
+\&.
+.PP 
+ulongValue
+.RS 1
+- (
+unsigned long
+)
+.B
+ulongValue
+.RE
+.PP
+Returns the two last digits of the integer as an 
+.B
+unsigned long
+value\&.
+.PP 
+ulongValue:
+.RS 1
+-
+.B
+ulongValue
+:(unsigned long)
+.I
+aValue
+.RE
+.PP
+Returns a (positive) integer with value as 
+.B
+unsigned long
+equal to 
+.I
+aValue
+\&.
+.PP 
+intValue
+.RS 1
+- (
+int
+)
+.B
+intValue
+.RE
+.PP
+Returns the value of the integer as 
+.B
+int
+value, if possible\&.  If the integer is too large to represented as 
+.B
+int
+, the method returns INT_MIN or INT_MAX depending on the sign of the integer\&.
+.PP 
+intValue:
+.RS 1
+-
+.B
+intValue
+:(int)
+.I
+aValue
+.RE
+.PP
+Returns a new integer with value equal to 
+.I
+aValue
+\&.
+.PP 
+doubleValue
+.RS 1
+- (
+double
+)
+.B
+doubleValue
+.RE
+.PP
+Returns the integer as a floating-point 
+.B
+double
+value, if possible\&.  If the integer is too big to be represented as 
+.B
+double
+, the method returns DBL_MIN or DBL_MAX depending on the sign of the integer\&.
+.PP 
+floatValue
+.RS 1
+- (
+float
+)
+.B
+floatValue
+.RE
+.PP
+Returns the integer as a floating-point 
+.B
+float
+value, if possible\&.  If the integer is too big to be represented as 
+.B
+float
+, the method returns FLT_MIN or FLT_MAX depending on the sign of the integer\&.
+.PP 
+sign
+.RS 1
+- (
+int
+)
+.B
+sign
+.RE
+.PP
+Returns plus one if the object is positive (greater than zero), zero if zero and minus one if negative (less than zero)\&.
+.PP 
+compare:
+.RS 1
+- (
+int
+)
+.B
+compare
+:
+.I
+b
+.RE
+.PP
+Returns -1, 0, or +1 if the object is respectively less than, equal to, or greater than 
+.I
+b
+\&.  Returns 0 for pointer equal objects\&.
+.PP 
+zero
+.RS 1
+-
+.B
+zero
+.RE
+.PP
+Returns a copy of a shared integer instance with value equal to zero\&.
+.PP 
+isZero
+.RS 1
+- (
+BOOL
+)
+.B
+isZero
+.RE
+.PP
+Whether the object is equal to zero\&.
+.PP 
+isOpposite:
+.RS 1
+- (
+BOOL
+)
+.B
+isOpposite
+:
+.I
+b
+.RE
+.PP
+Whether the object is the opposite of 
+.I
+b
+\&.
+.PP 
+negate
+.RS 1
+-
+.B
+negate
+.RE
+.PP
+Returns the opposite of the object\&.
+.PP 
+double
+.RS 1
+-
+.B
+double
+.RE
+.PP
+Returns a new object, equal to the object multiplied by two i\&.e\&., added to itself\&.
+.PP 
+add:
+.RS 1
+-
+.B
+add
+:
+.I
+b
+.RE
+.PP
+Adds 
+.I
+b
+to the object\&.  Returns a new object\&.
+.PP 
+subtract:
+.RS 1
+-
+.B
+subtract
+:
+.I
+b
+.RE
+.PP
+Subtracts 
+.I
+b
+from the object\&.  Returns a new object\&.
+.PP 
+addDigit:
+.RS 1
+-
+.B
+addDigit
+:(DIGIT)
+.I
+d
+.RE
+.PP
+Returns a new integer that is the sum of the integer 
+.B
+self
+and the digit 
+.I
+d
+\&.
+.PP 
+subtractDigit:
+.RS 1
+-
+.B
+subtractDigit
+:(DIGIT)
+.I
+d
+.RE
+.PP
+Returns a new integer that is the equal to the integer 
+.B
+self
+minus the digit 
+.I
+d
+\&.
+.PP 
+one
+.RS 1
+-
+.B
+one
+.RE
+.PP
+Returns a copy of a shared integer instance with value equal to one\&.
+.PP 
+minusOne
+.RS 1
+-
+.B
+minusOne
+.RE
+.PP
+Returns a copy of the integer minus one\&.
+.PP 
+isOne
+.RS 1
+- (
+BOOL
+)
+.B
+isOne
+.RE
+.PP
+Whether the object is equal to one\&.
+.PP 
+isMinusOne
+.RS 1
+- (
+BOOL
+)
+.B
+isMinusOne
+.RE
+.PP
+Whether the object is equal to minus one\&.
+.PP 
+square
+.RS 1
+-
+.B
+square
+.RE
+.PP
+Returns the square of the object i\&.e\&., a new object equal to the original object multiplied by itself\&.
+.PP 
+multiply:
+.RS 1
+-
+.B
+multiply
+:
+.I
+b
+.RE
+.PP
+Returns a new object, the product of the object multiplied (to the right) by 
+.I
+b
+\&.  If the objects are pointer equal, this method is equivalent to 
+.B
+square
+\&.
+.PP 
+multiplyDigit:
+.RS 1
+-
+.B
+multiplyDigit
+:(DIGIT)
+.I
+d
+.RE
+.PP
+Returns the product of the integer and the digit 
+.I
+d
+(the product is a new object)\&.
+.PP 
+inverse
+.RS 1
+-
+.B
+inverse
+.RE
+.PP
+Returns 
+.B
+nil
+, except if the integer is one or minus one, in which case the method returns a copy of the object itself\&.
+.PP 
+divide:
+.RS 1
+-
+.B
+divide
+:
+.I
+b
+.RE
+.PP
+Returns the exact quotient on division by 
+.I
+b
+\&.  Returns 
+.B
+nil
+if the divisor 
+.I
+b
+is zero or if the division is not exact (when the remainder is not zero)\&.
+.PP
+.B
+See also:
+
+quotient:
+.PP 
+divideDigit:
+.RS 1
+-
+.B
+divideDigit
+:(DIGIT)
+.I
+b
+.RE
+.PP
+Returns the exact quotient on division by the digit 
+.I
+b
+\&.  Returns 
+.B
+nil
+if the divisor 
+.I
+b
+is zero or if the division is not exact (when the remainder is not zero)\&.
+.PP 
+quotientDigit:
+.RS 1
+-
+.B
+quotientDigit
+:(DIGIT)
+.I
+b
+.RE
+.PP
+Returns the quotient on division by the digit 
+.I
+b
+; the division need not necessarily be exact\&.  Returns 
+.B
+nil
+if 
+.I
+b
+is equal to zero\&.
+.PP 
+remainder:quotient:
+.RS 1
+-
+.B
+remainder
+:
+.I
+b
+.B
+quotient
+:(id *)
+.I
+q
+.RE
+.PP
+Returns the remainder and, if a non-NULL pointer is passed for 
+.I
+q
+, the quotient on division of the dividend 
+.I
+self
+by a divisor 
+.I
+b
+\&.  Both remainder and quotient are new integer objects\&.  The remainder is 
+.I
+signed
+i\&.e\&., its sign is the same as the sign of the dividend; the relation 
+.I
+dividend
+== 
+.I
+quotient
+
+.I
+divisor
++ 
+.I
+remainder
+holds for all integers\&.
+.PP 
+quotientDigit:remainder:
+.RS 1
+-
+.B
+quotientDigit
+:(DIGIT)
+.I
+d
+.B
+remainder
+:(DIGIT *)
+.I
+r
+.RE
+.PP
+Returns the quotient and, if a non-NULL pointer is passed along for 
+.I
+r
+, the 
+.I
+unsigned
+remainder on division by a digit 
+.I
+d
+; the relation 
+.I
+dividend
+== 
+.I
+quotient
+
+.I
+divisor
++ 
+.I
+remainder
+does not hold if the dividend is negative\&.
+.PP 
+remainderDigit:
+.RS 1
+- (
+DIGIT
+)
+.B
+remainderDigit
+:(DIGIT)
+.I
+d
+.RE
+.PP
+Returns the 
+.I
+unsigned
+remainder on division by a digit 
+.I
+d
+i\&.e\&., the sign of the object is ignored\&.  The divisor 
+.I
+d
+shouldn\&'t be equal to zero\&.
+.PP 
+isEven
+.RS 1
+- (
+BOOL
+)
+.B
+isEven
+.RE
+.PP
+Whether the integer is even i\&.e\&., zero or divisible by two\&.
+.PP 
+isOdd
+.RS 1
+- (
+BOOL
+)
+.B
+isOdd
+.RE
+.PP
+Whether the integer is odd i\&.e\&., not divisible by two\&.
+.PP 
+gcd:
+.RS 1
+-
+.B
+gcd
+:
+.I
+b
+.RE
+.PP
+Returns a new (non-negative) integer, the greatest common divisor of the two integers, computed by the Euclidean algorithm\&. 
+.PP 
+printsLeadingSign
+.RS 1
+- (
+BOOL
+)
+.B
+printsLeadingSign
+.RE
+.PP
+Returns YES if the integer is negative\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints the integer in decimal representation to 
+.I
+aFile
+\&.

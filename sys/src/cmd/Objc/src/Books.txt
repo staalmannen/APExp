@@ -1,0 +1,36 @@
+
+For Objective-C :
+
+1.  The object oriented pre-compiler: programming Smalltalk 80 methods in C language
+        Brad L. Cox, ITT Programming Technology Center, Stratford, Connecticut
+	Volume 18, Issue 1, January 1983, ACM SIGPLAN Notices
+    	Association for Computing Machinery,New York,NY,United States
+	ISSN:0362-1340, EISSN:1558-1160
+
+	https://dl.acm.org/doi/abs/10.1145/948093.948095
+
+2.  Objects, Icons and Software-ICs
+	Brad Cox and Bill Hunt
+	Byte Magazine Volume 11 Issue 08: Object-Oriented Languages 
+	Special Issue on Object-Oriented Languages, pp. 186-202
+
+	https://archive.org/details/byte-magazine-1986-08/mode/2up
+
+3.  Producer, A Tool for Translating Smalltalk-80 to Objective-C
+	Brad J. Cox and Kurt J. Schmucker
+	Productivity Products International Inc., Sandy Hook CT
+	OOPSLA'87: Object-Oriented Programming Systems, Languages and
+	Applications, Orlando, Florida, USA, October, 1987
+	ISBN: 978-0-89791-247-1
+
+	https://doi.org/10.1145/38765.38846
+
+4.  Object Oriented Programming: An Evolutionary Approach. (2nd ed.)
+	Brad J. Cox, Andrew J. Novobilski
+	Addison-Wesley Publishing Company, Reading,
+	Massachusetts, 1986,1991. ISBN: 0-201-54834-8.
+    	Spanish: ISBN 0-201-60112-5, Japanese: ISBN 4-8101-8046-8
+
+5.  Taskmaster ECOOP position paper
+	Brad Cox
+        ECOOP'91, Workshop on Exception Handling And OOPLS, Geneva, Switzerland

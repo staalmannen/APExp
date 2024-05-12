@@ -1,0 +1,620 @@
+.TH "fraction" 3 "Mar 12, 2023"
+.SH Fraction
+.PP
+.B
+Inherits from:
+
+CAObject
+.PP
+.B
+Maturity Index:
+
+Relatively immature
+.SH Class Description
+.PP
+Fraction objects consist of a 
+.I
+numerator
+object divided by a 
+.I
+denominator
+object\&.   The numerators and denominators can be arbitrary Computer Algebra Kit objects, but the current implementation has been tested only in the case of 
+.I
+total
+fractions i\&.e\&., numerators and denominators are taken as elements of the same set\&.  For example, a fraction of two integers is a rational number; a fraction of two polynomials is a rational function\&.
+.SH Canonical Form
+.PP
+The arithmetical operations on fractions assume that the fractions are in a simplified (canonical) form, and produce, as result, a fraction in canonical form\&.  In the case of the integers, or any ordered, integral domain (see 
+.B
+inIntegralDomain
+and 
+.B
+inOrderedSet
+), the numerator and denominator are kept coprime (common gcd is divided out) and the denominator is kept positive\&.  For example, the fraction minus one, is represented as (-1)/1, and never as 1/(-1)\&.  In the case of an unordered, integral domain, such as polynomials over the integers or over a field, the denominator and numerator are also coprime, and the leading unit of the denominator is equal to one (over fields, this means that the denominator is kept monic, see 
+.B
+leadingUnit
+)\&. For example, the fraction minus 
+.I
+x
+is represented over 
+.B
+Z
+mod 3 as (2 
+.I
+x
+)/1 and not as 
+.I
+x
+/2\&.  Finally, for rational functions with floating-point coefficients, no gcd is computed, but the denominator of the fraction is kept monic\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* totalFraction:
+.br
+* numerator:denominator:
+.br
+* copy
+.br
+* deepCopy
+.RE
+.PP 
+.B
+Identity
+.RS 3
+.br
+* numerator
+.br
+* denominator
+.br
+* hash
+.br
+* isEqual:
+.br
+* compare:
+.RE
+.PP 
+.B
+Coercion
+.RS 3
+.br
+* asNumerical
+.br
+* asModp:
+.br
+* asIntegral
+.RE
+.PP 
+.B
+Addition
+.RS 3
+.br
+* zero
+.br
+* isZero
+.br
+* isOpposite:
+.br
+* negate
+.br
+* double
+.br
+* add:
+.br
+* subtract:
+.RE
+.PP 
+.B
+Multiplication
+.RS 3
+.br
+* one
+.br
+* isOne
+.br
+* isMinusOne
+.br
+* square
+.br
+* inverse
+.br
+* multiply:
+.br
+* divide:
+.br
+* power:
+.RE
+.PP 
+.B
+Multiplication by Int Value
+.RS 3
+.br
+* intValue:
+.br
+* intValue
+.br
+* multiplyIntValue:
+.br
+* divideIntValue:
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printsLeadingSign
+.br
+* printsSum
+.br
+* printsProduct
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+totalFraction:
+.RS 1
++
+.B
+totalFraction
+:
+.I
+aNumerator
+.RE
+.PP
+Returns a new fraction with numerator set to 
+.I
+aNumerator
+and denominator set to the element one for 
+.I
+aNumerator
+\&.
+.PP 
+numerator:denominator:
+.RS 1
++
+.B
+numerator
+:
+.I
+aNumerator
+.B
+denominator
+:
+.I
+aDenominator
+.RE
+.PP
+Returns a new fraction with numerator set to 
+.I
+aNumerator
+and denominator set to 
+.I
+aDenominator
+\&. 
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Returns a new copy of the fraction\&.
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+Returns a new copy of the fraction; sends 
+.B
+deepCopy
+messages to denominator and numerator\&.
+.PP 
+numerator
+.RS 1
+-
+.B
+numerator
+.RE
+.PP
+Returns 
+.I
+a
+for a fraction 
+.I
+a
+/
+.I
+b
+\&. 
+.PP 
+denominator
+.RS 1
+-
+.B
+denominator
+.RE
+.PP
+Returns 
+.I
+b
+for a fraction 
+.I
+a
+/
+.I
+b
+\&. 
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a small integer that is the same for fractions that are equal in the sense of 
+.B
+isEqual:
+\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+b
+.RE
+.PP
+Two fractions are equal if they are pointer equal, or if their numerators and denominators are equal\&.  If the numerators and denominators are coprime, but not ordered, the method returns YES if numerators and denominators are opposite to each other\&.  If the fraction is not in canonical form, it is verified that the difference of the two fractions is zero\&.
+.PP 
+compare:
+.RS 1
+- (
+int
+)
+.B
+compare
+:
+.I
+b
+.RE
+.PP
+Compares the fractions by comparing the products of numerators and denominators\&.
+.PP 
+asNumerical
+.RS 1
+-
+.B
+asNumerical
+.RE
+.PP
+Returns the numerical value of the fraction\&.  Attempts to divide the numerical value of the numerator and denominator\&.
+.PP 
+asModp:
+.RS 1
+-
+.B
+asModp
+:(unsigned short)
+.I
+p
+.RE
+.PP
+Returns the value of the fraction modulo 
+.I
+p
+\&.  Attempts to divide the values of the numerator and denominator\&.  If the division fails, the method generates an error message\&.
+.PP 
+asIntegral
+.RS 1
+-
+.B
+asIntegral
+.RE
+.PP
+Returns, if the denominator of the fraction is equal to one, a new reference to the numerator\&.  Otherwise, the method generates an error message\&.
+.PP 
+zero
+.RS 1
+-
+.B
+zero
+.RE
+.PP
+Returns a new fraction with numerator equal to zero\&.
+.PP 
+isZero
+.RS 1
+- (
+BOOL
+)
+.B
+isZero
+.RE
+.PP
+Whether the numerator of the fraction is equal to zero\&.
+.PP 
+isOpposite:
+.RS 1
+- (
+BOOL
+)
+.B
+isOpposite
+:
+.I
+b
+.RE
+.PP
+Two fractions are opposite if their numerators are opposite and the denominators are equal\&.  However, if the numerators and denominators are coprime, but not ordered, the method returns YES if the numerators are equal and the denominators are opposite to each other\&.  If the fraction is not in canonical form, it is verified that the sum of the two fractions is zero\&.
+.PP 
+negate
+.RS 1
+-
+.B
+negate
+.RE
+.PP
+Returns a new fraction, the opposite of 
+.B
+self
+by negating the numerator\&.
+.PP 
+double
+.RS 1
+-
+.B
+double
+.RE
+.PP
+Returns a new fraction, the double of 
+.B
+self
+by doubling the numerator\&.
+.PP 
+add:
+.RS 1
+-
+.B
+add
+:
+.I
+b
+.RE
+.PP
+Returns a new fraction, the sum of 
+.B
+self
+and 
+.I
+b
+\&.  The method first handles some special cases and then distinguishes between the case that both fractions have a common denominator or not\&.
+.PP 
+subtract:
+.RS 1
+-
+.B
+subtract
+:
+.I
+b
+.RE
+.PP
+Returns a new fraction, the difference of 
+.B
+self
+and 
+.I
+b
+\&.  The method first handles some special cases and then distinguishes between the case that both fractions have a common denominator or not\&.
+.PP 
+one
+.RS 1
+-
+.B
+one
+.RE
+.PP
+Returns a new fraction with numerator equal to one\&.
+.PP 
+isOne
+.RS 1
+- (
+BOOL
+)
+.B
+isOne
+.RE
+.PP
+Whether the numerator is equal to the denominator\&.
+.PP 
+isMinusOne
+.RS 1
+- (
+BOOL
+)
+.B
+isMinusOne
+.RE
+.PP
+Whether the numerator is the opposite of the denominator\&.
+.PP 
+square
+.RS 1
+-
+.B
+square
+.RE
+.PP
+Returns a new fraction; squares numerator and denominator\&.
+.PP 
+inverse
+.RS 1
+-
+.B
+inverse
+.RE
+.PP
+Returns the inverse of the fraction; interchanges, in the case of a total fraction, denominator and numerator\&.
+.PP 
+multiply:
+.RS 1
+-
+.B
+multiply
+:
+.I
+b
+.RE
+.PP
+Returns a new fraction; multiplies the numerators and the denominators together\&.
+.PP 
+divide:
+.RS 1
+-
+.B
+divide
+:
+.I
+b
+.RE
+.PP
+Returns a new fraction by multiplying the fraction by the inverse of 
+.I
+b
+\&.
+.PP 
+power:
+.RS 1
+-
+.B
+power
+:(int)
+.I
+n
+.RE
+.PP
+Returns a new fraction; raises numerator and denominator to the 
+.I
+n
+-th power\&.
+.PP 
+intValue:
+.RS 1
+-
+.B
+intValue
+:(int)
+.I
+intValue
+.RE
+.PP
+Creates a fraction with numerator equal to 
+.I
+intValue
+and denominator one\&.
+.PP 
+intValue
+.RS 1
+- (
+int
+)
+.B
+intValue
+.RE
+.PP
+Returns intValue of numerator divided by intValue of denominator\&.
+.PP 
+multiplyIntValue:
+.RS 1
+-
+.B
+multiplyIntValue
+:(int)
+.I
+intValue
+.RE
+.PP
+Returns a new fraction by multiplying the numerator by 
+.I
+intValue
+\&.
+.PP 
+divideIntValue:
+.RS 1
+-
+.B
+divideIntValue
+:(int)
+.I
+intValue
+.RE
+.PP
+Returns a new fraction by multiplying the denominator by 
+.I
+intValue
+\&.
+.PP 
+printsLeadingSign
+.RS 1
+- (
+BOOL
+)
+.B
+printsLeadingSign
+.RE
+.PP
+Whether the fraction prints a leading minus sign\&.
+.PP 
+printsSum
+.RS 1
+- (
+BOOL
+)
+.B
+printsSum
+.RE
+.PP
+Whether the fraction prints as a sum\&.
+.PP 
+printsProduct
+.RS 1
+- (
+BOOL
+)
+.B
+printsProduct
+.RE
+.PP
+Whether the fraction prints as a product\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints the fraction to 
+.I
+aFile
+by sending 
+.B
+printOn:
+messages to numerator and denominator\&.

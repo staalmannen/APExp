@@ -1,0 +1,70 @@
+
+#
+# Portable Object Compiler
+# $Id: Makefile.wmk,v 1.3 2003/09/27 09:32:44 stes Exp $
+#
+
+#
+# This Makefile should work with WATCOM wmake 
+#
+
+MKDIR=mkdir
+OBJC=objc
+RM=del
+CP=copy
+AR=wlib -q -c -b
+RANLIB=echo
+MAKE=wmake
+DBG_MFLAGS=-q -d2 -od
+OPT_MFLAGS=-q -DNDEBUG
+OBJSUFFIX=obj
+LIBSUFFIX=lib
+BOOTDIR=..\..
+LIBDIR=$(BOOTDIR)\lib
+IFLAGS=-noI
+MFLAGS=$(OPT_MFLAGS)
+
+.SUFFIXES: .m 
+
+DLL=objcrt.dll
+LIBRARY=objcrt.lib
+
+OBJFILES=&
+	Object.obj&
+	Block.obj&
+	Message.obj&
+	Exceptn.obj&
+	OutOfMem.obj&
+	objcrt.obj
+
+.m.obj:
+	@set INCPATH=$(IFLAGS)
+	$(OBJC) -c $(MFLAGS) @INCPATH $*.m
+	$(AR) $(LIBRARY) +- $@ 
+
+$(LIBRARY) : $(OBJFILES)
+	$(RANLIB) $(LIBRARY)
+
+$(DLL) : $(OBJFILES)
+	objc -dl $(OBJFILES) -o $(DLL)
+	wlib -n $(LIBRARY) +$(DLL)
+
+bootstrap : .SYMBOLIC
+	-$(MKDIR) $(LIBDIR)
+	-$(CP) $(LIBRARY) $(LIBDIR)
+
+cleantmp : .SYMBOLIC
+	-$(RM) *.P
+	-$(RM) *.c
+	-$(RM) *.i
+
+.NOCHECK
+clean : cleantmp
+	-$(RM) *.obj
+	-$(RM) *.lib
+
+.NOCHECK
+distclean : clean
+	-$(RM) Makefile 
+	-$(RM) config.h 
+

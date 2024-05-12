@@ -1,0 +1,122 @@
+
+#
+# Computer Algebra Kit
+# Copyright (c) 1992,1998 Computer Algebra Objects.  All Rights Reserved. 
+#
+
+#
+# This Makefile should work with UNIX make's (like AT&T, BSD, GNU make)
+#
+
+MKDIR=mkdir
+SED=sed
+OBJC=objc
+YACC=bison -y -d
+YTABH=y.tab.h
+YTABC=y.tab.c
+LEX=flex
+LEXYYC=lexyy.c
+RM=del
+CP=copy
+AR=ilib /NOBACKUP /NOIGNORECASE /QUIET
+FINAL_AR=echo
+RANLIB=echo
+MAKE=gmake
+DBG_MFLAGS=-q -Ti
+OPT_MFLAGS=-q -O -DNDEBUG
+OBJSUFFIX=obj
+LIBSUFFIX=lib
+BOOTDIR=..\\..
+LIBDIR=$(BOOTDIR)\\lib
+IFLAGS=-I. -noI -I..\\..\\include\\objcrt
+MFLAGS=$(OPT_MFLAGS)
+
+.SUFFIXES: .m
+
+LIBRARY=cakit.lib
+
+.m.obj:
+	$(OBJC) -c $*.m $(MFLAGS) $(IFLAGS)
+	$(AR) $(LIBRARY) -+ $@ ;
+
+OBJFILES=\
+	ccltn.obj\
+	ccltnsq.obj\
+	ccltnsqr.obj\
+	ccomplex.obj\
+	cfloat.obj\
+	fraction.obj\
+	integer.obj\
+	intmodp.obj\
+	matrix.obj\
+	 matsq.obj\
+	 matsqsq.obj\
+	monomial.obj\
+	 monomc.obj\
+	  dmonomc.obj\
+	  dmonoms.obj\
+	  smonomc.obj\
+	cobject.obj\
+	polynom.obj\
+	 polyeseq.obj\
+	 polyrseq.obj\
+	 polycseq.obj\
+	polc.obj\
+	 srspolc.obj\
+	  osrspolc.obj\
+	 drspolc.obj\
+	  odrspolc.obj\
+	  odrspols.obj\
+	  idrspolc.obj\
+	  idrspols.obj\
+	  mdrspolc.obj\
+	  mdrspols.obj\
+	 drdpolc.obj\
+	  odrdpolc.obj\
+	  odrdpols.obj\
+	  idrdpolc.obj\
+	  idrdpols.obj\
+	  mdrdpolc.obj\
+	  mdrdpols.obj\
+	 sespolc.obj\
+	  osespolc.obj\
+	 despolc.obj\
+	  odespolc.obj\
+	  odespols.obj\
+	  idespolc.obj\
+	  idespols.obj\
+	  mdespolc.obj\
+	  mdespols.obj\
+	cseq.obj\
+	 cseqc.obj\
+	symbol.obj\
+	term.obj\
+	vector.obj\
+	 vectorc.obj\
+	  ovectorc.obj\
+	  ovectors.obj\
+	  mvectorc.obj\
+	  mvectors.obj\
+	  ivectorc.obj\
+	  ivectors.obj
+
+$(LIBRARY) : $(OBJFILES)
+	$(FINAL_AR) $(LIBRARY) $(OBJFILES)
+	$(RANLIB) $(LIBRARY)
+
+bootstrap :
+	test -d $(LIBDIR) || $(MKDIR) $(LIBDIR)
+	-$(CP) $(LIBRARY) $(LIBDIR)
+
+cleantmp :
+	-$(RM) *.P
+	-$(RM) *.c
+	-$(RM) *.i
+
+clean : cleantmp
+	-$(RM) *.obj
+	-$(RM) *.lib
+
+distclean : clean
+	-$(RM) Makefile 
+

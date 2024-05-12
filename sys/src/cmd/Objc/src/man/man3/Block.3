@@ -1,0 +1,392 @@
+.TH "Block" 3 "Mar 12, 2023"
+.SH Block
+.PP
+.B
+Inherits from:
+
+Object
+.PP
+.B
+Maturity Index:
+
+Experimental
+.SH Class Description
+.PP
+Objective-C Blocks are similar to block expressions in Smalltalk\&. Blocks are a way to express deferred computations; computations to be written at one place but invoked from another\&.
+.PP
+The Portable Object Compiler uses blocks for error handling i\&.e\&., the processing of exceptional conditions that interrupt the normal flow of program execution, such as out of memory, division by zero etc\&.
+.PP
+The Object method 
+.B
+error:
+and the Block instance method 
+.B
+ifError:
+are used for this\&.
+.PP
+Blocks are a non-standard part of the Objective-C language; this implementation, the first and most powerful as far as we know, is based on Brad Cox\&'s TaskMaster paper where the same concept is discussed under the name of Action Expressions\&.
+.PP
+For a discussion on what Blocks are, and how to use them, we refer to the document 
+.I
+Objective-C Blocks
+\&.
+.PP
+The compiler has an option 
+.I
+-noBlocks
+that can be used to turn off the special syntax for Blocks\&.
+.SH Method types
+.PP 
+.B
+Exception Handling
+.RS 3
+.br
+* errorHandler
+.br
+* errorHandler:
+.br
+* halt:value:
+.br
+* ifError:
+.br
+* value:ifError:
+.br
+* on:do:
+.br
+* value:on:do:
+.RE
+.PP 
+.B
+Evaluating Blocks
+.RS 3
+.br
+* value
+.br
+* intvalue
+.br
+* atExit
+.br
+* value:
+.br
+* intvalue:
+.br
+* value:value:
+.br
+* intvalue:value:
+.RE
+.PP 
+.B
+Control Flow
+.RS 3
+.br
+* repeatTimes:
+.RE
+.SH Methods
+.PP 
+errorHandler
+.RS 1
++
+.B
+errorHandler
+.RE
+.PP
+Returns the current 
+.B
+ifError:
+exception handler Block\&.  If no 
+.B
+ifError:
+message was sent, returns the default handler, as set by 
+.B
+errorHandler:
+, or, if none was explicitely set, it uses the following handler:
+.RS 3
+
+id errorHandler = { :msg :rcv | fprintf(stderr,[msg str]);abort(); };
+.br
+
+.RE
+.PP 
+errorHandler:
+.RS 1
++
+.B
+errorHandler
+:
+.I
+aHandler
+.RE
+.PP
+Make 
+.I
+aHandler
+the default error handler\&.  Returns the handler that was previously registered as default handler\&.
+.PP
+.B
+Note:
+
+Normally the 
+.B
+ifError:
+message is used instead of 
+.B
+errorHandler:
+to set an error handler\&.
+.PP 
+halt:value:
+.RS 1
++
+.B
+halt
+:
+.I
+message
+.B
+value
+:
+.I
+receiver
+.RE
+.PP
+This message implements the 
+.B
+halt:
+message of the Object class\&.  It pops a handler of the stack of 
+.B
+ifError:
+handlers and evaluates the handler block\&.
+.PP 
+ifError:
+.RS 1
+-
+.B
+ifError
+:
+.I
+aHandler
+.RE
+.PP
+Evaluates the receiver of the message and returns its return value\&.  If an exception is raised, evaluates 
+.I
+aHandler
+\&.  This works by pushing 
+.I
+aHandler
+on a stack of error handlers, the method 
+.B
+halt:
+temporarily pops off an error handler and evaluates it with a message and receiver object as arguments :  
+.RS 3
+
+[ { \&.\&.\&. } ifError: { :msg :rcv | \&.\&.\&. }];
+.br
+
+.RE
+.PP
+.B
+Note:
+
+It is an error to have a non-local return from within the receiver, as this would leave an error handler dangling\&.  It is allowed to return however, from within the error handler\&. 
+.PP 
+value:ifError:
+.RS 1
+-
+.B
+value
+:
+.I
+anObject
+.B
+ifError
+:
+.I
+aHandler
+.RE
+.PP
+Like 
+.B
+ifError:
+but the receiving block can take an argument\&.
+.PP 
+on:do:
+.RS 1
+-
+.B
+on
+:
+.I
+aClassOfExceptions
+.B
+do
+:
+.I
+aHandler
+.RE
+.PP
+This message evaluates the receiver (like 
+.B
+value
+) and provides a way to install 
+.I
+aHandler
+Block as the exception handler for a certain class of exceptions\&.  The 
+.I
+aClassOfExceptions
+should be the name of the class, 
+.B
+Exception
+or one of its subclasses\&.  The handler Block takes one argument, the instance of the exception\&.
+.RS 3
+
+[ { \&.\&.\&. } on:Exception do: { :anException | \&.\&.\&. }];
+.br
+
+.RE
+.PP
+.B
+See also:
+
+- signal (Exception)
+.PP 
+value:on:do:
+.RS 1
+-
+.B
+value
+:
+.I
+anObject
+.B
+on
+:
+.I
+aClassOfExceptions
+.B
+do
+:
+.I
+aHandler
+.RE
+.PP
+Like 
+.B
+on:do:
+but the receiving block can take an argument\&.
+.PP 
+value
+.RS 1
+-
+.B
+value
+.RE
+.PP
+Evaluates the receiver of the message and returns its return value\&.
+.PP 
+intvalue
+.RS 1
+- (
+int
+)
+.B
+intvalue
+.RE
+.PP
+Evaluates the receiver of the message and returns its return value\&.
+.PP 
+atExit
+.RS 1
+-
+.B
+atExit
+.RE
+.PP
+Evaluates the receiver of the message when the process exits\&.  See the ANSI C function 
+.I
+atexit()
+for more details\&.  There\&'s a maximum of 32 exit Blocks that can be registered to be automatically called on exit\&.  Blocks are evaluated in reverse order of their registration\&.
+.PP 
+value:
+.RS 1
+-
+.B
+value
+:
+.I
+anObject
+.RE
+.PP
+Evaluates, with 
+.I
+anObject
+as argument, the receiver of the message and returns its return value\&.
+.PP 
+intvalue:
+.RS 1
+- (
+int
+)
+.B
+intvalue
+:
+.I
+anObject
+.RE
+.PP
+Evaluates, with 
+.I
+anObject
+as argument, the receiver of the message and returns its return value\&.
+.PP 
+value:value:
+.RS 1
+-
+.B
+value
+:
+.I
+firstObject
+.B
+value
+:
+.I
+secondObject
+.RE
+.PP
+Evaluates the receiver of the message with two arguments and returns its return value\&.
+.PP 
+intvalue:value:
+.RS 1
+- (
+int
+)
+.B
+intvalue
+:
+.I
+firstObject
+.B
+value
+:
+.I
+secondObject
+.RE
+.PP
+Evaluates the receiver of the message with two arguments and returns its return value\&.
+.PP 
+repeatTimes:
+.RS 1
+-
+.B
+repeatTimes
+:(int)
+.I
+n
+.RE
+.PP
+Method to evaluate the receiver Block 
+.I
+n
+times\&.  Similar to the Smalltalk method 
+.B
+timesRepeat:
+but with argument and receiver interchanged\&.  Returns self\&.

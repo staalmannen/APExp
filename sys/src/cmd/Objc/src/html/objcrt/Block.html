@@ -1,0 +1,99 @@
+<HTML>
+<TITLE>Block Specification Sheet</TITLE>
+<H1>Block Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 1997,2020.  All Rights Reserved.<P>
+<H1>Block</H1>
+<B>Inherits from:</B> Object<P>
+<B>Maturity Index:</B> Experimental<P>
+<H2>Class Description</H2>
+Objective-C Blocks are similar to block expressions in Smalltalk. Blocks are a way to express deferred computations; computations to be written at one place but invoked from another.<P>
+The Portable Object Compiler uses blocks for error handling i.e., the processing of exceptional conditions that interrupt the normal flow of program execution, such as out of memory, division by zero etc.<P>
+The Object method <B>error:</B> and the Block instance method <B>ifError:</B> are used for this.<P>
+Blocks are a non-standard part of the Objective-C language; this implementation, the first and most powerful as far as we know, is based on Brad Cox's TaskMaster paper where the same concept is discussed under the name of Action Expressions.<P>
+For a discussion on what Blocks are, and how to use them, we refer to the document <I>Objective-C Blocks</I>.<P>
+The compiler has an option <I>-noBlocks</I> that can be used to turn off the special syntax for Blocks.<P>
+<H2>Method types</H2>
+<H3><B>Exception Handling</B></H3>
+<UL>
+<LI><A HREF="#7">errorHandler</A></LI>
+<LI><A HREF="#8">errorHandler:</A></LI>
+<LI><A HREF="#9">halt:value:</A></LI>
+<LI><A HREF="#10">ifError:</A></LI>
+<LI><A HREF="#11">value:ifError:</A></LI>
+<LI><A HREF="#14">on:do:</A></LI>
+<LI><A HREF="#15">value:on:do:</A></LI>
+</UL>
+<H3><B>Evaluating Blocks</B></H3>
+<UL>
+<LI><A HREF="#18">value</A></LI>
+<LI><A HREF="#19">intvalue</A></LI>
+<LI><A HREF="#20">atExit</A></LI>
+<LI><A HREF="#21">value:</A></LI>
+<LI><A HREF="#22">intvalue:</A></LI>
+<LI><A HREF="#23">value:value:</A></LI>
+<LI><A HREF="#24">intvalue:value:</A></LI>
+</UL>
+<H3><B>Control Flow</B></H3>
+<UL>
+<LI><A HREF="#25">repeatTimes:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="7">errorHandler</A></H3>
+<BLOCKQUOTE>+<B>errorHandler</B></BLOCKQUOTE>
+Returns the current <B>ifError:</B> exception handler Block.  If no <B>ifError:</B> message was sent, returns the default handler, as set by <B>errorHandler:</B>, or, if none was explicitely set, it uses the following handler:<P>
+<BLOCKQUOTE><PRE>
+id errorHandler = { :msg :rcv | fprintf(stderr,[msg str]);abort(); };
+</PRE></BLOCKQUOTE>
+<H3><A NAME="8">errorHandler:</A></H3>
+<BLOCKQUOTE>+<B>errorHandler</B>:<I>aHandler</I></BLOCKQUOTE>
+Make <I>aHandler</I> the default error handler.  Returns the handler that was previously registered as default handler.<P>
+<B>Note:</B> Normally the <B>ifError:</B> message is used instead of <B>errorHandler:</B> to set an error handler.<P>
+<H3><A NAME="9">halt:value:</A></H3>
+<BLOCKQUOTE>+<B>halt</B>:<I>message</I><B>value</B>:<I>receiver</I></BLOCKQUOTE>
+This message implements the <B>halt:</B> message of the Object class.  It pops a handler of the stack of <B>ifError:</B> handlers and evaluates the handler block.<P>
+<H3><A NAME="10">ifError:</A></H3>
+<BLOCKQUOTE>-<B>ifError</B>:<I>aHandler</I></BLOCKQUOTE>
+Evaluates the receiver of the message and returns its return value.  If an exception is raised, evaluates <I>aHandler</I>.  This works by pushing <I>aHandler</I> on a stack of error handlers, the method <B>halt:</B> temporarily pops off an error handler and evaluates it with a message and receiver object as arguments :  <P>
+<BLOCKQUOTE><PRE>
+[ { ... } ifError: { :msg :rcv | ... }];
+</PRE></BLOCKQUOTE>
+<B>Note:</B> It is an error to have a non-local return from within the receiver, as this would leave an error handler dangling.  It is allowed to return however, from within the error handler. <P>
+<H3><A NAME="11">value:ifError:</A></H3>
+<BLOCKQUOTE>-<B>value</B>:<I>anObject</I><B>ifError</B>:<I>aHandler</I></BLOCKQUOTE>
+Like <B>ifError:</B> but the receiving block can take an argument.<P>
+<H3><A NAME="14">on:do:</A></H3>
+<BLOCKQUOTE>-<B>on</B>:<I>aClassOfExceptions</I><B>do</B>:<I>aHandler</I></BLOCKQUOTE>
+This message evaluates the receiver (like <B>value</B>) and provides a way to install <I>aHandler</I> Block as the exception handler for a certain class of exceptions.  The <I>aClassOfExceptions</I> should be the name of the class, <B>Exception</B> or one of its subclasses.  The handler Block takes one argument, the instance of the exception.<P>
+<BLOCKQUOTE><PRE>
+[ { ... } on:Exception do: { :anException | ... }];
+</PRE></BLOCKQUOTE>
+<B>See also:</B> - signal (Exception)<P>
+<H3><A NAME="15">value:on:do:</A></H3>
+<BLOCKQUOTE>-<B>value</B>:<I>anObject</I><B>on</B>:<I>aClassOfExceptions</I><B>do</B>:<I>aHandler</I></BLOCKQUOTE>
+Like <B>on:do:</B> but the receiving block can take an argument.<P>
+<H3><A NAME="18">value</A></H3>
+<BLOCKQUOTE>-<B>value</B></BLOCKQUOTE>
+Evaluates the receiver of the message and returns its return value.<P>
+<H3><A NAME="19">intvalue</A></H3>
+<BLOCKQUOTE>- (int)<B>intvalue</B></BLOCKQUOTE>
+Evaluates the receiver of the message and returns its return value.<P>
+<H3><A NAME="20">atExit</A></H3>
+<BLOCKQUOTE>-<B>atExit</B></BLOCKQUOTE>
+Evaluates the receiver of the message when the process exits.  See the ANSI C function <I>atexit()</I> for more details.  There's a maximum of 32 exit Blocks that can be registered to be automatically called on exit.  Blocks are evaluated in reverse order of their registration.<P>
+<H3><A NAME="21">value:</A></H3>
+<BLOCKQUOTE>-<B>value</B>:<I>anObject</I></BLOCKQUOTE>
+Evaluates, with <I>anObject</I> as argument, the receiver of the message and returns its return value.<P>
+<H3><A NAME="22">intvalue:</A></H3>
+<BLOCKQUOTE>- (int)<B>intvalue</B>:<I>anObject</I></BLOCKQUOTE>
+Evaluates, with <I>anObject</I> as argument, the receiver of the message and returns its return value.<P>
+<H3><A NAME="23">value:value:</A></H3>
+<BLOCKQUOTE>-<B>value</B>:<I>firstObject</I><B>value</B>:<I>secondObject</I></BLOCKQUOTE>
+Evaluates the receiver of the message with two arguments and returns its return value.<P>
+<H3><A NAME="24">intvalue:value:</A></H3>
+<BLOCKQUOTE>- (int)<B>intvalue</B>:<I>firstObject</I><B>value</B>:<I>secondObject</I></BLOCKQUOTE>
+Evaluates the receiver of the message with two arguments and returns its return value.<P>
+<H3><A NAME="25">repeatTimes:</A></H3>
+<BLOCKQUOTE>-<B>repeatTimes</B>:(int)<I>n</I></BLOCKQUOTE>
+Method to evaluate the receiver Block <I>n</I> times.  Similar to the Smalltalk method <B>timesRepeat:</B> but with argument and receiver interchanged.  Returns self.<P>

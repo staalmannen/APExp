@@ -1,0 +1,135 @@
+
+#
+# Portable Object Compiler
+# $Id: Makefile.lcc,v 1.2 2001/12/02 11:51:17 stes Exp $
+#
+
+#
+# This Makefile should work with LCC make
+#
+
+.SILENT:
+
+OBJC=objc
+RM=del
+CP=copy
+AR=lcclib
+FINAL_AR=echo
+RANLIB=echo
+MAKE=make
+DBG_MFLAGS=-q -g
+OPT_MFLAGS=-q -DNDEBUG
+OBJSUFFIX=obj
+LIBSUFFIX=lib
+IFLAGS=-noI -I..\..\include\objcrt -I..\..\include\objpak
+MFLAGS=$(OPT_MFLAGS)
+
+.SUFFIXES: .m 
+
+LIBRARY=oclib.lib
+
+OBJFILES=\
+    node.$(OBJSUFFIX)\
+    stkframe.$(OBJSUFFIX)\
+    symbol.$(OBJSUFFIX)\
+    stclass.$(OBJSUFFIX)\
+    cppdirec.$(OBJSUFFIX)\
+    type.$(OBJSUFFIX)\
+    options.$(OBJSUFFIX)\
+    stmt.$(OBJSUFFIX)\
+    ifstmt.$(OBJSUFFIX)\
+    whilstmt.$(OBJSUFFIX)\
+    switstmt.$(OBJSUFFIX)\
+    lblstmt.$(OBJSUFFIX)\
+    rtrnstmt.$(OBJSUFFIX)\
+    dfltstmt.$(OBJSUFFIX)\
+    casestmt.$(OBJSUFFIX)\
+    compstmt.$(OBJSUFFIX)\
+    exprstmt.$(OBJSUFFIX)\
+    gotostmt.$(OBJSUFFIX)\
+    contstmt.$(OBJSUFFIX)\
+    forstmt.$(OBJSUFFIX)\
+    dostmt.$(OBJSUFFIX)\
+    decl.$(OBJSUFFIX)\
+    pointer.$(OBJSUFFIX)\
+    arydecl.$(OBJSUFFIX)\
+    fundecl.$(OBJSUFFIX)\
+    precdecl.$(OBJSUFFIX)\
+    bflddecl.$(OBJSUFFIX)\
+    pfixdecl.$(OBJSUFFIX)\
+    initdecl.$(OBJSUFFIX)\
+    keywdecl.$(OBJSUFFIX)\
+    namedecl.$(OBJSUFFIX)\
+    stardecl.$(OBJSUFFIX)\
+    var.$(OBJSUFFIX)\
+    aryvar.$(OBJSUFFIX)\
+    scalar.$(OBJSUFFIX)\
+    expr.$(OBJSUFFIX)\
+    listxpr.$(OBJSUFFIX)\
+    keywxpr.$(OBJSUFFIX)\
+    condxpr.$(OBJSUFFIX)\
+    castxpr.$(OBJSUFFIX)\
+    unyxpr.$(OBJSUFFIX)\
+    deref.$(OBJSUFFIX)\
+    addrof.$(OBJSUFFIX)\
+    sizeof.$(OBJSUFFIX)\
+    typeof.$(OBJSUFFIX)\
+    pfixxpr.$(OBJSUFFIX)\
+    indexxpr.$(OBJSUFFIX)\
+    binxpr.$(OBJSUFFIX)\
+    dotxpr.$(OBJSUFFIX)\
+    arrowxpr.$(OBJSUFFIX)\
+    msgxpr.$(OBJSUFFIX)\
+    blockxpr.$(OBJSUFFIX)\
+    selxpr.$(OBJSUFFIX)\
+    precxpr.$(OBJSUFFIX)\
+    commaxpr.$(OBJSUFFIX)\
+    constxpr.$(OBJSUFFIX)\
+    identxpr.$(OBJSUFFIX)\
+    assign.$(OBJSUFFIX)\
+    relxpr.$(OBJSUFFIX)\
+    funcall.$(OBJSUFFIX)\
+    btincall.$(OBJSUFFIX)\
+    def.$(OBJSUFFIX)\
+    fundef.$(OBJSUFFIX)\
+    methdef.$(OBJSUFFIX)\
+    funbody.$(OBJSUFFIX)\
+    method.$(OBJSUFFIX)\
+    selector.$(OBJSUFFIX)\
+    gasmop.$(OBJSUFFIX)\
+    gasmstmt.$(OBJSUFFIX)\
+    dasmstmt.$(OBJSUFFIX)\
+    gattrib.$(OBJSUFFIX)\
+    gatrdecl.$(OBJSUFFIX)\
+    compdef.$(OBJSUFFIX)\
+    datadef.$(OBJSUFFIX)\
+    globdef.$(OBJSUFFIX)\
+    structsp.$(OBJSUFFIX)\
+    classdef.$(OBJSUFFIX)\
+    enumtor.$(OBJSUFFIX)\
+    enumsp.$(OBJSUFFIX)\
+    parmdef.$(OBJSUFFIX)\
+    parmlist.$(OBJSUFFIX)\
+    util.$(OBJSUFFIX)\
+    trlunit.$(OBJSUFFIX)
+
+.m.obj:
+	$(OBJC) -c $*.m $(MFLAGS) $(IFLAGS)
+
+$(LIBRARY) : $(OBJFILES)
+	$(AR) /OUT:$(LIBRARY) $(OBJFILES)
+	$(RANLIB) $(LIBRARY)
+
+cleantmp :
+	-$(RM) *.P
+	-$(RM) *.c
+	-$(RM) *.i
+
+clean : cleantmp
+	-$(RM) *.obj
+	-$(RM) *.lib
+
+distclean : clean
+	-$(RM) Makefile 
+	-$(RM) config.h 
+

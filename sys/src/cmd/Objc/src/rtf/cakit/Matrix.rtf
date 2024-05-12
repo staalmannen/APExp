@@ -1,0 +1,654 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Computer Algebra Kit (c) 1993,00 by Comp.Alg.Objects.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Matrix\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} CAObject\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Maturity Index:}} Relatively mature\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 A matrix consists of a number of {\i scalars} ordered in {\i rows}.  The rows are vector objects; the scalar objects can be arbitrary Computer Algebra Kit objects, but they currently have to be either floating-point, elements of a field (see {\b inField}) or elements of an integral domain (see {\b inIntegralDomain}).\fs16\
+\
+\f0\fs28\li2200 There are methods to access, insert and remove rows and {\i columns}.  Columns are collection objects of scalars (not vector objects).  It's also possible to place or replace a scalar directly at a position given by a row and column index.  See the documentation on {\b eachSequence} to access the scalar at a given row and column index.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Matrix objects are meant for computational tasks.  They are no substitute for a List or Collection object, and sometimes, e.g. for frequent random access, it's indeed better to work with a collection of collections than with a Matrix object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Special Matrices}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- diagonal:\
+	- circulant:\
+	- companion:\
+	- hankel::\
+	- toeplitz::\
+	- hilbert:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- scalar:numRows:numColumns:\
+	- copy\
+	- deepCopy\
+	- emptyVector\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Identity}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- scalarZero\
+	- rows\
+	- numRows\
+	- numColumns\
+	- isEqual:\
+	- hash\
+	- isDiagonal\
+	- isSymmetric\
+	- isAntiSymmetric\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Insertion}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- insertRow:\
+	- insertRow:at:\
+	- insertColumn:\
+	- insertColumn:at:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Removing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- removeRow\
+	- removeRowAt:\
+	- removeColumn\
+	- removeColumnAt:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Place and Replace}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- placeScalar:at::\
+	- replaceScalarAt::with:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Coercion}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- asNumerical\
+	- asModp:\
+	- onCommonDenominator:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Accessing Rows and Scalars}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- rowAt:\
+	- eachRow\
+	- eachScalar\
+	- eachSequence\
+	- floatValueAt::\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Addition}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- zero\
+	- negate\
+	- double\
+	- add:\
+	- subtract:\
+	- addScalar:\
+	- subtractScalar:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Multiplication}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- one\
+	- square\
+	- multiply:\
+	- multiplyVector:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Scalar Multiplication}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- multiplyScalar:\
+	- divideScalar:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Transposing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- transpose\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Gaussian Elimination}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- determinant\
+	- solveVector:\
+	- inverse\
+	- divide:\
+	- rank\
+	- nullity\
+	- kernel\
+	- image\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Trace Methods}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- trace\
+	- adjoint\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printOn:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 diagonal:\f0\b0\
+\f0\fs28\li2500 +{\b diagonal}:{\i cltnOfScalars}\fs16\
+\
+\f0\fs28\li2200 Creates a new, square matrix with the objects in {\i cltnOfScalars} on the diagonal. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 circulant:\f0\b0\
+\f0\fs28\li2500 +{\b circulant}:{\i cltnOfScalars}\fs16\
+\
+\f0\fs28\li2200 Creates a new {\i n} by {\i n} circulant matrix for a collection of {\i n} scalar objects. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 companion:\f0\b0\
+\f0\fs28\li2500 +{\b companion}:{\i cltnOfScalars}\fs16\
+\
+\f0\fs28\li2200 Creates a new {\i n} by {\i n} companion matrix for a collection of {\i n} scalar objects. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hankel::\f0\b0\
+\f0\fs28\li2500 +{\b hankel}:{\i rowScalars}:{\i colScalars}\fs16\
+\
+\f0\fs28\li2200 Creates a new rectangualr Hankel matrix, a matrix with {\i n} + 1 rows and {\i m} columns if {\i rowScalars} has {\i m} and {\i colScalars} {\i n} members.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 toeplitz::\f0\b0\
+\f0\fs28\li2500 +{\b toeplitz}:{\i rowScalars}:{\i colScalars}\fs16\
+\
+\f0\fs28\li2200 Creates a new rectangualr Toeplitz matrix, a matrix with {\i n} rows and {\i m} + 1 columns if {\i rowScalars} has {\i m} and {\i colScalars} {\i n} members.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hilbert:\f0\b0\
+\f0\fs28\li2500 +{\b hilbert}:(int){\i n}\fs16\
+\
+\f0\fs28\li2200 Creates a new Hilbert matrix over the rational numbers.  The element at position {\i i}, {\i j} is {\i 1 / (i+j+1)}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 scalar:numRows:numColumns:\f0\b0\
+\f0\fs28\li2500 +{\b scalar}:{\i aScalar}{\b numRows}:(int){\i numRows}{\b numColumns}:(int){\i numColumns}\fs16\
+\
+\f0\fs28\li2200 Creates a new {\i numRows} by {\i numColumns} matrix with zero elements, and with copies of {\i aScalar} on the diagonal.  For example, the 5 by 5 identity matrix over the polynomials with integer coefficients is created like this :\fs16\
+\
+\f2\fs24\li2800 aPolynomial = [Polynomial new];\
+aMatrix     = [Matrix scalar:aPolynomial numRows:5 numColumns:5];\
+\f0\fs16\
+\f0\fs28\li2200 {\b {\f1 See also:}} - one\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 copy\f0\b0\
+\f0\fs28\li2500 -{\b copy}\fs16\
+\
+\f0\fs28\li2200 Returns a new copy of the original; the rows are also copies of the original rows, not just new references.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deepCopy\f0\b0\
+\f0\fs28\li2500 -{\b deepCopy}\fs16\
+\
+\f0\fs28\li2200 Makes a fully independent copy of the matrix.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 emptyVector\f0\b0\
+\f0\fs28\li2500 -{\b emptyVector}\fs16\
+\
+\f0\fs28\li2200 Returns a new empty vector.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 scalarZero\f0\b0\
+\f0\fs28\li2500 -{\b scalarZero}\fs16\
+\
+\f0\fs28\li2200 Returns the zero scalar element. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 rows\f0\b0\
+\f0\fs28\li2500 -{\b rows}\fs16\
+\
+\f0\fs28\li2200 Returns the collection of row vectors; the first row is the first member of this collection. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 numRows\f0\b0\
+\f0\fs28\li2500 - (int){\b numRows}\fs16\
+\
+\f0\fs28\li2200 Returns the number of rows in the matrix, or zero if there are no rows in the matrix.  If {\b numRows} is equal to zero, {\b numColumns} is zero too, but not vice-versa.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 numColumns\f0\b0\
+\f0\fs28\li2500 - (int){\b numColumns}\fs16\
+\
+\f0\fs28\li2200 Returns the number of columns in the matrix, or zero if there are no columns in the matrix.  Note that if {\b numColumns} is equal to zero, it's still possible that {\b numRows} is {\i not} equal to zero; in other words, if there are no columns in the matrix, there can be empty vectors as rows.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEqual}:{\i aMatrix}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the matrices have the same number of rows and columns and if the scalars are equal.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hash\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b hash}\fs16\
+\
+\f0\fs28\li2200 Returns a small integer that is the same for matrices that are equal (in the sense of {\b isEqual:}).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isDiagonal\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isDiagonal}\fs16\
+\
+\f0\fs28\li2200 Returns YES if all scalars that are not on the diagonal of the matrix, are zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isSymmetric\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isSymmetric}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the scalar at position {\i i},{\i j} is equal to the scalar at {\i j},{\i i}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isAntiSymmetric\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isAntiSymmetric}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the scalar at position {\i i},{\i j} is the opposite of the scalar at {\i j},{\i i}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 insertRow:\f0\b0\
+\f0\fs28\li2500 -{\b insertRow}:{\i aVector}\fs16\
+\
+\f0\fs28\li2200 Inserts {\i aVector} as last row in the collection of rows and returns {\b self}.  The vector belongs after insertion to the matrix, and is not necessarily copied.  If there were already rows in the matrix, the vector must contain the same number of scalars.  To insert rows, the reference count of the matrix should be equal to one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 insertRow:at:\f0\b0\
+\f0\fs28\li2500 -{\b insertRow}:{\i aVector}{\b at}:(int){\i i}\fs16\
+\
+\f0\fs28\li2200 Similar to {\b insertRow:} but inserts at position {\i i}.  If {\i i} is equal to the number of rows, this method is identical to {\b insertRow:}.  If {\i i} is equal to zero, this method inserts the vector as first row in the matrix.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 insertColumn:\f0\b0\
+\f0\fs28\li2500 -{\b insertColumn}:{\i aCollection}\fs16\
+\
+\f0\fs28\li2200 Inserts {\i aCollection} in the matrix as first column and returns {\b self}.  The collection and its members belong after insertion to the matrix, and are not necessarily copied.  The number of rows of the matrix should be equal to the number of scalars in the collection, and the reference count of the matrix should be equal to one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 insertColumn:at:\f0\b0\
+\f0\fs28\li2500 -{\b insertColumn}:{\i aCollection}{\b at}:(int){\i i}\fs16\
+\
+\f0\fs28\li2200 Similar to {\b insertColumn:} but inserts at position {\i i}.  If {\i i} is equal to zero, this method is identical to {\b insertColumn:}.  If {\i i} is equal to the number of columns, this method inserts the collection as last column in the matrix.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 removeRow\f0\b0\
+\f0\fs28\li2500 -{\b removeRow}\fs16\
+\
+\f0\fs28\li2200 Removes (and returns) the last row of the matrix.  Returns {\b nil} if there are no rows in the matrix.  This can be used in the following way :\fs16\
+\
+\f2\fs24\li2800 while (row = [matrix removeRow]) \{ /* do something with row */ \}\
+\f0\fs16\
+\f0\fs28\li2200 To remove a row, the reference count of the matrix must be equal to one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 removeRowAt:\f0\b0\
+\f0\fs28\li2500 -{\b removeRowAt}:(int){\i i}\fs16\
+\
+\f0\fs28\li2200 Similar to {\b removeRow}, but removes the {\i i}-th row.  If {\i i} is equal the number of rows minus one, this method is identical to {\b removeRow}.  If {\i i} is equal to zero, then the method removes the first row of the matrix.  It's an error to use an illegal index {\i i} or to attempt to remove a row from a matrix whose reference count is not equal to one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 removeColumn\f0\b0\
+\f0\fs28\li2500 -{\b removeColumn}\fs16\
+\
+\f0\fs28\li2200 Removes (and returns) the first column of the matrix.  The column is a collection of scalars, not a vector object.  Returns {\b nil} if there are no columns in the matrix.  This can be used in the following way :\fs16\
+\
+\f2\fs24\li2800 while (column = [matrix removeColumn]) \{ /* do something with column */ \}\
+\f0\fs16\
+\f0\fs28\li2200 The reference count of the matrix must be equal to one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 removeColumnAt:\f0\b0\
+\f0\fs28\li2500 -{\b removeColumnAt}:(int){\i i}\fs16\
+\
+\f0\fs28\li2200 Similar to {\b removeColumn}, but removes the {\i i}-th column.  If {\i i} is equal to zero, this method is identical to {\b removeColumn}.  If {\i i} is equal to the number of columns minus one, then the method removes the last column in the matrix.  It's an error to use an illegal index {\i i} or to attempt to remove a column from a matrix whose reference count is not equal to one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 placeScalar:at::\f0\b0\
+\f0\fs28\li2500 -{\b placeScalar}:{\i aScalar}{\b at}:(int){\i i}:(int){\i j}\fs16\
+\
+\f0\fs28\li2200 Frees the scalar at position {\i i},{\i j} and replaces it by the scalar object {\i aScalar}.  Returns {\b self}.\fs16\
+\
+\f0\fs28\li2200 The scalar {\i aScalar} belongs, after placing, to the receiving matrix object; it is not necessarily copied.  It is an error to use illegal indices {\i i} and {\i j} or to attempt to place a scalar in a matrix whose reference count is not equal to one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 replaceScalarAt::with:\f0\b0\
+\f0\fs28\li2500 -{\b replaceScalarAt}:(int){\i i}:(int){\i j}{\b with}:{\i aScalar}\fs16\
+\
+\f0\fs28\li2200 Similar to {\b placeScalar::at:} but returns the scalar at position {\i i},{\i j} after replacing it by {\i aScalar}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asNumerical\f0\b0\
+\f0\fs28\li2500 -{\b asNumerical}\fs16\
+\
+\f0\fs28\li2200 Returns a new matrix, whose scalars are the numerical value of the scalars of the original matrix.  For a matrix with integer scalars, this method returns a matrix with floating-point scalars.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asModp:\f0\b0\
+\f0\fs28\li2500 -{\b asModp}:(unsigned short){\i p}\fs16\
+\
+\f0\fs28\li2200 Returns a new matrix, whose scalars are the value of the scalars of the original matrix mod {\i p}.  For a matrix with integer scalars, this method returns a matrix with IntegerModp scalars.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 onCommonDenominator:\f0\b0\
+\f0\fs28\li2500 -{\b onCommonDenominator}:(id *){\i denominator}\fs16\
+\
+\f0\fs28\li2200 Puts a matrix with fractional scalars on a common denominator.  Returns a new matrix with integral scalars, and, by reference, the common denominator of the scalars in the matrix (the least common multiple of the denominators of the fractions in the matrix).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 rowAt:\f0\b0\
+\f0\fs28\li2500 -{\b rowAt}:(int){\i i}\fs16\
+\
+\f0\fs28\li2200 Returns the {\i i}-th row of the matrix.  The following example is equivalent to using {\b eachRow} and sequencing over the rows :\fs16\
+\
+\f2\fs24\li2800 int i;\
+for(i=0;i<[aMatrix numRows];i++) \{\
+    id aRow = [aMatrix rowAt:i];\
+    /* do something with aRow */\
+\}\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 eachRow\f0\b0\
+\f0\fs28\li2500 -{\b eachRow}\fs16\
+\
+\f0\fs28\li2200 Returns a new sequence of the rows of the matrix.  You cannot add or remove rows, or alter in any other way the matrix, until you're done with the sequence object (the sequence contains a reference to the rows of the matrix).  The {\i i}-th member in this sequence is the {\i i}-th row of the matrix.  The following example is equivalent to using {\b rowAt:} for indices between 0 and {\b numRows} :\fs16\
+\
+\f2\fs24\li2800 id aRow,aSequence;\
+aSequence = [aMatrix eachRow];\
+while (aRow = [aSequence next]) \{\
+    /* do something with aRow */\
+\}\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 eachScalar\f0\b0\
+\f0\fs28\li2500 -{\b eachScalar}\fs16\
+\
+\f0\fs28\li2200 Returns a new sequence of scalars, obtained by concatenating the sequences of scalars of all row vectors of the matrix.  If the matrix contains {\i m} rows and {\i n} columns, then the sequence contains {\i m} times {\i n} members.  You cannot add or remove scalars, or alter in any other way the matrix, until you're done with the sequence object (the sequence contains a reference to the matrix).\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} The sequence returned by this method cannot be accessed through an index.  It doesn't implement the {\b at:} and {\b toElementAt:} methods.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 eachSequence\f0\b0\
+\f0\fs28\li2500 -{\b eachSequence}\fs16\
+\
+\f0\fs28\li2200 Returns a new sequence of sequences of scalars.  You cannot add or remove scalars, or alter in any other way the matrix, until you're done with the sequence object (the sequence contains a reference to the matrix).  The following example shows how to access the {\i i}-th sequence of scalars, and in that sequence, the {\i j}-th scalar object :\fs16\
+\
+\f2\fs24\li2800 aSequence = [aMatrix eachSequence];\
+aScalar   = [[aSequence at:i] at:j];\
+\
+/* do something here with aScalar */\
+\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 floatValueAt::\f0\b0\
+\f0\fs28\li2500 - (float){\b floatValueAt}:(int){\i i}:(int){\i j}\fs16\
+\
+\f0\fs28\li2200 Returns the {\b floatValue} of the scalar at row index {\i i} and column index {\i j}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 zero\f0\b0\
+\f0\fs28\li2500 -{\b zero}\fs16\
+\
+\f0\fs28\li2200 Returns a zero matrix of the same dimensions as the matrix that receives the message.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 negate\f0\b0\
+\f0\fs28\li2500 -{\b negate}\fs16\
+\
+\f0\fs28\li2200 Negates the matrix row by row.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 double\f0\b0\
+\f0\fs28\li2500 -{\b double}\fs16\
+\
+\f0\fs28\li2200 Returns a new matrix equal to the matrix multiplied by two.  Multiplies the matrix row by row by two.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 add:\f0\b0\
+\f0\fs28\li2500 -{\b add}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new matrix equal to the sum of the two matrices.  Adds the matrices row by row together.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subtract:\f0\b0\
+\f0\fs28\li2500 -{\b subtract}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new matrix equal to the difference of the two matrices.  Subtracts the matrices row by row from each other.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 addScalar:\f0\b0\
+\f0\fs28\li2500 -{\b addScalar}:{\i s}\fs16\
+\
+\f0\fs28\li2200 Adds the scalar {\i s} to the diagonal of the matrix.  Returns a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subtractScalar:\f0\b0\
+\f0\fs28\li2500 -{\b subtractScalar}:{\i s}\fs16\
+\
+\f0\fs28\li2200 Subtracts the scalar {\i s} from the diagonal of the matrix.  Returns a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 one\f0\b0\
+\f0\fs28\li2500 -{\b one}\fs16\
+\
+\f0\fs28\li2200 Returns the (right) unity matrix of the same dimensions as the matrix that receives the message.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 square\f0\b0\
+\f0\fs28\li2500 -{\b square}\fs16\
+\
+\f0\fs28\li2200 Multiplies the (square) matrix by itself.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiply:\f0\b0\
+\f0\fs28\li2500 -{\b multiply}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the product {\i self b}.  The number of columns of {\i self} must match the number of rows of {\i b}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiplyVector:\f0\b0\
+\f0\fs28\li2500 -{\b multiplyVector}:{\i aColumn}\fs16\
+\
+\f0\fs28\li2200 Returns a new vector, the product of the matrix by a column vector object.  The number of rows of the matrix must match the number of scalars in the vector.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiplyScalar:\f0\b0\
+\f0\fs28\li2500 -{\b multiplyScalar}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the matrix multiplied (to the right) by the scalar {\i b}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideScalar:\f0\b0\
+\f0\fs28\li2500 -{\b divideScalar}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the matrix divided by the scalar {\i b}.  Returns {\b nil} if the division was not exact for some scalar in the matrix.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 transpose\f0\b0\
+\f0\fs28\li2500 -{\b transpose}\fs16\
+\
+\f0\fs28\li2200 Returns the transposed of the matrix (a new matrix object).  If the matrix has {\i m} rows and {\i n} columns, the transposed matrix has {\i n} rows and {\i m} columns.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 determinant\f0\b0\
+\f0\fs28\li2500 -{\b determinant}\fs16\
+\
+\f0\fs28\li2200 Computes the determinant of the square matrix.  Returns a new scalar object.\fs16\
+\
+\f0\fs28\li2200 For fields of fractions, the method will extract a common denominator for the scalars, and compute the determinant over the associated integral domain.  For fields that are not fields of fractions, the method computes the determinant by Gaussian elimination taking inverses of leading non-zero elements.  For matrices over an integral domain, the determinant is computed by the Bareiss method.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} You can't compute a determinant over the floating-point numbers yet.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 solveVector:\f0\b0\
+\f0\fs28\li2500 -{\b solveVector}:{\i y}\fs16\
+\
+\f0\fs28\li2200 Returns a vector {\i x} that is the solution of the linear equation {\i A x = y} with {\i A} the (non-singular) matrix and {\i y} a column vector object.\fs16\
+\
+\f0\fs28\li2200 The method works over fields and integral domains, but in the latter case, the method looks for an integral (and primitive i.e., common gcd divided out) solution only.  It will give an error message if the solution requires the construction of the field of fractions.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inverse\f0\b0\
+\f0\fs28\li2500 -{\b inverse}\fs16\
+\
+\f0\fs28\li2200 Returns the inverse of the matrix (a new matrix object).  The matrix must be square; if it is singular (determinant equal to zero), the method returns {\b nil}.  Implemented as a special case of {\b divide:}, which computes {\i A B^-1}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divide:\f0\b0\
+\f0\fs28\li2500 -{\b divide}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new matrix, equal to the matrix multiplied to the right by the inverse of the matrix {\i b}.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Currently matrix inversion only works over a field (by Gaussian elimination).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 rank\f0\b0\
+\f0\fs28\li2500 - (int){\b rank}\fs16\
+\
+\f0\fs28\li2200 Returns the dimension of the image of the matrix, without computing the image vectors themselves.  Works currently only over a field.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 nullity\f0\b0\
+\f0\fs28\li2500 - (int){\b nullity}\fs16\
+\
+\f0\fs28\li2200 Returns the dimension of the kernel (nullspace) of the matrix, without computing the kernel itself.  By the dimension theorem, the nullity of the matrix is the number of columns minus the rank of the matrix.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 kernel\f0\b0\
+\f0\fs28\li2500 -{\b kernel}\fs16\
+\
+\f0\fs28\li2200 Returns the kernel (or nullspace) of the matrix as a collection of columns; each column is a vector object.  Works currently only over a field.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 image\f0\b0\
+\f0\fs28\li2500 -{\b image}\fs16\
+\
+\f0\fs28\li2200 Returns the image of the matrix as a collection of columns; each column is a vector object.  Works currently only over a field.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 trace\f0\b0\
+\f0\fs28\li2500 -{\b trace}\fs16\
+\
+\f0\fs28\li2200 Returns a new scalar object, the trace of the square matrix, ie. the sum of the scalars on the diagonal of the matrix.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 adjoint\f0\b0\
+\f0\fs28\li2500 -{\b adjoint}\fs16\
+\
+\f0\fs28\li2200 Returns a new matrix, the adjoint of the matrix computed through repeated trace computations (ie. the Faddeev-Leverrier method).  If the characteristic of the scalars is non-zero, it must be larger than the number of rows in the matrix.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Prints, between braces, a comma separated list of the rows.  Sends {\b printOn:} messages to the scalars in the matrix.\fs16\
+\
+\fs16\
+\
+\
+}

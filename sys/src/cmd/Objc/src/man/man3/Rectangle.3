@@ -1,0 +1,592 @@
+.TH "rectangl" 3 "Mar 12, 2023"
+.SH Rectangle
+.PP
+.B
+Inherits from:
+
+Object
+.SH Class Description
+.PP
+.B
+Rectangle
+instances are pairs of Point objects\&.  It is mostly Squeak and Stepstone ICpak101 compatible\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* new
+.br
+* origin:corner:
+.br
+* origin:extent:
+.br
+* origin::corner::
+.br
+* origin::extent::
+.br
+* free
+.RE
+.PP 
+.B
+Motion
+.RS 3
+.br
+* origin:
+.br
+* corner:
+.br
+* origin:corner:
+.br
+* extent::
+.br
+* extent:
+.br
+* origin::
+.br
+* corner::
+.RE
+.PP 
+.B
+Comparing
+.RS 3
+.br
+* contains:
+.br
+* hash
+.br
+* isEqual:
+.RE
+.PP 
+.B
+Interrogation
+.RS 3
+.br
+* left
+.br
+* right
+.br
+* top
+.br
+* bottom
+.br
+* width
+.br
+* height
+.br
+* origin
+.br
+* topLeft
+.br
+* topRight
+.br
+* topCenter
+.br
+* corner
+.br
+* bottomLeft
+.br
+* bottomCenter
+.br
+* bottomRight
+.br
+* center
+.br
+* leftCenter
+.br
+* rightCenter
+.br
+* extent
+.br
+* quickMerge:
+.RE
+.PP 
+.B
+Arithmetic
+.RS 3
+.br
+* moveBy:
+.br
+* translateBy:
+.br
+* align:with:
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+Returns a new rectangle with origin and corner at (0,0)\&.
+.PP 
+origin:corner:
+.RS 1
++
+.B
+origin
+:
+.I
+p
+.B
+corner
+:
+.I
+q
+.RE
+.PP
+Returns a new rectangle with origin and corner set to 
+.I
+p
+and 
+.I
+q
+\&.
+.PP 
+origin:extent:
+.RS 1
++
+.B
+origin
+:
+.I
+p
+.B
+extent
+:
+.I
+q
+.RE
+.PP 
+origin::corner::
+.RS 1
++
+.B
+origin
+:(int)
+.I
+x1
+:(int)
+.I
+y1
+.B
+corner
+:(int)
+.I
+x2
+:(int)
+.I
+y2
+.RE
+.PP 
+origin::extent::
+.RS 1
++
+.B
+origin
+:(int)
+.I
+x
+:(int)
+.I
+y
+.B
+extent
+:(int)
+.I
+w
+:(int)
+.I
+h
+.RE
+.PP 
+free
+.RS 1
+-
+.B
+free
+.RE
+.PP
+Frees the 
+.I
+origin
+and 
+.I
+corner
+of the Point too\&.
+.PP 
+origin:
+.RS 1
+-
+.B
+origin
+:
+.I
+p
+.RE
+.PP 
+corner:
+.RS 1
+-
+.B
+corner
+:
+.I
+q
+.RE
+.PP 
+origin:corner:
+.RS 1
+-
+.B
+origin
+:
+.I
+p
+.B
+corner
+:
+.I
+q
+.RE
+.PP
+Sets origin and corner to 
+.I
+p
+and 
+.I
+q
+\&.
+.PP 
+extent::
+.RS 1
+-
+.B
+extent
+:(int)
+.I
+w
+:(int)
+.I
+h
+.RE
+.PP 
+extent:
+.RS 1
+-
+.B
+extent
+:
+.I
+q
+.RE
+.PP 
+origin::
+.RS 1
+-
+.B
+origin
+:(int)
+.I
+x1
+:(int)
+.I
+y1
+.RE
+.PP 
+corner::
+.RS 1
+-
+.B
+corner
+:(int)
+.I
+x1
+:(int)
+.I
+y1
+.RE
+.PP 
+contains:
+.RS 1
+- (
+BOOL
+)
+.B
+contains
+:
+.I
+aPoint
+.RE
+.PP
+Yes if inside, or on a border of, the rectangle\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+aRectangle
+.RE
+.PP
+Returns YES if 
+.I
+aRectangle
+is some kind of rectangle, and if corner and origin are equal\&.
+.PP 
+left
+.RS 1
+- (
+int
+)
+.B
+left
+.RE
+.PP 
+right
+.RS 1
+- (
+int
+)
+.B
+right
+.RE
+.PP 
+top
+.RS 1
+- (
+int
+)
+.B
+top
+.RE
+.PP 
+bottom
+.RS 1
+- (
+int
+)
+.B
+bottom
+.RE
+.PP 
+width
+.RS 1
+- (
+int
+)
+.B
+width
+.RE
+.PP 
+height
+.RS 1
+- (
+int
+)
+.B
+height
+.RE
+.PP 
+origin
+.RS 1
+-
+.B
+origin
+.RE
+.PP 
+topLeft
+.RS 1
+-
+.B
+topLeft
+.RE
+.PP
+Same as 
+.B
+origin
+\&.
+.PP 
+topRight
+.RS 1
+-
+.B
+topRight
+.RE
+.PP
+Answer the point at the top right corner of the receiver\&'s top horizontal\&.
+.PP 
+topCenter
+.RS 1
+-
+.B
+topCenter
+.RE
+.PP
+Answer the point at the center of the receiver\&'s top horizontal\&.
+.PP 
+corner
+.RS 1
+-
+.B
+corner
+.RE
+.PP 
+bottomLeft
+.RS 1
+-
+.B
+bottomLeft
+.RE
+.PP
+Returns the point at the left edge of the bottom horizontal line of the receiver(or bottomLeft for short)\&.
+.PP 
+bottomCenter
+.RS 1
+-
+.B
+bottomCenter
+.RE
+.PP
+Answer the point at the center of the receiver\&'s bottom horizontal\&.
+.PP 
+bottomRight
+.RS 1
+-
+.B
+bottomRight
+.RE
+.PP
+Same as 
+.B
+corner
+\&.
+.PP 
+center
+.RS 1
+-
+.B
+center
+.RE
+.PP
+Return the point at the center of the receiver\&.
+.PP 
+leftCenter
+.RS 1
+-
+.B
+leftCenter
+.RE
+.PP
+Return the point at the center of the receiver\&'s left vertical line\&.
+.PP 
+rightCenter
+.RS 1
+-
+.B
+rightCenter
+.RE
+.PP
+Return the point at the center of the receiver\&'s left vertical line\&.
+.PP 
+extent
+.RS 1
+-
+.B
+extent
+.RE
+.PP
+Return a new Point, set to the width and height of the rectangle\&.
+.PP 
+quickMerge:
+.RS 1
+-
+.B
+quickMerge
+:
+.I
+rect
+.RE
+.PP
+Return the receiver if it encloses the given rectangle or the merge of the two rectangles if it doesn\&'t\&.  This method is an optimization to reduce extra rectangle creations\&.
+.PP 
+moveBy:
+.RS 1
+-
+.B
+moveBy
+:
+.I
+aPoint
+.RE
+.PP 
+translateBy:
+.RS 1
+-
+.B
+translateBy
+:
+.I
+p
+.RE
+.PP
+This method is like 
+.B
+moveBy:
+, but returns a new rectangle instead of modifying the receiver\&.
+.PP 
+align:with:
+.RS 1
+-
+.B
+align
+:
+.I
+p1
+.B
+with
+:
+.I
+p2
+.RE
+.PP
+Answer a rectangle that is translated by 
+.I
+p2
+- 
+.I
+p1
+\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE

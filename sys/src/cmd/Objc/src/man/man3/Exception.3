@@ -1,0 +1,241 @@
+.TH "Exceptn" 3 "Mar 12, 2023"
+.SH Exception
+.PP
+.B
+Inherits from:
+
+Object
+.PP
+.B
+Maturity Index:
+
+Experimental
+.SH Class Description
+.PP
+Exception instances (or instances of a subclass of 
+.B
+Exception
+) are used to signal exceptions\&.  This is an experimental class; Exception is not tested with the OTB (Object Tables) runtime and the class or exception API may change in future releases\&.
+.PP
+To raise an exception, use:
+.RS 3
+
+[[Exception new] signal];
+.br
+
+.br
+
+.RE
+.PP
+To install a handler to catch an exception, use the Block message:
+.RS 3
+
+[{ \&.\&.\&. } on:Exception do: { :anException | \&.\&.\&. }];
+.br
+
+.br
+
+.RE
+.PP
+The argument of the exception handler (the do: Block) is the instance of the Exception class that received the 
+.B
+signal
+message\&.
+.SH Method types
+.PP 
+.B
+Default Action
+.RS 3
+.RE
+.PP 
+.B
+Creation 
+.RS 3
+.br
+* signal
+.br
+* signal:
+.br
+* free
+.RE
+.PP 
+.B
+Signalling 
+.RS 3
+.br
+* signal
+.br
+* signal:
+.br
+* messageText
+.br
+* str
+.br
+* messageText:
+.br
+* str:
+.RE
+.PP 
+.B
+Re-Signalling 
+.RS 3
+.br
+* resignalAs:
+.br
+* resume
+.RE
+.SH Methods
+.PP 
+signal
+.RS 1
++
+.B
+signal
+.RE
+.PP
+This is a shortcut for:
+.RS 3
+
+[[self new] signal]
+.br
+
+.RE
+.PP 
+signal:
+.RS 1
++
+.B
+signal
+:(STR)
+.I
+message
+.RE
+.PP
+This is a shortcut for:
+.RS 3
+
+[[self new] signal:message]
+.br
+
+.RE
+.PP 
+free
+.RS 1
+-
+.B
+free
+.RE
+.PP
+Overridden to dispose attributes\&.
+.PP 
+signal
+.RS 1
+-
+.B
+signal
+.RE
+.PP
+The message evaluates the handler that is installed to deal with this class of exceptions\&.
+.PP
+.B
+Note:
+
+If no handler is set, this message currently sends a 
+.B
+halt:
+message with the 
+.I
+messageText
+as argument\&.
+.PP 
+signal:
+.RS 1
+-
+.B
+signal
+:(STR)
+.I
+message
+.RE
+.PP
+Like 
+.B
+signal
+, but first sets the message text to 
+.I
+message
+\&.
+.PP 
+messageText
+.RS 1
+-
+.B
+messageText
+.RE
+.PP
+This method returns the descriptive text that was associated to the exception instance\&.
+.PP 
+str
+.RS 1
+- (
+STR
+)
+.B
+str
+.RE
+.PP
+Equivalent to :
+.RS 3
+
+[messageText str]
+.br
+
+.RE
+.PP 
+messageText:
+.RS 1
+-
+.B
+messageText
+:
+.I
+message
+.RE
+.PP
+Associates a String attribute to the exception\&.
+.PP 
+str:
+.RS 1
+-
+.B
+str
+:(STR)
+.I
+message
+.RE
+.PP
+Equivalent to 
+.B
+messageText:
+\&.
+.PP 
+resignalAs:
+.RS 1
+-
+.B
+resignalAs
+:
+.I
+replacementException
+.RE
+.PP
+Signal an alternative exception in place of the receiver\&.
+.PP 
+resume
+.RS 1
+-
+.B
+resume
+.RE
+.PP
+Reinstall the handler that was active at the time the exception was signalled\&.

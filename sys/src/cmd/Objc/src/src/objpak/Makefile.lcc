@@ -1,0 +1,109 @@
+
+#
+# Portable Object Compiler
+# $Id: Makefile.lcc,v 1.4 2003/10/12 10:01:34 stes Exp $
+#
+
+#
+# This Makefile should work with LCC make
+#
+
+.SILENT:
+
+MKDIR=mkdir
+OBJC=objc
+RM=del
+CP=copy
+AR=lcclib
+FINAL_AR=echo
+RANLIB=echo
+MAKE=make
+DBG_MFLAGS=-q -g
+OPT_MFLAGS=-q -DNDEBUG
+DLL_MFLAGS=-q -DNDEBUG -pic
+OBJSUFFIX=obj
+LIBSUFFIX=lib
+BOOTDIR=..\..
+LIBDIR=$(BOOTDIR)\lib
+BINDIR=$(BOOTDIR)\bin
+IFLAGS=-noI -I..\..\include\objcrt
+
+# Uncomment next line to build static library
+MFLAGS=$(OPT_MFLAGS)
+# Uncomment next line to build dynamic library (dll)
+# MFLAGS=$(DLL_MFLAGS)
+
+.SUFFIXES: .m
+
+LIBRARY=objpak.lib
+DLL=objpak.dll
+
+OBJFILES=\
+	ascfiler.obj\
+	  notfound.obj\
+	  outofbnd.obj\
+	  badvers.obj\
+	  typeinc.obj\
+	  unknownt.obj\
+	cltn.obj\
+	  ordcltn.obj\
+	  sortcltn.obj\
+	  set.obj\
+	  bag.obj\
+	  stack.obj\
+	  runarray.obj\
+        dictnary.obj\
+	sequence.obj\
+	array.obj\
+	  idarray.obj\
+	  intarray.obj\
+	  ocstring.obj\
+	rectangl.obj\
+	point.obj\
+	assoc.obj\
+	objgraph.obj\
+	cltnseq.obj\
+	keyseq.obj\
+	valueseq.obj\
+	setseq.obj\
+	bagseq.obj\
+	treeseq.obj\
+	octext.obj\
+	paragrph.obj\
+	txtstyle.obj\
+	txtattr.obj
+
+.m.obj:
+	$(OBJC) -c $*.m $(MFLAGS) $(IFLAGS)
+
+# Uncomment to build static library
+ALL : $(LIBRARY)
+# Uncomment to build dynamic library
+# ALL : $(DLL)
+
+$(LIBRARY) : $(OBJFILES)
+	$(AR) /OUT:$(LIBRARY) $(OBJFILES)
+	$(RANLIB) $(LIBRARY)
+
+$(DLL) : $(OBJFILES)
+	$(OBJC) -dl $(OBJFILES) ..\objcrt\objcrt_s.lib -o $(DLL)
+	buildlib objpak.exp objpak_s.lib $(DLL)
+
+bootstrap :
+	-$(MKDIR) $(LIBDIR)
+	-$(MKDIR) $(BINDIR)
+	-$(CP) $(LIBRARY) $(LIBDIR)
+
+cleantmp :
+	-$(RM) *.P
+	-$(RM) *.c
+	-$(RM) *.i
+
+clean : cleantmp
+	-$(RM) *.obj
+	-$(RM) *.lib
+
+distclean : clean
+	-$(RM) Makefile 
+	-$(RM) config.h 
+

@@ -1,0 +1,62 @@
+<HTML>
+<TITLE>paragrph Specification Sheet</TITLE>
+<H1>paragrph Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 1997,98.  All Rights Reserved.<P>
+<H1>Paragraph</H1>
+<B>Inherits from:</B> Object<P>
+<B>Maturity Index:</B> Experimental<P>
+<H2>Class Description</H2>
+A <B>Paragraph</B> associates a <I>text</I> instance with a <I>text style</I>.  <P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#0">new</A></LI>
+<LI><A HREF="#1">withText:</A></LI>
+<LI><A HREF="#2">withText:style:</A></LI>
+<LI><A HREF="#4">copy</A></LI>
+<LI><A HREF="#5">free</A></LI>
+</UL>
+<H3><B>Accessing </B></H3>
+<UL>
+<LI><A HREF="#6">text</A></LI>
+<LI><A HREF="#7">textStyle</A></LI>
+<LI><A HREF="#8">text:</A></LI>
+<LI><A HREF="#9">textStyle:</A></LI>
+</UL>
+<H3><B>Format Conversions</B></H3>
+<UL>
+<LI><A HREF="#10">asString</A></LI>
+<LI><A HREF="#11">asText</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#12">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">new</A></H3>
+<BLOCKQUOTE>+<B>new</B></BLOCKQUOTE>
+<H3><A NAME="1">withText:</A></H3>
+<BLOCKQUOTE>+<B>withText</B>:<I>aText</I></BLOCKQUOTE>
+<H3><A NAME="2">withText:style:</A></H3>
+<BLOCKQUOTE>+<B>withText</B>:<I>aText</I><B>style</B>:<I>aStyle</I></BLOCKQUOTE>
+<H3><A NAME="4">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+<H3><A NAME="5">free</A></H3>
+<BLOCKQUOTE>-<B>free</B></BLOCKQUOTE>
+<H3><A NAME="6">text</A></H3>
+<BLOCKQUOTE>-<B>text</B></BLOCKQUOTE>
+<H3><A NAME="7">textStyle</A></H3>
+<BLOCKQUOTE>-<B>textStyle</B></BLOCKQUOTE>
+<H3><A NAME="8">text:</A></H3>
+<BLOCKQUOTE>-<B>text</B>:<I>v</I></BLOCKQUOTE>
+<H3><A NAME="9">textStyle:</A></H3>
+<BLOCKQUOTE>-<B>textStyle</B>:<I>v</I></BLOCKQUOTE>
+<H3><A NAME="10">asString</A></H3>
+<BLOCKQUOTE>-<B>asString</B></BLOCKQUOTE>
+<H3><A NAME="11">asText</A></H3>
+<BLOCKQUOTE>-<B>asText</B></BLOCKQUOTE>
+<H3><A NAME="12">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints the Text for this instance.  Returns the receiver.<P>

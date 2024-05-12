@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.1
+Name=BaconGUI (Legacy)
+GenericName=Integrated Development Environment
+Comment=A lightweight IDE for BASIC programming
+Exec=bacongui-legacy
+Icon=BaConLegacy
+Terminal=false
+Categories=GTK;Development;IDE;Building;
+MimeType=text/plain;

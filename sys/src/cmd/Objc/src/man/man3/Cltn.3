@@ -1,0 +1,812 @@
+.TH "cltn" 3 "Mar 12, 2023"
+.SH Cltn
+.PP
+.B
+Inherits from:
+
+Object
+.SH Class Description
+.PP
+This is an abstract superclass for collection classes\&.
+.PP
+It is useful for implementing functionality, that is inherited by such classes as:
+.RS 3
+.br
+* OrdCltn (Collection)
+.br
+* Set
+.br
+* Stack
+.br
+* SortCltn (Tree)
+.RE
+.PP
+In addition, this class is necessary for compatibility with Stepstone\&'s ICpak101\&.
+.SH Method types
+.PP 
+.B
+Testing Contents
+.RS 3
+.br
+* includesAllOf:
+.br
+* includesAnyOf:
+.RE
+.PP 
+.B
+Adding and Removing Contents
+.RS 3
+.br
+* addAll:
+.br
+* addContentsOf:
+.br
+* addContentsTo:
+.br
+* removeAll:
+.br
+* removeContentsFrom:
+.br
+* removeContentsOf:
+.RE
+.PP 
+.B
+Combining
+.RS 3
+.br
+* intersection:
+.br
+* union:
+.br
+* difference:
+.RE
+.PP 
+.B
+Converting
+.RS 3
+.br
+* asSet
+.br
+* asOrdCltn
+.RE
+.PP 
+.B
+Using Blocks
+.RS 3
+.br
+* detect:
+.br
+* detect:ifNone:
+.br
+* select:
+.br
+* reject:
+.br
+* collect:
+.br
+* count:
+.RE
+.PP 
+.B
+Making elements perform
+.RS 3
+.br
+* elementsPerform:
+.br
+* elementsPerform:with:
+.br
+* elementsPerform:with:with:
+.br
+* elementsPerform:with:with:with:
+.RE
+.PP 
+.B
+Do Blocks
+.RS 3
+.br
+* do:
+.br
+* do:until:
+.RE
+.SH Methods
+.PP 
+with:
+.RS 1
++
+.B
+with
+:(int)
+.I
+nArgs,\&.\&.\&.
+.RE
+.PP
+Returns a new object with 
+.I
+nArgs
+elements\&.  For example,
+.RS 3
+
+id aCltn = [OrdCltn with:2,anObject,otherObject];
+.br
+
+.RE
+.PP
+creates a collection and adds 
+.I
+anObject
+and 
+.I
+otherObject
+to it\&.  In a similar way, 
+.B
+Set
+or 
+.B
+SortCltn
+instances can be created like this\&.
+.PP 
+with:with:
+.RS 1
++
+.B
+with
+:
+.I
+firstObject
+.B
+with
+:
+.I
+nextObject
+.RE
+.PP
+This method is equivalent to 
+.B
+with:
+2,
+.I
+firstObject
+,
+.I
+nextObject
+\&. 
+.PP 
+add:
+.RS 1
++
+.B
+add
+:
+.I
+firstObject
+.RE
+.PP
+This method is equivalent to 
+.B
+with:
+1,
+.I
+firstObject
+\&. 
+.PP
+This (factory) method has the same name as the instance method 
+.B
+add:
+and can be used as follows, in circumstances when the user does not want to allocate a collection unless it is actually used :
+.RS 3
+
+aCltn = [ (aCltn)?aCltn:OrdCltn add:myObject ];
+.br
+
+.RE
+.PP
+This shows that creation of the collection is delayed until it is actually needed\&.  If the collection already exists, objects are simply added, using the instance method 
+.B
+add:
+\&.
+.PP 
+includesAllOf:
+.RS 1
+- (
+BOOL
+)
+.B
+includesAllOf
+:
+.I
+aCltn
+.RE
+.PP
+Answer whether all the elements of 
+.I
+aCltn
+are in the receiver, by sending 
+.B
+includes:
+for each individual element\&.
+.PP 
+includesAnyOf:
+.RS 1
+- (
+BOOL
+)
+.B
+includesAnyOf
+:
+.I
+aCltn
+.RE
+.PP
+Answer whether any element of 
+.I
+aCltn
+is in the receiver, by sending 
+.B
+includes:
+for each individual element\&.
+.PP 
+addAll:
+.RS 1
+-
+.B
+addAll
+:
+.I
+aCltn
+.RE
+.PP
+Adds each member of 
+.I
+aCltn
+to the receiver\&.  If 
+.I
+aCltn
+is 
+.B
+nil
+, no action is taken\&.  The argument 
+.I
+aCltn
+need not be a collection, so long as it responds to 
+.B
+eachElement
+in the same way as collections do\&.  Returns the receiver\&.
+.PP
+.B
+Note:
+
+If 
+.I
+aCltn
+is the same object as the receiver, a 
+.B
+addYourself
+message is sent to the object\&.
+.PP 
+addContentsOf:
+.RS 1
+-
+.B
+addContentsOf
+:
+.I
+aCltn
+.RE
+.PP
+This method is equivalent to 
+.B
+addAll:
+and is provided for Stepstone ICpak101 compatibility\&.
+.PP 
+addContentsTo:
+.RS 1
+-
+.B
+addContentsTo
+:
+.I
+aCltn
+.RE
+.PP
+This method is equivalent to 
+.B
+addAll:
+, but with argument and receiver interchanged, and is provided for Stepstone ICpak101 compatibility\&.
+.PP 
+removeAll:
+.RS 1
+-
+.B
+removeAll
+:
+.I
+aCltn
+.RE
+.PP
+Removes all of the members of 
+.I
+aCltn
+from the receiver\&. The argument 
+.I
+aCltn
+need not be a collection, as long as it responds to 
+.B
+eachElement
+as collections do\&.  Returns the receiver\&. 
+.PP
+.B
+Note:
+
+If 
+.I
+aCltn
+is the same object as the receiver, it empties itself using 
+.B
+emptyYourself
+and returns the receiver\&.
+.PP 
+removeContentsFrom:
+.RS 1
+-
+.B
+removeContentsFrom
+:
+.I
+aCltn
+.RE
+.PP
+This method is equivalent to 
+.B
+removeAll:
+, and is provided for compatibility with Stepstone ICpak101\&.
+.PP 
+removeContentsOf:
+.RS 1
+-
+.B
+removeContentsOf
+:
+.I
+aCltn
+.RE
+.PP
+This method is equivalent to 
+.B
+removeAll:
+, and is provided for compatibility with Stepstone ICpak101\&.
+.PP 
+intersection:
+.RS 1
+-
+.B
+intersection
+:
+.I
+bag
+.RE
+.PP
+Returns a new Collection which is the intersection of the receiver and 
+.I
+bag
+\&.  The new Collection contains only those elements that were in both the receiver and 
+.I
+bag
+\&.  The argument 
+.I
+bag
+need not be an actual 
+.B
+Set
+or 
+.B
+Bag
+instance, as long as it implements 
+.B
+find:
+as Sets do\&.
+.PP 
+union:
+.RS 1
+-
+.B
+union
+:
+.I
+bag
+.RE
+.PP
+Returns a new Collection which is the union of the receiver and 
+.I
+bag
+\&.  The new Collection returned has all the elements from both the receiver and 
+.I
+bag
+\&.  The argument 
+.I
+bag
+need not be an actual 
+.B
+Set
+or 
+.B
+Bag
+instance, as long as it implements 
+.B
+eachElement:
+as Sets and Bags do\&.
+.PP 
+difference:
+.RS 1
+-
+.B
+difference
+:
+.I
+bag
+.RE
+.PP
+Returns a new Collection which is the difference of the receiver and 
+.I
+bag
+\&.  The new Collection returned has only those elements in the receiver that are not in 
+.I
+bag
+\&.
+.PP 
+asSet
+.RS 1
+-
+.B
+asSet
+.RE
+.PP
+Creates a 
+.B
+Set
+instance and adds the contents of the object to the set\&.
+.PP 
+asOrdCltn
+.RS 1
+-
+.B
+asOrdCltn
+.RE
+.PP
+Creates a 
+.B
+OrdCltn
+instance and adds the contents of the object to the set\&.
+.PP 
+detect:
+.RS 1
+-
+.B
+detect
+:
+.I
+aBlock
+.RE
+.PP
+This message returns the first element in the receiver for which 
+.I
+aBlock
+evaluates to something that is non-nil \&.  For example, the following :
+.RS 3
+
+[ aCltn detect: { :each | [each isEqual:anObject] } ];
+.br
+
+.RE
+.PP
+Returns 
+.B
+nil
+if there\&'s no element for which 
+.I
+aBlock
+evaluates to something that non-nil\&.
+.PP 
+detect:ifNone:
+.RS 1
+-
+.B
+detect
+:
+.I
+aBlock
+.B
+ifNone
+:
+.I
+noneBlock
+.RE
+.PP
+This message returns the first element in the receiver for which 
+.I
+aBlock
+evaluates to something that is non-nil\&.
+.PP
+Evaluates 
+.I
+noneBlock
+if there\&'s no element for which 
+.I
+aBlock
+evaluates to something that is non-nil, and returns the return value of that block\&.  For example,
+.RS 3
+
+[ aCltn detect: { :e | [e isEqual:anObject]} ifNone: {anObject} ];
+.br
+
+.RE
+.PP 
+select:
+.RS 1
+-
+.B
+select
+:
+.I
+testBlock
+.RE
+.PP
+This message will return a subset of the receiver containing all elements for which 
+.I
+testBlock
+evaluates to an Object that is non-nil\&.  For example,
+.RS 3
+
+[ aCltn select: { :each | [each isEqual:anObject] } ];
+.br
+
+.RE
+.PP
+Returns a new empty instance of the same class as the receiver, if there\&'s no element for which 
+.I
+testBlock
+evaluates to something that is non-nil\&. 
+.PP 
+reject:
+.RS 1
+-
+.B
+reject
+:
+.I
+testBlock
+.RE
+.PP
+Complement of 
+.B
+select:
+.PP
+This message will return a subset of the receiver containing all elements for which 
+.I
+testBlock
+evaluates to nil\&.  For example,
+.RS 3
+
+[ aCltn reject: { :each | [each isEqual:anObject] } ];
+.br
+
+.RE
+.PP
+Returns a new empty instance of the same class as the receiver, if there\&'s no element for which 
+.I
+testBlock
+evaluates to nil\&.
+.PP 
+collect:
+.RS 1
+-
+.B
+collect
+:
+.I
+transformBlock
+.RE
+.PP
+This message creates and returns a new collection of the same size and type as the receiver\&. The elements are the result of performing 
+.I
+transformBlock
+on each element in the receiver (elements for which the Block would return 
+.B
+nil
+are filtered out)\&.
+.PP 
+count:
+.RS 1
+- (
+unsigned
+)
+.B
+count
+:
+.I
+aBlock
+.RE
+.PP
+Evaluate 
+.I
+aBlock
+with each of the receiver\&'s elements as the argument\&.  Return the number that answered a non-
+.B
+nil
+value\&.
+.PP 
+elementsPerform:
+.RS 1
+-
+.B
+elementsPerform
+:(SEL)
+.I
+aSelector
+.RE
+.PP
+Send 
+.I
+aSelector
+to all objects in the collection, starting from the object at offset 
+.I
+0
+\&.  For Stepstone compatibility\&.  Producer uses this\&.
+.PP 
+elementsPerform:with:
+.RS 1
+-
+.B
+elementsPerform
+:(SEL)
+.I
+aSelector
+.B
+with
+:
+.I
+anObject
+.RE
+.PP
+Send 
+.I
+aSelector
+to all objects in the collection, starting from the object at offset 
+.I
+0
+\&.  For Stepstone compatibility\&.  Producer uses this\&.
+.PP 
+elementsPerform:with:with:
+.RS 1
+-
+.B
+elementsPerform
+:(SEL)
+.I
+aSelector
+.B
+with
+:
+.I
+anObject
+.B
+with
+:
+.I
+otherObject
+.RE
+.PP
+Send 
+.I
+aSelector
+to all objects in the collection, starting from the object at offset 
+.I
+0
+\&.  For Stepstone compatibility\&.  Producer uses this\&.
+.PP 
+elementsPerform:with:with:with:
+.RS 1
+-
+.B
+elementsPerform
+:(SEL)
+.I
+aSelector
+.B
+with
+:
+.I
+anObject
+.B
+with
+:
+.I
+otherObject
+.B
+with
+:
+.I
+thirdObj
+.RE
+.PP
+Send 
+.I
+aSelector
+to all objects in the collection, starting from the object at offset 
+.I
+0
+\&.  For Stepstone compatibility\&.  ICpak201 uses this\&.
+.PP 
+do:
+.RS 1
+-
+.B
+do
+:
+.I
+aBlock
+.RE
+.PP
+Evaluates 
+.I
+aBlock
+for each element in the collection and returns 
+.B
+self
+\&.  
+.I
+aBlock
+must be a block taking one object (element) as argument; the return value of the block is ignored by this method\&.
+.PP
+Often, the Block would, as a side-effect, modify a variable, as in:
+.RS 3
+
+int count = 0;
+.br
+[contents do: { :what | if (what == anObject) count++; }];
+.br
+
+.RE
+.PP 
+do:until:
+.RS 1
+-
+.B
+do
+:
+.I
+aBlock
+.B
+until
+:(BOOL*)
+.I
+flag
+.RE
+.PP
+Evaluates 
+.I
+aBlock
+for each element in the collection, or until the variable pointed to by 
+.I
+flag
+becomes true, and returns 
+.B
+self
+\&.  
+.I
+aBlock
+must be a block taking one object (element) as argument; the return value of the block is ignored by this method\&.
+.PP
+Typically the Block will modify the variable 
+.I
+flag
+when some condition holds:
+.RS 3
+
+BOOL found = NO;
+.br
+[contents do:{ :what | if (what == findObject) found=YES;} until:&found];
+.br
+if (found) { \&.\&.\&. }
+.br
+
+.RE

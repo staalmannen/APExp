@@ -1,0 +1,129 @@
+!
+! Portable Object Compiler
+!
+! Makefile for OpenVMS make (like MMS, MMK)
+!
+
+.OBJ.OLB  :
+    @ If F$Search("$(MMS$TARGET)") .EQS. "" Then $(LIBR)/Create $(MMS$TARGET)
+    $(LIBR) $(LIBRFLAGS) $(MMS$TARGET) $(MMS$SOURCE)
+    @ If "$(MMS_DELETE_OBJECT)" Then Delete $(MMS$SOURCE);*
+
+.SUFFIXES : .M
+.M.OBJ    :
+    $(OBJC) $(OBJCFLAGS) $(MMS$SOURCE)
+OBJC  	    = OBJC
+OBJCFLAGS   = 
+
+LINK	    = LINK
+LINKFLAGS   = /EXEC=$(MMS$TARGET)
+
+.FIRST
+    @ Define  OC_INCLUDE_DIRECTORY [--.INCLUDE.OBJCRT],[--.INCLUDE.OBJPAK]
+
+!
+!
+!
+
+*    : -
+ oclib.olb
+	@ continue
+
+OBJS =	-
+-
+ OCLIB(node)    ,-
+ OCLIB(stkframe),-
+ OCLIB(symbol)  ,-
+ OCLIB(stclass) ,-
+ OCLIB(cppdirec),-
+ OCLIB(type)    ,-
+ OCLIB(options) ,-
+ OCLIB(stmt)    ,-
+ OCLIB(ifstmt)  ,-
+ OCLIB(whilstmt),-
+ OCLIB(switstmt),-
+ OCLIB(lblstmt) ,-
+ OCLIB(rtrnstmt),-
+ OCLIB(dfltstmt),-
+ OCLIB(casestmt),-
+ OCLIB(compstmt),-
+ OCLIB(exprstmt),-
+ OCLIB(gotostmt),-
+ OCLIB(contstmt),-
+ OCLIB(forstmt) ,-
+ OCLIB(dostmt)  ,-
+ OCLIB(decl)    ,-
+ OCLIB(pointer) ,-
+ OCLIB(arydecl) ,-
+ OCLIB(fundecl) ,-
+ OCLIB(precdecl),-
+ OCLIB(bflddecl),-
+ OCLIB(pfixdecl),-
+ OCLIB(initdecl),-
+ OCLIB(keywdecl),-
+ OCLIB(namedecl),-
+ OCLIB(stardecl),-
+ OCLIB(var)     ,-
+ OCLIB(aryvar)  ,-
+ OCLIB(scalar)  ,-
+ OCLIB(expr)    ,-
+ OCLIB(listxpr) ,-
+ OCLIB(keywxpr) ,-
+ OCLIB(condxpr) ,-
+ OCLIB(castxpr) ,-
+ OCLIB(unyxpr)  ,-
+ OCLIB(deref)   ,-
+ OCLIB(addrof)  ,-
+ OCLIB(sizeof)  ,-
+ OCLIB(typeof)  ,-
+ OCLIB(pfixxpr) ,-
+ OCLIB(indexxpr),-
+ OCLIB(binxpr)  ,-
+ OCLIB(dotxpr)  ,-
+ OCLIB(arrowxpr),-
+ OCLIB(msgxpr)  ,-
+ OCLIB(blockxpr),-
+ OCLIB(selxpr)  ,-
+ OCLIB(precxpr) ,-
+ OCLIB(commaxpr),-
+ OCLIB(constxpr),-
+ OCLIB(identxpr),-
+ OCLIB(assign)  ,-
+ OCLIB(relxpr)  ,-
+ OCLIB(funcall) ,-
+ OCLIB(btincall),-
+ OCLIB(def)     ,-
+ OCLIB(fundef)  ,-
+ OCLIB(methdef) ,-
+ OCLIB(funbody) ,-
+ OCLIB(method)  ,-
+ OCLIB(selector),-
+ OCLIB(gasmop)  ,-
+ OCLIB(gasmstmt),-
+ OCLIB(dasmstmt),-
+ OCLIB(gattrib) ,-
+ OCLIB(gatrdecl),-
+ OCLIB(compdef) ,-
+ OCLIB(datadef) ,-
+ OCLIB(globdef) ,-
+ OCLIB(structsp),-
+ OCLIB(classdef),-
+ OCLIB(enumtor) ,-
+ OCLIB(enumsp)  ,-
+ OCLIB(parmdef) ,-
+ OCLIB(parmlist),-
+ OCLIB(util)    ,-
+ OCLIB(trlunit) 
+
+oclib.olb  : -
+ $(OBJS)
+    @ continue
+
+cleantmp    : 
+    - Delete *.i;*
+    - Delete *.c;*
+
+clean       : -
+ cleantmp
+    - Delete *.obj;*
+    - Delete *.olb;*

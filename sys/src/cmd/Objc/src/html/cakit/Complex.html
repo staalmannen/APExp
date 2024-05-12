@@ -1,0 +1,180 @@
+<HTML>
+<TITLE>ccomplex Specification Sheet</TITLE>
+<H1>ccomplex Specification Sheet</H1>
+
+<HR>
+Computer Algebra Kit (c) 1993,00 by Comp.Alg.Objects.  All Rights Reserved.<P>
+<H1>Complex</H1>
+<B>Inherits from:</B> CAObject<P>
+<B>Maturity Index:</B> Relatively immature<P>
+<H2>Class Description</H2>
+A complex object consists of two real objects, a <I>real</I> and <I>imaginary</I> part.  Real objects could be arbitrary Computer Algebra Kit objects, but the class has been used so far only for the <I>Gaussian integers</I> i.e., complex numbers over the integers.  The imaginary unit is represented by the symbol <I>I</I>.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#0">real:</A></LI>
+<LI><A HREF="#2">real:imaginary:</A></LI>
+<LI><A HREF="#3">copy</A></LI>
+<LI><A HREF="#4">deepCopy</A></LI>
+</UL>
+<H3><B>Identity</B></H3>
+<UL>
+<LI><A HREF="#9">real</A></LI>
+<LI><A HREF="#10">imaginary</A></LI>
+<LI><A HREF="#11">isReal</A></LI>
+<LI><A HREF="#12">notReal</A></LI>
+<LI><A HREF="#13">hash</A></LI>
+<LI><A HREF="#14">isEqual:</A></LI>
+</UL>
+<H3><B>Conjugation</B></H3>
+<UL>
+<LI><A HREF="#15">conjugate</A></LI>
+<LI><A HREF="#16">norm</A></LI>
+<LI><A HREF="#17">asReal</A></LI>
+</UL>
+<H3><B>Addition</B></H3>
+<UL>
+<LI><A HREF="#18">zero</A></LI>
+<LI><A HREF="#19">isZero</A></LI>
+<LI><A HREF="#20">isOpposite:</A></LI>
+<LI><A HREF="#21">negate</A></LI>
+<LI><A HREF="#22">double</A></LI>
+<LI><A HREF="#23">add:</A></LI>
+<LI><A HREF="#24">subtract:</A></LI>
+</UL>
+<H3><B>Multiplication</B></H3>
+<UL>
+<LI><A HREF="#25">I</A></LI>
+<LI><A HREF="#26">one</A></LI>
+<LI><A HREF="#27">isOne</A></LI>
+<LI><A HREF="#28">isMinusOne</A></LI>
+<LI><A HREF="#29">isUnit</A></LI>
+<LI><A HREF="#30">square</A></LI>
+<LI><A HREF="#32">multiply:</A></LI>
+<LI><A HREF="#33">power:</A></LI>
+</UL>
+<H3><B>Complex Division</B></H3>
+<UL>
+<LI><A HREF="#35">divide:</A></LI>
+<LI><A HREF="#36">inverse</A></LI>
+<LI><A HREF="#38">quotient:</A></LI>
+<LI><A HREF="#39">remainder:quotient:</A></LI>
+</UL>
+<H3><B>Greatest Common Divisor</B></H3>
+<UL>
+<LI><A HREF="#40">gcd:</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#41">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">real:</A></H3>
+<BLOCKQUOTE>+<B>real</B>:<I>aReal</I></BLOCKQUOTE>
+Returns a new complex object with real part set to <I>aReal</I> and the imaginary part set to the real zero. <P>
+<H3><A NAME="2">real:imaginary:</A></H3>
+<BLOCKQUOTE>+<B>real</B>:<I>aReal</I><B>imaginary</B>:<I>anotherReal</I></BLOCKQUOTE>
+Returns a new complex object with real part set to <I>aReal</I> and the imaginary part set to <I>anotherReal</I>. <P>
+<H3><A NAME="3">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Returns a new copy of the complex object.<P>
+<H3><A NAME="4">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+Returns a new copy of the complex object; sends <B>deepCopy</B> messages to real and imaginary part.<P>
+<H3><A NAME="9">real</A></H3>
+<BLOCKQUOTE>-<B>real</B></BLOCKQUOTE>
+Returns the real part of a complex number. <P>
+<H3><A NAME="10">imaginary</A></H3>
+<BLOCKQUOTE>-<B>imaginary</B></BLOCKQUOTE>
+Returns the imaginary part of a complex number. <P>
+<H3><A NAME="11">isReal</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isReal</B></BLOCKQUOTE>
+Whether the imaginary part is equal to zero.<P>
+<H3><A NAME="12">notReal</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>notReal</B></BLOCKQUOTE>
+Whether the <B>isReal</B> returns NO.<P>
+<H3><A NAME="13">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a small integer that is the same for objects that are equal in the sense of <B>isEqual:</B>.<P>
+<H3><A NAME="14">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>b</I></BLOCKQUOTE>
+Whether real and imaginary parts are equal to each other.<P>
+<H3><A NAME="15">conjugate</A></H3>
+<BLOCKQUOTE>-<B>conjugate</B></BLOCKQUOTE>
+Returns a new reference to the object if it is real.  Otherwise, returns a new object that is equal to the complex conjugate of the object.  The conjugate of <I>a</I> + I <I>b</I> is <I>a</I> - I <I>b</I>.<P>
+<H3><A NAME="16">norm</A></H3>
+<BLOCKQUOTE>-<B>norm</B></BLOCKQUOTE>
+Returns a new <I>real</I> object, the norm of the complex object i.e., the object multiplied by its conjugate.<P>
+<H3><A NAME="17">asReal</A></H3>
+<BLOCKQUOTE>-<B>asReal</B></BLOCKQUOTE>
+If the imaginary part of the object is zero, this method returns a new reference to the real part of the object.<P>
+<H3><A NAME="18">zero</A></H3>
+<BLOCKQUOTE>-<B>zero</B></BLOCKQUOTE>
+Returns a new complex object with real and imaginary part equal to zero.<P>
+<H3><A NAME="19">isZero</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isZero</B></BLOCKQUOTE>
+Whether real and imaginary part are equal to zero.<P>
+<H3><A NAME="20">isOpposite:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOpposite</B>:<I>b</I></BLOCKQUOTE>
+Whether real and imaginary parts are opposite to each other.<P>
+<H3><A NAME="21">negate</A></H3>
+<BLOCKQUOTE>-<B>negate</B></BLOCKQUOTE>
+Returns a new complex number, by negating real and imaginary parts.<P>
+<H3><A NAME="22">double</A></H3>
+<BLOCKQUOTE>-<B>double</B></BLOCKQUOTE>
+Returns a new complex number, by doubling real and imaginary parts.<P>
+<H3><A NAME="23">add:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>b</I></BLOCKQUOTE>
+Returns the sum of the complex numbers; adds real and imaginary parts together.<P>
+<H3><A NAME="24">subtract:</A></H3>
+<BLOCKQUOTE>-<B>subtract</B>:<I>b</I></BLOCKQUOTE>
+Returns the difference of the complex numbers; subtracts real and imaginary parts from each other.<P>
+<H3><A NAME="25">I</A></H3>
+<BLOCKQUOTE>-<B>I</B></BLOCKQUOTE>
+Returns a new reference to the imaginary unit.  <P>
+<H3><A NAME="26">one</A></H3>
+<BLOCKQUOTE>-<B>one</B></BLOCKQUOTE>
+Returns a new object with real part equal to one and imaginary part equal to zero.<P>
+<H3><A NAME="27">isOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOne</B></BLOCKQUOTE>
+Whether the complex object is a multiplicative unit.  The complex units consist of the real units and the real units multiplied by the imaginary unit <I>i</I>.  <P>
+<H3><A NAME="28">isMinusOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isMinusOne</B></BLOCKQUOTE>
+Whether the complex object is a multiplicative unit.  The complex units consist of the real units and the real units multiplied by the imaginary unit <I>i</I>.  <P>
+<H3><A NAME="29">isUnit</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isUnit</B></BLOCKQUOTE>
+Whether the complex object is a multiplicative unit.  The complex units consist of the real units and the real units multiplied by the imaginary unit <I>i</I>.  <P>
+<H3><A NAME="30">square</A></H3>
+<BLOCKQUOTE>-<B>square</B></BLOCKQUOTE>
+Returns the complex number multiplied by itself, computed by the rule :<P>
+<BLOCKQUOTE><PRE>
+(a+I b)^2 == (a^2 - b^2) + I (2 a b)
+</PRE></BLOCKQUOTE>
+<H3><A NAME="32">multiply:</A></H3>
+<BLOCKQUOTE>-<B>multiply</B>:<I>b</I></BLOCKQUOTE>
+Returns the product of the two complex numbers, computed by the rule :<P>
+<BLOCKQUOTE><PRE>
+(a+I b)(c+I d) == (ac-bd) + I (ad+bc)
+</PRE></BLOCKQUOTE>
+<H3><A NAME="33">power:</A></H3>
+<BLOCKQUOTE>-<B>power</B>:(int)<I>n</I></BLOCKQUOTE>
+Returns the complex number raised to the <I>n</I>-th power.  If the object is real, simply computes the <I>n</I>-th power as a real.  Otherwise, computes the power by the binary exponentation algorithm.<P>
+<H3><A NAME="35">divide:</A></H3>
+<BLOCKQUOTE>-<B>divide</B>:<I>b</I></BLOCKQUOTE>
+Returns the exact quotient of the complex number by the complex number <I>b</I>.  Multiplies by the conjugate of <I>b</I> and then divides by the norm of <I>b</I>, or returns <B>nil</B> if the latter division is not exact.<P>
+<H3><A NAME="36">inverse</A></H3>
+<BLOCKQUOTE>-<B>inverse</B></BLOCKQUOTE>
+Returns the conjugate of the complex number divided by its norm, or <B>nil</B> if the latter division is not exact.<P>
+<H3><A NAME="38">quotient:</A></H3>
+<BLOCKQUOTE>-<B>quotient</B>:<I>b</I></BLOCKQUOTE>
+Returns the quotient on division by <I>b</I>.<P>
+<B>Note:</B> I'm not sure about the algorithm I'm using here !<P>
+<H3><A NAME="39">remainder:quotient:</A></H3>
+<BLOCKQUOTE>-<B>remainder</B>:<I>b</I><B>quotient</B>:(id *)<I>q</I></BLOCKQUOTE>
+Computes the remainder, and if <I>q</I> is non-NULL pointer, the quotient on division by <I>b</I>.<P>
+<H3><A NAME="40">gcd:</A></H3>
+<BLOCKQUOTE>-<B>gcd</B>:<I>b</I></BLOCKQUOTE>
+If both objects are real, returns a complex object with real part set to the (real) gcd of the objects.  Otherwise, computes the greatest common divisor by the Euclidean algorithm.<P>
+<H3><A NAME="41">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints the number to <I>aStream</I>.<P>

@@ -1,0 +1,14 @@
+# Sample VICI configuration file
+# $Id: vicifile,v 1.1.1.1 2000/06/07 21:09:23 stes Exp $
+
+echo
+echo Welcome to this VICI example
+echo Type help for more info ...
+echo
+
+load Graph.m
+load Node.m
+load mGraph.m
+
+set args main INPUT
+

@@ -1,0 +1,42 @@
+#!/bin/sh
+
+case $# in
+ 1) ;;
+ *) echo "Usage: plinktst cc";exit 1;;
+esac
+
+cc="$1"
+t1="x$$.c"
+t2="y$$.c"
+e1="x$$"
+e2="y$$"
+dir=/tmp
+msg="$cc is not supporting the common storage public storage model."
+
+trap "rm -f $e1 $e2 $t1 $t2;echo $msg; exit 1" 1 2 15
+
+cd $dir
+
+cat >$t1 <<EOF
+int a = 7;
+EOF
+
+cat >$t2 <<EOF
+#include <stdio.h>
+int a;
+int main() { return a; }
+EOF
+
+($cc $t1 $t2 -o $e1) 2> /dev/null
+($cc $t2 $t1 -o $e2) 2> /dev/null
+
+if [ -x $dir/$e1  -a  -x $dir/$e2 ]; then
+  if $dir/$e1 != 7; then echo $msg; fi;
+  if $dir/$e2 != 7; then echo $msg; fi;
+  echo "$cc seems to be supporting the common storage public storage model."
+else
+  echo $msg;
+fi
+
+rm -f $e1 $e2 $t1 $t2
+

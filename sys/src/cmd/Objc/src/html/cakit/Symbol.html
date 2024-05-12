@@ -1,0 +1,71 @@
+<HTML>
+<TITLE>symbol Specification Sheet</TITLE>
+<H1>symbol Specification Sheet</H1>
+
+<HR>
+Computer Algebra Kit (c) 1993,00 by Comp.Alg.Objects.  All Rights Reserved.<P>
+<H1>Symbol</H1>
+<B>Inherits from:</B> CAObject<P>
+<H2>Class Description</H2>
+Maturity Index : Relatively Mature<P>
+For symbols created with the factory method <B>str:</B>, the first character of the <B>str</B> of the symbol object must be a letter.  Subsequent characters can be letters or digits.  Whitespace or control characters are not allowed.<P>
+Using the factory method <B>chars:count:</B>, it's possible to use arbitrary C strings as the value of the symbol; in this case <B>Symbol</B> just acts like a regular Objective C String class.  If you intend to use the object as a mathematical symbol, it's not advised to do this as you might incorrectly interpret spaces etc. as mathematical operators.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#0">str:</A></LI>
+<LI><A HREF="#3">chars:count:</A></LI>
+<LI><A HREF="#5">copy</A></LI>
+<LI><A HREF="#6">deepCopy</A></LI>
+<LI><A HREF="#7">release</A></LI>
+</UL>
+<H3><B>Identity</B></H3>
+<UL>
+<LI><A HREF="#8">str</A></LI>
+<LI><A HREF="#9">str:</A></LI>
+<LI><A HREF="#10">hash</A></LI>
+<LI><A HREF="#11">isEqual:</A></LI>
+<LI><A HREF="#12">compare:</A></LI>
+<LI><A HREF="#13">isLetter</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#14">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">str:</A></H3>
+<BLOCKQUOTE>+<B>str</B>:(STR)<I>aString</I></BLOCKQUOTE>
+Creates a new symbol, and sets its value to a copy of <I>aString</I>.  Returns <B>nil</B> if <I>aString</I> is not suited as value for a symbol (when the first letter is not a letter, for instance).<P>
+<H3><A NAME="3">chars:count:</A></H3>
+<BLOCKQUOTE>+<B>chars</B>:(STR)<I>aBuffer</I><B>count</B>:(int)<I>numChars</I></BLOCKQUOTE>
+Creates a new symbol, and sets its value to a copy of the first <I>numChars</I> characters of <I>aBuffer</I>.  For this method, there are no restrictions on the C string being used.<P>
+<H3><A NAME="5">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Returns a new symbol object.  Copies the string.<P>
+<H3><A NAME="6">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+Equivalent to <B>copy</B>.<P>
+<H3><A NAME="7">release</A></H3>
+<BLOCKQUOTE>-<B>release</B></BLOCKQUOTE>
+Frees the memory for the string value.<P>
+<H3><A NAME="8">str</A></H3>
+<BLOCKQUOTE>- (STR)<B>str</B></BLOCKQUOTE>
+Returns the string value of the symbol.  The first character is a letter, subsequent characters can be alphanumeric.<P>
+<H3><A NAME="9">str:</A></H3>
+<BLOCKQUOTE>-<B>str</B>:(STR)<I>aString</I></BLOCKQUOTE>
+Creates a new symbol, and sets its value to a copy of <I>aString</I>.  Returns <B>nil</B> if <I>aString</I> is not suited as value for a symbol.<P>
+<H3><A NAME="10">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a hash value based upon the string.<P>
+<H3><A NAME="11">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>b</I></BLOCKQUOTE>
+Returns YES if the str's of both objects are equal.<P>
+<H3><A NAME="12">compare:</A></H3>
+<BLOCKQUOTE>- (int)<B>compare</B>:<I>b</I></BLOCKQUOTE>
+Compares the str's of both objects.<P>
+<H3><A NAME="13">isLetter</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isLetter</B></BLOCKQUOTE>
+Whether the symbol consists of just one character (and hence, is a letter, not a digit).<P>
+<H3><A NAME="14">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints the symbol to <I>aFile</I>. <P>

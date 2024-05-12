@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+ Author: Peter van Eerten <peter@basic-converter.org>
+ Copyright (C) 2010 Peter van Eerten <peter@basic-converter.org>
+
+ Language: BaCon (BAsic CONverter)
+ Last Change: March 6, 2024
+
+ This library is free software; you can redistribute it and/or
+ modify it under the terms of the GNU Library General Public
+ License as published by the Free Software Foundation; either
+ version 2 of the License, or (at your option) any later version.
+
+ This library is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+ Library General Public License for more details.
+
+ You should have received a copy of the GNU Library General Public
+ License along with this library; if not, write to the
+ Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+ Boston, MA 02111-1307, USA.
+
+    =========================
+    INSTALLATION INSTRUCTIONS
+    =========================
+
+(1) Create language directory for GtkSourceView:
+
+    mkdir -p ~/.local/share/gtksourceview-2.0/language-specs/
+
+(2) Copy this file to the new directory:
+
+    cp bacon.lang ~/.local/share/gtksourceview-2.0/language-specs/
+
+
+Now start gedit, Anjuta, Scribes etc and the BaCon sourcecode has
+   syntax highlighting!
+-->
+
+<language id="bacon" _name="BaCon" version="2.0" _section="Sources">
+
+<metadata>
+    <property name="mimetypes">text/x-bac</property>
+    <property name="globs">*.bac</property>
+    <property name="line-comment-start">'</property>
+</metadata>
+
+<styles>
+    <style id="comment"             _name="Comment"             map-to="def:comment"/>
+    <style id="shebang"             _name="Shebang"             map-to="def:shebang"/>
+    <style id="function"            _name="Function"            map-to="def:function"/>
+    <style id="string"              _name="String"              map-to="def:string"/>
+    <style id="keyword"             _name="Keyword"             map-to="def:keyword"/>
+    <style id="special-constant"    _name="Special constant"	map-to="def:special-constant"/>
+    <style id="boolean"		    _name="Boolean value"	map-to="def:boolean"/>
+    <style id="type"		    _name="Data Type"		map-to="def:type"/>
+    <style id="operator"	    _name="Operator"		map-to="def:operator"/>
+    <style id="wrapperfunc"	    _name="Wrapper"		map-to="def:preprocessor"/>
+</styles>
+
+<!-- <default-regex-options case-sensitive="false"/> -->
+
+<definitions>
+
+    <context id="line-comment" style-ref="comment" end-at-line-end="true">
+	<start>'</start>
+	    <include>
+		<context ref="def:in-line-comment"/>
+	    </include>
+    </context>
+
+    <context id="old-style-comment" style-ref="comment" end-at-line-end="true">
+      <start>^\s*REM([^A-za-z]|$)</start>
+      <include>
+        <context ref="def:escape"/>
+        <context ref="def:in-line-comment"/>
+      </include>
+    </context>
+
+    <context id="multiline-comment" style-ref="comment">
+        <start>\/\*</start>
+        <end>\*\/</end>
+	    <include>
+		<context ref="def:in-line-comment"/>
+	    </include>
+    </context>
+
+    <context id="string" style-ref="string">
+      <start>"</start>
+      <end>"</end>
+      <include>
+        <!-- highlight escaped chars -->
+        <context style-ref="def:special-char">
+            <match>\\[$`"\\]</match>
+        </context>
+        <!-- skip backslash where it's not an escaping char -->
+        <context>
+            <match>\\</match>
+        </context>
+        <context ref="def:line-continue"/>
+      </include>
+    </context>
+
+    <context id="function" style-ref="function">
+	<keyword>ABS</keyword>
+	<keyword>ACCEPT</keyword>
+	<keyword>ACOS</keyword>
+	<keyword>ADDRESS</keyword>
+	<keyword>AMOUNT</keyword>
+	<keyword>AND</keyword>
+	<keyword>ASC</keyword>
+	<keyword>ASIN</keyword>
+	<keyword>ATN</keyword>
+	<keyword>ATN2</keyword>
+	<keyword>BETWEEN</keyword>
+	<keyword>BEYOND</keyword>
+	<keyword>BIT</keyword>
+	<keyword>BLOAD</keyword>
+	<keyword>BYTELEN</keyword>
+	<keyword>CEIL</keyword>
+	<keyword>CMDLINE</keyword>
+	<keyword>COLUMNS</keyword>
+	<keyword>COS</keyword>
+	<keyword>COUNT</keyword>
+	<keyword>DAY</keyword>
+	<keyword>DEC</keyword>
+	<keyword>DEG</keyword>
+	<keyword>ENDFILE</keyword>
+	<keyword>EQUAL</keyword>
+	<keyword>EVAL</keyword>
+	<keyword>EVEN</keyword>
+	<keyword>EXCL</keyword>
+	<keyword>EXP</keyword>
+	<keyword>FILEEXISTS</keyword>
+	<keyword>FILELEN</keyword>
+	<keyword>FILETIME</keyword>
+	<keyword>FILETYPE</keyword>
+	<keyword>FIND</keyword>
+	<keyword>FLOOR</keyword>
+	<keyword>FORK</keyword>
+	<keyword>FP</keyword>
+	<keyword>GETKEY</keyword>
+	<keyword>GETX</keyword>
+	<keyword>GETY</keyword>
+	<keyword>GUIFN</keyword>
+	<keyword>GUIDEFINE</keyword>
+	<keyword>GUIGET</keyword>
+	<keyword>GUISET</keyword>
+	<keyword>GUIWIDGET</keyword>
+	<keyword>HASBOM</keyword>
+	<keyword>HASDELIM</keyword>
+	<keyword>HASH</keyword>
+	<keyword>HOUR</keyword>
+	<keyword>IIF</keyword>
+	<keyword>INDEX</keyword>
+	<keyword>INSTR</keyword>
+	<keyword>INSTRREV</keyword>
+	<keyword>INT</keyword>
+	<keyword>INVERT</keyword>
+	<keyword>ISASCII</keyword>
+	<keyword>ISFALSE</keyword>
+	<keyword>ISKEY</keyword>
+	<keyword>ISTOKEN</keyword>
+	<keyword>ISTRUE</keyword>
+	<keyword>ISUTF8</keyword>
+	<keyword>LEN</keyword>
+	<keyword>LOG</keyword>
+	<keyword>LOOP</keyword>
+	<keyword>MATCH</keyword>
+	<keyword>MAX</keyword>
+	<keyword>MAXNUM</keyword>
+	<keyword>MEMCHECK</keyword>
+	<keyword>MEMORY</keyword>
+	<keyword>MEMTELL</keyword>
+	<keyword>MIN</keyword>
+	<keyword>MINUTE</keyword>
+	<keyword>MOD</keyword>
+	<keyword>MONTH</keyword>
+	<keyword>MYPID</keyword>
+	<keyword>NANOTIMER</keyword>
+	<keyword>NOT</keyword>
+	<keyword>NOW</keyword>
+	<keyword>NRKEYS</keyword>
+	<keyword>ODD</keyword>
+	<keyword>OR</keyword>
+	<keyword>PEEK</keyword>
+	<keyword>POW</keyword>
+	<keyword>RAD</keyword>
+	<keyword>RANDOM</keyword>
+	<keyword>REGEX</keyword>
+	<keyword>REAP</keyword>
+	<keyword>RND</keyword>
+	<keyword>ROL</keyword>
+	<keyword>ROR</keyword>
+	<keyword>ROUND</keyword>
+	<keyword>ROWS</keyword>
+	<keyword>SEARCH</keyword>
+	<keyword>SECOND</keyword>
+	<keyword>SGN</keyword>
+	<keyword>SIN</keyword>
+	<keyword>SIZEOF</keyword>
+	<keyword>SQR</keyword>
+	<keyword>SUM</keyword>
+	<keyword>SUMF</keyword>
+	<keyword>TALLY</keyword>
+	<keyword>TAN</keyword>
+	<keyword>TELL</keyword>
+	<keyword>TIMER</keyword>
+	<keyword>TIMEVALUE</keyword>
+	<keyword>TOTAL</keyword>
+	<keyword>UBOUND</keyword>
+	<keyword>UCS</keyword>
+	<keyword>ULEN</keyword>
+	<keyword>VAL</keyword>
+	<keyword>VERIFY</keyword>
+	<keyword>WAIT</keyword>
+	<keyword>WEEK</keyword>
+	<keyword>WHERE</keyword>
+	<keyword>YEAR</keyword>
+    </context>
+
+    <context id="keywords" style-ref="keyword">
+	<keyword>ADD</keyword>
+	<keyword>ALARM</keyword>
+	<keyword>ALIAS</keyword>
+	<keyword>APPENDING</keyword>
+	<keyword>APPEND</keyword>
+	<keyword>ARRAY</keyword>
+	<keyword>AS</keyword>
+	<keyword>ASSOC</keyword>
+	<keyword>BACK</keyword>
+	<keyword>BAPPEND</keyword>
+	<keyword>BASE</keyword>
+	<keyword>BG</keyword>
+	<keyword>BLACK</keyword>
+	<keyword>BLINK</keyword>
+	<keyword>BLUE</keyword>
+	<keyword>BOLD</keyword>
+	<keyword>BREAK</keyword>
+	<keyword>BROADCAST</keyword>
+	<keyword>BSAVE</keyword>
+	<keyword>BY</keyword>
+	<keyword>CALL</keyword>
+	<keyword>CASE</keyword>
+	<keyword>CATCH</keyword>
+	<keyword>CERTIFICATE</keyword>
+	<keyword>CHANGEDIR</keyword>
+	<keyword>CHUNK</keyword>
+	<keyword>CLASS</keyword>
+	<keyword>CLEAR</keyword>
+	<keyword>CLOSE</keyword>
+	<keyword>CMODE</keyword>
+	<keyword>COLLAPSE</keyword>
+	<keyword>COLLECT</keyword>
+	<keyword>COLOR</keyword>
+	<keyword>CONST</keyword>
+	<keyword>COMPARE</keyword>
+	<keyword>COMPILER</keyword>
+	<keyword>CONTINUE</keyword>
+	<keyword>COPY</keyword>
+	<keyword>CURRENT</keyword>
+	<keyword>CURSOR</keyword>
+	<keyword>CYAN</keyword>
+	<keyword>DATA</keyword>
+	<keyword>DECLARE</keyword>
+	<keyword>DECR</keyword>
+	<keyword>DEFAULT</keyword>
+	<keyword>DEF</keyword>
+	<keyword>DELETE</keyword>
+	<keyword>DELIM</keyword>
+	<keyword>DEVICE</keyword>
+	<keyword>DIRECTORY</keyword>
+	<keyword>DO</keyword>
+	<keyword>DONE</keyword>
+	<keyword>DOTIMES</keyword>
+	<keyword>DOWN</keyword>
+	<keyword>DOWNTO</keyword>
+	<keyword>DQ</keyword>
+	<keyword>ELIF</keyword>
+	<keyword>ELSE</keyword>
+	<keyword>ENDFORK</keyword>
+	<keyword>ENDFUNCTION</keyword>
+	<keyword>ENDFUNC</keyword>
+	<keyword>ENDRECORD</keyword>
+	<keyword>ENDIF</keyword>
+	<keyword>END</keyword>
+	<keyword>ENDSELECT</keyword>
+	<keyword>ENDSUB</keyword>
+	<keyword>ENDCLASS</keyword>
+	<keyword>ENDENUM</keyword>
+	<keyword>ENDUSEC</keyword>
+	<keyword>ENDUSEH</keyword>
+	<keyword>ENDWITH</keyword>
+	<keyword>ENUM</keyword>
+	<keyword>EPRINT</keyword>
+	<keyword>EQ</keyword>
+	<keyword>ESC</keyword>
+	<keyword>EXIT</keyword>
+	<keyword>EXPLICIT</keyword>
+	<keyword>FG</keyword>
+	<keyword>FI</keyword>
+	<keyword>FILE</keyword>
+	<keyword>FN</keyword>
+	<keyword>FOR</keyword>
+	<keyword>FORMAT</keyword>
+	<keyword>FORWARD</keyword>
+	<keyword>FRAMEWORK</keyword>
+	<keyword>FREE</keyword>
+	<keyword>FROM</keyword>
+	<keyword>FTYPE</keyword>
+	<keyword>FUNC</keyword>
+	<keyword>FUNCTION</keyword>
+	<keyword>GE</keyword>
+	<keyword>GETBYTE</keyword>
+	<keyword>GETFILE</keyword>
+	<keyword>GETLINE</keyword>
+	<keyword>GLOBAL</keyword>
+	<keyword>GOSUB</keyword>
+	<keyword>GOTO</keyword>
+	<keyword>GOTOXY</keyword>
+	<keyword>GREEN</keyword>
+	<keyword>GT</keyword>
+	<keyword>GUI</keyword>
+	<keyword>IF</keyword>
+	<keyword>IMODE</keyword>
+	<keyword>IMPORT</keyword>
+	<keyword>IN</keyword>
+	<keyword>INCLUDE</keyword>
+	<keyword>INCR</keyword>
+	<keyword>INPUT</keyword>
+	<keyword>INTENSE</keyword>
+	<keyword>INTERNATIONAL</keyword>
+	<keyword>INVERSE</keyword>
+	<keyword>IS</keyword>
+	<keyword>ISNOT</keyword>
+	<keyword>ITALIC</keyword>
+	<keyword>JOIN</keyword>
+	<keyword>LABEL</keyword>
+	<keyword>LDFLAGS</keyword>
+	<keyword>LE</keyword>
+	<keyword>LET</keyword>
+	<keyword>LIBRARY</keyword>
+	<keyword>LMODE</keyword>
+	<keyword>LOCAL</keyword>
+	<keyword>LOOKUP</keyword>
+	<keyword>LT</keyword>
+	<keyword>MAP</keyword>
+	<keyword>MAGENTA</keyword>
+	<keyword>MAKEDIR</keyword>
+	<keyword>MEMREWIND</keyword>
+	<keyword>MEMSTREAM</keyword>
+	<keyword>MEMTYPE</keyword>
+	<keyword>MONITOR</keyword>
+	<keyword>MULTICAST</keyword>
+	<keyword>NE</keyword>
+	<keyword>NETWORK</keyword>
+	<keyword>NEXT</keyword>
+	<keyword>NO_C_ESC</keyword>
+	<keyword>NODE</keyword>
+	<keyword>NORMAL</keyword>
+	<keyword>OFF</keyword>
+	<keyword>OFFSET</keyword>
+	<keyword>OMODE</keyword>
+	<keyword>ON</keyword>
+	<keyword>OPEN</keyword>
+	<keyword>OPTION</keyword>
+	<keyword>OPTIONS</keyword>
+	<keyword>OTHER</keyword>
+	<keyword>PARSE</keyword>
+	<keyword>POKE</keyword>
+	<keyword>PRAGMA</keyword>
+	<keyword>PRINT</keyword>
+	<keyword>PRIORITY</keyword>
+	<keyword>PROPER</keyword>
+	<keyword>PROTO</keyword>
+	<keyword>PULL</keyword>
+	<keyword>PUSH</keyword>
+	<keyword>PUTBYTE</keyword>
+	<keyword>PUTLINE</keyword>
+	<keyword>QUOTED</keyword>
+	<keyword>RE</keyword>
+	<keyword>READING</keyword>
+	<keyword>READ</keyword>
+	<keyword>READLN</keyword>
+	<keyword>READWRITE</keyword>
+	<keyword>RECEIVE</keyword>
+	<keyword>RECORD</keyword>
+	<keyword>RECURSIVE</keyword>
+	<keyword>RED</keyword>
+	<keyword>REDIM</keyword>
+	<keyword>RELATE</keyword>
+	<keyword>RENAME</keyword>
+	<keyword>REPEAT</keyword>
+	<keyword>RESET</keyword>
+	<keyword>RESIZE</keyword>
+	<keyword>RESTORE</keyword>
+	<keyword>RESUME</keyword>
+	<keyword>RETURN</keyword>
+	<keyword>REWIND</keyword>
+	<keyword>RUN</keyword>
+	<keyword>SAVE</keyword>
+	<keyword>SCREEN</keyword>
+	<keyword>SCROLL</keyword>
+	<keyword>SCTP</keyword>
+	<keyword>SEED</keyword>
+	<keyword>SEEK</keyword>
+	<keyword>SELECT</keyword>
+	<keyword>SEND</keyword>
+	<keyword>SERVER</keyword>
+	<keyword>SET</keyword>
+	<keyword>SETENVIRON</keyword>
+	<keyword>SETSERIAL</keyword>
+	<keyword>SIGNAL</keyword>
+	<keyword>SIZE</keyword>
+	<keyword>SLEEP</keyword>
+	<keyword>SOCKET</keyword>
+	<keyword>SORT</keyword>
+	<keyword>SPEED</keyword>
+	<keyword>SPLIT</keyword>
+	<keyword>START</keyword>
+	<keyword>STARTPOINT</keyword>
+	<keyword>STATIC</keyword>
+	<keyword>STEP</keyword>
+	<keyword>STOP</keyword>
+	<keyword>STRIKE</keyword>
+	<keyword>SUB</keyword>
+	<keyword>SWAP</keyword>
+	<keyword>SYSTEM</keyword>
+	<keyword>TCP</keyword>
+	<keyword>TEXTDOMAIN</keyword>
+	<keyword>THEN</keyword>
+	<keyword>TLS</keyword>
+	<keyword>TO</keyword>
+	<keyword>TRACE</keyword>
+	<keyword>TRAP</keyword>
+	<keyword>TREE</keyword>
+	<keyword>TYPE</keyword>
+	<keyword>UDP</keyword>
+	<keyword>UNDERLINE</keyword>
+	<keyword>UNSET</keyword>
+	<keyword>UNTIL</keyword>
+	<keyword>UP</keyword>
+	<keyword>USEC</keyword>
+	<keyword>USEH</keyword>
+	<keyword>UTF8</keyword>
+	<keyword>VAR</keyword>
+	<keyword>VARTYPE</keyword>
+	<keyword>WEND</keyword>
+	<keyword>WHENCE</keyword>
+	<keyword>WHILE</keyword>
+	<keyword>WHITE</keyword>
+	<keyword>WITH</keyword>
+	<keyword>WRITELN</keyword>
+	<keyword>WRITING</keyword>
+	<keyword>YELLOW</keyword>
+    </context>
+
+    <context id="strfunction" style-ref="function">
+	<match extended="true">
+	    \bCHOP\$|\bCHR\$|\bCA\$|\bCN\$|\bCONCAT\$|\bCURDIR\$|\bEDITBOM\$|\bERR\$|\bESCAPE\$|\bEXEC\$|\bEXTRACT\$|\bFILL\$|\bGETENVIRON\$|\bGETPEER\$|\bHOSTNAME\$|\bHEX\$|\bHOST\$
+		|\bIIF\$|\bINTL\$|\bLCASE\$|\bCIPHER\$|\bLEFT\$|\bMAX\$|\bMID\$|\bMIN\$|\bMONTH\$|\bNNTL\$|\bOS\$|\bREPLACE\$|\bREVERSE\$|\bRIGHT\$|\bSPC\$|\bSTR\$|\bCOLLAPSE\$
+		|\bTAB\$|\bTYPEOF\$|\bUCASE\$|\bWEEKDAY\$|\bREALPATH\$|\bBASENAME\$|\bDIRNAME\$|\bRUN\$|\bINBETWEEN\$|\bTOKEN\$|\bLOAD\$|\bOUTBETWEEN\$|\bTOASCII\$|\bGUIEVENT\$
+		|\bFLATTEN\$|\bINSERT\$|\bBIN\$|\bEXCHANGE\$|\bCHANGE\$|\bUNESCAPE\$|\bUNFLATTEN\$|\bUNIQ\$|\bSORT\$|\bREV\$|\bDELIM\$|\bHEAD\$|\bTAIL\$|\bAPPEND\$|\bWALK\$|\bLOOP\$
+		|\bDEL\$|\bCUT\$|\bALIGN\$|\bUTF8\$|\bPROPER\$|\bROTATE\$|\bLAST\$|\bFIRST\$|\bME\$|\bEXPLODE\$|\bOBTAIN\$|\bB64ENC\$|\bB64DEC\$|\bMERGE\$|\bRIP\$|\bCOIL\$|\bINDEX\$
+	</match>
+    </context>
+
+    <context id="types" style-ref="type">
+	<keyword>NUMBER</keyword>
+	<keyword>STRING</keyword>
+	<keyword>FLOATING</keyword>
+	<keyword>FILE\*</keyword>
+	<keyword>int</keyword>
+	<keyword>double</keyword>
+	<keyword>float</keyword>
+	<keyword>long</keyword>
+	<keyword>char</keyword>
+	<keyword>short</keyword>
+	<keyword>void</keyword>
+	<keyword>signed</keyword>
+	<keyword>unsigned</keyword>
+	<keyword>static</keyword>
+	<keyword>const</keyword>
+	<keyword>volatile</keyword>
+	<keyword>struct</keyword>
+	<keyword>extern</keyword>
+	<keyword>public</keyword>
+	<keyword>private</keyword>
+	<keyword>virtual</keyword>
+	<keyword>intptr_t</keyword>
+	<keyword>uintptr_t</keyword>
+	<keyword>int8_t</keyword>
+	<keyword>uint8_t</keyword>
+	<keyword>int16_t</keyword>
+	<keyword>uint16_t</keyword>
+	<keyword>int32_t</keyword>
+	<keyword>uint32_t</keyword>
+	<keyword>int64_t</keyword>
+	<keyword>uint64_t</keyword>
+    </context>
+
+    <context id="special-constants" style-ref="special-constant">
+	<match extended="true">
+	    \bMAXRANDOM\b|\bNL\$|\bCR\$|\bDLE\$|\bEL\$|\bCL\$|\bPI\b|\bREGLEN\b|\bRETVAL\b|\bERROR\b|\bLINENO\b|\bSP\b|\bVERSION\$|\bARGUMENT\$|\bSOURCE\$|\bNULL\b
+	</match>
+    </context>
+
+    <context id="boolean" style-ref="boolean">
+	<keyword>FALSE</keyword>
+	<keyword>TRUE</keyword>
+    </context>
+
+    <context id="operators" style-ref="operator" extend-parent="false">
+      <match>[-%\+/\*\=|&amp;&lt;&gt;()]</match>
+    </context>
+
+    <context id="wrapper" style-ref="wrapperfunc">
+	<keyword>INIT</keyword>
+	<keyword>HUGOPTIONS</keyword>
+	<keyword>PROPERTY</keyword>
+	<keyword>GETPROPERTY</keyword>
+	<keyword>SETPROPERTY</keyword>
+	<keyword>QUIT</keyword>
+	<keyword>DRAW</keyword>
+	<keyword>HIDE</keyword>
+	<keyword>SHOW</keyword>
+	<keyword>WINDOW</keyword>
+	<keyword>DISPLAY</keyword>
+	<keyword>REGISTER</keyword>
+	<keyword>METHOD</keyword>
+	<keyword>TEXT</keyword>
+	<keyword>GET</keyword>
+	<keyword>NOTEBOOK</keyword>
+	<keyword>BUTTON</keyword>
+	<keyword>STOCK</keyword>
+	<keyword>TOGGLE</keyword>
+	<keyword>CHECK</keyword>
+	<keyword>RADIO</keyword>
+	<keyword>ENTRY</keyword>
+	<keyword>PASSWORD</keyword>
+	<keyword>MARK</keyword>
+	<keyword>COMBO</keyword>
+	<keyword>HSEPARATOR</keyword>
+	<keyword>VSEPARATOR</keyword>
+	<keyword>SEPARATOR</keyword>
+	<keyword>REMOVE</keyword>
+	<keyword>FRAME</keyword>
+	<keyword>EDIT</keyword>
+	<keyword>LIST</keyword>
+	<keyword>MSGDIALOG</keyword>
+	<keyword>FILEDIALOG</keyword>
+	<keyword>SPIN</keyword>
+	<keyword>IMAGE</keyword>
+	<keyword>CANVAS</keyword>
+	<keyword>CLIPBOARD</keyword>
+	<keyword>PROGRESSBAR</keyword>
+	<keyword>CALLBACK</keyword>
+	<keyword>CALLBACKX</keyword>
+	<keyword>MOUSE</keyword>
+	<keyword>CIRCLE</keyword>
+	<keyword>PIXEL</keyword>
+	<keyword>LINE</keyword>
+	<keyword>SQUARE</keyword>
+	<keyword>OUT</keyword>
+	<keyword>PICTURE</keyword>
+	<keyword>ATTACH</keyword>
+	<keyword>TIMEOUT</keyword>
+	<keyword>FONT</keyword>
+	<keyword>DISABLE</keyword>
+	<keyword>ENABLE</keyword>
+	<keyword>FOCUS</keyword>
+	<keyword>UNFOCUS</keyword>
+	<keyword>SCREENSIZE</keyword>
+	<keyword>KEY</keyword>
+	<keyword>RESETKEY</keyword>
+	<keyword>WIDGET</keyword>
+	<keyword>SYNC</keyword>
+	<keyword>INIT</keyword>
+	<keyword>HSLIDER</keyword>
+	<keyword>VSLIDER</keyword>
+	<keyword>SLIDER</keyword>
+	<keyword>ISPRIME</keyword>
+	<keyword>PRECISION</keyword>
+	<keyword>FCOMPARE</keyword>
+	<keyword>BACKEND</keyword>
+	<keyword>FULLSCREEN</keyword>
+	<keyword>ARC</keyword>
+	<keyword>TRIANGLE</keyword>
+	<keyword>POLYGON</keyword>
+	<keyword>QBEZIER</keyword>
+	<keyword>CBEZIER</keyword>
+	<keyword>PAINT</keyword>
+	<keyword>GETINK</keyword>
+	<keyword>FLIP</keyword>
+	<keyword>GRID</keyword>
+	<keyword>INK</keyword>
+	<keyword>PEN</keyword>
+	<keyword>ROTATION</keyword>
+	<keyword>SCALE</keyword>
+	<keyword>MOVE</keyword>
+	<keyword>CLS</keyword>
+	<keyword>WAITKEY</keyword>
+	<keyword>PENUP</keyword>
+	<keyword>PENDOWN</keyword>
+	<keyword>PENXY</keyword>
+	<keyword>PENTYPE</keyword>
+	<keyword>TURNRIGHT</keyword>
+	<keyword>TURN</keyword>
+	<keyword>TURNLEFT</keyword>
+	<keyword>RESETANGLE</keyword>
+	<keyword>LOADFONT</keyword>
+	<keyword>WIDTH</keyword>
+	<keyword>HEIGHT</keyword>
+	<keyword>REFRESH</keyword>
+	<keyword>FONTALIGN</keyword>
+	<keyword>TEXTLEN</keyword>
+	<keyword>OUTLINE</keyword>
+	<keyword>FRAMES</keyword>
+	<keyword>DELAY</keyword>
+    </context>
+
+    <context id="wrapperstr" style-ref="wrapperfunc">
+	<match extended="true">
+	    \bGRAB\$|\bGETCOLOR\$|\bHUGLIB\$|\bHUGVERSION\$|\bADD\$|\bSUBSTRACT\$|\bMULTIPLY\$|\bDIVIDE\$|\bMODULO\$|\bPOWER\$|\bSQUARE\$|\bROOT\$|\bFADD\$|\bFSUBSTRACT\$|\bFMULTIPLY\$|\bFDIVIDE\$|\bFPOWER\$|\bFIBONACCI\$|\bFACTORIAL\$|\bNEXTPRIME\$|\bFSQUARE\$|\bGCD\$
+	</match>
+    </context>
+
+    <context id="bacon">
+	<include>
+	    <context ref="def:shebang" style-ref="shebang"/>
+	    <context ref="line-comment"/>
+	    <context ref="old-style-comment"/>
+            <context ref="multiline-comment"/>
+	    <context ref="string"/>
+	    <context ref="strfunction"/>
+	    <context ref="function"/>
+	    <context ref="keywords"/>
+	    <context ref="special-constants"/>
+	    <context ref="types"/>
+	    <context ref="boolean"/>
+	    <context ref="operators"/>
+	    <context ref="wrapper"/>
+	    <context ref="wrapperstr"/>
+	</include>
+    </context>
+
+</definitions>
+
+</language>

@@ -1,0 +1,187 @@
+<HTML>
+<TITLE>ocstring Specification Sheet</TITLE>
+<H1>ocstring Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 1997,98,99,2003,09,14.  All Rights Reserved.<P>
+<H1>String</H1>
+<B>Inherits from:</B> Array<P>
+<H2>Class Description</H2>
+Strings are used to hold conventional, NULL-terminated C strings of characters.  String objects can, unlike ordinary C strings, easily be added to collections or sets.  They are also very useful as keys in a dictionary object.<P>
+New instances are usually created via <B>str:</B>, which initializes the object to a copy of the argument (a C string).  Another factory method is the <B>sprintf:</B> method which supports the options of the C library function, <I>sprintf()</I>.<P>
+It's possible to compare <B>String</B> instances using the methods <B>compare:</B> and <B>dictCompare:</B>.  These methods return an integer which is less than, equal to, or greater than zero, if the receiver is less than, equal to, or greater than the argument object.<P>
+You can randomly access the characters in a string object using the <B>charAt:</B> and <B>charAt:put:</B> methods.  The latter method replaces the character at the indicated offset by a new character, and returns the old value.<P>
+Finally, using such methods as <B>toLower</B>, <B>toUpper</B> etc., instances can do various conversions on their contents.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#0">new</A></LI>
+<LI><A HREF="#1">new:</A></LI>
+<LI><A HREF="#2">str:</A></LI>
+<LI><A HREF="#3">chars:count:</A></LI>
+<LI><A HREF="#5">sprintf:</A></LI>
+<LI><A HREF="#6">copy</A></LI>
+<LI><A HREF="#7">deepCopy</A></LI>
+<LI><A HREF="#8">free</A></LI>
+</UL>
+<H3><B>Comparison</B></H3>
+<UL>
+<LI><A HREF="#10">compare:</A></LI>
+<LI><A HREF="#11">compareSTR:</A></LI>
+<LI><A HREF="#12">hash</A></LI>
+<LI><A HREF="#13">dictCompare:</A></LI>
+<LI><A HREF="#14">isEqual:</A></LI>
+<LI><A HREF="#15">isEqualSTR:</A></LI>
+</UL>
+<H3><B>Interrogation</B></H3>
+<UL>
+<LI><A HREF="#17">size</A></LI>
+<LI><A HREF="#18">charAt:</A></LI>
+<LI><A HREF="#19">charAt:put:</A></LI>
+</UL>
+<H3><B>Concatenation</B></H3>
+<UL>
+<LI><A HREF="#20">strcat:</A></LI>
+<LI><A HREF="#21">concat:</A></LI>
+<LI><A HREF="#22">concatSTR:</A></LI>
+<LI><A HREF="#23">concatenateSTR:</A></LI>
+<LI><A HREF="#24">at:insert:count:</A></LI>
+<LI><A HREF="#25">at:insert:</A></LI>
+<LI><A HREF="#26">deleteFrom:to:</A></LI>
+<LI><A HREF="#27">assignSTR:</A></LI>
+<LI><A HREF="#28">assignSTR:length:</A></LI>
+</UL>
+<H3><B>Format Conversions</B></H3>
+<UL>
+<LI><A HREF="#29">asDouble</A></LI>
+<LI><A HREF="#30">asInt</A></LI>
+<LI><A HREF="#31">asLong</A></LI>
+<LI><A HREF="#32">asSTR:maxSize:</A></LI>
+<LI><A HREF="#33">str</A></LI>
+<LI><A HREF="#34">strCopy</A></LI>
+</UL>
+<H3><B>Conversions</B></H3>
+<UL>
+<LI><A HREF="#35">toLower</A></LI>
+<LI><A HREF="#36">toUpper</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#37">printOn:</A></LI>
+</UL>
+<H3><B>Archiving</B></H3>
+<UL>
+<LI><A HREF="#38">fileOutOn:</A></LI>
+<LI><A HREF="#39">fileInFrom:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">new</A></H3>
+<BLOCKQUOTE>+<B>new</B></BLOCKQUOTE>
+Creates an instance whose value is set to the empty string.<P>
+<H3><A NAME="1">new:</A></H3>
+<BLOCKQUOTE>+<B>new</B>:(unsigned)<I>nChars</I></BLOCKQUOTE>
+Creates an instance whose value is set to the empty string, can hold at least <I>nChars</I> without having to expand.<P>
+<H3><A NAME="2">str:</A></H3>
+<BLOCKQUOTE>+<B>str</B>:(STR)<I>aString</I></BLOCKQUOTE>
+Creates an instance whose value is set to a copy of <I>aString</I>.  If <I>aString</I> is NULL, creates an instance whose value is set to the empty string. <P>
+<H3><A NAME="3">chars:count:</A></H3>
+<BLOCKQUOTE>+<B>chars</B>:(STR)<I>aString</I><B>count</B>:(int)<I>n</I></BLOCKQUOTE>
+Creates an instance whose value is set to a copy of the <I>n</I> first characters of <I>aString</I>, and NULL-terminates the copy of characters.  The array of characters <I>aString</I> doesn't have to be NULL-terminated itself.  If <I>aString</I> is NULL, the method creates an instance whose value is set to the empty string. <P>
+<H3><A NAME="5">sprintf:</A></H3>
+<BLOCKQUOTE>+<B>sprintf</B>:(STR)<I>format,...</I></BLOCKQUOTE>
+Returns a new instace initialized just as the standard C library <I>sprintf()</I>.  See the documentation on <I>sprintf()</I> for the formats and variable declarations.<P>
+<H3><A NAME="6">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Returns a copy of the receiver with its internal C string copied as well.<P>
+<B>See also:</B> - strCopy<P>
+<H3><A NAME="7">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+For this class, this method acts as <B>copy</B>.<P>
+<H3><A NAME="8">free</A></H3>
+<BLOCKQUOTE>-<B>free</B></BLOCKQUOTE>
+Frees the receiver and its internal C string as well.<P>
+<H3><A NAME="10">compare:</A></H3>
+<BLOCKQUOTE>- (int)<B>compare</B>:<I>aStr</I></BLOCKQUOTE>
+Compares the receiver's string to another instance of this class (or its subclasses).  Comparison works by sending <I>aStr</I> a <B>str</B> message, and comparing the null terminated C strings.  Returns the comparison value (0 if the strings are equal).<P>
+<H3><A NAME="11">compareSTR:</A></H3>
+<BLOCKQUOTE>- (int)<B>compareSTR</B>:(STR)<I>aString</I></BLOCKQUOTE>
+Compares the receiver's string to <I>aString</I>.  Returns the comparison value.<P>
+<H3><A NAME="12">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a hash value based upon the contents of the string held in the receiver.<P>
+<H3><A NAME="13">dictCompare:</A></H3>
+<BLOCKQUOTE>- (int)<B>dictCompare</B>:<I>aStr</I></BLOCKQUOTE>
+Compares the receiver's string to another instance of this class, or its subclasses, according to <I>dictionary ordering</I>, i.e., all characters other than letters and numbers are ignored and case is ignored.  Returns the comparison value.<P>
+<H3><A NAME="14">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>aStr</I></BLOCKQUOTE>
+Returns YES if the value contained by <I>aStr</I> is equal to the contents of the receiver.<P>
+<H3><A NAME="15">isEqualSTR:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqualSTR</B>:(STR)<I>aString</I></BLOCKQUOTE>
+Returns YES if the ordinary C string <I>aString</I> is equal to the contents of the receiver.<P>
+<H3><A NAME="17">size</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>size</B></BLOCKQUOTE>
+Returns the number of actual characters in the string, excluding the NULL terminator.<P>
+<H3><A NAME="18">charAt:</A></H3>
+<BLOCKQUOTE>- (char)<B>charAt</B>:(unsigned)<I>anOffset</I></BLOCKQUOTE>
+Returns the character at <I>anOffset</I> or <B>zero</B> if <I>anOffset</I> is greater than the length of the C string.<P>
+<H3><A NAME="19">charAt:put:</A></H3>
+<BLOCKQUOTE>- (char)<B>charAt</B>:(unsigned)<I>anOffset</I><B>put</B>:(char)<I>aChar</I></BLOCKQUOTE>
+Replaces the character at <I>anOffset</I> with <I>aChar</I> and returns the old character which was in that location.  Returns <B>zero</B> if <I>anOffset</I> is greater than the length of the C string.<P>
+<H3><A NAME="20">strcat:</A></H3>
+<BLOCKQUOTE>- (STR)<B>strcat</B>:(STR)<I>aBuffer</I></BLOCKQUOTE>
+Concatenates the receiver's C string to <I>aBuffer</I>.  No length checking is possible to ensure that <I>aBuffer</I> is large enough.  Returns <I>aBuffer</I>.<P>
+<H3><A NAME="21">concat:</A></H3>
+<BLOCKQUOTE>-<B>concat</B>:<I>aString</I></BLOCKQUOTE>
+Concatenates <I>aString</I> (any instance that responds to <B>str</B>) to the end of the receiver.  Returns <B>self</B>.<P>
+<B>Note:</B> Since version 3.2.10, this method works correctly when the argument is the same object as the receiver.<P>
+<H3><A NAME="22">concatSTR:</A></H3>
+<BLOCKQUOTE>-<B>concatSTR</B>:(STR)<I>aString</I></BLOCKQUOTE>
+Concatenates <I>aString</I>, an ordinary C string, to the end of the receiver.  Returns <B>self</B>.<P>
+<H3><A NAME="23">concatenateSTR:</A></H3>
+<BLOCKQUOTE>-<B>concatenateSTR</B>:(STR)<I>aString</I></BLOCKQUOTE>
+Same as concatSTR.  For Stepstone compatibility.<P>
+<H3><A NAME="24">at:insert:count:</A></H3>
+<BLOCKQUOTE>-<B>at</B>:(unsigned)<I>anOffset</I><B>insert</B>:(char*)<I>aString</I><B>count</B>:(int)<I>n</I></BLOCKQUOTE>
+<H3><A NAME="25">at:insert:</A></H3>
+<BLOCKQUOTE>-<B>at</B>:(unsigned)<I>anOffset</I><B>insert</B>:<I>aString</I></BLOCKQUOTE>
+<H3><A NAME="26">deleteFrom:to:</A></H3>
+<BLOCKQUOTE>-<B>deleteFrom</B>:(unsigned)<I>p</I><B>to</B>:(unsigned)<I>q</I></BLOCKQUOTE>
+<H3><A NAME="27">assignSTR:</A></H3>
+<BLOCKQUOTE>-<B>assignSTR</B>:(STR)<I>aString</I></BLOCKQUOTE>
+Copies the C string <I>aString</I> into the receiver's string.  Returns the receiver.<P>
+<H3><A NAME="28">assignSTR:length:</A></H3>
+<BLOCKQUOTE>-<B>assignSTR</B>:(STR)<I>aString</I><B>length</B>:(unsigned)<I>nChars</I></BLOCKQUOTE>
+Copies the C string <I>aString</I> into the receiver's string, truncating at <I>nChars</I>.  Returns the receiver.<P>
+<H3><A NAME="29">asDouble</A></H3>
+<BLOCKQUOTE>- (double)<B>asDouble</B></BLOCKQUOTE>
+Returns the double value of the C string, using the standard C function <B>atof()</B>.<P>
+<H3><A NAME="30">asInt</A></H3>
+<BLOCKQUOTE>- (int)<B>asInt</B></BLOCKQUOTE>
+Returns the integer value of the C string, using the standard C function <B>atoi()</B>.<P>
+<H3><A NAME="31">asLong</A></H3>
+<BLOCKQUOTE>- (long)<B>asLong</B></BLOCKQUOTE>
+Returns the long value of the C string, using the standard C function <B>atol()</B>.<P>
+<H3><A NAME="32">asSTR:maxSize:</A></H3>
+<BLOCKQUOTE>-<B>asSTR</B>:(STR)<I>aBuffer</I><B>maxSize</B>:(int)<I>aSize</I></BLOCKQUOTE>
+Copies the value of the object into <I>aBuffer</I>, truncating at <I>aSize</I>, and returns the receiver.<P>
+<H3><A NAME="33">str</A></H3>
+<BLOCKQUOTE>- (STR)<B>str</B></BLOCKQUOTE>
+Returns a pointer to the NULL-terminated C string stored in the receiver.<P>
+<H3><A NAME="34">strCopy</A></H3>
+<BLOCKQUOTE>- (STR)<B>strCopy</B></BLOCKQUOTE>
+Returns a <B>OC_MallocAtomic()</B>'ed copy of the NULL-terminated C string stored in the receiver.  You are responsible for <B>OC_Free()</B>'ing the pointer.<P>
+<H3><A NAME="35">toLower</A></H3>
+<BLOCKQUOTE>-<B>toLower</B></BLOCKQUOTE>
+Converts the receiver string to lower case.<P>
+<H3><A NAME="36">toUpper</A></H3>
+<BLOCKQUOTE>-<B>toUpper</B></BLOCKQUOTE>
+Converts the receiver string to upper case.<P>
+<H3><A NAME="37">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints the string to <I>aFile</I> without appending a newline.  Returns the receiver.<P>
+<H3><A NAME="38">fileOutOn:</A></H3>
+<BLOCKQUOTE>-<B>fileOutOn</B>:<I>aFiler</I></BLOCKQUOTE>
+Writes the string on <I>aFiler</I>.  Returns the receiver.<P>
+<H3><A NAME="39">fileInFrom:</A></H3>
+<BLOCKQUOTE>-<B>fileInFrom</B>:<I>aFiler</I></BLOCKQUOTE>
+Reads a string object from <I>aFiler</I>.  Returns the receiver.<P>

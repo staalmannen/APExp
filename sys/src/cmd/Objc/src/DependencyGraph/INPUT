@@ -1,0 +1,8 @@
+main initialize compute terminate
+initialize openInputFile
+compute phaseOne phaseTwo
+terminate closeInputFile closeOutputFile
+phaseOne
+phaseTwo phaseOne
+phaseThree compute terminate
+

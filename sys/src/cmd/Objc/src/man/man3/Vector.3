@@ -1,0 +1,770 @@
+.TH "vector" 3 "Mar 12, 2023"
+.SH Vector
+.PP
+.B
+Inherits from:
+
+CAObject
+.PP
+.B
+Maturity Index:
+
+Relatively mature
+.SH Class Description
+.PP
+A vector consists of a number of 
+.I
+scalars
+that can be arbitrary Computer Algebra Kit objects, but they currently have to be either floating-point or elements of a field (see 
+.B
+inField
+) or elements of an integral domain (see 
+.B
+inIntegralDomain
+)\&.
+.PP
+There are methods to access, insert and remove scalars\&.  It\&'s also possible to place or replace a scalar directly at a given index\&.  See the documentation on 
+.B
+eachScalar
+to access the scalar at a given index\&.
+.PP
+.B
+Note:
+
+Vector objects are meant for computational tasks\&.  They are no substitute for List or Collection objects, that are better suited for the purpose of storing objects\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* collection:
+.br
+* scalarZero:numScalars:
+.br
+* copy
+.br
+* deepCopy
+.RE
+.PP 
+.B
+Identity
+.RS 3
+.br
+* scalarZero
+.br
+* numScalars
+.br
+* hash
+.br
+* isEqual:
+.RE
+.PP 
+.B
+Insertion Scalars
+.RS 3
+.br
+* insertScalar:
+.br
+* insertScalar:at:
+.RE
+.PP 
+.B
+Removing Scalars
+.RS 3
+.br
+* removeScalar
+.br
+* removeScalarAt:
+.RE
+.PP 
+.B
+Placing and Replacing
+.RS 3
+.br
+* placeScalar:at:
+.br
+* replaceScalarAt:with:
+.br
+* asCollection
+.br
+* asNumerical
+.br
+* asModp:
+.br
+* onCommonDenominator:
+.RE
+.PP 
+.B
+Accessing Scalars
+.RS 3
+.br
+* eachScalar
+.br
+* floatValueAt:
+.br
+* intValueAt:
+.RE
+.PP 
+.B
+Addition
+.RS 3
+.br
+* zero
+.br
+* isZero
+.br
+* isOpposite:
+.br
+* negate
+.br
+* double
+.br
+* add:
+.br
+* subtract:
+.br
+* addScalar:at:
+.br
+* subtractScalar:at:
+.RE
+.PP 
+.B
+Scalar Multiplication
+.RS 3
+.br
+* multiplyScalar:
+.br
+* divideScalar:
+.RE
+.PP 
+.B
+Multiplication
+.RS 3
+.br
+* dotSquare
+.br
+* dotMultiply:
+.br
+* multiplyLeftMatrix:
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+collection:
+.RS 1
++
+.B
+collection
+:
+.I
+aCltn
+.RE
+.PP
+Creates a vector containing references to the scalars from 
+.I
+aCltn
+\&.  The collection must not be empty\&.
+.PP 
+scalarZero:numScalars:
+.RS 1
++
+.B
+scalarZero
+:
+.I
+aScalarZero
+.B
+numScalars
+:(int)
+.I
+numScalars
+.RE
+.PP
+Creates a new vector with 
+.I
+numScalars
+zero scalars\&.
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Returns a new vector\&. 
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+Returns a new vector\&.  Sends 
+.B
+deepCopy
+messages to the scalars in the vector\&.
+.PP 
+scalarZero
+.RS 1
+-
+.B
+scalarZero
+.RE
+.PP
+Returns the zero scalar element\&. 
+.PP 
+numScalars
+.RS 1
+- (
+int
+)
+.B
+numScalars
+.RE
+.PP
+Returns the number of scalar objects in the vector\&.  Returns 0 if the vector is empty\&.  The first scalar in the vector is at index 0, the last scalar at 
+.I
+numScalars
+minus one\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a small integer that is the same for objects that are equal (in the sense of 
+.B
+isEqual:
+)\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+b
+.RE
+.PP
+Whether the two objects are equal\&.  Returns YES if the objects are pointer equal\&.
+.PP 
+insertScalar:
+.RS 1
+-
+.B
+insertScalar
+:
+.I
+aScalar
+.RE
+.PP
+Inserts 
+.I
+aScalar
+as first entry and returns 
+.B
+self
+\&.  The object 
+.I
+aScalar
+belongs to the vector after insertion, and is not necessarily copied\&.  To insert a scalar, the reference count of the vector should be equal to one\&.
+.PP 
+insertScalar:at:
+.RS 1
+-
+.B
+insertScalar
+:
+.I
+aScalar
+.B
+at
+:(int)
+.I
+i
+.RE
+.PP
+Inserts 
+.I
+aScalar
+as i-th entry and returns 
+.B
+self
+\&.  The object 
+.I
+aScalar
+belongs to the vector after insertion, and is not necessarily copied\&.  If 
+.I
+i
+is equal to zero, this method is identical to 
+.B
+-insertScalar:
+\&.  If 
+.I
+i
+is equal to 
+.B
+numScalars
+, this method inserts the scalar as last element\&.
+.PP 
+removeScalar
+.RS 1
+-
+.B
+removeScalar
+.RE
+.PP
+Removes (and returns) the first scalar in the vector (the scalar at index 0)\&.  Returns 
+.B
+nil
+if there were no more elements left\&.  This can be used in the following way :
+.RS 3
+
+while ((c = [vector removeScalar])) { /* do something with c */ }
+.br
+
+.RE
+.PP
+To remove a scalar, the reference count of the vector should be equal to one\&.
+.PP 
+removeScalarAt:
+.RS 1
+-
+.B
+removeScalarAt
+:(int)
+.I
+i
+.RE
+.PP
+Removes and returns the i-th scalar in the vector\&.  If 
+.I
+i
+is zero, this method is identical to 
+.B
+removeScalar
+\&.  Unlike 
+.B
+removeScalar
+, which returns 
+.B
+nil
+if there are no more scalars in the vector, this method generates an error message if you attempt to remove a scalar at an illegal index\&.
+.PP 
+placeScalar:at:
+.RS 1
+-
+.B
+placeScalar
+:
+.I
+aScalar
+.B
+at
+:(int)
+.I
+i
+.RE
+.PP
+Frees the scalar at position 
+.I
+i
+and replaces it by the scalar object 
+.I
+aScalar
+\&.  Returns 
+.B
+self
+\&.  The scalar 
+.I
+aScalar
+belongs to the receiving vector object; it is not necessarily copied\&.  This is similar to List\&'s -addObject: method\&.  It is an error to use an illegal index 
+.I
+i
+or to attempt to set a scalar in a vector whose reference count is not equal to one\&.
+.PP 
+replaceScalarAt:with:
+.RS 1
+-
+.B
+replaceScalarAt
+:(int)
+.I
+i
+.B
+with
+:
+.I
+aScalar
+.RE
+.PP
+Similar to 
+.B
+placeScalar:at:
+but returns the scalar at position 
+.I
+i
+after replacing it by 
+.I
+aScalar
+\&.  It is an error to use an illegal index 
+.I
+i
+or to attempt to replace a scalar in a vector whose reference count is not equal to one\&.
+.PP 
+asCollection
+.RS 1
+-
+.B
+asCollection
+.RE
+.PP
+Returns a new collection containing new references to the scalars in the vector\&.
+.PP 
+asNumerical
+.RS 1
+-
+.B
+asNumerical
+.RE
+.PP
+Returns a new vector, whose scalars are the numerical value of the scalars of the original vector\&.
+.PP 
+asModp:
+.RS 1
+-
+.B
+asModp
+:(unsigned short)
+.I
+p
+.RE
+.PP
+Returns a new vector, whose scalars are the value of the scalars of the original vector mod 
+.I
+p
+\&.
+.PP 
+onCommonDenominator:
+.RS 1
+-
+.B
+onCommonDenominator
+:(id *)
+.I
+denominator
+.RE
+.PP
+Puts a vector with fractional scalars on a common denominator\&.  Returns a new vector with integral scalars, and, by reference, the common denominator of the scalars in the vector\&.
+.PP 
+eachScalar
+.RS 1
+-
+.B
+eachScalar
+.RE
+.PP
+Returns a new sequence object that gives access to the scalars of the vector\&.
+.PP 
+floatValueAt:
+.RS 1
+- (
+float
+)
+.B
+floatValueAt
+:(int)
+.I
+i
+.RE
+.PP
+Returns the 
+.B
+floatValue
+of the scalar at the 
+.I
+i
+-th position\&.
+.PP 
+intValueAt:
+.RS 1
+- (
+int
+)
+.B
+intValueAt
+:(int)
+.I
+i
+.RE
+.PP
+Returns the 
+.B
+intValue
+of the scalar at the 
+.I
+i
+-th position\&.
+.PP 
+zero
+.RS 1
+-
+.B
+zero
+.RE
+.PP
+Returns a vector of the same dimension as the object that receives the message, but all filled with zero scalars\&.
+.PP 
+isZero
+.RS 1
+- (
+BOOL
+)
+.B
+isZero
+.RE
+.PP
+Whether the object is equal to zero\&.
+.PP 
+isOpposite:
+.RS 1
+- (
+BOOL
+)
+.B
+isOpposite
+:
+.I
+b
+.RE
+.PP
+Whether the object is the opposite of 
+.I
+b
+\&.
+.PP 
+negate
+.RS 1
+-
+.B
+negate
+.RE
+.PP
+Returns the opposite of the object\&.
+.PP 
+double
+.RS 1
+-
+.B
+double
+.RE
+.PP
+Returns a new object, equal to the object multiplied by two i\&.e\&., added to itself\&.
+.PP 
+add:
+.RS 1
+-
+.B
+add
+:
+.I
+b
+.RE
+.PP
+Adds 
+.I
+b
+to the object\&.  Returns a new object\&.
+.PP 
+subtract:
+.RS 1
+-
+.B
+subtract
+:
+.I
+b
+.RE
+.PP
+Subtracts 
+.I
+b
+from the object\&.  Returns a new object\&.
+.PP 
+addScalar:at:
+.RS 1
+-
+.B
+addScalar
+:
+.I
+s
+.B
+at
+:(int)
+.I
+i
+.RE
+.PP
+Returns a 
+.B
+new
+vector\&.  Adds 
+.I
+s
+to the scalar at position 
+.I
+i
+, and replaces the scalar by the sum\&.  
+.I
+i
+must be between 0 and the number of scalars in the vector\&.  This method is 
+.I
+not
+an insertion method\&.
+.PP
+.B
+See also:
+
+insertScalar:at:, replaceScalar:at:
+.PP 
+subtractScalar:at:
+.RS 1
+-
+.B
+subtractScalar
+:
+.I
+s
+.B
+at
+:(int)
+.I
+i
+.RE
+.PP
+Returns a 
+.B
+new
+vector\&.  Subtracts 
+.I
+s
+from the scalar at position 
+.I
+i
+\&.  
+.I
+i
+must be between 0 and the number of scalars in the vector\&.  This method is 
+.I
+not
+an insertion method\&.
+.PP 
+multiplyScalar:
+.RS 1
+-
+.B
+multiplyScalar
+:
+.I
+s
+.RE
+.PP
+Multiplies by the scalar 
+.I
+s
+\&.  Returns a new object\&.
+.PP 
+divideScalar:
+.RS 1
+-
+.B
+divideScalar
+:
+.I
+s
+.RE
+.PP
+Exact division by the scalar 
+.I
+s
+\&.  Returns a new object, or 
+.B
+nil
+if the division is not exact\&.
+.PP 
+dotSquare
+.RS 1
+-
+.B
+dotSquare
+.RE
+.PP
+Returns a new scalar product, the dot product of the vector by itself, defined as the sum of squares of the scalars in the vector\&.
+.PP 
+dotMultiply:
+.RS 1
+-
+.B
+dotMultiply
+:
+.I
+aVector
+.RE
+.PP
+Returns a new scalar product, the dot product of the vector 
+.I
+self
+by 
+.I
+aVector
+, defined as the sum of the products of the scalars in the vectors\&.
+.PP 
+multiplyLeftMatrix:
+.RS 1
+-
+.B
+multiplyLeftMatrix
+:
+.I
+aMatrix
+.RE
+.PP
+Returns a new vector, the product of 
+.I
+aMatrix
+by the column vector 
+.I
+self
+\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints, between braces, a comma separated list of the scalars (by sending   
+.B
+printOn:
+messages to the scalars)\&.

@@ -1,0 +1,1067 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Computer Algebra Kit (c) 1993,00 by Comp.Alg.Objects.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 CAObject\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} Object\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Maturity Index:}} Relatively mature\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 CAObject is the root class of the Computer Algebra Kit.  It implements functionality that is inherited by all Computer Algebra Kit objects and defines a number of methods that inheriting classes are expected to override, thus establishing interface conventions that must be followed by all classes.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Arithmetic\b0\f0\fs16\
+\
+\f0\fs28\li2200 Classes like Polynomial or Matrix work over arbitrary coefficient domains.   The interface to basic arithmetical operations that is declared by CAObject, is designed to support this important feature.\fs16\
+\
+\f0\fs28\li2200 Arithmetical operations such as {\b multiply:} or {\b add:} are defined only on instances of the same class, or more precisely on objects for which {\b sameClass:} returns YES.  The algebraic properties of a set (class) of objects is tested by sending messages to an element of the set (for example {\b inOrderedSet}), and control the algorithms being used.  Nullary operators, like obtaining the unity element of a set, are made unary : the unity element of a set is obtained by sending {\b one} to an arbitrary element of the set.\fs16\
+\
+\f0\fs28\li2200 For example, for two Integer objects, {\b sameClass:} simply returns YES, but for two IntegerModp objects, {\b sameClass:} returns YES if and only if the moduli are equal.  This means that you can sum, using {\b add:}, any pair of Integer instances, but that you cannot add an object mod {\i p} to an object mod {\i q}.  Also, you cannot add a Integer instance to a IntegerModp instance using the {\b add:} method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Class Methods}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- cakitRevision\
+	- str:\
+	- int:\
+	- copy\
+	- deepCopy\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Class of an Object}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- sameClass:\
+	- differentClass:\
+	- isKindOfSequence\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Coercion}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- str\
+	- str:\
+	- intValue\
+	- intValue:\
+	- asModp:\
+	- isFloatingPoint\
+	- asNumerical\
+	- floatValue\
+	- floatValue:\
+	- asTotalFraction\
+	- asScalar\
+	- asSymbol\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Equality}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- isEqual:\
+	- notEqual:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Comparing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- inOrderedSet\
+	- compare:\
+	- sign\
+	- isLess:\
+	- isGreater:\
+	- isLessEqual:\
+	- isGreaterEqual:\
+	- absValue\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Addition}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- inAdditiveSemiGroup\
+	- inAdditiveMonoid\
+	- inAdditiveGroup\
+	- isZero\
+	- notZero\
+	- isOpposite:\
+	- notOpposite:\
+	- zero\
+	- negate\
+	- add:\
+	- subtract:\
+	- increment\
+	- decrement\
+	- multiplyIntValue:\
+	- double\
+	- quadruple\
+	- divideIntValue:\
+	- half\
+	- quarter\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Multiplication}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- commutes\
+	- commutesWith:\
+	- inSemiGroup\
+	- inMonoid\
+	- inGroup\
+	- one\
+	- minusOne\
+	- isOne\
+	- notOne\
+	- isMinusOne\
+	- notMinusOne\
+	- square\
+	- multiply:\
+	- power:\
+	- inverse\
+	- isUnit\
+	- notUnit\
+	- divide:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Division with Remainder}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- remainder:quotient:\
+	- remainder:\
+	- quotient:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Greatest Common Divisor}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- inEuclideanDomain\
+	- isCoprime:\
+	- notCoprime:\
+	- isGcd::\
+	- isLcm::\
+	- gcd:\
+	- bezout:gcd:\
+	- lcm:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Modular Arithmetic}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- modulo:\
+	- multiply:modulo:\
+	- squareModulo:\
+	- power:modulo:\
+	- genpower:modulo:\
+	- inverseModulo:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Random}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- random\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Characteristic}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- characteristic\
+	- isCharacteristicZero\
+	- notCharacteristicZero\
+	- isCharacteristicTwo\
+	- notCharacteristicTwo\
+	- frobenius\
+	- frobeniusInverse\
+	- dimensionOverPrimeField\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Addition and Multiplication}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- inRing\
+	- inIntegralDomain\
+	- inField\
+	- inFieldOfFractions\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Scalar Multiplication}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- scalarZero\
+	- scalarContent\
+	- divideScalarContent\
+	- multiplyScalar:\
+	- divideScalar:\
+	- addScalar:\
+	- subtractScalar:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printsLeadingSign\
+	- printsSum\
+	- printsProduct\
+	- printOn:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 cakitRevision\f0\b0\
+\f0\fs28\li2500 + (STR){\b cakitRevision}\fs16\
+\
+\f0\fs28\li2200 This method returns the value of the revision string {\b __cakit_revision__} (declared in the header file cakit/cakit.h), as it was when the Computer Algebra Kit was built.  The string in the header file that you're using should match the string returned by this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 str:\f0\b0\
+\f0\fs28\li2500 +{\b str}:(STR){\i aString}\fs16\
+\
+\f0\fs28\li2200 Creates an object given a string description.  No default implementation.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 int:\f0\b0\
+\f0\fs28\li2500 +{\b int}:(int){\i intValue}\fs16\
+\
+\f0\fs28\li2200 Creates an object given an int value.  No default.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 copy\f0\b0\
+\f0\fs28\li2500 -{\b copy}\fs16\
+\
+\f0\fs28\li2200 Creates a copy of the object by sending {\b copy} to {\b super}.  Sets the reference count of the new object to one.\fs16\
+\
+\f0\fs28\li2200 Subclasses must implement their own versions of {\b copy} to copy additional memory consumed by the copied object.\fs16\
+\
+\f2\fs24\li2800 - copy\
+\{\
+    self = [super copy];\
+    pointer = malloc(nBytes);\
+    return self;\
+\}\
+\f0\fs16\
+\f0\fs28\li2200 Note that the message to {\b super} precedes the code added in the method.  This ensures that copying proceeds in the order of inheritance.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} deepCopy\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deepCopy\f0\b0\
+\f0\fs28\li2500 -{\b deepCopy}\fs16\
+\
+\f0\fs28\li2200 Creates a {\i deep} copy of the object by sending {\b copy} to {\b super}.  Sets the reference count of the new object to one.\fs16\
+\
+\f0\fs28\li2200 Subclasses must implement their own versions of {\b deepCopy} to make a full independent copy of the object.\fs16\
+\
+\f2\fs24\li2800 - deepCopy\
+\{\
+    self = [super deepCopy];\
+    companionObject = [companionObject deepCopy];\
+    return self;\
+\}\
+\f0\fs16\
+\f0\fs28\li2200 {\b {\f1 See also:}} copy\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 sameClass:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b sameClass}:{\i a}\fs16\
+\
+\f0\fs28\li2200 Whether the objects belong to the same class; the default implementation checks whether the {\i isa} pointers of the objects are the same.  Some classes override {\b sameClass:} to impose extra requirements; for example, for integers mod p :\fs16\
+\
+\f2\fs24\li2800 return [super sameClass:a] && [self modulus] == [a modulus];\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 differentClass:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b differentClass}:{\i a}\fs16\
+\
+\f0\fs28\li2200 Whether {\b sameClass:} returns NO.  Don't override this method.  Implement your own version of {\b sameClass:} instead (incorporating a call to {\b super}'s implementation of {\b sameClass:}).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isKindOfSequence\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isKindOfSequence}\fs16\
+\
+\f0\fs28\li2200 Equivalent to :\fs16\
+\
+\f2\fs24\li2800 [self isKindOf:(id)[CASequence class]]\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 str\f0\b0\
+\f0\fs28\li2500 - (STR){\b str}\fs16\
+\
+\f0\fs28\li2200 Returns a string containing a symbolic representation for the object.  Suited for small expressions only since output is unbuffered.  Works by allocating a small buffer and then invoking {\b printOn:} on that buffer to do the actual printing.\fs16\
+\
+\f0\fs28\li2200 You don't have to free the string (it is deallocated when you free or change the object), which makes it easy to use the method as follows :\fs16\
+\
+\f2\fs24\li2800 fprintf(stderr,"Value of this %s is %s\\n",[anObject name],[anObject str]);\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 str:\f0\b0\
+\f0\fs28\li2500 -{\b str}:(STR){\i aString}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, instance of the same class, created from {\i aString} or returns {\b nil} if it's not possible to evaluate {\i aString} in the set.  Note that it's not necessarily true that the string value of the new object is {\i literally} equal to {\i aString}.  There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intValue\f0\b0\
+\f0\fs28\li2500 - (int){\b intValue}\fs16\
+\
+\f0\fs28\li2200 Returns, if it makes sense, the value of the object as C integer.  There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intValue:\f0\b0\
+\f0\fs28\li2500 -{\b intValue}:(int){\i i}\fs16\
+\
+\f0\fs28\li2200 Returns a new object of the same class with {\b intValue} equal to {\i i} or returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asModp:\f0\b0\
+\f0\fs28\li2500 -{\b asModp}:(unsigned short){\i p}\fs16\
+\
+\f0\fs28\li2200 Returns an object that is the value modulo the small prime number {\i p} for the object that receives the message.  For example, an integer object returns a IntegerModp object in response to this method; a matrix returns a matrix with modular values and so on.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isFloatingPoint\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isFloatingPoint}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the object is some kind of floating-point arithmetic.  The default implementation returns NO.  No attempt has been made to integrate floating-point arithmetic into the Computer Algebra Kit's framework of algebraic structures; floating-point numbers are always treated as a special case.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asNumerical\f0\b0\
+\f0\fs28\li2500 -{\b asNumerical}\fs16\
+\
+\f0\fs28\li2200 Returns an object that is the numerical value for the object that receives the message.  For example, an integer object returns a floating-point object as numerical value; a matrix returns a matrix with numerical values and so on.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 floatValue\f0\b0\
+\f0\fs28\li2500 - (float){\b floatValue}\fs16\
+\
+\f0\fs28\li2200 Returns, if it makes sense, the value of the object as C floating-point number.  There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 floatValue:\f0\b0\
+\f0\fs28\li2500 -{\b floatValue}:(float){\i f}\fs16\
+\
+\f0\fs28\li2200 Returns a new object of the same class with {\b floatValue} equal to {\i f} or returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asTotalFraction\f0\b0\
+\f0\fs28\li2500 -{\b asTotalFraction}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction with the numerator set to a new reference to the original object, and with the denominator set to one.  For example, an integer object returns a rational number.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asScalar\f0\b0\
+\f0\fs28\li2500 -{\b asScalar}\fs16\
+\
+\f0\fs28\li2200 Returns a new scalar object or {\b nil} if the object cannot be coerced into a scalar object; there is no default implementation of the method.  Polynomial overrides this method to return a scalar object if the polynomial contains just a single scalar and no symbols, or {\b nil} otherwise.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asSymbol\f0\b0\
+\f0\fs28\li2500 -{\b asSymbol}\fs16\
+\
+\f0\fs28\li2200 Returns a new symbol object or {\b nil} if the object cannot be coerced into a symbol object; there is no default implementation provided.  Polynomial overrides this method to return a symbol object if the polynomial consists of a single symbol raised to the exponent one, or {\b nil} otherwise.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Symbol itself does {\i not} implement this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEqual}:{\i a}\fs16\
+\
+\f0\fs28\li2200 Should test whether the objects are equal.  Returns, by default, YES if the two objects are the same (ie. pointer equal)\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b notEqual}:{\i a}\fs16\
+\
+\f0\fs28\li2200 Whether {\b isEqual:} returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inOrderedSet\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b inOrderedSet}\fs16\
+\
+\f0\fs28\li2200 Whether the object is an element of a (totally) ordered set.  Elements can be compared with {\b compare:} if this method returns YES.  There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 compare:\f0\b0\
+\f0\fs28\li2500 - (int){\b compare}:{\i b}\fs16\
+\
+\f0\fs28\li2200 This method should return -1, 0, or +1 if {\b self} is less than, equal to, or greater than {\i b}.  There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 sign\f0\b0\
+\f0\fs28\li2500 - (int){\b sign}\fs16\
+\
+\f0\fs28\li2200 Returns the sign of the object : plus one if positive (greater than zero), zero if zero and minus one if negative (less than zero).  There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isLess:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isLess}:{\i a}\fs16\
+\
+\f0\fs28\li2200 Tests whether the object is less than (but not equal to) {\i a}.  Defined, by default, in terms of {\b compare:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isGreater:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isGreater}:{\i a}\fs16\
+\
+\f0\fs28\li2200 Tests whether the object is greater than (but not equal to) {\i a}.  Defined, by default, in terms of {\b compare:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isLessEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isLessEqual}:{\i a}\fs16\
+\
+\f0\fs28\li2200 Tests whether the object is less than or equal to {\i a}.  Defined, by default, in terms of {\b compare:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isGreaterEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isGreaterEqual}:{\i a}\fs16\
+\
+\f0\fs28\li2200 Tests whether the object is greater than or equal to {\i a}.  Defined, by default, in terms of {\b compare:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 absValue\f0\b0\
+\f0\fs28\li2500 -{\b absValue}\fs16\
+\
+\f0\fs28\li2200 Returns the absolute value of the object (a new object).  If the object is negative, invokes {\b negate}.  Otherwise returns {\b self}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inAdditiveSemiGroup\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b inAdditiveSemiGroup}\fs16\
+\
+\f0\fs28\li2200 Should return YES if the object is an element of an additive semigroup ie., a set equiped with a (commutative) additive operation, but not necessarily with a unique zero element.  Objects that return YES should be prepared to receive {\b negate}, {\b add:}, {\b subtract:}, {\b zero} and {\b isZero} messages, but a zero element for some object {\i a} is not necessarily the zero object for another object {\i b} of the same class.   For example, the vectors (of variable dimension) have zero elements of different dimension.  There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inAdditiveMonoid\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b inAdditiveMonoid}\fs16\
+\
+\f0\fs28\li2200 Should return YES if the object is an element of an additive monoid ie., an additive semigroup with a unique zero element : if an object returns YES to this method, and if {\b isZero} returns YES, then it is the zero object for all objects of the same class.  However, not every element in the set necessarily has an additive inverse : for example, the set of positive integers contains elements with no additive inverse.  There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inAdditiveGroup\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b inAdditiveGroup}\fs16\
+\
+\f0\fs28\li2200 Should return YES if the object is an element of an additive group ie., an additive monoid with an additive inverse for each element.  There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isZero\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isZero}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the object is equal to zero.  There is no default implementation for this method.\fs16\
+\
+\f0\fs28\li2200 If the object is an element of an additive monoid, the method should test whether the object is the {\i unique} zero element.  Otherwise, {\b isZero} should return YES if the object is the zero element for itself.  Matrices of variable dimension, for example,  have zero elements of different dimension.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notZero\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b notZero}\fs16\
+\
+\f0\fs28\li2200 Whether {\b isZero} returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOpposite:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOpposite}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Should return YES if the objects are additive inverses.  Zero is the only object that is its own additive inverse, unless the characteristic is equal to two.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notOpposite:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b notOpposite}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Whether {\b isOpposite} returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 zero\f0\b0\
+\f0\fs28\li2500 -{\b zero}\fs16\
+\
+\f0\fs28\li2200 Returns a new reference to the zero element.\fs16\
+\
+\f0\fs28\li2200 If the object is an element of an additive monoid, the zero element is unique.  Otherwise, {\b zero} should return an element {\i c} such that {\b self} + {\i c} = 0.  Matrices of variable dimension, for example,  have zero elements of different dimension.\fs16\
+\
+\f0\fs28\li2200 There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 negate\f0\b0\
+\f0\fs28\li2500 -{\b negate}\fs16\
+\
+\f0\fs28\li2200 Returns the opposite of the object (a new object).  There is no default implementation.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 add:\f0\b0\
+\f0\fs28\li2500 -{\b add}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the sum {\i self + b}.  If the object is pointer equal to the argument, this method should be equivalent to {\b double}.  Adding zero returns a new object that is equal to the non-zero object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subtract:\f0\b0\
+\f0\fs28\li2500 -{\b subtract}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, equal to {\i self - b}.  If the object is pointer equal to the argument, this method is equivalent to {\b zero}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 increment\f0\b0\
+\f0\fs28\li2500 -{\b increment}\fs16\
+\
+\f0\fs28\li2200 Adds {\b one} to the object.  Returns a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 decrement\f0\b0\
+\f0\fs28\li2500 -{\b decrement}\fs16\
+\
+\f0\fs28\li2200 Subtracts {\b one} from the object.  Returns a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiplyIntValue:\f0\b0\
+\f0\fs28\li2500 -{\b multiplyIntValue}:(int){\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new object equal to the product {\i self b}.  The default implementation creates an object through {\b -intValue:} and then invokes {\b multiply:}.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} zero, double, quadruple\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 double\f0\b0\
+\f0\fs28\li2500 -{\b double}\fs16\
+\
+\f0\fs28\li2200 Multiplies the object by two.  Returns a new object.  There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 quadruple\f0\b0\
+\f0\fs28\li2500 -{\b quadruple}\fs16\
+\
+\f0\fs28\li2200 Multiplies the object by four.  Returns a new object.\fs16\
+\
+\f0\fs28\li2200 There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideIntValue:\f0\b0\
+\f0\fs28\li2500 -{\b divideIntValue}:(int){\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, the {\i exact} quotient of the object on division by {\i b}.  Returns {\b nil} if the division is not exact or if {\i b} is equal to zero. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 half\f0\b0\
+\f0\fs28\li2500 -{\b half}\fs16\
+\
+\f0\fs28\li2200 Divides the object by two.  Returns a new object, or {\b nil} if the object is not a multiple of two.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 quarter\f0\b0\
+\f0\fs28\li2500 -{\b quarter}\fs16\
+\
+\f0\fs28\li2200 Divides the object by four.  Returns a new object, or {\b nil} if the object is not a multiple of four.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 commutes\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b commutes}\fs16\
+\
+\f0\fs28\li2200 Should return YES if multiplication is commutative for all elements of the set that the object belongs to.  There is no default implemenation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 commutesWith:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b commutesWith}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Should return YES if multiplication is commutative for the two objects.  There is no default implemenation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inSemiGroup\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b inSemiGroup}\fs16\
+\
+\f0\fs28\li2200 Should return YES if the object is an element of a (multiplicative) semigroup, ie. a set equiped with a (possibly non-commutative) multiplicative operation.  However, the set doesn't necessarily have a unique unity element.  For example, matrices of free dimension don't.  There is no default implemenation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inMonoid\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b inMonoid}\fs16\
+\
+\f0\fs28\li2200 Should return YES if {\b self} is an element of a (multiplicative, possibly non-commutative) monoid, ie. a semigroup with a unique unity element.  However, not every element in the set necessarily has a multiplicative inverse.  There is no default implemenation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inGroup\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b inGroup}\fs16\
+\
+\f0\fs28\li2200 Should return YES if {\b self} is an element of a (multiplicative, possibly non-commutative) group, ie. a monoid with a multiplicative inverse for each element.  There is no default implemenation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 one\f0\b0\
+\f0\fs28\li2500 -{\b one}\fs16\
+\
+\f0\fs28\li2200 Returns a new reference to the multiplicative unity.\fs16\
+\
+\f0\fs28\li2200 If the object is an element of a multiplicative monoid the unity element is unique.  Otherwise, {\b one} returns the (right) multiplicative unity element for the object itself, ie. an element {\i c} such that {\i self c} = 1.  Matrices of variable dimension, for example,  have unity elements of different dimension.\fs16\
+\
+\f0\fs28\li2200 There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 minusOne\f0\b0\
+\f0\fs28\li2500 -{\b minusOne}\fs16\
+\
+\f0\fs28\li2200 Returns a new reference to the opposite of the multiplicative unity.  Negates by default the object returned by {\b one}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOne}\fs16\
+\
+\f0\fs28\li2200 Should return YES if the object is equal to one.  There is no default implementation for this method.\fs16\
+\
+\f0\fs28\li2200 If the object is an element of an multiplicative monoid, the method should test whether the object is the {\i unique} unity element.  Otherwise, {\b isOne} should return YES if the object is the (right) multiplicative unity element for itself.  Matrices of variable dimension, for example,  have unity elements of different dimension.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b notOne}\fs16\
+\
+\f0\fs28\li2200 Whether {\b isOne} returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isMinusOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isMinusOne}\fs16\
+\
+\f0\fs28\li2200 Should return YES if the object is equal to minus one i.e., the additive inverse of the multiplicative unity.  There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notMinusOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b notMinusOne}\fs16\
+\
+\f0\fs28\li2200 Whether {\b isMinusOne} returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 square\f0\b0\
+\f0\fs28\li2500 -{\b square}\fs16\
+\
+\f0\fs28\li2200 Returns the square of the object ie., a new object equal to the object multiplied by itself.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiply:\f0\b0\
+\f0\fs28\li2500 -{\b multiply}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new object equal to the product {\i self b}.\fs16\
+\
+\f0\fs28\li2200 Note that when multiplication is not commutative, [a multiply:b] is not the same thing as [b multiply:a].  Non-commutative multiplication is currently hardly supported.  In general, we have used throughout the Computer Algebra Kit {\i right} multiplication.  Left multiplication will be explicitely indicated.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 power:\f0\b0\
+\f0\fs28\li2500 -{\b power}:(int){\i n}\fs16\
+\
+\f0\fs28\li2200 Returns the object raised to the {\i n}-th power ie., a new object obtained by multiplying the object {\i n} times by itself.\fs16\
+\
+\f0\fs28\li2200 If {\i n} is zero, the method invokes {\b one}, except if the object itself is zero.  In that case the method returns {\b nil}.  If {\i n} is negative, the method raises the inverse of the object to the {\i -n}-th power, or if the object is not invertible, it returns {\b nil}.\fs16\
+\
+\f0\fs28\li2200 The default implementation of this method consists of the binary exponentation algorithm (invoking {\b square}).  The method may be overridden in those cases where the binary exponentation algorithm performs worse than, for example, a repeated multiplication strategy (for sufficiently sparse polynomials e.g.).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inverse\f0\b0\
+\f0\fs28\li2500 -{\b inverse}\fs16\
+\
+\f0\fs28\li2200 Returns the multiplicative inverse (a new object).  If there is no inverse, the method returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isUnit\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isUnit}\fs16\
+\
+\f0\fs28\li2200 Tests whether the object has a multiplicative inverse.  The default implementation tests whether {\b inverse} returns {\b nil} or not.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notUnit\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b notUnit}\fs16\
+\
+\f0\fs28\li2200 Whether {\b isUnit} returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divide:\f0\b0\
+\f0\fs28\li2500 -{\b divide}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the {\i exact} quotient on division ie., returns a new object equal to the object multiplied (to the right) by the inverse of {\i b}.  If the division fails or if the division is not exact (when there is a remainder), this method returns {\b nil}.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Use {\b quotient:} to determine the quotient of a division with remainder.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 remainder:quotient:\f0\b0\
+\f0\fs28\li2500 -{\b remainder}:{\i b}{\b quotient}:(id *){\i q}\fs16\
+\
+\f0\fs28\li2200 Divides {\b self} by {\i b}; returns the remainder {\i R}, and by reference, the quotient {\i Q}, such that {\i a = Q b + R}.  The quotient should not be computed when a NULL pointer is passed for {\i q}.  There is no default implementation for this method.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} divide, quotient, remainder\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 remainder:\f0\b0\
+\f0\fs28\li2500 -{\b remainder}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, the remainder on division of {\b self} by {\i b}.  The default implementation invokes {\b remainder:quotient:} with a NULL quotient argument.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} For ordered domains (such as the integers), this method should return a {\i signed} remainder, while {\b modulo:} returns an unsigned remainder.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} modulo\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 quotient:\f0\b0\
+\f0\fs28\li2500 -{\b quotient}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, the quotient on division of by {\i b}.  There may be a remainder on division, which can be obtained through {\b remainder:}.  The default implementation invokes {\b remainder:quotient:}, and throws away the remainder.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} divide\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inEuclideanDomain\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b inEuclideanDomain}\fs16\
+\
+\f0\fs28\li2200 Returns YES if {\b self} is an element of a euclidean domain.  There is no default implementation.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isCoprime:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isCoprime}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Tests whether the greatest common divisor of {\b self} and {\i b} is a unit.  Computes the gcd (by invoking {\b -gcd:}) and then invokes {\b isUnit}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notCoprime:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b notCoprime}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Whether {\b isCoprime} returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isGcd::\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isGcd}:{\i a}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Whether {\b self} is the greatest common divisor of {\i a} and {\i b}.  The default implementation computes the gcd by sending {\b -gcd:} and compares to {\b self}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isLcm::\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isLcm}:{\i a}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Whether {\b self} is the least common multiple of {\i a} and {\i b}.  The default implementation computes the gcd by sending {\b -lcm:} and compares to {\b self}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 gcd:\f0\b0\
+\f0\fs28\li2500 -{\b gcd}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, the greatest common divisor of {\b self} and {\i b}.  In the case of an additive semigroup, the following should hold : gcd(0,b) = b and gcd(a,0) = a.  There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 bezout:gcd:\f0\b0\
+\f0\fs28\li2500 -{\b bezout}:{\i b}{\b gcd}:(id *){\i gcd}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, the bezout coefficient of the object, and if a non NULL pointer is passed for {\i gcd}, by reference, the gcd of object and {\i b}.  The bezout coefficient is the element {\i u} such that {\i u self + v b == gcd}.\fs16\
+\
+\f0\fs28\li2200 There is no default implementation for this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 lcm:\f0\b0\
+\f0\fs28\li2500 -{\b lcm}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the least common multiple of the objects.  The default implementation multiplies the the objects and divides by their gcd.  In the case of an additive semi-group, lcm(a,0) = a and lcm(0,b) = b and lcm(0,0) = 0.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 modulo:\f0\b0\
+\f0\fs28\li2500 -{\b modulo}:{\i m}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, the representant of the object modulo {\i m}.  For ordered domains (such as the integers), the representant is kept positive (in the range [0,{\i m}[).  For domains such as polynomials over a finite field, {\b modulo:} is equivalent to {\b remainder:}.\fs16\
+\
+\f0\fs28\li2200 The default implementation invokes {\b remainder:}.  Adds back {\i m}, if {\b self} is ordered and the remainder is negative.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiply:modulo:\f0\b0\
+\f0\fs28\li2500 -{\b multiply}:{\i b}{\b modulo}:{\i m}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, the product {\i self b} modulo {\i m}.  The default implementation first calls {\b multiply:} and then {\b modulo:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 squareModulo:\f0\b0\
+\f0\fs28\li2500 -{\b squareModulo}:{\i m}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, the square of {\b self} modulo {\i m}.  The default implementation first calls {\b square} and then {\b modulo:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 power:modulo:\f0\b0\
+\f0\fs28\li2500 -{\b power}:(int){\i n}{\b modulo}:{\i m}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, equal to {\b self} raised to the {\i n-th} power modulo {\i m}.  The default implementation uses the {\i modular binary exponentation} algorithm. \fs16\
+\
+\f0\fs28\li2200 If {\b self} and {\i n} are equal to zero, returns {\b nil}.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} genpower:modulo:\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 genpower:modulo:\f0\b0\
+\f0\fs28\li2500 -{\b genpower}:{\i n}{\b modulo}:{\i m}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, equal to {\b self} raised to the {\i n-th} power modulo {\i m} (where {\i n} is an instance of the {\b BigInt} class).  The default implementation uses the {\i modular binary exponentation} algorithm. \fs16\
+\
+\f0\fs28\li2200 If {\b self} and {\i n} are equal to zero, returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inverseModulo:\f0\b0\
+\f0\fs28\li2500 -{\b inverseModulo}:{\i m}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, the inverse of {\b self} modulo {\i m}.  Generates an error message by default.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 random\f0\b0\
+\f0\fs28\li2500 -{\b random}\fs16\
+\
+\f0\fs28\li2200 Returns a new random object.  For example, for the integers, {\b random} returns 0 or 1.  For the integers mod {\i p}, {\b random} returns an integer mod {\i p} (possibly zero).\fs16\
+\
+\f0\fs28\li2200 There is no default implementation.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 characteristic\f0\b0\
+\f0\fs28\li2500 - (int){\b characteristic}\fs16\
+\
+\f0\fs28\li2200 Returns the characteristic of (the set of) the object, ie. the number {\i n} such that {\i n a} is zero for each element {\i a}.  Domains of characteristic larger than INT_MAX are currently not supported.  There is no default implementation of the method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isCharacteristicZero\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isCharacteristicZero}\fs16\
+\
+\f0\fs28\li2200 Whether {\b characteristic} returns zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notCharacteristicZero\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b notCharacteristicZero}\fs16\
+\
+\f0\fs28\li2200 Whether {\b characteristic} returns not zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isCharacteristicTwo\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isCharacteristicTwo}\fs16\
+\
+\f0\fs28\li2200 Whether {\b characteristic} returns two.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notCharacteristicTwo\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b notCharacteristicTwo}\fs16\
+\
+\f0\fs28\li2200 Whether {\b characteristic} returns not two.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 frobenius\f0\b0\
+\f0\fs28\li2500 -{\b frobenius}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, the image of {\b self} under the {\i frobenius} map, ie. exponentation by the characteristic of {\b self}.  There is no default implementation.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 frobeniusInverse\f0\b0\
+\f0\fs28\li2500 -{\b frobeniusInverse}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, the inverse image of {\b self} under the {\i frobenius} map, ie. the {\i n-th} root of {\b self} where {\i n} is the characteristic of {\b self}.  There is no default implementation.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 dimensionOverPrimeField\f0\b0\
+\f0\fs28\li2500 - (int){\b dimensionOverPrimeField}\fs16\
+\
+\f0\fs28\li2200 This method should return the dimension of a finite field over its prime field.  For example, the dimension of GaloisField(9) over GaloisField(3) is 2.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inRing\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b inRing}\fs16\
+\
+\f0\fs28\li2200 The object is in a ring if it's in an additive group and a multiplicative monoid.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inIntegralDomain\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b inIntegralDomain}\fs16\
+\
+\f0\fs28\li2200 Should return YES if the object is an element of a ring without zero divisors.  There is no default implementation of this method.  Examples of integral domains in the Computer Algebra Kit include, the integers, the Gaussian (complex) integers and polynomial rings.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inField\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b inField}\fs16\
+\
+\f0\fs28\li2200 Whether the object is element of an additive group and a multiplicative group.  Examples of fields in the Computer Algebra Kit include, the integers mod {\i p}, Galois fields, and various fields of fractions such as the rational numbers or rational functions.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inFieldOfFractions\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b inFieldOfFractions}\fs16\
+\
+\f0\fs28\li2200 Whether the object is element of a field of fractions.  Returns NO by default; overridden by Fraction and used by some linear algebra algorithms to reduce computations over a field of fractions to computations over an integral domain.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 scalarZero\f0\b0\
+\f0\fs28\li2500 -{\b scalarZero}\fs16\
+\
+\f0\fs28\li2200 Returns a reference to the zero scalar object.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} zero\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 scalarContent\f0\b0\
+\f0\fs28\li2500 -{\b scalarContent}\fs16\
+\
+\f0\fs28\li2200 Returns a new scalar object, the (scalar) content of the objects, ie. the gcd of its scalars.\fs16\
+\
+\f0\fs28\li2200 There is no default implementation of this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideScalarContent\f0\b0\
+\f0\fs28\li2500 -{\b divideScalarContent}\fs16\
+\
+\f0\fs28\li2200 If the scalar content is zero, this method simply returns a copy of {\b self}.  Otherwise, it divides by the content (sending {\b divideScalar:}), ie. it computes the {\i primitive part} of {\b self}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiplyScalar:\f0\b0\
+\f0\fs28\li2500 -{\b multiplyScalar}:{\i s}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, equal to {\b self} multiplied (to the right) by the scalar {\i s}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideScalar:\f0\b0\
+\f0\fs28\li2500 -{\b divideScalar}:{\i s}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, equal to {\b self} divided by the scalar {\i s}.  The division is exact; if it isn't, the method returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 addScalar:\f0\b0\
+\f0\fs28\li2500 -{\b addScalar}:{\i s}\fs16\
+\
+\f0\fs28\li2200 Adds the scalar {\i s} to the object.  Should return a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subtractScalar:\f0\b0\
+\f0\fs28\li2500 -{\b subtractScalar}:{\i s}\fs16\
+\
+\f0\fs28\li2200 Subtracts the scalar {\i s} from the object.  Should return a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsLeadingSign\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsLeadingSign}\fs16\
+\
+\f0\fs28\li2200 Should return YES if the printing methods for this object print a leading minus sign.  This can be used in other implementations to avoid printing a plus sign followed by a minus sign.  The default implementation returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsSum\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsSum}\fs16\
+\
+\f0\fs28\li2200 Should return YES if the printing methods for this object print multiple terms separated by a plus or minus sign.  This can be used in other implementations to place the expression between parentheses if necessary.  The default implementation returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsProduct\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsProduct}\fs16\
+\
+\f0\fs28\li2200 Should return YES if the printing methods for this object print multiple factors separated by a space or multiplication sign.  This can be used in other implementations to place the expression between parentheses if necessary.  The default implementation returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Should print a textual representation of the object to {\i aFile}.  Methods such as {\b str}, {\b printForDebugger:}, {\b printOn:} etc. work by invoking this method.\fs16\
+\
+\fs16\
+\
+\
+}

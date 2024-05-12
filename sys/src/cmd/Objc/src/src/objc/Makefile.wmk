@@ -1,0 +1,152 @@
+
+#
+# Portable Object Compiler
+# $Id: Makefile.wmk,v 1.2 2002/05/18 10:57:50 stes Exp $
+#
+
+#
+# This Makefile should work with Sybase WATCOM wmake.
+#
+
+CD=cd
+MKDIR=mkdir
+RM=del
+CP=copy
+AR=wlib -q -c -b
+RANLIB=echo
+MAKE=wmake
+YACC=bison -y -d
+LEX=flex
+YTABH=y_tab.h
+YTABC=y_tab.c
+LEXYYC=lexyy.c
+DBG_MFLAGS=-q -d2 -od
+OPT_MFLAGS=-q -DNDEBUG
+OBJSUFFIX=obj
+LIBSUFFIX=lib
+BOOTDIR=..\..
+BINDIR=$(BOOTDIR)\bin
+LIBDIR=$(BOOTDIR)\lib
+IFLAGS=-I. -noI -I..\..\include\objcrt -I..\..\include\objpak -I..\oclib
+BOOTLIBS=-noLibs ..\oclib\oclib.lib ..\objpak\objpak.lib ..\objcrt\objcrt.lib
+MFLAGS=$(OPT_MFLAGS)
+
+#
+# Because this directory will contain a new compiler,
+# make sure we configure with a full path towards the old compiler.
+#
+
+OBJC=\objc\bin\objc
+
+#
+# On UNIX we deliver the YACC (.ym) and LEX (.lm) files.
+# On Windows, only the generated .m file.
+#
+
+.SUFFIXES: .m .lm .ym
+
+OBJCSCRIPT=objc
+OBJCPROGRAM=objc.exe
+#need suffix for bootstrap copy operation
+OBJC1PROGRAM=objc1.exe
+POSTLINK=postlink.exe
+FIXWCPP=fixwcpp.exe
+
+OBJCFILES=&
+	objc.obj
+
+OBJC1FILES=&
+	yacc.obj&
+	lex.obj&
+	lexfiltr.obj&
+	objc1.obj
+
+PRELINKFILE=&
+	_prelink.obj
+
+PREDLLFILE=&
+	_predll.obj
+
+POSTLINKFILES=&
+	postlink.obj
+
+FIXWCPPFILES=&
+	fixwcpp.obj
+
+.m.obj:
+	@set INCPATH=$(IFLAGS)
+	$(OBJC) -c $(MFLAGS) @INCPATH $*.m
+
+.lm.obj:
+	@set INCPATH=$(IFLAGS)
+	$(LEX) $*.lm
+	-$(CP) $(LEXYYC) $*.m
+	$(OBJC) -c $(MFLAGS) @INCPATH $*.m
+	-$(RM) $(LEXYYC)
+	-$(RM) $*.m
+
+.ym.obj:
+	@set INCPATH=$(IFLAGS)
+	$(YACC) $*.ym
+	-$(CP) $(YTABH) $*.h
+	-$(CP) $(YTABC) $*.m
+	$(OBJC) -c $(MFLAGS) @INCPATH $*.m
+	-$(RM) $(YTABC)
+	-$(RM) $*.m
+
+default : $(OBJCPROGRAM) $(OBJC1PROGRAM) $(PRELINKFILE) $(PREDLLFILE) $(POSTLINK) $(FIXWCPP)
+
+$(OBJCPROGRAM) : $(OBJCFILES)
+	@set LIBPATH=$(BOOTLIBS)
+	$(OBJC) $(OBJCFILES) @LIBPATH -o $(OBJCPROGRAM)
+
+$(OBJC1PROGRAM) : $(OBJC1FILES)
+	@set LIBPATH=$(BOOTLIBS)
+	$(OBJC) $(OBJC1FILES) @LIBPATH -o $(OBJC1PROGRAM)
+
+$(PRELINKFILE) : _prelink.c
+	$(OBJC) -c _prelink.c
+
+$(PREDLLFILE) : _predll.c
+	$(OBJC) -c _predll.c
+
+$(POSTLINK) : $(POSTLINKFILES)
+	@set LIBPATH=$(BOOTLIBS)
+	$(OBJC) $(POSTLINKFILES) @LIBPATH -o $(POSTLINK)
+
+$(FIXWCPP) : $(FIXWCPPFILES)
+	@set LIBPATH=$(BOOTLIBS)
+	$(OBJC) $(FIXWCPPFILES) @LIBPATH -o $(FIXWCPP)
+
+bootstrap : .SYMBOLIC
+	-$(MKDIR) $(BINDIR)
+	-$(CP) $(OBJCSCRIPT) $(BINDIR)
+	-$(CP) $(OBJCPROGRAM) $(BINDIR)
+	-$(CP) $(OBJC1PROGRAM) $(BINDIR)
+	-$(CP) $(PRELINKFILE) $(LIBDIR)
+	-$(CP) $(PREDLLFILE) $(LIBDIR)
+	-$(CP) $(POSTLINK) $(BINDIR)
+	-$(CP) $(FIXWCPP) $(BINDIR)
+	-$(CP) objchelp.txt $(LIBDIR)
+	-$(CP) objcdlnt.wat $(LIBDIR)
+
+cleantmp : .SYMBOLIC
+	-$(RM) *.P
+	-$(RM) *.i
+	-$(RM) y.tab.h
+
+.NOCHECK
+clean : cleantmp
+	-$(RM) *.obj
+	-$(RM) *.lib
+	-$(RM) $(OBJCPROGRAM)
+	-$(RM) $(OBJC1PROGRAM)
+	-$(RM) $(POSTLINK)
+	-$(RM) $(FIXWCPP)
+
+.NOCHECK
+distclean : clean
+	-$(RM) $(OBJCSCRIPT) 
+	-$(RM) Makefile 
+	-$(RM) config.h 
+

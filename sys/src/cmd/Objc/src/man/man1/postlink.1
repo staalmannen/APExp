@@ -1,0 +1,105 @@
+.ds ]W "Portable Object Compiler
+.de q
+``\\$1''\\$2
+..
+.TH postlink 1 "Jul 18, 1997"
+.SH NAME
+postlink \- Portable Object Compiler Postlink Tool
+.SH SYNOPSIS
+.B postlink
+[
+options
+]
+[
+-
+]
+[
+linkmap
+[
+outfile
+] ]
+.SH DESCRIPTION
+.B postlink
+is a tool that takes a link map as input and that writes a C program to the
+.B stdout
+or to 
+.B outfile.
+The program essentially consists of a table of all Objective-C classes that are linked into the program (as indicated by the link map).  The name stems from the fact that the C program is then compiled by the
+.B objc
+driver and linked into the program after a first link.  The
+.B objcrt
+runtime can use this table for initializing all classes.
+
+.SH AUTOMATIC INITIALIZATION
+Most UNIX
+.B objc
+drivers are by default configured for automatic initialization, and do NOT use this tool.  Automatic initialization determines at run-time what classes are linked into the program, and does not need a compile-time generated table of classes or a double link.  It is still possible to suppress automatic initialization by using the
+.B -postlink
+option.  Conversely, some non-UNIX drivers that are configured with postlink by default, can be used with the
+.B -noPostlink
+flag, but beware that, in general, the reason to configure a driver with postlink is that the automatic initialization code doesn't work for the particular platform.
+
+.SH EXAMPLE
+The command:
+.br
+
+.br
+	nm a.out | postlink > file.c
+.br
+
+writes a C file to file.c that can be used by the
+.BR objcrt
+runtime for initialization.  The table consists of BIND functions that need to be called for all modules that were compiled with the
+.B objc
+compiler.  Note that this includes all modules that need to be initialized, whether they define a class, or just send an Objective-C message.
+
+.SH OPTIONS
+
+.IP "\fB\-a file\fP"
+Append
+.BR
+file
+to the postlink output.  This can be used to prepare Objective-C packages that,  when loaded with dlopen(), automatically initialize themselves.  Classes defined in the package will automatically register themselves to the runtime.  The file that is appended to the postlink output, typically contains some C code to process the postlink output (initializers, finalizers).
+
+.IP "\fB\-o file\fP"
+Place output in
+.BR
+file
+
+.IP "\fB\-p symbol\fP"
+Prepend
+.BR
+symbol
+to the name
+.BR
+_objcModules.
+This option can be used when building tables of BIND functions for shared objects that are going to be dynamically loaded by a program (e.g. with dlopen()); in this case the program needs more than just one _objcModules table.
+
+.IP "\fB\-f format\fP"
+Currently
+.BR format
+can be one of
+.BR unix,
+.BR watcom
+.BR msvc
+.BR ibmvac
+or
+.BR metrowerks.
+The default format is unix.  If the format is
+.BR unix,
+then the input is assumed to be the output of the
+.B nm
+command (preferably the BSD nm format).  If the format is
+.BR watcom,
+then the input is assumed to be a WATCOM
+.B wlink
+link map, as generated with
+.B option map=.
+
+.SH FILES
+.ta \w'SomethingWiderThanAllItems\ \ 'u
+$OBJCDIR/lib/_prelink.o	prelink stub file
+.SH "SEE ALSO"
+objc(1),
+nm(1)
+

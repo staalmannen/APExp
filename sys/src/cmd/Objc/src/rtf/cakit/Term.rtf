@@ -1,0 +1,479 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Computer Algebra Kit (c) 1993,2000,14 by Comp.Alg.Objects.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Term\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} CAObject\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 Maturity Index : Relatively Mature\fs16\
+\
+\f0\fs28\li2200 A term consists of a {\i coefficient} multiplied by a {\i symbol} raised to an integral {\i exponent}.  The coefficient is a scalar object or a polynomial.  The symbol object is {\b nil} if the exponent is equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Recursive Polynomials\b0\f0\fs16\
+\
+\f0\fs28\li2200 A polynomial in recursive representation is a sum of terms.  If the polynomial is variable sparse, each symbol can be different and the coefficients of the terms are scalar objects or again variable sparse polynomials; if the coefficient is not a scalar object, then the exponent of the term cannot be zero (for example, the term 3 {\i x}^0 {\i y}^2 {\i z}^0 is reduced to 3 {\i y}^2 in the variable sparse case).  If the polynomial is variable dense, all symbols are equal to each other and the coefficients are either {\i all} scalar objects or again {\i all} variable dense polynomials; the exponent of a term may be zero, even if the coefficient is a polynomial (3 {\i x}^0 {\i y}^2 {\i z}^0 is a valid object in the variable dense case).  In a degree dense polynomial, the coefficients of the terms can be zero; in a degree sparse polynomial they cannot.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Monomials\b0\f0\fs16\
+\
+\f0\fs28\li2200 A monomial is a product of terms.  The coefficients of the terms of a monomial are scalar objects that are equal to one (but it's possible to insert terms with a non-trivial coefficient).  In a variable dense monomial, the exponents of the terms can be equal to zero; in a variable sparse monomial, they cannot.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Factors\b0\f0\fs16\
+\
+\f0\fs28\li2200 A factored polynomial is a product of terms.  The coefficients of the terms in the factorization are scalar objects, mostly equal to one, but they can store the content extracted out of the (primitive) factors.  The symbol (nucleus) objects of the terms are polynomials i.e., the factors in the factorization.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- scalar:symbol:exponent:\
+	- coefficient:symbol:exponent:\
+	- copy\
+	- deepCopy\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Identity}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- scalarZero\
+	- coefficient\
+	- symbol\
+	- exponent\
+	- degree\
+	- hash\
+	- isEqual:\
+	- compareExponents:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Coercion}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- intValue\
+	- intValue:\
+	- floatValue\
+	- floatValue:\
+	- asScalar\
+	- asSymbol\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Addition}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- zero\
+	- isZero\
+	- isOpposite:\
+	- negate\
+	- double\
+	- add:\
+	- subtract:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Multiplication}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- one\
+	- isOne\
+	- isMinusOne\
+	- square\
+	- inverse\
+	- multiplyScalar:\
+	- multiplyCoefficient:\
+	- multiply:\
+	- divideScalar:\
+	- divideCoefficient:\
+	- divide:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Exponentation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- power:\
+	- root:\
+	- squareRoot\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Characteristic}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- frobenius\
+	- frobeniusInverse\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Derivation and Integration}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- derive\
+	- integrate\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printsLeadingSign\
+	- printsSum\
+	- printsProduct\
+	- printOn:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 scalar:symbol:exponent:\f0\b0\
+\f0\fs28\li2500 +{\b scalar}:{\i aScalar}{\b symbol}:{\i aSymbol}{\b exponent}:(int){\i anExponent}\fs16\
+\
+\f0\fs28\li2200 Creates a new term with coefficient, symbol and exponent set to the specified objects.  This method sets {\i scalarZero} to the zero element for {\i aScalar}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 coefficient:symbol:exponent:\f0\b0\
+\f0\fs28\li2500 +{\b coefficient}:{\i aCoefficient}{\b symbol}:{\i aSymbol}{\b exponent}:(int){\i anExponent}\fs16\
+\
+\f0\fs28\li2200 Creates a new term with coefficient, symbol and exponent set to the specified objects.  This method sets {\i scalarZero} to the zero element obtained by sending {\b scalarZero} to {\i aCoefficient}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 copy\f0\b0\
+\f0\fs28\li2500 -{\b copy}\fs16\
+\
+\f0\fs28\li2200 Copies the term object, and if the coefficient is a scalar object, adds a reference to it.  If the coefficient is a polynomial, makes a copy of it. \fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} copy (Polynomial)\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deepCopy\f0\b0\
+\f0\fs28\li2500 -{\b deepCopy}\fs16\
+\
+\f0\fs28\li2200 Makes deep copies of the term object and its coefficient and symbol. \fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} deepCopy (Polynomial)\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 scalarZero\f0\b0\
+\f0\fs28\li2500 -{\b scalarZero}\fs16\
+\
+\f0\fs28\li2200 Returns the zero scalar of the term.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 coefficient\f0\b0\
+\f0\fs28\li2500 -{\b coefficient}\fs16\
+\
+\f0\fs28\li2200 Returns the coefficient of the term.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 symbol\f0\b0\
+\f0\fs28\li2500 -{\b symbol}\fs16\
+\
+\f0\fs28\li2200 Returns the symbol of the term.  If the exponent of the term is equal to zero, this method returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 exponent\f0\b0\
+\f0\fs28\li2500 - (int){\b exponent}\fs16\
+\
+\f0\fs28\li2200 Returns the exponent of the term.  If the exponent is equal to zero, the symbol of the term is equal to {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 degree\f0\b0\
+\f0\fs28\li2500 - (int){\b degree}\fs16\
+\
+\f0\fs28\li2200 Equivalent to {\b exponent}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hash\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b hash}\fs16\
+\
+\f0\fs28\li2200 Returns a small integer that is the same for terms that are equal (in the sense of {\b isEqual:}).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEqual}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Two terms are equal if they are pointer equal or if the coefficients are equal, if the exponents are equal and if the symbols are equal (or both {\b nil}).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 compareExponents:\f0\b0\
+\f0\fs28\li2500 - (int){\b compareExponents}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Compares two terms with respect to symbols and exponents; this imposes an ordering for the terms in {\i variable sparse} polynomials.  Returns zero if the terms are pointer equal.  A term with symbol {\b nil} is less than a term with non-nil symbol.  Compares the symbols, and if they are equal, compares the exponents.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intValue\f0\b0\
+\f0\fs28\li2500 - (int){\b intValue}\fs16\
+\
+\f0\fs28\li2200 Returns, if the exponent is equal to zero, the intValue of the coefficient.  If not, generates an error message.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intValue:\f0\b0\
+\f0\fs28\li2500 -{\b intValue}:(int){\i aValue}\fs16\
+\
+\f0\fs28\li2200 Returns a new term with exponent equal to zero and with a coefficient whose value as {\b int} is equal to {\i aValue}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 floatValue\f0\b0\
+\f0\fs28\li2500 - (float){\b floatValue}\fs16\
+\
+\f0\fs28\li2200 Returns, if the exponent is equal to zero, the floatValue of the coefficient.  If not, generates an error message.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 floatValue:\f0\b0\
+\f0\fs28\li2500 -{\b floatValue}:(float){\i aValue}\fs16\
+\
+\f0\fs28\li2200 Returns a term with exponent equal to zero and with a coefficient whose value as {\b float} is equal to {\i aValue}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asScalar\f0\b0\
+\f0\fs28\li2500 -{\b asScalar}\fs16\
+\
+\f0\fs28\li2200 Returns the term as scalar object.  Returns {\b nil} if the exponent of the term is not equal to zero.  If the coefficient of the term is a scalar, the method returns a new reference to it, otherwise the coefficient is a polynomial and the method returns the scalar value of it.  Note that in the variable sparse case, a term that is a scalar must have a scalar object as coefficient i.e., the term is always simplified.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asSymbol\f0\b0\
+\f0\fs28\li2500 -{\b asSymbol}\fs16\
+\
+\f0\fs28\li2200 Returns the term as symbol object.  If the exponent of the term is zero and if the coefficient is a polynomial, returns the symbol value of the polynomial.  If the exponent is equal to one and the coefficient is one, returns a new reference to the symbol of the term.  Otherwise returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 zero\f0\b0\
+\f0\fs28\li2500 -{\b zero}\fs16\
+\
+\f0\fs28\li2200 Returns a new term with coefficient equal to the zero element for the coefficient of the term that receives the message.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isZero\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isZero}\fs16\
+\
+\f0\fs28\li2200 Whether the coefficient of the term is equal to zero.  The exponent of the term may be non-zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOpposite:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOpposite}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Whether the coefficients of the term are opposite, and the exponents and symbols are equal to each other.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 negate\f0\b0\
+\f0\fs28\li2500 -{\b negate}\fs16\
+\
+\f0\fs28\li2200 Negates the coefficient of the term.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 double\f0\b0\
+\f0\fs28\li2500 -{\b double}\fs16\
+\
+\f0\fs28\li2200 Doubles the coefficient of the term.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 add:\f0\b0\
+\f0\fs28\li2500 -{\b add}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new term that is the sum of the two terms i.e., the coefficients are added together using {\b add:} or {\b addScalar:}.  The exponents must be equal and the symbols must be both {\b nil} or equal to each other.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subtract:\f0\b0\
+\f0\fs28\li2500 -{\b subtract}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new term that is the difference of the two terms i.e., the coefficients are subtracted from each other using {\b subtract:} or {\b subtractScalar:}.  The exponents must be equal and the symbols must be both {\b nil} or equal to each other.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 one\f0\b0\
+\f0\fs28\li2500 -{\b one}\fs16\
+\
+\f0\fs28\li2200 Returns a term with coefficient equal to one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOne}\fs16\
+\
+\f0\fs28\li2200 Whether the coefficient is one and the exponent is equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isMinusOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isMinusOne}\fs16\
+\
+\f0\fs28\li2200 Whether the coefficient is minus one and the exponent is equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 square\f0\b0\
+\f0\fs28\li2500 -{\b square}\fs16\
+\
+\f0\fs28\li2200 Squares coefficient and multiplies exponent by two.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inverse\f0\b0\
+\f0\fs28\li2500 -{\b inverse}\fs16\
+\
+\f0\fs28\li2200 Inverts coefficient and negates the exponent.  Returns {\b nil} if the coefficient has no inverse.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiplyScalar:\f0\b0\
+\f0\fs28\li2500 -{\b multiplyScalar}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new term; multiplies the coefficient of the term by the scalar object {\i b}, using {\b multiply:} if the coefficient of the term is a scalar object, or {\b multiplyScalar:} otherwise.  The symbol and exponent of the resulting term are equal to that of the original term.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiplyCoefficient:\f0\b0\
+\f0\fs28\li2500 -{\b multiplyCoefficient}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new term; multiplies the coefficient of the term by the coefficient object {\i b}, which must be an instance of the same class as the coefficient of the term.  The symbol and exponent of the resulting term are equal to that of the original term.  The method is implemented only for terms of variable dense (recursive) polynomials.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiply:\f0\b0\
+\f0\fs28\li2500 -{\b multiply}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new term that is the product of the two terms i.e., the exponents are added together and the coefficients are multiplied using {\b multiply:} or {\b multiplyScalar:}.  If the exponents are both non-zero, then the symbols must be equal to each other.  If one of the terms has exponent equal to zero, then the symbol of the resulting term is equal to that of the term with non-zero exponent.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideScalar:\f0\b0\
+\f0\fs28\li2500 -{\b divideScalar}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new term; divides the coefficient of the term by the scalar object {\i b}, using {\b divide:} if the coefficient of the term is a scalar object, or {\b divideScalar:} otherwise.  The symbol and exponent of the resulting term are equal to that of the original term.  Returns {\b nil} if the scalar division is not exact.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideCoefficient:\f0\b0\
+\f0\fs28\li2500 -{\b divideCoefficient}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new term; divides the coefficient of the term by the object {\i b}, which is an instance of the same class as the coefficient.  The symbol and exponent of the resulting term are equal to that of the original term.  Returns {\b nil} if the division is not exact.  The method is implemented only for terms of a variable dense polynomial.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divide:\f0\b0\
+\f0\fs28\li2500 -{\b divide}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new term that is the exact quotient of the two terms i.e., the exponents are subtracted from each other and the coefficients are divided using {\b divide:} or {\b divideScalar:}.  If the exponents are both non-zero, then the symbols must be equal to each other.  If one of the terms has exponent equal to zero, then the symbol of the resulting term is equal to that of the term with non-zero exponent.  Returns {\b nil} if the exponent of the divisor is greater than that of the dividend, or if the coefficient division fails.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 power:\f0\b0\
+\f0\fs28\li2500 -{\b power}:(int){\i n}\fs16\
+\
+\f0\fs28\li2200 Raises coefficient to the {\i n}-th power and multiplies exponent by {\i n}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 root:\f0\b0\
+\f0\fs28\li2500 -{\b root}:(int){\i n}\fs16\
+\
+\f0\fs28\li2200 Takes the {\i n}-th root of the coefficient and divides exponent by {\i n}.  Returns {\b nil} if the coefficient is not an {\i n}-th power or if the exponent is not divisible by {\i n}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 squareRoot\f0\b0\
+\f0\fs28\li2500 -{\b squareRoot}\fs16\
+\
+\f0\fs28\li2200 Takes the square root of the coefficient and divides exponent by two.  Returns {\b nil} if the coefficient is not a square or if the exponent is not divisible by two.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 frobenius\f0\b0\
+\f0\fs28\li2500 -{\b frobenius}\fs16\
+\
+\f0\fs28\li2200 Returns the {\i p}-th power of the term, obtained by raising the term to a power equal to the characteric of the coefficient.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 frobeniusInverse\f0\b0\
+\f0\fs28\li2500 -{\b frobeniusInverse}\fs16\
+\
+\f0\fs28\li2200 Returns either {\b nil} (if the term is not a {\i p}-th power) or a new term that is the {\i p}-th root of the term.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 derive\f0\b0\
+\f0\fs28\li2500 -{\b derive}\fs16\
+\
+\f0\fs28\li2200 Returns the derivative with respect to the variable.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 integrate\f0\b0\
+\f0\fs28\li2500 -{\b integrate}\fs16\
+\
+\f0\fs28\li2200 Integrates with respect to the variable.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsLeadingSign\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsLeadingSign}\fs16\
+\
+\f0\fs28\li2200 Whether the term prints a leading minus sign.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsSum\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsSum}\fs16\
+\
+\f0\fs28\li2200 Whether the term prints a sum.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsProduct\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsProduct}\fs16\
+\
+\f0\fs28\li2200 Whether the term prints a single product.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Prints, between braces, a comma separated list of the members.  If there are no members, the method prints two braces. \fs16\
+\
+\fs16\
+\
+\
+}

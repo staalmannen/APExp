@@ -1,0 +1,513 @@
+.TH "cfloat" 3 "Nov 27, 1997"
+.SH CLASS
+.B
+Float
+.SH SUPERCLASS
+CAObject
+.SH MATURITY INDEX
+Immature
+.SH DESCRIPTION
+.PP
+
+It is planned to make this class evolve into an Objective C class for arbitrary precision floating-point arithmetic.  Currently, 
+.B
+Float 
+is merely a Computer Algebra Kit compatible interface to plain C floating-point arithmetic.  Instances are object wrappers around the 
+.B
+float 
+datatype; arithmetic is subject to the same limitations, round-off errors etc. as in C.
+.PP
+
+Support for floating-point arithmetic is minimal in the Computer Algebra Kit; it is possible to convert results that are obtained by exact arithmetic to a numerical approximation (see the method 
+.B
+asNumerical 
+of Integer, Matrix, Polynomial etc.) for further processing by numerical analysis software.
+.SH METHOD TYPES
+.PP
+.B
+Creation
+.RS 3
+new
+.br
+newFloatValue:
+.br
+newStrValue:
+.br
+.RE
+.PP
+.B
+Identity
+.RS 3
+hash
+.br
+isEqual:
+.br
+floatValue
+.br
+floatValue:
+.br
+.RE
+.PP
+.B
+Comparing
+.RS 3
+sign
+.br
+compare:
+.br
+.RE
+.PP
+.B
+Addition
+.RS 3
+zero
+.br
+isZero
+.br
+isOpposite:
+.br
+negate
+.br
+double
+.br
+add:
+.br
+subtract:
+.br
+.RE
+.PP
+.B
+Multiplication
+.RS 3
+one
+.br
+minusOne
+.br
+isOne
+.br
+isMinusOne
+.br
+square
+.br
+multiply:
+.br
+inverse
+.br
+divide:
+.br
+.RE
+.PP
+.B
+Expression Object
+.RS 3
+asExpression
+.br
+expression:
+.br
+.RE
+.PP
+.B
+Printing
+.RS 3
+printsLeadingSign
+.br
+printToFile:
+.br
+.RE
+.SH METHODS
+.PP
+.B
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+
+Creates an floating-point object equal to zero.
+.PP
+.B
+newFloatValue:
+.RS 1
++
+.B
+newFloatValue:
+(float)
+.I
+floatValue
+.RE
+.PP
+
+Creates an object with value equal to 
+.I
+floatValue.
+.PP
+.B
+newStrValue:
+.RS 1
++
+.B
+newStrValue:
+(STR)
+.I
+aString
+.RE
+.PP
+
+Returns a new float object given a string 
+.I
+aString
+, or returns 
+.B
+nil 
+if the method can\&'t parse 
+.I
+aString.  
+This method acts like the ANSI function 
+.B
+atof().
+.PP
+.B
+hash
+.RS 1
+- (unsigned)
+.B
+hash
+.RE
+.PP
+
+Returns a small integer that is the same for objects that are equal (in the sense of 
+.B
+isEqual:
+).
+.PP
+.B
+isEqual:
+.RS 1
+- (BOOL)
+.B
+isEqual:
+.I
+b
+.RE
+.PP
+.B
+floatValue
+.RS 1
+- (float)
+.B
+floatValue
+.RE
+.PP
+
+Returns the value of the object.
+.PP
+.B
+floatValue:
+.RS 1
+-
+.B
+floatValue:
+(float)
+.I
+f
+.RE
+.PP
+
+Creates an object with value 
+.I
+f.
+.PP
+.B
+sign
+.RS 1
+- (int)
+.B
+sign
+.RE
+.PP
+
+Returns plus one if the object is positive (greater than zero), zero if zero and minus one if negative (less than zero).
+.PP
+.B
+compare:
+.RS 1
+- (int)
+.B
+compare:
+.I
+b
+.RE
+.PP
+
+Returns -1, 0, or +1 if the object is respectively less than, equal to, or greater than 
+.I
+b.  
+Returns 0 for pointer equal objects.
+.PP
+.B
+zero
+.RS 1
+-
+.B
+zero
+.RE
+.PP
+
+Returns a new reference to a shared float instance with value equal to zero.
+.PP
+.B
+isZero
+.RS 1
+- (BOOL)
+.B
+isZero
+.RE
+.PP
+
+Whether the object is equal to zero.
+.PP
+.B
+isOpposite:
+.RS 1
+- (BOOL)
+.B
+isOpposite:
+.I
+b
+.RE
+.PP
+
+Whether the object is the opposite of 
+.I
+b.
+.PP
+.B
+negate
+.RS 1
+-
+.B
+negate
+.RE
+.PP
+
+Returns the opposite of the object.
+.PP
+.B
+double
+.RS 1
+-
+.B
+double
+.RE
+.PP
+
+Returns a new object, equal to the object multiplied by two i.e., added to itself.
+.PP
+.B
+add:
+.RS 1
+-
+.B
+add:
+.I
+b
+.RE
+.PP
+
+Adds 
+.I
+b 
+to the object.  Returns a new object.
+.PP
+.B
+subtract:
+.RS 1
+-
+.B
+subtract:
+.I
+b
+.RE
+.PP
+
+Subtracts 
+.I
+b 
+from the object.  Returns a new object.
+.PP
+.B
+one
+.RS 1
+-
+.B
+one
+.RE
+.PP
+
+Returns a new reference to a shared float instance with value equal to one.
+.PP
+.B
+minusOne
+.RS 1
+-
+.B
+minusOne
+.RE
+.PP
+
+Returns a new reference to the float minus one.
+.PP
+.B
+isOne
+.RS 1
+- (BOOL)
+.B
+isOne
+.RE
+.PP
+
+Whether the object is equal to one.
+.PP
+.B
+isMinusOne
+.RS 1
+- (BOOL)
+.B
+isMinusOne
+.RE
+.PP
+
+Whether the object is equal to minus one.
+.PP
+.B
+square
+.RS 1
+-
+.B
+square
+.RE
+.PP
+
+Returns the square of the object i.e., a new object equal to the original object multiplied by itself.
+.PP
+.B
+multiply:
+.RS 1
+-
+.B
+multiply:
+.I
+b
+.RE
+.PP
+
+Returns a new object, the product of the object multiplied (to the right) by 
+.I
+b.  
+If the objects are pointer equal, this method is equivalent to 
+.B
+square.
+.PP
+.B
+inverse
+.RS 1
+-
+.B
+inverse
+.RE
+.PP
+
+Returns the multiplicative inverse of the object (returns a new object).  Returns 
+.B
+nil 
+if the object is equal to zero or cannot be inverted.
+.PP
+.B
+divide:
+.RS 1
+-
+.B
+divide:
+.I
+b
+.RE
+.PP
+
+Returns a new object, the 
+.I
+exact 
+quotient of the object divided by 
+.I
+b.  
+Returns 
+.B
+nil 
+if 
+.I
+b 
+is equal to zero or if the division is not exact.
+.PP
+.B
+asExpression
+.RS 1
+-
+.B
+asExpression
+.RE
+.PP
+
+Returns a new expression object, containing a copy of the receiving object.
+.PP
+.B
+expression:
+.RS 1
+-
+.B
+expression:
+.I
+anExpression
+.RE
+.PP
+
+Try to evaluate 
+.I
+anExpression 
+as a floating-point number or return 
+.B
+nil 
+otherwise (when 
+.I
+anExpression 
+is symbolic, for example).
+.PP
+.B
+printsLeadingSign
+.RS 1
+- (BOOL)
+.B
+printsLeadingSign
+.RE
+.PP
+
+Returns YES if the number is negative.
+.PP
+.B
+printToFile:
+.RS 1
+-
+.B
+printToFile:
+(FILE *)
+.I
+aFile
+.RE
+.PP
+
+Prints the floating-point number to 
+.I
+aFile 
+according to the \&'%g\&' format of the ANSI function 
+.B
+printf().

@@ -1,0 +1,193 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Portable Object Compiler (c) 1997,2020.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Block\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} Object\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Maturity Index:}} Experimental\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 Objective-C Blocks are similar to block expressions in Smalltalk. Blocks are a way to express deferred computations; computations to be written at one place but invoked from another.\fs16\
+\
+\f0\fs28\li2200 The Portable Object Compiler uses blocks for error handling i.e., the processing of exceptional conditions that interrupt the normal flow of program execution, such as out of memory, division by zero etc.\fs16\
+\
+\f0\fs28\li2200 The Object method {\f2 error:} and the Block instance method {\f2 ifError:} are used for this.\fs16\
+\
+\f0\fs28\li2200 Blocks are a non-standard part of the Objective-C language; this implementation, the first and most powerful as far as we know, is based on Brad Cox's TaskMaster paper where the same concept is discussed under the name of Action Expressions.\fs16\
+\
+\f0\fs28\li2200 For a discussion on what Blocks are, and how to use them, we refer to the document {\i Objective-C Blocks}.\fs16\
+\
+\f0\fs28\li2200 The compiler has an option {\i -noBlocks} that can be used to turn off the special syntax for Blocks.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Exception Handling}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- errorHandler\
+	- errorHandler:\
+	- halt:value:\
+	- ifError:\
+	- value:ifError:\
+	- on:do:\
+	- value:on:do:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Evaluating Blocks}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- value\
+	- intvalue\
+	- atExit\
+	- value:\
+	- intvalue:\
+	- value:value:\
+	- intvalue:value:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Control Flow}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- repeatTimes:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 errorHandler\f0\b0\
+\f0\fs28\li2500 +{\b errorHandler}\fs16\
+\
+\f0\fs28\li2200 Returns the current {\f2 ifError:} exception handler Block.  If no {\f2 ifError:} message was sent, returns the default handler, as set by {\f2 errorHandler:}, or, if none was explicitely set, it uses the following handler:\fs16\
+\
+\f2\fs24\li2800 id errorHandler = \{ :msg :rcv | fprintf(stderr,[msg str]);abort(); \};\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 errorHandler:\f0\b0\
+\f0\fs28\li2500 +{\b errorHandler}:{\i aHandler}\fs16\
+\
+\f0\fs28\li2200 Make {\i aHandler} the default error handler.  Returns the handler that was previously registered as default handler.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Normally the {\f2 ifError:} message is used instead of {\f2 errorHandler:} to set an error handler.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 halt:value:\f0\b0\
+\f0\fs28\li2500 +{\b halt}:{\i message}{\b value}:{\i receiver}\fs16\
+\
+\f0\fs28\li2200 This message implements the {\f2 halt:} message of the Object class.  It pops a handler of the stack of {\f2 ifError:} handlers and evaluates the handler block.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 ifError:\f0\b0\
+\f0\fs28\li2500 -{\b ifError}:{\i aHandler}\fs16\
+\
+\f0\fs28\li2200 Evaluates the receiver of the message and returns its return value.  If an exception is raised, evaluates {\i aHandler}.  This works by pushing {\i aHandler} on a stack of error handlers, the method {\f2 halt:} temporarily pops off an error handler and evaluates it with a message and receiver object as arguments :  \fs16\
+\
+\f2\fs24\li2800 [ \{ ... \} ifError: \{ :msg :rcv | ... \}];\
+\f0\fs16\
+\f0\fs28\li2200 {\b {\f1 Note:}} It is an error to have a non-local return from within the receiver, as this would leave an error handler dangling.  It is allowed to return however, from within the error handler. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 value:ifError:\f0\b0\
+\f0\fs28\li2500 -{\b value}:{\i anObject}{\b ifError}:{\i aHandler}\fs16\
+\
+\f0\fs28\li2200 Like {\f2 ifError:} but the receiving block can take an argument.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 on:do:\f0\b0\
+\f0\fs28\li2500 -{\b on}:{\i aClassOfExceptions}{\b do}:{\i aHandler}\fs16\
+\
+\f0\fs28\li2200 This message evaluates the receiver (like {\f2 value}) and provides a way to install {\i aHandler} Block as the exception handler for a certain class of exceptions.  The {\i aClassOfExceptions} should be the name of the class, {\b Exception} or one of its subclasses.  The handler Block takes one argument, the instance of the exception.\fs16\
+\
+\f2\fs24\li2800 [ \{ ... \} on:Exception do: \{ :anException | ... \}];\
+\f0\fs16\
+\f0\fs28\li2200 {\b {\f1 See also:}} - signal (Exception)\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 value:on:do:\f0\b0\
+\f0\fs28\li2500 -{\b value}:{\i anObject}{\b on}:{\i aClassOfExceptions}{\b do}:{\i aHandler}\fs16\
+\
+\f0\fs28\li2200 Like {\f2 on:do:} but the receiving block can take an argument.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 value\f0\b0\
+\f0\fs28\li2500 -{\b value}\fs16\
+\
+\f0\fs28\li2200 Evaluates the receiver of the message and returns its return value.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intvalue\f0\b0\
+\f0\fs28\li2500 - (int){\b intvalue}\fs16\
+\
+\f0\fs28\li2200 Evaluates the receiver of the message and returns its return value.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 atExit\f0\b0\
+\f0\fs28\li2500 -{\b atExit}\fs16\
+\
+\f0\fs28\li2200 Evaluates the receiver of the message when the process exits.  See the ANSI C function {\i atexit()} for more details.  There's a maximum of 32 exit Blocks that can be registered to be automatically called on exit.  Blocks are evaluated in reverse order of their registration.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 value:\f0\b0\
+\f0\fs28\li2500 -{\b value}:{\i anObject}\fs16\
+\
+\f0\fs28\li2200 Evaluates, with {\i anObject} as argument, the receiver of the message and returns its return value.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intvalue:\f0\b0\
+\f0\fs28\li2500 - (int){\b intvalue}:{\i anObject}\fs16\
+\
+\f0\fs28\li2200 Evaluates, with {\i anObject} as argument, the receiver of the message and returns its return value.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 value:value:\f0\b0\
+\f0\fs28\li2500 -{\b value}:{\i firstObject}{\b value}:{\i secondObject}\fs16\
+\
+\f0\fs28\li2200 Evaluates the receiver of the message with two arguments and returns its return value.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intvalue:value:\f0\b0\
+\f0\fs28\li2500 - (int){\b intvalue}:{\i firstObject}{\b value}:{\i secondObject}\fs16\
+\
+\f0\fs28\li2200 Evaluates the receiver of the message with two arguments and returns its return value.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 repeatTimes:\f0\b0\
+\f0\fs28\li2500 -{\b repeatTimes}:(int){\i n}\fs16\
+\
+\f0\fs28\li2200 Method to evaluate the receiver Block {\i n} times.  Similar to the Smalltalk method {\f2 timesRepeat:} but with argument and receiver interchanged.  Returns self.\fs16\
+\
+\fs16\
+\
+\
+}

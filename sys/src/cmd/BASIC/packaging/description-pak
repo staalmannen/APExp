@@ -1,0 +1,8 @@
+Free BASIC to C converter for Unix-based systems.
+BaCon is a free BASIC to C translator for Unix-based systems, which runs on
+most Unix/Linux/BSD platforms, including MacOSX. It intends to be a programming
+aid in creating tools which can be compiled on different platforms (32bit and
+64bit environments), while trying to revive the days of the good old BASIC.
+Code converted by BaCon can be compiled by GCC, the Compaq C Compiler, TCC,
+the clang/LLVM compiler (and possibly by other C compilers), but also by C++
+compilers like g++ or clang++.

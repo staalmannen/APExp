@@ -1,0 +1,516 @@
+.TH "dictnary" 3 "Mar 12, 2023"
+.SH Dictionary
+.PP
+.B
+Inherits from:
+
+Object
+.SH Class Description
+.PP
+Dictionaries (instances of the 
+.B
+Dictionary
+class) are key-value tables : to each key object, a value object is associated\&.  The key can then be used to access the corresponding value\&.  There are a few special provisions for tables with 
+.B
+String
+instances as keys\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* new
+.br
+* copy
+.br
+* deepCopy
+.br
+* emptyYourself
+.br
+* freeContents
+.br
+* freeAll
+.br
+* free
+.RE
+.PP 
+.B
+Interrogation
+.RS 3
+.br
+* size
+.br
+* isEmpty
+.br
+* includesKey:
+.RE
+.PP 
+.B
+Comparing
+.RS 3
+.br
+* hash
+.br
+* isEqual:
+.RE
+.PP 
+.B
+Indexed Access
+.RS 3
+.br
+* atKey:
+.br
+* atKey:ifAbsent:
+.br
+* atKeySTR:
+.br
+* atKey:put:
+.br
+* atKeySTR:put:
+.br
+* eachKey
+.br
+* eachValue
+.RE
+.PP 
+.B
+Adding and Removing
+.RS 3
+.br
+* removeKey:
+.br
+* removeKey:ifAbsent:
+.RE
+.PP 
+.B
+Blocks
+.RS 3
+.br
+* keysDo:
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+Returns a new empty dictionary\&.
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Returns a new copy of the dictionary\&.
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+Returns a new copy of the dictionary\&.  The members in the new dictionary are deep copies of the members in the original dictionary\&.
+.PP 
+emptyYourself
+.RS 1
+-
+.B
+emptyYourself
+.RE
+.PP
+Removes all the keys and values of the dictionary (without freeing them)\&.  Returns the receiver\&.
+.PP 
+freeContents
+.RS 1
+-
+.B
+freeContents
+.RE
+.PP
+This method is, in the case of the Dictionary class, equivalent to 
+.B
+emptyYourself
+\&.  Note that for the sake of Stepstone ICpak101 compatibility, this method does not free keys and values\&.  Use 
+.B
+freeAll
+for that\&.
+.PP 
+freeAll
+.RS 1
+-
+.B
+freeAll
+.RE
+.PP
+This method frees all the keys and values in the dictionary, without freeing the dictionary itself\&.  Returns the dictionary\&.
+.PP
+.B
+Note:
+
+This method is ObjectPak specific\&.
+.PP 
+free
+.RS 1
+-
+.B
+free
+.RE
+.PP
+Frees the dictionary, but not its contents\&.  Returns 
+.B
+nil
+\&.  Do :
+.RS 3
+
+aDic = [[aDic freeAll] free];
+.br
+
+.RE
+.PP
+if you want to free the dictionary and its contents\&.
+.PP 
+size
+.RS 1
+- (
+unsigned
+)
+.B
+size
+.RE
+.PP
+Returns the number of key-value associations in the dictionary\&.
+.PP 
+isEmpty
+.RS 1
+- (
+BOOL
+)
+.B
+isEmpty
+.RE
+.PP
+Whether the number of associations in the dictionary is equal to zero\&.
+.PP 
+includesKey:
+.RS 1
+- (
+BOOL
+)
+.B
+includesKey
+:
+.I
+aKey
+.RE
+.PP
+Returns YES if there is an association with key matching 
+.I
+aKey
+\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a hash value based on the receiver\&'s address and the results of sending the 
+.B
+hash
+message to the contents\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+aDic
+.RE
+.PP
+Returns YES if 
+.I
+aDic
+is a dictionary, and if its keys and values respond affirmatively to the message 
+.B
+isEqual:
+when compared to the corresponding objects of the receiver\&'s contents\&.
+.PP 
+atKey:
+.RS 1
+-
+.B
+atKey
+:
+.I
+aKey
+.RE
+.PP
+Returns the value of the association matching 
+.I
+aKey
+\&.  Returns 
+.B
+nil
+if the association is not found\&.
+.PP 
+atKey:ifAbsent:
+.RS 1
+-
+.B
+atKey
+:
+.I
+aKey
+.B
+ifAbsent
+:
+.I
+exceptionBlock
+.RE
+.PP
+Returns the value of the association matching 
+.I
+aKey
+\&.  Evaluates 
+.I
+exceptionBlock
+and returns its return value, if the association is not found\&.
+.PP 
+atKeySTR:
+.RS 1
+-
+.B
+atKeySTR
+:(STR)
+.I
+strKey
+.RE
+.PP
+Returns the value of the association matching 
+.I
+strKey
+\&.  Returns 
+.B
+nil
+if the association is not found\&.
+.PP 
+atKey:put:
+.RS 1
+-
+.B
+atKey
+:
+.I
+aKey
+.B
+put
+:
+.I
+anObject
+.RE
+.PP
+Associates 
+.I
+aKey
+to 
+.I
+anObject
+\&.  Adds the objects to the dictionary\&.  If 
+.I
+aKey
+was already in the dictionary, makes 
+.I
+anObject
+the value for this key and returns the old value\&.  Otherwise returns 
+.B
+nil
+\&.
+.PP 
+atKeySTR:put:
+.RS 1
+-
+.B
+atKeySTR
+:(STR)
+.I
+strKey
+.B
+put
+:
+.I
+anObject
+.RE
+.PP
+Associates 
+.I
+strKey
+to 
+.I
+anObject
+\&.  Adds the objects to the dictionary\&.  If 
+.I
+strKey
+was already in the dictionary, makes 
+.I
+anObject
+the value for this key and returns the old value\&.  Otherwise returns 
+.B
+nil
+\&.
+.PP 
+eachKey
+.RS 1
+-
+.B
+eachKey
+.RE
+.PP
+Returns a sequence of the key objects in the dictionary\&.
+.RS 3
+
+keys = [aDic eachKey];
+.br
+while ((aKey = [aSeq next])) {
+.br
+/* do something */
+.br
+}
+.br
+keys = [keys free];
+.br
+
+.RE
+.PP
+.B
+See also:
+
+eachValue
+.PP 
+eachValue
+.RS 1
+-
+.B
+eachValue
+.RE
+.PP
+Returns a sequence of the value objects in the dictionary\&.
+.RS 3
+
+keys   = [aDic eachKey];
+.br
+values = [aDic eachValue];
+.br
+while ((aKey = [aSeq next])) {
+.br
+aValue = [values next];
+.br
+/* do something */
+.br
+}
+.br
+keys   = [keys free];
+.br
+values = [values free];
+.br
+
+.RE
+.PP
+.B
+See also:
+
+eachKey
+.PP 
+removeKey:
+.RS 1
+-
+.B
+removeKey
+:
+.I
+key
+.RE
+.PP
+Remove key from the receiver and return value for given 
+.I
+key
+\&.  If 
+.I
+key
+is not in the receiver, signals the 
+.B
+NotFound
+exception\&.
+.PP 
+removeKey:ifAbsent:
+.RS 1
+-
+.B
+removeKey
+:
+.I
+key
+.B
+ifAbsent
+:
+.I
+aBlock
+.RE
+.PP
+Remove key (and its associated value) from the receiver\&.  If key is not in the receiver, answers the result of evaluating 
+.I
+aBlock
+\&.  Otherwise, answers the  value externally named by 
+.I
+key
+\&.
+.PP 
+keysDo:
+.RS 1
+-
+.B
+keysDo
+:
+.I
+aBlock
+.RE
+.PP
+The 
+.B
+keysDo:
+message iterates through all the Dictionary elements, running a  one-argument block of code specified by the aBlock argument with the argument set to the key of each assocation\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints a comma separated list of the key-value pairs by sending each individual object a 
+.B
+printOn:
+message\&.  Returns the receiver\&.

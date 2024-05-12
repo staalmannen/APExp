@@ -1,0 +1,13 @@
+# Sample VICI configuration file
+# $Id: vicifile,v 1.1.1.1 2000/06/07 21:09:26 stes Exp $
+
+echo
+echo Welcome to this VICI example
+echo Type help for more info ...
+echo
+
+load ./hello.m
+load ./dynclass.so
+
+set args 10
+

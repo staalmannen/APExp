@@ -1,0 +1,304 @@
+.TH "stack" 3 "Mar 12, 2023"
+.SH Stack
+.PP
+.B
+Inherits from:
+
+Cltn
+.SH Class Description
+.PP
+.B
+Stack
+instances are collections that maintain their entries in LIFO (last in first out) order\&.  Although Stacks are most often controlled by the 
+.B
+push:
+and 
+.B
+pop
+methods, the class also provides for random access of the stack, through the 
+.B
+at:
+and 
+.B
+removeAt:
+methods\&.  Note that the indices are relative to the top (last added) item on the stack, which is the opposite of how the 
+.B
+OrdCltn
+class works\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* new
+.br
+* new:
+.br
+* copy
+.br
+* deepCopy
+.br
+* emptyYourself
+.br
+* freeContents
+.br
+* free
+.RE
+.PP 
+.B
+Interrogation
+.RS 3
+.br
+* depth
+.br
+* isEmpty
+.br
+* eachElement
+.br
+* topElement
+.RE
+.PP 
+.B
+Adding
+.RS 3
+.br
+* push:
+.br
+* pop
+.br
+* swap
+.br
+* at:
+.br
+* removeAt:
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+Returns a new empty stack\&.
+.PP 
+new:
+.RS 1
++
+.B
+new
+:(unsigned)
+.I
+n
+.RE
+.PP
+Returns a new empty stack, that can hold 
+.I
+n
+objects\&.
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Returns a new copy of the stack\&.
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+Returns a new copy of the stack\&.  The members in the new stack are deep copies of the members in the original stack\&.
+.PP 
+emptyYourself
+.RS 1
+-
+.B
+emptyYourself
+.RE
+.PP
+Removes all the members of the stack (without freeing them)\&.  Returns the receiver\&.
+.PP 
+freeContents
+.RS 1
+-
+.B
+freeContents
+.RE
+.PP
+Removes and frees all the members of the receiver, but doesn\&'t free the receiver itself\&.  Returns the receiver\&.
+.PP 
+free
+.RS 1
+-
+.B
+free
+.RE
+.PP
+Frees the stack, but not its contents\&.  Returns 
+.B
+nil
+\&.  Do :
+.RS 3
+
+aCltn = [[aCltn freeContents] free];
+.br
+
+.RE
+.PP
+if you want to free the collection and its contents\&.
+.PP 
+depth
+.RS 1
+- (
+unsigned
+)
+.B
+depth
+.RE
+.PP
+Returns the number of objects on the stack\&.
+.PP 
+isEmpty
+.RS 1
+- (
+BOOL
+)
+.B
+isEmpty
+.RE
+.PP
+Whether the number of objects on the stack is equal to zero\&.
+.PP 
+eachElement
+.RS 1
+-
+.B
+eachElement
+.RE
+.PP
+Returns a sequence of the elements in the collection\&.
+.RS 3
+
+aSeq = [myStack eachElement];
+.br
+while ((anElement = [aSeq next])) {
+.br
+/* do something */
+.br
+}
+.br
+aSeq = [aSeq free];
+.br
+
+.RE
+.PP 
+topElement
+.RS 1
+-
+.B
+topElement
+.RE
+.PP
+Returns the top element on the stack, without removing it\&.  Returns 
+.B
+nil
+if there are no elements on the stack\&.
+.PP 
+push:
+.RS 1
+-
+.B
+push
+:
+.I
+anObject
+.RE
+.PP
+Pushes 
+.I
+anObject
+on the stack, so that it becomes the top of the stack\&.  Returns 
+.B
+self
+\&.
+.PP 
+pop
+.RS 1
+-
+.B
+pop
+.RE
+.PP
+Pops the top of the stack and returns it\&.  Returns 
+.B
+nil
+if the stack is empty\&.
+.PP 
+swap
+.RS 1
+-
+.B
+swap
+.RE
+.PP
+Exchanges the top two stack items and returns the receiver\&.  Generates an exception if the stack is not at least two items deep\&.
+.PP 
+at:
+.RS 1
+-
+.B
+at
+:(unsigned )
+.I
+anOffset
+.RE
+.PP
+Returns the object at 
+.I
+anOffset
+\&.  Note that the top of the stack is at offset 0\&.
+.PP 
+removeAt:
+.RS 1
+-
+.B
+removeAt
+:(unsigned )
+.I
+anOffset
+.RE
+.PP
+Removes the object at 
+.I
+anOffset
+\&.  Note that the top of the stack is at offset 0\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints a list of the objects in the objects by sending each individual object a 
+.B
+printOn:
+message\&.  Returns the receiver\&.

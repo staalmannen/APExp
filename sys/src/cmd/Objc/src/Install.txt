@@ -1,0 +1,205 @@
+Portable Object Compiler (c) 1997-2024  All Rights Reserved.
+
+For help, send email to me: stes@telenet.be
+or preferably to the objc-discuss@lists.sourceforge.net mailing list.
+
+0. Make sure to install lex and yacc and set LEX and YACC variables :
+
+   Use the original lex from Bell Labs (AT&T) by Mike Lesk.
+
+   Or use flex by Vern Paxson from http://flex.sourceforge.net
+
+   Some versions of 'flex' may require
+
+	export LEX="flex --nounistd"
+
+   depending on the C compiler and contents of the header file unistd.h.
+
+   For YACC be sure to use the -d option to generate a y.tab.h file.
+
+   The Bell Labs (AT&T) yacc (by Stephen C. Johnson), works :
+
+        export YACC="yacc -d"
+
+   I do an effort to keep the grammar compatible with AT&T 'original' yacc,
+   i.e., not to use any extensions of newer versions of yacc.
+
+   For Berkeley yacc (by Robert Corbett), if it is called 'byacc' :
+
+        export YACC="byacc -d"
+
+   some BSD UNIX systems install byacc as 'yacc' and in those cases :
+
+        export YACC="yacc -d"
+
+   I recommend Berkeley yacc (see Changes.txt for some subtle issues),
+   and originally used the byacc port from FreeBSD and Linux Slackware,
+   and the AT&T yacc from various AT&T SVR4 UNIX derived systems 
+
+   Berkeley yacc is maintained nowadays by Ken Dickey, byacc 2.0 on Debian,
+   however I do not use any of the Btyacc extensions of that version of byacc.
+
+   It is also possible to use GNU bison (originally by Robert Corbett as well).
+
+   Robert Corbett apparently wrote both Berkeley yacc and bison, 
+   based on his thesis and research work,
+   and based on work (an algorithm) by Tom Pennello and Frank DeRemer.
+
+   Originally the name of bison was 'zeus', 'zoo', 'ox' and 'byson'.
+
+   Later in the GNU project 'byson' was renamed to bison :
+
+	export YACC="bison -y -d"
+
+   For GNU bison the POSIX or yacc compatibility mode (-y) is required.
+
+   Some versions of GNU bison have had issues with Portable Object Compiler,
+   however in other cases it works fine. See Platforms.txt for more info.
+
+   It is possible to use different yacc's such as myacc.
+
+1. Start with a binary "port" of Portable Object Compiler to get a "bootstrap" (initial) compiler, or compile the bootstrap compiler package : 
+
+I'd recommend to start with a binary package and use operating system specific
+tools to install the binaries (such as RPM or APT or IPS pkg).
+
+The binaries that are installed as such, can then be used to recompile
+the actual compiler with itself (the compiler is used to compile itself),
+but this process must be started by installing a binary package first.
+
+In case you compile a bootstrap compiler from source,
+I'd recommend to install the bootstrap compiler in a different directory,
+(using a different --prefix) than the real compiler.
+
+	gnutar xvfz objc-2.3.1-bootstrap.tar.gz
+
+	cd objc-2.3.1-bootstrap
+
+	./configure --help
+	./configure --prefix=$HOME/objc-bootstrap
+	or
+	./configure --prefix=/opt/objc-bootstrap
+
+	make
+	make install
+
+It is important to use the --prefix option if you want to install the compiler in a directory like $HOME/bin.  The default (if no --prefix is specified) is to install into /usr/local/bin,/usr/local/include,/usr/local/man etc.  
+
+The configure script has to find a C compiler for all this to work.
+
+The configure script will try to find itself a C compiler.
+You may have to set the CC variable to prevent 'gcc' from being used :
+
+Some settings for CC can be "clang" or "icc" or "gcc".
+See the file Platforms.txt for a list of known combinations that work.
+
+e.g. on HP-UX, CC='cc -Aa' or on IRIX CC='cc -ansi -common'
+or on Digital Unix, CC='cc -std' or on Solaris /opt/developerstudio12.6/bin/cc
+
+2. Make sure that the bootstrap compiler (objc) is in the PATH :
+
+	PATH="$PATH:$HOME/bin";export PATH
+   or
+	setenv PATH "$PATH:$HOME/bin"
+
+   or specify using OBJC and XOBJC the full path to the bootstrap compiler.
+
+   By specifying OBJC and XOBJC on the command line it is not necessary to
+   change the PATH (because you then specify a full path at the cmd line).
+
+   Both values OBJC and XOBJC (full path cross-objc) must be set.
+
+   XOBJC stands for 'cross-objc' for cross compiles.
+
+3. After step 2 (set the PATH or use OBJC/XOBJC!),
+   go to the actual compiler sources :
+
+	gnutar xvfz objc-2.3.1.tar.gz
+
+	cd objc-2.3.1
+
+	./configure --help
+	./configure --prefix=$HOME
+
+        or
+
+	./configure --prefix=$HOME \
+           OBJC=/opt/objc-bootstrap/bin/objc \
+           XOBJC=/opt/objc-bootstrap/bin/objc \
+           YACC='yacc -d' LEX='flex --nounistd' \
+           AR=echo FINAL_AR='ar cr'
+
+        the previous configure line sets OBJC and XOBJC to 
+        a bootstrap compiler that was installed in /opt/objc-bootstrap,
+	which is only necessary,
+	if you don't have a previous version of objc in the PATH (see step 2)
+
+        it also sets YACC and LEX and changes the default values for AR,
+        where by default we use multiple ar invocations instead of a single
+        ar invocation.
+
+	make
+
+  Optionally run a few basic tests before 'make install':
+
+	make check
+
+  Then 
+
+	make install
+
+  Note that the actual compiler should be installed in a location like
+  
+  /usr/bin or /usr/local/bin or /opt/objc/bin or $HOME/bin 
+
+  different from /opt/objc-bootstrap/bin or $HOME/objc-bootstrap/bin.
+
+  Some examples can be used to check:
+
+	make words
+
+  or
+
+	make DependencyGraph
+
+4.  [Optional] Repeat step 3 to test the compiler (do not repeat step 1).
+
+	./configure --prefix=$HOME
+
+    observe that it finds OBJC and XOBJC as the real compiler,
+    not the one from /opt/objc-bootstrap.
+  
+    in fact when doing upgrades of Portable Object Compiler, only do step 4
+
+5.  the $HOME/objc-bootstrap or /opt/objc-bootstrap may be deleted
+
+6.  It is also supported since version 3.3.30 to build Portable Object
+    Compiler "out of the source tree"
+
+    Instead of 
+
+	gnutar xvfz objc-3.3.30.tar.gz
+
+	cd objc-3.3.30
+
+	./configure --prefix=$HOME
+
+   you can do a "out of source tree" build like :
+
+	gnutar xvfz objc-3.3.30.tar.gz
+
+	mkdir mybuild
+	cd mybuild
+
+	../objc-3.3.30/configure --prefix=$HOME
+
+This will compile/build the compiler in the "mybuild" directory.
+
+This can be useful to do multiple builds in different directories,
+using different flags.
+
+Good luck!
+
+Regards,
+David Stes
+

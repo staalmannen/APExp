@@ -1,0 +1,189 @@
+<HTML>
+<TITLE>cltn Specification Sheet</TITLE>
+<H1>cltn Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 1997,98,2003.  All Rights Reserved.<P>
+<H1>Cltn</H1>
+<B>Inherits from:</B> Object<P>
+<H2>Class Description</H2>
+This is an abstract superclass for collection classes.<P>
+It is useful for implementing functionality, that is inherited by such classes as:<P>
+<UL>
+<LI>OrdCltn (Collection)</LI>
+<LI>Set</LI>
+<LI>Stack</LI>
+<LI>SortCltn (Tree)</LI>
+</UL>
+In addition, this class is necessary for compatibility with Stepstone's ICpak101.<P>
+<H2>Method types</H2>
+<H3><B>Testing Contents</B></H3>
+<UL>
+<LI><A HREF="#10">includesAllOf:</A></LI>
+<LI><A HREF="#11">includesAnyOf:</A></LI>
+</UL>
+<H3><B>Adding and Removing Contents</B></H3>
+<UL>
+<LI><A HREF="#12">addAll:</A></LI>
+<LI><A HREF="#13">addContentsOf:</A></LI>
+<LI><A HREF="#14">addContentsTo:</A></LI>
+<LI><A HREF="#15">removeAll:</A></LI>
+<LI><A HREF="#16">removeContentsFrom:</A></LI>
+<LI><A HREF="#17">removeContentsOf:</A></LI>
+</UL>
+<H3><B>Combining</B></H3>
+<UL>
+<LI><A HREF="#18">intersection:</A></LI>
+<LI><A HREF="#19">union:</A></LI>
+<LI><A HREF="#20">difference:</A></LI>
+</UL>
+<H3><B>Converting</B></H3>
+<UL>
+<LI><A HREF="#21">asSet</A></LI>
+<LI><A HREF="#22">asOrdCltn</A></LI>
+</UL>
+<H3><B>Using Blocks</B></H3>
+<UL>
+<LI><A HREF="#23">detect:</A></LI>
+<LI><A HREF="#24">detect:ifNone:</A></LI>
+<LI><A HREF="#25">select:</A></LI>
+<LI><A HREF="#26">reject:</A></LI>
+<LI><A HREF="#27">collect:</A></LI>
+<LI><A HREF="#28">count:</A></LI>
+</UL>
+<H3><B>Making elements perform</B></H3>
+<UL>
+<LI><A HREF="#29">elementsPerform:</A></LI>
+<LI><A HREF="#30">elementsPerform:with:</A></LI>
+<LI><A HREF="#31">elementsPerform:with:with:</A></LI>
+<LI><A HREF="#32">elementsPerform:with:with:with:</A></LI>
+</UL>
+<H3><B>Do Blocks</B></H3>
+<UL>
+<LI><A HREF="#33">do:</A></LI>
+<LI><A HREF="#34">do:until:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="7">with:</A></H3>
+<BLOCKQUOTE>+<B>with</B>:(int)<I>nArgs,...</I></BLOCKQUOTE>
+Returns a new object with <I>nArgs</I> elements.  For example,<P>
+<BLOCKQUOTE><PRE>
+id aCltn = [OrdCltn with:2,anObject,otherObject];
+</PRE></BLOCKQUOTE>
+creates a collection and adds <I>anObject</I> and <I>otherObject</I> to it.  In a similar way, <B>Set</B> or <B>SortCltn</B> instances can be created like this.<P>
+<H3><A NAME="8">with:with:</A></H3>
+<BLOCKQUOTE>+<B>with</B>:<I>firstObject</I><B>with</B>:<I>nextObject</I></BLOCKQUOTE>
+This method is equivalent to <B>with:</B> 2,<I>firstObject</I>,<I>nextObject</I>. <P>
+<H3><A NAME="9">add:</A></H3>
+<BLOCKQUOTE>+<B>add</B>:<I>firstObject</I></BLOCKQUOTE>
+This method is equivalent to <B>with:</B> 1,<I>firstObject</I>. <P>
+This (factory) method has the same name as the instance method <B>add:</B> and can be used as follows, in circumstances when the user does not want to allocate a collection unless it is actually used :<P>
+<BLOCKQUOTE><PRE>
+aCltn = [ (aCltn)?aCltn:OrdCltn add:myObject ];
+</PRE></BLOCKQUOTE>
+This shows that creation of the collection is delayed until it is actually needed.  If the collection already exists, objects are simply added, using the instance method <B>add:</B>.<P>
+<H3><A NAME="10">includesAllOf:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>includesAllOf</B>:<I>aCltn</I></BLOCKQUOTE>
+Answer whether all the elements of <I>aCltn</I> are in the receiver, by sending <B>includes:</B> for each individual element.<P>
+<H3><A NAME="11">includesAnyOf:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>includesAnyOf</B>:<I>aCltn</I></BLOCKQUOTE>
+Answer whether any element of <I>aCltn</I> is in the receiver, by sending <B>includes:</B> for each individual element.<P>
+<H3><A NAME="12">addAll:</A></H3>
+<BLOCKQUOTE>-<B>addAll</B>:<I>aCltn</I></BLOCKQUOTE>
+Adds each member of <I>aCltn</I> to the receiver.  If <I>aCltn</I> is <B>nil</B>, no action is taken.  The argument <I>aCltn</I> need not be a collection, so long as it responds to <B>eachElement</B> in the same way as collections do.  Returns the receiver.<P>
+<B>Note:</B> If <I>aCltn</I> is the same object as the receiver, a <B>addYourself</B> message is sent to the object.<P>
+<H3><A NAME="13">addContentsOf:</A></H3>
+<BLOCKQUOTE>-<B>addContentsOf</B>:<I>aCltn</I></BLOCKQUOTE>
+This method is equivalent to <B>addAll:</B> and is provided for Stepstone ICpak101 compatibility.<P>
+<H3><A NAME="14">addContentsTo:</A></H3>
+<BLOCKQUOTE>-<B>addContentsTo</B>:<I>aCltn</I></BLOCKQUOTE>
+This method is equivalent to <B>addAll:</B>, but with argument and receiver interchanged, and is provided for Stepstone ICpak101 compatibility.<P>
+<H3><A NAME="15">removeAll:</A></H3>
+<BLOCKQUOTE>-<B>removeAll</B>:<I>aCltn</I></BLOCKQUOTE>
+Removes all of the members of <I>aCltn</I> from the receiver. The argument <I>aCltn</I> need not be a collection, as long as it responds to <B>eachElement</B> as collections do.  Returns the receiver. <P>
+<B>Note:</B> If <I>aCltn</I> is the same object as the receiver, it empties itself using <B>emptyYourself</B> and returns the receiver.<P>
+<H3><A NAME="16">removeContentsFrom:</A></H3>
+<BLOCKQUOTE>-<B>removeContentsFrom</B>:<I>aCltn</I></BLOCKQUOTE>
+This method is equivalent to <B>removeAll:</B>, and is provided for compatibility with Stepstone ICpak101.<P>
+<H3><A NAME="17">removeContentsOf:</A></H3>
+<BLOCKQUOTE>-<B>removeContentsOf</B>:<I>aCltn</I></BLOCKQUOTE>
+This method is equivalent to <B>removeAll:</B>, and is provided for compatibility with Stepstone ICpak101.<P>
+<H3><A NAME="18">intersection:</A></H3>
+<BLOCKQUOTE>-<B>intersection</B>:<I>bag</I></BLOCKQUOTE>
+Returns a new Collection which is the intersection of the receiver and <I>bag</I>.  The new Collection contains only those elements that were in both the receiver and <I>bag</I>.  The argument <I>bag</I> need not be an actual <B>Set</B> or <B>Bag</B> instance, as long as it implements <B>find:</B> as Sets do.<P>
+<H3><A NAME="19">union:</A></H3>
+<BLOCKQUOTE>-<B>union</B>:<I>bag</I></BLOCKQUOTE>
+Returns a new Collection which is the union of the receiver and <I>bag</I>.  The new Collection returned has all the elements from both the receiver and <I>bag</I>.  The argument <I>bag</I> need not be an actual <B>Set</B> or <B>Bag</B> instance, as long as it implements <B>eachElement:</B> as Sets and Bags do.<P>
+<H3><A NAME="20">difference:</A></H3>
+<BLOCKQUOTE>-<B>difference</B>:<I>bag</I></BLOCKQUOTE>
+Returns a new Collection which is the difference of the receiver and <I>bag</I>.  The new Collection returned has only those elements in the receiver that are not in <I>bag</I>.<P>
+<H3><A NAME="21">asSet</A></H3>
+<BLOCKQUOTE>-<B>asSet</B></BLOCKQUOTE>
+Creates a <B>Set</B> instance and adds the contents of the object to the set.<P>
+<H3><A NAME="22">asOrdCltn</A></H3>
+<BLOCKQUOTE>-<B>asOrdCltn</B></BLOCKQUOTE>
+Creates a <B>OrdCltn</B> instance and adds the contents of the object to the set.<P>
+<H3><A NAME="23">detect:</A></H3>
+<BLOCKQUOTE>-<B>detect</B>:<I>aBlock</I></BLOCKQUOTE>
+This message returns the first element in the receiver for which <I>aBlock</I> evaluates to something that is non-nil .  For example, the following :<P>
+<BLOCKQUOTE><PRE>
+[ aCltn detect: { :each | [each isEqual:anObject] } ];
+</PRE></BLOCKQUOTE>
+Returns <B>nil</B> if there's no element for which <I>aBlock</I> evaluates to something that non-nil.<P>
+<H3><A NAME="24">detect:ifNone:</A></H3>
+<BLOCKQUOTE>-<B>detect</B>:<I>aBlock</I><B>ifNone</B>:<I>noneBlock</I></BLOCKQUOTE>
+This message returns the first element in the receiver for which <I>aBlock</I> evaluates to something that is non-nil.<P>
+Evaluates <I>noneBlock</I> if there's no element for which <I>aBlock</I> evaluates to something that is non-nil, and returns the return value of that block.  For example,<P>
+<BLOCKQUOTE><PRE>
+[ aCltn detect: { :e | [e isEqual:anObject]} ifNone: {anObject} ];
+</PRE></BLOCKQUOTE>
+<H3><A NAME="25">select:</A></H3>
+<BLOCKQUOTE>-<B>select</B>:<I>testBlock</I></BLOCKQUOTE>
+This message will return a subset of the receiver containing all elements for which <I>testBlock</I> evaluates to an Object that is non-nil.  For example,<P>
+<BLOCKQUOTE><PRE>
+[ aCltn select: { :each | [each isEqual:anObject] } ];
+</PRE></BLOCKQUOTE>
+Returns a new empty instance of the same class as the receiver, if there's no element for which <I>testBlock</I> evaluates to something that is non-nil. <P>
+<H3><A NAME="26">reject:</A></H3>
+<BLOCKQUOTE>-<B>reject</B>:<I>testBlock</I></BLOCKQUOTE>
+Complement of <B>select:</B><P>
+This message will return a subset of the receiver containing all elements for which <I>testBlock</I> evaluates to nil.  For example,<P>
+<BLOCKQUOTE><PRE>
+[ aCltn reject: { :each | [each isEqual:anObject] } ];
+</PRE></BLOCKQUOTE>
+Returns a new empty instance of the same class as the receiver, if there's no element for which <I>testBlock</I> evaluates to nil.<P>
+<H3><A NAME="27">collect:</A></H3>
+<BLOCKQUOTE>-<B>collect</B>:<I>transformBlock</I></BLOCKQUOTE>
+This message creates and returns a new collection of the same size and type as the receiver. The elements are the result of performing <I>transformBlock</I> on each element in the receiver (elements for which the Block would return <B>nil</B> are filtered out).<P>
+<H3><A NAME="28">count:</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>count</B>:<I>aBlock</I></BLOCKQUOTE>
+Evaluate <I>aBlock</I> with each of the receiver's elements as the argument.  Return the number that answered a non-<B>nil</B> value.<P>
+<H3><A NAME="29">elementsPerform:</A></H3>
+<BLOCKQUOTE>-<B>elementsPerform</B>:(SEL)<I>aSelector</I></BLOCKQUOTE>
+Send <I>aSelector</I> to all objects in the collection, starting from the object at offset <I>0</I>.  For Stepstone compatibility.  Producer uses this.<P>
+<H3><A NAME="30">elementsPerform:with:</A></H3>
+<BLOCKQUOTE>-<B>elementsPerform</B>:(SEL)<I>aSelector</I><B>with</B>:<I>anObject</I></BLOCKQUOTE>
+Send <I>aSelector</I> to all objects in the collection, starting from the object at offset <I>0</I>.  For Stepstone compatibility.  Producer uses this.<P>
+<H3><A NAME="31">elementsPerform:with:with:</A></H3>
+<BLOCKQUOTE>-<B>elementsPerform</B>:(SEL)<I>aSelector</I><B>with</B>:<I>anObject</I><B>with</B>:<I>otherObject</I></BLOCKQUOTE>
+Send <I>aSelector</I> to all objects in the collection, starting from the object at offset <I>0</I>.  For Stepstone compatibility.  Producer uses this.<P>
+<H3><A NAME="32">elementsPerform:with:with:with:</A></H3>
+<BLOCKQUOTE>-<B>elementsPerform</B>:(SEL)<I>aSelector</I><B>with</B>:<I>anObject</I><B>with</B>:<I>otherObject</I><B>with</B>:<I>thirdObj</I></BLOCKQUOTE>
+Send <I>aSelector</I> to all objects in the collection, starting from the object at offset <I>0</I>.  For Stepstone compatibility.  ICpak201 uses this.<P>
+<H3><A NAME="33">do:</A></H3>
+<BLOCKQUOTE>-<B>do</B>:<I>aBlock</I></BLOCKQUOTE>
+Evaluates <I>aBlock</I> for each element in the collection and returns <B>self</B>.  <I>aBlock</I> must be a block taking one object (element) as argument; the return value of the block is ignored by this method.<P>
+Often, the Block would, as a side-effect, modify a variable, as in:<P>
+<BLOCKQUOTE><PRE>
+int count = 0;
+[contents do: { :what | if (what == anObject) count++; }];
+</PRE></BLOCKQUOTE>
+<H3><A NAME="34">do:until:</A></H3>
+<BLOCKQUOTE>-<B>do</B>:<I>aBlock</I><B>until</B>:(BOOL*)<I>flag</I></BLOCKQUOTE>
+Evaluates <I>aBlock</I> for each element in the collection, or until the variable pointed to by <I>flag</I> becomes true, and returns <B>self</B>.  <I>aBlock</I> must be a block taking one object (element) as argument; the return value of the block is ignored by this method.<P>
+Typically the Block will modify the variable <I>flag</I> when some condition holds:<P>
+<BLOCKQUOTE><PRE>
+BOOL found = NO;
+[contents do:{ :what | if (what == findObject) found=YES;} until:&amp;found];
+if (found) { ... }
+</PRE></BLOCKQUOTE>

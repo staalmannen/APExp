@@ -1,0 +1,33 @@
+.TH "OutOfMem" 3 "Mar 12, 2023"
+.SH OutOfMemory
+.PP
+.B
+Inherits from:
+
+Exception
+.PP
+.B
+Maturity Index:
+
+Experimental
+.SH Class Description
+.PP
+This is a subclass to signal 
+.I
+out of memory
+occurrences\&.  Messages that create objects can signal this 
+.B
+Exception
+to indicate that the operation failed due to a lack of resources\&.
+.PP
+The handler can be used as follows:
+.RS 3
+
+[[{ myObject=[Object new] } on:OutOfMemory do:{ :e | myObject=nil;}];
+.br
+
+.br
+
+.RE
+.SH Method types
+.SH Methods

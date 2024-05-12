@@ -1,0 +1,1225 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Computer Algebra Kit (c) 1993,2000,14 by Comp.Alg.Objects.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Polynomial\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} CAObject\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Maturity Index:}} Relatively mature\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 Polynomials are sums of products of {\i scalar} objects and {\i symbols} raised to small, non-negative integer {\i exponents}.  The scalars and symbols can be arbitrary Computer Algebra Kit objects.  Polynomial supports arithmetic over floating-point scalars, or elements of a field (see {\b inField}), or scalars that are elements of an integral domain (see {\b inIntegralDomain}).\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Representations\b0\f0\fs16\
+\
+\f0\fs28\li2200 All together, the Polynomial object presents eight different representations for polynomial arithmetic.  A {\i recursive} polynomial is a sum of {\i terms}, where each term consists of a {\i coefficient}, that is either a scalar object or again a polynomial, multiplied by a symbol raised to an exponent (see {\b Term}).  An {\i expanded} polynomial is a sum of {\i monomials}, each monomial consists of a {\i scalar} multiplied by a product of terms (see {\b Monomial}).  If the polynomial is {\i variable dense}, the collection of possible symbols is fixed and symbols raised to the exponent zero are internally stored; if the polynomial is {\i variable sparse}, it's not defined a priori what symbols are allowed to occur in the polynomial.   A polynomial can be either {\i degree dense} or {\i degree sparse}.  If the polynomial is degree dense, terms or monomials can have a zero coefficient, otherwise the polynomial is internally stored as a linked list of non-zero terms or monomials.\fs16\
+\
+\f0\fs28\li2200 As an example, consider the recursive polynomial in two variables (2 {\i x}^2 + 1) {\i y}^3 + {\i x} {\i y}; it's a sum of two terms.  The same polynomial in expanded representation is the sum of three monomials : 2 {\i x}^2 {\i y}^3 + {\i y}^3 + {\i x} {\i y}.\fs16\
+\
+\f0\fs28\li2200 Not all representations are implemented.  Some representations (notably the variable sparse ones) are implemented in Objective C, and can already be used, but may be slow.  The following table summarizes the current state of implementation of Polynomial :\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+	- variable sparse, recursive and degree sparse : temporary implementation\
+	- variable sparse, recursive and degree dense  : not implemented\
+	- variable dense, recursive and degree sparse  : implemented over objects, integers and integers modulo a small prime\
+	- variable dense, recursive and degree dense   : implemented over objects, integers and integers modulo a small prime\
+	- variable sparse, expanded and degree sparse  : temporary implementation\
+	- variable sparse, expanded and degree dense   : not implemented\
+	- variable dense, expanded and degree sparse   : implemented over objects, integers and integers modulo a small prime\
+	- variable dense, expanded and degree dense    : not implemented\
+\pard\fs16\
+\
+\f0\fs28\li2200 Depending on the type of algorithm you're implementing or using, a different representation is preferred.  The variable dense representation for polynomials of 'high' degree in 'few' variables.  The variable sparse representation for polynomials of 'small' degree in 'many' variables.  Degree dense polynomials over finite fields perform well in factorization problems.  Degree sparse polynomials are preferred when there are many zero coefficients in the polynomial.  The expanded representation is used in the computation of Groebner bases, recursive polynomials are preferred for greatest common divisors, resultants etc.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Symbols and Variable Ordering\b0\f0\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Symbols can be arbitrary objects.  Any object that implements {\b isEqual:}, and for variable sparse polynomials, {\b compare:}, will serve (in the variable dense case it's not necessary to compare symbols because the ordering is fixed by the collection of symbols).  We always refer to the objects in question as {\i symbols}, even when they are not instances of the {\b Symbol} class.  \fs16\
+\
+\f0\fs28\li2200 For a variable dense polynomial, the collection of symbols is fixed when the monomial is created; you can't insert terms in a different symbol.  In the variable sparse case, the collection of symbols is dynamically adapted as you insert terms, but is kept sorted alphabetically.  Note that in the variable dense case, the collection of symbols contains the actual set of symbols (those that actually occur in the polynomial with nonzero exponent) as a {\i subset}.   See the documentation on {\b symbols}.  The variable ordering imposed by the collection of symbols is called {\i lexicographic} (currently the variable ordering is always lexicographic).  Note that in the variable dense case, the lexicographic order need not be alphabetical. \fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Accessing Terms and Monomials in a Polynomial\b0\f0\fs16\
+\
+\f0\fs28\li2200 The methods {\b eachTerm}, {\b removeTerm} and {\b insertTerm:} apply to recursive polynomials.  For example, to obtain a collection of {\i non-zero} terms from a polynomial : \fs16\
+\
+\f2\fs24\li2800 while (aTerm = [aRecursivePolynomial removeTerm]) [aCollection add:aTerm];\
+\f0\fs16\
+\f0\fs28\li2200 If the polynomial is variable sparse, the coefficients of the terms are either scalar objects or again variable sparse polynomials and each symbol can be different.  If the polynomial is variable dense, all symbols of all terms are equal, and the coefficients are either all scalar objects or again all variable dense polynomials.  In a degree dense polynomial, the coefficients of the terms can be zero; {\b eachTerm} might in effect return a zero term.  It never does so for a degree sparse polynomial.\fs16\
+\
+\f0\fs28\li2200 The methods {\b eachMonomial}, {\b removeMonomial} and {\b insertMonomial:} apply to polynomials in expanded representation.  For example, to obtain a collection of monomials from a polynomial : \fs16\
+\
+\f2\fs24\li2800 aSequence = [anExpandedPolynomial eachMonomial];\
+while (aMonomial = [aSequence next]) [aCollection add:aMonomial];\
+\f0\fs16\
+\f0\fs28\li2200 The coefficients of the monomials are scalar objects.  If the polynomial is variable sparse, the monomials are too.  For degree dense polynomials {\b eachMonomial} also returns monomials with a zero coefficient.  The leading monomial, returned by {\b removeMonomial} is never zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Greatest Common Divisors\b0\f0\fs16\
+\
+\f0\fs28\li2200 There is an implementation of an algorithm to compute the GCD of (multivariate) polynomials.  For univariate polynomials over a field, the Euclidean algorithm is being used.  See {\b gcd:} for more details.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Counting Real Roots\b0\f0\fs16\
+\
+\f0\fs28\li2200 Polynomial implements for univariate polynomials with coefficients taken from an ordered domain (such as the integers) an algorithm to count the (total) number of real roots of the polynomial.  See the documentation on {\b numRealRoots}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Factorization\b0\f0\fs16\
+\
+\f0\fs28\li2200 Polynomial implements a method to factor a polynomial into its squarefree parts, over fields or integral domains (zero or non-zero characteristic).  See {\b factorSquareFree} for more details.  There is also an implementation of an algorithm to factor a polynomial over a finite field into its irreducible factors.  See the documentation on {\b factor}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- scalar:\
+	- copy\
+	- deepCopy\
+	- empty\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Identity}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- scalarZero\
+	- termZero\
+	- monomialZero\
+	- hash\
+	- isEqual:\
+	- isRecursive\
+	- isExpanded\
+	- isVariableSparse\
+	- isVariableDense\
+	- isDegreeDense\
+	- isDegreeSparse\
+	- isUnivariate\
+	- inUnivariateDomain\
+	- isMultivariate\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Coercion}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- intValue\
+	- intValue:\
+	- floatValue\
+	- floatValue:\
+	- asScalar\
+	- asSymbol\
+	- asTerm\
+	- asMonomial\
+	- asCoefficient\
+	- asNumerical\
+	- asModp:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Symbols and Variables}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- symbols\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Degree and Order}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- degree\
+	- order\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Number of Terms and Monomials}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- numTerms\
+	- numMonomials\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Removing and Inserting}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- removeTerm\
+	- insertTerm:\
+	- removeMonomial\
+	- insertMonomial:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Sequences}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- eachTerm\
+	- eachMonomial\
+	- eachSequence\
+	- eachScalar\
+	- eachCoefficient\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Representation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- makeDegreeDense\
+	- makeDegreeSparse\
+	- makeRecursive\
+	- makeExpanded\
+	- makeVariableSparse\
+	- makeVariableDense\
+	- collect:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Leading Term or Monomial}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- leadingTerm\
+	- leadingCoefficient\
+	- leadingSign\
+	- leadingMonomial\
+	- leadingScalar\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Monic Polynomials}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- isMonic\
+	- notMonic\
+	- makeMonic\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Addition}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- zero\
+	- isZero\
+	- isOpposite:\
+	- negate\
+	- double\
+	- add:\
+	- subtract:\
+	- addScalar:\
+	- subtractScalar:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Multiplication}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- one\
+	- isOne\
+	- isMinusOne\
+	- multiply:\
+	- square\
+	- inverse\
+	- multiplyScalar:\
+	- divideScalar:\
+	- multiplyCoefficient:\
+	- divideCoefficient:\
+	- multiplyTerm:\
+	- divideTerm:\
+	- multiplyMonomial:\
+	- divideMonomial:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Polynomial Division}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- remainder:quotient:\
+	- divide:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Pseudo Division}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- pseudoRemainder:quotient:\
+	- pseudoRemainder:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Contents and Primitive Parts}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- content\
+	- divideContent\
+	- coefficientContent\
+	- divideCoefficientContent\
+	- termContent\
+	- monomialContent\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Resultant and Greatest Common Divisor}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- gcd:\
+	- resultant:\
+	- resultant:wrt:\
+	- discriminant\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Counting Real Roots}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- numRealRoots\
+	- varRealRoots:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Factoring}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- isSquareFree\
+	- factorSquareFree\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Truncation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- truncateAtDegree:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Characteristic}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- frobenius\
+	- frobeniusInverse\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Evaluation and Substitution}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- evaluate:\
+	- evaluate:at:\
+	- evaluateAll:\
+	- substitute:\
+	- substitute:by:\
+	- substituteAll:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Derivation and Integration}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- derive\
+	- deriveWrt:\
+	- integrate\
+	- integrateWrt:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printsLeadingSign\
+	- printsSum\
+	- printsProduct\
+	- printOn:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 scalar:\f0\b0\
+\f0\fs28\li2500 +{\b scalar}:{\i aScalar}\fs16\
+\
+\f0\fs28\li2200 Creates and returns a polynomial in the recursive, variable sparse and degree sparse representation, containing the scalar object {\i aScalar}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 copy\f0\b0\
+\f0\fs28\li2500 -{\b copy}\fs16\
+\
+\f0\fs28\li2200 Makes a copy of all the terms or monomials of the polynomial.  The original polynomial and the copy don't share any terms or monomials.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deepCopy\f0\b0\
+\f0\fs28\li2500 -{\b deepCopy}\fs16\
+\
+\f0\fs28\li2200 Makes a full independent copy of the polynomial by copying all terms or monomials and by sending {\b deepCopy} messages to the scalar objects.  The original polynomial and the copy don't share any scalars, terms or monomials.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 empty\f0\b0\
+\f0\fs28\li2500 -{\b empty}\fs16\
+\
+\f0\fs28\li2200 Returns a new empty polynomial i.e. a polynomial that is equal to zero and not a copy of another polynomial.  The representation of the new polynomial is the same as the representation of the object that received the message.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 scalarZero\f0\b0\
+\f0\fs28\li2500 -{\b scalarZero}\fs16\
+\
+\f0\fs28\li2200 Returns the zero (base) scalar element.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 termZero\f0\b0\
+\f0\fs28\li2500 -{\b termZero}\fs16\
+\
+\f0\fs28\li2200 Returns the zero term for a recursive polynomial.  In the variable dense case, you may depend upon the fact that the symbol of this term is set to the main symbol of the polynomial (the exponent is set to one).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 monomialZero\f0\b0\
+\f0\fs28\li2500 -{\b monomialZero}\fs16\
+\
+\f0\fs28\li2200 Returns the zero monomial for an expanded polynomial.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hash\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b hash}\fs16\
+\
+\f0\fs28\li2200 Returns a small integer that is the same for objects that are equal (in the sense of {\b isEqual:}).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEqual}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Whether the two objects are equal.  Returns YES if the objects are pointer equal.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isRecursive\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isRecursive}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the polynomial is in recursive representation.  Implies that the polynomial is not in expanded representation.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isExpanded\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isExpanded}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the polynomial is in expanded representation.  Implies that the polynomial is not in recursive representation.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isVariableSparse\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isVariableSparse}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the polynomial is variable sparse.  Implies that the polynomial is not variable dense.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isVariableDense\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isVariableDense}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the polynomial is variable dense.  Implies that the polynomial is not variable sparse.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isDegreeDense\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isDegreeDense}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the polynomial is degree dense.  Implies that the polynomial is not degree sparse.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isDegreeSparse\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isDegreeSparse}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the polynomial is degree sparse.  Implies that the polynomial is not degree dense.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isUnivariate\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isUnivariate}\fs16\
+\
+\f0\fs28\li2200 Whether the number of symbols equals one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inUnivariateDomain\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b inUnivariateDomain}\fs16\
+\
+\f0\fs28\li2200 Whether the polynomial is variable dense and the number of symbols equals one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isMultivariate\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isMultivariate}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intValue\f0\b0\
+\f0\fs28\li2500 - (int){\b intValue}\fs16\
+\
+\f0\fs28\li2200 Returns zero if the polynomial is zero.  If the polynomial consists of a single term or monomial, returns the int value of that object.  Otherwise generates an error.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intValue:\f0\b0\
+\f0\fs28\li2500 -{\b intValue}:(int){\i aValue}\fs16\
+\
+\f0\fs28\li2200 Returns a polynomial (of the same representation as the polynomial that receives the message) with value equal to {\i aValue}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 floatValue\f0\b0\
+\f0\fs28\li2500 - (float){\b floatValue}\fs16\
+\
+\f0\fs28\li2200 Returns zero if the polynomial is zero.  If the polynomial consists of a single term or monomial, returns the float value of that object.  Otherwise generates an error.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 floatValue:\f0\b0\
+\f0\fs28\li2500 -{\b floatValue}:(float){\i aValue}\fs16\
+\
+\f0\fs28\li2200 Returns a polynomial (of the same representation as the polynomial that receives the message) with value equal to {\i aValue}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asScalar\f0\b0\
+\f0\fs28\li2500 -{\b asScalar}\fs16\
+\
+\f0\fs28\li2200 If the polynomial consists of just one term or monomial that is a scalar, this method returns a copy of the scalar.  Otherwise it returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asSymbol\f0\b0\
+\f0\fs28\li2500 -{\b asSymbol}\fs16\
+\
+\f0\fs28\li2200 If the polynomial consists of a single symbol (with exponent one and coefficient one), this method returns a copy of the symbol.  Otherwise it returns {\b nil}.  The method returns {\b nil} if the polynomial is a scalar that is a symbol...\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asTerm\f0\b0\
+\f0\fs28\li2500 -{\b asTerm}\fs16\
+\
+\f0\fs28\li2200 Returns, for a recursive polynomial that consists of a single term, a copy of that term.  Returns {\b nil} if the polynomial is zero (not considered to be a term) or a polynomial that consists of two or more terms.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asMonomial\f0\b0\
+\f0\fs28\li2500 -{\b asMonomial}\fs16\
+\
+\f0\fs28\li2200 Returns, for an expanded polynomial that consists of a single monomial, a copy of that monomial.  Returns {\b nil} if the polynomial is zero (not considered to be a monomial) or a polynomial that consists of two or more monomials.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asCoefficient\f0\b0\
+\f0\fs28\li2500 -{\b asCoefficient}\fs16\
+\
+\f0\fs28\li2200 This method applies only to recursive polynomials.  If the polynomial is a term, this method returns a copy of its coefficient.  Otherwise it returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asNumerical\f0\b0\
+\f0\fs28\li2500 -{\b asNumerical}\fs16\
+\
+\f0\fs28\li2200 Returns a numerical polynomial, ie. a polynomial in the same representation as the original polynomial but with the scalars are replaced by their numerical value.  For example, for a polynomial with integer coefficients, this method returns a polynomial with floating-point objects as coefficients.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asModp:\f0\b0\
+\f0\fs28\li2500 -{\b asModp}:(unsigned short){\i p}\fs16\
+\
+\f0\fs28\li2200 Returns a new polynomial, of the same representation as the original polynomial, but with the scalars replaced by their value modulo {\i p}, a small prime number.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 symbols\f0\b0\
+\f0\fs28\li2500 -{\b symbols}\fs16\
+\
+\f0\fs28\li2200 Returns a collection of symbols.  If the polynomial is variable dense, beware that some symbols may occur with a zero exponent in the polynomial.  If the polynomial is variable sparse, this method returns an alphabetically sorted collection of all the symbols that occur in the polynomial with non-zero exponent.  Don' modify the collection returned by this method; do not attempt to insert new symbols, or change their order.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 degree\f0\b0\
+\f0\fs28\li2500 - (int){\b degree}\fs16\
+\
+\f0\fs28\li2200 For a recursive polynomial, returns the maximum of the exponents of the terms.  For an expanded polynomial, returns the maximum of the degrees of the monomials (the method first checks whether the variable order is degree or reverse degree compatible, because if it is, the maximum is not really computed).  Returns minus one if the polynomial is equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 order\f0\b0\
+\f0\fs28\li2500 - (int){\b order}\fs16\
+\
+\f0\fs28\li2200 For a recursive polynomial, returns the minimum of the exponents of the terms.  For an expanded polynomial, returns the minimum of the degrees of the monomials (the method first checks whether the variable order is degree or reverse degree compatible, because if it is, the minimum is not really computed).  Returns minus one if the polynomial is equal to zero.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} termContent, monomialContent\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 numTerms\f0\b0\
+\f0\fs28\li2500 - (int){\b numTerms}\fs16\
+\
+\f0\fs28\li2200 Returns the number of nonzero terms in the polynomial.  Returns zero if the polynomial is equal to zero.  In the case of a degree dense polynomial, the actual number of terms (including zero terms) can be obtained as the number of members of the associated sequence, or, for a univariate polynomial, as the degree of the polynomial plus one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 numMonomials\f0\b0\
+\f0\fs28\li2500 - (int){\b numMonomials}\fs16\
+\
+\f0\fs28\li2200 Returns the number of a non-zero monomials in the polynomial.  Returns zero if the polynomial is equal to zero.  In the case of a degree dense polynomial, the actual number of monomials (including zero monomials) can be obtained as the number of members of the associated sequence.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 removeTerm\f0\b0\
+\f0\fs28\li2500 -{\b removeTerm}\fs16\
+\
+\f0\fs28\li2200 Removes (and returns) the leading non-zero term of the polynomial.  Returns {\b nil} if the polynomial is equal to zero.  The polynomial must be in recursive representation, but may be either degree sparse or degree dense, variable sparse or variable dense.  To remove a term, the polynomial may not be a copy of another polynomial.\fs16\
+\
+\f0\fs28\li2200 If the polynomial is variable dense, the coefficient of the term is either a scalar, or a variable dense polynomial in a variable less.  If the polynomial is variable sparse, the coefficient of the term is the same kind of variable sparse polynomial as the original ie., there is no difference between coefficient domain and polynomial domain in the variable sparse case.\fs16\
+\
+\f0\fs28\li2200 If the polynomial is degree dense, this method cannot be used to obtain the zero terms in the polynomial (because the leading term is defined as the first non-zero term in the sequence of terms).  The method {\b eachTerm} returns all terms, including zero terms.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 insertTerm:\f0\b0\
+\f0\fs28\li2500 -{\b insertTerm}:{\i aTerm}\fs16\
+\
+\f0\fs28\li2200 Inserts {\i aTerm} into the recursive polynomial and returns {\b self}.  If the polynomial already contains a term with the same exponent, then the coefficients of the terms are added together.  Otherwise, {\i aTerm} is inserted in the collection of terms.  In any case, after insertion, {\i aTerm} belongs to the polynomial.  To insert a term, the polynomial may not be a copy of another polynomial.\fs16\
+\
+\f0\fs28\li2200 As always, if the exponent of the term is zero, the symbol of the term must be {\b nil}.  If the polynomial is variable sparse, the coefficient of the term must be either a scalar object or a <<non-scalar>> variable sparse polynomial.  In the variable dense case, the symbol of the term must be equal to the main symbol of the variable dense polynomial; the coefficient domain of the polynomial must match the coefficient of the term; it may be either a scalar object or a variable dense polynomial.\fs16\
+\
+\f0\fs28\li2200 If the polynomial is degree sparse, insertion is fast at head or tail of the linked list of terms.  If the polynomial is degree dense, the array of coefficients is automatically expanded to make room for new terms.  Therefore, it's better to insert terms of higher degree before terms of smaller degree in the degree dense case.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 removeMonomial\f0\b0\
+\f0\fs28\li2500 -{\b removeMonomial}\fs16\
+\
+\f0\fs28\li2200 Removes the leading monomial of the polynomial.  Returns {\b nil} if the polynomial is equal to zero.  The polynomial may be variable sparse or variable dense, degree sparse or degree dense, but must be in expanded representation.  To remove a monomial, the polynomial may not be a copy of another polynomial.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 insertMonomial:\f0\b0\
+\f0\fs28\li2500 -{\b insertMonomial}:{\i aMonomial}\fs16\
+\
+\f0\fs28\li2200 Inserts {\i aMonomial} into the expanded polynomial and returns {\b self}.  If the polynomial already contains a monomial with the same terms, then the scalars of the monomials are added together.  Otherwise, {\i aMonomial} is inserted in the collection of monomials.  In any case, after insertion, {\i aMonomial} belongs to the polynomial.  The polynomial may not be a copy of another polynomial.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 eachTerm\f0\b0\
+\f0\fs28\li2500 -{\b eachTerm}\fs16\
+\
+\f0\fs28\li2200 Returns, for a recursive polynomial, a sequence of terms. You may not modify the terms in the sequence or alter the polynomial in any other way while sequencing over its contents.  A zero polynomial is represented by an empty sequence.  If the polynomial is variable dense, all the terms in the sequence have the same symbol; if it is variable sparse, the symbols may be different.  The terms are ordered with decreasing exponents (and in the variable sparse case, with respect to the symbols).  The first member of the sequence is the leading term of the polynomial; this term is never equal to zero.  If the polynomial is degree sparse, the sequence doesn't contain any terms with zero coefficient.  If the polynomial is degree dense, the sequence also contains the terms with zero coefficient (unlike {\b removeTerm}).\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} CASequence\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 eachMonomial\f0\b0\
+\f0\fs28\li2500 -{\b eachMonomial}\fs16\
+\
+\f0\fs28\li2200 Like {\b eachTerm} but for expanded polynomial; returns a sequence of monomials.  A zero polynomial is represented by an empty sequence.  If the polynomial is variable dense, all the monomials in the sequence are variable dense; they are variable sparse if the polynomial is variable sparse.  The monomials are ordered with respect to Monomials {\b compareTerms:} method.  The first member of the sequence is the leading monomial of the polynomial; it's never equal to zero.  If the polynomial is degree sparse, the sequence doesn't contain any monomials with zero coefficient.  If the polynomial is degree dense, the sequence also contains the monomials with zero coefficient (unlike {\b removeMonomial}).\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} CASequence\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 eachSequence\f0\b0\
+\f0\fs28\li2500 -{\b eachSequence}\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Not implemented.\fs16\
+\
+\f0\fs28\li2200 Returns, for recursive or expanded polynomials, a sequence whose members are either monomials or again sequences.  At the deepest level of recursion the members of this sequence are {\i monomials}, even for recursive polynomials.\fs16\
+\
+\f0\fs28\li2200 The following example shows how to access the leading monomial of a recursive, non-zero polynomial (such a polynomial is {\i not} a sum of monomials) :\fs16\
+\
+\f2\fs24\li2800 aSequence = [aRecursivePolynomial eachSequence];\
+aMember   = [aSequence firstElement];\
+while ([aMember isKindOfSequence]) aMember = [aMember firstElement];\
+printf("leading monomial is %s",[aMember str]);\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 eachScalar\f0\b0\
+\f0\fs28\li2500 -{\b eachScalar}\fs16\
+\
+\f0\fs28\li2200 Returns a sequence of the scalar objects in the polynomial.  If the polynomial is in expanded representation, this sequence contains the scalars of the monomials in the polynomial.  If it is recursive, then the sequence contains the (base) scalars in the polynomial.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} The sequence returned by this method doesn't respond to {\b at:} messages.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 eachCoefficient\f0\b0\
+\f0\fs28\li2500 -{\b eachCoefficient}\fs16\
+\
+\f0\fs28\li2200 Returns, for a recursive and variable dense polynomial, a sequence of the coefficients of the terms in the polynomial.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 makeDegreeDense\f0\b0\
+\f0\fs28\li2500 -{\b makeDegreeDense}\fs16\
+\
+\f0\fs28\li2200 If the polynomial is degree dense, this method merely returns a copy of {\b self}.  Otherwise, it creates a new degree dense polynomial and converts the polynomial into this new representation (making copies of the terms or monomials of the polynomial).   The resulting polynomial may be recursive, expanded, variable sparse or variable dense, depending on the representation of the original polynomial.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 makeDegreeSparse\f0\b0\
+\f0\fs28\li2500 -{\b makeDegreeSparse}\fs16\
+\
+\f0\fs28\li2200 If the polynomial is degree sparse, this method merely returns a copy of {\b self}.  Otherwise, it creates a new degree sparse polynomial and converts the polynomial into this new representation (making copies of the terms or monomials of the polynomial).   The resulting polynomial may be recursive, expanded, variable sparse or variable dense, depending on the representation of the original polynomial.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 makeRecursive\f0\b0\
+\f0\fs28\li2500 -{\b makeRecursive}\fs16\
+\
+\f0\fs28\li2200 Returns, for an expanded polynomial, a new polynomial over the same domain of scalars and with the same value, but in the recursive representation.  The polynomial may be degree dense or degree sparse, variable sparse or variable dense.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 makeExpanded\f0\b0\
+\f0\fs28\li2500 -{\b makeExpanded}\fs16\
+\
+\f0\fs28\li2200 Returns, for a recursive polynomial, a new polynomial over the same domain of scalars and with the same value, but in the expanded representation.  The polynomial may be degree dense or degree sparse, variable sparse or variable dense.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 makeVariableSparse\f0\b0\
+\f0\fs28\li2500 -{\b makeVariableSparse}\fs16\
+\
+\f0\fs28\li2200 Returns, for a variable dense polynomial, a new polynomial over the same domain of scalars and with the same value, but in the variable sparse representation.  The polynomial may be degree dense or degree sparse, recursive or expanded.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 makeVariableDense\f0\b0\
+\f0\fs28\li2500 -{\b makeVariableDense}\fs16\
+\
+\f0\fs28\li2200 Returns, for a variable sparse or variable dense polynomial, a new polynomial over the same domain of scalars and with the same value, but in the variable dense representation.  The polynomial may be degree dense or degree sparse, recursive or expanded.  This method invokes {\b collect:}.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} collect\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 collect:\f0\b0\
+\f0\fs28\li2500 -{\b collect}:{\i symbols}\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} <<The case of {\i symbols} a collection with less members than the number of variables of the polynomial is not yet implemented.  Currenlty {\i symbols} must contain the same number, or more symbols than the original polynomial>>\fs16\
+\
+\f0\fs28\li2200 Returns, for a variable sparse or variable dense polynomial, a new variable dense polynomial in the symbols indicated by the collection {\i symbols}.  The collection must contain at least one symbol.  The original polynomial may be degree dense or degree sparse, recursive or expanded, and the resulting polynomial will be of the same representation.\fs16\
+\
+\f0\fs28\li2200 The following examples show how to convert a variable sparse polynomial into variable dense representation, how to convert two variable sparse polynomials into the {\i same} variable dense representation, and finally how to change the variable order of a variable dense polynomial :\fs16\
+\
+\f2\fs24\li2800 \{\
+    dense = [sparse collect:[sparse symbols]];\
+\}\
+\
+\f0\fs16\
+\f2\fs24\li2800 \{\
+    symbols = [[a symbols] union:[b symbols]];\
+    c = [a collect:symbols];\
+    d = [b collect:symbols];\
+\}\
+\
+\f0\fs16\
+\f2\fs24\li2800 \{\
+    symbols = [[b symbols] copy];\
+    /* ... do something with "symbols" here... */\
+    d = [b collect:symbols];\
+\}\
+\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 leadingTerm\f0\b0\
+\f0\fs28\li2500 -{\b leadingTerm}\fs16\
+\
+\f0\fs28\li2200 Returns the leading term of the (recursive) polynomial.  Returns {\b nil} if the polynomial is equal to zero. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 leadingCoefficient\f0\b0\
+\f0\fs28\li2500 -{\b leadingCoefficient}\fs16\
+\
+\f0\fs28\li2200 Returns the leading coefficient of the (recursive) polynomial.  Returns {\b nil} if the polynomial is equal to zero.  \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 leadingSign\f0\b0\
+\f0\fs28\li2500 - (int){\b leadingSign}\fs16\
+\
+\f0\fs28\li2200 For a recursive polynomial, returns the sign of the leading coefficient.  For a polynomial in expanded representation, returns the sign of the leading scalar.  Returns zero if the polynomial is equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 leadingMonomial\f0\b0\
+\f0\fs28\li2500 -{\b leadingMonomial}\fs16\
+\
+\f0\fs28\li2200 Returns the leading monomial of the polynomial (in expanded representation).  Returns {\b nil} if the polynomial is equal to zero.  \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 leadingScalar\f0\b0\
+\f0\fs28\li2500 -{\b leadingScalar}\fs16\
+\
+\f0\fs28\li2200 Returns the scalar of the leading monomial of the polynomial.  Returns {\b nil} if the polynomial is equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isMonic\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isMonic}\fs16\
+\
+\f0\fs28\li2200 For a recursive polynomial, returns YES if the leading coefficient of the polynomial is equal to one.  For an expanded polynomial, tests whether the leading scalar is equal to one.  It follows that the same polynomial {\i x} {\i y} + 1 is monic in expanded representation, but is {\i not} monic in recursive representation (because the leading coefficient is {\i x}).  The method returns NO if the polynomial is equal to zero.  \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notMonic\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b notMonic}\fs16\
+\
+\f0\fs28\li2200 Whether {\b isMonic} returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 makeMonic\f0\b0\
+\f0\fs28\li2500 -{\b makeMonic}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 zero\f0\b0\
+\f0\fs28\li2500 -{\b zero}\fs16\
+\
+\f0\fs28\li2200 Returns a copy of the zero polynomial (same representation as polynomial that receives the message).  The only difference with {\b empty} is that the latter method creates a new object, while this method just returns a copy of an already existing object.  For example, it's not possible to insert terms in the polynomial returned by {\b zero}.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} empty\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isZero\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isZero}\fs16\
+\
+\f0\fs28\li2200 Whether the object is equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOpposite:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOpposite}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Whether the object is the opposite of {\i b}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 negate\f0\b0\
+\f0\fs28\li2500 -{\b negate}\fs16\
+\
+\f0\fs28\li2200 Returns the opposite of the object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 double\f0\b0\
+\f0\fs28\li2500 -{\b double}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, equal to the object multiplied by two i.e., added to itself.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 add:\f0\b0\
+\f0\fs28\li2500 -{\b add}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Adds {\i b} to the object.  Returns a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subtract:\f0\b0\
+\f0\fs28\li2500 -{\b subtract}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Subtracts {\i b} from the object.  Returns a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 addScalar:\f0\b0\
+\f0\fs28\li2500 -{\b addScalar}:{\i s}\fs16\
+\
+\f0\fs28\li2200 Returns a new polynomial; adds the (base) scalar {\i s} to the original polynomial.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subtractScalar:\f0\b0\
+\f0\fs28\li2500 -{\b subtractScalar}:{\i s}\fs16\
+\
+\f0\fs28\li2200 Returns a new polynomial; subtracts the (base) scalar {\i s} to the original polynomial.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 one\f0\b0\
+\f0\fs28\li2500 -{\b one}\fs16\
+\
+\f0\fs28\li2200 Returns a copy of the unity polynomial (same representation as polynomial that receives the message). \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOne}\fs16\
+\
+\f0\fs28\li2200 Whether the polynomial is equal to one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isMinusOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isMinusOne}\fs16\
+\
+\f0\fs28\li2200 Whether the polynomial is equal to minus one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiply:\f0\b0\
+\f0\fs28\li2500 -{\b multiply}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new polynomial.  Computes the product of the polynomials by the classical polynomial multiplication algorithm, except if the polynomials are equal in which case the method invokes {\b square}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 square\f0\b0\
+\f0\fs28\li2500 -{\b square}\fs16\
+\
+\f0\fs28\li2200 Returns a new polynomial.  Computes the square of the polynomial by the classical polynomial multiplication algorithm using symmetry.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inverse\f0\b0\
+\f0\fs28\li2500 -{\b inverse}\fs16\
+\
+\f0\fs28\li2200 Returns a new polynomial that is the inverse of the polynomial, or {\b nil} if the polynomial cannot be inverted.  A polynomial over a field or integral domain can be inverted if and only if it consists of a single term that is invertible.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiplyScalar:\f0\b0\
+\f0\fs28\li2500 -{\b multiplyScalar}:{\i s}\fs16\
+\
+\f0\fs28\li2200 Multiplies by the scalar {\i s}.  Returns a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideScalar:\f0\b0\
+\f0\fs28\li2500 -{\b divideScalar}:{\i s}\fs16\
+\
+\f0\fs28\li2200 Exact division by the scalar {\i s}.  Returns a new object, or {\b nil} if the division is not exact.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiplyCoefficient:\f0\b0\
+\f0\fs28\li2500 -{\b multiplyCoefficient}:{\i aCoefficient}\fs16\
+\
+\f0\fs28\li2200 Multiplies the (recursive and variable dense) polynomial by {\i aCoefficient} and returns a new object.  What {\i aCoefficient} means, depends on the representation of the polynomial.  If it is variable dense and univariate, then {\i aCoefficient} must be a scalar object.  If it is variable dense and multivariate, then {\i aCoefficient} must be again a variable dense polynomial in a variable less.   The method is {\i not} implemented in the variable sparse case; you can use {\b multiplyScalar:} or {\b multiply:} for these polynomials.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideCoefficient:\f0\b0\
+\f0\fs28\li2500 -{\b divideCoefficient}:{\i aCoefficient}\fs16\
+\
+\f0\fs28\li2200 Exact division of the (recursive and variable dense) polynomial by {\i aCoefficient}; returns a new object or {\b nil} if the division is not exact or if it fails.  If the polynomial is univariate, then {\i aCoefficient} must be a scalar object.  If it is multivariate, then {\i aCoefficient} must be again a variable dense polynomial in a variable less.   The method is not implemented in the variable sparse case; there you can use {\b divideScalar:} or {\b divide:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiplyTerm:\f0\b0\
+\f0\fs28\li2500 -{\b multiplyTerm}:{\i aTerm}\fs16\
+\
+\f0\fs28\li2200 Multiplies the (recursive) polynomial by the term {\i aTerm}; returns a new object.  This method is implemented for both variable sparse and variable dense {\i recursive} polynomials.  In the variable dense case, the symbol of the term must be equal to the main symbol of the polynomial and the coefficient classes must match.  In the variable sparse case, the only requirement is that the domain of scalars of the term and the polynomial are equal.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideTerm:\f0\b0\
+\f0\fs28\li2500 -{\b divideTerm}:{\i aTerm}\fs16\
+\
+\f0\fs28\li2200 (Exact) Division of the polynomial by {\i aTerm}; returns a new polynomial.  The division fails (and this method returns {\b nil}) if one of the terms of the polynomial is not divisible by {\i aTerm}.  This method is implemented for both variable sparse and variable dense {\i recursive} polynomials.  In the variable dense case, the symbol of the term must be equal to the main symbol of the polynomial and the coefficient classes must match.  In the variable sparse case, the only requirement is that the domain of scalars of the term and the polynomial are equal (and for the division not to fail, that the symbol of the term is less than or equal to the symbols of each term of the polynomial).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiplyMonomial:\f0\b0\
+\f0\fs28\li2500 -{\b multiplyMonomial}:{\i s}\fs16\
+\
+\f0\fs28\li2200 Multiplies by the monomial {\i s}.  Returns a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideMonomial:\f0\b0\
+\f0\fs28\li2500 -{\b divideMonomial}:{\i s}\fs16\
+\
+\f0\fs28\li2200 Exact division by the monomial {\i s}.  Returns a new object, or {\b nil} if the division is not exact.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 remainder:quotient:\f0\b0\
+\f0\fs28\li2500 -{\b remainder}:{\i b}{\b quotient}:(id *){\i q}\fs16\
+\
+\f0\fs28\li2200 Returns new polynomials {\i R} and, by reference, {\i Q} such that {\i self} = {\i Q b} + {\i R}.  If {\i q} is a NULL pointer, the quotient {\i Q} is not computed.  Returns {\b nil} (and sets the value pointed to by {\i q} to {\b nil}) if the polynomial division fails.\fs16\
+\
+\f2\fs24\li2800 id q,r;\
+\
+r = [self remainder:b quotient:&q];\
+	\
+/* do something with r and q */\
+	\
+\f0\fs16\
+\f0\fs28\li2200 If the polynomials are variable sparse, they are converted into variable dense representation.  The division algorithm itself, works for univariate and multivariate variable dense polynomials, in recursive or expanded representation, over fields or integral domains.  However, in the multivariate case, a non-zero remainder need not be unique.  In the case of division of polynomials with coefficients in an integral domain (such as the integers), the division possibly fails when a coefficient division fails; it is still possible to do a pseudo-division.  See {\b pseudoRemainder:quotient:} for more details.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divide:\f0\b0\
+\f0\fs28\li2500 -{\b divide}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the exact quotient (a new polynomial) of the polynomial division.  Returns {\b nil} if the polynomial division fails or if the division was not exact (if there was a non-zero remainder).  The polynomial may be expanded or recursive.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 pseudoRemainder:quotient:\f0\b0\
+\f0\fs28\li2500 -{\b pseudoRemainder}:{\i b}{\b quotient}:(id *){\i q}\fs16\
+\
+\f0\fs28\li2200 If the polynomials are variable sparse or expanded, they are temporarily converted into variable dense and recursive representation for this operation.  If {\i n} and {\i m} are the degrees of {\b self} and {\i b} respectively, and if {\i c} is the leading coefficient of {\i b}, than this method computes the pseudo-remainder {\i R} and, if {\i q} is not a NULL pointer, the pseudo-quotient {\i Q} such that {\i c}^(n-m+1) {\i self} = {\i Q b} + {\i R}.  Returns {\b nil} if the pseudo-division fails.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 pseudoRemainder:\f0\b0\
+\f0\fs28\li2500 -{\b pseudoRemainder}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Computes the pseudo-remainder of the polynomials by invoking {\b pseudoRemainder:quotient:} with a NULL argument.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 content\f0\b0\
+\f0\fs28\li2500 -{\b content}\fs16\
+\
+\f0\fs28\li2200 Returns the content of the sequence of scalars of the polynomial (the greatest common divisor of the scalars in the polynomial); the result is a new scalar object.  If the polynomial is zero, this method returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideContent\f0\b0\
+\f0\fs28\li2500 -{\b divideContent}\fs16\
+\
+\f0\fs28\li2200 If the polynomial is zero, this method returns a copy of itself.  Otherwise, this method returns the quotient (a new polynomial) on division by the scalar returned by {\b content}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 coefficientContent\f0\b0\
+\f0\fs28\li2500 -{\b coefficientContent}\fs16\
+\
+\f0\fs28\li2200 Returns for a variable dense and recursive polynomial, the greatest common divisor of the coefficients (not scalars) of the polynomial.  If the polynomial is equal to zero, this method returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideCoefficientContent\f0\b0\
+\f0\fs28\li2500 -{\b divideCoefficientContent}\fs16\
+\
+\f0\fs28\li2200 If the polynomial is zero, this method returns a copy of itself.  Otherwise, this method returns the quotient (a new polynomial) on division by the coefficient returned by {\b coefficientContent}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 termContent\f0\b0\
+\f0\fs28\li2500 -{\b termContent}\fs16\
+\
+\f0\fs28\li2200 Returns for a variable dense and recursive polynomial, the {\i monic} greatest common divisor of the terms of the polynomial.  In other words, this method returns the main symbol of the polynomial raised to the {\b order} of the polynomial. \fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} order\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 monomialContent\f0\b0\
+\f0\fs28\li2500 -{\b monomialContent}\fs16\
+\
+\f0\fs28\li2200 Returns the greatest common divisor (a monic monomial) of the monomials in an expanded polynomial.  If the polynomial is equal to zero, this method returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 gcd:\f0\b0\
+\f0\fs28\li2500 -{\b gcd}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new polynomial that is the gcd of the polynomials.  For recursive and variable dense polynomials over a field, the method computes the {\i monic} gcd of the polynomials by the euclidean algorithm.  Over an integral domain, the method computes the {\i primitive} gcd by the improved subresultant algorithm.  Expanded or variable dense polynomials are temporarily converted into recursive and variable dense representation (and the resulting gcd is converted back into the original representation).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 resultant:\f0\b0\
+\f0\fs28\li2500 -{\b resultant}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the resultant of the pair of two recursive and variable dense polynomials.  The result is a new object that is taken from the coefficient domain i.e., it is either a polynomial in a variable less than the argument polynomials, or it is a scalar.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 resultant:wrt:\f0\b0\
+\f0\fs28\li2500 -{\b resultant}:{\i b}{\b wrt}:(STR){\i aSymbol}\fs16\
+\
+\f0\fs28\li2200 Returns the resultant of the pair of polynomials with respect to the variable named {\i aSymbol}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 discriminant\f0\b0\
+\f0\fs28\li2500 -{\b discriminant}\fs16\
+\
+\f0\fs28\li2200 Returns the discriminant of the polynomial i.e. the resultant of the polynomial and its derivative.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} This is actually the discriminant up to a scalar.  Scalar factor will change in future.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 numRealRoots\f0\b0\
+\f0\fs28\li2500 - (int){\b numRealRoots}\fs16\
+\
+\f0\fs28\li2200 Returns the number of real roots of a univariate and variable dense polynomial, using Sturm's algorithm over any ordered integral domain or field.  A univariate variable sparse polynomial is temporarily converted into variable dense representation.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 varRealRoots:\f0\b0\
+\f0\fs28\li2500 - (int){\b varRealRoots}:{\i g}\fs16\
+\
+\f0\fs28\li2200 Returns the variation of real roots over the polynomial {\i g}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isSquareFree\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isSquareFree}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the polynomial is squarefree i.e., if the polynomial and its derivative are coprime.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 factorSquareFree\f0\b0\
+\f0\fs28\li2500 -{\b factorSquareFree}\fs16\
+\
+\f0\fs28\li2200 Factors a recursive and variable dense polynomial into a product of squarefree factors.  Returns a new collection of term objects; each term consists of a (base) scalar object, the squarefree factor and a positive integral exponent.  If the scalars are taken from a field, the factors are made monic; for an integral domain, the factors are made primitive.  The algorithm works in the case of zero and non-zero characteristic.  If the polynomial is expanded or variable sparse, the method temporarily converts it into recursive and variable dense representation.  The factors of the polynomial are made expanded or variable sparse again.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 truncateAtDegree:\f0\b0\
+\f0\fs28\li2500 -{\b truncateAtDegree}:(int){\i d}\fs16\
+\
+\f0\fs28\li2200 Drops terms or monomials of degree greater than {\i d}.  Returns a new polynomial.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 frobenius\f0\b0\
+\f0\fs28\li2500 -{\b frobenius}\fs16\
+\
+\f0\fs28\li2200 Returns a new polynomial that is the image of the polynomial under the frobenius map by sending {\b frobenius} messages to each term or monomial.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 frobeniusInverse\f0\b0\
+\f0\fs28\li2500 -{\b frobeniusInverse}\fs16\
+\
+\f0\fs28\li2200 Returns a new polynomial that is the image of the polynomial under the inverse of the frobenius map by sending {\b frobeniusInverse} messages to each term or monomial.  Returns {\b nil} if the polynomial is not the image of a polynomial under the frobenius map.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 evaluate:\f0\b0\
+\f0\fs28\li2500 -{\b evaluate}:{\i aScalar}\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Not implemented.\fs16\
+\
+\f0\fs28\li2200 Replaces the main variable of the polynomial by {\i aScalar}, and if the polynomial is univariate, returns a scalar object.  If the polynomial is not univariate, it must be recursive and variable dense and the method returns again a recursive and variable dense polynomial in a variable less (ie. a coefficient object), obtained by replacing the main variable by {\i aScalar}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 evaluate:at:\f0\b0\
+\f0\fs28\li2500 -{\b evaluate}:(STR){\i aSymbol}{\b at}:{\i aScalar}\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Not implemented.\fs16\
+\
+\f0\fs28\li2200 Returns a new polynomial object, obtained by replacing the variable named {\i aSymbol} by {\i aScalar}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 evaluateAll:\f0\b0\
+\f0\fs28\li2500 -{\b evaluateAll}:{\i cltnOfScalars}\fs16\
+\
+\f0\fs28\li2200 Returns a new scalar object, obtained by replacing all variables of the polynomial by the scalar objects in the collection {\i cltnOfScalars} i.e., the first member in the collection returned by {\b variables} is replaced by the first member in {\i cltnOfScalars} and so on.  Variable sparse or expanded polynomials are temporarily converted into recursive and variable dense representation by this method.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 substitute:\f0\b0\
+\f0\fs28\li2500 -{\b substitute}:{\i aPolynomial}\fs16\
+\
+\f0\fs28\li2200 Returns a new (variable dense) polynomial, obtained by replacing the main variable of a variable dense polynomial by {\i aPolynomial}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 substitute:by:\f0\b0\
+\f0\fs28\li2500 -{\b substitute}:(STR){\i aSymbol}{\b by}:{\i aPolynomial}\fs16\
+\
+\f0\fs28\li2200 Returns a new polynomial, obtained by replacing the variable named {\i aSymbol} by {\i aPolynomial}.  Implemented for recursive and variable sparse polynomials only.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 substituteAll:\f0\b0\
+\f0\fs28\li2500 -{\b substituteAll}:{\i cltnOfPolynomials}\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Not implemented.\fs16\
+\
+\f0\fs28\li2200 Returns a new polynomial, obtained by replacing all variables simultaneously by the polynomials in the collection{\i cltnOfPolynomials}.\fs16\
+\
+\f0\fs28\li2200 Change of Variables - Permuting (Swapping) Variables = substituteAll \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 derive\f0\b0\
+\f0\fs28\li2500 -{\b derive}\fs16\
+\
+\f0\fs28\li2200 Returns the derivative of a variable dense polynomial with respect to the main variable (the last member in the collection returned by {\b variables}).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deriveWrt:\f0\b0\
+\f0\fs28\li2500 -{\b deriveWrt}:(STR){\i aSymbol}\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Not implemented.\fs16\
+\
+\f0\fs28\li2200 Returns the derivative of the polynomial with respect to the variable named {\i aSymbol}.  For example, to integrate a polynomial with respect to {\i x} : \fs16\
+\
+\f2\fs24\li2800 pdx = [p deriveWrt:"x"];\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 integrate\f0\b0\
+\f0\fs28\li2500 -{\b integrate}\fs16\
+\
+\f0\fs28\li2200 Integrates a variable dense polynomial with respect to the main variable (the last member in the collection returned by {\b variables}).  Because the resulting polynomial is a polynomial over the same domain of scalars as the integrandum, this operation might fail and returns {\b nil} if the scalars are not taken from a field.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 integrateWrt:\f0\b0\
+\f0\fs28\li2500 -{\b integrateWrt}:(STR){\i aSymbol}\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} Not implemented.\fs16\
+\
+\f0\fs28\li2200 Integrates the polynomial with respect to the variable named {\i aSymbol}. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsLeadingSign\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsLeadingSign}\fs16\
+\
+\f0\fs28\li2200 Whether the polynomial prints a leading minus sign.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsSum\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsSum}\fs16\
+\
+\f0\fs28\li2200 Whether the polynomial prints multiple terms or monomials separated by a plus or minus signs.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsProduct\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsProduct}\fs16\
+\
+\f0\fs28\li2200 Whether the polynomial prints a single product.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Prints the polynomial, by sending {\b printOn:} messages to the terms or monomials.\fs16\
+\
+\fs16\
+\
+\
+}

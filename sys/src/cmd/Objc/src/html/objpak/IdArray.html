@@ -1,0 +1,95 @@
+<HTML>
+<TITLE>idarray Specification Sheet</TITLE>
+<H1>idarray Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 1998,2003.  All Rights Reserved.<P>
+<H1>IdArray</H1>
+<B>Inherits from:</B> Array<P>
+<H2>Class Description</H2>
+<B>IdArray</B> instances are used to hold objects (<B>nil</B> is allowed).  This class is somewhat similar to <B>String</B>, the difference being that a String is an Array of bytes, while this class provides a somewhat similar API to <I>strings of id</I>.<P>
+<B>Note:</B> This class is present mostly for compatibility with ICpak101.  You most likely want to use <B>OrdCltn</B> instead of this class.<P>
+The method <B>size</B> returns the number of non-nil objects in the <B>IdArray</B>.  The method <B>capacity</B> returns the total number of objects that the array can hold.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#0">new</A></LI>
+<LI><A HREF="#1">new:</A></LI>
+<LI><A HREF="#2">with:</A></LI>
+<LI><A HREF="#3">copy</A></LI>
+<LI><A HREF="#4">deepCopy</A></LI>
+<LI><A HREF="#5">free</A></LI>
+</UL>
+<H3><B>Interrogation</B></H3>
+<UL>
+<LI><A HREF="#7">size</A></LI>
+<LI><A HREF="#8">at:</A></LI>
+<LI><A HREF="#9">at:put:</A></LI>
+</UL>
+<H3><B>Resizing</B></H3>
+<UL>
+<LI><A HREF="#10">capacity</A></LI>
+<LI><A HREF="#11">capacity:</A></LI>
+<LI><A HREF="#12">packContents</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#13">printOn:</A></LI>
+</UL>
+<H3><B>Archiving</B></H3>
+<UL>
+<LI><A HREF="#14">fileOutOn:</A></LI>
+<LI><A HREF="#15">fileInFrom:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">new</A></H3>
+<BLOCKQUOTE>+<B>new</B></BLOCKQUOTE>
+Creates an instance whose value is set to the empty array.<P>
+<H3><A NAME="1">new:</A></H3>
+<BLOCKQUOTE>+<B>new</B>:(unsigned)<I>n</I></BLOCKQUOTE>
+Creates an instance of <I>n</I> <B>nil</B> objects.<P>
+<H3><A NAME="2">with:</A></H3>
+<BLOCKQUOTE>+<B>with</B>:(int)<I>nArgs,...</I></BLOCKQUOTE>
+Creates an instance of <I>nArgs</I> objects, using a variable number of arguments, that may contain <B>nil</B> objects.<P>
+<BLOCKQUOTE><PRE>
+id myArray = [IdArray with:3,nil,[Object new],nil];
+</PRE></BLOCKQUOTE>
+<H3><A NAME="3">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Returns a copy of the receiver with its internal C array copied as well (but not the objects that it contains).<P>
+<H3><A NAME="4">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+Like <B>copy</B>, but also sends <B>deepCopy</B> messages to the objects in the IdArray.<P>
+<H3><A NAME="5">free</A></H3>
+<BLOCKQUOTE>-<B>free</B></BLOCKQUOTE>
+Frees the receiver and its internal C array as well.<P>
+<H3><A NAME="7">size</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>size</B></BLOCKQUOTE>
+Returns the number of non-nil objects in the array.<P>
+<B>Note:</B> For Stepstone compatibility (with ICpak101) this method is, for this class, not the same as <B>capacity</B>.  In the case of the <B>IntArray</B> class, <B>size</B> and <B>capacity</B> are the same.<P>
+<H3><A NAME="8">at:</A></H3>
+<BLOCKQUOTE>-<B>at</B>:(unsigned)<I>anOffset</I></BLOCKQUOTE>
+Returns the object at <I>anOffset</I> or signals the <B>OutOfBounds</B> exception if <I>anOffset</I> is greater than the length of the array.<P>
+Unlike for <B>OrdCltn</B> instances, this method may return a nil object.<P>
+<H3><A NAME="9">at:put:</A></H3>
+<BLOCKQUOTE>-<B>at</B>:(unsigned)<I>anOffset</I><B>put</B>:<I>anObject</I></BLOCKQUOTE>
+Replaces the object at <I>anOffset</I> with <I>anObject</I> and returns the old object which was in that location.  Generates an out of bounds exception if <I>anOffset</I> is greater than the length of the array.<P>
+Unlike for <B>OrdCltn</B> instances, this method will accept a nil object.<P>
+<H3><A NAME="10">capacity</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>capacity</B></BLOCKQUOTE>
+Returns the total number of objects in the IdArray. (nil or non-nil).<P>
+<H3><A NAME="11">capacity:</A></H3>
+<BLOCKQUOTE>-<B>capacity</B>:(unsigned)<I>nSlots</I></BLOCKQUOTE>
+Changes the capacity to <I>nSlots</I>.  If <I>nSlots</I> is larger than the current capacity, the memory added at the end will be zero-filled.  If <I>nSlots</I> is less than the current capacity, the array is truncated.<P>
+<H3><A NAME="12">packContents</A></H3>
+<BLOCKQUOTE>-<B>packContents</B></BLOCKQUOTE>
+Removes nil objects while preserving the order of elements in the <B>IdArray</B>.  Used to eliminate the 'hole' left by a <B>at:put:</B> message with a <B>nil</B> argument.<P>
+<H3><A NAME="13">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints the array to <I>aFile</I> without appending a newline.  Returns the receiver.<P>
+<H3><A NAME="14">fileOutOn:</A></H3>
+<BLOCKQUOTE>-<B>fileOutOn</B>:<I>aFiler</I></BLOCKQUOTE>
+Writes the array on <I>aFiler</I>.  Returns the receiver.<P>
+<H3><A NAME="15">fileInFrom:</A></H3>
+<BLOCKQUOTE>-<B>fileInFrom</B>:<I>aFiler</I></BLOCKQUOTE>
+Reads a array object from <I>aFiler</I>.  Returns the receiver.<P>

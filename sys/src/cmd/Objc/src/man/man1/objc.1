@@ -1,0 +1,518 @@
+.ds ]W "Portable Object Compiler
+.de q
+``\\$1''\\$2
+..
+.TH objc 1 "Feb 2, 2023"
+.SH NAME
+objc \- Portable Object Compiler
+.SH SYNOPSIS
+.B objc
+[
+options
+]
+file ...
+.SH DESCRIPTION
+.B objc
+is a compiler for compiling Objective C objects into C, or directly into a binary object file (by automatically invoking an external C compiler).
+.LP
+Command line options that are not recognized by
+.B objc
+are passed on to
+.BR cc (1).
+
+.IP "\fB\-boehm\fP"
+
+
+\-boehm links against
+.B objcrtgc.a
+which is a version of the runtime library, compiled with -DOBJCRT_BOEHM.  This option also adds the library gc.a (a mark-and-sweep garbage collector, needs to be installed for this option to work) to the list of libraries that are automatically linked into the program. 
+
+.IP "\fB\-browse dir\fP"
+
+Generate or update menu files for the Objective\-C browser, in directory \fBdir\fP.
+
+.IP "\fB\-Bprefix\fP"
+
+Use
+.I prefix
+as prefix for the
+.B bin,
+.B include
+and
+.B lib
+directories when searching for binaries, include files and libraries.
+The default prefix is set to the installation directory (e.g. /usr/local).
+The environment variable
+.B OBJCDIR
+overrides the default, and this option can be used to
+override the value of the environment variable, on the command line.
+
+.IP "\fB\-c\fP"
+
+Produce a .o file but do not link.  Equivalent to \-Fo.  
+
+.IP "\fB\-C\fP"
+
+When used with the \-E option, this option will preserve comments in the preprocessed code.  Otherwise, this option is equivalent to \-Fi, i.e. generate C code, by translating Objective C into C, but do not run the C compiler to produce a .o file.
+
+.IP "\fB\-check\fP"
+
+Implemented for the binary driver objc.exe only.  Forces the driver to print a command whenever it is supposed to invoke some tool using a system() call.  Commands are simply printed, they are not executed.
+
+.IP "\fB\-cthreads\fP"
+
+Link against the runtime library
+.B objcrtth.a
+which is a thread-safe version of the
+.B objcrt.a
+runtime library (compiled with -DOBJCRT_CTHREADS).
+
+.IP "\fB\-dl\fP"
+
+Combine a number of object files into a dynamic module, to be loaded by dlopen() or similar, into a running Objective-C program.   This option makes sure the necessary code is generated to automatically initialize Objective-C classes that are loaded into the program.
+
+.IP "\fB\-dollars\fP"
+
+Passes flags to the C compiler to allow dollar characters in identifiers.  Only tested with GNU C.
+
+.IP "\fB\-dynamic\fP"
+
+Must be specified to link a program that will load dynamic modules (modules that are built with \-dl).  Attempts to link against
+.B objcrt.so
+and
+.B objpak.so
+shared runtime libraries, if those libraries can be found.
+
+\-dynamic passes on \-noShared to the stage 1 compiler and registers the function _objcInitNoShared as runtime initialization function.  This is strictly speaking not needed on UNIX, but essential when using DLLs on Windows, so it is done on all platforms.
+
+In addition, \-dynamic causes on some platforms to link against the necessary libraries that define dynamic linking functions.  For example, on Linux it adds a \-rdynamic flag.  On HP-UX it passes a -E flag to the link editor.  On Windows, (with the WATCOM driver), it adds a \-br flag to use the DLL versions of the WATCOM runtime.
+
+.IP "\fB\-E\fP"
+
+Preprocess input and write output to the
+.B stdout.
+
+.IP "\fB\-Fletter\fP"
+
+Stop at the compilation stage specified by
+.B letter.
+Letter can be one of o (\-Fo is equivalent to \-c), or other file suffixes such as i,c,j etc.
+
+.IP "\fB\-gc\fP"
+
+Turn on garbage collection.  Client programs compiled with this flag use \+new to allocate objects (as usual), but do not have to send a \-free message to destroy objects.  See \-refcnt for more information.
+
+.IP "\fB\-g\fP"
+
+Produce debugging symbols and attempts to link against
+.B objcrt_g.a
+and
+.B objpak_g.a
+runtime libraries with debug information, if they can be found. Since
+.BR objc
+is also emitting by default linetags that refer to the original source file, it is possible to step through the code using any C debugger.  
+
+.IP "\fB\-help\fP"
+
+Print overview of compiler switches.
+
+.IP "\fB\-i\fP"
+
+Generate a TDF capsule (.j file) for use with the
+.B tcc
+compiler and do not link.  Equivalent to \-Fj.
+
+.IP "\fB\-Idir\fP"
+
+Add
+.B dir
+to the search path for include files.
+
+.IP "\fB\-inlinecache\fP"
+
+Generate inline cache code for calls to _imp() messenger.  The inline cache messenger associates to each message expression its own cache, and will in
+many cases bypass the default objcrt messenger.
+
+It is safe to use this option to produce binary libraries of objects; the
+libraries can later be used both from within programs that are compiled
+either with or without the -inlinecache option.
+
+.IP "\fB\-import\fP"
+
+Pass flags to the C preprocessor to do the traditional Objective-C constructs # import and // on which we usually don't depend.  Note that it's also possible to set the environment variable CPP to a preprocessor that's newline-terminated-comments capable, or to use the cvtimport(1) utility so that the flag is not needed. 
+
+.IP "\fB\-jfoo\fP" 
+
+Find and add a TDF library
+.B foo.tl.
+
+.IP "\fB\-Jdir\fP" 
+
+Add
+.B dir
+to the search path for TDF libraries.
+
+.IP "\fB\-lfoo\fP" 
+
+Find and add a library
+.B libfoo.a
+(or corresponding shared library, depending on the system).
+
+.IP "\fB\-Ldir\fP" 
+
+Add
+.B dir
+to the search path for libraries.
+
+.IP "\fB\-main function\fP"
+
+Emit runtime initialization code as first statement in
+.B function.
+The default function name is
+.B main,
+but this can be changed using this option if it's not desirable for some reason to compile the main() function using
+.B objc.
+
+.IP "\fB\-noBlocks\fP"
+
+Define the preprocessor symbol OBJC_BLOCKS as 0 (by default the symbol is defined as 1), and make the parser refuse to parse Objective-C blocks.  See the documentation of the Block class for more information.
+
+.IP "\fB\-noCache\fP"
+
+Turn off global Objective C messenger cache.  This option can be used with \-inlineCache.  Sets the objcrt variable noCacheFlag to 1.  The program can selectively turn on caching by setting the variable to 0.
+
+.IP "\fB\-noI\fP"
+
+Do not search header files in the directories of the runtime (objcrt) and
+of the collection class library (objpak).
+
+.IP "\fB\-noLibs\fP"
+
+Do not link against the runtime (objcrt) and the collection class library (objpak).
+
+.IP "\fB\-noNilRcvr\fP"
+
+Messages to nil, the NULL Object, are handled by the nilHandler funtion.  This option registers a handler that aborts the process.
+
+.IP "\fB\-noCategories\fP"
+
+Do not allow (parse) categories.  It is still possible to use the method addMethodsTo: instead.
+
+.IP "\fB\-noFiler\fP"
+
+Do not automatically link the AsciiFiler into the program.  Do not automatically generate filer code for class implementations.  See the documentation on the show, storeOn and readFrom methods, and the AsciiFiler class, for more information.
+
+.IP "\fB\-noFwd\fP"
+
+Generate code for, and calls to, the traditional C messenger,
+.BR _imp(),
+instead of calls to our forwarding C messenger,
+.BR fwdimp().
+Programs compiled with \-noFwd compile faster and are significantly smaller in executable size, but cannot make use of Object's 
+.BR doesNotUnderstand:
+method.   Libraries and object files compiled with, or without, \-noFwd can be freely mixed, but message forwarding will only work for those classes that were compiled with message forwarding turned on.
+
+.IP "\fB\-noPostlink\fP"
+
+Allows to generate code for auto-init with compilers that are configured to generate by default code for postlink.
+
+.IP "\fB\-noSelfAssign\fP"
+
+Do not allow self as left hand side in an assignment.  This is related to the use of instance variables in factory methods.
+
+.IP "\fB\-noTags\fP"
+
+Suppress generation of line tags in temporary files.
+Normally, line tags as expected by the C compiler are
+generated to indicate the line numbers of the original source,
+so that diagnostics will be issued against the Objective C source,
+not against the generated C output.
+
+
+.IP "\fB\-nostdinc\fP"
+
+Do not search header files in the standard include directories.
+This option is system specific, i.e. must be supported by the
+.BR cpp (1)
+preprocessor that is being used; it differs from the -noI option.
+
+.IP "\fB\-O\fP"
+
+Enable the optimizer.  Whether it is possible to specify both -g and -O
+depends on the C compiler that is being used.
+
+.IP "\fB\-oneperfile\fP"
+
+Allow only one class implementation per compilation unit, as the original Stepstone compiler does.  The compiler will generate slightly different structures when this flag is used.  The runtime is properly initializing both code variants, and binary object files compiled with or without this flag can be linked into the same program.
+
+.IP "\fB\-objc\fP"
+
+Treat files ending with .c as Objective C source files.  Normally, files ending with a .m are assumed to be Objective C files, and .c files are assumed to contain plain C.
+
+.IP "\fB\-otb\fP"
+
+Use object tables.  This option causes the compiler to generate code that uses a double indirection for Object identifiers (handles, instead of pointers).  It also links against runtime libraries called
+.B otbcrt.a
+and
+.B otbpak.a,
+because modules or libraries compiled with the \-otb switch
+.B cannot
+be mixed with modules that were compiled without this option. 
+
+.IP "\fB\-pg\fP"
+
+Produce profiling information for use by
+.B gprof.
+
+.IP "\fB\-pic\fP"
+
+Generate position independent code (PIC) on systems that support it, for building shared libraries.  On some systems, this option translates to \-fpic, on other systems (e.g. HP-UX) it is equivalent to \+z.
+
+.IP "\fB\-ppi\fP"
+
+Include a set of compatibility header files in the default include path (for compatibility with Stepstone ICpak101). Also, allow classes to be defined using 3.x Productivity Products International syntax.  This is used for compiling Brad Cox' Smalltalk to Objective-C translator.  Implementations of classes start with '=' instead of the usual \@implementation keyword.  Superclasses still need to be declared with an \@interface part, but the class that is being defined, itself, does not need an interface part.
+
+.IP "\fB\-postlink\fP"
+
+Generate code for
+.B postlink.
+The default is not to do this.
+If you compile with this option on, you cannot combine object
+files for Objective C source with the usual link editor
+.B ld.
+Instead, if you use \-postlink, you will be using our 
+.B postlink (1)
+link editor processor, which does additional processing after linking.
+Programs compiled with postlink use a somewhat faster
+objcrt initialization, at the expense of longer link times.
+Use the combination of the flags \-postlink and \-retain to produce a file
+.B _postlnk.c
+that contains a list of all the Objective C modules that are linked into your program.
+
+.IP "\fB\-prod\fP"
+
+Combine target independent independent TDF capsules into a TDF archive (a .ta file).  This option is passed on to the
+.B tcc (1)
+compiler, the archive name can be set with \-o.  The resulting platform independent .ta file can be specified on the command line as an ordinary .a file.
+
+.IP "\fB\-pthreads\fP"
+
+Link against the library
+.B libpthreads.a
+and the runtime library
+.B objcrtth.a
+which is a thread-safe version of the
+.B objcrt.a
+runtime library (compiled with -DOBJCRT_PTHREADS).
+
+.IP "\fB\-quiet\fP"
+
+Disable copyright notice.  Same as \-q.
+
+.IP "\fB\-retain\fP"
+
+Do not remove intermediate C files.  Normally, intermediate C code files are removed after
+.BR objc
+has made the C compiler compile them.
+
+.IP "\fB\-refcnt\fP"
+
+The preferred interface to turn on garbage collection, is to use the \fB\-gc\fP flag (which is equivalent to \fB\-refcnt\fP).
+
+Generate code for reference counting.  Assignments of object variables are translated towards calls to the 
+.BR idassign()
+function and code to increment and decrement reference counts is emitted for each compound statement.  Only variables of type
+.BR id
+are being controlled by this option.  If an
+.BR id
+variable is declared as
+.BR volatile
+then assignments to the variable are
+.BR NOT
+reference counted.
+
+.IP "\fB\-static\fP"
+
+On systems that support dynamic linking and the \-static compiler flag,
+this prevents linking with shared libraries.
+
+.IP "\fB\-Tprefix\fP"
+
+Use
+.I prefix
+as prefix for temporary files (such as .P, .c, .i files) that are generated by the precompiler.  For example,
+.B \-T/scratch/
+(note the trailing slash) will place files in the /scratch directory.  Alternatively, the environment variable
+.B TMPDIR
+can be used to specify the directory that should be used.
+
+.IP "\fB\-undef\fP"
+
+Undefine all built-in C preprocessor symbols.  This option is system
+specific, i.e. must be supported by the
+.BR cpp (1)
+preprocessor that is being used.
+
+.IP "\fB\-unbuf\fP"
+
+Run
+.BR objc1
+in unbuffered output mode.  The default is to use block buffering.
+Unbuffered output mode is useful for debugging code generation of
+the precompiler.
+
+.IP "\fB\-version\fP"
+
+Print version of compiler and quit.
+
+.IP "\fB\-v\fP"
+
+Print commands that are being executed by the driver script.  Same as \-verbose.
+
+.IP "\fB\-verbose\fP"
+
+Print commands that are being executed by the driver script.  Equivalent to \-v.
+
+.IP "\fB\-w\fP"
+
+Suppress all warnings.
+
+.IP "\fB\-Wletter,option\fP"
+
+Add
+.BR option
+to the list of options passed to the tool identified by
+.BR letter.
+Letter can be
+.B l
+for the link editor,
+.B c
+for the C compiler,
+.B p
+for the C preprocessor, or
+.B o
+for the stage 1 Objective C compiler.  For example, \-Wp,-x passes the option \-x to 
+.B cc 
+when it is called with the \-E flag to do preprocessing.
+
+.IP "\fB\-wClassUsedAsType\fP"
+
+Suppress warnings when class names are used as types.  The compiler
+will translate pointers to classnames to "id".
+
+.IP "\fB\-wUndefinedMethod\fP"
+
+Suppress warnings for methods that are not prototyped.  The compiler will assume that the return value and argument types of such methods is "id".
+
+.IP "\fB\-Wall\fP"
+
+Passed on the GNU C compiler for enabling compiler warning messages.
+
+.IP "\fB\-xstr\fP strings"
+
+Run the (modified) BSD program
+.BR xstr (1)
+after running the Objective C compiler.  This option can somewhat reduce the size of Objective C selector tables of the executable (
+.BR xstr
+will extract selector strings out of the translated Objective C sources, assemble the strings in a file called "strings", and will cause the runtime to use a single, shared table of strings).  This could also speed up runtime
+initialization as selectors don't have to be uniqued anylonger at startup.
+
+.IP "\fB\-Yenv\fP"
+
+Use the specified environment.  This is for the TenDRA
+.B tcc
+compiler.  Valid values are \-Yansi, \-Yposix, \-Yunix95 etc.
+
+.SH ENVIRONMENT
+
+The most useful environment variable for setting options for
+.B objc
+is probably OBJCOPT.  It was introduced in version 1.3.7
+of the compiler (port to Windows95).  The environment variable
+OBJCDIR is kept for backward compatibility with older compilers.
+
+.IP "OBJCOPT"
+
+The environment variable OBJCOPT can hold a list of options that
+is always prepended to the command line arguments of
+.B objc.
+.br
+For example, on UNIX, using the ksh shell :
+.br
+
+	export OBJCOPT="\-q \-B$HOME/objc1.1.1"
+
+.br
+This would set the top location of the distribution, and would, in addition,
+always suppress copyright messages.  On Windows95, the syntax is :
+.br
+
+	set OBJCOPT=\-q \-B\\objc
+
+.br
+
+.IP "OBJCDIR"
+
+This variable can hold the top location of the
+.B objc
+distribution.  For example:
+.br
+.br
+
+	for ksh: export OBJCDIR="$HOME/objc1.1.1"
+
+	for csh: setenv OBJCDIR "$HOME/objc1.1.1"
+	
+.br
+
+$OBJCDIR/bin and $OBJCDIR/man can be added to $PATH and $MANPATH respectively.
+
+.br
+
+.IP "OBJCPATHSEP"
+
+This environment variable, if set, is a string that will be used as path separator instead of the default separator.  Applies to both objc and objc1.
+
+.br
+
+.IP "TMPDIR"
+
+If set, temporary files will be placed in this directory.  The \-T option overrides the value set by TMPDIR.
+
+.IP "CC"
+
+The environment variable CC can optionally hold the name of a C compiler that is used to compile intermediate C files.
+
+.br
+
+.IP "CPP"
+
+The environment variable CPP can optionally hold the name of a C preprocessor that is used to preprocess Objective-C input.  The driver is normally configured with a default value.
+
+.IP "CPPFILTER"
+
+The environment variable CPPFILTER can optionally hold the name of a C program that is to be ran after the C preprocessor.  The tool will be invoked with two arguments : the name of the input file, and the name of the output file.
+
+.IP "OBJCRTMSG"
+
+This environment variable is not strictly related to the compiler, but rather used by the runtime and hence, by all Objective\-C programs.  It can be set to either
+.B stderr
+or a filename to which messages should be logged.  For every message, class of the receiver and name of the selector are printed on a line.  This file can quickly become very large; it is block buffered, unless OBJCRTDBG is set, in which case it is line buffered.
+
+.IP "OBJCRTDBG"
+
+Like OBJCRTMSG, this variable is consulted by the runtime.  It can be set to either
+.B stderr
+or a filename to which messages of the
+.B dbg()
+function should be logged.  If this variable is set, output for OBJCRTDBG and OBJCRTMSG is line buffered.
+
+.SH BUGS
+
+Send bug reports to stes@telenet.be.
+
+.SH "SEE ALSO"
+cc(1),
+postlink(1),
+cvtimport(1)
+

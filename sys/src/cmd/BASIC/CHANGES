@@ -1,0 +1,1827 @@
++------------------------------------------------------+
+| March 15, 2024 - 4.8 stable **anniversary release ** |
++------------------------------------------------------+
+- New: TOTAL to return total amount of items in binary tree (all versions)
+- New: NANOTIMER to measure duration in nanoseconds (all versions)
+- New: OPTION NO_C_ESC to ignore effect of backslash in strings (alll versions)
+- New: command line parameter '-t' to tweak internal settings of BaCon (all versions)
+- Imp: complete overhaul of internal optimized string registration (all versions)
+- Imp: better overall memory management, cleaning up used memory at exit (all versions)
+- Imp: redesigned the binary tree API so it is more user-friendly (all versions)
+- Imp: core string engine now uses a memory pool to decrease heap allocations and memory usage (all versions)
+- Imp: the '+' symbol can be used as an alternative to '&' to concatenate strings (all versions)
+- Fix: regression in returning self-defined records from functions (all versions)
+- Fix: the internal by_local flag did not work for binary trees and associative arrays (BaCon version)
+- Fix: CHANGE$ returned wrong result in case incoming string was NULL (all versions)
+- Fix: self detection of being a muslC binary failed (BaCon version)
+- Fix: ACCEPT would crash in case TLS certificate is invalid or self-signed (all versions)
+
+January 2, 2024 - 4.7.2 (hotfix)
+- Fix: compilation on exotic platforms revealed collisions in memory management causing segfaults (all versions)
+
+January 1, 2024 - 4.7.1 stable
+- Imp: various updates and improvements in the built-in editor (BaCon version)
+- Fix: internal string type check fails in case of UBOUND for string arrays (all versions)
+- Fix: IMPORT did not reopen correct library in subsequent invocations (all versions, kudos alex)
+- Fix: collecting arguments in SUB/FUNC failed in case of more statements on the same line (Shell version)
+- Fix: pieces of code separated by colon were not parsed for special symbols (all versions, kudos rikky)
+- Fix: the VAR statement did reset the size variable in case one of the arguments is NULL (all versions, kudos rikky)
+- Fix: long standing issue: LABEL defined after RESTORE could not be referred to (all versions)
+- Fix: small letter code parsing clashed with C type keywords int, const and static (all versions)
+- Fix: the TOASCII$ function crashed when using string literals (all versions, kudos rikky)
+- Fix: code improvements to prevent warnings when using the '-Wall' compile flag (all versions)
+- Fix: EPRINT did not print to stderr when using FORMAT (BaCon version)
+- Fix: GETKEY did not flush the input queue before waiting for new input (all versions)
+
+June 1, 2023 - 4.7 stable
+- New: function HASBOM to detect if a text contains the UTF8 byte order mark (all versions)
+- New: function EDITBOM$ to add or remove UTF8 byte order mark (all versions)
+- Imp: more performance improvements in string concatenation (all versions)
+- Imp: added caching to core engine for delimited strings (all versions)
+- Imp: total redesign in usage of built-in editor (BaCon version)
+- Imp: initialize TLS when using PRAGMA for GnuTLS or WolfSSL (all versions)
+- Imp: simplified and improved justify method in ALIGN$ function (all versions)
+- Imp: optimization in internal empty string handling reducing memory allocations with approx 40% (all versions)
+- Fix: strings resulting from SPLIT could not be concatenated (all versions)
+- Fix: long standing issue with indenting commented lines (BaCon version, TK/FLTK/GTK versions)
+- Fix: parsing equations added superfluous brackets causing the NOT function to fail (all versions)
+- Fix: the APPEND$ function failed in case of single element in delimited string (all versions)
+- Fix: equation parser could not handle grouped equations of different type (all versions)
+- Fix: HASH function returned negative numbers on 32bit platforms (all versions)
+- Fix: MEMCHECK always returned TRUE for all memory addresses (all versions)
+- Fix: the reserved variable SOURCE$ was not recognized within SUB/FUNCTION (all versions)
+
+March 1, 2023 - 4.6.1 stable
+- Imp: added support for Haiku OS (all versions)
+- Imp: extended BETWEEN functionality with BEYOND (all versions)
+- Imp: added command line parameter '-r' to execute resulting binary after succesfull compilation (all versions)
+- Imp: GUI functions now support TK as a backend (BaCon version)
+- Imp: performance improvements in REGEX, WALK$, REPLACE$, EXTRACT$ (all versions)
+- Imp: GETFILE can use optional FTYPE keyword to retrieve filetype (all versions)
+- Imp: performance improvements in string concatenation (all versions)
+- Fix: check on duplicate SUB or FUNCTION names (all versions - kudos rikky)
+- Fix: memory leak in handling local string arrays (BaCon version)
+- Fix: regression and improvement in RUN statement (BaCon resp. Shell version)
+- Fix: type check in DECLARE/GLOBAL/LOCAL too strict (all versions - kudos rikky)
+- Fix: syntax highlighting fixes (BaCon version, FLTK version)
+
+November 1, 2022 - 4.6 stable
+- New: INVERT function to invert keys/values in associative arrays (all versions)
+- New: WHERE function to determine character position in string based on token index (all versions)
+- Imp: SORT now also can sort associative arrays (all versions)
+- Imp: extended INDEX with INDEX$ for associative arrays (all versions)
+- Imp: replaced 'which' for 'command -v' in shell searching (all versions)
+- Imp: set SSL parameter 'SSL_OP_LEGACY_SERVER_CONNECT' explicitly so OpenSSL3 works with legacy sites (all versions)
+- Imp: performance improvements in the string concatenation operator (all versions)
+- Fix: GUI statements could not be compiled when temporary directory is defined (BaCon version - kudos barry)
+- Fix: sorted OBTAIN$ and sorted LOOKUP could not handle string values larger than 32 characters (all versions)
+- Fix: ALIGN$ added an additional space to resulting string (all versions)
+- Fix: BLOAD should look at OPTION MEMSTREAM also (all versions)
+
+August 1, 2022 - 4.5 stable
+- New: added DLE$ for DOS Line Ending (all versions)
+- New: added TYPE statement to set font type in ANSI compliant terminals (all versions)
+- New: added SCREEN statement to save/restore the screen in ANSI compliant terminals (all versions)
+- New: added INDEX to retrieve index number in array based on value (all versions)
+- Imp: the VAR statement now allows all C types for variadic arguments (all versions)
+- Imp: simplified command line parsing for -i, -l, -o options (all versions)
+- Imp: various performance improvements in built-in editor (BaCon version)
+- Imp: made flex optional, if not available then BaCon will work but it cannot optimize binary (all versions)
+- Imp: the ON statement also allows CALL keyword to jump to functions (all versions)
+- Fix: the GUIFN function could not be compiled in some circumstances (BaCon version)
+- Fix: variable registration in LET used wrong scope for C assignment operators (BaCon version)
+- Fix: the BETWEEN keyword mixed up nested equations in some circumstances (all versions)
+- Fix: the GUI version did not memorize included files (GTK, FLTK version)
+- Fix: the STATIC keyword was broken for SPLIT, MAP, COLLECT and PARSE (BaCon version)
+- Fix: the HOST$ function could crash when name lookup failed (all versions)
+- Fix: regression in the detection of string type equations (all versions)
+- Fix: shell version lost spaces during printing and in the infix string concatenator parsing (Shell version)
+- Fix: EVAL could not be converted in some circumstances (all versions)
+
+October 1, 2021 - 4.4 stable
+- New: PARSE statement to parse parts from delimited strings based on pattern (all versions)
+- New: COLLAPSE$ to remove empty items from delimited string (all versions)
+- Imp: overall code improvements and cleaning (all versions)
+- Imp: allow C assignment operators like += and -= (all versions)
+- Imp: the APPEND statement now can concatenate strings as well (all versions)
+- Imp: pattern string in MATCH now accepts wildcards (all versions)
+- Imp: made second argument in LEFT$ and RIGHT$ optional (all versions)
+- Fix: fixed tokenization issue with the VERIFY keyword (all versions)
+- Fix: fixed crash in CIPHER$ when using WolfSSL (all versions)
+- Fix: GnuTLS could not handle some TLS connections properly (all versions)
+- Fix: memory leaks in CA$ and CN$ (all versions)
+- Fix: string concatenation failed for string members of RECORD (all versions)
+- Fix: memory leak in OPEN FOR SERVER when using SSL mode (all versions)
+- Fix: assignments to pointer members of RECORD caused erroneous variable declaration (all versions)
+- Fix: statement assignments to numeric associative variables did not work (all versions)
+- Fix: the '\' symbol in a comment is not ignored in all circumstances (BaCon version)
+
+May 1, 2021 - 4.3.2 stable
+- New: commands TREE, FIND and COLLECT to define binary trees (all versions)
+- Imp: code cleaning for all implicit variable declarations (all versions)
+- Imp: if no TYPE is defined in GUI definition then use GTK_TYPE (BaCon version)
+- Imp: improvements in stability and performance for recursive WALK$ (all versions)
+- Imp: improved tokenization for statements in Shell version (Shell version)
+- Imp: added support for GTK4 (BaCon version)
+- Fix: the PRINT..FORMAT..TO statement spoiled internal variable damaging other parts of generated code (all versions - kudos rikky)
+- Fix: RESTORE <label> did not work in SUB or FUNCTION when DATA is global (all versions)
+- Fix: the FUNC keyword was not recognized by indentation functions (GTK and FLTK version)
+- Fix: tracing facility could not handle various IF/ELIF/ELSE constructs properly (all versions)
+- Fix: LAST$ and FIRST$ should return empty string in case of one token and argument=1 (all versions)
+- Fix: string equations did not allow surrounding brackets (all versions - kudos vovchik)
+
+February 1, 2021 - 4.3.1 stable
+- New: MATCH to compare elements in delimited strings (all versions)
+- New: ESCAPE$ and UNESCAPE$ to translate bytecodes to escape sequences and vv (all versions)
+- Imp: the length argument in EXPLODE$ is optional (all versions)
+- Imp: made the last argument in IIF and IIF$ optional (all versions)
+- Imp: sorted OBTAIN$ and sorted LOOKUP now also sort keys based on duplicate value (all versions)
+- Imp: allow FUNC keyword for functions (all versions)
+- Fix: memory leak in VAR statement (all versions)
+- Fix: the DOWNTO argument in FOR was broken (all versions)
+- Fix: dynamic arrays declared STATIC could not be returned from function (BaCon version)
+- Fix: UNIQ$ did not use original delimiter in output (all versions - kudos rikky)
+- Fix: string arrays passed to functions could not be compiled properly (all versions)
+- Fix: GUI could crash when directory exists with target binary name (GTK and FLTK version)
+
+January 1, 2021 - 4.3 stable
+- New: OPTION ESC to define escaping character (all versions)
+- Imp: replaced M4 for LEX to analyze used functions (all versions)
+- Imp: performance improvements in UNIQ$, ISTOKEN, SORT$, DELIM$, ALIGN$, REV$, ROTATE$, PROPER$, LOOKUP, OBTAIN$ (all versions)
+- Imp: SIZE argument is optional in LOOKUP and MAP (all versions)
+- Imp: cleaned up memory allocation for intermediate string results (all versions)
+- Fix: returning error code to Shell did not work (all versions - kudos rikky)
+- Fix: converting small letter code using '-z' option was broken (BaCon version)
+- Fix: FREE of assoc array could cause crash afterwards (all versions)
+- Fix: COIL$ and LOOP$ could not be converted correctly in all circumstances (Shell version)
+- Fix: IMPORT did not use symbol name in NULL check (Shell version)
+- Fix: JOIN did not work with dynamic arrays (all versions)
+- Fix: PRINT FORMAT TO did not work in all circumstances (BaCon version - kudos rikky)
+
+November 1, 2020 - 4.2 stable
+- New: TLS for OPEN FOR SERVER, introducing ACCEPT and CERTIFICATE (all versions)
+- Imp: made generated code C89 compliant (all versions)
+- Imp: simplified PUSH/PULL stack, added SP reserved variable (all versions)
+- Imp: code cleaning and simplification in statement assignments and core string engine (all versions)
+- Imp: improved JOIN, READLN, INPUT, READ, NETWORK, SERVER statements, also improved SOURCE$, FILETYPE functions (all versions)
+- Fix: LOOKUP and OBTAIN$ did not recognize NUMBER type when sorting (all versions)
+- Fix: string array assignments did not take OPTION BASE into account (all versions)
+- Fix: APPEND$ mixed up empty tokens at start of delimited string (all versions)
+- Fix: FREE of associative array did not retain base (all versions - kudos rikky)
+- Fix: ARGUMENT$ did not handle delimiter grouping symbol correctly (all versions - kudos rikky)
+
+October 1, 2020 - 4.1.1 stable
+- New: UBOUND to get the upper bound of a one-dimensional array (all versions)
+- Imp: OBTAIN$ allows 3rd argument to sort assoc array before fetching indexes (all versions)
+- Imp: replaced inet_aton for POSIX compliant inet_pton (all versions)
+- Fix: string initialization during declaration went wrong in some circumstances (all versions - kudos rikky)
+- Fix: LOOKUP did not fetch correct key in case of sorted duplicates (all versions)
+- Fix: WALK$ did not accept value higher than 7 (all versions)
+- Fix: B64DEC$ did not set correct length in case of binary data (all versions)
+- Fix: dynamic arrays were declared without noticing scope of declaration (BaCon version)
+- Fix: fixed bug in declaring string arrays while initializing them (Shell version)
+- Fix: the OPEN FOR DEVICE statement needs mode argument in some circumstances (all versions)
+
+August 1, 2020 - 4.1 stable
+- New: added new GUI functions, backends XAW toolkit, Motif, GTK2/GTK3 or CDK (BaCon version)
+- Imp: COIL$ allows 4th argument to define delimiter (all versions)
+- Imp: put consistency in adding linker flags (all versions)
+- Imp: the DEC function should be able to convert long type values (all versions)
+- Imp: the HASH function now also can create hashes of memory areas (all versions)
+- Imp: SELECT/CASE evaluation allows function arguments, improving performance (all versions)
+- Imp: replaced hash table implementation reducing code and memory footprint (all versions)
+- Imp: replaced EVAL code because of license issue, using optional libmatheval (all versions)
+- Fix: improved argument handling for ALIGN$ thereby eliminating casting bug (all versions)
+- Fix: could not assign return value from a function to assoc string (all versions - kudos rikky)
+- Fix: could not assign return value from a function to RECORD type (all versions - kudos bigbass)
+- Fix: tokenizer should not be active in commented lines of text (all versions - kudos rikky) 
+- Fix: INBETWEEN/OUTBETWEEN mangled up the OPTION COLLAPSE setting (all versions)
+- Fix: RETURN could leak memory in certain circumstances (all versions)
+- Fix: BaConGUI crashed when source file was not saved (BaConGUI GTK version - kudos alex)
+- Fix: assoc array elements could not be assigned to each other (all versions - kudos rikky)
+- Fix: assigning a string in DECLARE/GLOBAL/LOCAL did not work (BaCon version - kudos rikky)
+- Fix: regression: RETURN could not handle composed string returns (all versions)
+- Fix: ISTOKEN skipped whole string when first token is empty (all versions - kudos rikky)
+- Fix: regression: functions using C++ class names could not be compiled (all versions)
+
+March 1, 2020 - 4.0 stable
+- New: compile scheme for dependent functions has improved, starting 4.0 (all versions)
+- New: LOOP as inline loop to perform mathematical functions (all versions)
+- Imp: optimized INTL$ and NNTL$ (all versions)
+- Imp: many small performance tweaks (all versions)
+- Imp: install process BaCon now allows specifying external library in LDFLAGS variable (all versions)
+- Imp: simplified handling of displaying error messages (all versions)
+- Imp: optional STEP in FOR/NEXT should take OPTION DELIM as default delimiter (all versions - kudos pebau)
+- Imp: SIZE in SPLIT should be optional (all versions)
+- Imp: WALK$ should allow binary mask to accept multiple filetypes (all versions)
+- Fix: core delimited string engine crashed when passing NULL variable (all versions)
+- Fix: compile warning in TermUX for ARM 64bit (all versions)
+- Fix: string concatenation would stop at uninitialized string variable (all versions - kudos rikky)
+- Fix: ALIGN$ referred to illegal memory (all versions - kudos vovchik)
+
+December 1, 2019 - 3.9.3 stable
+- New: RIP$ to take out part of string, as complement of MID$ (all versions)
+- New: LOOP$/COIL$ as inline loops to perform (delimited) string functions (all versions)
+- Imp: INBETWEEN$/OUTBETWEEN$ should skip delimiters within double quotes (all versions)
+- Imp: INBETWEEN$/OUTBETWEEN$ now also can return balanced substrings (all versions)
+- Imp: DOTIMES can use anonymous variable to obtain current loopnr (all versions)
+- Imp: performance improvements in the core delimited string engine and many delimited string functions (all versions)
+- Imp: set color selection to CSS approach for GTK3 (BaConGUI-GTK version)
+- Fix: cursor keeps selecting text in editor field (BaConGUI-GTK version)
+- Fix: EXPLODE$ should not affect embedded strings (all versions)
+- Fix: memory leak when associative arrays are declared globally within a function (all versions)
+- Fix: INCLUDED code did not set internal index for DATA statement (all versions kudos felixp7)
+- Fix: array of RECORDS did not obey OPTION BASE (all versions kudos felixp7)
+- Fix: internal variable administration lacked correct RECORD types (all versions kudos felixp7)
+- Fix: multiple issues in FOR..IN were fixed by using core delimiter engine (all versions kudos felixp7)
+- Fix: SPLIT statement should be using core delimiter engine as well (all versions)
+- Fix: again LET did not preserve spaces when assigning strings (Shell version)
+
+September 1, 2019 - 3.9.2 stable build 3
+- New: WALK$ to retrieve information from filesystem into delimited string (all versions)
+- New: HASDELIM to check if a string contains a delimiter (all versions)
+- Imp: fixed various compile warnings and errors in GCC 8 (all versions)
+- Imp: BaConGUI recognizes webkit2 to display documentation (BaConGUI-GTK version)
+- Imp: associative arrays can be assigned to each other (all versions)
+- Imp: performance improvements in LAST$ and FIRST$ (all versions)
+- Imp: optimized RETURN statement by eliminating superfluous reallocs (all versions)
+- Fix: erroneous linking order prevented use of external regex library (all versions)
+- Fix: BASENAME$/DIRNAME$/REALPATH$ crashed with NULL argument (all versions)
+- Fix: BASENAME$/DIRNAME$/REALPATH$ returned "." in case argument length is 0 (all versions)
+- Fix: repeatedly creating string buffer did not clear previous contents (all versions)
+- Fix: comparison of strings failed in some circumstances (all versions)
+- Fix: regression - RELATE failed assignments (BaCon version)
+- Fix: GUI versions could not use other compiler than GCC (GTK and FLTK version)
+- Fix: IF/THEN did not allow left side concatenation (all versions)
+- Fix: LINENO did not behave as a standalone token (all versions)
+- Fix: Raspberry Pi showed several compile errors (all versions)
+- Fix: More structural fix in nested concatenations, restoring original performance (build2 - all versions)
+- Fix: Optimized nested concatenations further (build3 - all versions)
+
+July 1, 2019 - 3.9.1 stable
+- New: TOASCII$ to convert string data to ASCII format (all versions)
+- Imp: improved ISUTF8 function (all versions)
+- Imp: download documentation at first run of GUI (GTK and FLTK versions)
+- Fix: FOR..IN did not fetch last element correctly in escaped delimited string (all versions)
+- Fix: REM should not mix up with same letter function names (all versions)
+- Fix: RECEIVE and SEND could not process calculated memory address (all versions)
+- Fix: Set correct data length in TLS mode for RECEIVE and SEND (all versions)
+
+May 1, 2019 - 3.9 stable
+- New: added CLASS keyword to allow embedding C++ classes in BaCon code (all versions)
+- New: added TLS for network connections using optional external library (all versions)
+- New: added CN$ and CA$ to obtain certificate info on TLS connection (all versions)
+- New: added CIPHER$ obtain encryption info on TLS connection (all versions)
+- New: added VERIFY to verify validity of certificate in TLS connection (all versions)
+- New: added ISUTF8 to verify if a string has consistent UTF8 encoding (all versions)
+- Fix: associative arrays crash when index is not initialized (all versions)
+- Fix: OPTION BREAK would fail in case of TRUE/FALSE pair (BaCon version)
+- Fix: PRAGMA RE did not handle multiple library entries correctly (all versions)
+- Fix: do not generate protoypes for C++ class member functions (all versions)
+- Fix: do not declare variables which refer to C++ class (all versions)
+- Fix: B64DEC$ should only accept one argument and set calculated length (all versions)
+
+January 1, 2019 - 3.8.1 stable
+- Imp: possibility to link with a static library (all versions)
+- Imp: RESET now also resets terminal (all versions)
+- Imp: SAVE and APPEND allow comma separated arguments (all versions)
+- Imp: added suport for HTTP proxy (BaCon, all GUI versions)
+- Imp: improvements in the embedded ASCII editor (BaCon version)
+- Imp: made semantic checking more flexible (BaCon version)
+- Imp: aligned installation scripts for Debian based systems and RH systems
+- Fix: REDIM could not process records (all versions thanks vovchik)
+- Fix: falling back to GTK3 still downloads syntax file for GTK2 (BaConGUI-GTK version)
+- Fix: issue in PRAGMA LDFLAGS when checking for library config script (BaCon version)
+- Fix: CASE did not handle binary operand priority correctly (all versions)
+- Fix: issue in record member assignments (BaCon version)
+- Fix: POKE could not parse argument containing comma's correctly (BaCon version)
+- Fix: dynamic array dimension check choke on argument comma's (all versions)
+- Fix: DECLARE did not force dynamic array to be global (all versions)
+
+October 1, 2018 - 3.8 stable
+- New: EVAL to evaluate mathematical expressions during runtime (all versions)
+- New: B64ENC$, B64DEC$ to base64 encode/decode (binary) data (all versions)
+- New: ATN2 for the arctangens of y/x (all versions)
+- New: MERGE$ to extract delimiter from delimited string (all versions)
+- New: HASH to calculate 64bit hash number out of a string (all versions)
+- New: CL$ to clear current text line (all versions)
+- New: embedded ASCII editor with syntax highlighting (all versions)
+- New: runtime error checking allows callback definition (all versions)
+- Imp: POKE accepts optional SIZE keyword for a range of memory addresses (all versions)
+- Imp: PROPER$ follows OPTION PROPER to enable/disable lowercase of remaining token (all versions)
+- Imp: OPTION ERROR to set behavior of functions generating error (all versions)
+- Fix: internal variable registration could block conversion (Shell version)
+- Fix: some compile errors could not be displayed by GUI (all versions)
+- Fix: EXIT FUNCTION generated compilation error (all versions)
+- Fix: typo in configure script could cause header file not to be detected (kudos bigbass)
+- Fix: CHANGE$ could not change empty token (all versions)
+- Fix: BaConGUI hung when opening help in a browser (GUI GTK version thanks Peter Bauer)
+- Fix: improvements in temporary directory handling (all GUI versions)
+- Fix: END statement could not return calculated return code (BaCon version thanks Peter Bauer)
+
+June 1, 2018 - 3.7.3 stable
+- New: OPTION INPUT to define symbol to break input stream from stdin (all versions)
+- Imp: type of result array in MAP should depend on applied function (all versions)
+- Imp: improved API in CUT$ (all versions)
+- Imp: BETWEEN comparison keyword now also accepts AND for range specification (all versions)
+- Fix: shared objects created by BaCon would crash when opening (all versions)
+- Fix: REDIM did not accept compound types (BaCon version)
+- Fix: string invalidation did not check literals causing segfault (all versions)
+- Fix: numeric array using VAL'ed string in index generated error (all versions)
+- Fix: GTK version of BaConGUI should select GTK version based on sourceview (GTK editor)
+- Fix: INPUT needs clean buffer before executing (all versions)
+- Fix: increased internal FNV1a hash to 64bit to better avoid collisions in assoc arrays (all versions)
+- Fix: INPUT did not construct result correctly in case of multiple buffer excess (all versions)
+- Fix: high performance string creation could cause memory error (all versions)
+- Fix: optimized internal hash tables further to avoid collisions in assoc arrays (all versions)
+- Fix: internal string detection only checked variables, not functions (all versions)
+
+March 1, 2018 - 3.7.2 stable
+- New: OPTION DQ to define symbol which prevents splitting delimited strings (all versions)
+- New: OPTION EXPLICIT to force variable declaration (all versions)
+- Imp: cleaned up the use of the '-L.' compile argument (all versions, generic)
+- Imp: invalidate high performance string in case pointer is assigned (all versions)
+- Fix: typo in URL to fetch documentation, improved syntax highlighting (GTK/FLTK editor)
+- Fix: assigning pointer string back to regular string caused crash (all versions)
+- Fix: performance difference in generated binary caused by double loop (BaCon version)
+- Fix: detection of floating point in implicit declaration failed in some circumstances (all versions)
+
+February 1, 2018 - 3.7.1 stable
+- New: OBTAIN$ to convert associative array keys to delimited string (all versions)
+- Imp: support for local associative arrays (all versions)
+- Imp: SWAP can exchange numeric<->string types (all versions)
+- Imp: added check to prevent variable names using C keywords (all versions)
+- Imp: implemented workaround for BSD type systems regarding strlcpy/strlcat (all versions)
+- Fix: ME$ did not work in SUBs and FUNCTIONs (all versions)
+- Fix: clang++ chokes on void pointer arithmetic (all versions)
+- Fix: improvements in configure scripts and Makefile template (generic)
+- Fix: error message from C compiler needed directory prefix from sourcefile (all versions)
+- Fix: network timeout setting was too tight (BaCon version)
+
+January 1, 2018 - 3.7 stable
+- New: BaConGUI based on FLTK
+- New: FIRST$ and LAST$ to return rest part of delimited string (all versions)
+- New: Option -s to suppress semantic warnings (all versions)
+- New: ME$ returns my current file location (all versions)
+- New: SUM/SUMF to summarize elements in a numeric array (all versions)
+- New: EXPLODE$ to insert delimiter into text returning delimited string (all versions)
+- New: BETWEEN/EXCL operator to check on ranges (all versions)
+- New: NRKEYS to count amount of entries in an associative array (all versions)
+- Imp: equation parser now accepts '->' constructs (all versions)
+- Imp: OPTION BREAK to disable the use of break statements, allowing OMP loop optimizations (all versions)
+- Imp: performance improvement in concatenation of string literals (all versions)
+- Imp: API change in RESIZE (all versions)
+- Imp: syntax for CASE now also allows comma separated list (all versions)
+- Imp: compile error exit codes should be returned to shell by BaCon (all versions - rikky)
+- Imp: reimplemented associative arrays using hash tables (all versions)
+- Imp: OPTION RE to support TRE, Oniguruma and PCRE regular expression engines (all versions)
+- Fix: compilation failed when bacon is in other directory and temp directory is specified (all versions)
+- Fix: RESIZE did not accept RECORD variables (all versions)
+- Fix: PUSH/PULL did not handle float and FLOATING types correctly (all versions)
+- Fix: END FUNCTION detected regular C type in some circumstances (all versions)
+- Fix: dynamic string arrays were not initialized in case of shared objects (all versions)
+- Fix: GOTOXY could not accept arguments which contained functions (all versions)
+- Fix: prevent explicit casting when variable is pointer type (all versions)
+- Fix: issues in FREEing individual associative members (all versions)
+- Fix: compile warnings in SEARCH and TALLY shown by clang (all versions)
+- Fix: FREE could not free assoc array element with multiple dimensions (al versions)
+
+August 1, 2017 - 3.6 stable
+- New: OPTION UTF8 to allow string functions to process UTF8 natively (all versions)
+- New: PROPER$ to capitalize first letter of each word in delimited string (all versions)
+- New: DO/DONE to enclose sections of code into one body (all versions)
+- New: OPTION DELIM to define the default delimiter for delimited string functions (all versions)
+- New: ROTATE$ to rotate the elements in a delimited string (all versions)
+- Imp: REVERSE$, LCASE$, UCASE$, INSERT$, INSTR, INSTRREV, LEFT$, RIGHT$, MID$, LEN are now UTF8 compatible (all versions)
+- Imp: ALIGN$ and internal UTF-8 functions show actual text in case of error (all versions)
+- Imp: introduced universal typing to improve compatibility with exotic platforms (all versions)
+- Imp: extended ULEN with optional length argument as inverse to BYTELEN (all versions)
+- Imp: configure scripts should make use of CFLAGS variable for compiler (BaCon and BaConGUI version)
+- Imp: INCLUDE does not need file extension for mentioned file (all versions)
+- Imp: extended BYTELEN with optional argument to count from the right (all versions)
+- Imp: PRAGMA will generate plain C #pragma code in case no valid option is specified (all versions)
+- Imp: The BY keyword in JOIN and SPLIT now is optional (all versions)
+- Imp: limited support for C++ compatible code (all versions)
+- Imp: MAP now also works for string arrays (all versions)
+- Fix: APPEND/SAVE did not parse the TO argument properly (all versions - rikky)
+- Fix: ALARM could not be used within called function (all versions)
+- Fix: FILL$ did not work for values between 128-255 (all versions)
+- Fix: Check on dynamic string arrays failed (Shell version)
+- Fix: Parsing of multiple statements on one line failed (Shell version)
+- Fix: INCLUDE did not work because of wrong initialization (Shell version)
+- Fix: Counting of total amount of converted lines was not correct (BaCon and BaConGUI version)
+- Fix: SORT$ did not take correct elements when OPTION COLLAPSE was set (all versions)
+- Fix: DATA chopped off white spaces (Shell version)
+- Fix: LEN returning unsigned int type caused unpredictable results in CONST (all versions)
+- Fix: Arguments in SUB/FUNC could not contain 'const' keyword (all versions)
+
+May 1, 2017 - 3.5.4 stable
+- Imp: FILL$, COUNT and ALIGN$ now are UTF8 compatible (all versions)
+- Imp: OPTION COLLAPSE should have an effect on the delimited string engine (all versions)
+- Imp: performance improvement in EXTRACT$, no need for reallocation (all versions)
+- Imp: statusbar should show filename of current program (BaConGUI version)
+- Fix: LOCAL should assign foreign type in main header file (all versions)
+- Fix: error indications were not working correctly for functions (all versions)
+- Fix: ALIGN$ did add extra line in some circumstances in mode 3 (all versions)
+- Fix: LET did not preserve spaces when assigning strings (Shell version)
+- Fix: UCS could not return single ASC values (all versions)
+
+April 1, 2017 - 3.5.3 stable
+- New: UTF8$ to print character from Unicode value, UCS to get code, ISASCII to detect ascii (all versions)
+- New: ULEN/BYTELEN to determine length of UTF8 string and substring (all versions)
+- Imp: string comparison should treat NULL and empty string as the same thing (all versions)
+- Imp: added check for Windows file type, now also in INCLUDE statement (all versions)
+- Fix: long standing issue with floating expressions sometimes producing integer (all versions)
+- Fix: DELIM$ could crash in case new delimiter has bigger size (all versions)
+- Fix: regression in JOIN (all versions)
+
+March 1, 2017 - 3.5.2 stable
+- Imp: small improvement in the autoconf macros (all versions)
+- Imp: SAVE/APPEND should read / execute string only once (all versions)
+- Imp: adapted BaConGUI help to new framed format (BaConGUI version)
+- Imp: changed the name of the temporary Makefile to avoid conflict with other Makefiles (all versions)
+- Imp: added '-q' command line option to suppress line counting during conversion (Shell and BaCon version)
+- Imp: code cleaning related to internal string checking as consequence of CASE bug (all versions)
+- Imp: SPLIT should return 0 elements with numeric argument 0 (all versions)
+- Fix: GUI version exits unexpectedly when canceling save action (BaConGUI version)
+- Fix: adapt to newer GCC versions which generate more elaborate error logging (all versions)
+- Fix: JOIN did not calculate size of resulting string correctly (all versions)
+- Fix: strndup is not recognized by certain platforms, replaced with propriety (all versions)
+- Fix: nested functions in RETURN statement could crash (all versions)
+- Fix: CASE did not detect string members in RECORDS correctly (all versions)
+- Fix: SORT worked partially in case OPTION BASE was set (all versions)
+- Fix: TOKEN$ returned last token instead of empty string in case index > total (all versions)
+- Fix: SPLIT crashed with numeric argument and string length 1 (all versions)
+- Fix: implementation of TYPEOF$ calculated wrong offset after occurrence (BaCon and BaConGUI version)
+- Fix: COPY and BSAVE needed proper cast for memory address (all versions)
+
+January 1, 2017 - 3.5.1 stable
+- Imp: two-side alignment in ALIGN$ (all versions)
+- Imp: ALIGN$ allows optional argument to define indentation (all versions - vovchik)
+- Imp: error reporting provides hint in case of missing function names (all versions)
+- Imp: APPEND$ will take position = 0 as appending, improved situation where target string was empty (all versions)
+- Imp: Semantic checking: duplicate IMPORT, MEMORY/BLOAD vs FREE, OPEN vs. CLOSE, function without END (all versions)
+- Fix: outlining in ALIGN$ was not correct when ASCII lines are separated by newline (all versions)
+- Fix: keyword ENDRECORD was missing (all versions)
+- Fix: error reporting would fail when library in PRAGMA does not exist (all versions)
+- Fix: ALIGN$ did not handle multiple empty lines correctly (all versions)
+- Fix: DEL$ crashed in case there was only 1 element (all versions)
+- Fix: core delimiter engine returned wrong value in case of empty strings (all versions)
+- Fix: memory leak of one byte in INPUT statement (all versions)
+- Fix: INPUT should not consider EOF as an error (all versions)
+- Fix: TALLY never returned when search string was empty (all versions)
+- Fix: INSTR/INSTRREV should return 0 in case of empty string argument (all versions)
+- Fix: the WAIT function showed initialization warnings in Valgrind (all versions)
+- Fix: compiler error warning syntax causes strange behavior for duplicate ENDSUB/ENDFUNCTION (all versions)
+
+December 1, 2016 - 3.5 stable
+- New: INBETWEEN$/OUTBETWEEN$ to get string in between/outside two delimiters (all versions - vovchik)
+- New: TOKEN$ to select member of tokenized series based on delimiter (all versions - vovchik)
+- New: LOAD$/SAVE/APPEND to load/save/append a file in one step to and from a variable (all versions - vovchik)
+- New: TALLY to count the amount of times a string occurs (all versions - vovchik)
+- New: INSERT$ to insert a string into another at specified position (all versions - vovchik)
+- New: FLATTEN$/UNFLATTEN$ to flatten out/unflatten escaped grouping characters (all versions)
+- New: BIN$ to convert number to string representing binary format (all versions)
+- New: EXCHANGE$ to swap 2 tokens in a series based on delimiter (all versions - vovchik)
+- New: CHANGE$ to change a token in a series based on delimiter (all versions)
+- New: AMOUNT to count the amount of tokens in a series based on delimiter (all versions - vovchik)
+- New: OPTION QUOTED to enable/disable skipping of delimiters when appearing in a string (all versions)
+- New: DOTIMES/DONE for anonymous loops (all versions)
+- New: ROL, ROR and BIT binary functions (all versions)
+- New: MAP to perform math on numeric arrays (all versions)
+- New: ISTOKEN to check if a string occurs in a delimited string (all versions)
+- New: UNIQ$, SORT$, REV$ and DELIM$ to manipulate delimited strings (all versions - vovchik)
+- New: HEAD$, TAIL$, CUT$ to obtain head, tail, part from delimited string (all versions)
+- New: APPEND$ and DEL$ to add/delete members from delimited string (all versions)
+- New: ALIGN$ to align pieces of ASCII text (all versions - vovchik)
+- Imp: SIGNAL does not need callback function with argument (all versions)
+- Imp: FREE now can delete all members of an associative array at once (all versions)
+- Imp: additional brackets when binary operator is used in IF/WHILE/REPEAT (all versions)
+- Imp: LEN now always uses the string optimized length calculation (all versions)
+- Imp: SPLIT to honor double quotes to skip the delimiter (all versions)
+- Imp: use math.h for MIN/MAX functions (all versions)
+- Imp: use actual BaCon icon for GUI when available (all versions)
+- Imp: SPLIT can perform numerical splitting of string (all versions)
+- Imp: BASENAME$ can accept optional argument to sepcify name or extension (all versions - vovchik)
+- Imp: REPLACE$ and EXTRACT$ should return haystack when needle is empty (all versions)
+- Imp: REPLACE$ should behave as EXTRACT$ when replacing string is empty (all versions)
+- Imp: statusbar of BaConGUI should indicate file size (BaConGUI version)
+- Imp: FOR..IN..STEP to honor double quotes to skip the delimiter (all versions)
+- Imp: string comparison now allows < and > symbols as well (all versions)
+- Imp: preliminary support for dynamic RECORD arrays (all versions)
+- Fix: fixed regression in EXIT (all versions)
+- Fix: comparison in IF/WHILE/REPEAT did not handle binary shift operators correctly (all versions)
+- Fix: potential bug when handling escaped escape sign in mini parsing (all versions)
+- Fix: JOIN statement crashed when target string was declared (all versions - vovchik)
+- Fix: fixed long standing issue where BaCon file needs newline at the end (all versions)
+- Fix: memory leak when using string members in arrays of RECORDS (all versions)
+- Fix: PRINT did not work with string arrays in RECORDS (all versions)
+- Fix: context info did not show some string functions properly (BaConGUI version)
+
+October 1, 2016 - 3.4 stable
+- New: RUN/RUN$ to transfer control to a program thereby replacing current process (all versions)
+- New: SIGNAL to connect SUB/FUNCTION to Unix signal (all versions)
+- New: SOURCE$ containing the original source code of the current program (all versions)
+- New: LINENO contains current linenumber in source code (all versions)
+- New: CLOSE LIBRARY to drop libraries from previous IMPORT statement(s) (all versions)
+- New: ON..GOTO statement for compatibility with old basics (all versions)
+- New: END FORK to exit forked child gracefully (all versions)
+- Imp: optional parameter for EXEC$ to specify stdout/stderr (all versions)
+- Imp: improved ALARM so it can resume interrupted task (all versions)
+- Fix: GUI should try to find library sequences up to 9999 for OpenBSD (BaConGUI version)
+- Fix: error reporting could not find source file in some circumstances (all versions)
+- Fix: improved error reporting in case of nesting errors (all versions)
+- Fix: memory leak when passing string arguments to functions/subs (all versions)
+- Fix: BaConGUI did not set theme on first startup (BaConGUI version)
+- Fix: EXEC$ could wait forever when using optional stdin argument (all versions)
+- Fix: the Enscript syntax file should always be installed in /usr/share prefix (BaConGUI version)
+- Fix: IMPORT could not handle function name in a string variable (all versions)
+- Fix: EXEC$ did not exit child process correctly (all versions)
+
+July 1, 2016 - 3.3.1 stable
+- New: MYPID to show process ID of program (all versions)
+- New: FORK/REAP to spawn process and reap zombie process (all versions)
+- Imp: WRITELN accepts ';' to prevent newline in writing (all versions)
+- Imp: STOP accepts optional argument specifying signal (all versions)
+- Fix: READLN cut off last char in case of EOF (all versions)
+- Fix: SWAP did not work when embedded in IF body (all versions)
+- Fix: system errors always should return '1' value (BaCon version)
+- Fix: regression in local string variables not being empty in SUB/FUNCTION (all versions)
+- Fix: CONST and DEF FN statements segfaulted when containing string functions (all versions)
+- Fix: IMPORT could not import functions with function pointer arguments (all versions - thx Boris Jakubith)
+
+May 29, 2016 - 3.3 stable
+- New: added MIN/MAX/MIN$/MAX$ (all versions)
+- Imp: more performance improvements in string handling (all versions)
+- Imp: code cleaning (all versions)
+- Imp: tokenizer checks specific on alpha numeric when converting float suffix (all versions)
+- Imp: IMPORT can import function from program itself (all versions)
+- Imp: full runtime error checking for functions (all versions)
+- Imp: SEARCH accepts optional argument for direction (all versions)
+- Imp: BaConGUI can fall back to GTK3 if GTK2 is not available (BaConGUI version)
+- Imp: generated source code should not include redundant comments (all versions)
+- Fix: improved memory checker, fixed issue with -O2 compiler flag (all versions)
+- Fix: indentation skipped some source files (BaCon and BaConGUI version)
+- Fix: potential bug in CONCAT$ causing segfault (all versions)
+- Fix: memory leak in direct character array assignment (all versions)
+- Fix: string comparison failed in case of array'ed record members (all versions)
+- Fix: SORT crashed when dimension < 0 (all versions)
+- Fix: fixed memory leak in arrays within record arrays (all versions)
+- Fix: CONST did not allow definition of string based symbol (all versions)
+- Fix: ENUM in main program should be visible globally (all versions)
+- Fix: SEEK could not handle composite arguments (all versions)
+- Fix: RESIZE should accept opaque pointer (all versions)
+- Fix: CLOSE did not accept arguments SERVER, UDP, DEVICE (Shell version)
+- Fix: regression with '-j' option (BaCon and BaConGUI version)
+
+January 1, 2016 - 3.2.2 stable
+- Imp: MEMORY should return opaque pointer (all versions)
+- Imp: improved error trapping detection (all versions)
+- Imp: changed to the more permissive MIT License (all versions)
+- Imp: performance improvements in string handling (all versions)
+- Fix: fixes in variable type registration (Shell version)
+- Fix: BaCon used local error trapping without correct signalling (all versions)
+- Fix: local variable names could conflict with dynamic array members (all versions)
+- Fix: the FRAMEWORK keyword could not be used in lowercase (all versions)
+- Fix: option -z and -j could not be used at the same time (all versions)
+
+December 1, 2015 - 3.2.1 stable
+- Imp: added '?' as synonym for PRINT (all versions)
+- Imp: improved error handling of lowercase programs (all versions)
+- Imp: CLOSE can handle comma separated list of handles (all versions)
+- Imp: statusbar shows cursor position (BaConGUI version)
+- Imp: only link with dlopen library when necessary (all versions)
+- Fix: OPEN FOR does not handle variables in RECORD correctly (all versions)
+- Fix: time functions messed up internal string buffer administration (all versions)
+- Fix: parsing of comma separated list in direct assigned strings would go wrong in some circumstances (all versions)
+- Fix: memory error in REPLACE$ function (all versions)
+- Fix: crash when creating new page after all tabs are closed (BaConGUI version)
+- Fix: string array in RECORD allocated 1 redundant byte (all versions)
+
+November 1, 2015 - 3.2 stable
+- New: added CEIL to round float value upwards (all versions)
+- New: OPTION VARTYPE to set default variable type for implicit declarations (all versions)
+- Imp: added translate functionality to REPLACE$ (all versions)
+- Imp: added ranlib option to add index tabel for BaCon static lib (all versions)
+- Imp: improvements in GUI for help dialog and indentation (BaConGUI)
+- Imp: option '-y' to skip question about temp files (Shell and BaCon version)
+- Imp: counting down DOWNTO keyword in FOR/NEXT (all versions)
+- Imp: code improvements and optimizations (all versions)
+- Fix: direct assigned strings lost spaces (all versions)
+- Fix: EXEC$ should flush stdout buffer before executing command (all versions)
+- Fix: the '-w' switch stored library name in an erroneous way (BaCon version)
+- Fix: some compile errors were not shown properly when source file was not in current dir (all versions)
+- Fix: LET should not take pointer assignment as associative array assignment (all versions)
+- Fix: arguments to SUB/FUNC could not contain array with dimension (BaCon and BaConGUI version)
+- Fix: assignments like 'a=b=c=0' should not be declared as variable (all versions)
+- Fix: error could not be shown when current dir is not the same as temp dir (all versions)
+- Fix: BaCon hung on '-j' option (BaCon version)
+- Fix: GUI should store all open files in case of loading and saving (BaConGUI version)
+- Fix: crash when REGEX receives empty arguments (all versions)
+- Fix: INCR / DECR should declare variable implicitly (all versions)
+- Fix: fixed error in handling array declarations (Shell version)
+- Fix: BaCon allowed function header variables to exist next to globals (all versions)
+- Fix: PRAGMA INCLUDE handled all files as relative (all versions)
+- Fix: infix string concatenator did not work in PRINT without newline (all versions)
+- Fix: cleaned errors shown by shell version of BaCon (Shell version)
+- Fix: directly assigned strings should allow comma separated list (all versions)
+
+August 1, 2015 - 3.1 stable
+- New: MAXNUM to determine max value for a type, RAD and DEG for degree conversions (all versions)
+- New: CR$ for Carriage Return, EL$ to clear current line from cursor to end (all versions)
+- New: added IIF / IIF$ for Inline IF (all versions)
+- New: added REALPATH$, BASENAME$, DIRNAME$ to handle pathnames and files (all versions)
+- Imp: SUB/FUNCTION arguments can omit type declaration by checking suffix (all versions)
+- Imp: code improvements and optimizations in SUB/FUNC, INPUT, READLN, GETFILE, COPY (all versions)
+- Imp: added compatibility with MAC Frameworks (all versions)
+- Imp: option to export to syntax highlighted HTML (BaConGUI version)
+- Imp: MID$ accepts negative value to start position from end of string (all versions)
+- Fix: BaCon did not work if settings directory does not exist (BaCon version)
+- Fix: the ARRAY and ENDUSEH keywords could not be used in lowercase (all versions)
+- Fix: the infix string concatenator did not count nested string functions correctly (all versions)
+- Fix: nested self-defined string functions could return wrong result (all versions)
+- Fix: relative included files should have full path prepended (all versions)
+- Fix: eliminated all TCC compile warnings (all versions)
+- Fix: direct assigned strings should be modifiable (all versions)
+- Fix: embedded C code did not understand BaCon type suffix (all versions)
+- Fix: improved memory management for record members of string type (all versions)
+- Fix: saved linker options were not used in subsequent compilations (Shell and BaCon version)
+
+May 1, 2015 - 3.0.3 stable
+- Imp: COLUMNS/ROWS performance improvement (all versions)
+- Imp: performance improvements, string handling performance improvements (all versions)
+- Imp: FREE can handle multiple arguments (all versions)
+- Fix: DECLARE/LOCAL could not define multiple foreign pointer variables at once (all versions)
+- Fix: reorganized generated main header file (all versions)
+- Fix: direct assigned string arrays should be modifiable (all versions)
+- Fix: code cleaning (all versions)
+- Fix: cleanup errors shown when using -Wall compiler option (all versions)
+- Fix: spaces were deleted in string array assignments (Shell version)
+- Fix: variable type detection went wrong in case of record arrays (all versons)
+- Fix: SORT did not detect array dimension of global array used in SUB/FUNC (all versions)
+- Fix: PRINT generated wrong code in case of spaces behind argument (Shell version)
+- Fix: ALIAS would generate wrong definition in some circumstances (BaCon and BaConGUI version)
+- Fix: REDIM should work for dynamic arrays created by SPLIT and LOOKUP (all versions)
+- Fix: COPY could not copy string arrays (all versions)
+- Fix: a lot of small fixes in generated code (all versions)
+
+December 1, 2014 - 3.0.2 stable
+- New: HOSTNAME$ to get local hostname (all versions)
+- Imp: better parsing allowing tabs in BaCon code (all versions)
+- Imp: general performance improvements (BaCon and BaConGUI version)
+- Imp: renamed Shell to Scratch Pad, improved: context info, tab space (BaConGUI version)
+- Imp: PROTO can define type of foreign function (all versions)
+- Imp: added indentation functionality (BaConGUI version)
+- Imp: more options in PRINT dialog (BaConGUI version)
+- Imp: option '-z' to allow lowercase BaCon statements and functions (all versions)
+- Imp: TRACE MONITOR to print values of variables (all versions)
+- Fix: LET generated wrong code for float assignment (Shell version)
+- Fix: foreign functions should not be taken as float (all versions)
+- Fix: RESTORE <label> was broken (all versions)
+- Fix: variable type detection did not work for record members (all versions)
+- Fix: complex types in function headers were not registered correctly (all versions)
+- Fix: static/dynamic arrays should not be registered as pointer type (all versions)
+- Fix: GETENVIRON did return pointer instead of modifiable string (all versions)
+- Fix: PULL did not detect float type properly (BaCon and BaConGUI version)
+- Fix: LET did not parse combined assignments correctly (all versions)
+- Fix: string variables in functions were registered as global (all versions)
+- Fix: SORT could not handle static arrays in records (all versions)
+- Fix: READ was not able to detect type of declared variable (all versions)
+
+August 1, 2014 - 3.0.1 stable
+- Imp: Android port - get rid of <search.h> header file (all versions)
+- Imp: Android port - get rid of <ftw.h> header file (all versions)
+- Imp: improved handling of BaCon configfile created by -w option (Shell and BaCon version)
+- Imp: configurable archiver using -b option (all versions)
+- Imp: ability to set the type of function explicitly using TYPE (all versions)
+- Imp: support for type suffix: '%' for long, '#' for float (all versions)
+- Imp: show timing of conversion when done (all versions)
+- Imp: BaCon console improvements (BaConGUI version)
+- Imp: OPTION PARSE to allow foreign functions without PROTO (all versions)
+- Fix: shared library creation was broken (all versions)
+- Fix: context info did not show DEF FN (BaConGUI version)
+- Fix: PRINT did not parse end of comma separated line correctly (BaCon and BaConGUI version)
+- Fix: commandline file loading did not work (BaConGUI version)
+- Fix: FOR/NEXT/STEP did not cast to float when variable in STEP is float (all versions)
+- Fix: INPUT did not handle type detection properly (all versions)
+- Fix: direct multi dimensional array initialization choked on OPTION BASE (all versions)
+- Fix: settings for BaCon could not be written upon first execution (Shell and BaCon version)
+- Fix: directly initialized arrays could not be sorted (all versions)
+- Fix: BaConGUI did not detect absence of syntax file upon first run (BaConGUI version)
+- Fix: associative arrays could not be declared using foreign type (all versions)
+- Fix: record members could not be declared using foreign type (all versions)
+- Fix: LET applied casting to all assignment instances (all versions)
+- Fix: PRINT TO used wrong variable type detection (BaCon and BaConGUI version)
+- Fix: IMPORT could not handle FROM argument in all cases (all versions)
+- Fix: direct string assignments could not contain multiple variables (all versions)
+- Fix: SORT did not sort all elements in static array (all versions)
+- Fix: SORT did not sort all types of arrays (all versions)
+- Fix: TRACE generated uncompilable source code (all versions)
+
+May 1, 2014 - 3.0 stable
+- New: CMDLINE to parse individual command line arguments (all versions)
+- New: PRAGMA BACONLIB to force creation of BaCon library programmatically (all versions)
+- New: TYPEOF$ to get the type of a variable (all versions)
+- Imp: COPY now also can perform a memory copy (all versions)
+- Imp: added tooltips to toolbar buttons (BaConGUI version)
+- Imp: changed compile scheme (all versions)
+- Imp: performance improvements in COUNT, LCASE, UCASE and HOST$ (all versions)
+- Imp: improved variable type detection (all versions)
+- Imp: improved performance (BaCon and BaConGUI version)
+- Imp: plain assignments should perform correct cast (all versions)
+- Imp: remember size of main window (BaConGUI version)
+- Imp: merged shell implementations into one script (KSH and BASH version)
+- Imp: added "-gtk3" as commandline option, merged GUI versions (BaConGUI version)
+- Fix: detection of function pointer type failed (BaCon and BaConGUI version)
+- Fix: ZSH could not convert programs (KSH version)
+- Fix: parsing of multiple wrapped lines failed (BASH and KSH version)
+- Fix: detection of array assignments not strict enough (all versions)
+- Fix: RETURN did not handle some string functions properly (all versions)
+- Fix: focus should be set to page when starting (BaConGUI version)
+- Fix: OPTION DEVICE did not allow spaces between arguments (BaCon and BaConGUI version)
+- Fix: clash with a defined COUNT, SIZEOF in X header files (all versions)
+- Fix: BaCon accepted erroneous syntax for LOCAL/DECLARE (all versions)
+- Fix: solved long standing issue with nested IF's of different type (all versions)
+- Fix: GUI could load URL without file (BaConGUI version)
+- Fix: IMPORT could not handle function protoypes in arguments (all versions)
+- Fix: binary AND did not work in some circumstances (all versions)
+
+January 1, 2014 - 2.4.0 stable
+- New: ENUM to define enumerated variables (all versions)
+- New: ISKEY to query if a key exists in an associative array (all versions)
+- New: COUNT to count how many times a character occurs in a string (all versions)
+- Imp: support for multidimensional associative arrays (all versions)
+- Imp: improved positioning of context info popup (BaConGUI version)
+- Imp: SORT can sort the values in associative arrays (all versions)
+- Imp: added default toolbar for the GUI version (BaConGUI version)
+- Imp: INPUT, GETFILE, RECEIVE, GETLINE, READ, PULL, READLN, CALL..TO, PRINT..TO can accept assoc array elements & rec members (all versions)
+- Imp: improved FREE for associative array elements so it does not destroy order (all versions)
+- Imp: FORMAT and TO should not depend syntactically in PRINT (all versions)
+- Imp: code cleaning in RELATE (BaCon and BaConGUI version)
+- Imp: code cleaning in RETURN, PUSH, PEEK, POKE, MEMORY, RESIZE, MEMCHECK (all versions)
+- Imp: overall code cleaning (all versions)
+- Fix: made sure VAL takes '.' as radix (all versions)
+- Fix: context info did not show ABS function (BaConGUI version)
+- Fix: SORT could not handle array members in RECORDS, major code improvements (all versions)
+- Fix: RELATE potentially could not assign long strings (all versions)
+- Fix: show correct error report even if C compiler does not mention line number (all versions)
+- Fix: BaCon should accept "END USEC" and "END USEH" also (KSH and BASH version)
+- Fix: the infix string concatenator failed in mixed expressions (BaCon and BaConGUI version)
+- Fix: RETURN handled combined strings erroneously (all versions)
+- Fix: READ could not declare string variable implicitly in list (KSH and BASH version)
+- Fix: REDIM did not detect plain char type correctly (all versions)
+- Fix: OPEN FOR MEMORY did not initialize handle properly (all versions)
+- Fix: CALL..TO did not declare variable implicitly (all versions)
+- Fix: menu could not be reached after updating documentation or syntax file (BaConGUI version)
+- Fix: OPTION MEMTYPE did not accept 'unsigned' types (all versions)
+- Fix: PUTLINE did not always detect correct data type, and failed when 'TO' was in string (BaCon and BaConGUI version)
+
+October 1, 2013 - 2.3.0 stable
+- New: SWAP to swap the contents of two variables (all versions)
+- New: OPEN FOR DEVICE to open any device or file for reading and writing (all versions)
+- New: SETSERIAL to configure serial ports (all versions)
+- Imp: CHUNK and SIZE should not depend syntactically in RECEIVE (all versions)
+- Imp: REPLACE$ and EXTRACT$ accept extended regular expressions in the needle argument (all versions)
+- Imp: support for multidimensional dynamic arrays (all versions)
+- Imp: EXTRACT$ removes strings and not sets of characters, use regex for sets (all versions)
+- Imp: put generic functions in separate generic header file (all versions)
+- Imp: removed GtkHTML support, added contextual help for statements and functions (BaConGUI version)
+- Imp: improved file download function (BaCon and BaConGUI version)
+- Imp: GETBYTE and PUTBYTE optionally can use CHUNK and SIZE keywords (all versions)
+- Imp: OPTION DEVICE to set flags for opening device (all versions)
+- Imp: functions can return 1-dimensional dynamic arrays (all versions)
+- Imp: SEND should be able to specify SIZE keyword (all versions)
+- Imp: more improvements in SEND and RECEIVE (all versions)
+- Fix: DECLARE did not detect more than one string array declaration (KSH and BASH version)
+- Fix: memory leak in static string array declaration using LOCAL (all versions)
+- Fix: EXTRACT$, CONCAT$ and REPLACE$ erroneously used hardcoded limit for size of result (all versions)
+- Fix: FOR..IN..NEXT could cause crash at end of SUB or FUNCTION (all versions)
+- Fix: some SUBS and FUNCTIONS used globally declared variables (BaCon and BaConGUI version)
+- Fix: corrected line counter in comments of generated source files (all versions)
+- Fix: TRACE did not work when there is a FORMAT argument in PRINT (all versions)
+- Fix: assigning value to associative string array went wrong in case of long strings (all versions)
+- Fix: CALL..TO would execute a function twice in case of string assignments (all versions)
+- Fix: set correct path to downloaded file for execution dialog (BaConGUI version)
+- Fix: variable type detection in READ failed in some cases (all versions)
+- Fix: OPEN did not declare handle implicitely in case of UDP (KSH and BASH version)
+
+August 1, 2013 - 2.2.0 stable
+- New: reserved variable REGLEN contains the length of last REGEX match (all versions)
+- New: EPRINT to print to stderr (all versions - thx Peter Fedorow)
+- New: FOR...IN...NEXT...STEP to retrieve individual elements from delim separated strings (all versions)
+- Imp: ';' is a valid separator for PRINT and INPUT (all versions - thx Peter Fedorow)
+- Imp: code cleaning, removing EQUAL, CONCAT$, IS from source code (BaCon and BaConGUI version)
+- Imp: added self-check to confirm compilation with correct version (BaCon and BaConGUI version)
+- Imp: both BaCon and BaConGUI check on old temporary files (BaCon and BaConGUI version)
+- Imp: BaConGUI can select colorscheme for syntax highlighting (BaConGUI version)
+- Imp: changed granularity for ALARM to milliseconds (all versions)
+- Fix: OPEN FOR SERVER should accept wildcard in variable (all versions)
+- Fix: regression OPEN FOR NETWORK/SERVER should accept host:port in variable (all versions)
+- Fix: ZSH could not convert programs using networking (KSH version)
+- Fix: RANDOM could not evaluate composite argument (all versions)
+- Fix: STR$ does not need to specify precision of '.10' in format (all versions)
+- Fix: messages from preprocessor directive #error were not captured correctly (BaCon and BaConGUI version)
+- Fix: CHOP$ could not handle empty string (all versions)
+- Fix: BaCon did not handle argument with double '-' properly (BaCon version)
+- Fix: LET missed variable declaration when variable name was equal to function behind equal sign (KSH and BASH version)
+- Fix: STR$ should distinguish between float and integer numbers (all versions)
+- Fix: DECLARE deleted spaces from static array definitions (KSH and BASH version)
+- Fix: DECLARE and LOCAL could not parse ARRAY declarations properly (KSH and BASH version)
+- Fix: show warning when executable is not found (BaConGUI version)
+- Fix: EXEC$ could wait endlessly in case of large block of data coming back (all versions)
+- Fix: the C keyword 'unsigned' was not handled properly (BASH, KSH version)
+- Fix: the C type 'short' is sometimes not recognized (all versions)
+- Fix: SPC$, TAB$, FILL$ did not handle composite arguments properly (all versions)
+- Fix: improved catching of function arguments to avoid potential bugs (all versions)
+- Fix: member names of a RECORD declared as ARRAY could not occur in other RECORD (all versions)
+- Fix: GUI version could not open 0-byte file (BaConGUI version)
+- Fix: the '&' infix concatenator could not append single "&" symbol (BaCon and BaConGUI version)
+- Fix: error messaging did not work when filename contained 'line' (all versions)
+- Fix: optional argument in INSTRREV corrupted source string (all versions)
+- Fix: string type detection in DECLARE and LOCAL was too broad (BASH and KSH version)
+- Fix: ZSH could not convert BaConGUI (KSH version)
+- Fix: inline assembly in USEC/ENDUSEC got corrupted (all versions)
+- Fix: BaCon files using Windows line termination fail to convert (BASH and KSH version)
+- Fix: EXEC$ could crash when result of executed command line string was empty (all versions)
+
+April 1, 2013 - 2.0 build 1 stable
+- New: EXTRACT$ to remove characters from strings (all versions)
+- New: DELETE RECURSIVE to delete a complete directory tree (all versions)
+- New: added ASIN, ACOS, LT, GT, LE, GE, improved casting in all goniometric functions (all versions)
+- New: JOIN to concatenate string array elements (reverse of SPLIT) (all versions)
+- New: MEMCHECK to verify if memory is illegal (all versions)
+- Imp: major improvements in the overall performance of the generated code (all versions)
+- Imp: optimized functions: MID$, INSTR, INSTRREV, CONCAT$, REPLACE$, EXEC$, LEFT$, RIGHT$, SPC$, TAB$, FILL$ (all versions)
+- Imp: added question to delete old temporary files (BASH and KSH version)
+- Imp: SPLIT and LOOKUP can use string array by reference to retrieve results (all versions)
+- Imp: added detector so each binary can identify BaCon version it is compiled with (all versions)
+- Imp: improved the '&' infix concatenator (all versions)
+- Imp: added menu item to update documentation file (BaConGUI version)
+- Imp: by default BaCon will use TRAP LOCAL, also improved error messaging (all versions)
+- Imp: improved internal memory checker (all versions)
+- Imp: POKE, RESIZE could not handle CATCH (all versions)
+- Imp: OPEN FOR SERVER can use wildcard (all versions)
+- Fix: LOCAL did not handle list of static string arrays properly causing memory leak (all versions)
+- Fix: GETPEER$ did not handle TRAP LOCAL correctly (all versions)
+- Fix: SPLIT could crash in case string or splitter is empty (all versions)
+- Fix: INCR/DECR did not detect associative variable with array index (BaCon and BaConGUI version)
+- Fix: fixed regression in OPEN FOR MEMORY (all versions)
+- Fix: adapted functions to fit Clang parsing (all versions)
+- Fix: REPLACE$ hung when haystack or needle was empty (all versions)
+- Fix: multiple -i parameters were interpreted wrong (BaCon version)
+- Fix: IMPORT could not handle string function returning library name (all versions)
+- Fix: LET did not check on uninitialized string variables (all versions)
+- Fix: string assignment containing NULL did crash (all versions)
+- Fix: CATCH trigger was not stored correctly when entering a SUB or FUNCTION (all versions)
+- Fix: PULL could not use array member as argument (all versions)
+- Fix: BaCon shell should show console errors also (BaConGUI version)
+- Fix: enlarged return buffers even further to 256 (all versions)
+- Fix: various code fixes, improvements and cleaning (all versions)
+
+February 1, 2013 - 1.0 build 29 stable
+- New: PRAGMA to influence the compiler behaviour (all versions)
+- New: TIMER to track the amount of milliseconds the current program runs (all versions)
+- New: SCROLL to scroll ANSI screen up and down (all versions)
+- New: support for '&' as infix string concatenator (all versions)
+- New: GETPEER$ to retrieve the remote IP address and port of connected peer (all versions)
+- Imp: major code revision and performance improvements in associative array handling (all versions)
+- Imp: FOR/NEXT tries to autodetect variable type better (all versions)
+- Imp: CURSOR can move ANSI cursor to four directions (all versions)
+- Imp: optimized the way strings are assigned in LET (all versions)
+- Imp: SPLIT code revision and performance improvement (all versions)
+- Imp: OPEN FOR NETWORK can specify optional source address(es) (all versions)
+- Fix: PUTBYTE must flush filedescriptor (all versions)
+- Fix: FREE did not free associative array element properly causing memory leak (all versions)
+- Fix: INCR and DECR did not handle associative variables connected with RELATE correctly (all versions)
+- Fix: string members of a RECORD were not freed when exiting function (KSH version) 
+- Fix: SEED did not accept compound argument (BaCon and BaConGUI version)
+- Fix: Zshell choked on '<' and '>' symbol in some expressions (KSH version)
+- Fix: DECLARE/LOCAL did not accept list of variables with external type (BaCon and BaConGUI version)
+- Fix: could not use variable 't' implicitly (KSH and BASH version)
+- Fix: PEEK used different logic for byte offset compared to POKE (all versions)
+- Fix: ARGUMENT$ should inherit double quotes from commandline (all versions)
+- Fix: MEMORY and RESIZE used wrong type for char* (all versions)
+
+December 1, 2012 - 1.0 build 28 stable
+- New: C-style block comments (all versions)
+- New: support for SCTP networking (all versions)
+- New: USEH to add definitions to global header file (all versions)
+- New: '==' and '<>' are allowed both in numeric and string equations (all versions)
+- New: EXIT to exit a SUB or FUNCTION prematurely (all versions)
+- Imp: also FI is allowed to end IF block (all versions)
+- Imp: 'convert' and 'execute' dialogs should keep focus on YES button (BaConGUI version)
+- Imp: RESTORE accepts label from where to restore (all versions)
+- Imp: READ can use comma separated list of arguments (all versions)
+- Fix: SORT miscalculated array size when OPTION BASE is set (all versions)
+- Fix: POKE needed additional brackets to evaluate argument (all versions)
+- Fix: BaCon could not handle spaces in filenames (BaCon and BaConGUI version)
+- Fix: INCR/DECR could not handle compound argument in associative arrays (all versions)
+- Fix: environment variable GREP_OPTIONS should be unset (KSH and BASH version)
+- Fix: variables of external type should not be redeclared (all versions)
+- Fix: increased timeout value for downloading files to 2 seconds (all versions)
+- Fix: variables written as pointer should not be initialized to 0 (all versions)
+- Fix: Tru64 cannot handle empty initialization for RECORD (all versions)
+- Fix: ABS did not work for float numbers (all versions)
+
+October 1, 2012 - 1.0 build 27 stable
+- New: BaCon can store default settings with '-w' switch (KSH, BASH and BaCon version)
+- Imp: performance improvements in generated source code (all versions)
+- Imp: REGEX returns position of first match, and obeys OPTION COMPARE (all versions)
+- Imp: PRINT...TO can specify memory size of target variable (all versions)
+- Imp: improved output of conversion progress (KSH, BASH and BaCon version)
+- Fix: SORT did not work for dynamic arrays (KSH and BASH version)
+- Fix: REDIM did not initialize new elements in string array properly (all versions)
+- Fix: temporary file cleanup generated error in case of duplicate SUB/FUNC (all versions)
+- Fix: declaring multiple pointer variables using LOCAL/GLOBAL failed (KSH and BASH version)
+- Fix: OPEN FOR MEMORY did not free string variable causing memory leak (all versions)
+- Fix: MAKEDIR failed when directory name did not contain '/' (all versions)
+
+June 1, 2012 - 1.0 build 26 stable
+- New: support for dynamic arrays (all versions)
+- New: REDIM to redimension dynamic arrays preserving existing data (all versions)
+- New: OPTION STARTPOINT to change behavior of INSTRREV (all versions)
+- Imp: omit link to BaCon Documentation Navigator when downloading documentation (BaConGUI version)
+- Imp: set filename in tab when downloading with "Open Url" (BaConGUI version)
+- Imp: preset current filename in "Save As" dialog (BaConGUI version)
+- Fix: solved more issues with INSTRREV (all versions)
+- Fix: BaConGUI could not store syntax file when using GTK3 (BaConGUI version)
+- Fix: referring to subdirectories in URL argument did not work (all versions)
+- Fix: SORT could not handle empty strings (all versions - thanks Tomaaz)
+- Fix: LOCAL declared string variable by reference as by value (all versions)
+- Fix: SORT worked incorrect when OPTION BASE was set (all versions)
+- Fix: crash in case of GCC error messages with certain format (BaConGUI version)
+- Fix: could not use relative paths to BaCon source files (KSH, BASH and BaCon version)
+
+March 1, 2012 - 1.0 build 25 stable
+- New: FILETIME to query timestamps of a file (all versions - thanks vovchik)
+- Imp: optional TO parameter for PRINT to print to string variable (all versions)
+- Imp: BaConGUI should remember compile options (BaConGUI version)
+- Imp: ensured compatibility with ZShell (KSH version)
+- Imp: VAR list should only contain arguments sent (all versions)
+- Fix: remove DELETE option from OPEN dialog (BaConGUI version)
+- Fix: fixed issues with optional parameter in INSTRREV (all versions - thanks Sunburnt)
+- Fix: option '-j' should also apply to INCLUDE files (all versions - thanks oldguy)
+- Fix: Cygwin port revealed bug in generic check function (BaCon and BaConGUI version)
+- Fix: INCLUDE could not follow symlinks (BaCon and BaConGUI version)
+- Fix: passing string arrays by reference failed (all versions)
+- Fix: commandline parameters could not be attached to their arguments (BaCon version)
+- Fix: could not assign value to RETVAL programmatically (BaCon and BaConGUI version)
+- Fix: PUTBYTE needed cast to char* in Tru64Unix (all versions)
+
+November 1, 2011 - 1.0 build 24 stable
+- New: support for UDP sockets, UDP broadcast & multicast (all versions - kudos Peter Fedorow / elias)
+- Imp: printing functionality in GUI (BaConGUI version)
+- Fix: compound equations were parsed incorrectly in some circumstances (BaCon and BaConGUI version)
+- Fix: GUI version crashed when opening tab in an empty notebook (BaConGUI version - kudos Gatordog)
+- Fix: declaration of function pointers was not detected when assigning address (all versions)
+- Fix: FILETYPE did not detect symlink correctly (all versions - kudos Sunburnt)
+- Fix: uClibc gave warning with ASC (BaCon version - kudos oldguy)
+
+July 1, 2011 - 1.0 build 23 stable
+- New: the good old GOSUB was added (all versions)
+- Imp: added BaCon shell to perform small code tests, more GUI improvements (BaConGUI version)
+- Imp: improved process output so it is aligned with GUI version (KSH, BASH and BaCon version)
+- Fix: EVEN and ODD should cast argument to integer type (all versions)
+- Fix: RETURN did not detect function in argument correctly (BaCon and BaConGUI version)
+- Fix: MOD, EVEN and ODD need additonal brackets to enclose their arguments (all versions)
+- Fix: POW needs correct casting of arguments (all versions)
+- Fix: CASE did not detect string type argument correctly (all versions)
+- Fix: functions without arguments were converted with wrong type (KSH and BASH version)
+- Fix: improved support for compound RETURN arguments (all versions)
+- Fix: READ should be able to handle all types (all versions)
+- Fix: Tru64 needs workaround for MAXRANDOM (all versions)
+- Fix: improved internal memory check (all versions)
+- Fix: INCR and DECR could not handle associative arrays (all versions)
+
+May 1, 2011 - 1.0 build 22 stable
+- New: NNTL$ for internationalization of plural forms (all versions)
+- Imp: INCLUDE can specify which subs/functions of an included file should be used (all versions)
+- Imp: file argument to BaCon may consist of URL to file (all versions)
+- Fix: DATA could not allow "TO" in string data (KSH and BASH version)
+- Fix: INTL should be INTL$ (all versions, thanks Barry K.)
+- Fix: tokenizer could not return from ESCAPE mode (KSH and BASH version)
+- Fix: GETBYTE and PUTBYTE should obey MEMTYPE setting (all versions)
+- Fix: READLN should cut off \r in textfiles from DOS/Win environment (all versions)
+- Fix: menubar and notebook should be attached directly (BaConGUI version)
+- Fix: increased search speed for libgtkhtml (BaConGUI version)
+- Fix: direct array assignments should take OPTION BASE into account (all versions)
+- Fix: MID$ crashed when length parameter was longer than total string (all versions)
+- Fix: argument list to executed programs should escape doublequotes (BaConGUI version)
+- Fix: implicit declaration in assignment failed in case of strings containing a '.' (all versions)
+- Fix: show error message if xgettext did not generate catalog file (all versions)
+
+March 1, 2011 - 1.0 build 21 stable
+- New: internationalization support with TEXTDOMAIN and INTL, option -x (all versions)
+- Imp: implemented genuine BASIC comparison syntax both for numbers and strings (all versions)
+- Imp: added check for correct BASH release (BASH version)
+- Fix: CALL could not accept stringarguments with \n (KSH version)
+- Fix: change to directory of sourcefile when compiling so INCLUDE files can be found (all versions)
+- Fix: RECEIVE did not declare buffer size correctly when CHUNK was specified (all versions)
+- Fix: WAIT should return 0 if no data is available on STDIN (all versions)
+- Fix: tokenizer did not handle '$' correctly in case of IMPORT (BASH version)
+- Fix: DEF FN needs additional brackets around definition (all versions)
+- Fix: enlarged return buffers to 32 (all versions)
+- Fix: OPEN MEMORY declared global variable, should be local (KSH and BASH version)
+- Fix: LET did not reassign variable for IMPORT (KSH version)
+- Fix: MAKEDIR could not create a directory without full path (all versions)
+- Fix: line parser added redundant spaces to concatenated lines (all versions)
+- Fix: INCLUDE should check existence of included file before checking type (BaCon version)
+- Fix: MacOSX: improved processing of timer settings in WAIT (all versions)
+- Fix: Solaris: workaround for wrong RAND_MAX definition in stdlib (all versions)
+- Fix: Solaris: additional terminal settings for GETKEY, TRACE and WAIT (all versions)
+- Fix: Solaris: BaCon needs additional link flags (all versions)
+- Fix: PDKSH does not handle read-only typeset flag like other Kornshells (KSH version)
+
+January 1, 2011 - 1.0 build 20 stable
+- New: CONTINUE to (partially) skip body of loop (all versions)
+- New: reserved variable RETVAL will contain exit status of last executed command in EXEC and SYSTEM (all versions)
+- New: variable argument lists to SUB and FUNCTION (all versions)
+- Imp: BREAK accepts optional parameter defining at which level the break should take place (all versions)
+- Imp: EXEC$ accepts optional parameter for STDIN (all versions)
+- Fix: IF/THEN could not wrap to next line with '\' (KSH and BASH version)
+- Fix: IMPORT using variable for libraryname could not import symbols if variable was redefined (all versions)
+- Fix: error reporting in OpenBSD could crash in case of particular BSD warning (BaCon version)
+- Fix: RETURN could not handle BaCon types (all versions)
+- Fix: PRINT could crash on NULL argument (all versions)
+- Fix: variable declarations containing assignments were not detected correctly (all versions)
+- Fix: TRACE mode did not work when FUNCTION or SUB was used in variable name (all versions)
+- Fix: string array declaration could not assign values directly (all versions)
+
+October 31, 2010 - 1.0 build 19 stable
+- Imp: CHOP$ optionally can define character(s) to chop, left and/or right side (all versions)
+- Imp: WAIT also can scan for a keypress without stopping program (all versions)
+- Imp: SORT optionally can specify amount of elements with SIZE (all versions)
+- Imp: DATA can contain mixed data types now (all versions)
+- Fix: when using GCC optimizations no warnings should appear (all versions)
+- Fix: initialize error reporting to erroneous filename (all versions)
+- Fix: HOST$ could crash without TRAP LOCAL (all versions)
+- Fix: multiple statements on same line should allow REM (all versions)
+- Fix: GETFILE could not handle string assignment in case result is empty (all versions)
+- Fix: SELECT did again not cleanup 'fallthrough' cache correctly (all versions)
+- Fix: OPEN FOR NETWORK/SERVER could crash if no port was specified (all versions)
+- Fix: DATA does not need to explicitely specify '.' for float values (all versions)
+- Fix: GETBYTE did not detect previously declared variables correctly (BaCon version)
+- Fix: IMPORT error handling can crash when dlerror() returns NULL (all versions)
+- Fix: IMPORT should declare internal variable locally (all versions)
+
+September 25, 2010 - 1.0 build 18 stable
+- New: SIZEOF to determine size of C type (all versions)
+- New: HOST$ to determine IP address from hostname or v.v. (all versions)
+- New: some math functions were added: EXP, LOG, ATN, SGN (all versions)
+- Imp: OPTION MEMTYPE to determine memory type for POKE, PEEK, MEMORY and RESIZE (all versions)
+- Imp: OPTION COLLAPSE to define behavior of SPLIT (all versions)
+- Imp: RECEIVE and SEND should be able to handle binary data (all versions)
+- Imp: RECEIVE optionally can return amount of data received (all versions)
+- Imp: SEND optionally can specify chunksize (all versions)
+- Imp: console colors can be enumerated (all versions)
+- Imp: FREE can also free associative array elements (all versions)
+- Imp: WRITELN, PUTLINE should convert non-strings automatically (all versions)
+- Imp: improved and simplified PRINT implementation (all versions)
+- Imp: statements may be separated by colon symbol (all versions)
+- Imp: nested INCLUDE statements work now (all versions)
+- Imp: multiple invocations of OPEN FOR SERVER allow multiple client connections (all versions)
+- Imp: emit warning if target conversion files already exist (all versions)
+- Fix: VAL'ed subscripts in arrays could not be parsed (all versions)
+- Fix: RELATE generated erroneous overflow (KSH version)
+- Fix: LOCAL could not parse STRING keyword properly (KSH version)
+- Fix: solved long-standing issue with redundant spaces behind parsed lines (KSH version)
+- Fix: not more than 2 numeric arrays could be passed to functions/subs (all versions)
+- Fix: only initiate known numeric C types to 0 (all versions)
+- Fix: string variables should be assigned an initial empty string (all versions)
+- Fix: RESIZE did not return new memory pointer (all versions)
+- Fix: -i option should detect header file in /usr/include directory (all versions)
+- Fix: various fixes, code improvements and cleaning (all versions)
+
+August 21, 2010 - 1.0 build 17 stable
+- Imp: OPTION MEMSTREAM to allow Memory Stream handle as string variable (all versions)
+- Fix: CALL TO did not handle order of functions correctly (all versions)
+- Fix: CALL TO handled string assignment as reference (all versions)
+- Fix: WRITELN could not write string containing the word 'TO' (all versions)
+- Fix: IMPORT generated different code in BaCon version (BaCon version)
+- Fix: variable in header of function was declared globally when assigned a value (all versions)
+- Fix: printparser did not detect some functions correctly (BASH and KSH version)
+- Fix: function arguments not declared correctly when surrounded by spaces (BASH and KSH version)
+- Fix: INCR and DECR could not handle VAL'ed combined string arguments (all versions)
+- Fix: string arrays could not be passed as function argument (all versions)
+- Fix: all array types were passed by reference, but this should be by value (all versions)
+- Fix: array declaration did not allow multiple identifiers (all versions)
+- Fix: another MID$ issue when length was lower than -1 (all versions)
+- Fix: it was not possible to assign string variables by reference (all versions)
+
+July 24, 2010 - 1.0 build 16 stable
+- Imp: optional ALIAS for PROTO (all versions)
+- Imp: optionally PROTO allows multiple identifiers (all versions)
+- Imp: changed -s flag into -o flag
+- Imp: improved usage of -l option (all versions)
+- Imp: check on availability of C compiler (all versions)
+- Imp: more improvements on error reporting (all versions)
+- Imp: more optimizations in associative arrays (all versions)
+- Fix: different BaCon versions generated different binaries (all versions)
+- Fix: ABS, DEC should return long type (all versions)
+- Fix: numeric arrays should be initialized to 0 (all versions)
+- Fix: MID$ wrote invalid memory when source string was empty (all versions)
+- Fix: MID$ wrote invalid memory when starting position was higher than length of string (all versions)
+- Fix: PULL crashed when string stack was empty (all versions)
+- Fix: PULL crashed when stack had no values pushed before (all versions)
+
+June 25, 2010 - 1.0 build 15 stable
+- New: LOOKUP to find all indexes in associative array (all versions)
+- New: RELATE to setup relations between associative arrays (all versions)
+- Imp: more improvements on error reporting (KSH and BASH version)
+- Imp: function blocks should contain license statement (all versions)
+- Imp: associative array declaration did not allow multiple identifiers (all versions)
+- Imp: many improvements in associative array implementation (all versions)
+- Fix: error reporting should also occur for main header file (all versions)
+- Fix: error reporting should work in Tru64Unix with Compaq C compiler (all versions)
+- Fix: nested SELECT/CASE did not clean 'fallthrough' cache properly (all versions)
+- Fix: string array assignment was not possible in declaration (all versions)
+- Fix: EXEC$ did not reap zombie processes (all versions)
+
+June 12, 2010 - 1.0 build 14 stable
+- New: ALIAS statement to alias any function (all versions)
+- Imp: optional ALIAS for IMPORT (all versions)
+- Imp: many improvements on error reporting (all versions)
+- Imp: allow nested SELECT/CASE statements (all versions)
+- Fix: INPUT parser delivered variable names surrounded by spaces (KSH and BASH version)
+- Fix: INCR and DECR need additional brackets around second argument (all versions)
+
+May 13, 2010 - 1.0 build 13 stable
+- New: GETX / GETY to get current cursor position in ANSI terminal (all versions)
+- New: COLUMNS / ROWS to get screencolumns and rows in ANSI terminal (all versions)
+- New: CURSOR ON/OFF to show/hide cursor in ANSI terminal (all versions)
+- Imp: GOTOXY can use variables as arguments now (kudos Vovchik - all versions)
+- Fix: GOTOXY needs flush (all versions)
+- Fix: COLOR and CLEAR use stdout explicitly (all versions)
+- Fix: EXEC$ would return partial results in case of slow output of shell statement (all versions)
+- Fix: MAKEDIR crashed (all versions)
+- Fix: detection of previous declared STRING variable failed (BaCon version)
+- Fix: make sure no string pointer is freed when using LOCAL in functions (all versions)
+
+April 17, 2010 - 1.0 build 12 stable
+- New: OPTION SOCKET to determine network timeouts (all versions)
+- New: ALARM to interrupt current operation and call local SUB (all versions)
+- Imp: optional SIZE argument in RECEIVE to determine chunksize (all versions)
+- Imp: IMPORT should convert function names to TCC compatible names (all versions)
+- Imp: MAKEDIR should implicitly create parent directories (all versions)
+- Imp: WRITELN should be able to write string pointers (all versions)
+- Imp: LOCAL/DECLARE should allow multiple string pointers (all versions)
+
+April 2, 2010 - 1.0 build 11 stable
+- New: by popular demand DECR and INCR to add/substract from variable (all versions)
+- New: OPTION COMPARE to define case-insensitive comparison (all versions)
+- Imp: simplified BaCon options (all versions)
+- Imp: ensured compatibility with TCC compiler (all versions)
+- Fix: SPLIT would collapse element where two separators are neighbours (all versions)
+- Fix: SPLIT did not reset internal counter when used repeatedly (all versions)
+- Fix: INSTRREV returned wrong index when string ended with equal letters (all versions)
+- Fix: MOD always should cast arguments to long (all versions)
+
+March 20, 2010 - 1.0 build 10 stable
+- New: option '-f' to create shared library (all versions)
+- New: PROTO to allow foreign symbols, link with external library (all versions)
+- New: GLOBAL/DECLARE accepts RECORD (all versions)
+- Imp: random generator always initialized (all versions)
+- Imp: stack depth grows and shrinks dynamically, option '-s' obsolete now (all versions)
+- Imp: MEMORY/RESIZE allocate 1 byte more to allow subsequent string management (all versions)
+- Imp: OPEN FOR MEMORY can use string variable names (all versions)
+- Fix: SPLIT could not handle combined separator string (kudos James Fuller - all versions)
+- Fix: TRACE inserts must be excluded during code parsing (all versions)
+- Fix: networking would crash in case of erroneous hostname (all versions)
+- Fix: FUNCTION always should return a value (kudos E.K. Virtanen - all versions)
+- Fix: IMPORT could not import library in same directory (BaCon version)
+
+March 6, 2010 - 1.0.9 stable
+- New: associative arrays (all versions)
+- New: flag '-e' to export symbols allowing callbacks from Glade, GtkBuilder (all versions)
+- New: function FILEEXISTS contributed by Armando Rivera (all versions)
+- New: function RANDOM(x) to generate a random number between 0 and x-1 (all versions)
+- Imp: preserve temporary files in case compilation fails (all versions)
+- Fix: FILELEN wrong error reporting (kudos James Fuller - all versions)
+
+February 20, 1.0.8 stable
+- New: MEMTELL to get current memory stream position (all versions)
+- Imp: PUTLINE should be able to handle comma separated arguments (all versions)
+- Imp: more performance improvements (BaCon version)
+- Fix: OPEN MEMORY needs additional check on starting position variable (all versions)
+- Fix: RESIZE would not work with TRAP LOCAL (all versions)
+- Fix: RESIZE showed SegFault when assigning new address (all versions)
+- Fix: bug in SPLIT where splitted line only contains separator (all versions)
+- Fix: minor issue in OPEN where BASH generates duplicates of file variables (BASH version)
+
+February 13, 2010 - 1.0.7 stable
+- New: OPTION BASE to define array base (all versions)
+- Imp: the DO in WHILE/WEND statement is optional now (all versions)
+- Fix: removed limitation for inputbuffers in READLN and INPUT (kudos James Fuller - all versions)
+- Fix: minor bug in Check_Type when looking up string variables (BaCon version)
+
+February 7, 2010 - 1.0.6 stable
+- Imp: automatically initialize numeric vars to 0 (all versions)
+- Imp: updated timestamps and messages in generated sources (all versions)
+
+January 30, 2010 - 1.0.5 stable
+- New: STOP to hold program, use Unix 'fg' or 'kill -CONT' to continue (all versions)
+- New: TRACE ON/OFF to execute program step-by-step (all versions)
+
+January 22, 2010 - 1.0.4 stable
+- Imp: performance improvements for BaCon version of BaCon
+- Imp: Option "DOWN" for SORT to sort descending (all versions)
+- Fix: potential bug in IMPORT when defining complicated function arguments (all versions)
+- Fix: '-l' option (BaCon version)
+
+January 18, 2010 - 1.0.3 stable
+- Imp: IF/ELIF/ELSE accepts single statement in THEN on same line (all versions)
+- Fix: COPY should emit runtime error when file is not found (all versions)
+- Fix: CALL could not invoke a FUNCTION or SUB with a function in the argument (BaCon version)
+
+ January 9, 2010 - 1.0.2 stable 
+- Imp: BaCon now can compile sourcefiles in any other directory, not only current directory (all versions)
+- Imp: simplified header file inclusion even more (all versions)
+- Fix: issue when INCLUDE contains full directories (all versions)
+
+ January 7, 2010 - 1.0.1 stable 
+- Imp: improved logic in temporary file naming (all versions)
+- Imp: simplified header file inclusion algorithm (KSH, BASH)
+
+January 1, 2010 - 1.0 stable
+- New: changed license to GPL version 3.
+- New: next to EQ/NE alternatively IS/ISNOT can be used to improve code readability
+- Fix: OpenBSD reveals issue with indent and temporary directories (all versions)
+
+December 26, 2009 - 1.0 release candidate 1
+- Testsuite: fixed initialization with COPY (all versions)
+- Testsuite: FILELEN should return -1 in case of error (all versions)
+- Testsuite: PULL should recognize types better (KSH, BASH)
+- Testsuite: CALL should be able to perform call forward (all versions)
+- Valgrind: fixed uninitialized value for jump (BaCon)
+- Testsuite: READ should recognize internal BaCon types (all versions)
+- Testsuite: INPUT should recognize internal BaCon types (all versions)
+- CURDIR$ to retrieve current working directory
+- SORT to sort one-dimensional arrays
+- Fixed issue in SELECT when CASE was empty and only DEFAULT contained code
+- Fixed bug with INSTRREV
+- Testsuite: GETBYTE, PUTBYTE had wrong size detection (BaCon version)
+- Testsuite: empty argument to FUNCTION/SUB should resolve to (void) (KSH/BASH)
+- Testsuite: color should be set similarly in all versions (BaCon)
+- Testsuite: inputbuffer for READLN and INPUT should be initialized before use (all versions)
+- BaCon version can be used within shebang also
+- Aligned printing of current linenumber better
+- Added '-j' option to invoke C Preprocessor
+- Fixed bug in RETURN handling (BaCon version)
+- Fixed issue in REGEX parsing (BaCon version)
+
+November 29, 2009 - beta 4
+- KSH88 needs double typeset when shrinking variable length
+- Removed '+' as concatenation symbol as it caused problems with PRINT and calculations
+- Fixed bug in CONST when embedding constructed CONSTs (all versions)
+- Code review: reserved variable VERSION should be VERSION$
+- Code review: OPEN NETWORK/SERVER - fixed failures when used multiple times (all versions)
+- Code review: COPY and GETFILE - fixed failures when used multiple times (all versions)
+- Code review: removed IFDEF for now as it is not fully functional
+- Documentation review: some small fixes and improvements
+- Improved Check_Declare function in BaCon version
+
+November 22, 2009 - beta 3
+- OpenBSD reveals wrong type for 'localtime'
+- CASE has fall-through with ';'
+- Indentation only when source files are not deleted (-p option)
+- Tempdir option should allow relative directories
+- Performance improvement for KSH/BASH versions
+- IFDEF/ENDIFDEF to determine code during compile time (James Fuller)
+- Fixed bug with variable type detection (BaCon version)
+- Fixed some minor compile warnings (all versions)
+
+November 16, 2009 - beta 2
+- Added SELECT/CASE/DEFAULT
+- Cleaned up echo/print in KSH and BASH version
+- Menu should show values from defaults not hardcoded
+- SETENVIRON to set environment variable
+- Code review: ENDWITH/ENDSELECT should exist
+- EXEC$ to redirect output from system command to BaCon program
+- ARGUMENT$ should contain program name of current program
+- Changed miniparsers to use low-ASCII (Debian chokes on 'C2')
+- Fixed crash in BaCon version when showing compile errors
+- Fixed bug in BaCon version with implicit declaration in FOR
+- Code review: cleaned up code in BaCon version
+
+November 13, 2009 - beta 1
+- Fixed bug with REPLACE where needle and replacement were the same
+- Fixed bug in Solaris where stringvariable names were taken as regex (BaCon version)
+- Fixed minor bug in Tru64Unix where shell print generates 'wrong option' (KSH version)
+- Default C compiler is 'cc' instead of 'gcc' as most Unix versions symlink to 'gcc'
+- Fixed minor bug where erroneous void SUB definition leads to compile warning (KSH, BASH)
+- Fixed bug in MacOSX where return buffers were initialized outside scope (all versions)
+
+November 10, 2009 (0.110)
+- Fixed harmless bug in READ code
+- SEED should check argument
+- Removed redundant code in DEF FN
+- Starting BETA phase of the BaCon project
+
+On Sunday November 8, 2009 at 14:21 Dutch time, BaCon became self-aware: BaCon can compile BaCon!
+
+November 8, 2009 (0.109)
+- Fixed exception for REGEX return value
+- Fixed issue with writing spaces in WRITELN (James Fuller)
+- Removed redundant WAIT statement parsing
+- Enlarged temporary input buffer to 512
+- SEARCH returns -1 when string not found
+- INSTRREV to search for a substring starting from the end of the haystack
+
+November 3, 2009 (0.108)
+- Merged duplicate SUB/FUNCTION routine
+- Added REPLACE$ function (similar to Scriptbasic)
+- Lots of discussion regarding shebang usage leads to '/usr/bin/env' construct
+
+October 27, 2009 (0.107)
+- Rewrote few small parts to ensure compatibility with KSH88 (Tru64, Solaris)
+
+October 25, 2009 (0.106)
+- Improved error message for REGEX
+- Fixed bug in OPEN variable detection
+- Fixed memory leak in SPLIT when string and separator are identical
+- Improved CHOP when string does not have regular characters
+- PUTLINE can use string array
+
+October 20, 2009 (0.105)
+- Signal definitions should not be in main header file
+- Fixed issue with CHOP and empty strings
+- SEARCH restores filepointer after searching is completed
+- WRITELN accepts argument list like PRINT and INPUT
+- Fixed issue in miniparsers when string uses \"
+- Use REGEX for Posix regular expressions (check 'man 7 regex' for syntax)
+- The PRINT statement can concat arguments using '+' also
+
+October 11, 2009 (0.104)
+- Memory streams with OPEN FOR MEMORY, MEMREWIND, GETLINE, and PUTLINE (see test18)
+
+October 9, 2009 (0.103)
+- BaCon types recognized in implicit declarations
+- INT as synonym for ROUND
+
+October 1, 2009 (0.102)
+- Corrected FILL$ failure on argument check
+
+September 27, 2009 (0.101)
+- STR$ returns correct string in case of INT's versus FLOAT's
+- CATCH RESET to restore default error message
+
+September 22, 2009 (0.100)
+- Redesigned the error catching functionality completely, see documentation
+
+September 18, 2009 (0.99)
+- Improved detection of PRINT arguments even more
+- Added '-a' option to force 32bit compilation
+- Third argument in MID$ is optional now - when omitted it uses rest of string
+
+September 16, 2009 (0.98)
+- Fixed issue when SPLIT runs in loop (bug found by James Fuller)
+- Fixed potential bug with RETURN
+- Numerous other small fixes and improvements
+
+September 15, 2009 (0.97)
+- Fixed '\' in REM statement (bug found by James Fuller)
+- Instead of REM also ' can be used
+- Improved PRINT so illegal string variables cannot crash the program
+- Added SPLIT (see documentation for an example)
+
+September 12, 2009 (0.96)
+- Fixed issue when string arrays were initialized in a loop (bug found by James Fuller)
+- Fixed memory leak with local strings
+- Passing (hardcoded) strings to functions and subs also by value now
+- RETURN statement correctly returns calculated results
+
+September 8, 2009 (0.95)
+- Fixed issue with FOR/NEXT arguments using '*'
+- Temp label generation in network code did not work correctly
+- GLOBAL/LOCAL could not declare arrays with string argument syntax
+- Fixed strange problem with declaration of 'x' and 'y' as variables
+
+September 6, 2009 (0.94)
+- Wrapping of lines included redundant space character
+- FLOOR should return an integer
+- READLN could not read into stringarray
+
+September 3, 2009 (0.93)
+- Full support for string arrays in all dimensions
+- Fixed potential memory leak for strings in records defined within a function
+- Fixed minor issue with RECORD naming
+
+September 1, 2009 (0.92)
+- END can return exit value of program (request and idea by James Fuller / John Spikowski)
+
+August 31, 2009 (0.91)
+- Array of RECORD initialized string members wrongly (bug found by James Fuller)
+- Fixed printing of FILL$
+
+August 30, 2009 (0.90)
+- LET did not take stringarrays into account (bug found by James Fuller)
+- PRINT of uninitialized stringvariable would segfault (bug found by James Fuller)
+- Added INVERSE for COLOR
+
+August 28, 2009 (0.89)
+- Lines of code may wrap to next line using '\' at the end of line
+- Avoid situation where dlerror() returns NULL
+- Fixed READ where strings are read into a stringarray
+- Fixed problem with INPUT and stringarrays
+- Fixed problem with PULL/PUSH and stringarrays
+
+August 24, 2009 (0.88)
+- Removed unnecessary definition of functions as a macro
+- Redesigned CONST implementation
+- Simplified DEF FN a little bit more
+
+August 20, 2009 (0.87)
+- Improved presentation of compile warnings
+
+August 17, 2009 (0.86)
+- Added WITH keyword to handle elements of records (request by James Fuller)
+- Changed the '-m' parameter so it adjusts temp buffers for string processing
+
+August 16, 2009 (0.85)
+- Allow standalone LABELS in BaCon code (bug found by James Fuller)
+- Finetuned memory limits even more to fit in Solaris and Tru64Unix
+
+August 14, 2009 (0.84)
+- Improved returning strings from functions
+- Increased amount of temp buffers for string processing from 32 to 256
+
+August 13, 2009 (0.83)
+- Fixed LOCAL declarations for test17 (bug found by James Fuller)
+- Corrected 'print' in BASH version
+- Fixed string variable initialization in functions
+- CONCAT would return (null) if first argument was not initialized
+- Local string variables are all byvalue now (request by James Fuller)
+- Removed all 'static' declared strings
+
+August 9, 2009 (0.82)
+- Added system type to OS$ (request by James Fuller)
+- Redesigned the ERROR assignment allowance
+- Fixed string allocations in RECORD structures
+
+August 8, 2009 (0.81)
+- Fixed LOCAL declarations
+- Made sure FILELEN and FILETYPE can be embedded in PRINT and INPUT statements
+
+August 7, 2009 (0.80)
+- Use FILETYPE to check if a file is directory, socket, fifo etc.
+
+August 6, 2009 (0.79)
+- Perfectionized error display when GCC refers to included files
+- The reserved ERROR variable now can be reset by BaCon program
+
+August 5, 2009 (0.78)
+- Improved error display in case GCC has problems
+- Reorganized INDENT
+
+August 2, 2009 (0.77)
+- DEF FN functions can be used standalone
+- Also defined LC_CTYPE env variable for correct execution in MacOSX "Term"
+- Removed duplicate Runtime Error
+- Ensured compatibility with FreeBSD
+
+August 1, 2009 (0.76)
+- Defined LANG environment variable to ensure correct execution in MacOSX
+
+July 27, 2009 (0.75)
+- NL$ defines the newline
+- Fixed issue with PRINT and ASC returnvalue
+- Input can print text now, for example: 'input "text", a$'
+
+July 23, 2009 (0.74)
+- Huge code cleanup by removing detection of statements in small letters. All keywords should
+    be written in capitals now; the detection of small letters was incomplete anyway.
+- Simplified unique label generation for temporary jumps in network code
+
+July 22, 2009 (0.73)
+- Improved PRINT argument parsing, now constructs like 'PRINT a,b,c$,"hello"' work
+
+July 16, 2009 (0.72)
+- Cleaned 'indent' detection
+- The '-l' argument passed library in a wrong way
+- Wrong reference to 'h_errno' in error detection
+
+July 12, 2009 (0.71)
+- Variablenames within records may be used in other records also
+- Variablenames within records can be used as standalone variable names also
+
+July 11, 2009 (0.70)
+- DEC must return an unsigned int, instead of int
+- CONST detects wrong string
+- Omitting type did not work when declaring arrays
+
+July 11, 1009 (0.69)
+- Prevent to define RECORD within RECORD
+- Fixed issue with strings in RECORD
+
+July 9, 2009 (0.68)
+- Fixed bug in DECLARE/GLOBAL on variable detection
+- Added RECORD structure
+
+July 5, 2009 (0.67)
+- Improved type detection for RETURN statement
+
+June 1, 209 (0.66)
+- MEMORY automatically initializes claimed memory to '0'
+
+May 17, 2009 (0.65)
+- Fixed erronous END USEC detection
+- Fixed TYPE detection in GLOBAL/DECLARE
+
+May 9, 2009 (0.64)
+- Show linenr during conversion
+- OS$ to return name of current Operating System
+
+May 9, 2009 (0.63)
+- Simplified temporary filename generation
+- Fixed bug with string variable detection
+- VAL must return FLOAT and not LONG
+- Always flush STDOUT for PRINT
+
+May 7, 2009 (0.62)
+- Put LOCAL strings back to static in order to prevent memory leaks
+
+May 2, 2009 (0.61)
+- CHOP$ to chop off CR, NL, TAB and SPACE
+- FILELEN returns size of file
+- SEARCH(x, y) to search string y in filehandle x
+
+April 29, 2009 (0.60)
+- GLOBAL, LOCAL and DECLARE can use TYPE as optional parameter
+
+April 27, 2009 (0.59)
+- RESIZE was broke
+
+April 25, 2009 (0.58)
+- Fixed issue with 'ldl' in Tru64Unix
+
+April 24, 2009 (0.57)
+- LOCAL strings should not be static
+- Fixed bug with DECLARE
+- Fixed multiple string declarations in one line
+
+April 24, 2009 (0.56)
+- Fixed issue with local string declaration
+- FILL$ to return a sequence of character strings
+
+April 23, 2009 (0.55)
+- Corrected returntypes of FUNCTION
+
+April 21, 2009 (0.54)
+- Fixed some annoying warnings with math functions
+- GLOBAL/DECLARE can be put anywhere for global declarations, even within FUNCTION and SUB
+
+April 21, 2009 (0.53)
+- Variables are globally declared (also implicitely), unless declared with LOCAL
+- Fixed implicit declaration in GETBYTE
+- fix: IMPORT always is global
+- DEF FN should be always be global
+- CONST should be always be global
+- Fixed error messages for Dynamic Linking
+- Fixed error messagetext in LET
+
+April 19, 2009 (0.52)
+- Added commandline flag '-o' to optimize compilation for current platform
+
+April 18, 2009 (0.51)
+- Fixed potential illegal memory writes with GETFILE
+- Fixed potential illegal memory writes with INPUT
+- Fixed potential illegal memory writes with READLN
+- Fixed potential illegal memory writes with RECEIVE
+- Fixed potential illegal memory writes with READ
+- Fixed potential illegal memory writes with PULL
+
+April 18, 2009 (0.50)
+- Corrected POKE and PEEK values to unsigned char
+
+April 18, 2009 (0.49)
+- Solved conflict with internal 'argument' variable
+
+April 18, 2009 (0.48)
+- Fixed string variable declaration issue with PDKSH
+
+April 17, 2009 (0.47)
+- CALL/TO to invoke functions
+
+April 17, 2009 (0.46)
+- Fixed problem where STEP in FOR could not be a float
+- Fixed crash in GETENVIRON if variable does not exist
+- NE for Not Equal '!='
+
+April 16, 2009 (0.45)
+- Fixed bug with DEC()
+
+April 16, 2009 (0.44)
+- Fixed bug with erronuous code generation when using PDKSH
+
+April 15, 2009 (0.43)
+- Got rid of indent warnings on MacOSX
+
+April 15, 2009 (0.42)
+- Fixed duplicate function generation when importing from external libraries
+- Imported functions can contain spaces between name and arguments
+- Ability to specify type of arguments of imported functions
+
+April 15, 2009 (0.41)
+- Dynamic string allocations
+- Fixed READ/DATA issue
+
+April 14, 2009 (0.40)
+- Fixed 'grep' issue on Tru64Unix
+
+April 14, 2009 (0.39)
+- Fixed spaces between functionnames and argumentlist
+
+April 13, 2009 (0.38)
+- Improvements in uniq label creation
+- Reserved variable VERSION to contain version number
+- ERROR automatically cleared after calling ERR$
+- Added ERROR=0 text message
+
+April 12, 2009 (0.37)
+- Made user added include files globally visible
+- Error messages globally visible
+- Fixed implicit variable declarations with INPUT and FOR
+
+April 12, 2009 (0.36)
+- INSTR third argument is optional now
+- MAKEDIR to create directories, DELETE now also can delete directories
+- CHANGEDIR to change working directory
+- SPC$(x) to print x space characters
+- TAB$(x) to print x tab characters
+- Always print in RAW mode to sourcefiles
+- Improved implicit variable declaration for FLOATING
+- Added command line option 'i' to include additional files to header
+- Added command line option 'l' to pass additional libraries to linker
+
+April 12, 2009 (0.35)
+- Redefined WAIT for network sockets (test15)
+- Added SERVER mode for accepting incoming TCP connections (test16)
+
+April 11, 2009 (0.34)
+- Basic network support with OPEN/CLOSE/SEND/RECEIVE (test15)
+- Fixed issues when passing \r\n in strings
+
+April 10, 2009 (0.33)
+- Changed POS to GOTOXY (like other BASIC's)
+- Fixed compilewarning in OSF1 (Tru64Unix)
+- Added WAIT statement for nostalgic reasons
+- Retracted POKED, PEEKD, COPYMEM
+
+April 9, 2009 (0.32)
+- Now really fixed DEF FN issue
+
+April 9, 2009 (0.31)
+- Fixed DEF FN issue with global declaration
+- Implemented RENAME <file> TO <name>
+- CLEAR to clear the terminal screen (ANSI compliant terminal)
+- COLOR to setup terminal colors (ANSI compliant terminal)
+- POS to put cursor to position (ANSI compliant terminal)
+
+April 8, 2009 (0.30)
+- Added runtime error for DELETE
+- Fixed CONST issue with global declaration
+- Implemented OPEN x FOR DIRECTORY AS <handle>, also CLOSE FILE/CLOSE DIRECTORY
+- GETFILE to read files from opened directory
+- redesigned ERR$ into function
+
+April 7, 2009 (0.29)
+- TRAP can be set to ON or OFF
+- RESIZE to resize memory claimed with MEMORY
+- Added runtime check to MEMORY
+- Added ABS
+- Possibility to define C-code with USEC/ENDUSEC
+
+April 6, 2009 (0.28)
+- Fixed calculation of address in PEEK/PEEKD
+- Fixed return of ADDRESS function
+- Changed TIMEVAL to TIMEVALUE
+- Changed INTEGER to NUMBER because of confusion with C int/long
+
+April 5, 2009 (0.27)
+- POKED, PEEKD, ADDRESS
+- Added runtime error checks TRAP, CATCH, RESUME
+
+April 3, 2009 (0.26)
+- added memory checks for GETBYTE, PUTBYTE, COPYMEM, FREE
+- in case of errors also mention actual file
+- GOTO and LABEL
+
+April 3, 2009 (0.25)
+- housekeeping of temporary files
+- added FREE to release claimed memory with MEMORY
+- added COPYMEM
+- fixed potential bugs with SIZEs of GETBYTE, PUTBYTE, COPYMEM
+
+April 2, 2009 (0.24)
+- COPY, DELETE
+- fixed conversion warning with empty functions
+- redesigned SEEK statement
+
+April 2, 2009 (0.23)
+- added TELL and SEEK
+- added DEF FN, CONST
+
+April 1, 2009 (0.22)
+- added PUTBYTE, GETBYTE for accessing binary files
+
+April 1, 2009 (0.21)
+- added TIMEVAL
+- remove ending \r from READLN
+
+March 31, 2009 (0.20)
+- added ISTRUE, ISFALSE
+- fixed problem in assigning values to arrays
+- added time functions NOW, DAY, MONTH, YEAR, HOUR, MINUTE, SECOND, WEEKDAY$, MONTH$, WEEK
+- added boolean functions ODD and EVEN
+- added SEED and RND, reserved variable MAXRANDOM
+
+March 29, 2009 (0.19)
+- function names also can be parsed standalone, e.g. without assignment
+- at every operation on temporary string buffer intialize to 0
+
+March 28, 2009 (0.18)
+- corrected GETKEY in VIM syntax file, should appear as function
+- GETKEY also should be available in small letters
+- added '-w' parameter to compile with warnings, now default is without
+
+March 28, 2009 (0.17)
+- apply indentation for FUNCTIONS and SUBS
+- parameter '-d' to define TEMP dir where temporary files are stored
+
+March 27, 2009 (0.16)
+- fixed issue with DECLARE and FUNCTIONS/SUBS
+- fixed potential bugs with other implicit declarations in FUNCTIONS/SUBS
+- DECLARE can take multiple arguments now
+
+March 27, 2009 (0.15)
+- END IF is also accepted
+- END SUB is also accepted
+- END FUNCTION is also accepted
+
+March 26, 2009 (0.14)
+- redesigned PRINT statement, dropped PRINTSTR statement
+- because of this, functions returning a string should be written with '$'-sign: concat$, left$, right$, mid$, hex$, chr$,
+    reverse$, arguments$, lcase$, ucase$, getenviron$, str$ (see other BASICs like GWbasic, C64 Basic etc)
+- fixed issue with INSTR
+- renamed ARGUMENTS$ to ARGUMENT$
+- functions and subs can accept arguments now
+
+March 25, 2009 (0.13)
+- CONCAT can take random amount of arguments
+- added NULL check for SYSTEM command
+
+March 24, 2009 (0.12)
+- returnbase of MID is 1 now
+- added UCASE and LCASE
+- internal improvements in parser
+
+March 24, 2009 (0.11)
+- reworked SUB/ENDSUB
+- check if RETURN exists in FUNCTION
+
+March 23, 2009 (0.10)
+- added version '-v' argument flag
+- fixed potential problem with string detection in PUSH
+- cleaned up variable declarations in KSH functions
+- renamed global vars with 'g_' for better readability
+- returnbase of INSTR is 1 now
+- rewrote FUNCTION/ENDFUNCTION statements
+
+March 22, 2009 (0.9)
+- added NULL checks for STRING functions
+
+March 20, 2009 (0.8)
+- added GETENV()
+
+March 19, 2009 (0.7)
+- added PUSH and PULL
+- READ/DATA can handle float values
+- CALL only needed when SUB is defined at end of program
+- fixed some small potential bugs
+
+March 18, 2009 (0.6)
+- improved getting arguments to BACON using 'getopts'
+- improved statement matching routines
+
+March 18, 2009 (0.5)
+- improved parsing of imported functions
+
+March 17, 2009 (0.4)
+- arguments to define compiler, string memory usage
+
+March 17, 2009 (0.3)
+- changed internal housekeeping of numeric variables to long
+- changed POKE, added MEMORY to claim memory
+- replaced DURING for UNTIL
+
+March 16, 2009 (0.2)
+- renamed internal naming for FUNCTION to avoid mangling
+- fixed READ to allow usage with arrays
+- fixed INPUT to allow usage with arrays
+- fixed FOR to allow usage with arrays
+- added variable check in READLN statement
+- added variable check in WRITELN statement
+- fixed ASC function for high ASCII
+
+March 15, 2009 (0.1)
+- Initial release

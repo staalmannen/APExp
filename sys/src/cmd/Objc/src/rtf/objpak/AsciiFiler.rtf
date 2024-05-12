@@ -1,0 +1,252 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Portable Object Compiler (c) 1997,2000,03,04.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 AsciiFiler\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} Object\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Maturity Index:}} Experimental\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 {\b AsciiFiler} is a (somewhat Stepstone compatible) {\i filer class}, to archive objects on disk.  Archiving is a general technique for saving (passivating) and later, loading (activating) objects to and from a file.  There are essentially two complementary operations.  {\f2 storeOn:} converts the object as it exists in memory into a {\i flat text file format}.  {\f2 readFrom:} does the inverse and translates the process-independent symbolic names again into a process-specific object.\fs16\
+\
+\f2\fs24\li2800 [myObject storeOn:"/tmp/aFile"];\
+\f0\fs16\
+\f0\fs28\li2200 and then later,\fs16\
+\
+\f2\fs24\li2800 myObject = [AsciiFiler readFrom:"/tmp/aFile"];\
+\f0\fs16\
+\f0\fs28\li2200 The {\f2 readFrom:} returns an instance of the class that it finds in the file, not an {\b AsciiFiler} instance.\fs16\
+\
+\f0\fs28\li2200 The methods {\f2 storeOn:} and {\f2 readFrom:} are declared in the Object class and are inherited by all objects.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Example\b0\f0\fs16\
+\
+\f0\fs28\li2200 Suppose a class named {\b Record} is implemented as follows :\fs16\
+\
+\f2\fs24\li2800 \\= Record : Object\
+\{\
+        id firstname;\
+        id familyname;\
+\}\
+\
++ new\
+\{\
+        self = [super new];\
+        firstname = [String str:"Paco"];\
+        familyname = [String str:"Rodriguez"];\
+        return self;\
+\}\
+\
+\\=:\
+\
+\f0\fs16\
+\f0\fs28\li2200 Then the following demonstrates how the AsciiFiler class automatically converts instances of {\b Record} to a flat file text representation :\fs16\
+\
+\f2\fs24\li2800 int main()\
+\{\
+	[[Record new] storeOn:"/tmp/aFile"];\
+\}\
+\f0\fs16\
+\f0\fs28\li2200 Inspection of the file {\i aFile} would show :\fs16\
+\
+\f2\fs24\li2800 #AsciiFiler i144 \
+0 #Record @2 @3 \
+0 #String i4 i5 *4"Paco \
+0 #String i9 i10 *9"Rodriguez \
+\f0\fs16\
+\f0\fs28\li2200 This file can be used to read back an instance of {\b Record} into memory, and all this without the developer having to write a single line of code.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 File Format\b0\f0\fs16\
+\
+\f0\fs28\li2200 Because we have no intention to reinvent the wheel in this area, we try to keep our AsciiFiler file format partly compatible with the original Stepstone file format.  The following shows a Stepstone dump of a {\b OrdCltn} containing some Strings and a Set :\fs16\
+\
+\f2\fs24\li2800 #AsciiFiler i3\
+10 #OrdCltn @2 i10 i3\
+10 #IdArray i10 @3 @3 @4 @0 @0 @0 @0 @0 @0 @0\
+12 #String i11 i11 *11"hello world\
+20 #Set @5 i20 i1\
+20 #IdArray i20 @0 @0 @0 @0 @0 @0 @0 @0 @0 @0 @0 @0 @0 @3 @0 @0 @0 @0 @0 @0\
+\f0\fs16\
+\f0\fs28\li2200 Each record in the file is newline terminated.  The first record indicates that this is a (Stepstone) AsciiFiler file, version 3.  Then follows object 1 on line 1, object 2 on line 2 and so on.  The first field for each record is the number of indexed variables (this will always be 0 for the Portable Object Compiler).  Then follows the {\i isa} pointer and the instance variables of each object.\fs16\
+\
+\f0\fs28\li2200 Here's a short list of the most commonly used notation in AsciiFiler files.  Note that objects are stored using a notation that allows for {\i back} or {\i forward} pointers.  For example, the object in record 5 may contain a reference to @3, the object in record 3, or to @10, the object in record 10.\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+	- i : integer, like in i3\
+	- S : unsigned short integer, like in S3\
+	- sharp : class name, such as #String\
+	- dollar : pointer (only used for NULL pointer)\
+	- at : object identifier, @0 stands for nil\
+	- star : NULL terminated char pointer\
+\pard\fs16\
+\
+\f0\fs28\li2200 The Stepstone filer class supports, for reasons explained below, many more {\i type descriptors} (characters to encode C types).  They are not necessarily implemented by this class, since the implementation significantly differs.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Automatic I/O\b0\f0\fs16\
+\
+\f0\fs28\li2200 The Stepstone and Portable Object Compiler runtime are said to have {\i automatic I/O}, because both compilers and runtimes attempt to do the job of implementing the necessary methods to write and read instance variables for a class, without intervention of the programmer.  Other runtimes sometimes offer only {\i semi-automatic I/O} where the programmer has to develop the code to read and write instance variables.\fs16\
+\
+\f0\fs28\li2200 However, the details about what is done automatically and what is left to the programmer differ.  The Stepstone compiler attempts to automatically file all C types (ints, chars, unions, structs etc.).\fs16\
+\
+\f0\fs28\li2200 The Portable Object Compiler emits for each class an implementation for the {\f2 fileOutIdsFor:} and {\f2 fileInIdsFrom:} methods.  These methods take care of the archiving of {\i id instance variables} (objects).  Unlike Stepstone, the Portable Object Compiler does not attempt to automatically archive C types; this must be done manually, if the programmer chooses to use instance variables that are raw C types instead of Objective-C objects.\fs16\
+\
+\f0\fs28\li2200 Therefore, if a class adds only {\i id} instance variables to its superclass, then {\f2 storeOn:} and {\f2 readFrom:} will immediately work for the class.  Otherwise manual archiving needs to be done, as explained in the following paragraphs.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 File Out Operation\b0\f0\fs16\
+\
+\f0\fs28\li2200 Storing an object works in two passes : the filer will first build a table of contents (TOC) by sending {\f2 fileOutOn:} to all objects that can be reached from the object that is being stored.  A second pass will again send {\f2 fileOutOn:} to the objects, this time to actually write the data to the file, assigning to each object a label, which is the offset of the object in the TOC.\fs16\
+\
+\f0\fs28\li2200 The default implementation of {\f2 fileOutOn:}, as implemented in the Object class, uses the compiler generated {\f2 fileOutIdsFor:} method to store all {\i id} instance variables.  This might suffice in many applications.\fs16\
+\
+\f0\fs28\li2200 Variables of a different type, or objects that are indirectly {\i owned} by the object must be manually written on the Filer, by using the {\f2 fileOut:type:} method.\fs16\
+\
+\f2\fs24\li2800 - fileOutOn:aFiler\
+\{\
+	[super fileOutOn:aFiler];\
+	[aFiler fileOut:&myInt type:'i'];\
+	[aFiler fileOut:&cArray[0] type:'@'];\
+	[aFiler fileOut:&cArray[1] type:'@'];\
+	return self;\
+\}\
+\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs36\li1400 File In Operation\b0\f0\fs16\
+\
+\f0\fs28\li2200 When activating objects, the Filer will first build a table of instances for each record in the file.  The Filer knows what factory class to use, since each record includes the necessary class information.  Then, once all (uninitialized) objects exist, each instance receives a {\f2 fileInFrom:} message.  Only when all instances have had the opportunity to file themselves in, from the Filer, {\f2 awakeFrom:} messages are sent to the objects.  This can be used to perform further initialization, to make objects or string unique etc.\fs16\
+\
+\f0\fs28\li2200 The default implementation of {\f2 fileInFrom:}, as implemented in the Object class, uses the compiler generated {\f2 fileInIdsFrom:} method to restore all {\i id} instance variables.  A method {\f2 fileInFrom:} needs to be implemented only to match a corresponding {\f2 fileOutOn:}.\fs16\
+\
+\f2\fs24\li2800 - fileInFrom:aFiler\
+\{\
+	[super fileInFrom:aFiler];\
+	[aFiler fileIn:&myInt type:'i'];\
+	[aFiler fileIn:&cArray[0] type:'@'];\
+	[aFiler fileIn:&cArray[1] type:'@'];\
+	return self;\
+\}\
+\
+\f0\fs16\
+\f0\fs28\li2200 If the type description character, passed as argument to {\f2 fileIn:type:} does not match what was used for {\f2 fileOut:type:}, the Filer will signal a {\b TypeInconsistency} exception.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Class Initialization}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- initialize\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creating}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- new\
+	- free\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Storing and Reading Objects}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- store:on:\
+	- readFrom:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b File Out Operation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- fileOut:type:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b File In Operation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- fileIn:type:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 initialize\f0\b0\
+\f0\fs28\li2500 +{\b initialize}\fs16\
+\
+\f0\fs28\li2200 Registers the {\b AsciiFiler} as default filer.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 new\f0\b0\
+\f0\fs28\li2500 +{\b new}\fs16\
+\
+\f0\fs28\li2200 Factory method to create and return a new instance of the class.  The default implementation clears (zeroes) the memory for instance variables and initializes the {\i isa} pointer.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 free\f0\b0\
+\f0\fs28\li2500 -{\b free}\fs16\
+\
+\f0\fs28\li2200 Frees the memory for this instance, and returns {\b nil}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 store:on:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b store}:{\i anObject}{\b on}:(STR){\i aFileName}\fs16\
+\
+\f0\fs28\li2200 AsciiFiler reimplementation of {\f2 storeOn:}.  Doesn't use the default Filer, but rather AsciiFiler itself as Filer class.  If the default filer is AsciiFiler, then the following are equivalent :\fs16\
+\
+\f2\fs24\li2800 [AsciiFiler store:anObject on:aFileName];\
+\f0\fs16\
+\f0\fs28\li2200 and\fs16\
+\
+\f2\fs24\li2800 [anObject storeOn:aFileName];\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 readFrom:\f0\b0\
+\f0\fs28\li2500 -{\b readFrom}:(STR){\i aFileName}\fs16\
+\
+\f0\fs28\li2200 AsciiFiler reimplements {\f2 readFrom:} and doesn't use the default Filer, but rather AsciiFiler itself as Filer class.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 fileOut:type:\f0\b0\
+\f0\fs28\li2500 -{\b fileOut}:(void *){\i value}{\b type}:(char){\i typeDesc}\fs16\
+\
+\f0\fs28\li2200 Writes out the data referenced by {\i value} to the filer.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 fileIn:type:\f0\b0\
+\f0\fs28\li2500 -{\b fileIn}:(void *){\i value}{\b type}:(char){\i typeDesc}\fs16\
+\
+\f0\fs28\li2200 Reads from the filer and returns data by reference.\fs16\
+\
+\fs16\
+\
+\
+}

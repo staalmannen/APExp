@@ -1,0 +1,81 @@
+
+#
+# Portable Object Compiler (c) 1996-2022. All Rights Reserved.
+# $Id: Makefile.in,v 1.12 2023/02/04 13:50:00 stes Exp $
+#
+
+#
+# This Makefile should work with UNIX make's (like SysV, BSD, GNU make)
+#
+
+SRCDIR=@srcdir@
+BUILDDIR=@builddir@
+MKDIR=mkdir
+OBJC=@OBJC@
+RM=@RM@
+CP=@CP@
+INSTALL=@INSTALL@
+# configure AR=echo FINAL_AR='ar cr' if you want a single ar invocation
+AR=@AR@
+FINAL_AR=@FINAL_AR@
+RANLIB=@RANLIB@
+@SET_MAKE@
+DBG_MFLAGS=@DBG_MFLAGS@
+OPT_MFLAGS=@OPT_MFLAGS@
+MFLAGS=$(@MFLAGS@)
+EXTRA_MFLAGS=@EXTRA_MFLAGS@
+OBJSUFFIX=@OBJSUFFIX@
+LIBSUFFIX=@LIBSUFFIX@
+LIBDIR=@LIBDIR@
+IFLAGS=@OBJCRT_IFLAGS@
+
+VPATH=$(SRCDIR)
+
+.SUFFIXES: .m 
+
+LIBRARY=objcrt.$(LIBSUFFIX)
+SHLIB=libobjcrt@DOTSHLIBSUFFIX@
+
+OBJFILES=\
+	Object.$(OBJSUFFIX)\
+	Block.$(OBJSUFFIX)\
+	Message.$(OBJSUFFIX)\
+	Exceptn.$(OBJSUFFIX)\
+	OutOfMem.$(OBJSUFFIX)\
+	objcrt.$(OBJSUFFIX)
+
+.m.o:
+	$(OBJC) -c $< $(MFLAGS) $(EXTRA_MFLAGS) $(IFLAGS)
+	$(AR) $(LIBRARY) $@ 
+
+$(LIBRARY) : $(OBJFILES)
+	$(FINAL_AR) $(LIBRARY) $(OBJFILES)
+	$(RANLIB) $(LIBRARY)
+
+$(SHLIB) : $(OBJFILES)
+	$(OBJC) -dl $(EXTRA_MFLAGS) $(OBJFILES) -o $(SHLIB)
+
+shlib : $(SHLIB)
+
+install : $(LIBRARY)
+	test -d $(LIBDIR) || $(MKDIR) $(LIBDIR)
+	-$(INSTALL) $(LIBRARY) $(LIBDIR)
+
+installshlib : $(SHLIB)
+	test -d $(LIBDIR) || $(MKDIR) $(LIBDIR)
+	-$(INSTALL) $(SHLIB) $(LIBDIR)
+
+cleantmp :
+	-$(RM) *.P
+	-$(RM) *.c
+	-$(RM) *.i
+
+clean : cleantmp
+	-$(RM) *.$(OBJSUFFIX)
+	-$(RM) *.$(LIBSUFFIX)
+	-$(RM) $(SHLIB)
+
+distclean : clean
+	-$(RM) Makefile 
+	-$(RM) config.h 
+

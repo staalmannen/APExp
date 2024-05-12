@@ -1,0 +1,238 @@
+.TH "symbol" 3 "Mar 12, 2023"
+.SH Symbol
+.PP
+.B
+Inherits from:
+
+CAObject
+.SH Class Description
+.PP
+Maturity Index : Relatively Mature
+.PP
+For symbols created with the factory method 
+.B
+str:
+, the first character of the 
+.B
+str
+of the symbol object must be a letter\&.  Subsequent characters can be letters or digits\&.  Whitespace or control characters are not allowed\&.
+.PP
+Using the factory method 
+.B
+chars:count:
+, it\&'s possible to use arbitrary C strings as the value of the symbol; in this case 
+.B
+Symbol
+just acts like a regular Objective C String class\&.  If you intend to use the object as a mathematical symbol, it\&'s not advised to do this as you might incorrectly interpret spaces etc\&. as mathematical operators\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* str:
+.br
+* chars:count:
+.br
+* copy
+.br
+* deepCopy
+.br
+* release
+.RE
+.PP 
+.B
+Identity
+.RS 3
+.br
+* str
+.br
+* str:
+.br
+* hash
+.br
+* isEqual:
+.br
+* compare:
+.br
+* isLetter
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+str:
+.RS 1
++
+.B
+str
+:(STR)
+.I
+aString
+.RE
+.PP
+Creates a new symbol, and sets its value to a copy of 
+.I
+aString
+\&.  Returns 
+.B
+nil
+if 
+.I
+aString
+is not suited as value for a symbol (when the first letter is not a letter, for instance)\&.
+.PP 
+chars:count:
+.RS 1
++
+.B
+chars
+:(STR)
+.I
+aBuffer
+.B
+count
+:(int)
+.I
+numChars
+.RE
+.PP
+Creates a new symbol, and sets its value to a copy of the first 
+.I
+numChars
+characters of 
+.I
+aBuffer
+\&.  For this method, there are no restrictions on the C string being used\&.
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Returns a new symbol object\&.  Copies the string\&.
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+Equivalent to 
+.B
+copy
+\&.
+.PP 
+release
+.RS 1
+-
+.B
+release
+.RE
+.PP
+Frees the memory for the string value\&.
+.PP 
+str
+.RS 1
+- (
+STR
+)
+.B
+str
+.RE
+.PP
+Returns the string value of the symbol\&.  The first character is a letter, subsequent characters can be alphanumeric\&.
+.PP 
+str:
+.RS 1
+-
+.B
+str
+:(STR)
+.I
+aString
+.RE
+.PP
+Creates a new symbol, and sets its value to a copy of 
+.I
+aString
+\&.  Returns 
+.B
+nil
+if 
+.I
+aString
+is not suited as value for a symbol\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a hash value based upon the string\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+b
+.RE
+.PP
+Returns YES if the str\&'s of both objects are equal\&.
+.PP 
+compare:
+.RS 1
+- (
+int
+)
+.B
+compare
+:
+.I
+b
+.RE
+.PP
+Compares the str\&'s of both objects\&.
+.PP 
+isLetter
+.RS 1
+- (
+BOOL
+)
+.B
+isLetter
+.RE
+.PP
+Whether the symbol consists of just one character (and hence, is a letter, not a digit)\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints the symbol to 
+.I
+aFile
+\&. 

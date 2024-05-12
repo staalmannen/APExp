@@ -1,0 +1,260 @@
++-------------------------------------+
+|                                     |
+| Installing BaCon 4.8                |
+|                                     |
++-------------------------------------+
+
+(1) How to execute the configure script
+
+LINUX
+=====
+
+To install BaCon on your system, either KSH build >2012, ZSH >4.x or
+BASH >4.x must be available on your system. Start by running the 
+configure script as follows:
+
+# ./configure
+
+This will compile the BaCon version of BaCon. Note that KSH and ZSH are a
+lot faster converting the code compared to BASH.
+
+Some older Linux distributions may require to use BASH, this can be forced
+as follows:
+
+# ./configure --enable-bash
+
+The configure script also tries to autodetect the toolkit required to build 
+the GUI. If no toolkit is found then one can be forced as follows (GTK3):
+
+# ./configure --enable-gui-gtk3
+
+Alternatively TK:
+
+# ./configure --enable-gui-tk
+
+Or FLTK:
+
+# ./configure --enable-gui-fltk
+
+Or the legacy GUI:
+
+# ./configure --enable-gui-legacy
+
+To build all the GUI versions:
+
+# ./configure --enable-gui-all
+
+The configure script allows certain options. To see them all then
+execute the configure script as follows:
+
+# ./configure --help
+
+
+OPENBSD
+=======
+
+On BSD type systems, the following line works to compile with clang:
+
+# CXXFLAGS="-x c++" CC=clang CXX=clang++ ./configure
+
+To set correct flags for FLTK, and using clang, the following command should work:
+
+# CPPFLAGS="$(fltk-config --cxxflags)" CXXFLAGS="$(fltk-config --cxxflags) -x c++" LDFLAGS="$(fltk-config --ldflags)" CC=clang CXX=clang++ ./configure --enable-gui-fltk
+
+
+MACOSX
+======
+
+The FLTK library can be obtained from the mac app store: http://macappstore.org/fltk/
+
+Then, the following configure command should be sufficient:
+
+# CXXFLAGS="-x c++" ./configure --enable-gui-fltk
+
+
+Raspberry PI/ARM
+================
+
+The following configure command should work, make sure FLTK is available on your system:
+
+# CXXFLAGS="-x c++" ./configure --enable-gui-fltk
+
+
+ANDROID / TERMUX
+================
+
+# CXXFLAGS="-x c++" ./configure --prefix=`pwd`/../../usr
+
+
+HAIKU OS
+========
+
+# ./configure --prefix=/boot/home/config/non-packaged --datadir=/boot/home/config/non-packaged/data
+
+
+(2) Makefile
+    
+The 'configure' script checks the requirements on your system and should
+finish successfully. A Makefile will be generated.
+
+Then start building the BaCon binary by executing:
+
+# make
+
+
+(3) Installation
+    
+Then, to install BaCon, simply execute:
+
+# make install
+
+On Ubuntu based systems, use sudo:
+
+# sudo make install
+
+
+(4) Compiling the BaCon source code with g++
+
+To compile BaCon with a C++ compiler, extra flags need to be added:
+
+# bacon -c g++ -o -Wno-write-strings -o -Wno-pointer-arith bacon
+
+
++-------------------------------------+
+|                                     |
+| Performance considerations          |
+|                                     |
++-------------------------------------+
+
+BaCon makes heavily use of dynamic memory allocation functions. The standard libC
+functions malloc/calloc/realloc/free are reliable, but designed for general
+purpose applications.
+
+To make use of an exernal memory allocator when compiling BaCon, it is possible
+to pass the library name before running the './configure' script.
+
+
+- Example with 'jemalloc':
+
+# LDFLAGS=-ljemalloc ./configure --enable-gui-gtk --enable-gui-fltk --enable-gui-tk
+
+Or in Ubuntu:
+
+# LDFLAGS=-l:libjemalloc.so.2 ./configure --enable-gui-gtk --enable-gui-fltk --enable-gui-tk
+
+
+- Example with 'tcmalloc':
+
+# LDFLAGS=-ltcmalloc ./configure --enable-gui-gtk --enable-gui-fltk --enable-gui-tk
+
+On Ubuntu based systems:
+
+# LDFLAGS=-l:libtcmalloc.so.4 ./configure --enable-gui-gtk --enable-gui-fltk --enable-gui-tk
+
+Or:
+
+# LDFLAGS=-l:libtcmalloc_minimal.so.4 ./configure --enable-gui-all
+
+The resulting BaCon binary now usually will show a performance increase
+between 10%-20% depending on system architecture.
+
+To use an external memory allocator with a BaCon program, just pass the library
+in the '-l' argument:
+
+# bacon -l tcmalloc <prog.bac>
+
+Or:
+
+# bacon -l:libtcmalloc.so.4 <prog.bac>
+
+
+- Example with 'mimalloc':
+
+On Ubuntu based systems:
+
+# LDFLAGS=-l:libmimalloc.so.2 ./configure --enable-gui-gtk --enable-gui-fltk --enable-gui-tk
+
+
+To always use an external memory allocator when compiling BaCon programs, store the command
+line configuration one time using '-w':
+
+# bacon -l tcmalloc -w <prog.bac>
+
+Subsequent uses of BaCon now always will include the external memory allocation library.
+
++-------------------------------------+
+|                                     |
+| Compile for 32-bit in 64-bit env    |
+|                                     |
++-------------------------------------+
+
+Install the multilib package (Debian/Ubuntu/Mint):
+
+# sudo apt-get install gcc-multilib
+
+Then compile the program as follows:
+
+# bacon -o -m32 -l -m32 bacon
+
++-------------------------------------+
+|                                     |
+| Compiling with TCC can fail         |
+|                                     |
++-------------------------------------+
+
+Compiling with TCC fails in regex.h from libc. This happens for TCC versions after commit 56b32251. 
+
+Solution is to define the '__STDC_NO_VLA__' macro in the command line:
+
+# bacon -c tcc -o -D__STDC_NO_VLA__ <prog.bac>
+
++-------------------------------------+
+|                                     |
+| Compatibility with earlier versions |
+|                                     |
++-------------------------------------+
+
+Though the BASIC syntax and API has undergone only 2 minor changes over
+more than 10 years, it occasionally may happen that older programs cannot be
+converted. The following hints should help to troubleshoot such problems.
+
+(1) Starting from 3.0, BaCon uses a new and optimized variable detection
+mechanism. This mechanism is faster and more precise. Now global variables
+with a certain name cannot be used in combination with local variables
+using the same name. This is known as 'variable shadowing' and considered
+to be confusing. It is not supported in BaCon.
+
+Solution: either change the name of the global variable, or consistently
+declare variables using LOCAL.
+
+(2) The IF/THEN/ELSE statement can be used in two ways. The first way
+is an IF/THEN/ELSE which contains a body with statements, ending with an
+ENDIF. The second way is an IF/THEN/ELSE containing one single statement
+on the same line, where no ENDIF is needed.
+
+The problem is that it cannot be detected which ELSE belongs to which IF
+in case of nested IF/THEN/ELSE statements.
+
+Solution: combinations of IF/THEN/ELSE with a body and without a body
+are not allowed anymore. Such combinations of IF/THEN/ELSE have to be
+rewritten. Either use IF/THEN/ELSE each with a body, or use IF/THEN/ELSE
+each with a single line.
+
+(3) As of BaCon 3.7 the syntax for the RESIZE statement has changed.
+
++-------------------------------------+
+|                                     |
+| A note to beta testers              |
+|                                     |
++-------------------------------------+
+
+Before installing BaCon, please make sure that old beta versions of
+the BaCon archives are removed from your system. These archives have the
+names 'libbacon.a' and 'libbacon++.a'.
+
++-----------------------------------------------------------------------
+
+Greetings
+Peter van Eerten
+
++-----------------------------------------------------------------------

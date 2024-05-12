@@ -1,0 +1,340 @@
+<HTML>
+<TITLE>bag Specification Sheet</TITLE>
+<H1>bag Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 1997,98.  All Rights Reserved.<P>
+<H1>Bag</H1>
+<B>Inherits from:</B> Cltn<P>
+<H2>Class Description</H2>
+<B>Bag</B> instances are unordered sets of objects, with possibly duplicate elements.  A <B>Bag</B> can be thought of, as a <B>Set</B>, assigning to each element, a count of how many times that element was added (<I>multiplicity</I> of the element).<P>
+The multiplicity of a particular element is returned by the <B>occurrencesOf:</B> message.  Repeatedly adding the same (in the sense of <B>hash</B> and <B>isEqual</B>) object, simply increases the multiplicity of the element.  Sending <B>remove:</B> messages, will not remove the element until the multiplicity of the element is zero.<P>
+<H2>Adding Objects</H2>
+The methods <B>add:</B>, <B>addNTest:</B>, <B>filter:</B>, <B>replace:</B> and <B>add:ifDuplicate:</B> are used to add objects to a Bag.  The difference between these methods is the procedure used in adding, how duplicates are handled and what value is returned.<P>
+<H2>Difference with OrdCltn</H2>
+Users should realize that, unlike <B>OrdCltn</B>, <B>Bag</B> does not preserve pointer equality (equality in the <B>isSame</B> sense).  Bag's instance method <B>eachElement</B> will return a sequence of objects, possibly containing duplicate elements, but those so-called duplicates will simply be pointers to the same element.  Also, since <B>Bag</B> is unordered, the order in which elements will be returned, is not the same as the order in which they were added.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#0">new</A></LI>
+<LI><A HREF="#1">new:</A></LI>
+<LI><A HREF="#30">with:</A></LI>
+<LI><A HREF="#31">with:with:</A></LI>
+<LI><A HREF="#32">add:</A></LI>
+<LI><A HREF="#2">copy</A></LI>
+<LI><A HREF="#3">deepCopy</A></LI>
+<LI><A HREF="#4">emptyYourself</A></LI>
+<LI><A HREF="#6">freeContents</A></LI>
+<LI><A HREF="#7">free</A></LI>
+</UL>
+<H3><B>Interrogation</B></H3>
+<UL>
+<LI><A HREF="#10">size</A></LI>
+<LI><A HREF="#11">isEmpty</A></LI>
+<LI><A HREF="#12">eachElement</A></LI>
+</UL>
+<H3><B>Comparing</B></H3>
+<UL>
+<LI><A HREF="#14">isEqual:</A></LI>
+</UL>
+<H3><B>Adding</B></H3>
+<UL>
+<LI><A HREF="#15">add:</A></LI>
+<LI><A HREF="#16">addNTest:</A></LI>
+<LI><A HREF="#17">filter:</A></LI>
+<LI><A HREF="#18">add:ifDuplicate:</A></LI>
+<LI><A HREF="#19">replace:</A></LI>
+</UL>
+<H3><B>Removing</B></H3>
+<UL>
+<LI><A HREF="#20">remove:</A></LI>
+<LI><A HREF="#21">remove:ifAbsent:</A></LI>
+</UL>
+<H3><B>Testing Contents</B></H3>
+<UL>
+<LI><A HREF="#33">includesAllOf:</A></LI>
+<LI><A HREF="#34">includesAnyOf:</A></LI>
+</UL>
+<H3><B>Adding and Removing Contents</B></H3>
+<UL>
+<LI><A HREF="#35">addAll:</A></LI>
+<LI><A HREF="#36">addContentsOf:</A></LI>
+<LI><A HREF="#37">addContentsTo:</A></LI>
+<LI><A HREF="#38">removeAll:</A></LI>
+<LI><A HREF="#39">removeContentsFrom:</A></LI>
+<LI><A HREF="#40">removeContentsOf:</A></LI>
+</UL>
+<H3><B>Combining</B></H3>
+<UL>
+<LI><A HREF="#41">intersection:</A></LI>
+<LI><A HREF="#42">union:</A></LI>
+<LI><A HREF="#43">difference:</A></LI>
+</UL>
+<H3><B>Converting</B></H3>
+<UL>
+<LI><A HREF="#44">asSet</A></LI>
+<LI><A HREF="#45">asOrdCltn</A></LI>
+</UL>
+<H3><B>Using Blocks</B></H3>
+<UL>
+<LI><A HREF="#46">detect:</A></LI>
+<LI><A HREF="#47">detect:ifNone:</A></LI>
+<LI><A HREF="#48">select:</A></LI>
+<LI><A HREF="#49">reject:</A></LI>
+<LI><A HREF="#50">collect:</A></LI>
+<LI><A HREF="#51">count:</A></LI>
+</UL>
+<H3><B>Making elements perform</B></H3>
+<UL>
+<LI><A HREF="#52">elementsPerform:</A></LI>
+<LI><A HREF="#53">elementsPerform:with:</A></LI>
+<LI><A HREF="#54">elementsPerform:with:with:</A></LI>
+<LI><A HREF="#55">elementsPerform:with:with:with:</A></LI>
+</UL>
+<H3><B>Do Blocks</B></H3>
+<UL>
+<LI><A HREF="#56">do:</A></LI>
+<LI><A HREF="#57">do:until:</A></LI>
+</UL>
+<H3><B>Locating</B></H3>
+<UL>
+<LI><A HREF="#22">find:</A></LI>
+<LI><A HREF="#23">contains:</A></LI>
+<LI><A HREF="#24">includes:</A></LI>
+<LI><A HREF="#25">occurrencesOf:</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#26">printOn:</A></LI>
+</UL>
+<H3><B>Archiving</B></H3>
+<UL>
+<LI><A HREF="#27">fileOutOn:</A></LI>
+<LI><A HREF="#28">fileInFrom:</A></LI>
+<LI><A HREF="#29">awakeFrom:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">new</A></H3>
+<BLOCKQUOTE>+<B>new</B></BLOCKQUOTE>
+Returns a new empty Bag.<P>
+<H3><A NAME="1">new:</A></H3>
+<BLOCKQUOTE>+<B>new</B>:(unsigned)<I>n</I></BLOCKQUOTE>
+Returns a new empty Bag, which can hold at least <I>n</I> different elements.<P>
+<H3><A NAME="30">with:</A></H3>
+<BLOCKQUOTE>+<B>with</B>:(int)<I>nArgs,...</I></BLOCKQUOTE>
+Returns a new object with <I>nArgs</I> elements.  For example,<P>
+<BLOCKQUOTE><PRE>
+id aCltn = [OrdCltn with:2,anObject,otherObject];
+</PRE></BLOCKQUOTE>
+creates a collection and adds <I>anObject</I> and <I>otherObject</I> to it.  In a similar way, <B>Set</B> or <B>SortCltn</B> instances can be created like this.<P>
+<H3><A NAME="31">with:with:</A></H3>
+<BLOCKQUOTE>+<B>with</B>:<I>firstObject</I><B>with</B>:<I>nextObject</I></BLOCKQUOTE>
+This method is equivalent to <B>with:</B> 2,<I>firstObject</I>,<I>nextObject</I>. <P>
+<H3><A NAME="32">add:</A></H3>
+<BLOCKQUOTE>+<B>add</B>:<I>firstObject</I></BLOCKQUOTE>
+This method is equivalent to <B>with:</B> 1,<I>firstObject</I>. <P>
+This (factory) method has the same name as the instance method <B>add:</B> and can be used as follows, in circumstances when the user does not want to allocate a collection unless it is actually used :<P>
+<BLOCKQUOTE><PRE>
+aCltn = [ (aCltn)?aCltn:OrdCltn add:myObject ];
+</PRE></BLOCKQUOTE>
+This shows that creation of the collection is delayed until it is actually needed.  If the collection already exists, objects are simply added, using the instance method <B>add:</B>.<P>
+<H3><A NAME="2">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Returns a new copy of the Bag.<P>
+<H3><A NAME="3">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+Returns a new copy of the Bag.  The elements in the new Bag are deep copies of the elements in the original Bag.<P>
+<H3><A NAME="4">emptyYourself</A></H3>
+<BLOCKQUOTE>-<B>emptyYourself</B></BLOCKQUOTE>
+Empties all the members of the Bag (without freeing them).  Returns the receiver.<P>
+<H3><A NAME="6">freeContents</A></H3>
+<BLOCKQUOTE>-<B>freeContents</B></BLOCKQUOTE>
+Removes and frees all the members of the Bag, but doesn't free the Bag itself.  Returns the receiver.<P>
+<H3><A NAME="7">free</A></H3>
+<BLOCKQUOTE>-<B>free</B></BLOCKQUOTE>
+Frees the Bag, but not its elements.  Returns <B>nil</B>.  Do :<P>
+<BLOCKQUOTE><PRE>
+bag = [[bag freeContents] free];
+</PRE></BLOCKQUOTE>
+if you want to free the Bag and its contents.<P>
+<H3><A NAME="10">size</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>size</B></BLOCKQUOTE>
+Returns the number of elements in the Bag.<P>
+If an Object was added twice, then <B>size</B> returns two, not one, although that the Bag internally stores only one occurence of the Object.<P>
+<H3><A NAME="11">isEmpty</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEmpty</B></BLOCKQUOTE>
+Whether the number of objects in the Bag is equal to zero.<P>
+<H3><A NAME="12">eachElement</A></H3>
+<BLOCKQUOTE>-<B>eachElement</B></BLOCKQUOTE>
+Returns a sequence of elements in the Bag.  If the multiplicity of an object in the Bag is greater than one, pointers to the same object will occur multiple times in the Sequence.<P>
+<BLOCKQUOTE><PRE>
+aSeq = [aBag eachElement];
+while ((anElement = [aSeq next])) {
+    /* do something */
+}
+aSeq = [aSeq free];
+</PRE></BLOCKQUOTE>
+<H3><A NAME="14">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>bag</I></BLOCKQUOTE>
+Returns YES if <I>bag</I> is a Bag, if <I>bag</I> has the same number of elements as the receiver, and if each member of the contents of <I>bag</I> is contained in the receiver's contents.<P>
+<H3><A NAME="15">add:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>anObject</I></BLOCKQUOTE>
+Adds <I>anObject</I> to the Bag, and, if it's a duplicate, simply increases the multiplicity of the element.  This method doesn't inform the caller about whether the Object was a duplicate, because the receiver is always returned.<P>
+<H3><A NAME="16">addNTest:</A></H3>
+<BLOCKQUOTE>-<B>addNTest</B>:<I>anObject</I></BLOCKQUOTE>
+Adds <I>anObject</I> if it was not previously in the Bag, otherwise increases the multiplicity of the matching element.  Returns <I>anObject</I> if it was not a duplicate, otherwise returns <B>nil</B>, but in either case adds the object to the Bag.<P>
+<H3><A NAME="17">filter:</A></H3>
+<BLOCKQUOTE>-<B>filter</B>:<I>anObject</I></BLOCKQUOTE>
+The <B>filter:</B> method has a special purpose.  If there is a matching object in the Bag, then <I>anObject</I> is freed, the multiplicity of the matching element is increased, and the matching object is returned.  Otherwise, <I>anObject</I> is added and returned.<P>
+<H3><A NAME="18">add:ifDuplicate:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>anObject</I><B>ifDuplicate</B>:<I>aBlock</I></BLOCKQUOTE>
+Adds and returns <I>anObject</I>, if there was no duplicate previously in the Bag.<P>
+Otherwise, this method evalutes <I>aBlock</I> and returns the matching object (the object that was already in the Bag).<P>
+For example, the <B>filter:</B> method is equivalent to :<P>
+<BLOCKQUOTE><PRE>
+[ Bag add: anObject ifDuplicate: { [anObject free] }];
+</PRE></BLOCKQUOTE>
+<H3><A NAME="19">replace:</A></H3>
+<BLOCKQUOTE>-<B>replace</B>:<I>anObject</I></BLOCKQUOTE>
+If a matching object is found, then <I>anObject</I> replaces that object, and the matching object is returned.  If there is no matching object, <I>anObject</I> is added to the receiver, and <B>nil</B> is returned.<P>
+<H3><A NAME="20">remove:</A></H3>
+<BLOCKQUOTE>-<B>remove</B>:<I>oldObject</I></BLOCKQUOTE>
+Removes <I>oldObject</I> or the element which matches it using <B>isEqual:</B>.  Returns the removed entry, or <B>nil</B> if there is no matching entry.<P>
+<B>Note:</B> The <B>remove:</B> method of the <B>OrdCltn</B> class is implemented to remove an exact match.  The <B>Set</B> class uses a match in the sense of <B>isEqual:</B> instead. <P>
+<H3><A NAME="21">remove:ifAbsent:</A></H3>
+<BLOCKQUOTE>-<B>remove</B>:<I>oldObject</I><B>ifAbsent</B>:<I>exceptionBlock</I></BLOCKQUOTE>
+Removes <I>oldObject</I> or the element which matches it using <B>isEqual:</B>.  Returns the removed entry, or return value of <I>exceptionBlock</I> if there is no matching entry.<P>
+For example, the method <B>remove:</B> is equivalent to :<P>
+<BLOCKQUOTE><PRE>
+[ aBag remove: oldObject ifAbsent: { nil } ];
+</PRE></BLOCKQUOTE>
+<B>Note:</B> The <B>remove:</B> method of the <B>OrdCltn</B> class is implemented to remove an exact match.  The <B>Set</B> class uses a match in the sense of <B>isEqual:</B> instead. <P>
+<H3><A NAME="33">includesAllOf:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>includesAllOf</B>:<I>aCltn</I></BLOCKQUOTE>
+Answer whether all the elements of <I>aCltn</I> are in the receiver, by sending <B>includes:</B> for each individual element.<P>
+<H3><A NAME="34">includesAnyOf:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>includesAnyOf</B>:<I>aCltn</I></BLOCKQUOTE>
+Answer whether any element of <I>aCltn</I> is in the receiver, by sending <B>includes:</B> for each individual element.<P>
+<H3><A NAME="35">addAll:</A></H3>
+<BLOCKQUOTE>-<B>addAll</B>:<I>aCltn</I></BLOCKQUOTE>
+Adds each member of <I>aCltn</I> to the receiver.  If <I>aCltn</I> is <B>nil</B>, no action is taken.  The argument <I>aCltn</I> need not be a collection, so long as it responds to <B>eachElement</B> in the same way as collections do.  Returns the receiver.<P>
+<B>Note:</B> If <I>aCltn</I> is the same object as the receiver, a <B>addYourself</B> message is sent to the object.<P>
+<H3><A NAME="36">addContentsOf:</A></H3>
+<BLOCKQUOTE>-<B>addContentsOf</B>:<I>aCltn</I></BLOCKQUOTE>
+This method is equivalent to <B>addAll:</B> and is provided for Stepstone ICpak101 compatibility.<P>
+<H3><A NAME="37">addContentsTo:</A></H3>
+<BLOCKQUOTE>-<B>addContentsTo</B>:<I>aCltn</I></BLOCKQUOTE>
+This method is equivalent to <B>addAll:</B>, but with argument and receiver interchanged, and is provided for Stepstone ICpak101 compatibility.<P>
+<H3><A NAME="38">removeAll:</A></H3>
+<BLOCKQUOTE>-<B>removeAll</B>:<I>aCltn</I></BLOCKQUOTE>
+Removes all of the members of <I>aCltn</I> from the receiver. The argument <I>aCltn</I> need not be a collection, as long as it responds to <B>eachElement</B> as collections do.  Returns the receiver. <P>
+<B>Note:</B> If <I>aCltn</I> is the same object as the receiver, it empties itself using <B>emptyYourself</B> and returns the receiver.<P>
+<H3><A NAME="39">removeContentsFrom:</A></H3>
+<BLOCKQUOTE>-<B>removeContentsFrom</B>:<I>aCltn</I></BLOCKQUOTE>
+This method is equivalent to <B>removeAll:</B>, and is provided for compatibility with Stepstone ICpak101.<P>
+<H3><A NAME="40">removeContentsOf:</A></H3>
+<BLOCKQUOTE>-<B>removeContentsOf</B>:<I>aCltn</I></BLOCKQUOTE>
+This method is equivalent to <B>removeAll:</B>, and is provided for compatibility with Stepstone ICpak101.<P>
+<H3><A NAME="41">intersection:</A></H3>
+<BLOCKQUOTE>-<B>intersection</B>:<I>bag</I></BLOCKQUOTE>
+Returns a new Collection which is the intersection of the receiver and <I>bag</I>.  The new Collection contains only those elements that were in both the receiver and <I>bag</I>.  The argument <I>bag</I> need not be an actual <B>Set</B> or <B>Bag</B> instance, as long as it implements <B>find:</B> as Sets do.<P>
+<H3><A NAME="42">union:</A></H3>
+<BLOCKQUOTE>-<B>union</B>:<I>bag</I></BLOCKQUOTE>
+Returns a new Collection which is the union of the receiver and <I>bag</I>.  The new Collection returned has all the elements from both the receiver and <I>bag</I>.  The argument <I>bag</I> need not be an actual <B>Set</B> or <B>Bag</B> instance, as long as it implements <B>eachElement:</B> as Sets and Bags do.<P>
+<H3><A NAME="43">difference:</A></H3>
+<BLOCKQUOTE>-<B>difference</B>:<I>bag</I></BLOCKQUOTE>
+Returns a new Collection which is the difference of the receiver and <I>bag</I>.  The new Collection returned has only those elements in the receiver that are not in <I>bag</I>.<P>
+<H3><A NAME="44">asSet</A></H3>
+<BLOCKQUOTE>-<B>asSet</B></BLOCKQUOTE>
+Creates a <B>Set</B> instance and adds the contents of the object to the set.<P>
+<H3><A NAME="45">asOrdCltn</A></H3>
+<BLOCKQUOTE>-<B>asOrdCltn</B></BLOCKQUOTE>
+Creates a <B>OrdCltn</B> instance and adds the contents of the object to the set.<P>
+<H3><A NAME="46">detect:</A></H3>
+<BLOCKQUOTE>-<B>detect</B>:<I>aBlock</I></BLOCKQUOTE>
+This message returns the first element in the receiver for which <I>aBlock</I> evaluates to something that is non-nil .  For example, the following :<P>
+<BLOCKQUOTE><PRE>
+[ aCltn detect: { :each | [each isEqual:anObject] } ];
+</PRE></BLOCKQUOTE>
+Returns <B>nil</B> if there's no element for which <I>aBlock</I> evaluates to something that non-nil.<P>
+<H3><A NAME="47">detect:ifNone:</A></H3>
+<BLOCKQUOTE>-<B>detect</B>:<I>aBlock</I><B>ifNone</B>:<I>noneBlock</I></BLOCKQUOTE>
+This message returns the first element in the receiver for which <I>aBlock</I> evaluates to something that is non-nil.<P>
+Evaluates <I>noneBlock</I> if there's no element for which <I>aBlock</I> evaluates to something that is non-nil, and returns the return value of that block.  For example,<P>
+<BLOCKQUOTE><PRE>
+[ aCltn detect: { :e | [e isEqual:anObject]} ifNone: {anObject} ];
+</PRE></BLOCKQUOTE>
+<H3><A NAME="48">select:</A></H3>
+<BLOCKQUOTE>-<B>select</B>:<I>testBlock</I></BLOCKQUOTE>
+This message will return a subset of the receiver containing all elements for which <I>testBlock</I> evaluates to an Object that is non-nil.  For example,<P>
+<BLOCKQUOTE><PRE>
+[ aCltn select: { :each | [each isEqual:anObject] } ];
+</PRE></BLOCKQUOTE>
+Returns a new empty instance of the same class as the receiver, if there's no element for which <I>testBlock</I> evaluates to something that is non-nil. <P>
+<H3><A NAME="49">reject:</A></H3>
+<BLOCKQUOTE>-<B>reject</B>:<I>testBlock</I></BLOCKQUOTE>
+Complement of <B>select:</B><P>
+This message will return a subset of the receiver containing all elements for which <I>testBlock</I> evaluates to nil.  For example,<P>
+<BLOCKQUOTE><PRE>
+[ aCltn reject: { :each | [each isEqual:anObject] } ];
+</PRE></BLOCKQUOTE>
+Returns a new empty instance of the same class as the receiver, if there's no element for which <I>testBlock</I> evaluates to nil.<P>
+<H3><A NAME="50">collect:</A></H3>
+<BLOCKQUOTE>-<B>collect</B>:<I>transformBlock</I></BLOCKQUOTE>
+This message creates and returns a new collection of the same size and type as the receiver. The elements are the result of performing <I>transformBlock</I> on each element in the receiver (elements for which the Block would return <B>nil</B> are filtered out).<P>
+<H3><A NAME="51">count:</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>count</B>:<I>aBlock</I></BLOCKQUOTE>
+Evaluate <I>aBlock</I> with each of the receiver's elements as the argument.  Return the number that answered a non-<B>nil</B> value.<P>
+<H3><A NAME="52">elementsPerform:</A></H3>
+<BLOCKQUOTE>-<B>elementsPerform</B>:(SEL)<I>aSelector</I></BLOCKQUOTE>
+Send <I>aSelector</I> to all objects in the collection, starting from the object at offset <I>0</I>.  For Stepstone compatibility.  Producer uses this.<P>
+<H3><A NAME="53">elementsPerform:with:</A></H3>
+<BLOCKQUOTE>-<B>elementsPerform</B>:(SEL)<I>aSelector</I><B>with</B>:<I>anObject</I></BLOCKQUOTE>
+Send <I>aSelector</I> to all objects in the collection, starting from the object at offset <I>0</I>.  For Stepstone compatibility.  Producer uses this.<P>
+<H3><A NAME="54">elementsPerform:with:with:</A></H3>
+<BLOCKQUOTE>-<B>elementsPerform</B>:(SEL)<I>aSelector</I><B>with</B>:<I>anObject</I><B>with</B>:<I>otherObject</I></BLOCKQUOTE>
+Send <I>aSelector</I> to all objects in the collection, starting from the object at offset <I>0</I>.  For Stepstone compatibility.  Producer uses this.<P>
+<H3><A NAME="55">elementsPerform:with:with:with:</A></H3>
+<BLOCKQUOTE>-<B>elementsPerform</B>:(SEL)<I>aSelector</I><B>with</B>:<I>anObject</I><B>with</B>:<I>otherObject</I><B>with</B>:<I>thirdObj</I></BLOCKQUOTE>
+Send <I>aSelector</I> to all objects in the collection, starting from the object at offset <I>0</I>.  For Stepstone compatibility.  ICpak201 uses this.<P>
+<H3><A NAME="56">do:</A></H3>
+<BLOCKQUOTE>-<B>do</B>:<I>aBlock</I></BLOCKQUOTE>
+Evaluates <I>aBlock</I> for each element in the collection and returns <B>self</B>.  <I>aBlock</I> must be a block taking one object (element) as argument; the return value of the block is ignored by this method.<P>
+Often, the Block would, as a side-effect, modify a variable, as in:<P>
+<BLOCKQUOTE><PRE>
+int count = 0;
+[contents do: { :what | if (what == anObject) count++; }];
+</PRE></BLOCKQUOTE>
+<H3><A NAME="57">do:until:</A></H3>
+<BLOCKQUOTE>-<B>do</B>:<I>aBlock</I><B>until</B>:(BOOL*)<I>flag</I></BLOCKQUOTE>
+Evaluates <I>aBlock</I> for each element in the collection, or until the variable pointed to by <I>flag</I> becomes true, and returns <B>self</B>.  <I>aBlock</I> must be a block taking one object (element) as argument; the return value of the block is ignored by this method.<P>
+Typically the Block will modify the variable <I>flag</I> when some condition holds:<P>
+<BLOCKQUOTE><PRE>
+BOOL found = NO;
+[contents do:{ :what | if (what == findObject) found=YES;} until:&amp;found];
+if (found) { ... }
+</PRE></BLOCKQUOTE>
+<H3><A NAME="22">find:</A></H3>
+<BLOCKQUOTE>-<B>find</B>:<I>anObject</I></BLOCKQUOTE>
+Returns any element in the receiver which <B>isEqual:</B> to <I>anObject</I>.  Otherwise, returns <B>nil</B>.<P>
+<H3><A NAME="23">contains:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>contains</B>:<I>anObject</I></BLOCKQUOTE>
+Returns YES if the receiver contains <I>anObject</I>.  Otherwise, returns NO.  Implementation is in terms of the receiver's <B>find:</B> method (which uses <B>isEqual:</B> and <B>hash</B> to decide whether the object is contained in the Bag).<P>
+<H3><A NAME="24">includes:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>includes</B>:<I>anObject</I></BLOCKQUOTE>
+This method is equivalent to <B>contains:</B>.<P>
+<H3><A NAME="25">occurrencesOf:</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>occurrencesOf</B>:<I>anObject</I></BLOCKQUOTE>
+Returns the multiplicity of <I>anObject</I> in the receiver, i.e. the number of Objects that are equal (in the sense of <B>isEqual</B> to <I>anObject</I>), otherwise returns 0.<P>
+<H3><A NAME="26">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints a list of the objects in the Bag by sending each individual object a <B>printOn:</B> message.  Returns the receiver.<P>
+<H3><A NAME="27">fileOutOn:</A></H3>
+<BLOCKQUOTE>-<B>fileOutOn</B>:<I>aFiler</I></BLOCKQUOTE>
+Writes out non-nil objects in the Set on <I>aFiler</I>.  Returns the receiver.<P>
+<H3><A NAME="28">fileInFrom:</A></H3>
+<BLOCKQUOTE>-<B>fileInFrom</B>:<I>aFiler</I></BLOCKQUOTE>
+Reads in objects from <I>aFiler</I>.  Returns the receiver, which is a Bag that is not yet usable (until the Bag gets the <B>awakeFrom:</B> message).<P>
+<H3><A NAME="29">awakeFrom:</A></H3>
+<BLOCKQUOTE>-<B>awakeFrom</B>:<I>aFiler</I></BLOCKQUOTE>
+Rehashes the contents of the Bag, which was previously read from <I>aFiler</I> by the <I>fileInFrom:</I> method.  The hash-values of the objects are possibly process or architecture dependent, so they are not stored on the filer.  Rather, <B>awakeFrom:</B> recomputes the values.<P>

@@ -1,0 +1,90 @@
+<HTML>
+<TITLE>Exceptn Specification Sheet</TITLE>
+<H1>Exceptn Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 2003,2023.  All Rights Reserved.<P>
+<H1>Exception</H1>
+<B>Inherits from:</B> Object<P>
+<B>Maturity Index:</B> Experimental<P>
+<H2>Class Description</H2>
+Exception instances (or instances of a subclass of <B>Exception</B>) are used to signal exceptions.  This is an experimental class; Exception is not tested with the OTB (Object Tables) runtime and the class or exception API may change in future releases.<P>
+To raise an exception, use:<P>
+<BLOCKQUOTE><PRE>
+    [[Exception new] signal];
+
+</PRE></BLOCKQUOTE>
+To install a handler to catch an exception, use the Block message:<P>
+<BLOCKQUOTE><PRE>
+    [{ ... } on:Exception do: { :anException | ... }];
+
+</PRE></BLOCKQUOTE>
+The argument of the exception handler (the do: Block) is the instance of the Exception class that received the <B>signal</B> message.<P>
+<H2>Method types</H2>
+<H3><B>Default Action</B></H3>
+<UL>
+</UL>
+<H3><B>Creation </B></H3>
+<UL>
+<LI><A HREF="#2">signal</A></LI>
+<LI><A HREF="#3">signal:</A></LI>
+<LI><A HREF="#4">free</A></LI>
+</UL>
+<H3><B>Signalling </B></H3>
+<UL>
+<LI><A HREF="#5">signal</A></LI>
+<LI><A HREF="#6">signal:</A></LI>
+<LI><A HREF="#7">messageText</A></LI>
+<LI><A HREF="#8">str</A></LI>
+<LI><A HREF="#9">messageText:</A></LI>
+<LI><A HREF="#10">str:</A></LI>
+</UL>
+<H3><B>Re-Signalling </B></H3>
+<UL>
+<LI><A HREF="#11">resignalAs:</A></LI>
+<LI><A HREF="#12">resume</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="2">signal</A></H3>
+<BLOCKQUOTE>+<B>signal</B></BLOCKQUOTE>
+This is a shortcut for:<P>
+<BLOCKQUOTE><PRE>
+[[self new] signal]
+</PRE></BLOCKQUOTE>
+<H3><A NAME="3">signal:</A></H3>
+<BLOCKQUOTE>+<B>signal</B>:(STR)<I>message</I></BLOCKQUOTE>
+This is a shortcut for:<P>
+<BLOCKQUOTE><PRE>
+[[self new] signal:message]
+</PRE></BLOCKQUOTE>
+<H3><A NAME="4">free</A></H3>
+<BLOCKQUOTE>-<B>free</B></BLOCKQUOTE>
+Overridden to dispose attributes.<P>
+<H3><A NAME="5">signal</A></H3>
+<BLOCKQUOTE>-<B>signal</B></BLOCKQUOTE>
+The message evaluates the handler that is installed to deal with this class of exceptions.<P>
+<B>Note:</B> If no handler is set, this message currently sends a <B>halt:</B> message with the <I>messageText</I> as argument.<P>
+<H3><A NAME="6">signal:</A></H3>
+<BLOCKQUOTE>-<B>signal</B>:(STR)<I>message</I></BLOCKQUOTE>
+Like <B>signal</B>, but first sets the message text to <I>message</I>.<P>
+<H3><A NAME="7">messageText</A></H3>
+<BLOCKQUOTE>-<B>messageText</B></BLOCKQUOTE>
+This method returns the descriptive text that was associated to the exception instance.<P>
+<H3><A NAME="8">str</A></H3>
+<BLOCKQUOTE>- (STR)<B>str</B></BLOCKQUOTE>
+Equivalent to :<P>
+<BLOCKQUOTE><PRE>
+[messageText str]
+</PRE></BLOCKQUOTE>
+<H3><A NAME="9">messageText:</A></H3>
+<BLOCKQUOTE>-<B>messageText</B>:<I>message</I></BLOCKQUOTE>
+Associates a String attribute to the exception.<P>
+<H3><A NAME="10">str:</A></H3>
+<BLOCKQUOTE>-<B>str</B>:(STR)<I>message</I></BLOCKQUOTE>
+Equivalent to <B>messageText:</B>.<P>
+<H3><A NAME="11">resignalAs:</A></H3>
+<BLOCKQUOTE>-<B>resignalAs</B>:<I>replacementException</I></BLOCKQUOTE>
+Signal an alternative exception in place of the receiver.<P>
+<H3><A NAME="12">resume</A></H3>
+<BLOCKQUOTE>-<B>resume</B></BLOCKQUOTE>
+Reinstall the handler that was active at the time the exception was signalled.<P>

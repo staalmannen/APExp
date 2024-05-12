@@ -1,0 +1,10 @@
+name: objc
+origin: objc/objc
+version: 3.3.12
+arch: dragonfly:5.4:x86:64
+maintainer: stes@telenet.be
+prefix: /usr/local
+licenselogic: single
+flatsize: 3
+comment: Portable Object Compiler
+

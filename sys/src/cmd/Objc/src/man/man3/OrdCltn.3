@@ -1,0 +1,1827 @@
+.TH "ordcltn" 3 "Mar 12, 2023"
+.SH OrdCltn
+.PP
+.B
+Inherits from:
+
+Cltn
+.SH Class Description
+.PP
+.B
+OrdCltn
+(alias 
+.B
+OrderedCollection
+) instances are ordered collections of objects : you can access, add or remove elements at a specified offset in the array of elements\&.  
+.B
+OrdCltn
+takes care of the memory allocation issues to hold the objects\&.
+.PP
+There can be no 
+.B
+nil
+entries between the first (at offset 0) and last  elements (at 
+.B
+size
+minus one)\&.  For this reason, all methods that add objects refuse to add 
+.B
+nil
+\&'s\&.  When entries are added or removed, the offsets of the remaining entries change\&.
+.PP
+Offsets into collections are traditionally unsigned integers\&.  Methods that return an offset, e\&.g\&., 
+.B
+offsetOf:
+and 
+.B
+lastOffset
+return a value of (unsigned)-1 to indicate that an object has not been found\&.
+.PP
+There are many methods for adding or inserting members into a collection\&.  Although members may be added at any point in the collection, they are generally added at the end using 
+.B
+add:
+\&.
+.PP
+A member may be searched for using either the 
+.B
+find:
+or 
+.B
+findMatching:
+method\&.  In the first case, the member in the collection must be an exact match\&.  In the second case, the member must match in the sense of the 
+.B
+isEqual:
+method\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* new
+.br
+* new:
+.br
+* with:
+.br
+* with:with:
+.br
+* add:
+.br
+* copy
+.br
+* deepCopy
+.br
+* emptyYourself
+.br
+* freeContents
+.br
+* free
+.RE
+.PP 
+.B
+Interrogation
+.RS 3
+.br
+* size
+.br
+* isEmpty
+.br
+* lastOffset
+.br
+* eachElement
+.br
+* firstElement
+.br
+* lastElement
+.RE
+.PP 
+.B
+Comparing
+.RS 3
+.br
+* isEqual:
+.RE
+.PP 
+.B
+Adding
+.RS 3
+.br
+* add:
+.br
+* addFirst:
+.br
+* addLast:
+.br
+* addIfAbsent:
+.br
+* addIfAbsentMatching:
+.RE
+.PP 
+.B
+Insertion
+.RS 3
+.br
+* at:insert:
+.br
+* insert:after:
+.br
+* insert:before:
+.RE
+.PP 
+.B
+Relative Accessing
+.RS 3
+.br
+* after:
+.br
+* before:
+.br
+* at:
+.br
+* at:put:
+.RE
+.PP 
+.B
+Removing
+.RS 3
+.br
+* removeFirst
+.br
+* removeLast
+.br
+* removeAt:
+.br
+* removeAtIndex:
+.br
+* remove:
+.br
+* remove:ifAbsent:
+.RE
+.PP 
+.B
+Testing Contents
+.RS 3
+.br
+* includesAllOf:
+.br
+* includesAnyOf:
+.RE
+.PP 
+.B
+Adding and Removing Contents
+.RS 3
+.br
+* addAll:
+.br
+* addContentsOf:
+.br
+* addContentsTo:
+.br
+* removeAll:
+.br
+* removeContentsFrom:
+.br
+* removeContentsOf:
+.RE
+.PP 
+.B
+Combining
+.RS 3
+.br
+* intersection:
+.br
+* union:
+.br
+* difference:
+.RE
+.PP 
+.B
+Converting
+.RS 3
+.br
+* asSet
+.br
+* asOrdCltn
+.RE
+.PP 
+.B
+Using Blocks
+.RS 3
+.br
+* detect:
+.br
+* detect:ifNone:
+.br
+* select:
+.br
+* reject:
+.br
+* collect:
+.br
+* count:
+.RE
+.PP 
+.B
+Making elements perform
+.RS 3
+.br
+* elementsPerform:
+.br
+* elementsPerform:with:
+.br
+* elementsPerform:with:with:
+.br
+* elementsPerform:with:with:with:
+.RE
+.PP 
+.B
+Do Blocks
+.RS 3
+.br
+* do:
+.br
+* do:until:
+.br
+* reverseDo:
+.RE
+.PP 
+.B
+Locating
+.RS 3
+.br
+* find:
+.br
+* findMatching:
+.br
+* includes:
+.br
+* findSTR:
+.br
+* contains:
+.br
+* offsetOf:
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.PP 
+.B
+Archiving
+.RS 3
+.br
+* fileOutOn:
+.br
+* fileInFrom:
+.RE
+.SH Methods
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+Returns a new empty collection\&.
+.PP 
+new:
+.RS 1
++
+.B
+new
+:(unsigned)
+.I
+n
+.RE
+.PP
+Returns a new empty collection, which can hold at least 
+.I
+n
+elements without having to expand\&.
+.PP 
+with:
+.RS 1
++
+.B
+with
+:(int)
+.I
+nArgs,\&.\&.\&.
+.RE
+.PP
+Returns a new object with 
+.I
+nArgs
+elements\&.  For example,
+.RS 3
+
+id aCltn = [OrdCltn with:2,anObject,otherObject];
+.br
+
+.RE
+.PP
+creates a collection and adds 
+.I
+anObject
+and 
+.I
+otherObject
+to it\&.  In a similar way, 
+.B
+Set
+or 
+.B
+SortCltn
+instances can be created like this\&.
+.PP 
+with:with:
+.RS 1
++
+.B
+with
+:
+.I
+firstObject
+.B
+with
+:
+.I
+nextObject
+.RE
+.PP
+This method is equivalent to 
+.B
+with:
+2,
+.I
+firstObject
+,
+.I
+nextObject
+\&. 
+.PP 
+add:
+.RS 1
++
+.B
+add
+:
+.I
+firstObject
+.RE
+.PP
+This method is equivalent to 
+.B
+with:
+1,
+.I
+firstObject
+\&. 
+.PP
+This (factory) method has the same name as the instance method 
+.B
+add:
+and can be used as follows, in circumstances when the user does not want to allocate a collection unless it is actually used :
+.RS 3
+
+aCltn = [ (aCltn)?aCltn:OrdCltn add:myObject ];
+.br
+
+.RE
+.PP
+This shows that creation of the collection is delayed until it is actually needed\&.  If the collection already exists, objects are simply added, using the instance method 
+.B
+add:
+\&.
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Returns a new copy of the collection\&.
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+Returns a new copy of the collection\&.  The members in the new collection are deep copies of the members in the original collection\&.
+.PP 
+emptyYourself
+.RS 1
+-
+.B
+emptyYourself
+.RE
+.PP
+Removes all the members of the collection (without freeing them)\&.  Returns the receiver\&.
+.PP 
+freeContents
+.RS 1
+-
+.B
+freeContents
+.RE
+.PP
+Removes and frees all the members of the receiver, but doesn\&'t free the receiver itself\&.  Returns the receiver\&.
+.PP 
+free
+.RS 1
+-
+.B
+free
+.RE
+.PP
+Frees the collection, but not its contents\&.  Returns 
+.B
+nil
+\&.  Do :
+.RS 3
+
+aCltn = [[aCltn freeContents] free];
+.br
+
+.RE
+.PP
+if you want to free the collection and its contents\&.
+.PP 
+size
+.RS 1
+- (
+unsigned
+)
+.B
+size
+.RE
+.PP
+Returns the number of objects in the collection\&.
+.PP 
+isEmpty
+.RS 1
+- (
+BOOL
+)
+.B
+isEmpty
+.RE
+.PP
+Whether the number of objects in the collection is equal to zero\&.
+.PP 
+lastOffset
+.RS 1
+- (
+unsigned
+)
+.B
+lastOffset
+.RE
+.PP
+Returns the offset of the last element\&.  If there are no elements it returns (unsigned)-1\&.
+.PP 
+eachElement
+.RS 1
+-
+.B
+eachElement
+.RE
+.PP
+Returns a sequence of the elements in the collection\&.
+.RS 3
+
+aSeq = [aCltn eachElement];
+.br
+while ((anElement = [aSeq next])) {
+.br
+/* do something */
+.br
+}
+.br
+aSeq = [aSeq free];
+.br
+
+.RE
+.PP 
+firstElement
+.RS 1
+-
+.B
+firstElement
+.RE
+.PP
+Returns the first element in the collection\&.  If there are no elements, returns 
+.B
+nil
+\&.
+.PP 
+lastElement
+.RS 1
+-
+.B
+lastElement
+.RE
+.PP
+Returns the last element in the collection\&.  If there are no elements, returns 
+.B
+nil
+\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+aCltn
+.RE
+.PP
+Returns YES if 
+.I
+aCltn
+is a collection, and if each member of its contents responds affirmatively to the message 
+.B
+isEqual:
+when compared to the corresponding member of the receiver\&'s contents\&.
+.PP 
+add:
+.RS 1
+-
+.B
+add
+:
+.I
+anObject
+.RE
+.PP
+Adds 
+.I
+anObject
+to the collection as the last element and returns the receiver\&.
+.PP 
+addFirst:
+.RS 1
+-
+.B
+addFirst
+:
+.I
+newObject
+.RE
+.PP
+Adds 
+.I
+newObject
+as the first (zero-th) element of the collection\&.  Returns the receiver\&.  Any elements at this offset or higher are relocated to the next higher offset to make room\&.
+.PP 
+addLast:
+.RS 1
+-
+.B
+addLast
+:
+.I
+newObject
+.RE
+.PP
+Identical to the 
+.B
+add:
+method\&.
+.PP 
+addIfAbsent:
+.RS 1
+-
+.B
+addIfAbsent
+:
+.I
+anObject
+.RE
+.PP
+Adds 
+.I
+anObject
+to the collection only if the collection does not have that same object, i\&.e\&., one that is pointer equal\&.  Returns the receiver\&.
+.PP 
+addIfAbsentMatching:
+.RS 1
+-
+.B
+addIfAbsentMatching
+:
+.I
+anObject
+.RE
+.PP
+Adds 
+.I
+anObject
+to the collection only if the collection does not have a matching object, i\&.e\&., one that is 
+.B
+isEqual:
+\&.  Returns the receiver\&.
+.PP 
+at:insert:
+.RS 1
+-
+.B
+at
+:(unsigned )
+.I
+anOffset
+.B
+insert
+:
+.I
+anObject
+.RE
+.PP
+Inserts 
+.I
+anObject
+at offset 
+.I
+anOffset
+and returns the receiver\&.  Any elements at this offset or higher are relocated to the next higher offet to make room\&.
+.PP
+If 
+.I
+anOffset
+is greater than the size of the collection, an 
+.B
+OutOfBounds
+exception is signalled\&.  The default handler aborts the process\&.
+.PP 
+insert:after:
+.RS 1
+-
+.B
+insert
+:
+.I
+newObject
+.B
+after
+:
+.I
+oldObject
+.RE
+.PP
+Searches for 
+.I
+oldObject
+in the collection, and inserts 
+.I
+newObject
+after 
+.I
+oldObject
+, moving later elements if necessary to make room\&.  Returns the receiver\&.
+.PP
+If 
+.I
+oldObject
+is not in the collection, a 
+.I
+Could not find object\&.
+exception is raised\&.  The default handler aborts the process\&.
+.PP 
+insert:before:
+.RS 1
+-
+.B
+insert
+:
+.I
+newObject
+.B
+before
+:
+.I
+oldObject
+.RE
+.PP
+First searches for 
+.I
+oldObject
+in the collection, and inserts the 
+.I
+newObject
+before 
+.I
+oldObject
+\&.  Returns the receiver\&.
+.PP
+If 
+.I
+oldObject
+is not in the collection, a 
+.I
+Could not find object
+exception is raised\&.  The default handler aborts the process\&.
+.PP 
+after:
+.RS 1
+-
+.B
+after
+:
+.I
+anObject
+.RE
+.PP
+Searches for 
+.I
+anObject
+in the collection and, if found, returns the next object\&.  If 
+.I
+anObject
+is the last element in the array, returns 
+.B
+nil
+\&. 
+.PP
+If 
+.I
+anObject
+is not in the collection, a 
+.I
+Could not find object
+exception is raised\&.  The default handler aborts the process\&.
+.PP 
+before:
+.RS 1
+-
+.B
+before
+:
+.I
+anObject
+.RE
+.PP
+Searches for 
+.I
+anObject
+in the collection and, if found, returns the object before it\&.  If 
+.I
+anObject
+is the first element in the array, returns 
+.B
+nil
+\&.
+.PP
+If 
+.I
+anObject
+is not in the collection, a 
+.I
+Could not find object
+exception is raised\&.  The default handler aborts the process\&.
+.PP 
+at:
+.RS 1
+-
+.B
+at
+:(unsigned )
+.I
+anOffset
+.RE
+.PP
+Returns the object at 
+.I
+anOffset
+\&.  The first object is at offset 0 and the last object is at 
+.B
+size
+minus one\&.
+.PP
+If 
+.I
+offset
+is greater than the last offset in the collection, an 
+.B
+OutOfBounds
+exception is signalled\&.  The default handler aborts the process\&.
+.PP 
+at:put:
+.RS 1
+-
+.B
+at
+:(unsigned )
+.I
+anOffset
+.B
+put
+:
+.I
+anObject
+.RE
+.PP
+Replaces the object at 
+.I
+anOffset
+with 
+.I
+anObject
+and returns the old member at 
+.I
+anOffset
+\&.  Signals an 
+.B
+OutOfBounds
+exception if 
+.I
+anOffset
+is greater than the size of the collection\&.  Returns 
+.B
+nil
+if 
+.I
+anObject
+is 
+.B
+nil
+\&.
+.PP 
+removeFirst
+.RS 1
+-
+.B
+removeFirst
+.RE
+.PP
+Removes the first element\&.  Returns that element or 
+.B
+nil
+if there are no elements\&.
+.PP 
+removeLast
+.RS 1
+-
+.B
+removeLast
+.RE
+.PP
+Removes the last element\&.  Returns that element or 
+.B
+nil
+if there are no elements\&.
+.PP 
+removeAt:
+.RS 1
+-
+.B
+removeAt
+:(unsigned )
+.I
+anOffset
+.RE
+.PP
+Removes the object at 
+.I
+anOffset
+\&.  When an object is removed, the remaining elements are adjusted so that there are no 
+.B
+nil
+entries between the first and last element\&.  This adjustment shrinks the collection and changes the offset of the entries\&.  Returns the object removed\&.
+.PP
+.B
+Note:
+
+Method name for ICpak101 compatibility\&.
+.PP 
+removeAtIndex:
+.RS 1
+-
+.B
+removeAtIndex
+:(unsigned )
+.I
+anOffset
+.RE
+.PP
+Same as 
+.B
+removeAt:
+\&.  Method name for Smalltalk compatibility\&.
+.PP 
+remove:
+.RS 1
+-
+.B
+remove
+:
+.I
+oldObject
+.RE
+.PP
+Removes 
+.I
+oldObject
+from the collection if 
+.I
+oldObject
+is found, and returns 
+.I
+oldObject
+\&.  Otherwise returns 
+.B
+nil
+\&.
+.PP
+.B
+Note:
+
+The 
+.B
+remove:
+method of the OrdCltn class is implemented to remove an exact match\&.  The Set class uses a match in the sense of 
+.B
+isEqual:
+instead\&. 
+.PP 
+remove:ifAbsent:
+.RS 1
+-
+.B
+remove
+:
+.I
+oldObject
+.B
+ifAbsent
+:
+.I
+exceptionBlock
+.RE
+.PP
+Removes 
+.I
+oldObject
+from the collection if 
+.I
+oldObject
+is found, and returns 
+.I
+oldObject
+\&.  Otherwise evaluates 
+.I
+exceptionBlock
+and returns its return value\&.  For example, the method 
+.B
+remove:
+is equivalent to the following :
+.RS 3
+
+[ aCltn remove: oldObject ifAbsent: { nil } ];
+.br
+
+.RE
+.PP
+.B
+Note:
+
+The 
+.B
+remove:
+method of the OrdCltn class is implemented to remove an exact match\&.  The Set class uses a match in the sense of 
+.B
+isEqual:
+instead\&. 
+.PP 
+includesAllOf:
+.RS 1
+- (
+BOOL
+)
+.B
+includesAllOf
+:
+.I
+aCltn
+.RE
+.PP
+Answer whether all the elements of 
+.I
+aCltn
+are in the receiver, by sending 
+.B
+includes:
+for each individual element\&.
+.PP 
+includesAnyOf:
+.RS 1
+- (
+BOOL
+)
+.B
+includesAnyOf
+:
+.I
+aCltn
+.RE
+.PP
+Answer whether any element of 
+.I
+aCltn
+is in the receiver, by sending 
+.B
+includes:
+for each individual element\&.
+.PP 
+addAll:
+.RS 1
+-
+.B
+addAll
+:
+.I
+aCltn
+.RE
+.PP
+Adds each member of 
+.I
+aCltn
+to the receiver\&.  If 
+.I
+aCltn
+is 
+.B
+nil
+, no action is taken\&.  The argument 
+.I
+aCltn
+need not be a collection, so long as it responds to 
+.B
+eachElement
+in the same way as collections do\&.  Returns the receiver\&.
+.PP
+.B
+Note:
+
+If 
+.I
+aCltn
+is the same object as the receiver, a 
+.B
+addYourself
+message is sent to the object\&.
+.PP 
+addContentsOf:
+.RS 1
+-
+.B
+addContentsOf
+:
+.I
+aCltn
+.RE
+.PP
+This method is equivalent to 
+.B
+addAll:
+and is provided for Stepstone ICpak101 compatibility\&.
+.PP 
+addContentsTo:
+.RS 1
+-
+.B
+addContentsTo
+:
+.I
+aCltn
+.RE
+.PP
+This method is equivalent to 
+.B
+addAll:
+, but with argument and receiver interchanged, and is provided for Stepstone ICpak101 compatibility\&.
+.PP 
+removeAll:
+.RS 1
+-
+.B
+removeAll
+:
+.I
+aCltn
+.RE
+.PP
+Removes all of the members of 
+.I
+aCltn
+from the receiver\&. The argument 
+.I
+aCltn
+need not be a collection, as long as it responds to 
+.B
+eachElement
+as collections do\&.  Returns the receiver\&. 
+.PP
+.B
+Note:
+
+If 
+.I
+aCltn
+is the same object as the receiver, it empties itself using 
+.B
+emptyYourself
+and returns the receiver\&.
+.PP 
+removeContentsFrom:
+.RS 1
+-
+.B
+removeContentsFrom
+:
+.I
+aCltn
+.RE
+.PP
+This method is equivalent to 
+.B
+removeAll:
+, and is provided for compatibility with Stepstone ICpak101\&.
+.PP 
+removeContentsOf:
+.RS 1
+-
+.B
+removeContentsOf
+:
+.I
+aCltn
+.RE
+.PP
+This method is equivalent to 
+.B
+removeAll:
+, and is provided for compatibility with Stepstone ICpak101\&.
+.PP 
+intersection:
+.RS 1
+-
+.B
+intersection
+:
+.I
+bag
+.RE
+.PP
+Returns a new Collection which is the intersection of the receiver and 
+.I
+bag
+\&.  The new Collection contains only those elements that were in both the receiver and 
+.I
+bag
+\&.  The argument 
+.I
+bag
+need not be an actual 
+.B
+Set
+or 
+.B
+Bag
+instance, as long as it implements 
+.B
+find:
+as Sets do\&.
+.PP 
+union:
+.RS 1
+-
+.B
+union
+:
+.I
+bag
+.RE
+.PP
+Returns a new Collection which is the union of the receiver and 
+.I
+bag
+\&.  The new Collection returned has all the elements from both the receiver and 
+.I
+bag
+\&.  The argument 
+.I
+bag
+need not be an actual 
+.B
+Set
+or 
+.B
+Bag
+instance, as long as it implements 
+.B
+eachElement:
+as Sets and Bags do\&.
+.PP 
+difference:
+.RS 1
+-
+.B
+difference
+:
+.I
+bag
+.RE
+.PP
+Returns a new Collection which is the difference of the receiver and 
+.I
+bag
+\&.  The new Collection returned has only those elements in the receiver that are not in 
+.I
+bag
+\&.
+.PP 
+asSet
+.RS 1
+-
+.B
+asSet
+.RE
+.PP
+Creates a 
+.B
+Set
+instance and adds the contents of the object to the set\&.
+.PP 
+asOrdCltn
+.RS 1
+-
+.B
+asOrdCltn
+.RE
+.PP
+Creates a 
+.B
+OrdCltn
+instance and adds the contents of the object to the set\&.
+.PP 
+detect:
+.RS 1
+-
+.B
+detect
+:
+.I
+aBlock
+.RE
+.PP
+This message returns the first element in the receiver for which 
+.I
+aBlock
+evaluates to something that is non-nil \&.  For example, the following :
+.RS 3
+
+[ aCltn detect: { :each | [each isEqual:anObject] } ];
+.br
+
+.RE
+.PP
+Returns 
+.B
+nil
+if there\&'s no element for which 
+.I
+aBlock
+evaluates to something that non-nil\&.
+.PP 
+detect:ifNone:
+.RS 1
+-
+.B
+detect
+:
+.I
+aBlock
+.B
+ifNone
+:
+.I
+noneBlock
+.RE
+.PP
+This message returns the first element in the receiver for which 
+.I
+aBlock
+evaluates to something that is non-nil\&.
+.PP
+Evaluates 
+.I
+noneBlock
+if there\&'s no element for which 
+.I
+aBlock
+evaluates to something that is non-nil, and returns the return value of that block\&.  For example,
+.RS 3
+
+[ aCltn detect: { :e | [e isEqual:anObject]} ifNone: {anObject} ];
+.br
+
+.RE
+.PP 
+select:
+.RS 1
+-
+.B
+select
+:
+.I
+testBlock
+.RE
+.PP
+This message will return a subset of the receiver containing all elements for which 
+.I
+testBlock
+evaluates to an Object that is non-nil\&.  For example,
+.RS 3
+
+[ aCltn select: { :each | [each isEqual:anObject] } ];
+.br
+
+.RE
+.PP
+Returns a new empty instance of the same class as the receiver, if there\&'s no element for which 
+.I
+testBlock
+evaluates to something that is non-nil\&. 
+.PP 
+reject:
+.RS 1
+-
+.B
+reject
+:
+.I
+testBlock
+.RE
+.PP
+Complement of 
+.B
+select:
+.PP
+This message will return a subset of the receiver containing all elements for which 
+.I
+testBlock
+evaluates to nil\&.  For example,
+.RS 3
+
+[ aCltn reject: { :each | [each isEqual:anObject] } ];
+.br
+
+.RE
+.PP
+Returns a new empty instance of the same class as the receiver, if there\&'s no element for which 
+.I
+testBlock
+evaluates to nil\&.
+.PP 
+collect:
+.RS 1
+-
+.B
+collect
+:
+.I
+transformBlock
+.RE
+.PP
+This message creates and returns a new collection of the same size and type as the receiver\&. The elements are the result of performing 
+.I
+transformBlock
+on each element in the receiver (elements for which the Block would return 
+.B
+nil
+are filtered out)\&.
+.PP 
+count:
+.RS 1
+- (
+unsigned
+)
+.B
+count
+:
+.I
+aBlock
+.RE
+.PP
+Evaluate 
+.I
+aBlock
+with each of the receiver\&'s elements as the argument\&.  Return the number that answered a non-
+.B
+nil
+value\&.
+.PP 
+elementsPerform:
+.RS 1
+-
+.B
+elementsPerform
+:(SEL)
+.I
+aSelector
+.RE
+.PP
+Send 
+.I
+aSelector
+to all objects in the collection, starting from the object at offset 
+.I
+0
+\&.  For Stepstone compatibility\&.  Producer uses this\&.
+.PP 
+elementsPerform:with:
+.RS 1
+-
+.B
+elementsPerform
+:(SEL)
+.I
+aSelector
+.B
+with
+:
+.I
+anObject
+.RE
+.PP
+Send 
+.I
+aSelector
+to all objects in the collection, starting from the object at offset 
+.I
+0
+\&.  For Stepstone compatibility\&.  Producer uses this\&.
+.PP 
+elementsPerform:with:with:
+.RS 1
+-
+.B
+elementsPerform
+:(SEL)
+.I
+aSelector
+.B
+with
+:
+.I
+anObject
+.B
+with
+:
+.I
+otherObject
+.RE
+.PP
+Send 
+.I
+aSelector
+to all objects in the collection, starting from the object at offset 
+.I
+0
+\&.  For Stepstone compatibility\&.  Producer uses this\&.
+.PP 
+elementsPerform:with:with:with:
+.RS 1
+-
+.B
+elementsPerform
+:(SEL)
+.I
+aSelector
+.B
+with
+:
+.I
+anObject
+.B
+with
+:
+.I
+otherObject
+.B
+with
+:
+.I
+thirdObj
+.RE
+.PP
+Send 
+.I
+aSelector
+to all objects in the collection, starting from the object at offset 
+.I
+0
+\&.  For Stepstone compatibility\&.  ICpak201 uses this\&.
+.PP 
+do:
+.RS 1
+-
+.B
+do
+:
+.I
+aBlock
+.RE
+.PP
+Evaluates 
+.I
+aBlock
+for each element in the collection and returns 
+.B
+self
+\&.  
+.I
+aBlock
+must be a block taking one object (element) as argument; the return value of the block is ignored by this method\&.
+.PP
+Often, the Block would, as a side-effect, modify a variable, as in:
+.RS 3
+
+int count = 0;
+.br
+[contents do: { :what | if (what == anObject) count++; }];
+.br
+
+.RE
+.PP 
+do:until:
+.RS 1
+-
+.B
+do
+:
+.I
+aBlock
+.B
+until
+:(BOOL*)
+.I
+flag
+.RE
+.PP
+Evaluates 
+.I
+aBlock
+for each element in the collection, or until the variable pointed to by 
+.I
+flag
+becomes true, and returns 
+.B
+self
+\&.  
+.I
+aBlock
+must be a block taking one object (element) as argument; the return value of the block is ignored by this method\&.
+.PP
+Typically the Block will modify the variable 
+.I
+flag
+when some condition holds:
+.RS 3
+
+BOOL found = NO;
+.br
+[contents do:{ :what | if (what == findObject) found=YES;} until:&found];
+.br
+if (found) { \&.\&.\&. }
+.br
+
+.RE
+.PP 
+reverseDo:
+.RS 1
+-
+.B
+reverseDo
+:
+.I
+aBlock
+.RE
+.PP
+Like 
+.B
+do:
+but specific to 
+.B
+OrdCltn
+: works from the element at the last offset towards the element at offset 0\&.
+.PP 
+find:
+.RS 1
+-
+.B
+find
+:
+.I
+anObject
+.RE
+.PP
+Returns the first member which is the same as 
+.I
+anObject
+, i\&.e\&., which is pointer equal\&.  If none is found, returns 
+.B
+nil
+\&.
+.PP 
+findMatching:
+.RS 1
+-
+.B
+findMatching
+:
+.I
+anObject
+.RE
+.PP
+Returns the first member which matches 
+.I
+anObject
+, i\&.e\&., using 
+.B
+isEqual:
+for comparison\&.  If none is found, returns 
+.B
+nil
+\&.
+.PP 
+includes:
+.RS 1
+- (
+BOOL
+)
+.B
+includes
+:
+.I
+anObject
+.RE
+.PP
+This method returns YES if 
+.I
+anObject
+is in the collection (in the sense of 
+.B
+isEqual:
+)\&.  It has therefore the same semantics as 
+.B
+includes:
+of the 
+.B
+Set
+class\&.
+.PP 
+findSTR:
+.RS 1
+-
+.B
+findSTR
+:(STR )
+.I
+aString
+.RE
+.PP
+Returns the first member whose string contents matches 
+.I
+aString
+, using the 
+.B
+isEqualSTR:
+method for comparison\&.  If none is found, returns 
+.B
+nil
+\&.
+.PP 
+contains:
+.RS 1
+- (
+BOOL
+)
+.B
+contains
+:
+.I
+anObject
+.RE
+.PP
+Returns YES if the receiver contains 
+.I
+anObject
+\&.  Otherwise, returns NO\&.  Implementation is in terms of the receiver\&'s 
+.B
+find:
+method (which uses 
+.B
+isSame
+, not 
+.B
+isEqual:
+)\&.
+.PP
+.B
+Note:
+
+To get the behavior of the method 
+.B
+contains:
+of the Set class (which uses 
+.B
+isEqual:
+), use 
+.B
+findMatching:
+or 
+.B
+includes:
+\&.
+.PP 
+offsetOf:
+.RS 1
+- (
+unsigned
+)
+.B
+offsetOf
+:
+.I
+anObject
+.RE
+.PP
+Searches for 
+.I
+anObject
+in the contents and returns the offset of the 
+.B
+first
+pointer equal object it finds\&.  Otherwise, returns (unsigned)-1\&.  If 
+.I
+anObject
+is 
+.B
+nil
+, also returns (unsigned)-1\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints a list of the objects in the objects by sending each individual object a 
+.B
+printOn:
+message\&.  Returns the receiver\&.
+.PP 
+fileOutOn:
+.RS 1
+-
+.B
+fileOutOn
+:
+.I
+aFiler
+.RE
+.PP
+Writes the collection on 
+.I
+aFiler
+\&.  Returns the receiver\&.
+.PP 
+fileInFrom:
+.RS 1
+-
+.B
+fileInFrom
+:
+.I
+aFiler
+.RE
+.PP
+Reads a string object from 
+.I
+aFiler
+\&.  Returns the receiver\&.

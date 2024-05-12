@@ -1,0 +1,602 @@
+.TH "ccomplex" 3 "Mar 12, 2023"
+.SH Complex
+.PP
+.B
+Inherits from:
+
+CAObject
+.PP
+.B
+Maturity Index:
+
+Relatively immature
+.SH Class Description
+.PP
+A complex object consists of two real objects, a 
+.I
+real
+and 
+.I
+imaginary
+part\&.  Real objects could be arbitrary Computer Algebra Kit objects, but the class has been used so far only for the 
+.I
+Gaussian integers
+i\&.e\&., complex numbers over the integers\&.  The imaginary unit is represented by the symbol 
+.I
+I
+\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* real:
+.br
+* real:imaginary:
+.br
+* copy
+.br
+* deepCopy
+.RE
+.PP 
+.B
+Identity
+.RS 3
+.br
+* real
+.br
+* imaginary
+.br
+* isReal
+.br
+* notReal
+.br
+* hash
+.br
+* isEqual:
+.RE
+.PP 
+.B
+Conjugation
+.RS 3
+.br
+* conjugate
+.br
+* norm
+.br
+* asReal
+.RE
+.PP 
+.B
+Addition
+.RS 3
+.br
+* zero
+.br
+* isZero
+.br
+* isOpposite:
+.br
+* negate
+.br
+* double
+.br
+* add:
+.br
+* subtract:
+.RE
+.PP 
+.B
+Multiplication
+.RS 3
+.br
+* I
+.br
+* one
+.br
+* isOne
+.br
+* isMinusOne
+.br
+* isUnit
+.br
+* square
+.br
+* multiply:
+.br
+* power:
+.RE
+.PP 
+.B
+Complex Division
+.RS 3
+.br
+* divide:
+.br
+* inverse
+.br
+* quotient:
+.br
+* remainder:quotient:
+.RE
+.PP 
+.B
+Greatest Common Divisor
+.RS 3
+.br
+* gcd:
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+real:
+.RS 1
++
+.B
+real
+:
+.I
+aReal
+.RE
+.PP
+Returns a new complex object with real part set to 
+.I
+aReal
+and the imaginary part set to the real zero\&. 
+.PP 
+real:imaginary:
+.RS 1
++
+.B
+real
+:
+.I
+aReal
+.B
+imaginary
+:
+.I
+anotherReal
+.RE
+.PP
+Returns a new complex object with real part set to 
+.I
+aReal
+and the imaginary part set to 
+.I
+anotherReal
+\&. 
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Returns a new copy of the complex object\&.
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+Returns a new copy of the complex object; sends 
+.B
+deepCopy
+messages to real and imaginary part\&.
+.PP 
+real
+.RS 1
+-
+.B
+real
+.RE
+.PP
+Returns the real part of a complex number\&. 
+.PP 
+imaginary
+.RS 1
+-
+.B
+imaginary
+.RE
+.PP
+Returns the imaginary part of a complex number\&. 
+.PP 
+isReal
+.RS 1
+- (
+BOOL
+)
+.B
+isReal
+.RE
+.PP
+Whether the imaginary part is equal to zero\&.
+.PP 
+notReal
+.RS 1
+- (
+BOOL
+)
+.B
+notReal
+.RE
+.PP
+Whether the 
+.B
+isReal
+returns NO\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a small integer that is the same for objects that are equal in the sense of 
+.B
+isEqual:
+\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+b
+.RE
+.PP
+Whether real and imaginary parts are equal to each other\&.
+.PP 
+conjugate
+.RS 1
+-
+.B
+conjugate
+.RE
+.PP
+Returns a new reference to the object if it is real\&.  Otherwise, returns a new object that is equal to the complex conjugate of the object\&.  The conjugate of 
+.I
+a
++ I 
+.I
+b
+is 
+.I
+a
+- I 
+.I
+b
+\&.
+.PP 
+norm
+.RS 1
+-
+.B
+norm
+.RE
+.PP
+Returns a new 
+.I
+real
+object, the norm of the complex object i\&.e\&., the object multiplied by its conjugate\&.
+.PP 
+asReal
+.RS 1
+-
+.B
+asReal
+.RE
+.PP
+If the imaginary part of the object is zero, this method returns a new reference to the real part of the object\&.
+.PP 
+zero
+.RS 1
+-
+.B
+zero
+.RE
+.PP
+Returns a new complex object with real and imaginary part equal to zero\&.
+.PP 
+isZero
+.RS 1
+- (
+BOOL
+)
+.B
+isZero
+.RE
+.PP
+Whether real and imaginary part are equal to zero\&.
+.PP 
+isOpposite:
+.RS 1
+- (
+BOOL
+)
+.B
+isOpposite
+:
+.I
+b
+.RE
+.PP
+Whether real and imaginary parts are opposite to each other\&.
+.PP 
+negate
+.RS 1
+-
+.B
+negate
+.RE
+.PP
+Returns a new complex number, by negating real and imaginary parts\&.
+.PP 
+double
+.RS 1
+-
+.B
+double
+.RE
+.PP
+Returns a new complex number, by doubling real and imaginary parts\&.
+.PP 
+add:
+.RS 1
+-
+.B
+add
+:
+.I
+b
+.RE
+.PP
+Returns the sum of the complex numbers; adds real and imaginary parts together\&.
+.PP 
+subtract:
+.RS 1
+-
+.B
+subtract
+:
+.I
+b
+.RE
+.PP
+Returns the difference of the complex numbers; subtracts real and imaginary parts from each other\&.
+.PP 
+I
+.RS 1
+-
+.B
+I
+.RE
+.PP
+Returns a new reference to the imaginary unit\&.  
+.PP 
+one
+.RS 1
+-
+.B
+one
+.RE
+.PP
+Returns a new object with real part equal to one and imaginary part equal to zero\&.
+.PP 
+isOne
+.RS 1
+- (
+BOOL
+)
+.B
+isOne
+.RE
+.PP
+Whether the complex object is a multiplicative unit\&.  The complex units consist of the real units and the real units multiplied by the imaginary unit 
+.I
+i
+\&.  
+.PP 
+isMinusOne
+.RS 1
+- (
+BOOL
+)
+.B
+isMinusOne
+.RE
+.PP
+Whether the complex object is a multiplicative unit\&.  The complex units consist of the real units and the real units multiplied by the imaginary unit 
+.I
+i
+\&.  
+.PP 
+isUnit
+.RS 1
+- (
+BOOL
+)
+.B
+isUnit
+.RE
+.PP
+Whether the complex object is a multiplicative unit\&.  The complex units consist of the real units and the real units multiplied by the imaginary unit 
+.I
+i
+\&.  
+.PP 
+square
+.RS 1
+-
+.B
+square
+.RE
+.PP
+Returns the complex number multiplied by itself, computed by the rule :
+.RS 3
+
+(a+I b)^2 == (a^2 - b^2) + I (2 a b)
+.br
+
+.RE
+.PP 
+multiply:
+.RS 1
+-
+.B
+multiply
+:
+.I
+b
+.RE
+.PP
+Returns the product of the two complex numbers, computed by the rule :
+.RS 3
+
+(a+I b)(c+I d) == (ac-bd) + I (ad+bc)
+.br
+
+.RE
+.PP 
+power:
+.RS 1
+-
+.B
+power
+:(int)
+.I
+n
+.RE
+.PP
+Returns the complex number raised to the 
+.I
+n
+-th power\&.  If the object is real, simply computes the 
+.I
+n
+-th power as a real\&.  Otherwise, computes the power by the binary exponentation algorithm\&.
+.PP 
+divide:
+.RS 1
+-
+.B
+divide
+:
+.I
+b
+.RE
+.PP
+Returns the exact quotient of the complex number by the complex number 
+.I
+b
+\&.  Multiplies by the conjugate of 
+.I
+b
+and then divides by the norm of 
+.I
+b
+, or returns 
+.B
+nil
+if the latter division is not exact\&.
+.PP 
+inverse
+.RS 1
+-
+.B
+inverse
+.RE
+.PP
+Returns the conjugate of the complex number divided by its norm, or 
+.B
+nil
+if the latter division is not exact\&.
+.PP 
+quotient:
+.RS 1
+-
+.B
+quotient
+:
+.I
+b
+.RE
+.PP
+Returns the quotient on division by 
+.I
+b
+\&.
+.PP
+.B
+Note:
+
+I\&'m not sure about the algorithm I\&'m using here !
+.PP 
+remainder:quotient:
+.RS 1
+-
+.B
+remainder
+:
+.I
+b
+.B
+quotient
+:(id *)
+.I
+q
+.RE
+.PP
+Computes the remainder, and if 
+.I
+q
+is non-NULL pointer, the quotient on division by 
+.I
+b
+\&.
+.PP 
+gcd:
+.RS 1
+-
+.B
+gcd
+:
+.I
+b
+.RE
+.PP
+If both objects are real, returns a complex object with real part set to the (real) gcd of the objects\&.  Otherwise, computes the greatest common divisor by the Euclidean algorithm\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints the number to 
+.I
+aStream
+\&.

@@ -1,0 +1,501 @@
+.TH "ascfiler" 3 "Mar 12, 2023"
+.SH AsciiFiler
+.PP
+.B
+Inherits from:
+
+Object
+.PP
+.B
+Maturity Index:
+
+Experimental
+.SH Class Description
+.PP
+.B
+AsciiFiler
+is a (somewhat Stepstone compatible) 
+.I
+filer class
+, to archive objects on disk\&.  Archiving is a general technique for saving (passivating) and later, loading (activating) objects to and from a file\&.  There are essentially two complementary operations\&.  
+.B
+storeOn:
+converts the object as it exists in memory into a 
+.I
+flat text file format
+\&.  
+.B
+readFrom:
+does the inverse and translates the process-independent symbolic names again into a process-specific object\&.
+.RS 3
+
+[myObject storeOn:\&"/tmp/aFile\&"];
+.br
+
+.RE
+.PP
+and then later,
+.RS 3
+
+myObject = [AsciiFiler readFrom:\&"/tmp/aFile\&"];
+.br
+
+.RE
+.PP
+The 
+.B
+readFrom:
+returns an instance of the class that it finds in the file, not an 
+.B
+AsciiFiler
+instance\&.
+.PP
+The methods 
+.B
+storeOn:
+and 
+.B
+readFrom:
+are declared in the Object class and are inherited by all objects\&.
+.SH Example
+.PP
+Suppose a class named 
+.B
+Record
+is implemented as follows :
+.RS 3
+
+\= Record : Object
+.br
+{
+.br
+id firstname;
+.br
+id familyname;
+.br
+}
+.br
+
+.br
++ new
+.br
+{
+.br
+self = [super new];
+.br
+firstname = [String str:\&"Paco\&"];
+.br
+familyname = [String str:\&"Rodriguez\&"];
+.br
+return self;
+.br
+}
+.br
+
+.br
+\=:
+.br
+
+.br
+
+.RE
+.PP
+Then the following demonstrates how the AsciiFiler class automatically converts instances of 
+.B
+Record
+to a flat file text representation :
+.RS 3
+
+int main()
+.br
+{
+.br
+	[[Record new] storeOn:\&"/tmp/aFile\&"];
+.br
+}
+.br
+
+.RE
+.PP
+Inspection of the file 
+.I
+aFile
+would show :
+.RS 3
+
+#AsciiFiler i144 
+.br
+0 #Record @2 @3 
+.br
+0 #String i4 i5 *4\&"Paco 
+.br
+0 #String i9 i10 *9\&"Rodriguez 
+.br
+
+.RE
+.PP
+This file can be used to read back an instance of 
+.B
+Record
+into memory, and all this without the developer having to write a single line of code\&.
+.SH File Format
+.PP
+Because we have no intention to reinvent the wheel in this area, we try to keep our AsciiFiler file format partly compatible with the original Stepstone file format\&.  The following shows a Stepstone dump of a 
+.B
+OrdCltn
+containing some Strings and a Set :
+.RS 3
+
+#AsciiFiler i3
+.br
+10 #OrdCltn @2 i10 i3
+.br
+10 #IdArray i10 @3 @3 @4 @0 @0 @0 @0 @0 @0 @0
+.br
+12 #String i11 i11 *11\&"hello world
+.br
+20 #Set @5 i20 i1
+.br
+20 #IdArray i20 @0 @0 @0 @0 @0 @0 @0 @0 @0 @0 @0 @0 @0 @3 @0 @0 @0 @0 @0 @0
+.br
+
+.RE
+.PP
+Each record in the file is newline terminated\&.  The first record indicates that this is a (Stepstone) AsciiFiler file, version 3\&.  Then follows object 1 on line 1, object 2 on line 2 and so on\&.  The first field for each record is the number of indexed variables (this will always be 0 for the Portable Object Compiler)\&.  Then follows the 
+.I
+isa
+pointer and the instance variables of each object\&.
+.PP
+Here\&'s a short list of the most commonly used notation in AsciiFiler files\&.  Note that objects are stored using a notation that allows for 
+.I
+back
+or 
+.I
+forward
+pointers\&.  For example, the object in record 5 may contain a reference to @3, the object in record 3, or to @10, the object in record 10\&.
+.RS 3
+.br
+* i : integer, like in i3
+.br
+* S : unsigned short integer, like in S3
+.br
+* sharp : class name, such as #String
+.br
+* dollar : pointer (only used for NULL pointer)
+.br
+* at : object identifier, @0 stands for nil
+.br
+* star : NULL terminated char pointer
+.RE
+.PP
+The Stepstone filer class supports, for reasons explained below, many more 
+.I
+type descriptors
+(characters to encode C types)\&.  They are not necessarily implemented by this class, since the implementation significantly differs\&.
+.SH Automatic I/O
+.PP
+The Stepstone and Portable Object Compiler runtime are said to have 
+.I
+automatic I/O
+, because both compilers and runtimes attempt to do the job of implementing the necessary methods to write and read instance variables for a class, without intervention of the programmer\&.  Other runtimes sometimes offer only 
+.I
+semi-automatic I/O
+where the programmer has to develop the code to read and write instance variables\&.
+.PP
+However, the details about what is done automatically and what is left to the programmer differ\&.  The Stepstone compiler attempts to automatically file all C types (ints, chars, unions, structs etc\&.)\&.
+.PP
+The Portable Object Compiler emits for each class an implementation for the 
+.B
+fileOutIdsFor:
+and 
+.B
+fileInIdsFrom:
+methods\&.  These methods take care of the archiving of 
+.I
+id instance variables
+(objects)\&.  Unlike Stepstone, the Portable Object Compiler does not attempt to automatically archive C types; this must be done manually, if the programmer chooses to use instance variables that are raw C types instead of Objective-C objects\&.
+.PP
+Therefore, if a class adds only 
+.I
+id
+instance variables to its superclass, then 
+.B
+storeOn:
+and 
+.B
+readFrom:
+will immediately work for the class\&.  Otherwise manual archiving needs to be done, as explained in the following paragraphs\&.
+.SH File Out Operation
+.PP
+Storing an object works in two passes : the filer will first build a table of contents (TOC) by sending 
+.B
+fileOutOn:
+to all objects that can be reached from the object that is being stored\&.  A second pass will again send 
+.B
+fileOutOn:
+to the objects, this time to actually write the data to the file, assigning to each object a label, which is the offset of the object in the TOC\&.
+.PP
+The default implementation of 
+.B
+fileOutOn:
+, as implemented in the Object class, uses the compiler generated 
+.B
+fileOutIdsFor:
+method to store all 
+.I
+id
+instance variables\&.  This might suffice in many applications\&.
+.PP
+Variables of a different type, or objects that are indirectly 
+.I
+owned
+by the object must be manually written on the Filer, by using the 
+.B
+fileOut:type:
+method\&.
+.RS 3
+
+- fileOutOn:aFiler
+.br
+{
+.br
+	[super fileOutOn:aFiler];
+.br
+	[aFiler fileOut:&myInt type:\&'i\&'];
+.br
+	[aFiler fileOut:&cArray[0] type:\&'@\&'];
+.br
+	[aFiler fileOut:&cArray[1] type:\&'@\&'];
+.br
+	return self;
+.br
+}
+.br
+
+.br
+
+.RE
+.SH File In Operation
+.PP
+When activating objects, the Filer will first build a table of instances for each record in the file\&.  The Filer knows what factory class to use, since each record includes the necessary class information\&.  Then, once all (uninitialized) objects exist, each instance receives a 
+.B
+fileInFrom:
+message\&.  Only when all instances have had the opportunity to file themselves in, from the Filer, 
+.B
+awakeFrom:
+messages are sent to the objects\&.  This can be used to perform further initialization, to make objects or string unique etc\&.
+.PP
+The default implementation of 
+.B
+fileInFrom:
+, as implemented in the Object class, uses the compiler generated 
+.B
+fileInIdsFrom:
+method to restore all 
+.I
+id
+instance variables\&.  A method 
+.B
+fileInFrom:
+needs to be implemented only to match a corresponding 
+.B
+fileOutOn:
+\&.
+.RS 3
+
+- fileInFrom:aFiler
+.br
+{
+.br
+	[super fileInFrom:aFiler];
+.br
+	[aFiler fileIn:&myInt type:\&'i\&'];
+.br
+	[aFiler fileIn:&cArray[0] type:\&'@\&'];
+.br
+	[aFiler fileIn:&cArray[1] type:\&'@\&'];
+.br
+	return self;
+.br
+}
+.br
+
+.br
+
+.RE
+.PP
+If the type description character, passed as argument to 
+.B
+fileIn:type:
+does not match what was used for 
+.B
+fileOut:type:
+, the Filer will signal a 
+.B
+TypeInconsistency
+exception\&.
+.SH Method types
+.PP 
+.B
+Class Initialization
+.RS 3
+.br
+* initialize
+.RE
+.PP 
+.B
+Creating
+.RS 3
+.br
+* new
+.br
+* free
+.RE
+.PP 
+.B
+Storing and Reading Objects
+.RS 3
+.br
+* store:on:
+.br
+* readFrom:
+.RE
+.PP 
+.B
+File Out Operation
+.RS 3
+.br
+* fileOut:type:
+.RE
+.PP 
+.B
+File In Operation
+.RS 3
+.br
+* fileIn:type:
+.RE
+.SH Methods
+.PP 
+initialize
+.RS 1
++
+.B
+initialize
+.RE
+.PP
+Registers the 
+.B
+AsciiFiler
+as default filer\&.
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+Factory method to create and return a new instance of the class\&.  The default implementation clears (zeroes) the memory for instance variables and initializes the 
+.I
+isa
+pointer\&.
+.PP 
+free
+.RS 1
+-
+.B
+free
+.RE
+.PP
+Frees the memory for this instance, and returns 
+.B
+nil
+\&.
+.PP 
+store:on:
+.RS 1
+- (
+BOOL
+)
+.B
+store
+:
+.I
+anObject
+.B
+on
+:(STR)
+.I
+aFileName
+.RE
+.PP
+AsciiFiler reimplementation of 
+.B
+storeOn:
+\&.  Doesn\&'t use the default Filer, but rather AsciiFiler itself as Filer class\&.  If the default filer is AsciiFiler, then the following are equivalent :
+.RS 3
+
+[AsciiFiler store:anObject on:aFileName];
+.br
+
+.RE
+.PP
+and
+.RS 3
+
+[anObject storeOn:aFileName];
+.br
+
+.RE
+.PP 
+readFrom:
+.RS 1
+-
+.B
+readFrom
+:(STR)
+.I
+aFileName
+.RE
+.PP
+AsciiFiler reimplements 
+.B
+readFrom:
+and doesn\&'t use the default Filer, but rather AsciiFiler itself as Filer class\&.
+.PP 
+fileOut:type:
+.RS 1
+-
+.B
+fileOut
+:(void *)
+.I
+value
+.B
+type
+:(char)
+.I
+typeDesc
+.RE
+.PP
+Writes out the data referenced by 
+.I
+value
+to the filer\&.
+.PP 
+fileIn:type:
+.RS 1
+-
+.B
+fileIn
+:(void *)
+.I
+value
+.B
+type
+:(char)
+.I
+typeDesc
+.RE
+.PP
+Reads from the filer and returns data by reference\&.

@@ -1,0 +1,675 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2019 (Released January 1, 2019) -->
+<HTML lang="EN">
+<HEAD>
+<TITLE>Objective-C Blocks</TITLE>
+<META NAME="description" CONTENT="Objective-C Blocks">
+<META NAME="keywords" CONTENT="block98">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2019">
+
+<LINK REL="STYLESHEET" HREF="block98.css">
+
+</HEAD>
+
+<BODY >
+
+<P>
+<H1 class="CENTER">Objective-C Blocks</H1><DIV CLASS="author_info">
+
+<P class="CENTER"><STRONG>David&nbsp;Stes</STRONG></P>
+<P class="CENTER"><I>Antwerp, Flanders, Belgium</I></P>
+<P class="CENTER"><STRONG>March 4, 1998</STRONG></P>
+<P class="LEFT"><SMALL>email: stes@pandora.be</SMALL></P>
+</DIV>
+
+<P>
+
+<H3>Abstract:</H3>
+<DIV CLASS="ABSTRACT">
+This paper proposes an implementation of <SPAN  CLASS="textit">Blocks</SPAN> for Objective-C.  The language and runtime, as described in [<A
+ HREF="block98.html#Cox86">Cox, 1986</A>] doesn't include Blocks, but work was done on adding support for Blocks in [<A
+ HREF="block98.html#Cox91">Cox, 1991</A>].  We try to give a detailed account of our experiences, discussing both syntax and semantics of an implementation where Blocks do not have to be evaluated in LIFO (last in first out) order and support non-local returns.  We also discuss an important application to exception handling in Objective-C.
+</DIV>
+<P>
+
+<P>
+
+<H1><A ID="SECTION00010000000000000000">
+Introduction</A>
+</H1>
+
+<P>
+In Smalltalk, one would iterate over the contents of a group of objects, using the <SPAN  CLASS="texttt">do:</SPAN> method which takes a Block, i.e. a piece of Smalltalk code, written inline, between square brackets, as argument.  The Block is evaluated for each element :
+
+<P><PRE>
+aCltn do: [:each | self remove: each].
+</PRE>
+<P>
+Blocks are heavily used in Smalltalk, for flow control.  Objective-C is using the conventional C keywords, <SPAN  CLASS="textit">if</SPAN>, <SPAN  CLASS="textit">while</SPAN>, <SPAN  CLASS="textit">for</SPAN>, <SPAN  CLASS="textit">break</SPAN>, <SPAN  CLASS="textit">continue</SPAN> etc. for this purpose.  However, there are still very good reasons to add support for Blocks, such as error handling using Blocks, as we will show.
+
+<P>
+Our implementation works out some of the ideas that are outlined in the <SPAN  CLASS="textit">TaskMaster</SPAN> paper, [<A
+ HREF="block98.html#Cox91">Cox, 1991</A>], a paper that is concerned with support for threads, processes and exceptions in Objective-C.  <SPAN  CLASS="textit">Taskmaster</SPAN> pointed out the need for support for <SPAN  CLASS="textit">Blocks</SPAN> in Objective-C, but no implementation was available, up to now.  Our article complements <SPAN  CLASS="textit">Taskmaster</SPAN> in other ways, since we present a different approach to Objective-C non-LIFO blocks.
+
+<P>
+The implementation described here, was tested with the <SPAN  CLASS="textit">Portable Object Compiler</SPAN>, a new, freeware compiler for Objective-C.  We are developing this compiler and distribute it under the terms of the <SPAN  CLASS="textbf">GNU</SPAN> Library General Public License.  It's as far as we know, the first Objective-C compiler that has a complete implementation of <SPAN  CLASS="textit">Blocks</SPAN>.
+
+<P>
+
+<H1><A ID="SECTION00020000000000000000">
+Choosing a Syntax for Objective-C Blocks</A>
+</H1>
+
+<P>
+The Smalltalk square bracket syntax for Blocks,
+
+<P><PRE>
+aCltn do: [:each | self remove: each].
+</PRE>
+<P>
+is not available for use in Objective-C because, in Objective-C, one mixes plain C with a special syntax for sending messages, which precisely consists of using square brackets.  For example,
+
+<P><PRE>
+int i;
+for(i=0;i&lt;[aCltn size];i++) { ... }
+</PRE>
+<P>
+The example shows that a pair of receiver and method selector (and arguments, if any), are placed between square brackets, and this is the syntax that is used in Objective-C to send a message.
+
+<P>
+Square brackets are, in Objective-C, <SPAN  CLASS="textit">not</SPAN> used for creating a Block.  Instead, for Blocks, the proposal is to use <SPAN  CLASS="textit">curly braces</SPAN>, as in,
+
+<P><PRE>
+[aCltn do: { :each | [self remove: each];} ];
+</PRE>
+<P>
+The braced group, argument of the <SPAN  CLASS="texttt">do:</SPAN> method, is a Block with one argument.
+
+<P>
+Curly braces are used in C for compound statements, and since there is some similarity, we believe that this syntax for Blocks fits nicely with the rest of the C and Objective-C language.
+
+<P>
+
+<H1><A ID="SECTION00030000000000000000">
+Terminology</A>
+</H1>
+
+<P>
+A Block can either have no arguments, it can have one argument, or it can have two or more arguments.
+
+<P>
+If the Block has no argument, it is <SPAN  CLASS="textit">evaluated</SPAN> by sending a <SPAN  CLASS="texttt">value</SPAN> message to it.  Evaluation of the Block means that the statements are executed.  The methods <SPAN  CLASS="texttt">value:</SPAN> and <SPAN  CLASS="texttt">value:value</SPAN> do the same thing, but they allow to pass Objects as arguments to the Block, when it's evaluated. 
+
+<P>
+A Block can be thought of as an anonymous method, with arguments, local variables and statements, but existing at runtime as data, as an instance of the Block class.
+
+<P>
+Ideally, instances of the Block class can be used whereever ordinary Objects are used.  It should be possible to add Blocks to a Collection object, to assign a Block to some variable, to use it as an argument of a message and so on.
+
+<P>
+
+<H1><A ID="SECTION00040000000000000000">
+Syntax for Arguments</A>
+</H1>
+
+<P>
+The syntax proposed in Taskmaster ([<A
+ HREF="block98.html#Cox91">Cox, 1991</A>]) for these Block objects, was, (we list three different Blocks, with respectively no, one and two arguments) :
+
+<P><PRE>
+{ int i; foo(...); }
+{ id a; | int i;foo(...); }
+{ id a,b; | int i;foo(...); }
+</PRE>
+<P>
+A vertical bar separates arguments from local variables and statements, as in Smalltalk.
+
+<P>
+When there's no argument (as in the first example out of three), no vertical bar is needed.
+
+<P>
+We implemented a syntax like this for our compiler, and another one where arguments were declared using ANSI C style, comma separated, lists, but in the end, after experimentation, we believe that arguments of a Block are in practice usually objects (i.e. variables that are of type <SPAN  CLASS="textbf">id</SPAN> , the type that stands in Objective-C for an Object instance).
+
+<P>
+Therefore, we propose a new syntax with a <SPAN  CLASS="textit">default</SPAN> (or implicit) argument type of <SPAN  CLASS="textbf">id</SPAN>.  This is consistent with the defaults for method return and argument types : arguments of Objective-C methods default to type <SPAN  CLASS="textbf">id</SPAN>, much as arguments of C functions default to <SPAN  CLASS="textbf">int</SPAN>.
+
+<P>
+These considerations led us to the following syntax, which turns out to be close to the Smalltalk syntax; our proposal is to use :
+
+<P><PRE>
+{ int i; foo(...); }
+{ :a | int i;foo(...); }
+{ :a :b | int i;foo(...); }
+</PRE>
+<P>
+In the case of a Block without arguments, there is no difference with the TaskMaster proposal.  Arguments are preceded by a colon, much as is the case for method selectors in Objective-C.
+
+<P>
+An extension that we did not implement, because we currently have no use for it, might be to allow a cast in front of the argument, in the same manner as it is done sometimes for arguments of ordinary Objective-C methods :
+
+<P><PRE>
+{ :(BOOL)a | int i;foo(...); }
+</PRE>
+<P>
+The point is that the <SPAN  CLASS="textit">default</SPAN> type, when the cast is omitted, should in any case be <SPAN  CLASS="textbf">id</SPAN>.  In a later section, about return values of a Block, we discuss the type issue in greater detail.
+
+<P>
+
+<H1><A ID="SECTION00050000000000000000">
+Examples</A>
+</H1>
+
+<P>
+A first example uses the same Block to iterate over two different groups of objects, and print all objects on the <SPAN  CLASS="textit">stderr</SPAN> :
+
+<P><PRE>
+static void
+printThem(firstCltn,otherCltn)
+  id firstCltn,otherCltn;
+{
+    id aBlock = { :each | [each printOn:stderr]; };
+    [firstCltn do:aBlock];
+    [otherCltn do:aBlock];
+}
+</PRE>
+<P>
+Another example to count the number of Objects in a collection that are the same as some given object :
+
+<P><PRE>
+static unsigned
+countThem(aCltn,anObject,count)
+    id aCltn,anObject;
+    unsigned count;
+{
+    [aCltn do: { :each | if (anObject == each) count++; }];
+    return count;
+}
+</PRE>
+<P>
+
+<H1><A ID="SECTION00060000000000000000">
+Curly Braces</A>
+</H1>
+
+<P>
+It is not obvious that the choice to use curly braces for Blocks, works.  By this we mean, whether it can be implemented in a way that is compatible with the C language.  Objective-C is a tool for C programmers and for C development, and the goal is to be fully compatible with the C language (see [<A
+ HREF="block98.html#Kernighan88">Kernighan and Ritchie, 1988</A>]).
+
+<P>
+In fact, the Taskmaster paper, [<A
+ HREF="block98.html#Cox91">Cox, 1991</A>], is printing braces in <SPAN  CLASS="textit">boldface</SPAN>, to indicate that ideally the syntax would be using ordinary braces, but that it was not yet clear, at that time, if and how it could be done, so the possibility was left open to use some other delimiter.
+
+<P>
+Consider the following example, where the right hand side of the assignment consists out of an ordinary C expression, which happens to be a Block without arguments, in the second case :
+
+<P><PRE>
+int count = 100;
+id aBlock = { [aStream echo:text]; };
+</PRE>
+<P>
+C initializers also use curly braces, so the following code is valid and traditional Objective-C.  It is totally unrelated to Blocks, but qua syntax very close to the previous example :  
+
+<P><PRE>
+int counters[1] = { 100 };
+id points[1] = { [Point new] };
+</PRE>
+<P>
+This is the C syntax for initializing a C array, which happens to be a C array consisting of a single, Objective-C Point object, in the second assignment.
+
+<P>
+An approach needs to be developed so that the parser, after processing a C declarator, knows whether to expect a C initializer for an array, or an expression (which might happen to be a Block).   
+
+<P>
+The rule is that the curly brace syntax for Blocks is allowed in two cases:
+
+<P>
+
+<UL>
+<LI>a curly brace Block is allowed as receiver or argument of an Objective-C message, as in:
+
+<P><PRE>
+[{ ... } value];
+[aCltn do:{ ... }];
+</PRE>
+<P>
+</LI>
+<LI>a curly brace Block is allowed as initializer of a local (not global) variable whose type is declared as <SPAN  CLASS="textbf">id</SPAN>, as in:
+
+<P><PRE>
+id aBlock = { ... };
+</PRE>
+<P>
+An initializer for an <SPAN  CLASS="textbf">id</SPAN> variable is not allowed in traditional Objective-C anyhow, so Objective-C compilers are free to assign a meaning to it.
+
+<P>
+</LI>
+</UL>
+
+<P>
+In the case of the Portable Object Compiler, the implementation is based on <SPAN  CLASS="textit">yacc</SPAN> feedback to the <SPAN  CLASS="textit">lex</SPAN> lexical analyzer (see [<A
+ HREF="block98.html#LexYacc92">John R.&nbsp;Levine, 1992</A>]), using <SPAN  CLASS="textit">embedded actions</SPAN>, for example :
+
+<P><PRE>
+MessageExpression : '[' {okBlock=1;} Receiver Arguments ']'
+</PRE>
+<P>
+The parser tells the lexical analyzer (using a flag called <SPAN  CLASS="textbf">okBlock</SPAN>) that a Block can follow.
+
+<P>
+In the case of a pointer to, or an array of <SPAN  CLASS="textbf">id</SPAN> types, the <SPAN  CLASS="textbf">okBlock</SPAN> flag is set to false, so that a curly brace stands again for a conventional C initializer, not related in any way to Blocks :
+
+<P><PRE>
+id array[2] = { [Point new],[Point new] };
+</PRE>
+<P>
+In our experience, the relaxed rules, allowing Blocks as (1) receiver or argument in a message and (2) as initializer of an <SPAN  CLASS="textbf">id</SPAN> variable, cover most cases using a natural syntax.
+
+<P>
+
+<H1><A ID="SECTION00070000000000000000">
+Self Referencing Blocks</A>
+</H1>
+
+<P>
+In an earlier implementation, we had introduced a variable, called <SPAN  CLASS="textit">thisBlock</SPAN>, which was to Blocks, what <SPAN  CLASS="textit">self</SPAN> is to object instances, and what <SPAN  CLASS="textit">_cmd</SPAN> is to methods : an implicit, <SPAN  CLASS="textit">hidden</SPAN> argument that referred to the Block itself that was being defined.  Blocks could use the <SPAN  CLASS="textit">thisBlock</SPAN> variable to send messages to themselves.
+
+<P>
+In the current implementation, however, we believe that <SPAN  CLASS="textit">thisBlock</SPAN> is a redundant concept because a Block can easily refer to locals from the enclosing compound statement, and the C initializer syntax was augmented so that it's very convenient to initialize some variable to a Block.  This means that a variable can easily be initialized to a Block that references itself :
+
+<P><PRE>
+id p = {:each | [each print];[[each subclasses] do:p];};
+</PRE>
+<P>
+Given this definition of <SPAN  CLASS="texttt">p</SPAN>, the following statement would print all subclasses of <SPAN  CLASS="textit">Object</SPAN> by recursively evaluating the Block <SPAN  CLASS="texttt">p</SPAN> :
+
+<P><PRE>
+[p value:Object];
+</PRE>
+<P>
+There is no longer a need for an implicit argument such as <SPAN  CLASS="textit">thisBlock</SPAN> to achieve the same thing.
+
+<P>
+
+<H1><A ID="SECTION00080000000000000000">
+Returning from a Block</A>
+</H1>
+
+<P>
+Blocks can have a <SPAN  CLASS="textit">return value</SPAN>, which is the value that is returned by methods such as <SPAN  CLASS="texttt">value</SPAN>, when the Block is evaluated.
+
+<P>
+On the other hand, it is also possible to return from the method (or function) in which the Block is being defined, from within a Block.   This is called <SPAN  CLASS="textit">non-local return</SPAN>.
+
+<P>
+In Smalltalk, in the first case, one would simply write the expression that needs to be returned when the Block is evaluated.  For example,
+
+<P><PRE>
+symbols &lt;- vars collect: [ :x  | x asSymbol ].
+</PRE>
+<P>
+On the other hand, in the second case, of a non-local return, in Smalltalk, one would use the <SPAN  CLASS="textit">up-arrow</SPAN> (usually entered from the keyword as a carret) :
+
+<P><PRE>
+self do: [ :each | (each=anObject) ifTrue:[^true]].
+^false
+</PRE>
+<P>
+An Objective-C Block can consist of a single expression, and in this case, the return value of the Block, consists of that expression, as in:
+
+<P><PRE>
+symbols = [vars collect:{:x|[x asSymbol]}];
+</PRE>
+<P>
+The above example shows a message expression, [x asSymbol], that is placed inside curly braces, to indicate that it's a Block.
+
+<P>
+An extension, that we did not implement, is that the type of the return value could be set to be the same as that of the expression.  This allows for arbitrary C types, and there is no ambiguity, since a C compiler always associates a type to expressions.
+
+<P>
+The type associated to the expression of the example, [x asSymbol], is <SPAN  CLASS="textbf">id</SPAN>, so the return value is an Object, which is the case that we implemented.
+
+<P>
+However, a function or a method, can also return from within an Objective-C Block, and in this case, an arbitrary type is possible as return value :
+
+<P><PRE>
+static BOOL
+isElementOf(anObject,aCltn)
+  id anObject,aCltn;
+{
+    [aCltn do:{ :eachCltn |
+        [eachCltn do:{ :element |
+           if ([element isEqual:anObject]) return YES;
+        }];
+    }];
+
+    return NO;
+}
+</PRE>
+<P>
+The above example shows that we have redefined the C keyword <SPAN  CLASS="textit">return</SPAN> to be equivalent to the Smalltalk uparrow (carret), for Objective-C Blocks.
+
+<P>
+Given the fact that the function <SPAN  CLASS="texttt">isElementOf()</SPAN> is defined to have a BOOL type return value, this is indeed what the <SPAN  CLASS="textit">return</SPAN> statement returns, <SPAN  CLASS="textit">even from within the nested block</SPAN>.
+
+<P>
+The Portable Object Compiler supports this by translating <SPAN  CLASS="textit">return</SPAN> statements within Blocks, to a pair of <SPAN  CLASS="texttt">setjmp()</SPAN> and <SPAN  CLASS="texttt">longjmp()</SPAN>, and it uses Block variables to return the actual value (about which we say more in a section below).
+
+<P>
+To summarize, returning from a Block differs from returning from a method or function, from within a Block.  In the first case, it is possible to assign a return value to a Block by simply writing the expression (of type <SPAN  CLASS="textbf">id</SPAN>) that it should return.  In the second case, one uses an explicit <SPAN  CLASS="textit">return</SPAN>keyword, and it acts very much like <SPAN  CLASS="texttt">return</SPAN> would in regular C compound statement, supporting arbitrary C types as return value.
+
+<P>
+
+<H1><A ID="SECTION00090000000000000000">
+Objective-C Blocks are not LIFO</A>
+</H1>
+
+<P>
+Objective-C blocks should not make the assumption that they are evaluated in LIFO (last-in first-out) order.  An Objective-C Block may be evaluated after the function where it was created, has returned, as for example in :
+
+<P><PRE>
+[openMenu action:{:sender | doOpen();} ];
+</PRE>
+<P>
+In the above example, an object called "openMenu", which could be an instance of the Menu class in some GUI library, saves the Block that is registered as the <SPAN  CLASS="textit">action Block</SPAN>.
+
+<P>
+When the user chooses an action (such as Open, or Quit) from the Menu, the Block is evaluated.
+
+<P>
+Clearly, evaluation of Blocks works in this case not in LIFO order : the function where the Block was created has already returned.
+
+<P>
+
+<H1><A ID="SECTION000100000000000000000">
+Variables in a Block</A>
+</H1>
+
+<P>
+Although that Blocks can have return values, they are often used for <SPAN  CLASS="textit">side effects</SPAN>, where the return value is irrelevant.  Typically the method <SPAN  CLASS="texttt">do:</SPAN> is used to evaluate a Block that modifies a variable of the enclosing scope :
+
+<P><PRE>
+static int
+totalSize(aCltn)
+  id aCltn;
+{
+    int count = 0;
+    [aCltn do: { :whatever | count += [whatever size]; }];
+    return count;
+}
+</PRE>
+<P>
+The local (stack) variable <SPAN  CLASS="texttt">count</SPAN> can be used and modified from within the Block, and when the method <SPAN  CLASS="texttt">do:</SPAN> returns, the value of the variable <SPAN  CLASS="texttt">count</SPAN> reflects the modifications by the Block.
+
+<P>
+The compiler makes a list of the local variables, class variables, instance variables, global variables, arguments etc. that blocks and their subblocks are referencing.  It then <SPAN  CLASS="textit">promotes</SPAN> local (stack) variables to <SPAN  CLASS="textit">heap allocated</SPAN> variables, by generating a C <SPAN  CLASS="texttt">struct</SPAN> for the variables, and by calling the C library function <SPAN  CLASS="texttt">malloc()</SPAN>.  The following semi-translated pseudo-code illustrates the point :
+
+<P><PRE>
+struct generated { int count; }
+
+static void
+blockFunction(id whatever,struct generated *scope)
+{
+    scope-&gt;count += [whatever size];
+}
+
+static int
+totalSize(id aCltn)
+{
+    struct generated *scope = malloc(sizeof(struct generated));
+
+    scope-&gt;count = 0;
+    [aCltn do: newBlock(1,blockFunction,scope)];
+    return scope-&gt;count;
+}
+</PRE>
+<P>
+In the above code, <SPAN  CLASS="texttt">newBlock()</SPAN> is the function that creates an instance of the Block class.  It takes the number of arguments, the function to evaluate when <SPAN  CLASS="texttt">value</SPAN> is sent, and a malloc'ed pointer towards variables, as argument.
+
+<P>
+Instead of passing a <SPAN  CLASS="textit">pointer</SPAN> towards a stack variable, to the Block, the compiler automatically allocates some heap memory for such variables, and it <SPAN  CLASS="textit">translates</SPAN> references to these locals, in the calling function <SPAN  CLASS="textit">and</SPAN> in the Block, towards expressions that dereference a compiler generated C <SPAN  CLASS="texttt">struct</SPAN>.
+
+<P>
+The use of a pointer into a stack-frame would only work for LIFO Blocks.
+
+<P>
+In practice, we use a <SPAN  CLASS="textit">double indirection</SPAN>, so that Blocks within Blocks work correctly, and such that variables with the same name, defined in different nested compound statements, are accessible from within Blocks, but the above pseudo-code illustrates the over-all approach.
+
+<P>
+We currently use a mark and sweep garbage collector for collecting the heap allocated memory that is used for communication between Blocks and the functions (or methods) where they are defined;  it's also planned to implement a reference counting scheme for keeping track of this auxiliary memory.
+
+<P>
+
+<H1><A ID="SECTION000110000000000000000">
+Rules for Variables</A>
+</H1>
+
+<P>
+The implementation of Blocks for the Portable Object Compiler treats various kinds of variables in the following way :
+
+<P>
+<SPAN  CLASS="textit">Global variables</SPAN> can be used in Blocks and they have their usual semantics.  They are <SPAN  CLASS="textit">not</SPAN> promoted to heap allocated variables, when referenced from within a Block.  They are accessed from within a Block in the same way as from within a function or method.
+
+<P>
+<SPAN  CLASS="textit">Instance variables</SPAN> (and <SPAN  CLASS="textit">class variables</SPAN> for those Objective-C compilers that have them) can be used in Blocks, within method definitions.  Since references to instance variables are translated by the compiler to expressions that derefence the <SPAN  CLASS="textbf">self</SPAN> pointer, the case of instance variables is in fact the case of sharing the <SPAN  CLASS="textbf">self</SPAN> pointer between a method and a Block.  Since <SPAN  CLASS="textbf">self</SPAN> is a hidden argument for Objective-C methods, it falls under the next rule. 
+
+<P>
+<SPAN  CLASS="textit">Local variables</SPAN> and <SPAN  CLASS="textit">arguments</SPAN> of methods, functions, or enclosing blocks of subblocks (in the case of nested blocks), are promoted by the compiler to heap allocated variables.  The compiler generates code such that, when those variables are accessed from within the Block or from within the enclosing function or method, the value is accessed via a pointer. 
+
+<P>
+Finally, in the case of an explicit return from a method or function, from within a Block, as discussed in one of the previous sections, the <SPAN  CLASS="textit">return value</SPAN> is treated as a local variable, and added as a <SPAN  CLASS="textit">dummy</SPAN> variable to the list of local variables that the method or function makes available to the Blocks that it contains.
+
+<P>
+
+<H1><A ID="SECTION000120000000000000000">
+Error Handling</A>
+</H1>
+
+<P>
+The original Objective-C runtime used to define a method <SPAN  CLASS="texttt">error:</SPAN> which could be used from within a method as follows :
+
+<P><PRE>
+- lookup:(STR)name
+{
+    id aClass = [self findClass:name];
+    return (aClass)?aClass:[self error:"Class not found."];
+}
+</PRE>
+<P>
+The problem with this approach used to be that <SPAN  CLASS="texttt">error:</SPAN> was <SPAN  CLASS="texttt">abort()</SPAN>'ing the process : it was not possible to do error handling, i.e. to specify that some other action than aborting the process should be performed in case of an error.
+
+<P>
+An alternative was developed using C macros, DURING, HANDLER and ENDHANDLER.  The message <SPAN  CLASS="texttt">error:</SPAN> was replaced by :
+
+<P><PRE>
+- lookup:(STR)name
+{
+    id aClass = [self findClass:aClassName];
+    return (aClass)?aClass:RAISE("Class not found.");
+}
+</PRE>
+<P>
+Applications would then <SPAN  CLASS="textit">catch</SPAN> the exception, set by RAISE(), by specifying a <SPAN  CLASS="textit">handler</SPAN> as follows:
+
+<P><PRE>
+static id
+findclass(STR name)
+{
+    id aClass;
+
+    DURING
+        aClass = [Object lookup:name];
+    HANDLER
+        aClass = Object; 
+    ENDHANDLER
+
+    return aClass;
+}
+</PRE>
+<P>
+which specified that, if <SPAN  CLASS="textit">Foo</SPAN> was not found, then the function should return the root class, instead of simply aborting the process.
+
+<P>
+The <SPAN  CLASS="textit">handler</SPAN> was, in this approach, not a Block, but a compound statement within the function that was catching the exception.  The pair of RAISE() and HANDLER macros would use <SPAN  CLASS="texttt">setjmp()</SPAN> and <SPAN  CLASS="texttt">longjmp()</SPAN> to do a non-local jump from the method that was setting the exception, to the method or function that was catching it.
+
+<P>
+This implies however, that it was not possible for a user to write a handler that would print for example, a stack backtrace, to see where the exception originated.  Valuable information was lost by the <SPAN  CLASS="texttt">longjmp</SPAN> to the handler, before the handler had a chance to execute.
+
+<P>
+
+<H1><A ID="SECTION000130000000000000000">
+Error Handling using Blocks</A>
+</H1>
+
+<P>
+With Blocks, we can implement an error handling approach based on the method <SPAN  CLASS="texttt">error:</SPAN> and on a new method, called <SPAN  CLASS="texttt">ifError:</SPAN>.
+
+<P>
+Also, a new instance method <SPAN  CLASS="texttt">halt:</SPAN> was added to the root class, <SPAN  CLASS="textit">Object</SPAN>, and the old method <SPAN  CLASS="texttt">error:</SPAN> was reimplemented in terms of <SPAN  CLASS="texttt">halt:</SPAN>.
+
+<P>
+<SPAN  CLASS="texttt">halt:</SPAN> takes an error message, a String object, as argument, and evaluates the <SPAN  CLASS="textit">current errorHandler</SPAN>.  This error handler is a Block that takes two arguments, namely the error message and the receiver of the <SPAN  CLASS="texttt">halt:</SPAN> message :
+
+<P><PRE>
+- halt:msg
+{
+    [errorHandler value:msg value:self];
+    return self;
+}
+</PRE>
+<P>
+The default <SPAN  CLASS="textit">errorHandler</SPAN> is a Block that simply aborts the process :
+
+<P><PRE>
+id handler = { :msg :rcv | fprintf(stderr,[msg str]);abort(); };
+</PRE>
+<P>
+Therefore, the <SPAN  CLASS="textit">default</SPAN> behavior of methods such as <SPAN  CLASS="texttt">error:</SPAN> remains compatible with their old usage.
+
+<P>
+Of course, since the error handler is just a Block, evaluated from within <SPAN  CLASS="texttt">error:</SPAN> or <SPAN  CLASS="texttt">halt:</SPAN>, the user can substitute a <SPAN  CLASS="textit">different</SPAN> Block for the default handler, and thereby change the default action (which is to abort the process).
+
+<P>
+This can happen on a per process basis, using the factory method <SPAN  CLASS="texttt">errorHandler:</SPAN>, to, for example, print the message in a modal error dialog box, instead of on the <SPAN  CLASS="textit">stderr</SPAN>.
+
+<P><PRE>
+[Block errorHandler:{ :msg :rcv | DialogBox([msg str]); }];
+</PRE>
+<P>
+Or, as an alternative to changing the default handler per process, the Block instance method <SPAN  CLASS="texttt">ifError:</SPAN> can be used.
+
+<P>
+<SPAN  CLASS="texttt">ifError:</SPAN> first pushes its argument, the error handler (a Block that takes two objects as argument) onto a stack, and then evaluates the receiver (a Block without arguments) in the same way as <SPAN  CLASS="texttt">value</SPAN> does :
+
+<P><PRE>
+static id
+findclass(STR name)
+{
+    id aClass;
+
+    [{
+        aClass = [Object lookup:name];
+    } ifError: { :msg :rcv |
+        if (!strcmp([msg str],"Class not found.")) {
+            return Object; 
+	} else {
+            [rcv halt:msg];
+	}
+    }];
+
+    return aClass;
+}
+</PRE>
+<P>
+<SPAN  CLASS="texttt">error:</SPAN> pops a handler from the stack, and evaluates it.  Since Blocks support non-local returns, it is possible to return from within the handler to the method that <SPAN  CLASS="textit">caught</SPAN> the exception.  It can also reraise exceptions in which it is not interested, by calling <SPAN  CLASS="texttt">halt:</SPAN> again, which will give control to the next handler on the stack, until the default handler (which aborts the process) is reached.
+
+<P>
+Unlike a strategy where the error handler is a subroutine of the method or function that catches the exception, the approach that uses Blocks allows that the error handler is evaluated from within the method that sets the exception, which means that no information such as a stack backtrace towards the location where the exception was set, is lost, for the handler.
+
+<P>
+
+<H1><A ID="SECTION000140000000000000000">
+Conclusion</A>
+</H1>
+
+<P>
+Objective-C doesn't need Blocks for control statements, since the usual C statements are available for this.  However, for error handling, it should be possible to pass a piece of code (a handler) as argument to the code that might raise an error.  Since Smalltalk shows that Blocks can be used for many other purposes as well, adding support for Blocks is a valuable extension to Objective-C.
+
+<P>
+
+<H1><A ID="SECTION000150000000000000000">
+Appendix : Extensions to the Grammar</A>
+</H1>
+
+<P>
+<SPAN  CLASS="textit">PrimaryExpression</SPAN> was extended to allow BlockExpressions, not just C expression and Objective-C MessageExpressions :
+
+<P><PRE>
+PrimaryExpression : ...
+ | MessageExpression
+ | BlockExpression
+;
+</PRE>
+<P>
+The rules for BlockArguments and BlockExpressions are :
+
+<P><PRE>
+BlockArguments : ':' Identifier
+ | BlockArguments ':' Identifier
+;
+</PRE>
+<P>
+The lexical analyzer returns BLOCK_TOKEN instead of '{' when a Block is allowed.
+
+<P><PRE>
+BlockExpression : BLOCK_TOKEN Expression '}'
+ | BLOCK_TOKEN Statements '}'
+ | BLOCK_TOKEN Declarators Statements '}'
+ | BLOCK_TOKEN BlockArguments '|' Expression '}'
+ | BLOCK_TOKEN BlockArguments '|' Statements '}'
+ | BLOCK_TOKEN BlockArguments '|' Declarators Statements '}'
+;
+</PRE>
+<P>
+
+<H2><A ID="SECTION000160000000000000000">
+Bibliography</A>
+</H2><DL class="COMPACT">
+
+<DT><A ID="Cox86">Cox, 1986</A>
+<DD>
+Cox, B.&nbsp;J. (1986).
+<BR><EM>Object-Oriented Programming : An Evolutionary Approach</EM>.
+<BR>Addison-Wesley, Reading, Mass.
+
+<DT><A ID="Cox91">Cox, 1991</A>
+<DD>
+Cox, B.&nbsp;J. (1991).
+<BR>Taskmaster ecoop position paper.
+<BR>In <EM>ECOOP'91, Workshop on Exception Handling And OOPLS</EM>, Geneva,
+  Switzerland.
+
+<DT><A ID="LexYacc92">John R.&nbsp;Levine, 1992</A>
+<DD>
+John R.&nbsp;Levine, Tony&nbsp;Mason, D.&nbsp;B. (1992).
+<BR><EM>lex and yacc</EM>.
+<BR>O'Reilly and Associates, Inc., Sebastopol, CA.
+
+<DT><A ID="Kernighan88">Kernighan and Ritchie, 1988</A>
+<DD>
+Kernighan, B.&nbsp;W. and Ritchie, D.&nbsp;M. (1988).
+<BR><EM>The C Programming Language, 2nd edition</EM>.
+<BR>Prentice-Hall.
+
+</DL>
+
+<P>
+<BR><HR>
+
+</BODY>
+</HTML>

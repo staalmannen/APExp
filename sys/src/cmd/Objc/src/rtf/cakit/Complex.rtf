@@ -1,0 +1,354 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Computer Algebra Kit (c) 1993,00 by Comp.Alg.Objects.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Complex\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} CAObject\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Maturity Index:}} Relatively immature\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 A complex object consists of two real objects, a {\i real} and {\i imaginary} part.  Real objects could be arbitrary Computer Algebra Kit objects, but the class has been used so far only for the {\i Gaussian integers} i.e., complex numbers over the integers.  The imaginary unit is represented by the symbol {\i I}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- real:\
+	- real:imaginary:\
+	- copy\
+	- deepCopy\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Identity}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- real\
+	- imaginary\
+	- isReal\
+	- notReal\
+	- hash\
+	- isEqual:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Conjugation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- conjugate\
+	- norm\
+	- asReal\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Addition}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- zero\
+	- isZero\
+	- isOpposite:\
+	- negate\
+	- double\
+	- add:\
+	- subtract:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Multiplication}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- I\
+	- one\
+	- isOne\
+	- isMinusOne\
+	- isUnit\
+	- square\
+	- multiply:\
+	- power:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Complex Division}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- divide:\
+	- inverse\
+	- quotient:\
+	- remainder:quotient:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Greatest Common Divisor}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- gcd:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printOn:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 real:\f0\b0\
+\f0\fs28\li2500 +{\b real}:{\i aReal}\fs16\
+\
+\f0\fs28\li2200 Returns a new complex object with real part set to {\i aReal} and the imaginary part set to the real zero. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 real:imaginary:\f0\b0\
+\f0\fs28\li2500 +{\b real}:{\i aReal}{\b imaginary}:{\i anotherReal}\fs16\
+\
+\f0\fs28\li2200 Returns a new complex object with real part set to {\i aReal} and the imaginary part set to {\i anotherReal}. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 copy\f0\b0\
+\f0\fs28\li2500 -{\b copy}\fs16\
+\
+\f0\fs28\li2200 Returns a new copy of the complex object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deepCopy\f0\b0\
+\f0\fs28\li2500 -{\b deepCopy}\fs16\
+\
+\f0\fs28\li2200 Returns a new copy of the complex object; sends {\b deepCopy} messages to real and imaginary part.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 real\f0\b0\
+\f0\fs28\li2500 -{\b real}\fs16\
+\
+\f0\fs28\li2200 Returns the real part of a complex number. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 imaginary\f0\b0\
+\f0\fs28\li2500 -{\b imaginary}\fs16\
+\
+\f0\fs28\li2200 Returns the imaginary part of a complex number. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isReal\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isReal}\fs16\
+\
+\f0\fs28\li2200 Whether the imaginary part is equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 notReal\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b notReal}\fs16\
+\
+\f0\fs28\li2200 Whether the {\b isReal} returns NO.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hash\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b hash}\fs16\
+\
+\f0\fs28\li2200 Returns a small integer that is the same for objects that are equal in the sense of {\b isEqual:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEqual}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Whether real and imaginary parts are equal to each other.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 conjugate\f0\b0\
+\f0\fs28\li2500 -{\b conjugate}\fs16\
+\
+\f0\fs28\li2200 Returns a new reference to the object if it is real.  Otherwise, returns a new object that is equal to the complex conjugate of the object.  The conjugate of {\i a} + I {\i b} is {\i a} - I {\i b}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 norm\f0\b0\
+\f0\fs28\li2500 -{\b norm}\fs16\
+\
+\f0\fs28\li2200 Returns a new {\i real} object, the norm of the complex object i.e., the object multiplied by its conjugate.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asReal\f0\b0\
+\f0\fs28\li2500 -{\b asReal}\fs16\
+\
+\f0\fs28\li2200 If the imaginary part of the object is zero, this method returns a new reference to the real part of the object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 zero\f0\b0\
+\f0\fs28\li2500 -{\b zero}\fs16\
+\
+\f0\fs28\li2200 Returns a new complex object with real and imaginary part equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isZero\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isZero}\fs16\
+\
+\f0\fs28\li2200 Whether real and imaginary part are equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOpposite:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOpposite}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Whether real and imaginary parts are opposite to each other.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 negate\f0\b0\
+\f0\fs28\li2500 -{\b negate}\fs16\
+\
+\f0\fs28\li2200 Returns a new complex number, by negating real and imaginary parts.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 double\f0\b0\
+\f0\fs28\li2500 -{\b double}\fs16\
+\
+\f0\fs28\li2200 Returns a new complex number, by doubling real and imaginary parts.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 add:\f0\b0\
+\f0\fs28\li2500 -{\b add}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the sum of the complex numbers; adds real and imaginary parts together.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subtract:\f0\b0\
+\f0\fs28\li2500 -{\b subtract}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the difference of the complex numbers; subtracts real and imaginary parts from each other.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 I\f0\b0\
+\f0\fs28\li2500 -{\b I}\fs16\
+\
+\f0\fs28\li2200 Returns a new reference to the imaginary unit.  \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 one\f0\b0\
+\f0\fs28\li2500 -{\b one}\fs16\
+\
+\f0\fs28\li2200 Returns a new object with real part equal to one and imaginary part equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOne}\fs16\
+\
+\f0\fs28\li2200 Whether the complex object is a multiplicative unit.  The complex units consist of the real units and the real units multiplied by the imaginary unit {\i i}.  \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isMinusOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isMinusOne}\fs16\
+\
+\f0\fs28\li2200 Whether the complex object is a multiplicative unit.  The complex units consist of the real units and the real units multiplied by the imaginary unit {\i i}.  \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isUnit\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isUnit}\fs16\
+\
+\f0\fs28\li2200 Whether the complex object is a multiplicative unit.  The complex units consist of the real units and the real units multiplied by the imaginary unit {\i i}.  \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 square\f0\b0\
+\f0\fs28\li2500 -{\b square}\fs16\
+\
+\f0\fs28\li2200 Returns the complex number multiplied by itself, computed by the rule :\fs16\
+\
+\f2\fs24\li2800 (a+I b)^2 == (a^2 - b^2) + I (2 a b)\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 multiply:\f0\b0\
+\f0\fs28\li2500 -{\b multiply}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the product of the two complex numbers, computed by the rule :\fs16\
+\
+\f2\fs24\li2800 (a+I b)(c+I d) == (ac-bd) + I (ad+bc)\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 power:\f0\b0\
+\f0\fs28\li2500 -{\b power}:(int){\i n}\fs16\
+\
+\f0\fs28\li2200 Returns the complex number raised to the {\i n}-th power.  If the object is real, simply computes the {\i n}-th power as a real.  Otherwise, computes the power by the binary exponentation algorithm.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divide:\f0\b0\
+\f0\fs28\li2500 -{\b divide}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the exact quotient of the complex number by the complex number {\i b}.  Multiplies by the conjugate of {\i b} and then divides by the norm of {\i b}, or returns {\b nil} if the latter division is not exact.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inverse\f0\b0\
+\f0\fs28\li2500 -{\b inverse}\fs16\
+\
+\f0\fs28\li2200 Returns the conjugate of the complex number divided by its norm, or {\b nil} if the latter division is not exact.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 quotient:\f0\b0\
+\f0\fs28\li2500 -{\b quotient}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the quotient on division by {\i b}.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} I'm not sure about the algorithm I'm using here !\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 remainder:quotient:\f0\b0\
+\f0\fs28\li2500 -{\b remainder}:{\i b}{\b quotient}:(id *){\i q}\fs16\
+\
+\f0\fs28\li2200 Computes the remainder, and if {\i q} is non-NULL pointer, the quotient on division by {\i b}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 gcd:\f0\b0\
+\f0\fs28\li2500 -{\b gcd}:{\i b}\fs16\
+\
+\f0\fs28\li2200 If both objects are real, returns a complex object with real part set to the (real) gcd of the objects.  Otherwise, computes the greatest common divisor by the Euclidean algorithm.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Prints the number to {\i aStream}.\fs16\
+\
+\fs16\
+\
+\
+}

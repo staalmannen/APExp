@@ -1,0 +1,344 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Portable Object Compiler (c) 1997,98,2003.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Cltn\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} Object\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 This is an abstract superclass for collection classes.\fs16\
+\
+\f0\fs28\li2200 It is useful for implementing functionality, that is inherited by such classes as:\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+	- OrdCltn (Collection)\
+	- Set\
+	- Stack\
+	- SortCltn (Tree)\
+\pard\fs16\
+\
+\f0\fs28\li2200 In addition, this class is necessary for compatibility with Stepstone's ICpak101.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Testing Contents}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- includesAllOf:\
+	- includesAnyOf:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Adding and Removing Contents}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- addAll:\
+	- addContentsOf:\
+	- addContentsTo:\
+	- removeAll:\
+	- removeContentsFrom:\
+	- removeContentsOf:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Combining}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- intersection:\
+	- union:\
+	- difference:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Converting}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- asSet\
+	- asOrdCltn\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Using Blocks}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- detect:\
+	- detect:ifNone:\
+	- select:\
+	- reject:\
+	- collect:\
+	- count:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Making elements perform}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- elementsPerform:\
+	- elementsPerform:with:\
+	- elementsPerform:with:with:\
+	- elementsPerform:with:with:with:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Do Blocks}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- do:\
+	- do:until:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 with:\f0\b0\
+\f0\fs28\li2500 +{\b with}:(int){\i nArgs,...}\fs16\
+\
+\f0\fs28\li2200 Returns a new object with {\i nArgs} elements.  For example,\fs16\
+\
+\f2\fs24\li2800 id aCltn = [OrdCltn with:2,anObject,otherObject];\
+\f0\fs16\
+\f0\fs28\li2200 creates a collection and adds {\i anObject} and {\i otherObject} to it.  In a similar way, {\b Set} or {\b SortCltn} instances can be created like this.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 with:with:\f0\b0\
+\f0\fs28\li2500 +{\b with}:{\i firstObject}{\b with}:{\i nextObject}\fs16\
+\
+\f0\fs28\li2200 This method is equivalent to {\f2 with:} 2,{\i firstObject},{\i nextObject}. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 add:\f0\b0\
+\f0\fs28\li2500 +{\b add}:{\i firstObject}\fs16\
+\
+\f0\fs28\li2200 This method is equivalent to {\f2 with:} 1,{\i firstObject}. \fs16\
+\
+\f0\fs28\li2200 This (factory) method has the same name as the instance method {\f2 add:} and can be used as follows, in circumstances when the user does not want to allocate a collection unless it is actually used :\fs16\
+\
+\f2\fs24\li2800 aCltn = [ (aCltn)?aCltn:OrdCltn add:myObject ];\
+\f0\fs16\
+\f0\fs28\li2200 This shows that creation of the collection is delayed until it is actually needed.  If the collection already exists, objects are simply added, using the instance method {\f2 add:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 includesAllOf:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b includesAllOf}:{\i aCltn}\fs16\
+\
+\f0\fs28\li2200 Answer whether all the elements of {\i aCltn} are in the receiver, by sending {\f2 includes:} for each individual element.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 includesAnyOf:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b includesAnyOf}:{\i aCltn}\fs16\
+\
+\f0\fs28\li2200 Answer whether any element of {\i aCltn} is in the receiver, by sending {\f2 includes:} for each individual element.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 addAll:\f0\b0\
+\f0\fs28\li2500 -{\b addAll}:{\i aCltn}\fs16\
+\
+\f0\fs28\li2200 Adds each member of {\i aCltn} to the receiver.  If {\i aCltn} is {\b nil}, no action is taken.  The argument {\i aCltn} need not be a collection, so long as it responds to {\f2 eachElement} in the same way as collections do.  Returns the receiver.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} If {\i aCltn} is the same object as the receiver, a {\f2 addYourself} message is sent to the object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 addContentsOf:\f0\b0\
+\f0\fs28\li2500 -{\b addContentsOf}:{\i aCltn}\fs16\
+\
+\f0\fs28\li2200 This method is equivalent to {\f2 addAll:} and is provided for Stepstone ICpak101 compatibility.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 addContentsTo:\f0\b0\
+\f0\fs28\li2500 -{\b addContentsTo}:{\i aCltn}\fs16\
+\
+\f0\fs28\li2200 This method is equivalent to {\f2 addAll:}, but with argument and receiver interchanged, and is provided for Stepstone ICpak101 compatibility.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 removeAll:\f0\b0\
+\f0\fs28\li2500 -{\b removeAll}:{\i aCltn}\fs16\
+\
+\f0\fs28\li2200 Removes all of the members of {\i aCltn} from the receiver. The argument {\i aCltn} need not be a collection, as long as it responds to {\f2 eachElement} as collections do.  Returns the receiver. \fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} If {\i aCltn} is the same object as the receiver, it empties itself using {\f2 emptyYourself} and returns the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 removeContentsFrom:\f0\b0\
+\f0\fs28\li2500 -{\b removeContentsFrom}:{\i aCltn}\fs16\
+\
+\f0\fs28\li2200 This method is equivalent to {\f2 removeAll:}, and is provided for compatibility with Stepstone ICpak101.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 removeContentsOf:\f0\b0\
+\f0\fs28\li2500 -{\b removeContentsOf}:{\i aCltn}\fs16\
+\
+\f0\fs28\li2200 This method is equivalent to {\f2 removeAll:}, and is provided for compatibility with Stepstone ICpak101.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intersection:\f0\b0\
+\f0\fs28\li2500 -{\b intersection}:{\i bag}\fs16\
+\
+\f0\fs28\li2200 Returns a new Collection which is the intersection of the receiver and {\i bag}.  The new Collection contains only those elements that were in both the receiver and {\i bag}.  The argument {\i bag} need not be an actual {\b Set} or {\b Bag} instance, as long as it implements {\f2 find:} as Sets do.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 union:\f0\b0\
+\f0\fs28\li2500 -{\b union}:{\i bag}\fs16\
+\
+\f0\fs28\li2200 Returns a new Collection which is the union of the receiver and {\i bag}.  The new Collection returned has all the elements from both the receiver and {\i bag}.  The argument {\i bag} need not be an actual {\b Set} or {\b Bag} instance, as long as it implements {\f2 eachElement:} as Sets and Bags do.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 difference:\f0\b0\
+\f0\fs28\li2500 -{\b difference}:{\i bag}\fs16\
+\
+\f0\fs28\li2200 Returns a new Collection which is the difference of the receiver and {\i bag}.  The new Collection returned has only those elements in the receiver that are not in {\i bag}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asSet\f0\b0\
+\f0\fs28\li2500 -{\b asSet}\fs16\
+\
+\f0\fs28\li2200 Creates a {\b Set} instance and adds the contents of the object to the set.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asOrdCltn\f0\b0\
+\f0\fs28\li2500 -{\b asOrdCltn}\fs16\
+\
+\f0\fs28\li2200 Creates a {\b OrdCltn} instance and adds the contents of the object to the set.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 detect:\f0\b0\
+\f0\fs28\li2500 -{\b detect}:{\i aBlock}\fs16\
+\
+\f0\fs28\li2200 This message returns the first element in the receiver for which {\i aBlock} evaluates to something that is non-nil .  For example, the following :\fs16\
+\
+\f2\fs24\li2800 [ aCltn detect: \{ :each | [each isEqual:anObject] \} ];\
+\f0\fs16\
+\f0\fs28\li2200 Returns {\b nil} if there's no element for which {\i aBlock} evaluates to something that non-nil.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 detect:ifNone:\f0\b0\
+\f0\fs28\li2500 -{\b detect}:{\i aBlock}{\b ifNone}:{\i noneBlock}\fs16\
+\
+\f0\fs28\li2200 This message returns the first element in the receiver for which {\i aBlock} evaluates to something that is non-nil.\fs16\
+\
+\f0\fs28\li2200 Evaluates {\i noneBlock} if there's no element for which {\i aBlock} evaluates to something that is non-nil, and returns the return value of that block.  For example,\fs16\
+\
+\f2\fs24\li2800 [ aCltn detect: \{ :e | [e isEqual:anObject]\} ifNone: \{anObject\} ];\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 select:\f0\b0\
+\f0\fs28\li2500 -{\b select}:{\i testBlock}\fs16\
+\
+\f0\fs28\li2200 This message will return a subset of the receiver containing all elements for which {\i testBlock} evaluates to an Object that is non-nil.  For example,\fs16\
+\
+\f2\fs24\li2800 [ aCltn select: \{ :each | [each isEqual:anObject] \} ];\
+\f0\fs16\
+\f0\fs28\li2200 Returns a new empty instance of the same class as the receiver, if there's no element for which {\i testBlock} evaluates to something that is non-nil. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 reject:\f0\b0\
+\f0\fs28\li2500 -{\b reject}:{\i testBlock}\fs16\
+\
+\f0\fs28\li2200 Complement of {\f2 select:}\fs16\
+\
+\f0\fs28\li2200 This message will return a subset of the receiver containing all elements for which {\i testBlock} evaluates to nil.  For example,\fs16\
+\
+\f2\fs24\li2800 [ aCltn reject: \{ :each | [each isEqual:anObject] \} ];\
+\f0\fs16\
+\f0\fs28\li2200 Returns a new empty instance of the same class as the receiver, if there's no element for which {\i testBlock} evaluates to nil.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 collect:\f0\b0\
+\f0\fs28\li2500 -{\b collect}:{\i transformBlock}\fs16\
+\
+\f0\fs28\li2200 This message creates and returns a new collection of the same size and type as the receiver. The elements are the result of performing {\i transformBlock} on each element in the receiver (elements for which the Block would return {\b nil} are filtered out).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 count:\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b count}:{\i aBlock}\fs16\
+\
+\f0\fs28\li2200 Evaluate {\i aBlock} with each of the receiver's elements as the argument.  Return the number that answered a non-{\b nil} value.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 elementsPerform:\f0\b0\
+\f0\fs28\li2500 -{\b elementsPerform}:(SEL){\i aSelector}\fs16\
+\
+\f0\fs28\li2200 Send {\i aSelector} to all objects in the collection, starting from the object at offset {\i 0}.  For Stepstone compatibility.  Producer uses this.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 elementsPerform:with:\f0\b0\
+\f0\fs28\li2500 -{\b elementsPerform}:(SEL){\i aSelector}{\b with}:{\i anObject}\fs16\
+\
+\f0\fs28\li2200 Send {\i aSelector} to all objects in the collection, starting from the object at offset {\i 0}.  For Stepstone compatibility.  Producer uses this.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 elementsPerform:with:with:\f0\b0\
+\f0\fs28\li2500 -{\b elementsPerform}:(SEL){\i aSelector}{\b with}:{\i anObject}{\b with}:{\i otherObject}\fs16\
+\
+\f0\fs28\li2200 Send {\i aSelector} to all objects in the collection, starting from the object at offset {\i 0}.  For Stepstone compatibility.  Producer uses this.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 elementsPerform:with:with:with:\f0\b0\
+\f0\fs28\li2500 -{\b elementsPerform}:(SEL){\i aSelector}{\b with}:{\i anObject}{\b with}:{\i otherObject}{\b with}:{\i thirdObj}\fs16\
+\
+\f0\fs28\li2200 Send {\i aSelector} to all objects in the collection, starting from the object at offset {\i 0}.  For Stepstone compatibility.  ICpak201 uses this.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 do:\f0\b0\
+\f0\fs28\li2500 -{\b do}:{\i aBlock}\fs16\
+\
+\f0\fs28\li2200 Evaluates {\i aBlock} for each element in the collection and returns {\b self}.  {\i aBlock} must be a block taking one object (element) as argument; the return value of the block is ignored by this method.\fs16\
+\
+\f0\fs28\li2200 Often, the Block would, as a side-effect, modify a variable, as in:\fs16\
+\
+\f2\fs24\li2800 int count = 0;\
+[contents do: \{ :what | if (what == anObject) count++; \}];\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 do:until:\f0\b0\
+\f0\fs28\li2500 -{\b do}:{\i aBlock}{\b until}:(BOOL*){\i flag}\fs16\
+\
+\f0\fs28\li2200 Evaluates {\i aBlock} for each element in the collection, or until the variable pointed to by {\i flag} becomes true, and returns {\b self}.  {\i aBlock} must be a block taking one object (element) as argument; the return value of the block is ignored by this method.\fs16\
+\
+\f0\fs28\li2200 Typically the Block will modify the variable {\i flag} when some condition holds:\fs16\
+\
+\f2\fs24\li2800 BOOL found = NO;\
+[contents do:\{ :what | if (what == findObject) found=YES;\} until:&found];\
+if (found) \{ ... \}\
+\f0\fs16\
+\fs16\
+\
+\
+}

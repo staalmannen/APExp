@@ -1,0 +1,66 @@
+#!/bin/sh -e
+#Portable Object Compiler (c) 1997 .. 2016.  All Rights Reserved.
+#$Id: objc.SlackBuild,v 1.3 2019/03/17 17:44:16 stes Exp $
+
+CWD=$(pwd)
+
+if [ "$TMP" = "" ]; then
+  TMP=/tmp
+fi
+
+VERSION=3.3.11
+PKG_VERSION=$VERSION
+ARCH=${ARCH:-x86_64}
+BUILD=${BUILD:-1_stes}
+APP=objc
+PKG=$TMP/package-$APP
+INSTALLDIR=$PKG/usr
+BINDIR=$INSTALLDIR/bin
+# the configure script is using lib64 or lib
+case $ARCH in
+  x86_64) 
+    LIBDIR=$INSTALLDIR/lib64;;
+  *) 
+    LIBDIR=$INSTALLDIR/lib;;
+esac
+MANDIR=$INSTALLDIR/share/man
+HDRDIR=$INSTALLDIR/include
+
+rm -rf $PKG
+mkdir -p $TMP $PKG $MANDIR $INSTALLDIR
+rm -rf $TMP/$APP-$VERSION
+
+cd $TMP || exit 1
+tar -zxvf $CWD/$APP-$VERSION.tar.gz || exit 1
+cd $APP-$VERSION || exit 1
+
+./configure OBJCDIR=/usr\
+  --prefix=$INSTALLDIR \
+  --build=$ARCH-slackware-linux \
+  --host=$ARCH-slackware-linux 
+
+make compiler
+
+make install || exit
+
+# slackware docs
+mkdir -p $PKG/usr/doc/$APP-$VERSION
+cp -a pkg/objc.SlackBuild Beos.txt Books.txt Changes.txt Ibmvac.txt Install.txt Intro.txt Lcc.txt License.txt Mpw.txt Platform.txt Readme.txt Visual.txt Vms.txt Watcom.txt $PKG/usr/doc/$APP-$VERSION
+find $PKG/usr/doc/$APP-$VERSION -type f -exec chmod 644 {} \;
+
+# Create the ./install directory and copy the slack-desc into it
+mkdir -p $PKG/install
+cat $CWD/slack-desc > $PKG/install/slack-desc
+
+# Compress man pages to save space
+if [ -d $MANDIR ]; then
+  ( cd $MANDIR
+  find . -type f -exec gzip -9 {} \;
+  for i in $(find . -type l) ; do ln -s $(readlink $i).gz $i.gz ; rm $i ; done
+  ) 
+fi
+
+# Build the package
+cd $PKG
+/sbin/makepkg -l y -c n $TMP/$APP-$PKG_VERSION-$ARCH-$BUILD.tgz
+

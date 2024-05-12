@@ -1,0 +1,458 @@
+.TH "point" 3 "Mar 12, 2023"
+.SH Point
+.PP
+.B
+Inherits from:
+
+Object
+.SH Class Description
+.PP
+.B
+Point
+instances are implemented as pairs of two C integers\&.   This is partly because of compatibility with the corresponding ICpak101 class, and partly because it (as opposed to some floating point arithmetic) gives portable results for equality testing\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* new
+.br
+* x:y:
+.RE
+.PP 
+.B
+Instance Variables
+.RS 3
+.br
+* x:y:
+.br
+* x:
+.br
+* y:
+.br
+* x
+.br
+* y
+.RE
+.PP 
+.B
+Comparing
+.RS 3
+.br
+* hash
+.br
+* isEqual:
+.br
+* isBelow:
+.br
+* isAbove:
+.br
+* isLeft:
+.br
+* isRight:
+.RE
+.PP 
+.B
+Point Arithmetic
+.RS 3
+.br
+* moveBy:
+.br
+* moveBy::
+.br
+* moveTo:
+.br
+* plus:
+.br
+* translateBy:
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.br
+* fileOutOn:
+.br
+* fileInFrom:
+.RE
+.SH Methods
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+Returns the point (0,0)\&.
+.PP 
+x:y:
+.RS 1
++
+.B
+x
+:(int)
+.I
+x
+.B
+y
+:(int)
+.I
+y
+.RE
+.PP
+Returns the point (x,y)\&.
+.PP 
+x:y:
+.RS 1
+-
+.B
+x
+:(int)
+.I
+x
+.B
+y
+:(int)
+.I
+y
+.RE
+.PP
+Resets the coordinates of an existing point to (x,y)\&.
+.PP 
+x:
+.RS 1
+-
+.B
+x
+:(int)
+.I
+x
+.RE
+.PP
+Resets the 
+.I
+xLoc
+coordinate\&.  Returns the receiver\&.
+.PP 
+y:
+.RS 1
+-
+.B
+y
+:(int)
+.I
+y
+.RE
+.PP
+Resets the 
+.I
+yLoc
+coordinate\&.  Returns the receiver\&.
+.PP 
+x
+.RS 1
+- (
+int
+)
+.B
+x
+.RE
+.PP
+Returns 
+.I
+xLoc
+as 
+.I
+int
+value\&.
+.PP 
+y
+.RS 1
+- (
+int
+)
+.B
+y
+.RE
+.PP
+Returns 
+.I
+yLoc
+as 
+.I
+int
+value\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a hash value based on the values of 
+.I
+xLoc
+and 
+.I
+yLoc
+\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+aPoint
+.RE
+.PP
+Returns YES if both arguments are instances of 
+.B
+Point
+(or of a subclass of Point) and if they have the same coordinates\&.
+.PP 
+isBelow:
+.RS 1
+- (
+BOOL
+)
+.B
+isBelow
+:
+.I
+aPoint
+.RE
+.PP
+Returns YES if the receiver\&'s 
+.I
+y
+coordinate is greater than the 
+.I
+y
+coordinate of 
+.I
+aPoint
+\&.
+.PP 
+isAbove:
+.RS 1
+- (
+BOOL
+)
+.B
+isAbove
+:
+.I
+aPoint
+.RE
+.PP
+Returns YES if the receiver\&'s 
+.I
+y
+coordinate is less than the 
+.I
+y
+coordinate of 
+.I
+aPoint
+\&.
+.PP 
+isLeft:
+.RS 1
+- (
+BOOL
+)
+.B
+isLeft
+:
+.I
+aPoint
+.RE
+.PP
+Returns YES if the receiver\&'s 
+.I
+x
+coordinate is less than the 
+.I
+x
+coordinate of 
+.I
+aPoint
+\&.
+.PP 
+isRight:
+.RS 1
+- (
+BOOL
+)
+.B
+isRight
+:
+.I
+aPoint
+.RE
+.PP
+Returns YES if the receiver\&'s 
+.I
+x
+coordinate is greater than the 
+.I
+x
+coordinate of 
+.I
+aPoint
+\&.
+.PP 
+moveBy:
+.RS 1
+-
+.B
+moveBy
+:
+.I
+aPoint
+.RE
+.PP
+Adds coordinates of 
+.I
+aPoint
+to the receiver\&.  Unlike 
+.B
+plus:
+, this method does not return a new object\&.
+.PP 
+moveBy::
+.RS 1
+-
+.B
+moveBy
+:(int)
+.I
+x
+:(int)
+.I
+y
+.RE
+.PP
+Adds 
+.I
+x
+and 
+.I
+y
+coordinates of 
+.I
+aPoint
+to the receiver\&.  Unlike 
+.B
+plus:
+, this method does not return a new object\&.
+.PP 
+moveTo:
+.RS 1
+-
+.B
+moveTo
+:
+.I
+aPoint
+.RE
+.PP
+Copies the coordinates of 
+.I
+aPoint
+into the receiver\&.  Typically used for translation\&.
+.PP 
+plus:
+.RS 1
+-
+.B
+plus
+:
+.I
+aPoint
+.RE
+.PP
+This method is like 
+.B
+moveBy:
+but it returns a 
+.B
+new
+point instance\&.
+.PP 
+translateBy:
+.RS 1
+-
+.B
+translateBy
+:
+.I
+aPoint
+.RE
+.PP
+This method is like 
+.B
+moveBy:
+but it returns a 
+.B
+new
+point instance\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints 
+.I
+x
+and 
+.I
+y
+coordinates inside parenthesis\&.
+.PP 
+fileOutOn:
+.RS 1
+-
+.B
+fileOutOn
+:
+.I
+aFiler
+.RE
+.PP
+Writes the point on 
+.I
+aFiler
+\&.  Returns the receiver\&.
+.PP 
+fileInFrom:
+.RS 1
+-
+.B
+fileInFrom
+:
+.I
+aFiler
+.RE
+.PP
+Reads the point from 
+.I
+aFiler
+\&.  Returns the receiver\&.

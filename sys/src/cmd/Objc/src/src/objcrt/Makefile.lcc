@@ -1,0 +1,90 @@
+
+#
+# Portable Object Compiler
+# $Id: Makefile.lcc,v 1.4 2003/10/11 19:28:09 stes Exp $
+#
+
+#
+# This Makefile should work with LCC make 
+#
+
+.SILENT:
+
+MKDIR=mkdir
+OBJC=objc
+RM=del
+CP=copy
+AR=lcclib
+FINAL_AR=echo
+RANLIB=echo
+MAKE=make
+DBG_MFLAGS=-q -g
+
+# Uncomment next line for Boehm gc support
+# OPT_MFLAGS=-q -DNDEBUG -DOBJCRTBOEHM
+
+# Uncomment for no Boehm support 
+OPT_MFLAGS=-q -DNDEBUG
+
+DLL_MFLAGS=-q -DNDEBUG -pic -DOBJCRTDLL
+OBJSUFFIX=obj
+LIBSUFFIX=lib
+BOOTDIR=..\..
+LIBDIR=$(BOOTDIR)\lib
+BINDIR=$(BOOTDIR)\bin
+IFLAGS=-noI
+
+# Uncomment next line to build static runtime
+MFLAGS=$(OPT_MFLAGS)
+
+# Uncomment next line to build dynamic runtime
+# MFLAGS=$(DLL_MFLAGS)
+
+.SUFFIXES: .m 
+
+LIBRARY=objcrt.lib
+DLL=objcrt.dll
+
+OBJFILES=\
+	Object.obj\
+	Block.obj\
+	Message.obj\
+	Exceptn.obj\
+	OutOfMem.obj\
+	objcrt.obj
+
+.m.obj:
+	$(OBJC) -c $*.m $(MFLAGS) $(IFLAGS)
+
+# Uncomment next line to build static runtime
+ALL : $(LIBRARY)
+	
+# Uncomment next line to build dynamic runtime
+# ALL : $(DLL)
+
+$(LIBRARY) : $(OBJFILES)
+	$(AR) /OUT:$(LIBRARY) $(OBJFILES)
+	$(RANLIB) $(LIBRARY)
+
+$(DLL) : $(OBJFILES)
+	$(OBJC) -dl $(OBJFILES) -o $(DLL)
+	buildlib objcrt.exp objcrt_s.lib $(DLL)
+
+bootstrap :
+	-$(MKDIR) $(LIBDIR)
+	-$(MKDIR) $(BINDIR)
+	-$(CP) $(LIBRARY) $(LIBDIR)
+
+cleantmp :
+	-$(RM) *.P
+	-$(RM) *.c
+	-$(RM) *.i
+
+clean : cleantmp
+	-$(RM) *.obj
+	-$(RM) *.lib
+
+distclean : clean
+	-$(RM) Makefile 
+	-$(RM) config.h 
+

@@ -1,0 +1,163 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Portable Object Compiler (c) 1997,98,99,03.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 RunArray\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} Cltn\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Maturity Index:}} Experimental\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 This class is used by the {\b Text} class, to associate lists of {\b TextAttribute} instances, to segments of characters in a string (slices of text with the same formatting properties, called {\i runs}).\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Accessing\b0\f0\fs16\
+\
+\f0\fs28\li2200 A {\b RunArray} is {\i not} indexed by segment number.\fs16\
+\
+\f0\fs28\li2200 Rather, it is indexed by character offsets : the message {\f2 at:} or {\f2 runLengthAt:} takes a character offset as argument, and translates this offset to a segment offset (the segment to which the character belongs) and returns the attributes or segment length, for that segment.\fs16\
+\
+\f0\fs28\li2200 The {\f2 size} of a {\b RunArray} is the largest character offset plus one;it is not the number of segments.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- new\
+	- free\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Accessing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- values\
+	- runs\
+	- at:\
+	- runLengthAt:\
+	- size\
+	- addAttribute:from:size:\
+	- at:insert:count:\
+	- deleteFrom:to:\
+	- concat:\
+	- coalesce\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printOn:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 new\f0\b0\
+\f0\fs28\li2500 +{\b new}\fs16\
+\
+\f0\fs28\li2200 Creates an empty RunArray collection.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 free\f0\b0\
+\f0\fs28\li2500 -{\b free}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 values\f0\b0\
+\f0\fs28\li2500 -{\b values}\fs16\
+\
+\f0\fs28\li2200 Returns a collection of OrdCltn instances (each element being a list of {\b TextAttribute} instances).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 runs\f0\b0\
+\f0\fs28\li2500 -{\b runs}\fs16\
+\
+\f0\fs28\li2200 Returns the run array (array of {\i int}).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 at:\f0\b0\
+\f0\fs28\li2500 -{\b at}:(unsigned){\i i}\fs16\
+\
+\f0\fs28\li2200 Returns a collection of TextAttributes for the {\i i}-th character.\fs16\
+\
+\f0\fs28\li2200 This method translates a character offset into a segment number.  The segment number is cached so that a subsequent call to {\f2 at:} or {\f2 runLengthAt:} doesn't have to recompute it.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 runLengthAt:\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b runLengthAt}:(unsigned){\i i}\fs16\
+\
+\f0\fs28\li2200 Returns the number of remaining characters in the string segment to which the character at position {\i i} belongs.  If {\i i} is the first character of a run, this method returns the size of the run.  Otherwise it returns the size minus the index of character in the run.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 size\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b size}\fs16\
+\
+\f0\fs28\li2200 Returns the size of the RunArray, which is the same as the size of the String instance for this RunArray object.\fs16\
+\
+\f0\fs28\li2200 The number of runs can be obtained by sending a {\f2 size} message to the object returned by {\f2 values}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 addAttribute:from:size:\f0\b0\
+\f0\fs28\li2500 -{\b addAttribute}:{\i attrib}{\b from}:(unsigned){\i p}{\b size}:(unsigned){\i s}\fs16\
+\
+\f0\fs28\li2200 Adds {\i attrib} to the attribute lists for the {\i s} characters from position {\i p}.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} This method is optimized for adding at the end of the RunArray.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 at:insert:count:\f0\b0\
+\f0\fs28\li2500 -{\b at}:(unsigned){\i anOffset}{\b insert}:(char*){\i aString}{\b count}:(int){\i n}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deleteFrom:to:\f0\b0\
+\f0\fs28\li2500 -{\b deleteFrom}:(unsigned){\i p}{\b to}:(unsigned){\i q}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 concat:\f0\b0\
+\f0\fs28\li2500 -{\b concat}:{\i b}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 coalesce\f0\b0\
+\f0\fs28\li2500 -{\b coalesce}\fs16\
+\
+\f0\fs28\li2200 Merges adjacent lists of TextAttribute instances, by testing whether they are equal (in the sense of {\b TextAttribute}'s {\f2 isEqual} method).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Prints the RunArray values.\fs16\
+\
+\fs16\
+\
+\
+}

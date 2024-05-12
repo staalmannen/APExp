@@ -1,0 +1,52 @@
+!
+! Portable Object Compiler
+!
+! Makefile for OpenVMS make (like MMS, MMK)
+!
+
+.OBJ.OLB  :
+    @ If F$Search("$(MMS$TARGET)") .EQS. "" Then $(LIBR)/Create $(MMS$TARGET)
+    $(LIBR) $(LIBRFLAGS) $(MMS$TARGET) $(MMS$SOURCE)
+    @ If "$(MMS_DELETE_OBJECT)" Then Delete $(MMS$SOURCE);*
+
+.SUFFIXES : .M
+.M.OBJ    :
+    $(OBJC) $(OBJCFLAGS) $(MMS$SOURCE)
+OBJC  	    = OBJC
+OBJCFLAGS   = 
+
+LINK	    = LINK
+LINKFLAGS   = /EXEC=$(MMS$TARGET)
+
+.FIRST
+    @ Define  OC_INCLUDE_DIRECTORY SYS$DISK:[]
+
+!
+!
+!
+
+*    : -
+ objcrt.olb
+    @ continue
+
+OBJS =	-
+-
+ OBJCRT(block)  ,-
+ OBJCRT(message),-
+ OBJCRT(exceptn),-
+ OBJCRT(outofmem),-
+ OBJCRT(objcrt) ,-
+ OBJCRT(object) 
+
+objcrt.olb  : -
+ $(OBJS)
+    @ continue
+
+cleantmp    : 
+    - Delete *.i;*
+    - Delete *.c;*
+
+clean       : -
+ cleantmp
+    - Delete *.obj;*
+    - Delete *.olb;*

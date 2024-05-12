@@ -1,0 +1,892 @@
+.TH "term" 3 "Mar 12, 2023"
+.SH Term
+.PP
+.B
+Inherits from:
+
+CAObject
+.SH Class Description
+.PP
+Maturity Index : Relatively Mature
+.PP
+A term consists of a 
+.I
+coefficient
+multiplied by a 
+.I
+symbol
+raised to an integral 
+.I
+exponent
+\&.  The coefficient is a scalar object or a polynomial\&.  The symbol object is 
+.B
+nil
+if the exponent is equal to zero\&.
+.SH Recursive Polynomials
+.PP
+A polynomial in recursive representation is a sum of terms\&.  If the polynomial is variable sparse, each symbol can be different and the coefficients of the terms are scalar objects or again variable sparse polynomials; if the coefficient is not a scalar object, then the exponent of the term cannot be zero (for example, the term 3 
+.I
+x
+^0 
+.I
+y
+^2 
+.I
+z
+^0 is reduced to 3 
+.I
+y
+^2 in the variable sparse case)\&.  If the polynomial is variable dense, all symbols are equal to each other and the coefficients are either 
+.I
+all
+scalar objects or again 
+.I
+all
+variable dense polynomials; the exponent of a term may be zero, even if the coefficient is a polynomial (3 
+.I
+x
+^0 
+.I
+y
+^2 
+.I
+z
+^0 is a valid object in the variable dense case)\&.  In a degree dense polynomial, the coefficients of the terms can be zero; in a degree sparse polynomial they cannot\&.
+.SH Monomials
+.PP
+A monomial is a product of terms\&.  The coefficients of the terms of a monomial are scalar objects that are equal to one (but it\&'s possible to insert terms with a non-trivial coefficient)\&.  In a variable dense monomial, the exponents of the terms can be equal to zero; in a variable sparse monomial, they cannot\&.
+.SH Factors
+.PP
+A factored polynomial is a product of terms\&.  The coefficients of the terms in the factorization are scalar objects, mostly equal to one, but they can store the content extracted out of the (primitive) factors\&.  The symbol (nucleus) objects of the terms are polynomials i\&.e\&., the factors in the factorization\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* scalar:symbol:exponent:
+.br
+* coefficient:symbol:exponent:
+.br
+* copy
+.br
+* deepCopy
+.RE
+.PP 
+.B
+Identity
+.RS 3
+.br
+* scalarZero
+.br
+* coefficient
+.br
+* symbol
+.br
+* exponent
+.br
+* degree
+.br
+* hash
+.br
+* isEqual:
+.br
+* compareExponents:
+.RE
+.PP 
+.B
+Coercion
+.RS 3
+.br
+* intValue
+.br
+* intValue:
+.br
+* floatValue
+.br
+* floatValue:
+.br
+* asScalar
+.br
+* asSymbol
+.RE
+.PP 
+.B
+Addition
+.RS 3
+.br
+* zero
+.br
+* isZero
+.br
+* isOpposite:
+.br
+* negate
+.br
+* double
+.br
+* add:
+.br
+* subtract:
+.RE
+.PP 
+.B
+Multiplication
+.RS 3
+.br
+* one
+.br
+* isOne
+.br
+* isMinusOne
+.br
+* square
+.br
+* inverse
+.br
+* multiplyScalar:
+.br
+* multiplyCoefficient:
+.br
+* multiply:
+.br
+* divideScalar:
+.br
+* divideCoefficient:
+.br
+* divide:
+.RE
+.PP 
+.B
+Exponentation
+.RS 3
+.br
+* power:
+.br
+* root:
+.br
+* squareRoot
+.RE
+.PP 
+.B
+Characteristic
+.RS 3
+.br
+* frobenius
+.br
+* frobeniusInverse
+.RE
+.PP 
+.B
+Derivation and Integration
+.RS 3
+.br
+* derive
+.br
+* integrate
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printsLeadingSign
+.br
+* printsSum
+.br
+* printsProduct
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+scalar:symbol:exponent:
+.RS 1
++
+.B
+scalar
+:
+.I
+aScalar
+.B
+symbol
+:
+.I
+aSymbol
+.B
+exponent
+:(int)
+.I
+anExponent
+.RE
+.PP
+Creates a new term with coefficient, symbol and exponent set to the specified objects\&.  This method sets 
+.I
+scalarZero
+to the zero element for 
+.I
+aScalar
+\&.
+.PP 
+coefficient:symbol:exponent:
+.RS 1
++
+.B
+coefficient
+:
+.I
+aCoefficient
+.B
+symbol
+:
+.I
+aSymbol
+.B
+exponent
+:(int)
+.I
+anExponent
+.RE
+.PP
+Creates a new term with coefficient, symbol and exponent set to the specified objects\&.  This method sets 
+.I
+scalarZero
+to the zero element obtained by sending 
+.B
+scalarZero
+to 
+.I
+aCoefficient
+\&.
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Copies the term object, and if the coefficient is a scalar object, adds a reference to it\&.  If the coefficient is a polynomial, makes a copy of it\&. 
+.PP
+.B
+See also:
+
+copy (Polynomial)
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+Makes deep copies of the term object and its coefficient and symbol\&. 
+.PP
+.B
+See also:
+
+deepCopy (Polynomial)
+.PP 
+scalarZero
+.RS 1
+-
+.B
+scalarZero
+.RE
+.PP
+Returns the zero scalar of the term\&.
+.PP 
+coefficient
+.RS 1
+-
+.B
+coefficient
+.RE
+.PP
+Returns the coefficient of the term\&.
+.PP 
+symbol
+.RS 1
+-
+.B
+symbol
+.RE
+.PP
+Returns the symbol of the term\&.  If the exponent of the term is equal to zero, this method returns 
+.B
+nil
+\&.
+.PP 
+exponent
+.RS 1
+- (
+int
+)
+.B
+exponent
+.RE
+.PP
+Returns the exponent of the term\&.  If the exponent is equal to zero, the symbol of the term is equal to 
+.B
+nil
+\&.
+.PP 
+degree
+.RS 1
+- (
+int
+)
+.B
+degree
+.RE
+.PP
+Equivalent to 
+.B
+exponent
+\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a small integer that is the same for terms that are equal (in the sense of 
+.B
+isEqual:
+)\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+b
+.RE
+.PP
+Two terms are equal if they are pointer equal or if the coefficients are equal, if the exponents are equal and if the symbols are equal (or both 
+.B
+nil
+)\&.
+.PP 
+compareExponents:
+.RS 1
+- (
+int
+)
+.B
+compareExponents
+:
+.I
+b
+.RE
+.PP
+Compares two terms with respect to symbols and exponents; this imposes an ordering for the terms in 
+.I
+variable sparse
+polynomials\&.  Returns zero if the terms are pointer equal\&.  A term with symbol 
+.B
+nil
+is less than a term with non-nil symbol\&.  Compares the symbols, and if they are equal, compares the exponents\&.
+.PP 
+intValue
+.RS 1
+- (
+int
+)
+.B
+intValue
+.RE
+.PP
+Returns, if the exponent is equal to zero, the intValue of the coefficient\&.  If not, generates an error message\&.
+.PP 
+intValue:
+.RS 1
+-
+.B
+intValue
+:(int)
+.I
+aValue
+.RE
+.PP
+Returns a new term with exponent equal to zero and with a coefficient whose value as 
+.B
+int
+is equal to 
+.I
+aValue
+\&.
+.PP 
+floatValue
+.RS 1
+- (
+float
+)
+.B
+floatValue
+.RE
+.PP
+Returns, if the exponent is equal to zero, the floatValue of the coefficient\&.  If not, generates an error message\&.
+.PP 
+floatValue:
+.RS 1
+-
+.B
+floatValue
+:(float)
+.I
+aValue
+.RE
+.PP
+Returns a term with exponent equal to zero and with a coefficient whose value as 
+.B
+float
+is equal to 
+.I
+aValue
+\&.
+.PP 
+asScalar
+.RS 1
+-
+.B
+asScalar
+.RE
+.PP
+Returns the term as scalar object\&.  Returns 
+.B
+nil
+if the exponent of the term is not equal to zero\&.  If the coefficient of the term is a scalar, the method returns a new reference to it, otherwise the coefficient is a polynomial and the method returns the scalar value of it\&.  Note that in the variable sparse case, a term that is a scalar must have a scalar object as coefficient i\&.e\&., the term is always simplified\&.
+.PP 
+asSymbol
+.RS 1
+-
+.B
+asSymbol
+.RE
+.PP
+Returns the term as symbol object\&.  If the exponent of the term is zero and if the coefficient is a polynomial, returns the symbol value of the polynomial\&.  If the exponent is equal to one and the coefficient is one, returns a new reference to the symbol of the term\&.  Otherwise returns 
+.B
+nil
+\&.
+.PP 
+zero
+.RS 1
+-
+.B
+zero
+.RE
+.PP
+Returns a new term with coefficient equal to the zero element for the coefficient of the term that receives the message\&.
+.PP 
+isZero
+.RS 1
+- (
+BOOL
+)
+.B
+isZero
+.RE
+.PP
+Whether the coefficient of the term is equal to zero\&.  The exponent of the term may be non-zero\&.
+.PP 
+isOpposite:
+.RS 1
+- (
+BOOL
+)
+.B
+isOpposite
+:
+.I
+b
+.RE
+.PP
+Whether the coefficients of the term are opposite, and the exponents and symbols are equal to each other\&.
+.PP 
+negate
+.RS 1
+-
+.B
+negate
+.RE
+.PP
+Negates the coefficient of the term\&.
+.PP 
+double
+.RS 1
+-
+.B
+double
+.RE
+.PP
+Doubles the coefficient of the term\&.
+.PP 
+add:
+.RS 1
+-
+.B
+add
+:
+.I
+b
+.RE
+.PP
+Returns a new term that is the sum of the two terms i\&.e\&., the coefficients are added together using 
+.B
+add:
+or 
+.B
+addScalar:
+\&.  The exponents must be equal and the symbols must be both 
+.B
+nil
+or equal to each other\&.
+.PP 
+subtract:
+.RS 1
+-
+.B
+subtract
+:
+.I
+b
+.RE
+.PP
+Returns a new term that is the difference of the two terms i\&.e\&., the coefficients are subtracted from each other using 
+.B
+subtract:
+or 
+.B
+subtractScalar:
+\&.  The exponents must be equal and the symbols must be both 
+.B
+nil
+or equal to each other\&.
+.PP 
+one
+.RS 1
+-
+.B
+one
+.RE
+.PP
+Returns a term with coefficient equal to one\&.
+.PP 
+isOne
+.RS 1
+- (
+BOOL
+)
+.B
+isOne
+.RE
+.PP
+Whether the coefficient is one and the exponent is equal to zero\&.
+.PP 
+isMinusOne
+.RS 1
+- (
+BOOL
+)
+.B
+isMinusOne
+.RE
+.PP
+Whether the coefficient is minus one and the exponent is equal to zero\&.
+.PP 
+square
+.RS 1
+-
+.B
+square
+.RE
+.PP
+Squares coefficient and multiplies exponent by two\&.
+.PP 
+inverse
+.RS 1
+-
+.B
+inverse
+.RE
+.PP
+Inverts coefficient and negates the exponent\&.  Returns 
+.B
+nil
+if the coefficient has no inverse\&.
+.PP 
+multiplyScalar:
+.RS 1
+-
+.B
+multiplyScalar
+:
+.I
+b
+.RE
+.PP
+Returns a new term; multiplies the coefficient of the term by the scalar object 
+.I
+b
+, using 
+.B
+multiply:
+if the coefficient of the term is a scalar object, or 
+.B
+multiplyScalar:
+otherwise\&.  The symbol and exponent of the resulting term are equal to that of the original term\&.
+.PP 
+multiplyCoefficient:
+.RS 1
+-
+.B
+multiplyCoefficient
+:
+.I
+b
+.RE
+.PP
+Returns a new term; multiplies the coefficient of the term by the coefficient object 
+.I
+b
+, which must be an instance of the same class as the coefficient of the term\&.  The symbol and exponent of the resulting term are equal to that of the original term\&.  The method is implemented only for terms of variable dense (recursive) polynomials\&.
+.PP 
+multiply:
+.RS 1
+-
+.B
+multiply
+:
+.I
+b
+.RE
+.PP
+Returns a new term that is the product of the two terms i\&.e\&., the exponents are added together and the coefficients are multiplied using 
+.B
+multiply:
+or 
+.B
+multiplyScalar:
+\&.  If the exponents are both non-zero, then the symbols must be equal to each other\&.  If one of the terms has exponent equal to zero, then the symbol of the resulting term is equal to that of the term with non-zero exponent\&.
+.PP 
+divideScalar:
+.RS 1
+-
+.B
+divideScalar
+:
+.I
+b
+.RE
+.PP
+Returns a new term; divides the coefficient of the term by the scalar object 
+.I
+b
+, using 
+.B
+divide:
+if the coefficient of the term is a scalar object, or 
+.B
+divideScalar:
+otherwise\&.  The symbol and exponent of the resulting term are equal to that of the original term\&.  Returns 
+.B
+nil
+if the scalar division is not exact\&.
+.PP 
+divideCoefficient:
+.RS 1
+-
+.B
+divideCoefficient
+:
+.I
+b
+.RE
+.PP
+Returns a new term; divides the coefficient of the term by the object 
+.I
+b
+, which is an instance of the same class as the coefficient\&.  The symbol and exponent of the resulting term are equal to that of the original term\&.  Returns 
+.B
+nil
+if the division is not exact\&.  The method is implemented only for terms of a variable dense polynomial\&.
+.PP 
+divide:
+.RS 1
+-
+.B
+divide
+:
+.I
+b
+.RE
+.PP
+Returns a new term that is the exact quotient of the two terms i\&.e\&., the exponents are subtracted from each other and the coefficients are divided using 
+.B
+divide:
+or 
+.B
+divideScalar:
+\&.  If the exponents are both non-zero, then the symbols must be equal to each other\&.  If one of the terms has exponent equal to zero, then the symbol of the resulting term is equal to that of the term with non-zero exponent\&.  Returns 
+.B
+nil
+if the exponent of the divisor is greater than that of the dividend, or if the coefficient division fails\&.
+.PP 
+power:
+.RS 1
+-
+.B
+power
+:(int)
+.I
+n
+.RE
+.PP
+Raises coefficient to the 
+.I
+n
+-th power and multiplies exponent by 
+.I
+n
+\&.
+.PP 
+root:
+.RS 1
+-
+.B
+root
+:(int)
+.I
+n
+.RE
+.PP
+Takes the 
+.I
+n
+-th root of the coefficient and divides exponent by 
+.I
+n
+\&.  Returns 
+.B
+nil
+if the coefficient is not an 
+.I
+n
+-th power or if the exponent is not divisible by 
+.I
+n
+\&.
+.PP 
+squareRoot
+.RS 1
+-
+.B
+squareRoot
+.RE
+.PP
+Takes the square root of the coefficient and divides exponent by two\&.  Returns 
+.B
+nil
+if the coefficient is not a square or if the exponent is not divisible by two\&.
+.PP 
+frobenius
+.RS 1
+-
+.B
+frobenius
+.RE
+.PP
+Returns the 
+.I
+p
+-th power of the term, obtained by raising the term to a power equal to the characteric of the coefficient\&.
+.PP 
+frobeniusInverse
+.RS 1
+-
+.B
+frobeniusInverse
+.RE
+.PP
+Returns either 
+.B
+nil
+(if the term is not a 
+.I
+p
+-th power) or a new term that is the 
+.I
+p
+-th root of the term\&.
+.PP 
+derive
+.RS 1
+-
+.B
+derive
+.RE
+.PP
+Returns the derivative with respect to the variable\&.
+.PP 
+integrate
+.RS 1
+-
+.B
+integrate
+.RE
+.PP
+Integrates with respect to the variable\&.
+.PP 
+printsLeadingSign
+.RS 1
+- (
+BOOL
+)
+.B
+printsLeadingSign
+.RE
+.PP
+Whether the term prints a leading minus sign\&.
+.PP 
+printsSum
+.RS 1
+- (
+BOOL
+)
+.B
+printsSum
+.RE
+.PP
+Whether the term prints a sum\&.
+.PP 
+printsProduct
+.RS 1
+- (
+BOOL
+)
+.B
+printsProduct
+.RE
+.PP
+Whether the term prints a single product\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints, between braces, a comma separated list of the members\&.  If there are no members, the method prints two braces\&. 

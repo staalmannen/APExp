@@ -1,0 +1,183 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Portable Object Compiler (c) 1998.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 IntArray\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} Array\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 {\b IntArray} instances are used to hold regular, small, C integers (of type {\b int}).  This class is somewhat similar to {\b String}, the difference being that a String is an Array of bytes, while this class provides a somewhat similar API to {\i strings of int}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- new\
+	- new:\
+	- with:\
+	- copy\
+	- deepCopy\
+	- free\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Interrogation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- size\
+	- intAt:\
+	- intAt:put:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Resizing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- capacity\
+	- capacity:\
+	- packContents\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printOn:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Archiving}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- fileOutOn:\
+	- fileInFrom:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 new\f0\b0\
+\f0\fs28\li2500 +{\b new}\fs16\
+\
+\f0\fs28\li2200 Creates an instance whose value is set to the empty array.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 new:\f0\b0\
+\f0\fs28\li2500 +{\b new}:(unsigned){\i n}\fs16\
+\
+\f0\fs28\li2200 Creates an instance of {\i n} zeroes.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 with:\f0\b0\
+\f0\fs28\li2500 +{\b with}:(int){\i nArgs,...}\fs16\
+\
+\f0\fs28\li2200 Creates an instance of {\i nArgs} objects, using a variable number of {\i int} arguments.\fs16\
+\
+\f2\fs24\li2800 id myArray = [IntArray with:3,0,1,2];\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 copy\f0\b0\
+\f0\fs28\li2500 -{\b copy}\fs16\
+\
+\f0\fs28\li2200 Returns a copy of the receiver with its internal C array copied as well.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} - strCopy\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deepCopy\f0\b0\
+\f0\fs28\li2500 -{\b deepCopy}\fs16\
+\
+\f0\fs28\li2200 For this class, this method acts as {\f2 copy}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 free\f0\b0\
+\f0\fs28\li2500 -{\b free}\fs16\
+\
+\f0\fs28\li2200 Frees the receiver and its internal C array as well.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 size\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b size}\fs16\
+\
+\f0\fs28\li2200 Returns the number of integers in the array.  For this class, {\f2 size} is equivalent to {\f2 capacity}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intAt:\f0\b0\
+\f0\fs28\li2500 - (int){\b intAt}:(unsigned){\i anOffset}\fs16\
+\
+\f0\fs28\li2200 Returns the integer at {\i anOffset} or signals the {\b OutOutBounds} exception if {\i anOffset} is greater than the length of the C array.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intAt:put:\f0\b0\
+\f0\fs28\li2500 - (int){\b intAt}:(unsigned){\i anOffset}{\b put}:(int){\i anInt}\fs16\
+\
+\f0\fs28\li2200 Replaces the integer at {\i anOffset} with {\i anInt} and returns the old integer which was in that location.  Generates an out of bounds exception if {\i anOffset} is greater than the length of the array.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 capacity\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b capacity}\fs16\
+\
+\f0\fs28\li2200 Returns the number of integers in the array.  For this class, {\f2 capacity} is equivalent to {\f2 size}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 capacity:\f0\b0\
+\f0\fs28\li2500 -{\b capacity}:(unsigned){\i nSlots}\fs16\
+\
+\f0\fs28\li2200 Changes the capacity to {\i nSlots}.  If {\i nSlots} is larger than the current capacity, the memory added at the end will be zero-filled.  If {\i nSlots} is less than the current capacity, the array is truncated.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 packContents\f0\b0\
+\f0\fs28\li2500 -{\b packContents}\fs16\
+\
+\f0\fs28\li2200 Removes zero elements while preserving the order of elements in the {\b IntArray}.  Used to eliminate the 'hole' left by a {\f2 at:put:} message with a zero argument.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Prints the array to {\i aFile} without appending a newline.  Returns the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 fileOutOn:\f0\b0\
+\f0\fs28\li2500 -{\b fileOutOn}:{\i aFiler}\fs16\
+\
+\f0\fs28\li2200 Writes the array on {\i aFiler}.  Returns the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 fileInFrom:\f0\b0\
+\f0\fs28\li2500 -{\b fileInFrom}:{\i aFiler}\fs16\
+\
+\f0\fs28\li2200 Reads a array object from {\i aFiler}.  Returns the receiver.\fs16\
+\
+\fs16\
+\
+\
+}

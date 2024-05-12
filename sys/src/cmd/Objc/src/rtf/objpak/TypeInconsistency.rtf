@@ -1,0 +1,57 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Portable Object Compiler (c) 2003,2023.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 TypeInconsistency\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} Exception\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Maturity Index:}} Experimental\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 This is a subclass to signal a type descriptor inconsistency, specifically for the {\b AsciiFiler} class.  If a filer scans a decriptor type string that it cannot handle, then it will signal the {\b TypeInconsistency} exception, passing the character that the filer {\i got} and the character that it actually expected ({\i wanted}).\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 gotChar\f0\b0\
+\f0\fs28\li2500 - (char){\b gotChar}\fs16\
+\
+\f0\fs28\li2200 Returns the type descriptor that the filer got.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 wantChar\f0\b0\
+\f0\fs28\li2500 - (char){\b wantChar}\fs16\
+\
+\f0\fs28\li2200 Returns the type descriptor that the filer expected.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 got:wanted:\f0\b0\
+\f0\fs28\li2500 -{\b got}:(char){\i c}{\b wanted}:(char){\i w}\fs16\
+\
+\f0\fs28\li2200 Sets the type descriptors.\fs16\
+\
+\fs16\
+\
+\
+}

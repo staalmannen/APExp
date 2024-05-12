@@ -1,0 +1,227 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Portable Object Compiler (c) 1997,98,99.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Point\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} Object\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 {\b Point} instances are implemented as pairs of two C integers.   This is partly because of compatibility with the corresponding ICpak101 class, and partly because it (as opposed to some floating point arithmetic) gives portable results for equality testing.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- new\
+	- x:y:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Instance Variables}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- x:y:\
+	- x:\
+	- y:\
+	- x\
+	- y\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Comparing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- hash\
+	- isEqual:\
+	- isBelow:\
+	- isAbove:\
+	- isLeft:\
+	- isRight:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Point Arithmetic}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- moveBy:\
+	- moveBy::\
+	- moveTo:\
+	- plus:\
+	- translateBy:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printOn:\
+	- fileOutOn:\
+	- fileInFrom:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 new\f0\b0\
+\f0\fs28\li2500 +{\b new}\fs16\
+\
+\f0\fs28\li2200 Returns the point (0,0).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 x:y:\f0\b0\
+\f0\fs28\li2500 +{\b x}:(int){\i x}{\b y}:(int){\i y}\fs16\
+\
+\f0\fs28\li2200 Returns the point (x,y).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 x:y:\f0\b0\
+\f0\fs28\li2500 -{\b x}:(int){\i x}{\b y}:(int){\i y}\fs16\
+\
+\f0\fs28\li2200 Resets the coordinates of an existing point to (x,y).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 x:\f0\b0\
+\f0\fs28\li2500 -{\b x}:(int){\i x}\fs16\
+\
+\f0\fs28\li2200 Resets the {\i xLoc} coordinate.  Returns the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 y:\f0\b0\
+\f0\fs28\li2500 -{\b y}:(int){\i y}\fs16\
+\
+\f0\fs28\li2200 Resets the {\i yLoc} coordinate.  Returns the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 x\f0\b0\
+\f0\fs28\li2500 - (int){\b x}\fs16\
+\
+\f0\fs28\li2200 Returns {\i xLoc} as {\i int} value.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 y\f0\b0\
+\f0\fs28\li2500 - (int){\b y}\fs16\
+\
+\f0\fs28\li2200 Returns {\i yLoc} as {\i int} value.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hash\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b hash}\fs16\
+\
+\f0\fs28\li2200 Returns a hash value based on the values of {\i xLoc} and {\i yLoc}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEqual}:{\i aPoint}\fs16\
+\
+\f0\fs28\li2200 Returns YES if both arguments are instances of {\b Point} (or of a subclass of Point) and if they have the same coordinates.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isBelow:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isBelow}:{\i aPoint}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the receiver's {\i y} coordinate is greater than the {\i y} coordinate of {\i aPoint}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isAbove:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isAbove}:{\i aPoint}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the receiver's {\i y} coordinate is less than the {\i y} coordinate of {\i aPoint}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isLeft:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isLeft}:{\i aPoint}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the receiver's {\i x} coordinate is less than the {\i x} coordinate of {\i aPoint}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isRight:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isRight}:{\i aPoint}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the receiver's {\i x} coordinate is greater than the {\i x} coordinate of {\i aPoint}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 moveBy:\f0\b0\
+\f0\fs28\li2500 -{\b moveBy}:{\i aPoint}\fs16\
+\
+\f0\fs28\li2200 Adds coordinates of {\i aPoint} to the receiver.  Unlike {\f2 plus:}, this method does not return a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 moveBy::\f0\b0\
+\f0\fs28\li2500 -{\b moveBy}:(int){\i x}:(int){\i y}\fs16\
+\
+\f0\fs28\li2200 Adds {\i x} and {\i y} coordinates of {\i aPoint} to the receiver.  Unlike {\f2 plus:}, this method does not return a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 moveTo:\f0\b0\
+\f0\fs28\li2500 -{\b moveTo}:{\i aPoint}\fs16\
+\
+\f0\fs28\li2200 Copies the coordinates of {\i aPoint} into the receiver.  Typically used for translation.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 plus:\f0\b0\
+\f0\fs28\li2500 -{\b plus}:{\i aPoint}\fs16\
+\
+\f0\fs28\li2200 This method is like {\f2 moveBy:} but it returns a {\b new} point instance.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 translateBy:\f0\b0\
+\f0\fs28\li2500 -{\b translateBy}:{\i aPoint}\fs16\
+\
+\f0\fs28\li2200 This method is like {\f2 moveBy:} but it returns a {\b new} point instance.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Prints {\i x} and {\i y} coordinates inside parenthesis.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 fileOutOn:\f0\b0\
+\f0\fs28\li2500 -{\b fileOutOn}:{\i aFiler}\fs16\
+\
+\f0\fs28\li2200 Writes the point on {\i aFiler}.  Returns the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 fileInFrom:\f0\b0\
+\f0\fs28\li2500 -{\b fileInFrom}:{\i aFiler}\fs16\
+\
+\f0\fs28\li2200 Reads the point from {\i aFiler}.  Returns the receiver.\fs16\
+\
+\fs16\
+\
+\
+}

@@ -1,0 +1,149 @@
+<HTML>
+<TITLE>dictnary Specification Sheet</TITLE>
+<H1>dictnary Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 1997,98.  All Rights Reserved.<P>
+<H1>Dictionary</H1>
+<B>Inherits from:</B> Object<P>
+<H2>Class Description</H2>
+Dictionaries (instances of the <B>Dictionary</B> class) are key-value tables : to each key object, a value object is associated.  The key can then be used to access the corresponding value.  There are a few special provisions for tables with <B>String</B> instances as keys.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#0">new</A></LI>
+<LI><A HREF="#2">copy</A></LI>
+<LI><A HREF="#4">deepCopy</A></LI>
+<LI><A HREF="#5">emptyYourself</A></LI>
+<LI><A HREF="#6">freeContents</A></LI>
+<LI><A HREF="#7">freeAll</A></LI>
+<LI><A HREF="#8">free</A></LI>
+</UL>
+<H3><B>Interrogation</B></H3>
+<UL>
+<LI><A HREF="#12">size</A></LI>
+<LI><A HREF="#13">isEmpty</A></LI>
+<LI><A HREF="#14">includesKey:</A></LI>
+</UL>
+<H3><B>Comparing</B></H3>
+<UL>
+<LI><A HREF="#15">hash</A></LI>
+<LI><A HREF="#16">isEqual:</A></LI>
+</UL>
+<H3><B>Indexed Access</B></H3>
+<UL>
+<LI><A HREF="#18">atKey:</A></LI>
+<LI><A HREF="#19">atKey:ifAbsent:</A></LI>
+<LI><A HREF="#20">atKeySTR:</A></LI>
+<LI><A HREF="#21">atKey:put:</A></LI>
+<LI><A HREF="#22">atKeySTR:put:</A></LI>
+<LI><A HREF="#23">eachKey</A></LI>
+<LI><A HREF="#24">eachValue</A></LI>
+</UL>
+<H3><B>Adding and Removing</B></H3>
+<UL>
+<LI><A HREF="#25">removeKey:</A></LI>
+<LI><A HREF="#26">removeKey:ifAbsent:</A></LI>
+</UL>
+<H3><B>Blocks</B></H3>
+<UL>
+<LI><A HREF="#27">keysDo:</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#28">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">new</A></H3>
+<BLOCKQUOTE>+<B>new</B></BLOCKQUOTE>
+Returns a new empty dictionary.<P>
+<H3><A NAME="2">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Returns a new copy of the dictionary.<P>
+<H3><A NAME="4">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+Returns a new copy of the dictionary.  The members in the new dictionary are deep copies of the members in the original dictionary.<P>
+<H3><A NAME="5">emptyYourself</A></H3>
+<BLOCKQUOTE>-<B>emptyYourself</B></BLOCKQUOTE>
+Removes all the keys and values of the dictionary (without freeing them).  Returns the receiver.<P>
+<H3><A NAME="6">freeContents</A></H3>
+<BLOCKQUOTE>-<B>freeContents</B></BLOCKQUOTE>
+This method is, in the case of the Dictionary class, equivalent to <B>emptyYourself</B>.  Note that for the sake of Stepstone ICpak101 compatibility, this method does not free keys and values.  Use <B>freeAll</B> for that.<P>
+<H3><A NAME="7">freeAll</A></H3>
+<BLOCKQUOTE>-<B>freeAll</B></BLOCKQUOTE>
+This method frees all the keys and values in the dictionary, without freeing the dictionary itself.  Returns the dictionary.<P>
+<B>Note:</B> This method is ObjectPak specific.<P>
+<H3><A NAME="8">free</A></H3>
+<BLOCKQUOTE>-<B>free</B></BLOCKQUOTE>
+Frees the dictionary, but not its contents.  Returns <B>nil</B>.  Do :<P>
+<BLOCKQUOTE><PRE>
+aDic = [[aDic freeAll] free];
+</PRE></BLOCKQUOTE>
+if you want to free the dictionary and its contents.<P>
+<H3><A NAME="12">size</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>size</B></BLOCKQUOTE>
+Returns the number of key-value associations in the dictionary.<P>
+<H3><A NAME="13">isEmpty</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEmpty</B></BLOCKQUOTE>
+Whether the number of associations in the dictionary is equal to zero.<P>
+<H3><A NAME="14">includesKey:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>includesKey</B>:<I>aKey</I></BLOCKQUOTE>
+Returns YES if there is an association with key matching <I>aKey</I>.<P>
+<H3><A NAME="15">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a hash value based on the receiver's address and the results of sending the <B>hash</B> message to the contents.<P>
+<H3><A NAME="16">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>aDic</I></BLOCKQUOTE>
+Returns YES if <I>aDic</I> is a dictionary, and if its keys and values respond affirmatively to the message <B>isEqual:</B> when compared to the corresponding objects of the receiver's contents.<P>
+<H3><A NAME="18">atKey:</A></H3>
+<BLOCKQUOTE>-<B>atKey</B>:<I>aKey</I></BLOCKQUOTE>
+Returns the value of the association matching <I>aKey</I>.  Returns <B>nil</B> if the association is not found.<P>
+<H3><A NAME="19">atKey:ifAbsent:</A></H3>
+<BLOCKQUOTE>-<B>atKey</B>:<I>aKey</I><B>ifAbsent</B>:<I>exceptionBlock</I></BLOCKQUOTE>
+Returns the value of the association matching <I>aKey</I>.  Evaluates <I>exceptionBlock</I> and returns its return value, if the association is not found.<P>
+<H3><A NAME="20">atKeySTR:</A></H3>
+<BLOCKQUOTE>-<B>atKeySTR</B>:(STR)<I>strKey</I></BLOCKQUOTE>
+Returns the value of the association matching <I>strKey</I>.  Returns <B>nil</B> if the association is not found.<P>
+<H3><A NAME="21">atKey:put:</A></H3>
+<BLOCKQUOTE>-<B>atKey</B>:<I>aKey</I><B>put</B>:<I>anObject</I></BLOCKQUOTE>
+Associates <I>aKey</I> to <I>anObject</I>.  Adds the objects to the dictionary.  If <I>aKey</I> was already in the dictionary, makes <I>anObject</I> the value for this key and returns the old value.  Otherwise returns <B>nil</B>.<P>
+<H3><A NAME="22">atKeySTR:put:</A></H3>
+<BLOCKQUOTE>-<B>atKeySTR</B>:(STR)<I>strKey</I><B>put</B>:<I>anObject</I></BLOCKQUOTE>
+Associates <I>strKey</I> to <I>anObject</I>.  Adds the objects to the dictionary.  If <I>strKey</I> was already in the dictionary, makes <I>anObject</I> the value for this key and returns the old value.  Otherwise returns <B>nil</B>.<P>
+<H3><A NAME="23">eachKey</A></H3>
+<BLOCKQUOTE>-<B>eachKey</B></BLOCKQUOTE>
+Returns a sequence of the key objects in the dictionary.<P>
+<BLOCKQUOTE><PRE>
+keys = [aDic eachKey];
+while ((aKey = [aSeq next])) {
+    /* do something */
+}
+keys = [keys free];
+</PRE></BLOCKQUOTE>
+<B>See also:</B> eachValue<P>
+<H3><A NAME="24">eachValue</A></H3>
+<BLOCKQUOTE>-<B>eachValue</B></BLOCKQUOTE>
+Returns a sequence of the value objects in the dictionary.<P>
+<BLOCKQUOTE><PRE>
+keys   = [aDic eachKey];
+values = [aDic eachValue];
+while ((aKey = [aSeq next])) {
+    aValue = [values next];
+    /* do something */
+}
+keys   = [keys free];
+values = [values free];
+</PRE></BLOCKQUOTE>
+<B>See also:</B> eachKey<P>
+<H3><A NAME="25">removeKey:</A></H3>
+<BLOCKQUOTE>-<B>removeKey</B>:<I>key</I></BLOCKQUOTE>
+Remove key from the receiver and return value for given <I>key</I>.  If <I>key</I> is not in the receiver, signals the <B>NotFound</B> exception.<P>
+<H3><A NAME="26">removeKey:ifAbsent:</A></H3>
+<BLOCKQUOTE>-<B>removeKey</B>:<I>key</I><B>ifAbsent</B>:<I>aBlock</I></BLOCKQUOTE>
+Remove key (and its associated value) from the receiver.  If key is not in the receiver, answers the result of evaluating <I>aBlock</I>.  Otherwise, answers the  value externally named by <I>key</I>.<P>
+<H3><A NAME="27">keysDo:</A></H3>
+<BLOCKQUOTE>-<B>keysDo</B>:<I>aBlock</I></BLOCKQUOTE>
+The <B>keysDo:</B> message iterates through all the Dictionary elements, running a  one-argument block of code specified by the aBlock argument with the argument set to the key of each assocation.<P>
+<H3><A NAME="28">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints a comma separated list of the key-value pairs by sending each individual object a <B>printOn:</B> message.  Returns the receiver.<P>

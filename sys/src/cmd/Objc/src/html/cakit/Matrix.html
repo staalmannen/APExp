@@ -1,0 +1,348 @@
+<HTML>
+<TITLE>matrix Specification Sheet</TITLE>
+<H1>matrix Specification Sheet</H1>
+
+<HR>
+Computer Algebra Kit (c) 1993,00 by Comp.Alg.Objects.  All Rights Reserved.<P>
+<H1>Matrix</H1>
+<B>Inherits from:</B> CAObject<P>
+<B>Maturity Index:</B> Relatively mature<P>
+<H2>Class Description</H2>
+A matrix consists of a number of <I>scalars</I> ordered in <I>rows</I>.  The rows are vector objects; the scalar objects can be arbitrary Computer Algebra Kit objects, but they currently have to be either floating-point, elements of a field (see <B>inField</B>) or elements of an integral domain (see <B>inIntegralDomain</B>).<P>
+There are methods to access, insert and remove rows and <I>columns</I>.  Columns are collection objects of scalars (not vector objects).  It's also possible to place or replace a scalar directly at a position given by a row and column index.  See the documentation on <B>eachSequence</B> to access the scalar at a given row and column index.<P>
+<B>Note:</B> Matrix objects are meant for computational tasks.  They are no substitute for a List or Collection object, and sometimes, e.g. for frequent random access, it's indeed better to work with a collection of collections than with a Matrix object.<P>
+<H2>Method types</H2>
+<H3><B>Special Matrices</B></H3>
+<UL>
+<LI><A HREF="#1">diagonal:</A></LI>
+<LI><A HREF="#2">circulant:</A></LI>
+<LI><A HREF="#3">companion:</A></LI>
+<LI><A HREF="#4">hankel::</A></LI>
+<LI><A HREF="#5">toeplitz::</A></LI>
+<LI><A HREF="#7">hilbert:</A></LI>
+</UL>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#12">scalar:numRows:numColumns:</A></LI>
+<LI><A HREF="#14">copy</A></LI>
+<LI><A HREF="#16">deepCopy</A></LI>
+<LI><A HREF="#22">emptyVector</A></LI>
+</UL>
+<H3><B>Identity</B></H3>
+<UL>
+<LI><A HREF="#23">scalarZero</A></LI>
+<LI><A HREF="#24">rows</A></LI>
+<LI><A HREF="#26">numRows</A></LI>
+<LI><A HREF="#27">numColumns</A></LI>
+<LI><A HREF="#30">isEqual:</A></LI>
+<LI><A HREF="#31">hash</A></LI>
+<LI><A HREF="#32">isDiagonal</A></LI>
+<LI><A HREF="#33">isSymmetric</A></LI>
+<LI><A HREF="#34">isAntiSymmetric</A></LI>
+</UL>
+<H3><B>Insertion</B></H3>
+<UL>
+<LI><A HREF="#35">insertRow:</A></LI>
+<LI><A HREF="#36">insertRow:at:</A></LI>
+<LI><A HREF="#37">insertColumn:</A></LI>
+<LI><A HREF="#38">insertColumn:at:</A></LI>
+</UL>
+<H3><B>Removing</B></H3>
+<UL>
+<LI><A HREF="#39">removeRow</A></LI>
+<LI><A HREF="#40">removeRowAt:</A></LI>
+<LI><A HREF="#41">removeColumn</A></LI>
+<LI><A HREF="#42">removeColumnAt:</A></LI>
+</UL>
+<H3><B>Place and Replace</B></H3>
+<UL>
+<LI><A HREF="#43">placeScalar:at::</A></LI>
+<LI><A HREF="#44">replaceScalarAt::with:</A></LI>
+</UL>
+<H3><B>Coercion</B></H3>
+<UL>
+<LI><A HREF="#45">asNumerical</A></LI>
+<LI><A HREF="#46">asModp:</A></LI>
+<LI><A HREF="#50">onCommonDenominator:</A></LI>
+</UL>
+<H3><B>Accessing Rows and Scalars</B></H3>
+<UL>
+<LI><A HREF="#51">rowAt:</A></LI>
+<LI><A HREF="#52">eachRow</A></LI>
+<LI><A HREF="#53">eachScalar</A></LI>
+<LI><A HREF="#54">eachSequence</A></LI>
+<LI><A HREF="#55">floatValueAt::</A></LI>
+</UL>
+<H3><B>Addition</B></H3>
+<UL>
+<LI><A HREF="#56">zero</A></LI>
+<LI><A HREF="#57">negate</A></LI>
+<LI><A HREF="#58">double</A></LI>
+<LI><A HREF="#59">add:</A></LI>
+<LI><A HREF="#60">subtract:</A></LI>
+<LI><A HREF="#61">addScalar:</A></LI>
+<LI><A HREF="#62">subtractScalar:</A></LI>
+</UL>
+<H3><B>Multiplication</B></H3>
+<UL>
+<LI><A HREF="#63">one</A></LI>
+<LI><A HREF="#64">square</A></LI>
+<LI><A HREF="#65">multiply:</A></LI>
+<LI><A HREF="#66">multiplyVector:</A></LI>
+</UL>
+<H3><B>Scalar Multiplication</B></H3>
+<UL>
+<LI><A HREF="#67">multiplyScalar:</A></LI>
+<LI><A HREF="#68">divideScalar:</A></LI>
+</UL>
+<H3><B>Transposing</B></H3>
+<UL>
+<LI><A HREF="#69">transpose</A></LI>
+</UL>
+<H3><B>Gaussian Elimination</B></H3>
+<UL>
+<LI><A HREF="#70">determinant</A></LI>
+<LI><A HREF="#73">solveVector:</A></LI>
+<LI><A HREF="#76">inverse</A></LI>
+<LI><A HREF="#77">divide:</A></LI>
+<LI><A HREF="#79">rank</A></LI>
+<LI><A HREF="#80">nullity</A></LI>
+<LI><A HREF="#82">kernel</A></LI>
+<LI><A HREF="#83">image</A></LI>
+</UL>
+<H3><B>Trace Methods</B></H3>
+<UL>
+<LI><A HREF="#84">trace</A></LI>
+<LI><A HREF="#85">adjoint</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#86">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="1">diagonal:</A></H3>
+<BLOCKQUOTE>+<B>diagonal</B>:<I>cltnOfScalars</I></BLOCKQUOTE>
+Creates a new, square matrix with the objects in <I>cltnOfScalars</I> on the diagonal. <P>
+<H3><A NAME="2">circulant:</A></H3>
+<BLOCKQUOTE>+<B>circulant</B>:<I>cltnOfScalars</I></BLOCKQUOTE>
+Creates a new <I>n</I> by <I>n</I> circulant matrix for a collection of <I>n</I> scalar objects. <P>
+<H3><A NAME="3">companion:</A></H3>
+<BLOCKQUOTE>+<B>companion</B>:<I>cltnOfScalars</I></BLOCKQUOTE>
+Creates a new <I>n</I> by <I>n</I> companion matrix for a collection of <I>n</I> scalar objects. <P>
+<H3><A NAME="4">hankel::</A></H3>
+<BLOCKQUOTE>+<B>hankel</B>:<I>rowScalars</I>:<I>colScalars</I></BLOCKQUOTE>
+Creates a new rectangualr Hankel matrix, a matrix with <I>n</I> + 1 rows and <I>m</I> columns if <I>rowScalars</I> has <I>m</I> and <I>colScalars</I> <I>n</I> members.<P>
+<H3><A NAME="5">toeplitz::</A></H3>
+<BLOCKQUOTE>+<B>toeplitz</B>:<I>rowScalars</I>:<I>colScalars</I></BLOCKQUOTE>
+Creates a new rectangualr Toeplitz matrix, a matrix with <I>n</I> rows and <I>m</I> + 1 columns if <I>rowScalars</I> has <I>m</I> and <I>colScalars</I> <I>n</I> members.<P>
+<H3><A NAME="7">hilbert:</A></H3>
+<BLOCKQUOTE>+<B>hilbert</B>:(int)<I>n</I></BLOCKQUOTE>
+Creates a new Hilbert matrix over the rational numbers.  The element at position <I>i</I>, <I>j</I> is <I>1 / (i+j+1)</I>.<P>
+<H3><A NAME="12">scalar:numRows:numColumns:</A></H3>
+<BLOCKQUOTE>+<B>scalar</B>:<I>aScalar</I><B>numRows</B>:(int)<I>numRows</I><B>numColumns</B>:(int)<I>numColumns</I></BLOCKQUOTE>
+Creates a new <I>numRows</I> by <I>numColumns</I> matrix with zero elements, and with copies of <I>aScalar</I> on the diagonal.  For example, the 5 by 5 identity matrix over the polynomials with integer coefficients is created like this :<P>
+<BLOCKQUOTE><PRE>
+aPolynomial = [Polynomial new];
+aMatrix     = [Matrix scalar:aPolynomial numRows:5 numColumns:5];
+</PRE></BLOCKQUOTE>
+<B>See also:</B> - one<P>
+<H3><A NAME="14">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Returns a new copy of the original; the rows are also copies of the original rows, not just new references.<P>
+<H3><A NAME="16">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+Makes a fully independent copy of the matrix.<P>
+<H3><A NAME="22">emptyVector</A></H3>
+<BLOCKQUOTE>-<B>emptyVector</B></BLOCKQUOTE>
+Returns a new empty vector.<P>
+<H3><A NAME="23">scalarZero</A></H3>
+<BLOCKQUOTE>-<B>scalarZero</B></BLOCKQUOTE>
+Returns the zero scalar element. <P>
+<H3><A NAME="24">rows</A></H3>
+<BLOCKQUOTE>-<B>rows</B></BLOCKQUOTE>
+Returns the collection of row vectors; the first row is the first member of this collection. <P>
+<H3><A NAME="26">numRows</A></H3>
+<BLOCKQUOTE>- (int)<B>numRows</B></BLOCKQUOTE>
+Returns the number of rows in the matrix, or zero if there are no rows in the matrix.  If <B>numRows</B> is equal to zero, <B>numColumns</B> is zero too, but not vice-versa.<P>
+<H3><A NAME="27">numColumns</A></H3>
+<BLOCKQUOTE>- (int)<B>numColumns</B></BLOCKQUOTE>
+Returns the number of columns in the matrix, or zero if there are no columns in the matrix.  Note that if <B>numColumns</B> is equal to zero, it's still possible that <B>numRows</B> is <I>not</I> equal to zero; in other words, if there are no columns in the matrix, there can be empty vectors as rows.<P>
+<H3><A NAME="30">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>aMatrix</I></BLOCKQUOTE>
+Returns YES if the matrices have the same number of rows and columns and if the scalars are equal.<P>
+<H3><A NAME="31">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a small integer that is the same for matrices that are equal (in the sense of <B>isEqual:</B>).<P>
+<H3><A NAME="32">isDiagonal</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isDiagonal</B></BLOCKQUOTE>
+Returns YES if all scalars that are not on the diagonal of the matrix, are zero.<P>
+<H3><A NAME="33">isSymmetric</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isSymmetric</B></BLOCKQUOTE>
+Returns YES if the scalar at position <I>i</I>,<I>j</I> is equal to the scalar at <I>j</I>,<I>i</I>.<P>
+<H3><A NAME="34">isAntiSymmetric</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isAntiSymmetric</B></BLOCKQUOTE>
+Returns YES if the scalar at position <I>i</I>,<I>j</I> is the opposite of the scalar at <I>j</I>,<I>i</I>.<P>
+<H3><A NAME="35">insertRow:</A></H3>
+<BLOCKQUOTE>-<B>insertRow</B>:<I>aVector</I></BLOCKQUOTE>
+Inserts <I>aVector</I> as last row in the collection of rows and returns <B>self</B>.  The vector belongs after insertion to the matrix, and is not necessarily copied.  If there were already rows in the matrix, the vector must contain the same number of scalars.  To insert rows, the reference count of the matrix should be equal to one.<P>
+<H3><A NAME="36">insertRow:at:</A></H3>
+<BLOCKQUOTE>-<B>insertRow</B>:<I>aVector</I><B>at</B>:(int)<I>i</I></BLOCKQUOTE>
+Similar to <B>insertRow:</B> but inserts at position <I>i</I>.  If <I>i</I> is equal to the number of rows, this method is identical to <B>insertRow:</B>.  If <I>i</I> is equal to zero, this method inserts the vector as first row in the matrix.<P>
+<H3><A NAME="37">insertColumn:</A></H3>
+<BLOCKQUOTE>-<B>insertColumn</B>:<I>aCollection</I></BLOCKQUOTE>
+Inserts <I>aCollection</I> in the matrix as first column and returns <B>self</B>.  The collection and its members belong after insertion to the matrix, and are not necessarily copied.  The number of rows of the matrix should be equal to the number of scalars in the collection, and the reference count of the matrix should be equal to one.<P>
+<H3><A NAME="38">insertColumn:at:</A></H3>
+<BLOCKQUOTE>-<B>insertColumn</B>:<I>aCollection</I><B>at</B>:(int)<I>i</I></BLOCKQUOTE>
+Similar to <B>insertColumn:</B> but inserts at position <I>i</I>.  If <I>i</I> is equal to zero, this method is identical to <B>insertColumn:</B>.  If <I>i</I> is equal to the number of columns, this method inserts the collection as last column in the matrix.<P>
+<H3><A NAME="39">removeRow</A></H3>
+<BLOCKQUOTE>-<B>removeRow</B></BLOCKQUOTE>
+Removes (and returns) the last row of the matrix.  Returns <B>nil</B> if there are no rows in the matrix.  This can be used in the following way :<P>
+<BLOCKQUOTE><PRE>
+while (row = [matrix removeRow]) { /* do something with row */ }
+</PRE></BLOCKQUOTE>
+To remove a row, the reference count of the matrix must be equal to one.<P>
+<H3><A NAME="40">removeRowAt:</A></H3>
+<BLOCKQUOTE>-<B>removeRowAt</B>:(int)<I>i</I></BLOCKQUOTE>
+Similar to <B>removeRow</B>, but removes the <I>i</I>-th row.  If <I>i</I> is equal the number of rows minus one, this method is identical to <B>removeRow</B>.  If <I>i</I> is equal to zero, then the method removes the first row of the matrix.  It's an error to use an illegal index <I>i</I> or to attempt to remove a row from a matrix whose reference count is not equal to one.<P>
+<H3><A NAME="41">removeColumn</A></H3>
+<BLOCKQUOTE>-<B>removeColumn</B></BLOCKQUOTE>
+Removes (and returns) the first column of the matrix.  The column is a collection of scalars, not a vector object.  Returns <B>nil</B> if there are no columns in the matrix.  This can be used in the following way :<P>
+<BLOCKQUOTE><PRE>
+while (column = [matrix removeColumn]) { /* do something with column */ }
+</PRE></BLOCKQUOTE>
+The reference count of the matrix must be equal to one.<P>
+<H3><A NAME="42">removeColumnAt:</A></H3>
+<BLOCKQUOTE>-<B>removeColumnAt</B>:(int)<I>i</I></BLOCKQUOTE>
+Similar to <B>removeColumn</B>, but removes the <I>i</I>-th column.  If <I>i</I> is equal to zero, this method is identical to <B>removeColumn</B>.  If <I>i</I> is equal to the number of columns minus one, then the method removes the last column in the matrix.  It's an error to use an illegal index <I>i</I> or to attempt to remove a column from a matrix whose reference count is not equal to one.<P>
+<H3><A NAME="43">placeScalar:at::</A></H3>
+<BLOCKQUOTE>-<B>placeScalar</B>:<I>aScalar</I><B>at</B>:(int)<I>i</I>:(int)<I>j</I></BLOCKQUOTE>
+Frees the scalar at position <I>i</I>,<I>j</I> and replaces it by the scalar object <I>aScalar</I>.  Returns <B>self</B>.<P>
+The scalar <I>aScalar</I> belongs, after placing, to the receiving matrix object; it is not necessarily copied.  It is an error to use illegal indices <I>i</I> and <I>j</I> or to attempt to place a scalar in a matrix whose reference count is not equal to one.<P>
+<H3><A NAME="44">replaceScalarAt::with:</A></H3>
+<BLOCKQUOTE>-<B>replaceScalarAt</B>:(int)<I>i</I>:(int)<I>j</I><B>with</B>:<I>aScalar</I></BLOCKQUOTE>
+Similar to <B>placeScalar::at:</B> but returns the scalar at position <I>i</I>,<I>j</I> after replacing it by <I>aScalar</I>.<P>
+<H3><A NAME="45">asNumerical</A></H3>
+<BLOCKQUOTE>-<B>asNumerical</B></BLOCKQUOTE>
+Returns a new matrix, whose scalars are the numerical value of the scalars of the original matrix.  For a matrix with integer scalars, this method returns a matrix with floating-point scalars.<P>
+<H3><A NAME="46">asModp:</A></H3>
+<BLOCKQUOTE>-<B>asModp</B>:(unsigned short)<I>p</I></BLOCKQUOTE>
+Returns a new matrix, whose scalars are the value of the scalars of the original matrix mod <I>p</I>.  For a matrix with integer scalars, this method returns a matrix with IntegerModp scalars.<P>
+<H3><A NAME="50">onCommonDenominator:</A></H3>
+<BLOCKQUOTE>-<B>onCommonDenominator</B>:(id *)<I>denominator</I></BLOCKQUOTE>
+Puts a matrix with fractional scalars on a common denominator.  Returns a new matrix with integral scalars, and, by reference, the common denominator of the scalars in the matrix (the least common multiple of the denominators of the fractions in the matrix).<P>
+<H3><A NAME="51">rowAt:</A></H3>
+<BLOCKQUOTE>-<B>rowAt</B>:(int)<I>i</I></BLOCKQUOTE>
+Returns the <I>i</I>-th row of the matrix.  The following example is equivalent to using <B>eachRow</B> and sequencing over the rows :<P>
+<BLOCKQUOTE><PRE>
+int i;
+for(i=0;i&lt;[aMatrix numRows];i++) {
+    id aRow = [aMatrix rowAt:i];
+    /* do something with aRow */
+}
+</PRE></BLOCKQUOTE>
+<H3><A NAME="52">eachRow</A></H3>
+<BLOCKQUOTE>-<B>eachRow</B></BLOCKQUOTE>
+Returns a new sequence of the rows of the matrix.  You cannot add or remove rows, or alter in any other way the matrix, until you're done with the sequence object (the sequence contains a reference to the rows of the matrix).  The <I>i</I>-th member in this sequence is the <I>i</I>-th row of the matrix.  The following example is equivalent to using <B>rowAt:</B> for indices between 0 and <B>numRows</B> :<P>
+<BLOCKQUOTE><PRE>
+id aRow,aSequence;
+aSequence = [aMatrix eachRow];
+while (aRow = [aSequence next]) {
+    /* do something with aRow */
+}
+</PRE></BLOCKQUOTE>
+<H3><A NAME="53">eachScalar</A></H3>
+<BLOCKQUOTE>-<B>eachScalar</B></BLOCKQUOTE>
+Returns a new sequence of scalars, obtained by concatenating the sequences of scalars of all row vectors of the matrix.  If the matrix contains <I>m</I> rows and <I>n</I> columns, then the sequence contains <I>m</I> times <I>n</I> members.  You cannot add or remove scalars, or alter in any other way the matrix, until you're done with the sequence object (the sequence contains a reference to the matrix).<P>
+<B>Note:</B> The sequence returned by this method cannot be accessed through an index.  It doesn't implement the <B>at:</B> and <B>toElementAt:</B> methods.<P>
+<H3><A NAME="54">eachSequence</A></H3>
+<BLOCKQUOTE>-<B>eachSequence</B></BLOCKQUOTE>
+Returns a new sequence of sequences of scalars.  You cannot add or remove scalars, or alter in any other way the matrix, until you're done with the sequence object (the sequence contains a reference to the matrix).  The following example shows how to access the <I>i</I>-th sequence of scalars, and in that sequence, the <I>j</I>-th scalar object :<P>
+<BLOCKQUOTE><PRE>
+aSequence = [aMatrix eachSequence];
+aScalar   = [[aSequence at:i] at:j];
+
+/* do something here with aScalar */
+
+</PRE></BLOCKQUOTE>
+<H3><A NAME="55">floatValueAt::</A></H3>
+<BLOCKQUOTE>- (float)<B>floatValueAt</B>:(int)<I>i</I>:(int)<I>j</I></BLOCKQUOTE>
+Returns the <B>floatValue</B> of the scalar at row index <I>i</I> and column index <I>j</I>.<P>
+<H3><A NAME="56">zero</A></H3>
+<BLOCKQUOTE>-<B>zero</B></BLOCKQUOTE>
+Returns a zero matrix of the same dimensions as the matrix that receives the message.<P>
+<H3><A NAME="57">negate</A></H3>
+<BLOCKQUOTE>-<B>negate</B></BLOCKQUOTE>
+Negates the matrix row by row.<P>
+<H3><A NAME="58">double</A></H3>
+<BLOCKQUOTE>-<B>double</B></BLOCKQUOTE>
+Returns a new matrix equal to the matrix multiplied by two.  Multiplies the matrix row by row by two.<P>
+<H3><A NAME="59">add:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>b</I></BLOCKQUOTE>
+Returns a new matrix equal to the sum of the two matrices.  Adds the matrices row by row together.<P>
+<H3><A NAME="60">subtract:</A></H3>
+<BLOCKQUOTE>-<B>subtract</B>:<I>b</I></BLOCKQUOTE>
+Returns a new matrix equal to the difference of the two matrices.  Subtracts the matrices row by row from each other.<P>
+<H3><A NAME="61">addScalar:</A></H3>
+<BLOCKQUOTE>-<B>addScalar</B>:<I>s</I></BLOCKQUOTE>
+Adds the scalar <I>s</I> to the diagonal of the matrix.  Returns a new object.<P>
+<H3><A NAME="62">subtractScalar:</A></H3>
+<BLOCKQUOTE>-<B>subtractScalar</B>:<I>s</I></BLOCKQUOTE>
+Subtracts the scalar <I>s</I> from the diagonal of the matrix.  Returns a new object.<P>
+<H3><A NAME="63">one</A></H3>
+<BLOCKQUOTE>-<B>one</B></BLOCKQUOTE>
+Returns the (right) unity matrix of the same dimensions as the matrix that receives the message.<P>
+<H3><A NAME="64">square</A></H3>
+<BLOCKQUOTE>-<B>square</B></BLOCKQUOTE>
+Multiplies the (square) matrix by itself.<P>
+<H3><A NAME="65">multiply:</A></H3>
+<BLOCKQUOTE>-<B>multiply</B>:<I>b</I></BLOCKQUOTE>
+Returns the product <I>self b</I>.  The number of columns of <I>self</I> must match the number of rows of <I>b</I>.<P>
+<H3><A NAME="66">multiplyVector:</A></H3>
+<BLOCKQUOTE>-<B>multiplyVector</B>:<I>aColumn</I></BLOCKQUOTE>
+Returns a new vector, the product of the matrix by a column vector object.  The number of rows of the matrix must match the number of scalars in the vector.<P>
+<H3><A NAME="67">multiplyScalar:</A></H3>
+<BLOCKQUOTE>-<B>multiplyScalar</B>:<I>b</I></BLOCKQUOTE>
+Returns the matrix multiplied (to the right) by the scalar <I>b</I>.<P>
+<H3><A NAME="68">divideScalar:</A></H3>
+<BLOCKQUOTE>-<B>divideScalar</B>:<I>b</I></BLOCKQUOTE>
+Returns the matrix divided by the scalar <I>b</I>.  Returns <B>nil</B> if the division was not exact for some scalar in the matrix.<P>
+<H3><A NAME="69">transpose</A></H3>
+<BLOCKQUOTE>-<B>transpose</B></BLOCKQUOTE>
+Returns the transposed of the matrix (a new matrix object).  If the matrix has <I>m</I> rows and <I>n</I> columns, the transposed matrix has <I>n</I> rows and <I>m</I> columns.<P>
+<H3><A NAME="70">determinant</A></H3>
+<BLOCKQUOTE>-<B>determinant</B></BLOCKQUOTE>
+Computes the determinant of the square matrix.  Returns a new scalar object.<P>
+For fields of fractions, the method will extract a common denominator for the scalars, and compute the determinant over the associated integral domain.  For fields that are not fields of fractions, the method computes the determinant by Gaussian elimination taking inverses of leading non-zero elements.  For matrices over an integral domain, the determinant is computed by the Bareiss method.<P>
+<B>Note:</B> You can't compute a determinant over the floating-point numbers yet.<P>
+<H3><A NAME="73">solveVector:</A></H3>
+<BLOCKQUOTE>-<B>solveVector</B>:<I>y</I></BLOCKQUOTE>
+Returns a vector <I>x</I> that is the solution of the linear equation <I>A x = y</I> with <I>A</I> the (non-singular) matrix and <I>y</I> a column vector object.<P>
+The method works over fields and integral domains, but in the latter case, the method looks for an integral (and primitive i.e., common gcd divided out) solution only.  It will give an error message if the solution requires the construction of the field of fractions.<P>
+<H3><A NAME="76">inverse</A></H3>
+<BLOCKQUOTE>-<B>inverse</B></BLOCKQUOTE>
+Returns the inverse of the matrix (a new matrix object).  The matrix must be square; if it is singular (determinant equal to zero), the method returns <B>nil</B>.  Implemented as a special case of <B>divide:</B>, which computes <I>A B^-1</I>.<P>
+<H3><A NAME="77">divide:</A></H3>
+<BLOCKQUOTE>-<B>divide</B>:<I>b</I></BLOCKQUOTE>
+Returns a new matrix, equal to the matrix multiplied to the right by the inverse of the matrix <I>b</I>.<P>
+<B>Note:</B> Currently matrix inversion only works over a field (by Gaussian elimination).<P>
+<H3><A NAME="79">rank</A></H3>
+<BLOCKQUOTE>- (int)<B>rank</B></BLOCKQUOTE>
+Returns the dimension of the image of the matrix, without computing the image vectors themselves.  Works currently only over a field.<P>
+<H3><A NAME="80">nullity</A></H3>
+<BLOCKQUOTE>- (int)<B>nullity</B></BLOCKQUOTE>
+Returns the dimension of the kernel (nullspace) of the matrix, without computing the kernel itself.  By the dimension theorem, the nullity of the matrix is the number of columns minus the rank of the matrix.<P>
+<H3><A NAME="82">kernel</A></H3>
+<BLOCKQUOTE>-<B>kernel</B></BLOCKQUOTE>
+Returns the kernel (or nullspace) of the matrix as a collection of columns; each column is a vector object.  Works currently only over a field.<P>
+<H3><A NAME="83">image</A></H3>
+<BLOCKQUOTE>-<B>image</B></BLOCKQUOTE>
+Returns the image of the matrix as a collection of columns; each column is a vector object.  Works currently only over a field.<P>
+<H3><A NAME="84">trace</A></H3>
+<BLOCKQUOTE>-<B>trace</B></BLOCKQUOTE>
+Returns a new scalar object, the trace of the square matrix, ie. the sum of the scalars on the diagonal of the matrix.<P>
+<H3><A NAME="85">adjoint</A></H3>
+<BLOCKQUOTE>-<B>adjoint</B></BLOCKQUOTE>
+Returns a new matrix, the adjoint of the matrix computed through repeated trace computations (ie. the Faddeev-Leverrier method).  If the characteristic of the scalars is non-zero, it must be larger than the number of rows in the matrix.<P>
+<H3><A NAME="86">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints, between braces, a comma separated list of the rows.  Sends <B>printOn:</B> messages to the scalars in the matrix.<P>

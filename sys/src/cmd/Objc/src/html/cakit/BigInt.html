@@ -1,0 +1,292 @@
+<HTML>
+<TITLE>integer Specification Sheet</TITLE>
+<H1>integer Specification Sheet</H1>
+
+<HR>
+Computer Algebra Kit (c) 1992,00 by Comp.Alg.Objects.  All Rights Reserved.<P>
+<H1>BigInt</H1>
+<B>Inherits from:</B> CAObject<P>
+<B>Maturity Index:</B> Relatively mature<P>
+<H2>Class Description</H2>
+An integer (alias <B>BigInt</B>) is an array of digits, each digit is a value of type DIGIT declared as <B>unsigned short int</B>.  So, abstractly, the integer is expressed base USHRT_MAX + 1, which is a power of two. (USHRT_MAX is defined in the ANSI header file limits.h)  The most significant (or <I>leading</I>) digit is never zero; the <I>last</I> digit is the least significant digit of the integer.  There are methods to count, access, insert or remove digits.  Besides the normal elementary arithmetical operations, Integer also supports multiplication, division etc. by digits.  For input and output, integers are in decimal representation.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#2">new</A></LI>
+<LI><A HREF="#3">str:</A></LI>
+<LI><A HREF="#4">int:</A></LI>
+<LI><A HREF="#6">factorial:</A></LI>
+<LI><A HREF="#7">fibonacci:</A></LI>
+<LI><A HREF="#8">copy</A></LI>
+<LI><A HREF="#9">deepCopy</A></LI>
+<LI><A HREF="#10">release</A></LI>
+</UL>
+<H3><B>Identity</B></H3>
+<UL>
+<LI><A HREF="#62">hash</A></LI>
+<LI><A HREF="#63">isEqual:</A></LI>
+<LI><A HREF="#23">numDigits</A></LI>
+<LI><A HREF="#24">isDigit</A></LI>
+</UL>
+<H3><B>Inserting and Removing Digits</B></H3>
+<UL>
+<LI><A HREF="#25">insertDigit:</A></LI>
+<LI><A HREF="#26">removeDigit</A></LI>
+</UL>
+<H3><B>Accessing Digits</B></H3>
+<UL>
+<LI><A HREF="#27">digitAt:</A></LI>
+<LI><A HREF="#28">lastDigit</A></LI>
+<LI><A HREF="#29">leadingDigit</A></LI>
+</UL>
+<H3><B>String Value</B></H3>
+<UL>
+<LI><A HREF="#30">str</A></LI>
+<LI><A HREF="#31">str:</A></LI>
+</UL>
+<H3><B>Coercion</B></H3>
+<UL>
+<LI><A HREF="#32">asNumerical</A></LI>
+<LI><A HREF="#33">asModp:</A></LI>
+<LI><A HREF="#34">digitValue</A></LI>
+<LI><A HREF="#35">digitValue:</A></LI>
+<LI><A HREF="#36">ulongValue</A></LI>
+<LI><A HREF="#37">ulongValue:</A></LI>
+<LI><A HREF="#38">intValue</A></LI>
+<LI><A HREF="#39">intValue:</A></LI>
+<LI><A HREF="#40">doubleValue</A></LI>
+<LI><A HREF="#41">floatValue</A></LI>
+</UL>
+<H3><B>Comparing</B></H3>
+<UL>
+<LI><A HREF="#65">sign</A></LI>
+<LI><A HREF="#66">compare:</A></LI>
+</UL>
+<H3><B>Addition</B></H3>
+<UL>
+<LI><A HREF="#42">zero</A></LI>
+<LI><A HREF="#67">isZero</A></LI>
+<LI><A HREF="#69">isOpposite:</A></LI>
+<LI><A HREF="#71">negate</A></LI>
+<LI><A HREF="#73">double</A></LI>
+<LI><A HREF="#75">add:</A></LI>
+<LI><A HREF="#76">subtract:</A></LI>
+<LI><A HREF="#43">addDigit:</A></LI>
+<LI><A HREF="#44">subtractDigit:</A></LI>
+</UL>
+<H3><B>Multiplication</B></H3>
+<UL>
+<LI><A HREF="#45">one</A></LI>
+<LI><A HREF="#46">minusOne</A></LI>
+<LI><A HREF="#80">isOne</A></LI>
+<LI><A HREF="#82">isMinusOne</A></LI>
+<LI><A HREF="#84">square</A></LI>
+<LI><A HREF="#85">multiply:</A></LI>
+<LI><A HREF="#47">multiplyDigit:</A></LI>
+<LI><A HREF="#48">inverse</A></LI>
+</UL>
+<H3><B>Division</B></H3>
+<UL>
+<LI><A HREF="#49">divide:</A></LI>
+<LI><A HREF="#50">divideDigit:</A></LI>
+<LI><A HREF="#51">quotientDigit:</A></LI>
+<LI><A HREF="#52">remainder:quotient:</A></LI>
+<LI><A HREF="#53">quotientDigit:remainder:</A></LI>
+<LI><A HREF="#54">remainderDigit:</A></LI>
+</UL>
+<H3><B>Parity</B></H3>
+<UL>
+<LI><A HREF="#55">isEven</A></LI>
+<LI><A HREF="#56">isOdd</A></LI>
+</UL>
+<H3><B>Greatest Common Divisor</B></H3>
+<UL>
+<LI><A HREF="#57">gcd:</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#58">printsLeadingSign</A></LI>
+<LI><A HREF="#59">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="2">new</A></H3>
+<BLOCKQUOTE>+<B>new</B></BLOCKQUOTE>
+Returns a new integer equal to zero.  The instance method <B>zero</B> returns a shared, zero integer object. <P>
+<B>See also:</B> - zero<P>
+<H3><A NAME="3">str:</A></H3>
+<BLOCKQUOTE>+<B>str</B>:(STR)<I>aString</I></BLOCKQUOTE>
+Returns a new integer from the decimal representation <I>aString</I>, or returns <B>nil</B> if <I>aString</I> doesn't contain decimal characters (with optional unary minus sign).<P>
+<H3><A NAME="4">int:</A></H3>
+<BLOCKQUOTE>+<B>int</B>:(int)<I>intValue</I></BLOCKQUOTE>
+Returns a new integer with value equal to <I>intValue</I>.<P>
+<H3><A NAME="6">factorial:</A></H3>
+<BLOCKQUOTE>+<B>factorial</B>:(int)<I>n</I></BLOCKQUOTE>
+Returns a new integer object that is the <I>n</I>-th factorial.<P>
+<H3><A NAME="7">fibonacci:</A></H3>
+<BLOCKQUOTE>+<B>fibonacci</B>:(int)<I>n</I></BLOCKQUOTE>
+Returns a new object that is the <I>n</I>-th Fibonacci number. (Not implemented).<P>
+<H3><A NAME="8">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Makes a copy of the digits.<P>
+<H3><A NAME="9">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+For integer objects, deepCopy is equivalent to <B>copy</B>.<P>
+<H3><A NAME="10">release</A></H3>
+<BLOCKQUOTE>-<B>release</B></BLOCKQUOTE>
+Frees the array of digits of the integer object.<P>
+<H3><A NAME="62">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a small integer that is the same for objects that are equal (in the sense of <B>isEqual:</B>).<P>
+<H3><A NAME="63">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>b</I></BLOCKQUOTE>
+<H3><A NAME="23">numDigits</A></H3>
+<BLOCKQUOTE>- (int)<B>numDigits</B></BLOCKQUOTE>
+Returns the number of DIGIT's in the integer.  Returns zero if the integer is zero.  The leading digit of an integer is at position numDigits minus one.<P>
+<H3><A NAME="24">isDigit</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isDigit</B></BLOCKQUOTE>
+Whether the integer consists of a single digit.  If the integer is zero, this method returns NO.  The method ignores the sign of the integer.<P>
+<B>See also:</B> digitValue<P>
+<H3><A NAME="25">insertDigit:</A></H3>
+<BLOCKQUOTE>-<B>insertDigit</B>:(DIGIT)<I>d</I></BLOCKQUOTE>
+Inserts <I>d</I> as last digit, shifting the other digits one position up.  The method doesn't insert anything if both the integer and <I>d</I> are equal to zero. <P>
+<H3><A NAME="26">removeDigit</A></H3>
+<BLOCKQUOTE>- (DIGIT)<B>removeDigit</B></BLOCKQUOTE>
+Removes and returns the last digit, shifting the other digits one position down.  The method returns zero if the integer is equal to zero. <P>
+<H3><A NAME="27">digitAt:</A></H3>
+<BLOCKQUOTE>- (DIGIT)<B>digitAt</B>:(int)<I>i</I></BLOCKQUOTE>
+Returns the digit at position <I>i</I>.  The leading digit is position numDigits minus one.  The last digit is at position zero.  Returns 0 if the index is less than zero or equal to or greater than numDigits.<P>
+<H3><A NAME="28">lastDigit</A></H3>
+<BLOCKQUOTE>- (DIGIT)<B>lastDigit</B></BLOCKQUOTE>
+Returns the least significant digit of the integer, the digit at position 0.  Returns 0 if the integer is zero.<P>
+<H3><A NAME="29">leadingDigit</A></H3>
+<BLOCKQUOTE>- (DIGIT)<B>leadingDigit</B></BLOCKQUOTE>
+Returns the most significant digit of the integer, the digit at position numDigits minus one.  The leading digit of a nonzero integer is never zero.  The method returns 0 if the integer is zero.<P>
+<H3><A NAME="30">str</A></H3>
+<BLOCKQUOTE>- (STR)<B>str</B></BLOCKQUOTE>
+Returns the decimal representation of the integer as a NULL-terminated string of characters.  The string is automatically disposed off when freeing the integer, or when modifying the integer with methods that work destructively on the integer such as <B>removeDigit</B> or <B>insertDigit:</B>.<P>
+<H3><A NAME="31">str:</A></H3>
+<BLOCKQUOTE>-<B>str</B>:(STR)<I>aString</I></BLOCKQUOTE>
+Returns a new integer from the decimal representation <I>aString</I>, or returns <B>nil</B> if <I>aString</I> doesn't contain decimal characters (with optional unary minus sign).<P>
+<H3><A NAME="32">asNumerical</A></H3>
+<BLOCKQUOTE>-<B>asNumerical</B></BLOCKQUOTE>
+Returns a new instance of the <B>Float</B> class whose float value is equal to that of the integer.<P>
+<B>See also:</B> floatValue<P>
+<H3><A NAME="33">asModp:</A></H3>
+<BLOCKQUOTE>-<B>asModp</B>:(unsigned short)<I>p</I></BLOCKQUOTE>
+Returns a new instance of the <B>IntegerModp</B> class whose value is equal to that of the integer modulo <I>p</I> (with <I>p</I> a small prime number).  Negative integers are mapped to the opposite (mod <I>p</I>) of their absolute value.<P>
+<B>See also:</B> IntegerModp<P>
+<H3><A NAME="34">digitValue</A></H3>
+<BLOCKQUOTE>- (DIGIT)<B>digitValue</B></BLOCKQUOTE>
+Equivalent to <B>lastDigit</B>.  This method ignores the sign of the integer i.e., for a negative integer that consists of just one digit, it returns the absolute value of the integer.<P>
+<H3><A NAME="35">digitValue:</A></H3>
+<BLOCKQUOTE>-<B>digitValue</B>:(DIGIT)<I>aValue</I></BLOCKQUOTE>
+Returns a new (positive) integer object, with value equal to <I>aValue</I>.<P>
+<H3><A NAME="36">ulongValue</A></H3>
+<BLOCKQUOTE>- (unsigned long)<B>ulongValue</B></BLOCKQUOTE>
+Returns the two last digits of the integer as an <B>unsigned long</B> value.<P>
+<H3><A NAME="37">ulongValue:</A></H3>
+<BLOCKQUOTE>-<B>ulongValue</B>:(unsigned long)<I>aValue</I></BLOCKQUOTE>
+Returns a (positive) integer with value as <B>unsigned long</B> equal to <I>aValue</I>.<P>
+<H3><A NAME="38">intValue</A></H3>
+<BLOCKQUOTE>- (int)<B>intValue</B></BLOCKQUOTE>
+Returns the value of the integer as <B>int</B> value, if possible.  If the integer is too large to represented as <B>int</B>, the method returns INT_MIN or INT_MAX depending on the sign of the integer.<P>
+<H3><A NAME="39">intValue:</A></H3>
+<BLOCKQUOTE>-<B>intValue</B>:(int)<I>aValue</I></BLOCKQUOTE>
+Returns a new integer with value equal to <I>aValue</I>.<P>
+<H3><A NAME="40">doubleValue</A></H3>
+<BLOCKQUOTE>- (double)<B>doubleValue</B></BLOCKQUOTE>
+Returns the integer as a floating-point <B>double</B> value, if possible.  If the integer is too big to be represented as <B>double</B>, the method returns DBL_MIN or DBL_MAX depending on the sign of the integer.<P>
+<H3><A NAME="41">floatValue</A></H3>
+<BLOCKQUOTE>- (float)<B>floatValue</B></BLOCKQUOTE>
+Returns the integer as a floating-point <B>float</B> value, if possible.  If the integer is too big to be represented as <B>float</B>, the method returns FLT_MIN or FLT_MAX depending on the sign of the integer.<P>
+<H3><A NAME="65">sign</A></H3>
+<BLOCKQUOTE>- (int)<B>sign</B></BLOCKQUOTE>
+Returns plus one if the object is positive (greater than zero), zero if zero and minus one if negative (less than zero).<P>
+<H3><A NAME="66">compare:</A></H3>
+<BLOCKQUOTE>- (int)<B>compare</B>:<I>b</I></BLOCKQUOTE>
+Returns -1, 0, or +1 if the object is respectively less than, equal to, or greater than <I>b</I>.  Returns 0 for pointer equal objects.<P>
+<H3><A NAME="42">zero</A></H3>
+<BLOCKQUOTE>-<B>zero</B></BLOCKQUOTE>
+Returns a copy of a shared integer instance with value equal to zero.<P>
+<H3><A NAME="67">isZero</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isZero</B></BLOCKQUOTE>
+Whether the object is equal to zero.<P>
+<H3><A NAME="69">isOpposite:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOpposite</B>:<I>b</I></BLOCKQUOTE>
+Whether the object is the opposite of <I>b</I>.<P>
+<H3><A NAME="71">negate</A></H3>
+<BLOCKQUOTE>-<B>negate</B></BLOCKQUOTE>
+Returns the opposite of the object.<P>
+<H3><A NAME="73">double</A></H3>
+<BLOCKQUOTE>-<B>double</B></BLOCKQUOTE>
+Returns a new object, equal to the object multiplied by two i.e., added to itself.<P>
+<H3><A NAME="75">add:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>b</I></BLOCKQUOTE>
+Adds <I>b</I> to the object.  Returns a new object.<P>
+<H3><A NAME="76">subtract:</A></H3>
+<BLOCKQUOTE>-<B>subtract</B>:<I>b</I></BLOCKQUOTE>
+Subtracts <I>b</I> from the object.  Returns a new object.<P>
+<H3><A NAME="43">addDigit:</A></H3>
+<BLOCKQUOTE>-<B>addDigit</B>:(DIGIT)<I>d</I></BLOCKQUOTE>
+Returns a new integer that is the sum of the integer <B>self</B> and the digit <I>d</I>.<P>
+<H3><A NAME="44">subtractDigit:</A></H3>
+<BLOCKQUOTE>-<B>subtractDigit</B>:(DIGIT)<I>d</I></BLOCKQUOTE>
+Returns a new integer that is the equal to the integer <B>self</B> minus the digit <I>d</I>.<P>
+<H3><A NAME="45">one</A></H3>
+<BLOCKQUOTE>-<B>one</B></BLOCKQUOTE>
+Returns a copy of a shared integer instance with value equal to one.<P>
+<H3><A NAME="46">minusOne</A></H3>
+<BLOCKQUOTE>-<B>minusOne</B></BLOCKQUOTE>
+Returns a copy of the integer minus one.<P>
+<H3><A NAME="80">isOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOne</B></BLOCKQUOTE>
+Whether the object is equal to one.<P>
+<H3><A NAME="82">isMinusOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isMinusOne</B></BLOCKQUOTE>
+Whether the object is equal to minus one.<P>
+<H3><A NAME="84">square</A></H3>
+<BLOCKQUOTE>-<B>square</B></BLOCKQUOTE>
+Returns the square of the object i.e., a new object equal to the original object multiplied by itself.<P>
+<H3><A NAME="85">multiply:</A></H3>
+<BLOCKQUOTE>-<B>multiply</B>:<I>b</I></BLOCKQUOTE>
+Returns a new object, the product of the object multiplied (to the right) by <I>b</I>.  If the objects are pointer equal, this method is equivalent to <B>square</B>.<P>
+<H3><A NAME="47">multiplyDigit:</A></H3>
+<BLOCKQUOTE>-<B>multiplyDigit</B>:(DIGIT)<I>d</I></BLOCKQUOTE>
+Returns the product of the integer and the digit <I>d</I> (the product is a new object).<P>
+<H3><A NAME="48">inverse</A></H3>
+<BLOCKQUOTE>-<B>inverse</B></BLOCKQUOTE>
+Returns <B>nil</B>, except if the integer is one or minus one, in which case the method returns a copy of the object itself.<P>
+<H3><A NAME="49">divide:</A></H3>
+<BLOCKQUOTE>-<B>divide</B>:<I>b</I></BLOCKQUOTE>
+Returns the exact quotient on division by <I>b</I>.  Returns <B>nil</B> if the divisor <I>b</I> is zero or if the division is not exact (when the remainder is not zero).<P>
+<B>See also:</B> quotient:<P>
+<H3><A NAME="50">divideDigit:</A></H3>
+<BLOCKQUOTE>-<B>divideDigit</B>:(DIGIT)<I>b</I></BLOCKQUOTE>
+Returns the exact quotient on division by the digit <I>b</I>.  Returns <B>nil</B> if the divisor <I>b</I> is zero or if the division is not exact (when the remainder is not zero).<P>
+<H3><A NAME="51">quotientDigit:</A></H3>
+<BLOCKQUOTE>-<B>quotientDigit</B>:(DIGIT)<I>b</I></BLOCKQUOTE>
+Returns the quotient on division by the digit <I>b</I>; the division need not necessarily be exact.  Returns <B>nil</B> if <I>b</I> is equal to zero.<P>
+<H3><A NAME="52">remainder:quotient:</A></H3>
+<BLOCKQUOTE>-<B>remainder</B>:<I>b</I><B>quotient</B>:(id *)<I>q</I></BLOCKQUOTE>
+Returns the remainder and, if a non-NULL pointer is passed for <I>q</I>, the quotient on division of the dividend <I>self</I> by a divisor <I>b</I>.  Both remainder and quotient are new integer objects.  The remainder is <I>signed</I> i.e., its sign is the same as the sign of the dividend; the relation <I>dividend</I> == <I>quotient</I> <I>divisor</I> + <I>remainder</I> holds for all integers.<P>
+<H3><A NAME="53">quotientDigit:remainder:</A></H3>
+<BLOCKQUOTE>-<B>quotientDigit</B>:(DIGIT)<I>d</I><B>remainder</B>:(DIGIT *)<I>r</I></BLOCKQUOTE>
+Returns the quotient and, if a non-NULL pointer is passed along for <I>r</I>, the <I>unsigned</I> remainder on division by a digit <I>d</I>; the relation <I>dividend</I> == <I>quotient</I> <I>divisor</I> + <I>remainder</I> does not hold if the dividend is negative.<P>
+<H3><A NAME="54">remainderDigit:</A></H3>
+<BLOCKQUOTE>- (DIGIT)<B>remainderDigit</B>:(DIGIT)<I>d</I></BLOCKQUOTE>
+Returns the <I>unsigned</I> remainder on division by a digit <I>d</I> i.e., the sign of the object is ignored.  The divisor <I>d</I> shouldn't be equal to zero.<P>
+<H3><A NAME="55">isEven</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEven</B></BLOCKQUOTE>
+Whether the integer is even i.e., zero or divisible by two.<P>
+<H3><A NAME="56">isOdd</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOdd</B></BLOCKQUOTE>
+Whether the integer is odd i.e., not divisible by two.<P>
+<H3><A NAME="57">gcd:</A></H3>
+<BLOCKQUOTE>-<B>gcd</B>:<I>b</I></BLOCKQUOTE>
+Returns a new (non-negative) integer, the greatest common divisor of the two integers, computed by the Euclidean algorithm. <P>
+<H3><A NAME="58">printsLeadingSign</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsLeadingSign</B></BLOCKQUOTE>
+Returns YES if the integer is negative.<P>
+<H3><A NAME="59">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints the integer in decimal representation to <I>aFile</I>.<P>

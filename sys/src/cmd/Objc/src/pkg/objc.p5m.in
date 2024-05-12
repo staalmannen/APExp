@@ -1,0 +1,246 @@
+set name=pkg.fmri value=pkg://stes/developer/objc@@OBJC1VERSION@
+set name=pkg.summary value="Portable Object Compiler"
+set name=variant.arch value=i386
+set name=pkg.description value="The Portable Object Compiler, a language and a runtime library for producing C programs that operate by the runtime conventions of Smalltalk 80 in a UNIX environment, as described in Brad Cox's book on Objective-C.  Smalltalk and Objective-C offer Object Oriend Programming in which data, and the programs which may access it, are designed, built and maintained as inseparable units called objects.  The precompiler is backed by a library which supports Smalltalk 80's interpretation of messaging; binding of a message to its target routine is done at run time.  The library also contains a growing number of primitive class definitions, such as an Object class whose abilities are inherited by every object in the system and features such as Blocks, enclosures like in Smalltalk 80."
+file usr/bin/cvtimport path=usr/bin/cvtimport owner=root group=bin mode=0755
+file usr/bin/objc path=usr/bin/objc owner=root group=bin mode=0755
+file usr/bin/objc1 path=usr/bin/objc1 owner=root group=bin mode=0755
+file usr/bin/postlink path=usr/bin/postlink owner=root group=bin mode=0755
+dir  path=usr/include/cakit owner=root group=bin mode=0755
+file usr/include/cakit/cakit.h path=usr/include/cakit/cakit.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/ccltn.h path=usr/include/cakit/ccltn.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/ccomplex.h path=usr/include/cakit/ccomplex.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/cfloat.h path=usr/include/cakit/cfloat.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/cobject.h path=usr/include/cakit/cobject.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/cseq.h path=usr/include/cakit/cseq.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/fraction.h path=usr/include/cakit/fraction.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/integer.h path=usr/include/cakit/integer.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/intmodp.h path=usr/include/cakit/intmodp.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/matrix.h path=usr/include/cakit/matrix.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/monomial.h path=usr/include/cakit/monomial.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/polynom.h path=usr/include/cakit/polynom.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/symbol.h path=usr/include/cakit/symbol.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/term.h path=usr/include/cakit/term.h owner=root \
+    group=bin mode=0755
+file usr/include/cakit/vector.h path=usr/include/cakit/vector.h owner=root \
+    group=bin mode=0755
+dir  path=usr/include/objcrt owner=root group=bin mode=0755
+file usr/include/objcrt/Block.h path=usr/include/objcrt/Block.h owner=root \
+    group=bin mode=0755
+file usr/include/objcrt/Exceptn.h path=usr/include/objcrt/Exceptn.h owner=root \
+    group=bin mode=0755
+file usr/include/objcrt/Message.h path=usr/include/objcrt/Message.h owner=root \
+    group=bin mode=0755
+file usr/include/objcrt/Object.h path=usr/include/objcrt/Object.h owner=root \
+    group=bin mode=0755
+file usr/include/objcrt/OutOfMem.h path=usr/include/objcrt/OutOfMem.h \
+    owner=root group=bin mode=0755
+file usr/include/objcrt/objc.h path=usr/include/objcrt/objc.h owner=root \
+    group=bin mode=0755
+file usr/include/objcrt/objcrt.h path=usr/include/objcrt/objcrt.h owner=root \
+    group=bin mode=0755
+dir  path=usr/include/objpak owner=root group=bin mode=0755
+file usr/include/objpak/array.h path=usr/include/objpak/array.h owner=root \
+    group=bin mode=0755
+file usr/include/objpak/ascfiler.h path=usr/include/objpak/ascfiler.h \
+    owner=root group=bin mode=0755
+file usr/include/objpak/badvers.h path=usr/include/objpak/badvers.h owner=root \
+    group=bin mode=0755
+file usr/include/objpak/bag.h path=usr/include/objpak/bag.h owner=root \
+    group=bin mode=0755
+file usr/include/objpak/cltn.h path=usr/include/objpak/cltn.h owner=root \
+    group=bin mode=0755
+file usr/include/objpak/dictnary.h path=usr/include/objpak/dictnary.h \
+    owner=root group=bin mode=0755
+file usr/include/objpak/idarray.h path=usr/include/objpak/idarray.h owner=root \
+    group=bin mode=0755
+file usr/include/objpak/intarray.h path=usr/include/objpak/intarray.h \
+    owner=root group=bin mode=0755
+file usr/include/objpak/notfound.h path=usr/include/objpak/notfound.h \
+    owner=root group=bin mode=0755
+file usr/include/objpak/objpak.h path=usr/include/objpak/objpak.h owner=root \
+    group=bin mode=0755
+file usr/include/objpak/ocstring.h path=usr/include/objpak/ocstring.h \
+    owner=root group=bin mode=0755
+file usr/include/objpak/octext.h path=usr/include/objpak/octext.h owner=root \
+    group=bin mode=0755
+file usr/include/objpak/ordcltn.h path=usr/include/objpak/ordcltn.h owner=root \
+    group=bin mode=0755
+file usr/include/objpak/outofbnd.h path=usr/include/objpak/outofbnd.h \
+    owner=root group=bin mode=0755
+file usr/include/objpak/paragrph.h path=usr/include/objpak/paragrph.h \
+    owner=root group=bin mode=0755
+file usr/include/objpak/point.h path=usr/include/objpak/point.h owner=root \
+    group=bin mode=0755
+file usr/include/objpak/rectangl.h path=usr/include/objpak/rectangl.h \
+    owner=root group=bin mode=0755
+file usr/include/objpak/runarray.h path=usr/include/objpak/runarray.h \
+    owner=root group=bin mode=0755
+file usr/include/objpak/sequence.h path=usr/include/objpak/sequence.h \
+    owner=root group=bin mode=0755
+file usr/include/objpak/set.h path=usr/include/objpak/set.h owner=root \
+    group=bin mode=0755
+file usr/include/objpak/sortcltn.h path=usr/include/objpak/sortcltn.h \
+    owner=root group=bin mode=0755
+file usr/include/objpak/stack.h path=usr/include/objpak/stack.h owner=root \
+    group=bin mode=0755
+file usr/include/objpak/txtattr.h path=usr/include/objpak/txtattr.h owner=root \
+    group=bin mode=0755
+file usr/include/objpak/txtstyle.h path=usr/include/objpak/txtstyle.h \
+    owner=root group=bin mode=0755
+file usr/include/objpak/typeinc.h path=usr/include/objpak/typeinc.h owner=root \
+    group=bin mode=0755
+file usr/include/objpak/unknownt.h path=usr/include/objpak/unknownt.h \
+    owner=root group=bin mode=0755
+dir  path=usr/include/ppi owner=root group=bin mode=0755
+file usr/include/ppi/Array.h path=usr/include/ppi/Array.h owner=root group=bin \
+    mode=0755
+file usr/include/ppi/Assoc.h path=usr/include/ppi/Assoc.h owner=root group=bin \
+    mode=0755
+file usr/include/ppi/Filer.h path=usr/include/ppi/Filer.h owner=root group=bin \
+    mode=0755
+file usr/include/ppi/Graph.h path=usr/include/ppi/Graph.h owner=root group=bin \
+    mode=0755
+file usr/include/ppi/ICpak101.h path=usr/include/ppi/ICpak101.h owner=root \
+    group=bin mode=0755
+file usr/include/ppi/IPSequence.h path=usr/include/ppi/IPSequence.h owner=root \
+    group=bin mode=0755
+file usr/include/ppi/IdArray.h path=usr/include/ppi/IdArray.h owner=root \
+    group=bin mode=0755
+file usr/include/ppi/IntArray.h path=usr/include/ppi/IntArray.h owner=root \
+    group=bin mode=0755
+file usr/include/ppi/OrdCltn.h path=usr/include/ppi/OrdCltn.h owner=root \
+    group=bin mode=0755
+file usr/include/ppi/Sequence.h path=usr/include/ppi/Sequence.h owner=root \
+    group=bin mode=0755
+file usr/include/ppi/SortCltn.h path=usr/include/ppi/SortCltn.h owner=root \
+    group=bin mode=0755
+file usr/include/ppi/String.h path=usr/include/ppi/String.h owner=root \
+    group=bin mode=0755
+file usr/include/ppi/StringCl.h path=usr/include/ppi/StringCl.h owner=root \
+    group=bin mode=0755
+file usr/include/ppi/mivarargs.h path=usr/include/ppi/mivarargs.h owner=root \
+    group=bin mode=0755
+file usr/include/ppi/vectors.h path=usr/include/ppi/vectors.h owner=root \
+    group=bin mode=0755
+file usr/lib/_predll.o path=usr/lib/_predll.o owner=root group=bin mode=0644
+file usr/lib/amd64/_predll.o path=usr/lib/amd64/_predll.o owner=root group=bin mode=0644
+file usr/lib/_prelink.o path=usr/lib/_prelink.o owner=root group=bin mode=0644
+file usr/lib/amd64/_prelink.o path=usr/lib/amd64/_prelink.o owner=root group=bin mode=0644
+file usr/lib/cakit.a path=usr/lib/cakit.a owner=root group=bin mode=0755
+file usr/lib/amd64/cakit.a path=usr/lib/amd64/cakit.a owner=root group=bin mode=0755
+file usr/lib/objcdlso.ld path=usr/lib/objcdlso.ld owner=root group=bin mode=0644
+file usr/lib/amd64/objcdlso.ld path=usr/lib/amd64/objcdlso.ld owner=root group=bin mode=0644
+file usr/lib/objchelp.txt path=usr/lib/objchelp.txt owner=root group=bin \
+    mode=0644
+file usr/lib/amd64/objchelp.txt path=usr/lib/amd64/objchelp.txt owner=root group=bin \
+    mode=0644
+file usr/lib/objcrt.a path=usr/lib/objcrt.a owner=root group=bin mode=0755
+file usr/lib/amd64/objcrt.a path=usr/lib/amd64/objcrt.a owner=root group=bin mode=0755
+file usr/lib/objpak.a path=usr/lib/objpak.a owner=root group=bin mode=0755
+file usr/lib/amd64/objpak.a path=usr/lib/amd64/objpak.a owner=root group=bin mode=0755
+file usr/share/man/man1/cvtimport.1 path=usr/share/man/man1/cvtimport.1 \
+    owner=root group=bin mode=0755
+file usr/share/man/man1/objc.1 path=usr/share/man/man1/objc.1 owner=root \
+    group=bin mode=0755
+file usr/share/man/man1/postlink.1 path=usr/share/man/man1/postlink.1 \
+    owner=root group=bin mode=0755
+file usr/share/man/man1/vici.1 path=usr/share/man/man1/vici.1 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/Array.3 path=usr/share/man/man3/Array.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/AsciiFiler.3 path=usr/share/man/man3/AsciiFiler.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/BadVersion.3 path=usr/share/man/man3/BadVersion.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/Bag.3 path=usr/share/man/man3/Bag.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/BigInt.3 path=usr/share/man/man3/BigInt.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/Block.3 path=usr/share/man/man3/Block.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/CAObject.3 path=usr/share/man/man3/CAObject.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/Cltn.3 path=usr/share/man/man3/Cltn.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/Complex.3 path=usr/share/man/man3/Complex.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/Dictionary.3 path=usr/share/man/man3/Dictionary.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/Exception.3 path=usr/share/man/man3/Exception.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/Float.3 path=usr/share/man/man3/Float.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/Fraction.3 path=usr/share/man/man3/Fraction.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/IdArray.3 path=usr/share/man/man3/IdArray.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/IntArray.3 path=usr/share/man/man3/IntArray.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/IntegerModp.3 path=usr/share/man/man3/IntegerModp.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/Matrix.3 path=usr/share/man/man3/Matrix.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/Message.3 path=usr/share/man/man3/Message.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/Monomial.3 path=usr/share/man/man3/Monomial.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/NotFound.3 path=usr/share/man/man3/NotFound.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/Object.3 path=usr/share/man/man3/Object.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/OrdCltn.3 path=usr/share/man/man3/OrdCltn.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/OutOfBounds.3 path=usr/share/man/man3/OutOfBounds.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/OutOfMemory.3 path=usr/share/man/man3/OutOfMemory.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/Paragraph.3 path=usr/share/man/man3/Paragraph.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/Point.3 path=usr/share/man/man3/Point.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/Polynomial.3 path=usr/share/man/man3/Polynomial.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/Rectangle.3 path=usr/share/man/man3/Rectangle.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/RunArray.3 path=usr/share/man/man3/RunArray.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/Sequence.3 path=usr/share/man/man3/Sequence.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/Set.3 path=usr/share/man/man3/Set.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/SortCltn.3 path=usr/share/man/man3/SortCltn.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/Stack.3 path=usr/share/man/man3/Stack.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/String.3 path=usr/share/man/man3/String.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/Symbol.3 path=usr/share/man/man3/Symbol.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/Term.3 path=usr/share/man/man3/Term.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/Text.3 path=usr/share/man/man3/Text.3 owner=root \
+    group=bin mode=0755
+file usr/share/man/man3/TextAttribute.3 \
+    path=usr/share/man/man3/TextAttribute.3 owner=root group=bin mode=0755
+file usr/share/man/man3/TextStyle.3 path=usr/share/man/man3/TextStyle.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/TypeInconsistency.3 \
+    path=usr/share/man/man3/TypeInconsistency.3 owner=root group=bin mode=0755
+file usr/share/man/man3/UnknownType.3 path=usr/share/man/man3/UnknownType.3 \
+    owner=root group=bin mode=0755
+file usr/share/man/man3/Vector.3 path=usr/share/man/man3/Vector.3 owner=root \
+    group=bin mode=0755

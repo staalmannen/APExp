@@ -1,0 +1,30 @@
+.TH "notfound" 3 "Mar 12, 2023"
+.SH NotFound
+.PP
+.B
+Inherits from:
+
+Exception
+.PP
+.B
+Maturity Index:
+
+Experimental
+.SH Class Description
+.PP
+This is a subclass to signal that an object could not be found in a collection\&. Messages that should search for an object can signal this 
+.B
+Exception
+to indicate that the operation failed because no matching object was found\&.
+.PP
+The handler can be used as follows:
+.RS 3
+
+[[{ match=[cltn find:myObject]; } on:NotFound do:{ :e | match=nil;}];
+.br
+
+.br
+
+.RE
+.SH Method types
+.SH Methods

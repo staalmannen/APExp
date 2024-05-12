@@ -1,0 +1,84 @@
+dnl
+dnl autoconf source file for vici configure script
+dnl $Id: configure.in,v 1.1.1.1 2000/06/07 21:09:26 stes Exp $
+dnl
+
+AC_INIT()
+
+NAME=vici-0.0.1;AC_SUBST(NAME)
+WARNING="DO NOT EDIT -- configure ${NAME}";AC_SUBST(WARNING)
+
+AC_ARG_WITH(readline,
+  [  --with-readline                 use GNU readline (for line editing)],
+  [ac_cv_readline=$withval],
+  [ac_cv_readline=no]
+)
+
+AC_ARG_WITH(dlopen,
+  [  --with-dlopen                   support dlopen (dynamic loading)],
+  [ac_cv_dlopen=$withval],
+  [ac_cv_dlopen=no]
+)
+
+AC_CHECK_PROG(OBJC,objc,objc)
+AC_PROG_MAKE_SET
+AC_PROG_CC
+AC_PROG_CPP
+AC_CHECK_PROG(RM,rm,rm -f,del)
+AC_CHECK_PROG(CP,cp,cp -p,copy)
+AC_CHECK_PROG(CAT,cat,cat,Catenate)
+AC_CHECK_PROG(MKDIR,mkdir,mkdir,mkdir)
+AC_CHECK_PROG(TAR,tar,tar)
+TARARGS='';AC_SUBST(TARARGS)
+AC_CHECK_PROG(AR,ar,ar cr,:)
+dnl Most lexes, yaccs and bison also work (but: byacc is required for -refcnt)
+AC_CHECK_PROG(LEX,flex,flex)
+if test -z "$LEX"
+then
+  AC_MSG_ERROR(Can't find flex)
+fi
+AC_CHECK_PROG(YACC,byacc,byacc -d)
+if test -z "$YACC"
+then
+  AC_MSG_ERROR(Can't find Berkeley yacc (byacc))
+fi
+LEXYYC=lex.yy.c; AC_SUBST(LEXYYC)
+YTABH=y.tab.h; AC_SUBST(YTABH)
+YTABC=y.tab.c; AC_SUBST(YTABC)
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS(string.h stdarg.h unistd.h)
+
+
+AC_PROG_CC_C_O
+AC_C_CONST
+
+IFLAGS=""
+MFLAGS="-q"
+LDFLAGS="-q"
+LIBS=""
+case $ac_cv_readline in
+  yes) USE_READLINE=1
+       IFLAGS="$IFLAGS -I/usr/include/readline"
+       LIBS="$LIBS -lreadline"
+       ;;
+  *)   USE_READLINE=0
+       ;;
+esac
+
+case $ac_cv_dlopen in
+  yes) HAVE_DLFCN_H=1;MFLAGS="$MFLAGS -dynamic";LDFLAGS="$LDFLAGS -dynamic";;
+  *) HAVE_DLFCN_H=0;;
+esac
+
+AC_SUBST(HAVE_DLFCN_H)
+AC_SUBST(USE_READLINE)
+AC_SUBST(IFLAGS)
+AC_SUBST(MFLAGS)
+AC_SUBST(LDFLAGS)
+AC_SUBST(LIBS)
+AC_CHECK_FUNCS(memcpy memset snprintf)
+
+list='Makefile config.h vici.m'
+AC_OUTPUT($list)
+

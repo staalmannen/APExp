@@ -1,0 +1,68 @@
+.TH "typeinc" 3 "Mar 12, 2023"
+.SH TypeInconsistency
+.PP
+.B
+Inherits from:
+
+Exception
+.PP
+.B
+Maturity Index:
+
+Experimental
+.SH Class Description
+.PP
+This is a subclass to signal a type descriptor inconsistency, specifically for the 
+.B
+AsciiFiler
+class\&.  If a filer scans a decriptor type string that it cannot handle, then it will signal the 
+.B
+TypeInconsistency
+exception, passing the character that the filer 
+.I
+got
+and the character that it actually expected (
+.I
+wanted
+)\&.
+.SH Method types
+.SH Methods
+.PP 
+gotChar
+.RS 1
+- (
+char
+)
+.B
+gotChar
+.RE
+.PP
+Returns the type descriptor that the filer got\&.
+.PP 
+wantChar
+.RS 1
+- (
+char
+)
+.B
+wantChar
+.RE
+.PP
+Returns the type descriptor that the filer expected\&.
+.PP 
+got:wanted:
+.RS 1
+-
+.B
+got
+:(char)
+.I
+c
+.B
+wanted
+:(char)
+.I
+w
+.RE
+.PP
+Sets the type descriptors\&.

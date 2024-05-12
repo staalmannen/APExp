@@ -1,0 +1,91 @@
+
+#
+# Portable Object Compiler
+# $Id: Makefile.vac,v 1.3 2003/10/12 10:01:34 stes Exp $
+#
+
+#
+# This Makefile should work with IBM's Visual Age NMAKE.
+#
+
+MKDIR=mkdir
+OBJC=objc
+RM=del
+CP=copy
+AR=ilib /NOBACKUP /NOIGNORECASE /QUIET
+FINAL_AR=echo
+RANLIB=echo
+MAKE=gmake
+DBG_MFLAGS=-q -Ti
+OPT_MFLAGS=-q -O -DNDEBUG
+OBJSUFFIX=obj
+LIBSUFFIX=lib
+BOOTDIR=..\\..
+LIBDIR=$(BOOTDIR)\\lib
+IFLAGS=-noI -I..\\..\\include\\objcrt
+MFLAGS=$(OPT_MFLAGS)
+
+.SUFFIXES: .m
+
+LIBRARY=objpak.lib
+
+OBJFILES=\
+	ascfiler.obj\
+	  notfound.obj\
+	  outofbnd.obj\
+	  badvers.obj\
+	  typeinc.obj\
+	  unknownt.obj\
+	cltn.obj\
+	  ordcltn.obj\
+	  sortcltn.obj\
+	  set.obj\
+	  bag.obj\
+	  stack.obj\
+	  runarray.obj\
+	dictnary.obj\
+	sequence.obj\
+	array.obj\
+	  idarray.obj\
+	  intarray.obj\
+	  ocstring.obj\
+	rectangl.obj\
+	point.obj\
+	assoc.obj\
+	objgraph.obj\
+	cltnseq.obj\
+	keyseq.obj\
+	valueseq.obj\
+	setseq.obj\
+	bagseq.obj\
+	txtattr.obj\
+	octext.obj\
+	txtstyle.obj\
+	paragrph.obj\
+	treeseq.obj
+
+.m.obj:
+	$(OBJC) -c $*.m $(MFLAGS) $(IFLAGS)
+	$(AR) $(LIBRARY) -+ $@ ;
+
+$(LIBRARY) : $(OBJFILES)
+	$(FINAL_AR) $(LIBRARY) $(OBJFILES)
+	$(RANLIB) $(LIBRARY)
+
+bootstrap :
+	test -d $(LIBDIR) || $(MKDIR) $(LIBDIR)
+	-$(CP) $(LIBRARY) $(LIBDIR)
+
+cleantmp :
+	-$(RM) *.P
+	-$(RM) *.c
+	-$(RM) *.i
+
+clean : cleantmp
+	-$(RM) *.obj
+	-$(RM) *.lib
+
+distclean : clean
+	-$(RM) Makefile 
+	-$(RM) config.h 
+

@@ -1,0 +1,164 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Portable Object Compiler (c) 2003,2023.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Exception\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} Object\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Maturity Index:}} Experimental\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 Exception instances (or instances of a subclass of {\b Exception}) are used to signal exceptions.  This is an experimental class; Exception is not tested with the OTB (Object Tables) runtime and the class or exception API may change in future releases.\fs16\
+\
+\f0\fs28\li2200 To raise an exception, use:\fs16\
+\
+\f2\fs24\li2800     [[Exception new] signal];\
+\
+\f0\fs16\
+\f0\fs28\li2200 To install a handler to catch an exception, use the Block message:\fs16\
+\
+\f2\fs24\li2800     [\{ ... \} on:Exception do: \{ :anException | ... \}];\
+\
+\f0\fs16\
+\f0\fs28\li2200 The argument of the exception handler (the do: Block) is the instance of the Exception class that received the {\f2 signal} message.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Default Action}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation }
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- signal\
+	- signal:\
+	- free\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Signalling }
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- signal\
+	- signal:\
+	- messageText\
+	- str\
+	- messageText:\
+	- str:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Re-Signalling }
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- resignalAs:\
+	- resume\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 signal\f0\b0\
+\f0\fs28\li2500 +{\b signal}\fs16\
+\
+\f0\fs28\li2200 This is a shortcut for:\fs16\
+\
+\f2\fs24\li2800 [[self new] signal]\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 signal:\f0\b0\
+\f0\fs28\li2500 +{\b signal}:(STR){\i message}\fs16\
+\
+\f0\fs28\li2200 This is a shortcut for:\fs16\
+\
+\f2\fs24\li2800 [[self new] signal:message]\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 free\f0\b0\
+\f0\fs28\li2500 -{\b free}\fs16\
+\
+\f0\fs28\li2200 Overridden to dispose attributes.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 signal\f0\b0\
+\f0\fs28\li2500 -{\b signal}\fs16\
+\
+\f0\fs28\li2200 The message evaluates the handler that is installed to deal with this class of exceptions.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Note:}} If no handler is set, this message currently sends a {\f2 halt:} message with the {\i messageText} as argument.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 signal:\f0\b0\
+\f0\fs28\li2500 -{\b signal}:(STR){\i message}\fs16\
+\
+\f0\fs28\li2200 Like {\f2 signal}, but first sets the message text to {\i message}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 messageText\f0\b0\
+\f0\fs28\li2500 -{\b messageText}\fs16\
+\
+\f0\fs28\li2200 This method returns the descriptive text that was associated to the exception instance.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 str\f0\b0\
+\f0\fs28\li2500 - (STR){\b str}\fs16\
+\
+\f0\fs28\li2200 Equivalent to :\fs16\
+\
+\f2\fs24\li2800 [messageText str]\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 messageText:\f0\b0\
+\f0\fs28\li2500 -{\b messageText}:{\i message}\fs16\
+\
+\f0\fs28\li2200 Associates a String attribute to the exception.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 str:\f0\b0\
+\f0\fs28\li2500 -{\b str}:(STR){\i message}\fs16\
+\
+\f0\fs28\li2200 Equivalent to {\f2 messageText:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 resignalAs:\f0\b0\
+\f0\fs28\li2500 -{\b resignalAs}:{\i replacementException}\fs16\
+\
+\f0\fs28\li2200 Signal an alternative exception in place of the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 resume\f0\b0\
+\f0\fs28\li2500 -{\b resume}\fs16\
+\
+\f0\fs28\li2200 Reinstall the handler that was active at the time the exception was signalled.\fs16\
+\
+\fs16\
+\
+\
+}

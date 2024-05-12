@@ -1,0 +1,105 @@
+
+#
+# Portable Object Compiler (c) 1997,98,99,2000.  All Rights Reserved. 
+# $Id: Makefile.in,v 1.1.1.1 2000/06/07 21:09:26 stes Exp $
+#
+
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+BINDIR=@bindir@
+RM=@RM@
+CP=@CP@
+OBJC=@OBJC@
+MFLAGS=@MFLAGS@
+LDFLAGS=@LDFLAGS@
+IFLAGS=-I../oclib @IFLAGS@
+@SET_MAKE@
+YACC=@YACC@
+LEX=@LEX@
+LEXYYC=lex.yy.c
+YTABH=y.tab.h
+YTABC=y.tab.c
+LIBS=../oclib/oclib.a @LIBS@
+
+.SUFFIXES: .m .lm .ym
+
+VICI=vici
+
+OBJFILES=\
+	vici.o\
+	yacc.o\
+	lex.o\
+        cmd.o\
+          run.o\
+          load.o\
+          quit.o\
+          echo.o\
+          help.o\
+          shell.o\
+          make.o\
+          args.o\
+          cflags.o\
+          list.o\
+          next.o\
+          step.o\
+          continue.o\
+          backtrace.o\
+          break.o\
+          breakpt.o\
+        loaded.o\
+        revmap.o\
+        msgwrap.o\
+          e_stdmsg.o\
+        funwrap.o\
+        globwrap.o\
+          e_stdio.o\
+          e_ctype.o\
+          e_stdlib.o\
+          e_string.o
+
+default : vici dynclass.so
+
+.m.o:
+	$(OBJC) -c $*.m $(MFLAGS) $(IFLAGS)
+
+.lm.o:
+	$(LEX) $*.lm
+	-$(CP) $(LEXYYC) $*.m
+	$(OBJC) -c $(MFLAGS) $(IFLAGS) $*.m
+	-$(RM) $(LEXYYC)
+	-$(RM) $*.m
+
+.ym.o:
+	$(YACC) $*.ym
+	-$(CP) $(YTABH) $*.h
+	-$(CP) $(YTABC) $*.m
+	$(OBJC) -c $(MFLAGS) $(IFLAGS) $*.m
+	-$(RM) $(YTABC)
+	-$(RM) $*.m
+
+$(VICI) : $(OBJFILES)
+	$(OBJC) $(LDFLAGS) $(OBJFILES) $(LIBS) -o $(VICI)
+
+install : $(VICI)
+	-$(CP) $(VICI) $(BINDIR)/$(VICI)
+
+cleantmp :
+	-$(RM) *.P
+	-$(RM) *.i
+	-$(RM) y.tab.h y.output y.tab.c 
+
+dynclass.so : dynclass.m
+	$(OBJC) -dl dynclass.m -o dynclass.so 
+
+clean : cleantmp
+	-$(RM) *.o
+	-$(RM) yacc.h yacc.m lex.m dynclass.so
+	-$(RM) $(VICI)
+
+distclean : clean
+	-$(RM) Makefile 
+	-$(RM) config.h 
+	-$(RM) vici.m
+	-$(RM) config.cache config.status config.log
+
+

@@ -1,0 +1,192 @@
+
+#
+# Portable Object Compiler (c) 1996-2023. All Rights Reserved.
+# $Id: Makefile.in,v 1.30 2023/02/17 15:39:00 stes Exp $
+#
+
+SRCDIR=@srcdir@
+BUILDDIR=@builddir@
+CD=cd
+RM=rm
+@SET_MAKE@
+MKDIR=@MKDIR@
+INSTALLDIR=@INSTALLDIR@
+LIBROOTDIR=@LIBROOTDIR@
+DATAROOTDIR=@DATAROOTDIR@
+CP=@CP@
+HDRDIR=@HDRDIR@
+MANDIR=@MANDIR@
+MAN1=man1
+MAN3=man3objc
+
+default ::
+	$(MAKE) compiler
+	$(MAKE) cakit
+
+compiler : objc
+
+runtimer : objcrtr objpakr cakitr
+
+objcrt ::
+	$(CD) src; $(CD) objcrt; $(MAKE)
+
+objcrtr ::
+	$(CD) src;$(CD) objcrt; $(MAKE) OBJC="objc -q -refcnt" LIBRARY=objcrtr.a
+
+objpak ::
+	$(CD) src; $(CD) objpak; $(MAKE)
+
+objpakr ::
+	$(CD) src;$(CD) objpak; $(MAKE) OBJC="objc -q -refcnt" LIBRARY=objpakr.a
+
+oclib ::
+	$(CD) src; $(CD) oclib;  $(MAKE)
+
+objc : objcrt objpak oclib
+	$(CD) src; $(CD) objc;   $(MAKE)
+
+test : compiler
+	$(CD) src; $(CD) objc;   $(MAKE) check
+
+check : compiler
+	$(CD) src; $(CD) objc;   $(MAKE) check
+
+cakit ::
+	$(CD) src; $(CD) cakit;  $(MAKE)
+
+cakitr ::
+	$(CD) src;$(CD) cakit;$(MAKE) OBJC="objc -q -refcnt" LIBRARY=cakitr.a
+
+browse ::
+	objc -browse tmp browse.h
+	cd tmp;cursel Menu.main
+
+# runtime descends into objc to install the _predll.o and help file
+
+runtime ::
+	$(CD) src; $(CD) objcrt; $(MAKE) 
+	$(CD) src; $(CD) objpak; $(MAKE) 
+	$(CD) src; $(CD) objc; $(MAKE) runtime
+	$(CD) src; $(CD) cakit; $(MAKE) 
+
+shlib ::
+	$(CD) src; $(CD) objcrt; $(MAKE) shlib
+	$(CD) src; $(CD) objpak; $(MAKE) shlib
+
+#
+# tags file (vi -t isEqual , for example, brings you to isEqual)
+# control-] for a classname also works.
+#
+
+tags :
+	gawk -f ctags.awk src/objcrt/*.m src/objpak/*.m src/oclib/*.m > tags
+
+#
+# UNIX install.
+#
+
+MAN1PAGES=cvtimport.1 objc.1 postlink.1 vici.1
+MAN3PAGES=Array.3 Message.3 Polynomial.3 Term.3 AsciiFiler.3 Dictionary.3 Monomial.3 Rectangle.3 Text.3 BadVersion.3 Exception.3 NotFound.3 RunArray.3 TextAttribute.3 Bag.3 Float.3 Object.3 Sequence.3 TextStyle.3 BigInt.3 Fraction.3 OrdCltn.3 Set.3 TypeInconsistency.3 Block.3 IdArray.3 OutOfBounds.3 SortCltn.3 UnknownType.3 CAObject.3 IntArray.3 OutOfMemory.3 Stack.3 Vector.3 Cltn.3 IntegerModp.3 Paragraph.3 String.3 Complex.3 Matrix.3 Point.3 Symbol.3 
+
+CAKITHDRS=cakit.h cfloat.h intmodp.h polynom.h vector.h ccltn.h cobject.h fraction.h matrix.h symbol.h ccomplex.h cseq.h integer.h monomial.h term.h
+PPIHDRS=Array.h Filer.h IdArray.h mivarargs.h SortCltn.h vectors.h Assoc.h Graph.h IntArray.h OrdCltn.h StringCl.h ICpak101.h IPSequence.h Sequence.h String.h
+OBJCRTHDRS=Block.h Exceptn.h Message.h objc.h objcrt.h Object.h OutOfMem.h
+OBJPAKHDRS=array.h objpak.h paragrph.h set.h typeinc.h ascfiler.h dictnary.h ocstring.h point.h sortcltn.h unknownt.h badvers.h idarray.h octext.h rectangl.h stack.h bag.h intarray.h ordcltn.h runarray.h txtattr.h cltn.h notfound.h outofbnd.h sequence.h txtstyle.h
+
+installshlib ::
+	test -d $(INSTALLDIR) || $(MKDIR) $(INSTALLDIR)
+	test -d $(LIBROOTDIR) || $(MKDIR) $(LIBROOTDIR)
+	$(CD) src; $(CD) objcrt; $(MAKE) installshlib
+	$(CD) src; $(CD) objpak; $(MAKE) installshlib
+
+#installruntime descends into objc to install the _predll.o and help file
+
+installruntime ::
+	test -d $(INSTALLDIR) || $(MKDIR) $(INSTALLDIR)
+	test -d $(LIBROOTDIR) || $(MKDIR) $(LIBROOTDIR)
+	-$(CD) src; $(CD) objcrt; $(MAKE) install
+	-$(CD) src; $(CD) objpak; $(MAKE) install
+	-$(CD) src; $(CD) objc; $(MAKE) installruntime
+	-$(CD) src; $(CD) cakit; $(MAKE) install
+
+#installman only installs manpages (for objc-doc.apk package)
+#copy from man/man{1,3} to man/$(MAN1) and man/$(MAN3)
+
+installman ::
+	test -d $(INSTALLDIR) || $(MKDIR) $(INSTALLDIR)
+	test -d $(DATAROOTDIR) || $(MKDIR) $(DATAROOTDIR)
+	test -d $(MANDIR) || $(MKDIR) $(MANDIR)
+	test -d $(MANDIR)/$(MAN1) || $(MKDIR) $(MANDIR)/$(MAN1)
+	-$(CD) $(SRCDIR)/man/man1; $(CP) $(MAN1PAGES) $(MANDIR)/$(MAN1)
+	test -d $(MANDIR)/$(MAN3) || $(MKDIR) $(MANDIR)/$(MAN3)
+	-$(CD) $(SRCDIR)/man/man3; $(CP) $(MAN3PAGES) $(MANDIR)/$(MAN3)
+
+installinclude ::
+	test -d $(INSTALLDIR) || $(MKDIR) $(INSTALLDIR)
+	test -d $(HDRDIR) || $(MKDIR) $(HDRDIR)
+	test -d $(HDRDIR)/ppi    || $(MKDIR) $(HDRDIR)/ppi
+	test -d $(HDRDIR)/objcrt || $(MKDIR) $(HDRDIR)/objcrt
+	test -d $(HDRDIR)/objpak || $(MKDIR) $(HDRDIR)/objpak
+	test -d $(HDRDIR)/cakit  || $(MKDIR) $(HDRDIR)/cakit
+	-$(CD) $(SRCDIR)/include/ppi; $(CP) $(PPIHDRS) $(HDRDIR)/ppi
+	-$(CD) $(SRCDIR)/include/objcrt; $(CP) $(OBJCRTHDRS) $(HDRDIR)/objcrt
+	-$(CD) $(SRCDIR)/include/objpak; $(CP) $(OBJPAKHDRS) $(HDRDIR)/objpak
+	-$(CD) $(SRCDIR)/include/cakit; $(CP) $(CAKITHDRS) $(HDRDIR)/cakit
+
+installcakit : cakit
+	test -d $(INSTALLDIR) || $(MKDIR) $(INSTALLDIR)
+	test -d $(LIBROOTDIR) || $(MKDIR) $(LIBROOTDIR)
+	-$(CD) src; $(CD) cakit;  $(MAKE) install
+
+installcompiler : compiler 
+	test -d $(INSTALLDIR) || $(MKDIR) $(INSTALLDIR)
+	test -d $(LIBROOTDIR) || $(MKDIR) $(LIBROOTDIR)
+	-$(CD) src; $(CD) objcrt; $(MAKE) install
+	-$(CD) src; $(CD) objpak; $(MAKE) install
+	-$(CD) src; $(CD) objc;   $(MAKE) install
+
+install : installcompiler installcakit installinclude installman
+
+words ::
+	-$(CD) words;             $(MAKE)
+	words/words -set  < words/erasmus | wc -l
+	words/words -cltn < words/erasmus | wc -l
+	words/words -dic  < words/erasmus | wc -l
+	words/words -sort < words/erasmus | wc -l
+
+DependencyGraph ::
+	-$(CD) DependencyGraph;   $(MAKE)
+	DependencyGraph/dg main DependencyGraph/INPUT
+
+cleantmp :
+	-$(CD) src; $(CD) objcrt; $(MAKE) cleantmp
+	-$(CD) src; $(CD) objpak; $(MAKE) cleantmp
+	-$(CD) src; $(CD) oclib;  $(MAKE) cleantmp
+	-$(CD) src; $(CD) objc;   $(MAKE) cleantmp
+	-$(CD) src; $(CD) cakit;  $(MAKE) cleantmp
+	-$(CD) examples;          $(MAKE) cleantmp
+	-$(CD) words;             $(MAKE) cleantmp
+	-$(CD) DependencyGraph;   $(MAKE) cleantmp
+
+cleanruntime :
+	-$(CD) src; $(CD) objcrt; $(MAKE) clean
+	-$(CD) src; $(CD) objpak; $(MAKE) clean
+	-$(CD) src; $(CD) cakit;  $(MAKE) clean
+
+clean : cleanruntime
+	-$(CD) src; $(CD) oclib;  $(MAKE) clean
+	-$(CD) src; $(CD) objc;   $(MAKE) clean
+
+distclean :
+	-$(RM) Makefile tags
+	-$(RM) -rf autom4te.cache
+	-$(RM) config.h config.cache config.log config.status
+	-$(CD) src; $(CD) objcrt; $(MAKE) distclean
+	-$(CD) src; $(CD) objpak; $(MAKE) distclean
+	-$(CD) src; $(CD) oclib;  $(MAKE) distclean
+	-$(CD) src; $(CD) objc;   $(MAKE) distclean
+	-$(CD) src; $(CD) cakit;  $(MAKE) distclean
+	-$(CD) examples;          $(MAKE) distclean
+	-$(CD) words;             $(MAKE) distclean
+	-$(CD) DependencyGraph;   $(MAKE) distclean
+

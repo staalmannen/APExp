@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="author" content="Peter van Eerten"/>
+<meta name="keywords" content="BASIC C transpiler converter"/>
+<meta name="description" content="BaCon Documentation Navigator"/>
+<title>BaCon Documentation Navigator</title>
+</head>
+<body bgcolor="#ffffff">
+<small>
+<img src="http://www.basic-converter.org/baconeyes2.png" alt="">
+<h3><i>Table of Contents</i></h3>
+<a href="documentation.html#INTRODUCTION" target="doc">Introduction</a><br>
+<a href="documentation.html#BACON_USAGE" target="doc">BaCon usage and parameters</a><br>
+<a href="documentation.html#GENERAL_SYNTAX" target="doc">General syntax</a><br>
+<a href="documentation.html#MATHEMATICS_VARIABLES" target="doc">Mathematics, variables</a><br>
+<a href="documentation.html#EQUATIONS" target="doc">Equations</a><br>
+<a href="documentation.html#BETWEEN" target="doc">The BETWEEN and BEYOND keywords</a><br>
+<a href="documentation.html#INDEXED" target="doc">Indexed arrays</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DECLARATION_ARRAY" target="doc">Declaration of static arrays</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DECLARATION_DYN" target="doc">Declaration of dynamic arrays</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DIMENSIONS" target="doc">Dimensions</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#PASSING" target="doc">Passing arrays to functions or subs</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RETURNING" target="doc">Returning arrays from functions</a><br>
+<a href="documentation.html#ASSOCIATIVE_ARRAYS" target="doc">Associative arrays</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DECLARATION" target="doc">Declaration</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RELATIONS_LOOKUPS" target="doc">Relations, lookups, keys</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#BASIC_LOGIC" target="doc">Basic logic programming</a><br>
+<a href="documentation.html#RECORDS" target="doc">Records</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DECLARATION_RECORD" target="doc">Declaration</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ARRAY_RECORD" target="doc">Arrays of records</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#PASSING_RECORDS" target="doc">Passing records to functions or subs</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RETURNING_RECORDS" target="doc">Returning records from functions</a><br>
+<a href="documentation.html#STRINGS_BY" target="doc">Strings by value or by reference</a><br>
+<a href="documentation.html#ASCII" target="doc">ASCII, Unicode, UTF8</a><br>
+<a href="documentation.html#BINARY" target="doc">Binary trees</a><br>
+<a href="documentation.html#CREATING_LINKING" target="doc">Creating and linking to libraries created with BaCon</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STEP1_CREATE" target="doc">Step 1: create a library</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STEP2_COMPILE" target="doc">Step 2: compile the library</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STEP3_COPY" target="doc">Step 3: copy library to a system path</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STEP4_UPDATE" target="doc">Step 4: update linker cache</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STEP5_DEMONSTRATION" target="doc">Step 5: demonstration program</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STEP6_COMPILE" target="doc">Step 6: compile and link</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#REMARKS" target="doc">Remarks</a><br>
+<a href="documentation.html#CREATING_INTERNATIONALIZATION" target="doc">Creating internationalization files</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STEP1_CREATEPROGRAM" target="doc">Step 1: create program</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STEP2_COMPPROGRAM" target="doc">Step 2: compile program</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STEP3_CREATECATALOG" target="doc">Step 3: create catalog file</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STEP4_ADD" target="doc">Step 4: add translations</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STEP5_CREATEOBJECT" target="doc">Step 5: create object file</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STEP6_INSTALL" target="doc">Step 6: install</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STEP7_SETUP" target="doc">Step 7: setup Unix environment</a><br>
+<a href="documentation.html#NETWORKING" target="doc">Networking</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TCP" target="doc">TCP</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#UDP" target="doc">UDP</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#BROADCAST" target="doc">BROADCAST</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MULTICAST" target="doc">MULTICAST</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SCTP" target="doc">SCTP</a><br>
+<a href="documentation.html#TLS" target="doc">TLS secured network connections</a><br>
+<a href="documentation.html#RAMDISK" target="doc">Ramdisks and memory streams</a><br>
+<a href="documentation.html#DELIMITED" target="doc">Delimited strings</a><br>
+<a href="documentation.html#REGULAR" target="doc">Regular expressions</a><br>
+<a href="documentation.html#ERROR_TRAPPING" target="doc">Error trapping, error catching and debugging</a><br>
+<a href="documentation.html#NOTES" target="doc">Notes on transcompiling</a><br>
+<a href="documentation.html#EDITOR" target="doc">Using the BaCon spartanic editor (BaSE)</a><br>
+<a href="documentation.html#GUI" target="doc">Support for GUI programming</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ENABLE_GUI" target="doc">Enabling GUI functions</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DEFINE_GUI" target="doc">Defining the GUI</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SET_PROPERTY" target="doc">Setting properties</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MAINLOOP" target="doc">Entering the mainloop</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#HELPER_FUNCTIONS" target="doc">Defining helper functions</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#NATIVE_FUNCTIONS" target="doc">Using native functions</a><br>
+<a href="documentation.html#STATEMENTS_FUNCTIONS" target="doc">Overview of BaCon statements and functions</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ABS" target="doc">ABS</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ACCEPT" target="doc">ACCEPT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ACOS" target="doc">ACOS</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ADDRESS" target="doc">ADDRESS</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ALARM" target="doc">ALARM</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ALIAS" target="doc">ALIAS</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ALIGN$" target="doc">ALIGN$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#AMOUNT" target="doc">AMOUNT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#AND" target="doc">AND</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#APPEND" target="doc">APPEND</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#APPEND$" target="doc">APPEND$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ARGUMENT$" target="doc">ARGUMENT$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ASC" target="doc">ASC</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ASIN" target="doc">ASIN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ATN" target="doc">ATN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ATN2" target="doc">ATN2</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#B64DEC$" target="doc">B64DEC$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#B64ENC$" target="doc">B64ENC$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#BAPPEND" target="doc">BAPPEND</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#BASENAME$" target="doc">BASENAME$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#BIN$" target="doc">BIN$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#BIT" target="doc">BIT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#BLOAD" target="doc">BLOAD</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#BREAK" target="doc">BREAK</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#BSAVE" target="doc">BSAVE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#BYTELEN" target="doc">BYTELEN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CA$" target="doc">CA$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CALL" target="doc">CALL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CATCH" target="doc">CATCH</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CEIL" target="doc">CEIL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CERTIFICATE" target="doc">CERTIFICATE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CHANGE$" target="doc">CHANGE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CHANGEDIR" target="doc">CHANGEDIR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CHOP$" target="doc">CHOP$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CHR$" target="doc">CHR$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CIPHER$" target="doc">CIPHER$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CL$" target="doc">CL$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CLASS" target="doc">CLASS</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CLEAR" target="doc">CLEAR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CLOSE" target="doc">CLOSE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CMDLINE" target="doc">CMDLINE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CN$" target="doc">CN$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#COIL$" target="doc">COIL$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#COLLAPSE" target="doc">COLLAPSE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#COLLECT" target="doc">COLLECT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#COLOR" target="doc">COLOR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#COLUMNS" target="doc">COLUMNS</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CONCAT$" target="doc">CONCAT$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CONST" target="doc">CONST</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CONTINUE" target="doc">CONTINUE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#COPY" target="doc">COPY</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#COS" target="doc">COS</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#COUNT" target="doc">COUNT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CR$" target="doc">CR$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CURDIR$" target="doc">CURDIR$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CURSOR" target="doc">CURSOR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#CUT$" target="doc">CUT$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DATA" target="doc">DATA</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DAY" target="doc">DAY</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DEC" target="doc">DEC</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DECLARE" target="doc">DECLARE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DECR" target="doc">DECR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DEF" target="doc">DEF FN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DEG" target="doc">DEG</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DEL$" target="doc">DEL$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DELETE" target="doc">DELETE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DELIM$" target="doc">DELIM$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DIRNAME$" target="doc">DIRNAME$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DLE$" target="doc">DLE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DO" target="doc">DO</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#DOTIMES" target="doc">DOTIMES</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#EDITBOM$" target="doc">EDITBOM$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#EL$" target="doc">EL$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#END" target="doc">END</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ENDFILE" target="doc">ENDFILE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ENUM" target="doc">ENUM</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#EPRINT" target="doc">EPRINT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#EQ" target="doc">EQ</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#EQUAL" target="doc">EQUAL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ERR$" target="doc">ERR$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ERROR" target="doc">ERROR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ESCAPE$" target="doc">ESCAPE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#EVAL" target="doc">EVAL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#EVEN" target="doc">EVEN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#EXCHANGE$" target="doc">EXCHANGE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#EXEC$" target="doc">EXEC$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#EXIT" target="doc">EXIT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#EXP" target="doc">EXP</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#EXPLODE$" target="doc">EXPLODE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#EXTRACT$" target="doc">EXTRACT$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FALSE" target="doc">FALSE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FILEEXISTS" target="doc">FILEEXISTS</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FILELEN" target="doc">FILELEN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FILETIME" target="doc">FILETIME</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FILETYPE" target="doc">FILETYPE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FILL$" target="doc">FILL$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FIND" target="doc">FIND</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FIRST$" target="doc">FIRST$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FLATTEN$" target="doc">FLATTEN$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FLOOR" target="doc">FLOOR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FOR" target="doc">FOR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FORK" target="doc">FORK</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FP" target="doc">FP</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FREE" target="doc">FREE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#FUNCTION" target="doc">FUNCTION</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GETBYTE" target="doc">GETBYTE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GETENVIRON$" target="doc">GETENVIRON$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GETFILE" target="doc">GETFILE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GETKEY" target="doc">GETKEY</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GETLINE" target="doc">GETLINE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GETPEER$" target="doc">GETPEER$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GETXGETY" target="doc">GETX / GETY</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GLOBAL" target="doc">GLOBAL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GOSUB" target="doc">GOSUB</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GOTO" target="doc">GOTO</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GOTOXY" target="doc">GOTOXY</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GUIDEFINE" target="doc">GUIDEFINE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GUIEVENT$" target="doc">GUIEVENT$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GUIFN" target="doc">GUIFN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GUIGET" target="doc">GUIGET</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GUISET" target="doc">GUISET</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#GUIWIDGET" target="doc">GUIWIDGET</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#HASBOM" target="doc">HASBOM</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#HASDELIM" target="doc">HASDELIM</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#HASH" target="doc">HASH</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#HEAD$" target="doc">HEAD$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#HEX$" target="doc">HEX$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#HOST$" target="doc">HOST$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#HOSTNAME$" target="doc">HOSTNAME$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#HOUR" target="doc">HOUR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#IF" target="doc">IF</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#IIFIIF$" target="doc">IIF / IIF$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#IMPORT" target="doc">IMPORT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#INBETWEEN$" target="doc">INBETWEEN$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#INCLUDE" target="doc">INCLUDE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#INCR" target="doc">INCR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#INDEX" target="doc">INDEX</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#INDEX$" target="doc">INDEX$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#INPUT" target="doc">INPUT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#INSERT$" target="doc">INSERT$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#INSTR" target="doc">INSTR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#INSTRREV" target="doc">INSTRREV</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#INTL$" target="doc">INTL$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#INVERT" target="doc">INVERT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ISASCII" target="doc">ISASCII</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ISFALSE" target="doc">ISFALSE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ISKEY" target="doc">ISKEY</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ISTOKEN" target="doc">ISTOKEN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ISTRUE" target="doc">ISTRUE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ISUTF8" target="doc">ISUTF8</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#JOIN" target="doc">JOIN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#LABEL" target="doc">LABEL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#LAST$" target="doc">LAST$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#LCASE$" target="doc">LCASE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#LEFT$" target="doc">LEFT$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#LEN" target="doc">LEN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#LET" target="doc">LET</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#LINENO" target="doc">LINENO</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#LOAD$" target="doc">LOAD$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#LOCAL" target="doc">LOCAL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#LOG" target="doc">LOG</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#LOOKUP" target="doc">LOOKUP</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#LOOP" target="doc">LOOP</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#LOOP$" target="doc">LOOP$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MAKEDIR" target="doc">MAKEDIR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MAP" target="doc">MAP</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MATCH" target="doc">MATCH</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MAX" target="doc">MAX / MAX$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MAXNUM" target="doc">MAXNUM</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MAXRANDOM" target="doc">MAXRANDOM</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ME$" target="doc">ME$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MEMCHECK" target="doc">MEMCHECK</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MEMORY" target="doc">MEMORY</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MEMREWIND" target="doc">MEMREWIND</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MEMTELL" target="doc">MEMTELL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MERGE$" target="doc">MERGE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MID$" target="doc">MID$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MIN" target="doc">MIN / MIN$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MINUTE" target="doc">MINUTE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MOD" target="doc">MOD</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MONTH" target="doc">MONTH</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MONTH$" target="doc">MONTH$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#MYPID" target="doc">MYPID</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#NANOTIMER" target="doc">NANOTIMER</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#NE" target="doc">NE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#NL$" target="doc">NL$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#NNTL$" target="doc">NNTL$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#NOT" target="doc">NOT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#NOW" target="doc">NOW</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#NRKEYS" target="doc">NRKEYS</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#OBTAIN$" target="doc">OBTAIN$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ODD" target="doc">ODD</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ON" target="doc">ON</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#OPEN" target="doc">OPEN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#OPTION" target="doc">OPTION</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#OR" target="doc">OR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#OS$" target="doc">OS$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#OUTBETWEEN$" target="doc">OUTBETWEEN$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#PARSE" target="doc">PARSE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#PEEK" target="doc">PEEK</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#PI" target="doc">PI</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#POKE" target="doc">POKE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#POW" target="doc">POW</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#PRAGMA" target="doc">PRAGMA</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#PRINT" target="doc">PRINT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#PROPER$" target="doc">PROPER$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#PROTO" target="doc">PROTO</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#PULL" target="doc">PULL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#PUSH" target="doc">PUSH</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#PUTBYTE" target="doc">PUTBYTE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#PUTLINE" target="doc">PUTLINE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RAD" target="doc">RAD</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RANDOM" target="doc">RANDOM</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#READ" target="doc">READ</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#READLN" target="doc">READLN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#REALPATH$" target="doc">REALPATH$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#REAP" target="doc">REAP</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RECEIVE" target="doc">RECEIVE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RECORD" target="doc">RECORD</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#REDIM" target="doc">REDIM</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#REGEX" target="doc">REGEX</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#REGLEN" target="doc">REGLEN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RELATE" target="doc">RELATE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#REM" target="doc">REM</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RENAME" target="doc">RENAME</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#REPEAT" target="doc">REPEAT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#REPLACE$" target="doc">REPLACE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RESIZE" target="doc">RESIZE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RESTORE" target="doc">RESTORE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RESUME" target="doc">RESUME</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RETURN" target="doc">RETURN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RETVAL" target="doc">RETVAL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#REV$" target="doc">REV$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#REVERSE$" target="doc">REVERSE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#REWIND" target="doc">REWIND</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RIGHT$" target="doc">RIGHT$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RIP$" target="doc">RIP$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RND" target="doc">RND</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ROL" target="doc">ROL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ROR" target="doc">ROR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ROTATE$" target="doc">ROTATE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ROUND" target="doc">ROUND</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ROWS" target="doc">ROWS</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RUN" target="doc">RUN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#RUN$" target="doc">RUN$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SAVE" target="doc">SAVE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SCREEN" target="doc">SCREEN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SCROLL" target="doc">SCROLL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SEARCH" target="doc">SEARCH</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SECOND" target="doc">SECOND</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SEED" target="doc">SEED</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SEEK" target="doc">SEEK</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SELECT" target="doc">SELECT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SEND" target="doc">SEND</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SETENVIRON" target="doc">SETENVIRON</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SETSERIAL" target="doc">SETSERIAL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SGN" target="doc">SGN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SIGNAL" target="doc">SIGNAL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SIN" target="doc">SIN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SIZEOF" target="doc">SIZEOF</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SLEEP" target="doc">SLEEP</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SORT" target="doc">SORT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SORT$" target="doc">SORT$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SOURCE$" target="doc">SOURCE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SP" target="doc">SP</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SPC$" target="doc">SPC$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SPLIT" target="doc">SPLIT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SQR" target="doc">SQR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STOP" target="doc">STOP</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#STR$" target="doc">STR$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SUB" target="doc">SUB</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SUM" target="doc">SUM / SUMF</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SWAP" target="doc">SWAP</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#SYSTEM" target="doc">SYSTEM</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TAB$" target="doc">TAB$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TAIL$" target="doc">TAIL$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TALLY" target="doc">TALLY</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TAN" target="doc">TAN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TELL" target="doc">TELL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TEXTDOMAIN" target="doc">TEXTDOMAIN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TIMER" target="doc">TIMER</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TIMEVALUE" target="doc">TIMEVALUE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TOASCII" target="doc">TOASCII$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TOKEN$" target="doc">TOKEN$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TALLY1" target="doc">TOTAL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TRACE" target="doc">TRACE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TRAP" target="doc">TRAP</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TREE" target="doc">TREE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TRUE" target="doc">TRUE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TYPE" target="doc">TYPE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#TYPEOF$" target="doc">TYPEOF$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#UBOUND" target="doc">UBOUND</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#UCASE$" target="doc">UCASE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#UCS" target="doc">UCS</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#ULEN" target="doc">ULEN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#UNESCAPE$" target="doc">UNESCAPE$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#UNFLATTEN$" target="doc">UNFLATTEN$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#UNIQ$" target="doc">UNIQ$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#USEC" target="doc">USEC</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#USEH" target="doc">USEH</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#UTF8$" target="doc">UTF8$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#VAL" target="doc">VAL</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#VAR" target="doc">VAR</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#VERIFY" target="doc">VERIFY</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#VERSION$" target="doc">VERSION$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#WAIT" target="doc">WAIT</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#WALK$" target="doc">WALK$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#WEEK" target="doc">WEEK</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#WEEKDAY$" target="doc">WEEKDAY$</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#WHERE" target="doc">WHERE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#WHILE" target="doc">WHILE</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#WITH" target="doc">WITH</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#WRITELN" target="doc">WRITELN</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#YEAR" target="doc">YEAR</a><br>
+<a href="documentation.html#APPENDIXA" target="doc">Appendix A: Runtime error codes</a><br>
+<a href="documentation.html#APPENDIXB" target="doc">Appendix B: standard POSIX variables</a><br>
+<a href="documentation.html#APPENDIXC" target="doc">Appendix C: reserved keywords and functions</a><br>
+<a href="documentation.html#APPENDIXD" target="doc">Appendix D: details on string optimization in BaCon</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#D_1" target="doc">Different binary layout</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#D_2" target="doc">Hash table</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#D_3" target="doc">Pointer swap</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#D_5" target="doc">Static character pointers</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#D_6" target="doc">Using a pre-buffer</a><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<a href="documentation.html#D_4" target="doc">Memory pool</a><br>
+</small>
+</body>
+</html>

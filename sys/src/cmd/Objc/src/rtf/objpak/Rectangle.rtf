@@ -1,0 +1,336 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Portable Object Compiler (c) 1997,98,99.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Rectangle\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} Object\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 {\b Rectangle} instances are pairs of Point objects.  It is mostly Squeak and Stepstone ICpak101 compatible.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- new\
+	- origin:corner:\
+	- origin:extent:\
+	- origin::corner::\
+	- origin::extent::\
+	- free\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Motion}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- origin:\
+	- corner:\
+	- origin:corner:\
+	- extent::\
+	- extent:\
+	- origin::\
+	- corner::\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Comparing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- contains:\
+	- hash\
+	- isEqual:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Interrogation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- left\
+	- right\
+	- top\
+	- bottom\
+	- width\
+	- height\
+	- origin\
+	- topLeft\
+	- topRight\
+	- topCenter\
+	- corner\
+	- bottomLeft\
+	- bottomCenter\
+	- bottomRight\
+	- center\
+	- leftCenter\
+	- rightCenter\
+	- extent\
+	- quickMerge:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Arithmetic}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- moveBy:\
+	- translateBy:\
+	- align:with:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printOn:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 new\f0\b0\
+\f0\fs28\li2500 +{\b new}\fs16\
+\
+\f0\fs28\li2200 Returns a new rectangle with origin and corner at (0,0).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 origin:corner:\f0\b0\
+\f0\fs28\li2500 +{\b origin}:{\i p}{\b corner}:{\i q}\fs16\
+\
+\f0\fs28\li2200 Returns a new rectangle with origin and corner set to {\i p} and {\i q}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 origin:extent:\f0\b0\
+\f0\fs28\li2500 +{\b origin}:{\i p}{\b extent}:{\i q}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 origin::corner::\f0\b0\
+\f0\fs28\li2500 +{\b origin}:(int){\i x1}:(int){\i y1}{\b corner}:(int){\i x2}:(int){\i y2}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 origin::extent::\f0\b0\
+\f0\fs28\li2500 +{\b origin}:(int){\i x}:(int){\i y}{\b extent}:(int){\i w}:(int){\i h}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 free\f0\b0\
+\f0\fs28\li2500 -{\b free}\fs16\
+\
+\f0\fs28\li2200 Frees the {\i origin} and {\i corner} of the Point too.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 origin:\f0\b0\
+\f0\fs28\li2500 -{\b origin}:{\i p}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 corner:\f0\b0\
+\f0\fs28\li2500 -{\b corner}:{\i q}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 origin:corner:\f0\b0\
+\f0\fs28\li2500 -{\b origin}:{\i p}{\b corner}:{\i q}\fs16\
+\
+\f0\fs28\li2200 Sets origin and corner to {\i p} and {\i q}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 extent::\f0\b0\
+\f0\fs28\li2500 -{\b extent}:(int){\i w}:(int){\i h}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 extent:\f0\b0\
+\f0\fs28\li2500 -{\b extent}:{\i q}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 origin::\f0\b0\
+\f0\fs28\li2500 -{\b origin}:(int){\i x1}:(int){\i y1}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 corner::\f0\b0\
+\f0\fs28\li2500 -{\b corner}:(int){\i x1}:(int){\i y1}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 contains:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b contains}:{\i aPoint}\fs16\
+\
+\f0\fs28\li2200 Yes if inside, or on a border of, the rectangle.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hash\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b hash}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEqual}:{\i aRectangle}\fs16\
+\
+\f0\fs28\li2200 Returns YES if {\i aRectangle} is some kind of rectangle, and if corner and origin are equal.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 left\f0\b0\
+\f0\fs28\li2500 - (int){\b left}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 right\f0\b0\
+\f0\fs28\li2500 - (int){\b right}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 top\f0\b0\
+\f0\fs28\li2500 - (int){\b top}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 bottom\f0\b0\
+\f0\fs28\li2500 - (int){\b bottom}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 width\f0\b0\
+\f0\fs28\li2500 - (int){\b width}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 height\f0\b0\
+\f0\fs28\li2500 - (int){\b height}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 origin\f0\b0\
+\f0\fs28\li2500 -{\b origin}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 topLeft\f0\b0\
+\f0\fs28\li2500 -{\b topLeft}\fs16\
+\
+\f0\fs28\li2200 Same as {\f2 origin}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 topRight\f0\b0\
+\f0\fs28\li2500 -{\b topRight}\fs16\
+\
+\f0\fs28\li2200 Answer the point at the top right corner of the receiver's top horizontal.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 topCenter\f0\b0\
+\f0\fs28\li2500 -{\b topCenter}\fs16\
+\
+\f0\fs28\li2200 Answer the point at the center of the receiver's top horizontal.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 corner\f0\b0\
+\f0\fs28\li2500 -{\b corner}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 bottomLeft\f0\b0\
+\f0\fs28\li2500 -{\b bottomLeft}\fs16\
+\
+\f0\fs28\li2200 Returns the point at the left edge of the bottom horizontal line of the receiver(or bottomLeft for short).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 bottomCenter\f0\b0\
+\f0\fs28\li2500 -{\b bottomCenter}\fs16\
+\
+\f0\fs28\li2200 Answer the point at the center of the receiver's bottom horizontal.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 bottomRight\f0\b0\
+\f0\fs28\li2500 -{\b bottomRight}\fs16\
+\
+\f0\fs28\li2200 Same as {\f2 corner}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 center\f0\b0\
+\f0\fs28\li2500 -{\b center}\fs16\
+\
+\f0\fs28\li2200 Return the point at the center of the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 leftCenter\f0\b0\
+\f0\fs28\li2500 -{\b leftCenter}\fs16\
+\
+\f0\fs28\li2200 Return the point at the center of the receiver's left vertical line.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 rightCenter\f0\b0\
+\f0\fs28\li2500 -{\b rightCenter}\fs16\
+\
+\f0\fs28\li2200 Return the point at the center of the receiver's left vertical line.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 extent\f0\b0\
+\f0\fs28\li2500 -{\b extent}\fs16\
+\
+\f0\fs28\li2200 Return a new Point, set to the width and height of the rectangle.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 quickMerge:\f0\b0\
+\f0\fs28\li2500 -{\b quickMerge}:{\i rect}\fs16\
+\
+\f0\fs28\li2200 Return the receiver if it encloses the given rectangle or the merge of the two rectangles if it doesn't.  This method is an optimization to reduce extra rectangle creations.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 moveBy:\f0\b0\
+\f0\fs28\li2500 -{\b moveBy}:{\i aPoint}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 translateBy:\f0\b0\
+\f0\fs28\li2500 -{\b translateBy}:{\i p}\fs16\
+\
+\f0\fs28\li2200 This method is like {\f2 moveBy:}, but returns a new rectangle instead of modifying the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 align:with:\f0\b0\
+\f0\fs28\li2500 -{\b align}:{\i p1}{\b with}:{\i p2}\fs16\
+\
+\f0\fs28\li2200 Answer a rectangle that is translated by {\i p2} - {\i p1}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\fs16\
+\
+\
+}

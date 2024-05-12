@@ -1,0 +1,375 @@
+# Process this file with autoconf to produce a configure script.
+AC_PREREQ([2.71])
+AC_INIT([BaCon],[4.8],[peter AT basic-converter DOT org])
+AC_CONFIG_SRCDIR([bacon.bac])
+
+# Checks for programs.
+AC_PROG_INSTALL
+
+# Determine platform
+AC_CANONICAL_HOST
+
+# Checks for libraries
+AC_SEARCH_LIBS(dlopen, [dl], [], [AC_MSG_ERROR(Cannot compile - missing library: dl)], [])
+AC_SEARCH_LIBS(dlsym, [dl], [], [AC_MSG_ERROR(Cannot compile - missing library: dl)], [])
+AC_SEARCH_LIBS(acos, [m], [], [AC_MSG_ERROR(Cannot compile - missing function: acos)], [])
+AC_SEARCH_LIBS(asin, [m], [], [AC_MSG_ERROR(Cannot compile - missing function: asin)], [])
+AC_SEARCH_LIBS(atan, [m], [], [AC_MSG_ERROR(Cannot compile - missing function: atan)], [])
+AC_SEARCH_LIBS(atan2, [m], [], [AC_MSG_ERROR(Cannot compile - missing function: atan2)], [])
+AC_SEARCH_LIBS(cos, [m], [], [AC_MSG_ERROR(Cannot compile - missing function: cos)], [])
+AC_SEARCH_LIBS(exp, [m], [], [AC_MSG_ERROR(Cannot compile - missing function: exp)], [])
+AC_SEARCH_LIBS(floor, [m], [], [AC_MSG_ERROR(Cannot compile - missing function: floor)], [])
+AC_SEARCH_LIBS(log, [m], [], [AC_MSG_ERROR(Cannot compile - missing function: log)], [])
+AC_SEARCH_LIBS(lrint, [m], [], [AC_MSG_ERROR(Cannot compile - missing function: lrint)], [])
+AC_SEARCH_LIBS(sin, [m], [], [AC_MSG_ERROR(Cannot compile - missing function: sin)], [])
+AC_SEARCH_LIBS(tan, [m], [], [AC_MSG_ERROR(Cannot compile - missing function: tan)], [])
+
+# Checks for header files.
+AC_CHECK_HEADER(arpa/inet.h, [], [AC_MSG_ERROR(Cannot compile - missing header: arpa/inet.h)])
+AC_CHECK_HEADER(ctype.h, [], [AC_MSG_ERROR(Cannot compile - missing header: ctype.h)])
+AC_CHECK_HEADER(dirent.h, [], [AC_MSG_ERROR(Cannot compile - missing header: dirent.h)])
+AC_CHECK_HEADER(dlfcn.h, [], [AC_MSG_ERROR(Cannot compile - missing header: dlfcn.h)])
+AC_CHECK_HEADER(errno.h, [], [AC_MSG_ERROR(Cannot compile - missing header: errno.h)])
+AC_CHECK_HEADER(fcntl.h, [], [AC_MSG_ERROR(Cannot compile - missing header: fcntl.h)])
+AC_CHECK_HEADER(fts.h, [], [AC_MSG_ERROR(Cannot compile - missing header: fts.h)])
+AC_CHECK_HEADER(libgen.h, [], [AC_MSG_ERROR(Cannot compile - missing header: libgen.h)])
+AC_CHECK_HEADER(locale.h, [], [AC_MSG_ERROR(Cannot compile - missing header: locale.h)])
+AC_CHECK_HEADER(limits.h, [], [AC_MSG_ERROR(Cannot compile - missing header: limits.h)])
+AC_CHECK_HEADER(math.h, [], [AC_MSG_ERROR(Cannot compile - missing header: math.h)])
+AC_CHECK_HEADER(netdb.h, [], [AC_MSG_ERROR(Cannot compile - missing header: netdb.h)])
+AC_CHECK_HEADER(regex.h, [], [AC_MSG_ERROR(Cannot compile - missing header: regex.h)])
+AC_CHECK_HEADER(search.h, [], [AC_MSG_ERROR(Cannot compile - missing header: search.h)])
+AC_CHECK_HEADER(setjmp.h, [], [AC_MSG_ERROR(Cannot compile - missing header: setjmp.h)])
+AC_CHECK_HEADER(signal.h, [], [AC_MSG_ERROR(Cannot compile - missing header: signal.h)])
+AC_CHECK_HEADER(stdarg.h, [], [AC_MSG_ERROR(Cannot compile - missing header: stdarg.h)])
+AC_CHECK_HEADER(stdio.h, [], [AC_MSG_ERROR(Cannot compile - missing header: stdio.h)])
+AC_CHECK_HEADER(stdlib.h, [], [AC_MSG_ERROR(Cannot compile - missing header: stdlib.h)])
+AC_CHECK_HEADER(stdint.h, [], [AC_MSG_ERROR(Cannot compile - missing header: stdint.h)])
+AC_CHECK_HEADER(string.h, [], [AC_MSG_ERROR(Cannot compile - missing header: string.h)])
+AC_CHECK_HEADER(sys/ioctl.h, [], [AC_MSG_ERROR(Cannot compile - missing header: sys/ioctl.h)])
+AC_CHECK_HEADER(sys/socket.h, [], [AC_MSG_ERROR(Cannot compile - missing header: sys/socket.h)])
+AC_CHECK_HEADER(sys/stat.h, [], [AC_MSG_ERROR(Cannot compile - missing header: sys/stat.h)])
+AC_CHECK_HEADER(sys/time.h, [], [AC_MSG_ERROR(Cannot compile - missing header: sys/time.h)])
+AC_CHECK_HEADER(sys/types.h, [], [AC_MSG_ERROR(Cannot compile - missing header: sys/types.h)])
+AC_CHECK_HEADER(sys/utsname.h, [], [AC_MSG_ERROR(Cannot compile - missing header: sys/utsname.h)])
+AC_CHECK_HEADER(sys/wait.h, [], [AC_MSG_ERROR(Cannot compile - missing header: sys/wait.h)])
+AC_CHECK_HEADER(termios.h, [], [AC_MSG_ERROR(Cannot compile - missing header: termios.h)])
+AC_CHECK_HEADER(time.h, [], [AC_MSG_ERROR(Cannot compile - missing header: time.h)])
+AC_CHECK_HEADER(unistd.h, [], [AC_MSG_ERROR(Cannot compile - missing header: unistd.h)])
+AC_CHECK_HEADER(wctype.h, [], [AC_MSG_ERROR(Cannot compile - missing header: wctype.h)])
+
+# Check platform specific header files
+case $host in
+	*bsd*|*haiku* )
+            AC_CHECK_HEADER(netinet/in.h, [], [AC_MSG_ERROR(cannot compile - missing header: netinet/in.h)]);;
+esac
+
+# Checks for library functions.
+case $host in
+	*haiku* )
+	    AC_SEARCH_LIBS(accept, [network], [], [AC_MSG_ERROR(Cannot compile - missing function: accept)], []);;
+	* )
+	    AC_CHECK_FUNCS(accept, [], [AC_MSG_ERROR(Cannot compile - missing function: accept)])
+	    AC_CHECK_FUNCS(htonl, [], [AC_MSG_ERROR(Cannot compile - missing function: htonl)])
+	    AC_CHECK_FUNCS(htons, [], [AC_MSG_ERROR(Cannot compile - missing function: htons)]);;
+esac
+AC_CHECK_FUNCS(bind, [], [AC_MSG_ERROR(Cannot compile - missing function: bind)])
+AC_CHECK_FUNCS(connect, [], [AC_MSG_ERROR(Cannot compile - missing function: connect)])
+AC_CHECK_FUNCS(gethostbyaddr, [], [AC_MSG_ERROR(Cannot compile - missing function: gethostbyaddr)])
+AC_CHECK_FUNCS(gethostbyname, [], [AC_MSG_ERROR(Cannot compile - missing function: gethostbyname)])
+AC_CHECK_FUNCS(gethostname, [], [AC_MSG_ERROR(Cannot compile - missing function: gethostname)])
+AC_CHECK_FUNCS(getpeername, [], [AC_MSG_ERROR(Cannot compile - missing function: getpeername)])
+AC_CHECK_FUNCS(inet_addr, [], [AC_MSG_ERROR(Cannot compile - missing function: inet_addr)])
+AC_CHECK_FUNCS(inet_pton, [], [AC_MSG_ERROR(Cannot compile - missing function: inet_pton)])
+AC_CHECK_FUNCS(inet_ntoa, [], [AC_MSG_ERROR(Cannot compile - missing function: inet_ntoa)])
+AC_CHECK_FUNCS(recv, [], [AC_MSG_ERROR(Cannot compile - missing function: recv)])
+AC_CHECK_FUNCS(select, [], [AC_MSG_ERROR(Cannot compile - missing function: select)])
+AC_CHECK_FUNCS(send, [], [AC_MSG_ERROR(Cannot compile - missing function: send)])
+AC_CHECK_FUNCS(setsockopt, [], [AC_MSG_ERROR(Cannot compile - missing function: setsockopt)])
+AC_CHECK_FUNCS(basename, [], [AC_MSG_ERROR(Cannot compile - missing function: basename)])
+AC_CHECK_FUNCS(calloc, [], [AC_MSG_ERROR(Cannot compile - missing function: calloc)])
+AC_CHECK_FUNCS(closedir, [], [AC_MSG_ERROR(Cannot compile - missing function: closedir)])
+AC_CHECK_FUNCS(dirname, [], [AC_MSG_ERROR(Cannot compile - missing function: dirname)])
+AC_CHECK_FUNCS(execlp, [], [AC_MSG_ERROR(Cannot compile - missing function: execlp)])
+AC_CHECK_FUNCS(execvp, [], [AC_MSG_ERROR(Cannot compile - missing function: execvp)])
+AC_CHECK_FUNCS(_exit, [], [AC_MSG_ERROR(Cannot compile - missing function: _exit)])
+AC_CHECK_FUNCS(fork, [], [AC_MSG_ERROR(Cannot compile - missing function: fork)])
+AC_CHECK_FUNCS(fprintf, [], [AC_MSG_ERROR(Cannot compile - missing function: fprintf)])
+AC_CHECK_FUNCS(getdelim, [], [AC_MSG_ERROR(Cannot compile - missing function: getdelim)])
+AC_CHECK_FUNCS(getline, [], [AC_MSG_ERROR(Cannot compile - missing function: getline)])
+AC_CHECK_FUNCS(getpid, [], [AC_MSG_ERROR(Cannot compile - missing function: getpid)])
+AC_CHECK_FUNCS(ioctl, [], [AC_MSG_ERROR(Cannot compile - missing function: ioctl)])
+AC_CHECK_FUNCS(listen, [], [AC_MSG_ERROR(Cannot compile - missing function: listen)])
+AC_CHECK_FUNCS(malloc, [], [AC_MSG_ERROR(Cannot compile - missing function: malloc)])
+AC_CHECK_FUNCS(mbtowc, [], [AC_MSG_ERROR(Cannot compile - missing function: mbtowc)])
+AC_CHECK_FUNCS(mbstowcs, [], [AC_MSG_ERROR(Cannot compile - missing function: mbstowcs)])
+AC_CHECK_FUNCS(memcmp, [], [AC_MSG_ERROR(Cannot compile - missing function: memcmp)])
+AC_CHECK_FUNCS(memchr, [], [AC_MSG_ERROR(Cannot compile - missing function: memchr)])
+AC_CHECK_FUNCS(memmove, [], [AC_MSG_ERROR(Cannot compile - missing function: memmove)])
+AC_CHECK_FUNCS(memset, [], [AC_MSG_ERROR(Cannot compile - missing function: memset)])
+AC_CHECK_FUNCS(qsort, [], [AC_MSG_ERROR(Cannot compile - missing function: qsort)])
+AC_CHECK_FUNCS(random, [], [AC_MSG_ERROR(Cannot compile - missing function: random)])
+AC_CHECK_FUNCS(readdir, [], [AC_MSG_ERROR(Cannot compile - missing function: readdir)])
+AC_CHECK_FUNCS(realloc, [], [AC_MSG_ERROR(Cannot compile - missing function: realloc)])
+AC_CHECK_FUNCS(realpath, [], [AC_MSG_ERROR(Cannot compile - missing function: realpath)])
+AC_CHECK_FUNCS(setenv, [], [AC_MSG_ERROR(Cannot compile - missing function: setenv)])
+AC_CHECK_FUNCS(sigaction, [], [AC_MSG_ERROR(Cannot compile - missing function: sigaction)])
+AC_CHECK_FUNCS(snprintf, [], [AC_MSG_ERROR(Cannot compile - missing function: snprintf)])
+AC_CHECK_FUNCS(socket, [], [AC_MSG_ERROR(Cannot compile - missing function: socket)])
+AC_CHECK_FUNCS(strcat, [], [AC_MSG_ERROR(Cannot compile - missing function: strcat)])
+AC_CHECK_FUNCS(strchr, [], [AC_MSG_ERROR(Cannot compile - missing function: strchr)])
+AC_CHECK_FUNCS(strrchr, [], [AC_MSG_ERROR(Cannot compile - missing function: strrchr)])
+AC_CHECK_FUNCS(strcmp, [], [AC_MSG_ERROR(Cannot compile - missing function: strcmp)])
+AC_CHECK_FUNCS(strcasecmp, [], [AC_MSG_ERROR(Cannot compile - missing function: strcasecmp)])
+AC_CHECK_FUNCS(strcpy, [], [AC_MSG_ERROR(Cannot compile - missing function: strcpy)])
+AC_CHECK_FUNCS(strftime, [], [AC_MSG_ERROR(Cannot compile - missing function: strftime)])
+AC_CHECK_FUNCS(strlen, [], [AC_MSG_ERROR(Cannot compile - missing function: strlen)])
+AC_CHECK_FUNCS(strncat, [], [AC_MSG_ERROR(Cannot compile - missing function: strncat)])
+AC_CHECK_FUNCS(strncpy, [], [AC_MSG_ERROR(Cannot compile - missing function: strncpy)])
+AC_CHECK_FUNCS(strndup, [], [AC_MSG_ERROR(Cannot compile - missing function: strndup)])
+AC_CHECK_FUNCS(strstr, [], [AC_MSG_ERROR(Cannot compile - missing function: strstr)])
+AC_CHECK_FUNCS(strtok, [], [AC_MSG_ERROR(Cannot compile - missing function: strtok)])
+AC_CHECK_FUNCS(towlower, [], [AC_MSG_ERROR(Cannot compile - missing function: towlower)])
+AC_CHECK_FUNCS(towupper, [], [AC_MSG_ERROR(Cannot compile - missing function: towupper)])
+AC_CHECK_FUNCS(usleep, [], [AC_MSG_ERROR(Cannot compile - missing function: usleep)])
+AC_CHECK_FUNCS(waitpid, [], [AC_MSG_ERROR(Cannot compile - missing function: waitpid)])
+AC_CHECK_FUNCS(wctomb, [], [AC_MSG_ERROR(Cannot compile - missing function: wctomb)])
+AC_CHECK_FUNCS(wcstombs, [], [AC_MSG_ERROR(Cannot compile - missing function: wcstombs)])
+
+# Default shell
+BSHELL="none"
+
+# Check parameter: force compilation with ZSH?
+AC_ARG_WITH(zsh,
+    [AS_HELP_STRING([--with-zsh],[force compilation with ZSH (default: GUESS)])],
+	[BSHELL="zsh"])
+
+# Check parameter: force compilation with BASH
+AC_ARG_WITH(bash,
+    [AS_HELP_STRING([--with-bash],[force compilation with BASH (default: GUESS)])],
+	[BSHELL="bash"])
+
+# Check parameter: force compilation with KSH?
+AC_ARG_WITH(ksh,
+    [AS_HELP_STRING([--with-ksh],[force compilation with KSH (default: GUESS)])],
+	[BSHELL="ksh"])
+
+# Check for shell version.
+if test "$BSHELL" = none; then
+    AC_PATH_PROGS(BSHELL, ksh zsh bash, no)
+    if test "$BSHELL" = no; then
+        AC_MSG_ERROR(cannot compile - please install either Kornshell93, BASH or ZShell first.)
+    fi
+fi
+
+# Check if we need to build any GUI
+GTK3="false"
+TK="false"
+FLTK="false"
+LEGACY="false"
+
+AC_ARG_ENABLE([gui-gtk3],
+  [AS_HELP_STRING([--enable-gui-gtk3],[Build the GTK3 version of BaconGUI])],
+        [GTK3="true"])
+
+AC_ARG_ENABLE([gui-tk],
+  [AS_HELP_STRING([--enable-gui-tk],[Build the TK version of BaconGUI])],
+        [TK="true"])
+
+AC_ARG_ENABLE([gui-fltk],
+  [AS_HELP_STRING([--enable-gui-fltk],[Build the FLTK version of BaconGUI])],
+        [FLTK="true"])
+
+AC_ARG_ENABLE([gui-legacy],
+  [AS_HELP_STRING([--enable-gui-legacy],[Build the legacy GTK version of BaconGUI])],
+        [LEGACY="true"])
+
+AC_ARG_ENABLE([gui-all],
+  [AS_HELP_STRING([--enable-gui-all],[Build all versions of BaconGUI])],
+        [GTK3="true" TK="true" FLTK="true" LEGACY="true"])
+
+AC_ARG_ENABLE([gui],
+  [AS_HELP_STRING([--disable-gui],[Do not build a BaconGUI])],
+        [GTK3="none" TK="none" FLTK="none" LEGACY="none"])
+
+# Default is GTK version of BaConGUI
+if test "$GTK3" = true -o "$TK" = false -a "$FLTK" = false -a "$LEGACY" = false; then
+    AC_CHECK_PROG(PKG_CONFIG, pkg-config, found, missing)
+    if test "$PKG_CONFIG" = missing; then
+        GTK3="false"
+    else
+        AC_MSG_CHECKING(if GTK3 and supporting GtkSourceView4 and Webkit4 libraries are installed)
+        GTK3=`pkg-config --silence-errors --libs gtk+-3.0`
+        SRC3=`pkg-config --silence-errors --libs gtksourceview-4`
+        WEB3=`pkg-config --silence-errors --libs webkit2gtk-4.0`
+        if test -z "$GTK3" -o -z "$SRC3" -o -z "$WEB3"; then
+            AC_MSG_RESULT(not found)
+            GTK3="false"
+        else
+            AC_MSG_RESULT(found)
+            AC_SEARCH_LIBS(gtk_init, [gtk-3], [GTK3="true"], [GTK3="false"], [])
+            if test "$GTK3" = true; then
+                AC_SEARCH_LIBS(gtk_source_view_new, [gtksourceview-4], [GTK3="true"], [GTK3="false"], [])
+                if test "$GTK3" = true; then
+                    AC_SEARCH_LIBS(webkit_web_view_new, [webkit2gtk-4.0], [GTK3="true"], [GTK3="false"], [])
+                fi
+            fi
+        fi
+    fi
+fi
+
+# No GTK3 found? Then verify presence of TK library
+if test "$TK" = true -o "$GTK3" = false -a "$FLTK" = false -a "$LEGACY" = false; then
+    AC_CHECK_PROG(PKG_CONFIG, pkg-config, found, missing)
+    if test "$PKG_CONFIG" = missing; then
+        TK="false"
+    else
+        AC_MSG_CHECKING(if TK library is installed)
+        TK=`pkg-config --silence-errors --libs tk`
+        if test -z "$TK"; then
+            AC_MSG_RESULT(not found)
+            TK="false"
+        else
+            AC_MSG_RESULT(found)
+            AC_SEARCH_LIBS(Tk_Init, [tk tk8.6], [TK="true"], [TK="false"], [])
+        fi
+    fi
+fi
+
+# No GTK3 nor TK found? Then verify presence of FLTK library
+if test "$FLTK" = true -o "$GTK3" = false -a "$TK" = false -a "$LEGACY" = false; then
+    AC_CHECK_PROG(FLTK_CONFIG, fltk-config, found, missing)
+    if test "$FLTK_CONFIG" = found; then
+        AC_MSG_CHECKING(FLTK major version)
+        FL_MAJOR_VERSION=`fltk-config --version | cut -d. -f1`
+        if test "$FL_MAJOR_VERSION" -lt 1; then
+            FLTK="false"
+            AC_MSG_RESULT(too low)
+        else
+            AC_MSG_RESULT([$FL_MAJOR_VERSION])
+            AC_MSG_CHECKING(FLTK minor version)
+            FL_MINOR_VERSION=`fltk-config --version | cut -d. -f2`
+            if test "$FL_MINOR_VERSION" -lt 3; then
+                FLTK="false"
+                AC_MSG_RESULT(too low)
+            else
+                AC_MSG_RESULT([$FL_MINOR_VERSION])
+                AC_MSG_CHECKING(FLTK patch version)
+                FL_PATCH_VERSION=`fltk-config --version | cut -d. -f3`
+                if test "$FL_PATCH_VERSION" -lt 2; then
+                    FLTK="false"
+                    AC_MSG_RESULT(too low)
+                else
+                    AC_MSG_RESULT([$FL_PATCH_VERSION])
+                    AC_CHECK_HEADERS([FL/fl_utf8.h], [FLTK="true"], [FLTK="false"])
+                fi
+            fi
+        fi
+    else
+        FLTK="false"
+    fi
+fi
+
+# No suitable toolkit? Fall back to legacy GUI
+if test "$LEGACY" = true -o "$GTK3" = false -a "$TK" = false -a "$FLTK" = false; then
+    LEGACY="true"
+fi
+
+# Check C compiler
+AC_PROG_CC
+
+# Add compile flag to prevent gcc from hanging during compilation (GCC 4.8.4)
+if test "$CC" = gcc; then
+    AC_MSG_CHECKING(whether $CC accepts optional compile flag '-fno-var-tracking-assignments')
+    C_COMPILE_FLAG=`$CC -fno-var-tracking-assignments -x c /dev/null -E 2>&1 >/dev/null`
+    if test -z "$C_COMPILE_FLAG"; then
+        AC_MSG_RESULT(accepted)
+        CFLAGS="$CFLAGS -fno-var-tracking-assignments"
+    else
+        AC_MSG_RESULT(not accepted)
+    fi
+fi
+
+# Add macros when compiler is c89 or c99
+if test "$CC" = c89 -o "$CC" = c99; then
+    AC_MSG_CHECKING(whether $CC needs additional macros)
+    ANSIFLAGS="-D_DEFAULT_SOURCE -D_BSD_SOURCE -D_XOPEN_SOURCE_EXTENDED"
+    CFLAGS="$CFLAGS $ANSIFLAGS"
+    AC_MSG_RESULT($ANSIFLAGS)
+fi
+
+# Check C++ compiler
+AC_PROG_CXX
+
+# Check for 'strip'
+AC_CHECK_PROG(STRIP,strip,strip,touch)
+
+# Check for 'make'
+AC_CHECK_PROG(MAKE,make,yes,no)
+if test "$MAKE" = no; then
+    AC_MSG_ERROR(cannot compile - please install the 'make' utility.)
+fi
+
+# Check for '(f)lex'
+AC_CHECK_PROG(LEX,flex,yes,no)
+if test "$LEX" = no; then
+    AC_CHECK_PROG(LEX,lex,yes,no)
+    if test "$LEX" = no; then
+        AC_MSG_WARN(neither 'lex' nor 'flex' was found on this system - BaCon binary cannot be optimized.)
+    fi
+fi
+
+# Check for 'indent'
+AC_CHECK_PROG(INDENT,indent,yes,no)
+if test "$INDENT" = no; then
+    AC_MSG_WARN('indent' was not found on this system - generated sources cannot be indented when preserved.)
+fi
+
+# Make sure CFLAGS always works in the Makefile
+if test -z "CFLAGS"; then
+    CFLAGS="-g -O2"
+fi
+
+# Make sure CXXFLAGS always works in the Makefile
+if test -z "CXXFLAGS"; then
+    CXXFLAGS="-g -O2"
+fi
+
+# Substitute variables in Makefile
+AC_SUBST(CC)
+AC_SUBST(CFLAGS)
+AC_SUBST(CXX)
+AC_SUBST(CXXFLAGS)
+AC_SUBST(LDFLAGS)
+AC_SUBST(STRIP)
+AC_SUBST(BSHELL)
+AC_SUBST(LIBS)
+AC_SUBST(GTK3)
+AC_SUBST(TK)
+AC_SUBST(FLTK)
+AC_SUBST(LEGACY)
+
+AC_CONFIG_FILES([Makefile])
+AC_OUTPUT
+
+# Print results
+echo
+echo "Congratulations, all requirements are met!"
+echo
+echo "- Makefile created."
+echo "- Using '${BSHELL}' to compile BaCon."
+if test "$GTK3" = true; then
+    echo "- Creating BaConGUI for GTK3."
+fi
+if test "$TK" = true; then
+    echo "- Creating BaConGUI for TK."
+fi
+if test "$FLTK" = true; then
+    echo "- Creating BaConGUI for FLTK."
+fi
+if test "$LEGACY" = true; then
+    echo "- Creating the legacy BaConGUI for GTK."
+fi
+echo
+echo "Now run 'make' and 'make install' to build and install BaCon."
+echo

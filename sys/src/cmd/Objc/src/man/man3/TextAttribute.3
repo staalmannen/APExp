@@ -1,0 +1,247 @@
+.TH "txtattr" 3 "Mar 12, 2023"
+.SH TextAttribute
+.PP
+.B
+Inherits from:
+
+Object
+.PP
+.B
+Maturity Index:
+
+Experimental
+.SH Class Description
+.PP
+Abstract superclass for Text Attributes, as used by the 
+.B
+Text
+and the 
+.B
+RunArray
+classes\&.
+.PP
+Typically, an application will subclass 
+.B
+TextAttribute
+and use its own subclass with the 
+.B
+Text
+instance method 
+.B
+addAttribute:
+\&.
+.SH Method types
+.PP 
+.B
+Text Emphasis
+.RS 3
+.br
+* normal
+.br
+* new
+.br
+* bold
+.br
+* emphasiscode:
+.RE
+.PP 
+.B
+Accessing
+.RS 3
+.br
+* emphasiscode
+.br
+* emphasiscode:
+.RE
+.PP 
+.B
+Comparison
+.RS 3
+.br
+* isEqual:
+.RE
+.PP 
+.B
+Coalescing 
+.RS 3
+.br
+* dominates:
+.br
+* reset
+.br
+* set
+.RE
+.PP 
+.B
+Setting Scanner Attributes
+.RS 3
+.br
+* emphasizeScanner:
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+normal
+.RS 1
++
+.B
+normal
+.RE
+.PP
+A Text Attribute instance with emphasiscode set to 0\&.
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+A Text Attribute instance with emphasiscode set to 0\&.
+.PP 
+bold
+.RS 1
++
+.B
+bold
+.RE
+.PP
+Creates a Textattribute with emphasiscode set to 1\&.
+.PP 
+emphasiscode:
+.RS 1
++
+.B
+emphasiscode
+:(unsigned)
+.I
+n
+.RE
+.PP
+A Text Attribute instance with emphasiscode set to 
+.I
+n
+\&.  This value may suffice for simple applications, but normally a subclass of 
+.B
+TextAttribute
+would be used to associate more sophisticated values to a Text Attribute (such as URL of a hypertext link, or such as a Color value, or an X-Windows font etc\&.)\&.
+.PP 
+emphasiscode
+.RS 1
+- (
+unsigned
+)
+.B
+emphasiscode
+.RE
+.PP 
+emphasiscode:
+.RS 1
+-
+.B
+emphasiscode
+:(unsigned)
+.I
+c
+.RE
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+attrib
+.RE
+.PP
+The equality test for TextAttributes is used by RunArray\&'s 
+.B
+coalesce
+method to merge adjacent TextAttribute instances\&.
+.PP 
+dominates:
+.RS 1
+- (
+BOOL
+)
+.B
+dominates
+:
+.I
+attrib
+.RE
+.PP
+Should return YES if the receiver dominates 
+.I
+attrib
+\&.  This implies that, when the receiver is added to a list of Text Attributes, attributes that are dominated by the receiver will be removed\&.
+.PP
+The default returns NO, unless both objects are members of the same class and equal to each other (in which case they don\&'t need to be added more than once to the attribute list)\&. 
+.PP 
+reset
+.RS 1
+-
+.B
+reset
+.RE
+.PP
+Message that is sent to the attribute before it is added to a list of attributes\&.  Doesn\&'t do anything by default\&.
+.PP 
+set
+.RS 1
+- (
+BOOL
+)
+.B
+set
+.RE
+.PP
+Message that is sent to the attribute before it is added to a list of attributes\&.  If it returns YES (the default), the attribute will be added\&.  May be overridden to 
+.I
+turn off
+attributes\&.
+.PP 
+emphasizeScanner:
+.RS 1
+-
+.B
+emphasizeScanner
+:
+.I
+aScanner
+.RE
+.PP
+The default implementation of this method simply returns 
+.B
+self
+\&.
+.PP
+Normally a 
+.I
+scanner
+class (which renders text in some specific format) would send 
+.B
+emphasizeScanner:
+messages with itself as argument to a list of text attributes\&.  The text attributes can then 
+.I
+act
+upon the scanner and set text color, font and other formatting properties\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE

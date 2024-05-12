@@ -1,0 +1,357 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Computer Algebra Kit (c) 1993,2000,14 by Comp.Alg.Objects.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Fraction\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} CAObject\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Maturity Index:}} Relatively immature\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 Fraction objects consist of a {\i numerator} object divided by a {\i denominator} object.   The numerators and denominators can be arbitrary Computer Algebra Kit objects, but the current implementation has been tested only in the case of {\i total} fractions i.e., numerators and denominators are taken as elements of the same set.  For example, a fraction of two integers is a rational number; a fraction of two polynomials is a rational function.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Canonical Form\b0\f0\fs16\
+\
+\f0\fs28\li2200 The arithmetical operations on fractions assume that the fractions are in a simplified (canonical) form, and produce, as result, a fraction in canonical form.  In the case of the integers, or any ordered, integral domain (see {\b inIntegralDomain} and {\b inOrderedSet}), the numerator and denominator are kept coprime (common gcd is divided out) and the denominator is kept positive.  For example, the fraction minus one, is represented as (-1)/1, and never as 1/(-1).  In the case of an unordered, integral domain, such as polynomials over the integers or over a field, the denominator and numerator are also coprime, and the leading unit of the denominator is equal to one (over fields, this means that the denominator is kept monic, see {\b leadingUnit}). For example, the fraction minus {\i x} is represented over {\b Z} mod 3 as (2 {\i x})/1 and not as {\i x}/2.  Finally, for rational functions with floating-point coefficients, no gcd is computed, but the denominator of the fraction is kept monic.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- totalFraction:\
+	- numerator:denominator:\
+	- copy\
+	- deepCopy\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Identity}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- numerator\
+	- denominator\
+	- hash\
+	- isEqual:\
+	- compare:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Coercion}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- asNumerical\
+	- asModp:\
+	- asIntegral\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Addition}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- zero\
+	- isZero\
+	- isOpposite:\
+	- negate\
+	- double\
+	- add:\
+	- subtract:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Multiplication}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- one\
+	- isOne\
+	- isMinusOne\
+	- square\
+	- inverse\
+	- multiply:\
+	- divide:\
+	- power:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Multiplication by Int Value}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- intValue:\
+	- intValue\
+	- multiplyIntValue:\
+	- divideIntValue:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printsLeadingSign\
+	- printsSum\
+	- printsProduct\
+	- printOn:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 totalFraction:\f0\b0\
+\f0\fs28\li2500 +{\b totalFraction}:{\i aNumerator}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction with numerator set to {\i aNumerator} and denominator set to the element one for {\i aNumerator}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 numerator:denominator:\f0\b0\
+\f0\fs28\li2500 +{\b numerator}:{\i aNumerator}{\b denominator}:{\i aDenominator}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction with numerator set to {\i aNumerator} and denominator set to {\i aDenominator}. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 copy\f0\b0\
+\f0\fs28\li2500 -{\b copy}\fs16\
+\
+\f0\fs28\li2200 Returns a new copy of the fraction.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deepCopy\f0\b0\
+\f0\fs28\li2500 -{\b deepCopy}\fs16\
+\
+\f0\fs28\li2200 Returns a new copy of the fraction; sends {\b deepCopy} messages to denominator and numerator.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 numerator\f0\b0\
+\f0\fs28\li2500 -{\b numerator}\fs16\
+\
+\f0\fs28\li2200 Returns {\i a} for a fraction {\i a}/{\i b}. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 denominator\f0\b0\
+\f0\fs28\li2500 -{\b denominator}\fs16\
+\
+\f0\fs28\li2200 Returns {\i b} for a fraction {\i a}/{\i b}. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hash\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b hash}\fs16\
+\
+\f0\fs28\li2200 Returns a small integer that is the same for fractions that are equal in the sense of {\b isEqual:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEqual}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Two fractions are equal if they are pointer equal, or if their numerators and denominators are equal.  If the numerators and denominators are coprime, but not ordered, the method returns YES if numerators and denominators are opposite to each other.  If the fraction is not in canonical form, it is verified that the difference of the two fractions is zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 compare:\f0\b0\
+\f0\fs28\li2500 - (int){\b compare}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Compares the fractions by comparing the products of numerators and denominators.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asNumerical\f0\b0\
+\f0\fs28\li2500 -{\b asNumerical}\fs16\
+\
+\f0\fs28\li2200 Returns the numerical value of the fraction.  Attempts to divide the numerical value of the numerator and denominator.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asModp:\f0\b0\
+\f0\fs28\li2500 -{\b asModp}:(unsigned short){\i p}\fs16\
+\
+\f0\fs28\li2200 Returns the value of the fraction modulo {\i p}.  Attempts to divide the values of the numerator and denominator.  If the division fails, the method generates an error message.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asIntegral\f0\b0\
+\f0\fs28\li2500 -{\b asIntegral}\fs16\
+\
+\f0\fs28\li2200 Returns, if the denominator of the fraction is equal to one, a new reference to the numerator.  Otherwise, the method generates an error message.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 zero\f0\b0\
+\f0\fs28\li2500 -{\b zero}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction with numerator equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isZero\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isZero}\fs16\
+\
+\f0\fs28\li2200 Whether the numerator of the fraction is equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOpposite:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOpposite}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Two fractions are opposite if their numerators are opposite and the denominators are equal.  However, if the numerators and denominators are coprime, but not ordered, the method returns YES if the numerators are equal and the denominators are opposite to each other.  If the fraction is not in canonical form, it is verified that the sum of the two fractions is zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 negate\f0\b0\
+\f0\fs28\li2500 -{\b negate}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction, the opposite of {\b self} by negating the numerator.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 double\f0\b0\
+\f0\fs28\li2500 -{\b double}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction, the double of {\b self} by doubling the numerator.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 add:\f0\b0\
+\f0\fs28\li2500 -{\b add}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction, the sum of {\b self} and {\i b}.  The method first handles some special cases and then distinguishes between the case that both fractions have a common denominator or not.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subtract:\f0\b0\
+\f0\fs28\li2500 -{\b subtract}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction, the difference of {\b self} and {\i b}.  The method first handles some special cases and then distinguishes between the case that both fractions have a common denominator or not.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 one\f0\b0\
+\f0\fs28\li2500 -{\b one}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction with numerator equal to one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOne}\fs16\
+\
+\f0\fs28\li2200 Whether the numerator is equal to the denominator.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isMinusOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isMinusOne}\fs16\
+\
+\f0\fs28\li2200 Whether the numerator is the opposite of the denominator.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 square\f0\b0\
+\f0\fs28\li2500 -{\b square}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction; squares numerator and denominator.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inverse\f0\b0\
+\f0\fs28\li2500 -{\b inverse}\fs16\
+\
+\f0\fs28\li2200 Returns the inverse of the fraction; interchanges, in the case of a total fraction, denominator and numerator.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiply:\f0\b0\
+\f0\fs28\li2500 -{\b multiply}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction; multiplies the numerators and the denominators together.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divide:\f0\b0\
+\f0\fs28\li2500 -{\b divide}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction by multiplying the fraction by the inverse of {\i b}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 power:\f0\b0\
+\f0\fs28\li2500 -{\b power}:(int){\i n}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction; raises numerator and denominator to the {\i n}-th power.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intValue:\f0\b0\
+\f0\fs28\li2500 -{\b intValue}:(int){\i intValue}\fs16\
+\
+\f0\fs28\li2200 Creates a fraction with numerator equal to {\i intValue} and denominator one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intValue\f0\b0\
+\f0\fs28\li2500 - (int){\b intValue}\fs16\
+\
+\f0\fs28\li2200 Returns intValue of numerator divided by intValue of denominator.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiplyIntValue:\f0\b0\
+\f0\fs28\li2500 -{\b multiplyIntValue}:(int){\i intValue}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction by multiplying the numerator by {\i intValue}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideIntValue:\f0\b0\
+\f0\fs28\li2500 -{\b divideIntValue}:(int){\i intValue}\fs16\
+\
+\f0\fs28\li2200 Returns a new fraction by multiplying the denominator by {\i intValue}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsLeadingSign\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsLeadingSign}\fs16\
+\
+\f0\fs28\li2200 Whether the fraction prints a leading minus sign.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsSum\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsSum}\fs16\
+\
+\f0\fs28\li2200 Whether the fraction prints as a sum.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsProduct\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsProduct}\fs16\
+\
+\f0\fs28\li2200 Whether the fraction prints as a product.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Prints the fraction to {\i aFile} by sending {\b printOn:} messages to numerator and denominator.\fs16\
+\
+\fs16\
+\
+\
+}

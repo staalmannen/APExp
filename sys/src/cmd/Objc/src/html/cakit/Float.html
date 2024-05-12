@@ -1,0 +1,135 @@
+<HTML>
+<TITLE>cfloat Specification Sheet</TITLE>
+<H1>cfloat Specification Sheet</H1>
+
+<HR>
+Computer Algebra Kit (c) 1993,00 by Comp.Alg.Objects.  All Rights Reserved.<P>
+<H1>Float</H1>
+<B>Inherits from:</B> CAObject<P>
+<B>Maturity Index:</B> Immature<P>
+<H2>Class Description</H2>
+It is planned to make this class evolve into an Objective C class for arbitrary precision floating-point arithmetic.  Currently, <B>Float</B> is merely a Computer Algebra Kit compatible interface to plain C floating-point arithmetic.  Instances are object wrappers around the <B>float</B> datatype; arithmetic is subject to the same limitations, round-off errors etc. as in C.<P>
+Support for floating-point arithmetic is minimal in the Computer Algebra Kit; it is possible to convert results that are obtained by exact arithmetic to a numerical approximation (see the method <B>asNumerical</B> of Integer, Matrix, Polynomial etc.) for further processing by numerical analysis software.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#0">new</A></LI>
+<LI><A HREF="#2">floatValue:</A></LI>
+<LI><A HREF="#3">str:</A></LI>
+</UL>
+<H3><B>Identity</B></H3>
+<UL>
+<LI><A HREF="#19">hash</A></LI>
+<LI><A HREF="#20">isEqual:</A></LI>
+<LI><A HREF="#11">floatValue</A></LI>
+<LI><A HREF="#12">floatValue:</A></LI>
+</UL>
+<H3><B>Comparing</B></H3>
+<UL>
+<LI><A HREF="#22">sign</A></LI>
+<LI><A HREF="#23">compare:</A></LI>
+</UL>
+<H3><B>Addition</B></H3>
+<UL>
+<LI><A HREF="#13">zero</A></LI>
+<LI><A HREF="#24">isZero</A></LI>
+<LI><A HREF="#26">isOpposite:</A></LI>
+<LI><A HREF="#28">negate</A></LI>
+<LI><A HREF="#30">double</A></LI>
+<LI><A HREF="#32">add:</A></LI>
+<LI><A HREF="#33">subtract:</A></LI>
+</UL>
+<H3><B>Multiplication</B></H3>
+<UL>
+<LI><A HREF="#14">one</A></LI>
+<LI><A HREF="#15">minusOne</A></LI>
+<LI><A HREF="#34">isOne</A></LI>
+<LI><A HREF="#36">isMinusOne</A></LI>
+<LI><A HREF="#38">square</A></LI>
+<LI><A HREF="#39">multiply:</A></LI>
+<LI><A HREF="#40">inverse</A></LI>
+<LI><A HREF="#41">divide:</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#17">printsLeadingSign</A></LI>
+<LI><A HREF="#18">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">new</A></H3>
+<BLOCKQUOTE>+<B>new</B></BLOCKQUOTE>
+Creates an floating-point object equal to zero.<P>
+<H3><A NAME="2">floatValue:</A></H3>
+<BLOCKQUOTE>+<B>floatValue</B>:(float)<I>floatValue</I></BLOCKQUOTE>
+Creates an object with value equal to <I>floatValue</I>.<P>
+<H3><A NAME="3">str:</A></H3>
+<BLOCKQUOTE>+<B>str</B>:(STR)<I>aString</I></BLOCKQUOTE>
+Returns a new float object given a string <I>aString</I>, or returns <B>nil</B> if the method can't parse <I>aString</I>.  This method acts like the ANSI function <B>atof()</B>.<P>
+<H3><A NAME="19">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a small integer that is the same for objects that are equal (in the sense of <B>isEqual:</B>).<P>
+<H3><A NAME="20">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>b</I></BLOCKQUOTE>
+<H3><A NAME="11">floatValue</A></H3>
+<BLOCKQUOTE>- (float)<B>floatValue</B></BLOCKQUOTE>
+Returns the value of the object.<P>
+<H3><A NAME="12">floatValue:</A></H3>
+<BLOCKQUOTE>-<B>floatValue</B>:(float)<I>f</I></BLOCKQUOTE>
+Creates an object with value <I>f</I>.<P>
+<H3><A NAME="22">sign</A></H3>
+<BLOCKQUOTE>- (int)<B>sign</B></BLOCKQUOTE>
+Returns plus one if the object is positive (greater than zero), zero if zero and minus one if negative (less than zero).<P>
+<H3><A NAME="23">compare:</A></H3>
+<BLOCKQUOTE>- (int)<B>compare</B>:<I>b</I></BLOCKQUOTE>
+Returns -1, 0, or +1 if the object is respectively less than, equal to, or greater than <I>b</I>.  Returns 0 for pointer equal objects.<P>
+<H3><A NAME="13">zero</A></H3>
+<BLOCKQUOTE>-<B>zero</B></BLOCKQUOTE>
+Returns a new reference to a shared float instance with value equal to zero.<P>
+<H3><A NAME="24">isZero</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isZero</B></BLOCKQUOTE>
+Whether the object is equal to zero.<P>
+<H3><A NAME="26">isOpposite:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOpposite</B>:<I>b</I></BLOCKQUOTE>
+Whether the object is the opposite of <I>b</I>.<P>
+<H3><A NAME="28">negate</A></H3>
+<BLOCKQUOTE>-<B>negate</B></BLOCKQUOTE>
+Returns the opposite of the object.<P>
+<H3><A NAME="30">double</A></H3>
+<BLOCKQUOTE>-<B>double</B></BLOCKQUOTE>
+Returns a new object, equal to the object multiplied by two i.e., added to itself.<P>
+<H3><A NAME="32">add:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>b</I></BLOCKQUOTE>
+Adds <I>b</I> to the object.  Returns a new object.<P>
+<H3><A NAME="33">subtract:</A></H3>
+<BLOCKQUOTE>-<B>subtract</B>:<I>b</I></BLOCKQUOTE>
+Subtracts <I>b</I> from the object.  Returns a new object.<P>
+<H3><A NAME="14">one</A></H3>
+<BLOCKQUOTE>-<B>one</B></BLOCKQUOTE>
+Returns a new reference to a shared float instance with value equal to one.<P>
+<H3><A NAME="15">minusOne</A></H3>
+<BLOCKQUOTE>-<B>minusOne</B></BLOCKQUOTE>
+Returns a new reference to the float minus one.<P>
+<H3><A NAME="34">isOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOne</B></BLOCKQUOTE>
+Whether the object is equal to one.<P>
+<H3><A NAME="36">isMinusOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isMinusOne</B></BLOCKQUOTE>
+Whether the object is equal to minus one.<P>
+<H3><A NAME="38">square</A></H3>
+<BLOCKQUOTE>-<B>square</B></BLOCKQUOTE>
+Returns the square of the object i.e., a new object equal to the original object multiplied by itself.<P>
+<H3><A NAME="39">multiply:</A></H3>
+<BLOCKQUOTE>-<B>multiply</B>:<I>b</I></BLOCKQUOTE>
+Returns a new object, the product of the object multiplied (to the right) by <I>b</I>.  If the objects are pointer equal, this method is equivalent to <B>square</B>.<P>
+<H3><A NAME="40">inverse</A></H3>
+<BLOCKQUOTE>-<B>inverse</B></BLOCKQUOTE>
+Returns the multiplicative inverse of the object (returns a new object).  Returns <B>nil</B> if the object is equal to zero or cannot be inverted.<P>
+<H3><A NAME="41">divide:</A></H3>
+<BLOCKQUOTE>-<B>divide</B>:<I>b</I></BLOCKQUOTE>
+Returns a new object, the <I>exact</I> quotient of the object divided by <I>b</I>.  Returns <B>nil</B> if <I>b</I> is equal to zero or if the division is not exact.<P>
+<H3><A NAME="17">printsLeadingSign</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsLeadingSign</B></BLOCKQUOTE>
+Returns YES if the number is negative.<P>
+<H3><A NAME="18">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints the floating-point number to <I>aFile</I> according to the '%g' format of the ANSI function <B>printf()</B>.<P>

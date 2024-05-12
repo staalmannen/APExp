@@ -1,0 +1,269 @@
+<HTML>
+<TITLE>monomial Specification Sheet</TITLE>
+<H1>monomial Specification Sheet</H1>
+
+<HR>
+Computer Algebra Kit (c) 1993,00 by Comp.Alg.Objects.  All Rights Reserved.<P>
+<H1>Monomial</H1>
+<B>Inherits from:</B> CAObject<P>
+<B>Maturity Index:</B> Relatively mature<P>
+<H2>Class Description</H2>
+A monomial consists of a scalar object <I>scalar</I> multiplied by a product of terms; each term consists of a scalar <I>coefficient</I> multiplied by a <I>symbol</I> raised to a nonnegative <I>exponent</I> (see the documentation on <B>Term</B>).  The <I>degree</I> of a monomial is the sum of the exponents of its terms.  A monomial can be either variable sparse or variable dense : the terms of a variable dense monomial are represented by a dense array of exponents, where the size of the array is equal to the number of symbols.  The exponent of a term can be equal to zero.  In a variable sparse monomial, terms with exponent equal to zero are not stored.<P>
+<H2>Scalar of a Monomial</H2>
+When a term is inserted into a monomial (see <B>insertTerm:</B>), its coefficient is multiplied together with the scalar of the monomial; it follows that a monomial consists internally of a scalar multiplied by a product of <I>monic</I> terms (a 'power product').  The methods <B>leadingTerm</B>, <B>removeTerm</B>, <B>eachTerm</B> etc. return monic terms.  A monomial is said to be <I>monic</I> if its scalar is equal to one.<P>
+<H2>Symbols and Variable Ordering</H2>
+For a variable dense monomial, the collection of symbols is fixed when the monomial is created; you can't insert terms in a different symbol.  In the variable sparse case, the collection of symbols is dynamically adapted as you insert terms.  Note that, in both cases - variable sparse or variable dense -, the collection of symbols contains the actual set of symbols (those that actually occur in the monomial with nonzero exponent) as a <I>subset</I>.   See the documentation on <B>findSymbols</B>.  The variable ordering imposed by the ordering of the collection of symbols is called <I>lexicographic</I> (currently the variable ordering is always lexicographic).  Monomials can be compared with respect to this ordering.<P>
+<H2>Conversion between Representations</H2>
+It suffices to remove terms from a monomial in one representation and to insert them into another; abstractly, both kind of monomials, are collections of terms.<P>
+<BLOCKQUOTE><PRE>
+sparse = [Monomial scalar:[dense scalar]];
+while ((term = [dense removeTerm])) [sparse insertTerm:term];
+</PRE></BLOCKQUOTE>
+The example shows how to, destructively, convert from the variable dense into the variable sparse representation (see also <B>makeVariableSparse</B>).  Note that when you create a variable sparse monomial, you don't have to specify the symbols in advance. <P>
+<BLOCKQUOTE><PRE>
+dense = [Monomial scalar:[sparse scalar] symbols:[sparse findSymbols]];
+while (term = [sparse removeTerm]) [dense insertTerm:term];
+</PRE></BLOCKQUOTE>
+The above example shows how to, destructively, convert from the variable sparse into the variable dense representation  (see also <B>makeVariableDense</B>).  To create a variable dense monomial, you have to fix the symbols prior to inserting terms.<P>
+<H2>Polynomials</H2>
+A polynomial in expanded (or 'distributed') representation is a sum of monomials.  Although a polynomial in recursive representation is <I>not</I> a sum of monomials (it's a sum of terms), recursive polynomials can to some extent be manipulated as sequences of monomials (see Polynomial's method <B>eachSequence</B>).  Note that in the recursive case, the scalars for monomials are taken from the (base) scalar ring.<P>
+The monomials in a variable sparse polynomial, are variable sparse.  Likewise, the monomials in a variable dense polynomial, are variable dense.  For a degree dense polynomial, the scalars of the monomials can be zero, while for a degree sparse polynomial they cannot.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#4">scalar:</A></LI>
+<LI><A HREF="#6">scalar:symbols:</A></LI>
+<LI><A HREF="#11">empty</A></LI>
+<LI><A HREF="#12">copy</A></LI>
+<LI><A HREF="#13">deepCopy</A></LI>
+</UL>
+<H3><B>Coercion</B></H3>
+<UL>
+<LI><A HREF="#17">intValue</A></LI>
+<LI><A HREF="#18">intValue:</A></LI>
+<LI><A HREF="#19">floatValue</A></LI>
+<LI><A HREF="#20">floatValue:</A></LI>
+<LI><A HREF="#22">asScalar</A></LI>
+<LI><A HREF="#26">asSymbol</A></LI>
+</UL>
+<H3><B>Identity</B></H3>
+<UL>
+<LI><A HREF="#28">scalar</A></LI>
+<LI><A HREF="#29">termOne</A></LI>
+<LI><A HREF="#31">isMonic</A></LI>
+<LI><A HREF="#33">isVariableSparse</A></LI>
+<LI><A HREF="#34">isVariableDense</A></LI>
+<LI><A HREF="#35">degree</A></LI>
+<LI><A HREF="#36">numTerms</A></LI>
+<LI><A HREF="#37">isTerm</A></LI>
+<LI><A HREF="#38">isEqual:</A></LI>
+<LI><A HREF="#39">hash</A></LI>
+</UL>
+<H3><B>Variable Ordering</B></H3>
+<UL>
+<LI><A HREF="#41">symbols</A></LI>
+<LI><A HREF="#42">isOrderDegreeCompatible</A></LI>
+<LI><A HREF="#43">isOrderReverseDegreeCompatible</A></LI>
+<LI><A HREF="#44">compareTerms:</A></LI>
+</UL>
+<H3><B>Inserting and Removing</B></H3>
+<UL>
+<LI><A HREF="#45">removeTerm</A></LI>
+<LI><A HREF="#46">insertTerm:</A></LI>
+</UL>
+<H3><B>Accessing Terms</B></H3>
+<UL>
+<LI><A HREF="#47">eachTerm</A></LI>
+<LI><A HREF="#48">leadingTerm</A></LI>
+</UL>
+<H3><B>Addition</B></H3>
+<UL>
+<LI><A HREF="#49">zero</A></LI>
+<LI><A HREF="#50">isZero</A></LI>
+<LI><A HREF="#51">negate</A></LI>
+<LI><A HREF="#52">double</A></LI>
+<LI><A HREF="#53">add:</A></LI>
+<LI><A HREF="#54">subtract:</A></LI>
+</UL>
+<H3><B>Multiplication</B></H3>
+<UL>
+<LI><A HREF="#55">one</A></LI>
+<LI><A HREF="#56">isOne</A></LI>
+<LI><A HREF="#57">isMinusOne</A></LI>
+<LI><A HREF="#58">square</A></LI>
+<LI><A HREF="#59">multiply:</A></LI>
+<LI><A HREF="#60">multiplyScalar:</A></LI>
+<LI><A HREF="#61">divideScalar:</A></LI>
+<LI><A HREF="#62">divide:</A></LI>
+<LI><A HREF="#63">divideTerms:</A></LI>
+</UL>
+<H3><B>Greatest Common Divisor</B></H3>
+<UL>
+<LI><A HREF="#64">gcd:</A></LI>
+<LI><A HREF="#65">lcm:</A></LI>
+</UL>
+<H3><B>Characteristic</B></H3>
+<UL>
+<LI><A HREF="#66">frobenius</A></LI>
+<LI><A HREF="#67">frobeniusInverse</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#69">printsLeadingSign</A></LI>
+<LI><A HREF="#70">printsSum</A></LI>
+<LI><A HREF="#71">printsProduct</A></LI>
+<LI><A HREF="#73">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="4">scalar:</A></H3>
+<BLOCKQUOTE>+<B>scalar</B>:<I>aScalar</I></BLOCKQUOTE>
+Creates a new <I>variable sparse</I> monomial.  Sets the scalar equal to <I>aScalar</I>.<P>
+<H3><A NAME="6">scalar:symbols:</A></H3>
+<BLOCKQUOTE>+<B>scalar</B>:<I>aScalar</I><B>symbols</B>:<I>aCltn</I></BLOCKQUOTE>
+Creates a new <I>variable dense</I> monomial.  Sets the scalar equal to <I>aScalar</I> and fixes the symbols to <I>aCltn</I>.  The collection of symbols must not be empty.<P>
+<H3><A NAME="11">empty</A></H3>
+<BLOCKQUOTE>-<B>empty</B></BLOCKQUOTE>
+Creates a new monomial with scalar equal to one and empty sequence of terms.  The representation of the monomial is identical to that of the original monomial.<P>
+<H3><A NAME="12">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Makes a copy of the terms of the monomial.<P>
+<H3><A NAME="13">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+Makes a deepCopy of the terms and the scalar of the monomial.<P>
+<H3><A NAME="17">intValue</A></H3>
+<BLOCKQUOTE>- (int)<B>intValue</B></BLOCKQUOTE>
+Returns the intValue of the scalar of the monomial, if all terms are trivial.  If not, generates an error message.<P>
+<H3><A NAME="18">intValue:</A></H3>
+<BLOCKQUOTE>-<B>intValue</B>:(int)<I>aValue</I></BLOCKQUOTE>
+Returns a new monomial with a scalar whose value as <B>int</B> is equal to <I>aValue</I>.  All terms in this monomial are trivial.<P>
+<H3><A NAME="19">floatValue</A></H3>
+<BLOCKQUOTE>- (float)<B>floatValue</B></BLOCKQUOTE>
+Returns the floatValue of the scalar of the monomial, if all terms are trivial.  If not, generates an error message.<P>
+<H3><A NAME="20">floatValue:</A></H3>
+<BLOCKQUOTE>-<B>floatValue</B>:(float)<I>aValue</I></BLOCKQUOTE>
+Returns a new monomial with a scalar whose value as <B>float</B> is equal to <I>aValue</I>.  All terms in this monomial are trivial.<P>
+<H3><A NAME="22">asScalar</A></H3>
+<BLOCKQUOTE>-<B>asScalar</B></BLOCKQUOTE>
+Returns, if all the terms in the monomial are trivial (have exponent equal to zero), a new reference to the scalar of the monomial.  Otherwise returns <B>nil</B>.<P>
+<H3><A NAME="26">asSymbol</A></H3>
+<BLOCKQUOTE>-<B>asSymbol</B></BLOCKQUOTE>
+Returns, if the scalar of the monomial is equal to one and if the monomial contains exactly one term whose exponent is equal to one, a new reference to the symbol of that term.  Otherwise returns <B>nil</B>.<P>
+<H3><A NAME="28">scalar</A></H3>
+<BLOCKQUOTE>-<B>scalar</B></BLOCKQUOTE>
+Returns the scalar of the monomial. <P>
+<H3><A NAME="29">termOne</A></H3>
+<BLOCKQUOTE>-<B>termOne</B></BLOCKQUOTE>
+Returns the trivial term.  <P>
+<H3><A NAME="31">isMonic</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isMonic</B></BLOCKQUOTE>
+Returns YES if the scalar of the monomial is equal to one.<P>
+<H3><A NAME="33">isVariableSparse</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isVariableSparse</B></BLOCKQUOTE>
+Returns YES if the terms of the monomial are variable sparse i.e., whether symbols raised to exponent zero are ignored and whether the collection of allowed symbols is dynamically adjusted when terms are inserted.<P>
+<H3><A NAME="34">isVariableDense</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isVariableDense</B></BLOCKQUOTE>
+Returns YES if the terms of the monomial are variable dense i.e., whether symbols raised to exponent zero are stored and whether the collection of allowed symbols is fixed.<P>
+<H3><A NAME="35">degree</A></H3>
+<BLOCKQUOTE>- (int)<B>degree</B></BLOCKQUOTE>
+Returns the sum of the exponents of the terms in the monomial.  Returns minus one if the monomial is equal to zero.<P>
+<H3><A NAME="36">numTerms</A></H3>
+<BLOCKQUOTE>- (int)<B>numTerms</B></BLOCKQUOTE>
+Returns the number of terms with non-zero exponent in the monomial.  The total number of terms in a variable dense monomial is equal to the number of symbols.  Note that <B>eachTerm</B> returns a sequence of all terms, trivial or not. <P>
+<H3><A NAME="37">isTerm</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isTerm</B></BLOCKQUOTE>
+Whether the monomial consists of a single term.<P>
+<H3><A NAME="38">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>aMonomial</I></BLOCKQUOTE>
+Returns YES if the scalars and the terms of the monomial are equal to each other.  The monomials must be in the same representation.<P>
+<H3><A NAME="39">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a hash value for the monomial.<P>
+<H3><A NAME="41">symbols</A></H3>
+<BLOCKQUOTE>-<B>symbols</B></BLOCKQUOTE>
+Returns a collection of symbols.  If the monomial is variable dense, beware that some symbols may occur with a zero exponent in the monomial.  If the monomial is variable sparse, this method returns an alphabetically sorted collection of all the symbols that occur in the monomial with non-zero exponent.  Don' modify the collection returned by this method; do not attempt to insert new symbols, or change their order.<P>
+<H3><A NAME="42">isOrderDegreeCompatible</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOrderDegreeCompatible</B></BLOCKQUOTE>
+Should return YES if, when the monomial <I>a</I> is less than the monomial <I>b</I>, the degree of <I>a</I> is less than the degree of <I>b</I>.  Currently, the order is degree compatible only for univariate, variable dense monomials. <P>
+<H3><A NAME="43">isOrderReverseDegreeCompatible</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOrderReverseDegreeCompatible</B></BLOCKQUOTE>
+Should return YES if, when the monomial <I>a</I> is less than the monomial <I>b</I>, the degree of <I>a</I> is greater than the degree of <I>b</I>.  Currently, there is no such order. <P>
+<H3><A NAME="44">compareTerms:</A></H3>
+<BLOCKQUOTE>- (int)<B>compareTerms</B>:<I>aMonomial</I></BLOCKQUOTE>
+Compares the terms (symbols and exponents) of the monomials; the scalars of the monomials are not taken into account.  Returns zero if the symbols and exponents of the terms are equal; returns -1 if the monomial is less than <I>aMonomial</I>, and +1 if it is greater than <I>aMonomial</I>.<P>
+If the monomials are variable dense, the first symbol in the collection of symbols is taken to be smaller than symbols with higher index in the array of symbols.  This method compares with respect to the lexicographic order : it starts comparing the smallest symbols, and as long as exponents are equal, it works towards larger symbols (those at the end of the collection of symbols).<P>
+If the monomials are variable sparse, the method also compares lexicographically, but now the smallest symbol, is the one that is smallest with respect to Symbol's <B>compare:</B>.  If the collection of symbols for a variable dense monomial is ordered alphabetically, the variable sparse and variable dense orderings coincide.<P>
+<H3><A NAME="45">removeTerm</A></H3>
+<BLOCKQUOTE>-<B>removeTerm</B></BLOCKQUOTE>
+Removes the leading term (first term with non-zero exponent) of the monomial or returns <B>nil</B> if there is no such term.  The coefficient of this term is equal to one.  The reference count of the monomial must be equal to one.<P>
+<B>See also:</B> leadingTerm, eachTerm<P>
+<H3><A NAME="46">insertTerm:</A></H3>
+<BLOCKQUOTE>-<B>insertTerm</B>:<I>aTerm</I></BLOCKQUOTE>
+Inserts <I>aTerm</I> in the product of terms and returns <B>self</B>.  The reference count of the monomial must be equal to one.<P>
+If the coefficient of the term is zero, this method empties the sequence of terms and sets the scalar to zero, as if the monomial were multiplied by zero.  Otherwise, the methods multiplies the coefficient of the term and the scalar of the monomial together, and, if the monomial doesn't contain a term with symbol equal to that of <I>aTerm</I>, the method inserts a (monic) term in the ordered sequence of terms.  If there is a term in the same symbol, the method adds the exponent of <I>aTerm</I> to it.<P>
+<H3><A NAME="47">eachTerm</A></H3>
+<BLOCKQUOTE>-<B>eachTerm</B></BLOCKQUOTE>
+Returns a sequence of terms.  The coefficient of each term is equal to one.  The scalar of the monomial itself is obtained by sending <B>scalar</B> to the monomial.  If the monomial is variable dense, the sequence also contains the terms whose exponent is equal to zero.<P>
+<H3><A NAME="48">leadingTerm</A></H3>
+<BLOCKQUOTE>-<B>leadingTerm</B></BLOCKQUOTE>
+Returns the leading term of the monomial i.e., the first term with a non-zero exponent.  The coefficient of this term is equal to one.  Returns <B>nil</B> if there is no such term in the monomial.<P>
+<H3><A NAME="49">zero</A></H3>
+<BLOCKQUOTE>-<B>zero</B></BLOCKQUOTE>
+<H3><A NAME="50">isZero</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isZero</B></BLOCKQUOTE>
+Returns YES if the scalar object is zero.<P>
+<H3><A NAME="51">negate</A></H3>
+<BLOCKQUOTE>-<B>negate</B></BLOCKQUOTE>
+<H3><A NAME="52">double</A></H3>
+<BLOCKQUOTE>-<B>double</B></BLOCKQUOTE>
+<H3><A NAME="53">add:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>b</I></BLOCKQUOTE>
+<H3><A NAME="54">subtract:</A></H3>
+<BLOCKQUOTE>-<B>subtract</B>:<I>b</I></BLOCKQUOTE>
+<H3><A NAME="55">one</A></H3>
+<BLOCKQUOTE>-<B>one</B></BLOCKQUOTE>
+Returns a monomial with scalar equal to one and containing no (nontrivial) terms.<P>
+<H3><A NAME="56">isOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOne</B></BLOCKQUOTE>
+Whether there are only trivial terms and the scalar is equal to one.<P>
+<H3><A NAME="57">isMinusOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isMinusOne</B></BLOCKQUOTE>
+<H3><A NAME="58">square</A></H3>
+<BLOCKQUOTE>-<B>square</B></BLOCKQUOTE>
+<H3><A NAME="59">multiply:</A></H3>
+<BLOCKQUOTE>-<B>multiply</B>:<I>b</I></BLOCKQUOTE>
+<H3><A NAME="60">multiplyScalar:</A></H3>
+<BLOCKQUOTE>-<B>multiplyScalar</B>:<I>s</I></BLOCKQUOTE>
+Multiplies the scalar of the monomial by <I>s</I> and copies the terms.<P>
+<H3><A NAME="61">divideScalar:</A></H3>
+<BLOCKQUOTE>-<B>divideScalar</B>:<I>s</I></BLOCKQUOTE>
+Divides scalar by <I>s</I> and copies terms.  Returns <B>nil</B> if the division fails or if it's not exact.<P>
+<H3><A NAME="62">divide:</A></H3>
+<BLOCKQUOTE>-<B>divide</B>:<I>aMonomial</I></BLOCKQUOTE>
+Divides the scalars and the terms of the monomials.  Returns <B>nil</B> if either of the scalar or term division is not exact.<P>
+<H3><A NAME="63">divideTerms:</A></H3>
+<BLOCKQUOTE>-<B>divideTerms</B>:<I>aMonomial</I></BLOCKQUOTE>
+Divides the terms of the monomials by the terms of <I>aMonomial</I>.  Returns a new monomial with scalar equal to the scalar of the dividend.  Returns <B>nil</B> if the division of terms is not exact.<P>
+<H3><A NAME="64">gcd:</A></H3>
+<BLOCKQUOTE>-<B>gcd</B>:<I>aMonomial</I></BLOCKQUOTE>
+Returns a new monomial that is the <I>monic</I> greatest common divisor of the monomials, ie. the greatest common divisor of the terms of the monomials.<P>
+<H3><A NAME="65">lcm:</A></H3>
+<BLOCKQUOTE>-<B>lcm</B>:<I>aMonomial</I></BLOCKQUOTE>
+Returns a new monomial that is the <I>monic</I> least common multiple of the monomials, ie. the least common multiple of the terms of the monomials.<P>
+<H3><A NAME="66">frobenius</A></H3>
+<BLOCKQUOTE>-<B>frobenius</B></BLOCKQUOTE>
+Returns a new monomial by sending a <B>frobenius</B> message to the scalar of the monomial and by raising the terms in the monomial to the <I>p</I>-th power (<I>p</I> is equal to the scalar's characteristic).<P>
+<H3><A NAME="67">frobeniusInverse</A></H3>
+<BLOCKQUOTE>-<B>frobeniusInverse</B></BLOCKQUOTE>
+Returns a new monomial by sending a <B>frobeniusInverse</B> message to the scalar of the monomial and by extracting the <I>p</I>-th root of the terms in the monomial to a power (where <I>p</I> is equal to the scalar's characteristic).  Returns <B>nil</B> if the monomial is not a <I>p</I>-th power.<P>
+<H3><A NAME="69">printsLeadingSign</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsLeadingSign</B></BLOCKQUOTE>
+Whether the monomial prints a leading minus sign.<P>
+<H3><A NAME="70">printsSum</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsSum</B></BLOCKQUOTE>
+Whether the monomial prints a sum.<P>
+<H3><A NAME="71">printsProduct</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsProduct</B></BLOCKQUOTE>
+Whether the monomial prints a single product.<P>
+<H3><A NAME="73">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints the monomial to <I>aFile</I> by sending <B>printOn:</B> to the scalar and terms.<P>

@@ -1,0 +1,168 @@
+.TH "Message" 3 "Mar 12, 2023"
+.SH Message
+.PP
+.B
+Inherits from:
+
+Object
+.PP
+.B
+Maturity Index:
+
+Experimental
+.SH Class Description
+.PP
+Message instances are used for forwarding Objective-C messages\&.  When an object doesn\&'t respond to a message, the 
+.B
+doesNotUnderstand:
+method is invoked, with an argument that is an instance of this class :
+.RS 3
+
+- doesNotUnderstand:msg
+.br
+{
+.br
+[msg sentTo:someObject];
+.br
+return self;
+.br
+}
+.br
+
+.br
+
+.RE
+.PP
+The user may override 
+.B
+-doesNotUnderstand:
+to send a 
+.B
+sentTo:
+message, which will forward the message to 
+.I
+someObject
+\&.  If 
+.I
+someObject
+doesn\&'t respond to the message, it will receive a 
+.B
+doesNotUnderstand:
+message, and so on\&.
+.PP
+.B
+Note:
+
+To forward class (factory) methods, override the class method 
+.B
++doesNotUnderstand:
+\&.
+.PP
+Also see Object\&'s 
+.B
+doesNotUnderstand:
+method for more details\&.
+.SH Method types
+.PP 
+.B
+Creating Messages
+.RS 3
+.br
+* selector:dispatch:args:
+.RE
+.PP 
+.B
+Querying Messages
+.RS 3
+.br
+* selector
+.RE
+.PP 
+.B
+Sending Messages
+.RS 3
+.br
+* sentTo:
+.RE
+.SH Methods
+.PP 
+selector:dispatch:args:
+.RS 1
++
+.B
+selector
+:(SEL)
+.I
+s
+.B
+dispatch
+:(ARGIMP)
+.I
+d
+.B
+args
+:(void *)
+.I
+a
+.RE
+.PP
+Creates a Message instance with the indicated selector name and pointer to argument structure\&.  The argument structure for a message consists of return value of the method (if not void), followed by the arguments of the method :
+.RS 3
+
+struct {
+.br
+int ret;
+.br
+int a;
+.br
+double d;
+.br
+}
+.br
+
+.RE
+.PP
+The above structure corresponds to a method such as (int)foo:(int)a bar:(double)d\&.
+.PP
+The 
+.I
+dispatch
+argument is a (compiler generated) function that decodes the arguments from the argument structure, and dispatches the messages\&.
+.PP 
+selector
+.RS 1
+- (
+SEL
+)
+.B
+selector
+.RE
+.PP
+Returns the selector for this message\&.
+.PP 
+sentTo:
+.RS 1
+-
+.B
+sentTo
+:
+.I
+receiver
+.RE
+.PP
+Forwards the message to 
+.I
+receiver
+(if it\&'s not 
+.B
+nil
+) and returns the message itself (
+.I
+self
+), not the return value of the message that was forwarded to 
+.I
+receiver
+\&.  The latter return value is associated to the Message instance, so that it can be returned to the sender of the message that caused a 
+.B
+doesNotUnderstand:
+message to be sent\&.

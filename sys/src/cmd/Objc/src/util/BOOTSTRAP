@@ -1,0 +1,45 @@
+
+ BOOTSTRAP PROCEDURE
+ -------------------
+
+1.  "./configure"  or "./configure --prefix=$HOME"
+
+    this will configure objc (the driver script) and
+    objc.exe (the driver executable)
+
+    on UNIX, you in fact only need objc (the sh script),
+    but objc.exe also works.
+    
+    on OpenVMS, don't use the configure script, use Makefile.vms and objc.com
+
+2.  "make"
+    
+    this will build objc1 (platform independent)
+
+3.  "[ su root; ] make install"
+
+    this will copy the executables objc and objc1 into /usr/local/bin
+    (or into $HOME/bin if you configured with --prefix=$HOME)
+
+ INSTALLATION PROCEDURE
+ ----------------------
+
+4.  "cd $HOME/objc1.7.1"
+
+    download the latest compiler sources and go to that directory
+
+5.  "./configure" or "./configure --prefix=$HOME"
+
+    configure the compiler sources
+    this will find the bootstrap compiler that we've built before
+
+6.  "make; [ su root; ] make install"
+
+    replace the bootstrap compiler by the actual compiler
+
+
+ FUTURE UPGRADES
+ ---------------
+
+Only step 4, 5 and 6 are necessary to upgrade a compiler.
+

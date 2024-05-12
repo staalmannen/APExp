@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.1
+Name=BaconGUI (GTK3)
+GenericName=Integrated Development Environment
+Comment=A lightweight IDE for BASIC programming
+Exec=bacongui-gtk3
+Icon=BaCon
+Terminal=false
+Categories=GTK;Development;IDE;Building;
+MimeType=text/plain;

@@ -1,0 +1,166 @@
+<HTML>
+<TITLE>rectangl Specification Sheet</TITLE>
+<H1>rectangl Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 1997,98,99.  All Rights Reserved.<P>
+<H1>Rectangle</H1>
+<B>Inherits from:</B> Object<P>
+<H2>Class Description</H2>
+<B>Rectangle</B> instances are pairs of Point objects.  It is mostly Squeak and Stepstone ICpak101 compatible.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#0">new</A></LI>
+<LI><A HREF="#1">origin:corner:</A></LI>
+<LI><A HREF="#3">origin:extent:</A></LI>
+<LI><A HREF="#4">origin::corner::</A></LI>
+<LI><A HREF="#5">origin::extent::</A></LI>
+<LI><A HREF="#8">free</A></LI>
+</UL>
+<H3><B>Motion</B></H3>
+<UL>
+<LI><A HREF="#9">origin:</A></LI>
+<LI><A HREF="#10">corner:</A></LI>
+<LI><A HREF="#11">origin:corner:</A></LI>
+<LI><A HREF="#12">extent::</A></LI>
+<LI><A HREF="#13">extent:</A></LI>
+<LI><A HREF="#14">origin::</A></LI>
+<LI><A HREF="#15">corner::</A></LI>
+</UL>
+<H3><B>Comparing</B></H3>
+<UL>
+<LI><A HREF="#16">contains:</A></LI>
+<LI><A HREF="#17">hash</A></LI>
+<LI><A HREF="#18">isEqual:</A></LI>
+</UL>
+<H3><B>Interrogation</B></H3>
+<UL>
+<LI><A HREF="#19">left</A></LI>
+<LI><A HREF="#20">right</A></LI>
+<LI><A HREF="#21">top</A></LI>
+<LI><A HREF="#22">bottom</A></LI>
+<LI><A HREF="#23">width</A></LI>
+<LI><A HREF="#24">height</A></LI>
+<LI><A HREF="#25">origin</A></LI>
+<LI><A HREF="#26">topLeft</A></LI>
+<LI><A HREF="#27">topRight</A></LI>
+<LI><A HREF="#28">topCenter</A></LI>
+<LI><A HREF="#29">corner</A></LI>
+<LI><A HREF="#30">bottomLeft</A></LI>
+<LI><A HREF="#31">bottomCenter</A></LI>
+<LI><A HREF="#32">bottomRight</A></LI>
+<LI><A HREF="#33">center</A></LI>
+<LI><A HREF="#34">leftCenter</A></LI>
+<LI><A HREF="#35">rightCenter</A></LI>
+<LI><A HREF="#36">extent</A></LI>
+<LI><A HREF="#37">quickMerge:</A></LI>
+</UL>
+<H3><B>Arithmetic</B></H3>
+<UL>
+<LI><A HREF="#38">moveBy:</A></LI>
+<LI><A HREF="#39">translateBy:</A></LI>
+<LI><A HREF="#40">align:with:</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#41">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">new</A></H3>
+<BLOCKQUOTE>+<B>new</B></BLOCKQUOTE>
+Returns a new rectangle with origin and corner at (0,0).<P>
+<H3><A NAME="1">origin:corner:</A></H3>
+<BLOCKQUOTE>+<B>origin</B>:<I>p</I><B>corner</B>:<I>q</I></BLOCKQUOTE>
+Returns a new rectangle with origin and corner set to <I>p</I> and <I>q</I>.<P>
+<H3><A NAME="3">origin:extent:</A></H3>
+<BLOCKQUOTE>+<B>origin</B>:<I>p</I><B>extent</B>:<I>q</I></BLOCKQUOTE>
+<H3><A NAME="4">origin::corner::</A></H3>
+<BLOCKQUOTE>+<B>origin</B>:(int)<I>x1</I>:(int)<I>y1</I><B>corner</B>:(int)<I>x2</I>:(int)<I>y2</I></BLOCKQUOTE>
+<H3><A NAME="5">origin::extent::</A></H3>
+<BLOCKQUOTE>+<B>origin</B>:(int)<I>x</I>:(int)<I>y</I><B>extent</B>:(int)<I>w</I>:(int)<I>h</I></BLOCKQUOTE>
+<H3><A NAME="8">free</A></H3>
+<BLOCKQUOTE>-<B>free</B></BLOCKQUOTE>
+Frees the <I>origin</I> and <I>corner</I> of the Point too.<P>
+<H3><A NAME="9">origin:</A></H3>
+<BLOCKQUOTE>-<B>origin</B>:<I>p</I></BLOCKQUOTE>
+<H3><A NAME="10">corner:</A></H3>
+<BLOCKQUOTE>-<B>corner</B>:<I>q</I></BLOCKQUOTE>
+<H3><A NAME="11">origin:corner:</A></H3>
+<BLOCKQUOTE>-<B>origin</B>:<I>p</I><B>corner</B>:<I>q</I></BLOCKQUOTE>
+Sets origin and corner to <I>p</I> and <I>q</I>.<P>
+<H3><A NAME="12">extent::</A></H3>
+<BLOCKQUOTE>-<B>extent</B>:(int)<I>w</I>:(int)<I>h</I></BLOCKQUOTE>
+<H3><A NAME="13">extent:</A></H3>
+<BLOCKQUOTE>-<B>extent</B>:<I>q</I></BLOCKQUOTE>
+<H3><A NAME="14">origin::</A></H3>
+<BLOCKQUOTE>-<B>origin</B>:(int)<I>x1</I>:(int)<I>y1</I></BLOCKQUOTE>
+<H3><A NAME="15">corner::</A></H3>
+<BLOCKQUOTE>-<B>corner</B>:(int)<I>x1</I>:(int)<I>y1</I></BLOCKQUOTE>
+<H3><A NAME="16">contains:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>contains</B>:<I>aPoint</I></BLOCKQUOTE>
+Yes if inside, or on a border of, the rectangle.<P>
+<H3><A NAME="17">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+<H3><A NAME="18">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>aRectangle</I></BLOCKQUOTE>
+Returns YES if <I>aRectangle</I> is some kind of rectangle, and if corner and origin are equal.<P>
+<H3><A NAME="19">left</A></H3>
+<BLOCKQUOTE>- (int)<B>left</B></BLOCKQUOTE>
+<H3><A NAME="20">right</A></H3>
+<BLOCKQUOTE>- (int)<B>right</B></BLOCKQUOTE>
+<H3><A NAME="21">top</A></H3>
+<BLOCKQUOTE>- (int)<B>top</B></BLOCKQUOTE>
+<H3><A NAME="22">bottom</A></H3>
+<BLOCKQUOTE>- (int)<B>bottom</B></BLOCKQUOTE>
+<H3><A NAME="23">width</A></H3>
+<BLOCKQUOTE>- (int)<B>width</B></BLOCKQUOTE>
+<H3><A NAME="24">height</A></H3>
+<BLOCKQUOTE>- (int)<B>height</B></BLOCKQUOTE>
+<H3><A NAME="25">origin</A></H3>
+<BLOCKQUOTE>-<B>origin</B></BLOCKQUOTE>
+<H3><A NAME="26">topLeft</A></H3>
+<BLOCKQUOTE>-<B>topLeft</B></BLOCKQUOTE>
+Same as <B>origin</B>.<P>
+<H3><A NAME="27">topRight</A></H3>
+<BLOCKQUOTE>-<B>topRight</B></BLOCKQUOTE>
+Answer the point at the top right corner of the receiver's top horizontal.<P>
+<H3><A NAME="28">topCenter</A></H3>
+<BLOCKQUOTE>-<B>topCenter</B></BLOCKQUOTE>
+Answer the point at the center of the receiver's top horizontal.<P>
+<H3><A NAME="29">corner</A></H3>
+<BLOCKQUOTE>-<B>corner</B></BLOCKQUOTE>
+<H3><A NAME="30">bottomLeft</A></H3>
+<BLOCKQUOTE>-<B>bottomLeft</B></BLOCKQUOTE>
+Returns the point at the left edge of the bottom horizontal line of the receiver(or bottomLeft for short).<P>
+<H3><A NAME="31">bottomCenter</A></H3>
+<BLOCKQUOTE>-<B>bottomCenter</B></BLOCKQUOTE>
+Answer the point at the center of the receiver's bottom horizontal.<P>
+<H3><A NAME="32">bottomRight</A></H3>
+<BLOCKQUOTE>-<B>bottomRight</B></BLOCKQUOTE>
+Same as <B>corner</B>.<P>
+<H3><A NAME="33">center</A></H3>
+<BLOCKQUOTE>-<B>center</B></BLOCKQUOTE>
+Return the point at the center of the receiver.<P>
+<H3><A NAME="34">leftCenter</A></H3>
+<BLOCKQUOTE>-<B>leftCenter</B></BLOCKQUOTE>
+Return the point at the center of the receiver's left vertical line.<P>
+<H3><A NAME="35">rightCenter</A></H3>
+<BLOCKQUOTE>-<B>rightCenter</B></BLOCKQUOTE>
+Return the point at the center of the receiver's left vertical line.<P>
+<H3><A NAME="36">extent</A></H3>
+<BLOCKQUOTE>-<B>extent</B></BLOCKQUOTE>
+Return a new Point, set to the width and height of the rectangle.<P>
+<H3><A NAME="37">quickMerge:</A></H3>
+<BLOCKQUOTE>-<B>quickMerge</B>:<I>rect</I></BLOCKQUOTE>
+Return the receiver if it encloses the given rectangle or the merge of the two rectangles if it doesn't.  This method is an optimization to reduce extra rectangle creations.<P>
+<H3><A NAME="38">moveBy:</A></H3>
+<BLOCKQUOTE>-<B>moveBy</B>:<I>aPoint</I></BLOCKQUOTE>
+<H3><A NAME="39">translateBy:</A></H3>
+<BLOCKQUOTE>-<B>translateBy</B>:<I>p</I></BLOCKQUOTE>
+This method is like <B>moveBy:</B>, but returns a new rectangle instead of modifying the receiver.<P>
+<H3><A NAME="40">align:with:</A></H3>
+<BLOCKQUOTE>-<B>align</B>:<I>p1</I><B>with</B>:<I>p2</I></BLOCKQUOTE>
+Answer a rectangle that is translated by <I>p2</I> - <I>p1</I>.<P>
+<H3><A NAME="41">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>

@@ -1,0 +1,52 @@
+
+/* Portable Object Compiler (c) 1997,98,99.  All Rights Reserved.
+ * OpenVMS config file contributed by Pierre.Bru@spotimage.fr
+ */
+
+#ifndef OBJCRT_CONFIG_H
+#define OBJCRT_CONFIG_H
+
+#define OBJCRT_USE_PREFIXED_NAMES 0
+#define OBJCRT_USE_YYLESS 1
+#define OBJCRT_LINUX 0
+#define OBJCRT_USE_STDARG 1
+
+#if OBJCRT_USE_STDARG
+#include "stdarg.h"
+#define OC_VA_LIST va_list
+#define OC_VA_START(ap,larg) va_start(ap,larg)
+#define OC_VA_ARG(ap,type) va_arg(ap,type)
+#define OC_VA_END(ap) va_end(ap)
+#else
+#include "varargs.h"
+#define OC_VA_LIST va_list
+#define OC_VA_START(ap,larg) va_start(ap)
+#define OC_VA_ARG(ap,type) va_arg(ap,type)
+#define OC_VA_END(ap) va_end(ap)
+#endif /* OBJCRT_USE_STDARG */
+
+#define OBJCRT_USE_SNPRINTF 0
+#define OBJCRT_USE_MEMSET 1
+
+#ifdef OBJCRTDLL
+#define EXPORT 
+#else
+#define EXPORT /* null */
+#endif /* OBJCRTDLL */
+
+#define OBJCRT_PROTOTYPE_MESSENGER 1
+#define OBJCRT_SCOPE_OBJCMODULES_EXTERN 0
+#define OBJCRT_DEFAULT_PATHSEPC "/"
+#define OBJC_HAVE_SYSTEM_CALL 1
+
+#if defined (__alpha) && defined (__vms)
+
+#pragma OCbuiltInFctn __VA_START_BUILTIN
+#pragma OCbuiltInFctn __IS_X_FLOAT_BUILTIN
+#pragma OCbuiltInType __int64
+
+#endif
+
+
+#endif /* OBJCRT_CONFIG_H */
+

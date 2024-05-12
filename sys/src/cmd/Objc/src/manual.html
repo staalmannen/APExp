@@ -1,0 +1,1736 @@
+<!DOCTYPE HTML>
+
+<!--Converted with LaTeX2HTML 2019 (Released January 1, 2019) -->
+<HTML lang="EN">
+<HEAD>
+<TITLE>User&nbsp;Manual
+Portable&nbsp;Object&nbsp;Compiler Version&nbsp;3.3.19</TITLE>
+<META NAME="description" CONTENT="User&nbsp;Manual
+Portable&nbsp;Object&nbsp;Compiler Version&nbsp;3.3.19">
+<META NAME="keywords" CONTENT="manual">
+<META NAME="resource-type" CONTENT="document">
+<META NAME="distribution" CONTENT="global">
+
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=utf-8">
+<META NAME="viewport" CONTENT="width=device-width, initial-scale=1.0">
+<META NAME="Generator" CONTENT="LaTeX2HTML v2019">
+
+<LINK REL="STYLESHEET" HREF="manual.css">
+
+</HEAD>
+
+<BODY >
+
+<P>
+<H1 class="CENTER">User&nbsp;Manual
+<BR>Portable&nbsp;Object&nbsp;Compiler
+<BR><P><P><BR>
+Version&nbsp;3.3.19</H1><DIV CLASS="author_info">
+
+<P class="CENTER"><STRONG>David&nbsp;Stes</STRONG></P>
+<P class="CENTER"><STRONG>May 10, 2020</STRONG></P>
+</DIV>
+
+<P>
+<BR>
+
+<H2><A ID="SECTION00100000000000000000">
+Contents</A>
+</H2>
+<!--Table of Contents-->
+
+<UL CLASS="TofC">
+<LI><A ID="tex2html91"
+  HREF="manual.html#SECTION00200000000000000000">Introduction</A>
+<UL>
+<LI><A ID="tex2html92"
+  HREF="manual.html#SECTION00210000000000000000">How OBJECTIVE-C differs from C</A>
+<LI><A ID="tex2html93"
+  HREF="manual.html#SECTION00220000000000000000">Hello World</A>
+<LI><A ID="tex2html94"
+  HREF="manual.html#SECTION00230000000000000000">More Hello World</A>
+<LI><A ID="tex2html95"
+  HREF="manual.html#SECTION00240000000000000000">More information</A>
+</UL><BR>
+<LI><A ID="tex2html96"
+  HREF="manual.html#SECTION00300000000000000000">Collection Classes</A>
+<UL>
+<LI><A ID="tex2html97"
+  HREF="manual.html#SECTION00310000000000000000">Object Pak</A>
+<LI><A ID="tex2html98"
+  HREF="manual.html#SECTION00320000000000000000">Integer (BigInt)</A>
+<LI><A ID="tex2html99"
+  HREF="manual.html#SECTION00330000000000000000">OrdCltn</A>
+<LI><A ID="tex2html100"
+  HREF="manual.html#SECTION00340000000000000000">Set</A>
+<LI><A ID="tex2html101"
+  HREF="manual.html#SECTION00350000000000000000">String</A>
+<LI><A ID="tex2html102"
+  HREF="manual.html#SECTION00360000000000000000">SortCltn</A>
+<LI><A ID="tex2html103"
+  HREF="manual.html#SECTION00370000000000000000">Collection Messages</A>
+<UL>
+<LI><A ID="tex2html104"
+  HREF="manual.html#SECTION00371000000000000000">new</A>
+<LI><A ID="tex2html105"
+  HREF="manual.html#SECTION00372000000000000000">str:</A>
+<LI><A ID="tex2html106"
+  HREF="manual.html#SECTION00373000000000000000">with:</A>
+<LI><A ID="tex2html107"
+  HREF="manual.html#SECTION00374000000000000000">printLine</A>
+<LI><A ID="tex2html108"
+  HREF="manual.html#SECTION00375000000000000000">size</A>
+<LI><A ID="tex2html109"
+  HREF="manual.html#SECTION00376000000000000000">do:</A>
+<LI><A ID="tex2html110"
+  HREF="manual.html#SECTION00377000000000000000">add:</A>
+<LI><A ID="tex2html111"
+  HREF="manual.html#SECTION00378000000000000000">remove:</A>
+<LI><A ID="tex2html112"
+  HREF="manual.html#SECTION00379000000000000000">at:</A>
+<LI><A ID="tex2html113"
+  HREF="manual.html#SECTION003710000000000000000">removeAt:</A>
+<LI><A ID="tex2html114"
+  HREF="manual.html#SECTION003711000000000000000">eachElement</A>
+<LI><A ID="tex2html115"
+  HREF="manual.html#SECTION003712000000000000000">addAll:</A>
+<LI><A ID="tex2html116"
+  HREF="manual.html#SECTION003713000000000000000">collect:</A>
+</UL>
+</UL><BR>
+<LI><A ID="tex2html117"
+  HREF="manual.html#SECTION00400000000000000000">Exception Handling</A>
+<UL>
+<LI><A ID="tex2html118"
+  HREF="manual.html#SECTION00410000000000000000">Exceptions and Blocks</A>
+<UL>
+<LI><A ID="tex2html119"
+  HREF="manual.html#SECTION00411000000000000000">The messages -error: and -ifError:</A>
+<LI><A ID="tex2html120"
+  HREF="manual.html#SECTION00412000000000000000">Debugging Exceptions</A>
+<LI><A ID="tex2html121"
+  HREF="manual.html#SECTION00413000000000000000">The message -on:do:</A>
+</UL>
+</UL><BR>
+<LI><A ID="tex2html122"
+  HREF="manual.html#SECTION00500000000000000000">Language Elements</A>
+<UL>
+<LI><A ID="tex2html123"
+  HREF="manual.html#SECTION00510000000000000000">Class Definitions</A>
+<UL>
+<LI><A ID="tex2html124"
+  HREF="manual.html#SECTION00511000000000000000">Old Style Definitions</A>
+<LI><A ID="tex2html125"
+  HREF="manual.html#SECTION00512000000000000000">Class Variables</A>
+<LI><A ID="tex2html126"
+  HREF="manual.html#SECTION00513000000000000000">Missing Interface Definitions</A>
+</UL>
+<LI><A ID="tex2html127"
+  HREF="manual.html#SECTION00520000000000000000">Classes</A>
+<LI><A ID="tex2html128"
+  HREF="manual.html#SECTION00530000000000000000">Messages</A>
+<LI><A ID="tex2html129"
+  HREF="manual.html#SECTION00540000000000000000">Blocks</A>
+</UL><BR>
+<LI><A ID="tex2html130"
+  HREF="manual.html#SECTION00600000000000000000">Runtime</A>
+<UL>
+<LI><A ID="tex2html131"
+  HREF="manual.html#SECTION00610000000000000000">Boehm Garbage Collection</A>
+<LI><A ID="tex2html132"
+  HREF="manual.html#SECTION00620000000000000000">Reference Counted Garbage Collection</A>
+<LI><A ID="tex2html133"
+  HREF="manual.html#SECTION00630000000000000000">Selectors</A>
+<LI><A ID="tex2html134"
+  HREF="manual.html#SECTION00640000000000000000">Sending Messages to Nil</A>
+<LI><A ID="tex2html135"
+  HREF="manual.html#SECTION00650000000000000000">Message Tracing</A>
+<LI><A ID="tex2html136"
+  HREF="manual.html#SECTION00660000000000000000">Initialization</A>
+<UL>
+<LI><A ID="tex2html137"
+  HREF="manual.html#SECTION00661000000000000000">General</A>
+<LI><A ID="tex2html138"
+  HREF="manual.html#SECTION00662000000000000000">Postlink</A>
+<LI><A ID="tex2html139"
+  HREF="manual.html#SECTION00663000000000000000">Automatic</A>
+</UL>
+<LI><A ID="tex2html140"
+  HREF="manual.html#SECTION00670000000000000000">Threads</A>
+</UL><BR>
+<LI><A ID="tex2html141"
+  HREF="manual.html#SECTION00700000000000000000">Compiler</A>
+<UL>
+<LI><A ID="tex2html142"
+  HREF="manual.html#SECTION00710000000000000000">Testing for Portable Object Compiler</A>
+<LI><A ID="tex2html143"
+  HREF="manual.html#SECTION00720000000000000000">Assignments to self</A>
+<LI><A ID="tex2html144"
+  HREF="manual.html#SECTION00730000000000000000">Inline Cache</A>
+<LI><A ID="tex2html145"
+  HREF="manual.html#SECTION00740000000000000000">Speeding up compiles</A>
+<UL>
+<LI><A ID="tex2html146"
+  HREF="manual.html#SECTION00741000000000000000">Binary driver</A>
+<LI><A ID="tex2html147"
+  HREF="manual.html#SECTION00742000000000000000">Temporary Files</A>
+<LI><A ID="tex2html148"
+  HREF="manual.html#SECTION00743000000000000000">C Compiler Backend</A>
+</UL>
+</UL><BR>
+<LI><A ID="tex2html149"
+  HREF="manual.html#SECTION00800000000000000000">Link Editor</A>
+<UL>
+<LI><A ID="tex2html150"
+  HREF="manual.html#SECTION00810000000000000000">Static Libraries</A>
+<LI><A ID="tex2html151"
+  HREF="manual.html#SECTION00820000000000000000">OBJECTIVE-C and Dynamic Libraries</A>
+<LI><A ID="tex2html152"
+  HREF="manual.html#SECTION00830000000000000000">UNIX</A>
+<UL>
+<LI><A ID="tex2html153"
+  HREF="manual.html#SECTION00831000000000000000">Dynamic Libraries</A>
+<LI><A ID="tex2html154"
+  HREF="manual.html#SECTION00832000000000000000">Shared Libraries</A>
+<LI><A ID="tex2html155"
+  HREF="manual.html#SECTION00833000000000000000">objpak_s.a and objcrt_s.a</A>
+</UL>
+<LI><A ID="tex2html156"
+  HREF="manual.html#SECTION00840000000000000000">Windows</A>
+<UL>
+<LI><A ID="tex2html157"
+  HREF="manual.html#SECTION00841000000000000000">Building a DLL</A>
+<LI><A ID="tex2html158"
+  HREF="manual.html#SECTION00842000000000000000">Dynamically loading DLL's</A>
+<LI><A ID="tex2html159"
+  HREF="manual.html#SECTION00843000000000000000">OBJCRT.DLL</A>
+<LI><A ID="tex2html160"
+  HREF="manual.html#SECTION00844000000000000000">OBJPAK.DLL</A>
+</UL>
+</UL><BR>
+<LI><A ID="tex2html161"
+  HREF="manual.html#SECTION00900000000000000000">Other Development Tools</A>
+<UL>
+<LI><A ID="tex2html162"
+  HREF="manual.html#SECTION00910000000000000000">Editors</A>
+<UL>
+<LI><A ID="tex2html163"
+  HREF="manual.html#SECTION00911000000000000000">ctags</A>
+<LI><A ID="tex2html164"
+  HREF="manual.html#SECTION00912000000000000000">vim</A>
+<LI><A ID="tex2html165"
+  HREF="manual.html#SECTION00913000000000000000">elvis</A>
+<LI><A ID="tex2html166"
+  HREF="manual.html#SECTION00914000000000000000">emacs</A>
+<LI><A ID="tex2html167"
+  HREF="manual.html#SECTION00915000000000000000">indent</A>
+</UL>
+<LI><A ID="tex2html168"
+  HREF="manual.html#SECTION00920000000000000000">Debuggers</A>
+<UL>
+<LI><A ID="tex2html169"
+  HREF="manual.html#SECTION00921000000000000000">Symbolic Representation of Objects</A>
+<LI><A ID="tex2html170"
+  HREF="manual.html#SECTION00922000000000000000">Message Tracing in gdb</A>
+<LI><A ID="tex2html171"
+  HREF="manual.html#SECTION00923000000000000000">Setting breakpoints</A>
+<LI><A ID="tex2html172"
+  HREF="manual.html#SECTION00924000000000000000">WATCOM wd and wdw</A>
+</UL>
+<LI><A ID="tex2html173"
+  HREF="manual.html#SECTION00930000000000000000">Integrated Development Environment</A>
+<UL>
+<LI><A ID="tex2html174"
+  HREF="manual.html#SECTION00931000000000000000">WATCOM IDE</A>
+</UL>
+<LI><A ID="tex2html175"
+  HREF="manual.html#SECTION00940000000000000000">gprof</A>
+<LI><A ID="tex2html176"
+  HREF="manual.html#SECTION00950000000000000000">purify</A>
+</UL><BR>
+<LI><A ID="tex2html177"
+  HREF="manual.html#SECTION001000000000000000000">Bibliography</A>
+</UL>
+<!--End of Table of Contents-->
+<P>
+
+<H1><A ID="SECTION00200000000000000000">
+Introduction</A>
+</H1>
+
+<P>
+
+<H1><A ID="SECTION00210000000000000000">
+How O<SMALL>BJECTIVE-</SMALL>C differs from C</A>
+</H1>
+
+<P>
+O<SMALL>BJECTIVE-</SMALL>C adds a few constructs, borrowed from Smalltalk, to the C language.  It is necessary, for using the O<SMALL>BJECTIVE-</SMALL>C constructs in a correct way, to learn some Smalltalk (as described, for instance, in [<A
+ HREF="manual.html#ST80">Goldberg and Robson, 1983</A>]).
+
+<P>
+At least, some superficial hands on experience with a commercial Smalltalk system, or a freely available one, such as the <SPAN  CLASS="textit">Squeak</SPAN> system, such as <SPAN  CLASS="textit">GNU Smalltalk</SPAN> or such as perhaps <SPAN  CLASS="textit">Little Smalltalk</SPAN>, is an important advantage when learning O<SMALL>BJECTIVE-</SMALL>C. 
+
+<P>
+
+<H1><A ID="SECTION00220000000000000000">
+Hello World</A>
+</H1>
+
+<P>
+Let's start by giving our version of the well-known <SPAN  CLASS="textit">hello world</SPAN> tutorial program.
+
+<P>
+We should warn the reader at once that there is no difference with regular, plain C (as defined in [<A
+ HREF="manual.html#Kernighan88">Kernighan and Ritchie, 1988</A>]), for such a simple program.
+
+<P>
+Source code files in O<SMALL>BJECTIVE-</SMALL>C have a <SPAN  CLASS="textit">.m</SPAN> extension, so use a text-editor, such as <SPAN  CLASS="textit">vi</SPAN>, and create a file <SPAN  CLASS="textit">hello.m</SPAN> :
+
+<P><PRE>
+#include &lt;stdio.h&gt;
+
+int main(int argc,char **argv)
+{
+    printf("hello world!\n");
+}
+</PRE>
+<P>
+Compile the file using the command :
+
+<P><PRE>
+objc -q hello.m -o hello
+</PRE>
+<P>
+Run the program by typing <SPAN  CLASS="textit">hello</SPAN>.  The <SPAN  CLASS="textit">-q</SPAN> option of the <SPAN  CLASS="textit">objc</SPAN> compiler suppresses a copyright message.  If you'd like to always suppress this message, edit a file such as <SPAN  CLASS="textit">.cshrc</SPAN> (or <SPAN  CLASS="textit">.zshrc</SPAN> and so on) and do (the equivalent of):
+
+<P><PRE>
+setenv OBJCOPT "-q"
+</PRE>
+<P>
+
+<H1><A ID="SECTION00230000000000000000">
+More Hello World</A>
+</H1>
+
+<P>
+You normally mix regular C and O<SMALL>BJECTIVE-</SMALL>C extensions.  For example, we'll extend the <SPAN  CLASS="textit">hello</SPAN> program to say hello to a <SPAN  CLASS="textit">Set</SPAN> of people.
+
+<P><PRE>
+#include &lt;stdio.h&gt;
+#include &lt;objpak.h&gt;
+
+int main(int argc,char **argv)
+{
+    id set = [Set new];
+    argv++;while (--argc) [set add:[String str:*argv++]];
+    [set do:{ :each | printf("hello, %s!\n",[each str]); }];
+}
+</PRE>
+<P>
+The program first <SPAN  CLASS="textit">includes</SPAN> a header file objpak.h, for defining O<SMALL>BJECTIVE-</SMALL>C datatypes.  The <SPAN  CLASS="textit">id</SPAN> type (as used in the main function) is a C type that stands for an O<SMALL>BJECTIVE-</SMALL>C object.  Message expressions are written inside square brackets (<SPAN  CLASS="textit">[receiver message]</SPAN>).  The example creates a Set instance and adds String objects to the Set.  Sets automatically remove duplicate entries, so there will be no duplicate names in the Set.  Finally, the program prints a hello message for each String object in the Set, using the Block syntax, which is just using ordinary braces, as for compound statements in C.
+
+<P><PRE>
+objc -q hello.m -o hello
+hello joe phil joe luke joe phil joe
+</PRE>
+<P>
+You should see something like:
+
+<P><PRE>
+hello, joe!
+hello, phil!
+hello, luke!
+</PRE>
+<P>
+Although some names were specified more than once on the command line, the program doesn't print multiple greetings for the same name; the Set object has filtered out duplicates; it uses String hashing to find equal strings.
+
+<P>
+
+<H1><A ID="SECTION00240000000000000000">
+More information</A>
+</H1>
+
+<P>
+On UNIX, try <SPAN  CLASS="textit">man objc</SPAN> to read the manpage of the compiler.  There are also manpages for most objects, e.g. <SPAN  CLASS="textit">man String</SPAN> or <SPAN  CLASS="textit">man OrdCltn</SPAN> will list a specification sheet for these Objects.  There is also a set of HTML specification sheets.
+
+<P>
+Also see the original book [<A
+ HREF="manual.html#Cox86">Cox, 1986</A>] on the language, or later papers, such as [<A
+ HREF="manual.html#Cox91">Cox, 1991</A>].  
+
+<P>
+
+<H1><A ID="SECTION00300000000000000000">
+Collection Classes</A>
+</H1>
+
+<P>
+
+<H1><A ID="SECTION00310000000000000000">
+Object Pak</A>
+</H1>
+
+<P>
+<SPAN  CLASS="textit">Object Pak</SPAN> is a set of classes that are interface compatible with Stepstone's ICpak101 classes, which in their turn, are modelled after Collection classes that you find in Smalltalk (see [<A
+ HREF="manual.html#ST80">Goldberg and Robson, 1983</A>]).
+
+<P>
+Collections are an important set of classes; they are classes that manage groups of objects; it is almost impossible to write O<SMALL>BJECTIVE-</SMALL>C withouth using some sort of collection.  A collection is simply a set of elements where each element is a pointer to an object.
+
+<P>
+Most collections do not care what class of object they manage.  Each element in a collection could contain a different instance (object) from a different class.  There are sometimes specific requirements, such as the fact that elements in a <SPAN  CLASS="textit">Set</SPAN> must implement the <SPAN  CLASS="texttt">hash</SPAN> method.
+
+<P>
+
+<H1><A ID="SECTION00320000000000000000">
+Integer (BigInt)</A>
+</H1>
+
+<P>
+<SPAN  CLASS="textit">BigInt</SPAN> instances represent (arbitrary length) integers.  Typically, the O<SMALL>BJECTIVE-</SMALL>C <SPAN  CLASS="textit">BigInt</SPAN> class is much more efficient than a Smalltalk large integer, because the <SPAN  CLASS="textit">BigInt</SPAN> class is implemented in C.
+
+<P>
+
+<H1><A ID="SECTION00330000000000000000">
+OrdCltn</A>
+</H1>
+
+<P>
+OrdCltn objects are the &ldquo;work-horse&rdquo; used most often in O<SMALL>BJECTIVE-</SMALL>C programs.  They are what Smalltalk programmers call an OrderedCollection : a variable-sized collection of elements, in which the user of the collection specifies the location of each element; index keys begin at 0 and increase.  The elements in the collection can be any class of Object; duplicate objects are allowed.
+
+<P>
+
+<H1><A ID="SECTION00340000000000000000">
+Set</A>
+</H1>
+
+<P>
+Sets do not allow duplicate objects.  A Set ignores any request that would add a duplicate to the colleciton.
+
+<P>
+
+<H1><A ID="SECTION00350000000000000000">
+String</A>
+</H1>
+
+<P>
+Strings are objects that hold ordinary C strings.  String objects are heavily used as elements of Collection classes.
+
+<P>
+
+<H1><A ID="SECTION00360000000000000000">
+SortCltn</A>
+</H1>
+
+<P>
+SortCltn's are what Smalltalk programmers call a SortedCollection.  Elements are stored in alphabetic order (by default, for Strings), or more generally, as specified by a block of code, called the SortBlock.  SortCltn's are used for maintaining sorted lists of elements.
+
+<P>
+
+<H1><A ID="SECTION00370000000000000000">
+Collection Messages</A>
+</H1>
+
+<P>
+
+<H2><A ID="SECTION00371000000000000000">
+new</A>
+</H2>
+
+<P>
+The new message allocates a collection with a default size.  It returns the new collection (empty, no elements) :
+
+<P><PRE>
+aCltn = [OrdCltn new];
+</PRE>
+<P>
+When objects are added to the OrdCltn, at some point, additional space can be needed; the OrdCltn object automatically expands itself.
+
+<P>
+
+<H2><A ID="SECTION00372000000000000000">
+str:</A>
+</H2>
+
+<P>
+The <SPAN  CLASS="texttt">str:</SPAN> message creates a new instance by setting the contents of the object to the C string argument :
+
+<P><PRE>
+myString = [String str:"hello world"];
+</PRE>
+<P>
+
+<H2><A ID="SECTION00373000000000000000">
+with:</A>
+</H2>
+
+<P>
+Method to create a OrdCltn to hold the specified objects.  This is an example of a method with a variable number of arguments : the first argument is the number of objects that follows.
+
+<P><PRE>
+aCltn = [OrdCltn with:1,[String str:"hello"]];
+</PRE>
+<P>
+In this case, the size of this OrdCltn will equal to the number of arguments of the <SPAN  CLASS="texttt">with:</SPAN> method, and the objects will be added in the same order as they are listed.   But <SPAN  CLASS="texttt">with:</SPAN> can also be used with other types of collections, such as a Set.
+
+<P>
+
+<H2><A ID="SECTION00374000000000000000">
+printLine</A>
+</H2>
+
+<P>
+Method to print an Object on the <SPAN  CLASS="textit">stdout</SPAN>, followed by a newline.
+
+<P><PRE>
+[ [ BigInt str:"3141592654" ] printLine ];
+</PRE>
+<P>
+
+<H2><A ID="SECTION00375000000000000000">
+size</A>
+</H2>
+
+<P>
+Returns the number of elements currently in the collection.  It is supported by all collections.  If the collection is empty, the size is zero.
+
+<P><PRE>
+int n = [aCltn size];
+</PRE>
+<P>
+If the receiver of the <SPAN  CLASS="texttt">size</SPAN> method is <SPAN  CLASS="textit">nil</SPAN>, then this would set <SPAN  CLASS="textit">n</SPAN> to zero.  If you compile with <SPAN  CLASS="textit">-noNilRcvr</SPAN>, an error message will be generated.
+
+<P>
+
+<H2><A ID="SECTION00376000000000000000">
+do:</A>
+</H2>
+
+<P>
+The <SPAN  CLASS="texttt">do:</SPAN> message is for looping through each element in a collection, and for running a one-argument block of code (specified by the argument) with each element as the argument (of the block).  This message is used for side effects mostly, with no interest in the return value of <SPAN  CLASS="texttt">do:</SPAN> itself.
+
+<P>
+The hello world example, of the introduction, is one example sending a <SPAN  CLASS="texttt">do:</SPAN> message to print the elements of a Set.
+
+<P>
+Blocks are important for O<SMALL>BJECTIVE-</SMALL>C exception handling, but Blocks can also be used for simple purposes, such as counting the number of elements in a OrdCltn:
+
+<P><PRE>
+int size = 0;
+[aOrdCltn do:{ :each | size++; }]
+printf("%i",size);
+</PRE>
+<P>
+
+<H2><A ID="SECTION00377000000000000000">
+add:</A>
+</H2>
+
+<P>
+The <SPAN  CLASS="texttt">add:</SPAN> message adds an element to a collection, and makes it dynamically grow (if more space is needed to hold the element).  In Smalltalk, the method <SPAN  CLASS="texttt">add:</SPAN> returns the element that was added.  In O<SMALL>BJECTIVE-</SMALL>C, it traditionally returns the receiver (the collection) so that multiple <SPAN  CLASS="texttt">add:</SPAN> messages can be nested.
+
+<P><PRE>
+[[aOrdCltn add:myObject] add:myString];
+</PRE>
+<H2><A ID="SECTION00378000000000000000">
+remove:</A>
+</H2>
+
+<P>
+The <SPAN  CLASS="texttt">remove:</SPAN> message removes the argument if it is in a collection.  It returns the object that was deleted from the collection, and shrinks the size of the collection.  If the object is not found, an exception is raised, which, if you do not catch it, will stop the program and display an error message.
+
+<P><PRE>
+[aOrdCltn add:myObject];
+[aOrdCltn remove:myObject];
+</PRE>
+<P>
+For some collections, the identity check is an equality check.  For example, the Set class will remove by using the <SPAN  CLASS="texttt">isEqual:</SPAN> as criterium.  You should consult the class documentation (specification sheet) to be sure.
+
+<P>
+
+<H2><A ID="SECTION00379000000000000000">
+at:</A>
+</H2>
+
+<P>
+This message is implemented by <SPAN  CLASS="textit">OrdCltn</SPAN>, but not by <SPAN  CLASS="textit">Set</SPAN>.  It returns the object at the index specified by the argument.
+
+<P><PRE>
+for(i=0;i&lt;[aCltn size];i++) [[aCltn at:i] foo];
+</PRE>
+<P>
+is pretty much equivalent to :
+
+<P><PRE>
+[ aCltn do: { :each | [each foo]; } ];
+</PRE>
+<P>
+
+<H2><A ID="SECTION003710000000000000000">
+removeAt:</A>
+</H2>
+
+<P>
+This message removes the object at the specified index.  This causes all succeeding elements to shift down one index position.  It returns the removed object.  It's most efficient to start with the last element and work towards the first element :
+
+<P><PRE>
+i = [aCltn size]; while (--i &gt;= 0) {
+    [aSet add:[aCltn removeAt:i]];
+}
+</PRE>
+<P>
+
+<H2><A ID="SECTION003711000000000000000">
+eachElement</A>
+</H2>
+
+<P>
+This message returns a <SPAN  CLASS="textit">Sequence</SPAN>, an Object that can be used to sequentially access the contents of a OrdCltn.
+
+<P><PRE>
+id eachElement = [aCltn eachElement];
+while (element = [eachElement next]) { [element foo]; }
+</PRE>
+<P>
+All Collections implement <SPAN  CLASS="texttt">eachElement</SPAN> so it's a good Collection-independent way to process the contents of a Collection.
+
+<P>
+
+<H2><A ID="SECTION003712000000000000000">
+addAll:</A>
+</H2>
+
+<P>
+This message is to combine two collections.  It can be used to move objects from <SPAN  CLASS="textit">Set</SPAN>'s into <SPAN  CLASS="textit">OrdCltn</SPAN>'s and vice versa.  For example, the following is a quick way to delete all the <SPAN  CLASS="textit">duplicates</SPAN> from a OrdCltn :
+
+<P><PRE>
+[[OrdCltn new] addAll:[[Set new] addAll:aCltn]];
+</PRE>
+<P>
+The <SPAN  CLASS="textit">SortCltn</SPAN> class can be used in the same way, as a filter to sort the objects in a collection, to then move the objects back into an indexable ordered OrdCltn.
+
+<P>
+
+<H2><A ID="SECTION003713000000000000000">
+collect:</A>
+</H2>
+
+<P>
+The <SPAN  CLASS="texttt">collect:</SPAN> message is similar to <SPAN  CLASS="texttt">addAll:</SPAN>, but allows you to specify a <SPAN  CLASS="textit">transformBlock</SPAN>.
+
+<P><PRE>
+filter = [Set new];
+aCltn  = [aCltn collect:{ :each | [filter addNTest:each] }];
+</PRE>
+<P>
+The <SPAN  CLASS="texttt">collect:</SPAN> method creates a new OrdCltn, which consists (in the example above) of the return values of the <SPAN  CLASS="texttt">addNTest:</SPAN> method, which returns <SPAN  CLASS="textit">nil</SPAN> for duplicates.  The transformBlock has as a side-effect, the creation of a Set, called &ldquo;filter&rdquo;, which has the same contents. 
+
+<P>
+
+<H1><A ID="SECTION00400000000000000000">
+Exception Handling</A>
+</H1>
+
+<P>
+
+<H1><A ID="SECTION00410000000000000000">
+Exceptions and Blocks</A>
+</H1>
+
+<P>
+This chapter discusses exception handling for O<SMALL>BJECTIVE-</SMALL>C as outlined in [<A
+ HREF="manual.html#Cox91">Cox, 1991</A>].  The messages <SPAN  CLASS="texttt">-error:</SPAN> and <SPAN  CLASS="texttt">-ifError:</SPAN> are similar to messages in older Smalltalk versions.  The message <SPAN  CLASS="texttt">-on:do:</SPAN> is modeled after ANSI Smalltalk.  The <SPAN  CLASS="texttt">-on:do:</SPAN> message is supported by version 3.2.x (or higher) of O<SMALL>BJECTIVE-</SMALL>C.
+
+<P>
+
+<H2><A ID="SECTION00411000000000000000">
+The messages -error: and -ifError:</A>
+</H2>
+
+<P>
+The message <SPAN  CLASS="texttt">-error:</SPAN> can be used in response to some abnormal program conditio.  This message can be sent to any Object.
+
+<P><PRE>
+if (!h) [ anObject error:"h can't be zero" ];
+</PRE>
+<P>
+This is similar to how in Stepstone O<SMALL>BJECTIVE-</SMALL>C an error action (aborting the process) is performed.
+
+<P>
+However, in our case, the user might substitute a different Block (called <SPAN  CLASS="textit">exception handler</SPAN>) for the default handler (which aborts the process).  This is done by using the method <SPAN  CLASS="texttt">ifError:</SPAN> :
+
+<P><PRE>
+[ { c = [a foo]; } ifError: { :msg :rcv | printf("got an exception"); } ];
+</PRE>
+<P>
+Instead of evaluating the default handler, <SPAN  CLASS="texttt">error:</SPAN> will execute the exception handler specified by <SPAN  CLASS="texttt">ifError:</SPAN>.  The handler is invoked with a message object and with the receiver of the <SPAN  CLASS="texttt">error:</SPAN> message. 
+
+<P>
+
+<H2><A ID="SECTION00412000000000000000">
+Debugging Exceptions</A>
+</H2>
+
+<P>
+An <SPAN  CLASS="textit">uncaught</SPAN> exception is easy to debug with O<SMALL>BJECTIVE-</SMALL>C exceptions : because the exception handler is evaluated as subroutine of the <SPAN  CLASS="texttt">error:</SPAN> method, the stack backtrace towards the function that is raising the exception, is not lost.
+
+<P>
+
+<H2><A ID="SECTION00413000000000000000">
+The message -on:do:</A>
+</H2>
+
+<P>
+In release 3.2.x, and newer versions, Block instances respond to the message <SPAN  CLASS="texttt">-on:do:</SPAN>.  This messages takes as argument the <SPAN  CLASS="textit">class</SPAN> of exceptions that should be handled, and a <SPAN  CLASS="textit">handler</SPAN>, which is a Block, taking one argument (the exception instance).
+
+<P>
+For example, to handle an exception using <SPAN  CLASS="texttt">-on:do:</SPAN> :   
+
+<P><PRE>
+[ { c = [a foo]; } on:OutOfMemory do: { :exc | printf("got an exception"); } ];
+</PRE>
+<P>
+The <SPAN  CLASS="texttt">-on:do:</SPAN> message works together with subclasses of the Exception class.  You can subclass the Exception class to make your custom Exception classes.  An exception is signalled as follows :
+
+<P><PRE>
+[[MyException new] signal];
+</PRE>
+<P>
+The instance of the exception class that is created (by sending <SPAN  CLASS="texttt">+new</SPAN>), is the argument of the handler block of the <SPAN  CLASS="texttt">-on:do:</SPAN> message.
+
+<P>
+
+<H1><A ID="SECTION00500000000000000000">
+Language Elements</A>
+</H1>
+
+<P>
+
+<H1><A ID="SECTION00510000000000000000">
+Class Definitions</A>
+</H1>
+
+<P>
+You normally define your own class by <SPAN  CLASS="textit">subclassing</SPAN> an existing class, such as the <SPAN  CLASS="textit">root class</SPAN>, Object.  A class automatically responds to all methods <SPAN  CLASS="textit">inherited</SPAN> from the superclass. 
+
+<P>
+The <SPAN  CLASS="textit">header file</SPAN>, say MyObject.h, would contain:
+
+<P><PRE>
+@interface MyObject : Object { id ivar; }
++ bar;
+- foo;
+@end
+</PRE>
+<P>
+This prototypes a class called <SPAN  CLASS="textit">MyObject</SPAN>, which is declared to be a subclass of <SPAN  CLASS="textit">Object</SPAN>, with one <SPAN  CLASS="textit">instance variable</SPAN> (called ivar) of type &ldquo;id&rdquo;.
+
+<P>
+The interface also exports two methods : a factory method (preceded by a &ldquo;+&rdquo;) and an instance method (foo).  The class itself responds to factory methods; instances of the class, respond to instance methods.
+
+<P>
+The <SPAN  CLASS="textit">implementation file</SPAN>, say MyObject.m, must include the interface file, and defines the implementation of the methods.
+
+<P><PRE>
+#include "MyObject.h"
+
+@implementation MyObject 
++ bar { return [self new] };
+- foo { return ivar; }
+@end
+</PRE>
+<P>
+
+<H2><A ID="SECTION00511000000000000000">
+Old Style Definitions</A>
+</H2>
+
+<P>
+Before O<SMALL>BJECTIVE-</SMALL>C version 4.x, the `=' syntax was used for defining classes.  The Portable Object Compiler supports this syntax (in addition to the version 4.x '@' syntax) :
+
+<P><PRE>
+= MyClass : Object { id ivar; }
++ new { self = [super new]; ivar = [String new]; return self; }
+=:
+</PRE>
+<P>
+
+<H2><A ID="SECTION00512000000000000000">
+Class Variables</A>
+</H2>
+
+<P>
+The Portable Object Compiler has an experimental implementation of class variables, using the same syntax as the K.Lerman extended Stepstone compiler.
+
+<P><PRE>
+= MyClass : Object { id ivar; } : { id cvar; }
+- foo { cvar = [Object new]; return self; }
++ bar { return cvar; }
+- boo:aString { ivar = aString; return self; }
+- boo { return ivar; }
+=:
+</PRE>
+<P>
+It's currently advised, and anyhow a safe thing to do, to compile with <SPAN  CLASS="textit">-noSelfAssign</SPAN> when using class variables.
+
+<P>
+
+<H2><A ID="SECTION00513000000000000000">
+Missing Interface Definitions</A>
+</H2>
+
+<P>
+Although normally you would define a .h file containing an <SPAN  CLASS="textit">@interface</SPAN> for each class, the Portable Object Compiler allows you to use <SPAN  CLASS="textit">@implementation</SPAN> without matching <SPAN  CLASS="textit">@interface</SPAN> :
+
+<P><PRE>
+@implementation MyClass : Object { id ivar; }
++ new { self = [super new]; ivar = [String new]; return self; }
+@end
+</PRE>
+<P>
+The compiler is warning you if it can't find an interface declaration.  You can suppress the warning by using the <SPAN  CLASS="textit">-w</SPAN> flag.
+
+<P>
+
+<H1><A ID="SECTION00520000000000000000">
+Classes</A>
+</H1>
+
+<P>
+Classes are implemented in the Portable Object Compiler as global variables.  There is a slight (implementation) difference in the <SPAN  CLASS="texttt">-dynamic</SPAN> case, but the semantics are the same.
+
+<P>
+Unlike some other compilers, but like the original Stepstone compiler, class names are ordinary expressions.  Usually a class will be receiver of a message (a factory method), but it is possible to use classnames as arguments as well (in the Portable Object Compiler) :
+
+<P><PRE>
+[[ Set inheritsFrom: Object ] ifTrue: { printf("yes"); } ];
+</PRE>
+<P>
+For writing completely portable code, that also compiles on older or less powerful O<SMALL>BJECTIVE-</SMALL>C compilers, you might want to write:
+
+<P><PRE>
+[[ Set inheritsFrom:[Object self] ] ifTrue: { printf("yes"); } ];
+</PRE>
+<P>
+
+<H1><A ID="SECTION00530000000000000000">
+Messages</A>
+</H1>
+(to be completed)
+
+<P>
+
+<H1><A ID="SECTION00540000000000000000">
+Blocks</A>
+</H1>
+(to be completed)
+
+<P>
+
+<H1><A ID="SECTION00600000000000000000">
+Runtime</A>
+</H1>
+
+<P>
+
+<H1><A ID="SECTION00610000000000000000">
+Boehm Garbage Collection</A>
+</H1>
+
+<P>
+The <SPAN  CLASS="textit">-boehm</SPAN> option option simply sets the function vectors for allocating memory to the <SPAN  CLASS="textit">malloc()</SPAN> functions of the Boehm <SPAN  CLASS="textit">gc</SPAN> package.  Except for some initialization code emitted for the <SPAN  CLASS="textit">main()</SPAN> of your program, there's no difference in code generation, so this is in fact a runtime issue.  You have to recompile however the runtime with the Boehm library.
+
+<P><PRE>
+objc -boehm main.m
+</PRE>
+<P>
+
+<H1><A ID="SECTION00620000000000000000">
+Reference Counted Garbage Collection</A>
+</H1>
+
+<P>
+The <SPAN  CLASS="textit">-refcnt</SPAN> (or <SPAN  CLASS="textit">-gc</SPAN>) flag selects a different kind of garbage collection to be used : it instructs the compiler to generate reference counting code, and links a version of the runtime that supports reference counting.
+
+<P><PRE>
+objc -gc main.m
+</PRE>
+<P>
+This option also causes a different runtime to be used, and it forces assignments to <SPAN  CLASS="textit">id variables</SPAN> to be translated to calls to the runtime function <SPAN  CLASS="textit">idassign()</SPAN>.  This function modifies the reference count of the objects in the assignment.
+
+<P>
+By defining a variable as <SPAN  CLASS="textit">volatile</SPAN> it is possible to prevent reference count code to be used.
+
+<P><PRE>
+volatile id myObject;
+</PRE>
+<P>
+
+<H1><A ID="SECTION00630000000000000000">
+Selectors</A>
+</H1>
+
+<P>
+One mistake, when using the method <SPAN  CLASS="texttt">perform:</SPAN>, is to assume that Selectors (of type SEL) are compatible with C Strings (of type STR).  This is not the case.  Selectors are <SPAN  CLASS="textit">uniqued</SPAN> strings, maintained by the runtime in a hashtable.  The messenger assumes that equal selectors are also pointer equal.
+
+<P>
+The function <SPAN  CLASS="textit">cvtToSel</SPAN> in the runtime is used to convert a string to a selector.  This function should <SPAN  CLASS="textit">not</SPAN> be used (it is static) because some other O<SMALL>BJECTIVE-</SMALL>C runtimes use a function of the same name, which might, in a mixed environment, give problems.  You can use @selector or the method <SPAN  CLASS="texttt">findSel:</SPAN>.
+
+<P><PRE>
+SEL aSel = [Object findSel:"foo"];
+if (aSel) [myCltn makeElementsPerform:aSel];
+</PRE>
+<P>
+Note that in many cases, a clean (and much more powerful) solution is to use a Block, instead of just a selector:
+
+<P><PRE>
+[myCltn do: { :each | [each foo]; }];
+</PRE>
+<P>
+
+<H1><A ID="SECTION00640000000000000000">
+Sending Messages to Nil</A>
+</H1>
+
+<P>
+The <SPAN  CLASS="textit">-noNilRcvr</SPAN> option can be used to prevent messages being sent to nil (the NULL pointer).  It is in fact a runtime option, since the only effect of this option is that, when the <SPAN  CLASS="textit">main()</SPAN> of the program is compiled with this option, a nilHandler() function will be registered that stops the process, instead of simply returning nil (as the default handler does).
+
+<P><PRE>
+objc -noNilRcvr main.m
+</PRE>
+<P>
+
+<H1><A ID="SECTION00650000000000000000">
+Message Tracing</A>
+</H1>
+
+<P>
+It's possible to use the global <SPAN  CLASS="textit">msgFlag</SPAN> to turn message tracing on and off.  Trace messages are written to <SPAN  CLASS="textit">msgIOD</SPAN>, which is normally set to <SPAN  CLASS="textit">stderr</SPAN>, unless the environment variable <SPAN  CLASS="textit">OBJCRTMSG</SPAN> is set to some filename, in which case that file is used.
+
+<P><PRE>
+setenv OBJCRTMSG "/tmp/trace"
+</PRE>
+<P>
+Maybe the file should be opened in append mode (currently the file just overwrites the existing file).  An easy way to prevent users to trace executables, is to set msgFlag to NO after runtime initialization (so that the OBJCRTMSG env.variable has no effect).
+
+<P>
+
+<H1><A ID="SECTION00660000000000000000">
+Initialization</A>
+</H1>
+
+<P>
+
+<H2><A ID="SECTION00661000000000000000">
+General</A>
+</H2>
+
+<P>
+Runtime initialization is one of the more complex aspects of O<SMALL>BJECTIVE-</SMALL>C compilers.  Whenever the program launches, or whenever a dynamical library is loaded, it is necessary to make method selectors unique and to send <SPAN  CLASS="texttt">+initialize</SPAN> messages to classes.
+
+<P>
+The Portable Object Compiler, like the Stepstone compiler, guarantuees that every class receives a <SPAN  CLASS="texttt">+initialize</SPAN> message at start-up, during runtime initialization, and before the user program starts sending messages.
+
+<P>
+There are two different strategies implemented for runtime initialization, <SPAN  CLASS="textit">postlink initialization</SPAN> and <SPAN  CLASS="textit">automatic initialization</SPAN>.  Whatever method is used, initialization works by processing an array <SPAN  CLASS="texttt">objcModules</SPAN> which contains pointers to class structures in each module (object file).
+
+<P>
+The difference between the two methods is, how they construct the <SPAN  CLASS="texttt">objcModules</SPAN> array.
+
+<P>
+A third method, which has not yet been done so far for the Portable Object Compiler, since it is totally unportable, would be to modify the link editor, or to use link editor specific features, for O<SMALL>BJECTIVE-</SMALL>C runtime initialization.
+
+<P>
+
+<H2><A ID="SECTION00662000000000000000">
+Postlink</A>
+</H2>
+
+<P>
+The <SPAN  CLASS="textit">postlink</SPAN> method constructs the <SPAN  CLASS="texttt">objcModules</SPAN> array at compile time.   A small utility program, also called <SPAN  CLASS="textit">postlink</SPAN>, is used for this.
+
+<P>
+The <SPAN  CLASS="textit">postlink</SPAN> program takes as input a link map (or the output of the UNIX <SPAN  CLASS="texttt">nm</SPAN> command) and writes to the <SPAN  CLASS="texttt">stdout</SPAN> a C program that defines the <SPAN  CLASS="texttt">objcModules</SPAN> array.
+
+<P>
+This file, automatically generated by the compiler, is then compiled and linked into the program, using a second link.
+
+<P>
+The name <SPAN  CLASS="textit">postlink</SPAN> comes from the fact that the <SPAN  CLASS="texttt">objcModules</SPAN> is generated, at compile time, after a first link.
+
+<P>
+
+<H2><A ID="SECTION00663000000000000000">
+Automatic</A>
+</H2>
+
+<P>
+The automatic runtime initialization strategy constructs the <SPAN  CLASS="texttt">objcModules</SPAN> pointer at runtime, and requires only a single link.
+
+<P>
+This strategy depends on some compiler support, where for each function that is being called in a <SPAN  CLASS="textit">.m</SPAN> source file, an <SPAN  CLASS="textit">OCU</SPAN> entry is generated (OCU stands for O<SMALL>BJECTIVE-</SMALL>C use).
+
+<P>
+At runtime, the <SPAN  CLASS="texttt">objcModules</SPAN> array is constructed by traversing the tree of dependencies, starting with the <SPAN  CLASS="textit">OCU_main</SPAN> entry, for the <SPAN  CLASS="textit">main()</SPAN> function. 
+
+<P>
+Automatic runtime initialization is slightly less portable than <SPAN  CLASS="textit">postlink</SPAN>.  It is however up to 30% faster during linking of larger executables, and has little overhead in space and time compared to <SPAN  CLASS="textit">postlink</SPAN>.  Most UNIX drivers are configured for automatic runtime initialization, but allow you to use the <SPAN  CLASS="texttt">-postlink</SPAN> option to change runtime initialization procedure, which is the safest strategy.
+
+<P>
+
+<H3><A ID="SECTION00663100000000000000">
+Note on portability</A>
+</H3>
+
+<P>
+The <SPAN  CLASS="textit">default</SPAN> configuration for our compiler drivers is for <SPAN  CLASS="textit">automatic initialization</SPAN> on all UNIX platforms, on OS/2 and on Windows with the Microsoft compiler.  On other platforms (Macintosh, some non-Microsoft C compilers on Windows) the default is to use <SPAN  CLASS="textit">postlink initialization</SPAN>, because it is the only alternative.
+
+<P>
+This is because our implementation of automatic runtime initialization depends on the availability of an ANSI C compiler that follows the so-called <SPAN  CLASS="textit">common storage</SPAN> linker model (see Appendix 10.6 in [<A
+ HREF="manual.html#Kernighan88">Kernighan and Ritchie, 1988</A>]).
+
+<P>
+Specifically, for the automatic runtime code to work, the C compiler is supposed to place <SPAN  CLASS="textit">uninitialized</SPAN> global variables in a segment, called the <SPAN  CLASS="textit">common segment</SPAN>, as opposed to placing them immediately, per translation unit, in the <SPAN  CLASS="textit">bss segment</SPAN> (the runtime segment of uninitialized globals).
+
+<P>
+Examples of compilers that do this by default : GNU cc, Sun acc, HP-UX cc, DEC cc, Microsoft cl, IBM icc and AIX cc.   Some compilers don't do it by default, but have an option for it, such as the SGI cc or MIPSpro cc.  And finally, examples of C compilers that provide the definition-reference model only : Metrowerks mwcc, WATCOM wcc. 
+
+<P>
+For the interesting history of this issue, see [<A
+ HREF="manual.html#Lapin87">J.E.Lapin, 1987</A>], a book that contains a discussion on how this C language feature was removed from the C compiler in some UNIX dialects, and how it then reappeared.
+
+<P>
+In any case, our <SPAN  CLASS="textit">postlink</SPAN> alternative, which works for <SPAN  CLASS="textit">both</SPAN> common storage <SPAN  CLASS="textit">and</SPAN> other linkage models (such as definition-reference and perhaps other models), even when it might be considerably slower for linking larger applications, is useful because it might be the only alternative for C compilers that do not provide a switch for the <SPAN  CLASS="textit">common storagel</SPAN> model. 
+
+<P>
+C<SMALL>ONCLUSION:</SMALL> the <SPAN  CLASS="textit">postlink</SPAN> approach works everywhere and is conceptually most portable; however, <SPAN  CLASS="textit">if</SPAN> your compiler supports the common storage model, it's best to configure our compiler driver to take advantage of this, and use the <SPAN  CLASS="textit">automatic initialization</SPAN> approach.
+
+<P>
+
+<H1><A ID="SECTION00670000000000000000">
+Threads</A>
+</H1>
+
+<P>
+By default, the runtime of the Portable Object Compiler is not thread-safe.  It can be made thread-safe, however, by compiling the main() of the program with <SPAN  CLASS="textit">-pthreads</SPAN>.
+
+<P><PRE>
+objc -pthreads -q main.m
+</PRE>
+<P>
+This will force the compiler to link against the <SPAN  CLASS="textit">libpthreads</SPAN> library, and use locks around the O<SMALL>BJECTIVE-</SMALL>C messenger.
+
+<P>
+
+<H1><A ID="SECTION00700000000000000000">
+Compiler</A>
+</H1>
+
+<P>
+
+<H1><A ID="SECTION00710000000000000000">
+Testing for Portable Object Compiler</A>
+</H1>
+
+<P>
+Sometimes, it is necessary to test for the compiler that is compiling a program.  It is much better to write O<SMALL>BJECTIVE-</SMALL>C code that works for all O<SMALL>BJECTIVE-</SMALL>C compilers, but in cases where compiler dependencies cannot be avoided, it is possible to test for the Portable Object Compiler by using the <SPAN  CLASS="texttt">__PORTABLE_OBJC__</SPAN> symbol :
+
+<P><PRE>
+#ifdef __PORTABLE_OBJC__
+	msgFlag = YES;
+#endif
+</PRE>
+<P>
+
+<H1><A ID="SECTION00720000000000000000">
+Assignments to self</A>
+</H1>
+
+<P>
+The <SPAN  CLASS="textit">-noSelfAssign</SPAN> option can be used to prevent assignments to the <SPAN  CLASS="textit">self</SPAN> pointer inside method definitions.
+
+<P><PRE>
+objc -c -noSelfAssign foo.m
+</PRE>
+<P>
+By default, the compiler allows you to assign values to <SPAN  CLASS="textit">self</SPAN>.
+
+<P>
+
+<H1><A ID="SECTION00730000000000000000">
+Inline Cache</A>
+</H1>
+
+<P>
+The <SPAN  CLASS="textit">-inlineCache</SPAN> option can be used to speed up the messenger.  For each message expression, the compiler will generate a one-slot cache to store the resulting IMP pointer for the method look-up.  In many cases, subsequent method-lookups are not needed any more.
+
+<P><PRE>
+objc -c -inlineCache foo.m
+</PRE>
+<P>
+This option is not the default.  It trades in speed for flexibility.  It will give, for example, incorrect results when tracing messages (with the msgFlag option).
+
+<P>
+
+<H1><A ID="SECTION00740000000000000000">
+Speeding up compiles</A>
+</H1>
+
+<P>
+
+<H2><A ID="SECTION00741000000000000000">
+Binary driver</A>
+</H2>
+
+<P>
+You can win a few seconds, by using the binary driver instead of the Bourne shell driver on UNIX :
+
+<P><PRE>
+configure -e OBJCC=objc.exe
+</PRE>
+<P>
+This will set up Makefiles that use objc.exe instead of objc.  How much you win, depends on the quality of the /bin/sh interpreter that your system uses to interpret the <SPAN  CLASS="textit">objc</SPAN> script.  If this is a modern, fast implementation, then using the binary driver <SPAN  CLASS="textit">objc.exe</SPAN> will not be a big win.
+
+<P>
+
+<H2><A ID="SECTION00742000000000000000">
+Temporary Files</A>
+</H2>
+
+<P>
+Compiles can be made substantially faster by using a directory for temporary files that is located on a local disk (as opposed to some NFS mounted volume).
+
+<P><PRE>
+export OBJCOPT=-T/tmp/
+</PRE>
+<P>
+This will place temporary files in /tmp.  The Portable Object Compiler is ideal software for kernels that allow memory mapped files (the <SPAN  CLASS="textit">mfs</SPAN> filesystem on BSD UNIX for instance), since the temporary files generated by the compiler, are normally immediately removed after being created.
+
+<P>
+
+<H2><A ID="SECTION00743000000000000000">
+C Compiler Backend</A>
+</H2>
+
+<P>
+Finally, consider using appropriate flags for your C compiler, since normally most time is spent in processing the <SPAN  CLASS="textit">output</SPAN> of the Portable Object Compiler (the translated sources).
+
+<P><PRE>
+export CC=lcc
+export CPP="lcc -E"
+</PRE>
+<P>
+It might be worthwhile to try out several compilers, some are better for producing tight, optimized executables, some compile simply faster (while producing less optimized object code).
+
+<P>
+
+<H1><A ID="SECTION00800000000000000000">
+Link Editor</A>
+</H1>
+
+<P>
+
+<H1><A ID="SECTION00810000000000000000">
+Static Libraries</A>
+</H1>
+
+<P>
+There's no special compiler option for building static libraries.  
+
+<P>
+Static libraries can be, regardless of whether the object files are compiled with <SPAN  CLASS="texttt">-postlink</SPAN> or <SPAN  CLASS="texttt">-noPostLink</SPAN>, combined with the usual tools, <SPAN  CLASS="textit">ld</SPAN>, <SPAN  CLASS="textit">ar</SPAN>, <SPAN  CLASS="textit">ranlib</SPAN> etc. 
+
+<P>
+Of course the same rules apply to static libraries as for ordinary object files; for example, a static library compiled with <SPAN  CLASS="texttt">-postlink</SPAN> can later not be used with automatic runtime initialization.  The UNIX driver would issue a warning for this (the Windows driver is configured for postlink anyhow). 
+
+<P>
+
+<H1><A ID="SECTION00820000000000000000">
+O<SMALL>BJECTIVE-</SMALL>C and Dynamic Libraries</A>
+</H1>
+
+<P>
+O<SMALL>BJECTIVE-</SMALL>C is well suited for development of dynamic libraries.  O<SMALL>BJECTIVE-</SMALL>C messages always work through a centralized message dispatcher, which means that messages are bound to implementations only at runtime.  In the case of dynamic libraries, there is no problem of <SPAN  CLASS="textit">undefined references</SPAN>, as long as you remember to resolve <SPAN  CLASS="textit">classnames</SPAN> (typically implemented as global variables) via the <SPAN  CLASS="texttt">findClass:</SPAN> or <SPAN  CLASS="texttt">findClass:</SPAN> methods.
+
+<P><PRE>
+id aClass = [Object findClass:"MyClass"];
+if (aClass) [[aClass new] doSpecificMethod];
+</PRE>
+<P>
+There will be no unresolved reference to <SPAN  CLASS="textit">MyClass</SPAN>, nor to <SPAN  CLASS="texttt">doMyClassSpecificMethod</SPAN>.  
+
+<P>
+In other words, the O<SMALL>BJECTIVE-</SMALL>C syntax for working with classes and methods loaded in at runtime, is, with the exception of the use of <SPAN  CLASS="texttt">findClass:</SPAN>, the same as for statically linked libraries (or for shared libraries with an import library).  There's no need to use functions such as <SPAN  CLASS="texttt">dlsym()</SPAN> to obtain the methods.
+
+<P>
+
+<H1><A ID="SECTION00830000000000000000">
+UNIX</A>
+</H1>
+
+<P>
+
+<H2><A ID="SECTION00831000000000000000">
+Dynamic Libraries</A>
+</H2>
+
+<P>
+A dynamic library is an object file that can be loaded into a running O<SMALL>BJECTIVE-</SMALL>C program.
+
+<P>
+Dynamic libraries need to be compiled as follows :
+
+<P><PRE>
+objc -c -pic foo.m
+objc -c -pic bar.m
+objc -dl foo.o bar.o -o pkg.so
+</PRE>
+<P>
+The <SPAN  CLASS="texttt">-pic</SPAN> option indicates that we want to produce Position Independent Code.   The <SPAN  CLASS="texttt">-dl</SPAN> option instructs the compiler to generate a table of modules to be initialized, to be used by the runtime when the dynamic library is loaded.
+
+<P>
+Programs that possibly load such dynamical libraries, must be compiled with <SPAN  CLASS="texttt">-dynamic</SPAN>.  On some systems, the symbols of the program must be marked as exportable to the dynamic library.
+
+<P><PRE>
+objc -dynamic main.m -o main
+</PRE>
+<P>
+On HP-UX,
+
+<P><PRE>
+h = shl_load(path, BIND_IMMEDIATE, 0L);
+if (!h) [Object error:strerror(errno)];
+</PRE>
+<P>
+On SunOS or Linux,
+
+<P><PRE>
+h = dlopen(path, 1);
+if (!h) [Object error:dlerror()];
+</PRE>
+<P>
+Once the package is loaded, classes (defined in the dynamic library) can be found by the usual methods :
+
+<P><PRE>
+aClass = [Object findClass:"MyClass"];
+anObject = [aClass new];
+</PRE>
+<P>
+
+<H2><A ID="SECTION00832000000000000000">
+Shared Libraries</A>
+</H2>
+
+<P>
+Since release 1.7.5 of the compiler, shared libraries are dealt with in the same way as dynamically loaded libraries.  
+
+<P>
+There's no difference in building a shared library or a dynamically loaded library :
+
+<P><PRE>
+objc -c -pic foo.m
+objc -c -pic bar.m
+objc -dl foo.o bar.o -o pkg.so
+</PRE>
+<P>
+The only difference is that shared libraries are specified on the command line, rather than explicitely being loaded by the program:
+
+<P><PRE>
+objc -dynamic main.m pkg.so -o myprogram
+</PRE>
+<P>
+Note that programs that possibly load such dynamical libraries, must be compiled with <SPAN  CLASS="texttt">-dynamic</SPAN>.  On some systems, the symbols of the program must be marked as exportable to the dynamic library.
+
+<P>
+The <SPAN  CLASS="texttt">-static</SPAN> option can be used to prevent linking against shared libraries.
+
+<P>
+Prior to 1.7.5, the strategy was to use some sort of <SPAN  CLASS="textit">import library</SPAN>, which was, on UNIX, simply the same library, built as a static library.
+
+<P>
+Import libraries are still supported for systems that do not support initializers in shared objects using the <SPAN  CLASS="texttt">-stubLib</SPAN> and <SPAN  CLASS="texttt">-realLib</SPAN> options, but the disadvantage of that approach is that whenever the shared library is updated, the stub library needs to be updated too, and the program that links against the shared library should be recompiled.   
+
+<P>
+
+<H2><A ID="SECTION00833000000000000000">
+objpak_s.a and objcrt_s.a</A>
+</H2>
+
+<P>
+The shared library versions of the libraries <SPAN  CLASS="texttt">objcrt.a</SPAN> and <SPAN  CLASS="texttt">objpak.a</SPAN> can be named <SPAN  CLASS="textit">objpak_s.a</SPAN> and <SPAN  CLASS="textit">objcrt_s.a</SPAN> and the driver will automatically select these libraries, when given the <SPAN  CLASS="textit">-dynamic</SPAN> flag.
+
+<P>
+To build the libraries, simply go to the source directory of those libraries, and type (for example, for <SPAN  CLASS="texttt">objpak.a</SPAN>) :
+
+<P><PRE>
+cd src/objpak
+setenv OBJCOPT -pic
+make
+objc -dl *.o -o objpak_s.a
+</PRE>
+<P>
+If you now install this version of <SPAN  CLASS="texttt">objpak_s.a</SPAN>, the compiler driver will link against a shared library when given the <SPAN  CLASS="textit">-dynamic</SPAN> flag.  
+
+<P>
+The procedure for objcrt_s.a is identical; it's possible to switch between static objcrt.a and shared objcrt_s.a.
+
+<P>
+
+<H1><A ID="SECTION00840000000000000000">
+Windows</A>
+</H1>
+
+<P>
+
+<H2><A ID="SECTION00841000000000000000">
+Building a DLL</A>
+</H2>
+
+<P>
+Building a DLL (for WIN32) is similar as for shared libraries on UNIX, but there is an extra step involved.
+
+<P>
+You need to build a Windows <SPAN  CLASS="textit">import library</SPAN> (to use the DLL).  This is a <SPAN  CLASS="texttt">.lib</SPAN> library that references the <SPAN  CLASS="texttt">.dll</SPAN>.  The import library, not the .dll itself, is specified on the command line, when linking against the .dll.
+
+<P>
+Compile the DLL as follows.  The PIC flag translates to <SPAN  CLASS="texttt">-bd -br</SPAN> using the WATCOM driver, and also adds a <SPAN  CLASS="texttt">-dllexport</SPAN> flag, to emit <SPAN  CLASS="texttt">dllexport</SPAN> directives in front of generated O<SMALL>BJECTIVE-</SMALL>C BIND functions, to export them from the DLL.
+
+<P><PRE>
+objc -c -pic foo.m
+objc -c -pic bar.m
+objc -dl foo.obj bar.obj -o pkg.dll
+</PRE>
+<P>
+The <SPAN  CLASS="textit">-dl</SPAN> option adds an approriate <SPAN  CLASS="textit">LibMain()</SPAN> function.  It's <SPAN  CLASS="textit">essential</SPAN> that this function is in the DLL, since it initializes the O<SMALL>BJECTIVE-</SMALL>C classes in the archive.
+
+<P>
+Now, install pkg.dll somewhere on the <SPAN  CLASS="texttt">PATH</SPAN>, e.g. in <SPAN  CLASS="texttt">C:&#92;OBJC&#92;BIN</SPAN>. 
+
+<P>
+Next, build a (Windows) <SPAN  CLASS="textit">import library</SPAN> for the DLL.   This is done as for a regular C DLL :
+
+<P>
+For WATCOM:,
+
+<P><PRE>
+wlib -n pkg.lib +pkg.dll
+</PRE>
+<P>
+For lcc-win32:,
+
+<P><PRE>
+buildlib pkg.lib pkg.exp pkg.dll
+</PRE>
+<P>
+Finally, to use the DLL, just specify the import library and use -dynamic.  If you do not specify -dynamic, you will get undefined references.
+
+<P><PRE>
+objc -dynamic main.m pkg.lib -o main.exe
+</PRE>
+<P>
+
+<H2><A ID="SECTION00842000000000000000">
+Dynamically loading DLL's</A>
+</H2>
+
+<P>
+It is also possible to use the <SPAN  CLASS="textit">LoadLibrary</SPAN> function call to load in an O<SMALL>BJECTIVE-</SMALL>C DLL.  The DLL will automatically initialize the classes that it contains.
+
+<P>
+To avoid including windows.h, you can have a .c file with a dlopen() definition:
+
+<P><PRE>
+int dlopen(char *name,int x) { return LoadLibrary(name) &lt; 32; }
+</PRE>
+<P>
+And in O<SMALL>BJECTIVE-</SMALL>C you simply do:
+
+<P><PRE>
+if (!dlopen("foo.dll",1)) [Object error:"can't load foo.dll"];
+
+[[Object findClass:"FooClass"] new];
+</PRE>
+<P>
+
+<H2><A ID="SECTION00843000000000000000">
+OBJCRT.DLL</A>
+</H2>
+
+<P>
+There is a prebuilt binary available of the DLL at the website.  The import library can be called <SPAN  CLASS="textit">objcrt_s.lib</SPAN> and the driver will select this library when given the <SPAN  CLASS="textit">-dynamic</SPAN> option.
+
+<P>
+The flags to correctly build the DLL, are:
+
+<P><PRE>
+set OBJCOPT=-pic -DOBJCRTDLL
+</PRE>
+<P>
+The .dll needs to be built with:
+
+<P>
+For Watcom:
+
+<P><PRE>
+wmake -u -c
+objc -dl objcrt.obj Object.obj Block.obj -o objcrt.dll
+wlib -n objcrt_s.lib +objcrt.dll
+</PRE>
+<P>
+For lcc-win32:
+
+<P>
+Edit the Makefile as follows: <PRE>
+MFLAGS=$(DLL_MFLAGS)
+ALL : $(DLL)
+</PRE>
+<P>
+Then run make.
+
+<P>
+
+<H2><A ID="SECTION00844000000000000000">
+OBJPAK.DLL</A>
+</H2>
+
+<P>
+There is a prebuilt binary available of the DLL at the website.  The import library can be called <SPAN  CLASS="textit">objpak_s.lib</SPAN> and the driver will select this library when given the <SPAN  CLASS="textit">-dynamic</SPAN> option.
+
+<P>
+The flags to correctly build the DLL, are:
+
+<P><PRE>
+set OBJCOPT=-pic
+</PRE>
+<P>
+The .dll needs to be built with:
+
+<P><PRE>
+wmake -u -c
+objc -dl @objpak.lnk
+wlib -n objpak +objpak.dll
+</PRE>
+<P>
+where objpak.lnk is a file containing the commands:
+
+<P><PRE>
+ascfiler.obj assoc.obj
+cltn.obj cltnseq.obj 
+dictnary.obj keyseq.obj 
+ocstring.obj point.obj 
+rectangl.obj sequence.obj 
+set.obj setseq.obj tree.obj 
+treeseq.obj valueseq.obj -o objpak.dll
+</PRE>
+<P>
+
+<H1><A ID="SECTION00900000000000000000">
+Other Development Tools</A>
+</H1>
+
+<P>
+
+<H1><A ID="SECTION00910000000000000000">
+Editors</A>
+</H1>
+
+<P>
+
+<H2><A ID="SECTION00911000000000000000">
+ctags</A>
+</H2>
+
+<P>
+ctags is a utility to generate a <SPAN  CLASS="textit">tags</SPAN> file, used by editors such as <SPAN  CLASS="textit">vi</SPAN> or <SPAN  CLASS="textit">vim</SPAN>, for their tag feature.  The command <SPAN  CLASS="textit">:ta</SPAN> jumps to the line (and file) that defines the given tag.
+
+<P>
+ctags.awk is a version of an AWK implementation of ctags, that was modified to deal with O<SMALL>BJECTIVE-</SMALL>C.   It works with <SPAN  CLASS="textit">nawk</SPAN>, <SPAN  CLASS="textit">mawk</SPAN> and <SPAN  CLASS="textit">gawk</SPAN>.  If you use <SPAN  CLASS="textit">gawk</SPAN>, it's recommended to place the file in some location that is in the AWKPATH (so that gawk will find the file).
+
+<P><PRE>
+gawk -f ctags.awk file.m &gt; tags
+</PRE>
+<P>
+For each O<SMALL>BJECTIVE-</SMALL>C class implementation, a tag of the same name is generated.
+
+<P><PRE>
+:ta String
+</PRE>
+<P>
+for instance, will jump to the file that defines the String class.
+
+<P>
+For each method implementation, two tags are generated : one which is simply the first keyword of the selector, and also a tag which is the full selector name.
+
+<P><PRE>
+:ta -remove:ifAbsent:
+</PRE>
+<P>
+would jump for instance to the instance method of the same name.  The tag which consists of just the first keyword, is so that the <SPAN  CLASS="textit">Control-]</SPAN> and <SPAN  CLASS="textit">Control-t</SPAN> mechanism of <SPAN  CLASS="textit">vi</SPAN> also works for methods.
+
+<P>
+
+<H2><A ID="SECTION00912000000000000000">
+vim</A>
+</H2>
+
+<P>
+vim is a popular <SPAN  CLASS="textit">vi</SPAN> clone.  For editing O<SMALL>BJECTIVE-</SMALL>C code, it's possible to add `[' to `cinwords' in the <SPAN  CLASS="textit">.vimrc</SPAN> file; indeed, when `[' is followed by a `{', you are most likely editing a Block expression.
+
+<P><PRE>
+set smartindent
+set cinwords=if,else,while,do,for,switch,[
+set showmatch
+</PRE>
+<P>
+
+<H2><A ID="SECTION00913000000000000000">
+elvis</A>
+</H2>
+
+<P>
+ELVIS is a <SPAN  CLASS="textit">vi</SPAN> clone with extensive support for tags.  The <SPAN  CLASS="textit">ctags.awk</SPAN> program that comes with the Portable Object Compiler, supports ELVIS hints, which makes it possible to browse through all classes that implement a certain method :
+
+<P><PRE>
+:browse -reject:ifNone:
+</PRE>
+<P>
+would show, for example, a list of all classes that implement <SPAN  CLASS="texttt">-reject:ifNone:</SPAN>, so that it's possible to select (from a table that ELVIS shows) the implementation that you want to see.
+
+<P>
+It's also possible to jump in ELVIS immediately to a method of a specific class, like in:
+
+<P><PRE>
+:tag +new class@MyClass
+</PRE>
+<P>
+which would bring you to the implementation of <SPAN  CLASS="texttt">+new</SPAN> in <SPAN  CLASS="textit">MyClass</SPAN>.
+
+<P>
+ELVIS has an O<SMALL>BJECTIVE-</SMALL>C language mode (for syntax highlighting) and recognizes files with a <SPAN  CLASS="textit">.m</SPAN> extension.
+
+<P>
+
+<H2><A ID="SECTION00914000000000000000">
+emacs</A>
+</H2>
+
+<P>
+I've never used the following package, but I know that there exists an Objective-C mode for <SPAN  CLASS="textit">emacs</SPAN>.  Available at, for example, <SPAN  CLASS="texttt">ftp.uni-mainz.de</SPAN> in the directory <SPAN  CLASS="texttt">/pub/gnu/elisp-archive/modes/objective-C-mode.el.gz</SPAN>.
+
+<P>
+
+<H2><A ID="SECTION00915000000000000000">
+indent</A>
+</H2>
+
+<P>
+There is a patch available (included with the compiler) for GNU indent 1.9.1, so that it works with O<SMALL>BJECTIVE-</SMALL>C.  This can be used to format O<SMALL>BJECTIVE-</SMALL>C programs using the various, commonly used indentation styles.  The compiler sources are indented with the following settings :
+
+<P><PRE>
+-kr -psl -i2 -bad -Tid -TBOOL -TSEL -TSTR
+</PRE>
+<P>
+
+<H1><A ID="SECTION00920000000000000000">
+Debuggers</A>
+</H1>
+
+<P>
+
+<H2><A ID="SECTION00921000000000000000">
+Symbolic Representation of Objects</A>
+</H2>
+
+<P>
+To print an ASCII representation of an (arbitrary) Object, do something like :
+
+<P><PRE>
+call __showOn(cltn,0)
+</PRE>
+<P>
+This uses the AsciiFiler class, to dump the instance variables of some object <SPAN  CLASS="textit">cltn</SPAN> to the stderr.
+
+<P>
+For example, for a collection containing one String instance, you'd get:
+
+<P><PRE>
+(gdb) call __showOn(cltn,0)
+#AsciiFiler i144 
+1 #OrdCltn i1 @2 
+2 #String i11 i12 *11"hello world 
+$1 = 86080
+</PRE>
+<P>
+The first column is a number, then follows the classname, then (for a OrdCltn) the number of elements, then pointers towards the Objects that the collection contains.  In this case, the collection contains a String of 11 characters.
+
+<P>
+
+<H2><A ID="SECTION00922000000000000000">
+Message Tracing in gdb</A>
+</H2>
+
+<P>
+For message tracing from withing the debugger, it's useful to have the following definitions in a <SPAN  CLASS="textit">.gdbinit</SPAN> file:
+
+<P><PRE>
+# message tracing
+
+document showmsg
+turn on Objective-C message tracing
+end
+
+document stopmsg
+turn off Objective-C message tracing
+end
+
+define stopmsg
+set var msgFlag = 0
+end
+
+define showmsg
+set var msgFlag = 1
+end
+</PRE>
+<P>
+
+<H2><A ID="SECTION00923000000000000000">
+Setting breakpoints</A>
+</H2>
+
+<P>
+One way to set break-points on an O<SMALL>BJECTIVE-</SMALL>C method, which should work by the way with any C debugger (not just gdb), is to &ldquo;fabricate&rdquo; the name of the translated function yourself:
+
+<P><PRE>
+(gdb) br c_String_new
+Breakpoint 1 at 0x6eac
+</PRE>
+<P>
+would set a breakpoint on the (class) method &ldquo;new&rdquo; of the class &ldquo;String&rdquo;.  For instance methods, the prefix is &ldquo;i&rdquo; instead of &ldquo;c&rdquo;.
+
+<P>
+This might also be useful, as some means of sending a message from within an ordinary (and arbitrary) C debugger:
+
+<P><PRE>
+(gdb) p i_OrdCltn_size(cltn,0)
+$1 = 1
+</PRE>
+<P>
+
+<H2><A ID="SECTION00924000000000000000">
+WATCOM wd and wdw</A>
+</H2>
+
+<P>
+O<SMALL>BJECTIVE-</SMALL>C source files are compatible with the <SPAN  CLASS="textit">wd</SPAN> debugger (or <SPAN  CLASS="textit">wdw</SPAN>, the windowed debugger), and it is possible to step through O<SMALL>BJECTIVE-</SMALL>C source, set breakpoints with the mouse on specific O<SMALL>BJECTIVE-</SMALL>C method implementations etc.
+
+<P><PRE>
+objc -d3 -c test.m -o test.obj
+objc -d3 test.obj -o test.exe
+wd test.exe
+</PRE>
+<P>
+to debug a sample project.
+
+<P>
+
+<H1><A ID="SECTION00930000000000000000">
+Integrated Development Environment</A>
+</H1>
+
+<P>
+
+<H2><A ID="SECTION00931000000000000000">
+WATCOM IDE</A>
+</H2>
+
+<P>
+The files <SPAN  CLASS="textit">ide.cfg</SPAN> and <SPAN  CLASS="textit">idew32.cfg</SPAN> have been modified so that automatic makefile generation works for O<SMALL>BJECTIVE-</SMALL>C source files.  The IDE also offers the possibility to create an O<SMALL>BJECTIVE-</SMALL>C DLL or executable, when starting a new project.
+
+<P>
+
+<H1><A ID="SECTION00940000000000000000">
+gprof</A>
+</H1>
+
+<P>
+The compiler driver has a <SPAN  CLASS="textit">-pg</SPAN> option to support <SPAN  CLASS="textit">gprof</SPAN> program profiles.  The driver will also attempt to link against <SPAN  CLASS="textit">objcrt_p.a</SPAN> and <SPAN  CLASS="textit">objpak_p.a</SPAN>, if it can find them, when compiling with <SPAN  CLASS="textit">-pg</SPAN>.
+
+<P><PRE>
+objc -pg myprogram.m -o myprogram
+myprogram
+gprof myprogram gmon.out &gt; myprofile
+</PRE>
+<P>
+
+<H1><A ID="SECTION00950000000000000000">
+purify</A>
+</H1>
+
+<P>
+The compiler was verified to work with <SPAN  CLASS="textit">purify</SPAN> on Silicon Graphics machines.  Add the command <SPAN  CLASS="textit">purify</SPAN> before the normal commands to compile, and the purify driver recognizes <SPAN  CLASS="textit">objc</SPAN> as compiler, and the <SPAN  CLASS="textit">-o</SPAN> flag for producing a <SPAN  CLASS="textit">.pure</SPAN> executable.
+
+<P><PRE>
+purify objc -g myprogram.m -o myprogram
+</PRE>
+<P>
+When running the executable produced in this way, memory leak and memory allocation information is obtained as for normal C programs.
+
+<P>
+
+<H2><A ID="SECTION001000000000000000000">
+Bibliography</A>
+</H2><DL class="COMPACT">
+
+<DT><A ID="Cox86">Cox, 1986</A>
+<DD>
+Cox, B.&nbsp;J. (1986).
+<BR><EM>Object-Oriented Programming : An Evolutionary Approach</EM>.
+<BR>Addison-Wesley, Reading, Mass.
+
+<DT><A ID="Cox91">Cox, 1991</A>
+<DD>
+Cox, B.&nbsp;J. (1991).
+<BR>Taskmaster ecoop position paper.
+<BR>In <EM>ECOOP'91, Workshop on Exception Handling And OOPLS</EM>, Geneva,
+  Switzerland.
+
+<DT><A ID="ST80">Goldberg and Robson, 1983</A>
+<DD>
+Goldberg, A. and Robson, D. (1983).
+<BR><EM>Smalltalk-80 : The Language and its Implementation</EM>.
+<BR>Addison-Wesley, Reading, Mass.
+
+<DT><A ID="Lapin87">J.E.Lapin, 1987</A>
+<DD>
+J.E.Lapin (1987).
+<BR><EM>Portable C and UNIX System Programming</EM>.
+<BR>Prentice-Hall, Englewood Cliffs, N.J.
+
+<DT><A ID="Kernighan88">Kernighan and Ritchie, 1988</A>
+<DD>
+Kernighan, B.&nbsp;W. and Ritchie, D.&nbsp;M. (1988).
+<BR><EM>The C Programming Language, 2nd edition</EM>.
+<BR>Prentice-Hall.
+
+</DL>
+
+<P>
+
+<H1><A ID="SECTION001100000000000000000">
+About this document ...</A>
+</H1>
+ <STRONG>User&nbsp;Manual
+<BR>Portable&nbsp;Object&nbsp;Compiler
+<BR><P><P><BR>
+Version&nbsp;3.3.19</STRONG><P>
+This document was generated using the
+<A HREF="http://www.latex2html.org/">LaTeX2HTML</A> translator Version 2019 (Released January 1, 2019)
+<P>
+The command line arguments were: <BR>
+ <kbd>latex2html -split 0 -no_images -no_navigation manual</kbd>
+<P>
+The translation was initiated on 2020-05-10<BR><HR>
+
+</BODY>
+</HTML>

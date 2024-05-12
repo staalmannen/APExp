@@ -1,0 +1,968 @@
+.TH "monomial" 3 "Mar 12, 2023"
+.SH Monomial
+.PP
+.B
+Inherits from:
+
+CAObject
+.PP
+.B
+Maturity Index:
+
+Relatively mature
+.SH Class Description
+.PP
+A monomial consists of a scalar object 
+.I
+scalar
+multiplied by a product of terms; each term consists of a scalar 
+.I
+coefficient
+multiplied by a 
+.I
+symbol
+raised to a nonnegative 
+.I
+exponent
+(see the documentation on 
+.B
+Term
+)\&.  The 
+.I
+degree
+of a monomial is the sum of the exponents of its terms\&.  A monomial can be either variable sparse or variable dense : the terms of a variable dense monomial are represented by a dense array of exponents, where the size of the array is equal to the number of symbols\&.  The exponent of a term can be equal to zero\&.  In a variable sparse monomial, terms with exponent equal to zero are not stored\&.
+.SH Scalar of a Monomial
+.PP
+When a term is inserted into a monomial (see 
+.B
+insertTerm:
+), its coefficient is multiplied together with the scalar of the monomial; it follows that a monomial consists internally of a scalar multiplied by a product of 
+.I
+monic
+terms (a \&'power product\&')\&.  The methods 
+.B
+leadingTerm
+, 
+.B
+removeTerm
+, 
+.B
+eachTerm
+etc\&. return monic terms\&.  A monomial is said to be 
+.I
+monic
+if its scalar is equal to one\&.
+.SH Symbols and Variable Ordering
+.PP
+For a variable dense monomial, the collection of symbols is fixed when the monomial is created; you can\&'t insert terms in a different symbol\&.  In the variable sparse case, the collection of symbols is dynamically adapted as you insert terms\&.  Note that, in both cases - variable sparse or variable dense -, the collection of symbols contains the actual set of symbols (those that actually occur in the monomial with nonzero exponent) as a 
+.I
+subset
+\&.   See the documentation on 
+.B
+findSymbols
+\&.  The variable ordering imposed by the ordering of the collection of symbols is called 
+.I
+lexicographic
+(currently the variable ordering is always lexicographic)\&.  Monomials can be compared with respect to this ordering\&.
+.SH Conversion between Representations
+.PP
+It suffices to remove terms from a monomial in one representation and to insert them into another; abstractly, both kind of monomials, are collections of terms\&.
+.RS 3
+
+sparse = [Monomial scalar:[dense scalar]];
+.br
+while ((term = [dense removeTerm])) [sparse insertTerm:term];
+.br
+
+.RE
+.PP
+The example shows how to, destructively, convert from the variable dense into the variable sparse representation (see also 
+.B
+makeVariableSparse
+)\&.  Note that when you create a variable sparse monomial, you don\&'t have to specify the symbols in advance\&. 
+.RS 3
+
+dense = [Monomial scalar:[sparse scalar] symbols:[sparse findSymbols]];
+.br
+while (term = [sparse removeTerm]) [dense insertTerm:term];
+.br
+
+.RE
+.PP
+The above example shows how to, destructively, convert from the variable sparse into the variable dense representation  (see also 
+.B
+makeVariableDense
+)\&.  To create a variable dense monomial, you have to fix the symbols prior to inserting terms\&.
+.SH Polynomials
+.PP
+A polynomial in expanded (or \&'distributed\&') representation is a sum of monomials\&.  Although a polynomial in recursive representation is 
+.I
+not
+a sum of monomials (it\&'s a sum of terms), recursive polynomials can to some extent be manipulated as sequences of monomials (see Polynomial\&'s method 
+.B
+eachSequence
+)\&.  Note that in the recursive case, the scalars for monomials are taken from the (base) scalar ring\&.
+.PP
+The monomials in a variable sparse polynomial, are variable sparse\&.  Likewise, the monomials in a variable dense polynomial, are variable dense\&.  For a degree dense polynomial, the scalars of the monomials can be zero, while for a degree sparse polynomial they cannot\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* scalar:
+.br
+* scalar:symbols:
+.br
+* empty
+.br
+* copy
+.br
+* deepCopy
+.RE
+.PP 
+.B
+Coercion
+.RS 3
+.br
+* intValue
+.br
+* intValue:
+.br
+* floatValue
+.br
+* floatValue:
+.br
+* asScalar
+.br
+* asSymbol
+.RE
+.PP 
+.B
+Identity
+.RS 3
+.br
+* scalar
+.br
+* termOne
+.br
+* isMonic
+.br
+* isVariableSparse
+.br
+* isVariableDense
+.br
+* degree
+.br
+* numTerms
+.br
+* isTerm
+.br
+* isEqual:
+.br
+* hash
+.RE
+.PP 
+.B
+Variable Ordering
+.RS 3
+.br
+* symbols
+.br
+* isOrderDegreeCompatible
+.br
+* isOrderReverseDegreeCompatible
+.br
+* compareTerms:
+.RE
+.PP 
+.B
+Inserting and Removing
+.RS 3
+.br
+* removeTerm
+.br
+* insertTerm:
+.RE
+.PP 
+.B
+Accessing Terms
+.RS 3
+.br
+* eachTerm
+.br
+* leadingTerm
+.RE
+.PP 
+.B
+Addition
+.RS 3
+.br
+* zero
+.br
+* isZero
+.br
+* negate
+.br
+* double
+.br
+* add:
+.br
+* subtract:
+.RE
+.PP 
+.B
+Multiplication
+.RS 3
+.br
+* one
+.br
+* isOne
+.br
+* isMinusOne
+.br
+* square
+.br
+* multiply:
+.br
+* multiplyScalar:
+.br
+* divideScalar:
+.br
+* divide:
+.br
+* divideTerms:
+.RE
+.PP 
+.B
+Greatest Common Divisor
+.RS 3
+.br
+* gcd:
+.br
+* lcm:
+.RE
+.PP 
+.B
+Characteristic
+.RS 3
+.br
+* frobenius
+.br
+* frobeniusInverse
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printsLeadingSign
+.br
+* printsSum
+.br
+* printsProduct
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+scalar:
+.RS 1
++
+.B
+scalar
+:
+.I
+aScalar
+.RE
+.PP
+Creates a new 
+.I
+variable sparse
+monomial\&.  Sets the scalar equal to 
+.I
+aScalar
+\&.
+.PP 
+scalar:symbols:
+.RS 1
++
+.B
+scalar
+:
+.I
+aScalar
+.B
+symbols
+:
+.I
+aCltn
+.RE
+.PP
+Creates a new 
+.I
+variable dense
+monomial\&.  Sets the scalar equal to 
+.I
+aScalar
+and fixes the symbols to 
+.I
+aCltn
+\&.  The collection of symbols must not be empty\&.
+.PP 
+empty
+.RS 1
+-
+.B
+empty
+.RE
+.PP
+Creates a new monomial with scalar equal to one and empty sequence of terms\&.  The representation of the monomial is identical to that of the original monomial\&.
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Makes a copy of the terms of the monomial\&.
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+Makes a deepCopy of the terms and the scalar of the monomial\&.
+.PP 
+intValue
+.RS 1
+- (
+int
+)
+.B
+intValue
+.RE
+.PP
+Returns the intValue of the scalar of the monomial, if all terms are trivial\&.  If not, generates an error message\&.
+.PP 
+intValue:
+.RS 1
+-
+.B
+intValue
+:(int)
+.I
+aValue
+.RE
+.PP
+Returns a new monomial with a scalar whose value as 
+.B
+int
+is equal to 
+.I
+aValue
+\&.  All terms in this monomial are trivial\&.
+.PP 
+floatValue
+.RS 1
+- (
+float
+)
+.B
+floatValue
+.RE
+.PP
+Returns the floatValue of the scalar of the monomial, if all terms are trivial\&.  If not, generates an error message\&.
+.PP 
+floatValue:
+.RS 1
+-
+.B
+floatValue
+:(float)
+.I
+aValue
+.RE
+.PP
+Returns a new monomial with a scalar whose value as 
+.B
+float
+is equal to 
+.I
+aValue
+\&.  All terms in this monomial are trivial\&.
+.PP 
+asScalar
+.RS 1
+-
+.B
+asScalar
+.RE
+.PP
+Returns, if all the terms in the monomial are trivial (have exponent equal to zero), a new reference to the scalar of the monomial\&.  Otherwise returns 
+.B
+nil
+\&.
+.PP 
+asSymbol
+.RS 1
+-
+.B
+asSymbol
+.RE
+.PP
+Returns, if the scalar of the monomial is equal to one and if the monomial contains exactly one term whose exponent is equal to one, a new reference to the symbol of that term\&.  Otherwise returns 
+.B
+nil
+\&.
+.PP 
+scalar
+.RS 1
+-
+.B
+scalar
+.RE
+.PP
+Returns the scalar of the monomial\&. 
+.PP 
+termOne
+.RS 1
+-
+.B
+termOne
+.RE
+.PP
+Returns the trivial term\&.  
+.PP 
+isMonic
+.RS 1
+- (
+BOOL
+)
+.B
+isMonic
+.RE
+.PP
+Returns YES if the scalar of the monomial is equal to one\&.
+.PP 
+isVariableSparse
+.RS 1
+- (
+BOOL
+)
+.B
+isVariableSparse
+.RE
+.PP
+Returns YES if the terms of the monomial are variable sparse i\&.e\&., whether symbols raised to exponent zero are ignored and whether the collection of allowed symbols is dynamically adjusted when terms are inserted\&.
+.PP 
+isVariableDense
+.RS 1
+- (
+BOOL
+)
+.B
+isVariableDense
+.RE
+.PP
+Returns YES if the terms of the monomial are variable dense i\&.e\&., whether symbols raised to exponent zero are stored and whether the collection of allowed symbols is fixed\&.
+.PP 
+degree
+.RS 1
+- (
+int
+)
+.B
+degree
+.RE
+.PP
+Returns the sum of the exponents of the terms in the monomial\&.  Returns minus one if the monomial is equal to zero\&.
+.PP 
+numTerms
+.RS 1
+- (
+int
+)
+.B
+numTerms
+.RE
+.PP
+Returns the number of terms with non-zero exponent in the monomial\&.  The total number of terms in a variable dense monomial is equal to the number of symbols\&.  Note that 
+.B
+eachTerm
+returns a sequence of all terms, trivial or not\&. 
+.PP 
+isTerm
+.RS 1
+- (
+BOOL
+)
+.B
+isTerm
+.RE
+.PP
+Whether the monomial consists of a single term\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+aMonomial
+.RE
+.PP
+Returns YES if the scalars and the terms of the monomial are equal to each other\&.  The monomials must be in the same representation\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a hash value for the monomial\&.
+.PP 
+symbols
+.RS 1
+-
+.B
+symbols
+.RE
+.PP
+Returns a collection of symbols\&.  If the monomial is variable dense, beware that some symbols may occur with a zero exponent in the monomial\&.  If the monomial is variable sparse, this method returns an alphabetically sorted collection of all the symbols that occur in the monomial with non-zero exponent\&.  Don\&' modify the collection returned by this method; do not attempt to insert new symbols, or change their order\&.
+.PP 
+isOrderDegreeCompatible
+.RS 1
+- (
+BOOL
+)
+.B
+isOrderDegreeCompatible
+.RE
+.PP
+Should return YES if, when the monomial 
+.I
+a
+is less than the monomial 
+.I
+b
+, the degree of 
+.I
+a
+is less than the degree of 
+.I
+b
+\&.  Currently, the order is degree compatible only for univariate, variable dense monomials\&. 
+.PP 
+isOrderReverseDegreeCompatible
+.RS 1
+- (
+BOOL
+)
+.B
+isOrderReverseDegreeCompatible
+.RE
+.PP
+Should return YES if, when the monomial 
+.I
+a
+is less than the monomial 
+.I
+b
+, the degree of 
+.I
+a
+is greater than the degree of 
+.I
+b
+\&.  Currently, there is no such order\&. 
+.PP 
+compareTerms:
+.RS 1
+- (
+int
+)
+.B
+compareTerms
+:
+.I
+aMonomial
+.RE
+.PP
+Compares the terms (symbols and exponents) of the monomials; the scalars of the monomials are not taken into account\&.  Returns zero if the symbols and exponents of the terms are equal; returns -1 if the monomial is less than 
+.I
+aMonomial
+, and +1 if it is greater than 
+.I
+aMonomial
+\&.
+.PP
+If the monomials are variable dense, the first symbol in the collection of symbols is taken to be smaller than symbols with higher index in the array of symbols\&.  This method compares with respect to the lexicographic order : it starts comparing the smallest symbols, and as long as exponents are equal, it works towards larger symbols (those at the end of the collection of symbols)\&.
+.PP
+If the monomials are variable sparse, the method also compares lexicographically, but now the smallest symbol, is the one that is smallest with respect to Symbol\&'s 
+.B
+compare:
+\&.  If the collection of symbols for a variable dense monomial is ordered alphabetically, the variable sparse and variable dense orderings coincide\&.
+.PP 
+removeTerm
+.RS 1
+-
+.B
+removeTerm
+.RE
+.PP
+Removes the leading term (first term with non-zero exponent) of the monomial or returns 
+.B
+nil
+if there is no such term\&.  The coefficient of this term is equal to one\&.  The reference count of the monomial must be equal to one\&.
+.PP
+.B
+See also:
+
+leadingTerm, eachTerm
+.PP 
+insertTerm:
+.RS 1
+-
+.B
+insertTerm
+:
+.I
+aTerm
+.RE
+.PP
+Inserts 
+.I
+aTerm
+in the product of terms and returns 
+.B
+self
+\&.  The reference count of the monomial must be equal to one\&.
+.PP
+If the coefficient of the term is zero, this method empties the sequence of terms and sets the scalar to zero, as if the monomial were multiplied by zero\&.  Otherwise, the methods multiplies the coefficient of the term and the scalar of the monomial together, and, if the monomial doesn\&'t contain a term with symbol equal to that of 
+.I
+aTerm
+, the method inserts a (monic) term in the ordered sequence of terms\&.  If there is a term in the same symbol, the method adds the exponent of 
+.I
+aTerm
+to it\&.
+.PP 
+eachTerm
+.RS 1
+-
+.B
+eachTerm
+.RE
+.PP
+Returns a sequence of terms\&.  The coefficient of each term is equal to one\&.  The scalar of the monomial itself is obtained by sending 
+.B
+scalar
+to the monomial\&.  If the monomial is variable dense, the sequence also contains the terms whose exponent is equal to zero\&.
+.PP 
+leadingTerm
+.RS 1
+-
+.B
+leadingTerm
+.RE
+.PP
+Returns the leading term of the monomial i\&.e\&., the first term with a non-zero exponent\&.  The coefficient of this term is equal to one\&.  Returns 
+.B
+nil
+if there is no such term in the monomial\&.
+.PP 
+zero
+.RS 1
+-
+.B
+zero
+.RE
+.PP 
+isZero
+.RS 1
+- (
+BOOL
+)
+.B
+isZero
+.RE
+.PP
+Returns YES if the scalar object is zero\&.
+.PP 
+negate
+.RS 1
+-
+.B
+negate
+.RE
+.PP 
+double
+.RS 1
+-
+.B
+double
+.RE
+.PP 
+add:
+.RS 1
+-
+.B
+add
+:
+.I
+b
+.RE
+.PP 
+subtract:
+.RS 1
+-
+.B
+subtract
+:
+.I
+b
+.RE
+.PP 
+one
+.RS 1
+-
+.B
+one
+.RE
+.PP
+Returns a monomial with scalar equal to one and containing no (nontrivial) terms\&.
+.PP 
+isOne
+.RS 1
+- (
+BOOL
+)
+.B
+isOne
+.RE
+.PP
+Whether there are only trivial terms and the scalar is equal to one\&.
+.PP 
+isMinusOne
+.RS 1
+- (
+BOOL
+)
+.B
+isMinusOne
+.RE
+.PP 
+square
+.RS 1
+-
+.B
+square
+.RE
+.PP 
+multiply:
+.RS 1
+-
+.B
+multiply
+:
+.I
+b
+.RE
+.PP 
+multiplyScalar:
+.RS 1
+-
+.B
+multiplyScalar
+:
+.I
+s
+.RE
+.PP
+Multiplies the scalar of the monomial by 
+.I
+s
+and copies the terms\&.
+.PP 
+divideScalar:
+.RS 1
+-
+.B
+divideScalar
+:
+.I
+s
+.RE
+.PP
+Divides scalar by 
+.I
+s
+and copies terms\&.  Returns 
+.B
+nil
+if the division fails or if it\&'s not exact\&.
+.PP 
+divide:
+.RS 1
+-
+.B
+divide
+:
+.I
+aMonomial
+.RE
+.PP
+Divides the scalars and the terms of the monomials\&.  Returns 
+.B
+nil
+if either of the scalar or term division is not exact\&.
+.PP 
+divideTerms:
+.RS 1
+-
+.B
+divideTerms
+:
+.I
+aMonomial
+.RE
+.PP
+Divides the terms of the monomials by the terms of 
+.I
+aMonomial
+\&.  Returns a new monomial with scalar equal to the scalar of the dividend\&.  Returns 
+.B
+nil
+if the division of terms is not exact\&.
+.PP 
+gcd:
+.RS 1
+-
+.B
+gcd
+:
+.I
+aMonomial
+.RE
+.PP
+Returns a new monomial that is the 
+.I
+monic
+greatest common divisor of the monomials, ie\&. the greatest common divisor of the terms of the monomials\&.
+.PP 
+lcm:
+.RS 1
+-
+.B
+lcm
+:
+.I
+aMonomial
+.RE
+.PP
+Returns a new monomial that is the 
+.I
+monic
+least common multiple of the monomials, ie\&. the least common multiple of the terms of the monomials\&.
+.PP 
+frobenius
+.RS 1
+-
+.B
+frobenius
+.RE
+.PP
+Returns a new monomial by sending a 
+.B
+frobenius
+message to the scalar of the monomial and by raising the terms in the monomial to the 
+.I
+p
+-th power (
+.I
+p
+is equal to the scalar\&'s characteristic)\&.
+.PP 
+frobeniusInverse
+.RS 1
+-
+.B
+frobeniusInverse
+.RE
+.PP
+Returns a new monomial by sending a 
+.B
+frobeniusInverse
+message to the scalar of the monomial and by extracting the 
+.I
+p
+-th root of the terms in the monomial to a power (where 
+.I
+p
+is equal to the scalar\&'s characteristic)\&.  Returns 
+.B
+nil
+if the monomial is not a 
+.I
+p
+-th power\&.
+.PP 
+printsLeadingSign
+.RS 1
+- (
+BOOL
+)
+.B
+printsLeadingSign
+.RE
+.PP
+Whether the monomial prints a leading minus sign\&.
+.PP 
+printsSum
+.RS 1
+- (
+BOOL
+)
+.B
+printsSum
+.RE
+.PP
+Whether the monomial prints a sum\&.
+.PP 
+printsProduct
+.RS 1
+- (
+BOOL
+)
+.B
+printsProduct
+.RE
+.PP
+Whether the monomial prints a single product\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints the monomial to 
+.I
+aFile
+by sending 
+.B
+printOn:
+to the scalar and terms\&.

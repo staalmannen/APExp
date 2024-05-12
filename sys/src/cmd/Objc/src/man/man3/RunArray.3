@@ -1,0 +1,302 @@
+.TH "runarray" 3 "Mar 12, 2023"
+.SH RunArray
+.PP
+.B
+Inherits from:
+
+Cltn
+.PP
+.B
+Maturity Index:
+
+Experimental
+.SH Class Description
+.PP
+This class is used by the 
+.B
+Text
+class, to associate lists of 
+.B
+TextAttribute
+instances, to segments of characters in a string (slices of text with the same formatting properties, called 
+.I
+runs
+)\&.
+.SH Accessing
+.PP
+A 
+.B
+RunArray
+is 
+.I
+not
+indexed by segment number\&.
+.PP
+Rather, it is indexed by character offsets : the message 
+.B
+at:
+or 
+.B
+runLengthAt:
+takes a character offset as argument, and translates this offset to a segment offset (the segment to which the character belongs) and returns the attributes or segment length, for that segment\&.
+.PP
+The 
+.B
+size
+of a 
+.B
+RunArray
+is the largest character offset plus one;it is not the number of segments\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* new
+.br
+* free
+.RE
+.PP 
+.B
+Accessing
+.RS 3
+.br
+* values
+.br
+* runs
+.br
+* at:
+.br
+* runLengthAt:
+.br
+* size
+.br
+* addAttribute:from:size:
+.br
+* at:insert:count:
+.br
+* deleteFrom:to:
+.br
+* concat:
+.br
+* coalesce
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+Creates an empty RunArray collection\&.
+.PP 
+free
+.RS 1
+-
+.B
+free
+.RE
+.PP 
+values
+.RS 1
+-
+.B
+values
+.RE
+.PP
+Returns a collection of OrdCltn instances (each element being a list of 
+.B
+TextAttribute
+instances)\&.
+.PP 
+runs
+.RS 1
+-
+.B
+runs
+.RE
+.PP
+Returns the run array (array of 
+.I
+int
+)\&.
+.PP 
+at:
+.RS 1
+-
+.B
+at
+:(unsigned)
+.I
+i
+.RE
+.PP
+Returns a collection of TextAttributes for the 
+.I
+i
+-th character\&.
+.PP
+This method translates a character offset into a segment number\&.  The segment number is cached so that a subsequent call to 
+.B
+at:
+or 
+.B
+runLengthAt:
+doesn\&'t have to recompute it\&.
+.PP 
+runLengthAt:
+.RS 1
+- (
+unsigned
+)
+.B
+runLengthAt
+:(unsigned)
+.I
+i
+.RE
+.PP
+Returns the number of remaining characters in the string segment to which the character at position 
+.I
+i
+belongs\&.  If 
+.I
+i
+is the first character of a run, this method returns the size of the run\&.  Otherwise it returns the size minus the index of character in the run\&.
+.PP 
+size
+.RS 1
+- (
+unsigned
+)
+.B
+size
+.RE
+.PP
+Returns the size of the RunArray, which is the same as the size of the String instance for this RunArray object\&.
+.PP
+The number of runs can be obtained by sending a 
+.B
+size
+message to the object returned by 
+.B
+values
+\&.
+.PP 
+addAttribute:from:size:
+.RS 1
+-
+.B
+addAttribute
+:
+.I
+attrib
+.B
+from
+:(unsigned)
+.I
+p
+.B
+size
+:(unsigned)
+.I
+s
+.RE
+.PP
+Adds 
+.I
+attrib
+to the attribute lists for the 
+.I
+s
+characters from position 
+.I
+p
+\&.
+.PP
+.B
+Note:
+
+This method is optimized for adding at the end of the RunArray\&.
+.PP 
+at:insert:count:
+.RS 1
+-
+.B
+at
+:(unsigned)
+.I
+anOffset
+.B
+insert
+:(char*)
+.I
+aString
+.B
+count
+:(int)
+.I
+n
+.RE
+.PP 
+deleteFrom:to:
+.RS 1
+-
+.B
+deleteFrom
+:(unsigned)
+.I
+p
+.B
+to
+:(unsigned)
+.I
+q
+.RE
+.PP 
+concat:
+.RS 1
+-
+.B
+concat
+:
+.I
+b
+.RE
+.PP 
+coalesce
+.RS 1
+-
+.B
+coalesce
+.RE
+.PP
+Merges adjacent lists of TextAttribute instances, by testing whether they are equal (in the sense of 
+.B
+TextAttribute
+\&'s 
+.B
+isEqual
+method)\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints the RunArray values\&.

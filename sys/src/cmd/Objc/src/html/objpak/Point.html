@@ -1,0 +1,111 @@
+<HTML>
+<TITLE>point Specification Sheet</TITLE>
+<H1>point Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 1997,98,99.  All Rights Reserved.<P>
+<H1>Point</H1>
+<B>Inherits from:</B> Object<P>
+<H2>Class Description</H2>
+<B>Point</B> instances are implemented as pairs of two C integers.   This is partly because of compatibility with the corresponding ICpak101 class, and partly because it (as opposed to some floating point arithmetic) gives portable results for equality testing.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#0">new</A></LI>
+<LI><A HREF="#1">x:y:</A></LI>
+</UL>
+<H3><B>Instance Variables</B></H3>
+<UL>
+<LI><A HREF="#2">x:y:</A></LI>
+<LI><A HREF="#3">x:</A></LI>
+<LI><A HREF="#4">y:</A></LI>
+<LI><A HREF="#5">x</A></LI>
+<LI><A HREF="#6">y</A></LI>
+</UL>
+<H3><B>Comparing</B></H3>
+<UL>
+<LI><A HREF="#7">hash</A></LI>
+<LI><A HREF="#8">isEqual:</A></LI>
+<LI><A HREF="#9">isBelow:</A></LI>
+<LI><A HREF="#10">isAbove:</A></LI>
+<LI><A HREF="#11">isLeft:</A></LI>
+<LI><A HREF="#12">isRight:</A></LI>
+</UL>
+<H3><B>Point Arithmetic</B></H3>
+<UL>
+<LI><A HREF="#13">moveBy:</A></LI>
+<LI><A HREF="#14">moveBy::</A></LI>
+<LI><A HREF="#15">moveTo:</A></LI>
+<LI><A HREF="#16">plus:</A></LI>
+<LI><A HREF="#17">translateBy:</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#18">printOn:</A></LI>
+<LI><A HREF="#19">fileOutOn:</A></LI>
+<LI><A HREF="#20">fileInFrom:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">new</A></H3>
+<BLOCKQUOTE>+<B>new</B></BLOCKQUOTE>
+Returns the point (0,0).<P>
+<H3><A NAME="1">x:y:</A></H3>
+<BLOCKQUOTE>+<B>x</B>:(int)<I>x</I><B>y</B>:(int)<I>y</I></BLOCKQUOTE>
+Returns the point (x,y).<P>
+<H3><A NAME="2">x:y:</A></H3>
+<BLOCKQUOTE>-<B>x</B>:(int)<I>x</I><B>y</B>:(int)<I>y</I></BLOCKQUOTE>
+Resets the coordinates of an existing point to (x,y).<P>
+<H3><A NAME="3">x:</A></H3>
+<BLOCKQUOTE>-<B>x</B>:(int)<I>x</I></BLOCKQUOTE>
+Resets the <I>xLoc</I> coordinate.  Returns the receiver.<P>
+<H3><A NAME="4">y:</A></H3>
+<BLOCKQUOTE>-<B>y</B>:(int)<I>y</I></BLOCKQUOTE>
+Resets the <I>yLoc</I> coordinate.  Returns the receiver.<P>
+<H3><A NAME="5">x</A></H3>
+<BLOCKQUOTE>- (int)<B>x</B></BLOCKQUOTE>
+Returns <I>xLoc</I> as <I>int</I> value.<P>
+<H3><A NAME="6">y</A></H3>
+<BLOCKQUOTE>- (int)<B>y</B></BLOCKQUOTE>
+Returns <I>yLoc</I> as <I>int</I> value.<P>
+<H3><A NAME="7">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a hash value based on the values of <I>xLoc</I> and <I>yLoc</I>.<P>
+<H3><A NAME="8">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>aPoint</I></BLOCKQUOTE>
+Returns YES if both arguments are instances of <B>Point</B> (or of a subclass of Point) and if they have the same coordinates.<P>
+<H3><A NAME="9">isBelow:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isBelow</B>:<I>aPoint</I></BLOCKQUOTE>
+Returns YES if the receiver's <I>y</I> coordinate is greater than the <I>y</I> coordinate of <I>aPoint</I>.<P>
+<H3><A NAME="10">isAbove:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isAbove</B>:<I>aPoint</I></BLOCKQUOTE>
+Returns YES if the receiver's <I>y</I> coordinate is less than the <I>y</I> coordinate of <I>aPoint</I>.<P>
+<H3><A NAME="11">isLeft:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isLeft</B>:<I>aPoint</I></BLOCKQUOTE>
+Returns YES if the receiver's <I>x</I> coordinate is less than the <I>x</I> coordinate of <I>aPoint</I>.<P>
+<H3><A NAME="12">isRight:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isRight</B>:<I>aPoint</I></BLOCKQUOTE>
+Returns YES if the receiver's <I>x</I> coordinate is greater than the <I>x</I> coordinate of <I>aPoint</I>.<P>
+<H3><A NAME="13">moveBy:</A></H3>
+<BLOCKQUOTE>-<B>moveBy</B>:<I>aPoint</I></BLOCKQUOTE>
+Adds coordinates of <I>aPoint</I> to the receiver.  Unlike <B>plus:</B>, this method does not return a new object.<P>
+<H3><A NAME="14">moveBy::</A></H3>
+<BLOCKQUOTE>-<B>moveBy</B>:(int)<I>x</I>:(int)<I>y</I></BLOCKQUOTE>
+Adds <I>x</I> and <I>y</I> coordinates of <I>aPoint</I> to the receiver.  Unlike <B>plus:</B>, this method does not return a new object.<P>
+<H3><A NAME="15">moveTo:</A></H3>
+<BLOCKQUOTE>-<B>moveTo</B>:<I>aPoint</I></BLOCKQUOTE>
+Copies the coordinates of <I>aPoint</I> into the receiver.  Typically used for translation.<P>
+<H3><A NAME="16">plus:</A></H3>
+<BLOCKQUOTE>-<B>plus</B>:<I>aPoint</I></BLOCKQUOTE>
+This method is like <B>moveBy:</B> but it returns a <B>new</B> point instance.<P>
+<H3><A NAME="17">translateBy:</A></H3>
+<BLOCKQUOTE>-<B>translateBy</B>:<I>aPoint</I></BLOCKQUOTE>
+This method is like <B>moveBy:</B> but it returns a <B>new</B> point instance.<P>
+<H3><A NAME="18">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints <I>x</I> and <I>y</I> coordinates inside parenthesis.<P>
+<H3><A NAME="19">fileOutOn:</A></H3>
+<BLOCKQUOTE>-<B>fileOutOn</B>:<I>aFiler</I></BLOCKQUOTE>
+Writes the point on <I>aFiler</I>.  Returns the receiver.<P>
+<H3><A NAME="20">fileInFrom:</A></H3>
+<BLOCKQUOTE>-<B>fileInFrom</B>:<I>aFiler</I></BLOCKQUOTE>
+Reads the point from <I>aFiler</I>.  Returns the receiver.<P>

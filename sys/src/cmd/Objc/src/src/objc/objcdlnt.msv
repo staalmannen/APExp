@@ -1,0 +1,29 @@
+
+/*
+ * Portable Object Compiler - Postlink Auxiliary File
+ * (c) 1997 David Stes. All rights reserved.
+ *
+ * Microsoft Visual C postlink configuration file.
+ * objc -dl initializer file for Windows NT DLL's.
+ */
+
+#include <stdio.h>
+#include <windows.h>
+
+extern void loadobjc(void *);
+extern void unloadobjc(void *);
+
+/* _msgControl emitted by postlink */
+
+int __stdcall DllMain(HANDLE h,DWORD w,LPVOID r)
+{
+    if (w == DLL_PROCESS_ATTACH) {
+	loadobjc(_msgControl);
+    }
+    if (w == DLL_PROCESS_DETACH) {
+	unloadobjc(_msgControl);
+    }
+
+    return 1; /* success */
+}
+

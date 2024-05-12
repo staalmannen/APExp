@@ -1,0 +1,8 @@
+set name=pkg.fmri value=pkg://stes/library/objclibs@@OBJC1VERSION@
+set name=pkg.summary value="Portable Object Compiler Shared Libraries"
+set name=variant.arch value=i386
+set name=pkg.description value="Shared Libraries for the Portable Object Compiler.  Only required for applications that links against the shared libraries of the Portable Object Compiler."
+file usr/lib/libobjcrt.so path=usr/lib/libobjcrt.so owner=root group=bin mode=0755
+file usr/lib/libobjpak.so path=usr/lib/libobjpak.so owner=root group=bin mode=0755
+file usr/lib/amd64/libobjcrt.so path=usr/lib/amd64/libobjcrt.so owner=root group=bin mode=0755
+file usr/lib/amd64/libobjpak.so path=usr/lib/amd64/libobjpak.so owner=root group=bin mode=0755

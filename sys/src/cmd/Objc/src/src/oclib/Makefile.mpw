@@ -1,0 +1,123 @@
+#
+# Portable Object Compiler
+# $Id: Makefile.mpw,v 1.2 2001/12/02 11:51:17 stes Exp $
+#
+
+#
+#  Makefile for Macintosh MPW
+#
+
+OBJC=objc
+LINK=MWLinkPPC -xm library
+DBG_MFLAGS=-q -g
+OPT_MFLAGS=-q -d NDEBUG
+LIBDIR="{OBJCDIR}:lib"
+IFLAGS=-noI -i ::objcrt -i ::objpak
+MFLAGS={OPT_MFLAGS}
+
+LIBRARY=oclib.o
+
+OBJFILES= ¶
+    node.o ¶
+    stkframe.o ¶
+    symbol.o ¶
+    stclass.o ¶
+    cppdirec.o ¶
+    type.o ¶
+    options.o ¶
+    stmt.o ¶
+    ifstmt.o ¶
+    whilstmt.o ¶
+    switstmt.o ¶
+    lblstmt.o ¶
+    rtrnstmt.o ¶
+    dfltstmt.o ¶
+    casestmt.o ¶
+    compstmt.o ¶
+    exprstmt.o ¶
+    gotostmt.o ¶
+    contstmt.o ¶
+    forstmt.o ¶
+    dostmt.o ¶
+    decl.o ¶
+    pointer.o ¶
+    arydecl.o ¶
+    fundecl.o ¶
+    precdecl.o ¶
+    bflddecl.o ¶
+    pfixdecl.o ¶
+    initdecl.o ¶
+    keywdecl.o ¶
+    namedecl.o ¶
+    stardecl.o ¶
+    var.o ¶
+    aryvar.o ¶
+    scalar.o ¶
+    expr.o ¶
+    listxpr.o ¶
+    keywxpr.o ¶
+    condxpr.o ¶
+    castxpr.o ¶
+    unyxpr.o ¶
+    deref.o ¶
+    addrof.o ¶
+    sizeof.o ¶
+    typeof.o ¶
+    pfixxpr.o ¶
+    indexxpr.o ¶
+    binxpr.o ¶
+    dotxpr.o ¶
+    arrowxpr.o ¶
+    msgxpr.o ¶
+    blockxpr.o ¶
+    selxpr.o ¶
+    precxpr.o ¶
+    commaxpr.o ¶
+    constxpr.o ¶
+    identxpr.o ¶
+    assign.o ¶
+    relxpr.o ¶
+    funcall.o ¶
+    btincall.o ¶
+    def.o ¶
+    fundef.o ¶
+    methdef.o ¶
+    funbody.o ¶
+    method.o ¶
+    selector.o ¶
+    gasmop.o ¶
+    gasmstmt.o ¶
+    dasmstmt.o ¶
+    gattrib.o ¶
+    gatrdecl.o ¶
+    compdef.o ¶
+    datadef.o ¶
+    globdef.o ¶
+    structsp.o ¶
+    classdef.o ¶
+    enumtor.o ¶
+    enumsp.o ¶
+    parmdef.o ¶
+    parmlist.o ¶
+    util.o ¶
+    trlunit.o
+
+{LIBRARY} Ä {OBJFILES}
+	{LINK} {OBJFILES} -o {LIBRARY}
+
+.o Ä .m
+	{OBJC} -c {DepDir}{Default}.m {MFLAGS} {IFLAGS} -o {Targ}
+
+bootstrap Ä
+	Duplicate {LIBRARY} {LIBDIR}
+
+cleantmp Ä
+	Delete Å.P
+	Delete Å.c
+	Delete Å.i
+
+clean Ä cleantmp
+	Delete {OBJFILES}
+	Delete {LIBRARY}
+
+

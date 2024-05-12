@@ -1,0 +1,626 @@
+.TH "octext" 3 "Mar 12, 2023"
+.SH Text
+.PP
+.B
+Inherits from:
+
+Object
+.PP
+.B
+Maturity Index:
+
+Experimental
+.SH Class Description
+.PP
+The 
+.B
+Text
+class associates to a 
+.B
+String
+instance a 
+.B
+RunArray
+\&.  The runs for a string, consist of string segments that have the same text attributes, such as font, boldface, fontsize etc\&.
+.PP
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* new
+.br
+* new:
+.br
+* str:
+.br
+* sprintf:
+.br
+* fromString:
+.br
+* string:attribute:
+.br
+* copy
+.br
+* free
+.RE
+.PP 
+.B
+Comparison
+.RS 3
+.br
+* hash
+.br
+* isEqual:
+.RE
+.PP 
+.B
+Accessing
+.RS 3
+.br
+* string
+.br
+* runs
+.br
+* str
+.br
+* size
+.br
+* charAt:
+.br
+* charAt:put:
+.br
+* at:insert:
+.br
+* at:insert:count:
+.br
+* deleteFrom:to:
+.br
+* concat:
+.br
+* concatSTR:
+.RE
+.PP 
+.B
+Emphasis
+.RS 3
+.br
+* allBold
+.br
+* makeBoldFrom:to:
+.br
+* addAttribute:
+.br
+* addAttribute:from:to:
+.br
+* attributesAt:
+.br
+* runLengthFor:
+.RE
+.PP 
+.B
+Format Conversions
+.RS 3
+.br
+* asString
+.br
+* asText
+.br
+* asParagraph
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+Creates an instance whose value is set to the empty string\&.
+.PP 
+new:
+.RS 1
++
+.B
+new
+:(unsigned)
+.I
+nChars
+.RE
+.PP
+Creates an instance whose value is set to the empty string, can hold at least 
+.I
+nChars
+without having to expand\&.
+.PP 
+str:
+.RS 1
++
+.B
+str
+:(STR)
+.I
+aString
+.RE
+.PP
+Creates an instance whose value is set to a copy of 
+.I
+aString
+\&.  If 
+.I
+aString
+is NULL, creates an instance whose value is set to the empty string\&. 
+.PP 
+sprintf:
+.RS 1
++
+.B
+sprintf
+:(STR)
+.I
+format,\&.\&.\&.
+.RE
+.PP
+Returns a new instace initialized just as the standard C library 
+.I
+sprintf()
+\&.  See the documentation on 
+.I
+sprintf()
+for the formats and variable declarations\&.
+.PP 
+fromString:
+.RS 1
++
+.B
+fromString
+:
+.I
+aString
+.RE
+.PP
+Creates an instance whose value is set to 
+.I
+aString
+\&.
+.PP 
+string:attribute:
+.RS 1
++
+.B
+string
+:
+.I
+aString
+.B
+attribute
+:
+.I
+attrib
+.RE
+.PP
+Creates an instance whose value is set to 
+.I
+aString
+and then sends itself an 
+.B
+addAttribute:
+message\&.
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Returns a copy of the receiver with its internal C string copied as well\&.
+.PP 
+free
+.RS 1
+-
+.B
+free
+.RE
+.PP
+Frees the receiver and its internal C string as well\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a hash value based upon the contents of the string held in the receiver\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+aStr
+.RE
+.PP
+Returns YES if the string and runarray contained by 
+.I
+aStr
+is equal to the contents of the receiver\&.
+.PP 
+string
+.RS 1
+-
+.B
+string
+.RE
+.PP
+Returns the String instance for this Text object\&.
+.PP 
+runs
+.RS 1
+-
+.B
+runs
+.RE
+.PP
+Returns the RunArray instance for this Text object\&.
+.PP 
+str
+.RS 1
+- (
+STR
+)
+.B
+str
+.RE
+.PP
+Returns a pointer to the NULL-terminated C string stored in the receiver\&.
+.PP 
+size
+.RS 1
+- (
+unsigned
+)
+.B
+size
+.RE
+.PP
+Returns the size of the String instance for this Text object\&.  The following all return the same value :
+.RS 3
+
+[text size];
+.br
+[[text string] size];
+.br
+[[text runs] size];
+.br
+
+.RE
+.PP 
+charAt:
+.RS 1
+- (
+char
+)
+.B
+charAt
+:(unsigned)
+.I
+anOffset
+.RE
+.PP
+Returns the character at 
+.I
+anOffset
+or 
+.B
+zero
+if 
+.I
+anOffset
+is greater than the length of the C string\&.
+.PP 
+charAt:put:
+.RS 1
+- (
+char
+)
+.B
+charAt
+:(unsigned)
+.I
+anOffset
+.B
+put
+:(char)
+.I
+aChar
+.RE
+.PP
+Replaces the character at 
+.I
+anOffset
+with 
+.I
+aChar
+and returns the old character which was in that location\&.  Returns 
+.B
+zero
+if 
+.I
+anOffset
+is greater than the length of the C string\&.
+.PP 
+at:insert:
+.RS 1
+-
+.B
+at
+:(unsigned)
+.I
+anOffset
+.B
+insert
+:
+.I
+aString
+.RE
+.PP 
+at:insert:count:
+.RS 1
+-
+.B
+at
+:(unsigned)
+.I
+anOffset
+.B
+insert
+:(char*)
+.I
+aString
+.B
+count
+:(int)
+.I
+size
+.RE
+.PP 
+deleteFrom:to:
+.RS 1
+-
+.B
+deleteFrom
+:(unsigned)
+.I
+p
+.B
+to
+:(unsigned)
+.I
+q
+.RE
+.PP 
+concat:
+.RS 1
+-
+.B
+concat
+:
+.I
+b
+.RE
+.PP 
+concatSTR:
+.RS 1
+-
+.B
+concatSTR
+:(STR)
+.I
+b
+.RE
+.PP 
+allBold
+.RS 1
+-
+.B
+allBold
+.RE
+.PP
+This message is equivalent to,
+.RS 3
+
+[self makeBoldFrom:0 to:[self size] - 1]\&.
+.br
+
+.RE
+.PP
+Returns 
+.B
+self
+(the text object)\&.
+.PP 
+makeBoldFrom:to:
+.RS 1
+-
+.B
+makeBoldFrom
+:(unsigned)
+.I
+p
+.B
+to
+:(unsigned)
+.I
+q
+.RE
+.PP
+Adds a boldface 
+.B
+TextAttribute
+for the characters from index 
+.I
+p
+to 
+.I
+q
+(including the characters at offset 
+.I
+p
+and 
+.I
+q
+)\&.  A boldface attribute has 
+.B
+emphasiscode
+equal to 1\&.
+.PP 
+addAttribute:
+.RS 1
+-
+.B
+addAttribute
+:
+.I
+attribute
+.RE
+.PP
+This message is equivalent to,
+.RS 3
+
+[self addAttribute:attribute from:0 to:[self size] - 1]\&.
+.br
+
+.RE
+.PP
+Returns 
+.B
+self
+(the text object)\&.
+.PP 
+addAttribute:from:to:
+.RS 1
+-
+.B
+addAttribute
+:
+.I
+attribute
+.B
+from
+:(unsigned)
+.I
+p
+.B
+to
+:(unsigned)
+.I
+q
+.RE
+.PP
+Adds 
+.I
+attribute
+to the string segments between 
+.I
+p
+and 
+.I
+q
+\&.
+.PP 
+attributesAt:
+.RS 1
+-
+.B
+attributesAt
+:(unsigned)
+.I
+i
+.RE
+.PP
+Returns an 
+.B
+OrdCltn
+of TextAttribute instances for the character at index 
+.I
+i
+\&.
+.PP 
+runLengthFor:
+.RS 1
+- (
+unsigned
+)
+.B
+runLengthFor
+:(unsigned)
+.I
+i
+.RE
+.PP
+Returns the number of remaining characters in the string segment to which the character at position 
+.I
+i
+belongs\&.  If 
+.I
+i
+is the first character of a run, this method returns the size of the run\&.  Otherwise it returns the size minus the index of character in the run\&.
+.PP 
+asString
+.RS 1
+-
+.B
+asString
+.RE
+.PP
+Equivalent to 
+.B
+string
+\&.
+.PP 
+asText
+.RS 1
+-
+.B
+asText
+.RE
+.PP
+Returns the object itself\&.
+.PP 
+asParagraph
+.RS 1
+-
+.B
+asParagraph
+.RE
+.PP
+Returns a paragraph for this text object\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints the Text for the string contained by this instance\&.  Returns the receiver\&.

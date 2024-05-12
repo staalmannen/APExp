@@ -1,0 +1,402 @@
+#
+# Portable Object Compiler (c) 1997,98.  All Rights Reserved.
+# Macintosh MPW Driver Script (objc-3.1.15)
+#
+# $Id: objc.mpw,v 1.3 2000/10/29 19:37:21 stes Exp $
+#
+# DO NOT EDIT -- configure objc-3.1.18 powerpc-mwcppc-system7
+
+Set Echo 0
+Unalias
+Set Exit 0
+Set savecs {CaseSensitive}
+Set CaseSensitive 1
+
+#
+# OBJCDIR is the top directory of the distribution.
+# Must be set as an environment variable (or with -B)
+#
+
+Set objcdir "{OBJCDIR}"
+Set cc "MWCPPC -w nopossible -w nounusedarg"
+# unlike sh driver, link via 'ld', not via the cc interface
+Set ld "MWLinkPPC"
+Set cpp "MWCPPC -e"
+Set cpargs "-d __PORTABLE_OBJC__ -nosyspath"
+Set ocargs "-msdos -refBind"
+Set ccargs ""
+Set ldargs ""
+Set dlargs "-bogus"
+Set dlfile "objcdlso.ld"
+Set plldargs "-map postlink.map"
+Set dlxccargs ""
+Set dlxldargs ""
+Set picflag "-fpic"
+Set staticflag "-static"
+Set ccdollarflag ""
+Set cppimportflag ""
+Set picocargs ""
+Set linkformat "mpw"
+Set ii "cc"
+
+Set inputs ""
+Set objfiles ""
+Set extensions ""
+Set actions ""
+Set output "a.out"
+Set t ""
+
+Set comments 0
+Set precompile 1
+Set compile 1
+Set link 1
+Set linkdl 0
+Set include 1
+Set libs ""
+Set finlibs ""
+Set uselibs 1
+Set blocks 1
+Set ppi 0
+Set verbose 0
+Set debug 0
+Set dynamic 0
+Set retain 0
+Set retaincpp 0
+Set profile 0
+Set useoutput 0
+Set cplusplus 0
+Set postlink 1
+Set initcall _objcInit
+Set pager Catenate 
+Set objcrt objcrt
+Set objpak objpak
+Set cakit cakit
+
+Set ccminuscflag ""
+Set ccminusoflag "-o "
+Set ldminusoflag "-o "
+Set ccminusiflag "-i "
+Set ccminusdflag "-d "
+Set cppminusoflag "> "
+
+Set siouxlibs "'{MWPPCLibraries}MathLib' '{MWPPCLibraries}InterfaceLib' '{MWPPCLibraries}MSL RuntimePPC.Lib' '{MWPPCLibraries}MSL C.PPC.Lib'"
+
+Set mpwlibs "'{MWPPCLibraries}MathLib' '{MWPPCLibraries}InterfaceLib' '{MWPPCLibraries}MSL MPWCRuntime.Lib' '{MWPPCLibraries}MSL MPW C.PPC.Lib' '{MWPPCLibraries}PPCToolLibs.o'"
+
+Set appllibs "'{MWPPCLibraries}MathLib' '{MWPPCLibraries}InterfaceLib' '{MWPPCLibraries}MWStdCRuntime.Lib' '{MWPPCLibraries}StdCLib' '{MWPPCLibraries}PPCToolLibs.o'"
+
+# by default .c files compile as C, not as Objective C
+Set actionc "c"
+Set actioncc "cc"
+Set sosuffix ".o"
+
+Set vermsg "Portable Object Compiler - objc-3.1.18 - powerpc-mwcppc-system7"
+Set cpymsg "Distributed under the terms of the GNU LGPL."
+
+If {#} == 0
+  {pager} {objcdir}:lib:objchelp.txt
+  Exit 0
+End
+
+LOOP
+  Break If {#} == 0
+  If "{1}" =~ /-O/
+    Set ccargs "{ccargs} -O"
+    Shift 2
+  Else If ("{1}" =~ /-objc/) || ("{1}" =~ /-ObjC/)
+    Set actionc "m"
+    Set actioncc "mm"
+    Shift 1
+  Else If ("{1}" =~ /-c/) || ("{1}" =~ /-Fo/)
+    Set link 0
+    Shift 1
+  Else If ("{1}" =~ /-C/) || ("{1}" =~ /-Fi/)
+    Set comments 1
+    Set link 0
+    Set compile 0
+    Set retain 1
+    Shift 1
+  Else If ("{1}" =~ /-d/) || ("{1}" =~ /-D/)
+    Set cpargs "{cpargs} {ccminusdflag}'{2}'"
+    Shift 2
+  Else If ("{1}" =~ /-E/)
+    Set link 0
+    Set precompile 0
+    Shift 1
+  Else If ("{1}" =~ /-i/) || ("{1}" =~ /-I/)
+    Set cpargs "{cpargs} {ccminusiflag}'{2}'"
+    Shift 2
+  Else If ("{1}" =~ /-init/)
+    Set initcall "{2}"
+    Shift 2
+  Else If ("{1}" =~ /-main/)
+    Set ocargs "{ocargs} -main {2}"
+    Shift 2
+  Else If ("{1}" =~ /-noobjcinc/) || ("{1}" =~ /-noI/)
+    Set include 0
+    Shift 1
+  Else If "{1}" =~ /-noLibs/
+    Set uselibs 0
+    Shift 1
+  Else If "{1}" =~ /-refcnt/
+    Set ocargs "{ocargs} -refcnt"
+    Set cpargs "{cpargs} {ccminusdflag}OBJC_REFCNT=1"
+    Set objcrt objcrtr
+    Set objpak objpakr
+    Shift 1
+  Else If "{1}" =~ /-noFiler/
+    Set ocargs "{ocargs} -noFiler"
+    Shift 1
+  Else If ("{1}" =~ /-nolinetags/) || ("{1}" =~ /-noTags/)
+    Set ocargs "{ocargs} -nolinetags"
+    Shift 1
+  Else If "{1}" =~ /-noFwd/
+    Set ocargs "{ocargs} -noFwd"
+    Shift 1
+  Else If "{1}" =~ /-noSelfAssign/
+    Set ocargs "{ocargs} -noSelfAssign"
+    Shift 1
+  Else If "{1}" =~ /-noNilRcvr/
+    Set ocargs "{ocargs} -noNilRcvr"
+    Shift 1
+  Else If "{1}" =~ /-inlinecache/
+    Set ocargs "{ocargs} -inlinecache"
+    Shift 1
+  Else If "{1}" =~ /-inlineCache/
+    Set ocargs "{ocargs} -inlinecache"
+    Shift 1
+  Else If "{1}" =~ /-noBlocks/
+    Set blocks 0
+    Shift 1
+  Else If "{1}" =~ /-mpwtool/
+    Set ldargs "{ldargs} -c 'MPS ' -t MPST"
+    Set libs "{libs} {mpwlibs}"
+    Shift 1
+  Else If "{1}" =~ /-sioux/
+    Set libs "{libs} {siouxlibs}"
+    Shift 1
+  Else If "{1}" =~ /-appl/
+    Set libs "{libs} {appllibs}"
+    Shift 1
+  Else If "{1}" =~ /-o/
+    Set output "{2}"
+    Set useoutput 1
+    Shift 2
+  Else If "{1}" =~ /-xm/
+    Set ccargs "{ccargs} -xm '{2}'"
+    Shift 2
+  Else If "{1}" =~ /-opt/
+    Set ccargs "{ccargs} -opt '{2}'"
+    Shift 2
+  Else If "{1}" =~ /-sym/
+    Set ccargs "{ccargs} -sym '{2}'"
+    Shift 2
+  Else If ("{1}" =~ /-u/) || ("{1}" =~ /-U/)
+    Set cpargs "{cpargs} -u '{2}'"
+    Shift 2
+  Else If ("{1}" =~ /-q/) || ("{1}" =~ /-quiet/)
+    Set ocargs "{ocargs} -quiet"
+    Shift 1
+  Else If ("{1}" =~ /-help/) || ("{1}" =~ /--help/)
+    {pager} {objcdir}:lib:objchelp.txt
+    Exit 0
+  Else If ("{1}" =~ /-usage/) || ("{1}" =~ /--usage/)
+    {pager} {objcdir}:lib:objchelp.txt
+    Exit 0
+  Else If ("{1}" =~ /-version/) || ("{1}" =~ /--version/)
+    Echo "{vermsg}"
+    Echo "{cpymsg}"
+    Exit 0
+  Else If ("{1}" =~ /-v/) || ("{1}" =~ /-verbose/)
+    Set verbose 1
+    Shift 1
+  Else If ("{1}" =~ /-w/)
+    Set ocargs "{ocargs} -w"
+    Shift 1
+  Else If "{1}" =~ /-retain/
+    Set retain 1
+    Set retaincpp 1
+    Shift 1
+  Else If "{1}" =~ /-retaincpp/
+    Set retaincpp 1
+    Shift 1
+  Else If "{1}" =~ /-cpOpt/
+    Set cpargs "{cpargs} '{2}'"
+    Shift 2
+  Else If "{1}" =~ /-ocOpt/
+    Set ocargs "{ocargs} '{2}'"
+    Shift 2
+  Else If "{1}" =~ /-ccOpt/
+    Set ccargs "{ccargs} '{2}'"
+    Shift 2
+  Else If "{1}" =~ /Å.c/
+    # temporary - should set inputs
+    Set input "{1}"
+    Set action "{actionc}"
+    Set extension "c"
+    Shift 1
+  Else If "{1}" =~ /Å.h/
+    # temporary - should set inputs
+    Set input "{1}"
+    Set action "m"
+    Set extension "h"
+    Shift 1
+  Else If "{1}" =~ /Å.m/
+    # temporary
+    Set input "{1}"
+    Set action "m"
+    Set extension "m"
+    # Set inputs "{inputs} '{1}'"
+    # Set actions "{actions} m"
+    # Set extensions "{extensions} m"
+    Shift 1
+  Else If "{1}" =~ /Å.o/
+    # temporary - should add to inputs
+    Set objfiles "{objfiles} '{1}'"
+    Shift 1
+  Else If "{1}" =~ /-Å/
+    Echo "Invalid option '{1}'"
+    Exit 1
+  Else
+    Echo "Invalid file type '{1}'"
+  End
+End
+
+Set CaseSensitive {savecs}
+
+Set bindir "{objcdir}:bin"
+Set libdir "{objcdir}:lib"
+Set hdrdir "{objcdir}:include"
+Set  objc1 "{bindir}:objc1"
+
+if {verbose}
+  Set Echo 1
+End
+
+
+if {cplusplus}
+  Set ocargs "{ocargs} -noFwd -cplus "
+End
+
+if {postlink}
+  Set ocargs "{ocargs} -postlink"
+  Set ldargs "{ldargs} {plldargs}"
+End
+
+Set ocargs "{ocargs} -init '{initcall}'"
+
+if {include}
+  Set cpargs "{cpargs} {ccminusiflag}'{hdrdir}':objcrt"
+  Set cpargs "{cpargs} {ccminusiflag}'{hdrdir}':objpak"
+  Set cpargs "{cpargs} {ccminusiflag}'{hdrdir}':cakit"
+End
+
+if {ppi}
+  Set cpargs "{cpargs} {ccminusiflag}'{hdrdir}':ppi"
+End
+
+if {blocks}
+  Set cpargs "{cpargs} {ccminusdflag}OBJC_BLOCKS=1"
+Else
+  Set cpargs "{cpargs} {ccminusdflag}OBJC_BLOCKS=0"
+  Set ocargs "{ocargs} -noBlocks"
+End
+
+Set rmfiles ""
+
+If ({useoutput}) && ({link} != 1) 
+  Set ofile "{output}"
+Else
+  Set ofile "{input}.o"
+End
+
+# this should be a LOOP over actions, inputs, extensions
+# but don't know yet how to do this.  do only one input for now.
+
+If {action} =~ /m/
+  Set base `date -n`
+  Set tmpp "{base}.P"
+  Set tmpi "{base}.i"
+
+  If {retaincpp} != 1
+    Set rmfiles "{rmfiles} '{tmpp}'"
+  End
+  If {retain} != 1
+    Set rmfiles "{rmfiles} '{tmpi}'"
+  End
+
+  If {precompile}
+    ((({cpp} {cpargs} "{input}" {cppminusoflag}"{tmpp}") && Set status 0) || Set status 1)
+    If {status}
+      Delete "{rmfiles}"
+      Exit {status}
+    End
+
+    ((({objc1} {ocargs} -filename "{input}" "{tmpp}" "{tmpi}") && Set status 0) || Set status 1)
+    If {status}
+      Delete "{rmfiles}"
+      Exit {status}
+    End
+
+    If {compile}
+      ((({cc} {ccminuscflag} {ccargs} "{tmpi}" {ccminusoflag} "{ofile}") && Set status 0) || Set status 1)
+      Delete {RmFiles}
+      If {status}
+       Exit {status}
+      End
+      Set objfiles "{objfiles} '{ofile}'"
+    End
+  Else
+    # (not precompile, i.e. -E case)
+    {cpp} {cpargs} "{input}"
+  End
+End
+
+If {action} =~ /c/
+  ((({cc} {ccminuscflag} {ccargs} "{input}" {ccminusoflag} "{ofile}") && Set status 0) || Set status 1)
+  If {status}
+    Exit {status}
+  End
+  Set objfiles "{objfiles} '{ofile}'"
+End
+
+If {link} != 1
+  Exit 0
+End
+
+If {uselibs}
+  Set lib "{libdir}":{cakit}.o
+  If `Exists {lib}`
+    Set libs "{libs} {lib}"
+  End
+  Set libs "{libs} '{libdir}:{objpak}.o'"
+  Set libs "{libs} '{libdir}:{objcrt}.o'"
+  Set libs "{libs} {finlibs}"
+End
+
+If {postlink}
+  Set rmfiles "_postlnk.o" 
+  If {retain} != 1
+    Set rmfiles "{rmfiles} _postlnk.c postlink.map"
+  End
+  #obtain postlink.map as side-effect
+  ((({ld} {ldargs} {objfiles} "{libdir}":_prelink.o {libs} {ldminusoflag} {output}) && Set status 0) || Set status 1)
+  If {status}
+    Delete {rmfiles}
+    Exit {status}
+  End
+  "{bindir}":postlink - postlink.map _postlnk.c
+  ((({cc} {ccminuscflag} {ccargs} _postlnk.c {ccminusoflag} _postlnk.o) && Set status 0) || Set status 1)
+  If {status}
+    Delete {rmfiles}
+    Exit {status}
+  End
+  ((({ld} {ldargs} {objfiles} _postlnk.o {libs} {ldminusoflag} {output}) && Set status 0) || Set status 1)
+  Delete {rmfiles}
+  If {status}
+    Exit {status}
+  End
+Else
+  Echo "-noPostlink case not implemented"
+End
+

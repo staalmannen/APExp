@@ -1,0 +1,163 @@
+<HTML>
+<TITLE>ascfiler Specification Sheet</TITLE>
+<H1>ascfiler Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 1997,2000,03,04.  All Rights Reserved.<P>
+<H1>AsciiFiler</H1>
+<B>Inherits from:</B> Object<P>
+<B>Maturity Index:</B> Experimental<P>
+<H2>Class Description</H2>
+<B>AsciiFiler</B> is a (somewhat Stepstone compatible) <I>filer class</I>, to archive objects on disk.  Archiving is a general technique for saving (passivating) and later, loading (activating) objects to and from a file.  There are essentially two complementary operations.  <B>storeOn:</B> converts the object as it exists in memory into a <I>flat text file format</I>.  <B>readFrom:</B> does the inverse and translates the process-independent symbolic names again into a process-specific object.<P>
+<BLOCKQUOTE><PRE>
+[myObject storeOn:"/tmp/aFile"];
+</PRE></BLOCKQUOTE>
+and then later,<P>
+<BLOCKQUOTE><PRE>
+myObject = [AsciiFiler readFrom:"/tmp/aFile"];
+</PRE></BLOCKQUOTE>
+The <B>readFrom:</B> returns an instance of the class that it finds in the file, not an <B>AsciiFiler</B> instance.<P>
+The methods <B>storeOn:</B> and <B>readFrom:</B> are declared in the Object class and are inherited by all objects.<P>
+<H2>Example</H2>
+Suppose a class named <B>Record</B> is implemented as follows :<P>
+<BLOCKQUOTE><PRE>
+\= Record : Object
+{
+        id firstname;
+        id familyname;
+}
+
++ new
+{
+        self = [super new];
+        firstname = [String str:"Paco"];
+        familyname = [String str:"Rodriguez"];
+        return self;
+}
+
+\=:
+
+</PRE></BLOCKQUOTE>
+Then the following demonstrates how the AsciiFiler class automatically converts instances of <B>Record</B> to a flat file text representation :<P>
+<BLOCKQUOTE><PRE>
+int main()
+{
+	[[Record new] storeOn:"/tmp/aFile"];
+}
+</PRE></BLOCKQUOTE>
+Inspection of the file <I>aFile</I> would show :<P>
+<BLOCKQUOTE><PRE>
+#AsciiFiler i144 
+0 #Record @2 @3 
+0 #String i4 i5 *4"Paco 
+0 #String i9 i10 *9"Rodriguez 
+</PRE></BLOCKQUOTE>
+This file can be used to read back an instance of <B>Record</B> into memory, and all this without the developer having to write a single line of code.<P>
+<H2>File Format</H2>
+Because we have no intention to reinvent the wheel in this area, we try to keep our AsciiFiler file format partly compatible with the original Stepstone file format.  The following shows a Stepstone dump of a <B>OrdCltn</B> containing some Strings and a Set :<P>
+<BLOCKQUOTE><PRE>
+#AsciiFiler i3
+10 #OrdCltn @2 i10 i3
+10 #IdArray i10 @3 @3 @4 @0 @0 @0 @0 @0 @0 @0
+12 #String i11 i11 *11"hello world
+20 #Set @5 i20 i1
+20 #IdArray i20 @0 @0 @0 @0 @0 @0 @0 @0 @0 @0 @0 @0 @0 @3 @0 @0 @0 @0 @0 @0
+</PRE></BLOCKQUOTE>
+Each record in the file is newline terminated.  The first record indicates that this is a (Stepstone) AsciiFiler file, version 3.  Then follows object 1 on line 1, object 2 on line 2 and so on.  The first field for each record is the number of indexed variables (this will always be 0 for the Portable Object Compiler).  Then follows the <I>isa</I> pointer and the instance variables of each object.<P>
+Here's a short list of the most commonly used notation in AsciiFiler files.  Note that objects are stored using a notation that allows for <I>back</I> or <I>forward</I> pointers.  For example, the object in record 5 may contain a reference to @3, the object in record 3, or to @10, the object in record 10.<P>
+<UL>
+<LI>i : integer, like in i3</LI>
+<LI>S : unsigned short integer, like in S3</LI>
+<LI>sharp : class name, such as #String</LI>
+<LI>dollar : pointer (only used for NULL pointer)</LI>
+<LI>at : object identifier, @0 stands for nil</LI>
+<LI>star : NULL terminated char pointer</LI>
+</UL>
+The Stepstone filer class supports, for reasons explained below, many more <I>type descriptors</I> (characters to encode C types).  They are not necessarily implemented by this class, since the implementation significantly differs.<P>
+<H2>Automatic I/O</H2>
+The Stepstone and Portable Object Compiler runtime are said to have <I>automatic I/O</I>, because both compilers and runtimes attempt to do the job of implementing the necessary methods to write and read instance variables for a class, without intervention of the programmer.  Other runtimes sometimes offer only <I>semi-automatic I/O</I> where the programmer has to develop the code to read and write instance variables.<P>
+However, the details about what is done automatically and what is left to the programmer differ.  The Stepstone compiler attempts to automatically file all C types (ints, chars, unions, structs etc.).<P>
+The Portable Object Compiler emits for each class an implementation for the <B>fileOutIdsFor:</B> and <B>fileInIdsFrom:</B> methods.  These methods take care of the archiving of <I>id instance variables</I> (objects).  Unlike Stepstone, the Portable Object Compiler does not attempt to automatically archive C types; this must be done manually, if the programmer chooses to use instance variables that are raw C types instead of Objective-C objects.<P>
+Therefore, if a class adds only <I>id</I> instance variables to its superclass, then <B>storeOn:</B> and <B>readFrom:</B> will immediately work for the class.  Otherwise manual archiving needs to be done, as explained in the following paragraphs.<P>
+<H2>File Out Operation</H2>
+Storing an object works in two passes : the filer will first build a table of contents (TOC) by sending <B>fileOutOn:</B> to all objects that can be reached from the object that is being stored.  A second pass will again send <B>fileOutOn:</B> to the objects, this time to actually write the data to the file, assigning to each object a label, which is the offset of the object in the TOC.<P>
+The default implementation of <B>fileOutOn:</B>, as implemented in the Object class, uses the compiler generated <B>fileOutIdsFor:</B> method to store all <I>id</I> instance variables.  This might suffice in many applications.<P>
+Variables of a different type, or objects that are indirectly <I>owned</I> by the object must be manually written on the Filer, by using the <B>fileOut:type:</B> method.<P>
+<BLOCKQUOTE><PRE>
+- fileOutOn:aFiler
+{
+	[super fileOutOn:aFiler];
+	[aFiler fileOut:&amp;myInt type:'i'];
+	[aFiler fileOut:&amp;cArray[0] type:'@'];
+	[aFiler fileOut:&amp;cArray[1] type:'@'];
+	return self;
+}
+
+</PRE></BLOCKQUOTE>
+<H2>File In Operation</H2>
+When activating objects, the Filer will first build a table of instances for each record in the file.  The Filer knows what factory class to use, since each record includes the necessary class information.  Then, once all (uninitialized) objects exist, each instance receives a <B>fileInFrom:</B> message.  Only when all instances have had the opportunity to file themselves in, from the Filer, <B>awakeFrom:</B> messages are sent to the objects.  This can be used to perform further initialization, to make objects or string unique etc.<P>
+The default implementation of <B>fileInFrom:</B>, as implemented in the Object class, uses the compiler generated <B>fileInIdsFrom:</B> method to restore all <I>id</I> instance variables.  A method <B>fileInFrom:</B> needs to be implemented only to match a corresponding <B>fileOutOn:</B>.<P>
+<BLOCKQUOTE><PRE>
+- fileInFrom:aFiler
+{
+	[super fileInFrom:aFiler];
+	[aFiler fileIn:&amp;myInt type:'i'];
+	[aFiler fileIn:&amp;cArray[0] type:'@'];
+	[aFiler fileIn:&amp;cArray[1] type:'@'];
+	return self;
+}
+
+</PRE></BLOCKQUOTE>
+If the type description character, passed as argument to <B>fileIn:type:</B> does not match what was used for <B>fileOut:type:</B>, the Filer will signal a <B>TypeInconsistency</B> exception.<P>
+<H2>Method types</H2>
+<H3><B>Class Initialization</B></H3>
+<UL>
+<LI><A HREF="#0">initialize</A></LI>
+</UL>
+<H3><B>Creating</B></H3>
+<UL>
+<LI><A HREF="#1">new</A></LI>
+<LI><A HREF="#2">free</A></LI>
+</UL>
+<H3><B>Storing and Reading Objects</B></H3>
+<UL>
+<LI><A HREF="#3">store:on:</A></LI>
+<LI><A HREF="#4">readFrom:</A></LI>
+</UL>
+<H3><B>File Out Operation</B></H3>
+<UL>
+<LI><A HREF="#8">fileOut:type:</A></LI>
+</UL>
+<H3><B>File In Operation</B></H3>
+<UL>
+<LI><A HREF="#10">fileIn:type:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">initialize</A></H3>
+<BLOCKQUOTE>+<B>initialize</B></BLOCKQUOTE>
+Registers the <B>AsciiFiler</B> as default filer.<P>
+<H3><A NAME="1">new</A></H3>
+<BLOCKQUOTE>+<B>new</B></BLOCKQUOTE>
+Factory method to create and return a new instance of the class.  The default implementation clears (zeroes) the memory for instance variables and initializes the <I>isa</I> pointer.<P>
+<H3><A NAME="2">free</A></H3>
+<BLOCKQUOTE>-<B>free</B></BLOCKQUOTE>
+Frees the memory for this instance, and returns <B>nil</B>.<P>
+<H3><A NAME="3">store:on:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>store</B>:<I>anObject</I><B>on</B>:(STR)<I>aFileName</I></BLOCKQUOTE>
+AsciiFiler reimplementation of <B>storeOn:</B>.  Doesn't use the default Filer, but rather AsciiFiler itself as Filer class.  If the default filer is AsciiFiler, then the following are equivalent :<P>
+<BLOCKQUOTE><PRE>
+[AsciiFiler store:anObject on:aFileName];
+</PRE></BLOCKQUOTE>
+and<P>
+<BLOCKQUOTE><PRE>
+[anObject storeOn:aFileName];
+</PRE></BLOCKQUOTE>
+<H3><A NAME="4">readFrom:</A></H3>
+<BLOCKQUOTE>-<B>readFrom</B>:(STR)<I>aFileName</I></BLOCKQUOTE>
+AsciiFiler reimplements <B>readFrom:</B> and doesn't use the default Filer, but rather AsciiFiler itself as Filer class.<P>
+<H3><A NAME="8">fileOut:type:</A></H3>
+<BLOCKQUOTE>-<B>fileOut</B>:(void *)<I>value</I><B>type</B>:(char)<I>typeDesc</I></BLOCKQUOTE>
+Writes out the data referenced by <I>value</I> to the filer.<P>
+<H3><A NAME="10">fileIn:type:</A></H3>
+<BLOCKQUOTE>-<B>fileIn</B>:(void *)<I>value</I><B>type</B>:(char)<I>typeDesc</I></BLOCKQUOTE>
+Reads from the filer and returns data by reference.<P>

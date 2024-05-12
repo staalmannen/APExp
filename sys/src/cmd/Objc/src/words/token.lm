@@ -1,0 +1,45 @@
+
+%{
+
+/*****************************************************************************
+ *
+ * ObjectPak Test Program - Example of using LEX & Objective C
+ *
+ ****************************************************************************/
+
+#include <stdio.h>
+#include <stdlib.h>
+#include "objpak.h"
+
+/*
+ * yylex() scans and adds words to the global "words" which may be a Set
+ * Collection, Tree etc.
+ */
+
+extern id words;
+
+int yyerror(char *s)
+{
+    return 1;
+}
+
+int yywrap()
+{
+    return 1;
+}
+
+%}
+
+%%
+
+[ \n\t]   { /* ignore whitespace */; }
+
+[A-Za-z]+ {
+	/* HPUX lex defines yytext as unsigned char* */
+	id s = [String str:(STR)yytext];
+	[words add:s];
+}
+
+.         { /* ignore digits, punctuation */; } 
+
+%%

@@ -1,0 +1,18 @@
+<HTML>
+<TITLE>notfound Specification Sheet</TITLE>
+<H1>notfound Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 2003,2023.  All Rights Reserved.<P>
+<H1>NotFound</H1>
+<B>Inherits from:</B> Exception<P>
+<B>Maturity Index:</B> Experimental<P>
+<H2>Class Description</H2>
+This is a subclass to signal that an object could not be found in a collection. Messages that should search for an object can signal this <B>Exception</B> to indicate that the operation failed because no matching object was found.<P>
+The handler can be used as follows:<P>
+<BLOCKQUOTE><PRE>
+    [[{ match=[cltn find:myObject]; } on:NotFound do:{ :e | match=nil;}];
+
+</PRE></BLOCKQUOTE>
+<H2>Method types</H2>
+<H2>Methods</H2>

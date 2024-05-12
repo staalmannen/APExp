@@ -1,0 +1,79 @@
+<HTML>
+<TITLE>txtattr Specification Sheet</TITLE>
+<H1>txtattr Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 1997,98,99.  All Rights Reserved.<P>
+<H1>TextAttribute</H1>
+<B>Inherits from:</B> Object<P>
+<B>Maturity Index:</B> Experimental<P>
+<H2>Class Description</H2>
+Abstract superclass for Text Attributes, as used by the <B>Text</B> and the <B>RunArray</B> classes.<P>
+Typically, an application will subclass <B>TextAttribute</B> and use its own subclass with the <B>Text</B> instance method <B>addAttribute:</B>.<P>
+<H2>Method types</H2>
+<H3><B>Text Emphasis</B></H3>
+<UL>
+<LI><A HREF="#0">normal</A></LI>
+<LI><A HREF="#1">new</A></LI>
+<LI><A HREF="#2">bold</A></LI>
+<LI><A HREF="#3">emphasiscode:</A></LI>
+</UL>
+<H3><B>Accessing</B></H3>
+<UL>
+<LI><A HREF="#4">emphasiscode</A></LI>
+<LI><A HREF="#5">emphasiscode:</A></LI>
+</UL>
+<H3><B>Comparison</B></H3>
+<UL>
+<LI><A HREF="#6">isEqual:</A></LI>
+</UL>
+<H3><B>Coalescing </B></H3>
+<UL>
+<LI><A HREF="#7">dominates:</A></LI>
+<LI><A HREF="#8">reset</A></LI>
+<LI><A HREF="#9">set</A></LI>
+</UL>
+<H3><B>Setting Scanner Attributes</B></H3>
+<UL>
+<LI><A HREF="#10">emphasizeScanner:</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#11">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">normal</A></H3>
+<BLOCKQUOTE>+<B>normal</B></BLOCKQUOTE>
+A Text Attribute instance with emphasiscode set to 0.<P>
+<H3><A NAME="1">new</A></H3>
+<BLOCKQUOTE>+<B>new</B></BLOCKQUOTE>
+A Text Attribute instance with emphasiscode set to 0.<P>
+<H3><A NAME="2">bold</A></H3>
+<BLOCKQUOTE>+<B>bold</B></BLOCKQUOTE>
+Creates a Textattribute with emphasiscode set to 1.<P>
+<H3><A NAME="3">emphasiscode:</A></H3>
+<BLOCKQUOTE>+<B>emphasiscode</B>:(unsigned)<I>n</I></BLOCKQUOTE>
+A Text Attribute instance with emphasiscode set to <I>n</I>.  This value may suffice for simple applications, but normally a subclass of <B>TextAttribute</B> would be used to associate more sophisticated values to a Text Attribute (such as URL of a hypertext link, or such as a Color value, or an X-Windows font etc.).<P>
+<H3><A NAME="4">emphasiscode</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>emphasiscode</B></BLOCKQUOTE>
+<H3><A NAME="5">emphasiscode:</A></H3>
+<BLOCKQUOTE>-<B>emphasiscode</B>:(unsigned)<I>c</I></BLOCKQUOTE>
+<H3><A NAME="6">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>attrib</I></BLOCKQUOTE>
+The equality test for TextAttributes is used by RunArray's <B>coalesce</B> method to merge adjacent TextAttribute instances.<P>
+<H3><A NAME="7">dominates:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>dominates</B>:<I>attrib</I></BLOCKQUOTE>
+Should return YES if the receiver dominates <I>attrib</I>.  This implies that, when the receiver is added to a list of Text Attributes, attributes that are dominated by the receiver will be removed.<P>
+The default returns NO, unless both objects are members of the same class and equal to each other (in which case they don't need to be added more than once to the attribute list). <P>
+<H3><A NAME="8">reset</A></H3>
+<BLOCKQUOTE>-<B>reset</B></BLOCKQUOTE>
+Message that is sent to the attribute before it is added to a list of attributes.  Doesn't do anything by default.<P>
+<H3><A NAME="9">set</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>set</B></BLOCKQUOTE>
+Message that is sent to the attribute before it is added to a list of attributes.  If it returns YES (the default), the attribute will be added.  May be overridden to <I>turn off</I> attributes.<P>
+<H3><A NAME="10">emphasizeScanner:</A></H3>
+<BLOCKQUOTE>-<B>emphasizeScanner</B>:<I>aScanner</I></BLOCKQUOTE>
+The default implementation of this method simply returns <B>self</B>.<P>
+Normally a <I>scanner</I> class (which renders text in some specific format) would send <B>emphasizeScanner:</B> messages with itself as argument to a list of text attributes.  The text attributes can then <I>act</I> upon the scanner and set text color, font and other formatting properties.<P>
+<H3><A NAME="11">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>

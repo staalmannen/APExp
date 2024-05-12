@@ -1,0 +1,176 @@
+.TH "paragrph" 3 "Mar 12, 2023"
+.SH Paragraph
+.PP
+.B
+Inherits from:
+
+Object
+.PP
+.B
+Maturity Index:
+
+Experimental
+.SH Class Description
+.PP
+A 
+.B
+Paragraph
+associates a 
+.I
+text
+instance with a 
+.I
+text style
+\&.  
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* new
+.br
+* withText:
+.br
+* withText:style:
+.br
+* copy
+.br
+* free
+.RE
+.PP 
+.B
+Accessing 
+.RS 3
+.br
+* text
+.br
+* textStyle
+.br
+* text:
+.br
+* textStyle:
+.RE
+.PP 
+.B
+Format Conversions
+.RS 3
+.br
+* asString
+.br
+* asText
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP 
+withText:
+.RS 1
++
+.B
+withText
+:
+.I
+aText
+.RE
+.PP 
+withText:style:
+.RS 1
++
+.B
+withText
+:
+.I
+aText
+.B
+style
+:
+.I
+aStyle
+.RE
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP 
+free
+.RS 1
+-
+.B
+free
+.RE
+.PP 
+text
+.RS 1
+-
+.B
+text
+.RE
+.PP 
+textStyle
+.RS 1
+-
+.B
+textStyle
+.RE
+.PP 
+text:
+.RS 1
+-
+.B
+text
+:
+.I
+v
+.RE
+.PP 
+textStyle:
+.RS 1
+-
+.B
+textStyle
+:
+.I
+v
+.RE
+.PP 
+asString
+.RS 1
+-
+.B
+asString
+.RE
+.PP 
+asText
+.RS 1
+-
+.B
+asText
+.RE
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints the Text for this instance\&.  Returns the receiver\&.

@@ -1,0 +1,137 @@
+<HTML>
+<TITLE>intmodp Specification Sheet</TITLE>
+<H1>intmodp Specification Sheet</H1>
+
+<HR>
+Computer Algebra Kit (c) 1993,00 by Comp.Alg.Objects.  All Rights Reserved.<P>
+<H1>IntegerModp</H1>
+<B>Inherits from:</B> CAObject<P>
+<B>Maturity Index:</B> Relatively immature<P>
+<H2>Class Description</H2>
+Instances are integers modulo a small, prime number, the <I>modulus</I> of the object.  The modulus can currently not be equal to two; it must be equal to or less than USHRT_MAX_PRIME (the largest prime number that fits in an <B>unsigned short</B> word, as defined in the header file cakit/IntegerModp.h).  Objects belong to the same class in the sense of <B>sameClass:</B> iff. the moduli are equal.<P>
+Every integer mod <I>p</I> keeps its own copy of the modulus; you don't need to set a global modulus.  As a consequence, it is possible to do multiple calculations modulo a different prime, even concurrenlty.<P>
+IntegerModp is the prototype, in the Computer Algebra Kit, of a <I>field</I> i.e., a structure where each (nonzero) element has a multiplicative inverse (see <B>inField</B> and <B>inverse</B>).  Matrix (in Gaussian elimination) and Polynomial (in polynomial division) take advantage of the field structure of scalars, such as integers mod p.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#1">modulus:</A></LI>
+<LI><A HREF="#4">int:modulus:</A></LI>
+</UL>
+<H3><B>Identity</B></H3>
+<UL>
+<LI><A HREF="#29">hash</A></LI>
+<LI><A HREF="#30">isEqual:</A></LI>
+<LI><A HREF="#15">modulus</A></LI>
+<LI><A HREF="#16">intValue</A></LI>
+<LI><A HREF="#17">intValue:</A></LI>
+</UL>
+<H3><B>Addition</B></H3>
+<UL>
+<LI><A HREF="#18">zero</A></LI>
+<LI><A HREF="#32">isZero</A></LI>
+<LI><A HREF="#34">isOpposite:</A></LI>
+<LI><A HREF="#36">negate</A></LI>
+<LI><A HREF="#38">double</A></LI>
+<LI><A HREF="#40">add:</A></LI>
+<LI><A HREF="#41">subtract:</A></LI>
+</UL>
+<H3><B>Multiplication</B></H3>
+<UL>
+<LI><A HREF="#19">one</A></LI>
+<LI><A HREF="#20">minusOne</A></LI>
+<LI><A HREF="#42">isOne</A></LI>
+<LI><A HREF="#44">isMinusOne</A></LI>
+<LI><A HREF="#46">square</A></LI>
+<LI><A HREF="#47">multiply:</A></LI>
+<LI><A HREF="#48">inverse</A></LI>
+<LI><A HREF="#21">divide:</A></LI>
+</UL>
+<H3><B>Characteristic</B></H3>
+<UL>
+<LI><A HREF="#22">characteristic</A></LI>
+<LI><A HREF="#23">frobenius</A></LI>
+<LI><A HREF="#24">frobeniusInverse</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#25">printsLeadingSign</A></LI>
+<LI><A HREF="#26">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="1">modulus:</A></H3>
+<BLOCKQUOTE>+<B>modulus</B>:(unsigned short)<I>aPrime</I></BLOCKQUOTE>
+Creates a new object, equal to zero, with modulus equal to <I>aPrime</I>.  The modulus must be a prime number less than or equal to USHRT_MAX_PRIME.<P>
+<H3><A NAME="4">int:modulus:</A></H3>
+<BLOCKQUOTE>+<B>int</B>:(int)<I>intValue</I><B>modulus</B>:(unsigned short)<I>aPrime</I></BLOCKQUOTE>
+Creates a new object with modulus equal to <I>aPrime</I>.  The value of the object is equal to <I>intValue</I> mod <I>aPrime</I>.  The modulus must be a prime number less than or equal to USHRT_MAX_PRIME.<P>
+<H3><A NAME="29">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a small integer that is the same for objects that are equal (in the sense of <B>isEqual:</B>).<P>
+<H3><A NAME="30">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>b</I></BLOCKQUOTE>
+<H3><A NAME="15">modulus</A></H3>
+<BLOCKQUOTE>- (unsigned short)<B>modulus</B></BLOCKQUOTE>
+Returns the modulus, a prime number equal to or less than USHRT_MAX_PRIME.<P>
+<H3><A NAME="16">intValue</A></H3>
+<BLOCKQUOTE>- (int)<B>intValue</B></BLOCKQUOTE>
+Returns a representant of the modular number in the range [0,modulus[.<P>
+<H3><A NAME="17">intValue:</A></H3>
+<BLOCKQUOTE>-<B>intValue</B>:(int)<I>aValue</I></BLOCKQUOTE>
+Returns a new object for <I>aValue</I>, modulo the modulus of the receiving object.  <P>
+<H3><A NAME="18">zero</A></H3>
+<BLOCKQUOTE>-<B>zero</B></BLOCKQUOTE>
+<H3><A NAME="32">isZero</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isZero</B></BLOCKQUOTE>
+Whether the object is equal to zero.<P>
+<H3><A NAME="34">isOpposite:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOpposite</B>:<I>b</I></BLOCKQUOTE>
+Whether the object is the opposite of <I>b</I>.<P>
+<H3><A NAME="36">negate</A></H3>
+<BLOCKQUOTE>-<B>negate</B></BLOCKQUOTE>
+Returns the opposite of the object.<P>
+<H3><A NAME="38">double</A></H3>
+<BLOCKQUOTE>-<B>double</B></BLOCKQUOTE>
+Returns a new object, equal to the object multiplied by two i.e., added to itself.<P>
+<H3><A NAME="40">add:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>b</I></BLOCKQUOTE>
+Adds <I>b</I> to the object.  Returns a new object.<P>
+<H3><A NAME="41">subtract:</A></H3>
+<BLOCKQUOTE>-<B>subtract</B>:<I>b</I></BLOCKQUOTE>
+Subtracts <I>b</I> from the object.  Returns a new object.<P>
+<H3><A NAME="19">one</A></H3>
+<BLOCKQUOTE>-<B>one</B></BLOCKQUOTE>
+<H3><A NAME="20">minusOne</A></H3>
+<BLOCKQUOTE>-<B>minusOne</B></BLOCKQUOTE>
+<H3><A NAME="42">isOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOne</B></BLOCKQUOTE>
+Whether the object is equal to one.<P>
+<H3><A NAME="44">isMinusOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isMinusOne</B></BLOCKQUOTE>
+Whether the object is equal to minus one.<P>
+<H3><A NAME="46">square</A></H3>
+<BLOCKQUOTE>-<B>square</B></BLOCKQUOTE>
+Returns the square of the object i.e., a new object equal to the original object multiplied by itself.<P>
+<H3><A NAME="47">multiply:</A></H3>
+<BLOCKQUOTE>-<B>multiply</B>:<I>b</I></BLOCKQUOTE>
+Returns a new object, the product of the object multiplied (to the right) by <I>b</I>.  If the objects are pointer equal, this method is equivalent to <B>square</B>.<P>
+<H3><A NAME="48">inverse</A></H3>
+<BLOCKQUOTE>-<B>inverse</B></BLOCKQUOTE>
+Returns the multiplicative inverse of the object (returns a new object).  Returns <B>nil</B> if the object is equal to zero or cannot be inverted.<P>
+<H3><A NAME="21">divide:</A></H3>
+<BLOCKQUOTE>-<B>divide</B>:<I>b</I></BLOCKQUOTE>
+Multiplies the object by the inverse of <I>b</I>.  Returns <B>nil</B> if <I>b</I> is zero (has no inverse).<P>
+<H3><A NAME="22">characteristic</A></H3>
+<BLOCKQUOTE>- (int)<B>characteristic</B></BLOCKQUOTE>
+Returns the modulus of the object.<P>
+<H3><A NAME="23">frobenius</A></H3>
+<BLOCKQUOTE>-<B>frobenius</B></BLOCKQUOTE>
+Simply returns a new reference to the object itself, since the <I>p</I>-th power of an integer modulo <I>p</I> is equal to that integer.<P>
+<H3><A NAME="24">frobeniusInverse</A></H3>
+<BLOCKQUOTE>-<B>frobeniusInverse</B></BLOCKQUOTE>
+Simply returns a new reference to the object itself, since the <I>p</I>-th power of an integer modulo <I>p</I> is equal to that integer.  This method also returns zero for the zero object.<P>
+<H3><A NAME="25">printsLeadingSign</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsLeadingSign</B></BLOCKQUOTE>
+Returns NO, because representants are taken positive for printing.<P>
+<H3><A NAME="26">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints a (nonnegative) representant of the integer modulo p.<P>

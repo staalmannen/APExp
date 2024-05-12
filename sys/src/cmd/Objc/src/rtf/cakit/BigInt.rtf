@@ -1,0 +1,581 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Computer Algebra Kit (c) 1992,00 by Comp.Alg.Objects.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 BigInt\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} CAObject\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Maturity Index:}} Relatively mature\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 An integer (alias {\b BigInt}) is an array of digits, each digit is a value of type DIGIT declared as {\b unsigned short int}.  So, abstractly, the integer is expressed base USHRT_MAX + 1, which is a power of two. (USHRT_MAX is defined in the ANSI header file limits.h)  The most significant (or {\i leading}) digit is never zero; the {\i last} digit is the least significant digit of the integer.  There are methods to count, access, insert or remove digits.  Besides the normal elementary arithmetical operations, Integer also supports multiplication, division etc. by digits.  For input and output, integers are in decimal representation.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- new\
+	- str:\
+	- int:\
+	- factorial:\
+	- fibonacci:\
+	- copy\
+	- deepCopy\
+	- release\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Identity}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- hash\
+	- isEqual:\
+	- numDigits\
+	- isDigit\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Inserting and Removing Digits}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- insertDigit:\
+	- removeDigit\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Accessing Digits}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- digitAt:\
+	- lastDigit\
+	- leadingDigit\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b String Value}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- str\
+	- str:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Coercion}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- asNumerical\
+	- asModp:\
+	- digitValue\
+	- digitValue:\
+	- ulongValue\
+	- ulongValue:\
+	- intValue\
+	- intValue:\
+	- doubleValue\
+	- floatValue\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Comparing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- sign\
+	- compare:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Addition}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- zero\
+	- isZero\
+	- isOpposite:\
+	- negate\
+	- double\
+	- add:\
+	- subtract:\
+	- addDigit:\
+	- subtractDigit:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Multiplication}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- one\
+	- minusOne\
+	- isOne\
+	- isMinusOne\
+	- square\
+	- multiply:\
+	- multiplyDigit:\
+	- inverse\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Division}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- divide:\
+	- divideDigit:\
+	- quotientDigit:\
+	- remainder:quotient:\
+	- quotientDigit:remainder:\
+	- remainderDigit:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Parity}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- isEven\
+	- isOdd\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Greatest Common Divisor}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- gcd:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printsLeadingSign\
+	- printOn:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 new\f0\b0\
+\f0\fs28\li2500 +{\b new}\fs16\
+\
+\f0\fs28\li2200 Returns a new integer equal to zero.  The instance method {\b zero} returns a shared, zero integer object. \fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} - zero\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 str:\f0\b0\
+\f0\fs28\li2500 +{\b str}:(STR){\i aString}\fs16\
+\
+\f0\fs28\li2200 Returns a new integer from the decimal representation {\i aString}, or returns {\b nil} if {\i aString} doesn't contain decimal characters (with optional unary minus sign).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 int:\f0\b0\
+\f0\fs28\li2500 +{\b int}:(int){\i intValue}\fs16\
+\
+\f0\fs28\li2200 Returns a new integer with value equal to {\i intValue}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 factorial:\f0\b0\
+\f0\fs28\li2500 +{\b factorial}:(int){\i n}\fs16\
+\
+\f0\fs28\li2200 Returns a new integer object that is the {\i n}-th factorial.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 fibonacci:\f0\b0\
+\f0\fs28\li2500 +{\b fibonacci}:(int){\i n}\fs16\
+\
+\f0\fs28\li2200 Returns a new object that is the {\i n}-th Fibonacci number. (Not implemented).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 copy\f0\b0\
+\f0\fs28\li2500 -{\b copy}\fs16\
+\
+\f0\fs28\li2200 Makes a copy of the digits.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deepCopy\f0\b0\
+\f0\fs28\li2500 -{\b deepCopy}\fs16\
+\
+\f0\fs28\li2200 For integer objects, deepCopy is equivalent to {\b copy}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 release\f0\b0\
+\f0\fs28\li2500 -{\b release}\fs16\
+\
+\f0\fs28\li2200 Frees the array of digits of the integer object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hash\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b hash}\fs16\
+\
+\f0\fs28\li2200 Returns a small integer that is the same for objects that are equal (in the sense of {\b isEqual:}).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEqual}:{\i b}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 numDigits\f0\b0\
+\f0\fs28\li2500 - (int){\b numDigits}\fs16\
+\
+\f0\fs28\li2200 Returns the number of DIGIT's in the integer.  Returns zero if the integer is zero.  The leading digit of an integer is at position numDigits minus one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isDigit\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isDigit}\fs16\
+\
+\f0\fs28\li2200 Whether the integer consists of a single digit.  If the integer is zero, this method returns NO.  The method ignores the sign of the integer.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} digitValue\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 insertDigit:\f0\b0\
+\f0\fs28\li2500 -{\b insertDigit}:(DIGIT){\i d}\fs16\
+\
+\f0\fs28\li2200 Inserts {\i d} as last digit, shifting the other digits one position up.  The method doesn't insert anything if both the integer and {\i d} are equal to zero. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 removeDigit\f0\b0\
+\f0\fs28\li2500 - (DIGIT){\b removeDigit}\fs16\
+\
+\f0\fs28\li2200 Removes and returns the last digit, shifting the other digits one position down.  The method returns zero if the integer is equal to zero. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 digitAt:\f0\b0\
+\f0\fs28\li2500 - (DIGIT){\b digitAt}:(int){\i i}\fs16\
+\
+\f0\fs28\li2200 Returns the digit at position {\i i}.  The leading digit is position numDigits minus one.  The last digit is at position zero.  Returns 0 if the index is less than zero or equal to or greater than numDigits.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 lastDigit\f0\b0\
+\f0\fs28\li2500 - (DIGIT){\b lastDigit}\fs16\
+\
+\f0\fs28\li2200 Returns the least significant digit of the integer, the digit at position 0.  Returns 0 if the integer is zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 leadingDigit\f0\b0\
+\f0\fs28\li2500 - (DIGIT){\b leadingDigit}\fs16\
+\
+\f0\fs28\li2200 Returns the most significant digit of the integer, the digit at position numDigits minus one.  The leading digit of a nonzero integer is never zero.  The method returns 0 if the integer is zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 str\f0\b0\
+\f0\fs28\li2500 - (STR){\b str}\fs16\
+\
+\f0\fs28\li2200 Returns the decimal representation of the integer as a NULL-terminated string of characters.  The string is automatically disposed off when freeing the integer, or when modifying the integer with methods that work destructively on the integer such as {\f2 removeDigit} or {\f2 insertDigit:}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 str:\f0\b0\
+\f0\fs28\li2500 -{\b str}:(STR){\i aString}\fs16\
+\
+\f0\fs28\li2200 Returns a new integer from the decimal representation {\i aString}, or returns {\b nil} if {\i aString} doesn't contain decimal characters (with optional unary minus sign).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asNumerical\f0\b0\
+\f0\fs28\li2500 -{\b asNumerical}\fs16\
+\
+\f0\fs28\li2200 Returns a new instance of the {\b Float} class whose float value is equal to that of the integer.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} floatValue\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 asModp:\f0\b0\
+\f0\fs28\li2500 -{\b asModp}:(unsigned short){\i p}\fs16\
+\
+\f0\fs28\li2200 Returns a new instance of the {\b IntegerModp} class whose value is equal to that of the integer modulo {\i p} (with {\i p} a small prime number).  Negative integers are mapped to the opposite (mod {\i p}) of their absolute value.\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} IntegerModp\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 digitValue\f0\b0\
+\f0\fs28\li2500 - (DIGIT){\b digitValue}\fs16\
+\
+\f0\fs28\li2200 Equivalent to {\b lastDigit}.  This method ignores the sign of the integer i.e., for a negative integer that consists of just one digit, it returns the absolute value of the integer.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 digitValue:\f0\b0\
+\f0\fs28\li2500 -{\b digitValue}:(DIGIT){\i aValue}\fs16\
+\
+\f0\fs28\li2200 Returns a new (positive) integer object, with value equal to {\i aValue}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 ulongValue\f0\b0\
+\f0\fs28\li2500 - (unsigned long){\b ulongValue}\fs16\
+\
+\f0\fs28\li2200 Returns the two last digits of the integer as an {\b unsigned long} value.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 ulongValue:\f0\b0\
+\f0\fs28\li2500 -{\b ulongValue}:(unsigned long){\i aValue}\fs16\
+\
+\f0\fs28\li2200 Returns a (positive) integer with value as {\b unsigned long} equal to {\i aValue}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intValue\f0\b0\
+\f0\fs28\li2500 - (int){\b intValue}\fs16\
+\
+\f0\fs28\li2200 Returns the value of the integer as {\b int} value, if possible.  If the integer is too large to represented as {\b int}, the method returns INT_MIN or INT_MAX depending on the sign of the integer.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intValue:\f0\b0\
+\f0\fs28\li2500 -{\b intValue}:(int){\i aValue}\fs16\
+\
+\f0\fs28\li2200 Returns a new integer with value equal to {\i aValue}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 doubleValue\f0\b0\
+\f0\fs28\li2500 - (double){\b doubleValue}\fs16\
+\
+\f0\fs28\li2200 Returns the integer as a floating-point {\b double} value, if possible.  If the integer is too big to be represented as {\b double}, the method returns DBL_MIN or DBL_MAX depending on the sign of the integer.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 floatValue\f0\b0\
+\f0\fs28\li2500 - (float){\b floatValue}\fs16\
+\
+\f0\fs28\li2200 Returns the integer as a floating-point {\b float} value, if possible.  If the integer is too big to be represented as {\b float}, the method returns FLT_MIN or FLT_MAX depending on the sign of the integer.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 sign\f0\b0\
+\f0\fs28\li2500 - (int){\b sign}\fs16\
+\
+\f0\fs28\li2200 Returns plus one if the object is positive (greater than zero), zero if zero and minus one if negative (less than zero).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 compare:\f0\b0\
+\f0\fs28\li2500 - (int){\b compare}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns -1, 0, or +1 if the object is respectively less than, equal to, or greater than {\i b}.  Returns 0 for pointer equal objects.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 zero\f0\b0\
+\f0\fs28\li2500 -{\b zero}\fs16\
+\
+\f0\fs28\li2200 Returns a copy of a shared integer instance with value equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isZero\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isZero}\fs16\
+\
+\f0\fs28\li2200 Whether the object is equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOpposite:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOpposite}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Whether the object is the opposite of {\i b}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 negate\f0\b0\
+\f0\fs28\li2500 -{\b negate}\fs16\
+\
+\f0\fs28\li2200 Returns the opposite of the object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 double\f0\b0\
+\f0\fs28\li2500 -{\b double}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, equal to the object multiplied by two i.e., added to itself.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 add:\f0\b0\
+\f0\fs28\li2500 -{\b add}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Adds {\i b} to the object.  Returns a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subtract:\f0\b0\
+\f0\fs28\li2500 -{\b subtract}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Subtracts {\i b} from the object.  Returns a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 addDigit:\f0\b0\
+\f0\fs28\li2500 -{\b addDigit}:(DIGIT){\i d}\fs16\
+\
+\f0\fs28\li2200 Returns a new integer that is the sum of the integer {\b self} and the digit {\i d}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subtractDigit:\f0\b0\
+\f0\fs28\li2500 -{\b subtractDigit}:(DIGIT){\i d}\fs16\
+\
+\f0\fs28\li2200 Returns a new integer that is the equal to the integer {\b self} minus the digit {\i d}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 one\f0\b0\
+\f0\fs28\li2500 -{\b one}\fs16\
+\
+\f0\fs28\li2200 Returns a copy of a shared integer instance with value equal to one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 minusOne\f0\b0\
+\f0\fs28\li2500 -{\b minusOne}\fs16\
+\
+\f0\fs28\li2200 Returns a copy of the integer minus one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOne}\fs16\
+\
+\f0\fs28\li2200 Whether the object is equal to one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isMinusOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isMinusOne}\fs16\
+\
+\f0\fs28\li2200 Whether the object is equal to minus one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 square\f0\b0\
+\f0\fs28\li2500 -{\b square}\fs16\
+\
+\f0\fs28\li2200 Returns the square of the object i.e., a new object equal to the original object multiplied by itself.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiply:\f0\b0\
+\f0\fs28\li2500 -{\b multiply}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, the product of the object multiplied (to the right) by {\i b}.  If the objects are pointer equal, this method is equivalent to {\b square}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiplyDigit:\f0\b0\
+\f0\fs28\li2500 -{\b multiplyDigit}:(DIGIT){\i d}\fs16\
+\
+\f0\fs28\li2200 Returns the product of the integer and the digit {\i d} (the product is a new object).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inverse\f0\b0\
+\f0\fs28\li2500 -{\b inverse}\fs16\
+\
+\f0\fs28\li2200 Returns {\b nil}, except if the integer is one or minus one, in which case the method returns a copy of the object itself.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divide:\f0\b0\
+\f0\fs28\li2500 -{\b divide}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the exact quotient on division by {\i b}.  Returns {\b nil} if the divisor {\i b} is zero or if the division is not exact (when the remainder is not zero).\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 See also:}} quotient:\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divideDigit:\f0\b0\
+\f0\fs28\li2500 -{\b divideDigit}:(DIGIT){\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the exact quotient on division by the digit {\i b}.  Returns {\b nil} if the divisor {\i b} is zero or if the division is not exact (when the remainder is not zero).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 quotientDigit:\f0\b0\
+\f0\fs28\li2500 -{\b quotientDigit}:(DIGIT){\i b}\fs16\
+\
+\f0\fs28\li2200 Returns the quotient on division by the digit {\i b}; the division need not necessarily be exact.  Returns {\b nil} if {\i b} is equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 remainder:quotient:\f0\b0\
+\f0\fs28\li2500 -{\b remainder}:{\i b}{\b quotient}:(id *){\i q}\fs16\
+\
+\f0\fs28\li2200 Returns the remainder and, if a non-NULL pointer is passed for {\i q}, the quotient on division of the dividend {\i self} by a divisor {\i b}.  Both remainder and quotient are new integer objects.  The remainder is {\i signed} i.e., its sign is the same as the sign of the dividend; the relation {\i dividend} == {\i quotient} {\i divisor} + {\i remainder} holds for all integers.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 quotientDigit:remainder:\f0\b0\
+\f0\fs28\li2500 -{\b quotientDigit}:(DIGIT){\i d}{\b remainder}:(DIGIT *){\i r}\fs16\
+\
+\f0\fs28\li2200 Returns the quotient and, if a non-NULL pointer is passed along for {\i r}, the {\i unsigned} remainder on division by a digit {\i d}; the relation {\i dividend} == {\i quotient} {\i divisor} + {\i remainder} does not hold if the dividend is negative.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 remainderDigit:\f0\b0\
+\f0\fs28\li2500 - (DIGIT){\b remainderDigit}:(DIGIT){\i d}\fs16\
+\
+\f0\fs28\li2200 Returns the {\i unsigned} remainder on division by a digit {\i d} i.e., the sign of the object is ignored.  The divisor {\i d} shouldn't be equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEven\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEven}\fs16\
+\
+\f0\fs28\li2200 Whether the integer is even i.e., zero or divisible by two.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOdd\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOdd}\fs16\
+\
+\f0\fs28\li2200 Whether the integer is odd i.e., not divisible by two.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 gcd:\f0\b0\
+\f0\fs28\li2500 -{\b gcd}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new (non-negative) integer, the greatest common divisor of the two integers, computed by the Euclidean algorithm. \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsLeadingSign\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsLeadingSign}\fs16\
+\
+\f0\fs28\li2200 Returns YES if the integer is negative.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Prints the integer in decimal representation to {\i aFile}.\fs16\
+\
+\fs16\
+\
+\
+}

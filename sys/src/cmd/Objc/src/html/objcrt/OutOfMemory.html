@@ -1,0 +1,18 @@
+<HTML>
+<TITLE>OutOfMem Specification Sheet</TITLE>
+<H1>OutOfMem Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 2003,2023.  All Rights Reserved.<P>
+<H1>OutOfMemory</H1>
+<B>Inherits from:</B> Exception<P>
+<B>Maturity Index:</B> Experimental<P>
+<H2>Class Description</H2>
+This is a subclass to signal <I>out of memory</I> occurrences.  Messages that create objects can signal this <B>Exception</B> to indicate that the operation failed due to a lack of resources.<P>
+The handler can be used as follows:<P>
+<BLOCKQUOTE><PRE>
+    [[{ myObject=[Object new] } on:OutOfMemory do:{ :e | myObject=nil;}];
+
+</PRE></BLOCKQUOTE>
+<H2>Method types</H2>
+<H2>Methods</H2>

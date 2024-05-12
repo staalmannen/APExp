@@ -1,0 +1,775 @@
+.TH "ocstring" 3 "Mar 12, 2023"
+.SH String
+.PP
+.B
+Inherits from:
+
+Array
+.SH Class Description
+.PP
+Strings are used to hold conventional, NULL-terminated C strings of characters\&.  String objects can, unlike ordinary C strings, easily be added to collections or sets\&.  They are also very useful as keys in a dictionary object\&.
+.PP
+New instances are usually created via 
+.B
+str:
+, which initializes the object to a copy of the argument (a C string)\&.  Another factory method is the 
+.B
+sprintf:
+method which supports the options of the C library function, 
+.I
+sprintf()
+\&.
+.PP
+It\&'s possible to compare 
+.B
+String
+instances using the methods 
+.B
+compare:
+and 
+.B
+dictCompare:
+\&.  These methods return an integer which is less than, equal to, or greater than zero, if the receiver is less than, equal to, or greater than the argument object\&.
+.PP
+You can randomly access the characters in a string object using the 
+.B
+charAt:
+and 
+.B
+charAt:put:
+methods\&.  The latter method replaces the character at the indicated offset by a new character, and returns the old value\&.
+.PP
+Finally, using such methods as 
+.B
+toLower
+, 
+.B
+toUpper
+etc\&., instances can do various conversions on their contents\&.
+.SH Method types
+.PP 
+.B
+Creation
+.RS 3
+.br
+* new
+.br
+* new:
+.br
+* str:
+.br
+* chars:count:
+.br
+* sprintf:
+.br
+* copy
+.br
+* deepCopy
+.br
+* free
+.RE
+.PP 
+.B
+Comparison
+.RS 3
+.br
+* compare:
+.br
+* compareSTR:
+.br
+* hash
+.br
+* dictCompare:
+.br
+* isEqual:
+.br
+* isEqualSTR:
+.RE
+.PP 
+.B
+Interrogation
+.RS 3
+.br
+* size
+.br
+* charAt:
+.br
+* charAt:put:
+.RE
+.PP 
+.B
+Concatenation
+.RS 3
+.br
+* strcat:
+.br
+* concat:
+.br
+* concatSTR:
+.br
+* concatenateSTR:
+.br
+* at:insert:count:
+.br
+* at:insert:
+.br
+* deleteFrom:to:
+.br
+* assignSTR:
+.br
+* assignSTR:length:
+.RE
+.PP 
+.B
+Format Conversions
+.RS 3
+.br
+* asDouble
+.br
+* asInt
+.br
+* asLong
+.br
+* asSTR:maxSize:
+.br
+* str
+.br
+* strCopy
+.RE
+.PP 
+.B
+Conversions
+.RS 3
+.br
+* toLower
+.br
+* toUpper
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printOn:
+.RE
+.PP 
+.B
+Archiving
+.RS 3
+.br
+* fileOutOn:
+.br
+* fileInFrom:
+.RE
+.SH Methods
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+Creates an instance whose value is set to the empty string\&.
+.PP 
+new:
+.RS 1
++
+.B
+new
+:(unsigned)
+.I
+nChars
+.RE
+.PP
+Creates an instance whose value is set to the empty string, can hold at least 
+.I
+nChars
+without having to expand\&.
+.PP 
+str:
+.RS 1
++
+.B
+str
+:(STR)
+.I
+aString
+.RE
+.PP
+Creates an instance whose value is set to a copy of 
+.I
+aString
+\&.  If 
+.I
+aString
+is NULL, creates an instance whose value is set to the empty string\&. 
+.PP 
+chars:count:
+.RS 1
++
+.B
+chars
+:(STR)
+.I
+aString
+.B
+count
+:(int)
+.I
+n
+.RE
+.PP
+Creates an instance whose value is set to a copy of the 
+.I
+n
+first characters of 
+.I
+aString
+, and NULL-terminates the copy of characters\&.  The array of characters 
+.I
+aString
+doesn\&'t have to be NULL-terminated itself\&.  If 
+.I
+aString
+is NULL, the method creates an instance whose value is set to the empty string\&. 
+.PP 
+sprintf:
+.RS 1
++
+.B
+sprintf
+:(STR)
+.I
+format,\&.\&.\&.
+.RE
+.PP
+Returns a new instace initialized just as the standard C library 
+.I
+sprintf()
+\&.  See the documentation on 
+.I
+sprintf()
+for the formats and variable declarations\&.
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Returns a copy of the receiver with its internal C string copied as well\&.
+.PP
+.B
+See also:
+
+- strCopy
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+For this class, this method acts as 
+.B
+copy
+\&.
+.PP 
+free
+.RS 1
+-
+.B
+free
+.RE
+.PP
+Frees the receiver and its internal C string as well\&.
+.PP 
+compare:
+.RS 1
+- (
+int
+)
+.B
+compare
+:
+.I
+aStr
+.RE
+.PP
+Compares the receiver\&'s string to another instance of this class (or its subclasses)\&.  Comparison works by sending 
+.I
+aStr
+a 
+.B
+str
+message, and comparing the null terminated C strings\&.  Returns the comparison value (0 if the strings are equal)\&.
+.PP 
+compareSTR:
+.RS 1
+- (
+int
+)
+.B
+compareSTR
+:(STR)
+.I
+aString
+.RE
+.PP
+Compares the receiver\&'s string to 
+.I
+aString
+\&.  Returns the comparison value\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a hash value based upon the contents of the string held in the receiver\&.
+.PP 
+dictCompare:
+.RS 1
+- (
+int
+)
+.B
+dictCompare
+:
+.I
+aStr
+.RE
+.PP
+Compares the receiver\&'s string to another instance of this class, or its subclasses, according to 
+.I
+dictionary ordering
+, i\&.e\&., all characters other than letters and numbers are ignored and case is ignored\&.  Returns the comparison value\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+aStr
+.RE
+.PP
+Returns YES if the value contained by 
+.I
+aStr
+is equal to the contents of the receiver\&.
+.PP 
+isEqualSTR:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqualSTR
+:(STR)
+.I
+aString
+.RE
+.PP
+Returns YES if the ordinary C string 
+.I
+aString
+is equal to the contents of the receiver\&.
+.PP 
+size
+.RS 1
+- (
+unsigned
+)
+.B
+size
+.RE
+.PP
+Returns the number of actual characters in the string, excluding the NULL terminator\&.
+.PP 
+charAt:
+.RS 1
+- (
+char
+)
+.B
+charAt
+:(unsigned)
+.I
+anOffset
+.RE
+.PP
+Returns the character at 
+.I
+anOffset
+or 
+.B
+zero
+if 
+.I
+anOffset
+is greater than the length of the C string\&.
+.PP 
+charAt:put:
+.RS 1
+- (
+char
+)
+.B
+charAt
+:(unsigned)
+.I
+anOffset
+.B
+put
+:(char)
+.I
+aChar
+.RE
+.PP
+Replaces the character at 
+.I
+anOffset
+with 
+.I
+aChar
+and returns the old character which was in that location\&.  Returns 
+.B
+zero
+if 
+.I
+anOffset
+is greater than the length of the C string\&.
+.PP 
+strcat:
+.RS 1
+- (
+STR
+)
+.B
+strcat
+:(STR)
+.I
+aBuffer
+.RE
+.PP
+Concatenates the receiver\&'s C string to 
+.I
+aBuffer
+\&.  No length checking is possible to ensure that 
+.I
+aBuffer
+is large enough\&.  Returns 
+.I
+aBuffer
+\&.
+.PP 
+concat:
+.RS 1
+-
+.B
+concat
+:
+.I
+aString
+.RE
+.PP
+Concatenates 
+.I
+aString
+(any instance that responds to 
+.B
+str
+) to the end of the receiver\&.  Returns 
+.B
+self
+\&.
+.PP
+.B
+Note:
+
+Since version 3\&.2\&.10, this method works correctly when the argument is the same object as the receiver\&.
+.PP 
+concatSTR:
+.RS 1
+-
+.B
+concatSTR
+:(STR)
+.I
+aString
+.RE
+.PP
+Concatenates 
+.I
+aString
+, an ordinary C string, to the end of the receiver\&.  Returns 
+.B
+self
+\&.
+.PP 
+concatenateSTR:
+.RS 1
+-
+.B
+concatenateSTR
+:(STR)
+.I
+aString
+.RE
+.PP
+Same as concatSTR\&.  For Stepstone compatibility\&.
+.PP 
+at:insert:count:
+.RS 1
+-
+.B
+at
+:(unsigned)
+.I
+anOffset
+.B
+insert
+:(char*)
+.I
+aString
+.B
+count
+:(int)
+.I
+n
+.RE
+.PP 
+at:insert:
+.RS 1
+-
+.B
+at
+:(unsigned)
+.I
+anOffset
+.B
+insert
+:
+.I
+aString
+.RE
+.PP 
+deleteFrom:to:
+.RS 1
+-
+.B
+deleteFrom
+:(unsigned)
+.I
+p
+.B
+to
+:(unsigned)
+.I
+q
+.RE
+.PP 
+assignSTR:
+.RS 1
+-
+.B
+assignSTR
+:(STR)
+.I
+aString
+.RE
+.PP
+Copies the C string 
+.I
+aString
+into the receiver\&'s string\&.  Returns the receiver\&.
+.PP 
+assignSTR:length:
+.RS 1
+-
+.B
+assignSTR
+:(STR)
+.I
+aString
+.B
+length
+:(unsigned)
+.I
+nChars
+.RE
+.PP
+Copies the C string 
+.I
+aString
+into the receiver\&'s string, truncating at 
+.I
+nChars
+\&.  Returns the receiver\&.
+.PP 
+asDouble
+.RS 1
+- (
+double
+)
+.B
+asDouble
+.RE
+.PP
+Returns the double value of the C string, using the standard C function 
+.B
+atof()
+\&.
+.PP 
+asInt
+.RS 1
+- (
+int
+)
+.B
+asInt
+.RE
+.PP
+Returns the integer value of the C string, using the standard C function 
+.B
+atoi()
+\&.
+.PP 
+asLong
+.RS 1
+- (
+long
+)
+.B
+asLong
+.RE
+.PP
+Returns the long value of the C string, using the standard C function 
+.B
+atol()
+\&.
+.PP 
+asSTR:maxSize:
+.RS 1
+-
+.B
+asSTR
+:(STR)
+.I
+aBuffer
+.B
+maxSize
+:(int)
+.I
+aSize
+.RE
+.PP
+Copies the value of the object into 
+.I
+aBuffer
+, truncating at 
+.I
+aSize
+, and returns the receiver\&.
+.PP 
+str
+.RS 1
+- (
+STR
+)
+.B
+str
+.RE
+.PP
+Returns a pointer to the NULL-terminated C string stored in the receiver\&.
+.PP 
+strCopy
+.RS 1
+- (
+STR
+)
+.B
+strCopy
+.RE
+.PP
+Returns a 
+.B
+OC_MallocAtomic()
+\&'ed copy of the NULL-terminated C string stored in the receiver\&.  You are responsible for 
+.B
+OC_Free()
+\&'ing the pointer\&.
+.PP 
+toLower
+.RS 1
+-
+.B
+toLower
+.RE
+.PP
+Converts the receiver string to lower case\&.
+.PP 
+toUpper
+.RS 1
+-
+.B
+toUpper
+.RE
+.PP
+Converts the receiver string to upper case\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Prints the string to 
+.I
+aFile
+without appending a newline\&.  Returns the receiver\&.
+.PP 
+fileOutOn:
+.RS 1
+-
+.B
+fileOutOn
+:
+.I
+aFiler
+.RE
+.PP
+Writes the string on 
+.I
+aFiler
+\&.  Returns the receiver\&.
+.PP 
+fileInFrom:
+.RS 1
+-
+.B
+fileInFrom
+:
+.I
+aFiler
+.RE
+.PP
+Reads a string object from 
+.I
+aFiler
+\&.  Returns the receiver\&.

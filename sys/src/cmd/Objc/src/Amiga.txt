@@ -1,0 +1,12 @@
+
+There was a version for AmigaOS in 1997 or 1998 by Fred Fish,
+a developer notable for work on the GNU Debugger,
+and his series of Fish disks of freeware for the Amiga.
+
+That was for AmigaOS m68k.
+
+The compiler still works on AmigaOS for those interested:
+http://www.efeelin.com/2019/04/construire-le-compilateur-portable.html
+
+The latter is for AmigaOS 4 on PowerPC.
+

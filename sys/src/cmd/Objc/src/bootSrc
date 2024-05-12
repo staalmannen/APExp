@@ -1,0 +1,61 @@
+#!/bin/sh
+#
+# script to precompile compiler to C (bootstrap package)
+# $Id: bootSrc,v 1.47 2023/10/07 11:54:36 stes Exp $
+
+DST=/tmp/objc-bootstrap-3.3.41
+
+if test -f Makefile
+then
+  make distclean
+fi
+
+AR=true;export AR
+RANLIB=true;export RANLIB
+ac_cv_func_memset=no;export ac_cv_func_memset
+ac_cv_func_memcpy=no;export ac_cv_func_memcpy
+ac_cv_func_snprintf=no;export ac_cv_func_snprintf
+./configure --with-postlink --with-prefixed-names
+
+OBJCOPT='-C -traditional -traditional-cpp -noFwd -noFiler -postlink -init oc_objcInit -nostdinc -I../../util/ -T../../util/'
+export OBJCOPT
+
+(cd src/objcrt;make)
+(cd src/objpak;make)
+(cd src/oclib;make)
+(cd src/objc;make objc)
+(cd src/objc;make objc1)
+(cd src/objc;make postlink)
+
+test -d $DST || mkdir $DST
+test -d $DST/util || mkdir $DST/util
+cp config.h.in $DST
+cp src/objc/_prelink.c $DST
+cp src/objc/objc.in $DST
+cp src/objc/objc.com $DST
+cp util/BOOTSTRAP $DST
+cp License.txt $DST
+cp util/configure.in $DST
+cp util/ax_cc_tentdef.m4 $DST
+cp util/ax_cc_attrcommon.m4 $DST
+cp util/Makefile.in $DST
+cp util/Makefile.vms $DST
+cp util/config.sub $DST/util/
+cp util/config.guess $DST/util/
+cp util/install-sh $DST/util/
+cp util/_objc1.c $DST
+cp util/_plink.c $DST
+
+for f in util/*.i
+do
+  g=`basename $f .i`
+  mv util/$g.i $DST/$g.c
+done
+
+rm -f util/*.[Pi]
+make distclean
+
+# create configure from configure.in
+cd $DST; autoconf; rm -rf autom4te.cache
+
+

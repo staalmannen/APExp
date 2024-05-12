@@ -1,0 +1,443 @@
+
+/*
+ * VICI Objective-C Interpreter.  Copyright (c) 1999 David Stes.
+ *
+ * $Id: lex.lm,v 1.1.1.1 2000/06/07 21:09:26 stes Exp $
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published 
+ * by the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+ *
+ */
+
+%{
+#include "config.h"
+#include <assert.h>
+#ifndef __OBJECT_INCLUDED__
+#define __OBJECT_INCLUDED__
+#include <stdio.h> /* FILE */
+#include "Object.h" /* Stepstone Object.h assumes #import */
+#endif
+#include <ocstring.h>
+#include <symbol.h>
+#include <node.h>
+#include <stclass.h>
+#include <util.h>
+#include "yacc.h" /* include after util.h only */
+#include <type.h>
+#include <options.h>
+
+/* VICI commands */
+
+#include "cmd.h"
+#include "run.h"
+#include "load.h"
+#include "break.h"
+#include "args.h"
+#include "cflags.h"
+#include "shell.h"
+#include "quit.h"
+#include "make.h"
+#include "echo.h"
+#include "help.h"
+#include "list.h"
+#include "step.h"
+#include "next.h"
+#include "continue.h"
+#include "backtrace.h"
+
+#define YY_NEVER_INTERACTIVE 1
+
+extern id yylval;
+
+/* accept VICI commands if set */
+int cmdmode;
+
+int identif(void);
+int keyw(int x);
+int tkeyw(int x,id t);
+int gnukeyw(int x);
+int msdoskeyw(int x);
+int watcomkeyw(int x);
+int ibmvackeyw(int x);
+
+/* set to YES if '{' is beginning of an Objective-C Block */
+int okblock;
+
+%}
+
+%x VICI
+%x READLINE
+%x READARGS
+
+/* a decimal digit / exponent */
+DIGIT ([0-9])
+EXP ([Ee][+-]?[0-9]+)
+
+/* octal and hexademical constants */
+OCTDIGIT ([0-7])
+HEXDIGIT ([0-9a-fA-F])
+
+/* escape seq such as \' or \\ or \n */
+/* WATCOM does things like '\0x0d' instead of '\x0d' (as it should be) */
+ESCAPEOCT (\\{OCTDIGIT}{1,3})
+ESCAPEHEX (\\0?[xX]({HEXDIGIT}{1,3}))
+ESCAPECHAR (\\[0'"?abfnrtv\\])
+ESCAPESEQ ({ESCAPECHAR}|{ESCAPEOCT}|{ESCAPEHEX})
+
+/* stuff for being able to scan files Unix/Mac */
+RETURN ((\n)|(\r)|(\r\n))
+
+/* an escape seq or any char other than backslash, double quote or newline */
+CCHAR ({ESCAPESEQ}|[^\"\\\n\r])
+  
+/* SGI has extensions such as LUL as int.suffix */
+INTSUFFIX ([uUlL]{1,3})
+DBLSUFFIX ([fFlL]{1,3})
+
+%%
+
+%{
+   switch(cmdmode) {
+     case 0 : { BEGIN INITIAL;break; }
+     case 1 : { BEGIN VICI;cmdmode = 2;break; } /* goto dont set mode */
+     default : { break; }
+   }
+%}
+
+<READLINE>.*		{ BEGIN VICI; return keyw(stringcomp); }
+<READLINE>{RETURN}      { BEGIN VICI; inlineno++;yylval=nil;return stringcomp; }
+<READARGS>[ \t]+	{ ; }
+<READARGS>[^ \t\n\r]+	{ return keyw(stringcomp); }
+<READARGS>{RETURN}      { BEGIN VICI; inlineno++; }
+
+<VICI>#.*		{ ; /* VICI comment */ }
+<VICI>[ \t]+            { ; }
+<VICI>{RETURN}          { /* newline - keep track of lineno */ inlineno++; }
+<VICI>"set args"	{ BEGIN READARGS;yylval=[Args new];return visetargs; }
+<VICI>"set cflags"	{ BEGIN READLINE;yylval=[Cflags new];return visetcflags; }
+<VICI>load[ \t]*	{ BEGIN READLINE;yylval=[Load new];return viload; }
+<VICI>r|run		{ yylval=[Run new];return virun; }
+<VICI>p|pr|print	{ return keyw(viprint); }
+<VICI>(l|li|list)[ \t]*	{ BEGIN READLINE;yylval=[List new];return vilist; }
+<VICI>h|help		{ yylval=[Help new];return vihelp; }
+<VICI>(b|br|break)[ \t]* { BEGIN READLINE;yylval=[Break new];return vibreak; }
+<VICI>s|step		{ yylval=[Step new];return (vistep); }
+<VICI>n|next		{ yylval=[Next new];return (vinext); }
+<VICI>c|cont|continue	{ yylval=[Continue new];return (vicontinue); }
+<VICI>bt|backtrace	{ yylval=[Backtrace new];return (vibacktrace); }
+<VICI>(\!|shell)[ \t]*	{ BEGIN READLINE;yylval=[Shell new];return vishell; }
+<VICI>vi|view|ed|edit   { BEGIN READLINE;yylval=[[Shell new] edit];return vishell; }
+<VICI>echo[ \t]*	{ BEGIN READLINE;yylval=[Echo new];return viecho; }
+<VICI>make		{ yylval=[Make new];return (vimake); }
+<VICI>q|quit		{ yylval=[Quit new];return viquit; }
+<VICI>[A-Za-z_$][0-9A-Za-z_$]* { warn("\"%s\" is not a VICI command.  Try \"help\".",yytext); }
+
+"auto" 				{ return keyw(storageclass); }
+"break" 			{ return keyw(breakkeyw); }
+"case"				{ return keyw(casekeyw); }
+"char"				{ return keyw(typeword); }
+"continue"			{ return keyw(continuekeyw); }
+"default"			{ return keyw(defaultkeyw); }
+"do"				{ return keyw(dokeyw); }
+"double"			{ return keyw(typeword); }
+"else"				{ return keyw(elsekeyw); }
+"enum"				{ return keyw(enumkeyw); }
+"extern \"C\""			{ if (o_cplus) return keyw(externlang); }
+"extern \"C++\""	        { if (o_cplus) return keyw(externlang); }
+"extern"			{ return keyw(storageclass); }
+"float"				{ return keyw(typeword); }
+"for"				{ return keyw(forkeyw); }
+"goto"				{ return keyw(gotokeyw); }
+"if"				{ return keyw(ifkeyw); }
+"int"				{ return keyw(typeword); }
+"long"				{ return keyw(typeword); }
+"register"			{ return keyw(storageclass); }
+"return"			{ return keyw(returnkeyw); }
+"short"				{ return keyw(typeword); }
+"sizeof"			{ return keyw(sizeofop); }
+"static"			{ return keyw(storageclass); }
+"struct"			{ return keyw(structkeyw); }
+"switch"			{ return keyw(switchkeyw); }
+"typedef"			{ return keyw(storageclass); }
+"union"				{ return keyw(structkeyw); }
+"unsigned"			{ return keyw(typeword); }
+"void"				{ return keyw(typeword); }
+"while"				{ return keyw(whilekeyw); }
+
+"bool"				{ return (o_cplus)?keyw(typeword):identif();}
+"wchar_t"			{ return (o_cplus)?keyw(typeword):identif();}
+"__wchar_t"			{ return (o_cplus)?keyw(typeword):identif();}
+
+"const"				{ return keyw(typequal); }
+"signed"			{ return keyw(typeword); }
+"volatile"			{ return keyw(typequal); }
+
+"@defs"				{ return keyw(atdefs); }
+"@selector"			{ return keyw(atselector); }
+"@interface"			{ return keyw(atinterface); }
+"@implementation"		{ return keyw(atinterface); }
+"@end"				{ return keyw(atend); }
+"@encode"			{ return keyw(atencode); }
+"id"				{ return keyw(typeword); }
+"@requires"			{ return keyw(atrequires); }
+"@public"			{ warn("ignoring @public."); }
+"@protected"			{ warn("ignoring @protected."); }
+"@private"			{ warn("ignoring @private."); }
+
+"inline"			{ return keyw(storageclass); }
+
+"asm" { return (o_enableasm)?keyw(asmkeyw):identif(); }
+
+"__const__"		{ return gnukeyw(typequal); }
+"__volatile"		{ return gnukeyw(typequal); }
+"__volatile__"		{ return gnukeyw(typequal); }
+"__const"		{ return gnukeyw(typequal); }
+"__signed"		{ return gnukeyw(typeword); }
+"__signed__"		{ return gnukeyw(typeword); }
+"__unsigned"		{ return gnukeyw(typeword); }
+"__unsigned__"		{ return gnukeyw(typeword); }
+"__attribute__"		{ return gnukeyw(attributekeyw); }
+"__asm"			{ return keyw(asmkeyw); }
+"__asm__"		{ return keyw(asmkeyw); }
+"__inline__"		{ return keyw(storageclass); }
+"__inline"		{ return keyw(storageclass); }
+"__extension__"		{ return gnukeyw(gnuextension); }
+"__typeof"		{ return gnukeyw(typeofop); }
+"__restrict"		{ return gnukeyw(typequal); }
+"__restrict__"		{ return gnukeyw(typequal); }
+
+"__cdecl"		{ return msdoskeyw(typequal); }
+"__far"			{ return msdoskeyw(typequal); }
+"_far"			{ return msdoskeyw(typequal); }
+"far"			{ return msdoskeyw(typequal); }
+"__near"		{ return msdoskeyw(typequal); }
+"_near"			{ return msdoskeyw(typequal); }
+"pascal"		{ return msdoskeyw(typequal); }
+"_pascal"		{ return msdoskeyw(typequal); }
+"_stdcall"		{ return msdoskeyw(typequal); }
+"__stdcall"		{ return msdoskeyw(typequal); }
+"__export"		{ return msdoskeyw(typequal); }
+"__cpluspl"		{ return msdoskeyw(typequal); }
+"__based"		{ return msdoskeyw(typequal); }
+"__declspec"		{ return msdoskeyw(typequal); }
+"__fastcall"		{ return msdoskeyw(typequal); }
+
+"__long_long" {
+    /* SGI IRIX */
+    return (o_llkeyw)?keyw(typeword):identif();
+}
+
+"__int64"           {
+ /* WATCOM C 11 io.h */ 
+  return watcomkeyw(typeword); 
+}
+"__huge"		{ return watcomkeyw(typequal); }
+"__segment"		{ return watcomkeyw(typequal); }
+"__segname"		{ return watcomkeyw(typequal); }
+"__self"		{ return watcomkeyw(typequal); }
+"_Packed"		{ return watcomkeyw(typequal); }
+"__fortran"		{ return watcomkeyw(typequal); }
+"__interrupt"		{ return watcomkeyw(typequal); }
+"__loadds"		{ return watcomkeyw(typequal); }
+"__saveregs"		{ return watcomkeyw(typequal); }
+"__syscall"		{ return watcomkeyw(typequal); }
+"__far16"		{ return watcomkeyw(typequal); }
+"_Seg16"		{ return watcomkeyw(typequal); }
+__based\([^)]*\)	{ return watcomkeyw(typequal); }
+__pragma\([^)]*\)	{ return watcomkeyw(typequal); }
+__declspec\([^)]*\)	{ return watcomkeyw(typequal); }
+
+"_Optlink"              { return ibmvackeyw(typequal); }
+"_Builtin"              { return ibmvackeyw(typequal);}
+"_System"               { return ibmvackeyw(typequal);}
+
+"("			{
+  okblock=0; /* ({ }) GNU nest block */
+  return '(';
+}
+")"				{ return ')'; }
+"["				{ return '['; }
+"]"				{ return ']'; }
+"->"				{ return keyw(arrow); }
+"."				{ return '.'; }
+"!"				{ return '!'; }
+"~"				{ return '~'; }
+"++"				{ return keyw(plusplus); }
+"--"				{ return keyw(plusplus); }
+"*"				{ return '*'; }
+"/"				{ return '/'; }
+"%"				{ return '%'; }
+"+"				{ return '+'; }
+"-"				{ return '-'; }
+"<<"				{ return keyw(shift); }
+">>"				{ return keyw(shift); }
+"<"				{ return keyw(relop); }
+"<="				{ return keyw(relop); }
+">"				{ return keyw(relop); }
+">="				{ return keyw(relop); }
+"=="				{ return keyw(equalop); }
+"!="				{ return keyw(relop); }
+"&"				{ return '&'; }
+"^"				{ return '^'; }
+"|"				{ return '|'; }
+"&&"				{ return logand; }
+"||"				{ return logor; }
+"?"				{ return '?'; }
+":"				{ return ':'; }
+"="				{ return '='; }
+"+="				{ return keyw(assignop); }
+"-="				{ return keyw(assignop); }
+"*="				{ return keyw(assignop); }
+"/="				{ return keyw(assignop); }
+"%="				{ return keyw(assignop); }
+"&="				{ return keyw(assignop); }
+"|="				{ return keyw(assignop); }
+"^="				{ return keyw(assignop); }
+"<<="				{ return keyw(assignop); }
+">>="				{ return keyw(assignop); }
+","				{ return ','; }
+";"				{ return ';'; }
+"{" { return keyw((okblock)?(okblock=0,blockbegin):('{')); }
+"}"				{ return keyw('}'); }
+
+"..."				{ return keyw(ellipsis); }
+
+"=:"				{ return keyw(atend); /* ppi */ }
+
+[ \t]+	{ /* white space */; }
+
+{RETURN} { /* newline - keep track of lineno */ inlineno++; }
+
+"#"[^\n\r]*{RETURN}	{
+  /* line directives, such as #, #line, #pragma, #ident */
+  yylval = mkcppdirect(yytext);
+  if (yylval) { inlineno++;return cppdirect; }
+}
+
+\"{CCHAR}*\" {
+  return tkeyw(stringcomp,t_str);
+}
+
+"__FUNCTION__" {
+  return (o_gnu)?tkeyw(stringcomp,t_str):identif();
+}
+
+'({ESCAPESEQ}|[^'\\\n\r])*' {
+  /* note that we also allow '"' (" is not CCHAR) */
+  /* support Macintosh usage 'TEXT' or 'icm#' etc. */
+  return tkeyw(constant,t_char);
+}
+
+(0{OCTDIGIT}+){INTSUFFIX}? {
+  return tkeyw(constant,t_int);
+}
+
+(0[xX]{HEXDIGIT}+){INTSUFFIX}? {
+  return tkeyw(constant,t_int);
+}
+
+([0-9]+){INTSUFFIX}? {
+  return tkeyw(constant,t_int);
+}
+
+({DIGIT}+"."{DIGIT}*{EXP}?){DBLSUFFIX}? {
+  return tkeyw(constant,t_double);
+}
+
+({DIGIT}+{EXP}){DBLSUFFIX}? {
+  return tkeyw(constant,t_double);
+}
+
+({DIGIT}*"."{DIGIT}+{EXP}?){DBLSUFFIX}? {
+  return tkeyw(constant,t_double);
+}
+
+[A-Za-z_$][0-9A-Za-z_$]* {
+  return identif();
+}
+
+"//"[^\n\r]* {
+  /* accept and ignore bcpl style comment */;
+}
+
+. {
+    if (o_warnlex) {
+        char c = (yytext)[0];
+	warn("lex ignoring '0x%x' (%c)",(int)c,c);
+    }
+}
+
+%%
+
+/*
+ * Put this in the routines section rather than the definitions section.
+ * Old flex versions don't define 'yytext' before rules section.
+ */ 
+
+void yyerror(char* str)
+{
+  fatal("%s \"%s\"",str,yytext);
+}
+
+/* some flex defines it as 1 */
+
+#ifndef yywrap
+int yywrap() { return 1; }
+#endif
+
+int identif(void)
+{
+  yylval = [Symbol str:yytext lineno:inlineno filename:infilename];
+  if (isbuiltinfun(yylval)) return builtinfun;
+  if (istypeword(yylval)) return typeword;
+  return identifier;
+}
+
+int keyw(int x)
+{
+  if (x == storageclass || x == externlang || x == gnuextension) {
+    yylval = [Storageclass str:yytext lineno:inlineno filename:infilename];
+  } else {
+    yylval = [Symbol str:yytext lineno:inlineno filename:infilename];
+  }
+  return x;
+}
+
+int tkeyw(int x,id t)
+{
+  yylval = [Symbol str:yytext lineno:inlineno filename:infilename];
+  [yylval type:t];
+  return x;
+}
+
+int gnukeyw(int x)
+{
+  return (o_gnu)?keyw(x):identif();
+}
+
+int msdoskeyw(int x)
+{
+  return (o_msdos)?keyw(x):identif();
+}
+
+int watcomkeyw(int x)
+{
+  return (o_watcom)?keyw(x):identif();
+}
+
+int ibmvackeyw(int x)
+{
+  return (o_ibmvac)?keyw(x):identif();
+}
+

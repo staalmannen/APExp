@@ -1,0 +1,2649 @@
+'-----------------------------------------------------------------------------------------------------------------------------------
+'
+' --= An FLTK based graphical user interface for the BaCon BASIC-to-C converter =--
+'
+' Peter van Eerten - August 2017 - March 2024. License: MIT License.
+'
+' Terminal execution string suggestions ('@' means the program and its arguments):
+'
+'	(1) xterm -sb -geometry 132x40 -e '@; read x'
+'	(2) rxvt -geometry 132x40 -e /bin/bash -c '@; read'
+'	(3) gnome-terminal --geometry 132x40 -e "/bin/bash -c '@; read'"
+'	(4) lxterminal --geometry=80x20 --command="/bin/bash -c 'time @; read'"
+'	(5) konsole --noclose --vt_sz 80x25 -e @
+'	(6) xfce4-terminal --geometry 132x40 -e "/bin/bash -c '@; read'"
+'	(7) MacOSX: mrxvt -hold 1 -e @
+'	(8) MacOSX: open @
+'-----------------------------------------------------------------------------------------------------------------------------------
+
+PRAGMA INCLUDE <FL/Fl.H> <FL/Fl_Double_Window.H> <FL/Fl_Text_Editor.H> <FL/Fl_Menu_Bar.H> <FL/Fl_Tabs.H> <FL/Fl_PNG_Image.H> <FL/Fl_Tooltip.H> <FL/Fl_Choice.H>
+PRAGMA INCLUDE <FL/Fl_File_Chooser.H> <FL/fl_ask.H> <FL/Fl_Box.H> <FL/Fl_Input.H> <FL/Fl_Check_Button.H> <FL/Fl_Button.H> <FL/Fl_Spinner.H> <FL/Fl_Menu_Button.H>
+PRAGMA INCLUDE <FL/Fl_Color_Chooser.H> <FL/Fl_Text_Display.H> <FL/Fl_Radio_Round_Button.H> <FL/Fl_Help_Dialog.H> <FL/Fl_Scroll.H> <FL/Fl_Multiline_Output.H> <FL/Fl_Pack.H>
+PRAGMA LDFLAGS -lfltk -lfltk_images
+PRAGMA OPTIONS -Wno-write-strings -Wno-pointer-arith
+
+OPTION PARSE FALSE
+
+OPTION COLLAPSE TRUE
+
+DEF FN NrDig(x) = LEN(STR$(x))+1
+
+CONST FontSize = 14
+
+' The notebook can have maximum pages
+CONST MAXPAGES = 64
+
+CONST DEFTITLE$ = "BaConGUI"
+
+CONST CONFIG$ = GETENVIRON$("HOME") & "/.bacon/settings_fltk.cfg"
+CONST TEXTDOC$ = GETENVIRON$("HOME") & "/.bacon/documentation.txt"
+CONST HTMLDOC$ = GETENVIRON$("HOME") & "/.bacon/documentation.html"
+CONST HTMLFRAME$ = GETENVIRON$("HOME") & "/.bacon/doc_frame.html"
+CONST HTMLIDX$ = GETENVIRON$("HOME") & "/.bacon/doc_index.html"
+
+' Hold widgets for the notebook
+RECORD nbook[MAXPAGES]
+	LOCAL text_buf, stylebuf TYPE Fl_Text_Buffer*
+	LOCAL edit TYPE Fl_Text_Editor*
+	LOCAL grp TYPE Fl_Group*
+	LOCAL syntax_start, linenr_digits
+	LOCAL file$
+END RECORD
+
+' Few global vars to administrate GUI
+RECORD BaconGui
+	LOCAL win, convert, srch, execute, progress, fsize, info, scratch, print TYPE Fl_Double_Window*
+	LOCAL documentation TYPE Fl_Help_Dialog*
+	LOCAL menu TYPE Fl_Menu_Bar*
+	LOCAL notebook TYPE Fl_Tabs*
+	LOCAL input_1, input_2, input_3, input_4, input_5, input_7, input_8, input_9, input_10 TYPE Fl_Input*
+	LOCAL check_2, check_3, check_4, check_5, check_6, check_9, check_10, pfmt5 TYPE Fl_Check_Button*
+	LOCAL check_7, check_8, pfmt1, pfmt2, pfmt3, pfmt4 TYPE Fl_Radio_Round_Button*
+	LOCAL exec_button, conv_button TYPE Fl_Return_Button*
+	LOCAL pages, xsize, ysize, ssize, show_info TYPE int
+	LOCAL box TYPE Fl_Box*
+	LOCAL icon TYPE Fl_PNG_Image*
+	LOCAL spinner TYPE Fl_Spinner*
+	LOCAL scroll TYPE Fl_Scroll*
+	LOCAL itxt TYPE Fl_Multiline_Output*
+	LOCAL sibuffer TYPE Fl_Text_Buffer*
+	LOCAL siedit TYPE Fl_Text_Editor*
+	LOCAL plist TYPE Fl_Choice*
+ENDRECORD
+
+' --------------------------------------------------------------------------------------------------
+
+CONST code_keyword$ = " ADD ALARM ALIAS APPEND APPENDING ARRAY AS ASSOC BACONLIB BACK BAPPEND BASE BG BLACK BLINK BLUE BOLD BREAK BROADCAST " \
+	"BSAVE BY CALL CASE CATCH CERTIFICATE CHANGEDIR CHUNK CLASS CLEAR CLOSE CMODE COLLAPSE COLOR CONST COMPARE COMPILER CONTINUE COPY " \
+	"CURRENT CURSOR CYAN DATA DECLARE DOWNTO DECR DEFAULT DEF DELETE DEVICE DIRECTORY DO DOWN ELIF ELSE ENDFUNC ENDFUNCTION ENDRECORD TREE " \
+	"ENDIF END ENDCLASS ENDSELECT ENDSUB ENDUSEC ENDUSEH ENDENUM ENDWITH ENUM EPRINT EQ EXIT FG FI FILE LDFLAGS FN FOR FORMAT COLLECT " \
+	"FORWARD FREE FROM FUNC FUNCTION GE GETBYTE FRAMEWORK FTYPE GETFILE GETLINE GLOBAL GOSUB GOTO GOTOXY GREEN GT GUI IF IMODE IMPORT " \
+	"IN INCLUDE INCR INPUT INTENSE INTERNATIONAL QUOTED INVERSE IS ISNOT ITALIC JOIN LABEL LE LET LIBRARY LMODE LOCAL LOOKUP " \
+	"LT MAGENTA MAKEDIR MAP MEMREWIND MEMSTREAM MEMTYPE MULTICAST NE NETWORK NEXT NO_C_ESC NODE NORMAL OFF OFFSET OMODE ON OPEN OPTION " \
+	"OPTIONS OTHER PARSE POKE PRAGMA PRINT PRIORITY PROTO PULL PUSH ENDFORK PUTBYTE PUTLINE READING READ READLN READWRITE RECEIVE " \
+	"RECORD RECURSIVE RED REDIM RELATE REM RENAME REPEAT RESET DELIM RESIZE RESTORE RESUME RETURN REWIND RUN SCROLL SCTP " \
+	"SEED SEEK SELECT SEND SERVER SETENVIRON SET SETSERIAL SIZE SLEEP SOCKET SORT SPEED SPLIT START STARTPOINT STEP STOP STRIKE SUB " \
+	"SWAP SYSTEM TCP TEXTDOMAIN THEN TLS TO TRACE TRAP TYPE UDP SAVE UNDERLINE UNSET UNTIL UP USEC USEH UTF8 VAR VARTYPE WEND WHENCE WHILE " \
+	"WHITE WITH WRITELN WRITING YELLOW MONITOR SIGNAL DOTIMES DONE STATIC RE DQ ESC EXPLICIT PROPER SCREEN "
+
+CONST code_func$ = " ABS ACCEPT ACOS ADDRESS AND ASC ASIN ATN ATN2 BIT BLOAD CEIL CMDLINE COLUMNS COS COUNT DAY DEC DEG EDITBOM$ ENDFILE EQUAL EVEN EXP FIND " \
+	"FILEEXISTS FILELEN FILETIME FILETYPE FLOOR FORK FP GETKEY GETX GETY GUIFN GUIDEFINE GUIGET GUISET GUIWIDGET HOUR IIF INSTR INSTRREV INT INVERT ISFALSE ISKEY ISTRUE " \
+	"SUM SUMF BETWEEN BEYOND EXCL LEN LOG MAX MAXNUM MEMORY MEMTELL MIN MINUTE MOD MONTH MYPID NANOTIMER NOT NOW ODD OR PEEK POW RAD RANDOM REAP REGEX RND ROL ROR NRKEYS HASH LOOP " \
+	"ROUND ROWS SEARCH SECOND MEMCHECK SGN SIN SIZEOF SQR TAN TALLY TELL TIMER TIMEVALUE UCS ULEN VAL VERIFY WAIT WEEK YEAR AMOUNT EVAL ISUTF8 UBOUND INDEX TOTAL " \
+	"ISTOKEN BYTELEN ISASCII MATCH BASENAME$ CA$ CN$ CHOP$ CHR$ CIPHER$ CONCAT$ CURDIR$ DIRNAME$ ERR$ EXEC$ EXTRACT$ FILL$ GETENVIRON$ GETPEER$ B64ENC$ INDEX$ " \
+	"HEX$ HOST$ HOSTNAME$ IIF$ INTL$ LCASE$ LEFT$ MAX$ MID$ MIN$ MONTH$ NNTL$ OS$ REALPATH$ REPLACE$ REVERSE$ RIGHT$ RUN$ B64DEC$ TOASCII$ COIL$ ESCAPE$ WHERE " \
+	"SPC$ STR$ TAB$ TYPEOF$ UCASE$ WEEKDAY$ INBETWEEN$ TOKEN$ LOAD$ OUTBETWEEN$ FLATTEN$ INSERT$ BIN$ EXCHANGE$ CHANGE$ OBTAIN$ WALK$ HASBOM HASDELIM UNESCAPE$ " \
+	"UNFLATTEN$ UNIQ$ SORT$ REV$ DELIM$ HEAD$ TAIL$ APPEND$ DEL$ CUT$ ALIGN$ UTF8$ PROPER$ ROTATE$ LAST$ FIRST$ ME$ EXPLODE$ MERGE$ RIP$ LOOP$ COLLAPSE$ GUIEVENT$ "
+
+CONST code_api$ = " BACKEND WINDOW FULLSCREEN PIXEL LINE SQUARE CIRCLE ARC TRIANGLE POLYGON QBEZIER CBEZIER PAINT TEXT GETINK " \
+	"FLIP GRID INK PEN ROTATION SCALE MOVE SYNC QUIT CLS CALLBACK WAITKEY PENUP PENDOWN PENXY PENTYPE TURNRIGHT TURN TURNLEFT " \
+	"RESETANGLE DRAW LOADFONT MOUSE WIDTH HEIGHT REFRESH INIT HUGLIB$ HUGOPTIONS QUIT HIDE SHOW GRAB$ GET NOTEBOOK BUTTON STOCK " \
+	"TOGGLE CHECK RADIO ENTRY PASSWORD MARK COMBO HSEPARATOR VSEPARATOR FRAME EDIT LIST MSGDIALOG FILEDIALOG SPIN HSLIDER VSLIDER SLIDER " \
+	"IMAGE REGISTER METHOD CANVAS CLIPBOARD PROGRESSBAR CALLBACKX OUT PICTURE GETCOLOR$ ATTACH TIMEOUT FONT DISABLE ENABLE FOCUS " \
+	"UNFOCUS SCREENSIZE KEY RESETKEY DISPLAY PROPERTY GETPROPERTY SETPROPERTY FRAMES DELAY SEPARATOR REMOVE FONTALIGN TEXTLEN OUTLINE "
+
+CONST code_var$ = " FALSE TRUE PI MAXRANDOM RETVAL REGLEN ERROR LINENO SP NL$ CR$ EL$ CL$ DLE$ VERSION$ ARGUMENT$ SOURCE$ NULL "
+
+CONST code_type$ = " NUMBER STRING FLOATING FILE int double float long char short void signed unsigned static " \
+	"volatile const struct extern public private virtual "
+
+' Embedded icon - vovchik
+DECLARE BaCon48[] = { \
+	"48 48 256 2 ", "   c #010101", ".  c #1A0E13", "X  c #181517", "o  c #140F0E", "O  c #230C0C", "+  c #2B0C08", "@  c #360A07", \
+	"#  c #2A1309", "$  c #34140B", "%  c #3B1609", "&  c #27191A", "*  c #371715", "=  c #200F12", "-  c #37231E", ";  c #2C241E", \
+	":  c #171A27", ">  c #0E1B25", ",  c #381E21", "<  c #19232A", "1  c #192936", "2  c #1B323C", "3  c #152B2E", "4  c #292528", \
+	"5  c #382827", "6  c #272B32", "7  c #2B3439", "8  c #363636", "9  c #3D3025", "0  c #450B01", "q  c #4C0D00", "w  c #480501", \
+	"e  c #530D01", "r  c #5B0C00", "t  c #540902", "y  c #491807", "u  c #5D1101", "i  c #551605", "p  c #481C14", "a  c #5D1C12", \
+	"s  c #640D00", "d  c #6B0E00", "f  c #640500", "g  c #740E00", "h  c #780D00", "j  c #631300", "k  c #6C1301", "l  c #691A09", \
+	"z  c #741401", "x  c #7C1400", "c  c #791B01", "v  c #5D290D", "b  c #482317", "n  c #572717", "m  c #4F3018", "M  c #52351A", \
+	"N  c #692508", "B  c #7C2C08", "V  c #7F310C", "C  c #65361A", "Z  c #7C3F18", "A  c #712E10", "S  c #432A23", "D  c #4B362A", \
+	"F  c #463C37", "G  c #583426", "H  c #663A28", "J  c #71441F", "K  c #4E4837", "L  c #6A4728", "P  c #754824", "I  c #79512B", \
+	"U  c #745835", "Y  c #1B3C4C", "T  c #1F3C53", "R  c #2A3D4E", "E  c #243947", "W  c #343E4B", "Q  c #1D454E", "!  c #36444D", \
+	"~  c #2E4854", "^  c #374B56", "/  c #3A5159", "(  c #2E4E46", ")  c #464646", "_  c #504944", "`  c #595757", "'  c #4F5251", \
+	"]  c #735F56", "[  c #68584D", "{  c #6A644C", "}  c #636256", "|  c #776544", " . c #495861", ".. c #555F64", "X. c #566468", \
+	"o. c #786E65", "O. c #6D6E6E", "+. c #890B00", "@. c #841300", "#. c #8C1500", "$. c #841B02", "%. c #8B1B00", "&. c #921300", \
+	"*. c #9A1500", "=. c #931B00", "-. c #9B1B00", ";. c #A41B00", ":. c #AB1D00", ">. c #A51600", ",. c #B41C00", "<. c #BA1E00", \
+	"1. c #BA1500", "2. c #862804", "3. c #9B2402", "4. c #982806", "5. c #88360C", "6. c #943B0B", "7. c #973307", "8. c #8E3512", \
+	"9. c #AC2301", "0. c #A72902", "q. c #B42400", "w. c #BC2200", "e. c #B52900", "r. c #BB2B01", "t. c #A73606", "y. c #B73606", \
+	"u. c #AB3E12", "i. c #C21F00", "p. c #C22500", "a. c #CB2401", "s. c #C42A00", "d. c #CB2C00", "f. c #D22D00", "g. c #D02700", \
+	"h. c #CC3401", "j. c #C83704", "k. c #D43300", "l. c #D33B02", "z. c #D63605", "x. c #94420F", "c. c #9E4511", "v. c #964816", \
+	"b. c #8E4818", "n. c #A64718", "m. c #B74A1A", "M. c #B84711", "N. c #9C4D22", "B. c #885A2B", "V. c #9A5626", "C. c #8A5D34", \
+	"Z. c #834D20", "A. c #AB4B20", "S. c #A6592A", "D. c #B75524", "F. c #A45C34", "G. c #896233", "H. c #9A6536", "J. c #91622D", \
+	"K. c #A96D3D", "L. c #BE733B", "P. c #A1733A", "I. c #CC470D", "U. c #D3440B", "Y. c #CC4D14", "T. c #C44A16", "R. c #D34B15", \
+	"E. c #C8581E", "W. c #D2531B", "Q. c #C85D24", "!. c #D45622", "~. c #C8642D", "^. c #CC6A32", "/. c #C76C3A", "(. c #D36A33", \
+	"). c #D36730", "_. c #C9773C", "`. c #D1733D", "'. c #C9692B", "]. c #845F54", "[. c #886E47", "{. c #89714E", "}. c #B87B46", \
+	"|. c #867C72", " X c #C77C47", ".X c #D17B44", "XX c #D37846", "oX c #7A8378", "OX c #A7804D", "+X c #BD8958", "@X c #B68551", \
+	"#X c #888578", "$X c #8C816E", "%X c #AD9664", "&X c #C4844D", "*X c #CC8649", "=X c #D38C4C", "-X c #D1834C", ";X c #C88A55", \
+	":X c #D48854", ">X c #D69558", ",X c #CE9257", "<X c #D8A25D", "1X c #D49461", "2X c #D39A62", "3X c #DA9D68", "4X c #CC9061", \
+	"5X c #D4A163", "6X c #DAA36B", "7X c #D9A769", "8X c #CAAB78", "9X c #DBAD76", "0X c #DDB576", "qX c #D7B06D", "wX c #E2B879", \
+	"eX c #E2AC6E", "rX c #E9C67A", "tX c #7B8080", "yX c #949390", "uX c #A69C92", "iX c #AEA597", "pX c #B6B8B6", "aX c #B3AEA6", \
+	"sX c #CDB38F", "dX c #E4BC82", "fX c #C2B7A9", "gX c #D8C487", "hX c #D7C892", "jX c #E5C984", "kX c #E9CC8B", "lX c #E7C687", \
+	"zX c #E6D28B", "xX c #EBD48E", "cX c #EAD78C", "vX c #E4C792", "bX c #EBD693", "nX c #EBDA94", "mX c #EDDA9C", "MX c #E9D599", \
+	"NX c #F0D893", "BX c #C6C6BF", "VX c #ECDBA2", "CX c #ECDEA8", "ZX c #EDE1A4", "AX c #EBE297", "SX c #CBCAC8", "DX c #D8D8D5", \
+	"FX c #D9D0C7", "GX c #E0E1D9", "HX c #EBEBEA", "JX c #E8E6E3", "KX c #F2F1EB", "LX c #F6F6F5", "PX c #FAFBFA", "IX c #F8F7F9", \
+	"UX c None", \
+	"UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUX~ T Q UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXE 1 : o X X O # + o X > > 2 ~ UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUXUXUXUX/ E < . $ y y y q e v J I J v e t @ = < ~ UXUXUXUXUXUXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUXUX^ < O @ 0 C I C.J.Z.x @.$.Z.}.}.}.F.2.@.@.d % 6 UXUXUXUXUXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUX2 O q r g g b.OX+X&X;X}.4.;.9.D.2X3X2X,XA.>.<.:.k 5 ^ UXUXUXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUX1 @ f h &.;.:.-.A.9X0X0XwX2Xy.i.e./.jXlXlXdX/.e.d.d.&.b ^ UXUXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUX: w g %.&.*.9.p.p.e._.zXkXxXxX>Xr.d.y.=XxXxXbXlX~.s.k.z.%.4 UXUXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUX1 w x #.=.:.q.:.s.k.f.r.>XnXMXNXxX(.g.f.Y.wXNXNXnXdXQ.y.2.l = 2 UXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXE @ x @.r q j 9.s.w.h.k.k.T.jXNXNXNXrXE.l.U..XnXMXMXMXOXD yXSXpXo.! UXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUX: g #.r 0 0 q d r.s.d.k.z.k.*X%X{.[.8X6X!.).`.lXAXmXhX{ SXPXIXPXKXuX/ UXUXUXUXUXUXUX", \
+	"UXUXUXUXUXR % *.z 0 q q e u =.g.s.k.U.y.v |.aXiXo.[.*X:X-X6XZXCX{.uXPXIXIXIXIXKXoXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUX1 k :.d e u j j k @.w.j.U.Y.C aXPXPXPXLXuXU :X,X1XVXMXK FXPXPXHXDXHXPXSX/ UXUXUXUXUXUX", \
+	"UXUXUXUXUX3 %.:.k j k z z x x ;.h.I.b.#XPXPXPXPXPXLX|.K.5X1XvXhX) HXPXGX) . 8 pXJXX.UXUXUXUXUXUX", \
+	"UXUXUXUXUX6 -.q.x x x x @.@.@.*.h.M.A fXPXPXLXJXLXPXFXU 6X2X9XsX_ HXPX#X  ) { W GXO.UXUXUXUXUXUX", \
+	"UXUXUXUXUX6 =.w.@.@.#.%.%.#.=.*.w.M.n FXPXHX} = _ DXLX[ 4X6X6XdXL SXLX}   4 K . aX..UXUXUXUXUXUX", \
+	"UXUXUXUXUX7 #.p.&.&.$.l t y , b 3.y.M FXPXyX  9 { ` HX] ;X<X2XzX[.tXIX#X      o yX^ UXUXUXUXUXUX", \
+	"UXUXUXUXUX! l <.@.p 3 E /  .X.) $.j.M pXPX`   < _ X SX' ;X2X2XkX8XK pXDX;     F ` T UXUXUXUXUXUX", \
+	"UXUXUXUXUXUX7 * : Y UXUXUXUXUX! l l.b.o.LXoX      o aX| :X:X,XdXMX@XF yXpXO.[ K > ^ UXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXR a k.n.m iXSX;     F #X%X:X:X:X9XmXzX%XL 9 D M 5.5 UXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXY v l.I.V.S uXiX_ _ ] | vXXX`.(.3XNXnXxXwX&Xn.T.I.G R UXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXQ v l.Y.`.V.b D ( D ].vXkXE.W.R.=XAXnXnXcX=Xj.l.s.n R UXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXQ n U.R.).(.E.N.+XqXbXbXdXI.z.k.=XnXnXcXbX=Xh.z.w.b UXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXY A l.I.W.!.R.Q.cXNXnXMXwXj.z.h.=XnXnXnXxX Xp.d.;.4 UXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUXUXUXUXUX..7 4.k.h.l.l.l.E.cXnXnXcX3Xa.k.s.=XnXcXcXwXQ.1.<.c 2 UXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXW 5 b n b , E / S r.s.h.z.k.k.Q.MXbXcXzX Xa.f.r.2XxXjXgX5X4.>.*.a R UXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXb 3.s.s.s.:.c p $.s.w.h.k.k.s.&XzXkXlXjXM.p.d.y.6XqX1X>XS.@.@.d & UXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXE %.d.q.=.%.=.;.;.:.:.:.w.w.<.t.2X7X7X6X X:.<.q.n.1X&X&XH.l s 0 & ! UXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUX, 1.;.h s u r u k k @.&.;.;.4.N.&X&X&X}.8.*.*.%.V.K.H.B.n @ = 1 / UXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUX~ a <.#.z z j j l N v r s d j N C.G.G.B.A j g k a P C v % . 1 / ....UXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXR l :.@.@.x x z B B V B A N j r q i i y q q t t t e s f & ~  ./ 6 * 2 UXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXE $.:.@.@.#.@.2.x.6.6.x.x.6.2.x z z B V 2.2.5.2.x x x g * : - l -.,.N 2 UXUXUXUXUXUXUX", \
+	"UXUXUXUXUX5 %.:.@.%.#.@.5.v.c.7.4.7.6.6.$.x x 2.x.x.v.x.x.2.+.+.&.c %.<.d.w.p.:.- UXUXUXUXUXUXUX", \
+	"UXUXUXUXUX* =.;.%.#.&.@.7.N.c.0.p.p.e.9.*.0.4.4.7.7.4.3.3.7.D. X<XqX=X0.<.a.h.h.G R UXUXUXUXUXUX", \
+	"UXUXUXUXUX* @.9.#.=.#.#.x.c.c.0.p.e.p.p.9.`.eX7X7X3XD.q.r.m.<X>X'.E._.^.g.U.Q.`.H E UXUXUXUXUXUX", \
+	"UXUXUXUXUX- x :.&.#.&.#.7.c.v.t.p.e.s.s.e.t.E.m.D.D.m.:.:.9./.7X0XjXAXwXQ.XX-X XH R UXUXUXUXUXUX", \
+	"UXUXUXUXUXF c <.&.#.#.&.$.x.v.t.a.r.k.f.k.Q.jXzXxXnXnX^.k.l.<XAXAXnXNXdXXXXXXX~.n UXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXl w.-.@.@.@.@.2.x.t.d.j.W.!.W._.nXnXbXNXMX>X^.(.eXCXmXmXmXwX!.!.W.y.5 UXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXn 9.<.x x x h x c t.h.E.-X-X X5XZXVXmXVXCX3X-X:XgXCXVXmXnX>Xl.l.f.$.7 UXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXS %.<.#.k k d j g q.h.W.(.`.).eXmXmXmXVXVX>XXXXXlXmXnXMXjXD.a.d.<.p UXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXF u :.3.j e e r @.r.s.U.U.U.Y.wXnXnXnXMXkX~.W.'.kXxXxXkX2X0.<.,.g 8 UXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUX9 d :.#.j u z :.e.p.k.h.h.T.lXjXzXzXcX:Xp.g.^.zXlXwX2Xn.;.;.h 5 UXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUX& t &.*.>.:.:.;.<.w.w.0. X0X7XqXqX5Xn.<.t.&X1X,X;XN.@.x t 5 UXUXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUX8 @ s x @.#.;.:.9.3.c.&X;X+X&X&XN.#.&.v.}.K.H.P i w @ 6 UXUXUXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUX` 8 $ 0 q s x x c Z.J.B.B.G.Z j k N P L m % + O & ) UXUXUXUXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUXUXUXUX8 5 5 * $ $ $ # # $ % + + + & - 8 6 8 UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUX8 F UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUX", \
+	"UXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUXUX"} TYPE static char*
+
+' Toolbar icons 16x16 from the Tango project at http://tango.freedesktop.org/ - all freeware
+DECLARE new_xpm[] = { \
+	"16 16 59 1", \
+	" 	c None", \
+	".	c #9E9E9E","+	c #818181","@	c #8C8C7C","#	c #9F9F72","$	c #AFAE6A","%	c #EDE436","&	c #FFFFFF","*	c #F2EE9B", \
+	"=	c #F7F069","-	c #FAF24D",";	c #F7EF46",">	c #F4EB28",",	c #ECECEC","'	c #EAEAEA",")	c #EBEBEB","!	c #F0EDB4", \
+	"~	c #F7F06A","{	c #FCF43A","]	c #FDF668","^	c #FDF66A","/	c #FBF23C","(	c #F9EF1E","_	c #F2EE9C",":	c #FAF24E", \
+	"<	c #FDF667","[	c #FEFAB5","}	c #FEFAB8","|	c #FDF56B","1	c #FAEF22","2	c #F3EF9B","3	c #FEFABB","4	c #FEFBBF", \
+	"5	c #FDF66E","6	c #FAF022","7	c #EDEDED","8	c #F1EEB1","9	c #F8F167","0	c #FDF440","a	c #FDF771","b	c #FDF772", \
+	"c	c #FCF343","d	c #F6EC24","e	c #EFEEE0","f	c #F4EF96","g	c #F8F163","h	c #FBF346","i	c #FBF345","j	c #F7EF5D", \
+	"k	c #EEEEEE","l	c #EEEEE2","m	c #F3F0B1","n	c #F5F092","o	c #F5F09A","p	c #969677","q	c #EFEFEF","r	c #F0F0F0", \
+	"s	c #F1F1F1","t	c #F2F2F2", \
+	".++++++++@#$%   ", \
+	"+&&&&&&&&*=-;>  ", \
+	"+&,'')))!~{]^/( ", \
+	"+&'')),,_:<[}|1 ", \
+	"+&')),,,2:^3456 ", \
+	"+&)),,,7890abcd ", \
+	"+&)),,77efghij  ", \
+	"+&),,77kklmnop  ", \
+	"+&,,77kkqqqr&+  ", \
+	"+&,,77kkqqrr&+  ", \
+	"+&,7kkqqrsss&+  ", \
+	"+&77kkqrrsst&+  ", \
+	"+&77kqqrrstt&+  ", \
+	"+&&&&&&&&&&&&+  ", \
+	".++++++++++++.  ", \
+	"                "} TYPE static char*
+
+DECLARE open_xpm[] = { \
+	"16 16 137 2", \
+	"  	c None", \
+	". 	c #565854","+ 	c #575955","@ 	c #595B57","# 	c #5A5C58","$ 	c #5F615D","% 	c #7A7A7A","& 	c #797979","* 	c #F7F7F7", \
+	"= 	c #F9F9F9","- 	c #FAFAFA","; 	c #FBFBFB","> 	c #FCFCFC",", 	c #A2A3A2","' 	c #5B5C58",") 	c #787878","! 	c #C9C9C9", \
+	"~ 	c #C7C7C7","{ 	c #C4C4C4","] 	c #555753","^ 	c #DADADA","/ 	c #D3D3D3","( 	c #D2D2D2","_ 	c #CFCFCF",": 	c #CDCDCD", \
+	"< 	c #FEFEFE","[ 	c #939392","} 	c #5B5E5A","| 	c #737373","1 	c #C5C5C5","2 	c #B0B0B0","3 	c #ACACAC","4 	c #DCDCDC", \
+	"5 	c #9C9D9C","6 	c #D5D5D4","7 	c #FDFDFD","8 	c #969796","9 	c #5B5D59","0 	c #6E6E6E","a 	c #C1C1C0","b 	c #AAAAAA", \
+	"c 	c #E2E2E2","d 	c #DFDFDF","e 	c #DEDEDE","f 	c #DDDDDD","g 	c #E0E0E0","h 	c #E9E9E9","i 	c #E5E5E5","j 	c #D0D0D0", \
+	"k 	c #5D5F5B","l 	c #6A6A6A","m 	c #BDBDBD","n 	c #A9A9A9","o 	c #A5A5A5","p 	c #E6E6E6","q 	c #9FA09E","r 	c #9C9D9B", \
+	"s 	c #E3E3E3","t 	c #D0D1D0","u 	c #656565","v 	c #B7B7B7","w 	c #A6A6A6","x 	c #A1A1A1","y 	c #EBEBEB","z 	c #EAEAEA", \
+	"A 	c #E8E8E8","B 	c #E7E7E7","C 	c #D9D9D9","D 	c #5B5C59","E 	c #5F5F5F","F 	c #B3B3B3","G 	c #406CA5","H 	c #3868A5", \
+	"I 	c #3768A5","J 	c #3666A5","K 	c #3566A5","L 	c #3566A4","M 	c #3465A4","N 	c #3767A6","O 	c #5B5B5B","P 	c #AEAEAE", \
+	"Q 	c #C0D5EA","R 	c #C1D5EA","S 	c #C1D6EA","T 	c #BBD2E8","U 	c #3465A5","V 	c #565656","W 	c #C3D6EA","X 	c #92B5DB", \
+	"Y 	c #95B8DC","Z 	c #B9D0E7","` 	c #3466A4"," .	c #515151","..	c #A5A5A4","+.	c #3666A4","@.	c #C5D7EB","#.	c #98B9DD", \
+	"$.	c #95B7DC","%.	c #B8CEE7","&.	c #4C4C4C","*.	c #3767A5","=.	c #BFD2E9","-.	c #9BBADD",";.	c #9ABADD",">.	c #96B7DC", \
+	",.	c #8FB2DA","'.	c #8BB0D8",").	c #B1C9E4","!.	c #484848","~.	c #9B9B9B","{.	c #A5C1E1","].	c #8EB2D9","^.	c #8AAFD8", \
+	"/.	c #85ACD7","(.	c #83AAD6","_.	c #81A9D5",":.	c #7EA7D4","<.	c #79A3D3","[.	c #77A2D2","}.	c #7BA5D3","|.	c #95B6DB", \
+	"1.	c #3567A6","2.	c #494949","3.	c #999999","4.	c #3968A5","5.	c #94B5DB","6.	c #82AAD5","7.	c #7DA6D4","8.	c #7FA8D4", \
+	"9.	c #85ABD5","0.	c #7E8896","a.	c #5588BF","b.	c #5689C0","c.	c #4B7EB7","d.	c #3667A6","e.	c #454A51","f.	c #3565A4", \
+	"        . + . + + @ # $         ", \
+	"% & & & . * = - ; ; > , '       ", \
+	") ! ~ { ] ^ / / ( _ : < [ }     ", \
+	"| 1 2 3 ] 4 5 5 5 5 6 < 7 8 9   ", \
+	"0 a 3 b . c d e e f g h i j k   ", \
+	"l m n o . p q r r r f s s t 9   ", \
+	"u v w x + y z z h h A A B C D   ", \
+	"E F G H H I J J K L L L M M M N ", \
+	"O P K Q Q Q Q Q Q R S S S S T U ", \
+	"V n L W X X X X X X X X X Y Z ` ", \
+	" ...+.@.#.#.#.#.#.#.#.#.#.$.%.K ", \
+	"&.x *.=.-.;.;.;.;.;.;.>.,.'.).K ", \
+	"!.~.H {.].^./.(._.:.<.[.[.}.|.1.", \
+	"2.3.4.5.6.7.7.7.7.7.7.7.7.8.9.J ", \
+	"!.0.4.a.b.b.b.b.b.b.b.b.b.b.c.d.", \
+	"e.M M M M M M M M M M M M M f.  "} TYPE static char*
+
+DECLARE save_xpm[] = { \
+	"16 16 107 2", \
+	"  	c None", \
+	". 	c #38678B","+ 	c #3D698A","@ 	c #4A7180","# 	c #58787A","$ 	c #B1CEE6","% 	c #D0DFEF","& 	c #C5DBEC","* 	c #9BC2DF", \
+	"= 	c #688BA0","- 	c #436E88","; 	c #6B7F88","> 	c #667173",", 	c #627075","' 	c #4A6D85",") 	c #41749A","! 	c #44789F", \
+	"~ 	c #9EBFD9","{ 	c #C1D9EB","] 	c #5186AF","^ 	c #4E6A7D","/ 	c #6E706B","( 	c #6B716E","_ 	c #E2E6DD",": 	c #FFFFFF", \
+	"< 	c #DDE1D6","[ 	c #C9D6DD","} 	c #6E99B6","| 	c #ABCBE2","1 	c #92B7D3","2 	c #547D9B","3 	c #D5DFE5","4 	c #F4F4F4", \
+	"5 	c #72756B","6 	c #FDFDFD","7 	c #EEEEEE","8 	c #EDEDED","9 	c #DFE2DE","0 	c #7798B0","a 	c #79A7CA","b 	c #8FB3CE", \
+	"c 	c #3D6B8E","d 	c #ACBCC3","e 	c #EDEDEE","f 	c #EDEEEE","g 	c #EDEEED","h 	c #F3F4F3","i 	c #FCFBFC","j 	c #EBECEC", \
+	"k 	c #5892BD","l 	c #ECECEC","m 	c #F3F3F3","n 	c #FAFAFA","o 	c #E9E9EA","p 	c #CACFC4","q 	c #98BFDC","r 	c #719FBF", \
+	"s 	c #739FC0","t 	c #96BBD8","u 	c #95A9AF","v 	c #EAE9EA","w 	c #F2F2F2","x 	c #F9F9F9","y 	c #E4E4E4","z 	c #C5CBBF", \
+	"A 	c #ABC8DF","B 	c #92A6AC","C 	c #F1F1F1","D 	c #ACCBE3","E 	c #3B6B8F","F 	c #F7F7F7","G 	c #E3E3E3","H 	c #CED4C8", \
+	"I 	c #3F6C8E","J 	c #9AAEB4","K 	c #FCFCFC","L 	c #F0F0F0","M 	c #FEFEFE","N 	c #EBEBEB","O 	c #CECECE","P 	c #C9C9C9", \
+	"Q 	c #C5C5C5","R 	c #D6D6D6","S 	c #9F9F9F","T 	c #AFAFAF","U 	c #BCBCBC","V 	c #C4C4C4","W 	c #C8C8C8","X 	c #D0D0D0", \
+	"Y 	c #A9A9A9","Z 	c #D2D2D2","` 	c #B9B9B9"," .	c #CACACA","..	c #CDCDCD","+.	c #C3C3C3","@.	c #AAAAA9","#.	c #B4B4B4", \
+	"$.	c #C2C2C2","%.	c #CBCBCB","&.	c #A8A7A8","*.	c #D1D1D1","=.	c #A8A7A7","-.	c #B7B6B6",";.	c #DDDDDD",">.	c #DCDCDC", \
+	",.	c #D5D5D5","'.	c #CFCFCF", \
+	"      . . . + @ #               ", \
+	"      $ % & * = -               ", \
+	"; > , ' ) ! ~ { ] ^ / / / / / / ", \
+	"( _ : < [ } . | 1 2 3 : : : 4 / ", \
+	"5 6 7 8 9 0 . a b c d e f g h / ", \
+	"/ i j . . . . a k . . . . l m / ", \
+	"/ n o p . q r r r s t . u v w / ", \
+	"/ x n y z . q s s A . B y 4 C / ", \
+	"/ x 7 n y z . D q E B y n 7 C / ", \
+	"/ F G 7 n n H I . J n K 7 G L / ", \
+	"/ M : : : : : : : 4 4 N N G L / ", \
+	"/ O P P P P Q P P Q Q Q Q Q R / ", \
+	"/ O Q S T U V W X Y Z Y Z `  ./ ", \
+	"/ ..+.@.#.$.V W %.&.*.=.*.-. ./ ", \
+	"/ ;.>.>.>.,.,.'.'.'.'.'.'.'. ./ ", \
+	"/ / / / / / / / / / / / / / / / "} TYPE static char*
+
+DECLARE save_as_xpm[] = { \
+	"16 16 95 2", \
+	"  	c None", \
+	". 	c #38678B","+ 	c #3D698A","@ 	c #4A7180","# 	c #58787A","$ 	c #B1CEE6","% 	c #D0DFEF","& 	c #C5DBEC","* 	c #9BC2DF", \
+	"= 	c #688BA0","- 	c #436E88","; 	c #6B7F88","> 	c #667173",", 	c #627075","' 	c #4A6D85",") 	c #41749A","! 	c #44789F", \
+	"~ 	c #9EBFD9","{ 	c #C1D9EB","] 	c #5186AF","^ 	c #4E6A7D","/ 	c #6E706B","( 	c #6B716E","_ 	c #E2E6DD",": 	c #FFFFFF", \
+	"< 	c #DDE1D6","[ 	c #C9D6DD","} 	c #6E99B6","| 	c #ABCBE2","1 	c #92B7D3","2 	c #547D9B","3 	c #D5DFE5","4 	c #F4F4F4", \
+	"5 	c #72756B","6 	c #FDFDFD","7 	c #EEEEEE","8 	c #EDEDED","9 	c #DFE2DE","0 	c #7798B0","a 	c #79A7CA","b 	c #8FB3CE", \
+	"c 	c #3D6B8E","d 	c #ACBCC3","e 	c #EDEDEE","f 	c #EDEEEE","g 	c #EDEEED","h 	c #F3F4F3","i 	c #FCFBFC","j 	c #EBECEC", \
+	"k 	c #5892BD","l 	c #ECECEC","m 	c #F3F3F3","n 	c #FAFAFA","o 	c #E9E9EA","p 	c #CACFC4","q 	c #98BFDC","r 	c #719FBF", \
+	"s 	c #739FC0","t 	c #96BBD8","u 	c #95A9AF","v 	c #EAE9EA","w 	c #F2F2F2","x 	c #F9F9F9","y 	c #E4E4E4","z 	c #C5CBBF", \
+	"A 	c #ABC8DF","B 	c #92A6AC","C 	c #F1F1F1","D 	c #ACCBE3","E 	c #3B6B8F","F 	c #F7F7F7","G 	c #E3E3E3","H 	c #CED4C8", \
+	"I 	c #3F6C8E","J 	c #9AAEB4","K 	c #FCFCFC","L 	c #F0F0F0","M 	c #A3A4A1","N 	c #A2A4A1","O 	c #DCDCDC","P 	c #DCDBDB", \
+	"Q 	c #DCDCDB","R 	c #DCDBDC","S 	c #DBDCDB","T 	c #DBDCDC","U 	c #000000","V 	c #EFEFEF","W 	c #AFB0AD","X 	c #AEB0AE", \
+	"Y 	c #AFB0AE","Z 	c #AEB0AD","` 	c #EFEEEF"," .	c #EEEFEE","..	c #EEEEEF","+.	c #B7B8B6", \
+	"      . . . + @ #               ", \
+	"      $ % & * = -               ", \
+	"; > , ' ) ! ~ { ] ^ / / / / / / ", \
+	"( _ : < [ } . | 1 2 3 : : : 4 / ", \
+	"5 6 7 8 9 0 . a b c d e f g h / ", \
+	"/ i j . . . . a k . . . . l m / ", \
+	"/ n o p . q r r r s t . u v w / ", \
+	"/ x n y z . q s s A . B y 4 C / ", \
+	"/ x 7 n y z . D q E B y n 7 C / ", \
+	"/ F G 7 n n H I . J n K 7 G L / ", \
+	"/ M N M M M M M M M M M M M M / ", \
+	"/ O P Q O R Q R O S T U Q T O / ", \
+	"/ V W X Y Z W W W W ` U  ...` / ", \
+	"/ : +.+.+.+.+.+.+.+.: U : : : / ", \
+	"/ : : : : : : : : : : U : : : / ", \
+	"/ / / / / / / / / / / / / / / / "} TYPE static char*
+
+DECLARE cut_xpm[] = { \
+	"16 16 88 1", \
+	" 	c None", \
+	".	c #8B8D88","+	c #939590","@	c #8F918C","#	c #8E908B","$	c #F7F7F7","%	c #90918D","&	c #D2D3D0","*	c #D2D4D0", \
+	"=	c #EFF0EF","-	c #92948F",";	c #AAACA7",">	c #C6C8C3",",	c #8D8F8A","'	c #B3B5B0",")	c #F7F7F6","!	c #CCCEC9", \
+	"~	c #AEAFAB","{	c #DBDCD9","]	c #91938E","^	c #8C8E89","/	c #B6B8B3","(	c #CDCECB","_	c #B5B6B2",":	c #9FA09C", \
+	"<	c #B5B6B3","[	c #B8BAB5","}	c #E1E1DF","|	c #F5F6F5","1	c #9A9C97","2	c #A8A9A5","3	c #BABBB7","4	c #E7E8E6", \
+	"5	c #8A8C87","6	c #898984","7	c #C5C6C3","8	c #B3B2AF","9	c #9C2F2C","0	c #AE1818","a	c #AB1616","b	c #A60606", \
+	"c	c #A34A45","d	c #A60202","e	c #C71A19","f	c #AD1717","g	c #A90707","h	c #D22020","i	c #CE1E1E","j	c #B70F0E", \
+	"k	c #A40502","l	c #A80403","m	c #C91A1A","n	c #D12020","o	c #CB1F1F","p	c #A90A0A","q	c #A80606","r	c #D01F1F", \
+	"s	c #A80303","t	c #C01514","u	c #A60101","v	c #CD1D1C","w	c #C01513","x	c #CD1D1D","y	c #A70606","z	c #AB1414", \
+	"A	c #D52323","B	c #CE1D1D","C	c #CA1B1A","D	c #AB0D0D","E	c #CF1D1D","F	c #B50B0B","G	c #D32121","H	c #AA0C0C", \
+	"I	c #AA0909","J	c #D62323","K	c #B80D0D","L	c #D11F1F","M	c #AB1111","N	c #AB1313","O	c #DB2727","P	c #A80707", \
+	"Q	c #AA0808","R	c #D42222","S	c #AA0E0E","T	c #AB1010","U	c #AA0D0D","V	c #AA0B0B","W	c #A90B0B", \
+	"    .+    .@    ", \
+	"   #$.    %&@   ", \
+	"   .*=-   ;>,   ", \
+	"   ,').  #!~.   ", \
+	"    .{=]^/(.    ", \
+	"    ,_$.:<[.    ", \
+	"     .}|12.     ", \
+	"     ,34;#5     ", \
+	"      6789      ", \
+	"    0abcdef0    ", \
+	"   ghijklmnop   ", \
+	"  qrstu  vwsxy  ", \
+	" zA  Bp  sC  nz ", \
+	" DE FGH  IJK LM ", \
+	" NOrBP    QREBN ", \
+	"  STa      UVW  "} TYPE static char*
+
+DECLARE copy_xpm[] = { \
+	"16 16 41 1", \
+	" 	c None", \
+	".	c #888A85","+	c #FFFFFF","@	c #F0F0EF","#	c #EFEFEE","$	c #C8C8C7","%	c #9A9B97","&	c #8D8F8A","*	c #8A8C87", \
+	"=	c #898B86","-	c #C7C7C6",";	c #C6C6C5",">	c #EEEEED",",	c #EDEDEC","'	c #FEFEFE",")	c #ECECEC","!	c #C4C4C3", \
+	"~	c #FAFAFA","{	c #F3F3F3","]	c #F9F9F9","^	c #EBEBEB","/	c #EAEAEA","(	c #EEEEEE","_	c #F7F7F6",":	c #C3C4C3", \
+	"<	c #F3F3F2","[	c #F4F4F3","}	c #F2F2F2","|	c #8C8E89","1	c #FEFEFD","2	c #989A95","3	c #F8F8F7","4	c #E3E4E2", \
+	"5	c #FAFAF9","6	c #E3E3E2","7	c #F4F4F4","8	c #F6F6F5","9	c #FCFCFB","0	c #FBFBFB","a	c #D4D4D4","b	c #989A96", \
+	" ..........     ", \
+	" ++++++++++.    ", \
+	" +@#####@@+.    ", \
+	" +@$%..........&", \
+	" +@@*++++++++++.", \
+	" +@$=+@@@@@@@@+.", \
+	" +@#*+@------@+.", \
+	" +#;=+@@@@@@@@+.", \
+	" +>,*+@-----@@+.", \
+	" ')!=+@@@@@@@~{.", \
+	" ]^/*+@-----(_:.", \
+	" <[}*+@@@@@||||.", \
+	" ====1@@@@~2~34.", \
+	"    =5@@@~~2~6..", \
+	"    =7_890ab4.. ", \
+	"    |=........  "} TYPE static char*
+
+DECLARE paste_xpm[] = { \
+	"16 16 77 1", \
+	" 	c None", \
+	".	c #5F5F5E","+	c #5C5C5C","@	c #6D4401","#	c #6C4401","$	c #6B4403","%	c #5C5C5B","&	c #959589","*	c #97978A", \
+	"=	c #C08424","-	c #A47E3E",";	c #706D64",">	c #5E5E5E",",	c #7F7F7C","'	c #80807D",")	c #7E7E7B","!	c #6E6C64", \
+	"~	c #A17C40","{	c #B97F23","]	c #6C4301","^	c #6F4602","/	c #C68827","(	c #716F64","_	c #F1F1F1",":	c #E0E0E0", \
+	"<	c #BBBBBB","[	c #F2F2F2","}	c #6E6D64","|	c #C58727","1	c #6A4200","2	c #666864","3	c #FFFFFF","4	c #F0F0EF", \
+	"5	c #676964","6	c #C28628","7	c #C58726","8	c #B3B5B5","9	c #EFEFEE","0	c #EFEFED","a	c #EDEDEB","b	c #6E4602", \
+	"c	c #B2B4B4","d	c #B1B2B2","e	c #EAEAE8","f	c #EDEDEC","g	c #EBEBEA","h	c #DBDBD9","i	c #EEEEED","j	c #ECECEB", \
+	"k	c #EBEBE9","l	c #E9E9E7","m	c #DADAD8","n	c #CCCDCA","o	c #ECECEA","p	c #E8E8E6","q	c #CDCECB","r	c #B9BAB6", \
+	"s	c #B8B9B5","t	c #6E4502","u	c #E7E7E5","v	c #D9D9D6","w	c #B9B9B6","x	c #E7E7E4","y	c #D8D8D5","z	c #C1C2BE", \
+	"A	c #B7B7B4","B	c #706D63","C	c #EDEEED","D	c #FEFEFE","E	c #FEFEFD","F	c #BA7F23","G	c #A77D3B","H	c #736F64", \
+	"I	c #6A6C68","J	c #A37C3D","K	c #B37B22","L	c #6B4301", \
+	"     .++++.     ", \
+	"  @#$%&**&%$##  ", \
+	" @=-;>,'')>!~{] ", \
+	" ^/(_:<<<<:[}|1 ", \
+	" ^/234444443561 ", \
+	" ^7234888893561 ", \
+	" ^72344440a3561 ", \
+	" b723488cde3561 ", \
+	" b72349fgeh3561 ", \
+	" b723ijklmn3561 ", \
+	" b723oepqrs3561 ", \
+	" t723luvw333561 ", \
+	" t723xyzA335|61 ", \
+	" t7BCDDD9E5|||1 ", \
+	" ]FGHIIIIIJJJKL ", \
+	"  ]##########L  "} TYPE static char*
+
+DECLARE find_xpm[] = { \
+	"16 16 77 1", \
+	" 	c None", \
+	".	c #9A9B97","+	c #888A85","@	c #8D8F8A","#	c #8A8C87","$	c #FFFFFF","%	c #898B86","&	c #F0F0EF","*	c #C7C7C6", \
+	"=	c #D6D6D5","-	c #818380",";	c #828480",">	c #A8A9A6",",	c #AEBAC8","'	c #A6BCD2",")	c #A2BAD4","!	c #A8B9CD", \
+	"~	c #D6D7D5","{	c #A8B7C8","]	c #8AACD2","^	c #BFD3E7","/	c #C5D7EA","(	c #9CBAD9","_	c #90ADCB",":	c #A3AEBB", \
+	"<	c #85A9CF","[	c #DCE6F2","}	c #E8EEF7","|	c #E4ECF5","1	c #CADAEC","2	c #8EB2D8","3	c #97AFCB","4	c #A2B8D0", \
+	"5	c #A5C0DF","6	c #D9E4F1","7	c #E0EAF3","8	c #DDE7F2","9	c #C1D4E9","0	c #A0BEDF","a	c #81A6D0","b	c #FEFEFD", \
+	"c	c #A9BFD6","d	c #A5C1E0","e	c #D0DEEE","f	c #DAE5F2","g	c #CDDCED","h	c #C8D9EC","i	c #BCD0E8","j	c #80A7D1", \
+	"k	c #FAFAF9","l	c #A7B5C3","m	c #89ABD0","n	c #B3CAE5","o	c #C3D7EB","p	c #C1D4EA","q	c #CFDDEE","r	c #A3BDDA", \
+	"s	c #93AFCE","t	c #CFCFCD","u	c #9FB8D1","v	c #91B3D6","w	c #AFC5DF","x	c #B2CAE3","y	c #A0BAD6","z	c #97B4D3", \
+	"A	c #757673","B	c #8C8E89","C	c #7E807B","D	c #B3C8DC","E	c #8BACCF","F	c #80A8D1","G	c #99B3D0","H	c #A3A4A3", \
+	"I	c #6C6E6A","J	c #8D8E8C","K	c #B8B8B7","L	c #848482", \
+	".++++++++++@    ", \
+	"#$$$$$$$$$$+    ", \
+	"%$&&&&&&&&$+    ", \
+	"#$&******&$+    ", \
+	"%$&&&&=----;    ", \
+	"#$&**>-,')!-    ", \
+	"%$&&~-{]^/(_-   ", \
+	"#$&*-:<[}|123-  ", \
+	"#$&&-4567890a-  ", \
+	"%b&&-cdefghij-  ", \
+	"%k&&-lmnopqrs-  ", \
+	"%$$$t-uvwxyz-A  ", \
+	"B%+++C-DEFG-HHI ", \
+	"      I----JKHHL", \
+	"            JKHL", \
+	"             JJL"} TYPE static char*
+
+DECLARE system_xpm[] = { \
+	"16 16 44 1", \
+	" 	c None", \
+	".	c #888A85","+	c #ECEBE9","@	c #EFEFEE","#	c #F0F0EE","$	c #F0F0F0","%	c #FAFAFA","&	c #8A8C87","*	c #F6F6F5", \
+	"=	c #ABACA9","-	c #F7F7F7",";	c #E5E3E2",">	c #ADADAA",",	c #EEEEEC","'	c #F3F3F3",")	c #F0F0EF","!	c #EEEEED", \
+	"~	c #ECECEA","{	c #BAB9B6","]	c #D2D1D0","^	c #A4A4A3","/	c #B8B7B5","(	c #B9B8B7","_	c #204A87",":	c #7D8385", \
+	"<	c #CAC9C8","[	c #BFBEBD","}	c #ADBBCC","|	c #7C93B3","1	c #D4D3D3","2	c #BDC8D4","3	c #788DA4","4	c #92A5BE", \
+	"5	c #E4E3E2","6	c #C6C4C2","7	c #748AA2","8	c #7A95B4","9	c #D4D3D2","0	c #C4C3C2","a	c #7D91A7","b	c #7A95B5", \
+	"c	c #728BAE","d	c #A0A19E","e	c #869CB8", \
+	"                ", \
+	"    .        .  ", \
+	"   .+.      .@. ", \
+	"    .#.    .$.  ", \
+	" .  .%.    .&   ", \
+	".*=.-;>,  .     ", \
+	" .')!~{. .      ", \
+	"  ....]^..      ", \
+	"      /.(.      ", \
+	"   ___:><[.     ", \
+	"  _}}|_..1[.    ", \
+	" _2334_  .56..  ", \
+	"_}378|_   .90.  ", \
+	"_}abc_     .d.  ", \
+	"_4ee_      ...  ", \
+	" ___            "} TYPE static char*
+
+DECLARE execute_xpm[] = { \
+	"16 16 17 1", \
+	" 	c None", \
+	".	c #888A85","+	c #EEEEEC","@	c #C0C0BE","#	c #A2A3A0","$	c #D3D7CF","%	c #B8BAB4","&	c #888A84","*	c #979993", \
+	"=	c #BDBFB9","-	c #71736F",";	c #676965",">	c #898B87",",	c #8D8F8A","'	c #8F918C",")	c #777975","!	c #C7CAC3", \
+	"                ", \
+	"      ...       ", \
+	"   .. .+. ..    ", \
+	"  .+@.#$#.@+.   ", \
+	"  .@$$$$$$$@.   ", \
+	"   .$%&*&=$.    ", \
+	" ..#$&- ;>$#..  ", \
+	" .+$$*   *$$+.  ", \
+	" ..#$,' )&$#..  ", \
+	"   .+%,*&!$.    ", \
+	"  .@$$$$$$$@.   ", \
+	"  .+@.#$#.@+.   ", \
+	"   .. .+. ..    ", \
+	"      ...       ", \
+	"                ", \
+	"                "} TYPE static char*
+
+DECLARE bacon_xpm[] = { \
+	"16 16 117 2", \
+	"  	c None", \
+	". 	c #750505","+ 	c #720202","@ 	c #730202","# 	c #5F0909","$ 	c #361212","% 	c #E16F6F","& 	c #F89B9B","* 	c #F68B8B", \
+	"= 	c #F9AAAA","- 	c #FFB9B9","; 	c #C42B2B","> 	c #740101",", 	c #FDCACA","' 	c #F06A6A",") 	c #FBC9C9","! 	c #EB4343", \
+	"~ 	c #F7B3B3","{ 	c #B91414","] 	c #750404","^ 	c #F8A5A5","/ 	c #F79191","( 	c #920202","_ 	c #690C0C",": 	c #F48383", \
+	"< 	c #EC4B4B","[ 	c #F57777","} 	c #841616","| 	c #790505","1 	c #F58F8F","2 	c #FE9292","3 	c #150202","4 	c #A63F3F", \
+	"5 	c #F8A4A4","6 	c #F6A6A6","7 	c #F79090","8 	c #6F0A0A","9 	c #7A0707","0 	c #F26D6D","a 	c #FFA6A6","b 	c #220303", \
+	"c 	c #F75757","d 	c #EB4848","e 	c #EE5B5B","f 	c #FFB4B4","g 	c #6D0909","h 	c #680303","i 	c #F56C6C","j 	c #1B1212", \
+	"k 	c #B48B8B","l 	c #957070","m 	c #A94848","n 	c #6E0C0C","o 	c #580000","p 	c #FA9090","q 	c #F74F4F","r 	c #E88282", \
+	"s 	c #DF8383","t 	c #D07D7D","u 	c #830E0E","v 	c #590000","w 	c #FA9292","x 	c #F86060","y 	c #260404","z 	c #F65B5B", \
+	"A 	c #EE5D5D","B 	c #EB3D3D","C 	c #F9ACAC","D 	c #971111","E 	c #670202","F 	c #F99A9A","G 	c #F78A8A","H 	c #5D0808", \
+	"I 	c #790D0D","J 	c #A61111","K 	c #F79494","L 	c #EA3838","M 	c #FD8484","N 	c #3E0F0F","O 	c #6A0303","P 	c #FAA4A4", \
+	"Q 	c #F59F9F","R 	c #A20101","S 	c #570404","T 	c #430505","U 	c #EC5151","V 	c #ED5454","W 	c #F8B5B5","X 	c #880B0B", \
+	"Y 	c #730404","Z 	c #F89F9F","` 	c #EF6868"," .	c #F69B9B","..	c #FFB6B6","+.	c #FDACAC","@.	c #F38C8C","#.	c #E50B0B", \
+	"$.	c #F7B0B0","%.	c #A00C0C","&.	c #730101","*.	c #FFF0F0","=.	c #FAC0C0","-.	c #F6A5A5",";.	c #F38282",">.	c #F28181", \
+	",.	c #F7ABAB","'.	c #F69D9D",").	c #F95353","!.	c #6B1515","~.	c #421111","{.	c #800C0C","].	c #850D0D","^.	c #850C0C", \
+	"/.	c #860707","(.	c #850808","_.	c #8A1010",":.	c #4F1111", \
+	"                                ", \
+	"        . + @ #                 ", \
+	"    $ % & * = - ;               ", \
+	"    > , ' ) = ! ~ {             ", \
+	"    ] ^ / ( _ : < [ }           ", \
+	"    | 1 2 3 4 5 6 7 8           ", \
+	"    9 0 a b c d e f g           ", \
+	"    h i 2 j k l m n             ", \
+	"    o p q j r s t u             ", \
+	"    v w x y z A B C D           ", \
+	"    E F G H I J K L M N         ", \
+	"    O P Q R S T U V W X         ", \
+	"    Y Z `  ...+.@.#.$.%.        ", \
+	"    &.*.=.-.;.>.,.'.).!.        ", \
+	"    ~.{.].^.]./.(._.:.          ", \
+	"                                "} TYPE static char*
+
+DECLARE help_xpm[] = { \
+	"16 16 153 2", \
+	"  	c None", \
+	". 	c #204A87","+ 	c #2C548D","@ 	c #8CA1C1","# 	c #BDC9DB","$ 	c #EBEFF4","% 	c #8CA2C1","& 	c #5B7AA7","* 	c #E3E8F0", \
+	"= 	c #A9B9D0","- 	c #6582AC","; 	c #3B6096","> 	c #AABAD1",", 	c #E4E9F0","' 	c #5C7BA7",") 	c #617EAA","! 	c #E7EBF2", \
+	"~ 	c #5978A6","{ 	c #47699C","] 	c #C2CEDE","^ 	c #F0F3F7","/ 	c #E6EAF1","( 	c #A7B8D0","_ 	c #4D6FA0",": 	c #6482AD", \
+	"< 	c #E8EDF3","[ 	c #5D7CA8","} 	c #2D558E","| 	c #E5EAF1","1 	c #5878A5","2 	c #6C88B0","3 	c #FDFDFE","4 	c #D6DEE9", \
+	"5 	c #EFF2F6","6 	c #FFFFFF","7 	c #BDCADC","8 	c #386098","9 	c #6B89B3","0 	c #E6EBF2","a 	c #2D558D","b 	c #90A5C3", \
+	"c 	c #4B6E9F","d 	c #325B94","e 	c #597AA8","f 	c #FBFCFD","g 	c #466DA1","h 	c #436A9F","i 	c #B7C6DA","j 	c #94A9C6", \
+	"k 	c #C0CCDD","l 	c #27508B","m 	c #2D5690","n 	c #345C95","o 	c #3A6299","p 	c #89A1C2","q 	c #E8ECF3","r 	c #4B72A5", \
+	"s 	c #4D73A6","t 	c #86A1C3","u 	c #C6D2E1","v 	c #234C89","w 	c #EDF0F5","x 	c #365C93","y 	c #254F8A","z 	c #345D95", \
+	"A 	c #3B639A","B 	c #6D8BB5","C 	c #F9FBFC","D 	c #FEFEFE","E 	c #829DC1","F 	c #547AAC","G 	c #567CAD","H 	c #6C8DB7", \
+	"I 	c #EFF3F7","J 	c #214B88","K 	c #385E94","L 	c #2A538E","M 	c #335B94","N 	c #42699F","O 	c #A0B5D0","P 	c #5A7FB0", \
+	"Q 	c #5E83B2","R 	c #6085B4","S 	c #7594BD","T 	c #F0F3F8","U 	c #224B88","V 	c #6A86AF","W 	c #2F5891","X 	c #386097", \
+	"Y 	c #40679D","Z 	c #5176A7","` 	c #C8D4E4"," .	c #CAD6E5","..	c #6286B4","+.	c #6387B6","@.	c #678BB9","#.	c #6A8EBA", \
+	"$.	c #9BB2D1","%.	c #CCD7E6","&.	c #244E8A","*.	c #ADBCD3","=.	c #335C94","-.	c #3C649A",";.	c #456CA1",">.	c #5278A9", \
+	",.	c #8FA8C8","'.	c #94ADCC",").	c #6589B7","!.	c #6B8FBB","~.	c #7093BF","{.	c #7396C1","].	c #C9D7E7","^.	c #A0B4CF", \
+	"/.	c #6987B1","(.	c #496FA3","_.	c #6284B2",":.	c #6F92BD","<.	c #7296C1","[.	c #789BC5","}.	c #9DB7D6","|.	c #EDF1F7", \
+	"1.	c #2F578F","2.	c #6381AB","3.	c #E9EEF3","4.	c #728FB7","5.	c #4C72A5","6.	c #6587B3","7.	c #7497C1","8.	c #A0B9D7", \
+	"9.	c #F1F5F9","0.	c #6B88B2","a.	c #6482AC","b.	c #E9EDF3","c.	c #BAC9DD","d.	c #8BA5C7","e.	c #7191BB","f.	c #7999C1", \
+	"g.	c #9FB7D5","h.	c #CDDAE9","i.	c #EFF3F8","j.	c #718DB5","k.	c #264F8B","l.	c #2E558F","m.	c #9BAFCB","n.	c #CBD6E5", \
+	"o.	c #F1F4F8","p.	c #F2F5F9","q.	c #D1DBE8","r.	c #A6B9D3","s.	c #315891","t.	c #234D89","u.	c #224C88","v.	c #254F8B", \
+	"          . . . . . .           ", \
+	"        + @ # $ $ # % +         ", \
+	"    . & * = - ; ; - > , ' .     ", \
+	"    ) ! ~ { ] ^ / ( _ : < [     ", \
+	"  } | 1 . 2 3 4 5 6 7 8 9 0 a   ", \
+	". b = . . c _ d e 6 f g h i j . ", \
+	". k - . l m n o p 6 q r s t u v ", \
+	". w x y m z A B C D E F G H I J ", \
+	". w K L M o N < 6 O P Q R S T U ", \
+	". k V W X Y Z `  ...+.@.#.$.%.&.", \
+	". b *.=.-.;.>.,.'.).!.~.{.].^.J ", \
+	"  } 0 /.Y (._.6 6 :.<.[.}.|.1.  ", \
+	"    2.3.4.5.6.6 6 7.[.8.9.0.    ", \
+	"    . a.b.c.d.e.f.g.h.i.j.k.    ", \
+	"        l.m.n.o.p.q.r.s.        ", \
+	"          . t.u.u.v.J           "} TYPE static char*
+
+' Syntax highlighting definitions
+DECLARE styletable[] = { { FL_BLACK, FL_COURIER, FontSize }, \
+	{ FL_DARK_BLUE,     FL_COURIER_ITALIC,  FontSize }, \
+	{ FL_DARK_BLUE,     FL_COURIER_ITALIC,  FontSize }, \
+	{ FL_MAGENTA,    FL_COURIER,           FontSize }, \
+	{ FL_DARK_CYAN,  FL_COURIER_BOLD,      FontSize }, \
+	{ FL_GREEN,      FL_COURIER_BOLD,      FontSize }, \
+	{ FL_DARK_RED,   FL_COURIER_BOLD,      FontSize }, \
+	{ FL_DARK_GREEN, FL_COURIER_BOLD,      FontSize }, \
+	{ FL_RED,        FL_COURIER,           FontSize }, } TYPE Fl_Text_Display::Style_Table_Entry
+
+' Embedded icon - vovchik
+DECLARE Icon_Pix TYPE Fl_Pixmap*
+
+' Check if settings directory exists
+IF NOT(FILEEXISTS(GETENVIRON$("HOME") & "/.bacon/")) THEN MAKEDIR GETENVIRON$("HOME") & "/.bacon/"
+
+' Do not forget to RESET the ERROR variable after all those erroneous IMPORT probing when running in TRAP LOCAL mode
+TRAP LOCAL
+ERROR = 0
+
+' Associative array to keep context info
+DECLARE ctx_info$ ASSOC STRING
+
+' Set some default values
+BaconGui.xsize = 800
+BaconGui.ysize = 600
+BaconGui.ssize = Fl::scrollbar_size()
+
+Icon_Pix = new Fl_Pixmap(BaCon48)
+
+CALL Init_Info
+
+CALL Create_Gui
+
+END
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Init_Info
+
+	LOCAL doc TYPE FILE*
+	LOCAL txt$, line$, key$
+
+	' Prepare context info
+	IF FILEEXISTS(TEXTDOC$) THEN
+		OPEN TEXTDOC$ FOR READING AS doc
+		REPEAT
+			READLN line$ FROM doc
+		UNTIL INSTR(line$, "Overview of BaCon statements and functions")
+		' Start of doc
+		REPEAT
+			READLN line$ FROM doc
+		UNTIL LEFT$(line$, 2) = "  "
+		txt$ = CHOP$(line$)
+
+		' Create body of doc
+		WHILE TRUE
+			WHILE TRUE
+				READLN line$ FROM doc
+				IF LEFT$(line$, 2) = "  " AND MID$(line$, 3, 1) <> " " THEN BREAK
+				IF INSTR(line$, "Appendix") THEN BREAK 2
+				ctx_info$(txt$) = ctx_info$(txt$) & MID$(line$, 4) & NL$
+			WEND
+			' Get rid of last NL
+			ctx_info$(txt$) = CHOP$(ctx_info$(txt$))
+			txt$ = CHOP$(line$)
+		WEND
+		CLOSE FILE doc
+	ENDIF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Load_Defaults
+
+	LOCAL item TYPE Fl_Menu_Item*
+	LOCAL txt$
+	LOCAL settings TYPE FILE*
+
+	IF FILEEXISTS(CONFIG$) THEN
+
+		OPEN CONFIG$ FOR READING AS settings
+
+		REPEAT
+			READLN txt$ FROM settings
+
+			SELECT HEAD$(txt$, 1)
+				CASE "linenr"
+					IF VAL(LAST$(txt$, 1)) THEN
+						item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/&Line numbers")
+						item->set()
+					ENDIF
+				CASE "wrap"
+					IF VAL(LAST$(txt$, 1)) THEN
+						item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/&Wrap lines")
+						item->set()
+					ENDIF
+				CASE "savepage"
+					IF VAL(LAST$(txt$, 1)) THEN
+						item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/&Restore tabs")
+						item->set()
+					ENDIF
+				CASE "lowercase"
+					IF VAL(LAST$(txt$, 1)) THEN
+						BaconGui.check_9->value(1)
+					ELSE
+						BaconGui.check_9->value(0)
+					ENDIF
+				CASE "scheme"
+					SELECT LAST$(txt$, 1)
+						CASE "none"
+							item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/Select &theme/none")
+							item->set()
+						CASE "plastic"
+							item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/Select &theme/plastic")
+							item->set()
+						CASE "gtk+"
+							item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/Select &theme/gtk+")
+							item->set()
+						CASE "gleam"
+							item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/Select &theme/gleam")
+							item->set()
+					ENDSELECT
+				CASE "fsize"
+					BaconGui.spinner->value(VAL(LAST$(txt$, 1)))
+				CASE "shell"
+					BaconGui.input_7->value(LAST$(txt$, 1))
+				CASE "compiler"
+					BaconGui.input_1->value(LAST$(txt$, 1))
+				CASE "libraries"
+					BaconGui.input_2->value(LAST$(txt$, 1))
+				CASE "includes"
+					BaconGui.input_4->value(LAST$(txt$, 1))
+				CASE "options"
+					BaconGui.input_3->value(LAST$(txt$, 1))
+				CASE "tmpdir"
+					BaconGui.input_5->value(LAST$(txt$, 1))
+				CASE "window_size"
+					BaconGui.xsize = VAL(HEAD$(TAIL$(txt$,1), 1, "x"))
+					BaconGui.ysize = VAL(TAIL$(TAIL$(txt$,1), 1, "x"))
+			ENDSELECT
+		UNTIL ENDFILE(settings)
+		CLOSE FILE settings
+	ELSE
+		' No config file found, first start
+		BaconGui.input_7->value("xterm -sb -geometry 132x40 -e '@; read x'")
+		BaconGui.input_1->value("cc")
+		BaconGui.input_5->value(GETENVIRON$("HOME"))
+		BaconGui.spinner->value(FontSize)
+	ENDIF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Save_Defaults
+
+	LOCAL item TYPE Fl_Menu_Item*
+	LOCAL settings TYPE FILE*
+	LOCAL set, w, h, x, savepages
+	LOCAL theme$, data$
+
+	OPEN CONFIG$ FOR WRITING AS settings
+
+	item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/&Line numbers")
+	set = item->value()
+	IF set THEN WRITELN "linenr 1" TO settings
+	ELSE WRITELN "linenr 0" TO settings
+
+	item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/&Wrap lines")
+	set = item->value()
+	IF set THEN WRITELN "wrap 1" TO settings
+	ELSE WRITELN "wrap 0" TO settings
+
+	item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/&Restore tabs")
+	set = item->value()
+	IF set THEN
+		WRITELN "savepage 1" TO settings
+		savepages = TRUE
+	ELSE
+		WRITELN "savepage 0" TO settings
+	ENDIF
+
+	item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/Select &theme/none")
+	set = item->value()
+	IF set THEN
+		theme$ = "none"
+	ELSE
+		item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/Select &theme/plastic")
+		set = item->value()
+		IF set THEN
+			theme$ = "plastic"
+		ELSE
+			item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/Select &theme/gtk+")
+			set = item->value()
+			IF set THEN
+				theme$ = "gtk+"
+			ELSE
+				theme$ = "gleam"
+			ENDIF
+		ENDIF
+	ENDIF
+	WRITELN "scheme ", theme$ TO settings
+
+	set = BaconGui.spinner->value()
+	WRITELN "fsize ", set TO settings
+
+	data$ = (char*)BaconGui.input_7->value()
+	WRITELN "shell ", data$ TO settings
+
+	data$ = (char*)BaconGui.input_1->value()
+	WRITELN "compiler ", data$ TO settings
+
+	data$ = (char*)BaconGui.input_2->value()
+	WRITELN "libraries ", data$ TO settings
+
+	data$ = (char*)BaconGui.input_4->value()
+	WRITELN "includes ", data$ TO settings
+
+	data$ = (char*)BaconGui.input_3->value()
+	WRITELN "options ", data$ TO settings
+
+	data$ = (char*)BaconGui.input_5->value()
+	WRITELN "tmpdir ", data$ TO settings
+
+	set = BaconGui.check_9->value()
+	WRITELN "lowercase ", set TO settings
+
+	w = BaconGui.win->w()
+	h = BaconGui.win->h()
+	WRITELN "window_size ", w, "x", h TO settings
+
+	IF savepages THEN
+		FOR x = 1 TO BaconGui.pages
+			WRITELN "file ", nbook[x].file$ TO settings
+		NEXT
+	ENDIF
+
+	CLOSE FILE settings
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Load_Files_Into_GUI
+
+	LOCAL item TYPE Fl_Menu_Item*
+	LOCAL txt$, name$
+	LOCAL value
+	LOCAL settings TYPE FILE*
+
+	item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/&Restore tabs")
+	value = item->value()
+
+	IF FILEEXISTS(CONFIG$) AND value THEN
+
+		OPEN CONFIG$ FOR READING AS settings
+
+		REPEAT
+			READLN txt$ FROM settings
+
+			IF HEAD$(txt$,1) = "file" THEN
+				name$ = TAIL$(txt$, AMOUNT(txt$)-1)
+				IF FILEEXISTS(name$) THEN
+					INCR BaconGui.pages
+					IF BaconGui.pages > MAXPAGES THEN
+						fl_message_title("System error detected!")
+						fl_alert("System error: cannot open more tabs than %d.", MAXPAGES)
+						BREAK
+					ENDIF
+					CALL Create_Page
+					CALL Load_File(name$)
+				END IF
+			END IF
+		UNTIL ENDFILE(settings)
+
+		CLOSE FILE settings
+		Fl::add_idle(Style_Apply)
+	END IF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+FUNCTION Get_Tab_Id
+
+	LOCAL x
+	LOCAL grp TYPE Fl_Group*
+
+	IF BaconGui.pages THEN
+		grp = BaconGui.notebook->value()
+
+		FOR x = 1 TO BaconGui.pages
+			IF nbook[x].grp = grp THEN BREAK
+		NEXT
+	ENDIF
+
+	RETURN x
+
+END FUNCTION
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Check_Before_Destroy(page)
+
+	LOCAL label TYPE char*
+
+	label = nbook[page].grp->label()
+
+	IF LEFT$(label, 1) = "*" THEN
+		IF fl_choice("Save program '%s'?", "No", "Yes", 0, label) = 1 THEN
+			BaconGui.notebook->value(nbook[page].grp)
+			CALL Save_File(NULL, NULL)
+		ENDIF
+	ENDIF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Hide_Widget(Fl_Widget* w, void* data)
+
+	LOCAL arg$
+
+	arg$ = (char*)data
+
+	SELECT arg$
+		CASE "convert"
+			BaconGui.convert->hide()
+		CASE "execute"
+			BaconGui.execute->hide()
+		CASE "search"
+			BaconGui.srch->hide()
+		CASE "font"
+			BaconGui.fsize->hide()
+		CASE "scratch"
+			BaconGui.scratch->hide()
+		CASE "print"
+			BaconGui.print->hide()
+	END SELECT
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Show_Widget(Fl_Widget* w, void* data)
+
+	LOCAL x
+	LOCAL r, g, b TYPE unsigned char
+	LOCAL page = Get_Tab_Id()
+	LOCAL arg$
+
+	arg$ = (char*)data
+
+	SELECT arg$
+		CASE "print"
+			BaconGui.print->show()
+		CASE "font"
+			BaconGui.fsize->show()
+		CASE "scratch"
+			BaconGui.scratch->show()
+		CASE "about"
+			fl_message_title("About BaConGUI")
+			fl_message("\tBaConGUI %s\n\nGUI version of BaCon using FLTK %d.%d.%d.\n\n\t(c) Peter van Eerten", VERSION$, FL_MAJOR_VERSION, FL_MINOR_VERSION, FL_PATCH_VERSION)
+		CASE "convert"
+			BaconGui.convert->show()
+			Fl::focus(BaconGui.conv_button)
+		CASE "execute"
+			BaconGui.execute->show()
+			Fl::focus(BaconGui.exec_button)
+		CASE "color"
+			IF fl_color_chooser("Select color...", r, g, b, -1) THEN
+				FOR x = 1 TO BaconGui.pages
+					nbook[x].edit->color(fl_rgb_color(r, g, b))
+				NEXT
+			ENDIF
+			BaconGui.notebook->redraw()
+		CASE "search"
+			BaconGui.srch->show()
+			BaconGui.input_9->position(0, LEN(BaconGui.input_9->value()))
+			BaconGui.input_10->position(0, LEN(BaconGui.input_10->value()))
+			Fl::focus(BaconGui.input_9)
+	END SELECT
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+FUNCTION Display_Info(void* event, void* data) TYPE int
+
+	LOCAL x, y, pos, start, end, height, size TYPE int
+	LOCAL text TYPE char*
+	LOCAL byte TYPE char
+	LOCAL page = Get_Tab_Id()
+	LOCAL arg$
+
+	arg$ = (char*)data
+
+	IF Fl::event() = FL_KEYBOARD AND BaconGui.show_info OR arg$ = "now" THEN
+		BaconGui.info->hide()
+		pos = nbook[page].edit->insert_position()
+
+		start = nbook[page].text_buf->word_start(pos)
+		end = nbook[page].text_buf->word_end(pos)
+		' Include string functions
+		byte = nbook[page].text_buf->byte_at(end)
+		IF byte = 36 THEN INCR end
+
+		text = nbook[page].text_buf->text_range(start, end)
+		IF LEN(ctx_info$(text)) > 0 THEN
+			BaconGui.scroll->scroll_to(0, 0)
+			size = BaconGui.itxt->textsize()+4
+			height = AMOUNT(ctx_info$(text), NL$)*size+2*size
+			IF  height > 150 THEN
+				BaconGui.itxt->size(550-BaconGui.ssize, height)
+			ELSE
+				BaconGui.itxt->size(550, 150)
+			ENDIF
+			BaconGui.itxt->value(ctx_info$(text))
+			nbook[page].edit->position_to_xy(pos, &x, &y)
+			BaconGui.info->position(BaconGui.win->x()+x, BaconGui.win->y()+y-150)
+			BaconGui.info->show()
+		ENDIF
+		free(text)
+	ENDIF
+
+	RETURN FALSE
+
+END FUNCTION
+
+' --------------------------------------------------------------------------------------------------
+
+FUNCTION Download_File$(name$)
+
+	LOCAL total$, dat$, head$, file$, proxy$, unpw$
+	LOCAL mynet
+	LOCAL recdata, size, length TYPE FLOATING
+
+	CATCH GOTO network_error
+
+	' Rip off HTTP protocol name if it is there
+	IF LEFT$(CHOP$(name$), 7) = "http://" THEN name$ = MID$(CHOP$(name$), 8)
+
+	file$ = MID$(name$, INSTRREV(name$, "/")+1)
+
+	' Get environment variable for proxy
+	proxy$ = GETENVIRON$("HTTP_PROXY")
+	IF LEN(proxy$) = 0 THEN proxy$ = GETENVIRON$("http_proxy")
+
+	' Parse proxy settings
+	IF LEN(proxy$) THEN
+		IF LEFT$(proxy$, 7) <> "http://" THEN
+			fl_message_title("System error detected!")
+			fl_alert("System error: proxy '%s' not supported! Redefine to default HTTP proxy or undefine.", proxy$)
+			GOTO finish
+		ENDIF
+
+		proxy$ = MID$(proxy$, 8)
+		IF TALLY(proxy$, "@") THEN
+			unpw$ = B64ENC$(TOKEN$(proxy$, 1, "@"))
+			proxy$ = TOKEN$(proxy$, 2, "@")
+		ENDIF
+
+		' Setup TCP connection on defined port
+		OPEN proxy$ FOR NETWORK AS mynet
+
+		SEND "CONNECT " & TOKEN$(name$, 1, "/") & ":80 HTTP/1.1" & "\r\n" TO mynet
+		IF LEN(unpw$) THEN SEND "Proxy-Authorization: Basic " & B64ENC$(unpw$) & "\r\n" TO mynet
+		SEND "\r\n" TO mynet
+
+		' Return should be OK
+		RECEIVE dat$ FROM mynet
+		IF NOT(TALLY(dat$, " 200 ")) THEN
+			fl_message_title("System error detected!")
+			fl_alert("System error: proxy '%s' returns error: %s", proxy$, dat$)
+			GOTO finish
+		ENDIF
+	ELSE
+		' Open TCP connection on port 80
+		OPEN TOKEN$(name$, 1, "/") & ":80" FOR NETWORK AS mynet
+	ENDIF
+
+	' Announce to user
+	BaconGui.box->label("Downloading '" & file$ & "'...")
+	BaconGui.progress->show()
+	BaconGui.progress->wait_for_expose()
+	Fl::flush()
+
+	' Get some metadata
+	SEND "HEAD /" & MID$(name$, INSTR(name$, "/")+1) & " HTTP/1.1\r\nHost: " & TOKEN$(name$, 1, "/") & "\r\n\r\n" TO mynet
+
+	RECEIVE head$ FROM mynet
+
+	' Get the filesize from the HTTP header
+	IF NOT(INSTR(head$, "Content-Length:")) THEN
+		fl_message_title("System error detected!")
+		fl_alert("System error: file '%s' not found! Check URL and try again.", name$)
+		GOTO finish
+	END IF
+
+	dat$ = MID$(head$, INSTR(head$, "Content-Length:")+15)
+	length = VAL(LEFT$(dat$, INSTR(dat$, NL$)))
+
+	' As long as there is data, get it
+	SEND "GET /" & MID$(name$, INSTR(name$, "/")+1) & " HTTP/1.1\r\nHost: " & TOKEN$(name$, 1, "/") & "\r\n\r\n" TO mynet
+	WHILE WAIT(mynet, 2000)
+		RECEIVE dat$ FROM mynet CHUNK 128 SIZE size
+		IF size = 0 THEN BREAK
+		total$ = total$ & dat$
+	WEND
+	CLOSE NETWORK mynet
+
+	' Rip off HTTP headers
+	total$ = MID$(total$, INSTR(total$, "\r\n\r\n")+4)
+
+	BaconGui.progress->hide()
+
+	' Check amount of data
+	IF LEN(total$) != length THEN
+		fl_message_title("System warning detected!")
+		fl_alert("WARNING: file http://%s could not be downloaded probably due to a timeout. Try again later.", name$)
+		total$ = ""
+	END IF
+
+	LABEL finish
+		RETURN total$
+
+	' Something happened in setting up the connection
+	LABEL network_error
+		BaconGui.progress->hide()
+		fl_message_title("System error detected!")
+		fl_alert("System error: the site http://%s is not reachable! Try again later.", LEFT$(name$, INSTR(name$, "/")-1) )
+		CATCH RESET
+		CLOSE NETWORK mynet
+		RETURN ""
+
+END FUNCTION
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Open_File(Fl_Widget* w, void* data)
+
+	LOCAL file$
+	LOCAL page = Get_Tab_Id()
+
+	IF page = 0 THEN
+		CALL New_Tab(NULL, NULL)
+	ELSE
+		CALL Check_Before_Destroy(page)
+	ENDIF
+
+	fl_file_chooser_ok_label("Open")
+	file$ = fl_file_chooser("Open file...", "*.bac", "", 0)
+
+	IF NOT(LEN(file$)) THEN EXIT SUB
+
+	CALL Load_File(file$)
+	Fl::add_idle(Style_Apply)
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Load_File(file$)
+
+	LOCAL result
+	LOCAL page = Get_Tab_Id()
+
+	result = nbook[page].text_buf->loadfile(file$)
+
+	IF result THEN EXIT SUB
+
+	' Set label
+	nbook[page].grp->copy_label(BASENAME$(file$))
+	nbook[page].file$ = file$
+	BaconGui.notebook->redraw()
+
+	' Apply syntax highlighting
+	nbook[page].syntax_start = 0
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Save_File(Fl_Widget* w, void* data)
+
+	LOCAL result
+	LOCAL page = Get_Tab_Id()
+
+	IF nbook[page].file$ = "New" THEN
+		CALL Save_File_As(NULL, NULL)
+	ELSE
+		result = nbook[page].text_buf->savefile(nbook[page].file$)
+		IF result THEN
+			fl_alert("Warning: Saving text failed!")
+		ELSE
+			' Set label
+			nbook[page].grp->copy_label(BASENAME$(nbook[page].file$))
+			BaconGui.notebook->redraw()
+		ENDIF
+	ENDIF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Save_File_As(Fl_Widget* w, void* data)
+
+	LOCAL file$
+	LOCAL result
+	LOCAL page = Get_Tab_Id()
+
+	fl_file_chooser_ok_label("Save")
+	file$ = fl_file_chooser("Save file as...", "*.bac", "", 0)
+
+	IF NOT(LEN(file$)) THEN EXIT SUB
+
+	result = nbook[page].text_buf->savefile(file$)
+
+	IF result THEN
+		fl_alert("Warning: saving text failed!")
+	ELSE
+		' Set label
+		nbook[page].grp->copy_label(BASENAME$(file$))
+		nbook[page].file$ = file$
+		BaconGui.notebook->redraw()
+	ENDIF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Print_Program(Fl_Widget* w, void* data)
+
+	LOCAL ptr TYPE char*
+	LOCAL command$
+	LOCAL set
+	LOCAL page = Get_Tab_Id()
+
+	BaconGui.print->hide()
+
+	CALL Save_File(NULL, NULL)
+
+	ptr = BaconGui.plist->text()
+	command$ = ptr
+
+	IF LEN(command$) = 0 OR command$ = "No printing system found" THEN
+		fl_message_title("System error detected!")
+		fl_alert("System error: unable to print document!\n\nNo printing system available.")
+	ELSE
+		IF ISTRUE(LEN(EXEC$("which enscript 2>/dev/null"))) THEN
+			set = BaconGui.pfmt2->value()
+			IF set THEN command$ = command$ & " --landscape"
+			set = BaconGui.pfmt3->value()
+			IF set THEN
+				command$ = command$ & " --media=A4"
+			ELSE
+				command$ = command$ & " --media=letter"
+			ENDIF
+			set = BaconGui.pfmt5->value()
+			IF set THEN command$ = command$ & " --line-numbers"
+			IF INSTR(command$, "enscript PDF") THEN
+				fl_message_title("Informational")
+				fl_message("Creating PDF file '%s.pdf'.", BASENAME$(nbook[page].file$, 1))
+				SYSTEM "enscript --color --tabsize=4 --no-header --style=emacs --font=Courier7 --highlight=bacon " & MID$(command$, INSTR(command$, "PDF")+1) & " " & nbook[page].file$ & " -p - 2>/dev/null | ps2pdf - " & BASENAME$(nbook[page].file$, 1) & ".pdf 2>/dev/null"
+			ELSE
+				fl_message_title("Informational")
+				fl_message("Sending PostScript to printer '%s'.", HEAD$(command$, 1))
+				SYSTEM "enscript --color --tabsize=4 --no-header --style=emacs --font=Courier7 --highlight=bacon " & nbook[page].file$ & " -d " & command$ & " >/dev/null 2>&1"
+			ENDIF
+		ELIF ISTRUE(LEN(EXEC$("which lp 2>/dev/null"))) THEN
+			set = BaconGui.pfmt2->value()
+			IF set THEN command$ = command$ & " -o landscape"
+			set = BaconGui.pfmt3->value()
+			IF set THEN
+				command$ = command$ & " -o media=A4"
+			ELSE
+				command$ = command$ & " -o media=letter"
+			ENDIF
+			fl_message_title("Informational")
+			fl_message("Sending plain text to printer '%s'.", HEAD$(command$, 1))
+			set = BaconGui.pfmt5->value()
+			IF set THEN
+				SYSTEM "cat -n " & nbook[page].file$ & " | lp -d " & command$
+			ELSE
+				SYSTEM "lp -d " & command$ & " " & nbook[page].file$
+			ENDIF
+		ENDIF
+	END IF
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Export_File(Fl_Widget *w, void* data)
+
+	LOCAL page = Get_Tab_Id()
+	LOCAL html$
+
+	IF LEN(nbook[page].file$) > 0 THEN
+		IF ISTRUE(LEN(EXEC$("which enscript 2>/dev/null"))) THEN
+			html$ = REPLACE$(EXEC$("enscript --color --style=emacs --language=html --highlight=bacon --title=" & BASENAME$(nbook[page].file$) & " " & nbook[page].file$ & " -p - 2>/dev/null"), TAB$(1), SPC$(4))
+			SAVE REPLACE$(html$, nbook[page].file$, BASENAME$(nbook[page].file$)) TO nbook[page].file$ & ".html"
+			fl_message_title("Info")
+			fl_message("Created HTML file '%s.html'.", BASENAME$(nbook[page].file$))
+		ELSE
+			fl_alert("The 'enscript' utility was not found on your system!")
+		ENDIF
+	ENDIF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB New_Tab(Fl_Widget *w, void* data)
+
+	INCR BaconGui.pages
+	IF BaconGui.pages > MAXPAGES THEN
+		fl_message_title("System error detected!")
+		fl_alert("System error: cannot open more tabs than %d.", MAXPAGES)
+	ELSE
+		CALL Create_Page
+		' Set line numbers and wrapping on all pages
+		CALL Set_Lineno(NULL, NULL)
+		CALL Wrap_Mode(NULL, NULL)
+		CALL Set_Fontsize(NULL, NULL)
+
+		BaconGui.notebook->redraw()
+	ENDIF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Open_Tab(Fl_Widget *w, void* data)
+
+	INCR BaconGui.pages
+	IF BaconGui.pages > MAXPAGES THEN
+		fl_message_title("System error detected!")
+		fl_alert("System error: cannot open more tabs than %d.", MAXPAGES)
+	ELSE
+		CALL Create_Page
+		' Set line numbers and wrapping on all pages
+		CALL Set_Lineno(NULL, NULL)
+		CALL Wrap_Mode(NULL, NULL)
+		CALL Set_Fontsize(NULL, NULL)
+
+		CALL Open_File(NULL, NULL)
+		BaconGui.notebook->redraw()
+	ENDIF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Close_Tab(Fl_Widget *w, void* data)
+
+	LOCAL x
+	LOCAL page = Get_Tab_Id()
+
+	IF page THEN
+
+		CALL Check_Before_Destroy(page)
+
+		Fl::delete_widget(nbook[page].grp)
+
+		' Scroll record array
+		FOR x = page TO BaconGui.pages
+			nbook[x].text_buf = nbook[x+1].text_buf
+			nbook[x].stylebuf = nbook[x+1].stylebuf
+			nbook[x].edit = nbook[x+1].edit
+			nbook[x].grp = nbook[x+1].grp
+			nbook[x].file$ = nbook[x+1].file$
+			nbook[x].syntax_start = nbook[x+1].syntax_start
+		NEXT
+
+		DECR BaconGui.pages
+
+		IF BaconGui.pages > 0 THEN Fl::add_idle(Style_Apply)
+
+		BaconGui.win->redraw()
+	ENDIF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Quit_Editor(Fl_Widget *w, void* data)
+
+	LOCAL page, x
+
+	CALL Save_Defaults
+
+	' Save programs if necessary
+	FOR page = 1 TO BaconGui.pages
+		CALL Check_Before_Destroy(page)
+	NEXT
+
+	' Stop the GUI
+	END
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Cut_Text(Fl_Widget *w, void* data)
+
+	LOCAL page = Get_Tab_Id()
+
+	nbook[page].edit->kf_cut(0, nbook[page].edit)
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Copy_Text(Fl_Widget *w, void* data)
+
+	LOCAL page = Get_Tab_Id()
+
+	nbook[page].edit->kf_copy(0, nbook[page].edit)
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Paste_Text(Fl_Widget *w, void* data)
+
+	LOCAL page = Get_Tab_Id()
+
+	nbook[page].edit->kf_paste(0, nbook[page].edit)
+
+	' Apply syntax highlighting again
+	nbook[page].syntax_start = 0
+	Fl::add_idle(Style_Apply)
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Undo_Text(Fl_Widget *w, void* data)
+
+	LOCAL page = Get_Tab_Id()
+
+	nbook[page].edit->kf_undo(0, nbook[page].edit)
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Select_Text(Fl_Widget *w, void* data)
+
+	LOCAL page = Get_Tab_Id()
+
+	nbook[page].edit->kf_select_all(0, nbook[page].edit)
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Set_Theme(Fl_Widget *w, void* data)
+
+	LOCAL item, none TYPE Fl_Menu_Item*
+	LOCAL status
+	LOCAL arg$
+
+	arg$ = (char*)data
+
+	IF arg$ = "set" THEN
+		item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/Select &theme/none")
+		status = item->value()
+		none = item
+		IF status THEN
+			Fl::scheme("none")
+		ELSE
+			item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/Select &theme/plastic")
+			status = item->value()
+			IF status THEN
+				Fl::scheme("plastic")
+			ELSE
+				item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/Select &theme/gtk+")
+				status = item->value()
+				IF status THEN
+					Fl::scheme("gtk+")
+				ELSE
+					item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/Select &theme/gleam")
+					status = item->value()
+					IF status THEN
+						Fl::scheme("gleam")
+					ELSE
+						Fl::scheme("none")
+						none->set()
+					ENDIF
+				ENDIF
+			ENDIF
+		ENDIF
+	ELSE
+		Fl::scheme(arg$)
+	ENDIF
+
+	BaconGui.win->redraw()
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Set_Fontsize(Fl_Widget *w, void* data)
+
+	LOCAL st, set
+
+	set = BaconGui.spinner->value()
+
+	FOR st = 0 TO 7
+		styletable[st].size = set
+	NEXT
+
+	FOR st = 1 TO BaconGui.pages
+		nbook[st].edit->textsize(set)
+	NEXT
+
+	BaconGui.win->redraw()
+	Fl::flush()
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+SUB Apply_Indentation(Fl_Widget *w, void* data)
+
+	LOCAL text$, data$, result$, str$, previous$, text
+	LOCAL myposition, nextposition, label_active, pos, total, wrap_active, x
+	LOCAL page = Get_Tab_Id()
+
+	' Save position
+	pos = nbook[page].edit->insert_position()
+
+	' Get pointer to text and free
+	text = nbook[page].text_buf->text()
+	text$ = text
+	free(text)
+
+	' Perform the indentation
+	OPTION COLLAPSE FALSE
+	SPLIT text$ BY NL$ TO line$ SIZE total
+
+	FOR x = 0 TO total-1
+
+		line$[x] = CHOP$(line$[x])
+
+		' Set my current position
+		myposition = nextposition
+
+		' Handle LABEL indentation
+		IF LEN(line$[x]) = 0 AND label_active THEN
+			label_active = FALSE
+			DECR myposition
+			nextposition = myposition
+		FI
+
+		' Current line backwards indentation
+		IF REGEX(line$[x], "^(CASE|UNTIL)[ \\t]|^(DEFAULT|FI|NEXT|WEND|DONE)|^ELSE$|^ELIF.+THEN$|^END.+") THEN
+			' End with value should not indent backwards
+			IF NOT(REGEX(line$[x], "^END.+[0-9]+")) THEN DECR myposition
+			' Extra step back with ENDSELECT
+			IF REGEX(line$[x], "SELECT$") THEN DECR myposition
+			' Tab not out of screen?
+			IF myposition < 0 THEN myposition = 0
+			nextposition = myposition
+		ENDIF
+
+		' Next line indentation
+		IF REGEX(line$[x], "^(CASE|ENUM|FOR|FUNCTION|FUNC|GLOBAL RECORD|LABEL|RECORD|SELECT|SUB|WHILE|DOTIMES|WITH)[ \\t]|^(DEFAULT|REPEAT|USEC|USEH|DO$)|^IF.+THEN$|^ELIF.+THEN$|^ELSE$") THEN
+			INCR nextposition
+			' The CASE right after SELECT should indent extra
+			IF REGEX(line$[x], "^SELECT") THEN INCR nextposition
+			' Set flag if we are in a LABEL
+			IF LEFT$(line$[x], 5) = "LABEL" THEN label_active = TRUE
+		FI
+
+		' Wrapped text
+		IF RIGHT$(line$[x], 2) = CHR$(32) & CHR$(92) AND NOT(REGEX(line$[x], "^(REM|')")) THEN
+			IF NOT(wrap_active) THEN INCR nextposition
+			wrap_active = TRUE
+		ELSE
+			IF wrap_active THEN DECR nextposition
+			wrap_active = FALSE
+		ENDIF
+
+		' Put result to total string
+		IF REGEX(previous$, "^(REM|')") THEN result$ = CHANGE$(result$, x, TAB$(myposition) & previous$, NL$)
+		IF LEN(line$[x]) THEN
+			FOR str$ IN line$[x] STEP NL$
+				result$ = result$ & TAB$(myposition) & str$ & NL$
+			NEXT
+		ELSE
+			result$ = result$ & NL$
+		FI
+		previous$ = line$[x]
+	NEXT
+
+	OPTION COLLAPSE TRUE
+
+	' Reload indented code
+	nbook[page].text_buf->text(CHOP$(result$))
+
+	' Apply syntax highlighting again
+	nbook[page].syntax_start = 0
+	Fl::add_idle(Style_Apply)
+
+	fl_message_title("Informational")
+	fl_message("Program code indented.")
+
+	' Scroll to cursor
+	nbook[page].edit->insert_position(pos)
+	nbook[page].edit->show_insert_position()
+
+	BaconGui.notebook->redraw()
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+' Update documentation file
+SUB Get_Docu(Fl_Widget *w, void* data)
+
+	LOCAL doc TYPE FILE*
+	LOCAL total$
+	LOCAL pos
+
+	total$ = Download_File$("http://www.basic-converter.org/documentation.txt")
+
+	IF LEN(total$) > 0 THEN
+		SAVE total$ TO TEXTDOC$
+		total$ = Download_File$("http://www.basic-converter.org/documentation.html")
+		' Save documentation
+		IF LEN(total$) > 0 THEN
+			SAVE total$ TO HTMLDOC$
+			SAVE Download_File$("http://www.basic-converter.org/doc_frame.html") TO HTMLFRAME$
+			' Replace picture
+			total$ = Download_File$("http://www.basic-converter.org/doc_index.html")
+			pos = INSTR(total$, "<img src=")
+			total$ = OUTBETWEEN$(total$, "<img src=", ">")
+			IF FILEEXISTS("/usr/local/share/pixmaps/BaConEyes.png") THEN
+				SAVE INSERT$(total$, pos, "<img src=" & CHR$(34) & "file:///usr/local/share/pixmaps/BaConEyes.png" & CHR$(34) & ">") TO HTMLIDX$
+			ELIF FILEEXISTS("/usr/share/pixmaps/BaConEyes.png") THEN
+				SAVE INSERT$(total$, pos, "<img src=" & CHR$(34) & "file:///usr/share/pixmaps/BaConEyes.png" & CHR$(34) & ">") TO HTMLIDX$
+			ENDIF
+			fl_message_title("Informational")
+			fl_message("The documentation was updated successfully!")
+		ELSE
+			fl_message_title("System error detected!")
+			fl_alert("The documentation could not be retrieved.\n\n\tPlease try again later.")
+		END IF
+	ELSE
+		fl_message_title("System error detected!")
+		fl_alert("The documentation could not be retrieved.\n\n\tPlease try again later.")
+	END IF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Set_Lineno(Fl_Widget *w, void* data)
+
+	LOCAL item TYPE Fl_Menu_Item*
+	LOCAL set, page, end, lines
+
+	item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/&Line numbers")
+	set = item->value()
+
+	FOR page = 1 TO BaconGui.pages
+		IF set <> 0 THEN
+			' Check line number width
+			end = nbook[page].text_buf->length()
+			lines = nbook[page].text_buf->count_lines(0, end)
+			nbook[page].linenr_digits = NrDig(lines)*12
+			nbook[page].edit->linenumber_width(nbook[page].linenr_digits)
+			nbook[page].edit->linenumber_format("%d")
+		ELSE
+			nbook[page].edit->linenumber_width(0)
+		ENDIF
+	NEXT
+
+	BaconGui.notebook->redraw()
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Wrap_Mode(Fl_Widget *w, void* data)
+
+	LOCAL item TYPE Fl_Menu_Item*
+	LOCAL set, page
+
+	item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/&Wrap lines")
+	set = item->value()
+
+	FOR page = 1 TO BaconGui.pages
+		IF set <> 0 THEN
+			nbook[page].edit->wrap_mode(3, 0)
+		ELSE
+			nbook[page].edit->wrap_mode(0, 0)
+		ENDIF
+	NEXT
+
+	BaconGui.notebook->redraw()
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Set_Info(Fl_Widget* w, void* data)
+
+	LOCAL item TYPE Fl_Menu_Item*
+
+	item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/&Context info")
+	BaconGui.show_info = item->value()
+
+	IF BaconGui.show_info = 0 THEN
+		BaconGui.info->hide()
+	ELSE
+		CALL Display_Info(NULL, (void*)"now")
+	ENDIF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Find_Term(Fl_Widget *w, void* data)
+
+	LOCAL pos, found TYPE int
+	LOCAL find$
+	LOCAL page = Get_Tab_Id()
+
+	find$ = (char*)BaconGui.input_9->value()
+
+	REPEAT
+		pos = nbook[page].edit->insert_position()
+		found = nbook[page].text_buf->search_forward(pos, find$, &pos, 0)
+		IF found THEN
+			nbook[page].text_buf->select(pos, pos+LEN(find$))
+			nbook[page].edit->insert_position(pos+LEN(find$))
+			nbook[page].edit->show_insert_position()
+		ELSE
+			IF fl_choice("No occurrences of '%s' found! Start from top?", "No", "Yes", 0, find$) THEN
+				nbook[page].edit->insert_position(0)
+				found = FALSE
+			ELSE
+				found = TRUE
+			ENDIF
+		ENDIF
+	UNTIL found
+
+	BaconGui.notebook->redraw()
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Replace_Term(Fl_Widget *w, void* data)
+
+	LOCAL pos, found, answer TYPE int
+	LOCAL find$, repl$
+	LOCAL page = Get_Tab_Id()
+
+	find$ = (char*)BaconGui.input_9->value()
+	repl$ = (char*)BaconGui.input_10->value()
+
+	REPEAT
+		pos = nbook[page].edit->insert_position()
+		found = nbook[page].text_buf->search_forward(pos, find$, &pos, 0)
+		IF found THEN
+			nbook[page].text_buf->select(pos, pos+LEN(find$))
+			nbook[page].edit->insert_position(pos+LEN(find$))
+			nbook[page].edit->show_insert_position()
+			fl_message_title("Replace confirmation")
+			answer = fl_choice("Replace?", "No", "Yes", "Cancel")
+			IF answer = 1 THEN
+				nbook[page].text_buf->remove_selection()
+				nbook[page].text_buf->insert(pos, repl$)
+				nbook[page].text_buf->select(pos, pos+LEN(repl$))
+				nbook[page].edit->insert_position(pos+LEN(repl$))
+				nbook[page].edit->show_insert_position()
+			ENDIF
+		ELSE
+			IF fl_choice("No occurrences of '%s' found! Start from top?", "No", "Yes", 0, find$) THEN
+				nbook[page].edit->insert_position(0)
+				answer = 0
+			ELSE
+				answer = 2
+			ENDIF
+		ENDIF
+	UNTIL answer = 2
+
+	BaconGui.notebook->redraw()
+
+END SUB
+
+'------------------------------------------------------------------------------------------------------------
+
+FUNCTION Check_Dir$
+
+	LOCAL arg$
+
+	arg$ = (char*)BaconGui.input_5->value()
+
+	IF LEN(arg$) = 0 THEN arg$ = "."
+
+	IF NOT(FILEEXISTS(arg$)) THEN MAKEDIR arg$
+
+	IF NOT(FILEEXISTS(arg$)) THEN
+		fl_alert("System error: temporary directory '%s' does not exist!", arg$)
+		EXIT SUB
+	END IF
+
+	RETURN arg$
+
+END FUNCTION
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Convert_Code(Fl_Widget *w, void* data)
+
+	LOCAL arg$, item$, cc$, lib$, opt$, inc$, tmp$, arc$, param$, log$, mak$, mesg$, name$, bin$, data$
+	LOCAL set, end, pos, linenr, answer
+	LOCAL page = Get_Tab_Id()
+
+	data$ = (char*)data
+
+	' Get all the settings
+	arg$ = (char*)BaconGui.input_1->value()
+	IF LEN(arg$) THEN
+		IF ISTRUE(LEN(EXEC$("which " & arg$ & " 2>/dev/null"))) THEN
+			cc$ = " -c " & arg$
+		ELSE
+			fl_message_title("System error detected!")
+			fl_alert("System error: compiler '%s' not found!", arg$)
+			EXIT SUB
+		ENDIF
+	ELSE
+		fl_message_title("System error detected!")
+		fl_alert("System error: no compiler provided!")
+		EXIT SUB
+	ENDIF
+
+	arg$ = (char*)BaconGui.input_2->value()
+	WHILE INSTR(arg$, "`")
+		lib$ = lib$ & " `" & INBETWEEN$(arg$, "`", "`", 2) & "`"
+		arg$ = OUTBETWEEN$(arg$, "`", "`", 2)
+	WEND
+	FOR item$ IN arg$
+		lib$ = lib$ & " -l " & item$
+	NEXT
+
+	arg$ = (char*)BaconGui.input_3->value()
+	WHILE INSTR(arg$, "`")
+		opt$ = opt$ & " `" & INBETWEEN$(arg$, "`", "`", 2) & "`"
+		arg$ = OUTBETWEEN$(arg$, "`", "`", 2)
+	WEND
+	FOR item$ IN arg$
+		opt$ = opt$ & " -o " & item$
+	NEXT
+
+	arg$ = (char*)BaconGui.input_4->value()
+	FOR item$ IN arg$
+		inc$ = inc$ & " -i " & item$
+	NEXT
+
+	param$ = " -q"
+
+	set = BaconGui.check_2->value()
+	IF set THEN param$ = param$ & " -f"
+
+	set = BaconGui.check_3->value()
+	IF set THEN param$ = param$ & " -n"
+
+	set = BaconGui.check_4->value()
+	IF set THEN param$ = param$ & " -j"
+
+	set = BaconGui.check_5->value()
+	IF set THEN param$ = param$ & " -p"
+
+	set = BaconGui.check_6->value()
+	IF set THEN param$ = param$ & " -x"
+
+	set = BaconGui.check_9->value()
+	IF set THEN param$ = param$ & " -z"
+
+	set = BaconGui.check_10->value()
+	IF set THEN param$ = param$ & " -s"
+
+	arg$ = Check_Dir$()
+
+	IF arg$ <> "." THEN
+		tmp$ = " -d " & arg$
+		log$ = CHOP$(arg$) & "/bacon.log"
+		IF data$ <> "scratch" THEN
+			mak$ = CHOP$(arg$) & "/" & BASENAME$(nbook[page].file$) & ".log"
+		ELSE
+			mak$ = CHOP$(arg$) & "/scratchpad.log"
+		ENDIF
+	ELSE
+		IF data$ <> "scratch" THEN
+			tmp$ = " -d " & DIRNAME$(nbook[page].file$)
+			log$ = DIRNAME$(nbook[page].file$) & "/bacon.log"
+			mak$ = DIRNAME$(nbook[page].file$) & "/" & BASENAME$(nbook[page].file$) & ".log"
+		ELSE
+			tmp$ = " -d ."
+			log$ = "./bacon.log"
+			mak$ = "./scratchpad.log"
+		ENDIF
+	FI
+
+	' Save the code
+	IF data$ = "scratch" THEN
+		name$ = arg$ & "/scratchpad.bac"
+		result = BaconGui.sibuffer->savefile(name$)
+		IF result THEN
+			fl_message_title("System error detected!")
+			fl_alert("Warning: Saving code from Scratchpad failed! Please provide a correct 'temp dir'.")
+			EXIT SUB
+		ENDIF
+	ELSE
+		CALL Save_File(NULL, NULL)
+		name$ = nbook[page].file$
+	ENDIF
+
+	IF TOKEN$(tmp$, 2) = "." THEN
+		bin$ = DIRNAME$(name$) & "/" & BASENAME$(name$, 1)
+	ELSE
+		bin$ = TOKEN$(tmp$, 2) & "/" & BASENAME$(name$, 1)
+	FI
+
+	BaconGui.convert->hide()
+	BaconGui.box->label("Converting and compiling, please wait...")
+	BaconGui.progress->show()
+	BaconGui.progress->wait_for_expose()
+	Fl::flush()
+
+	IF FILEEXISTS(bin$) AND FILETYPE(bin$) = 1 THEN DELETE FILE bin$
+	SYSTEM "bacon -y " & cc$ & param$ & lib$ & opt$ & inc$ & tmp$ & arc$ & " " & name$ & " >/dev/null 2>" & log$
+
+	BaconGui.progress->hide()
+
+	IF NOT(FILEEXISTS(log$)) THEN
+		fl_message_title("Informational")
+		fl_alert("Compiler logging not available! Please provide a correct 'temp dir'.")
+	ELIF FILELEN(log$) > 0 THEN
+		fl_message_title("Conversion error detected!")
+		arg$ = HEAD$(CHOP$(LOAD$(log$)), 1, NL$)
+		linenr = VAL(TOKEN$(arg$, 2, ":"))
+		nbook[page].edit->scroll(linenr-20, 1)
+		set = nbook[page].edit->skip_lines(0, linenr-1, FALSE)
+		set = nbook[page].text_buf->line_start(set)
+		end = nbook[page].text_buf->line_end(set)
+		nbook[page].text_buf->select(set, end)
+		nbook[page].edit->insert_position(set)
+		IF NOT(FILEEXISTS(bin$)) THEN
+			fl_alert("%s", arg$)
+			EXIT SUB
+		ELSE
+			answer = fl_choice("%s%s%sExecute?", "No", "Yes", 0, arg$, NL$, NL$)
+			IF answer = 0 THEN EXIT SUB
+		ENDIF
+	ELIF FILEEXISTS(mak$) AND FILELEN(mak$) THEN
+		fl_message_title("Compilation warnings / errors detected!")
+		mesg$ = HEAD$(LOAD$(mak$), 16, NL$)
+		IF NOT(FILEEXISTS(bin$)) THEN
+			fl_alert("%s", mesg$)
+			EXIT SUB
+		ELSE
+			answer = fl_choice("%s%s%sExecute?", "No", "Yes", 0, mesg$, NL$, NL$)
+			IF answer = 0 THEN EXIT SUB
+		ENDIF
+	ENDIF
+
+	IF FILEEXISTS(log$) THEN DELETE FILE log$
+
+	IF data$ = "scratch" THEN
+		CALL Exec_Prog(NULL, (void*)name$)
+	ELSE
+		BaconGui.execute->show()
+		Fl::focus(BaconGui.exec_button)
+	ENDIF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Exec_Prog(Fl_Widget *w, void* data)
+
+	LOCAL arg$, cmd$, file$, dir$, path$
+	LOCAL set
+	LOCAL page = Get_Tab_Id()
+
+	BaconGui.execute->hide()
+
+	IF (char*)data <> NULL THEN
+		path$ = (char*)data
+	ELSE
+		' Escape spaces in filename
+		file$ = BASENAME$(nbook[page].file$)
+		dir$ = (char*)BaconGui.input_5->value()
+		IF NOT(LEN(dir$)) OR CHOP$(dir$) = "." THEN dir$ = DIRNAME$(nbook[page].file$)
+		path$ = REPLACE$(dir$ & "/" & file$, CHR$(32), CHR$(92) & CHR$(32) )
+	ENDIF
+
+	' Get binary name
+	path$ = LEFT$(path$, INSTRREV(path$, ".")-1)
+
+	' Shell definition
+	set = BaconGui.check_8->value()
+	IF set THEN
+		' Get arguments
+		arg$ = (char*)BaconGui.input_8->value()
+		arg$ = REPLACE$(arg$, CHR$(34), CHR$(92) & CHR$(34) )
+		' Get shell command
+		cmd$ = (char*)BaconGui.input_7->value()
+		cmd$ = REPLACE$(cmd$, "@", path$ & " " & arg$ )
+	ELSE
+		cmd$ = path$
+	ENDIF
+
+	IF FILEEXISTS(path$) THEN
+		SYSTEM cmd$ & " &"
+	ELSE
+		fl_message_title("System error detected!")
+		fl_alert("System error: executable '%s' does not exist!", path$)
+	END IF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Open_Help(Fl_Widget *w, void* data)
+
+	IF ISTRUE(LEN(EXEC$("which links2 2>/dev/null"))) THEN
+		SYSTEM "links2 -g -mode 1280x700 " & HTMLFRAME$ & " &"
+	ELIF ISTRUE(LEN(EXEC$("which links 2>/dev/null"))) THEN
+		SYSTEM "links -g -mode 1280x700 " & HTMLFRAME$ & " &"
+	ELSE
+		BaconGui.documentation->show()
+	ENDIF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Tab_Changed(Fl_Widget *w, void* data)
+
+	Fl::add_idle(Style_Apply)
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Style_Parse(char *text, char *style, len)
+
+	LOCAL x, y, in_string, in_block_comment, in_line_comment, in_escaped, pos, color
+	LOCAL text$, term$, c1$, c2$
+
+	text$ = text
+
+	text$ = REPLACE$(text$, "\\" & NL$, "  ")
+
+	FOR x = 0 TO len-1
+
+		c1$ = MID$(text$, x+1, 1)
+		c2$ = MID$(text$, x+1, 2)
+
+		' Got escape sign?
+		IF c1$ = "\\" AND NOT(in_line_comment) AND NOT(in_block_comment) THEN
+			IF in_escaped THEN
+				in_escaped = 0
+			ELSE
+				in_escaped = 1
+			ENDIF
+		' String
+		ELIF c1$ = "\"" AND NOT(in_escaped) AND NOT(in_line_comment) AND NOT(in_block_comment) THEN
+			in_string = 1 - in_string
+			POKE style+x, 68
+		' Block comment start
+		ELIF c2$ = "/*" AND NOT(in_string) AND NOT(in_line_comment) THEN
+			in_block_comment = TRUE
+			in_escaped = FALSE
+		' Line comment start
+		ELIF c1$ = "'" OR REGEX(MID$(text$, x+1, 4), "REM[[:space:]]+") OR MID$(text$, x+1, 3) = "REM" AND x = LEN(text$)-3 THEN
+			IF NOT(in_string) AND NOT(in_block_comment) THEN
+				in_line_comment = TRUE
+				in_escaped = FALSE
+			ENDIF
+		' Line comment end
+		ELIF c1$ = NL$ AND NOT(in_string) AND NOT(in_block_comment) THEN
+			in_line_comment = FALSE
+			in_escaped = FALSE
+		ELSE
+			in_escaped = FALSE
+		ENDIF
+
+		' Highlight string
+		IF in_string THEN
+			POKE style+x, 68
+		' Highlight block comments
+		ELIF in_block_comment THEN
+			' Block comment end
+			IF PEEK(text+x) = 42 AND PEEK(text+x+1) = 47 THEN
+				POKE style+x+1, 67
+				POKE style+x, 67
+				in_block_comment = FALSE
+			ELSE
+				POKE style+x, 67
+			ENDIF
+		ELIF in_line_comment THEN
+			POKE style+x, 66
+		ELIF PEEK(text+x) BETWEEN 48 AND 57 THEN
+			POKE style+x, 73
+		ELIF PEEK(style+x) = 68 AND PEEK(text+x) = 34 THEN
+			POKE style+x, 68
+		ELIF PEEK(text+x) = 38 THEN
+			POKE style+x, 72
+		ELSE
+			pos = REGEX(MID$(text$, x+1), "[[:space:]]|[=,?;:+-/\\(\\)\\*]|\\||\\[|\\]")-1
+			IF pos < 0 THEN pos = len-x
+
+			term$ = " " & MID$(text$, x+1, pos) & " "
+			IF TALLY(code_keyword$, term$) THEN
+				color = 71
+			ELIF TALLY(code_func$, term$) THEN
+				color = 72
+			ELIF TALLY(code_api$, term$) THEN
+				color = 69
+			ELIF TALLY(code_type$, term$) THEN
+				color = 70
+			ELIF TALLY(code_var$, term$) THEN
+				color = 72
+			ELSE
+				color = 65
+			ENDIF
+
+			FOR y = 0 TO pos-1
+				POKE style+x+y, color
+			NEXT
+			POKE style+x+y, 65
+
+			INCR x, pos
+		ENDIF
+	NEXT
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Style_Apply(void* data)
+
+	LOCAL start, end, len, x
+	LOCAL style, text TYPE char*
+
+	LOCAL page = Get_Tab_Id()
+
+	len = nbook[page].text_buf->length()
+	start = nbook[page].syntax_start
+
+	IF start >= len THEN
+		Fl::remove_idle(Style_Apply)
+	ELSE
+		end = nbook[page].text_buf->skip_lines(start, 32)
+
+		text  = nbook[page].text_buf->text_range(start, end)
+		style = nbook[page].stylebuf->text_range(start, end)
+
+		Style_Parse(text, style, end - start)
+
+		nbook[page].stylebuf->replace(start, end, style)
+		nbook[page].edit->redisplay_range(start, end)
+		nbook[page].syntax_start = end
+
+		free(text)
+		free(style)
+	ENDIF
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Style_Update(int pos, int nInserted, int nDeleted, int nRestyled, const char* deletedText, void* cbArg)
+
+	LOCAL x, start, end, lines
+	LOCAL style, text TYPE char*
+	LOCAL label$
+	LOCAL page = Get_Tab_Id()
+
+	IF nInserted = 0 AND nDeleted = 0 THEN
+		nbook[page].stylebuf->unselect()
+		EXIT SUB
+	ENDIF
+
+	IF nInserted > 0 THEN
+		style = MEMORY(nInserted + 1)
+		FOR x = 0 TO nInserted-1
+			POKE style + x, 65
+		NEXT
+
+		nbook[page].stylebuf->replace(pos, pos + nDeleted, style)
+		FREE style
+	ELSE
+		nbook[page].stylebuf->remove(pos, pos + nDeleted)
+	ENDIF
+
+	nbook[page].stylebuf->select(pos, pos + nInserted - nDeleted)
+
+	start = nbook[page].text_buf->rewind_lines(pos, 48)
+	end = nbook[page].text_buf->skip_lines(pos, 48)
+
+	text  = nbook[page].text_buf->text_range(start, end)
+	style = nbook[page].stylebuf->text_range(start, end)
+
+	Style_Parse(text, style, end - start)
+
+	nbook[page].stylebuf->replace(start, end, style)
+	nbook[page].edit->redisplay_range(start, end)
+
+	free(text)
+	free(style)
+
+	' Check line number width
+	end = nbook[page].text_buf->length()
+	lines = nbook[page].text_buf->count_lines(0, end)
+	IF NrDig(lines)*12 <> nbook[page].linenr_digits THEN Set_Lineno(NULL, NULL)
+
+	' Set label
+	nbook[page].grp->copy_label("* " & BASENAME$(nbook[page].file$))
+	BaconGui.notebook->redraw()
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Create_Page
+
+	LOCAL width, height
+	LOCAL page = BaconGui.pages
+
+	width = BaconGui.win->w()
+	height = BaconGui.win->h()
+
+	BaconGui.notebook->begin()
+
+	nbook[page].grp = new Fl_Group(5, 92, width-10, height-92, "New")
+	DO
+		nbook[page].text_buf = new Fl_Text_Buffer()
+		nbook[page].stylebuf = new Fl_Text_Buffer(nbook[page].text_buf->length())
+
+		nbook[page].edit = new Fl_Text_Editor(10, 97, width-20, height-102)
+		nbook[page].edit->buffer(nbook[page].text_buf)
+		nbook[page].edit->highlight_data(nbook[page].stylebuf, styletable, sizeof(styletable)/sizeof(styletable[0]), 0, 0, 0)
+
+		nbook[page].text_buf->add_modify_callback(Style_Update, nbook[page].edit)
+		nbook[page].text_buf->tab_distance(4)
+	DONE
+
+	nbook[page].grp->end()
+	nbook[page].file$ = "New"
+
+	BaconGui.notebook->end()
+
+	BaconGui.notebook->add(nbook[page].grp)
+	BaconGui.notebook->resizable(nbook[page].grp)
+
+	'Select tab
+	BaconGui.notebook->value(nbook[page].grp)
+
+	BaconGui.win->resizable(nbook[page].edit)
+
+END SUB
+
+' --------------------------------------------------------------------------------------------------
+
+SUB Create_Gui
+
+	LOCAL button TYPE Fl_Button*
+	LOCAL group TYPE Fl_Group*
+	LOCAL popup TYPE Fl_Menu_Button*
+	LOCAL box TYPE Fl_Box*
+	LOCAL pixmap TYPE Fl_Pixmap*
+	LOCAL pack TYPE Fl_Pack*
+	LOCAL info$, file$, title$
+	LOCAL nr, x
+
+	' Define the BaCon icon
+	BaconGui.icon = new Fl_RGB_Image(Icon_Pix, FL_GRAY)
+
+	' Set default BaCon icon in dialogs
+	box = fl_message_icon()
+	box->image(Icon_Pix)
+	box->align(FL_ALIGN_IMAGE_BACKDROP)
+	box->color(FL_GRAY)
+	box->box(FL_FLAT_BOX)
+	box->labeltype(FL_NO_LABEL)
+
+	' Better visuals
+	Fl::visual(FL_DOUBLE|FL_INDEX)
+
+	' Create search and replace
+	BaconGui.srch = new Fl_Window(300, 110, "Search and replace")
+	BaconGui.input_9 = new Fl_Input(80, 10, 210, 25, "Find:")
+	BaconGui.input_9->align(FL_ALIGN_LEFT)
+	BaconGui.input_10 = new Fl_Input(80, 40, 210, 25, "Replace:")
+	BaconGui.input_10->align(FL_ALIGN_LEFT)
+	button = new Fl_Return_Button(105, 70, 120, 30, "Replace")
+	button->callback(Replace_Term)
+	button = new Fl_Return_Button(10, 70, 90, 30, "Find")
+	button->callback(Find_Term)
+	button = new Fl_Button(230, 70, 60, 30, "Cancel")
+	button->callback(Hide_Widget, (void*)"search")
+	BaconGui.srch->icon(BaconGui.icon)
+	BaconGui.srch->end()
+	BaconGui.srch->set_non_modal()
+
+	' Create convert window
+	BaconGui.convert = new Fl_Double_Window(240, 420, "Conversion options")
+	BaconGui.input_1 = new Fl_Input(120, 5, 110, 25, "C Compiler: ")
+	BaconGui.input_1->labelsize(13)
+	BaconGui.input_2 = new Fl_Input(120, 35, 110, 25, "Libraries: ")
+	BaconGui.input_2->labelsize(13)
+	BaconGui.input_3 = new Fl_Input(120, 65, 110, 25, "Options: ")
+	BaconGui.input_3->labelsize(13)
+	BaconGui.input_4 = new Fl_Input(120, 95, 110, 25, "Include files: ")
+	BaconGui.input_4->labelsize(13)
+	BaconGui.input_5 = new Fl_Input(120, 125, 110, 25, "Temp dir: ")
+	BaconGui.input_5->labelsize(13)
+	BaconGui.check_2 = new Fl_Check_Button(10, 160, 220, 30, " Create Shared Object")
+	BaconGui.check_2->labelsize(13)
+	BaconGui.check_3 = new Fl_Check_Button(10, 190, 220, 30, " Do not compile, only convert")
+	BaconGui.check_3->labelsize(13)
+	BaconGui.check_4 = new Fl_Check_Button(10, 220, 220, 30, " Invoke C Preprocessor")
+	BaconGui.check_4->labelsize(13)
+	BaconGui.check_5 = new Fl_Check_Button(10, 250, 220, 30, " Preserve temporary files")
+	BaconGui.check_5->labelsize(13)
+	BaconGui.check_6 = new Fl_Check_Button(10, 280, 220, 30, " Extract gettext strings")
+	BaconGui.check_6->labelsize(13)
+	BaconGui.check_9 = new Fl_Check_Button(10, 310, 220, 30, " Allow lowercase")
+	BaconGui.check_9->labelsize(13)
+	BaconGui.check_10 = new Fl_Check_Button(10, 340, 220, 30, " Suppress semantic warnings")
+	BaconGui.check_10->labelsize(13)
+	button = new Fl_Button(10, 380, 100, 30, "Cancel")
+	button->callback(Hide_Widget, (void*)"convert")
+	button->labelsize(13)
+	BaconGui.conv_button = new Fl_Return_Button(130, 380, 100, 30, "Convert")
+	BaconGui.conv_button->labelsize(13)
+	BaconGui.conv_button->callback(Convert_Code)
+	BaconGui.convert->icon(BaconGui.icon)
+	BaconGui.convert->end()
+
+	' Create font size window
+	BaconGui.fsize = new Fl_Double_Window(280, 75, "Font size")
+	BaconGui.spinner = new Fl_Spinner(170, 5, 100, 30, "Setting the font size: ")
+	BaconGui.spinner->type(FL_INT_INPUT)
+	BaconGui.spinner->labelsize(13)
+	BaconGui.spinner->callback(Set_Fontsize)
+	button = new Fl_Return_Button(200, 40, 70, 30, "Ok")
+	button->callback(Hide_Widget, (void*)"font")
+	button->labelsize(13)
+	BaconGui.fsize->icon(BaconGui.icon)
+	BaconGui.fsize->end()
+
+	' Create progression window
+	BaconGui.progress = new Fl_Double_Window(400, 50, "Informational")
+	BaconGui.box = new Fl_Box(10, 10, 380, 30, "Working, please wait...")
+	BaconGui.box->labelsize(13)
+	BaconGui.box->box(FL_BORDER_FRAME)
+	BaconGui.progress->icon(BaconGui.icon)
+	BaconGui.progress->end()
+
+	' Create execute window
+	BaconGui.execute = new Fl_Double_Window(600, 190, "Execute options")
+	BaconGui.check_7 = new Fl_Radio_Round_Button(10, 10, 220, 30, " GUI application")
+	BaconGui.check_7->labelsize(13)
+	BaconGui.check_8 = new Fl_Radio_Round_Button(10, 40, 220, 30, " Console application")
+	BaconGui.check_8->labelsize(13)
+	BaconGui.check_8->value(1)
+	BaconGui.input_7 = new Fl_Input(120, 80, 470, 25, "Default shell: ")
+	BaconGui.input_7->labelsize(13)
+	BaconGui.input_8 = new Fl_Input(120, 110, 470, 25, "Arguments: ")
+	BaconGui.input_8->labelsize(13)
+	button = new Fl_Button(10, 150, 100, 30, "Cancel")
+	button->callback(Hide_Widget, (void*)"execute")
+	button->labelsize(13)
+	BaconGui.exec_button = new Fl_Return_Button(490, 150, 100, 30, "Execute")
+	BaconGui.exec_button->labelsize(12)
+	BaconGui.exec_button->labelfont()
+	BaconGui.exec_button->callback(Exec_Prog)
+	BaconGui.execute->icon(BaconGui.icon)
+	BaconGui.execute->end()
+
+	' Create help window
+	BaconGui.documentation = new Fl_Help_Dialog()
+	BaconGui.documentation->textsize(15)
+	BaconGui.documentation->resize(BaconGui.documentation->x(), BaconGui.documentation->y(), 1024, 700)
+	BaconGui.documentation->load(HTMLIDX$)
+
+	' Create info window
+	BaconGui.info = new Fl_Double_Window(550,150)
+	BaconGui.scroll = new Fl_Scroll(0, 0, 550, 150)
+	BaconGui.itxt = new Fl_Multiline_Output(0, 0, 550, 150)
+	BaconGui.itxt->textsize(12)
+	BaconGui.itxt->textfont(FL_COURIER_ITALIC)
+	BaconGui.itxt->color(FL_YELLOW)
+	BaconGui.scroll->end()
+	BaconGui.info->end()
+	BaconGui.info->border(0)
+	BaconGui.info->set_menu_window()
+
+	' Create scratchpad
+	BaconGui.scratch = new Fl_Double_Window(600, 400, "BaCon Scratchpad")
+	BaconGui.sibuffer = new Fl_Text_Buffer()
+	BaconGui.sibuffer->tab_distance(4)
+	BaconGui.siedit = new Fl_Text_Editor(5, 5, 590, 355)
+	BaconGui.siedit->buffer(BaconGui.sibuffer)
+	BaconGui.siedit->textfont(FL_COURIER)
+	group = new Fl_Group(0, 360, 600, 50)
+	button = new Fl_Return_Button(5, 365, 100, 30, "Execute")
+	button->callback(Convert_Code, (void*)"scratch")
+	button = new Fl_Button(525, 365, 70, 30, "Close")
+	button->callback(Hide_Widget, (void*)"scratch")
+	button = new Fl_Button(200, 365, 10, 10, "fake")
+	button->hide()
+	group->end()
+	group->resizable(button)
+	BaconGui.scratch->resizable(BaconGui.siedit)
+	BaconGui.scratch->icon(BaconGui.icon)
+	BaconGui.scratch->end()
+
+	' Print panel
+	BaconGui.print = new Fl_Double_Window(300, 200, "Print BaCon program")
+	BaconGui.plist = new Fl_Choice(5, 5, 290, 30)
+	IF ISFALSE(LEN(EXEC$("which lpstat 2>/dev/null"))) THEN
+		BaconGui.plist->add("No printing system found")
+	ELSE
+		IF ISTRUE(LEN(EXEC$("which enscript 2>/dev/null"))) AND ISTRUE(LEN(EXEC$("which ps2pdf 2>/dev/null"))) THEN BaconGui.plist->add("enscript PDF")
+		info$ = EXEC$("lpstat -a 2>/dev/null")
+		SPLIT info$ BY NL$ TO printer$ SIZE nr
+		IF nr > 0 THEN
+			FOR x = 0 TO nr-1
+				BaconGui.plist->add(HEAD$(printer$[x], 1))
+			NEXT
+		END IF
+	ENDIF
+	BaconGui.plist->value(0)
+	group = new Fl_Group(0, 0, 150, 100)
+	BaconGui.pfmt1 = new Fl_Radio_Round_Button(5, 40, 140, 30, " Portrait")
+	BaconGui.pfmt2 = new Fl_Radio_Round_Button(5, 75, 140, 30, " Landscape")
+	BaconGui.pfmt1->value(1)
+	group->end()
+	group = new Fl_Group(200, 0, 150, 100)
+	BaconGui.pfmt3 = new Fl_Radio_Round_Button(155, 40, 140, 30, " Size A4")
+	BaconGui.pfmt4 = new Fl_Radio_Round_Button(155, 75, 140, 30, " Size letter")
+	BaconGui.pfmt3->value(1)
+	group->end()
+	BaconGui.pfmt5 = new Fl_Check_Button(5, 110, 290, 30, " Include source code line numbers")
+	button = new Fl_Button(5, 160, 70, 30, "Close")
+	button->callback(Hide_Widget, (void*)"print")
+	button = new Fl_Return_Button(170, 160, 120, 30, "Print")
+	button->callback(Print_Program)
+	BaconGui.print -> end()
+
+	' Main window
+	title$ = "BaConGUI FLTK " & VERSION$
+	BaconGui.win = new Fl_Double_Window(BaconGui.xsize, BaconGui.ysize, title$)
+	BaconGui.menu = new Fl_Menu_Bar(0,0,BaconGui.xsize,30)
+	BaconGui.menu->add("&File/&Open...", "^o", Open_File)
+	BaconGui.menu->add("&File/&Save", "^s", Save_File)
+	BaconGui.menu->add("&File/S&ave as...", "+^s", Save_File_As, 0, FL_MENU_DIVIDER)
+	BaconGui.menu->add("&File/&Print...", "^p", Show_Widget, (void*)"print", FL_MENU_DIVIDER)
+	BaconGui.menu->add("&File/E&xport to HTML", "^h", Export_File, 0, FL_MENU_DIVIDER)
+	BaconGui.menu->add("&File/&New tab", "^n", New_Tab)
+	BaconGui.menu->add("&File/O&pen tab...", "+^n", Open_Tab)
+	BaconGui.menu->add("&File/&Close tab", "^t", Close_Tab, 0, FL_MENU_DIVIDER)
+	BaconGui.menu->add("&File/&Quit", "^q", Quit_Editor)
+	BaconGui.menu->add("&Edit/&Cut", "^x", Cut_Text)
+	BaconGui.menu->add("&Edit/&Copy", "^c", Copy_Text)
+	BaconGui.menu->add("&Edit/&Paste", "^v", Paste_Text, 0, FL_MENU_DIVIDER)
+	BaconGui.menu->add("&Edit/&Undo", "^z", Undo_Text)
+	BaconGui.menu->add("&Edit/&Select all", "^a", Select_Text, 0, FL_MENU_DIVIDER)
+	BaconGui.menu->add("&Edit/&Find...", "^f", Show_Widget, (void*)"search")
+	BaconGui.menu->add("&Options/&Line numbers", 0, Set_Lineno, 0, FL_MENU_TOGGLE)
+	BaconGui.menu->add("&Options/&Wrap lines", 0, Wrap_Mode, 0, FL_MENU_TOGGLE)
+	BaconGui.menu->add("&Options/&Restore tabs", 0, 0, 0, FL_MENU_TOGGLE)
+	BaconGui.menu->add("&Options/&Context info", "^i", Set_Info, 0, FL_MENU_TOGGLE|FL_MENU_DIVIDER)
+	BaconGui.menu->add("&Options/A&pply indentation", "^m", Apply_Indentation, 0, FL_MENU_DIVIDER)
+	BaconGui.menu->add("&Options/&Select font size...", 0, Show_Widget, (void*)"font")
+	BaconGui.menu->add("&Options/&Background color...", 0, Show_Widget, (void*)"color")
+	BaconGui.menu->add("&Options/Select &theme", 0, 0, 0, FL_SUBMENU|FL_MENU_DIVIDER)
+	BaconGui.menu->add("&Options/Select &theme/none", 0, Set_Theme, (void*)"none", FL_MENU_RADIO)
+	BaconGui.menu->add("&Options/Select &theme/plastic", 0, Set_Theme, (void*)"plastic", FL_MENU_RADIO)
+	BaconGui.menu->add("&Options/Select &theme/gtk+", 0, Set_Theme, (void*)"gtk+", FL_MENU_RADIO)
+	BaconGui.menu->add("&Options/Select &theme/gleam", 0, Set_Theme, (void*)"gleam", FL_MENU_RADIO)
+	BaconGui.menu->add("&Options/Update &documentation...", 0, Get_Docu)
+	BaconGui.menu->add("&Tools/&Convert...", "^b", Show_Widget, (void*)"convert")
+	BaconGui.menu->add("&Tools/&Execute...", "^e", Show_Widget, (void*)"execute", FL_MENU_DIVIDER)
+	BaconGui.menu->add("&Tools/&BaCon Scatchpad...", "^w", Show_Widget, (void*)"scratch")
+	BaconGui.menu->add("&Help/&Documentation", 0, Open_Help)
+	BaconGui.menu->add("&Help/&About...", 0, Show_Widget, (void*)"about")
+
+	' Toolbar
+	pack = new Fl_Pack(0, 30, BaconGui.xsize, 32)
+	pack->type(Fl_Pack::HORIZONTAL)
+	pack->box(FL_UP_FRAME)
+	'pack->spacing(4)
+	' New tab
+	pixmap = new Fl_Pixmap(new_xpm)
+	button = new Fl_Button(1, 1, 32, 32)
+	button->clear_visible_focus()
+	button->box(FL_FLAT_BOX)
+	button->image(pixmap)
+	button->tooltip("New tab")
+	button->callback(New_Tab)
+	' Open file
+	pixmap = new Fl_Pixmap(open_xpm)
+	button = new Fl_Button(1, 1, 32, 32)
+	button->clear_visible_focus()
+	button->box(FL_FLAT_BOX)
+	button->image(pixmap)
+	button->tooltip("Open...")
+	button->callback(Open_File)
+	' Save file
+	pixmap = new Fl_Pixmap(save_xpm)
+	button = new Fl_Button(1, 1, 32, 32)
+	button->clear_visible_focus()
+	button->box(FL_FLAT_BOX)
+	button->image(pixmap)
+	button->tooltip("Save")
+	button->callback(Save_File)
+	' Save file as
+	pixmap = new Fl_Pixmap(save_as_xpm)
+	button = new Fl_Button(1, 1, 32, 32)
+	button->clear_visible_focus()
+	button->box(FL_FLAT_BOX)
+	button->image(pixmap)
+	button->tooltip("Save as...")
+	button->callback(Save_File_As)
+	' Cut
+	pixmap = new Fl_Pixmap(cut_xpm)
+	button = new Fl_Button(1, 1, 32, 32)
+	button->clear_visible_focus()
+	button->box(FL_FLAT_BOX)
+	button->image(pixmap)
+	button->tooltip("Cut")
+	button->callback(Cut_Text)
+	' Copy
+	pixmap = new Fl_Pixmap(copy_xpm)
+	button = new Fl_Button(1, 1, 32, 32)
+	button->clear_visible_focus()
+	button->box(FL_FLAT_BOX)
+	button->image(pixmap)
+	button->tooltip("Copy")
+	button->callback(Copy_Text)
+	' Paste
+	pixmap = new Fl_Pixmap(paste_xpm)
+	button = new Fl_Button(1, 1, 32, 32)
+	button->clear_visible_focus()
+	button->box(FL_NO_BOX)
+	button->image(pixmap)
+	button->tooltip("Paste")
+	button->callback(Paste_Text)
+	' Find
+	pixmap = new Fl_Pixmap(find_xpm)
+	button = new Fl_Button(1, 1, 32, 32)
+	button->clear_visible_focus()
+	button->box(FL_NO_BOX)
+	button->image(pixmap)
+	button->tooltip("Find and replace...")
+	button->callback(Show_Widget, (void*)"search")
+	' Convert
+	pixmap = new Fl_Pixmap(system_xpm)
+	button = new Fl_Button(1, 1, 32, 32)
+	button->clear_visible_focus()
+	button->box(FL_FLAT_BOX)
+	button->image(pixmap)
+	button->tooltip("Convert...")
+	button->callback(Show_Widget, (void*)"convert")
+	' Execute
+	pixmap = new Fl_Pixmap(execute_xpm)
+	button = new Fl_Button(1, 1, 32, 32)
+	button->clear_visible_focus()
+	button->box(FL_FLAT_BOX)
+	button->image(pixmap)
+	button->tooltip("Execute...")
+	button->callback(Show_Widget, (void*)"execute")
+	' Scratchpad
+	pixmap = new Fl_Pixmap(bacon_xpm)
+	button = new Fl_Button(1, 1, 32, 32)
+	button->clear_visible_focus()
+	button->box(FL_FLAT_BOX)
+	button->image(pixmap)
+	button->tooltip("BaCon Scratchpad...")
+	button->callback(Show_Widget, (void*)"scratch")
+	' Help
+	pixmap = new Fl_Pixmap(help_xpm)
+	button = new Fl_Button(1, 1, 32, 32)
+	button->clear_visible_focus()
+	button->box(FL_FLAT_BOX)
+	button->image(pixmap)
+	button->tooltip("Documentation")
+	button->callback(Open_Help)
+
+	pack->end()
+
+	' Notebook
+	BaconGui.notebook = new Fl_Tabs(5, 62, BaconGui.xsize-10, BaconGui.ysize-62)
+
+	' Obtain settings
+	CALL Load_Defaults
+
+	' See if files were saved in a previous session and load them
+	CALL Load_Files_Into_GUI
+
+	' Check argument
+	IF AMOUNT(ARGUMENT$) > 1 THEN
+		FOR file$ IN TAIL$(ARGUMENT$, AMOUNT(ARGUMENT$)-1)
+			IF NOT(FILEEXISTS(file$)) THEN
+				fl_message_title("System error detected!")
+				fl_alert("System error: file '%s' does not exist!", file$)
+			ELSE
+				INCR BaconGui.pages
+				CALL Create_Page
+				CALL Load_File(file$)
+			NEXT
+		ENDIF
+	ENDIF
+
+	' Otherwise start with empty tab
+	IF BaconGui.pages = 0 THEN
+		INCR BaconGui.pages
+		CALL Create_Page
+	ENDIF
+
+	' Set line numbers and wrapping on all pages
+	CALL Set_Lineno(NULL, NULL)
+	CALL Wrap_Mode(NULL, NULL)
+	CALL Set_Fontsize(NULL, NULL)
+
+	BaconGui.notebook->callback(Tab_Changed)
+
+	' Popup menu in the notebook
+	popup = new Fl_Menu_Button(0, 0, 640, 480)
+	popup->type(Fl_Menu_Button::POPUP3)
+	popup->add("Cut ", 0, Cut_Text, 0)
+	popup->add("Copy ", 0, Copy_Text, 0)
+	popup->add("Paste ", 0, Paste_Text, 0, FL_MENU_DIVIDER)
+	popup->add("New tab", 0, New_Tab, 0)
+	popup->add("Open tab...", 0, Open_Tab, 0)
+	popup->add("Close tab", 0, Close_Tab, 0)
+
+	BaconGui.notebook->end()
+
+	BaconGui.win->icon(BaconGui.icon)
+	BaconGui.win->callback(Quit_Editor)
+	BaconGui.win->end()
+
+	' Show main window
+	BaconGui.win->show()
+
+	' Set the Window size
+	BaconGui.win->size(BaconGui.xsize, BaconGui.ysize)
+
+	' Dialogs should appear centered on the screen
+	fl_message_hotspot(0)
+
+	' Set the theme
+	CALL Set_Theme(NULL, (void*)"set")
+
+	' Key handler
+	Fl::add_system_handler(Display_Info, NULL)
+
+	' Download docs if these are not available yet
+	IF NOT(FILEEXISTS(TEXTDOC$)) THEN
+		COPY CONCAT$(DATA_PATH, "/BaCon/documentation/documentation.txt") TO TEXTDOC$
+		COPY CONCAT$(DATA_PATH, "/BaCon/documentation/documentation.html") TO HTMLDOC$
+		COPY CONCAT$(DATA_PATH, "/BaCon/documentation/doc_index.html") TO HTMLIDX$
+		COPY CONCAT$(DATA_PATH, "/BaCon/documentation/doc_frame.html") TO HTMLFRAME$
+	ENDIF
+
+	Fl::run()
+
+END SUB

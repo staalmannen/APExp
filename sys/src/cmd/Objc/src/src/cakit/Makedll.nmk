@@ -1,0 +1,25 @@
+
+#
+# Portable Object Compiler
+# Copyright (c) 1996, 1997 Stes & Lerman.  All Rights Reserved. 
+#
+
+#
+# This Makefile should work with Microsoft nmake and build dll
+#
+
+.SILENT:
+
+!include <MakeDll.include>
+
+
+$(DLL) : $(OBJFILES)
+	$(OBJC) -dl -dynamic $(OBJFILES) -o $(DLL)
+	-$(CP) $(LIBRARY) $(IMPLIB)
+	-$(RM) $(LIBRARY)
+
+cleantmp :
+	-$(RM) *.P
+	-$(RM) *.c
+	-$(RM) *.i
+	-$(RM) *.exp

@@ -1,0 +1,278 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Computer Algebra Kit (c) 1993,00 by Comp.Alg.Objects.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 IntegerModp\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} CAObject\fs16\
+\
+\f0\fs28\li2200 {\b {\f1 Maturity Index:}} Relatively immature\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 Instances are integers modulo a small, prime number, the {\i modulus} of the object.  The modulus can currently not be equal to two; it must be equal to or less than USHRT_MAX_PRIME (the largest prime number that fits in an {\b unsigned short} word, as defined in the header file cakit/IntegerModp.h).  Objects belong to the same class in the sense of {\b sameClass:} iff. the moduli are equal.\fs16\
+\
+\f0\fs28\li2200 Every integer mod {\i p} keeps its own copy of the modulus; you don't need to set a global modulus.  As a consequence, it is possible to do multiple calculations modulo a different prime, even concurrenlty.\fs16\
+\
+\f0\fs28\li2200 IntegerModp is the prototype, in the Computer Algebra Kit, of a {\i field} i.e., a structure where each (nonzero) element has a multiplicative inverse (see {\b inField} and {\b inverse}).  Matrix (in Gaussian elimination) and Polynomial (in polynomial division) take advantage of the field structure of scalars, such as integers mod p.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- modulus:\
+	- int:modulus:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Identity}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- hash\
+	- isEqual:\
+	- modulus\
+	- intValue\
+	- intValue:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Addition}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- zero\
+	- isZero\
+	- isOpposite:\
+	- negate\
+	- double\
+	- add:\
+	- subtract:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Multiplication}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- one\
+	- minusOne\
+	- isOne\
+	- isMinusOne\
+	- square\
+	- multiply:\
+	- inverse\
+	- divide:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Characteristic}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- characteristic\
+	- frobenius\
+	- frobeniusInverse\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printsLeadingSign\
+	- printOn:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 modulus:\f0\b0\
+\f0\fs28\li2500 +{\b modulus}:(unsigned short){\i aPrime}\fs16\
+\
+\f0\fs28\li2200 Creates a new object, equal to zero, with modulus equal to {\i aPrime}.  The modulus must be a prime number less than or equal to USHRT_MAX_PRIME.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 int:modulus:\f0\b0\
+\f0\fs28\li2500 +{\b int}:(int){\i intValue}{\b modulus}:(unsigned short){\i aPrime}\fs16\
+\
+\f0\fs28\li2200 Creates a new object with modulus equal to {\i aPrime}.  The value of the object is equal to {\i intValue} mod {\i aPrime}.  The modulus must be a prime number less than or equal to USHRT_MAX_PRIME.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 hash\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b hash}\fs16\
+\
+\f0\fs28\li2200 Returns a small integer that is the same for objects that are equal (in the sense of {\b isEqual:}).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEqual:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEqual}:{\i b}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 modulus\f0\b0\
+\f0\fs28\li2500 - (unsigned short){\b modulus}\fs16\
+\
+\f0\fs28\li2200 Returns the modulus, a prime number equal to or less than USHRT_MAX_PRIME.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intValue\f0\b0\
+\f0\fs28\li2500 - (int){\b intValue}\fs16\
+\
+\f0\fs28\li2200 Returns a representant of the modular number in the range [0,modulus[.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 intValue:\f0\b0\
+\f0\fs28\li2500 -{\b intValue}:(int){\i aValue}\fs16\
+\
+\f0\fs28\li2200 Returns a new object for {\i aValue}, modulo the modulus of the receiving object.  \fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 zero\f0\b0\
+\f0\fs28\li2500 -{\b zero}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isZero\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isZero}\fs16\
+\
+\f0\fs28\li2200 Whether the object is equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOpposite:\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOpposite}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Whether the object is the opposite of {\i b}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 negate\f0\b0\
+\f0\fs28\li2500 -{\b negate}\fs16\
+\
+\f0\fs28\li2200 Returns the opposite of the object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 double\f0\b0\
+\f0\fs28\li2500 -{\b double}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, equal to the object multiplied by two i.e., added to itself.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 add:\f0\b0\
+\f0\fs28\li2500 -{\b add}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Adds {\i b} to the object.  Returns a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 subtract:\f0\b0\
+\f0\fs28\li2500 -{\b subtract}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Subtracts {\i b} from the object.  Returns a new object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 one\f0\b0\
+\f0\fs28\li2500 -{\b one}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 minusOne\f0\b0\
+\f0\fs28\li2500 -{\b minusOne}\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isOne}\fs16\
+\
+\f0\fs28\li2200 Whether the object is equal to one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isMinusOne\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isMinusOne}\fs16\
+\
+\f0\fs28\li2200 Whether the object is equal to minus one.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 square\f0\b0\
+\f0\fs28\li2500 -{\b square}\fs16\
+\
+\f0\fs28\li2200 Returns the square of the object i.e., a new object equal to the original object multiplied by itself.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 multiply:\f0\b0\
+\f0\fs28\li2500 -{\b multiply}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Returns a new object, the product of the object multiplied (to the right) by {\i b}.  If the objects are pointer equal, this method is equivalent to {\b square}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 inverse\f0\b0\
+\f0\fs28\li2500 -{\b inverse}\fs16\
+\
+\f0\fs28\li2200 Returns the multiplicative inverse of the object (returns a new object).  Returns {\b nil} if the object is equal to zero or cannot be inverted.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 divide:\f0\b0\
+\f0\fs28\li2500 -{\b divide}:{\i b}\fs16\
+\
+\f0\fs28\li2200 Multiplies the object by the inverse of {\i b}.  Returns {\b nil} if {\i b} is zero (has no inverse).\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 characteristic\f0\b0\
+\f0\fs28\li2500 - (int){\b characteristic}\fs16\
+\
+\f0\fs28\li2200 Returns the modulus of the object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 frobenius\f0\b0\
+\f0\fs28\li2500 -{\b frobenius}\fs16\
+\
+\f0\fs28\li2200 Simply returns a new reference to the object itself, since the {\i p}-th power of an integer modulo {\i p} is equal to that integer.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 frobeniusInverse\f0\b0\
+\f0\fs28\li2500 -{\b frobeniusInverse}\fs16\
+\
+\f0\fs28\li2200 Simply returns a new reference to the object itself, since the {\i p}-th power of an integer modulo {\i p} is equal to that integer.  This method also returns zero for the zero object.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printsLeadingSign\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b printsLeadingSign}\fs16\
+\
+\f0\fs28\li2200 Returns NO, because representants are taken positive for printing.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Prints a (nonnegative) representant of the integer modulo p.\fs16\
+\
+\fs16\
+\
+\
+}

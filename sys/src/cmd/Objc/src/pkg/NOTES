@@ -1,0 +1,82 @@
+
+For Slackware
+
+	./objc.SlackBuild
+
+For Gentoo Linux
+	
+	#assuming /var/db/repos/localrepo is set up as 'local repository'
+	cp objc.ebuild /var/db/repos/localrepo/sys-devel/objc/objc-3.3.22.ebuild
+
+	#create a "Manifest"
+	ebuild ./objc-3.3.22.ebuild digest 
+
+	#make a package, clean, unpack, configure, compile, install, merge
+	ebuild ./objc-3.3.22.ebuild package
+	
+For AlpineLinux
+
+	mkdir objc
+	cp APKBUILD objc/	
+	cd objc
+	abuild -d 
+
+	the -d flag is currently to avoid their fat build-base
+	which includes g++ (that is not minimalistic)
+
+For Solaris IPS (Image Package System for Solaris 11)
+	
+	pkgrepo create myrepo
+	pkgrepo add-publisher -s myrepo stes
+
+	then add directly using: pkg/build-ips-objc.sh
+	                    and: pkg/build-ips-objclibs.sh
+
+	this adds the software to the "myrepo" and also archives into .p5p
+
+	to load a downloaded archive instead of using build-ips-objc.sh :
+	pkgrecv -d myrepo -s *.p5p '*'
+
+For Solaris SVR4 package (older Solaris or 11 in legacy mode)
+
+	in this pkg directory based on pkginfo + prototype
+	DEV=`pwd`/SUNWobjc-3.3.8-i386  (leading / required)
+	mkdir $DEV
+	pkgmk -o -r / -d $DEV -f prototype
+
+	for the x86_64 package modify pkginfo
+
+	pkgsend generate SUNWobjc | pkgfmt >> objc.p5m
+	pkgdepend resolve -m objc.p5m
+	pkgsend publish -s /var/pkgrepo -d SUNWobjc objc.p5m.res
+	pkgrecv -s myrepo -d archive.p5p -a pkg://stes/developer/objc
+
+
+For FreeBSD 10 
+
+	pkg -d create -p freebsd10/pkg-plist -m freebsd10
+
+For Ubuntu
+	
+	apt-get install devscripts (for debuild)	
+
+	mv debian ../
+	cd ..
+	date -R >> debian/changelog
+	debuild -us -uc -b
+
+For RedHat / OracleLinux / SUSE / openSUSE / rpm based systems 
+
+	install rpm-build for build in $HOME/rpmbuild
+	for openSUSE: zypper install -t pattern devel_rpm_build
+
+	cp objc-boostrap.spec $HOME/rpmbuild/SPECS/objc-bootstrap.spec
+	cp objclibs.spec $HOME/rpmbuild/SPECS/objclibs.spec
+	cp objclibs.spec $HOME/rpmbuild/SPECS/objclibs.spec
+	cd $HOME
+	rpmbuild -bb --nodebuginfo rpmbuild/SPECS/objc-bootstrap.spec
+	rpm -iv objc-bootstrap # to install under /opt/objc-bootstrap
+	PATH=/opt/objc-bootstrap/bin:$PATH
+	rpmbuild -bb --nodebuginfo rpmbuild/SPECS/objc.spec
+	rpmbuild -bb --nodebuginfo rpmbuild/SPECS/objclibs.spec
+

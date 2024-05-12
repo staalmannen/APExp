@@ -1,0 +1,183 @@
+
+#
+# Computer Algebra Kit
+# Copyright (c) 1992,1998 Computer Algebra Objects.  All Rights Reserved. 
+#
+
+#
+# This Makefile should work with Microsoft nmake.
+#
+
+.SILENT:
+
+MKDIR=mkdir
+SED=sed
+OBJC=objc
+YACC=bison -y -d
+YTABH=y_tab.h
+YTABC=y_tab.c
+LEX=flex
+LEXYYC=lexyy.c
+RM=del
+CP=copy
+AR=lib /NOLOGO
+FINAL_AR=echo
+RANLIB=echo
+MAKE=nmake
+DBG_MFLAGS=-q -g
+OPT_MFLAGS=-q -O -DNDEBUG
+OBJSUFFIX=obj
+LIBSUFFIX=lib
+BOOTDIR=..\..
+LIBDIR=$(BOOTDIR)\lib
+BINDIR=$(BOOTDIR)\bin
+IFLAGS=-I. -noI -I..\..\include\objcrt
+MFLAGS=$(OPT_MFLAGS)
+DLLOBJSDIR=dll
+
+.SUFFIXES: .m
+
+DLL=cakit.dll
+LIBRARY=cakit.lib
+IMPLIB=cakit_s.lib
+
+OBJFILES=\
+	ccltn.obj\
+	ccltnsq.obj\
+	ccltnsqr.obj\
+	ccomplex.obj\
+	cfloat.obj\
+	fraction.obj\
+	integer.obj\
+	intmodp.obj\
+	matrix.obj\
+	 matsq.obj\
+	 matsqsq.obj\
+	monomial.obj\
+	 monomc.obj\
+	  dmonomc.obj\
+	  dmonoms.obj\
+	  smonomc.obj\
+	cobject.obj\
+	polynom.obj\
+	 polyeseq.obj\
+	 polyrseq.obj\
+	 polycseq.obj\
+	polc.obj\
+	 srspolc.obj\
+	  osrspolc.obj\
+	 drspolc.obj\
+	  odrspolc.obj\
+	  odrspols.obj\
+	  idrspolc.obj\
+	  idrspols.obj\
+	  mdrspolc.obj\
+	  mdrspols.obj\
+	 drdpolc.obj\
+	  odrdpolc.obj\
+	  odrdpols.obj\
+	  idrdpolc.obj\
+	  idrdpols.obj\
+	  mdrdpolc.obj\
+	  mdrdpols.obj\
+	 sespolc.obj\
+	  osespolc.obj\
+	 despolc.obj\
+	  odespolc.obj\
+	  odespols.obj\
+	  idespolc.obj\
+	  idespols.obj\
+	  mdespolc.obj\
+	  mdespols.obj\
+	cseq.obj\
+	 cseqc.obj\
+	symbol.obj\
+	term.obj\
+	vector.obj\
+	 vectorc.obj\
+	  ovectorc.obj\
+	  ovectors.obj\
+	  mvectorc.obj\
+	  mvectors.obj\
+	  ivectorc.obj\
+	  ivectors.obj
+
+.m.obj:
+	$(OBJC) -c $*.m $(MFLAGS) $(IFLAGS)
+	$(OBJC) -c -pic $*.m $(MFLAGS) $(IFLAGS) -o $(DLLOBJSDIR)\$*.$(OBJSUFFIX)
+
+.lm.obj:
+	$(LEX) $*.lm
+	$(SED) s/yy/ca_yy/g < $(LEXYYC) > $*.m
+	$(OBJC) -c $(MFLAGS) $(IFLAGS) $*.m
+	$(OBJC) -c -pic $(MFLAGS) $(IFLAGS) $*.m -o $(DLLOBJSDIR)\$*.$(OBJSUFFIX)
+	-$(RM) $*.m
+
+.ym.obj:
+	$(YACC) $*.ym
+	-$(CP) $(YTABH) $*.h
+	$(SED) s/yy/ca_yy/g < $(YTABC) > $*.m
+	$(OBJC) -c $(MFLAGS) $(IFLAGS) $*.m
+	$(OBJC) -c -pic $(MFLAGS) $(IFLAGS) $*.m -o $(DLLOBJSDIR)\$*.$(OBJSUFFIX)
+	-$(RM) $*.m
+
+ALL :	$(LIBRARY) $(DLL)
+
+
+$(LIBRARY) : CreateDllObjsPath $(OBJFILES)
+	$(AR) /OUT:$(LIBRARY) $(OBJFILES)
+	$(RANLIB) $(LIBRARY)
+
+$(DLL) : $(OBJFILES)
+	-cd $(DLLOBJSDIR)
+	-echo MKDIR=mkdir >> MakeDll.include
+	-echo OBJC=$(OBJC) >> MakeDll.include
+	-echo RM=$(RM) >> MakeDll.include
+	-echo CP=$(CP) >> MakeDll.include
+	-echo AR=$(AR) >> MakeDll.include
+	-echo FINAL_AR=$(FINAL_AR) >> MakeDll.include
+	-echo MAKE=$(MAKE) >> MakeDll.include
+	-echo DBG_MFLAGS=$(DBG_MFLAGS) >> MakeDll.include
+	-echo OPT_MFLAGS=$(OPT_MFLAGS) >> MakeDll.include
+	-echo OBJSUFFIX=$(OBJSUFFIX) >> MakeDll.include
+	-echo LIBSUFFIX=$(LIBSUFFIX) >> MakeDll.include
+	-echo BOOTDIR=$(BOOTDIR)\.. >> MakeDll.include
+	-echo LIBDIR=^$(BOOTDIR)\lib >> MakeDll.include
+	-echo BINDIR=^$(BOOTDIR)\bin >> MakeDll.include
+	-echo IFLAGS=$(OBJCRT_IFLAGS) >> MakeDll.include
+	-echo MFLAGS=$(MFLAGS) >> MakeDll.include
+	-echo DLLOBJSDIR=$(DLLOBJSDIR) >> MakeDll.include
+	-echo DLL=$(DLL) >> MakeDll.include
+	-echo LIBRARY=$(LIBRARY) >> MakeDll.include
+	-echo IMPLIB=$(IMPLIB) >> MakeDll.include
+	-echo OBJFILES=$(OBJFILES) >> MakeDll.include
+	$(MAKE) -f MakeDll.nmk
+	-$(RM) MakeDll.include
+	-$(RM) MakeDll.nmk
+	-cd ..
+
+CreateDllObjsPath :
+	-$(MKDIR) $(DLLOBJSDIR)
+	-$(CP) MakeDll.nmk $(DLLOBJSDIR)
+
+bootstrap :
+	-$(MKDIR) $(LIBDIR)
+	-$(MKDIR) $(BINDIR)
+	-$(CP) $(LIBRARY) $(LIBDIR)
+	-$(CP) $(DLLOBJSDIR)\$(IMPLIB) $(LIBDIR)
+	-$(CP) $(DLLOBJSDIR)\$(DLL) $(BINDIR)
+
+cleantmp :
+	-$(RM) *.P
+	-$(RM) *.c
+	-$(RM) *.i
+
+clean : cleantmp
+	-$(RM) *.obj
+	-$(RM) *.lib
+	-cd $(DLLOBJSDIR) && echo y | $(RM) *.* & cd ..
+	-rd $(DLLOBJSDIR)
+
+distclean : clean
+	-$(RM) Makefile 
+

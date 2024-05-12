@@ -1,0 +1,49 @@
+
+#
+# Portable Object Compiler (c) 1996-2023
+#
+
+#
+# This Makefile should work with UNIX make (like SysV, BSD, GNU make)
+#
+
+LEX=@LEX@
+LEXYYC=@LEXYYC@
+RM=@RM@
+CP=@CP@
+OBJC=@OBJC@
+DBG_MFLAGS=@DBG_MFLAGS@
+OPT_MFLAGS=@OPT_MFLAGS@
+
+MFLAGS = $(DBG_MFLAGS) 
+
+PROGRAM=words
+OBJFILES = token.o words.o
+
+.SUFFIXES: .m .lm
+
+.m.o:
+	$(OBJC) -c $*.m $(MFLAGS)
+
+.lm.o:
+	$(LEX) $*.lm
+	-$(CP) $(LEXYYC) $*.m
+	$(OBJC) -c $(MFLAGS) $(IFLAGS) $*.m
+	-$(RM) $*.m
+
+$(PROGRAM) : $(OBJFILES)
+	$(OBJC) $(MFLAGS) $(OBJFILES) -o $(PROGRAM)
+
+cleantmp :
+	-$(RM) *.P
+	-$(RM) *.c
+	-$(RM) *.i
+
+clean : cleantmp
+	-$(RM) *.o
+	-$(RM) postlink.map token.m
+	-$(RM) $(PROGRAM)
+
+distclean : clean
+	-$(RM) Makefile 
+

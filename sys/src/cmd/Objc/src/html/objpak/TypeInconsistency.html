@@ -1,0 +1,22 @@
+<HTML>
+<TITLE>typeinc Specification Sheet</TITLE>
+<H1>typeinc Specification Sheet</H1>
+
+<HR>
+Portable Object Compiler (c) 2003,2023.  All Rights Reserved.<P>
+<H1>TypeInconsistency</H1>
+<B>Inherits from:</B> Exception<P>
+<B>Maturity Index:</B> Experimental<P>
+<H2>Class Description</H2>
+This is a subclass to signal a type descriptor inconsistency, specifically for the <B>AsciiFiler</B> class.  If a filer scans a decriptor type string that it cannot handle, then it will signal the <B>TypeInconsistency</B> exception, passing the character that the filer <I>got</I> and the character that it actually expected (<I>wanted</I>).<P>
+<H2>Method types</H2>
+<H2>Methods</H2>
+<H3><A NAME="0">gotChar</A></H3>
+<BLOCKQUOTE>- (char)<B>gotChar</B></BLOCKQUOTE>
+Returns the type descriptor that the filer got.<P>
+<H3><A NAME="1">wantChar</A></H3>
+<BLOCKQUOTE>- (char)<B>wantChar</B></BLOCKQUOTE>
+Returns the type descriptor that the filer expected.<P>
+<H3><A NAME="2">got:wanted:</A></H3>
+<BLOCKQUOTE>-<B>got</B>:(char)<I>c</I><B>wanted</B>:(char)<I>w</I></BLOCKQUOTE>
+Sets the type descriptors.<P>

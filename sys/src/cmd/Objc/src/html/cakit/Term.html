@@ -1,0 +1,236 @@
+<HTML>
+<TITLE>term Specification Sheet</TITLE>
+<H1>term Specification Sheet</H1>
+
+<HR>
+Computer Algebra Kit (c) 1993,2000,14 by Comp.Alg.Objects.  All Rights Reserved.<P>
+<H1>Term</H1>
+<B>Inherits from:</B> CAObject<P>
+<H2>Class Description</H2>
+Maturity Index : Relatively Mature<P>
+A term consists of a <I>coefficient</I> multiplied by a <I>symbol</I> raised to an integral <I>exponent</I>.  The coefficient is a scalar object or a polynomial.  The symbol object is <B>nil</B> if the exponent is equal to zero.<P>
+<H2>Recursive Polynomials</H2>
+A polynomial in recursive representation is a sum of terms.  If the polynomial is variable sparse, each symbol can be different and the coefficients of the terms are scalar objects or again variable sparse polynomials; if the coefficient is not a scalar object, then the exponent of the term cannot be zero (for example, the term 3 <I>x</I>^0 <I>y</I>^2 <I>z</I>^0 is reduced to 3 <I>y</I>^2 in the variable sparse case).  If the polynomial is variable dense, all symbols are equal to each other and the coefficients are either <I>all</I> scalar objects or again <I>all</I> variable dense polynomials; the exponent of a term may be zero, even if the coefficient is a polynomial (3 <I>x</I>^0 <I>y</I>^2 <I>z</I>^0 is a valid object in the variable dense case).  In a degree dense polynomial, the coefficients of the terms can be zero; in a degree sparse polynomial they cannot.<P>
+<H2>Monomials</H2>
+A monomial is a product of terms.  The coefficients of the terms of a monomial are scalar objects that are equal to one (but it's possible to insert terms with a non-trivial coefficient).  In a variable dense monomial, the exponents of the terms can be equal to zero; in a variable sparse monomial, they cannot.<P>
+<H2>Factors</H2>
+A factored polynomial is a product of terms.  The coefficients of the terms in the factorization are scalar objects, mostly equal to one, but they can store the content extracted out of the (primitive) factors.  The symbol (nucleus) objects of the terms are polynomials i.e., the factors in the factorization.<P>
+<H2>Method types</H2>
+<H3><B>Creation</B></H3>
+<UL>
+<LI><A HREF="#5">scalar:symbol:exponent:</A></LI>
+<LI><A HREF="#6">coefficient:symbol:exponent:</A></LI>
+<LI><A HREF="#7">copy</A></LI>
+<LI><A HREF="#8">deepCopy</A></LI>
+</UL>
+<H3><B>Identity</B></H3>
+<UL>
+<LI><A HREF="#15">scalarZero</A></LI>
+<LI><A HREF="#16">coefficient</A></LI>
+<LI><A HREF="#18">symbol</A></LI>
+<LI><A HREF="#19">exponent</A></LI>
+<LI><A HREF="#20">degree</A></LI>
+<LI><A HREF="#21">hash</A></LI>
+<LI><A HREF="#22">isEqual:</A></LI>
+<LI><A HREF="#24">compareExponents:</A></LI>
+</UL>
+<H3><B>Coercion</B></H3>
+<UL>
+<LI><A HREF="#25">intValue</A></LI>
+<LI><A HREF="#26">intValue:</A></LI>
+<LI><A HREF="#27">floatValue</A></LI>
+<LI><A HREF="#28">floatValue:</A></LI>
+<LI><A HREF="#29">asScalar</A></LI>
+<LI><A HREF="#31">asSymbol</A></LI>
+</UL>
+<H3><B>Addition</B></H3>
+<UL>
+<LI><A HREF="#35">zero</A></LI>
+<LI><A HREF="#36">isZero</A></LI>
+<LI><A HREF="#37">isOpposite:</A></LI>
+<LI><A HREF="#38">negate</A></LI>
+<LI><A HREF="#39">double</A></LI>
+<LI><A HREF="#40">add:</A></LI>
+<LI><A HREF="#41">subtract:</A></LI>
+</UL>
+<H3><B>Multiplication</B></H3>
+<UL>
+<LI><A HREF="#42">one</A></LI>
+<LI><A HREF="#43">isOne</A></LI>
+<LI><A HREF="#44">isMinusOne</A></LI>
+<LI><A HREF="#45">square</A></LI>
+<LI><A HREF="#46">inverse</A></LI>
+<LI><A HREF="#47">multiplyScalar:</A></LI>
+<LI><A HREF="#48">multiplyCoefficient:</A></LI>
+<LI><A HREF="#50">multiply:</A></LI>
+<LI><A HREF="#51">divideScalar:</A></LI>
+<LI><A HREF="#52">divideCoefficient:</A></LI>
+<LI><A HREF="#55">divide:</A></LI>
+</UL>
+<H3><B>Exponentation</B></H3>
+<UL>
+<LI><A HREF="#56">power:</A></LI>
+<LI><A HREF="#57">root:</A></LI>
+<LI><A HREF="#58">squareRoot</A></LI>
+</UL>
+<H3><B>Characteristic</B></H3>
+<UL>
+<LI><A HREF="#59">frobenius</A></LI>
+<LI><A HREF="#60">frobeniusInverse</A></LI>
+</UL>
+<H3><B>Derivation and Integration</B></H3>
+<UL>
+<LI><A HREF="#61">derive</A></LI>
+<LI><A HREF="#62">integrate</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#68">printsLeadingSign</A></LI>
+<LI><A HREF="#69">printsSum</A></LI>
+<LI><A HREF="#70">printsProduct</A></LI>
+<LI><A HREF="#71">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="5">scalar:symbol:exponent:</A></H3>
+<BLOCKQUOTE>+<B>scalar</B>:<I>aScalar</I><B>symbol</B>:<I>aSymbol</I><B>exponent</B>:(int)<I>anExponent</I></BLOCKQUOTE>
+Creates a new term with coefficient, symbol and exponent set to the specified objects.  This method sets <I>scalarZero</I> to the zero element for <I>aScalar</I>.<P>
+<H3><A NAME="6">coefficient:symbol:exponent:</A></H3>
+<BLOCKQUOTE>+<B>coefficient</B>:<I>aCoefficient</I><B>symbol</B>:<I>aSymbol</I><B>exponent</B>:(int)<I>anExponent</I></BLOCKQUOTE>
+Creates a new term with coefficient, symbol and exponent set to the specified objects.  This method sets <I>scalarZero</I> to the zero element obtained by sending <B>scalarZero</B> to <I>aCoefficient</I>.<P>
+<H3><A NAME="7">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Copies the term object, and if the coefficient is a scalar object, adds a reference to it.  If the coefficient is a polynomial, makes a copy of it. <P>
+<B>See also:</B> copy (Polynomial)<P>
+<H3><A NAME="8">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+Makes deep copies of the term object and its coefficient and symbol. <P>
+<B>See also:</B> deepCopy (Polynomial)<P>
+<H3><A NAME="15">scalarZero</A></H3>
+<BLOCKQUOTE>-<B>scalarZero</B></BLOCKQUOTE>
+Returns the zero scalar of the term.<P>
+<H3><A NAME="16">coefficient</A></H3>
+<BLOCKQUOTE>-<B>coefficient</B></BLOCKQUOTE>
+Returns the coefficient of the term.<P>
+<H3><A NAME="18">symbol</A></H3>
+<BLOCKQUOTE>-<B>symbol</B></BLOCKQUOTE>
+Returns the symbol of the term.  If the exponent of the term is equal to zero, this method returns <B>nil</B>.<P>
+<H3><A NAME="19">exponent</A></H3>
+<BLOCKQUOTE>- (int)<B>exponent</B></BLOCKQUOTE>
+Returns the exponent of the term.  If the exponent is equal to zero, the symbol of the term is equal to <B>nil</B>.<P>
+<H3><A NAME="20">degree</A></H3>
+<BLOCKQUOTE>- (int)<B>degree</B></BLOCKQUOTE>
+Equivalent to <B>exponent</B>.<P>
+<H3><A NAME="21">hash</A></H3>
+<BLOCKQUOTE>- (unsigned)<B>hash</B></BLOCKQUOTE>
+Returns a small integer that is the same for terms that are equal (in the sense of <B>isEqual:</B>).<P>
+<H3><A NAME="22">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>b</I></BLOCKQUOTE>
+Two terms are equal if they are pointer equal or if the coefficients are equal, if the exponents are equal and if the symbols are equal (or both <B>nil</B>).<P>
+<H3><A NAME="24">compareExponents:</A></H3>
+<BLOCKQUOTE>- (int)<B>compareExponents</B>:<I>b</I></BLOCKQUOTE>
+Compares two terms with respect to symbols and exponents; this imposes an ordering for the terms in <I>variable sparse</I> polynomials.  Returns zero if the terms are pointer equal.  A term with symbol <B>nil</B> is less than a term with non-nil symbol.  Compares the symbols, and if they are equal, compares the exponents.<P>
+<H3><A NAME="25">intValue</A></H3>
+<BLOCKQUOTE>- (int)<B>intValue</B></BLOCKQUOTE>
+Returns, if the exponent is equal to zero, the intValue of the coefficient.  If not, generates an error message.<P>
+<H3><A NAME="26">intValue:</A></H3>
+<BLOCKQUOTE>-<B>intValue</B>:(int)<I>aValue</I></BLOCKQUOTE>
+Returns a new term with exponent equal to zero and with a coefficient whose value as <B>int</B> is equal to <I>aValue</I>.<P>
+<H3><A NAME="27">floatValue</A></H3>
+<BLOCKQUOTE>- (float)<B>floatValue</B></BLOCKQUOTE>
+Returns, if the exponent is equal to zero, the floatValue of the coefficient.  If not, generates an error message.<P>
+<H3><A NAME="28">floatValue:</A></H3>
+<BLOCKQUOTE>-<B>floatValue</B>:(float)<I>aValue</I></BLOCKQUOTE>
+Returns a term with exponent equal to zero and with a coefficient whose value as <B>float</B> is equal to <I>aValue</I>.<P>
+<H3><A NAME="29">asScalar</A></H3>
+<BLOCKQUOTE>-<B>asScalar</B></BLOCKQUOTE>
+Returns the term as scalar object.  Returns <B>nil</B> if the exponent of the term is not equal to zero.  If the coefficient of the term is a scalar, the method returns a new reference to it, otherwise the coefficient is a polynomial and the method returns the scalar value of it.  Note that in the variable sparse case, a term that is a scalar must have a scalar object as coefficient i.e., the term is always simplified.<P>
+<H3><A NAME="31">asSymbol</A></H3>
+<BLOCKQUOTE>-<B>asSymbol</B></BLOCKQUOTE>
+Returns the term as symbol object.  If the exponent of the term is zero and if the coefficient is a polynomial, returns the symbol value of the polynomial.  If the exponent is equal to one and the coefficient is one, returns a new reference to the symbol of the term.  Otherwise returns <B>nil</B>.<P>
+<H3><A NAME="35">zero</A></H3>
+<BLOCKQUOTE>-<B>zero</B></BLOCKQUOTE>
+Returns a new term with coefficient equal to the zero element for the coefficient of the term that receives the message.<P>
+<H3><A NAME="36">isZero</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isZero</B></BLOCKQUOTE>
+Whether the coefficient of the term is equal to zero.  The exponent of the term may be non-zero.<P>
+<H3><A NAME="37">isOpposite:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOpposite</B>:<I>b</I></BLOCKQUOTE>
+Whether the coefficients of the term are opposite, and the exponents and symbols are equal to each other.<P>
+<H3><A NAME="38">negate</A></H3>
+<BLOCKQUOTE>-<B>negate</B></BLOCKQUOTE>
+Negates the coefficient of the term.<P>
+<H3><A NAME="39">double</A></H3>
+<BLOCKQUOTE>-<B>double</B></BLOCKQUOTE>
+Doubles the coefficient of the term.<P>
+<H3><A NAME="40">add:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>b</I></BLOCKQUOTE>
+Returns a new term that is the sum of the two terms i.e., the coefficients are added together using <B>add:</B> or <B>addScalar:</B>.  The exponents must be equal and the symbols must be both <B>nil</B> or equal to each other.<P>
+<H3><A NAME="41">subtract:</A></H3>
+<BLOCKQUOTE>-<B>subtract</B>:<I>b</I></BLOCKQUOTE>
+Returns a new term that is the difference of the two terms i.e., the coefficients are subtracted from each other using <B>subtract:</B> or <B>subtractScalar:</B>.  The exponents must be equal and the symbols must be both <B>nil</B> or equal to each other.<P>
+<H3><A NAME="42">one</A></H3>
+<BLOCKQUOTE>-<B>one</B></BLOCKQUOTE>
+Returns a term with coefficient equal to one.<P>
+<H3><A NAME="43">isOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOne</B></BLOCKQUOTE>
+Whether the coefficient is one and the exponent is equal to zero.<P>
+<H3><A NAME="44">isMinusOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isMinusOne</B></BLOCKQUOTE>
+Whether the coefficient is minus one and the exponent is equal to zero.<P>
+<H3><A NAME="45">square</A></H3>
+<BLOCKQUOTE>-<B>square</B></BLOCKQUOTE>
+Squares coefficient and multiplies exponent by two.<P>
+<H3><A NAME="46">inverse</A></H3>
+<BLOCKQUOTE>-<B>inverse</B></BLOCKQUOTE>
+Inverts coefficient and negates the exponent.  Returns <B>nil</B> if the coefficient has no inverse.<P>
+<H3><A NAME="47">multiplyScalar:</A></H3>
+<BLOCKQUOTE>-<B>multiplyScalar</B>:<I>b</I></BLOCKQUOTE>
+Returns a new term; multiplies the coefficient of the term by the scalar object <I>b</I>, using <B>multiply:</B> if the coefficient of the term is a scalar object, or <B>multiplyScalar:</B> otherwise.  The symbol and exponent of the resulting term are equal to that of the original term.<P>
+<H3><A NAME="48">multiplyCoefficient:</A></H3>
+<BLOCKQUOTE>-<B>multiplyCoefficient</B>:<I>b</I></BLOCKQUOTE>
+Returns a new term; multiplies the coefficient of the term by the coefficient object <I>b</I>, which must be an instance of the same class as the coefficient of the term.  The symbol and exponent of the resulting term are equal to that of the original term.  The method is implemented only for terms of variable dense (recursive) polynomials.<P>
+<H3><A NAME="50">multiply:</A></H3>
+<BLOCKQUOTE>-<B>multiply</B>:<I>b</I></BLOCKQUOTE>
+Returns a new term that is the product of the two terms i.e., the exponents are added together and the coefficients are multiplied using <B>multiply:</B> or <B>multiplyScalar:</B>.  If the exponents are both non-zero, then the symbols must be equal to each other.  If one of the terms has exponent equal to zero, then the symbol of the resulting term is equal to that of the term with non-zero exponent.<P>
+<H3><A NAME="51">divideScalar:</A></H3>
+<BLOCKQUOTE>-<B>divideScalar</B>:<I>b</I></BLOCKQUOTE>
+Returns a new term; divides the coefficient of the term by the scalar object <I>b</I>, using <B>divide:</B> if the coefficient of the term is a scalar object, or <B>divideScalar:</B> otherwise.  The symbol and exponent of the resulting term are equal to that of the original term.  Returns <B>nil</B> if the scalar division is not exact.<P>
+<H3><A NAME="52">divideCoefficient:</A></H3>
+<BLOCKQUOTE>-<B>divideCoefficient</B>:<I>b</I></BLOCKQUOTE>
+Returns a new term; divides the coefficient of the term by the object <I>b</I>, which is an instance of the same class as the coefficient.  The symbol and exponent of the resulting term are equal to that of the original term.  Returns <B>nil</B> if the division is not exact.  The method is implemented only for terms of a variable dense polynomial.<P>
+<H3><A NAME="55">divide:</A></H3>
+<BLOCKQUOTE>-<B>divide</B>:<I>b</I></BLOCKQUOTE>
+Returns a new term that is the exact quotient of the two terms i.e., the exponents are subtracted from each other and the coefficients are divided using <B>divide:</B> or <B>divideScalar:</B>.  If the exponents are both non-zero, then the symbols must be equal to each other.  If one of the terms has exponent equal to zero, then the symbol of the resulting term is equal to that of the term with non-zero exponent.  Returns <B>nil</B> if the exponent of the divisor is greater than that of the dividend, or if the coefficient division fails.<P>
+<H3><A NAME="56">power:</A></H3>
+<BLOCKQUOTE>-<B>power</B>:(int)<I>n</I></BLOCKQUOTE>
+Raises coefficient to the <I>n</I>-th power and multiplies exponent by <I>n</I>.<P>
+<H3><A NAME="57">root:</A></H3>
+<BLOCKQUOTE>-<B>root</B>:(int)<I>n</I></BLOCKQUOTE>
+Takes the <I>n</I>-th root of the coefficient and divides exponent by <I>n</I>.  Returns <B>nil</B> if the coefficient is not an <I>n</I>-th power or if the exponent is not divisible by <I>n</I>.<P>
+<H3><A NAME="58">squareRoot</A></H3>
+<BLOCKQUOTE>-<B>squareRoot</B></BLOCKQUOTE>
+Takes the square root of the coefficient and divides exponent by two.  Returns <B>nil</B> if the coefficient is not a square or if the exponent is not divisible by two.<P>
+<H3><A NAME="59">frobenius</A></H3>
+<BLOCKQUOTE>-<B>frobenius</B></BLOCKQUOTE>
+Returns the <I>p</I>-th power of the term, obtained by raising the term to a power equal to the characteric of the coefficient.<P>
+<H3><A NAME="60">frobeniusInverse</A></H3>
+<BLOCKQUOTE>-<B>frobeniusInverse</B></BLOCKQUOTE>
+Returns either <B>nil</B> (if the term is not a <I>p</I>-th power) or a new term that is the <I>p</I>-th root of the term.<P>
+<H3><A NAME="61">derive</A></H3>
+<BLOCKQUOTE>-<B>derive</B></BLOCKQUOTE>
+Returns the derivative with respect to the variable.<P>
+<H3><A NAME="62">integrate</A></H3>
+<BLOCKQUOTE>-<B>integrate</B></BLOCKQUOTE>
+Integrates with respect to the variable.<P>
+<H3><A NAME="68">printsLeadingSign</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsLeadingSign</B></BLOCKQUOTE>
+Whether the term prints a leading minus sign.<P>
+<H3><A NAME="69">printsSum</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsSum</B></BLOCKQUOTE>
+Whether the term prints a sum.<P>
+<H3><A NAME="70">printsProduct</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsProduct</B></BLOCKQUOTE>
+Whether the term prints a single product.<P>
+<H3><A NAME="71">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Prints, between braces, a comma separated list of the members.  If there are no members, the method prints two braces. <P>

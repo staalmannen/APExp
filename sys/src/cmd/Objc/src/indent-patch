@@ -1,0 +1,360 @@
+diff -c /home/stes/src/indent-1.9.1.orig/args.c /scratch/indent-1.9.1/args.c
+*** /home/stes/src/indent-1.9.1.orig/args.c	Tue Feb  1 08:05:33 1994
+--- /scratch/indent-1.9.1/args.c	Wed Feb 25 15:54:05 1998
+***************
+*** 111,116 ****
+--- 111,117 ----
+  static int exp_troff = 0;
+  static int exp_ts = 0;
+  static int exp_v = 0;
++ static int exp_n = 0;
+  static int exp_version = 0;
+  
+  /* The following variables are controlled by command line parameters and
+***************
+*** 160,165 ****
+--- 161,167 ----
+  int extra_expression_indent;
+  
+  int expect_output_file;
++ int dobackup; /* stes */
+  
+  /* N.B.: because of the way the table here is scanned, options whose names
+     are substrings of other options must occur later; that is, with -lp vs -l,
+***************
+*** 283,288 ****
+--- 285,291 ----
+    {"version", PRO_PRSTRING, 0, ONOFF_NA,
+     (int *) VERSION_STRING, &exp_version},
+    {"v", PRO_BOOL, false, ON, &verbose, &exp_v},
++   {"n", PRO_BOOL, true, OFF, &dobackup, &exp_n},
+  
+  /* Signify end of structure.  */
+    {0, PRO_IGN, 0, ONOFF_NA, 0, 0}
+***************
+*** 389,394 ****
+--- 392,398 ----
+    {"version", PRO_PRSTRING, 0, ONOFF_NA,
+     (int *) VERSION_STRING, &exp_version},
+    {"v", PRO_BOOL, false, ON, &verbose, &exp_v},
++   {"n", PRO_BOOL, true, OFF, &dobackup, &exp_n},
+  
+  /* Signify end of structure.  */
+    {0, PRO_IGN, 0, ONOFF_NA, 0, 0}
+Only in /home/stes/src/indent-1.9.1.orig: config.status
+diff -c /home/stes/src/indent-1.9.1.orig/indent.1 /scratch/indent-1.9.1/indent.1
+*** /home/stes/src/indent-1.9.1.orig/indent.1	Thu Jul  2 01:15:21 1992
+--- /scratch/indent-1.9.1/indent.1	Wed Feb 25 14:18:20 1998
+***************
+*** 995,999 ****
+--- 995,1002 ----
+  \fI$HOME/.indent.pro\fR	holds default options for indent.
+  .SH AUTHOR
+  The Free Software Foundation.
++ .br
++ Objective\-C support added by David Stes (stes@pandora.be).
+  .SH HISTORY
+  Derived from the UCB program "indent".
++ 
+diff -c /home/stes/src/indent-1.9.1.orig/indent.c /scratch/indent-1.9.1/indent.c
+*** /home/stes/src/indent-1.9.1.orig/indent.c	Sun Jan 30 03:14:02 1994
+--- /scratch/indent-1.9.1/indent.c	Wed Feb 25 16:46:49 1998
+***************
+*** 124,129 ****
+--- 124,136 ----
+       with the following colon */
+    int scase = 0;
+  
++   /* stes: allowlabel true when label possible
++    * reset to 1 after semicolon, set to 0 inside Objective-C []
++    * message construct or method declarator + foo:x so that the colon
++    * is dealt with correctly
++    */
++   int allowlabel = 0;
++ 
+    /* true when in the expression part of if(...), while(...), etc. */
+    int sp_sw = 0;
+  
+***************
+*** 514,519 ****
+--- 521,528 ----
+  	  break;
+  
+  	case lparen:
++ 	  allowlabel = false; /* stes -- reset to true after semicolon */
++ 
+  	  /* Braces in initializer lists should be put on new lines. This is
+  	     necessary so that -gnu does not cause things like char
+  	     *this_is_a_string_array[] = { "foo", "this_string_does_not_fit",
+***************
+*** 543,549 ****
+  			  * sizeof (short));
+  	    }
+  	  parser_state_tos->paren_depth++;
+! 	  if (parser_state_tos->want_blank && *token != '['
+  	      && (parser_state_tos->last_token != ident || proc_calls_space
+  		  || (parser_state_tos->its_a_keyword
+  		      && (!parser_state_tos->sizeof_keyword
+--- 552,560 ----
+  			  * sizeof (short));
+  	    }
+  	  parser_state_tos->paren_depth++;
+! 
+! 	  /* stes: why no blank in 'x = [foo bar]' ? */
+! 	  if (parser_state_tos->want_blank /* && *token != '[' */
+  	      && (parser_state_tos->last_token != ident || proc_calls_space
+  		  || (parser_state_tos->its_a_keyword
+  		      && (!parser_state_tos->sizeof_keyword
+***************
+*** 690,695 ****
+--- 701,707 ----
+  	  break;
+  
+  	case unary_op:		/* this could be any unary operation */
++ 	  allowlabel = false;
+  	  if (parser_state_tos->want_blank)
+  	    *e_code++ = ' ';
+  
+***************
+*** 737,743 ****
+--- 749,764 ----
+  	  parser_state_tos->want_blank = false;
+  	  break;
+  
++ 	case method_op:	/* stes - Objective-C method */
++ 	  allowlabel = 0;
++ 	  for (t_ptr = token; t_ptr < token_end; ++t_ptr) {
++ 	    CHECK_CODE_SIZE;
++ 	    *e_code++ = *t_ptr;
++ 	  }
++ 	  break;
++ 
+  	case binary_op:	/* any binary operation */
++ 	  allowlabel = 0;
+  	  if (parser_state_tos->want_blank
+  	      || (e_code > s_code && *e_code != ' '))
+  	    *e_code++ = ' ';
+***************
+*** 817,828 ****
+  	      parser_state_tos->want_blank = true;
+  	      break;
+  	    }
+! 	  if (parser_state_tos->in_decl)
+  	    {
+  	      *e_code++ = ':';
+  	      parser_state_tos->want_blank = false;
+  	      break;
+  	    }
+  	  parser_state_tos->in_stmt = false;	/* seeing a label does not
+  						   imply we are in a stmt */
+  	  for (t_ptr = s_code; *t_ptr; ++t_ptr)
+--- 838,853 ----
+  	      parser_state_tos->want_blank = true;
+  	      break;
+  	    }
+! 
+! 	  /* stes -- Objective-C uses colon separated selectors */
+! 	  /* have to avoid objc selectors to be interpreted as labels */
+! 	  if (!allowlabel || parser_state_tos->in_decl)
+  	    {
+  	      *e_code++ = ':';
+  	      parser_state_tos->want_blank = false;
+  	      break;
+  	    }
++ 
+  	  parser_state_tos->in_stmt = false;	/* seeing a label does not
+  						   imply we are in a stmt */
+  	  for (t_ptr = s_code; *t_ptr; ++t_ptr)
+***************
+*** 843,848 ****
+--- 868,874 ----
+  	  /* we are not in an initialization or structure declaration */
+  	  parser_state_tos->in_or_st = false;
+  	  scase = false;
++ 	  allowlabel = true;
+  	  squest = 0;
+  	  /* The following code doesn't seem to do much good. Just because
+  	     we've found something like extern int foo();    or int (*foo)();
+***************
+*** 1763,1769 ****
+  	      exit (1);
+  	    }
+  
+! 	  make_backup (current_input);
+  	  reset_parser ();
+  	  indent (current_input);
+  	  if (fclose (output) != 0)
+--- 1789,1795 ----
+  	      exit (1);
+  	    }
+  
+! 	  if (dobackup) make_backup (current_input);
+  	  reset_parser ();
+  	  indent (current_input);
+  	  if (fclose (output) != 0)
+***************
+*** 1787,1793 ****
+  	  if (!out_name && !use_stdout)
+  	    {
+  	      out_name = in_file_names[0];
+! 	      make_backup (current_input);
+  	    }
+  	}
+        in_name = in_file_names[0];
+--- 1813,1819 ----
+  	  if (!out_name && !use_stdout)
+  	    {
+  	      out_name = in_file_names[0];
+! 	      if (dobackup) make_backup (current_input);
+  	    }
+  	}
+        in_name = in_file_names[0];
+diff -c /home/stes/src/indent-1.9.1.orig/indent.h /scratch/indent-1.9.1/indent.h
+*** /home/stes/src/indent-1.9.1.orig/indent.h	Sun Jan 30 03:26:45 1994
+--- /scratch/indent-1.9.1/indent.h	Wed Feb 25 15:52:20 1998
+***************
+*** 40,46 ****
+    sp_paren,			/* if, for, or while token */
+    sp_nparen, ifstmt, whilestmt,
+    forstmt, stmt, stmtl, elselit, dolit, dohead, dostmt, ifhead,
+!   elsehead, period
+  };
+  
+  enum rwcodes
+--- 40,47 ----
+    sp_paren,			/* if, for, or while token */
+    sp_nparen, ifstmt, whilestmt,
+    forstmt, stmt, stmtl, elselit, dolit, dohead, dostmt, ifhead,
+!   elsehead, period,
+!   method_op /* stes +/- */
+  };
+  
+  enum rwcodes
+***************
+*** 183,188 ****
+--- 184,190 ----
+  extern int max_col;		/* the maximum allowable line length */
+  extern int verbose;		/* when true, non-essential error messages
+  				   are printed */
++ extern int dobackup;		/* when false, no backup at all */
+  extern int cuddle_else;		/* true if else should cuddle up to '}' */
+  extern int star_comment_cont;	/* true iff comment continuation lines should
+  				   have stars at the beginning of each line. */
+diff -c /home/stes/src/indent-1.9.1.orig/lexi.c /scratch/indent-1.9.1/lexi.c
+*** /home/stes/src/indent-1.9.1.orig/lexi.c	Sun Jan 30 02:05:18 1994
+--- /scratch/indent-1.9.1/lexi.c	Wed Feb 25 19:25:10 1998
+***************
+*** 63,69 ****
+    0, 0, 3, 3, 0, 3, 0, 3,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 0, 0, 3, 3, 3, 3,
+!   0, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 0, 0, 0, 3, 1,
+--- 63,69 ----
+    0, 0, 3, 3, 0, 3, 0, 3,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 0, 0, 3, 3, 3, 3,
+!   1, 1, 1, 1, 1, 1, 1, 1, /* stes - made @ alphanum */
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 1, 1, 0, 0, 0, 3, 1,
+***************
+*** 173,178 ****
+--- 173,227 ----
+  
+  extern int squest;
+  
++ 
++ /* stes - check for @interface and @implementation
++  * so that this special case doesn't get dealt with 
++  * (gives sometimes weird sides-effects)
++  *
++  * it's not a keyword like a struct declarator or so,
++  * since if we see a class def, we just fill the buffer with it
++  */
++ 
++ int
++ is_objc(char *s,int n)
++ {
++     if (*s != '@') return 0; 
++     if (strncmp(s,"@interface",strlen("@interface")) == 0) return 1;
++     if (strncmp(s,"@implementation",strlen("@implementation")) == 0) return 1;
++     return 0;
++ }
++ 
++ /* stes - quick hack to consider Objective-C method declaration,
++  * starting with - or +, containing colons and typecasts
++  * (such as "- elementsPerform:sel with:obj") as a single code.  to avoid
++  * the colon inside the declaration to break up lines (as C label)
++  */
++ 
++ enum codes
++ leximeth()
++ {
++   /* before loop test buf_ptr points to the next */
++   /* character that we have not yet checked. */
++ 
++   while (*buf_ptr != 0) {
++       if (*buf_ptr == ';' || *buf_ptr == '{' || *buf_ptr == EOL) break;
++       if (*buf_ptr == '+' || *buf_ptr == '-') {
++ 	  diag(1,"Unterminated method declaration",0,0);
++       }
++ 
++       if (++buf_ptr >= buf_end) fill_buffer ();
++   }
++ 
++   /* doesn't hurt to do this here again for safety */
++   token_end = buf_ptr;
++ 
++   /* pretend it is a func def */
++   parser_state_tos->procname = token;
++   parser_state_tos->procname_end = token_end;
++ 
++   return method_op;
++ }
++ 
+  enum codes
+  lexi ()
+  {
+***************
+*** 283,288 ****
+--- 332,345 ----
+        parser_state_tos->last_u_d = false;
+        last_code = ident;
+  
++       /* stes - check whether the token is an Objective-C
++        * class interface or implementation.  we do this so that it isn't
++        * by mistake interpreted as something else (such as a label, when
++        * it contains a colon ':')
++        */
++ 
++       if (is_objc (token,token_end - token)) return leximeth();
++ 
+        /* Check whether the token is a reserved word.  Use perfect hashing... */
+        p = is_reserved (token, token_end - token);
+  
+***************
+*** 593,598 ****
+--- 650,658 ----
+  
+      case '-':
+      case '+':			/* check for -, +, --, ++ */
++       /* stes - Objective-C method decl */
++       if (parser_state_tos->ind_level == 0) { code = leximeth(); break; }
++ 
+        code = (parser_state_tos->last_u_d ? unary_op : binary_op);
+        unary_delim = true;
+  
+***************
+*** 622,627 ****
+--- 682,688 ----
+  	      parser_state_tos->want_blank = false;
+  	    }
+  	}
++ 
+        break;			/* buffer overflow will be checked at end of
+  				   switch */
+  
+Only in /home/stes/src/indent-1.9.1.orig: makefile

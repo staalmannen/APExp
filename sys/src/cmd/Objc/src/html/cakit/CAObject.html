@@ -1,0 +1,550 @@
+<HTML>
+<TITLE>cobject Specification Sheet</TITLE>
+<H1>cobject Specification Sheet</H1>
+
+<HR>
+Computer Algebra Kit (c) 1993,00 by Comp.Alg.Objects.  All Rights Reserved.<P>
+<H1>CAObject</H1>
+<B>Inherits from:</B> Object<P>
+<B>Maturity Index:</B> Relatively mature<P>
+<H2>Class Description</H2>
+CAObject is the root class of the Computer Algebra Kit.  It implements functionality that is inherited by all Computer Algebra Kit objects and defines a number of methods that inheriting classes are expected to override, thus establishing interface conventions that must be followed by all classes.<P>
+<H2>Arithmetic</H2>
+Classes like Polynomial or Matrix work over arbitrary coefficient domains.   The interface to basic arithmetical operations that is declared by CAObject, is designed to support this important feature.<P>
+Arithmetical operations such as <B>multiply:</B> or <B>add:</B> are defined only on instances of the same class, or more precisely on objects for which <B>sameClass:</B> returns YES.  The algebraic properties of a set (class) of objects is tested by sending messages to an element of the set (for example <B>inOrderedSet</B>), and control the algorithms being used.  Nullary operators, like obtaining the unity element of a set, are made unary : the unity element of a set is obtained by sending <B>one</B> to an arbitrary element of the set.<P>
+For example, for two Integer objects, <B>sameClass:</B> simply returns YES, but for two IntegerModp objects, <B>sameClass:</B> returns YES if and only if the moduli are equal.  This means that you can sum, using <B>add:</B>, any pair of Integer instances, but that you cannot add an object mod <I>p</I> to an object mod <I>q</I>.  Also, you cannot add a Integer instance to a IntegerModp instance using the <B>add:</B> method.<P>
+<H2>Method types</H2>
+<H3><B>Class Methods</B></H3>
+<UL>
+<LI><A HREF="#0">cakitRevision</A></LI>
+<LI><A HREF="#2">str:</A></LI>
+<LI><A HREF="#3">int:</A></LI>
+<LI><A HREF="#7">copy</A></LI>
+<LI><A HREF="#8">deepCopy</A></LI>
+</UL>
+<H3><B>Class of an Object</B></H3>
+<UL>
+<LI><A HREF="#13">sameClass:</A></LI>
+<LI><A HREF="#14">differentClass:</A></LI>
+<LI><A HREF="#18">isKindOfSequence</A></LI>
+</UL>
+<H3><B>Coercion</B></H3>
+<UL>
+<LI><A HREF="#28">str</A></LI>
+<LI><A HREF="#30">str:</A></LI>
+<LI><A HREF="#31">intValue</A></LI>
+<LI><A HREF="#32">intValue:</A></LI>
+<LI><A HREF="#33">asModp:</A></LI>
+<LI><A HREF="#34">isFloatingPoint</A></LI>
+<LI><A HREF="#35">asNumerical</A></LI>
+<LI><A HREF="#36">floatValue</A></LI>
+<LI><A HREF="#37">floatValue:</A></LI>
+<LI><A HREF="#38">asTotalFraction</A></LI>
+<LI><A HREF="#39">asScalar</A></LI>
+<LI><A HREF="#41">asSymbol</A></LI>
+</UL>
+<H3><B>Equality</B></H3>
+<UL>
+<LI><A HREF="#43">isEqual:</A></LI>
+<LI><A HREF="#44">notEqual:</A></LI>
+</UL>
+<H3><B>Comparing</B></H3>
+<UL>
+<LI><A HREF="#45">inOrderedSet</A></LI>
+<LI><A HREF="#46">compare:</A></LI>
+<LI><A HREF="#47">sign</A></LI>
+<LI><A HREF="#48">isLess:</A></LI>
+<LI><A HREF="#49">isGreater:</A></LI>
+<LI><A HREF="#50">isLessEqual:</A></LI>
+<LI><A HREF="#51">isGreaterEqual:</A></LI>
+<LI><A HREF="#52">absValue</A></LI>
+</UL>
+<H3><B>Addition</B></H3>
+<UL>
+<LI><A HREF="#53">inAdditiveSemiGroup</A></LI>
+<LI><A HREF="#54">inAdditiveMonoid</A></LI>
+<LI><A HREF="#55">inAdditiveGroup</A></LI>
+<LI><A HREF="#56">isZero</A></LI>
+<LI><A HREF="#57">notZero</A></LI>
+<LI><A HREF="#58">isOpposite:</A></LI>
+<LI><A HREF="#59">notOpposite:</A></LI>
+<LI><A HREF="#60">zero</A></LI>
+<LI><A HREF="#61">negate</A></LI>
+<LI><A HREF="#63">add:</A></LI>
+<LI><A HREF="#65">subtract:</A></LI>
+<LI><A HREF="#66">increment</A></LI>
+<LI><A HREF="#67">decrement</A></LI>
+<LI><A HREF="#68">multiplyIntValue:</A></LI>
+<LI><A HREF="#69">double</A></LI>
+<LI><A HREF="#71">quadruple</A></LI>
+<LI><A HREF="#72">divideIntValue:</A></LI>
+<LI><A HREF="#73">half</A></LI>
+<LI><A HREF="#74">quarter</A></LI>
+</UL>
+<H3><B>Multiplication</B></H3>
+<UL>
+<LI><A HREF="#75">commutes</A></LI>
+<LI><A HREF="#76">commutesWith:</A></LI>
+<LI><A HREF="#77">inSemiGroup</A></LI>
+<LI><A HREF="#78">inMonoid</A></LI>
+<LI><A HREF="#79">inGroup</A></LI>
+<LI><A HREF="#80">one</A></LI>
+<LI><A HREF="#81">minusOne</A></LI>
+<LI><A HREF="#82">isOne</A></LI>
+<LI><A HREF="#83">notOne</A></LI>
+<LI><A HREF="#84">isMinusOne</A></LI>
+<LI><A HREF="#85">notMinusOne</A></LI>
+<LI><A HREF="#86">square</A></LI>
+<LI><A HREF="#88">multiply:</A></LI>
+<LI><A HREF="#90">power:</A></LI>
+<LI><A HREF="#91">inverse</A></LI>
+<LI><A HREF="#92">isUnit</A></LI>
+<LI><A HREF="#93">notUnit</A></LI>
+<LI><A HREF="#94">divide:</A></LI>
+</UL>
+<H3><B>Division with Remainder</B></H3>
+<UL>
+<LI><A HREF="#95">remainder:quotient:</A></LI>
+<LI><A HREF="#96">remainder:</A></LI>
+<LI><A HREF="#97">quotient:</A></LI>
+</UL>
+<H3><B>Greatest Common Divisor</B></H3>
+<UL>
+<LI><A HREF="#98">inEuclideanDomain</A></LI>
+<LI><A HREF="#99">isCoprime:</A></LI>
+<LI><A HREF="#100">notCoprime:</A></LI>
+<LI><A HREF="#101">isGcd::</A></LI>
+<LI><A HREF="#102">isLcm::</A></LI>
+<LI><A HREF="#103">gcd:</A></LI>
+<LI><A HREF="#104">bezout:gcd:</A></LI>
+<LI><A HREF="#105">lcm:</A></LI>
+</UL>
+<H3><B>Modular Arithmetic</B></H3>
+<UL>
+<LI><A HREF="#106">modulo:</A></LI>
+<LI><A HREF="#107">multiply:modulo:</A></LI>
+<LI><A HREF="#108">squareModulo:</A></LI>
+<LI><A HREF="#109">power:modulo:</A></LI>
+<LI><A HREF="#110">genpower:modulo:</A></LI>
+<LI><A HREF="#111">inverseModulo:</A></LI>
+</UL>
+<H3><B>Random</B></H3>
+<UL>
+<LI><A HREF="#112">random</A></LI>
+</UL>
+<H3><B>Characteristic</B></H3>
+<UL>
+<LI><A HREF="#113">characteristic</A></LI>
+<LI><A HREF="#114">isCharacteristicZero</A></LI>
+<LI><A HREF="#115">notCharacteristicZero</A></LI>
+<LI><A HREF="#116">isCharacteristicTwo</A></LI>
+<LI><A HREF="#117">notCharacteristicTwo</A></LI>
+<LI><A HREF="#118">frobenius</A></LI>
+<LI><A HREF="#119">frobeniusInverse</A></LI>
+<LI><A HREF="#120">dimensionOverPrimeField</A></LI>
+</UL>
+<H3><B>Addition and Multiplication</B></H3>
+<UL>
+<LI><A HREF="#121">inRing</A></LI>
+<LI><A HREF="#122">inIntegralDomain</A></LI>
+<LI><A HREF="#123">inField</A></LI>
+<LI><A HREF="#124">inFieldOfFractions</A></LI>
+</UL>
+<H3><B>Scalar Multiplication</B></H3>
+<UL>
+<LI><A HREF="#131">scalarZero</A></LI>
+<LI><A HREF="#132">scalarContent</A></LI>
+<LI><A HREF="#133">divideScalarContent</A></LI>
+<LI><A HREF="#134">multiplyScalar:</A></LI>
+<LI><A HREF="#136">divideScalar:</A></LI>
+<LI><A HREF="#137">addScalar:</A></LI>
+<LI><A HREF="#138">subtractScalar:</A></LI>
+</UL>
+<H3><B>Printing</B></H3>
+<UL>
+<LI><A HREF="#147">printsLeadingSign</A></LI>
+<LI><A HREF="#148">printsSum</A></LI>
+<LI><A HREF="#149">printsProduct</A></LI>
+<LI><A HREF="#150">printOn:</A></LI>
+</UL>
+<H2>Methods</H2>
+<H3><A NAME="0">cakitRevision</A></H3>
+<BLOCKQUOTE>+ (STR)<B>cakitRevision</B></BLOCKQUOTE>
+This method returns the value of the revision string <B>__cakit_revision__</B> (declared in the header file cakit/cakit.h), as it was when the Computer Algebra Kit was built.  The string in the header file that you're using should match the string returned by this method.<P>
+<H3><A NAME="2">str:</A></H3>
+<BLOCKQUOTE>+<B>str</B>:(STR)<I>aString</I></BLOCKQUOTE>
+Creates an object given a string description.  No default implementation.<P>
+<H3><A NAME="3">int:</A></H3>
+<BLOCKQUOTE>+<B>int</B>:(int)<I>intValue</I></BLOCKQUOTE>
+Creates an object given an int value.  No default.<P>
+<H3><A NAME="7">copy</A></H3>
+<BLOCKQUOTE>-<B>copy</B></BLOCKQUOTE>
+Creates a copy of the object by sending <B>copy</B> to <B>super</B>.  Sets the reference count of the new object to one.<P>
+Subclasses must implement their own versions of <B>copy</B> to copy additional memory consumed by the copied object.<P>
+<BLOCKQUOTE><PRE>
+- copy
+{
+    self = [super copy];
+    pointer = malloc(nBytes);
+    return self;
+}
+</PRE></BLOCKQUOTE>
+Note that the message to <B>super</B> precedes the code added in the method.  This ensures that copying proceeds in the order of inheritance.<P>
+<B>See also:</B> deepCopy<P>
+<H3><A NAME="8">deepCopy</A></H3>
+<BLOCKQUOTE>-<B>deepCopy</B></BLOCKQUOTE>
+Creates a <I>deep</I> copy of the object by sending <B>copy</B> to <B>super</B>.  Sets the reference count of the new object to one.<P>
+Subclasses must implement their own versions of <B>deepCopy</B> to make a full independent copy of the object.<P>
+<BLOCKQUOTE><PRE>
+- deepCopy
+{
+    self = [super deepCopy];
+    companionObject = [companionObject deepCopy];
+    return self;
+}
+</PRE></BLOCKQUOTE>
+<B>See also:</B> copy<P>
+<H3><A NAME="13">sameClass:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>sameClass</B>:<I>a</I></BLOCKQUOTE>
+Whether the objects belong to the same class; the default implementation checks whether the <I>isa</I> pointers of the objects are the same.  Some classes override <B>sameClass:</B> to impose extra requirements; for example, for integers mod p :<P>
+<BLOCKQUOTE><PRE>
+return [super sameClass:a] &amp;&amp; [self modulus] == [a modulus];
+</PRE></BLOCKQUOTE>
+<H3><A NAME="14">differentClass:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>differentClass</B>:<I>a</I></BLOCKQUOTE>
+Whether <B>sameClass:</B> returns NO.  Don't override this method.  Implement your own version of <B>sameClass:</B> instead (incorporating a call to <B>super</B>'s implementation of <B>sameClass:</B>).<P>
+<H3><A NAME="18">isKindOfSequence</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isKindOfSequence</B></BLOCKQUOTE>
+Equivalent to :<P>
+<BLOCKQUOTE><PRE>
+[self isKindOf:(id)[CASequence class]]
+</PRE></BLOCKQUOTE>
+<H3><A NAME="28">str</A></H3>
+<BLOCKQUOTE>- (STR)<B>str</B></BLOCKQUOTE>
+Returns a string containing a symbolic representation for the object.  Suited for small expressions only since output is unbuffered.  Works by allocating a small buffer and then invoking <B>printOn:</B> on that buffer to do the actual printing.<P>
+You don't have to free the string (it is deallocated when you free or change the object), which makes it easy to use the method as follows :<P>
+<BLOCKQUOTE><PRE>
+fprintf(stderr,"Value of this %s is %s\n",[anObject name],[anObject str]);
+</PRE></BLOCKQUOTE>
+<H3><A NAME="30">str:</A></H3>
+<BLOCKQUOTE>-<B>str</B>:(STR)<I>aString</I></BLOCKQUOTE>
+Returns a new object, instance of the same class, created from <I>aString</I> or returns <B>nil</B> if it's not possible to evaluate <I>aString</I> in the set.  Note that it's not necessarily true that the string value of the new object is <I>literally</I> equal to <I>aString</I>.  There is no default implementation for this method.<P>
+<H3><A NAME="31">intValue</A></H3>
+<BLOCKQUOTE>- (int)<B>intValue</B></BLOCKQUOTE>
+Returns, if it makes sense, the value of the object as C integer.  There is no default implementation for this method.<P>
+<H3><A NAME="32">intValue:</A></H3>
+<BLOCKQUOTE>-<B>intValue</B>:(int)<I>i</I></BLOCKQUOTE>
+Returns a new object of the same class with <B>intValue</B> equal to <I>i</I> or returns <B>nil</B>.<P>
+<H3><A NAME="33">asModp:</A></H3>
+<BLOCKQUOTE>-<B>asModp</B>:(unsigned short)<I>p</I></BLOCKQUOTE>
+Returns an object that is the value modulo the small prime number <I>p</I> for the object that receives the message.  For example, an integer object returns a IntegerModp object in response to this method; a matrix returns a matrix with modular values and so on.<P>
+<H3><A NAME="34">isFloatingPoint</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isFloatingPoint</B></BLOCKQUOTE>
+Returns YES if the object is some kind of floating-point arithmetic.  The default implementation returns NO.  No attempt has been made to integrate floating-point arithmetic into the Computer Algebra Kit's framework of algebraic structures; floating-point numbers are always treated as a special case.<P>
+<H3><A NAME="35">asNumerical</A></H3>
+<BLOCKQUOTE>-<B>asNumerical</B></BLOCKQUOTE>
+Returns an object that is the numerical value for the object that receives the message.  For example, an integer object returns a floating-point object as numerical value; a matrix returns a matrix with numerical values and so on.<P>
+<H3><A NAME="36">floatValue</A></H3>
+<BLOCKQUOTE>- (float)<B>floatValue</B></BLOCKQUOTE>
+Returns, if it makes sense, the value of the object as C floating-point number.  There is no default implementation for this method.<P>
+<H3><A NAME="37">floatValue:</A></H3>
+<BLOCKQUOTE>-<B>floatValue</B>:(float)<I>f</I></BLOCKQUOTE>
+Returns a new object of the same class with <B>floatValue</B> equal to <I>f</I> or returns <B>nil</B>.<P>
+<H3><A NAME="38">asTotalFraction</A></H3>
+<BLOCKQUOTE>-<B>asTotalFraction</B></BLOCKQUOTE>
+Returns a new fraction with the numerator set to a new reference to the original object, and with the denominator set to one.  For example, an integer object returns a rational number.<P>
+<H3><A NAME="39">asScalar</A></H3>
+<BLOCKQUOTE>-<B>asScalar</B></BLOCKQUOTE>
+Returns a new scalar object or <B>nil</B> if the object cannot be coerced into a scalar object; there is no default implementation of the method.  Polynomial overrides this method to return a scalar object if the polynomial contains just a single scalar and no symbols, or <B>nil</B> otherwise.<P>
+<H3><A NAME="41">asSymbol</A></H3>
+<BLOCKQUOTE>-<B>asSymbol</B></BLOCKQUOTE>
+Returns a new symbol object or <B>nil</B> if the object cannot be coerced into a symbol object; there is no default implementation provided.  Polynomial overrides this method to return a symbol object if the polynomial consists of a single symbol raised to the exponent one, or <B>nil</B> otherwise.<P>
+<B>Note:</B> Symbol itself does <I>not</I> implement this method.<P>
+<H3><A NAME="43">isEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isEqual</B>:<I>a</I></BLOCKQUOTE>
+Should test whether the objects are equal.  Returns, by default, YES if the two objects are the same (ie. pointer equal)<P>
+<H3><A NAME="44">notEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>notEqual</B>:<I>a</I></BLOCKQUOTE>
+Whether <B>isEqual:</B> returns NO.<P>
+<H3><A NAME="45">inOrderedSet</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>inOrderedSet</B></BLOCKQUOTE>
+Whether the object is an element of a (totally) ordered set.  Elements can be compared with <B>compare:</B> if this method returns YES.  There is no default implementation for this method.<P>
+<H3><A NAME="46">compare:</A></H3>
+<BLOCKQUOTE>- (int)<B>compare</B>:<I>b</I></BLOCKQUOTE>
+This method should return -1, 0, or +1 if <B>self</B> is less than, equal to, or greater than <I>b</I>.  There is no default implementation for this method.<P>
+<H3><A NAME="47">sign</A></H3>
+<BLOCKQUOTE>- (int)<B>sign</B></BLOCKQUOTE>
+Returns the sign of the object : plus one if positive (greater than zero), zero if zero and minus one if negative (less than zero).  There is no default implementation for this method.<P>
+<H3><A NAME="48">isLess:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isLess</B>:<I>a</I></BLOCKQUOTE>
+Tests whether the object is less than (but not equal to) <I>a</I>.  Defined, by default, in terms of <B>compare:</B>.<P>
+<H3><A NAME="49">isGreater:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isGreater</B>:<I>a</I></BLOCKQUOTE>
+Tests whether the object is greater than (but not equal to) <I>a</I>.  Defined, by default, in terms of <B>compare:</B>.<P>
+<H3><A NAME="50">isLessEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isLessEqual</B>:<I>a</I></BLOCKQUOTE>
+Tests whether the object is less than or equal to <I>a</I>.  Defined, by default, in terms of <B>compare:</B>.<P>
+<H3><A NAME="51">isGreaterEqual:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isGreaterEqual</B>:<I>a</I></BLOCKQUOTE>
+Tests whether the object is greater than or equal to <I>a</I>.  Defined, by default, in terms of <B>compare:</B>.<P>
+<H3><A NAME="52">absValue</A></H3>
+<BLOCKQUOTE>-<B>absValue</B></BLOCKQUOTE>
+Returns the absolute value of the object (a new object).  If the object is negative, invokes <B>negate</B>.  Otherwise returns <B>self</B>.<P>
+<H3><A NAME="53">inAdditiveSemiGroup</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>inAdditiveSemiGroup</B></BLOCKQUOTE>
+Should return YES if the object is an element of an additive semigroup ie., a set equiped with a (commutative) additive operation, but not necessarily with a unique zero element.  Objects that return YES should be prepared to receive <B>negate</B>, <B>add:</B>, <B>subtract:</B>, <B>zero</B> and <B>isZero</B> messages, but a zero element for some object <I>a</I> is not necessarily the zero object for another object <I>b</I> of the same class.   For example, the vectors (of variable dimension) have zero elements of different dimension.  There is no default implementation for this method.<P>
+<H3><A NAME="54">inAdditiveMonoid</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>inAdditiveMonoid</B></BLOCKQUOTE>
+Should return YES if the object is an element of an additive monoid ie., an additive semigroup with a unique zero element : if an object returns YES to this method, and if <B>isZero</B> returns YES, then it is the zero object for all objects of the same class.  However, not every element in the set necessarily has an additive inverse : for example, the set of positive integers contains elements with no additive inverse.  There is no default implementation for this method.<P>
+<H3><A NAME="55">inAdditiveGroup</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>inAdditiveGroup</B></BLOCKQUOTE>
+Should return YES if the object is an element of an additive group ie., an additive monoid with an additive inverse for each element.  There is no default implementation for this method.<P>
+<H3><A NAME="56">isZero</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isZero</B></BLOCKQUOTE>
+Returns YES if the object is equal to zero.  There is no default implementation for this method.<P>
+If the object is an element of an additive monoid, the method should test whether the object is the <I>unique</I> zero element.  Otherwise, <B>isZero</B> should return YES if the object is the zero element for itself.  Matrices of variable dimension, for example,  have zero elements of different dimension.<P>
+<H3><A NAME="57">notZero</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>notZero</B></BLOCKQUOTE>
+Whether <B>isZero</B> returns NO.<P>
+<H3><A NAME="58">isOpposite:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOpposite</B>:<I>b</I></BLOCKQUOTE>
+Should return YES if the objects are additive inverses.  Zero is the only object that is its own additive inverse, unless the characteristic is equal to two.<P>
+<H3><A NAME="59">notOpposite:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>notOpposite</B>:<I>b</I></BLOCKQUOTE>
+Whether <B>isOpposite</B> returns NO.<P>
+<H3><A NAME="60">zero</A></H3>
+<BLOCKQUOTE>-<B>zero</B></BLOCKQUOTE>
+Returns a new reference to the zero element.<P>
+If the object is an element of an additive monoid, the zero element is unique.  Otherwise, <B>zero</B> should return an element <I>c</I> such that <B>self</B> + <I>c</I> = 0.  Matrices of variable dimension, for example,  have zero elements of different dimension.<P>
+There is no default implementation for this method.<P>
+<H3><A NAME="61">negate</A></H3>
+<BLOCKQUOTE>-<B>negate</B></BLOCKQUOTE>
+Returns the opposite of the object (a new object).  There is no default implementation.<P>
+<H3><A NAME="63">add:</A></H3>
+<BLOCKQUOTE>-<B>add</B>:<I>b</I></BLOCKQUOTE>
+Returns the sum <I>self + b</I>.  If the object is pointer equal to the argument, this method should be equivalent to <B>double</B>.  Adding zero returns a new object that is equal to the non-zero object.<P>
+<H3><A NAME="65">subtract:</A></H3>
+<BLOCKQUOTE>-<B>subtract</B>:<I>b</I></BLOCKQUOTE>
+Returns a new object, equal to <I>self - b</I>.  If the object is pointer equal to the argument, this method is equivalent to <B>zero</B>.<P>
+<H3><A NAME="66">increment</A></H3>
+<BLOCKQUOTE>-<B>increment</B></BLOCKQUOTE>
+Adds <B>one</B> to the object.  Returns a new object.<P>
+<H3><A NAME="67">decrement</A></H3>
+<BLOCKQUOTE>-<B>decrement</B></BLOCKQUOTE>
+Subtracts <B>one</B> from the object.  Returns a new object.<P>
+<H3><A NAME="68">multiplyIntValue:</A></H3>
+<BLOCKQUOTE>-<B>multiplyIntValue</B>:(int)<I>b</I></BLOCKQUOTE>
+Returns a new object equal to the product <I>self b</I>.  The default implementation creates an object through <B>-intValue:</B> and then invokes <B>multiply:</B>.<P>
+<B>See also:</B> zero, double, quadruple<P>
+<H3><A NAME="69">double</A></H3>
+<BLOCKQUOTE>-<B>double</B></BLOCKQUOTE>
+Multiplies the object by two.  Returns a new object.  There is no default implementation for this method.<P>
+<H3><A NAME="71">quadruple</A></H3>
+<BLOCKQUOTE>-<B>quadruple</B></BLOCKQUOTE>
+Multiplies the object by four.  Returns a new object.<P>
+There is no default implementation for this method.<P>
+<H3><A NAME="72">divideIntValue:</A></H3>
+<BLOCKQUOTE>-<B>divideIntValue</B>:(int)<I>b</I></BLOCKQUOTE>
+Returns a new object, the <I>exact</I> quotient of the object on division by <I>b</I>.  Returns <B>nil</B> if the division is not exact or if <I>b</I> is equal to zero. <P>
+<H3><A NAME="73">half</A></H3>
+<BLOCKQUOTE>-<B>half</B></BLOCKQUOTE>
+Divides the object by two.  Returns a new object, or <B>nil</B> if the object is not a multiple of two.<P>
+<H3><A NAME="74">quarter</A></H3>
+<BLOCKQUOTE>-<B>quarter</B></BLOCKQUOTE>
+Divides the object by four.  Returns a new object, or <B>nil</B> if the object is not a multiple of four.<P>
+<H3><A NAME="75">commutes</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>commutes</B></BLOCKQUOTE>
+Should return YES if multiplication is commutative for all elements of the set that the object belongs to.  There is no default implemenation for this method.<P>
+<H3><A NAME="76">commutesWith:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>commutesWith</B>:<I>b</I></BLOCKQUOTE>
+Should return YES if multiplication is commutative for the two objects.  There is no default implemenation for this method.<P>
+<H3><A NAME="77">inSemiGroup</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>inSemiGroup</B></BLOCKQUOTE>
+Should return YES if the object is an element of a (multiplicative) semigroup, ie. a set equiped with a (possibly non-commutative) multiplicative operation.  However, the set doesn't necessarily have a unique unity element.  For example, matrices of free dimension don't.  There is no default implemenation for this method.<P>
+<H3><A NAME="78">inMonoid</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>inMonoid</B></BLOCKQUOTE>
+Should return YES if <B>self</B> is an element of a (multiplicative, possibly non-commutative) monoid, ie. a semigroup with a unique unity element.  However, not every element in the set necessarily has a multiplicative inverse.  There is no default implemenation for this method.<P>
+<H3><A NAME="79">inGroup</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>inGroup</B></BLOCKQUOTE>
+Should return YES if <B>self</B> is an element of a (multiplicative, possibly non-commutative) group, ie. a monoid with a multiplicative inverse for each element.  There is no default implemenation for this method.<P>
+<H3><A NAME="80">one</A></H3>
+<BLOCKQUOTE>-<B>one</B></BLOCKQUOTE>
+Returns a new reference to the multiplicative unity.<P>
+If the object is an element of a multiplicative monoid the unity element is unique.  Otherwise, <B>one</B> returns the (right) multiplicative unity element for the object itself, ie. an element <I>c</I> such that <I>self c</I> = 1.  Matrices of variable dimension, for example,  have unity elements of different dimension.<P>
+There is no default implementation for this method.<P>
+<H3><A NAME="81">minusOne</A></H3>
+<BLOCKQUOTE>-<B>minusOne</B></BLOCKQUOTE>
+Returns a new reference to the opposite of the multiplicative unity.  Negates by default the object returned by <B>one</B>.<P>
+<H3><A NAME="82">isOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isOne</B></BLOCKQUOTE>
+Should return YES if the object is equal to one.  There is no default implementation for this method.<P>
+If the object is an element of an multiplicative monoid, the method should test whether the object is the <I>unique</I> unity element.  Otherwise, <B>isOne</B> should return YES if the object is the (right) multiplicative unity element for itself.  Matrices of variable dimension, for example,  have unity elements of different dimension.<P>
+<H3><A NAME="83">notOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>notOne</B></BLOCKQUOTE>
+Whether <B>isOne</B> returns NO.<P>
+<H3><A NAME="84">isMinusOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isMinusOne</B></BLOCKQUOTE>
+Should return YES if the object is equal to minus one i.e., the additive inverse of the multiplicative unity.  There is no default implementation for this method.<P>
+<H3><A NAME="85">notMinusOne</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>notMinusOne</B></BLOCKQUOTE>
+Whether <B>isMinusOne</B> returns NO.<P>
+<H3><A NAME="86">square</A></H3>
+<BLOCKQUOTE>-<B>square</B></BLOCKQUOTE>
+Returns the square of the object ie., a new object equal to the object multiplied by itself.<P>
+<H3><A NAME="88">multiply:</A></H3>
+<BLOCKQUOTE>-<B>multiply</B>:<I>b</I></BLOCKQUOTE>
+Returns a new object equal to the product <I>self b</I>.<P>
+Note that when multiplication is not commutative, [a multiply:b] is not the same thing as [b multiply:a].  Non-commutative multiplication is currently hardly supported.  In general, we have used throughout the Computer Algebra Kit <I>right</I> multiplication.  Left multiplication will be explicitely indicated.<P>
+<H3><A NAME="90">power:</A></H3>
+<BLOCKQUOTE>-<B>power</B>:(int)<I>n</I></BLOCKQUOTE>
+Returns the object raised to the <I>n</I>-th power ie., a new object obtained by multiplying the object <I>n</I> times by itself.<P>
+If <I>n</I> is zero, the method invokes <B>one</B>, except if the object itself is zero.  In that case the method returns <B>nil</B>.  If <I>n</I> is negative, the method raises the inverse of the object to the <I>-n</I>-th power, or if the object is not invertible, it returns <B>nil</B>.<P>
+The default implementation of this method consists of the binary exponentation algorithm (invoking <B>square</B>).  The method may be overridden in those cases where the binary exponentation algorithm performs worse than, for example, a repeated multiplication strategy (for sufficiently sparse polynomials e.g.).<P>
+<H3><A NAME="91">inverse</A></H3>
+<BLOCKQUOTE>-<B>inverse</B></BLOCKQUOTE>
+Returns the multiplicative inverse (a new object).  If there is no inverse, the method returns <B>nil</B>.<P>
+<H3><A NAME="92">isUnit</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isUnit</B></BLOCKQUOTE>
+Tests whether the object has a multiplicative inverse.  The default implementation tests whether <B>inverse</B> returns <B>nil</B> or not.<P>
+<H3><A NAME="93">notUnit</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>notUnit</B></BLOCKQUOTE>
+Whether <B>isUnit</B> returns NO.<P>
+<H3><A NAME="94">divide:</A></H3>
+<BLOCKQUOTE>-<B>divide</B>:<I>b</I></BLOCKQUOTE>
+Returns the <I>exact</I> quotient on division ie., returns a new object equal to the object multiplied (to the right) by the inverse of <I>b</I>.  If the division fails or if the division is not exact (when there is a remainder), this method returns <B>nil</B>.<P>
+<B>Note:</B> Use <B>quotient:</B> to determine the quotient of a division with remainder.<P>
+<H3><A NAME="95">remainder:quotient:</A></H3>
+<BLOCKQUOTE>-<B>remainder</B>:<I>b</I><B>quotient</B>:(id *)<I>q</I></BLOCKQUOTE>
+Divides <B>self</B> by <I>b</I>; returns the remainder <I>R</I>, and by reference, the quotient <I>Q</I>, such that <I>a = Q b + R</I>.  The quotient should not be computed when a NULL pointer is passed for <I>q</I>.  There is no default implementation for this method.<P>
+<B>See also:</B> divide, quotient, remainder<P>
+<H3><A NAME="96">remainder:</A></H3>
+<BLOCKQUOTE>-<B>remainder</B>:<I>b</I></BLOCKQUOTE>
+Returns a new object, the remainder on division of <B>self</B> by <I>b</I>.  The default implementation invokes <B>remainder:quotient:</B> with a NULL quotient argument.<P>
+<B>Note:</B> For ordered domains (such as the integers), this method should return a <I>signed</I> remainder, while <B>modulo:</B> returns an unsigned remainder.<P>
+<B>See also:</B> modulo<P>
+<H3><A NAME="97">quotient:</A></H3>
+<BLOCKQUOTE>-<B>quotient</B>:<I>b</I></BLOCKQUOTE>
+Returns a new object, the quotient on division of by <I>b</I>.  There may be a remainder on division, which can be obtained through <B>remainder:</B>.  The default implementation invokes <B>remainder:quotient:</B>, and throws away the remainder.<P>
+<B>See also:</B> divide<P>
+<H3><A NAME="98">inEuclideanDomain</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>inEuclideanDomain</B></BLOCKQUOTE>
+Returns YES if <B>self</B> is an element of a euclidean domain.  There is no default implementation.<P>
+<H3><A NAME="99">isCoprime:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isCoprime</B>:<I>b</I></BLOCKQUOTE>
+Tests whether the greatest common divisor of <B>self</B> and <I>b</I> is a unit.  Computes the gcd (by invoking <B>-gcd:</B>) and then invokes <B>isUnit</B>.<P>
+<H3><A NAME="100">notCoprime:</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>notCoprime</B>:<I>b</I></BLOCKQUOTE>
+Whether <B>isCoprime</B> returns NO.<P>
+<H3><A NAME="101">isGcd::</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isGcd</B>:<I>a</I>:<I>b</I></BLOCKQUOTE>
+Whether <B>self</B> is the greatest common divisor of <I>a</I> and <I>b</I>.  The default implementation computes the gcd by sending <B>-gcd:</B> and compares to <B>self</B>.<P>
+<H3><A NAME="102">isLcm::</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isLcm</B>:<I>a</I>:<I>b</I></BLOCKQUOTE>
+Whether <B>self</B> is the least common multiple of <I>a</I> and <I>b</I>.  The default implementation computes the gcd by sending <B>-lcm:</B> and compares to <B>self</B>.<P>
+<H3><A NAME="103">gcd:</A></H3>
+<BLOCKQUOTE>-<B>gcd</B>:<I>b</I></BLOCKQUOTE>
+Returns a new object, the greatest common divisor of <B>self</B> and <I>b</I>.  In the case of an additive semigroup, the following should hold : gcd(0,b) = b and gcd(a,0) = a.  There is no default implementation for this method.<P>
+<H3><A NAME="104">bezout:gcd:</A></H3>
+<BLOCKQUOTE>-<B>bezout</B>:<I>b</I><B>gcd</B>:(id *)<I>gcd</I></BLOCKQUOTE>
+Returns a new object, the bezout coefficient of the object, and if a non NULL pointer is passed for <I>gcd</I>, by reference, the gcd of object and <I>b</I>.  The bezout coefficient is the element <I>u</I> such that <I>u self + v b == gcd</I>.<P>
+There is no default implementation for this method.<P>
+<H3><A NAME="105">lcm:</A></H3>
+<BLOCKQUOTE>-<B>lcm</B>:<I>b</I></BLOCKQUOTE>
+Returns the least common multiple of the objects.  The default implementation multiplies the the objects and divides by their gcd.  In the case of an additive semi-group, lcm(a,0) = a and lcm(0,b) = b and lcm(0,0) = 0.<P>
+<H3><A NAME="106">modulo:</A></H3>
+<BLOCKQUOTE>-<B>modulo</B>:<I>m</I></BLOCKQUOTE>
+Returns a new object, the representant of the object modulo <I>m</I>.  For ordered domains (such as the integers), the representant is kept positive (in the range [0,<I>m</I>[).  For domains such as polynomials over a finite field, <B>modulo:</B> is equivalent to <B>remainder:</B>.<P>
+The default implementation invokes <B>remainder:</B>.  Adds back <I>m</I>, if <B>self</B> is ordered and the remainder is negative.<P>
+<H3><A NAME="107">multiply:modulo:</A></H3>
+<BLOCKQUOTE>-<B>multiply</B>:<I>b</I><B>modulo</B>:<I>m</I></BLOCKQUOTE>
+Returns a new object, the product <I>self b</I> modulo <I>m</I>.  The default implementation first calls <B>multiply:</B> and then <B>modulo:</B>.<P>
+<H3><A NAME="108">squareModulo:</A></H3>
+<BLOCKQUOTE>-<B>squareModulo</B>:<I>m</I></BLOCKQUOTE>
+Returns a new object, the square of <B>self</B> modulo <I>m</I>.  The default implementation first calls <B>square</B> and then <B>modulo:</B>.<P>
+<H3><A NAME="109">power:modulo:</A></H3>
+<BLOCKQUOTE>-<B>power</B>:(int)<I>n</I><B>modulo</B>:<I>m</I></BLOCKQUOTE>
+Returns a new object, equal to <B>self</B> raised to the <I>n-th</I> power modulo <I>m</I>.  The default implementation uses the <I>modular binary exponentation</I> algorithm. <P>
+If <B>self</B> and <I>n</I> are equal to zero, returns <B>nil</B>.<P>
+<B>See also:</B> genpower:modulo:<P>
+<H3><A NAME="110">genpower:modulo:</A></H3>
+<BLOCKQUOTE>-<B>genpower</B>:<I>n</I><B>modulo</B>:<I>m</I></BLOCKQUOTE>
+Returns a new object, equal to <B>self</B> raised to the <I>n-th</I> power modulo <I>m</I> (where <I>n</I> is an instance of the <B>BigInt</B> class).  The default implementation uses the <I>modular binary exponentation</I> algorithm. <P>
+If <B>self</B> and <I>n</I> are equal to zero, returns <B>nil</B>.<P>
+<H3><A NAME="111">inverseModulo:</A></H3>
+<BLOCKQUOTE>-<B>inverseModulo</B>:<I>m</I></BLOCKQUOTE>
+Returns a new object, the inverse of <B>self</B> modulo <I>m</I>.  Generates an error message by default.<P>
+<H3><A NAME="112">random</A></H3>
+<BLOCKQUOTE>-<B>random</B></BLOCKQUOTE>
+Returns a new random object.  For example, for the integers, <B>random</B> returns 0 or 1.  For the integers mod <I>p</I>, <B>random</B> returns an integer mod <I>p</I> (possibly zero).<P>
+There is no default implementation.<P>
+<H3><A NAME="113">characteristic</A></H3>
+<BLOCKQUOTE>- (int)<B>characteristic</B></BLOCKQUOTE>
+Returns the characteristic of (the set of) the object, ie. the number <I>n</I> such that <I>n a</I> is zero for each element <I>a</I>.  Domains of characteristic larger than INT_MAX are currently not supported.  There is no default implementation of the method.<P>
+<H3><A NAME="114">isCharacteristicZero</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isCharacteristicZero</B></BLOCKQUOTE>
+Whether <B>characteristic</B> returns zero.<P>
+<H3><A NAME="115">notCharacteristicZero</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>notCharacteristicZero</B></BLOCKQUOTE>
+Whether <B>characteristic</B> returns not zero.<P>
+<H3><A NAME="116">isCharacteristicTwo</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>isCharacteristicTwo</B></BLOCKQUOTE>
+Whether <B>characteristic</B> returns two.<P>
+<H3><A NAME="117">notCharacteristicTwo</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>notCharacteristicTwo</B></BLOCKQUOTE>
+Whether <B>characteristic</B> returns not two.<P>
+<H3><A NAME="118">frobenius</A></H3>
+<BLOCKQUOTE>-<B>frobenius</B></BLOCKQUOTE>
+Returns a new object, the image of <B>self</B> under the <I>frobenius</I> map, ie. exponentation by the characteristic of <B>self</B>.  There is no default implementation.<P>
+<H3><A NAME="119">frobeniusInverse</A></H3>
+<BLOCKQUOTE>-<B>frobeniusInverse</B></BLOCKQUOTE>
+Returns a new object, the inverse image of <B>self</B> under the <I>frobenius</I> map, ie. the <I>n-th</I> root of <B>self</B> where <I>n</I> is the characteristic of <B>self</B>.  There is no default implementation.<P>
+<H3><A NAME="120">dimensionOverPrimeField</A></H3>
+<BLOCKQUOTE>- (int)<B>dimensionOverPrimeField</B></BLOCKQUOTE>
+This method should return the dimension of a finite field over its prime field.  For example, the dimension of GaloisField(9) over GaloisField(3) is 2.<P>
+<H3><A NAME="121">inRing</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>inRing</B></BLOCKQUOTE>
+The object is in a ring if it's in an additive group and a multiplicative monoid.<P>
+<H3><A NAME="122">inIntegralDomain</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>inIntegralDomain</B></BLOCKQUOTE>
+Should return YES if the object is an element of a ring without zero divisors.  There is no default implementation of this method.  Examples of integral domains in the Computer Algebra Kit include, the integers, the Gaussian (complex) integers and polynomial rings.<P>
+<H3><A NAME="123">inField</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>inField</B></BLOCKQUOTE>
+Whether the object is element of an additive group and a multiplicative group.  Examples of fields in the Computer Algebra Kit include, the integers mod <I>p</I>, Galois fields, and various fields of fractions such as the rational numbers or rational functions.<P>
+<H3><A NAME="124">inFieldOfFractions</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>inFieldOfFractions</B></BLOCKQUOTE>
+Whether the object is element of a field of fractions.  Returns NO by default; overridden by Fraction and used by some linear algebra algorithms to reduce computations over a field of fractions to computations over an integral domain.<P>
+<H3><A NAME="131">scalarZero</A></H3>
+<BLOCKQUOTE>-<B>scalarZero</B></BLOCKQUOTE>
+Returns a reference to the zero scalar object.<P>
+<B>See also:</B> zero<P>
+<H3><A NAME="132">scalarContent</A></H3>
+<BLOCKQUOTE>-<B>scalarContent</B></BLOCKQUOTE>
+Returns a new scalar object, the (scalar) content of the objects, ie. the gcd of its scalars.<P>
+There is no default implementation of this method.<P>
+<H3><A NAME="133">divideScalarContent</A></H3>
+<BLOCKQUOTE>-<B>divideScalarContent</B></BLOCKQUOTE>
+If the scalar content is zero, this method simply returns a copy of <B>self</B>.  Otherwise, it divides by the content (sending <B>divideScalar:</B>), ie. it computes the <I>primitive part</I> of <B>self</B>.<P>
+<H3><A NAME="134">multiplyScalar:</A></H3>
+<BLOCKQUOTE>-<B>multiplyScalar</B>:<I>s</I></BLOCKQUOTE>
+Returns a new object, equal to <B>self</B> multiplied (to the right) by the scalar <I>s</I>.<P>
+<H3><A NAME="136">divideScalar:</A></H3>
+<BLOCKQUOTE>-<B>divideScalar</B>:<I>s</I></BLOCKQUOTE>
+Returns a new object, equal to <B>self</B> divided by the scalar <I>s</I>.  The division is exact; if it isn't, the method returns <B>nil</B>.<P>
+<H3><A NAME="137">addScalar:</A></H3>
+<BLOCKQUOTE>-<B>addScalar</B>:<I>s</I></BLOCKQUOTE>
+Adds the scalar <I>s</I> to the object.  Should return a new object.<P>
+<H3><A NAME="138">subtractScalar:</A></H3>
+<BLOCKQUOTE>-<B>subtractScalar</B>:<I>s</I></BLOCKQUOTE>
+Subtracts the scalar <I>s</I> from the object.  Should return a new object.<P>
+<H3><A NAME="147">printsLeadingSign</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsLeadingSign</B></BLOCKQUOTE>
+Should return YES if the printing methods for this object print a leading minus sign.  This can be used in other implementations to avoid printing a plus sign followed by a minus sign.  The default implementation returns NO.<P>
+<H3><A NAME="148">printsSum</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsSum</B></BLOCKQUOTE>
+Should return YES if the printing methods for this object print multiple terms separated by a plus or minus sign.  This can be used in other implementations to place the expression between parentheses if necessary.  The default implementation returns NO.<P>
+<H3><A NAME="149">printsProduct</A></H3>
+<BLOCKQUOTE>- (BOOL)<B>printsProduct</B></BLOCKQUOTE>
+Should return YES if the printing methods for this object print multiple factors separated by a space or multiplication sign.  This can be used in other implementations to place the expression between parentheses if necessary.  The default implementation returns NO.<P>
+<H3><A NAME="150">printOn:</A></H3>
+<BLOCKQUOTE>-<B>printOn</B>:(IOD)<I>aFile</I></BLOCKQUOTE>
+Should print a textual representation of the object to <I>aFile</I>.  Methods such as <B>str</B>, <B>printForDebugger:</B>, <B>printOn:</B> etc. work by invoking this method.<P>

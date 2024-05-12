@@ -1,0 +1,1989 @@
+.TH "Object" 3 "Mar 12, 2023"
+.SH Object
+.PP
+None\&.  (Object is the root class)\&.
+.SH Class Description
+.PP
+.B
+Object
+is the superclass of all classes\&.  Methods implemented here are inherited by all Objective C classes\&.
+.SH Indexed Variables
+.PP
+The Portable Object Compiler does not support indexed variables (variable sized objects)\&.  It is best to store data of variable size, by using a pointer to the data, instead of placing the data in the object itself\&.
+.SH Limits 
+.PP
+The Portable Object Compiler stores the size of instances of subclasses of 
+.B
+Object
+in a 
+.I
+short
+C integer, so it\&'s better to use a pointer to large blocks of data, as opposed to placing the data in the object itself (as an instance variable)\&.
+.PP
+The number of instance methods and class methods that a class can have, is also limited by the size of C 
+.I
+short
+integer (depends on the target platform)\&.
+.SH Method types
+.PP 
+.B
+Factory Initialization
+.RS 3
+.br
+* initialize
+.RE
+.PP 
+.B
+Creating, Copying and Freeing
+.RS 3
+.br
+* new
+.br
+* copy
+.br
+* deepCopy
+.br
+* free
+.br
+* release
+.RE
+.PP 
+.B
+Identity
+.RS 3
+.br
+* self
+.br
+* yourself
+.br
+* class
+.br
+* superclass
+.br
+* superClass
+.br
+* class
+.br
+* superclass
+.br
+* superClass
+.br
+* name
+.br
+* name
+.br
+* findClass:
+.br
+* findSel:
+.br
+* selOfSTR:
+.br
+* idOfSTR:
+.RE
+.PP 
+.B
+Comparing
+.RS 3
+.br
+* hash
+.br
+* isEqual:
+.br
+* str
+.br
+* size
+.br
+* isEqual:
+.br
+* isSame:
+.br
+* notEqual:
+.br
+* notSame:
+.br
+* compare:
+.br
+* invertCompare:
+.RE
+.PP 
+.B
+Responding to Methods
+.RS 3
+.br
+* respondsTo:
+.br
+* isMemberOf:
+.br
+* isKindOf:
+.RE
+.PP 
+.B
+Object Tables
+.RS 3
+.br
+* someInstance
+.br
+* nextInstance
+.br
+* become:
+.RE
+.PP 
+.B
+Class Management
+.RS 3
+.br
+* subclasses
+.br
+* poseAs:
+.br
+* addMethodsTo:
+.br
+* subclass:
+.br
+* subclass:::
+.br
+* load
+.br
+* unload
+.br
+* inheritsFrom:
+.br
+* isSubclassOf:
+.RE
+.PP 
+.B
+Error Handling
+.RS 3
+.br
+* subclassResponsibility
+.br
+* subclassResponsibility:
+.br
+* notImplemented
+.br
+* notImplemented:
+.br
+* shouldNotImplement
+.br
+* shouldNotImplement:
+.br
+* shouldNotImplement:from:
+.br
+* error:
+.br
+* halt:
+.RE
+.PP 
+.B
+Unknown Messages
+.RS 3
+.br
+* doesNotRecognize:
+.br
+* doesNotUnderstand:
+.RE
+.PP 
+.B
+Method Lookup
+.RS 3
+.br
+* methodFor:
+.br
+* instanceMethodFor:
+.RE
+.PP 
+.B
+Method Performing
+.RS 3
+.br
+* perform:
+.br
+* perform:with:
+.br
+* perform:with:with:
+.br
+* perform:with:with:with:
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* print
+.br
+* print
+.br
+* printLine
+.br
+* show
+.br
+* printOn:
+.RE
+.PP 
+.B
+Version
+.RS 3
+.br
+* objcrtRevision
+.RE
+.PP 
+.B
+Archiving
+.RS 3
+.br
+* readFrom:
+.br
+* storeOn:
+.RE
+.PP 
+.B
+AsciiFiler Methods
+.RS 3
+.br
+* fileOutOn:
+.br
+* fileInFrom:
+.br
+* fileInFrom:
+.br
+* fileOut:type:
+.br
+* fileIn:type:
+.br
+* awake
+.br
+* awakeFrom:
+.RE
+.SH Methods
+.PP 
+initialize
+.RS 1
++
+.B
+initialize
+.RE
+.PP
+Every class in the application, receives an 
+.B
+initialize
+message when the program starts\&.  By default this method doesn\&'t do anything\&.  It can be overridden to do class initialization\&.
+.PP
+Note that all classes are guarantueed to receive 
+.B
+initialize
+, before any other message is sent\&.  Other runtimes differ with ours in this respect, that 
+.B
+initialize
+is sometimes sent to a class, just before an instance of that particular class is being used (as opposed to all classes receiving 
+.B
+initialize
+, before any instance receives a message)\&.
+.PP
+.B
+Note:
+
+In some runtimes, the equivalent functionality is called 
+.B
++load
+instead of 
+.B
++initialize
+\&.
+.PP 
+new
+.RS 1
++
+.B
+new
+.RE
+.PP
+Factory method to create and return a new instance of the class\&.  The default implementation clears (zeroes) the memory for instance variables and initializes the 
+.I
+isa
+pointer\&.
+.PP
+On systems that allow to recover from a failed memory allocation call, 
+.B
+new
+might raise an exception that can be handled with 
+.B
+ifOutOfMemory:
+\&.  The default handler for this exception aborts the process\&.
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Should return a copy of the object\&.  The difference with 
+.B
+deepCopy
+is, that this copy might share pointers etc\&. with the receiver of the message\&.  By default, 
+.B
+copy
+just makes a byte copy of the memory for instance variables\&.
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+Should return a 
+.I
+deep copy
+of the object\&.  Usually this means a copy that doesn\&'t share objects with the original object and that can be 
+.B
+free
+\&'ed independently\&.  By default, 
+.B
+deepCopy
+just makes a byte copy of the memory for instance variables\&.
+.PP 
+free
+.RS 1
+-
+.B
+free
+.RE
+.PP
+Sets the 
+.B
+isa
+pointer for this instance to 
+.B
+nil
+, frees the memory for the instance, and returns 
+.B
+nil
+\&.
+.PP
+When compiling with the -gc option, the memory for the instance is not being freed\&.  The garbage collector takes cares of this\&.
+.PP
+.B
+Note:
+
+This method is implemented as 
+.B
+shouldNotImplement
+when using reference counted memory management\&.  This is so that the user doesn\&'t accidentally sends 
+.B
+free
+messages that interfere with the reference counted memory management\&.
+.PP 
+release
+.RS 1
+-
+.B
+release
+.RE
+.PP
+Message that is automatically sent to object when using the reference count compiler option\&.  Should free the memory for the instance, and returns 
+.B
+nil
+\&.
+.PP 
+self
+.RS 1
+-
+.B
+self
+.RE
+.PP
+Method that does nothing, except for returning 
+.B
+self
+\&.
+.PP 
+yourself
+.RS 1
+-
+.B
+yourself
+.RE
+.PP
+Method that does nothing, except for returning 
+.B
+self
+\&.
+.PP 
+class
+.RS 1
+-
+.B
+class
+.RE
+.PP
+Returns the class object for the receiver\&'s class\&.
+.PP
+.B
+See also:
+
++ class
+.PP 
+superclass
+.RS 1
+-
+.B
+superclass
+.RE
+.PP
+Returns the superclass object for the receiver\&'s class\&.  For GNU compatibility\&.
+.PP
+.B
+See also:
+
++ superclass
+.PP 
+superClass
+.RS 1
+-
+.B
+superClass
+.RE
+.PP
+Same as 
+.B
+superclass
+\&.  For Stepstone compatibility\&.
+.PP 
+class
+.RS 1
++
+.B
+class
+.RE
+.PP
+Traditionally, the 
+.I
+class
+of a class does NOT return the metaclass, but rather 
+.B
+self
+(that, it, the class itself)\&.
+.PP 
+superclass
+.RS 1
++
+.B
+superclass
+.RE
+.PP
+For GNU compatibility\&.  Returns the superclass of this factory (which is another factory object), or 
+.B
+nil
+for the root\&.
+.PP 
+superClass
+.RS 1
++
+.B
+superClass
+.RE
+.PP
+Same as 
+.B
+superclass
+, but for Stepstone compatibility\&.  Returns the superclass of this factory (which is another factory object), or 
+.B
+nil
+for the root\&.
+.PP 
+name
+.RS 1
+- (
+STR
+)
+.B
+name
+.RE
+.PP
+Returns the name of the object; implemented by default to return the name of the object\&'s class\&.
+.PP 
+name
+.RS 1
++ (
+STR
+)
+.B
+name
+.RE
+.PP
+Returns the name of the class\&.
+.PP 
+findClass:
+.RS 1
+-
+.B
+findClass
+:(STR)
+.I
+name
+.RE
+.PP
+Returns the id of a Class name, if that class has been linked in this executable image, otherwise returns 
+.B
+nil
+\&.
+.PP 
+findSel:
+.RS 1
+- (
+SEL
+)
+.B
+findSel
+:(STR)
+.I
+name
+.RE
+.PP
+Returns the selector (uniqued string) of the string 
+.I
+name
+\&.  Returns NULL if 
+.I
+name
+is not in the selector table\&.
+.PP 
+selOfSTR:
+.RS 1
+- (
+SEL
+)
+.B
+selOfSTR
+:(STR)
+.I
+name
+.RE
+.PP
+Same as 
+.B
+findSel:
+, but raises an exception if the selector is not found\&.
+.PP 
+idOfSTR:
+.RS 1
+-
+.B
+idOfSTR
+:(STR)
+.I
+aClassName
+.RE
+.PP
+Same as 
+.B
+findClass:
+, but raises an exception if the class is not found\&.
+.PP 
+hash
+.RS 1
+- (
+unsigned
+)
+.B
+hash
+.RE
+.PP
+Returns a small integer value derived from the object, that should be equal for two objects for which 
+.B
+isEqual:
+returns YES\&.  By default, returns the pointer address of the object as an unsigned integer\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+anObject
+.RE
+.PP
+Should return YES if the receiver is equal to 
+.I
+anObject
+\&.  By default, compares the pointer addresses of the two objects\&.
+.PP 
+str
+.RS 1
+- (
+STR
+)
+.B
+str
+.RE
+.PP
+Returns the name of the object; implemented by default to return the name of the object\&'s class\&.  The String subclass overrides this method to return its contents\&.  The method 
+.B
+isEqual:
+of the String class is implemented in terms of 
+.B
+str
+, and String instances can therefore be compared with arbitrary objects\&.
+.PP 
+size
+.RS 1
+- (
+unsigned
+)
+.B
+size
+.RE
+.PP
+Returns the number of other objects that this object contains\&.  Returns 0 by default, but the Collection subclasses override this method to return the size of their contents\&.
+.PP 
+isEqual:
+.RS 1
++ (
+BOOL
+)
+.B
+isEqual
+:
+.I
+anObject
+.RE
+.PP
+Tests whether two class objects are the same\&.
+.PP 
+isSame:
+.RS 1
+- (
+BOOL
+)
+.B
+isSame
+:
+.I
+anObject
+.RE
+.PP
+Returns YES if the pointer addresses of the two objects are equal\&.
+.PP 
+notEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+notEqual
+:
+.I
+anObject
+.RE
+.PP
+Whether 
+.B
+isEqual:
+returns NO\&.
+.PP 
+notSame:
+.RS 1
+- (
+BOOL
+)
+.B
+notSame
+:
+.I
+anObject
+.RE
+.PP
+Whether 
+.B
+isSame:
+returns NO\&.
+.PP 
+compare:
+.RS 1
+- (
+int
+)
+.B
+compare
+:
+.I
+anObject
+.RE
+.PP
+Should return an integer which is less than, equal to, or greater than zero, if the receiver is less than, equal to, or greater than 
+.I
+anObject
+\&.  The return value is called the method\&'s comparison value\&.
+.PP 
+invertCompare:
+.RS 1
+- (
+int
+)
+.B
+invertCompare
+:
+.I
+anObject
+.RE
+.PP
+This method simply inverts the return value of 
+.B
+compare:
+\&.
+.PP 
+respondsTo:
+.RS 1
+- (
+BOOL
+)
+.B
+respondsTo
+:(SEL)
+.I
+aSelector
+.RE
+.PP
+Test whether the class implements a certain method\&.  Returns YES if the class itself, or one of its superclasses, implements the method, otherwise NO\&.  The method does 
+.I
+not
+generate an error if the class does not implement the method\&.
+.PP 
+isMemberOf:
+.RS 1
+- (
+BOOL
+)
+.B
+isMemberOf
+:
+.I
+aClass
+.RE
+.PP
+Returns YES if the receiver is an instance of 
+.I
+aClass
+, but NO if it\&'s an instance of some subclass of 
+.I
+aClass
+\&.
+.PP 
+isKindOf:
+.RS 1
+- (
+BOOL
+)
+.B
+isKindOf
+:
+.I
+aClass
+.RE
+.PP
+Returns YES if the receiver is an instance of 
+.I
+aClass
+or an instance from some subclass of 
+.I
+aClass
+\&.  If the receiver is a class, returns YES if 
+.I
+aClass
+is the rootclass (
+.B
+Object
+) and NO otherwise\&.
+.PP
+.B
+Note:
+
+For portability, this method always needs to be used as follows:
+.RS 3
+
+[ foo isKindOf:(id) [Classname class] ];
+.br
+
+.RE
+.PP
+The reason is that some compilers do not allow class names as expressions, so the class must be obtained by sending a 
+.B
+class
+message\&.   In addition, some compilers have a 
+.B
+isKindOf:
+method that takes an 
+.I
+id
+argument, but the return value of 
+.B
+self
+or 
+.B
+class
+can be SHR for those compilers\&.  Therefore, it\&'s necessary to cast the return value to 
+.I
+id
+(to avoid compiler warnings)\&.
+.PP
+.B
+See also:
+
++inheritsFrom:, -isMemberOf:
+.PP 
+someInstance
+.RS 1
++
+.B
+someInstance
+.RE
+.PP
+Returns the first instance in an enumeration of instances, or 
+.B
+nil
+when there is no instance\&.
+.PP
+.B
+Note:
+
+Works only when using the -otb compiler switch\&.
+.PP 
+nextInstance
+.RS 1
+-
+.B
+nextInstance
+.RE
+.PP
+Returns the next instance in the enumeration of instances of a class, or 
+.B
+nil
+when there are no more instances\&.
+.PP
+.B
+Note:
+
+Works only when using the -otb compiler switch\&.
+.PP 
+become:
+.RS 1
+-
+.B
+become
+:
+.I
+other
+.RE
+.PP
+Swaps pointers for the receiver of the message and the argument\&.  All variables that used to point to the receiver, now point to the argument, and vice-versa\&.
+.PP
+.B
+Note:
+
+Works only when using the -otb compiler switch\&.
+.PP 
+subclasses
+.RS 1
++
+.B
+subclasses
+.RE
+.PP
+Returns a 
+.B
+OrdCltn
+of direct subclasses of the class that receives the message\&.  If the class has no subclasses, then this method returns an empty 
+.B
+OrdCltn
+(not 
+.B
+nil
+)\&.  The class itself is not considered subclass of itself\&.
+.PP
+.B
+Note:
+
+This method is Portable Object Compiler only\&.
+.PP
+.B
+See also:
+
++class, +superclass, +inheritsFrom:
+.PP 
+poseAs:
+.RS 1
++
+.B
+poseAs
+:
+.I
+superClass
+.RE
+.PP
+The 
+.B
+poseAs:
+method permits to modify a supplied 
+.I
+superClass
+(for which, for example, no source code is available) by substituting a direct subclass of 
+.I
+superClass
+\&.  It is normally used inside 
+.B
++initialize
+, but the Portable Object Compiler allows 
+.B
+poseAs:
+to be used anywhere in the program\&.
+.RS 3
+
++ initialize { [self poseAs:[Set self]]; return self; }
+.br
+
+.RE
+.PP
+The example shows how the 
+.B
+initialize
+of some subclass, called for example 
+.B
+SubSet
+, can substitute 
+.B
+SubSet
+for 
+.B
+Set
+\&.  Methods defined in 
+.B
+SubSet
+override those defined in the superclass, and new methods from 
+.B
+SubSet
+, will appear to have come from the 
+.B
+Set
+class\&.
+.PP
+When performing a 
+.B
+poseAs:
+, the following rules must be followed:
+.RS 3
+.br
+* The posing class must be an immediate subclass of the class that it is to impersonate\&.
+.br
+* The posing class may define or redefine only methods\&.
+.br
+* Specifically, the posing class may NOT add any new instance variables\&.
+.RE
+.PP
+The Portable Object Compiler implementation of 
+.B
+poseAs:
+differs from some other runtimes, since it allows 
+.B
+poseAs:
+to happen, even after messages have been sent to instances of posing or impersonated class\&.
+.PP
+Implementation details:
+.RS 3
+.br
+* poseAs: patches the superclass pointer of all subclasses (other than the posing class) that inherit from 
+.I
+superClass
+.br
+* poseAs: changes the name of 
+.I
+superClass
+by prefixing the name with  _%
+.br
+* findClass: for the name of 
+.I
+superClass
+will return the posing subclass\&.
+.RE
+.PP
+.B
+Note:
+
+All Objective-C compilers provide this functionality (sometimes with restrictions on when the method can be called)
+.PP 
+addMethodsTo:
+.RS 1
++
+.B
+addMethodsTo
+:
+.I
+superClass
+.RE
+.PP
+The 
+.B
+addMethodsTo:
+method permits to modify a supplied 
+.I
+superClass
+(for which, for example, no source code is available) by adding the (instance and factory) methods of a direct subclass, to 
+.I
+superClass
+\&.  It is normally used inside 
+.B
++initialize
+, but the Portable Object Compiler allows 
+.B
+addMethodsTo:
+to be used anywhere in the program\&.
+.PP
+The same restrictions apply as for 
+.B
+poseAs:
+: the subclass needs to be a direct subclass of 
+.I
+superClass
+and it may not add instance variables\&.  However, unlike 
+.B
+poseAs:
+, the subclass will not be substituted for the 
+.I
+superClass
+for purposes as 
+.B
+fileIn:
+etc\&.  Also, (unlike 
+.B
+poseAs:
+) when the subclass adds a method to the 
+.I
+superClass
+that was overridden from the 
+.I
+superClass
+, then this method will not replace the method of the 
+.I
+superClass
+\&.
+.RS 3
+.RE
+.PP
+.B
+Note:
+
+Portable Object Compiler only\&.
+.PP 
+subclass:
+.RS 1
++
+.B
+subclass
+:(STR)
+.I
+name
+.RE
+.PP
+Method to dynamically subclass a class\&.  Returns a new class object, which is still unregistered\&.  With the methods 
+.B
+load
+and 
+.B
+unload
+, one can add or remove the class to the runtime, such that methods like 
+.B
+findClass:
+will also return this new class\&.
+.PP
+.B
+Note:
+
+Portable Object Compiler only\&.
+.PP 
+subclass:::
+.RS 1
++
+.B
+subclass
+:(STR)
+.I
+name
+:(int)
+.I
+ivars
+:(int)
+.I
+cvars
+.RE
+.PP
+Method to dynamically subclass a class\&.  Returns a new class object, which is still unregistered\&.  With the methods 
+.B
+load
+and 
+.B
+unload
+, one can add or remove the class to the runtime, such that methods like 
+.B
+findClass:
+will also return this new class\&.
+.PP
+.B
+Note:
+
+Portable Object Compiler only\&.
+.PP 
+load
+.RS 1
++
+.B
+load
+.RE
+.PP
+This method adds a dynamically created class to the runtime\&.  The class will appear to methods such as 
+.B
+findClass:
+or 
+.B
+findSel:
+(for any selectors of methods of the class)\&.
+.PP
+.B
+Note:
+
+Portable Object Compiler only\&.
+.PP 
+unload
+.RS 1
++
+.B
+unload
+.RE
+.PP
+This method removes a dynamically created class from the runtime\&.  The class will appear to be unavailable to methods such as 
+.B
+findClass:
+, after removing the class by an 
+.B
+unload
+message\&.
+.PP
+.B
+Note:
+
+Portable Object Compiler only\&.
+.PP 
+inheritsFrom:
+.RS 1
++ (
+BOOL
+)
+.B
+inheritsFrom
+:
+.I
+aClass
+.RE
+.PP
+Returns YES if the receiving class is a subclass (direct or not) from 
+.I
+aClass
+\&.  Returns NO if the receiver is 
+.I
+aClass
+itself, e\&.g\&. :
+.RS 3
+
+- (BOOL)isKindOf:c { return (isa==c) || [isa inheritsFrom:aClass]; }
+.br
+
+.RE
+.PP
+.B
+Note:
+
+For compatibility with Squeak\&.
+.PP 
+isSubclassOf:
+.RS 1
++ (
+BOOL
+)
+.B
+isSubclassOf
+:
+.I
+aClass
+.RE
+.PP
+Equivalent to 
+.B
+inheritsFrom:
+\&.
+.PP 
+subclassResponsibility
+.RS 1
+-
+.B
+subclassResponsibility
+.RE
+.PP
+Used in classes to indicate that the functionality is assumed to be implemented by a subclass, as in:
+.RS 3
+
+- foo { [self subclassResponsibility]; }
+.br
+
+.RE
+.PP
+If the subclass does not implement the method, then an error message is generated\&.
+.PP 
+subclassResponsibility:
+.RS 1
+-
+.B
+subclassResponsibility
+:(SEL)
+.I
+aSelector
+.RE
+.PP
+For Stepstone compatibility\&.
+.PP 
+notImplemented
+.RS 1
+-
+.B
+notImplemented
+.RE
+.PP
+Method to indicate that a method is temporarily not implemented : 
+.RS 3
+
+-foo { [self notImplemented]; }
+.br
+
+.RE
+.PP
+When designing a class, the method 
+.B
+notImplemented
+can be used to implement stubs for the methods that make up the class\&.  When the design phase is finished, the actual implementation can begin\&.  If later, by accident, not all functionality is properly implemented, the method 
+.B
+notImplemented
+will help finding this\&.
+.PP 
+notImplemented:
+.RS 1
+-
+.B
+notImplemented
+:(SEL)
+.I
+aSelector
+.RE
+.PP
+For Stepstone compatibility\&.
+.PP 
+shouldNotImplement
+.RS 1
+-
+.B
+shouldNotImplement
+.RE
+.PP
+This is the opposite of 
+.B
+subclassResponsibility
+and a stronger form of 
+.B
+notImplemented
+: 
+.B
+shouldNotImplement
+should be used, when the class is not supposed to implement some method, i\&.e\&. when the method is not appropriate for the class and its subclasses\&.
+.PP
+An abstract superclass, called 
+.I
+MyClass
+for example, can use this method to indicate that subclasses should not send (or be sent) a 
+.B
+new
+message, but that they are supposed to send some other method (such as 
+.B
+foo:
+perhaps) :
+.RS 3
+
++new { [self shouldNotImplement]; }
+.br
++foo:aBar { self = [super new];bar = aBar; return self; }
+.br
+
+.RE
+.PP
+This announces that 
+.B
+new
+, which would otherwise have been inherited from the root class, is not an appropriate way to create an instance of a subclass of MyClass\&.
+.PP 
+shouldNotImplement:
+.RS 1
+-
+.B
+shouldNotImplement
+:(SEL)
+.I
+aSelector
+.RE
+.PP
+Method for Stepstone compatibility\&.
+.PP 
+shouldNotImplement:from:
+.RS 1
+-
+.B
+shouldNotImplement
+:(SEL)
+.I
+aSelector
+.B
+from
+:
+.I
+superClass
+.RE
+.PP
+Method for Stepstone compatibility\&.
+.PP 
+error:
+.RS 1
+-
+.B
+error
+:(STR)
+.I
+format,\&.\&.\&.
+.RE
+.PP
+Generate an error message\&.  Takes a format string in the style of the C library function 
+.I
+printf
+, with a variable number of arguments\&.  Returns 
+.B
+self
+\&.
+.PP
+This method is present in most runtimes, but it was reimplemented in the Portable Object Compiler, so that the error can be 
+.I
+caught
+, using the Block instance method 
+.B
+ifError:
+\&.  Traditionally, the method 
+.B
+error:
+simply aborts the process, and the default error handler in our implementation does the same thing\&.
+.PP 
+halt:
+.RS 1
+-
+.B
+halt
+:
+.I
+message
+.RE
+.PP
+This method is equivalent to the 
+.B
+error:
+method but takes an object as argument\&.
+.PP
+The halt method pops an error handler from the stack of handlers, as maintained by 
+.B
+ifError:
+\&.  The handler is evaluated with the message and the receiver of the 
+.B
+halt:
+message, as arguments\&.  If the handler returns, it is pushed again on the stack\&.  If there were no handlers on the stack, the default error handler is used instead, as returned by 
+.B
+errorHandler
+\&.
+.PP
+.B
+Note:
+
+Portable Object Compiler specific
+.PP 
+doesNotRecognize:
+.RS 1
+-
+.B
+doesNotRecognize
+:(SEL)
+.I
+aSelector
+.RE
+.PP
+Automatically sent by the 
+.I
+runtime
+when the class does not implement 
+.I
+aSelector
+\&.
+.PP
+.B
+Note:
+
+The Portable Object Compiler offers a generalization of this method, called 
+.B
+doesNotUnderstand:
+\&.  The 
+.B
+doesNotRecognize:
+method is sent 
+.I
+via
+
+.B
+doesNotUnderstand:
+and not directly by the messenger\&.
+.PP
+.B
+See also:
+
+doesNotUnderstand:
+.PP 
+doesNotUnderstand:
+.RS 1
+-
+.B
+doesNotUnderstand
+:
+.I
+aMessage
+.RE
+.PP
+This method is sent by the messenger when a message is sent to an object, that is not implemented by that object\&.  The default implementation is,
+.RS 3
+
+[self doesNotRecognize:[aMessage selector]];
+.br
+
+.RE
+.PP
+which means that code that was overriding 
+.B
+doesNotRecognize:
+to do forwarding of (unary) messages can continue to work\&.
+.PP
+However, the new (Portable Object Compiler specific) 
+.B
+doesNotUnderstand:
+method, together with the 
+.B
+Message
+class,  provides a way of forwarding messages with arbitrary return values and arguments\&.
+.PP
+.B
+See also:
+
+Message Class
+.PP 
+methodFor:
+.RS 1
+- (
+IMP
+)
+.B
+methodFor
+:(SEL)
+.I
+aSelector
+.RE
+.PP
+Returns a function implementation pointer for 
+.I
+aSelector
+\&.  Returns a pointer to an error handling function if the object does not respond to 
+.I
+aSelector
+\&.
+.PP
+Use of this method for reasons of performance, is not encouraged, because by repeatedly using the resulting function pointer, one is bypassing (the benefits of) dynamic binding\&.
+.PP
+A good use of 
+.B
+methodFor:
+however, is, because this method is supported by various runtimes, to send a message in a runtime independent, portable way, without using runtime specific functions (such as _imp(), _msg(), objc_msg_Send() etc\&. which have, unlike 
+.B
+methodFor:
+non-standard names) :
+.RS 3
+
+((int (*) (id,id,BOOL))[object methodFor:selector])(object,arg,flag);
+.br
+
+.RE
+.PP
+The same thing can be achieved by using the _imp() function immediately but using the 
+.B
+methodFor:
+message is the preferred API\&.
+.PP 
+instanceMethodFor:
+.RS 1
++ (
+IMP
+)
+.B
+instanceMethodFor
+:(SEL)
+.I
+aSelector
+.RE
+.PP
+Returns a function implementation pointer for 
+.I
+aSelector
+\&.  Returns a pointer to an error handling function if the object does not respond to 
+.I
+aSelector
+\&.
+.PP
+Use of this method is not encouraged, because by using the resulting function pointer, one is bypassing (the benefits of) dynamic binding\&.
+.PP 
+perform:
+.RS 1
+-
+.B
+perform
+:(SEL)
+.I
+aSelector
+.RE
+.PP
+Returns the value that would result when sending 
+.I
+aSelector
+to the receiver\&.
+.PP 
+perform:with:
+.RS 1
+-
+.B
+perform
+:(SEL)
+.I
+aSelector
+.B
+with
+:
+.I
+anObject
+.RE
+.PP
+Returns the value that would result when sending 
+.I
+aSelector
+to the receiver with a single argument 
+.I
+anObject
+\&.  The following are equivalent :
+.RS 3
+
+[aReceiver perform:@selector(do:) with:anObject];
+.br
+
+.RE
+.PP
+and
+.RS 3
+
+[aReceiver do:anObject];
+.br
+
+.RE
+.PP 
+perform:with:with:
+.RS 1
+-
+.B
+perform
+:(SEL)
+.I
+aSelector
+.B
+with
+:
+.I
+anObject
+.B
+with
+:
+.I
+otherObject
+.RE
+.PP
+Returns the value that would result when sending 
+.I
+aSelector
+to the receiver with arguments 
+.I
+anObject
+and 
+.I
+otherObject
+\&.
+.PP 
+perform:with:with:with:
+.RS 1
+-
+.B
+perform
+:(SEL)
+.I
+aSelector
+.B
+with
+:
+.I
+anObject
+.B
+with
+:
+.I
+otherObject
+.B
+with
+:
+.I
+thirdObj
+.RE
+.PP
+Returns the value that would result when sending 
+.I
+aSelector
+to the receiver with arguments 
+.I
+anObject
+and 
+.I
+otherObject
+\&.
+.PP 
+print
+.RS 1
+-
+.B
+print
+.RE
+.PP
+Prints the object to the 
+.I
+stdout
+and returns 
+.B
+self
+\&.  Implemented as,
+.RS 3
+
+return [self printOn:stdout]; 
+.br
+
+.RE
+.PP
+meaning that if you implement 
+.B
+printOn:
+, then this method will work\&.
+.PP 
+print
+.RS 1
++
+.B
+print
+.RE
+.PP
+Factory method to print the name of the class to the 
+.I
+stdout
+and to return 
+.B
+self
+\&.  
+.PP 
+printLine
+.RS 1
+-
+.B
+printLine
+.RE
+.PP
+Prints the object (in the sense of 
+.B
+print
+) and then a newline\&.
+.PP 
+show
+.RS 1
+-
+.B
+show
+.RE
+.PP
+Displays the object on the 
+.I
+stderr
+, by using Filer code, and returns 
+.B
+self
+\&.  Because it is implemented in terms of Filer code, this method is completely unrelated to the 
+.B
+print
+method, although that the goal in both cases is to print a symbolic representation of the object\&.
+.PP
+This method is extremely useful for debugging\&.  The compiler automatically implements Filer methods, so this method 
+.I
+dumps
+instance variables of the object in a symbolic format, without the programmer having to implement debug/printing routines\&.
+.PP
+Method for Stepstone compatibility\&.  Used in Producer code\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+anIOD
+.RE
+.PP
+Should print the object to 
+.I
+anIOD
+, which is of type 
+.B
+IOD
+(defined as an 
+.I
+input output device
+, a 
+.B
+FILE
+pointer, to be used with standard I/O)\&.  Should return the receiver\&.  By default, the method prints nothing\&.
+.PP
+This is the method to override in subclasses to make 
+.B
+print
+, 
+.B
+printLine
+etc\&. to work\&.
+.PP 
+objcrtRevision
+.RS 1
++ (
+STR
+)
+.B
+objcrtRevision
+.RE
+.PP
+Returns the version string of the runtime being used\&.
+.PP 
+readFrom:
+.RS 1
++
+.B
+readFrom
+:(STR)
+.I
+aFileName
+.RE
+.PP
+Activates the object stored in the file 
+.I
+aFileName
+\&.  The object will in all respects be functional, as it was before being stored\&.  Works by indirectly calling 
+.I
+fileIn()
+\&.  The class AsciiFiler must be linked into the application for this method to work\&.
+.PP
+This message can be sent to any factory object without regard of the class of the object being read in\&.  In other words, if file 
+.I
+foo
+contains a saved instance of a 
+.B
+OrdCltn
+, then
+.RS 3
+
+id myCollection = [Object readFrom:\&"foo\&"];
+.br
+
+.RE
+.PP
+will work, ie\&. the receiver doesn\&'t need to be 
+.B
+OrdCltn
+\&.  Returns 
+.B
+nil
+on failure\&.
+.PP 
+storeOn:
+.RS 1
+- (
+BOOL
+)
+.B
+storeOn
+:(STR)
+.I
+aFileName
+.RE
+.PP
+Stores the receiver to a file named 
+.I
+aFileName
+, in a format such that the object can then be activated later, using the 
+.B
+readFrom:
+method\&.  Works by indirectly calling the function 
+.I
+storeOn()
+\&.  The class AsciiFiler must be linked into the application for this method to work
+.PP 
+fileOutOn:
+.RS 1
+-
+.B
+fileOutOn
+:
+.I
+aFiler
+.RE
+.PP
+Writes the receiver on 
+.I
+aFiler
+\&. This is the method that a subclass will override to do it own processing, if the default implementation, which automatically writes out all instance variables of type 
+.I
+id
+, does not suffice\&.
+.PP
+This method will be invoked twice by the Filer class, during archiving\&.
+.PP 
+fileInFrom:
+.RS 1
++
+.B
+fileInFrom
+:
+.I
+aFiler
+.RE
+.PP
+Creates a new instance of the class, files in the instance from 
+.I
+aFiler
+(by sending the new object a 
+.B
+fileInFrom:
+) message, and returns the new object\&.
+.PP 
+fileInFrom:
+.RS 1
+-
+.B
+fileInFrom
+:
+.I
+aFiler
+.RE
+.PP
+Reads the receiver from 
+.I
+aFiler
+\&. The default implementation automatically reads in instance variables of type 
+.I
+id
+\&.  This method must be overridden to match 
+.B
+fileOutFor:
+, if that method was implemented by the subclass\&.
+.PP
+One should realize that, at the time this method is invoked, not all objects are guarantueed to be in a usable state\&.  This is only true once the filer starts sending 
+.B
+awakeFrom:
+messages\&.
+.PP 
+fileOut:type:
+.RS 1
+-
+.B
+fileOut
+:(void *)
+.I
+value
+.B
+type
+:(char)
+.I
+typeDesc
+.RE
+.PP
+Method to be implemented by Filer class\&.
+.PP 
+fileIn:type:
+.RS 1
+-
+.B
+fileIn
+:(void *)
+.I
+value
+.B
+type
+:(char)
+.I
+typeDesc
+.RE
+.PP
+Method to be implemented by Filer class\&.
+.PP 
+awake
+.RS 1
+-
+.B
+awake
+.RE
+.PP
+This message is sent to every object when it is filed in, after all the objects it references are in a usable state\&.  The default implementation simply returns self\&.
+.PP 
+awakeFrom:
+.RS 1
+-
+.B
+awakeFrom
+:
+.I
+aFiler
+.RE
+.PP
+Allows the receiver to do some cleanup work after an object has been filed in\&.  It is a generalization of the old 
+.B
+-awake
+method\&.  The difference is that this method passes 
+.I
+aFiler
+as an argument\&.  The default implementation is to send the 
+.B
+awake
+message\&.

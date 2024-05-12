@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Version=1.1
+Name=BaconGUI (TK)
+GenericName=Integrated Development Environment
+Comment=A lightweight IDE for BASIC programming
+Exec=bacongui-tk
+Icon=BaConStrip
+Terminal=false
+Categories=Development;IDE;Building;
+MimeType=text/plain;

@@ -1,0 +1,60 @@
+#
+# Portable Object Compiler
+# $Id: Makefile.mpw,v 1.2 2002/05/18 10:57:50 stes Exp $
+#
+
+#
+#  Makefile for Macintosh MPW
+#
+
+C=MWCPPC
+OBJC="{OBJCDIR}:bin:objc"
+DBG_MFLAGS=-q -g
+OPT_MFLAGS=-q -d NDEBUG
+LIBDIR="{OBJCDIR}:lib"
+BINDIR="{OBJCDIR}:bin"
+IFLAGS=-noI -i ::objcrt -i ::objpak -i ::oclib
+BOOTLIBS=::oclib:oclib.o
+MFLAGS={OPT_MFLAGS}
+
+OBJC1FILES= ¶
+	yacc.o ¶
+	lex.o ¶
+	lexfiltr.o ¶
+	objc1.o
+
+PRELINKFILE= ¶
+	_prelink.o
+
+POSTLINKFILES= ¶
+	postlink.o
+
+default Ä postlink objc1 _prelink.o
+
+.o Ä .m
+	{OBJC} -c {DepDir}{Default}.m {MFLAGS} {IFLAGS} -o {Targ}
+
+postlink Ä {POSTLINKFILES}
+	{OBJC} -mpwtool {POSTLINKFILES} -o postlink
+
+objc1 Ä {OBJC1FILES}
+	{OBJC} -mpwtool {OBJC1FILES} {BOOTLIBS} -o objc1
+
+{PRELINKFILE} Ä _prelink.c
+	{C} _prelink.c -o {PRELINKFILE}
+
+bootstrap Ä
+	Duplicate objc.ppc {BINDIR}:objc
+	Duplicate objc1 {BINDIR}
+	Duplicate postlink {BINDIR}
+	Duplicate _prelink.o {LIBDIR}
+	Duplicate objchelp.txt {LIBDIR}
+
+cleantmp Ä
+	Delete Å.P
+	Delete Å.i
+
+clean Ä cleantmp
+	Delete {OBJC1FILES} {POSTLINKFILES} 
+	Delete {PRELINKFILE} objc1 postlink
+

@@ -1,0 +1,19 @@
+
+/* VICI Objective-C Interpreter (c) 1999 David Stes.  All Rights Reserved.
+ *
+ * @WARNING@
+ */
+
+#ifndef VICI_CONFIG_H
+#define VICI_CONFIG_H
+
+#define PRMPT "vici#"
+
+#define CPPCMD "@CC@ -E -D__PORTABLE_OBJC__ -DOBJC_BLOCKS=1 -I@prefix@/include/objcrt -I@prefix@/include/objpak -I@prefix@/include/cakit -I@prefix@/include"
+
+#define USE_READLINE @USE_READLINE@
+
+#define HAVE_DLFCN_H @HAVE_DLFCN_H@
+
+#endif /* VICI_CONFIG_H */
+

@@ -1,0 +1,57 @@
+# Contributor: David Stes <stes@telenet.be>
+# Maintainer: David Stes <stes@telenet.be>
+pkgname=objc
+pkgver=3.3.30
+pkgrel=1
+pkgdesc="Portable Object Compiler"
+url="https://sourceforge.net/projects/objc"
+arch="all"
+license="LGPL-2.0-or-later"
+depends="musl "
+makedepends="objc flex byacc"
+install=""
+subpackages="$pkgname-doc"
+source="https://sourceforge.net/projects/objc/files/src/$pkgname-$pkgver.tar.gz"
+builddir="$srcdir/$pkgname-$pkgver"
+
+# normally they want to make DESTDIR="$pkgdir" install
+# but we --prefix to $pkgdir and set OBJDIR to /usr
+# Portable Object Compiler supports OBJCDIR since always
+
+# the config.sub of automake-111 does not know alpinelinux
+#		--build=$CBUILD \
+#		--host=$CHOST \
+
+# the configure script will set LIB64NAME=lib64 but AlpineLinux uses lib
+
+# currently use make -j1 to disable parallelism
+# objcrt,objpak,oclib,objc must be built in that order
+
+build() {
+	cd "$builddir"
+	./configure OBJCDIR=/usr LIB64NAME=lib --prefix="$pkgdir/usr"
+	make -j1 compiler
+}
+
+check() {
+	cd "$builddir"
+}
+
+package() {
+	cd "$builddir"
+	mkdir -p "$pkgdir"
+# a full install also installs manpages which alpinelinux wants in -doc pkg
+	make -j1 installcompiler
+	make -j1 installinclude
+}
+
+doc() {
+	cd "$builddir"
+	mkdir -p "$subpkgdir/usr"
+	./configure OBJCDIR=/usr LIB64NAME=lib --prefix="$subpkgdir/usr"
+#	make INSTALLDIR="$subpkgdir/usr" -j1 installman
+	make -j1 installman
+	find $subpkgdir/usr -type f -exec gzip {} \;
+}
+
+sha512sums="73312d0b08e445da33c003cc4647b81034e2006268d27a89c3cb981bbd63089f5462a4417e2ca4cb5f669910a0534d49e5181cc07a015a177094b392ff708f4b  objc-3.3.22.tar.gz"

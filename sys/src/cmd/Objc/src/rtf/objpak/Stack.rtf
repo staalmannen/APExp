@@ -1,0 +1,200 @@
+{\rtf1\ansi{\fonttbl\f0\fnil Times-Roman;\f1\fswiss Helvetica;\f2\fmodern Courier;}\paperw12000\paperh8000\margl40\margr40
+\pard\f0\fs24\cf0 Portable Object Compiler (c) 1998.  All Rights Reserved.\fs16\
+\
+\
+\
+\
+\
+\
+\f1\b\fs56\li2200 Stack\f0\b0\fs16\
+\
+\
+\
+\
+\
+\f0\fs28\li2200 {\b {\f1 Inherits from:}} Cltn\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Class Description\b0\f0\fs16\
+\
+\f0\fs28\li2200 {\b Stack} instances are collections that maintain their entries in LIFO (last in first out) order.  Although Stacks are most often controlled by the {\f2 push:} and {\f2 pop} methods, the class also provides for random access of the stack, through the {\f2 at:} and {\f2 removeAt:} methods.  Note that the indices are relative to the top (last added) item on the stack, which is the opposite of how the {\b OrdCltn} class works.\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Method types\b0\f0\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Creation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- new\
+	- new:\
+	- copy\
+	- deepCopy\
+	- emptyYourself\
+	- freeContents\
+	- free\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Interrogation}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- depth\
+	- isEmpty\
+	- eachElement\
+	- topElement\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Adding}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- push:\
+	- pop\
+	- swap\
+	- at:\
+	- removeAt:\
+\pard\fs16\
+\
+\pard\tx2600\fs28\li2600\cf0
+{\b Printing}
+\pard\tx6000\fs28\fi-3800\li6000\cf0
+	- printOn:\
+\pard\fs16\
+\
+\fs16\
+\
+\f1\b\fs36\li1400 Methods\b0\f0\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 new\f0\b0\
+\f0\fs28\li2500 +{\b new}\fs16\
+\
+\f0\fs28\li2200 Returns a new empty stack.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 new:\f0\b0\
+\f0\fs28\li2500 +{\b new}:(unsigned){\i n}\fs16\
+\
+\f0\fs28\li2200 Returns a new empty stack, that can hold {\i n} objects.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 copy\f0\b0\
+\f0\fs28\li2500 -{\b copy}\fs16\
+\
+\f0\fs28\li2200 Returns a new copy of the stack.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 deepCopy\f0\b0\
+\f0\fs28\li2500 -{\b deepCopy}\fs16\
+\
+\f0\fs28\li2200 Returns a new copy of the stack.  The members in the new stack are deep copies of the members in the original stack.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 emptyYourself\f0\b0\
+\f0\fs28\li2500 -{\b emptyYourself}\fs16\
+\
+\f0\fs28\li2200 Removes all the members of the stack (without freeing them).  Returns the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 freeContents\f0\b0\
+\f0\fs28\li2500 -{\b freeContents}\fs16\
+\
+\f0\fs28\li2200 Removes and frees all the members of the receiver, but doesn't free the receiver itself.  Returns the receiver.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 free\f0\b0\
+\f0\fs28\li2500 -{\b free}\fs16\
+\
+\f0\fs28\li2200 Frees the stack, but not its contents.  Returns {\b nil}.  Do :\fs16\
+\
+\f2\fs24\li2800 aCltn = [[aCltn freeContents] free];\
+\f0\fs16\
+\f0\fs28\li2200 if you want to free the collection and its contents.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 depth\f0\b0\
+\f0\fs28\li2500 - (unsigned){\b depth}\fs16\
+\
+\f0\fs28\li2200 Returns the number of objects on the stack.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 isEmpty\f0\b0\
+\f0\fs28\li2500 - (BOOL){\b isEmpty}\fs16\
+\
+\f0\fs28\li2200 Whether the number of objects on the stack is equal to zero.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 eachElement\f0\b0\
+\f0\fs28\li2500 -{\b eachElement}\fs16\
+\
+\f0\fs28\li2200 Returns a sequence of the elements in the collection.\fs16\
+\
+\f2\fs24\li2800 aSeq = [myStack eachElement];\
+while ((anElement = [aSeq next])) \{\
+    /* do something */\
+\}\
+aSeq = [aSeq free];\
+\f0\fs16\
+\fs16\
+\
+\f1\b\fs28\li2200 topElement\f0\b0\
+\f0\fs28\li2500 -{\b topElement}\fs16\
+\
+\f0\fs28\li2200 Returns the top element on the stack, without removing it.  Returns {\b nil} if there are no elements on the stack.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 push:\f0\b0\
+\f0\fs28\li2500 -{\b push}:{\i anObject}\fs16\
+\
+\f0\fs28\li2200 Pushes {\i anObject} on the stack, so that it becomes the top of the stack.  Returns {\b self}.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 pop\f0\b0\
+\f0\fs28\li2500 -{\b pop}\fs16\
+\
+\f0\fs28\li2200 Pops the top of the stack and returns it.  Returns {\b nil} if the stack is empty.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 swap\f0\b0\
+\f0\fs28\li2500 -{\b swap}\fs16\
+\
+\f0\fs28\li2200 Exchanges the top two stack items and returns the receiver.  Generates an exception if the stack is not at least two items deep.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 at:\f0\b0\
+\f0\fs28\li2500 -{\b at}:(unsigned ){\i anOffset}\fs16\
+\
+\f0\fs28\li2200 Returns the object at {\i anOffset}.  Note that the top of the stack is at offset 0.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 removeAt:\f0\b0\
+\f0\fs28\li2500 -{\b removeAt}:(unsigned ){\i anOffset}\fs16\
+\
+\f0\fs28\li2200 Removes the object at {\i anOffset}.  Note that the top of the stack is at offset 0.\fs16\
+\
+\fs16\
+\
+\f1\b\fs28\li2200 printOn:\f0\b0\
+\f0\fs28\li2500 -{\b printOn}:(IOD){\i aFile}\fs16\
+\
+\f0\fs28\li2200 Prints a list of the objects in the objects by sending each individual object a {\f2 printOn:} message.  Returns the receiver.\fs16\
+\
+\fs16\
+\
+\
+}

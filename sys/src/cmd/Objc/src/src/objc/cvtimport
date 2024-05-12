@@ -1,0 +1,108 @@
+#!/bin/sh
+# convert import to include and // to /* comments */
+# $Id: cvtimport,v 1.1.1.1 2000/06/07 21:09:25 stes Exp $
+
+AWK=awk
+S="/tmp/$$.import"
+S2="/tmp/$$.comments"
+T="/tmp/$$.file"
+trap 'rm -f $T $S $S2' 1 2 3 10 15
+
+cat > $S << EOF
+BEGIN {
+  g = ARGV[1]
+  gsub(/ /,"",g)
+  gsub(/\//,"_",g)
+  gsub(/\./,"_",g)
+  gsub(/[+-]/,"_",g)
+  cvted = 0
+}
+/^#[ ]*import/ {
+  if (!cvted) {
+    cvted = 1
+    print ""
+    print "#ifndef _" g "_"
+    print ""
+  }
+  gsub(/import/,"include");
+  print
+  next
+}
+{
+  print
+}
+END {
+  if (cvted) {
+  print ""
+  print "#define _" g "_"
+  print "#endif"
+  print ""
+  }
+}
+EOF
+
+cat > $S2 << EOF
+function iscmt(s)
+{
+  return match(s,/\/\//);
+}
+
+function subcmt(s,f,b,m,a) # b,m,a are locals (important for gawk)
+{
+  if ((n = match(s,/\"[^\"]*\"/)) || (n = match(s,/\/\*.*\*\//))) {
+     b = substr(s,1,RSTART - 1);
+     m = substr(s,RSTART,RLENGTH);
+     a = substr(s,RSTART+RLENGTH);
+     if (iscmt(b)) return subcmt(b,m a f); else return b m subcmt(a,f); 
+  }
+
+  if (n = iscmt(s)) {
+     b = substr(s,1,RSTART - 1);
+     a = substr(s,RSTART+RLENGTH);
+     return b "/*" a f " */"
+  }
+
+  return s f;
+}
+
+/\/\// {
+  print subcmt(\$0,"")
+  next
+}
+{
+  print
+}
+EOF
+
+CVTCMT=1
+
+case $# in
+  0) echo "Usage: cvtimport [-c] files";exit 0;;
+esac
+
+while :
+  do
+  case $1 in
+    -c) shift;CVTCMT=0;;
+    -*) echo "Usage: cvtimport [-c] files";exit 0;;
+    *)  break;;
+  esac
+done
+
+for file
+  do
+    cp $file "$file~"
+    if $AWK -f $S $file > $T; then
+      cp $T $file
+      case $CVTCMT in
+        1) if $AWK -f $S2 $file > $T; then
+	    cp $T $file
+	   fi
+	   ;;
+	0) ;;
+      esac
+    fi
+  done
+
+rm $T $S $S2
+

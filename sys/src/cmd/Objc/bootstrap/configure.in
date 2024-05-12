@@ -1,0 +1,728 @@
+dnl
+dnl autoconf source file for configure script for the objc-bootstrap compiler
+dnl $Id: configure.in,v 1.9 2023/03/04 08:16:31 stes Exp $
+dnl
+dnl note: we're in the process of converting the old configure script
+dnl (configure.orig) to an autoconf script (long term project)
+dnl before 3.3.30 objc-bootstrap would use the configure script from objc
+dnl this is now in its own util/configure.in script
+
+AC_INIT()
+
+dnl variable $OBJCDIR/lib or $OBJCDIR/lib64
+dnl this supports the Linux platforms (Red Hat/SuSE) that insist on lib64
+AC_ARG_VAR(LIB64NAME,name relative to OBJCDIR)
+
+dnl the following sets 'srcdir' check that it finds unique block98.html file
+AC_CONFIG_SRCDIR(BOOTSTRAP)
+
+dnl normally we check for _objcInit() (to see if it's not in the syslibs)
+dnl if it is, we should be using some other prefixed name (oc_objcInit)
+
+AC_ARG_WITH(prefixed-names,
+  [  --with-prefixed-names   use oc_objcInit as initialization function],
+  [ac_cv_prefixed_names=$withval]
+)
+
+AC_ARG_WITH(postlink,
+  [  --with-postlink         use postlink runtime initialization],
+  [ac_cv_postlink=$withval]
+)
+
+dnl generation of # or #line linetags (or none at all)
+
+AC_ARG_WITH(longlinetags,
+  [  --with-longlinetags     generate long #line linetags],
+  [ac_cv_longlinetags=$withval]
+)
+AC_ARG_WITH(shortlinetags,
+  [  --with-shortlinetags    generate short # linetags],
+  [ac_cv_longlinetags=$withval]
+)
+
+dnl for embedded SQL in Objective-C we could support several servers
+dnl currently only for Informix (with esql .ec files)
+
+AC_ARG_WITH(informix,
+  [  --with-informix         set SQLCC to Informix esql],
+  [ac_cv_informix=$withval],
+  [ac_cv_informix=no]
+)
+
+AC_CONFIG_AUX_DIR(util)
+AC_CANONICAL_SYSTEM
+
+TARGET=$target;AC_SUBST(TARGET)
+OBJC1VERSION=3.3.38;AC_SUBST(OBJC1VERSION)
+NAME=objc-${OBJC1VERSION};AC_SUBST(NAME)
+WARNING="DO NOT EDIT -- configure ${NAME} ${TARGET}";AC_SUBST(WARNING)
+
+dnl the following is for compatibility with the old configure script
+dnl INSTALLDIR is used in the makefile
+dnl OBJCDIR is used in the objc driver script (runtime)
+dnl staged installs are possible by using a different prefix and OBJCDIR
+dnl ./configure --prefix=/somedir/usr OBJCDIR=/usr
+dnl would set INSTALLDIR to /somedir/usr and OBJCDIR to /usr
+
+case "x$prefix" in
+  xNONE) INSTALLDIR=$ac_default_prefix;;
+  *) INSTALLDIR="$prefix"
+esac
+AC_SUBST(INSTALLDIR)
+
+AC_MSG_CHECKING(OBJCDIR)
+if test -z "$OBJCDIR"
+then
+  OBJCDIR=$INSTALLDIR
+fi
+AC_SUBST(OBJCDIR)
+AC_MSG_RESULT($OBJCDIR)
+
+# OBJCDIRC is the variable for the C language driver objc.m.in
+# allow backslash in this variable
+OBJCDIRC="$OBJCDIR";AC_SUBST(OBJCDIRC)
+
+GCPREFIX="$OBJCDIR";AC_SUBST(GCPREFIX)
+GCPREFIXC="$OBJCDIR";AC_SUBST(GCPREFIXC)
+
+# the stuff below was to support MPW on the Mac (uses :: instead of /)
+PATHSEP=/;AC_SUBST(PATHSEP)
+PATHSEPC=/;AC_SUBST(PATHSEPC)
+
+# POC assumes OBJCDIR to point to top level installation dir
+# and lib bin include subdirectories
+# this could be customized with below directories for 'make install'
+# these were introduced in POC 3.3.1 for the rpmbuild support (packaging)
+# lib/64 is a link on Solaris to lib/amd64
+
+if test -z "$LIB64NAME"
+then
+  case $target in 
+    x86_64-*linux*)
+      LIB64NAME=lib64
+      ;;
+  *64-pc-solaris*) 
+      LIB64NAME="lib/amd64"
+      ;;
+    *)
+      LIB64NAME=lib
+      ;;
+  esac
+fi
+AC_MSG_CHECKING(whether to place libraries in lib, lib/amd64 or lib64)
+AC_MSG_RESULT($LIB64NAME)
+
+AC_MSG_CHECKING(BINDIR)
+BINDIR=$INSTALLDIR/bin;AC_SUBST(BINDIR)
+AC_MSG_RESULT($BINDIR)
+
+# the following LIBROOTDIR is the parent directory of 64 in lib/64
+
+AC_MSG_CHECKING(LIBROOTDIR)
+case $LIB64NAME in
+  lib/*) LIBROOTDIR=$INSTALLDIR/lib;;
+  *) LIBROOTDIR=$INSTALLDIR;;
+esac
+AC_SUBST(LIBROOTDIR)
+AC_MSG_RESULT($LIBROOTDIR)
+
+AC_MSG_CHECKING(LIBDIR)
+LIBDIR=$INSTALLDIR/$LIB64NAME;AC_SUBST(LIBDIR)
+AC_MSG_RESULT($LIBDIR)
+
+# we used to write MANDIR as $INSTALLDIR/man (e.g. /usr/man)
+# which is ok for example on /usr/local/man and the traditional POC mandir
+# but Solaris and RHEL have moved to /usr/local/share/man /usr/share/man
+# those systems maintain /usr/man as softlink to the old /usr/man
+# so the code below is to have our MANDIR follow the builtin mandir variable
+
+AC_MSG_CHECKING(DATAROOTDIR)
+case $datarootdir in
+  */share) DATAROOTDIR=$INSTALLDIR/share;;
+  *) DATAROOTDIR=$INSTALLDIR;;
+esac
+AC_SUBST(DATAROOTDIR)
+AC_MSG_RESULT($DATAROOTDIR)
+
+AC_MSG_CHECKING(MANDIR)
+MANDIR=$DATAROOTDIR/man
+AC_SUBST(MANDIR)
+AC_MSG_RESULT($MANDIR)
+
+AC_MSG_CHECKING(HDRDIR)
+HDRDIR=$INSTALLDIR/include;AC_SUBST(HDRDIR)
+AC_MSG_RESULT($HDRDIR)
+
+AC_PROG_MAKE_SET
+
+AC_CHECK_PROG(OBJC,objc,objc -q)
+
+dnl for compiling in src/objc, must specify full path
+AC_PATH_PROG(XOBJC,objc,objc -q)
+
+case $CC in
+ *objc*) AC_MSG_ERROR(do not set CC to objc itself) ;;
+ *) ;;
+esac
+
+AC_PROG_CC
+AC_PROG_CPP
+
+dnl
+dnl many compilers (e.g. IRIX cc) don't accept .m
+dnl some gcc installations also don't accept .m files
+dnl
+
+AC_MSG_CHECKING(whether preprocessor processes .m files)
+cat <<EOF >foo.m 
+bar
+EOF
+$CPP foo.m | grep bar >/dev/null
+case $? in
+ 0) CPPWANTSDOTC=0; AC_MSG_RESULT(yes) ;;
+ *) CPPWANTSDOTC=1; AC_MSG_RESULT(no)  ;;
+esac
+rm -f foo.m
+AC_SUBST(CPPWANTSDOTC)
+
+dnl
+dnl gcc supports .m but switches to 'Objective-C' mode for this
+dnl this can also cause issues for example on GCC 5.3 observed
+dnl gcc -E -x c -O2 (in O2 mode) generate different code than
+dnl gcc -E -O2 (without -x c flag)
+dnl however in the gcc case we can use the -x c flag instead of rename file
+dnl
+
+case $ac_cv_prog_gcc in
+  yes) 
+AC_MSG_CHECKING(whether $CPP supports -x c to turn off Objective-C mode)
+cat <<EOF >foo.m 
+bar
+EOF
+$CPP -x c foo.m | grep bar 
+case $? in
+ 0) CPPHASCLANG=1; AC_MSG_RESULT(yes) ;;
+ *) CPPHASCLANG=0; AC_MSG_RESULT(no)  ;;
+esac
+rm -f foo.m
+   ;;
+  *) 
+   ;;
+esac
+
+CCMINUSDFLAG='-D';AC_SUBST(CCMINUSDFLAG)
+CCMINUSIFLAG='-I';AC_SUBST(CCMINUSIFLAG)
+CCMINUSCFLAG='-c ';AC_SUBST(CCMINUSCFLAG)
+CCMINUSOFLAG='-o ';AC_SUBST(CCMINUSOFLAG)
+CPPMINUSOFLAG='> ';AC_SUBST(CPPMINUSOFLAG)
+CPPSUFFIX='P';AC_SUBST(CPPSUFFIX)
+CPPFILTER='';AC_SUBST(CPPFILTER)
+OBJC1FILTER='';AC_SUBST(OBJC1FILTER)
+
+CPPIMPORTFLAG="";
+CCDOLLARFLAG="";
+
+case $ac_cv_prog_gcc in
+ yes) 
+  CPPIMPORTFLAG="-x objective-c -Wno-import";
+  CCDOLLARFLAG="-fdollars-in-identifiers";
+  ;;
+ *)
+  case $target in
+   *irix*)
+    CPPIMPORTFLAG="-acpp -Wp,-+";
+    CCDOLLARFLAG="-dollar";
+    ;; 
+   *sco*|*unixware*|*svrv*uw*)
+    CCDOLLARFLAG="-Kdollar";
+    ;; 
+  esac
+  ;;
+esac
+
+AC_SUBST(CCDOLLARFLAG)
+AC_SUBST(CPPIMPORTFLAG)
+
+dnl BeOS for PowerPC has a weird linker (on Intel they use something else)
+case $target in
+  *beos*)
+    AC_CHECK_PROG(LD,mwld,mwld,[$CC])
+    ;;
+  *) 
+    LD=$CC
+    AC_SUBST(LD)
+    ;;
+esac
+RUNXSTR=n;AC_SUBST(RUNXSTR)
+LDMINUSOFLAG='-o ';AC_SUBST(LDMINUSOFLAG)
+case $target in
+# cpp broken on nextstep without -traditional-cpp
+# cpp on darwin10 broken with -traditional-cpp
+ *nextstep*|*rhapsody*) OC_CPARGS="-traditional-cpp";;
+ *) OC_CPARGS='';;
+esac
+
+dnl
+dnl since POC 3.3.4 we select gcc in C mode rather than their Objective-C mode
+dnl in the case of -O2 (optimize) gcc -E seems to generate different code
+dnl but only if GCC actually supports -x c
+dnl note that old GCC compilers did not have an issue with this
+dnl and I think better to avoid -x c, after all GCC 5 behavior seems buggy
+dnl
+case $ac_cv_prog_gcc in
+  yes) 
+    case $CPPHASCLANG in
+      1) OC_CPARGS='-x c';;
+      *) ;;
+    esac
+    ;;
+  *) ;;
+esac
+
+OC_CPARGS="-D__PORTABLE_OBJC__ $OC_CPARGS"
+AC_SUBST(OC_CPARGS)
+
+OC_CCARGS=''
+AC_SUBST(OC_CCARGS)
+
+dnl
+dnl Testing linetag support of C compiler
+dnl
+
+# USL cc requires short tag
+# Workshop 6 (Forte) on Solaris requires -shortTags
+# GCC 3.1 requires -shortTags (support for long tags was removed in 3.1)
+
+AC_MSG_CHECKING(testing whether C compiler supports short line tags)
+AC_CACHE_VAL(ac_cv_shortlinetags,[
+t="st$$.i"
+e="st$$.o"
+ac_clean_files="$t $e"
+
+cat >$t <<EOF
+# 1 "foo.h" 
+int a;
+EOF
+
+echo "$CC -c $t -o $e" >&5
+($CC -c $t -o $e) 2>&5 1>&5
+
+if test -e $e
+then
+  ac_cv_shortlinetags=yes
+else
+  ac_cv_shortlinetags=no
+fi
+
+rm -rf $ac_clean_files
+],ac_cv_shortlinetags=yes,ac_cv_shortlinetags=no)
+AC_MSG_RESULT($ac_cv_shortlinetags)
+
+AC_MSG_CHECKING(testing whether C compiler supports long line tags)
+AC_CACHE_VAL(ac_cv_longlinetags,[
+t="lt$$.i"
+e="lt$$.o"
+ac_clean_files="$t $e"
+
+cat >$t <<EOF
+#line 1 "foo.h" 
+int a;
+EOF
+
+echo "$CC -c $t -o $e" >&5
+($CC -c $t -o $e) 2>&5 1>&5
+
+if test -e $e
+then
+  ac_cv_longlinetags=yes
+else
+  ac_cv_longlinetags=no
+fi
+
+rm -rf $ac_clean_files
+],ac_cv_longlinetags=yes,ac_cv_longlinetags=no)
+AC_MSG_RESULT($ac_cv_longlinetags)
+
+dnl again some old stuff
+case $target in
+	*watcom* | *msvc* | *lcc*) 
+	          OC_OCARGS="-gnu -msdos -watcom -linemax 127";
+		  ;;
+	*mwc*) OC_OCARGS="-msdos -refBind";;
+	*osf*) OC_OCARGS="-noasm -gnu";;
+	*ibmvac*) OC_OCARGS="-ibmvac";;
+	*beos*) OC_OCARGS="-msdos -watcom -refBind";;
+# since -gnu extensions are enabled by default, we'd better remove this switch
+	*apple-darwin*) OC_OCARGS="-gnu -darwin";;
+	*solaris*)
+case $ac_cv_prog_gcc in
+	yes) OC_OCARGS="-gnu";;
+	no) OC_OCARGS="-gnu -sunstudio";;
+esac;;
+	*) OC_OCARGS="-gnu";;
+esac
+case $ac_cv_shortlinetags in
+   yes)
+# prefer short output
+     OC_OCARGS="$OC_OCARGS -shortTags"
+     ;;     
+   no)
+     case $ac_cv_longlinetags in
+       yes)
+# default for objc1
+         ;;
+       no)
+	OC_OCARGS="$OC_OCARGS -noTags"
+         ;;
+     esac
+     ;;
+esac
+AC_SUBST(OC_OCARGS)
+OC_LDARGS='';
+AC_SUBST(OC_LDARGS)
+case $LD in
+  mwld) PLLDARGS='-map postlink.map';;
+  *) PLLDARGS='';;
+esac
+AC_SUBST(PLLDARGS)
+
+AC_CHECK_PROG(RM,rm,rm -f,del)
+AC_CHECK_PROG(CP,cp,cp -p,copy)
+AC_CHECK_PROG(CAT,cat,cat,Catenate)
+AC_CHECK_PROG(MKDIR,mkdir,mkdir,mkdir)
+# need BSD install (not the Solaris install syntax)
+AC_PROG_INSTALL
+AC_CHECK_PROG(AR,ar,ar cr,:)
+dnl BeOS for PPC has a mwld -xml which is not a real 'ar'
+case $target in
+ *beos*)
+   AC_CHECK_PROG(FINAL_AR,mwld,mwld -xml -o,:)
+   ;;
+ *)
+   AC_CHECK_PROG(FINAL_AR,echo,echo,echo)
+   ;;
+esac
+AC_PROG_RANLIB
+
+dnl stuff from the days we were using configure on win95 too
+LIBSUFFIX=a;AC_SUBST(LIBSUFFIX)
+OBJSUFFIX=o;AC_SUBST(OBJSUFFIX)
+AOUTNAME=a.out;AC_SUBST(AOUTNAME)
+BINDOTSUFFIX='';AC_SUBST(BINDOTSUFFIX)
+USELFLAG=1;AC_SUBST(USELFLAG)
+
+dnl flags for compiling the compiler
+MFLAGS=OPT_MFLAGS;AC_SUBST(MFLAGS)
+case $ac_cv_prog_gcc in
+  yes) OPT_MFLAGS='-DNDEBUG -O2';;
+  *) OPT_MFLAGS='-DNDEBUG';;
+esac
+AC_SUBST(OPT_MFLAGS)
+DBG_MFLAGS='-DDEBUG -g';AC_SUBST(DBG_MFLAGS)
+
+# allow configure EXTRA_CFLAGS=  to specify some extra .c flag
+AC_SUBST(EXTRA_CFLAGS)
+
+dnl Since the quality of the POC depends on lex/yacc, we require flex/byacc
+dnl Most lexes, yaccs and bison also work (but: byacc is required for -refcnt)
+AC_CHECK_PROG(LEX,flex,flex)
+if test -z "$LEX"
+then
+  AC_MSG_ERROR(Can't find flex)
+fi
+AC_CHECK_PROG(YACC,byacc,byacc -d)
+if test -z "$YACC"
+then
+  AC_MSG_ERROR(Can't find Berkeley yacc (byacc))
+fi
+LEXYYC=lex.yy.c; AC_SUBST(LEXYYC)
+YTABH=y.tab.h; AC_SUBST(YTABH)
+YTABC=y.tab.c; AC_SUBST(YTABC)
+
+dnl this should be cleaned up
+dnl a general test for bsd format of 'nm' would be nice
+case $target in
+	*hpux*) 
+NM='nm -p';AC_SUBST(NM)
+;;
+	*)
+AC_CHECK_PROG(NM,nm,nm)
+;;
+esac
+
+dnl
+dnl the shared library stuff is messy
+dnl it doesn't depend on tests, but rather checks the $target variable
+dnl (enumeration of supported platforms as opposed to trying to figure out
+dnl automagically how to build shlibs on the target)
+dnl
+DLXLDARGS=""
+DLXCCARGS=""
+DLARGS="-bogus"
+DLFILE="objcdlso.ld";
+PICFLAG="-fpic"
+STATICFLAG="-static"
+PICOCARGS=""
+OBJCRTEXPORT=""
+case $target in
+	*watcom* | *lcc* | *msvc* | *ibmvac* )
+		DOTSHLIBSUFFIX="_s.lib";;
+	*mwc*)
+		DOTSHLIBSUFFIX=".o";;
+	*freebsd*)
+		DOTSHLIBSUFFIX=".so.2.1";;
+	*hpux*)
+		DOTSHLIBSUFFIX=".sl";;
+	*)
+		DOTSHLIBSUFFIX=".so";;
+esac
+case $target in
+	*freebsd*) DLARGS="-Bshareable";
+		   ;;
+	*netbsd*)  DLARGS="-Bshareable";
+		   ;;
+	*sysv*uw*|*sco*)
+            case $ac_cv_prog_gcc in
+               yes)
+                   DLARGS="-shared";
+	           DLXLDARGS="-Xlinker --export-dynamic -ldl";
+		   ;;
+               no)
+                   DLARGS="-G";
+                   PICFLAG="-KPIC"
+                   STATICFLAG="-Bstatic"
+                   ;;
+            esac
+            ;;
+	*linux*) 
+# add -lc for debian per Marcel
+# add --build-id for rpmbuild package of shared libraries 
+# enforces on RHEL that build-id of .so is set
+		   DLARGS="-shared --build-id -lc";
+	           DLXLDARGS="-rdynamic -ldl";
+		   ;;
+	*sunos*|*solaris*) DLARGS="-G";DLXLDARGS="-ldl";
+		   ;;
+	*hpux*)
+            case $ac_cv_prog_gcc in
+	       yes)
+	           DLARGS="-shared";
+	           DLXLDARGS="-Wl,-E -ldld";
+		   ;;
+               no)
+	           PICFLAG="+z";
+	           DLARGS="-b +I _init";
+		   DLXLDARGS="-Wl,-E -ldld";
+		   STATICFLAG="-Wl,-a,archive";
+	       ;;
+            esac
+	    ;;
+	*osf*)
+            case $ac_cv_prog_gcc in
+	       yes)
+	           DLARGS="-shared";
+		   ;;
+               no)
+	           PICFLAG="";
+	           DLARGS="-shared -init _init";
+		   DLXLDARGS="";
+		   STATICFLAG="-non_shared";
+	           ;;
+            esac
+            ;;
+        *irix*)
+            case $ac_cv_prog_gcc in
+	       yes)
+	           DLARGS="-shared";
+		   ;;
+              no)
+                   DLXLDARGS="-lc";
+	           DLARGS="-shared -init _init";
+		   PICFLAG="-KPIC";
+		   ;;
+            esac
+            ;;
+	*watcom*) PICFLAG="-bd -br";
+		  PICOCARGS="-dllexport";
+		  OBJCRTEXPORT="__declspec(dllexport)";
+	          DLARGS="system nt_dll initinstance terminstance";
+		  DLXCCARGS="-br";
+		  DLFILE="objcdlnt.wat";
+		  ;;
+	*msvc*) PICFLAG="/LD";
+		PICOCARGS="-dllexport";
+		OBJCRTEXPORT="__declspec(dllexport)";
+	        DLARGS="/DLL";
+		DLXCCARGS="";
+                DLFILE="objcdlnt.msv";
+		;;
+	*lcc*) PICFLAG="";
+		PICOCARGS="-dllexport";
+		OBJCRTEXPORT="__declspec(dllexport)";
+	        DLARGS="-dll";
+		DLXCCARGS="";
+                DLFILE="objcdlnt.lcc";
+		;;
+	*) ;;
+esac
+
+AC_SUBST(DOTSHLIBSUFFIX)
+AC_SUBST(DLARGS)
+AC_SUBST(DLXCCARGS)
+AC_SUBST(DLXLDARGS)
+AC_SUBST(PICFLAG)
+AC_SUBST(PICOCARGS)
+AC_SUBST(STATICFLAG)
+AC_SUBST(DLFILE)
+AC_SUBST(OBJCRTEXPORT)
+
+case $target in
+	*watcom*) LINKFORMAT="watcom";;
+	*msvc*) LINKFORMAT="msvc";;
+	*lcc*) LINKFORMAT="msvc";;
+	*mwc*) LINKFORMAT="mpw";;
+	*beos*) LINKFORMAT="metrowerks";;
+	*ibmvac*) LINKFORMAT="ibmvac";;
+	*) LINKFORMAT="unix";; # bsdnm
+esac
+
+AC_SUBST(LINKFORMAT)
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS(string.h stdarg.h)
+
+AC_PROG_CC_C_O
+AC_C_CONST
+
+AC_CHECK_FUNCS(memcpy memset snprintf)
+
+dnl some old crap
+
+OBJCRT_USE_YYLESS=1
+AC_SUBST(OBJCRT_USE_YYLESS)
+PRINTSYSTEM=0
+AC_SUBST(PRINTFSYSTEM)
+SHORTCMDLINE=0
+AC_SUBST(SHORTCMDLINE)
+OBJCRT_PROTOTYPE_MESSENGER=1
+AC_SUBST(OBJCRT_PROTOTYPE_MESSENGER)
+case $ac_cv_header_stdarg_h in
+  yes) OBJCRT_USE_STDARG=1;;
+  *) OBJCRT_USE_STDARG=0;;
+esac
+AC_SUBST(OBJCRT_USE_STDARG)
+case $ac_cv_func_memset in
+  yes) OBJCRT_USE_MEMSET=1;;
+  *) OBJCRT_USE_MEMSET=0;;
+esac
+AC_SUBST(OBJCRT_USE_MEMSET)
+case $ac_cv_func_snprintf in
+  yes) OBJCRT_USE_SNPRINTF=1;;
+  *) OBJCRT_USE_SNPRINTF=0;;
+esac
+AC_SUBST(OBJCRT_USE_SNPRINTF)
+case $target in
+  *linux*) OBJCRT_LINUX=1;;
+  *) OBJCRT_LINUX=0;;
+esac
+AC_SUBST(OBJCRT_LINUX)
+OBJC_HAVE_SYSTEM_CALL=1;AC_SUBST(OBJC_HAVE_SYSTEM_CALL)
+
+m4_include([ax_cc_tentdef.m4])
+m4_include([ax_cc_attrcommon.m4])
+
+dnl only test for __attribute__ ((__common__)) in the non-ANSI case
+
+AX_CC_TENTDEF
+if test "$ac_cv_tentdef" = "no"
+then
+  AX_CC_ATTRCOMMON
+fi
+
+AC_MSG_CHECKING(whether to use postlink)
+AC_CACHE_VAL(ac_cv_postlink,[
+  case $ac_cv_tentdef in
+    yes) ac_cv_postlink=no;;
+    no) 
+    case $ac_cv_attrcommon in
+      yes) ac_cv_postlink=no;;
+        *) ac_cv_postlink=yes;
+   esac
+   ;;
+  esac
+],ac_cv_postlink=yes,ac_cv_postlink=no)
+AC_MSG_RESULT($ac_cv_postlink)
+
+case $ac_cv_tentdef in
+ yes) ATTRCOMMON=0; OBJCRT_SCOPE_OBJCMODULES_EXTERN=0 ;;
+ no) 
+   case $ac_cv_attrcommon in
+    yes) ATTRCOMMON=1; OBJCRT_SCOPE_OBJCMODULES_EXTERN=1 ;;
+    no)  ATTRCOMMON=0; OBJCRT_SCOPE_OBJCMODULES_EXTERN=1 ;;
+   esac
+   ;;
+esac
+AC_SUBST(ATTRCOMMON)
+AC_SUBST(OBJCRT_SCOPE_OBJCMODULES_EXTERN)
+
+case $ac_cv_postlink in
+  no) POSTLINK=0;;
+  yes) POSTLINK=1;;
+  *) AC_MSG_ERROR(you must use --with-postlink or --without-postlink);;
+esac
+AC_SUBST(POSTLINK)
+
+dnl
+dnl Testing for system libs that contain _objcInit
+dnl _objcInit is the name that Stepstone used to use for the runtime init
+dnl and we use the same name.
+dnl this is fine, except for the case where some vendors compile _objcInit
+dnl into their system libs, so that we have to be careful to use *our* init
+dnl
+
+if test -z "$ac_cv_prefixed_names"
+then
+AC_CHECK_FUNC(_objcInit,ac_cv_prefixed_names=yes,ac_cv_prefixed_names=no)
+else
+AC_MSG_CHECKING(for _objcInit)
+AC_MSG_RESULT((cached) $ac_cv_prefixed_names)
+fi
+
+case $ac_cv_prefixed_names in
+yes) OBJCRT_USE_PREFIXED_NAMES="1";INITCALL="oc_objcInit";;
+no) OBJCRT_USE_PREFIXED_NAMES="0";INITCALL="_objcInit";;
+esac
+AC_SUBST(OBJCRT_USE_PREFIXED_NAMES)
+AC_SUBST(INITCALL)
+
+SQLCC=""
+SQLLIBS=""
+SQLINC=""
+SQLEXT="ec"
+
+case $ac_cv_informix in
+yes)
+  if test ! -x "$INFORMIXDIR/bin/esql"
+  then
+    AC_MSG_ERROR(Can't find Informix esql.  Maybe INFORMIXDIR is not set ?)
+  fi
+  SQLCC="$INFORMIXDIR/bin/esql -e"
+  SQLINC="-I$INFORMIXDIR/incl -I$INFORMIXDIR/incl/esql"
+  SQLLIBS="-L$INFORMIXDIR/lib -L$INFORMIXDIR/lib/esql -lifsql -lifasf -lifgen -lifos -lifgls -lm -ldl -lcrypt $INFORMIXDIR/lib/esql/checkapi.o -lifglx"
+;;
+no)
+;;
+esac
+
+AC_SUBST(SQLCC)
+AC_SUBST(SQLINC)
+AC_SUBST(SQLLIBS)
+AC_SUBST(SQLEXT)
+
+list='Makefile objc'
+
+AC_OUTPUT($list)
+
+# created from objc.in
+chmod a+x objc
+

@@ -1,0 +1,678 @@
+#! /bin/sh
+# Portable Object Compiler (c) 1997,2020.  All Rights Reserved.
+# Driver Script (@NAME@)
+#
+# $Id: objc.in,v 1.21 2023/01/27 20:19:07 stes Exp $
+#
+# @WARNING@
+
+#
+# OBJCOPT can be set, as an environment variable, to a list
+# of options that is always prepended to command line
+# arguments of "objc".
+#
+
+set - $OBJCOPT "$@"
+
+#
+# OBJCDIR is the top directory of the distribution.
+# Can be set as an environment variable (or with -B)
+# For "staged installs" the installation directory could be different.
+#
+
+objcdir=${OBJCDIR-@OBJCDIR@}
+libdirname=@LIB64NAME@
+gcprefix=@GCPREFIX@
+
+cc=${CC-"@CC@"}
+ld=${LD-"ld"}
+cpp=${CPP-"@CPP@"}
+cppwantsdotc=@CPPWANTSDOTC@
+cpargs="@OC_CPARGS@"
+ocargs="@OC_OCARGS@"
+ccargs="@OC_CCARGS@"
+ldargs="@OC_LDARGS@"
+dlargs="@DLARGS@"
+dlfile="@DLFILE@"
+plldargs="@PLLDARGS@"
+dlxccargs="@DLXCCARGS@"
+dlxldargs="@DLXLDARGS@"
+picflag="@PICFLAG@"
+staticflag="@STATICFLAG@"
+ccdollarflag="@CCDOLLARFLAG@"
+cppimportflag="@CPPIMPORTFLAG@"
+picocargs="@PICOCARGS@"
+linkformat="@LINKFORMAT@"
+nm="@NM@"
+sqlext="@SQLEXT@"
+sqlcc="@SQLCC@"
+sqllibs="@SQLLIBS@"
+sqlinc="@SQLINC@"
+
+inputs=""
+extensions=""
+actions=""
+output="a.out"
+t="${TMPDIR+${TMPDIR}/}"
+
+comments=n
+browse=n
+precompile=y
+compile=y
+link=y
+linkdl=n
+include=y
+libs=""
+finlibs=""
+uselibs=y
+blocks=1
+ppi=0
+verbose=n
+debug=n
+dynamic=n
+retain=n
+stopflag="-c"
+retaincpp=n
+profile=n
+xstr=xstr
+runxstr=@RUNXSTR@
+useoutput=n
+postlink=@POSTLINK@
+attrcommon=@ATTRCOMMON@
+initcall=@INITCALL@
+pager=${MANPAGER-more}
+objcrt=objcrt
+objpak=objpak
+cakit=cakit
+
+# by default .c files compile as C, not as Objective C
+actionc="c"
+actioncc="cc"
+
+# how to deal with shared libs (use -l or not)
+uselflag=@USELFLAG@
+sosuffix="@DOTSHLIBSUFFIX@"
+
+vermsg="Portable Object Compiler - @NAME@ - @TARGET@"
+cpymsg="Distributed under the terms of the GNU LGPL."
+
+case $# in
+0) $pager "$objcdir/$libdirname/objchelp.txt"; exit 0;;
+esac
+
+while :
+do
+
+  case $# in
+    0)  break ;;
+  esac
+
+  arg="$1" ;
+  case $arg in
+    @*)              optfile=`expr $arg : '@\(.*\)'`; shift;
+                     if [ -f $optfile ]; then
+			 set - `cat $optfile` $*;
+	             else
+			 echo "objc: can't find $optfile";exit 1;
+		     fi
+		     ;;
+    -c|-Fo)          link=n ;;
+    -O)              ccargs="$ccargs $arg" ;;
+    -fast)           ccargs="$ccargs $arg" ;; # Sun cc max runtime performance
+    -C|-Fi|-Fii)     comments=y ; link=n ; compile=n ; retain=y ;;
+    -dl)             linkdl=y;postlink=y;;
+    -prod)           ccargs="$ccargs -prod";;
+    -dynamic|-dlx)   ocargs="$ocargs -noShared";
+    		     ccargs="$ccargs $dlxccargs";
+    		     ldargs="$ldargs $dlxldargs";
+                     initcall="_objcInitNoShared";
+		     dynamic=y;
+		     ;;
+    -dump)           link=n ; compile=n ; # simply output objc - for debugging
+                     retain=y ; ocargs="$ocargs -objc" ;;
+    -export)         ocargs="$ocargs $arg";shift;ocargs="$ocargs $1";;
+    -dllexport)      ocargs="$ocargs $arg";;
+    -ObjC|-objc)     actionc="m";;
+    -ObjCpp|-import) cpargs="$cpargs $cppimportflag";; 
+    -dollars)        ccargs="$ccargs $ccdollarflag";;
+    -E)              link=n;precompile=n;;
+    -i)              stopflag="-i";link=n;; # tcc
+    -Fj)             stopflag="-i";link=n;; # tcc
+    -N)              cpargs="$cpargs $arg" ;;
+    -nostdinc)	     cpargs="$cpargs $arg" ;; # for GNU cpp
+    -noobjcinc|-noI) include=n ;; # -noI for compatibility with Stepstone
+    -noLibs)         uselibs=n ;; # for cross compiles of runtime
+    -noBlocks)	     blocks=0 ;;
+    -m486)           ccargs="$ccargs $arg";;
+    -nno-486)        ccargs="$ccargs $arg";;
+    -noFiler)	     ocargs="$ocargs $arg" ;;
+    -fwd)	     ocargs="$ocargs $arg" ;;
+    -noFwd)	     ocargs="$ocargs $arg" ;;
+    -noCategories)   ocargs="$ocargs $arg" ;;
+    -noSelfAssign)   ocargs="$ocargs $arg" ;;
+    -noNilRcvr)	     ocargs="$ocargs $arg" ;;
+    -noCache)        ocargs="$ocargs $arg" ;;
+    -st80)	     ocargs="$ocargs $arg";;
+    -browse)	     browse=y;compile=n;link=n
+                     browsedir=$2;shift
+                     if [ ! -d $browsedir ]; then mkdir $browsedir; fi
+                     ocargs="$ocargs -browse $browsedir";;
+    -debugInfo)      ocargs="$ocargs $arg" ;;
+    -g)              ccargs="$ccargs $arg" ;
+                     debug=y ;; # could be used to link against debug libs
+    -o)              output="$2";useoutput=y; # used for cc -c foo.m -o bar.o
+                     shift ;;
+    -pg|-ql|-qf)     ccargs="$ccargs $arg" ; # gprof, SCO lprof, fprof
+		     ldargs="$ldargs $arg";
+		     profile=y;; # could be used to link against prof libs
+    -q|-quiet)       ocargs="$ocargs -quiet" ;;
+    -u|-unbuf)       ocargs="$ocargs -u" ;;
+    -help|--help)    $pager "$objcdir/$libdirname/objchelp.txt"; exit 0;;
+    -usage|--usage)  $pager "$objcdir/$libdirname/objchelp.txt"; exit 0;;
+    -undef)	     cpargs="$cpargs $arg" ;
+		     ccargs="$ccargs $arg" ;;    # for .c input
+    -static)	     libs="$libs $staticflag";; # like -Wl,-a,archive
+    -pic)            ccargs="$ccargs $picflag"; # like +z or -fpic
+                     ocargs="$ocargs $picocargs -noShared"; # like -dllexport
+# trick: don't define _objcInit; means that user will have to use -dynamic
+                     cpargs="$cpargs -DOBJCRT_NOSHARED";; 
+    -fpic)           ccargs="$ccargs $arg";;
+    +z|+Z)           ccargs="$ccargs $arg";; # HP-UX PIC 
+    -z)              shift ; ccargs="$ccargs -z $1";; # Sun -z lazyload
+    -B)              shift ; ccargs="$ccargs -B $1";; # Sun -B direct
+    -version|--version) echo $vermsg;echo $cpymsg;exit 0 ;;
+    -init)           shift ; initcall="$1" ;;
+    -main)           shift ; ocargs="$ocargs $arg $1" ;;
+    -builtintype)    shift ; ocargs="$ocargs -builtintype $1" ;;
+    -msdos)          ocargs="$ocargs $arg";;
+    -builtinType)    shift ; ocargs="$ocargs -builtintype $1" ;;
+    -builtinfunction) shift ; ocargs="$ocargs -builtinfunction $1" ;;
+    -builtinFunction) shift ; ocargs="$ocargs -builtinfunction $1" ;;
+    -ppi)            ocargs="$ocargs -ppi -oneperfile -noFwd -noBlocks";
+                     ccargs="$ccargs $ccdollarflag"; # dont assume gcc
+                     cpargs="$cpargs $cppimportflag"; # dont assume gnu cpp
+		     ppi=1;
+		     ;;
+    -retain)         retain=y ; retaincpp=y ;;
+    -retaincpp)      retaincpp=y ;;
+    -xstr)           runxstr=y; shift; xstrdb="$1" ;;
+    -noSelTbl)	     ocargs="$ocargs $arg" ;;
+    -inlinecache|-inlineCache)    ocargs="$ocargs -inlinecache";;
+    -opt)            shift;ccargs="$ccargs -opt $1";; # mwc
+    -sym)            shift;ccargs="$ccargs -sym $1";; # mwc
+    -xm)             shift;ccargs="$ccargs -xm $1";; # mwc
+    -oneperfile)     ocargs="$ocargs $arg";;
+    -cthreads)       objcrt=objcrtth;; 
+    -pthreads)       objcrt=objcrtth;finlibs="$finlibs -lpthread";;
+    -otb)            cpargs="$cpargs -DOTBCRT=1";
+                     ocargs="$ocargs $arg";
+		     objcrt=otbcrt;objpak=otbpak;cakit=cakitb;
+		     ;;
+    -boehm)    objcrt=objcrtgc;
+                     cpargs="$cpargs -I$gcprefix/include";
+		     finlibs="$finlibs $gcprefix/$libdirname/gc.a";
+		     ;;
+    -gc|-refcnt)	     cpargs="$cpargs -DOBJC_REFCNT=1";
+                     ocargs="$ocargs $arg";
+                     objcrt=objcrtr;objpak=objpakr;cakit=cakitr;;
+    -postlink|-postLink) postlink=1;;
+    -noPostlink|-noPostLink) postlink=0;;
+    -nolinetags|-noTags) ocargs="$ocargs -nolinetags";;
+    -shortTags) ocargs="$ocargs $arg";;
+    -objc1trace)     ocargs="$ocargs -trace";;
+    -v|-verbose)     verbose=y ;; # -verbose has a meaning for DEC cc !
+    -w)              ocargs="$ocargs -w" ;;
+    -WLex)           ocargs="$ocargs $arg" ;;
+    -WFwd)           ocargs="$ocargs $arg" ;;
+    -cpOpt:*)        cpargs="$cpargs `expr $arg : '-cpOpt:\(.*\)'`" ;;
+    -cppOpt:*)       cpargs="$cpargs `expr $arg : '-cppOpt:\(.*\)'`" ;;
+    -Wp,*)           cpargs="$cpargs `expr $arg : '-Wp,\(.*\)'`" ;;
+    -Wp:*)           cpargs="$cpargs `expr $arg : '-Wp:\(.*\)'`" ;;
+    -ocOpt:*)        ocargs="$ocargs `expr $arg : '-ocOpt:\(.*\)'`" ;;
+    -objc1Opt:*)     ocargs="$ocargs `expr $arg : '-objc1Opt:\(.*\)'`" ;;
+    -Wo,*)           ocargs="$ocargs `expr $arg : '-Wo,\(.*\)'`" ;;
+    -Wo:*)           ocargs="$ocargs `expr $arg : '-Wo:\(.*\)'`" ;;
+    -ccOpt:*)        ccargs="$ccargs `expr $arg : '-ccOpt:\(.*\)'`" ;;
+    -Wc,*)           ccargs="$ccargs `expr $arg : '-Wc,\(.*\)'`" ;;
+    -Wc:*)           ccargs="$ccargs `expr $arg : '-Wc:\(.*\)'`" ;;
+    -ldOpt:*)        ldargs="$ldargs `expr $arg : '-ldOpt:\(.*\)'`" ;;
+    -Wl,*)           ldargs="$ldargs `expr $arg : '-Wl,\(.*\)'`" ;;
+    -Wl:*)           ldargs="$ldargs `expr $arg : '-Wl:\(.*\)'`" ;;
+    -Wall)           ccargs="$ccargs $arg" ;; # GNU cc
+    -Wno-import)     ccargs="$ccargs $arg" ;; # GNU cc
+    -Werror)         ccargs="$ccargs $arg" ;; # GNU cc
+    -Wno-sign-compare) ccargs="$ccargs $arg" ;; # GNU cc
+    -fno-strength-reduce) ccargs="$ccargs $arg" ;; # GNU cc
+    -64)             ccargs="$ccargs $arg";ldargs="$ldargs $arg";; # SGI
+    -m32)            ocargs="$ocargs";
+                     ccargs="$ccargs $arg";libdirname="lib";
+                     ldargs="$ldargs $arg";; # OpenIndiana GCC9.2
+    -m64)            ocargs="$ocargs -m64";
+                     ccargs="$ccargs $arg";libdirname="lib/amd64";
+                     ldargs="$ldargs $arg";; # SunStudio
+    -32)             ccargs="$ccargs $arg";ldargs="$ldargs $arg";; # SGI
+    -n32)            ccargs="$ccargs $arg";ldargs="$ldargs $arg";; # SGI
+    -mips[1-9])      ccargs="$ccargs $arg" ldargs="$ldargs $arg";; # SGI
+    -noobject)       ccargs="$ccargs $arg" ;; # DEC cc
+    -edit[0-9])      ccargs="$ccargs $arg" ;; # DEC cc
+    -w[0-9])         ccargs="$ccargs $arg" ;; # DEC cc
+    -migrate)        ccargs="$ccargs $arg" ;; # DEC cc
+    -assume)         ccargs="$ccargs $1 $2"; shift;;  # DEC cc
+    -rpath)          ldargs="$ldargs $1 $2"; shift;;  # SGI ld rpath
+    -xansi)          ccargs="$ccargs $arg" ;; # SGI cc -xansi
+    -all)            ldargs="$ldargs $arg";;  # SGI ld shlib
+    -no_unresolved)  ldargs="$ldargs $arg";;  # SGI ld shlib
+    *.h)             inputs="$inputs $arg" ;
+                     extensions="$extensions h" ;
+                     actions="$actions m" ;;
+    *.m)             inputs="$inputs $arg" ;
+                     extensions="$extensions m" ;
+                     actions="$actions m" ;;
+    *.em)            inputs="$inputs $arg" ;
+                     extensions="$extensions em" ;
+                     actions="$actions em" ;;
+    *.i)             inputs="$inputs $arg" ;
+                     extensions="$extensions i" ;
+                     actions="$actions $actionc" ;;
+    *.c)             inputs="$inputs $arg" ;
+                     extensions="$extensions c" ;
+		     # .c files can compile as 'm' using -ObjC
+                     actions="$actions $actionc" ;;
+    *.s)             inputs="$inputs $arg" ;
+                     extensions="$extensions s" ;
+                     actions="$actions s" ;;
+    *.o)             inputs="$inputs $arg" ;
+                     extensions="$extensions o" ;
+                     actions="$actions o" ;;
+    *.lo)            inputs="$inputs $arg" ;
+                     extensions="$extensions lo" ;
+                     actions="$actions lo" ;;
+    *.j)             inputs="$inputs $arg" ;
+                     extensions="$extensions j" ;
+                     actions="$actions c" ;;
+    *.a)             libs="$libs $arg";;
+    *.ta)            libs="$libs $arg";;
+    *.so*)           libs="$libs $arg";;
+    -Wf,*)           ccargs="$ccargs $arg" ;;    # SGI cc -Wf,-XNh2000
+    -A*)             ccargs="$ccargs $arg" ;;    # HP-UX -Aa, -Ae etc.
+    -x*)             ccargs="$ccargs $arg" ;;    # Sun -xstrconst -xildoff
+    -X*)             ccargs="$ccargs $arg" ;;    # Sun -Xa
+    -D*)             cpargs="$cpargs $arg" ;
+                     ccargs="$ccargs $arg" ;;    # for .c input
+    -U*)             cpargs="$cpargs $arg" ;
+                     ccargs="$ccargs $arg" ;;    # for .c input
+    -B*)	     objcdir=`expr $arg : '-B\(.*\)'`;;
+    -T*)	     t=`expr $arg : '-T\(.*\)'`;;
+    -I*)             cpargs="$cpargs $arg" ;;
+    -L*)             libs="$libs $arg" ;;
+    -l*)             libs="$libs $arg" ;;
+    -J*)             libs="$libs $arg" ;;
+    -j*)             libs="$libs $arg" ;;
+    -O*)	     ccargs="$ccargs $arg" ;;
+    -g*)	     ccargs="$ccargs $arg" ;;
+    -w*)             ocargs="$ocargs $arg" ;; # -wClassUsedAsType etc
+    -Y*)	     ccargs="$ccargs $arg";; # tcc
+    -M*)             ccargs="$ccargs $arg" ;;    # Sun -M/usr/lib/ld/map
+    -*)              ccargs="$ccargs $arg";;
+    *)               echo "objc: Illegal file type " $arg ;exit 1;;
+  esac
+
+  shift
+done
+
+#
+# don't depend on $PATH for finding objc1
+# for cross compiles this is not what we want
+#
+
+bindir="$objcdir/bin"
+libdir="$objcdir/$libdirname"
+hdrdir="$objcdir/include"
+objc1=$bindir/objc1
+
+case $verbose in
+  y)  set -x ;;
+esac
+
+objfiles=""
+if [ $attrcommon = 1 ]; then 
+    ocargs="$ocargs -attrcommon "; 
+fi
+if [ $postlink = 1 ]; then 
+    ocargs="$ocargs -postlink "; 
+    ldargs="$ldargs $plldargs";
+fi
+ocargs="$ocargs -init $initcall"
+
+case $include in
+  # for cross compiles we compile with -noI to use the target config.h
+  y) cpargs="$cpargs $sqlinc -I$hdrdir/objcrt -I$hdrdir/objpak -I$hdrdir/cakit -I$hdrdir";;
+esac
+
+case $ppi in
+  1) cpargs="$cpargs -I$hdrdir/ppi";;
+esac
+
+case $blocks in
+  1) cpargs="$cpargs -U__BLOCKS__ -DOBJC_BLOCKS=1";;
+  0) cpargs="$cpargs -U__BLOCKS__ -DOBJC_BLOCKS=0";ocargs="$ocargs -noBlocks";;
+esac
+
+rmf()
+{
+  # or IRIX, rm -f seems to complain when invoked with no args 
+  if [ -n "$*" ]; then rm -f $*; fi
+}
+
+exits()
+{
+   status="$1"
+   shift;rmf $*
+   exit $status
+}
+
+thecc="$cc"
+thecpp="$cpp"
+occ1="$objc1"
+
+for input in $inputs
+ do
+    set $extensions;extension="$1";shift;extensions="$*"
+    set $actions;action="$1";shift;actions="$*"
+
+    if [ ! -f $input ]; then echo "objc: can't open $input"; continue; fi
+    base=`basename $input .$extension`
+
+    # we have to be careful with -o
+    # there might be a length limitation on the
+    # filename for -o, which comes from the limit imposed
+    # by the underlying cc (e.g. on AIX cc not so big)
+    
+    useoflag="n"
+    ofile="$base.o"
+    # like in cc -c foo.m -o bar.o
+    if [ $useoutput = y -a $link = n ]; then useoflag="y";ofile="$output"; fi;
+
+    case $action in
+      m)
+        junk="";
+	
+	tmpp="$t$base.P"
+
+        # we can't place the .c file in the $t directory
+	# on platforms like Digital UNIX (cc -E /tmp/foo.c)
+	# because this changes the include path
+
+	tmpi="$t$base.i"
+	tmpc="$base.c"
+	
+	if [ $retain = n ]; then junk="$junk $tmpi"; fi
+	if [ $retaincpp = n ]; then junk="$junk $tmpp"; fi
+	trap 'exits 1 $junk' 1 2 3 10 15
+	rmf $junk
+
+	# instead of invoking /lib/cpp, we prefer the cc -E
+	# interface because the location of cpp is not standard
+	# across different machines.
+
+	# note however that at least the SGI cc -E interprets
+	# a .m suffix as "FORTRAN".
+	
+	case $extension in
+	  h|c|cc) tmpc="$input" ;;
+	  m) if [ $cppwantsdotc = 1 ]; then
+	       echo '#line 1 "'$input'"' > $tmpc 
+	       cat $input >> $tmpc ; junk="$junk $tmpc" 
+	     else
+	       tmpc="$input"; # .m files are okay for gcc
+	     fi
+	     ;;
+	  *) echo '#line 1 "'$input'"' > $tmpc ;
+	     cat $input >> $tmpc ; junk="$junk $tmpc" ;;
+	esac
+
+        if [ $precompile = y ]; then
+	   if $thecpp $ccargs $cpargs $tmpc >$tmpp; then
+              if $occ1 $ocargs -filename $input $tmpp $tmpi; then
+				if [ $runxstr = y ]; then
+					junk="$junk x.c";
+					$xstr -c -s $xstrdb $tmpi;mv x.c $tmpi
+				fi
+				if [ $compile = y ]; then
+
+		    # use -o only if directed to do so
+                    ccall="$stopflag $ccargs"
+		    if [ $useoflag = y ]; then ccall="$ccall -o $ofile"; fi
+
+                    if $thecc $ccall $tmpi; then
+			objfiles="$objfiles $ofile"
+                    else
+                        exits 1 $junk; # cc failed
+                    fi
+                 fi
+              else # objc1 failed
+                 exits 1 $junk;
+              fi
+	    else # cpp failed
+		exits 1 $junk; # cpp failed
+	    fi
+	else # -E case
+	  if [ $comments = y ]; then
+	   $thecpp -C $ccargs $cpargs $tmpc
+	  else
+	   $thecpp $ccargs $cpargs $tmpc
+	  fi
+	fi
+
+	rmf $junk
+      ;;
+      em)
+        tmpc=$base.c
+        tmpp=$base.P
+        tmpi=$base.i
+        tmpec=$base.$sqlext
+        junk="$tmpec" 
+
+	echo '#line 1 "'$input'"' > $tmpec
+	cat $input >> $tmpec
+
+        $sqlcc $tmpec
+
+        if [ -f $tmpc ]
+        then
+          junk="$junk $tmpc $tmpp $tmpi" 
+          if [ $precompile = y ]; then
+	    if $thecpp $ccargs $cpargs $tmpc >$tmpp; then
+              if $occ1 $ocargs -filename $input $tmpp $tmpi; then
+                 if [ $compile = y ]; then
+		    # use -o only if directed to do so
+                    ccall="$stopflag $ccargs"
+		    if [ $useoflag = y ]; then ccall="$ccall -o $ofile"; fi
+                    if $thecc $ccall $tmpi; then
+			objfiles="$objfiles $ofile"
+                    else
+                        exits 1 $junk; # cc failed
+                    fi
+                 fi
+              else # objc1 failed
+                 exits 1 $junk;
+              fi
+	    else # cpp failed
+		exits 1 $junk; # cpp failed
+	    fi
+	  else # -E case
+	    if [ $comments = y ]; then
+	     $thecpp -C $ccargs $cpargs $tmpc
+	    else
+	     $thecpp $ccargs $cpargs $tmpc
+	    fi
+          fi
+        else
+          echo "Problem running SQLCC ($sqlcc)"
+          exits 1 $junk; # esql failed
+        fi
+
+	rmf $junk
+      ;;
+      c|cc) if [ $compile = y ]; then
+
+		ccall="$stopflag $cpargs $ccargs"
+		# use -o only if directed to do so
+		if [ $useoflag = y ]; then ccall="$ccall -o $ofile"; fi
+
+            if $thecc $ccall $input; then
+                objfiles="$objfiles $ofile"
+            else
+                 exits 1 ""; # cc failed
+            fi
+		fi
+      ;;
+      o|a|lo)
+	objfiles="$objfiles $input"
+      ;;
+    esac
+
+ done
+
+#
+# Select libraries and link
+#
+
+if [ $link = y -a $linkdl = n ]; then
+
+	if [ $uselibs = y ]; then
+	for G in $cakit $objpak $objcrt
+	do
+	    L="${libdir}/${G}"
+	    H="${libdir}/lib${G}${sosuffix}"
+	    if [ $profile = y -a -f ${L}_p.a ]; then
+	       libs="$libs ${L}_p.a";continue;
+	    fi
+
+	    if [ $debug = y ]; then
+               if [ $dynamic = y ]; then
+	          H2="${libdir}/lib${G}_g${sosuffix}"
+                  if [ -f ${H2} ]; then
+	            case $uselflag in
+	              1) libs="$libs -L${libdir} -l${G}_g";;
+	              0) libs="$libs ${H2}";;
+	            esac
+	            continue
+                  fi
+               else
+                  if [ -f ${L}_g.a ]; then
+	            libs="$libs ${L}_g.a";continue;
+                  fi
+               fi
+	    fi
+
+	    if [ $dynamic = y -a -f $H ]; then
+	       case $uselflag in
+	        1) libs="$libs -L${libdir} -l${G}";;
+	        0) libs="$libs ${H}";;
+	       esac
+	       continue
+	    fi
+	    
+            if [ -f $L.a ]; then
+	       # do not add if absent (e.g. cakit)
+               libs="$libs $L.a";
+	    else
+	       echo "objc: warning: can't find" $L.a
+	    fi
+	done
+	fi
+
+    if [ $runxstr = y ]; then
+	$xstr -s $xstrdb # assemble strings collected in file "strings"
+	$cc $stopflag $ccargs xs.c
+	objfiles="$objfiles xs.o"
+    fi
+
+    # add things that have to be added at the end
+    libs="$libs $sqllibs $finlibs"
+
+    if [ $postlink = 0 ]; then
+
+        if $thecc $ldargs $objfiles $libs -o $output; then
+	  if [ $retain = n ]; then junk="postlink.map"; fi
+	else
+	  exits 1 $junk
+	fi
+
+        case $linkformat in
+           unix|bsdnm) $nm $output > postlink.map ;;
+	   metrowerks) ;;
+	esac
+
+	# do a test here to verify that no modules were compiled
+	# with -postlink
+	
+	if grep OBJCPOSTLINK postlink.map; then
+	    echo "Warning: use -postlink to link files compiled with -postlink."
+	fi
+
+	if [ $retain = n ]; then rmf $junk;fi
+
+    else
+       # postlink is a compile-time alternative to auto-initialization
+       # of the objc system ( auto-initialization does the work at "runtime" )
+
+	junk="_postlnk.o"
+	if [ $retain = n ]; then junk="$junk _postlnk.c"; fi
+
+	# the executable that is produced in this first link will not 
+	# work so add it to junk (it is only for getting a postlink.map)
+	
+	trap 'exits 1 $output $junk' 1 2 3 10 15
+
+	if [ -f $libdir/_prelink.o ]; then
+	 if $thecc $ldargs $objfiles $libdir/_prelink.o $libs -o $output; then
+	   if [ $retain = n ]; then junk="$junk postlink.map"; fi
+	 else
+	   exits 1 $junk
+	 fi
+	else
+         echo "Can't find file $libdir/_prelink.o.";rmf $junk;exit 1;
+	fi
+
+        case $linkformat in
+           unix|bsdnm) $nm $output > postlink.map ;;
+	   metrowerks) ;;
+	esac
+
+	$bindir/postlink - postlink.map _postlnk.c
+	rmf $output
+
+        # link second time, using postlnk.o file
+	
+        $cc $stopflag $ccargs _postlnk.c
+	$thecc $ldargs $objfiles _postlnk.o $libs -o $output
+        rmf $junk
+    fi
+fi
+
+# building dynamic libraries 
+
+if [ $link = y -a $linkdl = y ]; then
+
+    if [ ! -f $dlfile ]; then dlfile="$objcdir/$libdirname/$dlfile"; fi;
+    if [ ! -f $dlfile ]; then echo "objc: Can't find" $dlfile; exit 1; fi
+
+    junk="_postlnk.o"
+    if [ $retain = n ]; then junk="$junk postlink.map _postlnk.c"; fi
+    $ld -r $ldargs $objfiles $libs -o $output 
+
+    case $linkformat in
+       unix|bsdnm) $nm $output >postlink.map ;;
+       metrowerks) ;;
+    esac
+
+    $bindir/postlink -a $dlfile - postlink.map _postlnk.c
+
+    rmf $output
+    $cc $stopflag $picflag $ccargs _postlnk.c
+    $ld $dlargs $ldargs $objfiles _postlnk.o $libs -o $output
+    rmf $junk
+fi 
+

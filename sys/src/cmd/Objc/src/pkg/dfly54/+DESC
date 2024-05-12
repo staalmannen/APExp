@@ -1,0 +1,4 @@
+The Portable Object Compiler, a language and a runtime library for producing C programs that operate by the runtime conventions of Smalltalk 80 in a UNIX environment, as described in Brad Cox's book on Objective-C.  Smalltalk and Objective-C offer Object Oriend Programming in which data, and the programs which may access it, are designed, built and maintained as inseparable units called objects.  The precompiler is backed by a library which supports Smalltalk 80's interpretation of messaging; binding of a message to its target routine is done at run time.  The library also contains a growing number of primitive class definitions, such as an Object class whose abilities are inherited by every object in the system and features such as Blocks, enclosures like in Smalltalk 80.
+
+WWW: http://users.pandora.be/stes/compiler.html
+

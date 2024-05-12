@@ -1,0 +1,2376 @@
+.TH "cobject" 3 "Mar 12, 2023"
+.SH CAObject
+.PP
+.B
+Inherits from:
+
+Object
+.PP
+.B
+Maturity Index:
+
+Relatively mature
+.SH Class Description
+.PP
+CAObject is the root class of the Computer Algebra Kit\&.  It implements functionality that is inherited by all Computer Algebra Kit objects and defines a number of methods that inheriting classes are expected to override, thus establishing interface conventions that must be followed by all classes\&.
+.SH Arithmetic
+.PP
+Classes like Polynomial or Matrix work over arbitrary coefficient domains\&.   The interface to basic arithmetical operations that is declared by CAObject, is designed to support this important feature\&.
+.PP
+Arithmetical operations such as 
+.B
+multiply:
+or 
+.B
+add:
+are defined only on instances of the same class, or more precisely on objects for which 
+.B
+sameClass:
+returns YES\&.  The algebraic properties of a set (class) of objects is tested by sending messages to an element of the set (for example 
+.B
+inOrderedSet
+), and control the algorithms being used\&.  Nullary operators, like obtaining the unity element of a set, are made unary : the unity element of a set is obtained by sending 
+.B
+one
+to an arbitrary element of the set\&.
+.PP
+For example, for two Integer objects, 
+.B
+sameClass:
+simply returns YES, but for two IntegerModp objects, 
+.B
+sameClass:
+returns YES if and only if the moduli are equal\&.  This means that you can sum, using 
+.B
+add:
+, any pair of Integer instances, but that you cannot add an object mod 
+.I
+p
+to an object mod 
+.I
+q
+\&.  Also, you cannot add a Integer instance to a IntegerModp instance using the 
+.B
+add:
+method\&.
+.SH Method types
+.PP 
+.B
+Class Methods
+.RS 3
+.br
+* cakitRevision
+.br
+* str:
+.br
+* int:
+.br
+* copy
+.br
+* deepCopy
+.RE
+.PP 
+.B
+Class of an Object
+.RS 3
+.br
+* sameClass:
+.br
+* differentClass:
+.br
+* isKindOfSequence
+.RE
+.PP 
+.B
+Coercion
+.RS 3
+.br
+* str
+.br
+* str:
+.br
+* intValue
+.br
+* intValue:
+.br
+* asModp:
+.br
+* isFloatingPoint
+.br
+* asNumerical
+.br
+* floatValue
+.br
+* floatValue:
+.br
+* asTotalFraction
+.br
+* asScalar
+.br
+* asSymbol
+.RE
+.PP 
+.B
+Equality
+.RS 3
+.br
+* isEqual:
+.br
+* notEqual:
+.RE
+.PP 
+.B
+Comparing
+.RS 3
+.br
+* inOrderedSet
+.br
+* compare:
+.br
+* sign
+.br
+* isLess:
+.br
+* isGreater:
+.br
+* isLessEqual:
+.br
+* isGreaterEqual:
+.br
+* absValue
+.RE
+.PP 
+.B
+Addition
+.RS 3
+.br
+* inAdditiveSemiGroup
+.br
+* inAdditiveMonoid
+.br
+* inAdditiveGroup
+.br
+* isZero
+.br
+* notZero
+.br
+* isOpposite:
+.br
+* notOpposite:
+.br
+* zero
+.br
+* negate
+.br
+* add:
+.br
+* subtract:
+.br
+* increment
+.br
+* decrement
+.br
+* multiplyIntValue:
+.br
+* double
+.br
+* quadruple
+.br
+* divideIntValue:
+.br
+* half
+.br
+* quarter
+.RE
+.PP 
+.B
+Multiplication
+.RS 3
+.br
+* commutes
+.br
+* commutesWith:
+.br
+* inSemiGroup
+.br
+* inMonoid
+.br
+* inGroup
+.br
+* one
+.br
+* minusOne
+.br
+* isOne
+.br
+* notOne
+.br
+* isMinusOne
+.br
+* notMinusOne
+.br
+* square
+.br
+* multiply:
+.br
+* power:
+.br
+* inverse
+.br
+* isUnit
+.br
+* notUnit
+.br
+* divide:
+.RE
+.PP 
+.B
+Division with Remainder
+.RS 3
+.br
+* remainder:quotient:
+.br
+* remainder:
+.br
+* quotient:
+.RE
+.PP 
+.B
+Greatest Common Divisor
+.RS 3
+.br
+* inEuclideanDomain
+.br
+* isCoprime:
+.br
+* notCoprime:
+.br
+* isGcd::
+.br
+* isLcm::
+.br
+* gcd:
+.br
+* bezout:gcd:
+.br
+* lcm:
+.RE
+.PP 
+.B
+Modular Arithmetic
+.RS 3
+.br
+* modulo:
+.br
+* multiply:modulo:
+.br
+* squareModulo:
+.br
+* power:modulo:
+.br
+* genpower:modulo:
+.br
+* inverseModulo:
+.RE
+.PP 
+.B
+Random
+.RS 3
+.br
+* random
+.RE
+.PP 
+.B
+Characteristic
+.RS 3
+.br
+* characteristic
+.br
+* isCharacteristicZero
+.br
+* notCharacteristicZero
+.br
+* isCharacteristicTwo
+.br
+* notCharacteristicTwo
+.br
+* frobenius
+.br
+* frobeniusInverse
+.br
+* dimensionOverPrimeField
+.RE
+.PP 
+.B
+Addition and Multiplication
+.RS 3
+.br
+* inRing
+.br
+* inIntegralDomain
+.br
+* inField
+.br
+* inFieldOfFractions
+.RE
+.PP 
+.B
+Scalar Multiplication
+.RS 3
+.br
+* scalarZero
+.br
+* scalarContent
+.br
+* divideScalarContent
+.br
+* multiplyScalar:
+.br
+* divideScalar:
+.br
+* addScalar:
+.br
+* subtractScalar:
+.RE
+.PP 
+.B
+Printing
+.RS 3
+.br
+* printsLeadingSign
+.br
+* printsSum
+.br
+* printsProduct
+.br
+* printOn:
+.RE
+.SH Methods
+.PP 
+cakitRevision
+.RS 1
++ (
+STR
+)
+.B
+cakitRevision
+.RE
+.PP
+This method returns the value of the revision string 
+.B
+__cakit_revision__
+(declared in the header file cakit/cakit\&.h), as it was when the Computer Algebra Kit was built\&.  The string in the header file that you\&'re using should match the string returned by this method\&.
+.PP 
+str:
+.RS 1
++
+.B
+str
+:(STR)
+.I
+aString
+.RE
+.PP
+Creates an object given a string description\&.  No default implementation\&.
+.PP 
+int:
+.RS 1
++
+.B
+int
+:(int)
+.I
+intValue
+.RE
+.PP
+Creates an object given an int value\&.  No default\&.
+.PP 
+copy
+.RS 1
+-
+.B
+copy
+.RE
+.PP
+Creates a copy of the object by sending 
+.B
+copy
+to 
+.B
+super
+\&.  Sets the reference count of the new object to one\&.
+.PP
+Subclasses must implement their own versions of 
+.B
+copy
+to copy additional memory consumed by the copied object\&.
+.RS 3
+
+- copy
+.br
+{
+.br
+self = [super copy];
+.br
+pointer = malloc(nBytes);
+.br
+return self;
+.br
+}
+.br
+
+.RE
+.PP
+Note that the message to 
+.B
+super
+precedes the code added in the method\&.  This ensures that copying proceeds in the order of inheritance\&.
+.PP
+.B
+See also:
+
+deepCopy
+.PP 
+deepCopy
+.RS 1
+-
+.B
+deepCopy
+.RE
+.PP
+Creates a 
+.I
+deep
+copy of the object by sending 
+.B
+copy
+to 
+.B
+super
+\&.  Sets the reference count of the new object to one\&.
+.PP
+Subclasses must implement their own versions of 
+.B
+deepCopy
+to make a full independent copy of the object\&.
+.RS 3
+
+- deepCopy
+.br
+{
+.br
+self = [super deepCopy];
+.br
+companionObject = [companionObject deepCopy];
+.br
+return self;
+.br
+}
+.br
+
+.RE
+.PP
+.B
+See also:
+
+copy
+.PP 
+sameClass:
+.RS 1
+- (
+BOOL
+)
+.B
+sameClass
+:
+.I
+a
+.RE
+.PP
+Whether the objects belong to the same class; the default implementation checks whether the 
+.I
+isa
+pointers of the objects are the same\&.  Some classes override 
+.B
+sameClass:
+to impose extra requirements; for example, for integers mod p :
+.RS 3
+
+return [super sameClass:a] && [self modulus] == [a modulus];
+.br
+
+.RE
+.PP 
+differentClass:
+.RS 1
+- (
+BOOL
+)
+.B
+differentClass
+:
+.I
+a
+.RE
+.PP
+Whether 
+.B
+sameClass:
+returns NO\&.  Don\&'t override this method\&.  Implement your own version of 
+.B
+sameClass:
+instead (incorporating a call to 
+.B
+super
+\&'s implementation of 
+.B
+sameClass:
+)\&.
+.PP 
+isKindOfSequence
+.RS 1
+- (
+BOOL
+)
+.B
+isKindOfSequence
+.RE
+.PP
+Equivalent to :
+.RS 3
+
+[self isKindOf:(id)[CASequence class]]
+.br
+
+.RE
+.PP 
+str
+.RS 1
+- (
+STR
+)
+.B
+str
+.RE
+.PP
+Returns a string containing a symbolic representation for the object\&.  Suited for small expressions only since output is unbuffered\&.  Works by allocating a small buffer and then invoking 
+.B
+printOn:
+on that buffer to do the actual printing\&.
+.PP
+You don\&'t have to free the string (it is deallocated when you free or change the object), which makes it easy to use the method as follows :
+.RS 3
+
+fprintf(stderr,\&"Value of this %s is %s\n\&",[anObject name],[anObject str]);
+.br
+
+.RE
+.PP 
+str:
+.RS 1
+-
+.B
+str
+:(STR)
+.I
+aString
+.RE
+.PP
+Returns a new object, instance of the same class, created from 
+.I
+aString
+or returns 
+.B
+nil
+if it\&'s not possible to evaluate 
+.I
+aString
+in the set\&.  Note that it\&'s not necessarily true that the string value of the new object is 
+.I
+literally
+equal to 
+.I
+aString
+\&.  There is no default implementation for this method\&.
+.PP 
+intValue
+.RS 1
+- (
+int
+)
+.B
+intValue
+.RE
+.PP
+Returns, if it makes sense, the value of the object as C integer\&.  There is no default implementation for this method\&.
+.PP 
+intValue:
+.RS 1
+-
+.B
+intValue
+:(int)
+.I
+i
+.RE
+.PP
+Returns a new object of the same class with 
+.B
+intValue
+equal to 
+.I
+i
+or returns 
+.B
+nil
+\&.
+.PP 
+asModp:
+.RS 1
+-
+.B
+asModp
+:(unsigned short)
+.I
+p
+.RE
+.PP
+Returns an object that is the value modulo the small prime number 
+.I
+p
+for the object that receives the message\&.  For example, an integer object returns a IntegerModp object in response to this method; a matrix returns a matrix with modular values and so on\&.
+.PP 
+isFloatingPoint
+.RS 1
+- (
+BOOL
+)
+.B
+isFloatingPoint
+.RE
+.PP
+Returns YES if the object is some kind of floating-point arithmetic\&.  The default implementation returns NO\&.  No attempt has been made to integrate floating-point arithmetic into the Computer Algebra Kit\&'s framework of algebraic structures; floating-point numbers are always treated as a special case\&.
+.PP 
+asNumerical
+.RS 1
+-
+.B
+asNumerical
+.RE
+.PP
+Returns an object that is the numerical value for the object that receives the message\&.  For example, an integer object returns a floating-point object as numerical value; a matrix returns a matrix with numerical values and so on\&.
+.PP 
+floatValue
+.RS 1
+- (
+float
+)
+.B
+floatValue
+.RE
+.PP
+Returns, if it makes sense, the value of the object as C floating-point number\&.  There is no default implementation for this method\&.
+.PP 
+floatValue:
+.RS 1
+-
+.B
+floatValue
+:(float)
+.I
+f
+.RE
+.PP
+Returns a new object of the same class with 
+.B
+floatValue
+equal to 
+.I
+f
+or returns 
+.B
+nil
+\&.
+.PP 
+asTotalFraction
+.RS 1
+-
+.B
+asTotalFraction
+.RE
+.PP
+Returns a new fraction with the numerator set to a new reference to the original object, and with the denominator set to one\&.  For example, an integer object returns a rational number\&.
+.PP 
+asScalar
+.RS 1
+-
+.B
+asScalar
+.RE
+.PP
+Returns a new scalar object or 
+.B
+nil
+if the object cannot be coerced into a scalar object; there is no default implementation of the method\&.  Polynomial overrides this method to return a scalar object if the polynomial contains just a single scalar and no symbols, or 
+.B
+nil
+otherwise\&.
+.PP 
+asSymbol
+.RS 1
+-
+.B
+asSymbol
+.RE
+.PP
+Returns a new symbol object or 
+.B
+nil
+if the object cannot be coerced into a symbol object; there is no default implementation provided\&.  Polynomial overrides this method to return a symbol object if the polynomial consists of a single symbol raised to the exponent one, or 
+.B
+nil
+otherwise\&.
+.PP
+.B
+Note:
+
+Symbol itself does 
+.I
+not
+implement this method\&.
+.PP 
+isEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isEqual
+:
+.I
+a
+.RE
+.PP
+Should test whether the objects are equal\&.  Returns, by default, YES if the two objects are the same (ie\&. pointer equal)
+.PP 
+notEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+notEqual
+:
+.I
+a
+.RE
+.PP
+Whether 
+.B
+isEqual:
+returns NO\&.
+.PP 
+inOrderedSet
+.RS 1
+- (
+BOOL
+)
+.B
+inOrderedSet
+.RE
+.PP
+Whether the object is an element of a (totally) ordered set\&.  Elements can be compared with 
+.B
+compare:
+if this method returns YES\&.  There is no default implementation for this method\&.
+.PP 
+compare:
+.RS 1
+- (
+int
+)
+.B
+compare
+:
+.I
+b
+.RE
+.PP
+This method should return -1, 0, or +1 if 
+.B
+self
+is less than, equal to, or greater than 
+.I
+b
+\&.  There is no default implementation for this method\&.
+.PP 
+sign
+.RS 1
+- (
+int
+)
+.B
+sign
+.RE
+.PP
+Returns the sign of the object : plus one if positive (greater than zero), zero if zero and minus one if negative (less than zero)\&.  There is no default implementation for this method\&.
+.PP 
+isLess:
+.RS 1
+- (
+BOOL
+)
+.B
+isLess
+:
+.I
+a
+.RE
+.PP
+Tests whether the object is less than (but not equal to) 
+.I
+a
+\&.  Defined, by default, in terms of 
+.B
+compare:
+\&.
+.PP 
+isGreater:
+.RS 1
+- (
+BOOL
+)
+.B
+isGreater
+:
+.I
+a
+.RE
+.PP
+Tests whether the object is greater than (but not equal to) 
+.I
+a
+\&.  Defined, by default, in terms of 
+.B
+compare:
+\&.
+.PP 
+isLessEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isLessEqual
+:
+.I
+a
+.RE
+.PP
+Tests whether the object is less than or equal to 
+.I
+a
+\&.  Defined, by default, in terms of 
+.B
+compare:
+\&.
+.PP 
+isGreaterEqual:
+.RS 1
+- (
+BOOL
+)
+.B
+isGreaterEqual
+:
+.I
+a
+.RE
+.PP
+Tests whether the object is greater than or equal to 
+.I
+a
+\&.  Defined, by default, in terms of 
+.B
+compare:
+\&.
+.PP 
+absValue
+.RS 1
+-
+.B
+absValue
+.RE
+.PP
+Returns the absolute value of the object (a new object)\&.  If the object is negative, invokes 
+.B
+negate
+\&.  Otherwise returns 
+.B
+self
+\&.
+.PP 
+inAdditiveSemiGroup
+.RS 1
+- (
+BOOL
+)
+.B
+inAdditiveSemiGroup
+.RE
+.PP
+Should return YES if the object is an element of an additive semigroup ie\&., a set equiped with a (commutative) additive operation, but not necessarily with a unique zero element\&.  Objects that return YES should be prepared to receive 
+.B
+negate
+, 
+.B
+add:
+, 
+.B
+subtract:
+, 
+.B
+zero
+and 
+.B
+isZero
+messages, but a zero element for some object 
+.I
+a
+is not necessarily the zero object for another object 
+.I
+b
+of the same class\&.   For example, the vectors (of variable dimension) have zero elements of different dimension\&.  There is no default implementation for this method\&.
+.PP 
+inAdditiveMonoid
+.RS 1
+- (
+BOOL
+)
+.B
+inAdditiveMonoid
+.RE
+.PP
+Should return YES if the object is an element of an additive monoid ie\&., an additive semigroup with a unique zero element : if an object returns YES to this method, and if 
+.B
+isZero
+returns YES, then it is the zero object for all objects of the same class\&.  However, not every element in the set necessarily has an additive inverse : for example, the set of positive integers contains elements with no additive inverse\&.  There is no default implementation for this method\&.
+.PP 
+inAdditiveGroup
+.RS 1
+- (
+BOOL
+)
+.B
+inAdditiveGroup
+.RE
+.PP
+Should return YES if the object is an element of an additive group ie\&., an additive monoid with an additive inverse for each element\&.  There is no default implementation for this method\&.
+.PP 
+isZero
+.RS 1
+- (
+BOOL
+)
+.B
+isZero
+.RE
+.PP
+Returns YES if the object is equal to zero\&.  There is no default implementation for this method\&.
+.PP
+If the object is an element of an additive monoid, the method should test whether the object is the 
+.I
+unique
+zero element\&.  Otherwise, 
+.B
+isZero
+should return YES if the object is the zero element for itself\&.  Matrices of variable dimension, for example,  have zero elements of different dimension\&.
+.PP 
+notZero
+.RS 1
+- (
+BOOL
+)
+.B
+notZero
+.RE
+.PP
+Whether 
+.B
+isZero
+returns NO\&.
+.PP 
+isOpposite:
+.RS 1
+- (
+BOOL
+)
+.B
+isOpposite
+:
+.I
+b
+.RE
+.PP
+Should return YES if the objects are additive inverses\&.  Zero is the only object that is its own additive inverse, unless the characteristic is equal to two\&.
+.PP 
+notOpposite:
+.RS 1
+- (
+BOOL
+)
+.B
+notOpposite
+:
+.I
+b
+.RE
+.PP
+Whether 
+.B
+isOpposite
+returns NO\&.
+.PP 
+zero
+.RS 1
+-
+.B
+zero
+.RE
+.PP
+Returns a new reference to the zero element\&.
+.PP
+If the object is an element of an additive monoid, the zero element is unique\&.  Otherwise, 
+.B
+zero
+should return an element 
+.I
+c
+such that 
+.B
+self
++ 
+.I
+c
+= 0\&.  Matrices of variable dimension, for example,  have zero elements of different dimension\&.
+.PP
+There is no default implementation for this method\&.
+.PP 
+negate
+.RS 1
+-
+.B
+negate
+.RE
+.PP
+Returns the opposite of the object (a new object)\&.  There is no default implementation\&.
+.PP 
+add:
+.RS 1
+-
+.B
+add
+:
+.I
+b
+.RE
+.PP
+Returns the sum 
+.I
+self + b
+\&.  If the object is pointer equal to the argument, this method should be equivalent to 
+.B
+double
+\&.  Adding zero returns a new object that is equal to the non-zero object\&.
+.PP 
+subtract:
+.RS 1
+-
+.B
+subtract
+:
+.I
+b
+.RE
+.PP
+Returns a new object, equal to 
+.I
+self - b
+\&.  If the object is pointer equal to the argument, this method is equivalent to 
+.B
+zero
+\&.
+.PP 
+increment
+.RS 1
+-
+.B
+increment
+.RE
+.PP
+Adds 
+.B
+one
+to the object\&.  Returns a new object\&.
+.PP 
+decrement
+.RS 1
+-
+.B
+decrement
+.RE
+.PP
+Subtracts 
+.B
+one
+from the object\&.  Returns a new object\&.
+.PP 
+multiplyIntValue:
+.RS 1
+-
+.B
+multiplyIntValue
+:(int)
+.I
+b
+.RE
+.PP
+Returns a new object equal to the product 
+.I
+self b
+\&.  The default implementation creates an object through 
+.B
+-intValue:
+and then invokes 
+.B
+multiply:
+\&.
+.PP
+.B
+See also:
+
+zero, double, quadruple
+.PP 
+double
+.RS 1
+-
+.B
+double
+.RE
+.PP
+Multiplies the object by two\&.  Returns a new object\&.  There is no default implementation for this method\&.
+.PP 
+quadruple
+.RS 1
+-
+.B
+quadruple
+.RE
+.PP
+Multiplies the object by four\&.  Returns a new object\&.
+.PP
+There is no default implementation for this method\&.
+.PP 
+divideIntValue:
+.RS 1
+-
+.B
+divideIntValue
+:(int)
+.I
+b
+.RE
+.PP
+Returns a new object, the 
+.I
+exact
+quotient of the object on division by 
+.I
+b
+\&.  Returns 
+.B
+nil
+if the division is not exact or if 
+.I
+b
+is equal to zero\&. 
+.PP 
+half
+.RS 1
+-
+.B
+half
+.RE
+.PP
+Divides the object by two\&.  Returns a new object, or 
+.B
+nil
+if the object is not a multiple of two\&.
+.PP 
+quarter
+.RS 1
+-
+.B
+quarter
+.RE
+.PP
+Divides the object by four\&.  Returns a new object, or 
+.B
+nil
+if the object is not a multiple of four\&.
+.PP 
+commutes
+.RS 1
+- (
+BOOL
+)
+.B
+commutes
+.RE
+.PP
+Should return YES if multiplication is commutative for all elements of the set that the object belongs to\&.  There is no default implemenation for this method\&.
+.PP 
+commutesWith:
+.RS 1
+- (
+BOOL
+)
+.B
+commutesWith
+:
+.I
+b
+.RE
+.PP
+Should return YES if multiplication is commutative for the two objects\&.  There is no default implemenation for this method\&.
+.PP 
+inSemiGroup
+.RS 1
+- (
+BOOL
+)
+.B
+inSemiGroup
+.RE
+.PP
+Should return YES if the object is an element of a (multiplicative) semigroup, ie\&. a set equiped with a (possibly non-commutative) multiplicative operation\&.  However, the set doesn\&'t necessarily have a unique unity element\&.  For example, matrices of free dimension don\&'t\&.  There is no default implemenation for this method\&.
+.PP 
+inMonoid
+.RS 1
+- (
+BOOL
+)
+.B
+inMonoid
+.RE
+.PP
+Should return YES if 
+.B
+self
+is an element of a (multiplicative, possibly non-commutative) monoid, ie\&. a semigroup with a unique unity element\&.  However, not every element in the set necessarily has a multiplicative inverse\&.  There is no default implemenation for this method\&.
+.PP 
+inGroup
+.RS 1
+- (
+BOOL
+)
+.B
+inGroup
+.RE
+.PP
+Should return YES if 
+.B
+self
+is an element of a (multiplicative, possibly non-commutative) group, ie\&. a monoid with a multiplicative inverse for each element\&.  There is no default implemenation for this method\&.
+.PP 
+one
+.RS 1
+-
+.B
+one
+.RE
+.PP
+Returns a new reference to the multiplicative unity\&.
+.PP
+If the object is an element of a multiplicative monoid the unity element is unique\&.  Otherwise, 
+.B
+one
+returns the (right) multiplicative unity element for the object itself, ie\&. an element 
+.I
+c
+such that 
+.I
+self c
+= 1\&.  Matrices of variable dimension, for example,  have unity elements of different dimension\&.
+.PP
+There is no default implementation for this method\&.
+.PP 
+minusOne
+.RS 1
+-
+.B
+minusOne
+.RE
+.PP
+Returns a new reference to the opposite of the multiplicative unity\&.  Negates by default the object returned by 
+.B
+one
+\&.
+.PP 
+isOne
+.RS 1
+- (
+BOOL
+)
+.B
+isOne
+.RE
+.PP
+Should return YES if the object is equal to one\&.  There is no default implementation for this method\&.
+.PP
+If the object is an element of an multiplicative monoid, the method should test whether the object is the 
+.I
+unique
+unity element\&.  Otherwise, 
+.B
+isOne
+should return YES if the object is the (right) multiplicative unity element for itself\&.  Matrices of variable dimension, for example,  have unity elements of different dimension\&.
+.PP 
+notOne
+.RS 1
+- (
+BOOL
+)
+.B
+notOne
+.RE
+.PP
+Whether 
+.B
+isOne
+returns NO\&.
+.PP 
+isMinusOne
+.RS 1
+- (
+BOOL
+)
+.B
+isMinusOne
+.RE
+.PP
+Should return YES if the object is equal to minus one i\&.e\&., the additive inverse of the multiplicative unity\&.  There is no default implementation for this method\&.
+.PP 
+notMinusOne
+.RS 1
+- (
+BOOL
+)
+.B
+notMinusOne
+.RE
+.PP
+Whether 
+.B
+isMinusOne
+returns NO\&.
+.PP 
+square
+.RS 1
+-
+.B
+square
+.RE
+.PP
+Returns the square of the object ie\&., a new object equal to the object multiplied by itself\&.
+.PP 
+multiply:
+.RS 1
+-
+.B
+multiply
+:
+.I
+b
+.RE
+.PP
+Returns a new object equal to the product 
+.I
+self b
+\&.
+.PP
+Note that when multiplication is not commutative, [a multiply:b] is not the same thing as [b multiply:a]\&.  Non-commutative multiplication is currently hardly supported\&.  In general, we have used throughout the Computer Algebra Kit 
+.I
+right
+multiplication\&.  Left multiplication will be explicitely indicated\&.
+.PP 
+power:
+.RS 1
+-
+.B
+power
+:(int)
+.I
+n
+.RE
+.PP
+Returns the object raised to the 
+.I
+n
+-th power ie\&., a new object obtained by multiplying the object 
+.I
+n
+times by itself\&.
+.PP
+If 
+.I
+n
+is zero, the method invokes 
+.B
+one
+, except if the object itself is zero\&.  In that case the method returns 
+.B
+nil
+\&.  If 
+.I
+n
+is negative, the method raises the inverse of the object to the 
+.I
+-n
+-th power, or if the object is not invertible, it returns 
+.B
+nil
+\&.
+.PP
+The default implementation of this method consists of the binary exponentation algorithm (invoking 
+.B
+square
+)\&.  The method may be overridden in those cases where the binary exponentation algorithm performs worse than, for example, a repeated multiplication strategy (for sufficiently sparse polynomials e\&.g\&.)\&.
+.PP 
+inverse
+.RS 1
+-
+.B
+inverse
+.RE
+.PP
+Returns the multiplicative inverse (a new object)\&.  If there is no inverse, the method returns 
+.B
+nil
+\&.
+.PP 
+isUnit
+.RS 1
+- (
+BOOL
+)
+.B
+isUnit
+.RE
+.PP
+Tests whether the object has a multiplicative inverse\&.  The default implementation tests whether 
+.B
+inverse
+returns 
+.B
+nil
+or not\&.
+.PP 
+notUnit
+.RS 1
+- (
+BOOL
+)
+.B
+notUnit
+.RE
+.PP
+Whether 
+.B
+isUnit
+returns NO\&.
+.PP 
+divide:
+.RS 1
+-
+.B
+divide
+:
+.I
+b
+.RE
+.PP
+Returns the 
+.I
+exact
+quotient on division ie\&., returns a new object equal to the object multiplied (to the right) by the inverse of 
+.I
+b
+\&.  If the division fails or if the division is not exact (when there is a remainder), this method returns 
+.B
+nil
+\&.
+.PP
+.B
+Note:
+
+Use 
+.B
+quotient:
+to determine the quotient of a division with remainder\&.
+.PP 
+remainder:quotient:
+.RS 1
+-
+.B
+remainder
+:
+.I
+b
+.B
+quotient
+:(id *)
+.I
+q
+.RE
+.PP
+Divides 
+.B
+self
+by 
+.I
+b
+; returns the remainder 
+.I
+R
+, and by reference, the quotient 
+.I
+Q
+, such that 
+.I
+a = Q b + R
+\&.  The quotient should not be computed when a NULL pointer is passed for 
+.I
+q
+\&.  There is no default implementation for this method\&.
+.PP
+.B
+See also:
+
+divide, quotient, remainder
+.PP 
+remainder:
+.RS 1
+-
+.B
+remainder
+:
+.I
+b
+.RE
+.PP
+Returns a new object, the remainder on division of 
+.B
+self
+by 
+.I
+b
+\&.  The default implementation invokes 
+.B
+remainder:quotient:
+with a NULL quotient argument\&.
+.PP
+.B
+Note:
+
+For ordered domains (such as the integers), this method should return a 
+.I
+signed
+remainder, while 
+.B
+modulo:
+returns an unsigned remainder\&.
+.PP
+.B
+See also:
+
+modulo
+.PP 
+quotient:
+.RS 1
+-
+.B
+quotient
+:
+.I
+b
+.RE
+.PP
+Returns a new object, the quotient on division of by 
+.I
+b
+\&.  There may be a remainder on division, which can be obtained through 
+.B
+remainder:
+\&.  The default implementation invokes 
+.B
+remainder:quotient:
+, and throws away the remainder\&.
+.PP
+.B
+See also:
+
+divide
+.PP 
+inEuclideanDomain
+.RS 1
+- (
+BOOL
+)
+.B
+inEuclideanDomain
+.RE
+.PP
+Returns YES if 
+.B
+self
+is an element of a euclidean domain\&.  There is no default implementation\&.
+.PP 
+isCoprime:
+.RS 1
+- (
+BOOL
+)
+.B
+isCoprime
+:
+.I
+b
+.RE
+.PP
+Tests whether the greatest common divisor of 
+.B
+self
+and 
+.I
+b
+is a unit\&.  Computes the gcd (by invoking 
+.B
+-gcd:
+) and then invokes 
+.B
+isUnit
+\&.
+.PP 
+notCoprime:
+.RS 1
+- (
+BOOL
+)
+.B
+notCoprime
+:
+.I
+b
+.RE
+.PP
+Whether 
+.B
+isCoprime
+returns NO\&.
+.PP 
+isGcd::
+.RS 1
+- (
+BOOL
+)
+.B
+isGcd
+:
+.I
+a
+:
+.I
+b
+.RE
+.PP
+Whether 
+.B
+self
+is the greatest common divisor of 
+.I
+a
+and 
+.I
+b
+\&.  The default implementation computes the gcd by sending 
+.B
+-gcd:
+and compares to 
+.B
+self
+\&.
+.PP 
+isLcm::
+.RS 1
+- (
+BOOL
+)
+.B
+isLcm
+:
+.I
+a
+:
+.I
+b
+.RE
+.PP
+Whether 
+.B
+self
+is the least common multiple of 
+.I
+a
+and 
+.I
+b
+\&.  The default implementation computes the gcd by sending 
+.B
+-lcm:
+and compares to 
+.B
+self
+\&.
+.PP 
+gcd:
+.RS 1
+-
+.B
+gcd
+:
+.I
+b
+.RE
+.PP
+Returns a new object, the greatest common divisor of 
+.B
+self
+and 
+.I
+b
+\&.  In the case of an additive semigroup, the following should hold : gcd(0,b) = b and gcd(a,0) = a\&.  There is no default implementation for this method\&.
+.PP 
+bezout:gcd:
+.RS 1
+-
+.B
+bezout
+:
+.I
+b
+.B
+gcd
+:(id *)
+.I
+gcd
+.RE
+.PP
+Returns a new object, the bezout coefficient of the object, and if a non NULL pointer is passed for 
+.I
+gcd
+, by reference, the gcd of object and 
+.I
+b
+\&.  The bezout coefficient is the element 
+.I
+u
+such that 
+.I
+u self + v b == gcd
+\&.
+.PP
+There is no default implementation for this method\&.
+.PP 
+lcm:
+.RS 1
+-
+.B
+lcm
+:
+.I
+b
+.RE
+.PP
+Returns the least common multiple of the objects\&.  The default implementation multiplies the the objects and divides by their gcd\&.  In the case of an additive semi-group, lcm(a,0) = a and lcm(0,b) = b and lcm(0,0) = 0\&.
+.PP 
+modulo:
+.RS 1
+-
+.B
+modulo
+:
+.I
+m
+.RE
+.PP
+Returns a new object, the representant of the object modulo 
+.I
+m
+\&.  For ordered domains (such as the integers), the representant is kept positive (in the range [0,
+.I
+m
+[)\&.  For domains such as polynomials over a finite field, 
+.B
+modulo:
+is equivalent to 
+.B
+remainder:
+\&.
+.PP
+The default implementation invokes 
+.B
+remainder:
+\&.  Adds back 
+.I
+m
+, if 
+.B
+self
+is ordered and the remainder is negative\&.
+.PP 
+multiply:modulo:
+.RS 1
+-
+.B
+multiply
+:
+.I
+b
+.B
+modulo
+:
+.I
+m
+.RE
+.PP
+Returns a new object, the product 
+.I
+self b
+modulo 
+.I
+m
+\&.  The default implementation first calls 
+.B
+multiply:
+and then 
+.B
+modulo:
+\&.
+.PP 
+squareModulo:
+.RS 1
+-
+.B
+squareModulo
+:
+.I
+m
+.RE
+.PP
+Returns a new object, the square of 
+.B
+self
+modulo 
+.I
+m
+\&.  The default implementation first calls 
+.B
+square
+and then 
+.B
+modulo:
+\&.
+.PP 
+power:modulo:
+.RS 1
+-
+.B
+power
+:(int)
+.I
+n
+.B
+modulo
+:
+.I
+m
+.RE
+.PP
+Returns a new object, equal to 
+.B
+self
+raised to the 
+.I
+n-th
+power modulo 
+.I
+m
+\&.  The default implementation uses the 
+.I
+modular binary exponentation
+algorithm\&. 
+.PP
+If 
+.B
+self
+and 
+.I
+n
+are equal to zero, returns 
+.B
+nil
+\&.
+.PP
+.B
+See also:
+
+genpower:modulo:
+.PP 
+genpower:modulo:
+.RS 1
+-
+.B
+genpower
+:
+.I
+n
+.B
+modulo
+:
+.I
+m
+.RE
+.PP
+Returns a new object, equal to 
+.B
+self
+raised to the 
+.I
+n-th
+power modulo 
+.I
+m
+(where 
+.I
+n
+is an instance of the 
+.B
+BigInt
+class)\&.  The default implementation uses the 
+.I
+modular binary exponentation
+algorithm\&. 
+.PP
+If 
+.B
+self
+and 
+.I
+n
+are equal to zero, returns 
+.B
+nil
+\&.
+.PP 
+inverseModulo:
+.RS 1
+-
+.B
+inverseModulo
+:
+.I
+m
+.RE
+.PP
+Returns a new object, the inverse of 
+.B
+self
+modulo 
+.I
+m
+\&.  Generates an error message by default\&.
+.PP 
+random
+.RS 1
+-
+.B
+random
+.RE
+.PP
+Returns a new random object\&.  For example, for the integers, 
+.B
+random
+returns 0 or 1\&.  For the integers mod 
+.I
+p
+, 
+.B
+random
+returns an integer mod 
+.I
+p
+(possibly zero)\&.
+.PP
+There is no default implementation\&.
+.PP 
+characteristic
+.RS 1
+- (
+int
+)
+.B
+characteristic
+.RE
+.PP
+Returns the characteristic of (the set of) the object, ie\&. the number 
+.I
+n
+such that 
+.I
+n a
+is zero for each element 
+.I
+a
+\&.  Domains of characteristic larger than INT_MAX are currently not supported\&.  There is no default implementation of the method\&.
+.PP 
+isCharacteristicZero
+.RS 1
+- (
+BOOL
+)
+.B
+isCharacteristicZero
+.RE
+.PP
+Whether 
+.B
+characteristic
+returns zero\&.
+.PP 
+notCharacteristicZero
+.RS 1
+- (
+BOOL
+)
+.B
+notCharacteristicZero
+.RE
+.PP
+Whether 
+.B
+characteristic
+returns not zero\&.
+.PP 
+isCharacteristicTwo
+.RS 1
+- (
+BOOL
+)
+.B
+isCharacteristicTwo
+.RE
+.PP
+Whether 
+.B
+characteristic
+returns two\&.
+.PP 
+notCharacteristicTwo
+.RS 1
+- (
+BOOL
+)
+.B
+notCharacteristicTwo
+.RE
+.PP
+Whether 
+.B
+characteristic
+returns not two\&.
+.PP 
+frobenius
+.RS 1
+-
+.B
+frobenius
+.RE
+.PP
+Returns a new object, the image of 
+.B
+self
+under the 
+.I
+frobenius
+map, ie\&. exponentation by the characteristic of 
+.B
+self
+\&.  There is no default implementation\&.
+.PP 
+frobeniusInverse
+.RS 1
+-
+.B
+frobeniusInverse
+.RE
+.PP
+Returns a new object, the inverse image of 
+.B
+self
+under the 
+.I
+frobenius
+map, ie\&. the 
+.I
+n-th
+root of 
+.B
+self
+where 
+.I
+n
+is the characteristic of 
+.B
+self
+\&.  There is no default implementation\&.
+.PP 
+dimensionOverPrimeField
+.RS 1
+- (
+int
+)
+.B
+dimensionOverPrimeField
+.RE
+.PP
+This method should return the dimension of a finite field over its prime field\&.  For example, the dimension of GaloisField(9) over GaloisField(3) is 2\&.
+.PP 
+inRing
+.RS 1
+- (
+BOOL
+)
+.B
+inRing
+.RE
+.PP
+The object is in a ring if it\&'s in an additive group and a multiplicative monoid\&.
+.PP 
+inIntegralDomain
+.RS 1
+- (
+BOOL
+)
+.B
+inIntegralDomain
+.RE
+.PP
+Should return YES if the object is an element of a ring without zero divisors\&.  There is no default implementation of this method\&.  Examples of integral domains in the Computer Algebra Kit include, the integers, the Gaussian (complex) integers and polynomial rings\&.
+.PP 
+inField
+.RS 1
+- (
+BOOL
+)
+.B
+inField
+.RE
+.PP
+Whether the object is element of an additive group and a multiplicative group\&.  Examples of fields in the Computer Algebra Kit include, the integers mod 
+.I
+p
+, Galois fields, and various fields of fractions such as the rational numbers or rational functions\&.
+.PP 
+inFieldOfFractions
+.RS 1
+- (
+BOOL
+)
+.B
+inFieldOfFractions
+.RE
+.PP
+Whether the object is element of a field of fractions\&.  Returns NO by default; overridden by Fraction and used by some linear algebra algorithms to reduce computations over a field of fractions to computations over an integral domain\&.
+.PP 
+scalarZero
+.RS 1
+-
+.B
+scalarZero
+.RE
+.PP
+Returns a reference to the zero scalar object\&.
+.PP
+.B
+See also:
+
+zero
+.PP 
+scalarContent
+.RS 1
+-
+.B
+scalarContent
+.RE
+.PP
+Returns a new scalar object, the (scalar) content of the objects, ie\&. the gcd of its scalars\&.
+.PP
+There is no default implementation of this method\&.
+.PP 
+divideScalarContent
+.RS 1
+-
+.B
+divideScalarContent
+.RE
+.PP
+If the scalar content is zero, this method simply returns a copy of 
+.B
+self
+\&.  Otherwise, it divides by the content (sending 
+.B
+divideScalar:
+), ie\&. it computes the 
+.I
+primitive part
+of 
+.B
+self
+\&.
+.PP 
+multiplyScalar:
+.RS 1
+-
+.B
+multiplyScalar
+:
+.I
+s
+.RE
+.PP
+Returns a new object, equal to 
+.B
+self
+multiplied (to the right) by the scalar 
+.I
+s
+\&.
+.PP 
+divideScalar:
+.RS 1
+-
+.B
+divideScalar
+:
+.I
+s
+.RE
+.PP
+Returns a new object, equal to 
+.B
+self
+divided by the scalar 
+.I
+s
+\&.  The division is exact; if it isn\&'t, the method returns 
+.B
+nil
+\&.
+.PP 
+addScalar:
+.RS 1
+-
+.B
+addScalar
+:
+.I
+s
+.RE
+.PP
+Adds the scalar 
+.I
+s
+to the object\&.  Should return a new object\&.
+.PP 
+subtractScalar:
+.RS 1
+-
+.B
+subtractScalar
+:
+.I
+s
+.RE
+.PP
+Subtracts the scalar 
+.I
+s
+from the object\&.  Should return a new object\&.
+.PP 
+printsLeadingSign
+.RS 1
+- (
+BOOL
+)
+.B
+printsLeadingSign
+.RE
+.PP
+Should return YES if the printing methods for this object print a leading minus sign\&.  This can be used in other implementations to avoid printing a plus sign followed by a minus sign\&.  The default implementation returns NO\&.
+.PP 
+printsSum
+.RS 1
+- (
+BOOL
+)
+.B
+printsSum
+.RE
+.PP
+Should return YES if the printing methods for this object print multiple terms separated by a plus or minus sign\&.  This can be used in other implementations to place the expression between parentheses if necessary\&.  The default implementation returns NO\&.
+.PP 
+printsProduct
+.RS 1
+- (
+BOOL
+)
+.B
+printsProduct
+.RE
+.PP
+Should return YES if the printing methods for this object print multiple factors separated by a space or multiplication sign\&.  This can be used in other implementations to place the expression between parentheses if necessary\&.  The default implementation returns NO\&.
+.PP 
+printOn:
+.RS 1
+-
+.B
+printOn
+:(IOD)
+.I
+aFile
+.RE
+.PP
+Should print a textual representation of the object to 
+.I
+aFile
+\&.  Methods such as 
+.B
+str
+, 
+.B
+printForDebugger:
+, 
+.B
+printOn:
+etc\&. work by invoking this method\&.

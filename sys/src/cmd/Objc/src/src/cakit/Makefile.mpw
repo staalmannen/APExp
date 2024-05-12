@@ -1,0 +1,99 @@
+
+#
+# Computer Algebra Kit
+# Copyright (c) 1992,98 Computer Algebra Objects.  All Rights Reserved. 
+#
+
+#
+#  Makefile for Macintosh MPW
+#
+
+OBJC=objc
+LINK=MWLinkPPC -xm library
+DBG_MFLAGS=-q -g
+OPT_MFLAGS=-q -d NDEBUG
+LIBDIR="{OBJCDIR}:lib"
+IFLAGS=
+MFLAGS={OPT_MFLAGS}
+
+LIBRARY=cakit.o
+
+OBJFILES= ¶
+	ccltn.o ¶
+	ccltnsq.o ¶
+	ccltnsqr.o ¶
+	ccomplex.o ¶
+	cfloat.o ¶
+	fraction.o ¶
+	integer.o ¶
+	intmodp.o ¶
+	matrix.o ¶
+	 matsq.o ¶
+	 matsqsq.o ¶
+	monomial.o ¶
+	 monomc.o ¶
+	  dmonomc.o ¶
+	  dmonoms.o ¶
+	  smonomc.o ¶
+	cobject.o ¶
+	polynom.o ¶
+	 polyeseq.o ¶
+	 polyrseq.o ¶
+	 polycseq.o ¶
+	polc.o ¶
+	 srspolc.o ¶
+	  osrspolc.o ¶
+	 drspolc.o ¶
+	  odrspolc.o ¶
+	  odrspols.o ¶
+	  idrspolc.o ¶
+	  idrspols.o ¶
+	  mdrspolc.o ¶
+	  mdrspols.o ¶
+	 drdpolc.o ¶
+	  odrdpolc.o ¶
+	  odrdpols.o ¶
+	  idrdpolc.o ¶
+	  idrdpols.o ¶
+	  mdrdpolc.o ¶
+	  mdrdpols.o ¶
+	 sespolc.o ¶
+	  osespolc.o ¶
+	 despolc.o ¶
+	  odespolc.o ¶
+	  odespols.o ¶
+	  idespolc.o ¶
+	  idespols.o ¶
+	  mdespolc.o ¶
+	  mdespols.o ¶
+	cseq.o ¶
+	 cseqc.o ¶
+	symbol.o ¶
+	term.o ¶
+	vector.o ¶
+	 vectorc.o ¶
+	  ovectorc.o ¶
+	  ovectors.o ¶
+	  mvectorc.o ¶
+	  mvectors.o ¶
+	  ivectorc.o ¶
+	  ivectors.o
+
+{LIBRARY} Ä {OBJFILES}
+	{LINK} {OBJFILES} -o {LIBRARY}
+
+.o Ä .m
+	{OBJC} -c {DepDir}{Default}.m {MFLAGS} {IFLAGS} -o {Targ}
+
+bootstrap Ä
+	Duplicate {LIBRARY} {LIBDIR}
+
+cleantmp Ä
+	Delete Å.P
+	Delete Å.c
+	Delete Å.i
+
+clean Ä cleantmp
+	Delete {OBJFILES}
+	Delete {LIBRARY}
+
