@@ -1,5 +1,7 @@
 </$objtype/mkfile
 
+APEXPROOT=../../../..
+
 LIB=cc.a$O
 OFILES=\
 	y.tab.$O\
@@ -29,7 +31,7 @@ CLEANFILES=$LIB
 CURCC=6c 8c qc vc
 OTHERCC=1c 2c 5c 7c kc
 
-</sys/src/cmd/mklib
+<$APEXPROOT/sys/src/cmd/mklib
 
 install:V:	$LIB
 	date

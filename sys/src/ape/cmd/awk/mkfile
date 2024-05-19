@@ -1,17 +1,18 @@
 </$objtype/mkfile
 MKFILES=gawk pdgawk dgawk
 
+APEXPROOT=../../../../..
 GAWKSRC=../../../external/gawk
 
 install:V:
 	for (i in $MKFILES)
 		@{ rm -f $O.out; mk -f mkfile.$i $target; rm -f $O.out }
-	mkdir -p /sys/lib/ape/awk
-	cp $GAWKSRC/awklib/eg/lib/*.awk /sys/lib/ape/awk/
-	cp $GAWKSRC/awklib/eg/prog/igawk.sh /rc/bin/ape/igawk
-	chmod +x /rc/bin/ape/igawk
-	cp $GAWKSRC/doc/gawk.1 /sys/man/1/gawk
-	cp $GAWKSRC/doc/igawk.1 /sys/man/1/igawk
+	mkdir -p $APEXPROOT/sys/lib/ape/awk
+	cp $GAWKSRC/awklib/eg/lib/*.awk $APEXPROOT/sys/lib/ape/awk/
+	cp $GAWKSRC/awklib/eg/prog/igawk.sh $APEXPROOT/rc/bin/ape/igawk
+	chmod +x $APEXPROOT/rc/bin/ape/igawk
+	cp $GAWKSRC/doc/gawk.1 $APEXPROOT/sys/man/1/gawk
+	cp $GAWKSRC/doc/igawk.1 $APEXPROOT/sys/man/1/igawk
 
 clean:V:
 	for (i in $MKFILES)
@@ -20,8 +21,8 @@ clean:V:
 nuke:V:
 	for (i in $MKFILES)
 		@{ mk -f mkfile.$i $target }
-	rm -rf /sys/lib/ape/awk
-	rm -f /rc/bin/ape/igawk
-	rm -f /sys/man/1/gawk
+	rm -rf $APEXPROOT/sys/lib/ape/awk
+	rm -f  $APEXPROOT/rc/bin/ape/igawk
+	rm -f $APEXPROOT/sys/man/1/gawk
 	rm -f /sys/man/1/igawk
 

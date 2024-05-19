@@ -1,0 +1,25 @@
+</$objtype/mkfile
+APEXPROOT=../../../..
+TARG=kc
+OFILES=\
+	cgen.$O\
+	enam.$O\
+	list.$O\
+	mul.$O\
+	peep.$O\
+	pgen.$O\
+	pswt.$O\
+	reg.$O\
+	sgen.$O\
+	swt.$O\
+	txt.$O\
+
+HFILES=\
+	gc.h\
+	k.out.h\
+	../cc/compat.h\
+	../cc/cc.h\
+
+T=k
+<../cc/mkfile.port
+<$APEXPROOT/sys/src/cmd/mkone

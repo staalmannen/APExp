@@ -1,19 +1,21 @@
 </$objtype/mkfile
 
+APEXPROOT=../../..
 #do not copy this file to /sys/src/cmd
 
-YTARG=`{ls | sed -n '/\.y$/s/\.y$//p'}
-TARG=$YTARG `{ls | sed -n '/\.c$/s/\.c$//p'}
+TARG=pcc
 HFILES=/$objtype/include/u.h /sys/include/libc.h /sys/include/bio.h
 
-BIN=/$objtype/bin
+BIN=$APEXPROOT/$objtype/bin
 LDFLAGS=
 YFLAGS=-d
 
-PCONLY=vmx
-POWERLESS=dtracy  # until someone fixes the build for power
-NOMK=$NOMK test `{~ $objtype (386 amd64) || echo $PCONLY} `{~ $objtype power && echo $POWERLESS}
-DIRS=`{echo */mkfile | sed 's,/mkfile *,\n,g' | grep -v '-e^'^('' $NOMK)^'$'}
+DIRS=	cc\
+		[1256789kqv]c\
+		[1256789kqv]a\
+		[1256789kqv]l\
+		cpp
+
 
 usage:VQ:
 	echo 'usage: mk all, all.cpus, cmds, $O.$cmd'

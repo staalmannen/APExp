@@ -1,9 +1,11 @@
 </$objtype/mkfile
 
-CFLAGS=-FV
-LIB=/$objtype/lib/c++/libC.a
+APEXPROOT=../../../../../../
+
+CFLAGS=-FV -I$APEXPROOT/sys/include/c++
+LIB=$APEXPROOT/$objtype/lib/c++/libC.a
 OFILES=abs.$O arg.$O cos.$O error.$O exp.$O io.$O \
 	log.$O oper.$O polar.$O pow.$O sin.$O sqrt.$O 
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 

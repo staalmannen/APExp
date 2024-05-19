@@ -14,6 +14,12 @@ $O.out:	$OFILES $LIB
 %.$O:	%.c
 	$CC $CFLAGS $stem.c
 
+%.$O:	%.C
+	c++/$CC $CFLAGS $stem.C
+
+%.$O:	%.cpp
+	c++/$CC $CFLAGS $stem.cpp
+
 %.$O:	%.s
 	$AS $AFLAGS $stem.s
 

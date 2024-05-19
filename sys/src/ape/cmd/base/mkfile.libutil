@@ -1,6 +1,6 @@
 </$objtype/mkfile
 LIB=libutil.a$O
-
+APEXPROOT=../../../../..
 OFILES=	concat.$O\
 #		cp.$O\
 		crypt.$O\
@@ -38,7 +38,7 @@ OFILES=	concat.$O\
 		unescape.$O\
 		writeall.$O
 
-</sys/src/cmd/mklib
+<$APEXPROOT/sys/src/cmd/mklib
 
 SBASESRC=../../../external/sbase
 

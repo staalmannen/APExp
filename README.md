@@ -46,13 +46,18 @@ the most capable web browser available on Plan9.
 **Modifications made to APE**
 
 
+***Starting material :*** Imported the latest 9front APE sources from git [x] (date: 2024-04-24)
+In addition, several patches from @lufia [x1, x2] to build libressl and curl
+(introduces pthread, include_next cpp support, etc) has been applied to the
+sources. This served as a base to add ports of third party libraries and utilities to enhance compatibility.
+
+
+Install paths have been modified so that libraries and binaries are installed in the local directory structure of APExp. A bind script (apexp.rc) in the root of APExp can be used to overlay APExp over the native APE.
+
+
 ***Libraries and headers***
 
 
-Imported the latest 9front APE sources from git [x] (date: )
-In addition, several patches from @lufia [x1, x2] to build libressl and curl
-(introduces pthread, include_next cpp support, etc) has been applied to the
-sources.
 - wchar.h/wctype.h provided by the thin "libwtf", integrated in libutf
 - curses.h, term.h, panel.h provided by PDCursesMod (built with wchar)
 - regex.h provided by pcre2 (pcre2posix, version 10.432024-02-16)
@@ -75,13 +80,19 @@ sources.
 - system lex has been replaced by flex (version 2.6.4) as ape/lex
 - the utilities "cut", "ls", "true", "tsort", "xargs" and "yes" have been built from suckless sbase under ape
 - steve's mkmk (/n/sources/contrib) imported to APExp
-- copied the last plan9 cfront (c++) port from fgb (/n/sources/contrib)
+
 - copied the remove-bitfields script from lufia's port of git to plan9
 - copied "head", "which", and "printenv" rc scripts from steve (/n/sources/contrib)
 - copied and modified "config" rc script from fgb (/n/sources/contrib)
 
-
 Many of these are old ports and will hopefully be replaced by more up-to-date ports soon.
+
+***Transpilers***
+
+
+C transpilers is a fun little proof-of-concept and also opens up for more languages.
+
+- copied the last (version 3.03) plan9 cfront (c++) port from steve (/n/sources/contrib)
 
 
 **References**

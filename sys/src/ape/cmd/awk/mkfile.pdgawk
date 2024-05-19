@@ -1,6 +1,7 @@
 </$objtype/mkfile
 TARG=pdgawk
-BIN=/$objtype/bin/ape
+APEXPROOT=../../../../..
+BIN=$APEXPROOT/$objtype/bin/ape
 OFILES=	array.$O\
 		builtin.$O\
 		dfa.$O\
@@ -23,17 +24,14 @@ OFILES=	array.$O\
 		main.$O\
 		random.$O
 
-</sys/src/cmd/mkone
+<$APEXPROOT/sys/src/cmd/mkone
 
 GAWKSRC=../../../external/gawk
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I. -I/sys/include/ape -I/386/include/ape -I./missing_d -DPLAN9 -DGAWK \
-	-D_POSIX_SOURCE -D_SUSV2_SOURCE -D_C99_SNPRINTF_EXTENSION -D_BSD_EXTENSION \
-	-D_REENTRANT_SOURCE -D_EXPERIMENTAL_SOURCE -DHAVE_SOCK_OPTS -DHAVE_CONFIG_H \
-	-DGETGROUPS_NOT_STANDARD -DHAVE_STDINT_H -DHAVE_MKTIME -DHAVE_WCHAR_H -DHAVE_WCTYPE_H \
-	-DHAVE_STDBOOL_H 
+CFLAGS=-c -I. -I$GAWKSRC/missing_d-DGAWK \
+		-DHAVE_CONFIG_H -DGETGROUPS_NOT_STANDARD	
 
 %.$O: $GAWKSRC/%.c
 	$CC $CFLAGS $GAWKSRC/$stem.c

@@ -1,5 +1,7 @@
 </$objtype/mkfile
 
+APEXPROOT=../../../..
+
 TARG=cpp
 OFILES=\
 	cpp.$O\
@@ -13,5 +15,5 @@ OFILES=\
 
 HFILES=cpp.h
 
-BIN=/$objtype/bin
-</sys/src/cmd/mkone
+BIN=$APEXPROOT/$objtype/bin
+<$APEXPROOT/sys/src/cmd/mkone

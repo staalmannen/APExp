@@ -1,6 +1,6 @@
 </$objtype/mkfile
 LIB=libutf.a$O
-
+APEXPROOT=../../../../..
 OFILES= fgetrune.$O\
 		fputrune.$O\
 		isalnumrune.$O\
@@ -21,7 +21,7 @@ OFILES= fgetrune.$O\
 		utf.$O\
 		utftorunestr.$O
 
-</sys/src/cmd/mklib
+<$APEXPROOT/sys/src/cmd/mklib
 
 SBASESRC=../../../external/sbase
 

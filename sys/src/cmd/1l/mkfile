@@ -1,0 +1,29 @@
+</$objtype/mkfile
+
+TARG=1l
+OFILES=\
+	asm.$O\
+	obj.$O\
+	optab.$O\
+	pass.$O\
+	span.$O\
+	list.$O\
+	enam.$O\
+	compat.$O\
+
+HFILES=\
+	l.h\
+	../2c/2.out.h\
+	../cc/compat.h\
+
+APEXPROOT=../../../..
+BIN=$APEXPROOT/$objtype/bin
+<$APEXPROOT/sys/src/cmd/mkone
+
+../2c/enam.c: ../2c/2.out.h
+	@ { cd ../2c; mk enam.c }
+
+enam.$O:	../2c/enam.c
+	$CC $CFLAGS ../2c/enam.c
+
+compat.$O:	../cc/compat

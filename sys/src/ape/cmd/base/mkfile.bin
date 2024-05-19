@@ -1,6 +1,6 @@
 APE=/sys/src/ape
 <$APE/config
-
+APEXPROOT=../../../../..
 LIB=libutil.a$O libutf.a$O
 TARG= \
 # APE\
@@ -20,8 +20,8 @@ TARG= \
 		xargs\
 		yes
 
-BIN=/$objtype/bin/ape
-</sys/src/cmd/mkmany
+BIN=$APEXPROOT/$objtype/bin/ape
+<$APEXPROOT/sys/src/cmd/mkmany
 
 SBASESRC=../../../external/sbase
 
@@ -50,16 +50,15 @@ install:V:
 	mk -f mkfile.bin all
 	for (i in $TARG)
 		@{ cp $O.$i $BIN/$i }
-	cp $SBASESRC/cut.1 /sys/man/1/cut
-	cp $SBASESRC/false.1 /sys/man/1/false
-	cp $SBASESRC/find.1 /sys/man/1/find
-	cp $SBASESRC/true.1 /sys/man/1/true
-	cp $SBASESRC/tsort.1 /sys/man/1/tsort
-	cp $SBASESRC/which.1 /sys/man/1/which
-	cp $SBASESRC/xargs.1 /sys/man/1/xargs
-	cp $SBASESRC/yes.1 /sys/man/1/yes
-	mkdir -p /sys/man/1ape
-	cp $SBASESRC/ls.1 /sys/man/1ape/ls
-	rm -f /rc/bin/ape/ls
-	cp psh.rc /rc/bin/ape/psh
-	chmod +x /rc/bin/ape/*
+	mkdir -p $APEXPROOT/sys/man/1
+	cp $SBASESRC/cut.1 $APEXPROOT/sys/man/1/cut
+	cp $SBASESRC/false.1 $APEXPROOT/sys/man/1/false
+	cp $SBASESRC/find.1 $APEXPROOT/sys/man/1/find
+	cp $SBASESRC/true.1 $APEXPROOT/sys/man/1/true
+	cp $SBASESRC/tsort.1 $APEXPROOT/sys/man/1/tsort
+	cp $SBASESRC/which.1 $APEXPROOT/sys/man/1/which
+	cp $SBASESRC/xargs.1 $APEXPROOT/sys/man/1/xargs
+	cp $SBASESRC/yes.1 $APEXPROOT/sys/man/1/yes
+	cp $SBASESRC/ls.1 $APEXPROOT/sys/man/1/ls
+	cp psh.rc $APEXPROOT/rc/bin/ape/psh
+	chmod +x $APEXPROOT/rc/bin/ape/*

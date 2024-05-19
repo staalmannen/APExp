@@ -1,10 +1,12 @@
 </$objtype/mkfile
 
+APEXPROOT=../../../..
+
 #	ptyfs\	# for X11, not going to bother
 TARG=\
 	stty\
 	tar\
 	cc\
 
-BIN=/$objtype/bin/ape
-</sys/src/cmd/mkmany
+BIN=$APEXPROOT/$objtype/bin/ape
+<$APEXPROOT/sys/src/cmd/mkmany

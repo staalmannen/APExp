@@ -1,0 +1,21 @@
+LIB=../cc/cc.a$O
+APEXPROOT=../../../..
+BIN=$APEXPROOT/$objtype/bin
+D=${T:%=%c}
+
+default:V: $O.out
+
+$LIB:	../cc/cc.h
+	cd ../cc
+	mk install
+
+%.$O: ../cc/%.c
+	$CC $CFLAGS ../cc/$stem.c
+
+t:V:	$O.out
+	$O.out -S t
+	$LD -o t.out t.$O
+	t.out
+
+enam.c: ../$D/$T.out.h
+	rc ../cc/mkenam

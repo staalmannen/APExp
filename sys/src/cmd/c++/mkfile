@@ -6,6 +6,9 @@ BUILTINS=
 
 dirs=`{ls -l | sed '/sys_src_cmd/d; /^d/!d; /cfront$/d; s/.* //'} cfront
 install:V:
+	mkdir -p /$objtype/bin/c++
+	mkdir -p /$objtype/lib/c++
+	mkdir -p /$objtype/include/c++
 	for(i in $dirs) @{
 		cd $i
 		mk install
@@ -47,4 +50,4 @@ nuke:V:
 	}
 
 pkg:V: nuke
-	tar cv /sys/src/c++ /386/bin/c++ /sys/man/1/c++ /sys/include/c++ /sys/lib/c++ /386/lib/c++ | bzip2 > $home/pkg/$PKG.tbz
+	tar cv /sys/src/c++ /$objtype/bin/c++ /sys/man/1/c++ /sys/include/c++ /sys/lib/c++ /$objtype/lib/c++ | bzip2 > $home/pkg/$PKG.tbz
