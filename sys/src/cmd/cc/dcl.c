@@ -1,5 +1,30 @@
 #include "cc.h"
 
+int bitinit;	/* 1 for subsequent bitfield initializations */
+Node *chunk;	/* points to the current chunk node, i.e. the first */
+		/* bitfield until a new 32-bit chunk is needed. */
+int lastoffset;	/* remember the last offset of a previous chunk */
+
+long *GEdatap;	/* gextern() writes the adress of p->to.offset here */
+long *GEbitfp;	/* pointer to the current bitfield chunk data */
+
+unsigned int Chunk;	/* One  bitfield 32 bit word */
+int Bitsleft;		/* number of bits left in the chunk */
+
+void
+bitfield(int bits, unsigned int val)	/* bits=1..31 Updates the output tree */
+{
+		int offset;
+		unsigned int mask;
+
+		val = val & ((1 << bits) - 1);	/* clear any overflowing bits */
+		offset = 32 - Bitsleft;		/* calculate where in the chunk the bitfield goes */
+		mask = val << offset;		/* calculate the mask against the chunk */
+		Chunk = Chunk | mask;
+		Bitsleft -= bits;
+		*GEbitfp = Chunk;
+}
+
 Node*
 dodecl(void (*f)(int,Type*,Sym*), int c, Type *t, Node *n)
 {
@@ -288,6 +313,10 @@ init1(Sym *s, Type *t, long o, int exflag)
 	Type *t1;
 	long e, w, so, mw;
 
+	if(exflag == 0)		/* new struct */
+		if(bitinit)
+			bitinit = 0;
+
 	a = peekinit();
 	if(a == Z)
 		return Z;
@@ -326,8 +355,6 @@ init1(Sym *s, Type *t, long o, int exflag)
 		if(a == Z)
 			return Z;
 
-		if(t->nbits)
-			diag(Z, "cannot initialize bitfields");
 		if(s->class == CAUTO) {
 			l = new(ONAME, Z, Z);
 			l->sym = s;
@@ -404,7 +431,32 @@ init1(Sym *s, Type *t, long o, int exflag)
 		}
 
 	gext:
-		gextern(s, a, o, t->width);
+		if(t->nbits){			/* encountered a bitfield, first or subsequent */
+			if(bitinit == 0){		/* a new bitfield (not subsequent) */
+				gextern(s, a, o, t->width);
+				GEbitfp	= GEdatap;	/* keep a pointer in the output tree */
+				lastoffset = o;		/* track the byte offset within the struct */
+				Chunk = 0;		/* start with an empty chunk */
+				Bitsleft = 32;
+				bitfield(t->nbits, a->vconst);	/* update the output tree */
+			}else{			/* subsequent bitfield */
+				if(lastoffset == o){			/* new bitfield, same chunk */
+					bitfield(t->nbits, a->vconst);	/* update last constant */
+				}else{					/* new offset == new chunk */
+					gextern(s, a, o, t->width);	/* generate a new data line */
+					GEbitfp	= GEdatap;	/* keep a pointer the new bitfield */
+					lastoffset = o;
+					Chunk = 0;		/* start with an empty chunk */
+					Bitsleft = 32;
+					bitfield(t->nbits, a->vconst);
+				}
+			}
+			bitinit = 1;			/* starting bitfield initiation */
+		} else {	/* not a bitfield */
+			if(bitinit)			/* first non-bitfield in struct */
+				bitinit = 0;
+			gextern(s, a, o, t->width);
+		}
 
 		return Z;
 

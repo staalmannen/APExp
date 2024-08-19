@@ -48,7 +48,7 @@ the most capable web browser available on Plan9.
 
 ***Starting material :*** Imported the latest 9front APE sources from git [x] (date: 2024-04-24)
 In addition, several patches from @lufia [x1, x2] to build libressl and curl
-(introduces pthread, include_next cpp support, etc) has been applied to the
+(introduces pthread, include_next cpp support, etc) and @jamoson (bitfield support in kencc) [x3] has been applied to the
 sources. This served as a base to add ports of third party libraries and utilities to enhance compatibility.
 
 
@@ -114,6 +114,8 @@ C transpilers is a fun little proof-of-concept and also opens up for more langua
 [x1] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52adaf.squirrel@mx.sdf.org/
 
 [x2] https://github.com/lufia/plan9/pulls
+
+[x3] https://webbkurs.ei.hv.se/~imjam/pub/kenccbitfield/
 
 
 
