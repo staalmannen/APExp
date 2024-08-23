@@ -1,7 +1,8 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=/$objtype/lib/ape/libv.a
+LIB=$APEXPROOT/$objtype/lib/ape/libv.a
 
 OFILES=getpass.$O\
 	tty.$O\
@@ -13,7 +14,7 @@ OFILES=getpass.$O\
 	error.$O\
 	nap.$O
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-c
 

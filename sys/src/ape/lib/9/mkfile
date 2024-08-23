@@ -1,7 +1,8 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=/$objtype/lib/ape/lib9.a
+LIB=$APEXPROOT/$objtype/lib/ape/lib9.a
 OFILES=\
 	argv0.$O\
 	bind.$O\
@@ -32,7 +33,7 @@ OFILES=\
 	unmount.$O\
 	fd2path.$O\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-c $CFLAGS -D_POSIX_SOURCE -D_PLAN9_SOURCE
 

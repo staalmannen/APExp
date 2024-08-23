@@ -1,7 +1,8 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=/$objtype/lib/ape/libfmt.a
+LIB=$APEXPROOT/$objtype/lib/ape/libfmt.a
 
 NUM=\
 	charstod.$O\
@@ -45,9 +46,9 @@ OFILES=\
 
 HFILES=\
 	fmtdef.h\
-	/sys/include/ape/fmt.h\
+	$APEXPROOT/sys/include/ape/fmt.h\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 $NAN.$O: nan.h
 strtod.$O: nan.h

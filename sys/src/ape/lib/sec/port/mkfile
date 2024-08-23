@@ -1,7 +1,8 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=/$objtype/lib/ape/libsec.a
+LIB=$APEXPROOT/$objtype/lib/ape/libsec.a
 
 CFILES = des.c desmodes.c desECB.c desCBC.c des3ECB.c des3CBC.c\
 	aes.c aesni.c aesCBC.c aesCFB.c aesOFB.c aes_gcm.c \
@@ -46,24 +47,24 @@ ALLOFILES=${CFILES:%.c=%.$O}
 
 # cull things in the per-machine directories from this list
 OFILES=	`{rfork n; \
-	bind -a ../../../../libsec/$objtype ../$objtype; \
-	rc ../../../../libsec/port/reduce $O $objtype $ALLOFILES}
+	bind -a /sys/src/libsec/$objtype ../$objtype; \
+	rc /sys/src/libsec/port/reduce $O $objtype $ALLOFILES}
 
-HFILES=/sys/include/ape/libsec.h
+HFILES=$APEXPROOT/sys/include/ape/libsec.h
 
 UPDATE=mkfile\
 	$HFILES\
 	$CFILES\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-TVwc -+ -D_POSIX_SOURCE -D_PLAN9_SOURCE -I. -I../../9 -I../../../../libmp/port
+CFLAGS=-TVwc -+ -D_POSIX_SOURCE -D_PLAN9_SOURCE -I. -I/sys/src/9 -I/sys/src/libmp/port
 
-../../../../libsec/port/%.c:D:	../../../../libsec/port/%.mp
-	@{cd ../../../../libsec/port && mk $stem.c}
+/sys/src/libsec/port/%.c:D:	/sys/src/libsec/port/%.mp
+	@{cd /sys/src/libsec/port && mk $stem.c}
 
-%.$O:	../../../../libsec/port/%.c
-	$CC $CFLAGS ../../../../libsec/port/$stem.c
+%.$O:	/sys/src/libsec/port/%.c
+	$CC $CFLAGS /sys/src/libsec/port/$stem.c
 	
 $O.rsatest: rsatest.$O
 	$LD -o $target $prereq

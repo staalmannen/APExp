@@ -1,7 +1,8 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=/$objtype/lib/ape/libmp.a
+LIB=$APEXPROOT/$objtype/lib/ape/libmp.a
 
 FILES=\
 	mpaux\
@@ -54,8 +55,8 @@ OFILES=	`{rfork en; \
 	rc /sys/src/libmp/port/reduce $O $objtype $ALLOFILES}
 
 HFILES=\
-	/sys/include/ape/mp.h\
-	/sys/src/libmp/port/dat.h\
+	$APEXPROOT/sys/include/ape/mp.h\
+	$APEXPROOT/sys/src/libmp/port/dat.h\
 
 CFILES=${FILES:%=%.c}
 
@@ -64,7 +65,7 @@ UPDATE=\
 	$HFILES\
 	$CFILES\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-TVwc -+ -D_POSIX_SOURCE -D_PLAN9_SOURCE -I. -I../../9
 

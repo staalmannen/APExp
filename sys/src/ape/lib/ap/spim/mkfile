@@ -1,6 +1,7 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
-LIB=/$objtype/lib/ape/libap.a
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
 MIPSSFILES=\
 	getfcr.s\
@@ -41,7 +42,7 @@ MIPSC=`{echo $MIPSCFILES | sed 's/\.c//g; s/ /|/g'}
 ^($MIPSC)\.$O:R:	'../mips/\1.c'
 	$CC $CFLAGS ../mips/$stem1.c
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-c -D_POSIX_SOURCE -D_PLAN9_SOURCE
 

@@ -1,11 +1,12 @@
 </$objtype/mkfile
-LIB=/$objtype/lib/ape/libiconv.a
+APEXPROOT=../../../../../
+LIB=$APEXPROOT/$objtype/lib/ape/libiconv.a
 
 OFILES=	\
 # lib\
 		iconv.$O\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 ICONVSRC=../../../external/libiconv/src
 
@@ -18,15 +19,15 @@ CFLAGS=-c -I. -I$ICONVSRC/lib -DEILSEQ=68 \
 	$CC $CFLAGS $ICONVSRC/$stem.c
 
 install:V:
-	cp iconv.h /sys/include/ape/
-	cp charmaps.h /sys/include/ape/
-	mkdir -p /sys/include/ape/charmaps
-	dircp $ICONVSRC/include/charmaps /sys/include/ape/charmaps
+	cp iconv.h $APEXPROOT/sys/include/ape/
+	cp charmaps.h $APEXPROOT/sys/include/ape/
+	mkdir -p $APEXPROOT/sys/include/ape/charmaps
+	dircp $ICONVSRC/include/charmaps $APEXPROOT/sys/include/ape/charmaps
 
 nuke:V:
 	mk clean
 	rm -f $LIB
-	rm /sys/include/ape/iconv.h
-	rm /sys/include/ape/charmaps.h
-	rm -rf /sys/include/ape/charmaps
+	rm $APEXPROOT/sys/include/ape/iconv.h
+	rm $APEXPROOT/sys/include/ape/charmaps.h
+	rm -rf $APEXPROOT/sys/include/ape/charmaps
 

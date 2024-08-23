@@ -6,6 +6,7 @@ HFILES= config.h
 </sys/src/cmd/mksyslib
 
 PCRESRC=../../../external/pcre2
+APEXPROOT=../../../../../
 
 CC=pcc
 LD=pcc
@@ -15,14 +16,14 @@ CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=8
 	$CC $CFLAGS $PCRESRC/src/$stem.c
 
 install:V:
-	cp libpcre2posix.a /$objtype/lib/ape/libpcre2posix.a
-	cp pcre2posix.h /sys/include/ape/
-	cp regex.h /sys/include/ape/
+	cp libpcre2posix.a $APEXPROOT/$objtype/lib/ape/libpcre2posix.a
+	cp pcre2posix.h $APEXPROOT/sys/include/ape/
+	cp regex.h $APEXPROOT/sys/include/ape/
 
 nuke:V:
 	mk clean
 	rm -f $LIB
-	rm -f /$objtype/lib/ape/libpcreposix.a
-	rm -f /sys/include/ape/pcre2posix.h
-	rm -f /sys/include/ape/regex.h
+	rm -f $APEXPROOT/$objtype/lib/ape/libpcreposix.a
+	rm -f $APEXPROOT/sys/include/ape/pcre2posix.h
+	rm -f $APEXPROOT/sys/include/ape/regex.h
 

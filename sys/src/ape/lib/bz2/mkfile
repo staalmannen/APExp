@@ -1,7 +1,8 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
 </$APE/config
 
-LIB=/$objtype/lib/ape/libbz2.a
+LIB=$APEXPROOT/$objtype/lib/ape/libbz2.a
 
 OFILES=\
 	blocksort.$O\
@@ -23,7 +24,7 @@ OFILES=\
 HFILES=\
 	/sys/include/ape/bzlib.h\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 BZSOURCE=../../../external/bzip2
 

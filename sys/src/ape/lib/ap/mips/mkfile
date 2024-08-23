@@ -1,6 +1,7 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
-LIB=/$objtype/lib/ape/libap.a
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 	cycles.$O\
 	getfcr.$O\
@@ -20,7 +21,7 @@ OFILES=\
 	vlop.$O\
 	vlrt.$O\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-c -D_POSIX_SOURCE -D_PLAN9_SOURCE
 

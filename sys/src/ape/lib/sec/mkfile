@@ -1,5 +1,7 @@
 </$objtype/mkfile
 
+APEXPROOT=../../../../../
+
 DIRS=port $CPUS
 
 default:V:	all
@@ -20,7 +22,7 @@ clean:V:
 	}
 
 nuke:V: clean
-	rm -f /$objtype/lib/ape/libsec.a
+	rm -f $APEXPROOT/$objtype/lib/ape/libsec.a
 
 installall:V:
 	for(objtype in $CPUS) mk $MKFLAGS install
@@ -33,7 +35,7 @@ everything:V:
 	}
 	rm -f */*.[$OS]
 
-APE=/sys/src/ape
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
 $O.tlsclient: tlsclient.c

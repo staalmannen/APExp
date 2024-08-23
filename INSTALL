@@ -1,6 +1,6 @@
 APExp is not meant to be copied to the file system root, but rather to be built
-from your local check out. The installed files and headers will overwrite your 
-existing APE, but you will still have your original APE source code.
+from your local check out. The files will be installed in local directories,
+which then will be mounted on top of your existing root using the apexp.rc script.
 
 Copying APExp to / will lead to some problems, for example will 
 sys/src/cmd/mkfile overwrite /sys/src/cmd/mkfile, which will mess up building 

@@ -1,7 +1,8 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=/$objtype/lib/ape/libbio.a
+LIB=$APEXPROOT/$objtype/lib/ape/libbio.a
 OFILES=\
 	bbuffered.$O\
 	bfildes.$O\
@@ -22,7 +23,7 @@ OFILES=\
 	bwrite.$O\
 	bvprint.$O\
 
-HFILES=/sys/include/ape/bio.h
+HFILES=$APEXPROOT/sys/include/ape/bio.h
 
 UPDATE=\
 	mkfile\
@@ -30,7 +31,7 @@ UPDATE=\
 	${OFILES:%.$O=%.c}\
 	${LIB:/$objtype/%=/386/%}\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-TVwc -D_PLAN9_SOURCE -D_POSIX_SOURCE -I. -I../9
 

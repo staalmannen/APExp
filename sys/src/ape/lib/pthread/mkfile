@@ -1,6 +1,7 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
-LIB=/$objtype/lib/ape/libpthread.a
+LIB=$APEXPROOT/$objtype/lib/ape/libpthread.a
 OFILES=\
 	_pthread.$O\
 	cond_broadcast.$O\
@@ -31,6 +32,6 @@ OFILES=\
 
 HFILES=lib.h
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-c -D_POSIX_SOURCE -FTVw -D_SUSV2_SOURCE -D_PLAN9_SOURCE

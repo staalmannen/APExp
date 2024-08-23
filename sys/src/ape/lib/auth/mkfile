@@ -1,7 +1,8 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=/$objtype/lib/ape/libauth.a
+LIB=$APEXPROOT/$objtype/lib/ape/libauth.a
 OFILES=\
 	amount.$O\
 	amount_getkey.$O\
@@ -22,8 +23,8 @@ OFILES=\
 	passtokey.$O\
 
 HFILES=\
-	/sys/include/ape/auth.h\
-	/sys/src/libauth/authlocal.h\
+	$APEXPROOT/sys/include/ape/auth.h\
+	$APEXPROOT/sys/src/libauth/authlocal.h\
 	../9/libc.h
 
 UPDATE=\
@@ -32,7 +33,7 @@ UPDATE=\
 	${OFILES:%.$O=%.c}\
 	${LIB:/$objtype/%=/386/%}\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-TVwc -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_NET_EXTENSION -I. -I../9 -I/sys/src/libauth
 

@@ -1,7 +1,8 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=/$objtype/lib/ape/libdraw.a
+LIB=$APEXPROOT/$objtype/lib/ape/libdraw.a
 
 OFILES=\
 	alloc.$O\
@@ -58,10 +59,10 @@ OFILES=\
 	writesubfont.$O\
 
 HFILES=\
-	/sys/include/ape/draw.h\
-	/sys/include/ape/event.h\
-	/sys/include/ape/mouse.h\
-	/sys/include/ape/keyboard.h\
+	$APEXPROOT/sys/include/ape/draw.h\
+	$APEXPROOT/sys/include/ape/event.h\
+	$APEXPROOT/sys/include/ape/mouse.h\
+	$APEXPROOT/sys/include/ape/keyboard.h\
 
 UPDATE=\
 	mkfile\
@@ -69,7 +70,7 @@ UPDATE=\
 	${OFILES:%.$O=%.c}\
 	${LIB:/$objtype/%=/386/%}\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-c $CFLAGS -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../9
 

@@ -4,7 +4,7 @@ APEXPROOT=../../..
 #do not copy this file to /sys/src/cmd
 
 TARG=pcc
-HFILES=/$objtype/include/u.h /sys/include/libc.h /sys/include/bio.h
+HFILES=$APEXPROOT/$objtype/include/u.h $APEXPROOT/sys/include/libc.h $APEXPROOT/sys/include/bio.h
 
 BIN=$APEXPROOT/$objtype/bin
 LDFLAGS=

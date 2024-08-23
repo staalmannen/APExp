@@ -1,6 +1,6 @@
 </$objtype/mkfile
-
-LIB=libcurses.a
+APEXPROOT=../../../../../
+LIB=$APEXPROOT/$objtype/lib/ape/libcurses.a
 
 OFILES=\
 # pdcurses \
@@ -57,9 +57,9 @@ OFILES=\
 	pdccolor.$O
 
 HFILES=\
-	/sys/include/ape/curses.h\
-	/sys/include/ape/panel.h\
-	/sys/include/ape/term.h
+	$APEXPROOT/sys/include/ape/curses.h\
+	$APEXPROOT/sys/include/ape/panel.h\
+	$APEXPROOT/sys/include/ape/term.h
 
 UPDATE=\
 	mkfile\
@@ -67,7 +67,7 @@ UPDATE=\
 	${OFILES:%.$O=%.c}\
 	${LIB:/$objtype/%=/$objtype/%}\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CURSRC=../../../external/PDCursesMod
 
@@ -86,11 +86,11 @@ pdccolor.$O: $CURSRC/common/pdccolor.c
 	$CC $CFLAGS $CURSRC/common/pdccolor.c
 
 install:V:
-	cp $CURSRC/curses.h /sys/include/ape/curses.h
-	ape/patch /sys/include/ape/curses.h <header.patch
-	cp $CURSRC/panel.h /sys/include/ape/panel.h
-	cp $CURSRC/term.h /sys/include/ape/term.h
-    cp libcurses.a /$objtype/lib/ape/libcurses.a
+	cp $CURSRC/curses.h $APEXPROOT/sys/include/ape/curses.h
+	ape/patch $APEXPROOT/sys/include/ape/curses.h <header.patch
+	cp $CURSRC/panel.h $APEXPROOT/sys/include/ape/panel.h
+	cp $CURSRC/term.h $APEXPROOT/sys/include/ape/term.h
+
 
 demos:V:
 	@{
@@ -102,9 +102,7 @@ clean:V:
 		mk -f mkfile_demo clean
 	}
 	rm -f *.[$OS]
-	rm -f libcurses.a
 
 nuke:V:
 	rm -f $LIB
-	rm -f /$objtype/lib/ape/libcurses.a
 	rm -f $HFILES

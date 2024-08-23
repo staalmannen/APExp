@@ -1,6 +1,7 @@
 </$objtype/mkfile
 
 PCRESRC=../../../external/pcre2
+APEXPROOT=../../../../../
 
 MAN1=\
 		pcre2-config\
@@ -108,20 +109,20 @@ default:V:
 install:V:
 	mk -f mkfile.libpcre $target
 	mk -f mkfile.libpcreposix $target
-	pcre2-config /rc/bin/ape
+	cp pcre2-config $APEXPROOT/rc/bin/ape
 	for (i in $MAN1)
-		@{ cd $PCRESRC/doc; cp $i.1 /sys/man/1/$i }
+		@{ cd $PCRESRC/doc; cp $i.1 $APEXPROOT/sys/man/1/$i }
 	for (i in $MAN3) 
-		@{ cd $PCRESRC/doc; cp $i.3 /sys/man/3/$i }
+		@{ cd $PCRESRC/doc; cp $i.3 $APEXPROOT/sys/man/3/$i }
 
 installall:V:
 	mk -f mkfile.libpcre install
 	mk -f mkfile.libpcreposix install
-	cp pcre2-config /rc/bin/ape
+	cp pcre2-config $APEXPROOT/rc/bin/ape
 	for (i in $MAN1)
-		@{ cd $PCRESRC/doc; cp $i.1 /sys/man/1/$i }
+		@{ cd $PCRESRC/doc; cp $i.1 $APEXPROOT/sys/man/1/$i }
 	for (i in $MAN3) 
-		@{ cd $PCRESRC/doc; cp $i.3 /sys/man/3/$i }
+		@{ cd $PCRESRC/doc; cp $i.3 $APEXPROOT/sys/man/3/$i }
 
 clean:V:
 	mk -f mkfile.libpcre $target
@@ -132,5 +133,5 @@ nuke:V:
 	mk -f mkfile.libpcre $target
 	mk -f mkfile.libpcreposix $target
 	mk -f mkfile.pcretest $target
-	rm -f /rc/bin/ape/pcre2-config
+	rm -f $APEXPROOT/rc/bin/ape/pcre2-config
 

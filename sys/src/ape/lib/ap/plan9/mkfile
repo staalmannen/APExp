@@ -1,6 +1,7 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
-LIB=/$objtype/lib/ape/libap.a
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 	_buf.$O\
 	_dirconv.$O\
@@ -109,10 +110,10 @@ OFILES=\
 
 UPDATE=\
 	mkfile\
-	/386/lib/ape/libap.a\
+	$APEXPROOT/$objtype/lib/ape/libap.a\
 	${OFILES:%.$O=%.c}\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION
 

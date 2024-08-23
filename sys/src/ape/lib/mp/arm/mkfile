@@ -1,13 +1,14 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=/$objtype/lib/ape/libmp.a
+LIB=$APEXPROOT/$objtype/lib/ape/libmp.a
 
 SFILES=mpvecdigmuladd.s mpvecdigmulsub.s mpvecadd.s mpvecsub.s
 
 HFILES=\
-	/sys/include/ape/mp.h\
-	/sys/src/libmp/port/dat.h
+	$APEXPROOT/sys/include/ape/mp.h\
+	$APEXPROOT/sys/src/libmp/port/dat.h
 
 OFILES=${SFILES:%.s=%.$O}
 
@@ -15,7 +16,7 @@ UPDATE=mkfile\
 	$HFILES\
 	$SFILES\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 %.$O:	/sys/src/libmp/arm/%.s
 	$AS /sys/src/libmp/arm/$stem.s

@@ -36,6 +36,7 @@ OFILES=\
 </sys/src/cmd/mksyslib
 
 PCRESRC=../../../external/pcre2
+APEXPROOT=../../../../../
 
 CC=pcc
 LD=pcc
@@ -47,12 +48,12 @@ CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=8
 	$CC $CFLAGS $PCRESRC/src/$stem.c
 
 install:V:
-	cp libpcre2.a /$objtype/lib/ape/libpcre2.a
-	cp pcre2.h /sys/include/ape/
+	cp libpcre2.a $APEXPROOT/$objtype/lib/ape/libpcre2.a
+	cp pcre2.h $APEXPROOT/sys/include/ape/
 
 nuke:V:
 	mk clean
 	rm -f $LIB
-	rm -f /$objtype/lib/ape/libpcre2.a
-	rm -f /sys/include/ape/pcre2.h
+	rm -f $APEXPROOT/$objtype/lib/ape/libpcre2.a
+	rm -f $APEXPROOT/sys/include/ape/pcre2.h
 

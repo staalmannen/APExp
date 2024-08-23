@@ -1,6 +1,7 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
-LIB=/$objtype/lib/ape/libap.a
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 	_IO_newfile.$O\
 	_IO_getc.$O\
@@ -67,6 +68,6 @@ OFILES=\
 	vsprintf.$O\
 	vsnprintf.$O\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=$CFLAGS -c -D_POSIX_SOURCE

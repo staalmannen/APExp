@@ -1,4 +1,5 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
 TARG=\
@@ -21,16 +22,16 @@ TARG=\
 	xmas
 
 HFILES=\
-	/sys/include/ape/curses.h\
-	/sys/include/ape/panel.h\
+	$APEXPROOT/sys/include/ape/curses.h\
+	$APEXPROOT/sys/include/ape/panel.h\
 
 UPDATE=\
 	mkfile\
 	$HFILES\
 	${OFILES:%.$O=%.c}\
-	/$objtype/ape/lib/libcurses.a
+	$APEXPROOT/$objtype/ape/lib/libcurses.a
 
-</sys/src/cmd/mkmany
+<$APEXPROOT/sys/src/cmd/mkmany
 
 CURSRC=../../../external/PDCursesMod
 

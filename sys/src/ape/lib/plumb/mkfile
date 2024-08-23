@@ -1,7 +1,8 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=/$objtype/lib/ape/libplumb.a
+LIB=$APEXPROOT/$objtype/lib/ape/libplumb.a
 
 OFILES=\
 	event.$O\
@@ -9,7 +10,7 @@ OFILES=\
 	plumbsendtext.$O
 
 HFILES=\
-	/sys/include/ape/plumb.h\
+	$APEXPROOT/sys/include/ape/plumb.h\
 
 UPDATE=\
 	mkfile\
@@ -17,7 +18,7 @@ UPDATE=\
 	${OFILES:%.$O=%.c}\
 	${LIB:/$objtype/%=/386/%}\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-c $CFLAGS -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../9
 

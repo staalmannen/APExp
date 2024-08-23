@@ -1,7 +1,8 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=/$objtype/lib/ape/libutf.a
+LIB=$APEXPROOT/$objtype/lib/ape/libutf.a
 
 OFILES=\
 	rune.$O\
@@ -38,12 +39,12 @@ OFILES=\
 	wcwidth.$O\
 
 HFILES=\
-	/sys/include/ape/utf.h\
+	$APEXPROOT/sys/include/ape/utf.h\
 
 UPDATE=\
 	mkfile\
 	${OFILES:%.$O=%.c}\
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-c -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION

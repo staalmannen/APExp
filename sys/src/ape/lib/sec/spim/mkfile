@@ -1,12 +1,13 @@
-APE=/sys/src/ape
+APEXPROOT=../../../../../../
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=/$objtype/lib/ape/libsec.a
+LIB=$APEXPROOT/$objtype/lib/ape/libsec.a
 
-HFILES=/sys/include/ape/libsec.h
+HFILES=$APEXPROOT/sys/include/ape/libsec.h
 
 OFILES=\
 
 UPDATE=mkfile $HFILES
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
