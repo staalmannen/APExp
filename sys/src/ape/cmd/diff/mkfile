@@ -1,5 +1,5 @@
 </$objtype/mkfile
-
+APEXPROOT=../../../../..
 OFILES=
 HFILES=\
 	system.h\
@@ -35,9 +35,9 @@ SDIFFO=\
 	getopt1.$O\
 	version.$O\
 
-BIN=/$objtype/bin/ape
+BIN=$APEXPROOT/$objtype/bin/ape
 
-</sys/src/cmd/mkmany
+<$APEXPROOT/sys/src/cmd/mkmany
 
 CC=pcc -c
 CFLAGS=-B -p -D_POSIX_SOURCE -DREGEX_MALLOC -I. \

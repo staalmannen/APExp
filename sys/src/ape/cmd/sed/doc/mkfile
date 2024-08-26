@@ -1,5 +1,5 @@
 </$objtype/mkfile
-
+APEXPROOT=../../../../../..
 GSEDSRC=../../../../external/gsed
 
 default:VQ:
@@ -12,9 +12,9 @@ clean:VQ:
 	;
 
 nuke:VQ:
-	rm -f /sys/man/1/gsed
+	rm -f $APEXPROOT/sys/man/1/sed
 	;
 
 install:V:
-	cp $GSEDSRC/doc/sed.1 /sys/man/1/gsed
+	cp $GSEDSRC/doc/sed.1 $APEXPROOT/sys/man/1/sed
 

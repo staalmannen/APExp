@@ -1,11 +1,12 @@
 </$objtype/mkfile
+APEXPROOT=../../../../..
 TARG=pcre2grep
 OFILES=pcre2grep.$O 
-LIB=/$objtype/lib/ape/libpcre2.a /$objtype/lib/ape/libpcre2posix.a
-BIN=/$objtype/bin/ape
-HFILES=/sys/include/ape/pcre2.h config.h
+LIB=$APEXPROOT/$objtype/lib/ape/libpcre2.a $APEXPROOT/$objtype/lib/ape/libpcre2posix.a
+BIN=$APEXPROOT/$objtype/bin/ape
+HFILES=$APEXPROOT/sys/include/ape/pcre2.h config.h
 
-</sys/src/cmd/mkone
+<$APEXPROOT/sys/src/cmd/mkone
 
 PCRESRC=../../../external/pcre2
 
@@ -19,8 +20,8 @@ pcre2grep.$O: $PCRESRC/src/pcre2grep.c
 install:V:
 	cp $O.out $BIN/pcre2grep
 	cp $O.out $BIN/grep
-	cp egrep /rc/bin/ape/
-	cp fgrep /rc/bin/ape/
+	cp egrep $APEXPROOT/rc/bin/ape/
+	cp fgrep $APEXPROOT/rc/bin/ape/
 
 
 

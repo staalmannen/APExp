@@ -1,6 +1,7 @@
 </$objtype/mkfile
+APEXPROOT=../../../../..
 TARG=m4
-LIB=/$objtype/lib/ape/libbsd.a
+LIB=$APEXPROOT/$objtype/lib/ape/libbsd.a
 OFILES=\
 	#src\
 		builtin.$O\
@@ -28,10 +29,10 @@ OFILES=\
 
 
 #LIB=
-BIN=/$objtype/bin/ape
+BIN=$APEXPROOT/$objtype/bin/ape
 HFILES=config.h
 
-</sys/src/cmd/mkone
+<$APEXPROOT/sys/src/cmd/mkone
 
 M4SRC=../../../external/m4
 

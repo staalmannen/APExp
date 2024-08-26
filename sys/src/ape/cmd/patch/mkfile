@@ -1,5 +1,5 @@
 </$objtype/mkfile
-
+APEXPROOT=../../../../..
 TARG=patch
 
 OFILES=\
@@ -30,9 +30,9 @@ HFILES=\
 	util.h\
 	version.h\
 
-BIN=/$objtype/bin/ape
+BIN=$APEXPROOT/$objtype/bin/ape
 
-</sys/src/cmd/mkone
+<$APEXPROOT/sys/src/cmd/mkone
 
 CC=pcc -c
 CFLAGS=-B -p -D_POSIX_SOURCE \

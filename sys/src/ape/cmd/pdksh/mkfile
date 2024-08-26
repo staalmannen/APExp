@@ -1,6 +1,6 @@
 </$objtype/mkfile
-
-BIN=/$objtype/bin/ape
+APEXPROOT=../../../../..
+BIN=$APEXPROOT/$objtype/bin/ape
 TARG=sh
 
 OFILES=\
@@ -30,9 +30,9 @@ OFILES=\
 	version.$O
 
 # Autolib doesn't get this right on the alpha, and I don't understand why. -rsc
-LIB=/$objtype/lib/ape/libap.a /$objtype/lib/ape/libbsd.a
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a $APEXPROOT/$objtype/lib/ape/libbsd.a
 
-</sys/src/cmd/mkone
+<$APEXPROOT/sys/src/cmd/mkone
 
 CC=pcc
 CFLAGS=-I. -DHAVE_CONFIG_H -c

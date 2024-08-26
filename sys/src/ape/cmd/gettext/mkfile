@@ -1,15 +1,16 @@
 </$objtype/mkfile
+APEXPROOT=../../../../..
 TARG=	msgfmt\
 		msgmerge
 
 PARSEROBJS =	poparser.$O\
 				StringEscape.$O
 
-LIB=/$objtype/lib/ape/libintl.a
-BIN=/$objtype/bin/ape
-HFILES=/sys/include/ape/libintl.h
+LIB=$APEXPROOT/$objtype/lib/ape/libintl.a
+BIN=$APEXPROOT/$objtype/bin/ape
+HFILES=$APEXPROOT/sys/include/ape/libintl.h
 
-</sys/src/cmd/mkmany
+<$APEXPROOT/sys/src/cmd/mkmany
 
 GETTEXTSRC=../../../external/gettext-tiny
 
@@ -30,11 +31,11 @@ install:V:
 	mk all
 	cp $O.msgfmt $BIN/msgfmt
 	cp $O.msgmerge $BIN/msgmerge
-	cp $GETTEXTSRC/src/xgettext.sh /rc/bin/ape/xgettext
-	cat $GETTEXTSRC/src/autopoint.in | sed 's,@datadir@,/sys/lib/ape,' > /rc/bin/ape/autopoint
-	chmod +x /rc/bin/ape/*
-	mkdir -p /sys/lib/ape/m4
-	dircp $GETTEXTSRC/m4 /sys/lib/ape/m4
-	mkdir -p /sys/lib/ape/data
-	dircp $GETTEXTSRC/data /sys/lib/ape/data
+	cp $GETTEXTSRC/src/xgettext.sh $APEXPROOT/rc/bin/ape/xgettext
+	cat $GETTEXTSRC/src/autopoint.in | sed 's,@datadir@,/sys/lib/ape,' > $APEXPROOT/rc/bin/ape/autopoint
+	chmod +x $APEXPROOT/rc/bin/ape/*
+	mkdir -p $APEXPROOT/sys/lib/ape/m4
+	dircp $GETTEXTSRC/m4 $APEXPROOT/sys/lib/ape/m4
+	mkdir -p $APEXPROOT/sys/lib/ape/data
+	dircp $GETTEXTSRC/data $APEXPROOT/sys/lib/ape/data
 

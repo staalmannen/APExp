@@ -1,4 +1,5 @@
 </$objtype/mkfile
+APEXPROOT=../../../../../..
 TARG=sed
 OFILES=	compile.$O\
 		execute.$O\
@@ -9,9 +10,9 @@ OFILES=	compile.$O\
 		utils.$O
 
 LIB=../lib/libsed.a$O 
-BIN=/$objtype/bin/ape
+BIN=$APEXPROOT/$objtype/bin/ape
 
-</sys/src/cmd/mkone
+<$APEXPROOT/sys/src/cmd/mkone
 
 GSEDSRC=../../../../external/gsed
 

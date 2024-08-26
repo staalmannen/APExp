@@ -17,13 +17,10 @@ _ARCHS=	386\
 		spim
 
 all:V:
-	./apexp.rc
-	for (i in $DIRS)
-		@{ cd $i; mk }
-
-install:V:
 	for (i in $_ARCHS)
 		@{ mkdir -p $i/lib/ape/ ; mkdir -p $i/bin/ape }
+
+install:V:
 	for (i in $DIRS)
 		@{ cd $i; mk $target }
 

@@ -1,6 +1,6 @@
-APE=/sys/src/ape
+APE=../../ape
 <$APE/config
-
+APEXPROOT=../../../../..
 TARG=pax
 OFILES=pax.$O\
 	append.$O\
@@ -30,8 +30,8 @@ HFILES=config.h\
 	port.h\
 	pax.h\
 
-BIN=$APEBIN
-</sys/src/cmd/mkone
+BIN=$APEXPROOT/$objtype/bin/ape
+<$APEXPROOT/sys/src/cmd/mkone
 
 CFLAGS =-c -D_POSIX_SOURCE -B -DPATH_MAX=1024
 

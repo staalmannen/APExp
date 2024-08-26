@@ -1,18 +1,17 @@
 #!/bin/rc
 # set up a shell running the APExp environment
+# APExp must already have been built for $cputype
 rfork en
 fn sigterm{}
 HOME=$home
 test -d /dev/fd || aux/stub -d /dev/fd && bind /fd /dev/fd
+bind -a $cputype/bin/ /bin
+bind -a $cputype/bin/ape /bin
 bind -b rc/bin /bin
 bind -b rc/bin/ape /bin
 bind -b $cputype /$cputype
-bind -b $cputype/bin /bin
-bind -b $cputype/bin/ape /bin
 bind -b sys/include /sys/include
 bind -b sys/lib /sys/lib
 bind -b sys/man /sys/man
 bind -b sys/src /sys/src
-if(test -d /$cputype/bin/pub)
-	bind -a /$cputype/bin/pub /bin
 /bin/sh $*

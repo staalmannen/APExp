@@ -1,6 +1,6 @@
 APE=../..
 <$APE/config
-
+APEXPROOT=../../../../..
 TARG=make
 OFILES=	alloca.$O\
 		ar.$O\
@@ -31,7 +31,7 @@ OFILES=	alloca.$O\
 		glob.$O\
 		fnmatch.$O
 
-BIN=/$objtype/bin/ape
+BIN=$APEXPROOT/$objtype/bin/ape
 <../../../cmd/mkone
 
 GMAKESRC=../../../external/gmake
@@ -58,7 +58,7 @@ clean:V:
 
 nuke:V:
 	rm -f *.[$OS] y.tab.? y.debug y.output [$OS].$TARG $TARG
-	rm -f /sys/man/1/gmake
+	rm -f $APEXPROOT/sys/man/1/make
 
 install:V:
-	cp $GMAKESRC/gmake.1 /sys/man/1/gmake
+	cp $GMAKESRC/gmake.1 $APEXPROOT/sys/man/1/make

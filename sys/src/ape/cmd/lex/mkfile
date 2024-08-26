@@ -1,5 +1,6 @@
 </$objtype/mkfile
 DIRS=doc libfl flex 
+APEXPROOT=../../../../..
 
 all:V:
 	for (i in $DIRS)
@@ -8,7 +9,7 @@ all:V:
 install:V:
 	for (i in $DIRS)
 		@{ cd $i; mk $target }
-	cp FlexLexer.h /sys/include/ape/
+	cp FlexLexer.h $APEXPROOT/sys/include/ape/
 
 clean:V:
 	for (i in $DIRS)
@@ -17,5 +18,5 @@ clean:V:
 nuke:V:
 	for (i in $DIRS)
 		@{ cd $i; mk $target }
-	rm -f /sys/include/ape/FlexLexer.h
+	rm -f $APEXPROOT/sys/include/ape/FlexLexer.h
 
