@@ -2,6 +2,7 @@ none:VQ:
 	echo usage: mk all, install, installall, cmd, cmd.install, lib, lib.install
 
 all clean nuke install installall:V:
+	./mount-include.rc
 	mk lib.$target
 	mk cmd.$target
 	mk 9src.$target

@@ -12,7 +12,7 @@ ICONVSRC=../../../external/libiconv/src
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I. -I$ICONVSRC/lib -DEILSEQ=68 \
+CFLAGS=-c -I$APEXPROOT/sys/include/ape -I. -I$ICONVSRC/lib -DEILSEQ=68 \
 		-D_POSIX_SOURCE -DPLAN9
 
 %.$O: $ICONVSRC/%.c

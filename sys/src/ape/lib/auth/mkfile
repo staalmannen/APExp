@@ -24,7 +24,7 @@ OFILES=\
 
 HFILES=\
 	$APEXPROOT/sys/include/ape/auth.h\
-	$APEXPROOT/sys/src/libauth/authlocal.h\
+	/sys/src/libauth/authlocal.h\
 	../9/libc.h
 
 UPDATE=\

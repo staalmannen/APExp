@@ -3,7 +3,7 @@
 APEXPROOT=../../..
 
 YTARG=`{ls | sed -n '/\.y$/s/\.y$//p'}
-TARG=$YTARG `{ls | sed -n '/^cp\.c$/d; /^yacc\.c$/d; /\.c$/s/\.c$//p'}
+TARG=$YTARG `{ls | sed -n '/\.c$/s/\.c$//p'}
 HFILES=/$objtype/include/u.h /sys/include/libc.h /sys/include/bio.h
 
 BIN=$APEXPROOT/$objtype/bin
@@ -34,12 +34,6 @@ $O.%: %.$O
 $BIN/%: $O.%
 	cp $O.$stem $target
 
-$BIN/cp: $O.cp
-	`{if(~ $objtype $cputype) echo ./$O.cp; if not echo cp} $prereq $target
-
-$BIN/init: $O.init  # hack, install location is not target
-	cp $O.init /$objtype/init
-
 %.acid: %.c $HFILES
 	$CC $CFLAGS -a $stem.c >$target
 
@@ -56,15 +50,15 @@ $BIN/init: $O.init  # hack, install location is not target
 %.tests:V:
 	@{cd test && mk $MKFLAGS $stem}
 
-cmds:V: $O.cp $O.yacc ${TARG:%=$O.%}
+cmds:V: ${TARG:%=$O.%}
 
 all:V: cmds
+	./mount-include.rc
 	mk $MKFLAGS all.dirs
 
 %.install:V: $BIN/%
 
-install:V: cp.install
-	mk $MKFLAGS yacc.install
+install:V:
 	mk $MKFLAGS $TARG.install
 	mk $MKFLAGS install.dirs
 

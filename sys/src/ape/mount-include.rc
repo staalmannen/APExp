@@ -1,0 +1,12 @@
+#!/bin/rc
+if(test -d /sys/include/ape/THIS_IS_APExp)
+    echo "APExp already mounted"
+if not
+    mkdir -p ../../../$objtype/bin/ape
+    mkdir -p ../../../$objtype/lib/ape
+    bind -b ../../../$objtype/bin/ape /bin
+    bind -b ../../../$objtype/lib/ape /$objtype/lib/ape
+    bind -b ../../../sys/include /sys/include
+    bind -b ../../../sys/src /sys/src
+echo "APExp mounted"
+
