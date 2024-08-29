@@ -1,0 +1,8 @@
+#!/bin/rc
+if(! test -e /sys/include/ape/THIS_IS_APExp) {
+    bind -b ../../../$cputype /$cputype
+    bind -b ../../../sys /sys
+    echo "APExp mounted"
+    }
+if not echo "APExp already mounted"
+

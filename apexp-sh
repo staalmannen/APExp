@@ -10,8 +10,5 @@ bind -a $cputype/bin/ape /bin
 bind -b rc/bin /bin
 bind -b rc/bin/ape /bin
 bind -b $cputype /$cputype
-bind -b sys/include /sys/include
-bind -b sys/lib /sys/lib
-bind -b sys/man /sys/man
-bind -b sys/src /sys/src
+bind -b sys /sys
 /bin/sh $*

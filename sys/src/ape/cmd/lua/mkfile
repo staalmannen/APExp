@@ -31,6 +31,9 @@ CFLAGS= -c -I. -D_C99_SNPRINTF_EXTENSION -D_POSIX_SOURCE \
         -D_SUSV2_SOURCE -DLUA_POSIX -DENABLE_CJSON_GLOBAL \
         -DPlan9 -DMAKE_LUA
 
+%.$O: $LUASRC/%.c
+    $CC $CFLAGS $LUASRC/$stem.c
+
 install:V:
         cp $O.out $BIN/lua
         

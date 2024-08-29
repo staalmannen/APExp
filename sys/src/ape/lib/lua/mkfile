@@ -55,9 +55,10 @@ CC=pcc
 LD=pcc
 CFLAGS= -c -I. -D_C99_SNPRINTF_EXTENSION -D_POSIX_SOURCE \
         -D_SUSV2_SOURCE -DLUA_POSIX -DENABLE_CJSON_GLOBAL \
-        -DMAKE_LIB -DPlan9 -DRand64='unsigned long long'
+        -DMAKE_LIB -DPlan9 -DRand64='unsigned long long' \
+        -DSRand64='long long'
 
-%.$O: %.c
+%.$O: $LUASRC/%.c
     $CC $CFLAGS $LUASRC/$stem.c
 
 install:V:
