@@ -1,0 +1,40 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/liblua.a
+LUASRC=../../../external/lua
+
+TARG=lua 
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+OFILES=\
+    lua.$O \
+    
+HFILES=\
+    $APEXPROOT/sys/include/ape/lauxlib.h \
+    $APEXPROOT/sys/include/ape/lua.h \
+    $APEXPROOT/sys/include/ape/luaconf.h \
+    $APEXPROOT/sys/include/ape/lualib.h
+
+UPDATE=\
+	mkfile\
+	$HFILES\
+	${OFILES:%.$O=%.c}\
+	$APEXPROOT/$objtype/lib/ape/liblua.a
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -I. -D_C99_SNPRINTF_EXTENSION -D_POSIX_SOURCE \
+        -D_SUSV2_SOURCE -DLUA_POSIX -DENABLE_CJSON_GLOBAL \
+        -DPlan9 -DMAKE_LUA
+
+install:V:
+        cp $O.out $BIN/lua
+        
+nuke:V:
+        rm -f $BIN/lua
+        
+

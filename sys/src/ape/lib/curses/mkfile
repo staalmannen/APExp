@@ -86,10 +86,10 @@ pdccolor.$O: $CURSRC/common/pdccolor.c
 	$CC $CFLAGS $CURSRC/common/pdccolor.c
 
 install:V:
-	cp $CURSRC/curses.h $APEXPROOT/sys/include/ape/curses.h
-	ape/patch $APEXPROOT/sys/include/ape/curses.h <header.patch
-	cp $CURSRC/panel.h $APEXPROOT/sys/include/ape/panel.h
-	cp $CURSRC/term.h $APEXPROOT/sys/include/ape/term.h
+#	cp $CURSRC/curses.h $APEXPROOT/sys/include/ape/curses.h
+#	ape/patch $APEXPROOT/sys/include/ape/curses.h <header.patch
+#	cp $CURSRC/panel.h $APEXPROOT/sys/include/ape/panel.h
+#	cp $CURSRC/term.h $APEXPROOT/sys/include/ape/term.h
 
 
 demos:V:
