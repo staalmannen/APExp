@@ -17,6 +17,8 @@ _ARCHS=	386\
 		spim
 
 all:V:
+	chmod +x mount-include
+	./mount-include
 	for (i in $_ARCHS)
 		@{ mkdir -p $i/lib/ape/ ; mkdir -p $i/bin/ape }
 

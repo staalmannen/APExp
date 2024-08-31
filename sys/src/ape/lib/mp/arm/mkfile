@@ -8,7 +8,7 @@ SFILES=mpvecdigmuladd.s mpvecdigmulsub.s mpvecadd.s mpvecsub.s
 
 HFILES=\
 	$APEXPROOT/sys/include/ape/mp.h\
-	$APEXPROOT/sys/src/libmp/port/dat.h
+	/sys/src/libmp/port/dat.h
 
 OFILES=${SFILES:%.s=%.$O}
 

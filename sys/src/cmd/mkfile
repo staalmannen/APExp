@@ -53,7 +53,8 @@ $BIN/%: $O.%
 cmds:V: ${TARG:%=$O.%}
 
 all:V: cmds
-	./mount-include.rc
+	chmod +x mount-include
+	./mount-include
 	mk $MKFLAGS all.dirs
 
 %.install:V: $BIN/%

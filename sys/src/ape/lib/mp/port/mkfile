@@ -56,7 +56,7 @@ OFILES=	`{rfork en; \
 
 HFILES=\
 	$APEXPROOT/sys/include/ape/mp.h\
-	$APEXPROOT/sys/src/libmp/port/dat.h\
+	/sys/src/libmp/port/dat.h\
 
 CFILES=${FILES:%=%.c}
 
