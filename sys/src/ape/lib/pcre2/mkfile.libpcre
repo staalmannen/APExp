@@ -36,7 +36,7 @@ OFILES=\
 </sys/src/cmd/mksyslib
 
 PCRESRC=../../../external/pcre2
-APEXPROOT=../../../../../
+APEXPROOT=../../../../..
 
 CC=pcc
 LD=pcc

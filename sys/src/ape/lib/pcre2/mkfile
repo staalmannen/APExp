@@ -1,7 +1,7 @@
 </$objtype/mkfile
 
 PCRESRC=../../../external/pcre2
-APEXPROOT=../../../../../
+APEXPROOT=../../../../..
 
 MAN1=\
 		pcre2-config\
