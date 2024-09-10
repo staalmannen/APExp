@@ -1,6 +1,6 @@
 </$objtype/mkfile
 
-APEXPROOT=../../../../../
+APEXPROOT=../../../../..
 
 DIRS=port $CPUS
 

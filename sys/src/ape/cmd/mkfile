@@ -9,6 +9,7 @@ DIRS=\
 	expr\
 #	gettext\
 	lex\
+#	m4\
 	make\
 	patch\
 	pax\
@@ -22,7 +23,7 @@ BIN=$APEXPROOT/$objtype/bin/ape
 
 all:V:	$DIRS
 
-install:V:	install.dir install.rc
+install:V:	install.dir
 
 installall:V:	installall.dir
 

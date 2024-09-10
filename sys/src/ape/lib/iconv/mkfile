@@ -1,5 +1,5 @@
 </$objtype/mkfile
-APEXPROOT=../../../../../
+APEXPROOT=../../../../..
 LIB=$APEXPROOT/$objtype/lib/ape/libiconv.a
 
 OFILES=	\
@@ -19,10 +19,10 @@ CFLAGS=-c -I$APEXPROOT/sys/include/ape -I. -I$ICONVSRC/lib -DEILSEQ=68 \
 	$CC $CFLAGS $ICONVSRC/$stem.c
 
 install:V:
-	cp iconv.h $APEXPROOT/sys/include/ape/
-	cp charmaps.h $APEXPROOT/sys/include/ape/
-	mkdir -p $APEXPROOT/sys/include/ape/charmaps
-	dircp $ICONVSRC/include/charmaps $APEXPROOT/sys/include/ape/charmaps
+#	cp iconv.h $APEXPROOT/sys/include/ape/
+#	cp charmaps.h $APEXPROOT/sys/include/ape/
+#	mkdir -p $APEXPROOT/sys/include/ape/charmaps
+#	dircp $ICONVSRC/include/charmaps $APEXPROOT/sys/include/ape/charmaps
 
 nuke:V:
 	mk clean

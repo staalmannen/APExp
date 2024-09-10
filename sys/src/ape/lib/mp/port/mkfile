@@ -1,4 +1,4 @@
-APEXPROOT=../../../../../../
+APEXPROOT=../../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
@@ -67,7 +67,7 @@ UPDATE=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-TVwc -+ -D_POSIX_SOURCE -D_PLAN9_SOURCE -I. -I../../9
+CFLAGS=-TVwc -+ -D_POSIX_SOURCE -D_PLAN9_SOURCE -I. -I$APE/lib/9
 
 %.$O:	/sys/src/libmp/port/%.c
 	$CC $CFLAGS /sys/src/libmp/port/$stem.c

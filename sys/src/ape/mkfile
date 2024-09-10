@@ -5,8 +5,8 @@ all clean nuke install installall:V:
 	chmod +x mount-include
 	./mount-include
 	mk lib.$target
-	mk cmd.$target
 	mk 9src.$target
+	mk cmd.$target
 
 lib.%:V:
 	cd lib

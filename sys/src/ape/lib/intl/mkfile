@@ -1,4 +1,4 @@
-APEXPROOT=../../../../../
+APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
@@ -13,7 +13,7 @@ GETTEXTSRC=../../../external/gettext-tiny
 CFLAGS=-c -I$GETTEXTSRC -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_BSD_EXTENSION
 
 install:V:
-	cp $GETTEXTSRC/include/libintl.h $APEXPROOT/sys/include/ape/
+#	cp $GETTEXTSRC/include/libintl.h $APEXPROOT/sys/include/ape/
 
 %.$O: $GETTEXTSRC/libintl/%.c
 	$CC $CFLAGS $GETTEXTSRC/libintl/$stem.c
