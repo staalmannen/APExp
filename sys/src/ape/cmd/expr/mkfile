@@ -1,6 +1,7 @@
-APE=../../ape
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
 <$APE/config
-APEXPROOT=../../../../../..
+
 
 TARG=expr
 OFILES=y.tab.$O
@@ -8,7 +9,11 @@ YFILES=expr.y
 HFILES=regexp.h
 
 BIN=$APEXPROOT/$objtype/bin/ape
+
 <$APEXPROOT/sys/src/cmd/mkone
 
 YFLAGS=-S
 CFLAGS=-B -c
+
+install:V:
+

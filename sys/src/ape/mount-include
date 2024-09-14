@@ -1,11 +1,11 @@
 #!/bin/rc
+bind -b ../../../$cputype/bin/ape /bin
 if(! test -e /sys/include/ape/THIS_IS_APExp) {
     bind -a ../../../$cputype /$cputype
     bind -a ../../../sys /sys
     bind -a ../../../$cputype/include/ape /sys/include/ape
     bind -b ../../../sys/include/ape /sys/include/ape
     bind -b ../../../$cputype/bin /bin
-    bind -b ../../../$cputype/bin/ape /bin
     bind -b ../../../$cputype/lib/ape /$cputype/lib/ape
     echo "APExp mounted"
     }

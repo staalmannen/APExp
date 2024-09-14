@@ -9,7 +9,7 @@ OFILES=	compile.$O\
 		sed.$O\
 		utils.$O
 
-LIB=../lib/libsed.a$O 
+LIB=../lib/libsed.a$O $APEXPROOT/$objtype/lib/ape/libutf.a
 BIN=$APEXPROOT/$objtype/bin/ape
 
 <$APEXPROOT/sys/src/cmd/mkone
@@ -18,10 +18,7 @@ GSEDSRC=../../../../external/gsed
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I.. -I$GSEDSRC -I$GSEDSRC/sed -I$GSEDSRC/lib -B -D_POSIX_SOURCE \
-	-D_SUSV2_SOURCE -D_EXPERIMENTAL_SOURCE -D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION \
-	-DHAVE_CONFIG_H -DPLAN9 -D_LIMITS_EXTENSION -DHAVE_WCHAR_H -DHAVE_WCTYPE_H \
-	-DHAVE_MEMMOVE -DHAVE_STRERROR 
+CFLAGS=-c -I.. -I$GSEDSRC -I$GSEDSRC/sed -I$GSEDSRC/lib -B -DHAVE_CONFIG_H
 
 %.$O: $GSEDSRC/sed/%.c
 	$CC $CFLAGS $GSEDSRC/sed/$stem.c

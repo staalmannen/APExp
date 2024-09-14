@@ -6,4 +6,5 @@ fn sigterm{}
 HOME=$home
 test -d /dev/fd || aux/stub -d /dev/fd && bind /fd /dev/fd
 ./mount-include
+bind -b $cputype/bin/ape /bin
 /bin/sh $*

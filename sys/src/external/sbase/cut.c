@@ -1,5 +1,5 @@
 /* See LICENSE file for copyright and license details. */
-#include <gnulib_stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 

@@ -1,0 +1,24 @@
+#!/bin/sh
+
+usage()
+{
+	echo mkproto: prefix manprefix proto>&2
+	exit 1
+}
+
+prefix=${1?$(usage)}
+manprefix=${2?$(usage)}
+proto=${3?$(usage)}
+
+trap "rm -f scripts/proto" EXIT INT QUIT TERM
+
+(set -e
+echo d $prefix/bin $prefix/bin 755
+find . ! -name . -prune -type f \( -perm -u+x -o -perm -g+x -o -perm o+x \) |
+sed "s@.*@c & $prefix/bin/& 755@"
+
+echo d $manprefix/man1 $manprefix/man1 755
+find . ! -name . -prune -name '*.1' |
+sed "s@.*@c & $manprefix/man1/& 644@") > $proto
+
+trap "" EXIT INT QUIT TERM

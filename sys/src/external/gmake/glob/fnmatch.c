@@ -1,5 +1,5 @@
 /* Copyright (C) 1991, 1992, 1993, 1996, 1997, 1998, 1999 Free Software
-Foundation, Inc.
+Foundation, Inc. btowc
 This file is part of the GNU C Library.
 
 This library is free software; you can redistribute it and/or
@@ -371,7 +371,7 @@ internal_fnmatch (pattern, string, no_leading_period, flags)
 		      /* Invalid character class name.  */
 		      return FNM_NOMATCH;
 
-		    if (__iswctype (__btowc ((unsigned char) *n), wt))
+		    if (iswctype (btowc ((unsigned char) *n), wt))
 		      goto matched;
 # else
 		    if ((STREQ (str, "alnum") && ISALNUM ((unsigned char) *n))

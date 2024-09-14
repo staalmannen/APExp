@@ -1,0 +1,87 @@
+The following list of commands is taken from the toybox roadmap[0] and
+has been stripped down  accordingly.  Commands that belong to ubase[1]
+are not listed here as well as commands that fall outside the scope of
+sbase such as vi and sh are also not listed here.
+
+at
+awk
+bc
+diff
+patch
+stty
+
+If you are looking for some work to do on sbase, another option is to
+pick a utility from the list in the README which has missing flags or
+features noted.
+
+What also needs to be implemented is the capability of the tools to
+handle data with NUL-bytes in it.
+
+The return values of mdcheckline() in crypt.c need to be fixed (0 -> success,
+1 -> error).
+
+[0] http://landley.net/toybox/roadmap.html
+[1] http://git.suckless.org/ubase/
+
+Bugs
+====
+
+ed
+--
+* cat <<EOF | ed
+  i
+  LLL
+  .
+  s/$/\\
+
+* cat <<EOF | ed
+    0a
+    int radix = 16;
+    int Pflag;
+    int Aflag;
+    int vflag;
+    int gflag;
+    int uflag;
+    int arflag;
+
+    .
+    ?radix?;/^$/-s/^/static /
+* cat <<EOF | ed
+    0a
+       Line
+    .
+    s# *##
+* cat <<EOF | ed
+    0a
+    line
+    .
+    1g/^$/p
+
+* cat <<EOF | ed
+    0a
+    line1
+    line2
+    line3
+    .
+    g/^$/d
+    ,p
+
+* Editing huge files doesn't work well.
+
+
+printf
+------
+* Flags for string conversion-specifier (%s) are not supported.
+* Escape sequences that expand to '%' are treated as beginning of
+  conversion specification.
+* An trailing '%' at the end of a format string causes a read past
+  the end of the string.
+
+tr
+--
+* When a character class is present, all other characters in the
+  string are ignored.
+
+sbase-box
+---------
+* List of commands does not contain `install` (only `xinstall`).

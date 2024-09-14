@@ -1,4 +1,5 @@
 #include <stdint.h>
+#include <stdlib.h>
 
 extern const uint32_t bittab[];
 
@@ -16,6 +17,3 @@ extern const uint32_t bittab[];
 /* Arbitrary encoding for representing code units instead of characters. */
 #define CODEUNIT(c) (0xdfff & (signed char)(c))
 #define IS_CODEUNIT(c) ((unsigned)(c)-0xdf80 < 0x80)
-
-/* Get inline definition of MB_CUR_MAX. */
-#include <locale.h>

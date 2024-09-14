@@ -1,6 +1,7 @@
 </$objtype/mkfile
 DIRS=doc libfl flex 
 APEXPROOT=../../../../..
+FLEXSRC=$APEXPROOT/sys/src/external/flex/src
 
 all:V:
 	for (i in $DIRS)
@@ -9,7 +10,7 @@ all:V:
 install:V:
 	for (i in $DIRS)
 		@{ cd $i; mk $target }
-	cp FlexLexer.h $APEXPROOT/sys/include/ape/
+	cp $FLEXSRC/FlexLexer.h $APEXPROOT/sys/include/ape/
 
 clean:V:
 	for (i in $DIRS)

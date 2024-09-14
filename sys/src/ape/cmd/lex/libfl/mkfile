@@ -1,11 +1,12 @@
 </$objtype/mkfile
-LIB=/$objtype/lib/ape/libfl.a
+APEXPROOT=../../../../../..
+LIB=$APEXPROOT/$objtype/lib/ape/libfl.a
 
 
 OFILES=	libmain.$O\
 		libyywrap.$O 
 
-</sys/src/cmd/mksyslib
+<$APEXPROOT/sys/src/cmd/mksyslib
 
 FLEXSRC=../../../../external/flex
 

@@ -24,7 +24,7 @@ struct entry {
 	uid_t   uid;
 	gid_t   gid;
 	off_t   size;
-	struct timespec	t;
+	struct timespec t;
 	dev_t   dev;
 	dev_t   rdev;
 	ino_t   ino, tino;
@@ -75,12 +75,12 @@ mkent(struct entry *ent, char *path, int dostat, int follow)
 	ent->uid   = st.st_uid;
 	ent->gid   = st.st_gid;
 	ent->size  = st.st_size;
-//	if (cflag)
-//		ent->t = st.st_ctim;
-//	else if (uflag)
-//		ent->t = st.st_atim;
-//	else
-//		ent->t = st.st_mtim;
+	if (cflag)
+		ent->t = st.st_ctim;
+	else if (uflag)
+		ent->t = st.st_atim;
+	else
+		ent->t = st.st_mtim;
 	ent->dev   = st.st_dev;
 	ent->rdev  = st.st_rdev;
 	ent->ino   = st.st_ino;

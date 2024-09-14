@@ -26,6 +26,7 @@ OFILES=\
 	utfrune.$O\
 	utfutf.$O\
 #	/*wchar*/\
+	internal.$O\
 	fwide.$O\
 	mbrlen.$O\
 	mbrtowc.$O\

@@ -1,7 +1,8 @@
 </$objtype/mkfile
 TARG=lex
-BIN=/$objtype/bin/ape
-LIB=/$objtype/lib/ape/libfl.a
+APEXPROOT=../../../../../..
+BIN=$APEXPROOT/$objtype/bin/ape
+LIB=$APEXPROOT/$objtype/lib/ape/libfl.a
 
 OFILES=	\
 	#src\

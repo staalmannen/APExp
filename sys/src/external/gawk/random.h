@@ -28,15 +28,8 @@
 #define random gawk_random
 #define srandom gawk_srandom
 
-#if SIZEOF_UNSIGNED_INT == 4
 typedef unsigned int gawk_uint32_t;
 typedef          int gawk_int32_t;
-#else
-#if SIZEOF_UNSIGNED_LONG == 4
-typedef unsigned long gawk_uint32_t;
-typedef          long gawk_int32_t;
-#endif
-#endif
 #define uint32_t gawk_uint32_t
 #define int32_t  gawk_int32_t
 

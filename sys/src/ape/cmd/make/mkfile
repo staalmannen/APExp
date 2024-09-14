@@ -1,6 +1,7 @@
 APE=../..
 <$APE/config
 APEXPROOT=../../../../..
+LIB=$APEXPROOT/$objtype/lib/ape/libutf.a
 TARG=make
 OFILES=	alloca.$O\
 		ar.$O\

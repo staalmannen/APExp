@@ -1,6 +1,5 @@
 </$objtype/mkfile
 LIB=libsed.a$O
-#disable all wchar objects and use libwtf / libutf
 OFILES=	alloca.$O\
 #		btowc.$O\
 		dirname.$O\
@@ -40,9 +39,7 @@ GSEDSRC=../../../../external/gsed
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I.. -I$GSEDSRC/lib -B -D_POSIX_SOURCE -D_SUSV2_SOURCE \
-	-D_EXPERIMENTAL_SOURCE -D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION -DHAVE_CONFIG_H \
-	-DPLAN9 -DHAVE_ISBLANK -DHAVE_WCTYPE_H -DHAVE_ISWCTYPE -DHAVE_CALLOC 
+CFLAGS=-c -I.. -I$GSEDSRC/lib -B -DHAVE_CONFIG_H 
 
 %.$O: $GSEDSRC/lib/%.c
 	$CC $CFLAGS $GSEDSRC/lib/$stem.c

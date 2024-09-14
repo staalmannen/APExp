@@ -44,9 +44,6 @@
    like the one from SunOS 4.1.1_U1. */
 #define RENAME_TRAILING_SLASH_BUG 1
 
-/* Define this to 1 if strerror is broken. */
-#define REPLACE_STRERROR 1
-
 /* Define to the version of GNU sed whose features are supported by this sed.
    */
 #define SED_FEATURE_VERSION "4.2"
@@ -163,7 +160,7 @@
 /* #undef malloc */
 
 /* Define to a type if <wchar.h> does not define. */
-//#define mbstate_t int
+//define mbstate_t int
 
 /* Define to the type of st_nlink in struct stat, or a supertype. */
 /* #undef nlink_t */
@@ -202,19 +199,19 @@
 #define re_syntax_options rpl_re_syntax_options
 
 /* Define to rpl_regcomp if the replacement should be used. */
-#define regcomp rpl_regcomp
+//define regcomp rpl_regcomp
 
 /* Define to rpl_regerror if the replacement should be used. */
-#define regerror rpl_regerror
+//define regerror rpl_regerror
 
 /* Define to rpl_regexec if the replacement should be used. */
-#define regexec rpl_regexec
+//define regexec rpl_regexec
 
 /* Define to rpl_regfree if the replacement should be used. */
-#define regfree rpl_regfree
+//define regfree rpl_regfree
 
 /* Define to rpl_rename if the replacement function should be used. */
-#define rename rpl_rename
+//define rename rpl_rename
 
 /* Define to the equivalent of the C99 'restrict' keyword, or to
    nothing if this is not supported.  Do not define if restrict is
@@ -236,7 +233,7 @@
 /* #undef ssize_t */
 
 /* Define to rpl_strnlen if the replacement function should be used. */
-#define strnlen rpl_strnlen
+//define strnlen rpl_strnlen
 
 /* Define as a marker that can be attached to function parameter declarations
    for parameters that are not used.  This helps to reduce warnings, such as

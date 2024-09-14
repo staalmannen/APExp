@@ -37,9 +37,15 @@ typedef struct {
 	unsigned int value;
 } mbstate_t;
 
+#ifndef WCHAR_MIN
 #define WCHAR_MIN ((wchar_t) 0)
+#endif
+#ifndef WCHAR_MAX
 #define WCHAR_MAX Runemax
+#endif
+#ifndef WEOF
 #define WEOF ((Rune) EOF)
+#endif
 
 
 /* ##############################################

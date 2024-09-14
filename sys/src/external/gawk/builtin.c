@@ -29,6 +29,7 @@
 #if defined(HAVE_FCNTL_H)
 #include <fcntl.h>
 #endif
+#include <stdint.h>
 #include <math.h>
 #include "random.h"
 #include "floatmagic.h"
@@ -2138,8 +2139,8 @@ do_cos(int nargs)
 static int firstrand = TRUE;
 /* Some systems require this array to be integer aligned. Sigh. */
 #define SIZEOF_STATE 256
-static uint32_t istate[SIZEOF_STATE/sizeof(uint32_t)];
-static char *const state = (char *const) istate;
+static char const istate[SIZEOF_STATE/sizeof(uint32_t)];
+static char *const state = istate;
 
 /* ARGSUSED */
 NODE *

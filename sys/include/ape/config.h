@@ -1,4 +1,9 @@
+#ifndef _CONFIG_H
+#define _CONFIG_H 1
+
+#ifndef PLAN9
 #define PLAN9
+#endif
 #include <_apetypes.h> /* for architecture-specific stuff */
 
 /* Define if the system does not provide POSIX.1 features except
@@ -290,6 +295,8 @@
 /* Define to 1 if you have the `memchr' function. */
 #define HAVE_MEMCHR 1
 
+#define HAVE_MEMCMP
+
 /* Define to 1 if you have the `memcpy' function. */
 #define HAVE_MEMCPY 1
 
@@ -297,7 +304,7 @@
 #define HAVE_MEMMOVE 1
 
 /* Define to 1 if you have the `mempcpy' function. */
-#define HAVE_MEMPCPY 1
+#undef HAVE_MEMPCPY
 
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
@@ -381,7 +388,7 @@
 #define HAVE_SIGACTION 1
 
 /* Define to 1 if you have the `sigsetmask' function. */
-#define HAVE_SIGSETMASK 1
+#undef HAVE_SIGSETMASK 
 
 /* Define to 1 if 'sig_atomic_t' is a signed integer type. */
 #define HAVE_SIGNED_SIG_ATOMIC_T 1
@@ -421,6 +428,7 @@
 
 /* Define to 1 if you have the `strcasecmp' function. */
 #define HAVE_STRCASECMP 1
+#define HAVE_STRNCASECMP 1
 
 /* Define to 1 if you have the `strchr' function. */
 #define HAVE_STRCHR 1
@@ -433,7 +441,7 @@
 #define HAVE_STRDUP 1
 
 /* Define if you have the strerror function.  */
-#define HAVE_STRERROR
+#define HAVE_STRERROR 1
 
 /* Define to 1 if you have the `strerror_r' function. */
 #define HAVE_STRERROR_R 1
@@ -623,6 +631,7 @@
 
 /* The number of bytes in a int.  */
 #define SIZEOF_INT sizeof(int)
+#define SIZEOF_UNSIGNED_INT sizeof(unsigned int)
 
 /* The number of bytes in a long.  */
 #define SIZEOF_LONG sizeof(long)
@@ -700,3 +709,6 @@
 #define __restrict__ /* nothing */
 #define _UC_RESTRICT /* nothing */
 #define DLL_VARIABLE /* nothing */
+
+#endif /* _CONFIG_H */
+

@@ -1,11 +1,11 @@
 </$objtype/mkfile
-
+APEXPROOT=../../../../../..
 FLEXSRC=../../../../external/flex
 
 nuke:V:
-	rm -f /sys/man/1/flex
+	rm -f $APEXPROOT/sys/man/1/flex
 	;
 
 install:V:
-	cp $FLEXSRC/doc/flex.1 /sys/man/1/flex
+	cp $FLEXSRC/doc/flex.1 $APEXPROOT/sys/man/1/flex
 
