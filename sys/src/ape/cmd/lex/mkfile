@@ -8,6 +8,7 @@ all:V:
 		@{ cd $i; mk }
 
 install:V:
+	bind -b $APEXPROOT/$objtype/lib/ape /$objtype/lib/ape
 	for (i in $DIRS)
 		@{ cd $i; mk $target }
 	cp $FLEXSRC/FlexLexer.h $APEXPROOT/sys/include/ape/

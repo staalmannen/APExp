@@ -2,7 +2,7 @@
 TARG=lex
 APEXPROOT=../../../../../..
 BIN=$APEXPROOT/$objtype/bin/ape
-LIB=$APEXPROOT/$objtype/lib/ape/libfl.a
+LIB=$APEXPROOT/$objtype/lib/ape/libfl.a $APEXPROOT/$objtype/lib/ape/libpcre2.a $APEXPROOT/$objtype/lib/ape/libap.a
 
 OFILES=	\
 	#src\
