@@ -171,7 +171,7 @@
 
 #ifdef _POSIX_SOURCE
 /* hack: depend on knowing bits out of stat.h for S_ISREG, etc. */
-#define S_IFMT	0170000
+//#define S_IFMT	0170000
 #define S_IFREG	0100000
 #define S_IFDIR	0040000
 #define S_IFCHR	0020000

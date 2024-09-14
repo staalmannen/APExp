@@ -1,4 +1,4 @@
-APE=../../ape
+APE=../..
 <$APE/config
 APEXPROOT=../../../../..
 TARG=pax
