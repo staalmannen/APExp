@@ -24,6 +24,11 @@ struct	stat {
 	time_t	st_ctime;
 };
 
+#define st_atim.tv_sec st_atime
+#define st_mtim.tv_sec st_mtime
+#define st_ctim.tv_sec st_ctime
+
+
 #define	S__MASK		     0170000
 #ifdef _RESEARCH_SOURCE
 #define S_ISLNK(m)	(((m)&S__MASK) == 0120000)

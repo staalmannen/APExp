@@ -1,0 +1,81 @@
+Sun 18 Dec 2022 21:04:40 IST
+============================
+
+Overall, for both Intel and ARM Mac systems, the best bet is to install
+gawk using homebrew or macports.  Building from source runs into problems
+with the readline library. On ARM systems, you need to use
+`./configure --with-readline=/opt/homebrew/opt/readline'. Otherwise,
+using the gawk debugger causes gawk to crash as soon as you enter a line
+at the `gawk>' prompt. On Intel systems, we could not find a way to
+build gawk so that it wouldn't crash; therefore you would have to use
+`./configure --without-readline' to get a usable debugger.  Sheesh.
+
+Sun 27 Nov 2022 14:54:06 EST
+============================
+
+Building an x86_64 binary on M1 systems was a bad idea. Not all systems
+have Rosetta installed, and there are still ppc and ppc64 systems out
+in the world. See https://trac.macports.org/ticket/66329.
+
+So for now, PMA in enabled for macOS only on x86_64.
+
+Sun 23 Oct 2022 14:24:37 IDT
+============================
+
+In order to use the new persistent memory feature, it's (currently) necessary
+to build gawk as a non-PIE (Position Independent Executable) binary. That
+is possible on Intel macOS systems, but not on Apple M1 systems. Such
+binaries are simply disallowed.
+
+*However*, M1 systems have x86_64 emulation capability, in order to be
+able to run old macOS binaries.  Thus, an Intel non-PIE executable works
+just fine on M1 systems. For that reason, on M1, we actually build an
+Intel binary, and everything "just works"! Woo hoo!
+
+This is a true hack. At some point it will probably stop working, but
+I'll worry about that when it happens.
+
+Fri Feb 23 10:38:05 IST 2018
+============================
+
+On PowerPC Macintosh, things are just weird.
+
+* Using the stock compiler, you can't build gawk (c99 mode) against MPFR;
+there is an issue with duplicate inline functions from GMP.  By default,
+I have disabled this compilation.
+
+* If you build GCC 4.2.4 and use that version of GCC, you can compile gawk
+with MPFR and the C99 settings.  But then the two readfile tests fail.
+The call to read(2) simply returns zero. I have no idea why.
+
+Since nobody but me has one of these left, I'm not going to mess
+with it anymore right now.
+
+Thu Jan 25 20:07:56 IST 2018
+============================
+
+You may need to explicitly tell configure where to find the GNU gettext
+header file and library with --with-libintl-prefix=...'. Otherwise,
+the nlstringtest test will fail.
+
+Mon Apr 13 09:49:40 IDT 2015
+============================
+
+I have reports of success on this compiler:
+
+$ gcc --version
+Configured with: --prefix=/Applications/Xcode.app/Contents/Developer/usr 
+--with-gxx-include-dir=/usr/include/c++/4.2.1
+Apple LLVM version 6.0 (clang-600.0.54) (based on LLVM 3.5svn)
+Target: x86_64-apple-darwin14.1.0
+Thread model: posix
+
+Thu Apr  9 10:39:26 IDT 2015
+============================
+
+There are reports of compilation issues on Mac OS X 10.10 (Yosemite).
+The only compiler reported to have produced a complete pass of
+"make check" is the MacPorts compiler, /opt/local/bin/clang-mp-3.5.
+
+Arnold Robbins
+arnold@skeeve.com

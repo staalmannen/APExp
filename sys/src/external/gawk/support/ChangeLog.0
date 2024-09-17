@@ -1,0 +1,226 @@
+2019-03-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* cdefs.h, dfa.c, dfa.h, intprops.h, libc-config.h, localeinfo.c,
+	localeinfo.h, regcomp.c, regex.c, regex.h, regex_internal.c,
+	regex_internal.h, regexec.c, verify.h, xalloc.h: Partial or
+	complete sync from GNULIB.
+
+2019-02-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regexec.c (proceed_next_node): Sync with GNULIB.
+
+2019-01-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am, regexec.c: Update copyright year.
+
+2019-01-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): Add cdefs.h and libc-config.h.
+
+2019-01-21         Paul Eggert           <eggert@cs.ucla.edu>
+
+	regex: fix read overrun
+	Problem found by AddressSanitizer, reported by Hongxu Chen in:
+	https://debbugs.gnu.org/cgi/34140
+	* regexec.c (proceed_next_node): Do not read past end of input buffer.
+
+2019-01-09         John E. Malmberg      <wb8tyw@qsl.net>
+
+	* cdefs.h, xalloc.h: For non GCC, have
+	__attribute__ definition match regex_internal.h exactly.
+
+2018-12-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	In a spirit of depressed resignation, synced regex
+	files with GNULIB and added new files needed to
+	get it to continue to compile. I lose.
+
+	* regcomp.c, regex.c, regex_internal.c, regex_internal.h,
+	regexec.c: Sync with GNULIB.
+	* libc-config.h, cdefs.h: New files.
+	
+2018-12-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c; Sync with GNULIB, bugfix for \b (\y in gawk)
+	in the C locale.
+
+2018-12-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (distclean-local): Remove .deps directory.
+
+2018-12-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.h, dfa.c: Sync with GNULIB.
+
+2018-10-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c (charclass_context): Remove unused function.
+
+2018-10-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Update from GNULIB.
+
+2018-09-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c, intprops.h: Sync from GNULIB.
+
+2018-09-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.in: Regenerated, using Automake 1.16.1.
+
+2018-09-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* intprops.h, verify.h: Updated from GNULIB.
+
+2018-08-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regex_internal.c: Sync with GNULIB.
+
+2018-08-22         Daniel Richard G.     <skunk@iSKUNK.ORG>
+
+	* regex_internal.h: Undefine additional macros in order
+	to compile on z/OS.
+
+2018-08-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNULIB.
+	* regcomp.c: Updated from GNULIB and proposed fix applied.
+
+2018-07-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regcomp.c, regex.c, regex.h, regex_internal.c, regex_internal.h,
+	regexec.c: Replaced with versions from GNULIB.
+
+2018-06-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c, intprops.h, localeinfo.c, localeinfo.h,
+	verify.h: Sync with GNULIB.
+
+2018-06-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regex_internal.h: Simplify undefining inline and defining to empty.
+	Thanks to Florian Weimer <fweimer@redhat.com> for the suggestion.
+
+2018-03-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* getopt.c: Update copyright year.
+
+2018-02-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.2.1: Release tar ball made.
+
+2017-12-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* getopt.c: Include <stdlib.h> to get declarations of
+	malloc and free.
+
+2017-12-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regex.h: Restore GLIBC's use of '__' in parameter names. They
+	have to be that way since public headers can't use identifiers that
+	users might define as macros.  At least now I understand why
+	things are the way they are.
+
+2017-12-19  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Small sync with gnulib based on mails in libc-alpha@sourceware.com.
+
+	Use re_malloc etc. consistently.
+
+	* regcomp.c (re_comp, analyze): Use re_malloc/re_free instead of
+	malloc/free.
+	* regexec.c (push_fail_stack): Use re_realloc instead of realloc.
+
+	Other changes:
+
+	* regex_internal.h: Synchronize on __libc_lock_define usage.
+
+2017-12-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regex.h: Yes define __USE_GNU. Needed for non-GLIBC systems.
+
+2017-12-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* intprops.h: Sync with GNULIB.
+	* regcomp.c (init_word): Move general_case label inside ifdef.
+	* regex.h: Don't define __USE_GNU. Brings closer to GLIBC regex.
+	* regex.c: Don't include gawkbool.h, we don't use it anymore.
+	* dfa.h: Ditto.
+
+2017-11-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regcomp.c regex_internal.c, regex_internal.h, regexec.c: Sync
+	with GLIBC.
+	* verfiy.h: Sync with GNULIB.
+
+2017-10-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.2.0: Release tar ball made.
+
+2017-10-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regex_internal.h: Minor fix from Andreas for OS/2.
+
+2017-08-27         Juan Manuel Guerrero  <juan.guerrero@gmx.de>
+
+	* localeinfo.c [__DJGPP__]: Include mbsupport.h.
+
+2017-06-25         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* dfa.c (dfaalloc): Replace xmalloc+memset with xzalloc.
+	* xalloc.h (xmalloc): New function moved here from gawkmisc.c.
+	(xcalloc): Replace xmalloc+memset with calloc.
+	(xzalloc): Replace xmalloc+memset with xcalloc.
+
+2017-06-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regcomp.c, regex.c, regex.h, regex_internal.c, regex_internal.h,
+	regexec.c: Sync with GLIBC.
+
+2017-06-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* intprops.h: Sync with GNULIB.
+
+2017-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c, dfa.h, intprops.h, verify.h: Sync with GNULIB.
+
+2017-03-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNULIB.
+	
+2017-01-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* localeinfo.h: Sync with GNULIB.
+	* localeinfo.c: Ditto.
+	* dfa.c: Ditto, to fix a memory leak.
+
+2017-01-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNULIB.
+
+2017-01-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNULIB.
+	Twice in one day!  Sigh.
+
+2017-01-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c: Sync with GNULIB.
+
+2016-12-27         Juergen Kahrs         <Juergen.Kahrs@googlemail.com>
+
+	* CMakeLists.txt: New file.
+
+2016-12-22         John E. Malmberg      <wb8tyw@qsl.net>
+
+	* dfa.c fixes for OpenVMS
+
+2016-12-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ChangeLog: Created.
+	* Makefile.am: New file.
+	* dfa.c, dfa.h, getopt.c, getopt.h, getopt1.c, getopt_int.h,
+	intprops.h, localeinfo.c, localeinfo.h, random.c, random.h,
+	regcomp.c, regex.c, regex.h, regex_internal.c, regex_internal.h,
+	regexec.c, verify.h, xalloc.h: Moved here from parent directory.

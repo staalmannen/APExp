@@ -5,14 +5,19 @@ APE=$APEXPROOT/sys/src/ape
 LIB=libutil.a$O libutf.a$O $APEXPROOT/$objtype/lib/ape/libap.a
 TARG= \
 		basename\
+		cat\
+		cmp\
 		cut\
 		dirname\
 		false\
 #		find\
 		kill\
-#		ls\
+		ls\
 		printf\
+		sort\
+#		test\
 		true\
+		tr\
 		tsort\
 		uname\
 #		which\
@@ -37,7 +42,7 @@ CPPFLAGS =\
 	-D_FILE_OFFSET_BITS=64
 
 SBASE_CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil -I$SBASESRC/../gnulib -D_POSIX_SOURCE -D_BSD_EXTENSION \
-		-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE -DS_ISVTX=S_IROTH -DSIGURG=24
+		-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE -DS_ISVTX=S_IROTH -DSIGURG=24 -DAT_EACCESS=NULL -DAT_FDCWD=NULL
 
 %.$O: $SBASESRC/%.c
 	$CC $SBASE_CFLAGS $SBASESRC/$stem.c

@@ -3,6 +3,8 @@
 	# 12/2010: Modified for gawk test suite to use a variable
 	# for the sort command and to use `sort -k1' instead of `sort +1'
 
+	# 10/2020: Bug fix applied to code.
+
         BEGIN {
 		if (sortcmd == "") sortcmd = "sort"		# "sort -k1"
 
@@ -121,15 +123,15 @@
                         else if ( line ~ /^}/ ) {
                                 tok = "}"; line = substr(line,2); return 3 }
 			# change regexes to use posix character classes
-                        else if ( match(line,/^[[:alpha:]_][[:alnum:]]*\[/) ) {
+                        else if ( match(line,/^[[:alpha:]_][[:alnum:]_]*\[/) ) {
                                 tok = substr(line,1,RLENGTH-1)
                                 line = substr(line,RLENGTH+1)
                                 return 5 }
-                        else if ( match(line,/^[[:alpha:]_][[:alnum:]]*\(/) ) {
+                        else if ( match(line,/^[[:alpha:]_][[:alnum:]_]*\(/) ) {
                                 tok = substr(line,1,RLENGTH-1)
                                 line = substr(line,RLENGTH+1)
                                 if ( ! ( tok in keywords ) ) return 6 }
-                        else if ( match(line,/^[[:alpha:]_][[:alnum:]]*/) ) {
+                        else if ( match(line,/^[[:alpha:]_][[:alnum:]_]*/) ) {
                                 tok = substr(line,1,RLENGTH)
                                 line = substr(line,RLENGTH+1)
                                 if ( ! ( tok in keywords ) ) return 4 }

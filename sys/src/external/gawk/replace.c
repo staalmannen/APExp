@@ -2,22 +2,22 @@
  * replace.c -- Get replacement versions of functions.
  */
 
-/* 
- * Copyright (C) 1989, 1991-2011 the Free Software Foundation, Inc.
- * 
+/*
+ * Copyright (C) 1989, 1991-2014, 2018, 2022, the Free Software Foundation, Inc.
+ *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
- * 
+ *
  * GAWK is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GAWK is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
@@ -27,8 +27,7 @@
  * Do all necessary includes here, so that we don't have to worry about
  * overlapping includes in the files in missing.d.
  */
-#include "config.h"
-#include "awk.h"
+#include "awk.h"	/* includes config.h for us */
 
 
 #ifndef HAVE_SYSTEM
@@ -51,7 +50,7 @@
 #include "missing_d/memmove.c"
 #endif	/* HAVE_MEMMOVE */
 
-#ifndef HAVE_STRNCASECMP
+#if !defined(HAVE_STRNCASECMP) || !defined(HAVE_STRCASECMP)
 #include "missing_d/strncasecmp.c"
 #endif	/* HAVE_STRCASE */
 
@@ -85,12 +84,16 @@
 #ifndef HAVE_TZSET
 #include "missing_d/tzset.c"
 #endif /* HAVE_TZSET */
- 
+
 #ifndef HAVE_MKTIME
 /* mktime.c defines main() if DEBUG is set */
 #undef DEBUG
 #include "missing_d/mktime.c"
 #endif /* HAVE_MKTIME */
+
+#ifndef HAVE_TIMEGM
+#include "missing_d/timegm.c"
+#endif /* HAVE_TIMEGM */
 
 #ifndef HAVE_SNPRINTF
 #include "missing_d/snprintf.c"
@@ -110,4 +113,8 @@
 
 #ifndef HAVE_STRCOLL
 #include "missing_d/strcoll.c"
+#endif
+
+#ifndef HAVE_STRSIGNAL
+#include "missing_d/strsignal.c"
 #endif

@@ -1,0 +1,56 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+</$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libedit.a
+
+OFILES=	chared.$O\
+		common.$O\
+		el.$O\
+		eln.$O\
+		emacs.$O\
+		hist.$O\
+		keymacro.$O\
+		map.$O\
+		chartype.$O\
+		parse.$O\
+		prompt.$O\
+		read.$O\
+		refresh.$O\
+		search.$O\
+		sig.$O\
+		terminal.$O\
+		tty.$O\
+		vi.$O\
+		reallocarr.$O\
+		wcsdup.$O\
+		tokenizer.$O\
+		tokenizern.$O\
+		history.$O\
+		historyn.$O\
+		filecomplete.$O\
+		readline.$O\
+		literal.$O\
+		strlcpy.$O\
+		strlcat.$O\
+		getline.$O\
+		vis.$O\
+		unvis.$O\
+
+HFILES=\
+		$APEXPROOT/sys/include/ape/editline/readline.h\
+		$APEXPROOT/sys/include/ape/histedit.h\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+EDITSRC=../../../external/libedit/src
+
+CC=pcc
+LD=pcc
+CFLAGS=-c -I. -I$APEXPROOT/sys/include/ape -I$EDITSRC -DHAVE_CONFIG_H -D_POSIX_SOURCE
+
+%.$O: $EDITSRC/%.c
+	$CC $CFLAGS $EDITSRC/$stem.c
+
+
+

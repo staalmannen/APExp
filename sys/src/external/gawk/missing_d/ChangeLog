@@ -1,5 +1,84 @@
-2011-06-23         Arnold D. Robbins     <arnold@skeeve.com>
+2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* ChangeLog.0: Rotated ChangeLog into this file.
-	* ChangeLog: Created anew for gawk 4.0.0 and on.
-	* 4.0.0: Release tar ball made.
+	* 5.3.0: Release tar ball made.
+
+2023-05-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.2: Release tar ball made.
+
+2023-04-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* strptime.c (strptime_internal): Rework a bit to use localtime()
+	instead of localtime_r(). This lets it work for MinGW and maybe
+	other systems. Thanks to Eli Zaretskii <eliz@gnu.org> for the report.
+
+2023-03-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* strptime.c: New file, from GNULIB, with a few slight mods.
+
+2022-11-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* strerror.c, system.c: Update to GPL 3. Move code to ISO C
+	style function definitions. Thanks to Corinna Vinschen for
+	noticing the GPL version issue.
+
+2022-11-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.1: Release tar ball made.
+
+2022-10-20  Paul Eggert  <eggert@cs.ucla.edu>
+
+	Port to current Gnulib
+	Adjust to current Gnulib, which uses C23 style keywords for bool,
+	true, false and static_assert, and assumes that <config.h>
+	supplies compatibility macros on older systems.
+
+	* missing_d/mktime.c: Sync from Gnulib.
+
+2022-09-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.0: Release tar ball made.
+
+2022-07-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* strsignal.c (strsignal): Fix return type to match Linux header.
+
+2022-07-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* strsignal.c: New file.
+
+2022-07-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* snprintf.c: Update copyright.
+
+2022-07-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* snprintf.c: Remove stuff related to __DJGPP__.
+
+2022-07-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* snprintf.c: Remove stuff related to __EMX__.
+
+2021-10-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.1.1: Release tar ball made.
+
+2020-06-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Miscellanious fixes from Michael Builov <mbuilov@gmail.com>.
+
+	* fnmatch.c (internal_fnmatch): Misc small fixes.
+
+2020-04-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.1.0: Release tar ball made.
+
+2019-06-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.0.1: Release tar ball made.
+
+2019-04-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ChangeLog.1: Rotated ChangeLog into this file.
+	* ChangeLog: Created anew for gawk 5.0.0 and on.
+	* 5.0.0: Release tar ball made.

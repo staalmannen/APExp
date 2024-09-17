@@ -27,7 +27,7 @@ BEGIN {
 		print "============"
 
 	}
-	
+
 	n = asorti(b)
 	for (i = 1; i <= n; i++)
 		printf("b[%d] = \"%s\"\n", i, b[i])

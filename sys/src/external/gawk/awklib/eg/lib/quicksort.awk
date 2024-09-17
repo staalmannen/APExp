@@ -1,13 +1,14 @@
 # quicksort.awk --- Quicksort algorithm, with user-supplied
 #                   comparison function
 #
-# Arnold Robbins, arnoldskeeve.com, Public Domain
+# Arnold Robbins, arnold@skeeve.com, Public Domain
 # January 2009
-# quicksort --- C.A.R. Hoare's quick sort algorithm. See Wikipedia
-#               or almost any algorithms or computer science text
+
+
+# quicksort --- C.A.R. Hoare's quicksort algorithm. See Wikipedia
+#               or almost any algorithms or computer science text.
 #
 # Adapted from K&R-II, page 110
-end ignore
 
 function quicksort(data, left, right, less_than,    i, last)
 {
@@ -26,7 +27,7 @@ function quicksort(data, left, right, less_than,    i, last)
 
 # quicksort_swap --- helper function for quicksort, should really be inline
 
-function quicksort_swap(data, i, j, temp)
+function quicksort_swap(data, i, j,      temp)
 {
     temp = data[i]
     data[i] = data[j]

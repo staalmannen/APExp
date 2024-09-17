@@ -3,8 +3,9 @@
 #
 # Arnold Robbins, arnold@skeeve.com, Public Domain
 # February, 2004
+# Revised June, 2014
 
-function mystrtonum(str,        ret, chars, n, i, k, c)
+function mystrtonum(str,        ret, n, i, k, c)
 {
     if (str ~ /^0[0-7]*$/) {
         # octal
@@ -12,12 +13,13 @@ function mystrtonum(str,        ret, chars, n, i, k, c)
         ret = 0
         for (i = 1; i <= n; i++) {
             c = substr(str, i, 1)
-            if ((k = index("01234567", c)) > 0)
-                k-- # adjust for 1-basing in awk
+            # index() returns 0 if c not in string,
+            # includes c == "0"
+            k = index("1234567", c)
 
             ret = ret * 8 + k
         }
-    } else if (str ~ /^0[xX][[:xdigit:]]+/) {
+    } else if (str ~ /^0[xX][[:xdigit:]]+$/) {
         # hexadecimal
         str = substr(str, 3)    # lop off leading 0x
         n = length(str)
@@ -25,10 +27,9 @@ function mystrtonum(str,        ret, chars, n, i, k, c)
         for (i = 1; i <= n; i++) {
             c = substr(str, i, 1)
             c = tolower(c)
-            if ((k = index("0123456789", c)) > 0)
-                k-- # adjust for 1-basing in awk
-            else if ((k = index("abcdef", c)) > 0)
-                k += 9
+            # index() returns 0 if c not in string,
+            # includes c == "0"
+            k = index("123456789abcdef", c)
 
             ret = ret * 16 + k
         }
@@ -50,8 +51,8 @@ function mystrtonum(str,        ret, chars, n, i, k, c)
 #     a[5] = "123.45"
 #     a[6] = "1.e3"
 #     a[7] = "1.32"
-#     a[7] = "1.32E2"
-# 
+#     a[8] = "1.32E2"
+#
 #     for (i = 1; i in a; i++)
 #         print a[i], strtonum(a[i]), mystrtonum(a[i])
 # }

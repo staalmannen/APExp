@@ -3,460 +3,842 @@
  *
  * Arnold Robbins
  * May 2009
+ * Redone June 2012
+ * Improved September 2017
+ * GMP/MPFR support added November 2021
  */
 
 /*
- * Copyright (C) 2009, 2010, 2011 the Free Software Foundation, Inc.
- * 
+ * Copyright (C) 2009-2014, 2017, 2018, 2020-2022
+ * the Free Software Foundation, Inc.
+ *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
- * 
+ *
  * GAWK is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GAWK is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#include "awk.h"
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+#include <stdio.h>
+#include <assert.h>
+#include <errno.h>
+#include <fcntl.h>
+#include <stdbool.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+
+#ifdef __MINGW32__
+#include <winsock2.h>
+#include <stdint.h>
+#else
 #include <arpa/inet.h>
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <fcntl.h>
 
+#ifdef HAVE_MPFR
+#include <gmp.h>
+#include <mpfr.h>
+#endif
+
+#include "gawkapi.h"
+
+#include "gettext.h"
+#define _(msgid)  gettext(msgid)
+#define N_(msgid) msgid
 
 #define MAGIC "awkrulz\n"
-#define MAJOR 1
-#define MINOR 0
+#define MAJOR 4
+#define MINOR 1
+
+static const gawk_api_t *api;	/* for convenience macros to work */
+static awk_ext_id_t ext_id;
+static const char *ext_version = "rwarray extension: version 2.1";
+static awk_bool_t (*init_func)(void) = NULL;
 
 int plugin_is_GPL_compatible;
 
-static int write_array(int fd, NODE *array);
-static int write_elem(int fd, int index, NODE *item);
-static int write_chain(int fd, int index, NODE *item);
-static int write_value(int fd, NODE *val);
+static awk_bool_t write_array(FILE *fp, awk_array_t array);
+static awk_bool_t write_elem(FILE *fp, awk_element_t *element);
+static awk_bool_t write_value(FILE *fp, awk_value_t *val);
+static awk_bool_t write_number(FILE *fp, awk_value_t *val);
 
-static int read_array(int fd, NODE *array);
-static NODE *read_elem(int fd, int *index, NODE *array);
-static NODE *read_value(int fd);
+#ifdef HAVE_MPFR
+typedef union {
+	mpz_t mpz_val;
+	mpfr_t mpfr_val;
+} value_storage;
+#else
+typedef int value_storage;	// should not be used
+#endif /* HAVE_MPFR */
+
+static awk_bool_t read_array(FILE *fp, awk_array_t array);
+static awk_bool_t read_elem(FILE *fp, awk_element_t *element, value_storage *);
+static awk_bool_t read_value(FILE *fp, awk_value_t *value, awk_value_t *idx, value_storage *vs);
+static awk_bool_t read_number(FILE *fp, awk_value_t *value, uint32_t code, value_storage *);
 
 /*
  * Format of array info:
  *
- * MAGIC	8 bytes
+ * MAGIC		8 bytes
  * Major version	4 bytes - network order
  * Minor version	4 bytes - network order
  * Element count	4 bytes - network order
- * Array size		4 bytes - network order
  * Elements
- * 
+ *
  * For each element:
- * Bucket number:	4 bytes - network order
- * Hash of index val:	4 bytes - network order
  * Length of index val:	4 bytes - network order
  * Index val as characters (N bytes)
- * Value type		1 byte (0 = string, 1 = number, 2 = array)
+ * Value type		4 bytes (see list below)
  * IF string:
  * 	Length of value	4 bytes
  * 	Value as characters (N bytes)
- * ELSE
+ * ELSE IF number:
  * 	8 bytes as native double
+ * ELSE
+ * 	Element count
+ * 	Elements
+ * END IF
  */
 
-/* do_writea --- write an array */
+#define VT_STRING	1
+#define VT_NUMBER	2
+#define VT_GMP		3
+#define VT_MPFR		4
+#define VT_ARRAY	5
+#define VT_REGEX	6
+#define VT_STRNUM	7
+#define VT_BOOL		8
+#define VT_UNDEFINED	20
 
-static NODE *
-do_writea(int nargs)
+/* write_backend --- write an array */
+
+static awk_value_t *
+write_backend(awk_value_t *result, awk_array_t array, const char *name)
 {
-	NODE *file, *array;
-	int ret;
-	int fd;
+	awk_value_t filename;
+	FILE *fp = NULL;
 	uint32_t major = MAJOR;
 	uint32_t minor = MINOR;
 
-	if (do_lint && get_curfunc_arg_count() > 2)
-		lintwarn("writea: called with too many arguments");
+	assert(result != NULL);
+	make_number(0.0, result);
 
-	/* directory is first arg, array to dump is second */
-	file = get_scalar_argument(0, FALSE);
-	array = get_array_argument(1, FALSE);
-
-	/* open the file, if error, set ERRNO and return */
-	(void) force_string(file);
-	fd = creat(file->stptr, 0600);
-	if (fd < 0) {
+	/* filename is first arg */
+	if (! get_argument(0, AWK_STRING, & filename)) {
+		warning(ext_id, _("%s: first argument is not a string"), name);
+		errno = EINVAL;
 		goto done1;
 	}
 
-	if (write(fd, MAGIC, strlen(MAGIC)) != strlen(MAGIC))
+	/* open the file, if error, set ERRNO and return */
+	fp = fopen(filename.str_value.str, "wb");
+	if (fp == NULL)
+		goto done1;
+
+	if (fwrite(MAGIC, 1, strlen(MAGIC), fp) != strlen(MAGIC))
 		goto done1;
 
 	major = htonl(major);
-	if (write(fd, & major, sizeof(major)) != sizeof(major))
+	if (fwrite(& major, 1, sizeof(major), fp) != sizeof(major))
 		goto done1;
 
 	minor = htonl(minor);
-	if (write(fd, & minor, sizeof(minor)) != sizeof(minor))
+	if (fwrite(& minor, 1, sizeof(minor), fp) != sizeof(minor))
 		goto done1;
 
-	ret = write_array(fd, array);
-	if (ret != 0)
-		goto done1;
-	ret = 0;
-	goto done0;
+	if (write_array(fp, array)) {
+		make_number(1.0, result);
+		fclose(fp);
+		return result;
+	}
 
 done1:
-	ret = -1;
-	update_ERRNO();
-	unlink(file->stptr);
+	update_ERRNO_int(errno);
+	if (fp != NULL) {
+		fclose(fp);
+		unlink(filename.str_value.str);
+	}
+	return result;
+}
 
-done0:
-	close(fd);
+/* do_writea --- write an array */
 
-	/* Set the return value */
-	return make_number((AWKNUM) ret);
+static awk_value_t *
+do_writea(int nargs, awk_value_t *result, struct awk_ext_func *unused)
+{
+	awk_value_t array;
+
+	if (! get_argument(1, AWK_ARRAY, & array)) {
+		warning(ext_id, _("writea: second argument is not an array"));
+		errno = EINVAL;
+		update_ERRNO_int(errno);
+		make_number(0.0, result);
+		return result;
+	}
+	return write_backend(result, array.array_cookie, "writea");
+}
+
+/* do_writeall --- write out SYMTAB */
+
+static awk_value_t *
+do_writeall(int nargs, awk_value_t *result, struct awk_ext_func *unused)
+{
+	awk_value_t array;
+
+	if (! sym_lookup("SYMTAB", AWK_ARRAY, & array)) {
+		warning(ext_id, _("writeall: unable to find SYMTAB array"));
+		errno = EINVAL;
+		update_ERRNO_int(errno);
+		make_number(0.0, result);
+		return result;
+	}
+	return write_backend(result, array.array_cookie, "writeall");
 }
 
 
 /* write_array --- write out an array or a sub-array */
 
-static int
-write_array(int fd, NODE *array)
+static awk_bool_t
+write_array(FILE *fp, awk_array_t array)
 {
-	int ret;
+	uint32_t i;
 	uint32_t count;
-	uint32_t array_sz;
-	int i;
+	awk_flat_array_t *flat_array;
 
-	count = htonl(array->table_size);
-	if (write(fd, & count, sizeof(count)) != sizeof(count))
-		return -1;
-
-	array_sz = htonl(array->array_size);
-	if (write(fd, & array_sz, sizeof(array_sz)) != sizeof(array_sz))
-		return -1;
-
-	for (i = 0; i < array->array_size; i++) {
-		ret = write_chain(fd, i, array->var_array[i]);
-		if (ret != 0)
-			return ret;
+	if (! flatten_array(array, & flat_array)) {
+		warning(ext_id, _("write_array: could not flatten array"));
+		return awk_false;
 	}
-	return 0;
-}
 
+	count = htonl(flat_array->count);
+	if (fwrite(& count, 1, sizeof(count), fp) != sizeof(count))
+		return awk_false;
 
-/* write_chain --- write out a whole hash chain */
+	for (i = 0; i < flat_array->count; i++) {
+		if (! write_elem(fp, & flat_array->elements[i])) {
+			(void) release_flattened_array(array, flat_array);
+			return awk_false;
+		}
+	}
 
-/*
- * Write elements in the chain in reverse order so that
- * when we read the elements back in we can just push them
- * onto the front and thus recreate the array as it was.
- */
+	if (! release_flattened_array(array, flat_array)) {
+		warning(ext_id, _("write_array: could not release flattened array"));
+		return awk_false;
+	}
 
-static int
-write_chain(int fd, int index, NODE *bucket)
-{
-	int ret;
-
-	if (bucket == NULL)
-		return 0;
-
-	ret = write_chain(fd, index, bucket->ahnext);
-	if (ret != 0)
-		return ret;
-
-	return write_elem(fd, index, bucket);
+	return awk_true;
 }
 
 /* write_elem --- write out a single element */
 
-static int
-write_elem(int fd, int index, NODE *item)
+static awk_bool_t
+write_elem(FILE *fp, awk_element_t *element)
 {
-	uint32_t hashval, indexval_len;
+	uint32_t indexval_len;
+	ssize_t write_count;
 
-	index = htonl(index);
-	if (write(fd, & index, sizeof(index)) != sizeof(index))
-		return -1;
+	indexval_len = htonl(element->index.str_value.len);
+	if (fwrite(& indexval_len, 1, sizeof(indexval_len), fp) != sizeof(indexval_len))
+		return awk_false;
 
-	hashval = htonl(item->ahcode);
-	if (write(fd, & hashval, sizeof(hashval)) != sizeof(hashval))
-		return -1;
-
-	indexval_len = htonl(item->ahname_len);
-	if (write(fd, & indexval_len, sizeof(indexval_len)) != sizeof(indexval_len))
-		return -1;
-
-	if (write(fd, item->ahname_str, item->ahname_len) != item->ahname_len)
-		return -1;
-
-	return write_value(fd, item->ahvalue);
-}
-
-/* write_value --- write a number or a string or a array */
-
-static int
-write_value(int fd, NODE *val)
-{
-	int code, len;
-
-	if (val->type == Node_var_array) {
-		code = htonl(2);
-		if (write(fd, & code, sizeof(code)) != sizeof(code))
-			return -1;
-		return write_array(fd, val);
+	if (element->index.str_value.len > 0) {
+		write_count = fwrite(element->index.str_value.str,
+				1, element->index.str_value.len, fp);
+		if (write_count != (ssize_t) element->index.str_value.len)
+			return awk_false;
 	}
 
-	if ((val->flags & NUMBER) != 0) {
-		code = htonl(1);
-		if (write(fd, & code, sizeof(code)) != sizeof(code))
-			return -1;
+	return write_value(fp, & element->value);
+}
 
-		if (write(fd, & val->numbr, sizeof(val->numbr)) != sizeof(val->numbr))
-			return -1;
+/* write_value --- write a number or a string or a strnum or a regex or an array */
+
+static awk_bool_t
+write_value(FILE *fp, awk_value_t *val)
+{
+	uint32_t code, len;
+
+	if (val->val_type == AWK_ARRAY) {
+		code = htonl(VT_ARRAY);
+		if (fwrite(& code, 1, sizeof(code), fp) != sizeof(code))
+			return awk_false;
+		return write_array(fp, val->array_cookie);
+	}
+
+	if (val->val_type == AWK_NUMBER)
+		return write_number(fp, val);
+
+	switch (val->val_type) {
+	case AWK_STRING:
+		code = htonl(VT_STRING);
+		break;
+	case AWK_STRNUM:
+		code = htonl(VT_STRNUM);
+		break;
+	case AWK_REGEX:
+		code = htonl(VT_REGEX);
+		break;
+	case AWK_BOOL:
+		code = htonl(VT_BOOL);
+		break;
+	case AWK_UNDEFINED:
+		code = htonl(VT_UNDEFINED);
+		break;
+	default:
+		/* XXX can this happen? */
+		code = htonl(VT_UNDEFINED);
+		warning(ext_id, _("array value has unknown type %d"), val->val_type);
+		break;
+	}
+
+	if (fwrite(& code, 1, sizeof(code), fp) != sizeof(code))
+		return awk_false;
+
+	if (code == ntohl(VT_BOOL)) {
+		len = (val->bool_value == awk_true ? 4 : 5);
+		len = htonl(len);
+		const char *s = (val->bool_value == awk_true ? "TRUE" : "FALSE");
+
+		if (fwrite(& len, 1, sizeof(len), fp) != sizeof(len))
+			return awk_false;
+
+		if (fwrite(s, 1, strlen(s), fp) != (ssize_t) strlen(s))
+			return awk_false;
 	} else {
-		code = 0;
-		if (write(fd, & code, sizeof(code)) != sizeof(code))
-			return -1;
+		len = htonl(val->str_value.len);
+		if (fwrite(& len, 1, sizeof(len), fp) != sizeof(len))
+			return awk_false;
 
-		len = htonl(val->stlen);
-		if (write(fd, & len, sizeof(len)) != sizeof(len))
-			return -1;
-
-		if (write(fd, val->stptr, val->stlen) != val->stlen)
-			return -1;
+		if (fwrite(val->str_value.str, 1, val->str_value.len, fp)
+				!= (ssize_t) val->str_value.len)
+			return awk_false;
 	}
-
-	return 0;
+	return awk_true;
 }
 
-/* do_reada --- read an array */
+/* write_number --- write a double, GMP or MPFR number */
 
-static NODE *
-do_reada(int nargs)
+static awk_bool_t
+write_number(FILE *fp, awk_value_t *val)
 {
-	NODE *file, *array;
-	int ret;
-	int fd;
+	uint32_t len, code;
+	char buffer[BUFSIZ];
+
+	if (val->num_type == AWK_NUMBER_TYPE_DOUBLE) {
+		uint32_t network_order_len;
+
+		code = htonl(VT_NUMBER);
+		if (fwrite(& code, 1, sizeof(code), fp) != sizeof(code))
+			return awk_false;
+
+		// for portability, save double precision number as a string
+		sprintf(buffer, "%.17g", val->num_value);
+		len = strlen(buffer) + 1;	// get trailing '\0' too...
+		network_order_len = htonl(len);
+
+		if (fwrite(& network_order_len, 1, sizeof(len), fp) != sizeof(len))
+			return awk_false;
+
+		if (fwrite(buffer, 1, len, fp) != len)
+			return awk_false;
+	} else {
+#ifdef HAVE_MPFR
+		if (val->num_type == AWK_NUMBER_TYPE_MPFR) {
+			code = htonl(VT_MPFR);
+			if (fwrite(& code, 1, sizeof(code), fp) != sizeof(code))
+				return awk_false;
+
+#ifdef USE_MPFR_FPIF
+			/*
+			 * This would be preferable, but it is not available
+			 * on older platforms with mpfr 3.x. It's also marked
+			 * experimental in mpfr 4.1, so perhaps not ready for
+			 * production use yet.
+			 */
+			if (mpfr_fpif_export(fp, val->num_ptr) != 0)
+#else
+#define MPFR_STR_BASE	62	   /* maximize base to minimize string len */
+#define MPFR_STR_ROUND	mpfr_get_default_rounding_mode()
+			/*
+			 * Does the choice of rounding mode matter, given
+			 * that the precision is 0, so we should be rendering
+			 * in full precision?
+			 */
+			// We need to write a terminating space, since
+			// mpfr_inp_str reads until it hits a space or EOF
+			if ((mpfr_out_str(fp, MPFR_STR_BASE, 0, val->num_ptr, MPFR_STR_ROUND) == 0) || (putc(' ', fp) == EOF))
+#endif
+				return awk_false;
+		} else {
+			code = htonl(VT_GMP);
+			if (fwrite(& code, 1, sizeof(code), fp) != sizeof(code))
+				return awk_false;
+
+			if (mpz_out_raw(fp, val->num_ptr) == 0)
+				return awk_false;
+		}
+#else
+		fatal(ext_id, _("rwarray extension: received GMP/MPFR value but compiled without GMP/MPFR support."));
+#endif
+	}
+	// all the OK cases fall through to here
+	return awk_true;
+}
+
+/* free_value --- release memory for ignored global variables */
+
+static void
+free_value(awk_value_t *v)
+{
+	switch (v->val_type) {
+	case AWK_ARRAY:
+		destroy_array(v->array_cookie);
+		break;
+	case AWK_STRING:
+	case AWK_REGEX:
+	case AWK_STRNUM:
+	case AWK_UNDEFINED:
+		gawk_free(v->str_value.str);
+		break;
+	case AWK_BOOL:
+		/* no memory allocated */
+		break;
+	case AWK_NUMBER:
+		switch (v->num_type) {
+		case AWK_NUMBER_TYPE_DOUBLE:
+			/* no memory allocated */
+			break;
+#ifdef HAVE_MPFR
+		case AWK_NUMBER_TYPE_MPZ:
+			mpz_clear(v->num_ptr);
+			break;
+		case AWK_NUMBER_TYPE_MPFR:
+			mpfr_clear(v->num_ptr);
+			break;
+#endif /* HAVE_MPFR */
+		default:
+			warning(ext_id, _("cannot free number with unknown type %d"), v->num_type);
+			break;
+		}
+		break;
+	default:
+		warning(ext_id, _("cannot free value with unhandled type %d"), v->val_type);
+		break;
+	}
+}
+
+/* do_poke --- create a global variable */
+
+static awk_bool_t
+do_poke(awk_element_t *e)
+{
+	awk_value_t t;
+
+	if (e->index.val_type != AWK_STRING)
+		return awk_false;
+	/*
+	 * So this is a bit tricky. If the program refers to the variable,
+	 * then it will already exist in an undefined state after parsing.
+	 * If the program never refers to it, then the lookup fails.
+	 * We still need to create it in case the program accesses it via
+	 * indirection through the SYMTAB table.
+	 */
+	// it's even trickier, we need to handle foo::bar as well
+	char *p = strstr(e->index.str_value.str, "::");
+	char *ns, *ident;
+	if (p != NULL) {
+		ns = e->index.str_value.str;
+		ident = p + 2;
+		*p = '\0';
+	} else {
+		ns = "";
+		ident = e->index.str_value.str;
+	}
+
+	if (sym_lookup_ns(ns, ident, AWK_UNDEFINED, & t)
+	    && (t.val_type != AWK_UNDEFINED))
+		return awk_false;
+
+	if (! sym_update_ns(ns, ident, & e->value)) {
+		if (ns[0])
+			warning(ext_id, _("readall: unable to set %s::%s"), ns, ident);
+		else
+			warning(ext_id, _("readall: unable to set %s"), ident);
+		return awk_false;
+	}
+	return awk_true;
+}
+
+/* read_global --- read top-level variables dumped from SYMTAB */
+
+static awk_bool_t
+read_global(FILE *fp, awk_array_t unused)
+{
+	uint32_t i;
+	uint32_t count;
+	awk_element_t new_elem;
+	value_storage vs;
+
+	if (fread(& count, 1, sizeof(count), fp) != sizeof(count))
+		return awk_false;
+
+	count = ntohl(count);
+
+	for (i = 0; i < count; i++) {
+		if (read_elem(fp, & new_elem, &vs)) {
+			if (! do_poke(& new_elem))
+				free_value(& new_elem.value);
+			if (new_elem.index.str_value.len)
+				/* free string allocated by make_const_string */
+				gawk_free(new_elem.index.str_value.str);
+		} else
+			return awk_false;
+	}
+
+	return awk_true;
+}
+
+/* read_one --- read one array */
+
+static awk_bool_t
+read_one(FILE *fp, awk_array_t array)
+{
+	if (! clear_array(array)) {
+		errno = ENOMEM;
+		warning(ext_id, _("reada: clear_array failed"));
+		return awk_false;
+	}
+
+	return read_array(fp, array);
+}
+
+/* read_backend --- common code for reada and readall */
+
+static awk_value_t *
+read_backend(awk_value_t *result, awk_array_t array, const char *name, awk_bool_t (*func)(FILE *, awk_array_t))
+{
+	awk_value_t filename;
+	FILE *fp = NULL;
 	uint32_t major;
 	uint32_t minor;
 	char magic_buf[30];
 
-	if (do_lint && get_curfunc_arg_count() > 2)
-		lintwarn("reada: called with too many arguments");
+	assert(result != NULL);
+	make_number(0.0, result);
 
-	/* directory is first arg, array to dump is second */
-	file = get_scalar_argument(0, FALSE);
-	array = get_array_argument(1, FALSE);
-
-	(void) force_string(file);
-	fd = open(file->stptr, O_RDONLY);
-	if (fd < 0) {
+	/* filename is first arg */
+	if (! get_argument(0, AWK_STRING, & filename)) {
+		warning(ext_id, _("%s: first argument is not a string"), name);
+		errno = EINVAL;
 		goto done1;
 	}
 
+	fp = fopen(filename.str_value.str, "rb");
+	if (fp == NULL)
+		goto done1;
+
 	memset(magic_buf, '\0', sizeof(magic_buf));
-	if (read(fd, magic_buf, strlen(MAGIC)) != strlen(MAGIC)) {
+	if (fread(magic_buf, 1, strlen(MAGIC), fp) != strlen(MAGIC)) {
+		errno = EBADF;
 		goto done1;
 	}
 
 	if (strcmp(magic_buf, MAGIC) != 0) {
+		errno = EBADF;
 		goto done1;
 	}
 
-	if (read(fd, & major, sizeof(major)) != sizeof(major)) {
+	if (fread(& major, 1, sizeof(major), fp) != sizeof(major)) {
+		errno = EBADF;
 		goto done1;
 	}
 	major = ntohl(major);
 
 	if (major != MAJOR) {
+		errno = EBADF;
 		goto done1;
 	}
 
-	if (read(fd, & minor, sizeof(minor)) != sizeof(minor)) {
+	if (fread(& minor, 1, sizeof(minor), fp) != sizeof(minor)) {
+		/* read() sets errno */
 		goto done1;
 	}
+
 	minor = ntohl(minor);
 	if (minor != MINOR) {
+		errno = EBADF;
 		goto done1;
 	}
 
-	assoc_clear(array);
-
-	ret = read_array(fd, array);
-	if (ret == 0)
+	if ((*func)(fp, array)) {
+		make_number(1.0, result);
 		goto done0;
+	}
 
 done1:
-	ret = -1;
-	update_ERRNO();
-
+	update_ERRNO_int(errno);
 done0:
-	close(fd);
+	if (fp != NULL)
+		fclose(fp);
+	return result;
+}
 
-	/* Set the return value */
-	return make_number((AWKNUM) ret);
+/* do_reada --- read an array */
+
+static awk_value_t *
+do_reada(int nargs, awk_value_t *result, struct awk_ext_func *unused)
+{
+	awk_value_t array;
+
+	if (! get_argument(1, AWK_ARRAY, & array)) {
+		warning(ext_id, _("reada: second argument is not an array"));
+		errno = EINVAL;
+		update_ERRNO_int(errno);
+		make_number(0.0, result);
+		return result;
+	}
+	return read_backend(result, array.array_cookie, "read", read_one);
+}
+
+/* do_readall --- read top-level variables */
+
+static awk_value_t *
+do_readall(int nargs, awk_value_t *result, struct awk_ext_func *unused)
+{
+	return read_backend(result, NULL, "readall", read_global);
 }
 
 
 /* read_array --- read in an array or sub-array */
 
-static int
-read_array(int fd, NODE *array)
+static awk_bool_t
+read_array(FILE *fp, awk_array_t array)
 {
-	int i;
+	uint32_t i;
 	uint32_t count;
-	uint32_t array_sz;
-	int index;
-	NODE *new_elem;
+	awk_element_t new_elem;
+	value_storage vs;
 
-	if (read(fd, & count, sizeof(count)) != sizeof(count)) {
-		return -1;
-	}
-	array->table_size = ntohl(count);
+	if (fread(& count, 1, sizeof(count), fp) != sizeof(count))
+		return awk_false;
 
-	if (read(fd, & array_sz, sizeof(array_sz)) != sizeof(array_sz)) {
-		return -1;
-	}
-	array->array_size = ntohl(array_sz);
+	count = ntohl(count);
 
-	/* malloc var_array */
-	array->var_array = (NODE **) malloc(array->array_size * sizeof(NODE *));
-	memset(array->var_array, '\0', array->array_size * sizeof(NODE *));
-
-	for (i = 0; i < array->table_size; i++) {
-		if ((new_elem = read_elem(fd, & index, array)) != NULL) {
-			new_elem->ahnext = array->var_array[index];
-			array->var_array[index] = new_elem;
+	for (i = 0; i < count; i++) {
+		if (read_elem(fp, & new_elem, &vs)) {
+			/* add to array */
+			if (! set_array_element_by_elem(array, & new_elem)) {
+				warning(ext_id, _("read_array: set_array_element failed"));
+				return awk_false;
+			}
 		} else
 			break;
 	}
-	if (i != array->table_size)
-		return -1; 
-	return 0;
-}
 
+	if (i != count)
+		return awk_false;
+
+	return awk_true;
+}
 
 /* read_elem --- read in a single element */
 
-static NODE *
-read_elem(int fd, int *the_index, NODE *array)
+static awk_bool_t
+read_elem(FILE *fp, awk_element_t *element, value_storage *vs)
 {
-	uint32_t hashval, indexval_len, index;
-	NODE *item;
-	NODE *val;
-	int ret;
+	uint32_t index_len;
+	static char *buffer;
+	static uint32_t buflen;
+	ssize_t ret;
 
-	*the_index = 0;
-
-	if ((ret = read(fd, & index, sizeof(index))) != sizeof(index)) {
-		return NULL;
+	if ((ret = fread(& index_len, 1, sizeof(index_len), fp)) != sizeof(index_len)) {
+		return awk_false;
 	}
-	*the_index = index = ntohl(index);
+	index_len = ntohl(index_len);
 
-	getnode(item);
-	memset(item, 0, sizeof(*item));
-	item->type = Node_ahash;
-	item->flags = MALLOC;
+	memset(element, 0, sizeof(*element));
 
-	if (read(fd, & hashval, sizeof(hashval)) != sizeof(hashval)) {
-		return NULL;
-	}
+	if (index_len > 0) {
+		if (buffer == NULL) {
+			/* allocate buffer */
+			emalloc(buffer, char *, index_len, "read_elem");
+			buflen = index_len;
+		} else if (buflen < index_len) {
+			/* reallocate buffer */
+			char *cp = gawk_realloc(buffer, index_len);
 
-	item->ahcode = ntohl(hashval);
+			if (cp == NULL)
+				return awk_false;
 
-	if (read(fd, & indexval_len, sizeof(indexval_len)) != sizeof(indexval_len)) {
-		return NULL;
-	}
-	item->ahname_len = ntohl(indexval_len);
+			buffer = cp;
+			buflen = index_len;
+		}
 
-	item->ahname_str = malloc(item->ahname_len + 2);
-	if (read(fd, item->ahname_str, item->ahname_len) != item->ahname_len) {
-		return NULL;
-	}
-	item->ahname_str[item->ahname_len] = '\0';
-	item->ahname_ref = 1;
-
-	item->ahvalue = val = read_value(fd);
-	if (val == NULL) {
-		return NULL;
-	}
-	if (val->type == Node_var_array) {
-		char *aname;
-		size_t aname_len;
-
-		/* construct the sub-array name */
-		aname_len = strlen(array->vname) + item->ahname_len + 4;
-		emalloc(aname, char *, aname_len + 2, "read_elem");
-		sprintf(aname, "%s[\"%.*s\"]", array->vname, (int) item->ahname_len, item->ahname_str);
-		val->vname = aname;
+		if (fread(buffer, 1, index_len, fp) != (ssize_t) index_len) {
+			return awk_false;
+		}
+		make_const_string(buffer, index_len, & element->index);
+	} else {
+		make_null_string(& element->index);
 	}
 
-	return item;
+	if (! read_value(fp, & element->value, & element->index, vs))
+		return awk_false;
+
+	return awk_true;
 }
 
 /* read_value --- read a number or a string */
 
-static NODE *
-read_value(int fd)
+static awk_bool_t
+read_value(FILE *fp, awk_value_t *value, awk_value_t *idx, value_storage *vs)
 {
-	NODE *val;
-	int code, len;
+	uint32_t code, len;
 
-	getnode(val);
-	memset(val, 0, sizeof(*val));
-	val->type = Node_val;
+	if (fread(& code, 1, sizeof(code), fp) != sizeof(code))
+		return awk_false;
 
-	if (read(fd, & code, sizeof(code)) != sizeof(code)) {
-		return NULL;
-	}
 	code = ntohl(code);
 
-	if (code == 2) {
-		val->type = Node_var_array;
-		if (read_array(fd, val) != 0)
-			return NULL; 
-	} else if (code == 1) {
-		if (read(fd, & val->numbr, sizeof(val->numbr)) != sizeof(val->numbr)) {
-			return NULL;
-		}
+	if (code == VT_ARRAY) {
+		awk_array_t array = create_array();
 
-		val->flags = NUMBER|NUMCUR|MALLOC;
+		if (! read_array(fp, array))
+			return awk_false;
+
+		/* hook into value */
+		value->val_type = AWK_ARRAY;
+		value->array_cookie = array;
+	} else if (code == VT_NUMBER
+		   || code == VT_GMP
+		   || code == VT_MPFR) {
+		return read_number(fp, value, code, vs);
 	} else {
-		if (read(fd, & len, sizeof(len)) != sizeof(len)) {
-			return NULL;
+		if (fread(& len, 1, sizeof(len), fp) != sizeof(len)) {
+			return awk_false;
 		}
-		val->stlen = ntohl(len);
-		val->stptr = malloc(val->stlen + 2);
-		memset(val->stptr, '\0', val->stlen + 2);
-
-		if (read(fd, val->stptr, val->stlen) != val->stlen) {
-			return NULL;
+		len = ntohl(len);
+		switch (code) {
+		case VT_STRING:
+			value->val_type = AWK_STRING;
+			break;
+		case VT_REGEX:
+			value->val_type = AWK_REGEX;
+			break;
+		case VT_STRNUM:
+			value->val_type = AWK_STRNUM;
+			break;
+		case VT_UNDEFINED:
+			value->val_type = AWK_UNDEFINED;
+			break;
+		case VT_BOOL:
+			value->val_type = AWK_BOOL;
+			break;
+		default:
+			/* this cannot happen! */
+			warning(ext_id, _("treating recovered value with unknown type code %d as a string"), code);
+			value->val_type = AWK_STRING;
+			break;
 		}
+		value->str_value.len = len;
+		value->str_value.str = gawk_malloc(len + 1);
 
-		val->flags = STRING|STRCUR|MALLOC;
+		if (fread(value->str_value.str, 1, len, fp) != (ssize_t) len) {
+			gawk_free(value->str_value.str);
+			return awk_false;
+		}
+		value->str_value.str[len] = '\0';
+		value->str_value.len = len;
+
+		if (code == VT_BOOL) {
+			bool val = (strcmp(value->str_value.str, "TRUE") == 0);
+
+			gawk_free(value->str_value.str);
+			value->str_value.str = NULL;
+			value->bool_value = val ? awk_true : awk_false;
+		}
 	}
 
-	return val;
+	return awk_true;
 }
 
-/* dlload --- load new builtins in this library */
+/* read_number --- read a double, GMP, or MPFR number */
 
-NODE *
-dlload(tree, dl)
-NODE *tree;
-void *dl;
+static awk_bool_t
+read_number(FILE *fp, awk_value_t *value, uint32_t code, value_storage *vs)
 {
-	make_builtin("writea", do_writea, 2);
-	make_builtin("reada", do_reada, 2);
+	uint32_t len;
 
-	return make_number((AWKNUM) 0);
+	if (code == VT_NUMBER) {
+		char buffer[BUFSIZ];
+		double d;
+
+		if (fread(& len, 1, sizeof(len), fp) != sizeof(len))
+			return awk_false;
+
+		len = ntohl(len);
+		if (fread(buffer, 1, len, fp) != len)
+			return awk_false;
+
+		(void) sscanf(buffer, "%lg", & d);
+
+		/* hook into value */
+		value = make_number(d, value);
+	} else {
+#ifdef HAVE_MPFR
+		if (code == VT_GMP) {
+			mpz_init(vs->mpz_val);
+    			if (mpz_inp_raw(vs->mpz_val, fp) == 0)
+				return awk_false;
+
+			value = make_number_mpz(vs->mpz_val, value);
+		} else {
+			mpfr_init(vs->mpfr_val);
+#ifdef USE_MPFR_FPIF
+			/* preferable if widely available and stable */
+			if (mpfr_fpif_import(vs->mpfr_val, fp) != 0)
+#else
+			// N.B. need to consume the terminating space we wrote
+			// after mpfr_out_str
+			if ((mpfr_inp_str(vs->mpfr_val, fp, MPFR_STR_BASE, MPFR_STR_ROUND) == 0) || (getc(fp) != ' '))
+#endif
+				return awk_false;
+
+			value = make_number_mpfr(vs->mpfr_val, value);
+		}
+#else
+		fatal(ext_id, _("rwarray extension: GMP/MPFR value in file but compiled without GMP/MPFR support."));
+#endif
+	}
+
+	return awk_true;
 }
+
+static awk_ext_func_t func_table[] = {
+	{ "writea", do_writea, 2, 2, awk_false, NULL },
+	{ "reada", do_reada, 2, 2, awk_false, NULL },
+	{ "writeall", do_writeall, 1, 1, awk_false, NULL },
+	{ "readall", do_readall, 1, 1, awk_false, NULL },
+};
+
+
+/* define the dl_load function using the boilerplate macro */
+
+dl_load_func(func_table, rwarray, "")

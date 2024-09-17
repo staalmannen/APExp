@@ -23,6 +23,11 @@ extern "C" {
 extern struct passwd *getpwuid(uid_t);
 extern struct passwd *getpwnam(const char *);
 
+/* make these functions */
+extern struct passwd *getpwent(void);
+extern void setpwent(void);
+extern void endpwent(void);
+
 #ifdef __cplusplus
 }
 #endif

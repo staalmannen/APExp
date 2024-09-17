@@ -90,6 +90,9 @@
 /* Define if you have the clock_gettime function. */
 #define HAVE_CLOCK_GETTIME 1
 
+/* Define to 1 if you have the <curses.h> header file. */
+#define HAVE_CURSES_H 1
+
 /* Define to 1 if you have the declaration of `__sys_siglist', and to 0 if you
    don't. */
 #define HAVE_DECL___SYS_SIGLIST 0
@@ -190,10 +193,13 @@
 #define HAVE_DUP2 1
 
 /* Define to 1 if you have the <editline/readline.h> header file. TODO */
-/* #undef HAVE_EDITLINE_READLINE_H */
+#define HAVE_EDITLINE_READLINE_H 1
 
 /* Define to 1 if you have the <edit/readline/readline.h> header file. TODO*/
 /* #undef HAVE_EDIT_READLINE_READLINE_H */
+
+/* Define to 1 if you have the 'endpwent' function. */
+#define HAVE_ENDPWENT 1
 
 /* Define to 1 if you have the <errno.h> header file. */
 #define HAVE_ERRNO_H 1
@@ -215,6 +221,9 @@
 
 /* Define to 1 if you have the `fork' function. */
 #define HAVE_FORK 1
+
+/* have getaddrinfo */
+#define HAVE_GETADDRINFO 1
 
 /* Define if you have the getcwd function.  */
 #define HAVE_GETCWD 1
@@ -254,6 +263,10 @@
 
 /* pthread library */
 #define HAVE_LIBPTHREAD 1
+
+
+/* Define to 1 if you have the 'curses' library (-lcurses). */
+#define HAVE_LIBCURSES 1
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
@@ -433,6 +446,9 @@
 /* Define to 1 if you have the `strchr' function. */
 #define HAVE_STRCHR 1
 
+/* Define to 1 if you have the 'strcspn' function. */
+#define HAVE_STRCSPN 1
+
 /* Define to 1 if you have the `strcoll' function and it is properly defined.
    */
 #define HAVE_STRCOLL 1
@@ -452,8 +468,17 @@
 /* Define to 1 if cpp supports the ANSI # stringizing operator. */
 #define HAVE_STRINGIZE 1
 
+/* Define to 1 if you have the <strings.h> header file. */
+#define HAVE_STRINGS_H 1
+
+/* Define to 1 if you have the <string.h> header file. */
+#define HAVE_STRING_H 1
+
+/* Define to 1 if you have the 'strrchr' function. */
+#define HAVE_STRRCHR 1
+
 /* Define if you have the strstr function.  */
-#define HAVE_STRSTR
+#define HAVE_STRSTR 1
 
 /* Define to 1 if you have the `strtod' function. */
 #define HAVE_STRTOD 1
@@ -474,6 +499,9 @@
 
 /* Define if you have the <sys/file.h> header file.  */
 #define HAVE_SYS_FILE_H 1
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#define HAVE_SYS_IOCTL_H 1
 
 /* Define to 1 if you have the <sys/param.h> header file. */
 #define HAVE_SYS_PARAM_H 1
@@ -501,6 +529,9 @@
 
 /* Define if you have the tcsetpgrp function.  */
 #define HAVE_TCSETPGRP 1
+
+/* Define to 1 if you have the <term.h> header file. */
+#define HAVE_TERM_H 1
 
 /* Define if you have a sane <termios.h> header file */
 #define HAVE_TERMIOS_H 1
@@ -670,6 +701,7 @@
 /* gnulib, compiler and C compatibility stuff */
 
 
+#define __STDC_ISO_10646__ 1
 
 /* Define if your compiler conforms to the ANSI C standard. */
 #define HAVE_ANSI_COMPILER 1

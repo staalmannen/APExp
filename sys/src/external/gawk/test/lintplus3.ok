@@ -1,0 +1,7 @@
+gawk: lintplus3.awk:1: warning: `typeof' is a gawk extension
+3 strnum strnum
+strnum strnum 3
+gawk: lintplus3.awk:1: (FILENAME=- FNR=2) warning: operator `+' used on two string values
+0 string string
+gawk: lintplus3.awk:2: (FILENAME=- FNR=2) warning: operator `+' used on two string values
+string string 0

@@ -1,26 +1,66 @@
 </$objtype/mkfile
-MKFILES=gawk pdgawk dgawk
-
+TARG=gawk
 APEXPROOT=../../../../..
+BIN=$APEXPROOT/$objtype/bin/ape
+
+OFILES=	array.$O\
+		awkgram.$O\
+		builtin.$O\
+		cint_array.$O\
+		command.$O\
+		debug.$O\
+		eval.$O\
+		ext.$O\
+		field.$O\
+		floatcomp.$O\
+		gawkapi.$O\
+		int_array.$O\
+		io.$O\
+		main.$O\
+		mpfr.$O\
+		msg.$O\
+		node.$O\
+		profile.$O\
+		re.$O\
+		replace.$O\
+		str_array.$O\
+		symbol.$O\
+		version.$O\
+#posix \
+		gawkmisc.$O\
+#support \
+		dfa.$O\
+		getopt.$O\
+		getopt1.$O\
+		regcomp.$O\
+		random.$O
+
+<$APEXPROOT/sys/src/cmd/mkone
+
 GAWKSRC=../../../external/gawk
 
+CC=pcc
+LD=pcc
+CFLAGS=-c -I. -I$GAWKSRC -I$GAWKSRC/support -DGAWK \
+		-DHAVE_CONFIG_H -DGETGROUPS_NOT_STANDARD
+
+%.$O: $GAWKSRC/%.c
+	$CC $CFLAGS $GAWKSRC/$stem.c
+
+%.$O: $GAWKSRC/support/%.c
+	$CC $CFLAGS $GAWKSRC/support/$stem.c
+
+
 install:V:
-	for (i in $MKFILES)
-		@{ rm -f $O.out; mk -f mkfile.$i $target; rm -f $O.out }
 	mkdir -p $APEXPROOT/sys/lib/ape/awk
 	cp $GAWKSRC/awklib/eg/lib/*.awk $APEXPROOT/sys/lib/ape/awk/
 	cp $GAWKSRC/awklib/eg/prog/igawk.sh $APEXPROOT/rc/bin/ape/igawk
 	chmod +x $APEXPROOT/rc/bin/ape/igawk
 	cp $GAWKSRC/doc/gawk.1 $APEXPROOT/sys/man/1/gawk
 	cp $GAWKSRC/doc/igawk.1 $APEXPROOT/sys/man/1/igawk
-
-clean:V:
-	for (i in $MKFILES)
-		@{ rm -f $O.out; mk -f mkfile.$i $target; rm -f $O.out }
+	cp $BIN/gawk $BIN/awk
 
 nuke:V:
-	for (i in $MKFILES)
-		@{ mk -f mkfile.$i $target }
 	rm -rf $APEXPROOT/sys/lib/ape/awk
 	rm -f  $APEXPROOT/rc/bin/ape/igawk
 	rm -f $APEXPROOT/sys/man/1/gawk

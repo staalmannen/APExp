@@ -1,57 +1,179 @@
-Add debugger commands to reference card
-Review all FIXME and TODO comments
+Mon 16 Oct 2023 16:48:39 IDT
+============================
 
-FIX regular field splitting to use FPAT algorithm.
+There were too many files tracking different thoughts and ideas for
+things to do, or consider doing.  This file merges them into one. As
+tasks are completed, they should be removed.
 
-Look at function order within files.
+This file should exist only in the master branch or branches based off
+of it for development, but not in the stable branch. This may require some
+careful work with Git.
 
-regex.h - remove underscores in param names (for 4.1)
+TODO
+====
 
-Really make failure to open a socket a non-fatal error (for 4.1).
+Minor Cleanups and Code Improvements
+------------------------------------
 
-?? Scope IDs for IPv6 addresses ??
+	Tzvetelin Katchov <katchov@gnu.org> points out the following:
 
-------
+	- Clean up file and directory permissions to 0644 and 0755
+	across the board.
 
-Code Review:
-awkgram.y
-awkprintf.h
-cmd.h
-command.y
-debug.c
-eval.c
-ext.c
-field.c
-floatcomp.c
-floatmagic.h
-gawkmisc.c
-io.c
-profile.c
-protos.h
+	- Use consistent #! lines in awk scripts in the test suite.
 
-DONE:
-awk.h
-array.c
-builtin.c
-node.c
-mbsupport.h
-xalloc.h
-version.c
-re.c
-replace.c
-msg.c
-hard-locale.h
-custom.h
-main.c
+	- Double check uses of xxx:: targets in the test suite Makefile,
+	maybe only one colon is needed.
 
-------
+	- The commas, mbstr1 and mbstr2 tests should probably be moved
+	into the locale tests.
 
-Add in gawk/mp
+	API:
+		??? #if !defined(GAWK) && !defined(GAWK_OMIT_CONVENIENCE_MACROS)
 
-Design and implement I/O plugin API.
+	?? Add debugger commands to reference card
 
-Implement C function call API per man pages
+	Look at function order within files.
 
-xgawk features (@load, -l, others)
+	Consider removing use of and/or need for the protos.h file.
 
-Add tests for patches in emails
+	Fully synchronize whitespace tests (for \s, \S in Unicode
+	environment) with those of GNU grep.
+
+	Lint option which would allow extensions and only complain
+	about genuine errors.
+
+	Go through the FIXMEs in the manual and fix as many as possible.
+
+	In the test suite, don't run locale tests if the locale aren't
+	available.
+
+	In the test suite, use grep -E if no egrep or egrep produces
+	a warning.
+
+Minor New Features
+------------------
+
+	Enable command line source text in the debugger.
+
+	Enhance extension/fork.c waitpid to allow the caller to specify
+	the options.  And add an optional array argument to wait and
+	waitpid in which to return exit status information.
+
+	Consider relaxing the strictness of --posix.
+
+	Enhance --lint=invalid to apply in more places.
+
+	? Add an optional base to strtonum, allowing 2-36.
+
+	? Optional third argument for index indicating where to start the
+	search.
+
+	Suggested by Jannick:
+	* It is possible to make gawk look for a file with extension name
+	plus API version number(s) in case a shared lib with the expected
+	basename cannot be found?  This would help have extension versions
+	compiled against different API versions in one single directory
+	and make gawk pick the extension with the right API version.
+
+Major New Features
+------------------
+
+	Think about how to generalize indirect access. Manuel Collado
+	suggests things like
+
+		foo = 5
+		@"foo" += 4
+
+	Also needed:
+
+		Indirect through array elements, not just scalar variables
+
+	Add ability to do decimal arithmetic.
+
+	Rework management of array index storage. (Partially DONE.)
+
+	Consider using an atom table for all string array indices.
+
+	DBM storage of awk arrays. Try to allow multiple dbm packages.
+
+	?? A RECLEN variable for fixed-length record input. PROCINFO["RS"]
+	would be "RS" or "RECLEN" depending upon what's in use.
+	*** Could this be done as an extension?
+
+	?? Use a new or improved dfa and/or regex library.
+
+	Rewrite in C++.
+
+Things To Think About That May Never Happen
+-------------------------------------------
+
+	Consider making shadowed variables a warning and not
+	a fatal warning when --lint=fatal.
+
+	Similar for extra parameters in a function call.
+
+	Look at code coverage tools, like S2E: https://s2e.epfl.ch/
+	
+	Try running with diehard. See http://www.diehard-software.org,
+	https://github.com/emeryberger/DieHard
+
+	Include a sample rpm spec file in a new packaging subdirectory.
+	(Really needed?)
+
+	Patch lexer for @include and @load to make quotes optional.
+	(Really needed?)
+
+	Add a lint check if the return value of a function is used but
+	the function did not supply a value.
+
+	Consider making gawk output +nan for NaN values so that it
+	will accept its own output as input.
+		NOTE: Investigated this.  GLIBC formats NaN as '-nan'
+		and -NaN as 'nan'.  Dealing with this is not simple.
+
+	Review the bash source script for working with shared libraries in
+	order to nuke the use of libtool. [ Partially started in the
+	dead-branches/nolibtool branch. ]
+
+Things That We Decided We Will Never Do
+=======================================
+
+	See if something like  b = a "" can be optimized to not do
+	a concatenation, but instead just set STRCUR on a.
+	(Tried this; the type of b doesn't come out correctly.)
+
+	Consider moving var_value info into Node_var itself to reduce
+	memory usage. This would break all uses of get_lhs in the
+	code. It's too sweeping a change.
+
+	Add macros for working with flags instead of using & and |
+	directly.
+
+	FIX regular field splitting to use FPAT algorithm.
+		Note: Looked at this. Not sure it's with the trouble:
+		If it ain't broke...
+
+	Scope IDs for IPv6 addresses
+
+	Gnulib
+
+	Make FIELDWIDTHS be an array?
+
+	"Do an optimization pass over parse tree?"
+	This isn't relevant now that we are using a byte code engine.
+
+	"Consider integrating Fred Fish's DBUG library into gawk."
+	I did this once as an experiment. But I don't see a lot of value
+	to this at this stage of the development. Stepping through things
+	in a debugger is generally enough. Also, I would have to try to
+	track down the latest version of this.
+
+	"Make 	awk '/foo/' files...	run at egrep speeds" (How?)
+	This has been on the list since the early days (gawk 1.x or early
+	2.x).  But I am not sure how to really do this, nor have I done
+	timings, nor does there seem to be any real demand for this.
+
+	Change from dlopen to using the libltdl library (i.e. lt_dlopen).
+	This may support more platforms.  If we move off of libtool
+	then this is the wrong direction.

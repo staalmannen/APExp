@@ -49,8 +49,13 @@
 	BEGIN {
 	    clear_array(table)
 	    foo(table)
+	    # 3/2022: This was the original. Use of 'k' in the print was
+	    # undoubtedly a typo but it helped find a bug, so let's
+	    # make it for real
+	    # for (key in table)
+	    # 	print key, table[k]
 	    for (key in table)
-		print key, table[k]
+		print key, table[key], "<" table[k] ">"
 	    clear_array(table)
 	    exit(0)
 	}

@@ -1,0 +1,23 @@
+ 5c 0a
+ 5c 0a
+ 5c 0a
+ 5c 0a
+ 5c 0a
+ 5c 0a
+gawk: cmd. line:2: warning: invalid `\u' escape sequence
+gawk: cmd. line:3: warning: invalid `\u' escape sequence
+ 3f 0a 3f 0a
+gawk: cmd. line:2: warning: invalid `\u' escape sequence
+right: literal ? is literal
+gawk: cmd. line:2: warning: invalid `\u' escape sequence
+gawk: cmd. line:5: warning: invalid `\u' escape sequence
+gawk: cmd. line:8: warning: invalid `\u' escape sequence
+1 == 1
+gawk: cmd. line:3: warning: invalid `\u' escape sequence
+1 == 1
+0 == 0
+gawk: cmd. line:6: warning: invalid `\u' escape sequence
+0 == 0
+0 == 0
+gawk: cmd. line:9: warning: invalid `\u' escape sequence
+0 == 0

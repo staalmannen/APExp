@@ -149,7 +149,7 @@ function polaz2yawpitch(polar, az) {
 #			x = cos (phi)
 #			y = sin (phi) * cos (theta)
 #			add2output( atan2(y,x)*180 / pi * 60 )
-		
+
 		if(az == 90 || az ==270 )
 			add2output( 0 )
 		else 
@@ -168,15 +168,15 @@ function polaz2yawpitch(polar, az) {
 # FAM_x; FAM_y;  FAM_z
 	   	if((offset_y == 0) && (offset_z == 0)){
 			add2output( fullradius - radius * cos (phi) )
-	
+
 			if (az == 90 || az ==270) 
 				add2output( 0 )
 			else
 				add2output(  radius * sin (phi) * cos (theta) )
-			
+
 			if (az == 0 || az == 180)
 				add2output( 0 )
-			else		
+			else
 				add2output( - radius * sin (phi) * sin (theta) )
 	   	} else {
 # ******* THIS SEGMENT OF CODE IS NOT MATHEMATICALLY CORRECT FOR ****
@@ -238,7 +238,7 @@ function tight_na() {
 			}
 			config = "HRMA/" grating
 		}
-	
+
 		if( detector ~ /ACIS|HRC/ ) {
 			detsys = detector
 			nsub = sub("-", ",", detsys)

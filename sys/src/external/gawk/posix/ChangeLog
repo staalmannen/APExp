@@ -1,5 +1,73 @@
-2011-06-23         Arnold D. Robbins     <arnold@skeeve.com>
+2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* ChangeLog.0: Rotated ChangeLog into this file.
-	* ChangeLog: Created anew for gawk 4.0.0 and on.
-	* 4.0.0: Release tar ball made.
+	* 5.3.0: Release tar ball made.
+
+2023-10-31         Corinna Vinschen      <vinschen@redhat.com>
+
+	* gawkmisc.c (wcitomb): New function for Cygwin.
+
+2023-05-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.2: Release tar ball made.
+
+2023-04-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c: Update copyright year.
+
+2022-11-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c: Update to GPL 3.  Thanks to Corinna Vinschen for
+	noticing the GPL version issue.
+
+2022-11-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.1: Release tar ball made.
+
+2022-11-17         Jannick               <thirdedition@gmx.net>
+
+	* gawkmisc.c: Restore some removed #include lines for CYGWIN.
+	These are needed for MSYS2 compilation.
+
+2022-09-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.0: Release tar ball made.
+
+2022-07-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c: Update copyright.
+
+2022-05-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (CYGWIN): Remove unecessary includes, leaving only
+	include of <io.h>.  Thanks to Tom Gray <tom_gray@keysight.com>
+	for the report.
+
+2021-12-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (os_maybe_set_errno): New, empty function.
+
+2021-10-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.1.1: Release tar ball made.
+
+2021-01-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (quote): Make const char *.
+	(defpath): Make const char *.
+	(deflibpath): Make const char *.
+	(envsep): Make const char *.
+	(gawk_name): Now returns const char *.
+
+2020-04-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.1.0: Release tar ball made.
+
+2019-06-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.0.1: Release tar ball made.
+
+2019-04-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ChangeLog.1: Rotated ChangeLog into this file.
+	* ChangeLog: Created anew for gawk 5.0.0 and on.
+	* 5.0.0: Release tar ball made.

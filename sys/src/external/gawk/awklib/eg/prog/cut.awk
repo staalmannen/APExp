@@ -4,24 +4,21 @@
 # May 1993
 
 # Options:
+#    -c list     Cut characters
 #    -f list     Cut fields
 #    -d c        Field delimiter character
-#    -c list     Cut characters
 #
 #    -s          Suppress lines without the delimiter
 #
 # Requires getopt() and join() library functions
 
-function usage(    e1, e2)
+function usage()
 {
-    e1 = "usage: cut [-f list] [-d c] [-s] [files...]"
-    e2 = "usage: cut [-c list] [files...]"
-    print e1 > "/dev/stderr"
-    print e2 > "/dev/stderr"
+    print("usage: cut [-f list] [-d c] [-s] [files...]") > "/dev/stderr"
+    print("       cut [-c list] [files...]") > "/dev/stderr"
     exit 1
 }
-BEGIN    \
-{
+BEGIN {
     FS = "\t"    # default
     OFS = FS
     while ((c = getopt(ARGC, ARGV, "sf:c:d:")) != -1) {
@@ -34,16 +31,16 @@ BEGIN    \
             OFS = ""
         } else if (c == "d") {
             if (length(Optarg) > 1) {
-                printf("Using first character of %s" \
+                printf("cut: using first character of %s" \
                        " for delimiter\n", Optarg) > "/dev/stderr"
                 Optarg = substr(Optarg, 1, 1)
             }
-            FS = Optarg
+            fs = FS = Optarg
             OFS = FS
             if (FS == " ")    # defeat awk semantics
                 FS = "[ ]"
         } else if (c == "s")
-            suppress++
+            suppress = 1
         else
             usage()
     }
@@ -75,7 +72,7 @@ function set_fieldlist(        n, m, i, j, k, f, g)
         if (index(f[i], "-") != 0) { # a range
             m = split(f[i], g, "-")
             if (m != 2 || g[1] >= g[2]) {
-                printf("bad field list: %s\n",
+                printf("cut: bad field list: %s\n",
                                   f[i]) > "/dev/stderr"
                 exit 1
             }
@@ -86,7 +83,7 @@ function set_fieldlist(        n, m, i, j, k, f, g)
     }
     nfields = j - 1
 }
-function set_charlist(    field, i, j, f, g, t,
+function set_charlist(    field, i, j, f, g, n, m, t,
                           filler, last, len)
 {
     field = 1   # count total fields
@@ -96,7 +93,7 @@ function set_charlist(    field, i, j, f, g, t,
         if (index(f[i], "-") != 0) { # range
             m = split(f[i], g, "-")
             if (m != 2 || g[1] >= g[2]) {
-                printf("bad character list: %s\n",
+                printf("cut: bad character list: %s\n",
                                f[i]) > "/dev/stderr"
                 exit 1
             }
@@ -126,7 +123,7 @@ function set_charlist(    field, i, j, f, g, t,
     nfields = j - 1
 }
 {
-    if (by_fields && suppress && index($0, FS) != 0)
+    if (by_fields && suppress && index($0, fs) == 0)
         next
 
     for (i = 1; i <= nfields; i++) {

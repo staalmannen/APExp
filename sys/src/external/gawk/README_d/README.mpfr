@@ -1,0 +1,70 @@
+Sun 03 Jul 2022 02:51:58 PM IDT
+===============================
+
+As mentioned in the NEWS file and documented in a little more detail
+in the manual, the MPFR feature is "on parole". This means that the
+gawk maintainer (Arnold ROobins) is no longer fixing bugs in the code
+or dealing with it.  However, a member of the gawk development team has
+volunteered to maintain this code.
+
+As long as this situation works, the MPFR feature will remain part of
+the gawk code base. If it changes, then MPFR support will be TOTALLY
+REMOVED from the next subsequent gawk release.
+
+-------------------------- DJGPP -----------------------------------
+
+2017-11-13
+==========
+The DJGPP port of Gawk has been compiled and tested using the
+following combinations of MPFR and GMP versions on FreeDOS and
+other versions of the DOS operating system:
+GNU MPFR 3.1.6, GNU MP 6.1.2
+
+Precompiled binaries of GMP and MPFR for DJGPP are available
+from DJ Delorie's ftp server and mirrors:
+
+    http://www.delorie.com/pub/djgpp/current/v2gnu/gmp612b.zip
+    http://www.delorie.com/pub/djgpp/current/v2gnu/mpfr316b.zip
+
+No previous versions of these libraries are supported.
+Newer versions should work.
+
+------------------------- Mac OS X on PPC -------------------------------
+
+Sat Mar 17 07:32:01 CDT 2012
+=============================
+
+The MPFR and GMP versions known to work for Mac OS X on PPC:
+GNU MPFR 3.1.0, GNU MP 4.3.1
+
+Wed Nov 15 21:57:29 IST 2017
+============================
+
+As of gawk 4.2, MPFR is no longer supported on Mac OS X on PPC.
+Gawk switched to C99, and the last PPC version doesn't play well
+with C99.
+
+------------------------ Windows MinGW ----------------------------
+
+Precompiled binaries for GMP and MPFR in Windows may be available
+from here:
+
+    http://sourceforge.net/projects/ezwinports/files/
+
+or here:
+
+    http://sourceforge.net/projects/mingw/files/MinGW/Base/mpfr/
+    http://sourceforge.net/projects/mingw/files/MinGW/Base/gmp/
+
+You should try to use libraries downloaded from the same site
+to avoid possible incompatibilities.
+
+------------------------- GNU/Linux --------------------------------
+
+Gawk has been compiled and tested using the following combinations
+of MPFR and GMP versions on GNU/Linux:
+GNU MPFR 2.4.2, GNU MP 4.3.2
+GNU MPFR 3.1.0, GNU MP 5.0.2, 5.0.3
+GNU MPFR 3.1.4, GNU MP 6.1.0
+GNU MPFR 4.0.1, GNU MP 6.1.2
+GNU MPFR 4.0.2, GNU MP 6.2.0

@@ -1,0 +1,20 @@
+Fri Sep  7 10:34:54 IDT 2018
+============================
+
+I have a report that Alpine Linux uses BusyBox for its utilities. In
+particular, the BusyBox ls does not have a -f option. This option is
+needed in at least one of the tests.
+
+Install coreutils on your Alpine Linux system:
+
+	apk add coreutils
+
+in order to get a fully POSIX-compliant ls.
+
+Similarly, 'make diffout' fails because BusyBox diff doesn't accept
+the -c option.  To get a working diff, use:
+
+	apk add diffutils
+
+Arnold Robbins
+arnold@skeeve.com

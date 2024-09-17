@@ -1,85 +1,62 @@
 /*
- * eval.c - gawk bytecode interpreter 
+ * eval.c - gawk bytecode interpreter
  */
 
-/* 
- * Copyright (C) 1986, 1988, 1989, 1991-2011 the Free Software Foundation, Inc.
- * 
+/*
+ * Copyright (C) 1986, 1988, 1989, 1991-2019, 2021, 2022, 2023,
+ * the Free Software Foundation, Inc.
+ *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
- * 
+ *
  * GAWK is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GAWK is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
 #include "awk.h"
+#include <math.h>
 
-extern void after_beginfile(IOBUF **curfile);
-extern double pow(double x, double y);
-extern double modf(double x, double *yp);
-extern double fmod(double x, double y);
-NODE **fcall_list;
-long fcall_count;
+NODE **fcall_list = NULL;
+long fcall_count = 0;
 int currule = 0;
 IOBUF *curfile = NULL;		/* current data file */
-int exiting = FALSE;
+bool exiting = false;
 
-#ifdef DEBUGGING
-extern int pre_execute(INSTRUCTION **);
-extern void post_execute(INSTRUCTION *);
-#else
-#define r_interpret interpret
-#endif
+int (*interpret)(INSTRUCTION *);
+#define MAX_EXEC_HOOKS	10
+static int num_exec_hook = 0;
+static Func_pre_exec pre_execute[MAX_EXEC_HOOKS];
+static Func_post_exec post_execute = NULL;
 
-/*
- * Flag which executable this is; done here because eval.c is compiled
- * differently for each of them.
- */
-enum exe_mode which_gawk =
-#ifdef PROFILING
-			   exe_profiling	/* pgawk */
-#else
-# ifdef DEBUGGING
-			   exe_debugging	/* dgawk */     
-# else
-			   exe_normal		/* normal gawk */   
-# endif
-#endif
-			   ;	/* which_gawk */
+static double fix_nan_sign(double left, double right, double result);
 
-#if __GNUC__ < 2
-NODE *_t;		/* used as a temporary in macros */
-#endif
+extern void frame_popped();
+
 int OFSlen;
 int ORSlen;
 int OFMTidx;
 int CONVFMTidx;
 
-/* Profiling stuff */
-#ifdef PROFILING
-#define INCREMENT(n)	n++
-#else
-#define INCREMENT(n)	/* nothing */
-#endif
+static NODE *node_Boolean[2];
 
 /* This rather ugly macro is for VMS C */
 #ifdef C
 #undef C
 #endif
-#define C(c) ((char)c)  
+#define C(c) ((char)c)
 /*
- * This table is used by the regexp routines to do case independant
+ * This table is used by the regexp routines to do case independent
  * matching. Basically, every ascii character maps to itself, except
  * uppercase letters map to lower case ones. This table has 256
  * entries, for ISO 8859-1. Note also that if the system this
@@ -128,6 +105,12 @@ char casetable[] = {
 	'\170', '\171', '\172', '\173', '\174', '\175', '\176', '\177',
 
 	/* Latin 1: */
+	/*
+	 * 4/2019: This is now overridden; in single byte locales
+	 * we call load_casetable from main and it fills in the values
+	 * based on the current locale. In particular, we want LC_ALL=C
+	 * to work correctly for values >= 0200.
+	 */
 	C('\200'), C('\201'), C('\202'), C('\203'), C('\204'), C('\205'), C('\206'), C('\207'),
 	C('\210'), C('\211'), C('\212'), C('\213'), C('\214'), C('\215'), C('\216'), C('\217'),
 	C('\220'), C('\221'), C('\222'), C('\223'), C('\224'), C('\225'), C('\226'), C('\227'),
@@ -145,7 +128,7 @@ char casetable[] = {
 	C('\360'), C('\361'), C('\362'), C('\363'), C('\364'), C('\365'), C('\366'), C('\367'),
 	C('\370'), C('\371'), C('\372'), C('\373'), C('\374'), C('\375'), C('\376'), C('\377'),
 };
-#elif 'a' == 0x81 /* it's EBCDIC */
+#elif defined(USE_EBCDIC)
 char casetable[] = {
  /*00  NU    SH    SX    EX    PF    HT    LC    DL */
       0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
@@ -225,23 +208,20 @@ load_casetable(void)
 {
 #if defined(LC_CTYPE)
 	int i;
-	char *cp;
-	static int loaded = FALSE;
+	static bool loaded = false;
 
 	if (loaded || do_traditional)
 		return;
 
-	loaded = TRUE;
-	cp = setlocale(LC_CTYPE, NULL);
+	loaded = true;
 
-	/* this is not per standard, but it's pretty safe */
-	if (cp == NULL || strcmp(cp, "C") == 0 || strcmp(cp, "POSIX") == 0)
-		return;
-
-#ifndef ZOS_USS
+#ifndef USE_EBCDIC
+	/* use of isalpha is ok here (see is_alpha in awkgram.y) */
 	for (i = 0200; i <= 0377; i++) {
 		if (isalpha(i) && islower(i) && i != toupper(i))
 			casetable[i] = toupper(i);
+		else
+			casetable[i] = i;
 	}
 #endif
 #endif
@@ -260,11 +240,15 @@ static const char *const nodetypes[] = {
 	"Node_var",
 	"Node_var_array",
 	"Node_var_new",
+	"Node_elem_new",
 	"Node_param_list",
 	"Node_func",
-	"Node_hashnode",
-	"Node_ahash",
+	"Node_ext_func",
+	"Node_builtin_func",
 	"Node_array_ref",
+	"Node_array_tree",
+	"Node_array_leaf",
+	"Node_dump_array",
 	"Node_arrayfor",
 	"Node_frame",
 	"Node_instruction",
@@ -305,12 +289,14 @@ static struct optypetab {
 	{ "Op_postincrement", "++" },
 	{ "Op_postdecrement", "--" },
 	{ "Op_unary_minus", "-" },
+	{ "Op_unary_plus", "+" },
 	{ "Op_field_spec", "$" },
 	{ "Op_not", "! " },
 	{ "Op_assign", " = " },
 	{ "Op_store_var", " = " },
 	{ "Op_store_sub", " = " },
 	{ "Op_store_field", " = " },
+	{ "Op_store_field_exp", " = " },
 	{ "Op_assign_times", " *= " },
 	{ "Op_assign_quotient", " /= " },
 	{ "Op_assign_mod", " %= " },
@@ -331,7 +317,7 @@ static struct optypetab {
 	{ "Op_match", " ~ " },
 	{ "Op_match_rec", NULL },
 	{ "Op_nomatch", " !~ " },
-	{ "Op_rule", NULL }, 
+	{ "Op_rule", NULL },
 	{ "Op_K_case", "case" },
 	{ "Op_K_default", "default" },
 	{ "Op_K_break", "break" },
@@ -342,17 +328,22 @@ static struct optypetab {
 	{ "Op_K_next", "next" },
 	{ "Op_K_exit", "exit" },
 	{ "Op_K_return", "return" },
+	{ "Op_K_return_from_eval", "return" },
 	{ "Op_K_delete", "delete" },
 	{ "Op_K_delete_loop", NULL },
 	{ "Op_K_getline_redir", "getline" },
 	{ "Op_K_getline", "getline" },
 	{ "Op_K_nextfile", "nextfile" },
+	{ "Op_K_namespace", "@namespace" },
 	{ "Op_builtin", NULL },
+	{ "Op_sub_builtin", NULL },
+	{ "Op_ext_builtin", NULL },
 	{ "Op_in_array", " in " },
 	{ "Op_func_call", NULL },
 	{ "Op_indirect_func_call", NULL },
 	{ "Op_push", NULL },
 	{ "Op_push_arg", NULL },
+	{ "Op_push_arg_untyped", NULL },
 	{ "Op_push_i", NULL },
 	{ "Op_push_re", NULL },
 	{ "Op_push_array", NULL },
@@ -373,13 +364,15 @@ static struct optypetab {
 	{ "Op_var_update", NULL },
 	{ "Op_var_assign", NULL },
 	{ "Op_field_assign", NULL },
+	{ "Op_subscript_assign", NULL },
 	{ "Op_after_beginfile", NULL },
 	{ "Op_after_endfile", NULL },
-	{ "Op_ext_func", NULL },
 	{ "Op_func", NULL },
+	{ "Op_comment", NULL },
 	{ "Op_exec_count", NULL },
 	{ "Op_breakpoint", NULL },
 	{ "Op_lint", NULL },
+	{ "Op_lint_plus", NULL },
 	{ "Op_atexit", NULL },
 	{ "Op_stop", NULL },
 	{ "Op_token", NULL },
@@ -394,6 +387,7 @@ static struct optypetab {
 	{ "Op_K_else", "else" },
 	{ "Op_K_function", "function" },
 	{ "Op_cond_exp", NULL },
+	{ "Op_parens", NULL },
 	{ "Op_final --- this should never appear", NULL },
 	{ NULL, NULL },
 };
@@ -412,7 +406,7 @@ nodetype2str(NODETYPE type)
 	return buf;
 }
 
-/* opcode2str --- convert a opcode type into a printable value */
+/* opcode2str --- convert an opcode type into a printable value */
 
 const char *
 opcode2str(OPCODE op)
@@ -422,6 +416,8 @@ opcode2str(OPCODE op)
 	fatal(_("unknown opcode %d"), (int) op);
 	return NULL;
 }
+
+/* op2str --- convert an opcode type to corresponding operator or keyword */
 
 const char *
 op2str(OPCODE op)
@@ -445,20 +441,25 @@ flags2str(int flagval)
 {
 	static const struct flagtab values[] = {
 		{ MALLOC, "MALLOC" },
-		{ PERM, "PERM" },
 		{ STRING, "STRING" },
 		{ STRCUR, "STRCUR" },
 		{ NUMCUR, "NUMCUR" },
 		{ NUMBER, "NUMBER" },
-		{ MAYBE_NUM, "MAYBE_NUM" },
-		{ ARRAYMAXED, "ARRAYMAXED" },
-		{ FUNC, "FUNC" },
-		{ FIELD, "FIELD" },
+		{ USER_INPUT, "USER_INPUT" },
+		{ BOOLVAL, "BOOL" },
 		{ INTLSTR, "INTLSTR" },
-		{ NUMIND, "NUMIND" },
-#ifdef WSTRCUR
+		{ NUMINT, "NUMINT" },
+		{ INTIND, "INTIND" },
 		{ WSTRCUR, "WSTRCUR" },
-#endif
+		{ MPFN,	"MPFN" },
+		{ MPZN,	"MPZN" },
+		{ NO_EXT_SET, "NO_EXT_SET" },
+		{ NULL_FIELD, "NULL_FIELD" },
+		{ ARRAYMAXED, "ARRAYMAXED" },
+		{ HALFHAT, "HALFHAT" },
+		{ XARRAY, "XARRAY" },
+		{ NUMCONSTSTR, "NUMCONSTSTR" },
+		{ REGEX, "REGEX" },
 		{ 0,	NULL },
 	};
 
@@ -483,7 +484,7 @@ genflags2str(int flagval, const struct flagtab *tab)
 			 * the '|' character.
 			 */
 			space_needed = (strlen(tab[i].name) + (sp != buffer));
-			if (space_left < space_needed)
+			if (space_left <= space_needed)
 				fatal(_("buffer overflow in genflags2str"));
 
 			if (sp != buffer) {
@@ -497,6 +498,7 @@ genflags2str(int flagval, const struct flagtab *tab)
 		}
 	}
 
+	*sp = '\0';
 	return buffer;
 }
 
@@ -505,79 +507,79 @@ genflags2str(int flagval, const struct flagtab *tab)
 static int
 posix_compare(NODE *s1, NODE *s2)
 {
-	int ret = 0;
-	char save1, save2;
-	size_t l = 0;
-
-	save1 = s1->stptr[s1->stlen];
-	s1->stptr[s1->stlen] = '\0';
-
-	save2 = s2->stptr[s2->stlen];
-	s2->stptr[s2->stlen] = '\0';
+	int ret;
 
 	if (gawk_mb_cur_max == 1) {
-		if (strlen(s1->stptr) == s1->stlen && strlen(s2->stptr) == s2->stlen)
-			ret = strcoll(s1->stptr, s2->stptr);
-		else {
-			char b1[2], b2[2];
-			char *p1, *p2;
-			size_t i;
+		char save1, save2;
+		const char *p1, *p2;
 
-			if (s1->stlen < s2->stlen)
-				l = s1->stlen;
-			else
-				l = s2->stlen;
+		save1 = s1->stptr[s1->stlen];
+		s1->stptr[s1->stlen] = '\0';
 
-			b1[1] = b2[1] = '\0';
-			for (i = ret = 0, p1 = s1->stptr, p2 = s2->stptr;
-			     ret == 0 && i < l;
-			     p1++, p2++) {
-				b1[0] = *p1;
-				b2[0] = *p2;
-				ret = strcoll(b1, b2);
+		save2 = s2->stptr[s2->stlen];
+		s2->stptr[s2->stlen] = '\0';
+
+		p1 = s1->stptr;
+		p2 = s2->stptr;
+
+		for (;;) {
+			size_t len;
+
+			ret = strcoll(p1, p2);
+			if (ret != 0)
+				break;
+
+			len = strlen(p1);
+			p1 += len + 1;
+			p2 += len + 1;
+
+			if (p1 == s1->stptr + s1->stlen + 1) {
+				if (p2 != s2->stptr + s2->stlen + 1)
+					ret = -1;
+				break;
+			}
+			if (p2 == s2->stptr + s2->stlen + 1) {
+				ret = 1;
+				break;
 			}
 		}
-		/*
-		 * Either worked through the strings or ret != 0.
-		 * In either case, ret will be the right thing to return.
-		 */
+
+		s1->stptr[s1->stlen] = save1;
+		s2->stptr[s2->stlen] = save2;
 	}
-#ifdef MBS_SUPPORT
 	else {
 		/* Similar logic, using wide characters */
+		const wchar_t *p1, *p2;
+
 		(void) force_wstring(s1);
 		(void) force_wstring(s2);
 
-		if (wcslen(s1->wstptr) == s1->wstlen && wcslen(s2->wstptr) == s2->wstlen)
-			ret = wcscoll(s1->wstptr, s2->wstptr);
-		else {
-			wchar_t b1[2], b2[2];
-			wchar_t *p1, *p2;
-			size_t i;
+		p1 = s1->wstptr;
+		p2 = s2->wstptr;
 
-			if (s1->wstlen < s2->wstlen)
-				l = s1->wstlen;
-			else
-				l = s2->wstlen;
+		for (;;) {
+			size_t len;
 
-			b1[1] = b2[1] = L'\0';
-			for (i = ret = 0, p1 = s1->wstptr, p2 = s2->wstptr;
-			     ret == 0 && i < l;
-			     p1++, p2++) {
-				b1[0] = *p1;
-				b2[0] = *p2;
-				ret = wcscoll(b1, b2);
+			ret = wcscoll(p1, p2);
+			if (ret != 0)
+				break;
+
+			len = wcslen(p1);
+			p1 += len + 1;
+			p2 += len + 1;
+
+			if (p1 == s1->wstptr + s1->wstlen + 1) {
+				if (p2 != s2->wstptr + s2->wstlen + 1)
+					ret = -1;
+				break;
+			}
+			if (p2 == s2->wstptr + s2->wstlen + 1) {
+				ret = 1;
+				break;
 			}
 		}
-		/*
-		 * Either worked through the strings or ret != 0.
-		 * In either case, ret will be the right thing to return.
-		 */
 	}
-#endif
 
-	s1->stptr[s1->stlen] = save1;
-	s2->stptr[s2->stlen] = save2;
 	return ret;
 }
 
@@ -585,7 +587,7 @@ posix_compare(NODE *s1, NODE *s2)
 /* cmp_nodes --- compare two nodes, returning negative, 0, positive */
 
 int
-cmp_nodes(NODE *t1, NODE *t2)
+cmp_nodes(NODE *t1, NODE *t2, bool use_strcmp)
 {
 	int ret = 0;
 	size_t len1, len2;
@@ -594,20 +596,11 @@ cmp_nodes(NODE *t1, NODE *t2)
 	if (t1 == t2)
 		return 0;
 
-	if (t1->flags & MAYBE_NUM)
-		(void) force_number(t1);
-	if (t2->flags & MAYBE_NUM)
-		(void) force_number(t2);
-	if ((t1->flags & NUMBER) && (t2->flags & NUMBER)) {
-		if (t1->numbr == t2->numbr)
-			ret = 0;
-		/* don't subtract, in case one or both are infinite */
-		else if (t1->numbr < t2->numbr)
-			ret = -1;
-		else
-			ret = 1;
-		return ret;
-	}
+	(void) fixtype(t1);
+	(void) fixtype(t2);
+
+	if ((t1->flags & NUMBER) != 0 && (t2->flags & NUMBER) != 0)
+		return cmp_numbers(t1, t2);
 
 	(void) force_string(t1);
 	(void) force_string(t2);
@@ -617,30 +610,37 @@ cmp_nodes(NODE *t1, NODE *t2)
 	if (len1 == 0 || len2 == 0)
 		return ldiff;
 
-	if (do_posix)
+	if (do_posix && ! use_strcmp)
 		return posix_compare(t1, t2);
 
 	l = (ldiff <= 0 ? len1 : len2);
 	if (IGNORECASE) {
 		const unsigned char *cp1 = (const unsigned char *) t1->stptr;
 		const unsigned char *cp2 = (const unsigned char *) t2->stptr;
+		char save1 = t1->stptr[t1->stlen];
+		char save2 = t2->stptr[t2->stlen];
 
-#ifdef MBS_SUPPORT
+
 		if (gawk_mb_cur_max > 1) {
+			t1->stptr[t1->stlen] = t2->stptr[t2->stlen] = '\0';
 			ret = strncasecmpmbs((const unsigned char *) cp1,
 					     (const unsigned char *) cp2, l);
-		} else
-#endif
-		/* Could use tolower() here; see discussion above. */
-		for (ret = 0; l-- > 0 && ret == 0; cp1++, cp2++)
-			ret = casetable[*cp1] - casetable[*cp2];
+			t1->stptr[t1->stlen] = save1;
+			t2->stptr[t2->stlen] = save2;
+		} else {
+			/* Could use tolower() here; see discussion above. */
+			for (ret = 0; l-- > 0 && ret == 0; cp1++, cp2++)
+				ret = casetable[*cp1] - casetable[*cp2];
+		}
 	} else
 		ret = memcmp(t1->stptr, t2->stptr, l);
-	return (ret == 0 ? ldiff : ret);
+
+	ret = ret == 0 ? ldiff : ret;
+	return ret;
 }
 
+/* push_frame --- push a frame NODE onto stack */
 
-#if defined(PROFILING) || defined(DEBUGGING)
 static void
 push_frame(NODE *f)
 {
@@ -658,40 +658,32 @@ push_frame(NODE *f)
 	}
 
 	if (fcall_count > 1)
-		memmove(fcall_list + 2, fcall_list + 1, (fcall_count - 1) * sizeof(NODE *)); 
+		memmove(fcall_list + 2, fcall_list + 1, (fcall_count - 1) * sizeof(NODE *));
 	fcall_list[1] = f;
 }
+
+
+/* pop_frame --- pop off a frame NODE*/
 
 static void
 pop_frame()
 {
-#ifdef DEBUGGING
-	extern void frame_popped();
-#endif
 	if (fcall_count > 1)
-		memmove(fcall_list + 1, fcall_list + 2, (fcall_count - 1) * sizeof(NODE *)); 
+		memmove(fcall_list + 1, fcall_list + 2, (fcall_count - 1) * sizeof(NODE *));
 	fcall_count--;
 	assert(fcall_count >= 0);
-#ifdef DEBUGGING
-	frame_popped();
-#endif
+	if (do_debug)
+		frame_popped();
 }
-#else	/* not PROFILING or DEBUGGING */
-#define push_frame(p)	/* nothing */
-#define pop_frame()		/* nothing */
-#endif
 
-
-#ifdef PROFILING
 
 /* dump_fcall_stack --- print a backtrace of the awk function calls */
 
 void
 dump_fcall_stack(FILE *fp)
 {
-
 	NODE *f, *func;
-	long i = 0;
+	long i = 0, k = 0;
 
 	if (fcall_count == 0)
 		return;
@@ -699,44 +691,35 @@ dump_fcall_stack(FILE *fp)
 
 	/* current frame */
 	func = frame_ptr->func_node;
-	fprintf(fp, "\t# %3ld. %s\n", i, func->lnode->param);
+	fprintf(fp, "\t# %3ld. %s\n", k++, func->vname);
 
 	/* outer frames except main */
 	for (i = 1; i < fcall_count; i++) {
 		f = fcall_list[i];
 		func = f->func_node;
-		fprintf(fp, "\t# %3ld. %s\n", i, func->lnode->param);
+		fprintf(fp, "\t# %3ld. %s\n", k++, func->vname);
 	}
 
-	fprintf(fp, "\t# %3ld. -- main --\n", fcall_count);
+	fprintf(fp, "\t# %3ld. -- main --\n", k);
 }
 
-#endif /* PROFILING */
 
 /* set_IGNORECASE --- update IGNORECASE as appropriate */
 
 void
 set_IGNORECASE()
 {
-	static short warned = FALSE;
+	static bool warned = false;
 
-	if ((do_lint || do_traditional) && ! warned) {
-		warned = TRUE;
+	if ((do_lint_extensions || do_traditional) && ! warned) {
+		warned = true;
 		lintwarn(_("`IGNORECASE' is a gawk extension"));
 	}
-	load_casetable();
+
 	if (do_traditional)
-		IGNORECASE = FALSE;
-	else if ((IGNORECASE_node->var_value->flags & (STRING|STRCUR)) != 0) {
-		if ((IGNORECASE_node->var_value->flags & MAYBE_NUM) == 0)
-			IGNORECASE = (force_string(IGNORECASE_node->var_value)->stlen > 0);
-		else
-			IGNORECASE = (force_number(IGNORECASE_node->var_value) != 0.0);
-	} else if ((IGNORECASE_node->var_value->flags & (NUMCUR|NUMBER)) != 0)
-		IGNORECASE = (force_number(IGNORECASE_node->var_value) != 0.0);
-	else
-		IGNORECASE = FALSE;		/* shouldn't happen */
-                  
+		IGNORECASE = false;
+   	else
+		IGNORECASE = boolval(IGNORECASE_node->var_value);
 	set_RS();	/* set_RS() calls set_FS() if need be, for us */
 }
 
@@ -745,26 +728,24 @@ set_IGNORECASE()
 void
 set_BINMODE()
 {
-	static short warned = FALSE;
+	static bool warned = false;
 	char *p;
-	NODE *v;
+	NODE *v = fixtype(BINMODE_node->var_value);
 
-	if ((do_lint || do_traditional) && ! warned) {
-		warned = TRUE;
+	if ((do_lint_extensions || do_traditional) && ! warned) {
+		warned = true;
 		lintwarn(_("`BINMODE' is a gawk extension"));
 	}
 	if (do_traditional)
-		BINMODE = 0;
-	else if ((BINMODE_node->var_value->flags & NUMBER) != 0) {
-		BINMODE = (int) force_number(BINMODE_node->var_value);
+		BINMODE = TEXT_TRANSLATE;
+	else if ((v->flags & NUMBER) != 0) {
+		BINMODE = get_number_si(v);
 		/* Make sure the value is rational. */
-		if (BINMODE < 0)
-			BINMODE = 0;
-		else if (BINMODE > 3)
-			BINMODE = 3;
-	}
-	else if ((BINMODE_node->var_value->flags & STRING) != 0) {
-		v = BINMODE_node->var_value;
+		if (BINMODE < TEXT_TRANSLATE)
+			BINMODE = TEXT_TRANSLATE;
+		else if (BINMODE > BINMODE_BOTH)
+			BINMODE = BINMODE_BOTH;
+	} else if ((v->flags & STRING) != 0) {
 		p = v->stptr;
 
 		/*
@@ -783,13 +764,13 @@ set_BINMODE()
 				BINMODE = p[0] - '0';
 				break;
 			case 'r':
-				BINMODE = 1;
+				BINMODE = BINMODE_INPUT;
 				break;
 			case 'w':
-				BINMODE = 2;
+				BINMODE = BINMODE_OUTPUT;
 				break;
 			default:
-				BINMODE = 3;
+				BINMODE = BINMODE_BOTH;
 				goto bad_value;
 				break;
 			}
@@ -797,24 +778,23 @@ set_BINMODE()
 		case 2:
 			switch (p[0]) {
 			case 'r':
-				BINMODE = 3;
+				BINMODE = BINMODE_BOTH;
 				if (p[1] != 'w')
 					goto bad_value;
 				break;
 			case 'w':
-				BINMODE = 3;
+				BINMODE = BINMODE_BOTH;
 				if (p[1] != 'r')
 					goto bad_value;
 				break;
+			}
 			break;
 		default:
 	bad_value:
 			lintwarn(_("BINMODE value `%s' is invalid, treated as 3"), p);
 			break;
-			}
 		}
-	}
-	else
+	} else
 		BINMODE = 3;		/* shouldn't happen */
 }
 
@@ -823,8 +803,35 @@ set_BINMODE()
 void
 set_OFS()
 {
-	OFS = force_string(OFS_node->var_value)->stptr;
-	OFSlen = OFS_node->var_value->stlen;
+	static bool first = true;
+	size_t new_ofs_len;
+
+	if (first)	/* true when called from init_vars() in main() */
+		first = false;
+	else {
+		/* rebuild $0 using OFS that was current when $0 changed */
+		if (! field0_valid) {
+			get_field(UNLIMITED - 1, NULL);
+			rebuild_record();
+		}
+	}
+
+	/*
+	 * Save OFS value for use in building record and in printing.
+	 * Can't just have OFS point into the OFS_node since it's
+	 * already updated when we come into this routine, and we need
+	 * the old value to rebuild the record (see above).
+	 */
+	OFS_node->var_value = force_string(OFS_node->var_value);
+	new_ofs_len = OFS_node->var_value->stlen;
+
+	if (OFS == NULL)
+		emalloc(OFS, char *, new_ofs_len + 1, "set_OFS");
+	else if (OFSlen < new_ofs_len)
+		erealloc(OFS, char *, new_ofs_len + 1, "set_OFS");
+
+	memcpy(OFS, OFS_node->var_value->stptr, OFS_node->var_value->stlen);
+	OFSlen = new_ofs_len;
 	OFS[OFSlen] = '\0';
 }
 
@@ -833,9 +840,9 @@ set_OFS()
 void
 set_ORS()
 {
-	ORS = force_string(ORS_node->var_value)->stptr;
+	ORS_node->var_value = force_string(ORS_node->var_value);
+	ORS = ORS_node->var_value->stptr;
 	ORSlen = ORS_node->var_value->stlen;
-	ORS[ORSlen] = '\0';
 }
 
 /* fmt_ok --- is the conversion format a valid one? */
@@ -849,6 +856,7 @@ fmt_ok(NODE *n)
 {
 	NODE *tmp = force_string(n);
 	const char *p = tmp->stptr;
+
 #if ! defined(PRINTF_HAS_F_FORMAT) || PRINTF_HAS_F_FORMAT != 1
 	static const char float_formats[] = "efgEG";
 #else
@@ -859,6 +867,8 @@ fmt_ok(NODE *n)
 #else
 	static const char flags[] = " +-#";
 #endif
+
+	// We rely on the caller to zero-terminate n->stptr.
 
 	if (*p++ != '%')
 		return 0;
@@ -887,22 +897,29 @@ fmt_index(NODE *n)
 	int ix = 0;
 	static int fmt_num = 4;
 	static int fmt_hiwater = 0;
+	char save;
 
 	if (fmt_list == NULL)
 		emalloc(fmt_list, NODE **, fmt_num*sizeof(*fmt_list), "fmt_index");
-	(void) force_string(n);
+	n = force_string(n);
+
+	save = n->stptr[n->stlen];
+	n->stptr[n->stlen] = '\0';
+
 	while (ix < fmt_hiwater) {
-		if (cmp_nodes(fmt_list[ix], n) == 0)
+		if (cmp_nodes(fmt_list[ix], n, true) == 0)
 			return ix;
 		ix++;
 	}
+
 	/* not found */
-	n->stptr[n->stlen] = '\0';
 	if (do_lint && ! fmt_ok(n))
 		lintwarn(_("bad `%sFMT' specification `%s'"),
 			    n == CONVFMT_node->var_value ? "CONV"
 			  : n == OFMT_node->var_value ? "O"
 			  : "", n->stptr);
+
+	n->stptr[n->stlen] = save;
 
 	if (fmt_hiwater >= fmt_num) {
 		fmt_num *= 2;
@@ -937,47 +954,40 @@ set_LINT()
 {
 #ifndef NO_LINT
 	int old_lint = do_lint;
+	NODE *n = fixtype(LINT_node->var_value);
 
-	if ((LINT_node->var_value->flags & (STRING|STRCUR)) != 0) {
-		if ((LINT_node->var_value->flags & MAYBE_NUM) == 0) {
-			const char *lintval;
-			size_t lintlen;
+	/* start with clean defaults */
+	lintfunc = r_warning;
+	do_flags &= ~(DO_LINT_ALL|DO_LINT_INVALID);
 
-			do_lint = (force_string(LINT_node->var_value)->stlen > 0);
-			lintval = LINT_node->var_value->stptr;
-			lintlen = LINT_node->var_value->stlen;
-			if (do_lint) {
-				do_lint = LINT_ALL;
+	if ((n->flags & STRING) != 0) {
+		const char *lintval;
+		size_t lintlen;
+
+		lintval = n->stptr;
+		lintlen = n->stlen;
+		if (lintlen > 0) {
+			if (lintlen == 7 && strncmp(lintval, "invalid", 7) == 0)
+				do_flags |= DO_LINT_INVALID;
+			else if (lintlen == 6 && strncmp(lintval, "no-ext", 6) == 0)
+				do_flags &= ~DO_LINT_EXTENSIONS;
+			else {
+				do_flags |= DO_LINT_ALL;
 				if (lintlen == 5 && strncmp(lintval, "fatal", 5) == 0)
 					lintfunc = r_fatal;
-				else if (lintlen == 7 && strncmp(lintval, "invalid", 7) == 0)
-					do_lint = LINT_INVALID;
-				else
-					lintfunc = warning;
-			} else
-				lintfunc = warning;
-		} else {
-			if (force_number(LINT_node->var_value) != 0.0)
-				do_lint = LINT_ALL;
-			else
-				do_lint = FALSE;
-			lintfunc = warning;
+			}
 		}
-	} else if ((LINT_node->var_value->flags & (NUMCUR|NUMBER)) != 0) {
-		if (force_number(LINT_node->var_value) != 0.0)
-			do_lint = LINT_ALL;
-		else
-			do_lint = FALSE;
-		lintfunc = warning;
-	} else
-		do_lint = FALSE;		/* shouldn't happen */
-
-	if (! do_lint)
-		lintfunc = warning;
+	} else {
+		if (! is_zero(n))
+			do_flags |= DO_LINT_ALL;
+	}
 
 	/* explicitly use warning() here, in case lintfunc == r_fatal */
-	if (old_lint != do_lint && old_lint && do_lint == FALSE)
+	if (old_lint != do_lint && old_lint && ! do_lint)
 		warning(_("turning off `--lint' due to assignment to `LINT'"));
+
+	/* inform plug-in api of change */
+	update_ext_api();
 #endif /* ! NO_LINT */
 }
 
@@ -986,24 +996,24 @@ set_LINT()
 void
 set_TEXTDOMAIN()
 {
-	int len;
+	NODE *tmp;
 
-	TEXTDOMAIN = force_string(TEXTDOMAIN_node->var_value)->stptr;
-	len = TEXTDOMAIN_node->var_value->stlen;
-	TEXTDOMAIN[len] = '\0';
+	tmp = TEXTDOMAIN_node->var_value = force_string(TEXTDOMAIN_node->var_value);
+	TEXTDOMAIN = tmp->stptr;
 	/*
 	 * Note: don't call textdomain(); this value is for
 	 * the awk program, not for gawk itself.
 	 */
 }
 
-/* update_ERRNO_saved --- update the value of ERRNO based on argument */
+/* update_ERRNO_int --- update the value of ERRNO based on argument */
 
 void
-update_ERRNO_saved(int errcode)
+update_ERRNO_int(int errcode)
 {
-	char *cp;
+	const char *cp;
 
+	update_PROCINFO_num("errno", errcode);
 	if (errcode) {
 		cp = strerror(errcode);
 		cp = gettext(cp);
@@ -1013,12 +1023,40 @@ update_ERRNO_saved(int errcode)
 	ERRNO_node->var_value = make_string(cp, strlen(cp));
 }
 
-/* update_ERRNO --- update the value of ERRNO based on errno */
+/* update_ERRNO_string --- update ERRNO */
 
 void
-update_ERRNO()
+update_ERRNO_string(const char *string)
 {
-	update_ERRNO_saved(errno);
+	update_PROCINFO_num("errno", 0);
+	unref(ERRNO_node->var_value);
+	size_t len = strlen(string);
+#if defined(USE_EBCDIC) && defined(ELIDE_IBM_ERROR_CODE)
+	// skip over leading IBM error code
+	// N.B. This code is untested
+	if (isupper(string[0]) && isupper(string[1])) {
+		while (*string && *string != ' ')
+			string++;
+
+		while (*string && *string == ' ')
+			string++;
+
+		len = strlen(string);
+		if (string[len-1] == '.')
+			len--;	// remove the final '.'
+	}
+#endif
+	ERRNO_node->var_value = make_string(string, len);
+}
+
+/* unset_ERRNO --- eliminate the value of ERRNO */
+
+void
+unset_ERRNO(void)
+{
+	update_PROCINFO_num("errno", 0);
+	unref(ERRNO_node->var_value);
+	ERRNO_node->var_value = dupnode(Nnull_string);
 }
 
 /* update_NR --- update the value of NR */
@@ -1026,9 +1064,14 @@ update_ERRNO()
 void
 update_NR()
 {
+#ifdef HAVE_MPFR
+	if (is_mpg_number(NR_node->var_value))
+		(void) mpg_update_var(NR_node);
+	else
+#endif
 	if (NR_node->var_value->numbr != NR) {
 		unref(NR_node->var_value);
-		NR_node->var_value = make_number((AWKNUM) NR);
+		NR_node->var_value = make_number(NR);
 	}
 }
 
@@ -1037,11 +1080,14 @@ update_NR()
 void
 update_NF()
 {
-	if (NF == -1 || NF_node->var_value->numbr != NF) {
+	long l;
+
+	l = get_number_si(NF_node->var_value);
+	if (NF == -1 || l != NF) {
 		if (NF == -1)
 			(void) get_field(UNLIMITED - 1, NULL); /* parse record */
 		unref(NF_node->var_value);
-		NF_node->var_value = make_number((AWKNUM) NF);
+		NF_node->var_value = make_number(NF);
 	}
 }
 
@@ -1050,12 +1096,16 @@ update_NF()
 void
 update_FNR()
 {
+#ifdef HAVE_MPFR
+	if (is_mpg_number(FNR_node->var_value))
+		(void) mpg_update_var(FNR_node);
+	else
+#endif
 	if (FNR_node->var_value->numbr != FNR) {
 		unref(FNR_node->var_value);
-		FNR_node->var_value = make_number((AWKNUM) FNR);
+		FNR_node->var_value = make_number(FNR);
 	}
 }
-
 
 
 NODE *frame_ptr;        /* current frame */
@@ -1064,7 +1114,7 @@ STACK_ITEM *stack_bottom;
 STACK_ITEM *stack_top;
 static unsigned long STACK_SIZE = 256;    /* initial size of stack */
 int max_args = 0;       /* maximum # of arguments to printf, print, sprintf,
-                         * or # of array subscripts, or adjacent strings     
+                         * or # of array subscripts, or adjacent strings
                          * to be concatenated.
                          */
 NODE **args_array = NULL;
@@ -1078,32 +1128,6 @@ NODE **args_array = NULL;
 STACK_ITEM *
 grow_stack()
 {
-	if (stack_ptr == NULL) {
-		char *val;
-
-		if ((val = getenv("GAWK_STACKSIZE")) != NULL) {
-			if (isdigit((unsigned char) *val)) {
-				unsigned long n = 0;
-				for (; *val && isdigit((unsigned char) *val); val++)
-					n = (n * 10) + *val - '0';
-				if (n >= 1)
-					STACK_SIZE = n;
-			}
-		}
-
-		emalloc(stack_bottom, STACK_ITEM *, STACK_SIZE * sizeof(STACK_ITEM), "grow_stack");
-		stack_ptr = stack_bottom - 1;
-		stack_top = stack_bottom + STACK_SIZE - 1;
-
-		/* initialize frame pointer */
-		getnode(frame_ptr);
-		frame_ptr->type = Node_frame;
-		frame_ptr->stack = NULL;
-		frame_ptr->func_node = NULL;	/* in main */
-		frame_ptr->vname = NULL;
-		return stack_ptr;
-	}
-
 	STACK_SIZE *= 2;
 	erealloc(stack_bottom, STACK_ITEM *, STACK_SIZE * sizeof(STACK_ITEM), "grow_stack");
 	stack_top = stack_bottom + STACK_SIZE - 1;
@@ -1118,15 +1142,12 @@ grow_stack()
  */
 
 NODE **
-r_get_lhs(NODE *n, int reference)
+r_get_lhs(NODE *n, bool reference)
 {
-	int isparam = FALSE;
+	bool isparam = false;
 
 	if (n->type == Node_param_list) {
-		if ((n->flags & FUNC) != 0)
-			fatal(_("can't use function name `%s' as variable or array"),
-					n->vname);
-		isparam = TRUE;
+		isparam = true;
 		n = GET_PARAM(n->param_cnt);
 	}
 
@@ -1134,29 +1155,34 @@ r_get_lhs(NODE *n, int reference)
 	case Node_var_array:
 		fatal(_("attempt to use array `%s' in a scalar context"),
 				array_vname(n));
+		return NULL;	// silence compiler warnings
 	case Node_array_ref:
 		if (n->orig_array->type == Node_var_array)
 			fatal(_("attempt to use array `%s' in a scalar context"),
 					array_vname(n));
-		n->orig_array->type = Node_var;
-		n->orig_array->var_value = Nnull_string;
+		if (n->orig_array->type != Node_var) {
+			n->orig_array->type = Node_var;
+			n->orig_array->var_value = dupnode(Nnull_string);
+		}
 		/* fall through */
 	case Node_var_new:
 		n->type = Node_var;
-		n->var_value = Nnull_string;
+		n->var_value = dupnode(Nnull_string);
+		break;
+
+	case Node_elem_new:
+		efree(n->stptr);
+		n->stptr = NULL;
+		n->stlen = 0;
+		n->type = Node_var;
+		n->var_value = dupnode(Nnull_string);
 		break;
 
 	case Node_var:
 		break;
 
-#if 0
-	case Node_builtin:
-		/* in gawk for a while */
-		fatal(_("assignment is not allowed to result of builtin function"));
-#endif
-
 	default:
-		cant_happen();
+		cant_happen("unexpected variable type %s", nodetype2str(n->type));
 	}
 
 	if (do_lint && reference && var_uninitialized(n))
@@ -1164,14 +1190,14 @@ r_get_lhs(NODE *n, int reference)
 			_("reference to uninitialized argument `%s'") :
 			_("reference to uninitialized variable `%s'")),
 				n->vname);
-	return &n->var_value;
+	return & n->var_value;
 }
 
 
 /* r_get_field --- get the address of a field node */
- 
-static inline NODE **
-r_get_field(NODE *n, Func_ptr *assign, int reference)
+
+NODE **
+r_get_field(NODE *n, Func_ptr *assign, bool reference)
 {
 	long field_num;
 	NODE **lhs;
@@ -1179,14 +1205,16 @@ r_get_field(NODE *n, Func_ptr *assign, int reference)
 	if (assign)
 		*assign = NULL;
 	if (do_lint) {
-		if ((n->flags & NUMBER) == 0) {
+		if ((fixtype(n)->flags & NUMBER) == 0) {
 			lintwarn(_("attempt to field reference from non-numeric value"));
 			if (n->stlen == 0)
 				lintwarn(_("attempt to field reference from null string"));
 		}
 	}
 
-	field_num = (long) force_number(n);
+	(void) force_number(n);
+	field_num = get_number_si(n);
+
 	if (field_num < 0)
 		fatal(_("attempt to access field %ld"), field_num);
 
@@ -1196,7 +1224,7 @@ r_get_field(NODE *n, Func_ptr *assign, int reference)
 			*assign = reset_record;
 	} else
 		lhs = get_field(field_num, assign);
-	if (do_lint && reference && (*lhs == Null_field || *lhs == Nnull_string))
+	if (do_lint && reference && ((*lhs)->flags & NULL_FIELD) != 0)
 		lintwarn(_("reference to uninitialized field `$%ld'"),
 			      field_num);
 	return lhs;
@@ -1239,24 +1267,26 @@ calc_exp(AWKNUM x1, AWKNUM x2)
 }
 
 
-/* setup_frame --- setup new frame for function call */ 
+/* setup_frame --- setup new frame for function call */
 
-static void
+static INSTRUCTION *
 setup_frame(INSTRUCTION *pc)
 {
 	NODE *r = NULL;
-	NODE *m;
-	NODE *f;
+	NODE *m, *f, *fp;
 	NODE **sp = NULL;
-	char **varnames;
-	int pcount, arg_count, i;
+	int pcount, arg_count, i, j;
 
 	f = pc->func_body;
-	pcount = f->lnode->param_cnt;
-	varnames = f->parmlist;
+	pcount = f->param_cnt;
+	fp = f->fparms;
 	arg_count = (pc + 1)->expr_count;
 
-	/* check for extra args */ 
+	if (pcount > 0) {
+		ezalloc(sp, NODE **, pcount * sizeof(NODE *), "setup_frame");
+	}
+
+	/* check for extra args */
 	if (arg_count > pcount) {
 		warning(
 			_("function `%s' called with more arguments than declared"),
@@ -1268,30 +1298,36 @@ setup_frame(INSTRUCTION *pc)
 		} while (--arg_count > pcount);
 	}
 
-	if (pcount > 0) {
-		emalloc(sp, NODE **, pcount * sizeof(NODE *), "setup_frame");
-		memset(sp, 0, pcount * sizeof(NODE *));
-	}
-
-	for (i = 0; i < pcount; i++) {
+	for (i = 0, j = arg_count - 1; i < pcount; i++, j--) {
 		getnode(r);
 		memset(r, 0, sizeof(NODE));
 		sp[i] = r;
+
 		if (i >= arg_count) {
 			/* local variable */
 			r->type = Node_var_new;
-			r->vname = varnames[i];
+			r->vname = fp[i].param;
 			continue;
 		}
 
-		m = PEEK(arg_count - i - 1); /* arguments in reverse order on runtime stack */
+		m = PEEK(j); /* arguments in reverse order on runtime stack */
 
 		if (m->type == Node_param_list)
 			m = GET_PARAM(m->param_cnt);
-			
+
+		/* $0 needs to be passed by value to a function */
+		if (m == fields_arr[0]) {
+			NODE *copy;
+
+			copy = dupnode(m);	// will be real copy
+			DEREF(m);
+			m = copy;
+		}
+
 		switch (m->type) {
 		case Node_var_new:
 		case Node_var_array:
+		case Node_elem_new:
 			r->type = Node_array_ref;
 			r->orig_array = r->prev_array = m;
 			break;
@@ -1308,7 +1344,7 @@ setup_frame(INSTRUCTION *pc)
 			 * subsequent param.
 			 */
 			r->type = Node_var;
-			r->var_value = Nnull_string;
+			r->var_value = dupnode(Nnull_string);
 			break;
 
 		case Node_val:
@@ -1316,11 +1352,19 @@ setup_frame(INSTRUCTION *pc)
 			r->var_value = m;
 			break;
 
+		case Node_func:
+		case Node_builtin_func:
+		case Node_ext_func:
+			r->type = Node_var;
+			r->var_value = make_string(m->vname, strlen(m->vname));
+			break;
+
 		default:
-			cant_happen();
+			cant_happen("unexpected parameter type %s", nodetype2str(m->type));
 		}
-		r->vname = varnames[i];
+		r->vname = fp[i].param;
 	}
+
 	stack_adj(-arg_count);	/* adjust stack pointer */
 
 	if (pc->opcode == Op_indirect_func_call) {
@@ -1328,18 +1372,24 @@ setup_frame(INSTRUCTION *pc)
 		DEREF(r);
 	}
 
-	push_frame(frame_ptr);
+	frame_ptr->vname = source;	/* save current source */
+
+	if (do_profile || do_debug)
+		push_frame(frame_ptr);
 
 	/* save current frame in stack */
 	PUSH(frame_ptr);
+
 	/* setup new frame */
 	getnode(frame_ptr);
-	frame_ptr->type = Node_frame;	
+	frame_ptr->type = Node_frame;
 	frame_ptr->stack = sp;
+	frame_ptr->prev_frame_size = (stack_ptr - stack_bottom); /* size of the previous stack frame */
 	frame_ptr->func_node = f;
 	frame_ptr->vname = NULL;
+	frame_ptr->reti = pc; /* on return execute pc->nexti */
 
-	frame_ptr->reti = (unsigned long) pc; /* on return execute pc->nexti */
+	return f->code_ptr;
 }
 
 
@@ -1355,7 +1405,7 @@ restore_frame(NODE *fp)
 	INSTRUCTION *ri;
 
 	func = frame_ptr->func_node;
-	n = func->lnode->param_cnt;
+	n = func->param_cnt;
 	sp = frame_ptr->stack;
 
 	for (; n > 0; n--) {
@@ -1366,15 +1416,22 @@ restore_frame(NODE *fp)
 			assoc_clear(r);
 		freenode(r);
 	}
+
 	if (frame_ptr->stack != NULL)
 		efree(frame_ptr->stack);
-	ri = (INSTRUCTION *) frame_ptr->reti; /* execution in calling frame
-	                                       * resumes from ri->nexti.
-	                                       */
+	ri = frame_ptr->reti;     /* execution in calling frame
+	                           * resumes from ri->nexti.
+	                           */
 	freenode(frame_ptr);
-	pop_frame();
+	if (do_profile || do_debug)
+		pop_frame();
 
+	/* restore frame */
 	frame_ptr = fp;
+	/* restore source */
+	source = fp->vname;
+	fp->vname = NULL;
+
 	return ri->nexti;
 }
 
@@ -1384,48 +1441,65 @@ restore_frame(NODE *fp)
 static inline void
 free_arrayfor(NODE *r)
 {
-	if (r->var_array != NULL) {
-		size_t num_elems = r->table_size;
-		NODE **list = r->var_array;
-		while (num_elems > 0)
-			unref(list[--num_elems]);
+	if (r->for_list != NULL) {
+		NODE *n;
+		size_t num_elems = r->for_list_size;
+		NODE **list = r->for_list;
+		while (num_elems > 0) {
+			n = list[--num_elems];
+			unref(n);
+		}
 		efree(list);
 	}
 	freenode(r);
 }
 
-/* unwind_stack --- pop the runtime stack */
 
-void
-unwind_stack(STACK_ITEM *sp_bottom)
+/*
+ * unwind_stack --- pop items off the run-time stack;
+ *	'n' is the # of items left in the stack.
+ */
+
+INSTRUCTION *
+unwind_stack(long n)
 {
 	NODE *r;
+	INSTRUCTION *cp = NULL;
+	STACK_ITEM *sp;
 
-	while (stack_ptr >= sp_bottom) {
-		r = POP();
+	if (stack_empty())
+		return NULL;
+
+	sp = stack_bottom + n;
+
+	if (stack_ptr < sp)
+		return NULL;
+
+	while ((r = POP()) != NULL) {
 		switch (r->type) {
-		case Node_instruction:
-			freenode(r);
-			break;
-
 		case Node_frame:
-			(void) restore_frame(r);
-			source = frame_ptr->vname;
+			cp = restore_frame(r);
 			break;
-
 		case Node_arrayfor:
 			free_arrayfor(r);
 			break;
-
 		case Node_val:
 			DEREF(r);
 			break;
-
+		case Node_instruction:
+			freenode(r);
+			break;
 		default:
-			if (in_main_context())
+			/*
+			 * Check `exiting' and don't produce an error for
+			 * cases like:
+			 *	func     _fn0() { exit }
+			 *	BEGIN { ARRAY[_fn0()] }
+			 */
+			if (in_main_context() && ! exiting)
 				fatal(_("unwind_stack: unexpected type `%s'"),
 						nodetype2str(r->type));
-			/* else 
+			/* else
 				* Node_var_array,
 				* Node_param_list,
 				* Node_var (e.g: trying to use scalar for array)
@@ -1434,82 +1508,173 @@ unwind_stack(STACK_ITEM *sp_bottom)
 			 */
 			break;
 		}
+
+		if (stack_ptr < sp)
+			break;
 	}
+	return cp;
 }
 
 
-/*
- * This generated compiler warnings from GCC 4.4. Who knows why.
- *
-#define eval_condition(t)	(((t)->flags & MAYBE_NUM) && force_number(t), \
-		((t)->flags & NUMBER) ? ((t)->numbr != 0.0) : ((t)->stlen != 0))
-*/
+/* pop_fcall --- pop off the innermost frame */
+#define pop_fcall()	unwind_stack(frame_ptr->prev_frame_size)
+
+/* pop the run-time stack */
+#define pop_stack()	(void) unwind_stack(0)
 
 
-static inline int
+static inline bool
 eval_condition(NODE *t)
 {
-	if ((t->flags & MAYBE_NUM) != 0)
-		force_number(t);
+	if (t == node_Boolean[false])
+		return false;
 
-	if ((t->flags & NUMBER) != 0)
-		return (t->numbr != 0.0);
+	if (t == node_Boolean[true])
+		return true;
 
-	return (t->stlen != 0);
+	return boolval(t);
 }
 
-/* cmp_scalar -- compare two nodes on the stack */
+static bool cmp_doubles(const NODE *t1, const NODE *t2, scalar_cmp_t comparison_type);
+extern bool mpg_cmp_as_numbers(const NODE *t1, const NODE *t2, scalar_cmp_t comparison_type);
 
-static inline int
-cmp_scalar()
+/* cmp_scalars -- compare two nodes on the stack */
+
+static bool
+cmp_scalars(scalar_cmp_t comparison_type)
 {
 	NODE *t1, *t2;
 	int di;
+	bool ret;
 
 	t2 = POP_SCALAR();
 	t1 = TOP();
+
+	t1 = elem_new_to_scalar(t1);
+	t2 = elem_new_to_scalar(t2);
+
 	if (t1->type == Node_var_array) {
 		DEREF(t2);
 		fatal(_("attempt to use array `%s' in a scalar context"), array_vname(t1));
 	}
-	di = cmp_nodes(t1, t2);
+
+	if ((t1->flags & STRING) != 0 || (t2->flags & STRING) != 0) {
+		bool use_strcmp = (comparison_type == SCALAR_EQ || comparison_type == SCALAR_NEQ);
+		di = cmp_nodes(t1, t2, use_strcmp);
+
+		switch (comparison_type) {
+		case SCALAR_EQ:
+			ret = (di == 0);
+			break;
+		case SCALAR_NEQ:
+			ret = (di != 0);
+			break;
+		case SCALAR_LT:
+			ret = (di < 0);
+			break;
+		case SCALAR_LE:
+			ret = (di <= 0);
+			break;
+		case SCALAR_GT:
+			ret = (di > 0);
+			break;
+		case SCALAR_GE:
+			ret = (di >= 0);
+			break;
+		}
+	} else {
+		fixtype(t1);
+		fixtype(t2);
+
+#ifdef HAVE_MPFR
+		if (do_mpfr)
+			ret = mpg_cmp_as_numbers(t1, t2, comparison_type);
+		else
+#endif
+			ret = cmp_doubles(t1, t2, comparison_type);
+	}
+
 	DEREF(t1);
 	DEREF(t2);
-	return di;
+	return ret;
 }
 
+
+/* cmp_doubles --- compare two doubles */
+
+static bool
+cmp_doubles(const NODE *t1, const NODE *t2, scalar_cmp_t comparison_type)
+{
+	/*
+	 * This routine provides numeric comparisons that should work
+	 * the same as in C.  It should NOT be used for sorting.
+	 */
+
+	bool t1_nan = isnan(t1->numbr);
+	bool t2_nan = isnan(t2->numbr);
+	int ret;
+
+	if ((t1_nan || t2_nan) && comparison_type != SCALAR_NEQ)
+		return false;
+
+	switch (comparison_type) {
+	case SCALAR_EQ:
+		ret = (t1->numbr == t2->numbr);
+		break;
+	case SCALAR_NEQ:
+		ret = (t1->numbr != t2->numbr);
+		break;
+	case SCALAR_LT:
+		ret = (t1->numbr < t2->numbr);
+		break;
+	case SCALAR_LE:
+		ret = (t1->numbr <= t2->numbr);
+		break;
+	case SCALAR_GT:
+		ret = (t1->numbr > t2->numbr);
+		break;
+	case SCALAR_GE:
+		ret = (t1->numbr >= t2->numbr);
+		break;
+	}
+
+	return ret;
+}
+
+
 /* op_assign --- assignment operators excluding = */
- 
+
 static void
 op_assign(OPCODE op)
 {
 	NODE **lhs;
-	NODE *r = NULL;
-	AWKNUM x1, x2;
-#ifndef HAVE_FMOD
-	AWKNUM x;
-#endif
+	NODE *t1, *t2;
+	AWKNUM x = 0.0, x1, x2;
 
 	lhs = POP_ADDRESS();
-	x1 = force_number(*lhs);
-	TOP_NUMBER(x2);
-	unref(*lhs);
+	t1 = *lhs;
+	x1 = force_number(t1)->numbr;
+
+	t2 = TOP_SCALAR();
+	x2 = force_number(t2)->numbr;
+	DEREF(t2);
+
 	switch (op) {
 	case Op_assign_plus:
-		r = *lhs = make_number(x1 + x2);
+		x = x1 + x2;
 		break;
 	case Op_assign_minus:
-		r = *lhs = make_number(x1 - x2);
+		x = x1 - x2;
 		break;
 	case Op_assign_times:
-		r = *lhs = make_number(x1 * x2);
+		x = x1 * x2;
 		break;
 	case Op_assign_quotient:
 		if (x2 == (AWKNUM) 0) {
 			decr_sp();
 			fatal(_("division by zero attempted in `/='"));
 		}
-		r = *lhs = make_number(x1 / x2);
+		x = x1 / x2;
 		break;
 	case Op_assign_mod:
 		if (x2 == (AWKNUM) 0) {
@@ -1517,24 +1682,30 @@ op_assign(OPCODE op)
 			fatal(_("division by zero attempted in `%%='"));
 		}
 #ifdef HAVE_FMOD
-		r = *lhs = make_number(fmod(x1, x2));
+		x = fmod(x1, x2);
 #else   /* ! HAVE_FMOD */
 		(void) modf(x1 / x2, &x);
 		x = x1 - x2 * x;
-		r = *lhs = make_number(x);
 #endif  /* ! HAVE_FMOD */
 		break;
 	case Op_assign_exp:
-		r = *lhs = make_number((AWKNUM) calc_exp((double) x1, (double) x2));
+		x = calc_exp((double) x1, (double) x2);
 		break;
 	default:
 		break;
 	}
 
-	UPREF(r);
-	REPLACE(r);
-}
+	if (t1->valref == 1 && t1->flags == (MALLOC|NUMCUR|NUMBER)) {
+		/* optimization */
+		t1->numbr = x;
+	} else {
+		unref(t1);
+		t1 = *lhs = make_number(x);
+	}
 
+	UPREF(t1);
+	REPLACE(t1);
+}
 
 /* PUSH_CODE --- push a code onto the runtime stack */
 
@@ -1563,1049 +1734,194 @@ POP_CODE()
 
 
 /*
- * r_interpret:
- *   code is a list of instructions to run. returns the exit value
- *	 from the awk code.
- */
- 
- /* N.B.:
- *   1) reference counting done for both number and string values.
- *   2) TEMP flag no longer needed (consequence of the above; valref = 0
- *	is the replacement).
- *   3) Stack operations:
- *       Use REPLACE[_XX] if last stack operation was TOP[_XX],
- *       PUSH[_XX] if last operation was POP[_XX] instead. 
- *   4) UPREF and DREF -- see awk.h 
+ * Implementation of BEGINFILE and ENDFILE requires saving an execution
+ * state and the ability to return to that state. The state is
+ * defined by the instruction triggering the BEGINFILE/ENDFILE rule, the
+ * run-time stack, the rule and the source file. The source line is available in
+ * the instruction and hence is not considered a part of the execution state.
  */
 
+
+typedef struct exec_state {
+	struct exec_state *next;
+
+	INSTRUCTION *cptr;  /* either getline (Op_K_getline) or the
+	                     * implicit "open-file, read-record" loop (Op_newfile).
+	                     */
+
+	int rule;           /* rule for the INSTRUCTION */
+
+	long stack_size;    /* For this particular usage, it is sufficient to save
+	                     * only the size of the call stack. We do not
+	                     * store the actual stack pointer to avoid problems
+	                     * in case the stack gets realloc-ed.
+	                     */
+
+	const char *source; /* source file for the INSTRUCTION */
+} EXEC_STATE;
+
+static EXEC_STATE exec_state_stack;
+
+/* push_exec_state --- save an execution state on stack */
+
+static void
+push_exec_state(INSTRUCTION *cp, int rule, char *src, STACK_ITEM *sp)
+{
+	EXEC_STATE *es;
+
+	emalloc(es, EXEC_STATE *, sizeof(EXEC_STATE), "push_exec_state");
+	es->rule = rule;
+	es->cptr = cp;
+	es->stack_size = (sp - stack_bottom) + 1;
+	es->source = src;
+	es->next = exec_state_stack.next;
+	exec_state_stack.next = es;
+}
+
+
+/* pop_exec_state --- pop one execution state off the stack */
+
+static INSTRUCTION *
+pop_exec_state(int *rule, char **src, long *sz)
+{
+	INSTRUCTION *cp;
+	EXEC_STATE *es;
+
+	es = exec_state_stack.next;
+	if (es == NULL)
+		return NULL;
+	cp = es->cptr;
+	if (rule != NULL)
+		*rule = es->rule;
+	if (src != NULL)
+		*src = (char *) es->source;
+	if (sz != NULL)
+		*sz = es->stack_size;
+	exec_state_stack.next = es->next;
+	efree(es);
+	return cp;
+}
+
+
+/* register_exec_hook --- add exec hooks in the interpreter. */
 
 int
-r_interpret(INSTRUCTION *code)
+register_exec_hook(Func_pre_exec preh, Func_post_exec posth)
 {
-	INSTRUCTION *pc;   /* current instruction */
-	NODE *r = NULL;
-	NODE *m;
-	INSTRUCTION *ni;
-	NODE *t1, *t2;
-	NODE *f;	/* function definition */
-	NODE **lhs;
-	AWKNUM x, x1, x2;
-	int di, pre = FALSE;
-	Regexp *rp;
-#if defined(GAWKDEBUG) || defined(ARRAYDEBUG)
-	int last_was_stopme = FALSE;	/* builtin stopme() called ? */
-#endif
-	int stdio_problem = FALSE;
+	int pos = 0;
 
-	if (args_array == NULL)
-		emalloc(args_array, NODE **, (max_args + 2)*sizeof(NODE *), "r_interpret");
-	else
-		erealloc(args_array, NODE **, (max_args + 2)*sizeof(NODE *), "r_interpret");
-
-/* array subscript */
-#define mk_sub(n)  	(n == 1 ? POP_STRING() : concat_exp(n, TRUE))
-
-#ifdef DEBUGGING
-#define JUMPTO(x)	do { post_execute(pc); pc = (x); goto top; } while(FALSE)
-#else
-#define JUMPTO(x)	do { pc = (x); goto top; } while(FALSE)
-#endif
-
-	pc = code;
-
-	/* N.B.: always use JUMPTO for next instruction, otherwise bad things
-	 * may happen. DO NOT add a real loop (for/while) below to
-	 * replace ' forever {'; this catches failure to use JUMPTO to execute
-	 * next instruction (e.g. continue statement).
+	/*
+	 * multiple post-exec hooks aren't supported. post-exec hook is mainly
+	 * for use by the debugger.
 	 */
 
-	/* loop until hit Op_stop instruction */
-
-	/* forever {  */
-top:
-		if (pc->source_line > 0)
-			sourceline = pc->source_line;
-
-#ifdef DEBUGGING
-		if (! pre_execute(&pc))
-			goto top;
-#endif
-
-		switch (pc->opcode) {
-		case Op_rule:
-			currule = pc->in_rule;   /* for sole use in Op_K_next, Op_K_nextfile, Op_K_getline* */
-			/* fall through */
-		case Op_func:
-		case Op_ext_func:
-			source = pc->source_file;
-			break;
-
-		case Op_atexit:
-			/* avoid false source indications */
-			source = NULL;
-			sourceline = 0;
-			(void) nextfile(&curfile, TRUE);	/* close input data file */ 
-			/*
-			 * This used to be:
-			 *
-			 * if (close_io() != 0 && ! exiting && exit_val == 0)
-			 *      exit_val = 1;
-			 *
-			 * Other awks don't care about problems closing open files
-			 * and pipes, in that it doesn't affect their exit status.
-			 * So we no longer do either.
-			 */
-			(void) close_io(& stdio_problem);
-			/*
-			 * However, we do want to exit non-zero if there was a problem
-			 * with stdout/stderr, so we reinstate a slightly different
-			 * version of the above:
-			 */
-			if (stdio_problem && ! exiting && exit_val == 0)
-				exit_val = 1;
-			break;
-
-		case Op_stop:
-			return 0;
-
-		case Op_push_i:
-			m = pc->memory;
-			PUSH((m->flags & INTLSTR) != 0 ? format_val(CONVFMT, CONVFMTidx, m): m);
-			break;
-
-		case Op_push:
-		case Op_push_arg:
-		{
-			NODE *save_symbol;
-			int isparam = FALSE;
-
-			save_symbol = m = pc->memory;
-			if (m->type == Node_param_list) {
-				if ((m->flags & FUNC) != 0)
-					fatal(_("can't use function name `%s' as variable or array"),
-							m->vname);
-				isparam = TRUE;
-				save_symbol = m = GET_PARAM(m->param_cnt);
-				if (m->type == Node_array_ref)
-					m = m->orig_array;
-			}
-				
-			switch (m->type) {
-			case Node_var:
-				if (do_lint && var_uninitialized(m))
-					lintwarn(isparam ?
-						_("reference to uninitialized argument `%s'") :
-						_("reference to uninitialized variable `%s'"),
-								save_symbol->vname);
-				m = m->var_value;
-				UPREF(m);
-				PUSH(m);
-				break;
-
-			case Node_var_new:
-				m->type = Node_var;
-				m->var_value = Nnull_string;
-				if (do_lint)
-					lintwarn(isparam ?
-						_("reference to uninitialized argument `%s'") :
-						_("reference to uninitialized variable `%s'"),
-								save_symbol->vname);
-				PUSH(Nnull_string);
-				break;
-
-			case Node_var_array:
-				if (pc->opcode == Op_push_arg)
-					PUSH(m);
-				else
-					fatal(_("attempt to use array `%s' in a scalar context"),
-							array_vname(save_symbol));
-				break;
-
-			default:
-				cant_happen();
-			}
-		}
-			break;	
-
-		case Op_push_param:		/* function argument */
-			m = pc->memory;
-			if (m->type == Node_param_list)
-				m = GET_PARAM(m->param_cnt);
-			if (m->type == Node_var) {
-				m = m->var_value;
-				UPREF(m);
-				PUSH(m);
-		 		break;
-			}
- 			/* else
-				fall through */
-		case Op_push_array:
-			PUSH(pc->memory);
-			break;
-
-		case Op_push_lhs:
-			lhs = get_lhs(pc->memory, pc->do_reference);
-			PUSH_ADDRESS(lhs);
-			break;
-
-		case Op_subscript:
-			t2 = mk_sub(pc->sub_count);
-			t1 = POP_ARRAY();
-			r = *assoc_lookup(t1, t2, TRUE);
-			DEREF(t2);
-			if (r->type == Node_val)
-				UPREF(r);
-			PUSH(r);
-			break;
-
-		case Op_sub_array:
-			t2 = mk_sub(pc->sub_count);
-			t1 = POP_ARRAY();
-			r = in_array(t1, t2);
-			if (r == NULL) {
-				getnode(r);
-				r->type = Node_var_array;
-				r->var_array = NULL;
-				r->vname = estrdup(t2->stptr, t2->stlen);	/* the subscript in parent array */
-				r->parent_array = t1;
-				*assoc_lookup(t1, t2, FALSE) = r;
-			} else if (r->type != Node_var_array)
-				fatal(_("attempt to use scalar `%s[\"%.*s\"]' as an array"),
-						array_vname(t1), (int) t2->stlen, t2->stptr);
-			DEREF(t2);
-			PUSH(r);
-			break;
-
-		case Op_subscript_lhs:
-			t2 = mk_sub(pc->sub_count);
-			t1 = POP_ARRAY();
-			lhs = assoc_lookup(t1, t2, pc->do_reference);
-			if ((*lhs)->type == Node_var_array)
-				fatal(_("attempt to use array `%s[\"%.*s\"]' in a scalar context"),
-						array_vname(t1), (int) t2->stlen, t2->stptr);
-			DEREF(t2);
-			PUSH_ADDRESS(lhs);
-			break;
-
-		case Op_field_spec:
-			t1 = TOP_SCALAR();
-			lhs = r_get_field(t1, (Func_ptr *) 0, TRUE);
-			decr_sp();
-			DEREF(t1);
-			/* This used to look like this:
-			    PUSH(dupnode(*lhs));
-			   but was changed to bypass an apparent bug in the z/OS C compiler.
-			   Please do not remerge.  */
-			r = dupnode(*lhs);     /* can't use UPREF here */
-			PUSH(r);
-			break;
-
-		case Op_field_spec_lhs:
-			t1 = TOP_SCALAR();
-			lhs = r_get_field(t1, &pc->target_assign->field_assign, pc->do_reference);
-			decr_sp();
-			DEREF(t1);
-			PUSH_ADDRESS(lhs);
-			break;
-
-		case Op_lint:
-			if (do_lint) {
-				switch (pc->lint_type) {
-				case LINT_assign_in_cond:
-					lintwarn(_("assignment used in conditional context"));
-					break;
-
-				case LINT_no_effect:
-					lintwarn(_("statement has no effect"));
-					break;
-
-				default:
-					cant_happen();
-				}
-			}
-			break;
-
-		case Op_K_break:
-		case Op_K_continue:
-		case Op_jmp:
-			JUMPTO(pc->target_jmp);
-
-		case Op_jmp_false:
-			r = POP_SCALAR();
-			di = eval_condition(r);
-			DEREF(r);
-			if (! di)
-				JUMPTO(pc->target_jmp);
-			break;
-
-		case Op_jmp_true:
-			r = POP_SCALAR();
-			di = eval_condition(r);
-			DEREF(r);			
-			if (di)
-				JUMPTO(pc->target_jmp);
-			break;
-
-		case Op_and:
-		case Op_or:
-			t1 = POP_SCALAR();
-			di = eval_condition(t1);
-			DEREF(t1);
-			if ((pc->opcode == Op_and && di)
-					|| (pc->opcode == Op_or && ! di))
-				break;
-			r = make_number((AWKNUM) di);
-			PUSH(r);
-			ni = pc->target_jmp;
-			JUMPTO(ni->nexti);
-
-		case Op_and_final:
-		case Op_or_final:
-			t1 = TOP_SCALAR();
-			r = make_number((AWKNUM) eval_condition(t1));
-			DEREF(t1);
-			REPLACE(r);
-			break;
-
-		case Op_not:
-			t1 = TOP_SCALAR(); 
-			r = make_number((AWKNUM) ! eval_condition(t1));
-			DEREF(t1);
-			REPLACE(r);
-			break;
-
-		case Op_equal:
-			r = make_number((AWKNUM) (cmp_scalar() == 0));
-			REPLACE(r);
-			break;
-
-		case Op_notequal:
-			r = make_number((AWKNUM) (cmp_scalar() != 0));
-			REPLACE(r);
-			break;
-
-		case Op_less:
-			r = make_number((AWKNUM) (cmp_scalar() < 0));
-			REPLACE(r);
-			break;
-
-		case Op_greater:
-			r = make_number((AWKNUM) (cmp_scalar() > 0));
-			REPLACE(r);
-			break;
-
-		case Op_leq:
-			r = make_number((AWKNUM) (cmp_scalar() <= 0));
-			REPLACE(r);
-			break;
-
-		case Op_geq:
-			r = make_number((AWKNUM) (cmp_scalar() >= 0));
-			REPLACE(r);
-			break;
-
-		case Op_plus_i:
-			x2 = force_number(pc->memory);
-			goto plus;
-
-		case Op_plus:
-			POP_NUMBER(x2);
-plus:
-			TOP_NUMBER(x1);
-			r = make_number(x1 + x2);
-			REPLACE(r);
-			break;
-
-		case Op_minus_i:
-			x2 = force_number(pc->memory);
-			goto minus;
-
-		case Op_minus:
-			POP_NUMBER(x2);
-minus:
-			TOP_NUMBER(x1);
-			r = make_number(x1 - x2);
-			REPLACE(r);
-			break;
-
-		case Op_times_i:
-			x2 = force_number(pc->memory);
-			goto times;
-
-		case Op_times:
-			POP_NUMBER(x2);
-times:
-			TOP_NUMBER(x1);
-			r = make_number(x1 * x2);
-			REPLACE(r);
-			break;
-
-		case Op_exp_i:
-			x2 = force_number(pc->memory);
-			goto exponent;
-
-		case Op_exp:
-			POP_NUMBER(x2);
-exponent:
-			TOP_NUMBER(x1);
-			x = calc_exp(x1, x2);
-			r = make_number(x);
-			REPLACE(r);
-			break;
-
-		case Op_quotient_i:
-			x2 = force_number(pc->memory);
-			goto quotient;
-
-		case Op_quotient:
-			POP_NUMBER(x2);
-quotient:
-			if (x2 == 0)
-				fatal(_("division by zero attempted"));
-
-			TOP_NUMBER(x1);
-			x = x1 / x2;
-			r = make_number(x);
-			REPLACE(r);
-			break;		
-
-		case Op_mod_i:
-			x2 = force_number(pc->memory);
-			goto mod;
-
-		case Op_mod:
-			POP_NUMBER(x2);
-mod:
-			if (x2 == 0)
-				fatal(_("division by zero attempted in `%%'"));
-
-			TOP_NUMBER(x1);
-#ifdef HAVE_FMOD
-			x = fmod(x1, x2);
-#else	/* ! HAVE_FMOD */
-			(void) modf(x1 / x2, &x);
-			x = x1 - x * x2;
-#endif	/* ! HAVE_FMOD */
-			r = make_number(x);
-			REPLACE(r);
-			break;		
-
-		case Op_preincrement:
-			pre = TRUE;
-		case Op_postincrement:
-			x2 = 1.0;
-post:
-			lhs = TOP_ADDRESS();
-			x1 = force_number(*lhs);
-			unref(*lhs);
-			r = *lhs = make_number(x1 + x2);
-			if (pre)
-				UPREF(r);
-			else
-				r = make_number(x1);
-			REPLACE(r);
-			pre = FALSE;
-			break;			
-
-		case Op_predecrement:
-			pre = TRUE;
-		case Op_postdecrement:
-			x2 = -1.0;
-			goto post;					
-
-		case Op_unary_minus:
-			TOP_NUMBER(x1);
-			r = make_number(-x1);
-			REPLACE(r);
-			break;
-
-		case Op_store_sub:
-			/* array[sub] assignment optimization,
-			 * see awkgram.y (optimize_assignment)
-			 */
-			t1 = get_array(pc->memory, TRUE);	/* array */
-			t2 = mk_sub(pc->expr_count);	/* subscript */
- 			lhs = assoc_lookup(t1, t2, FALSE);
-			if ((*lhs)->type == Node_var_array)
-				fatal(_("attempt to use array `%s[\"%.*s\"]' in a scalar context"),
-						array_vname(t1), (int) t2->stlen, t2->stptr);
-			DEREF(t2);
-			unref(*lhs);
-			*lhs = POP_SCALAR();
-			break;
-
-		case Op_store_var:
-			/* simple variable assignment optimization,
-			 * see awkgram.y (optimize_assignment)
-			 */
-	
-			lhs = get_lhs(pc->memory, FALSE);
-			unref(*lhs);
-			*lhs = POP_SCALAR();
-			break;
-
-		case Op_store_field:
-		{
-			/* field assignment optimization,
-			 * see awkgram.y (optimize_assignment)
-			 */
-
-			Func_ptr assign;
-			t1 = TOP_SCALAR();
-			lhs = r_get_field(t1, &assign, FALSE);
-			decr_sp();
-			DEREF(t1);
-			unref(*lhs);
-			*lhs = POP_SCALAR();
-			assert(assign != NULL);
-			assign();
-		}
-			break;
-
-		case Op_assign_concat:
-			/* x = x ... string concatenation optimization */
-			lhs = get_lhs(pc->memory, FALSE);
-			t1 = force_string(*lhs);
-			t2 = POP_STRING();
-
-			free_wstr(*lhs);
-
-			if (t1 != t2 && t1->valref == 1 && (t1->flags & PERM) == 0) {
-				size_t nlen = t1->stlen + t2->stlen;
-				erealloc(t1->stptr, char *, nlen + 2, "r_interpret");
-				memcpy(t1->stptr + t1->stlen, t2->stptr, t2->stlen);
-				t1->stlen = nlen;
-				t1->stptr[nlen] = '\0';
-			} else {
-				size_t nlen = t1->stlen + t2->stlen;  
-				char *p;
-
-				emalloc(p, char *, nlen + 2, "r_interpret");
-				memcpy(p, t1->stptr, t1->stlen);
-				memcpy(p + t1->stlen, t2->stptr, t2->stlen);
-				unref(*lhs);
-				t1 = *lhs = make_str_node(p, nlen,  ALREADY_MALLOCED); 
-			}
-			t1->flags &= ~(NUMCUR|NUMBER);
-			DEREF(t2);
-			break;
-
-		case Op_assign:
-			lhs = POP_ADDRESS();
-			r = TOP_SCALAR();
-			unref(*lhs);
-			*lhs = r;
-			UPREF(r);
-			REPLACE(r);
-			break;
-
-		/* numeric assignments */
-		case Op_assign_plus:
-		case Op_assign_minus:
-		case Op_assign_times:
-		case Op_assign_quotient:
-		case Op_assign_mod:
-		case Op_assign_exp:
-			op_assign(pc->opcode);
-			break;
-
-		case Op_var_update:        /* update value of NR, FNR or NF */
-			pc->update_var();
-			break;
-
-		case Op_var_assign:
-			pc->assign_var();
-			break;
-
-		case Op_field_assign:
-			pc->field_assign();
-			break;
-
-		case Op_concat:
-			r = concat_exp(pc->expr_count, pc->concat_flag & CSUBSEP);
-			PUSH(r);
-			break;
-
-		case Op_K_case:
-			if ((pc + 1)->match_exp) {
-				/* match a constant regex against switch expression instead of $0. */
-				m = POP();	/* regex */
-				t2 = TOP_SCALAR();	/* switch expression */
-				(void) force_string(t2);
-				rp = re_update(m);
-				di = (research(rp, t2->stptr, 0, t2->stlen,
-							avoid_dfa(m, t2->stptr, t2->stlen)) >= 0);
-			} else {
-				t1 = POP_SCALAR();	/* case value */
-				t2 = TOP_SCALAR();	/* switch expression */
-				di = (cmp_nodes(t2, t1) == 0);
-				DEREF(t1);
-			}
-
-			if (di) {	/* match found */
-				decr_sp();
-				DEREF(t2);
-				JUMPTO(pc->target_jmp);
-			}
-			break;
-
-		case Op_K_delete:
-			t1 = POP_ARRAY();
-			do_delete(t1, pc->expr_count);
-			stack_adj(-pc->expr_count);
-			break;
-
-		case Op_K_delete_loop:
-			t1 = POP_ARRAY();
-			lhs = POP_ADDRESS();	/* item */
-			do_delete_loop(t1, lhs);
-			break;
-
-		case Op_in_array:
-			t1 = POP_ARRAY();
-			t2 = mk_sub(pc->expr_count);
-			di = (in_array(t1, t2) != NULL);
-			DEREF(t2);
-			PUSH(make_number((AWKNUM) di));
-			break;
-
-		case Op_arrayfor_init:
-		{
-			NODE **list = NULL;
-			NODE *array, *sort_str;
-			size_t num_elems = 0;
-			static NODE *sorted_in = NULL;
-			const char *how_to_sort = "@unsorted";
-
-			/* get the array */
-			array = POP_ARRAY();
-
-			/* sanity: check if empty */
-			if (array->var_array == NULL || array->table_size == 0)
-				goto arrayfor;
-
-			num_elems = array->table_size;
-
-			if (sorted_in == NULL)		/* do this once */
-				sorted_in = make_string("sorted_in", 9);
-
-			sort_str = NULL;
-			/*
-			 * If posix, or if there's no PROCINFO[],
-			 * there's no ["sorted_in"], so no sorting
-			 */
-			if (! do_posix && PROCINFO_node != NULL)
-				sort_str = in_array(PROCINFO_node, sorted_in);
-
-			if (sort_str != NULL) {
-				sort_str = force_string(sort_str);
-				if (sort_str->stlen > 0)
-					how_to_sort = sort_str->stptr;
-			}
-
-			list = assoc_list(array, how_to_sort, SORTED_IN);
-
-			/*
-			 * Actual array for use in lint warning
-			 * in Op_arrayfor_incr
-                         */
-			list[num_elems] = array;
-
-arrayfor:
-			getnode(r);
-			r->type = Node_arrayfor;
-			r->var_array = list;
-			r->table_size = num_elems;     /* # of elements in list */
-			r->array_size = -1;            /* current index */
-			PUSH(r);
-
-			if (num_elems == 0)
-				JUMPTO(pc->target_jmp);   /* Op_arrayfor_final */
-		}
-			break;
-
-		case Op_arrayfor_incr:
-			r = TOP();	/* Node_arrayfor */
-			if (++r->array_size == r->table_size) {
-				NODE *array;
-				array = r->var_array[r->table_size];	/* actual array */
-				if (do_lint && array->table_size != r->table_size)
-					lintwarn(_("for loop: array `%s' changed size from %ld to %ld during loop execution"),
-						array_vname(array), (long) r->table_size, (long) array->table_size);
-				JUMPTO(pc->target_jmp);	/* Op_arrayfor_final */
-			}
-
-			t1 = r->var_array[r->array_size];
-			lhs = get_lhs(pc->array_var, FALSE);
-			unref(*lhs);
-			*lhs = make_string(t1->ahname_str, t1->ahname_len);
-			break; 			 
-
-		case Op_arrayfor_final:
-			r = POP();
-			assert(r->type == Node_arrayfor);
-			free_arrayfor(r);
-			break;
-
-		case Op_builtin:
-			r = pc->builtin(pc->expr_count);
-#if defined(GAWKDEBUG) || defined(ARRAYDEBUG)
-			if (! r)
-				last_was_stopme = TRUE;
-			else
-#endif
-				PUSH(r);
-			break;
-			
-		case Op_K_print:
-			do_print(pc->expr_count, pc->redir_type);
-			break;
-
-		case Op_K_printf:
-			do_printf(pc->expr_count, pc->redir_type);
-			break;
-
-		case Op_K_print_rec:
-			do_print_rec(pc->expr_count, pc->redir_type);
-			break;
-
-		case Op_push_re:
-			m = pc->memory;
-			if (m->type == Node_dynregex) {
-				r = POP_STRING();
-				unref(m->re_exp);
-				m->re_exp = r;
-			}
-			PUSH(m);
-			break;
-			
-		case Op_match_rec:
-			m = pc->memory;
-			t1 = *get_field(0, (Func_ptr *) 0);
-match_re:
-			rp = re_update(m);
-			/*
-			 * Any place where research() is called with a last parameter of
-			 * zero, we need to use the avoid_dfa test. This appears here and
-			 * in the code for Op_K_case.
-			 *
-			 * A new or improved dfa that distinguishes beginning/end of
-			 * string from beginning/end of line will allow us to get rid of
-			 * this hack.
-			 *
-			 * The avoid_dfa() function is in re.c; it is not very smart.
-			 */
-
-			di = research(rp, t1->stptr, 0, t1->stlen,
-								avoid_dfa(m, t1->stptr, t1->stlen));
-			di = (di == -1) ^ (pc->opcode != Op_nomatch);
-			if(pc->opcode != Op_match_rec) {
-				decr_sp();
-				DEREF(t1);
-			}
-			r = make_number((AWKNUM) di);
-			PUSH(r);
-			break;
-
-		case Op_nomatch:
-			/* fall through */
-		case Op_match:
-			m = pc->memory;
-			t1 = TOP_STRING();
-			if (m->type == Node_dynregex) {
-				unref(m->re_exp);
-				m->re_exp = t1;
-				decr_sp();
-				t1 = TOP_STRING();
-			}
-			goto match_re;
-			break;
-
-		case Op_indirect_func_call:
-		{
-			int arg_count;
-
-			f = NULL;
-			arg_count = (pc + 1)->expr_count;
-			t1 = PEEK(arg_count);	/* indirect var */
-			assert(t1->type == Node_val);	/* @a[1](p) not allowed in grammar */
-			(void) force_string(t1);
-			if (t1->stlen > 0) {
-				/* retrieve function definition node */
-				f = pc->func_body;
-				if (f != NULL && STREQ(f->vname, t1->stptr))
-					/* indirect var hasn't been reassigned */
-					goto func_call;
-				f = lookup(t1->stptr);
-			}
-
-			if (f == NULL || f->type != Node_func)
-				fatal(_("function called indirectly through `%s' does not exist"), pc->func_name);	
-			pc->func_body = f;     /* save for next call */
-
-			goto func_call;
-		}
-
-		case Op_func_call:
-			/* retrieve function definition node */
-			f = pc->func_body;
-			if (f == NULL) {
-				f = lookup(pc->func_name);
-				if (f == NULL || f->type != Node_func)
-					fatal(_("function `%s' not defined"), pc->func_name);
-				pc->func_body = f;     /* save for next call */
-			}
-
-			/* save current frame along with source */
-
-func_call:
-			frame_ptr->vname = source;          /* save current source */
-			setup_frame(pc);
-
-			ni = f->code_ptr;	/* function code */							
-			if (ni->opcode == Op_ext_func) {
-				/* dynamically set source and line numbers for an extension builtin. */
-				ni->source_file = source;
-				ni->source_line = sourceline;
-				ni->nexti->source_line = sourceline;	/* Op_builtin */
-				ni->nexti->nexti->source_line = sourceline;	/* Op_K_return */
-			}
-
-			/* run the function instructions */
-			JUMPTO(ni);		/* Op_func or Op_ext_func */
-
-		case Op_K_return:
-			m = POP_SCALAR();       /* return value */
-
-			r = POP();
-			while (r->type != Node_frame) {
-				switch (r->type) {
-				case Node_arrayfor:
-					free_arrayfor(r);
-					break;
-				case Node_val:
-					DEREF(r);
-					break;
-				case Node_instruction:
-					freenode(r);
-					break;
-				default:
-					break;
-				}
-				r = POP();
-			} 
-
-			ni = restore_frame(r);
-			source = frame_ptr->vname;
-			
-			/* put the return value back on stack */
-			PUSH(m);
-			JUMPTO(ni);
-
-		case Op_K_getline_redir:
-			if ((currule == BEGINFILE || currule == ENDFILE)
-					&& pc->into_var == FALSE
-					&& pc->redir_type == redirect_input)
-				fatal(_("`getline' invalid inside `%s' rule"), ruletab[currule]);
-			r = do_getline_redir(pc->into_var, pc->redir_type);
-			PUSH(r);
-			break;
-
-		case Op_K_getline:	/* no redirection */
-			if (currule == BEGINFILE || currule == ENDFILE)
-				fatal(_("non-redirected `getline' invalid inside `%s' rule"),
-						ruletab[currule]);
-			do {
-				int ret;
-				ret = nextfile(&curfile, FALSE);
-				if (ret <= 0)
-					r = do_getline(pc->into_var, curfile);
-				else {
-					PUSH_CODE(pc);
-					if (curfile == NULL)
-						JUMPTO((pc + 1)->target_endfile);
-					else
-						JUMPTO((pc + 1)->target_beginfile);
-				}
-			} while (r == NULL);	/* EOF */
-			PUSH(r);
-			break;
-
-		case Op_after_endfile:
-			ni = POP_CODE();
-			assert(ni->opcode == Op_newfile || ni->opcode == Op_K_getline);
-			JUMPTO(ni);
-
-		case Op_after_beginfile:
-			after_beginfile(&curfile);
-			ni = POP_CODE();
-			if (ni->opcode == Op_K_getline
-					|| curfile == NULL      /* skipping directory argument */
-			)
-				JUMPTO(ni);
-			PUSH_CODE(ni);      /* for use in Op_K_nextfile and Op_get_record */
-			break;              /* Op_get_record */
-
-		case Op_newfile:
-		{
-			int ret;
-			ret = nextfile(&curfile, FALSE);
-			if (ret < 0)
-				JUMPTO(pc->target_jmp);     /* end block or Op_atexit */
-			else if (ret > 0) {
-				PUSH_CODE(pc);
-				if (curfile == NULL)
-					JUMPTO(pc->target_endfile);
-				break;	/* beginfile block */
-			} else
-				PUSH_CODE(pc);
-				/* fall through */
-		}
-			
-		case Op_get_record:
-			if (curfile == NULL) {          /* from getline without redirection */
-				ni = POP_CODE();            /* Op_newfile */
-				ni = ni->target_jmp;        /* end_block or Op_atexit */
-			} else if (inrec(curfile) == 0)
-				break;                      /* prog(rule) block */
-			else
-				ni = POP_CODE();            /* Op_newfile */
-			JUMPTO(ni);
-
-		case Op_K_nextfile:
-			if (currule != Rule && currule != BEGINFILE)
-				fatal(_("`nextfile' cannot be called from a `%s' rule"), ruletab[currule]);
-			(void) nextfile(&curfile, TRUE);
-			while (currule == BEGINFILE) {
-				r = POP();
-				switch (r->type) {
-				case Node_instruction:
-					ni = r->code_ptr;
-					freenode(r);
-					if (ni->opcode == Op_newfile || ni->opcode == Op_K_getline)
-						JUMPTO(ni);
-					break;
-				case Node_frame:
-					(void) restore_frame(r);
-					source = frame_ptr->vname;
-					break;
-				case Node_arrayfor:
-					free_arrayfor(r);
-					break;
-				case Node_val:
-					DEREF(r);
-					break;
-				default:
-					break;
-				}
-			}
-
-			assert(currule != BEGINFILE);
-			unwind_stack(stack_bottom + 1);	/* don't pop Op_newfile */ 
-			JUMPTO(pc->target_endfile);		/* endfile block */
-
-		case Op_K_exit:
-			if (currule == END)
-				ni = pc->target_atexit;
-			else
-				ni = pc->target_end;
-
-			exiting = TRUE;
-			POP_NUMBER(x1);
-			exit_val = (int) x1;
-#ifdef VMS
-			if (exit_val == 0)
-				exit_val = EXIT_SUCCESS;
-			else if (exit_val == 1)
-				exit_val = EXIT_FAILURE;
-			/* else
-				just pass anything else on through */
-#endif
-			/* jump to either the first end_block instruction
-			 * or to Op_atexit
-			 */
-			unwind_stack(stack_bottom);
-			JUMPTO(ni);
-
-		case Op_K_next:
-			if (currule != Rule)
-				fatal(_("`next' cannot be called from a `%s' rule"), ruletab[currule]);
-
-			/* jump to Op_get_record */
-			unwind_stack(stack_bottom + 1);	/* don't pop Op_newfile */
-			JUMPTO(pc->target_jmp);
-
-		case Op_pop:
-#if defined(GAWKDEBUG) || defined(ARRAYDEBUG)
-			if (last_was_stopme)
-				last_was_stopme = FALSE;
-			else
-#endif
-			{
-				r = POP_SCALAR();
-				DEREF(r);
-			}
-			break;
-
-		case Op_line_range:
-			if (pc->triggered)		/* evaluate right expression */
-				JUMPTO(pc->target_jmp);
-			/* else
-				evaluate left expression */
-			break;
-
-		case Op_cond_pair:
-		{
-			int result;
-			INSTRUCTION *ip;
-
-			t1 = TOP_SCALAR();   /* from right hand side expression */
-			di = (eval_condition(t1) != 0);
-			DEREF(t1);
-
-			ip = pc->line_range;            /* Op_line_range */
-
-			if (! ip->triggered && di) {
-				/* not already triggered and left expression is TRUE */
-				decr_sp();
-				ip->triggered = TRUE;
-				JUMPTO(ip->target_jmp);	/* evaluate right expression */ 
-			}
-
-			result = ip->triggered || di;
-			ip->triggered ^= di;            /* update triggered flag */
-			r = make_number((AWKNUM) result);      /* final value of condition pair */
-			REPLACE(r);
-			JUMPTO(pc->target_jmp);
-		}
-
-		case Op_exec_count:
-			INCREMENT(pc->exec_count);
-			break;
-
-		case Op_no_op:
-		case Op_K_do:
-		case Op_K_while:
-		case Op_K_for:
-		case Op_K_arrayfor:
-		case Op_K_switch:
-		case Op_K_default:
-		case Op_K_if:
-		case Op_K_else:
-		case Op_cond_exp:
-			break;
-
-		default:
-			fatal(_("Sorry, don't know how to interpret `%s'"), opcode2str(pc->opcode));
-		}
-
-		JUMPTO(pc->nexti);
-
-/*	} forever */
-
-	/* not reached */
-	return 0;
-
-#undef mk_sub
-#undef JUMPTO
+	if (! preh || (post_execute && posth))
+		return false;
+
+	if (num_exec_hook == MAX_EXEC_HOOKS)
+		return false;
+
+	/*
+	 * Add to the beginning of the array but do not displace the
+	 * debugger hook if it exists.
+	 */
+	if (num_exec_hook > 0) {
+		pos = !! do_debug;
+		if (num_exec_hook > pos)
+			memmove(pre_execute + pos + 1, pre_execute + pos,
+					(num_exec_hook - pos) * sizeof (preh));
+	}
+	pre_execute[pos] = preh;
+	num_exec_hook++;
+
+	if (posth)
+		post_execute = posth;
+
+	return true;
+}
+
+
+/* interpreter routine when not debugging */
+#include "interpret.h"
+
+/* interpreter routine with exec hook(s). Used when debugging and/or with MPFR. */
+#define r_interpret h_interpret
+#define EXEC_HOOK 1
+#include "interpret.h"
+#undef EXEC_HOOK
+#undef r_interpret
+
+
+void
+init_interpret()
+{
+	long newval;
+
+	if ((newval = getenv_long("GAWK_STACKSIZE")) > 0)
+		STACK_SIZE = newval;
+
+	emalloc(stack_bottom, STACK_ITEM *, STACK_SIZE * sizeof(STACK_ITEM), "grow_stack");
+	stack_ptr = stack_bottom - 1;
+	stack_top = stack_bottom + STACK_SIZE - 1;
+
+	/* initialize frame pointer */
+	getnode(frame_ptr);
+	frame_ptr->type = Node_frame;
+	frame_ptr->stack = NULL;
+	frame_ptr->func_node = NULL;	/* in main */
+	frame_ptr->vname = NULL;
+
+	/* initialize true and false nodes */
+	node_Boolean[false] = make_number(0.0);
+	node_Boolean[true] = make_number(1.0);
+	if (! is_mpg_number(node_Boolean[false])) {
+		node_Boolean[false]->flags |= NUMINT;
+		node_Boolean[true]->flags |= NUMINT;
+	}
+
+	/*
+	 * Select the interpreter routine. The version without
+	 * any exec hook support (r_interpret) is faster by about
+	 * 5%, or more depending on the opcodes.
+	 */
+
+	if (num_exec_hook > 0)
+		interpret = h_interpret;
+	else
+		interpret = r_interpret;
+}
+
+/* elem_new_to_scalar --- convert Node_elem_new to untyped scalar */
+
+NODE *
+elem_new_to_scalar(NODE *n)
+{
+	if (n->type != Node_elem_new)
+		return n;
+
+	if (n->valref > 1) {
+		unref(n);
+		return dupnode(Nnull_string);
+	}
+
+	n->type = Node_val;
+
+	return n;
+}
+
+/* fix_nan_sign --- fix NaN sign on RiscV */
+
+// See the thread starting at
+// https://lists.gnu.org/archive/html/bug-gawk/2022-09/msg00005.html
+// for why we need this function.
+
+static double
+fix_nan_sign(double left, double right, double result)
+{
+	if (isnan(left) && signbit(left))
+		return copysign(result, -1.0);
+	else if (isnan(right) && signbit(right))
+		return copysign(result, -1.0);
+	else
+		return result;
 }

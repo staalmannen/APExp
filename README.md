@@ -27,7 +27,7 @@ of the alternative operating system. In many ways, this kind of elitism does
 serve a purpose - especially to keep the base system clean and philosophically
 coherent. As with any ideology or virtue, however, it can easily be perverted
 when applied *in absurdum*. As an opposing ideology stands the pragmatic
-live-and-let-live "*do as Þou wilt*", where enabling people to do anything with
+live-and-let-live "*do what Þou wilt ...*", where enabling people to do anything with
 their system is seen as a good thing.
 
 
@@ -46,13 +46,13 @@ the most capable web browser available on Plan9.
 **Modifications made to APE**
 
 
-***Starting material :*** Imported the latest 9front APE sources from git [x] (date: 2024-04-24)
-In addition, several patches from @lufia [x1, x2] to build libressl and curl
-(introduces pthread, include_next cpp support, etc) and @jamoson (bitfield support in kencc) [x3] has been applied to the
+***Starting material :*** Imported the latest 9front APE sources from git [7] (date: 2024-04-24)
+In addition, several patches from @lufia [8, 9] to build libressl and curl
+(introduces pthread, include_next cpp support, etc) and @jamoson (bitfield support in kencc) [10] has been applied to the
 sources. This served as a base to add ports of third party libraries and utilities to enhance compatibility.
 
 
-Install paths have been modified so that libraries and binaries are installed in the local directory structure of APExp. A bind script (apexp.rc) in the root of APExp can be used to overlay APExp over the native APE.
+Install paths have been modified so that libraries and binaries are installed in the local directory structure of APExp. A bind script (apexp-sh) in the root of APExp can be used to overlay APExp over the native APE.
 
 
 ***Libraries and headers***
@@ -75,7 +75,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - APE make has been replaced by a port of GNU make (version 3.82)
 - APE sed has been replaced by a port of GNU sed (version 4.2.1)
 - APE grep has been replaced by pcre2grep (version 10.432024-02-16 )
-- system awk has been replaced by GNU awk (version 4.0.0) as ape/awk
+- system awk has been replaced by GNU awk (version 5.3.0) as ape/awk
 - system yacc has been replaced by byacc (version 20240109) as ape/yacc
 - system lex has been replaced by flex (version 2.6.4) as ape/lex
 - the utilities "cut", "ls", "true", "tsort", "xargs" and "yes" have been built from suckless sbase under ape
@@ -109,13 +109,13 @@ C transpilers is a fun little proof-of-concept and also opens up for more langua
 
 [6] https://github.com/netsurf-plan9
 
-[x] git://git.9front.org/plan9front/plan9front
+[7] git://git.9front.org/plan9front/plan9front
 
-[x1] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52adaf.squirrel@mx.sdf.org/
+[8] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52adaf.squirrel@mx.sdf.org/
 
-[x2] https://github.com/lufia/plan9/pulls
+[9] https://github.com/lufia/plan9/pulls
 
-[x3] https://webbkurs.ei.hv.se/~imjam/pub/kenccbitfield/
+[10] https://webbkurs.ei.hv.se/~imjam/pub/kenccbitfield/
 
 
 

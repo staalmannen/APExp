@@ -1,11 +1,11 @@
 /* gawkmisc.c --- miscellaneous gawk routines that are OS specific.
- 
-   Copyright (C) 1986, 1988, 1989, 1991 - 1998, 2001 - 2004, 2011
+
+   Copyright (C) 1986, 1988, 1989, 1991 - 1998, 2001 - 2004, 2011, 2021, 2022, 2023,
    the Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -17,25 +17,19 @@
    along with this program; if not, write to the Free Software Foundation,
    Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.  */
 
-/* find: fatal, warning, SRCFILE */
-
-#ifdef PLAN9
-#define DEFPATH "/sys/lib/gnu/awk"
-#include <string.h>
-#include <awk.h>
-#endif
-
-
 #ifdef __CYGWIN__
-#include <stdio.h>
+#ifdef __MSYS__
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <sys/cygwin.h>
-#include <io.h>
+#endif
+#include <io.h>		/* for declaration of setmode(). */
 #endif
 
-char quote = '\'';
-char *defpath = DEFPATH; 
-char envsep = ':';
+const char quote = '\'';
+const char *defpath = DEFPATH;
+const char *deflibpath = DEFLIBPATH;
+const char envsep = ':';
 
 #ifndef INVALID_HANDLE
 /* FIXME: is this value for INVALID_HANDLE correct? */
@@ -44,11 +38,11 @@ char envsep = ':';
 
 /* gawk_name --- pull out the "gawk" part from how the OS called us */
 
-char *
+const char *
 gawk_name(const char *filespec)
 {
-	char *p;
-    
+	const char *p;
+
 	/* "path/name" -> "name" */
 	p = strrchr(filespec, '/');
 	return (p == NULL ? (char *) filespec : p + 1);
@@ -101,8 +95,8 @@ optimal_bufsize(int fd, struct stat *stb)
 {
 	char *val;
 	static size_t env_val = 0;
-	static short first = TRUE;
-	static short exact = FALSE;
+	static bool first = true;
+	static bool exact = false;
 
 	/* force all members to zero in case OS doesn't use all of them. */
 	memset(stb, '\0', sizeof(struct stat));
@@ -112,11 +106,11 @@ optimal_bufsize(int fd, struct stat *stb)
 		fatal("can't stat fd %d (%s)", fd, strerror(errno));
 
 	if (first) {
-		first = FALSE;
+		first = false;
 
 		if ((val = getenv("AWKBUFSIZE")) != NULL) {
 			if (strcmp(val, "exact") == 0)
-				exact = TRUE;
+				exact = true;
 			else if (isdigit((unsigned char) *val)) {
 				for (; *val && isdigit((unsigned char) *val); val++)
 					env_val = (env_val * 10) + *val - '0';
@@ -135,7 +129,7 @@ optimal_bufsize(int fd, struct stat *stb)
 	 * guess. We use stdio's BUFSIZ, since that is what it was
 	 * meant for in the first place.
 	 */
-#ifdef HAVE_ST_BLKSIZE
+#ifdef HAVE_STRUCT_STAT_ST_BLKSIZE
 #define DEFBLKSIZE	(stb->st_blksize > 0 ? stb->st_blksize : BUFSIZ)
 #else
 #define DEFBLKSIZE	BUFSIZ
@@ -212,6 +206,34 @@ os_isdir(int fd)
 	return (fstat(fd, &sbuf) == 0 && S_ISDIR(sbuf.st_mode));
 }
 
+/* os_isreadable --- fd can be read from */
+
+int
+os_isreadable(const awk_input_buf_t *iobuf, bool *isdir)
+{
+	*isdir = false;
+
+	if (iobuf->fd == INVALID_HANDLE)
+		return false;
+
+	switch (iobuf->sbuf.st_mode & S_IFMT) {
+	case S_IFREG:
+	case S_IFCHR:	/* ttys, /dev/null, .. */
+#ifdef S_IFSOCK
+	case S_IFSOCK:
+#endif
+#ifdef S_IFIFO
+	case S_IFIFO:
+#endif
+		return true;
+	case S_IFDIR:
+		*isdir = true;
+		/* fall through */
+	default:
+		return false;
+	}
+}
+
 /* os_is_setuid --- true if running setuid root */
 
 int
@@ -252,7 +274,7 @@ os_isatty(int fd)
 {
 	return isatty(fd);
 }
- 
+
 /* files_are_same --- return true if files are identical */
 
 int
@@ -265,7 +287,18 @@ files_are_same(char *path, SRCFILE *src)
 		&& st.st_ino == src->sbuf.st_ino);
 }
 
-#ifdef __CYGWIN__
+void
+init_sockets(void)
+{
+}
+
+void
+os_maybe_set_errno(void)
+{
+}
+
+// For MSYS, restore behavior of working in text mode.
+#ifdef __MSYS__
 void
 cygwin_premain0(int argc, char **argv, struct per_process *myself)
 {
@@ -281,5 +314,24 @@ void
 cygwin_premain2(int argc, char **argv, struct per_process *myself)
 {
 	setmode(fileno (stdin), O_TEXT);
+}
+#endif
+
+#ifdef __CYGWIN__
+size_t
+wcitomb (char *s, int wc, mbstate_t *ps)
+{
+	/* If s is NULL, behave as if s pointed to an internal buffer and wc
+	   was a null wide character (L'').  wcrtomb will do that for us*/
+	if (wc <= 0xffff || !s)
+		return wcrtomb (s, (wchar_t) wc, ps);
+
+	wchar_t wc_arr[2];
+	const wchar_t *wcp = wc_arr;
+
+	wc -= 0x10000;
+	wc_arr[0] = (wc >> 10) + 0xd800;
+	wc_arr[1] = (wc & 0x3ff) + 0xdc00;
+	return wcsnrtombs (s, &wcp, 2, SIZE_MAX, ps);
 }
 #endif

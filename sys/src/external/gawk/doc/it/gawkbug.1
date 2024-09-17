@@ -1,0 +1,82 @@
+.\"
+.\" MAN PAGE COMMENTS to
+.\"
+.\"     Arnold Robbins
+.\"     bug-gawk@gnu.org
+.\"
+.\" Traduzione di Antonio Giovanni Colombo <azc100@gmail.com>
+.\" per la versione gawk-5.2 / gawk-5.3
+.TH GAWKBUG 1 "2023 Oct 18" "GNU Awk 5.3"
+.SH NOME
+gawkbug \- segnala un bug di gawk
+.SH SINTASSI
+\fBgawkbug\fP [\fI\-\^\-version\fP] [\fI\-\^\-help\fP] [\fIemail-address\fP]
+.SH DESCRIZIONE
+.B gawkbug
+è una script di shell che aiuta un utente a comporre e spedire delle
+segnalazioni di bug riguardo a
+.B gawk
+in un formato standard.
+.B gawkbug
+chiama il programma di edit specificato nella variabile
+.SM
+.B EDITOR
+per modificare una copia temporanea di un modulo standard per
+la segnalazione di errori.  L'utente deve riempire i campi appropriati
+e quindi uscire dalla sessione di edit.
+In seguito,
+.B gawkbug
+spedisce la segnalazione così preparata a \fIbug-gawk@gnu.org\fP, o
+all'\fIindirizzo-email\fP specificato.  Se l'invio non riesce, il
+modulo compilato viene salvato, con il nome \fIdead.gawkbug\fP,
+nella home directory dell'utente che sta facendo la segnalazione.
+.PP
+Il modulo di segnalazione bug è composto da più sezioni.
+La prima sezione fornisce informazioni riguarda al computer, al
+sistema operativo, alla versione di
+.B gawk
+e all'ambiente di compilazione.
+La seconda sezione va riempita con la descrizione del bug.
+La terza sezione dovrebbe contenere una descrizione di come è
+possibile riprodurre il bug.
+La quarta sezione (opzionale) permette di segnalare una possibile
+correzione.  La segnalazione di correzioni è molto gradita.
+.SH VARIABILI D'AMBIENTE
+.B gawkbug
+utilizzerà le seguenti variabili d'ambiente, se definite:
+.TP
+.B EDITOR
+Specifica il programma di edit preferito.  Se
+.SM
+.B EDITOR
+non è impostato,
+.B gawkbug
+tenta di trovare alcuni programma di edit alternativi, compreso
+.BR vim
+e, se necessario,
+.BR emacs .
+Se
+.B gawkbug
+non riesce a trovare alcun programma di edit alternativo, tenta di eseguire \fBvi\fP.
+.TP
+.B HOME
+Nome della directory in cui viene salvata una segnalazione di bug, se non
+è stato possibile inviarla con la posta elettronica.
+.TP
+.B TMPDIR
+Nome della directory in cui creare file e directory temporanei.
+.SH VEDERE ANCHE
+.TP
+\fIgawk\fP(1)
+.SH AUTORI
+Brian Fox, Free Software Foundation
+.br
+bfox@gnu.org
+.PP
+Chet Ramey, Case Western Reserve University
+.br
+chet@po.cwru.edu
+.PP
+Arnold Robbins
+.br
+bug-gawk@gnu.org

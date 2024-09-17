@@ -75,11 +75,11 @@ BEGIN {
 # 386			*buf += len;
 # 387			return nf;
 # 388		}
-# 389	
+# 389
 # 390		/* before doing anything save the char at *end */
 # 391		sav = *end;
 # 392		/* because it will be destroyed now: */
-# 393	
+# 393
 # 394		*end = ' ';	/* sentinel character */
 # 395		for (; nf < up_to; scan++) {
 # (gdb) print end

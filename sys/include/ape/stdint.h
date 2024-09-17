@@ -121,7 +121,11 @@ typedef _uintptr_t uintptr_t;
  * Right now, all of our size_t types are 32 bit, even on
  * 64 bit architectures.
  */
+#ifndef SIZE_MIN
 #define SIZE_MIN	UINT32_MIN
+#endif
+#ifndef SIZE_MAX
 #define SIZE_MAX	UINT32_MAX
+#endif
 
 #endif

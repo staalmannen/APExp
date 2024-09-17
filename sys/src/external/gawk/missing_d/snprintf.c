@@ -2,22 +2,22 @@
  * snprintf.c - Implement snprintf and vsnprintf on platforms that need them.
  */
 
-/* 
- * Copyright (C) 2006, 2007 the Free Software Foundation, Inc.
- * 
+/*
+ * Copyright (C) 2006, 2007, 2018, 2022 the Free Software Foundation, Inc.
+ *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
- * 
+ *
  * GAWK is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GAWK is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
@@ -53,14 +53,14 @@ static void close_safe_f()
 static FILE *
 safe_tmpfile (void)
 {
-	static short first = TRUE;
+	static bool first = true;
 	static const char template[] = "snprintfXXXXXX";
 	int fd;
 	static char *tmpdir = NULL;
 	static int len = 0;
 
 	if (first) {
-		first = FALSE;
+		first = false;
 		/*
 		 * First try Unix stanadard env var, then Windows var,
 		 * then fall back to /tmp.
@@ -86,10 +86,10 @@ safe_tmpfile (void)
 	if ((fd = mkstemp (tmpfilename)) < 0)
 		return NULL;
 
-#if ! defined(DJGPP) && ! defined(MSDOS) && ! defined(_MSC_VER) \
-	&& ! defined(_WIN32) && ! defined(__CRTRSXNT__) && ! defined(__EMX__) \
+#if ! defined(MSDOS) && ! defined(_MSC_VER) \
+	&& ! defined(_WIN32) && ! defined(__CRTRSXNT__) \
 	&& ! defined(__MINGW32__) && ! defined(__WIN32__)
-	/* If not MS, unlink after opening. */
+	/* If not MS unlink after opening. */
 	unlink (tmpfilename);
 	free(tmpfilename);
 	tmpfilename = NULL;
@@ -174,28 +174,12 @@ vsnprintf (char *restrict buf, size_t len,
 }
 
 int
-#if defined(HAVE_STDARG_H) && defined(__STDC__) && __STDC__
 snprintf (char *restrict buf, size_t len, const char *restrict fmt, ...)
-#else
-snprintf (va_alist)
-     va_dcl
-#endif
 {
 	int rv;
 	va_list args;
 
-#if defined(HAVE_STDARG_H) && defined(__STDC__) && __STDC__
 	va_start (args, fmt);
-#else
-	char *buf;
-	size_t len;
-	char *fmt;
-
-	va_start (args);
-	buf = va_arg (args, char *);
-	len = va_arg (args, size_t);
-	fmt = va_arg (args, char *);
-#endif
 	rv = vsnprintf (buf, len, fmt, args);
 	va_end (args);
 	return rv;

@@ -1,6 +1,6 @@
 /* system.c --- replacement system() for systems missing one
 
-   Copyright (C) 1986, 1988, 1989, 1991 the Free Software Foundation, Inc.
+   Copyright (C) 1986, 1988, 1989, 1991, 2023 the Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,8 +19,7 @@
 extern void fatal();
 
 int
-system(s)
-char *s;
+system(const char *s)
 {
 	fatal("system() not supported on this system");
 	return 0;

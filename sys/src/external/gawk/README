@@ -1,5 +1,5 @@
-  Copyright (C) 2005, 2006, 2007, 2009, 2010, 2011
-  Free Software Foundation, Inc.
+  Copyright (C) 2005, 2006, 2007, 2009, 2010, 2011, 2012, 2013, 2014, 2015,
+  2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023 Free Software Foundation, Inc.
   
   Copying and distribution of this file, with or without modification,
   are permitted in any medium without royalty provided the copyright
@@ -7,20 +7,24 @@
 
 README:
 
-This is GNU Awk 4.0.0. It is upwardly compatible with Brian Kernighan's
+This is GNU Awk 5.3.0. It is upwardly compatible with Brian Kernighan's
 version of Unix awk.  It is almost completely compliant with the
-2008 POSIX 1003.1 standard for awk. (See the note below about POSIX.)
+2018 POSIX 1003.1 standard for awk. (See the note below about POSIX.)
 
-This is a major new release. See NEWS and ChangeLog for details.
+This is a major release. See NEWS and ChangeLog for details.
 
-Work to be done is described briefly in the FUTURES file.  Changes in this
-version are summarized in the NEWS file. Please read the LIMITATIONS file.
+Work to be done is described briefly in the TODO file, which is available
+only in the 'master' branch in the Git repo.
+
+Changes in this version are summarized in the NEWS file.
 
 Read the file POSIX.STD for a discussion of issues where the standard
 says one thing but gawk does something different.
 
-To format the documentation with TeX, use at least version 2010-12-23.17
+To format the documentation with TeX, use at least version 2023-09-19.19
 of texinfo.tex. There is a usable copy of texinfo.tex in the doc directory.
+You must also use at least version 7.1 of texindex and of makeinfo
+from the texinfo-7.1 distribution.
 
 INSTALLATION:
 
@@ -30,12 +34,15 @@ have read and didn't, and you bug me about it, I'm going to yell at you.
 
 See the file INSTALL for installation instructions.
 
-If you have neither bison nor yacc, use the awkgram.c file here.  It was
-generated with bison, and has no proprietary code in it.  (Note that
-modifying awkgram.y without bison or yacc will be difficult, at best.
-You might want to get a copy of bison from the FSF too.)
+If you don't have Bison, use the awkgram.c file here.  It was
+generated with Bison, and has no proprietary code in it.  (Note that
+modifying awkgram.y without Bison is next to impossible.  You might
+want to get a copy of Bison from the FSF too.)
 
-If you have an MS-DOS, MS-Windows, or OS/2 system, use the stuff in the `pc'
+The build mechanics depend upon Bison. Also, gawk doesn't work correctly
+with some versions of yacc, so just use Bison.
+
+If you have an MS-DOS, or MS-Windows system, use the stuff in the `pc'
 directory.  Similarly, there is a separate directory for VMS.
 
 Appendix B of ``GAWK: Effective Awk Programming'' discusses configuration
@@ -45,9 +52,12 @@ Automake.
 After successful compilation, do `make check' to run the test suite.
 There should be no output from the `cmp' invocations except in the
 cases where there are small differences in floating point values, and
-possibly in the case of strftime. Several of the tests ignore errors
-on purpose; those are not a problem.  If there are other differences,
-please investigate and report the problem.
+possibly in the case of strftime.  There may be differences based on
+installed (or not installed) locales and the quality of multibyte
+character support on your system.
+
+Several of the tests ignore errors on purpose; those are not a problem.
+If there are other differences, please investigate and report the problem.
 
 PRINTING THE MANUAL
 
@@ -62,33 +72,29 @@ BUG REPORTS AND FIXES (Un*x systems):
 
 Please coordinate changes through Arnold Robbins. In particular, see
 the section in the manual on reporting bugs. Note that comp.lang.awk
-is about the worst place to post a gawk bug report. Please, use the
-mechanisms outlined in the manual.
+is about the worst place to post a gawk bug report. So too is use of
+a web forum such as Stack Overflow. Please, use the mechanisms outlined
+in the manual.
 
-Email should be sent to bug-gawk@gnu.org.  This address sends mail to
-Arnold Robbins and the general GNU utilities bug list.  The advantage
-to using this address is that bug reports are archived at GNU Central.
+Bug reports should be submitted using the `gawkbug' script. This formats
+a report and sends it to bug-gawk@gnu.org.  This is a separate mailing
+list at GNU Central.  The advantage to using this address is that bug
+reports are archived at GNU Central.
+
+General non-bug questions should be sent to help-gawk@gnu.org.
 
 Arnold Robbins
 
 BUG REPORTS AND FIXES, non-Unix systems:
 
-MS-DOS with DJGPP:
-	Scott Deifik
-	scottd.mail@sbcglobal.net
-
 MS-Windows with MinGW:
 	Eli Zaretskii
 	eliz@gnu.org
 
-OS/2:
-	Andreas Buening
-	andreas.buening@nexgo.de
+OpenVMS:
+	John Malmberg
+	wb8tyw@qsl.net
 
-VMS:
-	Pat Rankin
-	rankin@pactechdata.com
-
-z/OS (OS/390):
-	Dave Pitts
-	dpitts@cozx.com
+z/OS (OS/390) Contact:
+	Daniel Richard G.
+	skunk@iSKUNK.ORG

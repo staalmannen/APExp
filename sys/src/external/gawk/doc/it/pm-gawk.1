@@ -1,0 +1,218 @@
+.ds EP \fIGAWK: Programmare efficacemente in AWK\fP
+.\"Traduzione per la versione gawk-5.2.0 di A.G. Colombo - 12 Agosto 2022
+.\"Aggiornamento per la versione gawk-5.2.0 di A.G. Colombo - 14 Agosto 2022
+.ds PM \fIManuale utente funzionalità Memoria Persistente in gawk\fP
+.TH PM-GAWK 1 "17 novembre 2022" "Free Software Foundation" "Comandi di utilità"
+.SH NOME
+gawk con memoria persistente \- dati e funzioni persistenti
+.SH SINTASSI
+.ft CW
+.nf
+truncate -s \f(CIdimensione\fP deposito.pma
+export GAWK_PERSIST_FILE=deposito.pma
+gawk .\^.\^.
+.sp
+truncate -s \f(CIdimensione\fP deposito.pma
+GAWK_PERSIST_FILE=deposito.pma gawk .\^.\^.
+.sp
+truncate -s \f(CIdimensione\fP deposito.pma
+alias pm='GAWK_PERSIST_FILE=deposito.pma'
+pm gawk .\^.\^.                       # forma concisa
+.sp
+unset GAWK_PERSIST_FILE   # disabilitare persistenza
+.sp
+export GAWK_PERSIST_FILE=altro_deposito.pma  # modificare deposito
+.sp
+rm deposito.pma               # cancellare deposito
+.fi
+.ft R
+.SH DESCRIZIONE
+.PP
+.I Gawk
+a partire dalla versione 5.2 supporta la funzionalità
+"memoria persistente", che permette di immagazzinare
+in un file variabili e funzioni definite in uno script
+.I Gawk
+per essere utilizzate in successive esecuzioni di
+.I Gawk .
+La funzionalità, chiamata
+.IR pm-gawk ,
+è descritta in \*(EP e in \*(PM.
+.PP
+.I pm-gawk
+è attivato passando a
+.I gawk
+il nome di un
+.IR "file-deposito" ,
+inizialmente vuoto (tutto a zeri binari)
+attraverso la variabile di ambiente
+\f(CWGAWK_PERSIST_FILE\fP.
+.I pm-gawk
+conserva in tale file-deposito le variabili e le funzioni definite in uno script
+.I Gawk
+per utilizzo in successive esecuzioni di
+.I gawk.
+.PP
+.I pm-gawk
+offre almeno due vantaggi, rispetto all'esistente estensione
+\f(CWrwarray\fP: offre accesso permanente (``O(1) time'') a singoli
+elementi di vettori associativi persistenti, e può immagazzinare
+funzioni definite in uno script
+.I gawk
+oltre alle variabili di cui sopra.
+.SH ESEMPI
+.PP
+Dimostrazione della persistenza di variabili:
+.sp .5
+.RS
+.nf
+.ft CW
+$ \f(CBtruncate -s 1G deposito.pma\fP            # creazione file-deposito
+$ \f(CBexport GAWK_PERSIST_FILE=deposito.pma\fP  # definizione variabile d'ambiente
+$ \f(CBgawk 'BEGIN{ print ++i }'\fP
+1
+$ \f(CBgawk 'BEGIN{ print ++i }'\fP
+2
+$ \f(CBgawk 'BEGIN{ print ++i }'\fP
+3
+.ft R
+.fi
+.RE
+.PP
+Per passare la variabile d'ambiente a livello di singolo comando:
+.sp .5
+.RS
+.nf
+.ft CW
+$ \f(CBunset GAWK_PERSIST_FILE\fP
+$ \f(CBGAWK_PERSIST_FILE=deposito.pma gawk 'BEGIN{ print ++i }'\fP
+4
+$ \f(CBGAWK_PERSIST_FILE=deposito.pma gawk 'BEGIN{ print ++i }'\fP
+5
+$ \f(CBGAWK_PERSIST_FILE=deposito.pma gawk 'BEGIN{ print ++i }'\fP
+6
+.ft R
+.fi
+.RE
+.PP
+Per ridurre l'ingombro legato al passare la variabile d'ambiente
+a livello di ogni singolo comando si può definire un alias:
+.sp .5
+.RS
+.nf
+.ft CW
+$ \f(CBalias pm='GAWK_PERSIST_FILE=deposito.pma'\fP
+$ \f(CBpm gawk 'BEGIN{ print ++i }'\fP
+7
+$ \f(CBpm gawk 'BEGIN{ print ++i }'\fP
+8
+.ft R
+.fi
+.RE
+.PP
+Per evitare di attivare la persistenza:
+.sp .5
+.RS
+.nf
+.ft CW
+$ \f(CBunset GAWK_PERSIST_FILE\fP
+$ \f(CBgawk 'BEGIN{ print ++i }'\fP
+1
+$ \f(CBgawk 'BEGIN{ print ++i }'\fP
+1
+.ft R
+.fi
+.RE
+.PP
+Per ``dimenticare'' definitivamente i contenuti del file-deposito:
+.sp .5
+.RS
+.nf
+.ft CW
+$ \f(CBrm deposito.pma\fP
+.ft R
+.fi
+.RE
+.PP
+.SH VARIABILI D'AMBIENTE
+.PP
+\f(CWGAWK_PERSIST_FILE\fP contiene il nome di un file-deposito dove
+sono immagazzinate le variabili e le funzioni definite in uno script.
+Se tale variabile d'ambiente non è visibile a
+.IR gawk ,
+la funzionalità "memoria persistente"
+non è attivata e
+.I gawk
+si comporta in maniera tradizionale.
+.SH INFORMAZIONE SULLA VERSIONE
+.PP
+La funzionalità "memoria persistente"
+.I gawk
+è stata resa disponibile nella versione
+.I gawk
+5.2.
+.SH AUTORI
+Arnold Robbins, il manutentore di
+.IR gawk ,
+ha implementato
+.I pm-gawk
+usando un allocatore di memoria persistente
+(Persistent Memory Allocator - pma) fornito da
+Terence Kelly.  Una versione precedente, prototipica,
+di
+.I gawk
+con memoria persistente è stata sviluppata da
+Haris Volos, Zi Fan Tan e Jianan Li
+a partire da una diramazione della distribuzione sorgente di
+.I gawk .
+.SH AVVERTIMENTI
+Il filesysten CIFS in ambiente GNU/Linux crea dei problemi
+all'allocatore di memoria persistente. Evitare quindi di
+usare un file di appoggio che risieda su un tale filesystem con
+.IR pm-gawk .
+.SH SEGNALAZIONE DI ERRORI
+Seguire le procedure descritte in \*(EP e in \*(PM.
+Se si ritiene che gli errori siano legati alla
+"memoria persistente" (e non ad altri errori
+.I gawk
+non correlati alla "memoria persistente") siete pregati di
+spedire un messaggio e-mail a
+Terence Kelly a uno o più dei seguenti indirizzi:
+\f(CWtpkelly@acm.org\fP,
+\f(CWtpkelly@eecs.umich.edu\fP,
+o
+\f(CWtpkelly@cs.princeton.edu\fP.
+.SH VEDERE ANCHE
+.IR gawk (1),
+\*(EP,
+e
+\*(PM.
+I due manuali dovrebbero essere disponibili in formato Info,
+se il comando Info è installato nel vostro sistema.
+.PP
+Vedere \f(CWhttps://web.eecs.umich.edu/~tpkelly/pma/\fP per
+l'ultima versione del codice sorgente e del manuale.
+.SH PERMESSI DI COPIA
+Copyright \(co 2022
+Terence Kelly.
+.PP
+È permesso stampare e distribuire copie letterali di questa pagina
+di manuale, a patto che il copyright e questa nota di autorizzazione
+siano conservate e presenti in ogni copia.
+.ig
+È permesso elaborare questo file con il programma troff e stampare il
+risultato, a patto che il documento stampato contenga una sezione
+identica a questa sui permessi di ristampa, tranne che per la rimozione di
+questo paragrafo (in quanto non rilevante per la pagina stampata).
+..
+.PP
+È permesso copiare e distribuire versioni modificate di questa
+pagina del manuale, sotto le condizioni poste per la copia letterale,
+a patto che l'intero lavoro derivato sia distribuito secondo permessi
+di stampa identici a questi.
+.PP
+È permesso copiare e distribuire traduzioni di questa pagina di
+manuale in un'altra lingua, sotto le condizioni poste sopra per le
+versioni modificate, salvo che quest'informazione sui
+permessi di copia e ristampa deve essere espressa in una traduzione
+approvata dalla Free Software Foundation.

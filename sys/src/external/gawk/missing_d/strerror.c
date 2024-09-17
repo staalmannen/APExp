@@ -1,10 +1,10 @@
 /* strerror.c --- ANSI C compatible system error routine
 
-   Copyright (C) 1986, 1988, 1989, 1991 the Free Software Foundation, Inc.
+   Copyright (C) 1986, 1988, 1989, 1991, 2023 the Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
+   the Free Software Foundation; either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -24,8 +24,7 @@ extern int sys_nerr;
 extern char *sys_errlist[];
 
 char *
-strerror(n)
-int n;
+strerror(int n)
 {
 	static char mesg[30];
 

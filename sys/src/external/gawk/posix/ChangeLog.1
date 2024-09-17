@@ -1,0 +1,95 @@
+2018-03-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (cygwin_premain0, cygwin_premain2): Restored for
+	use in MSYS environment only.
+
+2018-02-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.2.1: Release tar ball made.
+
+2017-10-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.2.0: Release tar ball made.
+
+2017-02-20         Corinna Vinschen      <vinschen@redhat.com>
+
+	* gawkmisc.c (cygwin_premain0, cygwin_premain2): Remove.
+	No longer needed.
+
+2016-10-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* General: Remove trailing whitespace from all relevant files.
+
+2016-08-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.4: Release tar ball made.
+
+2015-05-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.3: Release tar ball made.
+
+2015-04-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.2: Release tar ball made.
+
+2014-04-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.1: Release tar ball made.
+
+2013-06-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (init_sockets): Remove ifdefs.
+
+2013-06-01  Eli Zaretskii  <eliz@gnu.org>
+
+	* gawkmisc.c (init_sockets): New dummy function.
+
+2013-05-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (optimal_bufsize): Change check from HAVE_ST_BLKSIZE
+	to HAVE_STRUCT_STAT_ST_BLKSIZE.
+
+2013-05-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.0: Release tar ball made.
+
+2012-12-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.0.2: Release tar ball made.
+
+2012-10-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (os_isreadable): Change name of input parameter to
+	awk_inputbuf_t.
+
+2012-08-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.pc (os_isreadable): Take IOBUF_PUBLIC instead of fd and
+	use passed in info.
+
+2012-07-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (os_isreadable): Add isdir pointer parameter to be
+	set to true if fd is for a directory.
+
+2012-07-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (os_isreadable): New function.
+
+2012-05-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c: Use `bool', `true', and `false' everywhere.
+
+2012-03-20         Andrew J. Schorr     <aschorr@telemetry-investments.com>
+
+	* gawkmisc.c (deflibpath): New global variable.
+
+2012-03-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.0.1: Release tar ball made.
+
+2011-06-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ChangeLog.0: Rotated ChangeLog into this file.
+	* ChangeLog: Created anew for gawk 4.0.0 and on.
+	* 4.0.0: Release tar ball made.

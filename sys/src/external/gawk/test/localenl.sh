@@ -36,9 +36,9 @@
 AWK=${AWK:-../gawk}
 
 # April 2010: Remove UNKNOWN, causes spurious failures on some systems
-for LC_ALL in C POSIX en_US.ISO-8859-1 en_US.UTF-8 #UNKNOWN 
+for LC in C POSIX en_US.ISO-8859-1 en_US.UTF-8 #UNKNOWN
 do
-export LC_ALL
+export LC_ALL=$LC 2>/dev/null
 cat <<EOF |
 line1
 line2

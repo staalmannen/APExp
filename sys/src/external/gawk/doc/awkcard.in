@@ -1,7 +1,9 @@
 .\" AWK Reference Card --- Arnold Robbins, arnold@skeeve.com
 .\"
-.\" Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002,
-.\" 2003, 2004, 2005, 2007, 2009, 2010, 2011 Free Software Foundation, Inc.
+.\" Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+.\" 2005, 2007, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018,
+.\" 2019, 2020, 2021, 2022, 2023
+.\" Free Software Foundation, Inc.
 .\" 
 .\" Permission is granted to make and distribute verbatim copies of
 .\" this reference card provided the copyright notice and this permission
@@ -25,8 +27,7 @@
 .\" Strings to save typing
 .ds AK \*(FCawk\*(FR
 .ds GK \*(FCgawk\*(FR
-.ds PK \*(FCpgawk\*(FR
-.ds NK Bell Labs \*(FCawk\*(FR
+.ds NK Brian Kernighan's \*(FCawk\*(FR
 .ds MK \*(FCmawk\*(FR
 .\"
 .\"
@@ -47,7 +48,8 @@
 .ES
 .in +.2i
 .nf
-\*(FRAction Statements	9
+\*(FRAcknowledgements	9
+Action Statements	9
 Arrays	7
 Awk Program Execution	5
 Bit Manipulation Functions (\*(GK)	17
@@ -64,22 +66,23 @@ Environment Variables (\*(GK)	11
 Escape Sequences	9
 Expressions	7
 Fields	10
-FTP/HTTP Information	18
+FTP/HTTP/GIT Information	18
 Historical Features (\*(GK)	10
 Input Control	13
 Internationalization (\*(GK)	18
 Lines And Statements	4
 Localization (\*(GK)	12
+Namespaces (\*(GK)	12
 Numeric Functions	15
 Output Control	13
 Pattern Elements	8
 Printf Formats	14
 Records	10
 Regular Expressions	11
-Signals (\*(PK)	4
+Signals (\*(GK \*(FC\-\^\-profile\*(FR)	4
 Special Filenames	12
 String Functions	16
-Time Functions (\*(GK)	17
+Time Functions	17
 Type Functions (\*(GK)	18
 User-defined Functions	15
 Variables	5\*(CX
@@ -88,20 +91,17 @@ Variables	5\*(CX
 .sp .4
 .TD
 .fi
-\*(CD\*(FRArnold Robbins wrote this reference card.
-We thank
-Brian Kernighan and Michael Brennan who reviewed it.
 .sp .4
 .SL
 .sp .4
 .so SRCDIR/ad.block
 .\" a subtlety here; this line changes color. We rely on it
-.\" also to provide a blank line.
+.\" also to provide a empty line.
 \*(CD
 .SL
 .nf
-\*(FRCopyright \(co 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-2005, 2007, 2009, 2010, 2011 Free Software Foundation, Inc.
+\*(FRCopyright \(co 1996\(en2005, 2007, 2009\(en2023
+Free Software Foundation, Inc.
 .nf
 .BT
 
@@ -113,7 +113,7 @@ Brian Kernighan and Michael Brennan who reviewed it.
 .ES
 \*(CDThis card describes POSIX AWK, as well as three
 freely available \*(AK implementations
-(see \fHFTP/HTTP Information\fP below).
+(see \fHFTP/HTTP/GIT Information\fP).
 \*(CLCommon extensions (in two or more versions) are printed in light blue.
 \*(CBFeatures specific to just one version\(emusually GNU AWK (\*(GK)\(emare
 printed in dark blue.
@@ -146,7 +146,7 @@ or
 .sp .5
 \*(FIescape sequences\fP \- a special sequence of characters beginning
 with a backslash, used to describe otherwise unprintable characters.
-(See \fHEscape Sequences\fP below.)
+(See \fHEscape Sequences\fP.)
 .sp .5
 \*(FIstring\fP \- a group of characters enclosed in double quotes.
 Strings may contain \*(FIescape sequences\*(FR.
@@ -154,6 +154,10 @@ Strings may contain \*(FIescape sequences\*(FR.
 \*(FIregexp\fP \- a regular expression, either a regexp constant
 enclosed in forward slashes, or a dynamic regexp computed at run-time.
 Regexp constants may contain \*(FIescape sequences\*(FR.
+.sp .5
+\*(CB\*(FIstrongly typed regexp\fP \- a regular expression constant with
+a leading \*(FC@\*(FR. E.g., \*(FC@/stuff/\*(FR. Such constants may
+be assigned to variables and passed to user-defined functions.\*(CD
 .sp .5
 \*(FIname\fP \- a variable, array or function name.
 .sp .5
@@ -174,7 +178,7 @@ be missing.\*(CX
 .ES
 .fi
 \*(CDCommand line arguments control setting the field separator,
-setting variables before the \*(FCBEGIN\fP rule is run, and
+setting variables before the \*(FCBEGIN\fP rule runs, and
 the location of AWK program source code.
 Implementation-specific command line arguments change
 the behavior of the running interpreter.
@@ -200,8 +204,8 @@ T}
 .\" --- Bug Reports
 .ES
 .fi
-\*(CDIf you find a bug in this reference card, please report it via electronic
-mail to \*(FCbug-gawk@gnu.org\*(FR.\*(CX
+\*(CDIf you find a bug in this reference card, please use
+\*(FCgawkbug\*(FR to report it.\*(CX
 .EB "\s+2\f(HBBUG REPORTS\*(FR\s0"
 
 .BT
@@ -211,9 +215,9 @@ mail to \*(FCbug-gawk@gnu.org\*(FR.\*(CX
 .\" --- Command Line Arguments (gawk)
 .ES
 .fi
-\*(CDLong options may abbreviated as long as the abbreviation
+\*(CDLong options may be abbreviated as long as the abbreviation
 remains unique.
-You may use ``\*(FC\-W \*(FIoption\*(FR''
+Use ``\*(FC\-W \*(FIoption\*(FR''
 for full POSIX compliance.
 .sp .5
 .ig
@@ -237,76 +241,70 @@ l lw(1.3i).
 .TE
 .in +4n
 .TI "\*(FC\-b\*(FR, \*(FC\-\^\-characters\-as\-bytes\*(FR
-Treat all input data as single-byte characters. I.e.,
-don't attempt to
-process strings as multibyte characters.
+Treat all input data as single-byte characters.
 Overridden by \*(FC\-\^\-posix\*(FR.
 .TI "\*(FC\-c\*(FR, \*(FC\-\^\-traditional\*(FR
 Disable \*(GK-specific extensions.
 .TI "\*(FC\-C\*(FR, \*(FC\-\^\-copyright\*(FR
-Print the short version of the GNU
+Print the short GNU
 copyright information on \*(FCstdout\*(FR.
 .TI "\*(FC\-d\*(FR[\*(FIfile\*(FR], \*(FC\-\^\-dump-variables\*(FR[\*(FC=\*(FIfile\*(FR]
 Print a sorted list of global variables,
 their types and final values to
-\*(FIfile\*(FR.
-If no \*(FIfile\*(FR
-is provided, \*(FCgawk\*(FR
-uses \*(FCawkvars.out\*(FR.
+\*(FIfile\*(FR (default: \*(FCawkvars.out\*(FR).
+.TI "\*(FC\-D\*(FR[\*(FC\*(FIfile\*(FR], \*(FC\-\^\-debug\*(FR[\*(FC=\*(FIfile\*(FR]
+Enable debugging of program. Optionally read stored commands
+from \*(FIfile\*(FR.
 .TI "\*(FC-e '\*(FItext\*(FC'\*(FR, \*(FC\-\^\-source '\*(FItext\*(FC'\*(FR
 Use \*(FItext\*(FR as AWK program source code.
 .TI "\*(FC\-E \*(FIfile\*(FR, \*(FC\-\^\-exec \*(FIfile\*(FR
 Read program text from \*(FIfile\fP. No other
 options are processed.
-Also disables command-line variable assignments.
+Also disable command-line variable assignments.
 Useful with \*(FC#!\fP.
 .TI "\*(FC\-g\*(FR, \*(FC\-\^\-gen\-pot\*(FR
 Process the program and print a GNU \*(FCgettext\*(FR
-format \*(FC\&.pot\*(FR file on standard output,
+format \*(FC\&.pot\*(FR file on \*(FCstdout\*(FR,
 containing the text of all strings that were marked
 for localization.
 .TI "\*(FC\-h\*(FR, \*(FC\-\^\-help\*(FR
 Print a short summary of the available
 options on \*(FCstdout\*(FR, then exit zero.
+.TI "\*(FC\-i \*(FIfile\*(FR, \*(FC\-\^\-include \*(FIfile\*(FR
+Include library AWK code in \*(FIfile\*(FR.
+See \fHAwk Program Execution\*(FR.
+.TI "\*(FC\-I\*(FR, \*(FC\-\^\-trace\*(FR
+Print the internal byte code names as they are executed.
+.TI "\*(FC\-k\*(FR, \*(FC\-\^\-csv\*(FR
+Enable CSV special processing. See the manual for details.
+.TI "\*(FC\-l \*(FIlib\*(FR, \*(FC\-\^\-load \*(FIlib\*(FR
+Load dynamic extension \*(FIlib\fP.
+See \fHDynamic Extensions\*(FR.
 .TI "\*(FC\-L \*(FR[\*(FC\*(FIvalue\*(FR], \*(FC\-\^\-lint\*(FR[\*(FC=\*(FIvalue\*(FR]
-Warn about dubious or non-portable constructs.
-If \*(FIvalue\*(FR is
+Warn about dubious or non-portable constructs. Possible optional
+\*(FIvalue\*(FRs are
 \*(FCfatal\*(FR,
-lint warnings become fatal errors.
-If \*(FIvalue\*(FR is
-\*(FCinvalid\*(FR,
-only issue warnings about things that are
-actually invalid (not fully implemented yet).
+\*(FCinvalid\*(FR, and
+\*(FCno-ext\*(FR.
+See \*(AM for the details.
+.TI "\*(FC\-M\*(FR, \*(FC\-\^\-bignum\*(FR
+Enable arbitrary-precision arithmetic.
 .TI "\*(FC\-n\*(FR, \*(FC\-\^\-non\-decimal\-data\*(FR
 Recognize octal and hexadecimal values in input data.
 \*(FIUse this option with great caution!\*(FR
 .TI "\*(FC\-N\*(FR, \*(FC\-\^\-use\-lc\-numeric\*(FR
 Force use of the locale's decimal point character when parsing input data.
+.TI "\*(FC\-o\*(FR[\*(FC\*(FIfile\*(FR], \*(FC\-\^\-pretty-print\*(FR[\*(FC=\*(FIfile\*(FR]
+Output a pretty printed version of the program to \*(FIfile\*(FR
+(default: \*(FCawkprof.out\*(FR).
 .TI "\*(FC\-O\*(FR, \*(FC\-\^\-optimize\*(FR
-Enable some internal optimizations.
+Enable internal optimizations (default is on).
 .TI "\*(FC\-p\*(FR[\*(FC\*(FIfile\*(FR], \*(FC\-\^\-profile\*(FR[\*(FC=\*(FIfile\*(FR]
 Send profiling data to \*(FIfile\*(FR
 (default: \*(FCawkprof.out\*(FR).
-With \*(GK,
-the profile is just a ``pretty printed'' version of the program.
-With \*(PK,
-the profile contains execution counts in the left margin
-of each statement in the program.
+The profile contains execution counts in the left margin.
 .TI "\*(FC\-P\*(FR, \*(FC\-\^\-posix\*(FR
-Disable common and GNU extensions.
-.TI "\*(FC\-R \*(FIfile\*(FR, \*(FC\-\^\-command \*(FIfile\*(FR"
-\*(FCdgawk\*(FR only.
-Read stored debugger commands from \*(FIfile\*(FR.
-.TI "\*(FC\-r\*(FR, \*(FC\-\^\-re\-interval\*(FR
-Enable \*(FIinterval expressions\*(FR in regular
-expression matching (see \fHRegular
-Expressions\fP below). Useful if
-\*(FC\-\^\-traditional\*(FR is specified.
-.TI "\*(FC\-S\*(FR, \*(FC\-\^\-sandbox\*(FR
-Disable the \*(FCsystem()\*(FR function,
-input redirection with \*(FCgetline\*(FR,
-output redirection with \*(FCprint\*(FR and \*(FCprintf\*(FR,
-and dynamic extensions loading.\*(CB
+Disable common and GNU extensions.\*(CB
 .in -4n
 .EB "\s+2\f(HBCOMMAND LINE ARGUMENTS (\*(GK\f(HB)\*(FR\s0"
 
@@ -318,6 +316,15 @@ and dynamic extensions loading.\*(CB
 .ES
 .fi
 .in +4n
+.TI "\*(FC\-r\*(FR, \*(FC\-\^\-re\-interval\*(FR
+Does nothing; for backwards compatibility only.
+.TI "\*(FC\-s\*(FR, \*(FC\-\^\-no\-optimize\*(FR
+Disable internal optimizations.
+.TI "\*(FC\-S\*(FR, \*(FC\-\^\-sandbox\*(FR
+Disable the \*(FCsystem()\*(FR function,
+input redirection with \*(FCgetline\*(FR,
+output redirection with \*(FCprint\*(FR and \*(FCprintf\*(FR,
+and loading dynamic extensions.
 .TI "\*(FC-t\*(FR, \*(FC\-\^\-lint\-old\*(FR
 Warn about constructs that are not
 portable to the original version of
@@ -330,14 +337,14 @@ and exit zero.
 .in -4n
 .sp .5
 .fi
-In compatibility mode,
-any other options are flagged as invalid, but are otherwise ignored.
 Normally, if there is program text, unknown
 options are passed on to the AWK program in
 \*(FCARGV\*(FR
-for processing.\*(CB
+for processing.
+In compatibility mode,
+unknown options are flagged as invalid, but are otherwise ignored.\*(CB
 .EB "\s+2\f(HBCOMMAND LINE ARGUMENTS (\*(GK\f(HB)\*(FR\s0"
-
+.sp .4
 .\"
 .\"
 .\" --- Command Line Arguments (mawk)
@@ -370,7 +377,7 @@ Adjust the size of \*(MK's internal
 T}
 \*(FC\-W version\*(FR	T{
 Print version and copyright on
-\*(FCstdout\fP and limit information on \*(FCstderr\fP
+\*(FCstdout\fP, limit information on \*(FCstderr\fP,
 and exit zero.
 T}
 .TE
@@ -382,14 +389,14 @@ The options may be abbreviated using just the first letter, e.g.,
 and so on.\*(CB
 .EB "\s+2\f(HBCOMMAND LINE ARGUMENTS (\*(MK\f(HB)\*(FR\s0"
 .sp .7
-.\" --- Signals (pgawk)
+.\" --- Signals (gawk --profile)
 .ES
 .fi
-\*(CD\*(PK accepts two signals.
+\*(CD\*(GK accepts two signals while profiling.
 \*(FCSIGUSR1\fP dumps a profile and function call stack to the
 profile file.  It then continues to run.
 \*(FCSIGHUP\fP is similar, but exits.\*(CB
-.EB "\s+2\f(HBSIGNALS (\*(PK\f(HB)\*(FR\s0"
+.EB "\s+2\f(HBSIGNALS (\*(GK \f(HB\-\^\-profile)\*(FR\s0"
 
 .\" --- Lines And Statements
 .ES
@@ -400,21 +407,21 @@ Either the pattern  or the action may be missing, but
 not both. If the pattern is missing, the action is
 executed for every input record.
 A missing action is equivalent to
-.sp .5
-	\*(FC{ print }\fP
-.sp .5
+.\" .sp .5
+\*(FC{ print }\fP
+.\" .sp .5
 which prints the entire record.
 .sp .5
 Comments begin with the \*(FC#\*(FR character, and continue until the
 end of the line.
-Normally, a statement ends with a newline, but lines ending in
+Normally, statements end with a newline, but lines ending in
 a ``,'',
 \*(FC{\*(FR,
 \*(CB\*(FC?\*(FR,
 \*(FC:\*(FR,\*(CD
-\*(FC&&\*(FR
+\*(FC&&\*(FR,
 or
-\*(FC||\*(FR
+\*(FC||\*(FR,
 are automatically continued.
 Lines ending in \*(FCdo\fP or \*(FCelse\fP
 also have their statements automatically continued on the following line.
@@ -432,10 +439,16 @@ and to the pattern-action statements themselves.\*(CX
 .\" --- Awk Program Execution
 .ES
 .fi
-\*(CDAWK programs are a sequence of pattern-action statements
+\*(CDAWK programs are a sequence of
+\*(CBoptional directives,\*(CD
+pattern-action statements
 and optional function definitions.
 .sp .5
-	\*(CB\*(FC@include "\*(FIfilename\*(FC"\*(CD
+	\*(CB\*(FC@include "\*(FIfilename\*(FC"
+.br
+	\*(FC@load "\*(FIfilename\*(FC"
+.br
+	\*(FC@namespace "\*(FInamespace\*(FC"\*(CD
 .br
 	\*(FIpattern\*(FC	{ \*(FIaction statements\*(FC }\*(FR
 .br
@@ -449,8 +462,10 @@ The program text is read as if all the \*(FIprog-file\*(FR(s)
 \*(CBand command line
 source texts\*(CD had been concatenated.
 .sp
-\*(GK includes files named on \*(FC@include\*(FR lines.
-Nested includes are allowed.\*(CD
+\*(CB\*(GK includes files named on \*(FC@include\*(FR lines.
+Nested includes are allowed.
+\*(GK loads extensions named on \*(FC@load\*(FR lines;
+see \fHDynamic Extensions\*(FR.\*(CD
 .sp .5
 AWK programs execute in the following order.
 First, all variable assignments specified via the \*(FC\-v\fP
@@ -458,35 +473,33 @@ option are performed.
 Next, \*(AK executes the code in the
 \*(FCBEGIN\fP rules(s), if any, and then proceeds to read
 the files \*(FC1\fP through \*(FCARGC \- 1\fP in the \*(FCARGV\fP array.
-(Adjusting \*(FCARGC\fP and \*(FCARGV\fP thus provides control over
-the input files that will be processed.)
 If there are no files named on the command line,
 \*(AK reads the standard input.
 .sp .5
-If a command line argument has the form
+A command line argument of the form
 \*(FIvar\*(FC=\*(FIval\*(FR,
-it is treated as a variable assignment. The variable
-\*(FIvar\fP will be assigned the value \*(FIval\*(FR.
+is treated as a variable assignment. The variable
+\*(FIvar\fP is assigned the value \*(FIval\*(FR.
 (This happens after any \*(FCBEGIN\fP rule(s) have been run.)
-... delete this paragraph if no space
-Command line variable assignment
-is most useful for dynamically assigning values to the variables
-\*(AK uses to control how input is broken into fields and records. It
-is also useful for controlling state if multiple passes are needed over
-a single data file.
 .sp .5
 If the value of a particular element of \*(FCARGV\fP is empty
 (\*(FC"\^"\*(FR), \*(AK skips over it.
 .sp .5
+Naming directories on the command-line is generally a fatal error.
+\*(CB\*(GK skips them, with a warning, unless invoked with
+\*(FC\-\^\-posix\*(FR
+or
+\*(FC\-\^\-traditional.\*(CK\*(FR
+.sp .5
 \*(CBFor each input file,
-if a \*(FCBEGINFILE\fP rule exists, \*(GK executes the associated code
+if a \*(FCBEGINFILE\fP rule exists, \*(GK executes the associated \*(FIaction\*(FR
 before processing the contents of the file. Similarly, \*(GK executes
-the code associated with \*(FCENDFILE\fP after processing the file.\*(CD
+the \*(FIaction\*(FR associated with \*(FCENDFILE\fP after processing the file.\*(CD
 .sp .5
 For each record in the input, \*(AK tests to see if it matches any
 \*(FIpattern\fP in the AWK program.
-For each pattern that the record matches, the associated
-\*(FIaction\fP is executed.
+For each pattern that the record matches,
+it executes the associated \*(FIaction\fP.
 The patterns are tested in the order they occur in the program.
 .sp .5
 Finally, after all the input is exhausted,
@@ -502,7 +515,7 @@ If a program only has an \*(FCEND\fP rule, the input is read.
 .fi
 .TS
 expand;
-l lw(2i).
+l lw(2.3i).
 \*(CD\*(FCARGC\fP	T{
 Number of command line arguments.
 T}
@@ -511,14 +524,14 @@ Index in \*(FCARGV\fP of current data file.\*(CD
 T}
 \*(FCARGV\fP	T{
 Array of command line arguments. Indexed from
-0 to \*(FCARGC\fP \- 1. Dynamically changing the
+zero to \*(FCARGC\fP \- 1. Dynamically changing the
 contents of \*(FCARGV\fP can control the files used
 for data.
 T}
 \*(CL\*(FCBINMODE\fP	T{
 Controls ``binary'' mode for all file I/O.  Values of 1, 2, or 3,
 indicate input, output, or all files, respectively, should use binary
-I/O.  \*(CR(Not \*(NK.)  \*(CLApplies only to non-POSIX systems.
+I/O.  \*(CR(Not \*(NK.)  \*(CLOnly for non-POSIX systems.
 \*(CBFor \*(GK, string values of \*(FC"r"\fP, or \*(FC"w"\fP specify
 that input files, or output files, respectively, should use binary I/O.
 Use \*(FC"rw"\fP or \*(FC"wr"\fP for all files.\*(CX
@@ -539,21 +552,22 @@ is \*(FC"%.6g"\*(FR.
 T}
 \*(FCENVIRON\fP	T{
 Array containing the current environment.
-it is indexed by the environment
-variables, each element being the value of
+It is indexed by the environment
+variable names, each element being the value of
 that variable.
 T}
 \*(CB\*(FCERRNO\fP	T{
-String describing the error if a
+String error value if a
 \*(FCgetline\*(FR
 redirection or read
 fails, or if
 \*(FCclose()\*(FR fails.
 T}
 \*(FCFIELDWIDTHS\fP	T{
-Whitespace separated list of field widths. Used
-to parse the input into fields of fixed width,
-instead of the value of \*(FCFS\fP.\*(CD
+Whitespace-separated list of field widths.
+Used to parse the input into fields of fixed width,
+instead of the value of \*(FCFS\fP
+(see \fHFields\*(FR).\*(CD
 T}
 \*(FCFILENAME\fP	T{
 Name of the current input file. If no files given
@@ -567,11 +581,16 @@ T}
 \*(CB\*(FCFPAT\fP	T{
 Regular expression describing field contents.
 Used to parse the input based on the fields
-instead of the field separator.\*(CD
+instead of the field separator
+(see \fHFields\*(FR).\*(CD
 T}
 \*(FCFS\fP	T{
 Input field separator, a space by default
-(see \fHFields\fP above).
+(see \fHFields\fP).
+T}
+\*(CB\*(FCFUNCTAB\fP	T{
+An array indexed by the names of all user-defined
+and extension functions.\*(CD
 T}
 \*(CB\*(FCIGNORECASE\fP	T{
 If non-zero, all regular expression and string
@@ -587,13 +606,8 @@ T}
 \*(CB\*(FCLINT\fP	T{
 Provides dynamic control of the \*(FC\-\^\-lint\fP
 option from within an AWK program.
-When true, \*(GK
-prints lint warnings.
-When assigned the string value \*(FC"fatal"\*(FR,
-lint warnings become fatal errors.
-Any other true value just prints warnings.\*(CD
 T}
-\*(FCNF\fP	T{
+\*(CD\*(FCNF\fP	T{
 Number of fields in the current input record.
 T}
 \*(FCNR\fP	T{
@@ -608,7 +622,11 @@ T}
 \*(FCORS\fP	T{
 Output record separator, a newline by default.
 T}
-\*(CB\*(FCPROCINFO\fP	T{
+\*(CB\*(FCPREC\fP	T{
+The working precision of arbitrary precision floating-point
+numbers, 53 by default.
+T}
+\*(FCPROCINFO\fP	T{
 Elements of this array provide access to information
 about the running AWK program. See
 \*(AM for details.\*(CD
@@ -617,13 +635,17 @@ T}
 Length of the string matched by \*(FCmatch()\*(FR;
 \-1 if no match.
 T}
+\*(CB\*(FCROUNDMODE\fP	T{
+The rounding mode to use for arbitrary precision arithmetic,
+by default \*(FC"N"\fP.\*(CD
+T}
 \*(FCRS\fP	T{
 Input record separator, a newline by default
-(see \fHRecords\fP above).
+(see \fHRecords\fP).
 T}
 \*(FCRSTART\fP	T{
 Index of the first character matched by
-\*(FCmatch()\*(FR; 0 if no match.
+\*(FCmatch()\*(FR; zero if no match.
 T}
 \*(CB\*(FCRT\fP	T{
 Record terminator. \*(GK sets \*(FCRT\fP to the input
@@ -633,7 +655,12 @@ T}
 \*(FCSUBSEP\fP	T{
 Character(s) used to separate multiple subscripts
 in array elements, by default \*(FC"\e034"\*(FR. (See
-\fHArrays\fP below).
+\fHArrays\fP).
+T}
+\*(CB\*(FCSYMTAB\fP	T{
+An array indexed by the names of all global
+variables and arrays. May be used to indirectly
+set variable and array values.\*(CD
 T}
 \*(CB\*(FCTEXTDOMAIN\fP	T{
 The internationalization text domain,
@@ -654,7 +681,7 @@ If the expression is a list
 (\*(FIexpr\*(FC, \*(FIexpr \*(FR...),
 then the subscript is a string consisting of the
 concatenation of the (string) value of each expression,
-separated by the value of the \*(FCSUBSEP\fP variable.
+separated by the value of \*(FCSUBSEP\fP.
 This simulates multi-dimensional
 arrays. For example:
 .nf
@@ -685,9 +712,11 @@ loop to iterate over all the elements of an array.
 .sp .5
 Use the \*(FCdelete\fP statement to delete an
 element from an array.
-\*(CLSpecifying just the array name without a subscript in
+Specifying just the array name without a subscript in
 the \*(FCdelete\fP
 statement deletes the entire contents of an array.
+\*(CBYou cannot use \*(FCdelete\fP with \*(FCFUNCTAB\fP
+or \*(FCSYMTAB\fP.\*(CD
 .sp .5
 \*(CB\*(GK provides true multidimensional arrays.
 Such arrays need not be ``rectangular'' as in C or C++. For example:
@@ -739,7 +768,7 @@ T}
 \*(FIspace\fP	String concatenation
 \*(FC< >\fP	Less than, greater than
 \*(FC<= >=\fP	Less than or equal, greater than or equal
-\*(FC!= ==\fP	Not equal, equal
+\*(FC== !=\fP	Equal, not equal
 \*(FC~ !~\fP	Regular expression match, negated match
 \*(FCin\fP	Array membership
 \*(FC&&\fP	Logical AND, short circuit
@@ -760,11 +789,17 @@ l lw(1.8i).
 .fi
 \*(CDVariables and fields may be (floating point) numbers, strings or both.
 Context determines how a variable's value is interpreted. If used in
-a numeric expression, it will be treated as a number, if used as a string
+a numeric expression, it will be treated as a number; if used as a string
 it will be treated as a string.
+\*(CBAssigning a strongly typed regexp constant to a scalar makes it
+a regexp.\*(CD
 .sp .5
-To force a variable to be treated as a number, add 0 to it; to force it
+To force a variable to be treated as a number, add zero to it; to force it
 to be treated as a string, concatenate it with the null string.
+.sp .5
+Uninitialized variables have the numeric value zero and the string value
+\*(FC"\^"\fP
+(the null, or empty, string).
 .sp .5
 When a string must be converted to a number, the conversion is accomplished
 using \*(FIstrtod\*(FR(3).
@@ -790,11 +825,7 @@ elements and the elements of an array created by \*(FCsplit()\fP
 \*(CBor \*(FCpatsplit()\fP\*(CD that are numeric strings.
 The basic idea is that \*(FIuser input\*(FR,
 and only user input, that looks numeric,
-should be treated that way.\*(CD
-.sp .5
-Uninitialized variables have the numeric value 0 and the string value
-\*(FC"\^"\fP
-(the null, or empty, string).\*(CX
+should be treated that way.\*(CX
 .EB "\s+2\f(HBCONVERSIONS AND COMPARISONS\*(FR\s0"
 
 .\" --- Pattern Elements
@@ -820,7 +851,7 @@ in a program, including different source files.
 \*(CB\*(FCBEGINFILE\*(FR and \*(FCENDFILE\*(FR are special patterns that
 execute before the first record of each file and after the last record
 of each file, respectively. In the \*(FCBEGINFILE\*(FR rule, the \*(FCERRNO\*(FR
-variable is non-null if there is a problem with the file; the code should use
+variable is non-null if there is a problem with the file; the rule should use
 \*(FCnextfile\*(FR to skip the file if desired. Otherwise \*(GK exits with
 its usual fatal error.  The actions for multiple
 \*(FCBEGINFILE\*(FR and \*(FCENDFILE\*(FR patterns are merged.\*(CD
@@ -860,9 +891,9 @@ or go to the \*(FIincr\*(FR part of a \*(FCfor\*(FR loop.
 .br
 Delete element \*(FIindex\*(FR from array \*(FIarray\*(FR.
 .ti -.2i
-\*(CL\*(FCdelete \*(FIarray\^\*(FR
+\*(FCdelete \*(FIarray\^\*(FR
 .br
-Delete all elements from array \*(FIarray\*(FR.\*(CD
+Delete all elements from array \*(FIarray\*(FR.
 .ti -.2i
 \*(FCdo \*(FIstatement  \*(FCwhile (\*(FIcondition\*(FC)\*(FR
 .br
@@ -899,7 +930,7 @@ matches the closest \*(FCif\*(FR.
 .ti -.2i
 \*(FCnext\*(FR	See \fHInput Control.\fP
 .ti -.2i
-\*(CL\*(FCnextfile\*(FR	See \fHInput Control.\fP\*(CD
+\*(FCnextfile\*(FR	See \fHInput Control.\fP
 .in -.2i
 .\" --- Start switch statement
 \*(CB\*(FCswitch (\*(FIexpression\*(FC) {
@@ -943,9 +974,18 @@ lp8 lp8 lp8 lp8.
 \*(FC\ef\fP~form feed~\*(FC\ev\fP~vertical tab
 \*(FC\en\fP~newline~\*(FC\e\e\fP~backslash
 \*(FC\e\*(FIddd\*(FR~octal value \*(FIddd\fP~\*(CL\*(FC\ex\*(FIhh\*(FR~hex value \*(FIhh\fP\*(CD
-\*(FC\e"\fP~double quote~\*(FC\e/\fP~forward slash\*(CX
+\*(FC\e"\fP~double quote~\*(FC\e/\fP~forward slash
+\*(CL\*(FC\eu\*(FIhh...\fR~unicode character\*(CX
 .TE
 .EB "\s+2\f(HBESCAPE SEQUENCES\*(FR\s0"
+.sp
+.\" --- Acknowledgements
+.ES
+.fi
+\*(CD\*(FRArnold Robbins wrote this reference card.
+We thank
+Brian Kernighan and Michael Brennan who reviewed it.\*(CX
+.EB "\s+2\f(HBACKNOWLEDGMENTS\*(FR\s0"
 .BT
 
 .\" --- Records
@@ -956,7 +996,6 @@ Assigning values to the built-in variable \*(FCRS\*(FR
 controls how records are separated.
 If \*(FCRS\fP is any single character, that character separates records.
 \*(CLOtherwise, \*(FCRS\fP is a regular expression.
-\*(CR(Not \*(NK.)\*(CL
 Text in the input that matches this
 regular expression separates the record.
 \*(CB\*(GK sets \*(FCRT\*(FR to the value of the
@@ -965,13 +1004,13 @@ The value of \*(FCIGNORECASE\fP
 also affects how records are separated when
 \*(FCRS\fP is a regular expression.\*(CD
 If \*(FCRS\fP is set to the null string,
-then records are separated by one or more blank lines.
+then records are separated by one or more empty lines.
 When \*(FCRS\fP is set to the null string,
 the newline character always acts as
 a field separator, in addition to whatever value
 \*(FCFS\fP may have.
 \*(CB\*(MK does not apply exceptional rules to \*(FCFS\fP
-when \*(FCRS = "\^"\fP.\*(CX
+when \*(FCRS\fP is set to \*(FC"\^"\fP.\*(CX
 .EB "\s+2\f(HBRECORDS\*(FR\s0"
 
 .\" --- Fields
@@ -988,20 +1027,21 @@ Otherwise, \*(FCFS\fP is expected to be a full regular expression.
 In the special case that \*(FCFS\fP
 is a single space, fields are separated
 by runs of spaces and/or tabs
-\*(CLand/or newlines\*(CD.
+and/or newlines.
 Leading and trailing whitespace are ignored.
 \*(CBThe value of \*(FCIGNORECASE\fP
 also affects how fields are split when
 \*(FCFS\fP is a regular expression.\*(CD
 .sp .5
-\*(CBIf the \*(FCFIELDWIDTHS\fP
-variable is set to a space-separated list of numbers, each field is
+\*(CBIf \*(FCFIELDWIDTHS\fP
+is set to a space-separated list of numbers, each field is
 expected to have a fixed width, and \*(GK
-splits up the record using the specified widths.
+splits the record using the specified widths.
+Each field width may optionally be preceded by a colon-separated
+value specifying the number of characters to skip before the field starts.
 The value of \*(FCFS\fP is ignored.
 Assigning a new value to \*(FCFS\fP or \*(FCFPAT\fP
 overrides the use of \*(FCFIELDWIDTHS\*(FR.
-and restores the default behavior.
 .sp .5
 Similarly, if the
 \*(FCFPAT\fP
@@ -1016,7 +1056,7 @@ or
 overrides the use of
 \*(FCFPAT\fP.\*(CD
 .sp .5
-Each field in the input record may be referenced by its position,
+Each field in the input record may be referenced by its position:
 \*(FC$1\*(FR, \*(FC$2\*(FR and so on.
 \*(FC$0\fP is the whole record.
 Fields may also be assigned new values.
@@ -1025,15 +1065,14 @@ The variable \*(FCNF\fP
 is set to the total number of fields in the input record.
 .sp .5
 References to non-existent fields (i.e., fields after \*(FC$NF\*(FR)
-produce the null-string. However, assigning to a non-existent field
+produce the null string. However, assigning to a non-existent field
 (e.g., \*(FC$(NF+2) = 5\*(FR) increases the value of
 \*(FCNF\*(FR, creates any intervening fields with the null string as their value,
 and causes the value of \*(FC$0\fP
 to be recomputed with the fields being separated by the
 value of \*(FCOFS\*(FR.
 References to negative numbered fields cause a fatal error.
-Decreasing the value of \*(FCNF\fP causes the trailing fields to be lost
-\*(CR(not \*(NK).\*(CX
+Decreasing the value of \*(FCNF\fP causes the trailing fields to be lost.\*(CX
 .EB "\s+2\f(HBFIELDS\*(FR\s0"
 
 .\" --- Historical Features
@@ -1041,11 +1080,11 @@ Decreasing the value of \*(FCNF\fP causes the trailing fields to be lost
 .fi
 \*(CDIt is possible to call the \*(FClength()\fP
 built-in function not only with no argument, but even without parentheses.
-Doing so, however, is poor practice,
-and \*(GK
+Doing so, however, is poor practice.
+\*(CB\*(GK
 issues a warning about its use if \*(FC\-\^\-lint\fP
-is specified on the command line.\*(CB
-.EB "\s+2\f(HBHISTORICAL FEATURES (\*(GK\f(HB)\*(FR\s0"
+is specified on the command line.\*(CL
+.EB "\s+2\f(HBHISTORICAL FEATURES\*(FR\s0"
 .BT
 
 .\" --- Regular Expressions
@@ -1068,7 +1107,7 @@ Summary of Regular Expressions
 In Decreasing Precedence
 _
 \*(FC(\^\*(FIr\*(FC)\*(FR~regular expression (for grouping)
-\*(FIc\*(FR~if non-special char, matches itself
+\*(FIc\*(FR~if non-special character, matches itself
 \*(FC\e\*(FI\^c\*(FR~turn off special meaning of \*(FIc\fP
 \*(FC^\*(FR~beginning of string (note: \*(FInot\fP line)
 \*(FC$\*(FR~end of string (note: \*(FInot\fP line)
@@ -1088,14 +1127,15 @@ _
 \*(FIr\*(FC*\*(FR~zero or more occurrences of \*(FIr\*(FR
 \*(FIr\*(FC+\*(FR~one or more occurrences of \*(FIr\*(FR
 \*(FIr\*(FC?\*(FR~zero or one occurrences of \*(FIr\*(FR
-\*(FIr\*(FC{\*(FIn\*(FC,\*(FIm\*(FC}\*(FR~\*(FIn\fP to \*(FIm\fP occurrences of \*(FIr\*(FR \*(CR(POSIX: see note below)\*(CD
+\*(FIr\*(FC{\*(FIn\*(FC,\*(FIm\*(FC}\*(FR~\*(FIn\fP to \*(FIm\fP occurrences of \*(FIr\*(FR (POSIX: see note below)
 \*(FIr1\*(FC|\|\*(FIr2\*(FR~\*(FIr1\*(FR or \*(FIr2\*(FR
 .TE
 .sp .5
 .fi
-\*(CRThe \*(FIr\*(FC{\*(FIn\*(FC,\*(FIm\*(FC}\*(FR notation is called an
-\*(FIinterval expression\fP. POSIX mandates it for AWK regexps, but
-most \*(AKs don't implement it.\*(CX
+The \*(FIr\*(FC{\*(FIn\*(FC,\*(FIm\*(FC}\*(FR notation is called an
+\*(FIinterval expression\fP.
+\*(CRNot supported by
+\*(MK.\*(CX
 .sp .5
 \*(CDIn regular expressions, within character ranges
 (\*(FC[\*(FR...\*(FC]\*(FR),
@@ -1117,29 +1157,29 @@ lp8 lp8 lp8 lp8.
 .\" --- Environment Variables
 .ES
 .fi
-\*(CDThe environment variable \*(FCAWKPATH\fP specifies a search path to use
-when finding source files named with the \*(FC\-f\fP
-option.
-The default path is
-\*(FC".:/usr/local/share/awk"\*(FR.
-.\" if this variable does not exist.
-.\" (The actual directory may vary,
-.\" depending upon how \*(GK was built and installed.)
-If a file name given to the \*(FC\-f\fP option contains a ``/'' character,
-no path search is performed.
+\*(CD\*(FCAWKPATH\fP specifies a search path to use
+when finding source files named with the \*(FC\-f\fP and \*(FC\-i\fP
+options.
 .sp .5
-.PP
+\*(FCAWKLIBPATH\fP
+specifies the search path for dynamic extensions to use
+with \*(FC@load\fP and the \*(FC\-l\fP option.
+.sp .5
 For socket communication,
 \*(FCGAWK_SOCK_RETRIES\fP
-controls the number of retries, and
+controls the number of connection retries, and
 \*(FCGAWK_MSEC_SLEEP\fP controls
 the interval between retries.
-The interval is in milliseconds. On systems that do not support
-\*(FIusleep\fP(3),
-the value is rounded up to an integral number of seconds.
+The interval is in milliseconds.
+.sp .5
+\*(FCGAWK_PERSIST_FILE\fP specifies a backing store file to use
+for persistent storage. See the manual for details.
+.sp .5
+\*(FCGAWK_READ_TIMEOUT\fP specifies the time, in milliseconds,
+for \*(GK to
+wait for input before returning with an error.
 .sp .5
 If \*(FCPOSIXLY_CORRECT\fP exists
-.\" in the environment,
 then \*(GK
 behaves exactly as if the \*(FC\-\^\-posix\fP option had been given.\*(CB
 .EB "\s+2\f(HBENVIRONMENT VARIABLES (\*(GK\f(HB)\*(FR\s0"
@@ -1158,7 +1198,7 @@ your program.
 .ti +5n
 \*(FCBEGIN { TEXTDOMAIN = "myprog" }\*(FR
 .sp .3
-This allows \*(GK to find the \*(FC\&.mo\*(FR
+This allows \*(GK to find the \*(FC\&.gmo\*(FR
 file associated with your program.
 Without this step, \*(GK uses the \*(FCmessages\*(FR text domain,
 which probably won't work.
@@ -1181,7 +1221,7 @@ to generate a \*(FC\&.pot\*(FR
 file for your program.
 .sp .5
 5. Provide appropriate translations, and build and install a corresponding
-\*(FC\&.mo\*(FR file.
+\*(FC\&.gmo\*(FR file.
 .sp .5
 The internationalization features are described in full detail in \*(AM.\*(CB
 .EB "\s+2\f(HBLOCALIZATION (\*(GK\f(HB)\*(FR\s0"
@@ -1204,7 +1244,7 @@ The filenames are:
 expand;
 l lw(2i).
 \*(FC"\-"\fP	standard input
-\*(FC/dev/stdin\fP	standard input \*(CR(not \*(MK)\*(CD
+\*(FC/dev/stdin\fP	standard input
 \*(FC/dev/stdout\fP	standard output
 \*(FC/dev/stderr\fP	standard error output
 .TE
@@ -1245,6 +1285,26 @@ Usable only with the \*(FC|&\*(FR two-way I/O operator.
 Similar, but use UDP/IP instead of TCP/IP.\*(CL
 .in -.2i
 .EB "\s+2\f(HBSPECIAL FILENAMES\*(FR\s0"
+.sp .5
+.\" --- Namespaces
+.ES
+.fi
+\*(CDA
+\*(FIqualified name\fP
+consists of a two simple identifiers joined by a double colon
+(\*(FC::\fP).
+The left identifier is the namespace and the right one
+is the variable within it.
+All non-qualified names are treated as if in the
+``current'' namespace; the default namespace is \*(FCawk\fP.
+However, simple identifiers consisting solely of uppercase
+letters are forced into the
+\*(FCawk\fP
+namespace.
+You change the current namespace with an
+\*(FC@namespace "\*(FIname\^\*(FC"\*(FR
+directive.\*(CB
+.EB "\s+2\f(HBNAMESPACES (\*(GK\f(HB)\*(FR\s0"
 
 .BT
 
@@ -1266,14 +1326,18 @@ T}
 \*(FCgetline \*(FIv \*(FC< \*(FIfile\*(FR	Set \*(FIv\fP from next record of \*(FIfile\*(FR.
 \*(FIcmd \*(FC| getline\*(FR	Pipe into \*(FCgetline\*(FR; set \*(FC$0\*(FR, \*(FCNF\*(FR.
 \*(FIcmd \*(FC| getline \*(FIv\*(FR	Pipe into \*(FCgetline\*(FR; set \*(FIv\*(FR.
-\*(CB\*(FIcmd \*(FC|& getline\*(FR	Co-process pipe into \*(FCgetline\*(FR; set \*(FC$0\*(FR, \*(FCNF\*(FR.
 .TE
 .fi
 .in +.2i
 .ti -.2i
+\*(CB\*(FIcmd \*(FC|& getline\*(FR
+.br
+Coprocess pipe into \*(FCgetline\*(FR; set \*(FC$0\*(FR, \*(FCNF\*(FR.
+.br
+.ti -.2i
 \*(FIcmd \*(FC|& getline \*(FIv\*(FR
 .br
-Co-process pipe into \*(FCgetline\*(FR; set \*(FIv\*(FR.
+Coprocess pipe into \*(FCgetline\*(FR; set \*(FIv\*(FR.
 .ti -.2i
 \*(CD\*(FCnext\fP
 .br
@@ -1284,39 +1348,41 @@ program. Upon end of the input data,
 execute any \*(FCEND\fP rule(s).
 .br
 .ti -.2i
-\*(CL\*(FCnextfile\fP
+\*(FCnextfile\fP
 .br
 Stop processing the current input file.
 The next input record comes from the
-next input file. \*(FCFILENAME\fP \*(CBand
-\*(FCARGIND\fP\*(CL are updated, \*(FCFNR\fP is reset to 1,
-and processing starts over with the first
-pattern in the AWK program. Upon end
-of input data, execute any \*(FCEND\fP rule(s).\*(CD
+next input file. Update \*(FCFILENAME\fP \*(CBand
+\*(FCARGIND\fP\*(CD, reset \*(FCFNR\fP to 1,
+and start over with the first
+pattern. At end
+of file, execute any \*(CB\*(FCENDFILE\fP and\*(CD \*(FCEND\fP rule(s).
 .in -.2i
 .sp .5
 .fi
-\*(FCgetline\*(FR returns 1 on success, 0 on end of file, and \-1 on an error.
-\*(CBUpon an error, \*(FCERRNO\*(FR contains a string describing
+\*(FCgetline\*(FR returns 1 on success, zero on end of file,
+and \-1 on an error.
+\*(CBFor retryable I/O, \*(FCgetline\*(FR returns \-2.
+All versions set \*(FCRT\fP.
+Upon an error, \*(FCERRNO\*(FR describes
 the problem.\*(CX
 .EB "\s+2\f(HBINPUT CONTROL\*(FR\s0"
-
+.sp .6
 .\" --- Output Control
 .ES
 .fi
 .in +.2i
 .ti -.2i
-\*(CL\*(FCfflush(\*(FR[\*(FIfile\^\*(FR]\*(FC)\*(FR
+\*(CD\*(FCfflush(\*(FR[\*(FIfile\^\*(FR]\*(FC)\*(FR
 .br
 Flush any buffers associated
-with the open output file or pipe \*(FIfile\*(FR.\*(CD
-\*(CBIf no \*(FIfile\fP, then flush standard output.
-If \*(FIfile\fP is null, then flush all open output files and pipes
-(\*(GK and \*(NK)\*(CD.
+with the open output file or pipe \*(FIfile\*(FR.
+If no \*(FIfile\fP, or if
+\*(FIfile\fP is null, then flush all open output files and pipes.
 .ti -.2i
 \*(FCprint\fP
 .br
-Print the current record. Terminate output record
+Print \*(FC$0\*(FR. Terminate the output record
 with \*(FCORS\fP.
 .ti -.2i
 \*(FCprint \*(FIexpr-list\*(FR
@@ -1327,7 +1393,7 @@ with \*(FCORS\fP.
 .ti -.2i
 \*(FCprintf \*(FIfmt\*(FC, \*(FIexpr-list\*(FR
 .br
-Format and print (see \fHPrintf Formats\fP below).
+Format and print (see \fHPrintf Formats\fP).
 .ti -.2i
 \*(FCsystem(\*(FIcmd\*(FC)\*(FR
 .br
@@ -1355,10 +1421,10 @@ Print data down a pipeline to \*(FIcmd\*(FR.
 .ti -.2i
 \*(CB\*(FCprint "hello" |& \*(FIcmd\*(FR
 .br
-Print data down a pipeline to co-process \*(FIcmd\*(FR.\*(CX
+Print data down a pipeline to coprocess \*(FIcmd\*(FR.\*(CX
 .in -.2i
 .EB "\s+2\f(HBOUTPUT CONTROL\*(FR\s0"
-
+.sp .6
 .\" --- Closing Redirections
 .ES
 .fi
@@ -1366,11 +1432,11 @@ Print data down a pipeline to co-process \*(FIcmd\*(FR.\*(CX
 .ti -.2i
 \*(CD\*(FCclose(\*(FIfile\*(FC)\*(FR
 .br
-Close input or output file, pipe \*(CBor co-process.\*(CD
+Close input or output file, pipe \*(CBor coprocess.\*(CD
 .ti -.2i
 \*(CB\*(FCclose(\*(FIcommand\*(FC, \*(FIhow\*(FC)\*(FR
 .br
-Close one end of co-process pipe.
+Close one end of coprocess pipe.
 Use \*(FC"to"\*(FR for the write end, or
 \*(FC"from"\*(FR for the read end.\*(CD
 .in -.2i
@@ -1393,24 +1459,25 @@ the error.\*(CX
 accept the following conversion specification formats:
 .sp .5
 .nf
-\*(FC%c\fP		An \s-1ASCII\s+1 character
-\*(FC%d\fP, \*(FC%i\fP	A decimal number (the integer part)
+\*(CB\*(FC%a\fP, \*(FC%A\fP	A C99 floating point hexadecimal number.\*(CD
+\*(FC%c\fP		A single character.
+\*(FC%d\fP, \*(FC%i\fP	A decimal number (the integer part).
 \*(FC%e\fP		A floating point number of the form
-		\*(FC[\-]d.dddddde[+\^\-]dd\*(FR
-\*(FC%E\fP		Like \*(FC%e\fP, but use \*(FCE\fP instead of \*(FCe\*(FR
+		\*(FC[\-]d.dddddde[+\^\-]dd\*(FR.
+\*(FC%E\fP		Like \*(FC%e\fP, but use \*(FCE\fP instead of \*(FCe\*(FR.
 \*(FC%f\fP		A floating point number of the form
-		\*(FC[\-]ddd.dddddd\*(FR
+		\*(FC[\-]ddd.dddddd\*(FR.
 \*(FC%F\fP		Like \*(FC%f\fP, but use capital letters for infinity and
 		not-a-number values.
 \*(FC%g\fP		Use \*(FC%e\fP or \*(FC%f\fP, whichever is shorter, with
-		nonsignificant zeros suppressed
-\*(FC%G\fP		Like \*(FC%g\fP, but use \*(FC%E\fP instead of \*(FC%e\*(FR
-\*(FC%o\fP		An unsigned octal integer
-\*(FC%u\fP		An unsigned decimal integer
-\*(FC%s\fP		A character string
-\*(FC%x\fP		An unsigned hexadecimal integer
-\*(FC%X\fP		Like \*(FC%x\fP, but use \*(FCABCDEF\fP for 10\(en15
-\*(FC%%\fP		A literal \*(FC%\fP; no argument is converted
+		nonsignificant zeros suppressed.
+\*(FC%G\fP		Like \*(FC%g\fP, but use \*(FC%E\fP instead of \*(FC%e\*(FR.
+\*(FC%o\fP		An unsigned octal integer.
+\*(FC%u\fP		An unsigned decimal integer.
+\*(FC%s\fP		A character string.
+\*(FC%x\fP		An unsigned hexadecimal integer.
+\*(FC%X\fP		Like \*(FC%x\fP, but use \*(FCABCDEF\fP for 10\(en15.
+\*(FC%%\fP		A literal \*(FC%\fP; no argument is converted.
 .sp .5
 .fi
 Optional, additional parameters may lie between the \*(FC%\fP
@@ -1424,7 +1491,7 @@ Use the
 \*(FIcount\*(FR'th
 argument at this point in the formatting
 (a \*(FIpositional specifier\*(FR).
-Use in translated versions of
+For use in translated versions of
 format strings, not in the original text of an AWK program.\*(CD
 T}
 \*(FC\-\fP	T{
@@ -1463,7 +1530,8 @@ Only has an effect when the field width is wider
 than the value to be printed.
 T}
 \*(CB\*(FC'\*(FR	T{
-Use the locale's thousands separator for \*(FC%d\fP, \*(FC%i\fP, and \*(FC%u\fP.\*(CD
+Use the locale's thousands separator and decimal
+point characters.\*(CD
 T}
 \*(FIwidth\fP	T{
 Pad the field to this width. The field is normally
@@ -1474,8 +1542,8 @@ T}
 Precision.
 The meaning of the \*(FIprec\*(FR varies by control letter:
 T}
-  \*(FC%d\*(FR, \*(FC%o\*(FR, \*(FC%i\*(FR,
-  \*(FC%u\*(FR, \*(FC%x\*(FR, \*(FC%X\fP	T{
+  \*(FC%d\*(FR,\|\*(FC%o\*(FR,\|\*(FC%i\fP,	\0
+  \*(FC%u\*(FR,\|\*(FC%x\*(FR,\|\*(FC%X\fP	T{
 The minimum number of digits to print.
 T}
   \*(FC%e\*(FR, \*(FC%E\*(FR, \*(FC%f\*(FR	T{
@@ -1513,12 +1581,12 @@ with a dynamic width or precision.\*(CX
 	\*(FC}\*(FR
 .sp .5
 .fi
-Functions are executed when they are called from within expressions
+Functions execute when they are called from within expressions
 in either patterns or actions. Actual parameters supplied in the function
 call instantiate the formal parameters declared in the function.
 Arrays are passed by reference, other variables are passed by value.
 .sp .5
-Local variables are declared as extra parameters
+Declare local variables as extra parameters
 in the parameter list. The convention is to separate local variables from
 real parameters by extra spaces in the parameter list. For example:
 .sp .5
@@ -1575,20 +1643,23 @@ may be used in place of
 .fi
 .TS
 expand;
-l lw(2i).
+l lw(1.9i).
 \*(CD\*(FCatan2(\*(FIy\*(FC, \*(FIx\*(FC)\*(FR	The arctangent of \*(FIy/x\fP in radians.
 \*(FCcos(\*(FIexpr\*(FC)\*(FR	The cosine of \*(FIexpr\fP, which is in radians.
-\*(FCexp(\*(FIexpr\*(FC)\*(FR	The exponential function (\*(FIe \*(FC^ \*(FIx\*(FR).
+\*(FCexp(\*(FIexpr\*(FC)\*(FR	The exponential function (\*(FIe\|\*(FC^\|\*(FIx\*(FR).
 \*(FCint(\*(FIexpr\*(FC)\*(FR	Truncate to integer.
+.\" \*(CB\*(FCintdiv(\*(FIn\*(FR\*(FC,\*(FI d\*(FR\*(FC,\*(FI r\*(FR\*(FC)\*(FR	T{
+.\" Return result of integer division in \*(FIr\*(FR.\*(CD
+.\" T}
 \*(FClog(\*(FIexpr\*(FC)\*(FR	The natural logarithm function (base \*(FIe\^\*(FR).
-\*(FCrand()\fP	A random number between 0 and 1 (0 \(<= \*(FIN\fP < 1).
+\*(FCrand()\fP	A random number \*(FIN\fP such that 0 \(<= \*(FIN\fP < 1.
 \*(FCsin(\*(FIexpr\*(FC)\*(FR	The sine of \*(FIexpr\fP, which is in radians.
-\*(FCsqrt(\*(FIexpr\*(FC)\*(FR	The square root function.
+\*(FCsqrt(\*(FIexpr\*(FC)\*(FR	The square root of \*(FIexpr\fP.
 \&\*(FCsrand(\*(FR[\*(FIexpr\^\*(FR]\*(FC)\*(FR	T{
 Use \*(FIexpr\fP as the new seed for the random number
-generator. If no \*(FIexpr\fP, the time of day is used.
-Return the random number
-generator's previous seed.\*(CX
+generator. If no \*(FIexpr\fP, use the time of day.
+Return the \" random number generator's
+previous seed.\*(CX
 T}
 .TE
 .EB "\s+2\f(HBNUMERIC FUNCTIONS\*(FR\s0"
@@ -1623,12 +1694,12 @@ replace all matches of \*(FIr\fP with \*(FIs\*(FR. Otherwise, \*(FIh\fP
 is a number indicating which match of \*(FIr\fP to replace.
 If \*(FIt\fP is not supplied, use \*(FC$0\fP instead. Within the
 replacement text \*(FIs\*(FR, the sequence \*(FC\e\*(FIn\*(FR,
-where \*(FIn\fP is a digit from 1 to 9, may be used to indicate just
+where \*(FIn\fP is a digit from 1 to 9, indicates just
 the text that matched the \*(FIn\*(FRth parenthesized subexpression.
 The sequence \*(FC\e0\fP represents the entire matched text, as does
 the character \*(FC&\*(FR. Unlike \*(FCsub()\fP and \*(FCgsub()\*(FR,
-the modified string is returned as the result of the function,
-and the original target string is \*(FInot\fP changed.\*(CD
+the function returns the modified string;
+the original target string is \*(FInot\fP changed.\*(CD
 .ti -.2i
 \*(FCgsub(\*(FIr\*(FC, \*(FIs \*(FR[\*(FC, \*(FIt\*(FR]\*(FC)\*(FR
 .br
@@ -1640,12 +1711,12 @@ replacement text is replaced with the text that was actually matched.
 Use \*(FC\e&\fP to get a literal \*(FC&\*(FR. See \*(AM
 for a fuller discussion of the rules for \*(FC&\*(FR's and backslashes
 in the replacement text of \*(CB\*(FCgensub()\*(FR,\*(CD \*(FCsub()\*(FR
-and \*(FCgsub()\*(FR
+and \*(FCgsub().\*(FR
 .ti -.2i
 \*(FCindex(\*(FIs\*(FC, \*(FIt\*(FC)\*(FR
 .br
 Return the index of the string
-\*(FIt\fP in the string \*(FIs\*(FR, or 0 if \*(FIt\fP is not present.
+\*(FIt\fP in the string \*(FIs\*(FR, or zero if \*(FIt\fP is not present.
 .ti -.2i
 \*(FClength(\*(FR[\*(FIs\*(FR]\*(FC)\*(FR
 .br
@@ -1657,7 +1728,7 @@ in the array.\*(CD
 \*(FCmatch(\*(FIs\*(FC, \*(FIr \*(CB\*(FR[\*(FC, \*(FIa\*(FR]\*(CD\*(FC)\*(FR
 .br
 Return the position in
-\*(FIs\fP where the regular expression \*(FIr\fP occurs, or 0 if
+\*(FIs\fP where the regular expression \*(FIr\fP occurs, or zero if
 \*(FIr\fP is not present, and set the values of variables
 \*(FCRSTART\fP
 and \*(FCRLENGTH\*(FR.
@@ -1666,10 +1737,10 @@ is placed in \*(FIa\*(FC[0]\*(FR.  If there were parenthesized
 subexpressions, the matching texts are placed
 in \*(FIa\*(FC[1]\*(FR, \*(FIa\*(FC[2]\*(FR, and so on.
 Subscripts
-\*(FCa[\*(FIn\^\*(FC, "start"]\*(FR,
+\*(FIa\*(FC[\*(FIn\^\*(FC, "start"]\*(FR,
 and
-\*(FCa[\*(FIn\^\*(FC, "length"]\*(FR
-provide the starting index in the string and length
+\*(FIa\*(FC[\*(FIn\^\*(FC, "length"]\*(FR
+provide the starting index in the string and length,
 respectively, of each matching substring.\*(CD
 .ti -.2i
 \*(CB\*(FCpatsplit(\*(FIs\*(FC, \*(FIa \*(FR[\*(FC, \*(FIr \*(CB\*(FR[\*(FC, \*(FIseps \*(FR] \*(FR] \*(FC)\*(FR
@@ -1680,8 +1751,8 @@ and the array \*(FIseps\fP of separator strings
 using the regular expression \*(FIr\*(FR,
 and return the number of fields.
 Element values are the portions of \*(FIs\fP that matched \*(FIr\fP.
-The value of \*(FIseps\fP[\*(FIi\fP] is the separator that appeared in
-front of \*(FIa\fP[\*(FIi\fP+1].
+The value of \*(FIseps\*(FC[\*(FIi\^\fP]\*(FR is the separator that appeared in
+front of \*(FIa\*(FC[\*(FIi\fP+1]\*(FR.
 If \*(FIr\fP is omitted, use \*(FCFPAT\fP instead.
 Clear the arrays \*(FIa\fP and \*(FIseps\fP first.
 Splitting behaves identically to field splitting with \*(FCFPAT\fP.\*(CD
@@ -1693,9 +1764,9 @@ Split the string
 using the regular expression \*(FIr\*(FR,
 and return the number of fields. If \*(FIr\fP is omitted, use \*(FCFS\fP
 instead.
-Clear the \*(FIa\fP \*(CBand \*(FIseps\fP\*(CD first.
+Clear the arrays \*(FIa\fP \*(CBand \*(FIseps\fP\*(CD first.
 Splitting behaves identically to field splitting.
-(See \fHFields\fP, above.)
+(See \fHFields\fP.)
 .ti -.2i
 \*(FCsprintf(\*(FIfmt\*(FC, \*(FIexpr-list\*(FC)\*(FR
 .br
@@ -1715,12 +1786,11 @@ according to \*(FIfmt\*(FR, and return the result.\*(CX
 .br
 Examine \*(FIs\*(FR, and return its numeric value.
 If \*(FIs\*(FR begins with a leading \*(FC0\*(FR,
-\*(FCstrtonum()\*(FR assumes that \*(FIs\*(FR
-is an octal number.
+treat it as an octal number.
 If \*(FIs\*(FR begins with a leading \*(FC0x\*(FR
-or \*(FC0X\*(FR, \*(FCstrtonum()\*(FR assumes that
-\*(FIs\*(FR is a hexadecimal number. Otherwise, the
-number is treated as decimal.\*(CD
+or \*(FC0X\*(FR, treat
+\*(FIs\*(FR as a hexadecimal number. Otherwise,
+treat \*(FIs\*(FR as decimal.\*(CD
 .ti -.2i
 \*(FCsub(\*(FIr\*(FC, \*(FIs \*(FR[\*(FC, \*(FIt\*(FR]\*(FC)\*(FR
 .br
@@ -1752,20 +1822,23 @@ left unchanged.\*(CX
 .\" --- Built-in Time Functions
 .ES
 .fi
-\*(CD\*(GK
-provides the following functions for obtaining time stamps and
+\*(CD\*(GK and \*(MK
+provide the following functions for obtaining time stamps and
 formatting them.
 .sp .5
 .fi
 .in +.2i
 .ti -.2i
-\*(FCmktime(\*(FIdatespec\*(FC)\*(FR
+\*(FCmktime(\*(FIdatespec \*(CB\*(FR[\*(FC, \*(FIutc-flag\*(FR]\*(FC\*(CD)\*(FR
 .br
 Convert \*(FIdatespec\fP into a time
 stamp of the same form as returned by \*(FCsystime()\*(FR
 and return it.
 The \*(FIdatespec\fP is a string of the form
 \*(FC"\*(FIYYYY MM DD HH MM SS[ DST]\*(FC"\*(FR.
+\*(CBIf \*(FIutc-flag\*(FR
+is present and is non-zero or non-null, the result
+is in UTC, otherwise it is in local time.\*(CD
 .ti -.2i
 \*(FCstrftime(\*(FR[\*(FIformat \*(FR[\*(FC, \*(FItimestamp\*(FR[\*(FC, \*(FIutc-flag\*(FR]]]\*(FC)\*(FR
 .br
@@ -1775,33 +1848,32 @@ according to the specification in \*(FIformat\*(FR. The
 \*(FCsystime()\*(FR.
 If \*(FIutc-flag\*(FR
 is present and is non-zero or non-null, the result
-is in UTC, otherwise the result is in local time.
-If \*(FItimestamp\fP is missing, the current time of day is used. If
+is in UTC, otherwise it is in local time.
+If \*(FItimestamp\fP is missing, use the current time of day. If
 \*(FIformat\fP is missing, use \*(FCPROCINFO["strftime"]\fP.
 The default value is
 equivalent to the output
-of \*(FIdate\*(FR(1).
+of \*(FIdate\*(FR\^(1).
 .ti -.2i
 \*(FCsystime()\fP
 .br
 Return the current time of day as the number of
-seconds since the Epoch.\*(CB
+seconds since the Epoch.\*(CL
 .in -.2i
-.EB "\s+2\f(HBTIME FUNCTIONS (\*(GK\f(HB)\*(FR\s0"
+.EB "\s+2\f(HBTIME FUNCTIONS\*(FR\s0"
 .sp .6
 .\" --- Built-in Bit Manipulation Functions
 .ES
 .fi
 \*(CD\*(GK
-provides the following functions for doing bitwise operations.
+provides the following bit manipulation functions.
 .sp .5
 .fi
 .in +.2i
 .ti -.2i
-\*(FCand(\*(FIv1\*(FC, \*(FIv2\*(FC)\*(FR
+\*(FCand(\*(FIv1\*(FC, \*(FIv2\*(FR [\*(FC,\*(FR ... ]\*(FC)\*(FR
 .br
-Return the bitwise AND of the values provided by
-\*(FIv1\*(FR and \*(FIv2\*(FR.
+Return the bitwise AND of the arguments.
 .ti -.2i
 \*(FCcompl(\*(FIval\*(FC)\*(FR
 .br
@@ -1813,20 +1885,18 @@ Return the bitwise complement of
 Return the value of \*(FIval\*(FR,
 shifted left by \*(FIcount\*(FR bits.
 .ti -.2i
-\*(FCor(\*(FIv1\*(FC, \*(FIv2\*(FC)\*(FR
+\*(FCor(\*(FIv1\*(FC, \*(FIv2\*(FR [\*(FC,\*(FR ... ]\*(FC)\*(FR
 .br
-Return the bitwise OR of the values provided by
-\*(FIv1\*(FR and \*(FIv2\*(FR.
+Return the bitwise OR of the arguments.
 .ti -.2i
 \*(FCrshift(\*(FIval\*(FC, \*(FIcount\*(FC)\*(FR
 .br
 Return the value of \*(FIval\*(FR,
 shifted right by \*(FIcount\*(FR bits.
 .ti -.2i
-\*(FCxor(\*(FIv1\*(FC, \*(FIv2\*(FC)\*(FR
+\*(FCxor(\*(FIv1\*(FC, \*(FIv2\*(FR [\*(FC,\*(FR ... ]\*(FC)\*(FR
 .br
-Return the bitwise XOR of the values provided by
-\*(FIv1\*(FR and \*(FIv2\*(FR.\*(CB
+Return the bitwise XOR of the arguments.\*(CB
 .in -.2i
 .EB "\s+2\f(HBBIT MANIPULATION FUNCTIONS (\*(GK\f(HB)\*(FR\s0"
 .sp .6
@@ -1835,20 +1905,29 @@ Return the bitwise XOR of the values provided by
 .fi
 .in +.2i
 .ti -.2i
-\*(CD\*(FCextension(\*(FIlib\*(FC, \*(FIfunc\*(FC)\*(FR
+\*(CD\*(FC@load "\*(FIextension\*(FC"\*(FR
 .br
-Dynamically load the shared library
-\*(FIlib\*(FR
-and call
-\*(FIfunc\*(FR
-in it to initialize the library.
+Dynamically load the named \*(FIextension\*(FR.
 This adds new built-in functions to \*(GK.
-It returns the value returned by
-\*(FIfunc\*(FR.\*(CB
+The extension is loaded during the parsing of the program.
+See the manual for details.\*(CB
 .in -.2i
 .EB "\s+2\f(HBDYNAMIC EXTENSIONS (\*(GK\f(HB)\*(FR\s0"
 .BT
 
+.\" --- Generator Functions
+.ES
+.fi
+.in +.2i
+.ti -.2i
+\*(CD\*(FCmkbool(\*(FIexpression\*(FC)\*(FR
+.br
+Return a Boolean-typed value based on the Boolean value
+of \*(FIexpression\fP. True values have a numeric value of one.
+False values have a numeric value of zero.\*(CB
+.in -.2i
+.EB "\s+2\f(HBGENERATOR FUNCTIONS (\*(GK\f(HB)\*(FR\s0"
+.sp .5
 .\" --- Type Functions
 .ES
 .fi
@@ -1856,7 +1935,12 @@ It returns the value returned by
 .ti -.2i
 \*(CD\*(FCisarray(\*(FIx\*(FC)\*(FR
 .br
-Return true if \*(FIx\fP is an array, false otherwise.\*(CB
+Return true if \*(FIx\fP is an array, false otherwise.
+.br
+.ti -.2i
+\*(FCtypeof(\*(FIx\*(FC)\*(FR
+.br
+Return a string indicating the type of \*(FIx\fP.\*(CB
 .in -.2i
 .EB "\s+2\f(HBTYPE FUNCTIONS (\*(GK\f(HB)\*(FR\s0"
 .sp .5
@@ -1870,7 +1954,7 @@ provides the following functions for runtime message translation.
 .ti -.2i
 \*(FCbindtextdomain(\*(FIdirectory \*(FR[\*(FC, \*(FIdomain\*(FR]\*(FC)\*(FR
 .br
-Specify the directory where \*(GK looks for the \*(FC\&.mo\*(FR
+Specify the directory where \*(GK looks for the \*(FC\&.gmo\*(FR
 files, in case they
 will not or cannot be placed in the ``standard'' locations
 (e.g., during testing).
@@ -1887,11 +1971,6 @@ Return the translation of \*(FIstring\*(FR in text domain
 \*(FIdomain\*(FR for locale category \*(FIcategory\*(FR.
 The default value for \*(FIdomain\*(FR is the current value of \*(FCTEXTDOMAIN\*(FR.
 The default value for \*(FIcategory\*(FR is \*(FC"LC_MESSAGES"\*(FR.
-.sp .5
-If you supply a value for \*(FIcategory\*(FR, it must be a string equal to
-one of the known locale categories.
-You must also supply a text domain.  Use \*(FCTEXTDOMAIN\*(FR
-to use the current domain.
 .ti -.2i
 \*(FCdcngettext(\*(FIstring1\*(FC, \*(FIstring2\*(FC, \*(FInumber\*(FR [\*(FC, \*(FIdom \*(FR[\*(FC, \*(FIcat\*(FR]]\*(FC)\*(FR
 .br
@@ -1899,29 +1978,22 @@ Return the plural form used for \*(FInumber\*(FR of the translation of
 \*(FIstring1\*(FR and \*(FIstring2\*(FR in text domain
 \*(FIdom\*(FR for locale category \*(FIcat\*(FR.
 The default value for \*(FIdom\*(FR is the current value of \*(FCTEXTDOMAIN\*(FR.
-The default for \*(FC"LC_MESSAGES"\*(FR
-is \*(FIcat\*(FR.
-.sp .5
-If you supply a value for \*(FIcat\*(FR, it must be a string equal to
-one of the known locale categories.
-You must also supply a text domain.  Use \*(FCTEXTDOMAIN\*(FR
-to use the current domain.\*(CB
+The default for \*(FIcat\*(FR is \*(FC"LC_MESSAGES"\*(FR.\*(CB
 .in -.2i
 .EB "\s+2\f(HBINTERNATIONALIZATION (\*(GK\f(HB)\*(FR\s0"
 .sp .5
-.\" --- FTP/HTTP Information
+.\" --- FTP/HTTPS/GIT Information
 .ES
 .nf
 \*(CDHost: \*(FCftp.gnu.org\*(FR
-File: \*(FC/gnu/gawk/gawk-4.0.0.tar.gz\fP
+File: \*(FC/gnu/gawk/gawk-5.3.0.tar.gz\fP
 .in +.2i
 .fi
 GNU \*(AK (\*(GK). There may be a later version.
 .in -.2i
 .nf
 .sp .4
-\*(FChttp://www.cs.princeton.edu/~bwk/btl.mirror/
-awk.tar.gz\fP
+\*(FCgit clone https://github.com/onetrueawk/awk\fP
 .in +.2i
 .fi
 \*(NK. This version requires an ANSI C compiler;
@@ -1929,9 +2001,6 @@ GCC (the GNU Compiler Collection) works well.
 .in -.2i
 .nf
 .sp .4
-... Host: \*(FCftp.whidbey.net\*(FR
-... File: \*(FC/pub/brennan/mawk1.3.3.tar.gz\fP
-... \*(FChttp://www.skeeve.com/gawk/mawk1.3.3.tar.gz\fP
 Host: \*(FCinvisible-island.net\*(FR
 File: \*(FC/mawk/mawk.tar.gz\fP
 .in +.2i
@@ -1939,13 +2008,13 @@ File: \*(FC/mawk/mawk.tar.gz\fP
 Michael Brennan's \*(MK. Thomas Dickey now
 maintains it.\*(CX
 .in -.2i
-.EB "\s+2\f(HBFTP/HTTP INFORMATION\*(FR\s0"
+.EB "\s+2\f(HBFTP/HTTPS/GIT INFORMATION\*(FR\s0"
 .sp .5
 .\" --- Copying Permissions
 .ES
 .fi
-\*(CDCopyright \(co 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005,
-2007, 2009, 2010, 2011 Free Software Foundation, Inc.
+\*(CDCopyright \(co 1996\(en2005,
+2007, 2009\(en2023 Free Software Foundation, Inc.
 .sp .5   
 Permission is granted to make and distribute verbatim copies of this
 reference card provided the copyright notice and this permission notice

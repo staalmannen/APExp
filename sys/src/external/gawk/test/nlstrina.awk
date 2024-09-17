@@ -61,7 +61,7 @@ BEGIN {
 #            o                 
 #                                               
 #                  o               Dept. of Biochemistry
-#                                  University of Groningen		
+#                                  University of Groningen
 #                                  The Netherlands                      
 #                   o  
 #             . .     

@@ -7,280 +7,206 @@
  */
 
 /*
- * Copyright (C) 1995 - 2001, 2003-2011 the Free Software Foundation, Inc.
- * 
+ * Copyright (C) 1995 - 2001, 2003-2014, 2016-2020, 2022,
+ * the Free Software Foundation, Inc.
+ *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
- * 
+ *
  * GAWK is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GAWK is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
 #include "awk.h"
+extern SRCFILE *srcfiles;
 
 #ifdef DYNAMIC
 
 #include <dlfcn.h>
 
-#ifdef __GNUC__
-static unsigned long long dummy;	/* fake out gcc for dynamic loading? */
-#endif
+#define INIT_FUNC	"dl_load"
 
-/* do_ext --- load an extension */
+/* load_ext --- load an external library */
 
-NODE *
-do_ext(int nargs)
+void
+load_ext(const char *lib_name)
 {
-	NODE *obj;
-	NODE *fun;
-	NODE *tmp = NULL;
-	NODE *(*func)(NODE *, void *);
+	int (*install_func)(const gawk_api_t *const, awk_ext_id_t);
 	void *dl;
 	int flags = RTLD_LAZY;
-	int fatal_error = FALSE;
 	int *gpl_compat;
-#if 0
-	static short warned = FALSE;
-#endif
-
-#ifdef __GNUC__
-	AWKNUM junk;
-
-	junk = (AWKNUM) dummy;
-#endif
 
 	if (do_sandbox)
 		fatal(_("extensions are not allowed in sandbox mode"));
 
-#if 0
-	/* already done in parser */
-	if (do_lint && ! warned) {
-		warned = TRUE;
-		lintwarn(_("`extension' is a gawk extension"));
-	}
-#endif
-
 	if (do_traditional || do_posix)
-		error(_("`extension' is a gawk extension"));
+		fatal(_("-l / @load are gawk extensions"));
 
-	fun = POP_STRING();
-	obj = POP_STRING();
+	if (lib_name == NULL)
+		fatal(_("load_ext: received NULL lib_name"));
 
-#ifdef RTLD_GLOBAL
-	flags |= RTLD_GLOBAL;
-#endif
-	if ((dl = dlopen(obj->stptr, flags)) == NULL) {
-		/* fatal needs `obj', and we need to deallocate it! */
-		msg(_("fatal: extension: cannot open `%s' (%s)\n"), obj->stptr,
+	if ((dl = dlopen(lib_name, flags)) == NULL)
+		fatal(_("load_ext: cannot open library `%s': %s"), lib_name,
 		      dlerror());
-		fatal_error = TRUE;
-		goto done;
-	}
 
 	/* Per the GNU Coding standards */
 	gpl_compat = (int *) dlsym(dl, "plugin_is_GPL_compatible");
-	if (gpl_compat == NULL) {
-		msg(_("fatal: extension: library `%s': does not define `plugin_is_GPL_compatible' (%s)\n"),
-				obj->stptr, dlerror());
-		fatal_error = TRUE;
-		goto done;
-	}
+	if (gpl_compat == NULL)
+		fatal(_("load_ext: library `%s': does not define `plugin_is_GPL_compatible': %s"),
+				lib_name, dlerror());
 
+	install_func = (int (*)(const gawk_api_t *const, awk_ext_id_t))
+				dlsym(dl, INIT_FUNC);
+	if (install_func == NULL)
+		fatal(_("load_ext: library `%s': cannot call function `%s': %s"),
+				lib_name, INIT_FUNC, dlerror());
 
-	func = (NODE *(*)(NODE *, void *)) dlsym(dl, fun->stptr);
-	if (func == NULL) {
-		msg(_("fatal: extension: library `%s': cannot call function `%s' (%s)\n"),
-				obj->stptr, fun->stptr, dlerror());
-		fatal_error = TRUE;
-		goto done;
-	}
-
-	tmp = (*func)(obj, dl);
-	if (tmp == NULL)
-		tmp = Nnull_string;
-done:
-	DEREF(obj);
-	DEREF(fun);
-	if (fatal_error)
-		gawk_exit(EXIT_FATAL);
-	return tmp; 
+	if (install_func(& api_impl, NULL /* ext_id */) == 0)
+		warning(_("load_ext: library `%s' initialization routine `%s' failed"),
+				lib_name, INIT_FUNC);
 }
-
 
 /* make_builtin --- register name to be called as func with a builtin body */
 
-void
-make_builtin(const char *name, NODE *(*func)(int), int count)
+awk_bool_t
+make_builtin(const char *name_space, const awk_ext_func_t *funcinfo)
 {
-	NODE *p, *symbol, *f;
-	INSTRUCTION *b, *r;
-	const char *sp;
-	char *pname;
-	char **vnames = NULL;
-	char c, buf[200];
-	size_t space_needed;
-	int i;
+	NODE *symbol, *f;
+	INSTRUCTION *b;
+	const char *name = funcinfo->name;
+	int count = funcinfo->max_expected_args;
+	const char *install_name;
 
-	sp = name;
-	if (sp == NULL || *sp == '\0')
-		fatal(_("extension: missing function name"));
+	if (name == NULL || *name == '\0')
+		fatal(_("make_builtin: missing function name"));
 
-	while ((c = *sp++) != '\0') {
-		if ((sp == &name[1] && c != '_' && ! isalpha((unsigned char) c))
-				|| (sp > &name[1] && ! is_identchar((unsigned char) c)))
-			fatal(_("extension: illegal character `%c' in function name `%s'"), c, name);
+	if (! is_valid_identifier(name))
+		return awk_false;
+
+	assert(name_space != NULL);
+	if (name_space[0] == '\0' || strcmp(name_space, awk_namespace) == 0) {
+		if (check_special(name) >= 0)
+			fatal(_("make_builtin: cannot use gawk built-in `%s' as function name"), name);
+
+		f = lookup(name);
+		install_name = estrdup(name, strlen(name));
+	} else {
+		if (! is_valid_identifier(name_space))
+			return awk_false;
+
+		if (check_special(name_space) >= 0)
+			fatal(_("make_builtin: cannot use gawk built-in `%s' as namespace name"), name_space);
+		if (check_special(name) >= 0)
+			fatal(_("make_builtin: cannot use gawk built-in `%s' as function name"), name);
+
+		size_t len = strlen(name_space) + 2 + strlen(name) + 1;
+		char *buf;
+		emalloc(buf, char *, len, "make_builtin");
+		sprintf(buf, "%s::%s", name_space, name);
+		install_name = buf;
+
+		f = lookup(install_name);
 	}
 
-	f = lookup(name);
-
 	if (f != NULL) {
+		// found it, but it shouldn't be there if we want to install this function
 		if (f->type == Node_func) {
-			INSTRUCTION *pc = f->code_ptr;
-			if (pc->opcode != Op_ext_func)	/* user-defined function */
-				fatal(_("extension: can't redefine function `%s'"), name);
-			else {
-				/* multiple extension() calls etc. */ 
-				if (do_lint)
-					lintwarn(_("extension: function `%s' already defined"), name);
-				return;
-			}
+			/* user-defined function */
+			fatal(_("make_builtin: cannot redefine function `%s'"), name);
+		} else if (f->type == Node_ext_func) {
+			/* multiple extension() calls etc. */
+			if (do_lint)
+				lintwarn(_("make_builtin: function `%s' already defined"), name);
+			free((void *) install_name);
+			return awk_false;
 		} else
-			/* variable name etc. */ 
-			fatal(_("extension: function name `%s' previously defined"), name);
-	} else if (check_special(name) >= 0)
-		fatal(_("extension: can't use gawk built-in `%s' as function name"), name); 
-	/* count parameters, create artificial list of param names */
+			/* variable name etc. */
+			fatal(_("make_builtin: function name `%s' previously defined"), name);
+	}
 
 	if (count < 0)
 		fatal(_("make_builtin: negative argument count for function `%s'"),
-					name);
+				name);
 
-	if (count > 0) {
-		sprintf(buf, "p%d", count);
-		space_needed = strlen(buf) + 1;
-		emalloc(vnames, char **, count * sizeof(char  *), "make_builtin");
-		for (i = 0; i < count; i++) {
-			emalloc(pname, char *, space_needed, "make_builtin");
-			sprintf(pname, "p%d", i);
-			vnames[i] = pname;
-		}
-	}
-
-
-	getnode(p);
-	p->type = Node_param_list;
-	p->flags |= FUNC;
-	/* get our own copy for name */
-	p->param = estrdup(name, strlen(name));
-	p->param_cnt = count;
-
-	/* actual source and line numbers set at runtime for these instructions */
-	b = bcalloc(Op_builtin, 1, __LINE__);
-	b->builtin = func;
-	b->expr_count = count;
-	b->nexti = bcalloc(Op_K_return, 1, __LINE__);
-	r = bcalloc(Op_ext_func, 1, __LINE__);
-	r->source_file = __FILE__;
-	r->nexti = b;
+	b = bcalloc(Op_symbol, 1, 0);
+	b->extfunc = funcinfo->function;
+	b->c_function = (awk_ext_func_t *) funcinfo;
 
 	/* NB: extension sub must return something */
 
-	symbol = mk_symbol(Node_func, p);
-	symbol->parmlist = vnames;
-	symbol->code_ptr = r;
-	r->func_body = symbol;
-	(void) install_symbol(p->param, symbol);
+	symbol = install_symbol(install_name, Node_ext_func);
+	symbol->code_ptr = b;
+	track_ext_func(name);
+	return awk_true;
 }
 
-
-/* get_curfunc_arg_count --- return number actual parameters */
-
-size_t
-get_curfunc_arg_count()
-{
-	size_t argc;
-	INSTRUCTION *pc;
-	
-	pc = (INSTRUCTION *) frame_ptr->reti;      /* Op_func_call instruction */
-	argc = (pc + 1)->expr_count;        /* # of arguments supplied */
-	return argc;
-}
-
-
-/* get_argument --- get the n'th argument of a dynamically linked function */
+/* get_argument --- get the i'th argument of a dynamically linked function */
 
 NODE *
 get_argument(int i)
 {
-	int pcount;
-	NODE *t, *f;
-	int actual_args;
+	NODE *t;
+	int arg_count;
 	INSTRUCTION *pc;
-	
-	f = frame_ptr->func_node;
-	pcount = f->lnode->param_cnt;
 
-	pc = (INSTRUCTION *) frame_ptr->reti;     /* Op_func_call instruction */
-	actual_args = (pc + 1)->expr_count;       /* # of arguments supplied */
-         
-	if (i < 0 || i >= pcount || i >= actual_args)
+	pc = TOP()->code_ptr;		/* Op_ext_builtin instruction */
+	arg_count = pc->expr_count;	/* # of arguments supplied */
+
+	if (i < 0 || i >= arg_count)
 		return NULL;
 
-	t = GET_PARAM(i);
+	t = PEEK(arg_count - i);
+	if (t->type == Node_param_list)
+		t = GET_PARAM(t->param_cnt);
 
-	if (t->type == Node_array_ref)
+	if (t->type == Node_array_ref) {
+		if (t->orig_array->type == Node_var) {
+			/* already a scalar, can no longer use it as array */
+			t->type = Node_var;
+			t->var_value = Nnull_string;
+			return t;
+		}
 		return t->orig_array; 	/* Node_var_new or Node_var_array */
-	if (t->type == Node_var_new || t->type == Node_var_array)
-		return t;
-	return t->var_value;
+	}
+	if (t->type == Node_var)	/* See Case Node_var in setup_frame(), eval.c */
+		return Nnull_string;
+	/* Node_var_new, Node_var_array or Node_val */
+	return t;
 }
 
 
-/* get_actual_argument --- get a scalar or array, allowed to be optional */
+/*
+ * get_actual_argument --- get the i'th scalar or array argument of a
+ *	dynamically linked function.
+ */
 
 NODE *
-get_actual_argument(int i, int optional, int want_array)
+get_actual_argument(NODE *t, int i, bool want_array)
 {
-	/* optional : if TRUE and i th argument not present return NULL, else fatal. */
-
-	NODE *t, *f;
-	int pcount;
 	char *fname;
+	INSTRUCTION *pc;
 
-	t = get_argument(i);
+	pc = TOP()->code_ptr;	/* Op_ext_builtin instruction */
+	fname = (pc + 1)->func_name;
 
-	f = frame_ptr->func_node;
-	pcount = f->lnode->param_cnt;
-	fname = f->lnode->param;
-
-	if (t == NULL) {
-		if (i >= pcount)		/* must be fatal */
-			fatal(_("function `%s' defined to take no more than %d argument(s)"),
-					fname, pcount);
-		if (! optional)
-			fatal(_("function `%s': missing argument #%d"),
-					fname, i + 1);
-		return NULL;
-	}
-
-	if (t->type == Node_var_new) {
+	if (t->type == Node_var_new || t->type == Node_elem_new) {
 		if (want_array)
-			return get_array(t, FALSE);
+			return force_array(t, false);
 		else {
 			t->type = Node_var;
-			t->var_value = Nnull_string;
-			return Nnull_string;
+			t->var_value = dupnode(Nnull_string);
+			return t->var_value;
 		}
 	}
 
@@ -293,20 +219,51 @@ get_actual_argument(int i, int optional, int want_array)
 			fatal(_("function `%s': argument #%d: attempt to use array as a scalar"),
 				fname, i + 1);
 	}
+	assert(t->type == Node_var_array || t->type == Node_val);
 	return t;
 }
 
 #else
 
-/* do_ext --- dummy version if extensions not available */
+/* load_ext --- dummy version if extensions not available */
 
-NODE *
-do_ext(int nargs)
+void
+load_ext(const char *lib_name)
 {
-	const char *emsg = _("Operation Not Supported");
-
-	unref(ERRNO_node->var_value);
-	ERRNO_node->var_value = make_string(emsg, strlen(emsg));
-	return make_number((AWKNUM) -1);
+	fatal(_("dynamic loading of libraries is not supported"));
 }
 #endif
+
+/* close_extensions --- execute extension cleanup routines */
+
+void
+close_extensions()
+{
+	SRCFILE *s;
+
+	if (srcfiles == NULL)
+		return;
+
+	for (s = srcfiles->next; s != srcfiles; s = s->next)
+		if (s->stype == SRC_EXTLIB && s->fini_func)
+               	        (*s->fini_func)();
+}
+
+/* is_valid_identifier --- return true if name is a valid simple identifier */
+
+bool
+is_valid_identifier(const char *name)
+{
+	const char *sp = name;
+	int c;
+
+	if (! is_letter(*sp))
+		return false;
+
+	for (sp++; (c = *sp++) != '\0';) {
+		if (! is_identchar(c))
+			return false;
+	}
+
+	return true;
+}

@@ -1,4 +1,4 @@
-# ftrans.awk --- handle data file transitions
+# ftrans.awk --- handle datafile transitions
 #
 # user supplies beginfile() and endfile() functions
 #
@@ -12,4 +12,4 @@ FNR == 1 {
     beginfile(FILENAME)
 }
 
-END  { endfile(_filename_) }
+END { endfile(_filename_) }

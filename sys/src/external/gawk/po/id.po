@@ -1,0 +1,4572 @@
+# Pesan bahasa indonesia untuk gawk.
+# Copyright (C) 2008 Free Software Foundation, Inc.
+# This file is distributed under the same license as the gawk package.
+# Arif E. Nugroho <arif_endro@yahoo.com>, 2008, 2009, 2010, 2011, 2012, 2013, 2014.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gawk 4.1.0b\n"
+"Report-Msgid-Bugs-To: bug-gawk@gnu.org\n"
+"POT-Creation-Date: 2023-11-02 15:33+0200\n"
+"PO-Revision-Date: 2014-08-03 07:30+0700\n"
+"Last-Translator: Arif E. Nugroho <arif_endro@yahoo.com>\n"
+"Language-Team: Indonesian <translation-team-id@lists.sourceforge.net>\n"
+"Language: id\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: array.c:249
+#, c-format
+msgid "from %s"
+msgstr "dari %s"
+
+#: array.c:355
+msgid "attempt to use a scalar value as array"
+msgstr "mencoba untuk menggunakan skalar sebagai sebuah array"
+
+#: array.c:357
+#, c-format
+msgid "attempt to use scalar parameter `%s' as an array"
+msgstr "mencoba untuk menggunakan parameter `%s' sebagai sebuah array"
+
+#: array.c:360
+#, c-format
+msgid "attempt to use scalar `%s' as an array"
+msgstr "mencoba untuk menggunakan skalar `%s' sebagai sebuah array"
+
+#: array.c:407 array.c:574 builtin.c:88 builtin.c:1746 builtin.c:1794
+#: builtin.c:1807 builtin.c:2323 builtin.c:2350 eval.c:1156 eval.c:1161
+#: eval.c:1558
+#, c-format
+msgid "attempt to use array `%s' in a scalar context"
+msgstr "mencoba menggunakan array `%s' dalam sebuah konteks skalar"
+
+#: array.c:581
+#, fuzzy, c-format
+msgid "delete: index `%.*s' not in array `%s'"
+msgstr "delete: indeks `%s' tidak dalam array `%s'"
+
+#: array.c:595
+#, c-format
+msgid "attempt to use scalar `%s[\"%.*s\"]' as an array"
+msgstr "mencoba untuk menggunakan skalar `%s[\"%.*s\"]' sebagai sebuah array"
+
+#: array.c:808 array.c:858
+#, fuzzy, c-format
+msgid "%s: first argument is not an array"
+msgstr "asort: argumen ketiga bukan sebuah array"
+
+#: array.c:850
+#, fuzzy, c-format
+msgid "%s: second argument is not an array"
+msgstr "split: argumen kedua bukan sebuah array"
+
+#: array.c:853 field.c:1148 field.c:1245
+#, fuzzy, c-format
+msgid "%s: cannot use %s as second argument"
+msgstr "asort: cannot use a subarray of first arg for second arg"
+
+#: array.c:861
+#, fuzzy, c-format
+msgid "%s: first argument cannot be SYMTAB without a second argument"
+msgstr "asort: argumen ketiga bukan sebuah array"
+
+#: array.c:863
+#, fuzzy, c-format
+msgid "%s: first argument cannot be FUNCTAB without a second argument"
+msgstr "asort: argumen ketiga bukan sebuah array"
+
+#: array.c:870
+msgid ""
+"asort/asorti: using the same array as source and destination without a third "
+"argument is silly."
+msgstr ""
+
+#: array.c:875
+#, fuzzy, c-format
+msgid "%s: cannot use a subarray of first argument for second argument"
+msgstr "asort: cannot use a subarray of first arg for second arg"
+
+#: array.c:880
+#, fuzzy, c-format
+msgid "%s: cannot use a subarray of second argument for first argument"
+msgstr "asort: cannot use a subarray of second arg for first arg"
+
+#: array.c:1410
+#, c-format
+msgid "`%s' is invalid as a function name"
+msgstr "`%s' digunakan dalam aksi"
+
+#: array.c:1414
+#, c-format
+msgid "sort comparison function `%s' is not defined"
+msgstr "fungsi `%s' tidak didefinisikan"
+
+#: awkgram.y:278
+#, c-format
+msgid "%s blocks must have an action part"
+msgstr "%s blok harus memiliki sebuah bagian aksi"
+
+#: awkgram.y:281
+msgid "each rule must have a pattern or an action part"
+msgstr "setiap aturan harus memiliki sebuah pola atau sebuah bagian aksi"
+
+#: awkgram.y:435 awkgram.y:447
+msgid "old awk does not support multiple `BEGIN' or `END' rules"
+msgstr "awk lama tidak mendukung multiple aturan `BEGIN' atau `END'"
+
+#: awkgram.y:500
+#, c-format
+msgid "`%s' is a built-in function, it cannot be redefined"
+msgstr "`%s' adalah sebuah fungsi bawaan, ini tidak dapat di redefinisi"
+
+#: awkgram.y:564
+msgid "regexp constant `//' looks like a C++ comment, but is not"
+msgstr "konstanta regexp `//' tampak seperti sebuah komentar C++, tetapi bukan"
+
+#: awkgram.y:568
+#, c-format
+msgid "regexp constant `/%s/' looks like a C comment, but is not"
+msgstr "konstanta regexp `/%s/' tampak seperti sebuah komentar C, tetapi bukan"
+
+#: awkgram.y:695
+#, c-format
+msgid "duplicate case values in switch body: %s"
+msgstr "duplikasi nilai case dalam tubuh switch: %s"
+
+#: awkgram.y:716
+msgid "duplicate `default' detected in switch body"
+msgstr "Duplikasi `default' terdeteksi dalam tubuh switch"
+
+#: awkgram.y:1052 awkgram.y:4484
+msgid "`break' is not allowed outside a loop or switch"
+msgstr "`break' diluar sebuah loop tidak diijinkan"
+
+#: awkgram.y:1062 awkgram.y:4476
+msgid "`continue' is not allowed outside a loop"
+msgstr "`continue' diluar sebuah loop tidak diijinkan"
+
+#: awkgram.y:1073
+#, c-format
+msgid "`next' used in %s action"
+msgstr "`next' digunakan dalam aksi %s"
+
+#: awkgram.y:1084
+#, c-format
+msgid "`nextfile' used in %s action"
+msgstr "`nextfile' digunakan dalam aksi %s"
+
+#: awkgram.y:1112
+msgid "`return' used outside function context"
+msgstr "`return' digunakan diluar konteks fungsi"
+
+#: awkgram.y:1185
+msgid "plain `print' in BEGIN or END rule should probably be `print \"\"'"
+msgstr ""
+"plain `print' dalam aturan BEGIN atau AKHIR seharusnya berupa `print \"\"'"
+
+#: awkgram.y:1255 awkgram.y:1304
+msgid "`delete' is not allowed with SYMTAB"
+msgstr "`delete' is not allowed with SYMTAB"
+
+#: awkgram.y:1257 awkgram.y:1306
+msgid "`delete' is not allowed with FUNCTAB"
+msgstr "`delete' is not allowed with FUNCTAB"
+
+#: awkgram.y:1291 awkgram.y:1295
+msgid "`delete(array)' is a non-portable tawk extension"
+msgstr "`delete(array)' adalah sebuah ekstensi tidak portabel tawk"
+
+#: awkgram.y:1431
+msgid "multistage two-way pipelines don't work"
+msgstr "multi tahap dua jalur pipe lines tidak bekerja"
+
+#: awkgram.y:1433
+msgid "concatenation as I/O `>' redirection target is ambiguous"
+msgstr ""
+
+#: awkgram.y:1645
+msgid "regular expression on right of assignment"
+msgstr "ekspresi regular di penempatan kanan"
+
+#: awkgram.y:1660 awkgram.y:1673
+msgid "regular expression on left of `~' or `!~' operator"
+msgstr "ekspresi regular di kiri dari operator `~' atau `!~'"
+
+#: awkgram.y:1690 awkgram.y:1840
+msgid "old awk does not support the keyword `in' except after `for'"
+msgstr "awk lama tidak mendukung kata kunci `in' kecuali setelah `for'"
+
+#: awkgram.y:1700
+msgid "regular expression on right of comparison"
+msgstr "ekspresi regular di kanan dari perbandingan"
+
+#: awkgram.y:1819
+#, fuzzy, c-format
+msgid "non-redirected `getline' invalid inside `%s' rule"
+msgstr "`getline' invalid inside `%s' rule"
+
+#: awkgram.y:1822
+msgid "non-redirected `getline' undefined inside END action"
+msgstr "tidak terdireksi `getline' tidak terdefinisi didalam aksi END"
+
+#: awkgram.y:1842
+msgid "old awk does not support multidimensional arrays"
+msgstr "awk lama tidak mendukung array multi dimensi"
+
+#: awkgram.y:1945
+msgid "call of `length' without parentheses is not portable"
+msgstr "panggilan dari `length' tanpa tanda kurung tidak portabel"
+
+#: awkgram.y:2019
+msgid "indirect function calls are a gawk extension"
+msgstr "indirect adalah sebuah ekstensi gawk"
+
+#: awkgram.y:2032
+#, fuzzy, c-format
+msgid "cannot use special variable `%s' for indirect function call"
+msgstr "tidak dapat menggunakan variabel `%s' sebagai fungsi parameter"
+
+#: awkgram.y:2065
+#, fuzzy, c-format
+msgid "attempt to use non-function `%s' in function call"
+msgstr "mencoba untuk menggunakan fungsi `%s' sebagai sebuah array"
+
+#: awkgram.y:2130
+msgid "invalid subscript expression"
+msgstr "ekspresi subscript tidak valid"
+
+#: awkgram.y:2505 awkgram.y:2525 gawkapi.c:274 gawkapi.c:291 msg.c:133
+msgid "warning: "
+msgstr "peringatan: "
+
+#: awkgram.y:2523 gawkapi.c:246 gawkapi.c:289 msg.c:165
+msgid "fatal: "
+msgstr "fatal: "
+
+#: awkgram.y:2576
+msgid "unexpected newline or end of string"
+msgstr "tidak terduga baris baru atau akhir dari string"
+
+#: awkgram.y:2597
+msgid ""
+"source files / command-line arguments must contain complete functions or "
+"rules"
+msgstr ""
+
+#: awkgram.y:2881 awkgram.y:2959 awkgram.y:3197 debug.c:545 debug.c:561
+#: debug.c:2844 debug.c:5213
+#, fuzzy, c-format
+msgid "cannot open source file `%s' for reading: %s"
+msgstr "tidak dapat membuka berkas sumber `%s' untuk pembacaan (%s)"
+
+#: awkgram.y:2882 awkgram.y:3019
+#, fuzzy, c-format
+msgid "cannot open shared library `%s' for reading: %s"
+msgstr "tidak dapat membuka berkas sumber `%s' untuk pembacaan (%s)"
+
+#: awkgram.y:2884 awkgram.y:2960 awkgram.y:3020 builtin.c:136 debug.c:5364
+msgid "reason unknown"
+msgstr "alasan tidak diketahui"
+
+#: awkgram.y:2893 awkgram.y:2917
+#, fuzzy, c-format
+msgid "cannot include `%s' and use it as a program file"
+msgstr "can't include `%s' and use it as a program file"
+
+#: awkgram.y:2906
+#, c-format
+msgid "already included source file `%s'"
+msgstr "tidak dapat membaca berkas sumber `%s'"
+
+#: awkgram.y:2907
+#, c-format
+msgid "already loaded shared library `%s'"
+msgstr "already loaded shared library `%s'"
+
+#: awkgram.y:2944
+msgid "@include is a gawk extension"
+msgstr "@include adalah sebuah ekstensi gawk"
+
+#: awkgram.y:2950
+msgid "empty filename after @include"
+msgstr "empty filename after @include"
+
+#: awkgram.y:2999
+msgid "@load is a gawk extension"
+msgstr "@load adalah sebuah ekstensi gawk"
+
+#: awkgram.y:3006
+msgid "empty filename after @load"
+msgstr "empty filename after @load"
+
+#: awkgram.y:3149
+msgid "empty program text on command line"
+msgstr "aplikasi teks kosong di baris perintah"
+
+#: awkgram.y:3265 debug.c:470 debug.c:628
+#, fuzzy, c-format
+msgid "cannot read source file `%s': %s"
+msgstr "tidak dapat membaca berkas sumber `%s' (%s)"
+
+#: awkgram.y:3276
+#, c-format
+msgid "source file `%s' is empty"
+msgstr "berkas sumber `%s' kosong"
+
+#: awkgram.y:3336
+#, fuzzy, c-format
+msgid "error: invalid character '\\%03o' in source code"
+msgstr "nama kelas karakter tidak valid"
+
+#: awkgram.y:3563
+msgid "source file does not end in newline"
+msgstr "berkas sumber tidak berakhir dalam baris baru"
+
+#: awkgram.y:3673
+msgid "unterminated regexp ends with `\\' at end of file"
+msgstr "tidak terakhiri regexp akhir denga `\\' diakhir dari berkas"
+
+#: awkgram.y:3700
+#, c-format
+msgid "%s: %d: tawk regex modifier `/.../%c' doesn't work in gawk"
+msgstr "%s: %d: tawk regex pemodifikasi `/.../%c' tidak bekerja dalam gawk"
+
+#: awkgram.y:3704
+#, c-format
+msgid "tawk regex modifier `/.../%c' doesn't work in gawk"
+msgstr "tawk regex pemodifikasi `/.../%c' tidak bekerja dalam gawk"
+
+#: awkgram.y:3717
+msgid "unterminated regexp"
+msgstr "tidak terselesaikan regexp"
+
+#: awkgram.y:3721
+msgid "unterminated regexp at end of file"
+msgstr "tidak terselesaikan di akhir dari berkas"
+
+#: awkgram.y:3810
+msgid "use of `\\ #...' line continuation is not portable"
+msgstr "penggunaan dari `\\ #...' kelanjutan baris tidak portabel"
+
+#: awkgram.y:3832
+msgid "backslash not last character on line"
+msgstr "backslash bukan karakter terakhir di baris"
+
+#: awkgram.y:3880 awkgram.y:3882
+#, fuzzy
+msgid "multidimensional arrays are a gawk extension"
+msgstr "indirect adalah sebuah ekstensi gawk"
+
+#: awkgram.y:3907 awkgram.y:3918
+#, fuzzy, c-format
+msgid "POSIX does not allow operator `%s'"
+msgstr "POSIX tidak mengijinkan operator `**'"
+
+#: awkgram.y:3909 awkgram.y:3920 awkgram.y:3955 awkgram.y:3963
+#, fuzzy, c-format
+msgid "operator `%s' is not supported in old awk"
+msgstr "operator `^' tidak didukung dalam awk lama"
+
+#: awkgram.y:4060 awkgram.y:4082 command.y:1188
+msgid "unterminated string"
+msgstr "string tidak terselesaikan"
+
+#: awkgram.y:4070 main.c:1272
+#, fuzzy
+msgid "POSIX does not allow physical newlines in string values"
+msgstr "POSIX tidak mengijinkan escapes `\\x'"
+
+#: awkgram.y:4072 node.c:483
+#, fuzzy
+msgid "backslash string continuation is not portable"
+msgstr "penggunaan dari `\\ #...' kelanjutan baris tidak portabel"
+
+#: awkgram.y:4313
+#, c-format
+msgid "invalid char '%c' in expression"
+msgstr "karakter '%c' tidak valid dalam ekspresi"
+
+#: awkgram.y:4408
+#, c-format
+msgid "`%s' is a gawk extension"
+msgstr "`%s' adalah sebuah ekstensi gawk"
+
+#: awkgram.y:4413
+#, c-format
+msgid "POSIX does not allow `%s'"
+msgstr "POSIX tidak mengijinkan `%s'"
+
+#: awkgram.y:4421
+#, c-format
+msgid "`%s' is not supported in old awk"
+msgstr "`%s' tidak didukung dalam awk lama"
+
+#: awkgram.y:4521
+#, fuzzy
+msgid "`goto' considered harmful!"
+msgstr "`goto' dipertimbangkan berbahaya!\n"
+
+#: awkgram.y:4590
+#, c-format
+msgid "%d is invalid as number of arguments for %s"
+msgstr "%d tidak valid sebagai jumlah dari argumen untuk %s"
+
+#: awkgram.y:4625
+#, fuzzy, c-format
+msgid "%s: string literal as last argument of substitute has no effect"
+msgstr ""
+"%s: literal string sebagai argumen terakhir dari pergantian tidak memiliki "
+"efek"
+
+#: awkgram.y:4630
+#, c-format
+msgid "%s third parameter is not a changeable object"
+msgstr "%s parameter ketika bukan sebuah objek yang dapat diubah"
+
+#: awkgram.y:4734 awkgram.y:4737
+msgid "match: third argument is a gawk extension"
+msgstr "cocok: argumen ketiga adalah sebuah ekstensi gawk"
+
+#: awkgram.y:4791 awkgram.y:4794
+msgid "close: second argument is a gawk extension"
+msgstr "tutup: argumen kedua adalah sebuah ekstensi gawk"
+
+#: awkgram.y:4806
+msgid "use of dcgettext(_\"...\") is incorrect: remove leading underscore"
+msgstr ""
+"penggunaan dari dcgettext(_\"...\") adalah tidak benar: hapus garis bawah "
+"yang mengawali"
+
+#: awkgram.y:4821
+msgid "use of dcngettext(_\"...\") is incorrect: remove leading underscore"
+msgstr ""
+"penggunaan dari dcngettext(_\"...\") adalah tidak benar: hapus garis bawah "
+"yang mengawali"
+
+#: awkgram.y:4840
+msgid "index: regexp constant as second argument is not allowed"
+msgstr "index: diterima argumen kedua bukan string"
+
+#: awkgram.y:4893
+#, c-format
+msgid "function `%s': parameter `%s' shadows global variable"
+msgstr "fungsi `%s': parameter `%s' bayangan variabel global"
+
+#: awkgram.y:4942 debug.c:4197 debug.c:4240 debug.c:5362 profile.c:110
+#, c-format
+msgid "could not open `%s' for writing: %s"
+msgstr "tidak dapat membuka `%s' untuk penulisan: %s"
+
+#: awkgram.y:4943
+msgid "sending variable list to standard error"
+msgstr "mengirim profile ke standar error"
+
+#: awkgram.y:4951
+#, fuzzy, c-format
+msgid "%s: close failed: %s"
+msgstr "%s: tutup gagal (%s)"
+
+#: awkgram.y:4976
+msgid "shadow_funcs() called twice!"
+msgstr "shadow_funcs() dipanggil dua kali!"
+
+#: awkgram.y:4984
+#, fuzzy
+#| msgid "there were shadowed variables."
+msgid "there were shadowed variables"
+msgstr "disana tidak ada variabel bayangan."
+
+#: awkgram.y:5061
+#, c-format
+msgid "function name `%s' previously defined"
+msgstr "nama fungsi `%s' sebelumnya telah didefinisikan"
+
+#: awkgram.y:5112
+#, fuzzy, c-format
+msgid "function `%s': cannot use function name as parameter name"
+msgstr ""
+"fungsi `%s': tidak dapat menggunakan nama fungsi sebagai nama parameter"
+
+#: awkgram.y:5115
+#, fuzzy, c-format
+msgid "function `%s': cannot use special variable `%s' as a function parameter"
+msgstr ""
+"fungsi `%s': tidak dapat menggunakan variabel `%s' sebagai fungsi parameter"
+
+#: awkgram.y:5119
+#, fuzzy, c-format
+msgid "function `%s': parameter `%s' cannot contain a namespace"
+msgstr "fungsi `%s': parameter `%s' bayangan variabel global"
+
+#: awkgram.y:5126
+#, c-format
+msgid "function `%s': parameter #%d, `%s', duplicates parameter #%d"
+msgstr "fungsi `%s': parameter #%d, `%s', duplikasi paramter #%d"
+
+#: awkgram.y:5215
+#, c-format
+msgid "function `%s' called but never defined"
+msgstr "fungsi `%s' dipanggil tetapi tidak pernah didefinisikan"
+
+#: awkgram.y:5219
+#, c-format
+msgid "function `%s' defined but never called directly"
+msgstr "fungsi `%s' didefinisikan tetapi tidak pernah dipanggil"
+
+#: awkgram.y:5251
+#, c-format
+msgid "regexp constant for parameter #%d yields boolean value"
+msgstr "konstanta regexp untuk parameter #%d menghasilkan nilai boolean"
+
+#: awkgram.y:5266
+#, c-format
+msgid ""
+"function `%s' called with space between name and `(',\n"
+"or used as a variable or an array"
+msgstr ""
+"fungsi `%s' dipanggil dengan spasi diantara nama dan `(',\n"
+"atau gunakan sebagai sebuah variabel atau sebuah array"
+
+#: awkgram.y:5490 awkgram.y:5543 mpfr.c:1589 mpfr.c:1624
+msgid "division by zero attempted"
+msgstr "pembagian dengan nol telah dicoba"
+
+#: awkgram.y:5499 awkgram.y:5552 mpfr.c:1634
+#, c-format
+msgid "division by zero attempted in `%%'"
+msgstr "pembagian dengan nol dicoba dalam `%%'"
+
+#: awkgram.y:5872
+msgid ""
+"cannot assign a value to the result of a field post-increment expression"
+msgstr ""
+"cannot assign a value to the result of a field post-increment expression"
+
+#: awkgram.y:5875
+#, c-format
+msgid "invalid target of assignment (opcode %s)"
+msgstr "tidak valid sebagai jumlah dari argumen untuk %s"
+
+#: awkgram.y:6255
+msgid "statement has no effect"
+msgstr "pernyataan tidak memiliki efek"
+
+#: awkgram.y:6770
+#, c-format
+msgid "identifier %s: qualified names not allowed in traditional / POSIX mode"
+msgstr ""
+
+#: awkgram.y:6775
+#, c-format
+msgid "identifier %s: namespace separator is two colons, not one"
+msgstr ""
+
+#: awkgram.y:6781
+#, c-format
+msgid "qualified identifier `%s' is badly formed"
+msgstr ""
+
+#: awkgram.y:6788
+#, c-format
+msgid ""
+"identifier `%s': namespace separator can only appear once in a qualified name"
+msgstr ""
+
+#: awkgram.y:6837 awkgram.y:6888
+#, c-format
+msgid "using reserved identifier `%s' as a namespace is not allowed"
+msgstr ""
+
+#: awkgram.y:6844 awkgram.y:6854
+#, c-format
+msgid ""
+"using reserved identifier `%s' as second component of a qualified name is "
+"not allowed"
+msgstr ""
+
+#: awkgram.y:6872
+#, fuzzy
+msgid "@namespace is a gawk extension"
+msgstr "@include adalah sebuah ekstensi gawk"
+
+#: awkgram.y:6879
+#, c-format
+msgid "namespace name `%s' must meet identifier naming rules"
+msgstr ""
+
+#: builtin.c:98 builtin.c:105
+#, fuzzy, c-format
+#| msgid "ord: called with no arguments"
+msgid "%s: called with %d arguments"
+msgstr "ord: dipanggil dengan argumen negatif"
+
+#: builtin.c:130
+#, fuzzy, c-format
+msgid "%s to \"%s\" failed: %s"
+msgstr "%s ke \"%s\" gagal (%s)"
+
+#: builtin.c:134
+msgid "standard output"
+msgstr "standar keluaran"
+
+#: builtin.c:135
+#, fuzzy
+msgid "standard error"
+msgstr "standar keluaran"
+
+#: builtin.c:211 builtin.c:549 builtin.c:649 builtin.c:1859 builtin.c:2608
+#: builtin.c:2626 builtin.c:2745 builtin.c:3775 mpfr.c:821
+#, c-format
+msgid "%s: received non-numeric argument"
+msgstr "%s: diterima argumen bukan numerik"
+
+#: builtin.c:217
+#, c-format
+msgid "exp: argument %g is out of range"
+msgstr "exp: argumen %g diluar dari jangkauan"
+
+#: builtin.c:281 builtin.c:618 builtin.c:2201 builtin.c:2263 builtin.c:2517
+#: builtin.c:2550
+#, fuzzy, c-format
+msgid "%s: received non-string argument"
+msgstr "system: diterima argumen bukan string"
+
+#: builtin.c:298
+#, fuzzy, c-format
+msgid "fflush: cannot flush: pipe `%.*s' opened for reading, not writing"
+msgstr ""
+"fflush: tidak dapat flush: pipe `%s' dibuka untuk dibaca, bukan ditulis"
+
+#: builtin.c:301
+#, fuzzy, c-format
+msgid "fflush: cannot flush: file `%.*s' opened for reading, not writing"
+msgstr ""
+"fflush: tidak dapat flush: berkas `%s' dibuka untuk dibaca, bukan ditulis"
+
+#: builtin.c:312
+#, fuzzy, c-format
+msgid "fflush: cannot flush file `%.*s': %s"
+msgstr ""
+"fflush: tidak dapat flush: berkas `%s' dibuka untuk dibaca, bukan ditulis"
+
+#: builtin.c:317
+#, fuzzy, c-format
+msgid "fflush: cannot flush: two-way pipe `%.*s' has closed write end"
+msgstr ""
+"fflush: tidak dapat flush: pipe `%s' dibuka untuk dibaca, bukan ditulis"
+
+#: builtin.c:323
+#, fuzzy, c-format
+msgid "fflush: `%.*s' is not an open file, pipe or co-process"
+msgstr "fflush: `%s' bukan sebuah berkas terbuka, pipe atau co-proses"
+
+#: builtin.c:432 builtin.c:1897 builtin.c:2107 builtin.c:2787 builtin.c:4037
+#: builtin.c:4124 builtin.c:4191
+#, fuzzy, c-format
+msgid "%s: received non-string first argument"
+msgstr "indeks: diterima argumen pertama bukan string"
+
+#: builtin.c:434 builtin.c:4015 builtin.c:4030 builtin.c:4120 builtin.c:4182
+#, fuzzy, c-format
+msgid "%s: received non-string second argument"
+msgstr "indeks: diterima argumen kedua bukan string"
+
+#: builtin.c:592
+msgid "length: received array argument"
+msgstr "length: diterima argumen bukan-string"
+
+#: builtin.c:595
+msgid "`length(array)' is a gawk extension"
+msgstr "`length(array)' adalah sebuah ekstensi gawk"
+
+#: builtin.c:652 builtin.c:1863
+#, fuzzy, c-format
+msgid "%s: received negative argument %g"
+msgstr "log: diterima argumen negatif %g"
+
+#: builtin.c:857 builtin.c:862 builtin.c:1016
+msgid "fatal: must use `count$' on all formats or none"
+msgstr "harus menggunakan `count$' di semua format atau tidak sama sekali"
+
+#: builtin.c:935
+#, c-format
+msgid "field width is ignored for `%%' specifier"
+msgstr "lebar daerah diabaikan untuk penspesifikasi `%%'"
+
+#: builtin.c:937
+#, c-format
+msgid "precision is ignored for `%%' specifier"
+msgstr "ketepatan diabaikan untuk penspesifikasi `%%'"
+
+#: builtin.c:939
+#, c-format
+msgid "field width and precision are ignored for `%%' specifier"
+msgstr "lebar daerah dan presisi diabaikan untuk penspesifikasi `%%'"
+
+#: builtin.c:990
+msgid "fatal: `$' is not permitted in awk formats"
+msgstr "`$' tidak diijinkan dalam format awk"
+
+#: builtin.c:999
+#, fuzzy
+msgid "fatal: argument index with `$' must be > 0"
+msgstr "arg count dengan `$' harus > 0"
+
+#: builtin.c:1003
+#, fuzzy, c-format
+msgid ""
+"fatal: argument index %ld greater than total number of supplied arguments"
+msgstr ""
+"arg count %ld lebih besar dari jumlah total dari argumen yang diberikan"
+
+#: builtin.c:1007
+msgid "fatal: `$' not permitted after period in format"
+msgstr "`$' tidak diijinkan setelah periode dalam format"
+
+#: builtin.c:1026
+msgid "fatal: no `$' supplied for positional field width or precision"
+msgstr "tidak ada `$' yang diberikan untuk posisional field width atau presisi"
+
+#: builtin.c:1104
+#, fuzzy, c-format
+#| msgid "`l' is meaningless in awk formats; ignored"
+msgid "`%c' is meaningless in awk formats; ignored"
+msgstr "`l' tidak berarti dalam format awk; diabaikan"
+
+#: builtin.c:1108
+#, fuzzy, c-format
+#| msgid "fatal: `l' is not permitted in POSIX awk formats"
+msgid "fatal: `%c' is not permitted in POSIX awk formats"
+msgstr "`l' tidak diijinkan dalam format POSIX awk"
+
+#: builtin.c:1139
+#, fuzzy, c-format
+msgid "[s]printf: value %g is too big for %%c format"
+msgstr "[s]printf: nilai %g diluar dari jangkauan untuk format `%%%c'"
+
+#: builtin.c:1152
+#, fuzzy, c-format
+msgid "[s]printf: value %g is not a valid wide character"
+msgstr "[s]printf: nilai %g diluar dari jangkauan untuk format `%%%c'"
+
+#: builtin.c:1544
+#, c-format
+msgid "[s]printf: value %g is out of range for `%%%c' format"
+msgstr "[s]printf: nilai %g diluar dari jangkauan untuk format `%%%c'"
+
+#: builtin.c:1552
+#, fuzzy, c-format
+msgid "[s]printf: value %s is out of range for `%%%c' format"
+msgstr "[s]printf: nilai %g diluar dari jangkauan untuk format `%%%c'"
+
+#: builtin.c:1577
+#, c-format
+msgid "%%%c format is POSIX standard but not portable to other awks"
+msgstr ""
+
+#: builtin.c:1688
+#, c-format
+msgid "ignoring unknown format specifier character `%c': no argument converted"
+msgstr ""
+"mengabaikan format tidak dikenal karakter penspesifikasi `%c': tidak ada "
+"argumen yang diubah"
+
+#: builtin.c:1693
+msgid "fatal: not enough arguments to satisfy format string"
+msgstr "tidak cukup argumen untuk memuaskan format string"
+
+#: builtin.c:1695
+msgid "^ ran out for this one"
+msgstr "^ kehabisan untuk yang ini"
+
+#: builtin.c:1702
+msgid "[s]printf: format specifier does not have control letter"
+msgstr "[s]printf: penspesifikasi format tidak memiliki pengontrol huruf"
+
+#: builtin.c:1705
+msgid "too many arguments supplied for format string"
+msgstr "terlalu banyak argumen diberikan untuk format string"
+
+#: builtin.c:1752
+#, fuzzy, c-format
+msgid "%s: received non-string format string argument"
+msgstr "indeks: diterima argumen pertama bukan string"
+
+#: builtin.c:1767
+msgid "sprintf: no arguments"
+msgstr "sprintf: tidak ada argumen"
+
+#: builtin.c:1790 builtin.c:1801
+msgid "printf: no arguments"
+msgstr "printf: tidak ada argumen"
+
+#: builtin.c:1816
+msgid "printf: attempt to write to closed write end of two-way pipe"
+msgstr ""
+
+#: builtin.c:1884 builtin.c:4113
+#, fuzzy, c-format
+msgid "%s: received non-numeric third argument"
+msgstr "or: diterima argumen pertama bukan numerik"
+
+#: builtin.c:1891 builtin.c:2081 builtin.c:2587 builtin.c:3603 builtin.c:3644
+#: builtin.c:4244
+#, fuzzy, c-format
+msgid "%s: received non-numeric second argument"
+msgstr "or: diterima argumen kedua bukan numerik"
+
+#: builtin.c:1902
+#, c-format
+msgid "substr: length %g is not >= 1"
+msgstr "substr: panjang %g tidak >= 1"
+
+#: builtin.c:1904
+#, c-format
+msgid "substr: length %g is not >= 0"
+msgstr "substr: panjang %g tidak >= 0"
+
+#: builtin.c:1918
+#, c-format
+msgid "substr: non-integer length %g will be truncated"
+msgstr "substr: panjang bukan integer %g akan dipotong"
+
+#: builtin.c:1923
+#, c-format
+msgid "substr: length %g too big for string indexing, truncating to %g"
+msgstr ""
+"substr: panjang %g terlalu besar untuk pengindeksan string, dipotong ke %g"
+
+#: builtin.c:1935
+#, c-format
+msgid "substr: start index %g is invalid, using 1"
+msgstr "substr: awal indeks %g tidak valid, menggunakan 1"
+
+#: builtin.c:1940
+#, c-format
+msgid "substr: non-integer start index %g will be truncated"
+msgstr "substr: awal indeks %g bukan integer akan dipotong"
+
+#: builtin.c:1963
+msgid "substr: source string is zero length"
+msgstr "substr: sumber string memiliki panjang nol"
+
+#: builtin.c:1977
+#, c-format
+msgid "substr: start index %g is past end of string"
+msgstr "substr: awal indeks %g melewati akhir dari string"
+
+#: builtin.c:1985
+#, c-format
+msgid ""
+"substr: length %g at start index %g exceeds length of first argument (%lu)"
+msgstr ""
+"substr: panjang %g di awal indeks %g melewati panjang dari argumen pertama "
+"(%lu)"
+
+#: builtin.c:2060
+msgid "strftime: format value in PROCINFO[\"strftime\"] has numeric type"
+msgstr "strftime: format value in PROCINFO[\"strftime\"] has numeric type"
+
+#: builtin.c:2091
+msgid "strftime: second argument less than 0 or too big for time_t"
+msgstr "strftime: second argument less than 0 or too big for time_t"
+
+#: builtin.c:2098
+#, fuzzy
+msgid "strftime: second argument out of range for time_t"
+msgstr "strftime: second argument less than 0 or too big for time_t"
+
+#: builtin.c:2114
+msgid "strftime: received empty format string"
+msgstr "strftime: diterima format string kosong"
+
+#: builtin.c:2220
+msgid "mktime: at least one of the values is out of the default range"
+msgstr "mktime: at least one of the values is out of the default range"
+
+#: builtin.c:2258
+msgid "'system' function not allowed in sandbox mode"
+msgstr "'system' function not allowed in sandbox mode"
+
+#: builtin.c:2332 builtin.c:2407
+msgid "print: attempt to write to closed write end of two-way pipe"
+msgstr ""
+
+#: builtin.c:2430
+#, c-format
+msgid "reference to uninitialized field `$%d'"
+msgstr "referensi ke field tidak terinisialisasi `$%d'"
+
+#: builtin.c:2585 builtin.c:3601 builtin.c:3642 builtin.c:4242
+#, fuzzy, c-format
+msgid "%s: received non-numeric first argument"
+msgstr "or: diterima argumen pertama bukan numerik"
+
+#: builtin.c:2778
+msgid "match: third argument is not an array"
+msgstr "match: argumen ketiga bukan sebuah array"
+
+#: builtin.c:2780
+#, fuzzy, c-format
+#| msgid "fnmatch: could not get third argument"
+msgid "%s: cannot use %s as third argument"
+msgstr "fnmatch: could not get third argument"
+
+#: builtin.c:3029
+#, fuzzy, c-format
+msgid "gensub: third argument `%.*s' treated as 1"
+msgstr "gensub: argumen ketiga dari 0 diperlakukan sebagai 1"
+
+#: builtin.c:3403
+#, fuzzy, c-format
+msgid "%s: can be called indirectly only with two arguments"
+msgstr "and: dipanggil dengan argumen negatif"
+
+#: builtin.c:3426
+#, fuzzy
+msgid "indirect call to gensub requires three or four arguments"
+msgstr "and: dipanggil dengan argumen negatif"
+
+#: builtin.c:3488
+#, fuzzy
+msgid "indirect call to match requires two or three arguments"
+msgstr "and: dipanggil dengan argumen negatif"
+
+#: builtin.c:3532
+#, fuzzy, c-format
+msgid "indirect call to %s requires two to four arguments"
+msgstr "and: dipanggil dengan argumen negatif"
+
+#: builtin.c:3609
+#, fuzzy, c-format
+msgid "lshift(%f, %f): negative values are not allowed"
+msgstr "lshift(%f, %f): nilai negatif akan memberikan hasil aneh"
+
+#: builtin.c:3613
+#, c-format
+msgid "lshift(%f, %f): fractional values will be truncated"
+msgstr "lshift(%f, %f): nilai pecahan akan dipotong"
+
+#: builtin.c:3615
+#, c-format
+msgid "lshift(%f, %f): too large shift value will give strange results"
+msgstr "lshift(%f, %f): nilai shift terlalu besar akan memberikan hasil aneh"
+
+#: builtin.c:3650
+#, fuzzy, c-format
+msgid "rshift(%f, %f): negative values are not allowed"
+msgstr "rshift(%f. %f): nilai negatif akan memberikan hasil aneh"
+
+#: builtin.c:3654
+#, c-format
+msgid "rshift(%f, %f): fractional values will be truncated"
+msgstr "rshift(%f, %f): nilai pecahan akan dipotong"
+
+#: builtin.c:3656
+#, c-format
+msgid "rshift(%f, %f): too large shift value will give strange results"
+msgstr "rshift(%f, %f): nilai shift terlalu besar akan memberikan hasil aneh"
+
+#: builtin.c:3680 builtin.c:3711 builtin.c:3741
+#, fuzzy, c-format
+msgid "%s: called with less than two arguments"
+msgstr "or: dipanggil dengan argumen negatif"
+
+#: builtin.c:3685 builtin.c:3716 builtin.c:3747
+#, fuzzy, c-format
+msgid "%s: argument %d is non-numeric"
+msgstr "or: argumen %d diluar dari jangkauan"
+
+#: builtin.c:3689 builtin.c:3720 builtin.c:3751
+#, fuzzy, c-format
+msgid "%s: argument %d negative value %g is not allowed"
+msgstr "%s: #%d nilai negatif %Rg akan memberikan hasil aneh"
+
+#: builtin.c:3780
+#, fuzzy, c-format
+msgid "compl(%f): negative value is not allowed"
+msgstr "compl(%f): nilai negatif akan memberikan hasil aneh"
+
+#: builtin.c:3783
+#, c-format
+msgid "compl(%f): fractional value will be truncated"
+msgstr "compl(%f): nilai pecahan akan dipotong"
+
+#: builtin.c:3971
+#, c-format
+msgid "dcgettext: `%s' is not a valid locale category"
+msgstr "dcgettext: `%s' bukan sebuah kategori lokal yang valid"
+
+#: builtin.c:4006 builtin.c:4024
+#, fuzzy, c-format
+msgid "%s: received non-string third argument"
+msgstr "indeks: diterima argumen pertama bukan string"
+
+#: builtin.c:4079 builtin.c:4100
+#, fuzzy, c-format
+msgid "%s: received non-string fifth argument"
+msgstr "indeks: diterima argumen pertama bukan string"
+
+#: builtin.c:4089 builtin.c:4106
+#, fuzzy, c-format
+msgid "%s: received non-string fourth argument"
+msgstr "indeks: diterima argumen pertama bukan string"
+
+#: builtin.c:4234 mpfr.c:1337
+#, fuzzy
+msgid "intdiv: third argument is not an array"
+msgstr "match: argumen ketiga bukan sebuah array"
+
+#: builtin.c:4253 mpfr.c:1386
+#, fuzzy
+msgid "intdiv: division by zero attempted"
+msgstr "pembagian dengan nol telah dicoba"
+
+#: builtin.c:4294
+#, fuzzy
+msgid "typeof: second argument is not an array"
+msgstr "split: argumen kedua bukan sebuah array"
+
+#: builtin.c:4384
+#, c-format
+msgid ""
+"typeof detected invalid flags combination `%s'; please file a bug report"
+msgstr ""
+
+#: builtin.c:4422
+#, c-format
+msgid "typeof: unknown argument type `%s'"
+msgstr ""
+
+#: cint_array.c:1268 cint_array.c:1296
+#, c-format
+msgid "cannot add a new file (%.*s) to ARGV in sandbox mode"
+msgstr ""
+
+#: command.y:228
+#, fuzzy, c-format
+msgid "Type (g)awk statement(s). End with the command `end'\n"
+msgstr "Type (g)awk statement(s). End with the command \"end\"\n"
+
+#: command.y:292
+#, c-format
+msgid "invalid frame number: %d"
+msgstr "Akhir jangkauan tidak valid: %d"
+
+#: command.y:298
+#, fuzzy, c-format
+msgid "info: invalid option - `%s'"
+msgstr "info: pilihan tidak valid - \"%s\""
+
+#: command.y:324
+#, fuzzy, c-format
+msgid "source: `%s': already sourced"
+msgstr "source \"%s\": already sourced."
+
+#: command.y:329
+#, fuzzy, c-format
+msgid "save: `%s': command not permitted"
+msgstr "save \"%s\": command not permitted."
+
+#: command.y:342
+#, fuzzy
+msgid "cannot use command `commands' for breakpoint/watchpoint commands"
+msgstr "Can't use command `commands' for breakpoint/watchpoint commands"
+
+#: command.y:344
+msgid "no breakpoint/watchpoint has been set yet"
+msgstr "no breakpoint/watchpoint has been set yet"
+
+#: command.y:346
+msgid "invalid breakpoint/watchpoint number"
+msgstr "invalid breakpoint/watchpoint number"
+
+#: command.y:351
+#, c-format
+msgid "Type commands for when %s %d is hit, one per line.\n"
+msgstr "Type commands for when %s %d is hit, one per line.\n"
+
+#: command.y:353
+#, fuzzy, c-format
+msgid "End with the command `end'\n"
+msgstr "End with the command \"end\"\n"
+
+#: command.y:360
+msgid "`end' valid only in command `commands' or `eval'"
+msgstr "`end' valid only in command `commands' or `eval'"
+
+#: command.y:370
+msgid "`silent' valid only in command `commands'"
+msgstr "`silent' valid only in command `commands'"
+
+#: command.y:376
+#, fuzzy, c-format
+msgid "trace: invalid option - `%s'"
+msgstr "trace: pilihan tidak valid - \"%s\""
+
+#: command.y:390
+msgid "condition: invalid breakpoint/watchpoint number"
+msgstr "condition: invalid breakpoint/watchpoint number"
+
+#: command.y:452
+msgid "argument not a string"
+msgstr "tidak cukup argumen untuk memuaskan format string"
+
+#: command.y:462 command.y:467
+#, fuzzy, c-format
+msgid "option: invalid parameter - `%s'"
+msgstr "option: invalid parameter - \"%s\""
+
+#: command.y:477
+#, fuzzy, c-format
+msgid "no such function - `%s'"
+msgstr "no such function - \"%s\""
+
+#: command.y:534
+#, fuzzy, c-format
+msgid "enable: invalid option - `%s'"
+msgstr "enable: pilihan tidak valid - \"%s\""
+
+#: command.y:600
+#, c-format
+msgid "invalid range specification: %d - %d"
+msgstr "Akhir jangkauan tidak valid: %d - %d"
+
+#: command.y:662
+msgid "non-numeric value for field number"
+msgstr "non-numeric value for field number"
+
+#: command.y:683 command.y:690
+msgid "non-numeric value found, numeric expected"
+msgstr "non-numeric value found, numeric expected"
+
+#: command.y:715 command.y:721
+msgid "non-zero integer value"
+msgstr "non-zero integer value"
+
+#: command.y:820
+#, fuzzy
+#| msgid ""
+#| "backtrace [N] - print trace of all or N innermost (outermost if N < 0) "
+#| "frames."
+msgid ""
+"backtrace [N] - print trace of all or N innermost (outermost if N < 0) frames"
+msgstr ""
+"backtrace [N] - print trace of all or N innermost (outermost if N < 0) "
+"frames."
+
+#: command.y:822
+#, fuzzy
+#| msgid ""
+#| "break [[filename:]N|function] - set breakpoint at the specified location."
+msgid ""
+"break [[filename:]N|function] - set breakpoint at the specified location"
+msgstr ""
+"break [[filename:]N|function] - set breakpoint at the specified location."
+
+#: command.y:824
+#, fuzzy
+#| msgid "clear [[filename:]N|function] - delete breakpoints previously set."
+msgid "clear [[filename:]N|function] - delete breakpoints previously set"
+msgstr "clear [[filename:]N|function] - delete breakpoints previously set."
+
+#: command.y:826
+#, fuzzy
+#| msgid ""
+#| "commands [num] - starts a list of commands to be executed at a "
+#| "breakpoint(watchpoint) hit."
+msgid ""
+"commands [num] - starts a list of commands to be executed at a "
+"breakpoint(watchpoint) hit"
+msgstr ""
+"commands [num] - starts a list of commands to be executed at a "
+"breakpoint(watchpoint) hit."
+
+#: command.y:828
+#, fuzzy
+#| msgid ""
+#| "condition num [expr] - set or clear breakpoint or watchpoint condition."
+msgid "condition num [expr] - set or clear breakpoint or watchpoint condition"
+msgstr ""
+"condition num [expr] - set or clear breakpoint or watchpoint condition."
+
+#: command.y:830
+#, fuzzy
+#| msgid "continue [COUNT] - continue program being debugged."
+msgid "continue [COUNT] - continue program being debugged"
+msgstr "continue [COUNT] - continue program being debugged."
+
+#: command.y:832
+#, fuzzy
+#| msgid "delete [breakpoints] [range] - delete specified breakpoints."
+msgid "delete [breakpoints] [range] - delete specified breakpoints"
+msgstr "delete [breakpoints] [range] - delete specified breakpoints."
+
+#: command.y:834
+#, fuzzy
+#| msgid "disable [breakpoints] [range] - disable specified breakpoints."
+msgid "disable [breakpoints] [range] - disable specified breakpoints"
+msgstr "disable [breakpoints] [range] - disable specified breakpoints."
+
+#: command.y:836
+#, fuzzy
+#| msgid "display [var] - print value of variable each time the program stops."
+msgid "display [var] - print value of variable each time the program stops"
+msgstr "display [var] - print value of variable each time the program stops."
+
+#: command.y:838
+#, fuzzy
+#| msgid "down [N] - move N frames down the stack."
+msgid "down [N] - move N frames down the stack"
+msgstr "down [N] - move N frames down the stack."
+
+#: command.y:840
+#, fuzzy
+#| msgid "dump [filename] - dump instructions to file or stdout."
+msgid "dump [filename] - dump instructions to file or stdout"
+msgstr "dump [filename] - dump instructions to file or stdout."
+
+#: command.y:842
+#, fuzzy
+#| msgid ""
+#| "enable [once|del] [breakpoints] [range] - enable specified breakpoints."
+msgid "enable [once|del] [breakpoints] [range] - enable specified breakpoints"
+msgstr ""
+"enable [once|del] [breakpoints] [range] - enable specified breakpoints."
+
+#: command.y:844
+#, fuzzy
+#| msgid "end - end a list of commands or awk statements."
+msgid "end - end a list of commands or awk statements"
+msgstr "end - end a list of commands or awk statements."
+
+#: command.y:846
+#, fuzzy
+#| msgid "eval stmt|[p1, p2, ...] - evaluate awk statement(s)."
+msgid "eval stmt|[p1, p2, ...] - evaluate awk statement(s)"
+msgstr "eval stmt|[p1, p2, ...] - evaluate awk statement(s)."
+
+#: command.y:848
+#, fuzzy
+msgid "exit - (same as quit) exit debugger"
+msgstr "quit - exit debugger."
+
+#: command.y:850
+#, fuzzy
+#| msgid "finish - execute until selected stack frame returns."
+msgid "finish - execute until selected stack frame returns"
+msgstr "finish - execute until selected stack frame returns."
+
+#: command.y:852
+#, fuzzy
+#| msgid "frame [N] - select and print stack frame number N."
+msgid "frame [N] - select and print stack frame number N"
+msgstr "frame [N] - select and print stack frame number N."
+
+#: command.y:854
+#, fuzzy
+#| msgid "help [command] - print list of commands or explanation of command."
+msgid "help [command] - print list of commands or explanation of command"
+msgstr "help [command] - print list of commands or explanation of command."
+
+#: command.y:856
+#, fuzzy
+#| msgid "ignore N COUNT - set ignore-count of breakpoint number N to COUNT."
+msgid "ignore N COUNT - set ignore-count of breakpoint number N to COUNT"
+msgstr "ignore N COUNT - set ignore-count of breakpoint number N to COUNT."
+
+#: command.y:858
+#, fuzzy
+#| msgid ""
+#| "info topic - source|sources|variables|functions|break|frame|args|locals|"
+#| "display|watch."
+msgid ""
+"info topic - source|sources|variables|functions|break|frame|args|locals|"
+"display|watch"
+msgstr ""
+"info topic - source|sources|variables|functions|break|frame|args|locals|"
+"display|watch."
+
+#: command.y:860
+#, fuzzy
+#| msgid ""
+#| "list [-|+|[filename:]lineno|function|range] - list specified line(s)."
+msgid "list [-|+|[filename:]lineno|function|range] - list specified line(s)"
+msgstr "list [-|+|[filename:]lineno|function|range] - list specified line(s)."
+
+#: command.y:862
+#, fuzzy
+#| msgid "next [COUNT] - step program, proceeding through subroutine calls."
+msgid "next [COUNT] - step program, proceeding through subroutine calls"
+msgstr "next [COUNT] - step program, proceeding through subroutine calls."
+
+#: command.y:864
+#, fuzzy
+#| msgid ""
+#| "nexti [COUNT] - step one instruction, but proceed through subroutine "
+#| "calls."
+msgid ""
+"nexti [COUNT] - step one instruction, but proceed through subroutine calls"
+msgstr ""
+"nexti [COUNT] - stepp one instruction, but proceed through subroutine calls."
+
+#: command.y:866
+#, fuzzy
+#| msgid "option [name[=value]] - set or display debugger option(s)."
+msgid "option [name[=value]] - set or display debugger option(s)"
+msgstr "option [name[=value]] - set or display debugger option(s)."
+
+#: command.y:868
+#, fuzzy
+#| msgid "print var [var] - print value of a variable or array."
+msgid "print var [var] - print value of a variable or array"
+msgstr "print var [var] - print value of a variable or array."
+
+#: command.y:870
+#, fuzzy
+#| msgid "printf format, [arg], ... - formatted output."
+msgid "printf format, [arg], ... - formatted output"
+msgstr "printf format, [arg], ... - formatted output."
+
+#: command.y:872
+#, fuzzy
+#| msgid "quit - exit debugger."
+msgid "quit - exit debugger"
+msgstr "quit - exit debugger."
+
+#: command.y:874
+#, fuzzy
+#| msgid "return [value] - make selected stack frame return to its caller."
+msgid "return [value] - make selected stack frame return to its caller"
+msgstr "return [value] - make selected stack frame return to its caller."
+
+#: command.y:876
+#, fuzzy
+#| msgid "run - start or restart executing program."
+msgid "run - start or restart executing program"
+msgstr "run - start or restart executing program."
+
+#: command.y:879
+#, fuzzy
+#| msgid "save filename - save commands from the session to file."
+msgid "save filename - save commands from the session to file"
+msgstr "save filename - save commands from the session to file."
+
+#: command.y:882
+#, fuzzy
+#| msgid "set var = value - assign value to a scalar variable."
+msgid "set var = value - assign value to a scalar variable"
+msgstr "set var = value - assign value to a scalar variable."
+
+#: command.y:884
+#, fuzzy
+#| msgid ""
+#| "silent - suspends usual message when stopped at a breakpoint/watchpoint."
+msgid "silent - suspends usual message when stopped at a breakpoint/watchpoint"
+msgstr ""
+"silent - suspends usual message when stopped at a breakpoint/watchpoint."
+
+#: command.y:886
+#, fuzzy
+#| msgid "source file - execute commands from file."
+msgid "source file - execute commands from file"
+msgstr "source file - execute commads from file."
+
+#: command.y:888
+#, fuzzy
+#| msgid ""
+#| "step [COUNT] - step program until it reaches a different source line."
+msgid "step [COUNT] - step program until it reaches a different source line"
+msgstr "step [COUNT] - step program until it reaches a different source line."
+
+#: command.y:890
+#, fuzzy
+#| msgid "stepi [COUNT] - step one instruction exactly."
+msgid "stepi [COUNT] - step one instruction exactly"
+msgstr "stepi [COUNT] - step one instruction exactly."
+
+#: command.y:892
+#, fuzzy
+#| msgid "tbreak [[filename:]N|function] - set a temporary breakpoint."
+msgid "tbreak [[filename:]N|function] - set a temporary breakpoint"
+msgstr "tbreak [[filename:]N|function] - set a temporary breakpoint."
+
+#: command.y:894
+#, fuzzy
+#| msgid "trace on|off - print instruction before executing."
+msgid "trace on|off - print instruction before executing"
+msgstr "trace on|off - print instruction before executing."
+
+#: command.y:896
+#, fuzzy
+#| msgid "undisplay [N] - remove variable(s) from automatic display list."
+msgid "undisplay [N] - remove variable(s) from automatic display list"
+msgstr "undisplay [N] - remove variable(s) from automatic display list."
+
+#: command.y:898
+#, fuzzy
+#| msgid ""
+#| "until [[filename:]N|function] - execute until program reaches a different "
+#| "line or line N within current frame."
+msgid ""
+"until [[filename:]N|function] - execute until program reaches a different "
+"line or line N within current frame"
+msgstr ""
+"until [[filename:]N|function] - execute until program reaches a different "
+"line or line N within current frame."
+
+#: command.y:900
+#, fuzzy
+#| msgid "unwatch [N] - remove variable(s) from watch list."
+msgid "unwatch [N] - remove variable(s) from watch list"
+msgstr "unwatch [N] - remove variable(s) from watch list."
+
+#: command.y:902
+#, fuzzy
+#| msgid "up [N] - move N frames up the stack."
+msgid "up [N] - move N frames up the stack"
+msgstr "up [N] - move N frames up the stack."
+
+#: command.y:904
+#, fuzzy
+#| msgid "watch var - set a watchpoint for a variable."
+msgid "watch var - set a watchpoint for a variable"
+msgstr "watch var - set a watchpoint for a variable."
+
+#: command.y:906
+#, fuzzy
+msgid ""
+"where [N] - (same as backtrace) print trace of all or N innermost (outermost "
+"if N < 0) frames"
+msgstr ""
+"backtrace [N] - print trace of all or N innermost (outermost if N < 0) "
+"frames."
+
+#: command.y:1017 debug.c:423 gawkapi.c:260 msg.c:142
+#, c-format
+msgid "error: "
+msgstr "error: "
+
+#: command.y:1061
+#, fuzzy, c-format
+msgid "cannot read command: %s\n"
+msgstr "tidak dapat redirek dari (%s)\n"
+
+#: command.y:1075
+#, fuzzy, c-format
+msgid "cannot read command: %s"
+msgstr "tidak dapat redirek dari (%s)"
+
+#: command.y:1126
+msgid "invalid character in command"
+msgstr "nama kelas karakter tidak valid"
+
+#: command.y:1162
+#, fuzzy, c-format
+msgid "unknown command - `%.*s', try help"
+msgstr "unknown command - \"%.*s\", try help"
+
+#: command.y:1232
+#, c-format
+msgid "%s"
+msgstr "%s"
+
+#: command.y:1294
+msgid "invalid character"
+msgstr "Karakter kolasi tidak valid"
+
+#: command.y:1498
+#, c-format
+msgid "undefined command: %s\n"
+msgstr "undefined command: %s\n"
+
+#: debug.c:257
+#, fuzzy
+#| msgid "set or show the number of lines to keep in history file."
+msgid "set or show the number of lines to keep in history file"
+msgstr "set or show the number of lines to keep in history file."
+
+#: debug.c:259
+#, fuzzy
+#| msgid "set or show the list command window size."
+msgid "set or show the list command window size"
+msgstr "set or show the list command window size."
+
+#: debug.c:261
+#, fuzzy
+#| msgid "set or show gawk output file."
+msgid "set or show gawk output file"
+msgstr "set or show gawk output file."
+
+#: debug.c:263
+#, fuzzy
+#| msgid "set or show debugger prompt."
+msgid "set or show debugger prompt"
+msgstr "set or show debugger prompt."
+
+#: debug.c:265
+#, fuzzy
+#| msgid "(un)set or show saving of command history (value=on|off)."
+msgid "(un)set or show saving of command history (value=on|off)"
+msgstr "(un)set or show saving of command history (value=on|off)."
+
+#: debug.c:267
+#, fuzzy
+#| msgid "(un)set or show saving of options (value=on|off)."
+msgid "(un)set or show saving of options (value=on|off)"
+msgstr "(un)set or show saving of options (value=on|off)."
+
+#: debug.c:269
+#, fuzzy
+#| msgid "(un)set or show instruction tracing (value=on|off)."
+msgid "(un)set or show instruction tracing (value=on|off)"
+msgstr "(un)set or show instruction tracing (value=on|off)."
+
+#: debug.c:358
+#, fuzzy
+#| msgid "program not running."
+msgid "program not running"
+msgstr "program not running."
+
+#: debug.c:475
+#, c-format
+msgid "source file `%s' is empty.\n"
+msgstr "berkas sumber `%s' kosong.\n"
+
+#: debug.c:502
+#, fuzzy
+#| msgid "no current source file."
+msgid "no current source file"
+msgstr "no current source file."
+
+#: debug.c:527
+#, fuzzy, c-format
+msgid "cannot find source file named `%s': %s"
+msgstr "tidak dapat membaca berkas sumber `%s' (%s)"
+
+#: debug.c:551
+#, fuzzy, c-format
+#| msgid "WARNING: source file `%s' modified since program compilation.\n"
+msgid "warning: source file `%s' modified since program compilation.\n"
+msgstr "WARNING: source file `%s' modified since program compilation.\n"
+
+#: debug.c:573
+#, c-format
+msgid "line number %d out of range; `%s' has %d lines"
+msgstr "line number %d out of range; `%s' has %d lines"
+
+#: debug.c:633
+#, c-format
+msgid "unexpected eof while reading file `%s', line %d"
+msgstr "tidak terduga baris baru atau akhir dari string `%s', %d"
+
+#: debug.c:642
+#, c-format
+msgid "source file `%s' modified since start of program execution"
+msgstr "source file `%s' modified since start of program execution"
+
+#: debug.c:754
+#, c-format
+msgid "Current source file: %s\n"
+msgstr "Current source file: %s\n"
+
+#: debug.c:755
+#, c-format
+msgid "Number of lines: %d\n"
+msgstr "Number of lines: %d\n"
+
+#: debug.c:762
+#, c-format
+msgid "Source file (lines): %s (%d)\n"
+msgstr "Source file (lines): %s (%d)\n"
+
+#: debug.c:776
+msgid ""
+"Number  Disp  Enabled  Location\n"
+"\n"
+msgstr ""
+"Number  Disp  Enabled  Location\n"
+"\n"
+
+#: debug.c:787
+#, fuzzy, c-format
+#| msgid "\tno of hits = %ld\n"
+msgid "\tnumber of hits = %ld\n"
+msgstr "\tno of hits = %ld\n"
+
+#: debug.c:789
+#, c-format
+msgid "\tignore next %ld hit(s)\n"
+msgstr "\tignore next %ld hit(s)\n"
+
+#: debug.c:791 debug.c:931
+#, c-format
+msgid "\tstop condition: %s\n"
+msgstr "\tstop condition: %s\n"
+
+#: debug.c:793 debug.c:933
+msgid "\tcommands:\n"
+msgstr "\tcommands:\n"
+
+#: debug.c:815
+#, c-format
+msgid "Current frame: "
+msgstr "Current frame: "
+
+#: debug.c:818
+#, c-format
+msgid "Called by frame: "
+msgstr "Called by frame: "
+
+#: debug.c:822
+#, c-format
+msgid "Caller of frame: "
+msgstr "Caller of frame: "
+
+#: debug.c:840
+#, c-format
+msgid "None in main().\n"
+msgstr "None in main().\n"
+
+#: debug.c:870
+msgid "No arguments.\n"
+msgstr "tidak ada argumen\n"
+
+#: debug.c:871
+msgid "No locals.\n"
+msgstr "No locals.\n"
+
+#: debug.c:879
+msgid ""
+"All defined variables:\n"
+"\n"
+msgstr ""
+"All defined variables:\n"
+"\n"
+
+#: debug.c:889
+msgid ""
+"All defined functions:\n"
+"\n"
+msgstr ""
+"All defined functions:\n"
+"\n"
+
+#: debug.c:908
+msgid ""
+"Auto-display variables:\n"
+"\n"
+msgstr ""
+"Auto-display variables:\n"
+"\n"
+
+#: debug.c:911
+msgid ""
+"Watch variables:\n"
+"\n"
+msgstr ""
+"Watch variables:\n"
+"\n"
+
+#: debug.c:1054
+#, c-format
+msgid "no symbol `%s' in current context\n"
+msgstr "no symbol `%s' in current context\n"
+
+#: debug.c:1066 debug.c:1455
+#, c-format
+msgid "`%s' is not an array\n"
+msgstr "`%s' bukan sebuah nama variabel legal\n"
+
+#: debug.c:1080
+#, c-format
+msgid "$%ld = uninitialized field\n"
+msgstr "referensi ke field tidak terinisialisasi $%ld\n"
+
+#: debug.c:1101
+#, c-format
+msgid "array `%s' is empty\n"
+msgstr "berkas data `%s' kosong\n"
+
+#: debug.c:1144 debug.c:1196
+#, fuzzy, c-format
+msgid "subscript \"%.*s\" is not in array `%s'\n"
+msgstr "indeks [\"%s\"] tidak dalam array `%s'\n"
+
+#: debug.c:1200
+#, fuzzy, c-format
+msgid "`%s[\"%.*s\"]' is not an array\n"
+msgstr "`%s[\"%s\"]' is no an array\n"
+
+#: debug.c:1262 debug.c:5122
+#, c-format
+msgid "`%s' is not a scalar variable"
+msgstr "`%s' bukan sebuah nama variabel legal"
+
+#: debug.c:1285 debug.c:5152
+#, fuzzy, c-format
+msgid "attempt to use array `%s[\"%.*s\"]' in a scalar context"
+msgstr "mencoba menggunakan array `%s[\"%s\"]' dalam sebuah konteks skalar"
+
+#: debug.c:1308 debug.c:5163
+#, fuzzy, c-format
+msgid "attempt to use scalar `%s[\"%.*s\"]' as array"
+msgstr "mencoba untuk menggunakan skalar `%s[\"%s\"]' sebagai sebuah array"
+
+#: debug.c:1451
+#, c-format
+msgid "`%s' is a function"
+msgstr "`%s' digunakan dalam aksi"
+
+#: debug.c:1493
+#, c-format
+msgid "watchpoint %d is unconditional\n"
+msgstr "watchpoint %d is unconditional\n"
+
+#: debug.c:1527
+#, fuzzy, c-format
+#| msgid "No display item numbered %ld"
+msgid "no display item numbered %ld"
+msgstr "No display item numbered %ld"
+
+#: debug.c:1530
+#, fuzzy, c-format
+#| msgid "No watch item numbered %ld"
+msgid "no watch item numbered %ld"
+msgstr "No watch item numbered %ld"
+
+#: debug.c:1556
+#, fuzzy, c-format
+msgid "%d: subscript \"%.*s\" is not in array `%s'\n"
+msgstr "%d: indeks [\"%s\"] tidak dalam array `%s'\n"
+
+#: debug.c:1796
+msgid "attempt to use scalar value as array"
+msgstr "mencoba untuk menggunakan skalar sebagai sebuah array"
+
+#: debug.c:1887
+#, c-format
+msgid "Watchpoint %d deleted because parameter is out of scope.\n"
+msgstr "Watchpoint %d deleted because parameter is out of scope.\n"
+
+#: debug.c:1898
+#, c-format
+msgid "Display %d deleted because parameter is out of scope.\n"
+msgstr "Display %d deleted because parameter is out of scope.\n"
+
+#: debug.c:1931
+#, c-format
+msgid " in file `%s', line %d\n"
+msgstr " in file `%s', line %d\n"
+
+#: debug.c:1952
+#, c-format
+msgid " at `%s':%d"
+msgstr " at `%s':%d"
+
+#: debug.c:1968 debug.c:2031
+#, c-format
+msgid "#%ld\tin "
+msgstr "#%ld\tin"
+
+#: debug.c:2005
+#, c-format
+msgid "More stack frames follow ...\n"
+msgstr "More stack frames follow ...\n"
+
+#: debug.c:2048
+msgid "invalid frame number"
+msgstr "Akhir jangkauan tidak valid"
+
+#: debug.c:2231
+#, c-format
+msgid "Note: breakpoint %d (enabled, ignore next %ld hits), also set at %s:%d"
+msgstr "Note: breakpoint %d (enabled, ignore next %ld hits), alse set at %s:%d"
+
+#: debug.c:2238
+#, c-format
+msgid "Note: breakpoint %d (enabled), also set at %s:%d"
+msgstr "Note: breakpoint %d (enabled), also set at %s:%d"
+
+#: debug.c:2245
+#, c-format
+msgid "Note: breakpoint %d (disabled, ignore next %ld hits), also set at %s:%d"
+msgstr ""
+"Note: breakpoint %d (disabled, ignore next %ld hits), also set at %s:%d"
+
+#: debug.c:2252
+#, c-format
+msgid "Note: breakpoint %d (disabled), also set at %s:%d"
+msgstr "Note: breakpoint %d (disabled), also set at %s:%d"
+
+#: debug.c:2269
+#, c-format
+msgid "Breakpoint %d set at file `%s', line %d\n"
+msgstr "Breakpoint %d set at file `%s', line %d\n"
+
+#: debug.c:2371
+#, fuzzy, c-format
+msgid "cannot set breakpoint in file `%s'\n"
+msgstr "Can't set breakpoint in file `%s'\n"
+
+#: debug.c:2400
+#, fuzzy, c-format
+#| msgid "line number %d in file `%s' out of range"
+msgid "line number %d in file `%s' is out of range"
+msgstr "argumen %d diluar dari jangkauan `%s'"
+
+#: debug.c:2404
+#, fuzzy, c-format
+msgid "internal error: cannot find rule\n"
+msgstr "internal error: %s dengan null vname"
+
+#: debug.c:2406
+#, fuzzy, c-format
+msgid "cannot set breakpoint at `%s':%d\n"
+msgstr "Can't set breakpoint at `%s':%d\n"
+
+#: debug.c:2418
+#, fuzzy, c-format
+msgid "cannot set breakpoint in function `%s'\n"
+msgstr "Can't set breakpoint in function `%s'\n"
+
+#: debug.c:2436
+#, c-format
+msgid "breakpoint %d set at file `%s', line %d is unconditional\n"
+msgstr "breakpoint %d set at file `%s', line %d is unconditional\n"
+
+#: debug.c:2524 debug.c:3381
+#, c-format
+msgid "line number %d in file `%s' out of range"
+msgstr "argumen %d diluar dari jangkauan `%s'"
+
+#: debug.c:2540 debug.c:2562
+#, c-format
+msgid "Deleted breakpoint %d"
+msgstr "Deleted breakpoint %d"
+
+#: debug.c:2546
+#, c-format
+msgid "No breakpoint(s) at entry to function `%s'\n"
+msgstr "No breakpoint(s) at entry to function `%s'\n"
+
+#: debug.c:2573
+#, c-format
+msgid "No breakpoint at file `%s', line #%d\n"
+msgstr "error membaca berkas masukan `%s': %d\n"
+
+#: debug.c:2628 debug.c:2669 debug.c:2689 debug.c:2732
+msgid "invalid breakpoint number"
+msgstr "invalid breakpoint number"
+
+#: debug.c:2644
+msgid "Delete all breakpoints? (y or n) "
+msgstr "Delete all breakpoints? (y or n) "
+
+#: debug.c:2645 debug.c:2955 debug.c:3008
+msgid "y"
+msgstr "y"
+
+#: debug.c:2694
+#, c-format
+msgid "Will ignore next %ld crossing(s) of breakpoint %d.\n"
+msgstr "Will ignore next %ld crossing(s) of breakpoint %d.\n"
+
+#: debug.c:2698
+#, c-format
+msgid "Will stop next time breakpoint %d is reached.\n"
+msgstr "Will stop next time breakpoint %d is reached.\n"
+
+#: debug.c:2815
+#, c-format
+msgid "Can only debug programs provided with the `-f' option.\n"
+msgstr "Can only debug programs provided with the `-f' option.\n"
+
+#: debug.c:2835
+#, c-format
+msgid "Restarting ...\n"
+msgstr ""
+
+#: debug.c:2940
+#, c-format
+msgid "Failed to restart debugger"
+msgstr "Failed to restart debugger"
+
+#: debug.c:2954
+msgid "Program already running. Restart from beginning (y/n)? "
+msgstr "Program already running. Restart from beginning (y/n)? "
+
+#: debug.c:2958
+#, c-format
+msgid "Program not restarted\n"
+msgstr "Program not restarted\n"
+
+#: debug.c:2968
+#, c-format
+msgid "error: cannot restart, operation not allowed\n"
+msgstr "error: cannot restart, operation not allowed\n"
+
+#: debug.c:2974
+#, c-format
+msgid "error (%s): cannot restart, ignoring rest of the commands\n"
+msgstr "error (%s): cannot restart, ignoring rest of the commands\n"
+
+#: debug.c:2982
+#, fuzzy, c-format
+#| msgid "Starting program: \n"
+msgid "Starting program:\n"
+msgstr "Starting program: \n"
+
+#: debug.c:2992
+#, fuzzy, c-format
+msgid "Program exited abnormally with exit value: %d\n"
+msgstr "Program exited %s with exit value: %d\n"
+
+#: debug.c:2993
+#, fuzzy, c-format
+msgid "Program exited normally with exit value: %d\n"
+msgstr "Program exited %s with exit value: %d\n"
+
+#: debug.c:3007
+msgid "The program is running. Exit anyway (y/n)? "
+msgstr "The program is running. Exit anyway (y/n)? "
+
+#: debug.c:3042
+#, c-format
+msgid "Not stopped at any breakpoint; argument ignored.\n"
+msgstr "Not stopped at any breakpoint; argument ignored.\n"
+
+#: debug.c:3047
+#, fuzzy, c-format
+#| msgid "invalid breakpoint number %d."
+msgid "invalid breakpoint number %d"
+msgstr "invalid breakpoint number %d."
+
+#: debug.c:3052
+#, c-format
+msgid "Will ignore next %ld crossings of breakpoint %d.\n"
+msgstr "Will ignore next %ld crossings of breakpoint %d.\n"
+
+#: debug.c:3239
+#, c-format
+msgid "'finish' not meaningful in the outermost frame main()\n"
+msgstr "'finish' not meaningful in the outermost frame main()\n"
+
+#: debug.c:3244
+#, fuzzy, c-format
+#| msgid "Run till return from "
+msgid "Run until return from "
+msgstr "Run till return from"
+
+#: debug.c:3287
+#, c-format
+msgid "'return' not meaningful in the outermost frame main()\n"
+msgstr "'return' not meaningful in the outermost frame main()\n"
+
+#: debug.c:3400
+#, fuzzy, c-format
+msgid "cannot find specified location in function `%s'\n"
+msgstr "Can't find specified location in function `%s'\n"
+
+#: debug.c:3408
+#, c-format
+msgid "invalid source line %d in file `%s'"
+msgstr "invalid source line %d in file `%s'"
+
+#: debug.c:3423
+#, fuzzy, c-format
+msgid "cannot find specified location %d in file `%s'\n"
+msgstr "Can't find specified location %d in file `%s'\n"
+
+#: debug.c:3455
+#, c-format
+msgid "element not in array\n"
+msgstr "tidak dalam array\n"
+
+#: debug.c:3455
+#, c-format
+msgid "untyped variable\n"
+msgstr "untyped variable\n"
+
+#: debug.c:3497
+#, c-format
+msgid "Stopping in %s ...\n"
+msgstr "Stopping in %s ...\n"
+
+#: debug.c:3574
+#, c-format
+msgid "'finish' not meaningful with non-local jump '%s'\n"
+msgstr "'finish' not meaningful with non-local jump '%s'\n"
+
+#: debug.c:3581
+#, c-format
+msgid "'until' not meaningful with non-local jump '%s'\n"
+msgstr "'until' not meaningful with non-local jump '%s'\n"
+
+#. TRANSLATORS: don't translate the 'q' inside the brackets.
+#: debug.c:4342
+#, fuzzy
+msgid "\t------[Enter] to continue or [q] + [Enter] to quit------"
+msgstr "\t------[Enter] to continue or q [Enter] to quit------"
+
+#: debug.c:5159
+#, fuzzy, c-format
+msgid "[\"%.*s\"] not in array `%s'"
+msgstr "[\"%s\"] tidak dalam array `%s'"
+
+#: debug.c:5365
+#, c-format
+msgid "sending output to stdout\n"
+msgstr "sending output to stdout\n"
+
+#: debug.c:5405
+msgid "invalid number"
+msgstr "invalid number"
+
+#: debug.c:5539
+#, c-format
+msgid "`%s' not allowed in current context; statement ignored"
+msgstr "`%s' not allowed in current context; statement ignored"
+
+#: debug.c:5547
+msgid "`return' not allowed in current context; statement ignored"
+msgstr "`return' not allowed in current context; statement ignored"
+
+#: debug.c:5595
+#, fuzzy, c-format
+#| msgid "fatal error: internal error"
+msgid "fatal error during eval, need to restart.\n"
+msgstr "fatal error: internal error"
+
+#: debug.c:5785
+#, fuzzy, c-format
+#| msgid "no symbol `%s' in current context\n"
+msgid "no symbol `%s' in current context"
+msgstr "no symbol `%s' in current context\n"
+
+#: eval.c:405
+#, c-format
+msgid "unknown nodetype %d"
+msgstr "tipe titik %d tidak diketahui"
+
+#: eval.c:416 eval.c:432
+#, c-format
+msgid "unknown opcode %d"
+msgstr "tipe titik %d tidak diketahui"
+
+#: eval.c:429
+#, c-format
+msgid "opcode %s not an operator or keyword"
+msgstr "opcode %s not an operator or keyword"
+
+#: eval.c:488
+msgid "buffer overflow in genflags2str"
+msgstr "buffer overflow dalam genflags2str"
+
+#: eval.c:690
+#, c-format
+msgid ""
+"\n"
+"\t# Function Call Stack:\n"
+"\n"
+msgstr ""
+"\n"
+"\t# Fungsi Call Stack:\n"
+"\n"
+
+#: eval.c:716
+msgid "`IGNORECASE' is a gawk extension"
+msgstr "`IGNORECASE' adalah ekstensi gawk"
+
+#: eval.c:737
+msgid "`BINMODE' is a gawk extension"
+msgstr "`BINMODE' adalah ekstensi gawk"
+
+#: eval.c:794
+#, c-format
+msgid "BINMODE value `%s' is invalid, treated as 3"
+msgstr "BINMODE nilai `%s' tidak valid, diperlakukan sebagai 3"
+
+#: eval.c:917
+#, c-format
+msgid "bad `%sFMT' specification `%s'"
+msgstr "buruk `%sFMT' spesifikasi `%s'"
+
+#: eval.c:987
+msgid "turning off `--lint' due to assignment to `LINT'"
+msgstr "menonaktifkan `--lint' karena penempatan ke `LINT'"
+
+#: eval.c:1190
+#, c-format
+msgid "reference to uninitialized argument `%s'"
+msgstr "referensi ke argumen `%s' tidak terinisialisasi"
+
+#: eval.c:1191
+#, c-format
+msgid "reference to uninitialized variable `%s'"
+msgstr "referensi ke variabel `%s' tidak terinisialisasi"
+
+#: eval.c:1209
+msgid "attempt to field reference from non-numeric value"
+msgstr "mencoba untuk mereferensi field dari nilai bukan numerik"
+
+#: eval.c:1211
+msgid "attempt to field reference from null string"
+msgstr "mencoba untuk mereferensi dari null string"
+
+#: eval.c:1219
+#, c-format
+msgid "attempt to access field %ld"
+msgstr "mencoba untuk mengakses field %ld"
+
+#: eval.c:1228
+#, c-format
+msgid "reference to uninitialized field `$%ld'"
+msgstr "referensi ke field tidak terinisialisasi `$%ld'"
+
+#: eval.c:1292
+#, c-format
+msgid "function `%s' called with more arguments than declared"
+msgstr "fungsi `%s' dipanggil argumen lebih dari yang dideklarasikan"
+
+#: eval.c:1500
+#, c-format
+msgid "unwind_stack: unexpected type `%s'"
+msgstr "unwind_stack: unexpected type `%s'"
+
+#: eval.c:1675
+msgid "division by zero attempted in `/='"
+msgstr "pembagian dengan nol dicoba dalam `/='"
+
+#: eval.c:1682
+#, c-format
+msgid "division by zero attempted in `%%='"
+msgstr "pembagian dengan nol dicoba dalam `%%='"
+
+#: ext.c:51
+msgid "extensions are not allowed in sandbox mode"
+msgstr "extensions are not allowed in sandbox mode"
+
+#: ext.c:54
+msgid "-l / @load are gawk extensions"
+msgstr "adalah sebuah ekstensi gawk"
+
+#: ext.c:57
+msgid "load_ext: received NULL lib_name"
+msgstr "load_ext: received NULL lib_name"
+
+#: ext.c:60
+#, fuzzy, c-format
+msgid "load_ext: cannot open library `%s': %s"
+msgstr "load_ext: tidak dapat membuka `%s' (%s)\n"
+
+#: ext.c:66
+#, fuzzy, c-format
+msgid "load_ext: library `%s': does not define `plugin_is_GPL_compatible': %s"
+msgstr ""
+"load_ext: library `%s': does not define `plugin_is_GPL_compatible' (%s)\n"
+
+#: ext.c:72
+#, fuzzy, c-format
+msgid "load_ext: library `%s': cannot call function `%s': %s"
+msgstr "load_ext: perpustakaan `%s': tidak dapat memanggil fungsi `%s' (%s)\n"
+
+#: ext.c:76
+#, fuzzy, c-format
+msgid "load_ext: library `%s' initialization routine `%s' failed"
+msgstr "load_ext: library `%s' initialization routine `%s' failed\n"
+
+#: ext.c:92
+msgid "make_builtin: missing function name"
+msgstr "make_builtin: hilang nama fungsi"
+
+#: ext.c:100 ext.c:111
+#, fuzzy, c-format
+msgid "make_builtin: cannot use gawk built-in `%s' as function name"
+msgstr ""
+"make_builtin: tidak dapat menggunakan gawk bawaan `%s' sebagai nama fungsi"
+
+#: ext.c:109
+#, fuzzy, c-format
+msgid "make_builtin: cannot use gawk built-in `%s' as namespace name"
+msgstr ""
+"make_builtin: tidak dapat menggunakan gawk bawaan `%s' sebagai nama fungsi"
+
+#: ext.c:126
+#, fuzzy, c-format
+msgid "make_builtin: cannot redefine function `%s'"
+msgstr "make_builtin: tidak dapat meredefinisi fungsi `%s'"
+
+#: ext.c:130
+#, c-format
+msgid "make_builtin: function `%s' already defined"
+msgstr "make_builtin: fungsi `%s' telah didefinisikan"
+
+#: ext.c:135
+#, c-format
+msgid "make_builtin: function name `%s' previously defined"
+msgstr "make_builtin: nama fungsi `%s' telah didefinisikan sebelumnya"
+
+#: ext.c:139
+#, c-format
+msgid "make_builtin: negative argument count for function `%s'"
+msgstr "make_builtin: negative argument count for function `%s'"
+
+#: ext.c:215
+#, c-format
+msgid "function `%s': argument #%d: attempt to use scalar as an array"
+msgstr ""
+"fungsi `%s': argumen #%d: mencoba menggunaka skalar sebagai sebuah array"
+
+#: ext.c:219
+#, c-format
+msgid "function `%s': argument #%d: attempt to use array as a scalar"
+msgstr ""
+"fungsi `%s': argumen #%d: mencoba untuk menggunakan array sebagai sebuah "
+"skalar"
+
+#: ext.c:233
+#, fuzzy
+msgid "dynamic loading of libraries is not supported"
+msgstr "dynamic loading of library not supported"
+
+#: extension/filefuncs.c:446
+#, c-format
+msgid "stat: unable to read symbolic link `%s'"
+msgstr "stat: unable to read symbolic link `%s'"
+
+#: extension/filefuncs.c:479
+#, fuzzy
+msgid "stat: first argument is not a string"
+msgstr "do_write: argumen diluar dari jangkauan\n"
+
+#: extension/filefuncs.c:484
+#, fuzzy
+msgid "stat: second argument is not an array"
+msgstr "split: argumen kedua bukan sebuah array"
+
+#: extension/filefuncs.c:528
+msgid "stat: bad parameters"
+msgstr "stat: adalah parameter"
+
+#: extension/filefuncs.c:594
+#, c-format
+msgid "fts init: could not create variable %s"
+msgstr "fts init: could not create variable %s"
+
+#: extension/filefuncs.c:615
+msgid "fts is not supported on this system"
+msgstr "tidak didukung dalam awk lama"
+
+#: extension/filefuncs.c:634
+#, fuzzy
+msgid "fill_stat_element: could not create array, out of memory"
+msgstr "fill_stat_element: could not create array"
+
+#: extension/filefuncs.c:643
+msgid "fill_stat_element: could not set element"
+msgstr "fill_stat_element: could not set element"
+
+#: extension/filefuncs.c:658
+msgid "fill_path_element: could not set element"
+msgstr "fill_path_element: could not set element"
+
+#: extension/filefuncs.c:674
+msgid "fill_error_element: could not set element"
+msgstr "fill_error_element: could not set element"
+
+#: extension/filefuncs.c:726 extension/filefuncs.c:773
+msgid "fts-process: could not create array"
+msgstr "fts-process: could not create array"
+
+#: extension/filefuncs.c:736 extension/filefuncs.c:783
+#: extension/filefuncs.c:801
+msgid "fts-process: could not set element"
+msgstr "fts-process: could not set element"
+
+#: extension/filefuncs.c:850
+msgid "fts: called with incorrect number of arguments, expecting 3"
+msgstr "fts: dipanggil dengan argumen negatif"
+
+#: extension/filefuncs.c:853
+#, fuzzy
+msgid "fts: first argument is not an array"
+msgstr "asort: argumen ketiga bukan sebuah array"
+
+#: extension/filefuncs.c:859
+#, fuzzy
+msgid "fts: second argument is not a number"
+msgstr "split: argumen kedua bukan sebuah array"
+
+#: extension/filefuncs.c:865
+#, fuzzy
+msgid "fts: third argument is not an array"
+msgstr "match: argumen ketiga bukan sebuah array"
+
+#: extension/filefuncs.c:872
+msgid "fts: could not flatten array\n"
+msgstr "fts: could not flatten array\n"
+
+#: extension/filefuncs.c:890
+msgid "fts: ignoring sneaky FTS_NOSTAT flag. nyah, nyah, nyah."
+msgstr "fts: ignoring sneaky FTS_NOSTAT flag. nyah, nyah, nyah."
+
+#: extension/fnmatch.c:120
+msgid "fnmatch: could not get first argument"
+msgstr "fnmatch: diterima argumen pertama bukan string"
+
+#: extension/fnmatch.c:125
+msgid "fnmatch: could not get second argument"
+msgstr "fnmatch: diterima argumen kedua bukan string"
+
+#: extension/fnmatch.c:130
+msgid "fnmatch: could not get third argument"
+msgstr "fnmatch: could not get third argument"
+
+#: extension/fnmatch.c:143
+msgid "fnmatch is not implemented on this system\n"
+msgstr "fnmatch is not implemented on this system\n"
+
+#: extension/fnmatch.c:175
+msgid "fnmatch init: could not add FNM_NOMATCH variable"
+msgstr "fnmatch init: could not add FNM_NOMATCH variable"
+
+#: extension/fnmatch.c:185
+#, c-format
+msgid "fnmatch init: could not set array element %s"
+msgstr "fnmatch init: could not set array element %s"
+
+#: extension/fnmatch.c:195
+msgid "fnmatch init: could not install FNM array"
+msgstr "fnmatch init: could not install FNM array"
+
+#: extension/fork.c:92
+msgid "fork: PROCINFO is not an array!"
+msgstr "fork: PROCINFO is not an array!"
+
+#: extension/inplace.c:131
+#, fuzzy
+msgid "inplace::begin: in-place editing already active"
+msgstr "inplace_begin: in-place editing already active"
+
+#: extension/inplace.c:134
+#, fuzzy, c-format
+msgid "inplace::begin: expects 2 arguments but called with %d"
+msgstr "inplace_begin: expects 2 arguments but called with %d"
+
+#: extension/inplace.c:137
+#, fuzzy
+msgid "inplace::begin: cannot retrieve 1st argument as a string filename"
+msgstr "inplace_begin: cannot retrieve 1st argument as a string filename"
+
+#: extension/inplace.c:145
+#, fuzzy, c-format
+msgid "inplace::begin: disabling in-place editing for invalid FILENAME `%s'"
+msgstr "inplace_begin: disabling in-place editing for invalid FILENAME `%s'"
+
+#: extension/inplace.c:152
+#, fuzzy, c-format
+msgid "inplace::begin: Cannot stat `%s' (%s)"
+msgstr "inplace_begin: tidak dapat membuka `%s' (%s)"
+
+#: extension/inplace.c:159
+#, fuzzy, c-format
+msgid "inplace::begin: `%s' is not a regular file"
+msgstr "inplace_begin: `%s' is not a regular file"
+
+#: extension/inplace.c:170
+#, fuzzy, c-format
+msgid "inplace::begin: mkstemp(`%s') failed (%s)"
+msgstr "inplace_begin: mkstemp(`%s') failed (%s)"
+
+#: extension/inplace.c:182
+#, fuzzy, c-format
+msgid "inplace::begin: chmod failed (%s)"
+msgstr "inplace_begin: tutup gagal (%s)"
+
+#: extension/inplace.c:189
+#, fuzzy, c-format
+msgid "inplace::begin: dup(stdout) failed (%s)"
+msgstr "inplace_begin: dup(stdout) failed (%s)"
+
+#: extension/inplace.c:192
+#, fuzzy, c-format
+msgid "inplace::begin: dup2(%d, stdout) failed (%s)"
+msgstr "inplace_begin: dup2(%d, stdout) failed (%s)"
+
+#: extension/inplace.c:195
+#, fuzzy, c-format
+msgid "inplace::begin: close(%d) failed (%s)"
+msgstr "inplace_begin: tutup(%d) gagal (%s)"
+
+#: extension/inplace.c:211
+#, fuzzy, c-format
+msgid "inplace::end: expects 2 arguments but called with %d"
+msgstr "inplace_begin: expects 2 arguments but called with %d"
+
+#: extension/inplace.c:214
+#, fuzzy
+msgid "inplace::end: cannot retrieve 1st argument as a string filename"
+msgstr "inplace_end: cannot retrieve 1st argument as a string filename"
+
+#: extension/inplace.c:221
+#, fuzzy
+msgid "inplace::end: in-place editing not active"
+msgstr "inplace_end: in-place editing not active"
+
+#: extension/inplace.c:227
+#, fuzzy, c-format
+msgid "inplace::end: dup2(%d, stdout) failed (%s)"
+msgstr "inplace_end: dup2(%d, stdout) failed (%s)"
+
+#: extension/inplace.c:230
+#, fuzzy, c-format
+msgid "inplace::end: close(%d) failed (%s)"
+msgstr "inplace_end: tutup(%d) gagal (%s)"
+
+#: extension/inplace.c:234
+#, fuzzy, c-format
+msgid "inplace::end: fsetpos(stdout) failed (%s)"
+msgstr "inplace_end: fsetpos(stdout) failed (%s)"
+
+#: extension/inplace.c:247
+#, fuzzy, c-format
+msgid "inplace::end: link(`%s', `%s') failed (%s)"
+msgstr "inplace_end: pipe flush dari (`%s',`%s') gagal (%s)."
+
+#: extension/inplace.c:257
+#, fuzzy, c-format
+msgid "inplace::end: rename(`%s', `%s') failed (%s)"
+msgstr "inplace_end: penutupan dari fd (`%s',`%s') gagal (%s)"
+
+#: extension/ordchr.c:72
+#, fuzzy
+msgid "ord: first argument is not a string"
+msgstr "do_reada: argumen diluar dari jangkauan\n"
+
+#: extension/ordchr.c:99
+#, fuzzy
+msgid "chr: first argument is not a number"
+msgstr "asort: argumen ketiga bukan sebuah array"
+
+#: extension/readdir.c:291
+#, fuzzy, c-format
+#| msgid "dir_take_control_of: opendir/fdopendir failed: %s"
+msgid "dir_take_control_of: %s: opendir/fdopendir failed: %s"
+msgstr "dir_take_control_of: opendir/fdopendir failed: %s"
+
+#: extension/readfile.c:133
+#, fuzzy
+msgid "readfile: called with wrong kind of argument"
+msgstr "readfile: dipanggil dengan argumen negatif"
+
+#: extension/revoutput.c:127
+msgid "revoutput: could not initialize REVOUT variable"
+msgstr ""
+
+#: extension/rwarray.c:145 extension/rwarray.c:548
+#, fuzzy, c-format
+msgid "%s: first argument is not a string"
+msgstr "do_write: argumen diluar dari jangkauan\n"
+
+#: extension/rwarray.c:189
+#, fuzzy
+msgid "writea: second argument is not an array"
+msgstr "do_writea: argumen kedua bukan sebuah array\n"
+
+#: extension/rwarray.c:206
+msgid "writeall: unable to find SYMTAB array"
+msgstr ""
+
+#: extension/rwarray.c:226
+#, fuzzy
+msgid "write_array: could not flatten array"
+msgstr "write_array: could not flatten array\n"
+
+#: extension/rwarray.c:242
+#, fuzzy
+msgid "write_array: could not release flattened array"
+msgstr "write_array: could not release flattened array\n"
+
+#: extension/rwarray.c:307
+#, fuzzy, c-format
+msgid "array value has unknown type %d"
+msgstr "tipe titik %d tidak diketahui"
+
+#: extension/rwarray.c:398
+msgid ""
+"rwarray extension: received GMP/MPFR value but compiled without GMP/MPFR "
+"support."
+msgstr ""
+
+#: extension/rwarray.c:437
+#, fuzzy, c-format
+msgid "cannot free number with unknown type %d"
+msgstr "tipe titik %d tidak diketahui"
+
+#: extension/rwarray.c:442
+#, fuzzy, c-format
+msgid "cannot free value with unhandled type %d"
+msgstr "tipe titik %d tidak diketahui"
+
+#: extension/rwarray.c:481
+#, c-format
+msgid "readall: unable to set %s::%s"
+msgstr ""
+
+#: extension/rwarray.c:483
+#, c-format
+msgid "readall: unable to set %s"
+msgstr ""
+
+#: extension/rwarray.c:525
+#, fuzzy
+msgid "reada: clear_array failed"
+msgstr "do_reada: clear_array failed\n"
+
+#: extension/rwarray.c:611
+#, fuzzy
+msgid "reada: second argument is not an array"
+msgstr "do_reada: argumen ketiga bukan sebuah array\n"
+
+#: extension/rwarray.c:648
+#, fuzzy
+msgid "read_array: set_array_element failed"
+msgstr "read_array: set_array_element failed\n"
+
+#: extension/rwarray.c:756
+#, c-format
+msgid "treating recovered value with unknown type code %d as a string"
+msgstr ""
+
+#: extension/rwarray.c:827
+msgid ""
+"rwarray extension: GMP/MPFR value in file but compiled without GMP/MPFR "
+"support."
+msgstr ""
+
+#: extension/time.c:142
+msgid "gettimeofday: not supported on this platform"
+msgstr "gettimeofday: not supported on this platform"
+
+#: extension/time.c:163
+msgid "sleep: missing required numeric argument"
+msgstr "sleep: diterima argumen bukan-numerik"
+
+#: extension/time.c:169
+msgid "sleep: argument is negative"
+msgstr "sleep: argumen diluar dari jangkauan"
+
+#: extension/time.c:203
+msgid "sleep: not supported on this platform"
+msgstr "sleep: not supported on this platform"
+
+#: extension/time.c:225
+#, fuzzy
+#| msgid "chr: called with no arguments"
+msgid "strptime: called with no arguments"
+msgstr "chr: dipanggil dengan argumen negatif"
+
+#: extension/time.c:233
+#, fuzzy, c-format
+msgid "do_strptime: argument 1 is not a string\n"
+msgstr "do_write: argumen diluar dari jangkauan\n"
+
+#: extension/time.c:238
+#, fuzzy, c-format
+msgid "do_strptime: argument 2 is not a string\n"
+msgstr "do_write: argumen diluar dari jangkauan\n"
+
+#: field.c:320
+msgid "input record too large"
+msgstr ""
+
+#: field.c:441
+msgid "NF set to negative value"
+msgstr "NF set ke nilai negatif"
+
+#: field.c:446
+msgid "decrementing NF is not portable to many awk versions"
+msgstr ""
+
+#: field.c:1003
+msgid "accessing fields from an END rule may not be portable"
+msgstr ""
+
+#: field.c:1130 field.c:1139
+msgid "split: fourth argument is a gawk extension"
+msgstr "split: argumen ketiga adalah sebuah ekstensi gawk"
+
+#: field.c:1134
+msgid "split: fourth argument is not an array"
+msgstr "split: argumen kedua bukan sebuah array"
+
+#: field.c:1136 field.c:1238
+#, fuzzy, c-format
+msgid "%s: cannot use %s as fourth argument"
+msgstr "asort: cannot use a subarray of second arg for first arg"
+
+#: field.c:1146
+msgid "split: second argument is not an array"
+msgstr "split: argumen kedua bukan sebuah array"
+
+#: field.c:1152
+msgid "split: cannot use the same array for second and fourth args"
+msgstr "split: cannot use the same array for second and fourth args"
+
+#: field.c:1157
+msgid "split: cannot use a subarray of second arg for fourth arg"
+msgstr "split: cannot use a subarray of second arg for fourth arg"
+
+#: field.c:1160
+msgid "split: cannot use a subarray of fourth arg for second arg"
+msgstr "split: cannot use a subarray of fourth arg for secod arg"
+
+#: field.c:1197
+#, fuzzy
+msgid "split: null string for third arg is a non-standard extension"
+msgstr "split: null string untuk arg ketika adalah sebuah ekstensi gawk"
+
+#: field.c:1236
+msgid "patsplit: fourth argument is not an array"
+msgstr "patsplit: argumen kedua bukan sebuah array"
+
+#: field.c:1243
+msgid "patsplit: second argument is not an array"
+msgstr "patsplit: argumen kedua bukan sebuah array"
+
+#: field.c:1254
+msgid "patsplit: third argument must be non-null"
+msgstr "patsplit: argumen ketiga bukan sebuah array"
+
+#: field.c:1258
+msgid "patsplit: cannot use the same array for second and fourth args"
+msgstr "patsplit: cannot use the same array for second and fourth args"
+
+#: field.c:1263
+msgid "patsplit: cannot use a subarray of second arg for fourth arg"
+msgstr "patsplit: cannot use a subarray of second arg for fourth arg"
+
+#: field.c:1266
+msgid "patsplit: cannot use a subarray of fourth arg for second arg"
+msgstr "patsplit: cannot use a subarray of fourth arg for second arg"
+
+#: field.c:1304
+msgid "assignment to FS/FIELDWIDTHS/FPAT has no effect when using --csv"
+msgstr ""
+
+#: field.c:1334
+msgid "`FIELDWIDTHS' is a gawk extension"
+msgstr "`FIELDWIDTHS' adalah sebuah ekstensi gawk"
+
+#: field.c:1403
+msgid "`*' must be the last designator in FIELDWIDTHS"
+msgstr ""
+
+#: field.c:1424
+#, fuzzy, c-format
+msgid "invalid FIELDWIDTHS value, for field %d, near `%s'"
+msgstr "nilai FIELDWIDTHS tidak valid, didekat `%s'"
+
+#: field.c:1498
+msgid "null string for `FS' is a gawk extension"
+msgstr "null string untuk `FS' adalah sebuah ekstensi gawk"
+
+#: field.c:1502
+msgid "old awk does not support regexps as value of `FS'"
+msgstr "awk lama tidak mendukung regexps sebagai nilai dari `FS'"
+
+#: field.c:1628
+msgid "`FPAT' is a gawk extension"
+msgstr "`FPAT' adalah sebuah ekstensi gawk"
+
+#: gawkapi.c:156
+msgid "awk_value_to_node: received null retval"
+msgstr "awk_value_to_node: received null retval"
+
+#: gawkapi.c:176 gawkapi.c:189
+#, fuzzy
+msgid "awk_value_to_node: not in MPFR mode"
+msgstr "awk_value_to_node: received null retval"
+
+#: gawkapi.c:183 gawkapi.c:195
+#, fuzzy
+msgid "awk_value_to_node: MPFR not supported"
+msgstr "awk_value_to_node: received null retval"
+
+#: gawkapi.c:199
+#, fuzzy, c-format
+msgid "awk_value_to_node: invalid number type `%d'"
+msgstr "awk_value_to_node: received null retval"
+
+#: gawkapi.c:386
+#, fuzzy
+msgid "add_ext_func: received NULL name_space parameter"
+msgstr "load_ext: received NULL lib_name"
+
+#: gawkapi.c:524
+#, c-format
+msgid ""
+"node_to_awk_value: detected invalid numeric flags combination `%s'; please "
+"file a bug report"
+msgstr ""
+
+#: gawkapi.c:562
+msgid "node_to_awk_value: received null node"
+msgstr "node_to_awk_value: received null node"
+
+#: gawkapi.c:565
+msgid "node_to_awk_value: received null val"
+msgstr "node_to_awk_value: received null val"
+
+#: gawkapi.c:633 gawkapi.c:670 gawkapi.c:700 gawkapi.c:737
+#, c-format
+msgid ""
+"node_to_awk_value detected invalid flags combination `%s'; please file a bug "
+"report"
+msgstr ""
+
+#: gawkapi.c:1129
+msgid "remove_element: received null array"
+msgstr "remove_element: received null array"
+
+#: gawkapi.c:1132
+msgid "remove_element: received null subscript"
+msgstr "remove_element: received null subscript"
+
+#: gawkapi.c:1275
+#, fuzzy, c-format
+msgid "api_flatten_array_typed: could not convert index %d to %s"
+msgstr "api_flatten_array: could not convert index %d\n"
+
+#: gawkapi.c:1280
+#, fuzzy, c-format
+msgid "api_flatten_array_typed: could not convert value %d to %s"
+msgstr "api_flatten_array: could not convert value %d\n"
+
+#: gawkapi.c:1376 gawkapi.c:1393
+msgid "api_get_mpfr: MPFR not supported"
+msgstr ""
+
+#: gawkapi.c:1424
+#, fuzzy
+msgid "cannot find end of BEGINFILE rule"
+msgstr "`next' tidak dapat dipanggil dari sebuah aturan BEGIN"
+
+#: gawkapi.c:1478
+#, fuzzy, c-format
+msgid "cannot open unrecognized file type `%s' for `%s'"
+msgstr "tidak dapat membuka berkas sumber `%s' untuk pembacaan (%s)"
+
+#: io.c:417
+#, c-format
+msgid "command line argument `%s' is a directory: skipped"
+msgstr "command line argument `%s' is a directory: skipped"
+
+#: io.c:420 io.c:534
+#, fuzzy, c-format
+msgid "cannot open file `%s' for reading: %s"
+msgstr "tidak dapat membuka berkas `%s' untuk membaca (%s)"
+
+#: io.c:661
+#, fuzzy, c-format
+msgid "close of fd %d (`%s') failed: %s"
+msgstr "penutupan dari fd %d (`%s') gagal (%s)"
+
+#: io.c:733
+#, c-format
+msgid "`%.*s' used for input file and for output file"
+msgstr ""
+
+#: io.c:735
+#, c-format
+msgid "`%.*s' used for input file and input pipe"
+msgstr ""
+
+#: io.c:737
+#, c-format
+msgid "`%.*s' used for input file and two-way pipe"
+msgstr ""
+
+#: io.c:739
+#, c-format
+msgid "`%.*s' used for input file and output pipe"
+msgstr ""
+
+#: io.c:741
+#, c-format
+msgid "unnecessary mixing of `>' and `>>' for file `%.*s'"
+msgstr "pencampuran tidak perlu dari `>' dan `>>' untuk berkas `%.*s'"
+
+#: io.c:743
+#, c-format
+msgid "`%.*s' used for input pipe and output file"
+msgstr ""
+
+#: io.c:745
+#, c-format
+msgid "`%.*s' used for output file and output pipe"
+msgstr ""
+
+#: io.c:747
+#, c-format
+msgid "`%.*s' used for output file and two-way pipe"
+msgstr ""
+
+#: io.c:749
+#, c-format
+msgid "`%.*s' used for input pipe and output pipe"
+msgstr ""
+
+#: io.c:751
+#, c-format
+msgid "`%.*s' used for input pipe and two-way pipe"
+msgstr ""
+
+#: io.c:753
+#, c-format
+msgid "`%.*s' used for output pipe and two-way pipe"
+msgstr ""
+
+#: io.c:802
+msgid "redirection not allowed in sandbox mode"
+msgstr "redirection not allowed in sandbox mode"
+
+#: io.c:836
+#, fuzzy, c-format
+msgid "expression in `%s' redirection is a number"
+msgstr "ekspresi dalam `%s' redireksi hanya memiliki nilai numerik"
+
+#: io.c:840
+#, c-format
+msgid "expression for `%s' redirection has null string value"
+msgstr "ekspresi untuk `%s' redireksi hanya memiliki nilai string null"
+
+#: io.c:845
+#, fuzzy, c-format
+msgid ""
+"filename `%.*s' for `%s' redirection may be result of logical expression"
+msgstr ""
+"nama berkas `%s' untuk `%s' redireksi hanya menghasilkan ekspresi logikal"
+
+#: io.c:942 io.c:971
+#, c-format
+msgid "get_file cannot create pipe `%s' with fd %d"
+msgstr ""
+
+#: io.c:957
+#, fuzzy, c-format
+msgid "cannot open pipe `%s' for output: %s"
+msgstr "tidak dapat membuka pipe `%s' untuk keluaran (%s)"
+
+#: io.c:976
+#, fuzzy, c-format
+msgid "cannot open pipe `%s' for input: %s"
+msgstr "tidak dapat membuka pipe `%s' untuk masukan (%s)"
+
+#: io.c:1000
+#, fuzzy, c-format
+msgid ""
+"get_file socket creation not supported on this platform for `%s' with fd %d"
+msgstr "gettimeofday: not supported on this platform"
+
+#: io.c:1011
+#, fuzzy, c-format
+msgid "cannot open two way pipe `%s' for input/output: %s"
+msgstr "tidak dapat membuka pipe dua arah `%s' untuk input/output (%s)"
+
+#: io.c:1098
+#, fuzzy, c-format
+msgid "cannot redirect from `%s': %s"
+msgstr "tidak dapat redirek dari `%s' (%s)"
+
+#: io.c:1101
+#, fuzzy, c-format
+msgid "cannot redirect to `%s': %s"
+msgstr "tidak dapat redirek ke `%s' (%s)"
+
+#: io.c:1203
+msgid ""
+"reached system limit for open files: starting to multiplex file descriptors"
+msgstr ""
+"batas sistem tercapi untuk berkas terbuka: mulai untuk multiplex berkas "
+"deskripsi"
+
+#: io.c:1219
+#, fuzzy, c-format
+msgid "close of `%s' failed: %s"
+msgstr "penutupan dari `%s' gagal (%s)."
+
+#: io.c:1227
+msgid "too many pipes or input files open"
+msgstr "terlalu banyak pipes atau berkas masukan terbuka"
+
+#: io.c:1253
+msgid "close: second argument must be `to' or `from'"
+msgstr "close: argumen kedua harus berupa `to' atau `from'"
+
+#: io.c:1271
+#, c-format
+msgid "close: `%.*s' is not an open file, pipe or co-process"
+msgstr "close: `%.*s' bukan sebuah berkas terbuka, pipe atau co-proses"
+
+#: io.c:1276
+msgid "close of redirection that was never opened"
+msgstr "penutupan dari redireksi yang tidak pernah terbuka"
+
+#: io.c:1378
+#, c-format
+msgid "close: redirection `%s' not opened with `|&', second argument ignored"
+msgstr ""
+"close: redireksi `%s' tidak dibuka dengan `|&', argumen kedua diabaikan"
+
+#: io.c:1395
+#, fuzzy, c-format
+msgid "failure status (%d) on pipe close of `%s': %s"
+msgstr "status gagal (%d) di tutup pipe  dari `%s' (%s)"
+
+#: io.c:1398
+#, fuzzy, c-format
+msgid "failure status (%d) on two-way pipe close of `%s': %s"
+msgstr "status gagal (%d) di tutup pipe  dari `%s' (%s)"
+
+#: io.c:1401
+#, fuzzy, c-format
+msgid "failure status (%d) on file close of `%s': %s"
+msgstr "status gagal (%d) di tutup berkas dari `%s' (%s)"
+
+#: io.c:1421
+#, c-format
+msgid "no explicit close of socket `%s' provided"
+msgstr "tidak ada eksplisit tutup dari socket `%s' yang disediakan"
+
+#: io.c:1424
+#, c-format
+msgid "no explicit close of co-process `%s' provided"
+msgstr "tidak ada eksplisit tutup dari co-proses `%s' yang disediakan"
+
+#: io.c:1427
+#, c-format
+msgid "no explicit close of pipe `%s' provided"
+msgstr "tidak ada eksplisit tutup dari pipe `%s' disediakan"
+
+#: io.c:1430
+#, c-format
+msgid "no explicit close of file `%s' provided"
+msgstr "tidak ada eksplisit close dari berkas `%s' disediakan"
+
+#: io.c:1465
+#, c-format
+msgid "fflush: cannot flush standard output: %s"
+msgstr ""
+
+#: io.c:1466
+#, c-format
+msgid "fflush: cannot flush standard error: %s"
+msgstr ""
+
+#: io.c:1471 io.c:1560 main.c:704 main.c:749
+#, fuzzy, c-format
+msgid "error writing standard output: %s"
+msgstr "error menulis standar keluaran (%s)"
+
+#: io.c:1472 io.c:1571 main.c:706
+#, fuzzy, c-format
+msgid "error writing standard error: %s"
+msgstr "error menulis standar error (%s)"
+
+#: io.c:1511
+#, fuzzy, c-format
+msgid "pipe flush of `%s' failed: %s"
+msgstr "pipe flush dari `%s' gagal (%s)."
+
+#: io.c:1514
+#, fuzzy, c-format
+msgid "co-process flush of pipe to `%s' failed: %s"
+msgstr "co-proses flush dari pipe ke `%s' gagal (%s)."
+
+#: io.c:1517
+#, fuzzy, c-format
+msgid "file flush of `%s' failed: %s"
+msgstr "file flush dari `%s' gagal (%s)."
+
+#: io.c:1660
+#, fuzzy, c-format
+msgid "local port %s invalid in `/inet': %s"
+msgstr "lokal port %s tidak valid dalam `/inet'"
+
+#: io.c:1663
+#, c-format
+msgid "local port %s invalid in `/inet'"
+msgstr "lokal port %s tidak valid dalam `/inet'"
+
+#: io.c:1686
+#, fuzzy, c-format
+msgid "remote host and port information (%s, %s) invalid: %s"
+msgstr "remote host dan informasi port (%s, %s) tidak valid"
+
+#: io.c:1689
+#, c-format
+msgid "remote host and port information (%s, %s) invalid"
+msgstr "remote host dan informasi port (%s, %s) tidak valid"
+
+#: io.c:1931
+msgid "TCP/IP communications are not supported"
+msgstr "komunikasi TCP/IP tidak didukung"
+
+#: io.c:2059 io.c:2102
+#, c-format
+msgid "could not open `%s', mode `%s'"
+msgstr "tidak dapat membuka `%s', mode `%s'"
+
+#: io.c:2067 io.c:2119
+#, fuzzy, c-format
+msgid "close of master pty failed: %s"
+msgstr "penutupan dari master pty gagal (%s)"
+
+#: io.c:2069 io.c:2121 io.c:2462 io.c:2700
+#, fuzzy, c-format
+msgid "close of stdout in child failed: %s"
+msgstr "penutupan dari stdout dalam child gagal (%s)"
+
+#: io.c:2072 io.c:2124
+#, c-format
+msgid "moving slave pty to stdout in child failed (dup: %s)"
+msgstr "memindahkan slave pty ke stdout dalam child gagal (dup: %s)"
+
+#: io.c:2074 io.c:2126 io.c:2467
+#, fuzzy, c-format
+msgid "close of stdin in child failed: %s"
+msgstr "penutupan dari stdin dalam anak gagal (%s)"
+
+#: io.c:2077 io.c:2129
+#, c-format
+msgid "moving slave pty to stdin in child failed (dup: %s)"
+msgstr "memindahkan slave pty ke stdin dalam anak gagal (dup: %s)"
+
+#: io.c:2079 io.c:2131 io.c:2153
+#, fuzzy, c-format
+msgid "close of slave pty failed: %s"
+msgstr "penutupan dari pty budak gagal (%s)"
+
+#: io.c:2315
+#, fuzzy
+msgid "could not create child process or open pty"
+msgstr "tidak dapat membuat proses anak untuk `%s' (fork: %s)"
+
+#: io.c:2401 io.c:2465 io.c:2675 io.c:2703
+#, c-format
+msgid "moving pipe to stdout in child failed (dup: %s)"
+msgstr "memindahkan pipe ke stdout dalam anak gaal (dup: %s)"
+
+#: io.c:2408 io.c:2470
+#, c-format
+msgid "moving pipe to stdin in child failed (dup: %s)"
+msgstr "memindahkan pipe ke stdin dalam anak gagal (dup: %s)"
+
+#: io.c:2430 io.c:2693
+#, fuzzy
+msgid "restoring stdout in parent process failed"
+msgstr "mengembalikan stdout dalam proses orang tua gagal\n"
+
+#: io.c:2438
+#, fuzzy
+msgid "restoring stdin in parent process failed"
+msgstr "mengembalikan stdin dalam proses orang tua gagal\n"
+
+#: io.c:2473 io.c:2705 io.c:2720
+#, fuzzy, c-format
+msgid "close of pipe failed: %s"
+msgstr "penutupan dari pipe gagal (%s)"
+
+#: io.c:2532
+msgid "`|&' not supported"
+msgstr "`|&' tidak didukung"
+
+#: io.c:2660
+#, fuzzy, c-format
+msgid "cannot open pipe `%s': %s"
+msgstr "tidak dapat membuka pipe `%s' (%s)"
+
+#: io.c:2714
+#, c-format
+msgid "cannot create child process for `%s' (fork: %s)"
+msgstr "tidak dapat membuat proses anak untuk `%s' (fork: %s)"
+
+#: io.c:2853
+msgid "getline: attempt to read from closed read end of two-way pipe"
+msgstr ""
+
+#: io.c:3177
+msgid "register_input_parser: received NULL pointer"
+msgstr "register_input_parser: received NULL pointer"
+
+#: io.c:3205
+#, c-format
+msgid "input parser `%s' conflicts with previously installed input parser `%s'"
+msgstr ""
+"input parser `%s' conflicts with previously installed input parser `%s'"
+
+#: io.c:3212
+#, c-format
+msgid "input parser `%s' failed to open `%s'"
+msgstr "input parser `%s' failed to open `%s'"
+
+#: io.c:3232
+msgid "register_output_wrapper: received NULL pointer"
+msgstr "register_output_wrapper: received NULL pointer"
+
+#: io.c:3260
+#, c-format
+msgid ""
+"output wrapper `%s' conflicts with previously installed output wrapper `%s'"
+msgstr ""
+"output wrapper `%s' conflicts with previously installed output wrapper `%s'"
+
+#: io.c:3267
+#, c-format
+msgid "output wrapper `%s' failed to open `%s'"
+msgstr "output wrapper `%s' failed to open `%s'"
+
+#: io.c:3288
+msgid "register_output_processor: received NULL pointer"
+msgstr "register_output_processor: received NULL pointer"
+
+#: io.c:3317
+#, c-format
+msgid ""
+"two-way processor `%s' conflicts with previously installed two-way processor "
+"`%s'"
+msgstr ""
+"two-way processor `%s' conflicts with previously installed two-way processor "
+"`%s'"
+
+#: io.c:3326
+#, c-format
+msgid "two way processor `%s' failed to open `%s'"
+msgstr "two way processor `%s' failed to open `%s'"
+
+#: io.c:3457
+#, c-format
+msgid "data file `%s' is empty"
+msgstr "berkas data `%s' kosong"
+
+#: io.c:3499 io.c:3507
+msgid "could not allocate more input memory"
+msgstr "tidak dapat mengalokasikan lebih dari masukan memori"
+
+#: io.c:4175
+msgid "assignment to RS has no effect when using --csv"
+msgstr ""
+
+#: io.c:4195
+msgid "multicharacter value of `RS' is a gawk extension"
+msgstr "nilai multi karakter dari `RS' adalah sebuah ekstensi gawk"
+
+#: io.c:4354
+msgid "IPv6 communication is not supported"
+msgstr "IPv6 komunikasi TCP/IP tidak didukung"
+
+#: main.c:231
+#, c-format
+msgid ""
+"%s: fatal: persistent memory allocator failed to initialize: return value "
+"%d, pma.c line: %d.\n"
+msgstr ""
+
+#: main.c:239
+#, fuzzy
+msgid "persistent memory is not supported"
+msgstr "operator `^' tidak didukung dalam awk lama"
+
+#: main.c:347
+msgid "environment variable `POSIXLY_CORRECT' set: turning on `--posix'"
+msgstr "variabel lingkungan `POSIXLY_CORRECT' set: mengaktifkan `--posix'"
+
+#: main.c:354
+msgid "`--posix' overrides `--traditional'"
+msgstr "`--posix' overrides `--traditional'"
+
+#: main.c:365
+msgid "`--posix'/`--traditional' overrides `--non-decimal-data'"
+msgstr "`--posix'/`--traditional' overrides `--non-decimal-data'"
+
+#: main.c:370
+msgid "`--posix' overrides `--characters-as-bytes'"
+msgstr "`--posix' overrides `--characters-as-bytes'"
+
+#: main.c:380
+msgid "`--posix' and `--csv' conflict"
+msgstr ""
+
+#: main.c:384
+#, c-format
+msgid "running %s setuid root may be a security problem"
+msgstr "menjalankan %s setuid root mungkin sebuah masalah keamanan"
+
+#: main.c:386
+msgid "The -r/--re-interval options no longer have any effect"
+msgstr ""
+
+#: main.c:444
+#, fuzzy, c-format
+msgid "cannot set binary mode on stdin: %s"
+msgstr "tidak dapat menset mode binari di stdin (%s)"
+
+#: main.c:447
+#, fuzzy, c-format
+msgid "cannot set binary mode on stdout: %s"
+msgstr "tidak dapat menset mode binari di stdout (%s)"
+
+#: main.c:449
+#, fuzzy, c-format
+msgid "cannot set binary mode on stderr: %s"
+msgstr "tidak dapat menset mode binari di stderr (%s)"
+
+#: main.c:514
+msgid "no program text at all!"
+msgstr "tidak ada teks aplikasi apapun!"
+
+#: main.c:612
+#, c-format
+msgid "Usage: %s [POSIX or GNU style options] -f progfile [--] file ...\n"
+msgstr ""
+"Penggunaan: %s [pilihan POSIX atau gaya GNU] -f progfile [--] berkas ...\n"
+
+#: main.c:614
+#, c-format
+msgid "Usage: %s [POSIX or GNU style options] [--] %cprogram%c file ...\n"
+msgstr ""
+"Penggunaan: %s[ pilihan POSIX atau gaya GNU] [--] %cprogram%c berkas ...\n"
+
+#: main.c:619
+msgid "POSIX options:\t\tGNU long options: (standard)\n"
+msgstr "pilihan POSIX:\t\tpilihan panjang GNU:\n"
+
+#: main.c:620
+msgid "\t-f progfile\t\t--file=progfile\n"
+msgstr "\t-f progfile\t\t--file=progfile\n"
+
+#: main.c:621
+msgid "\t-F fs\t\t\t--field-separator=fs\n"
+msgstr "\t-F fs\t\t\t--field-separator=fs\n"
+
+#: main.c:622
+msgid "\t-v var=val\t\t--assign=var=val\n"
+msgstr "\t-v var=val\t\t--assign=var=val\n"
+
+#: main.c:623
+msgid "Short options:\t\tGNU long options: (extensions)\n"
+msgstr "pilihan POSIX:\t\tpilihan panjang GNU:\n"
+
+#: main.c:624
+msgid "\t-b\t\t\t--characters-as-bytes\n"
+msgstr "\t-b\t\t\t--characters-as-bytes\n"
+
+#: main.c:625
+msgid "\t-c\t\t\t--traditional\n"
+msgstr "\t-c\t\t\t--traditional\n"
+
+#: main.c:626
+msgid "\t-C\t\t\t--copyright\n"
+msgstr "\t-C hak cipta\t\t--copyright\n"
+
+#: main.c:627
+msgid "\t-d[file]\t\t--dump-variables[=file]\n"
+msgstr "\t-d tampilkan variabel[=berkas]\t\t--dump-variables[=berkas]\n"
+
+#: main.c:628
+msgid "\t-D[file]\t\t--debug[=file]\n"
+msgstr "\t-D profile[=file]\t\t--profile[=file]\n"
+
+#: main.c:629
+msgid "\t-e 'program-text'\t--source='program-text'\n"
+msgstr "\t-e sumber=teks-program\t\t--source=teks-program\n"
+
+#: main.c:630
+msgid "\t-E file\t\t\t--exec=file\n"
+msgstr "\t-E exec=berkas\t\t\t--exec=berkas\n"
+
+#: main.c:631
+msgid "\t-g\t\t\t--gen-pot\n"
+msgstr "\t-g gen-po\t\t\t--gen-po\n"
+
+#: main.c:632
+msgid "\t-h\t\t\t--help\n"
+msgstr "\t-h bantuan\t\t\t--help\n"
+
+#: main.c:633
+msgid "\t-i includefile\t\t--include=includefile\n"
+msgstr "\t-i includefile\t\t--include=includefile\n"
+
+#: main.c:634
+#, fuzzy
+#| msgid "\t-h\t\t\t--help\n"
+msgid "\t-I\t\t\t--trace\n"
+msgstr "\t-h bantuan\t\t\t--help\n"
+
+#: main.c:635
+#, fuzzy
+#| msgid "\t-h\t\t\t--help\n"
+msgid "\t-k\t\t\t--csv\n"
+msgstr "\t-h bantuan\t\t\t--help\n"
+
+#: main.c:636
+msgid "\t-l library\t\t--load=library\n"
+msgstr "\t-I library\t\t--load=library\n"
+
+#. TRANSLATORS: the "fatal", "invalid" and "no-ext" here are literal
+#. values, they should not be translated. Thanks.
+#.
+#: main.c:641
+#, fuzzy
+msgid "\t-L[fatal|invalid|no-ext]\t--lint[=fatal|invalid|no-ext]\n"
+msgstr "\t-L lint[=fatal]\t\t--lint[=fatal]\n"
+
+#: main.c:642
+msgid "\t-M\t\t\t--bignum\n"
+msgstr "\t-M\t\t\t--optimize\n"
+
+#: main.c:643
+msgid "\t-N\t\t\t--use-lc-numeric\n"
+msgstr "\t-N use-lc-numeric\t\t\t--use-lc-numeric\n"
+
+#: main.c:644
+msgid "\t-n\t\t\t--non-decimal-data\n"
+msgstr "\t-n non-decimal-data\t\t\t--non-decimal-data\n"
+
+#: main.c:645
+msgid "\t-o[file]\t\t--pretty-print[=file]\n"
+msgstr "\t-W profile[=file]\t\t--profile[=file]\n"
+
+#: main.c:646
+msgid "\t-O\t\t\t--optimize\n"
+msgstr "\t-0\t\t\t--optimize\n"
+
+#: main.c:647
+msgid "\t-p[file]\t\t--profile[=file]\n"
+msgstr "\t-p profile[=file]\t\t--profile[=file]\n"
+
+#: main.c:648
+msgid "\t-P\t\t\t--posix\n"
+msgstr "\t-P posix\t\t\t--posix\n"
+
+#: main.c:649
+msgid "\t-r\t\t\t--re-interval\n"
+msgstr "\t-r re-interval\t\t\t--re-interval\n"
+
+#: main.c:650
+#, fuzzy
+msgid "\t-s\t\t\t--no-optimize\n"
+msgstr "\t-0\t\t\t--optimize\n"
+
+#: main.c:651
+msgid "\t-S\t\t\t--sandbox\n"
+msgstr "\t-S\t\t\t--sandbox\n"
+
+#: main.c:652
+msgid "\t-t\t\t\t--lint-old\n"
+msgstr "\t-t lint-old\t\t\t--lint-old\n"
+
+#: main.c:653
+msgid "\t-V\t\t\t--version\n"
+msgstr "\t-V versi\t\t\t--version\n"
+
+#: main.c:655
+msgid "\t-W nostalgia\t\t--nostalgia\n"
+msgstr "\t-W nostalgia\t\t--nostalgia\n"
+
+#: main.c:658
+#, fuzzy
+msgid "\t-Y\t\t\t--parsedebug\n"
+msgstr "\t-Y parsedebug\t\t--parsedebug\n"
+
+#: main.c:661
+msgid "\t-Z locale-name\t\t--locale=locale-name\n"
+msgstr ""
+
+#. TRANSLATORS: --help output (end)
+#. no-wrap
+#: main.c:667
+#, fuzzy
+msgid ""
+"\n"
+"To report bugs, use the `gawkbug' program.\n"
+"For full instructions, see the node `Bugs' in `gawk.info'\n"
+"which is section `Reporting Problems and Bugs' in the\n"
+"printed version.  This same information may be found at\n"
+"https://www.gnu.org/software/gawk/manual/html_node/Bugs.html.\n"
+"PLEASE do NOT try to report bugs by posting in comp.lang.awk,\n"
+"or by using a web forum such as Stack Overflow.\n"
+"\n"
+msgstr ""
+"\n"
+"Untuk melaporkan bugs, lihat titik `Bugs' dalam `gawk.info', dalam\n"
+"daerah `Reporting Problems and Bugs' dalam versi tercetak.\n"
+"\n"
+
+#: main.c:683
+#, c-format
+msgid ""
+"Source code for gawk may be obtained from\n"
+"%s/gawk-%s.tar.gz\n"
+"\n"
+msgstr ""
+
+#: main.c:687
+msgid ""
+"gawk is a pattern scanning and processing language.\n"
+"By default it reads standard input and writes standard output.\n"
+"\n"
+msgstr ""
+"gawk adalah sebuah pencarian pola dan bahasa pemrosesan.\n"
+"Secara baku ini membaca standar masukan dan menulis standa keluaran.\n"
+"\n"
+
+#: main.c:691
+#, fuzzy, c-format
+msgid ""
+"Examples:\n"
+"\t%s '{ sum += $1 }; END { print sum }' file\n"
+"\t%s -F: '{ print $1 }' /etc/passwd\n"
+msgstr ""
+"Contoh:\n"
+"\tgawk '{ sum += $1 }; END { print sum }' berkas\n"
+"\tgawk -F: '{ print $1 }' /etc/passwd\n"
+
+#: main.c:721
+#, c-format
+msgid ""
+"Copyright (C) 1989, 1991-%d Free Software Foundation.\n"
+"\n"
+"This program is free software; you can redistribute it and/or modify\n"
+"it under the terms of the GNU General Public License as published by\n"
+"the Free Software Foundation; either version 3 of the License, or\n"
+"(at your option) any later version.\n"
+"\n"
+msgstr ""
+"Hak Cipta (C) 1989, 1991-%d Free Software Foundationn.\n"
+"\n"
+"Aplikasi ini adalah aplikasi bebas; anda dapat meredistribusikannya dan/atau "
+"memodifikasinya\n"
+"dibawah ketentuan dari GNU General Public License seperti dipublikasikan "
+"oleh\n"
+"Free Software Foundation; baik versi 3 dari Lisensi, atau\n"
+"(di pilihan anda) untuk versi selanjutnya.\n"
+"\n"
+
+#: main.c:729
+msgid ""
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"\n"
+msgstr ""
+"Aplikasi ini didistribusikan dengan harapan ini akan berguna,\n"
+"tetapi TANPA GARANSI APAPUN; bahkan tanpa garansi yang diimplisikasikan "
+"dari\n"
+"PERDAGANGAN atau KESESUAIAN UNTUK SEBUAH TUJUAN TERTENTU. Lihat\n"
+"GNU General Public License untuk lebih lengkapnya.\n"
+"\n"
+
+#: main.c:735
+msgid ""
+"You should have received a copy of the GNU General Public License\n"
+"along with this program. If not, see http://www.gnu.org/licenses/.\n"
+msgstr ""
+"Anda seharusnya menerima salinan dari GNU General Public License\n"
+"bersama dengan aplikasi ini. Jika tidak, lihat http://www.gnu.org/"
+"licenses/.\n"
+
+#: main.c:774
+msgid "-Ft does not set FS to tab in POSIX awk"
+msgstr "-Ft tidak menset FS ke tab dalam POSIX awk"
+
+#: main.c:1202
+#, c-format
+msgid ""
+"%s: `%s' argument to `-v' not in `var=value' form\n"
+"\n"
+msgstr ""
+"%s: `%s' argumen ke `-v' tidak dalam bentuk `var=value'\n"
+"\n"
+
+#: main.c:1228
+#, c-format
+msgid "`%s' is not a legal variable name"
+msgstr "`%s' bukan sebuah nama variabel legal"
+
+#: main.c:1231
+#, c-format
+msgid "`%s' is not a variable name, looking for file `%s=%s'"
+msgstr "`%s' bukan sebuah nama variabel, pencarian untuk berkas `%s=%s'"
+
+#: main.c:1245
+#, c-format
+msgid "cannot use gawk builtin `%s' as variable name"
+msgstr "tidak dapat menggunakan gawk bawaan `%s' sebagai nama fungsi"
+
+#: main.c:1250
+#, c-format
+msgid "cannot use function `%s' as variable name"
+msgstr ""
+"tidak dapat menggunakan nama fungsi `%s' sebagai sebuah variabel atau array"
+
+#: main.c:1329
+msgid "floating point exception"
+msgstr "eksepsi titik pecahan"
+
+#: main.c:1339
+msgid "fatal error: internal error"
+msgstr "fatal error: internal error"
+
+#: main.c:1440
+#, c-format
+msgid "no pre-opened fd %d"
+msgstr "tidak ada pre-opened fd %d"
+
+#: main.c:1447
+#, c-format
+msgid "could not pre-open /dev/null for fd %d"
+msgstr "tidak dapat pre-open /dev/null untuk fd %d"
+
+#: main.c:1661
+msgid "empty argument to `-e/--source' ignored"
+msgstr "argumen kosong ke `-e/--source' diabaikan"
+
+#: main.c:1730 main.c:1735
+#, fuzzy
+msgid "`--profile' overrides `--pretty-print'"
+msgstr "`--posix' overrides `--traditional'"
+
+#: main.c:1747
+msgid "-M ignored: MPFR/GMP support not compiled in"
+msgstr ""
+
+#: main.c:1773
+#, c-format
+msgid "Use `GAWK_PERSIST_FILE=%s gawk ...' instead of --persist."
+msgstr ""
+
+#: main.c:1775
+#, fuzzy
+#| msgid "IPv6 communication is not supported"
+msgid "Persistent memory is not supported."
+msgstr "IPv6 komunikasi TCP/IP tidak didukung"
+
+#: main.c:1784
+#, c-format
+msgid "%s: option `-W %s' unrecognized, ignored\n"
+msgstr "%s: pilihan `-W %s' tidak dikenal, diabaikan\n"
+
+#: main.c:1837
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: pilihan membutuhkan sebuah argumen -- %c\n"
+
+#: main.c:1940
+#, c-format
+msgid "%s: fatal: cannot stat %s: %s\n"
+msgstr ""
+
+#: main.c:1944
+#, c-format
+msgid ""
+"%s: fatal: using persistent memory is not allowed when running as root.\n"
+msgstr ""
+
+#: main.c:1947
+#, c-format
+msgid "%s: warning: %s is not owned by euid %d.\n"
+msgstr ""
+
+#: mpfr.c:661
+#, c-format
+msgid "PREC value `%.*s' is invalid"
+msgstr "PREC nilai `%.*s' tidak valid, diperlakukan sebagai 3"
+
+#: mpfr.c:720
+#, fuzzy, c-format
+#| msgid "RNDMODE value `%.*s' is invalid"
+msgid "ROUNDMODE value `%.*s' is invalid"
+msgstr "RNDMODE nilai `%.*s' tidak valid, diperlakukan sebagai 3"
+
+#: mpfr.c:786
+msgid "atan2: received non-numeric first argument"
+msgstr "atan2: diterima argumen pertama bukan numerik"
+
+#: mpfr.c:788
+msgid "atan2: received non-numeric second argument"
+msgstr "atan2: diterima argumen kedua bukan numerik"
+
+#: mpfr.c:827
+#, fuzzy, c-format
+msgid "%s: received negative argument %.*s"
+msgstr "log: diterima argumen negatif %g"
+
+#: mpfr.c:894
+msgid "int: received non-numeric argument"
+msgstr "int: diterima argumen bukan numerik"
+
+#: mpfr.c:926
+msgid "compl: received non-numeric argument"
+msgstr "compl: diterima argumen bukan numerik"
+
+#: mpfr.c:938
+#, fuzzy
+msgid "compl(%Rg): negative value is not allowed"
+msgstr "compl(%Rg): nilai negatif akan memberikan hasil aneh"
+
+#: mpfr.c:943
+msgid "comp(%Rg): fractional value will be truncated"
+msgstr "compl(%Rg): nilai pecahan akan dipotong"
+
+#: mpfr.c:954
+#, fuzzy, c-format
+msgid "compl(%Zd): negative values are not allowed"
+msgstr "compl(%Zd): nilai negatif akan memberikan hasil aneh"
+
+#: mpfr.c:972
+#, c-format
+msgid "%s: received non-numeric argument #%d"
+msgstr "%s: diterima argumen bukan numerik #%d"
+
+#: mpfr.c:982
+msgid "%s: argument #%d has invalid value %Rg, using 0"
+msgstr "%s: argument #%d has invalid value %Rg, using 0"
+
+#: mpfr.c:993
+#, fuzzy
+msgid "%s: argument #%d negative value %Rg is not allowed"
+msgstr "%s: #%d nilai negatif %Rg akan memberikan hasil aneh"
+
+#: mpfr.c:1000
+msgid "%s: argument #%d fractional value %Rg will be truncated"
+msgstr "%s: #%d nilai pecahan %Rg akan dipotong"
+
+#: mpfr.c:1014
+#, fuzzy, c-format
+msgid "%s: argument #%d negative value %Zd is not allowed"
+msgstr "%s: #%d nilai negatif %Zd akan memberikan hasil aneh"
+
+#: mpfr.c:1108
+msgid "and: called with less than two arguments"
+msgstr "and: dipanggil dengan argumen negatif"
+
+#: mpfr.c:1140
+msgid "or: called with less than two arguments"
+msgstr "or: dipanggil dengan argumen negatif"
+
+#: mpfr.c:1171
+msgid "xor: called with less than two arguments"
+msgstr "xor: dipanggil dengan argumen negatif"
+
+#: mpfr.c:1301
+msgid "srand: received non-numeric argument"
+msgstr "srand: diterima argumen bukan numerik"
+
+#: mpfr.c:1345
+#, fuzzy
+msgid "intdiv: received non-numeric first argument"
+msgstr "and: diterima argumen pertama tidak numerik"
+
+#: mpfr.c:1347
+#, fuzzy
+msgid "intdiv: received non-numeric second argument"
+msgstr "and: diterima argumen kedua bukan numerik"
+
+#: msg.c:76
+#, c-format
+msgid "cmd. line:"
+msgstr "cmd. baris:"
+
+#: node.c:478
+msgid "backslash at end of string"
+msgstr "backslash di akhir dari string"
+
+#: node.c:512
+#, fuzzy
+msgid "could not make typed regex"
+msgstr "tidak terselesaikan regexp"
+
+#: node.c:586
+#, c-format
+msgid "old awk does not support the `\\%c' escape sequence"
+msgstr "awk lama tidak mendukung escape sequence `\\%c'"
+
+#: node.c:647
+msgid "POSIX does not allow `\\x' escapes"
+msgstr "POSIX tidak mengijinkan escapes `\\x'"
+
+#: node.c:655
+msgid "no hex digits in `\\x' escape sequence"
+msgstr "tidak ada digit heksa dalam escape sequence `\\x'"
+
+#: node.c:677
+#, c-format
+msgid ""
+"hex escape \\x%.*s of %d characters probably not interpreted the way you "
+"expect"
+msgstr ""
+"hex escape \\x%.*s dari karakter %d mungkin tidak dapat diinterpretrasikan "
+"seperti yang anda kira"
+
+#: node.c:692
+#, fuzzy
+#| msgid "POSIX does not allow `\\x' escapes"
+msgid "POSIX does not allow `\\u' escapes"
+msgstr "POSIX tidak mengijinkan escapes `\\x'"
+
+#: node.c:700
+#, fuzzy
+#| msgid "no hex digits in `\\x' escape sequence"
+msgid "no hex digits in `\\u' escape sequence"
+msgstr "tidak ada digit heksa dalam escape sequence `\\x'"
+
+#: node.c:731
+#, fuzzy
+#| msgid "no hex digits in `\\x' escape sequence"
+msgid "invalid `\\u' escape sequence"
+msgstr "tidak ada digit heksa dalam escape sequence `\\x'"
+
+#: node.c:753
+#, c-format
+msgid "escape sequence `\\%c' treated as plain `%c'"
+msgstr "escape sequence `\\%c' diperlakukan sebagai plain `%c'"
+
+#: node.c:893
+#, fuzzy
+#| msgid ""
+#| "Invalid multibyte data detected. There may be a mismatch between your "
+#| "data and your locale."
+msgid ""
+"Invalid multibyte data detected. There may be a mismatch between your data "
+"and your locale"
+msgstr ""
+"Invalid multibyte data detected. There may be a mismatch between your data "
+"and your locale."
+
+#: posix/gawkmisc.c:179
+#, c-format
+msgid "%s %s `%s': could not get fd flags: (fcntl F_GETFD: %s)"
+msgstr "%s %s `%s': tidak dapat menset close-on-exec: (fcntl: %s)"
+
+#: posix/gawkmisc.c:191
+#, c-format
+msgid "%s %s `%s': could not set close-on-exec: (fcntl F_SETFD: %s)"
+msgstr "%s %s `%s': tidak dapat menset close-on-exec: (fcntl: %s)"
+
+#: profile.c:73
+msgid "Program indentation level too deep. Consider refactoring your code"
+msgstr ""
+
+#: profile.c:112
+msgid "sending profile to standard error"
+msgstr "mengirim profile ke standar error"
+
+#: profile.c:270
+#, fuzzy, c-format
+msgid ""
+"\t# %s rule(s)\n"
+"\n"
+msgstr ""
+"\t# Aturan\n"
+"\n"
+
+#: profile.c:278
+#, c-format
+msgid ""
+"\t# Rule(s)\n"
+"\n"
+msgstr ""
+"\t# Aturan\n"
+"\n"
+
+#: profile.c:366
+#, c-format
+msgid "internal error: %s with null vname"
+msgstr "internal error: %s dengan null vname"
+
+#: profile.c:671
+msgid "internal error: builtin with null fname"
+msgstr "internal error: dengan null vname"
+
+#: profile.c:1329
+#, fuzzy, c-format
+msgid ""
+"%s# Loaded extensions (-l and/or @load)\n"
+"\n"
+msgstr ""
+"\t# Loaded extensions (-l and/or @load)\n"
+"\n"
+
+#: profile.c:1360
+#, fuzzy, c-format
+msgid ""
+"\n"
+"# Included files (-i and/or @include)\n"
+"\n"
+msgstr ""
+"\t# Loaded extensions (-l and/or @load)\n"
+"\n"
+
+#: profile.c:1424
+#, c-format
+msgid "\t# gawk profile, created %s\n"
+msgstr "\t# gawk profile, dibuat %s\n"
+
+#: profile.c:1992
+#, c-format
+msgid ""
+"\n"
+"\t# Functions, listed alphabetically\n"
+msgstr ""
+"\n"
+"\t# Fungsi, terdaftar secara alphabet\n"
+
+#: profile.c:2053
+#, c-format
+msgid "redir2str: unknown redirection type %d"
+msgstr "redir2str: unknown redirection type %d"
+
+#: re.c:61 re.c:175
+msgid ""
+"behavior of matching a regexp containing NUL characters is not defined by "
+"POSIX"
+msgstr ""
+
+#: re.c:131
+msgid "invalid NUL byte in dynamic regexp"
+msgstr ""
+
+#: re.c:215
+#, fuzzy, c-format
+msgid "regexp escape sequence `\\%c' treated as plain `%c'"
+msgstr "escape sequence `\\%c' diperlakukan sebagai plain `%c'"
+
+#: re.c:249
+#, c-format
+msgid "regexp escape sequence `\\%c' is not a known regexp operator"
+msgstr ""
+
+#: re.c:720
+#, c-format
+msgid "regexp component `%.*s' should probably be `[%.*s]'"
+msgstr "regexp component `%.*s' should probably be `[%.*s]'"
+
+#: support/dfa.c:912
+msgid "unbalanced ["
+msgstr "unbalanced ["
+
+#: support/dfa.c:1033
+msgid "invalid character class"
+msgstr "nama kelas karakter tidak valid"
+
+#: support/dfa.c:1161
+msgid "character class syntax is [[:space:]], not [:space:]"
+msgstr "character class syntax is [[:space:]], not [:space:]"
+
+#: support/dfa.c:1237
+msgid "unfinished \\ escape"
+msgstr "unfinished \\ escape"
+
+#: support/dfa.c:1347
+#, fuzzy
+#| msgid "invalid subscript expression"
+msgid "? at start of expression"
+msgstr "ekspresi subscript tidak valid"
+
+#: support/dfa.c:1359
+#, fuzzy
+#| msgid "invalid subscript expression"
+msgid "* at start of expression"
+msgstr "ekspresi subscript tidak valid"
+
+#: support/dfa.c:1373
+#, fuzzy
+#| msgid "invalid subscript expression"
+msgid "+ at start of expression"
+msgstr "ekspresi subscript tidak valid"
+
+#: support/dfa.c:1428
+msgid "{...} at start of expression"
+msgstr ""
+
+#: support/dfa.c:1431
+#, fuzzy
+msgid "invalid content of \\{\\}"
+msgstr "Isi dari \\{\\} tidak valid"
+
+#: support/dfa.c:1433
+#, fuzzy
+msgid "regular expression too big"
+msgstr "Ekspresi regular terlalu besar"
+
+#: support/dfa.c:1583
+msgid "stray \\ before unprintable character"
+msgstr ""
+
+#: support/dfa.c:1585
+msgid "stray \\ before white space"
+msgstr ""
+
+#: support/dfa.c:1596
+#, c-format
+msgid "stray \\ before %s"
+msgstr ""
+
+#: support/dfa.c:1597 support/dfa.c:1600
+msgid "stray \\"
+msgstr ""
+
+#: support/dfa.c:1951
+msgid "unbalanced ("
+msgstr "unbalanced ("
+
+#: support/dfa.c:2068
+msgid "no syntax specified"
+msgstr "no syntax specified"
+
+#: support/dfa.c:2079
+msgid "unbalanced )"
+msgstr "unbalanced )"
+
+#: support/getopt.c:605 support/getopt.c:634
+#, c-format
+msgid "%s: option '%s' is ambiguous; possibilities:"
+msgstr "%s: pilihan '%s' adalah ambigu"
+
+#: support/getopt.c:680 support/getopt.c:684
+#, c-format
+msgid "%s: option '--%s' doesn't allow an argument\n"
+msgstr "%s: pilihan '--%s' tidak mengijinkan sebuah argumen\n"
+
+#: support/getopt.c:693 support/getopt.c:698
+#, c-format
+msgid "%s: option '%c%s' doesn't allow an argument\n"
+msgstr "%s: pilihan '%c%s' tidak mengijinkan sebuah argumen\n"
+
+#: support/getopt.c:741 support/getopt.c:760
+#, c-format
+msgid "%s: option '--%s' requires an argument\n"
+msgstr "%s: pilihan '--%s' membutuhkan sebuah argumen\n"
+
+#: support/getopt.c:798 support/getopt.c:801
+#, c-format
+msgid "%s: unrecognized option '--%s'\n"
+msgstr "%s: pilihan tidak dikenal '--%s'\n"
+
+#: support/getopt.c:809 support/getopt.c:812
+#, c-format
+msgid "%s: unrecognized option '%c%s'\n"
+msgstr "%s: pilihan tidak dikenal '%c%s'\n"
+
+#: support/getopt.c:861 support/getopt.c:864
+#, c-format
+msgid "%s: invalid option -- '%c'\n"
+msgstr "%s: pilihan tidak valid -- '%c'\n"
+
+#: support/getopt.c:917 support/getopt.c:934 support/getopt.c:1144
+#: support/getopt.c:1162
+#, c-format
+msgid "%s: option requires an argument -- '%c'\n"
+msgstr "%s: pilihan membutuhkan sebuah argumen -- '%c'\n"
+
+#: support/getopt.c:990 support/getopt.c:1006
+#, c-format
+msgid "%s: option '-W %s' is ambiguous\n"
+msgstr "%s: pilihan '-W %s' adalah ambigu\n"
+
+#: support/getopt.c:1030 support/getopt.c:1048
+#, c-format
+msgid "%s: option '-W %s' doesn't allow an argument\n"
+msgstr "%s: pilihan '-W %s' tidak mengijinkan sebuah argumen\n"
+
+#: support/getopt.c:1069 support/getopt.c:1087
+#, c-format
+msgid "%s: option '-W %s' requires an argument\n"
+msgstr "%s: pilihan '-w %s' membutuhkan sebuah argumen\n"
+
+#: support/regcomp.c:122
+msgid "Success"
+msgstr "Sukses"
+
+#: support/regcomp.c:125
+msgid "No match"
+msgstr "Tidak cocok"
+
+#: support/regcomp.c:128
+msgid "Invalid regular expression"
+msgstr "Ekspresi regular tidak valid"
+
+#: support/regcomp.c:131
+msgid "Invalid collation character"
+msgstr "Karakter kolasi tidak valid"
+
+#: support/regcomp.c:134
+msgid "Invalid character class name"
+msgstr "nama kelas karakter tidak valid"
+
+#: support/regcomp.c:137
+msgid "Trailing backslash"
+msgstr "Akhiran backslash"
+
+#: support/regcomp.c:140
+msgid "Invalid back reference"
+msgstr "Referensi balik tidak valid"
+
+#: support/regcomp.c:143
+#, fuzzy
+msgid "Unmatched [, [^, [:, [., or [="
+msgstr "Tidak cocok [ atau [^"
+
+#: support/regcomp.c:146
+msgid "Unmatched ( or \\("
+msgstr "Tidak cocok ( atau \\("
+
+#: support/regcomp.c:149
+msgid "Unmatched \\{"
+msgstr "Tidak cocok \\{"
+
+#: support/regcomp.c:152
+msgid "Invalid content of \\{\\}"
+msgstr "Isi dari \\{\\} tidak valid"
+
+#: support/regcomp.c:155
+msgid "Invalid range end"
+msgstr "Akhir jangkauan tidak valid"
+
+#: support/regcomp.c:158
+msgid "Memory exhausted"
+msgstr "Kehabisan memori"
+
+#: support/regcomp.c:161
+msgid "Invalid preceding regular expression"
+msgstr "Ekspresi regular yang mengawali tidak valid"
+
+#: support/regcomp.c:164
+msgid "Premature end of regular expression"
+msgstr "Akhir dari ekspresi regular prematur"
+
+#: support/regcomp.c:167
+msgid "Regular expression too big"
+msgstr "Ekspresi regular terlalu besar"
+
+#: support/regcomp.c:170
+msgid "Unmatched ) or \\)"
+msgstr "Tidak cocok ) atau \\)"
+
+#: support/regcomp.c:650
+msgid "No previous regular expression"
+msgstr "Tidak ada ekspresi regular sebelumnya"
+
+#: symbol.c:137
+msgid ""
+"current setting of -M/--bignum does not match saved setting in PMA backing "
+"file"
+msgstr ""
+
+#: symbol.c:780
+#, fuzzy, c-format
+msgid "function `%s': cannot use function `%s' as a parameter name"
+msgstr ""
+"fungsi `%s': tidak dapat menggunakan nama fungsi sebagai nama parameter"
+
+#: symbol.c:910
+#, fuzzy
+msgid "cannot pop main context"
+msgstr "can not pop main context"
+
+#~ msgid "fatal error: internal error: segfault"
+#~ msgstr "fatal error: internal error: segfault"
+
+#~ msgid "fatal error: internal error: stack overflow"
+#~ msgstr "fatal error: internal error: stack overflow"
+
+#, fuzzy, c-format
+#~ msgid "typeof: invalid argument type `%s'"
+#~ msgstr "option: invalid parameter - \"%s\""
+
+#, fuzzy
+#~ msgid "do_writea: first argument is not a string"
+#~ msgstr "do_write: argumen diluar dari jangkauan\n"
+
+#, fuzzy
+#~ msgid "do_reada: first argument is not a string"
+#~ msgstr "do_reada: argumen diluar dari jangkauan\n"
+
+#, fuzzy
+#~ msgid "do_writea: argument 1 is not an array"
+#~ msgstr "do_writea: argumen kedua bukan sebuah array\n"
+
+#, fuzzy
+#~ msgid "do_reada: argument 0 is not a string"
+#~ msgstr "do_reada: argumen diluar dari jangkauan\n"
+
+#, fuzzy
+#~ msgid "do_reada: argument 1 is not an array"
+#~ msgstr "do_reada: argumen ketiga bukan sebuah array\n"
+
+#~ msgid "`L' is meaningless in awk formats; ignored"
+#~ msgstr "`L' tidak berarti dalam format awk; diabaikan"
+
+#~ msgid "fatal: `L' is not permitted in POSIX awk formats"
+#~ msgstr "`L' tidak diijinkan dalam format awk POSIX"
+
+#~ msgid "`h' is meaningless in awk formats; ignored"
+#~ msgstr "`h' tidak berarti dalam format awk; diabaikan"
+
+#~ msgid "fatal: `h' is not permitted in POSIX awk formats"
+#~ msgstr "`h' tidak diijinkan dalam format awk POSIX"
+
+#~ msgid "No symbol `%s' in current context"
+#~ msgstr "No symbol `%s' in current context"
+
+#, fuzzy
+#~ msgid "fts: first parameter is not an array"
+#~ msgstr "asort: argumen ketiga bukan sebuah array"
+
+#, fuzzy
+#~ msgid "fts: third parameter is not an array"
+#~ msgstr "match: argumen ketiga bukan sebuah array"
+
+#~ msgid "adump: first argument not an array"
+#~ msgstr "adump: argumen ketiga bukan sebuah array"
+
+#~ msgid "asort: second argument not an array"
+#~ msgstr "asort: argumen kedua bukan sebuah array"
+
+#~ msgid "asorti: second argument not an array"
+#~ msgstr "asorti: argumen kedua bukan sebuah array"
+
+#~ msgid "asorti: first argument not an array"
+#~ msgstr "asorti: argumen ketiga bukan sebuah array"
+
+#, fuzzy
+#~ msgid "asorti: first argument cannot be SYMTAB"
+#~ msgstr "asorti: argumen ketiga bukan sebuah array"
+
+#, fuzzy
+#~ msgid "asorti: first argument cannot be FUNCTAB"
+#~ msgstr "asorti: argumen ketiga bukan sebuah array"
+
+#~ msgid "asorti: cannot use a subarray of first arg for second arg"
+#~ msgstr "asorti: cannot use a subarray of first arg for second arg"
+
+#~ msgid "asorti: cannot use a subarray of second arg for first arg"
+#~ msgstr "asorti: cannot use a subarray of second arg for first arg"
+
+#~ msgid "can't read sourcefile `%s' (%s)"
+#~ msgstr "tidak dapat membaca berkas sumber `%s' (%s)"
+
+#~ msgid "POSIX does not allow operator `**='"
+#~ msgstr "POSIX tidak mengijinkan operator `**='"
+
+#~ msgid "old awk does not support operator `**='"
+#~ msgstr "awk lama tidak mendukung operator `**='"
+
+#~ msgid "old awk does not support operator `**'"
+#~ msgstr "awk lama tidak mendukung operator `**'"
+
+#~ msgid "operator `^=' is not supported in old awk"
+#~ msgstr "operator `^=' tidak didukung dalam awk lama"
+
+#~ msgid "could not open `%s' for writing (%s)"
+#~ msgstr "tidak dapat membuka `%s' untuk menulis (%s)"
+
+#~ msgid "exp: received non-numeric argument"
+#~ msgstr "exp: diterima argumen bukan-numerik"
+
+#~ msgid "length: received non-string argument"
+#~ msgstr "length: diterima argumen bukan-string"
+
+#~ msgid "log: received non-numeric argument"
+#~ msgstr "log: diterima argumen bukan numerik"
+
+#~ msgid "sqrt: received non-numeric argument"
+#~ msgstr "sqrt: diterima argumen bukan numerik"
+
+#~ msgid "sqrt: called with negative argument %g"
+#~ msgstr "sqrt: dipanggil dengan argumen %g negatif"
+
+#~ msgid "strftime: received non-numeric second argument"
+#~ msgstr "strftime: diterima argumen kedua bukan numerik"
+
+#~ msgid "strftime: received non-string first argument"
+#~ msgstr "strftime: diterima argumen pertama bukan string"
+
+#~ msgid "mktime: received non-string argument"
+#~ msgstr "mktime: diterima argumen bukan string"
+
+#~ msgid "tolower: received non-string argument"
+#~ msgstr "tolower: diterima argumen bukan string"
+
+#~ msgid "toupper: received non-string argument"
+#~ msgstr "toupper: diterima argumen bukan string"
+
+#~ msgid "sin: received non-numeric argument"
+#~ msgstr "sin: diterima argumen bukan numerik"
+
+#~ msgid "cos: received non-numeric argument"
+#~ msgstr "cos: diterima argumen bukan numerik"
+
+#~ msgid "lshift: received non-numeric first argument"
+#~ msgstr "lshift: diterima argumen pertama bukan numerik"
+
+#~ msgid "lshift: received non-numeric second argument"
+#~ msgstr "lshift: diterima argumen kedua bukan numerik"
+
+#~ msgid "rshift: received non-numeric first argument"
+#~ msgstr "rshift: diterima argumen pertama bukan numerik"
+
+#~ msgid "rshift: received non-numeric second argument"
+#~ msgstr "rshift: diterima argumen kedua bukan-numerik"
+
+#~ msgid "and: argument %d is non-numeric"
+#~ msgstr "and: argumen %d diluar dari jangkauan"
+
+#, fuzzy
+#~ msgid "and: argument %d negative value %g is not allowed"
+#~ msgstr "and: nilai %d negatif akan memberikan %g hasil aneh"
+
+#, fuzzy
+#~ msgid "or: argument %d negative value %g is not allowed"
+#~ msgstr "or: nilai %d negatif akan memberikan %g hasil aneh"
+
+#~ msgid "xor: argument %d is non-numeric"
+#~ msgstr "xor: argumen %d diluar dari jangkauan"
+
+#, fuzzy
+#~ msgid "xor: argument %d negative value %g is not allowed"
+#~ msgstr "xor: nilai %d negatif akan memberikan %g hasil aneh"
+
+#~ msgid "Can't find rule!!!\n"
+#~ msgstr "Can't find rule!!!\n"
+
+#~ msgid "q"
+#~ msgstr "q"
+
+#~ msgid "fts: bad first parameter"
+#~ msgstr "fts: adalah parameter"
+
+#~ msgid "fts: bad second parameter"
+#~ msgstr "fts: adalah parameter"
+
+#~ msgid "fts: bad third parameter"
+#~ msgstr "fts: adalah parameter"
+
+#~ msgid "fts: clear_array() failed\n"
+#~ msgstr "fts: clear_array() failed\n"
+
+#~ msgid "ord: called with inappropriate argument(s)"
+#~ msgstr "ord: dipanggil dengan argumen negatif"
+
+#~ msgid "chr: called with inappropriate argument(s)"
+#~ msgstr "chr: dipanggil dengan argumen negatif"
+
+#, fuzzy
+#~ msgid "setenv(TZ, %s) failed (%s)"
+#~ msgstr "%s ke \"%s\" gagal (%s)"
+
+#, fuzzy
+#~ msgid "unsetenv(TZ) failed (%s)"
+#~ msgstr "%s: tutup gagal (%s)"
+
+#, fuzzy
+#~ msgid "attempt to use array `%s[\".*%s\"]' in a scalar context"
+#~ msgstr "mencoba menggunakan array `%s[\"%s\"]' dalam sebuah konteks skalar"
+
+#, fuzzy
+#~ msgid "attempt to use scalar `%s[\".*%s\"]' as array"
+#~ msgstr "mencoba untuk menggunakan skalar `%s[\"%s\"]' sebagai sebuah array"
+
+#, fuzzy
+#~ msgid "gensub: third argument %g treated as 1"
+#~ msgstr "gensub: argumen ketiga dari 0 diperlakukan sebagai 1"
+
+#~ msgid "`extension' is a gawk extension"
+#~ msgstr "`extension' adalah sebuah ekstensi gawk"
+
+#~ msgid "extension: received NULL lib_name"
+#~ msgstr "extension: received NULL lib_name"
+
+#~ msgid "extension: cannot open library `%s' (%s)"
+#~ msgstr "extension: tidak dapat membuka `%s' (%s)"
+
+#~ msgid ""
+#~ "extension: library `%s': does not define `plugin_is_GPL_compatible' (%s)"
+#~ msgstr "extension: perpustakaan `%s': tidak dapat memanggil fungsi (%s)"
+
+#~ msgid "extension: library `%s': cannot call function `%s' (%s)"
+#~ msgstr ""
+#~ "extension: perpustakaan `%s': tidak dapat memanggil fungsi `%s' (%s)"
+
+#~ msgid "extension: missing function name"
+#~ msgstr "extension: hilang nama fungsi"
+
+#~ msgid "extension: illegal character `%c' in function name `%s'"
+#~ msgstr "extension: karakter `%c' tidak legal dalam nama fungsi `%s'"
+
+#~ msgid "extension: can't redefine function `%s'"
+#~ msgstr "extension: tidak dapat meredefinisi fungsi `%s'"
+
+#~ msgid "extension: function `%s' already defined"
+#~ msgstr "extension: fungsi `%s' telah didefinisikan"
+
+#~ msgid "extension: function name `%s' previously defined"
+#~ msgstr "extension: nama fungsi `%s' telah didefinisikan sebelumnya"
+
+#~ msgid "extension: can't use gawk built-in `%s' as function name"
+#~ msgstr ""
+#~ "extension: tidak dapat menggunakan gawk bawaan `%s' sebagai nama fungsi"
+
+#~ msgid "chdir: called with incorrect number of arguments, expecting 1"
+#~ msgstr "chdir: dipanggil dengan argumen %g negatif"
+
+#~ msgid "stat: called with wrong number of arguments"
+#~ msgstr "stat: dipanggil dengan argumen negatif"
+
+#, fuzzy
+#~ msgid "statvfs: called with wrong number of arguments"
+#~ msgstr "stat: dipanggil dengan argumen negatif"
+
+#~ msgid "fnmatch: called with less than three arguments"
+#~ msgstr "fnmatch: dipanggil dengan argumen negatif"
+
+#~ msgid "fnmatch: called with more than three arguments"
+#~ msgstr "fnmatch: dipanggil dengan argumen negatif"
+
+#~ msgid "fork: called with too many arguments"
+#~ msgstr "fork: dipanggil dengan argumen negatif"
+
+#~ msgid "waitpid: called with too many arguments"
+#~ msgstr "waitpid: dipanggil dengan argumen negatif"
+
+#~ msgid "wait: called with no arguments"
+#~ msgstr "wait: dipanggil dengan argumen negatif"
+
+#~ msgid "wait: called with too many arguments"
+#~ msgstr "wait: dipanggil dengan argumen negatif"
+
+#~ msgid "ord: called with too many arguments"
+#~ msgstr "ord: dipanggil dengan argumen negatif"
+
+#~ msgid "chr: called with too many arguments"
+#~ msgstr "chr: dipanggil dengan argumen negatif"
+
+#~ msgid "readfile: called with too many arguments"
+#~ msgstr "readfile: dipanggil dengan argumen negatif"
+
+#~ msgid "writea: called with too many arguments"
+#~ msgstr "writea: dipanggil dengan argumen negatif"
+
+#~ msgid "reada: called with too many arguments"
+#~ msgstr "reada: dipanggil dengan argumen negatif"
+
+#~ msgid "gettimeofday: ignoring arguments"
+#~ msgstr "gettimeofday: diterima argumen bukan string"
+
+#~ msgid "sleep: called with too many arguments"
+#~ msgstr "sleep: dipanggil dengan argumen negatif"
+
+#~ msgid "unknown value for field spec: %d\n"
+#~ msgstr "unknown value for field spec: %d\n"
+
+#~ msgid "function `%s' defined to take no more than %d argument(s)"
+#~ msgstr "fungsi `%s' didefinisikan untuk mengambil lebih dari %d argumen"
+
+#~ msgid "function `%s': missing argument #%d"
+#~ msgstr "fungsi `%s': hilang argumen #%d"
+
+#~ msgid "`getline var' invalid inside `%s' rule"
+#~ msgstr "`getline var' invalid inside `%s' rule"
+
+#~ msgid "no (known) protocol supplied in special filename `%s'"
+#~ msgstr ""
+#~ "tidak (diketahui) protokol yang diberikan dalam nama berkas spesial `%s'"
+
+#~ msgid "special file name `%s' is incomplete"
+#~ msgstr "nama berkas spesial `%s' tidak lengkap"
+
+#~ msgid "must supply a remote hostname to `/inet'"
+#~ msgstr "harus memberikan sebuah remote hostname ke `/inet'"
+
+#~ msgid "must supply a remote port to `/inet'"
+#~ msgstr "harus memberikan sebuah remote port ke `/inet'"
+
+#~ msgid ""
+#~ "\t# %s block(s)\n"
+#~ "\n"
+#~ msgstr ""
+#~ "\t# %s END blok\n"
+#~ "\n"
+
+#~ msgid "reference to uninitialized element `%s[\"%s\"]'"
+#~ msgstr "referensi ke elemen tidak terinisialisasi `%s[\"%s\"]'"
+
+#~ msgid "subscript of array `%s' is null string"
+#~ msgstr "subscript dari array `%s' adalah string null"
+
+#~ msgid "%s: empty (null)\n"
+#~ msgstr "%s: kosong (null)\n"
+
+#~ msgid "%s: empty (zero)\n"
+#~ msgstr "%s: kosong (nol)\n"
+
+#~ msgid "%s: table_size = %d, array_size = %d\n"
+#~ msgstr "%s: table_size = %d, array_size = %d\n"
+
+#~ msgid "%s: array_ref to %s\n"
+#~ msgstr "%s: array_ref ke %s\n"
+
+#~ msgid "statement may have no effect"
+#~ msgstr "pernyataan mungkin tidak memiliki pengaruh"
+
+#~ msgid "`delete array' is a gawk extension"
+#~ msgstr "`delete array' adalah sebuah ekstensi gawk"
+
+#~ msgid "call of `length' without parentheses is deprecated by POSIX"
+#~ msgstr ""
+#~ "panggilan dari `length' tanpa tanda kurung sudah ditinggalkan oleh POSIX"
+
+#~ msgid "use of non-array as array"
+#~ msgstr "penggunaan dari bukan array sebagai array"
+
+#~ msgid "`%s' is a Bell Labs extension"
+#~ msgstr "`%s' adalah sebuah ekstensi Bell Labs"
+
+#~ msgid "length: untyped argument will be forced to scalar"
+#~ msgstr "length: argument tidak terketik akan dipaksa ke skalar"
+
+#~ msgid "or(%lf, %lf): negative values will give strange results"
+#~ msgstr "or(%lf, %lf): nilai negatif akan memberikan hasil aneh"
+
+#~ msgid "or(%lf, %lf): fractional values will be truncated"
+#~ msgstr "or(%lf, %lf): nilai pecahan akan dipotong"
+
+#~ msgid "xor: received non-numeric first argument"
+#~ msgstr "xor: diterima argumen pertama bukan numerik"
+
+#~ msgid "xor: received non-numeric second argument"
+#~ msgstr "xor: diterima argumen kedua bukan numerik"
+
+#~ msgid "xor(%lf, %lf): fractional values will be truncated"
+#~ msgstr "xor(%lf, %lf): nilai pecahan akan dipotong"
+
+#~ msgid ""
+#~ "for loop: array `%s' changed size from %ld to %ld during loop execution"
+#~ msgstr ""
+#~ "for loop: array `%s' berubah ukuran dari %ld ke %ld selama eksekusi loop"
+
+#~ msgid "`break' outside a loop is not portable"
+#~ msgstr "`break' diluar sebuah loop adalah tidak portabel"
+
+#~ msgid "`continue' outside a loop is not portable"
+#~ msgstr "`continue' diluar sebuah loop tidak portabel"
+
+#~ msgid "`next' cannot be called from an END rule"
+#~ msgstr "`next' tidak dapat dipanggil dari sebuah aturan END"
+
+#~ msgid "`nextfile' cannot be called from a BEGIN rule"
+#~ msgstr "`nextfile' tidak dapat dipanggil dari sebuah aturan BEGIN"
+
+#~ msgid "`nextfile' cannot be called from an END rule"
+#~ msgstr "`nextfile' tidak dapat dipanggil dari sebuah aturan END"
+
+#~ msgid ""
+#~ "concatenation: side effects in one expression have changed the length of "
+#~ "another!"
+#~ msgstr ""
+#~ "concatenation: efek samping dalam satu ekspresi telah mengubah panjang "
+#~ "dari yang lain!"
+
+#~ msgid "assignment used in conditional context"
+#~ msgstr "penempatan digunakan dalam konteks kondisional"
+
+#~ msgid "illegal type (%s) in tree_eval"
+#~ msgstr "tipe (%s) tidak legal dalam tree_eval"
+
+#~ msgid "\t# -- main --\n"
+#~ msgstr "\t# -- main --\n"
+
+#~ msgid "assignment is not allowed to result of builtin function"
+#~ msgstr "penempatan tidak diijinkan untuk menghasilkan fungsi bawaan"
+
+#~ msgid "Operation Not Supported"
+#~ msgstr "Operasi Tidak Didukung"
+
+#~ msgid "invalid tree type %s in redirect()"
+#~ msgstr "tipe tree %s tidak valid dalam redirect()"
+
+#~ msgid "can't open two way socket `%s' for input/output (%s)"
+#~ msgstr "tidak dapat membuka socket dua arah `%s' untuk input/output (%s)"
+
+#~ msgid "/inet/raw client not ready yet, sorry"
+#~ msgstr "/inet/raw client belum siap, maaf"
+
+#~ msgid "only root may use `/inet/raw'."
+#~ msgstr "hanya root yang boleh menggunakan `/inet/raw'."
+
+#~ msgid "/inet/raw server not ready yet, sorry"
+#~ msgstr "/inet/raw server belum siap, maaf"
+
+#~ msgid "file `%s' is a directory"
+#~ msgstr "berkas `%s' adalah sebuah direktori"
+
+#~ msgid "use `PROCINFO[\"%s\"]' instead of `%s'"
+#~ msgstr "lebih baik gunakan `PROCINFO[\"%s\"]' daripada `%s'"
+
+#~ msgid "use `PROCINFO[...]' instead of `/dev/user'"
+#~ msgstr "lebih baik gunakan `PROCINFO[...]' daripada `/dev/user'"
+
+#~ msgid "out of memory"
+#~ msgstr "kehabisan memori"
+
+#~ msgid "`-m[fr]' option irrelevant in gawk"
+#~ msgstr "pilihan `-m[fr]' tidak relevan dalam gawk"
+
+#~ msgid "-m option usage: `-m[fr] nnn'"
+#~ msgstr "penggunaan pilihan -m: `-m[fr] nnn'"
+
+#~ msgid "\t-m[fr] val\n"
+#~ msgstr "\t-m[fr] val\n"
+
+#~ msgid "\t-W compat\t\t--compat\n"
+#~ msgstr "\t-W compabilitas\t\t--compat\n"
+
+#~ msgid "\t-W copyleft\t\t--copyleft\n"
+#~ msgstr "\t-W copyleft\t\t--copyleft\n"
+
+#~ msgid "\t-W usage\t\t--usage\n"
+#~ msgstr "\t-W penggunaan\t\t--usage\n"
+
+#~ msgid "could not find groups: %s"
+#~ msgstr "tidak dapat menemukan grup: %s"
+
+#~ msgid "can't convert string to float"
+#~ msgstr "tidak dapat mengubah string ke float"
+
+#~ msgid "# treated internally as `delete'"
+#~ msgstr "# diperlakukan secara internal sebagai `delete'"
+
+#~ msgid "# this is a dynamically loaded extension function"
+#~ msgstr "# ini adalah sebuah fungsi yang secara dinamis diload ekstensi"
+
+#~ msgid ""
+#~ "\t# BEGIN block(s)\n"
+#~ "\n"
+#~ msgstr ""
+#~ "\t # BEGIN blok\n"
+#~ "\n"
+
+#~ msgid "unexpected type %s in prec_level"
+#~ msgstr "tipe %s tidak terduga dalam prec_level"
+
+#~ msgid "Unknown node type %s in pp_var"
+#~ msgstr "tipe titik %s dalam pp_var tidak diketahui"
+
+#~ msgid "%s: illegal option -- %c\n"
+#~ msgstr "%s: pilihan tidak legal -- %c\n"

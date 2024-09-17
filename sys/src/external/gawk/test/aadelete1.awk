@@ -8,7 +8,7 @@ BEGIN {
 	print length(a), length(a[1])
 	delete a
 	print length(a), length(a[1]), length(a)
-	a[1][1] = 11
+	a[1][1] = 11	# this used to fatal, now it no longer does.
 }
 
 function f(c, b) {

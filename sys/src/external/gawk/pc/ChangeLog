@@ -1,0 +1,513 @@
+2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.0: Release tar ball made.
+
+2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.h: Regenerated.
+
+2023-10-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.h: Regenerated.
+
+2023-10-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-10-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.pc: Update copyright year.
+
+2023-10-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst.prologue: Update copyright years. Duh.
+
+2023-10-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Update copyright years.
+
+2023-10-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.h: Regenerated.
+
+2023-10-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-10-12  Eli Zaretskii  <eliz@gnu.org>
+
+	* gawkmisc.pc (w32_wc_to_lc): New function.
+
+2023-10-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-10-07  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile (ALL_EXTENSIONS, readdir_test.$(SOEXT)): Remove
+	readdir_test, to follow the upstream.
+
+2023-10-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.h: Updated.
+
+2023-10-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-09-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-09-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-08-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-07-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-06-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-06-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-05-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-05-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-05-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.2: Release tar ball made.
+
+2023-04-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.h: Regenerated.
+
+2023-04-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.ext: Update copyright year.
+
+2023-04-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+	* config.h: Regenerated.
+	* Makefile.tst: Regenerated.
+
+2023-03-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-03-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-03-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-03-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-03-12  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile.ext (readdir_test.$(SOEXT)): Fix typo.
+
+2023-03-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-02-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-01-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-11-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-11-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.1: Release tar ball made.
+
+2022-11-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.h: Regenerated.
+
+2022-11-03  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile.tst (dbugeval4): Expect this to fail with MinGW.
+
+2022-11-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.h: Regenerated.
+
+2022-10-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-10-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-09-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-09-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-09-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-09-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-09-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.0: Release tar ball made.
+
+2022-09-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.h: Regenerated.
+
+2022-09-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-08-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-08-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-08-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-08-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst.prologue (SORT2): New variable.
+	* Makefile.tst: Regenerated.
+
+2022-08-08  Eli Zaretskii  <eliz@gnu.org>
+
+	* gawkmisc.pc (setenv, unsetenv): Add comment about usage in
+	different MinGW flavors.
+
+	* config.sed, config.h: Define HAVE_STRSIGNAL.
+
+	* gawkmisc.pc (memcpy_ulong, memset_ulong): Remove unused
+	functions.
+	(os_close_on_exec): Remove DJGPP code.
+	(os_isatty): Remove non-MinGW code.
+	(strsignal): New function.
+
+	* Makefile ($(ALLOBJS) $(LIBOBJS) $(DYNOBJS)): Remove mbsupport.h.
+
+2022-08-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* GenMakefileTst.awk: Fix substitution of `ls' to work
+	with updated input.
+	* Makefile.tst: Regenerated.
+
+2022-08-04  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile (install1): Remove installation of igawk.
+
+2022-07-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.sed: Remove stuff for DJGPP and EMX.
+	* config.h: Regenerated.
+
+2022-07-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-07-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-07-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-07-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-07-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.pc, getid.c, popen.h: Update copyright.
+
+2022-07-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.sed, config.h: Restored from stable branch,
+	I messed them up somehow.
+
+2022-07-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst, config.h: Regenerated.
+
+2022-07-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* GenMakefileTst.awk, Makefile, Makefile.tst, config.h, config.sed,
+	gawkmisc.pc, getid.c, popen.h: Remove stuff related to DJGPP.
+
+2022-07-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile, config.h, config.sed, gawkmisc.pc:
+	Remove stuff related to __EMX__.
+
+2022-06-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-06-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-05-24         Adam Van Scyoc        <avanscy@g.clemson.edu>
+
+	* Makefile.tst: Regenerated.
+
+2022-05-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst.prologue: Add GAWK_NO_MPFR_WARN=1.
+
+2022-04-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-04-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-04-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-03-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-03-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-12-10         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-02-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2022-01-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2021-12-08         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* Makefile.tst: Regenerated.
+
+2021-12-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.pc (os_maybe_set_errno): Renamed from
+	w32_maybe_set_errno. Add check for errno values.
+
+2021-11-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2021-11-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2021-10-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.1.1: Release tar ball made.
+
+2021-10-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2021-10-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2021-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2021-09-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2021-05-15  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile (DEFPATH): New variable, like in Makefile.am.
+	(CFLAGS): Include -DDEFPATH=$(DEFPATH).
+
+2021-05-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2021-05-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* GenMakefileTst.awk: Fix the test for the @echo line.
+	* Makefile.tst: Regenerated.
+
+2021-05-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* GenMakefileTst.awk: Use ~ to match @echo line instead of ==,
+	gets things more right. Thanks to Manuel Collado for the
+	suggestion.
+	* Makefile.tst: Regenerated.
+	* Makefile (DYNOBJS): Add dynarray_at_failure$O and
+	dynarray_resize_clear$O.
+
+2021-05-09  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile.tst (testext): Use $(CMP), not a literal "cmp", so that
+	end-of-line differences could be ignored on MS-DOS/Windows.
+	(argcasfile): Use ' /no/such/file', with a leading space, to avoid
+	MinGW thinking it's a file name, and converting it to C:\foo\bar.
+	test/argcasfile.ok adjusted accordingly.
+
+	* Makefile (VPATH): Adapt to addition of support/malloc
+	directory.
+	(DYNOBJS): New list with dependencies of new files in
+	support/malloc.
+	(LIBOBJS): Add DYNOBJS.
+	(regex$O): Depend on some files in support/malloc.
+
+2021-05-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+	* config.h: Rebuilt.
+
+2021-03-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+
+2021-02-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+
+2021-01-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+
+2021-01-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.pc (quote): Make const char *.
+	(defpath): Make const char *.
+	(deflibpath): Make const char *.
+	(envsep): Make const char *.
+	(gawk_name): Now returns const char *.
+
+2021-01-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+
+2020-12-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+
+2020-12-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+
+2020-12-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+
+2020-11-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+
+2020-10-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+
+2020-10-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+
+2020-09-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+
+2020-08-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+
+2020-08-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Rebuilt.
+
+2020-07-25  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile (mingw32, mingw32-readline, mingw32-mpfr)
+	(mingw32-readline-mpfr): Remove -lmsvcp60 from the linker command
+	line.  That library is not freely redistributable, and linking
+	against it should no longer be necessary with latest MinGW runtime
+	versions.
+
+2020-04-25  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile.ext:
+	* Makefile.tst.prologue:
+	* Makefile:
+	* socket.h:
+	* popen.h:
+	* popen.c:
+	* getid.c:
+	* gawkmisc.pc:
+	* dlfcn.h:
+	* config.sed: Update copyright years.  Reported by Scott Deifik
+	<scottd.mail@sbcglobal.net>.
+
+2020-04-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.1.0: Release tar ball made.
+
+2019-12-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Updated.
+
+2019-06-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.0.1: Release tar ball made.
+
+2019-04-13  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile (install1): Copy the *.txt files needed to display the
+	manuals in the stand-alone Info reader.
+
+2019-04-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ChangeLog.1: Rotated ChangeLog into this file.
+	* ChangeLog: Created anew for gawk 5.0.0 and on.
+	* 5.0.0: Release tar ball made.

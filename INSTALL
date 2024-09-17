@@ -1,10 +1,10 @@
-APExp is not meant to be copied to the file system root, but rather to be built
+APExp is NOT meant to be copied to the file system root, but rather to be built
 from your local check out. The files will be installed in local directories,
-which then will be mounted on top of your existing root using the apexp-sh script.
+which then will be union mounted on top of your existing root using the apexp-sh script.
 
-Copying APExp to / will lead to some problems, for example will 
-sys/src/cmd/mkfile overwrite /sys/src/cmd/mkfile, which will mess up building 
-the rest of the programs in that directory.
+To install, just write mk install in the top level directory.
+At the moment, you will have to do this twice because syscalls are somehow not integrated in libap the first time.
 
-The aim is to have a top level mkfile that handles building and installation
-(currently TODO).
+
+
+APExp builds on a clean 9front (amd64) VM. Please let me know if any changes are needed to make it build on other Plan9 distros and architectures.

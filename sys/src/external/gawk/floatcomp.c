@@ -2,29 +2,31 @@
  * floatcomp.c - Isolate floating point details.
  */
 
-/* 
- * Copyright (C) 1986, 1988, 1989, 1991-2011 the Free Software Foundation, Inc.
- * 
+/*
+ * Copyright (C) 1986, 1988, 1989, 1991-2011, 2016, 2021,
+ * the Free Software Foundation, Inc.
+ *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
- * 
+ *
  * GAWK is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GAWK is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
 #include "awk.h"
-#include <math.h>
+
+#ifdef HAVE_UINTMAX_T
 
 /* Assume IEEE-754 arithmetic on pre-C89 hosts.  */
 #ifndef FLT_RADIX
@@ -69,28 +71,20 @@ Please port the following code to your weird host;
 #define AWKNUM_FRACTION_BITS (AWKNUM_MANT_DIG * (FLT_RADIX == 2 ? 1 : 4))
 #define DBL_FRACTION_BITS (DBL_MANT_DIG * (FLT_RADIX == 2 ? 1 : 4))
 
-/*
- * Floor and Ceil --- Work around a problem in conversion of
- * doubles to exact integers.
- */
-
-/* Floor --- do floor(), also for Cray */
-
-AWKNUM
-Floor(AWKNUM n)
+/* Return the number of trailing zeros in N.  N must be nonzero.  */
+static int
+count_trailing_zeros(uintmax_t n)
 {
-	return floor(n);
+#if 3 < (__GNUC__ + (4 <= __GNUC_MINOR__)) && UINTMAX_MAX <= ULLONG_MAX
+	return __builtin_ctzll(n);
+#else
+	int i = 0;
+	for (; (n & 3) == 0; n >>= 2)
+		i += 2;
+	return i + (1 & ~n);
+#endif
 }
 
-/* Ceil --- do ceil(), also for Cray */
-
-AWKNUM
-Ceil(AWKNUM n)
-{
-	return ceil(n);
-}
-
-#ifdef HAVE_UINTMAX_T
 /* adjust_uint --- fiddle with values, ask Paul Eggert to explain */
 
 uintmax_t
@@ -104,8 +98,15 @@ adjust_uint(uintmax_t n)
 	 * This is more desirable in practice, since it means the user sees
 	 * integers that are the same width as the AWKNUM fractions.
 	 */
-	if (AWKNUM_FRACTION_BITS < CHAR_BIT * sizeof n)
-		n &= ((uintmax_t) 1 << AWKNUM_FRACTION_BITS) - 1;
+	int wordbits = CHAR_BIT * sizeof n;
+	if (AWKNUM_FRACTION_BITS < wordbits) {
+		uintmax_t one = 1;
+		uintmax_t sentinel = one << (wordbits - AWKNUM_FRACTION_BITS);
+		int shift = count_trailing_zeros(n | sentinel);
+		uintmax_t mask = (one << AWKNUM_FRACTION_BITS) - 1;
+
+		n &= mask << shift;
+	}
 
 	return n;
 }

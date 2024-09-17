@@ -2,60 +2,100 @@
  * node.c -- routines for node management
  */
 
-/* 
- * Copyright (C) 1986, 1988, 1989, 1991-2001, 2003-2011,
+/*
+ * Copyright (C) 1986, 1988, 1989, 1991-2001, 2003-2015, 2017-2019, 2021, 2022, 2023,
  * the Free Software Foundation, Inc.
- * 
+ *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
- * 
+ *
  * GAWK is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GAWK is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-#include <awk.h>
-#include <math.h>
+#include "awk.h"
 
-static int is_ieee_magic_val(const char *val);
-static AWKNUM get_ieee_magic_val(const char *val);
+static NODE *r_make_number(double x);
+static AWKNUM get_ieee_magic_val(char *val);
+extern NODE **fmt_list;          /* declared in eval.c */
+
+NODE *(*make_number)(double) = r_make_number;
+NODE *(*str2number)(NODE *) = r_force_number;
+NODE *(*format_val)(const char *, int, NODE *) = r_format_val;
+int (*cmp_numbers)(const NODE *, const NODE *) = cmp_awknums;
+
+/* is_hex --- return true if a string looks like a hex value */
+
+static bool
+is_hex(const char *str, const char *cpend)
+{
+	/* on entry, we know the string length is >= 1 */
+	if (*str == '-' || *str == '+')
+		str++;
+
+	if (str + 1 < cpend && str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
+		return true;
+
+	return false;
+}
 
 /* force_number --- force a value to be numeric */
 
-AWKNUM
+NODE *
 r_force_number(NODE *n)
 {
 	char *cp;
 	char *cpend;
 	char save;
 	char *ptr;
-	unsigned int newflags;
-	extern double strtod();
 
-	if (n->flags & NUMCUR)
-		return n->numbr;
+	if (n->type == Node_elem_new) {
+		n->type = Node_val;
+		n->flags &= ~STRING;
+		n->stptr[0] = '0';	// STRCUR is still set
+		n->stlen = 1;
 
-	/* all the conditionals are an attempt to avoid the expensive strtod */
-
-	/* Note: only set NUMCUR if we actually convert some digits */
-
-	n->numbr = 0.0;
-
-	if (n->stlen == 0) {
-		return 0.0;
+		return n;
 	}
 
-	cp = n->stptr;
+	if ((n->flags & NUMCUR) != 0)
+		return n;
+
+	/*
+	 * We should always set NUMCUR. If USER_INPUT is set and it's a
+	 * numeric string, we clear STRING and enable NUMBER, but if it's not
+	 * numeric, we disable USER_INPUT.
+	 */
+
+	/* All the conditionals are an attempt to avoid the expensive strtod */
+
+	n->flags |= NUMCUR;
+	n->numbr = 0.0;
+
+	/* Trim leading white space, bailing out if there's nothing else */
+	for (cp = n->stptr, cpend = cp + n->stlen;
+	     cp < cpend && isspace((unsigned char) *cp); cp++)
+		continue;
+
+	if (cp == cpend)
+		goto badnum;
+
+	/* At this point, we know the string is not entirely white space */
+	/* Trim trailing white space */
+	while (isspace((unsigned char) cpend[-1]))
+		cpend--;
+
 	/*
 	 * 2/2007:
 	 * POSIX, by way of severe language lawyering, seems to
@@ -64,84 +104,90 @@ r_force_number(NODE *n)
 	 * This also allows hexadecimal floating point. Ugh.
 	 */
 	if (! do_posix) {
-		if (isalpha((unsigned char) *cp)) {
-			return 0.0;
-		} else if (n->stlen == 4 && is_ieee_magic_val(n->stptr)) {
-			if (n->flags & MAYBE_NUM)
-				n->flags &= ~MAYBE_NUM;
-			n->flags |= NUMBER|NUMCUR;
-			n->numbr = get_ieee_magic_val(n->stptr);
-
-			return n->numbr;
+		if (is_alpha((unsigned char) *cp))
+			goto badnum;
+		else if (is_ieee_magic_val(cp)) {
+			if (cpend == cp + 4) {
+				n->numbr = get_ieee_magic_val(cp);
+				goto goodnum;
+			} else
+				goto badnum;
 		}
 		/* else
 			fall through */
 	}
-	/* else not POSIX, so
+	/* else POSIX, so
 		fall through */
 
-	cpend = cp + n->stlen;
-	while (cp < cpend && isspace((unsigned char) *cp))
-		cp++;
-
-	if (   cp == cpend		/* only spaces, or */
-	    || (! do_posix		/* not POSIXLY paranoid and */
-	        && (isalpha((unsigned char) *cp)	/* letter, or */
+	if (   (! do_posix		/* not POSIXLY paranoid and */
+	        && (is_alpha((unsigned char) *cp)	/* letter, or */
 					/* CANNOT do non-decimal and saw 0x */
-		    || (! do_non_decimal_data && cp[0] == '0'
-		        && (cp[1] == 'x' || cp[1] == 'X'))))) {
-		return 0.0;
+		    || (! do_non_decimal_data && is_hex(cp, cpend))))) {
+		goto badnum;
 	}
-
-	if (n->flags & MAYBE_NUM) {
-		newflags = NUMBER;
-		n->flags &= ~MAYBE_NUM;
-	} else
-		newflags = 0;
 
 	if (cpend - cp == 1) {		/* only one character */
 		if (isdigit((unsigned char) *cp)) {	/* it's a digit! */
 			n->numbr = (AWKNUM)(*cp - '0');
-			n->flags |= newflags;
-			n->flags |= NUMCUR;
+			if (n->stlen == 1)		/* no white space */
+				n->flags |= NUMINT;
+			goto goodnum;
 		}
-		return n->numbr;
-	}
-
-	if (do_non_decimal_data) {	/* main.c assures false if do_posix */
-		errno = 0;
-		if (! do_traditional && isnondecimal(cp, TRUE)) {
-			n->numbr = nondec2awknum(cp, cpend - cp);
-			n->flags |= NUMCUR;
-			ptr = cpend;
-			goto finish;
-		}
+		goto badnum;
 	}
 
 	errno = 0;
-	save = *cpend;
-	*cpend = '\0';
-	n->numbr = (AWKNUM) strtod((const char *) cp, &ptr);
-
-	/* POSIX says trailing space is OK for NUMBER */
-	while (isspace((unsigned char) *ptr))
-		ptr++;
-	*cpend = save;
-finish:
-	if (errno == 0 && ptr == cpend) {
-		n->flags |= newflags;
-		n->flags |= NUMCUR;
+	if (do_non_decimal_data		/* main.c assures false if do_posix */
+		&& ! do_traditional && get_numbase(cp, cpend - cp, true) != 10) {
+		/* nondec2awknum() saves and restores the byte after the string itself */
+		n->numbr = nondec2awknum(cp, cpend - cp, &ptr);
 	} else {
-		errno = 0;
+		save = *cpend;
+		*cpend = '\0';
+		n->numbr = (AWKNUM) strtod((const char *) cp, &ptr);
+		*cpend = save;
 	}
 
-	return n->numbr;
+	if (errno == 0 || errno == ERANGE) {
+		errno = 0;	/* reset in case of ERANGE */
+		if (ptr == cpend)
+			goto goodnum;
+		/* else keep the leading numeric value without updating flags */
+		/* fall through to badnum */
+	} else {
+		errno = 0;
+		/*
+		 * N.B. For subnormal values, strtod may return the
+		 * floating-point representation while setting errno to ERANGE.
+		 * We force the numeric value to 0 in such cases.
+		 */
+		n->numbr = 0;
+		/*
+		 * Or should we accept it as a NUMBER even though strtod
+		 * threw an error?
+		 */
+		/* fall through to badnum */
+	}
+badnum:
+	n->flags &= ~USER_INPUT;
+	return n;
+
+goodnum:
+	if (isnan(n->numbr) && *cp == '-' && signbit(n->numbr) == 0)
+		n->numbr = -(n->numbr);
+
+	if ((n->flags & USER_INPUT) != 0) {
+		/* leave USER_INPUT enabled to indicate that this is a strnum */
+		n->flags &= ~STRING;
+		n->flags |= NUMBER;
+	}
+	return n;
 }
 
 
 /*
  * The following lookup table is used as an optimization in force_string;
- * (more complicated) variations on this theme didn't seem to pay off, but 
+ * (more complicated) variations on this theme didn't seem to pay off, but
  * systematic testing might be in order at some point.
  */
 static const char *values[] = {
@@ -158,26 +204,14 @@ static const char *values[] = {
 };
 #define	NVAL	(sizeof(values)/sizeof(values[0]))
 
-/* format_val --- format a numeric value based on format */
+/* r_format_val --- format a numeric value based on format */
 
 NODE *
-format_val(const char *format, int index, NODE *s)
+r_format_val(const char *format, int index, NODE *s)
 {
 	char buf[BUFSIZ];
 	char *sp = buf;
 	double val;
-	char *orig, *trans, save;
-
-	if (! do_traditional && (s->flags & INTLSTR) != 0) {
-		save = s->stptr[s->stlen];
-		s->stptr[s->stlen] = '\0';
-
-		orig = s->stptr;
-		trans = dgettext(TEXTDOMAIN, orig);
-
-		s->stptr[s->stlen] = save;
-		return make_string(trans, strlen(trans));
-	}
 
 	/*
 	 * 2/2007: Simplify our lives here. Instead of worrying about
@@ -196,46 +230,52 @@ format_val(const char *format, int index, NODE *s)
 	 * < and > so that things work correctly on systems with 64 bit integers.
 	 */
 
-	/* not an integral value, or out of range */
-	if ((val = double_to_int(s->numbr)) != s->numbr
-	    || val <= LONG_MIN || val >= LONG_MAX) {
+	if (out_of_range(s)) {
+		const char *result = format_nan_inf(s, 'g');
+		return make_string(result, strlen(result));
+	} else if ((val = double_to_int(s->numbr)) != s->numbr
+			|| val <= LONG_MIN || val >= LONG_MAX
+	) {
+		/* not an integral value, or out of integer range */
 		/*
 		 * Once upon a time, we just blindly did this:
 		 *	sprintf(sp, format, s->numbr);
 		 *	s->stlen = strlen(sp);
-		 *	s->stfmt = (char) index;
+		 *	s->stfmt = index;
 		 * but that's no good if, e.g., OFMT is %s. So we punt,
 		 * and just always format the value ourselves.
 		 */
 
 		NODE *dummy[2], *r;
-		unsigned short oflags;
-		extern NODE **fmt_list;          /* declared in eval.c */
+		unsigned int oflags;
 
 		/* create dummy node for a sole use of format_tree */
 		dummy[1] = s;
 		oflags = s->flags;
+
 		if (val == s->numbr) {
 			/* integral value, but outside range of %ld, use %.0f */
 			r = format_tree("%.0f", 4, dummy, 2);
-			s->stfmt = -1;
+			s->stfmt = STFMT_UNUSED;
 		} else {
 			r = format_tree(format, fmt_list[index]->stlen, dummy, 2);
 			assert(r != NULL);
-			s->stfmt = (char) index;
+			s->stfmt = index;
 		}
 		s->flags = oflags;
 		s->stlen = r->stlen;
-		if ((s->flags & STRCUR) != 0)
+		if ((s->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
 			efree(s->stptr);
 		s->stptr = r->stptr;
+#ifdef HAVE_MPFR
+		s->strndmode = MPFR_round_mode;
+#endif
 		freenode(r);	/* Do not unref(r)! We want to keep s->stptr == r->stpr.  */
 
 		goto no_malloc;
 	} else {
 		/*
-		 * integral value
-	         * force conversion to long only once
+		 * integral value; force conversion to long only once.
 		 */
 		long num = (long) val;
 
@@ -246,58 +286,57 @@ format_val(const char *format, int index, NODE *s)
 			(void) sprintf(sp, "%ld", num);
 			s->stlen = strlen(sp);
 		}
-		s->stfmt = -1;
+		s->stfmt = STFMT_UNUSED;
+		if ((s->flags & INTIND) != 0) {
+			s->flags &= ~(INTIND|NUMBER);
+			s->flags |= STRING;
+		}
+#ifdef HAVE_MPFR
+		s->strndmode = MPFR_round_mode;
+#endif
 	}
-	if (s->stptr != NULL)
+	if ((s->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
 		efree(s->stptr);
-	emalloc(s->stptr, char *, s->stlen + 2, "format_val");
-	memcpy(s->stptr, sp, s->stlen+1);
+	emalloc(s->stptr, char *, s->stlen + 1, "format_val");
+	memcpy(s->stptr, sp, s->stlen + 1);
 no_malloc:
 	s->flags |= STRCUR;
 	free_wstr(s);
 	return s;
 }
 
-/* force_string --- force a value to be a string */
+/* r_dupnode --- duplicate a node */
 
 NODE *
-r_force_string(NODE *s)
-{
-	if ((s->flags & STRCUR) != 0
-		    && (s->stfmt == -1 || s->stfmt == CONVFMTidx)
-	)
-		return s;
-	return format_val(CONVFMT, CONVFMTidx, s);
-}
-
-/* dupnode --- duplicate a node */
-
-NODE *
-dupnode(NODE *n)
+r_dupnode(NODE *n)
 {
 	NODE *r;
 
-	if (n->type == Node_ahash) {
-		n->ahname_ref++;
-		return n;
-	}
-
 	assert(n->type == Node_val);
 
-	if ((n->flags & PERM) != 0)
-		return n;
-	
+#ifdef GAWKDEBUG
+	/* Do the same as in awk.h:dupnode().  */
 	if ((n->flags & MALLOC) != 0) {
 		n->valref++;
 		return n;
 	}
-
+#endif
 	getnode(r);
 	*r = *n;
-	r->flags &= ~FIELD;
+
+#ifdef HAVE_MPFR
+	if ((n->flags & MPZN) != 0) {
+		mpz_init(r->mpg_i);
+		mpz_set(r->mpg_i, n->mpg_i);
+	} else if ((n->flags & MPFN) != 0) {
+		mpfr_init(r->mpg_numbr);
+		int tval = mpfr_set(r->mpg_numbr, n->mpg_numbr, ROUND_MODE);
+		IEEE_FMT(r->mpg_numbr, tval);
+	}
+#endif
+
 	r->flags |= MALLOC;
 	r->valref = 1;
-#ifdef MBS_SUPPORT
 	/*
 	 * DON'T call free_wstr(r) here!
 	 * r->wstptr still points at n->wstptr's value, and we
@@ -305,64 +344,82 @@ dupnode(NODE *n)
 	 */
 	r->wstptr = NULL;
 	r->wstlen = 0;
-#endif /* defined MBS_SUPPORT */
 
 	if ((n->flags & STRCUR) != 0) {
-		emalloc(r->stptr, char *, n->stlen + 2, "dupnode");
+		emalloc(r->stptr, char *, n->stlen + 1, "r_dupnode");
 		memcpy(r->stptr, n->stptr, n->stlen);
 		r->stptr[n->stlen] = '\0';
-#if defined MBS_SUPPORT
+		r->stlen = n->stlen;
 		if ((n->flags & WSTRCUR) != 0) {
 			r->wstlen = n->wstlen;
-			emalloc(r->wstptr, wchar_t *, sizeof(wchar_t) * (n->wstlen + 2), "dupnode");
+			emalloc(r->wstptr, wchar_t *, sizeof(wchar_t) * (n->wstlen + 1), "r_dupnode");
 			memcpy(r->wstptr, n->wstptr, n->wstlen * sizeof(wchar_t));
 			r->wstptr[n->wstlen] = L'\0';
 			r->flags |= WSTRCUR;
 		}
-#endif /* defined MBS_SUPPORT */
 	}
-	
+
 	return r;
 }
 
-/* mk_number --- allocate a node with defined number */
+/* r_make_number --- allocate a node with defined number */
 
-NODE *
-mk_number(AWKNUM x, unsigned int flags)
+static NODE *
+r_make_number(double x)
 {
-	NODE *r;
-
-	getnode(r);
-	r->type = Node_val;
+	NODE *r = make_number_node(0);
 	r->numbr = x;
-	r->valref = 1;
-	r->flags = flags;
-	r->stptr = NULL;
-	r->stlen = 0;
-	free_wstr(r);
 	return r;
+}
+
+/* cmp_awknums --- compare two AWKNUMs */
+
+int
+cmp_awknums(const NODE *t1, const NODE *t2)
+{
+	/*
+	 * This routine is used to sort numeric array indices or values.
+	 * For the purposes of sorting, NaN is considered greater than
+	 * any other value, and all NaN values are considered equivalent and equal.
+	 * This isn't in compliance with IEEE standard, but compliance w.r.t. NaN
+	 * comparison at the awk level is a different issue, and needs to be dealt
+	 * with in the interpreter for each opcode seperately.
+	 */
+
+	if (isnan(t1->numbr))
+		return ! isnan(t2->numbr);
+	if (isnan(t2->numbr))
+		return -1;
+	/* don't subtract, in case one or both are infinite */
+	if (t1->numbr == t2->numbr)
+		return 0;
+	if (t1->numbr < t2->numbr)
+		return -1;
+	return 1;
 }
 
 /* make_str_node --- make a string node */
 
 NODE *
-r_make_str_node(const char *s, unsigned long len, int flags)
+make_str_node(const char *s, size_t len, int flags)
 {
 	NODE *r;
-
 	getnode(r);
 	r->type = Node_val;
 	r->numbr = 0;
-	r->flags = (STRING|STRCUR|MALLOC);
-#ifdef MBS_SUPPORT
+	r->flags = (MALLOC|STRING|STRCUR);
+	r->valref = 1;
+	r->stfmt = STFMT_UNUSED;
+#ifdef HAVE_MPFR
+	r->strndmode = MPFR_round_mode;
+#endif
 	r->wstptr = NULL;
 	r->wstlen = 0;
-#endif /* defined MBS_SUPPORT */
 
-	if (flags & ALREADY_MALLOCED)
+	if ((flags & ALREADY_MALLOCED) != 0)
 		r->stptr = (char *) s;
 	else {
-		emalloc(r->stptr, char *, len + 2, "make_str_node");
+		emalloc(r->stptr, char *, len + 1, "make_str_node");
 		memcpy(r->stptr, s, len);
 	}
 	r->stptr[len] = '\0';
@@ -372,109 +429,120 @@ r_make_str_node(const char *s, unsigned long len, int flags)
 		char *ptm;
 		int c;
 		const char *end;
-#ifdef MBS_SUPPORT
 		mbstate_t cur_state;
 
 		memset(& cur_state, 0, sizeof(cur_state));
-#endif
 
 		end = &(r->stptr[len]);
 		for (pf = ptm = r->stptr; pf < end;) {
-#ifdef MBS_SUPPORT
 			/*
 			 * Keep multibyte characters together. This avoids
 			 * problems if a subsequent byte of a multibyte
 			 * character happens to be a backslash.
 			 */
 			if (gawk_mb_cur_max > 1) {
-				int mblen = mbrlen(pf, end-pf, &cur_state);
+				size_t mblen = mbrlen(pf, end-pf, &cur_state);
 
-				if (mblen > 1) {
-					int i;
+				/*
+				 * Incomplete (-2), invalid (-1), and
+				 * null (0) characters are excluded here.
+				 * They are read as a sequence of bytes.
+				 */
+				if (mblen > 1 && mblen < (size_t) -2) {
+					size_t i;
 
 					for (i = 0; i < mblen; i++)
 						*ptm++ = *pf++;
 					continue;
 				}
 			}
-#endif
+
 			c = *pf++;
 			if (c == '\\') {
-				c = parse_escape(&pf);
-				if (c < 0) {
+				const char *result;
+				size_t nbytes;
+				enum escape_results ret;
+
+				ret = parse_escape(& pf, & result, & nbytes);
+				switch (ret) {
+				case ESCAPE_OK:
+					assert(nbytes > 0);
+					while (nbytes--)
+						*ptm++ = *result++;
+					break;
+				case ESCAPE_CONV_ERR:
+					*ptm++ = '?';
+					break;
+				case ESCAPE_TERM_BACKSLASH:
 					if (do_lint)
 						lintwarn(_("backslash at end of string"));
-					c = '\\';
+					*ptm++ = '\\';
+					break;
+				case ESCAPE_LINE_CONTINUATION:
+					if (do_lint)
+						lintwarn(_("backslash string continuation is not portable"));
+					continue;
+				default:
+					cant_happen("received bad result %d from parse_escape(), nbytes = %zu",
+							(int) ret, nbytes);
+					break;
 				}
-				*ptm++ = c;
 			} else
 				*ptm++ = c;
 		}
 		len = ptm - r->stptr;
 		erealloc(r->stptr, char *, len + 1, "make_str_node");
 		r->stptr[len] = '\0';
-		r->flags &= ~MALLOC;
-		r->flags |= PERM;
 	}
 	r->stlen = len;
-	r->valref = 1;
-	r->stfmt = -1;
 
 	return r;
 }
 
-/* more_nodes --- allocate more nodes */
-
-#define NODECHUNK	100
-
-NODE *nextfree = NULL;
+/* make_typed_regex --- make a typed regex node */
 
 NODE *
-more_nodes()
+make_typed_regex(const char *re, size_t len)
 {
-	NODE *np;
+	NODE *n, *exp, *n2;
 
-	/* get more nodes and initialize list */
-	emalloc(nextfree, NODE *, NODECHUNK * sizeof(NODE), "more_nodes");
-	memset(nextfree, 0, NODECHUNK * sizeof(NODE));
-	for (np = nextfree; np <= &nextfree[NODECHUNK - 1]; np++) {
-		np->nextp = np + 1;
-	}
-	--np;
-	np->nextp = NULL;
-	np = nextfree;
-	nextfree = nextfree->nextp;
-	return np;
+	exp = make_str_node(re, len, ALREADY_MALLOCED);
+	n = make_regnode(Node_regex, exp);
+	if (n == NULL)
+		fatal(_("could not make typed regex"));
+
+	n2 = make_string(re, len);
+	n2->typed_re = n;
+#if HAVE_MPFR
+	if (do_mpfr)
+		mpg_zero(n2);
+	else
+#endif
+	n2->numbr = 0;
+	n2->flags |= NUMCUR|STRCUR|REGEX;
+	n2->flags &= ~(STRING|NUMBER);
+
+	return n2;
 }
+
 
 /* unref --- remove reference to a particular node */
 
 void
-unref(NODE *tmp)
+r_unref(NODE *tmp)
 {
-	if (tmp == NULL)
+#ifdef GAWKDEBUG
+	/* Do the same as in awk.h:unref().  */
+	assert(tmp == NULL || tmp->valref > 0);
+	if (tmp == NULL || --tmp->valref > 0)
 		return;
-	if ((tmp->flags & PERM) != 0)
-		return;
+#endif
 
-	if (tmp->type == Node_ahash) {
-		if (tmp->ahname_ref > 1)
-			tmp->ahname_ref--;
-		else {
-			efree(tmp->ahname_str);
-			freenode(tmp);
-		}
-		return;
-	}
+	if ((tmp->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
+		efree(tmp->stptr);
 
-	if ((tmp->flags & MALLOC) != 0) {
-		if (tmp->valref > 1) {
-			tmp->valref--;  
-			return;
-		} 
-		if (tmp->flags & STRCUR)
-			efree(tmp->stptr);
-	}
+	mpfr_unset(tmp);
+
 	free_wstr(tmp);
 	freenode(tmp);
 }
@@ -483,62 +551,72 @@ unref(NODE *tmp)
 /*
  * parse_escape:
  *
- * Parse a C escape sequence.  STRING_PTR points to a variable containing a
- * pointer to the string to parse.  That pointer is updated past the
- * characters we use.  The value of the escape sequence is returned. 
+ * Parse a C escape sequence.  string_ptr points to a variable containing
+ * a pointer to the string to parse.  result points to a pointer which will
+ * be set to the address of the internal buffer holding the bytes of the
+ * translated escape sequence.
  *
- * A negative value means the sequence \ newline was seen, which is supposed to
- * be equivalent to nothing at all. 
+ * Return values:
+ *	ESCAPE_OK,		// nbytes == 1 to MB_CUR_MAX: the length of the translated escape sequence
+ *	ESCAPE_CONV_ERR,	// wcrtomb conversion error
+ *	ESCAPE_TERM_BACKSLASH,	// terminal backslash (to be preserved in cmdline strings)
+ *	ESCAPE_LINE_CONTINUATION	// line continuation  (backslash-newline pair)
  *
- * If \ is followed by a null character, we return a negative value and leave
- * the string pointer pointing at the null character. 
- *
- * If \ is followed by 000, we return 0 and leave the string pointer after the
- * zeros.  A value of 0 does not mean end of string.  
- *
- * POSIX doesn't allow \x.
+ * POSIX doesn't allow \x or \u.
  */
 
-int
-parse_escape(const char **string_ptr)
+enum escape_results
+parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 {
+	static char buf[MB_LEN_MAX];
+	enum escape_results retval = ESCAPE_OK;
 	int c = *(*string_ptr)++;
 	int i;
 	int count;
 	int j;
 	const char *start;
 
+	*nbytes = 1;
 	if (do_lint_old) {
 		switch (c) {
 		case 'a':
 		case 'b':
 		case 'f':
 		case 'r':
-			warning(_("old awk does not support the `\\%c' escape sequence"), c);
+			lintwarn(_("old awk does not support the `\\%c' escape sequence"), c);
 			break;
 		}
 	}
 
 	switch (c) {
 	case 'a':
-		return '\a';
+		buf[0] = '\a';
+		break;
 	case 'b':
-		return '\b';
+		buf[0] = '\b';
+		break;
 	case 'f':
-		return '\f';
+		buf[0] = '\f';
+		break;
 	case 'n':
-		return '\n';
+		buf[0] = '\n';
+		break;
 	case 'r':
-		return '\r';
+		buf[0] = '\r';
+		break;
 	case 't':
-		return '\t';
+		buf[0] = '\t';
+		break;
 	case 'v':
-		return '\v';
+		buf[0] = '\v';
+		break;
 	case '\n':
-		return -2;
+		retval = ESCAPE_LINE_CONTINUATION;
+		break;
 	case 0:
 		(*string_ptr)--;
-		return -1;
+		retval = ESCAPE_TERM_BACKSLASH;
+		break;
 	case '0':
 	case '1':
 	case '2':
@@ -558,27 +636,30 @@ parse_escape(const char **string_ptr)
 				break;
 			}
 		}
-		return i;
+		buf[0] = i;
+		break;
 	case 'x':
 		if (do_lint) {
-			static short warned = FALSE;
+			static bool warned = false;
 
 			if (! warned) {
-				warned = TRUE;
+				warned = true;
 				lintwarn(_("POSIX does not allow `\\x' escapes"));
 			}
 		}
-		if (do_posix)
-			return ('x');
+		if (do_posix) {
+			buf[0] = 'x';
+			break;
+		}
 		if (! isxdigit((unsigned char) (*string_ptr)[0])) {
 			warning(_("no hex digits in `\\x' escape sequence"));
-			return ('x');
+			buf[0] = 'x';
+			break;
 		}
-		i = j = 0;
 		start = *string_ptr;
-		for (;; j++) {
+		for (i = j = 0; j < 2; j++) {
 			/* do outside test to avoid multiple side effects */
-			c = *(*string_ptr)++;
+			c = (unsigned char) *(*string_ptr)++;
 			if (isxdigit(c)) {
 				i *= 16;
 				if (isdigit(c))
@@ -592,35 +673,102 @@ parse_escape(const char **string_ptr)
 				break;
 			}
 		}
-		if (do_lint && j > 2)
-			lintwarn(_("hex escape \\x%.*s of %d characters probably not interpreted the way you expect"), j, start, j);
-		return i;
+		if (do_lint && j == 2 && isxdigit((unsigned char)*(*string_ptr)))
+			lintwarn(_("hex escape \\x%.*s of %d characters probably not interpreted the way you expect"), 3, start, 3);
+		buf[0] = i;
+		break;
+	case 'u':
+	{
+		size_t n;
+#ifndef __MINGW32__
+		mbstate_t mbs;
+#endif
+
+		if (do_lint) {
+			static bool warned = false;
+
+			if (! warned) {
+				warned = true;
+				lintwarn(_("POSIX does not allow `\\u' escapes"));
+			}
+		}
+		if (do_posix) {
+			buf[0] = 'u';
+			break;
+		}
+		if (! isxdigit((unsigned char) (*string_ptr)[0])) {
+			warning(_("no hex digits in `\\u' escape sequence"));
+			buf[0] = 'u';
+			break;
+		}
+		start = *string_ptr;
+		for (i = j = 0; j < 8; j++) {
+			/* do outside test to avoid multiple side effects */
+			c = (unsigned char) *(*string_ptr)++;
+			if (isxdigit(c)) {
+				i *= 16;
+				if (isdigit(c))
+					i += c - '0';
+				else if (isupper(c))
+					i += c - 'A' + 10;
+				else
+					i += c - 'a' + 10;
+			} else {
+				(*string_ptr)--;
+				break;
+			}
+		}
+#ifdef __MINGW32__
+		n = w32_wc_to_lc (i, buf);
+#elif defined (__CYGWIN__)
+		memset(& mbs, 0, sizeof(mbs));
+		n = wcitomb(buf, i, & mbs);
+#else
+		memset(& mbs, 0, sizeof(mbs));
+		n = wcrtomb(buf, i, & mbs);
+#endif	/* !__MINGW32__ */
+		if (n == (size_t) -1) {
+			warning(_("invalid `\\u' escape sequence"));
+			retval = ESCAPE_CONV_ERR;
+			*nbytes = 0;
+		} else {
+			*nbytes = n;
+		}
+		break;
+	}
 	case '\\':
 	case '"':
-		return c;
+		buf[0] = c;
+		break;
 	default:
 	{
-		static short warned[256];
+		static bool warned[256];
 		unsigned char uc = (unsigned char) c;
 
 		/* N.B.: use unsigned char here to avoid Latin-1 problems */
 
 		if (! warned[uc]) {
-			warned[uc] = TRUE;
+			warned[uc] = true;
 
 			warning(_("escape sequence `\\%c' treated as plain `%c'"), uc, uc);
 		}
 	}
-		return c;
+		buf[0] = c;
+		break;
 	}
+
+	*result = buf;
+	return retval;
 }
 
-/* isnondecimal --- return true if number is not a decimal number */
+/* get_numbase --- return the base to use for the number in 's' */
 
 int
-isnondecimal(const char *str, int use_locale)
+get_numbase(const char *s, size_t len, bool use_locale)
 {
 	int dec_point = '.';
+	const char *str = s;
+
 #if defined(HAVE_LOCALE_H)
 	/*
 	 * loc.decimal_point may not have been initialized yet,
@@ -630,12 +778,12 @@ isnondecimal(const char *str, int use_locale)
 		dec_point = loc.decimal_point[0];	/* XXX --- assumes one char */
 #endif
 
-	if (str[0] != '0')
-		return FALSE;
+	if (len < 2 || str[0] != '0')
+		return 10;
 
 	/* leading 0x or 0X */
 	if (str[1] == 'x' || str[1] == 'X')
-		return TRUE;
+		return 16;
 
 	/*
 	 * Numbers with '.', 'e', or 'E' are decimal.
@@ -643,17 +791,20 @@ isnondecimal(const char *str, int use_locale)
 	 *
 	 * These beasts can have trailing whitespace. Deal with that too.
 	 */
-	for (; *str != '\0'; str++) {
+	for (; len > 0; len--, str++) {
 		if (*str == 'e' || *str == 'E' || *str == dec_point)
-			return FALSE;
+			return 10;
 		else if (! isdigit((unsigned char) *str))
 			break;
 	}
 
-	return TRUE;
+	if (! isdigit((unsigned char) s[1])
+			|| s[1] == '8' || s[1] == '9'
+	)
+		return 10;
+	return 8;
 }
 
-#if defined MBS_SUPPORT
 /* str2wstr --- convert a multibyte string to a wide string */
 
 NODE *
@@ -663,7 +814,7 @@ str2wstr(NODE *n, size_t **ptr)
 	char *sp;
 	mbstate_t mbs;
 	wchar_t wc, *wsp;
-	static short warned = FALSE;
+	static bool warned = false;
 
 	assert((n->flags & (STRING|STRCUR)) != 0);
 
@@ -697,7 +848,7 @@ str2wstr(NODE *n, size_t **ptr)
 	 * realloc the wide string down in size.
 	 */
 
-	emalloc(n->wstptr, wchar_t *, sizeof(wchar_t) * (n->stlen + 2), "str2wstr");
+	emalloc(n->wstptr, wchar_t *, sizeof(wchar_t) * (n->stlen + 1), "str2wstr");
 	wsp = n->wstptr;
 
 	/*
@@ -709,8 +860,7 @@ str2wstr(NODE *n, size_t **ptr)
 	 * Create the array.
 	 */
 	if (ptr != NULL) {
-		emalloc(*ptr, size_t *, sizeof(size_t) * n->stlen, "str2wstr");
-		memset(*ptr, 0, sizeof(size_t) * n->stlen);
+		ezalloc(*ptr, size_t *, sizeof(size_t) * (n->stlen + 1), "str2wstr");
 	}
 
 	sp = n->stptr;
@@ -732,22 +882,37 @@ str2wstr(NODE *n, size_t **ptr)
 		case (size_t) -2:
 		case (size_t) -1:
 			/*
-			 * Just skip the bad byte and keep going, so that
-			 * we get a more-or-less full string, instead of
-			 * stopping early. This is particularly important
-			 * for match() where we need to build the indices.
-			 */
-			sp++;
-			src_count--;
-			/*
 			 * mbrtowc(3) says the state of mbs becomes undefined
 			 * after a bad character, so reset it.
 			 */
 			memset(& mbs, 0, sizeof(mbs));
-			/* And warn the user something's wrong */
-			if (do_lint && ! warned) {
-				warned = TRUE;
-				lintwarn(_("Invalid multibyte data detected. There may be a mismatch between your data and your locale."));
+
+			/* Warn the user something's wrong */
+			if (! warned) {
+				warned = true;
+				warning(_("Invalid multibyte data detected. There may be a mismatch between your data and your locale"));
+			}
+
+			/*
+			 * 8/2015: If we're using UTF, then instead of just
+			 * skipping the character, plug in the Unicode
+			 * replacement character. In most cases this gives
+			 * us "better" results, in that character counts
+			 * and string lengths tend to make more sense.
+			 *
+			 * Otherwise, just skip the bad byte and keep going,
+			 * so that we get a more-or-less full string, instead of
+			 * stopping early. This is particularly important
+			 * for match() where we need to build the indices.
+			 */
+			if (using_utf8()) {
+				count = 1;
+				wc = 0xFFFD;	/* unicode replacement character */
+				goto set_wc;
+			} else {
+				/* skip it and keep going */
+				sp++;
+				src_count--;
 			}
 			break;
 
@@ -755,6 +920,7 @@ str2wstr(NODE *n, size_t **ptr)
 			count = 1;
 			/* fall through */
 		default:
+		set_wc:
 			*wsp++ = wc;
 			src_count -= count;
 			while (count--)  {
@@ -766,12 +932,17 @@ str2wstr(NODE *n, size_t **ptr)
 		}
 	}
 
+	/* Needed for zero-length matches at the end of a string */
+	assert(sp - n->stptr == n->stlen);
+	if (ptr != NULL)
+		(*ptr)[sp - n->stptr] = i;
+
 	*wsp = L'\0';
 	n->wstlen = wsp - n->wstptr;
 	n->flags |= WSTRCUR;
 #define ARBITRARY_AMOUNT_TO_GIVE_BACK 100
 	if (n->stlen - n->wstlen > ARBITRARY_AMOUNT_TO_GIVE_BACK)
-		erealloc(n->wstptr, wchar_t *, sizeof(wchar_t) * (n->wstlen + 2), "str2wstr");
+		erealloc(n->wstptr, wchar_t *, sizeof(wchar_t) * (n->wstlen + 1), "str2wstr");
 
 	return n;
 }
@@ -798,7 +969,7 @@ wstr2str(NODE *n)
 	memset(& mbs, 0, sizeof(mbs));
 
 	length = n->wstlen;
-	emalloc(newval, char *, (length * gawk_mb_cur_max) + 2, "wstr2str");
+	emalloc(newval, char *, (length * gawk_mb_cur_max) + 1, "wstr2str");
 
 	wp = n->wstptr;
 	for (cp = newval; length > 0; length--) {
@@ -810,6 +981,7 @@ wstr2str(NODE *n)
 	}
 	*cp = '\0';
 
+	/* N.B. caller just created n with make_string, so this free is safe */
 	efree(n->stptr);
 	n->stptr = newval;
 	n->stlen = cp - newval;
@@ -820,7 +992,7 @@ wstr2str(NODE *n)
 /* free_wstr --- release the wide string part of a node */
 
 void
-free_wstr(NODE *n)
+r_free_wstr(NODE *n)
 {
 	assert(n->type == Node_val);
 
@@ -902,11 +1074,10 @@ out:	;
 
 	return NULL;
 }
-#endif /* defined MBS_SUPPORT */
 
 /* is_ieee_magic_val --- return true for +inf, -inf, +nan, -nan */
 
-static int
+bool
 is_ieee_magic_val(const char *val)
 {
 	/*
@@ -925,18 +1096,22 @@ is_ieee_magic_val(const char *val)
 /* get_ieee_magic_val --- return magic value for string */
 
 static AWKNUM
-get_ieee_magic_val(const char *val)
+get_ieee_magic_val(char *val)
 {
-	static short first = TRUE;
+	static bool first = true;
 	static AWKNUM inf;
 	static AWKNUM nan;
+	char save;
 
 	char *ptr;
+	save = val[4];
+	val[4] = '\0';
 	AWKNUM v = strtod(val, &ptr);
+	val[4] = save;
 
 	if (val == ptr) { /* Older strtod implementations don't support inf or nan. */
 		if (first) {
-			first = FALSE;
+			first = false;
 			nan = sqrt(-1.0);
 			inf = -log(0.0);
 		}
@@ -949,7 +1124,6 @@ get_ieee_magic_val(const char *val)
 	return v;
 }
 
-#ifdef MBS_SUPPORT
 wint_t btowc_cache[256];
 
 /* init_btowc_cache --- initialize the cache */
@@ -958,8 +1132,90 @@ void init_btowc_cache()
 {
 	int i;
 
-	for (i = 0; i < 255; i++) {
+	for (i = 0; i <= 255; i++) {
 		btowc_cache[i] = btowc(i);
 	}
 }
+
+#define BLOCKCHUNK 100
+
+struct block_header nextfree[BLOCK_MAX] = {
+	{ NULL, sizeof(NODE), "node" },
+	{ NULL, sizeof(BUCKET), "bucket" },
+};
+
+#ifdef MEMDEBUG
+
+void *
+r_getblock(int id)
+{
+	void *res;
+	emalloc(res, void *, nextfree[id].size, "getblock");
+	nextfree[id].active++;
+	if (nextfree[id].highwater < nextfree[id].active)
+		nextfree[id].highwater = nextfree[id].active;
+	return res;
+}
+
+void
+r_freeblock(void *p, int id)
+{
+	nextfree[id].active--;
+	free(p);
+}
+
+#else
+
+/* more_blocks --- get more blocks of memory and add to the free list;
+	size of a block must be >= sizeof(struct block_item)
+ */
+
+void *
+more_blocks(int id)
+{
+	struct block_item *freep, *np, *next;
+	char *p, *endp;
+	size_t size;
+
+	size = nextfree[id].size;
+
+	assert(size >= sizeof(struct block_item));
+	emalloc(freep, struct block_item *, BLOCKCHUNK * size, "more_blocks");
+	p = (char *) freep;
+	endp = p + BLOCKCHUNK * size;
+
+	for (np = freep; ; np = next) {
+		next = (struct block_item *) (p += size);
+		if (p >= endp) {
+			np->freep = NULL;
+			break;
+		}
+		np->freep = next;
+	}
+	nextfree[id].freep = freep->freep;
+	nextfree[id].highwater += BLOCKCHUNK;
+	return freep;
+}
+
 #endif
+
+/* make_bool_node --- make a boolean-valued node */
+
+extern NODE *
+make_bool_node(bool value)
+{
+	NODE *val;
+	const char *sval;
+	AWKNUM nval;
+
+	sval = (value ? "1" : "0");
+	nval = (value ? 1.0 : 0.0);
+
+	val = make_number(nval);
+	val->stptr = estrdup(sval, strlen(sval));
+	val->stlen = strlen(sval);
+	val->flags |= NUMCUR|STRCUR|BOOLVAL;
+	val->stfmt = STFMT_UNUSED;
+
+	return val;
+}

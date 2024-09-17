@@ -1,6 +1,6 @@
 # alarm.awk --- set an alarm
 #
-# Requires gettimeofday() library function
+# Requires getlocaltime() library function
 #
 # Arnold Robbins, arnold@skeeve.com, Public Domain
 # May 1993
@@ -8,8 +8,7 @@
 
 # usage: alarm time [ "message" [ count [ delay ] ] ]
 
-BEGIN    \
-{
+BEGIN {
     # Initial argument sanity checking
     usage1 = "usage: alarm time ['message' [count [delay]]]"
     usage2 = sprintf("\t(%s) time ::= hh:mm", ARGV[1])
@@ -53,7 +52,7 @@ BEGIN    \
     minute = atime[2] + 0  # force numeric
 
     # get current broken down time
-    gettimeofday(now)
+    getlocaltime(now)
 
     # if time given is 12-hour hours and it's after that
     # hour, e.g., `alarm 5:30' at 9 a.m. means 5:30 p.m.,
@@ -71,7 +70,7 @@ BEGIN    \
     # how long to sleep for
     naptime = target - current
     if (naptime <= 0) {
-        print "time is in the past!" > "/dev/stderr"
+        print "alarm: time is in the past!" > "/dev/stderr"
         exit 1
     }
     # zzzzzz..... go away if interrupted

@@ -1,0 +1,80 @@
+This is the README for GNU awk 5 under Windows32.
+
+    Gawk has been compiled and tested on MS-Windows using
+the MinGW ports of the GNU development tools.
+
+    The Cygwin environment (http://cygwin.com) may also be used
+to compile and run gawk under Windows.  For Cygwin, building and
+installation is the same as under Unix:
+
+	tar -xvpzf gawk-5.2.x.tar.gz
+	cd gawk-5.2.x
+	./configure && make
+
+The `configure' step takes a long time, but works otherwise.
+
+Building gawk
+-------------
+
+Copy the files in the `pc' directory (EXCEPT for `ChangeLog') to the
+directory with the rest of the gawk sources.  (The subdirectories of 
+`pc' need not be copied.)  The Makefile contains a configuration 
+section with comments, and may need to be edited in order to work
+with your make utility.  Also, copy the file Makefile.ext to
+extension/Makefile.
+
+The "prefix" line in the Makefile is used during the install of gawk
+(and in building igawk.bat and igawk.cmd).  Since the libraries for
+gawk will be installed under $(prefix)/lib/awk (e.g., /gnu/lib/awk),
+it is convenient to have this directory in DEFPATH of config.h. 
+
+The makefile contains a number of targets for building the MS-Windows
+version.  A list of targets will be printed if the make command is
+given without a target.  As an example, to build gawk using the MinGW
+tools, enter "make mingw32".
+
+After you build in the top-level directory, chdir to the extension
+subdirectory and say "make" there to build the extensions.  If you
+built gawk without libmpfr, say this instead to build the extensions:
+
+  make MPFR= MPFR_LIBS=
+
+
+Testing and installing gawk
+---------------------------
+
+The command "make test" (and possibly "make install") requires several 
+Unix-like tools, including an sh-like shell, sed, cp, and cmp.  Only 
+GNU make is known to work on "make test".
+
+There are two methods for the install: Method 1 uses a typical Unix-like 
+approach and requires cat, cp, mkdir, sed, and sh; method 2 uses gawk 
+and batch files. See the configuration section of the makefile.
+
+The file test/Makefile may need some editing. A sample makefile with
+comments appears in pc/Makefile.tst, and can be used to modify
+test/Makefile for your platform.  For starters, just copy
+pc/Makefile.tst to test/Makefile, then walk through the variables
+defined at the beginning and change them as appropriate for your
+setup.  In addition, some files in the test directory may need to have
+their end-of-line markers converted, as described in Makefile.tst.
+One change you will have to make for testing the MinGW port using the
+MSYS Bash is to set SLASH to //.
+
+Testing Gawk built with MPFR support should report 30 tests failed, and
+if your ls.exe doesn't produce inode numbers consistent with the readdir
+extension, you should see 31 failures.  If you see more failures, you
+should investigate the reasons.
+
+It is routine to install by hand, but note that the install target also
+builds igawk.bat and igawk.cmd, which are used to add an include
+facility to gawk (and which require sh).
+
+
+Gawk thanks
+-----------
+
+We are indebted to Juan Grigera <juan@biophnet.unlp.edu.ar> for
+additional help on changes for MS-Windows.
+
+Support for MS-Windows started in gawk-3.0.3.

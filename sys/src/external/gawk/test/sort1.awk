@@ -22,6 +22,18 @@ BEGIN{
 		SORT_STR, IGNORECASE)
 
 	makea(a)
+	SORT_STR = "@ind_num_desc"
+	asort1(a, "")
+	printf("---end asort(a, b, \"%s\"), IGNORECASE = %d---\n",
+		SORT_STR, IGNORECASE)
+		
+	makea(a)
+	SORT_STR = "@ind_str_asc"
+	asort1(a, "")
+	printf("---end asort(a, a, \"%s\"), IGNORECASE = %d---\n",
+		SORT_STR, IGNORECASE)
+
+	makea(a)
 	SORT_STR = "@ind_str_desc"
 	asort1(a, "")
 	printf("---end asort(a, a, \"%s\"), IGNORECASE = %d---\n",

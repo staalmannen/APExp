@@ -12,6 +12,8 @@
 #ifdef HAVE_ARPA_INET_H
 #include <arpa/inet.h>
 #endif
+#include <errno.h>
+#include <string.h>	/* strerror */
 
 #include "getaddrinfo.h"
 
@@ -29,20 +31,19 @@ getaddrinfo(const char *hostname, const char *portname,
 {
 	struct addrinfo *out;
 	if (res == NULL)
-		return -1;
+		return EINVAL;
 
-	out = (struct addrinfo *) malloc(sizeof(*out));
+	out = (struct addrinfo *) calloc(1, sizeof(*out));
 	if (out == NULL) {
 		*res = NULL;
-		return -1;
+		return ENOMEM;
 	}
-	memset(out, '\0', sizeof(*out));
 
 	out->ai_addr = (struct sockaddr *) malloc(sizeof(struct sockaddr_in));
 	if (out->ai_addr == NULL) {
 		free(out);
 		*res = NULL;
-		return -1;
+		return ENOMEM;
 	}
 
 	out->ai_socktype = SOCK_STREAM;
@@ -78,7 +79,7 @@ getaddrinfo(const char *hostname, const char *portname,
 				= ((struct in_addr *)he->h_addr_list[0])->s_addr;
 		} else {
 			freeaddrinfo(out);
-			return -1;
+			return EADDRNOTAVAIL;
 		}
 	} else {
 		if (!(out->ai_flags & AI_PASSIVE))
@@ -108,5 +109,11 @@ getaddrinfo(const char *hostname, const char *portname,
 	*res = out;
 
 	return 0;
+}
+
+const char *
+gai_strerror(int errcode)
+{
+	return strerror(errcode);
 }
 #endif

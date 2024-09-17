@@ -1,26 +1,28 @@
 /*
- * command.y - yacc/bison parser for debugger command 
+ * command.y - yacc/bison parser for debugger commands.
  */
 
-/* 
- * Copyright (C) 2004, 2010, 2011 the Free Software Foundation, Inc.
- * 
+/*
+ * Copyright (C) 2004, 2010, 2011, 2014, 2016, 2017, 2019-2021, 2023,
+ * the Free Software Foundation, Inc.
+ *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
- * 
+ *
  * GAWK is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GAWK is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1335,
+ * USA
  */
 
 %{
@@ -34,27 +36,28 @@ int yydebug = 2;
 
 static int yylex(void);
 static void yyerror(const char *mesg, ...);
+#define YYERROR_IS_DECLARED	1	/* for bison 3.8. sigh. */
 
 static int find_command(const char *token, size_t toklen);
 
-static int want_nodeval = FALSE;
+static bool want_nodeval = false;
 
-static int cmd_idx = -1;			/* index of current command in cmd table */
-static int repeat_idx = -1;			/* index of last repeatable command in command table */
-static CMDARG *arg_list = NULL;		/* list of arguments */ 
-static long errcount = 0;
+static int cmd_idx = -1;		/* index of current command in cmd table */
+static int repeat_idx = -1;		/* index of last repeatable command in command table */
+static CMDARG *arg_list = NULL;		/* list of arguments */
+static long dbg_errcount = 0;
 static char *lexptr_begin = NULL;
-static int in_commands = FALSE;
+static bool in_commands = false;
 static int num_dim;
 
-static int in_eval = FALSE;
+static bool in_eval = false;
 static const char start_EVAL[] = "function @eval(){";
-static const char end_EVAL[] = "}";	
-static CMDARG *append_statement(CMDARG *alist, char *stmt);
-static char *next_word(char *p, int len, char **endp);
+static const char end_EVAL[] = "}";
+static CMDARG *append_statement(CMDARG *stmt_list, char *stmt);
 static NODE *concat_args(CMDARG *a, int count);
 
 #ifdef HAVE_LIBREADLINE
+static char *next_word(char *p, int len, char **endp);
 static void history_expand_line(char **line);
 static char *command_generator(const char *text, int state);
 static char *srcfile_generator(const char *text, int state);
@@ -108,7 +111,7 @@ input
 	| input line
 	  {
 		cmd_idx = -1;
-		want_nodeval = FALSE;
+		want_nodeval = false;
 		if (lexptr_begin != NULL) {
 			if (input_from_tty && lexptr_begin[0] != '\0')
 				add_history(lexptr_begin);
@@ -126,12 +129,12 @@ line
 	: nls
 	| command nls
 	  {
-		if (errcount == 0 && cmd_idx >= 0) {
+		if (dbg_errcount == 0 && cmd_idx >= 0) {
 			Func_cmd cmdfunc;
-			int terminate = FALSE;
+			bool terminate = false;
 			CMDARG *args;
 			int ctype = 0;
-			
+
 			ctype = cmdtab[cmd_idx].type;
 
 			/* a blank line repeats previous command
@@ -162,7 +165,7 @@ line
 			if (in_commands)
 				cmdfunc = do_commands;
 			cmd_idx = -1;
-			want_nodeval = FALSE;
+			want_nodeval = false;
 
 			args = arg_list;
 			arg_list = NULL;
@@ -209,23 +212,24 @@ break_cmd
 
 /* mid-rule action buried in non-terminal to avoid conflict */
 set_want_nodeval
-	: { want_nodeval = TRUE; }
+	: { want_nodeval = true; }
 	;
 
 eval_prologue
 	: D_EVAL set_want_nodeval opt_param_list nls
 	  {
-		if (errcount == 0) {
+		if (dbg_errcount == 0) {
 			/* don't free arg_list;	passed on to statement_list
 			 * non-terminal (empty rule action). See below.
 			 */
 			if (input_from_tty) {
-				dPrompt = eval_Prompt;
-				fprintf(out_fp, _("Type (g)awk statement(s). End with the command \"end\"\n"));
+				dbg_prompt = eval_prompt;
+				fprintf(out_fp,
+		_("Type (g)awk statement(s). End with the command `end'\n"));
 				rl_inhibit_completion = 1;
 			}
 			cmd_idx = -1;
-			in_eval = TRUE;
+			in_eval = true;
 		}
 	  }
 	;
@@ -256,11 +260,11 @@ eval_cmd
 			str[len - 2] = '\0';
 		}
 		if (input_from_tty) {
-			dPrompt = in_commands ? commands_Prompt : dgawk_Prompt;
+			dbg_prompt = in_commands ? commands_prompt : dgawk_prompt;
 			rl_inhibit_completion = 0;
 		}
 		cmd_idx = find_command("eval", 4);
-		in_eval = FALSE;
+		in_eval = false;
 	  }
 	| D_EVAL set_want_nodeval string_node
 	  {
@@ -283,7 +287,7 @@ command
 	| control_cmd opt_plus_integer
 	| frame_cmd opt_integer
 	  {
-		if (cmdtab[cmd_idx].class == D_FRAME
+		if (cmdtab[cmd_idx].lex_class == D_FRAME
 				&& $2 != NULL && $2->a_int < 0)
 			yyerror(_("invalid frame number: %d"), $2->a_int);
 	  }
@@ -291,7 +295,7 @@ command
 	  {
 		int idx = find_argument($2);
 		if (idx < 0)
-			yyerror(_("info: invalid option - \"%s\""), $2->a_string);
+			yyerror(_("info: invalid option - `%s'"), $2->a_string);
 		else {
 			efree($2->a_string);
 			$2->a_string = NULL;
@@ -301,28 +305,28 @@ command
 	  }
 	| D_IGNORE plus_integer D_INT
 	| D_ENABLE enable_args
-	| D_PRINT { want_nodeval = TRUE; } print_args
-	| D_PRINTF { want_nodeval = TRUE; } printf_args
+	| D_PRINT { want_nodeval = true; } print_args
+	| D_PRINTF { want_nodeval = true; } printf_args
 	| D_LIST list_args
 	| D_UNTIL location
 	| D_CLEAR location
-	| break_cmd break_args 
-	| D_SET { want_nodeval = TRUE; } variable '=' node
+	| break_cmd break_args
+	| D_SET { want_nodeval = true; } variable '=' node
 	| D_OPTION option_args
-	| D_RETURN { want_nodeval = TRUE; } opt_node
-	| D_DISPLAY { want_nodeval = TRUE; } opt_variable
-	| D_WATCH { want_nodeval = TRUE; } variable condition_exp
+	| D_RETURN { want_nodeval = true; } opt_node
+	| D_DISPLAY { want_nodeval = true; } opt_variable
+	| D_WATCH { want_nodeval = true; } variable condition_exp
 	| d_cmd opt_integer_list
 	| D_DUMP opt_string
 	| D_SOURCE D_STRING
 	  {
 		if (in_cmd_src($2->a_string))
-			yyerror(_("source \"%s\": already sourced."), $2->a_string);
+			yyerror(_("source: `%s': already sourced"), $2->a_string);
 	  }
 	| D_SAVE D_STRING
 	  {
 		if (! input_from_tty)
-			yyerror(_("save \"%s\": command not permitted."), $2->a_string);
+			yyerror(_("save: `%s': command not permitted"), $2->a_string);
 	  }
 	| D_COMMANDS commands_arg
 	  {
@@ -332,21 +336,21 @@ command
 		if ($2 != NULL)
 			num = $2->a_int;
 
-		if (errcount != 0)
+		if (dbg_errcount != 0)
 			;
 		else if (in_commands)
-			yyerror(_("Can't use command `commands' for breakpoint/watchpoint commands"));
-		else if ($2 == NULL &&  ! (type = has_break_or_watch_point(&num, TRUE)))
+			yyerror(_("cannot use command `commands' for breakpoint/watchpoint commands"));
+		else if ($2 == NULL &&  ! (type = has_break_or_watch_point(&num, true)))
 			yyerror(_("no breakpoint/watchpoint has been set yet"));
-		else if ($2 != NULL && ! (type = has_break_or_watch_point(&num, FALSE)))
+		else if ($2 != NULL && ! (type = has_break_or_watch_point(&num, false)))
 			yyerror(_("invalid breakpoint/watchpoint number"));
 		if (type) {
-			in_commands = TRUE;
+			in_commands = true;
 			if (input_from_tty) {
-				dPrompt = commands_Prompt; 
+				dbg_prompt = commands_prompt;
 				fprintf(out_fp, _("Type commands for when %s %d is hit, one per line.\n"),
 								(type == D_break) ? "breakpoint" : "watchpoint", num);
-				fprintf(out_fp, _("End with the command \"end\"\n"));
+				fprintf(out_fp, _("End with the command `end'\n"));
 			}
 		}
 	  }
@@ -356,8 +360,8 @@ command
 			yyerror(_("`end' valid only in command `commands' or `eval'"));
 		else {
 			if (input_from_tty)
-				dPrompt = dgawk_Prompt;	
-			in_commands = FALSE;
+				dbg_prompt = dgawk_prompt;
+			in_commands = false;
 		}
 	  }
 	| D_SILENT
@@ -369,7 +373,7 @@ command
 	  {
 		int idx = find_argument($2);
 		if (idx < 0)
-			yyerror(_("trace: invalid option - \"%s\""), $2->a_string);
+			yyerror(_("trace: invalid option - `%s'"), $2->a_string);
 		else {
 			efree($2->a_string);
 			$2->a_string = NULL;
@@ -377,11 +381,11 @@ command
 			$2->a_argument = argtab[idx].value;
 		}
 	  }
-	| D_CONDITION plus_integer { want_nodeval = TRUE; } condition_exp
+	| D_CONDITION plus_integer { want_nodeval = true; } condition_exp
 	  {
 		int type;
 		int num = $2->a_int;
-		type = has_break_or_watch_point(&num, FALSE);
+		type = has_break_or_watch_point(&num, false);
 		if (! type)
 			yyerror(_("condition: invalid breakpoint/watchpoint number"));
 	  }
@@ -455,12 +459,12 @@ option_args
 	| D_STRING
 	  {
 		if (find_option($1->a_string) < 0)
-			yyerror(_("option: invalid parameter - \"%s\""), $1->a_string);
+			yyerror(_("option: invalid parameter - `%s'"), $1->a_string);
  	  }
 	| D_STRING '=' D_STRING
 	  {
 		if (find_option($1->a_string) < 0)
-			yyerror(_("option: invalid parameter - \"%s\""), $1->a_string);
+			yyerror(_("option: invalid parameter - `%s'"), $1->a_string);
  	  }
 	;
 
@@ -470,7 +474,7 @@ func_name
 		NODE *n;
 		n = lookup($1->a_string);
 		if (n == NULL || n->type != Node_func)
-			yyerror(_("no such function - \"%s\""), $1->a_string);
+			yyerror(_("no such function - `%s'"), $1->a_string);
 		else {
 			$1->type = D_func;
 			efree($1->a_string);
@@ -491,10 +495,10 @@ location
 
 break_args
 	: /* empty */
-	  { $$ = NULL; }	
-	| plus_integer { want_nodeval = TRUE; } condition_exp
-	| func_name 
-	| D_STRING ':' plus_integer { want_nodeval = TRUE; } condition_exp
+	  { $$ = NULL; }
+	| plus_integer { want_nodeval = true; } condition_exp
+	| func_name
+	| D_STRING ':' plus_integer { want_nodeval = true; } condition_exp
 	| D_STRING ':' func_name
 	;
 
@@ -527,7 +531,7 @@ enable_args
 	  {
 		int idx = find_argument($1);
 		if (idx < 0)
-			yyerror(_("enable: invalid option - \"%s\""), $1->a_string);
+			yyerror(_("enable: invalid option - `%s'"), $1->a_string);
 		else {
 			efree($1->a_string);
 			$1->a_string = NULL;
@@ -629,7 +633,7 @@ subscript
 		CMDARG *a;
 		NODE *subs;
 		int count = 0;
-		
+
 		for (a = $2; a != NULL; a = a->next)
 			count++;
 		subs = concat_args($2, count);
@@ -639,7 +643,7 @@ subscript
 		$2->a_node = subs;
 		$$ = $2;
 	  }
-	| '[' exp_list error 
+	| '[' exp_list error
 	;
 
 subscript_list
@@ -673,19 +677,19 @@ node
 	: D_NODE
 	  { $$ = $1; }
 	| '+' D_NODE
-	  { 
+	  {
 		NODE *n = $2->a_node;
 		if ((n->flags & NUMBER) == 0)
 			yyerror(_("non-numeric value found, numeric expected"));
 		$$ = $2;
 	  }
 	| '-' D_NODE
-	  { 
+	  {
 		NODE *n = $2->a_node;
 		if ((n->flags & NUMBER) == 0)
 			yyerror(_("non-numeric value found, numeric expected"));
 		else
-			$2->a_node->numbr = - n->numbr;
+			negate_num(n);
 		$$ = $2;
 	  }
 	;
@@ -703,7 +707,7 @@ opt_integer
 	| integer
 	  { $$ = $1; }
 	;
-			
+
 plus_integer
 	: D_INT
 	  {
@@ -718,7 +722,7 @@ plus_integer
 		$$ = $2;
 	  }
 	;
-	
+
 integer
 	: D_INT
 	  { $$ = $1; }
@@ -746,12 +750,12 @@ nls
 %%
 
 
-/* append_statement --- append 'stmt' to the list of eval awk statements */ 
+/* append_statement --- append 'stmt' to the list of eval awk statements */
 
 static CMDARG *
-append_statement(CMDARG *alist, char *stmt) 
+append_statement(CMDARG *stmt_list, char *stmt)
 {
-	CMDARG *a, *arg; 
+	CMDARG *a, *arg;
 	char *s;
 	int len, slen, ssize;
 
@@ -759,11 +763,11 @@ append_statement(CMDARG *alist, char *stmt)
 
 	if (stmt == start_EVAL) {
 		len = sizeof(start_EVAL);
-		for (a = alist; a != NULL; a = a->next)
+		for (a = stmt_list; a != NULL; a = a->next)
 			len += strlen(a->a_string) + 1;	/* 1 for ',' */
 		len += EVALSIZE;
 
-		emalloc(s, char *, (len + 2) * sizeof(char), "append_statement");
+		emalloc(s, char *, (len + 1) * sizeof(char), "append_statement");
 		arg = mk_cmdarg(D_string);
 		arg->a_string = s;
 		arg->a_count = len;	/* kludge */
@@ -771,7 +775,7 @@ append_statement(CMDARG *alist, char *stmt)
 		slen = sizeof("function @eval(") - 1;
 		memcpy(s, start_EVAL, slen);
 
-		for (a = alist; a != NULL; a = a->next) {
+		for (a = stmt_list; a != NULL; a = a->next) {
 			len = strlen(a->a_string);
 			memcpy(s + slen, a->a_string, len);
 			slen += len;
@@ -783,16 +787,16 @@ append_statement(CMDARG *alist, char *stmt)
 		s[slen] = '\0';
 		return arg;
 	}
-		 
+
 	len = strlen(stmt) + 1;	/* 1 for newline */
-	s = alist->a_string;
+	s = stmt_list->a_string;
 	slen = strlen(s);
-	ssize = alist->a_count;
+	ssize = stmt_list->a_count;
 	if (len > ssize - slen) {
 		ssize = slen + len + EVALSIZE;
-		erealloc(s, char *, (ssize + 2) * sizeof(char), "append_statement");
-		alist->a_string = s;
-		alist->a_count = ssize;
+		erealloc(s, char *, (ssize + 1) * sizeof(char), "append_statement");
+		stmt_list->a_string = s;
+		stmt_list->a_count = ssize;
 	}
 	memcpy(s + slen, stmt, len);
 	slen += len;
@@ -802,8 +806,8 @@ append_statement(CMDARG *alist, char *stmt)
 	}
 
 	if (stmt == end_EVAL)
-		erealloc(alist->a_string, char *, slen + 2, "append_statement");
-	return alist;
+		erealloc(stmt_list->a_string, char *, slen + 1, "append_statement");
+	return stmt_list;
 
 #undef EVALSIZE
 }
@@ -813,89 +817,93 @@ append_statement(CMDARG *alist, char *stmt)
 
 struct cmdtoken cmdtab[] = {
 { "backtrace", "bt", D_backtrace, D_BACKTRACE, do_backtrace,
-	gettext_noop("backtrace [N] - print trace of all or N innermost (outermost if N < 0) frames.") },
+	gettext_noop("backtrace [N] - print trace of all or N innermost (outermost if N < 0) frames") },
 { "break", "b", D_break, D_BREAK, do_breakpoint,
-	gettext_noop("break [[filename:]N|function] - set breakpoint at the specified location.") },
+	gettext_noop("break [[filename:]N|function] - set breakpoint at the specified location") },
 { "clear", "", D_clear, D_CLEAR, do_clear,
-	gettext_noop("clear [[filename:]N|function] - delete breakpoints previously set.") },
+	gettext_noop("clear [[filename:]N|function] - delete breakpoints previously set") },
 { "commands", "", D_commands, D_COMMANDS, do_commands,
-	gettext_noop("commands [num] - starts a list of commands to be executed at a breakpoint(watchpoint) hit.") },
+	gettext_noop("commands [num] - starts a list of commands to be executed at a breakpoint(watchpoint) hit") },
 { "condition", "", D_condition, D_CONDITION, do_condition,
-	gettext_noop("condition num [expr] - set or clear breakpoint or watchpoint condition.") },
+	gettext_noop("condition num [expr] - set or clear breakpoint or watchpoint condition") },
 { "continue", "c", D_continue, D_CONTINUE, do_continue,
-	gettext_noop("continue [COUNT] - continue program being debugged.") },
+	gettext_noop("continue [COUNT] - continue program being debugged") },
 { "delete", "d", D_delete, D_DELETE, do_delete_breakpoint,
-	gettext_noop("delete [breakpoints] [range] - delete specified breakpoints.") },
+	gettext_noop("delete [breakpoints] [range] - delete specified breakpoints") },
 { "disable", "", D_disable, D_DISABLE, do_disable_breakpoint,
-	gettext_noop("disable [breakpoints] [range] - disable specified breakpoints.") },
+	gettext_noop("disable [breakpoints] [range] - disable specified breakpoints") },
 { "display", "", D_display, D_DISPLAY, do_display,
-	gettext_noop("display [var] - print value of variable each time the program stops.") },
+	gettext_noop("display [var] - print value of variable each time the program stops") },
 { "down", "", D_down, D_DOWN, do_down,
-	gettext_noop("down [N] - move N frames down the stack.") },
+	gettext_noop("down [N] - move N frames down the stack") },
 { "dump", "", D_dump, D_DUMP, do_dump_instructions,
-	gettext_noop("dump [filename] - dump instructions to file or stdout.") },
+	gettext_noop("dump [filename] - dump instructions to file or stdout") },
 { "enable", "e", D_enable, D_ENABLE, do_enable_breakpoint,
-	gettext_noop("enable [once|del] [breakpoints] [range] - enable specified breakpoints.") },
+	gettext_noop("enable [once|del] [breakpoints] [range] - enable specified breakpoints") },
 { "end", "", D_end, D_END, do_commands,
-	gettext_noop("end - end a list of commands or awk statements.") },
+	gettext_noop("end - end a list of commands or awk statements") },
 { "eval", "", D_eval, D_EVAL, do_eval,
-	gettext_noop("eval stmt|[p1, p2, ...] - evaluate awk statement(s).") },
+	gettext_noop("eval stmt|[p1, p2, ...] - evaluate awk statement(s)") },
+{ "exit", "", D_quit, D_QUIT, do_quit,
+	gettext_noop("exit - (same as quit) exit debugger") },
 { "finish", "", D_finish, D_FINISH, do_finish,
-	gettext_noop("finish - execute until selected stack frame returns.") },
+	gettext_noop("finish - execute until selected stack frame returns") },
 { "frame", "f", D_frame, D_FRAME, do_frame,
-	gettext_noop("frame [N] - select and print stack frame number N.") },
+	gettext_noop("frame [N] - select and print stack frame number N") },
 { "help", "h", D_help, D_HELP, do_help,
-	gettext_noop("help [command] - print list of commands or explanation of command.") },
+	gettext_noop("help [command] - print list of commands or explanation of command") },
 { "ignore", "", D_ignore, D_IGNORE, do_ignore_breakpoint,
-	gettext_noop("ignore N COUNT - set ignore-count of breakpoint number N to COUNT.") },
+	gettext_noop("ignore N COUNT - set ignore-count of breakpoint number N to COUNT") },
 { "info", "i", D_info, D_INFO, do_info,
-	gettext_noop("info topic - source|sources|variables|functions|break|frame|args|locals|display|watch.") },
+	gettext_noop("info topic - source|sources|variables|functions|break|frame|args|locals|display|watch") },
 { "list", "l", D_list, D_LIST, do_list,
-	gettext_noop("list [-|+|[filename:]lineno|function|range] - list specified line(s).") },
+	gettext_noop("list [-|+|[filename:]lineno|function|range] - list specified line(s)") },
 { "next", "n", D_next, D_NEXT, do_next,
-	gettext_noop("next [COUNT] - step program, proceeding through subroutine calls.") },
+	gettext_noop("next [COUNT] - step program, proceeding through subroutine calls") },
 { "nexti", "ni", D_nexti, D_NEXTI, do_nexti,
-	gettext_noop("nexti [COUNT] - step one instruction, but proceed through subroutine calls.") },
+	gettext_noop("nexti [COUNT] - step one instruction, but proceed through subroutine calls") },
 { "option", "o", D_option, D_OPTION, do_option,
-	gettext_noop("option [name[=value]] - set or display debugger option(s).") },
+	gettext_noop("option [name[=value]] - set or display debugger option(s)") },
 { "print", "p", D_print, D_PRINT, do_print_var,
-	gettext_noop("print var [var] - print value of a variable or array.") },
+	gettext_noop("print var [var] - print value of a variable or array") },
 { "printf", "", D_printf, D_PRINTF, do_print_f,
-	gettext_noop("printf format, [arg], ... - formatted output.") },
+	gettext_noop("printf format, [arg], ... - formatted output") },
 { "quit", "q", D_quit, D_QUIT, do_quit,
-	gettext_noop("quit - exit debugger.") },
+	gettext_noop("quit - exit debugger") },
 { "return", "", D_return, D_RETURN, do_return,
-	gettext_noop("return [value] - make selected stack frame return to its caller.") },
+	gettext_noop("return [value] - make selected stack frame return to its caller") },
 { "run", "r", D_run, D_RUN, do_run,
-	gettext_noop("run - start or restart executing program.") },
+	gettext_noop("run - start or restart executing program") },
 #ifdef HAVE_LIBREADLINE
 { "save", "", D_save, D_SAVE, do_save,
-	gettext_noop("save filename - save commands from the session to file.") },
+	gettext_noop("save filename - save commands from the session to file") },
 #endif
 { "set", "", D_set, D_SET, do_set_var,
-	gettext_noop("set var = value - assign value to a scalar variable.") },
+	gettext_noop("set var = value - assign value to a scalar variable") },
 { "silent", "", D_silent, D_SILENT, do_commands,
-	gettext_noop("silent - suspends usual message when stopped at a breakpoint/watchpoint.") },
+	gettext_noop("silent - suspends usual message when stopped at a breakpoint/watchpoint") },
 { "source", "", D_source, D_SOURCE, do_source,
-	gettext_noop("source file - execute commands from file.") },
+	gettext_noop("source file - execute commands from file") },
 { "step", "s", D_step, D_STEP, do_step,
-	gettext_noop("step [COUNT] - step program until it reaches a different source line.") },
+	gettext_noop("step [COUNT] - step program until it reaches a different source line") },
 { "stepi", "si", D_stepi, D_STEPI, do_stepi,
-	gettext_noop("stepi [COUNT] - step one instruction exactly.") },
+	gettext_noop("stepi [COUNT] - step one instruction exactly") },
 { "tbreak", "t", D_tbreak, D_TBREAK, do_tmp_breakpoint,
-	gettext_noop("tbreak [[filename:]N|function] - set a temporary breakpoint.") },
+	gettext_noop("tbreak [[filename:]N|function] - set a temporary breakpoint") },
 { "trace", "", D_trace, D_TRACE, do_trace_instruction,
-	gettext_noop("trace on|off - print instruction before executing.") },
+	gettext_noop("trace on|off - print instruction before executing") },
 { "undisplay",	"", D_undisplay, D_UNDISPLAY, do_undisplay,
-	gettext_noop("undisplay [N] - remove variable(s) from automatic display list.") },
+	gettext_noop("undisplay [N] - remove variable(s) from automatic display list") },
 { "until", "u", D_until, D_UNTIL, do_until,
-	gettext_noop("until [[filename:]N|function] - execute until program reaches a different line or line N within current frame.") },
+	gettext_noop("until [[filename:]N|function] - execute until program reaches a different line or line N within current frame") },
 { "unwatch", "", D_unwatch, D_UNWATCH, do_unwatch,
-	gettext_noop("unwatch [N] - remove variable(s) from watch list.") },
+	gettext_noop("unwatch [N] - remove variable(s) from watch list") },
 { "up",	"", D_up, D_UP, do_up,
-	gettext_noop("up [N] - move N frames up the stack.") },
+	gettext_noop("up [N] - move N frames up the stack") },
 { "watch", "w", D_watch, D_WATCH, do_watch,
-	gettext_noop("watch var - set a watchpoint for a variable.") },
+	gettext_noop("watch var - set a watchpoint for a variable") },
+{ "where", "", D_backtrace, D_BACKTRACE, do_backtrace,
+	gettext_noop("where [N] - (same as backtrace) print trace of all or N innermost (outermost if N < 0) frames") },
 { NULL, NULL, D_illegal, 0, (Func_cmd) 0,
 	 NULL },
 };
@@ -915,7 +923,7 @@ struct argtoken argtab[] = {
 	{ "sources", D_info, A_SOURCES },
 	{ "variables", D_info, A_VARIABLES },
 	{ "watch", D_info, A_WATCH },
-	{ NULL, D_illegal, 0 },
+	{ NULL, D_illegal, A_NONE },
 };
 
 
@@ -943,7 +951,7 @@ get_command_name(int ctype)
 			return cmdtab[i].name;
 	}
 	return NULL;
-} 
+}
 
 /* mk_cmdarg --- make an argument for command */
 
@@ -951,14 +959,13 @@ static CMDARG *
 mk_cmdarg(enum argtype type)
 {
 	CMDARG *arg;
-	emalloc(arg, CMDARG *, sizeof(CMDARG), "mk_cmdarg");
-	memset(arg, 0, sizeof(CMDARG));
+	ezalloc(arg, CMDARG *, sizeof(CMDARG), "mk_cmdarg");
 	arg->type = type;
 	return arg;
 }
 
 /* append_cmdarg --- append ARG to the list of arguments for the current command */
- 
+
 static void
 append_cmdarg(CMDARG *arg)
 {
@@ -1011,7 +1018,7 @@ yyerror(const char *mesg, ...)
 	vfprintf(out_fp, mesg, args);
 	fprintf(out_fp, "\n");
 	va_end(args);
-	errcount++;
+	dbg_errcount++;
 	repeat_idx = -1;
 }
 
@@ -1019,27 +1026,31 @@ yyerror(const char *mesg, ...)
 /* yylex --- read a command and turn it into tokens */
 
 static int
+#ifdef USE_EBCDIC
+yylex_ebcdic(void)
+#else
 yylex(void)
+#endif
 {
 	static char *lexptr = NULL;
 	static char *lexend;
 	int c;
 	char *tokstart;
-	size_t toklen; 
+	size_t toklen;
 
 	yylval = (CMDARG *) NULL;
 
-	if (errcount > 0 && lexptr_begin == NULL) {
+	if (dbg_errcount > 0 && lexptr_begin == NULL) {
 		/* fake a new line */
-		errcount = 0;
+		dbg_errcount = 0;
 		return '\n';
 	}
 
 	if (lexptr_begin == NULL) {
 again:
-		lexptr_begin = read_a_line(dPrompt);
+		lexptr_begin = read_a_line(dbg_prompt);
 		if (lexptr_begin == NULL) {	/* EOF or error */
-			if (get_eof_status() == EXIT_FATAL) 
+			if (get_eof_status() == EXIT_FATAL)
 				exit(EXIT_FATAL);
 			if (get_eof_status() == EXIT_FAILURE) {
 				static int seen_eof = 0;
@@ -1047,7 +1058,7 @@ again:
 				/* force a quit, and let do_quit (in debug.c) exit */
 				if (! seen_eof) {
 					if (errno != 0)	{
-						fprintf(stderr, _("can't read command (%s)\n"), strerror(errno));
+						fprintf(stderr, _("cannot read command: %s\n"), strerror(errno));
 						exit_val = EXIT_FAILURE;
 					} /* else
 						exit_val = EXIT_SUCCESS; */
@@ -1061,7 +1072,7 @@ again:
 					return '\n';	/* end command 'quit' */
 			}
 			if (errno != 0)
-				d_error(_("can't read command (%s)"), strerror(errno));
+				d_error(_("cannot read command: %s"), strerror(errno));
 			if (pop_cmd_src() == 0)
 				goto again;
 			exit(EXIT_FATAL);	/* shouldn't happen */
@@ -1071,7 +1082,7 @@ again:
 				&& input_from_tty
 		)
 			history_expand_line(&lexptr_begin);
-	
+
 		lexptr = lexptr_begin;
 		lexend = lexptr + strlen(lexptr);
 		if (*lexptr == '\0'		/* blank line */
@@ -1086,18 +1097,18 @@ again:
 				add_history(h->line);
 #endif
 			cmd_idx = repeat_idx;
-			return cmdtab[cmd_idx].class;	/* repeat last command */
+			return cmdtab[cmd_idx].lex_class;	/* repeat last command */
 		}
 		repeat_idx = -1;
 	}
-	
+
 	c = *lexptr;
 
 	while (c == ' ' || c == '\t')
 		c = *++lexptr;
 
 	if (! input_from_tty && c == '#')
-		return '\n'; 
+		return '\n';
 
 	tokstart = lexptr;
 	if (lexptr >= lexend)
@@ -1111,7 +1122,7 @@ again:
 		}
 
 		while (c != '\0' && c != ' ' && c != '\t') {
-			if (! isalpha(c) && ! in_eval) {
+			if (! is_alpha(c) && ! in_eval) {
 				yyerror(_("invalid character in command"));
 				return '\n';
 			}
@@ -1146,15 +1157,15 @@ again:
 				arg->a_string = estrdup(lexptr_begin, lexend - lexptr_begin);
 				append_cmdarg(arg);
 			}
-			return cmdtab[cmd_idx].class;
+			return cmdtab[cmd_idx].lex_class;
 		} else {
-			yyerror(_("unknown command - \"%.*s\", try help"), toklen, tokstart);
+			yyerror(_("unknown command - `%.*s', try help"), toklen, tokstart);
 			return '\n';
 		}
 	}
 
 	c = *lexptr;
-	
+
 	if (cmdtab[cmd_idx].type == D_option) {
 		if (c == '=')
 			return *lexptr++;
@@ -1164,10 +1175,10 @@ again:
 	if (c == '"') {
 		char *str, *p;
 		int flags = ALREADY_MALLOCED;
-		int esc_seen = FALSE;
+		bool esc_seen = false;
 
 		toklen = lexend - lexptr;
-		emalloc(str, char *, toklen + 2, "yylex");
+		emalloc(str, char *, toklen + 1, "yylex");
 		p = str;
 
 		while ((c = *++lexptr) != '"') {
@@ -1179,7 +1190,7 @@ err:
 			}
 			if (c == '\\') {
 				c = *++lexptr;
-				esc_seen = TRUE;
+				esc_seen = true;
 				if (want_nodeval || c != '"')
 					*p++ = '\\';
 			}
@@ -1192,7 +1203,7 @@ err:
 
 		if (! want_nodeval) {
 			yylval = mk_cmdarg(D_string);
-			yylval->a_string = estrdup(str, p - str);
+			yylval->a_string = str;
 			append_cmdarg(yylval);
 			return D_STRING;
 		} else {	/* awk string */
@@ -1238,22 +1249,37 @@ err:
 		return D_STRING;
 	}
 
-	/* assert(want_nodval == TRUE); */
-
 	/* look for awk number */
 
 	if (isdigit((unsigned char) tokstart[0])) {
-		double d;
+		NODE *r = NULL;
 
 		errno = 0;
-		d = strtod(tokstart, &lexptr);
+#ifdef HAVE_MPFR
+		if (do_mpfr) {
+			int tval;
+			r = mpg_float();
+			tval = mpfr_strtofr(r->mpg_numbr, tokstart, & lexptr, 0, ROUND_MODE);
+			IEEE_FMT(r->mpg_numbr, tval);
+			if (mpfr_integer_p(r->mpg_numbr)) {
+				/* integral value, convert to a GMP type. */
+				NODE *tmp = r;
+				r = mpg_integer();
+				mpfr_get_z(r->mpg_i, tmp->mpg_numbr, MPFR_RNDZ);
+				unref(tmp);
+			}
+		} else
+#endif
+			r = make_number(strtod(tokstart, & lexptr));
+
 		if (errno != 0) {
 			yyerror(strerror(errno));
+			unref(r);
 			errno = 0;
 			return '\n';
 		}
 		yylval = mk_cmdarg(D_node);
-		yylval->a_node = make_number(d);
+		yylval->a_node = r;
 		append_cmdarg(yylval);
 		return D_NODE;
 	}
@@ -1264,12 +1290,12 @@ err:
 			|| c == ',' || c == '=')
 		return *lexptr++;
 
-	if (c != '_' && ! isalpha(c)) {
+	if (! is_letter(c)) {
 		yyerror(_("invalid character"));
 		return '\n';
 	}
 
-	while (isalnum(c) || c == '_')
+	while (is_identchar(c))
 		c = *++lexptr;
 	toklen = lexptr - tokstart;
 
@@ -1279,6 +1305,39 @@ err:
 	append_cmdarg(yylval);
 	return D_VARIABLE;
 }
+
+/* Convert single-character tokens coming out of yylex() from EBCDIC to
+   ASCII values on-the-fly so that the parse tables need not be regenerated
+   for EBCDIC systems.  */
+#ifdef USE_EBCDIC
+static int
+yylex(void)
+{
+	static char etoa_xlate[256];
+	static int do_etoa_init = 1;
+	int tok;
+
+	if (do_etoa_init)
+	{
+		for (tok = 0; tok < 256; tok++)
+			etoa_xlate[tok] = (char) tok;
+#ifdef HAVE___ETOA_L
+		/* IBM helpfully provides this function.  */
+		__etoa_l(etoa_xlate, sizeof(etoa_xlate));
+#else
+# error "An EBCDIC-to-ASCII translation function is needed for this system"
+#endif
+		do_etoa_init = 0;
+	}
+
+	tok = yylex_ebcdic();
+
+	if (tok >= 0 && tok <= 0xFF)
+		tok = etoa_xlate[tok];
+
+	return tok;
+}
+#endif /* USE_EBCDIC */
 
 /* find_argument --- find index in 'argtab' for a command option */
 
@@ -1318,7 +1377,7 @@ concat_args(CMDARG *arg, int count)
 		n = force_string(arg->a_node);
 		return dupnode(n);
 	}
-	
+
 	emalloc(tmp, NODE **, count * sizeof(NODE *), "concat_args");
 	subseplen = SUBSEP_node->var_value->stlen;
 	subsep = SUBSEP_node->var_value->stptr;
@@ -1331,7 +1390,7 @@ concat_args(CMDARG *arg, int count)
 		arg = arg->next;
 	}
 
-	emalloc(str, char *, len + 2, "concat_args");
+	emalloc(str, char *, len + 1, "concat_args");
 	n = tmp[0];
 	memcpy(str, n->stptr, n->stlen);
 	p = str + n->stlen;
@@ -1353,19 +1412,19 @@ concat_args(CMDARG *arg, int count)
 }
 
 /* find_command --- find the index in 'cmdtab' using exact,
- *                  abbreviation or unique partial match 
+ *                  abbreviation or unique partial match
  */
 
 static int
 find_command(const char *token, size_t toklen)
 {
-	char *name, *abrv;
+	const char *name, *abrv;
 	int i, k;
-	int try_exact = TRUE;
+	bool try_exact = true;
 	int abrv_match = -1;
 	int partial_match = -1;
 
-#if 'a' == 0x81 /* it's EBCDIC */
+#ifdef USE_EBCDIC
 	/* make sure all lower case characters in token (sorting
 	 * isn't the solution in this case)
 	 */
@@ -1383,8 +1442,10 @@ find_command(const char *token, size_t toklen)
 				&& strncmp(name, token, toklen) == 0
 		)
 			return i;
-		if (*name > *token)
-			try_exact = FALSE;
+
+		if (*name > *token || i == (k - 1))
+			try_exact = false;
+
 		if (abrv_match < 0) {
 			abrv = cmdtab[i].abbrvn;
 			if (abrv[0] == token[0]) {
@@ -1431,20 +1492,22 @@ do_help(CMDARG *arg, int cmd)
 		i = find_command(name, strlen(name));
 		if (i >= 0) {
 			fprintf(out_fp, "%s\n", cmdtab[i].help_txt);
-			if (STREQ(cmdtab[i].name, "option"))
+			if (strcmp(cmdtab[i].name, "option") == 0)
 				option_help();
 		} else
 			fprintf(out_fp, _("undefined command: %s\n"), name);
 	}
 
-	return FALSE;
+	return false;
 }
 
 
-/* next_word --- find the next word in a line to complete 
+#ifdef HAVE_LIBREADLINE
+
+/* next_word --- find the next word in a line to complete
  *               (word seperation characters are space and tab).
  */
-   
+
 static char *
 next_word(char *p, int len, char **endp)
 {
@@ -1467,8 +1530,6 @@ next_word(char *p, int len, char **endp)
 	return p;
 }
 
-#ifdef HAVE_LIBREADLINE
-
 /* command_completion --- attempt to complete based on the word number in line;
  *    try to complete on command names if this is the first word; for the next
  *    word(s), the type of completion depends on the command name (first word).
@@ -1486,7 +1547,7 @@ command_completion(const char *text, int start, int end)
 	int idx;
 	int len;
 
-	rl_attempted_completion_over = TRUE;	/* no default filename completion please */
+	rl_attempted_completion_over = true;	/* no default filename completion please */
 
 	this_cmd = D_illegal;
 	len = start;
@@ -1524,13 +1585,14 @@ command_completion(const char *text, int start, int end)
 			return NULL;
 		}
 	}
+
 	if (this_cmd == D_print || this_cmd == D_printf)
 		return rl_completion_matches(text, variable_generator);
 	return NULL;
-}	
+}
 
 /* command_generator --- generator function for command completion */
- 
+
 static char *
 command_generator(const char *text, int state)
 {
@@ -1584,7 +1646,7 @@ argument_generator(const char *text, int state)
 {
 	static size_t textlen;
 	static int idx;
-	char *name;
+	const char *name;
 
 	if (! state) {	/* first time */
 		textlen = strlen(text);
@@ -1592,18 +1654,18 @@ argument_generator(const char *text, int state)
 	}
 
 	if (this_cmd == D_help) {
-		while ((name = (char *) cmdtab[idx++].name) != NULL) {
+		while ((name = cmdtab[idx++].name) != NULL) {
 			if (strncmp(name, text, textlen) == 0)
 				return estrdup(name, strlen(name));
 		}
 	} else {
-		while ((name = (char *) argtab[idx].name) != NULL) {
+		while ((name = argtab[idx].name) != NULL) {
 			if (this_cmd != argtab[idx++].cmd)
 				continue;
 			if (strncmp(name, text, textlen) == 0)
 				return estrdup(name, strlen(name));
 		}
-	}		
+	}
 	return NULL;
 }
 
@@ -1614,45 +1676,39 @@ variable_generator(const char *text, int state)
 {
 	static size_t textlen;
 	static int idx = 0;
-	static char **pnames = NULL;
-	static NODE **var_table = NULL;
-	char *name;
-	NODE *hp;
+	static NODE *func = NULL;
+	static NODE **vars = NULL;
+	const char *name;
+	NODE *r;
 
 	if (! state) {	/* first time */
 		textlen = strlen(text);
-		if (var_table != NULL)
-			efree(var_table);
-		var_table = get_varlist();
+		if (vars != NULL)
+			efree(vars);
+		vars = variable_list();
 		idx = 0;
-		pnames = get_parmlist();  /* names of function params in
-		                           * current context; the array
-		                           * is NULL terminated in
-		                           * awkgram.y (func_install).
-		                           */
+		func = get_function();  /* function in current context */
 	}
 
 	/* function params */
-	while (pnames != NULL) {
-		name = pnames[idx];
-		if (name == NULL) {
-			pnames = NULL;	/* don't try to match params again */
+	while (func != NULL) {
+		if (idx >= func->param_cnt) {
+			func = NULL;	/* don't try to match params again */
 			idx = 0;
 			break;
 		}
-		idx++;
+		name = func->fparms[idx++].param;
 		if (strncmp(name, text, textlen) == 0)
 			return estrdup(name, strlen(name));
 	}
 
 	/* globals */
-	while ((hp = var_table[idx]) != NULL) {
-		idx++;
-		if (hp->hvalue->type == Node_func)
-			continue;
-		if (strncmp(hp->hname, text, textlen) == 0)
-			return estrdup(hp->hname, hp->hlength);
+	while ((r = vars[idx++]) != NULL) {
+		name = r->vname;
+		if (strncmp(name, text, textlen) == 0)
+			return estrdup(name, strlen(name));
 	}
+
 	return NULL;
 }
 
@@ -1677,4 +1733,3 @@ history_expand_line(char **line)
 }
 
 #endif
-

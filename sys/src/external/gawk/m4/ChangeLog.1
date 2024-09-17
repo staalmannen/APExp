@@ -1,0 +1,193 @@
+2018-09-16  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* gettext.m4: Upgrade to gettext-0.19.8.1.
+	* iconv.m4: Upgrade to gettext-0.19.8.1.
+	* lib-ld.m4: Upgrade to gettext-0.19.8.1.
+	* lib-link.m4: Upgrade to gettext-0.19.8.1.
+	* lib-prefix.m4: Upgrade to gettext-0.19.8.1.
+	* nls.m4: Upgrade to gettext-0.19.8.1.
+	* po.m4: Upgrade to gettext-0.19.8.1.
+	* progtest.m4: Upgrade to gettext-0.19.8.1.
+
+2018-03-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* extern-inline.m4, intl.m4: Updated.
+
+2018-02-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.2.1: Release tar ball made.
+
+2017-10-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.2.0: Release tar ball made.
+
+2017-08-21         Daniel Richard G.     <skunk@iSKUNK.ORG>
+
+	* arch.m4: Improvements and enable compiling with unlocked stdio.
+
+2016-08-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.4: Release tar ball made.
+
+2016-02-22  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* gettext.m4: Upgrade to gettext-0.19.7.
+	* lib-ld.m4: Upgrade to gettext-0.19.7.
+	* lib-link.m4: Upgrade to gettext-0.19.7.
+	* lib-prefix.m4: Upgrade to gettext-0.19.7.
+	* nls.m4: Upgrade to gettext-0.19.7.
+	* po.m4: Upgrade to gettext-0.19.7.
+	* progtest.m4: Upgrade to gettext-0.19.7.
+
+2016-01-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* arch.m4 (GAWK_AC_AIX_TWEAK): Remove definition.
+
+2016-01-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* arch.m4 (GAWK_AC_LINUX_ALPHA): Remove definition.
+
+2015-09-11	Daniel Richard G.	<skunk@iSKUNK.ORG>
+
+	* arch.m4: Rework again. In particular, provide a wrapper
+	for CC to work around some issues.
+
+2015-08-28	Daniel Richard G.	<skunk@iSKUNK.ORG>
+
+	* arch.m4: Complete rewrite of AC_ZOS_USS. It no longer
+	deletes awkgram.c and command.c on a z/OS system, as these are
+	now usable in EBCDIC-land without regeneration; it sets some
+	important CFLAGS/CPPFLAGS to enable standard compiler
+	behavior, like giving an error instead of a warning when a
+	header file cannot be found (!); prevents the use of cc(1),
+	which on z/OS does not build gawk correctly; and gives some
+	help to the user if s/he is building with c89(1), which
+	presents some difficulties due to its option syntax.
+
+2015-08-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* codeset.m4, glibc2.m4, glibc21.m4, intdiv0.m4, intl.m4,
+	intlmacosx.m4, intmax.m4, inttypes-pri.m4, inttypes_h.m4,
+	lcmessage.m4, lock.m4, longlong.m4, printf-posix.m4,
+	size_max.m4, stdint_h.m4, visibility.m4, wchar_t.m4,
+	wint_t.m4, xsize.m4: Updated via autoreconf -f -i.
+	* extern-inline.m4, fcntl-o.m4, threadlib.m4: Added.
+
+
+2015-06-15         Yuta SATOH            <nigoro@gentoo.gr.jp>
+
+	* readline.m4: Add check for libtermcap on Gentoo/FreeBSD.
+
+2015-05-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.3: Release tar ball made.
+
+2015-04-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.2: Release tar ball made.
+
+2015-04-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* isc-posix.m4: Removed. No longer needed.
+
+2015-01-24  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* iconv.m4: Upgrade to gettext-0.19.4.
+	* po.m4: Upgrade to gettext-0.19.4.
+
+2014-11-19  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* gettext.m4: Upgrade to gettext-0.19.3.
+	* iconv.m4: Upgrade to gettext-0.19.3.
+	* lib-ld.m4: Upgrade to gettext-0.19.3.
+	* lib-link.m4: Upgrade to gettext-0.19.3.
+	* lib-prefix.m4: Upgrade to gettext-0.19.3.
+	* nls.m4: Upgrade to gettext-0.19.3.
+	* po.m4: Upgrade to gettext-0.19.3.
+	* progtest.m4: Upgrade to gettext-0.19.3.
+
+2014-10-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* readline.m4: Enable cross compiling. Thanks to
+	Christer Solskogen <christer.solskogen@gmail.com> for
+	motivating and testing.
+
+2014-04-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.1: Release tar ball made.
+
+2014-03-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* readline.m4: Add manual check for *bsd* OS and add -ltermcap
+	if so.  Hack, slash. Can you say "quick and dirty" boys and girls?
+	I knew you could.
+
+2013-10-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* readline.m4: Add check for NULL return from readline() in
+	call to printf() for results. Thanks to Dagobert Michelsen
+	<dam@opencsw.org> for the report.
+
+2013-08-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* readline.m4: Add additional code to check for history_list()
+	function. Patterned after checks in:
+	http://ftp.samba.org/pub/unpacked/samba_3_current/source4/lib/smbreadline/readline.m4
+	Thanks to Larry Baker (larry.baker@stanfordalumni.org) for the
+	pointer.
+
+2013-05-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.0: Release tar ball made.
+
+2013-01-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* readline.m4: Add cross-compiling action.
+
+2013-01-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* readline.m4 (GAWK_CHECK_READLINE): Renamed from GNUPG_CHECK_READLINE.
+	Test program changed and test changed to try to run the built program
+	since some systems don't notice a link dependency between libreadline
+	and other libs until runtime. Isn't that fun?
+
+2012-12-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.0.2: Release tar ball made.
+
+2012-10-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* po.m4, intl.m4: Fix droppings left over from a git merge.
+
+2012-05-21         Andrew J. Schorr     <aschorr@telemetry-investments.com>
+
+	* libtool.m4, ltoptions.m4, ltsugar.m4, ltversion.m4, lt~obsolete.m4:
+	Remove files related to libtool support.  Libtool usage has been
+	pushed down into the extension directory.
+
+2012-04-01         John Haque      <j.eh@mchsi.com>
+
+	* mpfr.m4: New file.
+
+2012-04-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Update to autoconf 2.69, automake 1.12.
+
+	* codeset.m4, glibc2.m4, glibc21.m4, intdiv0.m4, intl.m4, intldir.m4,
+	intlmacosx.m4, intmax.m4, inttypes-pri.m4, inttypes_h.m4, lcmessage.m4,
+	lock.m4, longlong.m4, printf-posix.m4, size_max.m4, stdint_h.m4,
+	uintmax_t.m4, visibility.m4, wchar_t.m4, wint_t.m4, xsize.m4: Updated.
+
+2012-03-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* noreturn.m4: New file.
+
+2012-03-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.0.1: Release tar ball made.
+
+2011-06-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ChangeLog.0: Rotated ChangeLog into this file.
+	* ChangeLog: Created anew for gawk 4.0.0 and on.
+	* 4.0.0: Release tar ball made.

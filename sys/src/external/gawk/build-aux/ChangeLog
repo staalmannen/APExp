@@ -1,0 +1,176 @@
+2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.0: Release tar ball made.
+
+2023-10-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texinfo.tex: Upated from Texinfo 7.1 distribution.
+
+2023-10-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, config.sub, texinfo.tex: Sync from GNULIB.
+
+2023-08-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, config.sub, depcomp, texinfo.tex: Sync from GNULIB.
+
+2023-05-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.2: Release tar ball made.
+
+2023-04-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texinfo.tex: Sync from GNULIB.
+
+2023-03-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texinfo.tex: Sync from Texinfo.
+
+2023-03-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texinfo.tex: Sync from GNULIB.
+
+2023-02-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ar-lib, compile, config.guess, config.rpath, config.sub,
+	depcomp: Update from GNULIB. Primarily updates to the copyright year.
+	* texinfo.tex: Update from GNULIB. Only change is to remove
+	trailing whitespace.
+
+2023-01-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texinfo.tex: Updated to latest version from ftp.gnu.org.
+
+2022-12-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texinfo.tex: Updated to latest version from GNULIB.
+
+2022-12-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texinfo.tex: Updated from texinfo 7.0.1 distribution.
+
+2022-11-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.1: Release tar ball made.
+
+2022-11-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* depcomp, texinfo.tex: Updated from GNULIB.
+
+2022-10-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, config.sub, texinfo.tex: Updated from GNULIB.
+
+2022-09-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.2.0: Release tar ball made.
+
+2022-09-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texinfo.tex: Updated from GNULIB.
+
+2022-07-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* compile: Updated from GNULIB.
+
+2022-07-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ltmain.sh: Updated to Libtool 2.4.7.
+
+2022-06-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, config.sub: Updated from GNULIB.
+
+2022-04-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ar-lib, compile, config.guess, config.rpath, config.sub,
+	depcomp, texinfo.tex: Updated from GNULIB.
+
+2021-12-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texinfo.tex: Updated from GNULIB.
+
+2021-10-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.1.1: Release tar ball made.
+
+2021-08-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ar-lib, compile, config.sub, depcomp: Updated from GNULIB.
+	
+2021-07-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, config.sub: Updated from GNULIB.
+
+2021-06-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, texinfo.tex: Updated from GNULIB.
+
+2021-05-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, config.sub: Updated from GNULIB.
+
+2021-05-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texinfo.tex: New file. Automake wants it.
+
+2021-03-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.rpath, config.sub: Updated from GNULIB.
+
+2021-01-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, config.sub: Updated from GNULIB.
+
+2021-01-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, config.rpath, config.sub: Updated from GNULIB.
+
+2020-12-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, config.sub: Updated from GNULIB.
+
+2020-12-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, config.sub: Updated from GNULIB.
+
+2020-11-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, config.sub, install-sh: Updated from GNULIB.
+
+2020-10-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess: Updated from GNULIB.
+
+2020-10-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.sub: Updated from GNULIB.
+
+2020-10-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.sub: Updated from GNULIB.
+
+2020-09-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess: Updated from GNULIB.
+
+2020-09-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.sub: Updated from GNULIB.
+
+2020-08-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.guess, config.sub: Updated from GNULIB.
+
+2020-07-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* install-sh: Updated from GNULIB.
+
+2020-07-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ltmain.sh: New file, from extension/build-aux.
+
+2020-07-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ar-lib, compile, config.guess, config.rpath, config.sub,
+	depcomp, install-sh, missing: Moved here from parent directory.

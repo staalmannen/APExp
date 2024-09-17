@@ -2,25 +2,26 @@
  * cmd.h - definitions for command parser
  */
 
-/* 
- * Copyright (C) 2004, 2010, 2011 the Free Software Foundation, Inc.
- * 
+/*
+ * Copyright (C) 2004, 2010, 2011, 2013, 2014, 2017, 2021,
+ * the Free Software Foundation, Inc.
+ *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
- * 
+ *
  * GAWK is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
- * 
+ *
  * GAWK is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
 #ifdef HAVE_LIBREADLINE
@@ -28,8 +29,7 @@
 #include <readline/history.h>
 extern char **command_completion(const char *text, int start, int end);
 extern void initialize_pager(FILE *fp); /* debug.c */
-extern NODE **get_varlist(void);
-extern char **get_parmlist(void);
+extern NODE *get_function(void);
 #else
 #define initialize_pager(x)		/* nothing */
 #define add_history(x)		/* nothing */
@@ -39,14 +39,14 @@ extern int gprintf(FILE *fp, const char *format, ...);
 extern jmp_buf pager_quit_tag;
 extern int pager_quit_tag_valid;
 
-extern int output_is_tty;
+extern bool output_is_tty;
 extern int input_fd;
-extern int input_from_tty;
+extern bool input_from_tty;
 extern FILE *out_fp;
-extern char *dPrompt;
-extern char *commands_Prompt;
-extern char *eval_Prompt;
-extern char *dgawk_Prompt;
+extern const char *dbg_prompt;
+extern const char *commands_prompt;
+extern const char *eval_prompt;
+extern const char *dgawk_prompt;
 
 enum argtype {
 	D_illegal,
@@ -107,10 +107,11 @@ enum argtype {
 	D_range
 };
 
-/* non-number arguments to commands */ 
+/* non-number arguments to commands */
 
 enum nametypeval {
-	A_ARGS = 1,
+	A_NONE = 0,
+	A_ARGS,
 	A_BREAK,
 	A_DEL,
 	A_DISPLAY,
@@ -135,21 +136,21 @@ typedef struct cmd_argument {
 		NODE *nodeval;
 	} value;
 
-#define a_int       value.lval	/* type = D_int or D_range */ 
+#define a_int       value.lval	/* type = D_int or D_range */
 #define a_argument  value.lval	/* type = D_argument */
 #define a_string  value.sval	/* type = D_string, D_array, D_subscript or D_variable */
 #define a_node    value.nodeval /* type = D_node, D_field or D_func */
 
-	int a_count;				/* subscript count for D_subscript and D_array */
+	int a_count;		/* subscript count for D_subscript and D_array */
 } CMDARG;
 
 typedef int (*Func_cmd)(CMDARG *, int);
 
 struct cmdtoken {
 	const char *name;
-	char *abbrvn;	/* abbreviation */
+	const char *abbrvn;	/* abbreviation */
 	enum argtype type;
-	int class;
+	int lex_class;
 	Func_cmd cf_ptr;
 	const char *help_txt;
 };
@@ -169,9 +170,10 @@ extern char *(*read_a_line)(const char *prompt);
 extern char *read_commands_string(const char *prompt);
 extern int in_cmd_src(const char *);
 extern int get_eof_status(void);
-extern void push_cmd_src(int fd, int istty, char * (*readfunc)(const char *), int (*closefunc)(int), int cmd, int eofstatus);
+extern void push_cmd_src(int fd, bool istty, char * (*readfunc)(const char *),
+		int (*closefunc)(int), int cmd, int eofstatus);
 extern int pop_cmd_src(void);
-extern int has_break_or_watch_point(int *pnum, int any);
+extern int has_break_or_watch_point(int *pnum, bool any);
 extern int do_list(CMDARG *arg, int cmd);
 extern int do_info(CMDARG *arg, int cmd);
 extern int do_print_var(CMDARG *arg, int cmd);

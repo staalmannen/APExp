@@ -5,13 +5,14 @@
  * value, and the BSD manual says bcmp() only returns zero/non-zero.
  */
 
-int memcmp (s1, s2, l)
-{
+int
+memcmp (s1, s2, l)
 char *s1, *s2;
 int l;
+{
 	for (; l-- > 0; s1++, s2++) {
 		if (*s1 != *s2)
-			(int) return (*s1 - *s2);
+			return (*s1 - *s2);
 	}
 	return (0);
 }

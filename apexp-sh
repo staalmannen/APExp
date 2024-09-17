@@ -4,6 +4,7 @@
 rfork en
 fn sigterm{}
 HOME=$home
+LD=pcc
 test -d /dev/fd || aux/stub -d /dev/fd && bind /fd /dev/fd
 ./mount-include
 bind -b $cputype/bin/ape /bin

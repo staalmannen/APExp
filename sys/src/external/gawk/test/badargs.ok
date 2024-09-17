@@ -10,23 +10,39 @@ Short options:		GNU long options: (extensions)
 	-c			--traditional
 	-C			--copyright
 	-d[file]		--dump-variables[=file]
+	-D[file]		--debug[=file]
 	-e 'program-text'	--source='program-text'
 	-E file			--exec=file
 	-g			--gen-pot
 	-h			--help
-	-L [fatal]		--lint[=fatal]
-	-n			--non-decimal-data
+	-i includefile		--include=includefile
+	-I			--trace
+	-k			--csv
+	-l library		--load=library
+	-L[fatal|invalid|no-ext]	--lint[=fatal|invalid|no-ext]
+	-M			--bignum
 	-N			--use-lc-numeric
+	-n			--non-decimal-data
+	-o[file]		--pretty-print[=file]
 	-O			--optimize
 	-p[file]		--profile[=file]
 	-P			--posix
 	-r			--re-interval
+	-s			--no-optimize
 	-S			--sandbox
 	-t			--lint-old
 	-V			--version
 
-To report bugs, see node `Bugs' in `gawk.info', which is
-section `Reporting Problems and Bugs' in the printed version.
+To report bugs, use the `gawkbug' program.
+For full instructions, see the node `Bugs' in `gawk.info'
+which is section `Reporting Problems and Bugs' in the
+printed version.  This same information may be found at
+https://www.gnu.org/software/gawk/manual/html_node/Bugs.html.
+PLEASE do NOT try to report bugs by posting in comp.lang.awk,
+or by using a web forum such as Stack Overflow.
+
+Source code for gawk may be obtained from
+https://ftp.gnu.org/gnu/gawk/gawk-5.3.0.tar.gz
 
 gawk is a pattern scanning and processing language.
 By default it reads standard input and writes standard output.

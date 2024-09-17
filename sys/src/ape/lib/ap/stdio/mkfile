@@ -21,6 +21,7 @@ OFILES=\
 	fgets.$O\
 	fileno.$O\
 	fmemopen.$O\
+	fnmatch.$O\
 	getdelim.$O\
 	getline.$O\
 	fopen.$O\

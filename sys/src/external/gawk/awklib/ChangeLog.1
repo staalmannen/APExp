@@ -1,0 +1,103 @@
+2018-12-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (distclean-local): Remove .deps directory.
+
+2018-09-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.in: Regenerated, using Automake 1.16.1.
+
+2018-05-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* extract.awk: Updated after changes.
+
+2018-04-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* .gitignore: Add pwcat.c and grcat.c. Remove igawk. Sort the list.
+
+2018-02-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.2.1: Release tar ball made.
+
+2017-10-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.2.0: Release tar ball made.
+
+2016-08-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.4: Release tar ball made.
+
+2015-08-28	Daniel Richard G.	<skunk@iSKUNK.ORG>
+
+	* Makefile.am: Build pwcat.c and grcat.c with (copied)
+	source in the current directory, so that (1) we can use
+	Automake-generated build rules instead of rolling our own, and
+	(2) Automake doesn't then admonish us to enable subdir-objects
+	due to the source files being in another directory.
+	* Makefile.am: Make the $(srcdir)/stamp-eg rule depend
+	on gawktexi.in instead of the gawk.texi file that is generated
+	from same, so that the build doesn't break if the latter is
+	missing.
+
+2015-06-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* extract.awk: Sync with current version in the doc. Thanks to
+	Antonio Columbo for pointing this out.
+
+2015-05-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.3: Release tar ball made.
+
+2015-04-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.2: Release tar ball made.
+
+2014-11-05         Juergen Kahrs       <juergen.kahrs@googlemail.com>
+
+	* Makefile.am (AWKPROG): Add quotes around the name in case the
+	build dir has spaces in it.
+
+2014-10-17         Andrew J. Schorr     <aschorr@telemetry-investments.com>
+
+	* Makefile.am (stamp-eg): Use explicit ./extract.awk to avoid
+	assumptions about AWKPATH in the environment.
+
+2014-04-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.1: Release tar ball made.
+
+2014-03-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (clean-local): Clean up .dSYM directories for Mac OS X.
+	Thanks to Hermann Piefer for the suggestion.
+
+2013-05-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.1.0: Release tar ball made.
+
+2013-02-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (AWKPROG): Add definition and conditional for
+	cross compiling. Thanks to Juergen Kahrs.
+
+2013-01-08         Andrew J. Schorr     <aschorr@telemetry-investments.com>
+
+	* eg/lib/inplace.awk: Add new file generated from doc/gawk.texi.
+
+2012-12-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.0.2: Release tar ball made.
+
+2012-03-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 4.0.1: Release tar ball made.
+
+2011-06-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): Add ChangeLog.0.
+	* 4.0.0: Remake the tar ball.
+
+2011-06-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ChangeLog.0: Rotated ChangeLog into this file.
+	* ChangeLog: Created anew for gawk 4.0.0 and on.
+	* 4.0.0: Release tar ball made.
