@@ -75,10 +75,10 @@ error (int status, int errnum, const char *message, ...)
 #define _(str) gettext(str)
 
 /* Ensure that iconv_no_i18n does not depend on libintl.  */
-#ifdef NO_I18N
+//#ifdef NO_I18N
 # define xmalloc malloc
 # define xalloc_die abort
-#endif
+//#endif
 
 /* Locale independent test for a decimal digit.
    Argument can be  'char' or 'unsigned char'.  (Whereas the argument of

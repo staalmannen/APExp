@@ -61,7 +61,8 @@ CFLAGS=-c -B -I. -I$GETTEXTSRC/intl -I$GETTEXTSRC/intl/gnulib-lib\
 		-DLOCALEDIR="/sys/lib/ape/locale" -Drpl_open=open -DPIC\
 		-DENABLE_NLS -DENABLE_RELOCATABLE -DENABLE_COSTLY_RELOCATABLE -DPLAN9\
 		-DEXEEXT="" -DDEPENDS_ON_LIBICONV=1 -DDEPENDS_ON_LIBINTL=1\
-		-Dset_relocation_prefix=libintl_set_relocation_prefix
+		-Dset_relocation_prefix=libintl_set_relocation_prefix\
+		-Dcompute_curr_prefix=libintl_compute_curr_prefix
 
 
 %.$O: $GETTEXTSRC/intl/%.c

@@ -15,6 +15,9 @@ OFILES= iconv.$O\
 		xmalloc.$O\
 #srclib/malloc \
 		scratch_buffer_grow.$O\
+		scratch_buffer_grow_preserve.$O\
+		scratch_buffer_dupfree.$O\
+		scratch_buffer_set_array_size.$O\
 #srclib/uniwidth \
 		width.$O
 
