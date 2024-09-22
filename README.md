@@ -11,10 +11,10 @@ death of APE, I would argue that it frees up alternative use cases for it
 when APE stops being an integral part of the base 9front system: NPE
 aims to be as small, neat and native as possible, only aiming to build some
 alien software. In contrast, I aim to make this free APE something bigger, 
-messier (and some would say uglier) with the purpose of an as complete POSIX
+messier (and some would say uglier) with the purpose of an as complete GNU / POSIX
 compatibility as possible. Ideally will any (C and possibly transpiled-to-C) 
 program built for UNIX be a simple configure/make away from being built on 
-9front with APExp.
+Plan9 with APExp.
 
 
 **Fighting the Knights that say NIH**
@@ -58,11 +58,11 @@ Install paths have been modified so that libraries and binaries are installed in
 ***Libraries and headers***
 
 
-- wchar.h/wctype.h provided by the thin "libwtf", integrated in libutf
+- wchar.h/wctype.h provided by the thin "libwtf" [11], integrated in libutf
 - curses.h, term.h, panel.h provided by PDCursesMod (built with wchar)
 - regex.h provided by pcre2 (pcre2posix, version 10.432024-02-16)
-- iconv.h provided by minimal iconv from OpenWrt
-- gettext utilities + libintl provided by gettext-tiny from OpenWrt
+- iconv.h provided by GNU libiconv (version 1.17 )
+- gettext utilities + libintl from GNU (version 0.22.5 )
 - OpenBSD sys/queue.h copied from suckless sbase
 - getopt.h with gnu getopt_long from NetBSD, imported to libbsd
 - strings.h shim pointing to bsd.h
@@ -116,6 +116,8 @@ C transpilers is a fun little proof-of-concept and also opens up for more langua
 [9] https://github.com/lufia/plan9/pulls
 
 [10] https://webbkurs.ei.hv.se/~imjam/pub/kenccbitfield/
+
+[11] https://github.com/staalmannen/libwtf
 
 
 

@@ -32,8 +32,16 @@ OFILES=	array.$O\
 		dfa.$O\
 		getopt.$O\
 		getopt1.$O\
-		regcomp.$O\
-		random.$O
+		localeinfo.$O\
+		regex.$O\
+		random.$O\
+#support/malloc \
+		dynarray_at_failure.$O\
+		dynarray_emplace_enlarge.$O\
+		dynarray_resize.$O\
+		dynarray_resize_clear.$O\
+		dynarray_finalize.$O\
+#		dynarray-skeleton.$O
 
 <$APEXPROOT/sys/src/cmd/mkone
 
@@ -41,8 +49,9 @@ GAWKSRC=../../../external/gawk
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I. -I$GAWKSRC -I$GAWKSRC/support -DGAWK \
-		-DHAVE_CONFIG_H -DGETGROUPS_NOT_STANDARD
+CFLAGS=-c -B -I. -I$GAWKSRC -I$GAWKSRC/support -DGAWK \
+		-DHAVE_CONFIG_H -DGETGROUPS_NOT_STANDARD\
+		-DLOCALEDIR="/sys/lib/ape/locale" 
 
 %.$O: $GAWKSRC/%.c
 	$CC $CFLAGS $GAWKSRC/$stem.c
@@ -50,15 +59,19 @@ CFLAGS=-c -I. -I$GAWKSRC -I$GAWKSRC/support -DGAWK \
 %.$O: $GAWKSRC/support/%.c
 	$CC $CFLAGS $GAWKSRC/support/$stem.c
 
+%.$O: $GAWKSRC/support/malloc/%.c
+	$CC $CFLAGS $GAWKSRC/support/malloc/$stem.c
+
 
 install:V:
+	cp $BIN/gawk $BIN/awk
 	mkdir -p $APEXPROOT/sys/lib/ape/awk
 	cp $GAWKSRC/awklib/eg/lib/*.awk $APEXPROOT/sys/lib/ape/awk/
 	cp $GAWKSRC/awklib/eg/prog/igawk.sh $APEXPROOT/rc/bin/ape/igawk
 	chmod +x $APEXPROOT/rc/bin/ape/igawk
 	cp $GAWKSRC/doc/gawk.1 $APEXPROOT/sys/man/1/gawk
 	cp $GAWKSRC/doc/igawk.1 $APEXPROOT/sys/man/1/igawk
-	cp $BIN/gawk $BIN/awk
+
 
 nuke:V:
 	rm -rf $APEXPROOT/sys/lib/ape/awk

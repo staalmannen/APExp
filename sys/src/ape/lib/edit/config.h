@@ -3,7 +3,6 @@
 
 #include "../../../../include/ape/config.h"
 
-#define EILSEQ ENOTSOCK
 #define NBBY CHAR_BIT
 
 /* Define to 1 if 'fork' works. */

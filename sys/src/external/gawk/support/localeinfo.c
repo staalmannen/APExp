@@ -87,7 +87,7 @@ using_simple_locale (bool multibyte)
      where the native order is the collating-sequence order but there
      are multi-character collating elements.  */
   for (int i = 0; i < UCHAR_MAX; i++)
-    if (0 <= strcoll (((char []) {i, 0}), ((char []) {i + 1, 0})))
+    if (0 <= strcoll (((const char *) (i)), ((const char *) (i + 1))))
       return false;
 
   return true;

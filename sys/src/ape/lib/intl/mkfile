@@ -4,18 +4,69 @@ APE=$APEXPROOT/sys/src/ape
 
 LIB=$APEXPROOT/$objtype/lib/ape/libintl.a
 
-OFILES= libintl.$O
+OFILES= \
+# intl \
+		bindtextdom.$O\
+  		dcgettext.$O\
+  		dgettext.$O\
+  		gettext.$O\
+  		finddomain.$O\
+  		hash-string.$O\
+  		loadmsgcat.$O\
+  		localealias.$O\
+  		textdomain.$O\
+  		l10nflist.$O\
+  		explodename.$O\
+  		dcigettext.$O\
+  		dcngettext.$O\
+  		dngettext.$O\
+  		ngettext.$O\
+  		plural.$O\
+  		plural-exp.$O\
+  		langprefs.$O\
+  		log.$O\
+  		printf.$O\
+  		setlocale.$O\
+  		version.$O\
+  		osdep.$O\
+  		intl-compat.$O\
+# intl/gnulib-lib \
+		tsearch.$O \
+		localename.$O\
+		localename-unsafe.$O\
+		localename-table.$O\
+		printf-parse.$O\
+		printf-args.$O\
+		printf-frexp.$O\
+		printf-frexpl.$O\
+		relocatable.$O\
+		progreloc.$O\
+		setlocale_null.$O\
+		setlocale_null-unlocked.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-GETTEXTSRC=../../../external/gettext-tiny
+GETTEXTSRC=../../../external/gettext/gettext-runtime
 
-CFLAGS=-c -I$GETTEXTSRC -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_BSD_EXTENSION
+CFLAGS=-c -B -I. -I$GETTEXTSRC/intl -I$GETTEXTSRC/intl/gnulib-lib\
+		-DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION\
+		-DLOCALE_ALIAS_PATH="/sys/lib/ape/locale.alias"\
+		-DLOCALEDIR="/sys/lib/ape/locale" -Drpl_open=open -DPIC\
+		-DENABLE_NLS -DENABLE_RELOCATABLE -DENABLE_COSTLY_RELOCATABLE -DPLAN9\
+		-DEXEEXT="" -DDEPENDS_ON_LIBICONV=1 -DDEPENDS_ON_LIBINTL=1\
+		-Dset_relocation_prefix=libintl_set_relocation_prefix
+
+%.$O: $GETTEXTSRC/intl/%.c
+	$CC $CFLAGS $GETTEXTSRC/intl/$stem.c
+
+%.$O: $GETTEXTSRC/intl/gnulib-lib//%.c
+	$CC $CFLAGS $GETTEXTSRC/intl/gnulib-lib/$stem.c
+
 
 install:V:
-#	cp $GETTEXTSRC/include/libintl.h $APEXPROOT/sys/include/ape/
+	mkdir -p $APEXPROOT/sys/lib/ape/locale
+	cp $GETTEXTSRC/intl/locale.alias $APEXPROOT/sys/lib/ape/
 
-%.$O: $GETTEXTSRC/libintl/%.c
-	$CC $CFLAGS $GETTEXTSRC/libintl/$stem.c
+
 
 

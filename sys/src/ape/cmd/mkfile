@@ -12,6 +12,7 @@ DIRS=\
 	diff\
 	expr\
 #	gettext\
+	iconv\
 #	m4\
 	make\
 	patch\

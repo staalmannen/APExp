@@ -1,0 +1,7 @@
+     ../gnulib-lib/closeout.c \
+     ../gnulib-lib/error.c \
+     ../gnulib-lib/getopt.c \
+     ../gnulib-lib/xalloc-die.c \
+     ../src/envsubst.c \
+     ../src/gettext.c \
+     ../src/ngettext.c

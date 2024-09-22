@@ -1,79 +1,253 @@
-#
-# Copyright (C) 2010-2012 OpenWrt.org
-#
-# This Makefile and the code shipped in src/ is free software, licensed
-# under the GNU Lesser General Public License, version 2.1 and later.
-# See src/COPYING for more information.
-#
-# Refer to src/COPYRIGHT for copyright statements on the source files.
-#
+# Makefile for libiconv
 
-include $(TOPDIR)/rules.mk
+#### Start of system configuration section. ####
 
-PKG_NAME:=libiconv
-PKG_RELEASE:=8
+# Directories used by "make":
+srcdir = .
 
-PKG_LICENSE:=LGPL-2.1
-PKG_LICENSE_FILES:=LICENSE
+# Directories used by "make install":
+prefix = /usr/local
+local_prefix = /usr/local
+exec_prefix = ${prefix}
+datarootdir = ${prefix}/share
+datadir = ${datarootdir}
+libdir = ${exec_prefix}/lib
+includedir = ${prefix}/include
+mandir = ${datarootdir}/man
 
-PKG_MAINTAINER:=Jo-Philipp Wich <jo@mein.io>
+# Programs used by "make":
+RM = rm -f
 
-include $(INCLUDE_DIR)/package.mk
-include $(INCLUDE_DIR)/host-build.mk
 
-define Package/libiconv
-  SECTION:=libs
-  CATEGORY:=Libraries
-  TITLE:=Tiny drop-in replacement for the GNU Character set conversion library
-endef
+# Programs used by "make install":
+INSTALL = ./build-aux/install-sh -c
+INSTALL_PROGRAM = ${INSTALL}
+INSTALL_DATA = ${INSTALL} -m 644
+mkinstalldirs = $(SHELL) ./build-aux/mkinstalldirs
 
-define Build/Configure
-endef
+#### End of system configuration section. ####
 
-define Build/Compile
-	$(TARGET_CC) $(TARGET_CFLAGS) -c $(PKG_BUILD_DIR)/iconv.c -o $(PKG_BUILD_DIR)/iconv.o -I$(PKG_BUILD_DIR)/include $(FPIC)
-	$(TARGET_CROSS)ar rcs $(PKG_BUILD_DIR)/libiconv.a $(PKG_BUILD_DIR)/iconv.o
-endef
+SHELL = /bin/sh
 
-define Build/InstallDev
-	$(INSTALL_DIR) $(1)/usr/lib/libiconv-stub/lib
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/libiconv.a $(1)/usr/lib/libiconv-stub/lib/
+all : lib/localcharset.h force
+	cd lib && $(MAKE) all
+	cd srclib && $(MAKE) all
+	cd src && $(MAKE) all
+	cd po && $(MAKE) all
+	cd man && $(MAKE) all
+	if test -d tests; then cd tests && $(MAKE) all; fi
 
-	$(INSTALL_DIR) $(1)/usr/lib/libiconv-stub/include
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/include/iconv.h $(1)/usr/lib/libiconv-stub/include/
+lib/localcharset.h :
+	builddir="`pwd`"; cd libcharset && $(MAKE) all && $(MAKE) install-lib libdir="$$builddir/lib" includedir="$$builddir/lib"
 
-	$(INSTALL_DIR) $(1)/usr/share/aclocal
-	$(INSTALL_DATA) $(PKG_BUILD_DIR)/m4/* $(1)/usr/share/aclocal/
-endef
+# Installs the library and include files only. Typically called with only
+# $(libdir) and $(includedir) - don't use $(prefix) and $(exec_prefix) here.
+install-lib : all force
+	cd lib && $(MAKE) install-lib libdir='$(libdir)' includedir='$(includedir)'
+	if [ ! -d $(includedir) ] ; then $(mkinstalldirs) $(includedir) ; fi
+	$(INSTALL_DATA) include/iconv.h.inst $(includedir)/iconv.h
 
-define Package/libiconv/install
-	$(INSTALL_DIR) $(1)/tmp
-	touch $(1)/tmp/.libiconv-placeholder
-endef
+install : lib/localcharset.h force
+	cd libcharset && $(MAKE) install prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	cd lib && $(MAKE) install prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	cd srclib && $(MAKE) install prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	cd src && $(MAKE) install prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	if [ ! -d $(DESTDIR)$(includedir) ] ; then $(mkinstalldirs) $(DESTDIR)$(includedir) ; fi
+	$(INSTALL_DATA) include/iconv.h.inst $(DESTDIR)$(includedir)/iconv.h
+	cd po && $(MAKE) install prefix='$(prefix)' exec_prefix='$(exec_prefix)' datarootdir='$(datarootdir)' datadir='$(datadir)'
+	cd man && $(MAKE) install prefix='$(prefix)' exec_prefix='$(exec_prefix)' datarootdir='$(datarootdir)' datadir='$(datadir)' mandir='$(mandir)'
 
-define Host/Prepare
-	mkdir -p $(HOST_BUILD_DIR)
-endef
+install-strip : lib/localcharset.h force
+	cd libcharset && $(MAKE) install-strip prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	cd lib && $(MAKE) install-strip prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	cd srclib && $(MAKE) install-strip prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	cd src && $(MAKE) install-strip prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	if [ ! -d $(DESTDIR)$(includedir) ] ; then $(mkinstalldirs) $(DESTDIR)$(includedir) ; fi
+	$(INSTALL_DATA) include/iconv.h.inst $(DESTDIR)$(includedir)/iconv.h
+	cd po && $(MAKE) install-strip prefix='$(prefix)' exec_prefix='$(exec_prefix)' datarootdir='$(datarootdir)' datadir='$(datadir)'
+	cd man && $(MAKE) install-strip prefix='$(prefix)' exec_prefix='$(exec_prefix)' datarootdir='$(datarootdir)' datadir='$(datadir)' mandir='$(mandir)'
 
-define Host/Configure
+installdirs : force
+	cd libcharset && $(MAKE) installdirs prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	cd lib && $(MAKE) installdirs prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	cd srclib && $(MAKE) installdirs prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	cd src && $(MAKE) installdirs prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	if [ ! -d $(DESTDIR)$(includedir) ] ; then $(mkinstalldirs) $(DESTDIR)$(includedir) ; fi
+	cd po && $(MAKE) installdirs prefix='$(prefix)' exec_prefix='$(exec_prefix)' datarootdir='$(datarootdir)' datadir='$(datadir)'
+	cd man && $(MAKE) installdirs prefix='$(prefix)' exec_prefix='$(exec_prefix)' datarootdir='$(datarootdir)' datadir='$(datadir)' mandir='$(mandir)'
 
-endef
+uninstall : force
+	cd libcharset && $(MAKE) uninstall prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	cd lib && $(MAKE) uninstall prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	cd srclib && $(MAKE) uninstall prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	cd src && $(MAKE) uninstall prefix='$(prefix)' exec_prefix='$(exec_prefix)' libdir='$(libdir)'
+	$(RM) $(DESTDIR)$(includedir)/iconv.h
+	cd po && $(MAKE) uninstall prefix='$(prefix)' exec_prefix='$(exec_prefix)' datarootdir='$(datarootdir)' datadir='$(datadir)'
+	cd man && $(MAKE) uninstall prefix='$(prefix)' exec_prefix='$(exec_prefix)' datarootdir='$(datarootdir)' datadir='$(datadir)' mandir='$(mandir)'
 
-define Host/Compile
-	$(HOSTCC) -c src/iconv.c -o $(HOST_BUILD_DIR)/iconv.o -Isrc/include -fPIC
-	ar rcs $(HOST_BUILD_DIR)/libiconv.a $(HOST_BUILD_DIR)/iconv.o
-endef
+check : all force
+	cd libcharset && $(MAKE) check
+	cd lib && $(MAKE) check
+	cd srclib && $(MAKE) check
+	cd src && $(MAKE) check
+	cd po && $(MAKE) check
+	cd man && $(MAKE) check
+	if test -d tests; then cd tests && $(MAKE) check; fi
 
-define Host/Install
-	$(INSTALL_DIR) $(STAGING_DIR_HOSTPKG)/lib
-	$(INSTALL_DATA) $(HOST_BUILD_DIR)/libiconv.a $(STAGING_DIR_HOSTPKG)/lib/
+mostlyclean : force
+	cd libcharset && $(MAKE) mostlyclean
+	$(RM) lib/libcharset.* lib/localcharset.h
+	cd lib && $(MAKE) mostlyclean
+	cd srclib && $(MAKE) mostlyclean
+	cd src && $(MAKE) mostlyclean
+	cd po && $(MAKE) mostlyclean
+	cd man && $(MAKE) mostlyclean
+	if test -d tests; then cd tests && $(MAKE) mostlyclean; fi
+	rm -rf bin
 
-	$(INSTALL_DIR) $(STAGING_DIR_HOSTPKG)/include
-	$(INSTALL_DATA) ./src/include/iconv.h $(STAGING_DIR_HOSTPKG)/include/
+clean : force
+	cd libcharset && $(MAKE) clean
+	$(RM) lib/libcharset.* lib/localcharset.h
+	cd lib && $(MAKE) clean
+	cd srclib && $(MAKE) clean
+	cd src && $(MAKE) clean
+	cd po && $(MAKE) clean
+	cd man && $(MAKE) clean
+	if test -d tests; then cd tests && $(MAKE) clean; fi
+	rm -rf bin
 
-	$(INSTALL_DIR) $(STAGING_DIR_HOSTPKG)/share/aclocal
-	$(INSTALL_DATA) ./src/m4/* $(STAGING_DIR_HOSTPKG)/share/aclocal/
-endef
+distclean : force
+	cd libcharset && if test -f Makefile; then $(MAKE) distclean; fi
+	$(RM) lib/libcharset.* lib/localcharset.h
+	cd lib && if test -f Makefile; then $(MAKE) distclean; fi
+	cd srclib && if test -f Makefile; then $(MAKE) distclean; fi
+	cd src && if test -f Makefile; then $(MAKE) distclean; fi
+	cd po && if test -f Makefile; then $(MAKE) distclean; fi
+	cd man && if test -f Makefile; then $(MAKE) distclean; fi
+	if test -d tests; then cd tests && if test -f Makefile; then $(MAKE) distclean; fi; fi
+	$(RM) config.status config.log config.cache Makefile libtool
+	$(RM) config.h stamp-h1 lib/stamp-h2
+	$(RM) include/iconv.h include/iconv.h.inst
+	rm -rf bin
 
-$(eval $(call HostBuild))
-$(eval $(call BuildPackage,libiconv))
+maintainer-clean : force
+	cd libcharset && if test -f Makefile; then $(MAKE) maintainer-clean; fi
+	$(RM) lib/libcharset.* lib/localcharset.h
+	cd lib && if test -f Makefile; then $(MAKE) maintainer-clean; fi
+	cd srclib && if test -f Makefile; then $(MAKE) maintainer-clean; fi
+	cd src && if test -f Makefile; then $(MAKE) maintainer-clean; fi
+	cd po && if test -f Makefile; then $(MAKE) maintainer-clean; fi
+	cd man && if test -f Makefile; then $(MAKE) maintainer-clean; fi
+	if test -d tests; then cd tests && if test -f Makefile; then $(MAKE) maintainer-clean; fi; fi
+	$(RM) config.status config.log config.cache Makefile libtool
+	$(RM) config.h stamp-h1 lib/stamp-h2
+	$(RM) include/iconv.h include/iconv.h.inst
+	rm -rf bin
+
+
+# List of source files.
+SOURCE_FILES = \
+  README DEPENDENCIES INSTALL.windows HACKING AUTHORS NEWS DESIGN NOTES THANKS \
+  ChangeLog Makefile.devel configure.ac Makefile.in \
+  include/export.h include/iconv.h.in \
+  gnulib-local/lib/alloca.in.h \
+  gnulib-local/lib/error.h.diff \
+  gnulib-local/lib/progname.h.diff \
+  gnulib-local/lib/xalloc.h \
+  gnulib-local/lib/xmalloc.c \
+  gnulib-local/lib/xstrdup.c \
+  gnulib-local/m4/alloca.m4 \
+  gnulib-local/modules/libiconv-misc \
+  gnulib-local/modules/mbstate \
+  gnulib-local/modules/xalloc \
+  m4/cp.m4 \
+  m4/eilseq.m4 \
+  m4/general.m4 \
+  m4/ln.m4 \
+  m4/proto.m4 \
+  windows/iconv.rc windows/libiconv.rc windows/windres-options \
+  woe32dll/export.h woe32dll/iconv-exports.c \
+  os2/iconv.def \
+  extras/ChangeLog extras/iconv_string.h extras/iconv_string.c \
+  tools/Makefile \
+  tools/8bit_tab_to_h.c tools/cjk_tab_to_h.c tools/cjk_variants.c \
+  tools/CP50221-0208-EXT.TXT tools/CP50221-0212-EXT.TXT tools/JISX0213.TXT
+# List of distributed files imported from other packages.
+LIBTOOL_IMPORTED_FILES = \
+  build-aux/ltmain.sh \
+  m4/libtool.m4 \
+  m4/lt~obsolete.m4 \
+  m4/ltoptions.m4 \
+  m4/ltsugar.m4 \
+  m4/ltversion.m4
+AUTOMAKE_OLD_IMPORTED_FILES = \
+  build-aux/mkinstalldirs
+AUTOMAKE_IMPORTED_FILES = \
+  build-aux/install-sh \
+  build-aux/missing
+GNULIB_IMPORTED_FILES = \
+  doc/relocatable.texi \
+  build-aux/config.guess \
+  build-aux/config.libpath \
+  build-aux/config.rpath \
+  build-aux/config.sub \
+  build-aux/install-reloc \
+  build-aux/reloc-ldflags
+IMPORTED_FILES = \
+  COPYING COPYING.LIB \
+  ABOUT-NLS INSTALL.generic \
+  build-aux/compile \
+  build-aux/ar-lib \
+  $(LIBTOOL_IMPORTED_FILES) $(AUTOMAKE_OLD_IMPORTED_FILES) $(AUTOMAKE_IMPORTED_FILES) $(GNULIB_IMPORTED_FILES)
+# List of distributed files generated by autotools or Makefile.devel.
+GENERATED_FILES = \
+  aclocal.m4 configure config.h.in \
+  include/iconv.h.build.in
+# List of distributed files generated by "make".
+DISTRIBUTED_BUILT_FILES =
+# List of distributed files.
+DISTFILES = $(SOURCE_FILES) $(IMPORTED_FILES) $(GENERATED_FILES) $(DISTRIBUTED_BUILT_FILES)
+
+distdir : $(DISTFILES)
+	for file in $(DISTFILES); do \
+	  if test -f $$file; then dir='.'; else dir='$(srcdir)'; fi; \
+	  destdir=`echo '$(distdir)'/$$file | sed -e 's|//*[^/]*$$||'`; \
+	  test -d "$$destdir" || $(mkinstalldirs) "$$destdir" >/dev/null; \
+	  cp -p "$$dir/$$file" '$(distdir)'/$$file || exit 1; \
+	done
+	for sdir in srcm4; do \
+	  mkdir -p '$(distdir)'/$$sdir; \
+	  for file in '$(srcdir)'/$$sdir/*.m4; do \
+	    cp -p "$$file" '$(distdir)'/$$sdir/ || exit 1; \
+	  done; \
+	done
+	test -d '$(distdir)'/libcharset || mkdir '$(distdir)'/libcharset; cd libcharset && $(MAKE) distdir distdir='$(distdir)'/libcharset
+	test -d '$(distdir)'/lib || mkdir '$(distdir)'/lib; cd lib && $(MAKE) distdir distdir='$(distdir)'/lib
+	test -d '$(distdir)'/srclib || mkdir '$(distdir)'/srclib; cd srclib && $(MAKE) distdir distdir='$(distdir)'/srclib
+	test -d '$(distdir)'/src || mkdir '$(distdir)'/src; cd src && $(MAKE) distdir distdir='$(distdir)'/src
+	test -d '$(distdir)'/tests || mkdir '$(distdir)'/tests; cd tests && $(MAKE) distdir distdir='$(distdir)'/tests
+	test -d '$(distdir)'/po || mkdir '$(distdir)'/po; cd po && $(MAKE) distdir distdir='$(distdir)'/po
+	test -d '$(distdir)'/man || mkdir '$(distdir)'/man; cd man && $(MAKE) distdir distdir='$(distdir)'/man
+
+
+# Creating a distribution tarball.
+PACKAGE = libiconv
+VERSION = 1.17
+TAR = tar
+GZIP = gzip
+
+dist : force
+	tmpdistdir=$(PACKAGE)-$(VERSION); \
+	abstmpdistdir=`pwd`/$$tmpdistdir; \
+	rm -rf $$tmpdistdir $$tmpdistdir.tar $$tmpdistdir.tar.gz \
+	  && mkdir $$tmpdistdir \
+	  && $(MAKE) distdir distdir="$$abstmpdistdir" \
+	  && $(TAR) chof $$tmpdistdir.tar --owner=root --group=root $$tmpdistdir \
+	  && $(GZIP) -9 $$tmpdistdir.tar \
+	  && rm -rf $$tmpdistdir
+
+
+force :
+
+# Work around an automake-1.8 bug.
+am--refresh:

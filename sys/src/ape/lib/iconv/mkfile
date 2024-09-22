@@ -3,31 +3,49 @@ APEXPROOT=../../../../..
 LIB=$APEXPROOT/$objtype/lib/ape/libiconv.a
 
 OFILES=	\
-# lib\
+# libiconv\
+#		genaliases.$O\
+#		genaliases2.$O\
+#		genflags.$O\
+		gentranslit.$O\
 		iconv.$O\
+		relocatable.$O\
+# libcharset\
+		localcharset.$O\
+		relocatable-stub.$O\
+# srclib\
+#		progreloc.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-ICONVSRC=../../../external/libiconv/src
+ICONVSRC=../../../external/libiconv/
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I$APEXPROOT/sys/include/ape -I. -I$ICONVSRC/lib -DEILSEQ=68 \
-		-D_POSIX_SOURCE -DPLAN9
+DEFS = \
+  -DLIBDIR="/$M/lib/ape" \
+  -DBUILDING_LIBICONV -DBUILDING_LIBCHARSET -DBUILDING_STATIC \
+  -DENABLE_RELOCATABLE=1 -DIN_LIBRARY -DINSTALLDIR="/$M/lib/ape" -DNO_XMALLOC \
+	-Drelocate=libiconv_relocate \
+	-Drelocate2=libiconv_relocate2 \
+	-Dset_relocation_prefix=libiconv_set_relocation_prefix \
+	-DHAVE_CONFIG_H -D_POSIX_SOURCE -DEXEEXT=""
 
-%.$O: $ICONVSRC/%.c
-	$CC $CFLAGS $ICONVSRC/$stem.c
+CFLAGS=-c -B -I. -I$ICONVSRC/lib  -I$ICONVSRC/srclib\
+		-I$ICONVSRC/include -I$ICONVSRC/lib -I$ICONVSRC/srclib $DEFS
+
+%.$O: $ICONVSRC/lib/%.c
+	$CC $CFLAGS $ICONVSRC/lib/$stem.c
+
+%.$O: $ICONVSRC/libcharset/lib/%.c
+	$CC $CFLAGS $ICONVSRC/libcharset/lib/$stem.c
+
+%.$O: $ICONVSRC/srclib/%.c
+	$CC $CFLAGS $ICONVSRC/srclib/$stem.c
 
 install:V:
-#	cp iconv.h $APEXPROOT/sys/include/ape/
-#	cp charmaps.h $APEXPROOT/sys/include/ape/
-#	mkdir -p $APEXPROOT/sys/include/ape/charmaps
-#	dircp $ICONVSRC/include/charmaps $APEXPROOT/sys/include/ape/charmaps
 
 nuke:V:
 	mk clean
-	rm -f $LIB
-	rm $APEXPROOT/sys/include/ape/iconv.h
-	rm $APEXPROOT/sys/include/ape/charmaps.h
-	rm -rf $APEXPROOT/sys/include/ape/charmaps
+	rm $LIB
 

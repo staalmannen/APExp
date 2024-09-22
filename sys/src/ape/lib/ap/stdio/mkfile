@@ -63,6 +63,7 @@ OFILES=\
 	strtod.$O\
 	tmpnam.$O\
 	ungetc.$O\
+	vasprintf.$O\
 	vfprintf.$O\
 	vfscanf.$O\
 	vprintf.$O\

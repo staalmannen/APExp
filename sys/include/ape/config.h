@@ -59,12 +59,28 @@
 
 /* typical config.h stuff stolen from various application-specific generated config.h */
 
+/* Define to 1 if using 'alloca.c'. */
+#define C_ALLOCA 1
+
 /* Define if dup2() preserves the close-on-exec flag (ultrix does this) */
 #define DUP2_BROKEN 1
 
+/* Define as good substitute value for EILSEQ. */
+#define EILSEQ ENOENT
+
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
-#define ENABLE_NLS 0
+#define ENABLE_NLS 1
+
+/* Define this to 1 if F_DUPFD behavior does not match POSIX */
+#define FCNTL_DUPFD_BUGGY 1
+
+/* Define to the type of elements in the array set by `getgroups'. Usually
+   this is either `int' or `gid_t'. */
+#define GETGROUPS_T gid_t
+
+/* Define to 1 if the `getpgrp' function requires zero arguments. */
+#define GETPGRP_VOID 1
 
 /* Define to 1 if you have the `alarm' function. */
 #define HAVE_ALARM 1
@@ -93,9 +109,37 @@
 /* Define to 1 if you have the <curses.h> header file. */
 #define HAVE_CURSES_H 1
 
+/* Define to 1 if you have the declaration of `__argv', and to 0 if you don't.
+   */
+#define HAVE_DECL___ARGV 0
+
 /* Define to 1 if you have the declaration of `__sys_siglist', and to 0 if you
    don't. */
 #define HAVE_DECL___SYS_SIGLIST 0
+
+/* Define if the GNU dcgettext() function is already present or preinstalled.
+   */
+#define HAVE_DCGETTEXT 1
+
+/* Define to 1 if you have the declaration of `clearerr_unlocked', and to 0 if
+   you don't. */
+#define HAVE_DECL_CLEARERR_UNLOCKED 0
+
+/* Define to 1 if you have the declaration of `ecvt', and to 0 if you don't.
+   */
+#define HAVE_DECL_ECVT 0
+
+/* Define to 1 if you have the declaration of `execvpe', and to 0 if you
+   don't. */
+#define HAVE_DECL_EXECVPE 0
+
+/* Define to 1 if you have the declaration of `fcloseall', and to 0 if you
+   don't. */
+#define HAVE_DECL_FCLOSEALL 0
+
+/* Define to 1 if you have the declaration of `fcvt', and to 0 if you don't.
+   */
+#define HAVE_DECL_FCVT 0
 
 /* Define to 1 if you have the declaration of `clearerr_unlocked', and to 0 if
    you don't. */
@@ -133,6 +177,10 @@
    you don't. */
 #define HAVE_DECL_FWRITE_UNLOCKED 0
 
+/* Define to 1 if you have the declaration of `gcvt', and to 0 if you don't.
+   */
+#define HAVE_DECL_GCVT 0
+
 /* Define to 1 if you have the declaration of `getchar_unlocked', and to 0 if
    you don't. */
 #define HAVE_DECL_GETCHAR_UNLOCKED 0
@@ -140,6 +188,10 @@
 /* Define to 1 if you have the declaration of `getc_unlocked', and to 0 if you
    don't. */
 #define HAVE_DECL_GETC_UNLOCKED 0
+
+/* Define to 1 if you have the declaration of `getdtablesize', and to 0 if you
+   don't. */
+#define HAVE_DECL_GETDTABLESIZE 0
 
 /* Define to 1 if you have the declaration of `getdelim', and to 0 if you
    don't. */
@@ -157,6 +209,14 @@
    don't. */
 #define HAVE_DECL_ISBLANK 0
 
+/* Define to 1 if you have the declaration of `program_invocation_name', and
+   to 0 if you don't. */
+#define HAVE_DECL_PROGRAM_INVOCATION_NAME 0
+
+/* Define to 1 if you have the declaration of `program_invocation_short_name',
+   and to 0 if you don't. */
+#define HAVE_DECL_PROGRAM_INVOCATION_SHORT_NAME 0
+
 /* Define to 1 if you have the declaration of `putchar_unlocked', and to 0 if
    you don't. */
 #define HAVE_DECL_PUTCHAR_UNLOCKED 0
@@ -164,6 +224,10 @@
 /* Define to 1 if you have the declaration of `putc_unlocked', and to 0 if you
    don't. */
 #define HAVE_DECL_PUTC_UNLOCKED 0
+
+/* Define to 1 if you have the declaration of `setenv', and to 0 if you don't.
+   */
+#define HAVE_DECL_SETENV 0
 
 /* Define to 1 if you have the declaration of `strerror', and to 0 if you
    don't. */
@@ -184,6 +248,14 @@
 /* Define to 1 if you have the declaration of `tzname', and to 0 if you don't.
    */
 #define HAVE_DECL_TZNAME 1
+
+/* Define to 1 if you have the declaration of `wcsdup', and to 0 if you don't.
+   */
+#define HAVE_DECL_WCSDUP 0
+
+/* Define if the GNU dcgettext() function is already present or preinstalled.
+   */
+#define HAVE_DCGETTEXT 1
 
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
    */
@@ -222,11 +294,17 @@
 /* Define to 1 if you have the `fork' function. */
 #define HAVE_FORK 1
 
+/* Define to 1 if you have the `gai_strerror' function. */
+#define HAVE_GAI_STRERROR 1
+
 /* have getaddrinfo */
 #define HAVE_GETADDRINFO 1
 
 /* Define if you have the getcwd function.  */
 #define HAVE_GETCWD 1
+
+/* Define to 1 if you have the `getdtablesize' function. */
+#define HAVE_GETDTABLESIZE 1
 
 /* Define to 1 if you have the `getgrent' function. */
 #define HAVE_GETGRENT 1
@@ -246,6 +324,9 @@
 /* Define to 1 if getopt variables are declared in header */
 #define HAVE_GETOPT_HEADER 1
 
+/* Define to 1 if you have the `getprogname' function. */
+#define HAVE_GETPROGNAME 1
+
 /* Define to 1 if you have the `gettimeofday' function. */
 #define HAVE_GETTIMEOFDAY 1
 
@@ -264,7 +345,6 @@
 /* pthread library */
 #define HAVE_LIBPTHREAD 1
 
-
 /* Define to 1 if you have the 'curses' library (-lcurses). */
 #define HAVE_LIBCURSES 1
 
@@ -276,6 +356,9 @@
 
 /* Define to 1 if the system has the type `long long'. */
 #define HAVE_LONG_LONG 1
+
+/* Define to 1 if the system has the type 'long long int'. */
+#define HAVE_LONG_LONG_INT 1
 
 /* Define to 1 if you have the <locale.h> header file. */
 #define HAVE_LOCALE_H 1
@@ -360,6 +443,12 @@
 /* Define to 1 if you have the <pthread.h> header file. */
 #define HAVE_PTHREAD_H 1
 
+/* Define to 1 if you have the `raise' function. */
+#define HAVE_RAISE 1
+
+/* Define to 1 if you have the `readlink' function. */
+#define HAVE_READLINK 1
+
 /* Define to 1 if your system has a GNU libc compatible `realloc' function,
    and to 0 otherwise. */
 #define HAVE_REALLOC 1
@@ -394,11 +483,20 @@
 /* Define to 1 if you have the `setlocale' function. */
 #define HAVE_SETLOCALE 1
 
+/* Define to 1 if you have the `setsid' function. */
+#define HAVE_SETSID 1
+
 /* Define to 1 if you have the `setvbuf' function. */
 #define HAVE_SETVBUF 1
 
 /* Define if you have the sigaction function.  */
 #define HAVE_SIGACTION 1
+
+/* Define to 1 if you have the `sigprocmask' function. */
+#define HAVE_SIGPROCMASK 1
+
+/* Define to 1 if the system has the type `sigset_t'. */
+#define HAVE_SIGSET_T 1
 
 /* Define to 1 if you have the `sigsetmask' function. */
 #undef HAVE_SIGSETMASK 
@@ -474,6 +572,9 @@
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
 
+/* Define to 1 if you have the `strncasecmp' function. */
+#define HAVE_STRNCASECMP 1
+
 /* Define to 1 if you have the 'strrchr' function. */
 #define HAVE_STRRCHR 1
 
@@ -495,6 +596,15 @@
 /* Define to 1 if you have the `strtoul' function. */
 #define HAVE_STRTOUL 1
 
+/* Define to 1 if `gr_passwd' is a member of `struct group'. */
+#define HAVE_STRUCT_GROUP_GR_PASSWD 1
+
+/* Define to 1 if `pw_passwd' is a member of `struct passwd'. */
+#define HAVE_STRUCT_PASSWD_PW_PASSWD 1
+
+/* Define to 1 if you have the `symlink' function. */
+#define HAVE_SYMLINK 1
+
 #define HAVE_SYS_ERRLIST 1
 
 /* Define if you have the <sys/file.h> header file.  */
@@ -508,6 +618,9 @@
 
 /* Define if you have the <sys/resource.h> header file.  */
 #define HAVE_SYS_RESOURCE_H 1
+
+/* Define to 1 if you have the <sys/select.h> header file. */
+#define HAVE_SYS_SELECT_H 1
 
 /* Define to 1 if you have the <sys/socket.h> header file. */
 #define HAVE_SYS_SOCKET_H 1
@@ -552,6 +665,9 @@
 /* Define to 1 if you have the `tzset' function. */
 #define HAVE_TZSET 1
 
+/* Define to 1 if the system has the type `uintmax_t'. */
+#define HAVE_UINTMAX_T 1
+
 /* Define if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
@@ -579,6 +695,12 @@
 /* Define to 1 if you have the <wctype.h> header file. */
 #define HAVE_WCTYPE_H 1
 
+/* systems should define this type here */
+#define HAVE_WCTYPE_T 1
+
+/* systems should define this type here */
+#define HAVE_WINT_T 1
+
 /* Define to 1 if you have the `wcrtomb' function. */
 #define HAVE_WCRTOMB 1
 
@@ -587,6 +709,12 @@
 
 /* Define to 1 if `fork' works. */
 #define HAVE_WORKING_FORK 1
+
+/* Define to 1 if O_NOATIME works. */
+#define HAVE_WORKING_O_NOATIME 0
+
+/* Define to 1 if O_NOFOLLOW works. */
+#define HAVE_WORKING_O_NOFOLLOW 0
 
 /* Define to 1 if you have the <zlib.h> header file. */
 #define HAVE_ZLIB_H 1
@@ -639,6 +767,10 @@
 
 
 /* VARIOUS SYSTEM STUFF */
+/* Define to 1 if all of the C90 standard headers exist (not just the ones
+   required in a freestanding environment). This macro is provided for
+   backward compatibility; new code need not use it. */
+#define STDC_HEADERS 1
 
 /* Define to nonzero if you want access control list support. */
 #define USE_ACL 0
@@ -661,14 +793,15 @@
 #define STDC_HEADERS 1
 
 /* The number of bytes in a int.  */
-#define SIZEOF_INT sizeof(int)
-#define SIZEOF_UNSIGNED_INT sizeof(unsigned int)
+#define SIZEOF_INT 4
+#define SIZEOF_UNSIGNED_INT 4
 
 /* The number of bytes in a long.  */
-#define SIZEOF_LONG sizeof(long)
+#define SIZEOF_LONG 4
+#define SIZEOF_UNSIGNED_LONG 4
 
 /* Define to the number of bits in type 'ptrdiff_t'. */
-#define BITSIZEOF_PTRDIFF_T 32
+#define BITSIZEOF_PTRDIFF_T 64
 
 /* Define to the number of bits in type 'sig_atomic_t'. */
 #define BITSIZEOF_SIG_ATOMIC_T 32
@@ -677,10 +810,10 @@
 #define BITSIZEOF_SIZE_T 32
 
 /* Define to the number of bits in type 'wchar_t'. */
-#define BITSIZEOF_WCHAR_T 32
+#define BITSIZEOF_WCHAR_T 16
 
 /* Define to the number of bits in type 'wint_t'. */
-//#define BITSIZEOF_WINT_T 0
+#define BITSIZEOF_WINT_T 32
 
 /* Define on systems for which file names may have a so-called `drive letter'
    prefix, define this to compute the length of that prefix, including the

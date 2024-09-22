@@ -23,6 +23,33 @@ OFILES=\
 	sinh.$O\
 	tan.$O\
 	tanh.$O\
+# musl \
+	copysign.$O\
+	finite.$O\
+	finitef.$O\
+	frexp.$O\
+	frexpf.$O\
+	frexpl.$O\
+	ldexp.$O\
+	ldexpf.$O\
+	ldexpl.$O\
+	modf.$O\
+	modff.$O\
+	modfl.$O\
+	rint.$O\
+	rintf.$O\
+	rintl.$O\
+	scalb.$O\
+	scalbf.$O\
+	scalbln.$O\
+	scalblnf.$O\
+	scalblnl.$O\
+	scalbn.$O\
+	scalbnf.$O\
+	scalbnl.$O\
+	signbit.$O\
+	signbitf.$O\
+	signbitl.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

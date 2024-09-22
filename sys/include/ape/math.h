@@ -6,6 +6,8 @@
 /* the correct value, 1.797693134862316e+308, causes a ken overflow */
 #define HUGE_VAL 1.79769313486231e+308
 
+#define INFINITY HUGE_VAL
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -76,5 +78,66 @@ extern double yn(int, double);
 
 #define isnan(x) isNaN(x)
 #define isinf(x) isInf(x, 0)
+
+/* gnulib compatibility hacks */
+#define isnanl(x) isnan(x)
+#define isnand(x) isnan(x)
+#define isnanf(x) isnan(x)
+
+/* functions imported from musl math */
+
+#define FP_NAN       0
+#define FP_INFINITE  1
+#define FP_ZERO      2
+#define FP_SUBNORMAL 3
+#define FP_NORMAL    4
+
+int __fpclassify(double);
+int __fpclassifyf(float);
+int __fpclassifyl(long double);
+
+static unsigned __FLOAT_BITS(float __f)
+{
+	union {float __f; unsigned __i;} __u;
+	__u.__f = __f;
+	return __u.__i;
+}
+static unsigned long long __DOUBLE_BITS(double __f)
+{
+	union {double __f; unsigned long long __i;} __u;
+	__u.__f = __f;
+	return __u.__i;
+}
+
+#define fpclassify(x) ( \
+	sizeof(x) == sizeof(float) ? __fpclassifyf(x) : \
+	sizeof(x) == sizeof(double) ? __fpclassify(x) : \
+	__fpclassifyl(x) )
+
+int signbit(double);
+int signbitf(float);
+int signbitl(long double);
+double copysign(double, double);
+double frexp(double, int *);
+float frexpf(float, int *);
+long double frexpl(long double, int *);
+float modff(float, float *);
+long double modfl(long double, long double *);
+double scalbln(double, long);
+float scalblnf(float, long);
+long double scalblnl(long double, long);
+double scalbn(double, int);
+float scalbnf(float, int);
+long double scalbnl(long double, int);
+int finite(double);
+int finitef(float);
+double rint(double);
+float rintf(float);
+long double rintl(long double);
+
+#define isfinite(x) ( \
+	sizeof(x) == sizeof(float) ? (__FLOAT_BITS(x) & 0x7fffffff) < 0x7f800000 : \
+	sizeof(x) == sizeof(double) ? (__DOUBLE_BITS(x) & -1ULL>>1) < 0x7ffULL<<52 : \
+	__fpclassifyl(x) > FP_INFINITE)
 
 #endif /* __MATH */

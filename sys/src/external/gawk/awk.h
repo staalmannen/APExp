@@ -1876,7 +1876,7 @@ POP_ARRAY(bool check_for_untyped)
 /* POP_PARAM --- get the top parameter, array or scalar */
 
 static inline NODE *
-POP_PARAM()
+POP_PARAM(void)
 {
 	NODE *t = POP();
 
@@ -1884,9 +1884,8 @@ POP_PARAM()
 }
 
 /* POP_SCALAR --- pop the scalar at the top of the stack */
-
 static inline NODE *
-POP_SCALAR()
+POP_SCALAR(void)
 {
 	NODE *t = POP();
 
@@ -1901,7 +1900,7 @@ POP_SCALAR()
 /* TOP_SCALAR --- get the scalar at the top of the stack */
 
 static inline NODE *
-TOP_SCALAR()
+TOP_SCALAR(void)
 {
 	NODE *t = TOP();
 

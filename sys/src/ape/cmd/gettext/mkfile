@@ -1,41 +1,63 @@
 </$objtype/mkfile
 APEXPROOT=../../../../..
-TARG=	msgfmt\
-		msgmerge
+TARG=	\
+#gettext-runtime \
+      	gettext\
+      	ngettext\
+      	envsubst\
+#gettext-tools \
+      	msgattrib\
+		msgcat\
+		msgcmp\
+		msgcomm\
+		msgconv\
+		msgen\
+		msgexec\
+		msgfilter\
+		msgfmt\
+		msggrep\
+		msginit\
+		msgmerge\
+		msgunfmt\
+		msguniq\
+      	xgettext\
+      	gettextize\
+      	autopoint\
+      	recode-sr-latin
 
-PARSEROBJS =	poparser.$O\
-				StringEscape.$O
-
-LIB=$APEXPROOT/$objtype/lib/ape/libintl.a
+LIB=$APEXPROOT/$objtype/lib/ape/libintl.a $APEXPROOT/$objtype/lib/ape/libiconv.a
 BIN=$APEXPROOT/$objtype/bin/ape
 HFILES=$APEXPROOT/sys/include/ape/libintl.h
 
 <$APEXPROOT/sys/src/cmd/mkmany
 
-GETTEXTSRC=../../../external/gettext-tiny
+GETTEXTSRC=../../../external/gettext
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I$GETTEXTSRC/src -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_BSD_EXTENSION -D_LIMITS_EXTENSION
+CFLAGS=-c -B -DHAVE_CONFIG_H -D_POSIX_SOURCE
+RINCLUDE= -I$GETTEXTSRC/gettext-runtime/src
+TINCLUDE= -I$GETTEXTSRC/gettext-tools
 
-%.$O: $GETTEXTSRC/src/%.c
-	$CC $CFLAGS $GETTEXTSRC/src/$stem.c
+%.$O: $GETTEXTSRC/gettext-runtime/src/%.c
+	$CC $CFLAGS $RINCLUDE $GETTEXTSRC/gettext-runtime/src/$stem.c
 
-$O.msgfmt:V: msgfmt.$O $PARSEROBJS
+%.$O: $GETTEXTSRC/gettext-tools/src/%.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/src/$stem.c
+
+%.$O: $GETTEXTSRC/gettext-runtime/intl/%.c
+	$CC $CFLAGS $RINCLUDE $GETTEXTSRC/gettext-runtime/intl/$stem.c
+
+$O.msgfmt:V: 	msgfmt.$O write-mo.$O write-java.$O write-csharp.$O write-resources.$O\
+				write-tcl.$O write-qt.$O write-desktop.$O write-xml.$O hash-string.$O
 	$LD -o $target $prereq
 
-$O.msgmerge:V: msgfmt.$O $PARSEROBJS
+$O.msgcmp:V: 	msgcmp.$O msg-fsearch.$O
 	$LD -o $target $prereq
+
+$O.msgunfmt:V:	msgunfmt.$O read-mo.$O read-java.$O read-csharp.$O read-resources.$O\
+				read-tcl.$O hash-string.$O
 
 install:V:
-	mk all
-	cp $O.msgfmt $BIN/msgfmt
-	cp $O.msgmerge $BIN/msgmerge
-	cp $GETTEXTSRC/src/xgettext.sh $APEXPROOT/rc/bin/ape/xgettext
-	cat $GETTEXTSRC/src/autopoint.in | sed 's,@datadir@,/sys/lib/ape,' > $APEXPROOT/rc/bin/ape/autopoint
-	chmod +x $APEXPROOT/rc/bin/ape/*
-	mkdir -p $APEXPROOT/sys/lib/ape/m4
-	dircp $GETTEXTSRC/m4 $APEXPROOT/sys/lib/ape/m4
-	mkdir -p $APEXPROOT/sys/lib/ape/data
-	dircp $GETTEXTSRC/data $APEXPROOT/sys/lib/ape/data
+
 

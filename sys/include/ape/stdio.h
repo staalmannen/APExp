@@ -94,6 +94,8 @@ extern int sprintf(char *, const char *, ...);
 extern int snprintf(char *, size_t, const char *, ...);
 extern int vsnprintf(char *, size_t, const char *, va_list);
 extern int sscanf(const char *, const char *, ...);
+extern int vasprintf(char **, const char *, va_list); /* from musl libc */
+//#define vasnprintf(x, size_t, y, z) vasprintf(x, y, z)
 extern int vfprintf(FILE *, const char *, va_list);
 extern int vprintf(const char *, va_list);
 extern int vsprintf(char *, const char *, va_list);
