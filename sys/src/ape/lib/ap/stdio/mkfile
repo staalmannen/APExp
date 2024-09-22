@@ -20,10 +20,7 @@ OFILES=\
 	fgetpos.$O\
 	fgets.$O\
 	fileno.$O\
-	fmemopen.$O\
 	fnmatch.$O\
-	getdelim.$O\
-	getline.$O\
 	fopen.$O\
 	fprintf.$O\
 	fputc.$O\
@@ -63,13 +60,22 @@ OFILES=\
 	strtod.$O\
 	tmpnam.$O\
 	ungetc.$O\
-	vasprintf.$O\
 	vfprintf.$O\
 	vfscanf.$O\
 	vprintf.$O\
 	vsprintf.$O\
 	vsnprintf.$O\
+# musl \
+# gnulib et al \
+	alloca.$O\
+#	asnprintf.$O\
+#	asprintf.$O\
+	fmemopen.$O\
+	getdelim.$O\
+	getline.$O\
+#	vasprintf.$O\
+#	vasnprintf.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -D_POSIX_SOURCE
+CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -D_POSIX_SOURCE -D_BSD_EXTENSION

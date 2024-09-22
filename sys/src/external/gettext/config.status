@@ -427,7 +427,7 @@ ac_pwd='/usr/glenda/APExp/sys/src/external/gettext'
 srcdir='.'
 INSTALL='./build-aux/install-sh -c'
 MKDIR_P='mkdir -p'
-AWK='awk'
+AWK='gawk'
 test -n "$AWK" || AWK=awk
 # The default lists apply if the user does not specify any file.
 ac_need_defaults=:
@@ -617,7 +617,7 @@ S["am__tar"]="${AMTAR} chf - --format=ustar --owner=root --group=root \"$$tardir
 S["AMTAR"]="$${TAR-tar}"
 S["am__leading_dot"]="."
 S["SET_MAKE"]=""
-S["AWK"]="awk"
+S["AWK"]="gawk"
 S["mkdir_p"]="$(MKDIR_P)"
 S["MKDIR_P"]="mkdir -p"
 S["INSTALL_STRIP_PROGRAM"]="$(install_sh) -c -s"

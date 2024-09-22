@@ -51,7 +51,7 @@ CC=pcc
 LD=pcc
 CFLAGS=-c -B -I. -I$GAWKSRC -I$GAWKSRC/support -DGAWK \
 		-DHAVE_CONFIG_H -DGETGROUPS_NOT_STANDARD\
-		-DLOCALEDIR="/sys/lib/ape/locale" 
+		-DLOCALEDIR="/sys/lib/ape/locale"
 
 %.$O: $GAWKSRC/%.c
 	$CC $CFLAGS $GAWKSRC/$stem.c
@@ -70,12 +70,9 @@ install:V:
 	cp $GAWKSRC/awklib/eg/prog/igawk.sh $APEXPROOT/rc/bin/ape/igawk
 	chmod +x $APEXPROOT/rc/bin/ape/igawk
 	cp $GAWKSRC/doc/gawk.1 $APEXPROOT/sys/man/1/gawk
-	cp $GAWKSRC/doc/igawk.1 $APEXPROOT/sys/man/1/igawk
-
 
 nuke:V:
 	rm -rf $APEXPROOT/sys/lib/ape/awk
 	rm -f  $APEXPROOT/rc/bin/ape/igawk
 	rm -f $APEXPROOT/sys/man/1/gawk
-	rm -f $APEXPROOT/sys/man/1/igawk
 

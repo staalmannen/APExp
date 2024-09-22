@@ -81,9 +81,6 @@ extern int fclose(FILE *);
 extern int fflush(FILE *);
 extern FILE *fopen(const char *, const char *);
 extern FILE *freopen(const char *, const char *, FILE *);
-extern FILE *fmemopen(void *, size_t, const char *); /*added from ... */
-extern ssize_t getdelim(char **restrict, size_t *restrict, int, FILE *restrict); /* from gnulib */
-extern ssize_t getline (char **restrict, size_t *restrict, FILE *restrict); /* from gnulib */
 extern void setbuf(FILE *, char *);
 extern int setvbuf(FILE *, char *, int, size_t);
 extern int fprintf(FILE *, const char *, ...);
@@ -94,8 +91,6 @@ extern int sprintf(char *, const char *, ...);
 extern int snprintf(char *, size_t, const char *, ...);
 extern int vsnprintf(char *, size_t, const char *, va_list);
 extern int sscanf(const char *, const char *, ...);
-extern int vasprintf(char **, const char *, va_list); /* from musl libc */
-//#define vasnprintf(x, size_t, y, z) vasprintf(x, y, z)
 extern int vfprintf(FILE *, const char *, va_list);
 extern int vprintf(const char *, va_list);
 extern int vsprintf(char *, const char *, va_list);
@@ -148,6 +143,20 @@ extern char *ctermid_r(char *);
 extern FILE *popen(char *, char *);
 extern int	pclose(FILE *);
 #endif
+
+
+/* from musl libc */
+
+
+/* from gnulib et al */
+// extern int asprintf(char**, const char *, ...);
+// extern char *asnprintf(char *, size_t, const char *, ...);
+extern FILE *fmemopen(void *, size_t, const char *);
+extern ssize_t getdelim(char **restrict, size_t *restrict, int, FILE *restrict);
+extern ssize_t getline (char **restrict, size_t *restrict, FILE *restrict);
+// extern int vasprintf(char **, const char *, va_list); 
+// extern char *vasnprintf(char **, size_t *, char *, va_list);
+
 
 #ifdef __cplusplus
 }

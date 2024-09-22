@@ -42,7 +42,14 @@ OFILES= \
 		relocatable.$O\
 		progreloc.$O\
 		setlocale_null.$O\
-		setlocale_null-unlocked.$O
+		setlocale_null-unlocked.$O\
+		vasnprintf.$O\
+		nl_langinfo.$O\
+		free.$O\
+		frexp.$O\
+		frexpl.$O\
+		signbitl.$O\
+		isnanl.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
@@ -55,6 +62,7 @@ CFLAGS=-c -B -I. -I$GETTEXTSRC/intl -I$GETTEXTSRC/intl/gnulib-lib\
 		-DENABLE_NLS -DENABLE_RELOCATABLE -DENABLE_COSTLY_RELOCATABLE -DPLAN9\
 		-DEXEEXT="" -DDEPENDS_ON_LIBICONV=1 -DDEPENDS_ON_LIBINTL=1\
 		-Dset_relocation_prefix=libintl_set_relocation_prefix
+
 
 %.$O: $GETTEXTSRC/intl/%.c
 	$CC $CFLAGS $GETTEXTSRC/intl/$stem.c

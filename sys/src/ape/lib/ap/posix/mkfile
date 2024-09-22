@@ -15,6 +15,9 @@ OFILES=\
 	sysconf.$O\
 	tzset.$O\
 	nanosleep.$O\
+# gnulib \
+	nl_langinfo.$O\
+	setlocale_null.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

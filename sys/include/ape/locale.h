@@ -39,6 +39,10 @@ extern "C" {
 extern char *setlocale(int, const char *);
 extern struct lconv *localeconv(void);
 
+/* from gnulib */
+#define LC_MESSAGES 1729
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -48,14 +48,8 @@ configure:2214: result: yes
 configure:2375: checking for a race-free mkdir -p
 configure:2418: result: mkdir -p
 configure:2425: checking for gawk
-configure:2461: result: no
-configure:2425: checking for mawk
-configure:2461: result: no
-configure:2425: checking for nawk
-configure:2461: result: no
-configure:2425: checking for awk
-configure:2446: found /bin/awk
-configure:2458: result: awk
+configure:2446: found /bin/gawk
+configure:2458: result: gawk
 configure:2469: checking whether make sets $(MAKE)
 configure:2493: result: yes
 configure:2523: checking whether make supports nested variables
@@ -158,7 +152,7 @@ ac_cv_env_host_alias_value=
 ac_cv_env_target_alias_set=
 ac_cv_env_target_alias_value=
 ac_cv_host=x86_64-unknown-plan9
-ac_cv_prog_AWK=awk
+ac_cv_prog_AWK=gawk
 ac_cv_prog_make_make_set=yes
 am_cv_make_support_nested_variables=yes
 am_cv_prog_tar_ustar=none
@@ -176,7 +170,7 @@ AM_V='$(V)'
 AUTOCONF='${SHELL} '\''/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing'\'' autoconf'
 AUTOHEADER='${SHELL} '\''/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing'\'' autoheader'
 AUTOMAKE='${SHELL} '\''/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing'\'' automake-1.16'
-AWK='awk'
+AWK='gawk'
 CC=''
 CFLAGS=''
 CPP=''
@@ -293,6 +287,7 @@ target_alias=''
 #define HAVE_LANGINFO_H 1
 #define HAVE_SYS_TIME_H 1
 #define HAVE_STDBOOL_H 1
+#define HAVE_FEATURES_H 1
 #define STDC_HEADERS 1
 #define _ALL_SOURCE 1
 #define _DARWIN_C_SOURCE 1
@@ -351,6 +346,7 @@ target_alias=''
 #define WCHAR_T_SUFFIX 
 #define WINT_T_SUFFIX u
 #define HAVE_WCHAR_T 1
+#define HAVE_LC_MESSAGES 1
 #define MALLOC_0_IS_NONNULL 1
 #define PROMOTED_MODE_T int
 #define HAVE_SIGSET_T 1

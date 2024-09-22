@@ -1,4 +1,4 @@
-/* config.h.  Generated from config.h.in by configure. vasnprintf */
+/* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Witness that <config.h> has been included.  */
@@ -191,7 +191,7 @@
 /* #undef HAVE_ALLOCA_H */
 
 /* Define to 1 if you have the 'asprintf' function. */
-/* #undef HAVE_ASPRINTF */
+#define HAVE_ASPRINTF 1
 
 /* Define to 1 if you have the <bp-sym.h> header file. */
 /* #undef HAVE_BP_SYM_H */
@@ -319,7 +319,7 @@
 /* #undef HAVE_FAKE_LOCALES */
 
 /* Define to 1 if you have the <features.h> header file. */
-/* #undef HAVE_FEATURES_H */
+#define HAVE_FEATURES_H 1
 
 /* Define to 1 if you have the `freelocale' function. */
 /* #undef HAVE_FREELOCALE */
@@ -390,10 +390,10 @@
 #define HAVE_LANGINFO_H 1
 
 /* Define if your <locale.h> file defines LC_MESSAGES. */
-/* #undef HAVE_LC_MESSAGES */
+#define HAVE_LC_MESSAGES 1
 
 /* Define if the ldexpl function is available in libc. */
-/* #undef HAVE_LDEXPL_IN_LIBC */
+#define HAVE_LDEXPL_IN_LIBC 1
 
 /* Define if the ldexp function is available in libc. */
 #define HAVE_LDEXP_IN_LIBC 1
@@ -571,7 +571,7 @@
 /* #undef HAVE_USELOCALE */
 
 /* Define to 1 if you have the 'vasnprintf' function. */
-//#define HAVE_VASNPRINTF 1
+/* #undef HAVE_VASNPRINTF */
 
 /* Define to 1 or 0, depending whether the compiler supports simple visibility
    declarations. */

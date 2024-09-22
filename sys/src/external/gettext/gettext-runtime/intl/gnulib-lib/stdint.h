@@ -8,7 +8,7 @@
    published by the Free Software Foundation; either version 2.1 of the
    License, or (at your option) any later version.
 
-   This file is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful, WIDTH
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU Lesser General Public License for more details.
@@ -682,7 +682,7 @@ typedef int _verify_intmax_size[sizeof (intmax_t) == sizeof (uintmax_t)
 /* Macros specified by ISO/IEC TS 18661-1:2014.  */
 
 #if (!defined UINTMAX_WIDTH \
-     && (defined _GNU_SOURCE || defined __STDC_WANT_IEC_60559_BFP_EXT__))
+     && (defined _GNU_SOURCE || defined __STDC_WANT_IEC_60559_BFP_EXT__)) || defined PLAN9
 # ifdef INT8_MAX
 #  define INT8_WIDTH _GL_INTEGER_WIDTH (INT8_MIN, INT8_MAX)
 # endif

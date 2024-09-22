@@ -555,7 +555,7 @@
 #define HAVE_FCNTL 1
 
 /* Define to 1 if you have the <features.h> header file. */
-/* #undef HAVE_FEATURES_H */
+#define HAVE_FEATURES_H 1
 
 /* Define to 1 if you have the `freelocale' function. */
 /* #undef HAVE_FREELOCALE */
@@ -618,7 +618,7 @@
 #define HAVE_LANGINFO_H 1
 
 /* Define if your <locale.h> file defines LC_MESSAGES. */
-/* #undef HAVE_LC_MESSAGES */
+#define HAVE_LC_MESSAGES 1
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
