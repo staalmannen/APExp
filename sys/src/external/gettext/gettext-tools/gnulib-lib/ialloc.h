@@ -120,7 +120,7 @@ ireallocarray (void *p, idx_t n, idx_t s)
       size_t sx = s;
       if (n == 0 || s == 0)
         nx = sx = 1;
-      p = reallocarray (p, nx, sx);
+      p = (void *) reallocarray (p, nx, sx);
 #if defined __CHERI_PURE_CAPABILITY__
       if (p != NULL && (n == 0 || s == 0))
         p = cheri_bounds_set (p, 0);

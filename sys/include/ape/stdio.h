@@ -147,14 +147,15 @@ extern int	pclose(FILE *);
 
 /* from musl libc */
 
+extern int asprintf(char**, const char *, ...);
+extern int vasprintf(char **, const char *, va_list);
 
 /* from gnulib et al */
-// extern int asprintf(char**, const char *, ...);
+
 // extern char *asnprintf(char *, size_t, const char *, ...);
 extern FILE *fmemopen(void *, size_t, const char *);
 extern ssize_t getdelim(char **restrict, size_t *restrict, int, FILE *restrict);
 extern ssize_t getline (char **restrict, size_t *restrict, FILE *restrict);
-// extern int vasprintf(char **, const char *, va_list); 
 // extern char *vasnprintf(char **, size_t *, char *, va_list);
 
 

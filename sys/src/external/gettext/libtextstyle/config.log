@@ -51,14 +51,8 @@ configure:4600: result: yes
 configure:4761: checking for a race-free mkdir -p
 configure:4804: result: mkdir -p
 configure:4811: checking for gawk
-configure:4847: result: no
-configure:4811: checking for mawk
-configure:4847: result: no
-configure:4811: checking for nawk
-configure:4847: result: no
-configure:4811: checking for awk
-configure:4832: found /bin/awk
-configure:4844: result: awk
+configure:4832: found /bin/gawk
+configure:4844: result: gawk
 configure:4855: checking whether make sets $(MAKE)
 configure:4879: result: yes
 configure:4909: checking whether make supports nested variables
@@ -2712,7 +2706,8 @@ configure:6669: $? = 0
 configure:6669: result: yes
 configure:6669: checking for minix/config.h
 configure:6669: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: cha
+<eof> not a function
+<eof> syntax error, last name: u
 configure:6669: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2771,8 +2766,8 @@ configure:6669: $? = 0
 configure:6669: result: yes
 configure:6669: checking for error.h
 configure:6669: cc -c -g  conftest.c >&5
-/sys/include/ape/error.h:4[stdin:1090] not a function
-/sys/include/ape/error.h:4[stdin:1090] syntax error, last name: header
+/sys/include/ape/error.h:4[stdin:1105] not a function
+/sys/include/ape/error.h:4[stdin:1105] syntax error, last name: header
 configure:6669: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2844,7 +2839,7 @@ configure:6669: $? = 0
 configure:6669: result: yes
 configure:6669: checking for threads.h
 configure:6669: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: cons
+<eof> syntax error, last name: extern
 configure:6669: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2908,7 +2903,7 @@ configure:6669: $? = 0
 configure:6669: result: yes
 configure:6669: checking for sys/mman.h
 configure:6669: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: con
+<eof> syntax error, last name: extern
 configure:6669: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2969,7 +2964,7 @@ configure: failed program was:
 configure:6669: result: no
 configure:6669: checking for obstack.h
 configure:6669: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: con
+<eof> syntax error, last name: extern
 configure:6669: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3030,72 +3025,16 @@ configure: failed program was:
 configure:6669: result: no
 configure:6669: checking for features.h
 configure:6669: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: con
-configure:6669: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME ""
-| #define PACKAGE_TARNAME ""
-| #define PACKAGE_VERSION ""
-| #define PACKAGE_STRING ""
-| #define PACKAGE_BUGREPORT ""
-| #define PACKAGE_URL ""
-| #define PACKAGE "libtextstyle"
-| #define VERSION "0.22.5"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_MATH_H 1
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| #include <features.h>
-configure:6669: result: no
+configure:6669: $? = 0
+configure:6669: result: yes
 configure:6669: checking for stdbool.h
 configure:6669: cc -c -g  conftest.c >&5
 configure:6669: $? = 0
 configure:6669: result: yes
 configure:6669: checking for stdckdint.h
 configure:6669: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: co
+<eof> not a function
+<eof> syntax error, last name: exte
 configure:6669: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3123,6 +3062,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | /* end confdefs.h.  */
 | #include <stddef.h>
@@ -3161,7 +3101,8 @@ configure:6669: $? = 0
 configure:6669: result: yes
 configure:6669: checking for crtdefs.h
 configure:6669: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: c
+<eof> not a function
+<eof> syntax error, last name: ext
 configure:6669: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3189,6 +3130,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | /* end confdefs.h.  */
@@ -3243,7 +3185,7 @@ configure:7292: checking for cc option to enable large file support
 configure:7327: cc -c -g  conftest.c >&5
 configure:7327: $? = 0
 configure:7333: cc -DFTYPE=ino_t -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:56[stdin:116] array size must be a positive constant
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:57[stdin:117] array size must be a positive constant
 configure:7333: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3271,6 +3213,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -3312,7 +3255,7 @@ configure: failed program was:
 |   return 0;
 | }
 configure:7338: cc -DFTYPE=ino_t -D_FILE_OFFSET_BITS=64 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:56[stdin:116] array size must be a positive constant
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:57[stdin:117] array size must be a positive constant
 configure:7338: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3340,6 +3283,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -3420,6 +3364,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -3530,6 +3475,7 @@ configure:11573: : '-?'
 configure:11582: result: no
 configure:12317: checking for dlfcn.h
 configure:12317: cc -c -g  conftest.c >&5
+<eof> syntax error, last name: c
 configure:12317: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3557,6 +3503,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -3646,7 +3593,7 @@ configure:17304: checking for size_t
 configure:17304: cc -c -g  conftest.c >&5
 configure:17304: $? = 0
 configure:17304: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:80[stdin:1116] syntax error, last name: size_t
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:81[stdin:1132] syntax error, last name: size_t
 configure:17304: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3674,6 +3621,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -3736,6 +3684,7 @@ configure: failed program was:
 configure:17304: result: yes
 configure:17317: checking for working alloca.h
 configure:17335: cc -o conftest -g   conftest.c  >&5
+alloca: undefined: memory_full in alloca
 configure:17335: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3763,6 +3712,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -3798,7 +3748,7 @@ configure: failed program was:
 configure:17346: result: no
 configure:17354: checking for alloca
 configure:17390: cc -o conftest -g   conftest.c  >&5
-main: undefined: alloca in main
+alloca: undefined: memory_full in alloca
 configure:17390: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3826,6 +3776,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -3906,6 +3857,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -3983,7 +3935,7 @@ configure:17561: checking whether source code line length is unlimited
 configure:17588: result: yes
 configure:17687: checking whether malloc is ptrdiff_t safe
 configure:17724: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:73[stdin:211] syntax error, last name: error
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:74[stdin:212] syntax error, last name: error
 configure:17724: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4011,6 +3963,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -4097,6 +4050,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -4205,6 +4159,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -4302,6 +4257,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -4396,6 +4352,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -4490,6 +4447,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -4592,6 +4550,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -4688,6 +4647,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -4788,6 +4748,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -4885,6 +4846,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -4962,7 +4924,7 @@ configure:18867: checking for EOVERFLOW value
 configure:18928: result: yes
 configure:18944: checking for cc options needed to detect all undeclared functions
 configure:18966: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:65[stdin:66] name not declared: strchr
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:66[stdin:67] name not declared: strchr
 configure:18966: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4990,6 +4952,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -5067,6 +5030,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -5137,8 +5101,8 @@ configure:19157: result: no
 configure:19173: result: no
 configure:19196: checking whether error_at_line is declared
 configure:19196: cc -c -g   conftest.c >&5
-/sys/include/ape/error.h:4[stdin:66] not a function
-/sys/include/ape/error.h:4[stdin:66] syntax error, last name: header
+/sys/include/ape/error.h:4[stdin:67] not a function
+/sys/include/ape/error.h:4[stdin:67] syntax error, last name: header
 configure:19196: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5166,6 +5130,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -5220,7 +5185,7 @@ configure: failed program was:
 configure:19196: result: no
 configure:19349: checking whether strerror_r is declared
 configure:19349: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:96[stdin:1132] name not declared: strerror_r
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:97[stdin:1148] name not declared: strerror_r
 configure:19349: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5248,6 +5213,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -5357,6 +5323,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -5403,7 +5370,7 @@ configure:19448: checking for sig_atomic_t
 configure:19448: cc -c -g  conftest.c >&5
 configure:19448: $? = 0
 configure:19448: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:67[stdin:166] syntax error, last name: sig_atomic_t
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:68[stdin:167] syntax error, last name: sig_atomic_t
 configure:19448: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5431,6 +5398,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -5510,6 +5478,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -5701,7 +5670,7 @@ configure:19663: checking for pid_t
 configure:19663: cc -c -g  conftest.c >&5
 configure:19663: $? = 0
 configure:19663: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:97[stdin:1133] syntax error, last name: pid_t
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:98[stdin:1149] syntax error, last name: pid_t
 configure:19663: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5729,6 +5698,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -5810,7 +5780,7 @@ configure:19701: checking for mode_t
 configure:19701: cc -c -g  conftest.c >&5
 configure:19701: $? = 0
 configure:19701: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:96[stdin:1132] syntax error, last name: mode_t
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:97[stdin:1148] syntax error, last name: mode_t
 configure:19701: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5838,6 +5808,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -5932,7 +5903,7 @@ configure:20550: $? = 0
 configure:20560: result: no
 configure:20654: checking for C/C++ restrict keyword
 configure:20684: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:68[stdin:69] syntax error, last name: ip
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:69[stdin:70] syntax error, last name: ip
 configure:20684: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5960,6 +5931,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -6018,7 +5990,7 @@ configure: failed program was:
 |   return 0;
 | }
 configure:20684: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:68[stdin:69] syntax error, last name: ip
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:69[stdin:70] syntax error, last name: ip
 configure:20684: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6046,6 +6018,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -6104,7 +6077,7 @@ configure: failed program was:
 |   return 0;
 | }
 configure:20684: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:68[stdin:69] syntax error, last name: ip
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:69[stdin:70] syntax error, last name: ip
 configure:20684: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6132,6 +6105,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -6190,7 +6164,7 @@ configure: failed program was:
 |   return 0;
 | }
 configure:20684: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:69[stdin:70] syntax error, last name: restrict
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:70[stdin:71] syntax error, last name: restrict
 configure:20684: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6218,6 +6192,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -6280,7 +6255,7 @@ configure:20803: checking for nlink_t
 configure:20803: cc -c -g  conftest.c >&5
 configure:20803: $? = 0
 configure:20803: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:74[stdin:227] syntax error, last name: nlink_t
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:75[stdin:228] syntax error, last name: nlink_t
 configure:20803: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6308,6 +6283,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -6364,7 +6340,7 @@ configure: failed program was:
 configure:20803: result: yes
 configure:20925: checking whether getdtablesize is declared
 configure:20925: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:103[stdin:1139] name not declared: getdtablesize
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:104[stdin:1155] name not declared: getdtablesize
 configure:20925: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6392,6 +6368,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -6519,10 +6496,10 @@ configure:22495: $? = 0
 configure:22505: result: inline
 configure:22606: checking whether limits.h has WORD_BIT, BOOL_WIDTH etc.
 configure:22633: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:76[stdin:169] name not declared: WORD_BIT
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:77[stdin:170] name not declared: ULLONG_WIDTH
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:78[stdin:171] name not declared: BOOL_WIDTH
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:79[stdin:172] name not declared: BOOL_MAX
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:77[stdin:170] name not declared: WORD_BIT
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:78[stdin:171] name not declared: ULLONG_WIDTH
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:79[stdin:172] name not declared: BOOL_WIDTH
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:80[stdin:173] name not declared: BOOL_MAX
 configure:22633: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6550,6 +6527,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -6624,8 +6602,8 @@ configure:22734: $? = 0
 configure:22744: result: yes
 configure:22757: checking whether the compiler produces multi-arch binaries
 configure:22772: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:73[stdin:74] not a function
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:73[stdin:74] syntax error, last name: a
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:74[stdin:75] not a function
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:74[stdin:75] syntax error, last name: a
 configure:22772: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6653,6 +6631,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -6707,17 +6686,17 @@ configure: failed program was:
 configure:22801: result: no
 configure:22934: checking whether stdint.h conforms to C99
 configure:23114: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:123[stdin:1182] initializer is not a constant: c1
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:126[stdin:1185] initializer is not a constant: c2
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:129[stdin:1188] initializer is not a constant: c3
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:132[stdin:1191] initializer is not a constant: c4
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:135[stdin:1194] initializer is not a constant: d1
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:137[stdin:1196] initializer is not a constant: d2
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:139[stdin:1198] initializer is not a constant: d3
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:141[stdin:1200] initializer is not a constant: d4
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:179[stdin:1330] name not declared: PTRDIFF_MIN
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:180[stdin:1331] name not declared: PTRDIFF_MAX
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:178[stdin:1329] field width must be non-negative constant
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:124[stdin:1194] initializer is not a constant: c1
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:127[stdin:1197] initializer is not a constant: c2
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:130[stdin:1200] initializer is not a constant: c3
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:133[stdin:1203] initializer is not a constant: c4
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:136[stdin:1206] initializer is not a constant: d1
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:138[stdin:1208] initializer is not a constant: d2
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:140[stdin:1210] initializer is not a constant: d3
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:142[stdin:1212] initializer is not a constant: d4
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:180[stdin:1342] name not declared: PTRDIFF_MIN
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:181[stdin:1343] name not declared: PTRDIFF_MAX
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:179[stdin:1341] field width must be non-negative constant
 too many errors
 configure:23114: $? = 1
 configure: failed program was:
@@ -6746,6 +6725,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -6960,7 +6940,7 @@ configure: failed program was:
 configure:23214: result: no
 configure:23324: checking for sys/inttypes.h
 configure:23324: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: cons
+<eof> syntax error, last name: extern
 configure:23324: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6988,6 +6968,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -7068,7 +7049,7 @@ configure: failed program was:
 configure:23324: result: no
 configure:23330: checking for sys/bitypes.h
 configure:23330: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: cons
+<eof> syntax error, last name: extern
 configure:23330: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7096,6 +7077,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -7210,7 +7192,7 @@ configure:23458: $? = 0
 configure:23471: result: yes
 configure:23434: checking whether wchar_t is signed
 configure:23458: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:87[stdin:1136] array size must be a positive constant
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:88[stdin:1148] array size must be a positive constant
 configure:23458: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7238,6 +7220,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -7310,7 +7293,7 @@ configure: failed program was:
 configure:23471: result: no
 configure:23434: checking whether wint_t is signed
 configure:23458: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:87[stdin:1136] array size must be a positive constant
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:88[stdin:1148] array size must be a positive constant
 configure:23458: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7338,6 +7321,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -7410,9 +7394,9 @@ configure: failed program was:
 configure:23471: result: no
 configure:23491: checking for ptrdiff_t integer literal suffix
 configure:23534: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:88[stdin:1137] external redeclaration of: foo
-	EXTERN INT /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:88[stdin:1137]
-	EXTERN VLONG /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:87[stdin:1136]
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:89[stdin:1149] external redeclaration of: foo
+	EXTERN INT /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:89[stdin:1149]
+	EXTERN VLONG /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:88[stdin:1148]
 configure:23534: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7440,6 +7424,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -7511,9 +7496,9 @@ configure: failed program was:
 |   return 0;
 | }
 configure:23534: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:88[stdin:1137] external redeclaration of: foo
-	EXTERN LONG /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:88[stdin:1137]
-	EXTERN VLONG /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:87[stdin:1136]
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:89[stdin:1149] external redeclaration of: foo
+	EXTERN LONG /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:89[stdin:1149]
+	EXTERN VLONG /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:88[stdin:1148]
 configure:23534: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7541,6 +7526,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -7616,9 +7602,9 @@ configure:23534: $? = 0
 configure:23545: result: ll
 configure:23491: checking for size_t integer literal suffix
 configure:23534: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:89[stdin:1138] external redeclaration of: foo
-	EXTERN UINT /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:89[stdin:1138]
-	EXTERN ULONG /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:88[stdin:1137]
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:90[stdin:1150] external redeclaration of: foo
+	EXTERN UINT /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:90[stdin:1150]
+	EXTERN ULONG /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:89[stdin:1149]
 configure:23534: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7646,6 +7632,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -7726,9 +7713,9 @@ configure:23603: $? = 0
 configure:23614: result: 
 configure:23560: checking for wchar_t integer literal suffix
 configure:23603: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:91[stdin:1140] external redeclaration of: foo
-	EXTERN UINT /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:91[stdin:1140]
-	EXTERN USHORT /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:90[stdin:1139]
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:92[stdin:1152] external redeclaration of: foo
+	EXTERN UINT /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:92[stdin:1152]
+	EXTERN USHORT /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:91[stdin:1151]
 configure:23603: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7756,6 +7743,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -7830,9 +7818,9 @@ configure: failed program was:
 |   return 0;
 | }
 configure:23603: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:91[stdin:1140] external redeclaration of: foo
-	EXTERN ULONG /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:91[stdin:1140]
-	EXTERN USHORT /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:90[stdin:1139]
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:92[stdin:1152] external redeclaration of: foo
+	EXTERN ULONG /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:92[stdin:1152]
+	EXTERN USHORT /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:91[stdin:1151]
 configure:23603: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7860,6 +7848,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -7934,9 +7923,9 @@ configure: failed program was:
 |   return 0;
 | }
 configure:23603: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:91[stdin:1140] external redeclaration of: foo
-	EXTERN UVLONG /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:91[stdin:1140]
-	EXTERN USHORT /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:90[stdin:1139]
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:92[stdin:1152] external redeclaration of: foo
+	EXTERN UVLONG /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:92[stdin:1152]
+	EXTERN USHORT /usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:91[stdin:1151]
 configure:23603: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7964,6 +7953,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -8038,8 +8028,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:23603: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:91[stdin:1140] not a function
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:91[stdin:1140] syntax error, last name: foo
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:92[stdin:1152] not a function
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:92[stdin:1152] syntax error, last name: foo
 configure:23603: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8067,6 +8057,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -8147,8 +8138,8 @@ configure:23603: $? = 0
 configure:23614: result: u
 configure:23773: checking whether byte ordering is bigendian
 configure:23789: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:86[stdin:87] not a function
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:86[stdin:87] syntax error, last name: a
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:87[stdin:88] not a function
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:87[stdin:88] syntax error, last name: a
 configure:23789: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8176,6 +8167,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -8241,8 +8233,8 @@ configure: failed program was:
 | 	     typedef int dummy;
 | 
 configure:23835: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/param.h:5[stdin:153] not a function
-/sys/include/ape/sys/param.h:5[stdin:153] syntax error, last name: header
+/sys/include/ape/sys/param.h:5[stdin:154] not a function
+/sys/include/ape/sys/param.h:5[stdin:154] syntax error, last name: header
 configure:23835: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8270,6 +8262,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -8345,7 +8338,7 @@ configure: failed program was:
 |   return 0;
 | }
 configure:23882: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:91[stdin:184] syntax error, last name: endian
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:92[stdin:185] syntax error, last name: endian
 configure:23882: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8373,6 +8366,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -8461,8 +8455,8 @@ configure:24155: $? = 0
 configure:24167: result: yes
 configure:24226: checking whether isnan(float) works
 configure:24316: cc -o conftest -g   conftest.c   >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:113[stdin:195] divide check
-cc: cpp: 6c 4253: error
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:114[stdin:255] divide check
+cc: cpp: 6c 4291: error
 configure:24316: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -8491,6 +8485,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -8644,6 +8639,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -8852,6 +8848,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -8929,8 +8926,8 @@ configure: failed program was:
 configure:25360: result: no
 configure:25389: checking for pthread.h
 configure:25389: cc -c -g  conftest.c >&5
-/sys/include/ape/lock.h:2[stdin:1407] not a function
-/sys/include/ape/lock.h:2[stdin:1407] syntax error, last name: header
+/sys/include/ape/lock.h:2[stdin:1423] not a function
+/sys/include/ape/lock.h:2[stdin:1423] syntax error, last name: header
 configure:25389: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8958,6 +8955,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -9083,6 +9081,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -9186,6 +9185,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -9300,6 +9300,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -9410,7 +9411,7 @@ configure:26890: $? = 0
 configure:26900: result: yes
 configure:26979: checking for nl_langinfo and CODESET
 configure:26996: cc -o conftest -g   conftest.c  >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:97[stdin:1362] incompatible types: "IND CHAR" and "INT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:98[stdin:457] incompatible types: "IND CHAR" and "INT" for op "AS"
 configure:26996: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9438,6 +9439,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -9556,6 +9558,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -9663,7 +9666,7 @@ configure:28087: $? = 0
 configure:28102: result: yes
 configure:28291: checking whether <limits.h> defines MIN and MAX
 configure:28309: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:94[stdin:187] initializer is not a constant: x
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:95[stdin:188] initializer is not a constant: x
 configure:28309: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9691,6 +9694,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -9770,8 +9774,8 @@ configure: failed program was:
 configure:28319: result: no
 configure:28332: checking whether <sys/param.h> defines MIN and MAX
 configure:28350: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/param.h:5[stdin:99] not a function
-/sys/include/ape/sys/param.h:5[stdin:99] syntax error, last name: header
+/sys/include/ape/sys/param.h:5[stdin:100] not a function
+/sys/include/ape/sys/param.h:5[stdin:100] syntax error, last name: header
 configure:28350: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9799,6 +9803,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -9878,8 +9883,8 @@ configure: failed program was:
 configure:28360: result: no
 configure:28376: checking for O_CLOEXEC
 configure:28397: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:95[stdin:217] not a function
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:95[stdin:217] syntax error, last name: me
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:96[stdin:218] not a function
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:96[stdin:218] syntax error, last name: me
 configure:28397: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9907,6 +9912,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -9995,7 +10001,7 @@ configure:28464: checking for sigset_t
 configure:28464: cc -c -g  conftest.c >&5
 configure:28464: $? = 0
 configure:28464: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:103[stdin:263] syntax error, last name: sigset_t
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:104[stdin:264] syntax error, last name: sigset_t
 configure:28464: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -10023,6 +10029,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -10114,7 +10121,7 @@ configure:28588: checking for uid_t
 configure:28588: cc -c -g  conftest.c >&5
 configure:28588: $? = 0
 configure:28588: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:126[stdin:1162] syntax error, last name: uid_t
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:127[stdin:1178] syntax error, last name: uid_t
 configure:28588: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -10142,6 +10149,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -10252,7 +10260,7 @@ configure:28599: checking for gid_t
 configure:28599: cc -c -g  conftest.c >&5
 configure:28599: $? = 0
 configure:28599: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:126[stdin:1162] syntax error, last name: gid_t
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:127[stdin:1178] syntax error, last name: gid_t
 configure:28599: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -10280,6 +10288,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -10390,7 +10399,7 @@ configure:28691: checking for volatile sig_atomic_t
 configure:28691: cc -c -g  conftest.c >&5
 configure:28691: $? = 0
 configure:28691: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:102[stdin:201] syntax error, last name: sig_atomic_t
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:103[stdin:202] syntax error, last name: sig_atomic_t
 configure:28691: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -10418,6 +10427,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -10502,7 +10512,7 @@ configure: failed program was:
 configure:28691: result: yes
 configure:28709: checking for sighandler_t
 configure:28709: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:102[stdin:201] name not declared: sighandler_t
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:103[stdin:202] name not declared: sighandler_t
 configure:28709: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -10530,6 +10540,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -10650,6 +10661,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -10776,6 +10788,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -10918,6 +10931,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -11054,7 +11068,7 @@ configure:29603: checking whether printf supports infinite 'double' arguments
 configure:29735: cc -o conftest -g   conftest.c  >&5
 configure:29735: $? = 0
 configure:29735: ./conftest
-conftest 5012: suicide: sys: fp: division by zero fppc=0x20012e status=0x4 pc=0x20012e
+conftest 5050: suicide: sys: fp: division by zero fppc=0x20012e status=0x4 pc=0x20012e
 configure:29735: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -11083,6 +11097,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -11227,7 +11242,7 @@ configure:29765: checking whether printf supports infinite 'long double' argumen
 configure:30088: cc -o conftest -g   conftest.c  >&5
 configure:30088: $? = 0
 configure:30088: ./conftest
-conftest 5034: suicide: sys: fp: division by zero fppc=0x20012d status=0x4 pc=0x20012d
+conftest 5072: suicide: sys: fp: division by zero fppc=0x20012d status=0x4 pc=0x20012d
 configure:30088: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -11256,6 +11271,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -11591,7 +11607,7 @@ configure:30113: checking whether printf supports the 'a' and 'A' directives
 configure:30218: cc -o conftest -g   conftest.c  >&5
 configure:30218: $? = 0
 configure:30218: ./conftest
-conftest 5055: suicide: sys: fp: division by zero fppc=0x200240 status=0x4 pc=0x200240
+conftest 5093: suicide: sys: fp: division by zero fppc=0x200240 status=0x4 pc=0x200240
 configure:30218: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -11620,6 +11636,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -11782,6 +11799,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -11872,7 +11890,7 @@ configure:30319: checking whether printf supports the 'F' directive
 configure:30398: cc -o conftest -g   conftest.c  >&5
 configure:30398: $? = 0
 configure:30398: ./conftest
-conftest 5097: suicide: sys: fp: division by zero fppc=0x2000b0 status=0x4 pc=0x2000b0
+conftest 5135: suicide: sys: fp: division by zero fppc=0x2000b0 status=0x4 pc=0x2000b0
 configure:30398: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -11901,6 +11919,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -12033,6 +12052,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -12189,6 +12209,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -12284,7 +12305,7 @@ configure:30785: checking whether printf supports the zero flag correctly
 configure:30827: cc -o conftest -g   conftest.c  >&5
 configure:30827: $? = 0
 configure:30827: ./conftest
-conftest 5214: suicide: sys: fp: division by zero fppc=0x200044 status=0x4 pc=0x200044
+conftest 5252: suicide: sys: fp: division by zero fppc=0x200044 status=0x4 pc=0x200044
 configure:30827: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -12313,6 +12334,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -12414,9 +12436,9 @@ configure:30948: $? = 0
 configure:30963: result: yes
 configure:30969: checking whether printf survives out-of-memory conditions
 configure:31142: cc -o conftest -g   conftest.c  >&5
-/sys/include/ape/sys/resource.h:5[stdin:916] not a function
-/sys/include/ape/sys/resource.h:5[stdin:916] syntax error, last name: header
-cc: cpp: 6c 5264: error
+/sys/include/ape/sys/resource.h:5[stdin:928] not a function
+/sys/include/ape/sys/resource.h:5[stdin:928] syntax error, last name: header
+cc: cpp: 6c 5302: error
 configure:31145: $? = 1
 configure:31197: result: guessing no
 configure:31203: checking whether snprintf truncates the result as in C99
@@ -12479,6 +12501,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -12622,6 +12645,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -12733,7 +12757,7 @@ configure: failed program was:
 configure:31776: result: no
 configure:31783: checking whether _snprintf is declared
 configure:31783: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:112[stdin:360] name not declared: _snprintf
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:113[stdin:372] name not declared: _snprintf
 configure:31783: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -12761,6 +12785,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -12865,8 +12890,8 @@ configure:31984: $? = 0
 configure:32071: result: none needed
 configure:32112: checking for good max_align_t
 configure:32149: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:115[stdin:150] name not declared: max_align_t
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:120[stdin:155] syntax error, last name: max_align_t
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:116[stdin:151] name not declared: max_align_t
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:121[stdin:156] syntax error, last name: max_align_t
 configure:32149: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -12894,6 +12919,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -13038,6 +13064,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -13132,7 +13159,7 @@ configure: failed program was:
 configure:32239: result: no
 configure:32323: checking whether fcloseall is declared
 configure:32323: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:142[stdin:1178] name not declared: fcloseall
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:143[stdin:1194] name not declared: fcloseall
 configure:32323: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -13160,6 +13187,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -13286,7 +13314,7 @@ configure: failed program was:
 configure:32323: result: no
 configure:32333: checking whether getw is declared
 configure:32333: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:143[stdin:1179] name not declared: getw
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:144[stdin:1195] name not declared: getw
 configure:32333: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -13314,6 +13342,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -13441,7 +13470,7 @@ configure: failed program was:
 configure:32333: result: no
 configure:32343: checking whether putw is declared
 configure:32343: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:144[stdin:1180] name not declared: putw
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:145[stdin:1196] name not declared: putw
 configure:32343: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -13469,6 +13498,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -13601,7 +13631,7 @@ configure:32457: $? = 0
 configure:32467: result: system
 configure:32503: checking whether ecvt is declared
 configure:32503: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:145[stdin:1181] name not declared: ecvt
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:146[stdin:1197] name not declared: ecvt
 configure:32503: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -13629,6 +13659,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -13758,7 +13789,7 @@ configure: failed program was:
 configure:32503: result: no
 configure:32513: checking whether fcvt is declared
 configure:32513: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:146[stdin:1182] name not declared: fcvt
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:147[stdin:1198] name not declared: fcvt
 configure:32513: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -13786,6 +13817,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -13916,7 +13948,7 @@ configure: failed program was:
 configure:32513: result: no
 configure:32523: checking whether gcvt is declared
 configure:32523: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:147[stdin:1183] name not declared: gcvt
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:148[stdin:1199] name not declared: gcvt
 configure:32523: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -13944,6 +13976,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -14083,8 +14116,8 @@ configure:32730: $? = 0
 configure:32745: result: yes
 configure:32859: checking whether <sys/socket.h> is self-contained
 configure:32877: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:119] not a function
-/sys/include/ape/sys/socket.h:5[stdin:119] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:120] not a function
+/sys/include/ape/sys/socket.h:5[stdin:120] syntax error, last name: header
 configure:32877: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -14112,6 +14145,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -14210,8 +14244,8 @@ configure: failed program was:
 configure:32888: result: no
 configure:33038: checking for struct sockaddr_storage
 configure:33038: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:185] not a function
-/sys/include/ape/sys/socket.h:5[stdin:185] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:186] not a function
+/sys/include/ape/sys/socket.h:5[stdin:186] syntax error, last name: header
 configure:33038: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -14239,6 +14273,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -14350,8 +14385,8 @@ configure: failed program was:
 configure:33038: result: no
 configure:33058: checking for sa_family_t
 configure:33058: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:185] not a function
-/sys/include/ape/sys/socket.h:5[stdin:185] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:186] not a function
+/sys/include/ape/sys/socket.h:5[stdin:186] syntax error, last name: header
 configure:33058: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -14379,6 +14414,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -14523,6 +14559,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -14673,6 +14710,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -14823,6 +14861,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -14973,6 +15012,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -15124,6 +15164,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -15238,7 +15279,7 @@ configure:35935: $? = 0
 configure:35945: result: yes
 configure:36146: checking for TIME_UTC in <time.h>
 configure:36164: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:120[stdin:241] name not declared: TIME_UTC
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:121[stdin:242] name not declared: TIME_UTC
 configure:36164: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -15266,6 +15307,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -15367,7 +15409,7 @@ configure: failed program was:
 configure:36174: result: no
 configure:36241: checking whether execvpe is declared
 configure:36241: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:150[stdin:1186] name not declared: execvpe
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:151[stdin:1202] name not declared: execvpe
 configure:36241: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -15395,6 +15437,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -15529,156 +15572,8 @@ configure: failed program was:
 configure:36241: result: no
 configure:36425: checking for vasprintf
 configure:36425: cc -o conftest -g   conftest.c  >&5
-main: undefined: vasprintf in main
-configure:36425: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME ""
-| #define PACKAGE_TARNAME ""
-| #define PACKAGE_VERSION ""
-| #define PACKAGE_STRING ""
-| #define PACKAGE_BUGREPORT ""
-| #define PACKAGE_URL ""
-| #define PACKAGE "libtextstyle"
-| #define VERSION "0.22.5"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_MATH_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_UIO_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __USE_MINGW_ANSI_STDIO 1
-| #define LT_OBJDIR ".libs/"
-| #define C_ALLOCA 1
-| #define STACK_DIRECTION -1
-| #define HAVE_MALLOC_POSIX 1
-| #define HAVE_FCNTL 1
-| #define HAVE_SYMLINK 1
-| #define HAVE_TCDRAIN 1
-| #define HAVE_FSYNC 1
-| #define HAVE_GETDTABLESIZE 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_LSTAT 1
-| #define HAVE_SIGACTION 1
-| #define HAVE_SNPRINTF 1
-| #define HAVE_DECL_STRERROR_R 0
-| #define HAVE_SIG_ATOMIC_T 1
-| #define HAVE_WORKING_O_NOATIME 0
-| #define HAVE_WORKING_O_NOFOLLOW 0
-| #define HAVE_DECL_ALARM 1
-| #define HAVE_SAME_LONG_DOUBLE_AS_DOUBLE 1
-| #define restrict /**/
-| #define HAVE_DECL_GETDTABLESIZE 0
-| #define HAVE_ICONV 1
-| #define ICONV_CONST 
-| #define HAVE_WINT_T 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define BITSIZEOF_PTRDIFF_T 64
-| #define BITSIZEOF_SIZE_T 32
-| #define BITSIZEOF_SIG_ATOMIC_T 32
-| #define BITSIZEOF_WCHAR_T 16
-| #define BITSIZEOF_WINT_T 32
-| #define HAVE_SIGNED_SIG_ATOMIC_T 1
-| #define PTRDIFF_T_SUFFIX ll
-| #define SIZE_T_SUFFIX ul
-| #define SIG_ATOMIC_T_SUFFIX 
-| #define WCHAR_T_SUFFIX 
-| #define WINT_T_SUFFIX u
-| #define FLT_EXPBIT0_WORD 0
-| #define FLT_EXPBIT0_BIT 23
-| #define DBL_EXPBIT0_WORD 1
-| #define DBL_EXPBIT0_BIT 20
-| #define LDBL_EXPBIT0_WORD 1
-| #define LDBL_EXPBIT0_BIT 20
-| #define MALLOC_0_IS_NONNULL 1
-| #define HAVE_MBSTATE_T 1
-| #define PROMOTED_MODE_T int
-| #define HAVE_SIGSET_T 1
-| #define HAVE_DECL_SNPRINTF 1
-| #define HAVE_STDINT_H_WITH_UINTMAX 1
-| #define HAVE_INTTYPES_H_WITH_UINTMAX 1
-| #define CHECK_PRINTF_SAFE 1
-| #define HAVE_SNPRINTF 1
-| #define HAVE_WCHAR_T 1
-| #define HAVE_SNPRINTF 1
-| #define HAVE_STRNLEN 1
-| #define HAVE_DECL__SNPRINTF 0
-| #define HAVE_SNPRINTF_RETVAL_C99 1
-| #define HAVE_SNPRINTF_TRUNCATION_C99 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_DECL_FCLOSEALL 0
-| #define HAVE_DECL_GETW 0
-| #define HAVE_DECL_PUTW 0
-| #define HAVE_DECL_ECVT 0
-| #define HAVE_DECL_FCVT 0
-| #define HAVE_DECL_GCVT 0
-| #define _USE_STD_STAT 1
-| #define HAVE_TERMINFO 1
-| #define HAVE_DECL_EXECVPE 0
-| /* end confdefs.h.  */
-| /* Define vasprintf to an innocuous variant, in case <limits.h> declares vasprintf.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define vasprintf innocuous_vasprintf
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char vasprintf (void); below.  */
-| 
-| #include <limits.h>
-| #undef vasprintf
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char vasprintf (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_vasprintf || defined __stub___vasprintf
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return vasprintf ();
-|   ;
-|   return 0;
-| }
-configure:36425: result: no
+configure:36425: $? = 0
+configure:36425: result: yes
 configure:36510: checking whether vsnprintf is declared
 configure:36510: cc -c -g   conftest.c >&5
 configure:36510: $? = 0
@@ -15687,7 +15582,7 @@ configure:36522: checking whether <wchar.h> uses 'inline' correctly
 configure:36579: result: yes
 configure:36711: checking whether wcsdup is declared
 configure:36711: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:128[stdin:1071] name not declared: wcsdup
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:130[stdin:1084] name not declared: wcsdup
 configure:36711: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -15715,6 +15610,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -15804,6 +15700,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | /* end confdefs.h.  */
 | 
@@ -15833,7 +15730,7 @@ configure:36748: $? = 0
 configure:36759: result: none
 configure:36884: checking for alignas and alignof
 configure:36942: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:133[stdin:307] syntax error, last name: double
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:135[stdin:309] syntax error, last name: double
 configure:36942: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -15861,6 +15758,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -15950,6 +15848,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | /* end confdefs.h.  */
@@ -16014,6 +15913,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -16103,6 +16003,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | /* end confdefs.h.  */
@@ -16142,7 +16043,7 @@ configure: failed program was:
 configure:36956: result: no
 configure:37061: checking for static_assert
 configure:37099: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:125[stdin:126] syntax error, last name: 2
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:127[stdin:128] syntax error, last name: 2
 configure:37099: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -16170,6 +16071,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -16259,6 +16161,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | /* end confdefs.h.  */
@@ -16283,7 +16186,7 @@ configure: failed program was:
 |   return 0;
 | }
 configure:37099: cc -c -g -DINCLUDE_ASSERT_H  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:125[stdin:144] syntax error, last name: 2
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:127[stdin:146] syntax error, last name: 2
 configure:37099: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -16311,6 +16214,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -16400,6 +16304,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | /* end confdefs.h.  */
@@ -16428,9 +16333,9 @@ configure:37421: checking whether // is distinct from /
 configure:37452: result: no
 configure:37463: checking whether dup2 works
 configure:37556: cc -o conftest -g   conftest.c  >&5
-/sys/include/ape/sys/resource.h:5[stdin:441] not a function
-/sys/include/ape/sys/resource.h:5[stdin:441] syntax error, last name: header
-cc: cpp: 6c 6103: error
+/sys/include/ape/sys/resource.h:5[stdin:443] not a function
+/sys/include/ape/sys/resource.h:5[stdin:443] syntax error, last name: header
+cc: cpp: 6c 6136: error
 configure:37556: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -16459,6 +16364,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -16548,6 +16454,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -16703,6 +16610,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -16792,6 +16700,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -16837,9 +16746,9 @@ configure:37727: $? = 0
 configure:37739: result: yes
 configure:37820: checking whether fcntl handles F_DUPFD correctly
 configure:37884: cc -o conftest -g   conftest.c  >&5
-/sys/include/ape/sys/resource.h:5[stdin:441] not a function
-/sys/include/ape/sys/resource.h:5[stdin:441] syntax error, last name: header
-cc: cpp: 6c 6155: error
+/sys/include/ape/sys/resource.h:5[stdin:443] not a function
+/sys/include/ape/sys/resource.h:5[stdin:443] syntax error, last name: header
+cc: cpp: 6c 6188: error
 configure:37884: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -16868,6 +16777,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -16957,6 +16867,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -17068,8 +16979,8 @@ configure: failed program was:
 configure:37898: result: no
 configure:37916: checking whether fcntl understands F_DUPFD_CLOEXEC
 configure:37951: cc -o conftest -g   conftest.c  >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:131[stdin:433] name not declared: F_DUPFD_CLOEXEC
-cc: cpp: 6c 6172: error
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:133[stdin:435] name not declared: F_DUPFD_CLOEXEC
+cc: cpp: 6c 6205: error
 configure:37951: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -17098,6 +17009,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -17187,6 +17099,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -17249,6 +17162,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -17338,6 +17252,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -17368,7 +17283,7 @@ configure:38412: checking whether frexp works
 configure:38519: cc -o conftest -g   conftest.c  >&5
 configure:38519: $? = 0
 configure:38519: ./conftest
-conftest 6232: suicide: sys: fp: denormalized operand fppc=0x2000e9 status=0x6 pc=0x2000e9
+conftest 6265: suicide: sys: fp: denormalized operand fppc=0x20011c status=0x6 pc=0x20011c
 configure:38519: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -17397,6 +17312,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -17486,6 +17402,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -17565,8 +17482,19 @@ configure: failed program was:
 configure:38534: result: no
 configure:38585: checking whether frexpl is declared
 configure:38585: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:136[stdin:218] name not declared: frexpl
-configure:38585: $? = 1
+configure:38585: $? = 0
+configure:38585: result: yes
+configure:38596: checking whether frexpl() can be used without linking with libm
+configure:38615: cc -o conftest -g   conftest.c  >&5
+configure:38615: $? = 0
+configure:38627: result: yes
+configure:38633: checking whether frexpl works
+configure:38748: cc -o conftest -g   conftest.c  >&5
+configure:38748: $? = 0
+configure:38748: ./conftest
+conftest 6319: suicide: sys: fp: numeric overflow fppc=0x200114 status=0x8 pc=0x200114
+configure:38748: $? = 1
+configure: program exited with status 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME ""
@@ -17593,6 +17521,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -17682,6 +17611,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -17694,32 +17624,111 @@ configure: failed program was:
 | #define GNULIB_TEST_FREE_POSIX 1
 | #define GNULIB_TEST_FREXP 1
 | /* end confdefs.h.  */
+| 
+| #include <float.h>
 | #include <math.h>
-| 
-| int
-| main (void)
-| {
-| #ifndef frexpl
+| /* Override the values of <float.h>, like done in float.in.h.  */
+| #if defined __i386__ && (defined __BEOS__ || defined __OpenBSD__)
+| # undef LDBL_MIN_EXP
+| # define LDBL_MIN_EXP    (-16381)
+| #endif
+| #if defined __i386__ && (defined __FreeBSD__ || defined __DragonFly__)
+| # undef LDBL_MIN_EXP
+| # define LDBL_MIN_EXP    (-16381)
+| #endif
+| #if (defined _ARCH_PPC || defined _POWER) && defined _AIX && (LDBL_MANT_DIG == 106) && defined __GNUC__
+| # undef LDBL_MIN_EXP
+| # define LDBL_MIN_EXP DBL_MIN_EXP
+| #endif
+| #if defined __sgi && (LDBL_MANT_DIG >= 106)
+| # if defined __GNUC__
+| #  undef LDBL_MIN_EXP
+| #  define LDBL_MIN_EXP DBL_MIN_EXP
+| # endif
+| #endif
+| extern
 | #ifdef __cplusplus
-|   (void) frexpl;
-| #else
-|   (void) frexpl;
+| "C"
 | #endif
-| #endif
-| 
-|   ;
-|   return 0;
+| long double frexpl (long double, int *);
+| long double zero = 0.0L;
+| int main()
+| {
+|   int result = 0;
+|   volatile long double x;
+|   /* Test on finite numbers that fails on AIX 5.1.  */
+|   x = 16.0L;
+|   {
+|     int exp = -9999;
+|     frexpl (x, &exp);
+|     if (exp != 5)
+|       result |= 1;
+|   }
+|   /* Test on finite numbers that fails on Mac OS X 10.4, because its frexpl
+|      function returns an invalid (incorrectly normalized) value: it returns
+|                y = { 0x3fe028f5, 0xc28f5c28, 0x3c9eb851, 0xeb851eb8 }
+|      but the correct result is
+|           0.505L = { 0x3fe028f5, 0xc28f5c29, 0xbc547ae1, 0x47ae1480 }  */
+|   x = 1.01L;
+|   {
+|     int exp = -9999;
+|     long double y = frexpl (x, &exp);
+|     if (!(exp == 1 && y == 0.505L))
+|       result |= 2;
+|   }
+|   /* Test on large finite numbers.  This fails on BeOS at i = 16322, while
+|      LDBL_MAX_EXP = 16384.
+|      In the loop end test, we test x against Infinity, rather than comparing
+|      i with LDBL_MAX_EXP, because BeOS <float.h> has a wrong LDBL_MAX_EXP.  */
+|   {
+|     int i;
+|     for (i = 1, x = 1.0L; x != x + x; i++, x *= 2.0L)
+|       {
+|         int exp = -9999;
+|         frexpl (x, &exp);
+|         if (exp != i)
+|           {
+|             result |= 4;
+|             break;
+|           }
+|       }
+|   }
+|   /* Test on denormalized numbers.  */
+|   {
+|     int i;
+|     for (i = 1, x = 1.0L; i >= LDBL_MIN_EXP; i--, x *= 0.5L)
+|       ;
+|     if (x > 0.0L)
+|       {
+|         int exp;
+|         long double y = frexpl (x, &exp);
+|         /* On machines with IEEE854 arithmetic: x = 1.68105e-4932,
+|            exp = -16382, y = 0.5.  On Mac OS X 10.5: exp = -16384, y = 0.5.  */
+|         if (exp != LDBL_MIN_EXP - 1)
+|           result |= 8;
+|       }
+|   }
+|   /* Test on infinite numbers.  */
+|   /* The Microsoft MSVC 14 compiler chokes on the expression 1.0 / 0.0.  */
+|   x = 1.0L / zero;
+|   {
+|     int exp;
+|     long double y = frexpl (x, &exp);
+|     if (y != x)
+|       result |= 16;
+|   }
+|   return result;
 | }
-configure:38585: result: no
+configure:38763: result: no
 configure:39066: checking for gethostname
 configure:39066: cc -o conftest -g   conftest.c  >&5
 configure:39066: $? = 0
 configure:39066: result: yes
 configure:39128: checking for HOST_NAME_MAX
 configure:39156: cc -o conftest -g   conftest.c  >&5
-/sys/include/ape/sys/param.h:5[stdin:202] not a function
-/sys/include/ape/sys/param.h:5[stdin:202] syntax error, last name: header
-cc: cpp: 6c 6296: error
+/sys/include/ape/sys/param.h:5[stdin:204] not a function
+/sys/include/ape/sys/param.h:5[stdin:204] syntax error, last name: header
+cc: cpp: 6c 6360: error
 configure:39156: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -17748,6 +17757,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -17837,6 +17847,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -17907,7 +17918,7 @@ configure:39280: result: yes
 configure:39296: result: yes
 configure:39316: checking whether program_invocation_name is declared
 configure:39316: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:144[stdin:241] name not declared: program_invocation_name
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:146[stdin:243] name not declared: program_invocation_name
 configure:39316: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -17935,6 +17946,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -18024,6 +18036,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -18123,7 +18136,6 @@ configure:41134: checking for dlfcn.h
 configure:41134: result: no
 configure:41140: checking for dl.h
 configure:41140: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: c
 configure:41140: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -18151,6 +18163,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -18240,6 +18253,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -18323,8 +18337,7 @@ configure:41164: checking for limits.h
 configure:41164: result: yes
 configure:41170: checking for malloc.h
 configure:41170: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: li
+<eof> syntax error, last name: char
 configure:41170: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -18352,6 +18365,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -18441,6 +18455,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -18577,6 +18592,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -18666,6 +18682,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -18758,6 +18775,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -18847,6 +18865,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -18936,7 +18955,7 @@ configure:41612: checking whether log10 works
 configure:41645: cc -o conftest -g   conftest.c   >&5
 configure:41645: $? = 0
 configure:41645: ./conftest
-conftest 6859: suicide: sys: fp: numeric overflow fppc=0x200047 status=0x8 pc=0x200047
+conftest 6923: suicide: sys: fp: numeric overflow fppc=0x20007a status=0x8 pc=0x20007a
 configure:41645: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -18965,6 +18984,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -19054,6 +19074,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -19144,207 +19165,23 @@ configure:42432: cc -o conftest -g   conftest.c  >&5
 configure:42432: $? = 0
 configure:42444: result: yes
 configure:42457: checking whether frexpl() can be used without linking with libm
-configure:42476: cc -o conftest -g   conftest.c  >&5
-main: undefined: frexpl in main
-configure:42476: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME ""
-| #define PACKAGE_TARNAME ""
-| #define PACKAGE_VERSION ""
-| #define PACKAGE_STRING ""
-| #define PACKAGE_BUGREPORT ""
-| #define PACKAGE_URL ""
-| #define PACKAGE "libtextstyle"
-| #define VERSION "0.22.5"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_MATH_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_UIO_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __USE_MINGW_ANSI_STDIO 1
-| #define LT_OBJDIR ".libs/"
-| #define C_ALLOCA 1
-| #define STACK_DIRECTION -1
-| #define HAVE_MALLOC_POSIX 1
-| #define HAVE_FCNTL 1
-| #define HAVE_SYMLINK 1
-| #define HAVE_TCDRAIN 1
-| #define HAVE_FSYNC 1
-| #define HAVE_GETDTABLESIZE 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_LSTAT 1
-| #define HAVE_SIGACTION 1
-| #define HAVE_SNPRINTF 1
-| #define HAVE_DECL_STRERROR_R 0
-| #define HAVE_SIG_ATOMIC_T 1
-| #define HAVE_WORKING_O_NOATIME 0
-| #define HAVE_WORKING_O_NOFOLLOW 0
-| #define HAVE_DECL_ALARM 1
-| #define HAVE_SAME_LONG_DOUBLE_AS_DOUBLE 1
-| #define restrict /**/
-| #define HAVE_DECL_GETDTABLESIZE 0
-| #define HAVE_ICONV 1
-| #define ICONV_CONST 
-| #define HAVE_WINT_T 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define BITSIZEOF_PTRDIFF_T 64
-| #define BITSIZEOF_SIZE_T 32
-| #define BITSIZEOF_SIG_ATOMIC_T 32
-| #define BITSIZEOF_WCHAR_T 16
-| #define BITSIZEOF_WINT_T 32
-| #define HAVE_SIGNED_SIG_ATOMIC_T 1
-| #define PTRDIFF_T_SUFFIX ll
-| #define SIZE_T_SUFFIX ul
-| #define SIG_ATOMIC_T_SUFFIX 
-| #define WCHAR_T_SUFFIX 
-| #define WINT_T_SUFFIX u
-| #define FLT_EXPBIT0_WORD 0
-| #define FLT_EXPBIT0_BIT 23
-| #define DBL_EXPBIT0_WORD 1
-| #define DBL_EXPBIT0_BIT 20
-| #define LDBL_EXPBIT0_WORD 1
-| #define LDBL_EXPBIT0_BIT 20
-| #define MALLOC_0_IS_NONNULL 1
-| #define HAVE_MBSTATE_T 1
-| #define PROMOTED_MODE_T int
-| #define HAVE_SIGSET_T 1
-| #define HAVE_DECL_SNPRINTF 1
-| #define HAVE_STDINT_H_WITH_UINTMAX 1
-| #define HAVE_INTTYPES_H_WITH_UINTMAX 1
-| #define CHECK_PRINTF_SAFE 1
-| #define HAVE_SNPRINTF 1
-| #define HAVE_WCHAR_T 1
-| #define HAVE_SNPRINTF 1
-| #define HAVE_STRNLEN 1
-| #define HAVE_DECL__SNPRINTF 0
-| #define HAVE_SNPRINTF_RETVAL_C99 1
-| #define HAVE_SNPRINTF_TRUNCATION_C99 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_DECL_FCLOSEALL 0
-| #define HAVE_DECL_GETW 0
-| #define HAVE_DECL_PUTW 0
-| #define HAVE_DECL_ECVT 0
-| #define HAVE_DECL_FCVT 0
-| #define HAVE_DECL_GCVT 0
-| #define _USE_STD_STAT 1
-| #define HAVE_TERMINFO 1
-| #define HAVE_DECL_EXECVPE 0
-| #define HAVE_DECL_VSNPRINTF 1
-| #define HAVE_DECL_WCSDUP 0
-| #define GNULIB_TEST_CALLOC_GNU 1
-| #define GNULIB_TEST_CALLOC_POSIX 1
-| #define GNULIB_TEST_CLOEXEC 1
-| #define GNULIB_TEST_CLOSE 1
-| #define GNULIB_TEST_DUP2 1
-| #define FCNTL_DUPFD_BUGGY 1
-| #define GNULIB_TEST_FCNTL 1
-| #define GNULIB_TEST_FREE_POSIX 1
-| #define GNULIB_TEST_FREXP 1
-| #define GNULIB_TEST_FREXPL 1
-| #define GNULIB_TEST_FSTAT 1
-| #define GNULIB_TEST_FSYNC 1
-| #define GNULIB_TEST_GETDTABLESIZE 1
-| #define HAVE_GETHOSTNAME 1
-| #define HOST_NAME_MAX 256
-| #define GNULIB_TEST_GETHOSTNAME 1
-| #define HAVE_GETPROGNAME 1
-| #define HAVE_DECL_PROGRAM_INVOCATION_NAME 0
-| #define GNULIB_TEST_GETPROGNAME 1
-| #define GETTIMEOFDAY_TIMEZONE void
-| #define GNULIB_TEST_GETTIMEOFDAY 1
-| #define HAVE_INLINE 1
-| #define GNULIB_TEST_ISATTY 1
-| #define HAVE_DECL_ISINF 1
-| #define GNULIB_TEST_ISINF 1
-| #define GNULIB_TEST_ISNAN 1
-| #define GNULIB_TEST_ISNAND 1
-| #define HAVE_ISNAND_IN_LIBC 1
-| #define GNULIB_TEST_ISNANF 1
-| #define GNULIB_TEST_ISNANL 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STRUCT_LCONV_DECIMAL_POINT 1
-| #define HAVE_ARPA_INET_H 1
-| #define HAVE_CTYPE_H 1
-| #define HAVE_ERRNO_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_FLOAT_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_MATH_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_NETINET_IN_H 1
-| #define HAVE_SIGNAL_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_TIME_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_GETADDRINFO 1
-| #define HAVE_LOCALTIME 1
-| #define HAVE_STAT 1
-| #define HAVE_STRFTIME 1
-| #define VA_COPY va_copy
-| #define GNULIB_LOCK 1
-| #define GNULIB_TEST_LOG10 1
-| #define GNULIB_TEST_MALLOC_GNU 1
-| #define GNULIB_TEST_MALLOC_POSIX 1
-| #define GNULIB_TEST_MBSZERO 1
-| #define GNULIB_TEST_MEMCHR 1
-| #define GNULIB_MSVC_NOTHROW 1
-| #define GNULIB_TEST_OPEN 1
-| #define HAVE_LDEXP_IN_LIBC 1
-| /* end confdefs.h.  */
-| #include <math.h>
-|              long double x;
-| int
-| main (void)
-| {
-| int e; return frexpl (x, &e) > 0;
-|   ;
-|   return 0;
-| }
-configure:42488: result: no
+configure:42488: result: yes
+configure:42494: checking whether frexpl works
+configure:42624: result: no
 configure:42651: checking whether ldexpl() can be used without linking with libm
 configure:42670: cc -o conftest -g   conftest.c  >&5
-main: undefined: ldexpl in main
-configure:42670: $? = 1
+configure:42670: $? = 0
+configure:42682: result: yes
+configure:42688: checking whether ldexpl works
+configure:42733: cc -o conftest -g   conftest.c  >&5
+configure:42733: $? = 0
+configure:42733: ./conftest
+configure:42733: $? = 0
+configure:42748: result: yes
+configure:42756: checking whether ldexpl is declared
+configure:42756: cc -c -g   conftest.c >&5
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:196[stdin:337] name not declared: ldexpl
+configure:42756: $? = 1
 configure: failed program was:
 | /* confdefs.h */
 | #define PACKAGE_NAME ""
@@ -19371,6 +19208,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -19460,6 +19298,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -19528,17 +19367,25 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | /* end confdefs.h.  */
 | #include <math.h>
-|              long double x;
+| 
 | int
 | main (void)
 | {
-| return ldexpl (x, -1) > 0;
+| #ifndef ldexpl
+| #ifdef __cplusplus
+|   (void) ldexpl;
+| #else
+|   (void) ldexpl;
+| #endif
+| #endif
+| 
 |   ;
 |   return 0;
 | }
-configure:42682: result: no
+configure:42756: result: no
 configure:42773: checking for raise
 configure:42773: cc -o conftest -g   conftest.c  >&5
 configure:42773: $? = 0
@@ -19584,6 +19431,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -19673,6 +19521,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -19741,6 +19590,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -19782,7 +19632,7 @@ configure:43075: result: no
 configure:43091: result: no
 configure:43169: checking for struct sigaction.sa_sigaction
 configure:43169: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:197[stdin:296] not a member of struct/union: sa_sigaction
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:200[stdin:299] not a member of struct/union: sa_sigaction
 configure:43169: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -19810,6 +19660,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -19899,6 +19750,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -19967,6 +19819,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -19987,7 +19840,7 @@ configure: failed program was:
 |   return 0;
 | }
 configure:43169: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:197[stdin:296] not a member of struct/union: sa_sigaction
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:200[stdin:299] not a member of struct/union: sa_sigaction
 configure:43169: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -20015,6 +19868,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -20104,6 +19958,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -20172,6 +20027,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -20194,8 +20050,8 @@ configure: failed program was:
 configure:43169: result: no
 configure:43255: checking for signbit macro
 configure:43366: cc -o conftest -g   conftest.c  >&5
-cpp: conftest.c:202 #error directive: "signbit should be a macro"
-cc: 6c: cpp 7091: errors
+cpp: conftest.c:205 #error directive: "signbit should be a macro"
+cc: 6c: cpp 7181: errors
 configure:43366: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -20224,6 +20080,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -20313,6 +20170,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -20381,6 +20239,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -20480,8 +20339,8 @@ configure: failed program was:
 configure:43381: result: no
 configure:43383: checking for signbit compiler built-ins
 configure:43496: cc -o conftest -g   conftest.c  >&5
-cpp: conftest.c:196 #error directive: "signbit should be three compiler built-ins"
-cc: 6c: cpp 7107: errors
+cpp: conftest.c:199 #error directive: "signbit should be three compiler built-ins"
+cc: 6c: cpp 7197: errors
 configure:43496: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -20510,6 +20369,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -20599,6 +20459,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -20667,6 +20528,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -20817,6 +20679,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -20906,6 +20769,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -20974,6 +20838,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -21035,7 +20900,7 @@ configure:44649: checking for ptrdiff_t
 configure:44649: cc -c -g  conftest.c >&5
 configure:44649: $? = 0
 configure:44649: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:246[stdin:1282] syntax error, last name: ptrdiff_t
+/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/conftest.c:249[stdin:1300] syntax error, last name: ptrdiff_t
 configure:44649: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -21063,6 +20928,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -21152,6 +21018,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -21220,6 +21087,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -21291,8 +21159,8 @@ configure: failed program was:
 configure:44649: result: yes
 configure:44693: checking for socklen_t
 configure:44693: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:287] not a function
-/sys/include/ape/sys/socket.h:5[stdin:287] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:290] not a function
+/sys/include/ape/sys/socket.h:5[stdin:290] syntax error, last name: header
 configure:44693: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -21320,6 +21188,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -21409,6 +21278,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -21477,6 +21347,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -21532,8 +21403,8 @@ configure: failed program was:
 configure:44693: result: no
 configure:44709: checking for socklen_t equivalent
 configure:44735: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:283] not a function
-/sys/include/ape/sys/socket.h:5[stdin:283] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:286] not a function
+/sys/include/ape/sys/socket.h:5[stdin:286] syntax error, last name: header
 configure:44735: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -21561,6 +21432,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -21650,6 +21522,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -21718,6 +21591,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -21763,8 +21637,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:44735: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:283] not a function
-/sys/include/ape/sys/socket.h:5[stdin:283] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:286] not a function
+/sys/include/ape/sys/socket.h:5[stdin:286] syntax error, last name: header
 configure:44735: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -21792,6 +21666,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -21881,6 +21756,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -21949,6 +21825,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -21994,8 +21871,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:44735: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:283] not a function
-/sys/include/ape/sys/socket.h:5[stdin:283] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:286] not a function
+/sys/include/ape/sys/socket.h:5[stdin:286] syntax error, last name: header
 configure:44735: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -22023,6 +21900,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -22112,6 +21990,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -22180,6 +22059,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -22225,8 +22105,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:44735: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:283] not a function
-/sys/include/ape/sys/socket.h:5[stdin:283] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:286] not a function
+/sys/include/ape/sys/socket.h:5[stdin:286] syntax error, last name: header
 configure:44735: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -22254,6 +22134,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -22343,6 +22224,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -22411,6 +22293,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -22456,8 +22339,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:44735: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:283] not a function
-/sys/include/ape/sys/socket.h:5[stdin:283] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:286] not a function
+/sys/include/ape/sys/socket.h:5[stdin:286] syntax error, last name: header
 configure:44735: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -22485,6 +22368,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -22574,6 +22458,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -22642,6 +22527,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -22687,8 +22573,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:44735: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:283] not a function
-/sys/include/ape/sys/socket.h:5[stdin:283] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:286] not a function
+/sys/include/ape/sys/socket.h:5[stdin:286] syntax error, last name: header
 configure:44735: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -22716,6 +22602,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -22805,6 +22692,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -22873,6 +22761,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -22918,8 +22807,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:44735: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:283] not a function
-/sys/include/ape/sys/socket.h:5[stdin:283] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:286] not a function
+/sys/include/ape/sys/socket.h:5[stdin:286] syntax error, last name: header
 configure:44735: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -22947,6 +22836,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -23036,6 +22926,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -23104,6 +22995,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -23149,8 +23041,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:44735: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:283] not a function
-/sys/include/ape/sys/socket.h:5[stdin:283] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:286] not a function
+/sys/include/ape/sys/socket.h:5[stdin:286] syntax error, last name: header
 configure:44735: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -23178,6 +23070,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -23267,6 +23160,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -23335,6 +23229,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -23380,8 +23275,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:44735: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:283] not a function
-/sys/include/ape/sys/socket.h:5[stdin:283] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:286] not a function
+/sys/include/ape/sys/socket.h:5[stdin:286] syntax error, last name: header
 configure:44735: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -23409,6 +23304,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -23498,6 +23394,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -23566,6 +23463,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -23611,8 +23509,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:44735: cc -c -g  conftest.c >&5
-/sys/include/ape/sys/socket.h:5[stdin:283] not a function
-/sys/include/ape/sys/socket.h:5[stdin:283] syntax error, last name: header
+/sys/include/ape/sys/socket.h:5[stdin:286] not a function
+/sys/include/ape/sys/socket.h:5[stdin:286] syntax error, last name: header
 configure:44735: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -23640,6 +23538,7 @@ configure: failed program was:
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_LIMITS_H 1
 | #define HAVE_MATH_H 1
+| #define HAVE_FEATURES_H 1
 | #define HAVE_STDBOOL_H 1
 | #define HAVE_SYS_UIO_H 1
 | #define STDC_HEADERS 1
@@ -23729,6 +23628,7 @@ configure: failed program was:
 | #define _USE_STD_STAT 1
 | #define HAVE_TERMINFO 1
 | #define HAVE_DECL_EXECVPE 0
+| #define HAVE_VASPRINTF 1
 | #define HAVE_DECL_VSNPRINTF 1
 | #define HAVE_DECL_WCSDUP 0
 | #define GNULIB_TEST_CALLOC_GNU 1
@@ -23797,6 +23697,7 @@ configure: failed program was:
 | #define GNULIB_MSVC_NOTHROW 1
 | #define GNULIB_TEST_OPEN 1
 | #define HAVE_LDEXP_IN_LIBC 1
+| #define HAVE_LDEXPL_IN_LIBC 1
 | #define HAVE_RAISE 1
 | #define GNULIB_TEST_RAISE 1
 | #define GNULIB_TEST_READ 1
@@ -23910,7 +23811,7 @@ ac_cv_func_strnlen=yes
 ac_cv_func_symlink=yes
 ac_cv_func_tcdrain=yes
 ac_cv_func_vasnprintf=no
-ac_cv_func_vasprintf=no
+ac_cv_func_vasprintf=yes
 ac_cv_func_wcrtomb=no
 ac_cv_func_wcslen=no
 ac_cv_have_decl__snprintf=no
@@ -23920,11 +23821,12 @@ ac_cv_have_decl_error_at_line=no
 ac_cv_have_decl_execvpe=no
 ac_cv_have_decl_fcloseall=no
 ac_cv_have_decl_fcvt=no
-ac_cv_have_decl_frexpl=no
+ac_cv_have_decl_frexpl=yes
 ac_cv_have_decl_gcvt=no
 ac_cv_have_decl_getdtablesize=no
 ac_cv_have_decl_getw=no
 ac_cv_have_decl_isinf=yes
+ac_cv_have_decl_ldexpl=no
 ac_cv_have_decl_program_invocation_name=no
 ac_cv_have_decl_putw=no
 ac_cv_have_decl_snprintf=yes
@@ -23940,7 +23842,7 @@ ac_cv_header_dlfcn_h=no
 ac_cv_header_errno_h=yes
 ac_cv_header_error_h=no
 ac_cv_header_fcntl_h=yes
-ac_cv_header_features_h=no
+ac_cv_header_features_h=yes
 ac_cv_header_float_h=yes
 ac_cv_header_inttypes_h=yes
 ac_cv_header_limits_h=yes
@@ -23987,7 +23889,7 @@ ac_cv_path_EGREP_TRADITIONAL='/bin/grep -E'
 ac_cv_path_FGREP='/bin/grep -F'
 ac_cv_path_GREP=/bin/grep
 ac_cv_path_SED=/bin/sed
-ac_cv_prog_AWK=awk
+ac_cv_prog_AWK=gawk
 ac_cv_prog_CC=cc
 ac_cv_prog_CPP='cc -E'
 ac_cv_prog_ac_ct_AR=ar
@@ -24069,7 +23971,8 @@ gl_cv_func_fcntl_f_dupfd_works=no
 gl_cv_func_free_preserves_errno=no
 gl_cv_func_frexp_no_libm=yes
 gl_cv_func_frexp_works=no
-gl_cv_func_frexpl_no_libm=no
+gl_cv_func_frexpl_no_libm=yes
+gl_cv_func_frexpl_works=no
 gl_cv_func_gettimeofday_posix_signature=yes
 gl_cv_func_isinfl_works=yes
 gl_cv_func_isnand_no_libm=yes
@@ -24079,7 +23982,8 @@ gl_cv_func_isnanl_no_libm=yes
 gl_cv_func_isnanl_works=no
 gl_cv_func_itold_works=yes
 gl_cv_func_ldexp_no_libm=yes
-gl_cv_func_ldexpl_no_libm=no
+gl_cv_func_ldexpl_no_libm=yes
+gl_cv_func_ldexpl_works=yes
 gl_cv_func_log10_works=no
 gl_cv_func_malloc_0_nonnull=1
 gl_cv_func_malloc_posix=yes
@@ -24258,7 +24162,7 @@ ASSERT_H='assert.h'
 AUTOCONF='${SHELL} '\''/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/build-aux/missing'\'' autoconf'
 AUTOHEADER='${SHELL} '\''/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/build-aux/missing'\'' autoheader'
 AUTOMAKE='${SHELL} '\''/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/build-aux/missing'\'' automake-1.16'
-AWK='awk'
+AWK='gawk'
 BITSIZEOF_PTRDIFF_T='64'
 BITSIZEOF_SIG_ATOMIC_T='32'
 BITSIZEOF_SIZE_T='32'
@@ -24906,7 +24810,7 @@ HAVE_DECL_FDATASYNC='1'
 HAVE_DECL_FLOORF='1'
 HAVE_DECL_FLOORL='1'
 HAVE_DECL_FPURGE='1'
-HAVE_DECL_FREXPL='0'
+HAVE_DECL_FREXPL='1'
 HAVE_DECL_FSEEKO='1'
 HAVE_DECL_FTELLO='1'
 HAVE_DECL_GCVT='0'
@@ -24922,7 +24826,7 @@ HAVE_DECL_GETW='0'
 HAVE_DECL_IMAXABS='1'
 HAVE_DECL_IMAXDIV='1'
 HAVE_DECL_INITSTATE='1'
-HAVE_DECL_LDEXPL='1'
+HAVE_DECL_LDEXPL='0'
 HAVE_DECL_LOCALTIME_R='1'
 HAVE_DECL_LOG10L='1'
 HAVE_DECL_LOG2='1'
@@ -24986,7 +24890,7 @@ HAVE_FCHMODAT='1'
 HAVE_FCHOWNAT='1'
 HAVE_FCNTL='1'
 HAVE_FDATASYNC='1'
-HAVE_FEATURES_H='0'
+HAVE_FEATURES_H='1'
 HAVE_FFSL='1'
 HAVE_FFSLL='1'
 HAVE_FMA='1'
@@ -25765,6 +25669,7 @@ target_alias=''
 #define HAVE_SYS_TIME_H 1
 #define HAVE_LIMITS_H 1
 #define HAVE_MATH_H 1
+#define HAVE_FEATURES_H 1
 #define HAVE_STDBOOL_H 1
 #define HAVE_SYS_UIO_H 1
 #define STDC_HEADERS 1
@@ -25854,6 +25759,7 @@ target_alias=''
 #define _USE_STD_STAT 1
 #define HAVE_TERMINFO 1
 #define HAVE_DECL_EXECVPE 0
+#define HAVE_VASPRINTF 1
 #define HAVE_DECL_VSNPRINTF 1
 #define HAVE_DECL_WCSDUP 0
 #define GNULIB_TEST_CALLOC_GNU 1
@@ -25922,6 +25828,7 @@ target_alias=''
 #define GNULIB_MSVC_NOTHROW 1
 #define GNULIB_TEST_OPEN 1
 #define HAVE_LDEXP_IN_LIBC 1
+#define HAVE_LDEXPL_IN_LIBC 1
 #define HAVE_RAISE 1
 #define GNULIB_TEST_RAISE 1
 #define GNULIB_TEST_READ 1

@@ -17,8 +17,6 @@
 
 #include <config.h>
 
-#include "setlocale_null.h"
-
 /* Specification.  */
 #include <langinfo.h>
 
@@ -351,10 +349,9 @@ rpl_nl_langinfo (nl_item item)
    BeOS.  */
 
 # include <time.h>
-#include "langinfo.h"
 
 char *
-nl_langinfo (int item)
+nl_langinfo (nl_item item)
 {
   char buf[100];
   struct tm tmm = { 0 };

@@ -66,14 +66,14 @@ OFILES=\
 	vsprintf.$O\
 	vsnprintf.$O\
 # musl \
+	asprintf.$O\
+	vasprintf.$O\
 # gnulib et al \
 	alloca.$O\
 #	asnprintf.$O\
-#	asprintf.$O\
 	fmemopen.$O\
 	getdelim.$O\
 	getline.$O\
-#	vasprintf.$O\
 #	vasnprintf.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib

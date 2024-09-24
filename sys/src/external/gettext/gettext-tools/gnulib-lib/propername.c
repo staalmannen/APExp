@@ -66,7 +66,7 @@ mbsstr_trimmed_wordbounded (const char *string, const char *sub)
 
   while (*string != '\0')
     {
-      const char *tsub_in_string = mbsstr (string, tsub);
+      const char *tsub_in_string = (const char *) mbsstr (string, tsub);
       if (tsub_in_string == NULL)
         break;
       else

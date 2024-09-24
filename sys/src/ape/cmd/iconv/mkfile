@@ -6,12 +6,15 @@ TARG=iconv
 OFILES= iconv.$O\
 #srclib \
 		canonicalize-lgpl.$O\
+		error.$O\
 		mempcpy.$O\
 		progname.$O\
 		progreloc.$O\
 		_relocatable.$O\
 		rawmemchr.$O\
 		safe-read.$O\
+		strerror.$O\
+		strerror-override.$O\
 		xmalloc.$O\
 #srclib/malloc \
 		scratch_buffer_grow.$O\

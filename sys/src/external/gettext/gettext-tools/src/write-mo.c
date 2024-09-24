@@ -55,7 +55,7 @@
 
 #define _(str) gettext (str)
 
-#define freea(p) /* nothing */
+//#define freea(p) /* nothing */
 
 /* Usually defined in <sys/param.h>.  */
 #ifndef roundup
@@ -291,7 +291,7 @@ concat_prefix_cs (const char *prefix, char conversion)
   char *result = XNMALLOC (strlen (prefix) + 2, char);
   {
     char *p = result;
-    p = stpcpy (p, prefix);
+    p = (char *) stpcpy (p, prefix);
     *p++ = conversion;
     *p = '\0';
   }

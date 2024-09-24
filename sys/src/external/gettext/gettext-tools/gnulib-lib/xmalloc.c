@@ -81,7 +81,7 @@ xirealloc (void *p, idx_t s)
 void *
 xreallocarray (void *p, size_t n, size_t s)
 {
-  void *r = reallocarray (p, n, s);
+  void *r = (void *) reallocarray (p, n, s);
   if (!r && (!p || (n && s)))
     xalloc_die ();
   return r;

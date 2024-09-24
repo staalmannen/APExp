@@ -325,7 +325,6 @@ lookup_symbol (const char *name, symbol_lookup mode)
       M4ERROR ((warning_status, 0,
                 "INTERNAL ERROR: invalid mode to symbol_lookup ()"));
       abort ();
-	return NULL;
     }
 }
 

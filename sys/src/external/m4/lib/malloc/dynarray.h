@@ -168,11 +168,11 @@ bool __libc_dynarray_finalize (struct dynarray_header *list, void *scratch,
 _Noreturn void __libc_dynarray_at_failure (size_t size, size_t index);
 
 #ifndef _ISOMAC
-//libc_hidden_proto (__libc_dynarray_emplace_enlarge)
-//libc_hidden_proto (__libc_dynarray_resize)
-//libc_hidden_proto (__libc_dynarray_resize_clear)
-//libc_hidden_proto (__libc_dynarray_finalize)
-//libc_hidden_proto (__libc_dynarray_at_failure)
+libc_hidden_proto (__libc_dynarray_emplace_enlarge)
+libc_hidden_proto (__libc_dynarray_resize)
+libc_hidden_proto (__libc_dynarray_resize_clear)
+libc_hidden_proto (__libc_dynarray_finalize)
+libc_hidden_proto (__libc_dynarray_at_failure)
 #endif
 
 #endif /* _DYNARRAY_H */

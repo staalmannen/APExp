@@ -1,11 +1,11 @@
 </$objtype/mkfile
 APEXPROOT=../../../../..
 TARG=	\
-#gettext-runtime \
+#gettext-runtime/src \
       	gettext\
       	ngettext\
       	envsubst\
-#gettext-tools \
+#gettext-tools/src \
       	msgattrib\
 		msgcat\
 		msgcmp\
@@ -21,11 +21,23 @@ TARG=	\
 		msgunfmt\
 		msguniq\
       	xgettext\
-      	gettextize\
-      	autopoint\
       	recode-sr-latin
+#gettext-tools/misc \
+#      	gettextize\
+#      	autopoint\
 
-LIB=$APEXPROOT/$objtype/lib/ape/libintl.a $APEXPROOT/$objtype/lib/ape/libiconv.a
+GNULIB_OBJECTS=	\
+		getprogname.$O\
+		getopt.$O\
+		getopt1.$O\
+		progname.$O\
+		propername.$O\
+		xmalloc.$O
+
+
+LIB=$APEXPROOT/$objtype/lib/ape/libintl.a\
+	$APEXPROOT/$objtype/lib/ape/libiconv.a\
+	$GNULIB_OBJECTS
 BIN=$APEXPROOT/$objtype/bin/ape
 HFILES=$APEXPROOT/sys/include/ape/libintl.h
 
@@ -35,9 +47,15 @@ GETTEXTSRC=../../../external/gettext
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -B -DHAVE_CONFIG_H -D_POSIX_SOURCE
-RINCLUDE= -I$GETTEXTSRC/gettext-runtime/src
-TINCLUDE= -I$GETTEXTSRC/gettext-tools
+DEFS= 	-DLOCALEDIR="/sys/lib/ape/locale" -DBISON_LOCALEDIR="/sys/lib/ape/locale"
+#TODO make conditional variables based on architecture
+CFLAGS=-c -B -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION $DEFS 
+RINCLUDE= -I$GETTEXTSRC/gettext-runtime/src -I$GETTEXTSRC/gettext-runtime -I$GETTEXTSRC/gettext-runtime/gnulib-lib -I$GETTEXTSRC/gettext-runtime/intl
+TINCLUDE= -I$GETTEXTSRC/gettext-tools -I$GETTEXTSRC/gettext-tools/gnulib-lib\
+		  -I$GETTEXTSRC/libtextstyle/lib -I$GETTEXTSRC/gnulib-local/lib $RINCLUDE
+
+hash-string.$O: $GETTEXTSRC/gettext-runtime/intl/hash-string.c
+	$CC $CFLAGS $RINCLUDE $GETTEXTSRC/gettext-runtime/intl/hash-string.c
 
 %.$O: $GETTEXTSRC/gettext-runtime/src/%.c
 	$CC $CFLAGS $RINCLUDE $GETTEXTSRC/gettext-runtime/src/$stem.c
@@ -45,18 +63,20 @@ TINCLUDE= -I$GETTEXTSRC/gettext-tools
 %.$O: $GETTEXTSRC/gettext-tools/src/%.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/src/$stem.c
 
-%.$O: $GETTEXTSRC/gettext-runtime/intl/%.c
-	$CC $CFLAGS $RINCLUDE $GETTEXTSRC/gettext-runtime/intl/$stem.c
+%.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/%.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/$stem.c
 
 $O.msgfmt:V: 	msgfmt.$O write-mo.$O write-java.$O write-csharp.$O write-resources.$O\
 				write-tcl.$O write-qt.$O write-desktop.$O write-xml.$O hash-string.$O
 	$LD -o $target $prereq
 
-$O.msgcmp:V: 	msgcmp.$O msg-fsearch.$O
+$O.msgcmp:V: 	msgcmp.$O msgl-fsearch.$O
 	$LD -o $target $prereq
 
 $O.msgunfmt:V:	msgunfmt.$O read-mo.$O read-java.$O read-csharp.$O read-resources.$O\
 				read-tcl.$O hash-string.$O
+	$LD -o $target $prereq
+
 
 install:V:
 

@@ -14,17 +14,21 @@
    You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#include <stdarg.h>
-#include <unistd.h>
-#include <stdio.h>
+#include <config.h>
 
-char
-*asnprintf (char *resultbuf, size_t lengthp, const char *format, ...)
+/* Specification.  */
+#include "vasnprintf.h"
+
+#include <stdarg.h>
+
+char *
+asnprintf (char *resultbuf, size_t *lengthp, const char *format, ...)
 {
   va_list args;
   char *result;
+
   va_start (args, format);
-  result = vasnprintf ((char **) resultbuf, (size_t *) lengthp, (char *) format, args);
+  result = vasnprintf (resultbuf, lengthp, format, args);
   va_end (args);
   return result;
 }

@@ -1,4 +1,4 @@
-/* GNU m4 -- A simple macro processor long_options
+/* GNU m4 -- A simple macro processor
 
    Copyright (C) 1989-1994, 2004-2014, 2016-2017, 2020-2021 Free
    Software Foundation, Inc.
@@ -26,7 +26,7 @@
 #include <signal.h>
 
 #include "c-stack.h"
-//#include "configmake.h"
+#include "configmake.h"
 #include "ignore-value.h"
 #include "progname.h"
 #include "propername.h"
@@ -435,10 +435,10 @@ main (int argc, char *const *argv)
   program_error_message
     = xasprintf (_("internal error detected; please report this bug to <%s>"),
                  PACKAGE_BUGREPORT);
-  signal_message[SIGSEGV] = xstrdup (strsignal ( (int) SIGSEGV));
-  signal_message[SIGABRT] = xstrdup (strsignal ((int) SIGABRT));
-  signal_message[SIGILL] = xstrdup (strsignal ((int) SIGILL));
-  signal_message[SIGFPE] = xstrdup (strsignal ((int) SIGFPE));
+  signal_message[SIGSEGV] = xstrdup (strsignal (SIGSEGV));
+  signal_message[SIGABRT] = xstrdup (strsignal (SIGABRT));
+  signal_message[SIGILL] = xstrdup (strsignal (SIGILL));
+  signal_message[SIGFPE] = xstrdup (strsignal (SIGFPE));
   if (SIGBUS != SIGILL && SIGBUS != SIGSEGV)
     signal_message[SIGBUS] = xstrdup (strsignal (SIGBUS));
   sigemptyset (&act.sa_mask);
@@ -729,5 +729,4 @@ main (int argc, char *const *argv)
   output_exit ();
   free_macro_sequence ();
   exit (retcode);
-  return 1;
 }
