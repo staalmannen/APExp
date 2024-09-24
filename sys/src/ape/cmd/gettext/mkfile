@@ -27,17 +27,35 @@ TARG=	\
 #      	autopoint\
 
 GNULIB_OBJECTS=	\
+		basename-lgpl.$O\
+		c-strstr.$O\
+		c32iscntrl.$O\
+		c32width.$O\
+		c32isalnum.$O\
+		close.$O\
+		closeout.$O\
+		error.$O\
+		exitfail.$O\
+		fwriteerror.$O\
 		getprogname.$O\
 		getopt.$O\
 		getopt1.$O\
+		mbchar.$O\
+		mbrtoc32.$O\
 		progname.$O\
 		propername.$O\
+		progreloc.$O\
+		reallocarray.$O\
+		strnlen1.$O\
+#		trim.$O\
+		xalloc-die.$O\
 		xmalloc.$O
 
 
 LIB=$APEXPROOT/$objtype/lib/ape/libintl.a\
 	$APEXPROOT/$objtype/lib/ape/libiconv.a\
 	$GNULIB_OBJECTS
+
 BIN=$APEXPROOT/$objtype/bin/ape
 HFILES=$APEXPROOT/sys/include/ape/libintl.h
 
@@ -47,12 +65,18 @@ GETTEXTSRC=../../../external/gettext
 
 CC=pcc
 LD=pcc
-DEFS= 	-DLOCALEDIR="/sys/lib/ape/locale" -DBISON_LOCALEDIR="/sys/lib/ape/locale"
+DEFS= 	-DLOCALEDIR="/sys/lib/ape/locale" -DBISON_LOCALEDIR="/sys/lib/ape/locale" -DLIBDIR="/$objtype/lib/ape"\
+		-DEXEEXT="" -DPROJECTSDIR="." -DGETTEXTJAR="/sys/lib/ape/gettext" -DGETTEXTDATADIR="/sys/lib/ape/gettext"
 #TODO make conditional variables based on architecture
-CFLAGS=-c -B -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION $DEFS 
-RINCLUDE= -I$GETTEXTSRC/gettext-runtime/src -I$GETTEXTSRC/gettext-runtime -I$GETTEXTSRC/gettext-runtime/gnulib-lib -I$GETTEXTSRC/gettext-runtime/intl
-TINCLUDE= -I$GETTEXTSRC/gettext-tools -I$GETTEXTSRC/gettext-tools/gnulib-lib\
-		  -I$GETTEXTSRC/libtextstyle/lib -I$GETTEXTSRC/gnulib-local/lib $RINCLUDE
+
+RINCLUDE= 	-I$GETTEXTSRC/gettext-runtime/src -I$GETTEXTSRC/gettext-runtime\
+			-I$GETTEXTSRC/gettext-runtime/gnulib-lib -I$GETTEXTSRC/gettext-runtime/intl
+
+TINCLUDE= 	-I$GETTEXTSRC/gettext-tools -I$GETTEXTSRC/gettext-tools/gnulib-lib\
+		  	-I$GETTEXTSRC/libtextstyle/lib -I$GETTEXTSRC/gnulib-local/lib\
+			-I$GETTEXTSRC/gettext-tools/libgrep $RINCLUDE
+
+CFLAGS=-c -B -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION $DEFS
 
 hash-string.$O: $GETTEXTSRC/gettext-runtime/intl/hash-string.c
 	$CC $CFLAGS $RINCLUDE $GETTEXTSRC/gettext-runtime/intl/hash-string.c

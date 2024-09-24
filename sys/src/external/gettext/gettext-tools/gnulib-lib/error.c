@@ -2,7 +2,7 @@
    Copyright (C) 1990-1998, 2000-2007, 2009-2024 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
-   This file is free software: you can redistribute it and/or modify
+   This file is free software: you can redistribute it and/or modify 
    it under the terms of the GNU Lesser General Public License as
    published by the Free Software Foundation; either version 2.1 of the
    License, or (at your option) any later version.
@@ -34,16 +34,16 @@
 # define _(msgid) gettext (msgid)
 #endif
 
-#ifdef _LIBC
+//#ifdef _LIBC
 # include <libintl.h>
 # include <stdbool.h>
 # include <stdint.h>
 # include <wchar.h>
-# define mbsrtowcs __mbsrtowcs
-# define USE_UNLOCKED_IO 0
+//# define mbsrtowcs __mbsrtowcs
+//# define USE_UNLOCKED_IO 0
 # define _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD(a, b)
 # define _GL_ARG_NONNULL(a)
-#endif
+//#endif
 
 #if USE_UNLOCKED_IO
 # include "unlocked-io.h"

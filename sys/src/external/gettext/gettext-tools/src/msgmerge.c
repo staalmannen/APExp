@@ -1267,7 +1267,7 @@ message_merge (message_ty *def, message_ty *ref, bool force_fuzzy,
 
 #define IF_FILLED(idx)                                                        \
       if (header_fields[idx].string)                                          \
-        newp = stpncpy (stpcpy (newp, known_fields[idx].name),                \
+        newp = (char *) stpncpy (stpcpy (newp, known_fields[idx].name),                \
                         header_fields[idx].string, header_fields[idx].len)
 
       IF_FILLED (PROJECT_ID);
