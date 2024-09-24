@@ -1,0 +1,66 @@
+# Variable needed by LTLIBINTL.
+top_builddir=../..
+
+OBJEXT="o"
+EXEEXT=""
+CC="cc"
+CFLAGS="-g"
+CXX="no"
+CXXFLAGS=""
+CPPFLAGS=""
+LDFLAGS=""
+LTLIBINTL="${top_builddir}/../gettext-runtime/intl/libintl.la  "
+JAVA_CHOICE="yes"
+BUILDJAVA="no"
+TESTJAVA="no"
+CSHARP_CHOICE="any"
+BUILDCSHARP="no"
+TESTCSHARP="no"
+TESTLIBASPRINTF="no"
+GLIBC2="no"
+LOCALE_FR="none"
+LOCALE_FR_UTF8="none"
+LOCALE_JA="ja_JP"
+LOCALE_DE_UTF8=""
+host_os="plan9"
+ARCHIVE_VERSION="0.22.5"
+
+# For specific filename variables, define a variant that - in mingw builds
+# in a Cygwin environment - has the Windows filename syntax.
+wabs_srcdir="$abs_srcdir"
+wabs_top_srcdir="$abs_top_srcdir"
+case "$host_os" in
+  mingw*)
+    if (cygpath --version) >/dev/null 2>/dev/null; then
+      wabs_srcdir=`cygpath -w "$abs_srcdir"`
+      wabs_top_srcdir=`cygpath -w "$abs_top_srcdir"`
+    fi
+    ;;
+esac
+
+# Variable needed by xgettext.
+GETTEXTDATADIR="$wabs_top_srcdir"
+export GETTEXTDATADIR
+
+# Variable needed for checking output with --color.
+GETTEXTSTYLESDIR="$GETTEXTDATADIR/styles"
+export GETTEXTSTYLESDIR
+
+: ${GETTEXT=tstgettext}
+: ${NGETTEXT=tstngettext}
+: ${XGETTEXT=xgettext}
+: ${MSGATTRIB=msgattrib}
+: ${MSGCAT=msgcat}
+: ${MSGCMP=msgcmp}
+: ${MSGCOMM=msgcomm}
+: ${MSGCONV=msgconv}
+: ${MSGEN=msgen}
+: ${MSGEXEC=msgexec}
+: ${MSGFILTER=msgfilter}
+: ${MSGFMT=msgfmt}
+: ${MSGGREP=msggrep}
+: ${MSGINIT=msginit}
+: ${MSGMERGE=msgmerge}
+: ${MSGUNFMT=msgunfmt}
+: ${MSGUNIQ=msguniq}
+: ${RECODE=recode}
