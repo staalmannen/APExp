@@ -1,3 +1,8 @@
+IMPORTANT NOTE
+There is no guarantee that APExp builds from scratch in between releases.
+Many (temporarily) breaking changes can occur between releases. 
+The best option is probably to download the latest release.
+
 # APExp
 Plan9 (9front) APE with experimental patches (a.k.a APExp)
 
