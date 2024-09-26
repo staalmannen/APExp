@@ -1,8 +1,6 @@
 #include <math.h>
 #include <stdint.h>
 
-//#define 0x1p64 18446744073709551616
-
 float frexpf(float x, int *e)
 {
 	union { float f; uint32_t i; } y = { x };
@@ -10,7 +8,7 @@ float frexpf(float x, int *e)
 
 	if (!ee) {
 		if (x) {
-			x = frexpf(x*18446744073709551616, e);
+			x = frexpf(x*0x1p64, e);
 			*e -= 64;
 		} else *e = 0;
 		return x;

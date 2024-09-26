@@ -3,6 +3,7 @@ APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
+# original APE \
 	asin.$O\
 	atan.$O\
 	atan2.$O\
@@ -24,21 +25,168 @@ OFILES=\
 	tan.$O\
 	tanh.$O\
 # musl \
+	__cos.$O\
+	__cosdf.$O\
+	__cosl.$O\
+#	__expo2.$O\
+#	__expo2f.$O\
+	__fpclassify.$O\
+	__fpclassifyf.$O\
+	__fpclassifyl.$O\
+	__invtrigl.$O\
+#	__math_divzero.$O\
+#	__math_divzerof.$O\
+	__math_invalid.$O\
+	__math_invalidf.$O\
+	__math_invalidl.$O\
+#	__math_oflow.$O\
+#	__math_oflowf.$O\
+#	__math_uflow.$O\
+#	__math_uflowf.$O\
+	__math_xflow.$O\
+	__math_xflowf.$O\
+	__polevll.$O\
+#	__rem_pio2.$O\
+#	__rem_pio2_large.$O\
+#	__rem_pio2f.$O\
+	__rem_pio2l.$O\
+	__signbit.$O\
+	__signbitf.$O\
+	__signbitl.$O\
+	__sin.$O\
+#	__sindf.$O\
+	__sinl.$O\
+#	__tan.$O\
+#	__tandf.$O\
+	__tanl.$O\
+#	acos.$O\
+#	acosf.$O\
+	acosh.$O\
+	acoshf.$O\
+	acoshl.$O\
+	acosl.$O\
+#	asinf.$O\
+#	asinh.$O\
+#	asinhf.$O\
+	asinhl.$O\
+	asinl.$O\
+#	atan2f.$O\
+	atan2l.$O\
+#	cbrt.$O\
+#	cbrtf.$O\
+	cbrtl.$O\
+	ceil.$O\
+#	ceilf.$O\
+	ceill.$O\
 	copysign.$O\
+	copysignf.$O\
+	copysignl.$O\
+#	cos.$O\
+#	cosf.$O\
+#	cosh.$O\
+#	coshf.$O\
+	coshl.$O\
+	cosl.$O\
+	exp10.$O\
+	exp10f.$O\
+	exp10l.$O\
+#	exp2.$O\
+#	exp2f.$O\
+#	exp2f_data.$O\
+	exp2l.$O\
+#	exp_data.$O\
+#	expf.$O\
+	expl.$O\
+#	expm1.$O\
+#	expm1f.$O\
+	expm1l.$O\
+	fabsf.$O\
+	fabsl.$O\
+	fdim.$O\
+	fdimf.$O\
+	fdiml.$O\
 	finite.$O\
 	finitef.$O\
-	frexp.$O\
-	frexpf.$O\
+#	frexp.$O\
+#	frexpf.$O\
 	frexpl.$O\
+#	hypotf.$O\
+	hypotl.$O\
+	ilogb.$O\
+	ilogbf.$O\
+	ilogbl.$O\
+#	j0f.$O\
+#	j1f.$O\
+#	jnf.$O\
 	ldexp.$O\
 	ldexpf.$O\
 	ldexpl.$O\
+	lgamma.$O\
+	lgamma_r.$O\
+	lgammaf.$O\
+	lgammaf_r.$O\
+	lgammal.$O\
+	llrint.$O\
+	llrintf.$O\
+	llrintl.$O\
+	llround.$O\
+	llroundf.$O\
+	llroundl.$O\
+#	log10.$O\
+#	log10f.$O\
+	log10l.$O\
+#	log1p.$O\
+#	log1pf.$O\
+	log1pl.$O\
+#	log2.$O\
+#	log2_data.$O\
+#	log2f.$O\
+#	log2f_data.$O\
+	log2l.$O\
+#	log_data.$O\
+	logb.$O\
+	logbf.$O\
+	logbl.$O\
+#	logf.$O\
+#	logf_data.$O\
+	logl.$O\
+#	lrint.$O\
+#	lrintf.$O\
+	lrintl.$O\
+	lround.$O\
+	lroundf.$O\
+	lroundl.$O\
 	modf.$O\
 	modff.$O\
 	modfl.$O\
+#	nan.$O\
+#	nanf.$O\
+#	nanl.$O\
+	nearbyint.$O\
+	nearbyintf.$O\
+	nearbyintl.$O\
+	nextafter.$O\
+	nextafterf.$O\
+	nextafterl.$O\
+	nexttoward.$O\
+	nexttowardf.$O\
+	nexttowardl.$O\
+#	pow_data.$O\
+#	powf.$O\
+#	powf_data.$O\
+	powl.$O\
+	remainder.$O\
+	remainderf.$O\
+	remainderl.$O\
+	remquo.$O\
+	remquof.$O\
+	remquol.$O\
 	rint.$O\
 	rintf.$O\
 	rintl.$O\
+	round.$O\
+	roundf.$O\
+	roundl.$O\
 	scalb.$O\
 	scalbf.$O\
 	scalbln.$O\
@@ -47,10 +195,31 @@ OFILES=\
 	scalbn.$O\
 	scalbnf.$O\
 	scalbnl.$O\
-	signbit.$O\
-	signbitf.$O\
-	signbitl.$O\
+	signgam.$O\
+	significand.$O\
+	significandf.$O\
+#	sincos.$O\
+#	sincosf.$O\
+	sincosl.$O\
+#	sinf.$O\
+	sinhf.$O\
+	sinhl.$O\
+	sinl.$O\
+#	sqrt.$O\
+	sqrt_data.$O\
+#	sqrtf.$O\
+	sqrtl.$O\
+#	tanf.$O\
+	tanhf.$O\
+	tanhl.$O\
+	tanl.$O\
+#	tgamma.$O\
+	tgammaf.$O\
+	tgammal.$O\
+#	trunc.$O\
+#	truncf.$O\
+	truncl.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=$CFLAGS -c -D_POSIX_SOURCE
+CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_BSD_SOURCE

@@ -1,6 +1,7 @@
 #include "libm.h"
 
-int signbit(double x)
+// FIXME: macro in math.h
+int __signbit(double x)
 {
 	union {
 		double d;

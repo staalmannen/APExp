@@ -29,32 +29,36 @@ TARG=	\
 GNULIB_OBJECTS=	\
 		basename-lgpl.$O\
 		c-strstr.$O\
+		c-strncasecmp.$O\
 		c32iscntrl.$O\
 		c32width.$O\
 		c32isalnum.$O\
-		close.$O\
-		closeout.$O\
-		error.$O\
+		clean-temp.$O\
+		error-progname.$O\
 		exitfail.$O\
 		fwriteerror.$O\
 		getprogname.$O\
-		getopt.$O\
-		getopt1.$O\
 		mbchar.$O\
 		mbrtoc32.$O\
+		mkdtemp.$O\
 		progname.$O\
 		propername.$O\
 		progreloc.$O\
 		reallocarray.$O\
 		strnlen1.$O\
-#		trim.$O\
 		xalloc-die.$O\
-		xmalloc.$O
+		xerror.$O\
+		xmalloc.$O\
+		xstriconv.$O\
+# gnulib-lib/unictype\
+		ctype_alnum.$O\
+		ctype_cntrl.$O
 
+# weird thing: some things are not included when linked from library...
 
 LIB=$APEXPROOT/$objtype/lib/ape/libintl.a\
 	$APEXPROOT/$objtype/lib/ape/libiconv.a\
-	$GNULIB_OBJECTS
+	libgnulib.a$O
 
 BIN=$APEXPROOT/$objtype/bin/ape
 HFILES=$APEXPROOT/sys/include/ape/libintl.h
@@ -66,7 +70,10 @@ GETTEXTSRC=../../../external/gettext
 CC=pcc
 LD=pcc
 DEFS= 	-DLOCALEDIR="/sys/lib/ape/locale" -DBISON_LOCALEDIR="/sys/lib/ape/locale" -DLIBDIR="/$objtype/lib/ape"\
-		-DEXEEXT="" -DPROJECTSDIR="." -DGETTEXTJAR="/sys/lib/ape/gettext" -DGETTEXTDATADIR="/sys/lib/ape/gettext"
+		-DEXEEXT="" -DPROJECTSDIR="." -DGETTEXTJAR="/sys/lib/ape/gettext" -DGETTEXTDATADIR="/sys/lib/ape/gettext"\
+		-Drpl_optarg=optarg -Drpl_getopt=getopt -Drpl_optind=optind -Drpl_getopt_long=getopt_long -Drpl_malloc=malloc\
+		-Drpl_realloc=realloc -Drpl_calloc=calloc -Drpl_free=free -Drpl_rmdir=rmdir -Drpl_open=open\
+		-DENABLE_NLS -DHAVE_ICONV -DGNULIB_XALLOC -DGNULIB_XALLOC_DIE
 #TODO make conditional variables based on architecture
 
 RINCLUDE= 	-I$GETTEXTSRC/gettext-runtime/src -I$GETTEXTSRC/gettext-runtime\
@@ -90,16 +97,22 @@ hash-string.$O: $GETTEXTSRC/gettext-runtime/intl/hash-string.c
 %.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/%.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/$stem.c
 
-$O.msgfmt:V: 	msgfmt.$O write-mo.$O write-java.$O write-csharp.$O write-resources.$O\
-				write-tcl.$O write-qt.$O write-desktop.$O write-xml.$O hash-string.$O
-	$LD -o $target $prereq
+%.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/unictype/%.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/unictype/$stem.c
 
-$O.msgcmp:V: 	msgcmp.$O msgl-fsearch.$O
-	$LD -o $target $prereq
+libgnulib.a$O:V:	$GNULIB_OBJS
+					ar vu libgnulib.a$O $GNULIB_OBJS
+
+$O.msgfmt:V: 	msgfmt.$O write-mo.$O write-java.$O write-csharp.$O write-resources.$O\
+				write-tcl.$O write-qt.$O write-desktop.$O write-xml.$O hash-string.$O $LIB
+				$LD -o $target $prereq
+
+$O.msgcmp:V: 	msgcmp.$O msgl-fsearch.$O $LIB
+				$LD -o $target $prereq
 
 $O.msgunfmt:V:	msgunfmt.$O read-mo.$O read-java.$O read-csharp.$O read-resources.$O\
-				read-tcl.$O hash-string.$O
-	$LD -o $target $prereq
+				read-tcl.$O hash-string.$O $LIB
+				$LD -o $target $prereq
 
 
 install:V:

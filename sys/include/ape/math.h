@@ -8,6 +8,9 @@
 
 #define INFINITY HUGE_VAL
 
+#define double_t double
+#define float_t double
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -42,7 +45,7 @@ extern double Inf(int);
 extern int isInf(double, int);
 extern double fmin(double, double);
 
-#ifdef _RESEARCH_SOURCE
+#if defined(_RESEARCH_SOURCE) || defined(_XOPEN_SOURCE) || defined(_GNU_SOURCE) || defined(_BSD_SOURCE)
 /* does >> treat left operand as unsigned ? */
 #define Unsigned_Shifts 1
 #define	M_E		2.7182818284590452354	/* e */
@@ -86,6 +89,9 @@ extern double yn(int, double);
 
 /* functions imported from musl math */
 
+#define FP_ILOGBNAN (-1-0x7fffffff)
+#define FP_ILOGB0 FP_ILOGBNAN
+
 #define FP_NAN       0
 #define FP_INFINITE  1
 #define FP_ZERO      2
@@ -102,6 +108,7 @@ static unsigned __FLOAT_BITS(float __f)
 	__u.__f = __f;
 	return __u.__i;
 }
+
 static unsigned long long __DOUBLE_BITS(double __f)
 {
 	union {double __f; unsigned long long __i;} __u;
@@ -114,9 +121,17 @@ static unsigned long long __DOUBLE_BITS(double __f)
 	sizeof(x) == sizeof(double) ? __fpclassify(x) : \
 	__fpclassifyl(x) )
 
-int signbit(double);
-int signbitf(float);
-int signbitl(long double);
+int __signbit(double);
+int __signbitf(float);
+int __signbitl(long double);
+
+
+#define signbit(x) ( \
+	sizeof(x) == sizeof(float) ? (int)(__FLOAT_BITS(x)>>31) : \
+	sizeof(x) == sizeof(double) ? (int)(__DOUBLE_BITS(x)>>63) : \
+	__signbitl(x) )
+
+
 double copysign(double, double);
 double frexp(double, int *);
 float frexpf(float, int *);

@@ -42,6 +42,7 @@
 //# define mbsrtowcs __mbsrtowcs
 //# define USE_UNLOCKED_IO 0
 # define _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD(a, b)
+# undef _GL_ARG_NONNULL
 # define _GL_ARG_NONNULL(a)
 //#endif
 

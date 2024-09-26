@@ -235,7 +235,7 @@ create_temp_dir (const char *prefix, const char *parentdir,
       goto quit;
     }
   block_fatal_signals ();
-  tmpdirname = mkdtemp (xtemplate);
+  tmpdirname = (char *) mkdtemp (xtemplate);
   int saved_errno = errno;
   if (tmpdirname != NULL)
     {

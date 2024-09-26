@@ -9,14 +9,14 @@
 #elif FLT_EVAL_METHOD==2
 #define EPS LDBL_EPSILON
 #endif
-static const float toint = 1/EPS;
+static const float_t toint = 1/EPS;
 
 float rintf(float x)
 {
 	union {float f; uint32_t i;} u = {x};
 	int e = u.i>>23 & 0xff;
 	int s = u.i>>31;
-	float y;
+	float_t y;
 
 	if (e >= 0x7f+23)
 		return x;

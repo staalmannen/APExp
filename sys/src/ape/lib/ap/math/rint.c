@@ -7,14 +7,14 @@
 #elif FLT_EVAL_METHOD==2
 #define EPS LDBL_EPSILON
 #endif
-static const double toint = 1/EPS;
+static const double_t toint = 1/EPS;
 
 double rint(double x)
 {
 	union {double f; uint64_t i;} u = {x};
 	int e = u.i>>52 & 0x7ff;
 	int s = u.i>>63;
-	double y;
+	double_t y;
 
 	if (e >= 0x3ff+52)
 		return x;
