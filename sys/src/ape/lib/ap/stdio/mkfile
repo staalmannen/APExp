@@ -74,7 +74,8 @@ OFILES=\
 	fmemopen.$O\
 	getdelim.$O\
 	getline.$O\
-#	vasnprintf.$O
+#	vasnprintf.$O\
+
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

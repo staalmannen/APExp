@@ -2,7 +2,7 @@ APEXPROOT=../../../../../
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-DIRS=gen math plan9 posix stdio syscall
+DIRS=gen math fenv plan9 posix stdio syscall
 
 default:V:	all
 

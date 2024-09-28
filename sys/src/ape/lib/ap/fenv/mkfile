@@ -1,0 +1,18 @@
+APEXPROOT=../../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+
+OFILES=\
+# musl \
+	fegetexceptflag.$O\
+	feholdexcept.$O\
+	fenv.$O\
+	fesetexceptflag.$O\
+	fesetround.$O\
+	feupdateenv.$O
+
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_BSD_SOURCE
