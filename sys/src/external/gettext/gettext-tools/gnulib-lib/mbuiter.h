@@ -161,7 +161,7 @@ mbuiter_multi_next (struct mbuiter_multi *iter)
       iter->in_shift = true;
     with_shift:
       #endif
-      iter->cur.bytes = mbrtoc32 (&iter->cur.wc, iter->cur.ptr,
+      iter->cur.bytes = mbrtoc32 ((unsigned int *) &iter->cur.wc, iter->cur.ptr,
                                   strnlen1 (iter->cur.ptr, iter->cur_max),
                                   &iter->state);
       if (iter->cur.bytes == (size_t) -1)

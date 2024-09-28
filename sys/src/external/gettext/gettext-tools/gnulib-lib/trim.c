@@ -105,7 +105,7 @@ trim2 (const char *s, int how)
   char *d = malloc (dlen + 1);
   if (!d)
     xalloc_die ();
-  char *d_end = mempcpy (d, start, dlen);
+  char *d_end = (char *) mempcpy (d, start, dlen);
   *d_end = '\0';
 
   return d;

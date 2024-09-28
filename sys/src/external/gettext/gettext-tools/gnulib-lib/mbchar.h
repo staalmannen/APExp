@@ -151,6 +151,7 @@
 
 #include <string.h>
 #include <uchar.h>
+#include <stdbool.h>
 
 _GL_INLINE_HEADER_BEGIN
 #ifndef MBCHAR_INLINE
@@ -166,7 +167,7 @@ struct mbchar
   const char *ptr;      /* pointer to current character */
   size_t bytes;         /* number of bytes of current character, > 0 */
   bool wc_valid;        /* true if wc is a valid 32-bit wide character */
-  char32_t wc;          /* if wc_valid: the current character */
+  const char wc;          /* if wc_valid: the current character */
 #if defined GNULIB_MBFILE
   char buf[MBCHAR_BUF_SIZE]; /* room for the bytes, used for file input only */
 #endif

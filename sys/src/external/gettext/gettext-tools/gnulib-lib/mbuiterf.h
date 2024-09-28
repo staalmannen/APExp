@@ -104,7 +104,7 @@ _GL_INLINE_HEADER_BEGIN
 struct mbuif_state
 {
   #if !GNULIB_MBRTOC32_REGULAR
-  bool in_shift;        /* true if next byte may not be interpreted as ASCII */
+  bool in_shift;        /* true if next byte may not be interpreted as ASCII */0
                         /* If GNULIB_MBRTOC32_REGULAR, it is always false,
                            so optimize it away.  */
   #endif
@@ -123,7 +123,7 @@ mbuiterf_next (struct mbuif_state *ps, const char *iter)
     goto with_shift;
   #endif
   /* Handle most ASCII characters quickly, without calling mbrtowc().  */
-  if (is_basic (*iter))
+  if (is_basic (*iter)) 
     {
       /* These characters are part of the POSIX portable character set.
          For most of them, namely those in the ISO C basic character set,
@@ -131,7 +131,7 @@ mbuiterf_next (struct mbuif_state *ps, const char *iter)
          their char code.  For the few other ones, this is the case as well,
          in all locale encodings that are in use.  The 32-bit wide character
          code is the same as well.  */
-      return (mbchar_t) { .ptr = iter, .bytes = 1, .wc_valid = true, .wc = *iter };
+//      return (mbchar_t) { .ptr = iter, .bytes = 1, .wc_valid = true, .wc = *iter };
     }
   else
     {
@@ -151,14 +151,14 @@ mbuiterf_next (struct mbuif_state *ps, const char *iter)
           ps->in_shift = false;
           #endif
           mbszero (&ps->state);
-          return (mbchar_t) { .ptr = iter, .bytes = 1, .wc_valid = false };
+//          return (mbchar_t) { .ptr = iter, .bytes = 1, .wc_valid = false };
         }
       else if (bytes == (size_t) -2)
         {
           /* An incomplete multibyte character at the end.  */
           /* Whether to set ps->in_shift = false and reset ps->state or not is
              not important; the string end is reached anyway.  */
-          return (mbchar_t) { .ptr = iter, .bytes = strlen (iter), .wc_valid = false };
+//          return (mbchar_t) { .ptr = iter, .bytes = strlen (iter), .wc_valid = false };
         }
       else
         {
@@ -182,7 +182,7 @@ mbuiterf_next (struct mbuif_state *ps, const char *iter)
           if (mbsinit (&ps->state))
             ps->in_shift = false;
           #endif
-          return (mbchar_t) { .ptr = iter, .bytes = bytes, .wc_valid = true, .wc = wc };
+//          return (mbchar_t) { .ptr = iter, .bytes = bytes, .wc_valid = true, .wc = wc };
         }
     }
 }

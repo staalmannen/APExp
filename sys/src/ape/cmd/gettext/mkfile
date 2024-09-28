@@ -29,30 +29,48 @@ TARG=	\
 GNULIB_OBJECTS=	\
 		basename-lgpl.$O\
 		c-strstr.$O\
+		c-strcasecmp.$O\
 		c-strncasecmp.$O\
 		c32iscntrl.$O\
 		c32width.$O\
 		c32isalnum.$O\
+		c32isspace.$O\
 		clean-temp.$O\
+		closeout.$O\
+		error.$O\
 		error-progname.$O\
 		exitfail.$O\
 		fwriteerror.$O\
 		getprogname.$O\
+		lc-charset-dispatch.$O\
+		malloca.$O\
 		mbchar.$O\
+		mbtowc-lock.$O\
 		mbrtoc32.$O\
+		mbslen.$O\
+		mbsinit.$O\
+		mbsstr.$O\
+		mbszero.$O\
+		mempcpy.$O\
+		mbuiter.$O\
 		mkdtemp.$O\
 		progname.$O\
 		propername.$O\
 		progreloc.$O\
 		reallocarray.$O\
 		strnlen1.$O\
+		striconv.$O\
+		trim.$O\
 		xalloc-die.$O\
 		xerror.$O\
 		xmalloc.$O\
 		xstriconv.$O\
 # gnulib-lib/unictype\
 		ctype_alnum.$O\
-		ctype_cntrl.$O
+		ctype_cntrl.$O\
+		ctype_space.$O\
+# gnulib-lib/uniwidth\
+		width.$O
 
 # weird thing: some things are not included when linked from library...
 
@@ -73,8 +91,7 @@ DEFS= 	-DLOCALEDIR="/sys/lib/ape/locale" -DBISON_LOCALEDIR="/sys/lib/ape/locale"
 		-DEXEEXT="" -DPROJECTSDIR="." -DGETTEXTJAR="/sys/lib/ape/gettext" -DGETTEXTDATADIR="/sys/lib/ape/gettext"\
 		-Drpl_optarg=optarg -Drpl_getopt=getopt -Drpl_optind=optind -Drpl_getopt_long=getopt_long -Drpl_malloc=malloc\
 		-Drpl_realloc=realloc -Drpl_calloc=calloc -Drpl_free=free -Drpl_rmdir=rmdir -Drpl_open=open\
-		-DENABLE_NLS -DHAVE_ICONV -DGNULIB_XALLOC -DGNULIB_XALLOC_DIE
-#TODO make conditional variables based on architecture
+		-DENABLE_NLS -DHAVE_ICONV -DGNULIB_MBRTOC32_REGULAR -DGNULIB_MBRTOWC_SINGLE_THREAD -DPLAN9
 
 RINCLUDE= 	-I$GETTEXTSRC/gettext-runtime/src -I$GETTEXTSRC/gettext-runtime\
 			-I$GETTEXTSRC/gettext-runtime/gnulib-lib -I$GETTEXTSRC/gettext-runtime/intl
@@ -100,8 +117,11 @@ hash-string.$O: $GETTEXTSRC/gettext-runtime/intl/hash-string.c
 %.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/unictype/%.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/unictype/$stem.c
 
-libgnulib.a$O:V:	$GNULIB_OBJS
-					ar vu libgnulib.a$O $GNULIB_OBJS
+%.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/uniwidth/%.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/uniwidth/$stem.c
+
+libgnulib.a$O:V:	$GNULIB_OBJECTS
+					ar vu libgnulib.a$O $GNULIB_OBJECTS
 
 $O.msgfmt:V: 	msgfmt.$O write-mo.$O write-java.$O write-csharp.$O write-resources.$O\
 				write-tcl.$O write-qt.$O write-desktop.$O write-xml.$O hash-string.$O $LIB
