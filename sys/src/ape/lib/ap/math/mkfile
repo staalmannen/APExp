@@ -59,7 +59,6 @@ OFILES=\
 #	__tan.$O\
 #	__tandf.$O\
 	__tanl.$O\
-#	acos.$O\
 #	acosf.$O\
 	acosh.$O\
 	acoshf.$O\
@@ -72,21 +71,24 @@ OFILES=\
 	asinl.$O\
 #	atan2f.$O\
 	atan2l.$O\
+	atanh.$O\
+	atanhf.$O\
+	atanhl.$O\
 #	cbrt.$O\
 #	cbrtf.$O\
 	cbrtl.$O\
-	ceil.$O\
 #	ceilf.$O\
 	ceill.$O\
 	copysign.$O\
 	copysignf.$O\
 	copysignl.$O\
-#	cos.$O\
 #	cosf.$O\
 #	cosh.$O\
 #	coshf.$O\
 	coshl.$O\
 	cosl.$O\
+#	erff.$O\
+	erfl.$O\
 	exp10.$O\
 	exp10f.$O\
 	exp10l.$O\
@@ -105,6 +107,16 @@ OFILES=\
 	fdim.$O\
 	fdimf.$O\
 	fdiml.$O\
+#	fma.$O\
+	fmaf.$O\
+	fmal.$O\
+	fmax.$O\
+	fmaxf.$O\
+	fmaxl.$O\
+	fminf.$O\
+	fminl.$O\
+	fmodf.$O\
+	fmodl.$O\
 	finite.$O\
 	finitef.$O\
 #	frexp.$O\
@@ -132,13 +144,11 @@ OFILES=\
 	llround.$O\
 	llroundf.$O\
 	llroundl.$O\
-#	log10.$O\
 #	log10f.$O\
 	log10l.$O\
 #	log1p.$O\
 #	log1pf.$O\
 	log1pl.$O\
-#	log2.$O\
 #	log2_data.$O\
 #	log2f.$O\
 #	log2f_data.$O\

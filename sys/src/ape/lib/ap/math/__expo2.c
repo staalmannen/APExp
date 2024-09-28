@@ -2,7 +2,7 @@
 
 /* k is such that k*ln2 has minimal relative error and x - kln2 > log(DBL_MIN) */
 static const int k = 2043;
-static const double kln2 = 0x1.62066151add8bp+10;
+static const double kln2 = 1.38290985340231276091 * 1024;
 
 /* exp(x)/2 for x >= log(DBL_MAX), slightly better than 0.5*exp(x/2)*exp(x/2) */
 double __expo2(double x, double sign)

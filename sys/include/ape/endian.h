@@ -7,8 +7,8 @@
 #define __NEED_uint32_t
 #define __NEED_uint64_t
 
-#include <inttypes.h>
-#include <stdint.h>
+// todo: how do I make includes from arch directories?
+//#include "/$M/include/ape/alltypes.h"
 
 #define __PDP_ENDIAN 3412
 

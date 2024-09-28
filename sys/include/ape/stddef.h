@@ -1,6 +1,8 @@
 #ifndef __STDDEF_H
 #define __STDDEF_H
 
+#include <stddef_arch.h>
+
 #ifndef __STDDEF_ARCH_H
 typedef long _ptrdiff_t;
 #endif

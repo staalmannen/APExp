@@ -1,6 +1,8 @@
 #ifndef _STDINT_GENERIC_H_
 #define _STDINT_GENERIC_H_ 1
 
+#include <stdint_arch.h>
+
 /*
  * Default for 32 bit architectures, overriden by
  * /$objtype/include/ape/stdint.h if needed.
