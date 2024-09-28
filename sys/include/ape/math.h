@@ -196,6 +196,9 @@ double      	fdim(double, double);
 float       	fdimf(float, float);
 long double 	fdiml(long double, long double);
 
+float       floorf(float);
+long double floorl(long double);
+
 double      	fma(double, double, double);
 float       	fmaf(float, float, float);
 long double 	fmal(long double, long double, long double);

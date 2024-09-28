@@ -7,7 +7,7 @@
 #define _XOPEN_SOURCE 500
 #define _POSIX_C_SOURCE 199506L
 
-#include "/sys/include/ape/config.h"
+#include <config_common.h>
 
 #endif /* __CONFIG_H */
 

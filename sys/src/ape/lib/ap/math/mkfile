@@ -108,7 +108,7 @@ OFILES=\
 	fdimf.$O\
 	fdiml.$O\
 #	fma.$O\
-	fmaf.$O\
+#	fmaf.$O\
 	fmal.$O\
 	fmax.$O\
 	fmaxf.$O\

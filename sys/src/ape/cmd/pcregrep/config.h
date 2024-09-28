@@ -1,7 +1,7 @@
 /* src/config.h.  Generated from config.h.in by configure.  */
 /* src/config.h.in.  Generated from configure.ac by autoheader.  */
 
-#include "/sys/include/ape/config.h"
+#include <config_common.h>
 
 /* PCRE2 is written in Standard C, but there are a few non-standard things it
 can cope with, allowing it to run on SunOS4 and other "close to standard"

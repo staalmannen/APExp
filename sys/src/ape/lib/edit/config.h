@@ -1,7 +1,7 @@
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-#include "../../../../include/ape/config.h"
+#include <config_common.h>
 
 #define NBBY CHAR_BIT
 

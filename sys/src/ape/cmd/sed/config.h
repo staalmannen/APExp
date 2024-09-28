@@ -1,4 +1,4 @@
-#include "/sys/include/ape/config.h"
+#include <config_common.h>
 
 /* Define to the copyright year printed by --version. */
 #define COPYRIGHT_YEAR 2009

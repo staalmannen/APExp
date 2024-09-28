@@ -9,7 +9,7 @@
    */
 /* #undef CRAY_STACKSEG_END */
 
-#include "/sys/include/ape/config.h"
+#include <config_common.h>
 
 /* Use high resolution file timestamps if nonzero. */
 #define FILE_TIMESTAMP_HI_RES 0

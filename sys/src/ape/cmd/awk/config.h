@@ -1,7 +1,7 @@
 /* config.h.  Generated from configh.in by configure.  */
 /* configh.in.  Generated from configure.ac by autoheader.  */
 
-#include "/sys/include/ape/config.h"
+#include <config_common.h>
 
 #define SHLIBEXT ".a"
 #define DEFLIBPATH "/sys/lib/ape/awk"
