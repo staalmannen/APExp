@@ -1,5 +1,5 @@
 </$objtype/mkfile
-APEXPROOT=../../../../../..
+APEXPROOT=../../../../..
 LIB=$APEXPROOT/$objtype/lib/ape/libfl.a
 
 
@@ -8,7 +8,7 @@ OFILES=	libmain.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-FLEXSRC=../../../../external/flex
+FLEXSRC=../../../external/flex
 
 %.$O: $FLEXSRC/src/%.c
 	$CC $CFLAGS $FLEXSRC/src/$stem.c

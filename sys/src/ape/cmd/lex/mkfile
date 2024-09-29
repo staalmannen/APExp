@@ -1,24 +1,56 @@
 </$objtype/mkfile
-DIRS=doc libfl flex 
+TARG=flex
 APEXPROOT=../../../../..
-FLEXSRC=$APEXPROOT/sys/src/external/flex/src
+BIN=$APEXPROOT/$objtype/bin/ape
+LIB=	$APEXPROOT/$objtype/lib/ape/libfl.a\
+		$APEXPROOT/$objtype/lib/ape/libpcre2posix.a\
+		$APEXPROOT/$objtype/lib/ape/libpcre2.a
 
-all:V:
-	for (i in $DIRS)
-		@{ cd $i; mk }
+
+OFILES=	\
+	#src\
+		buf.$O\
+		ccl.$O\
+		dfa.$O\
+		ecs.$O\
+		filter.$O\
+		gen.$O\
+		main.$O\
+		misc.$O\
+		nfa.$O\
+		options.$O\
+		parse.$O\
+		regex.$O\
+		scan.$O\
+		scanflags.$O\
+		scanopt.$O\
+		skel.$O\
+		sym.$O\
+		tables.$O\
+		tables_shared.$O\
+		tblcmp.$O\
+		yylex.$O\
+	#lib\
+		malloc.$O\
+		realloc.$O
+
+</sys/src/cmd/mkone
+
+FLEXSRC=../../../external/flex
+
+%.$O: $FLEXSRC/src/%.c
+	$CC $CFLAGS $FLEXSRC/src/$stem.c
+
+%.$O: $FLEXSRC/lib/%.c
+	$CC $CFLAGS $FLEXSRC/lib/$stem.c
+
+CC=pcc
+LD=pcc
+CFLAGS=-c -I. -I$FLEXSRC/flex/src -B -D_POSIX_SOURCE -D_SUSV2_SOURCE \
+	-D_BSD_EXTENSION -DHAVE_CONFIG_H 
+
 
 install:V:
-	bind -b $APEXPROOT/$objtype/lib/ape /$objtype/lib/ape
-	for (i in $DIRS)
-		@{ cd $i; mk $target }
-	cp $FLEXSRC/FlexLexer.h $APEXPROOT/sys/include/ape/
-
-clean:V:
-	for (i in $DIRS)
-		@{ cd $i; mk $target }
-
-nuke:V:
-	for (i in $DIRS)
-		@{ cd $i; mk $target }
-	rm -f $APEXPROOT/sys/include/ape/FlexLexer.h
+		cp $BIN/flex $BIN/lex
+		cp $FLEXSRC/doc/flex.1 $APEXPROOT/sys/man/1/flex
 
