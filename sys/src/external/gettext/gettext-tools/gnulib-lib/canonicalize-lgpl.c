@@ -235,13 +235,13 @@ realpath_stk (const char *name, char *resolved, struct realpath_bufs *bufs)
             return NULL;
           rname = bufs->rname.data;
         }
-      dest = __rawmemchr (rname, '\0');
+      dest = (char *) __rawmemchr (rname, '\0');
       start = name;
       prefix_len = FILE_SYSTEM_PREFIX_LEN (rname);
     }
   else
     {
-      dest = __mempcpy (rname, name, prefix_len);
+      dest = (char *) __mempcpy (rname, name, prefix_len);
       *dest++ = '/';
       if (DOUBLE_SLASH_IS_DISTINCT_ROOT)
         {
@@ -297,7 +297,7 @@ realpath_stk (const char *name, char *resolved, struct realpath_bufs *bufs)
               dest = rname + dest_offset;
             }
 
-          dest = __mempcpy (dest, start, startlen);
+          dest = (char *) __mempcpy (dest, start, startlen);
           *dest = '\0';
 
           char *buf;
@@ -350,7 +350,7 @@ realpath_stk (const char *name, char *resolved, struct realpath_bufs *bufs)
                 {
                   idx_t pfxlen = FILE_SYSTEM_PREFIX_LEN (buf);
 
-                  dest = __mempcpy (rname, buf, pfxlen);
+                  dest = (char *) __mempcpy (rname, buf, pfxlen);
                   *dest++ = '/'; /* It's an absolute symlink */
                   if (DOUBLE_SLASH_IS_DISTINCT_ROOT)
                     {

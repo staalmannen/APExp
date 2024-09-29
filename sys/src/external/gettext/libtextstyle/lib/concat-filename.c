@@ -66,7 +66,7 @@ concatenated_filename (const char *directory, const char *filename,
       if (need_slash)
         *p++ = '/';
     }
-  p = stpcpy (p, filename);
+  p = (char *) stpcpy (p, filename);
   if (suffix != NULL)
     stpcpy (p, suffix);
   return result;

@@ -7,16 +7,56 @@ LIB=$APEXPROOT/$objtype/lib/ape/libintl.a
 
 OFILES= \
 # src \
+	dir-list.$O\
+	file-list.$O\
+	format.$O\
+	format-awk.$O\
+	format-boost.$O\
+	format-c++-brace.$O\
+	format-c.$O\
+	format-csharp.$O\
+	format-elisp.$O\
+	format-gcc-internal.$O\
+	format-gfc-internal.$O\
+	format-java-printf.$O\
+	format-java.$O\
+	format-javascript.$O\
+	format-kde-kuit.$O\
+	format-kde.$O\
+	format-librep.$O\
+	format-lisp.$O\
+	format-lua.$O\
+	format-pascal.$O\
+	format-perl-brace.$O\
+	format-perl.$O\
+	format-php.$O\
+	format-python-brace.$O\
+	format-python.$O\
+	format-qt-plural.$O\
+	format-qt.$O\
+	format-ruby.$O\
+	format-scheme.$O\
+	format-sh.$O\
+	format-smalltalk.$O\
+	format-tcl.$O\
 	po-error.$O\
 	po-xerror.$O\
 	po-charset.$O\
 	po-lex.$O\
 	po-gram-gen.$O\
 	pos.$O\
+	mbswidth.$O\
+	mbszero.$O\
+	message.$O\
 	msgl-ascii.$O\
+	msgl-cat.$O\
 	msgl-charset.$O\
 #	msgl-check.$O\
+	msgl-english.$O\
+	msgl-equal.$O\
+	msgl-header.$O\
 	msgl-iconv.$O\
+	msgl-ofn.$O\
 	open-catalog.$O\
 	read-catalog.$O\
 	read-catalog-abstract.$O\
@@ -25,6 +65,11 @@ OFILES= \
 	read-properties.$O\
 	read-resources.$O\
 	read-stringtable.$O\
+	write-catalog.$O\
+	write-po.$O\
+	write-properties.$O\
+	write-stringtable.$O\
+	str-list.$O\
 	xg-arglist-callshape.$O\
 	xg-arglist-context.$O\
 	xg-arglist-parser.$O\
@@ -32,13 +77,63 @@ OFILES= \
 	xg-message.$O\
 	xg-mixed-string.$O\
 	xg-pos.$O\
+	x-po.$O\
 # libgettextpo \
+	c-strstr.$O\
+	mem-hash-map.$O\
+	memrchr.$O\
+	fstrcmp.$O\
+	gcd.$O\
 	gettext-po.$O\
+	lc-charset-dispatch.$O\
+	obstack.$O\
+	rawmemchr.$O\
+	stpncpy.$O\
+	strchrnul.$O\
+	string-desc.$O\
 	striconv.$O\
 	striconveh.$O\
+	striconveha.$O\
+	xasprintf.$O\
+	xvasprintf.$O\
+	xerror.$O\
 	xstriconv.$O\
 # woe32dll \
-	gettextpo-exports.$O
+	gettextpo-exports.$O\
+# gnulib-lib/unistr \
+	u8-check.$O\
+	u8-mblen.$O\
+	u8-mbtouc.$O\
+	u8-mbtouc-aux.$O\
+	u8-mbtouc-unsafe.$O\
+	u8-mbtouc-unsafe-aux.$O\
+	u16-mbtouc-aux.$O\
+	u8-uctomb.$O\
+	u8-uctomb-aux.$O\
+	u8-mbtouc.$O\
+	u8-mbtoucr.$O\
+	u8-prev.$O\
+# gnulib-lib/unictype \
+	ctype_alnum.$O\
+	ctype_cntrl.$O\
+	ctype_space.$O\
+# gnulib-lib/uniwidth \
+	width.$O\
+# gnulib-lib/unilbrk \
+	u8-width-linebreaks.$O\
+	u8-possible-linebreaks.$O\
+	ulc-common.$O\
+	ulc-width-linebreaks.$O\
+	lbrktables.$O\
+# gnulib-lib/uniconv\
+	u8-conv-from-enc.$O\
+# gnulib-lib\
+#	findprog.$O\
+	read-file.$O\
+	memset_explicit.$O\
+#	unsetenv.$O\
+#	xsetenv.$O\
+	xstriconveh.$O\
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib
@@ -46,10 +141,13 @@ OFILES= \
 GETTEXTSRC=../../../external/gettext/gettext-tools/libgettextpo
 
 CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/.. -I$GETTEXTSRC/../src\
+		-I$GETTEXTSRC/../../libtextstyle/lib\
 		-I$GETTEXTSRC/../gnulib-lib -Drpl_malloc=malloc -Drpl_free=free\
-		-Drpl_realloc=realloc -Drpl_strtoul=strtoul\
+		-Drpl_realloc=realloc -Drpl_strtoul=strtoul -Drpl_strstr=strstr\
+		-Drpl_strerror=strerror -Drpl_calloc=calloc -Drpl_readlink=readlink\
 		-DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION -D_RESEARCH_SOURCE\
-		-DLIBDIR="/sys/lib/ape"
+		-DLIBDIR="/sys/lib/ape" -DHAVE_ICONV -DEILSEQ=ENOENT -DPTRDIFF_MAX=SIZE_MAX\
+		-DUINTPTR_MAX=INT_MAX -DUINTPTR_WIDTH=UINTPTR_MAX -DUCHAR_WIDTH=UCHAR_MAX
 
 %.$O: $GETTEXTSRC/%.c
 	$CC $CFLAGS $GETTEXTSRC/$stem.c
@@ -59,6 +157,40 @@ CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/.. -I$GETTEXTSRC/../src\
 
 %.$O: $GETTEXTSRC/../woe32dll//%.c
 	$CC $CFLAGS $GETTEXTSRC/../woe32dll/$stem.c
+
+%.$O: $GETTEXTSRC/../gnulib-lib/unistr/%.c
+	$CC $CFLAGS $GETTEXTSRC/../gnulib-lib/unistr/$stem.c
+
+%.$O: $GETTEXTSRC/../gnulib-lib/unictype/%.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/unictype/$stem.c
+
+%.$O: $GETTEXTSRC/../gnulib-lib/uniwidth/%.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/uniwidth/$stem.c
+
+%.$O: $GETTEXTSRC/../gnulib-lib/unilbrk/%.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/unilbrk/$stem.c
+
+%.$O: $GETTEXTSRC/../gnulib-lib/uniconv/%.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/uniconv/$stem.c
+
+read-file.$O: $GETTEXTSRC/../gnulib-lib/read-file.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/read-file.c
+
+memset_explicit.$O: $GETTEXTSRC/../gnulib-lib/memset_explicit.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/memset_explicit.c
+
+findprog.$O: $GETTEXTSRC/../gnulib-lib/findprog.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/findprog.c
+
+unsetenv.$O: $GETTEXTSRC/../gnulib-lib/unsetenv.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/unsetenv.c
+
+xsetenv.$O: $GETTEXTSRC/../gnulib-lib/xsetenv.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/xsetenv.c
+
+xstriconveh.$O: $GETTEXTSRC/../gnulib-lib/xstriconveh.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/xstriconveh.c
+
 
 
 

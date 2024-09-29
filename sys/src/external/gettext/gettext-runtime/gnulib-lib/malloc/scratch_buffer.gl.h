@@ -95,8 +95,7 @@ bool __libc_scratch_buffer_grow (struct scratch_buffer *buffer);
 libc_hidden_proto (__libc_scratch_buffer_grow)
 
 /* Alias for __libc_scratch_buffer_grow.  */
-static __always_inline bool
-scratch_buffer_grow (struct scratch_buffer *buffer)
+static bool scratch_buffer_grow (struct scratch_buffer *buffer)
 {
   return __glibc_likely (__libc_scratch_buffer_grow (buffer));
 }
@@ -110,7 +109,7 @@ libc_hidden_proto (__libc_scratch_buffer_grow_preserve)
 static __always_inline bool
 scratch_buffer_grow_preserve (struct scratch_buffer *buffer)
 {
-  return __glibc_likely (__libc_scratch_buffer_grow_preserve (buffer));
+ return __glibc_likely (__libc_scratch_buffer_grow_preserve (buffer));
 }
 
 /* Grow *BUFFER so that it can store at least NELEM elements of SIZE

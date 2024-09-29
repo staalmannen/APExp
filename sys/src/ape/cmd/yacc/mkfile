@@ -1,6 +1,6 @@
 </$objtype/mkfile
 APEXPROOT=../../../../..
-TARG=yacc
+TARG=byacc
 BIN=$APEXPROOT/$objtype/bin/ape
 HFILES=config.h
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a $APEXPROOT/$objtype/lib/ape/libutf.a
@@ -34,5 +34,6 @@ CFLAGS=-c -I. -I$YACCSRC -B -D_POSIX_SOURCE -D_SUSV2_SOURCE \
 	$CC $CFLAGS $YACCSRC/$stem.c
 
 install:V:
+	cp $BIN/byacc $BIN/yacc
 	cp $YACCSRC/yacc.1 $APEXPROOT/sys/man/1/yacc
 

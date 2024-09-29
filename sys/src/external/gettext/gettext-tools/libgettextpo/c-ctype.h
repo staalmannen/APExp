@@ -72,10 +72,10 @@ extern "C" {
 /* The character set is ASCII or one of its variants or extensions, not EBCDIC.
    Testing the value of '\n' and '\r' is not relevant.  */
 # define C_CTYPE_ASCII 1
-#elif ! (' ' == '\x40' && '0' == '\xf0'                     \
-         && 'A' == '\xc1' && 'J' == '\xd1' && 'S' == '\xe2' \
-         && 'a' == '\x81' && 'j' == '\x91' && 's' == '\xa2')
-# error "Only ASCII and EBCDIC are supported"
+//#elif ! (' ' == '\x40' && '0' == '\xf0'                     \
+//         && 'A' == '\xc1' && 'J' == '\xd1' && 'S' == '\xe2' \
+//         && 'a' == '\x81' && 'j' == '\x91' && 's' == '\xa2')
+//# error "Only ASCII and EBCDIC are supported"
 #endif
 
 #if 'A' < 0

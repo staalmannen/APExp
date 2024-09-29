@@ -874,50 +874,50 @@ get_type_description (char buf[MAX_TYPE_DESCRIPTION_LEN], unsigned int type)
   char *p = buf;
   bool first = true;
 
-  p = stpcpy (p, "[");
+  p = (char *) stpcpy (p, "[");
   if (type & FAT_INTEGER)
     {
       if (!first)
-        p = stpcpy (p, ", ");
-      p = stpcpy (p, "integer");
+        p = (char *) stpcpy (p, ", ");
+      p = (char *) stpcpy (p, "integer");
       first = false;
     }
   if (type & FAT_FLOAT)
     {
       if (!first)
-        p = stpcpy (p, ", ");
-      p = stpcpy (p, "float");
+        p = (char *) stpcpy (p, ", ");
+      p = (char *) stpcpy (p, "float");
       first = false;
     }
   if (type & FAT_CHARACTER)
     {
       if (!first)
-        p = stpcpy (p, ", ");
-      p = stpcpy (p, "character");
+        p = (char *) stpcpy (p, ", ");
+      p = (char *) stpcpy (p, "character");
       first = false;
     }
   if (type & FAT_STRING)
     {
       if (!first)
-        p = stpcpy (p, ", ");
-      p = stpcpy (p, "string");
+        p = (char *) stpcpy (p, ", ");
+      p = (char *) stpcpy (p, "string");
       first = false;
     }
   if (type & FAT_BOOL)
     {
       if (!first)
-        p = stpcpy (p, ", ");
-      p = stpcpy (p, "bool");
+        p = (char *) stpcpy (p, ", ");
+      p = (char *) stpcpy (p, "bool");
       first = false;
     }
   if (type & FAT_POINTER)
     {
       if (!first)
-        p = stpcpy (p, ", ");
-      p = stpcpy (p, "pointer");
+        p = (char *) stpcpy (p, ", ");
+      p = (char *) stpcpy (p, "pointer");
       first = false;
     }
-  p = stpcpy (p, "]");
+  p = (char *) stpcpy (p, "]");
   *p++ = '\0';
   /* Verify that the buffer was large enough.  */
   if (p - buf > MAX_TYPE_DESCRIPTION_LEN)

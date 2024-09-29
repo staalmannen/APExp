@@ -12,32 +12,24 @@ TARG=	\
 		msgcomm\
 		msgconv\
 		msgen\
-		msgexec\
-		msgfilter\
-		msgfmt\
-		msggrep\
-		msginit\
-		msgmerge\
-		msgunfmt\
+#		msgexec\
+#		msgfilter\
+#		msgfmt\
+#		msggrep\
+#		msginit\
+#		msgmerge\
+#		msgunfmt\
 		msguniq\
-      	xgettext\
-      	recode-sr-latin
+#      	xgettext\
+#      	recode-sr-latin
 #gettext-tools/misc \
 #      	gettextize\
 #      	autopoint\
 
 GNULIB_OBJECTS=	\
-#gettext-tools/src\
-		dir-list.$O\
-		message.$O\
-		read-catalog.$O\
-		str-list.$O\
-		write-catalog.$O\
-		write-po.$O\
-		write-properties.$O\
 #gnulib-lib\
 		basename-lgpl.$O\
-		c-strstr.$O\
+		canonicalize-lgpl.$O\
 		c-strcasecmp.$O\
 		c-strncasecmp.$O\
 		c32iscntrl.$O\
@@ -46,12 +38,15 @@ GNULIB_OBJECTS=	\
 		c32isspace.$O\
 		clean-temp.$O\
 		closeout.$O\
+		dup-safer-flag.$O\
 		error.$O\
 		error-progname.$O\
 		exitfail.$O\
+		fd-safer-flag.$O\
+		findprog.$O\
+		findprog-in.$O\
 		fwriteerror.$O\
 		getprogname.$O\
-		lc-charset-dispatch.$O\
 		malloca.$O\
 		mbchar.$O\
 		mbtowc-lock.$O\
@@ -59,41 +54,32 @@ GNULIB_OBJECTS=	\
 		mbslen.$O\
 		mbsinit.$O\
 		mbsstr.$O\
-		mbszero.$O\
-		mem-hash-map.$O\
 		mempcpy.$O\
 		mbuiter.$O\
 		mkdtemp.$O\
-		obstack.$O\
+		pipe2.$O\
+		pipe2-safer.$O\
 		progname.$O\
 		propername.$O\
 		progreloc.$O\
 		reallocarray.$O\
+		setenv.$O\
+		spawn-pipe.$O\
+		spawn_faction_addchdir.$O\
+		spawn_faction_addclose.$O\
+		spawn_faction_adddup2.$O\
+		spawn_faction_addopen.$O\
+		spawn_faction_destroy.$O\
+		spawn_faction_init.$O\
 		strnlen1.$O\
 		striconv.$O\
 		trim.$O\
-		xconcat-filename.$O\
+		unsetenv.$O\
+		wait-process.$O\
 		xalloc-die.$O\
-		xerror.$O\
 		xmalloc.$O\
-		xasprintf.$O\
-		xvasprintf.$O\
-		xstriconv.$O\
-# gnulib-lib/unictype\
-		ctype_alnum.$O\
-		ctype_cntrl.$O\
-		ctype_space.$O\
-# gnulib-lib/unistr\
-		u8-mbtouc.$O\
-		u8-mbtouc-aux.$O\
-		u8-mbtouc-unsafe.$O\
-		u8-mbtouc-unsafe-aux.$O\
-		u16-mbtouc-aux.$O\
-		u8-uctomb-aux.$O\
-		u8-mbtouc.$O\
-		u8-mbtoucr.$O\
-# gnulib-lib/uniwidth\
-		width.$O
+		xsetenv.$O\
+		xstriconv.$O
 
 LIB= libgnulib.a$O\
 	$APEXPROOT/$objtype/lib/ape/libintl.a\
@@ -103,6 +89,7 @@ LIB= libgnulib.a$O\
 
 
 BIN=$APEXPROOT/$objtype/bin/ape
+
 HFILES=$APEXPROOT/sys/include/ape/libintl.h
 
 <$APEXPROOT/sys/src/cmd/mkmany
@@ -115,6 +102,7 @@ DEFS= 	-DLOCALEDIR="/sys/lib/ape/locale" -DBISON_LOCALEDIR="/sys/lib/ape/locale"
 		-DEXEEXT="" -DPROJECTSDIR="." -DGETTEXTJAR="/sys/lib/ape/gettext" -DGETTEXTDATADIR="/sys/lib/ape/gettext"\
 		-Drpl_optarg=optarg -Drpl_getopt=getopt -Drpl_optind=optind -Drpl_getopt_long=getopt_long -Drpl_malloc=malloc\
 		-Drpl_realloc=realloc -Drpl_calloc=calloc -Drpl_free=free -Drpl_rmdir=rmdir -Drpl_open=open -Drpl_strtol=strtol\
+		-Drpl_readlink=readlink -Drpl_fcntl=fcntl -Drpl_posix_spawnattr_init=posix_spawnattr_init\
 		-DENABLE_NLS -DHAVE_ICONV -DGNULIB_MBRTOC32_REGULAR -DGNULIB_MBRTOWC_SINGLE_THREAD -DPLAN9
 
 RINCLUDE= 	-I$GETTEXTSRC/gettext-runtime/src -I$GETTEXTSRC/gettext-runtime\
@@ -138,14 +126,6 @@ hash-string.$O: $GETTEXTSRC/gettext-runtime/intl/hash-string.c
 %.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/%.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/$stem.c
 
-%.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/unictype/%.c
-	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/unictype/$stem.c
-
-%.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/uniwidth/%.c
-	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/uniwidth/$stem.c
-
-%.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/unistr/%.c
-	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/unistr/$stem.c
 
 libgnulib.a$O:V:	$GNULIB_OBJECTS
 					ar vu libgnulib.a$O $GNULIB_OBJECTS
@@ -163,6 +143,5 @@ $O.msgunfmt:V:	msgunfmt.$O read-mo.$O read-java.$O read-csharp.$O read-resources
 				$LD -o $target $prereq
 
 
-install:V:
 
 

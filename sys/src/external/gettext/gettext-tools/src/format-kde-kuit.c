@@ -200,7 +200,7 @@ format_parse (const char *format, bool translated, char *fdi,
 
   for (amp_count = 0; str < str_limit; amp_count++)
     {
-      const char *amp = strchrnul (str, '&');
+      const char *amp = (const char *) strchrnul (str, '&');
       if (*amp != '&')
         break;
       str = amp + 1;
@@ -213,17 +213,17 @@ format_parse (const char *format, bool translated, char *fdi,
   *buffer = '\0';
 
   bp = buffer;
-  bp = stpcpy (bp, "<gt:kuit xmlns:gt=\"" XML_NS "\">");
+  bp = (char *) stpcpy (bp, "<gt:kuit xmlns:gt=\"" XML_NS "\">");
   str = format;
   while (str < str_limit)
     {
-      const char *amp = strchrnul (str, '&');
+      const char *amp = (const char *) strchrnul (str, '&');
 
-      bp = stpncpy (bp, str, amp - str);
+      bp = (char *) stpncpy (bp, str, amp - str);
       if (*amp != '&')
         break;
 
-      bp = stpcpy (bp, is_reference (amp) ? "&" : "&amp;");
+      bp = (char *) stpcpy (bp, is_reference (amp) ? "&" : "&amp;");
       str = amp + 1;
     }
   stpcpy (bp, "</gt:kuit>");

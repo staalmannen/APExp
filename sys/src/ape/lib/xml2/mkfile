@@ -1,0 +1,72 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+#merge this in libintl with libtextstyle
+LIB=$APEXPROOT/$objtype/lib/ape/libintl.a
+
+OFILES= \
+	DOCBparser.$O\
+	HTMLparser.$O\
+	HTMLtree.$O\
+	SAX.$O\
+	SAX2.$O\
+	buf.$O\
+	c14n.$O\
+	catalog.$O\
+	chvalid.$O\
+	debugXML.$O\
+	dict.$O\
+	encoding.$O\
+	entities.$O\
+	error.$O\
+	globals.$O\
+	hash.$O\
+	legacy.$O\
+	list.$O\
+	nanoftp.$O\
+	nanohttp.$O\
+	parser.$O\
+	parserInternals.$O\
+	pattern.$O\
+	relaxng.$O\
+	schematron.$O\
+	threads.$O\
+	tree.$O\
+	trionan.$O\
+	uri.$O\
+	valid.$O\
+	xinclude.$O\
+	xlink.$O\
+	xmlIO.$O\
+	xmlmemory.$O\
+	xmlmodule.$O\
+	xmlreader.$O\
+	xmlregexp.$O\
+	xmlsave.$O\
+	xmlschemas.$O\
+	xmlschemastypes.$O\
+	xmlstring.$O\
+	xmlunicode.$O\
+	xmlwriter.$O\
+	xpath.$O\
+	xpointer.$O
+
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+GETTEXTSRC=../../../external/gettext
+XMLSRC=../../../external/gettext/libtextstyle/lib/libxml
+
+CFLAGS=-c -B -I. -I$XMLSRC -I$XMLSRC/.. -I$GETTEXTSRC/libtextstyle\
+		-D_POSIX_SOURCE -D_BSD_SOURCE
+
+%.$O: $XMLSRC/%.c
+	$CC $CFLAGS $XMLSRC/$stem.c
+
+
+
+
+
+
+
