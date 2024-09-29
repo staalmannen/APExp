@@ -1,0 +1,68 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+#libgettextpo depends on libintl so just merge
+LIB=$APEXPROOT/$objtype/lib/ape/libintl.a
+
+OFILES= \
+# src \
+	po-error.$O\
+	po-xerror.$O\
+	po-charset.$O\
+	po-lex.$O\
+	po-gram-gen.$O\
+	pos.$O\
+	msgl-ascii.$O\
+	msgl-charset.$O\
+#	msgl-check.$O\
+	msgl-iconv.$O\
+	open-catalog.$O\
+	read-catalog.$O\
+	read-catalog-abstract.$O\
+#	read-mo.$O\
+	read-po.$O\
+	read-properties.$O\
+	read-resources.$O\
+	read-stringtable.$O\
+	xg-arglist-callshape.$O\
+	xg-arglist-context.$O\
+	xg-arglist-parser.$O\
+	xg-encoding.$O\
+	xg-message.$O\
+	xg-mixed-string.$O\
+	xg-pos.$O\
+# libgettextpo \
+	gettext-po.$O\
+	striconv.$O\
+	striconveh.$O\
+	xstriconv.$O\
+# woe32dll \
+	gettextpo-exports.$O
+
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+GETTEXTSRC=../../../external/gettext/gettext-tools/libgettextpo
+
+CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/.. -I$GETTEXTSRC/../src\
+		-I$GETTEXTSRC/../gnulib-lib -Drpl_malloc=malloc -Drpl_free=free\
+		-Drpl_realloc=realloc -Drpl_strtoul=strtoul\
+		-DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION -D_RESEARCH_SOURCE\
+		-DLIBDIR="/sys/lib/ape"
+
+%.$O: $GETTEXTSRC/%.c
+	$CC $CFLAGS $GETTEXTSRC/$stem.c
+
+%.$O: $GETTEXTSRC/../src//%.c
+	$CC $CFLAGS $GETTEXTSRC/../src/$stem.c
+
+%.$O: $GETTEXTSRC/../woe32dll//%.c
+	$CC $CFLAGS $GETTEXTSRC/../woe32dll/$stem.c
+
+
+
+
+
+
+

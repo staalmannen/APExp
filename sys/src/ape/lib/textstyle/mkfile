@@ -2,14 +2,17 @@ APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=$APEXPROOT/$objtype/lib/ape/libtextstyle.a
+#libtextstyle depends on libintl so just merge
+LIB=$APEXPROOT/$objtype/lib/ape/libintl.a
 
 OFILES= \
 # libtextstyle \
+	color.$O\
 	fd-ostream.$O\
 #	fd-ostream.oo.$O\
 	file-ostream.$O\
 #	file-ostream.oo.$O\
+	full-write.$O\
 	html-ostream.$O\
 #	html-ostream.oo.$O\
 	html-styled-ostream.$O\
@@ -18,6 +21,7 @@ OFILES= \
 #	iconv-ostream.oo.$O\
 	memory-ostream.$O\
 #	memory-ostream.oo.$O\
+	misc.$O\
 	noop-styled-ostream.$O\
 #	noop-styled-ostream.oo.$O\
 	ostream.$O\
@@ -28,6 +32,8 @@ OFILES= \
 #	term-ostream.oo.$O\
 	term-styled-ostream.$O\
 #	term-styled-ostream.oo.$O\
+	safe-read.$O\
+	safe-write.$O\
 # libtextstyle/libcroco \
 	cr-additional-sel.$O\
 	cr-attr-sel.$O\
@@ -63,7 +69,7 @@ GETTEXTSRC=../../../external/gettext/libtextstyle
 
 CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/lib -I$GETTEXTSRC/lib/libcroco\
 		-DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION -D_RESEARCH_SOURCE\
-		-DSET=set
+		-DSET=set -Drpl_open=open -DO_BINARY=0
 
 %.$O: $GETTEXTSRC/lib/%.c
 	$CC $CFLAGS $GETTEXTSRC/lib/$stem.c

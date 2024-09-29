@@ -226,7 +226,7 @@ mixed_string_contents (const mixed_string_ty *ms)
         for (i = 0; i < nsegments; i++)
           if (ms->segments[i]->type == source_encoded)
             {
-              p = stpcpy (p, converted_segments[i]);
+              p = (char *) stpcpy (p, converted_segments[i]);
               free (converted_segments[i]);
             }
           else
