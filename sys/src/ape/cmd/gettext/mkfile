@@ -27,6 +27,19 @@ TARG=	\
 #      	autopoint\
 
 GNULIB_OBJECTS=	\
+#libtextstyle/lib\
+		color.$O\
+		term-ostream.$O\
+		styled-ostream.$O\
+#gettext-tools/src\
+		dir-list.$O\
+		message.$O\
+		read-catalog.$O\
+		str-list.$O\
+		write-catalog.$O\
+		write-po.$O\
+		write-properties.$O\
+#gnulib-lib\
 		basename-lgpl.$O\
 		c-strstr.$O\
 		c-strcasecmp.$O\
@@ -61,6 +74,7 @@ GNULIB_OBJECTS=	\
 		strnlen1.$O\
 		striconv.$O\
 		trim.$O\
+		xconcat-filename.$O\
 		xalloc-die.$O\
 		xerror.$O\
 		xmalloc.$O\
@@ -69,8 +83,16 @@ GNULIB_OBJECTS=	\
 		ctype_alnum.$O\
 		ctype_cntrl.$O\
 		ctype_space.$O\
+# gnulib-lib/unistr\
+		u8-mbtouc.$O\
+		u8-mbtouc-aux.$O\
+		u8-mbtouc-unsafe.$O\
+		u8-mbtouc-unsafe-aux.$O\
+		u16-mbtouc-aux.$O\
 # gnulib-lib/uniwidth\
-		width.$O
+		width.$O\
+#libgettextpo\
+		gettext-po.$O
 
 # weird thing: some things are not included when linked from library...
 
@@ -90,20 +112,33 @@ LD=pcc
 DEFS= 	-DLOCALEDIR="/sys/lib/ape/locale" -DBISON_LOCALEDIR="/sys/lib/ape/locale" -DLIBDIR="/$objtype/lib/ape"\
 		-DEXEEXT="" -DPROJECTSDIR="." -DGETTEXTJAR="/sys/lib/ape/gettext" -DGETTEXTDATADIR="/sys/lib/ape/gettext"\
 		-Drpl_optarg=optarg -Drpl_getopt=getopt -Drpl_optind=optind -Drpl_getopt_long=getopt_long -Drpl_malloc=malloc\
-		-Drpl_realloc=realloc -Drpl_calloc=calloc -Drpl_free=free -Drpl_rmdir=rmdir -Drpl_open=open\
+		-Drpl_realloc=realloc -Drpl_calloc=calloc -Drpl_free=free -Drpl_rmdir=rmdir -Drpl_open=open -Drpl_strtol=strtol\
 		-DENABLE_NLS -DHAVE_ICONV -DGNULIB_MBRTOC32_REGULAR -DGNULIB_MBRTOWC_SINGLE_THREAD -DPLAN9
 
 RINCLUDE= 	-I$GETTEXTSRC/gettext-runtime/src -I$GETTEXTSRC/gettext-runtime\
 			-I$GETTEXTSRC/gettext-runtime/gnulib-lib -I$GETTEXTSRC/gettext-runtime/intl
 
-TINCLUDE= 	-I$GETTEXTSRC/gettext-tools -I$GETTEXTSRC/gettext-tools/gnulib-lib\
+TINCLUDE= 	-I$GETTEXTSRC/gettext-tools -I$GETTEXTSRC/gettext-tools/src -I$GETTEXTSRC/gettext-tools/gnulib-lib\
 		  	-I$GETTEXTSRC/libtextstyle/lib -I$GETTEXTSRC/gnulib-local/lib\
-			-I$GETTEXTSRC/gettext-tools/libgrep $RINCLUDE
+			-I$GETTEXTSRC/gettext-tools/libgrep $GETTEXTSRC/gettext-tools/libgettextpo $RINCLUDE
 
 CFLAGS=-c -B -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION $DEFS
 
 hash-string.$O: $GETTEXTSRC/gettext-runtime/intl/hash-string.c
 	$CC $CFLAGS $RINCLUDE $GETTEXTSRC/gettext-runtime/intl/hash-string.c
+
+gettext-po.$O: $GETTEXTSRC/gettext-tools/libgettextpo/gettext-po.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/libgettextpo/gettext-po.c
+
+color.$O: $GETTEXTSRC/libtextstyle/lib/color.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/color.c
+
+term-ostream.$O: $GETTEXTSRC/libtextstyle/lib/term-ostream.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/term-ostream.c
+
+styled-ostream.$O: $GETTEXTSRC/libtextstyle/lib/styled-ostream.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/styled-ostream.c
+
 
 %.$O: $GETTEXTSRC/gettext-runtime/src/%.c
 	$CC $CFLAGS $RINCLUDE $GETTEXTSRC/gettext-runtime/src/$stem.c
@@ -119,6 +154,9 @@ hash-string.$O: $GETTEXTSRC/gettext-runtime/intl/hash-string.c
 
 %.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/uniwidth/%.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/uniwidth/$stem.c
+
+%.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/unistr/%.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/unistr/$stem.c
 
 libgnulib.a$O:V:	$GNULIB_OBJECTS
 					ar vu libgnulib.a$O $GNULIB_OBJECTS

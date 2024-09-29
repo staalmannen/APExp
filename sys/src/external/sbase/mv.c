@@ -24,7 +24,7 @@ mv(const char *s1, const char *s2, int depth)
 		rm_status = 0;
 		cp(s1, s2, depth);
 		if (cp_status == 0)
-			recurse(AT_FDCWD, s1, NULL, &r);
+			recurse((int) AT_FDCWD, s1, NULL, &r);
 		if (cp_status || rm_status)
 			mv_status = 1;
 	} else {

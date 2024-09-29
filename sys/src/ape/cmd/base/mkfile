@@ -1,23 +1,131 @@
-</$objtype/mkfile
-LIBMKFILES= libutil libutf
-MKFILES= $LIBMKFILES bin
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
 
-default:V:
-	for (i in $LIBMKFILES)
-		@{ mk -f mkfile.$i }
-	mk -f mkfile.bin all
+LIB=libutil.a$O libutf.a$O $APEXPROOT/$objtype/lib/ape/libap.a
+TARG= \
+		basename\
+		cat\
+		cmp\
+		cut\
+		dirname\
+		false\
+#		find\
+		kill\
+		ls\
+#		mv\
+		printf\
+		sort\
+#		test\
+		true\
+		tr\
+		tsort\
+		uname\
+#		which\
+		xargs\
+		yes
+
+UTIL_OBJS=\
+		concat.$O\
+#		cp.$O\
+		crypt.$O\
+		ealloc.$O\
+		enmasse.$O\
+		eprintf.$O\
+		eregcomp.$O\
+		estrtod.$O\
+		fnck.$O\
+		fshut.$O\
+		getlines.$O\
+		human.$O\
+		linecmp.$O\
+		md5.$O\
+		memmem.$O\
+		mkdirp.$O\
+		mode.$O\
+		parseoffset.$O\
+		putword.$O\
+		reallocarray.$O\
+#		recurse.$O\
+#		rm.$O\
+		sha1.$O\
+#		sha224.$O\
+#		sha256.$O\
+#		sha384.$O\
+#		sha512-224.$O\
+		sha512-256.$O\
+		sha512.$O\
+		strcasestr.$O\
+		strlcpy.$O\
+		strnsubst.$O\
+		strsep.$O\
+		strtonum.$O\
+		unescape.$O\
+		writeall.$O
+
+UTF_OBJS=\
+		fgetrune.$O\
+		fputrune.$O\
+		isalnumrune.$O\
+		isalpharune.$O\
+		isblankrune.$O\
+		iscntrlrune.$O\
+		isdigitrune.$O\
+		isgraphrune.$O\
+		isprintrune.$O\
+		ispunctrune.$O\
+		isspacerune.$O\
+		istitlerune.$O\
+		isxdigitrune.$O\
+		lowerrune.$O\
+		rune.$O\
+		runetype.$O\
+		upperrune.$O\
+		utf.$O\
+		utftorunestr.$O
+
+BIN=$APEXPROOT/$objtype/bin/ape
+<$APEXPROOT/sys/src/cmd/mkmany
+
+SBASESRC=../../../external/sbase
+
+CC=pcc
+LD=pcc
+
+CFLAGS=-c -D_POSIX_SOURCE
+
+CPPFLAGS =\
+	-D_DEFAULT_SOURCE \
+	-D_NETBSD_SOURCE \
+	-D_BSD_SOURCE \
+	-D_XOPEN_SOURCE=700 \
+	-D_FILE_OFFSET_BITS=64
+
+SBASE_CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil -I$SBASESRC/../gnulib -D_POSIX_SOURCE -D_BSD_EXTENSION \
+		-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE -DS_ISVTX=S_IROTH -DSIGURG=24 -DAT_EACCESS=NULL -DAT_FDCWD=NULL
+
+
+libutil.a$O: $UTIL_OBJS
+			ar vu libutil.a$O $UTIL_OBJS
+
+libutf.a$O: $UTF_OBJS
+			ar vu libutf.a$O $UTF_OBJS
+
+%.$O: $SBASESRC/%.c
+	$CC $SBASE_CFLAGS $SBASESRC/$stem.c
+
+%.$O: $SBASESRC/libutf/%.c
+	$CC $SBASE_CFLAGS $SBASESRC/libutf/$stem.c
+
+%.$O: $SBASESRC/libutil/%.c
+	$CC $SBASE_CFLAGS $SBASESRC/libutil/$stem.c
 
 install:V:
-	for (i in $LIBMKFILES)
-		@{ mk -f mkfile.$i }
-	mk -f mkfile.bin install
-
-clean:V:
-	for (i in $MKFILES)
-		@{ rm -f $O.*; mk -f mkfile.$i $target; rm -f $O.* }
-
-nuke:V:
-	for (i in $MKFILES)
-		@{ mk -f mkfile.$i $target }
+	mk -f mkfile.bin all
+	for (i in $TARG)
+		@{ cp $O.$i $BIN/$i }
+	mkdir -p $APEXPROOT/sys/man/1
+	for (i in $TARG)
+		@{ cp $SBASESRC/$i.1 $APEXPROOT/sys/man/1/$i }
 
 

@@ -1,0 +1,81 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libtextstyle.a
+
+OFILES= \
+# libtextstyle \
+	fd-ostream.$O\
+#	fd-ostream.oo.$O\
+	file-ostream.$O\
+#	file-ostream.oo.$O\
+	html-ostream.$O\
+#	html-ostream.oo.$O\
+	html-styled-ostream.$O\
+#	html-styled-ostream.oo.$O\
+	iconv-ostream.$O\
+#	iconv-ostream.oo.$O\
+	memory-ostream.$O\
+#	memory-ostream.oo.$O\
+	noop-styled-ostream.$O\
+#	noop-styled-ostream.oo.$O\
+	ostream.$O\
+#	ostream.oo.$O\
+	styled-ostream.$O\
+#	styled-ostream.oo.$O\
+	term-ostream.$O\
+#	term-ostream.oo.$O\
+	term-styled-ostream.$O\
+#	term-styled-ostream.oo.$O\
+# libtextstyle/libcroco \
+	cr-additional-sel.$O\
+	cr-attr-sel.$O\
+	cr-cascade.$O\
+	cr-declaration.$O\
+	cr-doc-handler.$O\
+	cr-enc-handler.$O\
+	cr-fonts.$O\
+	cr-input.$O\
+	cr-num.$O\
+	cr-om-parser.$O\
+	cr-parser.$O\
+	cr-parsing-location.$O\
+	cr-prop-list.$O\
+	cr-pseudo.$O\
+	cr-rgb.$O\
+	cr-sel-eng.$O\
+	cr-selector.$O\
+	cr-simple-sel.$O\
+	cr-statement.$O\
+	cr-string.$O\
+	cr-style.$O\
+	cr-stylesheet.$O\
+	cr-term.$O\
+	cr-tknzr.$O\
+	cr-token.$O\
+	cr-utils.$O
+
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+GETTEXTSRC=../../../external/gettext/libtextstyle
+
+CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/lib -I$GETTEXTSRC/lib/libcroco\
+		-DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION -D_RESEARCH_SOURCE\
+		-DSET=set
+
+%.$O: $GETTEXTSRC/lib/%.c
+	$CC $CFLAGS $GETTEXTSRC/lib/$stem.c
+
+%.$O: $GETTEXTSRC/lib/libcroco/%.c
+	$CC $CFLAGS $GETTEXTSRC/lib/libcroco/$stem.c
+
+%.$O: $GETTEXTSRC/gnulib-local//%.c
+	$CC $CFLAGS $GETTEXTSRC/gnulib-local/$stem.c
+
+
+
+
+
+
