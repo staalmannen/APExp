@@ -1,0 +1,24 @@
+#!/bin/rc
+
+fn mv {
+    if (~ $#* 0) {
+        echo 'mv: missing file operands' >[1=2]
+        return
+    }
+
+    # Remove the '-f' option, if present
+    args=()
+    for (arg in $*) {
+        if not {
+            ~ $arg '-f'
+            continue
+        }
+        args = ${args} $arg
+    }
+
+    # Execute the real 'mv' command without '-f'
+    /bin/mv $args
+}
+
+
+
