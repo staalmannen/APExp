@@ -1,7 +1,9 @@
 </$objtype/mkfile
 APEXPROOT=../../../../..
 TARG=m4
-LIB=$APEXPROOT/$objtype/lib/ape/libbsd.a
+LIB=$APEXPROOT/$objtype/lib/ape/libbsd.a\
+	$APEXPROOT/$objtype/lib/ape/libintl.a
+
 OFILES=\
 	#src\
 		builtin.$O\
@@ -17,10 +19,30 @@ OFILES=\
 		symtab.$O\
 	#lib\
 		c-ctype.$O\
+		clean-temp.$O\
+		error.$O\
+		execute.$O\
+		findprog-in.$O\
 		nl_langinfo.$O\
+		memchr2.$O\
+		mkdtemp.$O\
+		mkstemp-safer.$O\
+		obstack.$O\
+		progname.$O\
 		reallocarray.$O\
-		regcomp.$O\
+		regex.$O\
+		rmdir.$O\
+		spawn-pipe.$O\
+		spawn_faction_addchdir.$O\
+		spawn_faction_addclose.$O\
+		spawn_faction_adddup2.$O\
+		spawn_faction_addopen.$O\
+		spawn_faction_destroy.$O\
+		spawn_faction_init.$O\
+		spawnp.$O\
 		strsignal.$O\
+		strstr.$O\
+		version-etc.$O\
 		xalloc-die.$O\
 		xmalloc.$O\
 		xmalloca.$O\
@@ -28,7 +50,6 @@ OFILES=\
 		xstrndup.$O
 
 
-#LIB=
 BIN=$APEXPROOT/$objtype/bin/ape
 HFILES=config.h
 
@@ -38,8 +59,13 @@ M4SRC=../../../external/m4
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I. -I$M4SRC/src  -I$M4SRC/lib -DHAVE_CONFIG_H  -Doption=gnu_option\
-	-DSA_NODEFER=0 -D__USE_GNU -D_REGEX_LARGE_OFFSETS
+
+UNRPL= -Drpl_readlink=readlink -Drpl_lseek=lseek -Drpl_posix_spawn_file_actions_addopen=posix_spawn_file_actions_addopen\
+
+
+CFLAGS=-c -B -I. -I$M4SRC -I$M4SRC/src  -I$M4SRC/lib -DHAVE_CONFIG_H  -Doption=gnu_option\
+	-DSA_NODEFER=0 -D__USE_GNU -D_REGEX_LARGE_OFFSETS -D_POSIX_SOURCE -DO_BINARY=0\
+	-D_BSD_EXTENSION -DSETLOCALE_NULL_MAX=(256+1) -DPTRDIFF_MAX=LONG_MAX $UNRPL
 
 %.$O: $M4SRC/src/%.c
 	$CC $CFLAGS $M4SRC/src/$stem.c

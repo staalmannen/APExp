@@ -86,9 +86,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - the utilities "cut", "ls", "true", "tsort", "xargs" and "yes" have been built from suckless sbase under ape
 - steve's mkmk (/n/sources/contrib) imported to APExp
 
-- copied the remove-bitfields script from lufia's port of git to plan9
 - copied "head", "which", and "printenv" rc scripts from steve (/n/sources/contrib)
-- copied and modified "config" rc script from fgb (/n/sources/contrib)
 
 Many of these are old ports and will hopefully be replaced by more up-to-date ports soon.
 
