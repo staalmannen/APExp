@@ -1,24 +1,23 @@
 #!/bin/rc
 
-fn mv {
-    if (~ $#* 0) {
-        echo 'mv: missing file operands' >[1=2]
-        return
-    }
-
-    # Remove the '-f' option, if present
-    args=()
-    for (arg in $*) {
-        if not {
-            ~ $arg '-f'
-            continue
-        }
-        args = ${args} $arg
-    }
+argv0=$0
+while(! ~ $#* 0 && ~ $1 -*){
+	switch($1){
+	case -f
+		;
+	case -i
+		;
+	case *
+		echo 'usage: mv source destination' >[1=2]
+		exit 'usage'
+	}
+	shift
+}
 
     # Execute the real 'mv' command without '-f'
-    /bin/mv $args
-}
+    /$cputype/bin/mv $1 $2
+
+
 
 
 
