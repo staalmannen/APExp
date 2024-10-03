@@ -229,7 +229,7 @@ int         	ilogbl(long double);
 
 double      	ldexp(double, int);
 float       	ldexpf(float, int);
-long double 	ldexpl(long double, int);
+//long double 	ldexpl(long double, int);
 
 double      	lgamma(double);
 float       	lgammaf(float);
@@ -293,7 +293,7 @@ long double 	nexttowardl(long double, long double);
 float       	powf(float, float);
 long double 	powl(long double, long double);
 
-double      	pow10(double);
+//double      	pow10(double);
 float       	pow10f(float);
 long double 	pow10l(long double);
 

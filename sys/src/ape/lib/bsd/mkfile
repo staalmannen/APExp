@@ -57,7 +57,8 @@ OFILES=\
 	writev.$O\
 # NetBSD \
 	gnu_getopt.$O
-	
+
+
 HFILES=priv.h
 
 <$APEXPROOT/sys/src/cmd/mksyslib

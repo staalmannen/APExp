@@ -7,9 +7,11 @@
 
 struct __locale_map;
 
+#ifndef _LANGINFO_H
 struct __locale_struct {
 	const struct __locale_map *cat[6];
 };
+#endif
 
 struct tls_module {
 	struct tls_module *next;
@@ -34,25 +36,25 @@ struct __libc {
 #define PAGE_SIZE libc.page_size
 #endif
 
-extern hidden struct __libc __libc;
+extern struct __libc __libc;
 #define libc __libc
 
-hidden void __init_libc(char **, char *);
-hidden void __init_tls(size_t *);
-hidden void __init_ssp(void *);
-hidden void __libc_start_init(void);
-hidden void __funcs_on_exit(void);
-hidden void __funcs_on_quick_exit(void);
-hidden void __libc_exit_fini(void);
-hidden void __fork_handler(int);
+void __init_libc(char **, char *);
+void __init_tls(size_t *);
+void __init_ssp(void *);
+void __libc_start_init(void);
+void __funcs_on_exit(void);
+void __funcs_on_quick_exit(void);
+void __libc_exit_fini(void);
+void __fork_handler(int);
 
-extern hidden size_t __hwcap;
-extern hidden size_t __sysinfo;
+extern size_t __hwcap;
+extern size_t __sysinfo;
 extern char *__progname, *__progname_full;
 
-extern hidden const char __libc_version[];
+extern const char __libc_version[];
 
-hidden void __synccall(void (*)(void *), void *);
-hidden int __setxid(int, int, int, int);
+void __synccall(void (*)(void *), void *);
+int __setxid(int, int, int, int);
 
 #endif

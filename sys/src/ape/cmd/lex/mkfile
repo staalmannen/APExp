@@ -4,7 +4,8 @@ APEXPROOT=../../../../..
 BIN=$APEXPROOT/$objtype/bin/ape
 LIB=	$APEXPROOT/$objtype/lib/ape/libfl.a\
 		$APEXPROOT/$objtype/lib/ape/libpcre2posix.a\
-		$APEXPROOT/$objtype/lib/ape/libpcre2.a
+		$APEXPROOT/$objtype/lib/ape/libpcre2.a\
+		$APEXPROOT/$objtype/lib/ape/libap.a
 
 
 OFILES=	\
@@ -47,7 +48,7 @@ FLEXSRC=../../../external/flex
 CC=pcc
 LD=pcc
 CFLAGS=-c -I. -I$FLEXSRC/flex/src -B -D_POSIX_SOURCE -D_SUSV2_SOURCE \
-	-D_BSD_EXTENSION -DHAVE_CONFIG_H 
+	-D_BSD_EXTENSION -DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"
 
 
 install:V:

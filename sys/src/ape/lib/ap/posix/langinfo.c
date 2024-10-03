@@ -1,4 +1,5 @@
 #include <locale.h>
+#include <nl_types.h>
 #include <langinfo.h>
 #include "locale_impl.h"
 
@@ -64,10 +65,13 @@ char *__nl_langinfo_l(nl_item item, locale_t loc)
 	return (char *)str;
 }
 
-char *__nl_langinfo(nl_item item)
-{
-	return __nl_langinfo_l(item, CURRENT_LOCALE);
-}
+
+#define __nl_langinfo(item) __nl_langinfo_l(item, CURRENT_LOCALE)
+
+//char *__nl_langinfo(nl_item item)
+//{
+//	return __nl_langinfo_l(item, (locale_t) CURRENT_LOCALE);
+//}
 
 weak_alias(__nl_langinfo, nl_langinfo);
 weak_alias(__nl_langinfo_l, nl_langinfo_l);

@@ -132,7 +132,7 @@ OFILES=\
 #	jnf.$O\
 	ldexp.$O\
 	ldexpf.$O\
-	ldexpl.$O\
+#duplicate?	ldexpl.$O\
 	lgamma.$O\
 	lgamma_r.$O\
 	lgammaf.$O\
@@ -166,7 +166,7 @@ OFILES=\
 	lround.$O\
 	lroundf.$O\
 	lroundl.$O\
-	modf.$O\
+#duplicate?	modf.$O\
 	modff.$O\
 	modfl.$O\
 #	nan.$O\

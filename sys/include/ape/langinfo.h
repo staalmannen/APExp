@@ -9,6 +9,8 @@ extern "C" {
 #include <features.h>
 #include <nl_types.h>
 
+#define LOCALE_NAME_MAX 23
+
 struct __locale_map {
 	const void *map;
 	size_t map_size;
@@ -20,7 +22,7 @@ struct __locale_struct {
 	const struct __locale_map *cat[6];
 };
 
-typedef struct __locale_struct locale_t;
+typedef struct __locale_struct *locale_t;
 
 #define ABDAY_1 0x20000
 #define ABDAY_2 0x20001

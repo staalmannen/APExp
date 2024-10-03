@@ -44,7 +44,6 @@ OFILES= \
 		setlocale_null.$O\
 		setlocale_null-unlocked.$O\
 		vasnprintf.$O\
-		nl_langinfo.$O\
 		free.$O\
 		frexp.$O\
 		frexpl.$O\

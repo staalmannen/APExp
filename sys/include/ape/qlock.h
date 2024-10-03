@@ -1,7 +1,3 @@
-#ifndef _PLAN9_SOURCE
-  This header file is an extension to ANSI/POSIX
-#endif
-
 #ifndef __QLOCK_H_
 #define __QLOCK_H_
 #pragma lib "/$M/lib/ape/lib9.a"

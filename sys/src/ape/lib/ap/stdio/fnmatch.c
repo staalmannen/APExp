@@ -17,8 +17,6 @@ along with this library; see the file COPYING.LIB.  If not, write to the Free
 Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301
 USA.  */
 
-# include <config.h>
-
 /* Enable GNU extensions in fnmatch.h.  */
 #ifndef _GNU_SOURCE
 # define _GNU_SOURCE	1
@@ -27,52 +25,17 @@ USA.  */
 #include <errno.h>
 #include <fnmatch.h>
 #include <ctype.h>
-
-#if HAVE_STRING_H || defined _LIBC
 # include <string.h>
-#else
-# include <strings.h>
-#endif
-
-#if defined STDC_HEADERS || defined _LIBC
 # include <stdlib.h>
-#endif
-
-/* For platform which support the ISO C amendement 1 functionality we
-   support user defined character classes.  */
-#if defined _LIBC || (defined HAVE_WCTYPE_H && defined HAVE_WCHAR_H)
-/* Solaris 2.5 has a bug: <wchar.h> must be included before <wctype.h>.  */
 # include <wchar.h>
 # include <wctype.h>
-#endif
+#define _btowc(c) btowc(c)
+#define __btowc(c) btowc(c)
+#define __iswctype(c,d) iswctype(c,d)
 
-/* Comment out all this code if we are using the GNU C Library, and are not
-   actually compiling the library itself.  This code is part of the GNU C
-   Library, but also included in many other GNU distributions.  Compiling
-   and linking in this code is a waste when using the GNU C library
-   (especially if it is a shared library).  Rather than having every GNU
-   program understand `configure --with-gnu-libc' and omit the object files,
-   it is simpler to just do this in the source for each such file.  */
-
-#if defined _LIBC || !defined __GNU_LIBRARY__
-
-
-# if defined STDC_HEADERS || !defined isascii
-#  define ISASCII(c) 1
-# else
 #  define ISASCII(c) isascii(c)
-# endif
-
-# ifdef isblank
 #  define ISBLANK(c) (ISASCII (c) && isblank (c))
-# else
-#  define ISBLANK(c) ((c) == ' ' || (c) == '\t')
-# endif
-# ifdef isgraph
 #  define ISGRAPH(c) (ISASCII (c) && isgraph (c))
-# else
-#  define ISGRAPH(c) (ISASCII (c) && isprint (c) && !isspace (c))
-# endif
 
 # define ISPRINT(c) (ISASCII (c) && isprint (c))
 # define ISDIGIT(c) (ISASCII (c) && isdigit (c))
@@ -87,59 +50,22 @@ USA.  */
 
 # define STREQ(s1, s2) ((strcmp (s1, s2) == 0))
 
-# if defined _LIBC || (defined HAVE_WCTYPE_H && defined HAVE_WCHAR_H)
-/* The GNU C library provides support for user-defined character classes
-   and the functions from ISO C amendement 1.  */
-#  ifdef CHARCLASS_NAME_MAX
-#   define CHAR_CLASS_MAX_LENGTH CHARCLASS_NAME_MAX
-#  else
-/* This shouldn't happen but some implementation might still have this
-   problem.  Use a reasonable default value.  */
-#   define CHAR_CLASS_MAX_LENGTH 256
-#  endif
+#define CHAR_CLASS_MAX_LENGTH 256
 
-#  ifdef _LIBC
-#   define IS_CHAR_CLASS(string) __wctype (string)
-#  else
-#   define IS_CHAR_CLASS(string) wctype (string)
-#  endif
-# else
-#  define CHAR_CLASS_MAX_LENGTH  6 /* Namely, `xdigit'.  */
-
-#  define IS_CHAR_CLASS(string)						      \
-   (STREQ (string, "alpha") || STREQ (string, "upper")			      \
-    || STREQ (string, "lower") || STREQ (string, "digit")		      \
-    || STREQ (string, "alnum") || STREQ (string, "xdigit")		      \
-    || STREQ (string, "space") || STREQ (string, "print")		      \
-    || STREQ (string, "punct") || STREQ (string, "graph")		      \
-    || STREQ (string, "cntrl") || STREQ (string, "blank"))
-# endif
+#define IS_CHAR_CLASS(string) wctype (string)
 
 /* Avoid depending on library functions or files
    whose names are inconsistent.  */
 
-# if !defined _LIBC && !defined getenv
-extern char *getenv ();
-# endif
-
-# ifndef errno
-extern int errno;
-# endif
-
 /* This function doesn't exist on most systems.  */
-
-# if !defined HAVE___STRCHRNUL && !defined _LIBC
 static char *
-__strchrnul (s, c)
-     const char *s;
-     int c;
+__strchrnul (const char *s, int c)
 {
   char *result = strchr (s, c);
   if (result == NULL)
     result = strchr (s, '\0');
   return result;
 }
-# endif
 
 # ifndef internal_function
 /* Inside GNU libc we mark some function in a special way.  In other
@@ -163,12 +89,7 @@ internal_fnmatch (pattern, string, no_leading_period, flags)
   register const char *p = pattern, *n = string;
   register unsigned char c;
 
-/* Note that this evaluates C many times.  */
-# ifdef _LIBC
-#  define FOLD(c) ((flags & FNM_CASEFOLD) ? tolower (c) : (c))
-# else
 #  define FOLD(c) ((flags & FNM_CASEFOLD) && ISUPPER (c) ? tolower (c) : (c))
-# endif
 
   while ((c = *p++) != '\0')
     {
@@ -335,9 +256,7 @@ internal_fnmatch (pattern, string, no_leading_period, flags)
 		    /* Leave room for the null.  */
 		    char str[CHAR_CLASS_MAX_LENGTH + 1];
 		    size_t c1 = 0;
-# if defined _LIBC || (defined HAVE_WCTYPE_H && defined HAVE_WCHAR_H)
 		    wctype_t wt;
-# endif
 		    const char *startp = p;
 
 		    for (;;)
@@ -365,7 +284,6 @@ internal_fnmatch (pattern, string, no_leading_period, flags)
 		      }
 		    str[c1] = '\0';
 
-# if defined _LIBC || (defined HAVE_WCTYPE_H && defined HAVE_WCHAR_H)
 		    wt = IS_CHAR_CLASS (str);
 		    if (wt == 0)
 		      /* Invalid character class name.  */
@@ -373,21 +291,6 @@ internal_fnmatch (pattern, string, no_leading_period, flags)
 
 		    if (__iswctype (__btowc ((unsigned char) *n), wt))
 		      goto matched;
-# else
-		    if ((STREQ (str, "alnum") && ISALNUM ((unsigned char) *n))
-			|| (STREQ (str, "alpha") && ISALPHA ((unsigned char) *n))
-			|| (STREQ (str, "blank") && ISBLANK ((unsigned char) *n))
-			|| (STREQ (str, "cntrl") && ISCNTRL ((unsigned char) *n))
-			|| (STREQ (str, "digit") && ISDIGIT ((unsigned char) *n))
-			|| (STREQ (str, "graph") && ISGRAPH ((unsigned char) *n))
-			|| (STREQ (str, "lower") && ISLOWER ((unsigned char) *n))
-			|| (STREQ (str, "print") && ISPRINT ((unsigned char) *n))
-			|| (STREQ (str, "punct") && ISPUNCT ((unsigned char) *n))
-			|| (STREQ (str, "space") && ISSPACE ((unsigned char) *n))
-			|| (STREQ (str, "upper") && ISUPPER ((unsigned char) *n))
-			|| (STREQ (str, "xdigit") && ISXDIGIT ((unsigned char) *n)))
-		      goto matched;
-# endif
 		    c = *p++;
 		  }
 		else if (c == '\0')
@@ -487,4 +390,4 @@ fnmatch (pattern, string, flags)
   return internal_fnmatch (pattern, string, flags & FNM_PERIOD, flags);
 }
 
-#endif	/* _LIBC or not __GNU_LIBRARY__.  */
+
