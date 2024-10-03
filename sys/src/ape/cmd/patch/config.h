@@ -1,5 +1,5 @@
 
-#include "/sys/include/ape/config.h"
+#include <config_common.h>
 
 
 

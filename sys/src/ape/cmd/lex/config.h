@@ -9,7 +9,7 @@
 /* Define to 1 if using `alloca.c'. */
 /* #undef C_ALLOCA */
 
-#include "/sys/include/ape/config.h"
+#include <config_common.h>
 
 /* Define to the GNU M4 executable name. */
 #define M4 "/$M/bin/ape/m4"

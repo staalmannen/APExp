@@ -15,10 +15,13 @@ OFILES=\
 	sysconf.$O\
 	tzset.$O\
 	nanosleep.$O\
-# gnulib \
-	nl_langinfo.$O\
-	setlocale_null.$O
+# musl \
+# requires sys/mmap.h	catclose.$O\
+	catgets.$O\
+# requires sys/mmap.h catopen.$O\
+	langinfo.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -D_POSIX_SOURCE
+CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I./musl\
+		-D_POSIX_SOURCE

@@ -13,7 +13,6 @@ TARG= \
 #		find\
 		kill\
 		ls\
-#		mv\
 		printf\
 		sort\
 #		test\
@@ -21,7 +20,6 @@ TARG= \
 		tr\
 		tsort\
 		uname\
-#		which\
 		xargs\
 		yes
 

@@ -1,6 +1,6 @@
 This is an attempt to make the utilities specified in
 POSIX 1002.3 available, assuming /$objtype/ape/bin
-and /lib/rc/ape are bound to /bin before the regular
+and /rc/bin/ape are bound to /bin before the regular
 bin directories.
 
 Here's a brief description of the status of these commands.
@@ -13,8 +13,7 @@ basename POSIX conforming
 
 bc	Plan 9 bc.
 
-cat	Plan 9 cat.
-	no -u option (for byte-at-at-time)
+cat	cat from sbase
 
 cd	shell builtins
 	doesn't use $HOME or $CDPATH
@@ -33,9 +32,7 @@ chown	Always prints 'Permission denied' and fails.
 
 cksum	not implemented
 
-cmp	Plan 9 cmp.
-	nonstandard -L option
-	no line number printed; hex instead of octal for bytes
+cmp		cmp from sbase
 
 comm	Plan 9 comm.
 
@@ -58,7 +55,7 @@ diff	Plan 9 diff.
 	no -r (recursive) option
 	-c<n> instead of -c and -C <n> for context
 
-dirname	POSIX conforming
+dirname	dirname from sbase
 
 echo	Plan 9 echo
 
@@ -69,7 +66,7 @@ env	not implemented
 
 expr	V10 expr (seems to be like POSIX)
 
-false	POSIX conforming, from sbase
+false	false from sbase
 
 find	not implemented
 
@@ -79,18 +76,17 @@ getconf	not implemented
 
 getopts	not implemented
 
-grep 	from sbase
+grep 	using pcre2grep
 
-head	not implemented
+head	rc script
 
 id	not implemented
 
 join	not implemented
 
-kill	V10 kill
-	no -s signalname, no -l arg
+kill	kill from sbase
 
-ln	not implemented
+ln	rc script
 
 locale	not implemented
 
@@ -102,7 +98,7 @@ logname	not implemented
 
 lp	Plan 9 lp
 
-ls	Plan 9 ls
+ls	ls from sbase
 
 mailx	not implemented
 
@@ -110,7 +106,7 @@ mkdir	Plan 9 mkdir
 
 mkfifo	not implemented
 
-mv	Plan 9 mv
+mv	Plan 9 mv, rc wrapper to filter -f option
 
 nohup	not implemented
 
@@ -155,7 +151,7 @@ touch	Plan 9 touch
 
 tr	Plan 9 tr
 
-true	POSIX compliant
+true	true from sbase
 
 umask	noop
 

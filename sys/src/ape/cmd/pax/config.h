@@ -34,7 +34,7 @@
 #ifndef _PAX_CONFIG_H
 #define _PAX_CONFIG_H
 
-#include "/sys/include/ape/config.h"
+#include <config_common.h>
 
 /* Defines */
 

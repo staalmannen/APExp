@@ -1,4 +1,4 @@
-APEXPROOT=../../../../../../
+APEXPROOT=../../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
@@ -70,11 +70,9 @@ OFILES=\
 	vasprintf.$O\
 # gnulib et al \
 	alloca.$O\
-#	asnprintf.$O\
 	fmemopen.$O\
 	getdelim.$O\
-	getline.$O\
-#	vasnprintf.$O\
+	getline.$O
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib

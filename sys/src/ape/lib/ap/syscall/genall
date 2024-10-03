@@ -1,5 +1,8 @@
 #!/bin/rc
 # genall - generate the APE versions of the system call C interfaces.
+
+APEXPROOT=../../../../../..
+
 #	must be invoked by mk so that the right env variables are set.
 rfork e
 # ugh. sources's build process can't hack absolute path names.
@@ -12,5 +15,5 @@ for(I in $SYS) {
 	n=`{sed -n '/[ 	]'$I'[ 	]/s/.*	//p' $SYSH}
 	./gencall
 }
-ar vu /$objtype/lib/ape/libap.a *.$O
+ar vu $APEXPROOT/$objtype/lib/ape/libap.a *.$O
 rm -f *.$O *.s

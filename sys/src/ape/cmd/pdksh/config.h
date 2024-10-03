@@ -8,7 +8,7 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
-#include "/sys/include/ape/config.h"
+#include <config_common.h>
 
 /* Include ksh features? (see comments in configure.in for more details) */
 #define KSH 1

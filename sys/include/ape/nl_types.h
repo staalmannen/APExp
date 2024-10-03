@@ -1,5 +1,6 @@
 #ifndef _NL_TYPES_H
 #define _NL_TYPES_H
+#pragma lib "/$M/lib/ape/libap.a"
 
 #ifdef __cplusplus
 extern "C" {
