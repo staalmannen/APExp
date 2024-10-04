@@ -1,4 +1,4 @@
-APEXPROOT=../../../../../../
+APEXPROOT=../../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a

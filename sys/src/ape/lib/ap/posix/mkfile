@@ -1,4 +1,4 @@
-APEXPROOT=../../../../../../
+APEXPROOT=../../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
@@ -24,4 +24,4 @@ OFILES=\
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I./musl\
-		-D_POSIX_SOURCE
+		-I$APEXPROOT/$objtype/include/ape -D_POSIX_SOURCE

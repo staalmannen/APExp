@@ -77,4 +77,5 @@ OFILES=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -D_POSIX_SOURCE -D_BSD_EXTENSION
+CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I$APEXPROOT/$objtype/include/ape\
+		-D_POSIX_SOURCE -D_BSD_EXTENSION
