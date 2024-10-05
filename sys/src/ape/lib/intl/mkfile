@@ -48,7 +48,8 @@ OFILES= \
 		frexp.$O\
 		frexpl.$O\
 		signbitl.$O\
-		isnanl.$O
+		isnanl.$O\
+		copysign.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
@@ -61,7 +62,7 @@ CFLAGS=-c -B -I. -I$GETTEXTSRC/intl -I$GETTEXTSRC/intl/gnulib-lib\
 		-DENABLE_NLS -DENABLE_RELOCATABLE -DENABLE_COSTLY_RELOCATABLE -DPLAN9\
 		-DEXEEXT="" -DDEPENDS_ON_LIBICONV=1 -DDEPENDS_ON_LIBINTL=1\
 		-Dset_relocation_prefix=libintl_set_relocation_prefix\
-		-Dcompute_curr_prefix=libintl_compute_curr_prefix
+		-Dcompute_curr_prefix=libintl_compute_curr_prefix -Dxmalloc=malloc
 
 
 %.$O: $GETTEXTSRC/intl/%.c

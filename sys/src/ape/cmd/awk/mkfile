@@ -3,6 +3,10 @@ TARG=gawk
 APEXPROOT=../../../../..
 BIN=$APEXPROOT/$objtype/bin/ape
 
+LIB=$APEXPROOT/$objtype/lib/ape/libiconv.a\
+	$APEXPROOT/$objtype/lib/ape/libintl.a
+
+
 OFILES=	array.$O\
 		awkgram.$O\
 		builtin.$O\

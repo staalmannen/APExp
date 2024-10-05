@@ -27,7 +27,7 @@ static const char c_time[] =
 static const char c_messages[] = "^[yY]\0" "^[nN]\0" "yes\0" "no";
 static const char c_numeric[] = ".\0" "";
 
-char *__nl_langinfo_l(nl_item item, locale_t loc)
+char *nl_langinfo_l(nl_item item, locale_t loc)
 {
 	int cat = item >> 16;
 	int idx = item & 65535;
@@ -60,18 +60,43 @@ char *__nl_langinfo_l(nl_item item, locale_t loc)
 		return "";
 	}
 
-	for (; idx; idx--, str++) for (; *str; str++);
-	if (cat != LC_NUMERIC && *str) str = LCTRANS(str, cat, loc);
+	return (char *)str;
+}
+
+char *nl_langinfo(nl_item item)
+{
+	int cat = item >> 16;
+	int idx = item & 65535;
+	const char *str = "UTF-8";
+
+	if (item == CODESET) return  "UTF-8";
+
+	/* _NL_LOCALE_NAME extension */
+	if (idx == 65535 && cat < LC_ALL)
+		return "C";
+	
+	switch (cat) {
+	case LC_NUMERIC:
+		if (idx > 1) return "";
+		str = c_numeric;
+		break;
+	case LC_TIME:
+		if (idx > 0x31) return "";
+		str = c_time;
+		break;
+	case LC_MONETARY:
+		if (idx > 0) return "";
+		str = "";
+		break;
+	case LC_MESSAGES:
+		if (idx > 3) return "";
+		str = c_messages;
+		break;
+	default:
+		return "";
+	}
+
 	return (char *)str;
 }
 
 
-#define __nl_langinfo(item) __nl_langinfo_l(item, CURRENT_LOCALE)
-
-//char *__nl_langinfo(nl_item item)
-//{
-//	return __nl_langinfo_l(item, (locale_t) CURRENT_LOCALE);
-//}
-
-weak_alias(__nl_langinfo, nl_langinfo);
-weak_alias(__nl_langinfo_l, nl_langinfo_l);

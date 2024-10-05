@@ -25,8 +25,8 @@ LD=pcc
 DEFS = \
   -DLIBDIR="/$M/lib/ape" \
   -DBUILDING_LIBICONV -DBUILDING_LIBCHARSET -DBUILDING_STATIC \
-  -DENABLE_RELOCATABLE=1 -DIN_LIBRARY -DINSTALLDIR="/$M/lib/ape" -DNO_XMALLOC \
-	-Drelocate=libiconv_relocate \
+  -DENABLE_RELOCATABLE=1 -DIN_LIBRARY -DINSTALLDIR="/$M/lib/ape"\
+	-Drelocate=libiconv_relocate -Dxmalloc=malloc\
 	-Drelocate2=libiconv_relocate2 \
 	-Dset_relocation_prefix=libiconv_set_relocation_prefix \
 	-DHAVE_CONFIG_H -D_POSIX_SOURCE -DEXEEXT=""

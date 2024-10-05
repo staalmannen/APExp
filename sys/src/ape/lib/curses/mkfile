@@ -105,4 +105,4 @@ clean:V:
 
 nuke:V:
 	rm -f $LIB
-	rm -f $HFILES
+#	rm -f $HFILES

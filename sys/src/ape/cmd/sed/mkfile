@@ -52,7 +52,8 @@ GSEDSRC=../../../external/gsed
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I. -I$GSEDSRC -I$GSEDSRC/sed -I$GSEDSRC/lib -B -DHAVE_CONFIG_H
+CFLAGS=-c -I. -I$GSEDSRC -I$GSEDSRC/sed -I$GSEDSRC/lib -B -DHAVE_CONFIG_H\
+		-DLOCALEDIR="/sys/lib/ape/locale"
 
 %.$O: $GSEDSRC/sed/%.c
 	$CC $CFLAGS $GSEDSRC/sed/$stem.c

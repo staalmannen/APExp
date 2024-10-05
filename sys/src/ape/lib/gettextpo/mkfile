@@ -80,21 +80,26 @@ OFILES= \
 	x-po.$O\
 # libgettextpo \
 	c-strstr.$O\
-	mem-hash-map.$O\
-	memrchr.$O\
+	error.$O\
+	exitfail.$O\
 	fstrcmp.$O\
 	gcd.$O\
 	gettext-po.$O\
 	lc-charset-dispatch.$O\
+	mem-hash-map.$O\
+	memrchr.$O\
 	obstack.$O\
 	rawmemchr.$O\
+	reallocarray.$O\
 	stpncpy.$O\
 	strchrnul.$O\
 	string-desc.$O\
 	striconv.$O\
 	striconveh.$O\
 	striconveha.$O\
+#	xalloc-die.$O\
 	xasprintf.$O\
+#	xmalloc.$O\
 	xvasprintf.$O\
 	xerror.$O\
 	xstriconv.$O\
