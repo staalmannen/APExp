@@ -72,7 +72,7 @@ $answer = ".x\n$dir/foo.x\nx\n\$@.x\n$dir.x\nfoo.x\n$dir/bar.x\nbar.x\n";
 &compare_output($answer, &get_logfile(1));
 
 &run_make_with_options($makefile2, "$dir/x.z $dir/y.z", &get_logfile);
-$answer = ".x\n$dir/x.z.x\nx\n\$@.x\n$dir.x\nx.z.x\n.y\n$dir/y.z.y\n\y\n\$@.y\n$dir.y\ny.z.y\n";
+$answer = ".x\n$dir/x.z.x\nx\n\$@.x\n$dir.x\nx.z.x\n.y\n$dir/y.z.y\ny\n\$@.y\n$dir.y\ny.z.y\n";
 &compare_output($answer, &get_logfile(1));
 
 &run_make_with_options($makefile2, "$dir/biz", &get_logfile);
@@ -91,6 +91,30 @@ mbr.src: ; @:',
               '',
               'mbr');
 
+# Same as above with second expansion.
+#
+run_make_test('
+.SECONDEXPANSION:
+.SUFFIXES: .b .src
+
+p:=mbr.src
+mbr.b: $$p
+	@echo $*
+
+mbr.src: ; @:',
+              '',
+              'mbr');
+
+# Test that $* is set to empty string for unknown suffixes.
+
+run_make_test('
+mbr.b: mbr.src
+	@echo star=$*
+
+mbr.src: ; @:',
+              '',
+              "star=\n");
+
 # TEST #3 -- test for Savannah bug #8154
 # Make sure that nonexistent prerequisites are listed in $?, since they are
 # considered reasons for the target to be rebuilt.
@@ -107,7 +131,7 @@ bar: ;',
 
 unlink('foo');
 
-# TEST #4: ensure prereq ordering is correct when the commmand target has none
+# TEST #4: ensure prereq ordering is correct when the command target has none
 # See Savannah bug #21198
 
 run_make_test('

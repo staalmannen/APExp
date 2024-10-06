@@ -2,8 +2,7 @@ APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-#libtextstyle depends on libintl so just merge
-LIB=$APEXPROOT/$objtype/lib/ape/libintl.a
+LIB=$APEXPROOT/$objtype/lib/ape/libtextstyle.a
 
 OFILES= \
 # libtextstyle \

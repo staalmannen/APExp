@@ -125,7 +125,7 @@ check_multibyte_string (const char *buf, size_t buf_size)
   for (i = 0; i < buf_size ;)
     {
       size_t mbclen;
-      mbclen = mbrlen (buf + i, buf_size - i, &cur_state);
+//      mbclen = mbrlen (buf + i, buf_size - i, &cur_state);
 
       if (mbclen == (size_t) -1 || mbclen == (size_t) -2 || mbclen == 0)
         {

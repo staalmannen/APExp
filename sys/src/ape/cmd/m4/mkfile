@@ -1,8 +1,13 @@
 </$objtype/mkfile
 APEXPROOT=../../../../..
 TARG=m4
-LIB=$APEXPROOT/$objtype/lib/ape/libbsd.a\
-	$APEXPROOT/$objtype/lib/ape/libintl.a
+LIB=libgnu.a$O\
+	$APEXPROOT/$objtype/lib/ape/libintl.a\
+	$APEXPROOT/$objtype/lib/ape/libgettextpo.a\
+	$APEXPROOT/$objtype/lib/ape/libtextstyle.a\
+	$APEXPROOT/$objtype/lib/ape/libiconv.a\
+	$APEXPROOT/$objtype/lib/ape/libbsd.a\
+	$APEXPROOT/$objtype/lib/ape/libxml.a
 
 OFILES=\
 	#src\
@@ -16,19 +21,27 @@ OFILES=\
 		macro.$O\
 		output.$O\
 		path.$O\
-		symtab.$O\
-	#lib\
+		symtab.$O
+
+LIB_OBJS= \
+		asyncsafe-spin.$O\
 		c-ctype.$O\
+		c-stack.$O\
 		clean-temp.$O\
+		concat-filename.$O\
+		dup-safer.$O\
 		error.$O\
 		execute.$O\
+		fatal-signal.$O\
+		fd-safer.$O\
 		findprog-in.$O\
-		nl_langinfo.$O\
 		memchr2.$O\
 		mkdtemp.$O\
 		mkstemp-safer.$O\
 		obstack.$O\
+		pipe-safer.$O\
 		progname.$O\
+		propername.$O\
 		reallocarray.$O\
 		regex.$O\
 		rmdir.$O\
@@ -39,11 +52,18 @@ OFILES=\
 		spawn_faction_addopen.$O\
 		spawn_faction_destroy.$O\
 		spawn_faction_init.$O\
+		spawnattr_destroy.$O\
+		spawnattr_init.$O\
+		spawnattr_setflags.$O\
+		spawnattr_setpgroup.$O\
+		spawnattr_setsigmask.$O\
 		spawnp.$O\
 		strsignal.$O\
 		strstr.$O\
 		version-etc.$O\
+		wait-process.$O\
 		xalloc-die.$O\
+		xasprintf.$O\
 		xmalloc.$O\
 		xmalloca.$O\
 		xprintf.$O\
@@ -65,13 +85,16 @@ UNRPL= -Drpl_readlink=readlink -Drpl_lseek=lseek -Drpl_posix_spawn_file_actions_
 
 CFLAGS=-c -B -I. -I$M4SRC -I$M4SRC/src  -I$M4SRC/lib -DHAVE_CONFIG_H  -Doption=gnu_option\
 	-DSA_NODEFER=0 -D__USE_GNU -D_REGEX_LARGE_OFFSETS -D_POSIX_SOURCE -DO_BINARY=0\
-	-D_BSD_EXTENSION -DSETLOCALE_NULL_MAX=(256+1) -DPTRDIFF_MAX=LONG_MAX $UNRPL
+	-D_BSD_EXTENSION -DSETLOCALE_NULL_MAX=(256+1) -DPTRDIFF_MAX=LONG_MAX -DENOTSUP=ENOENT $UNRPL
 
 %.$O: $M4SRC/src/%.c
 	$CC $CFLAGS $M4SRC/src/$stem.c
 
 %.$O: $M4SRC/lib/%.c
 	$CC $CFLAGS $M4SRC/lib/$stem.c
+
+libgnu.a$O: $LIB_OBJS
+	ar vu libgnu.a$O $LIB_OBJS
 
 
 

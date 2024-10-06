@@ -11,7 +11,7 @@ DIRS=\
 	base\
 	diff\
 	expr\
-#	gettext\
+	gettext\
 	iconv\
 #	m4\
 	make\

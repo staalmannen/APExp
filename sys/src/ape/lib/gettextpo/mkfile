@@ -2,8 +2,7 @@ APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-#libgettextpo depends on libintl so just merge
-LIB=$APEXPROOT/$objtype/lib/ape/libintl.a
+LIB=$APEXPROOT/$objtype/lib/ape/libgettextpo.a
 
 OFILES= \
 # src \
@@ -80,9 +79,11 @@ OFILES= \
 	x-po.$O\
 # libgettextpo \
 	c-strstr.$O\
+	concat-filename.$O\
 	error.$O\
 	exitfail.$O\
 	fstrcmp.$O\
+	full-write.$O\
 	gcd.$O\
 	gettext-po.$O\
 	lc-charset-dispatch.$O\
@@ -91,20 +92,25 @@ OFILES= \
 	obstack.$O\
 	rawmemchr.$O\
 	reallocarray.$O\
+	safe-write.$O\
+	stpcpy.$O\
 	stpncpy.$O\
 	strchrnul.$O\
 	string-desc.$O\
 	striconv.$O\
 	striconveh.$O\
 	striconveha.$O\
-#	xalloc-die.$O\
 	xasprintf.$O\
-#	xmalloc.$O\
+	xconcat-filename.$O\
 	xvasprintf.$O\
 	xerror.$O\
 	xstriconv.$O\
 # woe32dll \
 	gettextpo-exports.$O\
+# gnulib-lib/malloc \
+	scratch_buffer_grow.$O\
+	scratch_buffer_grow_preserve.$O\
+	scratch_buffer_set_array_size.$O\
 # gnulib-lib/unistr \
 	u8-check.$O\
 	u8-mblen.$O\
@@ -133,11 +139,22 @@ OFILES= \
 # gnulib-lib/uniconv\
 	u8-conv-from-enc.$O\
 # gnulib-lib\
-#	findprog.$O\
+	canonicalize.$O\
+	file-set.$O\
+	hash.$O\
+	hash-triple-simple.$O\
+	hash-pjw.$O\
 	read-file.$O\
+	spawn.$O\
+	spawni.$O\
+	spawnp.$O\
+	spawn-pipe.$O\
+	spawnattr_destroy.$O\
+	spawnattr_init.$O\
+	spawnattr_setflags.$O\
+	spawnattr_setpgroup.$O\
+	spawnattr_setsigmask.$O\
 	memset_explicit.$O\
-#	unsetenv.$O\
-#	xsetenv.$O\
 	xstriconveh.$O\
 
 
@@ -150,6 +167,8 @@ CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/.. -I$GETTEXTSRC/../src\
 		-I$GETTEXTSRC/../gnulib-lib -Drpl_malloc=malloc -Drpl_free=free\
 		-Drpl_realloc=realloc -Drpl_strtoul=strtoul -Drpl_strstr=strstr\
 		-Drpl_strerror=strerror -Drpl_calloc=calloc -Drpl_readlink=readlink\
+		-Drpl_getcwd=getcwd -Drpl_open=open -Drpl_dup2=dup2\
+		-DHAVE_SETEUID -DHAVE_SETEGID -Dseteuid=setuid -Dsetegid=setgid\
 		-DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION -D_RESEARCH_SOURCE\
 		-DLIBDIR="/sys/lib/ape" -DHAVE_ICONV -DEILSEQ=ENOENT -DPTRDIFF_MAX=SIZE_MAX\
 		-DUINTPTR_MAX=INT_MAX -DUINTPTR_WIDTH=UINTPTR_MAX -DUCHAR_WIDTH=UCHAR_MAX
@@ -162,6 +181,9 @@ CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/.. -I$GETTEXTSRC/../src\
 
 %.$O: $GETTEXTSRC/../woe32dll//%.c
 	$CC $CFLAGS $GETTEXTSRC/../woe32dll/$stem.c
+
+%.$O: $GETTEXTSRC/../gnulib-lib/malloc/%.c
+	$CC $CFLAGS $GETTEXTSRC/../gnulib-lib/malloc/$stem.c
 
 %.$O: $GETTEXTSRC/../gnulib-lib/unistr/%.c
 	$CC $CFLAGS $GETTEXTSRC/../gnulib-lib/unistr/$stem.c
@@ -178,20 +200,53 @@ CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/.. -I$GETTEXTSRC/../src\
 %.$O: $GETTEXTSRC/../gnulib-lib/uniconv/%.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/uniconv/$stem.c
 
+canonicalize.$O: $GETTEXTSRC/../gnulib-lib/canonicalize.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/canonicalize.c
+
 read-file.$O: $GETTEXTSRC/../gnulib-lib/read-file.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/read-file.c
 
 memset_explicit.$O: $GETTEXTSRC/../gnulib-lib/memset_explicit.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/memset_explicit.c
 
-findprog.$O: $GETTEXTSRC/../gnulib-lib/findprog.c
-	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/findprog.c
+hash.$O: $GETTEXTSRC/../gnulib-lib/hash.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/hash.c
 
-unsetenv.$O: $GETTEXTSRC/../gnulib-lib/unsetenv.c
-	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/unsetenv.c
+spawn.$O: $GETTEXTSRC/../gnulib-lib/spawn.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/spawn.c
 
-xsetenv.$O: $GETTEXTSRC/../gnulib-lib/xsetenv.c
-	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/xsetenv.c
+spawni.$O: $GETTEXTSRC/../gnulib-lib/spawni.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/spawni.c
+
+spawnp.$O: $GETTEXTSRC/../gnulib-lib/spawnp.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/spawnp.c
+
+spawn-pipe.$O: $GETTEXTSRC/../gnulib-lib/spawn-pipe.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/spawn-pipe.c
+
+spawnattr_destroy.$O: $GETTEXTSRC/../gnulib-lib/spawnattr_destroy.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/spawnattr_destroy.c
+
+spawnattr_init.$O: $GETTEXTSRC/../gnulib-lib/spawnattr_init.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/spawnattr_init.c
+
+spawnattr_setflags.$O: $GETTEXTSRC/../gnulib-lib/spawnattr_setflags.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/spawnattr_setflags.c
+
+spawnattr_setpgroup.$O: $GETTEXTSRC/../gnulib-lib/spawnattr_setpgroup.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/spawnattr_setpgroup.c
+
+spawnattr_setsigmask.$O: $GETTEXTSRC/../gnulib-lib/spawnattr_setsigmask.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/spawnattr_setsigmask.c
+
+file-set.$O: $GETTEXTSRC/../gnulib-lib/file-set.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/file-set.c
+
+hash-triple-simple.$O: $GETTEXTSRC/../gnulib-lib/hash-triple-simple.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/hash-triple-simple.c
+
+hash-pjw.$O: $GETTEXTSRC/../gnulib-lib/hash-pjw.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/hash-pjw.c
 
 xstriconveh.$O: $GETTEXTSRC/../gnulib-lib/xstriconveh.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/xstriconveh.c

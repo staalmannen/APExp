@@ -2,8 +2,7 @@ APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-#merge this in libintl with libtextstyle
-LIB=$APEXPROOT/$objtype/lib/ape/libintl.a
+LIB=$APEXPROOT/$objtype/lib/ape/libxml.a
 
 OFILES= \
 	DOCBparser.$O\
@@ -59,7 +58,7 @@ GETTEXTSRC=../../../external/gettext
 XMLSRC=../../../external/gettext/libtextstyle/lib/libxml
 
 CFLAGS=-c -B -I. -I$XMLSRC -I$XMLSRC/.. -I$GETTEXTSRC/libtextstyle\
-		-D_POSIX_SOURCE -D_BSD_SOURCE
+		-D_POSIX_SOURCE -D_BSD_SOURCE -DHAVE_CONFIG_H
 
 %.$O: $XMLSRC/%.c
 	$CC $CFLAGS $XMLSRC/$stem.c

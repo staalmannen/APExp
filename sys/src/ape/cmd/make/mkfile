@@ -2,35 +2,43 @@ APE=../..
 <$APE/config
 APEXPROOT=../../../../..
 LIB=$APEXPROOT/$objtype/lib/ape/libutf.a
-TARG=make
-OFILES=	alloca.$O\
-		ar.$O\
-		arscan.$O\
-		commands.$O\
-		default.$O\
-		dir.$O\
-		expand.$O\
-		file.$O\
-		function.$O\
-		getloadavg.$O\
-		getopt.$O\
-		getopt1.$O\
-		hash.$O\
-		implicit.$O\
-		job.$O\
-		main.$O\
-		misc.$O\
-		read.$O\
-		remake.$O\
-		remote-stub.$O\
-		rule.$O\
-		signame.$O\
-		strcache.$O\
-		variable.$O\
-		version.$O\
-		vpath.$O\
-		glob.$O\
-		fnmatch.$O
+TARG=gmake
+OFILES=	\
+# src \
+	ar.$O\
+	arscan.$O\
+	commands.$O\
+	default.$O\
+	dir.$O\
+	expand.$O\
+	file.$O\
+	function.$O\
+	getopt.$O\
+	getopt1.$O\
+	guile.$O\
+	hash.$O\
+	implicit.$O\
+	job.$O\
+	load.$O\
+	loadapi.$O\
+	main.$O\
+	misc.$O\
+	output.$O\
+	read.$O\
+	remake.$O\
+	rule.$O\
+	shuffle.$O\
+	signame.$O\
+	strcache.$O\
+	variable.$O\
+	version.$O\
+	vpath.$O\
+	posixos.$O\
+	remote-stub.$O\
+# lib\
+	getloadavg.$O\
+	glob.$O
+
 
 BIN=$APEXPROOT/$objtype/bin/ape
 <../../../cmd/mkone
@@ -39,20 +47,18 @@ GMAKESRC=../../../external/gmake
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -p -B -I. -I$GMAKESRC -I$GMAKESRC/glob -DPLAN9 -DHAVE_CONFIG_H \
+CFLAGS=-c -p -B -I. -I$GMAKESRC -I$GMAKESRC/src -I$GMAKESRC/lib -DPLAN9 -DHAVE_CONFIG_H \
 	-D_LIMITS_EXTENSION -DHAVE_SYS_RESOURCE_H -DHAVE_STRCASECMP -DHAVE_STRNCASECMP \
 	-DHAVE_SETLOCALE -DHAVE_FILENO -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_RESEARCH_SOURCE \
-	-D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION
+	-D_BSD_EXTENSION -D_C99_SNPRINTF_EXTENSION -DLOCALEDIR="/sys/lib/ape/locale"\
+	-DLIBDIR="/$objtype/lib/ape"
 
 
-%.$O: $GMAKESRC/%.c
-	$CC $CFLAGS $GMAKESRC/$stem.c
+%.$O: $GMAKESRC/src/%.c
+	$CC $CFLAGS $GMAKESRC/src/$stem.c
 
-glob.$O: $GMAKESRC/glob/glob.c
-	$CC $CFLAGS $GMAKESRC/glob/glob.c
-
-fnmatch.$O: $GMAKESRC/glob/fnmatch.c
-	$CC $CFLAGS $GMAKESRC/glob/fnmatch.c
+%.$O: $GMAKESRC/lib/%.c
+	$CC $CFLAGS $GMAKESRC/lib/$stem.c
 
 clean:V:
 	rm -f [$OS].* *.[$OS] $CLEANFILES
@@ -62,4 +68,5 @@ nuke:V:
 	rm -f $APEXPROOT/sys/man/1/make
 
 install:V:
-	cp $GMAKESRC/gmake.1 $APEXPROOT/sys/man/1/make
+	cp $GMAKESRC/doc/make.1 $APEXPROOT/sys/man/1/make
+	cp $BIN/gmake $BIN/make

@@ -8,7 +8,8 @@
 @cindex standards for makefiles
 
 @c Copyright 1992, 1993, 1994, 1995, 1996, 1997, 1998, 2000, 2001,
-@c 2004, 2005, 2006, 2007, 2008, 2010 Free Software Foundation, Inc.
+@c 2004, 2005, 2006, 2007, 2008, 2010, 2013, 2014, 2015
+@c Free Software Foundation, Inc.
 @c
 @c Permission is granted to copy, distribute and/or modify this document
 @c under the terms of the GNU Free Documentation License, Version 1.3
@@ -44,7 +45,7 @@ Autoconf}.
 * DESTDIR::                     Supporting staged installs.
 * Directory Variables::         Variables for installation directories.
 * Standard Targets::            Standard targets for users.
-* Install Command Categories::  Three categories of commands in the `install'
+* Install Command Categories::  Three categories of commands in the @samp{install}
                                   rule: normal, pre-install and post-install.
 @end menu
 
@@ -159,7 +160,7 @@ installation should not use any utilities directly except these:
 @c mkfifo mknod tee uname
 
 @example
-awk cat cmp cp diff echo egrep expr false grep install-info ln ls
+awk cat cmp cp diff echo expr false grep install-info ln ls
 mkdir mv printf pwd rm rmdir sed sleep sort tar test touch tr true
 @end example
 
@@ -360,7 +361,7 @@ variants of it are used in GNU/Linux and other modern operating
 systems.
 
 Installers are expected to override these values when calling
-@command{make} (e.g., @kbd{make prefix=/usr install} or
+@command{make} (e.g., @kbd{make prefix=/usr install}) or
 @command{configure} (e.g., @kbd{configure --prefix=/usr}).  GNU
 packages should not try to guess which value should be appropriate for
 these variables on the system they are being installed onto: use the
@@ -518,6 +519,19 @@ in @file{$(datadir)} or @file{$(sysconfdir)}.  @file{$(localstatedir)}
 should normally be @file{/usr/local/var}, but write it as
 @file{$(prefix)/var}.
 (If you are using Autoconf, write it as @samp{@@localstatedir@@}.)
+
+@item runstatedir
+The directory for installing data files which the programs modify
+while they run, that pertain to one specific machine, and which need
+not persist longer than the execution of the program---which is
+generally long-lived, for example, until the next reboot.  PID files
+for system daemons are a typical use.  In addition, this directory
+should not be cleaned except perhaps at reboot, while the general
+@file{/tmp} (@code{TMPDIR}) may be cleaned arbitrarily.  This should
+normally be @file{/var/run}, but write it as
+@file{$(localstatedir)/run}.  Having it as a separate variable allows
+the use of @file{/run} if desired, for example.  (If you are using
+Autoconf 2.70 or later, write it as @samp{@@runstatedir@@}.)
 @end table
 
 These variables specify the directory for installing certain specific
@@ -535,15 +549,15 @@ should normally be @file{/usr/local/include}, but write it as
 
 Most compilers other than GCC do not look for header files in directory
 @file{/usr/local/include}.  So installing the header files this way is
-only useful with GCC.  Sometimes this is not a problem because some
-libraries are only really intended to work with GCC.  But some libraries
+only useful with GCC@.  Sometimes this is not a problem because some
+libraries are only really intended to work with GCC@.  But some libraries
 are intended to work with other compilers.  They should install their
 header files in two places, one specified by @code{includedir} and one
 specified by @code{oldincludedir}.
 
 @item oldincludedir
 The directory for installing @samp{#include} header files for use with
-compilers other than GCC.  This should normally be @file{/usr/include}.
+compilers other than GCC@.  This should normally be @file{/usr/include}.
 (If you are using Autoconf, you can write it as @samp{@@oldincludedir@@}.)
 
 The Makefile commands should check whether the value of
@@ -602,7 +616,7 @@ should be written as @file{$(datarootdir)/emacs/site-lisp}.
 
 If you are using Autoconf, write the default as @samp{@@lispdir@@}.
 In order to make @samp{@@lispdir@@} work, you need the following lines
-in your @file{configure.in} file:
+in your @file{configure.ac} file:
 
 @example
 lispdir='$@{datarootdir@}/emacs/site-lisp'
@@ -672,7 +686,7 @@ prefix = /usr/local
 datarootdir = $(prefix)/share
 datadir = $(datarootdir)
 exec_prefix = $(prefix)
-# Where to put the executable for the command `gcc'.
+# Where to put the executable for the command 'gcc'.
 bindir = $(exec_prefix)/bin
 # Where to put the directories used by the compiler.
 libexecdir = $(exec_prefix)/libexec
@@ -715,8 +729,9 @@ documentation format) files should be made only when explicitly asked
 for.
 
 By default, the Make rules should compile and link with @samp{-g}, so
-that executable programs have debugging symbols.  Users who don't mind
-being helpless can strip the executables later if they wish.
+that executable programs have debugging symbols.  Otherwise, you are
+essentially helpless in the face of a crash, and it is often far from
+easy to reproduce with a fresh build.
 
 @item install
 Compile the program and copy the executables, libraries, and so on to
@@ -724,8 +739,11 @@ the file names where they should reside for actual use.  If there is a
 simple test to verify that a program is properly installed, this target
 should run that test.
 
-Do not strip executables when installing them.  Devil-may-care users can
-use the @code{install-strip} target to do that.
+Do not strip executables when installing them.  This helps eventual
+debugging that may be needed later, and nowadays disk space is cheap
+and dynamic loaders typically ensure debug sections are not loaded during
+normal execution.  Users that need stripped binaries may invoke the
+@code{install-strip} target to do that.
 
 If possible, write the @code{install} target rule so that it does not
 modify anything in the directory where the program was built, provided
@@ -764,9 +782,9 @@ do-install-info: foo.info installdirs
         $(INSTALL_DATA) $$d/foo.info \
           "$(DESTDIR)$(infodir)/foo.info"
 # Run install-info only if it exists.
-# Use `if' instead of just prepending `-' to the
+# Use 'if' instead of just prepending '-' to the
 # line so we notice real errors from install-info.
-# Use `$(SHELL) -c' because some shells do not
+# Use '$(SHELL) -c' because some shells do not
 # fail gracefully when there is an unknown command.
         $(POST_INSTALL)
         if $(SHELL) -c 'install-info --version' \
@@ -837,10 +855,7 @@ the program has no bugs.  However, it can be reasonable to install a
 stripped executable for actual execution while saving the unstripped
 executable elsewhere in case there is a bug.
 
-@comment The gratuitous blank line here is to make the table look better
-@comment in the printed Make manual.  Please leave it in.
 @item clean
-
 Delete all files in the current directory that are normally created by
 building the program.  Also delete files in other directories if they
 are created by this makefile.  However, don't delete the files that
@@ -943,11 +958,12 @@ foo.dvi: foo.texi chap1.texi chap2.texi
 @end smallexample
 
 @noindent
-You must define the variable @code{TEXI2DVI} in the Makefile.  It should
-run the program @code{texi2dvi}, which is part of the Texinfo
-distribution.@footnote{@code{texi2dvi} uses @TeX{} to do the real work
-of formatting. @TeX{} is not distributed with Texinfo.}  Alternatively,
-write just the dependencies, and allow GNU @code{make} to provide the command.
+You must define the variable @code{TEXI2DVI} in the Makefile.  It
+should run the program @code{texi2dvi}, which is part of the Texinfo
+distribution.  (@code{texi2dvi} uses @TeX{} to do the real work of
+formatting. @TeX{} is not distributed with Texinfo.)  Alternatively,
+write only the dependencies, and allow GNU @code{make} to provide the
+command.
 
 Here's another example, this one for generating HTML from Texinfo:
 
@@ -1119,7 +1135,7 @@ programs except for these:
 
 @example
 [ basename bash cat chgrp chmod chown cmp cp dd diff echo
-egrep expand expr false fgrep find getopt grep gunzip gzip
+expand expr false find getopt grep gunzip gzip
 hostname install install-info kill ldconfig ln ls md5sum
 mkdir mkfifo mknod mv printenv pwd rm rmdir sed sort tee
 test touch true uname xargs yes

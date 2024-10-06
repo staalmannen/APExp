@@ -86,6 +86,12 @@ typedef union hdr
 
 static header *last_alloca_header = NULL;       /* -> last alloca header.  */
 
+/* hack stub function for memory_full */
+void *memory_full() {
+return NULL;
+}
+
+
 /* Return a pointer to at least SIZE bytes of storage,
    which will be automatically reclaimed upon exit from
    the procedure that called alloca.  Originally, this space

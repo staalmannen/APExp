@@ -120,6 +120,7 @@ libutf.a$O: $UTF_OBJS
 
 install:V:
 	for (i in $TARG)
-		@{ cp $SBASESRC/$i.1 $APEXPROOT/sys/man/1/$i }
+		@{ cp $SBASESRC/$i.1 $APEXPROOT/sys/man/1/$i 
+		cp $O.$i $BIN/$i}
 
 

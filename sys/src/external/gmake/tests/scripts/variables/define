@@ -30,6 +30,10 @@ define simple :=
 @echo $(FOO)
 endef
 
+define posix ::=
+@echo $(FOO)
+endef
+
 append = @echo a
 
 define append +=
@@ -49,10 +53,59 @@ FOO = there
 
 all: ; $(multi)
 	$(simple)
+	$(posix)
 	$(append)
 	$(cond)
 ',
-              '', "echo hi\nhi\nthere\nfoo\na\nb\nfirst\n");
+              '', "echo hi\nhi\nthere\nfoo\nfoo\na\nb\nfirst\n");
+
+# TEST 1a: Various new-style define/endef, with no spaces
+
+run_make_test(q!
+FOO = foo
+
+define multi=
+echo hi
+@echo $(FOO)
+endef # this is the end
+
+define simple:=
+@echo $(FOO)
+endef
+
+define posix::=
+@echo $(FOO)
+endef
+
+define posixbsd:::=
+@echo '$(FOO)$$bar'
+endef
+
+append = @echo a
+
+define append+=
+
+@echo b
+endef
+
+define cond?= # this is a conditional
+@echo first
+endef
+
+define cond?=
+@echo second
+endef
+
+FOO = there
+
+all: ; $(multi)
+	$(simple)
+	$(posix)
+	$(posixbsd)
+	$(append)
+	$(cond)
+!,
+              '', "echo hi\nhi\nthere\nfoo\nfoo\nfoo\$bar\na\nb\nfirst\n");
 
 # TEST 2: define in true section of conditional (containing conditional)
 
@@ -112,7 +165,7 @@ ouch
 endef
 all: ; @echo ok
 ',
-              '', "#MAKEFILE#:3: extraneous text after `define' directive\nok\n");
+              '', "#MAKEFILE#:3: extraneous text after 'define' directive\nok\n");
 
 # TEST 7: NEGATIVE: extra text after endef
 
@@ -123,7 +176,7 @@ ouch
 endef $(NAME)
 all: ; @echo ok
 ',
-              '', "#MAKEFILE#:5: extraneous text after `endef' directive\nok\n");
+              '', "#MAKEFILE#:5: extraneous text after 'endef' directive\nok\n");
 
 # TEST 8: NEGATIVE: missing endef
 
@@ -134,7 +187,7 @@ define NAME =
 ouch
 endef$(NAME)
 ',
-              '', "#MAKEFILE#:4: *** missing `endef', unterminated `define'.  Stop.\n", 512);
+              '', "#MAKEFILE#:4: *** missing 'endef', unterminated 'define'.  Stop.\n", 512);
 
 # -------------------------
 # Make sure that prefix characters apply properly to define/endef values.
@@ -230,5 +283,23 @@ world
 hello
 world
 ');
+
+# Ensure that define can be a target when not appearing in a variable
+# definition context.  See SV 59870
+
+run_make_test(q!
+define = define
+
+$(define) : ;@echo $@
+
+%:define
+
+all: define foo
+
+%.x : define
+
+foo:;
+!,
+    '', "define\n");
 
 1;

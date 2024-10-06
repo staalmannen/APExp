@@ -77,7 +77,7 @@ Install paths have been modified so that libraries and binaries are installed in
 ***Utilities***
 
 
-- APE make has been replaced by a port of GNU make (version 3.82)
+- APE make has been replaced by a port of GNU make (version 4.4.1)
 - APE sed has been replaced by a port of GNU sed (version 4.2.1)
 - APE grep has been replaced by pcre2grep (version 10.432024-02-16 )
 - system awk has been replaced by GNU awk (version 5.3.0) as ape/awk

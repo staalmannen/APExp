@@ -1,24 +1,24 @@
 #                                                                    -*-perl-*-
 
-$description = "The following test creates a makefile to ...";
+$description = "Test the -e (environment overrides) option";
 
-$details = "";
+$ENV{GOOGLE} = 'boggle';
 
-$extraENV{GOOGLE} = 'boggle';
-
-open(MAKEFILE,"> $makefile");
-
-print MAKEFILE <<'EOF';
+run_make_test(q!
 GOOGLE = bazzle
 all:; @echo "$(GOOGLE)"
-EOF
+!,
+              '-e', "boggle\n");
 
-close(MAKEFILE);
+# Ensure variables set on the command line have the origin correct
+# See SV 61218
 
-&run_make_with_options($makefile, '-e' ,&get_logfile);
-
-$answer = "boggle\n";
-
-&compare_output($answer,&get_logfile(1));
+run_make_test(q!
+$(info FOO [$(origin FOO)]: $(value FOO))
+all: ;
+recurse: ; @$(MAKE) -f #MAKEFILE#
+!,
+              '-e --no-print-directory FOO=1 recurse',
+              "FOO [command line]: 1\nFOO [command line]: 1\n#MAKE#[1]: 'all' is up to date.");
 
 1;

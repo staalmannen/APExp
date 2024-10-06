@@ -232,7 +232,7 @@ canonicalize_filename_mode_stk (const char *name, canonicalize_mode_t can_mode,
     }
   else
     {
-      dest = mempcpy (rname, name, prefix_len);
+      dest = (char *) mempcpy (rname, name, prefix_len);
       *dest++ = '/';
       if (DOUBLE_SLASH_IS_DISTINCT_ROOT)
         {
@@ -313,7 +313,7 @@ canonicalize_filename_mode_stk (const char *name, canonicalize_mode_t can_mode,
               dest = rname + dest_offset;
             }
 
-          dest = mempcpy (dest, start, startlen);
+          dest = (char *) mempcpy (dest, start, startlen);
           *dest = '\0';
 
           char *buf;
@@ -391,7 +391,7 @@ canonicalize_filename_mode_stk (const char *name, canonicalize_mode_t can_mode,
                 {
                   idx_t pfxlen = FILE_SYSTEM_PREFIX_LEN (buf);
 
-                  dest = mempcpy (rname, buf, pfxlen);
+                  dest = (char *) mempcpy (rname, buf, pfxlen);
                   *dest++ = '/'; /* It's an absolute symlink */
                   if (DOUBLE_SLASH_IS_DISTINCT_ROOT)
                     {

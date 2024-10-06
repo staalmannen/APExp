@@ -12,7 +12,7 @@ TARG=	\
 		msgcomm\
 		msgconv\
 		msgen\
-#		msgexec\
+		msgexec\
 #		msgfilter\
 #		msgfmt\
 #		msggrep\
@@ -24,7 +24,8 @@ TARG=	\
 #      	recode-sr-latin
 #gettext-tools/misc \
 #      	gettextize\
-#      	autopoint\
+#      	autopoint
+
 
 GNULIB_OBJECTS=	\
 #gnulib-lib\
@@ -38,6 +39,8 @@ GNULIB_OBJECTS=	\
 		c32isspace.$O\
 		clean-temp.$O\
 		closeout.$O\
+		concat-filename.$O\
+#		copy-file.$O\
 		dup-safer-flag.$O\
 		error.$O\
 		error-progname.$O\
@@ -45,6 +48,7 @@ GNULIB_OBJECTS=	\
 		fd-safer-flag.$O\
 		findprog.$O\
 		findprog-in.$O\
+		full-write.$O\
 		fwriteerror.$O\
 		getprogname.$O\
 		malloca.$O\
@@ -77,15 +81,22 @@ GNULIB_OBJECTS=	\
 		unsetenv.$O\
 		wait-process.$O\
 		xalloc-die.$O\
+		xconcat-filename.$O\
 		xmalloc.$O\
 		xsetenv.$O\
-		xstriconv.$O
+		xstriconv.$O\
+# libgrep \
+		m-regex.$O\
+		m-fgrep.$O
 
-LIB= libgnulib.a$O\
+LIB=\
+	libgnu.a$O\
+	$APEXPROOT/$objtype/lib/ape/libtextstyle.a\
+	$APEXPROOT/$objtype/lib/ape/libgettextpo.a\
 	$APEXPROOT/$objtype/lib/ape/libintl.a\
 	$APEXPROOT/$objtype/lib/ape/libiconv.a\
 	$APEXPROOT/$objtype/lib/ape/libcurses.a\
-	libgnulib.a$O
+	$APEXPROOT/$objtype/lib/ape/libxml.a
 
 
 BIN=$APEXPROOT/$objtype/bin/ape
@@ -126,11 +137,14 @@ hash-string.$O: $GETTEXTSRC/gettext-runtime/intl/hash-string.c
 %.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/%.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/$stem.c
 
+%.$O: $GETTEXTSRC/gettext-tools/libgrep/%.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/libgrep/$stem.c
 
-libgnulib.a$O:V:	$GNULIB_OBJECTS
-					ar vu libgnulib.a$O $GNULIB_OBJECTS
 
-#removed: write-java.$O write-csharp.$O
+libgnu.a$O:V:	$GNULIB_OBJECTS
+				ar vu libgnu.a$O $GNULIB_OBJECTS
+
+#write-java.$O write-csharp.$O
 $O.msgfmt:V: 	msgfmt.$O write-mo.$O write-resources.$O\
 				write-tcl.$O write-qt.$O write-desktop.$O write-xml.$O hash-string.$O $LIB
 				$LD -o $target $prereq
