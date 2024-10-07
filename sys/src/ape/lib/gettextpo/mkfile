@@ -163,6 +163,10 @@ OFILES= \
 
 GETTEXTSRC=../../../external/gettext/gettext-tools/libgettextpo
 
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
 CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/.. -I$GETTEXTSRC/../src\
 		-I$GETTEXTSRC/../../libtextstyle/lib\
 		-I$GETTEXTSRC/../gnulib-lib -Drpl_malloc=malloc -Drpl_free=free\

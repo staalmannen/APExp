@@ -72,6 +72,10 @@ OFILES= \
 
 GETTEXTSRC=../../../external/gettext/libtextstyle
 
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
 CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/lib -I$GETTEXTSRC/lib/libcroco\
 		-DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION -D_RESEARCH_SOURCE\
 		-DSET=set -Drpl_open=open -DO_BINARY=0

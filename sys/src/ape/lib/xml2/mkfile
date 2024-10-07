@@ -57,6 +57,10 @@ OFILES= \
 GETTEXTSRC=../../../external/gettext
 XMLSRC=../../../external/gettext/libtextstyle/lib/libxml
 
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
 CFLAGS=-c -B -I. -I$XMLSRC -I$XMLSRC/.. -I$GETTEXTSRC/libtextstyle\
 		-D_POSIX_SOURCE -D_BSD_SOURCE -DHAVE_CONFIG_H
 

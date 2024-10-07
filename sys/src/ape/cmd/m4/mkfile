@@ -110,8 +110,9 @@ HFILES=config.h
 
 M4SRC=../../../external/m4
 
-CC=pcc
-LD=pcc
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
 
 UNRPL= -Drpl_readlink=readlink -Drpl_lseek=lseek -Drpl_posix_spawn_file_actions_addopen=posix_spawn_file_actions_addopen\
 		-Drpl_open=open -Drpl_free=free -Drpl_malloc=malloc -Drpl_strtod=strtod -Drpl_realloc=realloc -Drpl_calloc=calloc\

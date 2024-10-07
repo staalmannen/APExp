@@ -48,6 +48,8 @@
 // Never included before - need to define base class.
 #define __FLEX_LEXER_H
 
+#pragma lib "/$M/lib/ape/libfl.a"
+
 #include <iostream>
 
 extern "C++" {

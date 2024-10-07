@@ -107,8 +107,11 @@ HFILES=$APEXPROOT/sys/include/ape/libintl.h
 
 GETTEXTSRC=../../../external/gettext
 
-CC=pcc
-LD=pcc
+
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
 DEFS= 	-DLOCALEDIR="/sys/lib/ape/locale" -DBISON_LOCALEDIR="/sys/lib/ape/locale" -DLIBDIR="/$objtype/lib/ape"\
 		-DEXEEXT="" -DPROJECTSDIR="." -DGETTEXTJAR="/sys/lib/ape/gettext" -DGETTEXTDATADIR="/sys/lib/ape/gettext"\
 		-Drpl_optarg=optarg -Drpl_getopt=getopt -Drpl_optind=optind -Drpl_getopt_long=getopt_long -Drpl_malloc=malloc\

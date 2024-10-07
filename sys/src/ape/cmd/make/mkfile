@@ -45,8 +45,10 @@ BIN=$APEXPROOT/$objtype/bin/ape
 
 GMAKESRC=../../../external/gmake
 
-CC=pcc
-LD=pcc
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
 CFLAGS=-c -p -B -I. -I$GMAKESRC -I$GMAKESRC/src -I$GMAKESRC/lib -DPLAN9 -DHAVE_CONFIG_H \
 	-D_LIMITS_EXTENSION -DHAVE_SYS_RESOURCE_H -DHAVE_STRCASECMP -DHAVE_STRNCASECMP \
 	-DHAVE_SETLOCALE -DHAVE_FILENO -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_RESEARCH_SOURCE \

@@ -19,7 +19,7 @@
 #ifndef _TEXTSTYLE_H
 #define _TEXTSTYLE_H
 
-#pragma lib "/$M/lib/ape/libintl.a"
+#pragma lib "/$M/lib/ape/libtextstyle.a"
 
 #include <stdarg.h>
 #include <stddef.h>

@@ -51,8 +51,10 @@ OFILES=	array.$O\
 
 GAWKSRC=../../../external/gawk
 
-CC=pcc
-LD=pcc
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
 CFLAGS=-c -B -I. -I$GAWKSRC -I$GAWKSRC/support -DGAWK \
 		-DHAVE_CONFIG_H -DGETGROUPS_NOT_STANDARD\
 		-DLOCALEDIR="/sys/lib/ape/locale"

@@ -50,8 +50,10 @@ BIN=$APEXPROOT/$objtype/bin/ape
 
 GSEDSRC=../../../external/gsed
 
-CC=pcc
-LD=pcc
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
 CFLAGS=-c -I. -I$GSEDSRC -I$GSEDSRC/sed -I$GSEDSRC/lib -B -DHAVE_CONFIG_H\
 		-DLOCALEDIR="/sys/lib/ape/locale"
 

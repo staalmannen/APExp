@@ -45,8 +45,10 @@ HFILES=\
 
 EDITSRC=../../../external/libedit/src
 
-CC=pcc
-LD=pcc
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
 CFLAGS=-c -I. -I$APEXPROOT/sys/include/ape -I$EDITSRC -DHAVE_CONFIG_H -D_POSIX_SOURCE
 
 %.$O: $EDITSRC/%.c

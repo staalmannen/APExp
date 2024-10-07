@@ -55,6 +55,10 @@ OFILES= \
 
 GETTEXTSRC=../../../external/gettext/gettext-runtime
 
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
 CFLAGS=-c -B -I. -I$GETTEXTSRC/intl -I$GETTEXTSRC/intl/gnulib-lib\
 		-DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION\
 		-DLOCALE_ALIAS_PATH="/sys/lib/ape/locale.alias"\

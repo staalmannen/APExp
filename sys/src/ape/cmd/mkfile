@@ -11,15 +11,15 @@ DIRS=\
 	base\
 	diff\
 	expr\
-	gettext\
 	iconv\
-#	m4\
 	make\
 	patch\
 #	pax\
 	pcregrep\
 	pdksh\
-	sed
+	sed\
+	gettext\
+	m4
 
 BIN=$APEXPROOT/$objtype/bin/ape
 <$APEXPROOT/sys/src/cmd/mkmany

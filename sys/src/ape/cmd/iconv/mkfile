@@ -33,8 +33,10 @@ HFILES=$APEXPROOT/sys/include/ape/iconv.h
 
 ICONVSRC=../../../external/libiconv
 
-CC=pcc
-LD=pcc
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
 CFLAGS=-c -I$ICONVSRC -I$ICONVSRC/src -I$ICONVSRC/include -I$ICONVSRC/srclib\
 		-I$ICONVSRC/srclib/uniwidth -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION\
 		-DENABLE_NLS -DENABLE_RELOCATABLE -DINSTALLDIR="/bin" \

@@ -20,8 +20,10 @@ OFILES=	\
 
 ICONVSRC=../../../external/libiconv/
 
-CC=pcc
-LD=pcc
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
 DEFS = \
   -DLIBDIR="/$M/lib/ape" \
   -DBUILDING_LIBICONV -DBUILDING_LIBCHARSET -DBUILDING_STATIC \
