@@ -4,12 +4,14 @@
 rfork en
 fn sigterm{}
 HOME=$home
+M4PATH="/sys/lib/ape/m4"
+LOCALEDIR="/sys/lib/ape/locale"
 LD=pcc
 test -d /dev/fd || aux/stub -d /dev/fd && bind /fd /dev/fd
 ./mount-include
 chmod +x rc/bin
 chmod +x rc/bin/ape
-bind -b /$objtype/bin/ape /bin
+bind -b /$cputype/bin/ape /bin
 bind -b rc/bin /bin
 bind -b rc/bin/ape /bin
 bind -b $cputype/bin/ape /bin
