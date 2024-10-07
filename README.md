@@ -67,7 +67,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - curses.h, term.h, panel.h provided by PDCursesMod (built with wchar)
 - regex.h provided by pcre2 (pcre2posix, version 10.432024-02-16)
 - iconv.h provided by GNU libiconv (version 1.17 )
-- gettext utilities + libintl from GNU (version 0.22.5 )
+- gettext libintl from GNU (version 0.22.5 )
 - OpenBSD sys/queue.h copied from suckless sbase
 - getopt.h with gnu getopt_long from NetBSD, imported to libbsd
 - strings.h shim pointing to bsd.h
@@ -81,14 +81,16 @@ Install paths have been modified so that libraries and binaries are installed in
 - APE sed has been replaced by a port of GNU sed (version 4.2.1)
 - APE grep has been replaced by pcre2grep (version 10.432024-02-16 )
 - system awk has been replaced by GNU awk (version 5.3.0) as ape/awk
+- GNU m4 (version 1.4.19) has been added
+- GNU gettext utilities (version 0.22.5) have been added
+- GNU iconv utility (version 1.17) has been added
 - system yacc has been replaced by byacc (version 20240109) as ape/yacc
 - system lex has been replaced by flex (version 2.6.4) as ape/lex
-- the utilities "cut", "ls", "true", "tsort", "xargs" and "yes" have been built from suckless sbase under ape
+- the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" et al. have been built from suckless sbase under ape
 - steve's mkmk (/n/sources/contrib) imported to APExp
 
 - copied "head", "which", and "printenv" rc scripts from steve (/n/sources/contrib)
 
-Many of these are old ports and will hopefully be replaced by more up-to-date ports soon.
 
 ***Transpilers***
 

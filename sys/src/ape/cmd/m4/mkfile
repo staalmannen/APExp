@@ -25,26 +25,48 @@ OFILES=\
 
 LIB_OBJS= \
 		asyncsafe-spin.$O\
+		basename-lgpl.$O\
 		c-ctype.$O\
 		c-stack.$O\
+		c-strcasecmp.$O\
 		clean-temp.$O\
+		clean-temp-simple.$O\
+		close-stream.$O\
+		closein.$O\
+		closeout.$O\
 		concat-filename.$O\
 		dup-safer.$O\
 		error.$O\
 		execute.$O\
 		fatal-signal.$O\
 		fd-safer.$O\
+		filenamecat.$O\
+		filenamecat-lgpl.$O\
 		findprog-in.$O\
+		fopen-safer.$O\
+		fpending.$O\
+		freadahead.$O\
+		getrandom.$O\
+		gl_avltree_oset.$O\
+		gl_linked_list.$O\
+		gl_linkedhash_list.$O\
+		mbchar.$O\
+		mbslen.$O\
+		mbsstr.$O\
 		memchr2.$O\
+		mempcpy.$O\
 		mkdtemp.$O\
 		mkstemp-safer.$O\
+		malloca.$O\
 		obstack.$O\
 		pipe-safer.$O\
 		progname.$O\
 		propername.$O\
+		quotearg.$O\
 		reallocarray.$O\
 		regex.$O\
 		rmdir.$O\
+		secure_getenv.$O\
 		spawn-pipe.$O\
 		spawn_faction_addchdir.$O\
 		spawn_faction_addclose.$O\
@@ -58,16 +80,27 @@ LIB_OBJS= \
 		spawnattr_setpgroup.$O\
 		spawnattr_setsigmask.$O\
 		spawnp.$O\
+		strnlen1.$O\
 		strsignal.$O\
 		strstr.$O\
+		tempname.$O\
+		tmpdir.$O\
+		trim.$O\
+		verror.$O\
 		version-etc.$O\
+		version-etc-fsf.$O\
 		wait-process.$O\
 		xalloc-die.$O\
 		xasprintf.$O\
 		xmalloc.$O\
 		xmalloca.$O\
 		xprintf.$O\
-		xstrndup.$O
+		xstrndup.$O\
+# lib/malloc \
+		dynarray_at_failure.$O\
+		dynarray_emplace_enlarge.$O\
+		dynarray_finalize.$O\
+		dynarray_resize.$O
 
 
 BIN=$APEXPROOT/$objtype/bin/ape
@@ -81,6 +114,8 @@ CC=pcc
 LD=pcc
 
 UNRPL= -Drpl_readlink=readlink -Drpl_lseek=lseek -Drpl_posix_spawn_file_actions_addopen=posix_spawn_file_actions_addopen\
+		-Drpl_open=open -Drpl_free=free -Drpl_malloc=malloc -Drpl_strtod=strtod -Drpl_realloc=realloc -Drpl_calloc=calloc\
+		-Drpl_fcntl=fcntl -Drpl_mkstemp=mkstemp
 
 
 CFLAGS=-c -B -I. -I$M4SRC -I$M4SRC/src  -I$M4SRC/lib -DHAVE_CONFIG_H  -Doption=gnu_option\
@@ -92,6 +127,9 @@ CFLAGS=-c -B -I. -I$M4SRC -I$M4SRC/src  -I$M4SRC/lib -DHAVE_CONFIG_H  -Doption=g
 
 %.$O: $M4SRC/lib/%.c
 	$CC $CFLAGS $M4SRC/lib/$stem.c
+
+%.$O: $M4SRC/lib/malloc/%.c
+	$CC $CFLAGS $M4SRC/lib/malloc/$stem.c
 
 libgnu.a$O: $LIB_OBJS
 	ar vu libgnu.a$O $LIB_OBJS

@@ -111,7 +111,7 @@ path_search (char *tmpl, size_t tmpl_len, const char *dir, const char *pfx,
 
   if (try_tmpdir)
     {
-      d = __libc_secure_getenv ("TMPDIR");
+      d = (const char *) __libc_secure_getenv ("TMPDIR");
       if (d != NULL && direxists (d))
         dir = d;
       else if (dir != NULL && direxists (dir))

@@ -144,6 +144,7 @@ OFILES= \
 	hash.$O\
 	hash-triple-simple.$O\
 	hash-pjw.$O\
+	mempcpy.$O\
 	read-file.$O\
 	spawn.$O\
 	spawni.$O\
@@ -250,6 +251,9 @@ hash-pjw.$O: $GETTEXTSRC/../gnulib-lib/hash-pjw.c
 
 xstriconveh.$O: $GETTEXTSRC/../gnulib-lib/xstriconveh.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/xstriconveh.c
+
+mempcpy.$O: $GETTEXTSRC/../gnulib-lib/mempcpy.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/mempcpy.c
 
 
 

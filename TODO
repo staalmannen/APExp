@@ -1,6 +1,5 @@
 Several 3rd party applications have been imported to replace some custom APE
-implementations of UNIX commands. Several of these are old ports, and one
-task will be to update those ports.
+implementations of UNIX commands.
 
 Everything that enhances POSIX or "GNU de facto standard" compatibility is
 welcome in APExp. We might thus integrate more 3rd party content in the
