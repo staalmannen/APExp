@@ -18,10 +18,10 @@
 #define STATIC static
 #endif
 
+#include "plural-exp.h"
+
 /* Evaluate the plural expression and return an index value.  */
-STATIC
-unsigned long int
-internal_function
+unsigned long int 
 plural_eval (const struct expression *pexp, unsigned long int n)
 {
   switch (pexp->nargs)

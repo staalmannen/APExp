@@ -422,7 +422,7 @@ normalize_whitespace (const char *text, enum its_whitespace_type_ty whitespace)
 
               for (p = start_of_paragraph;;)
                 {
-                  const char *nl = strchrnul (p, '\n');
+                  const char *nl = (const char *) strchrnul (p, '\n');
                   if (*nl == '\0')
                     {
                       end_of_paragraph = nl;
@@ -547,17 +547,17 @@ _its_encode_special_chars (const char *content, bool is_attribute)
       switch (*str)
         {
         case '&':
-          p = stpcpy (p, "&amp;");
+          p = (char *) stpcpy (p, "&amp;");
           break;
         case '<':
-          p = stpcpy (p, "&lt;");
+          p = (char *) stpcpy (p, "&lt;");
           break;
         case '>':
-          p = stpcpy (p, "&gt;");
+          p = (char *) stpcpy (p, "&gt;");
           break;
         case '"':
           if (is_attribute)
-            p = stpcpy (p, "&quot;");
+            p = (char *) stpcpy (p, "&quot;");
           else
             *p++ = '"';
           break;
@@ -633,7 +633,7 @@ _its_collect_text_content (xmlNode *node,
 
         case XML_ELEMENT_NODE:
           {
-            xmlOutputBuffer *obuffer = xmlAllocOutputBuffer (NULL);
+            xmlOutputBuffer *obuffer = (xmlOutputBuffer *) xmlAllocOutputBuffer (NULL);
             xmlTextWriter *writer = xmlNewTextWriter (obuffer);
             char *p = _its_collect_text_content (n, whitespace,
                                                  no_escape);

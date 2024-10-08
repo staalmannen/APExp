@@ -46,6 +46,8 @@
 #include "unistr.h"
 #include "gettext.h"
 
+#define parse_args cldr_plural_parse_args
+
 #define _(str) gettext (str)
 
 #define SIZEOF(a) (sizeof(a) / sizeof(a[0]))
@@ -459,7 +461,7 @@ check_plural (message_list_ty *mlp,
 
               seen_errors++;
             }
-          plural_expr = args.res;
+//          plural_expr = args.res;
 
           /* See whether nplurals and plural fit together.  */
           if (!seen_errors)
@@ -520,7 +522,7 @@ check_plural (message_list_ty *mlp,
         }
      no_plural:
       /* By default, the Germanic formula (n != 1) is used.  */
-      distribution.expr = &germanic_plural;
+//      distribution.expr = &germanic_plural;
       {
         unsigned char *array = XCALLOC (2, unsigned char);
         array[1] = 1;

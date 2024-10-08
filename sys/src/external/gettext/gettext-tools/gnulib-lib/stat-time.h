@@ -10,7 +10,7 @@
    This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU Lesser General Public License for more details.
+   GNU Lesser General Public License for more details. atime
 
    You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
@@ -124,8 +124,10 @@ get_stat_atime (struct stat const *st)
 #ifdef STAT_TIMESPEC
   return STAT_TIMESPEC (st, st_atim);
 #else
-  return (struct timespec) { .tv_sec = st->st_atime,
-                             .tv_nsec = get_stat_atime_ns (st) };
+   struct timespec x;
+  x.tv_sec = st->st_atime;
+  x.tv_nsec = get_stat_atime_ns (st);
+  return x;
 #endif
 }
 
@@ -136,8 +138,10 @@ get_stat_ctime (struct stat const *st)
 #ifdef STAT_TIMESPEC
   return STAT_TIMESPEC (st, st_ctim);
 #else
-  return (struct timespec) { .tv_sec = st->st_ctime,
-                             .tv_nsec = get_stat_ctime_ns (st) };
+  struct timespec x;
+  x.tv_sec = st->st_ctime;
+  x.tv_nsec = get_stat_ctime_ns (st);
+  return x;
 #endif
 }
 
@@ -148,8 +152,10 @@ get_stat_mtime (struct stat const *st)
 #ifdef STAT_TIMESPEC
   return STAT_TIMESPEC (st, st_mtim);
 #else
-  return (struct timespec) { .tv_sec = st->st_mtime,
-                             .tv_nsec = get_stat_mtime_ns (st) };
+  struct timespec x;
+  x.tv_sec = st->st_mtime;
+  x.tv_nsec = get_stat_mtime_ns (st);
+  return x;
 #endif
 }
 
@@ -177,7 +183,8 @@ get_stat_birthtime (_GL_UNUSED struct stat const *st)
 # endif
 #else
   /* Birth time is not supported.  */
-  t = (struct timespec) { .tv_sec = -1, .tv_nsec = -1 };
+  t.tv_sec = -1;
+  t.tv_nsec = -1;
 #endif
 
 #if (defined HAVE_STRUCT_STAT_ST_BIRTHTIMESPEC_TV_NSEC \

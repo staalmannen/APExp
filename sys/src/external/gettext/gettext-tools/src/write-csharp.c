@@ -90,6 +90,8 @@
 #include "unistr.h"
 #include "gettext.h"
 
+#include "../../gettext-runtime/intl/plural-exp.h"
+
 #define _(str) gettext (str)
 
 

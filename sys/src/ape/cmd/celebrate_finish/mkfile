@@ -1,0 +1,10 @@
+APE=../..
+<$APE/config
+
+
+default:V:
+	cat celebrate
+
+install:V: default
+
+all:V: default

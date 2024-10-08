@@ -19,7 +19,8 @@ DIRS=\
 	pdksh\
 	sed\
 	gettext\
-	m4
+	m4\
+	celebrate_finish
 
 BIN=$APEXPROOT/$objtype/bin/ape
 <$APEXPROOT/sys/src/cmd/mkmany

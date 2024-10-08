@@ -38,33 +38,42 @@ OFILES= \
 	format-sh.$O\
 	format-smalltalk.$O\
 	format-tcl.$O\
-	po-error.$O\
-	po-xerror.$O\
-	po-charset.$O\
-	po-lex.$O\
-	po-gram-gen.$O\
-	pos.$O\
+	lang-table.$O\
 	mbswidth.$O\
 	mbszero.$O\
 	message.$O\
 	msgl-ascii.$O\
 	msgl-cat.$O\
 	msgl-charset.$O\
-#	msgl-check.$O\
+	msgl-check.$O\
 	msgl-english.$O\
 	msgl-equal.$O\
+	msgl-fsearch.$O\
 	msgl-header.$O\
 	msgl-iconv.$O\
 	msgl-ofn.$O\
 	open-catalog.$O\
+	plural-count.$O\
+	plural-eval.$O\
+	plural-exp.$O\
+	plural-table.$O\
+	po-error.$O\
+	po-xerror.$O\
+	po-charset.$O\
+	po-lex.$O\
+	po-gram-gen.$O\
+	po-time.$O\
+	pos.$O\
 	read-catalog.$O\
 	read-catalog-abstract.$O\
-#	read-mo.$O\
+	read-mo.$O\
 	read-po.$O\
 	read-properties.$O\
 	read-resources.$O\
 	read-stringtable.$O\
+	sentence.$O\
 	write-catalog.$O\
+	write-mo.$O\
 	write-po.$O\
 	write-properties.$O\
 	write-stringtable.$O\
@@ -140,12 +149,17 @@ OFILES= \
 	u8-conv-from-enc.$O\
 # gnulib-lib\
 	canonicalize.$O\
+	csharpcomp.$O\
 	file-set.$O\
 	hash.$O\
 	hash-triple-simple.$O\
 	hash-pjw.$O\
+	javacomp.$O\
+	localename.$O\
+	localename-unsafe.$O\
 	mempcpy.$O\
 	read-file.$O\
+	safe-read.$O\
 	spawn.$O\
 	spawni.$O\
 	spawnp.$O\
@@ -155,6 +169,7 @@ OFILES= \
 	spawnattr_setflags.$O\
 	spawnattr_setpgroup.$O\
 	spawnattr_setsigmask.$O\
+	supersede.$O\
 	memset_explicit.$O\
 	xstriconveh.$O\
 
@@ -167,16 +182,22 @@ GETTEXTSRC=../../../external/gettext/gettext-tools/libgettextpo
 #fails on include_next
 CC=$APEXPROOT/$objtype/bin/pcc
 
-CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/.. -I$GETTEXTSRC/../src\
-		-I$GETTEXTSRC/../../libtextstyle/lib\
-		-I$GETTEXTSRC/../gnulib-lib -Drpl_malloc=malloc -Drpl_free=free\
-		-Drpl_realloc=realloc -Drpl_strtoul=strtoul -Drpl_strstr=strstr\
+UNRPL=	-Drpl_strtol=strtol -Drpl_realloc=realloc -Drpl_strtoul=strtoul -Drpl_strstr=strstr\
 		-Drpl_strerror=strerror -Drpl_calloc=calloc -Drpl_readlink=readlink\
-		-Drpl_getcwd=getcwd -Drpl_open=open -Drpl_dup2=dup2\
-		-DHAVE_SETEUID -DHAVE_SETEGID -Dseteuid=setuid -Dsetegid=setgid\
+		-Drpl_getcwd=getcwd -Drpl_open=open -Drpl_dup2=dup2 -Drpl_malloc=malloc -Drpl_free=free\
+		-Drpl_unlink=unlink
+
+DEFS=	-DHAVE_SETEUID -DHAVE_SETEGID -Dseteuid=setuid -Dsetegid=setgid\
 		-DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION -D_RESEARCH_SOURCE\
 		-DLIBDIR="/sys/lib/ape" -DHAVE_ICONV -DEILSEQ=ENOENT -DPTRDIFF_MAX=SIZE_MAX\
 		-DUINTPTR_MAX=INT_MAX -DUINTPTR_WIDTH=UINTPTR_MAX -DUCHAR_WIDTH=UCHAR_MAX
+
+
+CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/.. -I$GETTEXTSRC/../src\
+		-I$GETTEXTSRC/../../libtextstyle/lib -I$GETTEXTSRC/../../gettext-runtime/intl\
+		-I$GETTEXTSRC/../gnulib-lib\
+		$UNRPL $DEFS
+
 
 %.$O: $GETTEXTSRC/%.c
 	$CC $CFLAGS $GETTEXTSRC/$stem.c
@@ -259,6 +280,23 @@ xstriconveh.$O: $GETTEXTSRC/../gnulib-lib/xstriconveh.c
 mempcpy.$O: $GETTEXTSRC/../gnulib-lib/mempcpy.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/mempcpy.c
 
+javacomp.$O: $GETTEXTSRC/../gnulib-lib/javacomp.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/javacomp.c
+
+csharpcomp.$O: $GETTEXTSRC/../gnulib-lib/csharpcomp.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/csharpcomp.c
+
+supersede.$O: $GETTEXTSRC/../gnulib-lib/supersede.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/supersede.c
+
+safe-read.$O: $GETTEXTSRC/../gnulib-lib/safe-read.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/safe-read.c
+
+localename.$O: $GETTEXTSRC/../gnulib-lib/localename.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/localename.c
+
+localename-unsafe.$O: $GETTEXTSRC/../gnulib-lib/localename-unsafe.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/localename-unsafe.c
 
 
 

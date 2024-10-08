@@ -13,22 +13,58 @@ TARG=	\
 		msgconv\
 		msgen\
 		msgexec\
-#		msgfilter\
-#		msgfmt\
-#		msggrep\
-#		msginit\
-#		msgmerge\
-#		msgunfmt\
+		msgfilter\
+		msgfmt\
+		msggrep\
+		msginit\
+		msgmerge\
+		msgunfmt\
 		msguniq\
 #      	xgettext\
-#      	recode-sr-latin
-#gettext-tools/misc \
-#      	gettextize\
-#      	autopoint
+      	recode-sr-latin
 
+
+RC_SCRIPTS=\
+#gettext-tools/misc \
+      	gettextize\
+      	autopoint
 
 GNULIB_OBJECTS=	\
+#src \
+		filter-quote.$O\
+		filter-sr-latin.$O\
+		its.$O\
+		locating-rule.$O\
+		read-desktop.$O\
+		write-desktop.$O\
+		search-path.$O\
+		x-awk.$O\
+		x-c.$O\
+		x-csharp.$O\
+		x-desktop.$O\
+		x-elisp.$O\
+		x-java.$O\
+		x-javascript.$O\
+		x-librep.$O\
+		x-lisp.$O\
+		x-lua.$O\
+		x-perl.$O\
+		x-php.$O\
+		x-po.$O\
+		x-python.$O\
+		x-rst.$O\
+		x-ruby.$O\
+		x-scheme.$O\
+		x-sh.$O\
+		x-smalltalk.$O\
+		x-tcl.$O\
+		x-vala.$O\
+		x-ycp.$O\
 #gnulib-lib\
+		addext.$O\
+		argmatch.$O\
+		asyncsafe-spin.$O\
+		backupfile.$O\
 		basename-lgpl.$O\
 		canonicalize-lgpl.$O\
 		c-strcasecmp.$O\
@@ -36,14 +72,20 @@ GNULIB_OBJECTS=	\
 		c32iscntrl.$O\
 		c32width.$O\
 		c32isalnum.$O\
+		c32isprint.$O\
 		c32isspace.$O\
+		classpath.$O\
+		csharpexec.$O\
 		clean-temp.$O\
+		clean-temp-simple.$O\
 		closeout.$O\
 		concat-filename.$O\
-#		copy-file.$O\
+		copy-file.$O\
+		copy-file-range.$O\
 		dup-safer-flag.$O\
 		error.$O\
 		error-progname.$O\
+		execute.$O\
 		exitfail.$O\
 		fd-safer-flag.$O\
 		findprog.$O\
@@ -51,6 +93,9 @@ GNULIB_OBJECTS=	\
 		full-write.$O\
 		fwriteerror.$O\
 		getprogname.$O\
+		getrandom.$O\
+		gettime.$O\
+		javaexec.$O\
 		malloca.$O\
 		mbchar.$O\
 		mbtowc-lock.$O\
@@ -61,13 +106,18 @@ GNULIB_OBJECTS=	\
 		mempcpy.$O\
 		mbuiter.$O\
 		mkdtemp.$O\
+		pipe-filter-ii.$O\
 		pipe2.$O\
 		pipe2-safer.$O\
 		progname.$O\
 		propername.$O\
 		progreloc.$O\
+		quotearg.$O\
 		reallocarray.$O\
+		safe-read.$O\
+		secure_getenv.$O\
 		setenv.$O\
+		sh-quote.$O\
 		spawn-pipe.$O\
 		spawn_faction_addchdir.$O\
 		spawn_faction_addclose.$O\
@@ -77,26 +127,48 @@ GNULIB_OBJECTS=	\
 		spawn_faction_init.$O\
 		strnlen1.$O\
 		striconv.$O\
+		tempname.$O\
+		tmpdir.$O\
 		trim.$O\
 		unsetenv.$O\
+		utimens.$O\
 		wait-process.$O\
 		xalloc-die.$O\
 		xconcat-filename.$O\
 		xmalloc.$O\
+		xmemdup0.$O\
 		xsetenv.$O\
 		xstriconv.$O\
+#gnulib-lib/unictype\
+		ctype_print.$O\
+		sy_java_whitespace.$O\
+#gnulib-lib/uniname\
+		uniname.$O\
 # libgrep \
 		m-regex.$O\
-		m-fgrep.$O
+		m-fgrep.$O\
+		kwset.$O\
+		regex.$O\
+# libgrep/malloc \
+		dynarray_at_failure.$O\
+		dynarray_emplace_enlarge.$O\
+		dynarray_finalize.$O\
+		dynarray_resize.$O\
+		dynarray_resize_clear.$O\
+#libxml\
+		xpath.$O\
+		xmlsave.$O\
+		xmlwriter.$O\
 
 LIB=\
 	libgnu.a$O\
 	$APEXPROOT/$objtype/lib/ape/libtextstyle.a\
 	$APEXPROOT/$objtype/lib/ape/libgettextpo.a\
 	$APEXPROOT/$objtype/lib/ape/libintl.a\
+	$APEXPROOT/$objtype/lib/ape/libxml.a\
 	$APEXPROOT/$objtype/lib/ape/libiconv.a\
 	$APEXPROOT/$objtype/lib/ape/libcurses.a\
-	$APEXPROOT/$objtype/lib/ape/libxml.a
+
 
 
 BIN=$APEXPROOT/$objtype/bin/ape
@@ -114,10 +186,17 @@ CC=$APEXPROOT/$objtype/bin/pcc
 
 DEFS= 	-DLOCALEDIR="/sys/lib/ape/locale" -DBISON_LOCALEDIR="/sys/lib/ape/locale" -DLIBDIR="/$objtype/lib/ape"\
 		-DEXEEXT="" -DPROJECTSDIR="." -DGETTEXTJAR="/sys/lib/ape/gettext" -DGETTEXTDATADIR="/sys/lib/ape/gettext"\
-		-Drpl_optarg=optarg -Drpl_getopt=getopt -Drpl_optind=optind -Drpl_getopt_long=getopt_long -Drpl_malloc=malloc\
+		-DENABLE_NLS -DHAVE_ICONV -DPLAN9 -D__wcrtomb=wcrtomb -D__mbrtowc=mbrtowc -DGNULIB_MBRTOC32_REGULAR\
+		-DLIBXML_XPATH_ENABLED -DLIBXML_WRITER_ENABLED -DGNULIB_MBRTOWC_SINGLE_THREAD -DLIBXML_WRITER_ENABLED\
+		-DLIBXML_OUTPUT_ENABLED
+
+UNRPL=	-Drpl_optarg=optarg -Drpl_getopt=getopt -Drpl_optind=optind -Drpl_getopt_long=getopt_long -Drpl_malloc=malloc\
 		-Drpl_realloc=realloc -Drpl_calloc=calloc -Drpl_free=free -Drpl_rmdir=rmdir -Drpl_open=open -Drpl_strtol=strtol\
-		-Drpl_readlink=readlink -Drpl_fcntl=fcntl -Drpl_posix_spawnattr_init=posix_spawnattr_init\
-		-DENABLE_NLS -DHAVE_ICONV -DGNULIB_MBRTOC32_REGULAR -DGNULIB_MBRTOWC_SINGLE_THREAD -DPLAN9
+		-Drpl_readlink=readlink -Drpl_fcntl=fcntl -Drpl_posix_spawnattr_init=posix_spawnattr_init -Drpl_strtoul=strtoul\
+		-Drpl_re_set_syntax=re_set_syntax -Drpl_re_compile_pattern=re_compile_pattern -Drpl_re_search=re_search\
+		-Drpl_re_match=re_match -Drpl_mbrtowc=mbrtowc -Drpl_lstat=lstat -Drpl_strtol=strtol -Drpl_mkdir=mkdir\
+		-Drpl_unlink=unlink
+
 
 RINCLUDE= 	-I$GETTEXTSRC/gettext-runtime/src -I$GETTEXTSRC/gettext-runtime\
 			-I$GETTEXTSRC/gettext-runtime/gnulib-lib -I$GETTEXTSRC/gettext-runtime/intl
@@ -126,7 +205,7 @@ TINCLUDE= 	-I$GETTEXTSRC/gettext-tools -I$GETTEXTSRC/gettext-tools/src -I$GETTEX
 		  	-I$GETTEXTSRC/libtextstyle/lib -I$GETTEXTSRC/gnulib-local/lib\
 			-I$GETTEXTSRC/gettext-tools/libgrep $GETTEXTSRC/gettext-tools/libgettextpo $RINCLUDE
 
-CFLAGS=-c -B -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION $DEFS
+CFLAGS=-c -B -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION $DEFS $UNRPL
 
 hash-string.$O: $GETTEXTSRC/gettext-runtime/intl/hash-string.c
 	$CC $CFLAGS $RINCLUDE $GETTEXTSRC/gettext-runtime/intl/hash-string.c
@@ -140,15 +219,32 @@ hash-string.$O: $GETTEXTSRC/gettext-runtime/intl/hash-string.c
 %.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/%.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/$stem.c
 
+%.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/unictype/%.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/unictype/$stem.c
+
+%.$O: $GETTEXTSRC/gettext-tools/gnulib-lib/uniname/%.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/gnulib-lib/uniname/$stem.c
+
 %.$O: $GETTEXTSRC/gettext-tools/libgrep/%.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/libgrep/$stem.c
+
+%.$O: $GETTEXTSRC/gettext-tools/libgrep/malloc/%.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/gettext-tools/libgrep/malloc/$stem.c
+
+xpath.$O: $GETTEXTSRC/libtextstyle/lib/libxml/xpath.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/libxml/xpath.c
+
+xmlsave.$O: $GETTEXTSRC/libtextstyle/lib/libxml/xmlsave.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/libxml/xmlsave.c
+
+xmlwriter.$O: $GETTEXTSRC/libtextstyle/lib/libxml/xmlwriter.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/libxml/xmlwriter.c
 
 
 libgnu.a$O:V:	$GNULIB_OBJECTS
 				ar vu libgnu.a$O $GNULIB_OBJECTS
 
-#write-java.$O write-csharp.$O
-$O.msgfmt:V: 	msgfmt.$O write-mo.$O write-resources.$O\
+$O.msgfmt:V: 	msgfmt.$O write-mo.$O write-resources.$O write-java.$O write-csharp.$O\
 				write-tcl.$O write-qt.$O write-desktop.$O write-xml.$O hash-string.$O $LIB
 				$LD -o $target $prereq
 
@@ -158,6 +254,8 @@ $O.msgcmp:V: 	msgcmp.$O msgl-fsearch.$O $LIB
 $O.msgunfmt:V:	msgunfmt.$O read-mo.$O read-java.$O read-csharp.$O read-resources.$O\
 				read-tcl.$O hash-string.$O $LIB
 				$LD -o $target $prereq
+
+
 
 
 

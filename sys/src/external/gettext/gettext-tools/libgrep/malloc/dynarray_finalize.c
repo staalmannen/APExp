@@ -55,8 +55,8 @@ __libc_dynarray_finalize (struct dynarray_header *list,
         memcpy (heap_array, list->array, allocation_size);
       if (list->array != scratch)
         free (list->array);
-      *result = (struct dynarray_finalize_result)
-        { .array = heap_array, .length = used };
+//      *result = (struct dynarray_finalize_result)
+//        { .array = heap_array, .length = used };
       return true;
     }
   else

@@ -502,8 +502,8 @@ fdutimens (int fd, char const *file, struct timespec const timespec[2])
       struct utimbuf *ut;
       if (ts)
         {
-          utimbuf = (struct utimbuf) { .actime  = ts[0].tv_sec,
-                                       .modtime = ts[1].tv_sec };
+          utimbuf.actime = ts[0].tv_sec;
+		  utimbuf.modtime = ts[1].tv_sec;
           ut = &utimbuf;
         }
       else

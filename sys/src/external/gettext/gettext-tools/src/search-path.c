@@ -49,7 +49,7 @@ foreach_elements (const char *dirs, foreach_function_ty function, void *data)
   /* Count the number of valid elements in DIRS.  */
   while (*start != '\0')
     {
-      char *end = strchrnul (start, ':');
+      char *end = (char *) strchrnul (start, ':');
 
       /* Skip empty element.  */
       if (start != end)

@@ -512,12 +512,12 @@ desktop_escape_string (const char *s, bool is_list)
   /* The first character must not be a whitespace.  */
   if (*s == ' ')
     {
-      p = stpcpy (p, "\\s");
+      p = (char *) stpcpy (p, "\\s");
       s++;
     }
   else if (*s == '\t')
     {
-      p = stpcpy (p, "\\t");
+      p = (char *) stpcpy (p, "\\t");
       s++;
     }
 
@@ -532,19 +532,19 @@ desktop_escape_string (const char *s, bool is_list)
       switch (*s)
         {
         case '\n':
-          p = stpcpy (p, "\\n");
+          p = (char *) stpcpy (p, "\\n");
           break;
         case '\r':
-          p = stpcpy (p, "\\r");
+          p = (char *) stpcpy (p, "\\r");
           break;
         case '\\':
           if (is_list && *(s + 1) == ';')
             {
-              p = stpcpy (p, "\\;");
+              p = (char *) stpcpy (p, "\\;");
               s++;
             }
           else
-            p = stpcpy (p, "\\\\");
+            p = (char *) stpcpy (p, "\\\\");
           break;
         default:
           *p++ = *s;
@@ -594,7 +594,7 @@ desktop_unescape_string (const char *s, bool is_list)
               *p++ = '\r';
               break;
             case ';':
-              p = stpcpy (p, "\\;");
+              p = (char *) stpcpy (p, "\\;");
               break;
             default:
               *p++ = *s;

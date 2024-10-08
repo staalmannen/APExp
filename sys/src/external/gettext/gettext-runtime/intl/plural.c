@@ -72,7 +72,7 @@
 #define yynerrs         __gettextnerrs
 
 /* First part of user prologue.  */
-#line 1 "plural.y"
+//#line 1 "plural.y"
 
 /* Expression parsing for plural form selection.
    Copyright (C) 2000-2020 Free Software Foundation, Inc.
