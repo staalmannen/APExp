@@ -21,6 +21,8 @@
 # define _GNU_SOURCE	1
 #endif
 
+#define plural_eval libintl_plural_eval
+
 #ifdef HAVE_CONFIG_H
 # include <config.h>
 #endif
