@@ -292,6 +292,7 @@ $O.msgunfmt:V:	msgunfmt.$O read-mo.$O read-java.$O read-csharp.$O read-resources
 
 
 install:V:
+	mk all
 	for (i in $TARG)
 		@{cp $O.$i $BIN/$i}
 	for (j in $RC_SCRIPTS)

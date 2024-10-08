@@ -119,6 +119,7 @@ libutf.a$O: $UTF_OBJS
 	$CC $SBASE_CFLAGS $SBASESRC/libutil/$stem.c
 
 install:V:
+	mk all
 	for (i in $TARG)
 		@{ cp $SBASESRC/$i.1 $APEXPROOT/sys/man/1/$i 
 		cp $O.$i $BIN/$i}
