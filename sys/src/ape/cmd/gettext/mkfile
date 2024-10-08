@@ -20,7 +20,7 @@ TARG=	\
 		msgmerge\
 		msgunfmt\
 		msguniq\
-#      	xgettext\
+      	xgettext\
       	recode-sr-latin
 
 
@@ -95,7 +95,11 @@ GNULIB_OBJECTS=	\
 		getprogname.$O\
 		getrandom.$O\
 		gettime.$O\
+		gl_linked_list.$O\
+		gl_linkedhash_list.$O\
+		javacomp.$O\
 		javaexec.$O\
+		javaversion.$O\
 		malloca.$O\
 		mbchar.$O\
 		mbtowc-lock.$O\
@@ -156,8 +160,16 @@ GNULIB_OBJECTS=	\
 		dynarray_resize.$O\
 		dynarray_resize_clear.$O\
 #libxml\
+		catalog.$O\
+		encoding.$O\
+		entities.$O\
+		parser.$O\
+		SAX2.$O\
+		valid.$O\
+		xmlIO.$O\
 		xpath.$O\
 		xmlsave.$O\
+		xmlreader.$O\
 		xmlwriter.$O\
 
 LIB=\
@@ -188,14 +200,14 @@ DEFS= 	-DLOCALEDIR="/sys/lib/ape/locale" -DBISON_LOCALEDIR="/sys/lib/ape/locale"
 		-DEXEEXT="" -DPROJECTSDIR="." -DGETTEXTJAR="/sys/lib/ape/gettext" -DGETTEXTDATADIR="/sys/lib/ape/gettext"\
 		-DENABLE_NLS -DHAVE_ICONV -DPLAN9 -D__wcrtomb=wcrtomb -D__mbrtowc=mbrtowc -DGNULIB_MBRTOC32_REGULAR\
 		-DLIBXML_XPATH_ENABLED -DLIBXML_WRITER_ENABLED -DGNULIB_MBRTOWC_SINGLE_THREAD -DLIBXML_WRITER_ENABLED\
-		-DLIBXML_OUTPUT_ENABLED
+		-DLIBXML_OUTPUT_ENABLED -DLIBXML_PUSH_ENABLED
 
 UNRPL=	-Drpl_optarg=optarg -Drpl_getopt=getopt -Drpl_optind=optind -Drpl_getopt_long=getopt_long -Drpl_malloc=malloc\
 		-Drpl_realloc=realloc -Drpl_calloc=calloc -Drpl_free=free -Drpl_rmdir=rmdir -Drpl_open=open -Drpl_strtol=strtol\
 		-Drpl_readlink=readlink -Drpl_fcntl=fcntl -Drpl_posix_spawnattr_init=posix_spawnattr_init -Drpl_strtoul=strtoul\
 		-Drpl_re_set_syntax=re_set_syntax -Drpl_re_compile_pattern=re_compile_pattern -Drpl_re_search=re_search\
 		-Drpl_re_match=re_match -Drpl_mbrtowc=mbrtowc -Drpl_lstat=lstat -Drpl_strtol=strtol -Drpl_mkdir=mkdir\
-		-Drpl_unlink=unlink
+		-Drpl_unlink=unlink -Drpl_getcwd=getcwd
 
 
 RINCLUDE= 	-I$GETTEXTSRC/gettext-runtime/src -I$GETTEXTSRC/gettext-runtime\
@@ -237,9 +249,32 @@ xpath.$O: $GETTEXTSRC/libtextstyle/lib/libxml/xpath.c
 xmlsave.$O: $GETTEXTSRC/libtextstyle/lib/libxml/xmlsave.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/libxml/xmlsave.c
 
+xmlreader.$O: $GETTEXTSRC/libtextstyle/lib/libxml/xmlreader.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/libxml/xmlreader.c
+
 xmlwriter.$O: $GETTEXTSRC/libtextstyle/lib/libxml/xmlwriter.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/libxml/xmlwriter.c
 
+xmlIO.$O: $GETTEXTSRC/libtextstyle/lib/libxml/xmlIO.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/libxml/xmlIO.c
+
+catalog.$O: $GETTEXTSRC/libtextstyle/lib/libxml/catalog.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/libxml/catalog.c
+
+encoding.$O: $GETTEXTSRC/libtextstyle/lib/libxml/encoding.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/libxml/encoding.c
+
+entities.$O: $GETTEXTSRC/libtextstyle/lib/libxml/entities.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/libxml/entities.c
+
+parser.$O: $GETTEXTSRC/libtextstyle/lib/libxml/parser.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/libxml/parser.c
+
+valid.$O: $GETTEXTSRC/libtextstyle/lib/libxml/valid.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/libxml/valid.c
+
+SAX2.$O: $GETTEXTSRC/libtextstyle/lib/libxml/SAX2.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/libtextstyle/lib/libxml/SAX2.c
 
 libgnu.a$O:V:	$GNULIB_OBJECTS
 				ar vu libgnu.a$O $GNULIB_OBJECTS
@@ -256,7 +291,11 @@ $O.msgunfmt:V:	msgunfmt.$O read-mo.$O read-java.$O read-csharp.$O read-resources
 				$LD -o $target $prereq
 
 
-
+install:V:
+	for (i in $TARG)
+		@{cp $O.$i $BIN/$i}
+	for (j in $RC_SCRIPTS)
+		@{cp $GETTEXTSRC/gettext-tools/misc/$j $APEXPROOT/rc/bin/ape/}
 
 
 

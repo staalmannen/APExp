@@ -8,3 +8,10 @@ future. Suggestions are welcome
 The aim of APExp is to be portable. I should test other distributions of 
 Plan9 and multiple architectures to make sure that APExp builds on as many
 of them as possible.
+
+
+* Clean up the dependency mess of gnulib/libiconv/libintl/libgettextpo/libtextstyle/libxml
+The same objects often have to be integrated in multiple libraries to satisfy internal dependencies
+Would it make sense to just make one huge monster library providing all the GNU stuff?
+
+* Seek and destroy ugly hacks in the code which may have a nicer solution (eyeballs appreciated)

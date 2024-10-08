@@ -642,8 +642,8 @@ is_envjavac_usable (const char *javac,
                     command = (char *) xmalloca (command_length);
                     {
                       char *p = command;
-                      p = stpcpy (p, javac);
-                      p = stpcpy (p, " -version");
+                      p = (char *) stpcpy (p, javac);
+                      p = (char *) stpcpy (p, " -version");
                       *p++ = '\0';
                       /* Ensure command_length was correctly calculated.  */
                       if (p - command > command_length)

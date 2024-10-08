@@ -151,6 +151,7 @@ OFILES= \
 	canonicalize.$O\
 	csharpcomp.$O\
 	file-set.$O\
+	gettime.$O\
 	hash.$O\
 	hash-triple-simple.$O\
 	hash-pjw.$O\
@@ -170,6 +171,7 @@ OFILES= \
 	spawnattr_setpgroup.$O\
 	spawnattr_setsigmask.$O\
 	supersede.$O\
+	utimens.$O\
 	memset_explicit.$O\
 	xstriconveh.$O\
 
@@ -185,7 +187,7 @@ CC=$APEXPROOT/$objtype/bin/pcc
 UNRPL=	-Drpl_strtol=strtol -Drpl_realloc=realloc -Drpl_strtoul=strtoul -Drpl_strstr=strstr\
 		-Drpl_strerror=strerror -Drpl_calloc=calloc -Drpl_readlink=readlink\
 		-Drpl_getcwd=getcwd -Drpl_open=open -Drpl_dup2=dup2 -Drpl_malloc=malloc -Drpl_free=free\
-		-Drpl_unlink=unlink
+		-Drpl_unlink=unlink -Drpl_lstat=lstat
 
 DEFS=	-DHAVE_SETEUID -DHAVE_SETEGID -Dseteuid=setuid -Dsetegid=setgid\
 		-DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION -D_RESEARCH_SOURCE\
@@ -297,6 +299,12 @@ localename.$O: $GETTEXTSRC/../gnulib-lib/localename.c
 
 localename-unsafe.$O: $GETTEXTSRC/../gnulib-lib/localename-unsafe.c
 	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/localename-unsafe.c
+
+utimens.$O: $GETTEXTSRC/../gnulib-lib/utimens.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/utimens.c
+
+gettime.$O: $GETTEXTSRC/../gnulib-lib/gettime.c
+	$CC $CFLAGS $TINCLUDE $GETTEXTSRC/../gnulib-lib/gettime.c
 
 
 
