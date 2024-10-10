@@ -40,7 +40,7 @@ MV = mv
 
 SHELL = /bin/sh
 
-CFLAGS = -g -DHAVE_CONFIG_H -D__private_extern__=/**/
+CFLAGS = -g -DHAVE_CONFIG_H 
 CPPFLAGS = 
 LDFLAGS = 
 
