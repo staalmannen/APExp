@@ -1,0 +1,146 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+TARG=bash
+
+OFILES=\
+	shell.$O\
+	eval.$O\
+	parse.$O\
+	general.$O\
+	make_cmd.$O\
+	print_cmd.$O\
+	dispose_cmd.$O\
+	execute_cmd.$O\
+	variables.$O\
+	copy_cmd.$O\
+	error.$O\
+	expr.$O\
+	flags.$O\
+	jobs.$O\
+	subst.$O\
+	hashcmd.$O\
+	hashlib.$O\
+	mailcheck.$O\
+	trap.$O\
+	input.$O\
+	unwind_prot.$O\
+	pathexp.$O\
+	sig.$O\
+	test.$O\
+	version.$O\
+	alias.$O\
+	array.$O\
+	arrayfunc.$O\
+	assoc.$O\
+	braces.$O\
+	bracecomp.$O\
+	bashhist.$O\
+	bashline.$O\
+	siglist.$O\
+	list.$O\
+	stringlib.$O\
+	locale.$O\
+	findcmd.$O\
+	redir.$O\
+	pcomplete.$O\
+	pcomplib.$O\
+	syntax.$O\
+	xmalloc.$O
+
+
+BASHSRC=../../../external/bash
+
+BASHLIBS=\
+	libmalloc.a$O\
+#	libhistory.a$O\
+	libbuiltins.a$O\
+	libtermcap.a$O\
+	libintl.a$O\
+#	libtilde.a$O\
+	libreadline.a$O\
+	libglob.a$O\
+	libsh.a$O
+
+LIB= $BASHLIBS\
+#	$APEXPROOT/$objtype/lib/ape/libedit.a\
+	$APEXPROOT/$objtype/lib/ape/libiconv.a\
+	$APEXPROOT/$objtype/lib/ape/libcurses.a\
+	$APEXPROOT/$objtype/lib/ape/libutf.a
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+
+DEFS= 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale" -D_POSIX_SOURCE\
+		-D_BSD_EXTENSION -DHAVE_LIMITS_H -D_LIMITS_EXTENSION -DPLAN9\
+		-DCONF_OSTYPE="Plan9" -DCONF_MACHTYPE="$objtype" -DPROGRAM="Bash"\
+		-DPACKAGE="Bash" -DPACKAGE_STRING="bash_5.2-release"\
+		-DCONF_VENDOR="Bell_Labs" -DCONF_HOSTTYPE="$objtype" -DHAVE_SYS_RESOURCE_H
+
+CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib $DEFS
+
+%.$O: $BASHSRC/%.c
+	$CC $CFLAGS $BASHSRC/$stem.c
+
+%.$O: $BASHSRC/builtins/%.c
+	$CC $CFLAGS $BASHSRC/builtins/$stem.c
+
+
+libsh.a$O: $BASHSRC/lib/sh/Makefile
+			make -C $BASHSRC/lib/sh
+			mv $BASHSRC/lib/sh/libsh.a libsh.a$O
+			ar d libsh.a$O strtoimax.o # conflict with libap
+			rm $BASHSRC/lib/sh/*.o
+
+libglob.a$O: $BASHSRC/lib/glob/Makefile
+			make -C $BASHSRC/lib/glob
+			mv $BASHSRC/lib/glob/libglob.a libglob.a$O
+			rm $BASHSRC/lib/glob/*.o
+
+libmalloc.a$O: $BASHSRC/lib/malloc/Makefile
+			make -C $BASHSRC/lib/malloc
+			mv $BASHSRC/lib/malloc/libmalloc.a libmalloc.a$O
+			rm $BASHSRC/lib/malloc/*.o
+
+libreadline.a$O: $BASHSRC/lib/readline/Makefile
+			make -C $BASHSRC/lib/readline
+			mv $BASHSRC/lib/readline/libreadline.a libreadline.a$O
+			mv $BASHSRC/lib/readline/libhistory.a libhistory.a$O
+			rm $BASHSRC/lib/readline/*.o
+
+libhistory.a$O:
+
+libintl.a$O: $BASHSRC/lib/intl/Makefile
+			make -C $BASHSRC/lib/intl
+			mv $BASHSRC/lib/intl/libintl.a libintl.a$O
+			rm $BASHSRC/lib/intl/*.o
+
+libtilde.a$O: $BASHSRC/lib/tilde/Makefile
+			make -C $BASHSRC/lib/tilde
+			mv $BASHSRC/lib/tilde/libtilde.a libtilde.a$O
+			rm $BASHSRC/lib/tilde/*.o
+
+libtermcap.a$O: $BASHSRC/lib/termcap/Makefile
+			make -C $BASHSRC/lib/termcap
+			mv $BASHSRC/lib/termcap/libtermcap.a libtermcap.a$O
+			rm $BASHSRC/lib/termcap/*.o
+
+libbuiltins.a$O: $BASHSRC/builtins/Makefile
+			make -C $BASHSRC/builtins
+			mv $BASHSRC/builtins/libbuiltins.a libbuiltins.a$O
+			rm $BASHSRC/builtins/*.o
+			rm $BASHSRC/builtins/mkbuiltins
+			rm $BASHSRC/builtins/psize.aux
+
+install:V:
+		cp $BIN/bash $BIN/sh
+		cp $GSEDSRC/doc/bash.1 $APEXPROOT/sys/man/1/bash
+
+clean:V:
+	rm -f *.[$OS] [$OS].out lib*.a*
+
+
+

@@ -1,0 +1,28 @@
+# bash.pc.in
+
+prefix=/usr/local
+exec_prefix=${prefix}
+includedir=${prefix}/include
+libdir=${exec_prefix}/lib
+
+loadablesdir=${libdir}/bash
+headersdir=${includedir}/bash
+
+LOCAL_CFLAGS = 
+LOCAL_DEFS = -DSHELL
+CCFLAGS = ${LOCAL_DEFS} ${LOCAL_CFLAGS}
+
+CC = cc
+SHOBJ_CC = 
+SHOBJ_CFLAGS = 
+SHOBJ_LD = 
+SHOBJ_LDFLAGS = 
+SHOBJ_XLDFLAGS = 
+SHOBJ_LIBS = 
+
+Name: bash
+Description: Bash headers for bash loadable builtins
+Version: 5.2-release
+Url: 
+Libs: ${SHOBJ_LIBS}
+Cflags: ${SHOBJ_CFLAGS} ${CCFLAGS} -I${headersdir} -I${headersdir}/builtins -I${headersdir}/include

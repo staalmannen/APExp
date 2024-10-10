@@ -44,6 +44,12 @@
 #define	FF0	0
 #define	FF1	0100000
 
+/* tcflow */
+#define TCOOFF 0
+#define TCOON 1
+#define TCIOFF 2
+#define TCION 3
+
 /* control modes */
 #define CLOCAL	0x001
 #define CREAD	0x002
