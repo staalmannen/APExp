@@ -1,0 +1,12 @@
+
+Having Bash as a shell would certainly help APExp in its task of building foreign software.
+The final binary is about 10X bigger than the APE pdksh sh, but crashes when executed.
+
+I have been experimenting with disabling job control (nojobs instead of jobs) with no success. 
+This was otherwise a thing for mksh.
+
+I tried using acid on the bindary but I am not sure how to move forward with the informaiton gleanded from that.
+
+
+So if you have the 1337 haxxer skillz needed to get bash working, I would be totally grateful :)
+

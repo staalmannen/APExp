@@ -17,6 +17,7 @@ OFILES=\
 	expr.$O\
 	flags.$O\
 	jobs.$O\
+#	nojobs.$O\
 	subst.$O\
 	hashcmd.$O\
 	hashlib.$O\
@@ -36,6 +37,7 @@ OFILES=\
 	bracecomp.$O\
 	bashhist.$O\
 	bashline.$O\
+	sig.$O\
 	siglist.$O\
 	list.$O\
 	stringlib.$O\
@@ -56,7 +58,7 @@ BASHLIBS=\
 	libbuiltins.a$O\
 	libtermcap.a$O\
 	libintl.a$O\
-#	libtilde.a$O\
+	libtilde.a$O\
 	libreadline.a$O\
 	libglob.a$O\
 	libsh.a$O
@@ -76,9 +78,10 @@ LD=pcc
 
 DEFS= 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale" -D_POSIX_SOURCE\
 		-D_BSD_EXTENSION -DHAVE_LIMITS_H -D_LIMITS_EXTENSION -DPLAN9\
-		-DCONF_OSTYPE="Plan9" -DCONF_MACHTYPE="$objtype" -DPROGRAM="Bash"\
-		-DPACKAGE="Bash" -DPACKAGE_STRING="bash_5.2-release"\
-		-DCONF_VENDOR="Bell_Labs" -DCONF_HOSTTYPE="$objtype" -DHAVE_SYS_RESOURCE_H
+		-DCONF_OSTYPE="Plan9" -DCONF_MACHTYPE="$objtype-unknown-Plan9" -DPROGRAM="Bash"\
+		-DPACKAGE="Bash" -DPACKAGE_STRING='bash 5.2-release'\
+		-DCONF_VENDOR="unknonw" -DCONF_HOSTTYPE="$objtype"\
+		-DHAVE_SYS_RESOURCE_H
 
 CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib $DEFS
 

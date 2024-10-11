@@ -1137,7 +1137,7 @@
 /* #undef SVR4 */
 
 /* Define if job control is unusable or unsupported. */
-/* #undef JOB_CONTROL_MISSING */
+// #define JOB_CONTROL_MISSING 1
 
 /* Do we need to define _KERNEL to get the RLIMIT_* defines from
    <sys/resource.h>? */
