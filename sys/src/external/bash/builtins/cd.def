@@ -21,10 +21,6 @@ along with Bash.  If not, see <http://www.gnu.org/licenses/>.
 $PRODUCES cd.c
 #include <config.h>
 
-char BC;
-char* PC, UP;
-
-
 #if defined (HAVE_UNISTD_H)
 #  ifdef _MINIX
 #    include <sys/types.h>

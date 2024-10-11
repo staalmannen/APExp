@@ -16,8 +16,8 @@ OFILES=\
 	error.$O\
 	expr.$O\
 	flags.$O\
-	jobs.$O\
-#	nojobs.$O\
+#	jobs.$O\
+	nojobs.$O\
 	subst.$O\
 	hashcmd.$O\
 	hashlib.$O\
@@ -47,27 +47,27 @@ OFILES=\
 	pcomplete.$O\
 	pcomplib.$O\
 	syntax.$O\
-	xmalloc.$O
+	xmalloc.$O\
+# termcap - force linking... \
+	termcap.$O\
+	tparam.$O\
+# tilde -force linking \
+	tilde.$O\
 
 
 BASHSRC=../../../external/bash
 
 BASHLIBS=\
-	libmalloc.a$O\
-#	libhistory.a$O\
 	libbuiltins.a$O\
-	libtermcap.a$O\
+	libsh.a$O\
+	libmalloc.a$O\
 	libintl.a$O\
-	libtilde.a$O\
-	libreadline.a$O\
 	libglob.a$O\
-	libsh.a$O
+	libreadline.a$O\
 
 LIB= $BASHLIBS\
-#	$APEXPROOT/$objtype/lib/ape/libedit.a\
 	$APEXPROOT/$objtype/lib/ape/libiconv.a\
-	$APEXPROOT/$objtype/lib/ape/libcurses.a\
-	$APEXPROOT/$objtype/lib/ape/libutf.a
+	$APEXPROOT/$objtype/lib/ape/libcurses.a
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
@@ -88,9 +88,14 @@ CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib $DEFS
 %.$O: $BASHSRC/%.c
 	$CC $CFLAGS $BASHSRC/$stem.c
 
-%.$O: $BASHSRC/builtins/%.c
-	$CC $CFLAGS $BASHSRC/builtins/$stem.c
+termcap.$O: $BASHSRC/lib/termcap/termcap.c
+	$CC $CFLAGS $BASHSRC/lib/termcap/termcap.c
 
+tparam.$O: $BASHSRC/lib/termcap/tparam.c
+	$CC $CFLAGS $BASHSRC/lib/termcap/tparam.c
+
+tilde.$O: $BASHSRC/lib/tilde/tilde.c
+	$CC $CFLAGS $BASHSRC/lib/tilde/tilde.c
 
 libsh.a$O: $BASHSRC/lib/sh/Makefile
 			make -C $BASHSRC/lib/sh
@@ -114,22 +119,10 @@ libreadline.a$O: $BASHSRC/lib/readline/Makefile
 			mv $BASHSRC/lib/readline/libhistory.a libhistory.a$O
 			rm $BASHSRC/lib/readline/*.o
 
-libhistory.a$O:
-
 libintl.a$O: $BASHSRC/lib/intl/Makefile
 			make -C $BASHSRC/lib/intl
 			mv $BASHSRC/lib/intl/libintl.a libintl.a$O
 			rm $BASHSRC/lib/intl/*.o
-
-libtilde.a$O: $BASHSRC/lib/tilde/Makefile
-			make -C $BASHSRC/lib/tilde
-			mv $BASHSRC/lib/tilde/libtilde.a libtilde.a$O
-			rm $BASHSRC/lib/tilde/*.o
-
-libtermcap.a$O: $BASHSRC/lib/termcap/Makefile
-			make -C $BASHSRC/lib/termcap
-			mv $BASHSRC/lib/termcap/libtermcap.a libtermcap.a$O
-			rm $BASHSRC/lib/termcap/*.o
 
 libbuiltins.a$O: $BASHSRC/builtins/Makefile
 			make -C $BASHSRC/builtins

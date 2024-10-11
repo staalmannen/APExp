@@ -28,7 +28,7 @@
 
 /* Define JOB_CONTROL if your operating system supports
    BSD-like job control. */
-#define JOB_CONTROL 1
+//#define JOB_CONTROL 1
 
 /* Define ALIAS if you want the alias features. */
 #define ALIAS 1
@@ -1137,7 +1137,7 @@
 /* #undef SVR4 */
 
 /* Define if job control is unusable or unsupported. */
-// #define JOB_CONTROL_MISSING 1
+#define JOB_CONTROL_MISSING 1
 
 /* Do we need to define _KERNEL to get the RLIMIT_* defines from
    <sys/resource.h>? */
