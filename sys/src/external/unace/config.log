@@ -1,0 +1,7 @@
+
+cc: flag -- ignored
+cc: flag -e ignored
+cc: flag -r ignored
+cc: flag -i ignored
+cc: no files to compile or load
+

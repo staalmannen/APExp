@@ -1,0 +1,48 @@
+  Public UnAce Licence
+ ----------------------
+
+The Public UnAce Package (v2.0 or later if not otherwise stated) is
+distritbuted under the following licence:
+
+"Package" refers to the collection of files distributed by the Copyright Holder, and derivatives 
+of that collection of files created through textual modification. 
+
+"Standard Version" refers to such a Package if it has not been modified, or has been modified
+in accordance with the wishes of the Copyright Holder. 
+
+"Distribution" as it is used here means making data available to a third party.
+No matter in which way the data is made available.
+
+"Copyright Holder" is ACE Compression Software. 
+"Distribution Partner" is e-merge GmbH (authorised signatory).
+
+
+   1. The Standard Version of Public UnAce Package may be freely distributed.
+
+   2. The UnAce sources may be used in any software to handle ACE
+      archives without limitations free of charge, but must not be used
+      to reproduce the ACE compression algorithm.
+      This means that that the code must not be used to develop an
+      ACE compatible archiver (that is: software capable of compressing to 
+      Ace archives) in any way.
+
+   3. Distribution of modified Public UnAce sources (as part of other software 
+      or as stand-alone package) requires that it is clearly stated in the 
+      documentation and source code that it is distributed under the 
+      Public UnAce Licence. 
+      The Public UnAce Licence has to be included in this package.
+
+   4. The name of the Copyright Holder or the support of ACE archives may not be 
+      used to endorse or promote products derived from this package without specific
+      prior written permission from the Copyright Holder or its Distribution Partner.
+
+   5. This Software is distributed "AS IS".
+      NO WARRANTY OF ANY KIND IS EXPRESSED OR IMPLIED.  YOU USE AT 
+      YOUR OWN RISK. THE AUTHOR WILL NOT BE LIABLE FOR DATA LOSS, 
+      DAMAGES, LOSS OF PROFITS OR ANY OTHER KIND OF LOSS WHILE USING
+      OR MISUSING THIS SOFTWARE.
+
+   6. Installing and using the Public UnAce Package signifies acceptance of
+      these terms and conditions of the license.
+      
+ Marcel Lemke, ACE Compression Software

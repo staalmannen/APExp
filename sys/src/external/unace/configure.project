@@ -1,0 +1,51 @@
+#!/bin/sh
+
+# Project name and version
+PACKAGE="unace"
+VERSION="2.7w"
+PACKAGE_URL=''
+
+# Flags that will be used in all makefiles that compile code...
+PROJECT_CFLAGS='-Wall -g -O2' # -Wextra -Wno-unused-parameter -Wno-missing-field-initializers
+PROJECT_CXXFLAGS="${PROJECT_CFLAGS}"
+PROJECT_CPPFLAGS=''
+PROJECT_LDFLAGS=''
+PROJECT_LXXFLAGS=''
+PROJECT_LIBS=''
+
+# Project type, use C to avoid checking for C++ compiler and stuff
+# supported values: C, C++ ("" = C++)
+PROJECT_TYPE=C
+
+# Makefile
+MK_SUBDIRS="src"
+MK_DISTCLEAN_FILES=''
+MK_CHECK='scripts/run-tests.sh'
+
+# configure the project using the commands provided
+# by `configure` and other scripts and commands/tools
+w_main_func()
+{
+	# GCC=yes if gcc has been detected
+
+	# if the Makefiles are only compatible with GNU make, use w_require_gnu_make
+	#w_prefer_gnu_make
+
+	# check required headers and exit on error
+	w_check_headers_required stdio.h
+}
+
+# function to run after performing all checks
+w_aftercheck_func()
+{
+	# haiku: strsep is in libbsd
+	if [ "$TARGET_OS" = "Haiku" ] ; then
+		LIBS="$LIBS -lbsd"
+	fi
+}
+
+# function to run once everything is done, probably add stuff to config.h and config.mk
+w_finish_func()
+{
+	printf ""
+}

@@ -1,0 +1,90 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+ACESRC=../../../external/unace
+
+TARG= unace
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+OFILES=\
+	acefuncs.$O\
+	commline.$O\
+	convert.$O\
+	input.$O\
+	main.$O\
+	output.$O\
+	state.$O\
+# src/base \
+	all.$O\
+	unused.$O\
+	arcblk.$O\
+	bitwidth.$O\
+	bufread.$O\
+	comments.$O\
+	b_convert.$O\
+	crc.$O\
+	crypt.$O\
+	dosfuncs.$O\
+	error.$O\
+	errorout.$O\
+	extract.$O\
+	filelist.$O\
+	funcs.$O\
+	lfn.$O\
+	memory.$O\
+	msgout.$O\
+	options.$O\
+	pathfunc.$O\
+	qsort.$O\
+	b_state.$O\
+	volume.$O\
+# src/base/archive \
+	ace.$O\
+	read.$O\
+	test.$O\
+# src/base/cprdcpr \
+	cprdcpr.$O\
+# src/base/dcpr \
+	d_comments.$O\
+	dcpr.$O\
+	huff.$O\
+	lz77.$O\
+	pic.$O\
+	sound.$O\
+# src/base/uninorm \
+	unincore.$O\
+	uninorm.$O\
+# src/messages\
+	messages.$O
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -D_POSIX_SOURCE -D_BSD_EXTENSION -I$ACESRC -I$ACESRC/src\
+		-I$ACESRC/lib -Dstrsep=strtok
+
+%.$O: $ACESRC/src/%.c
+    $CC $CFLAGS $ACESRC/src/$stem.c
+
+%.$O: $ACESRC/src/base/%.c
+    $CC $CFLAGS $ACESRC/src/base/$stem.c
+
+%.$O: $ACESRC/src/base/archives/%.c
+    $CC $CFLAGS $ACESRC/src/base/archives/$stem.c
+
+%.$O: $ACESRC/src/base/cprdcpr/%.c
+    $CC $CFLAGS $ACESRC/src/base/cprdcpr/$stem.c
+
+%.$O: $ACESRC/src/base//dcpr/%.c
+    $CC $CFLAGS $ACESRC/src/base/dcpr/$stem.c
+
+%.$O: $ACESRC/src/base/uninorm/%.c
+    $CC $CFLAGS $ACESRC/src/base/uninorm/$stem.c
+
+%.$O: $ACESRC/src/messages/%.c
+    $CC $CFLAGS $ACESRC/src/messages/$stem.c
+
+

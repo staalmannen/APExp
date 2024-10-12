@@ -1,0 +1,22 @@
+#ifndef _BASE_CONVERT_H_INCLUDED
+#define _BASE_CONVERT_H_INCLUDED
+
+typedef struct
+{
+  tLFN    ToOEMStr,
+          ToANSIStr;
+} tBASE_CONVERT;
+
+extern tBASE_CONVERT BASE_CONVERT; //convert.c
+
+INT     BASE_CONVERT_UpCase(INT CharCode);
+INT     BASE_CONVERT_LowCase(INT CharCode);
+void    BASE_CONVERT_StrCatBefore(PCHAR Str1, PCHAR Str2);
+PCHAR   BASE_CONVERT_ToOEM(PCHAR Str);
+PCHAR   BASE_CONVERT_ToANSI(PCHAR Str);
+PCHAR   BASE_CONVERT_StrUpr(PCHAR Str);
+PCHAR   BASE_CONVERT_StrLwr(PCHAR Str);
+INT     BASE_CONVERT_StrICmp(PCHAR Str1, PCHAR Str2);
+INT     BASE_CONVERT_StrNICmp(PCHAR Str1, PCHAR Str2, INT Size);
+
+#endif
