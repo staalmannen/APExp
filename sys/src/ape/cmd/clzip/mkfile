@@ -1,0 +1,32 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LZSRC=../../../external/clzip
+
+TARG= lzip 
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+OFILES=\
+    carg_parser.$O\
+	lzip_index.$O\
+	list.$O\
+	encoder_base.$O\
+	encoder.$O\
+	fast_encoder.$O\
+	decoder.$O\
+	main.$O
+
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -D_POSIX_SOURCE -DPROGVERSION="1.14" -Dfchown=chown -Dfchmod=chmod\
+		-D_RESEARCH_SOURCE -DS_ISVTX=0
+
+%.$O: $LZSRC/%.c
+    $CC $CFLAGS $LZSRC/$stem.c
+
+

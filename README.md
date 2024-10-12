@@ -110,6 +110,7 @@ sources could be a barrier. Because of this, APExp package several (un)archivers
 - unarj (2.65)
 - unrar (2.71 ; can handle old rar archives. More recent versions written in c++)
 - unace (2.7)
+- clzip (1.14)
 
 
 

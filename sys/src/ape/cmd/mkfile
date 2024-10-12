@@ -22,9 +22,12 @@ DIRS=\
 	expr\
 # archivers \
 	bzip2\
+	clzip\
 	minigzip\
-	unarj\
 #	pax\
+	unace\
+	unarj\
+	unrar\
 # languages and transpilers \
 	lua\
 # dev tools \

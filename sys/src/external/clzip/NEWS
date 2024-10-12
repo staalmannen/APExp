@@ -1,0 +1,24 @@
+Changes in version 1.14:
+
+The option '--empty-error', which forces exit status 2 if any empty member
+is found, has been added.
+
+The option '--marking-error', which forces exit status 2 if the first LZMA
+byte is non-zero in any member, has been added.
+
+File diagnostics have been reformatted as 'PROGRAM: FILE: MESSAGE'.
+
+Diagnostics caused by invalid arguments to command-line options now show the
+argument and the name of the option.
+
+The option '-o, --output' now preserves dates, permissions, and ownership of
+the file when (de)compressing exactly one file.
+
+The option '-o, --output' now creates missing intermediate directories when
+writing to a file.
+
+The variable MAKEINFO has been added to configure and Makefile.in.
+
+It has been documented in INSTALL that when choosing a C standard, the POSIX
+features need to be enabled explicitly:
+  ./configure CFLAGS+='--std=c99 -D_XOPEN_SOURCE=500'

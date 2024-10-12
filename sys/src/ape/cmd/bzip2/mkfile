@@ -15,7 +15,7 @@ BIN=$APEXPROOT/$objtype/bin/ape
 
 CC=pcc
 LD=pcc
-CFLAGS= -c -D_POSIX_SOURCE -Dlstat=stat -Dfchmod=chmod -Dfchown=chown
+CFLAGS= -c -D_POSIX_SOURCE -D_BSD_EXTENSION -Dfchmod=chmod -Dfchown=chown
 
 %.$O: $BZ2SRC/%.c
     $CC $CFLAGS $BZ2SRC/$stem.c
