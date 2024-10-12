@@ -1,0 +1,20 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+RARSRC=../../../external/unrar
+
+TARG=unrar
+
+OFILES=	unrar.$O
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+</sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS=-c -B -I$RARSRC -D_POSIX_SOURCE -D_SUSV2_SOURCE -D_BSD_EXTENSION -D_UNIX 
+
+%.$O: $RARSRC/%.c
+    $CC $CFLAGS $RARSRC/$stem.c

@@ -1,0 +1,26 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+ARJSRC=../../../external/unarj
+
+TARG=unarj 
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+OFILES=\
+    unarj.$O\
+	environ.$O\
+	decode.$O
+
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -I$ARJSRC -D_POSIX_SOURCE
+
+%.$O: $ARJSRC/%.c
+    $CC $CFLAGS $ARJSRC/$stem.c
+
+

@@ -2,24 +2,35 @@ APE=../../ape
 <$APE/config
 APEXPROOT=../../../..
 
-#stuff needs to be built out of alphabetical order
-#some stuff needs flex and byacc for example
+
+#some stuff needs flex and byacc to build
 DIRS=\
+# parsing/editing source etc \
 	lex\
 	yacc\
 	awk\
-	base\
-	diff\
-	expr\
-	iconv\
-	make\
-	patch\
-#	pax\
-	pcregrep\
-	pdksh\
 	sed\
-	gettext\
+# often invoked during make \
+	make\
 	m4\
+	gettext\
+# core utilities \
+	base\
+	pdksh\
+	pcregrep\
+	iconv\
+	expr\
+# archivers \
+	bzip2\
+	minigzip\
+	unarj\
+#	pax\
+# languages and transpilers \
+	lua\
+# dev tools \
+	diff\
+	patch\
+# always last :) \
 	celebrate_finish
 
 BIN=$APEXPROOT/$objtype/bin/ape

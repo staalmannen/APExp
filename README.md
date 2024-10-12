@@ -100,6 +100,18 @@ C transpilers is a fun little proof-of-concept and also opens up for more langua
 - copied the last (version 3.03) plan9 cfront (c++) port from steve (/n/sources/contrib)
 
 
+*** (un)archivers ***
+
+Many (old) sources are still distributed as compressed archives, and the ability to unpack those
+sources could be a barrier. Because of this, APExp package several (un)archivers by default:
+
+- minigzip (from zlib)
+- bzip2 utilities (from libbz2)
+- unarj (2.65)
+- unrar (2.71 ; can handle old rar archives. More recent versions in c++)
+
+
+
 **References**
 
 [1] https://9p.io/wiki/plan9/porting_alien_software_to_plan_9/index.html

@@ -1,0 +1,23 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libbz2.a
+BZ2SRC=../../../external/bzip2
+
+TARG= bzip2\
+	  bzip2recover
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+
+<$APEXPROOT/sys/src/cmd/mkmany
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -D_POSIX_SOURCE -Dlstat=stat -Dfchmod=chmod -Dfchown=chown
+
+%.$O: $BZ2SRC/%.c
+    $CC $CFLAGS $BZ2SRC/$stem.c
+
+

@@ -1077,10 +1077,10 @@ void applySavedFileAttrToOutputFile ( IntNative fd )
 #  if BZ_UNIX
    IntNative retVal;
 
-   retVal = fchmod ( fd, fileMetaInfo.st_mode );
+   retVal = chmod ( (const char *) fd, fileMetaInfo.st_mode );
    ERROR_IF_NOT_ZERO ( retVal );
 
-   (void) fchown ( fd, fileMetaInfo.st_uid, fileMetaInfo.st_gid );
+   (void) chown ( (const char *) fd, fileMetaInfo.st_uid, fileMetaInfo.st_gid );
    /* chown() will in many cases return with EPERM, which can
       be safely ignored.
    */

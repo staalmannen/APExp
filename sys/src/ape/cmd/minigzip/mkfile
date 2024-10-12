@@ -1,0 +1,24 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libz.a
+ZSRC=../../../external/zlib
+
+TARG=minigzip 
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+OFILES=\
+    minigzip.$O\
+
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -D_POSIX_SOURCE
+
+%.$O: $ZSRC/%.c
+    $CC $CFLAGS $ZSRC/$stem.c
+
+
