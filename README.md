@@ -107,6 +107,8 @@ C transpilers is a fun little proof-of-concept and also opens up for more langua
 
 - The pascal-to-C transpiler p2c (1.21alpha) is included in APExp
 
+- The fortran-to-C transpiler f2c (20240504) is included in APExp
+
 
 *** (un)archivers ***
 

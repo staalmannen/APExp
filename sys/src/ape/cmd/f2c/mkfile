@@ -1,0 +1,48 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+
+TARG=f2c
+
+OFILES=\
+	main.$O\
+	init.$O\
+	gram.$O\
+	lex.$O\
+	proc.$O\
+	equiv.$O\
+	data.$O\
+	format.$O\
+	expr.$O\
+	exec.$O\
+	intr.$O\
+	io.$O\
+	misc.$O\
+	error.$O\
+	mem.$O\
+	names.$O\
+	output.$O\
+	p1output.$O\
+	pread.$O\
+	put.$O\
+	putpcc.$O\
+	vax.$O\
+	formatdata.$O\
+	parse_args.$O\
+	niceprintf.$O\
+	cds.$O\
+	sysdep.$O\
+	version.$O\
+	malloc.$O
+
+F2CSRC=../../../external/f2c
+
+BIN=$APEXPROOT/$objtype/bin/ape
+<../../../cmd/mkone
+
+CC=pcc
+LC=pcc
+CFLAGS= -c -B -D_POSIX_SOURCE -D_BSD_EXTENSION\
+		-I$F2CSRC/src
+
+%.$O: $F2CSRC/src/%.c
+	$CC $CFLAGS $F2CSRC/src/$stem.c

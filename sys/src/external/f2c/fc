@@ -11,7 +11,7 @@
 #	may be useful as way to pass system-specific stuff to the C compiler.
 #	The script below simply appends to the initial CFLAGS value.
 
-PATH=/usr/local/bin:/bin:/usr/bin
+PATH=/bin
 
 # f77-style shell script to compile and load fortran, C, and assembly codes
 

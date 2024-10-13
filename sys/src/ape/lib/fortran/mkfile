@@ -1,0 +1,18 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+
+LIB=$APEXPROOT/$objtype/lib/ape/libf2c.a
+
+F2CSRC=../../../external/f2c
+
+default:V: install
+
+install:V:
+	cd $F2CSRC/lib && mk -f mkfile.plan9
+	mv libf2c.a$O $LIB
+
+clean:V:
+	rm $F2CSRC/lib/*.$O
+	rm $F2CSRC/lib/*.a$O
+
+
