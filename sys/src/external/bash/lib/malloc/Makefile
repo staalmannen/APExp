@@ -51,8 +51,8 @@ BASHINCDIR = ${topdir}/include
 
 INTL_LIBSRC = ${topdir}/lib/intl
 INTL_BUILDDIR = ${LIBBUILD}/intl
-INTL_INC = -I${INTL_LIBSRC} -I${INTL_BUILDDIR}
-LIBINTL_H = ${INTL_BUILDDIR}/libintl.h
+INTL_INC = 
+LIBINTL_H = 
 
 INCLUDES = -I. -I../.. -I$(topdir) -I$(BASHINCDIR) -I$(topdir)/lib $(INTL_INC)
 
@@ -71,7 +71,7 @@ STUB_SOURCE = stub.c
 ALLOCA_SOURCE = alloca.c
 ALLOCA_OBJECT = alloca.o
 
-MALLOC_SRC = malloc.c
+MALLOC_SRC = 
 MALLOC = @MALLOC@
 ALLOCA = 
 

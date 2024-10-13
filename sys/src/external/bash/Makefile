@@ -132,7 +132,7 @@ THIS_SH = $(BUILD_DIR)/$(Program)
 # with gprof, or nothing (the default).
 PROFILE_FLAGS= 
 
-CFLAGS = -g -D_BSD_EXTENSION -DHAVE_SYS_RESOURCE_H
+CFLAGS = -g
 CFLAGS_FOR_BUILD = -g 
 CPPFLAGS = 
 CPPFLAGS_FOR_BUILD = 
@@ -194,8 +194,8 @@ LIBBUILD = ${BUILD_DIR}/${LIBSUBDIR}
 
 SUBDIR_INCLUDES = -I.  -I$(topdir) -I$(topdir)/$(LIBSUBDIR)
 
-BUILD_INCLUDED_LIBINTL = yes
-USE_INCLUDED_LIBINTL = yes
+BUILD_INCLUDED_LIBINTL = no
+USE_INCLUDED_LIBINTL = no
 
 # the bash library
 # the library is a mix of functions that the C library does not provide on
@@ -256,10 +256,10 @@ RL_ABSSRC = ${topdir}/$(RL_LIBDIR)
 
 RL_INCLUDEDIR = 
 
-READLINE_LIB = -lreadline
+READLINE_LIB = 
 READLINE_LIBRARY = $(RL_LIBDIR)/libreadline.a
 READLINE_LDFLAGS = -L${RL_LIBDIR}
-READLINE_DEP = $(READLINE_LIBRARY)
+READLINE_DEP = 
 
 # The source, object and documentation of the GNU Readline library.
 READLINE_SOURCE	= $(RL_LIBSRC)/rldefs.h $(RL_LIBSRC)/rlconf.h \
@@ -327,7 +327,7 @@ TERM_LIBSRC = $(LIBSRC)/termcap
 TERM_LIBDIR = $(dot)/$(LIBSUBDIR)/termcap
 TERM_ABSSRC = ${topdir}/$(TERM_LIBDIR)
 
-TERMCAP_LIB = -lncurses
+TERMCAP_LIB = 
 TERMCAP_LIBRARY = $(TERM_LIBDIR)/libtermcap.a
 TERMCAP_LDFLAGS = -L$(TERM_LIBDIR)
 TERMCAP_DEP = 
@@ -372,24 +372,24 @@ INTL_LIBDIR = $(dot)/$(LIBSUBDIR)/intl
 INTL_ABSSRC = ${topdir}/$(INTL_LIB)
 INTL_BUILDDIR = ${LIBBUILD}/intl
 
-INTL_LIB     = lib/intl/libintl.a  
+INTL_LIB     = 
 INTL_LIBRARY = $(INTL_LIBDIR)/libintl.a
-INTL_DEP = ${INTL_LIBDIR}/libintl.a
-INTL_INC = -I${INTL_LIBSRC} -I${INTL_BUILDDIR}
+INTL_DEP = 
+INTL_INC = 
 
-LIBINTL_H = ${INTL_BUILDDIR}/libintl.h
+LIBINTL_H = 
 
 # libiconv
 LIBICONV = 
 
 # tests
-LIBINTL = lib/intl/libintl.a  
-LTLIBINTL = lib/intl/libintl.a  
-INTLLIBS = lib/intl/libintl.a  
-INTLOBJS = $(GETTOBJS)
+LIBINTL = 
+LTLIBINTL = 
+INTLLIBS = 
+INTLOBJS = 
 
 # Our malloc.
-MALLOC_TARGET = malloc
+MALLOC_TARGET = 
 
 # set to alloca.o if we are using the C alloca in lib/malloc
 ALLOCA = 
@@ -398,16 +398,16 @@ ALLOC_LIBSRC = $(LIBSRC)/malloc
 ALLOC_LIBDIR = $(dot)/$(LIBSUBDIR)/malloc
 ALLOC_ABSSRC = ${topdir}/$(ALLOC_LIBDIR)
 
-MALLOC_SRC = malloc.c
+MALLOC_SRC = 
 MALLOC_OTHERSRC = ${ALLOC_LIBSRC}/trace.c ${ALLOC_LIBSRC}/stats.c \
 		  ${ALLOC_LIBSRC}/table.c ${ALLOC_LIBSRC}/watch.c
 MALLOC_SOURCE = ${ALLOC_LIBSRC}/${MALLOC_SRC} ${MALLOC_OTHERSRC}
 MALLOC_CFLAGS = -DRCHECK -Dbotch=programming_error ${MALLOC_DEBUG}
 
-MALLOC_LIB     = -lmalloc
-MALLOC_LIBRARY = $(ALLOC_LIBDIR)/libmalloc.a
-MALLOC_LDFLAGS = -L$(ALLOC_LIBDIR)
-MALLOC_DEP = $(MALLOC_LIBRARY)
+MALLOC_LIB     = 
+MALLOC_LIBRARY = 
+MALLOC_LDFLAGS = 
+MALLOC_DEP = 
 
 ALLOC_HEADERS = $(ALLOC_LIBSRC)/getpagesize.h $(ALLOC_LIBSRC)/shmalloc.h \
 		$(ALLOC_LIBSRC)/imalloc.h $(ALLOC_LIBSRC)/mstats.h \
@@ -481,7 +481,7 @@ INSTALLED_INCFILES =	 posixstat.h ansi_stdlib.h filecntl.h posixdir.h \
 SIGNAMES_H = lsignames.h
 
 # object files chosen based on running of configure
-JOBS_O = jobs.o
+JOBS_O = nojobs.o
 SIGLIST_O = siglist.o
 SIGNAMES_O = 
 

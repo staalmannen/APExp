@@ -1,10 +1,6 @@
 #ifndef __SYS_SOCKET_H__
 #define __SYS_SOCKET_H__
 
-#ifndef _BSD_EXTENSION
-    This header file is an extension to ANSI/POSIX
-#endif
-
 #pragma lib "/$M/lib/ape/libbsd.a"
 
 #ifdef __cplusplus

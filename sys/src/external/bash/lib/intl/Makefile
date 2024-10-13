@@ -58,7 +58,7 @@ YFLAGS = --name-prefix=__gettext
 
 ARFLAGS = cr
 
-LOCAL_DEFS = -DSHELL -D_BSD_EXTENSION
+LOCAL_DEFS = -DSHELL
 
 DEFS = -DLOCALEDIR=\"$(localedir)\" -DLOCALE_ALIAS_PATH=\"$(aliaspath)\" \
 -DLIBDIR=\"$(prefix)/libdata\" -DIN_LIBINTL \
@@ -140,9 +140,9 @@ Makefile.vms libgnuintl.h.msvc-shared README.woe32 Makefile.msvc
 DISTFILES.obsolete = xopen-msg.sed linux-msg.sed po2tbl.sed.in cat-compat.c \
 COPYING.LIB-2 gettext.h libgettext.h plural-eval.c libgnuintl.h
 
-all: all-yes
+all: all-no
 all-yes: libintl.$la libintl.h charset.alias ref-add.sed ref-del.sed
-all-no: all-no-yes
+all-no: all-no-no
 all-no-yes: libgnuintl.$la
 all-no-no:
 
@@ -252,7 +252,7 @@ check: all
 install: install-exec install-data
 install-exec: all
 	if { test "$(PACKAGE)" = "gettext-runtime" || test "$(PACKAGE)" = "gettext-tools"; } \
-	   && test 'yes' = yes; then \
+	   && test 'no' = yes; then \
 	  $(mkinstalldirs) $(DESTDIR)$(libdir) $(DESTDIR)$(includedir); \
 	  $(INSTALL_DATA) libintl.h $(DESTDIR)$(includedir)/libintl.h; \
 	  $(LIBTOOL) --mode=install \
@@ -267,7 +267,7 @@ install-exec: all
 	  : ; \
 	fi
 	if test "$(PACKAGE)" = "gettext-tools" \
-	   && test 'yes' = no; then \
+	   && test 'no' = no; then \
 	  $(mkinstalldirs) $(DESTDIR)$(libdir); \
 	  $(LIBTOOL) --mode=install \
 	    $(INSTALL_DATA) libgnuintl.$la $(DESTDIR)$(libdir)/libgnuintl.$la; \
@@ -278,7 +278,7 @@ install-exec: all
 	else \
 	  : ; \
 	fi
-	if test 'yes' = yes; then \
+	if test 'no' = yes; then \
 	  $(mkinstalldirs) $(DESTDIR)$(localedir); \
 	  test -f $(DESTDIR)$(localedir)/locale.alias \
 	    && orig=$(DESTDIR)$(localedir)/locale.alias \
@@ -320,18 +320,18 @@ install-strip: install
 
 installdirs:
 	if { test "$(PACKAGE)" = "gettext-runtime" || test "$(PACKAGE)" = "gettext-tools"; } \
-	   && test 'yes' = yes; then \
+	   && test 'no' = yes; then \
 	  $(mkinstalldirs) $(DESTDIR)$(libdir) $(DESTDIR)$(includedir); \
 	else \
 	  : ; \
 	fi
 	if test "$(PACKAGE)" = "gettext-tools" \
-	   && test 'yes' = no; then \
+	   && test 'no' = no; then \
 	  $(mkinstalldirs) $(DESTDIR)$(libdir); \
 	else \
 	  : ; \
 	fi
-	if test 'yes' = yes; then \
+	if test 'no' = yes; then \
 	  test no != no || $(mkinstalldirs) $(DESTDIR)$(libdir); \
 	  $(mkinstalldirs) $(DESTDIR)$(localedir); \
 	else \
@@ -348,7 +348,7 @@ installcheck:
 
 uninstall:
 	if { test "$(PACKAGE)" = "gettext-runtime" || test "$(PACKAGE)" = "gettext-tools"; } \
-	   && test 'yes' = yes; then \
+	   && test 'no' = yes; then \
 	  rm -f $(DESTDIR)$(includedir)/libintl.h; \
 	  $(LIBTOOL) --mode=uninstall \
 	    rm -f $(DESTDIR)$(libdir)/libintl.$la; \
@@ -356,12 +356,12 @@ uninstall:
 	  : ; \
 	fi
 	if test "$(PACKAGE)" = "gettext-tools" \
-	   && test 'yes' = no; then \
+	   && test 'no' = no; then \
 	  rm -f $(DESTDIR)$(libdir)/preloadable_libintl.so; \
 	else \
 	  : ; \
 	fi
-	if test 'yes' = yes; then \
+	if test 'no' = yes; then \
 	  if test -f $(DESTDIR)$(prefix)/libdata/charset.alias; then \
 	    temp=$(DESTDIR)$(prefix)/libdata/t-charset.alias; \
 	    dest=$(DESTDIR)$(prefix)/libdata/charset.alias; \

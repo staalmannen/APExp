@@ -54,15 +54,14 @@ CTAGS = ctags -tw
 
 DEBUG = 
 
-# use pdcursesmod instead of ncurses
-CFLAGS = -g -DHAVE_CONFIG_H -D_BSD_EXTENSION -DNCURSES_VERSION=4.4 
+CFLAGS = -g -Dsh_set_lines_and_columns=rl_set_lines_and_columns -Dsh_get_env_value=rl_get_env_value -Dsh_get_home_dir=rl_get_home_dir -Dsh_unset_nodelay_mode=rl_unset_nodelay_mode
 LOCAL_CFLAGS =  ${DEBUG}
 STYLE_CFLAGS =  
 CPPFLAGS = 
 LDFLAGS = 
 
 DEFS = -DHAVE_CONFIG_H
-LOCAL_DEFS = -DSHELL -Dsh_get_env_value=rl_get_env_value -Dsh_get_home_dir=rl_get_home_dir -Dsh_unset_nodelay_mode=rl_unset_nodelay_mode -Dsh_set_lines_and_columns=rl_set_lines_and_columns
+LOCAL_DEFS = -DSHELL
 
 INCLUDES = -I. -I$(BUILD_DIR) -I$(topdir) -I$(topdir)/lib
 

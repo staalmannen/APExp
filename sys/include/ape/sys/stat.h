@@ -30,10 +30,8 @@ struct	stat {
 
 
 #define	S__MASK		     0170000
-#ifdef _RESEARCH_SOURCE
 #define S_ISLNK(m)	(((m)&S__MASK) == 0120000)
 #define S_ISSOCK(m)	(((m)&S__MASK) == 0010000)
-#endif
 #define S_ISREG(m)	(((m)&S__MASK) == 0100000)
 #define S_ISDIR(m)	(((m)&S__MASK) == 0040000)
 #define S_ISCHR(m)	(((m)&S__MASK) == 0020000)
@@ -55,7 +53,6 @@ struct	stat {
 #define	S_IWOTH	00002		/* write permission: other */
 #define	S_IXOTH	00001		/* execute permission: other */
 
-#ifdef _BSD_EXTENSION
 #define S_IFMT S__MASK
 #define S_IFDIR 0040000
 #define S_IFCHR 0020000
@@ -64,7 +61,6 @@ struct	stat {
 #define S_IFIFO 0010000
 #define S_IFLNK 0120000
 #define S_IFSOCK S_IFIFO
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -77,12 +73,10 @@ extern int stat(const char *, struct stat *);
 extern int fstat(int, struct stat *);
 extern int chmod(const char *, mode_t);
 
-#ifdef _BSD_EXTENSION
 #pragma lib "/$M/lib/ape/libbsd.a"
 extern int	lstat(char *, struct stat *);
 extern int	symlink(char *, char *);
 extern int	readlink(char *, char*, int);
-#endif
 
 #ifdef __cplusplus
 }

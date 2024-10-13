@@ -36,8 +36,8 @@ BASHINCDIR = ${topdir}/include
 
 INTL_LIBSRC = ${topdir}/lib/intl
 INTL_BUILDDIR = ${LIBBUILD}/intl
-INTL_INC = -I${INTL_LIBSRC} -I${INTL_BUILDDIR}
-LIBINTL_H = ${INTL_BUILDDIR}/libintl.h
+INTL_INC = 
+LIBINTL_H = 
 
 datarootdir = ${prefix}/share
 
@@ -55,7 +55,7 @@ MV = mv
 
 SHELL = /bin/sh
 
-CFLAGS = -g -D_BSD_EXTENSION
+CFLAGS = -g
 LOCAL_CFLAGS =  ${DEBUG}
 STYLE_CFLAGS =  
 CPPFLAGS = 

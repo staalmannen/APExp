@@ -40,7 +40,7 @@ MV = mv
 
 SHELL = /bin/sh
 
-CFLAGS = -g -DHAVE_CONFIG_H 
+CFLAGS = -g
 CPPFLAGS = 
 LDFLAGS = 
 

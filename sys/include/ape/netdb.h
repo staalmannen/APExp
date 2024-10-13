@@ -1,10 +1,6 @@
 #ifndef __NETDB_H__
 #define __NETDB_H__
 
-#ifndef _BSD_EXTENSION
-    This header file is an extension to ANSI/POSIX
-#endif
-
 #pragma lib "/$M/lib/ape/libbsd.a"
 
 /*-

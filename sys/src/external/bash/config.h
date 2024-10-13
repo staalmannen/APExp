@@ -28,7 +28,7 @@
 
 /* Define JOB_CONTROL if your operating system supports
    BSD-like job control. */
-//#define JOB_CONTROL 1
+/* #undef JOB_CONTROL */
 
 /* Define ALIAS if you want the alias features. */
 #define ALIAS 1
@@ -46,7 +46,7 @@
 /* Define READLINE to get the nifty/glitzy editing features.
    This is on by default.  You can turn it off interactively
    with the -nolineediting flag. */
-#define READLINE 1
+/* #undef READLINE */
 
 /* Define BANG_HISTORY if you want to have Csh style "!" history expansion.
    This is unrelated to READLINE. */
@@ -60,7 +60,7 @@
 
    If only HISTORY is defined, the `fc' and `history' builtins are
    available. */
-#define HISTORY 1
+/* #undef HISTORY */
 
 /* Define this if you want completion that puts all alternatives into
    a brace expansion shell expression. */
@@ -182,7 +182,7 @@
 /* Define AFS if you are using Transarc's AFS. */
 /* #undef AFS */
 
-#define ENABLE_NLS 1
+/* #undef ENABLE_NLS */
 
 /* End of configuration settings controllable by autoconf. */
 /* Other settable options appear in config-top.h. */
@@ -272,7 +272,7 @@
 /* Memory management functions. */
 
 /* Define if using the bash version of malloc in lib/malloc/malloc.c */
-#define USING_BASH_MALLOC 1
+/* #undef USING_BASH_MALLOC */
 
 /* #undef DISABLE_MALLOC_WRAPPERS */
 
@@ -429,7 +429,7 @@
 
 /* #undef TIOCSTAT_IN_SYS_IOCTL */
 
-/* #undef FIONREAD_IN_SYS_IOCTL */
+#define FIONREAD_IN_SYS_IOCTL 1
 
 /* #undef GWINSZ_IN_SYS_IOCTL */
 
@@ -1093,7 +1093,7 @@
 #define HAVE_SYS_WAIT_H 1
 
 /* Define if you have the <termcap.h> header file.  */
-/* #undef HAVE_TERMCAP_H */
+#define HAVE_TERMCAP_H 1
 
 /* Define if you have the <termio.h> header file.  */
 /* #undef HAVE_TERMIO_H */
@@ -1137,7 +1137,7 @@
 /* #undef SVR4 */
 
 /* Define if job control is unusable or unsupported. */
-#define JOB_CONTROL_MISSING 1
+/* #undef JOB_CONTROL_MISSING */
 
 /* Do we need to define _KERNEL to get the RLIMIT_* defines from
    <sys/resource.h>? */

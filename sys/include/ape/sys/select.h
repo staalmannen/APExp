@@ -1,8 +1,6 @@
 #ifndef __SELECT_H
 #define __SELECT_H
-#ifndef _BSD_EXTENSION
-    This header file is an extension to ANSI/POSIX
-#endif
+
 #pragma lib "/$M/lib/ape/libap.a"
 
 #ifndef _FD_SET_T
