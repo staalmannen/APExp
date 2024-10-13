@@ -1,7 +1,8 @@
 #!/bin/rc
 if(! test -e /sys/include/ape/THIS_IS_APExp) {
     bind -a $cputype /$cputype
-    bind -a sys /sys
+    bind -a sys/lib /sys/lib
+	bind -a sys/man /sys/man
     bind -a $cputype/include/ape /sys/include/ape
     bind -b $cputype/bin /bin
     bind -b $cputype/lib/ape /$cputype/lib/ape

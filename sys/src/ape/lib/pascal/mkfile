@@ -1,0 +1,22 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+
+LIB=$APEXPROOT/$objtype/lib/ape/libp2c.a
+
+P2CSRC=../../../external/p2c
+
+OFILES=\
+	p2clib.$O\
+	loc.p2clib.$O
+
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -I.
+
+%.$O: $P2CSRC/src/%.c
+    $CC $CFLAGS $P2CSRC/src/$stem.c
+
+

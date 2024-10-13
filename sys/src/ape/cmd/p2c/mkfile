@@ -1,0 +1,37 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+P2CSRC=../../../external/p2c
+
+TARG=p2c
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+OFILES=\
+    trans.$O\
+	stuff.$O\
+	out.$O\
+	comment.$O\
+	lex.$O\
+	parse.$O\
+	decl.$O\
+	expr.$O\
+	pexpr.$O\
+	funcs.$O\
+	dir.$O\
+	hpmods.$O\
+	citmods.$O
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -D_POSIX_SOURCE -DCUST1=hpmods -DCUST2=citmods\
+		-DLIBDIR="/$objtype/lib/ape" -DP2C_HOME="/sys/lib/pascal"\
+		-DINCDIR="/sys/include/ape" -DHASDUMPS
+
+%.$O: $P2CSRC/src/%.c
+    $CC $CFLAGS $P2CSRC/src/$stem.c
+
+

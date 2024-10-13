@@ -19,9 +19,9 @@
 
 
 # To be filled in by the Makefile:
-$homedir = "--HOMEDIR--";
-$incdir = "--INCDIR--";
-$libdir = "--LIBDIR--";
+$homedir = "/sys/lib/pascal";
+$incdir = "/sys/include/ape";
+$libdir = "/$objtype/lib/ape";
 
 $pascalpat = $ENV{"P2CC_PAT"} || "\\.p\$|\\.pas\$";
 $cccommand = $ENV{"P2CC_CC"} || "cc";

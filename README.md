@@ -92,12 +92,20 @@ Install paths have been modified so that libraries and binaries are installed in
 - copied "head", "which", and "printenv" rc scripts from steve (/n/sources/contrib)
 
 
+***Languages***
+
+
+- Lua is included by default in APExp
+
+
 ***Transpilers***
 
 
-C transpilers is a fun little proof-of-concept and also opens up for more languages.
+C transpilers is a fun little proof-of-concept and also opens up for more languages. Many will only have very little practical use, however.
 
 - copied the last (version 3.03) plan9 cfront (c++) port from steve (/n/sources/contrib)
+
+- The pascal-to-C transpiler p2c (1.21alpha) is included in APExp
 
 
 *** (un)archivers ***
