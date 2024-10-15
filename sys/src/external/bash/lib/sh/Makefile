@@ -64,7 +64,7 @@ LDFLAGS =
 PROFILE_FLAGS = 
 
 DEFS = -DHAVE_CONFIG_H
-LOCAL_DEFS = -DSHELL
+LOCAL_DEFS = -DSHELL -D_sh_single_quote=sh_single_quote
 
 INCLUDES = -I. -I../.. -I$(topdir) -I$(topdir)/lib -I$(BASHINCDIR) -I$(srcdir) $(INTL_INC)
 

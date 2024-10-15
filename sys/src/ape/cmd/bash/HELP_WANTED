@@ -5,8 +5,27 @@ The final binary is about 10X bigger than the APE pdksh sh, but crashes when exe
 I have been experimenting with disabling job control (nojobs instead of jobs) with no success. 
 This was otherwise a thing for mksh.
 
-I tried using acid on the bindary but I am not sure how to move forward with the informaiton gleanded from that.
-
 
 So if you have the 1337 haxxer skillz needed to get bash working, I would be totally grateful :)
 
+
+output from acid (minimal sh build, disabling realine, history, threads, multibyte, gnu-malloc, nls, job control). Edited shell.c to exclude a section with term=emacs, since those variables showed up on an earlier lstk() and are irrelevant for us.
+
+term% acid bash
+bash:amd64 plan 9 executable
+/sys/lib/acid/port
+/sys/lib/acid/amd64
+acid: new()
+14073: system call	_main	MOVQ	AX,_tos(SB)
+14073: breakpoint	main+0x4	MOVL	BP,argc+0x0(FP)
+acid: lstk()
+main(argc=0x0,argv=0x7fffffffefa0,env=0x523080)+0x4 /usr/glenda/APExp/sys/src/external/bash/shell.c:370
+	arg_index=0x1300000021
+	locally_skip_execution=0x2200000013
+	i=0x25fd5800000003
+	top_level_arg_index=0x2100000022
+	old_errexit_flag=0x400000022
+	t=0x300001b58
+_apemain(argc=0x1,argv=0x7fffffffefa0)+0x2d /usr/glenda/APExp/sys/src/ape/lib/ap/plan9/callmain.c:39
+_callmain+0x60 /usr/glenda/APExp/sys/src/ape/lib/ap/plan9/callmain.c:31
+acid: 

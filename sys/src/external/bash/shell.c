@@ -1,6 +1,6 @@
 /* shell.c -- GNU's idea of the POSIX shell specification. */
 
-/* Copyright (C) 1987-2021 Free Software Foundation, Inc.
+/* Copyright (C) 1987-2021 Free Software Foundation, Inc. emacs
 
    This file is part of GNU Bash, the Bourne Again SHell.
 
@@ -429,7 +429,9 @@ main (argc, argv, env)
     {
       argc = subshell_argc;
       argv = subshell_argv;
+#ifndef NO_MAIN_ENV_ARG
       env = subshell_envp;
+#endif
       sourced_env = 0;
     }
 
@@ -463,7 +465,9 @@ main (argc, argv, env)
 	exit (2);
     }
 
+#ifndef NO_MAIN_ENV_ARG
   shell_environment = env;
+#endif
   set_shell_name (argv[0]);
 
   gettimeofday (&shellstart, 0);
@@ -592,6 +596,7 @@ main (argc, argv, env)
    * a now-obsolete command that sets neither EMACS nor INSIDE_EMACS:
    * M-x terminal -> TERM='emacs-em7955' (line editing)
    */
+#ifndef PLAN9
   if (interactive_shell)
     {
       char *term, *emacs, *inside_emacs;
@@ -626,6 +631,7 @@ main (argc, argv, env)
       if (running_under_emacs)
 	gnu_error_format = 1;
     }
+#endif
 
   top_level_arg_index = arg_index;
   old_errexit_flag = exit_immediately_on_error;

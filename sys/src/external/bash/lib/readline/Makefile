@@ -54,7 +54,7 @@ CTAGS = ctags -tw
 
 DEBUG = 
 
-CFLAGS = -g -Dsh_set_lines_and_columns=rl_set_lines_and_columns -Dsh_get_env_value=rl_get_env_value -Dsh_get_home_dir=rl_get_home_dir -Dsh_unset_nodelay_mode=rl_unset_nodelay_mode
+CFLAGS = -g
 LOCAL_CFLAGS =  ${DEBUG}
 STYLE_CFLAGS =  
 CPPFLAGS = 

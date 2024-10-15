@@ -49,8 +49,8 @@ OFILES=\
 	syntax.$O\
 	xmalloc.$O\
 # termcap - force linking... \
-	termcap.$O\
-	tparam.$O\
+#	termcap.$O\
+#	tparam.$O\
 # tilde -force linking \
 	tilde.$O\
 
@@ -59,15 +59,10 @@ BASHSRC=../../../external/bash
 
 BASHLIBS=\
 	libbuiltins.a$O\
-	libsh.a$O\
-	libmalloc.a$O\
-	libintl.a$O\
 	libglob.a$O\
-	libreadline.a$O\
+	libsh.a$O
 
-LIB= $BASHLIBS\
-	$APEXPROOT/$objtype/lib/ape/libiconv.a\
-	$APEXPROOT/$objtype/lib/ape/libcurses.a
+LIB= $BASHLIBS
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
@@ -81,7 +76,7 @@ DEFS= 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale" -D_POSIX_SOURCE\
 		-DCONF_OSTYPE="Plan9" -DCONF_MACHTYPE="$objtype-unknown-Plan9" -DPROGRAM="Bash"\
 		-DPACKAGE="Bash" -DPACKAGE_STRING='bash 5.2-release'\
 		-DCONF_VENDOR="unknonw" -DCONF_HOSTTYPE="$objtype"\
-		-DHAVE_SYS_RESOURCE_H
+		-DHAVE_SYS_RESOURCE_H -DTERM=xterm
 
 CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib $DEFS
 
@@ -114,7 +109,7 @@ libmalloc.a$O: $BASHSRC/lib/malloc/Makefile
 			rm $BASHSRC/lib/malloc/*.o
 
 libreadline.a$O: $BASHSRC/lib/readline/Makefile
-			make -C $BASHSRC/lib/readline
+			make -C $BASHSRC/lib/readline libhistory.a
 			mv $BASHSRC/lib/readline/libreadline.a libreadline.a$O
 			mv $BASHSRC/lib/readline/libhistory.a libhistory.a$O
 			rm $BASHSRC/lib/readline/*.o
