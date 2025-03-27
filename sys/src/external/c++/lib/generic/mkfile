@@ -1,6 +1,8 @@
 </$objtype/mkfile
 
-CFLAGS=-FV -I.
+APEXPROOT=../../../../../..
+
+CFLAGS=-FV -I. -I$APEXPROOT/sys/include/c++
 LIB=/$objtype/lib/c++/libC.a
 OFILES=generic.$O
 

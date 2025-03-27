@@ -19,7 +19,7 @@ y-tab.C: gram.y oldyacc
 
 oldyacc: yacc.c
 	$CC $prereq
-	$CLD -o $target yacc.8
+	$CLD -o $target yacc.$O
 
 clean:V:
 	rm -f *.[S$O] [S$O].out oldyacc y-tab.C

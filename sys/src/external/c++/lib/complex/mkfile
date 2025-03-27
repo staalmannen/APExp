@@ -1,8 +1,9 @@
 </$objtype/mkfile
 
-APEXPROOT=../../../../../../
+APEXPROOT=../../../../../..
 
 CFLAGS=-FV -I$APEXPROOT/sys/include/c++
+
 LIB=$APEXPROOT/$objtype/lib/c++/libC.a
 OFILES=abs.$O arg.$O cos.$O error.$O exp.$O io.$O \
 	log.$O oper.$O polar.$O pow.$O sin.$O sqrt.$O 

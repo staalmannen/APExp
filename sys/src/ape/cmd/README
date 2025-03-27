@@ -9,7 +9,7 @@ EXECUTION ENVIRONMENT UTILITIES
 
 awk	Plan 9 awk replaced by GNU awk (gawk)
 
-basename POSIX conforming
+basename from sbase
 
 bc	Plan 9 bc.
 
@@ -100,6 +100,8 @@ lp	Plan 9 lp
 
 ls	ls from sbase
 
+m4	m4 from GNU
+
 mailx	not implemented
 
 mkdir	Plan 9 mkdir
@@ -120,7 +122,7 @@ pax	implemented
 
 pr	Plan 9 pr
 
-printf	POSIX compliant
+printf	from sbase
 
 pwd	Plan 9 pwd
 
@@ -137,7 +139,7 @@ sh	ksh93 -- POSIX compliant
 
 sleep	Plan 9 sleep
 
-sort	Plan 9 sort
+sort	from sbase
 
 stty	POSIX compliant (sort of)
 
@@ -149,7 +151,7 @@ test	Plan 9 test (POSIX compliant); copied as [
 
 touch	Plan 9 touch
 
-tr	Plan 9 tr
+tr	from sbase
 
 true	true from sbase
 
