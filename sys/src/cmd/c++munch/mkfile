@@ -1,0 +1,20 @@
+BUILTINS=
+</$objtype/mkfile
+<../c++mkfile
+
+APEXPROOT=../../../..
+CXXSRC=../../external/c++
+
+%.$O:	$CXXSRC/munch/%.c
+	$CC $CXXSRC/munch/$stem.c
+
+$O.out:	munch.$O
+	$LD $prereq 
+
+install:V: $O.out
+	mv $O.out $APEXPROOT/$objtype/bin/c++/munch
+
+clean:V:
+	rm -f *.[$OS] [$OS].out y.tab.?
+
+nuke:V: clean

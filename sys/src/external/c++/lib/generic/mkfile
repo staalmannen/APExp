@@ -3,7 +3,7 @@
 APEXPROOT=../../../../../..
 
 CFLAGS=-FV -I. -I$APEXPROOT/sys/include/c++
-LIB=/$objtype/lib/c++/libC.a
+LIB=$APEXPROOT/$objtype/lib/c++/libC.a
 OFILES=generic.$O
 
 </sys/src/cmd/mksyslib

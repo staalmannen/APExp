@@ -37,11 +37,11 @@ extern char* strcpy(char*, const char*);
 #endif
 */
 
-#ifdef SVR42
+//#ifdef SVR42
 #include <stdlib.h>
-#else
-#include <malloc.h>
-#endif
+//#else
+//#include <malloc.h>
+//#endif
 #include <string.h>
 #include <stdio.h>
 

@@ -72,6 +72,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - getopt.h with gnu getopt_long from NetBSD, imported to libbsd
 - strings.h shim pointing to bsd.h
 - stdio.h : added fmemopen from tuxpaint, getdelim/getline from gnulib
+- imported several math and other functions from musl libc
 
 
 ***Utilities***
@@ -88,7 +89,6 @@ Install paths have been modified so that libraries and binaries are installed in
 - system lex has been replaced by flex (version 2.6.4) as ape/lex
 - the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" et al. have been built from suckless sbase under ape
 - steve's mkmk (/n/sources/contrib) imported to APExp
-
 - copied "head", "which", and "printenv" rc scripts from steve (/n/sources/contrib)
 
 
@@ -103,14 +103,12 @@ Install paths have been modified so that libraries and binaries are installed in
 
 C transpilers is a fun little proof-of-concept and also opens up for more languages. Many will only have very little practical use, however.
 
-- copied the last (version 3.03) plan9 cfront (c++) port from steve (/n/sources/contrib)
-
+- The last (version 3.03) plan9 cfront (c++) port from steve (/n/sources/contrib) included in APExp
 - The pascal-to-C transpiler p2c (1.21alpha) is included in APExp
-
 - The fortran-to-C transpiler f2c (20240504) is included in APExp
 
 
-*** (un)archivers ***
+***(un)archivers***
 
 Many (old) sources are still distributed as compressed archives, and the ability to unpack those
 sources could be a barrier. Because of this, APExp package several (un)archivers by default:

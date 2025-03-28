@@ -1,0 +1,27 @@
+</$objtype/mkfile
+
+APEXPROOT=../../../..
+CXXSRC=../../external/c++
+
+CFLAGS=-c -B -D_POSIX_SOURCE -D_BSD_EXTENSION -I $CXXSRC/demangle
+CC=pcc
+TARG=ptcomp ptlink
+BIN=$APEXPROOT/$objtype/bin/c++
+
+</sys/src/cmd/mkmany
+
+$O.ptcomp: ptcomp.$O ptutil.$O
+
+$O.ptlink: ptlink.$O ptutil.$O dem.$O
+
+ptutil.$O:	$CXXSRC/pt/ptutil.c $CXXSRC/pt/pt.h
+	$CC $CFLAGS -o $target $prereq
+
+ptcomp.$O: $CXXSRC/pt/ptcomp.c $CXXSRC/pt/pt.h
+	$CC $CFLAGS -o $target $prereq
+
+ptlink.$O:	$CXXSRC/pt/ptlink.c $CXXSRC/pt/pt.h $CXXSRC/demangle/dem.h
+	$CC $CFLAGS -o $target $prereq
+
+dem.$O: $CXXSRC/demangle/dem.c
+	$CC $CFLAGS -o $target $prereq
