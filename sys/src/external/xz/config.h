@@ -1,167 +1,7 @@
 /* config.h.  Generated from config.h.in by configure.  */
-/* config.h.in.  Generated from configure.ac by autoheader.  */
+/* config.h.in.  Generated from configure.ac by autoheader. PHYSMEM*/
 
-/* Define if building universal (internal helper macro) */
-/* #undef AC_APPLE_UNIVERSAL_BUILD */
-
-/* How many MiB of RAM to assume if the real amount cannot be determined. */
-#define ASSUME_RAM 128
-
-/* Define to 1 if translation of program messages to the user's native
-   language is requested. */
-#define ENABLE_NLS 1
-
-/* Define to 1 if ARM64 CRC32 instruction is supported. See configure.ac for
-   details. */
-/* #undef HAVE_ARM64_CRC32 */
-
-/* Define to 1 if bswap_16 is available. */
-/* #undef HAVE_BSWAP_16 */
-
-/* Define to 1 if bswap_32 is available. */
-/* #undef HAVE_BSWAP_32 */
-
-/* Define to 1 if bswap_64 is available. */
-/* #undef HAVE_BSWAP_64 */
-
-/* Define to 1 if you have the <byteswap.h> header file. */
-/* #undef HAVE_BYTESWAP_H */
-
-/* Define to 1 if you have the 'cap_rights_limit' function. */
-/* #undef HAVE_CAP_RIGHTS_LIMIT */
-
-/* Define to 1 if the system has the type 'CC_SHA256_CTX'. */
-/* #undef HAVE_CC_SHA256_CTX */
-
-/* Define to 1 if you have the 'CC_SHA256_Init' function. */
-/* #undef HAVE_CC_SHA256_INIT */
-
-/* Define to 1 if you have the Mac OS X function
-   CFLocaleCopyPreferredLanguages in the CoreFoundation framework. */
-/* #undef HAVE_CFLOCALECOPYPREFERREDLANGUAGES */
-
-/* Define to 1 if you have the Mac OS X function CFPreferencesCopyAppValue in
-   the CoreFoundation framework. */
-/* #undef HAVE_CFPREFERENCESCOPYAPPVALUE */
-
-/* Define to 1 if crc32 integrity check is enabled. */
-#define HAVE_CHECK_CRC32 1
-
-/* Define to 1 if crc64 integrity check is enabled. */
-#define HAVE_CHECK_CRC64 1
-
-/* Define to 1 if sha256 integrity check is enabled. */
-#define HAVE_CHECK_SHA256 1
-
-/* Define to 1 if you have the 'clock_gettime' function. */
-#define HAVE_CLOCK_GETTIME 1
-
-/* Define to 1 if 'CLOCK_MONOTONIC' is declared in <time.h>. */
-#define HAVE_CLOCK_MONOTONIC 1
-
-/* Define to 1 if you have the <CommonCrypto/CommonDigest.h> header file. */
-/* #undef HAVE_COMMONCRYPTO_COMMONDIGEST_H */
-
-/* Define to 1 if you have the <cpuid.h> header file. */
-#define HAVE_CPUID_H 1
-
-/* Define if the GNU dcgettext() function is already present or preinstalled.
-   */
-#define HAVE_DCGETTEXT 1
-
-/* Define to 1 if any of HAVE_DECODER_foo have been defined. */
-#define HAVE_DECODERS 1
-
-/* Define to 1 if arm decoder is enabled. */
-#define HAVE_DECODER_ARM 1
-
-/* Define to 1 if arm64 decoder is enabled. */
-#define HAVE_DECODER_ARM64 1
-
-/* Define to 1 if armthumb decoder is enabled. */
-#define HAVE_DECODER_ARMTHUMB 1
-
-/* Define to 1 if delta decoder is enabled. */
-#define HAVE_DECODER_DELTA 1
-
-/* Define to 1 if ia64 decoder is enabled. */
-#define HAVE_DECODER_IA64 1
-
-/* Define to 1 if lzma1 decoder is enabled. */
-#define HAVE_DECODER_LZMA1 1
-
-/* Define to 1 if lzma2 decoder is enabled. */
-#define HAVE_DECODER_LZMA2 1
-
-/* Define to 1 if powerpc decoder is enabled. */
-#define HAVE_DECODER_POWERPC 1
-
-/* Define to 1 if riscv decoder is enabled. */
-#define HAVE_DECODER_RISCV 1
-
-/* Define to 1 if sparc decoder is enabled. */
-#define HAVE_DECODER_SPARC 1
-
-/* Define to 1 if x86 decoder is enabled. */
-#define HAVE_DECODER_X86 1
-
-/* Define to 1 if you have the <dlfcn.h> header file. */
-#define HAVE_DLFCN_H 1
-
-/* Define to 1 if you have the 'elf_aux_info' function. */
-/* #undef HAVE_ELF_AUX_INFO */
-
-/* Define to 1 if any of HAVE_ENCODER_foo have been defined. */
-#define HAVE_ENCODERS 1
-
-/* Define to 1 if arm encoder is enabled. */
-#define HAVE_ENCODER_ARM 1
-
-/* Define to 1 if arm64 encoder is enabled. */
-#define HAVE_ENCODER_ARM64 1
-
-/* Define to 1 if armthumb encoder is enabled. */
-#define HAVE_ENCODER_ARMTHUMB 1
-
-/* Define to 1 if delta encoder is enabled. */
-#define HAVE_ENCODER_DELTA 1
-
-/* Define to 1 if ia64 encoder is enabled. */
-#define HAVE_ENCODER_IA64 1
-
-/* Define to 1 if lzma1 encoder is enabled. */
-#define HAVE_ENCODER_LZMA1 1
-
-/* Define to 1 if lzma2 encoder is enabled. */
-#define HAVE_ENCODER_LZMA2 1
-
-/* Define to 1 if powerpc encoder is enabled. */
-#define HAVE_ENCODER_POWERPC 1
-
-/* Define to 1 if riscv encoder is enabled. */
-#define HAVE_ENCODER_RISCV 1
-
-/* Define to 1 if sparc encoder is enabled. */
-#define HAVE_ENCODER_SPARC 1
-
-/* Define to 1 if x86 encoder is enabled. */
-#define HAVE_ENCODER_X86 1
-
-/* Define to 1 if __attribute__((__constructor__)) is supported for functions.
-   */
-#define HAVE_FUNC_ATTRIBUTE_CONSTRUCTOR 1
-
-/* Define to 1 if you have the 'futimens' function. */
-#define HAVE_FUTIMENS 1
-
-/* Define to 1 if you have the 'futimes' function. */
-/* #undef HAVE_FUTIMES */
-
-/* Define to 1 if you have the 'futimesat' function. */
-/* #undef HAVE_FUTIMESAT */
-
-/* Define to 1 if you have the 'getauxval' function. */
-/* #undef HAVE_GETAUXVAL */
+#include <config_common.h>
 
 /* Define to 1 if you have the <getopt.h> header file. */
 #define HAVE_GETOPT_H 1
@@ -172,81 +12,14 @@
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #define HAVE_GETTEXT 1
 
-/* Define if you have the iconv() function and it works. */
-/* #undef HAVE_ICONV */
-
-/* Define to 1 if you have the <immintrin.h> header file. */
-#define HAVE_IMMINTRIN_H 1
-
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
-
-/* Define to 1 if Linux Landlock is supported. See configure.ac for details.
-   */
-#define HAVE_LINUX_LANDLOCK 1
 
 /* Define to 1 if .lz (lzip) decompression support is enabled. */
 #define HAVE_LZIP_DECODER 1
 
 /* Define to 1 if mbrtowc and mbstate_t are properly declared. */
 #define HAVE_MBRTOWC 1
-
-/* Define to 1 to enable bt2 match finder. */
-#define HAVE_MF_BT2 1
-
-/* Define to 1 to enable bt3 match finder. */
-#define HAVE_MF_BT3 1
-
-/* Define to 1 to enable bt4 match finder. */
-#define HAVE_MF_BT4 1
-
-/* Define to 1 to enable hc3 match finder. */
-#define HAVE_MF_HC3 1
-
-/* Define to 1 to enable hc4 match finder. */
-#define HAVE_MF_HC4 1
-
-/* Define to 1 if you have the <minix/config.h> header file. */
-/* #undef HAVE_MINIX_CONFIG_H */
-
-/* Define to 1 if getopt.h declares extern int optreset. */
-/* #undef HAVE_OPTRESET */
-
-/* Define to 1 if you have the 'pledge' function. */
-/* #undef HAVE_PLEDGE */
-
-/* Define to 1 if you have the 'posix_fadvise' function. */
-#define HAVE_POSIX_FADVISE 1
-
-/* Define to 1 if 'program_invocation_name' is declared in <errno.h>. */
-#define HAVE_PROGRAM_INVOCATION_NAME 1
-
-/* Define to 1 if you have the 'pthread_condattr_setclock' function. */
-#define HAVE_PTHREAD_CONDATTR_SETCLOCK 1
-
-/* Have PTHREAD_PRIO_INHERIT. */
-#define HAVE_PTHREAD_PRIO_INHERIT 1
-
-/* Define to 1 if you have the 'SHA256Init' function. */
-/* #undef HAVE_SHA256INIT */
-
-/* Define to 1 if the system has the type 'SHA256_CTX'. */
-/* #undef HAVE_SHA256_CTX */
-
-/* Define to 1 if you have the <sha256.h> header file. */
-/* #undef HAVE_SHA256_H */
-
-/* Define to 1 if you have the 'SHA256_Init' function. */
-/* #undef HAVE_SHA256_INIT */
-
-/* Define to 1 if the system has the type 'SHA2_CTX'. */
-/* #undef HAVE_SHA2_CTX */
-
-/* Define to 1 if you have the <sha2.h> header file. */
-/* #undef HAVE_SHA2_H */
-
-/* Define to 1 if optimizing for size. */
-/* #undef HAVE_SMALL */
 
 /* Define to 1 if stdbool.h conforms to C99. */
 #define HAVE_STDBOOL_H 1
@@ -266,40 +39,6 @@
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
 
-/* Define to 1 if 'st_atimensec' is a member of 'struct stat'. */
-/* #undef HAVE_STRUCT_STAT_ST_ATIMENSEC */
-
-/* Define to 1 if 'st_atimespec.tv_nsec' is a member of 'struct stat'. */
-/* #undef HAVE_STRUCT_STAT_ST_ATIMESPEC_TV_NSEC */
-
-/* Define to 1 if 'st_atim.st__tim.tv_nsec' is a member of 'struct stat'. */
-/* #undef HAVE_STRUCT_STAT_ST_ATIM_ST__TIM_TV_NSEC */
-
-/* Define to 1 if 'st_atim.tv_nsec' is a member of 'struct stat'. */
-#define HAVE_STRUCT_STAT_ST_ATIM_TV_NSEC 1
-
-/* Define to 1 if 'st_uatime' is a member of 'struct stat'. */
-/* #undef HAVE_STRUCT_STAT_ST_UATIME */
-
-/* Define to 1 to if GNU/Linux-specific details are unconditionally wanted for
-   symbol versioning. Define to 2 to if these are wanted only if also PIC is
-   defined (allows building both shared and static liblzma at the same time
-   with Libtool if neither --with-pic nor --without-pic is used). This define
-   must be used together with liblzma_linux.map. */
-#define HAVE_SYMBOL_VERSIONS_LINUX 2
-
-/* Define to 1 if you have the 'sysctlbyname' function. */
-/* #undef HAVE_SYSCTLBYNAME */
-
-/* Define to 1 if you have the <sys/byteorder.h> header file. */
-/* #undef HAVE_SYS_BYTEORDER_H */
-
-/* Define to 1 if you have the <sys/cdefs.h> header file. */
-#define HAVE_SYS_CDEFS_H 1
-
-/* Define to 1 if you have the <sys/endian.h> header file. */
-/* #undef HAVE_SYS_ENDIAN_H */
-
 /* Define to 1 if you have the <sys/param.h> header file. */
 #define HAVE_SYS_PARAM_H 1
 
@@ -315,20 +54,6 @@
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
-/* Define to 1 if _mm_set_epi64x and _mm_clmulepi64_si128 are usable. See
-   configure.ac for details. */
-#define HAVE_USABLE_CLMUL 1
-
-/* Define to 1 if you have the 'utime' function. */
-/* #undef HAVE_UTIME */
-
-/* Define to 1 if you have the 'utimes' function. */
-/* #undef HAVE_UTIMES */
-
-/* Define to 1 or 0, depending whether the compiler supports simple visibility
-   declarations. */
-#define HAVE_VISIBILITY 1
-
 /* Define to 1 if you have the <wchar.h> header file. */
 #define HAVE_WCHAR_H 1
 
@@ -337,34 +62,6 @@
 
 /* Define to 1 if the system has the type '_Bool'. */
 #define HAVE__BOOL 1
-
-/* Define to 1 if you have the '_futime' function. */
-/* #undef HAVE__FUTIME */
-
-/* Define to 1 if _mm_movemask_epi8 is available. */
-#define HAVE__MM_MOVEMASK_EPI8 1
-
-/* Define to 1 if the GNU C extension __builtin_assume_aligned is supported.
-   */
-#define HAVE___BUILTIN_ASSUME_ALIGNED 1
-
-/* Define to 1 if the GNU C extensions __builtin_bswap16/32/64 are supported.
-   */
-#define HAVE___BUILTIN_BSWAPXX 1
-
-/* Define to the sub-directory where libtool stores uninstalled libraries. */
-#define LT_OBJDIR ".libs/"
-
-/* Define to 1 when using POSIX threads (pthreads). */
-#define MYTHREAD_POSIX 1
-
-/* Define to 1 when using Windows Vista compatible threads. This uses features
-   that are not available on Windows XP. */
-/* #undef MYTHREAD_VISTA */
-
-/* Define to 1 when using Windows 95 (and thus XP) compatible threads. This
-   avoids use of features that were added in Windows Vista. */
-/* #undef MYTHREAD_WIN95 */
 
 /* Define to 1 to disable debugging code. */
 #define NDEBUG 1
@@ -390,12 +87,8 @@
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "5.6.3"
 
-/* Define to necessary symbol if this constant uses a non-standard name on
-   your system. */
-/* #undef PTHREAD_CREATE_JOINABLE */
-
 /* The size of 'size_t', as computed by sizeof. */
-#define SIZEOF_SIZE_T 8
+#define SIZEOF_SIZE_T 4
 
 /* Define to 1 if all of the C89 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
@@ -412,7 +105,7 @@
 
 /* Define to 1 if the number of available CPU cores can be detected with
    sched_getaffinity() */
-#define TUKLIB_CPUCORES_SCHED_GETAFFINITY 1
+// #undef TUKLIB_CPUCORES_SCHED_GETAFFINITY
 
 /* Define to 1 if the number of available CPU cores can be detected with
    sysconf(_SC_NPROCESSORS_ONLN) or sysconf(_SC_NPROC_ONLN). */
@@ -444,7 +137,7 @@
 
 /* Define to 1 if the amount of physical memory can be detected with
    sysconf(_SC_PAGESIZE) and sysconf(_SC_PHYS_PAGES). */
-#define TUKLIB_PHYSMEM_SYSCONF 1
+// #undef TUKLIB_PHYSMEM_SYSCONF
 
 /* Define to 1 if the amount of physical memory can be detected with sysctl().
    */

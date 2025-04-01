@@ -1,5 +1,0 @@
-
-main()
-{
-	long long longlong;
-}

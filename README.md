@@ -103,7 +103,6 @@ Install paths have been modified so that libraries and binaries are installed in
 
 C transpilers is a fun little proof-of-concept and also opens up for more languages. Many will only have very little practical use, however.
 
-- The last (version 3.03) plan9 cfront (c++) port from steve (/n/sources/contrib) included in APExp
 - The pascal-to-C transpiler p2c (1.21alpha) is included in APExp
 - The fortran-to-C transpiler f2c (20240504) is included in APExp
 

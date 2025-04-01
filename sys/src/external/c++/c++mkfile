@@ -1,3 +1,0 @@
-CCS= qc uc vc 0c 2c kc 5c 6c 7c 8c 9c
-LDS= ql ul vl 0l 2l kl 5l 6l 7l 8l 9l
-CPUS= power sparc64 mips spim 68020 sparc arm amd64 arm64 386 power64
