@@ -1,0 +1,135 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+
+LIB=$APEXPROOT/$objtype/lib/ape/liblzma.a
+
+XZSRC=../../../external/xz/src/liblzma
+
+OFILES=\
+# ../common \
+	tuklib_cpucores.$O\
+	tuklib_physmem.$O\
+# common \
+	common.$O\
+	block_util.$O\
+	easy_preset.$O\
+	filter_common.$O\
+	hardware_physmem.$O\
+	index.$O\
+	stream_flags_common.$O\
+#	string_conversion.$O\
+	vli_size.$O\
+	hardware_cputhreads.$O\
+	outqueue.$O\
+	alone_encoder.$O\
+	block_buffer_encoder.$O\
+	block_encoder.$O\
+	block_header_encoder.$O\
+	easy_buffer_encoder.$O\
+	easy_encoder.$O\
+	easy_encoder_memusage.$O\
+	filter_buffer_encoder.$O\
+#	filter_encoder.$O\
+	filter_flags_encoder.$O\
+	index_encoder.$O\
+	stream_buffer_encoder.$O\
+	stream_encoder.$O\
+	stream_flags_encoder.$O\
+	vli_encoder.$O\
+#	stream_encoder_mt.$O\
+	microlzma_encoder.$O\
+	alone_decoder.$O\
+	auto_decoder.$O\
+	block_buffer_decoder.$O\
+	block_decoder.$O\
+	block_header_decoder.$O\
+	easy_decoder_memusage.$O\
+	file_info.$O\
+	filter_buffer_decoder.$O\
+#	filter_decoder.$O\
+	filter_flags_decoder.$O\
+	index_decoder.$O\
+	index_hash.$O\
+	stream_buffer_decoder.$O\
+	stream_decoder.$O\
+	stream_flags_decoder.$O\
+	vli_decoder.$O\
+#	stream_decoder_mt.$O\
+	microlzma_decoder.$O\
+	lzip_decoder.$O\
+# check \
+	check.$O\
+	crc32_table.$O\
+	crc32_fast.$O\
+##	crc64_small.$O\ #if/else\
+	crc64_table.$O\
+##	crc64_fast.$O\ #if/else\
+	sha256.$O\
+# lz \
+	lz_encoder.$O\
+	lz_encoder_mf.$O\
+#	lz_decoder.$O\
+# lzma \
+##	fastpos_tablegen.$O\ # main()?\
+	lzma_encoder_presets.$O\
+	lzma_encoder.$O\
+	lzma_encoder_optimum_fast.$O\
+	lzma_encoder_optimum_normal.$O\
+	lzma_decoder.$O\
+	lzma2_encoder.$O\
+#	lzma2_decoder.$O\
+# rangecoder \
+	price_tablegen.$O\
+	price_table.$O\
+# delta \
+	delta_common.$O\
+	delta_encoder.$O\
+	delta_decoder.$O\
+# simple \
+	simple_coder.$O\
+	simple_encoder.$O\
+	simple_decoder.$O\
+	x86.$O\
+	powerpc.$O\
+	ia64.$O\
+	arm.$O\
+	armthumb.$O\
+	arm64.$O\
+	sparc.$O\
+	riscv.$O
+
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CC=pcc
+LD=pcc
+INCLUDES = 	-I$XZSRC/../.. -I$XZSRC/api -I$XZSRC/check\
+			-I$XZSRC/../common -I$XZSRC/lzma -I$XZSRC/simple\
+			-I$XZSRC/delta -I$XZSRC/lz -I$XZSRC/common\
+			-I$XZSRC/rangecoder
+CFLAGS= -c -DTUKLIB_SYMBOL_PREFIX=lzma_ -DHAVE_CONFIG_H $INCLUDES
+
+%.$O: $XZSRC/../common/%.c
+    $CC $CFLAGS $XZSRC/../common/$stem.c
+
+%.$O: $XZSRC/common/%.c
+    $CC $CFLAGS $XZSRC/common/$stem.c
+
+%.$O: $XZSRC/check/%.c
+    $CC $CFLAGS $XZSRC/check/$stem.c
+
+%.$O: $XZSRC/lz/%.c
+    $CC $CFLAGS $XZSRC/lz/$stem.c
+
+%.$O: $XZSRC/rangecoder/%.c
+    $CC $CFLAGS $XZSRC/rangecoder/$stem.c
+
+%.$O: $XZSRC/lzma/%.c
+    $CC $CFLAGS $XZSRC/lzma/$stem.c
+
+%.$O: $XZSRC/delta/%.c
+    $CC $CFLAGS $XZSRC/delta/$stem.c
+
+%.$O: $XZSRC/simple/%.c
+    $CC $CFLAGS $XZSRC/simple/$stem.c
+

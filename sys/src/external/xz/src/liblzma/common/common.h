@@ -275,8 +275,8 @@ struct lzma_next_coder_s {
 
 /// Macro to initialize lzma_next_coder structure
 // hack to get it to build on plan9, which is C89
-struct lzma_next_coder LZMA_NEXT_CODER_INIT;
-LZMA_NEXT_CODER_INIT.coder = NULL;
+lzma_next_coder LZMA_NEXT_CODER_INIT;
+/* LZMA_NEXT_CODER_INIT.coder = NULL;
 LZMA_NEXT_CODER_INIT.init = (uintptr_t) NULL;
 LZMA_NEXT_CODER_INIT.id = LZMA_VLI_UNKNOWN;
 LZMA_NEXT_CODER_INIT.code = NULL;
@@ -285,7 +285,7 @@ LZMA_NEXT_CODER_INIT.get_progress = NULL;
 LZMA_NEXT_CODER_INIT.get_check = NULL;
 LZMA_NEXT_CODER_INIT.memconfig = NULL;
 LZMA_NEXT_CODER_INIT.update = NULL;
-LZMA_NEXT_CODER_INIT.set_out_limit = NULL;
+LZMA_NEXT_CODER_INIT.set_out_limit = NULL; */
 
 
 /// Internal data for lzma_strm_init, lzma_code, and lzma_end. A pointer to

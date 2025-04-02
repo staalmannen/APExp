@@ -55,6 +55,8 @@ typedef uint64_t	uint_least64_t;
 typedef _intptr_t intptr_t;
 typedef _uintptr_t uintptr_t;
 
+#define UINT32_C(x) (unsigned long) x
+
 #define INT8_MIN	((int8_t)0x80)
 #define INT16_MIN	((int16_t)0x8000)
 #define INT32_MIN	((int32_t)0x80000000)

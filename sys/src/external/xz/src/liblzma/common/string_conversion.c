@@ -228,7 +228,6 @@ typedef struct {
 	} u;
 } option_map;
 
-
 static const char *parse_options(const char **const str, const char *str_end,
 		void *filter_options,
 		const option_map *const optmap, const size_t optmap_size);
