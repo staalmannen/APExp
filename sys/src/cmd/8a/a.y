@@ -20,7 +20,7 @@
 %left	'+' '-'
 %left	'*' '/' '%'
 %token	<lval>	LTYPE0 LTYPE1 LTYPE2 LTYPE3 LTYPE4
-%token	<lval>	LTYPEC LTYPED LTYPEN LTYPER LTYPET LTYPES LTYPEM LTYPEI LTYPEG LTYPEXC LTYPEX
+%token	<lval>	LTYPEC LTYPED LTYPEN LTYPER LTYPET LTYPES LTYPEM LTYPEI LTYPEG LTYPEXC LTYPEX LTYPEXQ
 %token	<lval>	LCONST LFP LPC LSB
 %token	<lval>	LBREG LLREG LSREG LFREG LMREG LXREG
 %token	<dval>	LFCONST
@@ -30,7 +30,7 @@
 %type	<con2>	con2
 %type	<gen>	mem imm imm2 reg nam rel rem rim rom omem nmem
 %type	<gen2>	nonnon nonrel nonrem rimnon rimrem remrim
-%type	<gen2>	spec1 spec2 spec3 spec4 spec5 spec6 spec7 spec8 spec9 spec10
+%type	<gen2>	spec1 spec2 spec3 spec4 spec5 spec6 spec7 spec8 spec9 spec10 spec11
 %%
 prog:
 |	prog line
@@ -81,6 +81,7 @@ inst:
 |	LTYPEG spec8	{ outcode($1, &$2); }
 |	LTYPEXC spec9	{ outcode($1, &$2); }
 |	LTYPEX spec10	{ outcode($1, &$2); }
+|	LTYPEXQ spec11	{ outcode($1, &$2); }
 
 nonnon:
 	{
@@ -255,6 +256,13 @@ spec10:	/* shufl */
 		if($1.type != D_CONST)
 			yyerror("illegal constant");
 		$$.to.offset = $1.offset;
+	}
+
+spec11: /* CMPXCHG8B */
+	mem
+	{
+		$$.from = nullgen;
+		$$.to = $1;
 	}
 
 rem:

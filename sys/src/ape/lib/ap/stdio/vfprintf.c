@@ -215,7 +215,7 @@ vfprintf(FILE *f, const char *s, va_list args)
 		}
 		return -1;
 	}
-	return ferror(f) ? -1 : nprint;
+	return nprint;
 }
 
 static int

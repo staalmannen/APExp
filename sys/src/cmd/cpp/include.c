@@ -23,10 +23,10 @@ oncecmp(Once *a, Once *b)
 static int
 curpos(int next)
 {
-	if (next)
-		return cursource->pos;
-	return NINCLUDE;
-}
+		if (next)
+			return cursource->pos;
+		return NINCLUDE;
+	}
 
 void
 doinclude(Tokenrow *trp, int next)
@@ -95,8 +95,8 @@ doinclude(Tokenrow *trp, int next)
 			strcat(iname, "/");
 			strcat(iname, fname);
 			if((fd = open(iname, 0)) >= 0){
-				pos = i;
-				break;
+					pos = i;
+					break;
 			}
 		}
 		if (fd<0 && angled && !next) {

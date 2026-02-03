@@ -51,9 +51,9 @@ the most capable web browser available on Plan9.
 **Modifications made to APE**
 
 
-***Starting material :*** Imported the latest 9front APE sources from git [7] (date: 2024-04-24)
-In addition, several patches from @lufia [8, 9] to build libressl and curl
-(introduces pthread, include_next cpp support, etc) and @jamoson (bitfield support in kencc) [10] has been applied to the
+***Starting material :*** Imported the latest 9front APE sources from git [7] (date: 2024-04-24; rebased 2026-01-29, which included the bitfield patch from @jamoson (bitfield support in kencc) [8]).
+In addition, several patches from @lufia [9, 10] to build libressl and curl
+(introduces pthread, include_next cpp support, etc) has been applied to the
 sources. This served as a base to add ports of third party libraries and utilities to enhance compatibility.
 
 
@@ -137,11 +137,11 @@ sources could be a barrier. Because of this, APExp package several (un)archivers
 
 [7] git://git.9front.org/plan9front/plan9front
 
-[8] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52adaf.squirrel@mx.sdf.org/
+[8] https://webbkurs.ei.hv.se/~imjam/pub/kenccbitfield/
 
 [9] https://github.com/lufia/plan9/pulls
 
-[10] https://webbkurs.ei.hv.se/~imjam/pub/kenccbitfield/
+[10] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52adaf.squirrel@mx.sdf.org/
 
 [11] https://github.com/staalmannen/libwtf
 

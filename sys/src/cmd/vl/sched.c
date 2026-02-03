@@ -341,6 +341,12 @@ regsused(Sch *s, Prog *realp)
 				print("botch %P\n", p);
 		}
 		break;
+
+	case ASC:
+	case ALL:
+		sz = 4;
+		ld = 1;
+		break;
 	}
 
 /*
@@ -516,6 +522,10 @@ regsused(Sch *s, Prog *realp)
 		s->used.ireg |= 1<<REGSB;
 		break;
 	case C_REG:
+		/* special case -- SC writes result to p->from.reg */
+		if (p->as == ASC)
+			s->set.ireg |= 1<<p->from.reg;
+
 		s->used.ireg |= 1<<p->from.reg;
 		break;
 	case C_FREG:
@@ -590,6 +600,15 @@ depend(Sch *sa, Sch *sb)
 		if(sa->p.reg == sb->p.reg)
 		if(regoff(&sa->p.from) == regoff(&sb->p.from))
 			return 1;
+
+	/*
+	 * special case
+	 * atomic instructions cannot pass.
+	 */
+	if(sa->p.as == ALL || sb->p.as == ALL)
+		return 1;
+	if(sa->p.as == ASC || sb->p.as == ASC)
+		return 1;
 
 	x = (sa->set.cc & (sb->set.cc|sb->used.cc)) |
 		(sb->set.cc & sa->used.cc);

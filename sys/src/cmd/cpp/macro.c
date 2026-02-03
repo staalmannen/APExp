@@ -185,7 +185,7 @@ expandrow(Tokenrow *trp, char *flag)
 void
 expand(Tokenrow *trp, Nlist *np)
 {
-	int ntokc, narg, i, hs;
+	int ntokc, narg, nparam, i, hs;
 	Tokenrow *atr[NARG+1];
 	Tokenrow ntr;
 	Token *tp;
@@ -202,7 +202,18 @@ expand(Tokenrow *trp, Nlist *np)
 			/* gatherargs has already pushed trp->tr to the next token */
 			return;
 		}
-		if (narg != rowlen(np->ap)) {
+		nparam = rowlen(np->ap);
+
+		if(narg == nparam - 1
+		&& (narg == 0 || (np->flag&ISVARMAC))) {
+			if(narg == NARG)
+				error(ERROR, "Too many arguments");
+			atr[narg] = new(Tokenrow);
+			maketokenrow(0, atr[narg]);
+			narg++;
+		}
+
+		if (narg != nparam) {
 			error(ERROR, "Disagreement in number of macro arguments");
 			trp->tp->hideset = newhideset(trp->tp->hideset, np);
 			trp->tp += ntokc;

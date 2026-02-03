@@ -215,6 +215,9 @@ struct
 	"R30",		LREG,	30,
 	"R31",		LREG,	31,
 
+	"RARG",		LREG,	REGARG,
+	"RSP",		LREG,	REGSP,
+
 	"F",		LF,	0,
 	"F0",		LFREG,	0,
 	"F1",		LFREG,	1,

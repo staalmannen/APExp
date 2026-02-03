@@ -388,6 +388,10 @@ struct
 
 	"MCR",		LTYPEJ, 0,
 	"MRC",		LTYPEJ, 1,
+
+	"DMB",		LTYPEDMB, ADMB,
+	"DSB",		LTYPEDMB, ADSB,
+	"ISB",		LTYPEDMB, AISB,
 	0
 };
 

@@ -336,7 +336,7 @@ regalloc(Node *n, Node *tn, Node *o)
 			regalloc(n->right, &regnode, o->right);
 		} else {
 			regalloc(n->left, &regnode, Z);
-			regalloc(n->right, &regnode, Z);
+			regalloc(n->right, &regnode, o);
 		}
 		n->right->type = types[TULONG];
 		if(tn->type->etype == TUVLONG)

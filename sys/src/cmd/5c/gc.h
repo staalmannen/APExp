@@ -126,7 +126,6 @@ struct	Reg
 };
 #define	R	((Reg*)0)
 
-#define	NRGN	600
 struct	Rgn
 {
 	Reg*	enter;
@@ -149,16 +148,13 @@ EXTERN	long	maxargsafe;
 EXTERN	int	mnstring;
 EXTERN	Multab	multab[20];
 EXTERN	int	hintabsize;
-EXTERN	Node*	nodrat;
 EXTERN	Node*	nodret;
 EXTERN	Node*	nodsafe;
-EXTERN	long	nrathole;
 EXTERN	long	nstring;
 EXTERN	Prog*	p;
 EXTERN	long	pc;
 EXTERN	Node	regnode;
 EXTERN	char	string[NSNAME];
-EXTERN	Sym*	symrathole;
 EXTERN	Node	znode;
 EXTERN	Prog	zprog;
 EXTERN	char	reg[NREG+NFREG];
@@ -178,9 +174,6 @@ EXTERN	int	suppress;
 #define	CINF	1000
 #define	LOOP	3
 
-EXTERN	Rgn	region[NRGN];
-EXTERN	Rgn*	rgp;
-EXTERN	int	nregion;
 EXTERN	int	nvar;
 
 EXTERN	Bits	externs;

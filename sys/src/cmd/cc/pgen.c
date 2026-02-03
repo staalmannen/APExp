@@ -12,6 +12,11 @@ codgen(Node *n, Node *nn)
 	hasdoubled = 0;
 
 	/*
+	 * no point in giving invalid code to the backend.
+	 */
+	if(nerrors != 0)
+		return;
+	/*
 	 * isolate name
 	 */
 	for(n1 = nn;; n1 = n1->left) {
@@ -122,12 +127,13 @@ uncomma(Node *n)
 void
 gen(Node *n)
 {
-	Node *l, nod, rn;
+	Node *l, *r, nod, rn;
 	Prog *sp, *spc, *spb;
 	Case *cn;
 	long sbc, scc;
 	int snbreak, sncontin;
 	int f, o, oldreach;
+	vlong i, end;
 
 loop:
 	if(n == Z)
@@ -184,8 +190,6 @@ loop:
 	case OLIST:
 	case OCOMMA:
 		gen(n->left);
-
-	rloop:
 		n = n->right;
 		goto loop;
 
@@ -247,7 +251,7 @@ loop:
 		}
 		gbranch(OGOTO);	/* prevent self reference in reg */
 		patch(p, pc);
-		goto rloop;
+		break;
 
 	case OGOTO:
 		canreach = 0;
@@ -274,6 +278,7 @@ loop:
 	case OCASE:
 		canreach = 1;
 		l = n->left;
+		r = n->right;
 		if(cases == C)
 			diag(n, "case/default outside a switch");
 		if(l == Z) {
@@ -282,21 +287,37 @@ loop:
 			cases->def = 1;
 			cases->label = pc;
 			cases->isv = 0;
-			goto rloop;
+			break;
 		}
 		complex(l);
 		if(l->type == T)
-			goto rloop;
+			break;
 		if(l->op != OCONST || !typeswitch[l->type->etype]) {
 			diag(n, "case expression must be integer constant");
-			goto rloop;
+			break;
 		}
-		casf();
-		cases->val = l->vconst;
-		cases->def = 0;
-		cases->label = pc;
-		cases->isv = typev[l->type->etype];
-		goto rloop;
+		if(r != Z){
+			complex(r);
+			if(r->op != OCONST || !typeswitch[r->type->etype]) {
+				diag(n, "case expression must be integer constant");
+				break;
+			}
+			if(r->vconst < l->vconst){
+				diag(n, "case range must be increasing");
+				break;
+			}
+			end = r->vconst;
+		} else
+			end = l->vconst;
+
+		for(i = l->vconst; i <= end; i++){
+			casf();
+			cases->val = i;
+			cases->def = 0;
+			cases->label = pc;
+			cases->isv = typev[l->type->etype];
+		}
+		break;
 
 	case OSWITCH:
 		l = n->left;
@@ -554,6 +575,8 @@ loop:
 void
 usedset(Node *n, int o)
 {
+	if(n == Z)
+		return;
 	if(n->op == OLIST) {
 		usedset(n->left, o);
 		usedset(n->right, o);

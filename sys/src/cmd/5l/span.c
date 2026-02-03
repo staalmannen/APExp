@@ -794,6 +794,11 @@ buildop(void)
 			oprange[AMULLU] = oprange[r];
 			oprange[AMULALU] = oprange[r];
 			break;
+
+		case ADMB:
+			oprange[ADSB] = oprange[r];
+			oprange[AISB] = oprange[r];
+			break;
 		}
 	}
 }

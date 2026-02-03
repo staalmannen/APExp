@@ -1,5 +1,4 @@
 #include "gc.h"
-extern long	*GEdatap;	/* Passing DATA constant to caller of gextern() */
 
 void
 swit1(C1 *q, int nc, long def, Node *n)
@@ -306,7 +305,6 @@ gextern(Sym *s, Node *a, long o, long w)
 		return;
 	}
 	gpseudo(ADATA, s, a);
-	GEdatap = &(p->to.offset); /* pass ptr to DATA const to caller */
 	p->from.offset += o;
 	p->reg = w;
 	if(p->to.type == D_OREG)
@@ -483,7 +481,7 @@ zname(Biobuf *b, Sym *s, int t)
 	ulong sig;
 
 	n = s->name;
-	if(debug['T'] && t == D_EXTERN && s->sig != SIGDONE && s->type != types[TENUM] && s != symrathole){
+	if(debug['T'] && t == D_EXTERN && s->sig != SIGDONE && s->type != types[TENUM]){
 		sig = sign(s);
 		bf[0] = ASIGNAME;
 		bf[1] = sig;

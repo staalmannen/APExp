@@ -1,6 +1,8 @@
 #define NOP(x) x
 #define CAT(a, b) a ## b
 #define EOF	(-1)
+
+-- test nop --
 x NOP(CAT(foo, EOF)) y
 x NOP(CAT(EOF, foo)) y
 x CAT(, EOF) y
@@ -8,32 +10,34 @@ y CAT(foo,) x
 x CAT(,foo) y
 X NOP(CAT(,)) y
 
+-- test ncat --
 #define NCAT(a)	foo ## a
 NCAT(bar)
 
+-- test xcat (no left arg) --
 #define XCAT(a)	## a
 foo XCAT(bar)
 
+-- test cat3 --
 #define CAT3(foo)	a##foo##b
 CAT3(blah)
 
+-- test expand and cat --
 #define BAR	3
 #define FOO	CAT(BAR, 3)
 FOO
 
+-- test expand and cat 2 --
 /* Expected: a bc d */
 CAT(a b, c d)
 WUT
 
-/*
- * CURRENTLY BROKEN:
- *     __VA_ARGS__ requires at least one item.
- *     It should accept an empty list.
+-- test varargs --
 #define xprint(a, ...)	print(a, __VA_ARGS__)
 xprint("hi", "there")
 xprint("hi")
-*/
 
+-- test expanding commas --
 #define C	a,b
 #define X(a)	a
 #define Y	X(C)
@@ -53,13 +57,15 @@ Y
 #define    q(x)       x
 #define    r(x,y)     x ## y
 #define    str(x)     # x
+-- test complex expressions --
 f(y+1) + f(f(z)) % t(t(g)(0) + t)(1);
 g(x+(3,4)-w) | h 5) & m
 (f)^m(m);
-/*
- * CURRENTLY BROKEN:
- *     mac() needs at least one argument.
- *     It should treat no args as a single empty arg list.
+
+-- test empty args --
+#define ZARGS(a) a b a
+ZARGS()
+
+-- test complex expressions with empty args --
 p() i[q()] = { q(1), r(2,3), r(4,), r(,5), r(,) };
 char c[2][6] = { str(hello), str() };
-*/

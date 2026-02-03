@@ -160,6 +160,10 @@ enum	as
 
 	AROR,
 
+	ADMB,
+	ADSB,
+	AISB,
+
 	ALAST,
 };
 

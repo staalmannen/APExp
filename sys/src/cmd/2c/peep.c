@@ -147,7 +147,6 @@ loop1:
 void
 excise(Reg *r)
 {
-
 	p = r->prog;
 	p->as = ANOP;
 	p->from = zprog.from;
@@ -930,6 +929,8 @@ copyu(Prog *p, Adr *v, Adr *s)
 		return 3;
 
 	case ABSR:	/* funny */
+		if(copyau(&p->to, v))
+			return 4;
 		t = v->type;
 		if(t >= D_R0 && t < D_R0+NREG)
 		if(t-D_R0 > exregoffset)

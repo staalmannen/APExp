@@ -1124,6 +1124,12 @@ PP = p;
 		o1 = 0xf57ff01f;
 		break;
 
+	case 43:	/* dmb */
+		o1 = opirr(p->as);
+		if(p->from.type == D_CONST)
+			o1 |= p->from.offset & 0xF;
+		break;
+
 	case 50:	/* floating point store */
 		v = regoff(&p->to);
 		r = p->to.reg;
@@ -1486,6 +1492,20 @@ PP = p;
 		lputl(o6);
 		break;
 	}
+}
+
+long
+opirr(int a)
+{
+	switch(a) {
+	case ADSB:	return 0xf57ff040;
+	case ADMB:	return 0xf57ff050;
+	case AISB:		return 0xf57ff060;
+	}
+
+	diag("bad irr %d", a);
+	prasm(curp);
+	return 0;
 }
 
 long

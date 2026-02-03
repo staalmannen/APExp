@@ -81,6 +81,12 @@ tcomo(Node *n, int f)
 		diag(n, "unknown op in type complex: %O", n->op);
 		goto bad;
 
+	case OBIT:
+		if(tcom(l))
+			goto bad;
+		n->addable = l->addable;
+		break;
+
 	case ODOTDOT:
 		/*
 		 * tcom has already been called on this subtree
@@ -723,7 +729,7 @@ tcomo(Node *n, int f)
 	t = n->type;
 	if(t == T)
 		goto bad;
-	if(t->width < 0) {
+	if(t->width < 0 && !(f & ADDROP)) {
 		snap(t);
 		if(t->width < 0) {
 			if(typesu[t->etype] && t->tag)

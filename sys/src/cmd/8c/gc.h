@@ -122,7 +122,6 @@ struct	Renv
 	Node*	scope;
 };
 
-#define	NRGN	600
 struct	Rgn
 {
 	Reg*	enter;
@@ -143,10 +142,8 @@ EXTERN	Prog*	firstp;
 EXTERN	Prog*	lastp;
 EXTERN	long	maxargsafe;
 EXTERN	int	mnstring;
-EXTERN	Node*	nodrat;
 EXTERN	Node*	nodret;
 EXTERN	Node*	nodsafe;
-EXTERN	long	nrathole;
 EXTERN	long	nstring;
 EXTERN	Prog*	p;
 EXTERN	long	pc;
@@ -154,7 +151,6 @@ EXTERN	Node	regnode;
 EXTERN	Node	fregnode0;
 EXTERN	Node	fregnode1;
 EXTERN	char	string[NSNAME];
-EXTERN	Sym*	symrathole;
 EXTERN	Node	znode;
 EXTERN	Prog	zprog;
 EXTERN	int	reg[D_NONE];
@@ -173,9 +169,6 @@ EXTERN	long	exfregoffset;
 #define	CINF	1000
 #define	LOOP	3
 
-EXTERN	Rgn	region[NRGN];
-EXTERN	Rgn*	rgp;
-EXTERN	int	nregion;
 EXTERN	int	nvar;
 
 EXTERN	Bits	externs;

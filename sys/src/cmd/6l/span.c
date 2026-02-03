@@ -596,7 +596,7 @@ static void
 put4(long v)
 {
 	if(dlm && curp != P && reloca != nil){
-		dynreloc(reloca->sym, curp->pc + andptr - &and[0], 1);
+		dynreloc(reloca->sym, curp->pc + andptr - &and[0] + !!rexflag, 1);
 		reloca = nil;
 	}
 	andptr[0] = v;
@@ -610,7 +610,7 @@ static void
 put8(vlong v)
 {
 	if(dlm && curp != P && reloca != nil){
-		dynreloc(reloca->sym, curp->pc + andptr - &and[0], 1);	/* TO DO */
+		dynreloc(reloca->sym, curp->pc + andptr - &and[0] + !!rexflag, 1);	/* TO DO */
 		reloca = nil;
 	}
 	andptr[0] = v;

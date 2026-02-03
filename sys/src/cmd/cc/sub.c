@@ -1796,8 +1796,8 @@ Init	tandinit[] =
 	TUCHAR,		BINTEGER,	0,
 	TSHORT,		BINTEGER,	0,
 	TUSHORT,	BINTEGER,	0,
-	TINT,		BNUMBER,	0,
-	TUINT,		BNUMBER,	0,
+	TINT,		BINTEGER,	0,
+	TUINT,		BINTEGER,	0,
 	TLONG,		BINTEGER,	0,
 	TULONG,		BINTEGER,	0,
 	TVLONG,		BINTEGER,	0,
@@ -2067,7 +2067,7 @@ loop:
 	case OCASE:
 		if(!caseok)
 			return 0;
-		goto rloop;
+		break;
 
 	case OSWITCH:
 		return deadhead(n->right, 1);

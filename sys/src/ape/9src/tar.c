@@ -15,7 +15,7 @@
 void
 usage(void)
 {
-	fprint(2, "usage: ape/tar [crtx][vfmop] [args...] [file...]\n");
+	fprint(2, "usage: ape/tar [crtx][vfm] [args...] [file...]\n");
 	exits("usage");
 }
 
@@ -73,8 +73,7 @@ main(int argc, char **argv)
 		case 'm':
 			Tflag = 0;
 			break;
-		case 'o':		/* pretend nothing's wrong */
-		case 'p':
+		case 'p':		/* pretend nothing's wrong */
 			break;
 		}
 	}

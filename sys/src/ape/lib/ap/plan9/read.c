@@ -1,5 +1,4 @@
 #include <errno.h>
-#include <inttypes.h>
 #include <unistd.h>
 #include <string.h>
 #include "lib.h"
@@ -8,7 +7,7 @@
 #include <stdio.h>
 
 ssize_t
-pread(int d, void *buf, size_t nbytes, off_t offset)
+read(int d, void *buf, size_t nbytes)
 {
 	int n, noblock, isbuf;
 	Fdinfo *f;
@@ -39,15 +38,9 @@ pread(int d, void *buf, size_t nbytes, off_t offset)
 		}
 		n = _readbuf(d, buf, nbytes, noblock);
 	}else{
-		n = _PREAD(d, buf, nbytes, offset);
+		n = _READ(d, buf, nbytes);
 		if(n < 0)
 			_syserrno();
 	}
 	return n;
-}
-
-ssize_t
-read(int d, void *buf, size_t nbytes)
-{
-	return pread(d, buf, nbytes, -1LL);
 }

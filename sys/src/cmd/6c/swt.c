@@ -1,5 +1,4 @@
 #include "gc.h"
-extern long	*GEdatap;	/* Passing DATA constant to caller of gextern() */
 
 void
 swit1(C1 *q, int nc, long def, Node *n)
@@ -158,7 +157,6 @@ gextern(Sym *s, Node *a, long o, long w)
 		return;
 	}
 	gpseudo(ADATA, s, a);
-	GEdatap = (long *) &(p->to.offset); /* pass ptr to DATA const to caller */
 	p->from.offset += o;
 	p->from.scale = w;
 	switch(p->to.type) {

@@ -307,7 +307,7 @@ aclass(Adr *a)
 			}
 			if(s->type == STEXT || s->type == SLEAF || s->type == SUNDEF) {
 				instoffset = s->value + a->offset;
-				goto consize;
+				return C_LCON;
 			}
 			if(s->type == SCONST) {
 				instoffset = s->value + a->offset;
@@ -321,9 +321,7 @@ aclass(Adr *a)
 					return C_SECON;
 			}
 			instoffset = s->value + a->offset + INITDAT;
-			if(dlm)
-				return C_LCON;
-			goto consize;
+			return C_LCON;
 
 		case D_AUTO:
 			instoffset = autosize + a->offset;

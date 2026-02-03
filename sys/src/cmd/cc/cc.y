@@ -64,7 +64,7 @@
 %token	LIF LINT LLONG LREGISTER LRETURN LSHORT LSIZEOF LUSED
 %token	LSTATIC LSTRUCT LSWITCH LTYPEDEF LTYPESTR LUNION LUNSIGNED
 %token	LWHILE LVOID LENUM LSIGNED LCONSTNT LVOLATILE LSET LSIGNOF
-%token	LRESTRICT LINLINE LNORET
+%token	LRESTRICT LINLINE LNORET LDOTDOTDOT
 %%
 prog:
 |	prog xdecl
@@ -353,7 +353,7 @@ arglist:
 		$$ = new(OPROTO, $2, Z);
 		$$->type = $1;
 	}
-|	'.' '.' '.'
+|	LDOTDOTDOT
 	{
 		$$ = new(ODOTDOT, Z, Z);
 	}
@@ -393,7 +393,11 @@ labels:
 	}
 
 label:
-	LCASE expr ':'
+	LCASE expr LDOTDOTDOT expr ':'	/* extension */
+	{
+		$$ = new(OCASE, $2, $4);
+	}
+|	LCASE expr ':'
 	{
 		$$ = new(OCASE, $2, Z);
 	}

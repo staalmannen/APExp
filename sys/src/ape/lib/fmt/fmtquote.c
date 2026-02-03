@@ -30,6 +30,17 @@
  * *ninp is set to number of input bytes accepted.
  * nin may be <0 initially, to avoid checking input by count.
  */
+
+static int
+fmtdoquote(int c)
+{
+	if(c <= ' ')
+		return 1;
+	if(utfrune("`^#*[]=|\\?${}()'<>&;", c))
+		return 1;
+	return 0;
+}
+
 void
 __quotesetup(char *s, Rune *r, int nin, int nout, Quoteinfo *q, int sharp, int runesout)
 {
@@ -66,7 +77,7 @@ __quotesetup(char *s, Rune *r, int nin, int nout, Quoteinfo *q, int sharp, int r
 				break;
 		}
 
-		if((c <= L' ') || (c == L'\'') || (fmtdoquote!=nil && fmtdoquote(c))){
+		if((c <= L' ') || (c == L'\'') || fmtdoquote(c)){
 			if(!q->quoted){
 				if(runesout){
 					if(1+q->nrunesout+1+1 > nout)	/* no room for quotes */

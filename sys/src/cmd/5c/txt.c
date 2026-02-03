@@ -5,8 +5,6 @@ static	char	resvreg[nelem(reg)];
 void
 ginit(void)
 {
-	Type *t;
-
 	thechar = '5';
 	thestring = "arm";
 	exregoffset = REGEXT;
@@ -14,7 +12,6 @@ ginit(void)
 	listinit();
 	nstring = 0;
 	mnstring = 0;
-	nrathole = 0;
 	pc = 0;
 	breakpc = -1;
 	continpc = -1;
@@ -58,19 +55,6 @@ ginit(void)
 	nodsafe->class = CAUTO;
 	complex(nodsafe);
 
-	t = typ(TARRAY, types[TCHAR]);
-	symrathole = slookup(".rathole");
-	symrathole->class = CGLOBL;
-	symrathole->type = t;
-
-	nodrat = new(ONAME, Z, Z);
-	nodrat->sym = symrathole;
-	nodrat->type = types[TIND];
-	nodrat->etype = TVOID;
-	nodrat->class = CGLOBL;
-	complex(nodrat);
-	nodrat->type = t;
-
 	nodret = new(ONAME, Z, Z);
 	nodret->sym = slookup(".ret");
 	nodret->type = types[TIND];
@@ -109,7 +93,6 @@ gclean(void)
 	while(mnstring)
 		outstring("", 1L);
 	symstring->type->width = nstring;
-	symrathole->type->width = nrathole;
 	for(i=0; i<NHASH; i++)
 	for(s = hash[i]; s != S; s = s->link) {
 		if(s->type == T)
@@ -338,7 +321,7 @@ regalloc(Node *n, Node *tn, Node *o)
 			regalloc(n->left, &regnode, o->left);
 			regalloc(n->right, &regnode, o->right);
 		} else {
-			regalloc(n->left, &regnode, Z);
+			regalloc(n->left, &regnode, o);
 			regalloc(n->right, &regnode, Z);
 		}
 		if(n->left->reg > n->right->reg){

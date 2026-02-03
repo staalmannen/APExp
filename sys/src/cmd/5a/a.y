@@ -19,7 +19,7 @@
 %token	<lval>	LTYPE6 LTYPE7 LTYPE8 LTYPE9 LTYPEA
 %token	<lval>	LTYPEB LTYPEC LTYPED LTYPEE LTYPEF
 %token	<lval>	LTYPEG LTYPEH LTYPEI LTYPEJ LTYPEK
-%token	<lval>	LTYPEL LTYPEM LTYPEN LTYPEBX
+%token	<lval>	LTYPEL LTYPEM LTYPEN LTYPEBX LTYPEDMB
 %token	<lval>	LCONST LSP LSB LFP LPC
 %token	<lval>	LTYPEX LR LREG LF LFREG LC LCREG LPSR LFCR
 %token	<lval>	LCOND LS LAT
@@ -271,6 +271,14 @@ inst:
 	{
 		outcode($1, Always, &nullgen, NREG, &nullgen);
 	}
+
+/*
+ * DMB
+ */
+|	LTYPEDMB imm comma
+	{
+		outcode($1, Always, &$2, NREG, &nullgen);
+	} 
 
 cond:
 	{

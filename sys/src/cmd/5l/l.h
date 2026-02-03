@@ -363,6 +363,7 @@ void	objfile(char*);
 int	ocmp(const void*, const void*);
 long	opirr(int);
 Optab*	oplook(Prog*);
+long	opirr(int);
 long	oprrr(int, int);
 long	opvfprrr(int, int);
 long	olr(long, int, int, int);

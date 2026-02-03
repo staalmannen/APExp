@@ -29,8 +29,6 @@ char *_IO_sclose(FILE *f){
 					goto Error;
 				f->buf=t;
 				f->wp=t+f->bufl;
-			} else if(f->buf==NULL){
-				return NULL;
 			} else {
 				if(f->wp > f->buf)
 					*(f->wp-1) = '\0';

@@ -805,12 +805,12 @@ asmout(Prog *p, Optab *o)
 
 	case 59:	/* stxr */
 		o1 = opstore(p->as);
-		o1 |= p->reg << 16;
-		if(p->from3.type != D_NONE)
-			o1 |= p->from3.reg<<10;
-		else
-			o1 |= 0x1F<<10;
+		o1 |= 0x1F<<10;
 		o1 |= p->to.reg<<5;
+		if(p->reg != NREG)
+			o1 |= p->reg<<16;
+		else
+			o1 |= 0x1F<<16;
 		o1 |= p->from.reg;
 		break;
 

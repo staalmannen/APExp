@@ -79,7 +79,6 @@ main(int argc, char *argv[])
 			if(!oname)
 				fatal("no -o argument");
 			break;
-		case 'u':
 		case 'w':
 		case 'B':
 		case 'F':

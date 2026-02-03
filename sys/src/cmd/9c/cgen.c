@@ -1,34 +1,25 @@
 #include "gc.h"
 
-/*
- * POWER only gives us 16 bit immediates and shifted 16 bit immediate with optional sign extension
- */
-
 static int
 issim16(vlong v)
 {
+	/* addi */
 	if((short)v == v)
 		return 1;
-
-	if(v < 0 && (v & 0xFFFFFFFFULL<<32) != 0xFFFFFFFFULL<<32)
-		return 0;
-	else if((v & 0xFFFFFFFFULL<<32) != 0)
-		return 0;
-
-	if((v & 0xFFFF) != 0)
-		return 0;
-	return 1;
+	/* addis */
+	if(v == (long)(v & 0xFFFF0000))
+		return 1;
+	return 0;
 }
 
-
 static int
-isuim16(vlong v)
+isuim16(uvlong v)
 {
+	/* andi */
 	if((ushort)v == v)
 		return 1;
-	if((v & 0xFFFFFFFFULL<<32) != 0)
-		return 0;
-	if((v & 0xFFFF) == 0)
+	/* andis */
+	if(v == (ulong)(v & 0xFFFF0000))
 		return 1;
 	return 0;
 }
@@ -192,8 +183,11 @@ cgen(Node *n, Node *nn)
 		goto usereg;
 
 	case OSUB:
-		r->vconst = -r->vconst;
-		o = n->op = OADD;
+		if(r->op == OCONST)
+		if(!typefd[n->type->etype]) {
+			r->vconst = -r->vconst;
+			o = n->op = OADD;
+		}
 
 	case OADD:
 		/*
@@ -274,8 +268,11 @@ cgen(Node *n, Node *nn)
 		goto useregas;
 
 	case OASSUB:
-		r->vconst = -r->vconst;
-		o = n->op = OASADD;
+		if(r->op == OCONST)
+		if(!typefd[n->type->etype]) {
+			r->vconst = -r->vconst;
+			o = n->op = OADD;
+		}
 
 	case OASADD:
 		if(l->op == OBIT)

@@ -439,6 +439,11 @@ uchar	ymskb[] =
 	Ymr,	Yrl,	Zm_r_xm,	1,
 	0
 };
+uchar	ycxq[] =
+{
+	Ynone,	Ym,	Zo_m,	2,
+	0
+};
 
 Optab optab[] =
 /*	as, ytab, andproto, opcode */
@@ -836,6 +841,9 @@ Optab optab[] =
 	{ AVERW,	ydivl,	Pm, 0x00,(05) },
 	{ AWAIT,	ynone,	Px, 0x9b },
 	{ AWORD,	ybyte,	Px, 2 },
+	{ AXADDB,	yml_mb, Pm, 0xc0,0xc0 },
+	{ AXADDL,	yml_ml, Pm, 0xc1,0xc1 },
+	{ AXADDW,	yml_ml, Pq, 0xc1,0xc1 },
 	{ AXCHGB,	yml_mb,	Pb, 0x86,0x86 },
 	{ AXCHGL,	yml_ml,	Px, 0x87,0x87 },
 	{ AXCHGW,	yml_ml,	Pe, 0x87,0x87 },
@@ -952,6 +960,11 @@ Optab optab[] =
 	{ AFXTRACT,	ynone,	Px, 0xd9, 0xf4 },
 	{ AFYL2X,	ynone,	Px, 0xd9, 0xf1 },
 	{ AFYL2XP1,	ynone,	Px, 0xd9, 0xf9 },
+
+	{ ACMPXCHGB,	yml_mb,	Pm, 0xb0, 0xb0 },
+	{ ACMPXCHGL,	yml_mb,	Pm, 0xb1, 0xb1 },
+	{ ACMPXCHGW,	yml_mb,	Pq, 0xb1, 0xb1 },
+	{ ACMPXCHG8B,	ycxq,	Pm, 0xc7, (01) },
 
 	{ AEND },
 	0

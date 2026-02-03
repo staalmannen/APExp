@@ -51,7 +51,6 @@
  *	-p		use standard cpp ANSI preprocessor (not on windows)
  *	-s		print structure offsets (with -a or -aa)
  *	-t		print type trees
- *	-u		enable implicit conversion between type* and utype*
  *	-v		verbose printing
  *	-w		print warnings
  *	-x
@@ -517,7 +516,14 @@ l1:
 
 	case '.':
 		c1 = GETC();
-		if(isdigit(c1)) {
+		if(c1 == '.'){
+			c = GETC();
+			if(c == '.')
+				return LDOTDOTDOT;
+			else
+				yyerror(".. instead of ...");
+				
+		} else if(isdigit(c1)) {
 			cp = symb;
 			*cp++ = c;
 			c = c1;
