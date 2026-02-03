@@ -23,10 +23,10 @@ oncecmp(Once *a, Once *b)
 static int
 curpos(int next)
 {
-		if (next)
-			return cursource->pos;
-		return NINCLUDE;
-	}
+	if (next)
+		return cursource->pos;
+	return NINCLUDE;
+}
 
 void
 doinclude(Tokenrow *trp, int next)

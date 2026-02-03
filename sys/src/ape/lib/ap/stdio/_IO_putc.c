@@ -51,8 +51,13 @@ int _IO_putc(int c, FILE *f){
 				f->bufl+=BUFSIZ;
 				f->rp=t+f->bufl;
 			}else{
-				f->state=ERR;
-				return EOF;
+				/*
+				 * [v]snprintf should return number of characters
+				 * which would have written if enough space had enough available.
+				 * however sprintf is not.
+				 */
+				f->state=WR;
+				return c&0xff;
 			}
 		}
 		*f->wp++=c;

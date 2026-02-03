@@ -30,6 +30,16 @@ struct Rendez
 	QLp	*tail;
 } Rendez;
 
+typedef
+struct RWLock
+{
+	Lock	lock;
+	int	readers;	/* number of readers */
+	int	writer;		/* number of writers */
+	QLp	*head;		/* list of waiting processes */
+	QLp	*tail;
+} RWLock;
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,6 +51,13 @@ extern	int	canqlock(QLock*);
 extern	void	rsleep(Rendez*);
 extern	int	rwakeup(Rendez*);
 extern	int	rwakeupall(Rendez*);
+
+extern	void	rlock(RWLock*);
+extern	void	runlock(RWLock*);
+extern	int	canrlock(RWLock*);
+extern	void	wlock(RWLock*);
+extern	void	wunlock(RWLock*);
+extern	int	canwlock(RWLock*);
 
 #ifdef __cplusplus
 }

@@ -24,6 +24,7 @@ typedef struct	Rectangle Rectangle;
 typedef struct	RGB RGB;
 typedef struct	Screen Screen;
 typedef struct	Subfont Subfont;
+typedef long	Warp[3][3];
 
 #pragma varargck	type	"R"	Rectangle
 #pragma varargck	type	"P"	Point
@@ -182,8 +183,9 @@ struct Screen
 
 struct Display
 {
-	QLock	qlock;
-	int		locking;	/*program is using lockdisplay */
+	QLock		qlock;
+	RWLock		usrlock;	/* for getwindow(2) and the globals */
+	int		locking;	/* ignored (kept for backwards compatibility) */
 	int		dirno;
 	int		fd;
 	int		reffd;
@@ -460,6 +462,8 @@ extern void	fillarc(Image*, Point, int, int, Image*, Point, int, int);
 extern void	fillarcop(Image*, Point, int, int, Image*, Point, int, int, Drawop);
 extern void	border(Image*, Rectangle, int, Image*, Point);
 extern void	borderop(Image*, Rectangle, int, Image*, Point, Drawop);
+extern void	mkwarp(Warp, double[3][3]);
+extern void	affinewarp(Image*, Rectangle, Image*, Point, Warp, int);
 
 /*
  * Font management
@@ -490,8 +494,16 @@ extern int	loadchar(Font*, Rune, Cacheinfo*, int, int, char**);
 extern char*	subfontname(char*, char*, int);
 extern Subfont*	_getsubfont(Display*, char*);
 extern Subfont*	getdefont(Display*);
-extern void		lockdisplay(Display*);
+
+/*
+ * Concurrency
+ */
+extern void	lockdisplay(Display*);
 extern void	unlockdisplay(Display*);
+extern void	rlockdisplay(Display*);
+extern void	runlockdisplay(Display*);
+extern void	_lockdisplay(Display*);
+extern void	_unlockdisplay(Display*);
 
 /*
  * Predefined 
@@ -509,7 +521,7 @@ extern	Font		*font;
 extern	Image	*screen;
 extern	Screen	*_screen;
 extern	int	_cursorfd;
-extern	void	_setdrawop(Display*, Drawop);
+extern	uchar*	_bufimageop(Display*, int, Drawop);
 
 #define	BGSHORT(p)	((p)[0]|((p)[1]<<8))
 #define	BGLONG(p)	((p)[0]|((p)[1]<<8)|((p)[2]<<16)|((p)[3]<<24))
