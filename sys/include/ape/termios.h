@@ -123,6 +123,8 @@ struct termios {
 	cc_t		c_cc[NCCS];	/* control characters */
 };
 
+#include <sys/types.h>
+
 extern speed_t cfgetospeed(const struct termios *);
 extern int cfsetospeed(struct termios *, speed_t);
 extern speed_t cfgetispeed(const struct termios *);

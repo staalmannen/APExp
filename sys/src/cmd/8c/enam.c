@@ -558,5 +558,9 @@ char*	anames[] =
 	"PI2FW",
 	"PI2FL",
 	"JMPF",
+	"CMPXCHG8B",
+	"XADDB",
+	"XADDL",
+	"XADDW",
 	"LAST",
 };

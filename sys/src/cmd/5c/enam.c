@@ -102,5 +102,8 @@ char*	anames[] =
 	"STREXD",
 	"CLREX",
 	"ROR",
+	"DMB",
+	"DSB",
+	"ISB",
 	"LAST",
 };

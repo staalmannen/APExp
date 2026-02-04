@@ -35,7 +35,7 @@ pthread_atfork(void (*prepare)(void), void (*parent)(void), void
 		childhdlr[nchild++] = child;
 	}
 	return 0;
-+}
+}
 
 
 pid_t

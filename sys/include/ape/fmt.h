@@ -92,8 +92,6 @@ extern	int	runefmtstrinit(Fmt*);
 
 extern	int	quotestrfmt(Fmt *f);
 extern	void	quotefmtinstall(void);
-extern	int	(*fmtdoquote)(int);
-
 
 extern	int	fmtinstall(int, int (*)(Fmt*));
 extern	int	dofmt(Fmt*, char*);
