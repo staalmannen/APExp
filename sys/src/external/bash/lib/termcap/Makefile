@@ -22,7 +22,7 @@
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
+BUILD_DIR = ../..
 
 libdir = ${exec_prefix}/lib
 

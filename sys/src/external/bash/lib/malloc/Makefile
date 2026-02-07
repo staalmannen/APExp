@@ -18,7 +18,7 @@
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
+BUILD_DIR = ../..
 
 INSTALL = /bin/install -c
 INSTALL_PROGRAM = ${INSTALL}

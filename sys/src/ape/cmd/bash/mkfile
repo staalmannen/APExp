@@ -55,7 +55,7 @@ OFILES=\
 	tilde.$O\
 
 
-BASHSRC=../../../external/bash
+BASHSRC=$APEXPROOT/sys/src/external/bash
 
 BASHLIBS=\
 	libbuiltins.a$O\

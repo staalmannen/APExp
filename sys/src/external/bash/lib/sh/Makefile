@@ -28,7 +28,7 @@ PACKAGE_VERSION = 5.2-release
 srcdir = .
 
 topdir = ../..
-BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
+BUILD_DIR = ../..
 
 LIBBUILD = ${BUILD_DIR}/lib
 
