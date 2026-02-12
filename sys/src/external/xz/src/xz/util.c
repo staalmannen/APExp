@@ -167,6 +167,7 @@ error:
 	message_fatal(_("Value of the option '%s' must be in the range "
 				"[%" PRIu64 ", %" PRIu64 "]"),
 				name, min, max);
+	return result;
 }
 
 

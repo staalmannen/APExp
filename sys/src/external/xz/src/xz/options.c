@@ -170,11 +170,11 @@ options_delta(const char *str)
 	};
 
 	lzma_options_delta *options = xmalloc(sizeof(lzma_options_delta));
-	*options = (lzma_options_delta){
+/*	*options = (lzma_options_delta){
 		// It's hard to give a useful default for this.
 		.type = LZMA_DELTA_TYPE_BYTE,
 		.dist = LZMA_DELTA_DIST_MIN,
-	};
+	}; */
 
 	parse_options(str, opts, &set_delta, options);
 
@@ -213,9 +213,9 @@ options_bcj(const char *str)
 	};
 
 	lzma_options_bcj *options = xmalloc(sizeof(lzma_options_bcj));
-	*options = (lzma_options_bcj){
+/*	*options = (lzma_options_bcj){
 		.start_offset = 0,
-	};
+	}; */
 
 	parse_options(str, opts, &set_bcj, options);
 

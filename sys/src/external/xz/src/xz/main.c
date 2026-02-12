@@ -364,4 +364,5 @@ main(int argc, char **argv)
 		es = E_SUCCESS;
 
 	tuklib_exit((int)es, E_ERROR, message_verbosity_get() != V_SILENT);
+	return 0;
 }

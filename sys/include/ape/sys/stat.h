@@ -52,6 +52,8 @@ struct	stat {
 #define	S_IROTH	00004		/* read permission: other */
 #define	S_IWOTH	00002		/* write permission: other */
 #define	S_IXOTH	00001		/* execute permission: other */
+/*hack*/
+#define S_ISVTX S_IWOTH
 
 #define S_IFMT S__MASK
 #define S_IFDIR 0040000
@@ -72,6 +74,9 @@ extern int mkfifo(const char *, mode_t);
 extern int stat(const char *, struct stat *);
 extern int fstat(int, struct stat *);
 extern int chmod(const char *, mode_t);
+/* stubs */
+extern int fchown (int fd, uid_t uid, gid_t gid);
+extern int fchmod (int fd, mode_t mode);
 
 #pragma lib "/$M/lib/ape/libbsd.a"
 extern int	lstat(char *, struct stat *);

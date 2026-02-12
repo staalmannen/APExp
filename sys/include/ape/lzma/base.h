@@ -14,6 +14,8 @@
 #	error Never include this file directly. Use <lzma.h> instead.
 #endif
 
+#include <stdint.h>
+
 
 /**
  * \brief       Boolean

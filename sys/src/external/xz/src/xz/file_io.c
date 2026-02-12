@@ -702,7 +702,7 @@ io_open_src(const char *src_name)
 	// which is expected to be <= 0 by default. fstat() isn't
 	// called when reading from standard input but src_st.st_size
 	// is still read.
-	pair = (file_pair){
+/*	pair = (file_pair){
 		.src_name = src_name,
 		.dest_name = NULL,
 		.src_fd = -1,
@@ -712,7 +712,18 @@ io_open_src(const char *src_name)
 		.flush_needed = false,
 		.dest_try_sparse = false,
 		.dest_pending_sparse = 0,
-	};
+	}; */
+
+pair.src_name = src_name;
+pair.dest_name = NULL;
+pair.src_fd = -1;
+pair.dest_fd = -1;
+pair.src_eof = false;
+pair.src_has_seen_input = false;
+pair.flush_needed = false;
+pair.dest_try_sparse = false;
+pair.dest_pending_sparse = 0;
+
 
 	// Block the signals, for which we have a custom signal handler, so
 	// that we don't need to worry about EINTR.

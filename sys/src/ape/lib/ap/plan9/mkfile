@@ -107,6 +107,8 @@ OFILES=\
 	utime.$O\
 	wait.$O\
 	write.$O\
+#	stubs\
+	fchown-stub.$O
 
 UPDATE=\
 	mkfile\

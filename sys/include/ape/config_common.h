@@ -6,6 +6,8 @@
 #endif
 #include <_apetypes.h> /* for architecture-specific stuff */
 
+#define LOCALEDIR  "/sys/lib/ape/locale"
+
 /* Define if the system does not provide POSIX.1 features except
    with this defined.  */
 #ifndef _POSIX_1_SOURCE

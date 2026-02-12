@@ -39,6 +39,7 @@
 #	define LZMA_VERSION_COMMIT ""
 #endif
 
+#include <stdint.h>
 
 /*
  * Map symbolic stability levels to integers.

@@ -32,6 +32,14 @@
 
 #pragma lib "/$M/lib/ape/liblzma.a"
 
+#undef UINT32_C
+#undef UINT32_MAX
+#undef UINT64_MAX
+
+#include <stddef.h>
+#include <inttypes.h>
+#include <stdbool.h>
+
 /*****************************
  * Required standard headers *
  *****************************/
