@@ -315,7 +315,7 @@ static int LZe_sequence_optimizer( struct LZ_encoder * const e,
         --prev_index;
       else					/* prev_index2 >= 0 */
         prev_index = prev_index2;
-      cur_state = St_set_char_rep();
+      cur_state = 8;
       }
     cur_trial->state = cur_state;
     for( i = 0; i < num_rep_distances; ++i )

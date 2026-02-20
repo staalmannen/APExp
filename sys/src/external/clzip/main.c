@@ -36,6 +36,19 @@
 #include <unistd.h>
 #include <utime.h>
 #include <sys/stat.h>
+#ifndef S_ISVTX
+#define S_ISVTX 0
+#endif
+#ifndef S_ISSOCK
+#define S_ISSOCK(m) 0
+#endif
+/* APE/Plan9: fchown/fchmod may be unavailable */
+#ifndef HAVE_FCHOWN
+#define HAVE_FCHOWN 0
+#endif
+#ifndef HAVE_FCHMOD
+#define HAVE_FCHMOD 0
+#endif
 #if defined __MSVCRT__ || defined __OS2__ || defined __DJGPP__
 #include <io.h>
 #if defined __MSVCRT__
@@ -619,20 +632,17 @@ static void close_and_set_permissions( const struct stat * const in_statsp )
   bool warning = false;
   if( in_statsp )
     {
-    const mode_t mode = in_statsp->st_mode;
-    /* fchown in many cases returns with EPERM, which can be safely ignored. */
-    if( fchown( (char *) outfd, in_statsp->st_uid, in_statsp->st_gid ) == 0 )
-      { if( fchmod( (char *) outfd, mode ) != 0 ) warning = true; }
-    else
-      if( errno != EPERM ||
-          fchmod( (char *) outfd, mode & ~( S_ISUID | S_ISGID | S_ISVTX ) ) != 0 )
-        warning = true;
+    /* APE: no fchown/fchmod available; keep only utime() below. */
+    /* const mode_t mode = in_statsp->st_mode; */
+    (void)in_statsp;	/* keep compiler happy if it warns about unused */
     }
+
   if( close( outfd ) != 0 )
     { show_file_error( output_filename, "Error closing output file", errno );
       cleanup_and_fail( 1 ); }
   outfd = -1;
   delete_output_on_interrupt = false;
+
   if( in_statsp )
     {
     struct utimbuf t;
@@ -640,6 +650,7 @@ static void close_and_set_permissions( const struct stat * const in_statsp )
     t.modtime = in_statsp->st_mtime;
     if( utime( output_filename, &t ) != 0 ) warning = true;
     }
+
   if( warning && verbosity >= 1 )
     show_file_error( output_filename,
                      "warning: can't change output file attributes", errno );
