@@ -29,7 +29,7 @@ OFILES=\
 	easy_encoder.$O\
 	easy_encoder_memusage.$O\
 	filter_buffer_encoder.$O\
-#	filter_encoder.$O\
+	filter_encoder.$O\
 	filter_flags_encoder.$O\
 	index_encoder.$O\
 	stream_buffer_encoder.$O\
@@ -46,7 +46,7 @@ OFILES=\
 	easy_decoder_memusage.$O\
 	file_info.$O\
 	filter_buffer_decoder.$O\
-#	filter_decoder.$O\
+	filter_decoder.$O\
 	filter_flags_decoder.$O\
 	index_decoder.$O\
 	index_hash.$O\
@@ -77,7 +77,7 @@ OFILES=\
 	lzma_encoder_optimum_normal.$O\
 	lzma_decoder.$O\
 	lzma2_encoder.$O\
-#	lzma2_decoder.$O\
+	lzma2_decoder.$O\
 # rangecoder \
 	price_tablegen.$O\
 	price_table.$O\
@@ -107,7 +107,10 @@ INCLUDES = 	-I$XZSRC/../.. -I$XZSRC/api -I$XZSRC/check\
 			-I$XZSRC/../common -I$XZSRC/lzma -I$XZSRC/simple\
 			-I$XZSRC/delta -I$XZSRC/lz -I$XZSRC/common\
 			-I$XZSRC/rangecoder
-CFLAGS= -c -DTUKLIB_SYMBOL_PREFIX=lzma_ -DHAVE_CONFIG_H $INCLUDES
+DEFS = 		-DTUKLIB_SYMBOL_PREFIX=lzma_ -DHAVE_ENCODER_LZMA1\
+			-DHAVE_DECODER_LZMA1 -DHAVE_ENCODER_LZMA2\
+			-DHAVE_DECODER_LZMA2 -DPLAN9
+CFLAGS= -c -DHAVE_CONFIG_H $DEFS $INCLUDES
 
 %.$O: $XZSRC/../common/%.c
     $CC $CFLAGS $XZSRC/../common/$stem.c

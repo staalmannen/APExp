@@ -27,7 +27,7 @@ OFILES=\
 	getopt.$O\
 	getopt1.$O
 
-LIB=$APEXPROOT/$objtype/lib/ape/liblzma.a
+LIB=$APEXPROOT/$objtype/lib/ape/liblzma.a $APEXPROOT/$objtype/lib/ape/libap.a
 BIN=$APEXPROOT/$objtype/bin/ape
 
 <$APEXPROOT/sys/src/cmd/mkone

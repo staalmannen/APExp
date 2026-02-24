@@ -214,7 +214,6 @@ lz_decoder_end(void *coder_ptr, const lzma_allocator *allocator)
 	return;
 }
 
-
 extern lzma_ret
 lzma_lz_decoder_init(lzma_next_coder *next, const lzma_allocator *allocator,
 		const lzma_filter_info *filters,
