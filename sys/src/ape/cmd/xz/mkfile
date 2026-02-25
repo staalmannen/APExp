@@ -33,7 +33,7 @@ BIN=$APEXPROOT/$objtype/bin/ape
 <$APEXPROOT/sys/src/cmd/mkone
 
 XZSRC=../../../external/xz
-#LINKS=unxz xzcat lzma unlzma lzcat
+LINKS=unxz xzcat lzma unlzma lzcat
 
 XZINC=-I$XZSRC -I$XZSRC/lib -I$XZSRC/src/common\
 	-I$XZSRC/src/liblzma -DASSUME_RAM=128\
@@ -51,6 +51,13 @@ CFLAGS= -c -D_POSIX_SOURCE -D_BSD_EXTENSION $XZINC
 
 %.$O: $XZSRC/lib/%.c
     $CC $CFLAGS $XZSRC/lib/$stem.c
+
+install:V:
+	for (i in $LINKS)
+		@{ cp $BIN/xz $BIN/$i }
+
+
+
 
 
 
