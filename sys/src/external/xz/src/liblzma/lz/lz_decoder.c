@@ -235,7 +235,7 @@ lzma_lz_decoder_init(lzma_next_coder *next, const lzma_allocator *allocator,
 
 		coder->dict.buf = NULL;
 		coder->dict.size = 0;
-		coder->lz = LZMA_LZ_DECODER_INIT;
+//		coder->lz = LZMA_LZ_DECODER_INIT;
 		coder->next = LZMA_NEXT_CODER_INIT;
 	}
 

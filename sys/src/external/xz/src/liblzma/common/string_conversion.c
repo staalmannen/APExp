@@ -225,6 +225,7 @@ typedef struct {
 			uint32_t min;
 			uint32_t max;
 		} range;
+
 	} u;
 } option_map;
 
@@ -379,22 +380,22 @@ static const option_map lzma12_optmap[] = {
 		.u.range.min = LZMA_DICT_SIZE_MIN,
 		// FIXME? The max is really max for encoding but decoding
 		// would allow 4 GiB - 1 B.
-		.u.range.max = (UINT32_C(1) << 30) + (UINT32_C(1) << 29),
+//		.u.range.max = (UINT32_C(1) << 30) + (UINT32_C(1) << 29),
 	}, {
 		.name = "lc",
 		.offset = offsetof(lzma_options_lzma, lc),
 		.u.range.min = LZMA_LCLP_MIN,
-		.u.range.max = LZMA_LCLP_MAX,
+//		.u.range.max = LZMA_LCLP_MAX,
 	}, {
 		.name = "lp",
 		.offset = offsetof(lzma_options_lzma, lp),
 		.u.range.min = LZMA_LCLP_MIN,
-		.u.range.max = LZMA_LCLP_MAX,
+//		.u.range.max = LZMA_LCLP_MAX,
 	}, {
 		.name = "pb",
 		.offset = offsetof(lzma_options_lzma, pb),
 		.u.range.min = LZMA_PB_MIN,
-		.u.range.max = LZMA_PB_MAX,
+//		.u.range.max = LZMA_PB_MAX,
 	}, {
 		.name = "mode",
 		.type = OPTMAP_TYPE_LZMA_MODE,
@@ -405,7 +406,7 @@ static const option_map lzma12_optmap[] = {
 		.name = "nice",
 		.offset = offsetof(lzma_options_lzma, nice_len),
 		.u.range.min = 2,
-		.u.range.max = 273,
+//		.u.range.max = 273,
 	}, {
 		.name = "mf",
 		.type = OPTMAP_TYPE_LZMA_MATCH_FINDER,
@@ -416,7 +417,7 @@ static const option_map lzma12_optmap[] = {
 		.name = "depth",
 		.offset = offsetof(lzma_options_lzma, depth),
 		.u.range.min = 0,
-		.u.range.max = UINT32_MAX,
+//		.u.range.max = UINT32_MAX,
 	}
 };
 

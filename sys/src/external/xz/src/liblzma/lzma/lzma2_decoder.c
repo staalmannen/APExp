@@ -238,7 +238,7 @@ lzma2_decoder_init(lzma_lz_decoder *lz, const lzma_allocator *allocator,
 		lz->code = &lzma2_decode;
 		lz->end = &lzma2_decoder_end;
 
-		coder->lzma = LZMA_LZ_DECODER_INIT;
+//		coder->lzma = LZMA_LZ_DECODER_INIT;
 	}
 
 	const lzma_options_lzma *options = opt;

@@ -17,7 +17,7 @@ OFILES=\
 	hardware_physmem.$O\
 	index.$O\
 	stream_flags_common.$O\
-#	string_conversion.$O\
+	string_conversion.$O\
 	vli_size.$O\
 	hardware_cputhreads.$O\
 	outqueue.$O\
@@ -68,7 +68,7 @@ OFILES=\
 # lz \
 	lz_encoder.$O\
 	lz_encoder_mf.$O\
-#	lz_decoder.$O\
+	lz_decoder.$O\
 # lzma \
 ##	fastpos_tablegen.$O\ # main()?\
 	lzma_encoder_presets.$O\
