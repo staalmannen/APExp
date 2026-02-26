@@ -1,0 +1,9 @@
+This is tcl 9.0.3 but with the files from fgb's tcl 8.5.9 port included
+
+TCL 8.5.9 APE port for Plan 9
+
+% cd plan9
+% mk
+% mk install
+
+Federico G. Benavento - benavento@gmail.com

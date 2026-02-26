@@ -1,0 +1,22 @@
+APE=/sys/src/ape
+<$APE/config
+
+BIN=/$objtype/bin
+TARG=tclsh
+
+OFILES=tclAppInit.$O
+LIB=libtcl.a$O
+HFILES=plan9/tclConfig.h
+CLEANFILES=$LIB
+</sys/src/cmd/mkone
+CFLAGS=-FVp -c -Iplan9 -Igeneric -Iunix -Ilibtommath -DHAVE_TCL_CONFIG_H -DPLAN9
+
+$O.out: $OFILES $LIB
+	$LD $LDFLAGS -o $target $prereq
+
+$LIB:V:
+	mk $MKFLAGS -f mkfile.lib
+
+tclAppInit.$O: unix/tclAppInit.c
+	$CC $CFLAGS unix/tclAppInit.c
+
