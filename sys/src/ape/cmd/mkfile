@@ -28,6 +28,7 @@ DIRS=\
 	unace\
 	unarj\
 	unrar\
+	xz\
 # languages and transpilers \
 	lua\
 # dev tools \

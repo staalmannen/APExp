@@ -72,6 +72,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - getopt.h with gnu getopt_long from NetBSD, imported to libbsd
 - strings.h shim pointing to bsd.h
 - stdio.h : added fmemopen from tuxpaint, getdelim/getline from gnulib
+- fchown/fchmod stubs introduced
 - imported several math and other functions from musl libc
 
 
@@ -95,7 +96,7 @@ Install paths have been modified so that libraries and binaries are installed in
 ***Languages***
 
 
-- Lua is included by default in APExp
+- Lua (5.5.0) is included by default in APExp
 
 
 ***Transpilers***
@@ -118,6 +119,7 @@ sources could be a barrier. Because of this, APExp package several (un)archivers
 - unrar (2.71 ; can handle old rar archives. More recent versions written in c++)
 - unace (2.7)
 - clzip (1.14)
+- xz (5.6.3)
 
 
 
