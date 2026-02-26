@@ -1,0 +1,28 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+MKMKSRC=$APEXPROOT/sys/src/external/mkmk
+
+TARG=mkmk
+OFILES=mkmk.$O syms.$O hints.$O parse_f77.$O parse_cpp.$O expr.$O misc.$O nm.$O
+BIN=$APEXPROOT/$objtype/bin
+CFLAGS=-p
+CLEANFILES=objtab.h syslimits.h
+HFILES=objtab.h syslimits.h
+
+</sys/src/cmd/mkone
+
+
+syslimits.h: $MKMKSRC/mksyslimits.rc $APEXPROOT/sys/include/ape/sys/limits.h
+	$MKMKSRC/mksyslimits.rc  $APEXPROOT/sys/include/ape/sys/limits.h > syslimits.h
+
+objtab.h: $MKMKSRC/mkobjtab.rc /sys/include/mach.h
+	$MKMKSRC/mkobjtab.rc  /sys/include/mach.h > objtab.h
+
+%.$O: $MKMKSRC/%.c
+	$CC $CFLAGS $MKMKSRC/$stem.c
+
+
+install:V:
+	cp $MKMKSRC/$TARG.man $APEXPROOT/sys/man/1/$TARG
+
+

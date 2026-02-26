@@ -34,6 +34,7 @@ DIRS=\
 # dev tools \
 	diff\
 	patch\
+	mkmk\
 # always last :) \
 	celebrate_finish
 
