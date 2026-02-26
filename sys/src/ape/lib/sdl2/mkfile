@@ -1,0 +1,24 @@
+</$objtype/mkfile
+
+LIB=/$objtype/lib/libnpe_sdl2.a
+CFLAGS=$CFLAGS -p -I../include/npe -I../libnpe -D__plan9__ -D__${objtype}__
+
+HFILES=\
+
+OFILES=\
+	audio.$O\
+	events.$O\
+	image.$O\
+	rwops.$O\
+	scale.$O\
+	sdl2.$O\
+	mixer.$O\
+	threads.$O\
+
+UPDATE=\
+	mkfile\
+	$HFILES\
+	${OFILES:%.$O=%.c}\
+	${LIB:/$objtype/%=/386/%}\
+
+</sys/src/cmd/mksyslib
