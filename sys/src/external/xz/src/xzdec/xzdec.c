@@ -481,4 +481,5 @@ main(int argc, char **argv)
 #endif
 
 	tuklib_exit(EXIT_SUCCESS, EXIT_FAILURE, display_errors);
+	return 0;
 }

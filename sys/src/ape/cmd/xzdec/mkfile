@@ -1,0 +1,45 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+TARG=xzdec
+
+OFILES=\
+	xzdec.$O\
+#	../common\
+	tuklib_progname.$O\
+	tuklib_exit.$O
+
+LIB=$APEXPROOT/$objtype/lib/ape/liblzma.a $APEXPROOT/$objtype/lib/ape/libap.a
+BIN=$APEXPROOT/$objtype/bin/ape
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+XZSRC=../../../external/xz
+LINKS=lzmadec
+
+XZINC=-I$XZSRC -I$XZSRC/lib -I$XZSRC/src/common\
+	-I$XZSRC/src/liblzma -DASSUME_RAM=128\
+	-DSIZE_MAX=UINT64_MAX -DHAVE_CONFIG_H -DHAVE_DECODERS
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -D_POSIX_SOURCE -D_BSD_EXTENSION $XZINC
+
+%.$O: $XZSRC/src/xzdec/%.c
+    $CC $CFLAGS $XZSRC/src/xzdec/$stem.c
+
+%.$O: $XZSRC/src/common/%.c
+    $CC $CFLAGS $XZSRC/src/common/$stem.c
+
+%.$O: $XZSRC/lib/%.c
+    $CC $CFLAGS $XZSRC/lib/$stem.c
+
+install:V:
+	for (i in $LINKS)
+		@{ cp $BIN/xzdec $BIN/$i }
+
+
+
+
+
+
