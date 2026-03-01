@@ -32,6 +32,9 @@ DIRS=\
 	xzdec\
 # languages and transpilers \
 	lua\
+	f2c\
+	p2c\
+	objc\
 # dev tools \
 	diff\
 	patch\
