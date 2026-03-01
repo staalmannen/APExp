@@ -1,0 +1,166 @@
+
+INSTALLDIR=/usr/local
+SRCDIR=.
+BUILDDIR=.
+BINDIR=$(INSTALLDIR)/bin
+LIBDIR=/usr/local/lib
+LIBROOTDIR=/usr/local
+
+# DNDEBUG important because src was preprocessed with DNDEBUG too
+CC=cc
+CFLAGS=-DNDEBUG  
+CP=cp
+MKDIR=mkdir
+RM=rm
+CHMOD=chmod
+
+VPATH=$(SRCDIR)
+
+.c.o:
+	$(CC) $(CFLAGS) -c $<
+
+OBJS= pointer.o\
+	compdef.o\
+	exprstmt.o\
+	dfltstmt.o\
+	namedecl.o\
+	structsp.o\
+	Message.o\
+        Exceptn.o\
+        OutOfMem.o\
+        badvers.o\
+        outofbnd.o\
+        typeinc.o\
+        unknownt.o\
+        notfound.o\
+	trlunit.o\
+	gasmstmt.o\
+	dasmstmt.o\
+	contstmt.o\
+	setseq.o\
+	method.o\
+	enumtor.o\
+	keyseq.o\
+	sizeof.o\
+	typeof.o\
+	lblstmt.o\
+	arydecl.o\
+	dotxpr.o\
+	set.o\
+	stclass.o\
+	assoc.o\
+	pfixxpr.o\
+	casestmt.o\
+	constxpr.o\
+	condxpr.o\
+	precdecl.o\
+	ordcltn.o\
+	treeseq.o\
+	sortcltn.o\
+	identxpr.o\
+	assign.o\
+	precxpr.o\
+	Object.o\
+	classdef.o\
+	initdecl.o\
+	dictnary.o\
+	selector.o\
+	fundef.o\
+	options.o\
+	funcall.o\
+	expr.o\
+	keywxpr.o\
+	node.o\
+	valueseq.o\
+	btincall.o\
+	Block.o\
+	ifstmt.o\
+	unyxpr.o\
+	parmdef.o\
+	util.o\
+	cltnseq.o\
+	array.o\
+	idarray.o\
+	forstmt.o\
+	deref.o\
+	binxpr.o\
+	ocstring.o\
+	objcrt.o\
+	datadef.o\
+	gasmop.o\
+	dostmt.o\
+	gattrib.o\
+	arrowxpr.o\
+	cppdirec.o\
+	keywdecl.o\
+	ascfiler.o\
+	relxpr.o\
+	gatrdecl.o\
+	switstmt.o\
+	funbody.o\
+	rtrnstmt.o\
+	listxpr.o\
+	whilstmt.o\
+	type.o\
+	fundecl.o\
+	def.o\
+	stkframe.o\
+	globdef.o\
+	var.o\
+	aryvar.o\
+	scalar.o\
+	parmlist.o\
+	commaxpr.o\
+	stardecl.o\
+	gotostmt.o\
+	indexxpr.o\
+	addrof.o\
+	selxpr.o\
+	sequence.o\
+	stmt.o\
+	msgxpr.o\
+	methdef.o\
+	compstmt.o\
+	decl.o\
+	symbol.o\
+	blockxpr.o\
+	enumsp.o\
+	bflddecl.o\
+	castxpr.o\
+	lex.o\
+	lexfiltr.o\
+	yacc.o\
+	cltn.o\
+	pfixdecl.o
+
+OBJC1OBJS=_objc1.o objc1.o
+PLINKOBJS=_plink.o postlink.o
+
+default : objc1 postlink _prelink.o
+
+objc1 : $(OBJC1OBJS) $(OBJS) 
+	$(CC) $(CFLAGS) $(OBJC1OBJS) $(OBJS) -o objc1
+
+postlink : $(PLINKOBJS) $(OBJS) 
+	$(CC) $(CFLAGS) $(PLINKOBJS) $(OBJS) -o postlink
+
+install :
+	-test -d $(INSTALLDIR) || $(MKDIR) $(INSTALLDIR)
+	-test -d $(BINDIR) || $(MKDIR) $(BINDIR)
+	-$(CP) objc $(BINDIR)/objc
+	-$(CHMOD) 755 $(BINDIR)/objc
+	-$(CP) objc1 $(BINDIR)/objc1
+	-$(CHMOD) 755 $(BINDIR)/objc1
+	-$(CP) postlink $(BINDIR)/postlink
+	-$(CHMOD) 755 $(BINDIR)/postlink
+	-test -d $(LIBROOTDIR) || $(MKDIR) $(LIBROOTDIR)
+	-test -d $(LIBDIR) || $(MKDIR) $(LIBDIR)
+	-$(CP) _prelink.o $(LIBDIR)/_prelink.o
+
+clean :
+	-$(RM) *.o
+	-$(RM) objc1 postlink
+	
+distclean: clean
+	-$(RM) objc config.cache config.status Makefile
+

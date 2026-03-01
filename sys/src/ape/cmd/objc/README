@@ -1,0 +1,3 @@
+Currently, we only build the bootstrap Objc transpiler from C source code.
+
+TODO is to make a variant mkfile to rebuild the ObjC-coded transpiler, which represent a more up-to-date version.

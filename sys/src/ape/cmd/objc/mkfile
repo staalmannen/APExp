@@ -1,0 +1,148 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+OBJCSRC=../../../external/Objc
+
+TARG=objc1\
+	postlink
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+OBJS= pointer.$O\
+	compdef.$O\
+	exprstmt.$O\
+	dfltstmt.$O\
+	namedecl.$O\
+	structsp.$O\
+	Message.$O\
+	Exceptn.$O\
+	OutOfMem.$O\
+	badvers.$O\
+	outofbnd.$O\
+	typeinc.$O\
+	unknownt.$O\
+	notfound.$O\
+	trlunit.$O\
+	gasmstmt.$O\
+	dasmstmt.$O\
+	contstmt.$O\
+	setseq.$O\
+	method.$O\
+	enumtor.$O\
+	keyseq.$O\
+	sizeof.$O\
+	typeof.$O\
+	lblstmt.$O\
+	arydecl.$O\
+	dotxpr.$O\
+	set.$O\
+	stclass.$O\
+	assoc.$O\
+	pfixxpr.$O\
+	casestmt.$O\
+	constxpr.$O\
+	condxpr.$O\
+	precdecl.$O\
+	ordcltn.$O\
+	treeseq.$O\
+	sortcltn.$O\
+	identxpr.$O\
+	assign.$O\
+	precxpr.$O\
+	Object.$O\
+	classdef.$O\
+	initdecl.$O\
+	dictnary.$O\
+	selector.$O\
+	fundef.$O\
+	options.$O\
+	funcall.$O\
+	expr.$O\
+	keywxpr.$O\
+	node.$O\
+	valueseq.$O\
+	btincall.$O\
+	Block.$O\
+	ifstmt.$O\
+	unyxpr.$O\
+	parmdef.$O\
+	util.$O\
+	cltnseq.$O\
+	array.$O\
+	idarray.$O\
+	forstmt.$O\
+	deref.$O\
+	binxpr.$O\
+	ocstring.$O\
+	objcrt.$O\
+	datadef.$O\
+	gasmop.$O\
+	dostmt.$O\
+	gattrib.$O\
+	arrowxpr.$O\
+	cppdirec.$O\
+	keywdecl.$O\
+	ascfiler.$O\
+	relxpr.$O\
+	gatrdecl.$O\
+	switstmt.$O\
+	funbody.$O\
+	rtrnstmt.$O\
+	listxpr.$O\
+	whilstmt.$O\
+	type.$O\
+	fundecl.$O\
+	def.$O\
+	stkframe.$O\
+	globdef.$O\
+	var.$O\
+	aryvar.$O\
+	scalar.$O\
+	parmlist.$O\
+	commaxpr.$O\
+	stardecl.$O\
+	gotostmt.$O\
+	indexxpr.$O\
+	addrof.$O\
+	selxpr.$O\
+	sequence.$O\
+	stmt.$O\
+	msgxpr.$O\
+	methdef.$O\
+	compstmt.$O\
+	decl.$O\
+	symbol.$O\
+	blockxpr.$O\
+	enumsp.$O\
+	bflddecl.$O\
+	castxpr.$O\
+	lex.$O\
+	lexfiltr.$O\
+	yacc.$O\
+	cltn.$O\
+	pfixdecl.$O
+
+OBJC1OBJS=_objc1.$O\
+	objc1.$O
+PLINKOBJS=_plink.$O\
+	postlink.$O
+
+<$APEXPROOT/sys/src/cmd/mkmany
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -DNDEBUG -D_POSIX_SOURCE -I$OBJCSRC/bootstrap
+
+%.$O: $OBJCSRC/bootstrap/%.c
+    $CC $CFLAGS $OBJCSRC/bootstrap/$stem.c
+
+$O.objc1: $OBJS $OBJC1OBJS
+
+$O.postlink: $OBJS $PLINKOBJS
+
+install:V:
+	$CC $CFLAGS $OBJCSRC/bootstrap/_prelink.c
+	cp _prelink.$O $APEXPROOT/$objtype/lib/ape/
+
+
