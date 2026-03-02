@@ -1,0 +1,10 @@
+# Created with Shell BaCon 5.0.3 - (c) Peter van Eerten - MIT License
+
+bacon: bacon.bac.o
+	cc -o bacon bacon.bac.o    -lm
+bacon.bac.o: bacon.bac.c
+	cc  -c bacon.bac.c
+
+.PHONY: clean
+clean:
+	rm -f *.o *.c ../bacon ../bacon.*.* Makefile.bacon
