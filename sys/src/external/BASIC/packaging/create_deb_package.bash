@@ -17,7 +17,7 @@ autoconf
 ./configure --prefix=/usr
 make clean
 make
-sudo checkinstall --install=no --type=debian --pkgname=bacon --pkgversion=$1 --pkgrelease=1 --pkggroup=devel --pkglicense=MIT --maintainer="Peter van Eerten \<peter@basic-converter.org\>" --provides=bacon --requires=enscript,xterm,indent,flex
+sudo checkinstall --install=no --type=debian --pkgname=bacon --pkgversion=$1 --pkgrelease=1 --pkggroup=devel --pkglicense=MIT --maintainer="Peter van Eerten \<peter@basic-converter.org\>" --provides=bacon --requires=enscript,xterm,indent
 cd -
 
 rm doc-pak/changelog.gz

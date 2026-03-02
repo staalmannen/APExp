@@ -1,0 +1,10 @@
+# Created with BaCon 5.0.2 - (c) Peter van Eerten - MIT License
+
+bacongui-gtk4: bacongui-gtk4.bac.o
+	cc -o bacongui-gtk4 bacongui-gtk4.bac.o  `pkg-config --libs gtksourceview-5`   `pkg-config --libs gtk4`  -lm
+bacongui-gtk4.bac.o: bacongui-gtk4.bac.c
+	cc  `pkg-config --cflags gtk4` `pkg-config --cflags gtksourceview-5` -Wno-deprecated-declarations -c bacongui-gtk4.bac.c
+
+.PHONY: clean
+clean:
+	rm -f *.o *.c bacongui-gtk4 bacongui-gtk4.*.* Makefile.bacon

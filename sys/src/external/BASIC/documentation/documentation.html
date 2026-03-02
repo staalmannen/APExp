@@ -6,7 +6,7 @@
 	<meta name="generator" content="LibreOffice 7.3.7.2 (Linux)"/>
 	<meta name="author" content="Peter van Eerten"/>
 	<meta name="created" content="00:00:00"/>
-	<meta name="changed" content="2024-03-06T19:13:07.249034907"/>
+	<meta name="changed" content="2025-09-01T17:02:15.655935689"/>
 	<meta name="Info 1" content=""/>
 	<meta name="Info 2" content=""/>
 	<meta name="Info 3" content=""/>
@@ -39,7 +39,7 @@
 <br>
 
 </p>
-<h1 class="western">BaCon 4.8 documentation</h1>
+<h1 class="western">BaCon 5.0.3 documentation</h1>
 <p style="margin-bottom: 0cm; border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0cm; padding-right: 0cm">
 <br>
 
@@ -2342,34 +2342,38 @@ of errors.</p>
 	<li><p style="margin-bottom: 0cm">Runtime errors. These can occur
 	during execution of the program.</p>
 </ol>
-<p style="margin-bottom: 0cm">When an error occurs, the default
-behavior of a BaCon program is to stop. Only in case of runtime
-errors, it is possible to let the program handle the error.</p>
+<p style="margin-bottom: 0cm">The <a href="#TRAP">TRAP LOCAL</a>
+statement will cause the BaCon program to stop when an error occurs
+during runtime. This is the default behavior of any BaCon program.
+However, in case of such a runtime error, it is possible to let the
+program handle the error by itself.</p>
 <ul>
 	<li><p style="margin-bottom: 0cm">In case of <i>statements,</i> the
-	<a href="#CATCH">CATCH GOTO</a> command can jump to a self-defined
-	error handling function. This is especially convenient when creating
-	GUI applications, as runtime errors by default appear on the Unix
-	command prompt.</p>
+	<a href="#CATCH">CATCH GOTO</a> command can be used to jump to
+	self-defined error handling code. This is especially convenient when
+	creating GUI applications, as runtime errors by default appear on
+	the Unix command prompt.</p>
 	<li><p style="margin-bottom: 0cm">In case of <i>functions,</i> the
-	<a href="#OPTION">OPTION ERROR</a> must be set to FALSE to prevent
-	the program from stopping. The program then needs to check the
-	reserved <a href="#ERROR">ERROR</a> variable to handle any
-	unexpected situation.</p>
+	<a href="#TRAP">TRAP SYSTEM</a> statement will prevent BaCon from
+	performing a runtime check and stopping the program. In case of an
+	unexpected situation, the program then needs to check the reserved
+	<a href="#ERROR">ERROR</a> variable. Note that the operating system
+	still may break or stop the program.</p>
+	<li><p style="margin-bottom: 0cm">In case of both <i>statements</i>
+	and <i>functions</i>, when using <a href="#TRAP">TRAP SYSTEM</a>, it
+	is also possible to set a error callback function. This callback
+	function can be defined by the <a href="#CATCH">CATCH ERROR</a>
+	statement. It should point to a separate function with three
+	arguments: the first argument captures the statement or function
+	causing the error, the second the name of the file and the last
+	argument the line number.</p>
 </ul>
-<p style="margin-bottom: 0cm">Alternatively, it is possible to set a
-callback function for both statements and functions. This callback
-function can be defined by the <a href="#CATCH">CATCH ERROR</a>
-statement. It should point to a function with three arguments: the
-first argument capturing the statement or function causing the error,
-the second the name of the file and the last the line number.</p>
-<p style="margin-bottom: 0cm">To prevent BaCon from detecting runtime
-errors altogether, use <a href="#TRAP">TRAP SYSTEM</a>.</p>
 <p style="margin-bottom: 0cm">The reserved <a href="#ERROR">ERROR</a>
 variable contains the number of the last error occurred. A full list
 of error numbers can be found in <a href="#APPENDIXA">appendix A</a>.
-With the <a href="#ERR$">ERR$</a> function a human readable text for
-the error number can be retrieved programmatically.</p>
+With the <a href="#ERR$">ERR</a><a href="#ERR$">$(ERROR)</a> function
+a human readable text for the error number can be retrieved
+programmatically.</p>
 <p style="margin-bottom: 0cm">Next to these options, the statement
 <a href="#TRACE">TRACE ON</a> can set the program in such a way that
 it is executed at each keystroke, step-by-step. This way it is
@@ -2653,6 +2657,19 @@ functions</h3>
 memory address of a widget based on the defined name for that widget.
 This can come handy in cases where <font color="#000000">a GUI helper
 function is used natively.</font></p>
+<h3 class="western"><a name="EXTERNAL_CALLBACK"></a>Defining
+callbacks outside GUIDEFINE</h3>
+<p>In exceptional cases, it can come handy to define widgets outside
+the main definition and attach them to the main callback function, so
+BaCon will recognize an event with GUIEVENT$. For this purpose, the
+function <a href="#GUICB">GUICB</a> can be used. This is an example
+for its usage in GTK4, creating an event controller, which responds
+to the mouse pointer entering the widget:</p>
+<p><font face="DejaVu Sans Mono, sans-serif"><font size="2" style="font-size: 10pt">ctrlr
+= gtk_event_controller_motion_new()<br>
+<font color="#280099">CALL</font>
+<font color="#ff6309">GUICB</font>(ctrlr, &quot;enter&quot;,
+&quot;show_my_widget&quot;)</font></font></p>
 <p style="margin-bottom: 0cm; border-top: none; border-bottom: 1px solid #000000; border-left: none; border-right: none; padding-top: 0cm; padding-bottom: 0.05cm; padding-left: 0cm; padding-right: 0cm">
 <br>
 
@@ -3195,14 +3212,14 @@ statement.</p>
 keyword restores the BaCon default error messages for statements.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">The ERROR
 keyword allows setting a callback function where the program will
-jump to in case an error occurs. This works both for statements and
-functions provided that OPTION ERROR is set to FALSE. This is to
-prevent that erroneous functions will stop the program. The callback
-function should have three arguments which will hold the name of the
-statement or function, the name of the file and the line number where
-the error occurred. Example:</p>
-<p style="margin-bottom: 0cm; border: none; padding: 0cm"><font face="DejaVu Sans Mono, sans-serif">OPTION
-ERROR FALSE<br>
+jump to in case an error occurs. This is to prevent that erroneous
+functions will stop the program. This will only work in combination
+with <a href="#TRAP">TRAP SYSTEM</a>. The callback function should
+have three arguments which will hold the name of the statement or
+function, the name of the file and the line number where the error
+occurred. Example:</p>
+<p style="margin-bottom: 0cm; border: none; padding: 0cm"><font face="DejaVu Sans Mono, sans-serif">TRAP
+SYSTEM<br>
 CATCH ERROR help<br>
 SUB help(c$, f$, no)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;PRINT
@@ -3285,12 +3302,12 @@ y$[, z]])</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Type:
 function</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Returns a
-string defined in x$ where on both sides &lt;CR&gt;, &lt;NL&gt;,
-&lt;TAB&gt; and &lt;SPACE&gt; have been removed. If other characters
-need to be chopped then these can be specified in the optional y$.
-The optional parameter z defines where the chopping must take place:
-0 means on both sides, 1 means chop at the left and 2 means chop at
-the right. Examples:</p>
+string defined in x$ where on both sides the characters in regex
+character class <font color="#000000">[:isspace:] </font>has been
+removed. If other characters need to be chopped then these can be
+specified in the optional y$. The optional parameter z defines where
+the chopping must take place: 0 means on both sides, 1 means chop at
+the left and 2 means chop at the right. Examples:</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><font face="DejaVu Sans Mono, sans-serif">PRINT
 CHOP$(&quot;bacon&quot;, &quot;bn&quot;)<br>
 PRINT CHOP$(&quot;
@@ -4617,7 +4634,7 @@ function</p>
 &lt;filename$&gt; exists. If the file exists, this function returns
 1. Else it returns 0. This function also can be used to verify if a
 directory exists. If &lt;filename$&gt; is a symbolic link, it is
-dereferenced.</p>
+dereferenced. If an error occurs then this function returns '-1'.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><br>
 
 </p>
@@ -4627,10 +4644,10 @@ dereferenced.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Type:
 function</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Returns the
-size of a file identified by &lt;filename$&gt;. If an error occurs
-this function returns '-1'. The <a href="#ERR$">ERR$</a> statement
-can be used to find out the error if <a href="#TRAP">TRAP</a> is set
-to LOCAL. Example:</p>
+size of a file identified by &lt;filename$&gt;. When <a href="#ERR$">TRAP</a><a href="#ERR$">
+</a><a href="#ERR$">SYSTEM</a> is active, any error will return '-1'.
+The <a href="#ERR$">ERR$(ERROR)</a> statement can then be used to
+find out the error. Example:</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><font face="DejaVu Sans Mono, sans-serif">length
 = FILELEN(&quot;/etc/passwd&quot;)</font></p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><br>
@@ -4646,7 +4663,8 @@ function</p>
 timestamp of a file identified by &lt;filename$&gt;, depending on the
 type of timestamp indicated in &lt;type&gt;. The type can be one of
 the following: 0 = access time, 1 = modification time and 2 = status
-change time. Example:</p>
+change time. If an error occurs then this function returns '-1'.
+Example:</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><font face="DejaVu Sans Mono, sans-serif">stamp
 = FILETIME(&quot;/etc/hosts&quot;, 0) <br>
 PRINT &quot;Last access:
@@ -4661,10 +4679,10 @@ YEAR(stamp)</font></p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Type:
 function</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Returns the
-type of a file identified by &lt;filename$&gt;. If an error occurs
-this function returns '0'. The <a href="#ERR$">ERR$</a> statement can
-be used find out which error if <a href="#TRAP">TRAP</a> is set to
-LOCAL. The following values may be returned:</p>
+type of a file identified by &lt;filename$&gt;. When <a href="#ERR$">TRAP</a><a href="#ERR$">
+</a><a href="#ERR$">SYSTEM</a> is active, any error will return '0'.
+The <a href="#ERR$">ERR$(ERROR)</a> function can then be used find
+out which error. The following values may be returned from FILETYPE:</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><br>
 
 </p>
@@ -4860,22 +4878,23 @@ trees</a><font color="#000000">.</font></p>
 </p>
 <h3 class="western" style="page-break-after: avoid"><a name="FIRST$"></a>
 <font color="#c5000b">FIRST$</font></h3>
-<p style="margin-bottom: 0cm; border: none; padding: 0cm"><b>FIRST$</b>(string$,
-amount [, delimiter$])</p>
+<p style="margin-bottom: 0cm; border: none; padding: 0cm"><b>FIRST$</b>(string$
+[, amount [, delimiter$]])</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Type:
 function</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Retrieves
-the remaining elements except the last &lt;amount&gt; from a
-delimited &lt;string$&gt; split by delimiter$. The delimiter$ is
-optional. If it is omitted, then the definition from <a href="#OPTION">OPTION
+the first elements except the last &lt;amount&gt; from a delimited
+&lt;string$&gt; split by &lt;delimiter$&gt;. The &lt;amount&gt; is an
+optional argument, which defaults to 1. The &lt;delimiter$&gt; also
+is optional. If omitted, then the definition from <a href="#OPTION">OPTION
 DELIM</a> is assumed. When specified, it may consist of multiple
 characters.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">If no
 delimiter is present in the string, this function will return the
 full &lt;string$&gt;.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">If
-delimiter$ occurs between double quotes in string$, then it is
-ignored. This behavior can be changed by setting <a href="#OPTION">OPTION
+&lt;delimiter$&gt; occurs between double quotes in &lt;string$&gt;,
+then it is ignored. This behavior can be changed by setting <a href="#OPTION">OPTION
 QUOTED</a> to FALSE.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">See also
 <a href="#TAIL$">TAIL$</a> to obtain elements counting from the end
@@ -4987,7 +5006,9 @@ function</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Duplicate
 the current running program in memory. If the return value is 0, then
 we're in the child process. If the child process needs an explicit
-exit then ENDFORK can be used.</p>
+exit then ENDFORK can be used. The ENDFORK statement also will close
+all inherited file handles, thereby also preventing the parent
+process to use them further.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">If the
 return value &gt; 0, then we are in the parent process; the actual
 value is the process ID of the spawned child.</p>
@@ -5126,7 +5147,7 @@ program:</p>
 prog$ FOR READING AS myfile<br>
 &nbsp;&nbsp;&nbsp;&nbsp;bin = MEMORY(100)<br>
 &nbsp;&nbsp;&nbsp;&nbsp;GETBYTE
-bin FROM myfile SIZE 100<br>
+bin FROM myfile CHUNK 100<br>
 CLOSE FILE myfile</font></p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><br>
 
@@ -5260,7 +5281,18 @@ declares a variable to a C-type. The ASSOC keyword is used to declare
 associative arrays. The TREE keyword is used to declare binary trees.
 This is always a global declaration, meaning that variables declared
 with the GLOBAL keyword are visible in each part of the program. Use
-<a href="#LOCAL">LOCAL</a> for local declarations.</p>
+<a href="#LOCAL">LOCAL</a> for declarations local to a SUB or
+FUNCTION.</p>
+<p style="margin-bottom: 0cm; border: none; padding: 0cm">The TYPE
+keyword can be omitted. In such situation, BaCon will verify the
+suffix of the variable name. If the variable name ends with a '$'
+then the variable is assumed to be a string. If the variable name
+ends with '<font color="#000000">#' then it is considered to be of a
+float type. When the variable name ends with a '%' then it is
+considered to be a long type. If no suffix is provided then </font><font color="#000000">GLOBAL</font><font color="#000000">
+will assume the configuration set by OPTION VARTYPE, which by default
+is long. It is allowed to mix types in the same </font><font color="#000000">GLOBAL</font><font color="#000000">
+statement.</font></p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">The ARRAY
 keyword is used to define a <a href="#DECLARATION_DYN">dynamic array</a>,
 which can be resized with <a href="#REDIM">REDIM</a> at a later stage
@@ -5272,8 +5304,10 @@ to define a record variable which is visible globally.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><font face="DejaVu Sans Mono, sans-serif">GLOBAL
 x TYPE float<br>
 GLOBAL q$<br>
-GLOBAL new_array TYPE float ARRAY
-100<br>
+GLOBAL a# = 4.5, b% = 123, c$[] = {
+&quot;<font color="#000000">a&quot;, &quot;b&quot; }</font><br>
+GLOBAL
+new_array TYPE float ARRAY 100<br>
 GLOBAL name$ ARRAY 25</font></p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Multiple
 variables of the same type can be declared at once, using a comma
@@ -5341,6 +5375,23 @@ x = 5 TO 10<br>
 world&quot;<br>
 NEXT<br>
 GOTOXY 1, 12</font></p>
+<p style="margin-bottom: 0cm; border: none; padding: 0cm"><br>
+
+</p>
+<h3 class="western" style="page-break-after: avoid"><a name="GUICB"></a>
+<font color="#c5000b">GUICB</font></h3>
+<p style="margin-bottom: 0cm; border: none; padding: 0cm"><b>GUI</b><b>CB</b>(widget,
+event$, <font color="#000000">data$</font>)</p>
+<p style="margin-bottom: 0cm; border: none; padding: 0cm">Type:
+function</p>
+<p style="margin-bottom: 0cm; border: none; padding: 0cm">Adds a
+widget defined outside <a href="#GUIDEFINE">GUIDEFINE</a> to the main
+callback mechanism, which can be recognized by <a href="#GUIEVENT$">GUIEVENTS</a>.
+For example:</p>
+<p style="margin-bottom: 0cm; border: none; padding: 0cm"><font face="DejaVu Sans Mono, sans-serif"><font size="3" style="font-size: 12pt">ctrlr
+= gtk_event_controller_motion_new()<br>
+CALL GUICB(ctrlr, &quot;enter&quot;,
+&quot;show_my_widget&quot;)</font></font></p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><br>
 
 </p>
@@ -5521,17 +5572,19 @@ PRINT HASH(mem, 16) FORMAT &quot;%lu\n&quot;</font></p>
 <h3 class="western" style="page-break-after: avoid"><a name="HEAD$"></a>
 <font color="#c5000b">HEAD$</font></h3>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><b>HEAD$</b>(string$,
-amount [, delimiter$])</p>
+[amount [, delimiter$]])</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Type:
 function</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Retrieves
-the first &lt;amount&gt; elements from a delimited string$ split by
-delimiter$. The delimiter$ is optional. If it is omitted, then the
-definition from <a href="#OPTION">OPTION DELIM</a> is assumed. When
-specified, it may consist of multiple characters.</p>
+the first &lt;amount&gt; elements from a delimited &lt;string$&gt;
+split by &lt;delimiter$&gt;. The &lt;amount&gt; is an optional
+argument, which defaults to 1. The &lt;delimiter$&gt; also is
+optional. If omitted, the definition from <a href="#OPTION">OPTION
+DELIM</a> is assumed. When specified, it may consist of multiple
+characters.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">If
-delimiter$ occurs between double quotes in string$, then it is
-ignored. This behavior can be changed by setting <a href="#OPTION">OPTION
+&lt;delimiter$&gt; occurs between double quotes in &lt;string$&gt;,
+then it is ignored. This behavior can be changed by setting <a href="#OPTION">OPTION
 QUOTED</a> to FALSE.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">See also
 <a href="#LAST$">LAST$</a> to obtain the remaining elements, and
@@ -6139,22 +6192,23 @@ globally.</p>
 </p>
 <h3 class="western" style="page-break-after: avoid"><a name="LAST$"></a>
 <font color="#c5000b">LAST$</font></h3>
-<p style="margin-bottom: 0cm; border: none; padding: 0cm"><b>LAST$</b>(string$,
-amount [, delimiter$])</p>
+<p style="margin-bottom: 0cm; border: none; padding: 0cm"><b>LAST$</b>(string$
+[, amount [, delimiter$]])</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Type:
 function</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Retrieves
 the remaining elements except the first &lt;amount&gt; from a
-delimited string$ split by delimiter$. The delimiter$ is optional. If
-it is omitted, then the definition from <a href="#OPTION">OPTION
+delimited &lt;string$&gt; split by &lt;delimiter$&gt;. The &lt;amount&gt;
+is an optional argument, which defaults to 1. The &lt;delimiter$&gt;
+also is optional. If omitted, then the definition from <a href="#OPTION">OPTION
 DELIM</a> is assumed. When specified, it may consist of multiple
 characters.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">If no
 delimiter is present in the string, this function will return the
 full &lt;string$&gt;.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">If
-delimiter$ occurs between double quotes in string$, then it is
-ignored. This behavior can be changed by setting <a href="#OPTION">OPTION
+&lt;delimiter$&gt; occurs between double quotes in &lt;string$&gt;,
+then it is ignored. This behavior can be changed by setting <a href="#OPTION">OPTION
 QUOTED</a> to FALSE. See also <a href="#HEAD$">HEAD$</a> to get the
 first element(s), and the chapter on <a href="#DELIMITED">delimited
 string functions</a> for more information about delimited strings.
@@ -6258,10 +6312,15 @@ statement only has sense within functions, subroutines or records. It
 defines a local variable &lt;var&gt; with C type &lt;type&gt; which
 will not be visible to other functions, subroutines or records, nor
 to the main program.</p>
-<p style="margin-bottom: 0cm; border: none; padding: 0cm">If the TYPE
-keyword is omitted then variables are assumed to be of 'long' type.
-If TYPE is omitted and the variable name ends with a '$' then the
-variable will be a string.</p>
+<p style="margin-bottom: 0cm; border: none; padding: 0cm">The TYPE
+keyword can be omitted. In such situation, BaCon will verify the
+suffix of the variable name. If the variable name ends with a '$'
+then the variable is assumed to be a string. If the variable name
+ends with '<font color="#000000">#' then it is considered to be of a
+float type. When the variable name ends with a '%' then it is
+considered to be a long type. If no suffix is provided then LOCAL
+will assume the configuration set by OPTION VARTYPE, which by default
+is long. It is allowed to mix types in the same LOCAL statement.</font></p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">The ARRAY
 keyword is used to define a <a href="#DECLARATION_DYN">dynamic array</a>,
 which can be resized with <a href="#REDIM">REDIM</a> at a later stage
@@ -6270,12 +6329,12 @@ returned from a function.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Examples:</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><font face="DejaVu Sans Mono, sans-serif">LOCAL
 tt TYPE int<br>
-LOCAL q$<br>
-LOCAL new_array TYPE float ARRAY
-100<br>
-LOCAL name$ ARRAY 25</font></p>
-<p style="margin-bottom: 0cm; border: none; padding: 0cm"><font face="DejaVu Sans Mono, sans-serif">LOCAL
-key$ ASSOC STRING</font></p>
+LOCAL q$, p# = 0.5, i% = 1, var<br>
+LOCAL new_array
+TYPE float ARRAY 100<br>
+LOCAL name$ ARRAY 25<br>
+LOCAL key$ ASSOC
+STRING</font></p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Multiple
 variables of the same type can be declared at once, using a comma
 separated list. In case of pointer variables the asterisk should be
@@ -6714,11 +6773,14 @@ minute (0-59) where x is amount of seconds since January 1, 1970.</p>
 <h3 class="western" style="page-break-after: avoid"><a name="MOD"></a>
 <font color="#c5000b">MOD</font></h3>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><b>MOD</b>(x,
-y)</p>
+y [, z])</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Type:
 function</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Returns the
-modulo of x divided by y.</p>
+modulo of x divided by y. The optional argument &lt;z&gt; can either
+be TRUE or FALSE (default). When TRUE, the MOD function will switch
+to floating point mode and calculate the modulo delivering a floating
+point result.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><br>
 
 </p>
@@ -7051,7 +7113,8 @@ x&gt; | &lt;</span><b>UTF8</b> <span style="font-weight: normal">x&gt;
 &lt;</span><b>TLS</b> <span style="font-weight: normal">x&gt; | &lt;</span><b>EVAL</b>
 <span style="font-weight: normal">x&gt; </span><span style="font-weight: normal">|
 &lt;</span><b>NO_C</b><b>_ESC</b><span style="font-weight: normal">
-x&gt;</span></p>
+x&gt; </span><span style="font-weight: normal">|</span><span style="font-weight: normal">
+&lt;</span><b>LOCAL</b><span style="font-weight: normal"> x&gt;</span></p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Type:
 statement</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Sets an
@@ -7162,16 +7225,13 @@ avoid unexpected results.</p>
 	a program. The default value is 0 (FALSE), so no variable
 	declaration is enforced.</p>
 	<li><p style="margin-bottom: 0cm; border: none; padding: 0cm">The
+	LOCAL argument makes sure that implicitly declared variables used in
+	a SUB or FUNCTION have a local scope (1). The default value is 0
+	(FALSE).</p>
+	<li><p style="margin-bottom: 0cm; border: none; padding: 0cm">The
 	INPUT argument defines where the stream of input characters from
 	STDIN should be cut off. By default, INPUT returns when a newline is
 	encountered. The default value is <font face="Liberation Serif, serif">&quot;</font>\n<font face="Liberation Serif, serif">&quot;</font>.</p>
-	<li><p style="margin-bottom: 0cm; border: none; padding: 0cm">The
-	ERROR argument sets whether or not a program will exit as soon a
-	runtime error occurs. The default is TRUE (exit upon error). If set
-	to FALSE, the program must take care of error handling by itself,
-	and setting an error callback will be possible. See also the chapter
-	on <a href="#ERROR_TRAPPING">error catching</a> for more
-	information.</p>
 	<li><p style="margin-bottom: 0cm; border: none; padding: 0cm">The
 	PROPER argument sets whether or not the <a href="#PROPER$">PROPER$</a>
 	function should leave the items in a delimited string intact or not.
@@ -8758,8 +8818,9 @@ dimension<br>
 NEXT</font></p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">The above
 example will return four elements, of which the third element is
-empty. If <a href="#OPTION">OPTION COLLAPSE</a> is put to 1, the
-above example will return three elements, ignoring empty entries.</p>
+empty. If <a href="#OPTION">OPTION </a><a href="#OPTION">COLLAPSE</a>
+is put to 1, the above example will return three elements, ignoring
+empty entries.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><font face="DejaVu Sans Mono, sans-serif">SPLIT
 &quot;one,two,\&quot;three,four\&quot;,five&quot; BY &quot;,&quot; TO
 array$ SIZE dim</font></p>
@@ -8921,18 +8982,20 @@ x amount of tabs.</p>
 </p>
 <h3 class="western" style="page-break-after: avoid"><a name="TAIL$"></a>
 <font color="#c5000b">TAIL$</font></h3>
-<p style="margin-bottom: 0cm; border: none; padding: 0cm"><b>TAIL$</b>(string$,
-amount [, delimiter$])</p>
+<p style="margin-bottom: 0cm; border: none; padding: 0cm"><b>TAIL$</b>(string$
+[, amount [, delimiter$]])</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Type:
 function</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Retrieves
-the last &lt;amount&gt; elements from a delimited string$ split by
-delimiter$. The delimiter$ is optional. If it is omitted, then the
-definition from <a href="#OPTION">OPTION DELIM</a> is assumed. When
-specified, it may consist of multiple characters.</p>
+the last &lt;amount&gt; elements from a delimited &lt;string$&gt;
+split by &lt;delimiter$&gt;. The &lt;amount&gt; is an optional
+argument, which defaults to 1. The &lt;delimiter$&gt; also is
+optional. If omitted, then the definition from <a href="#OPTION">OPTION
+DELIM</a> is assumed. When specified, it may consist of multiple
+characters.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">If
-delimiter$ occurs between double quotes in string$, then it is
-ignored. This behavior can be changed by setting <a href="#OPTION">OPTION
+&lt;delimiter$&gt; occurs between double quotes in &lt;string$&gt;,
+then it is ignored. This behavior can be changed by setting <a href="#OPTION">OPTION
 QUOTED</a> to FALSE.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">See also
 <a href="#FIRST$">FIRST$</a> to obtain the remaining elements from
@@ -9079,7 +9142,7 @@ CHR$(34) &amp; &quot;,5,&quot;, 6, &quot;,&quot;)</font></p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><br>
 
 </p>
-<h3 class="western" style="page-break-after: avoid"><a name="TALLY1"></a><a name="TOTAL"></a>
+<h3 class="western" style="page-break-after: avoid"><a name="TOTAL"></a><a name="TALLY1"></a>
 <font color="#c5000b">TOTAL</font></h3>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><b>T</b><b>OTAL</b>(binary_tree)</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Type:
@@ -9137,14 +9200,14 @@ runtime error trapping. By default, BaCon performs error trapping
 possible, and will display an error message based on the operating
 system internals, indicating which statement or function causes a
 problem. Optionally, when a <a href="#CATCH">CATCH</a> is set, BaCon
-can jump to a <a href="#LABEL">LABEL</a> instead, where a
-self-defined error function can be executed, and from where a <a href="#RESUME">RESUME</a>
+can jump to a <a href="#LABEL">LABEL</a> instead, where self-defined
+code can be executed, and from where a <a href="#RESUME">RESUME</a>
 is possible.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">When set to
 SYSTEM, error trapping is performed by the operating system. This
 means that if an error occurs, a signal will be caught by the program
 and a generic error message is displayed on the prompt. The program
-will then exit gracefully</p>
+then may exit gracefully, depending on the actual error.</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">The setting
 LOCAL decreases the performance of the program, because additional
 runtime checks are carried out when the program is executed.</p>
@@ -9343,7 +9406,10 @@ e f a c f&quot;)</font></p>
 statement</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm">Defines a
 body with C code. This code is put unmodified into the generated C
-source file. Example:</p>
+source file. Note that defining complete C functions within a
+USEC/ENDUSEC block is not possible. Instead, such functions should be
+put into a <a href="#USEH">USEH</a>/ENDUSEH block.</p>
+<p style="margin-bottom: 0cm; border: none; padding: 0cm">Example:</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><font face="DejaVu Sans Mono, sans-serif">USEC<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char
 *str;<br>
@@ -9366,8 +9432,8 @@ statement</p>
 body with C declarations and/or definitions. This code is put
 unmodified into the generated global header source file. This can
 particularly be useful in case of using variables from external
-libraries. See also <a href="#USEC">USEC</a> to pass C source code.
-Example:</p>
+libraries or when defining full C functions. See also <a href="#USEC">USEC</a>
+to pass lines of C source code. Example:</p>
 <p style="margin-bottom: 0cm; border: none; padding: 0cm"><font face="DejaVu Sans Mono, sans-serif">USEH<br>
 &nbsp;&nbsp;&nbsp;&nbsp;char
 *str;<br>

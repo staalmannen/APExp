@@ -1,6 +1,6 @@
 +-------------------------------------+
 |                                     |
-| Installing BaCon 4.8                |
+| Installing BaCon 5.0.3              |
 |                                     |
 +-------------------------------------+
 
@@ -15,8 +15,8 @@ configure script as follows:
 
 # ./configure
 
-This will compile the BaCon version of BaCon. Note that KSH and ZSH are a
-lot faster converting the code compared to BASH.
+This will create the Makefile for the BaCon version of BaCon. Note that
+KSH and ZSH are a lot faster converting the code compared to BASH.
 
 Some older Linux distributions may require to use BASH, this can be forced
 as follows:
@@ -24,7 +24,7 @@ as follows:
 # ./configure --enable-bash
 
 The configure script also tries to autodetect the toolkit required to build 
-the GUI. If no toolkit is found then one can be forced as follows (GTK3):
+the GUI. If no toolkit is found then one can be forced as follows:
 
 # ./configure --enable-gui-gtk3
 
@@ -83,7 +83,7 @@ The following configure command should work, make sure FLTK is available on your
 ANDROID / TERMUX
 ================
 
-# CXXFLAGS="-x c++" ./configure --prefix=`pwd`/../../usr
+# CXXFLAGS="-x c++" ./configure --prefix=$HOME/../usr
 
 
 HAIKU OS
@@ -126,12 +126,11 @@ To compile BaCon with a C++ compiler, extra flags need to be added:
 |                                     |
 +-------------------------------------+
 
-BaCon makes heavily use of dynamic memory allocation functions. The standard libC
-functions malloc/calloc/realloc/free are reliable, but designed for general
-purpose applications.
+BaCon relies heavily on dynamic memory allocation functions. The standard libC functions
+malloc/calloc/realloc/free are designed for general purpose applications.
 
 To make use of an exernal memory allocator when compiling BaCon, it is possible
-to pass the library name before running the './configure' script.
+to pass the appropriate library name before running the './configure' script.
 
 
 - Example with 'jemalloc':

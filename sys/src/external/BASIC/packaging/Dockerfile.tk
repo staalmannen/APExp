@@ -16,7 +16,7 @@
 FROM alpine:latest
 
 RUN apk update
-RUN apk add build-base musl-fts-dev zsh flex indent openssl-libs-static openssl-dev pcre-dev xterm tcl-dev tk-dev font-dejavu
+RUN apk add build-base musl-fts-dev zsh indent openssl-libs-static openssl-dev pcre-dev xterm tcl-dev tk-dev font-dejavu
 
 COPY . /usr/src/bacon
 WORKDIR /usr/src/bacon

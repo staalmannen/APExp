@@ -2,10 +2,10 @@
 <!--
 
  Author: Peter van Eerten <peter@basic-converter.org>
- Copyright (C) 2010 Peter van Eerten <peter@basic-converter.org>
+ Copyright (C) 2010-2024 Peter van Eerten <peter@basic-converter.org>
 
  Language: BaCon (BAsic CONverter)
- Last Change: March 6, 2024
+ Last Change: November 18, 2024
 
  This library is free software; you can redistribute it and/or
  modify it under the terms of the GNU Library General Public
@@ -26,13 +26,30 @@
     INSTALLATION INSTRUCTIONS
     =========================
 
-(1) Create language directory for GtkSourceView:
+(1) Create language directory for GtkSourceView 2.0:
 
-    mkdir -p ~/.local/share/gtksourceview-2.0/language-specs/
+    mkdir -p ~/.local/share/gtksourceview-2.0/language-specs
 
-(2) Copy this file to the new directory:
+    For GtkSourceView 4.0:
+
+    mkdir -p ~/.local/share/gtksourceview-4/language-specs
+
+    For GtkSourceView 5.0:
+
+    mkdir -p ~/.local/share/gtksourceview-5/language-specs
+
+
+(2) Copy this file to the new directory for GtkSourceView 2.0:
 
     cp bacon.lang ~/.local/share/gtksourceview-2.0/language-specs/
+
+    In case of GtkSourceView 4.0:
+
+    cp bacon.lang ~/.local/share/gtksourceview-4/language-specs/
+
+    In case of GtkSourceView 5.0:
+
+    cp bacon.lang ~/.local/share/gtksourceview-5/language-specs/
 
 
 Now start gedit, Anjuta, Scribes etc and the BaCon sourcecode has
@@ -144,6 +161,7 @@ Now start gedit, Anjuta, Scribes etc and the BaCon sourcecode has
 	<keyword>GETKEY</keyword>
 	<keyword>GETX</keyword>
 	<keyword>GETY</keyword>
+	<keyword>GUICB</keyword>
 	<keyword>GUIFN</keyword>
 	<keyword>GUIDEFINE</keyword>
 	<keyword>GUIGET</keyword>

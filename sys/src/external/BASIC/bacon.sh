@@ -5,7 +5,7 @@
 # | |_) | (_| | |__| (_) | | | |   --= A Shell BASIC-to-C converter =--
 # |____/ \__,_|\____\___/|_| |_|
 #
-# Peter van Eerten - March 2009/March 2024. License: MIT License.
+# Peter van Eerten - March 2009/March 2025. License: MIT License.
 #
 #---------------------------------------------------------------------------------------------------------------------
 # CREDITS to all people of the BaCon forum. Without them BaCon would not be as it is now.
@@ -33,10 +33,15 @@ then
     shopt -s extglob
 else
     # Check Kornshell version
-    if [[ ${KSH_VERSION} = +(*MIRBSD*) || -n ${ZSH_NAME} ]]
+    if [[ ${KSH_VERSION} = +(*MIRBSD*) || ${KSH_VERSION} = +(*PD*) ]]
+    then
+        echo "System error: this is KSH version '${KSH_VERSION}' - BaCon 4.0+ is not compatible with Public Domain Kornshell and friends like MKSH due to their lack of associative arrays. Please use Kornshell ksh93u+ or later, or BASH >4.x, or ZSH >4.x instead."
+        exit 1
+    elif [[ -n ${ZSH_NAME} ]]
     then
         alias echo="print -R"
-    else
+    elif [[ `uname` != +(*BSD*) ]]
+    then
         ulimit -s unlimited
     fi
 
@@ -57,15 +62,15 @@ fi
 unset GREP_OPTIONS
 
 # Version of BACON
-typeset -rx g_VERSION="4.8"
+typeset -rx g_VERSION="5.0.3"
 
 # Our numerical environment is POSIX
 export LC_NUMERIC="POSIX"
 
 # Find coretools
-if [[ -z `command -v cat` || -z `command -v rm` || -z `command -v tr` || -z `command -v touch` || -z `command -v uname` || -z `command -v head` || -z `command -v pwd` ]]
+if [[ -z `command -v cat` || -z `command -v rm` || -z `command -v tr` || -z `command -v touch` || -z `command -v uname` || -z `command -v head` || -z `command -v pwd` || -z `command -v sort` || -z `command -v grep` ]]
 then
-    echo "System error: 'cat', 'rm', 'tr', 'touch', 'uname', 'head' or 'pwd' not found on this system!"
+    echo "System error: 'cat', 'rm', 'tr', 'touch', 'uname', 'head', 'pwd', 'sort' or 'grep' not found on this system!"
     exit 1
 fi
 
@@ -113,7 +118,7 @@ typeset -rx g_TAB=`echo -e "\011"`
 # Remember the original field separator
 typeset -rx g_ORGIFS="${IFS}"
 
-# Needed to prevent accidental variable names using C keywords
+# Needed for a check to prevent variable names accidentally being C keywords
 typeset -rx g_C_KEYWORDS="asm|auto|break|case|char|const|continue|default|do|double|else|enum|extern|float|for|goto|if|inline|int|long|register|return|short|signed|sizeof|static|struct|switch|typedef|union|unsigned|void|volatile|while|y0|y1|yn|y0f|y1f|ynf|y0l|y1l|ynl"
 
 # Associative vars to keep track of BaCon variables
@@ -293,7 +298,7 @@ function Save_Func_Var
 
 function Debug_Vars
 {
-    typeset i
+    typeset i TOTAL
 
     if [[ ${#g_ALL_MAIN_VARS[@]} -gt 0 ]]
     then
@@ -314,6 +319,15 @@ function Debug_Vars
         done
         echo
     fi
+
+    for i in ${DATA_1} ${DATA_2} ${DATA_3} ${DATA_4} ${DATA_5} ${DATA_6} ${DATA_7} ${DATA_8} ${DATA_9} ${DATA_10} ${DATA_11} ${DATA_12}
+    do
+        if [[ -n $(grep "${i}(" <<<${g_DEPEND}) || -n $(grep "${i}[[:space:]]" <<<${g_DEPEND}) ]]
+        then
+            TOTAL="${TOTAL}${i} "
+        fi
+    done
+    echo ${TOTAL}
 }
 
 # This function registers variables. $1 = var to be declared, $2 type of var
@@ -329,22 +343,44 @@ function Register_Numeric
 	        echo -e "\nSyntax error: OPTION EXPLICIT forces explicit variable declaration at line $g_COUNTER in file '$g_CURFILE'!"
                 exit 1
             fi
-            if [[ ${2} != "default" ]]
+            if [[ $g_OPTION_LOCAL = "1" || $g_OPTION_LOCAL = "TRUE" ]]
             then
-	        echo "${2} ${1} = 0;" >> $g_HFILE
-                Save_Main_Var "${1}" "${2}"
-            else
-	        if [[ "${1}" = +(*${g_FLOATSIGN}) ]]
-	        then
-                    echo "double ${1} = 0.0;" >> $g_HFILE
-                    Save_Main_Var "${1}" "double"
-                elif [[ "${1}" = +(*${g_LONGSIGN}) ]]
+                if [[ ${2} != "default" ]]
                 then
-                    echo "long ${1} = 0;" >> $g_HFILE
-                    Save_Main_Var "${1}" "long"
+	            echo "${2} ${1} = 0;" >> $g_CFILE
+                    Save_Func_Var "${1}" "${g_FUNCNAME}" "${2}"
                 else
-                    echo "${g_VARTYPE} ${1} = 0;" >> $g_HFILE
-                    Save_Main_Var "${1}" "${g_VARTYPE}"
+	            if [[ "${1}" = +(*${g_FLOATSIGN}) ]]
+	            then
+                        echo "double ${1} = 0.0;" >> $g_CFILE
+                        Save_Func_Var "${1}" "${g_FUNCNAME}" "double"
+                    elif [[ "${1}" = +(*${g_LONGSIGN}) ]]
+                    then
+                        echo "long ${1} = 0;" >> $g_CFILE
+                        Save_Func_Var "${1}" "${g_FUNCNAME}" "long"
+                    else
+                        echo "${g_VARTYPE} ${1} = 0;" >> $g_CFILE
+                        Save_Func_Var "${1}" "${g_FUNCNAME}" "${g_VARTYPE}"
+                    fi
+                fi
+            else
+                if [[ ${2} != "default" ]]
+                then
+	            echo "${2} ${1} = 0;" >> $g_HFILE
+                    Save_Main_Var "${1}" "${2}"
+                else
+	            if [[ "${1}" = +(*${g_FLOATSIGN}) ]]
+	            then
+                        echo "double ${1} = 0.0;" >> $g_HFILE
+                        Save_Main_Var "${1}" "double"
+                    elif [[ "${1}" = +(*${g_LONGSIGN}) ]]
+                    then
+                        echo "long ${1} = 0;" >> $g_HFILE
+                        Save_Main_Var "${1}" "long"
+                    else
+                        echo "${g_VARTYPE} ${1} = 0;" >> $g_HFILE
+                        Save_Main_Var "${1}" "${g_VARTYPE}"
+                    fi
                 fi
             fi
         fi
@@ -363,8 +399,14 @@ function Register_Pointer
 	        echo -e "\nSyntax error: OPTION EXPLICIT forces explicit variable declaration at line $g_COUNTER in file '$g_CURFILE'!"
                 exit 1
             fi
-            echo "${2} ${1} = NULL;" >> $g_HFILE
-            Save_Main_Var "${1}" "${2}"
+            if [[ $g_OPTION_LOCAL = "1" || $g_OPTION_LOCAL = "TRUE" ]]
+            then
+                echo "${2} ${1} = NULL;" >> $g_CFILE
+                Save_Func_Var "${1}" "${g_FUNCNAME}" "${2}"
+            else
+                echo "${2} ${1} = NULL;" >> $g_HFILE
+                Save_Main_Var "${1}" "${2}"
+            fi
         fi
     fi
 }
@@ -375,13 +417,13 @@ function Trim
 {
     typeset TRIMMED=${1}
 
-    while [[ ${TRIMMED} = ' '* ]]
+    while [[ "${TRIMMED}" =~ ^([[:space:]]+.*)$ ]]
     do
-       TRIMMED="${TRIMMED## }"
+        TRIMMED="${TRIMMED:1}"
     done
-    while [[ ${TRIMMED} = *' ' ]]
+    while [[ "${TRIMMED}" =~ ^(.*[[:space:]]+)$ ]]
     do
-       TRIMMED="${TRIMMED%% }"
+        TRIMMED="${TRIMMED:0:${#TRIMMED}-1}"
     done
 
     echo "${TRIMMED}"
@@ -485,13 +527,13 @@ function Mini_Parser
 		    fi
 		fi
 		ESCAPED=0;;
-	    "(")
+	    "("|"{")
 		if [[ $IN_STRING -eq 0 ]]
 		then
 		    ((IN_FUNC=$IN_FUNC+1))
 		fi
 		ESCAPED=0;;
-	    ")")
+	    ")"|"}")
 		if [[ $IN_STRING -eq 0 ]]
 		then
 		    ((IN_FUNC=$IN_FUNC-1))
@@ -726,7 +768,13 @@ function Handle_Print
             do
                 TOKEN=$(Mini_Parser "${EXP}")
 	        Print_Element "${TOKEN}" "${2}"
-                EXP="${EXP:${#TOKEN}+1}"
+                EXP="${EXP:${#TOKEN}}"
+                if [[ -n ${EXP} && ${EXP:0:1} != "," && ${EXP:0:1} != ";" || $(Trim "${EXP}") = "," ]]
+                then
+	            echo -e "\nSyntax error: malformed expression in PRINT at line $g_COUNTER in file '$g_CURFILE'!"
+                    exit 1
+                fi
+                EXP="${EXP:1}"
             done
             # If line ends with ';' then skip newline
 	    if [[ -n $(echo ${1##*;}) ]]
@@ -761,16 +809,30 @@ function Handle_Input
     while [[ -n ${EXP} ]]
     do
         TOKEN=$(Mini_Parser "${EXP}")
-        EXP="${EXP:${#TOKEN}+1}"
+        EXP="${EXP:${#TOKEN}}"
         if [[ -n ${EXP} ]]
         then
-	    Print_Element "${TOKEN}" "stdout"
+            if [[ ${EXP:0:1} != "," || $(Trim "${EXP}") = "," ]]
+            then
+	        echo -e "\nSyntax error: malformed expression in INPUT at line $g_COUNTER in file '$g_CURFILE'!"
+                exit 1
+            else
+	        Print_Element "${TOKEN}" "stdout"
+            fi
         fi
+        EXP="${EXP:1}"
     done
     echo "fflush(stdout);" >> $g_CFILE
 
     # Remove spaces in variable
     VAR=$(echo ${TOKEN})
+
+    # Argument must be a variable
+    if [[ ! "${VAR}" =~ ^([a-zA-Z]+.*) ]]
+    then
+	echo -e "\nSyntax error: argument in INPUT statement at line $g_COUNTER in file '$g_CURFILE' is not a variable!"
+	exit 1
+    fi
 
     # Check if string is declared
     if [[ "${VAR}" = +(*${g_STRINGSIGN}) ]]
@@ -1122,8 +1184,7 @@ function Handle_Let
         PTR="${VAR//[[:punct:]]/}"
         if [[ -n $(Get_Var __b2c__dlopen__pointer_$PTR) ]]
 	then
-	    echo "__b2c__dlopen__pointer_$PTR = dlopen($VAR, RTLD_LAZY); if(__b2c__dlopen__pointer_$PTR == NULL)" >> $g_CFILE
-	    echo "{ if(__b2c__trap){ERROR = 3; if(!__b2c__catch_set) RUNTIMEERROR(\"IMPORT\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO; } }" >> $g_CFILE
+	    echo "__b2c__dlopen__pointer_$PTR = dlopen($VAR, RTLD_LAZY); if(__b2c__dlopen__pointer_$PTR == NULL) { ERROR = 3; RUNTIMEERROR(\"IMPORT\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
 	fi
 	# Check for array member in RECORD
 	if [[ ${VAR} = +(*\.*) && ${VAR%%.*} = +(*\[*\]*) && -n ${g_FUNCNAME} && -z $(Get_Var ${VAR}) ]]
@@ -1239,19 +1300,19 @@ function Handle_Open
     case $MODE in
 	@(READING) )
 	    echo "$HANDLE = fopen((const char*)${VAR}, \"r\");" >> $g_CFILE
-	    echo "if($HANDLE == NULL){if(__b2c__trap){ERROR = 2; if(!__b2c__catch_set) RUNTIMEERROR(\"OPEN FOR READING\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE;;
+	    echo "if($HANDLE == NULL){ ERROR = 2; RUNTIMEERROR(\"OPEN FOR READING\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE;;
 	@(WRITING) )
 	    echo "$HANDLE = fopen((const char*)${VAR}, \"w\");" >> $g_CFILE
-	    echo "if($HANDLE == NULL){if(__b2c__trap){ERROR = 2; if(!__b2c__catch_set) RUNTIMEERROR(\"OPEN FOR WRITING\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE;;
+	    echo "if($HANDLE == NULL){ ERROR = 2; RUNTIMEERROR(\"OPEN FOR WRITING\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE;;
 	@(APPENDING) )
 	    echo "$HANDLE = fopen((const char*)${VAR}, \"a\");" >> $g_CFILE
-	    echo "if($HANDLE == NULL){if(__b2c__trap){ERROR = 2; if(!__b2c__catch_set) RUNTIMEERROR(\"OPEN FOR APPENDING\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE;;
+	    echo "if($HANDLE == NULL){ ERROR = 2; RUNTIMEERROR(\"OPEN FOR APPENDING\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE;;
 	@(READWRITE) )
 	    echo "$HANDLE = fopen((const char*)${VAR}, \"r+\");" >> $g_CFILE
-	    echo "if($HANDLE == NULL){if(__b2c__trap){ERROR = 2; if(!__b2c__catch_set) RUNTIMEERROR(\"OPEN FOR READWRITE\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE;;
+	    echo "if($HANDLE == NULL){ ERROR = 2; RUNTIMEERROR(\"OPEN FOR READWRITE\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE;;
 	@(DIRECTORY) )
 	    echo "$HANDLE = opendir(${VAR});" >> $g_CFILE
-	    echo "if($HANDLE == NULL){if(__b2c__trap){ERROR = 2; if(!__b2c__catch_set) RUNTIMEERROR(\"OPEN FOR DIRECTORY\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE;;
+	    echo "if($HANDLE == NULL){ ERROR = 2; RUNTIMEERROR(\"OPEN FOR DIRECTORY\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE;;
 	@(MEMORY) )
             if [[ -z $(Get_Var __b2c_mem_$HANDLE ${g_FUNCNAME}) ]]
 	    then
@@ -1263,20 +1324,22 @@ function Handle_Open
 	        echo "__b2c__STRFREE(${HANDLE});" >> $g_CFILE
             fi
             echo "$HANDLE = (char*)${VAR}; __b2c_mem_$HANDLE = (uintptr_t)${VAR};" >> $g_CFILE
-	    echo "if(__b2c__trap){if(!__b2c__memory__check($HANDLE, sizeof(__b2c__MEMTYPE))) {ERROR=1; if(!__b2c__catch_set) RUNTIMEERROR(\"OPEN FOR MEMORY\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE;;
+	    echo "if(!__b2c__memory__check($HANDLE, sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"OPEN FOR MEMORY\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE;;
         @(NETWORK) )
 	    # Network code
-            echo "ERROR = __b2c__network_init((uintptr_t*)&${HANDLE}, ${VAR}, ${FROM}, ${g_SOCKTYPE}, ${g_OPTION_SOCKET}, \"${g_NETWORKTYPE}\", ${g_MULTICAST_TTL}, ${g_SCTP_STREAMS}, __b2c__capeer, __b2c__cacerts);" >> $g_CFILE
-            echo "if(ERROR && __b2c__trap){ if(!__b2c__catch_set) RUNTIMEERROR(\"OPEN FOR NETWORK\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO; }" >> $g_CFILE
+            echo "ERROR = __b2c__network_init((uintptr_t*)&${HANDLE}, ${VAR}, ${FROM}, ${g_SOCKTYPE}, ${g_OPTION_SOCKET}, \"${g_NETWORKTYPE}\", ${g_MULTICAST_TTL}, ${g_SCTP_STREAMS}, __b2c__capeer, __b2c__cacerts, __b2c__caprivate, __b2c__caserver);" >> $g_CFILE
+            echo "if(ERROR){ RUNTIMEERROR(\"OPEN FOR NETWORK\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
             ;;
 	@(SERVER) )
 	    # Network code
-            echo "ERROR = __b2c__server_init((uintptr_t*)&${HANDLE}, ${VAR}, ${g_SOCKTYPE}, ${g_OPTION_SOCKET}, ${g_SCTP_STREAMS});" >> $g_CFILE
-            echo "if(ERROR && __b2c__trap){ if(!__b2c__catch_set) RUNTIMEERROR(\"OPEN FOR SERVER\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO; }" >> $g_CFILE
+            echo "ERROR = __b2c__server_init((uintptr_t*)&${HANDLE}, ${VAR}, ${g_SOCKTYPE}, ${g_OPTION_SOCKET}, ${g_SCTP_STREAMS}); if(ERROR){ RUNTIMEERROR(\"OPEN FOR SERVER\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
             ;;
 	@(DEVICE) )
-	    echo "$HANDLE = open(${VAR}, __b2c__option_open, S_IRUSR|S_IWUSR);" >> $g_CFILE
-	    echo "if($HANDLE < 0){if(__b2c__trap){ERROR = 32; if(!__b2c__catch_set) RUNTIMEERROR(\"OPEN FOR DEVICE\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE;;
+	    echo "$HANDLE = open(${VAR}, __b2c__option_open, S_IRUSR|S_IWUSR); if($HANDLE < 0){ ERROR = 32; RUNTIMEERROR(\"OPEN FOR DEVICE\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
+            ;;
+        *)
+	    echo -e "\nSyntax error: wrong mode '${MODE}' to OPEN statement at line ${g_COUNTER} in file '${g_CURFILE}'!"
+	    exit 1
     esac
     if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
     then
@@ -1413,11 +1476,10 @@ function Handle_Getbyte
     CHECK=$(Get_Var ${FROM} ${g_FUNCNAME})
 
     # Translate function to C function
-    echo "if(__b2c__trap){if(!__b2c__memory__check((char*)${VAR}, sizeof(__b2c__MEMTYPE))) {ERROR=1; if(!__b2c__catch_set) RUNTIMEERROR(\"GETBYTE\", ${g_COUNTER}, \"${g_CURFILE}\", ERROR); else if(!setjmp(__b2c__jump)) goto ${g_CATCHGOTO};} }" >> $g_CFILE
+    echo "if(!__b2c__memory__check((char*)${VAR}, sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"GETBYTE\", ${g_COUNTER}, \"${g_CURFILE}\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
     if [[ $CHECK = +(*int*) ]]
     then
-        echo "if((${SIZE} = read(${FROM}, (void*)(${VAR}), ${CHUNK})) < 0)" >> $g_CFILE
-        echo "{if(__b2c__trap){ERROR = 34; if(!__b2c__catch_set) RUNTIMEERROR(\"GETBYTE\", ${g_COUNTER}, \"${g_CURFILE}\", ERROR); else if(!setjmp(__b2c__jump)) goto ${g_CATCHGOTO};} }" >> $g_CFILE
+        echo "if((${SIZE} = read(${FROM}, (void*)(${VAR}), ${CHUNK})) < 0) { ERROR = 34; RUNTIMEERROR(\"GETBYTE\", ${g_COUNTER}, \"${g_CURFILE}\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
     else
         echo "${SIZE} = fread((void*)(${VAR}), sizeof(__b2c__MEMTYPE), ${CHUNK}, ${FROM});" >> $g_CFILE
     fi
@@ -1484,11 +1546,10 @@ function Handle_Putbyte
     CHECK=$(Get_Var ${TO} ${g_FUNCNAME})
 
     # Translate function to C function
-    echo "if(__b2c__trap){if(!__b2c__memory__check((char*)${VAR}, sizeof(__b2c__MEMTYPE))) {ERROR=1; if(!__b2c__catch_set) RUNTIMEERROR(\"PUTBYTE\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+    echo "if(!__b2c__memory__check((char*)${VAR}, sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"PUTBYTE\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
     if [[ $CHECK = +(*int*) ]]
     then
-        echo "if(($SIZE = write(${TO}, (void*)(${VAR}), $CHUNK)) < 0)" >> $g_CFILE
-        echo "{if(__b2c__trap){ERROR = 34; if(!__b2c__catch_set) RUNTIMEERROR(\"PUTBYTE\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+        echo "if(($SIZE = write(${TO}, (void*)(${VAR}), $CHUNK)) < 0) { ERROR = 34; RUNTIMEERROR(\"PUTBYTE\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
     else
         echo "$SIZE = fwrite((void*)(${VAR}), sizeof(__b2c__MEMTYPE), $CHUNK, $TO); fflush($TO);" >> $g_CFILE
     fi
@@ -1618,7 +1679,7 @@ function Handle_Receive
             echo "if(($SIZE = recv($FROM, (void*)__b2c__assign, $CHUNK, 0)) < 0) {" >> $g_CFILE
         fi
     fi
-    echo "if(__b2c__trap){ERROR = 14; if(!__b2c__catch_set) RUNTIMEERROR(\"RECEIVE\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO; } }" >> $g_CFILE
+    echo "ERROR = 14; RUNTIMEERROR(\"RECEIVE\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
 
     Assign_To_String "__b2c__assign" "${VAR}" "${SIZE}"
 
@@ -1685,7 +1746,7 @@ function Handle_Send
             echo "if(($SIZE = send($TO, (void*)($VAR), $CHUNK, 0)) < 0) {" >> $g_CFILE
         fi
     fi
-    echo "if(__b2c__trap){ERROR = 15; if(!__b2c__catch_set) RUNTIMEERROR(\"SEND\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+    echo "ERROR = 15; RUNTIMEERROR(\"SEND\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
     if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
     then
         g_CATCH_USED=1
@@ -1839,19 +1900,16 @@ function Handle_Import
                 Save_Main_Var "__b2c__dlopen__pointer_${PTR}" "void*"
             fi
 	fi
-	echo "if(__b2c__dlopen__pointer_$PTR == NULL){__b2c__dlopen__pointer_$PTR = dlopen($LIB, RTLD_LAZY); if(__b2c__dlopen__pointer_$PTR == NULL) {" >> $g_CFILE
-	echo "if(__b2c__trap){ERROR = 3; if(!__b2c__catch_set) RUNTIMEERROR(\"IMPORT\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} } }" >> $g_CFILE
+	echo "if(__b2c__dlopen__pointer_$PTR == NULL){__b2c__dlopen__pointer_$PTR = dlopen($LIB, RTLD_LAZY); if(__b2c__dlopen__pointer_$PTR == NULL) { ERROR = 3; RUNTIMEERROR(\"IMPORT\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); } }" >> $g_CFILE
 
         # Create prototype
         if [[ $LIB != "NULL" ]]
         then
 	    echo "$TYPE (*${SYM})(${TOKEN});" >> $g_HFILE
-	    echo "*(${TYPE}**) (&${SYM}) = (${TYPE}*)dlsym(__b2c__dlopen__pointer_$PTR, \"${SYM}\");" >> $g_CFILE
-	    echo "if(${SYM} == NULL) {if(__b2c__trap){ERROR = 4; if(!__b2c__catch_set) RUNTIMEERROR(\"IMPORT\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+	    echo "*(${TYPE}**) (&${SYM}) = (${TYPE}*)dlsym(__b2c__dlopen__pointer_$PTR, \"${SYM}\"); if(${SYM} == NULL) { ERROR = 4; RUNTIMEERROR(\"IMPORT\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
         else
 	    echo "$TYPE (*$ALIAS)(${TOKEN});" >> $g_HFILE
-	    echo "*(${TYPE}**) (&$ALIAS) = (${TYPE}*)dlsym(__b2c__dlopen__pointer_$PTR, \"${SYM}\");" >> $g_CFILE
-	    echo "if($ALIAS == NULL) {if(__b2c__trap){ERROR = 4; if(!__b2c__catch_set) RUNTIMEERROR(\"IMPORT\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+	    echo "*(${TYPE}**) (&$ALIAS) = (${TYPE}*)dlsym(__b2c__dlopen__pointer_$PTR, \"${SYM}\"); if($ALIAS == NULL) { ERROR = 4; RUNTIMEERROR(\"IMPORT\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
         fi
     fi
 
@@ -2120,8 +2178,8 @@ function Binary_Tree
 function Handle_Declare
 {
     # Local variables
-    typeset VAR TYPE CHECK NEW VALUE OPTION ARRAY i PTR TOKEN
-    typeset -i CTR
+    typeset VAR TYPE VALUE OPTION ARRAY i TOKEN STR
+    typeset -i CTR SELF_DECLARED=0
 
     if [[ -n $g_RECORDNAME ]]
     then
@@ -2166,14 +2224,10 @@ function Handle_Declare
 	then
 	    VAR=$(Trim "${1%% TREE *}")
 	    TYPE=$(Trim "${1##* TREE }")
-	else
-	    if [[ "${1}" = +(* ARRAY *) ]]
-	    then
-		ARRAY=${1##* ARRAY }
-	        VAR=$(Trim "${1%% ARRAY *}")
-            else
-	        VAR=$(Trim "${1}")
-	    fi
+        elif [[ "$1" = +(* ARRAY *) ]]
+        then
+	    ARRAY=${1##* ARRAY }
+	    VAR=$(Trim "${1%% ARRAY *}")
             # This construction needed for KSH93
 	    if [[ "${VAR//${g_STRINGSIGN}/}" != "${VAR}" ]]
 	    then
@@ -2184,176 +2238,183 @@ function Handle_Declare
 	    else
 	        TYPE="${g_VARTYPE}"
 	    fi
-        fi
-        # Check if variable was already declared - no record and not a function pointer?
-        if [[ "$VAR" != +(*.*) && "$VAR" != +(\(*) ]]
-        then
-            IFS=","
-	    for i in ${VAR// /}
-            do
+        else
+	    VAR=$(Trim "${1}")
+            SELF_DECLARED=1
+	fi
+
+        while [[ -n ${VAR} ]]
+        do
+            STR=$(Mini_Parser "${VAR}")
+            VAR="${VAR:${#STR}+1}"
+            STR=$(Trim "${STR}")
+            # Case of mixed declarations?
+            if [[ ${SELF_DECLARED} -eq 1 ]]
+            then
+                i=$(echo ${STR%%=*} | tr -d "\040")
+                # This construction needed for KSH93
+	        if [[ "${i//${g_STRINGSIGN}/}" != "${i}" ]]
+	        then
+	            TYPE="char*"
+	        elif [[ "${i//${g_FLOATSIGN}/}" != "${i}" ]]
+	        then
+	            TYPE="double"
+	        elif [[ "${i//${g_LONGSIGN}/}" != "${i}" ]]
+	        then
+	            TYPE="long"
+	        else
+	            TYPE="${g_VARTYPE}"
+	        fi
+            fi
+            # Check if variable was already declared - no record and not a function pointer?
+            if [[ "$STR" != +(*.*) && "$STR" != +(\(*) ]]
+            then
                 # Check for C keywords
-                if [[ "${i%%=*}" = +(${g_C_KEYWORDS}) ]]
-                then
-	            echo -e "\nSyntax error: variable '${i}' in DECLARE/GLOBAL statement at line $g_COUNTER in file '$g_CURFILE' is a C keyword or function!"
+                if [[ "${STR%%=*}" = +(${g_C_KEYWORDS}) ]]
+                    then
+	            echo -e "\nSyntax error: variable '${STR}' in DECLARE/GLOBAL statement at line $g_COUNTER in file '$g_CURFILE' is a C keyword or function!"
 	            exit 1
                 fi
                 # Previous definitions
-                if [[ -n $(Get_Var "${i%%=*}") ]]
+                if [[ -n $(Get_Var "${STR%%=*}") ]]
                 then
-	            echo -e "\nSyntax error: variable '${i}' in DECLARE/GLOBAL statement at line $g_COUNTER in file '$g_CURFILE' was defined previously!"
+	            echo -e "\nSyntax error: variable '${STR}' in DECLARE/GLOBAL statement at line $g_COUNTER in file '$g_CURFILE' was defined previously!"
 	            exit 1
                 fi
-            done
-            IFS="${g_ORGIFS}"
-        fi
+            fi
 
-	# Check for associative array
-	if [[ "${1}" = +(* ASSOC *) ]]
-	then
-            Assoc_Array "${VAR}" "${TYPE}"
-
-	# Check for binary tree
-	elif [[ "${1}" = +(* TREE *) ]]
-	then
-            Binary_Tree "${VAR}" "${TYPE}"
-
-        #  Check for dynamic array declaration
-	elif [[ -n ${ARRAY} ]]
-	then
-            Normal_Dyn_Array "$TYPE" "${VAR//,/ }" "$ARRAY" 0 0
-
-        # Check if it is a known type, if not BaCon has to use external .h file
-        elif [[ ${TYPE%%\**} != +(DIR|FILE|*short|*int|*long|*float|*double|*char|void|STRING|NUMBER|FLOATING) ]]
-        then
-	    if [[ "$VAR" = +(*=*) ]]
+	    # Check for associative array
+	    if [[ "${1}" = +(* ASSOC *) ]]
 	    then
-	        echo "$TYPE $VAR;" >> $g_HFILE
-		Save_Main_Var "${VAR}" "${TYPE}"
-	    else
-		for i in ${VAR//,/ }
-		do
-	            echo "$TYPE $i;" >> $g_HFILE
-		    Save_Main_Var "${i}" "${TYPE}"
-		done
-	    fi
+                Assoc_Array "${STR}" "${TYPE}"
 
-	# Check if var is string var
-	elif [[ ( "${VAR}" = +(*${g_STRINGSIGN}*) || "${TYPE}" = +(STRING|char\*) ) && "${VAR}" != +(*=*) ]]
-	then
-	    for i in ${VAR//,/ }
-	    do
-                if [[ -z $(Get_Var ${i}) ]]
+	    # Check for binary tree
+	    elif [[ "${1}" = +(* TREE *) ]]
+	    then
+                Binary_Tree "${STR}" "${TYPE}"
+
+            # Check for dynamic array declaration
+	    elif [[ -n ${ARRAY} ]]
+	    then
+                Normal_Dyn_Array "$TYPE" "${STR//,/ }" "$ARRAY" 0 0
+
+            # Check if it is a known type, if not BaCon has to use external .h file
+            elif [[ ${TYPE%%\**} != +(DIR|FILE|*short|*int|*long|*float|*double|*char|void|STRING|NUMBER|FLOATING) ]]
+            then
+	        if [[ "$STR" = +(*=*) ]]
 	        then
-		    if [[ "${i}" = +(*\[*\]*) ]]
+	            echo "$TYPE $STR;" >> $g_HFILE
+		    Save_Main_Var "${STR}" "${TYPE}"
+	        else
+	            echo "$TYPE $STR;" >> $g_HFILE
+		    Save_Main_Var "${STR}" "${TYPE}"
+	        fi
+
+	    # Check if var is string var
+	    elif [[ ( "${STR}" = +(*${g_STRINGSIGN}*) || "${TYPE}" = +(STRING|char\*) ) && "${STR}" != +(*=*) ]]
+	    then
+                if [[ -z $(Get_Var ${STR}) ]]
+	        then
+		    if [[ "${STR}" = +(*\[*\]*) ]]
 		    then
-			echo "char *${i//]/+$g_OPTION_BASE]} = { NULL };" >> $g_HFILE
+			echo "char *${STR//]/+$g_OPTION_BASE]} = { NULL };" >> $g_HFILE
                         # Save type
-                        Save_Main_Var "${i}" "char*"
-                    elif [[ ${i} = +(*\(*\)*) ]]
+                        Save_Main_Var "${STR}" "char*"
+                    elif [[ ${STR} = +(*\(*\)*) ]]
                     then
                         # Function pointer
-		        echo "$TYPE $i;" >> $g_HFILE
-                        i=`echo ${i%%\)*} | tr -d "\052"`
-                        Save_Main_Var "${i##*\(}" "void*"
+		        echo "$TYPE $STR;" >> $g_HFILE
+                        STR=`echo ${STR%%\)*} | tr -d "\052"`
+                        Save_Main_Var "${STR##*\(}" "void*"
 		    else
-			echo "char *$i = NULL;" >> $g_HFILE
-                        Save_Main_Var "${i}" "char*"
+			echo "char *${STR} = NULL;" >> $g_HFILE
+                        Save_Main_Var "${STR}" "char*"
 		    fi
 	        fi
-	    done
 
-        # Var is string array assignment
-	elif [[ ( "${VAR}" = +(*${g_STRINGSIGN}*) || "${TYPE}" = +(*STRING*|*char\**) ) && "${VAR}" = +(*=*) ]]
-        then
-            if [[ -z $(Get_Var ${VAR}) ]]
-	    then
-		if [[ "${VAR}" = +(*\[*\]*) && "${VAR}" = +(*=*) ]]
-		then
-		    if [[ "${VAR}" = +(*\[*\]*\]*) ]]
+            # Var is string array assignment
+	    elif [[ ( "${STR}" = +(*${g_STRINGSIGN}*) || "${TYPE}" = +(*STRING*|*char\**) ) && "${STR}" = +(*=*) ]]
+            then
+                if [[ -z $(Get_Var ${STR}) ]]
+	        then
+		    if [[ "${STR}" = +(*\[*\]*) && "${STR}" = +(*=*) ]]
 		    then
-		        echo -e "\nSyntax error: multidimensional stringarrays at line $g_COUNTER in file '$g_CURFILE' are not supported!"
-		        exit 1
-		    fi
-		    # Determine elements to declare array
-                    VALUE=`echo ${VAR} | tr -d -c "," | wc -c`
-                    ((VALUE+=1))
-		    echo "char *${VAR%%\[*}[$VALUE + $g_OPTION_BASE] = { NULL };" >> $g_HFILE
-                    # Save type
-                    Save_Main_Var "${VAR}" "char*"
-		    # Copy elements
-		    CTR=$g_OPTION_BASE
-		    ARRAY=${VAR#*\{}
-		    while [[ -n ${ARRAY} ]]
-		    do
-                        TOKEN=$(Mini_Parser "${ARRAY%\}*}")
-			echo "${VAR%%\[*}[${CTR}] = __b2c_Copy_String(${VAR%%\[*}[${CTR}], ${TOKEN});" >> $g_CFILE
-                        ARRAY="${ARRAY:${#TOKEN}+1}"
-			((CTR+=1))
-		    done
-                else
-                    while [[ -n ${VAR} ]]
-                    do
-                        TOKEN=$(Mini_Parser "${VAR}")
-		        echo "char *${TOKEN%%=*} = NULL;" >> $g_HFILE
-			echo "${TOKEN%%=*} = __b2c_Copy_String(${TOKEN%%=*}, ${TOKEN#*=});" >> $g_CFILE
-                        Save_Main_Var "${TOKEN%%=*}" "char*"
-                        VAR="${VAR:${#TOKEN}+1}"
-                    done
-                fi
-            fi
-	# Assume char assignment or number
-	else
-	    if [[ "$VAR" = +(*\[*\]*) && "$VAR" != +(*=*) ]]
-	    then
-                IFS=","
-		for i in ${VAR// /}
-		do
-		    echo "$TYPE ${i//]/+$g_OPTION_BASE]} = { 0 };" >> $g_HFILE
-                    # Save type
-                    Save_Main_Var "${i}" "${TYPE}"
-		done
-                IFS="${g_ORGIFS}"
-	    elif [[ "$VAR" = +(*\[*\]*) && "$VAR" = +(*=*) ]]
-            then
-                # Numeric array assignment
-                echo "$TYPE ${VAR%%\{*} {" >> $g_HFILE
-                OPTION=$g_OPTION_BASE
-                CTR=`echo ${VAR} | tr -d -c "[" | wc -c`
-                if [[ ${OPTION} -gt 0 && $CTR -gt 1 ]]
-                then
-	            echo -e "\nWARNING: OPTION BASE has no impact on multidimensional array '${VAR%%\[*}' in DECLARE/GLOBAL statement at line $g_COUNTER in file '$g_CURFILE'!"
-                fi
-                while [[ ${OPTION} -gt 0 && $CTR -eq 1 ]]
-                do
-                    echo " 0, " >> $g_HFILE
-                    ((OPTION-=1))
-                done
-	        echo "${VAR#*\{};" >> $g_HFILE
-                Save_Main_Var "${VAR%%\[*}" "${TYPE}"
-            elif [[ ${VAR} = +(*\(*\)*) ]]
-            then
-                # Function pointer
-		echo "$TYPE $VAR;" >> $g_HFILE
-                VAR=`echo ${VAR%%\)*} | tr -d "\052"`
-                Save_Main_Var "${VAR##*\(}" "void*"
-	    else
-                IFS=","
-                for i in ${VAR// /}
-                do
-                    if [[ "$i" = +(*=*) ]]
-                    then
-		        echo "$TYPE $i;" >> $g_HFILE
-                    elif [[ "$TYPE" = +(*\*) || "$i" = +(\**) ]]
-                    then
-		        echo "$TYPE ${i} = NULL;" >> $g_HFILE
+		        if [[ "${STR}" = +(*\[*\]*\]*) ]]
+		        then
+		            echo -e "\nSyntax error: multidimensional stringarrays at line $g_COUNTER in file '$g_CURFILE' are not supported!"
+		            exit 1
+		        fi
+		        # Determine elements to declare array
+                        VALUE=`echo ${STR} | tr -d -c "," | wc -c`
+                        ((VALUE+=1))
+		        echo "char *${STR%%\[*}[$VALUE + $g_OPTION_BASE] = { NULL };" >> $g_HFILE
+                        # Save type
+                        Save_Main_Var "${STR}" "char*"
+		        # Copy elements
+		        CTR=$g_OPTION_BASE
+		        ARRAY=${STR#*\{}
+		        while [[ -n ${ARRAY} ]]
+		        do
+                            TOKEN=$(Mini_Parser "${ARRAY%\}*}")
+			    echo "${STR%%\[*}[${CTR}] = __b2c_Copy_String(${STR%%\[*}[${CTR}], ${TOKEN});" >> $g_CFILE
+                            ARRAY="${ARRAY:${#TOKEN}+1}"
+			    ((CTR+=1))
+		        done
                     else
-		        echo "$TYPE ${i} = 0;" >> $g_HFILE
+                        while [[ -n ${STR} ]]
+                        do
+                            TOKEN=$(Mini_Parser "${STR}")
+		            echo "char *${TOKEN%%=*} = NULL;" >> $g_HFILE
+			    echo "${TOKEN%%=*} = __b2c_Copy_String(${TOKEN%%=*}, ${TOKEN#*=});" >> $g_CFILE
+                            Save_Main_Var "${TOKEN%%=*}" "char*"
+                            STR="${STR:${#TOKEN}+1}"
+                        done
                     fi
-                    Save_Main_Var "${i}" "${TYPE}"
-                done
-                IFS="${g_ORGIFS}"
-            fi
-	fi
+                fi
+	    # Assume char assignment or number
+	    else
+	        if [[ "$STR" = +(*\[*\]*) && "$STR" != +(*=*) ]]
+	        then
+		    echo "$TYPE ${STR//]/+$g_OPTION_BASE]} = { 0 };" >> $g_HFILE
+                    # Save type
+                    Save_Main_Var "${STR}" "${TYPE}"
+	        elif [[ "$STR" = +(*\[*\]*) && "$STR" = +(*=*) ]]
+                then
+                    # Numeric array assignment
+                    echo "$TYPE ${STR%%\{*} {" >> $g_HFILE
+                    OPTION=$g_OPTION_BASE
+                    CTR=`echo ${STR} | tr -d -c "[" | wc -c`
+                    if [[ ${OPTION} -gt 0 && $CTR -gt 1 ]]
+                    then
+	                echo -e "\nWARNING: OPTION BASE has no impact on multidimensional array '${STR%%\[*}' in DECLARE/GLOBAL statement at line $g_COUNTER in file '$g_CURFILE'!"
+                    fi
+                    while [[ ${OPTION} -gt 0 && $CTR -eq 1 ]]
+                    do
+                        echo " 0, " >> $g_HFILE
+                        ((OPTION-=1))
+                    done
+	            echo "${STR#*\{};" >> $g_HFILE
+                    Save_Main_Var "${STR%%\[*}" "${TYPE}"
+                elif [[ ${STR} = +(*\(*\)*) ]]
+                then
+                    # Function pointer
+		    echo "$TYPE $STR;" >> $g_HFILE
+                    STR=`echo ${STR%%\)*} | tr -d "\052"`
+                    Save_Main_Var "${STR##*\(}" "void*"
+	        else
+                    if [[ "${STR}" = +(*=*) ]]
+                    then
+		        echo "$TYPE ${STR};" >> $g_HFILE
+                    elif [[ "$TYPE" = +(*\*) || "${STR}" = +(\**) ]]
+                    then
+		        echo "$TYPE ${STR} = NULL;" >> $g_HFILE
+                    else
+		        echo "$TYPE ${STR} = 0;" >> $g_HFILE
+                    fi
+                    Save_Main_Var "${STR}" "${TYPE}"
+                fi
+	    fi
+        done
     fi
 }
 
@@ -2362,8 +2423,8 @@ function Handle_Declare
 function Handle_Local
 {
     # Local variables
-    typeset VAR TYPE DIM DIM2 NEW VALUE i OPTION ARRAY STATIC PTR TOKEN
-    typeset -i CTR
+    typeset VAR TYPE DIM DIM2 VALUE i OPTION ARRAY STATIC TOKEN STR
+    typeset -i CTR  SELF_DECLARED=0
 
     # Get the variablename and type
     if [[ "$1" = +(* TYPE *) ]]
@@ -2383,14 +2444,10 @@ function Handle_Local
     then
 	VAR=$(Trim "${1%% TREE *}")
 	TYPE=$(Trim "${1##* TREE }")
-    else
-	if [[ "${1}" = +(* ARRAY *) ]]
-	then
-	    ARRAY=${1##* ARRAY }
-	    VAR=$(Trim "${1%% ARRAY *}")
-        else
-	    VAR=$(Trim "${1}")
-	fi
+    elif [[ "${1}" = +(* ARRAY *) ]]
+    then
+	ARRAY=${1##* ARRAY }
+	VAR=$(Trim "${1%% ARRAY *}")
         # This construction needed for KSH93
 	if [[ "${VAR//${g_STRINGSIGN}/}" != "${VAR}" ]]
 	then
@@ -2401,93 +2458,110 @@ function Handle_Local
 	else
 	    TYPE="${g_VARTYPE}"
 	fi
+    else
+	VAR=$(Trim "${1}")
+        SELF_DECLARED=1
     fi
 
-    # Check if variable was already declared - no record and not function pointer?
-    if [[ "$VAR" != +(*.*) && "$VAR" != +(\(*) ]]
-    then
-        IFS=","
-	for i in ${VAR// /}
-        do
+    while [[ -n ${VAR} ]]
+    do
+        STR=$(Mini_Parser "${VAR}")
+        VAR="${VAR:${#STR}+1}"
+        STR=$(Trim "${STR}")
+        # Case of mixed declarations?
+        if [[ ${SELF_DECLARED} -eq 1 ]]
+        then
+            i=$(echo ${STR%%=*} | tr -d "\040")
+            # This construction needed for KSH93
+	    if [[ "${i//${g_STRINGSIGN}/}" != "${i}" ]]
+	    then
+	        TYPE="char*"
+	    elif [[ "${i//${g_FLOATSIGN}/}" != "${i}" ]]
+	    then
+	        TYPE="double"
+	    elif [[ "${i//${g_LONGSIGN}/}" != "${i}" ]]
+	    then
+	        TYPE="long"
+	    else
+	        TYPE="${g_VARTYPE}"
+	    fi
+        fi
+
+        # Check if variable was already declared - no record and not function pointer?
+        if [[ "$STR" != +(*.*) && "$STR" != +(\(*) ]]
+        then
             # Check for C keywords
-            if [[ "${i%%=*}" = +(${g_C_KEYWORDS}) ]]
+            if [[ "${STR%%=*}" = +(${g_C_KEYWORDS}) ]]
             then
-	        echo -e "\nSyntax error: variable '${i}' in LOCAL statement at line $g_COUNTER in file '$g_CURFILE' is a C keyword or function!"
+	        echo -e "\nSyntax error: variable '${STR}' in LOCAL statement at line $g_COUNTER in file '$g_CURFILE' is a C keyword or function!"
 	        exit 1
             fi
             # Previous definitions
-            if [[ -n $(Get_Var "${i%%=*}" ${g_FUNCNAME}) ]]
+            if [[ -n $(Get_Var "${STR%%=*}" ${g_FUNCNAME}) ]]
             then
-	        echo -e "\nSyntax error: variable '${i}' in LOCAL statement at line $g_COUNTER in file '$g_CURFILE' was defined previously!"
+	        echo -e "\nSyntax error: variable '${STR}' in LOCAL statement at line $g_COUNTER in file '$g_CURFILE' was defined previously!"
 	        exit 1
             fi
-        done
-        IFS="${g_ORGIFS}"
-    fi
+        fi
 
-    # Check for associative array
-    if [[ "${1}" = +(* ASSOC *) ]]
-    then
-        Assoc_Array "${VAR}" "${TYPE}" "${g_FUNCNAME}"
+        # Check for associative array
+        if [[ "${1}" = +(* ASSOC *) ]]
+        then
+            Assoc_Array "${STR}" "${TYPE}" "${g_FUNCNAME}"
 
 	# Check for binary tree
-    elif [[ "${1}" = +(* TREE *) ]]
-    then
-        Binary_Tree "${VAR}" "${TYPE}" "${g_FUNCNAME}"
-
-    # Check for dynamic array declaration
-    elif [[ -n ${ARRAY} ]]
-    then
-        if [[ $ARRAY = +(*STATIC*) ]]
+        elif [[ "${1}" = +(* TREE *) ]]
         then
-            STATIC=1
-	    ARRAY=`echo ${ARRAY%% STATIC*} | tr "," " "`
-        else
-            STATIC=0
-	    ARRAY="${ARRAY//,/ }"
-        fi
-        if [[ -n $g_FUNCNAME ]]
-        then
-            Normal_Dyn_Array "$TYPE" "${VAR//,/ }" "$ARRAY" $STATIC 1
-        else
-            Normal_Dyn_Array "$TYPE" "${VAR//,/ }" "$ARRAY" $STATIC 0
-        fi
+            Binary_Tree "${STR}" "${TYPE}" "${g_FUNCNAME}"
 
-    # Check if it is a known type, if not BaCon has to use external .h file
-    elif [[ ${TYPE%%\**} != +(DIR|FILE|*int|*short|*long|*float|*double|*char|void|STRING|NUMBER|FLOATING) && -z $g_RECORDNAME ]]
-    then
-	if [[ "$VAR" = +(*=*) ]]
-	then
-	    echo "$TYPE $VAR;" >> $g_CFILE
-	    if [[ -z ${g_FUNCNAME} ]]
+        # Check for dynamic array declaration
+        elif [[ -n ${ARRAY} ]]
+        then
+            if [[ $ARRAY = +(*STATIC*) ]]
+            then
+                STATIC=1
+	        ARRAY=`echo ${ARRAY%% STATIC*} | tr "," " "`
+            else
+                STATIC=0
+	        ARRAY="${ARRAY//,/ }"
+            fi
+            if [[ -n $g_FUNCNAME ]]
+            then
+                Normal_Dyn_Array "$TYPE" "${STR//,/ }" "$ARRAY" $STATIC 1
+            else
+                Normal_Dyn_Array "$TYPE" "${STR//,/ }" "$ARRAY" $STATIC 0
+            fi
+
+        # Check if it is a known type, if not BaCon has to use external .h file
+        elif [[ ${TYPE%%\**} != +(DIR|FILE|*int|*short|*long|*float|*double|*char|void|STRING|NUMBER|FLOATING) && -z $g_RECORDNAME ]]
+        then
+	    if [[ "$STR" = +(*=*) ]]
 	    then
-		Save_Main_Var "${VAR}" "${TYPE}"
+	        echo "$TYPE $STR;" >> $g_CFILE
+	        if [[ -z ${g_FUNCNAME} ]]
+	        then
+		    Save_Main_Var "${STR}" "${TYPE}"
+	        else
+		    Save_Func_Var "${STR}" "${g_FUNCNAME}" "${TYPE}"
+	        fi
 	    else
-		Save_Func_Var "${VAR}" "${g_FUNCNAME}" "${TYPE}"
-	    fi
-	else
-	    for i in ${VAR//,/ }
-	    do
 		if [[ -z ${g_FUNCNAME} ]]
 		then
-	            echo "$TYPE $i;" >> $g_HFILE
-		    Save_Main_Var "${i}" "${TYPE}"
+	            echo "$TYPE ${STR};" >> $g_HFILE
+		    Save_Main_Var "${STR}" "${TYPE}"
 		else
-	            echo "$TYPE $i;" >> $g_CFILE
-		    Save_Func_Var "${i}" "${g_FUNCNAME}" "${TYPE}"
+	            echo "$TYPE ${STR};" >> $g_CFILE
+		    Save_Func_Var "${STR}" "${g_FUNCNAME}" "${TYPE}"
 		fi
-	    done
-	fi
+	    fi
 
-    # Check if var is string var
-    elif [[ ( "${TYPE}" = +(STRING|*char\*) || "${VAR}" = +(*${g_STRINGSIGN}*) ) && "${VAR}" != +(*=*) && "${VAR}" != +(*\[*${g_STRINGSIGN}\]*) ]]
-    then
-	for i in ${VAR//,/ }
-	do
-            if [[ -z $(Get_Var ${i} ${g_FUNCNAME}) ]]
+        # Check if var is string var
+        elif [[ ( "${TYPE}" = +(STRING|*char\*) || "${STR}" = +(*${g_STRINGSIGN}*) ) && "${STR}" != +(*=*) && "${STR}" != +(*\[*${g_STRINGSIGN}\]*) ]]
+        then
+            if [[ -z $(Get_Var ${STR} ${g_FUNCNAME}) ]]
 	    then
 		# Check on multidimensional stringarrays
-		if [[ "${i}" = +(*\[*\]*\]*) ]]
+		if [[ "${STR}" = +(*\[*\]*\]*) ]]
 		then
 		    echo -e "\nSyntax error: multidimensional stringarrays at line $g_COUNTER in file '$g_CURFILE' are not supported!"
 		    exit 1
@@ -2497,10 +2571,10 @@ function Handle_Local
 		then
 		    if [[ -n $g_RECORDNAME ]]
 		    then
-			if [[ "${i}" = +(*\[*\]*) ]]
+			if [[ "${STR}" = +(*\[*\]*) ]]
 			then
-			    echo "char *${i//]/+$g_OPTION_BASE]};" >> $g_CFILE
-			    DIM=${i##*\[}; DIM=${DIM%%\]*}
+			    echo "char *${STR//]/+$g_OPTION_BASE]};" >> $g_CFILE
+			    DIM=${STR##*\[}; DIM=${DIM%%\]*}
                             if [[ "${g_RECORDVAR}" = +(*\[*\]*) ]]
                             then
 				if [[ -n ${g_RECORDARRAY} ]]
@@ -2509,43 +2583,43 @@ function Handle_Local
 				else
 				    DIM2=${g_RECORDVAR##*\[}; DIM2=${DIM2%%\]*}
 				fi
-                                g_RECORDEND_BODY="${g_RECORDEND_BODY} for(__b2c__counter=0; __b2c__counter<$DIM2; __b2c__counter++){for(__b2c__ctr=0; __b2c__ctr<$DIM; __b2c__ctr++) ${g_RECORDVAR%%\[*}[__b2c__counter].${i%%\[*}[__b2c__ctr]=NULL;}"
-			        g_STRINGARRAYS="$g_STRINGARRAYS for(__b2c__counter=0; __b2c__counter<$DIM2; __b2c__counter++){for(__b2c__ctr=0; __b2c__ctr<$DIM; __b2c__ctr++) { __b2c__STRFREE(${g_RECORDVAR%%\[*}[__b2c__counter].${i%%\[*}[__b2c__ctr]);} }"
+                                g_RECORDEND_BODY="${g_RECORDEND_BODY} for(__b2c__counter=0; __b2c__counter<$DIM2; __b2c__counter++){for(__b2c__ctr=0; __b2c__ctr<$DIM; __b2c__ctr++) ${g_RECORDVAR%%\[*}[__b2c__counter].${STR%%\[*}[__b2c__ctr]=NULL;}"
+			        g_STRINGARRAYS="$g_STRINGARRAYS for(__b2c__counter=0; __b2c__counter<$DIM2; __b2c__counter++){for(__b2c__ctr=0; __b2c__ctr<$DIM; __b2c__ctr++) { __b2c__STRFREE(${g_RECORDVAR%%\[*}[__b2c__counter].${STR%%\[*}[__b2c__ctr]);} }"
                             else
-                                g_RECORDEND_BODY="${g_RECORDEND_BODY} for(__b2c__ctr=0; __b2c__ctr<$DIM; __b2c__ctr++) $g_RECORDVAR.${i%%\[*}[__b2c__ctr] = NULL;"
-			        g_STRINGARRAYS="$g_STRINGARRAYS __b2c__free_str_array_members(&$g_RECORDVAR.${i%%\[*}, ${g_OPTION_BASE}, ${DIM}); }"
+                                g_RECORDEND_BODY="${g_RECORDEND_BODY} for(__b2c__ctr=0; __b2c__ctr<$DIM; __b2c__ctr++) $g_RECORDVAR.${STR%%\[*}[__b2c__ctr] = NULL;"
+			        g_STRINGARRAYS="$g_STRINGARRAYS __b2c__free_str_array_members(&$g_RECORDVAR.${STR%%\[*}, ${g_OPTION_BASE}, ${DIM}); }"
                             fi
 			else
-			    echo "char *$i;" >> $g_CFILE
+			    echo "char *${STR};" >> $g_CFILE
 			    # Pointer var should not be initialized
-			    if [[ "${i}" = +(*${g_STRINGSIGN}*) && "${g_RECORDVAR}" != +(*\[*\]*) && -z ${g_RECORDARRAY} ]]
+			    if [[ "${STR}" = +(*${g_STRINGSIGN}*) && "${g_RECORDVAR}" != +(*\[*\]*) && -z ${g_RECORDARRAY} ]]
 			    then
-                                g_RECORDEND_BODY="${g_RECORDEND_BODY} $g_RECORDVAR.$i = NULL;"
-			        g_LOCALSTRINGS="$g_LOCALSTRINGS ${g_RECORDVAR}.${i}"
+                                g_RECORDEND_BODY="${g_RECORDEND_BODY} $g_RECORDVAR.${STR} = NULL;"
+			        g_LOCALSTRINGS="$g_LOCALSTRINGS ${g_RECORDVAR}.${STR}"
                             fi
 			fi
-                        Save_Func_Var "${i}" "${g_FUNCNAME}" "char*"
+                        Save_Func_Var "${STR}" "${g_FUNCNAME}" "char*"
 		    else
-			if [[ "${i}" = +(*\[*\]*) ]]
+			if [[ "${STR}" = +(*\[*\]*) ]]
 			then
-			    echo "char *${i//]/+$g_OPTION_BASE]} = { NULL };" >> $g_CFILE
-			    DIM=${i##*\[}; DIM=${DIM%%\]*}
-			    g_STRINGARRAYS="$g_STRINGARRAYS for(__b2c__ctr=0; __b2c__ctr<$DIM; __b2c__ctr++) { __b2c__STRFREE(${g_WITHVAR}${i%%\[*}[__b2c__ctr]); }"
+			    echo "char *${STR//]/+$g_OPTION_BASE]} = { NULL };" >> $g_CFILE
+			    DIM=${STR##*\[}; DIM=${DIM%%\]*}
+			    g_STRINGARRAYS="$g_STRINGARRAYS for(__b2c__ctr=0; __b2c__ctr<$DIM; __b2c__ctr++) { __b2c__STRFREE(${g_WITHVAR}${STR%%\[*}[__b2c__ctr]); }"
 			    # Save type
-                            Save_Func_Var "${i}" "${g_FUNCNAME}" "char*"
-                        elif [[ ${i} = +(*\(*\)*) ]]
+                            Save_Func_Var "${STR}" "${g_FUNCNAME}" "char*"
+                        elif [[ ${STR} = +(*\(*\)*) ]]
                         then
                             # Function pointer
-		            echo "$TYPE $i;" >> $g_CFILE
-                            i=`echo ${i%%\)*} | tr -d "\052"`
-                            Save_Func_Var "${i##*\(}" "${g_FUNCNAME}" "void*"
+		            echo "$TYPE ${STR};" >> $g_CFILE
+                            STR=$(echo ${STR%%\)*} | tr -d "\052")
+                            Save_Func_Var "${STR##*\(}" "${g_FUNCNAME}" "void*"
 			else
-			    echo "char *$i = NULL;" >> $g_CFILE
-                            Save_Func_Var "${i}" "${g_FUNCNAME}" "char*"
+			    echo "char *${STR} = NULL;" >> $g_CFILE
+                            Save_Func_Var "${STR}" "${g_FUNCNAME}" "char*"
                             # Defined as string?
-			    if [[ "${i}" = +(*${g_STRINGSIGN}*) ]]
+			    if [[ "${STR}" = +(*${g_STRINGSIGN}*) ]]
 			    then
-				g_LOCALSTRINGS="$g_LOCALSTRINGS ${i}"
+				g_LOCALSTRINGS="$g_LOCALSTRINGS ${STR}"
                             fi
 			fi
 		    fi
@@ -2553,253 +2627,233 @@ function Handle_Local
 		else
 		    if [[ -n $g_RECORDNAME ]]
 		    then
-			if [[ "${i}" = +(*\[*\]*) ]]
+			if [[ "${STR}" = +(*\[*\]*) ]]
 			then
-			    echo "char *${i//]/+$g_OPTION_BASE]};" >> $g_HFILE
+			    echo "char *${STR//]/+$g_OPTION_BASE]};" >> $g_HFILE
                         else
-			    echo "char *$i;" >> $g_HFILE
+			    echo "char *${STR};" >> $g_HFILE
 			    # Pointer var should not be initialized
-			    if [[ "${i}" = +(*${g_STRINGSIGN}*) && "${g_RECORDVAR}" != +(*\[*\]*) && -z ${g_RECORDARRAY} ]]
+			    if [[ "${STR}" = +(*${g_STRINGSIGN}*) && "${g_RECORDVAR}" != +(*\[*\]*) && -z ${g_RECORDARRAY} ]]
 			    then
-                                g_RECORDEND_BODY="${g_RECORDEND_BODY} $g_RECORDVAR.$i = NULL;"
+                                g_RECORDEND_BODY="${g_RECORDEND_BODY} $g_RECORDVAR.${STR} = NULL;"
                             fi
                         fi
-                        Save_Main_Var "${i}" "char*"
+                        Save_Main_Var "${STR}" "char*"
 		    else
-			if [[ "${i}" = +(*\[*\]*) ]]
+			if [[ "${STR}" = +(*\[*\]*) ]]
 			then
-			    echo "char *${i//]/+$g_OPTION_BASE]} = { NULL };" >> $g_HFILE
+			    echo "char *${STR//]/+$g_OPTION_BASE]} = { NULL };" >> $g_HFILE
 			    # Save type
-                            Save_Main_Var "${i}" "char*"
-                        elif [[ ${i} = +(*\(*\)*) ]]
+                            Save_Main_Var "${STR}" "char*"
+                        elif [[ ${STR} = +(*\(*\)*) ]]
                         then
                             # Function pointer
-		            echo "$TYPE $i;" >> $g_HFILE
-                            i=`echo ${i%%\)*} | tr -d "\052"`
-                            Save_Main_Var "${i##*\(}" "void*"
+		            echo "$TYPE ${STR};" >> $g_HFILE
+                            STR=$(echo ${STR%%\)*} | tr -d "\052")
+                            Save_Main_Var "${STR##*\(}" "void*"
 			else
-			    echo "char *$i = NULL;" >> $g_HFILE
-                            Save_Main_Var "${i}" "char*"
+			    echo "char *${STR} = NULL;" >> $g_HFILE
+                            Save_Main_Var "${STR}" "char*"
 			fi
 		    fi
 		fi
 	    fi
-	done
-    elif [[ ( "${VAR}" = +(*${g_STRINGSIGN}*) || "${TYPE}" = +(*STRING*|*char\**) ) && "${VAR}" = +(*=*) ]]
-    then
-        if [[ -n $g_FUNCNAME ]]
-	then
-            if [[ -z $(Get_Var ${VAR}) ]]
+        elif [[ ( "${STR}" = +(*${g_STRINGSIGN}*) || "${TYPE}" = +(*STRING*|*char\**) ) && "${STR}" = +(*=*) ]]
+        then
+            if [[ -n $g_FUNCNAME ]]
 	    then
-		if [[ "${VAR}" = +(*\[*\]*\]*) ]]
-		then
-		    echo -e "\nSyntax error: multidimensional stringarrays at line $g_COUNTER in file '$g_CURFILE' are not supported!"
-		    exit 1
-		fi
-		if [[ "${VAR}" = +(*\[*\]*) && "${VAR}" = +(*=*) ]]
-		then
-		    # Determine elements to declare array
-                    VALUE=`echo ${VAR} | tr -d -c "," | wc -c`
-                    ((VALUE+=1))
-		    echo "static char *${VAR%%\[*}[$VALUE + $g_OPTION_BASE] = { NULL };" >> $g_CFILE
-		    # Set dimension needed for SORT
-                    if [[ -n ${g_RECORDVAR} ]]
-                    then
-		        echo -e "\nSyntax error: C does not allow initialization of an array within a struct at line $g_COUNTER in file '$g_CURFILE'!"
+                if [[ -z $(Get_Var ${STR}) ]]
+	        then
+		    if [[ "${STR}" = +(*\[*\]*\]*) ]]
+		    then
+		        echo -e "\nSyntax error: multidimensional stringarrays at line $g_COUNTER in file '$g_CURFILE' are not supported!"
 		        exit 1
-                    fi
-                    # Save type
-                    Save_Func_Var "${VAR}" "${g_FUNCNAME}" "char*"
-		    # Copy elements
-		    CTR=$g_OPTION_BASE
-		    ARRAY=${VAR#*\{}
-		    while [[ -n ${ARRAY} ]]
-		    do
-                        TOKEN=$(Mini_Parser "${ARRAY%\}*}")
-			echo "${VAR%%\[*}[${CTR}] = __b2c_Copy_String(${VAR%%\[*}[${CTR}], ${TOKEN});" >> $g_CFILE
-                        ARRAY="${ARRAY:${#TOKEN}+1}"
-			((CTR+=1))
-		    done
-                else
-                    while [[ -n ${VAR} ]]
-                    do
-                        TOKEN=$(Mini_Parser "${VAR}")
-		        echo "static char *${TOKEN%%=*} = NULL;" >> $g_CFILE
-			echo "${TOKEN%%=*} = __b2c_Copy_String(${TOKEN%%=*}, ${TOKEN#*=});" >> $g_CFILE
-                        Save_Func_Var "${TOKEN%%=*}" "${g_FUNCNAME}" "char*"
-                        VAR="${VAR:${#TOKEN}+1}"
-                    done
-                fi
-            fi
-        else
-            if [[ -z $(Get_Var ${VAR}) ]]
-	    then
-		if [[ "${VAR}" = +(*\[*\]*\]*) ]]
-		then
-		    echo -e "\nSyntax error: multidimensional stringarrays at line $g_COUNTER in file '$g_CURFILE' are not supported!"
-		    exit 1
-		fi
-		if [[ "${VAR}" = +(*\[*\]*) && "${VAR}" = +(*=*) ]]
-		then
-		    # Determine elements to declare array
-                    VALUE=`echo ${VAR} | tr -d -c "," | wc -c`
-                    ((VALUE+=1))
-		    echo "char *${VAR%%\[*}[$VALUE + $g_OPTION_BASE] = { NULL };" >> $g_HFILE
-		    # Set dimension needed for SORT
-                    if [[ -n ${g_RECORDVAR} ]]
-                    then
-		        echo -e "\nSyntax error: C does not allow initialization of an array within a struct at line $g_COUNTER in file '$g_CURFILE'!"
-		        exit 1
-                    fi
-                    # Save type
-                    Save_Main_Var "${VAR}" "char*"
-		    # Copy elements
-		    CTR=$g_OPTION_BASE
-		    ARRAY=${VAR#*\{}
-		    while [[ -n ${ARRAY} ]]
-		    do
-                        TOKEN=$(Mini_Parser "${ARRAY%\}*}")
-			echo "${VAR%%\[*}[${CTR}] = __b2c_Copy_String(${VAR%%\[*}[${CTR}], ${TOKEN});" >> $g_CFILE
-                        ARRAY="${ARRAY:${#TOKEN}+1}"
-			((CTR+=1))
-		    done
-                else
-                    while [[ -n ${VAR} ]]
-                    do
-                        TOKEN=$(Mini_Parser "${VAR}")
-		        echo "char *${TOKEN%%=*} = NULL;" >> $g_HFILE
-			echo "${TOKEN%%=*} = __b2c_Copy_String(${TOKEN%%=*}, ${TOKEN#*=});" >> $g_CFILE
-                        Save_Main_Var "${TOKEN%%=*}" "char*"
-                        VAR="${VAR:${#TOKEN}+1}"
-                    done
-                fi
-            fi
-        fi
-    # Assume number or complicated type
-    else
-	if [[ -n $g_FUNCNAME ]]
-	then
-	    if [[ "$VAR" = +(*\[*\]*) && "$VAR" != +(*=*) ]]
-	    then
-                IFS=","
-		for i in ${VAR// /}
-		do
-                    if [[ -z $g_RECORDNAME ]]
-                    then
-			echo "$TYPE ${i//]/+$g_OPTION_BASE]} = { 0 };" >> $g_CFILE
+		    fi
+		    if [[ "${STR}" = +(*\[*\]*) && "${STR}" = +(*=*) ]]
+		    then
+		        # Determine elements to declare array
+                        VALUE=`echo ${STR} | tr -d -c "," | wc -c`
+                        ((VALUE+=1))
+		        echo "static char *${STR%%\[*}[$VALUE + $g_OPTION_BASE] = { NULL };" >> $g_CFILE
+		        # Set dimension needed for SORT
+                        if [[ -n ${g_RECORDVAR} ]]
+                        then
+		            echo -e "\nSyntax error: C does not allow initialization of an array within a struct at line $g_COUNTER in file '$g_CURFILE'!"
+		            exit 1
+                        fi
+                        # Save type
+                        Save_Func_Var "${STR}" "${g_FUNCNAME}" "char*"
+		        # Copy elements
+		        CTR=$g_OPTION_BASE
+		        ARRAY=${STR#*\{}
+		        while [[ -n ${ARRAY} ]]
+		        do
+                            TOKEN=$(Mini_Parser "${ARRAY%\}*}")
+			    echo "${STR%%\[*}[${CTR}] = __b2c_Copy_String(${STR%%\[*}[${CTR}], ${TOKEN});" >> $g_CFILE
+                            ARRAY="${ARRAY:${#TOKEN}+1}"
+			    ((CTR+=1))
+		        done
                     else
-			echo "$TYPE ${i//]/+$g_OPTION_BASE]};" >> $g_CFILE
+                        while [[ -n ${STR} ]]
+                        do
+                            TOKEN=$(Mini_Parser "${STR}")
+		            echo "static char *${TOKEN%%=*} = NULL;" >> $g_CFILE
+			    echo "${TOKEN%%=*} = __b2c_Copy_String(${TOKEN%%=*}, ${TOKEN#*=});" >> $g_CFILE
+                            Save_Func_Var "${TOKEN%%=*}" "${g_FUNCNAME}" "char*"
+                            STR="${STR:${#TOKEN}+1}"
+                        done
                     fi
-                    Save_Func_Var "${i}" "${g_FUNCNAME}" "${TYPE}"
-		done
-                IFS="${g_ORGIFS}"
-	    elif [[ "$VAR" = +(*\[*\]*) && "$VAR" = +(*=*) ]]
-            then
-                # Numeric array assignment
-                echo "$TYPE ${VAR%%\{*} {" >> $g_CFILE
-                OPTION=$g_OPTION_BASE
-                CTR=`echo ${VAR} | tr -d -c "[" | wc -c` ; PTR=
-                if [[ ${OPTION} -gt 0 && $CTR -gt 1 ]]
-                then
-	            echo -e "\nWARNING: OPTION BASE has no impact on multidimensional array '${VAR%%\[*}' in LOCAL statement at line $g_COUNTER in file '$g_CURFILE'!"
                 fi
-                while [[ ${OPTION} -gt 0 && $CTR -eq 1 ]]
-                do
-                    echo " 0, " >> $g_CFILE
-                    ((OPTION-=1))
-                done
-	        echo "${VAR#*\{};" >> $g_CFILE
-                if [[ -n ${g_RECORDVAR} ]]
-                then
-		    echo -e "\nSyntax error: C does not allow initialization of an array within a struct at line $g_COUNTER in file '$g_CURFILE'!"
-		    exit 1
-                fi
-                Save_Func_Var "${VAR}" "${g_FUNCNAME}" "${TYPE}"
-            elif [[ ${VAR} = +(*\(*\)*) ]]
-            then
-                # Function pointer
-		echo "$TYPE $VAR;" >> $g_CFILE
-                VAR=`echo ${VAR%%\)*} | tr -d "\052"`
-                Save_Func_Var "${VAR##*\(}" "${g_FUNCNAME}" "void*"
-	    else
-                IFS=","
-                for i in ${VAR// /}
-                do
-                    if [[ "$i" = +(*=*) || -n ${g_RECORDVAR} ]]
-                    then
-		        echo "$TYPE $i;" >> $g_CFILE
-                    elif [[ "$TYPE" = +(*\*) || "$i" = +(\**) ]]
-                    then
-		        echo "$TYPE ${i} = NULL;" >> $g_CFILE
-                    else
-		        echo "$TYPE ${i} = 0;" >> $g_CFILE
-                    fi
-                    Save_Func_Var "${i}" "${g_FUNCNAME}" "${TYPE}"
-                done
-                IFS="${g_ORGIFS}"
-	    fi
-	else
-	    if [[ "$VAR" = +(*\[*\]*) && "$VAR" != +(*=*) ]]
-	    then
-                IFS=","
-		for i in ${VAR// /}
-		do
-                    if [[ -z $g_RECORDNAME ]]
-                    then
-			echo "$TYPE ${i//]/+$g_OPTION_BASE]} = { 0 };" >> $g_HFILE
-                    else
-			echo "$TYPE ${i//]/+$g_OPTION_BASE]};" >> $g_HFILE
-                    fi
-                    Save_Main_Var "${i}" "${TYPE}"
-		done
-                IFS="${g_ORGIFS}"
-	    elif [[ "$VAR" = +(*\[*\]*) && "$VAR" = +(*=*) ]]
-            then
-                # Numeric array assignment
-                echo "$TYPE ${VAR%%\{*} {" >> $g_HFILE
-                OPTION=$g_OPTION_BASE
-                CTR=`echo ${VAR} | tr -d -c "[" | wc -c` ; PTR=
-                if [[ ${OPTION} -gt 0 && $CTR -gt 1 ]]
-                then
-	            echo -e "\nWARNING: OPTION BASE has no impact on multidimensional array '${VAR%%\[*}' in LOCAL statement at line $g_COUNTER in file '$g_CURFILE'!"
-                fi
-                while [[ ${OPTION} -gt 0 && $CTR -eq 1 ]]
-                do
-                    echo " 0, " >> $g_HFILE
-                    ((OPTION-=1))
-                done
-	        echo "${VAR#*\{};" >> $g_HFILE
-                if [[ -n ${g_RECORDVAR} ]]
-                then
-		    echo -e "\nSyntax error: C does not allow initialization of an array within a struct at line $g_COUNTER in file '$g_CURFILE'!"
-		    exit 1
-                fi
-                Save_Main_Var "${VAR}" "${TYPE}"
-            elif [[ ${VAR} = +(*\(*\)*) ]]
-            then
-                # Function pointer
-		echo "$TYPE $VAR;" >> $g_HFILE
-                VAR=`echo ${VAR%%\)*} | tr -d "\052"`
-                Save_Main_Var "${VAR##*\(}" "void*"
             else
-                IFS=","
-                for i in ${VAR// /}
-                do
-                    if [[ "$i" = +(*=*) || -n ${g_RECORDVAR} ]]
-                    then
-		        echo "$TYPE $i;" >> $g_HFILE
-                    elif [[ "$TYPE" = +(*\*) || "$i" = +(\**) ]]
-                    then
-		        echo "$TYPE ${i} = NULL;" >> $g_HFILE
+                if [[ -z $(Get_Var ${STR}) ]]
+	        then
+		    if [[ "${STR}" = +(*\[*\]*\]*) ]]
+		    then
+		        echo -e "\nSyntax error: multidimensional stringarrays at line $g_COUNTER in file '$g_CURFILE' are not supported!"
+		        exit 1
+		    fi
+		    if [[ "${STR}" = +(*\[*\]*) && "${STR}" = +(*=*) ]]
+		    then
+		        # Determine elements to declare array
+                        VALUE=`echo ${STR} | tr -d -c "," | wc -c`
+                        ((VALUE+=1))
+		        echo "char *${STR%%\[*}[$VALUE + $g_OPTION_BASE] = { NULL };" >> $g_HFILE
+		        # Set dimension needed for SORT
+                        if [[ -n ${g_RECORDVAR} ]]
+                        then
+		            echo -e "\nSyntax error: C does not allow initialization of an array within a struct at line $g_COUNTER in file '$g_CURFILE'!"
+		            exit 1
+                        fi
+                        # Save type
+                        Save_Main_Var "${STR}" "char*"
+		        # Copy elements
+		        CTR=$g_OPTION_BASE
+		        ARRAY=${STR#*\{}
+		        while [[ -n ${ARRAY} ]]
+		        do
+                            TOKEN=$(Mini_Parser "${ARRAY%\}*}")
+			    echo "${STR%%\[*}[${CTR}] = __b2c_Copy_String(${STR%%\[*}[${CTR}], ${TOKEN});" >> $g_CFILE
+                            ARRAY="${ARRAY:${#TOKEN}+1}"
+			    ((CTR+=1))
+		        done
                     else
-		        echo "$TYPE ${i} = 0;" >> $g_HFILE
+                        while [[ -n ${STR} ]]
+                        do
+                            TOKEN=$(Mini_Parser "${STR}")
+		            echo "char *${TOKEN%%=*} = NULL;" >> $g_HFILE
+			    echo "${TOKEN%%=*} = __b2c_Copy_String(${TOKEN%%=*}, ${TOKEN#*=});" >> $g_CFILE
+                            Save_Main_Var "${TOKEN%%=*}" "char*"
+                            STR="${STR:${#TOKEN}+1}"
+                        done
                     fi
-                    Save_Main_Var "${i}" "${TYPE}"
-                done
-                IFS="${g_ORGIFS}"
+                fi
+            fi
+        # Assume number or complicated type
+        else
+	    if [[ -n $g_FUNCNAME ]]
+	    then
+	        if [[ "$STR" = +(*\[*\]*) && "$STR" != +(*=*) ]]
+	        then
+                    if [[ -z $g_RECORDNAME ]]
+                    then
+			echo "$TYPE ${STR//]/+$g_OPTION_BASE]} = { 0 };" >> $g_CFILE
+                    else
+			echo "$TYPE ${STR//]/+$g_OPTION_BASE]};" >> $g_CFILE
+                    fi
+                    Save_Func_Var "${STR}" "${g_FUNCNAME}" "${TYPE}"
+	        elif [[ "$STR" = +(*\[*\]*) && "$STR" = +(*=*) ]]
+                then
+                    # Numeric array assignment
+                    echo "$TYPE ${STR%%\{*} {" >> $g_CFILE
+                    OPTION=$g_OPTION_BASE
+                    CTR=`echo ${STR} | tr -d -c "[" | wc -c`
+                    if [[ ${OPTION} -gt 0 && $CTR -gt 1 ]]
+                    then
+	                echo -e "\nWARNING: OPTION BASE has no impact on multidimensional array '${STR%%\[*}' in LOCAL statement at line $g_COUNTER in file '$g_CURFILE'!"
+                    fi
+                    while [[ ${OPTION} -gt 0 && $CTR -eq 1 ]]
+                    do
+                        echo " 0, " >> $g_CFILE
+                        ((OPTION-=1))
+                    done
+	            echo "${STR#*\{};" >> $g_CFILE
+                    if [[ -n ${g_RECORDVAR} ]]
+                    then
+		        echo -e "\nSyntax error: C does not allow initialization of an array within a struct at line $g_COUNTER in file '$g_CURFILE'!"
+		        exit 1
+                    fi
+                    Save_Func_Var "${STR}" "${g_FUNCNAME}" "${TYPE}"
+                elif [[ ${STR} = +(*\(*\)*) ]]
+                then
+                    # Function pointer
+		    echo "$TYPE $STR;" >> $g_CFILE
+                    STR=`echo ${STR%%\)*} | tr -d "\052"`
+                    Save_Func_Var "${STR##*\(}" "${g_FUNCNAME}" "void*"
+	        else
+                    if [[ "${STR}" = +(*=*) || -n ${g_RECORDVAR} ]]
+                    then
+		        echo "$TYPE ${STR};" >> $g_CFILE
+                    elif [[ "$TYPE" = +(*\*) || "${STR}" = +(\**) ]]
+                    then
+		        echo "$TYPE ${STR} = NULL;" >> $g_CFILE
+                    else
+		        echo "$TYPE ${STR} = 0;" >> $g_CFILE
+                    fi
+                    Save_Func_Var "${STR}" "${g_FUNCNAME}" "${TYPE}"
+	        fi
+	    else
+	        if [[ "$STR" = +(*\[*\]*) && "$STR" != +(*=*) ]]
+	        then
+                    if [[ -z $g_RECORDNAME ]]
+                    then
+			echo "$TYPE ${STR//]/+$g_OPTION_BASE]} = { 0 };" >> $g_HFILE
+                    else
+			echo "$TYPE ${STR//]/+$g_OPTION_BASE]};" >> $g_HFILE
+                    fi
+                    Save_Main_Var "${STR}" "${TYPE}"
+	        elif [[ "$STR" = +(*\[*\]*) && "$STR" = +(*=*) ]]
+                then
+                    # Numeric array assignment
+                    echo "$TYPE ${STR%%\{*} {" >> $g_HFILE
+                    OPTION=$g_OPTION_BASE
+                    CTR=`echo ${STR} | tr -d -c "[" | wc -c`
+                    if [[ ${OPTION} -gt 0 && $CTR -gt 1 ]]
+                    then
+	                echo -e "\nWARNING: OPTION BASE has no impact on multidimensional array '${STR%%\[*}' in LOCAL statement at line $g_COUNTER in file '$g_CURFILE'!"
+                    fi
+                    while [[ ${OPTION} -gt 0 && $CTR -eq 1 ]]
+                    do
+                        echo " 0, " >> $g_HFILE
+                        ((OPTION-=1))
+                    done
+	            echo "${STR#*\{};" >> $g_HFILE
+                    if [[ -n ${g_RECORDVAR} ]]
+                    then
+		        echo -e "\nSyntax error: C does not allow initialization of an array within a struct at line $g_COUNTER in file '$g_CURFILE'!"
+		        exit 1
+                    fi
+                    Save_Main_Var "${STR}" "${TYPE}"
+                elif [[ ${STR} = +(*\(*\)*) ]]
+                then
+                    # Function pointer
+		    echo "$TYPE $STR;" >> $g_HFILE
+                    STR=`echo ${STR%%\)*} | tr -d "\052"`
+                    Save_Main_Var "${STR##*\(}" "void*"
+                else
+                    if [[ "${STR}" = +(*=*) || -n ${g_RECORDVAR} ]]
+                    then
+		        echo "$TYPE ${STR};" >> $g_HFILE
+                    elif [[ "$TYPE" = +(*\*) || "${STR}" = +(\**) ]]
+                    then
+		        echo "$TYPE ${STR} = NULL;" >> $g_HFILE
+                    else
+		        echo "$TYPE ${STR} = 0;" >> $g_HFILE
+                    fi
+                    Save_Main_Var "${STR}" "${TYPE}"
+	        fi
 	    fi
-	fi
-    fi
+        fi
+    done
 }
 
 #-----------------------------------------------------------
@@ -3055,8 +3109,15 @@ function Handle_Push
 
 function Handle_Pull
 {
+    # Check if we have an argument at all
+    if [[ "$1" = "PULL" ]]
+    then
+	echo -e "\nSyntax error: empty PULL at line $g_COUNTER in file '$g_CURFILE'!"
+	exit 1
+    fi
+
     # Argument must be a variable
-    if [[ "$1" = +(![a-zA-Z]) ]]
+    if [[ ! "${1}" =~ ^([a-zA-Z]+.*) ]]
     then
 	echo -e "\nSyntax error: argument in PULL statement at line $g_COUNTER in file '$g_CURFILE' is not a variable!"
 	exit 1
@@ -3209,7 +3270,7 @@ function Handle_SubFunc
 		    Save_Func_Var ${ARR} "${g_FUNCNAME}" "char*"
 		    g_STRINGARGS="$g_STRINGARGS long __b2c__var_$ARR = $g_OPTION_BASE; va_list __b2c__ap; char **${ARR} = NULL; $ARR = (char **)calloc(__b2c__arg_tot+$g_OPTION_BASE, sizeof(char*));"
 		    g_STRINGARGS="$g_STRINGARGS ${SIZE} = __b2c__arg_tot; va_start(__b2c__ap, __b2c__arg_tot); while (__b2c__arg_tot)"
-                    g_STRINGARGS="$g_STRINGARGS { ${ARR}[__b2c__var_$ARR] = __b2c_Copy_String(${ARR}[__b2c__var_$ARR], va_arg(__b2c__ap, char*)); if(${ARR}[__b2c__var_$ARR] == NULL) { break; } __b2c__var_$ARR++; __b2c__arg_tot--; } va_end(__b2c__ap);"
+                    g_STRINGARGS="$g_STRINGARGS { ${ARR}[__b2c__var_$ARR] = __b2c_Copy_String(${ARR}[__b2c__var_$ARR], va_arg(__b2c__ap, char*)); __b2c__var_$ARR++; __b2c__arg_tot--; } va_end(__b2c__ap);"
 		    g_PROTOTYPE="__${g_PROTOTYPE}int, ..."
 		    g_ORIGFUNCNAME="${g_ORIGFUNCNAME}int __b2c__arg_tot, ..."
 		    g_STRINGARRAYS="$g_STRINGARRAYS __b2c__free_str_array_members(&${ARR}, ${g_OPTION_BASE}, ${SIZE}); free($ARR);"
@@ -3284,7 +3345,7 @@ function Handle_SubFunc
 		    fi
 		else
 		    g_ORIGFUNCNAME="$g_ORIGFUNCNAME char *__b2c_${TOKEN##* }"
-		    g_STRINGARGS="$g_STRINGARGS char*${TOKEN##* } = NULL; ${TOKEN##* } = __b2c_Copy_String(${TOKEN##* }, __b2c_${TOKEN##* });"
+		    g_STRINGARGS="$g_STRINGARGS char*${TOKEN##* } = NULL; ${TOKEN##* } = __b2c_Copy_String(NULL, __b2c_${TOKEN##* });"
 		    g_LOCALSTRINGS="$g_LOCALSTRINGS ${TOKEN##* }"
 		    g_PROTOTYPE="$g_PROTOTYPE ${TOKEN}"
 		fi
@@ -3575,9 +3636,9 @@ function Handle_Copy
     # Translate to C function
     if [[ -z $SIZE ]]
     then
-        echo "if(__b2c__copy(${FROM}, ${TO})){ if(__b2c__trap){ ERROR = 2; if(!__b2c__catch_set) RUNTIMEERROR(\"COPY\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+        echo "if(__b2c__copy(${FROM}, ${TO})){ ERROR = 2; RUNTIMEERROR(\"COPY\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
     else
-	echo "if (__b2c__trap){if(!__b2c__memory__check((char*)${TO}, sizeof(__b2c__MEMTYPE)*${SIZE})) {ERROR=1; if(!__b2c__catch_set) RUNTIMEERROR(\"COPY\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+        echo "if(!__b2c__memory__check((char*)${TO}, sizeof(__b2c__MEMTYPE)*${SIZE})) { ERROR=1; RUNTIMEERROR(\"COPY\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
         if [[ ${FROM} = +(*${g_STRINGSIGN}*) ]]
         then
             echo "__b2c__free_str_array_members(&${TO}, ${g_OPTION_BASE}, ${SIZE});" >> $g_CFILE
@@ -3611,7 +3672,7 @@ function Handle_Rename
     FROM=$(Trim "${ARGS:0:${POS}}")
 
     # Translate to C function
-    echo "if(rename($FROM, $TO) < 0) {if(__b2c__trap){ERROR = 9; if(!__b2c__catch_set) RUNTIMEERROR(\"RENAME\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+    echo "if(rename($FROM, $TO) < 0) { ERROR = 9; RUNTIMEERROR(\"RENAME\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
     if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
     then
         g_CATCH_USED=1
@@ -4015,7 +4076,7 @@ function Handle_Sort
         fi
 
         # Check size
-        echo "if((${SIZE}-${g_OPTION_BASE}) < 0) {if(__b2c__trap){ERROR=36; if(!__b2c__catch_set) RUNTIMEERROR(\"SORT\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+        echo "if((${SIZE}-${g_OPTION_BASE}) < 0) { ERROR=36; RUNTIMEERROR(\"SORT\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
         if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
         then
             g_CATCH_USED=1
@@ -4442,7 +4503,7 @@ function Handle_Setserial
     fi
 
     echo "ERROR = __b2c_setserial(${DESC}, ${WHICH}, ${PARAM}, ${VALUE}, ${NOT});" >> $g_CFILE
-    echo "if(ERROR && __b2c__trap){ if(!__b2c__catch_set) RUNTIMEERROR(\"SETSERIAL\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO; }" >> $g_CFILE
+    echo "if(ERROR){ RUNTIMEERROR(\"SETSERIAL\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
 
     if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
     then
@@ -4613,7 +4674,7 @@ function Handle_Save
 
     # How to open the file
     echo "ERROR = __b2c__save(${1}, ${SIZE}, ${TO}, ${VAR}, NULL);" >> $g_CFILE
-    echo "if(ERROR && __b2c__trap) { if(!__b2c__catch_set) RUNTIMEERROR(\"SAVE/BSAVE/APPEND/BAPPEND\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO; }" >> $g_CFILE
+    echo "if(ERROR) { RUNTIMEERROR(\"SAVE/BSAVE/APPEND/BAPPEND\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
     if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
     then
         g_CATCH_USED=1
@@ -5020,7 +5081,7 @@ function Handle_Parse
 function Parse_Line
 {
     typeset FOUND SYM INC COPY_COUNTER COPY_CURFILE STATEMENT CHECK FLINES TXT ARGS=${1}
-    typeset LEN SEQ TOTAL EXP THEN LINE TO_PARSE NEWFEED TRC_BACKUP TOKEN POS UNIQ
+    typeset LEN SEQ TOTAL PROG EXP THEN LINE TO_PARSE NEWFEED TRC_BACKUP TOKEN POS UNIQ
 
     if [[ -z ${1} ]]
     then
@@ -5260,7 +5321,7 @@ function Parse_Line
 		    echo -e "\nSyntax error: empty SYSTEM at line $g_COUNTER in file '$g_CURFILE'!"
 		    exit 1
 		else
-		    echo "SYSTEM (${1#* });" >> $g_CFILE
+		    echo "RETVAL = system(${1#* }); if(WIFEXITED(RETVAL)) { RETVAL = WEXITSTATUS(RETVAL); }" >> $g_CFILE
 		fi;;
 	    "SLEEP")
 		# Check argument
@@ -5335,15 +5396,14 @@ function Parse_Line
                             then
                                 if [[ ${g_LIB_TLS} != +(*gnutls*) ]]
                                 then
-                                    echo "SSL_CTX_free(SSL_get_SSL_CTX((SSL*)${TOKEN}));" >> $g_CFILE
+                                    echo "if(fcntl((uintptr_t)${TOKEN},F_GETFL,0) == -1 && errno == EBADF) { close(SSL_get_fd((SSL*)(uintptr_t)${TOKEN}));" >> $g_CFILE
+                                    echo "SSL_CTX_free(SSL_get_SSL_CTX((SSL*)(uintptr_t)${TOKEN})); SSL_shutdown((SSL*)(uintptr_t)${TOKEN});" >> $g_CFILE
+                                    echo "SSL_free((SSL*)(uintptr_t)${TOKEN}); } else { close((uintptr_t)${TOKEN}); }" >> $g_CFILE
                                 else
-                                    echo "SSL_CTX_free(((SSL*)${TOKEN})->ctx);" >> $g_CFILE
-                                fi
-                                echo "SSL_shutdown((SSL*)${TOKEN});" >> $g_CFILE
-                                echo "SSL_free((SSL*)${TOKEN});" >> $g_CFILE
-                                if [[ ${g_LIB_TLS} = +(*gnutls*) ]]
-                                then
-				    echo "gnutls_global_deinit();" >> $g_CFILE
+                                    echo "if(fcntl((uintptr_t)${TOKEN},F_GETFL,0) == -1 && errno == EBADF) { BIO_get_fd( ((SSL*)(uintptr_t)${TOKEN})->gnutls_state, &__b2c__counter);" >> $g_CFILE
+                                    echo "close(__b2c__counter); free(((SSL*)(uintptr_t)${TOKEN})->ctx->certfile); free(((SSL*)(uintptr_t)${TOKEN})->ctx->keyfile);" >> $g_CFILE
+                                    echo "SSL_CTX_free(((SSL*)(uintptr_t)${TOKEN})->ctx); SSL_shutdown((SSL*)(uintptr_t)${TOKEN}); SSL_free((SSL*)(uintptr_t)${TOKEN}); gnutls_global_deinit(); }" >> $g_CFILE
+                                    echo "else { close((uintptr_t)${TOKEN}); }" >> $g_CFILE
                                 fi
                             else
                                 echo "shutdown((uintptr_t)${TOKEN}, SHUT_RDWR);" >> $g_CFILE
@@ -5402,7 +5462,7 @@ function Parse_Line
 		    if [[ -n $g_FUNCNAME ]]
 		    then
 			echo "} $g_RECORDNAME;" >> $g_CFILE
-			echo "typedef $g_RECORDNAME ${g_RECORDNAME%_*}_type;" >> $g_CFILE
+			echo "typedef $g_RECORDNAME ${g_RECORDNAME}_type;" >> $g_CFILE
 			if [[ -n $g_RECORDARRAY ]]
 			then
 			    echo "$g_RECORDNAME *${g_RECORDVAR%%\[*} = ($g_RECORDNAME*)calloc(${g_RECORDARRAY}+${g_OPTION_BASE}, sizeof($g_RECORDNAME));" >> $g_CFILE
@@ -5413,7 +5473,7 @@ function Parse_Line
 			fi
 		    else
 			echo "} $g_RECORDNAME;" >> $g_HFILE
-			echo "typedef $g_RECORDNAME ${g_RECORDNAME%_*}_type;" >> $g_HFILE
+			echo "typedef $g_RECORDNAME ${g_RECORDNAME}_type;" >> $g_HFILE
 			if [[ -n $g_RECORDARRAY ]]
 			then
 			    echo "$g_RECORDNAME *${g_RECORDVAR%%\[*};" >> $g_HFILE
@@ -5591,14 +5651,9 @@ function Parse_Line
 		    COPY_CURFILE=$g_CURFILE
 		    # Set current filename
 		    g_CURFILE=${NEWFEED}
-                    # Detect if this is a Windows file
-                    if [[ `head -1 ${NEWFEED}` = +(*${g_CRLF}) ]]
-                    then
-                        echo "System error: Windows file detected! Remove non-Unix CR line separators first. Exiting..."
-                        exit 1
-                    fi
 		    while read -r LINE || [[ -n $LINE ]]
 		    do
+                        LINE=$(Trim "${LINE}")
 			# See if we need to enable flag
 			for SYM in ${EXP}
 			do
@@ -5615,7 +5670,7 @@ function Parse_Line
 			    then
 				echo -e -n "\rConverting '${INC}'... ${g_COUNTER}\033[0K"
 			    fi
-			    if [[ "$LINE" = +(* \\) && "$LINE" != +(${g_SQUOTESIGN}*) ]]
+			    if [[ "$LINE" = +(* \\) && "$LINE" != +(${g_SQUOTESIGN}*) && ! "${LINE}" =~ ^(REM[[:space:]]+.*)$ ]]
 			    then
 				let LEN="${#LINE}"-2
 				SEQ="${LINE:0:$LEN}"
@@ -5633,6 +5688,19 @@ function Parse_Line
                                         echo "#line $g_COUNTER \"${NEWFEED}\"" >> $g_HFILE
                                     fi
 				    Tokenize "${TOTAL}"
+                                    # Remove \" in each line, then remove string from line, to determine dependencies later
+                                    IFS=$'\n'
+                                    TOTAL="${TOTAL//'\\'/}"
+                                    TOTAL="${TOTAL//'\"'/}"
+                                    if [[ ${TOTAL} = *'"'* ]]
+                                    then
+                                        for i in $(grep -o '"[^"]*"' <<<${TOTAL})
+                                        do
+                                            TOTAL=${TOTAL/"${i}"/}
+                                        done
+                                    fi
+                                    IFS="${g_ORGIFS}"
+                                    g_DEPEND="${g_DEPEND}${TOTAL}${g_CRLF}"
 				fi
 				TOTAL=
 			    fi
@@ -5669,12 +5737,12 @@ function Parse_Line
                         EXP=${EXP% SIZE *}
                         TOKEN=$(Mini_Parser "${EXP}")
                         EXP="${EXP:${#TOKEN}+1}"
-		        echo "if (__b2c__trap){if(!__b2c__memory__check((char*)${TOKEN}, (${SYM})*sizeof(__b2c__MEMTYPE))) {ERROR=1; if(!__b2c__catch_set) RUNTIMEERROR(\"POKE\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+                        echo "if(!__b2c__memory__check((char*)${TOKEN}, (${SYM})*sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"POKE\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
 		        echo "memset((void*)(__b2c__MEMTYPE*)(${TOKEN}), ${EXP}, (${SYM})*sizeof(__b2c__MEMTYPE));" >> $g_CFILE
                     else
                         TOKEN=$(Mini_Parser "${EXP}")
                         EXP="${EXP:${#TOKEN}+1}"
-		        echo "if (__b2c__trap){if(!__b2c__memory__check((char*)${TOKEN}, sizeof(__b2c__MEMTYPE))) {ERROR=1; if(!__b2c__catch_set) RUNTIMEERROR(\"POKE\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+                        echo "if(!__b2c__memory__check((char*)${TOKEN}, sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"POKE\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
 		        echo "*(__b2c__MEMTYPE*)(${TOKEN}) = (__b2c__MEMTYPE)(${EXP});" >> $g_CFILE
                     fi
                     if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
@@ -5692,9 +5760,9 @@ function Parse_Line
 		    SYM=${1#* }
 		    EXP=${SYM%% TO *}
                     CHECK=$(Get_Var ${EXP//./} ${g_FUNCNAME})
-                    echo "if(__b2c__trap) {if(!__b2c__memory__check((char*)${EXP}, sizeof(__b2c__MEMTYPE))) {ERROR=1; if(!__b2c__catch_set) RUNTIMEERROR(\"RESIZE\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+                    echo "if(!__b2c__memory__check((char*)${EXP}, sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"RESIZE\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
                     echo "${EXP} = (${CHECK})realloc((void*)${EXP}, sizeof(__b2c__MEMTYPE)*(${SYM##* TO }+1));" >> $g_CFILE
-                    echo "if(__b2c__trap) {if((void*)${EXP} == NULL) {ERROR=6; if(!__b2c__catch_set) RUNTIMEERROR(\"RESIZE\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+                    echo "if((void*)${EXP} == NULL) { ERROR=6; RUNTIMEERROR(\"RESIZE\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
                     if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
                     then
                         g_CATCH_USED=1
@@ -5712,14 +5780,14 @@ function Parse_Line
 		    # Translate to C function
 		    if [[ "${1#* }" = +(*FILE*) ]]
 		    then
-			echo "if (unlink(${1#*FILE })==-1){if(__b2c__trap){ERROR = 7;if(!__b2c__catch_set) RUNTIMEERROR(\"DELETE\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+                        echo "if(unlink(${1#*FILE })==-1){ ERROR = 7; RUNTIMEERROR(\"DELETE\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
                         if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
                         then
                             g_CATCH_USED=1
                         fi
 		    elif [[ "${1#* }" = +(*DIRECTORY*) ]]
 		    then
-		        echo "if (rmdir(${1#*DIRECTORY }) == -1){if(__b2c__trap){ERROR = 20;if(!__b2c__catch_set) RUNTIMEERROR(\"DELETE\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+                        echo "if(rmdir(${1#*DIRECTORY }) == -1){ ERROR = 20; RUNTIMEERROR(\"DELETE\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
                         if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
                         then
                             g_CATCH_USED=1
@@ -5742,7 +5810,7 @@ function Parse_Line
                             echo "${CHECK#*:} *${UNIQ} = (${CHECK#*:}*)malloc(sizeof(${CHECK#*:})); *${UNIQ} = (${CHECK#*:})${EXP}; __b2c__assign2 = tfind((void*)${UNIQ}, &${SYM}, ${CHECK%:*}); if(__b2c__assign2) { __b2c__assign = *__b2c__assign2; tdelete((void*)${UNIQ}, &${SYM}, ${CHECK%:*}); free(__b2c__assign); } free(${UNIQ});" >> $g_CFILE
                         fi
 		    else
-			echo "\nERROR: erronuous argument for DELETE at line $g_COUNTER in file '$g_CURFILE'!"
+			echo "\nSyntax error: erronuous argument for DELETE at line $g_COUNTER in file '$g_CURFILE'!"
 			exit 1
 		    fi
 		fi;;
@@ -5756,7 +5824,7 @@ function Parse_Line
 		    exit 1
 		else
 		    # Translate to C function
-                    echo "ERROR = __b2c__makedir(${1#* }); if(ERROR && __b2c__trap) { if(!__b2c__catch_set) RUNTIMEERROR(\"MAKEDIR\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO; }" >> $g_CFILE
+                    echo "ERROR = __b2c__makedir(${1#* }); if(ERROR) { RUNTIMEERROR(\"MAKEDIR\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
                     if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
                     then
                         g_CATCH_USED=1
@@ -5770,7 +5838,7 @@ function Parse_Line
 		    exit 1
 		else
 		    # Translate to C function
-		    echo "if (${1#* } == NULL || chdir(${1#* }) == -1){if(__b2c__trap) {ERROR = 22;if(!__b2c__catch_set) RUNTIMEERROR(\"CHANGEDIR\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+                    echo "if(${1#* } == NULL || chdir(${1#* }) == -1){ ERROR = 22; RUNTIMEERROR(\"CHANGEDIR\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
                     if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
                     then
                         g_CATCH_USED=1
@@ -5805,8 +5873,8 @@ function Parse_Line
                                 echo "__b2c__hash_clear(__b2c__assoc_${i});" >> $g_CFILE
 			    else
 				EXP=${i// /}
-				echo "if(__b2c__trap){if(!__b2c__memory__check((char *)${EXP}, sizeof(__b2c__MEMTYPE)))" >> $g_CFILE
-				echo "{ERROR=1; if(!__b2c__catch_set) RUNTIMEERROR(\"FREE\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} } free((void*)${EXP});" >> $g_CFILE
+				echo "if(!__b2c__memory__check((char *)${EXP}, sizeof(__b2c__MEMTYPE)))" >> $g_CFILE
+                                echo "{ ERROR=1; RUNTIMEERROR(\"FREE\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); } free((void*)${EXP});" >> $g_CFILE
 				unset g_SEMANTIC_MEMFREE[${EXP}]
 			    fi
                         done
@@ -5876,7 +5944,7 @@ function Parse_Line
 		    exit 1
 		else
 		    # Translate to C label
-		    echo "__b2c__gosub_buffer_ptr++; if (__b2c__gosub_buffer_ptr >= $g_MAX_RBUFFERS) {ERROR=31; if(!__b2c__catch_set) RUNTIMEERROR(\"GOSUB\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;}" >> $g_CFILE
+                    echo "__b2c__gosub_buffer_ptr++; if (__b2c__gosub_buffer_ptr >= $g_MAX_RBUFFERS) { ERROR=31; RUNTIMEERROR(\"GOSUB\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
 		    echo "if(!setjmp(__b2c__gosub_buffer[__b2c__gosub_buffer_ptr])) goto ${1#* };" >> $g_CFILE
 		    echo "__b2c__gosub_buffer_ptr--; if(__b2c__gosub_buffer_ptr < -1) __b2c__gosub_buffer_ptr = -1;" >> $g_CFILE
                     if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
@@ -5950,7 +6018,7 @@ function Parse_Line
 		    exit 1
 		fi;;
 	    "RESUME")
-		echo "longjmp(__b2c__jump, 1);" >> $g_CFILE;;
+                echo "if(jmp_buf_is_used(__b2c__jump)) { longjmp(__b2c__jump, 1); }" >> $g_CFILE;;
 	    "CLEAR")
 		echo "fprintf(stdout,\"\033[2J\"); fprintf(stdout,\"\033[0;0f\"); fflush(stdout);" >> $g_CFILE;;
 	    "COLOR")
@@ -6272,15 +6340,6 @@ function Parse_Line
 			    echo -e "\nSyntax error: invalid argument to OPTION PROPER at line $g_COUNTER in file '$g_CURFILE'!"
 			    exit 1
 			fi
-		    elif [[ "${1#* }" = +(*ERROR*) ]]
-		    then
-			if [[ "${1##*ERROR }" = +([01]*|TRUE*|FALSE*) ]]
-			then
-			    echo "__b2c__option_error = $(echo ${1##*ERROR });" >> $g_CFILE
-			else
-			    echo -e "\nSyntax error: invalid argument to OPTION ERROR at line $g_COUNTER in file '$g_CURFILE'!"
-			    exit 1
-			fi
 		    elif [[ "${1#* }" = +(*DELIM*) ]]
 		    then
                         echo "__b2c__option_delim = $(echo ${1##*DELIM});" >> $g_CFILE
@@ -6357,8 +6416,8 @@ function Parse_Line
 			then
 			    echo "#include <libintl.h>" >> $g_HFILE
                             echo "setlocale(LC_ALL, \"\");" >> $g_CFILE
-			    echo "if(bindtextdomain(\"${g_SOURCEFILE%.*}\",\"/usr/share/locale\")==NULL){if(__b2c__trap){ERROR = 6;if(!__b2c__catch_set) RUNTIMEERROR(\"OPTION INTERNATIONAL\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
-			    echo "if(textdomain(\"${g_SOURCEFILE%.*}\")==NULL){if(__b2c__trap){ERROR = 6; if(!__b2c__catch_set) RUNTIMEERROR(\"OPTION INTERNATIONAL\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+                            echo "if(bindtextdomain(\"${g_SOURCEFILE%.*}\",\"/usr/share/locale\")==NULL){ ERROR = 6; RUNTIMEERROR(\"OPTION INTERNATIONAL\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
+                            echo "if(textdomain(\"${g_SOURCEFILE%.*}\")==NULL){ ERROR = 6; RUNTIMEERROR(\"OPTION INTERNATIONAL\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
                             if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
                             then
                                 g_CATCH_USED=1
@@ -6424,9 +6483,21 @@ function Parse_Line
 			    echo -e "\nSyntax error: invalid argument to OPTION EXPLICIT at line $g_COUNTER in file '$g_CURFILE'!"
 			    exit 1
 			fi
+                    elif [[ "${1#* }" = +(*LOCAL*) ]]
+		    then
+			if [[ "${1##*LOCAL }" = +([01]*|TRUE*|FALSE*) ]]
+			then
+			    g_OPTION_LOCAL=$(echo ${1##*LOCAL })
+			else
+			    echo -e "\nSyntax error: invalid argument to OPTION LOCAL at line $g_COUNTER in file '$g_CURFILE'!"
+			    exit 1
+			fi
                     elif [[ "${1#* }" = +(*VARTYPE*) ]]
 		    then
                         g_VARTYPE=$(echo ${1##*VARTYPE })
+		    elif [[ "${1#* }" = +(*ERROR*) ]]
+		    then
+	                echo "WARNING: OPTION ERROR is deprecated."
 		    else
 			echo -e "\nSyntax error: argument to OPTION at line $g_COUNTER in file '$g_CURFILE' not recognized!"
 			exit 1
@@ -6636,8 +6707,8 @@ function Parse_Line
 		    EXP=${1#* }
 		    if [[ ${EXP} = +(*,*) ]]
 		    then
-			echo "if(bindtextdomain(${EXP})==NULL){if(__b2c__trap){ERROR = 6;if(!__b2c__catch_set) RUNTIMEERROR(\"TEXTDOMAIN\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
-			echo "if(textdomain(${EXP%,*})==NULL){if(__b2c__trap){ERROR = 6; if(!__b2c__catch_set) RUNTIMEERROR(\"TEXTDOMAIN\", $g_COUNTER, \"$g_CURFILE\", ERROR); else if(!setjmp(__b2c__jump)) goto $g_CATCHGOTO;} }" >> $g_CFILE
+                        echo "if(bindtextdomain(${EXP})==NULL){ ERROR = 6; RUNTIMEERROR(\"TEXTDOMAIN\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
+                        echo "if(textdomain(${EXP%,*})==NULL){ ERROR = 6; RUNTIMEERROR(\"TEXTDOMAIN\", $g_COUNTER, \"$g_CURFILE\", ERROR, ${g_CATCHGOTO}); }" >> $g_CFILE
                         if [[ ${g_CATCHGOTO} = "__B2C__PROGRAM__EXIT" ]]
                         then
                             g_CATCH_USED=1
@@ -6732,7 +6803,7 @@ function Parse_Line
                         fi
                     elif [[ "${1#* }" = +(*LDFLAGS*) ]]
 		    then
-                        if [[ ${1##*LDFLAGS } = +(*pkg-config*) ]]
+                        if [[ ${1##*LDFLAGS } = +(*pkg-config*) || ${1##*LDFLAGS } = +(*fltk-config*) ]]
                         then
                             g_LDFLAGS="${1##*LDFLAGS } $g_LDFLAGS"
                         else
@@ -7294,7 +7365,7 @@ function Tokenize
 	    echo "fprintf(stderr, \"File '${g_CURFILE}' line %d: ${LINE}\n\", $g_COUNTER);" >> $g_CFILE
             if [[ -n $g_MONITOR ]]
             then
-                echo "${g_MONITOR#*&&} ;" >> $g_CFILE
+                echo "${g_MONITOR#*\&\&} ;" >> $g_CFILE
             fi
         fi
         g_TRACE_PREFIX=
@@ -7652,12 +7723,16 @@ function Tokenize
 	    let LEN=${#DATA}-1
 	    DATA="${DATA: -$LEN}"
         done
-        # Check if all nested '&' and '+' have been parsed. The '%' is the modulo operator, but also an integer suffix.
-        if [[ "${TOKEN//[&+%]/}" = "${TOKEN}" || "${TOKEN}" = "${RESULT}" ]]
+        if [[ "${TOKEN}" = "${RESULT}" ]]
         then
             break
         fi
         RESULT=${TOKEN}
+        # Check if all nested '&' and '+' have been parsed. The '%' is the modulo operator, but also an integer suffix. Check '#' and '$' as well.
+        if [[ "${TOKEN//[&+%#\$]/}" = "${TOKEN}" ]]
+        then
+            break
+        fi
         DATA="${TOKEN// /${g_PARSEVAR}}"
     done
 
@@ -7711,12 +7786,22 @@ function Parse_Chunk
         DATA=${DATA:1}
         LB="${LB}("
     done
-    while [[ ${DATA: -1} = ")" ]]
-    do
-        ((LEN-=1))
+    if [[ $CHECK -eq 1 ]]
+    then
+        TOKEN=$(Mini_Parser "${DATA}")
+        RB="${DATA:${#TOKEN}}"
+        ((LEN-=${#RB}))
         DATA=${DATA:0:${LEN}}
-        RB="${RB})"
-    done
+    else
+        while [[ ${DATA: -1} = ")" ]]
+        do
+            ((LEN-=1))
+            DATA=${DATA:0:${LEN}}
+            RB="${RB})"
+        done
+    fi
+
+    TOKEN=
     DATA=$(echo ${DATA// /${g_PARSEVAR}})
 
     until [[ $LEN -eq 0 ]]
@@ -7945,7 +8030,7 @@ function Parse_Chunk
 
     if [[ $CHECK -eq 1 ]]
     then
-        g_EQUATION="${g_EQUATION} ${LB}__b2c__STRCMP(${TERM}, $TOKEN)${RB} $EQ 0"
+        g_EQUATION="${g_EQUATION} ${LB}__b2c__STRCMP(${TERM}, $TOKEN) $EQ 0${RB}"
     else
         g_EQUATION="${g_EQUATION} ${LB}${TOKEN}${RB}"
     fi
@@ -8024,6 +8109,14 @@ function Parse_Equation
         fi
 	CHAR="${DATA:0:1}"
 	case $CHAR in
+            \;|,)
+	        if [[ $IS_STRING -eq 0 ]]
+	        then
+                    if [[ ${FLAG} -eq 1 ]]
+                    then
+                        FLAG=0
+		    fi
+		fi;;
 	    \\)
 		if [[ $IS_ESCAPED -eq 0 ]]
 		then
@@ -8136,6 +8229,7 @@ g_TRACE_PREFIX=
 g_IGNORE_PARSE="1"
 g_PRIORITY="\"NORMAL:-VERS-TLS1.3:%COMPAT\""
 g_OPTION_EXPLICIT="0"
+g_OPTION_LOCAL="0"
 g_OPTION_INPUT="\"\n\""
 g_VARTYPE="long"
 g_OBJ_FILES=
@@ -8145,6 +8239,7 @@ let g_STRING_FUNC=1
 g_DOTIMES=0
 g_LOCAL_SBUFFER=
 g_TWEAK=
+g_DEPEND=""
 
 # Always create a final label
 g_CATCHGOTO="__B2C__PROGRAM__EXIT"
@@ -8175,7 +8270,6 @@ g_RELATE_CTR=0
 
 g_FCTR=0
 g_CCTR=0
-NOLEX=0
 RETURN_CODE=0
 
 # Timer related
@@ -8223,7 +8317,7 @@ do
            else
 	       g_INCFILES="${g_INCFILES}#include \"`pwd`/${OPTARG}\""
 	   fi;;
-	l) if [[ $OPTARG = +(* *) || $OPTARG = +(-*) ]]
+	l) if [[ "${OPTARG}" =~ ^(.*[[:space:]]+.*)$ || "${OPTARG}" =~ ^(-.*)$ ]]
            then
                g_LDFLAGS="$OPTARG $g_LDFLAGS"
            else
@@ -8423,8 +8517,6 @@ g_FUNCTIONS=$g_TEMPDIR/${g_SOURCEFILE##*/}.functions.h
 STRINGARRAYFILE=$g_TEMPDIR/${g_SOURCEFILE##*/}.string.h
 FLOATARRAYFILE=$g_TEMPDIR/${g_SOURCEFILE##*/}.float.h
 SRCARRAYFILE=$g_TEMPDIR/${g_SOURCEFILE##*/}.src.h
-g_BACONTOKEN=$g_TEMPDIR/${g_SOURCEFILE##*/}.token.lex
-g_BACONLEXER=$g_TEMPDIR/${g_SOURCEFILE##*/}.lex
 
 # Add to total file list
 g_TMP_FILES="$g_CFILE $g_HFILE $STRINGARRAYFILE $FLOATARRAYFILE"
@@ -8528,7 +8620,7 @@ DATA_1="ABS ACCEPT ACOS ADD ADDRESS ALARM ALIAS ALIGN$ AMOUNT AND APPEND APPEND$
 DATA_2="BSAVE BY BYTELEN CA$ CALL CASE CATCH CEIL CERTIFICATE CHANGE$ CHANGEDIR CHOP$ CHR$ CHUNK CIPHER$ CL$ CLASS CLEAR CLOSE CMDLINE CMODE CN$ COIL$ COLLAPSE COLLAPSE$ COLLECT COLOR COLUMNS COMPARE COMPILER CONCAT$ CONST CONTINUE"
 DATA_3="COPY COS COUNT CR$ CURDIR$ CURRENT CURSOR CUT$ CYAN DATA DAY DEC DECLARE DECR DEF DEFAULT DEG DEL$ DELETE DELIM DELIM$ DEVICE DIRECTORY DIRNAME$ DLE$ DO DONE DOTIMES DOWN DOWNTO DQ EDITBOM$ EL$ ELIF ELSE END ENDCLASS ENDENUM ENDFILE ENDFORK"
 DATA_4="ENDFUNC ENDFUNCTION ENDIF ENDRECORD ENDSELECT ENDSUB ENDUSEC ENDUSEH ENDWITH ENUM EPRINT EQ EQUAL ERR$ ERROR ESC ESCAPE$ EVAL EVEN EXCHANGE$ EXCL EXEC$ EXIT EXP EXPLICIT EXPLODE$ EXTRACT$ FALSE FG FI FILE FILEEXISTS FILELEN FILETIME"
-DATA_5="FILETYPE FILL$ FIND FIRST$ FLATTEN$ FLOATING FLOOR FN FOR FORK FORMAT FORWARD FP FRAMEWORK FREE FROM FTYPE FUNC FUNCTION GE GETBYTE GETENVIRON$ GETFILE GETKEY GETLINE GETPEER$ GETX GETY GLOBAL GOSUB GOTO GOTOXY GREEN GT HASBOM HASDELIM HASH"
+DATA_5="FILETYPE FILL$ FIND FIRST$ FLATTEN$ FLOATING FLOOR FN FOR FORK FORMAT FORWARD FP FRAMEWORK FREE FROM FTYPE FUNC FUNCTION GE GETBYTE GETENVIRON$ GETFILE GETKEY GETLINE GETPEER$ GETX GETY GLOBAL GOSUB GOTO GOTOXY GREEN GT GUI HASBOM HASDELIM HASH"
 DATA_6="HEAD$ HEX$ HOST$ HOSTNAME$ HOUR IF IIF IIF$ IMODE IMPORT IN INBETWEEN$ INCLUDE INCR INDEX INDEX$ INPUT INSERT$ INSTR INSTRREV INT INTENSE INTERNATIONAL INTL$ INVERSE INVERT IS ISASCII ISFALSE ISKEY ISNOT ISTOKEN ISTRUE ISUTF8 ITALIC JOIN LABEL LAST$"
 DATA_7="LCASE$ LDFLAGS LE LEFT$ LEN LET LIBRARY LINENO LMODE LOAD$ LOCAL LOG LOOKUP LOOP LOOP$ LT MAGENTA MAKEDIR MAP MATCH MAX MAX$ MAXNUM MAXRANDOM ME$ MEMCHECK MEMORY MEMREWIND MEMSTREAM MEMTELL MEMTYPE MERGE$ MID$ MIN MIN$ MINUTE"
 DATA_8="MOD MONITOR MONTH MONTH$ MULTICAST MYPID NANOTIMER NE NETWORK NEXT NL$ NNTL$ NO_C_ESC NODE NORMAL NOT NOW NRKEYS NULL NUMBER OBTAIN$ ODD OFF OFFSET OMODE ON OPEN OPTION OPTIONS OR OS$ OTHER OUTBETWEEN$ PARSE PEEK PI POKE POW PRAGMA PRINT PRIORITY"
@@ -8580,7 +8672,6 @@ fi
 g_CURFILE="${g_SOURCEFILE}"
 
 # Initialize
-LEN=
 TOTAL=
 SEQ=
 g_COUNTER=0
@@ -8594,30 +8685,24 @@ Save_Main_Var "__b2c__loop_result" "long"
 Save_Main_Var "ERROR" "int"
 Save_Main_Var "_" "long"
 
-# Detect if this is a Windows file
-if [[ `head -1 ${g_FEED}` = +(*${g_CRLF}) ]]
-then
-    echo "System error: Windows file detected! Remove non-Unix CR line separators first. Exiting..."
-    exit 1
-fi
-
 # Start walking through program
 echo -e -n "\rConverting '${g_SOURCEFILE}'... "
 
 while read -r LINE || [[ -n "$LINE" ]]
 do
+    LINE=$(Trim "${LINE}")
+
     ((g_COUNTER+=1))
-    if [[ $g_QUIET -eq 0 ]]
-    then
-	echo -e -n "\rConverting '${g_SOURCEFILE}'... ${g_COUNTER}\033[0K"
-    fi
     # Line is not empty?
     if [[ -n "$LINE" ]]
     then
-	if [[ "$LINE" = +(* \\) && "$LINE" != +(${g_SQUOTESIGN}*) ]]
+        if [[ $g_QUIET -eq 0 ]]
+        then
+	    echo -e -n "\rConverting '${g_SOURCEFILE}'... ${g_COUNTER}\033[0K"
+        fi
+	if [[ "$LINE" = +(* \\) && "$LINE" != +(${g_SQUOTESIGN}*) && ! "${LINE}" =~ ^(REM[[:space:]]+.*)$ ]]
 	then
-	    let LEN="${#LINE}"-1
-	    SEQ="${LINE:0:$LEN}"
+	    SEQ="${LINE:0:${#LINE}-1}"
 	    TOTAL="${TOTAL}${SEQ}"
         else
 	    TOTAL="${TOTAL}${LINE}"
@@ -8632,6 +8717,19 @@ do
                     echo "#line $g_COUNTER \"${g_SOURCEFILE##*/}\"" >> $g_HFILE
                 fi
 		Tokenize "${TOTAL}"
+                # Remove \" in each line, then remove string from line, to determine dependencies later
+                IFS=$'\n'
+                TOTAL="${TOTAL//'\\'/}"
+                TOTAL="${TOTAL//'\"'/}"
+                if [[ ${TOTAL} = *'"'* ]]
+                then
+                    for i in $(grep -o '"[^"]*"' <<<${TOTAL})
+                    do
+                        TOTAL=${TOTAL/"${i}"/}
+                    done
+                fi
+                IFS="${g_ORGIFS}"
+                g_DEPEND="${g_DEPEND}${TOTAL}${g_CRLF}"
 	    fi
 	    TOTAL=
 	fi
@@ -8697,7 +8795,10 @@ if [[ -n ${g_GLOBALARRAYS} ]]
 then
     echo "void __b2c__arrays_free(void) { ${g_GLOBALARRAYS} }" >> $g_HFILE
 fi
-echo "void __b2c__twalk_free(void) { if (__b2c__twalk_array) { free (__b2c__twalk_array); } }" >> $g_HFILE
+if [[ -n $(grep -E "COLLECT[[:space:]]|TREE[[:space:]]" <<<${g_DEPEND}) ]]
+then
+    echo "void __b2c__twalk_free(void) { if (__b2c__twalk_array) { free (__b2c__twalk_array); } }" >> $g_HFILE
+fi
 
 # Create generic headerfile, functions are converted using macros
 echo "/* Created with Shell BaCon $g_VERSION - (c) Peter van Eerten - MIT License */" > $g_GENERIC
@@ -8730,6 +8831,7 @@ then
     echo "#include <netinet/in.h>" >> $g_GENERIC
     echo "#define strcat(x, y) __b2c_strlcat(x, y)" >> $g_GENERIC
     echo "#define strcpy(x, y) __b2c_strlcpy(x, y)" >> $g_GENERIC
+    echo "#define random(void) arc4random(void)" >> $g_GENERIC
 fi
 echo "#include <arpa/inet.h>" >> $g_GENERIC
 echo "#include <signal.h>" >> $g_GENERIC
@@ -8794,7 +8896,7 @@ do
 done
 
 echo "/* Declarations for internal variables */" >> $g_GENERIC
-echo "jmp_buf __b2c__jump;" >> $g_GENERIC
+echo "jmp_buf __b2c__jump = { 0 };" >> $g_GENERIC
 echo "int __b2c__trap = 1;" >> $g_GENERIC
 echo "int __b2c__catch_set_backup = 0, __b2c__catch_set = 0;" >> $g_GENERIC
 echo "void (*__b2c__error_callback)(char*, char*, long) = NULL;" >> $g_GENERIC
@@ -8804,7 +8906,6 @@ echo "int __b2c__option_dq = 34;" >> $g_GENERIC
 echo "int __b2c__option_esc = 92;" >> $g_GENERIC
 echo "int __b2c__option_utf8 = 0;" >> $g_GENERIC
 echo "int __b2c__option_proper = 0;" >> $g_GENERIC
-echo "int __b2c__option_error = 1;" >> $g_GENERIC
 echo "int __b2c__option_tls = 0;" >> $g_GENERIC
 echo "char *__b2c__option_delim = \" \";" >> $g_GENERIC
 echo "int __b2c__option_memstream = 0;" >> $g_GENERIC
@@ -8813,7 +8914,7 @@ echo "int __b2c__option_open = O_RDWR|O_NOCTTY|O_SYNC;" >> $g_GENERIC
 echo "int __b2c__collapse = 0;" >> $g_GENERIC
 echo "int __b2c__break_ctr = 0;" >> $g_GENERIC
 echo "int __b2c__break_flag = 0;" >> $g_GENERIC
-echo "char __b2c__chop_default[] = \"\r\n\t \";" >> $g_GENERIC
+echo "char __b2c__chop_default[] = \"\r\n\t\f\v \";" >> $g_GENERIC
 echo "int __b2c__stringarray_ptr = 0;" >> $g_GENERIC
 echo "int __b2c__floatarray_ptr = 0;" >> $g_GENERIC
 echo "long __b2c__ctr = 0;" >> $g_GENERIC
@@ -8827,7 +8928,7 @@ echo "long __b2c__loop_result = 0;" >> $g_GENERIC
 echo "jmp_buf __b2c__data_jump, __b2c__loop1, __b2c__loop2;" >> $g_GENERIC
 echo "char *__b2c__assign = NULL;" >> $g_GENERIC
 echo "void **__b2c__assign2 = NULL;" >> $g_GENERIC
-echo "int __b2c__counter;" >> $g_GENERIC
+echo "int __b2c__counter = 0;" >> $g_GENERIC
 echo "char **__b2c__stack = NULL;" >> $g_GENERIC
 echo "void **__b2c__twalk_array = NULL; int __b2c__twalk_idx = 0;" >> $g_GENERIC
 echo "extern char *__b2c__stringarray[];" >> $g_GENERIC
@@ -8923,12 +9024,12 @@ then
 else
     echo "#define COMPILED_BY_WHICH_BACON${g_STRINGSIGN} \"Shell Script BaCon $g_VERSION in KSH $KSH_VERSION\"" >> $g_GENERIC
 fi
-echo "#define RUNTIMEERROR(a, x, y, z) do { if(__b2c__option_error) { fprintf(stderr, \"Runtime error: statement '%s' at line %d in '%s': %s\n\", a, x, y, ERR${g_STRINGSIGN}(z)); exit(z); } if(__b2c__error_callback){(*__b2c__error_callback)(a,y,x);} } while(0)" >> $g_GENERIC
-echo "#define RUNTIMEFERR(a, x, y, z) do { if(__b2c__option_error) { fprintf(stderr, \"Runtime error: function '%s' at line %d in '%s': %s\n\", a, z, y, ERR${g_STRINGSIGN}(x)); exit(x); } if(__b2c__error_callback){(*__b2c__error_callback)(a,y,z);} } while(0)" >> $g_GENERIC
+echo "#define RUNTIMEERROR(a, x, y, z, q) do { if(!__b2c__catch_set) { if(__b2c__trap) { fprintf(stderr, \"Runtime error: statement '%s' at line %d in '%s': %s\n\", a, x, y, ERR${g_STRINGSIGN}(z)); exit(z); } if(__b2c__error_callback){ (*__b2c__error_callback)(a,y,x); } } else { if(!setjmp(__b2c__jump)) { goto q; } } } while(0)" >> $g_GENERIC
+echo "#define RUNTIMEFERR(a, x, y, z) do { if(__b2c__trap) { fprintf(stderr, \"Runtime error: function '%s' at line %d in '%s': %s\n\", a, z, y, ERR${g_STRINGSIGN}(x)); exit(x); } if(__b2c__error_callback){ (*__b2c__error_callback)(a,y,z); } } while(0)" >> $g_GENERIC
 echo "#define RUNTIMEDEBUG(x, y, z) (__b2c__getch() == 27 ? fprintf(stderr, \"TRACE OFF - exiting trace mode.\n\") && __b2c__stop_program() : fprintf(stderr, \"File '%s' line %d: %s\n\", #x, y, z)${g_MONITOR} )" >> $g_GENERIC
 echo "int __b2c__stop_program(void) { exit(EXIT_SUCCESS); return(1); }" >> $g_GENERIC
 echo "/* BaCon functions */" >> $g_GENERIC
-echo "#define ABS(x) (((x) < 0) ? -(x) : (x))" >> $g_GENERIC
+echo "#define ABS(x) fabs((double)x)" >> $g_GENERIC
 echo "#define ACOS(x) acos((double)x)" >> $g_GENERIC
 echo "#define ADDRESS(x) (uintptr_t)(&x)" >> $g_GENERIC
 echo "#define __b2c__ALIGN3(x, y, z) __b2c__align(__LINE__, __FILE__, x, y, z, 0)" >> $g_GENERIC
@@ -8944,10 +9045,10 @@ echo "#define APPEND${g_STRINGSIGN}(...) __b2c__FUNCSELECT4(__VA_ARGS__, __b2c__
 echo "#define __b2c__FAPPEND4(s, x, y, z) __b2c__append(&s, 1, x, y, z, NULL)" >> $g_GENERIC
 echo "#define __b2c__FAPPEND5(s, x, y, z, f) __b2c__append(&s, 1, x, y, z, f)" >> $g_GENERIC
 echo "#define F_APPEND${g_STRINGSIGN}(...) __b2c__FUNCSELECT5(__VA_ARGS__, __b2c__FAPPEND5, __b2c__FAPPEND4)(__VA_ARGS__)" >> $g_GENERIC
-echo "#define ASC(x) (x == NULL ? 0 : (unsigned char)*x)" >> $g_GENERIC
-echo "#define ASIN(x) asin((double)x)" >> $g_GENERIC
-echo "#define ATN(x) atan((double)x)" >> $g_GENERIC
-echo "#define ATN2(x,y) atan2((double)x,(double)y)" >> $g_GENERIC
+echo "#define ASC(x) __b2c__asc(x)" >> $g_GENERIC
+echo "#define ASIN(x) asin((double)(x))" >> $g_GENERIC
+echo "#define ATN(x) atan((double)(x))" >> $g_GENERIC
+echo "#define ATN2(x,y) atan2((double)(x),(double)(y))" >> $g_GENERIC
 echo "#define B64DEC${g_STRINGSIGN}(x) __b2c__b64dec(__LINE__, __FILE__, x)" >> $g_GENERIC
 echo "#define __b2c__B64ENC1(x) __b2c__b64enc(x, 0)" >> $g_GENERIC
 echo "#define __b2c__B64ENC2(x, y) __b2c__b64enc((char*)x, y)" >> $g_GENERIC
@@ -8989,8 +9090,8 @@ echo "#define COLLAPSE${g_STRINGSIGN}(...) __b2c__FUNCSELECT2(__VA_ARGS__, __b2c
 echo "#define COLUMNS __b2c__screen(0)" >> $g_GENERIC
 echo "#define CONCAT${g_STRINGSIGN}(...) __b2c__concat(sizeof((const char*[]) {__VA_ARGS__}) / sizeof(char*), __VA_ARGS__)" >> $g_GENERIC
 echo "#define F_CONCAT${g_STRINGSIGN}(...) __b2c__concat2(sizeof((const char*[]) {__VA_ARGS__}) / sizeof(char*), __VA_ARGS__)" >> $g_GENERIC
-echo "#define COS(x) cos((double)x)" >> $g_GENERIC
-echo "#define COUNT(x, y) ((x) != NULL ? __b2c__count(__LINE__, __FILE__, x, y) : 0)" >> $g_GENERIC
+echo "#define COS(x) cos((double)(x))" >> $g_GENERIC
+echo "#define COUNT(x, y) __b2c__count(__LINE__, __FILE__, x, y)" >> $g_GENERIC
 echo "#define CR${g_STRINGSIGN} \"\r\"" >> $g_GENERIC
 echo "#define CURDIR${g_STRINGSIGN} __b2c__curdir()" >> $g_GENERIC
 echo "#define __b2c__CUT3(x, y, z) __b2c__cut(x, y, z, NULL)" >> $g_GENERIC
@@ -9011,7 +9112,7 @@ echo "#define EDITBOM${g_STRINGSIGN}(x, y) __b2c__editbom(x, y)" >> $g_GENERIC
 echo "#define EL${g_STRINGSIGN} \"\033[0K\"" >> $g_GENERIC
 echo "#define ENDFILE(x) feof(x)" >> $g_GENERIC
 echo "#define EQ ==" >> $g_GENERIC
-echo "#define EQUAL(x, y) ((x) != NULL && (y) != NULL ? !__b2c__STRCMP(x, y) : 0)" >> $g_GENERIC
+echo "#define EQUAL(x, y) !__b2c__STRCMP(x, y)" >> $g_GENERIC
 echo "#define ESCAPE${g_STRINGSIGN}(x) __b2c__escape(__LINE__, __FILE__, x)" >> $g_GENERIC
 echo "#define EVAL(x, y, z, q) __b2c__eval(__LINE__, __FILE__, x, y, z, q)" >> $g_GENERIC
 echo "#define EVEN(x) (((long)(x) % 2 == 0) ? 1 : 0)" >> $g_GENERIC
@@ -9031,15 +9132,16 @@ echo "#define __b2c__EXTRACT2(x, y) __b2c__extract(__LINE__, __FILE__, x, y, 0)"
 echo "#define __b2c__EXTRACT3(x, y, z) __b2c__extract(__LINE__, __FILE__, x, y, z)" >> $g_GENERIC
 echo "#define EXTRACT${g_STRINGSIGN}(...) __b2c__FUNCSELECT3(__VA_ARGS__, __b2c__EXTRACT3, __b2c__EXTRACT2)(__VA_ARGS__)" >> $g_GENERIC
 echo "#define FALSE 0" >> $g_GENERIC
-echo "#define FILEEXISTS(x) (x != NULL ? !access(x, F_OK) : 0)" >> $g_GENERIC
-echo "#define FILELEN(x) __b2c__filelen(__LINE__, __FILE__, x)" >> $g_GENERIC
+echo "#define FILEEXISTS(x) __b2c__filestat(__LINE__, __FILE__, x, 1)" >> $g_GENERIC
+echo "#define FILELEN(x) __b2c__filestat(__LINE__, __FILE__, x, 0)" >> $g_GENERIC
 echo "#define FILETIME(x, y) __b2c__filetime(__LINE__, __FILE__, x, y)" >> $g_GENERIC
 echo "#define FILETYPE(x) __b2c__filetype(__LINE__, __FILE__, x)" >> $g_GENERIC
-echo "#define FILL${g_STRINGSIGN}(x, y) ((y) >= 0 && (y) <= 0x10FFFF ? __b2c__fill(x, y) : NULL)" >> $g_GENERIC
+echo "#define FILL${g_STRINGSIGN}(x, y) __b2c__fill(x, y)" >> $g_GENERIC
 echo "#define FIND(x, y, z, a) __b2c__find(x, y, z, a)" >> $g_GENERIC
+echo "#define __b2c__FIRST1(x) __b2c__first(x, 1, NULL)" >> $g_GENERIC
 echo "#define __b2c__FIRST2(x, y) __b2c__first(x, y, NULL)" >> $g_GENERIC
 echo "#define __b2c__FIRST3(x, y, z) __b2c__first(x, y, z)" >> $g_GENERIC
-echo "#define FIRST${g_STRINGSIGN}(...) __b2c__FUNCSELECT3(__VA_ARGS__, __b2c__FIRST3, __b2c__FIRST2)(__VA_ARGS__)" >> $g_GENERIC
+echo "#define FIRST${g_STRINGSIGN}(...) __b2c__FUNCSELECT3(__VA_ARGS__, __b2c__FIRST3, __b2c__FIRST2, __b2c__FIRST1)(__VA_ARGS__)" >> $g_GENERIC
 echo "#define __b2c__FLATTEN1(x) __b2c__flatten(x, NULL)" >> $g_GENERIC
 echo "#define __b2c__FLATTEN2(x, y) __b2c__flatten(x, y)" >> $g_GENERIC
 echo "#define FLATTEN${g_STRINGSIGN}(...) __b2c__FUNCSELECT2(__VA_ARGS__, __b2c__FLATTEN2, __b2c__FLATTEN1)(__VA_ARGS__)" >> $g_GENERIC
@@ -9048,7 +9150,7 @@ echo "#define FLOOR(x) (long)floor(x)" >> $g_GENERIC
 echo "#define FORK fork()" >> $g_GENERIC
 echo "#define FP(x) (void*)(&x)" >> $g_GENERIC
 echo "#define GE >=" >> $g_GENERIC
-echo "#define GETENVIRON${g_STRINGSIGN}(x) ((x) != NULL ? __b2c__getenv(x) : (char*)\"null\")" >> $g_GENERIC
+echo "#define GETENVIRON${g_STRINGSIGN}(x) __b2c__getenv(x)" >> $g_GENERIC
 echo "#define GETKEY __b2c__getch()" >> $g_GENERIC
 echo "#define GETPEER${g_STRINGSIGN}(x) __b2c__getpeer(__LINE__, __FILE__, (uintptr_t)x)" >> $g_GENERIC
 echo "#define GETX __b2c__getxy(0)" >> $g_GENERIC
@@ -9061,9 +9163,10 @@ echo "#define HASDELIM(...) __b2c__FUNCSELECT2(__VA_ARGS__, __b2c__HASDELIM2, __
 echo "#define __b2c__HASH1(x) HASH_FUNC((char*)x, 0)" >> $g_GENERIC
 echo "#define __b2c__HASH2(x, y) HASH_FUNC((char*)x, y)" >> $g_GENERIC
 echo "#define HASH(...) __b2c__FUNCSELECT2(__VA_ARGS__, __b2c__HASH2, __b2c__HASH1)(__VA_ARGS__)" >> $g_GENERIC
+echo "#define __b2c__HEAD1(x) __b2c__head(x, 1, NULL)" >> $g_GENERIC
 echo "#define __b2c__HEAD2(x, y) __b2c__head(x, y, NULL)" >> $g_GENERIC
 echo "#define __b2c__HEAD3(x, y, z) __b2c__head(x, y, z)" >> $g_GENERIC
-echo "#define HEAD${g_STRINGSIGN}(...) __b2c__FUNCSELECT3(__VA_ARGS__, __b2c__HEAD3, __b2c__HEAD2)(__VA_ARGS__)" >> $g_GENERIC
+echo "#define HEAD${g_STRINGSIGN}(...) __b2c__FUNCSELECT3(__VA_ARGS__, __b2c__HEAD3, __b2c__HEAD2, __b2c__HEAD1)(__VA_ARGS__)" >> $g_GENERIC
 echo "#define HEX${g_STRINGSIGN}(x) __b2c__dec2hex(x)" >> $g_GENERIC
 echo "#define HOST${g_STRINGSIGN}(x) __b2c__nethost(__LINE__, __FILE__, x)" >> $g_GENERIC
 echo "#define HOSTNAME${g_STRINGSIGN} __b2c__hostname(__LINE__, __FILE__)" >> $g_GENERIC
@@ -9110,9 +9213,10 @@ echo "#define LEN(x) (__b2c__option_utf8 ? __b2c__ulen(__LINE__, __FILE__, \"LEN
 echo "#define __b2c__ULEN1(x) __b2c__ulen(__LINE__, __FILE__, \"ULEN\", (char*)x, -1)" >> $g_GENERIC
 echo "#define __b2c__ULEN2(x, y) __b2c__ulen(__LINE__, __FILE__, \"ULEN\", (char*)x, y)" >> $g_GENERIC
 echo "#define ULEN(...) __b2c__FUNCSELECT2(__VA_ARGS__, __b2c__ULEN2, __b2c__ULEN1)(__VA_ARGS__)" >> $g_GENERIC
+echo "#define __b2c__LAST1(x) __b2c__last(x, 1, NULL)" >> $g_GENERIC
 echo "#define __b2c__LAST2(x, y) __b2c__last(x, y, NULL)" >> $g_GENERIC
 echo "#define __b2c__LAST3(x, y, z) __b2c__last(x, y, z)" >> $g_GENERIC
-echo "#define LAST${g_STRINGSIGN}(...) __b2c__FUNCSELECT3(__VA_ARGS__, __b2c__LAST3, __b2c__LAST2)(__VA_ARGS__)" >> $g_GENERIC
+echo "#define LAST${g_STRINGSIGN}(...) __b2c__FUNCSELECT3(__VA_ARGS__, __b2c__LAST3, __b2c__LAST2, __b2c__LAST1)(__VA_ARGS__)" >> $g_GENERIC
 echo "#define LINENO __LINE__" >> $g_GENERIC
 echo "#define LOAD${g_STRINGSIGN}(x) __b2c__load(0, __LINE__, __FILE__, x)" >> $g_GENERIC
 echo "#define LOG(x) log((double)x)" >> $g_GENERIC
@@ -9148,7 +9252,9 @@ echo "#define F_MID${g_STRINGSIGN}(...) __b2c__FUNCSELECT4(__VA_ARGS__, __b2c__F
 echo "#define MIN(x, y) fmin(x, y)" >> $g_GENERIC
 echo "#define MIN${g_STRINGSIGN}(x, y) __b2c__min_str(x, y)" >> $g_GENERIC
 echo "#define MINUTE(x) __b2c__time(x, 5)" >> $g_GENERIC
-echo "#define MOD(x, y) ((long)(x) % (long)(y))" >> $g_GENERIC
+echo "#define __b2c__MOD2(x, y) ((long)(x) % (long)(y))" >> $g_GENERIC
+echo "#define __b2c__MOD3(x, y, z) (z == 0 ? ((long)(x) % (long)(y)) : fmod((double)x, (double)y))" >> $g_GENERIC
+echo "#define MOD(...) __b2c__FUNCSELECT3(__VA_ARGS__, __b2c__MOD3, __b2c__MOD2)(__VA_ARGS__)" >> $g_GENERIC
 echo "#define MONTH(x) __b2c__time(x, 2)" >> $g_GENERIC
 echo "#define MONTH${g_STRINGSIGN}(x) __b2c__datename(x, 2)" >> $g_GENERIC
 echo "#define MYPID getpid()" >> $g_GENERIC
@@ -9170,14 +9276,14 @@ echo "#define OS${g_STRINGSIGN} __b2c__os(__LINE__, __FILE__)" >> $g_GENERIC
 echo "#define __b2c__OUTBETWEEN3(x, y, z) __b2c__inbetween(1, x, y, z, 0)" >> $g_GENERIC
 echo "#define __b2c__OUTBETWEEN4(x, y, z, f) __b2c__inbetween(1, x, y, z, f)" >> $g_GENERIC
 echo "#define OUTBETWEEN${g_STRINGSIGN}(...) __b2c__FUNCSELECT4(__VA_ARGS__, __b2c__OUTBETWEEN4, __b2c__OUTBETWEEN3)(__VA_ARGS__)" >> $g_GENERIC
-echo "#define PEEK(x) (__b2c__peek_check(__LINE__, __FILE__, (char*)x, sizeof(__b2c__MEMTYPE)) == 0 ? *(__b2c__MEMTYPE *)(x) : 0)" >> $g_GENERIC
+echo "#define PEEK(x) *(__b2c__MEMTYPE*)__b2c__peek_check(__LINE__, __FILE__, (char*)x, sizeof(__b2c__MEMTYPE))" >> $g_GENERIC
 echo "#define PI 3.14159265358979323846" >> $g_GENERIC
 echo "#define POW(x, y) pow((double)x, (double)y)" >> $g_GENERIC
 echo "#define __b2c__PROPER1(x) __b2c__proper(__LINE__, __FILE__, x, NULL)" >> $g_GENERIC
 echo "#define __b2c__PROPER2(x, y) __b2c__proper(__LINE__, __FILE__, x, y)" >> $g_GENERIC
 echo "#define PROPER${g_STRINGSIGN}(...) __b2c__FUNCSELECT2(__VA_ARGS__, __b2c__PROPER2, __b2c__PROPER1)(__VA_ARGS__)" >> $g_GENERIC
 echo "#define RAD(x) (x*PI/180)" >> $g_GENERIC
-echo "#define RANDOM(x) ((x) != 0 ? random()/(MAXRANDOM/(x)) : 0)" >> $g_GENERIC
+echo "#define RANDOM(x) (long)((x+0.0)*random()/(MAXRANDOM+0.0))" >> $g_GENERIC
 echo "#define REALPATH${g_STRINGSIGN}(x) __b2c__dirname(__LINE__, __FILE__, 0, x, 0)" >> $g_GENERIC
 echo "#define REAP(x) waitpid(x, NULL, WNOHANG)" >> $g_GENERIC
 echo "#define REGEX(x, y) __b2c__regex(__LINE__, __FILE__, x, y)" >> $g_GENERIC
@@ -9210,28 +9316,28 @@ echo "#define __b2c__SEARCH2(x, y) __b2c__search(__LINE__, __FILE__, x, y, -1)" 
 echo "#define __b2c__SEARCH3(x, y, z) __b2c__search(__LINE__, __FILE__, x, y, z)" >> $g_GENERIC
 echo "#define SEARCH(...) __b2c__FUNCSELECT3(__VA_ARGS__, __b2c__SEARCH3, __b2c__SEARCH2)(__VA_ARGS__)" >> $g_GENERIC
 echo "#define SECOND(x) __b2c__time(x, 6)" >> $g_GENERIC
-echo "#define SETENVIRON(x, y) if((x) != NULL && (y) != NULL) setenv(x, y, 1)" >> $g_GENERIC
-echo "#define SGN(x) ((x) == 0 ? 0 : ((x) < 0 ? -1 : 1))" >> $g_GENERIC
-echo "#define SIN(x) sin((double)x)" >> $g_GENERIC
+echo "#define SETENVIRON(x, y) __b2c__setenviron(x, y)" >> $g_GENERIC
+echo "#define SGN(x) __b2c__sgn((double)(x))" >> $g_GENERIC
+echo "#define SIN(x) sin((double)(x))" >> $g_GENERIC
 echo "#define SIZEOF(x) sizeof(x)" >> $g_GENERIC
 echo "#define __b2c__SORT1(x) __b2c__sort(x, NULL)" >> $g_GENERIC
 echo "#define __b2c__SORT2(x, y) __b2c__sort(x, y)" >> $g_GENERIC
 echo "#define SORT${g_STRINGSIGN}(...) __b2c__FUNCSELECT2(__VA_ARGS__, __b2c__SORT2, __b2c__SORT1)(__VA_ARGS__)" >> $g_GENERIC
-echo "#define SPC${g_STRINGSIGN}(x) ((x) > 0 ? __b2c__spc(x) : NULL)" >> $g_GENERIC
+echo "#define SPC${g_STRINGSIGN}(x) __b2c__spc(x)" >> $g_GENERIC
 echo "#define SQR(x) sqrt((double)(x))" >> $g_GENERIC
 echo "#define STR${g_STRINGSIGN}(x) __b2c__str(x)" >> $g_GENERIC
 echo "#define STRING char*" >> $g_GENERIC
 echo "#define SUM(x,...) __b2c__sum($g_OPTION_BASE, x, __VA_ARGS__, LONG_MAX)" >> $g_GENERIC
 echo "#define SUMF(x,...) __b2c__sumf($g_OPTION_BASE, x, __VA_ARGS__, DBL_MAX)" >> $g_GENERIC
-echo "#define SYSTEM(x) do {if (x != NULL) {RETVAL = system(x); if(WIFEXITED(RETVAL)) RETVAL = WEXITSTATUS(RETVAL);} else RETVAL=0;} while(0)" >> $g_GENERIC
-echo "#define TAB${g_STRINGSIGN}(x) ((x) > 0 ? __b2c__tab(x) : NULL)" >> $g_GENERIC
+echo "#define TAB${g_STRINGSIGN}(x) __b2c__tab(x)" >> $g_GENERIC
+echo "#define __b2c__TAIL1(x) __b2c__tail(x, 1, NULL)" >> $g_GENERIC
 echo "#define __b2c__TAIL2(x, y) __b2c__tail(x, y, NULL)" >> $g_GENERIC
 echo "#define __b2c__TAIL3(x, y, z) __b2c__tail(x, y, z)" >> $g_GENERIC
-echo "#define TAIL${g_STRINGSIGN}(...) __b2c__FUNCSELECT3(__VA_ARGS__, __b2c__TAIL3, __b2c__TAIL2)(__VA_ARGS__)" >> $g_GENERIC
+echo "#define TAIL${g_STRINGSIGN}(...) __b2c__FUNCSELECT3(__VA_ARGS__, __b2c__TAIL3, __b2c__TAIL2, __b2c__TAIL1)(__VA_ARGS__)" >> $g_GENERIC
 echo "#define __b2c__TALLY2(x, y) __b2c__tally(x, y, -1)" >> $g_GENERIC
 echo "#define __b2c__TALLY3(x, y, z) __b2c__tally(x, y, z)" >> $g_GENERIC
 echo "#define TALLY(...) __b2c__FUNCSELECT3(__VA_ARGS__, __b2c__TALLY3, __b2c__TALLY2)(__VA_ARGS__)" >> $g_GENERIC
-echo "#define TAN(x) tan((double)x)" >> $g_GENERIC
+echo "#define TAN(x) tan((double)(x))" >> $g_GENERIC
 echo "#define TELL(x) ftell(x)" >> $g_GENERIC
 echo "#define TIMER __b2c__timer(0)" >> $g_GENERIC
 echo "#define TIMEVALUE(x,y,z,a,b,c) __b2c__epoch(x,y,z,a,b,c)" >> $g_GENERIC
@@ -9250,7 +9356,7 @@ echo "#define UNFLATTEN${g_STRINGSIGN}(...) __b2c__FUNCSELECT2(__VA_ARGS__, __b2
 echo "#define __b2c__UNIQ1(x) __b2c__uniq(x, NULL)" >> $g_GENERIC
 echo "#define __b2c__UNIQ2(x, y) __b2c__uniq(x, y)" >> $g_GENERIC
 echo "#define UNIQ${g_STRINGSIGN}(...) __b2c__FUNCSELECT2(__VA_ARGS__, __b2c__UNIQ2, __b2c__UNIQ1)(__VA_ARGS__)" >> $g_GENERIC
-echo "#define VAL(x) ((x) != NULL ? atof(x) : 0)" >> $g_GENERIC
+echo "#define VAL(x) __b2c__val(x)" >> $g_GENERIC
 echo "#define WAIT(x, y) __b2c__netpeek(__LINE__, __FILE__, (uintptr_t)x, y)" >> $g_GENERIC
 echo "#define __b2c__WALK4(x, y, z, q) __b2c__walk(__LINE__, __FILE__, x, y, z, q, NULL)" >> $g_GENERIC
 echo "#define __b2c__WALK5(x, y, z, q, f) __b2c__walk(__LINE__, __FILE__, x, y, z, q, f)" >> $g_GENERIC
@@ -9266,224 +9372,170 @@ echo "#define __b2c__capeer 0" >> $g_GENERIC
 echo "#define __b2c__caprivate NULL" >> $g_GENERIC
 echo "#define __b2c__caserver NULL" >> $g_GENERIC
 
-# Check presence of lex
-if [[ -n `command -v flex 2>/dev/null` ]]
-then
-    LEX="flex"
-elif [[ -n `command -v lex 2>/dev/null` ]]
-then
-    LEX="lex"
-else
-    echo "WARNING: neither 'lex' nor 'flex' was found on this system!"
-    echo "Generated binary cannot be optimized."
-fi
-
-if [[ -n ${LEX} ]]
-then
-    # Create lexer file to see which functions are needed, so the resulting binary can be optimized
-    echo "%{" > ${g_BACONLEXER}
-    echo "#include <stdio.h>" >> ${g_BACONLEXER}
-    echo "%}" >> ${g_BACONLEXER}
-    echo "%x text escaped comment multi" >> ${g_BACONLEXER}
-    echo "WS [ \n\r\t]+" >> ${g_BACONLEXER}
-    echo "%%" >> ${g_BACONLEXER}
-    echo "\"ALARM\"{WS}       printf(\"alarm \");" >> ${g_BACONLEXER}
-    echo "\"ALIGN\$(\"        printf(\"align delimengine \");" >> ${g_BACONLEXER}
-    echo "\"AMOUNT(\"         printf(\"amount delimengine \");" >> ${g_BACONLEXER}
-    echo "\"APPEND\"{WS}      printf(\"save concat \");" >> ${g_BACONLEXER}
-    echo "\"APPEND\$(\"       printf(\"append delimengine \");" >> ${g_BACONLEXER}
-    echo "\"ASSOC\"{WS}       printf(\"hash sortstr sortnr \");" >> ${g_BACONLEXER}
-    echo "\"B64DEC\$(\"       printf(\"base64 \");" >> ${g_BACONLEXER}
-    echo "\"B64ENC\$(\"       printf(\"base64 \");" >> ${g_BACONLEXER}
-    echo "\"BASENAME\$(\"     printf(\"dirname \");" >> ${g_BACONLEXER}
-    echo "\"BIT(\"            printf(\"binary \");" >> ${g_BACONLEXER}
-    echo "\"BIN\$(\"          printf(\"binary \");" >> ${g_BACONLEXER}
-    echo "\"BLOAD(\"          printf(\"load \");" >> ${g_BACONLEXER}
-    echo "\"CA\$(\"           printf(\"cipher \");" >> ${g_BACONLEXER}
-    echo "\"CHANGE\$(\"       printf(\"change delimengine \");" >> ${g_BACONLEXER}
-    echo "\"CHOP\$(\"         printf(\"chop \");" >> ${g_BACONLEXER}
-    echo "\"CHR\$(\"          printf(\"chrstr \");" >> ${g_BACONLEXER}
-    echo "\"CIPHER\$(\"       printf(\"cipher \");" >> ${g_BACONLEXER}
-    echo "\"CMDLINE(\"        printf(\"cmdline \");" >> ${g_BACONLEXER}
-    echo "\"CN\$(\"           printf(\"cipher \");" >> ${g_BACONLEXER}
-    echo "\"COIL\$(\"         printf(\"append delimengine \");" >> ${g_BACONLEXER}
-    echo "\"COLLAPSE\$(\"     printf(\"collapsefunc delimengine \");" >> ${g_BACONLEXER}
-    echo "\"COLLECT\"{WS}     printf(\"collect \");" >> ${g_BACONLEXER}
-    echo "\"COLUMNS\"         printf(\"screen \");" >> ${g_BACONLEXER}
-    echo "\"&\"|\"+\"         printf(\"concat \");" >> ${g_BACONLEXER}
-    echo "\"CONCAT\$(\"       printf(\"concat \");" >> ${g_BACONLEXER}
-    echo "\"COPY\"{WS}        printf(\"copy \");" >> ${g_BACONLEXER}
-    echo "\"COUNT(\"          printf(\"count chrstr \");" >> ${g_BACONLEXER}
-    echo "\"CURDIR\$\"        printf(\"curdir \");" >> ${g_BACONLEXER}
-    echo "\"CUT\$(\"          printf(\"cut delimengine \");" >> ${g_BACONLEXER}
-    echo "\"DAY(\"            printf(\"chrono \");" >> ${g_BACONLEXER}
-    echo "\"DEC(\"            printf(\"dec \");" >> ${g_BACONLEXER}
-    echo "\"DEL\$(\"          printf(\"delstr delimengine \");" >> ${g_BACONLEXER}
-    echo "\"DELIM\$(\"        printf(\"delimstr delimengine \");" >> ${g_BACONLEXER}
-    echo "\"DIRNAME\$(\"      printf(\"dirname \");" >> ${g_BACONLEXER}
-    echo "\"EDITBOM\$(\"      printf(\"bom \");" >> ${g_BACONLEXER}
-    echo "\"ESCAPE\$(\"       printf(\"doescape chrstr \");" >> ${g_BACONLEXER}
-    echo "\"EVAL(\"           printf(\"eval \");" >> ${g_BACONLEXER}
-    echo "\"EXCHANGE\$(\"     printf(\"exchange delimengine \");" >> ${g_BACONLEXER}
-    echo "\"EXEC\$(\"         printf(\"exec delimengine \");" >> ${g_BACONLEXER}
-    echo "\"EXPLODE\$(\"      printf(\"explode delimengine \");" >> ${g_BACONLEXER}
-    echo "\"EXTRACT\$(\"      printf(\"extract hash \");" >> ${g_BACONLEXER}
-    echo "\"FILELEN(\"        printf(\"filelen \");" >> ${g_BACONLEXER}
-    echo "\"FILETIME(\"       printf(\"filetime \");" >> ${g_BACONLEXER}
-    echo "\"FILETYPE(\"       printf(\"filetype \");" >> ${g_BACONLEXER}
-    echo "\"FILL\$(\"         printf(\"fill \");" >> ${g_BACONLEXER}
-    echo "\"FIND(\"           printf(\"find \");" >> ${g_BACONLEXER}
-    echo "\"FIRST\$(\"        printf(\"first delimengine \");" >> ${g_BACONLEXER}
-    echo "\"FLATTEN\$(\"      printf(\"flatten \");" >> ${g_BACONLEXER}
-    echo "\"FOR\"{WS}         printf(\"for delimengine \");" >> ${g_BACONLEXER}
-    echo "\"GETENVIRON\$(\"   printf(\"getenviron \");" >> ${g_BACONLEXER}
-    echo "\"GETFILE\"{WS}     printf(\"getfile \");" >> ${g_BACONLEXER}
-    echo "\"GETKEY\"          printf(\"getkey \");" >> ${g_BACONLEXER}
-    echo "\"GETLINE\"{WS}     printf(\"getline \");" >> ${g_BACONLEXER}
-    echo "\"GETPEER\$(\"      printf(\"getpeer \");" >> ${g_BACONLEXER}
-    echo "\"GETX\"            printf(\"getxy \");" >> ${g_BACONLEXER}
-    echo "\"GETY\"            printf(\"getxy \");" >> ${g_BACONLEXER}
-    echo "\"HASBOM(\"         printf(\"bom \");" >> ${g_BACONLEXER}
-    echo "\"HASDELIM(\"       printf(\"hasdelim delimengine \");" >> ${g_BACONLEXER}
-    echo "\"HASH(\"           printf(\"hash sortstr sortnr \");" >> ${g_BACONLEXER}
-    echo "\"HEAD\$(\"         printf(\"head delimengine \");" >> ${g_BACONLEXER}
-    echo "\"HEX\$(\"          printf(\"hex \");" >> ${g_BACONLEXER}
-    echo "\"HOST\$(\"         printf(\"host \");" >> ${g_BACONLEXER}
-    echo "\"HOSTNAME\$\"      printf(\"hostname \");" >> ${g_BACONLEXER}
-    echo "\"HOUR(\"           printf(\"chrono \");" >> ${g_BACONLEXER}
-    echo "\"INBETWEEN\$(\"    printf(\"between delimengine \");" >> ${g_BACONLEXER}
-    echo "\"INDEX(\"          printf(\"indexarray sortnr sortstr \");" >> ${g_BACONLEXER}
-    echo "\"INDEX\$(\"        printf(\"indexassoc hash \");" >> ${g_BACONLEXER}
-    echo "\"INPUT\"{WS}       printf(\"input \");" >> ${g_BACONLEXER}
-    echo "\"INSERT\$(\"       printf(\"insert \");" >> ${g_BACONLEXER}
-    echo "\"INSTR(\"          printf(\"instring \");" >> ${g_BACONLEXER}
-    echo "\"INSTRREV(\"       printf(\"instrrev \");" >> ${g_BACONLEXER}
-    echo "\"INVERT(\"         printf(\"invert hash \");" >> ${g_BACONLEXER}
-    echo "\"ISASCII(\"        printf(\"chrstr \");" >> ${g_BACONLEXER}
-    echo "\"ISTOKEN(\"        printf(\"istok delimengine \");" >> ${g_BACONLEXER}
-    echo "\"ISUTF8(\"         printf(\"chrstr \");" >> ${g_BACONLEXER}
-    echo "\"JOIN\"{WS}        printf(\"join \");" >> ${g_BACONLEXER}
-    echo "\"LAST\$(\"         printf(\"last delimengine \");" >> ${g_BACONLEXER}
-    echo "\"LCASE\$(\"        printf(\"lcase \");" >> ${g_BACONLEXER}
-    echo "\"LEFT\$(\"         printf(\"left \");" >> ${g_BACONLEXER}
-    echo "\"LOAD\$(\"         printf(\"load \");" >> ${g_BACONLEXER}
-    echo "\"LOOKUP\"{WS}      printf(\"lookup hash sortnr sortstr \");" >> ${g_BACONLEXER}
-    echo "\"LOOP\$(\"         printf(\"concat \");" >> ${g_BACONLEXER}
-    echo "\"MAKEDIR\"{WS}     printf(\"makedir delimengine \");" >> ${g_BACONLEXER}
-    echo "\"MATCH(\"          printf(\"match delimengine \");" >> ${g_BACONLEXER}
-    echo "\"MERGE\$(\"        printf(\"merge delimengine \");" >> ${g_BACONLEXER}
-    echo "\"MID\$(\"          printf(\"mid \");" >> ${g_BACONLEXER}
-    echo "\"MINUTE(\"         printf(\"chrono \");" >> ${g_BACONLEXER}
-    echo "\"MONTH(\"          printf(\"chrono \");" >> ${g_BACONLEXER}
-    echo "\"MONTH\$(\"        printf(\"datename \");" >> ${g_BACONLEXER}
-    echo "\"NANOTIMER\"       printf(\"nano \");" >> ${g_BACONLEXER}
-    echo "\"NETWORK\"{WS}     printf(\"network delimengine \");" >> ${g_BACONLEXER}
-    echo "\"OBTAIN\$(\"       printf(\"obtain hash sortnr sortstr \");" >> ${g_BACONLEXER}
-    echo "\"OS\$\"            printf(\"os \");" >> ${g_BACONLEXER}
-    echo "\"OUTBETWEEN\$(\"   printf(\"between delimengine \");" >> ${g_BACONLEXER}
-    echo "\"PARSE\"{WS}       printf(\"parse delimengine \");" >> ${g_BACONLEXER}
-    echo "\"PEEK(\"           printf(\"peek \");" >> ${g_BACONLEXER}
-    echo "\"PROPER\$(\"       printf(\"proper delimengine \");" >> ${g_BACONLEXER}
-    echo "\"READLN\"{WS}      printf(\"readln \");" >> ${g_BACONLEXER}
-    echo "\"REALPATH\$(\"     printf(\"dirname \");" >> ${g_BACONLEXER}
-    echo "\"RECURSIVE\"{WS}   printf(\"recursive \");" >> ${g_BACONLEXER}
-    echo "\"REGEX(\"          printf(\"regex hash \");" >> ${g_BACONLEXER}
-    echo "\"REPLACE\$(\"      printf(\"replace hash \");" >> ${g_BACONLEXER}
-    echo "\"RETURN\"{WS}      printf(\"return \");" >> ${g_BACONLEXER}
-    echo "\"REV\$(\"          printf(\"revstr delimengine \");" >> ${g_BACONLEXER}
-    echo "\"REVERSE\$(\"      printf(\"reverse \");" >> ${g_BACONLEXER}
-    echo "\"RIGHT\$(\"        printf(\"right \");" >> ${g_BACONLEXER}
-    echo "\"RIP\$(\"          printf(\"rip \");" >> ${g_BACONLEXER}
-    echo "\"ROL(\"            printf(\"binary \");" >> ${g_BACONLEXER}
-    echo "\"ROR(\"            printf(\"binary \");" >> ${g_BACONLEXER}
-    echo "\"ROTATE\$(\"       printf(\"rotate delimengine \");" >> ${g_BACONLEXER}
-    echo "\"ROWS\"            printf(\"screen \");" >> ${g_BACONLEXER}
-    echo "\"RUN\$(\"          printf(\"exec \");" >> ${g_BACONLEXER}
-    echo "\"SAVE\"{WS}        printf(\"save \");" >> ${g_BACONLEXER}
-    echo "\"SEARCH(\"         printf(\"search \");" >> ${g_BACONLEXER}
-    echo "\"SECOND(\"         printf(\"chrono \");" >> ${g_BACONLEXER}
-    echo "\"SERVER\"{WS}      printf(\"server delimengine \");" >> ${g_BACONLEXER}
-    echo "\"SETSERIAL\"{WS}   printf(\"setserial \");" >> ${g_BACONLEXER}
-    echo "\"SIGNAL\"{WS}      printf(\"signal \");" >> ${g_BACONLEXER}
-    echo "\"SORT\"{WS}        printf(\"sortassoc lookup sortnr sortstr hash \");" >> ${g_BACONLEXER}
-    echo "\"SORT\$(\"         printf(\"sortdelim sortstr delimengine \");" >> ${g_BACONLEXER}
-    echo "\"SPC\$(\"          printf(\"spc \");" >> ${g_BACONLEXER}
-    echo "\"SPLIT\"{WS}       printf(\"split delimengine \");" >> ${g_BACONLEXER}
-    echo "\"SUM(\"            printf(\"sum \");" >> ${g_BACONLEXER}
-    echo "\"SUMF(\"           printf(\"sum \");" >> ${g_BACONLEXER}
-    echo "\"TAB\$(\"          printf(\"tab \");" >> ${g_BACONLEXER}
-    echo "\"TAIL\$(\"         printf(\"tail delimengine \");" >> ${g_BACONLEXER}
-    echo "\"TALLY(\"          printf(\"tally \");" >> ${g_BACONLEXER}
-    echo "\"TIMER\"           printf(\"timer \");" >> ${g_BACONLEXER}
-    echo "\"TIMEVALUE(\"      printf(\"epoch \");" >> ${g_BACONLEXER}
-    echo "\"TOASCII\$(\"      printf(\"chrstr \");" >> ${g_BACONLEXER}
-    echo "\"TOKEN\$(\"        printf(\"token delimengine \");" >> ${g_BACONLEXER}
-    echo "\"TOTAL(\"          printf(\"total \");" >> ${g_BACONLEXER}
-    echo "\"TRACE\"{WS}       printf(\"getkey \");" >> ${g_BACONLEXER}
-    echo "\"TREE\"{WS}        printf(\"tree collect sortnr sortstr \");" >> ${g_BACONLEXER}
-    echo "\"UCASE\$(\"        printf(\"ucase \");" >> ${g_BACONLEXER}
-    echo "\"UCS(\"            printf(\"chrstr \");" >> ${g_BACONLEXER}
-    echo "\"UNESCAPE\$(\"     printf(\"unescape \");" >> ${g_BACONLEXER}
-    echo "\"UNFLATTEN\$(\"    printf(\"flatten \");" >> ${g_BACONLEXER}
-    echo "\"UNIQ\$(\"         printf(\"uniq obtain delimengine hash sortnr sortstr \");" >> ${g_BACONLEXER}
-    echo "\"UTF8\$(\"         printf(\"chrstr \");" >> ${g_BACONLEXER}
-    echo "\"WAIT(\"           printf(\"wait \");" >> ${g_BACONLEXER}
-    echo "\"WALK\$(\"         printf(\"walk hash \");" >> ${g_BACONLEXER}
-    echo "\"WEEK(\"           printf(\"chrono \");" >> ${g_BACONLEXER}
-    echo "\"WEEKDAY\$(\"      printf(\"datename \");" >> ${g_BACONLEXER}
-    echo "\"WHERE(\"          printf(\"where delimengine \");" >> ${g_BACONLEXER}
-    echo "\"YEAR(\"           printf(\"chrono \");" >> ${g_BACONLEXER}
-    echo "\\\"                BEGIN(text);" >> ${g_BACONLEXER}
-    echo "<text>\\\\          BEGIN(escaped);" >> ${g_BACONLEXER}
-    echo "<text>\\\"          BEGIN(INITIAL);" >> ${g_BACONLEXER}
-    echo "<text>.             /* Do nothing */" >> ${g_BACONLEXER}
-    echo "<escaped>\n\\\"     BEGIN(INITIAL);" >> ${g_BACONLEXER}
-    echo "<escaped>\n         /* Do nothing */" >> ${g_BACONLEXER}
-    echo "<escaped>.          BEGIN(text);" >> ${g_BACONLEXER}
-    echo "\\'                 BEGIN(comment);" >> ${g_BACONLEXER}
-    echo "<comment>\n         BEGIN(INITIAL);" >> ${g_BACONLEXER}
-    echo "<comment>.          /* Do nothing */" >> ${g_BACONLEXER}
-    echo "\"/*\"              BEGIN(multi);" >> ${g_BACONLEXER}
-    echo "<multi>[^*]*        /* Eat anything that's not a '*' */" >> ${g_BACONLEXER}
-    echo "<multi>\"*\"+[^*/]* /* Eat up '*'s not followed by '/' */" >> ${g_BACONLEXER}
-    echo "<multi>\"*\"+\"/\"  BEGIN(INITIAL);" >> ${g_BACONLEXER}
-    echo "{WS}                /* Skip whitespace */" >> ${g_BACONLEXER}
-    echo ".                   /* Skip anything else */" >> ${g_BACONLEXER}
-    echo "<<EOF>>             yyterminate();" >> ${g_BACONLEXER}
-    echo "%%" >> ${g_BACONLEXER}
-    echo "int main(int argc, char *argv[]) { printf(\"argument error malloc memcheck minmax nano str timer utf8 \"); yylex(); return(0); } int yywrap(void) { return(1); }" >> ${g_BACONLEXER}
-
-    echo -n "Creating lexical analyzer using ${LEX}... "
-    ${LEX} -o ${g_BACONLEXER}.c ${g_BACONLEXER}
-    ${g_CCNAME} ${g_BACONLEXER}.c -o ${g_BACONLEXER}.exe
-    echo "done."
-
-    # Create list of required functions
-    TOTAL=$(cat ${g_FEED} | ${g_BACONLEXER}.exe)
-    for i in $g_TMP_FILES
-    do
-        if [[ ${i} = +(*bac) ]]
-        then
-            TOTAL="${TOTAL} $(cat ${i} | ${g_BACONLEXER}.exe)"
-        fi
-    done
-    TOTAL="$(echo ${TOTAL} | tr '\040' '\012' | sort -u)"
-    if [[ ${g_DEBUG} -eq 1 ]]
-    then
-        echo "Analyzing dependencies... $(echo ${TOTAL} | tr '\012' '\040')"
-    fi
-    NOLEX=0
-    g_TMP_FILES="${g_TMP_FILES} ${g_GENERIC} ${g_FUNCTIONS} ${g_BACONLEXER} ${g_BACONLEXER}.c ${g_BACONLEXER}.exe"
-else
-    NOLEX=1
-    g_TMP_FILES="${g_TMP_FILES} ${g_GENERIC} ${g_FUNCTIONS}"
-fi
-
 # Generate functions
 echo "/* Created with Shell BaCon $g_VERSION - (c) Peter van Eerten - MIT License */" > $g_FUNCTIONS
 echo -e "${g_TWEAK}" >> $g_FUNCTIONS
 
-if [[ ${TOTAL//base64/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+# error
+echo "char * ERR${g_STRINGSIGN}(int nr) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long flen = 0, slen = 0; char *first = NULL, *second = NULL; switch (nr)" >> $g_FUNCTIONS
+echo "{ case 0: first = \"Success\"; break; case 1: first = \"Trying to access illegal memory: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
+echo "case 2: first = \"Error opening file: \"; second = strerror (errno); break; case 3: first = \"Could not open library.\"; break;" >> $g_FUNCTIONS
+echo "case 4: first = \"Symbol not found in library.\"; break; case 5: first = \"Wrong value: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
+echo "case 6: first = \"Unable to claim memory.\"; break; case 7: first = \"Unable to delete file: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
+echo "case 8: first = \"Could not open directory: \"; second = strerror(errno); break; case 9: first = \"Unable to rename file: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
+echo "case 10: first = \"NETWORK argument should contain colon with port number\"; break; case 11: first = \"Could not resolve hostname!\"; break;" >> $g_FUNCTIONS
+echo "case 12: first = \"Socket error: \"; second = strerror(errno); break; case 13: first = \"Unable to open address: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
+echo "case 14: first = \"Error reading from socket: \"; second = strerror(errno); break; case 15: first = \"Error sending to socket: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
+echo "case 16: first = \"Error checking socket: \"; second = strerror(errno); break; case 17: first = \"Unable to bind the specified socket address: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
+echo "case 18: first = \"Unable to listen to socket address: \"; second = strerror(errno); break; case 19: first = \"Cannot accept incoming connection: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
+echo "case 20: first = \"Unable to remove directory: \"; second = strerror(errno); break; case 21: first = \"Unable to create directory: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
+echo "case 22: first = \"Unable to change to directory: \"; second = strerror(errno); break; case 23: first = \"GETENVIRON argument does not exist as environment variable\"; break;" >> $g_FUNCTIONS
+echo "case 24: first = \"Unable to stat file: \"; second = strerror(errno); break; case 25: first = \"Search contains illegal string\"; break;" >> $g_FUNCTIONS
+echo "case 26: first = \"Cannot return name: \"; second = strerror(errno); break; case 27: first = \"Illegal regex expression\"; break;" >> $g_FUNCTIONS
+echo "case 28: first = \"Unable to create bidirectional pipes: \"; second = strerror(errno); break; case 29: first = \"Unable to fork process: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
+echo "case 30: first = \"Cannot read from pipe: \"; second = strerror(errno); break; case 31: first = \"Gosub nesting too deep!\"; break;" >> $g_FUNCTIONS
+echo "case 32: first = \"Could not open device: \"; second = strerror(errno); break; case 33: first = \"Error configuring serial port: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
+echo "case 34: first = \"Error accessing device: \"; second = strerror(errno); break; case 35: first = \"Error in INPUT: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
+echo "case 36: first = \"Illegal value in SORT dimension!\"; break; case 37: first = \"Illegal option for SEARCH!\"; break;" >> $g_FUNCTIONS
+echo "case 38: first = \"Invalid UTF8 string!\"; break; case 39: first = \"Illegal EVAL expression!\"; break;" >> $g_FUNCTIONS
+echo "case 40: first = \"SSL file descriptor error!\"; break; case 41: first = \"Error loading certificate!\"; break;" >> $g_FUNCTIONS
+echo "case 42: first = \"Widget not found!\"; ERROR = 42; break; case 43: first = \"Unsupported array type!\"; break; };" >> $g_FUNCTIONS
+echo "if(first) { flen = strlen(first); } if(second) { slen = strlen(second); } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], flen+slen+1);if(first)" >> $g_FUNCTIONS
+echo "{ memmove(buf[idx], first, flen); } if(second) { memmove(buf[idx]+flen, second, slen); } __b2c__SETLEN(buf[idx], flen+slen); buf[idx][flen+slen] = '\0'; return((char*)buf[idx]); }" >> $g_FUNCTIONS
+
+# malloc
+echo "char *__b2c__strdup(char *s) { if (s == NULL) { return(NULL); } return(__b2c_Copy_String(NULL, s)); }" >> $g_FUNCTIONS
+echo "char *__b2c__strndup(char *s, size_t n) { if(s == NULL) { return(NULL); } return(__b2c_Copy_N_String(NULL, s, n)); }" >> $g_FUNCTIONS
+echo "int __b2c__strcmp(const char *__b2c__s1, const char *__b2c__s2){ int len1 = 0, len2 = 0; len1 = __b2c__len(__b2c__s1); len2 = __b2c__len(__b2c__s2); if((__b2c__s1 == NULL || len1 == 0) && (__b2c__s2 == NULL || len2 == 0)) { return(0); }" >> $g_FUNCTIONS
+echo "if(__b2c__s1 == NULL || len1 == 0) { return(-1); } if(__b2c__s2 == NULL || len2 == 0) { return(1); } return(strcmp(__b2c__s1, __b2c__s2)); }" >> $g_FUNCTIONS
+echo "int __b2c__strcasecmp(const char *__b2c__s1, const char *__b2c__s2){ int len1 = 0, len2 = 0; len1 = __b2c__len(__b2c__s1); len2 = __b2c__len(__b2c__s2); if((__b2c__s1 == NULL || len1 == 0) && (__b2c__s2 == NULL || len2 == 0)) { return(0); }" >> $g_FUNCTIONS
+echo "if(__b2c__s1 == NULL || len1 == 0) { return(-1); } if(__b2c__s2 == NULL || len2 == 0) { return(1); } return(strcasecmp(__b2c__s1, __b2c__s2)); }" >> $g_FUNCTIONS
+echo "#ifndef __b2c_Pool_Block_Count" >> $g_FUNCTIONS
+echo "#define __b2c_Pool_Block_Count 2048" >> $g_FUNCTIONS
+echo "#endif" >> $g_FUNCTIONS
+echo "#ifndef __b2c_Pool_Block_Size" >> $g_FUNCTIONS
+echo "#define __b2c_Pool_Block_Size 1024" >> $g_FUNCTIONS
+echo "#endif" >> $g_FUNCTIONS
+echo "void *__b2c_mempool_realloc_core (void *address, size_t size, int action) { static char bottom[__b2c_Pool_Block_Count*__b2c_Pool_Block_Size] = { 0 }; static void *top = NULL, *current = NULL; static int inited = 0, amount_used = 0; void *result = NULL;" >> $g_FUNCTIONS
+echo "if(!inited) { current = bottom; top = bottom + (__b2c_Pool_Block_Size * __b2c_Pool_Block_Count); *(uintptr_t*)current = (uintptr_t)((uint8_t*)current + __b2c_Pool_Block_Size); inited++; } switch(action) { case 0: fprintf(stderr, \"Memory pool contains %d slots, each %d bytes, of which %d were used.\n\", __b2c_Pool_Block_Count, __b2c_Pool_Block_Size, inited);" >> $g_FUNCTIONS
+echo "break; case 1: if((uintptr_t)address >= (uintptr_t)bottom && (uintptr_t)address < (uintptr_t)top) { *(uintptr_t *)address = (uintptr_t)current; current = address; amount_used--; return(address); } break; case 2:" >> $g_FUNCTIONS
+echo "if ((uintptr_t)address >= (uintptr_t)bottom && (uintptr_t)address < (uintptr_t)top) { return(address); } break; default: if(amount_used < __b2c_Pool_Block_Count-1 && size < __b2c_Pool_Block_Size) { if(address == NULL) { result = current;" >> $g_FUNCTIONS
+echo "current = (void*)*(uintptr_t*)current; amount_used++; if(amount_used == inited) { *(uintptr_t*)current = (uintptr_t)((uint8_t*)current + __b2c_Pool_Block_Size); inited++; } } else if((uintptr_t)address >= (uintptr_t)bottom && (uintptr_t)address < (uintptr_t)top)" >> $g_FUNCTIONS
+echo "{ if(size == 0) { *(uintptr_t*)address = (uintptr_t)current; current = address; amount_used--; } else { result = address; } } else { result = realloc(address, size); } } else { if(address == NULL) { result = realloc(address, size); }" >> $g_FUNCTIONS
+echo "else if((uintptr_t)address >= (uintptr_t)bottom && (uintptr_t)address < (uintptr_t)top) { if(size == 0) { *(uintptr_t*)address = (uintptr_t)current; current = address; amount_used--; } else { result = malloc(size > __b2c_Pool_Block_Size ? size : __b2c_Pool_Block_Size);" >> $g_FUNCTIONS
+echo "memcpy(result, address, __b2c_Pool_Block_Size); *(uintptr_t*)address = (uintptr_t)current; current = address; amount_used--; } } else { result = realloc(address, size); } } break; } return ((void *) result); }" >> $g_FUNCTIONS
+echo "#ifndef __b2c_HASH_STR_STORE" >> $g_FUNCTIONS
+echo "#define __b2c_HASH_STR_STORE 0x100000" >> $g_FUNCTIONS
+echo "#endif" >> $g_FUNCTIONS
+echo "#define __b2c_HASH_STR_INDEX (__b2c_HASH_STR_STORE-1)" >> $g_FUNCTIONS
+echo "#ifndef __b2c_HASH_LINEAR_DEPTH" >> $g_FUNCTIONS
+echo "#define __b2c_HASH_LINEAR_DEPTH 16" >> $g_FUNCTIONS
+echo "#endif" >> $g_FUNCTIONS
+echo "#define __b2c_get_string(p, e, i, d, l) if(p) { while(e[i] != p) { i++; if(++d == l) { p=NULL; break; }}}" >> $g_FUNCTIONS
+echo "#define __b2c_del_string(p, e, i, d, l) if(p) { while(e[i] != p) { i++; if(++d == l) { break; } } if(d < l) { e[i] = NULL; } }" >> $g_FUNCTIONS
+echo "#define __b2c_add_string(p, e, i, d, l) if(p) { while(e[i] != NULL && e[i]!=p) { i++; if(++d == l) { if(++l == __b2c_HASH_LINEAR_DEPTH) { fprintf (stderr, \"\nInternal error: cannot register string! Try to tweak the 'hld' parameter.\n\"); __b2c_str_realloc_debug_string(); exit (EXIT_FAILURE); } } } e[i] = p; }" >> $g_FUNCTIONS
+echo "void *__b2c_str_realloc_core (char *ptr, size_t size, int action) { static char *even_addr[__b2c_HASH_STR_STORE + __b2c_HASH_LINEAR_DEPTH] = { NULL }; static int linear_depth = 1; char *next; uint32_t lbufsize = 0, rbufsize = 0, idx, len, depth = 0, total = 0; idx = (((uintptr_t) ptr % __b2c_HASH_STR_STORE) & __b2c_HASH_STR_INDEX); switch (action)" >> $g_FUNCTIONS
+echo "{ case 0: case 1: next = ptr; __b2c_get_string(next, even_addr, idx, depth, linear_depth); if(next) { lbufsize = __b2c__LBUFSIZE (ptr); rbufsize = __b2c__RBUFSIZE (ptr); if (action == 0) { if (rbufsize <= size) { __b2c_del_string(ptr, even_addr, idx, depth, linear_depth); next = (char*)__b2c_mempool_realloc(ptr - __b2c__BUFOFFSET - lbufsize, __b2c__BUFOFFSET + lbufsize + rbufsize + size * 2 + 1);" >> $g_FUNCTIONS
+echo "ptr = next + lbufsize; *(uint32_t *) ((char *) ptr + 4) = size * 2 + 1 + rbufsize; } else { return (ptr); } } else { if (lbufsize <= size) { __b2c_del_string(ptr, even_addr, idx, depth, linear_depth); next = (char*)__b2c_mempool_realloc(ptr - __b2c__BUFOFFSET - lbufsize, __b2c__BUFOFFSET + lbufsize + rbufsize + size * 2);" >> $g_FUNCTIONS
+echo "memmove (next + lbufsize + size * 2, next + lbufsize, __b2c__BUFOFFSET + rbufsize); ptr = next + size * 2 + lbufsize; *(uint32_t *) ((char *) ptr + 8) = size * 2 + lbufsize; } else { return (ptr); } } } else { rbufsize = __b2c__len (ptr); next = (char*)__b2c_mempool_realloc(ptr, __b2c__BUFOFFSET + rbufsize + size * 2 + 1);" >> $g_FUNCTIONS
+echo "if (action == 0) { ptr = next; *(uint32_t *) ((char *) ptr) = rbufsize; *(uint32_t *) ((char *) ptr + 4) = rbufsize + size * 2 + 1; *(uint32_t *) ((char *) ptr + 8) = 0; } else { memmove (next + size * 2, next, __b2c__BUFOFFSET + rbufsize); ptr = next+size * 2; *(uint32_t *) ((char *) ptr) = rbufsize;" >> $g_FUNCTIONS
+echo "*(uint32_t *) ((char *) ptr + 4) = rbufsize + 1; *(uint32_t *) ((char *) ptr + 8) = size * 2; } } ptr += __b2c__BUFOFFSET; idx = (((uintptr_t) ptr % __b2c_HASH_STR_STORE) & __b2c_HASH_STR_INDEX); depth = 0; __b2c_add_string(ptr, even_addr, idx, depth, linear_depth); break; case 2: __b2c_add_string(ptr, even_addr, idx, depth, linear_depth);" >> $g_FUNCTIONS
+echo "break; case 3: __b2c_del_string(ptr, even_addr, idx, depth, linear_depth); break; case 4: __b2c_get_string(ptr, even_addr, idx, depth, linear_depth); break; case 5: for (idx = 0; idx < __b2c_HASH_STR_STORE + __b2c_HASH_LINEAR_DEPTH; idx++) { if (even_addr[idx] != NULL) { total++; len = (*(uint32_t*)(even_addr[idx]-__b2c__BUFOFFSET));" >> $g_FUNCTIONS
+echo "lbufsize = __b2c__LBUFSIZE(even_addr[idx]); rbufsize = __b2c__RBUFSIZE(even_addr[idx]); if(len > 64) { even_addr[idx][64] = 0; fprintf(stderr, \"Bucketnr:lbuf:rbuf:length:string = %d:%d:%d:%d:%s[...]\n\", idx, lbufsize, rbufsize, len, even_addr[idx]); } else { fprintf(stderr, \"Bucketnr:lbuf:rbuf:length:string = %d:%d:%d:%d:%s\n\", idx, lbufsize, rbufsize, len, even_addr[idx]); } } }" >> $g_FUNCTIONS
+echo "fprintf(stderr, \"Total optimized strings: %d - max depth: %d\n\", total, linear_depth); break; case 6: for (idx = 0; idx < __b2c_HASH_STR_STORE + __b2c_HASH_LINEAR_DEPTH; idx++) { if(even_addr[idx] && !__b2c_mempool_realloc_in_block(even_addr[idx])) { free(even_addr[idx] - __b2c__BUFOFFSET - __b2c__LBUFSIZE(even_addr[idx])); } } break; } return (ptr); }" >> $g_FUNCTIONS
+echo "char *__b2c_Copy_String_core(char *x, char *y, int len) { long ylen; if(y == NULL) { __b2c__STRFREE(x); return(NULL); } if(len == -1) { ylen = __b2c__len(y); } else { ylen = len; } if (ylen == 0) { __b2c__STRFREE (x); return (NULL); } x = (char*)__b2c_str_realloc(x, ylen);" >> $g_FUNCTIONS
+echo "memmove(x, y, ylen); __b2c__SETLEN(x, ylen); x[ylen] = '\0'; return(x); }" >> $g_FUNCTIONS
+echo "char *__b2c_Swap_String(char **x, char **y) { char *ptr; ptr = *x; *x = *y; *y = ptr; return(*x); }" >> $g_FUNCTIONS
+echo "unsigned long __b2c__len (const char *ptr) { if (ptr == NULL) { return (0); } if(__b2c_str_realloc_get_string(ptr)) { return (*(uint32_t *) (ptr - __b2c__BUFOFFSET)); } return ((unsigned long) strlen (ptr)); }" >> $g_FUNCTIONS
+echo "char *__b2c__loop_helper(jmp_buf buf) { if(__b2c__loop_result${g_STRINGSIGN} != NULL) { __b2c__SETLEN (__b2c__loop_result${g_STRINGSIGN}, 0); __b2c__loop_result${g_STRINGSIGN} = __b2c_Copy_String(__b2c__loop_result${g_STRINGSIGN}, NULL); } longjmp(buf, 1); return(NULL); }" >> $g_FUNCTIONS
+echo "long __b2c__loop_helper2(jmp_buf buf) { __b2c__loop_result = 0; longjmp(buf, 1); return(0); }" >> $g_FUNCTIONS
+echo "void __b2c__free_str_array_members(char ***array, int base, int size) { int i; if(*array != NULL) { for(i=0; i < size; i++){ __b2c__STRFREE((*array)[i+base]); (*array)[i+base] = NULL; } } }" >> $g_FUNCTIONS
+if [[ `uname` = +(*BSD*) ]]
+then
+    echo "char *__b2c_strlcat(char *dest, const char *src) { strlcat(dest, src, __b2c__len(dest)+__b2c__len(src)+1); return(dest); }" >> $g_FUNCTIONS
+    echo "char *__b2c_strlcpy(char *dest, const char *src) { strlcpy(dest, src, __b2c__len(src)+1); return(dest); }" >> $g_FUNCTIONS
+fi
+echo -n "void __b2c_str_free(void) {" >> $g_FUNCTIONS
+if [[ -n $(grep "REGEX(" <<<${g_DEPEND}) ]]
+then
+    echo -n "__b2c__regex_free();" >> $g_FUNCTIONS
+fi
+if [[ -n $(grep "EXTRACT\$(" <<<${g_DEPEND}) ]]
+then
+    echo -n "__b2c__extract_free();" >> $g_FUNCTIONS
+fi
+if [[ -n $(grep "REPLACE\$(" <<<${g_DEPEND}) ]]
+then
+    echo -n "__b2c__replace_free();" >> $g_FUNCTIONS
+fi
+if [[ -n $(grep "WALK\$(" <<<${g_DEPEND}) ]]
+then
+    echo -n "__b2c__walk_free();" >> $g_FUNCTIONS
+fi
+if [[ -n $(grep -E "ALIGN\\$\(|AMOUNT\(|APPEND\\$\(|CHANGE\\$\(|COIL\\$\(|COLLAPSE\\$\(|CUT\\$\(|DEL\\$\(|DELIM\\$\(|EXCHANGE\\$\(|EXEC\\$\(|EXPLODE\\$\(|FIRST\\$\(|FOR[[:space:]]|HASDELIM\(|HEAD\\$\(|INBETWEEN\\$\(|ISTOKEN\(|LAST\\$\(|MAKEDIR[[:space:]]|MATCH\(|MERGE\\$\(|NETWORK[[:space:]]|OUTBETWEEN\\$\(|PARSE[[:space:]]|PROPER\\$\(|REV\\$\(|ROTATE\\$\(|SERVER[[:space:]]|SORT\\$\(|SPLIT[[:space:]]|TAIL\\$\(|TOKEN\\$\(|UNIQ\\$\(|WHERE\(" <<<${g_DEPEND}) ]]
+then
+    echo -n "__b2c__delim_engine_free();" >> $g_FUNCTIONS
+fi
+if [[ -n ${g_GLOBALARRAYS} ]]
+then
+    echo -n "__b2c__arrays_free();" >> $g_FUNCTIONS
+fi
+if [[ -n $(grep -E "COLLECT[[:space:]]|TREE[[:space:]]" <<<${g_DEPEND}) ]]
+then
+    echo -n "__b2c__twalk_free();" >> $g_FUNCTIONS
+fi
+echo "__b2c_str_realloc_free_string(); }">> $g_FUNCTIONS
+
+# memcheck
+echo "void __b2c__catch_signal(int sig){" >> $g_FUNCTIONS
+echo "switch (sig) {case SIGABRT: fprintf(stderr, \"ERROR: signal ABORT received - internal error. Try to compile the program with TRAP LOCAL to find the cause.\n\"); break;" >> $g_FUNCTIONS
+echo "case SIGFPE: fprintf(stderr, \"ERROR: signal for FPE received - division by zero? Examine the calculations in the program.\n\"); break;" >> $g_FUNCTIONS
+echo "case SIGSEGV: fprintf(stderr, \"ERROR: signal for SEGMENTATION FAULT received - memory invalid or array out of bounds? Try to compile the program with TRAP LOCAL to find the cause.\n\"); break;" >> $g_FUNCTIONS
+echo "case SIGILL: fprintf(stderr, \"ERROR: signal for ILLEGAL INSTRUCTION received - executing the program on other hardware? Try to recompile the program from scratch.\n\"); break;} exit(sig);}" >> $g_FUNCTIONS
+echo "void __b2c__segv(int sig){ longjmp(__b2c__jump, 1); }" >> $g_FUNCTIONS
+echo "int __b2c__memory__check (char *x, int size) { volatile char c; unsigned int i, illegal = 1; struct sigaction osa, psa; sigaction(SIGSEGV, NULL, &osa); if (osa.sa_handler != SIG_IGN)" >> $g_FUNCTIONS
+echo "{ memset(&psa, 0, sizeof(psa)); psa.sa_flags = SA_NODEFER|SA_RESTART; psa.sa_handler = __b2c__segv; sigaction(SIGSEGV, &psa, NULL); } if (!setjmp (__b2c__jump))" >> $g_FUNCTIONS
+echo "{ for (i = 0; i < size; i++) { c = *(char*)(x+i); /* Use c to avoid warning */ if(c) {;} } } else { illegal = 0; } sigaction(SIGSEGV, &osa, NULL); return (illegal); }" >> $g_FUNCTIONS
+echo "int jmp_buf_is_used(jmp_buf data) { jmp_buf p = { 0 }; if(!data) {return(0);} if(memcmp(data, p, sizeof(jmp_buf))) { return(1); } return(0); }" >> $g_FUNCTIONS
+
+# minmax
+echo "char* __b2c__min_str(char* x, char* y) {if(strcmp(x, y) < 0) { return(x); } return(y);}" >> $g_FUNCTIONS
+echo "char* __b2c__max_str(char* x, char* y) {if(strcmp(x, y) > 0) { return(x); } return(y);}" >> $g_FUNCTIONS
+
+# str
+echo "char* __b2c__str(double nr) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; int len; idx++; if (idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc (buf[idx], ${g_MAX_DIGITS}); if(floor(nr) == nr)" >> $g_FUNCTIONS
+echo "{ len = snprintf(buf[idx], ${g_MAX_DIGITS}, \"%ld\", (long)nr); } else { len = snprintf(buf[idx], ${g_MAX_DIGITS}, \"%g\", (double)nr); } __b2c__SETLEN(buf[idx], len); buf[idx][len] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
+
+# timer
+echo "unsigned long __b2c__timer(int init) { struct timeval time; static time_t elapsed_secs = 0; static int elapsed_usecs = 0; if(init) { gettimeofday(&time, NULL); elapsed_usecs = time.tv_usec; elapsed_secs = time.tv_sec; return(0); }" >> $g_FUNCTIONS
+echo "else { gettimeofday(&time, NULL); if(difftime(time.tv_sec, elapsed_secs) < 1) { return((unsigned long) (time.tv_usec-elapsed_usecs)/1000); }" >> $g_FUNCTIONS
+echo "else { return((unsigned long) (difftime(time.tv_sec, elapsed_secs)-1)*1000+((1000000-elapsed_usecs)+time.tv_usec)/1000); } } }" >> $g_FUNCTIONS
+
+# nano
+echo "uint64_t __b2c__nanotimer(int init) { static struct timespec before = { 0 }; struct timespec after; if (init) { clock_gettime(CLOCK_MONOTONIC, &before); return(0); } else { clock_gettime(CLOCK_MONOTONIC, &after); return((int64_t)(after.tv_sec - before.tv_sec) * (int64_t)1000000000UL + (int64_t)(after.tv_nsec - before.tv_nsec)); } }" >> $g_FUNCTIONS
+
+# argument
+echo "void __b2c__argument(char **arg, int total, char **data) { long x, dlen, slen, pos, tot_len = 0; char quote[] = { 34, 0 }; if (total == 0) { *arg = NULL; } else { dlen = __b2c__len (__b2c__option_delim); for (pos = 0; pos < total; pos++)" >> $g_FUNCTIONS
+echo "{ slen = strlen(data[pos]); *arg = (char*)__b2c_str_realloc(*arg, tot_len + slen * 2 + dlen + 1); if (strstr (data[pos], \" \") || strstr (data[pos], \"\\\"\")) { (*arg)[tot_len++] = 34; for (x = 0; data[pos][x] != 0; x++) { if (data[pos][x] == quote[0])" >> $g_FUNCTIONS
+echo "{ (*arg)[tot_len++] = __b2c__option_esc; } (*arg)[tot_len++] = data[pos][x]; } (*arg)[tot_len++] = 34; } else { memmove (*arg + tot_len, data[pos], slen); tot_len += slen; } if (pos < total - 1) { memmove (*arg + tot_len, __b2c__option_delim, dlen);" >> $g_FUNCTIONS
+echo "tot_len += dlen; } } __b2c__SETLEN(*arg, tot_len); (*arg)[tot_len] = 0; } }" >> $g_FUNCTIONS
+
+# utf8
+echo "int __b2c_utf8_conv(int txt, char* utf8) { unsigned char b1, b2, b3; int len; if (txt > 0xFFFF) { b1 = txt & 0x0000FF; b2 = (txt & 0x00FF00) >> 8; b3 = (txt & 0xFF0000) >> 16;" >> $g_FUNCTIONS
+echo "len = snprintf (utf8, 5, \"%c%c%c%c\", 0xF0 | (b3 >> 2), 0x80 | ((b3 & 0x03) << 4) | ((b2 & 0xF0) >> 4), 0x80 | ((b2 & 0x0F) << 2) | ((b1 & 0xC0) >> 6)," >> $g_FUNCTIONS
+echo "0x80 | (b1 & 0x3F)); } else if (txt > 0x07FF) { b1 = txt & 0x00FF; b2 = (txt & 0xFF00) >> 8; len = snprintf (utf8, 4, \"%c%c%c\", 0xE0 | ((b2 & 0xF0) >> 4)," >> $g_FUNCTIONS
+echo "0x80 | ((b2 & 0x0F) << 2) | ((b1 & 0xC0) >> 6), 0x80 | (b1 & 0x3F)); } else if (txt > 0x007F) { b1 = txt & 0x00FF; b2 = (txt & 0xFF00) >> 8; len = snprintf (utf8, 3, \"%c%c\"," >> $g_FUNCTIONS
+echo "0xC0 | (b2 << 2) | ((b1 & 0xC0) >> 6), 0x80 | (b1 & 0x3F)); } else { len = snprintf (utf8, 2, \"%c\", txt & 0x7F); } return(len); }" >> $g_FUNCTIONS
+echo "unsigned long __b2c__ulen (int l, char *k, char *func, char *ptr, int pos) { long len = 0; if (ptr == NULL) { return(0); } if(pos < 0) { while(*ptr){ if((*ptr&0xF0) == 0xF0) { len++; ptr += 4; } else if((*ptr&0xE0) == 0xE0) { len++; ptr += 3; }" >> $g_FUNCTIONS
+echo "else if((*ptr&0xC0) == 0xC0) { len++; ptr += 2; } else if((*ptr&0x80) == 0) { len++; ptr++; } else { ERROR = 38; RUNTIMEFERR(func, ERROR, k, l); return(0); } } } else { len = __b2c__ucs2_clen(l, k, \"ULEN\", ptr, pos); } return(len); }" >> $g_FUNCTIONS
+echo "unsigned long __b2c__blen (int l, char *k, char *func, char *ptr, long c, int flag) { char *org = ptr; if (ptr == NULL){ return (0); }" >> $g_FUNCTIONS
+echo "if(flag) { c = __b2c__ulen (l, k, \"BYTELEN\", org, -1)-c; } while (*ptr && c > 0) { if ((*ptr & 0xF0) == 0xF0) { ptr += 4; } else if ((*ptr & 0xE0) == 0xE0) { ptr += 3; } else if ((*ptr & 0xC0) == 0xC0) { ptr += 2; } else if ((*ptr & 0x80) == 0)" >> $g_FUNCTIONS
+echo "{ ptr++; } else { ERROR = 38; fprintf (stderr, \"Cannot decode UTF-8 string: '%s'\n\", org); RUNTIMEFERR (func, ERROR, k, l); return(0); } c--; } if(flag) { return (__b2c__len(org) - (ptr - org)); } else { return (ptr - org); } }" >> $g_FUNCTIONS
+echo "unsigned long __b2c__ucs2_clen (int l, char* k, char *func, char *ptr, int c) { int len = 0; char *org; if (ptr == NULL) return (0); org = ptr; while (*ptr && c > 0) { if ((*ptr & 0xF0) == 0xF0) { ptr += 4; c -= 4; } else if ((*ptr & 0xE0) == 0xE0)" >> $g_FUNCTIONS
+echo "{ ptr += 3; c -= 3; } else if ((*ptr & 0xC0) == 0xC0) { ptr += 2; c -= 2; } else if ((*ptr & 0x80) == 0) { ptr++; c--; } else { ERROR = 38; fprintf(stderr, \"Cannot decode UTF-8 string: '%s'\n\", org); RUNTIMEFERR (func, ERROR, k, l); return(0); } len++; } return (len); }" >> $g_FUNCTIONS
+
+# Check other dependencies
+if [[ -n $(grep -E "B64DEC\\$\(|B64ENC\\$\(" <<<${g_DEPEND}) ]]
 then
     echo "/* Portions of this code based on Bob Trower's C implementation at http://base64.sourceforge.net - MIT licensed */ static const char cd64[]=\"|\$\$\$}rstuvwxyz{\$\$\$\$\$\$\$>?@ABCDEFGHIJKLMNOPQRSTUVW\$\$\$\$\$\$XYZ[\\\\]^_\`abcdefghijklmnopq\";" >> $g_FUNCTIONS
     echo "static const char cb64[]=\"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/\"; static void __b2c__encodeblock( unsigned char *in, unsigned char *out, int len)" >> $g_FUNCTIONS
@@ -9502,7 +9554,7 @@ then
     echo "for(i = 0; i < len - 1; i++) { buf[idx][posit + i] = out[i]; } buf[idx][posit + i] = '\0'; posit += len - 1; } } __b2c__SETLEN(buf[idx], dec_len); return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//binary/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "BIT\(|BIN\\$\(|ROL\(|ROR\(" <<<${g_DEPEND}) ]]
 then
     echo "unsigned long __b2c__bit(long x) { return(x ? 2<<(x-1) : 1); } unsigned long __b2c__rol(int type, long x)" >> $g_FUNCTIONS
     echo "{ return((x)&lrint(pow(2, type*8-1)) ? (((x)<<1)|1)&lrint(pow(2, type*8)-1) : ((x)<<1)&lrint(pow(2, type*8)-1)); }" >> $g_FUNCTIONS
@@ -9512,7 +9564,7 @@ then
     echo "x = x>>1; } buf[idx][type*8] = '\0'; __b2c__SETLEN(buf[idx], type*8); return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//chop/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "CHOP\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__chop(char **swap, int type, char *source, char *string, int location) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; char *tmp; long length; if (source == NULL || *source == '\0') { if (type == 1) { *swap = __b2c_Copy_String(*swap, NULL); } return (NULL); } if (string == NULL) { string = (char *) __b2c__chop_default; }" >> $g_FUNCTIONS
     echo "idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } length = __b2c__len(string); if (location == 0 || location == 1) { while (*source != '\0') { if(memchr(string, *source, length)) { source++; } else { break; } } if (*source == '\0'){ if (type == 1) { *swap = __b2c_Copy_String (*swap, NULL); } return(NULL); } } tmp = source + __b2c__len(source) - 1;" >> $g_FUNCTIONS
@@ -9520,7 +9572,7 @@ then
     echo "__b2c__SETLEN(buf[idx], tmp - source); buf[idx][tmp - source] = '\0'; if (type == 1) { return(__b2c_Swap_String(swap, &buf[idx])); } return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//chrstr/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "CHR\\$\(|COUNT\(|ESCAPE\\$\(|ISASCII\(|ISUTF8\(|TOASCII\\$\(|UCS\(|UTF8\\$\(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__asc2char (int i) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; int len; idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; }" >> $g_FUNCTIONS
     echo "buf[idx] = (char*)__b2c_str_realloc(buf[idx], 2); len = snprintf(buf[idx], 2, \"%c\", i); __b2c__SETLEN(buf[idx], len); return(char*)(buf[idx]); }" >> $g_FUNCTIONS
@@ -9539,13 +9591,13 @@ then
     echo "buf[idx] = (char*)__b2c_str_realloc(buf[idx], len); for(x = 0; x < len; x++) { *(buf[idx] + x) = *(ptr + x) & 0x7f; } __b2c__SETLEN (buf[idx], len); buf[idx][len] = '\0'; return((char*)buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//cmdline/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "CMDLINE(" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c__getopt(int argc, char **argv, char* str){int opt; extern char *optarg; extern int optind, opterr; opterr = 0; opt = getopt(argc, argv, str); if(opt != -1)" >> $g_FUNCTIONS
     echo "{ ARGUMENT${g_STRINGSIGN} = __b2c_Copy_String(ARGUMENT${g_STRINGSIGN}, optarg); } else { ARGUMENT${g_STRINGSIGN} = __b2c_Copy_String(ARGUMENT${g_STRINGSIGN}, argv[optind]); } return(opt); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//concat/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "APPEND[[:space:]]|\&|\+|CONCAT\\$\(|LOOP\\$\(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__concat(int n, ...) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long length = 0, buflen = 0, cnew; char *next; va_list ap; if (n == 0) { return (NULL); } idx++;" >> $g_FUNCTIONS
     echo "if (idx == __b2c_STRING_FUNC) { idx = 0; } va_start (ap, n); if(buf[idx]) { buflen = __b2c__RBUFSIZE(buf[idx]); } while (n) { next = va_arg (ap, char *); if (next) { cnew = __b2c__len (next);" >> $g_FUNCTIONS
@@ -9561,125 +9613,95 @@ then
     echo "{ memmove (result + length, offset, cnew); } } length += cnew; } next = va_arg (ap, char *); total--; } va_end (ap); if(result) { __b2c__SETLEN (result, length); result[length] = '\0'; } return ((char *) result); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//count/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "COUNT(" <<<${g_DEPEND}) ]]
 then
-    echo "long __b2c__count (int l, char *k, char *x, unsigned int y) { long i, z = 0; if (__b2c__option_utf8) { while (*x) { if (__b2c__utf8toasc (x) == y) { z++; } if ((*x & 0xF0) == 0xF0) { x += 4; }" >> $g_FUNCTIONS
+    echo "long __b2c__count (int l, char *k, char *x, unsigned int y) { long i, z = 0; if(x == NULL) { return(0); } if (__b2c__option_utf8) { while (*x) { if (__b2c__utf8toasc (x) == y) { z++; } if ((*x & 0xF0) == 0xF0) { x += 4; }" >> $g_FUNCTIONS
     echo "else if ((*x & 0xE0) == 0xE0) { x += 3; } else if ((*x & 0xC0) == 0xC0) { x += 2; } else if ((*x & 0x80) == 0) { x++; } else { ERROR = 38; RUNTIMEFERR (\"COUNT\", ERROR, k, l); return(0); } } } else " >> $g_FUNCTIONS
     echo "{ for (i = 0; x[i] != '\0'; i++) { if (x[i] == y) { z++; } } } return z; }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//curdir/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "CURDIR\\$" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__curdir (void) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], ${g_BUFFER_SIZE});" >> $g_FUNCTIONS
     echo "buf[idx] = getcwd(buf[idx], ${g_BUFFER_SIZE}); __b2c__SETLEN(buf[idx], strlen(buf[idx])); buf[idx][${g_BUFFER_SIZE}-1] = '\\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//datename/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "MONTH\\$\(|WEEKDAY\\$\(" <<<${g_DEPEND}) ]]
 then
     echo "char* __b2c__datename(time_t now, int which) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; struct tm *ts; int len = 0; idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; }" >> $g_FUNCTIONS
     echo "buf[idx] = (char*)__b2c_str_realloc(buf[idx], ${g_MAX_DIGITS}); ts = localtime (&now); switch (which) { case 1: len = strftime(buf[idx], ${g_MAX_DIGITS}, \"%A\", ts); break;" >> $g_FUNCTIONS
     echo "case 2: len = strftime(buf[idx], ${g_MAX_DIGITS}, \"%B\", ts); break; } __b2c__SETLEN(buf[idx], len); buf[idx][len] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//dec/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "DEC(" <<<${g_DEPEND}) ]]
 then
     echo "uint64_t __b2c__hex2dec (int l, char *k, char *h, int flag) { uint64_t j=0; char *status = NULL; if(h == NULL) { return(0); } if(flag == 1) { flag = 2; } else if(flag > 36) {ERROR = 5; RUNTIMEFERR (\"DEC\", ERROR, k, l); return(0); }" >> $g_FUNCTIONS
-    echo "if(flag == 0) { j = strtol(h, &status, 16); if(*status != '\0' && __b2c__trap) { ERROR = 5; RUNTIMEFERR (\"DEC\", ERROR, k, l); return(0); } } else { j = strtol(h, &status, flag);" >> $g_FUNCTIONS
+    echo "if(flag == 0) { j = strtol(h, &status, 16); if(*status != '\0') { ERROR = 5; RUNTIMEFERR (\"DEC\", ERROR, k, l); return(0); } } else { j = strtol(h, &status, flag);" >> $g_FUNCTIONS
     echo "if(*status != '\0') { ERROR = 5; RUNTIMEFERR (\"DEC\", ERROR, k, l); return(0); } } return(uint64_t)(j); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//dirname/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "BASENAME\\$\(|DIRNAME\\$\(|REALPATH\\$\(" <<<${g_DEPEND}) ]]
 then
     echo "#ifndef PATH_MAX" >> $g_FUNCTIONS
     echo "#define PATH_MAX 4096" >> $g_FUNCTIONS
     echo "#endif" >> $g_FUNCTIONS
     echo "char *__b2c__dirname(int l, char *k, int x, char *y, long arg) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long i; char *dup; if(y == NULL || __b2c__len(y) == 0){ return(NULL); }" >> $g_FUNCTIONS
-    echo "idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], PATH_MAX*sizeof(char)); dup = __b2c__strdup(y); switch(x) {case 0: if ((realpath(y, buf[idx])) == NULL) { if (__b2c__trap) { ERROR = 26; RUNTIMEFERR(\"REALPATH$\", ERROR, k, l); return(NULL); }" >> $g_FUNCTIONS
-    echo "else strncpy(buf[idx], \"Error getting real path\", ${g_BUFFER_SIZE}); } break; case 1: if(strncpy(buf[idx], basename(dup), PATH_MAX) == NULL) {if (__b2c__trap) { ERROR = 26; RUNTIMEFERR(\"BASENAME$\", ERROR, k, l); return(NULL); } else strncpy (buf[idx], \"Error getting basename\", ${g_BUFFER_SIZE});}" >> $g_FUNCTIONS
-    echo "break; case 2: if (strncpy(buf[idx], dirname(dup), PATH_MAX) == NULL) {if(__b2c__trap) { ERROR = 26; RUNTIMEFERR(\"DIRNAME$\", ERROR, k, l); return(NULL); } else strncpy(buf[idx], \"Error getting dirname\", ${g_BUFFER_SIZE});" >> $g_FUNCTIONS
-    echo "} break;} __b2c__STRFREE(dup); __b2c__SETLEN(buf[idx], strlen(buf[idx])); buf[idx][PATH_MAX - 1] = '\0'; if(arg && x==1){ for(i=__b2c__len(buf[idx]); i>=0; i--) { if(buf[idx][i] == 46) break; }" >> $g_FUNCTIONS
+    echo "idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], PATH_MAX*sizeof(char)); dup = __b2c__strdup(y); switch(x) {case 0: if ((realpath(y, buf[idx])) == NULL) { ERROR = 26; RUNTIMEFERR(\"REALPATH$\", ERROR, k, l); strncpy(buf[idx], \"Error getting real path\", ${g_BUFFER_SIZE});" >> $g_FUNCTIONS
+    echo "return(NULL); } break; case 1: if(strncpy(buf[idx], basename(dup), PATH_MAX) == NULL) { ERROR = 26; RUNTIMEFERR(\"BASENAME$\", ERROR, k, l); strncpy (buf[idx], \"Error getting basename\", ${g_BUFFER_SIZE}); return(NULL); }" >> $g_FUNCTIONS
+    echo "break; case 2: if (strncpy(buf[idx], dirname(dup), PATH_MAX) == NULL) { ERROR = 26; RUNTIMEFERR(\"DIRNAME$\", ERROR, k, l); strncpy(buf[idx], \"Error getting dirname\", ${g_BUFFER_SIZE}); return(NULL); }" >> $g_FUNCTIONS
+    echo "break; } __b2c__STRFREE(dup); __b2c__SETLEN(buf[idx], strlen(buf[idx])); buf[idx][PATH_MAX - 1] = '\0'; if(arg && x==1){ for(i=__b2c__len(buf[idx]); i>=0; i--) { if(buf[idx][i] == 46) break; }" >> $g_FUNCTIONS
     echo "if(i >= 0){ if(arg == 1) { buf[idx][i] = '\\0'; __b2c__SETLEN(buf[idx], i);} if(arg == 2){ i++; memmove(buf[idx], buf[idx]+i, __b2c__len(buf[idx])-i+1);" >> $g_FUNCTIONS
     echo "__b2c__SETLEN(buf[idx], __b2c__len(buf[idx])-i);} } else if(arg == 2) {buf[idx][0] = '\0'; __b2c__SETLEN(buf[idx], 0);} } return(char*)(buf[idx]);}" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//epoch/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "TIMEVALUE(" <<<${g_DEPEND}) ]]
 then
     echo "unsigned long __b2c__epoch(int year, int month, int day, int hour, int minute, int second){struct tm tm; time_t t; tm.tm_year = year - 1900; tm.tm_mon = month - 1; tm.tm_mday = day;" >> $g_FUNCTIONS
     echo "tm.tm_hour = hour; tm.tm_min = minute; tm.tm_sec = second; tm.tm_isdst = -1; t = mktime(&tm); if (t == -1) return (0); return(long) t; }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//error/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-then
-    echo "char * ERR${g_STRINGSIGN}(int nr) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long flen = 0, slen = 0; char *first = NULL, *second = NULL; switch (nr)" >> $g_FUNCTIONS
-    echo "{ case 0: first = \"Success\"; break; case 1: first = \"Trying to access illegal memory: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
-    echo "case 2: first = \"Error opening file: \"; second = strerror (errno); break; case 3: first = \"Could not open library.\"; break;" >> $g_FUNCTIONS
-    echo "case 4: first = \"Symbol not found in library.\"; break; case 5: first = \"Wrong value: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
-    echo "case 6: first = \"Unable to claim memory.\"; break; case 7: first = \"Unable to delete file: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
-    echo "case 8: first = \"Could not open directory: \"; second = strerror(errno); break; case 9: first = \"Unable to rename file: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
-    echo "case 10: first = \"NETWORK argument should contain colon with port number\"; break; case 11: first = \"Could not resolve hostname!\"; break;" >> $g_FUNCTIONS
-    echo "case 12: first = \"Socket error: \"; second = strerror(errno); break; case 13: first = \"Unable to open address: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
-    echo "case 14: first = \"Error reading from socket: \"; second = strerror(errno); break; case 15: first = \"Error sending to socket: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
-    echo "case 16: first = \"Error checking socket: \"; second = strerror(errno); break; case 17: first = \"Unable to bind the specified socket address: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
-    echo "case 18: first = \"Unable to listen to socket address: \"; second = strerror(errno); break; case 19: first = \"Cannot accept incoming connection: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
-    echo "case 20: first = \"Unable to remove directory: \"; second = strerror(errno); break; case 21: first = \"Unable to create directory: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
-    echo "case 22: first = \"Unable to change to directory: \"; second = strerror(errno); break; case 23: first = \"GETENVIRON argument does not exist as environment variable\"; break;" >> $g_FUNCTIONS
-    echo "case 24: first = \"Unable to stat file: \"; second = strerror(errno); break; case 25: first = \"Search contains illegal string\"; break;" >> $g_FUNCTIONS
-    echo "case 26: first = \"Cannot return name: \"; second = strerror(errno); break; case 27: first = \"Illegal regex expression\"; break;" >> $g_FUNCTIONS
-    echo "case 28: first = \"Unable to create bidirectional pipes: \"; second = strerror(errno); break; case 29: first = \"Unable to fork process: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
-    echo "case 30: first = \"Cannot read from pipe: \"; second = strerror(errno); break; case 31: first = \"Gosub nesting too deep!\"; break;" >> $g_FUNCTIONS
-    echo "case 32: first = \"Could not open device: \"; second = strerror(errno); break; case 33: first = \"Error configuring serial port: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
-    echo "case 34: first = \"Error accessing device: \"; second = strerror(errno); break; case 35: first = \"Error in INPUT: \"; second = strerror(errno); break;" >> $g_FUNCTIONS
-    echo "case 36: first = \"Illegal value in SORT dimension!\"; break; case 37: first = \"Illegal option for SEARCH!\"; break;" >> $g_FUNCTIONS
-    echo "case 38: first = \"Invalid UTF8 string!\"; break; case 39: first = \"Illegal EVAL expression!\"; break;" >> $g_FUNCTIONS
-    echo "case 40: first = \"SSL file descriptor error!\"; break; case 41: first = \"Error loading certificate!\"; break;" >> $g_FUNCTIONS
-    echo "case 42: first = \"Widget not found!\"; ERROR = 42; break; case 43: first = \"Unsupported array type!\"; break; };" >> $g_FUNCTIONS
-    echo "if(first) { flen = strlen(first); } if(second) { slen = strlen(second); } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], flen+slen+1);if(first)" >> $g_FUNCTIONS
-    echo "{ memmove(buf[idx], first, flen); } if(second) { memmove(buf[idx]+flen, second, slen); } __b2c__SETLEN(buf[idx], flen+slen); buf[idx][flen+slen] = '\0'; return((char*)buf[idx]); }" >> $g_FUNCTIONS
-fi
-
-if [[ ${TOTAL//exec/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "EXEC\\$\(|RUN\\$\(" <<<${g_DEPEND}) ]]
 then
     echo "static char **__b2c__Get_Args(char *line) { char **ptr = NULL; long start, x, collapse; long length = 0, amount = 0; collapse = __b2c__collapse; __b2c__collapse = 1; start = __b2c__delim_engine (2, &amount, line, \" \", 0); ptr = (char**)calloc(amount, sizeof(char*));" >> $g_FUNCTIONS
     echo "for(x = 0; x < amount; x++) { start = __b2c__delim_engine_cache (1, &length, line, \" \", x + 1); ptr[x] = __b2c__strndup(line+start, length); } ptr[x] = NULL; __b2c__collapse = collapse; return (ptr); }" >> $g_FUNCTIONS
     echo "char * __b2c__exec(int t, int l, char *k, char *cmd, char *str, int out) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; int forking, length, dnull; ssize_t result = 0; int wpipe[2], rpipe[2]; char **args; char *ans = NULL;" >> $g_FUNCTIONS
-    echo "idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], sizeof(char)); if (pipe (rpipe) < 0 || pipe (wpipe) < 0) { if (__b2c__trap) { ERROR = 29; RUNTIMEFERR(\"EXEC$\", ERROR, k, l); return(NULL); } } if ((forking = fork ()) < 0) { if (__b2c__trap) { ERROR = 29; RUNTIMEFERR(\"EXEC$\", ERROR, k, l); return(NULL); } }" >> $g_FUNCTIONS
+    echo "idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], sizeof(char)); if (pipe (rpipe) < 0 || pipe (wpipe) < 0) { ERROR = 29; RUNTIMEFERR(\"EXEC$\", ERROR, k, l); return(NULL); } if ((forking = fork ()) < 0) { ERROR = 29; RUNTIMEFERR(\"EXEC$\", ERROR, k, l); return(NULL); }" >> $g_FUNCTIONS
     echo "else if (forking == 0) { fflush(stdout); close (wpipe[1]); close (rpipe[0]); dup2 (wpipe[0], STDIN_FILENO); close (wpipe[0]);	dnull = open(\"/dev/null\", O_RDWR); if(out == 1) { dup2 (rpipe[1], STDOUT_FILENO); dup2(dnull, STDERR_FILENO); } else if (out == 2) { dup2(dnull, STDOUT_FILENO);" >> $g_FUNCTIONS
     echo "dup2(rpipe[1], STDERR_FILENO); } else { dup2(rpipe[1], STDOUT_FILENO); dup2(rpipe[1], STDERR_FILENO); } close (rpipe[1]); if(t == 0) { forking = system (cmd); if (WIFEXITED (forking)) result = WEXITSTATUS (forking); }" >> $g_FUNCTIONS
-    echo "else { args = __b2c__Get_Args(cmd); if(execvp(args[0], args) < 0 ) { if (__b2c__trap) { ERROR = 29; RUNTIMEFERR (\"EXEC$\", ERROR, k, l); return(NULL); } } } close(dnull); __b2c_str_free(); _exit(result); } else { close (wpipe[0]); close (rpipe[1]); ans = (char*)malloc(${g_BUFFER_SIZE});" >> $g_FUNCTIONS
-    echo "length = 0; if (str != NULL) result = write (wpipe[1], str, __b2c__len(str)); close (wpipe[1]); do { result = read (rpipe[0], ans, ${g_BUFFER_SIZE}); if (result == -1 && __b2c__trap) { ERROR = 30; RUNTIMEFERR(\"EXEC$\", ERROR, k, l); return(NULL); }" >> $g_FUNCTIONS
-    echo "if (result == 0) { break; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], length + result + 1); if (buf[idx] == NULL && __b2c__trap) { ERROR = 6; RUNTIMEFERR(\"EXEC$\", ERROR, k, l); return(NULL); }" >> $g_FUNCTIONS
+    echo "else { args = __b2c__Get_Args(cmd); if(execvp(args[0], args) < 0 ) { ERROR = 29; RUNTIMEFERR (\"EXEC$\", ERROR, k, l); return(NULL); } } close(dnull); __b2c_str_free(); _exit(result); } else { close (wpipe[0]); close (rpipe[1]); ans = (char*)malloc(${g_BUFFER_SIZE});" >> $g_FUNCTIONS
+    echo "length = 0; if (str != NULL) result = write (wpipe[1], str, __b2c__len(str)); close (wpipe[1]); do { result = read (rpipe[0], ans, ${g_BUFFER_SIZE}); if (result == -1) { ERROR = 30; RUNTIMEFERR(\"EXEC$\", ERROR, k, l); return(NULL); }" >> $g_FUNCTIONS
+    echo "if (result == 0) { break; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], length + result + 1); if (buf[idx] == NULL) { ERROR = 6; RUNTIMEFERR(\"EXEC$\", ERROR, k, l); return(NULL); }" >> $g_FUNCTIONS
     echo "memcpy(buf[idx] + length, ans, (size_t)labs(result)); length += result; } while (result > 0); __b2c__SETLEN(buf[idx], length); buf[idx][length] = '\0';" >> $g_FUNCTIONS
     echo "close (rpipe[0]); free (ans); wait (&RETVAL); RETVAL = WEXITSTATUS (RETVAL); } return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//filelen/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "FILEEXISTS\(|FILELEN\(" <<<${g_DEPEND}) ]]
 then
-    echo "long __b2c__filelen(int l, char *k, const char *x) {struct stat buf; if(stat(x, &buf) < 0 && __b2c__trap){ERROR = 24; RUNTIMEFERR(\"FILELEN\", ERROR, k, l); return(0); }" >> $g_FUNCTIONS
-    echo "if(x == NULL || stat(x, &buf) < 0) return -1; else return(long)(buf.st_size);}" >> $g_FUNCTIONS
+    echo "long __b2c__filestat(int l, char *k, const char *x, int check) { struct stat buf = { 0 }; int result; if(x == NULL) { if(check == 0) { return(-1); } return(0); } result = stat(x, &buf); if(result < 0 && check == 0)" >> $g_FUNCTIONS
+    echo "{ ERROR = 24; RUNTIMEFERR(\"FILELEN\", ERROR, k, l); return(-1); } if(check == 0) { return((long)buf.st_size); } if(buf.st_mode) { return(1); } return(0); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//filetime/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "FILETIME(" <<<${g_DEPEND}) ]]
 then
-    echo "long __b2c__filetime(int l, char *k, const char *x, int y) {struct stat buf; if(stat(x, &buf) < 0 && __b2c__trap){ERROR = 24; RUNTIMEFERR(\"FILETIME\", ERROR, k, l); return(0); }" >> $g_FUNCTIONS
-    echo "if(x == NULL || stat(x, &buf) < 0 || y < 0 || y > 2) { return -1; } switch(y) {case 0: return(long)(buf.st_atime); break;" >> $g_FUNCTIONS
-    echo "case 1: return(long)(buf.st_mtime); break;} return(long)(buf.st_ctime);}" >> $g_FUNCTIONS
+    echo "long __b2c__filetime(int l, char *k, const char *x, int y) { struct stat buf = { 0 }; int result; if (x == NULL || y < 0 || y > 2) { return(-1); } result = stat(x, &buf); if(result < 0)" >> $g_FUNCTIONS
+    echo "{ ERROR = 24; RUNTIMEFERR(\"FILETIME\", ERROR, k, l); return(-1); } if(y == 0) { return((long)buf.st_atime); } if(y == 1) { return((long)buf.st_mtime); } return((long)buf.st_ctime); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//filetype/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "FILETYPE(" <<<${g_DEPEND}) ]]
 then
-    echo "int __b2c__filetype(int l, char *k, const char *file) { int type = 0; struct stat buf = { 0 }; if(file == NULL) { return(0); } if(lstat (file, &buf) < 0 && __b2c__trap) { ERROR = 24; RUNTIMEFERR (\"FILETYPE\", ERROR, k, l); return(0); }" >> $g_FUNCTIONS
+    echo "int __b2c__filetype(int l, char *k, const char *file) { int type = 0; struct stat buf = { 0 }; if(file == NULL) { return(0); } if(lstat(file, &buf) < 0) { ERROR = 24; RUNTIMEFERR (\"FILETYPE\", ERROR, k, l); return(0); }" >> $g_FUNCTIONS
     echo "switch (buf.st_mode & S_IFMT) { case S_IFBLK: type = 4; break; case S_IFCHR: type = 3; break; case S_IFDIR: type = 2; break; case S_IFIFO: type = 5; break; case S_IFLNK: type = 6; break;" >> $g_FUNCTIONS
-    echo "case S_IFREG: type = 1; break; case S_IFSOCK: type = 7; break; default: if(__b2c__trap) { ERROR = 24; RUNTIMEFERR(\"FILETYPE\", ERROR, k, l); return(0); } break; } return(type); }" >> $g_FUNCTIONS
+    echo "case S_IFREG: type = 1; break; case S_IFSOCK: type = 7; break; default: ERROR = 24; RUNTIMEFERR(\"FILETYPE\", ERROR, k, l); return(0); break; } return(type); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//fill/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "FILL\$(" <<<${g_DEPEND}) ]]
 then
-    echo "char * __b2c__fill (unsigned long amount, unsigned int txt) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; char bf[5]; int x, len; idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } if (__b2c__option_utf8) { len = __b2c_utf8_conv (txt, bf);" >> $g_FUNCTIONS
-    echo "buf[idx] = (char*)__b2c_str_realloc(buf[idx], amount*len+1); for (x = 0; x < (amount * len); x += len) { memcpy(buf[idx] + x, bf, len); } __b2c__SETLEN(buf[idx], amount * len); buf[idx][amount * len] = '\0'; } else" >> $g_FUNCTIONS
+    echo "char * __b2c__fill(long amount, int txt) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; char bf[5]; int x, len; if(amount < 0 || txt > 0x10FFFF) { return(NULL); } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } if (__b2c__option_utf8)" >> $g_FUNCTIONS
+    echo "{ len = __b2c_utf8_conv (txt, bf); buf[idx] = (char*)__b2c_str_realloc(buf[idx], amount*len+1); for (x = 0; x < (amount * len); x += len) { memcpy(buf[idx] + x, bf, len); } __b2c__SETLEN(buf[idx], amount * len); buf[idx][amount * len] = '\0'; } else" >> $g_FUNCTIONS
     echo "{ buf[idx] = (char*)__b2c_str_realloc(buf[idx], amount+1); memset(buf[idx], txt, amount); __b2c__SETLEN(buf[idx], amount); buf[idx][amount] = '\0'; } return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//flatten/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "FLATTEN\\$\(|UNFLATTEN\\$\(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__flatten(char *src, char *meta) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; char quote[1]; long len, x, pos=0, escaped=0; quote[0] = __b2c__option_dq; if(src == NULL) { return(src); }" >> $g_FUNCTIONS
     echo "if (meta == NULL) { meta = quote; } len = __b2c__len(src); idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], len+1);" >> $g_FUNCTIONS
@@ -9692,19 +9714,19 @@ then
     echo "__b2c__SETLEN(buf[idx], pos); buf[idx][pos] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//getenviron/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "GETENVIRON\$(" <<<${g_DEPEND}) ]]
 then
-    echo "char *__b2c__getenv (char *env) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; char *result; long len; result = getenv (env); if(result == NULL) { return(NULL); } len = strlen(result); idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; }" >> $g_FUNCTIONS
+    echo "char *__b2c__getenv (char *env) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; char *result; long len; if(env == NULL) { return(NULL); } result = getenv(env); if(result == NULL) { return(NULL); } len = strlen(result); idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; }" >> $g_FUNCTIONS
     echo "buf[idx] = (char*)__b2c_str_realloc(buf[idx], (len+1)*sizeof(char)); strncpy(buf[idx], result, len); __b2c__SETLEN(buf[idx], len); buf[idx][len] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//getkey/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "GETKEY|TRACE[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "long __b2c__getch(void){long ch; struct termios oldt, newt; tcflush(STDIN_FILENO, TCIFLUSH); tcgetattr(STDIN_FILENO, &oldt); newt = oldt; newt.c_lflag &= ~(ICANON | ECHO); newt.c_cc[VMIN]=1;" >> $g_FUNCTIONS
     echo "newt.c_cc[VTIME]=0; tcsetattr(STDIN_FILENO, TCSANOW, &newt); ch = getchar(); tcsetattr(STDIN_FILENO, TCSANOW, &oldt); return(ch);}" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//getpeer/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "GETPEER\$(" <<<${g_DEPEND}) ]]
 then
     if [[ `uname` = "OSF1" ]]
     then
@@ -9723,18 +9745,18 @@ then
         fi
     fi
     echo "if(!__b2c__option_tls) { desc = remote; } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], ${g_BUFFER_SIZE}*sizeof(char));" >> $g_FUNCTIONS
-    echo "if (getpeername(desc, (struct sockaddr *) peer, &length) < 0) { if (__b2c__trap) { ERROR = 16; RUNTIMEFERR(\"GETPEER$\", ERROR, k, l); return(NULL); } else strncpy(buf[idx], \"Peer not found\", ${g_BUFFER_SIZE}); }" >> $g_FUNCTIONS
+    echo "if (getpeername(desc, (struct sockaddr *) peer, &length) < 0) { free(peer); ERROR = 16; RUNTIMEFERR(\"GETPEER$\", ERROR, k, l); strncpy(buf[idx], \"Peer not found\", ${g_BUFFER_SIZE}); return(NULL); }" >> $g_FUNCTIONS
     echo "else { strncpy(buf[idx], inet_ntoa (peer->sin_addr),  ${g_BUFFER_SIZE} - 7); strcat(buf[idx], \":\"); snprintf (port, 6, \"%d\", ntohs (peer->sin_port)); strcat(buf[idx], port); }" >> $g_FUNCTIONS
     echo "free (peer); __b2c__SETLEN(buf[idx], strlen(buf[idx])); buf[idx][ ${g_BUFFER_SIZE} - 1] = '\0'; return(char*)(buf[idx]);}" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//getxy/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "GETX|GETY" <<<${g_DEPEND}) ]]
 then
     echo "long __b2c__getxy(int type){char asw[$g_BUFFER_SIZE]; struct termios old, cnew; int len, x = 0, y = 0; tcgetattr(STDIN_FILENO, &old); cnew = old; cnew.c_lflag &= ~(ICANON | ECHO); tcsetattr(STDIN_FILENO, TCSANOW, &cnew);" >> $g_FUNCTIONS
     echo "if(write(STDOUT_FILENO, \"\033[6n\", 4)>=0){len = read(STDIN_FILENO, asw, $g_BUFFER_SIZE); asw[len] = '\0'; tcsetattr(STDIN_FILENO, TCSANOW, &old); sscanf(asw, \"\033[%d;%dR\", &y, &x);} if (!type) return(long)x; return(long)y;}" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//sortnr/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "ASSOC[[:space:]]|HASH\(|INDEX\(|LOOKUP[[:space:]]|OBTAIN\\$\(|SORT[[:space:]]|TREE[[:space:]]|UNIQ\\$\(" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c__sortnrd(const void *a, const void *b) {if (*(double*)a==*(double*)b) return(0); else if (*(double*)a < *(double*)b) return(-1); else return(1);}" >> $g_FUNCTIONS
     echo "int __b2c__sortnrd_wrap(const void *a, const void *b) { return(__b2c__sortnrd(*(void**)a, *(void**)b)); }" >> $g_FUNCTIONS
@@ -9762,7 +9784,7 @@ then
     echo "int __b2c__sortnrc_wrap_down(const void *a, const void *b) { return(__b2c__sortnrc_down(*(void**)a, *(void**)b)); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//sortstr/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "ASSOC[[:space:]]|HASH\(|INDEX\(|LOOKUP[[:space:]]|OBTAIN\\$\(|SORT[[:space:]]|SORT\\$\(|TREE[[:space:]]|UNIQ\\$\(" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c__sortstr(const void *a, const void *b)" >> $g_FUNCTIONS
     echo "{if(*(char **)a == NULL) return(-1); if(*(char **)b == NULL) return(1); return strcmp(*(char **)a, *(char **)b);}" >> $g_FUNCTIONS
@@ -9772,92 +9794,7 @@ then
     echo "{if(*(char **)a == NULL) return(-1); if(*(char **)b == NULL) return(1); return strcmp(*(char **)b, *(char **)a);}" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//malloc/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-then
-    echo "char *__b2c__strdup(char *s) { if (s == NULL) { return(NULL); } return(__b2c_Copy_String(NULL, s)); }" >> $g_FUNCTIONS
-    echo "char *__b2c__strndup(char *s, size_t n) { if(s == NULL) { return(NULL); } return(__b2c_Copy_N_String(NULL, s, n)); }" >> $g_FUNCTIONS
-    echo "int __b2c__strcmp(const char *__b2c__s1, const char *__b2c__s2){ int len1 = 0, len2 = 0; len1 = __b2c__len(__b2c__s1); len2 = __b2c__len(__b2c__s2); if((__b2c__s1 == NULL || len1 == 0) && (__b2c__s2 == NULL || len2 == 0)) { return(0); }" >> $g_FUNCTIONS
-    echo "if(__b2c__s1 == NULL || len1 == 0) { return(-1); } if(__b2c__s2 == NULL || len2 == 0) { return(1); } return(strcmp(__b2c__s1, __b2c__s2)); }" >> $g_FUNCTIONS
-    echo "int __b2c__strcasecmp(const char *__b2c__s1, const char *__b2c__s2){ int len1 = 0, len2 = 0; len1 = __b2c__len(__b2c__s1); len2 = __b2c__len(__b2c__s2); if((__b2c__s1 == NULL || len1 == 0) && (__b2c__s2 == NULL || len2 == 0)) { return(0); }" >> $g_FUNCTIONS
-    echo "if(__b2c__s1 == NULL || len1 == 0) { return(-1); } if(__b2c__s2 == NULL || len2 == 0) { return(1); } return(strcasecmp(__b2c__s1, __b2c__s2)); }" >> $g_FUNCTIONS
-    echo "#ifndef __b2c_Pool_Block_Count" >> $g_FUNCTIONS
-    echo "#define __b2c_Pool_Block_Count 2048" >> $g_FUNCTIONS
-    echo "#endif" >> $g_FUNCTIONS
-    echo "#ifndef __b2c_Pool_Block_Size" >> $g_FUNCTIONS
-    echo "#define __b2c_Pool_Block_Size 1024" >> $g_FUNCTIONS
-    echo "#endif" >> $g_FUNCTIONS
-    echo "void *__b2c_mempool_realloc_core (void *address, size_t size, int action) { static char bottom[__b2c_Pool_Block_Count*__b2c_Pool_Block_Size] = { 0 }; static void *top = NULL, *current = NULL; static int inited = 0, amount_used = 0; void *result = NULL;" >> $g_FUNCTIONS
-    echo "if(!inited) { current = bottom; top = bottom + (__b2c_Pool_Block_Size * __b2c_Pool_Block_Count); *(uintptr_t*)current = (uintptr_t)((uint8_t*)current + __b2c_Pool_Block_Size); inited++; } switch(action) { case 0: fprintf(stderr, \"Memory pool contains %d slots, each %d bytes, of which %d were used.\n\", __b2c_Pool_Block_Count, __b2c_Pool_Block_Size, inited);" >> $g_FUNCTIONS
-    echo "break; case 1: if((uintptr_t)address >= (uintptr_t)bottom && (uintptr_t)address < (uintptr_t)top) { *(uintptr_t *)address = (uintptr_t)current; current = address; amount_used--; return(address); } break; case 2:" >> $g_FUNCTIONS
-    echo "if ((uintptr_t)address >= (uintptr_t)bottom && (uintptr_t)address < (uintptr_t)top) { return(address); } break; default: if(amount_used < __b2c_Pool_Block_Count-1 && size < __b2c_Pool_Block_Size) { if(address == NULL) { result = current;" >> $g_FUNCTIONS
-    echo "current = (void*)*(uintptr_t*)current; amount_used++; if(amount_used == inited) { *(uintptr_t*)current = (uintptr_t)((uint8_t*)current + __b2c_Pool_Block_Size); inited++; } } else if((uintptr_t)address >= (uintptr_t)bottom && (uintptr_t)address < (uintptr_t)top)" >> $g_FUNCTIONS
-    echo "{ if(size == 0) { *(uintptr_t*)address = (uintptr_t)current; current = address; amount_used--; } else { result = address; } } else { result = realloc(address, size); } } else { if(address == NULL) { result = realloc(address, size); }" >> $g_FUNCTIONS
-    echo "else if((uintptr_t)address >= (uintptr_t)bottom && (uintptr_t)address < (uintptr_t)top) { if(size == 0) { *(uintptr_t*)address = (uintptr_t)current; current = address; amount_used--; } else { result = malloc(size > __b2c_Pool_Block_Size ? size : __b2c_Pool_Block_Size);" >> $g_FUNCTIONS
-    echo "memcpy(result, address, size > __b2c_Pool_Block_Size ? size : __b2c_Pool_Block_Size); *(uintptr_t*)address = (uintptr_t)current; current = address; amount_used--; } } else { result = realloc(address, size); } } break; } return ((void *) result); }" >> $g_FUNCTIONS
-    echo "#ifndef __b2c_HASH_STR_STORE" >> $g_FUNCTIONS
-    echo "#define __b2c_HASH_STR_STORE 0x100000" >> $g_FUNCTIONS
-    echo "#endif" >> $g_FUNCTIONS
-    echo "#define __b2c_HASH_STR_INDEX (__b2c_HASH_STR_STORE-1)" >> $g_FUNCTIONS
-    echo "#ifndef __b2c_HASH_LINEAR_DEPTH" >> $g_FUNCTIONS
-    echo "#define __b2c_HASH_LINEAR_DEPTH 16" >> $g_FUNCTIONS
-    echo "#endif" >> $g_FUNCTIONS
-    echo "#define __b2c_get_string(p, e, i, d, l) if(p) { while(e[i] != p) { i++; if(++d == l) { p=NULL; break; }}}" >> $g_FUNCTIONS
-    echo "#define __b2c_del_string(p, e, i, d, l) if(p) { while(e[i] != p) { i++; if(++d == l) { break; } } if(d < l) { e[i] = NULL; } }" >> $g_FUNCTIONS
-    echo "#define __b2c_add_string(p, e, i, d, l) if(p) { while(e[i] != NULL && e[i]!=p) { i++; if(++d == l) { if(++l == __b2c_HASH_LINEAR_DEPTH) { fprintf (stderr, \"\nInternal error: cannot register string! Try to tweak the 'hld' parameter.\n\"); __b2c_str_realloc_debug_string(); exit (EXIT_FAILURE); } } } e[i] = p; }" >> $g_FUNCTIONS
-    echo "void *__b2c_str_realloc_core (char *ptr, size_t size, int action) { static char *even_addr[__b2c_HASH_STR_STORE + __b2c_HASH_LINEAR_DEPTH] = { NULL }; static int linear_depth = 1; char *next; uint32_t lbufsize = 0, rbufsize = 0, idx, len, depth = 0, total = 0; idx = (((uintptr_t) ptr % __b2c_HASH_STR_STORE) & __b2c_HASH_STR_INDEX); switch (action)" >> $g_FUNCTIONS
-    echo "{ case 0: case 1: next = ptr; __b2c_get_string(next, even_addr, idx, depth, linear_depth); if(next) { lbufsize = __b2c__LBUFSIZE (ptr); rbufsize = __b2c__RBUFSIZE (ptr); if (action == 0) { if (rbufsize <= size) { __b2c_del_string(ptr, even_addr, idx, depth, linear_depth); next = (char*)__b2c_mempool_realloc(ptr - __b2c__BUFOFFSET - lbufsize, __b2c__BUFOFFSET + lbufsize + rbufsize + size * 2 + 1);" >> $g_FUNCTIONS
-    echo "ptr = next + lbufsize; *(uint32_t *) ((char *) ptr + 4) = size * 2 + 1 + rbufsize; } else { return (ptr); } } else { if (lbufsize <= size) { __b2c_del_string(ptr, even_addr, idx, depth, linear_depth); next = (char*)__b2c_mempool_realloc(ptr - __b2c__BUFOFFSET - lbufsize, __b2c__BUFOFFSET + lbufsize + rbufsize + size * 2);" >> $g_FUNCTIONS
-    echo "memmove (next + lbufsize + size * 2, next + lbufsize, __b2c__BUFOFFSET + rbufsize); ptr = next + size * 2 + lbufsize; *(uint32_t *) ((char *) ptr + 8) = size * 2 + lbufsize; } else { return (ptr); } } } else { rbufsize = __b2c__len (ptr); next = (char*)__b2c_mempool_realloc(ptr, __b2c__BUFOFFSET + rbufsize + size * 2 + 1);" >> $g_FUNCTIONS
-    echo "if (action == 0) { ptr = next; *(uint32_t *) ((char *) ptr) = rbufsize; *(uint32_t *) ((char *) ptr + 4) = rbufsize + size * 2 + 1; *(uint32_t *) ((char *) ptr + 8) = 0; } else { memmove (next + size * 2, next, __b2c__BUFOFFSET + rbufsize); ptr = next+size * 2; *(uint32_t *) ((char *) ptr) = rbufsize;" >> $g_FUNCTIONS
-    echo "*(uint32_t *) ((char *) ptr + 4) = rbufsize + 1; *(uint32_t *) ((char *) ptr + 8) = size * 2; } } ptr += __b2c__BUFOFFSET; idx = (((uintptr_t) ptr % __b2c_HASH_STR_STORE) & __b2c_HASH_STR_INDEX); depth = 0; __b2c_add_string(ptr, even_addr, idx, depth, linear_depth); break; case 2: __b2c_add_string(ptr, even_addr, idx, depth, linear_depth);" >> $g_FUNCTIONS
-    echo "break; case 3: __b2c_del_string(ptr, even_addr, idx, depth, linear_depth); break; case 4: __b2c_get_string(ptr, even_addr, idx, depth, linear_depth); break; case 5: for (idx = 0; idx < __b2c_HASH_STR_STORE + __b2c_HASH_LINEAR_DEPTH; idx++) { if (even_addr[idx] != NULL) { total++; len = (*(uint32_t*)(even_addr[idx]-__b2c__BUFOFFSET));" >> $g_FUNCTIONS
-    echo "lbufsize = __b2c__LBUFSIZE(even_addr[idx]); rbufsize = __b2c__RBUFSIZE(even_addr[idx]); if(len > 64) { even_addr[idx][64] = 0; fprintf(stderr, \"Bucketnr:lbuf:rbuf:length:string = %d:%d:%d:%d:%s[...]\n\", idx, lbufsize, rbufsize, len, even_addr[idx]); } else { fprintf(stderr, \"Bucketnr:lbuf:rbuf:length:string = %d:%d:%d:%d:%s\n\", idx, lbufsize, rbufsize, len, even_addr[idx]); } } }" >> $g_FUNCTIONS
-    echo "fprintf(stderr, \"Total optimized strings: %d - max depth: %d\n\", total, linear_depth); break; case 6: for (idx = 0; idx < __b2c_HASH_STR_STORE + __b2c_HASH_LINEAR_DEPTH; idx++) { if(even_addr[idx] && !__b2c_mempool_realloc_in_block(even_addr[idx])) { free(even_addr[idx] - __b2c__BUFOFFSET - __b2c__LBUFSIZE(even_addr[idx])); } } break; } return (ptr); }" >> $g_FUNCTIONS
-    echo "char *__b2c_Copy_String_core(char *x, char *y, int len) { long ylen; if(y == NULL) { __b2c__STRFREE(x); return(NULL); } if(len == -1) { ylen = __b2c__len(y); } else { ylen = len; } if (ylen == 0) { __b2c__STRFREE (x); return (NULL); } x = (char*)__b2c_str_realloc(x, ylen);" >> $g_FUNCTIONS
-    echo "memmove(x, y, ylen); __b2c__SETLEN(x, ylen); x[ylen] = '\0'; return(x); }" >> $g_FUNCTIONS
-    echo "char *__b2c_Swap_String(char **x, char **y) { char *ptr; ptr = *x; *x = *y; *y = ptr; return(*x); }" >> $g_FUNCTIONS
-    echo "unsigned long __b2c__len (const char *ptr) { if (ptr == NULL) { return (0); } if(__b2c_str_realloc_get_string(ptr)) { return (*(uint32_t *) (ptr - __b2c__BUFOFFSET)); } return ((unsigned long) strlen (ptr)); }" >> $g_FUNCTIONS
-    echo "char *__b2c__loop_helper(jmp_buf buf) { if(__b2c__loop_result${g_STRINGSIGN} != NULL) { __b2c__SETLEN (__b2c__loop_result${g_STRINGSIGN}, 0); __b2c__loop_result${g_STRINGSIGN} = __b2c_Copy_String(__b2c__loop_result${g_STRINGSIGN}, NULL); } longjmp(buf, 1); return(NULL); }" >> $g_FUNCTIONS
-    echo "long __b2c__loop_helper2(jmp_buf buf) { __b2c__loop_result = 0; longjmp(buf, 1); return(0); }" >> $g_FUNCTIONS
-    echo "void __b2c__free_str_array_members(char ***array, int base, int size) { int i; if(*array != NULL) { for(i=0; i < size; i++){ __b2c__STRFREE((*array)[i+base]); (*array)[i+base] = NULL; } } }" >> $g_FUNCTIONS
-    if [[ `uname` = +(*BSD*) ]]
-    then
-        echo "char *__b2c_strlcat(char *dest, const char *src) { strlcat(dest, src, __b2c__len(dest)+__b2c__len(src)+1); return(dest); }" >> $g_FUNCTIONS
-        echo "char *__b2c_strlcpy(char *dest, const char *src) { strlcpy(dest, src, __b2c__len(src)+1); return(dest); }" >> $g_FUNCTIONS
-    fi
-    echo -n "void __b2c_str_free(void) {" >> $g_FUNCTIONS
-    if [[ ${TOTAL//regex/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-    then
-        echo -n "__b2c__regex_free();" >> $g_FUNCTIONS
-    fi
-    if [[ ${TOTAL//extract/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-    then
-        echo -n "__b2c__extract_free();" >> $g_FUNCTIONS
-    fi
-    if [[ ${TOTAL//replace/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-    then
-        echo -n "__b2c__replace_free();" >> $g_FUNCTIONS
-    fi
-    if [[ ${TOTAL//walk/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-    then
-        echo -n "__b2c__walk_free();" >> $g_FUNCTIONS
-    fi
-    if [[ ${TOTAL//delimengine/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-    then
-        echo -n "__b2c__delim_engine_free();" >> $g_FUNCTIONS
-    fi
-    if [[ -n ${g_GLOBALARRAYS} ]]
-    then
-        echo -n "__b2c__arrays_free();" >> $g_FUNCTIONS
-    fi
-    if [[ ${TOTAL//collect/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-    then
-        echo -n "__b2c__twalk_free();" >> $g_FUNCTIONS
-    fi
-    echo "__b2c_str_realloc_free_string(); }">> $g_FUNCTIONS
-fi
-
-if [[ ${TOTAL//hash/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "ASSOC[[:space:]]|EXTRACT\\$\(|HASH\(|INDEX\\$\(|INVERT\(|LOOKUP[[:space:]]|OBTAIN\\$\(|REGEX\(|REPLACE\\$\(|SORT[[:space:]]|UNIQ\\$\(|WALK\\$\(" <<<${g_DEPEND}) ]]
 then
     echo "typedef struct __b2c__htable { char *key[65536]; void *value[65536]; char *index[65536]; int total; struct __b2c__htable *next; } __b2c__htable;" >> $g_FUNCTIONS
     echo "const char *__b2c__hash_key_collect(int n, const char *first, ...) { static char *keys[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long length = 0, buflen = 0, cnew; char *next; va_list ap; if (n == 0) { return (NULL); } if (n == 1) { return (first); }" >> $g_FUNCTIONS
@@ -9877,7 +9814,7 @@ then
     echo "void *__b2c__hash_find_value_do(__b2c__htable *name, const char *key) { __b2c__htable *table; unsigned short pos; if(name == NULL || key == NULL) { return(NULL); } pos = __b2c__HashFNV1a_16(key); table = __b2c__hash_find_key(name, pos, key);" >> $g_FUNCTIONS
     echo "if(table) { return(table->value[pos]); } return(NULL); }" >> $g_FUNCTIONS
     echo "#define __b2c__hash_find_value(x, ...) __b2c__hash_find_value_do(x, __b2c__KEYCOLLECT(__VA_ARGS__))" >> $g_FUNCTIONS
-    echo "void __b2c__hash_add_do(__b2c__htable *name, const void *value, int flag, unsigned int len, const char *key) { unsigned short hash; if(name == NULL || value == NULL) { return; } hash = __b2c__HashFNV1a_16(key);" >> $g_FUNCTIONS
+    echo "void __b2c__hash_add_do(__b2c__htable *name, const void *value, int flag, unsigned int len, const char *key) { unsigned short hash; if(name == NULL) { return; } hash = __b2c__HashFNV1a_16(key);" >> $g_FUNCTIONS
     echo "while(1) { if(name->key[hash] == NULL) { name->total++; break; } if(!strcmp(name->key[hash], key)) { if(flag != 2) { break; } } if(name->next) { name = name->next; } else { name->next = __b2c__hash_new(); name = name->next;} }" >> $g_FUNCTIONS
     echo "if(!name->key[hash]) { name->key[hash] = __b2c_Copy_String(name->key[hash], (char*)key); name->index[name->total-1] = name->key[hash]; } if(flag == 0) { if(!name->value[hash]) { name->value[hash] = calloc(1, sizeof(void*)); } memcpy(name->value[hash], value, sizeof(void*)); }" >> $g_FUNCTIONS
     echo "else if(flag == 3) { name->value[hash] = realloc(name->value[hash], len); memcpy(name->value[hash], value, len); } else { name->value[hash] = __b2c_Copy_String((char*)name->value[hash], (char*)value); } }" >> $g_FUNCTIONS
@@ -9904,7 +9841,7 @@ then
     echo "#define __b2c__hash_dup_str(x, y) __b2c__hash_dup_do(x, y, 1)" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//obtain/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "OBTAIN\\$\(|UNIQ\\$\(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__hash_obtain(__b2c__htable *name, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long ctr, dlen, len, total = 0; if(name == NULL) { return (NULL); } if(delim == NULL) { delim = __b2c__option_delim; }" >> $g_FUNCTIONS
     echo "if(name->total == 0) { return (NULL); } dlen = __b2c__len(delim); idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], dlen); do { for(ctr=0; ctr < name->total; ctr++) { len = __b2c__len(name->index[ctr]);" >> $g_FUNCTIONS
@@ -9914,7 +9851,7 @@ then
     echo "unsigned short loc; char *value; char bf[${g_MAX_DIGITS} + 1] = { 0 }; if (name == NULL || name->total == 0) { return (NULL); } if (delim == NULL) { delim = __b2c__option_delim; } values = (void **) calloc (__b2c__hash_nrkeys (name), sizeof (char *)); inv = __b2c__hash_new (); ptr = name; do { for(i = 0; i < ptr->total; i++) { loc = __b2c__HashFNV1a_16(ptr->index[i]); switch(type)" >> $g_FUNCTIONS
     echo "{ case 0: value = (char*)ptr->value[loc]; break; case 1: snprintf (bf, ${g_MAX_DIGITS}, \"%g\", *(double *) ptr->value[loc]); value = bf; break; case 2: snprintf (bf, ${g_MAX_DIGITS}, \"%g\", *(float *) ptr->value[loc]); value = bf; break;" >> $g_FUNCTIONS
     echo "case 3: snprintf (bf, ${g_MAX_DIGITS}, \"%ld\", *(long *) ptr->value[loc]); value = bf; break; case 4: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", *(int *) ptr->value[loc]); value = bf; break; case 5: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", *(short *) ptr->value[loc]); value = bf; break;" >> $g_FUNCTIONS
-    echo "case 6: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", *(char *) ptr->value[loc]); value = bf; break; default: if (__b2c__trap) { ERROR = 43; RUNTIMEFERR(\"OBTAIN$\", ERROR, k, l); return(NULL); } } __b2c__hash_add_redundant(inv, ptr->index[i], value); values[pos++] = ptr->value[loc]; } ptr = ptr->next; } while (ptr);" >> $g_FUNCTIONS
+    echo "case 6: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", *(char *) ptr->value[loc]); value = bf; break; default: ERROR = 43; RUNTIMEFERR(\"OBTAIN$\", ERROR, k, l); return(NULL); } __b2c__hash_add_redundant(inv, ptr->index[i], value); values[pos++] = ptr->value[loc]; } ptr = ptr->next; } while (ptr);" >> $g_FUNCTIONS
     echo "switch (type) { case 0: if (up_down) { qsort (&values[0], pos, sizeof (void *), __b2c__sortstr); } else { qsort (&values[0], pos, sizeof (void *), __b2c__sortstr_down); } break; case 1: if (up_down) { qsort (&values[0], pos, sizeof (void *), __b2c__sortnrd_wrap); }" >> $g_FUNCTIONS
     echo "else { qsort (&values[0], pos, sizeof (void *), __b2c__sortnrd_wrap_down); } break; case 2: if (up_down) { qsort (&values[0], pos, sizeof (void *), __b2c__sortnrf_wrap); } else { qsort (&values[0], pos, sizeof (void *), __b2c__sortnrf_wrap_down); } break;" >> $g_FUNCTIONS;
     echo "case 3: if (up_down) { qsort (&values[0], pos, sizeof (void *), __b2c__sortnrl_wrap); } else { qsort (&values[0], pos, sizeof (void *), __b2c__sortnrl_wrap_down); } break; case 4: if (up_down) { qsort (&values[0], pos, sizeof (void *), __b2c__sortnri_wrap); }" >> $g_FUNCTIONS
@@ -9930,7 +9867,7 @@ then
     echo "__b2c__hash_clear (inv); free(inv); free(values); free(dups); free(keys); total -= dlen; __b2c__SETLEN(buf[idx], total); buf[idx][total] = '\0'; return((char*)buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//lookup/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "LOOKUP[[:space:]]|SORT[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c__lookup_by_order(__b2c__htable *name, char ***array, int size, int base) { int i, count = 0; if(name) { if(*array) { __b2c__free_str_array_members (&(*array), base, size); free(*array); } *array = (char **)calloc(__b2c__hash_nrkeys(name)+base, sizeof(char*));" >> $g_FUNCTIONS
     echo "count = base; do { for(i = 0; i < name->total; i++) { (*array)[count] = __b2c_Copy_String((*array)[count], name->index[i]); count++; } name = name->next; } while(name); count -= base; } return(count); }" >> $g_FUNCTIONS
@@ -9946,60 +9883,60 @@ then
     echo "free (keys); count -= base; } return (count); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//hex/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "HEX\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__dec2hex(int nr) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; int len; idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], ${g_MAX_DIGITS});" >> $g_FUNCTIONS
     echo "len = snprintf(buf[idx], ${g_MAX_DIGITS}, \"%X\", nr); __b2c__SETLEN(buf[idx], len); buf[idx][len] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//host/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "HOST\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__nethost(int l, char *k, char *host) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; int y, flag = 0; struct hostent *he = NULL; unsigned char bf[sizeof(struct sockaddr_in*)]; idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; }" >> $g_FUNCTIONS
     echo "buf[idx] = (char*)__b2c_str_realloc(buf[idx], ${g_BUFFER_SIZE}); for (y = 0; host[y] != '\\0'; y++) { if (isalpha (*(host + y))) { flag = 1; break; } } if (flag){ he = gethostbyname (host); strncpy(buf[idx], inet_ntoa(*((struct in_addr*)he->h_addr)), ${g_BUFFER_SIZE}); }" >> $g_FUNCTIONS
-    echo "else { if (inet_pton(AF_INET, host, bf) <= 0) { if (__b2c__trap) { ERROR = 11; RUNTIMEFERR (\"HOST$\", ERROR, k, l); return(NULL); } else { strncpy(buf[idx], \"Host not found\", ${g_BUFFER_SIZE}); } }" >> $g_FUNCTIONS
-    echo "else { he = gethostbyaddr(bf, sizeof(struct sockaddr_in*), AF_INET); if(he == NULL) { if (__b2c__trap) { ERROR = 11; RUNTIMEFERR (\"HOST$\", ERROR, k, l); return(NULL); } else { strncpy(buf[idx], \"Host not found\", ${g_BUFFER_SIZE}); } } else { strncpy(buf[idx], he->h_name, ${g_BUFFER_SIZE}); } } }" >> $g_FUNCTIONS
+    echo "else { if (inet_pton(AF_INET, host, bf) <= 0) { ERROR = 11; RUNTIMEFERR (\"HOST$\", ERROR, k, l); strncpy(buf[idx], \"Host not found\", ${g_BUFFER_SIZE}); return(NULL); }" >> $g_FUNCTIONS
+    echo "else { he = gethostbyaddr(bf, sizeof(struct sockaddr_in*), AF_INET); if(he == NULL) { ERROR = 11; RUNTIMEFERR (\"HOST$\", ERROR, k, l); strncpy(buf[idx], \"Host not found\", ${g_BUFFER_SIZE}); return(NULL); } else { strncpy(buf[idx], he->h_name, ${g_BUFFER_SIZE}); } } }" >> $g_FUNCTIONS
     echo "__b2c__SETLEN(buf[idx], strlen(buf[idx])); buf[idx][${g_BUFFER_SIZE}-1] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//hostname/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "HOSTNAME\\$" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__hostname(int l, char *k) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], ${g_BUFFER_SIZE}*sizeof(char));" >> $g_FUNCTIONS
-    echo "if(gethostname(buf[idx], ${g_BUFFER_SIZE})) { if (__b2c__trap) { ERROR = 26; RUNTIMEFERR(\"HOSTNAME$\", ERROR, k, l); return(NULL); } else strncpy (buf[idx], \"Error getting hostname\", ${g_BUFFER_SIZE}); }" >> $g_FUNCTIONS
+    echo "if(gethostname(buf[idx], ${g_BUFFER_SIZE})) { ERROR = 26; RUNTIMEFERR(\"HOSTNAME$\", ERROR, k, l); strncpy (buf[idx], \"Error getting hostname\", ${g_BUFFER_SIZE}); return(NULL); }" >> $g_FUNCTIONS
     echo "__b2c__SETLEN(buf[idx], strlen(buf[idx])); buf[idx][${g_BUFFER_SIZE}-1] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//indexarray/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "INDEX(" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c__index (int line, char *k, size_t range, int type, void *array, int flag, ...) { int result = 0 + ${g_OPTION_BASE}; double d; float f; long l; int i; short s; char c; char *term; void *index; va_list ap; va_start (ap, flag); if (flag == 0) { switch (type)" >> $g_FUNCTIONS
     echo "{ case 0: term = va_arg(ap, char*); if ((index = lfind (&term, array, &range, sizeof (char *), __b2c__sortstr)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (char *) + 1; } break; case 1: d = va_arg (ap, double); if ((index = lfind (&d, array, &range, sizeof (double), __b2c__sortnrd)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (double) + 1; } break;" >> $g_FUNCTIONS
     echo "case 2: f = va_arg (ap, double); if ((index = lfind (&f, array, &range, sizeof (float), __b2c__sortnrf)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (float) + 1; } break; case 3: l = va_arg (ap, long); if ((index = lfind (&l, array, &range, sizeof (long), __b2c__sortnrl)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (long) + 1; } break;" >> $g_FUNCTIONS
     echo "case 4: i = va_arg (ap, int); if ((index = lfind (&i, array, &range, sizeof (int), __b2c__sortnri)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (int) + 1; } break; case 5: s = va_arg (ap, int); if ((index = lfind (&s, array, &range, sizeof (short), __b2c__sortnrs)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (short) + 1; } break;" >> $g_FUNCTIONS
-    echo "case 6: c = va_arg (ap, int); if ((index = lfind (&c, array, &range, sizeof (char), __b2c__sortnrc)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (char) + 1; } break; default: if (__b2c__trap) { ERROR = 43; RUNTIMEFERR (\"INDEX\", ERROR, k, line); return(0); } } } else { switch (type)" >> $g_FUNCTIONS
+    echo "case 6: c = va_arg (ap, int); if ((index = lfind (&c, array, &range, sizeof (char), __b2c__sortnrc)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (char) + 1; } break; default: ERROR = 43; RUNTIMEFERR (\"INDEX\", ERROR, k, line); return(0); } } else { switch (type)" >> $g_FUNCTIONS
     echo "{ case 0: term = va_arg(ap, char*); if ((index = bsearch (&term, array, range, sizeof (char *), __b2c__sortstr)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (char *) + 1; } break; case 1: d = va_arg (ap, double); if ((index = bsearch (&d, array, range, sizeof (double), __b2c__sortnrd)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (double) + 1; } break;" >> $g_FUNCTIONS
     echo "case 2: f = va_arg (ap, double); if ((index = bsearch (&f, array, range, sizeof (float), __b2c__sortnrf)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (float) + 1; } break; case 3: l = va_arg (ap, long); if ((index = bsearch (&l, array, range, sizeof (long), __b2c__sortnrl)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (long) + 1; } break;" >> $g_FUNCTIONS
     echo "case 4: i = va_arg (ap, int); if ((index = bsearch (&i, array, range, sizeof (int), __b2c__sortnri)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (int) + 1; } break; case 5: s = va_arg (ap, int); if ((index = bsearch (&s, array, range, sizeof (short), __b2c__sortnrs)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (short) + 1; } break;" >> $g_FUNCTIONS
-    echo "case 6: c = va_arg (ap, int); if ((index = bsearch (&c, array, range, sizeof (char), __b2c__sortnrc)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (char) + 1; } break; default: if (__b2c__trap) { ERROR = 43; RUNTIMEFERR (\"INDEX\", ERROR, k, line); return(0); } } } va_end (ap); return (result - ${g_OPTION_BASE}); }" >> $g_FUNCTIONS
+    echo "case 6: c = va_arg (ap, int); if ((index = bsearch (&c, array, range, sizeof (char), __b2c__sortnrc)) != NULL) { result = ((uintptr_t) index - (uintptr_t) array) / sizeof (char) + 1; } break; default: ERROR = 43; RUNTIMEFERR (\"INDEX\", ERROR, k, line); return(0); } } va_end (ap); return (result - ${g_OPTION_BASE}); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//indexassoc/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "INDEX\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__index_assoc (int l, char *k, int type, __b2c__htable * name, ...) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; __b2c__htable *inv; unsigned short pos; char *value, *result; char bf[${g_MAX_DIGITS} + 1] = { 0 }; int i, len; va_list ap; if(name == NULL || name->total == 0) { return (NULL); } inv = __b2c__hash_new (); do { for(i = 0; i < name->total; i++) { pos = __b2c__HashFNV1a_16(name->index[i]); switch (type) { case 0: value = (char*)name->value[pos];" >> $g_FUNCTIONS
     echo "break; case 1: snprintf (bf, ${g_MAX_DIGITS}, \"%g\", *(double *) name->value[pos]); value = bf; break; case 2: snprintf (bf, ${g_MAX_DIGITS}, \"%g\", *(float *) name->value[pos]); value = bf; break; case 3: snprintf (bf, ${g_MAX_DIGITS}, \"%ld\", *(long *) name->value[pos]); value = bf; break; case 4: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", *(int *) name->value[pos]); value = bf; break; case 5: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", *(short *) name->value[pos]); value = bf; break;" >> $g_FUNCTIONS
-    echo "case 6: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", *(char *) name->value[pos]); value = bf; break; default: if (__b2c__trap) { ERROR = 43; RUNTIMEFERR (\"INDEX$\", ERROR, k, l); return(NULL); } } __b2c__hash_add_redundant (inv, name->index[i], value); } name = name->next; } while (name); va_start (ap, name); switch (type) { case 0: value = va_arg (ap, char *); break; case 1: snprintf (bf, ${g_MAX_DIGITS}, \"%g\", va_arg (ap, double)); value = bf; break;" >> $g_FUNCTIONS
+    echo "case 6: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", *(char *) name->value[pos]); value = bf; break; default: ERROR = 43; RUNTIMEFERR (\"INDEX$\", ERROR, k, l); return(NULL); } __b2c__hash_add_redundant (inv, name->index[i], value); } name = name->next; } while (name); va_start (ap, name); switch (type) { case 0: value = va_arg (ap, char *); break; case 1: snprintf (bf, ${g_MAX_DIGITS}, \"%g\", va_arg (ap, double)); value = bf; break;" >> $g_FUNCTIONS
     echo "case 2: snprintf (bf, ${g_MAX_DIGITS}, \"%g\", va_arg (ap, double)); value = bf; break; case 3: snprintf (bf, ${g_MAX_DIGITS}, \"%ld\", va_arg (ap, long)); value = bf; break; case 4: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", va_arg (ap, int)); value = bf; break; case 5: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", va_arg (ap, int)); value = bf; break; case 6: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", va_arg (ap, int)); value = bf; break;" >> $g_FUNCTIONS
-    echo "default: if (__b2c__trap) { ERROR = 43; RUNTIMEFERR (\"INDEX$\", ERROR, k, l); return(NULL); } } va_end (ap); result = (char *) __b2c__hash_find_value_do (inv, value); idx++; if (idx == __b2c_STRING_FUNC) { idx = 0; } len = __b2c__len (result); buf[idx] = (char *) __b2c_str_realloc (buf[idx], len + 1); memmove (buf[idx], result, len); __b2c__SETLEN (buf[idx], len); buf[idx][len] = '\0'; __b2c__hash_clear (inv); free (inv); return ((char *) buf[idx]); }" >> $g_FUNCTIONS
+    echo "default: ERROR = 43; RUNTIMEFERR (\"INDEX$\", ERROR, k, l); return(NULL); } va_end (ap); result = (char *) __b2c__hash_find_value_do (inv, value); idx++; if (idx == __b2c_STRING_FUNC) { idx = 0; } len = __b2c__len (result); buf[idx] = (char *) __b2c_str_realloc (buf[idx], len + 1); memmove (buf[idx], result, len); __b2c__SETLEN (buf[idx], len); buf[idx][len] = '\0'; __b2c__hash_clear (inv); free (inv); return ((char *) buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//invert/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "INVERT(" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c__invert (int line, char *k, int type, __b2c__htable ** name) { __b2c__htable *inv, *ptr; char bf[${g_MAX_DIGITS} + 1] = { 0 }; unsigned short pos; char *swap = NULL; int j, coll = 0; double d; float f; int i; long l; short s; char c; if (*name == NULL || (*name)->total == 0) { return (0); } inv = __b2c__hash_new (); ptr = *name; do { for (j = 0; j < ptr->total; j++) { pos = __b2c__HashFNV1a_16(ptr->index[j]); switch (type) { case 0: swap = (char*)ptr->value[pos]; break;" >> $g_FUNCTIONS
     echo "case 1: snprintf (bf, ${g_MAX_DIGITS}, \"%g\", *(double *) ptr->value[pos]); d = atof(ptr->index[j]); break; case 2: snprintf (bf, ${g_MAX_DIGITS}, \"%g\", *(float *) ptr->value[pos]); f = atof(ptr->index[j]); break; case 3: snprintf (bf, ${g_MAX_DIGITS}, \"%ld\", *(long *) ptr->value[pos]); l = atol(ptr->index[j]); break; case 4: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", *(int *) ptr->value[pos]); i = atoi(ptr->index[j]); break;" >> $g_FUNCTIONS
-    echo "case 5: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", *(short *) ptr->value[pos]); s = atoi(ptr->index[j]); break; case 6: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", *(char *) ptr->value[pos]); c = atoi(ptr->index[j]); break; default: if (__b2c__trap) { ERROR = 43; RUNTIMEFERR (\"INVERT\", ERROR, k, line); return(0); } } if(__b2c__hash_find_value_do(inv, bf) || __b2c__hash_find_value_do(inv, swap)) { coll++; } switch(type) { case 0: __b2c__hash_add_str(inv, ptr->index[j], swap); break;" >> $g_FUNCTIONS
-    echo "case 1: __b2c__hash_add(inv, &d, bf); break; case 2: __b2c__hash_add(inv, &f, bf); break; case 3: __b2c__hash_add(inv, &l, bf); break; case 4: __b2c__hash_add(inv, &i, bf); break; case 5: __b2c__hash_add(inv, &s, bf); break; case 6: __b2c__hash_add(inv, &c, bf); break; default: if (__b2c__trap) { ERROR = 43; RUNTIMEFERR (\"INVERT\", ERROR, k, line); return(0); } } } ptr = ptr->next; } while (ptr); __b2c__hash_clear (*name);" >> $g_FUNCTIONS
+    echo "case 5: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", *(short *) ptr->value[pos]); s = atoi(ptr->index[j]); break; case 6: snprintf (bf, ${g_MAX_DIGITS}, \"%d\", *(char *) ptr->value[pos]); c = atoi(ptr->index[j]); break; default: ERROR = 43; RUNTIMEFERR (\"INVERT\", ERROR, k, line); return(0); } if(__b2c__hash_find_value_do(inv, bf) || __b2c__hash_find_value_do(inv, swap)) { coll++; } switch(type) { case 0: __b2c__hash_add_str(inv, ptr->index[j], swap); break;" >> $g_FUNCTIONS
+    echo "case 1: __b2c__hash_add(inv, &d, bf); break; case 2: __b2c__hash_add(inv, &f, bf); break; case 3: __b2c__hash_add(inv, &l, bf); break; case 4: __b2c__hash_add(inv, &i, bf); break; case 5: __b2c__hash_add(inv, &s, bf); break; case 6: __b2c__hash_add(inv, &c, bf); break; default: ERROR = 43; RUNTIMEFERR (\"INVERT\", ERROR, k, line); return(0); } } ptr = ptr->next; } while (ptr); __b2c__hash_clear (*name);" >> $g_FUNCTIONS
     echo "free(*name); *name = inv; return(coll); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//insert/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "INSERT\$(" <<<${g_DEPEND}) ]]
 then
     echo "char * __b2c__insert (int l, char *k, char *src, int pos, char *str) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long len, tot, blen; if (str == NULL) { return (src); } if (src == NULL) { return(str); } len = __b2c__len (src); tot = __b2c__len (str);" >> $g_FUNCTIONS
     echo "idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], len+tot+1); pos--; if (pos <= 0) { memmove(buf[idx], str, tot); memmove(buf[idx] + tot, src, len); } else if (pos > len) { memmove(buf[idx], src, len);" >> $g_FUNCTIONS
@@ -10008,13 +9945,13 @@ then
     echo "__b2c__SETLEN(buf[idx], len + tot); buf[idx][len + tot] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//instring/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "INSTR(" <<<${g_DEPEND}) ]]
 then
     echo "long __b2c__instr(int l, char *k, char *first, char *tmp, int pos) { char *result; if (first == NULL) { return (0); } if (tmp == NULL || __b2c__len (tmp) == 0) { return (0); } if (pos <= 0) {  pos = 1; }" >> $g_FUNCTIONS
     echo "result = strstr (first + pos - 1, tmp); if(result == NULL) {  return (0); } if (__b2c__option_utf8) { return (long) __b2c__ucs2_clen (l, k, \"INSTR\", first, result - first + 1); } return (long) (result - first + 1); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//instrrev/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "INSTRREV(" <<<${g_DEPEND}) ]]
 then
     echo "long __b2c__instrrev(int m, char *k, char *first, char *tmp, int pos) { char *result, *found; long l; if (first == NULL){ return (0);} if (tmp == NULL || __b2c__len (tmp) == 0) { return (0); } if (pos < 0) { pos = 0; }" >> $g_FUNCTIONS
     echo "l = __b2c__len (first); found = first; do { result = strstr (found, tmp); if (result != NULL && result <= first + l - pos) { found = result + 1; continue; } if (result > first + l - pos) result = NULL; } while (result != NULL);" >> $g_FUNCTIONS
@@ -10022,7 +9959,7 @@ then
     echo "return (long) (l - (found - first) + 1); } if (__b2c__option_utf8) { return (long) __b2c__ucs2_clen (m, k, \"INSTRREV\", first, found - first); } return (long) (found - first); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//lcase/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "LCASE\$(" <<<${g_DEPEND}) ]]
 then
     echo "char * __b2c__lcase(int l, char *k, char *src) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long len, i; size_t mbslen; wchar_t *wcs, *wp; char *local; if (src == NULL) { return (NULL); } len = __b2c__len (src); idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; }" >> $g_FUNCTIONS
     echo "buf[idx] = (char*)__b2c_str_realloc(buf[idx], len+1); if (__b2c__option_utf8) { local = setlocale (LC_ALL, \"\"); if ((mbslen = mbstowcs (NULL, src, 0)) == (size_t) - 1) { ERROR = 38; RUNTIMEFERR (\"LCASE$\", ERROR, k, l); return(NULL); } wcs = (wchar_t*)calloc (mbslen + 1, sizeof (wchar_t));" >> $g_FUNCTIONS
@@ -10030,36 +9967,23 @@ then
     echo "setlocale (LC_ALL, local); } else { for (i = 0; i < len; i++) { buf[idx][i] = tolower(src[i]); } } __b2c__SETLEN(buf[idx], len); buf[idx][len] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//left/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "LEFT\$(" <<<${g_DEPEND}) ]]
 then
     echo "char * __b2c__left(int l, char *k, char *src, unsigned long n) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; unsigned long length; if (src == NULL) { return (NULL); } idx++; if (idx == __b2c_STRING_FUNC) { idx = 0; } length = __b2c__len (src);" >> $g_FUNCTIONS
     echo "if (n > (__b2c__option_utf8 ? __b2c__ucs2_clen (l, k, \"LEFT$\", src, length) : length)) { return(src); } else { if (__b2c__option_utf8)" >> $g_FUNCTIONS
     echo "{ n = __b2c__blen (l, k, \"LEFT$\", src, n, 0); } buf[idx] = (char *) __b2c_str_realloc (buf[idx], n+1); memmove(buf[idx], src, n); __b2c__SETLEN (buf[idx], n); buf[idx][n] = '\0'; } return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//load/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "BLOAD\(|LOAD\\$\(" <<<${g_DEPEND}) ]]
 then
-    echo "char* __b2c__load(int flag, int l, char *k, char *file) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; FILE *handle; struct stat bf; void* mem; handle = fopen ((const char*)file, \"r\"); if(handle == NULL && __b2c__trap)" >> $g_FUNCTIONS
-    echo "{ ERROR = 2; RUNTIMEFERR (\"LOAD$/BLOAD\", ERROR, k, l); return(NULL); } if(stat(file, &bf) < 0 && __b2c__trap) { ERROR = 24; RUNTIMEFERR (\"LOAD$/BLOAD\", ERROR, k, l); return(NULL); } if(flag) { mem = calloc(bf.st_size+__b2c__option_memstream, sizeof(char));" >> $g_FUNCTIONS
-    echo "if(fread (mem, sizeof (char), bf.st_size, handle) != (size_t)bf.st_size && __b2c__trap) { ERROR = 2; RUNTIMEFERR(\"BLOAD\", ERROR, k, l); return(NULL); } fclose(handle); return(char*)(mem); } else" >> $g_FUNCTIONS
-    echo "{ idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], bf.st_size + 1); if(fread(buf[idx], sizeof (char), bf.st_size, handle) != (size_t)bf.st_size && __b2c__trap)" >> $g_FUNCTIONS
+    echo "char* __b2c__load(int flag, int l, char *k, char *file) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; FILE *handle; struct stat bf; void* mem; handle = fopen ((const char*)file, \"r\"); if(handle == NULL)" >> $g_FUNCTIONS
+    echo "{ ERROR = 2; RUNTIMEFERR (\"LOAD$/BLOAD\", ERROR, k, l); return(NULL); } if(stat(file, &bf) < 0) { ERROR = 24; RUNTIMEFERR (\"LOAD$/BLOAD\", ERROR, k, l); return(NULL); } if(flag) { mem = calloc(bf.st_size+__b2c__option_memstream, sizeof(char));" >> $g_FUNCTIONS
+    echo "if(fread (mem, sizeof (char), bf.st_size, handle) != (size_t)bf.st_size) { ERROR = 2; RUNTIMEFERR(\"BLOAD\", ERROR, k, l); return(NULL); } fclose(handle); return(char*)(mem); } else" >> $g_FUNCTIONS
+    echo "{ idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], bf.st_size + 1); if(fread(buf[idx], sizeof (char), bf.st_size, handle) != (size_t)bf.st_size)" >> $g_FUNCTIONS
     echo "{ ERROR = 2; RUNTIMEFERR (\"LOAD$\", ERROR, k, l); return(NULL); } __b2c__SETLEN(buf[idx], bf.st_size); buf[idx][bf.st_size] = '\0'; fclose(handle); return(char*)(buf[idx]); } }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//memcheck/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-then
-    echo "void __b2c__catch_signal(int sig){" >> $g_FUNCTIONS
-    echo "switch (sig) {case SIGABRT: fprintf(stderr, \"ERROR: signal ABORT received - internal error. Try to compile the program with TRAP LOCAL to find the cause.\n\"); break;" >> $g_FUNCTIONS
-    echo "case SIGFPE: fprintf(stderr, \"ERROR: signal for FPE received - division by zero? Examine the calculations in the program.\n\"); break;" >> $g_FUNCTIONS
-    echo "case SIGSEGV: fprintf(stderr, \"ERROR: signal for SEGMENTATION FAULT received - memory invalid or array out of bounds? Try to compile the program with TRAP LOCAL to find the cause.\n\"); break;" >> $g_FUNCTIONS
-    echo "case SIGILL: fprintf(stderr, \"ERROR: signal for ILLEGAL INSTRUCTION received - executing the program on other hardware? Try to recompile the program from scratch.\n\"); break;} exit(sig);}" >> $g_FUNCTIONS
-    echo "void __b2c__segv(int sig){ longjmp(__b2c__jump, 1); }" >> $g_FUNCTIONS
-    echo "int __b2c__memory__check (char *x, int size) { volatile char c; unsigned int i, illegal = 1; struct sigaction osa, psa; sigaction(SIGSEGV, NULL, &osa); if (osa.sa_handler != SIG_IGN)" >> $g_FUNCTIONS
-    echo "{ memset(&psa, 0, sizeof(psa)); psa.sa_flags = SA_NODEFER|SA_RESTART; psa.sa_handler = __b2c__segv; sigaction(SIGSEGV, &psa, NULL); } if (!setjmp (__b2c__jump))" >> $g_FUNCTIONS
-    echo "{ for (i = 0; i < size; i++) { c = *(char*)(x+i); /* Use c to avoid warning */ if(c) {;} } } else { illegal = 0; } sigaction(SIGSEGV, &osa, NULL); return (illegal); }" >> $g_FUNCTIONS
-fi
-
-if [[ ${TOTAL//mid/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "MID\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__mid(int l, char *k, char **swap, int type, char *src, long pos, long length) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long src_len; if (src == NULL) { if (type == 1) { *swap = __b2c_Copy_String (*swap, NULL); } return(NULL); }" >> $g_FUNCTIONS
     echo "idx++; if (idx == __b2c_STRING_FUNC) { idx = 0; } src_len = __b2c__len (src); pos -= 1; if (pos < 0) { pos = (__b2c__option_utf8 ? __b2c__ucs2_clen (l, k, \"MID$\", src, src_len) : src_len) + 1 + pos; } if (__b2c__option_utf8) { pos = __b2c__blen (l, k, \"MID$\", src, pos, 0); }" >> $g_FUNCTIONS
@@ -10067,49 +9991,43 @@ then
     echo "buf[idx] = (char*)__b2c_str_realloc(buf[idx], length + 1); memmove (buf[idx], src + pos, length); __b2c__SETLEN (buf[idx], length); buf[idx][length] = '\0'; if (type == 1) { return (__b2c_Swap_String (swap, &buf[idx])); } return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//minmax/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "OS\\$" <<<${g_DEPEND}) ]]
 then
-    echo "char* __b2c__min_str(char* x, char* y) {if(strcmp(x, y) < 0) { return(x); } return(y);}" >> $g_FUNCTIONS
-    echo "char* __b2c__max_str(char* x, char* y) {if(strcmp(x, y) > 0) { return(x); } return(y);}" >> $g_FUNCTIONS
-fi
-
-if [[ ${TOTAL//os/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-then
-    echo "char *__b2c__os(int l, char *k) { static char *result = NULL ; struct utsname bf; unsigned int len = 0; if(!result) { result = (char*)__b2c_str_realloc(result, 256 * sizeof (char)); if (uname(&bf) < 0 && __b2c__trap)" >> $g_FUNCTIONS
+    echo "char *__b2c__os(int l, char *k) { static char *result = NULL ; struct utsname bf; unsigned int len = 0; if(!result) { result = (char*)__b2c_str_realloc(result, 256 * sizeof (char)); if (uname(&bf) < 0)" >> $g_FUNCTIONS
     echo "{ ERROR = 26; RUNTIMEFERR(\"OS$\", ERROR, k, l); return(NULL); } strncpy(result, bf.sysname, 64); len += strlen(bf.sysname); strncat(result, \" \", 2); len++; strncat(result, bf.machine, 128);" >> $g_FUNCTIONS
     echo "len += strlen(bf.machine); __b2c__SETLEN(result, len); result[len] = '\0'; } return(char*)result; }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//peek/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "PEEK(" <<<${g_DEPEND}) ]]
 then
-    echo "int __b2c__peek_check(int l, char *k, char* x, int size) {if(__b2c__trap) {if(!__b2c__memory__check((char*)x, size)) {ERROR=1; RUNTIMEFERR(\"PEEK\", ERROR, k, l); return(0); } } return(0); }" >> $g_FUNCTIONS
+    echo "void *__b2c__peek_check(int l, char *k, char *x, int size) { if(!__b2c__memory__check((char*)x, size)) { ERROR=1; RUNTIMEFERR(\"PEEK\", ERROR, k, l); } return((void*)x); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//recursive/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "RECURSIVE[[:space:]]" <<<${g_DEPEND}) ]]
 then
-    echo "int __b2c__rmrecursive(int l, char *k, char *dir){DIR *mydir; char *path, *item = NULL; struct stat buf = { 0 }; struct dirent *next = { NULL }; mydir = opendir(dir); if(mydir == NULL) {if(__b2c__trap) {ERROR = 8; RUNTIMEFERR(\"DELETE RECURSIVE\", ERROR, k, l); return(0);} }" >> $g_FUNCTIONS
+    echo "int __b2c__rmrecursive(int l, char *k, char *dir){ DIR *mydir; char *path, *item = NULL; struct stat buf = { 0 }; struct dirent *next = { NULL }; mydir = opendir(dir); if(mydir == NULL) { ERROR = 8; RUNTIMEFERR(\"DELETE RECURSIVE\", ERROR, k, l); return(0); }" >> $g_FUNCTIONS
     echo "while (1) { if (item != NULL) free(item); next = readdir(mydir); if(next != NULL) { item = (char*)calloc((strlen (next->d_name) + 1), sizeof(char));" >> $g_FUNCTIONS
     echo "strcpy(item, next->d_name); } else { break; } if (!strcmp (item, \".\") || !strcmp(item, \"..\") ) continue; path = (char*)calloc(strlen(dir)+strlen(item)+2, sizeof(char));" >> $g_FUNCTIONS
     echo "strcpy(path, dir); strcat(path, \"/\"); strcat(path, item); lstat(path, &buf); if(S_ISDIR (buf.st_mode)) { __b2c__rmrecursive(l, k, path); } else { if(remove(path) < 0)" >> $g_FUNCTIONS
-    echo "{ if(__b2c__trap) { ERROR = 7; RUNTIMEFERR(\"DELETE RECURSIVE\", ERROR, k, l); return(0); } } } if(path != NULL) free(path); } closedir(mydir); if(remove(dir) < 0)" >> $g_FUNCTIONS
-    echo "{ if(__b2c__trap) { ERROR = 7; RUNTIMEFERR(\"DELETE RECURSIVE\", ERROR, k, l); return(0); } } return(0);}" >> $g_FUNCTIONS
+    echo "{ ERROR = 7; RUNTIMEFERR(\"DELETE RECURSIVE\", ERROR, k, l); return(0); } } if(path != NULL) free(path); } closedir(mydir); if(remove(dir) < 0)" >> $g_FUNCTIONS
+    echo "{ ERROR = 7; RUNTIMEFERR(\"DELETE RECURSIVE\", ERROR, k, l); return(0); } return(0); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//reverse/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "REVERSE\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__reverse(int l, char *k, char *src) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long i, length, len, blen; if (src == NULL) { return (NULL); } length = __b2c__len (src); idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; }" >> $g_FUNCTIONS
     echo "buf[idx] = (char*)__b2c_str_realloc(buf[idx], length+1); if(__b2c__option_utf8) { len = length; while (len > 0) { blen = __b2c__blen (l, k, \"REVERSE$\", src, 1, 0); memcpy(buf[idx] + len - blen, src, blen); src += blen; len -= blen; } } else" >> $g_FUNCTIONS
     echo "{ for (i = 0; i < length; i++) { buf[idx][i] = src[length-i-1]; } } __b2c__SETLEN(buf[idx], length); buf[idx][length] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//right/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "RIGHT\$(" <<<${g_DEPEND}) ]]
 then
     echo "char * __b2c__right (int l, char *k, char *src, unsigned long n) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; unsigned long length; if (src == NULL) { return (NULL); } idx++; if (idx == __b2c_STRING_FUNC) { idx = 0; } length = __b2c__len (src);" >> $g_FUNCTIONS
     echo "if (n > (__b2c__option_utf8 ? __b2c__ucs2_clen (l, k, \"RIGHT$\", src, length) : length)) { return(src); } else { if (__b2c__option_utf8)" >> $g_FUNCTIONS
     echo "{ n = __b2c__blen (l, k, \"RIGHT$\", src, n, 1); } buf[idx] = (char*)__b2c_str_realloc(buf[idx], n+1); memmove(buf[idx], src + length - n, n); __b2c__SETLEN(buf[idx], n); buf[idx][n] = '\0'; } return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//rip/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "RIP\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__rip(int l, char *k, char *src, long pos, long length) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long src_len; if (src == NULL) { return (NULL); } src_len = __b2c__len (src); pos -= 1;" >> $g_FUNCTIONS
     echo "if (pos < 0) { pos = (__b2c__option_utf8 ? __b2c__ucs2_clen (l, k, \"RIP$\", src, src_len) : src_len) + 1 + pos; } if (__b2c__option_utf8) { pos = __b2c__blen (l, k, \"RIP$\", src, pos, 0); } if (pos > src_len)" >> $g_FUNCTIONS
@@ -10118,34 +10036,28 @@ then
     echo "__b2c__SETLEN(buf[idx], src_len-length); buf[idx][src_len-length] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//screen/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "COLUMNS|ROWS" <<<${g_DEPEND}) ]]
 then
     echo "long __b2c__screen(int type){long x; struct winsize tmp; ioctl(STDOUT_FILENO, TIOCGWINSZ, &tmp); if(type) { x = tmp.ws_row; } else { x = tmp.ws_col; } return(x); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//search/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "SEARCH(" <<<${g_DEPEND}) ]]
 then
-    echo "long __b2c__search (int l, char *k, FILE *x, char *y, int whence) { long off, pos=0, org_pos; int flag = 0; char *ptr; if (x == NULL && __b2c__trap)" >> $g_FUNCTIONS
-    echo "{ ERROR = 2; RUNTIMEFERR (\"SEARCH\", ERROR, k, l); return(0); } if (y == NULL && __b2c__trap) { ERROR = 25; RUNTIMEFERR (\"SEARCH\", ERROR, k, l); return(0); } org_pos = ftell (x); ptr = (char *) malloc (__b2c__len (y) + 1);" >> $g_FUNCTIONS
+    echo "long __b2c__search (int l, char *k, FILE *x, char *y, int whence) { long off, pos=0, org_pos; int flag = 0; char *ptr; if (x == NULL)" >> $g_FUNCTIONS
+    echo "{ ERROR = 2; RUNTIMEFERR (\"SEARCH\", ERROR, k, l); return(0); } if (y == NULL) { ERROR = 25; RUNTIMEFERR (\"SEARCH\", ERROR, k, l); return(0); } org_pos = ftell (x); ptr = (char *) malloc (__b2c__len (y) + 1);" >> $g_FUNCTIONS
     echo "switch(whence) { case -1: case 0: off = 1; break; case 1: off = 1; break; case 2: off = -1; break; case 3: off = -1; break; default: ERROR = 37; RUNTIMEFERR (\"SEARCH\", ERROR, k, l); return(0); } do { switch(whence) { case -1: case 0: fseek (x, pos, SEEK_SET);" >> $g_FUNCTIONS
     echo "break; case 1: fseek (x, org_pos+pos, SEEK_SET);break; case 2: flag = fseek (x, org_pos- __b2c__len (y)+pos, SEEK_SET); break; case 3: fseek (x, pos-__b2c__len (y), SEEK_END); break; }" >> $g_FUNCTIONS
-    echo "if (fread (ptr, sizeof (char), __b2c__len (y), x) <= 0) { if (__b2c__trap) { ERROR = 2; RUNTIMEFERR (\"SEARCH\", ERROR, k, l); return(0); } } pos += off; } while (!feof (x) && !flag && memcmp (ptr, y, __b2c__len (y)));" >> $g_FUNCTIONS
+    echo "if (fread (ptr, sizeof (char), __b2c__len (y), x) <= 0) { ERROR = 2; RUNTIMEFERR (\"SEARCH\", ERROR, k, l); return(0); } pos += off; } while (!feof (x) && !flag && memcmp (ptr, y, __b2c__len (y)));" >> $g_FUNCTIONS
     echo "if (memcmp (ptr, y, __b2c__len (y))) { pos = -1; } else {pos = ftell(x)-__b2c__len (y); } fseek (x, org_pos, SEEK_SET); free (ptr); return(pos); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//spc/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "SPC\$(" <<<${g_DEPEND}) ]]
 then
-    echo "char *__b2c__spc(int amount) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], amount+1);" >> $g_FUNCTIONS
+    echo "char *__b2c__spc(int amount) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; if(amount <= 0) { return(NULL); } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], amount+1);" >> $g_FUNCTIONS
     echo "memset(buf[idx], 32, amount); __b2c__SETLEN(buf[idx], amount); buf[idx][amount] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//str/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-then
-    echo "char * __b2c__str(double nr) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; int len; idx++; if (idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc (buf[idx], ${g_MAX_DIGITS}); if(floor(nr) == nr)" >> $g_FUNCTIONS
-    echo "{ len = snprintf(buf[idx], ${g_MAX_DIGITS}, \"%ld\", (long)nr); } else { len = snprintf(buf[idx], ${g_MAX_DIGITS}, \"%g\", (double)nr); } __b2c__SETLEN(buf[idx], len); buf[idx][len] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
-fi
-
-if [[ ${TOTAL//sum/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "SUM\(|SUMF\(" <<<${g_DEPEND}) ]]
 then
     echo "long __b2c__sum(int base, long *array, long nr, ...) { va_list ap; long limit = 0, total = 0; int x; va_start (ap, nr); limit = va_arg (ap, long); va_end (ap);" >> $g_FUNCTIONS
     echo "for(x = base; x < nr+base; x++) { if(limit == LONG_MAX){ total += array[x]; } else { if(array[x]>limit) { total += array[x]; } } } return(total); }" >> $g_FUNCTIONS
@@ -10153,20 +10065,20 @@ then
     echo "for(x = base; x < nr+base; x++) { if(limit == DBL_MAX){ total += array[x]; } else { if(array[x]>limit) { total += array[x]; } } } return(total); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//tab/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "TAB\$(" <<<${g_DEPEND}) ]]
 then
-    echo "char *__b2c__tab(int amount) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], amount+1);" >> $g_FUNCTIONS
+    echo "char *__b2c__tab(int amount) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; if(amount <= 0) { return(NULL); } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], amount+1);" >> $g_FUNCTIONS
     echo "memset(buf[idx], 9, amount); __b2c__SETLEN(buf[idx], amount); buf[idx][amount] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//tally/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "TALLY(" <<<${g_DEPEND}) ]]
 then
     echo "long __b2c__tally(char *haystack, char *needle, int pos) { char *res; long total = 0; if (haystack == NULL) { return (0); }" >> $g_FUNCTIONS
     echo "if (needle == NULL || __b2c__len(needle) == 0) { return (0); } if (pos <= 0) { pos = 1; }" >> $g_FUNCTIONS
     echo "haystack+=pos-1; while((res = strstr(haystack, needle)) != NULL) { haystack = res+1; total++; } return((long)total); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//chrono/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "DAY\(|HOUR\(|MINUTE\(|MONTH\(|SECOND\(|WEEK\(|YEAR\(" <<<${g_DEPEND}) ]]
 then 
     echo "long __b2c__time (time_t now, int which){ long result; char *buffer; struct tm *ts; buffer = (char*)calloc(${g_MAX_DIGITS}, sizeof (char)); ts = localtime (&now); switch (which) {" >> $g_FUNCTIONS
     echo "case 1: strftime (buffer, ${g_MAX_DIGITS}, \"%d\", ts); break; case 2: strftime (buffer, ${g_MAX_DIGITS}, \"%m\", ts); break; case 3: strftime (buffer, ${g_MAX_DIGITS}, \"%Y\", ts); break;" >> $g_FUNCTIONS
@@ -10174,19 +10086,7 @@ then
     echo "case 7: strftime (buffer, ${g_MAX_DIGITS}, \"%W\", ts); break; } result = atol(buffer); free(buffer); return(result); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//timer/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-then
-    echo "unsigned long __b2c__timer(int init) { struct timeval time; static time_t elapsed_secs = 0; static int elapsed_usecs = 0; if(init) { gettimeofday(&time, NULL); elapsed_usecs = time.tv_usec; elapsed_secs = time.tv_sec; return(0); }" >> $g_FUNCTIONS
-    echo "else { gettimeofday(&time, NULL); if(difftime(time.tv_sec, elapsed_secs) < 1) { return((unsigned long) (time.tv_usec-elapsed_usecs)/1000); }" >> $g_FUNCTIONS
-    echo "else { return((unsigned long) (difftime(time.tv_sec, elapsed_secs)-1)*1000+((1000000-elapsed_usecs)+time.tv_usec)/1000); } } }" >> $g_FUNCTIONS
-fi
-
-if [[ ${TOTAL//nano/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-then
-    echo "uint64_t __b2c__nanotimer(int init) { static struct timespec before = { 0 }; struct timespec after; if (init) { clock_gettime(CLOCK_MONOTONIC, &before); return(0); } else { clock_gettime(CLOCK_MONOTONIC, &after); return((int64_t)(after.tv_sec - before.tv_sec) * (int64_t)1000000000UL + (int64_t)(after.tv_nsec - before.tv_nsec)); } }" >> $g_FUNCTIONS
-fi
-
-if [[ ${TOTAL//delimengine/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "ALIGN\\$\(|AMOUNT\(|APPEND\\$\(|CHANGE\\$\(|COIL\\$\(|COLLAPSE\\$\(|CUT\\$\(|DEL\\$\(|DELIM\\$\(|EXCHANGE\\$\(|EXEC\\$\(|EXPLODE\\$\(|FIRST\\$\(|FOR[[:space:]]|HASDELIM\(|HEAD\\$\(|INBETWEEN\\$\(|ISTOKEN\(|LAST\\$\(|MAKEDIR[[:space:]]|MATCH\(|MERGE\\$\(|NETWORK[[:space:]]|OUTBETWEEN\\$\(|PARSE[[:space:]]|PROPER\\$\(|REV\\$\(|ROTATE\\$\(|SERVER[[:space:]]|SORT\\$\(|SPLIT[[:space:]]|TAIL\\$\(|TOKEN\\$\(|UNIQ\\$\(|WHERE\(" <<<${g_DEPEND}) ]]
 then
     echo "/* API >>>> nr == 0, use_cache == 0 : rebuild cache | nr != 0, use_cache == 0 : dynamic calc member | nr != 0, use_cache == 1 : use member from cache */" >> $g_FUNCTIONS
     echo "long __b2c__delim_engine_core(int action, int type, long *returned_value, char *string, char *delim, long nr, int use_cache) { static long *cache = NULL, cache_tot = 0, cnt = 0; long x, len, pos = 0, start = 0; int in_string = 0, is_escaped = 0; if(action == 0) { if(cache) { free(cache); cache = NULL; } return(0); } *returned_value = 0; if (string == NULL || string[0] == 0) { return (0); }" >> $g_FUNCTIONS
@@ -10196,38 +10096,30 @@ then
     echo "cache[cnt * 2 + 1] = start; } } if (nr <= cnt) { if (type == 1) { *returned_value = cache[nr*2]; pos = cache[nr*2+1]; } else { *returned_value = cnt; pos = cache[nr*2+1]; } } return(pos); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//argument/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-then
-    echo "void __b2c__argument(char **arg, int total, char **data) { long x, dlen, slen, pos, tot_len = 0; char quote[] = { 34, 0 }; if (total == 0) { *arg = NULL; } else { dlen = __b2c__len (__b2c__option_delim); for (pos = 0; pos < total; pos++)" >> $g_FUNCTIONS
-    echo "{ slen = strlen(data[pos]); *arg = (char*)__b2c_str_realloc(*arg, tot_len + slen * 2 + dlen + 1); if (strstr (data[pos], \" \") || strstr (data[pos], \"\\\"\")) { (*arg)[tot_len++] = 34; for (x = 0; data[pos][x] != 0; x++) { if (data[pos][x] == quote[0])" >> $g_FUNCTIONS
-    echo "{ (*arg)[tot_len++] = __b2c__option_esc; } (*arg)[tot_len++] = data[pos][x]; } (*arg)[tot_len++] = 34; } else { memmove (*arg + tot_len, data[pos], slen); tot_len += slen; } if (pos < total - 1) { memmove (*arg + tot_len, __b2c__option_delim, dlen);" >> $g_FUNCTIONS
-    echo "tot_len += dlen; } } __b2c__SETLEN(*arg, tot_len); (*arg)[tot_len] = 0; } }" >> $g_FUNCTIONS
-fi
-
-if [[ ${TOTAL//token/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "TOKEN\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__token(char *string, long nr, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long start; long length = 0; if (string == NULL || nr < 1) { return (NULL); }" >> $g_FUNCTIONS
     echo "start = __b2c__delim_engine(1, &length, string, delim, nr); if(length == 0) { return(NULL); } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; }" >> $g_FUNCTIONS
     echo "buf[idx] = (char*)__b2c_str_realloc(buf[idx], length+1); memmove(buf[idx], string + start, length); __b2c__SETLEN(buf[idx], length); buf[idx][length] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//where/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "WHERE(" <<<${g_DEPEND}) ]]
 then
     echo "long __b2c__where (char *string, long nr, char *delim) { long result = 0, length = 0; if (string == NULL || nr < 1) { return (0); } result = __b2c__delim_engine (1, &length, string, delim, nr); return(result+1); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//amount/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "AMOUNT(" <<<${g_DEPEND}) ]]
 then
     echo "long __b2c__amount(char *string, char *delim) { long amount = 0; if (string == NULL) { return (0); } __b2c__delim_engine(2, &amount, string, delim, 0); return(amount); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//hasdelim/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "HASDELIM(" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c__hasdelim (char *string, char *delim) { long length = 0; long start = 0; if (string == NULL) { return (0); }" >> $g_FUNCTIONS
     echo "start = __b2c__delim_engine (2, &length, string, delim, 2); if(start == 0) { return (0); } if (delim == NULL) { delim = __b2c__option_delim; } return (start-__b2c__len (delim)+1); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//exchange/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "EXCHANGE\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__exchange (char *string, int index1, int index2, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long tmp, tlen, len1, len2, start1 = 0, start2 = 0; long length = 0;" >> $g_FUNCTIONS
     echo "if (string == NULL || index1 <= 0 || index2 <= 0) { return (string); } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } start1 = __b2c__delim_engine(1, &length, string, delim, index1);" >> $g_FUNCTIONS
@@ -10238,7 +10130,7 @@ then
     echo "__b2c__SETLEN(buf[idx], tlen); buf[idx][tlen] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//change/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "CHANGE\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__change(char *string, int index, char *cnew, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long tlen, start, len, nlen; long length = 0; if(string == NULL) { return(cnew); }" >> $g_FUNCTIONS
     echo "if (index <= 0) { return (string); } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } start = __b2c__delim_engine(1, &length, string, delim, index); len = length; tlen = __b2c__len(string); nlen = __b2c__len(cnew);" >> $g_FUNCTIONS
@@ -10246,14 +10138,14 @@ then
     echo "__b2c__SETLEN(buf[idx], tlen - len + nlen); buf[idx][tlen-len+nlen] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//istok/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "ISTOKEN(" <<<${g_DEPEND}) ]]
 then
     echo "long __b2c__istoken(char *string, char *token, char *delim) { long len, start, x, result = 0; long length = 0, amount = 0; if(string == NULL) { return(0); } if(delim == NULL)" >> $g_FUNCTIONS
     echo "{ delim = __b2c__option_delim; } len = __b2c__len(token); if(len==0) { return(0); } start = __b2c__delim_engine (2, &amount, string, delim, 0); for(x = 0; x < amount; x++)" >> $g_FUNCTIONS
     echo "{ start = __b2c__delim_engine_cache(1, &length, string, delim, x+1); if(len == length && memcmp(string + start, token, len) == 0) { result = x+1; break; } } return (result); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//uniq/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "UNIQ\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__uniq(char *string, char *delim) { long x, start, amount = 0, length = 0; int t = 1; __b2c__htable *table; char *item, *result; if(string == NULL) { return (string); }" >> $g_FUNCTIONS
     echo "if(delim == NULL) { delim = __b2c__option_delim; } start = __b2c__delim_engine (2, &amount, string, delim, 0); if(amount <= 1) { return (string); }" >> $g_FUNCTIONS
@@ -10262,7 +10154,7 @@ then
     echo "__b2c__hash_clear(table); free(table); return(result); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//sortdelim/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "SORT\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__sort(char *string, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; char **array; char *buffer, *backup; long start, total = 0, x, len, dlen; long amount = 0; long length = 0;" >> $g_FUNCTIONS
     echo "if(string == NULL) { return (string); } if (delim == NULL) { delim = __b2c__option_delim; } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } dlen = __b2c__len (delim); buf[idx] = (char*)__b2c_str_realloc(buf[idx], __b2c__len(string)+1);" >> $g_FUNCTIONS
@@ -10274,14 +10166,14 @@ then
     echo "total += dlen; } } __b2c__STRFREE(backup); free(array); __b2c__SETLEN(buf[idx], total); buf[idx][total] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//sortassoc/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "SORT[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "void __b2c__assoc_sort(__b2c__htable **name, int type, int (*compare) (const void *, const void *)) { char **results = {  NULL }; int total; char *value; __b2c__htable *ptr; int i; total =  __b2c__lookup_by_sort(*name, &results, 0, 0, type, compare);" >> $g_FUNCTIONS
     echo "ptr = __b2c__hash_new(); for (i = 0; i < total; i++) { value = (char *) __b2c__hash_find_value_do(*name, results[i]); if(type == 0) { __b2c__hash_add_str(ptr, value, results[i]); } else { __b2c__hash_add(ptr, value, results[i]); } } __b2c__hash_clear (*name); free (*name); *name = ptr;" >> $g_FUNCTIONS
     echo "if(results) { __b2c__free_str_array_members(&results, 0, total); free(results); } }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//revstr/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "REV\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__rev(char *string, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long start, total, x, len, dlen; long amount = 0; long length = 0; if (string == NULL) { return (string); }" >> $g_FUNCTIONS
     echo "len = __b2c__len (string); if (delim == NULL) { delim = __b2c__option_delim; } dlen = __b2c__len (delim); idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } start = __b2c__delim_engine (2, &amount, string, delim, 0);" >> $g_FUNCTIONS
@@ -10290,7 +10182,7 @@ then
     echo "__b2c__SETLEN(buf[idx], len); buf[idx][len] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//delimstr/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "DELIM\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__delim(char *string, char *from, char *to) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long start, total = 0, x, tlen, dlen; long amount = 0; long length = 0; if (string == NULL) { return (string); }" >> $g_FUNCTIONS
     echo "if(from == NULL) { from = __b2c__option_delim; } if(to == NULL) { to = __b2c__option_delim; } dlen = __b2c__len (from); tlen = __b2c__len (to); idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } start = __b2c__delim_engine (2, &amount, string, from, 0);" >> $g_FUNCTIONS
@@ -10298,7 +10190,7 @@ then
     echo "total += length; if (x < amount-1) { memmove(buf[idx] + total, to, tlen); total += tlen; } string += (start + length + dlen); } __b2c__SETLEN(buf[idx], total); buf[idx][total] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//head/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "HEAD\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__head (char *string, long pos, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long start; long amount = 0; long length = 0; if (string == NULL)" >> $g_FUNCTIONS
     echo "{ return (string); } if (delim == NULL) { delim = __b2c__option_delim; } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } start = __b2c__delim_engine (2, &amount, string, delim, 0);" >> $g_FUNCTIONS
@@ -10306,7 +10198,7 @@ then
     echo "memmove(buf[idx], string, start + length); __b2c__SETLEN(buf[idx], start + length); buf[idx][start + length] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//tail/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "TAIL\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__tail(char *string, long pos, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long start, slen; long amount = 0; long length = 0; if (string == NULL)" >> $g_FUNCTIONS
     echo "{ return (string); } if (delim == NULL) { delim = __b2c__option_delim; } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } start = __b2c__delim_engine (2, &amount, string, delim, 0);" >> $g_FUNCTIONS
@@ -10314,7 +10206,7 @@ then
     echo "start = __b2c__delim_engine_cache(1, &length, string, delim, pos); memmove(buf[idx], string + start, slen-start); __b2c__SETLEN(buf[idx], slen-start); buf[idx][slen-start] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//append/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "APPEND\\$\(|COIL\\$\(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__append(char **swap, int type, char *string, long pos, char *cnew, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long start, dlen, slen, nlen, total = 0; long amount = 0; long length = 0; if (cnew == NULL || pos < 0)" >> $g_FUNCTIONS
     echo "{ if (type == 1) { *swap = __b2c_Copy_String(*swap, string); } return (string); } if (delim == NULL) { delim = __b2c__option_delim; } idx++; if (idx == __b2c_STRING_FUNC) { idx = 0; } start = __b2c__delim_engine (2, &amount, string, delim, 0);" >> $g_FUNCTIONS
@@ -10324,7 +10216,7 @@ then
     echo "buf[idx][total] = '\0'; if (type == 1) { return(__b2c_Swap_String(swap, &buf[idx])); } return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//delstr/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "DEL\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__del(char *string, long pos, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long start, slen, dlen, total = 0; long amount = 0; long length = 0; if (string == NULL)" >> $g_FUNCTIONS
     echo "{ return (string); } if (delim == NULL) { delim = __b2c__option_delim; } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } start = __b2c__delim_engine (2, &amount, string, delim, 0); if (pos < 1 || pos > amount)" >> $g_FUNCTIONS
@@ -10333,7 +10225,7 @@ then
     echo "else { if(total >= dlen) { total -= dlen; } } __b2c__SETLEN(buf[idx], total); buf[idx][total] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//cut/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "CUT\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__cut(char *string, long pos1, long pos2, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long start1, start2, tmp, total = 0; long amount = 0; long length = 0; if (string == NULL)" >> $g_FUNCTIONS
     echo "{ return (string); } if (delim == NULL) { delim = __b2c__option_delim; } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } if (pos1 > pos2) { tmp = pos1; pos1 = pos2; pos2 = tmp; } __b2c__delim_engine (2, &amount, string, delim, 0);" >> $g_FUNCTIONS
@@ -10342,14 +10234,14 @@ then
     echo "buf[idx][total] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//align/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "ALIGN\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__align (int l, char *k, char *str, unsigned long width, int mode, int indent) { static unsigned char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long start, x, y, left, line_start = 0, paragraph_end = 0, last_write_pos, write_pos = 0, characters, last_read_pos, read_pos = 0, wtotal = 0, ctotal = 0, found = 0, tab, pos, spaces;" >> $g_FUNCTIONS
     echo "int quoted, collapse, utf8, preserve = 0; long amount = 0, length = 0, total, lw; char *string = NULL, *backup, *concat, *wrap, *line; if (str == NULL) { return (str); } if (width < 1) { return (NULL); } collapse = __b2c__collapse; quoted = __b2c__option_quoted; utf8 = __b2c__option_utf8; __b2c__option_quoted = 0; backup = string = __b2c__strdup (str);" >> $g_FUNCTIONS
     echo "if ((unsigned char) string[0] == 0xEF && (unsigned char) string[1] == 0xBB && (unsigned char) string[2] == 0xBF) { string += 3; __b2c__option_utf8 = 1; preserve = 1; } for (x = 0; string[x]; x++) { if (string[x] == 10 && string[x + 1] == 10) x++; else if (string[x] == 10) string[x] = 32; }" >> $g_FUNCTIONS
     echo "__b2c__collapse = 1; start = __b2c__delim_engine (2, &amount, string, \" \", 0); concat = (char *) calloc (x + amount + 1, sizeof (char)); for (x = 0; x < amount; x++) { start = __b2c__delim_engine_cache(1, &length, string, \" \", x+1); memmove (concat + ctotal, string + start, length); ctotal += length;" >> $g_FUNCTIONS
     echo "if (x < amount - 1) { memset (concat + ctotal, 32, 1); ctotal += 1; } } __b2c__STRFREE(backup); backup = wrap = (char *) calloc (ctotal*2 + 1, sizeof (char)); while (read_pos < ctotal) { if (*(concat + read_pos) == 32) { if (write_pos == 0) { read_pos++; continue; } else" >> $g_FUNCTIONS
-    echo "{ last_write_pos = wtotal; last_read_pos = read_pos; found = 1; } } memmove (wrap + wtotal, concat + read_pos, 1); write_pos++; wtotal++; if (*(concat + read_pos) == 10) { write_pos = 0; line_start = wtotal; } else if ((__b2c__option_utf8 ? __b2c__ucs2_clen (l, k, \"ALIGN$\", wrap + line_start, write_pos) : write_pos) > width)" >> $g_FUNCTIONS
+    echo "{ last_write_pos = wtotal; last_read_pos = read_pos; found = 1; } } memmove (wrap + wtotal, concat + read_pos, 1); write_pos++; wtotal++; if (*(concat + read_pos) == 10) { write_pos = 0; line_start = wtotal; } else if ((__b2c__option_utf8 ? __b2c__ucs2_clen (l, k, \"ALIGN$\", wrap + line_start, write_pos) : write_pos) >= width)" >> $g_FUNCTIONS
     echo "{ if (found) { memset (wrap + last_write_pos, 10, 1); wtotal = last_write_pos + 1; read_pos = last_read_pos; if (*(concat + read_pos + 1) == 10) { read_pos++; } } else { memset (wrap + wtotal, 10, 1); wtotal += 1; } found = 0; write_pos = 0; line_start = wtotal; } read_pos++; } __b2c__collapse = 0;" >> $g_FUNCTIONS
     echo "start = __b2c__delim_engine (2, &amount, wrap, \"\n\", 0); line_start = 0; idx++; if (idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (unsigned char*)__b2c_str_realloc((char*)buf[idx], amount * indent + amount * width * 4 + 3 + 1); if(preserve) { buf[idx][0] = 0xEF; buf[idx][1] = 0xBB; buf[idx][2] = 0xBF;" >> $g_FUNCTIONS
     echo "line_start += 3; } line = (char *) calloc (width * 4, sizeof (char)); for (x = 1; x <= amount; x++) { __b2c__collapse = 0; paragraph_end = 0; start = __b2c__delim_engine (1, &length, wrap, \"\n\", 1); if(length && (*(wrap + start + length + 1) == 10 || x == amount )) { paragraph_end = 1; } characters = (__b2c__option_utf8 ? __b2c__ucs2_clen (l, k, \"ALIGN$\", wrap + start, length) : length);" >> $g_FUNCTIONS
@@ -10361,7 +10253,7 @@ then
     echo "spaces--; line_start += tab; } } } if (x < amount) { memset (buf[idx] + line_start, '\n', 1); line_start++; } break; } wrap += (start + length + 1); } free(backup); free (concat); free (line); __b2c__option_quoted = quoted; __b2c__collapse = collapse; __b2c__option_utf8 = utf8; __b2c__SETLEN (buf[idx], line_start); buf[idx][line_start] = '\0'; return (char *) (buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//bom/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "EDITBOM\\$\(|HASBOM\(" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c__hasbom(char *string) { if (string == NULL || __b2c__len(string) < 3) { return (0); } if ((unsigned char) string[0] == 0xEF && (unsigned char) string[1] == 0xBB && (unsigned char) string[2] == 0xBF) { return(1); } return(0); }" >> $g_FUNCTIONS
     echo "char *__b2c__editbom(char *string, int edit) { static unsigned char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; int slen; if (string == NULL) { return(NULL); } idx++; if (idx == __b2c_STRING_FUNC) { idx = 0; } slen = __b2c__len(string);" >> $g_FUNCTIONS
@@ -10370,18 +10262,18 @@ then
     echo "memcpy(buf[idx], string+3, slen-3); __b2c__SETLEN(buf[idx], slen-3); buf[idx][slen-3] = '\0'; } return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//proper/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "PROPER\$(" <<<${g_DEPEND}) ]]
 then
     echo "char * __b2c__proper(int l, char *k, char *string, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; char *local; long start, total = 0, x, y, dlen, blen; long amount = 0; long length = 0; wchar_t wcs[8] = { 0 }; if (string == NULL) { return (string); }" >> $g_FUNCTIONS
     echo "if (delim == NULL) { delim = __b2c__option_delim; } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } dlen = __b2c__len (delim); start = __b2c__delim_engine (2, &amount, string, delim, 0); buf[idx] = (char*)__b2c_str_realloc(buf[idx], __b2c__len (string)+1); if(__b2c__option_utf8)" >> $g_FUNCTIONS
     echo "{ local = setlocale (LC_ALL, \"\"); for (x = 0; x < amount; x++) { start = __b2c__delim_engine (1, &length, string, delim, 1); blen = __b2c__blen (l, k, \"PROPER$\", string + start, 1, 0); if (mbtowc (wcs, string + start, blen) == (int) - 1) { ERROR = 38; RUNTIMEFERR (\"PROPER$\", ERROR, k, l); return(NULL); }" >> $g_FUNCTIONS
-    echo "*wcs = towupper (*wcs); if (wctomb(buf[idx] + total, *wcs) == (int) - 1) { ERROR = 38; RUNTIMEFERR (\"PROPER$\", ERROR, k, l); return(NULL); } for (y = blen; y < length; y += blen) { blen = __b2c__blen (l, k, \"PROPER$\", string + start + y, 1, 0); if (mbtowc (wcs, string + start + y, blen) == (int) - 1)" >> $g_FUNCTIONS
+    echo "*wcs = towupper (*wcs); if (wctomb(buf[idx] + total, *wcs) == (int) -1) { ERROR = 38; RUNTIMEFERR (\"PROPER$\", ERROR, k, l); return(NULL); } for (y = blen; y < length; y += blen) { blen = __b2c__blen (l, k, \"PROPER$\", string + start + y, 1, 0); if (mbtowc (wcs, string + start + y, blen) == (int) - 1)" >> $g_FUNCTIONS
     echo "{ ERROR = 38; RUNTIMEFERR (\"PROPER$\", ERROR, k, l); return(NULL); } if(__b2c__option_proper == 0) { *wcs = towlower (*wcs); } if (wctomb(buf[idx] + total + y, *wcs) == (int) - 1) { ERROR = 38; RUNTIMEFERR (\"PROPER$\", ERROR, k, l); return(NULL); } } total += length; if (x < amount-1) { memmove(buf[idx] + total, delim, dlen);" >> $g_FUNCTIONS
     echo "total += dlen; } string += (start + length + dlen); } setlocale (LC_ALL, local); } else { for (x = 0; x < amount; x++) { start = __b2c__delim_engine (1, &length, string, delim, 1); *(buf[idx] + total) = toupper(*(string+start)); for (y = 1; y < length; y ++) { *(buf[idx]+total+y) = (__b2c__option_proper == 0 ? tolower(*(string+start+y)) : *(string+start+y)); }" >> $g_FUNCTIONS
     echo "total += length; if (x < amount-1) { memmove(buf[idx] + total, delim, dlen); total += dlen; } string += (start + length + dlen); } } __b2c__SETLEN(buf[idx], total); buf[idx][total] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//rotate/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "ROTATE\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__rotate (char *string, int pos, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long start, total = 0, x, dlen; long amount = 0, length = 0; char *next; if (string == NULL) { return (string); } if (delim == NULL) { delim = __b2c__option_delim; }" >> $g_FUNCTIONS
     echo "idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } dlen = __b2c__len (delim); start = __b2c__delim_engine (2, &amount, string, delim, 0); if (amount <= 1) { return (string); } if (abs (pos) >= amount) { pos = pos % amount; } if (pos == 0) { return (string); } if (pos < 0)" >> $g_FUNCTIONS
@@ -10391,45 +10283,45 @@ then
     echo "__b2c__SETLEN(buf[idx], total);buf[idx][total] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//last/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "LAST\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__last (char *string, int pos, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long start, slen; long amount = 0; long length = 0; if (string == NULL) { return (string); } if (delim == NULL) { delim = __b2c__option_delim; }" >> $g_FUNCTIONS
     echo "idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } start = __b2c__delim_engine (2, &amount, string, delim, 0); if (pos <= 0) { return (string); } if (amount < 1 || pos >= amount) { return (NULL); } slen = __b2c__len (string); buf[idx] = (char*)__b2c_str_realloc(buf[idx], slen + 1);" >> $g_FUNCTIONS
     echo "start = __b2c__delim_engine_cache(1, &length, string, delim, pos+1); memmove(buf[idx], string + start, slen-start); __b2c__SETLEN(buf[idx], slen-start); buf[idx][slen-start] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//first/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "FIRST\$(" <<<${g_DEPEND}) ]]
 then
     echo "char * __b2c__first (char *string, int pos, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long dlen, end; long amount = 0; long length = 0; if (string == NULL) { return (string); } if (delim == NULL) { delim = __b2c__option_delim; }" >> $g_FUNCTIONS
     echo "idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } end = __b2c__delim_engine (2, &amount, string, delim, 0); if (pos <= 0) { return (string); } if (amount < 1 || pos >= amount) { return (NULL); } buf[idx] = (char*)__b2c_str_realloc(buf[idx], __b2c__len (string)+1);" >> $g_FUNCTIONS
     echo "end = __b2c__delim_engine_cache(1, &length, string, delim, amount-pos+1); dlen = __b2c__len (delim); memmove(buf[idx], string, end-dlen); __b2c__SETLEN(buf[idx], end-dlen); buf[idx][end-dlen] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//match/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "MATCH(" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c__match(char *string1, char *string2, long count, char *delim) { long dlen, start1, start2, amount1, amount2, length1, length2, tmplen; int x, found = 1, wildcard = 0, after = 0; if (string1 == NULL && string2 == NULL) { return (1); }" >> $g_FUNCTIONS
-    echo "if (count == 0) { return (1); } if (delim == NULL) { delim = __b2c__option_delim; } start1 = __b2c__delim_engine (2, &amount1, string1, delim, 0); if (count > amount1) { return (0); } if(count == -1) { count = amount1; } dlen = __b2c__len (delim);" >> $g_FUNCTIONS
+    echo "if (count == 0) { return (1); } if (delim == NULL) { delim = __b2c__option_delim; } start1 = __b2c__delim_engine (2, &amount1, string1, delim, 0); if (count > amount1 || amount1 == 0) { return (0); } if(count == -1) { count = amount1; } dlen = __b2c__len (delim);" >> $g_FUNCTIONS
     echo "for (x = 0; x < count; x++) { start1 = __b2c__delim_engine (1, &length1, string1, delim, 1); start2 = __b2c__delim_engine (1, &length2, string2, delim, 1); if (length1 == 0) { found = wildcard; break; } if (length2 == 0)" >> $g_FUNCTIONS
     echo "{ found = wildcard; break; } if (strncmp (string2, \"?\", 1)) { if (!strncmp (string2, \"*\", 1)) { wildcard = 1; __b2c__delim_engine (2, &amount2, string2+1, delim, 0); if(amount2) { after = 1; string2+=1+dlen; } else { after = 0; found = wildcard; break; } }" >> $g_FUNCTIONS
     echo "else { if (!strncmp (string2, \"\\\\?\", 2) || !strncmp (string2, \"\\\\*\", 2)) { string2++; length2--; } } __b2c__delim_engine (1, &tmplen, string2, delim, 1); if(length1 != tmplen || memcmp (string1, string2, tmplen)) { if (wildcard == 0) { found = 0; break; } else { string2 = string2-1-dlen; } }" >> $g_FUNCTIONS
     echo "else { wildcard = 0; after = 0; } if(wildcard == 0) { string2 += (start2 + length1 + dlen); } } else { string2 += (start2 + length2 + dlen); } string1 += (start1 + length1 + dlen); } if(after) { found = 0; } return (found); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//explode/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "EXPLODE\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__explode (int l, char *k, char *string, int pos, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long x, dlen, len, blen, ctr=0, where = 0, escaped = 0, in_string = 0; if (string == NULL || pos <= 0 || pos >= (len = __b2c__len (string)) ) { return (string); } if (delim == NULL) { delim = __b2c__option_delim; }" >> $g_FUNCTIONS
     echo "dlen = __b2c__len (delim); idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } blen = pos; buf[idx] = (char*)__b2c_str_realloc(buf[idx], len + (len - 1) * dlen + 1); for (x = 0; x < len; x += blen) { if (__b2c__option_utf8) { blen = __b2c__blen(l, k, \"EXPLODE$\", string + x, pos, 0); } if(*(string+x) == __b2c__option_esc) { escaped = 1 - escaped; } if(*(string+x) == 34)" >> $g_FUNCTIONS
     echo "{ if(!escaped && __b2c__option_quoted) { in_string = 1 - in_string; } escaped = 0; } else { escaped = 0; } memmove(buf[idx] + where, string + x, blen); where+=blen; if (x < (len - blen) && !in_string) { memmove(buf[idx] + where, delim, dlen); where+=dlen; ctr+=dlen; } } __b2c__SETLEN(buf[idx], len+ctr); buf[idx][len+ctr] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//merge/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "MERGE\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__merge(char *string, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long start, total = 0, x; long amount = 0; long length = 0; if (string == NULL) { return (string); }" >> $g_FUNCTIONS
     echo "if (delim == NULL) { delim = __b2c__option_delim; } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } start = __b2c__delim_engine (2, &amount, string, delim, 0); buf[idx] = (char*)__b2c_str_realloc(buf[idx], __b2c__len (string) + 1); for(x = 1; x <= amount; x++)" >> $g_FUNCTIONS
     echo "{ start = __b2c__delim_engine_cache(1, &length, string, delim, x); memmove(buf[idx] + total, string + start, length); total += length; } __b2c__SETLEN(buf[idx], total); buf[idx][total] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//between/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "INBETWEEN\\$\(|OUTBETWEEN\\$\(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__inbetween(int flag, char *haystack, char *lm, char *rm, int greedy) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; char *l, *pos; int collapse; long len, start, end=0, in, w1, w2; long length = 0;" >> $g_FUNCTIONS
     echo "if (haystack == NULL || lm == NULL || rm == NULL) { return (NULL); } collapse = __b2c__collapse; __b2c__collapse = 0; idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } start = __b2c__delim_engine (2, &length, haystack, lm, 2);" >> $g_FUNCTIONS
@@ -10442,7 +10334,7 @@ then
     echo "{ l += strlen (lm); buf[idx] = (char*)__b2c_str_realloc(buf[idx], pos - l + 1); memmove(buf[idx], l, pos - l); __b2c__SETLEN(buf[idx], pos - l); buf[idx][pos - l] = '\0'; } __b2c__collapse = collapse; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//ucase/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "UCASE\$(" <<<${g_DEPEND}) ]]
 then
     echo "char * __b2c__ucase(int l, char *k, char *src) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long len, i; size_t mbslen; wchar_t *wcs, *wp; char *local; if (src == NULL) { return (NULL); } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } len = __b2c__len (src);" >> $g_FUNCTIONS
     echo "buf[idx] = (char*)__b2c_str_realloc(buf[idx], len + 1); if(__b2c__option_utf8) { local = setlocale (LC_ALL, \"\"); if ((mbslen = mbstowcs (NULL, src, 0)) == (size_t) - 1) { ERROR = 38; RUNTIMEFERR (\"UCASE$\", ERROR, k, l); return(NULL); } wcs = (wchar_t*)calloc (mbslen + 1, sizeof (wchar_t)); if (mbstowcs (wcs, src, mbslen + 1) == (size_t) - 1)" >> $g_FUNCTIONS
@@ -10450,25 +10342,9 @@ then
     echo "setlocale(LC_ALL, local); } else { for (i = 0; i < len; i++) { buf[idx][i] = toupper (src[i]); } } __b2c__SETLEN(buf[idx], len); buf[idx][len] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//utf8/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "WAIT(" <<<${g_DEPEND}) ]]
 then
-    echo "int __b2c_utf8_conv(int txt, char* utf8) { unsigned char b1, b2, b3; int len; if (txt > 0xFFFF) { b1 = txt & 0x0000FF; b2 = (txt & 0x00FF00) >> 8; b3 = (txt & 0xFF0000) >> 16;" >> $g_FUNCTIONS
-    echo "len = snprintf (utf8, 5, \"%c%c%c%c\", 0xF0 | (b3 >> 2), 0x80 | ((b3 & 0x03) << 4) | ((b2 & 0xF0) >> 4), 0x80 | ((b2 & 0x0F) << 2) | ((b1 & 0xC0) >> 6)," >> $g_FUNCTIONS
-    echo "0x80 | (b1 & 0x3F)); } else if (txt > 0x07FF) { b1 = txt & 0x00FF; b2 = (txt & 0xFF00) >> 8; len = snprintf (utf8, 4, \"%c%c%c\", 0xE0 | ((b2 & 0xF0) >> 4)," >> $g_FUNCTIONS
-    echo "0x80 | ((b2 & 0x0F) << 2) | ((b1 & 0xC0) >> 6), 0x80 | (b1 & 0x3F)); } else if (txt > 0x007F) { b1 = txt & 0x00FF; b2 = (txt & 0xFF00) >> 8; len = snprintf (utf8, 3, \"%c%c\"," >> $g_FUNCTIONS
-    echo "0xC0 | (b2 << 2) | ((b1 & 0xC0) >> 6), 0x80 | (b1 & 0x3F)); } else { len = snprintf (utf8, 2, \"%c\", txt & 0x7F); } return(len); }" >> $g_FUNCTIONS
-    echo "unsigned long __b2c__ulen (int l, char *k, char *func, char *ptr, int pos) { long len = 0; if (ptr == NULL) { return(0); } if(pos < 0) { while(*ptr){ if((*ptr&0xF0) == 0xF0) { len++; ptr += 4; } else if((*ptr&0xE0) == 0xE0) { len++; ptr += 3; }" >> $g_FUNCTIONS
-    echo "else if((*ptr&0xC0) == 0xC0) { len++; ptr += 2; } else if((*ptr&0x80) == 0) { len++; ptr++; } else { ERROR = 38; RUNTIMEFERR(func, ERROR, k, l); return(0); } } } else { len = __b2c__ucs2_clen(l, k, \"ULEN\", ptr, pos); } return(len); }" >> $g_FUNCTIONS
-    echo "unsigned long __b2c__blen (int l, char *k, char *func, char *ptr, long c, int flag) { char *org = ptr; if (ptr == NULL){ return (0); }" >> $g_FUNCTIONS
-    echo "if(flag) { c = __b2c__ulen (l, k, \"BYTELEN\", org, -1)-c; } while (*ptr && c > 0) { if ((*ptr & 0xF0) == 0xF0) { ptr += 4; } else if ((*ptr & 0xE0) == 0xE0) { ptr += 3; } else if ((*ptr & 0xC0) == 0xC0) { ptr += 2; } else if ((*ptr & 0x80) == 0)" >> $g_FUNCTIONS
-    echo "{ ptr++; } else { ERROR = 38; fprintf (stderr, \"Cannot decode UTF-8 string: '%s'\n\", org); RUNTIMEFERR (func, ERROR, k, l); return(0); } c--; } if(flag) { return (__b2c__len(org) - (ptr - org)); } else { return (ptr - org); } }" >> $g_FUNCTIONS
-    echo "unsigned long __b2c__ucs2_clen (int l, char* k, char *func, char *ptr, int c) { int len = 0; char *org; if (ptr == NULL) return (0); org = ptr; while (*ptr && c > 0) { if ((*ptr & 0xF0) == 0xF0) { ptr += 4; c -= 4; } else if ((*ptr & 0xE0) == 0xE0)" >> $g_FUNCTIONS
-    echo "{ ptr += 3; c -= 3; } else if ((*ptr & 0xC0) == 0xC0) { ptr += 2; c -= 2; } else if ((*ptr & 0x80) == 0) { ptr++; c--; } else { ERROR = 38; fprintf(stderr, \"Cannot decode UTF-8 string: '%s'\n\", org); RUNTIMEFERR (func, ERROR, k, l); return(0); } len++; } return (len); }" >> $g_FUNCTIONS
-fi
-
-if [[ ${TOTAL//wait/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
-then
-    echo "long __b2c__netpeek(int l, char *k, uintptr_t fd, int usec){fd_set rfds; struct timeval tv; int desc = 0; long retval; struct termios oldt = { 0 }, newt = { 0 }; if(fd == STDIN_FILENO){tcgetattr(STDIN_FILENO, &oldt);" >> $g_FUNCTIONS
+    echo "long __b2c__netpeek(int l, char *k, uintptr_t fd, int usec){fd_set rfds; struct timeval tv; int desc = 0; long retval = 0; struct termios oldt = { 0 }, newt = { 0 }; if(fd == STDIN_FILENO){tcgetattr(STDIN_FILENO, &oldt);" >> $g_FUNCTIONS
     echo "newt = oldt; newt.c_lflag &= ~(ICANON | ECHO); newt.c_cc[VMIN]=1; newt.c_cc[VTIME]=0; tcsetattr(STDIN_FILENO, TCSANOW, &newt);} tv.tv_usec = (usec%1000)*1000; tv.tv_sec = usec/1000; FD_ZERO(&rfds);" >> $g_FUNCTIONS
     echo "if(fd == STDIN_FILENO) { desc = fd; } else {" >> $g_FUNCTIONS
     if [[ ${g_OPTION_TLS} = +(1*|TRUE*) ]]
@@ -10481,32 +10357,32 @@ then
         fi
     fi
     echo "if(!__b2c__option_tls) { desc = fd; } }" >> $g_FUNCTIONS
-    echo "FD_SET(desc, &rfds); retval = select(desc + 1, &rfds, NULL, NULL, &tv); if(retval == -1 && __b2c__trap) { ERROR = 16; RUNTIMEFERR(\"WAIT\", ERROR, k, l); return(0); }" >> $g_FUNCTIONS
+    echo "FD_SET(desc, &rfds); retval = select(desc + 1, &rfds, NULL, NULL, &tv); if(retval == -1) { ERROR = 16; RUNTIMEFERR(\"WAIT\", ERROR, k, l); return(0); }" >> $g_FUNCTIONS
     echo "if(fd == STDIN_FILENO){ if(retval) if(read(fd, &retval, 1)==0) { retval=0; } tcsetattr(STDIN_FILENO, TCSANOW, &oldt);} return(retval); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//extract/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "EXTRACT\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__extract_core(int action, int l, char *k, char *src, char *needle, int flag) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; int reti = 0, len, pos = 0; char *tmp; regex_t regex; char __b2c__buf[100]; regmatch_t where[1];" >> $g_FUNCTIONS
     echo "static __b2c__htable *table_icase = NULL, *table_normal = NULL; void *found = NULL; if(action == 0) { __b2c__hash_clear_regfree(table_icase); free(table_icase); __b2c__hash_clear_regfree(table_normal); free(table_normal); return(NULL); } if (src == NULL || needle == NULL) { return (src); } if (__b2c__len (src) == 0 || __b2c__len (needle) == 0) { return (src); } idx++; if (idx == __b2c_STRING_FUNC)" >> $g_FUNCTIONS
     echo "{ idx = 0; } buf[idx] = (char *) __b2c_str_realloc (buf[idx], __b2c__len (src) + 1); if (flag > 0) { if (__b2c__option_compare == 0) { if (table_normal == NULL) { table_normal = __b2c__hash_new(); } found = __b2c__hash_find_value_do(table_normal, needle);" >> $g_FUNCTIONS
     echo "if(!found) { reti = regcomp(&regex, needle, REG_EXTENDED); if (reti == 0) { __b2c__hash_add_data(table_normal, (void *) &regex, sizeof(regex), needle); } } else { regex = *(regex_t*)found; } } else { if (table_icase == NULL) { table_icase = __b2c__hash_new (); }" >> $g_FUNCTIONS
     echo "found = __b2c__hash_find_value_do(table_icase, needle); if (!found) { reti = regcomp (&regex, needle, REG_EXTENDED|REG_ICASE); if (reti == 0) { __b2c__hash_add_data (table_icase, (void *) &regex, sizeof (regex), needle); } } else { regex = *(regex_t*)found; } }" >> $g_FUNCTIONS
-    echo "if (__b2c__trap && reti) { ERROR = 27; regerror (reti, &regex, __b2c__buf, sizeof (__b2c__buf)); fprintf (stderr, \"%s\n\", __b2c__buf); RUNTIMEFERR(\"EXTRACT$\", ERROR, k, l); return (NULL); } while ((reti = regexec (&regex, src, 1, where, 0)) == 0)" >> $g_FUNCTIONS
+    echo "if(reti) { ERROR = 27; regerror (reti, &regex, __b2c__buf, sizeof (__b2c__buf)); fprintf (stderr, \"%s\n\", __b2c__buf); RUNTIMEFERR(\"EXTRACT$\", ERROR, k, l); return (NULL); } while ((reti = regexec (&regex, src, 1, where, 0)) == 0)" >> $g_FUNCTIONS
     echo "{ memcpy (buf[idx] + pos, src, (size_t) where[0].rm_so); pos += where[0].rm_so; src += (long) where[0].rm_eo; } len = strlen (src); memcpy (buf[idx] + pos, src, len); pos += len; } else { while ((tmp = strstr (src, needle)) != NULL)" >> $g_FUNCTIONS
     echo "{ memcpy (buf[idx] + pos, src, (size_t) (tmp - src)); pos += tmp - src; src = tmp + __b2c__len (needle); } len = strlen (src); memcpy (buf[idx] + pos, src, len); pos += len; } __b2c__SETLEN (buf[idx], pos); buf[idx][pos] = '\0'; return (char *) (buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//regex/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "REGEX(" <<<${g_DEPEND}) ]]
 then
     echo "long __b2c__regex_core (int action, int l, char *k, char *x, char *y) { regex_t reg; int reti = 0; char buf[100]; regmatch_t where[1]; static __b2c__htable *table_icase = NULL, *table_normal = NULL; void *found = NULL; if(action == 0) { __b2c__hash_clear_regfree(table_icase); free(table_icase); __b2c__hash_clear_regfree(table_normal); free(table_normal);" >> $g_FUNCTIONS
     echo "return(0); } if (x == NULL || y == NULL) { return (0); } if (__b2c__option_compare == 0) { if (table_normal == NULL) { table_normal = __b2c__hash_new(); } found = __b2c__hash_find_value_do (table_normal, y); if (!found) { reti = regcomp (&reg, y, REG_EXTENDED); if (reti == 0) { __b2c__hash_add_data (table_normal, (void *) &reg, sizeof (reg), y); } }" >> $g_FUNCTIONS
     echo "else { reg = *(regex_t*)found; } } else { if (table_icase == NULL) { table_icase = __b2c__hash_new(); } found = __b2c__hash_find_value_do (table_icase, y); if (!found) { reti = regcomp (&reg, y, REG_EXTENDED | REG_ICASE); if (reti == 0) { __b2c__hash_add_data (table_icase, (void *) &reg, sizeof (reg), y); } }" >> $g_FUNCTIONS
-    echo "else { reg = *(regex_t*)found; } } if (__b2c__trap && reti) { ERROR = 27; regerror (reti, &reg, buf, sizeof (buf)); fprintf(stderr, \"%s\n\", buf); RUNTIMEFERR(\"REGEX\", ERROR, k, l); return (0); } reti = regexec (&reg, x, 1, where, 0); if (!reti) { REGLEN = where[0].rm_eo - where[0].rm_so;" >> $g_FUNCTIONS
+    echo "else { reg = *(regex_t*)found; } } if(reti) { ERROR = 27; regerror (reti, &reg, buf, sizeof (buf)); fprintf(stderr, \"%s\n\", buf); RUNTIMEFERR(\"REGEX\", ERROR, k, l); return (0); } reti = regexec (&reg, x, 1, where, 0); if (!reti) { REGLEN = where[0].rm_eo - where[0].rm_so;" >> $g_FUNCTIONS
     echo "return (where[0].rm_so + 1); } else { REGLEN = 0; return (0); } }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//replace/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "REPLACE\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__replace_core (int action, int l, char *k, char *haystack, char *needle, char *replace, int flag) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; char *tmp; long replen, hstlen, ndllen, length = 0; regex_t regex; int i, reti = 0; char buffer[100]; regmatch_t where[1];" >> $g_FUNCTIONS
     echo "static __b2c__htable *table_icase = NULL, *table_normal = NULL; void *found = NULL; if(action == 0) { __b2c__hash_clear_regfree(table_icase); free(table_icase); __b2c__hash_clear_regfree(table_normal); free(table_normal); return(NULL); } if (haystack == NULL || needle == NULL) { return (haystack); } if (replace == NULL) { replace = __b2c_EMPTYSTRING; } ndllen = __b2c__len (needle); hstlen = __b2c__len (haystack); if (hstlen == 0 || ndllen == 0)" >> $g_FUNCTIONS
@@ -10514,13 +10390,13 @@ then
     echo "__b2c__SETLEN (buf[idx], i); buf[idx][i] = '\0'; return (char *) (buf[idx]); } buf[idx] = (char *) __b2c_str_realloc (buf[idx], sizeof (char)); buf[idx][0] = '\0'; replen = __b2c__len (replace); if (flag == 1) { if (__b2c__option_compare == 0) { if (table_normal == NULL) { table_normal = __b2c__hash_new (); }" >> $g_FUNCTIONS
     echo "found = __b2c__hash_find_value_do(table_normal, needle); if (!found) { reti = regcomp (&regex, needle, REG_EXTENDED); if (reti == 0) { __b2c__hash_add_data (table_normal, (void *) &regex, sizeof (regex), needle); } } else { regex = *(regex_t*)found; } } else { if (table_icase == NULL)" >> $g_FUNCTIONS
     echo "{ table_icase = __b2c__hash_new (); } found = __b2c__hash_find_value_do(table_icase, needle); if (!found) { reti = regcomp (&regex, needle, REG_EXTENDED | REG_ICASE); if (reti == 0) { __b2c__hash_add_data (table_icase, (void *) &regex, sizeof (regex), needle); } } else { regex = *(regex_t*)found; } }" >> $g_FUNCTIONS
-    echo "if (__b2c__trap && reti) { ERROR = 27; regerror (reti, &regex, buffer, sizeof (buffer)); fprintf (stderr, \"%s\n\", buffer); RUNTIMEFERR (\"REPLACE$\", ERROR, k, l); return (NULL); } while ((reti = regexec (&regex, haystack, 1, where, 0)) == 0) { buf[idx] = (char *) __b2c_str_realloc (buf[idx], length + where[0].rm_so + replen + 1);" >> $g_FUNCTIONS
+    echo "if(reti) { ERROR = 27; regerror (reti, &regex, buffer, sizeof (buffer)); fprintf (stderr, \"%s\n\", buffer); RUNTIMEFERR (\"REPLACE$\", ERROR, k, l); return (NULL); } while ((reti = regexec (&regex, haystack, 1, where, 0)) == 0) { buf[idx] = (char *) __b2c_str_realloc (buf[idx], length + where[0].rm_so + replen + 1);" >> $g_FUNCTIONS
     echo "memcpy (buf[idx] + length, haystack, (size_t) where[0].rm_so); length += where[0].rm_so; memcpy (buf[idx] + length, replace, replen); length += replen; haystack += (long) where[0].rm_eo; }} else { while ((tmp = strstr (haystack, needle)) != NULL) { buf[idx] = (char *) __b2c_str_realloc (buf[idx], length + tmp - haystack + replen + 1);" >> $g_FUNCTIONS
     echo "memcpy (buf[idx] + length, haystack, (size_t) (tmp - haystack)); length += tmp - haystack; memcpy (buf[idx] + length, replace, replen); length += replen; haystack = tmp + ndllen; }} hstlen = strlen (haystack); buf[idx] = (char *) __b2c_str_realloc (buf[idx], length + hstlen + 1); memcpy (buf[idx] + length, haystack, hstlen);" >> $g_FUNCTIONS
     echo "length += hstlen; __b2c__SETLEN (buf[idx], length); buf[idx][length] = '\0'; return (char *) (buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//walk/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "WALK\$(" <<<${g_DEPEND}) ]]
 then
     echo "#ifndef PATH_MAX" >> $g_FUNCTIONS
     echo "#define PATH_MAX 4096" >> $g_FUNCTIONS
@@ -10536,54 +10412,59 @@ then
     echo "flen = strlen(item->d_name); if (plen + flen >= PATH_MAX) { return (-1); } strncat (path, item->d_name, PATH_MAX - plen - 1); flen += plen; if (lstat (path, &bf) < 0 && __b2c__trap) { result = -1; break; } if (__b2c__walk_filter_file (reg, path, type, bf)) { *buf = (char*)__b2c_str_realloc(*buf, total + flen + dlen + 1);" >> $g_FUNCTIONS
     echo "memcpy(*buf+total, path, flen); memcpy(*buf+total+flen, delim, dlen); total += flen + dlen; } } if(total == 0) { dlen = 0; } __b2c__SETLEN(*buf, total - dlen); (*buf)[total - dlen] = '\0'; closedir (here); return (result); }" >> $g_FUNCTIONS
     echo "char *__b2c__walk_core(int action, int l, char *k, char *dir, int type, char *exp, int recurse, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; regex_t reg; char buffer[100]; int reti = 0; static __b2c__htable *table_icase = NULL, *table_normal = NULL; void *found = NULL; if(action == 0) { __b2c__hash_clear_regfree(table_icase); free(table_icase); __b2c__hash_clear_regfree(table_normal); free(table_normal); return(NULL); } if (dir == NULL || exp == NULL)" >> $g_FUNCTIONS
-    echo "{ return (NULL); } if (delim == NULL) { delim = __b2c__option_delim; } if ((type < 1 || type > 127) && __b2c__trap) { ERROR = 5; RUNTIMEFERR(\"WALK$\", ERROR, k, l); return (NULL); } if (__b2c__option_compare == 0) { if (table_normal == NULL) { table_normal = __b2c__hash_new (); } found = __b2c__hash_find_value_do (table_normal, exp);" >> $g_FUNCTIONS
+    echo "{ return (NULL); } if (delim == NULL) { delim = __b2c__option_delim; } if(type < 1 || type > 127) { ERROR = 5; RUNTIMEFERR(\"WALK$\", ERROR, k, l); return (NULL); } if (__b2c__option_compare == 0) { if (table_normal == NULL) { table_normal = __b2c__hash_new (); } found = __b2c__hash_find_value_do (table_normal, exp);" >> $g_FUNCTIONS
     echo "if (!found) { reti = regcomp (&reg, exp, REG_EXTENDED); if (reti == 0) { __b2c__hash_add_data (table_normal, (void *) &reg, sizeof (reg), exp); } } else { reg = *(regex_t*)found; } } else { if (table_icase == NULL) { table_icase = __b2c__hash_new (); } found = __b2c__hash_find_value_do (table_icase, exp); if (!found)" >> $g_FUNCTIONS
-    echo "{ reti = regcomp (&reg, exp, REG_EXTENDED | REG_ICASE); if (reti == 0) { __b2c__hash_add_data (table_icase, (void *) &reg, sizeof (reg), exp); } } else { reg = *(regex_t*)found; } } if (__b2c__trap && reti) { ERROR = 27; regerror (reti, &reg, buffer, sizeof (buffer)); fprintf(stderr, \"%s\n\", buffer); RUNTIMEFERR(\"WALK$\", ERROR, k, l);" >> $g_FUNCTIONS
+    echo "{ reti = regcomp (&reg, exp, REG_EXTENDED | REG_ICASE); if (reti == 0) { __b2c__hash_add_data (table_icase, (void *) &reg, sizeof (reg), exp); } } else { reg = *(regex_t*)found; } } if(reti) { ERROR = 27; regerror (reti, &reg, buffer, sizeof (buffer)); fprintf(stderr, \"%s\n\", buffer); RUNTIMEFERR(\"WALK$\", ERROR, k, l);" >> $g_FUNCTIONS
     echo "return (NULL); } idx++; if (idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char *) __b2c_str_realloc (buf[idx], PATH_MAX * sizeof (char)); if (recurse) { if (__b2c__walk_each_file_recurse (reg, &buf[idx], dir, type, delim) == -1) { ERROR = 24; RUNTIMEFERR(\"WALK$\", ERROR, k, l); return (NULL); } } else" >> $g_FUNCTIONS
     echo "{ if (__b2c__walk_each_file_dir (reg, &buf[idx], dir, type, delim) == -1) { ERROR = 24; RUNTIMEFERR (\"WALK$\", ERROR, k, l); return (NULL); } } return (char *) (buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//eval/} != ${TOTAL} || ${g_OPTION_EVAL} -eq 1 ]]
+if [[ -n $(grep "EVAL(" <<<${g_DEPEND}) || ${g_OPTION_EVAL} -eq 1 ]]
 then
     echo "#include <matheval.h>" >> $g_FUNCTIONS
     echo "double __b2c__eval(int l, char *k, char **vars, double *vals, int nr, char *expr) { void *f; double result; if (expr == NULL) return (0); f = evaluator_create(expr);" >> $g_FUNCTIONS
-    echo "if(f) { result = evaluator_evaluate(f, nr, vars, vals); } else if (__b2c__trap) { ERROR = 39; RUNTIMEFERR(\"EVAL\", ERROR, k, l); return(0); } evaluator_destroy(f); return(result); }" >> $g_FUNCTIONS
+    echo "if(f) { result = evaluator_evaluate(f, nr, vars, vals); } else { ERROR = 39; RUNTIMEFERR(\"EVAL\", ERROR, k, l); return(0); } evaluator_destroy(f); return(result); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//getfile/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "GETFILE[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo -e "void __b2c__getfile(int l, char *k, char **result, DIR * from, int *type) { struct dirent *dir; *type = -1; dir = readdir (from); if (dir != NULL) { *result = __b2c__strdup (dir->d_name);\n#ifdef _DIRENT_HAVE_D_TYPE\nswitch (dir->d_type) { case DT_UNKNOWN: *type = 0; break;" >> $g_FUNCTIONS
-    echo "case DT_REG: *type = 1; break; case DT_DIR: *type = 2; break; case DT_FIFO: *type = 5; break; case DT_SOCK: *type = 7; break; case DT_CHR: *type = 3; break; case DT_BLK: *type = 4; break; case DT_LNK: *type = 6; break; default: if(__b2c__trap)" >> $g_FUNCTIONS
-    echo -e "{ ERROR = 24; RUNTIMEFERR(\"GETFILE\", ERROR, k, l); return; } }\n#endif\n } else { *result = NULL; } }" >> $g_FUNCTIONS
+    echo "case DT_REG: *type = 1; break; case DT_DIR: *type = 2; break; case DT_FIFO: *type = 5; break; case DT_SOCK: *type = 7; break; case DT_CHR: *type = 3; break; case DT_BLK: *type = 4; break; case DT_LNK: *type = 6; break; default:" >> $g_FUNCTIONS
+    echo -e "ERROR = 24; RUNTIMEFERR(\"GETFILE\", ERROR, k, l); return; }\n#endif\n } else { *result = NULL; } }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//copy/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "COPY[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c__copy(const char *from, const char *to) { char buffer[${g_BUFFER_SIZE}]; FILE *in, *out; size_t size; in = fopen(from, \"r\"); out = fopen(to, \"w\"); if(in == NULL || out == NULL) { return(1); }" >> $g_FUNCTIONS
     echo "while((size = fread(buffer, sizeof(char), ${g_BUFFER_SIZE}, in)) > 0) { if(fwrite(buffer, sizeof(char), size, out) != size) { return(1); } } fclose(in); fclose(out); return(0); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//input/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "ASC\(|INPUT[[:space:]]" <<<${g_DEPEND}) ]]
 then
-    echo "void __b2c__input(int l, char *k, char **result, char *sep) { size_t size; ssize_t total; size = ${g_BUFFER_SIZE}; *result = (char*)calloc(${g_BUFFER_SIZE}, sizeof(char));" >> $g_FUNCTIONS
-    echo "total = getdelim(&(*result), &size, ASC(sep), stdin); if(total == 0) { free(*result); *result = NULL; } else if(total > 0 && (*result)[total-1] == ASC(sep)) { (*result)[total-1] = '\0'; } else if (__b2c__trap) { ERROR = 2; RUNTIMEFERR(\"INPUT\", ERROR, k, l); } }" >> $g_FUNCTIONS
+    echo "unsigned char __b2c__asc(char *data) { if(data == NULL) { return(0); } return((unsigned char)*data); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//readln/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "INPUT[[:space:]]" <<<${g_DEPEND}) ]]
+then
+    echo "void __b2c__input(int l, char *k, char **result, char *sep) { size_t size; ssize_t total; size = ${g_BUFFER_SIZE}; *result = (char*)calloc(${g_BUFFER_SIZE}, sizeof(char));" >> $g_FUNCTIONS
+    echo "total = getdelim(&(*result), &size, ASC(sep), stdin); if(total == 0) { free(*result); *result = NULL; } else if(total > 0 && (*result)[total-1] == ASC(sep)) { (*result)[total-1] = '\0'; } else { ERROR = 2; RUNTIMEFERR(\"INPUT\", ERROR, k, l); } }" >> $g_FUNCTIONS
+fi
+
+if [[ -n $(grep "READLN[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "void __b2c__readln(char **result, FILE *from) { size_t size; ssize_t total; size = ${g_BUFFER_SIZE}; *result = (char*)calloc(${g_BUFFER_SIZE}, sizeof(char));" >> $g_FUNCTIONS
     echo "total = getline(&(*result), &size, from); if(total == 0) { free(*result); *result = NULL; } else if(total > 0 && (*result)[total-1] == '\n') { (*result)[total-1] = '\0'; } }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//return/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "RETURN[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__return (char *data) { static char *rbuffer[${g_MAX_RBUFFERS}] = { NULL }; static int rbuffer_ptr = 0; size_t size; if(data == NULL) { return(NULL); } size = __b2c__len (data); if(size == 0) { return(NULL); }" >> $g_FUNCTIONS
-    echo "rbuffer_ptr++; if(rbuffer_ptr >= ${g_MAX_RBUFFERS}) { rbuffer_ptr = 0; } rbuffer[rbuffer_ptr] = (char *) __b2c_str_realloc (rbuffer[rbuffer_ptr], size + 1); memcpy (rbuffer[rbuffer_ptr], data, size + 1);" >> $g_FUNCTIONS
+    echo "rbuffer_ptr++; if(rbuffer_ptr >= ${g_MAX_RBUFFERS}) { rbuffer_ptr = 0; } rbuffer[rbuffer_ptr] = (char *) __b2c_str_realloc (rbuffer[rbuffer_ptr], size); memcpy (rbuffer[rbuffer_ptr], data, size);" >> $g_FUNCTIONS
     echo "__b2c__SETLEN (rbuffer[rbuffer_ptr], size); rbuffer[rbuffer_ptr][size] = '\0'; return (rbuffer[rbuffer_ptr]); }" >> $g_FUNCTIONS
 
 fi
 
-if [[ ${TOTAL//join/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "JOIN[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "void __b2c__join (char **result, char **array, int base, int size, char *by) { long dlen, i, slen, total; dlen = __b2c__len (by); total = __b2c__len (array[0 + base]);" >> $g_FUNCTIONS
     echo "*result = (char*)calloc(total, sizeof(char)+1); memmove(*result, array[0 + base], total); for (i = 1; i < size; i++) { if (array[i + base] != NULL) { slen = __b2c__len (array[i + base]);" >> $g_FUNCTIONS
@@ -10591,7 +10472,7 @@ then
     echo "total += slen; } } (*result)[total] = '\0'; }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//network/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "NETWORK[[:space:]]" <<<${g_DEPEND}) ]]
 then
     if [[ ${g_LIB_TLS} = +(*gnutls*) ]]
     then
@@ -10603,7 +10484,7 @@ then
         echo "gnutls_certificate_free_credentials(cred); return(result); }" >> $g_FUNCTIONS
         echo "SSL_METHOD *TLS_client_method(void) { SSL_METHOD *tls; tls = calloc(1, sizeof(SSL_METHOD)); strncpy(tls->priority_string, ${g_PRIORITY}, 256); tls->connend = 2; return(tls); }" >> $g_FUNCTIONS
     fi
-    echo "int __b2c__network_init(uintptr_t *handle, char *site, char *org, int sock_type, int sock_opt, char *nw_type, int multicast_ttl, int sctp_streams, int capeer, char *cacerts) { struct sockaddr_in *addr, *from; struct hostent *he;" >> $g_FUNCTIONS
+    echo "int __b2c__network_init(uintptr_t *handle, char *site, char *org, int sock_type, int sock_opt, char *nw_type, int multicast_ttl, int sctp_streams, int capeer, char *cacerts, char *priv, char *cert) { struct sockaddr_in *addr, *from; struct hostent *he;" >> $g_FUNCTIONS
     echo "long amount = 0; long length = 0; char data_client[${g_BUFFER_SIZE}]; char *host, *local, *port, *from_client; struct timeval tval; int sock, i, yes = 1; long start; char ttl = 1; __b2c__delim_engine (2, &amount, site, \",\", 0);" >> $g_FUNCTIONS
     echo "addr = (struct sockaddr_in*)calloc(amount, sizeof(*addr)); for(i = 0; i < amount; i++) { start = __b2c__delim_engine (1, &length, site, \",\", i+1); if(length >= ${g_BUFFER_SIZE}) { return(5); } memset(data_client, 0, ${g_BUFFER_SIZE});" >> $g_FUNCTIONS
     echo "strncpy(data_client, site+start, length); if(strstr(data_client, \":\") == NULL) { return(10); } host = strtok(data_client, \":\"); port = strtok(NULL, \":\"); he = gethostbyname(host); if(he == NULL || he->h_addr == NULL) { return(11); }" >> $g_FUNCTIONS
@@ -10643,6 +10524,7 @@ then
         then
             echo "SSL_CTX_set_options(ssl_context, SSL_OP_LEGACY_SERVER_CONNECT);" >> $g_FUNCTIONS
         fi
+        echo "if(priv != NULL && SSL_CTX_use_PrivateKey_file(ssl_context, priv, SSL_FILETYPE_PEM) <= 0) { return(41); } if(cert != NULL && SSL_CTX_use_certificate_file(ssl_context, cert, SSL_FILETYPE_PEM) <= 0) { return(41); }" >> $g_FUNCTIONS
         echo "SSL_CTX_set_options(ssl_context, SSL_OP_ALL); ssl_sock = SSL_new(ssl_context); SSL_set_tlsext_host_name(ssl_sock, host); if(SSL_set_fd(ssl_sock, *handle) == 0) { return(40); }" >> $g_FUNCTIONS
         echo "if((ret = SSL_connect(ssl_sock)) <= 0) { fprintf(stderr, \"SSL CONNECT error: %s\n\", ERR_error_string(SSL_get_error(ssl_sock, ret), NULL)); return(40); }" >> $g_FUNCTIONS
         echo "*handle = (uintptr_t)ssl_sock; }" >> $g_FUNCTIONS
@@ -10650,7 +10532,7 @@ then
     echo "free(addr); return(0); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//server/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "SERVER[[:space:]]" <<<${g_DEPEND}) ]]
 then
     if [[ ${g_LIB_TLS} = +(*gnutls*) ]]
     then
@@ -10695,21 +10577,21 @@ then
         echo "if(__b2c__option_tls) { int result = 0; SSL_CTX *ssl_context = NULL; SSL *ssl_sock = NULL; SSL_library_init(); ssl_context = SSL_CTX_new(TLS_server_method());" >> $g_FUNCTIONS
         echo "if(SSL_CTX_use_PrivateKey_file(ssl_context, priv, SSL_FILETYPE_PEM) <= 0) { return(41); } if(SSL_CTX_use_certificate_file(ssl_context, cert, SSL_FILETYPE_PEM) <= 0) { return(41); }" >> $g_FUNCTIONS
         echo "ssl_sock = SSL_new(ssl_context); SSL_set_fd(ssl_sock, desc); if((result = SSL_accept(ssl_sock)) <= 0){ fprintf(stderr, \"SSL ACCEPT error: %s\n\", ERR_error_string(SSL_get_error(ssl_sock, result), NULL));" >> $g_FUNCTIONS
-        echo "return(-1); } handle = (uintptr_t)ssl_sock; }" >> $g_FUNCTIONS
+        echo "return(-1); } handle = (uintptr_t)ssl_sock; } else { handle = (uintptr_t)desc; }" >> $g_FUNCTIONS
     else
         echo "if(!__b2c__option_tls) { handle = (uintptr_t)desc; }" >> $g_FUNCTIONS
     fi
     echo "return(handle); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//save/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep -E "APPEND[[:space:]]|SAVE[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c__save(int mode, size_t size, char *file, ...) { FILE *outfile; va_list args; char *item; switch(mode){ case 0: case 1: outfile = fopen((const char *) file, \"w\"); break;" >> $g_FUNCTIONS
     echo "case 2: case 3: outfile = fopen((const char *) file, \"a\"); break; } if (outfile == NULL) { return(2); } switch(mode) { case 0: case 2: va_start(args, file); while((item = va_arg(args, char*)) != NULL)" >> $g_FUNCTIONS
     echo "{ fprintf(outfile, \"%s\", item); } va_end(args); break; case 1: case 3: va_start(args, file); if(fwrite(va_arg(args, void*), 1, size, outfile) != size){ return(2); } va_end(args); break; } fclose (outfile); return(0); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//setserial/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "SETSERIAL[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c_setserial(int device, int mode, int param, int value, int donot) { struct termios tty; memset(&tty, 0, sizeof(tty)); if(tcgetattr(device, &tty) != 0) { return(33); } switch(mode)" >> $g_FUNCTIONS
     echo "{ case 0: if(donot) { tty.c_iflag &= value; } else { tty.c_iflag |= value; } break; case 1: if(donot) { tty.c_oflag &= value; } else { tty.c_oflag |= value; } break; case 2: if(donot) { tty.c_cflag &= value; }" >> $g_FUNCTIONS
@@ -10717,13 +10599,13 @@ then
     echo "break; } if(tcsetattr(device, TCSANOW, &tty) != 0) { return(33); } return(0); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//getline/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "GETLINE[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__getline(char **handle) { char *pos, *result; if(*handle == NULL || (*handle)[0] == '\0') { return(NULL); } else { pos = strchr(*handle, '\n'); if(pos)" >> $g_FUNCTIONS
     echo "{ result = __b2c_Copy_N_String(NULL, *handle, (size_t)(pos - *handle)); } else { result = __b2c_Copy_String(NULL, *handle); } *handle += __b2c__len(result); if((*handle)[0] == '\n') { (*handle)++; } } return(result); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//split/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "SPLIT[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "void __b2c__split_by(char ***array, int base, long *amount, char *string, char *by) { long length, i, start; __b2c__free_str_array_members(&(*array), base, *amount);" >> $g_FUNCTIONS
     echo "start = __b2c__delim_engine(2, amount, string, by, 0); *array = (char**)realloc(*array, (*amount+base) * sizeof(char*)); for (i = 0; i < *amount; i++)" >> $g_FUNCTIONS
@@ -10733,33 +10615,33 @@ then
     echo "if (counter > 0) { for (i = 0; i < *amount; i++) { (*array)[i + base] = __b2c_Copy_N_String(NULL, string + i*counter, (size_t)counter); } } }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//for/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "FOR[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "long __b2c__for_amount(char *string, char *step) { long amount = 0; __b2c__delim_engine(2, &amount, string, step, 0); return(amount); }" >> $g_FUNCTIONS
     echo "void __b2c__for_item (char **string, char *step, char **result) { long length = 0; long start; start = __b2c__delim_engine (1, &length, *string, step, 1); if(length == 0) { *result = NULL; } else" >> $g_FUNCTIONS
     echo "{ *result = (char *) __b2c_str_realloc (*result, length + 1); memmove (*result, *string + start, length); __b2c__SETLEN (*result, length); (*result)[length] = '\0'; } *string += (start + length + __b2c__len (step)); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//makedir/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "MAKEDIR[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c__makedir(char *newdir) { long start, amount = 0, length = 0; int item, collapse; char *dir; if (newdir != NULL && *newdir != 0) { collapse = __b2c__collapse; __b2c__collapse = 0; dir = (char*)calloc(__b2c__len(newdir)+1, sizeof(char));" >> $g_FUNCTIONS
     echo "start = __b2c__delim_engine(2, &amount, newdir, \"/\", 0); for(item = 1; item <= amount; item++) { start = __b2c__delim_engine(1, &length, newdir, \"/\", item); if(length) { strncat(dir, newdir+start, length);" >> $g_FUNCTIONS
     echo "if(mkdir(dir, S_IRWXU | S_IRGRP | S_IXGRP | S_IROTH | S_IXOTH) < 0 && errno != EEXIST && errno != 0) { return(21); } } if(item < amount) { strcat(dir, \"/\"); } } free(dir); __b2c__collapse = collapse; } return(0); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//alarm/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "ALARM[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "void __b2c__alarm(void *func, long time) { void(*target)(int); struct itimerval alarm; struct sigaction psa; memset(&psa, 0, sizeof(psa)); psa.sa_flags = SA_RESETHAND|SA_RESTART;" >> $g_FUNCTIONS
     echo "*((void**)&target) = func; psa.sa_handler = target; sigaction(SIGALRM, &psa, NULL); alarm.it_value.tv_sec = (long)(time)/1000; alarm.it_value.tv_usec = ((time)%1000)*1000;" >> $g_FUNCTIONS
     echo "alarm.it_interval.tv_sec = 0; alarm.it_interval.tv_usec = 0; setitimer(ITIMER_REAL, &alarm, NULL); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//signal/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "SIGNAL[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "void __b2c__signal(void *func, int action) { void(*target)(int); struct sigaction psa; memset(&psa, 0, sizeof(psa)); *((void**)&target) = func; psa.sa_flags = SA_RESETHAND|SA_RESTART; psa.sa_handler = target; sigaction(action, &psa, NULL); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//cipher/} != ${TOTAL} || ${g_OPTION_TLS} = +(1*|TRUE*) ]]
+if [[ -n $(grep -E "CA\\$\(|CIPHER\\$\(|CN\\$\(" <<<${g_DEPEND}) || ${g_OPTION_TLS} = +(1*|TRUE*) ]]
 then
     echo "char *__b2c__ca(int l, char *k, uintptr_t desc) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long len; char buffer[4096] = { 0 }; X509 *cert; X509_NAME *name; if((SSL*)desc == NULL) { ERROR = 40; RUNTIMEFERR(\"CA$\", ERROR, k, l); return(NULL); } cert = (X509*)SSL_get_peer_certificate((SSL*)desc); if(cert==NULL) { ERROR = 41; RUNTIMEFERR(\"CA$\", ERROR, k, l); return(NULL); }" >> $g_FUNCTIONS
     echo "name = X509_get_issuer_name(cert); X509_NAME_oneline(name, buffer, 4095); len = strlen(buffer); idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], len + 1); memmove(buf[idx], buffer, len);__b2c__SETLEN(buf[idx], len); buf[idx][len] = '\\0';" >> $g_FUNCTIONS
@@ -10779,7 +10661,7 @@ then
     echo "len = strlen(buffer); idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], len + 1); memmove(buf[idx], buffer, len);__b2c__SETLEN(buf[idx], len); buf[idx][len] = '\\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//doescape/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "ESCAPE\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__escape(int l, char *k, char *string) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long slen, length = 0; unsigned int current; if (string == NULL) { return (string); } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], sizeof(char));" >> $g_FUNCTIONS
     echo "while(*string) { current = __b2c__utf8toasc(string); if(current > 0xffff) { buf[idx] = (char *) __b2c_str_realloc(buf[idx], length + 11); snprintf(buf[idx]+length, 11, \"\\\\U%08X\", current); length += 10; } else if(current > 0x7f)" >> $g_FUNCTIONS
@@ -10791,7 +10673,7 @@ then
     echo "default: snprintf(buf[idx]+length, 2, \"%c\", current); length+=1; } } slen = __b2c__blen(l, k, \"ESCAPE$\", string, 1, 0); if(slen == 0) { break; } else {string += slen; } } __b2c__SETLEN(buf[idx], length); buf[idx][length] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//unescape/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "UNESCAPE\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__unescape(int l, char *k, char *string) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long len, tlen, length = 0; char *pos, *status = NULL; char hex[9], buffer[9]; uint32_t byte; if (string == NULL) { return (string); } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; }" >> $g_FUNCTIONS
     echo "buf[idx] = (char*)__b2c_str_realloc(buf[idx], sizeof(char)); while ((pos = strchr (string, 92)) != NULL) { switch (*(pos + 1)) { case 'u': case 'U': buf[idx] = (char *) __b2c_str_realloc(buf[idx], length + (pos - string)); memcpy(buf[idx] + length, string, (size_t) (pos - string));" >> $g_FUNCTIONS
@@ -10804,19 +10686,34 @@ then
     echo "buf[idx] = (char*)__b2c_str_realloc(buf[idx], length + len + 1); memcpy(buf[idx] + length, string, len); length += len; __b2c__SETLEN(buf[idx], length); buf[idx][length] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//tree/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "TREE[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "void __b2c__tree_add(void *node, void **tree, int(*func)(const void*, const void*)) { void *result; if(node) { result = tsearch(node, tree, func); if(*(uintptr_t**)result != (uintptr_t*)node) { __b2c__STRFREE(node); } } }" >> $g_FUNCTIONS
     echo "void __b2c__binary_tree_free(void *tree, int(*func)(const void*, const void*)) { int total, i; void **array = { NULL }; total = __b2c__collect(tree, &array, ${g_OPTION_BASE}, 0); for(i = ${g_OPTION_BASE}; i<total; i++)" >> $g_FUNCTIONS
     echo "{ tdelete((void*)array[i], &tree, func); __b2c__STRFREE(array[i]); } if(array) { free(array); } }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//find/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "FIND(" <<<${g_DEPEND}) ]]
 then
     echo "int __b2c__find(int (*func)(const void*, const void*), void* tree, void* node, int dofree) { void **result; result = tfind(node, &tree, func); if(dofree) { free(node); } if(result == NULL) { return(0); } return(1); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//collect/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "SGN(" <<<${g_DEPEND}) ]]
+then
+    echo "char __b2c__sgn(double data) { if(data == 0) { return(0); } if(data > 0) { return(1); } return(-1); }" >> $g_FUNCTIONS
+fi
+
+if [[ -n $(grep "VAL(" <<<${g_DEPEND}) ]]
+then
+    echo "double __b2c__val(char *data) { if(data == NULL) { return(0); } return(atof(data)); }" >> $g_FUNCTIONS
+fi
+
+if [[ -n $(grep "SETENVIRON[[:space:]]" <<<${g_DEPEND}) ]]
+then
+    echo "void __b2c__setenviron(char *name, char *value) { if(name != NULL && value != NULL) { setenv(name, value, 1); } }" >> $g_FUNCTIONS
+fi
+
+if [[ -n $(grep -E "COLLECT[[:space:]]|TREE[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "static void __b2c__collect_do(const void *node, VISIT which, int depth) { switch (which) { case preorder: break; case endorder: break; case postorder: case leaf: __b2c__twalk_idx++; __b2c__twalk_array = (void**)realloc(__b2c__twalk_array, sizeof(void*)*__b2c__twalk_idx);" >> $g_FUNCTIONS
     echo "__b2c__twalk_array[__b2c__twalk_idx-1] = *(uintptr_t**)node; break; } }" >> $g_FUNCTIONS
@@ -10826,13 +10723,13 @@ then
     echo "case 5: (*(short**)array)[count++] = *(short*)__b2c__twalk_array[i]; break; case 6: (*(char**)array)[count++] = *(char*)__b2c__twalk_array[i]; break; } } return (count-base); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//total/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "TOTAL(" <<<${g_DEPEND}) ]]
 then
     echo "static void __b2c__total_do(const void *node, VISIT which, int depth) { switch (which) { case preorder: break; case endorder: break; case postorder: case leaf: __b2c__twalk_idx++; break; } }" >> $g_FUNCTIONS
     echo "int __b2c__total(void *tree) { __b2c__twalk_idx = 0; twalk(tree, __b2c__total_do); return(__b2c__twalk_idx); }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//parse/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "PARSE[[:space:]]" <<<${g_DEPEND}) ]]
 then
     echo "void __b2c__parse(char ***array, int base, long *amount1, char *string, char *with, char *delim) { long dlen, start1, start2, amount2, length1, length2, tmplen, sublen = 0; int x, i = 0, wildcard = 0, next = 0; char *pos = NULL;" >> $g_FUNCTIONS
     echo "__b2c__free_str_array_members (&(*array), base, *amount1); free (*array); *array = NULL; if (string == NULL && with == NULL) { *amount1 = 0; return; } if (delim == NULL) { delim = __b2c__option_delim; }" >> $g_FUNCTIONS
@@ -10845,13 +10742,16 @@ then
     echo "string += (start1 + length1 + dlen); if (wildcard == 0) { with += (start2 + length1 + dlen + next); } } } if (wildcard) { (*array)[i + base] = __b2c_Copy_N_String(NULL, pos, (size_t) sublen); i++; } *amount1 = i; }" >> $g_FUNCTIONS
 fi
 
-if [[ ${TOTAL//collapsefunc/} != ${TOTAL} || ${NOLEX} -eq 1 ]]
+if [[ -n $(grep "COLLAPSE\$(" <<<${g_DEPEND}) ]]
 then
     echo "char *__b2c__collapse_func(char *string, char *delim) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; long start, dlen, option, x, total = 0; long amount = 0, length = 0; if (string == NULL) { return (string); } if (delim == NULL) { delim = __b2c__option_delim; }" >> $g_FUNCTIONS
     echo "option = __b2c__collapse; __b2c__collapse = 1; dlen = __b2c__len (delim); idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } buf[idx] = (char*)__b2c_str_realloc(buf[idx], __b2c__len (string) + 1); __b2c__delim_engine(2, &amount, string, delim, 0); for (x = 0; x < amount; x++)" >> $g_FUNCTIONS
     echo "{ start = __b2c__delim_engine (1, &length, string, delim, 1); memmove(buf[idx] + total, string + start, length); total += length; if (x < amount - 1) { memmove(buf[idx] + total, delim, dlen); total += dlen; }" >> $g_FUNCTIONS
     echo "string += (start + length); } __b2c__collapse = option; __b2c__SETLEN(buf[idx], total); buf[idx][total] = '\0'; return(char*)(buf[idx]); }" >> $g_FUNCTIONS
 fi
+
+# Add the generated files
+g_TMP_FILES="${g_TMP_FILES} ${g_GENERIC} ${g_FUNCTIONS}"
 
 # Check MEMORY/FREE
 if [[ $g_SEMANTIC -eq 0 ]]
@@ -10886,7 +10786,7 @@ then
 	echo -n "Applying indentation... "
 	for i in $g_TMP_FILES
 	do
-	    if [[ $i != +(*.cpp) && $i != +(*.tmp) && $i != +(*.bac) && $i != +(*.lex) && $i != +(*.exe) ]]
+	    if [[ $i != +(*.cpp) && $i != +(*.tmp) && $i != +(*.bac) && $i != +(*.nostr) ]]
 	    then
 		if [[ `uname` = "Darwin" || `uname` = +(*BSD*) ]]
 		then
@@ -10963,13 +10863,13 @@ then
 
     if [[ -z `cat $g_TEMPDIR/${g_SOURCEFILE##*/}.log` ]]
     then
-	echo "Done, program '${g_SOURCEFILE##*/}$g_BINEXT' ready."
+	echo "Done, program '${BASE##*/}$g_BINEXT' ready."
         if [[ $g_EXEC -eq 1 ]]
         then
             ${g_TEMPDIR}/${g_SOURCEFILE%.bac*}
         fi
     else
-        LINE=$(cat ${g_TEMPDIR}/${g_SOURCEFILE##*/}.log | grep -v ".generic.h" | grep -E -i "error:|warning:|note:" | head -1)
+        LINE=$(cat ${g_TEMPDIR}/${g_SOURCEFILE##*/}.log | grep -v ".generic.h" | grep -i -E "error:|warning:|note:" | head -1)
         LINE=${LINE//$g_STRINGSIGN/\$}
         LINE=${LINE//$g_FLOATSIGN/\#}
         LINE=${LINE//$g_LONGSIGN/\%}

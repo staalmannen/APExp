@@ -710,31 +710,31 @@ SUB Load_Defaults
 
 		REPEAT
 			READLN txt$ FROM settings
-			SELECT HEAD$(txt$, 1)
+			SELECT HEAD$(txt$)
 				CASE "indent"
-					value = VAL(LAST$(txt$, 1))
+					value = VAL(LAST$(txt$))
 					gtk_source_view_set_auto_indent(nbook[page].view, value)
 					gtk_check_menu_item_set_active(indent_menu, value)
 				CASE "linenr"
-					value = VAL(LAST$(txt$, 1))
+					value = VAL(LAST$(txt$))
 					gtk_source_view_set_show_line_numbers(nbook[page].view, value)
 					gtk_check_menu_item_set_active(linenr_menu, value)
 				CASE "wrap"
-					value = VAL(LAST$(txt$, 1))
+					value = VAL(LAST$(txt$))
 					gtk_text_view_set_wrap_mode(nbook[page].view, value)
 					gtk_check_menu_item_set_active(wrap_menu, value)
 				CASE "savepage"
-					value = VAL(LAST$(txt$, 1))
+					value = VAL(LAST$(txt$))
 					gtk_check_menu_item_set_active(page_menu, value)
 				CASE "font"
-					name$ = LAST$(txt$, 1)
+					name$ = LAST$(txt$)
 					gtk_font_selection_dialog_set_font_name(g_Font_dialog, name$)
 					desc = pango_font_description_from_string(name$)
 					gtk_widget_modify_font(nbook[page].view, desc)
 					gtk_widget_modify_font(g_Test_view1, desc)
 					pango_font_description_free(desc)
 				CASE "color"
-					name$ = LAST$(txt$, 1)
+					name$ = LAST$(txt$)
 					IF Gtk_Version$ = "gtk2" THEN
 						g_object_get(g_Color_dialog, "color-selection", ADDRESS(colselect), NULL)
 					ELSE
@@ -754,29 +754,29 @@ SUB Load_Defaults
 					ENDIF
 					FREE gdkcol
 				CASE "scheme"
-					name$ = LAST$(txt$, 1)
+					name$ = LAST$(txt$)
 					style = gtk_source_style_scheme_manager_get_scheme(g_Scheme_Manager, name$)
 					gtk_source_buffer_set_style_scheme(nbook[page].buffer, style)
 				CASE "shell"
-					name$ = LAST$(txt$, 1)
+					name$ = LAST$(txt$)
 					gtk_entry_set_text(g_Shell_entry1, IIF$(LEN(name$)>0, name$, ""))
 				CASE "compiler"
-					cc$ = LAST$(txt$, 1)
+					cc$ = LAST$(txt$)
 					gtk_entry_set_text(g_Compiler_entry, IIF$(LEN(cc$)>0, cc$, ""))
 				CASE "options"
-					option$ = LAST$(txt$, 1)
+					option$ = LAST$(txt$)
 					gtk_entry_set_text(g_Options_entry, IIF$(LEN(option$)>0, option$, ""))
 				CASE "libraries"
-					lib$ = LAST$(txt$, 1)
+					lib$ = LAST$(txt$)
 					gtk_entry_set_text(g_Flags_entry, IIF$(LEN(lib$)>0, lib$, ""))
 				CASE "includes"
-					inc$ = LAST$(txt$, 1)
+					inc$ = LAST$(txt$)
 					gtk_entry_set_text(g_Inc_entry, IIF$(LEN(inc$)>0, inc$, ""))
 				CASE "tmpdir"
-					lib$ = LAST$(txt$, 1)
+					lib$ = LAST$(txt$)
 					gtk_entry_set_text(g_Tmpdir_entry, IIF$(LEN(lib$)>0, lib$, ""))
 				CASE "window_size"
-					name$ = LAST$(txt$, 1)
+					name$ = LAST$(txt$)
 					gtk_window_set_default_size(g_Win, VAL(LEFT$(name$, INSTR(name$, "x")-1)), VAL(MID$(name$, INSTR(name$, "x")+1)))
 			ENDSELECT
 		UNTIL ENDFILE(settings)
@@ -2145,7 +2145,7 @@ SUB Apply_Indentation
 		' Current line backwards indentation
 		IF REGEX(line$, "^(CASE|UNTIL)[ \\t]|^(DEFAULT|FI|NEXT|WEND|DONE)|^ELSE$|^ELIF.+THEN$|^END.+") THEN
 			' End with value should not indent backwards
-			IF NOT(REGEX(line$, "^END.+[0-9]+")) THEN DECR myposition
+			IF NOT(REGEX(line$, "^END.+[0-9]+|^ENDFORK")) THEN DECR myposition
 			' Extra step back with ENDSELECT
 			IF REGEX(line$, "SELECT$") THEN DECR myposition
 			' Tab not out of screen?

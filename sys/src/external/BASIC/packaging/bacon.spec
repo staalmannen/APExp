@@ -1,10 +1,10 @@
 Summary: BaCon - a free BASIC to C converter for Unix-based systems.
 Name: bacon
-Version: 4.8
+Version: 5.0.3
 Release: 1
 License: MIT
 Group: Development
-Source: http://www.basic-converter.org/stable/bacon-4.8.tar.gz
+Source: http://www.basic-converter.org/stable/bacon-5.0.3.tar.gz
 URL: http://www.basic-converter.org
 Distribution: CentOS 7
 Vendor: Peter van Eerten
@@ -40,6 +40,7 @@ make DESTDIR=${RPM_BUILD_ROOT} install
 /usr/share/pixmaps/BaCon.png
 /usr/share/pixmaps/BaCon.xbm
 /usr/share/pixmaps/BaCon24.png
+/usr/share/pixmaps/BaCon4.png
 /usr/share/pixmaps/BaConEyes.png
 /usr/share/pixmaps/BaConStrip.png
 /usr/share/pixmaps/BaConLegacy.png

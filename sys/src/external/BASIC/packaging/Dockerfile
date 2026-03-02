@@ -18,7 +18,7 @@
 FROM alpine:latest
 
 RUN apk update
-RUN apk add build-base musl-fts-dev zsh flex indent openssl-libs-static openssl-dev pcre-dev
+RUN apk add build-base musl-fts-dev zsh indent openssl-libs-static openssl-dev pcre-dev
 
 COPY . /usr/src/bacon
 WORKDIR /usr/src/bacon

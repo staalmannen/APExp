@@ -1,6 +1,6 @@
 .TH bacon 1
 .SH NAME
-bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
+BaCon 5.0.3 \- a free BASIC to C converter for Unix-based systems.
 .SH "Introduction"
 .SH ""
    BaCon is an acronym for BAsic CONverter. The BaCon BASIC converter is a
@@ -2527,50 +2527,53 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
     4. Runtime errors. These can occur during execution of the program.
 .br
 .SH ""
-   When an error occurs, the default behavior of a BaCon program is to stop.
+   The TRAP LOCAL statement will cause the BaCon program to stop when an
 .br
-   Only in case of runtime errors, it is possible to let the program handle
+   error occurs during runtime. This is the default behavior of any BaCon
 .br
-   the error.
+   program. However, in case of such a runtime error, it is possible to let
 .br
-.SH ""
-     * In case of statements, the CATCH GOTO command can jump to a
-.br
-       self-defined error handling function. This is especially convenient
-.br
-       when creating GUI applications, as runtime errors by default appear on
-.br
-       the Unix command prompt.
+   the program handle the error by itself.
 .br
 .SH ""
-     * In case of functions, the OPTION ERROR must be set to FALSE to prevent
+     * In case of statements, the CATCH GOTO command can be used to jump to
 .br
-       the program from stopping. The program then needs to check the
+       self-defined error handling code. This is especially convenient when
 .br
-       reserved ERROR variable to handle any unexpected situation.
+       creating GUI applications, as runtime errors by default appear on the
 .br
-.SH ""
-   Alternatively, it is possible to set a callback function for both
-.br
-   statements and functions. This callback function can be defined by the
-.br
-   CATCH ERROR statement. It should point to a function with three arguments:
-.br
-   the first argument capturing the statement or function causing the error,
-.br
-   the second the name of the file and the last the line number.
+       Unix command prompt.
 .br
 .SH ""
-   To prevent BaCon from detecting runtime errors altogether, use TRAP
+     * In case of functions, the TRAP SYSTEM statement will prevent BaCon
 .br
-   SYSTEM.
+       from performing a runtime check and stopping the program. In case of
+.br
+       an unexpected situation, the program then needs to check the reserved
+.br
+       ERROR variable. Note that the operating system still may break or stop
+.br
+       the program.
+.br
+.SH ""
+     * In case of both statements and functions, when using TRAP SYSTEM, it
+.br
+       is also possible to set a error callback function. This callback
+.br
+       function can be defined by the CATCH ERROR statement. It should point
+.br
+       to a separate function with three arguments: the first argument
+.br
+       captures the statement or function causing the error, the second the
+.br
+       name of the file and the last argument the line number.
 .br
 .SH ""
    The reserved ERROR variable contains the number of the last error
 .br
    occurred. A full list of error numbers can be found in appendix A. With
 .br
-   the ERR$ function a human readable text for the error number can be
+   the ERR$(ERROR) function a human readable text for the error number can be
 .br
    retrieved programmatically.
 .br
@@ -2996,6 +2999,24 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
    the defined name for that widget. This can come handy in cases where a GUI
 .br
    helper function is used natively.
+.br
+.SH ""
+.SS "  Defining callbacks outside GUIDEFINE"
+.SH ""
+   In exceptional cases, it can come handy to define widgets outside the main
+.br
+   definition and attach them to the main callback function, so BaCon will
+.br
+   recognize an event with GUIEVENT$. For this purpose, the function GUICB
+.br
+   can be used. This is an example for its usage in GTK4, creating an event
+.br
+   controller, which responds to the mouse pointer entering the widget:
+.br
+.SH ""
+   ctrlr = gtk_event_controller_motion_new()
+.br
+   CALL GUICB(ctrlr, "enter", "show_my_widget")
 .br
 .SH ""
 .SH "Overview of BaCon statements and functions"
@@ -3693,20 +3714,18 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .SH ""
    The ERROR keyword allows setting a callback function where the program
 .br
-   will jump to in case an error occurs. This works both for statements and
+   will jump to in case an error occurs. This is to prevent that erroneous
 .br
-   functions provided that OPTION ERROR is set to FALSE. This is to prevent
+   functions will stop the program. This will only work in combination with
 .br
-   that erroneous functions will stop the program. The callback function
+   TRAP SYSTEM. The callback function should have three arguments which will
 .br
-   should have three arguments which will hold the name of the statement or
+   hold the name of the statement or function, the name of the file and the
 .br
-   function, the name of the file and the line number where the error
-.br
-   occurred. Example:
+   line number where the error occurred. Example:
 .br
 .SH ""
-   OPTION ERROR FALSE
+   TRAP SYSTEM
 .br
    CATCH ERROR help
 .br
@@ -3807,15 +3826,15 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
    Type: function
 .br
 .SH ""
-   Returns a string defined in x$ where on both sides <CR>, <NL>, <TAB> and
+   Returns a string defined in x$ where on both sides the characters in regex
 .br
-   <SPACE> have been removed. If other characters need to be chopped then
+   character class [:isspace:] has been removed. If other characters need to
 .br
-   these can be specified in the optional y$. The optional parameter z
+   be chopped then these can be specified in the optional y$. The optional
 .br
-   defines where the chopping must take place: 0 means on both sides, 1 means
+   parameter z defines where the chopping must take place: 0 means on both
 .br
-   chop at the left and 2 means chop at the right. Examples:
+   sides, 1 means chop at the left and 2 means chop at the right. Examples:
 .br
 .SH ""
    PRINT CHOP$("bacon", "bn")
@@ -5278,6 +5297,8 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .br
    directory exists. If <filename$> is a symbolic link, it is dereferenced.
 .br
+   If an error occurs then this function returns '-1'.
+.br
 .SH ""
 .SS "  FILELEN"
 .SH ""
@@ -5287,11 +5308,11 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
    Type: function
 .br
 .SH ""
-   Returns the size of a file identified by <filename$>. If an error occurs
+   Returns the size of a file identified by <filename$>. When TRAP  SYSTEM is
 .br
-   this function returns '-1'. The ERR$ statement can be used to find out the
+   active, any error will return '-1'. The ERR$(ERROR) statement can then be
 .br
-   error if TRAP is set to LOCAL. Example:
+   used to find out the error. Example:
 .br
 .SH ""
    length = FILELEN("/etc/passwd")
@@ -5311,7 +5332,7 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .br
    following: 0 = access time, 1 = modification time and 2 = status change
 .br
-   time. Example:
+   time. If an error occurs then this function returns '-1'. Example:
 .br
 .SH ""
    stamp = FILETIME("/etc/hosts", 0)
@@ -5327,11 +5348,13 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
    Type: function
 .br
 .SH ""
-   Returns the type of a file identified by <filename$>. If an error occurs
+   Returns the type of a file identified by <filename$>. When TRAP  SYSTEM is
 .br
-   this function returns '0'. The ERR$ statement can be used find out which
+   active, any error will return '0'. The ERR$(ERROR) function can then be
 .br
-   error if TRAP is set to LOCAL. The following values may be returned:
+   used find out which error. The following values may be returned from
+.br
+   FILETYPE:
 .br
 .SH ""
        Value               Meaning            
@@ -5399,19 +5422,21 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .SH ""
 .SS "  FIRST$"
 .SH ""
-   FIRST$(string$, amount [, delimiter$])
+   FIRST$(string$ [, amount [, delimiter$]])
 .br
 .SH ""
    Type: function
 .br
 .SH ""
-   Retrieves the remaining elements except the last <amount> from a delimited
+   Retrieves the first elements except the last <amount> from a delimited
 .br
-   <string$> split by delimiter$. The delimiter$ is optional. If it is
+   <string$> split by <delimiter$>. The <amount> is an optional argument,
 .br
-   omitted, then the definition from OPTION DELIM is assumed. When specified,
+   which defaults to 1. The <delimiter$> also is optional. If omitted, then
 .br
-   it may consist of multiple characters.
+   the definition from OPTION DELIM is assumed. When specified, it may
+.br
+   consist of multiple characters.
 .br
 .SH ""
    If no delimiter is present in the string, this function will return the
@@ -5419,9 +5444,9 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
    full <string$>.
 .br
 .SH ""
-   If delimiter$ occurs between double quotes in string$, then it is ignored.
+   If <delimiter$> occurs between double quotes in <string$>, then it is
 .br
-   This behavior can be changed by setting OPTION QUOTED to FALSE.
+   ignored. This behavior can be changed by setting OPTION QUOTED to FALSE.
 .br
 .SH ""
    See also TAIL$ to obtain elements counting from the end from the delimited
@@ -5568,7 +5593,11 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .br
    then we're in the child process. If the child process needs an explicit
 .br
-   exit then ENDFORK can be used.
+   exit then ENDFORK can be used. The ENDFORK statement also will close all
+.br
+   inherited file handles, thereby also preventing the parent process to use
+.br
+   them further.
 .br
 .SH ""
    If the return value > 0, then we are in the parent process; the actual
@@ -5761,7 +5790,7 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .br
        bin = MEMORY(100)
 .br
-       GETBYTE bin FROM myfile SIZE 100
+       GETBYTE bin FROM myfile CHUNK 100
 .br
    CLOSE FILE myfile
 .br
@@ -5927,7 +5956,24 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .br
    declared with the GLOBAL keyword are visible in each part of the program.
 .br
-   Use LOCAL for local declarations.
+   Use LOCAL for declarations local to a SUB or FUNCTION.
+.br
+.SH ""
+   The TYPE keyword can be omitted. In such situation, BaCon will verify the
+.br
+   suffix of the variable name. If the variable name ends with a '$' then the
+.br
+   variable is assumed to be a string. If the variable name ends with '#'
+.br
+   then it is considered to be of a float type. When the variable name ends
+.br
+   with a '%' then it is considered to be a long type. If no suffix is
+.br
+   provided then GLOBAL will assume the configuration set by OPTION VARTYPE,
+.br
+   which by default is long. It is allowed to mix types in the same GLOBAL
+.br
+   statement.
 .br
 .SH ""
    The ARRAY keyword is used to define a dynamic array, which can be resized
@@ -5945,6 +5991,8 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
    GLOBAL x TYPE float
 .br
    GLOBAL q$
+.br
+   GLOBAL a# = 4.5, b% = 123, c$[] = { "a", "b" }
 .br
    GLOBAL new_array TYPE float ARRAY 100
 .br
@@ -6034,6 +6082,24 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
    NEXT
 .br
    GOTOXY 1, 12
+.br
+.SH ""
+.SS "  GUICB"
+.SH ""
+   GUICB(widget, event$, data$)
+.br
+.SH ""
+   Type: function
+.br
+.SH ""
+   Adds a widget defined outside GUIDEFINE to the main callback mechanism,
+.br
+   which can be recognized by GUIEVENTS. For example:
+.br
+.SH ""
+   ctrlr = gtk_event_controller_motion_new()
+.br
+   CALL GUICB(ctrlr, "enter", "show_my_widget")
 .br
 .SH ""
 .SS "  GUIDEFINE"
@@ -6261,24 +6327,24 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .SH ""
 .SS "  HEAD$"
 .SH ""
-   HEAD$(string$, amount [, delimiter$])
+   HEAD$(string$, [amount [, delimiter$]])
 .br
 .SH ""
    Type: function
 .br
 .SH ""
-   Retrieves the first <amount> elements from a delimited string$ split by
+   Retrieves the first <amount> elements from a delimited <string$> split by
 .br
-   delimiter$. The delimiter$ is optional. If it is omitted, then the
+   <delimiter$>. The <amount> is an optional argument, which defaults to 1.
 .br
-   definition from OPTION DELIM is assumed. When specified, it may consist of
+   The <delimiter$> also is optional. If omitted, the definition from OPTION
 .br
-   multiple characters.
+   DELIM is assumed. When specified, it may consist of multiple characters.
 .br
 .SH ""
-   If delimiter$ occurs between double quotes in string$, then it is ignored.
+   If <delimiter$> occurs between double quotes in <string$>, then it is
 .br
-   This behavior can be changed by setting OPTION QUOTED to FALSE.
+   ignored. This behavior can be changed by setting OPTION QUOTED to FALSE.
 .br
 .SH ""
    See also LAST$ to obtain the remaining elements, and TAIL$ to obtain
@@ -7062,7 +7128,7 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .SH ""
 .SS "  LAST$"
 .SH ""
-   LAST$(string$, amount [, delimiter$])
+   LAST$(string$ [, amount [, delimiter$]])
 .br
 .SH ""
    Type: function
@@ -7070,11 +7136,13 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .SH ""
    Retrieves the remaining elements except the first <amount> from a
 .br
-   delimited string$ split by delimiter$. The delimiter$ is optional. If it
+   delimited <string$> split by <delimiter$>. The <amount> is an optional
 .br
-   is omitted, then the definition from OPTION DELIM is assumed. When
+   argument, which defaults to 1. The <delimiter$> also is optional. If
 .br
-   specified, it may consist of multiple characters.
+   omitted, then the definition from OPTION DELIM is assumed. When specified,
+.br
+   it may consist of multiple characters.
 .br
 .SH ""
    If no delimiter is present in the string, this function will return the
@@ -7082,13 +7150,13 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
    full <string$>.
 .br
 .SH ""
-   If delimiter$ occurs between double quotes in string$, then it is ignored.
+   If <delimiter$> occurs between double quotes in <string$>, then it is
 .br
-   This behavior can be changed by setting OPTION QUOTED to FALSE. See also
+   ignored. This behavior can be changed by setting OPTION QUOTED to FALSE.
 .br
-   HEAD$ to get the first element(s), and the chapter on delimited string
+   See also HEAD$ to get the first element(s), and the chapter on delimited
 .br
-   functions for more information about delimited strings. Example:
+   string functions for more information about delimited strings. Example:
 .br
 .SH ""
    PRINT "Remaining members: ", LAST$("Rome Amsterdam Kiev Bern Paris
@@ -7210,11 +7278,21 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
    program.
 .br
 .SH ""
-   If the TYPE keyword is omitted then variables are assumed to be of 'long'
+   The TYPE keyword can be omitted. In such situation, BaCon will verify the
 .br
-   type. If TYPE is omitted and the variable name ends with a '$' then the
+   suffix of the variable name. If the variable name ends with a '$' then the
 .br
-   variable will be a string.
+   variable is assumed to be a string. If the variable name ends with '#'
+.br
+   then it is considered to be of a float type. When the variable name ends
+.br
+   with a '%' then it is considered to be a long type. If no suffix is
+.br
+   provided then LOCAL will assume the configuration set by OPTION VARTYPE,
+.br
+   which by default is long. It is allowed to mix types in the same LOCAL
+.br
+   statement.
 .br
 .SH ""
    The ARRAY keyword is used to define a dynamic array, which can be resized
@@ -7229,13 +7307,12 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .SH ""
    LOCAL tt TYPE int
 .br
-   LOCAL q$
+   LOCAL q$, p# = 0.5, i% = 1, var
 .br
    LOCAL new_array TYPE float ARRAY 100
 .br
    LOCAL name$ ARRAY 25
 .br
-.SH ""
    LOCAL key$ ASSOC STRING
 .br
 .SH ""
@@ -7777,13 +7854,19 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .SH ""
 .SS "  MOD"
 .SH ""
-   MOD(x, y)
+   MOD(x, y [, z])
 .br
 .SH ""
    Type: function
 .br
 .SH ""
-   Returns the modulo of x divided by y.
+   Returns the modulo of x divided by y. The optional argument <z> can either
+.br
+   be TRUE or FALSE (default). When TRUE, the MOD function will switch to
+.br
+   floating point mode and calculate the modulo delivering a floating point
+.br
+   result.
 .br
 .SH ""
 .SS "  MONTH"
@@ -8189,7 +8272,7 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .br
    <EXPLICIT x> | <INPUT x> | <ERROR x> | <PROPER x> | <TLS x> | <EVAL x> |
 .br
-   <NO_C_ESC x>
+   <NO_C_ESC x> | <LOCAL x>
 .br
 .SH ""
    Type: statement
@@ -8362,22 +8445,18 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
        declaration is enforced.
 .br
 .SH ""
+     * The LOCAL argument makes sure that implicitly declared variables used
+.br
+       in a SUB or FUNCTION have a local scope (1). The default value is 0
+.br
+       (FALSE).
+.br
+.SH ""
      * The INPUT argument defines where the stream of input characters from
 .br
        STDIN should be cut off. By default, INPUT returns when a newline is
 .br
        encountered. The default value is "\\n".
-.br
-.SH ""
-     * The ERROR argument sets whether or not a program will exit as soon a
-.br
-       runtime error occurs. The default is TRUE (exit upon error). If set to
-.br
-       FALSE, the program must take care of error handling by itself, and
-.br
-       setting an error callback will be possible. See also the chapter on
-.br
-       error catching for more information.
 .br
 .SH ""
      * The PROPER argument sets whether or not the PROPER$ function should
@@ -10615,24 +10694,26 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .SH ""
 .SS "  TAIL$"
 .SH ""
-   TAIL$(string$, amount [, delimiter$])
+   TAIL$(string$ [, amount [, delimiter$]])
 .br
 .SH ""
    Type: function
 .br
 .SH ""
-   Retrieves the last <amount> elements from a delimited string$ split by
+   Retrieves the last <amount> elements from a delimited <string$> split by
 .br
-   delimiter$. The delimiter$ is optional. If it is omitted, then the
+   <delimiter$>. The <amount> is an optional argument, which defaults to 1.
 .br
-   definition from OPTION DELIM is assumed. When specified, it may consist of
+   The <delimiter$> also is optional. If omitted, then the definition from
 .br
-   multiple characters.
+   OPTION DELIM is assumed. When specified, it may consist of multiple
+.br
+   characters.
 .br
 .SH ""
-   If delimiter$ occurs between double quotes in string$, then it is ignored.
+   If <delimiter$> occurs between double quotes in <string$>, then it is
 .br
-   This behavior can be changed by setting OPTION QUOTED to FALSE.
+   ignored. This behavior can be changed by setting OPTION QUOTED to FALSE.
 .br
 .SH ""
    See also FIRST$ to obtain the remaining elements from the delimited
@@ -10890,18 +10971,18 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .br
    indicating which statement or function causes a problem. Optionally, when
 .br
-   a CATCH is set, BaCon can jump to a LABEL instead, where a self-defined
+   a CATCH is set, BaCon can jump to a LABEL instead, where self-defined code
 .br
-   error function can be executed, and from where a RESUME is possible.
+   can be executed, and from where a RESUME is possible.
 .br
 .SH ""
    When set to SYSTEM, error trapping is performed by the operating system.
 .br
    This means that if an error occurs, a signal will be caught by the program
 .br
-   and a generic error message is displayed on the prompt. The program will
+   and a generic error message is displayed on the prompt. The program then
 .br
-   then exit gracefully
+   may exit gracefully, depending on the actual error.
 .br
 .SH ""
    The setting LOCAL decreases the performance of the program, because
@@ -11140,7 +11221,14 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .SH ""
    Defines a body with C code. This code is put unmodified into the generated
 .br
-   C source file. Example:
+   C source file. Note that defining complete C functions within a
+.br
+   USEC/ENDUSEC block is not possible. Instead, such functions should be put
+.br
+   into a USEH/ENDUSEH block.
+.br
+.SH ""
+   Example:
 .br
 .SH ""
    USEC
@@ -11170,9 +11258,11 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
 .br
    unmodified into the generated global header source file. This can
 .br
-   particularly be useful in case of using variables from external libraries.
+   particularly be useful in case of using variables from external libraries
 .br
-   See also USEC to pass C source code. Example:
+   or when defining full C functions. See also USEC to pass lines of C source
+.br
+   code. Example:
 .br
 .SH ""
    USEH
@@ -12179,6 +12269,11 @@ bacon 4.8 \- a free BASIC to C converter for Unix-based systems.
    command line parameter '-t' (see the chapter on Basic Usage and
 .br
    Parameters).
+.br
+.SH ""
+   This documentation © by Peter van Eerten.
+.br
+   Please report errors to: REVERSE$("gro.retrevnoc-cisab@retep")
 .br
 .SH ""
 .SH LICENSE

@@ -1,6 +1,50 @@
-+------------------------------------------------------+
-| March 15, 2024 - 4.8 stable **anniversary release ** |
-+------------------------------------------------------+
++---------------------------------+
+| October 24, 2025 - 5.0.3 stable |
++---------------------------------+
+- Fix: hotfixed security check in RESUME statement (all versions)
+
+September 1, 2025 - 5.0.2 stable
+- Imp: optimized closing network sockets (all versions)
+- Imp: RESUME should not perform jump back when no CATCH was set (all versions)
+- Fix: solved issues in dependency check for BSD platforms (Shell version)
+- Fix: the FLTK dependency check in configure script did not match with FLTK library check (BaCon version)
+- Fix: the BETWEEN / BEYOND keywords could not combine semicolon and a logical AND (all versions)
+- Fix: SSL file descriptor missed cast when embedded in string function (all versions, kudos rikky)
+- Fix: runtime error handling did not work in case of statements (all versions)
+
+November 1, 2024 - 5.0.1 stable
+- Imp: optimized error handling for statements (all versions)
+- Fix: important - memory pool core engine could crash in case of heavy load and optimized builds (all versions)
+- Fix: aligned and corrected all syntax error warnings (all versions)
+- Fix: combination of REM and line continution caused succeeding line to be skipped (all versions)
+- Fix: regular functions could not obtain the error cause in case of TRAP SYSTEM (all versions)
+- Fix: deprecated OPTION ERROR (all versions)
+- Fix: redesigned SETENVIRON, parameters should be checked for NULL (all versions, kudos rikky)
+
+August 1, 2024 - 5.0 stable
+- New: added GUICB to embed GUI callbacks in regular code (BaCon version)
+- New: OPTION LOCAL to enable local implicit declarations (all versions)
+- New: added GTK4 version of editor demonstration program (BaConGUI GTK4 version)
+- Imp: improvements and code fixes in TK version of GUI (BaConGUI TK version)
+- Imp: improvements and code fixes in GTK3 version of GUI (BaConGUI GTK3 version)
+- Imp: improvements in handling callback result codes for TK binding (BaCon version)
+- Imp: improvements in syntax highlighting in built-in editor (BaCon version)
+- Imp: support for client certificates in TLS client connections (all versions)
+- Imp: FIRST$, LAST$, HEAD$ and TAIL$ can omit 2nd argument, defaulting to 1 (all versions)
+- Imp: MOD can calculate modulo of floating numbers (all versions)
+- Imp: getting rid of FLEX dependency (all versions)
+- Imp: support for mixed variable declarations of different type (all versions)
+- Fix: built-in editor did not handle <return> key and indentation properly (BaCon version)
+- Fix: VAR would skip incoming string arguments in case of NULL (all versions, kudos rikky)
+- Fix: hash table would skip string values in case of NULL (all versions, kudos rikky)
+- Fix: MATCH would return TRUE in case delimited string is empty (all versions, kudos Peter F.)
+- Fix: parentheses in WHILE/UNTIL breaks string comparison (BaCon version, kudos Roger M.)
+- Fix: the VAL function would evaluate argument twice (all versions, kudos Roger M.)
+- Fix: detection of nested functions failed (all versions, kudos rikky)
+- Fix: the ALIGN$ function failed in some circumstances (all versions, kudos rikky)
+- Fix: RECORD declared wrong type causing clash (Shell version)
+
+March 15, 2024 - 4.8 stable **anniversary release **
 - New: TOTAL to return total amount of items in binary tree (all versions)
 - New: NANOTIMER to measure duration in nanoseconds (all versions)
 - New: OPTION NO_C_ESC to ignore effect of backslash in strings (alll versions)

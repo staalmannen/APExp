@@ -4,7 +4,7 @@
  * Description: Basic Converter syntax highlighting
  * Author: Peter van Eerten <peter@basic-converter.org>
  * Usage: Copy this file to /usr/share/enscript/hl/
- * Date: March 6, 2024
+ * Date: April 16, 2024
  * 
  *    Console output: enscript --color --tabsize=4 --style=emacs --language=ansi --highlight=bacon prog.bac -p -
  *    HTML output: enscript --color --tabsize=4 --style=emacs --language=html --highlight=bacon prog.bac -p prog.html
@@ -85,7 +85,7 @@ state bacon extends HighlightEntry
 |FILELEN|FILETIME|FILETYPE|FLOOR|FORK|FP|GETKEY|GETX|GETY|HOUR|IIF|INSTR|INSTRREV|INT|INVERT|ISFALSE|ISKEY|ISTRUE|LEN|LOG|LOOP|MAX|MAXNUM|BETWEEN|HASDELIM\
 |HASBOM|MATCH|MEMORY|MEMTELL|MIN|MINUTE|MOD|MONTH|MYPID|NANOTIMER|NOT|NOW|ODD|OR|PEEK|POW|RAD|RANDOM|REAP|REGEX|RND|ROL|ROR|ROUND|ROWS|SEARCH|SECOND|EXCL|HASH|ISUTF8\
 |MEMCHECK|SGN|SIN|SIZEOF|SQR|TAN|TALLY|TELL|TIMER|TIMEVALUE|TOTAL|UCS|ULEN|VAL|VERIFY|WAIT|WEEK|YEAR|AMOUNT|ISTOKEN|BYTELEN|ISASCII|SUM|SUMF|NRKEYS|BEYOND\
-|GUIDEFINE|GUIGET|GUISET|GUIWIDGET|GUIFN|UBOUND|FIND|INDEX)\b/ {
+|GUIDEFINE|GUIGET|GUISET|GUIWIDGET|GUIFN|GUICB|UBOUND|FIND|INDEX)\b/ {
     function_name_face (true);
     language_print ($0);
     function_name_face (false);

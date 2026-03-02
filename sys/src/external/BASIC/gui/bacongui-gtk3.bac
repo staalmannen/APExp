@@ -1,33 +1,126 @@
 '------------------------------------------------------------------------
 ' A minimal editor for the BaCon BASIC-to-C converter based on GTK3.
 '
-' Peter van Eerten - February 2023. License: MIT License.
+' Peter van Eerten - February 2023/July 2024. License: MIT License.
 '------------------------------------------------------------------------
 
 OPTION GUI TRUE
 PRAGMA GUI gtk3
 
 OPTION EXPLICIT TRUE
+OPTION QUOTED FALSE
+
+CONST Configuration$ = GETENVIRON$("HOME") & "/.bacon/settings_gtk3.cfg"
+CONST Data_Path$ = DATA_PATH
+CONST Scratch_Temp$ = "/tmp/scratchpad.bac"
 
 ' Using GtkSourceView: apt install libgtksourceview-4-dev
 PRAGMA INCLUDE <gtksourceview/gtksource.h>
 PRAGMA OPTIONS `pkg-config --cflags gtksourceview-4`
+PRAGMA OPTIONS -Wno-deprecated-declarations
 PRAGMA LDFLAGS `pkg-config --libs gtksourceview-4`
 
-' Using libwebkit2gtk: apt install libwebkit2gtk-4.0-dev
-PRAGMA INCLUDE <webkit2/webkit2.h>
-PRAGMA OPTIONS `pkg-config --cflags webkit2gtk-4.0`
-PRAGMA LDFLAGS `pkg-config --libs webkit2gtk-4.0`
+LOCAL id, mode, linenr, find_mode
+LOCAL file TYPE STRING
+LOCAL current_name$, command$, txt$, cfg$, term$, filename$
 
-LOCAL window, mode
+LOCAL (*show)(GtkWidget*) = gtk_widget_show_all TYPE void
+LOCAL (*hide)(GtkWidget*) = gtk_widget_hide TYPE void
+LOCAL start_iter, end_iter, find_iter TYPE GtkTextIter
+LOCAL *buffer, *sbuffer, *dbuffer, *tmp_buffer TYPE GtkTextBuffer
+LOCAL *group TYPE GtkAccelGroup
+LOCAL *txt_head, *txt_bold, *txt_para TYPE GtkTextTag
+LOCAL *clipBoard TYPE GtkClipboard
+LOCAL heading ASSOC int
 
-window = GUIDEFINE(" \
+'----------------------------------------------------------------------------
+
+' Indentation code taken from BaCon source
+FUNC Indent_Prog$(text$)
+	LOCAL result$, line$, previous$
+	LOCAL myposition, nextposition, label_active, wrap_active, total, x
+	SPLIT text$ BY NL$ TO lines$ SIZE total
+	FOR x = 0 TO total-1
+		myposition = nextposition
+		lines$[x] = CHOP$(lines$[x])
+		IF LEN(lines$[x]) = 0 AND label_active THEN
+			label_active = FALSE
+			DECR myposition
+			nextposition = myposition
+		ENDIF
+		IF REGEX(lines$[x], "^(CASE|UNTIL)[ \\t]|^(DEFAULT|FI|NEXT|WEND|DONE)|^ELSE$|^ELIF.+THEN$|^END.+") THEN
+			IF NOT(REGEX(lines$[x], "^END.+[0-9]+|^ENDFORK")) THEN DECR myposition
+			IF REGEX(lines$[x], "SELECT$") THEN DECR myposition
+			IF myposition < 0 THEN myposition = 0
+			nextposition = myposition
+		ENDIF
+		IF REGEX(lines$[x], "^(CASE|ENUM|FOR|FUNCTION|FUNC|GLOBAL RECORD|LABEL|RECORD|SELECT|SUB|WHILE|DOTIMES|WITH)[ \\t]|^(DEFAULT|REPEAT|USEC|USEH|DO$)|^IF.+THEN$|^ELIF.+THEN$|^ELSE$") THEN
+			INCR nextposition
+			IF REGEX(lines$[x], "^SELECT") THEN INCR nextposition
+			IF LEFT$(lines$[x], 5) = "LABEL" THEN label_active = TRUE
+		ENDIF
+		IF RIGHT$(lines$[x], 2) = CHR$(32) & CHR$(92) AND NOT(REGEX(lines$[x], "^(REM|')")) THEN
+			IF NOT(wrap_active) THEN INCR nextposition
+			wrap_active = TRUE
+		ELSE
+			IF wrap_active THEN DECR nextposition
+			wrap_active = FALSE
+		ENDIF
+		IF REGEX(previous$, "^(REM|')") THEN result$ = CHANGE$(result$, x, TAB$(myposition) & previous$, NL$)
+		IF LEN(lines$[x]) THEN
+			result$ = result$ & TAB$(myposition) & lines$[x] & NL$
+		ELSE
+			result$ = result$ & NL$
+		ENDIF
+		previous$ = lines$[x]
+	NEXT
+	RETURN CHOP$(result$)
+ENDFUNC
+
+'----------------------------------------------------------------------------
+
+' Create ad-hoc dialogue for emitting messages
+SUB Dialog_Msg(type, buttons, title$, msg$)
+	LOCAL *dialog TYPE GtkWidget
+	dialog = gtk_message_dialog_new(GTK_WINDOW(GUIWIDGET(id, "window")), GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT, type, buttons, "\n%s", msg$)
+	CALL gtk_window_set_title(GTK_WINDOW(dialog), title$)
+	CALL gtk_dialog_run(GTK_DIALOG(dialog))
+	CALL gtk_widget_destroy(dialog)
+ENDSUB
+
+' Create ad-hoc dialogue for user interaction
+FUNC Dialog_Feedback(id$, msg$)
+	LOCAL *dialog TYPE GtkWidget
+	dialog = gtk_message_dialog_new(GTK_WINDOW(GUIWIDGET(id, id$)), GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", msg$)
+	CALL gtk_window_set_title(GTK_WINDOW(dialog), "Warning!")
+	IF gtk_dialog_run(GTK_DIALOG(dialog)) = GTK_RESPONSE_NO THEN
+		CALL gtk_widget_destroy(dialog)
+		RETURN TRUE
+	FI
+	CALL gtk_widget_destroy(dialog)
+	RETURN FALSE
+ENDFUNC
+
+'----------------------------------------------------------------------------
+
+SUB Load_File(file$)
+	CALL gtk_text_buffer_set_text(buffer, LOAD$(file$), -1)
+	CALL gtk_text_buffer_set_modified(buffer, FALSE)
+	CALL gtk_text_buffer_get_start_iter(buffer, &start_iter)
+	CALL gtk_text_buffer_place_cursor(buffer, &start_iter)
+	CHANGEDIR DIRNAME$(file$)
+	CALL GUISET(id, "window", "title", "The BaCon Editor - '" & BASENAME$(file$) & "'")
+ENDSUB
+
+'----------------------------------------------------------------------------
+
+id = GUIDEFINE(" \
 	{ type=WINDOW name=window callback=delete-event title=\"The BaCon Editor\" window-position=GTK_WIN_POS_CENTER width-request=900 height-request=600 } \
 	{ type=BOX name=box parent=window orientation=GTK_ORIENTATION_VERTICAL } \
 	{ type=MENU_BAR name=menu parent=box } \
 	{ type=MENU name=filemenu } \
+	{ type=MENU_ITEM name=new_file parent=filemenu callback=activate use-underline=1 label=\"_New\" } \
 	{ type=MENU_ITEM name=open_file parent=filemenu callback=activate use-underline=1 label=\"_Open...\" } \
-	{ type=MENU_ITEM name=close_file parent=filemenu callback=activate use-underline=1 label=\"_Close\" } \
 	{ type=MENU_ITEM name=store_file parent=filemenu callback=activate use-underline=1 label=\"_Save\" } \
 	{ type=MENU_ITEM name=save_file parent=filemenu callback=activate use-underline=1 label=\"S_ave as...\" } \
 	{ type=SEPARATOR_MENU_ITEM name=sep1 parent=filemenu } \
@@ -37,21 +130,33 @@ window = GUIDEFINE(" \
 	{ type=SEPARATOR_MENU_ITEM name=sep3 parent=filemenu } \
 	{ type=MENU_ITEM name=exit_menu parent=filemenu callback=activate use-underline=1 label=\"E_xit\" } \
 	{ type=MENU_ITEM name=menu1 parent=menu use-underline=1 label=\"_File\" submenu=filemenu } \
+	{ type=MENU name=editmenu } \
+	{ type=MENU_ITEM name=undo_menu parent=editmenu callback=activate use-underline=1 label=\"Undo\" } \
+	{ type=MENU_ITEM name=redo_menu parent=editmenu callback=activate use-underline=1 label=\"Redo\" } \
+	{ type=SEPARATOR_MENU_ITEM name=sep4 parent=editmenu } \
+	{ type=MENU_ITEM name=cut_menu parent=editmenu callback=activate use-underline=1 label=\"C_ut\" } \
+	{ type=MENU_ITEM name=copy_menu parent=editmenu callback=activate use-underline=1 label=\"C_opy\" } \
+	{ type=MENU_ITEM name=paste_menu parent=editmenu callback=activate use-underline=1 label=\"_Paste\" } \
+	{ type=SEPARATOR_MENU_ITEM name=sep5 parent=editmenu } \
+	{ type=MENU_ITEM name=select_menu parent=editmenu callback=activate use-underline=1 label=\"Select _All\" } \
+	{ type=SEPARATOR_MENU_ITEM name=sep6 parent=editmenu } \
+	{ type=MENU_ITEM name=find_menu parent=editmenu callback=activate use-underline=1 label=\"_Find...\" } \
+	{ type=MENU_ITEM name=menu2 parent=menu use-underline=1 label=\"_Edit\" submenu=editmenu } \
 	{ type=MENU name=configmenu } \
 	{ type=MENU_ITEM name=exec_menu parent=configmenu callback=activate use-underline=1 label=\"_Execute\" } \
-	{ type=SEPARATOR_MENU_ITEM name=sep4 parent=configmenu } \
+	{ type=SEPARATOR_MENU_ITEM name=sep7 parent=configmenu } \
 	{ type=CHECK_MENU_ITEM name=nr_menu parent=configmenu callback=activate use-underline=1 label=\"Line _Numbers\" active=TRUE } \
-	{ type=SEPARATOR_MENU_ITEM name=sep5 parent=configmenu } \
+	{ type=SEPARATOR_MENU_ITEM name=sep8 parent=configmenu } \
 	{ type=MENU_ITEM name=indent parent=configmenu callback=activate use-underline=1 label=\"Indent Code\" } \
-	{ type=SEPARATOR_MENU_ITEM name=sep6 parent=configmenu } \
+	{ type=SEPARATOR_MENU_ITEM name=sep9 parent=configmenu } \
 	{ type=MENU_ITEM name=scratch_pad parent=configmenu callback=activate use-underline=1 label=\"_Scratchpad\" } \
-	{ type=MENU_ITEM name=menu2 parent=menu use-underline=1 label=\"_Tools\" submenu=configmenu } \
+	{ type=MENU_ITEM name=menu3 parent=menu use-underline=1 label=\"_Tools\" submenu=configmenu } \
 	{ type=MENU name=helpmenu } \
 	{ type=MENU_ITEM name=doc_menu parent=helpmenu callback=activate use-underline=1 label=\"_Documentation\" } \
 	{ type=MENU_ITEM name=con_menu parent=helpmenu callback=activate use-underline=1 label=\"Context _Info\" } \
-	{ type=SEPARATOR_MENU_ITEM name=sep7 parent=helpmenu } \
+	{ type=SEPARATOR_MENU_ITEM name=sep10 parent=helpmenu } \
 	{ type=MENU_ITEM name=about_menu parent=helpmenu callback=activate use-underline=1 label=\"_About\" } \
-	{ type=MENU_ITEM name=menu3 parent=menu use-underline=1 label=\"_Help\" submenu=helpmenu right-justified=1 } \
+	{ type=MENU_ITEM name=menu4 parent=menu use-underline=1 label=\"_Help\" submenu=helpmenu } \
 	{ type=SCROLLED_WINDOW name=scrolled parent=box shadow-type=1 height-request=400 } \
 	{ type=GTK_SOURCE_TYPE_VIEW name=view parent=scrolled wrap-mode=GTK_WRAP_NONE vexpand=1 monospace=1 tab-width=4 show-line-numbers=1 } \
 	{ type=WINDOW name=file_dialog callback=delete-event title=\"Open File\" window-position=GTK_WIN_POS_CENTER width-request=800 height-request=500 } \
@@ -81,28 +186,50 @@ window = GUIDEFINE(" \
 	{ type=BUTTON_BOX name=exec_bbox parent=exec_box layout-style=GTK_BUTTONBOX_EDGE } \
 	{ type=BUTTON name=exec_cancel parent=exec_bbox callback=clicked margin=5 label=\"gtk-cancel\" use-stock=1 } \
 	{ type=BUTTON name=exec_run parent=exec_bbox callback=clicked margin=5 label=\"gtk-execute\" use-stock=1 } \
-	{ type=WINDOW name=doc_dialog callback=delete-event title=\"BaCon Documentation\" window-position=GTK_WIN_POS_NONE } \
+	{ type=WINDOW name=doc_dialog callback=delete-event title=\"BaCon Documentation\" window-position=GTK_WIN_POS_CENTER } \
 	{ type=BOX name=doc_box parent=doc_dialog orientation=GTK_ORIENTATION_VERTICAL } \
-	{ type=WEBKIT_TYPE_WEB_VIEW name=web_view parent=doc_box width-request=1024 height-request=600 expand=TRUE } \
+	{ type=SCROLLED_WINDOW name=scroll_txt parent=doc_box shadow-type=1 width-request=670 height-request=650 vscrollbar-policy=TRUE expand=TRUE } \
+	{ type=TEXT_VIEW name=doc_view parent=scroll_txt monospace=TRUE editable=FALSE wrap-mode=2 vexpand=1 } \
 	{ type=BUTTON_BOX name=doc_bbox parent=doc_box layout-style=GTK_BUTTONBOX_CENTER } \
-	{ type=BUTTON name=doc_close parent=doc_bbox callback=clicked margin=5 label=\"gtk-close\" use-stock=TRUE } \
-	{ type=MESSAGE_DIALOG name=about_dialog callback=response message-type=GTK_MESSAGE_INFO buttons=GTK_BUTTONS_CLOSE title=\"About This Editor\" text=\"\\nA Minimal BaCon Editor in GTK3!\\n\\n  (c) 2023 Peter van Eerten\" }")
+	{ type=BUTTON name=doc_close parent=doc_bbox callback=clicked has-focus=TRUE margin=5 label=\"gtk-close\" use-stock=TRUE } \
+	{ type=WINDOW name=find_dialog callback=delete-event title=\"Find term...\" transient-for=window window-position=GTK_WIN_POS_CENTER width-request=300 } \
+	{ type=BOX name=find_box parent=find_dialog orientation=GTK_ORIENTATION_VERTICAL } \
+	{ type=BOX name=find_hbox parent=find_box orientation=GTK_ORIENTATION_HORIZONTAL } \
+	{ type=LABEL name=find_label parent=find_hbox margin=5 yalign=0.2 label=\"Enter term: \" } \
+	{ type=BOX name=find_vbox parent=find_hbox orientation=GTK_ORIENTATION_VERTICAL } \
+	{ type=ENTRY name=find_entry callback=activate parent=find_vbox margin=5 hexpand=1 } \
+	{ type=CHECK_BUTTON name=find_check parent=find_vbox label=\"Case sensitive\" margin=5 hexpand=1 } \
+	{ type=BUTTON_BOX name=find_bbox parent=find_box layout-style=GTK_BUTTONBOX_EDGE } \
+	{ type=BUTTON name=find_cancel parent=find_bbox callback=clicked margin=5 label=\"gtk-cancel\" use-stock=1 } \
+	{ type=BUTTON name=find_term parent=find_bbox callback=clicked margin=5 label=\"gtk-find\" use-stock=1 } \
+	{ type=MESSAGE_DIALOG name=about_dialog callback=response message-type=GTK_MESSAGE_INFO buttons=GTK_BUTTONS_CLOSE title=\"About This Editor\" text=\"\\nA Minimal BaCon Editor in GTK3!\\n\\n  (c) 2024 Peter van Eerten\" }")
 
-CONST Scratch_Temp$ = "/tmp/scratchpad.bac"
+CALL GUIGET(id, "view", "buffer", &buffer)
+CALL GUIGET(id, "scratch_view", "buffer", &sbuffer)
+CALL GUIGET(id, "doc_view", "buffer", &dbuffer)
 
-LOCAL file TYPE STRING
-LOCAL current_name$, command$
+clipBoard = gtk_clipboard_get(gdk_atom_intern("CLIPBOARD", 0))
 
-LOCAL (*show)() = gtk_widget_show_all TYPE void
-LOCAL (*hide)() = gtk_widget_hide TYPE void
+' Load and format the documentation
+txt_head = gtk_text_buffer_create_tag(dbuffer, "txt_head", "weight", PANGO_WEIGHT_ULTRABOLD, "scale", PANGO_SCALE_X_LARGE, NULL)
+txt_bold = gtk_text_buffer_create_tag(dbuffer, "txt_bold", "weight", PANGO_WEIGHT_BOLD, "scale", PANGO_SCALE_LARGE, NULL)
+txt_para = gtk_text_buffer_create_tag(dbuffer, "txt_para", "weight", PANGO_WEIGHT_BOLD, "scale", PANGO_SCALE_LARGE, "foreground", "red", NULL)
+CALL gtk_text_buffer_get_start_iter(dbuffer, &start_iter)
 
-LOCAL start_iter, end_iter TYPE GtkTextIter
-LOCAL *buffer, *sbuffer TYPE GtkTextBuffer
-LOCAL *dialog TYPE GtkWidget
-LOCAL *group TYPE GtkAccelGroup
-
-CALL GUIGET(window, "view", "buffer", &buffer)
-CALL GUIGET(window, "scratch_view", "buffer", &sbuffer)
+FOR txt$ IN LOAD$(Data_Path$ & "/BaCon/documentation/documentation.txt") STEP NL$
+	IF linenr = 0 THEN
+		CALL gtk_text_buffer_insert_with_tags(dbuffer, &start_iter, CHOP$(txt$) & NL$, -1, txt_head, NULL)
+	ELIF REGEX(txt$, "^[A-Z]+") THEN
+		CALL gtk_text_buffer_insert_with_tags(dbuffer, &start_iter, txt$ & NL$, -1, txt_bold, NULL)
+		heading(UCASE$(CHOP$(txt$))) = linenr
+	ELIF REGEX(txt$, "^  [A-Z]+") THEN
+		CALL gtk_text_buffer_insert_with_tags(dbuffer, &start_iter, txt$ & NL$, -1, txt_para, NULL)
+		heading(UCASE$(CHOP$(txt$))) = linenr
+	ELSE
+		CALL gtk_text_buffer_insert(dbuffer, &start_iter, txt$ & NL$, -1)
+	ENDIF
+	INCR linenr
+NEXT
 
 ' Set syntax highlighting to BaCon
 CALL gtk_source_buffer_set_language(GTK_SOURCE_BUFFER(buffer), gtk_source_language_manager_get_language(gtk_source_language_manager_get_default(), "bacon") )
@@ -110,177 +237,206 @@ CALL gtk_source_buffer_set_language(GTK_SOURCE_BUFFER(sbuffer), gtk_source_langu
 
 ' Keyboard shortcuts
 CALL gtk_accel_group_new() TO group
-CALL gtk_window_add_accel_group(GTK_WINDOW(GUIWIDGET(window, "window")), group)
-CALL gtk_widget_add_accelerator(GUIWIDGET(window, "con_menu"), "activate", group, gdk_keyval_from_name("i"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
-CALL gtk_widget_add_accelerator(GUIWIDGET(window, "exec_menu"), "activate", group, gdk_keyval_from_name("e"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
-CALL gtk_widget_add_accelerator(GUIWIDGET(window, "open_file"), "activate", group, gdk_keyval_from_name("o"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
-CALL gtk_widget_add_accelerator(GUIWIDGET(window, "store_file"), "activate", group, gdk_keyval_from_name("s"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
-CALL gtk_widget_add_accelerator(GUIWIDGET(window, "indent"), "activate", group, gdk_keyval_from_name("m"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_window_add_accel_group(GTK_WINDOW(GUIWIDGET(id, "window")), group)
+CALL gtk_window_add_accel_group(GTK_WINDOW(GUIWIDGET(id, "scratch_dialog")), group)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "new_file"), "activate", group, gdk_keyval_from_name("n"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "open_file"), "activate", group, gdk_keyval_from_name("o"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "store_file"), "activate", group, gdk_keyval_from_name("s"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "exit_menu"), "activate", group, gdk_keyval_from_name("q"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "undo_menu"), "activate", group, gdk_keyval_from_name("z"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "redo_menu"), "activate", group, gdk_keyval_from_name("r"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "cut_menu"), "activate", group, gdk_keyval_from_name("x"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "copy_menu"), "activate", group, gdk_keyval_from_name("c"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "paste_menu"), "activate", group, gdk_keyval_from_name("v"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "select_menu"), "activate", group, gdk_keyval_from_name("a"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "find_menu"), "activate", group, gdk_keyval_from_name("f"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "exec_menu"), "activate", group, gdk_keyval_from_name("e"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "indent"), "activate", group, gdk_keyval_from_name("m"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "scratch_pad"), "activate", group, gdk_keyval_from_name("p"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "doc_menu"), "activate", group, gdk_keyval_from_name("d"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL gtk_widget_add_accelerator(GUIWIDGET(id, "con_menu"), "activate", group, gdk_keyval_from_name("i"), GDK_CONTROL_MASK, GTK_ACCEL_VISIBLE)
+CALL g_signal_connect(GTK_WINDOW(GUIWIDGET(id, "scratch_dialog")), "key-press-event", G_CALLBACK(gtk_window_propagate_key_event), NULL)
 
-' Create ad-hoc dialogue for user interaction
-FUNC Dialog_Feedback(id$, msg$)
-	dialog = gtk_message_dialog_new(GTK_WINDOW(GUIWIDGET(window, id$)), GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_QUESTION, GTK_BUTTONS_YES_NO, "%s", msg$)
-	IF gtk_dialog_run(GTK_DIALOG(dialog)) = GTK_RESPONSE_NO THEN
-		CALL gtk_widget_destroy(dialog)
-		RETURN TRUE
-	FI
-	CALL gtk_widget_destroy(dialog)
-	RETURN FALSE
-ENDFUNC
-
-' Indentation code taken from BaCon source
-FUNC Indent_Prog$(text$)
-	LOCAL result$, line$, previous$
-	LOCAL myposition, nextposition, label_active, wrap_active, total, x
-	SPLIT text$ BY NL$ TO lines$ SIZE total
-	FOR x = 0 TO total-1
-		myposition = nextposition
-		lines$[x] = CHOP$(lines$[x])
-		IF LEN(lines$[x]) = 0 AND label_active THEN
-			label_active = FALSE
-			DECR myposition
-			nextposition = myposition
-		ENDIF
-		IF REGEX(lines$[x], "^(CASE|UNTIL)[ \\t]|^(DEFAULT|FI|NEXT|WEND|DONE)|^ELSE$|^ELIF.+THEN$|^END.+") THEN
-			IF NOT(REGEX(lines$[x], "^END.+[0-9]+")) THEN DECR myposition
-			IF REGEX(lines$[x], "SELECT$") THEN DECR myposition
-			IF myposition < 0 THEN myposition = 0
-			nextposition = myposition
-		ENDIF
-		IF REGEX(lines$[x], "^(CASE|ENUM|FOR|FUNCTION|FUNC|GLOBAL RECORD|LABEL|RECORD|SELECT|SUB|WHILE|DOTIMES|WITH)[ \\t]|^(DEFAULT|REPEAT|USEC|USEH|DO$)|^IF.+THEN$|^ELIF.+THEN$|^ELSE$") THEN
-			INCR nextposition
-			IF REGEX(lines$[x], "^SELECT") THEN INCR nextposition
-			IF LEFT$(lines$[x], 5) = "LABEL" THEN label_active = TRUE
-		ENDIF
-		IF RIGHT$(lines$[x], 2) = CHR$(32) & CHR$(92) AND NOT(REGEX(lines$[x], "^(REM|')")) THEN
-			IF NOT(wrap_active) THEN INCR nextposition
-			wrap_active = TRUE
-		ELSE
-			IF wrap_active THEN DECR nextposition
-			wrap_active = FALSE
-		ENDIF
-		IF REGEX(previous$, "^(REM|')") THEN result$ = CHANGE$(result$, x, TAB$(myposition) & previous$, NL$)
-		IF LEN(lines$[x]) THEN
-			result$ = result$ & TAB$(myposition) & lines$[x] & NL$
-		ELSE
-			result$ = result$ & NL$
-		ENDIF
-		previous$ = lines$[x]
+' Load last file if it is there
+IF FILEEXISTS(Configuration$) THEN
+	FOR cfg$ IN LOAD$(Configuration$) STEP NL$
+		SELECT HEAD$(cfg$)
+			CASE "file"
+				filename$ = LAST$(cfg$)
+				current_name$ = BASENAME$(filename$)
+		ENDSELECT
 	NEXT
-	RETURN result$
-ENDFUNC
+	IF LEN(filename$) AND FILEEXISTS(filename$) THEN Load_File(filename$)
+ENDIF
 
 ' Endless loop
 WHILE TRUE
-	SELECT GUIEVENT$(window)
+	SELECT GUIEVENT$(id)
 		CASE "window", "exit_menu"
 			IF gtk_text_buffer_get_modified(buffer) AND Dialog_Feedback("file_dialog", "\nDiscard current changes?") THEN CONTINUE
+			IF LEN(current_name$) THEN
+				IF FILEEXISTS(Configuration$) THEN
+					cfg$ = COLLAPSE$(LOAD$(Configuration$), NL$)
+					DOTIMES AMOUNT(cfg$, NL$)
+						IF REGEX(TOKEN$(cfg$, _, NL$), "^file") THEN cfg$ = DEL$(cfg$, _, NL$)
+					NEXT
+					SAVE CHOP$(APPEND$(cfg$, 0, "file " & CURDIR$ & "/" & current_name$, NL$)) TO Configuration$
+				ELSE
+					SAVE "file " & CURDIR$ & "/" & current_name$ TO Configuration$
+				ENDIF
+			ENDIF
 			BREAK
 		CASE "open_file"
-			CALL GUIFN(window, "file_dialog", show)
-		CASE "close_file"
+			CALL GUIFN(id, "file_dialog", show)
+		CASE "new_file"
 			IF gtk_text_buffer_get_modified(buffer) AND Dialog_Feedback("file_dialog", "\nDiscard current changes?") THEN CONTINUE
 			CALL gtk_text_buffer_set_text(buffer, "", -1)
 			CALL gtk_text_buffer_set_modified(buffer, FALSE)
+			CALL GUISET(id, "window", "title", "The BaCon Editor")
 		CASE "save_file"
-			CALL GUIFN(window, "save_dialog", show)
+			CALL GUIFN(id, "save_dialog", show)
 		CASE "export_text"
 			IF NOT(LEN(EXEC$("which enscript 2>/dev/null"))) OR NOT(LEN(current_name$)) THEN
-				dialog = gtk_message_dialog_new(GTK_WINDOW(GUIWIDGET(window, "window")), GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_ERROR, GTK_BUTTONS_CLOSE, "\nThe 'enscript' utility fails!")
-				CALL gtk_dialog_run(GTK_DIALOG(dialog))
-				CALL gtk_widget_destroy(dialog)
+				Dialog_Msg(GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Error!", "The 'enscript' utility fails!")
 			ELSE
 				SYSTEM "enscript --tabsize=4 --color --language=html --highlight=bacon --title=" & current_name$ & " --output=" & current_name$ & ".html " & current_name$
-				dialog = gtk_message_dialog_new(GTK_WINDOW(GUIWIDGET(window, "window")), GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_CLOSE, "\nHTML generated.")
-				CALL gtk_dialog_run(GTK_DIALOG(dialog))
-				CALL gtk_widget_destroy(dialog)
+				Dialog_Msg(GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Information", "HTML generated.")
 			ENDIF
 		CASE "file_dialog", "file_cancel"
-			CALL GUIFN(window, "file_dialog", hide)
+			CALL GUIFN(id, "file_dialog", hide)
 		CASE "save_dialog", "save_cancel"
-			CALL GUIFN(window, "save_dialog", hide)
+			CALL GUIFN(id, "save_dialog", hide)
 		CASE "file_open"
 			IF gtk_text_buffer_get_modified(buffer) AND Dialog_Feedback("file_dialog", "\nDiscard current changes?") THEN CONTINUE
-			file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(GUIWIDGET(window, "filechooser")))
-			CALL gtk_text_buffer_set_text(buffer, LOAD$(file), -1)
-			CALL GUIFN(window, "file_dialog", hide)
-			CALL gtk_text_buffer_set_modified(buffer, FALSE)
-			CALL GUISET(window, "window", "title", "The BaCon Editor - '" & BASENAME$(file) & "'")
-			CHANGEDIR DIRNAME$(file)
+			file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(GUIWIDGET(id, "filechooser")))
+			IF LEN(file) THEN Load_File(file)
+			CALL GUIFN(id, "file_dialog", hide)
 			current_name$ = BASENAME$(file)
 			FREE file
 		CASE "store_file"
 			IF NOT(LEN(current_name$)) THEN
-				dialog = gtk_message_dialog_new(GTK_WINDOW(GUIWIDGET(window, "window")), GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "\nSave program first!")
-				CALL gtk_dialog_run(GTK_DIALOG(dialog))
-				CALL gtk_widget_destroy(dialog)
+				Dialog_Msg(GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Error!", "Save program first!")
 			ELSE
 				CALL gtk_text_buffer_get_bounds(buffer, &start_iter, &end_iter)
 				SAVE gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, TRUE) TO current_name$
 				CALL gtk_text_buffer_set_modified(buffer, FALSE)
+				Dialog_Msg(GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Information", "Program saved.")
 			ENDIF
 		CASE "save_open"
-			file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(GUIWIDGET(window, "savechooser")))
+			file = gtk_file_chooser_get_filename(GTK_FILE_CHOOSER(GUIWIDGET(id, "savechooser")))
 			IF FILEEXISTS(file) AND Dialog_Feedback("save_dialog", "\nAre you sure to overwrite?") THEN CONTINUE
 			CALL gtk_text_buffer_get_bounds(buffer, &start_iter, &end_iter)
 			SAVE gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, TRUE) TO file
-			CALL GUIFN(window, "save_dialog", hide)
+			CALL GUIFN(id, "save_dialog", hide)
 			CALL gtk_text_buffer_set_modified(buffer, FALSE)
 			CHANGEDIR DIRNAME$(file)
 			current_name$ = BASENAME$(file)
+			CALL GUISET(id, "window", "title", "The BaCon Editor - '" & current_name$ & "'")
 			FREE file
 		CASE "clone_me"
 			SYSTEM ME$ & " &"
 		CASE "scratch_pad"
-			CALL GUIFN(window, "scratch_dialog", show)
+			CALL GUIFN(id, "scratch_dialog", show)
 		CASE "scratch_dialog", "scratch_cancel"
-			CALL GUIFN(window, "scratch_dialog", hide)
+			CALL GUIFN(id, "scratch_dialog", hide)
 		CASE "scratch_run"
 			CALL gtk_text_buffer_get_bounds(sbuffer, &start_iter, &end_iter)
 			SAVE gtk_text_buffer_get_text(sbuffer, &start_iter, &end_iter, TRUE) TO Scratch_Temp$
-			command$ = gtk_entry_get_text(GTK_ENTRY(GUIWIDGET(window, "exec_entry")))
+			command$ = gtk_entry_get_text(GTK_ENTRY(GUIWIDGET(id, "exec_entry")))
 			SYSTEM REPLACE$(command$, "@", Scratch_Temp$)
 		CASE "exec_menu"
-			CALL GUIFN(window, "exec_dialog", show)
-			CALL gtk_editable_set_position(GTK_EDITABLE(GUIWIDGET(window, "exec_entry")), -1)
-			CALL gtk_widget_grab_focus(GUIWIDGET(window, "exec_run"))
+			CALL GUIFN(id, "exec_dialog", show)
+			CALL gtk_editable_set_position(GTK_EDITABLE(GUIWIDGET(id, "exec_entry")), -1)
+			CALL gtk_widget_grab_focus(GUIWIDGET(id, "exec_run"))
 		CASE "exec_run"
 			IF NOT(LEN(current_name$)) THEN
-				dialog = gtk_message_dialog_new(GTK_WINDOW(GUIWIDGET(window, "window")), GTK_DIALOG_MODAL|GTK_DIALOG_DESTROY_WITH_PARENT, GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "\nSave program first!")
-				CALL gtk_dialog_run(GTK_DIALOG(dialog))
-				CALL gtk_widget_destroy(dialog)
+				Dialog_Msg(GTK_MESSAGE_ERROR, GTK_BUTTONS_OK, "Error!", "Save program first!")
 			ELSE
 				CALL gtk_text_buffer_get_bounds(buffer, &start_iter, &end_iter)
 				SAVE gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, TRUE) TO current_name$
 				CALL gtk_text_buffer_set_modified(buffer, FALSE)
-				command$ = gtk_entry_get_text(GTK_ENTRY(GUIWIDGET(window, "exec_entry")))
+				command$ = gtk_entry_get_text(GTK_ENTRY(GUIWIDGET(id, "exec_entry")))
 				SYSTEM REPLACE$(command$, "@", current_name$)
 			ENDIF
-			CALL GUIFN(window, "exec_dialog", hide)
+			CALL GUIFN(id, "exec_dialog", hide)
 		CASE "exec_dialog", "exec_cancel"
-			CALL GUIFN(window, "exec_dialog", hide)
+			CALL GUIFN(id, "exec_dialog", hide)
 		CASE "con_menu"
-			CALL gtk_text_buffer_get_iter_at_mark(buffer, &start_iter, gtk_text_buffer_get_insert(buffer))
-			CALL gtk_text_buffer_get_iter_at_mark(buffer, &end_iter, gtk_text_buffer_get_insert(buffer))
+			IF gtk_widget_has_focus(GTK_WIDGET(GUIWIDGET(id, "scratch_view"))) THEN
+				tmp_buffer = sbuffer
+			ELSE
+				tmp_buffer = buffer
+			ENDIF
+			CALL gtk_text_buffer_get_iter_at_mark(tmp_buffer, &start_iter, gtk_text_buffer_get_insert(tmp_buffer))
+			CALL gtk_text_buffer_get_iter_at_mark(tmp_buffer, &end_iter, gtk_text_buffer_get_insert(tmp_buffer))
 			IF NOT(gtk_text_iter_starts_word(&start_iter)) THEN CALL gtk_text_iter_backward_word_start(&start_iter)
 			IF NOT(gtk_text_iter_ends_word(&end_iter)) THEN CALL gtk_text_iter_forward_word_end(&end_iter)
-			CALL gtk_text_iter_forward_visible_cursor_position(&end_iter)
-			CALL webkit_web_view_load_uri((WebKitWebView*)GUIWIDGET(window, "web_view"), "file://" & CONCAT$(DATA_PATH, "/BaCon/documentation/documentation.html") & "#" & UCASE$(CHOP$(gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, 1), " (")))
-			CALL GUIFN(window, "doc_dialog", show)
+			CALL gtk_text_iter_forward_char(&end_iter)
+			txt$ = CHOP$(gtk_text_buffer_get_text(tmp_buffer, &start_iter, &end_iter, 1))
+			IF NOT(REGEX(RIGHT$(txt$, 1), "[a-zA-Z$]")) THEN txt$ = LEFT$(txt$, LEN(txt$)-1)
+			linenr = heading(UCASE$(txt$))
+			CALL gtk_text_buffer_get_iter_at_line(dbuffer, &start_iter, linenr)
+			CALL gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(GUIWIDGET(id, "doc_view")), &start_iter, 0.0, TRUE, 0.0, 0.0)
+			CALL GUIFN(id, "doc_dialog", show)
 		CASE "doc_menu"
-			CALL webkit_web_view_load_uri((WebKitWebView*)GUIWIDGET(window, "web_view"), "file://" & CONCAT$(DATA_PATH, "/BaCon/documentation/doc_frame.html"))
-			CALL GUIFN(window, "doc_dialog", show)
+			CALL gtk_text_buffer_get_start_iter(dbuffer, &start_iter)
+			CALL gtk_text_view_scroll_to_iter(GTK_TEXT_VIEW(GUIWIDGET(id, "doc_view")), &start_iter, 0.0, TRUE, 0.0, 0.0)
+			CALL GUIFN(id, "doc_dialog", show)
+			CALL gtk_widget_grab_focus(GUIWIDGET(id, "doc_close"))
 		CASE "doc_dialog", "doc_close"
-			CALL GUIFN(window, "doc_dialog", hide)
+			CALL GUIFN(id, "doc_dialog", hide)
 		CASE "about_menu"
-			CALL GUIFN(window, "about_dialog", show)
+			CALL GUIFN(id, "about_dialog", show)
 		CASE "about_dialog"
-			CALL GUIFN(window, "about_dialog", hide)
+			CALL GUIFN(id, "about_dialog", hide)
 		CASE "nr_menu"
-			CALL GUIGET(window, "nr_menu", "active", &mode)
-			CALL GUISET(window, "view", "show-line-numbers", mode)
+			CALL GUIGET(id, "nr_menu", "active", &mode)
+			CALL GUISET(id, "view", "show-line-numbers", mode)
 		CASE "indent"
 			CALL gtk_text_buffer_get_bounds(buffer, &start_iter, &end_iter)
 			CALL gtk_text_buffer_set_text(buffer, Indent_Prog$(gtk_text_buffer_get_text(buffer, &start_iter, &end_iter, TRUE)), -1)
+			CALL gtk_text_buffer_get_start_iter(buffer, &start_iter)
+			CALL gtk_text_buffer_place_cursor(buffer, &start_iter)
+			Dialog_Msg(GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Information", "Indentation applied.")
+		CASE "undo_menu"
+			IF gtk_source_buffer_can_undo(GTK_SOURCE_BUFFER(buffer)) THEN CALL gtk_source_buffer_undo(GTK_SOURCE_BUFFER(buffer))
+			CALL gtk_text_view_scroll_mark_onscreen(GTK_TEXT_VIEW(GUIWIDGET(id, "view")), gtk_text_buffer_get_insert(buffer))
+		CASE "redo_menu"
+			IF gtk_source_buffer_can_redo(GTK_SOURCE_BUFFER(buffer)) THEN CALL gtk_source_buffer_redo(GTK_SOURCE_BUFFER(buffer))
+			CALL gtk_text_view_scroll_mark_onscreen(GTK_TEXT_VIEW(GUIWIDGET(id, "view")), gtk_text_buffer_get_insert(buffer))
+		CASE "cut_menu"
+			CALL gtk_text_buffer_cut_clipboard(buffer, clipBoard, 1)
+		CASE "copy_menu"
+			CALL gtk_text_buffer_copy_clipboard(buffer, clipBoard)
+		CASE "paste_menu"
+			CALL gtk_text_buffer_paste_clipboard(buffer, clipBoard, NULL, 1)
+		CASE "select_menu"
+			CALL gtk_text_buffer_get_bounds(buffer, &start_iter, &end_iter)
+			CALL gtk_text_buffer_select_range(buffer, &start_iter, &end_iter)
+		CASE "find_menu"
+			CALL GUIFN(id, "find_dialog", show)
+			CALL gtk_editable_set_position(GTK_EDITABLE(GUIWIDGET(id, "find_entry")), -1)
+			CALL gtk_widget_grab_focus(GUIWIDGET(id, "find_entry"))
+		CASE "find_dialog", "find_cancel"
+			CALL GUIFN(id, "find_dialog", hide)
+		CASE "find_term", "find_entry"
+			term$ = gtk_entry_get_text(GTK_ENTRY(GUIWIDGET(id, "find_entry")))
+			IF gtk_text_buffer_get_has_selection(buffer) THEN
+				CALL gtk_text_buffer_get_iter_at_mark(buffer, &find_iter, gtk_text_buffer_get_selection_bound(buffer))
+			ELSE
+				CALL gtk_text_buffer_get_iter_at_mark(buffer, &find_iter, gtk_text_buffer_get_insert(buffer))
+			ENDIF
+			IF LEN(term$) THEN
+				find_mode = GTK_TEXT_SEARCH_TEXT_ONLY | GTK_TEXT_SEARCH_CASE_INSENSITIVE
+				IF gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(GUIWIDGET(id, "find_check"))) THEN find_mode = GTK_TEXT_SEARCH_TEXT_ONLY
+				IF gtk_text_iter_forward_search(&find_iter, term$, find_mode, &start_iter, &end_iter, NULL) THEN
+					CALL gtk_text_buffer_select_range(buffer, &start_iter, &end_iter)
+					CALL gtk_text_view_scroll_to_mark(GTK_TEXT_VIEW(GUIWIDGET(id, "view")), gtk_text_buffer_get_selection_bound(buffer), 0, 1, 0.5, 0.5)
+				ELSE
+					Dialog_Msg(GTK_MESSAGE_INFO, GTK_BUTTONS_OK, "Information", "Term not found, restarting from top!")
+					CALL gtk_text_buffer_get_start_iter(buffer, &find_iter)
+					CALL gtk_text_buffer_place_cursor(buffer, &find_iter)
+				ENDIF
+			ENDIF
 	ENDSELECT
 WEND

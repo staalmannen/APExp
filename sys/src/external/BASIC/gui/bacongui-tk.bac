@@ -1,12 +1,13 @@
 '------------------------------------------------------------------------
 ' A minimal editor for the BaCon BASIC-to-C converter based on TK.
 '
-' Peter van Eerten - March 2024. License: MIT License.
+' Peter van Eerten - February 2023/July 2024. License: MIT License.
 '------------------------------------------------------------------------
 OPTION GUI TRUE
 PRAGMA GUI tk
 
 OPTION EXPLICIT TRUE
+OPTION QUOTED FALSE
 
 ' Define statements
 CONST Stat$ = "|ADD|ALARM|ALIAS|APPEND|APPENDING|ARRAY|AS|ASSOC|BACK|BAPPEND|BASE|BG|BLACK|BLINK|BLUE|BOLD|BREAK|BROADCAST|BSAVE|BY|CALL|CASE|CATCH|CERTIFICATE|" \
@@ -24,7 +25,7 @@ CONST Stat$ = "|ADD|ALARM|ALIAS|APPEND|APPENDING|ARRAY|AS|ASSOC|BACK|BAPPEND|BAS
 CONST Func$ = "|ABS|ACCEPT|ACOS|ADDRESS|ALIGN\\$|AMOUNT|AND|APPEND\\$|ASC|ASIN|ATN|ATN2|B64DEC\\$|B64ENC\\$|BASENAME\\$|COIL\\$|BETWEEN|BEYOND|BIN\\$|BIT|BLOAD|" \
 	"BYTELEN|CEIL|CA\\$|CN\\$|CHANGE\\$|COLLAPSE\\$|CHOP\\$|CHR\\$|CIPHER\\$|CMDLINE|COLUMNS|CONCAT\\$|COS|COUNT|CURDIR\\$|CUT\\$|DAY|DEC|DEG|DEL\\$|DELIM\\$|" \
 	"DIRNAME\\$|EDITBOM\\$|ENDFILE|EQUAL|ERR\\$|ESCAPE\\$|EVAL|EVEN|EXCHANGE\\$|EXCL|EXEC\\$|EXP|EXPLODE\\$|EXTRACT\\$|FILEEXISTS|FILELEN|FILETIME|FILETYPE|FILL\\$|" \
-	"FIRST\\$|FLATTEN\\$|FLOOR|FORK|FP|GUIFN|GUIDEFINE|GUIGET|GUISET|GUIEVENT\\$|GUIWIDGET|GETENVIRON\\$|GETKEY|GETPEER\\$|GETX|GETY|HASBOM|HASDELIM|HASH|HEAD\\$|HEX\\$|" \
+	"FIRST\\$|FLATTEN\\$|FLOOR|FORK|FP|GUICB|GUIFN|GUIDEFINE|GUIGET|GUISET|GUIEVENT\\$|GUIWIDGET|GETENVIRON\\$|GETKEY|GETPEER\\$|GETX|GETY|HASBOM|HASDELIM|HASH|HEAD\\$|HEX\\$|" \
 	"HOST\\$|HOSTNAME\\$|HOUR|IIF|IIF\\$|INBETWEEN\\$|INDEX|INDEX\\$|INSERT\\$|INSTR|INSTRREV|INT|INTL\\$|INVERT|ISASCII|ISFALSE|ISKEY|ISTOKEN|ISTRUE|ISUTF8|LAST\\$|" \
 	"LCASE\\$|LEFT\\$|LEN|LOAD\\$|LOG|LOOP|LOOP\\$|MATCH|MAX|MAX\\$|MAXNUM|ME\\$|MEMCHECK|MEMORY|MEMTELL|MERGE\\$|MID\\$|MIN|MIN\\$|MINUTE|MOD|MONTH|MONTH\\$|" \
 	"MYPID|NANOTIMER|NNTL\\$|NOT|NOW|NRKEYS|OBTAIN\\$|ODD|OR|OS\\$|OUTBETWEEN\\$|PEEK|POW|PROPER\\$|RAD|RANDOM|REALPATH\\$|REAP|RIP\\$|REGEX|REPLACE\\$|REV\\$|REVERSE\\$|" \
@@ -37,29 +38,30 @@ CONST Var$ = "|FALSE|TRUE|PI|MAXRANDOM|RETVAL|REGLEN|ERROR|LINENO|SP|NL\\$|CR\\$
 ' Types
 CONST Type$ = "|const|int|double|float|long|char|short|void|signed|unsigned|static|volatile|struct|extern|public|private|virtual|uint8_t|uint16_t|uint32_t|uint64_t|uintptr_t|int8_t|int16_t|int32_t|int64_t|intptr_t|size_t|"
 
+CONST Configuration$ = GETENVIRON$("HOME") & "/.bacon/settings_tk.cfg"
 CONST Scratch_Temp$ = "/tmp/scratchpad.bac"
+CONST Data_Path$ = DATA_PATH
 
-LOCAL id
-LOCAL command$, filetext$, filename$, tag$, nr$, startline$, endline$, total_lines$ = "1"
+DECLARE id, modified, command$, filetext$, filename$, tag$, nr$, startline$, endline$, curline$, prvline$, cfg$, dir$, total_lines$ = "1"
 
 '----------------------------------------------------------------------------
 
-SUB Editor_Tag_Line(nr, xstart$, xend$, keep_string_wrap, widget$, clear_separate_line)
+SUB Editor_Tag_Line(nr, xstart$, keep_string_wrap, widget$, clear_separate_line)
 
 	LOCAL in_block_comment = 0, in_string = 0, startstr = 0, startline = 0 TYPE static int
-	LOCAL x, in_line_comment, in_escaped, pos, len, display_columns, last_wrap
-	LOCAL term$, c1$, c2$, chunk$, name$
+	LOCAL x, in_line_comment, in_escaped, pos, len, display_columns, last_wrap, term$, c1$, c2$, chunk$, name$
+
+	' Determine start and end of line
+	CALL GUISET(id, "xstart", xstart$)
+	CALL GUISET(id, "widget", widget$)
+	CALL GUIFN(id, "set xend [$widget index \"$xstart lineend\"];")
 
 	' Remove existing tags in this line first
-	CALL GUISET(id, "xstart", xstart$)
-	CALL GUISET(id, "xend", xend$)
-	CALL GUISET(id, "widget", widget$)
-	IF clear_separate_line THEN CALL GUIFN(id, "while {[regsub {\\" & CHR$(46) & "} $xstart {}] < [regsub {\\" & CHR$(46) & "} $xend {}] } { set tn [$widget tag names $xstart]; \
-		if {[string length $tn]==0} { set xstart [$widget index \"$xstart +1 indices\"]; } else { set tagrange [$widget tag nextrange $tn $xstart]; \
-		$widget tag remove $tn [lindex $tagrange 0] [lindex $tagrange 1]; set xstart [lindex $tagrange 1]; } }")
+	IF clear_separate_line THEN CALL GUIFN(id, "while { [$widget compare $xstart \"<\" $xend] } { set tn [$widget tag names $xstart]; \
+		if {[string length $tn]==0} { set xstart [$widget index \"$xstart+1c\"]; } else { $widget tag remove $tn $xstart $xend; } }")
 
 	' Get the line from the GUI
-	CALL GUIFN(id, "set chunk [$widget get " & xstart$ & " " & xend$ &  "]")
+	CALL GUIFN(id, "set chunk [$widget get " & xstart$ & " $xend];")
 	CALL GUIGET(id, "chunk", chunk$)
 
 	IF keep_string_wrap = FALSE THEN in_string = 0
@@ -136,19 +138,26 @@ SUB Editor_Tag_Line(nr, xstart$, xend$, keep_string_wrap, widget$, clear_separat
 			INCR x, pos
 		ENDIF
 	NEXT
+	CALL GUIFN(id, "update idletasks;")
 END SUB
 
 '----------------------------------------------------------------------------
 
 SUB Editor_Tag_Text(widget$)
-	LOCAL total$, xend$
-	LOCAL x
-	CALL GUIFN(id, "set total [" & widget$ & " count -lines 1.0 end]")
+	LOCAL total$, x
+	CALL GUISET(id, "widget", widget$)
+	CALL GUIFN(id, "$widget tag remove stat_col [$widget index \"1.0\"] [$widget index end];")
+	CALL GUIFN(id, "$widget tag remove func_col [$widget index \"1.0\"] [$widget index end];")
+	CALL GUIFN(id, "$widget tag remove var_col [$widget index \"1.0\"] [$widget index end];")
+	CALL GUIFN(id, "$widget tag remove type_col [$widget index \"1.0\"] [$widget index end];")
+	CALL GUIFN(id, "$widget tag remove num_col [$widget index \"1.0\"] [$widget index end];")
+	CALL GUIFN(id, "$widget tag remove comm_col [$widget index \"1.0\"] [$widget index end];")
+	CALL GUIFN(id, "$widget tag remove quot_col [$widget index \"1.0\"] [$widget index end];")
+	CALL GUIFN(id, "$widget tag delete find_col;")
+	CALL GUIFN(id, "set total [$widget count -lines 1.0 end];")
 	CALL GUIGET(id, "total", total$)
 	FOR x = 1 TO VAL(total$)
-		CALL GUIFN(id, "set xend [" & widget$ & " index \"" & STR$(x) & ".0 lineend\"]")
-		CALL GUIGET(id, "xend", xend$)
-		Editor_Tag_Line(x, STR$(x) & ".0", xend$, TRUE, widget$, FALSE)
+		Editor_Tag_Line(x, STR$(x) & ".0", TRUE, widget$, FALSE)
 	NEXT
 ENDSUB
 
@@ -156,10 +165,9 @@ ENDSUB
 
 ' Indentation code taken from BaCon source
 FUNC Indent_Prog$(text$)
-	LOCAL result$, line$, previous$
-	LOCAL myposition, nextposition, label_active, wrap_active, total, x
-	SPLIT text$ BY NL$ TO lines$ SIZE total
-	FOR x = 0 TO total-1
+	LOCAL result$, line$, previous$, myposition, nextposition, label_active, wrap_active, x
+	SPLIT text$ BY NL$ TO lines$
+	FOR x = 0 TO UBOUND(lines$)-1
 		myposition = nextposition
 		lines$[x] = CHOP$(lines$[x])
 		IF LEN(lines$[x]) = 0 AND label_active THEN
@@ -168,7 +176,7 @@ FUNC Indent_Prog$(text$)
 			nextposition = myposition
 		ENDIF
 		IF REGEX(lines$[x], "^(CASE|UNTIL)[ \\t]|^(DEFAULT|FI|NEXT|WEND|DONE)|^ELSE$|^ELIF.+THEN$|^END.+") THEN
-			IF NOT(REGEX(lines$[x], "^END.+[0-9]+")) THEN DECR myposition
+			IF NOT(REGEX(lines$[x], "^END.+[0-9]+|^ENDFORK")) THEN DECR myposition
 			IF REGEX(lines$[x], "SELECT$") THEN DECR myposition
 			IF myposition < 0 THEN myposition = 0
 			nextposition = myposition
@@ -200,9 +208,7 @@ ENDFUNC
 
 FUNC Confirm_Close
 	LOCAL response$, modified$
-	CALL GUIFN(id, "set modified [.txt edit modified]")
-	CALL GUIGET(id, "modified", modified$)
-	IF modified$ = "1" THEN
+	IF modified = TRUE THEN
 		CALL GUIFN(id, "set response [tk_messageBox -title {Warning!} -message {Discard current changes?} -icon question -type okcancel]")
 		CALL GUIGET(id, "response", response$)
 		IF response$ = "cancel" THEN RETURN TRUE
@@ -219,8 +225,22 @@ SUB Update_Linenrs
 	IF total$ <> total_lines$ THEN
 		total_lines$ = total$
 		CALL GUIFN(id, ".lnr configure -state normal; .lnr tag remove just 1.0 end; .lnr delete 1.0 end; .lnr configure -width " & STR$(LEN(total$)+1))
-		CALL GUIFN(id, "for {set i 1} {$i<=$total} {incr i} { .lnr insert $i.0 \"$i\n\"} ; .lnr tag add just 1.0 end; .lnr configure -state disabled;")
+		CALL GUIFN(id, "for {set i 1} {$i<=$total} {incr i} { .lnr insert $i.0 \"$i\n\"} ; .lnr tag add just 1.0 end; .lnr yview [.txt index @0,0]; .lnr configure -state disabled;")
 	ENDIF
+ENDSUB
+
+'----------------------------------------------------------------------------
+
+SUB Load_File(file$)
+	CALL GUIFN(id, ".txt delete 1.0 end")
+	CALL GUISET(id, "filetext", LOAD$(file$))
+	CALL GUIFN(id, ".txt insert 1.0 $filetext")
+	CALL GUIFN(id, ".txt mark set insert [.txt index \"1.0\"];")
+	CALL Editor_Tag_Text(".txt")
+	CHANGEDIR DIRNAME$(file$)
+	CALL GUIFN(id, "wm title . {The BaCon Editor - '" & BASENAME$(file$) & "'}")
+	CALL Update_Linenrs()
+	modified = FALSE
 ENDSUB
 
 '----------------------------------------------------------------------------
@@ -228,53 +248,63 @@ ENDSUB
 id = GUIDEFINE(" \
 	wm title . {The BaCon Editor}; \
 	wm protocol . \"WM_DELETE_WINDOW\" tk_exit; \
-	wm iconbitmap . BaCon; \
+	wm withdraw .; \
 	option add *tearOff 0; \
 	menu .menubar; \
 	. configure -menu .menubar; \
 	menu .menubar.file; \
+	menu .menubar.edit; \
 	menu .menubar.tools; \
 	menu .menubar.help; \
 	.menubar add cascade -menu .menubar.file -label File; \
+	.menubar.file add command -label \"New\" -command new_doc; \
+	.menubar.file entryconfigure 0 -accelerator \"CTRL+N\"; \
 	.menubar.file add command -label \"Open...\" -command openf; \
-	.menubar.file entryconfigure 0 -accelerator \"ALT+O\"; \
-	bind . <Alt-KeyPress-o> openf; \
-	.menubar.file add command -label \"Close\" -command close; \
-	.menubar.file entryconfigure 1 -accelerator \"ALT+C\"; \
-	bind . <Alt-KeyPress-s> close; \
+	.menubar.file entryconfigure 1 -accelerator \"CTRL+O\"; \
 	.menubar.file add command -label \"Save\" -command save; \
-	.menubar.file entryconfigure 2 -accelerator \"ALT+S\"; \
-	bind . <Alt-KeyPress-s> save; \
+	.menubar.file entryconfigure 2 -accelerator \"CTRL+S\"; \
 	.menubar.file add command -label \"Save as...\" -command saveas; \
-	.menubar.file entryconfigure 3 -accelerator \"ALT+A\"; \
-	bind . <Alt-KeyPress-a> saveas; \
 	.menubar.file add separator; \
 	.menubar.file add command -label \"Clone Me\" -command clone; \
 	.menubar.file add separator; \
 	.menubar.file add command -label \"HTML export\" -command export; \
 	.menubar.file add separator; \
 	.menubar.file add command -label \"Exit\" -command exit; \
-	.menubar.file entryconfigure 9 -accelerator \"ALT+X\"; \
-	bind . <Alt-KeyPress-x> exit; \
+	.menubar.file entryconfigure 9 -accelerator \"CTRL+Q\"; \
+	.menubar add cascade -menu .menubar.edit -label Edit; \
+	.menubar.edit add command -label \"Undo\" -command undo; \
+	.menubar.edit entryconfigure 0 -accelerator \"CTRL+Z\"; \
+	.menubar.edit add command -label \"Redo\" -command redo; \
+	.menubar.edit entryconfigure 1 -accelerator \"CTRL+R\"; \
+	.menubar.edit add separator; \
+	.menubar.edit add command -label \"Cut\" -command cut; \
+	.menubar.edit entryconfigure 3 -accelerator \"CTRL+X\"; \
+	.menubar.edit add command -label \"Copy\" -command copy; \
+	.menubar.edit entryconfigure 4 -accelerator \"CTRL+C\"; \
+	.menubar.edit add command -label \"Paste\" -command paste; \
+	.menubar.edit entryconfigure 5 -accelerator \"CTRL+V\"; \
+	.menubar.edit add separator; \
+	.menubar.edit add command -label \"Select All\" -command txt_selectall; \
+	.menubar.edit entryconfigure 7 -accelerator \"CTRL+A\"; \
+	.menubar.edit add separator; \
+	.menubar.edit add command -label \"Find...\" -command find; \
+	.menubar.edit entryconfigure 9 -accelerator \"CTRL+F\"; \
 	.menubar add cascade -menu .menubar.tools -label Tools; \
 	.menubar.tools add command -label \"Execute\" -command execute; \
-	.menubar.tools entryconfigure 0 -accelerator \"ALT+E\"; \
-	bind . <Alt-KeyPress-e> execute; \
+	.menubar.tools entryconfigure 0 -accelerator \"CTRL+E\"; \
 	.menubar.tools add separator; \
 	.menubar.tools add checkbutton -label \"Line Numbers\" -variable lnr_check -command nrs; set lnr_check 1; \
 	.menubar.tools add separator; \
 	.menubar.tools add command -label \"Indent Code\" -command indent; \
-	.menubar.tools entryconfigure 4 -accelerator \"ALT+M\"; \
-	bind . <Alt-KeyPress-m> indent; \
+	.menubar.tools entryconfigure 4 -accelerator \"CTRL+M\"; \
 	.menubar.tools add separator; \
 	.menubar.tools add command -label \"Scratchpad\" -command scratch; \
-	.menubar.tools entryconfigure 6 -accelerator \"ALT+P\"; \
-	bind . <Alt-KeyPress-p> scratch; \
+	.menubar.tools entryconfigure 6 -accelerator \"CTRL+P\"; \
 	.menubar add cascade -menu .menubar.help -label Help; \
 	.menubar.help add command -label \"Documentation\" -command documentation; \
+	.menubar.help entryconfigure 0 -accelerator \"CTRL+D\"; \
 	.menubar.help add command -label {Context Info} -command context; \
-	.menubar.help entryconfigure 1 -accelerator \"ALT+I\"; \
-	bind . <Alt-KeyPress-i> context; \
+	.menubar.help entryconfigure 1 -accelerator \"CTRL+I\"; \
 	.menubar.help add separator; \
 	.menubar.help add command -label \"About\" -command about; \
 	proc alignText {} { .txt yview [.txt index @0,0]; .lnr yview [.txt index @0,0]; }; \
@@ -294,8 +324,18 @@ id = GUIDEFINE(" \
 	grid .hsb -row 1 -column 0 -columnspan 2 -sticky nsew; \
 	grid columnconfigure . 1 -weight 1; \
 	grid rowconfigure . 0 -weight 1; \
-	bind .txt <KeyPress> key; \
-	bind .txt <<Paste>> txtpaste; \
+	bind .txt <Control-KeyPress-n> new_doc+break; \
+	bind .txt <Control-KeyPress-o> openf+break; \
+	bind .txt <Control-KeyPress-s> save+break; \
+	bind .txt <Control-KeyPress-q> exit+break; \
+	bind .txt <Control-KeyPress-f> find+break; \
+	bind .txt <Control-KeyPress-e> execute+break; \
+	bind .txt <Control-KeyPress-m> indent+break; \
+	bind .txt <Control-KeyPress-p> scratch+break; \
+	bind .txt <Control-KeyPress-d> documentation+break; \
+	bind .txt <Control-KeyPress-i> context+break; \
+	bind .txt <Control-KeyPress-a> txt_selectall+break; \
+	bind .txt <<Modified>> txt_modified; \
 	.txt tag configure stat_col -foreground {dark green}; \
 	.txt tag configure func_col -foreground {dark cyan}; \
 	.txt tag configure var_col -foreground orange; \
@@ -308,7 +348,6 @@ id = GUIDEFINE(" \
 	toplevel .exec; \
 	wm title .exec \"Compile and Execute\"; \
 	wm protocol .exec \"WM_DELETE_WINDOW\" {wm withdraw .exec}; \
-	wm iconbitmap .exec BaCon; \
 	wm withdraw .exec; \
 	label .exec.lbl -text {Convert command:}; \
 	entry .exec.ent -width 45; \
@@ -323,10 +362,9 @@ id = GUIDEFINE(" \
 	toplevel .scratch; \
 	wm title .scratch {BaCon Scratchpad}; \
 	wm protocol .scratch \"WM_DELETE_WINDOW\" {wm withdraw .scratch}; \
-	wm iconbitmap .scratch BaCon; \
 	scrollbar .scratch.hsb -orient horizontal -command {.scratch.txt xview}; \
 	scrollbar .scratch.vsb -orient vertical -command {.scratch.txt yview}; \
-	text .scratch.txt -width 70 -height 20 -wrap none -undo 1 -bg white -font TkFixedFont -xscrollcommand {.scratch.hsb set} -yscrollcommand {.scratch.vsb set}; \
+	text .scratch.txt -width 70 -height 20 -wrap none -undo 1 -bg white -font TkFixedFont -tabs \"[expr {4*[font measure TkFixedFont 0]}] left\" -tabstyle wordprocessor -xscrollcommand {.scratch.hsb set} -yscrollcommand {.scratch.vsb set}; \
 	button .scratch.canc -text \"Cancel\" -command {wm withdraw .scratch}; \
 	button .scratch.exe -text \"Execute\" -command runscratch; \
 	grid .scratch.txt -row 0 -column 0 -sticky nsew; \
@@ -336,8 +374,10 @@ id = GUIDEFINE(" \
 	grid .scratch.exe -row 2 -column 0 -padx 5 -pady 5 -sticky e; \
 	grid columnconfigure .scratch 0 -weight 1; \
 	grid rowconfigure .scratch 0 -weight 1; \
-	bind .scratch.txt <KeyPress> skey; \
-	bind .scratch.txt <<Paste>> scratchpaste; \
+	bind .scratch.txt <Control-KeyPress-i> context+break; \
+	bind .scratch.txt <Control-KeyPress-a> scratch_selectall+break; \
+	bind .scratch.txt <Control-KeyPress-v> scratch_paste; \
+	bind .scratch.txt <<Modified>> scratch_modified; \
 	.scratch.txt tag configure stat_col -foreground {dark green}; \
 	.scratch.txt tag configure func_col -foreground {dark cyan}; \
 	.scratch.txt tag configure var_col -foreground orange; \
@@ -345,70 +385,119 @@ id = GUIDEFINE(" \
 	.scratch.txt tag configure num_col -foreground red; \
 	.scratch.txt tag configure comm_col -foreground blue -font {TkFixedFont 10 italic}; \
 	.scratch.txt tag configure quot_col -foreground magenta; \
-	bind .scratch <Alt-KeyPress-i> ctxscratch; \
+	.scratch.txt edit modified 0; \
 	wm withdraw .scratch; \
 	toplevel .doc; \
 	wm title .doc {BaCon Documentation}; \
 	wm protocol .doc \"WM_DELETE_WINDOW\" {wm withdraw .doc}; \
-	wm iconbitmap .doc BaCon; \
 	scrollbar .doc.vsb -orient vertical -command {.doc.txt yview}; \
 	text .doc.txt -width 70 -height 30 -wrap none -bg white -font TkTextFont -yscrollcommand {.doc.vsb set}; \
-	button .doc.close -text \"Close\" -command {wm withdraw .doc}; \
+	button .doc.close -text \"Close\" -default active -command {wm withdraw .doc}; \
 	grid .doc.txt -row 0 -column 0 -sticky nsew; \
 	grid .doc.vsb -row 0 -column 1 -sticky nsew; \
 	grid .doc.close -row 1 -column 0 -padx 5 -pady 5; \
 	grid columnconfigure .doc 0 -weight 1; \
 	grid rowconfigure .doc 0 -weight 1; \
+	bind .doc <Return> {.doc.close invoke}; \
 	.doc.txt tag configure txt_head -font {TkTextFont 14 bold}; \
 	.doc.txt tag configure txt_bold -font {TkTextFont 12 bold}; \
 	.doc.txt tag configure txt_para -font {TkTextFont 11 bold} -foreground red; \
-	wm withdraw .doc;")
+	wm withdraw .doc; \
+	toplevel .find; \
+	wm title .find \"Find term...\"; \
+	wm protocol .find \"WM_DELETE_WINDOW\" {wm withdraw .exec}; \
+	wm withdraw .find; \
+	label .find.lbl -text {Enter term:}; \
+	entry .find.ent -width 30; \
+	checkbutton .find.check -text {Case sensitive}; \
+	grid .find.lbl -row 0 -column 0 -padx 5 -pady 5; \
+	grid .find.ent -row 0 -column 1 -padx 5 -pady 5; \
+	grid .find.check -row 1 -column 1 -sticky w -padx 5 -pady 5; \
+	button .find.canc -text \"Cancel\" -command {wm withdraw .find}; \
+	button .find.exe -text \"Find\" -default active -command findterm; \
+	bind .find <Return> findterm; \
+	set find_term \"\"; \
+	grid .find.canc -row 2 -column 0 -padx 5 -pady 5 -sticky w; \
+	grid .find.exe -row 2 -column 1 -padx 5 -pady 5 -sticky e;")
+
+' Define showing a window centered
+CALL GUIFN(id, "proc show_window_centered {w} { update idletasks; set x [expr [winfo screenwidth $w]/2 - [winfo reqwidth $w]/2 ]; \
+	set y [expr [winfo screenheight $w]/2 - [winfo reqheight $w]/2]; wm geom $w +$x+$y; wm deiconify $w; }")
+
+' Center the main window and set the application icon for all windows
+CALL GUIFN(id, "show_window_centered .; image create photo BaCon -file " & Data_Path$ & "/pixmaps/BaConStrip.png; wm iconphoto . -default BaCon;")
+CALL GUIFN(id, "wm iconphoto .exec -default BaCon; wm iconphoto .scratch -default BaCon; wm iconphoto .doc -default BaCon; wm iconphoto .find -default BaCon;")
 
 ' Load and format the documentation
-CALL GUISET(id, "filetext", LOAD$(CONCAT$(DATA_PATH, "/BaCon/documentation/documentation.txt")))
+CALL GUISET(id, "filetext", LOAD$(Data_Path$ & "/BaCon/documentation/documentation.txt"))
 CALL GUIFN(id, ".doc.txt insert 1.0 \"$filetext\"")
 CALL GUIFN(id, ".doc.txt tag add txt_head 1.0 [.doc.txt index \"1.0 lineend\"];")
 CALL GUIFN(id, "set total [.doc.txt count -lines 1.0 end]; for {set i 2} {$i < $total} {incr i} { set endline [.doc.txt index \"${i}.0 lineend\"]; \
 	if { [string match {[A-Z]*} [.doc.txt get ${i}.0] ]==1 } {.doc.txt tag add txt_bold ${i}.0 $endline; }; \
 	if { [string match {  [A-Z]*} [.doc.txt get ${i}.0 $endline] ]==1 } {.doc.txt tag add txt_para ${i}.0 $endline; }; }; .doc.txt configure -state disabled;")
 
+' Load last file if it is there
+IF FILEEXISTS(Configuration$) THEN
+	FOR cfg$ IN LOAD$(Configuration$) STEP NL$
+		SELECT HEAD$(cfg$)
+			CASE "file"
+				filename$ = LAST$(cfg$)
+		ENDSELECT
+	NEXT
+	IF LEN(filename$) AND FILEEXISTS(filename$) THEN Load_File(filename$)
+ENDIF
+
 ' Mainloop
 WHILE TRUE
 	SELECT GUIEVENT$(id)
-		CASE "key"
-			CALL GUIFN(id, "set startline [.txt index \"[.txt index insert] linestart\"]")
-			CALL GUIFN(id, "set endline [.txt index \"[.txt index insert] lineend\"]")
+		CASE "txt_modified"
+			modified = TRUE
+			CALL GUIFN(id, ".txt edit modified 0; .txt tag delete find_col;")
+			CALL GUIFN(id, "set startline [.txt index \"[.txt index insert] linestart\"]; set curline [.txt get $startline [.txt index \"$startline lineend\"] ]")
+			CALL GUIFN(id, "set prevstart [.txt index \"$startline -1 lines\"]; set prvline [.txt get $prevstart [.txt index \"$prevstart lineend\"] ];")
+			CALL GUIGET(id, "curline", curline$)
+			CALL GUIGET(id, "prvline", prvline$)
+			IF RIGHT$(curline$, 2) = CHR$(32) & CHR$(92) OR RIGHT$(prvline$, 2) = CHR$(32) & CHR$(92) THEN
+				CALL Editor_Tag_Text(".txt")
+			ELSE
+				CALL GUIGET(id, "startline", startline$)
+				CALL Editor_Tag_Line(VAL(TOKEN$(startline$, 1, ".")), startline$, FALSE, ".txt", TRUE)
+			ENDIF
+		CASE "txt_selectall"
+			CALL GUIFN(id, ".txt tag add sel 1.0 end")
+		CASE "scratch_modified"
+			CALL GUIFN(id, ".scratch.txt edit modified 0; set startline [.scratch.txt index \"[.scratch.txt index insert] linestart\"];")
 			CALL GUIGET(id, "startline", startline$)
-			CALL GUIGET(id, "endline", endline$)
-			CALL Editor_Tag_Line(VAL(TOKEN$(startline$, 1, ".")), startline$, endline$, FALSE, ".txt", TRUE)
-		CASE "skey"
-			CALL GUIFN(id, "set startline [.scratch.txt index \"[.scratch.txt index insert] linestart\"]")
-			CALL GUIFN(id, "set endline [.scratch.txt index \"[.scratch.txt index insert] lineend\"]")
-			CALL GUIGET(id, "startline", startline$)
-			CALL GUIGET(id, "endline", endline$)
-			CALL Editor_Tag_Line(VAL(TOKEN$(startline$, 1, ".")), startline$, endline$, FALSE, ".scratch.txt", TRUE)
+			CALL Editor_Tag_Line(VAL(TOKEN$(startline$, 1, ".")), startline$, FALSE, ".scratch.txt", TRUE)
+		CASE "scratch_selectall"
+			CALL GUIFN(id, ".scratch.txt tag add sel 1.0 end")
 		CASE "exit", "tk_exit"
 			IF Confirm_Close() THEN CONTINUE
+			IF LEN(filename$) THEN
+				IF FILEEXISTS(Configuration$) THEN
+					cfg$ = COLLAPSE$(LOAD$(Configuration$), NL$)
+					DOTIMES AMOUNT(cfg$, NL$)
+						IF REGEX(TOKEN$(cfg$, _, NL$), "^file") THEN cfg$ = DEL$(cfg$, _, NL$)
+					NEXT
+					SAVE CHOP$(APPEND$(cfg$, 0, "file " & filename$, NL$)) TO Configuration$
+				ELSE
+					SAVE "file " & filename$ TO Configuration$
+				ENDIF
+			ENDIF
+			CALL GUIFN(id, "exit;")
 			BREAK
 		CASE "openf"
 			IF Confirm_Close() THEN CONTINUE
-			CALL GUIFN(id, "set filename [tk_getOpenFile -title {Open File} -filetypes {{{BaCon Source Files} {.bac} TEXT}} ]")
+			IF LEN(filename$) THEN dir$ = "-initialdir " + DIRNAME$(filename$)
+			CALL GUIFN(id, "set filename [tk_getOpenFile -title {Open File} " + dir$ + " -filetypes {{{BaCon Source Files} {.bac} TEXT}} ]")
 			CALL GUIGET(id, "filename", filename$)
-			IF LEN(filename$) THEN
-				CALL GUIFN(id, ".txt delete 1.0 end")
-				CALL GUISET(id, "filetext", LOAD$(filename$))
-				CALL GUIFN(id, ".txt insert 1.0 $filetext")
-				CALL GUIFN(id, ".txt edit modified 0")
-				CALL Editor_Tag_Text(".txt")
-				CHANGEDIR DIRNAME$(filename$)
-				filename$ = BASENAME$(filename$)
-				CALL GUIFN(id, "wm title . {The BaCon Editor - '" & filename$ & "'}")
-			ENDIF
-		CASE "txtpaste"
-			CALL Editor_Tag_Text(".txt")
-		CASE "close"
+			IF LEN(filename$) THEN Load_File(filename$)
+		CASE "new_doc"
 			IF Confirm_Close() THEN CONTINUE
-			CALL GUIFN(id, ".txt delete 1.0 end; .txt edit modified 0;")
+			CALL GUIFN(id, ".txt delete 1.0 end;")
+			CALL GUIFN(id, "wm title . {The BaCon Editor}")
+			modified = FALSE
+			filename$ = ""
 		CASE "save"
 			IF NOT(LEN(filename$)) THEN
 				CALL GUIFN(id, "tk_messageBox -title {Error!} -message {Save program first!} -icon error -type ok")
@@ -416,7 +505,8 @@ WHILE TRUE
 				CALL GUIFN(id, "set filetext [.txt get 1.0 end]")
 				CALL GUIGET(id, "filetext", filetext$)
 				SAVE CHOP$(filetext$) TO filename$
-				CALL GUIFN(id, ".txt edit modified 0")
+				modified = FALSE
+				CALL GUIFN(id, "tk_messageBox -title {Information} -message {Program saved.} -icon info -type ok")
 			ENDIF
 		CASE "saveas"
 			CALL GUIFN(id, "set filename [tk_getSaveFile -title {Save File} -filetypes {{{BaCon Source Files} {.bac} TEXT}} ]")
@@ -425,7 +515,7 @@ WHILE TRUE
 				CALL GUIFN(id, "set filetext [.txt get 1.0 end]")
 				CALL GUIGET(id, "filetext", filetext$)
 				SAVE CHOP$(filetext$) TO filename$
-				CALL GUIFN(id, ".txt edit modified 0")
+				modified = FALSE
 				CHANGEDIR DIRNAME$(filename$)
 				filename$ = BASENAME$(filename$)
 				CALL GUIFN(id, "wm title . {The BaCon Editor - '" & filename$ & "'}")
@@ -440,7 +530,7 @@ WHILE TRUE
 				CALL GUIFN(id, "tk_messageBox -title {Information} -message {HTML generated.} -icon info -type ok")
 			ENDIF
 		CASE "execute"
-			CALL GUIFN(id, "wm deiconify .exec; ::tk::PlaceWindow .exec;")
+			CALL GUIFN(id, "show_window_centered .exec;")
 		CASE "runprog"
 			IF NOT(LEN(filename$)) THEN
 				CALL GUIFN(id, "tk_messageBox -title {Error!} -message {Save program first!} -icon error -type ok")
@@ -448,7 +538,7 @@ WHILE TRUE
 				CALL GUIFN(id, "set filetext [.txt get 1.0 end]")
 				CALL GUIGET(id, "filetext", filetext$)
 				SAVE CHOP$(filetext$) TO filename$
-				CALL GUIFN(id, ".txt edit modified 0")
+				modified = FALSE
 				CALL GUIFN(id, "set command [.exec.ent get]")
 				CALL GUIGET(id, "command", command$)
 				SYSTEM REPLACE$(command$, "@", filename$)
@@ -465,11 +555,11 @@ WHILE TRUE
 			CALL GUIFN(id, "set filetext [.txt get 1.0 end]")
 			CALL GUIGET(id, "filetext", filetext$)
 			CALL GUISET(id, "filetext", Indent_Prog$(filetext$))
-			CALL GUIFN(id, ".txt delete 1.0 end")
-			CALL GUIFN(id, ".txt insert 1.0 $filetext")
+			CALL GUIFN(id, ".txt delete 1.0 end; .txt insert 1.0 $filetext; .txt mark set insert [.txt index \"1.0\"];")
 			CALL Editor_Tag_Text(".txt")
+			CALL GUIFN(id, "tk_messageBox -title {Information} -message {Indentation applied.} -icon info -type ok")
 		CASE "scratch"
-			CALL GUIFN(id, "wm deiconify .scratch; ::tk::PlaceWindow .scratch; focus .scratch.txt")
+			CALL GUIFN(id, "show_window_centered .scratch; focus .scratch.txt")
 		CASE "runscratch"
 			CALL GUIFN(id, "set filetext [.scratch.txt get 1.0 end]")
 			CALL GUIGET(id, "filetext", filetext$)
@@ -477,24 +567,38 @@ WHILE TRUE
 			CALL GUIFN(id, "set command [.exec.ent get]")
 			CALL GUIGET(id, "command", command$)
 			SYSTEM REPLACE$(command$, "@", Scratch_Temp$)
-		CASE "scratchpaste"
+		CASE "scratch_paste"
 			CALL Editor_Tag_Text(".scratch.txt")
 		CASE "about"
 			CALL GUIFN(id, "tk_messageBox -title {About This Editor} -message {A Minimal BaCon Editor in TK!} -icon info -type ok -detail {(c) 2024 Peter van Eerten}")
 		CASE "documentation"
-			CALL GUIFN(id, "wm deiconify .doc; .doc.txt yview 1.0")
+			CALL GUIFN(id, "show_window_centered .doc; .doc.txt yview 1.0;")
 		CASE "context"
-			CALL GUIFN(id, "wm deiconify .doc")
-			CALL GUIFN(id, "set bpos [.txt index \"[.txt index insert] wordstart\"]; set epos [.txt index \"[.txt index insert] wordend+1c\"]")
-			CALL GUIFN(id, "set term [string trim [.txt get $bpos $epos]]; set term [string trimright $term {(}]")
+			CALL GUIFN(id, "set fwin [focus]; show_window_centered .doc;")
+			CALL GUIFN(id, "set bpos [$fwin index \"[$fwin index insert] wordstart\"]; set epos [$fwin index \"[$fwin index insert] wordend+1c\"]")
+			CALL GUIFN(id, "set term [string trim [$fwin get $bpos $epos]]; if { [string match {[a-zA-Z$]*} [string index $term end]] == 0 } { set term [string range $term 0 end-1]; }")
 			CALL GUIFN(id, "set total [.doc.txt count -lines 1.0 end]; for {set i 2} {$i < $total} {incr i} { set endline [.doc.txt index \"${i}.0 lineend\"]; \
 				if { [string equal \"  $term\" [.doc.txt get ${i}.0 $endline] ]==1 } {.doc.txt yview $i.0; break; }; }")
-		CASE "ctxscratch"
-			CALL GUIFN(id, "wm deiconify .doc")
-			CALL GUIFN(id, "set bpos [.scratch.txt index \"[.scratch.txt index insert] wordstart\"]; set epos [.scratch.txt index \"[.scratch.txt index insert] wordend+1c\"]")
-			CALL GUIFN(id, "set term [string trim [.scratch.txt get $bpos $epos]]; set term [string trimright $term {(}]")
-			CALL GUIFN(id, "set total [.doc.txt count -lines 1.0 end]; for {set i 2} {$i < $total} {incr i} { set endline [.doc.txt index \"${i}.0 lineend\"]; \
-				if { [string equal \"  $term\" [.doc.txt get ${i}.0 $endline] ]==1 } {.doc.txt yview $i.0; break; }; }")
+		CASE "undo"
+			CALL GUIFN(id, ".txt edit undo;")
+			CALL Editor_Tag_Text(".txt")
+		CASE "redo"
+			CALL GUIFN(id, ".txt edit redo;")
+			CALL Editor_Tag_Text(".txt")
+		CASE "cut"
+			CALL GUIFN(id, "tk_textCut .txt;")
+		CASE "copy"
+			CALL GUIFN(id, "tk_textCopy .txt;")
+		CASE "paste"
+			CALL GUIFN(id, "tk_textPaste .txt;")
+		CASE "find"
+			CALL GUIFN(id, "show_window_centered .find; focus .find.ent;")
+		CASE "findterm"
+			CALL GUIFN(id, ".txt tag delete find_col; .txt tag configure find_col -background yellow; if { [string equal $find_term [.find.ent get]]==0 } { set bpos [.txt index \"insert\"]; \
+				set find_term [.find.ent get]; } else { set bpos $bpos+1c }; if { $check == 0 } { set bpos [.txt search -nocase $find_term $bpos end]; } else { set bpos [.txt search $find_term $bpos end]; }; \
+				if { [string length $bpos]==0 } { wm withdraw .find; tk_messageBox -title {Information} -message \"Term not found, restarting from top!\" -icon info -type ok; set bpos \"1.0\"; wm deiconify .find; } \
+				else { .txt see $bpos; .txt tag add find_col $bpos [.txt index \"$bpos wordend\"]; };")
 	ENDSELECT
 	CALL Update_Linenrs()
+	CALL GUIFN(id, "update idletasks;")
 WEND

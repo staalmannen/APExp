@@ -2,7 +2,7 @@
 '
 ' --= An FLTK based graphical user interface for the BaCon BASIC-to-C converter =--
 '
-' Peter van Eerten - August 2017 - March 2024. License: MIT License.
+' Peter van Eerten - August 2017 - November 2024. License: MIT License.
 '
 ' Terminal execution string suggestions ('@' means the program and its arguments):
 '
@@ -16,11 +16,17 @@
 '	(8) MacOSX: open @
 '-----------------------------------------------------------------------------------------------------------------------------------
 
+' Avoid compile warnings
+PRAGMA OPTIONS -Wno-write-strings -Wno-pointer-arith
+
+' FLTK dependencies
+PRAGMA OPTIONS `fltk-config --cxxflags`
+PRAGMA LDFLAGS `fltk-config --ldflags` -lfltk -lfltk_images
+
+' Include the FLTK stuff required
 PRAGMA INCLUDE <FL/Fl.H> <FL/Fl_Double_Window.H> <FL/Fl_Text_Editor.H> <FL/Fl_Menu_Bar.H> <FL/Fl_Tabs.H> <FL/Fl_PNG_Image.H> <FL/Fl_Tooltip.H> <FL/Fl_Choice.H>
 PRAGMA INCLUDE <FL/Fl_File_Chooser.H> <FL/fl_ask.H> <FL/Fl_Box.H> <FL/Fl_Input.H> <FL/Fl_Check_Button.H> <FL/Fl_Button.H> <FL/Fl_Spinner.H> <FL/Fl_Menu_Button.H>
 PRAGMA INCLUDE <FL/Fl_Color_Chooser.H> <FL/Fl_Text_Display.H> <FL/Fl_Radio_Round_Button.H> <FL/Fl_Help_Dialog.H> <FL/Fl_Scroll.H> <FL/Fl_Multiline_Output.H> <FL/Fl_Pack.H>
-PRAGMA LDFLAGS -lfltk -lfltk_images
-PRAGMA OPTIONS -Wno-write-strings -Wno-pointer-arith
 
 OPTION PARSE FALSE
 
@@ -87,7 +93,7 @@ CONST code_keyword$ = " ADD ALARM ALIAS APPEND APPENDING ARRAY AS ASSOC BACONLIB
 	"WHITE WITH WRITELN WRITING YELLOW MONITOR SIGNAL DOTIMES DONE STATIC RE DQ ESC EXPLICIT PROPER SCREEN "
 
 CONST code_func$ = " ABS ACCEPT ACOS ADDRESS AND ASC ASIN ATN ATN2 BIT BLOAD CEIL CMDLINE COLUMNS COS COUNT DAY DEC DEG EDITBOM$ ENDFILE EQUAL EVEN EXP FIND " \
-	"FILEEXISTS FILELEN FILETIME FILETYPE FLOOR FORK FP GETKEY GETX GETY GUIFN GUIDEFINE GUIGET GUISET GUIWIDGET HOUR IIF INSTR INSTRREV INT INVERT ISFALSE ISKEY ISTRUE " \
+	"FILEEXISTS FILELEN FILETIME FILETYPE FLOOR FORK FP GETKEY GETX GETY GUICB GUIFN GUIDEFINE GUIGET GUISET GUIWIDGET HOUR IIF INSTR INSTRREV INT INVERT ISFALSE ISKEY ISTRUE " \
 	"SUM SUMF BETWEEN BEYOND EXCL LEN LOG MAX MAXNUM MEMORY MEMTELL MIN MINUTE MOD MONTH MYPID NANOTIMER NOT NOW ODD OR PEEK POW RAD RANDOM REAP REGEX RND ROL ROR NRKEYS HASH LOOP " \
 	"ROUND ROWS SEARCH SECOND MEMCHECK SGN SIN SIZEOF SQR TAN TALLY TELL TIMER TIMEVALUE UCS ULEN VAL VERIFY WAIT WEEK YEAR AMOUNT EVAL ISUTF8 UBOUND INDEX TOTAL " \
 	"ISTOKEN BYTELEN ISASCII MATCH BASENAME$ CA$ CN$ CHOP$ CHR$ CIPHER$ CONCAT$ CURDIR$ DIRNAME$ ERR$ EXEC$ EXTRACT$ FILL$ GETENVIRON$ GETPEER$ B64ENC$ INDEX$ " \
@@ -649,30 +655,30 @@ SUB Load_Defaults
 		REPEAT
 			READLN txt$ FROM settings
 
-			SELECT HEAD$(txt$, 1)
+			SELECT HEAD$(txt$)
 				CASE "linenr"
-					IF VAL(LAST$(txt$, 1)) THEN
+					IF VAL(LAST$(txt$)) THEN
 						item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/&Line numbers")
 						item->set()
 					ENDIF
 				CASE "wrap"
-					IF VAL(LAST$(txt$, 1)) THEN
+					IF VAL(LAST$(txt$)) THEN
 						item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/&Wrap lines")
 						item->set()
 					ENDIF
 				CASE "savepage"
-					IF VAL(LAST$(txt$, 1)) THEN
+					IF VAL(LAST$(txt$)) THEN
 						item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/&Restore tabs")
 						item->set()
 					ENDIF
 				CASE "lowercase"
-					IF VAL(LAST$(txt$, 1)) THEN
+					IF VAL(LAST$(txt$)) THEN
 						BaconGui.check_9->value(1)
 					ELSE
 						BaconGui.check_9->value(0)
 					ENDIF
 				CASE "scheme"
-					SELECT LAST$(txt$, 1)
+					SELECT LAST$(txt$)
 						CASE "none"
 							item = (Fl_Menu_Item*)BaconGui.menu->find_item("&Options/Select &theme/none")
 							item->set()
@@ -687,22 +693,22 @@ SUB Load_Defaults
 							item->set()
 					ENDSELECT
 				CASE "fsize"
-					BaconGui.spinner->value(VAL(LAST$(txt$, 1)))
+					BaconGui.spinner->value(VAL(LAST$(txt$)))
 				CASE "shell"
-					BaconGui.input_7->value(LAST$(txt$, 1))
+					BaconGui.input_7->value(LAST$(txt$))
 				CASE "compiler"
-					BaconGui.input_1->value(LAST$(txt$, 1))
+					BaconGui.input_1->value(LAST$(txt$))
 				CASE "libraries"
-					BaconGui.input_2->value(LAST$(txt$, 1))
+					BaconGui.input_2->value(LAST$(txt$))
 				CASE "includes"
-					BaconGui.input_4->value(LAST$(txt$, 1))
+					BaconGui.input_4->value(LAST$(txt$))
 				CASE "options"
-					BaconGui.input_3->value(LAST$(txt$, 1))
+					BaconGui.input_3->value(LAST$(txt$))
 				CASE "tmpdir"
-					BaconGui.input_5->value(LAST$(txt$, 1))
+					BaconGui.input_5->value(LAST$(txt$))
 				CASE "window_size"
-					BaconGui.xsize = VAL(HEAD$(TAIL$(txt$,1), 1, "x"))
-					BaconGui.ysize = VAL(TAIL$(TAIL$(txt$,1), 1, "x"))
+					BaconGui.xsize = VAL(HEAD$(TAIL$(txt$), 1, "x"))
+					BaconGui.ysize = VAL(TAIL$(TAIL$(txt$), 1, "x"))
 			ENDSELECT
 		UNTIL ENDFILE(settings)
 		CLOSE FILE settings
@@ -824,7 +830,7 @@ SUB Load_Files_Into_GUI
 		REPEAT
 			READLN txt$ FROM settings
 
-			IF HEAD$(txt$,1) = "file" THEN
+			IF HEAD$(txt$) = "file" THEN
 				name$ = TAIL$(txt$, AMOUNT(txt$)-1)
 				IF FILEEXISTS(name$) THEN
 					INCR BaconGui.pages
@@ -1230,7 +1236,7 @@ SUB Print_Program(Fl_Widget* w, void* data)
 				SYSTEM "enscript --color --tabsize=4 --no-header --style=emacs --font=Courier7 --highlight=bacon " & MID$(command$, INSTR(command$, "PDF")+1) & " " & nbook[page].file$ & " -p - 2>/dev/null | ps2pdf - " & BASENAME$(nbook[page].file$, 1) & ".pdf 2>/dev/null"
 			ELSE
 				fl_message_title("Informational")
-				fl_message("Sending PostScript to printer '%s'.", HEAD$(command$, 1))
+				fl_message("Sending PostScript to printer '%s'.", HEAD$(command$))
 				SYSTEM "enscript --color --tabsize=4 --no-header --style=emacs --font=Courier7 --highlight=bacon " & nbook[page].file$ & " -d " & command$ & " >/dev/null 2>&1"
 			ENDIF
 		ELIF ISTRUE(LEN(EXEC$("which lp 2>/dev/null"))) THEN
@@ -1243,7 +1249,7 @@ SUB Print_Program(Fl_Widget* w, void* data)
 				command$ = command$ & " -o media=letter"
 			ENDIF
 			fl_message_title("Informational")
-			fl_message("Sending plain text to printer '%s'.", HEAD$(command$, 1))
+			fl_message("Sending plain text to printer '%s'.", HEAD$(command$))
 			set = BaconGui.pfmt5->value()
 			IF set THEN
 				SYSTEM "cat -n " & nbook[page].file$ & " | lp -d " & command$
@@ -1491,8 +1497,8 @@ END SUB
 
 SUB Apply_Indentation(Fl_Widget *w, void* data)
 
-	LOCAL text$, data$, result$, str$, previous$, text
-	LOCAL myposition, nextposition, label_active, pos, total, wrap_active, x
+	LOCAL text$, data$, result$, str$, previous$
+	LOCAL myposition, nextposition, label_active, pos, total, wrap_active, x, text
 	LOCAL page = Get_Tab_Id()
 
 	' Save position
@@ -1501,7 +1507,7 @@ SUB Apply_Indentation(Fl_Widget *w, void* data)
 	' Get pointer to text and free
 	text = nbook[page].text_buf->text()
 	text$ = text
-	free(text)
+	free((void*)text)
 
 	' Perform the indentation
 	OPTION COLLAPSE FALSE
@@ -1524,7 +1530,7 @@ SUB Apply_Indentation(Fl_Widget *w, void* data)
 		' Current line backwards indentation
 		IF REGEX(line$[x], "^(CASE|UNTIL)[ \\t]|^(DEFAULT|FI|NEXT|WEND|DONE)|^ELSE$|^ELIF.+THEN$|^END.+") THEN
 			' End with value should not indent backwards
-			IF NOT(REGEX(line$[x], "^END.+[0-9]+")) THEN DECR myposition
+			IF NOT(REGEX(line$[x], "^END.+[0-9]+|^ENDFORK")) THEN DECR myposition
 			' Extra step back with ENDSELECT
 			IF REGEX(line$[x], "SELECT$") THEN DECR myposition
 			' Tab not out of screen?
@@ -1959,7 +1965,7 @@ SUB Exec_Prog(Fl_Widget *w, void* data)
 
 	BaconGui.execute->hide()
 
-	IF (char*)data <> NULL THEN
+	IF data <> NULL THEN
 		path$ = (char*)data
 	ELSE
 		' Escape spaces in filename
@@ -2405,7 +2411,7 @@ SUB Create_Gui
 		SPLIT info$ BY NL$ TO printer$ SIZE nr
 		IF nr > 0 THEN
 			FOR x = 0 TO nr-1
-				BaconGui.plist->add(HEAD$(printer$[x], 1))
+				BaconGui.plist->add(HEAD$(printer$[x]))
 			NEXT
 		END IF
 	ENDIF

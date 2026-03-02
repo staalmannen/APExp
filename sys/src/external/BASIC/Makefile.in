@@ -14,11 +14,12 @@ LDFLAGS         = @LDFLAGS@
 INSTALL         = @INSTALL@
 BSHELL          = @BSHELL@
 GTK3            = @GTK3@
+GTK4            = @GTK4@
 TK              = @TK@
 FLTK            = @FLTK@
 LEGACY          = @LEGACY@
 
-all : clean bacon bacongui-gtk3 bacongui-fltk bacongui-tk bacongui-legacy
+all : clean bacon bacongui-gtk4 bacongui-gtk3 bacongui-fltk bacongui-tk bacongui-legacy
 	@echo "Run 'make install' or 'sudo make install' to install BaCon on your system."
 
 bacon :
@@ -28,6 +29,14 @@ bacon :
 		$(BSHELL) ./bacon.sh -c "$(CC)" -o "$(CFLAGS)" -d build bacon.bac; \
 	fi;
 	$(STRIP) build/bacon
+
+bacongui-gtk4 :
+	@if [ $(GTK4) = 'true' ]; then \
+		build/bacon -c "$(CC)" -o "$(CFLAGS)" -o -DDATA_PATH='\"$(DESTDIR)$(DATADIR)\"' -l "-L. $(LDFLAGS)" -d build gui/bacongui-gtk4.bac; \
+		$(STRIP) build/bacongui-gtk4; \
+	else \
+		echo "Skipping BaConGUI for GTK4."; \
+	fi;
 
 bacongui-gtk3 :
 	@if [ $(GTK3) = 'true' ]; then \
@@ -66,16 +75,25 @@ install :
 	mkdir -p $(DESTDIR)$(DATADIR)/applications
 	$(INSTALL) bacon.sh $(DESTDIR)$(BINDIR)
 	$(INSTALL) build/bacon $(DESTDIR)$(BINDIR)
+	@if [ $(GTK4) = 'true' ]; then \
+		$(INSTALL) build/bacongui-gtk4 $(DESTDIR)$(BINDIR)/bacongui-gtk4; \
+		echo $(INSTALL) build/bacongui-gtk4 $(DESTDIR)$(BINDIR)/bacongui-gtk4; \
+		mkdir -p $(DESTDIR)${DATADIR}/gtksourceview-5/language-specs; \
+		echo mkdir -p $(DESTDIR)${DATADIR}/gtksourceview-5/language-specs; \
+		$(INSTALL) syntax/bacon.lang $(DESTDIR)${DATADIR}/gtksourceview-5/language-specs/bacon.lang; \
+		echo $(INSTALL) syntax/bacon.lang $(DESTDIR)${DATADIR}/gtksourceview-5/language-specs/bacon.lang; \
+		$(INSTALL) -m 644 desktop/bacongui-gtk4.desktop $(DESTDIR)$(DATADIR)/applications; \
+		echo $(INSTALL) -m 644 desktop/bacongui-gtk4.desktop $(DESTDIR)$(DATADIR)/applications; \
+	fi;
 	@if [ $(GTK3) = 'true' ]; then \
 		$(INSTALL) build/bacongui-gtk3 $(DESTDIR)$(BINDIR)/bacongui-gtk3; \
 		echo $(INSTALL) build/bacongui-gtk3 $(DESTDIR)$(BINDIR)/bacongui-gtk3; \
-		mkdir -p $(DESTDIR)/usr/share/gtksourceview-4/language-specs; \
-		echo mkdir -p $(DESTDIR)/usr/share/gtksourceview-4/language-specs; \
-		$(INSTALL) syntax/bacon.lang $(DESTDIR)/usr/share/gtksourceview-4/language-specs/bacon.lang; \
-		echo $(INSTALL) syntax/bacon.lang $(DESTDIR)/usr/share/gtksourceview-4/language-specs/bacon.lang; \
+		mkdir -p $(DESTDIR)${DATADIR}/gtksourceview-4/language-specs; \
+		echo mkdir -p $(DESTDIR)${DATADIR}/gtksourceview-4/language-specs; \
+		$(INSTALL) syntax/bacon.lang $(DESTDIR)${DATADIR}/gtksourceview-4/language-specs/bacon.lang; \
+		echo $(INSTALL) syntax/bacon.lang $(DESTDIR)${DATADIR}/gtksourceview-4/language-specs/bacon.lang; \
 		$(INSTALL) -m 644 desktop/bacongui-gtk3.desktop $(DESTDIR)$(DATADIR)/applications; \
 		echo $(INSTALL) -m 644 desktop/bacongui-gtk3.desktop $(DESTDIR)$(DATADIR)/applications; \
-		rm -f $(DESTDIR)$(DATADIR)/applications/bacongui-gtk.desktop; \
 	fi;
 	@if [ $(TK) = 'true' ]; then \
 		$(INSTALL) build/bacongui-tk $(DESTDIR)$(BINDIR)/bacongui-tk; \
@@ -92,30 +110,30 @@ install :
 	@if [ $(LEGACY) = 'true' ]; then \
 		$(INSTALL) build/bacongui-legacy $(DESTDIR)$(BINDIR)/bacongui-legacy; \
 		echo $(INSTALL) build/bacongui-legacy $(DESTDIR)$(BINDIR)/bacongui-legacy; \
-		mkdir -p $(DESTDIR)/usr/share/gtksourceview-2.0/language-specs; \
-		echo mkdir -p $(DESTDIR)/usr/share/gtksourceview-2.0/language-specs; \
-		$(INSTALL) syntax/bacon.lang $(DESTDIR)/usr/share/gtksourceview-2.0/language-specs/bacon.lang; \
-		echo $(INSTALL) syntax/bacon.lang $(DESTDIR)/usr/share/gtksourceview-2.0/language-specs/bacon.lang; \
-		mkdir -p $(DESTDIR)/usr/share/gtksourceview-3.0/language-specs; \
-		echo mkdir -p $(DESTDIR)/usr/share/gtksourceview-3.0/language-specs; \
-		$(INSTALL) syntax/bacon.lang $(DESTDIR)/usr/share/gtksourceview-3.0/language-specs/bacon.lang; \
-		echo $(INSTALL) syntax/bacon.lang $(DESTDIR)/usr/share/gtksourceview-3.0/language-specs/bacon.lang; \
+		mkdir -p $(DESTDIR)${DATADIR}/gtksourceview-2.0/language-specs; \
+		echo mkdir -p $(DESTDIR)${DATADIR}/gtksourceview-2.0/language-specs; \
+		$(INSTALL) syntax/bacon.lang $(DESTDIR)${DATADIR}/gtksourceview-2.0/language-specs/bacon.lang; \
+		echo $(INSTALL) syntax/bacon.lang $(DESTDIR)${DATADIR}/gtksourceview-2.0/language-specs/bacon.lang; \
+		mkdir -p $(DESTDIR)${DATADIR}/gtksourceview-3.0/language-specs; \
+		echo mkdir -p $(DESTDIR)${DATADIR}/gtksourceview-3.0/language-specs; \
+		$(INSTALL) syntax/bacon.lang $(DESTDIR)${DATADIR}/gtksourceview-3.0/language-specs/bacon.lang; \
+		echo $(INSTALL) syntax/bacon.lang $(DESTDIR)${DATADIR}/gtksourceview-3.0/language-specs/bacon.lang; \
 		$(INSTALL) -m 644 desktop/bacongui-legacy.desktop $(DESTDIR)$(DATADIR)/applications; \
 		echo $(INSTALL) -m 644 desktop/bacongui-legacy.desktop $(DESTDIR)$(DATADIR)/applications; \
-		rm -f $(DESTDIR)$(DATADIR)/applications/bacongui-gtk.desktop; \
 	fi;
-	@if [ $(LEGACY) = 'true' -o $(GTK3) = 'true' ]; then \
-		mkdir -p $(DESTDIR)/usr/share/icons/hicolor/scalable/apps; \
-		echo mkdir -p $(DESTDIR)/usr/share/icons/hicolor/scalable/apps; \
-		$(INSTALL) -m 644 icons/BaCon.png $(DESTDIR)/usr/share/icons/hicolor/scalable/apps/bacon.png; \
-		echo $(INSTALL) -m 644 icons/BaCon.png $(DESTDIR)/usr/share/icons/hicolor/scalable/apps/bacon.png; \
+	@if [ $(LEGACY) = 'true' -o $(GTK3) = 'true' -o $(GTK4) = 'true' ]; then \
+		mkdir -p $(DESTDIR)${DATADIR}/icons/hicolor/scalable/apps; \
+		echo mkdir -p $(DESTDIR)${DATADIR}/icons/hicolor/scalable/apps; \
+		$(INSTALL) -m 644 icons/BaCon.png $(DESTDIR)${DATADIR}/icons/hicolor/scalable/apps/bacon.png; \
+		echo $(INSTALL) -m 644 icons/BaCon.png $(DESTDIR)${DATADIR}/icons/hicolor/scalable/apps/bacon.png; \
 		gtk-update-icon-cache; \
 		echo gtk-update-icon-cache; \
-		update-icon-caches /usr/share/icons/hicolor/* 2>/dev/null; \
-		echo 'update-icon-caches /usr/share/icons/hicolor/*'; \
+		update-icon-caches ${DATADIR}/icons/hicolor/* 2>/dev/null; \
+		echo 'update-icon-caches ${DATADIR}/icons/hicolor/*'; \
 	fi;
 	mkdir -p $(DESTDIR)$(DATADIR)/pixmaps
 	$(INSTALL) -m 644 icons/BaCon.png $(DESTDIR)$(DATADIR)/pixmaps
+	$(INSTALL) -m 644 icons/BaCon4.png $(DESTDIR)$(DATADIR)/pixmaps
 	$(INSTALL) -m 644 icons/BaCon.xbm $(DESTDIR)$(DATADIR)/pixmaps
 	$(INSTALL) -m 644 icons/BaCon24.png $(DESTDIR)$(DATADIR)/pixmaps
 	$(INSTALL) -m 644 icons/BaConEyes.png $(DESTDIR)$(DATADIR)/pixmaps
@@ -144,6 +162,7 @@ install :
 
 uninstall :
 	rm -f $(DESTDIR)$(BINDIR)/bacon
+	rm -f $(DESTDIR)$(BINDIR)/bacongui-gtk4
 	rm -f $(DESTDIR)$(BINDIR)/bacongui-gtk3
 	rm -f $(DESTDIR)$(BINDIR)/bacongui-tk
 	rm -f $(DESTDIR)$(BINDIR)/bacongui-fltk
@@ -156,12 +175,13 @@ uninstall :
 	rm -f $(DESTDIR)$(DATADIR)/applications/bacongui-legacy.desktop
 	rm -f $(DESTDIR)$(DATADIR)/applications/bacongui-gtk.desktop
 	rm -f $(DESTDIR)$(DATADIR)/pixmaps/BaCon.png
+	rm -f $(DESTDIR)$(DATADIR)/pixmaps/BaCon4.png
 	rm -f $(DESTDIR)$(DATADIR)/pixmaps/BaCon.xbm
 	rm -f $(DESTDIR)$(DATADIR)/pixmaps/BaCon24.png
 	rm -f $(DESTDIR)$(DATADIR)/pixmaps/BaConEyes.png
 	rm -f $(DESTDIR)$(DATADIR)/pixmaps/BaConLegacy.png
 	rm -f $(DESTDIR)/usr/share/enscript/hl/bacon.st
-	rm -f $(DESTDIR)/usr/share/icons/hicolor/scalable/apps/bacon.png
+	rm -f $(DESTDIR)${DATADIR}/icons/hicolor/scalable/apps/bacon.png
 	rm -f $(DESTDIR)$(DATADIR)/BaCon/LICENSE.txt
 	rm -f $(DESTDIR)$(DATADIR)/BaCon/syntax/lower.m4
 	rm -f $(DESTDIR)$(DATADIR)/BaCon/syntax/upper.m4

@@ -1,4 +1,4 @@
-                            BaCon 4.8 documentation
+                           BaCon 5.0.3 documentation
 
 Introduction
 
@@ -1495,31 +1495,32 @@ Error trapping, error catching and debugging
 
     4. Runtime errors. These can occur during execution of the program.
 
-   When an error occurs, the default behavior of a BaCon program is to stop.
-   Only in case of runtime errors, it is possible to let the program handle
-   the error.
+   The TRAP LOCAL statement will cause the BaCon program to stop when an
+   error occurs during runtime. This is the default behavior of any BaCon
+   program. However, in case of such a runtime error, it is possible to let
+   the program handle the error by itself.
 
-     * In case of statements, the CATCH GOTO command can jump to a
-       self-defined error handling function. This is especially convenient
-       when creating GUI applications, as runtime errors by default appear on
-       the Unix command prompt.
+     * In case of statements, the CATCH GOTO command can be used to jump to
+       self-defined error handling code. This is especially convenient when
+       creating GUI applications, as runtime errors by default appear on the
+       Unix command prompt.
 
-     * In case of functions, the OPTION ERROR must be set to FALSE to prevent
-       the program from stopping. The program then needs to check the
-       reserved ERROR variable to handle any unexpected situation.
+     * In case of functions, the TRAP SYSTEM statement will prevent BaCon
+       from performing a runtime check and stopping the program. In case of
+       an unexpected situation, the program then needs to check the reserved
+       ERROR variable. Note that the operating system still may break or stop
+       the program.
 
-   Alternatively, it is possible to set a callback function for both
-   statements and functions. This callback function can be defined by the
-   CATCH ERROR statement. It should point to a function with three arguments:
-   the first argument capturing the statement or function causing the error,
-   the second the name of the file and the last the line number.
-
-   To prevent BaCon from detecting runtime errors altogether, use TRAP
-   SYSTEM.
+     * In case of both statements and functions, when using TRAP SYSTEM, it
+       is also possible to set a error callback function. This callback
+       function can be defined by the CATCH ERROR statement. It should point
+       to a separate function with three arguments: the first argument
+       captures the statement or function causing the error, the second the
+       name of the file and the last argument the line number.
 
    The reserved ERROR variable contains the number of the last error
    occurred. A full list of error numbers can be found in appendix A. With
-   the ERR$ function a human readable text for the error number can be
+   the ERR$(ERROR) function a human readable text for the error number can be
    retrieved programmatically.
 
    Next to these options, the statement TRACE ON can set the program in such
@@ -1768,6 +1769,17 @@ Support for GUI programming
    The function GUIWIDGET will return the memory address of a widget based on
    the defined name for that widget. This can come handy in cases where a GUI
    helper function is used natively.
+
+  Defining callbacks outside GUIDEFINE
+
+   In exceptional cases, it can come handy to define widgets outside the main
+   definition and attach them to the main callback function, so BaCon will
+   recognize an event with GUIEVENT$. For this purpose, the function GUICB
+   can be used. This is an example for its usage in GTK4, creating an event
+   controller, which responds to the mouse pointer entering the widget:
+
+   ctrlr = gtk_event_controller_motion_new()
+   CALL GUICB(ctrlr, "enter", "show_my_widget")
 
 Overview of BaCon statements and functions
 
@@ -2210,14 +2222,13 @@ Overview of BaCon statements and functions
    statements.
 
    The ERROR keyword allows setting a callback function where the program
-   will jump to in case an error occurs. This works both for statements and
-   functions provided that OPTION ERROR is set to FALSE. This is to prevent
-   that erroneous functions will stop the program. The callback function
-   should have three arguments which will hold the name of the statement or
-   function, the name of the file and the line number where the error
-   occurred. Example:
+   will jump to in case an error occurs. This is to prevent that erroneous
+   functions will stop the program. This will only work in combination with
+   TRAP SYSTEM. The callback function should have three arguments which will
+   hold the name of the statement or function, the name of the file and the
+   line number where the error occurred. Example:
 
-   OPTION ERROR FALSE
+   TRAP SYSTEM
    CATCH ERROR help
    SUB help(c$, f$, no)
        PRINT "Error is: ", ERR$(ERROR), " in function ", c$, " in file '",
@@ -2282,11 +2293,11 @@ Overview of BaCon statements and functions
 
    Type: function
 
-   Returns a string defined in x$ where on both sides <CR>, <NL>, <TAB> and
-   <SPACE> have been removed. If other characters need to be chopped then
-   these can be specified in the optional y$. The optional parameter z
-   defines where the chopping must take place: 0 means on both sides, 1 means
-   chop at the left and 2 means chop at the right. Examples:
+   Returns a string defined in x$ where on both sides the characters in regex
+   character class [:isspace:] has been removed. If other characters need to
+   be chopped then these can be specified in the optional y$. The optional
+   parameter z defines where the chopping must take place: 0 means on both
+   sides, 1 means chop at the left and 2 means chop at the right. Examples:
 
    PRINT CHOP$("bacon", "bn")
    PRINT CHOP$(" hello world ", " ", 2)
@@ -3206,6 +3217,7 @@ Overview of BaCon statements and functions
    Verifies if <filename$> exists. If the file exists, this function returns
    1. Else it returns 0. This function also can be used to verify if a
    directory exists. If <filename$> is a symbolic link, it is dereferenced.
+   If an error occurs then this function returns '-1'.
 
   FILELEN
 
@@ -3213,9 +3225,9 @@ Overview of BaCon statements and functions
 
    Type: function
 
-   Returns the size of a file identified by <filename$>. If an error occurs
-   this function returns '-1'. The ERR$ statement can be used to find out the
-   error if TRAP is set to LOCAL. Example:
+   Returns the size of a file identified by <filename$>. When TRAP  SYSTEM is
+   active, any error will return '-1'. The ERR$(ERROR) statement can then be
+   used to find out the error. Example:
 
    length = FILELEN("/etc/passwd")
 
@@ -3228,7 +3240,7 @@ Overview of BaCon statements and functions
    Returns the timestamp of a file identified by <filename$>, depending on
    the type of timestamp indicated in <type>. The type can be one of the
    following: 0 = access time, 1 = modification time and 2 = status change
-   time. Example:
+   time. If an error occurs then this function returns '-1'. Example:
 
    stamp = FILETIME("/etc/hosts", 0)
    PRINT "Last access: ", MONTH$(stamp), " ", DAY(stamp), ", ", YEAR(stamp)
@@ -3239,9 +3251,10 @@ Overview of BaCon statements and functions
 
    Type: function
 
-   Returns the type of a file identified by <filename$>. If an error occurs
-   this function returns '0'. The ERR$ statement can be used find out which
-   error if TRAP is set to LOCAL. The following values may be returned:
+   Returns the type of a file identified by <filename$>. When TRAP  SYSTEM is
+   active, any error will return '0'. The ERR$(ERROR) function can then be
+   used find out which error. The following values may be returned from
+   FILETYPE:
 
        Value               Meaning            
          0          Error or undetermined     
@@ -3284,20 +3297,21 @@ Overview of BaCon statements and functions
 
   FIRST$
 
-   FIRST$(string$, amount [, delimiter$])
+   FIRST$(string$ [, amount [, delimiter$]])
 
    Type: function
 
-   Retrieves the remaining elements except the last <amount> from a delimited
-   <string$> split by delimiter$. The delimiter$ is optional. If it is
-   omitted, then the definition from OPTION DELIM is assumed. When specified,
-   it may consist of multiple characters.
+   Retrieves the first elements except the last <amount> from a delimited
+   <string$> split by <delimiter$>. The <amount> is an optional argument,
+   which defaults to 1. The <delimiter$> also is optional. If omitted, then
+   the definition from OPTION DELIM is assumed. When specified, it may
+   consist of multiple characters.
 
    If no delimiter is present in the string, this function will return the
    full <string$>.
 
-   If delimiter$ occurs between double quotes in string$, then it is ignored.
-   This behavior can be changed by setting OPTION QUOTED to FALSE.
+   If <delimiter$> occurs between double quotes in <string$>, then it is
+   ignored. This behavior can be changed by setting OPTION QUOTED to FALSE.
 
    See also TAIL$ to obtain elements counting from the end from the delimited
    string, and HEAD$ to obtain elements counting from the start. Refer to the
@@ -3386,7 +3400,9 @@ Overview of BaCon statements and functions
 
    Duplicate the current running program in memory. If the return value is 0,
    then we're in the child process. If the child process needs an explicit
-   exit then ENDFORK can be used.
+   exit then ENDFORK can be used. The ENDFORK statement also will close all
+   inherited file handles, thereby also preventing the parent process to use
+   them further.
 
    If the return value > 0, then we are in the parent process; the actual
    value is the process ID of the spawned child.
@@ -3501,7 +3517,7 @@ Overview of BaCon statements and functions
 
    OPEN prog$ FOR READING AS myfile
        bin = MEMORY(100)
-       GETBYTE bin FROM myfile SIZE 100
+       GETBYTE bin FROM myfile CHUNK 100
    CLOSE FILE myfile
 
   GETENVIRON$
@@ -3605,7 +3621,16 @@ Overview of BaCon statements and functions
    declare associative arrays. The TREE keyword is used to declare binary
    trees. This is always a global declaration, meaning that variables
    declared with the GLOBAL keyword are visible in each part of the program.
-   Use LOCAL for local declarations.
+   Use LOCAL for declarations local to a SUB or FUNCTION.
+
+   The TYPE keyword can be omitted. In such situation, BaCon will verify the
+   suffix of the variable name. If the variable name ends with a '$' then the
+   variable is assumed to be a string. If the variable name ends with '#'
+   then it is considered to be of a float type. When the variable name ends
+   with a '%' then it is considered to be a long type. If no suffix is
+   provided then GLOBAL will assume the configuration set by OPTION VARTYPE,
+   which by default is long. It is allowed to mix types in the same GLOBAL
+   statement.
 
    The ARRAY keyword is used to define a dynamic array, which can be resized
    with REDIM at a later stage in the program.
@@ -3616,6 +3641,7 @@ Overview of BaCon statements and functions
 
    GLOBAL x TYPE float
    GLOBAL q$
+   GLOBAL a# = 4.5, b% = 123, c$[] = { "a", "b" }
    GLOBAL new_array TYPE float ARRAY 100
    GLOBAL name$ ARRAY 25
 
@@ -3670,6 +3696,18 @@ Overview of BaCon statements and functions
        PRINT "Hello world"
    NEXT
    GOTOXY 1, 12
+
+  GUICB
+
+   GUICB(widget, event$, data$)
+
+   Type: function
+
+   Adds a widget defined outside GUIDEFINE to the main callback mechanism,
+   which can be recognized by GUIEVENTS. For example:
+
+   ctrlr = gtk_event_controller_motion_new()
+   CALL GUICB(ctrlr, "enter", "show_my_widget")
 
   GUIDEFINE
 
@@ -3813,17 +3851,17 @@ Overview of BaCon statements and functions
 
   HEAD$
 
-   HEAD$(string$, amount [, delimiter$])
+   HEAD$(string$, [amount [, delimiter$]])
 
    Type: function
 
-   Retrieves the first <amount> elements from a delimited string$ split by
-   delimiter$. The delimiter$ is optional. If it is omitted, then the
-   definition from OPTION DELIM is assumed. When specified, it may consist of
-   multiple characters.
+   Retrieves the first <amount> elements from a delimited <string$> split by
+   <delimiter$>. The <amount> is an optional argument, which defaults to 1.
+   The <delimiter$> also is optional. If omitted, the definition from OPTION
+   DELIM is assumed. When specified, it may consist of multiple characters.
 
-   If delimiter$ occurs between double quotes in string$, then it is ignored.
-   This behavior can be changed by setting OPTION QUOTED to FALSE.
+   If <delimiter$> occurs between double quotes in <string$>, then it is
+   ignored. This behavior can be changed by setting OPTION QUOTED to FALSE.
 
    See also LAST$ to obtain the remaining elements, and TAIL$ to obtain
    elements counting from the end of the delimited string. Refer to the
@@ -4305,22 +4343,23 @@ Overview of BaCon statements and functions
 
   LAST$
 
-   LAST$(string$, amount [, delimiter$])
+   LAST$(string$ [, amount [, delimiter$]])
 
    Type: function
 
    Retrieves the remaining elements except the first <amount> from a
-   delimited string$ split by delimiter$. The delimiter$ is optional. If it
-   is omitted, then the definition from OPTION DELIM is assumed. When
-   specified, it may consist of multiple characters.
+   delimited <string$> split by <delimiter$>. The <amount> is an optional
+   argument, which defaults to 1. The <delimiter$> also is optional. If
+   omitted, then the definition from OPTION DELIM is assumed. When specified,
+   it may consist of multiple characters.
 
    If no delimiter is present in the string, this function will return the
    full <string$>.
 
-   If delimiter$ occurs between double quotes in string$, then it is ignored.
-   This behavior can be changed by setting OPTION QUOTED to FALSE. See also
-   HEAD$ to get the first element(s), and the chapter on delimited string
-   functions for more information about delimited strings. Example:
+   If <delimiter$> occurs between double quotes in <string$>, then it is
+   ignored. This behavior can be changed by setting OPTION QUOTED to FALSE.
+   See also HEAD$ to get the first element(s), and the chapter on delimited
+   string functions for more information about delimited strings. Example:
 
    PRINT "Remaining members: ", LAST$("Rome Amsterdam Kiev Bern Paris
    London", 1)
@@ -4401,9 +4440,14 @@ Overview of BaCon statements and functions
    visible to other functions, subroutines or records, nor to the main
    program.
 
-   If the TYPE keyword is omitted then variables are assumed to be of 'long'
-   type. If TYPE is omitted and the variable name ends with a '$' then the
-   variable will be a string.
+   The TYPE keyword can be omitted. In such situation, BaCon will verify the
+   suffix of the variable name. If the variable name ends with a '$' then the
+   variable is assumed to be a string. If the variable name ends with '#'
+   then it is considered to be of a float type. When the variable name ends
+   with a '%' then it is considered to be a long type. If no suffix is
+   provided then LOCAL will assume the configuration set by OPTION VARTYPE,
+   which by default is long. It is allowed to mix types in the same LOCAL
+   statement.
 
    The ARRAY keyword is used to define a dynamic array, which can be resized
    with REDIM at a later stage in the program. The optional STATIC keyword
@@ -4412,10 +4456,9 @@ Overview of BaCon statements and functions
    Examples:
 
    LOCAL tt TYPE int
-   LOCAL q$
+   LOCAL q$, p# = 0.5, i% = 1, var
    LOCAL new_array TYPE float ARRAY 100
    LOCAL name$ ARRAY 25
-
    LOCAL key$ ASSOC STRING
 
    Multiple variables of the same type can be declared at once, using a comma
@@ -4753,11 +4796,14 @@ Overview of BaCon statements and functions
 
   MOD
 
-   MOD(x, y)
+   MOD(x, y [, z])
 
    Type: function
 
-   Returns the modulo of x divided by y.
+   Returns the modulo of x divided by y. The optional argument <z> can either
+   be TRUE or FALSE (default). When TRUE, the MOD function will switch to
+   floating point mode and calculate the modulo delivering a floating point
+   result.
 
   MONTH
 
@@ -5007,7 +5053,7 @@ Overview of BaCon statements and functions
    <STARTPOINT x> | <DEVICE x> | <PARSE x> | <FRAMEWORK x> | <VARTYPE x> |
    <QUOTED x> | <DQ x> | <ESC x> | <UTF8 x> | <DELIM x> | <BREAK x> |
    <EXPLICIT x> | <INPUT x> | <ERROR x> | <PROPER x> | <TLS x> | <EVAL x> |
-   <NO_C_ESC x>
+   <NO_C_ESC x> | <LOCAL x>
 
    Type: statement
 
@@ -5105,15 +5151,13 @@ Overview of BaCon statements and functions
        in a program. The default value is 0 (FALSE), so no variable
        declaration is enforced.
 
+     * The LOCAL argument makes sure that implicitly declared variables used
+       in a SUB or FUNCTION have a local scope (1). The default value is 0
+       (FALSE).
+
      * The INPUT argument defines where the stream of input characters from
        STDIN should be cut off. By default, INPUT returns when a newline is
        encountered. The default value is "\n".
-
-     * The ERROR argument sets whether or not a program will exit as soon a
-       runtime error occurs. The default is TRUE (exit upon error). If set to
-       FALSE, the program must take care of error handling by itself, and
-       setting an error callback will be possible. See also the chapter on
-       error catching for more information.
 
      * The PROPER argument sets whether or not the PROPER$ function should
        leave the items in a delimited string intact or not. The default value
@@ -6503,17 +6547,18 @@ Overview of BaCon statements and functions
 
   TAIL$
 
-   TAIL$(string$, amount [, delimiter$])
+   TAIL$(string$ [, amount [, delimiter$]])
 
    Type: function
 
-   Retrieves the last <amount> elements from a delimited string$ split by
-   delimiter$. The delimiter$ is optional. If it is omitted, then the
-   definition from OPTION DELIM is assumed. When specified, it may consist of
-   multiple characters.
+   Retrieves the last <amount> elements from a delimited <string$> split by
+   <delimiter$>. The <amount> is an optional argument, which defaults to 1.
+   The <delimiter$> also is optional. If omitted, then the definition from
+   OPTION DELIM is assumed. When specified, it may consist of multiple
+   characters.
 
-   If delimiter$ occurs between double quotes in string$, then it is ignored.
-   This behavior can be changed by setting OPTION QUOTED to FALSE.
+   If <delimiter$> occurs between double quotes in <string$>, then it is
+   ignored. This behavior can be changed by setting OPTION QUOTED to FALSE.
 
    See also FIRST$ to obtain the remaining elements from the delimited
    string, and HEAD$ to obtain elements counting from the start. Refer to the
@@ -6677,13 +6722,13 @@ Overview of BaCon statements and functions
    (LOCAL). BaCon tries to examine statements and functions where possible,
    and will display an error message based on the operating system internals,
    indicating which statement or function causes a problem. Optionally, when
-   a CATCH is set, BaCon can jump to a LABEL instead, where a self-defined
-   error function can be executed, and from where a RESUME is possible.
+   a CATCH is set, BaCon can jump to a LABEL instead, where self-defined code
+   can be executed, and from where a RESUME is possible.
 
    When set to SYSTEM, error trapping is performed by the operating system.
    This means that if an error occurs, a signal will be caught by the program
-   and a generic error message is displayed on the prompt. The program will
-   then exit gracefully
+   and a generic error message is displayed on the prompt. The program then
+   may exit gracefully, depending on the actual error.
 
    The setting LOCAL decreases the performance of the program, because
    additional runtime checks are carried out when the program is executed.
@@ -6837,7 +6882,11 @@ Overview of BaCon statements and functions
    Type: statement
 
    Defines a body with C code. This code is put unmodified into the generated
-   C source file. Example:
+   C source file. Note that defining complete C functions within a
+   USEC/ENDUSEC block is not possible. Instead, such functions should be put
+   into a USEH/ENDUSEH block.
+
+   Example:
 
    USEC
        char *str;
@@ -6855,8 +6904,9 @@ Overview of BaCon statements and functions
 
    Defines a body with C declarations and/or definitions. This code is put
    unmodified into the generated global header source file. This can
-   particularly be useful in case of using variables from external libraries.
-   See also USEC to pass C source code. Example:
+   particularly be useful in case of using variables from external libraries
+   or when defining full C functions. See also USEC to pass lines of C source
+   code. Example:
 
    USEH
        char *str;
@@ -7446,7 +7496,3 @@ Appendix D: details on string optimization in BaCon
 
    This documentation © by Peter van Eerten.
    Please report errors to: REVERSE$("gro.retrevnoc-cisab@retep")
-
-   Created with LibreOffice 7.3.7.2
-
-   Back to top of document
