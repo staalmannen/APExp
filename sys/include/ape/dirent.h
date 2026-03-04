@@ -39,6 +39,9 @@ struct dirent	*readdir(DIR *);
 void		rewinddir(DIR *);
 int		closedir(DIR *);
 
+//stub
+int dirfd(DIR *) { return -1; }
+
 #ifdef __cplusplus
 }
 #endif

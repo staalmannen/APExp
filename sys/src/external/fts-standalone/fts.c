@@ -39,6 +39,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <limits.h>
 
 /* Largest alignment size needed, minus one.
  *    Usually long double is the worst case.  */
@@ -918,7 +919,7 @@ fts_alloc(FTS *sp, char *name, size_t namelen)
 	 */
 	len = sizeof(FTSENT) + namelen;
 	if (!ISSET(FTS_NOSTAT))
-		len += sizeof(struct stat) + ALIGNBYTES;
+//		len += sizeof(struct stat) + ALIGNBYTES;
 	if ((p = malloc(len)) == NULL)
 		return (NULL);
 
@@ -927,7 +928,7 @@ fts_alloc(FTS *sp, char *name, size_t namelen)
 	p->fts_namelen = namelen;
 	p->fts_instr = FTS_NOINSTR;
 	if (!ISSET(FTS_NOSTAT))
-		p->fts_statp = (struct stat *)ALIGN(p->fts_name + namelen + 2);
+//		p->fts_statp = (struct stat *)ALIGN(p->fts_name + namelen + 2);
 	memcpy(p->fts_name, name, namelen);
 
 	return (p);

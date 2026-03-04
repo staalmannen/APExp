@@ -1,0 +1,21 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+LIB=$APEXPROOT/$objtype/lib/ape/libfts.a
+
+
+OFILES=	fts.$O
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+FTSSRC=../../../external/fts-standalone
+
+%.$O: $FTSSRC/%.c
+	$CC $CFLAGS $FTSSRC/$stem.c
+
+CC=pcc
+LD=pcc
+CFLAGS=-c 
+
+nuke:V:
+	mk clean
+	rm -f $LIB

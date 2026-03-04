@@ -7,6 +7,11 @@ extern "C" {
 
 #define NOFILES_MAX 100
 
+//copied from musl
+#define MIN(a,b) (((a)<(b))?(a):(b))
+#define MAX(a,b) (((a)>(b))?(a):(b))
+
+
 #ifdef __cplusplus
 }
 #endif

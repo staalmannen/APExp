@@ -9,8 +9,6 @@ extern int *_errnoloc;
 #define ERANGE	1001
 #define EPLAN9	1002
 
-#ifdef _POSIX_SOURCE
-
 #define E2BIG	1
 #define EACCES	2
 #define	EAGAIN	3
@@ -93,7 +91,5 @@ extern int *_errnoloc;
 
 #define EOVERFLOW	66
 #define ELOOP		67
-
-#endif /* _POSIX_SOURCE */
 
 #endif /* __ERRNO */

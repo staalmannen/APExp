@@ -1,10 +1,6 @@
 #ifndef __RESOURCE_H__
 #define __RESOURCE_H__
 
-#ifndef _BSD_EXTENSION
-    This header file is an extension to ANSI/POSIX
-#endif
-
 #include <sys/time.h>
 
 #pragma lib "/$M/lib/ape/libap.a"
