@@ -1,4 +1,6 @@
-GG</$objtype/mkfile
+</$objtype/mkfile
+
+APEXPROOT=.
 
 DIRS=	sys/src/cmd\
 		sys/src/ape/9src\
@@ -24,7 +26,7 @@ all:V:
 
 install:V:
 	for (i in $_ARCHS)
-		@{ mkdir -p $i/lib/ape/ ; mkdir -p $i/bin/ape ; mkdir -p $i/bin/c++ }
+		@{ mkdir -p $i/lib/ape/ ; mkdir -p $i/bin/ape }
 	cp /$objtype/lib/ape/libap.a $objtype/lib/ape/
 	mkdir -p sys/man/1
 	mkdir -p sys/man/3
