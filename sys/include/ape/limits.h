@@ -25,8 +25,6 @@
 #define LONG_MIN	(-LONG_MAX-1)
 #define LLONG_MIN	(-LLONG_MAX-1)
 
-#ifdef _POSIX_SOURCE
-
 #define _POSIX_AIO_LISTIO_MAX	2
 #define _POSIX_AIO_MAX			1
 #define _POSIX_ARG_MAX			4096
@@ -70,6 +68,7 @@
 /*#define PAGESIZE 1 */
 #define PASS_MAX 64
 #define PATH_MAX _POSIX_PATH_MAX
+#define MAXPATHLEN _POSIX_PATH_MAX
 #define PIPE_BUF _POSIX_PIPE_BUF
 /*#define RTSIG_MAX _POSIX_RTSIG_MAX */
 /*#define SEM_NSEMS_MAX _POSIX_SEM_NSEMS_MAX */
@@ -81,11 +80,7 @@
 /*#define TIMER_MAX _POSIX_TIMER_MAX */
 #define TZNAME_MAX _POSIX_TZNAME_MAX
 
-
-#ifdef _LIMITS_EXTENSION
 /* some things are just too big for pedagogy (X!) */
 #include <sys/limits.h>
-#endif
-#endif /* _POSIX_SOURCE */
 
 #endif /* __LIMITS */
