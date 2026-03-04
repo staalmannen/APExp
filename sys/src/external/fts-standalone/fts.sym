@@ -1,0 +1,10 @@
+LIBFTS_1 {
+global:
+	fts_open;
+	fts_read;
+	fts_children;
+	fts_set;
+	fts_close;
+local:
+	*;
+};
