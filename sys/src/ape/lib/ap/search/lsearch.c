@@ -4,7 +4,8 @@
 void *lsearch(const void *key, void *base, size_t *nelp, size_t width,
 	int (*compar)(const void *, const void *))
 {
-	char (*p)[width] = base;
+// plan9 compiler cannot do VLA, so I set width = 255 ...
+	char (*p)[255] = base;
 	size_t n = *nelp;
 	size_t i;
 
@@ -18,7 +19,7 @@ void *lsearch(const void *key, void *base, size_t *nelp, size_t width,
 void *lfind(const void *key, const void *base, size_t *nelp,
 	size_t width, int (*compar)(const void *, const void *))
 {
-	char (*p)[width] = (void *)base;
+	char (*p)[255] = (void *)base;
 	size_t n = *nelp;
 	size_t i;
 

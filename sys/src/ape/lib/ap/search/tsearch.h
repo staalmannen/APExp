@@ -10,4 +10,7 @@ struct node {
 	int h;
 };
 
-hidden int __tsearch_balance(void **);
+int __tsearch_balance(void **);
+
+
+

@@ -1,7 +1,3 @@
-#ifndef _BSD_EXTENSION
-    This header file is an extension to ANSI/POSIX
-#endif
-
 #ifndef __BSD_H_
 #define __BSD_H_
 #pragma src "/sys/src/ape/lib/bsd"

@@ -50,9 +50,7 @@ extern unsigned char _ctype[];
 #define	isupper(c)	(_ctype[(unsigned char)(c)]&_ISupper)
 #define	isxdigit(c)	(_ctype[(unsigned char)(c)]&_ISxdigit)
 
-#ifdef _BSD_EXTENSION
 #define	isascii(c) (((unsigned int)(c))<0x80)
 #define	toascii( c ) ((unsigned)(c) & 0x007f)
-#endif
 
 #endif /* __CTYPE */
