@@ -39,25 +39,25 @@ OFILES=\
 	__math_invalid.$O\
 	__math_invalidf.$O\
 	__math_invalidl.$O\
-#	__math_oflow.$O\
-#	__math_oflowf.$O\
-#	__math_uflow.$O\
-#	__math_uflowf.$O\
+	__math_oflow.$O\
+	__math_oflowf.$O\
+	__math_uflow.$O\
+	__math_uflowf.$O\
 	__math_xflow.$O\
 	__math_xflowf.$O\
 	__polevll.$O\
-#	__rem_pio2.$O\
-#	__rem_pio2_large.$O\
-#	__rem_pio2f.$O\
+	__rem_pio2.$O\
+	__rem_pio2_large.$O\
+	__rem_pio2f.$O\
 	__rem_pio2l.$O\
 	__signbit.$O\
 	__signbitf.$O\
 	__signbitl.$O\
 	__sin.$O\
-#	__sindf.$O\
+	__sindf.$O\
 	__sinl.$O\
 #	__tan.$O\
-#	__tandf.$O\
+	__tandf.$O\
 	__tanl.$O\
 #	acosf.$O\
 	acosh.$O\
@@ -65,8 +65,8 @@ OFILES=\
 	acoshl.$O\
 	acosl.$O\
 #	asinf.$O\
-#	asinh.$O\
-#	asinhf.$O\
+	asinh.$O\
+	asinhf.$O\
 	asinhl.$O\
 	asinl.$O\
 #	atan2f.$O\
@@ -74,17 +74,17 @@ OFILES=\
 	atanh.$O\
 	atanhf.$O\
 	atanhl.$O\
-#	cbrt.$O\
-#	cbrtf.$O\
+	cbrt.$O\
+	cbrtf.$O\
 	cbrtl.$O\
-#	ceilf.$O\
+	ceilf.$O\
 	ceill.$O\
 	copysign.$O\
 	copysignf.$O\
 	copysignl.$O\
 #	cosf.$O\
-#	cosh.$O\
-#	coshf.$O\
+	cosh.$O\
+	coshf.$O\
 	coshl.$O\
 	cosl.$O\
 #	erff.$O\
@@ -99,8 +99,8 @@ OFILES=\
 #	exp_data.$O\
 #	expf.$O\
 	expl.$O\
-#	expm1.$O\
-#	expm1f.$O\
+	expm1.$O\
+	expm1f.$O\
 	expm1l.$O\
 	fabsf.$O\
 	fabsl.$O\
@@ -108,7 +108,7 @@ OFILES=\
 	fdimf.$O\
 	fdiml.$O\
 #	fma.$O\
-#	fmaf.$O\
+	fmaf.$O\
 	fmal.$O\
 	fmax.$O\
 	fmaxf.$O\
@@ -119,10 +119,10 @@ OFILES=\
 	fmodl.$O\
 	finite.$O\
 	finitef.$O\
-#	frexp.$O\
-#	frexpf.$O\
+	frexp.$O\
+	frexpf.$O\
 	frexpl.$O\
-#	hypotf.$O\
+	hypotf.$O\
 	hypotl.$O\
 	ilogb.$O\
 	ilogbf.$O\
@@ -153,7 +153,7 @@ OFILES=\
 #	log2f.$O\
 #	log2f_data.$O\
 	log2l.$O\
-#	log_data.$O\
+	log_data.$O\
 	logb.$O\
 	logbf.$O\
 	logbl.$O\
@@ -161,7 +161,7 @@ OFILES=\
 #	logf_data.$O\
 	logl.$O\
 #	lrint.$O\
-#	lrintf.$O\
+	lrintf.$O\
 	lrintl.$O\
 	lround.$O\
 	lroundf.$O\
@@ -181,9 +181,9 @@ OFILES=\
 	nexttoward.$O\
 	nexttowardf.$O\
 	nexttowardl.$O\
-#	pow_data.$O\
+	pow_data.$O\
 #	powf.$O\
-#	powf_data.$O\
+	powf_data.$O\
 	powl.$O\
 	remainder.$O\
 	remainderf.$O\
@@ -223,11 +223,11 @@ OFILES=\
 	tanhf.$O\
 	tanhl.$O\
 	tanl.$O\
-#	tgamma.$O\
+	tgamma.$O\
 	tgammaf.$O\
 	tgammal.$O\
-#	trunc.$O\
-#	truncf.$O\
+	trunc.$O\
+	truncf.$O\
 	truncl.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
