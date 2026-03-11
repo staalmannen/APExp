@@ -10,12 +10,34 @@ OFILES=\
 	fenv.$O\
 	fesetexceptflag.$O\
 	fesetround.$O\
-	feupdateenv.$O
-
+	feupdateenv.$O\
+	$objtype_fenv.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
+AS=$APEXPROOT/$objtype/bin/as
+CC=$APEXPROOT/$objtype/bin/pcc
+
+if ( $objtype = amd64 ) _ARCH=x86_64
+if ( $objtype = 386 ) _ARCH=i386
+if ( $objtype = arm ) _ARCH=arm
+if ( $objtype = arm64 ) _ARCH=aarch64
+if ( $objtype = power ) _ARCH=powerpc
+if ( $objtype = power64 ) _ARCH=powerpc64
+if ( $objtype = 68020 ) _ARCH=m68k
+if ( $objtype = 68000 ) _ARCH=m68k
+if ( $objtype = mips ) _ARCH=mips
+
 CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_BSD_SOURCE\
 		-I$APEXPROOT/sys/include/ape -I$APEXPROOT/$objtype/include/ape
+		-
+$objtype_fenv.$O: $_ARCH/fenv.s
+	$AS -o $target $prereq
+
+$objtype_fenv.$O: $_ARCH/fenv.S
+	$AS -o $target $prereq
+
+$objtype_fenv.$O: $_ARCH/fenv.c
+	$CC $CFLAGS -o $target $prereq
 
 
