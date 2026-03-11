@@ -2,7 +2,7 @@
 
 A drop-in `as` replacement for 9front that translates GNU assembler (GAS)
 syntax — both AT&T and Intel — into Plan 9 assembly, then invokes the
-native `6a` (amd64) or `8a` (i386) assembler.
+native $Oa assembler for the correct architecture.
 
 This allows third-party `.s` files written for GNU `as` to be assembled
 on Plan 9 without modification, fitting naturally into the Plan 9 build

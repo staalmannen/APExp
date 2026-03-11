@@ -41,9 +41,7 @@ typedef int sig_atomic_t;
 #define SIGVTALRM 22 /* virtual alarm clock */
 #define SIGPROF 23  /* profiling alarm clock */
 
-#ifdef _BSD_EXTENSION
 #define NSIG 24
-#endif
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,8 +53,6 @@ extern int raise(int);
 #ifdef __cplusplus
 }
 #endif
-
-#ifdef _POSIX_SOURCE
 
 typedef long sigset_t;
 struct sigaction {
@@ -70,6 +66,7 @@ struct sigaction {
 #define SA_RESETHAND	3
 #define SA_RESTART	4
 #define SA_RESTORER	5
+#define SA_NODEFER 0
 
 /* first argument to sigprocmask */
 #define SIG_BLOCK	1
@@ -80,9 +77,7 @@ struct sigaction {
 extern "C" {
 #endif
 
-#ifdef __TYPES_H
 extern int kill(pid_t, int);
-#endif
 extern int sigemptyset(sigset_t *);
 extern int sigfillset(sigset_t *);
 extern int sigaddset(sigset_t *, int);
@@ -96,7 +91,5 @@ extern int sigsuspend(const sigset_t *);
 #ifdef __cplusplus
 }
 #endif
-
-#endif /* _POSIX_SOURCE */
 
 #endif /* __SIGNAL_H */

@@ -764,7 +764,7 @@ if( NOT(LEN(g_CCNAME__b2c__string_var)) ){
 g_CCNAME__b2c__string_var = __b2c_Copy_String(g_CCNAME__b2c__string_var, (char*) g_CCNAME_TMP__b2c__string_var);
 #line 8250 "bacon.bac"
 if( NOT(LEN(g_CCNAME__b2c__string_var)) ){
-g_CCNAME__b2c__string_var = __b2c_Copy_String(g_CCNAME__b2c__string_var, (char*) "cc");
+g_CCNAME__b2c__string_var = __b2c_Copy_String(g_CCNAME__b2c__string_var, (char*) "pcc");
 }
 #line 8251 "bacon.bac"
 }

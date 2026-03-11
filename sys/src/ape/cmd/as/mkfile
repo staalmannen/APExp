@@ -1,0 +1,17 @@
+</$objtype/mkfile
+
+APEXPROOT=../../../../..
+
+TARG=as
+OFILES=\
+	as.$O\
+
+HFILES=\
+
+BIN=$APEXPROOT/$objtype/bin
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -DPOSIX_SOURCE
+
+< $APEXPROOT/sys/src/cmd/mkone

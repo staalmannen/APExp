@@ -49,17 +49,12 @@ extern int wctomb(char *, wchar_t);
 extern size_t mbstowcs(wchar_t *, const char *, size_t);
 extern size_t wcstombs(char *, const wchar_t *, size_t);
 
-#ifdef _BSD_EXTENSION
 #include <bsd.h>
-#endif
 
-#ifdef _BSD_SOURCE
 extern char *mktemp(char *);
-#endif
-
-#ifdef _POSIX_C_SOURCE
 extern int mkstemp(char *template);
-#endif
+
+#define realpath(x, y) x
 
 #ifdef __cplusplus
 }

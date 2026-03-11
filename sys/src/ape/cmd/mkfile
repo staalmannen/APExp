@@ -20,6 +20,7 @@ DIRS=\
 	pcregrep\
 	iconv\
 	expr\
+# stuff below this line is optional bloat\
 # archivers \
 	bzip2\
 	clzip\

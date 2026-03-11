@@ -184,7 +184,7 @@ long __b2c__filestat(int l, char *k, const char *x, int check) { struct stat buf
 { ERROR = 24; RUNTIMEFERR("FILELEN", ERROR, k, l); return(-1); } if(check == 0) { return((long)buf.st_size); } if(buf.st_mode) { return(1); } return(0); }
 int __b2c__filetype(int l, char *k, const char *file) { int type = 0; struct stat buf = { 0 }; if(file == NULL) { return(0); } if(lstat(file, &buf) < 0) { ERROR = 24; RUNTIMEFERR ("FILETYPE", ERROR, k, l); return(0); }
 switch (buf.st_mode & S_IFMT) { case S_IFBLK: type = 4; break; case S_IFCHR: type = 3; break; case S_IFDIR: type = 2; break; case S_IFIFO: type = 5; break; case S_IFLNK: type = 6; break;
-case S_IFREG: type = 1; break; case S_IFSOCK: type = 7; break; default: ERROR = 24; RUNTIMEFERR("FILETYPE", ERROR, k, l); return(0); break; } return(type); }
+case S_IFREG: type = 1; default: ERROR = 24; RUNTIMEFERR("FILETYPE", ERROR, k, l); return(0); break; } return(type); }
 char * __b2c__fill(long amount, int txt) { static char *buf[__b2c_STRING_FUNC] = { NULL }; static int idx = 0; char bf[5]; int x, len; if(amount < 0 || txt > 0x10FFFF) { return(NULL); } idx++; if(idx == __b2c_STRING_FUNC) { idx = 0; } if (__b2c__option_utf8)
 { len = __b2c_utf8_conv (txt, bf); buf[idx] = (char*)__b2c_str_realloc(buf[idx], amount*len+1); for (x = 0; x < (amount * len); x += len) { memcpy(buf[idx] + x, bf, len); } __b2c__SETLEN(buf[idx], amount * len); buf[idx][amount * len] = '\0'; } else
 { buf[idx] = (char*)__b2c_str_realloc(buf[idx], amount+1); memset(buf[idx], txt, amount); __b2c__SETLEN(buf[idx], amount); buf[idx][amount] = '\0'; } return(char*)(buf[idx]); }
@@ -248,7 +248,9 @@ __b2c__htable *__b2c__hash_new(void) { __b2c__htable *name; name = (__b2c__htabl
 __b2c__htable* __b2c__hash_find_key_do(__b2c__htable *name, unsigned short hash, const char *key) { if(key == NULL || name == NULL) { return(NULL); } if(hash == 0) { hash = __b2c__HashFNV1a_16(key); } do
 { if(name->key[hash] && !strcmp(name->key[hash], key)) { return(name); } name = name->next; } while(name); return(NULL); }
 #define __b2c__hash_find_key(x, y, ...) __b2c__hash_find_key_do(x, y, __b2c__KEYCOLLECT(__VA_ARGS__))
-void *__b2c__hash_find_value_do(__b2c__htable *name, const char *key) { __b2c__htable *table; unsigned short pos; if(name == NULL || key == NULL) { return(NULL); } pos = __b2c__HashFNV1a_16(key); table = __b2c__hash_find_key(name, pos, key);
+void *__b2c__hash_find_value_do(__b2c__htable *name, const char *key) { __b2c__htable *table; unsigned short pos; if(name == NULL || key == NULL) { return NULL; } 
+pos = __b2c__HashFNV1a_16(key); 
+//table = __b2c__hash_find_key(name, pos, key);
 if(table) { return(table->value[pos]); } return(NULL); }
 #define __b2c__hash_find_value(x, ...) __b2c__hash_find_value_do(x, __b2c__KEYCOLLECT(__VA_ARGS__))
 void __b2c__hash_add_do(__b2c__htable *name, const void *value, int flag, unsigned int len, const char *key) { unsigned short hash; if(name == NULL) { return; } hash = __b2c__HashFNV1a_16(key);
@@ -259,10 +261,14 @@ else if(flag == 3) { name->value[hash] = realloc(name->value[hash], len); memcpy
 #define __b2c__hash_add_str(x, y, ...) __b2c__hash_add_do(x, y, 1, 0, __b2c__KEYCOLLECT(__VA_ARGS__))
 #define __b2c__hash_add_redundant(x, y, ...) __b2c__hash_add_do(x, y, 2, 0, __b2c__KEYCOLLECT(__VA_ARGS__))
 #define __b2c__hash_add_data(x, y, len, ...) __b2c__hash_add_do(x, y, 3, len, __b2c__KEYCOLLECT(__VA_ARGS__))
-void *__b2c__hash_realloc_str_value_do(__b2c__htable *name, int len, const char *key) { __b2c__htable *table; unsigned short pos; if (name == NULL || key == NULL) { return (NULL); } __b2c__hash_add_str(name, "", key); pos = __b2c__HashFNV1a_16(key);
-table = __b2c__hash_find_key(name, pos, key); table->value[pos] = realloc(table->value[pos], len); return (table->value[pos]); }
+void *__b2c__hash_realloc_str_value_do(__b2c__htable *name, int len, const char *key) { __b2c__htable *table; unsigned short pos; if (name == NULL || key == NULL) { return (NULL); } 
+//__b2c__hash_add_str(name, "", key); 
+pos = __b2c__HashFNV1a_16(key);
+//table = __b2c__hash_find_key(name, pos, key); table->value[pos] = realloc(table->value[pos], len); return (table->value[pos]); }
 #define __b2c__hash_realloc_str_value(x, y, ...) __b2c__hash_realloc_str_value_do(x, y, __b2c__KEYCOLLECT(__VA_ARGS__))
-void __b2c__hash_del_do(__b2c__htable *name, int rebuild, const char *key) { __b2c__htable *found; unsigned short pos; int i, which; if(name == NULL) { return; } pos = __b2c__HashFNV1a_16(key); found = __b2c__hash_find_key(name, pos, key);
+void __b2c__hash_del_do(__b2c__htable *name, int rebuild, const char *key) { __b2c__htable *found; unsigned short pos; int i, which; if(name == NULL) { return NULL; } 
+pos = __b2c__HashFNV1a_16(key); 
+found = __b2c__hash_find_key(name, pos, key);
 if(found) { if (rebuild) { for (i = 0; i < found->total; i++) { which = __b2c__HashFNV1a_16(found->index[i]); if (which == pos) { if(i != found->total-1) { found->index[i] = found->index[found->total-1]; } found->index[found->total-1] = NULL; break; } } }
 __b2c__STRFREE(found->key[pos]); found->key[pos] = NULL; if(found->value[pos]) { __b2c__STRFREE(found->value[pos]); } found->value[pos] = NULL; found->total -= 1; } }
 #define __b2c__hash_del(x, ...) __b2c__hash_del_do(x, 1, __b2c__KEYCOLLECT(__VA_ARGS__))
