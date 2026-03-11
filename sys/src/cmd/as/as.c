@@ -2,32 +2,52 @@
  * as - GNU assembler syntax front-end for Plan 9 (9front)
  *
  * Translates AT&T (GAS) or Intel syntax assembly to Plan 9 assembly,
- * then invokes the native assembler (6a or 8a).
+ * then invokes the appropriate native Plan 9 assembler.
+ *
+ * Supported target architectures and their Plan 9 assemblers:
+ *   amd64    6a   (default)
+ *   386      8a
+ *   arm      5a
+ *   arm64    7a
+ *   ppc64    9a
+ *   power    qa   (32-bit PowerPC)
+ *   mips     va
+ *   sparc    ka
+ *   68000    1a
+ *   68020    2a
  *
  * Usage:
  *   as [options] file.s ...
- *   as -att [options] file.s ...     (force AT&T syntax)
- *   as -intel [options] file.s ...   (force Intel syntax)
  *
- * Options (GNU as compatible):
- *   -o outfile     output file
- *   -m32           target i386 (use 8a)
- *   -m64           target amd64 (use 6a)  [default]
- *   --32           same as -m32
- *   --64           same as -m64
- *   -I dir         add include directory (passed to native assembler)
- *   -D sym=val     define symbol (passed to native assembler)
- *   -v             verbose: print translated output to stderr
- *   --             end of options
+ * Architecture selection (default: amd64):
+ *   -march=ARCH or -m ARCH   where ARCH is one of the names above
+ *   -m32 / --32              alias for -march=386
+ *   -m64 / --64              alias for -march=amd64
+ *   -marm / -marm64          alias for arm / arm64
+ *   -mppc64 / -mpower        alias for ppc64 / power
+ *   -mmips / -msparc         alias for mips / sparc
+ *   -m68k / -m68020          alias for 68000 / 68020
+ *
+ * Syntax selection (default: auto-detect):
+ *   -att             force AT&T syntax
+ *   -intel           force Intel syntax
+ *   -plan9           force Plan 9 pass-through
+ *
+ * Other options (GNU as compatible):
+ *   -o outfile       output file
+ *   -I dir           add include directory (passed to native assembler)
+ *   -D sym[=val]     define symbol (passed to native assembler)
+ *   -v               verbose
+ *   --               end of options
  *
  * Syntax detection (when not forced):
- *   - If file contains ".intel_syntax", use Intel mode
- *   - If file contains ".att_syntax" or "%"-prefixed registers, use AT&T
- *   - If file looks like Plan 9 assembly (uppercase opcodes, no % or []),
- *     pass it through unmodified directly to the native assembler
- *   - Default: AT&T
+ *   - ".intel_syntax" in file  → Intel mode
+ *   - "%" signs in file        → AT&T mode
+ *   - TEXT/DATA/GLOBL/$(SB)    → Plan 9 pass-through
+ *   - Default                  → AT&T
  */
 
+#define _GNU_SOURCE
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -46,8 +66,44 @@
 #define MAXDEF     64
 #define MAXFILES   256
 
-typedef enum { ARCH_AMD64, ARCH_386 } Arch;
+typedef enum {
+	ARCH_AMD64,   /* 6a */
+	ARCH_386,     /* 8a */
+	ARCH_ARM,     /* 5a */
+	ARCH_ARM64,   /* 7a */
+	ARCH_PPC64,   /* 9a */
+	ARCH_POWER,   /* qa  (32-bit PowerPC) */
+	ARCH_MIPS,    /* va */
+	ARCH_SPARC,   /* ka */
+	ARCH_68000,   /* 1a */
+	ARCH_68020    /* 2a */
+} Arch;
+
 typedef enum { SYN_AUTO, SYN_ATT, SYN_INTEL, SYN_PLAN9 } Syntax;
+
+/* Return the Plan 9 assembler name for the current arch */
+static const char *
+assembler_name(Arch a)
+{
+	switch(a) {
+	case ARCH_AMD64:  return "6a";
+	case ARCH_386:    return "8a";
+	case ARCH_ARM:    return "5a";
+	case ARCH_ARM64:  return "7a";
+	case ARCH_PPC64:  return "9a";
+	case ARCH_POWER:  return "qa";
+	case ARCH_MIPS:   return "va";
+	case ARCH_SPARC:  return "ka";
+	case ARCH_68000:  return "1a";
+	case ARCH_68020:  return "2a";
+	}
+	return "6a";
+}
+
+/* Return 1 if arch uses x86-style register naming (%), 0 for Rn/Fn style */
+static int arch_is_x86(Arch a) { return a == ARCH_AMD64 || a == ARCH_386; }
+/* Return 1 if arch uses 68k-style Dn/An register naming */
+static int arch_is_68k(Arch a) { return a == ARCH_68000 || a == ARCH_68020; }
 
 static Arch   arch    = ARCH_AMD64;
 static Syntax syntax  = SYN_AUTO;
@@ -112,8 +168,232 @@ static RegMap att_regs[] = {
  * We normalise to lowercase before lookup in the same table.
  */
 
-/* ------------------------------------------------------------------ */
-/* Opcode translation tables */
+/* ================================================================
+ * RISC / non-x86 register alias tables
+ * ================================================================ */
+
+/*
+ * ARM (5a) — r0-r15, ABI aliases, VFP regs
+ * Plan 9 5a names: R0-R15, F0-F15, C0-C15 (coprocessor)
+ */
+static RegMap arm_aliases[] = {
+	/* integer registers */
+	{ "r0",  "R0"  }, { "r1",  "R1"  }, { "r2",  "R2"  }, { "r3",  "R3"  },
+	{ "r4",  "R4"  }, { "r5",  "R5"  }, { "r6",  "R6"  }, { "r7",  "R7"  },
+	{ "r8",  "R8"  }, { "r9",  "R9"  }, { "r10", "R10" }, { "r11", "R11" },
+	{ "r12", "R12" }, { "r13", "R13" }, { "r14", "R14" }, { "r15", "R15" },
+	/* ABI name aliases */
+	{ "sp",  "R13" }, /* stack pointer */
+	{ "lr",  "R14" }, /* link register */
+	{ "pc",  "R15" }, /* program counter */
+	{ "ip",  "R12" }, /* intra-procedure scratch */
+	{ "fp",  "R11" }, /* frame pointer (Linux EABI) */
+	{ "sl",  "R10" }, /* stack limit */
+	/* VFP single-precision: GNU s0-s31 pair into Plan 9 F0-F15 */
+	{ "s0",  "F0"  }, { "s1",  "F0"  }, { "s2",  "F1"  }, { "s3",  "F1"  },
+	{ "s4",  "F2"  }, { "s5",  "F2"  }, { "s6",  "F3"  }, { "s7",  "F3"  },
+	{ "s8",  "F4"  }, { "s9",  "F4"  }, { "s10", "F5"  }, { "s11", "F5"  },
+	{ "s12", "F6"  }, { "s13", "F6"  }, { "s14", "F7"  }, { "s15", "F7"  },
+	{ "s16", "F8"  }, { "s17", "F8"  }, { "s18", "F9"  }, { "s19", "F9"  },
+	{ "s20", "F10" }, { "s21", "F10" }, { "s22", "F11" }, { "s23", "F11" },
+	{ "s24", "F12" }, { "s25", "F12" }, { "s26", "F13" }, { "s27", "F13" },
+	{ "s28", "F14" }, { "s29", "F14" }, { "s30", "F15" }, { "s31", "F15" },
+	/* VFP double-precision: GNU d0-d15 → Plan 9 F0-F15 */
+	{ "d0",  "F0"  }, { "d1",  "F1"  }, { "d2",  "F2"  }, { "d3",  "F3"  },
+	{ "d4",  "F4"  }, { "d5",  "F5"  }, { "d6",  "F6"  }, { "d7",  "F7"  },
+	{ "d8",  "F8"  }, { "d9",  "F9"  }, { "d10", "F10" }, { "d11", "F11" },
+	{ "d12", "F12" }, { "d13", "F13" }, { "d14", "F14" }, { "d15", "F15" },
+	/* status registers */
+	{ "cpsr", "CPSR" }, { "spsr", "SPSR" },
+	{ "fpsr", "FPSR" }, { "fpcr", "FPCR" },
+	{ NULL, NULL }
+};
+
+/*
+ * ARM64 (7a) — x0-x30/w0-w30, xzr/wzr, sp, v0-v31, d0-d31, s0-s31
+ * Plan 9 7a names: R0-R30, ZR(R31), RSP, F0-F31, V0-V31
+ */
+static RegMap arm64_aliases[] = {
+	/* 64-bit x-registers → R0-R30 */
+	{ "x0",  "R0"  }, { "x1",  "R1"  }, { "x2",  "R2"  }, { "x3",  "R3"  },
+	{ "x4",  "R4"  }, { "x5",  "R5"  }, { "x6",  "R6"  }, { "x7",  "R7"  },
+	{ "x8",  "R8"  }, { "x9",  "R9"  }, { "x10", "R10" }, { "x11", "R11" },
+	{ "x12", "R12" }, { "x13", "R13" }, { "x14", "R14" }, { "x15", "R15" },
+	{ "x16", "R16" }, { "x17", "R17" }, { "x18", "R18" }, { "x19", "R19" },
+	{ "x20", "R20" }, { "x21", "R21" }, { "x22", "R22" }, { "x23", "R23" },
+	{ "x24", "R24" }, { "x25", "R25" }, { "x26", "R26" }, { "x27", "R27" },
+	{ "x28", "R28" }, { "x29", "R29" }, { "x30", "R30" },
+	/* 32-bit w-registers → same Rn (assembler infers width from opcode) */
+	{ "w0",  "R0"  }, { "w1",  "R1"  }, { "w2",  "R2"  }, { "w3",  "R3"  },
+	{ "w4",  "R4"  }, { "w5",  "R5"  }, { "w6",  "R6"  }, { "w7",  "R7"  },
+	{ "w8",  "R8"  }, { "w9",  "R9"  }, { "w10", "R10" }, { "w11", "R11" },
+	{ "w12", "R12" }, { "w13", "R13" }, { "w14", "R14" }, { "w15", "R15" },
+	{ "w16", "R16" }, { "w17", "R17" }, { "w18", "R18" }, { "w19", "R19" },
+	{ "w20", "R20" }, { "w21", "R21" }, { "w22", "R22" }, { "w23", "R23" },
+	{ "w24", "R24" }, { "w25", "R25" }, { "w26", "R26" }, { "w27", "R27" },
+	{ "w28", "R28" }, { "w29", "R29" }, { "w30", "R30" },
+	/* zero register, stack pointer, ABI aliases */
+	{ "xzr", "ZR"  }, { "wzr", "ZR"  },
+	{ "sp",  "RSP" },
+	{ "lr",  "R30" }, { "fp",  "R29" },
+	/* SIMD/FP: v-regs → V, d/s/h/b-regs → F */
+	{ "v0",  "V0"  }, { "v1",  "V1"  }, { "v2",  "V2"  }, { "v3",  "V3"  },
+	{ "v4",  "V4"  }, { "v5",  "V5"  }, { "v6",  "V6"  }, { "v7",  "V7"  },
+	{ "v8",  "V8"  }, { "v9",  "V9"  }, { "v10", "V10" }, { "v11", "V11" },
+	{ "v12", "V12" }, { "v13", "V13" }, { "v14", "V14" }, { "v15", "V15" },
+	{ "v16", "V16" }, { "v17", "V17" }, { "v18", "V18" }, { "v19", "V19" },
+	{ "v20", "V20" }, { "v21", "V21" }, { "v22", "V22" }, { "v23", "V23" },
+	{ "v24", "V24" }, { "v25", "V25" }, { "v26", "V26" }, { "v27", "V27" },
+	{ "v28", "V28" }, { "v29", "V29" }, { "v30", "V30" }, { "v31", "V31" },
+	{ "d0",  "F0"  }, { "d1",  "F1"  }, { "d2",  "F2"  }, { "d3",  "F3"  },
+	{ "d4",  "F4"  }, { "d5",  "F5"  }, { "d6",  "F6"  }, { "d7",  "F7"  },
+	{ "d8",  "F8"  }, { "d9",  "F9"  }, { "d10", "F10" }, { "d11", "F11" },
+	{ "d12", "F12" }, { "d13", "F13" }, { "d14", "F14" }, { "d15", "F15" },
+	{ "d16", "F16" }, { "d17", "F17" }, { "d18", "F18" }, { "d19", "F19" },
+	{ "d20", "F20" }, { "d21", "F21" }, { "d22", "F22" }, { "d23", "F23" },
+	{ "d24", "F24" }, { "d25", "F25" }, { "d26", "F26" }, { "d27", "F27" },
+	{ "d28", "F28" }, { "d29", "F29" }, { "d30", "F30" }, { "d31", "F31" },
+	{ "s0",  "F0"  }, { "s1",  "F1"  }, { "s2",  "F2"  }, { "s3",  "F3"  },
+	{ "s4",  "F4"  }, { "s5",  "F5"  }, { "s6",  "F6"  }, { "s7",  "F7"  },
+	{ "s8",  "F8"  }, { "s9",  "F9"  }, { "s10", "F10" }, { "s11", "F11" },
+	{ "s12", "F12" }, { "s13", "F13" }, { "s14", "F14" }, { "s15", "F15" },
+	{ "s16", "F16" }, { "s17", "F17" }, { "s18", "F18" }, { "s19", "F19" },
+	{ "s20", "F20" }, { "s21", "F21" }, { "s22", "F22" }, { "s23", "F23" },
+	{ "s24", "F24" }, { "s25", "F25" }, { "s26", "F26" }, { "s27", "F27" },
+	{ "s28", "F28" }, { "s29", "F29" }, { "s30", "F30" }, { "s31", "F31" },
+	/* system registers */
+	{ "nzcv", "NZCV" }, { "fpcr", "FPCR" }, { "fpsr", "FPSR" },
+	{ NULL, NULL }
+};
+
+/*
+ * MIPS (va) — r0-r31, f0-f31, ABI names
+ * Plan 9 va names: R0-R31, F0-F31, M0-M31 (CP0), HI, LO
+ * GNU MIPS ABI: $zero/$0, $at, $v0-$v1, $a0-$a3, $t0-$t9,
+ *               $s0-$s7, $k0-$k1, $gp, $sp, $fp/$s8, $ra
+ */
+static RegMap mips_aliases[] = {
+	/* numeric names */
+	{ "r0",  "R0"  }, { "r1",  "R1"  }, { "r2",  "R2"  }, { "r3",  "R3"  },
+	{ "r4",  "R4"  }, { "r5",  "R5"  }, { "r6",  "R6"  }, { "r7",  "R7"  },
+	{ "r8",  "R8"  }, { "r9",  "R9"  }, { "r10", "R10" }, { "r11", "R11" },
+	{ "r12", "R12" }, { "r13", "R13" }, { "r14", "R14" }, { "r15", "R15" },
+	{ "r16", "R16" }, { "r17", "R17" }, { "r18", "R18" }, { "r19", "R19" },
+	{ "r20", "R20" }, { "r21", "R21" }, { "r22", "R22" }, { "r23", "R23" },
+	{ "r24", "R24" }, { "r25", "R25" }, { "r26", "R26" }, { "r27", "R27" },
+	{ "r28", "R28" }, { "r29", "R29" }, { "r30", "R30" }, { "r31", "R31" },
+	/* ABI symbolic names (also written with $ prefix in GNU: $zero etc) */
+	{ "zero", "R0"  }, { "at",  "R1"  },
+	{ "v0",   "R2"  }, { "v1",  "R3"  },
+	{ "a0",   "R4"  }, { "a1",  "R5"  }, { "a2",  "R6"  }, { "a3",  "R7"  },
+	{ "t0",   "R8"  }, { "t1",  "R9"  }, { "t2",  "R10" }, { "t3",  "R11" },
+	{ "t4",   "R12" }, { "t5",  "R13" }, { "t6",  "R14" }, { "t7",  "R15" },
+	{ "s0",   "R16" }, { "s1",  "R17" }, { "s2",  "R18" }, { "s3",  "R19" },
+	{ "s4",   "R20" }, { "s5",  "R21" }, { "s6",  "R22" }, { "s7",  "R23" },
+	{ "t8",   "R24" }, { "t9",  "R25" },
+	{ "k0",   "R26" }, { "k1",  "R27" },
+	{ "gp",   "R28" }, { "sp",  "R29" }, { "fp",  "R30" }, { "ra",  "R31" },
+	/* FP registers */
+	{ "f0",  "F0"  }, { "f1",  "F1"  }, { "f2",  "F2"  }, { "f3",  "F3"  },
+	{ "f4",  "F4"  }, { "f5",  "F5"  }, { "f6",  "F6"  }, { "f7",  "F7"  },
+	{ "f8",  "F8"  }, { "f9",  "F9"  }, { "f10", "F10" }, { "f11", "F11" },
+	{ "f12", "F12" }, { "f13", "F13" }, { "f14", "F14" }, { "f15", "F15" },
+	{ "f16", "F16" }, { "f17", "F17" }, { "f18", "F18" }, { "f19", "F19" },
+	{ "f20", "F20" }, { "f21", "F21" }, { "f22", "F22" }, { "f23", "F23" },
+	{ "f24", "F24" }, { "f25", "F25" }, { "f26", "F26" }, { "f27", "F27" },
+	{ "f28", "F28" }, { "f29", "F29" }, { "f30", "F30" }, { "f31", "F31" },
+	{ NULL, NULL }
+};
+
+/*
+ * SPARC (ka) — GNU window-based names map to flat R0-R31
+ *   %g0-%g7  global   → R0-R7
+ *   %o0-%o7  out      → R8-R15   (%o6 = %sp)
+ *   %l0-%l7  local    → R16-R23
+ *   %i0-%i7  in       → R24-R31  (%i6 = %fp)
+ * FP: %f0-%f31 → F0-F31 (ka only defines even-numbered for doubles,
+ *     but we map all 32; the assembler enforces alignment)
+ */
+static RegMap sparc_aliases[] = {
+	{ "g0", "R0"  }, { "g1", "R1"  }, { "g2", "R2"  }, { "g3", "R3"  },
+	{ "g4", "R4"  }, { "g5", "R5"  }, { "g6", "R6"  }, { "g7", "R7"  },
+	{ "o0", "R8"  }, { "o1", "R9"  }, { "o2", "R10" }, { "o3", "R11" },
+	{ "o4", "R12" }, { "o5", "R13" }, { "o6", "R14" }, { "o7", "R15" },
+	{ "l0", "R16" }, { "l1", "R17" }, { "l2", "R18" }, { "l3", "R19" },
+	{ "l4", "R20" }, { "l5", "R21" }, { "l6", "R22" }, { "l7", "R23" },
+	{ "i0", "R24" }, { "i1", "R25" }, { "i2", "R26" }, { "i3", "R27" },
+	{ "i4", "R28" }, { "i5", "R29" }, { "i6", "R30" }, { "i7", "R31" },
+	{ "sp", "R14" }, /* %o6 */
+	{ "fp", "R30" }, /* %i6 */
+	{ "f0",  "F0"  }, { "f1",  "F1"  }, { "f2",  "F2"  }, { "f3",  "F3"  },
+	{ "f4",  "F4"  }, { "f5",  "F5"  }, { "f6",  "F6"  }, { "f7",  "F7"  },
+	{ "f8",  "F8"  }, { "f9",  "F9"  }, { "f10", "F10" }, { "f11", "F11" },
+	{ "f12", "F12" }, { "f13", "F13" }, { "f14", "F14" }, { "f15", "F15" },
+	{ "f16", "F16" }, { "f17", "F17" }, { "f18", "F18" }, { "f19", "F19" },
+	{ "f20", "F20" }, { "f21", "F21" }, { "f22", "F22" }, { "f23", "F23" },
+	{ "f24", "F24" }, { "f25", "F25" }, { "f26", "F26" }, { "f27", "F27" },
+	{ "f28", "F28" }, { "f29", "F29" }, { "f30", "F30" }, { "f31", "F31" },
+	/* special registers */
+	{ "y",   "Y"   }, { "psr", "PSR" }, { "wim", "WIM" }, { "tbr", "TBR" },
+	{ "fsr", "FSR" }, { "csr", "CSR" },
+	{ NULL, NULL }
+};
+
+/*
+ * PowerPC 32-bit (qa) and PPC64 (9a) — identical register namespaces.
+ * Plan 9 names: R0-R31, F0-F31, CR0-CR7, LR, CTR, XER, MSR, FPSCR
+ * GNU names: r0-r31, f0-f31, cr0-cr7, lr, ctr, xer, msr, fpscr
+ */
+static RegMap ppc_aliases[] = {
+	{ "r0",  "R0"  }, { "r1",  "R1"  }, { "r2",  "R2"  }, { "r3",  "R3"  },
+	{ "r4",  "R4"  }, { "r5",  "R5"  }, { "r6",  "R6"  }, { "r7",  "R7"  },
+	{ "r8",  "R8"  }, { "r9",  "R9"  }, { "r10", "R10" }, { "r11", "R11" },
+	{ "r12", "R12" }, { "r13", "R13" }, { "r14", "R14" }, { "r15", "R15" },
+	{ "r16", "R16" }, { "r17", "R17" }, { "r18", "R18" }, { "r19", "R19" },
+	{ "r20", "R20" }, { "r21", "R21" }, { "r22", "R22" }, { "r23", "R23" },
+	{ "r24", "R24" }, { "r25", "R25" }, { "r26", "R26" }, { "r27", "R27" },
+	{ "r28", "R28" }, { "r29", "R29" }, { "r30", "R30" }, { "r31", "R31" },
+	/* ABI aliases */
+	{ "sp",  "R1"  }, /* stack pointer */
+	{ "toc", "R2"  }, /* table of contents (64-bit ABI) */
+	{ "f0",  "F0"  }, { "f1",  "F1"  }, { "f2",  "F2"  }, { "f3",  "F3"  },
+	{ "f4",  "F4"  }, { "f5",  "F5"  }, { "f6",  "F6"  }, { "f7",  "F7"  },
+	{ "f8",  "F8"  }, { "f9",  "F9"  }, { "f10", "F10" }, { "f11", "F11" },
+	{ "f12", "F12" }, { "f13", "F13" }, { "f14", "F14" }, { "f15", "F15" },
+	{ "f16", "F16" }, { "f17", "F17" }, { "f18", "F18" }, { "f19", "F19" },
+	{ "f20", "F20" }, { "f21", "F21" }, { "f22", "F22" }, { "f23", "F23" },
+	{ "f24", "F24" }, { "f25", "F25" }, { "f26", "F26" }, { "f27", "F27" },
+	{ "f28", "F28" }, { "f29", "F29" }, { "f30", "F30" }, { "f31", "F31" },
+	{ "cr0", "CR0" }, { "cr1", "CR1" }, { "cr2", "CR2" }, { "cr3", "CR3" },
+	{ "cr4", "CR4" }, { "cr5", "CR5" }, { "cr6", "CR6" }, { "cr7", "CR7" },
+	{ "lr",    "LR"    }, { "ctr",   "CTR"   },
+	{ "xer",   "XER"   }, { "msr",   "MSR"   },
+	{ "fpscr", "FPSCR" },
+	{ NULL, NULL }
+};
+
+/*
+ * MC68000 / MC68020 (1a / 2a)
+ * GNU AT&T: %d0-%d7 (data), %a0-%a7 (address), %fp0-%fp7 (float)
+ * Plan 9:   R0-R7          A0-A7               F0-F7
+ * %a7 = %sp (stack pointer), %a6 = %fp (frame pointer by convention)
+ * %pc = PC, %ccr = CCR, %sr = SR
+ */
+static RegMap m68k_aliases[] = {
+	{ "d0", "R0" }, { "d1", "R1" }, { "d2", "R2" }, { "d3", "R3" },
+	{ "d4", "R4" }, { "d5", "R5" }, { "d6", "R6" }, { "d7", "R7" },
+	{ "a0", "A0" }, { "a1", "A1" }, { "a2", "A2" }, { "a3", "A3" },
+	{ "a4", "A4" }, { "a5", "A5" }, { "a6", "A6" }, { "a7", "A7" },
+	{ "sp", "A7" }, /* stack pointer = a7 */
+	{ "fp", "A6" }, /* frame pointer = a6 by convention */
+	{ "fp0", "F0" }, { "fp1", "F1" }, { "fp2", "F2" }, { "fp3", "F3" },
+	{ "fp4", "F4" }, { "fp5", "F5" }, { "fp6", "F6" }, { "fp7", "F7" },
+	{ "pc",  "PC"  }, { "ccr", "CCR" }, { "sr",  "SR"  },
+	{ "usp", "USP" }, { "vbr", "VBR" }, { "sfc", "SFC" }, { "dfc", "DFC" },
+	{ "cacr","CACR"}, { "caar","CAAR"}, { "msp", "MSP" }, { "isp", "ISP" },
+	{ "fpcr","FPCR"}, { "fpsr","FPSR"}, { "fpiar","FPIAR" },
+	{ NULL, NULL }
+};
 /* ------------------------------------------------------------------ */
 
 /*
@@ -318,23 +598,89 @@ strlower(const char *src, char *buf, int sz)
 /* ------------------------------------------------------------------ */
 
 /*
+ * Look up in a RegMap table. Returns Plan 9 name or NULL.
+ */
+static const char *
+lookup_in_table(const RegMap *tab, const char *name)
+{
+	int i;
+	for (i = 0; tab[i].gas; i++) {
+		if (strcmp(tab[i].gas, name) == 0)
+			return tab[i].p9;
+	}
+	return NULL;
+}
+
+/*
+ * For RISC arches whose GNU names are just lowercase Rn/Fn/etc,
+ * try a generic uppercase conversion as a fallback.
+ * e.g. "r5" → "R5", "f12" → "F12", "cr3" → "CR3"
+ */
+static const char *
+generic_risc_reg(const char *name)
+{
+	static char buf[16];
+	int i;
+	/* must start with a letter, rest digits */
+	if (!isalpha((unsigned char)name[0])) return NULL;
+	for (i = 1; name[i]; i++)
+		if (!isdigit((unsigned char)name[i])) return NULL;
+	/* uppercase prefix + digits */
+	buf[0] = toupper((unsigned char)name[0]);
+	strncpy(buf+1, name+1, sizeof(buf)-2);
+	buf[sizeof(buf)-1] = '\0';
+	return buf;
+}
+
+/*
  * Look up a register name (without % prefix, already lowercased).
  * Returns Plan 9 name or NULL if unknown.
+ * Dispatches based on current arch.
  */
 static const char *
 lookup_reg(const char *name)
 {
-	int i;
-	/* handle st(n) variants */
-	if (strncmp(name, "st(", 3) == 0) {
-		static char buf[8];
-		int n = atoi(name+3);
-		snprintf(buf, sizeof(buf), "F%d", n);
-		return buf;
-	}
-	for (i = 0; att_regs[i].gas; i++) {
-		if (strcmp(att_regs[i].gas, name) == 0)
-			return att_regs[i].p9;
+	const char *r;
+	static char buf[8];
+	int n;
+
+	switch (arch) {
+	case ARCH_AMD64:
+	case ARCH_386:
+		/* x86: handle st(n) variants, then look up in att_regs */
+		if (strncmp(name, "st(", 3) == 0) {
+			n = atoi(name+3);
+			snprintf(buf, sizeof(buf), "F%d", n);
+			return buf;
+		}
+		return lookup_in_table(att_regs, name);
+
+	case ARCH_ARM:
+		r = lookup_in_table(arm_aliases, name);
+		return r ? r : generic_risc_reg(name);
+
+	case ARCH_ARM64:
+		r = lookup_in_table(arm64_aliases, name);
+		return r ? r : generic_risc_reg(name);
+
+	case ARCH_MIPS:
+		/* MIPS GNU uses $rN or $name; we receive name without $ */
+		r = lookup_in_table(mips_aliases, name);
+		return r ? r : generic_risc_reg(name);
+
+	case ARCH_SPARC:
+		/* sparc register names come in after stripping %, e.g. "g0", "o1" */
+		r = lookup_in_table(sparc_aliases, name);
+		return r ? r : generic_risc_reg(name);
+
+	case ARCH_PPC64:
+	case ARCH_POWER:
+		r = lookup_in_table(ppc_aliases, name);
+		return r ? r : generic_risc_reg(name);
+
+	case ARCH_68000:
+	case ARCH_68020:
+		return lookup_in_table(m68k_aliases, name);
 	}
 	return NULL;
 }
@@ -1293,7 +1639,7 @@ static int
 invoke_assembler(const char *translated, const char *output)
 {
 	char cmd[4096];
-	const char *native = (arch == ARCH_AMD64) ? "6a" : "8a";
+	const char *native = assembler_name(arch);
 	int pos = 0;
 	int n;
 	int i;
@@ -1362,17 +1708,54 @@ usage(void)
 	fprintf(stderr,
 		"usage: as [options] file.s ...\n"
 		"options:\n"
-		"  -o outfile     output file\n"
-		"  -att           force AT&T syntax input\n"
-		"  -intel         force Intel syntax input\n"
-		"  -plan9         force Plan 9 syntax (pass through unmodified)\n"
-		"  -m32 / --32    target i386 (use 8a)\n"
-		"  -m64 / --64    target amd64 (use 6a) [default]\n"
-		"  -I dir         add include directory\n"
-		"  -D sym[=val]   define symbol\n"
-		"  -v             verbose\n"
+		"  -o outfile         output file\n"
+		"  -att               force AT&T syntax input\n"
+		"  -intel             force Intel syntax input\n"
+		"  -plan9             force Plan 9 syntax (pass through)\n"
+		"architecture (default: amd64 / 6a):\n"
+		"  -march=ARCH        amd64 386 arm arm64 ppc64 power mips sparc 68000 68020\n"
+		"  -m32 / --32        alias for -march=386\n"
+		"  -m64 / --64        alias for -march=amd64\n"
+		"  -marm              alias for -march=arm\n"
+		"  -marm64            alias for -march=arm64\n"
+		"  -mppc64 / -mpowerpc64  alias for -march=ppc64\n"
+		"  -mpower / -mpowerpc    alias for -march=power\n"
+		"  -mmips             alias for -march=mips\n"
+		"  -msparc            alias for -march=sparc\n"
+		"  -m68k              alias for -march=68000\n"
+		"  -m68020            alias for -march=68020\n"
+		"other:\n"
+		"  -I dir             add include directory\n"
+		"  -D sym[=val]       define symbol\n"
+		"  -v                 verbose\n"
 	);
 	exit(1);
+}
+
+/*
+ * Parse an architecture name string into an Arch enum.
+ * Returns -1 if unrecognized.
+ */
+static int
+parse_arch(const char *s)
+{
+	if (strcmp(s, "amd64") == 0 || strcmp(s, "x86_64") == 0) return ARCH_AMD64;
+	if (strcmp(s, "386")   == 0 || strcmp(s, "i386")   == 0 ||
+	    strcmp(s, "i486")  == 0 || strcmp(s, "i586")   == 0 ||
+	    strcmp(s, "i686")  == 0)                              return ARCH_386;
+	if (strcmp(s, "arm")   == 0 || strcmp(s, "armv7")  == 0) return ARCH_ARM;
+	if (strcmp(s, "arm64") == 0 || strcmp(s, "aarch64") == 0) return ARCH_ARM64;
+	if (strcmp(s, "ppc64") == 0 || strcmp(s, "powerpc64") == 0 ||
+	    strcmp(s, "powerpc64le") == 0)                        return ARCH_PPC64;
+	if (strcmp(s, "power") == 0 || strcmp(s, "powerpc") == 0 ||
+	    strcmp(s, "ppc")   == 0)                              return ARCH_POWER;
+	if (strcmp(s, "mips")  == 0 || strcmp(s, "mips64") == 0 ||
+	    strcmp(s, "mipsel") == 0)                             return ARCH_MIPS;
+	if (strcmp(s, "sparc") == 0 || strcmp(s, "sparc64") == 0) return ARCH_SPARC;
+	if (strcmp(s, "68000") == 0 || strcmp(s, "m68000") == 0 ||
+	    strcmp(s, "m68k")  == 0)                              return ARCH_68000;
+	if (strcmp(s, "68020") == 0 || strcmp(s, "m68020") == 0) return ARCH_68020;
+	return -1;
 }
 
 /* ------------------------------------------------------------------ */
@@ -1404,10 +1787,39 @@ main(int argc, char *argv[])
 			syntax = SYN_INTEL;
 		} else if (strcmp(a, "-plan9") == 0 || strcmp(a, "--plan9") == 0) {
 			syntax = SYN_PLAN9;
+		/* Architecture flags */
 		} else if (strcmp(a, "-m32") == 0 || strcmp(a, "--32") == 0) {
 			arch = ARCH_386;
 		} else if (strcmp(a, "-m64") == 0 || strcmp(a, "--64") == 0) {
 			arch = ARCH_AMD64;
+		} else if (strcmp(a, "-marm") == 0) {
+			arch = ARCH_ARM;
+		} else if (strcmp(a, "-marm64") == 0 || strcmp(a, "-maarch64") == 0) {
+			arch = ARCH_ARM64;
+		} else if (strcmp(a, "-mppc64") == 0 || strcmp(a, "-mpowerpc64") == 0 ||
+		           strcmp(a, "-mpowerpc64le") == 0) {
+			arch = ARCH_PPC64;
+		} else if (strcmp(a, "-mpower") == 0 || strcmp(a, "-mpowerpc") == 0 ||
+		           strcmp(a, "-mppc") == 0) {
+			arch = ARCH_POWER;
+		} else if (strcmp(a, "-mmips") == 0 || strcmp(a, "-mmips64") == 0) {
+			arch = ARCH_MIPS;
+		} else if (strcmp(a, "-msparc") == 0 || strcmp(a, "-msparc64") == 0) {
+			arch = ARCH_SPARC;
+		} else if (strcmp(a, "-m68k") == 0 || strcmp(a, "-m68000") == 0) {
+			arch = ARCH_68000;
+		} else if (strcmp(a, "-m68020") == 0) {
+			arch = ARCH_68020;
+		} else if (strncmp(a, "-march=", 7) == 0) {
+			int r = parse_arch(a+7);
+			if (r < 0) die("unknown architecture: %s", a+7);
+			arch = (Arch)r;
+		} else if (strcmp(a, "-march") == 0) {
+			if (++i >= argc) die("-march requires argument");
+			int r = parse_arch(argv[i]);
+			if (r < 0) die("unknown architecture: %s", argv[i]);
+			arch = (Arch)r;
+		/* Other options */
 		} else if (strcmp(a, "-v") == 0 || strcmp(a, "--verbose") == 0) {
 			verbose = 1;
 		} else if (strcmp(a, "-I") == 0) {
@@ -1422,11 +1834,15 @@ main(int argc, char *argv[])
 			if (ndef < MAXDEF) defines[ndef++] = a+2;
 		} else if (*a == '-') {
 			/* Silently ignore other GNU as options we don't care about:
-			   --noexecstack, -g, --gdwarf*, --fatal-warnings, etc. */
+			   --noexecstack, -g, --gdwarf*, --fatal-warnings, -EL/-EB etc. */
 			if (strcmp(a, "--noexecstack") != 0 &&
 			    strcmp(a, "--fatal-warnings") != 0 &&
 			    strncmp(a, "--gdwarf", 8) != 0 &&
 			    strncmp(a, "-g", 2) != 0 &&
+			    strcmp(a, "-EL") != 0 &&
+			    strcmp(a, "-EB") != 0 &&
+			    strcmp(a, "-mfpu=vfp") != 0 &&
+			    strncmp(a, "-mfpu=", 6) != 0 &&
 			    strcmp(a, "-W") != 0 &&
 			    strcmp(a, "-w") != 0) {
 				warn("ignoring unknown option: %s", a);
@@ -1455,15 +1871,8 @@ main(int argc, char *argv[])
 
 		/* Determine output file for this input */
 		char *thisout = outfile;
-		char autout[256];
-		if (!thisout && nfiles == 1) {
-			thisout = NULL; /* let 6a/8a derive it */
-		} else if (!thisout) {
-			/* multiple files, no -o: derive from input name */
-			strncpy(autout, infile, sizeof(autout)-4);
-			char *dot = strrchr(autout, '.');
-			if (dot) *dot = '\0';
-			/* 6a will produce .6, 8a will produce .8 */
+		if (!thisout && nfiles > 1) {
+			/* multiple files, no -o: let the native assembler derive it */
 			thisout = NULL;
 		}
 
