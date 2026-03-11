@@ -94,10 +94,10 @@ struct	fsm {
 	/* saw a digit */
 	NUM1,	{ C_XX },	ACT(NUMBER,S_SELFB),
 	NUM1,	{ C_NUM, C_ALPH, '.' },	NUM1,
-	NUM1,	{ 'E', 'e' },	NUM2,
+	NUM1,	{ 'E', 'e', 'P', 'p' },	NUM2,
 	NUM1,	{ '_' },	ACT(NUMBER,S_SELFB),
 
-	/* saw possible start of exponent, digits-e */
+	/* saw possible start of exponent, digits-e or binary-e (hex float) */
 	NUM2,	{ C_XX },	ACT(NUMBER,S_SELFB),
 	NUM2,	{ '+', '-' },	NUM1,
 	NUM2,	{ C_NUM, C_ALPH },	NUM1,

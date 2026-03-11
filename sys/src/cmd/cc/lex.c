@@ -825,6 +825,10 @@ tnum:
 			}
 			if(cp == symb+2)
 				yyerror("malformed hex constant");
+			if(c == '.')
+				goto casedothex;
+			if(c == 'p' || c == 'P')
+				goto casep;
 			goto ncu;
 		}
 	if(c == 'b' || c == 'B')
@@ -921,6 +925,41 @@ nret:
 		warn(Z, "truncated constant: %T %s", types[t], symb);
 	}
 	return c;
+
+casedothex:
+	/* collect optional hex fractional digits after '.' in a hex float */
+	for(;;) {
+		if(cp >= &symb[NSYMB-1])
+			goto toolong;
+		*cp++ = c;
+		c = GETC();
+		if(!isdigit(c) && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F'))
+			break;
+	}
+	if(c != 'p' && c != 'P')
+		yyerror("hex float constant requires binary exponent (p or P)");
+
+casep:
+	/* binary exponent for C99 hex float: p[+-]?[0-9]+ */
+	if(cp >= &symb[NSYMB-2])
+		goto toolong;
+	*cp++ = 'p';
+	c = GETC();
+	if(c == '+' || c == '-') {
+		if(cp >= &symb[NSYMB-1])
+			goto toolong;
+		*cp++ = c;
+		c = GETC();
+	}
+	if(!isdigit(c))
+		yyerror("malformed hex float constant exponent");
+	while(isdigit(c)) {
+		if(cp >= &symb[NSYMB-1])
+			goto toolong;
+		*cp++ = c;
+		c = GETC();
+	}
+	goto caseout;
 
 casedot:
 	for(;;) {

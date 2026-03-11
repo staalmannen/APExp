@@ -274,108 +274,34 @@ l1:
 		c = GETC();
 		c1 = 3;
 		if(c == 'x' || c == 'X') {
-			/* hex integer or C99 hex float: collect into symb for strtod/strtoull */
-			*cp++ = c;	/* store 'x' or 'X' */
+			c1 = 4;
 			c = GETC();
-			goto hexnum;
 		} else
 		if(c < '0' || c > '7')
 			goto dc;
-		/* octal */
 		yylval.lval = 0;
 		for(;;) {
 			if(c >= '0' && c <= '9') {
-				if(c > '7')
+				if(c > '7' && c1 == 3)
 					break;
-				yylval.lval <<= 3;
+				yylval.lval <<= c1;
 				yylval.lval += c - '0';
+				c = GETC();
+				continue;
+			}
+			if(c1 == 3)
+				break;
+			if(c >= 'A' && c <= 'F')
+				c += 'a' - 'A';
+			if(c >= 'a' && c <= 'f') {
+				yylval.lval <<= c1;
+				yylval.lval += c - 'a' + 10;
 				c = GETC();
 				continue;
 			}
 			break;
 		}
 		goto ncu;
-
-hexnum:
-	/*
-	 * Hex integer or C99 hex float.
-	 * symb already holds "0x" (or "0X"); cp points past it.
-	 * Collect the full token text, then decide which kind it is.
-	 *
-	 * Grammar (C99 §6.4.4.2):
-	 *   hexfloat  ::= 0x <hexdig>* [. <hexdig>*] (p|P) [+-] <decdig>+ [fFlL]?
-	 *   hexint    ::= 0x <hexdig>+ [uUlL]*
-	 */
-
-	/* leading hex digits (integer part of significand) */
-	while((c >= '0' && c <= '9') ||
-	      (c >= 'a' && c <= 'f') ||
-	      (c >= 'A' && c <= 'F')) {
-		if(cp >= &symb[NSYMB-1])
-			goto toolong;
-		*cp++ = c;
-		c = GETC();
-	}
-
-	/* optional fractional part */
-	if(c == '.') {
-		if(cp >= &symb[NSYMB-1])
-			goto toolong;
-		*cp++ = c;
-		c = GETC();
-		while((c >= '0' && c <= '9') ||
-		      (c >= 'a' && c <= 'f') ||
-		      (c >= 'A' && c <= 'F')) {
-			if(cp >= &symb[NSYMB-1])
-				goto toolong;
-			*cp++ = c;
-			c = GETC();
-		}
-		if(c != 'p' && c != 'P')
-			yyerror("hex floating constant requires binary exponent (p or P)");
-	}
-
-	/* binary exponent: presence makes this a float */
-	if(c == 'p' || c == 'P') {
-		if(cp >= &symb[NSYMB-1])
-			goto toolong;
-		*cp++ = 'p';
-		c = GETC();
-		if(c == '+' || c == '-') {
-			if(cp >= &symb[NSYMB-1])
-				goto toolong;
-			*cp++ = c;
-			c = GETC();
-		}
-		if(c < '0' || c > '9')
-			yyerror("hex floating constant: missing digits after exponent");
-		while(c >= '0' && c <= '9') {
-			if(cp >= &symb[NSYMB-1])
-				goto toolong;
-			*cp++ = c;
-			c = GETC();
-		}
-		/* consume optional float/long-double suffix */
-		if(c == 'f' || c == 'F' || c == 'l' || c == 'L')
-			c = GETC();
-		*cp = 0;
-		peekc = c;
-		if(FPCHIP) {
-			yylval.dval = strtod(symb, nil);
-			return LFCONST;
-		}
-		yyerror("assembler cannot interpret fp constants");
-		yylval.lval = 1L;
-		return LCONST;
-	}
-
-	/* no '.' and no 'p': pure hex integer */
-	*cp = 0;
-	if(sizeof(yylval.lval) == sizeof(vlong))
-		yylval.lval = strtoull(symb, nil, 16);
-	else
-		yylval.lval = strtoul(symb, nil, 16);
-	goto ncu;
 
 	dc:
 		for(;;) {
