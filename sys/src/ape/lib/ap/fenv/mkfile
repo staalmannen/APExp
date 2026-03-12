@@ -14,27 +14,12 @@ OFILES=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-AS=$APEXPROOT/$objtype/bin/as
-CC=$APEXPROOT/$objtype/bin/pcc
-
-if ( $objtype = amd64 ) _ARCH=x86_64
-if ( $objtype = 386 ) _ARCH=i386
-if ( $objtype = arm ) _ARCH=dummy
-if ( $objtype = arm64 ) _ARCH=aarch64
-if ( $objtype = power ) _ARCH=powerpc
-if ( $objtype = power64 ) _ARCH=dummy
-if ( $objtype = 68020 ) _ARCH=dummy
-if ( $objtype = 68000 ) _ARCH=dummy
-if ( $objtype = mips ) _ARCH=mips
-
+CC=pcc
 CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_BSD_SOURCE\
 		-I$APEXPROOT/sys/include/ape -I$APEXPROOT/$objtype/include/ape
 		-
-fenv.$O: $_ARCH/fenv.s
-	$AS -o $target $prereq
-
-fenv.$O: $_ARCH/fenv.S
-	$AS -o $target $prereq
+# TODO: figure out how to build the arch-specific fenv objects
+# We have a dependency issue: as needs APExp libraries so it is built after
 
 fenv.$O: dummy/fenv.c
 	$CC $CFLAGS -o $target $prereq

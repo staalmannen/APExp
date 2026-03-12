@@ -1343,8 +1343,21 @@ translate_line_att(const char *line, FILE *out)
 	char buf[MAXLINE];
 	strncpy(buf, line, sizeof(buf)-1);
 	char *p = buf;
+	static int in_block_comment = 0;  /* persists across lines */
 
-	/* Strip comments: #, //, and C-style block comments */
+	/* Handle multi-line C block comments across lines */
+	if (in_block_comment) {
+		char *end = strstr(p, "*/");
+		if (end) {
+			in_block_comment = 0;
+			p = end + 2;
+		} else {
+			fprintf(out, "\n");
+			return;
+		}
+	}
+
+	/* Strip comments: #, //, and C-style block comments (may start mid-line) */
 	{
 		int in_str2 = 0;
 		char *c = p;
@@ -1356,12 +1369,16 @@ translate_line_att(const char *line, FILE *out)
 			if (*c == '/' && c[1] == '*') {
 				char *end = strstr(c+2, "*/");
 				if (end) {
-					*c = ' ';
-					memmove(c+1, end+2, strlen(end+2)+1);
+					/* inline block comment — replace with space */
+					memmove(c, end+2, strlen(end+2)+1);
+					/* don't advance c, re-scan from same position */
+					continue;
 				} else {
+					/* opens a block comment that continues on next lines */
+					in_block_comment = 1;
 					*c = '\0';
+					break;
 				}
-				continue;
 			}
 			c++;
 		}
@@ -1487,8 +1504,30 @@ translate_line_att(const char *line, FILE *out)
 	char ops[8][MAXLINE];
 	int nops = split_operands(p, ops, 8);
 
-	/* AT&T operand order: src, dst — Plan 9 is also src, dst — same! */
-	/* But we still need to translate each operand */
+	/* AT&T operand order: src, dst — Plan 9 is also src, dst — same!
+	 * Exception: CMP and TEST. Plan 9 grammar requires the register first
+	 * even when the immediate is the "source" in AT&T.
+	 * AT&T: cmpl $0, %eax  → Plan 9: CMPL AX, $0
+	 * AT&T: testl $1, %eax → Plan 9: TESTL AX, $1
+	 */
+	{
+		char mlow[64];
+		strlower(mnem, mlow, sizeof(mlow));
+		if (nops == 2 && ops[0][0] == '$') {
+			/* check if it's a CMP or TEST variant */
+			int is_cmp_test = (strncmp(mlow, "cmp",  3) == 0 ||
+			                   strncmp(mlow, "test", 4) == 0);
+			if (is_cmp_test) {
+				/* swap: Plan 9 wants reg, $imm not $imm, reg */
+				char tmp[MAXLINE];
+				strncpy(tmp,    ops[0], MAXLINE);
+				strncpy(ops[0], ops[1], MAXLINE);
+				strncpy(ops[1], tmp,    MAXLINE);
+			}
+		}
+	}
+
+	/* Translate each operand */
 	char tops[8][MAXLINE];
 	for (i = 0; i < nops; i++)
 		translate_operand_att(ops[i], tops[i], MAXLINE);
@@ -1511,10 +1550,46 @@ translate_line_intel(const char *line, FILE *out)
 	char buf[MAXLINE];
 	strncpy(buf, line, sizeof(buf)-1);
 	char *p = buf;
+	static int in_block_comment = 0;
 
-	/* Strip comment: ; is Intel comment */
-	char *sc = strchr(p, ';');
-	if (sc) *sc = '\0';
+	/* Handle multi-line block comments */
+	if (in_block_comment) {
+		char *end = strstr(p, "*/");
+		if (end) {
+			in_block_comment = 0;
+			p = end + 2;
+		} else {
+			fprintf(out, "\n");
+			return;
+		}
+	}
+
+	/* Strip C-style block comments (inline) and open-ended ones */
+	{
+		char *c = p;
+		while (*c) {
+			if (*c == '/' && c[1] == '*') {
+				char *end = strstr(c+2, "*/");
+				if (end) {
+					memmove(c, end+2, strlen(end+2)+1);
+					continue;
+				} else {
+					in_block_comment = 1;
+					*c = '\0';
+					break;
+				}
+			}
+			c++;
+		}
+	}
+
+	/* Strip Intel comment (;) and C++ comment (//) */
+	{
+		char *sc = strchr(p, ';');
+		if (sc) *sc = '\0';
+		char *lc = strstr(p, "//");
+		if (lc) *lc = '\0';
+	}
 
 	p = trim(p);
 	if (!*p) { fprintf(out, "\n"); return; }
@@ -1558,8 +1633,6 @@ translate_line_intel(const char *line, FILE *out)
 	mnem[i] = '\0';
 	while (isspace((unsigned char)*p)) p++;
 
-	const char *p9op = translate_opcode(mnem);
-
 	char ops[8][MAXLINE];
 	int nops = split_operands(p, ops, 8);
 
@@ -1568,20 +1641,81 @@ translate_line_intel(const char *line, FILE *out)
 	for (i = 0; i < nops; i++)
 		translate_operand_intel(ops[i], tops[i], MAXLINE, mnem);
 
-	fprintf(out, "\t%s", p9op);
+	const char *p9op = translate_opcode(mnem);
+
+	/*
+	 * Intel instructions without size suffixes:
+	 * push/pop/call/jmp/ret in 64-bit mode need Q suffix in Plan 9.
+	 * mov/add/sub etc. without suffix: Plan 9 can often infer from operands,
+	 * but for safety we add Q for 64-bit, L for 32-bit arch.
+	 */
+	{
+		char mlow[64];
+		strlower(mnem, mlow, sizeof(mlow));
+		int n = strlen(mlow);
+
+		/*
+		 * has_suffix: true if the mnemonic already ends with a valid
+		 * Plan 9 size suffix letter that is NOT just part of the opcode name.
+		 * We use an explicit whitelist of unsuffixed ops to avoid false positives
+		 * (e.g. "sub" ends in 'b', "add" ends in 'd', "or" ends in 'r').
+		 */
+		static const char *need_suffix[] = {
+			"push", "pop", "call", "ret", "leave",
+			"mov",  "add", "sub",  "and", "or",  "xor",
+			"cmp",  "test","lea",  "not", "neg",
+			"inc",  "dec", "mul",  "imul","div", "idiv",
+			"shl",  "shr", "sal",  "sar", "rol", "ror",
+			"xchg", "bswap",
+			NULL
+		};
+		const char *sfx = (arch == ARCH_AMD64) ? "Q" : "L";
+		int matched = 0;
+		for (int j = 0; need_suffix[j]; j++) {
+			if (strcmp(mlow, need_suffix[j]) == 0) {
+				static char sfxbuf[80];
+				snprintf(sfxbuf, sizeof(sfxbuf), "%s%s",
+				         translate_opcode(mnem), sfx);
+				p9op = sfxbuf;
+				matched = 1;
+				break;
+			}
+		}
+		(void)n; (void)matched;
+
+		/*
+		 * Intel CMP/TEST operand adjustment:
+		 * Intel: cmp eax, 0  (dst=eax src=0) → after swap tops[1],tops[0] = $0,AX
+		 * But Plan 9 needs: CMPQ AX, $0
+		 * The 2-operand swap below already swaps Intel dst,src → src,dst.
+		 * For CMP, Intel "dst" is the register being compared, which becomes
+		 * tops[0] and after swap is output second — WRONG.
+		 * We need to UN-swap for CMP/TEST: output tops[0], tops[1] (Intel order =
+		 * register, immediate = Plan 9 order for CMP).
+		 */
+		if (nops == 2 && (strncmp(mlow, "cmp", 3) == 0 ||
+		                  strncmp(mlow, "test", 4) == 0)) {
+			/* output without swap */
+			fprintf(out, "\t%s\t%s, %s\n", p9op, tops[0], tops[1]);
+			return;
+		}
+	}
 	if (nops == 2) {
 		/* Intel: dst, src → Plan 9: src, dst — swap */
-		fprintf(out, "\t%s, %s", tops[1], tops[0]);
+		fprintf(out, "\t%s\t%s, %s\n", p9op, tops[1], tops[0]);
 	} else if (nops == 1) {
-		fprintf(out, "\t%s", tops[0]);
-	} else if (nops > 2) {
+		fprintf(out, "\t%s\t%s\n", p9op, tops[0]);
+	} else if (nops == 0) {
+		fprintf(out, "\t%s\n", p9op);
+	} else {
 		/* 3-operand: usually imm, src, dst → keep as-is for now */
+		fprintf(out, "\t%s", p9op);
 		for (i = 0; i < nops; i++) {
 			if (i == 0) fprintf(out, "\t%s", tops[i]);
 			else        fprintf(out, ", %s", tops[i]);
 		}
+		fprintf(out, "\n");
 	}
-	fprintf(out, "\n");
 }
 
 /* ------------------------------------------------------------------ */
@@ -1618,21 +1752,32 @@ translate_file(const char *infile, const char *outfile_path, Syntax syn)
 	if (!out) die("cannot open output: %s: %s", outfile_path, strerror(errno));
 
 	while (fgets(line, sizeof(line), in)) {
+		/*
+		 * Translate once into the output file.
+		 * For verbose, we re-read what we wrote (can't call translate again
+		 * because the static in_block_comment state would be wrong).
+		 * Instead, use a per-line buffer approach: translate to a temp
+		 * string and write it to both destinations.
+		 */
 		if (syn == SYN_INTEL)
 			translate_line_intel(line, out);
 		else
 			translate_line_att(line, out);
-
-		if (verbose) {
-			if (syn == SYN_INTEL)
-				translate_line_intel(line, stderr);
-			else
-				translate_line_att(line, stderr);
-		}
 	}
 
 	fclose(in);
 	fclose(out);
+
+	/* Verbose: re-read the translated file and print to stderr */
+	if (verbose) {
+		FILE *f = fopen(outfile_path, "r");
+		if (f) {
+			char vline[MAXLINE];
+			while (fgets(vline, sizeof(vline), f))
+				fputs(vline, stderr);
+			fclose(f);
+		}
+	}
 }
 
 static int
@@ -1650,6 +1795,32 @@ invoke_assembler(const char *translated, const char *output)
 	if (output) {
 		n = snprintf(cmd+pos, sizeof(cmd)-pos, " -o %s", output);
 		pos += n;
+	}
+
+	/*
+	 * Always add the standard Plan 9 include directories so that
+	 * #include "textflag.h" and similar headers resolve correctly.
+	 * $objtype/include is the arch-specific include path.
+	 * /sys/include is the system-wide include path.
+	 */
+	{
+		static const char *std_incs[] = {
+			"/sys/include",
+			NULL
+		};
+		/* arch-specific: /$arch/include where arch is the thestring */
+		static const char *arch_thestring[] = {
+			"amd64", "386", "arm", "arm64",
+			"power64", "power", "mips", "sparc",
+			"68000", "68020"
+		};
+		const char *astr = arch_thestring[arch];
+		n = snprintf(cmd+pos, sizeof(cmd)-pos, " -I /%s/include", astr);
+		pos += n;
+		for (i = 0; std_incs[i]; i++) {
+			n = snprintf(cmd+pos, sizeof(cmd)-pos, " -I %s", std_incs[i]);
+			pos += n;
+		}
 	}
 
 	for (i = 0; i < ninc; i++) {
