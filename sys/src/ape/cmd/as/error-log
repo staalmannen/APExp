@@ -1,0 +1,31 @@
+$ as test_att.s
+/tmp/as_890_0.s:97 syntax error, last name: myvar
+inst:  LTYPEM.spec6 
+saw LLAB
+/tmp/as_890_0.s:102 redeclaration of myvar
+as: warning: assembler failed for test_att.s (exit 256)
+$ as test_intel.s
+/tmp/as_896_0.s:65 syntax error, last name: RETQ
+line:  LNAME.: $$5 line 
+inst:  LNAME.= expr 
+saw  ;
+/tmp/as_896_0.s:73 syntax error, last name: RETQ
+line:  LNAME.: $$5 line 
+inst:  LNAME.= expr 
+saw  ;
+/tmp/as_896_0.s:80 syntax error, last name: RETQ
+line:  LNAME.: $$5 line 
+inst:  LNAME.= expr 
+saw  ;
+as: warning: assembler failed for test_intel.s (exit 256)
+$ as test_plan9.s
+/tmp/as_902_0.s:4 syntax error, last name: TEXT
+inst:  LTYPET.spec2 
+saw $unk
+/tmp/as_902_0.s:11 syntax error, last name: TEXT
+inst:  LTYPET.spec2 
+saw $unk
+/tmp/as_902_0.s:21 syntax error, last name: GLOBL
+inst:  LTYPET.spec2 
+saw $unk
+as: warning: assembler failed for test_plan9.s (exit 256)
