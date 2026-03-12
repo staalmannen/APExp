@@ -472,6 +472,27 @@ static OpcMap opcode_map[] = {
 	{ "movsb","MOVSB"},{ "movsl","MOVSL"},{ "movsw","MOVSW"},{ "movsq","MOVSQ"},
 	{ "scasb","SCASB"},{ "scasl","SCASL"},{ "scasw","SCASW"},{ "scasq","SCASQ"},
 	{ "cmpsb","CMPSB"},{ "cmpsl","CMPSL"},{ "cmpsw","CMPSW"},{ "cmpsq","CMPSQ"},
+	/*
+	 * Instructions that NEVER take a size suffix in Plan 9.
+	 * These must be listed explicitly so the Intel suffix-adding logic
+	 * (which sees "ret"/"nop"/etc. as bare names) does not append Q/L.
+	 */
+	{ "ret",    "RET"     }, { "retl",   "RET"     }, { "retq",  "RET"  },
+	{ "retw",   "RET"     }, { "retf",   "RETF"    }, { "retfq", "RETF" },
+	{ "nop",    "NOP"     }, { "nopl",   "NOP"     }, { "nopw",  "NOP"  },
+	{ "hlt",    "HLT"     }, { "pause",  "PAUSE"   },
+	{ "leave",  "LEAVE"   }, { "leaveq", "LEAVE"   }, { "leavel","LEAVE"},
+	{ "cpuid",  "CPUID"   },
+	{ "syscall","SYSCALL" }, { "sysret", "SYSRET"  },
+	{ "int3",   "INT"     }, { "int",    "INT"      },
+	{ "cli",    "CLI"     }, { "sti",    "STI"      },
+	{ "cld",    "CLD"     }, { "std",    "STD"      },
+	{ "clc",    "CLC"     }, { "stc",    "STC"      }, { "cmc",  "CMC"  },
+	{ "pushf",  "PUSHFL"  }, { "pushfq", "PUSHFQ"  }, { "popf", "POPFL"},
+	{ "popfq",  "POPFQ"   },
+	{ "lahf",   "LAHF"    }, { "sahf",   "SAHF"     },
+	{ "cbw",    "CBW"     }, { "cwde",   "CWDE"     }, { "cdqe", "CDQE" },
+	{ "cwd",    "CWD"     }, { "cdq",    "CDQ"      }, { "cqo",  "CQO"  },
 	{ NULL, NULL }
 };
 
@@ -1341,9 +1362,31 @@ static void
 translate_line_att(const char *line, FILE *out)
 {
 	char buf[MAXLINE];
+	static int in_block_comment = 0;
+	static int in_data_section  = 0;
+	static char data_label[256] = "";
+	static int  data_offset     = 0;
+	static int  data_is_globl   = 0;
+
+#define FLUSH_DATA_GLOBL() do { \
+	if (data_label[0] && data_offset > 0) { \
+		fprintf(out, "GLOBL %s(SB),%d,$%d\n", \
+		        data_label, data_is_globl ? 0 : 4 /*NOPTR*/, data_offset); \
+		data_label[0] = '\0'; \
+		data_offset   = 0; \
+		data_is_globl = 0; \
+	} \
+} while(0)
+
+	/* NULL line = EOF signal: flush any pending data GLOBL */
+	if (!line) {
+		FLUSH_DATA_GLOBL();
+		return;
+	}
+
 	strncpy(buf, line, sizeof(buf)-1);
+	buf[sizeof(buf)-1] = '\0';
 	char *p = buf;
-	static int in_block_comment = 0;  /* persists across lines */
 
 	/* Handle multi-line C block comments across lines */
 	if (in_block_comment) {
@@ -1414,8 +1457,16 @@ translate_line_att(const char *line, FILE *out)
 			if (ok) {
 				p = colon+1;
 				while (isspace((unsigned char)*p)) p++;
-				/* output label */
-				fprintf(out, "%s:\n", label);
+				if (in_data_section) {
+					/* flush GLOBL for previous data symbol if any */
+					FLUSH_DATA_GLOBL();
+					/* record this label for the upcoming data directives */
+					strncpy(data_label, label, sizeof(data_label)-1);
+					data_label[sizeof(data_label)-1] = '\0';
+					data_offset = 0;
+				} else {
+					fprintf(out, "%s:\n", label);
+				}
 			}
 			(void)tmp2;
 		}
@@ -1434,6 +1485,21 @@ translate_line_att(const char *line, FILE *out)
 		while (isspace((unsigned char)*sp)) sp++;
 		char *args = sp;
 
+		/* Track which section we're in */
+		if (strcasecmp(dir, ".text") == 0) {
+			FLUSH_DATA_GLOBL();
+			in_data_section = 0;
+		} else if (strcasecmp(dir, ".data") == 0 ||
+		           strcasecmp(dir, ".bss")  == 0 ||
+		           strcasecmp(dir, ".rodata") == 0) {
+			in_data_section = 1;
+		} else if (strcasecmp(dir, ".section") == 0) {
+			int going_text = (strstr(args, ".text") != NULL ||
+			                  strcmp(trim(args), "text") == 0);
+			if (going_text) { FLUSH_DATA_GLOBL(); in_data_section = 0; }
+			else              in_data_section = 1;
+		}
+
 		/* Look up directive */
 		int found = 0;
 		for (i = 0; dir_map[i].gas_dir; i++) {
@@ -1442,17 +1508,56 @@ translate_line_att(const char *line, FILE *out)
 				if (dir_map[i].p9_dir == NULL) {
 					fprintf(out, "// %s %s\n", dir, args);
 				} else if (strcmp(dir_map[i].p9_dir, "GLOBL") == 0) {
-					/* .globl symbol → we'll emit GLOBL at TEXT time; for now just note it */
-					fprintf(out, "// GLOBL %s\n", args);
+					/*
+					 * .globl sym — mark the named symbol as globally visible.
+					 * If we're in the data section and this matches the current
+					 * data label, set the flag so GLOBL gets flags=0 (exported).
+					 * Otherwise comment it out — we can't generate a full GLOBL
+					 * without knowing the size yet.
+					 */
+					char gsym[256];
+					strncpy(gsym, args, sizeof(gsym)-1);
+					gsym[sizeof(gsym)-1] = '\0';
+					trim(gsym);
+					if (in_data_section && strcmp(gsym, data_label) == 0) {
+						data_is_globl = 1;
+					} else if (in_data_section) {
+						/* .globl before the label — remember it */
+						if (strcmp(gsym, data_label) == 0 || !data_label[0]) {
+							strncpy(data_label, gsym, sizeof(data_label)-1);
+							data_is_globl = 1;
+						} else {
+							fprintf(out, "// GLOBL %s\n", args);
+						}
+					} else {
+						fprintf(out, "// GLOBL %s\n", args);
+					}
 				} else if (strcmp(dir_map[i].p9_dir, "BYTE") == 0 ||
 				           strcmp(dir_map[i].p9_dir, "WORD") == 0 ||
 				           strcmp(dir_map[i].p9_dir, "LONG") == 0 ||
 				           strcmp(dir_map[i].p9_dir, "QUAD") == 0) {
-					/* Data directives — emit for each comma-separated value */
+					/*
+					 * Data directives in .data context:
+					 * If we just swallowed a label, emit as DATA label+0(SB)/N,$val
+					 * Otherwise emit as bare BYTE/WORD/LONG/QUAD $val (in .text context).
+					 */
+					int elemsz = (strcmp(dir_map[i].p9_dir,"BYTE")==0) ? 1 :
+					             (strcmp(dir_map[i].p9_dir,"WORD")==0) ? 2 :
+					             (strcmp(dir_map[i].p9_dir,"LONG")==0) ? 4 : 8;
 					char ops[8][MAXLINE];
 					int nops = split_operands(args, ops, 8);
-					for (int j = 0; j < nops; j++)
-						fprintf(out, "\t%s $%s\n", dir_map[i].p9_dir, trim(ops[j]));
+					if (in_data_section && data_label[0]) {
+						for (int j = 0; j < nops; j++) {
+							char *v = trim(ops[j]);
+							if (*v == '$') v++;   /* strip leading $ if present */
+							fprintf(out, "DATA %s+%d(SB)/%d,$%s\n",
+							        data_label, data_offset, elemsz, v);
+							data_offset += elemsz;
+						}
+					} else {
+						for (int j = 0; j < nops; j++)
+							fprintf(out, "\t%s $%s\n", dir_map[i].p9_dir, trim(ops[j]));
+					}
 				} else if (strcmp(dir_map[i].p9_dir, "SCONST") == 0) {
 					/* .string "..." — emit as BYTE sequence */
 					fprintf(out, "\t// string: %s\n", args);
@@ -1661,7 +1766,7 @@ translate_line_intel(const char *line, FILE *out)
 		 * (e.g. "sub" ends in 'b', "add" ends in 'd', "or" ends in 'r').
 		 */
 		static const char *need_suffix[] = {
-			"push", "pop", "call", "ret", "leave",
+			"push", "pop",
 			"mov",  "add", "sub",  "and", "or",  "xor",
 			"cmp",  "test","lea",  "not", "neg",
 			"inc",  "dec", "mul",  "imul","div", "idiv",
@@ -1752,18 +1857,15 @@ translate_file(const char *infile, const char *outfile_path, Syntax syn)
 	if (!out) die("cannot open output: %s: %s", outfile_path, strerror(errno));
 
 	while (fgets(line, sizeof(line), in)) {
-		/*
-		 * Translate once into the output file.
-		 * For verbose, we re-read what we wrote (can't call translate again
-		 * because the static in_block_comment state would be wrong).
-		 * Instead, use a per-line buffer approach: translate to a temp
-		 * string and write it to both destinations.
-		 */
 		if (syn == SYN_INTEL)
 			translate_line_intel(line, out);
 		else
 			translate_line_att(line, out);
 	}
+
+	/* Flush any pending data section GLOBL at end of file */
+	if (syn != SYN_INTEL)
+		translate_line_att(NULL, out);
 
 	fclose(in);
 	fclose(out);
@@ -1798,29 +1900,28 @@ invoke_assembler(const char *translated, const char *output)
 	}
 
 	/*
-	 * Always add the standard Plan 9 include directories so that
+	 * Add Plan 9 standard include directories so that
 	 * #include "textflag.h" and similar headers resolve correctly.
-	 * $objtype/include is the arch-specific include path.
-	 * /sys/include is the system-wide include path.
+	 *
+	 * Priority order (mirrors what Plan 9 mk does):
+	 *   1. /$objtype/include  (arch-specific, from $objtype env var)
+	 *   2. /sys/include       (system-wide)
+	 *
+	 * We read $objtype from the environment; if unset, fall back to
+	 * the arch string for the selected target.
 	 */
 	{
-		static const char *std_incs[] = {
-			"/sys/include",
-			NULL
-		};
-		/* arch-specific: /$arch/include where arch is the thestring */
 		static const char *arch_thestring[] = {
 			"amd64", "386", "arm", "arm64",
 			"power64", "power", "mips", "sparc",
 			"68000", "68020"
 		};
-		const char *astr = arch_thestring[arch];
-		n = snprintf(cmd+pos, sizeof(cmd)-pos, " -I /%s/include", astr);
+		const char *objtype = getenv("objtype");
+		if (!objtype || !*objtype)
+			objtype = arch_thestring[arch];
+		n = snprintf(cmd+pos, sizeof(cmd)-pos,
+		             " -I /%s/include -I /sys/include", objtype);
 		pos += n;
-		for (i = 0; std_incs[i]; i++) {
-			n = snprintf(cmd+pos, sizeof(cmd)-pos, " -I %s", std_incs[i]);
-			pos += n;
-		}
 	}
 
 	for (i = 0; i < ninc; i++) {
