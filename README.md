@@ -88,6 +88,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - GNU iconv utility (version 1.17) has been added
 - system yacc has been replaced by byacc (version 20240109) as ape/yacc
 - system lex has been replaced by flex (version 2.6.4) as ape/lex
+- vibe-coded (claude.ai) GAS-compatible "as" front end to native $Oa assemblers.
 - the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" et al. have been built from suckless sbase under ape
 - steve's mkmk (/n/sources/contrib) imported to APExp
 - copied "head", "which", and "printenv" rc scripts from steve (/n/sources/contrib)
