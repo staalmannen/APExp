@@ -1,0 +1,17 @@
+APEXPROOT=../../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+
+ALLOFILES=\
+#	musl regex\
+	fnmatch.$O\
+	glob.$O\
+	regcomp.$O\
+	regerror.$O\
+	regexec.$O\
+	tre-mem.$O
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=$CFLAGS -c -D_POSIX_SOURCE

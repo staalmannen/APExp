@@ -1,7 +1,7 @@
 #ifndef __BSD_H_
 #define __BSD_H_
-#pragma src "/sys/src/ape/lib/bsd"
-#pragma lib "/$M/lib/ape/libbsd.a"
+
+#pragma lib "/$M/lib/ape/libap.a"
 
 #ifndef __TYPES_H
 #include <sys/types.h>

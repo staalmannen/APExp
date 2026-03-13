@@ -1,0 +1,48 @@
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+OFILES=\
+	accept.$O\
+	bind.$O\
+	connect.$O\
+	endhostent.$O\
+	gai_strerror.$O\
+	getaddrinfo.$O\
+	gethostbyaddr.$O\
+	gethostbyname.$O\
+	gethostname.$O\
+	getnameinfo.$O\
+	getpeername.$O\
+	getprotobyname.$O\
+	getservbyaddr.$O\
+	getservbyname.$O\
+	getsockname.$O\
+	in6_addr.$O\
+	inet_addr.$O\
+	inet_aton.$O\
+	inet_ntoa.$O\
+	inet_ntop.$O\
+	inet_pton.$O\
+	listen.$O\
+	ntohl.$O\
+	rcmd.$O\
+	rresvport.$O\
+	send.$O\
+	sendto.$O\
+	shutdown.$O\
+	_sock_ingetaddr.$O\
+	_sock_ipattr.$O\
+	_sock_srv.$O\
+	socket.$O\
+	socketpair.$O\
+
+
+HFILES=priv.h
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=-c -I$APEXPROOT/sys/include/ape\
+	-D_POSIX_SOURCE -D_BSD_EXTENSION -D_PLAN9_SOURCE\
+	-I../plan9 -I../include

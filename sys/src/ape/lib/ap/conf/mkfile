@@ -1,0 +1,16 @@
+APEXPROOT=../../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+OFILES=\
+	getpagesize.$O\
+	getdtablesize.$O\
+	pathconf.$O\
+	sysconf.$O
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape \
+	-I$APEXPROOT/$objtype/include/ape\
+	-D_POSIX_SOURCE -D_BSD_EXTENSION -D_PLAN9_SOURCE\
+	-I../plan9 -I../include

@@ -1,7 +1,6 @@
 #ifndef _UTF_H_
 #define _UTF_H_ 1
-#pragma lib "/$M/lib/ape/libutf.a"
-#pragma src "/sys/src/ape/lib/utf"
+#pragma lib "/$M/lib/ape/libap.a"
 
 #if defined(__cplusplus)
 extern "C" { 

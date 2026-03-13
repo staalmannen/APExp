@@ -2,12 +2,49 @@ APEXPROOT=../../../../../
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-DIRS=gen math fenv plan9 posix search stdio syscall
+# libap and libbsd have been merged
+# source code re-organized like the musl src directory
+
+DIRS= conf\
+	ctype\
+	dirent\
+	env\
+	errno\
+	exit\
+	fcntl\
+	fenv\
+	fmt\
+	legacy\
+	locale\
+	malloc\
+	math\
+	misc\
+	multibyte\
+	network\
+	passwd\
+	plan9\
+	prng\
+	process\
+	regex\
+	search\
+	select\
+	signal\
+	stat\
+	stdio\
+	stdlib\
+	string\
+	syscall\
+	temp\
+	termios\
+	time\
+	unistd\
+	wchar
+
 
 default:V:	all
 
 install all:V:
-	for(i in $DIRS $objtype)@{
+	for(i in $DIRS arch/$objtype)@{
 		echo $i
 		cd $i
 		mk $MKFLAGS $target
@@ -18,7 +55,7 @@ installall:V:
 
 
 clean nuke:V:
-	for(i in $DIRS $CPUS)@{
+	for(i in $DIRS arch/$CPUS)@{
 		echo $i
 		cd $i
 		mk $MKFLAGS $target

@@ -1,0 +1,21 @@
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+OFILES=\
+	ctermid.$O\
+	getopt.$O\
+	getprogname.$O\
+	getrusage.$O\
+	ioctl.$O\
+	pty.$O\
+	setprogname.$O\
+	syslog.$O\
+	uname.$O\
+#	musl\
+
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=-c -I$APEXPROOT/sys/include/ape -D_POSIX_SOURCE -D_BSD_EXTENSION -D_PLAN9_SOURCE -I../plan9 -I../include

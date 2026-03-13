@@ -1,7 +1,7 @@
 #ifndef __NETDB_H__
 #define __NETDB_H__
 
-#pragma lib "/$M/lib/ape/libbsd.a"
+#pragma lib "/$M/lib/ape/libap.a"
 
 /*-
  * Copyright (c) 1980, 1983, 1988 Regents of the University of California.

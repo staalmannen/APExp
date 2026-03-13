@@ -1,0 +1,22 @@
+APEXPROOT=../../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+
+ALLOFILES=\
+	alarm.$O\
+	kill.$O\
+	pause.$O\
+	raise.$O\
+	sigset.$O\
+	signal.$O\
+	sigpending.$O\
+	sigprocmask.$O\
+	sigsuspend.$O\
+#	musl\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=$CFLAGS -c -D_POSIX_SOURCE\
+	-D_PLAN9_SOURCE -D_BSD_EXTENSION\
+	-D_RESEARCH_SOURCE -D_NET_EXTENSION -I../include -I../plan9

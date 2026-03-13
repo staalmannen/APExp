@@ -1,9 +1,7 @@
 #ifndef __ERROR_H
 #define __ERROR_H
-#ifndef _RESEARCH_SOURCE
-   This header file is not defined in pure ANSI or POSIX
-#endif
-#pragma lib "/$M/lib/ape/libv.a"
+
+#pragma lib "/$M/lib/ape/libap.a"
 
 #ifdef __cplusplus
 extern "C" {

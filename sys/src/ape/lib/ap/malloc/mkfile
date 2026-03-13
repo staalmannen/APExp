@@ -1,0 +1,18 @@
+APEXPROOT=../../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+
+ALLOFILES=\
+	calloc.$O\
+#	musl mallocng\
+	aligned_alloc.$O\
+	donate.$O\
+	free.$O\
+	malloc.$O\
+	malloc_usable_size.$O\
+	realloc.$O\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=$CFLAGS -c -D_POSIX_SOURCE

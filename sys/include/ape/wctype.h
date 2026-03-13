@@ -5,8 +5,7 @@
 #ifndef _WCTYPE_H
 #define _WCTYPE_H 1
 
-#pragma lib "/$M/lib/ape/libutf.a"
-#pragma src "/sys/src/ape/lib/utf"
+#pragma lib "/$M/lib/ape/libap.a"
 
 #include <wchar.h> /* provides wint_t --> Rune and wctype_t */
 

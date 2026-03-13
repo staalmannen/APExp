@@ -1,0 +1,65 @@
+APEXPROOT=../../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+
+# originally from "gen", "bsd", "posix" now "string"
+ALLOFILES=\
+	basename.$O\
+	dirname.$O\
+	ffs.$O\
+	memccpy.$O\
+	memchr.$O\
+	memcmp.$O\
+	memmove.$O\
+	memset.$O\
+	strcasecmp.$O\
+	strcat.$O\
+	strchr.$O\
+	strcmp.$O\
+	strcoll.$O\
+	strcpy.$O\
+	strcspn.$O\
+	strdup.$O\
+	strftime.$O\
+	strlen.$O\
+	strncasecmp.$O\
+	strncat.$O\
+	strncmp.$O\
+	strncpy.$O\
+	strndup.$O\
+	strnlen.$O\
+	strpbrk.$O\
+	strrchr.$O\
+	strspn.$O\
+	strstr.$O\
+	strtok.$O\
+	strtol.$O\
+	strtoll.$O\
+	strtoul.$O\
+	strtoull.$O\
+	strxfrm.$O\
+#	musl\
+	bcmp.$O\
+	bcopy.$O\
+	bzero.$O\
+	index.$O\
+	memmem.$O\
+	memrchr.$O\
+	strcasestr.$O\
+	strchrnul.$O\
+	strsignal.$O\
+	strerror_r.$O\
+	strlcat.$O\
+	strlcpy.$O\
+	strsep.$O\
+	strverscmp.$O\
+	strtok_r.$O\
+	stpcpy.$O\
+	stpncpy.$O
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I../include\
+	-I$APEXPROOT/$objtype/include/ape -D_POSIX_SOURCE\
+	-D_BSD_EXTENSION -D_PLAN9_SOURCE -I../plan9

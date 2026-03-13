@@ -1,0 +1,18 @@
+APEXPROOT=../../../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+OFILES=\
+	_seek.$O\
+	tas.$O\
+	lock.$O\
+	notetramp.$O\
+	setjmp.$O\
+	argv0.$O\
+	main9.$O\
+	main9p.$O\
+	cycles.$O\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=-c -D_POSIX_SOURCE -D_PLAN9_SOURCE

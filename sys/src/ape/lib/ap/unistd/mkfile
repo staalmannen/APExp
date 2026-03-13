@@ -1,0 +1,46 @@
+APEXPROOT=../../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+OFILES=\
+	access.$O\
+	chdir.$O\
+	chroot.$O\
+	close.$O\
+	dup.$O\
+	fchdir.$O\
+	fsync.$O\
+	ftruncate.$O\
+	getcwd.$O\
+	getgid.$O\
+	getgroups.$O\
+	getlogin.$O\
+	getpgid.$O\
+	getpgrp.$O\
+	getpid.$O\
+	getppid.$O\
+	getuid.$O\
+	isatty.$O\
+	link.$O\
+	lseek.$O\
+	mkdir.$O\
+	mkfifo.$O\
+	pipe.$O\
+	readv.$O\
+	read.$O\
+	rename.$O\
+	rmdir.$O\
+	setgid.$O\
+	setpgid.$O\
+	setsid.$O\
+	setuid.$O\
+	ttyname.$O\
+	unlink.$O\
+	writev.$O\
+	write.$O\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I../include\
+	-I$APEXPROOT/$objtype/include/ape -D_POSIX_SOURCE\
+	-D_BSD_EXTENSION -D_PLAN9_SOURCE -I../plan9 -I../include

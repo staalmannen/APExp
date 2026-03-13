@@ -5,8 +5,7 @@
 #ifndef _WCHAR_H
 #define _WCHAR_H 1
 
-#pragma lib "/$M/lib/ape/libutf.a"
-#pragma src "/sys/src/ape/lib/utf"
+#pragma lib "/$M/lib/ape/libap.a"
 
 #define _REENTRANT_SOURCE 1
 

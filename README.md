@@ -62,18 +62,21 @@ Install paths have been modified so that libraries and binaries are installed in
 
 ***Libraries and headers***
 
-
+- libap, libbsd, libutf, libfmt, libv and libnet are merged, 3rd party libc functions from musl libc
+- sys/src/ape/lib/ap has been reorganized like the musl src directory
+- imported several math, regex, search and other functions from musl libc
+- regex.h provided by musl libc
+- OpenBSD sys/queue.h copied from suckless sbase
+- getopt.h gnu getopt_long from musl libc
+- strings.h shim pointing to bsd.h
+- stdio.h : added fmemopen, getdelim/getline from musl libc
+- fchown/fchmod stubs introduced
 - wchar.h/wctype.h provided by the thin "libwtf" [11], integrated in libutf
+
+
 - curses.h, term.h, panel.h provided by PDCursesMod (built with wchar)
-- regex.h provided by pcre2 (pcre2posix, version 10.432024-02-16)
 - iconv.h provided by GNU libiconv (version 1.17 )
 - gettext libintl from GNU (version 0.22.5 )
-- OpenBSD sys/queue.h copied from suckless sbase
-- getopt.h with gnu getopt_long from NetBSD, imported to libbsd
-- strings.h shim pointing to bsd.h
-- stdio.h : added fmemopen from tuxpaint, getdelim/getline from gnulib
-- fchown/fchmod stubs introduced
-- imported several math and other functions from musl libc
 
 
 ***Utilities***
@@ -122,6 +125,11 @@ sources could be a barrier. Because of this, APExp package several (un)archivers
 - unace (2.7)
 - clzip (1.14)
 - xz (5.6.3)
+
+
+***BLOAT!!!1!!!***
+
+Yes, the default build is "bloated" because I enable everything that I believe will build out of the box. That way, I can identify bugs early on. As an end-user, it is *very* easy to make a minimal build: just comment out the sub-directories you don't want to build in the mkfiles. In general, libraries (in sys/src/ape/lib) and utilities (in sys/src/ape/cmd) relating to non-C languages, transpilers or archivers should be safe to disable. You might even be able to disable other stuff as well and get a working build.
 
 
 

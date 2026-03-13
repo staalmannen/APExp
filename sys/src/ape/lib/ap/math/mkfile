@@ -19,9 +19,11 @@ OFILES=\
 	j1.$O\
 	jn.$O\
 	log.$O\
+	nan.$O\
 	pow.$O\
 	sin.$O\
 	sinh.$O\
+	sqrt.$O\
 	tan.$O\
 	tanh.$O\
 # musl \
@@ -132,7 +134,7 @@ OFILES=\
 #	jnf.$O\
 	ldexp.$O\
 	ldexpf.$O\
-#duplicate?	ldexpl.$O\
+	ldexpl.$O\
 	lgamma.$O\
 	lgamma_r.$O\
 	lgammaf.$O\
@@ -166,10 +168,9 @@ OFILES=\
 	lround.$O\
 	lroundf.$O\
 	lroundl.$O\
-#duplicate?	modf.$O\
+	modf.$O\
 	modff.$O\
 	modfl.$O\
-#	nan.$O\
 #	nanf.$O\
 #	nanl.$O\
 	nearbyint.$O\
@@ -215,7 +216,6 @@ OFILES=\
 	sinhf.$O\
 	sinhl.$O\
 	sinl.$O\
-#	sqrt.$O\
 	sqrt_data.$O\
 #	sqrtf.$O\
 	sqrtl.$O\
@@ -233,4 +233,5 @@ OFILES=\
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -D_POSIX_SOURCE\
-				-I$APEXPROOT/$objtype/include/ape -D_BSD_SOURCE
+	-I$APEXPROOT/$objtype/include/ape -D_BSD_SOURCE\
+	-D_PLAN9_SOURCE -I../include -I../plan9

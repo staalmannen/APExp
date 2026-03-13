@@ -1,0 +1,16 @@
+APEXPROOT=../../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+OFILES=\
+	locale.$O\
+# musl \
+	catclose.$O\
+	catgets.$O\
+	catopen.$O\
+	langinfo.$O\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I../include\
+	-I$APEXPROOT/$objtype/include/ape -D_POSIX_SOURCE

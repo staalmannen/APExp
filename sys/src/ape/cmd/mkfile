@@ -6,6 +6,7 @@ APEXPROOT=../../../..
 #some stuff needs flex and byacc to build
 DIRS=\
 # parsing/editing source etc \
+	as\
 	lex\
 	yacc\
 	awk\

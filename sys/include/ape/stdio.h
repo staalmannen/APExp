@@ -127,22 +127,15 @@ extern int ferror(FILE *);
 extern void perror(const char *);
 extern FILE _IO_stream[FOPEN_MAX];
 
-#ifdef _POSIX_SOURCE
 extern int fileno(FILE *);
 extern FILE* fdopen(int, const char*);
 extern char *ctermid(char *);
-#endif
 
-#ifdef _REENTRANT_SOURCE
 extern char *tmpnam_r(char *);
 extern char *ctermid_r(char *);
-#endif
 
-#ifdef _BSD_EXTENSION
-#pragma lib "/$M/lib/ape/libbsd.a"
 extern FILE *popen(char *, char *);
 extern int	pclose(FILE *);
-#endif
 
 
 /* from musl libc */

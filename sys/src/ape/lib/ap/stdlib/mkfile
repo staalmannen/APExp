@@ -1,0 +1,30 @@
+APEXPROOT=../../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+
+ALLOFILES=\
+	_assert.$O\
+	abort.$O\
+	abs.$O\
+	atof.$O\
+	atoi.$O\
+	atol.$O\
+	atoll.$O\
+	bsearch.$O\
+	div.$O\
+	itoa.$O\
+	itol.$O\
+	ldiv.$O\
+	mbwc.$O\
+	qsort.$O\
+	system.$O\
+#	musl\
+	strtod.$O\
+# public domain \
+	alloca.$O
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION\
+	-D_RESEARCH_SOURCE -D_NET_EXTENSION -I../include -I../plan9

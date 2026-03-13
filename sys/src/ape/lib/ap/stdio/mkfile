@@ -9,8 +9,6 @@ OFILES=\
 	_dtoa.$O\
 	_fconv.$O\
 	clearerr.$O\
-	atexit.$O\
-	exit.$O\
 	fclose.$O\
 	fdopen.$O\
 	feof.$O\
@@ -20,7 +18,6 @@ OFILES=\
 	fgetpos.$O\
 	fgets.$O\
 	fileno.$O\
-	fnmatch.$O\
 	fopen.$O\
 	fprintf.$O\
 	fputc.$O\
@@ -39,6 +36,7 @@ OFILES=\
 	getchar.$O\
 	gets.$O\
 	perror.$O\
+	popen.$O\
 	pow10.$O\
 	printf.$O\
 	putc.$O\
@@ -49,6 +47,7 @@ OFILES=\
 	scanf.$O\
 	sclose.$O\
 	setbuf.$O\
+	setlinebuf.$O\
 	setvbuf.$O\
 	snprintf.$O\
 	sopenr.$O\
@@ -57,7 +56,6 @@ OFILES=\
 	sscanf.$O\
 	stdio.$O\
 	strerror.$O\
-	strtod.$O\
 	tmpnam.$O\
 	ungetc.$O\
 	vfprintf.$O\
@@ -68,14 +66,14 @@ OFILES=\
 # musl \
 	asprintf.$O\
 	vasprintf.$O\
-# gnulib et al \
-	alloca.$O\
 	fmemopen.$O\
 	getdelim.$O\
-	getline.$O
+	getline.$O\
+
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I$APEXPROOT/$objtype/include/ape\
-		-D_POSIX_SOURCE -D_BSD_EXTENSION
+	-D_POSIX_SOURCE -D_BSD_EXTENSION -D_PLAN9_SOURCE\
+	-I../plan9 -I../include
