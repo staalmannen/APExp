@@ -20,7 +20,14 @@ ALLOFILES=\
 	qsort.$O\
 	system.$O\
 #	musl\
+	imaxdiv.$O\
+	imaxabs.$O\
+	lldiv.$O\
+	llabs.$O\
+	qsort_r.$O\
+	qsort_nr.$O\
 	strtod.$O\
+	strtol.$O\
 # public domain \
 	alloca.$O
 
