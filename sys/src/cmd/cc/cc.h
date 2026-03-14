@@ -292,6 +292,9 @@ enum
 	OREGPAIR,
 	OEXREG,
 
+	OALLOCA,	/* VLA: runtime stack allocation */
+	OVLAVAR,	/* VLA: unspecified dimension [*] in prototype */
+
 	OEND
 };
 enum
