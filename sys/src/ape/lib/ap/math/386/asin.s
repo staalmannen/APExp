@@ -1,0 +1,23 @@
+// GLOBL asin
+// .type asin,@function
+asin:
+	FMOVD	4(SP)
+	MOV	8(SP), AX
+	ADD	AX, AX
+	CMP	AX, $0x00200000
+	JCS	1f
+	FLD	F0
+	FLD1
+	FSUB	F0, F1
+	FADD	F2
+	FMULDP
+	FSQRT
+	FPATAN
+	FMOVDP	4(SP)
+	FMOVD	4(SP)
+	RET
+
+1:
+	FMOVF	4(SP)
+	RET
+

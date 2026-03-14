@@ -1,0 +1,50 @@
+APEXPROOT=../../../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+
+OFILES=\
+# musl asm converted to plan9\
+	acos.$O\
+	acosf.$O\
+	acosl.$O\
+	asin.$O\
+	asinf.$O\
+	asinl.$O\
+	atan.$O\
+	atan2.$O\
+	atan2f.$O\
+	atan2l.$O\
+	atanf.$O\
+	atanl.$O\
+	exp_ld.$O\
+	expl.$O\
+	floor.$O\
+	hypot.$O\
+	hypotf.$O\
+	log.$O\
+	log10.$O\
+	log10f.$O\
+	log10l.$O\
+	log1p.$O\
+	log1pf.$O\
+	log1pl.$O\
+	log2.$O\
+	log2f.$O\
+	log2l.$O\
+	logf.$O\
+	logl.$O\
+	remquo.$O\
+	scalbn.$O\
+	scalbnf.$O\
+	scalbnl.$O\
+
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+%.$O: %.s
+    $Oa $stem.s
+
+
+
+

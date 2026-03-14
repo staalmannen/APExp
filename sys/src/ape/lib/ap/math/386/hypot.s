@@ -1,0 +1,51 @@
+// GLOBL hypot
+// .type hypot,@function
+hypot:
+	MOV	8(SP), AX
+	MOV	16(SP), CX
+	ADD	AX, AX
+	ADD	CX, CX
+	AND	AX, CX
+	CMP	CX, $0xffe00000
+	JCC	2f
+	OR	4(SP), AX
+	JNE	1f
+	FMOVD	12(SP)
+	FABS
+	RET
+1:
+	MOV	16(SP), AX
+	ADD	AX, AX
+	OR	12(SP), AX
+	JNE	1f
+	FMOVD	4(SP)
+	FABS
+	RET
+1:
+	FMOVD	4(SP)
+	FLD	F0
+	FMULDP
+	FMOVD	12(SP)
+	FLD	F0
+	FMULDP
+	FADDDP
+	FSQRT
+	RET
+2:
+	SUB	$0xffe00000, AX
+	OR	4(SP), AX
+	JNE	1f
+	FMOVD	4(SP)
+	FABS
+	RET
+1:
+	MOV	16(SP), AX
+	ADD	AX, AX
+	SUB	$0xffe00000, AX
+	OR	12(SP), AX
+	FMOVD	12(SP)
+	JNE	1f
+	FABS
+1:
+	RET
+

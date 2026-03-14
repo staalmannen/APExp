@@ -18,10 +18,22 @@ CC=pcc
 CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_BSD_SOURCE\
 		-I$APEXPROOT/sys/include/ape -I$APEXPROOT/$objtype/include/ape
 		-
-# TODO: figure out how to build the arch-specific fenv objects
-# We have a dependency issue: as needs APExp libraries so it is built after
+# default
+_archdir=dummy
+_compiler=$CC
+_srcext=c
+_flags=$CFLAGS
 
-fenv.$O: dummy/fenv.c
-	$CC $CFLAGS -o $target $prereq
+# if matching arch directory present
+ASMARCHS= 386 amd64 arm64 mips power
+if ($objtype in $ASMARCHS)@{
+		_archdir=$objtype
+		_compiler=$Oa
+		_srcext=s
+		_flags=
+	}
+
+fenv.$O: $_archdir/fenv.$_srcext
+	$_compiler $_flags -o $target $prereq
 
 

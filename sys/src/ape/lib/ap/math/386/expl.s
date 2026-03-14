@@ -1,0 +1,100 @@
+// GLOBL expl
+// .type expl,@function
+expl:
+	FMOVX	4(SP)
+
+
+
+	MOV	12(SP), AX
+	OR	$0x8000, AX
+	SUB	$0xbfdf, AX
+	CMP	AX, $45
+	JLS	2f
+	TEST	AX, AX
+	FLD1
+	JMI	1f
+
+	FSCALE
+	FSTP	F1
+	RET
+
+1:
+	FADDDP
+	RET
+
+
+
+2:
+	FLDL2E
+	SUBL	$44, SP
+
+
+	FMUL	F1, F0
+	FLD	F0
+	FMOVXP	(SP)
+	FMOVXP	16(SP)
+	FMOVXP	32(SP)
+// .hidden __exp2l
+	CALL	__exp2l
+
+	FLD	F0
+	FMOVXP	(SP)
+	CMPW	8(SP), $0x7fff
+	JEQ	1f
+	FMOVX	32(SP)
+	FMOVX	16(SP)
+
+
+	FLD	F1
+
+	PUSHL	$0x41f00000
+	PUSHL	$0x00100000
+	FMOVD	(SP)
+
+
+	FMULDP
+	FLD	F2
+	FSUB	F1, F0
+	FADDDP
+	FLD	F2
+	FSUB	F1, F0
+
+	PUSHL	$0x3ff71547
+	PUSHL	$0x65200000
+	FMOVD	(SP)
+
+
+	FLD	F2
+	FMUL	F1, F0
+	FSUBDP	F0, F4
+	FMUL	F1, F0
+	FADDDP	F0, F3
+
+	PUSHL	$0x3de705fc
+	PUSHL	$0x2f000000
+	FMOVD	(SP)
+
+
+	FMUL	F0, F2
+	FMULDP	F0, F1
+	FXCH	F2
+	FADDDP
+	FADDDP
+
+	PUSHL	$0xbfbe
+	PUSHL	$0x82f0025f
+	PUSHL	$0x2dc582ee
+	FMOVX	(SP)
+	ADDL	$36, SP
+
+
+
+	FMULDP	F0, F2
+	FADDDP
+	F2XM1
+	FMUL	F1, F0
+	FADDDP
+1:
+	ADDL	$44, SP
+	RET
+

@@ -1,0 +1,101 @@
+// GLOBL expm1l
+// .type expm1l,@function
+expm1l:
+	FMOVX	4(SP)
+	FLDL2E
+	FMULDP
+	MOV	$0xc2820000, AX
+	PUSH	AX
+	FMOVF	(SP)
+	POP	AX
+	FUCOMP	F1
+	FNSTSW	AX
+	SAHF
+	FLD1
+	JCS	1f
+
+	FSTP	F1
+	FCHS
+	RET
+1:
+	FLD	F1
+	FABS
+	FUCOM	F1
+	FNSTSW	AX
+	FSTP	F0
+	FSTP	F0
+	SAHF
+	JHI	1f
+	F2XM1
+	RET
+1:
+	CALL	1f
+	FLD1
+	FSUBRDP
+	RET
+
+// GLOBL exp2l
+// GLOBL __exp2l
+// .hidden __exp2l
+// .type exp2l,@function
+exp2l:
+__exp2l:
+	FMOVX	4(SP)
+1:
+	SUB	$12, SP
+	FLD	F0
+	FMOVXP	(SP)
+	MOV	8(SP), AX
+	AND	$0x7fff, AX
+	CMP	AX, $0x3fff+13
+	JCS	4f
+	CMP	AX, $0x3fff+15
+	JCC	3f
+	FMOVF	(SP)
+	CMPL	(SP), $0xc67ff800
+	JCS	2f
+	MOVL	$0x5f000000, (SP)
+	FMOVF	(SP)
+	FLD	F1
+	FSUB	F1
+	FADDDP
+	FUCOMP	F1
+	FNSTSW
+	SAHF
+	JEQ	2f
+	MOVL	$1, (SP)
+	FMOVF	(SP)
+	FDIV	F1
+	FMOVFP	(SP)
+2:
+	FLD1
+	FLD	F1
+	FRNDINT
+	FXCH	F2
+	FSUB	F2
+	F2XM1
+	FADDDP
+1:
+	FSCALE
+	FSTP	F1
+	ADD	$12, SP
+	RET
+3:
+	XOR	AX, AX
+4:
+	CMP	AX, $0x3fff-64
+	FLD1
+	JCS	1b
+	FMOVXP	(SP)
+	FMOVL	8(SP)
+	FMOVL	8(SP)
+	FSUBRDP	F1
+	ADDL	$0x3fff, 8(SP)
+	F2XM1
+	FLD1
+	FADDDP
+	FMOVX	(SP)
+	FMULDP
+	ADD	$12, SP
+	RET
+

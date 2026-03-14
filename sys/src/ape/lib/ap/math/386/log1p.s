@@ -1,0 +1,29 @@
+// GLOBL log1p
+// .type log1p,@function
+log1p:
+	MOV	8(SP), AX
+	FLDLN2
+	AND	$0x7fffffff, AX
+	FMOVD	4(SP)
+	CMP	AX, $0x3fd28f00
+	JHI	1f
+	CMP	AX, $0x00100000
+	JCS	2f
+	FYL2XP1
+	FMOVDP	4(SP)
+	FMOVD	4(SP)
+	RET
+1:
+	FLD1
+	FADDDP
+	FYL2X
+	FMOVDP	4(SP)
+	FMOVD	4(SP)
+	RET
+
+2:
+	FMOVF	4(SP)
+	FSTP	F1
+	RET
+
+
