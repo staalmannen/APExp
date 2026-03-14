@@ -17,7 +17,6 @@ ALLOFILES=\
 	itol.$O\
 	ldiv.$O\
 	mbwc.$O\
-	qsort.$O\
 	system.$O\
 #	musl\
 	imaxdiv.$O\
@@ -28,6 +27,10 @@ ALLOFILES=\
 	qsort_nr.$O\
 	strtod.$O\
 	strtol.$O\
+	wcstol.$O\
+	wcstod.$O\
+# musl internal dependency\
+	floatscan.$O\
 # public domain \
 	alloca.$O
 
