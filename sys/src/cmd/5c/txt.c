@@ -90,6 +90,8 @@ gclean(void)
 	for(i=NREG; i<NREG+NFREG; i++)
 		if(reg[i] && !resvreg[i])
 			diag(Z, "freg %d left allocated", i-NREG);
+	if(vlanest > 0)
+		gvla_epilogue();
 	while(mnstring)
 		outstring("", 1L);
 	symstring->type->width = nstring;
@@ -1377,3 +1379,53 @@ long	ncast[NTYPE] =
 	BUNION,				/* [TUNION] */
 	0,				/* [TENUM] */
 };
+
+/*
+ * VLA frame management for ARM.
+ *
+ * gvla_prologue – called at function entry when vlanest > 0.
+ * Saves the frame pointer (R11/REGFP) so that gvla_epilogue can
+ * restore SP unconditionally:
+ *   MOVW R11, -4(SP)   (push R11)
+ *   MOVW SP,  R11      (R11 = frame base)
+ *
+ * gvla_epilogue – called before every RET when vlanest > 0:
+ *   MOVW R11, SP       (restore SP)
+ *   MOVW -4(SP), R11   (pop R11 — now SP is restored, old R11 above it)
+ *
+ * We use gins() here because gopcode() has no direct MOVW(reg,reg)
+ * without going through the full OAS path, and we need precise control.
+ *
+ * gret – wrapper for gbranch(ORETURN) that inserts the epilogue first.
+ */
+void
+gvla_prologue(void)
+{
+	Node nfp, nsp;
+
+	nodreg(&nfp, types[TLONG], REGFP);
+	nodreg(&nsp, types[TLONG], REGSP);
+	reg[REGFP]++;
+	gins(AMOVW, &nfp, &nsp);	/* push R11 onto stack */
+	gins(AMOVW, &nsp, &nfp);	/* R11 = SP (frame anchor) */
+}
+
+void
+gvla_epilogue(void)
+{
+	Node nfp, nsp;
+
+	nodreg(&nfp, types[TLONG], REGFP);
+	nodreg(&nsp, types[TLONG], REGSP);
+	gins(AMOVW, &nfp, &nsp);	/* SP = R11 (reclaim all VLA frames) */
+	gins(AMOVW, &nsp, &nfp);	/* pop R11 */
+	reg[REGFP]--;
+}
+
+void
+gret(void)
+{
+	if(vlanest > 0)
+		gvla_epilogue();
+	gbranch(ORETURN);
+}

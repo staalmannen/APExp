@@ -19,6 +19,7 @@ OFILES=\
 	compat.$O\
 	dpchk.$O\
 	omachcap.$O\
+	vla.$O\
 
 HFILES=cc.h\
 	compat.h\

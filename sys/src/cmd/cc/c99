@@ -4,10 +4,7 @@ http://home.datacomm.ch/t_wolf/tw/c/c9x_changes.html
 (Numbers are from the web page list.)
 
 Not done (yet?):
-9, 19. Hexdecimal floating point constants.
 11. _Complex, _Imaginary, _Bool
-14. Variable arrays in parameter lists.
-33. Variable-length arrays
 34. goto restrictions for variable-length arrows
 18. Notation for universal characters \uXXXX
 25. Division and mod truncate toward zero.
@@ -15,11 +12,14 @@ Not done (yet?):
 
 Done:
 7. __VA_ARGS__
+9, 19. Hexdecimal floating point constants. [in APExp, works, claude.ai help]
 11, 30, 31, 32. restrict, inline
 12. Allow declarations anywhere.
+14. Variable arrays in parameter lists. [in APExp, testing, claude.ai help]
 15. for loop declarations
 23. __func__ identifier
 28. structs ending in incomplete type.
+33. Variable-length arrays [in APExp, testing, claude.ai help]
 
 Unneeded (already had):
 1. Translation limits

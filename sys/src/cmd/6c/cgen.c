@@ -78,6 +78,33 @@ cgen(Node *n, Node *nn)
 		diag(n, "unknown op in cgen: %O", o);
 		break;
 
+	case OALLOCA:
+		/*
+		 * VLA stack allocation: subtract rounded-up size from SP,
+		 * store new SP in nn.
+		 *
+		 *   MOVQ  size, tmp
+		 *   ADDQ  $15, tmp
+		 *   ANDQ  $-16, tmp
+		 *   SUBQ  tmp, SP
+		 *   MOVQ  SP, nn
+		 */
+		{
+			Node nsize;
+			regalloc(&nsize, l, Z);
+			cgen(l, &nsize);
+			gins(AADDQ, nodconst(15), &nsize);
+			gins(AANDQ, nodconst(-16), &nsize);
+			nodreg(&nod, &nsize, D_SP);
+			gins(ASUBQ, &nsize, &nod);
+			regfree(&nsize);
+			if(nn != Z) {
+				nodreg(&nod, n, D_SP);
+				gmove(&nod, nn);
+			}
+		}
+		goto done;
+
 	case ONEG:
 	case OCOM:
 		if(nn == Z) {

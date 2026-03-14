@@ -10,6 +10,7 @@ codgen(Node *n, Node *nn)
 	curarg = 0;
 	maxargsafe = 0;
 	hasdoubled = 0;
+	vlanest = 0;		/* reset VLA scope depth for this function */
 
 	/*
 	 * no point in giving invalid code to the backend.

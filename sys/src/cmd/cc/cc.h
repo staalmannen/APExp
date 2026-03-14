@@ -125,6 +125,8 @@ struct	Type
 	char	nbits;
 	char	etype;
 	char	garb;
+	char	vla;		/* 1 = variable-length array */
+	Node*	vlasizevar;	/* hidden auto holding runtime byte count (VLA only) */
 };
 
 #define	T	((Type*)0)
@@ -477,6 +479,8 @@ EXTERN	int	newvlongcode;
 EXTERN	int	canreach;
 EXTERN	int	warnreach;
 EXTERN	Bits	zbits;
+EXTERN	int	vlanest;	/* depth of VLA scopes in current function */
+EXTERN	long	vlaseq;		/* counter for unique _vla<N> hidden variable names */
 
 extern	char	*onames[], *tnames[], *gnames[];
 extern	char	*cnames[], *qnames[], *bnames[];
@@ -727,6 +731,10 @@ void	xcom(Node*);
 long	exreg(Type*);
 long	align(long, Type*, int);
 long	maxround(long, long);
+void	gvlalloc(Type*, Node*);	/* emit runtime stack alloc for a VLA */
+void	gvla_prologue(void);	/* save frame pointer before first VLA */
+void	gvla_epilogue(void);	/* restore SP from frame pointer */
+void	gret(void);		/* emit RET, restoring VLA frame first */
 
 extern	schar	ewidth[];
 

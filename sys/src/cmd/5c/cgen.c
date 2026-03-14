@@ -78,6 +78,32 @@ cgenrel(Node *n, Node *nn, int inrel)
 		diag(n, "unknown op in cgen: %O", o);
 		break;
 
+	case OALLOCA:
+		/*
+		 * VLA stack allocation for ARM: subtract rounded-up size from SP,
+		 * store new SP in nn.
+		 *
+		 *   SUB  size, R13, R13
+		 *   MOVW R13, nn
+		 *
+		 * We round up to 4-byte alignment (ARM requirement).
+		 * SP is R13 (REGSP); frame pointer is R11 (REGFP), saved by
+		 * gvla_prologue() in txt.c.
+		 */
+		{
+			Node nsize, nsp;
+			regalloc(&nsize, l, Z);
+			cgen(l, &nsize);
+			gopcode(OADD, nodconst(3), Z, &nsize);
+			gopcode(OAND, nodconst(-4), Z, &nsize);
+			nodreg(&nsp, types[TLONG], REGSP);
+			gopcode(OSUB, &nsize, Z, &nsp);
+			regfree(&nsize);
+			if(nn != Z)
+				gopcode(OAS, &nsp, Z, nn);
+		}
+		break;
+
 	case OAS:
 		if(l->op == OBIT)
 			goto bitas;

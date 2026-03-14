@@ -589,6 +589,24 @@ tcomo(Node *n, int f)
 		}
 		if(n->type == T)
 			goto bad;
+		/*
+		 * VLA: sizeof returns the runtime byte count stored in the
+		 * hidden _vlaN auto variable rather than the static width
+		 * (which is 0 for VLAs).  Rewrite the node in-place to an
+		 * ONAME load of vlasizevar; type is long (same as the hidden var).
+		 */
+		if(n->type->vla && n->type->vlasizevar != Z) {
+			Node *sv = n->type->vlasizevar;
+			n->op    = sv->op;
+			n->sym   = sv->sym;
+			n->type  = sv->type;
+			n->etype = sv->etype;
+			n->class = sv->class;
+			n->xoffset = sv->xoffset;
+			n->left  = Z;
+			n->right = Z;
+			break;
+		}
 		if(n->type->width <= 0) {
 			diag(n, "sizeof undefined type");
 			goto bad;

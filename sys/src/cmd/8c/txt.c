@@ -86,6 +86,8 @@ gclean(void)
 	Sym *s;
 
 	reg[D_SP]--;
+	if(vlanest > 0)
+		gvla_epilogue();
 	for(i=D_AX; i<=D_DI; i++)
 		if(reg[i])
 			diag(Z, "reg %R left allocated", i);
@@ -1448,3 +1450,48 @@ long	ncast[NTYPE] =
 	BUNION,				/*[TUNION]*/
 	0,				/*[TENUM]*/
 };
+
+/*
+ * VLA frame management for i386.
+ *
+ * gvla_prologue – called at function entry when vlanest > 0:
+ *   pushl %ebp
+ *   movl  %esp, %ebp
+ *
+ * gvla_epilogue – called before every RET when vlanest > 0:
+ *   movl  %ebp, %esp
+ *   popl  %ebp
+ *
+ * gret – wrapper for gbranch(ORETURN) that inserts the epilogue first.
+ */
+void
+gvla_prologue(void)
+{
+	Node nbp, nsp;
+
+	nodreg(&nbp, types[TLONG], D_BP);
+	nodreg(&nsp, types[TLONG], D_SP);
+	reg[D_BP]++;
+	gins(APUSHL, &nbp, Z);
+	gmove(&nsp, &nbp);
+}
+
+void
+gvla_epilogue(void)
+{
+	Node nbp, nsp;
+
+	nodreg(&nbp, types[TLONG], D_BP);
+	nodreg(&nsp, types[TLONG], D_SP);
+	gmove(&nbp, &nsp);
+	gins(APOPL, &nbp, Z);
+	reg[D_BP]--;
+}
+
+void
+gret(void)
+{
+	if(vlanest > 0)
+		gvla_epilogue();
+	gbranch(ORETURN);
+}

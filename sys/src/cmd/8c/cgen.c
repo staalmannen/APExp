@@ -96,6 +96,33 @@ cgen(Node *n, Node *nn)
 		regfree(&nod);
 		break;
 
+	case OALLOCA:
+		/*
+		 * VLA stack allocation: subtract rounded-up size from SP,
+		 * store new SP in nn.
+		 *
+		 *   MOVL  size, tmp
+		 *   ADDL  $3, tmp
+		 *   ANDL  $-4, tmp
+		 *   SUBL  tmp, SP
+		 *   MOVL  SP, nn
+		 */
+		{
+			Node nsize;
+			regalloc(&nsize, l, Z);
+			cgen(l, &nsize);
+			gins(AADDL, nodconst(3), &nsize);
+			gins(AANDL, nodconst(-4), &nsize);
+			nodreg(&nod, &nsize, D_SP);
+			gins(ASUBL, &nsize, &nod);
+			regfree(&nsize);
+			if(nn != Z) {
+				nodreg(&nod, n, D_SP);
+				gmove(&nod, nn);
+			}
+		}
+		goto done;
+
 	case OAS:
 		if(typefd[n->type->etype]) {
 			cgen(r, &fregnode0);

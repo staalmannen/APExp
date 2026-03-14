@@ -1,5 +1,7 @@
 #include "cc.h"
 
+static Node*	mkvlasym(Node*);
+
 Node*
 dodecl(void (*f)(int,Type*,Sym*), int c, Type *t, Node *n)
 {
@@ -24,14 +26,56 @@ loop:
 		n = n->left;
 		if(n1 != Z) {
 			complex(n1);
-			v = -1;
-			if(n1->op == OCONST)
+			if(n1->op == OCONST) {
+				/* ordinary constant-size array */
 				v = n1->vconst;
-			if(v <= 0) {
-				diag(n, "array size must be a positive constant");
-				v = 1;
+				if(v <= 0) {
+					diag(n, "array size must be a positive constant");
+					v = 1;
+				}
+				t->width = v * t->link->width;
+			} else {
+				/*
+				 * C99 variable-length array (item 33) or VLA
+				 * parameter (item 14).
+				 *
+				 * If the dimension is OVLAVAR the source wrote
+				 * "a[*]" (unspecified VLA in a prototype); no
+				 * runtime size variable is needed.
+				 *
+				 * Otherwise we create two hidden CAUTO variables:
+				 *   _vlaN   stores the element count at runtime
+				 *   _vlaN+1 stores the byte count (= count *
+				 *           sizeof element) so that sizeof(arr)
+				 *           can be lowered to a plain load.
+				 *
+				 * t->width stays 0 (unknown at compile time).
+				 */
+				Node *countvar, *sizevar, *mul;
+				long ewidth;
+
+				t->vla = 1;
+				vlanest++;
+
+				if(n1->op == OVLAVAR) {
+					/* prototype-only [*]: no storage */
+					t->vlasizevar = Z;
+				} else {
+					countvar = mkvlasym(n1);
+					ewidth = t->link->width;
+					if(ewidth <= 1) {
+						sizevar = countvar;
+					} else {
+						mul = new(OMUL, countvar,
+							new(OCONST, Z, Z));
+						mul->right->vconst = ewidth;
+						mul->right->type   = types[TLONG];
+						mul->right->etype  = TLONG;
+						sizevar = mkvlasym(mul);
+					}
+					t->vlasizevar = sizevar;
+				}
 			}
-			t->width = v * t->link->width;
 		}
 		goto loop;
 
@@ -104,6 +148,57 @@ loop:
 		break;
 	}
 	lastdcl = t;
+	return n;
+}
+
+/*
+ * mkvlasym – create a hidden CAUTO variable of type long to cache
+ * a VLA dimension or byte-count expression at runtime.
+ *
+ * The symbol is named _vla<N> (N from vlaseq).  It is pushed onto
+ * dclstack so that revertdcl() restores it at scope exit.
+ *
+ * If e is already a reference to a _vla* symbol it is returned as-is
+ * (avoids double-wrapping when element width is 1).
+ */
+static Node*
+mkvlasym(Node *e)
+{
+	char name[32];
+	Sym *s;
+	Node *n;
+	Decl *d;
+
+	if(e != Z && e->op == ONAME &&
+	   e->sym != S && strncmp(e->sym->name, "_vla", 4) == 0)
+		return e;
+
+	snprint(name, sizeof name, "_vla%ld", vlaseq++);
+	s = slookup(name);
+
+	/* save current sym state onto dclstack (mirrors push1) */
+	d = push();
+	d->sym       = s;
+	d->val       = DAUTO;
+	d->type      = s->type;
+	d->class     = s->class;
+	d->offset    = s->offset;
+	d->block     = s->block;
+	d->varlineno = s->varlineno;
+	d->aused     = s->aused;
+
+	s->class  = CAUTO;
+	s->type   = types[TLONG];
+	s->block  = autobn;
+	s->offset = 0;		/* adecl() will assign the real frame offset */
+	s->aused  = 1;		/* suppress "declared and not used" warning */
+
+	n = new(ONAME, Z, Z);
+	n->sym     = s;
+	n->type    = types[TLONG];
+	n->etype   = TLONG;
+	n->class   = CAUTO;
+	n->addable = 1;
 	return n;
 }
 

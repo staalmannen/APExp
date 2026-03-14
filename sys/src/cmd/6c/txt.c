@@ -108,6 +108,8 @@ gclean(void)
 	for(i=D_X0; i<=D_X7; i++)
 		if(reg[i] && !resvreg[i])
 			diag(Z, "reg %R left allocated", i);
+	if(vlanest > 0)
+		gvla_epilogue();
 	while(mnstring)
 		outstring("", 1L);
 	symstring->type->width = nstring;
@@ -1548,3 +1550,52 @@ long	ncast[NTYPE] =
 	BUNION,				/*[TUNION]*/
 	0,				/*[TENUM]*/
 };
+
+/*
+ * VLA frame management for amd64.
+ *
+ * Any function that allocates a VLA needs a stable frame pointer so that
+ * the epilogue can restore SP regardless of how many VLA frames were pushed.
+ * We use %rbp for this, matching the System V AMD64 ABI frame layout.
+ *
+ * gvla_prologue – called at function entry when vlanest > 0:
+ *   pushq %rbp
+ *   movq  %rsp, %rbp
+ *
+ * gvla_epilogue – called before every RET when vlanest > 0:
+ *   movq  %rbp, %rsp
+ *   popq  %rbp
+ *
+ * gret – wrapper for gbranch(ORETURN) that inserts the epilogue first.
+ */
+void
+gvla_prologue(void)
+{
+	Node nrbp, nrsp;
+
+	nodreg(&nrbp, types[TLONG], D_BP);
+	nodreg(&nrsp, types[TLONG], D_SP);
+	reg[D_BP]++;
+	gins(APUSHQ, &nrbp, Z);
+	gmove(&nrsp, &nrbp);
+}
+
+void
+gvla_epilogue(void)
+{
+	Node nrbp, nrsp;
+
+	nodreg(&nrbp, types[TLONG], D_BP);
+	nodreg(&nrsp, types[TLONG], D_SP);
+	gmove(&nrbp, &nrsp);
+	gins(APOPQ, &nrbp, Z);
+	reg[D_BP]--;
+}
+
+void
+gret(void)
+{
+	if(vlanest > 0)
+		gvla_epilogue();
+	gbranch(ORETURN);
+}
