@@ -12,6 +12,9 @@ struct cookie {
 	int mode;
 };
 
+#undef FILE
+#define FILE _IO_FILE
+
 struct mem_FILE {
 	FILE f;
 	struct cookie c;

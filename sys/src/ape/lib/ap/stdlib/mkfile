@@ -27,8 +27,8 @@ OFILES=\
 	qsort_nr.$O\
 	strtod.$O\
 	strtol.$O\
-	wcstol.$O\
-	wcstod.$O\
+	strtold.$O\
+	strtof.$O\
 # musl internal dependency\
 	floatscan.$O\
 	intscan.$O\
