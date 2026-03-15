@@ -29,9 +29,6 @@ OFILES=\
 	strtol.$O\
 	strtold.$O\
 	strtof.$O\
-# musl internal dependency\
-	floatscan.$O\
-	intscan.$O\
 # public domain \
 	alloca.$O
 

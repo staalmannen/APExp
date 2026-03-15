@@ -1,4 +1,4 @@
-#define _PLAN9_SOURCE
+//#define _PLAN9_SOURCE
 #include "../plan9/lib.h"
 #include <sys/types.h>
 #include <time.h>

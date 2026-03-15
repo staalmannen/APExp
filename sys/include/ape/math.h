@@ -7,6 +7,7 @@
 #define HUGE_VAL 1.79769313486231e+308
 
 #define INFINITY HUGE_VAL
+#define HUGE_VALF HUGE_VAL
 
 #define double_t double
 #define float_t float
@@ -45,7 +46,6 @@ extern double Inf(int);
 extern int isInf(double, int);
 extern double fmin(double, double);
 
-#if defined(_RESEARCH_SOURCE) || defined(_XOPEN_SOURCE) || defined(_GNU_SOURCE) || defined(_BSD_SOURCE)
 /* does >> treat left operand as unsigned ? */
 #define Unsigned_Shifts 1
 #define	M_E		2.7182818284590452354	/* e */
@@ -71,8 +71,6 @@ extern double j1(double);
 extern double y1(double);
 extern double jn(int, double);
 extern double yn(int, double);
-
-#endif
 
 
 #ifdef __cplusplus
