@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <unistd.h>
 
-static void dummy(char *old, char *new) {}
-//weak_alias(dummy, __env_rm_add);
+static void dummy(char *, char *) {}
+#define __env_rm_add(x,y) dummy(x,y)
 extern	char **environ;
 #define __environ environ
 

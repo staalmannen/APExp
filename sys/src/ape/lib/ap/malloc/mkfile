@@ -5,14 +5,8 @@ LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
 OFILES=\
 	calloc.$O\
-#	musl mallocng\
-	aligned_alloc.$O\
-	donate.$O\
-	free.$O\
 	malloc.$O\
-	malloc_usable_size.$O\
-	realloc.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=$CFLAGS -c -D_POSIX_SOURCE
+CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -I../include

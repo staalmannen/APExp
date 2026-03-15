@@ -331,4 +331,17 @@ static inline int a_clz_32(uint32_t x)
 }
 #endif
 
+#ifndef a_cas
+#define a_cas a_cas
+static inline int a_cas(volatile int *p, int t, int s)
+{
+	int old;
+	a_pre_llsc();
+	do old = a_ll(p);
+	while (old==t && !a_sc(p, s));
+	a_post_llsc();
+	return old;
+}
+#endif
+
 #endif

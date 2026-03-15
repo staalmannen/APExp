@@ -2,6 +2,9 @@
 #include <string.h>
 #include <errno.h>
 
+#define __strchrnul strchrnul
+#define __putenv(x,y,z) putenv(x)
+
 void __env_rm_add(char *old, char *new)
 {
 	static char **env_alloced;

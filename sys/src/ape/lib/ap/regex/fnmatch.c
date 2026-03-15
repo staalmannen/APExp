@@ -230,7 +230,7 @@ static int fnmatch_internal(const char *pat, size_t m, const char *str, size_t n
 	 * On illegal sequences we may get it wrong, but in that case
 	 * we necessarily have a matching failure anyway. */
 	for (s=endstr; s>str && tailcnt; tailcnt--) {
-		if (s[-1] < 128U || MB_CUR_MAX==1) s--;
+		if (s[-1] < 128U /* || MB_CUR_MAX==1 */) s--;
 		else while ((unsigned char)*--s-0x80U<0x40 && s>str);
 	}
 	if (tailcnt) return FNM_NOMATCH;

@@ -80,6 +80,14 @@
 /*#define TIMER_MAX _POSIX_TIMER_MAX */
 #define TZNAME_MAX _POSIX_TZNAME_MAX
 
+/* from musl */
+#define CHARCLASS_NAME_MAX 14
+#define RE_DUP_MAX 255
+#define _POSIX_RE_DUP_MAX       255
+#define _POSIX2_RE_DUP_MAX      255
+#define _SC_RE_DUP_MAX	44
+
+
 /* some things are just too big for pedagogy (X!) */
 #include <sys/limits.h>
 

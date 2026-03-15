@@ -1,4 +1,5 @@
 #include <inttypes.h>
+#include <stdint.h>
 
 imaxdiv_t imaxdiv(intmax_t num, intmax_t den)
 {

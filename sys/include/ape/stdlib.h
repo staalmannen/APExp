@@ -56,6 +56,9 @@ extern int mkstemp(char *template);
 
 #define realpath(x, y) x
 
+/* from musl */
+typedef struct { long long quot, rem; } lldiv_t;
+
 #ifdef __cplusplus
 }
 #endif

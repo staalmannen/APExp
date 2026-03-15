@@ -5,9 +5,10 @@
 
 extern	char **environ;
 #define __environ environ
+#define __strchrnul strchrnul
 
-static void dummy(char *old, char *new) {}
-//weak_alias(dummy, __env_rm_add);
+static void dummy(char *, char *) {}
+#define __env_rm_add dummy
 
 int unsetenv(const char *name)
 {

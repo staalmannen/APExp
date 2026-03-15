@@ -31,6 +31,8 @@
 #define PRIuPTR "llu"
 #define PRIuMAX "llu"
 
+/*from musl*/
 extern intmax_t strtoimax(const char *, char **, int);
+typedef struct { intmax_t quot, rem; } imaxdiv_t;
 
 #endif

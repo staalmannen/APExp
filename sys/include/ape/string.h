@@ -35,14 +35,14 @@ extern char *strerror(int);
 extern size_t strlen(const char *);
 extern size_t strnlen(const char *, size_t);
 
-#ifdef _REENTRANT_SOURCE
 extern char *strerror_r(int, const char *, int);
 extern char *strtok_r(char *, const char *, char **);
-#endif
 
-#ifdef _BSD_EXTENSION
 #include <bsd.h>
-#endif
+
+/* from musl */
+extern char *strchrnul(const char*, int);
+
 
 #ifdef __cplusplus
 }
