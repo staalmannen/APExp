@@ -784,6 +784,42 @@ talph:
 	yylval.sym = s;
 	if(s->class == CTYPEDEF || s->class == CTYPESTR)
 		return LTYPE;
+	/*
+	 * GNU __attribute__((...)), __declspec(...), __extension__:
+	 * swallow the following parenthesised argument list entirely so
+	 * the parser never sees it.  We peek at the next non-space char;
+	 * if it is '(' we consume everything up to the matching ')'.
+	 * __extension__ takes no arguments; it is simply dropped.
+	 *
+	 * After consuming we loop back to lex the next real token,
+	 * making these constructs completely invisible to the grammar.
+	 */
+	if(s->lexical == LNAME && (
+	    strcmp(s->name, "__attribute__") == 0 ||
+	    strcmp(s->name, "__attribute")   == 0 ||
+	    strcmp(s->name, "__declspec")    == 0 ||
+	    strcmp(s->name, "__extension__") == 0)) {
+		int ac, depth;
+		/* skip whitespace to see if '(' follows */
+		do { ac = GETC(); } while(ac == ' ' || ac == '\t');
+		if(ac == '(') {
+			depth = 1;
+			while(depth > 0) {
+				ac = GETC();
+				if(ac == EOF) {
+					yyerror("unexpected EOF in __attribute__");
+					break;
+				}
+				if(ac == '(') depth++;
+				else if(ac == ')') depth--;
+				else if(ac == '\n') lineno++;
+			}
+		} else {
+			/* no argument list (e.g. bare __extension__); put char back */
+			unget(ac);
+		}
+		goto l0;	/* fetch next real token */
+	}
 	return s->lexical;
 
 tnum:
@@ -1225,6 +1261,65 @@ struct
 	"void",		LVOID,		TVOID,
 	"volatile",	LVOLATILE,	0,
 	"while",	LWHILE,		0,
+
+	/*
+	 * GNU / C99 compatibility aliases.
+	 * Double-underscore spellings map to the same token as their
+	 * standard counterparts so the grammar needs no changes.
+	 */
+
+	/* restrict aliases */
+	"__restrict",		LRESTRICT,	0,
+	"__restrict__",		LRESTRICT,	0,
+
+	/* inline aliases */
+	"__inline",		LINLINE,	0,
+	"__inline__",		LINLINE,	0,
+
+	/* _Noreturn aliases */
+	"__noreturn__",		LNORET,		0,
+
+	/* const/volatile/signed aliases - map to existing qualifier tokens */
+	"__const",		LCONSTNT,	0,
+	"__const__",		LCONSTNT,	0,
+	"__volatile",		LVOLATILE,	0,
+	"__volatile__",		LVOLATILE,	0,
+	"__signed",		LSIGNED,	0,
+	"__signed__",		LSIGNED,	0,
+
+	/*
+	 * _Bool: C99 boolean.  Map to LCHAR (unsigned char width).
+	 * Values are 0 or 1; the width and integer promotion match.
+	 */
+	"_Bool",		LCHAR,		TUCHAR,
+
+	/*
+	 * __attribute__((...)) and __declspec(...):
+	 * These are registered as LNAME so lookup() returns them as
+	 * ordinary identifiers.  The yylex() function detects them by
+	 * name after lookup and swallows the following argument list,
+	 * making them completely transparent to the parser.
+	 *
+	 * __extension__ is a no-op marker; same treatment.
+	 */
+	"__attribute__",	LNAME,		0,
+	"__attribute",		LNAME,		0,
+	"__declspec",		LNAME,		0,
+	"__extension__",	LNAME,		0,
+
+	/*
+	 * GNU visibility / linkage hints.
+	 * These appear as function/variable attributes.  When used as
+	 * plain identifiers (not inside __attribute__) they are harmless
+	 * LNAME tokens the parser ignores in declaration-specifier position.
+	 */
+	"__hidden",		LNAME,		0,
+	"__visible",		LNAME,		0,
+	"__used",		LNAME,		0,
+	"__leaf__",		LNAME,		0,
+	"__pure__",		LNAME,		0,
+	"__nonnull__",		LNAME,		0,
+
 	0
 };
 
