@@ -3,7 +3,7 @@ APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
-ALLOFILES=\
+OFILES=\
 	arc4random.$O\
 	rand.$O\
 #	musl\

@@ -3,7 +3,7 @@ APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
-ALLOFILES=\
+OFILES=\
 	calloc.$O\
 #	musl mallocng\
 	aligned_alloc.$O\

@@ -1,9 +1,10 @@
 APEXPROOT=../../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
+
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
-ALLOFILES=\
+OFILES=\
 	alarm.$O\
 	kill.$O\
 	pause.$O\
@@ -14,6 +15,7 @@ ALLOFILES=\
 	sigprocmask.$O\
 	sigsuspend.$O\
 #	musl\
+
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
