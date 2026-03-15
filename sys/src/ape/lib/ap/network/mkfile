@@ -39,8 +39,6 @@ OFILES=\
 	socketpair.$O\
 
 
-HFILES=priv.h
-
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=-c -I$APEXPROOT/sys/include/ape\

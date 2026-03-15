@@ -7,7 +7,7 @@ OFILES=\
 # musl \
 	catclose.$O\
 	catgets.$O\
-	catopen.$O\
+#	catopen.$O\
 	langinfo.$O\
 	strtod_l.$O\
 	strfmon.$O\

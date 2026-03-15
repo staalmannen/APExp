@@ -1573,8 +1573,8 @@ gvla_prologue(void)
 {
 	Node nrbp, nrsp;
 
-	nodreg(&nrbp, types[TLONG], D_BP);
-	nodreg(&nrsp, types[TLONG], D_SP);
+	nodreg(&nrbp, &qregnode, D_BP);
+	nodreg(&nrsp, &qregnode, D_SP);
 	reg[D_BP]++;
 	gins(APUSHQ, &nrbp, Z);
 	gmove(&nrsp, &nrbp);
@@ -1585,8 +1585,8 @@ gvla_epilogue(void)
 {
 	Node nrbp, nrsp;
 
-	nodreg(&nrbp, types[TLONG], D_BP);
-	nodreg(&nrsp, types[TLONG], D_SP);
+	nodreg(&nrbp, &qregnode, D_BP);
+	nodreg(&nrsp, &qregnode, D_SP);
 	gmove(&nrbp, &nrsp);
 	gins(APOPQ, &nrbp, Z);
 	reg[D_BP]--;

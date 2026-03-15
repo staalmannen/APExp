@@ -96,7 +96,7 @@ cgenrel(Node *n, Node *nn, int inrel)
 			cgen(l, &nsize);
 			gopcode(OADD, nodconst(3), Z, &nsize);
 			gopcode(OAND, nodconst(-4), Z, &nsize);
-			nodreg(&nsp, types[TLONG], REGSP);
+			nodreg(&nsp, &regnode, REGSP);
 			gopcode(OSUB, &nsize, Z, &nsp);
 			regfree(&nsize);
 			if(nn != Z)

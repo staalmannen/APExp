@@ -18,4 +18,4 @@ CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I$APEXPROOT/$objtype/include/ape
 	-D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION\
 	-D_RESEARCH_SOURCE -D_NET_EXTENSION -I../include
 
-$OFILES: lib.h
+

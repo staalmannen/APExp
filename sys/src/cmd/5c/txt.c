@@ -1384,7 +1384,7 @@ long	ncast[NTYPE] =
  * VLA frame management for ARM.
  *
  * gvla_prologue – called at function entry when vlanest > 0.
- * Saves the frame pointer (R11/REGFP) so that gvla_epilogue can
+ * Saves the frame pointer (R11/REGTMP) so that gvla_epilogue can
  * restore SP unconditionally:
  *   MOVW R11, -4(SP)   (push R11)
  *   MOVW SP,  R11      (R11 = frame base)
@@ -1403,9 +1403,9 @@ gvla_prologue(void)
 {
 	Node nfp, nsp;
 
-	nodreg(&nfp, types[TLONG], REGFP);
-	nodreg(&nsp, types[TLONG], REGSP);
-	reg[REGFP]++;
+	nodreg(&nfp, &regnode, REGTMP);
+	nodreg(&nsp, &regnode, REGSP);
+	reg[REGTMP]++;
 	gins(AMOVW, &nfp, &nsp);	/* push R11 onto stack */
 	gins(AMOVW, &nsp, &nfp);	/* R11 = SP (frame anchor) */
 }
@@ -1415,11 +1415,11 @@ gvla_epilogue(void)
 {
 	Node nfp, nsp;
 
-	nodreg(&nfp, types[TLONG], REGFP);
-	nodreg(&nsp, types[TLONG], REGSP);
+	nodreg(&nfp, &regnode, REGTMP);
+	nodreg(&nsp, &regnode, REGSP);
 	gins(AMOVW, &nfp, &nsp);	/* SP = R11 (reclaim all VLA frames) */
 	gins(AMOVW, &nsp, &nfp);	/* pop R11 */
-	reg[REGFP]--;
+	reg[REGTMP]--;
 }
 
 void

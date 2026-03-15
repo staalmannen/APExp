@@ -17,23 +17,9 @@ OFILES=\
 CC=pcc
 CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_BSD_SOURCE\
 		-I$APEXPROOT/sys/include/ape -I$APEXPROOT/$objtype/include/ape
-		-
-# default
-_archdir=dummy
-_compiler=$CC
-_srcext=c
-_flags=$CFLAGS
 
-# if matching arch directory present
-ASMARCHS= 386 amd64 arm64 mips power
-if ($objtype in $ASMARCHS)@{
-		_archdir=$objtype
-		_compiler=$Oa
-		_srcext=s
-		_flags=
-	}
+# todo: figure out how to build fenv.$O with .s in supported archs
 
-fenv.$O: $_archdir/fenv.$_srcext
-	$_compiler $_flags -o $target $prereq
+
 
 
