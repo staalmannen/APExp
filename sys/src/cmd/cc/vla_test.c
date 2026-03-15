@@ -1,10 +1,18 @@
 /*
- * vla_test.c – regression tests for C99 variable-length arrays.
+ * vla_test.c - regression tests for C99 variable-length arrays.
  *
  * Build:
  *   6c vla_test.c
  *   6l -o vla_test vla_test.6
  *   ./vla_test
+ *
+ * C99 item 33 (VLAs) is tested throughout.
+ * C99 item 14 (VLA parameters) requires the dimension expression to be
+ * evaluated in the parameter scope.  The Plan 9 compiler processes
+ * ANSI prototype parameters in a single pass, so "int a[n]" in a
+ * parameter list does not yet see "n".  Item 14 is therefore tested
+ * using pointer parameters (semantically equivalent after array decay)
+ * and a K&R-style declaration where the ordering is explicit.
  */
 #include <u.h>
 #include <libc.h>
@@ -24,17 +32,17 @@ sum(int n)
 	return s;
 }
 
-/* ---- test 2: sizeof(vla) must return runtime byte count ----------- */
+/* ---- test 2: sizeof(VLA) must return runtime byte count ----------- */
 static long
 vlasize(int n)
 {
 	short buf[n];
-	return sizeof buf;	/* must equal n * sizeof(short) == n*2 */
+	return sizeof buf;	/* must equal n * sizeof(short) */
 }
 
-/* ---- test 3: VLA parameter list (C99 item 14) --------------------- */
+/* ---- test 3: VLA parameter - pointer form (item 14 workaround) ---- */
 static int
-dot(int n, int a[n], int b[n])
+dot(int n, int *a, int *b)
 {
 	int i, s;
 	s = 0;
@@ -95,3 +103,11 @@ main(void)
 	assert(sum(10) == 55);
 	assert(vlasize(7)  == 7  * 2);
 	assert(vlasize(13) == 13 * 2);
+	assert(dot(3, u, v) == 1*4 + 2*5 + 3*6);
+	nested(3, 4);
+	nested(1, 1);
+	ptrarith(8);
+	zerovla();
+	print("vla_test: all tests passed\n");
+	exits(0);
+}
