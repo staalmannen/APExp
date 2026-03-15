@@ -2,8 +2,8 @@
  * turn raw (no echo, etc.) on and off.
  * ptyfs is gone, so don't even try tcsetattr, etc.
  */
-#define _POSIX_SOURCE
-#define _RESEARCH_SOURCE
+//#define _POSIX_SOURCE
+//#define _RESEARCH_SOURCE
 
 #include <sys/types.h>
 #include <unistd.h>

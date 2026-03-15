@@ -4,10 +4,11 @@
 #define	NANEXP	(2047<<20)
 #define	NANMASK	(2047<<20)
 #define	NANSIGN	(1<<31)
+#define NAN 0.0f/0.0f
 
 double nan(const char *s)
 {
-	return NaN;
+	return NAN;
 }
 
 double

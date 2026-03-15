@@ -239,9 +239,9 @@ CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -D_POSIX_SOURCE\
 # use assembly files if present. Most architectures used c files with inline
 # asm which we cannot use.
 
-install:V:
-	if ($objtype = amd64) mk -f amd64/mkfile install
-	if ($objtype = 386) mk -f 386/mkfile install
+# install:V:
+#	if ($objtype = amd64) mk -f amd64/mkfile install
+#	if ($objtype = 386) mk -f 386/mkfile install
 
 
 

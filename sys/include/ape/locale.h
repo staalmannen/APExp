@@ -3,6 +3,7 @@
 #pragma lib "/$M/lib/ape/libap.a"
 
 #include <stddef.h>
+#include <langinfo.h>
 
 #define LC_ALL		0
 #define LC_COLLATE	1

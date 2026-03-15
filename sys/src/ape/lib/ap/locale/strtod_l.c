@@ -2,17 +2,17 @@
 #include <stdlib.h>
 #include <locale.h>
 
-float strtof_l(const char *restrict s, char **restrict p, locale_t l)
+float strtof_l(const char *s, char **p, locale_t l)
 {
 	return strtof(s, p);
 }
 
-double strtod_l(const char *restrict s, char **restrict p, locale_t l)
+double strtod_l(const char *s, char **p, locale_t l)
 {
 	return strtod(s, p);
 }
 
-long double strtold_l(const char *restrict s, char **restrict p, locale_t l)
+long double strtold_l(const char *s, char **p, locale_t l)
 {
 	return strtold(s, p);
 }

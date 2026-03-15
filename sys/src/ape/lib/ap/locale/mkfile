@@ -10,7 +10,7 @@ OFILES=\
 #	catopen.$O\
 	langinfo.$O\
 	strtod_l.$O\
-	strfmon.$O\
+#	strfmon.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

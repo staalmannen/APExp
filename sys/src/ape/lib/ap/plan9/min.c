@@ -1,4 +1,4 @@
-#define _RESEARCH_SOURCE
+//#define _RESEARCH_SOURCE
 #include <libv.h>
 
 min(int a, int b)

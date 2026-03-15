@@ -1,6 +1,6 @@
 #define _LOCK_EXTENSION
 #define _QLOCK_EXTENSION
-#define _RESEARCH_SOURCE
+//#define _RESEARCH_SOURCE
 #include <u.h>
 #include <lock.h>
 #include <qlock.h>

@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <inttypes.h>
-#include "musl/musl.h"
+#include "../include/musl.h"
 
 struct cookie {
 	size_t pos, len, size;

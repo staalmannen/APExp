@@ -6,11 +6,11 @@ OFILES=\
 	getgrent.$O\
 	getgrgid.$O\
 	getgrnam.$O\
-	getpwent.$O
+	getpwent.$O\
 	getpwnam.$O\
 	getpwuid.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I../include\
+CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I../include -I../plan9\
 	-I$APEXPROOT/$objtype/include/ape -D_POSIX_SOURCE

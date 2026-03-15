@@ -6,7 +6,6 @@ LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
 OFILES=\
 #	/*wchar*/\
-	internal.$O\
 	fwide.$O\
 	mbrlen.$O\
 	mbrtowc.$O\

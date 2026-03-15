@@ -3,7 +3,7 @@
  */
 #include "iolib.h"
 
-#define _PLAN9_SOURCE
+//#define _PLAN9_SOURCE
 #include <lock.h>
 #include <errno.h>
 

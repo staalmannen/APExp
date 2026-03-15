@@ -1,4 +1,4 @@
-APEXPROOT=../../../../../
+APEXPROOT=../../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
@@ -15,9 +15,9 @@ OFILES=\
 	uname.$O\
 #	musl\
 	a64l.$O\
-	realpath.$O\
+#	realpath.$O\
 	getopt_long.$O\
-	nftw.$O\
+#	nftw.$O\
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib

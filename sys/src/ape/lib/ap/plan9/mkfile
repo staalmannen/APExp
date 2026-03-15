@@ -52,3 +52,10 @@ CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I$APEXPROOT/$objtype/include/ape
 	-D_RESEARCH_SOURCE -D_NET_EXTENSION -I../include
 
 $OFILES: lib.h
+
+getpass.$O: plan9/getpass.c
+	$CC $CFLAGS plan9/getpass.c
+
+tty.$O: plan9/tty.c
+	$CC $CFLAGS plan9/tty.c
+

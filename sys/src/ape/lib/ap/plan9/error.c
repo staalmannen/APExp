@@ -1,5 +1,5 @@
-#define _POSIX_SOURCE
-#define _RESEARCH_SOURCE
+//#define _POSIX_SOURCE
+//#define _RESEARCH_SOURCE
 #include <error.h>
 #include <stdio.h>
 #include <libv.h>
