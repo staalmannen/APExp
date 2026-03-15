@@ -2,6 +2,8 @@
 #define __SIGNAL_H
 #pragma lib "/$M/lib/ape/libap.a"
 
+#include <sys/types.h>
+
 typedef int sig_atomic_t;
 
 /*

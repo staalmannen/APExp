@@ -7,8 +7,8 @@ extern "C" {
 
 #include <features.h>
 
-#define __NEED_regoff_t
-#define __NEED_size_t
+#include <sys/types.h>
+typedef off_t regoff_t;
 
 #include <alltypes.h>
 

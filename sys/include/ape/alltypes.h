@@ -8,7 +8,7 @@
 #include <time.h>
 #include <sys/time.h>
 #include <sys/socket.h>
-#include <pcre2posix.h>
+#include <regex.h>
 #include <wchar.h>
 #include <pthread.h>
 #include <langinfo.h>

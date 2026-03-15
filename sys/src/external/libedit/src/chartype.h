@@ -51,9 +51,9 @@
 /* Oh for a <uchar.h> with char32_t and __STDC_UTF_32__ in it...
  * ref: ISO/IEC DTR 19769
  */
-#if WCHAR_MAX < INT32_MAX
-#warning Build environment does not support non-BMP characters
-#endif
+//#if WCHAR_MAX < INT32_MAX
+//#warning Build environment does not support non-BMP characters
+//#endif
 
 /*
  * Conversion buffer
