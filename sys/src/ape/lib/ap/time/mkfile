@@ -16,6 +16,8 @@ OFILES=\
 	times.$O\
 	tzset.$O\
 #	musl\
+	__map_file.$O\
+
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

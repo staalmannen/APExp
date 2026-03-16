@@ -38,6 +38,8 @@ OFILES=\
 	max.$O\
 	error.$O\
 	nap.$O\
+# musl/linux syscall compatibility hack\
+	__p9_syscall.$O\
 
 
 UPDATE=\
@@ -53,9 +55,6 @@ CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I$APEXPROOT/$objtype/include/ape
 
 $OFILES: lib.h
 
-getpass.$O: plan9/getpass.c
-	$CC $CFLAGS plan9/getpass.c
-
-tty.$O: plan9/tty.c
-	$CC $CFLAGS plan9/tty.c
+%.$O:	plan9/%.c
+	$CC $CFLAGS $prereq
 

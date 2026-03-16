@@ -7,12 +7,12 @@ OFILES=\
 # musl \
 	catclose.$O\
 	catgets.$O\
-#	catopen.$O\
+	catopen.$O\
 	langinfo.$O\
 	strtod_l.$O\
-#	strfmon.$O\
+	strfmon.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I../include\
-	-I$APEXPROOT/$objtype/include/ape -D_POSIX_SOURCE
+	-I$APEXPROOT/$objtype/include/ape -D_POSIX_SOURCE -I../plan9
