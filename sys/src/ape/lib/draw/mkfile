@@ -74,11 +74,11 @@ UPDATE=\
 
 CFLAGS=-c $CFLAGS -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../9
 
-%.$O: /sys/src/libdraw/%.c
-	$CC $CFLAGS /sys/src/libdraw/$stem.c
+%.$O: %.c
+	$CC $CFLAGS $stem.c
 
-colors.$O: /sys/src/cmd/colors.c
-	$CC $CFLAGS /sys/src/cmd/colors.c
+colors.$O: colors.c
+	$CC $CFLAGS colors.c
 
 $O.colors: colors.$O
 	$LD -o $target colors.$O

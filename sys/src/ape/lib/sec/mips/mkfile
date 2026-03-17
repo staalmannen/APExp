@@ -20,5 +20,5 @@ UPDATE=mkfile\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-%.$O:	/sys/src/libsec/$objtype/%.s
-	$AS $AFLAGS /sys/src/libsec/$objtype/$stem.s
+%.$O:	%.s
+	$AS $AFLAGS $stem.s

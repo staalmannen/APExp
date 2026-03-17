@@ -8,7 +8,7 @@ SFILES=mpvecdigmuladd.s mpvecdigmulsub.s mpvecadd.s mpvecsub.s
 
 HFILES=\
 	$APEXPROOT/sys/include/ape/mp.h\
-	/sys/src/libmp/port/dat.h
+	../port/dat.h
 
 OFILES=${SFILES:%.s=%.$O}
 
@@ -18,5 +18,5 @@ UPDATE=mkfile\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-%.$O:	/sys/src/libmp/arm/%.s
-	$AS /sys/src/libmp/arm/$stem.s
+%.$O:	%.s
+	$AS $stem.s

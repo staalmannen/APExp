@@ -24,7 +24,7 @@ OFILES=\
 
 HFILES=\
 	$APEXPROOT/sys/include/ape/auth.h\
-	/sys/src/libauth/authlocal.h\
+	authlocal.h\
 	../9/libc.h
 
 UPDATE=\
@@ -35,10 +35,9 @@ UPDATE=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-TVwc -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_NET_EXTENSION -I. -I../9 -I/sys/src/libauth
+CFLAGS=-TVwc -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_NET_EXTENSION -I. -I../9
 
-%.$O:	/sys/src/libauth/%.c
-	$CC $CFLAGS /sys/src/libauth/$stem.c
+%.$O:	%.c
+	$CC $CFLAGS $stem.c
 
-passtokey.$O:	/sys/src/libauthsrv/passtokey.c
-	$CC $CFLAGS /sys/src/libauthsrv/passtokey.c
+

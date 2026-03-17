@@ -1,0 +1,16 @@
+APEXPROOT=../../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libsec.a
+
+OFILES=	\
+
+HFILES=$APEXPROOT/sys/include/ape/libsec.h
+
+UPDATE=mkfile
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+%.$O:	/sys/src/libsec/$objtype/%.s
+	$AS $AFLAGS /sys/src/libsec/$objtype/$stem.s

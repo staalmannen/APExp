@@ -22,5 +22,5 @@ UPDATE=\
 
 CFLAGS=-c $CFLAGS -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../9
 
-%.$O: /sys/src/libplumb/%.c
-	$CC $CFLAGS /sys/src/libplumb/$stem.c
+%.$O: %.c
+	$CC $CFLAGS $stem.c

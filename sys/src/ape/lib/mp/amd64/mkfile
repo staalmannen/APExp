@@ -13,7 +13,7 @@ SFILES=\
 
 HFILES=\
 	$APEXPROOT/sys/include/ape/mp.h\
-	/sys/src/libmp/port/dat.h
+	../port/dat.h
 
 OFILES=${SFILES:%.s=%.$O}
 
@@ -23,5 +23,5 @@ UPDATE=mkfile\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-%.$O:	/sys/src/libmp/amd64/%.s
-	$AS /sys/src/libmp/amd64/$stem.s
+%.$O:	%.s
+	$AS $stem.s

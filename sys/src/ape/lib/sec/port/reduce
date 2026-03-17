@@ -1,0 +1,12 @@
+O=$1
+shift
+objtype=$1
+shift
+if(ls -p ../$objtype/*.[cs] >[2]/dev/null | sed 's/..$//;s/^/^/' > /tmp/reduce.$pid) {
+	echo $* | tr ' ' \012 | grep -v -f /tmp/reduce.$pid | tr \012 ' '
+}
+if not {
+	# if empty directory, just return the input files
+	echo $*
+}
+rm /tmp/reduce.$pid

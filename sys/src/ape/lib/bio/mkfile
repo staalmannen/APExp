@@ -35,5 +35,5 @@ UPDATE=\
 
 CFLAGS=-TVwc -D_PLAN9_SOURCE -D_POSIX_SOURCE -I. -I../9
 
-%.$O:	/sys/src/libbio/%.c
-	$CC $CFLAGS /sys/src/libbio/$stem.c
+%.$O:	%.c
+	$CC $CFLAGS $stem.c
