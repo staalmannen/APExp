@@ -26,10 +26,12 @@
 #include <stdint.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <poll.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/time.h>
 #include <sys/uio.h>
+#include <sys/resource.h>
 #include <time.h>
 #include <signal.h>
 
@@ -133,6 +135,14 @@ p9retl(long r)
 #define MAP_FIXED       0x10
 #endif
 
+/* O_CLOEXEC: use Plan9's OCEXEC which has the same semantics.
+ * This ensures posix_flags_to_p9() translates it correctly.
+ * Note: FD_CLOEXEC is a different constant (used with fcntl F_SETFD)
+ * and must not be used here. */
+#ifndef O_CLOEXEC
+#define O_CLOEXEC OCEXEC
+#endif
+
 static long
 p9_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 {
@@ -217,9 +227,15 @@ p9_munmap(void *addr, size_t len)
 extern long long nsec(void);  /* Plan9 libthread / libc */
 
 #ifndef CLOCK_REALTIME
-#define CLOCK_REALTIME  0
-#define CLOCK_MONOTONIC 1
+#define CLOCK_REALTIME           0
+#endif
+#ifndef CLOCK_MONOTONIC
+#define CLOCK_MONOTONIC          1
+#endif
+#ifndef CLOCK_PROCESS_CPUTIME_ID
 #define CLOCK_PROCESS_CPUTIME_ID 2
+#endif
+#ifndef CLOCK_THREAD_CPUTIME_ID
 #define CLOCK_THREAD_CPUTIME_ID  3
 #endif
 
@@ -702,7 +718,6 @@ __p9_syscall(long n, long a1, long a2, long a3, long a4, long a5, long a6)
 
 	case SYS_getdents:
 	case SYS_getdents64:
-	case SYS_mremap:
 	case SYS_sysinfo:
 	case SYS_times:
 	case SYS_getsid:
