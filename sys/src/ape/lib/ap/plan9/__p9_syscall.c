@@ -35,6 +35,14 @@
 #include <time.h>
 #include <signal.h>
 
+/* nfds_t: POSIX type for poll() fd count. APE does not define this
+ * in its poll headers; unsigned int is correct per POSIX (it must
+ * be able to represent any non-negative fd count). */
+#ifndef _NFDS_T_DEFINED
+#define _NFDS_T_DEFINED
+typedef unsigned int nfds_t;
+#endif
+
 /* ------------------------------------------------------------------ */
 /* Internal helpers                                                    */
 /* ------------------------------------------------------------------ */
@@ -163,7 +171,7 @@ p9_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 		p = _SEGATTACH(0, "memory", 0, len);
 		if(p == (void*)-1)
 			return -ENOMEM;
-		return (long)p;
+		return (long)(uintptr_t)p;
 	}
 
 	/* malloc for small allocations */
@@ -171,7 +179,7 @@ p9_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 	if(p == NULL)
 		return -ENOMEM;
 	memset(p, 0, len);
-	return (long)p;
+	return (long)(uintptr_t)p;
 }
 
 /* We can't reliably know whether an address came from segattach or
@@ -360,13 +368,13 @@ p9_brk(void *addr)
 		/* query current brk */
 		if(p9_curbrk == NULL)
 			p9_curbrk = _SEGBRK(0, 0);
-		return (long)p9_curbrk;
+		return (long)(uintptr_t)p9_curbrk;
 	}
 	newbrk = _SEGBRK(0, addr);
 	if(newbrk == (void*)-1)
 		return -ENOMEM;
 	p9_curbrk = newbrk;
-	return (long)newbrk;
+	return (long)(uintptr_t)newbrk;
 }
 
 /* ------------------------------------------------------------------ */
