@@ -2,6 +2,72 @@
 
 static Node*	mkvlasym(Node*);
 
+/*
+ * compoundlit(t, initnode) -- lower a C99 compound literal to a hidden auto.
+ *
+ * Called from the cc.y xuexpr production after both the type and the
+ * brace-enclosed initialiser list have been fully parsed.
+ *
+ *   t        resolved Type* (from dodecl(NODECL,...)  lastdcl, done
+ *            by the grammar action before calling us)
+ *   initnode the ilist tree built by the existing ilist production --
+ *            same format as a normal variable initialiser
+ *
+ * We mirror exactly what the grammar does for  T name = { ... }:
+ *
+ *   push1(s)          save on dclstack so revertdcl() cleans up at
+ *                     block exit  (C99 §6.5.2.5 p5: lifetime = block)
+ *   adecl(CAUTO,t,s)  assign a frame slot (sets s->offset, stkoff)
+ *   doinit(s,t,0,n)   generate the assignment tree
+ *
+ * Return value:
+ *   init != Z:  OCOMMA(init-tree, ONAME)
+ *               side-effects run first; ONAME is the lvalue on which
+ *               postfix operators ([], ., ->, &, ...) compose normally.
+ *   init == Z:  bare ONAME  (trivially-zero or empty literal)
+ */
+Node*
+compoundlit(Type *t, Node *initnode)
+{
+	static long litseq;
+	char  name[32];
+	Sym  *s;
+	Node *var, *init, *seq;
+	Decl *d;
+
+	/* Unique hidden name; leading '.' follows Plan 9 convention
+	 * (cf. mkvlasym "_vla%ld", fndecls "__func__"). */
+	snprint(name, sizeof name, ".clit%ld", litseq++);
+	s = slookup(name);
+
+	/* Save sym state for revertdcl() at enclosing block exit. */
+	d = push1(s);
+	d->val   = DAUTO;
+	s->aused = 1;		/* suppress "declared and not used" warning */
+
+	/* Assign a stack slot; sets s->class, s->block, s->offset, stkoff. */
+	adecl(CAUTO, t, s);
+
+	/* Build the ONAME node callers and postfix operators will use. */
+	var          = new(ONAME, Z, Z);
+	var->sym     = s;
+	var->type    = t;
+	var->etype   = t->etype;
+	var->xoffset = s->offset;
+	var->class   = CAUTO;
+	var->addable = 1;
+
+	/* Generate assignment tree from the already-parsed ilist. */
+	init = doinit(s, t, 0L, initnode);
+
+	if(init != Z) {
+		seq       = new(OCOMMA, init, var);
+		seq->type = t;
+		return seq;
+	}
+	return var;
+}
+
 Node*
 dodecl(void (*f)(int,Type*,Sym*), int c, Type *t, Node *n)
 {

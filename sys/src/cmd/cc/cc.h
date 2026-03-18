@@ -579,6 +579,7 @@ Type*	tcopy(Type*);
 Node*	init1(Sym*, Type*, long, int);
 Node*	newlist(Node*, Node*);
 void	adecl(int, Type*, Sym*);
+Node*	compoundlit(Type*, Node*);
 int	anyproto(Node*);
 void	argmark(Node*, int);
 void	dbgdecl(Sym*);

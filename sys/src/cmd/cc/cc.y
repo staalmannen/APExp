@@ -672,11 +672,19 @@ xuexpr:
 		$$->type = lastdcl;
 		$$->xcast = 1;
 	}
-|	'(' tlist abdecor ')' '{' ilist '}'	/* extension */
+|	'(' tlist abdecor ')' '{' ilist '}'
 	{
-		$$ = new(OSTRUCT, $6, Z);
+		/* C99 compound literal (§6.5.2.5).
+		 * dodecl resolves tlist+abdecor into lastdcl as usual;
+		 * compoundlit() allocates a hidden auto and calls doinit(). */
 		dodecl(NODECL, CXXX, $2, $3);
-		$$->type = lastdcl;
+		$$ = compoundlit(lastdcl, new(OINIT, invert($6), Z));
+	}
++|	'(' tlist abdecor ')' '{' ilist ',' '}'
+	{
+		/* trailing-comma variant */
+		dodecl(NODECL, CXXX, $2, $3);
+		$$ = compoundlit(lastdcl, new(OINIT, invert($6), Z));
 	}
 
 uexpr:
