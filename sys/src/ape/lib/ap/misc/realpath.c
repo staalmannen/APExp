@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <string.h>
 
+#define __strchrnul strchrnul
+
 static size_t slash_len(const char *s)
 {
 	const char *s0 = s;

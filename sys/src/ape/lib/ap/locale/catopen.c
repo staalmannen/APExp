@@ -7,14 +7,19 @@
 #include <langinfo.h>
 #include <locale.h>
 #include <sys/mman.h>
-#include "musl.h"
+#include "../include/musl.h"
 
 #define V(p) be32toh(*(uint32_t *)(p))
+
+// __map_file in time, uses syscall hack
+extern const char *__map_file(const char *, size_t);
+
+#define __strchrnul strchrnul
 
 static nl_catd do_catopen(const char *name)
 {
 	size_t size;
-	const unsigned char *map = __map_file(name, &size);
+	const unsigned char *map = (const unsigned char *) __map_file(name, size);
 	/* Size recorded in the file must match file size; otherwise
 	 * the information needed to unmap the file will be lost. */
 	if (!map || V(map) != 0xff88ff89 || 20+V(map+8) != size) {

@@ -25,10 +25,6 @@ OFILES=\
 	llabs.$O\
 	qsort_r.$O\
 	qsort_nr.$O\
-	strtod.$O\
-	strtol.$O\
-	strtold.$O\
-	strtof.$O\
 # public domain \
 	alloca.$O
 

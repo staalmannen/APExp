@@ -86,6 +86,7 @@
 #define _POSIX_RE_DUP_MAX       255
 #define _POSIX2_RE_DUP_MAX      255
 #define _SC_RE_DUP_MAX	44
+#define SYMLOOP_MAX 40
 
 
 /* some things are just too big for pedagogy (X!) */

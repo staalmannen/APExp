@@ -1,6 +1,8 @@
 #ifndef	__UNISTD_H
 #define	__UNISTD_H
 
+#include <sys/types.h>
+
 #pragma lib "/$M/lib/ape/libap.a"
 
 #define _POSIX_VERSION	199309L
@@ -93,9 +95,7 @@ extern _Noreturn void _exit(int);
 extern unsigned int alarm(unsigned int);
 extern int pause(void);
 extern unsigned int sleep(unsigned int);
-#ifdef __TYPES_H
 extern pid_t fork(void);
-#endif
 
 /* process environment */
 extern char *getlogin(void);
@@ -103,7 +103,6 @@ extern char *cuserid(char *);
 extern char *ttyname(int);
 extern int isatty(int);
 extern long sysconf(int);
-#ifdef __TYPES_H
 extern pid_t getpid(void);
 extern pid_t getppid(void);
 extern uid_t getuid(void);
@@ -117,7 +116,6 @@ extern pid_t getpgrp(void);
 extern int getpgid(pid_t);
 extern int setpgid(pid_t, pid_t);
 extern pid_t setsid(void);
-#endif
 
 /* files and directories */
 extern int chdir(const char *);
@@ -131,9 +129,7 @@ extern int access(const char *, int);
 extern long pathconf(const char *, int);
 extern long fpathconf(int, int);
 extern int fchdir(int);
-#ifdef __TYPES_H
 extern int chown(const char *, uid_t, gid_t);
-#endif
 
 
 /* input and output primitives */
@@ -143,32 +139,26 @@ extern int dup2(int, int);
 extern int close(int);
 extern ssize_t read(int, void *, size_t);
 extern ssize_t write(int, const void *, size_t);
-#ifdef __TYPES_H
 extern int ftruncate(int, off_t);
 extern off_t lseek(int, off_t, int);
 
 extern ssize_t pread(int, void *, size_t, off_t);
 extern ssize_t pwrite(int, const void *, size_t, off_t);
-#endif
 
 /* device- and class-specific functions */
-#ifdef __TYPES_H
 extern pid_t tcgetpgrp(int);
 extern int tcsetpgrp(int, pid_t);
-#endif
 
-#ifdef _REENTRANT_SOURCE
 extern char *getlogin_r(char *, int);
-#endif
 
 /* berkeley specific functions */
-#ifdef _BSD_EXTENSION
 #include <bsd.h>
 
 extern int getpagesize(void);
-#endif
-
 extern int gethostname(char *, size_t);
+
+/* stubs and hacks */
+# include <sys/stat.h> /* readlink */
 
 #ifdef __cplusplus
 }

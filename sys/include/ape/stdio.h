@@ -39,6 +39,41 @@ typedef struct{
 	size_t bufl;	/* actual length of buffer */
 	char unbuf[1];	/* tiny buffer for unbuffered io (used for ungetc?) */
 }FILE;
+
+/* 	copied _IO_FILE from musl stdio_impl and renamed.
+	some musl functions expect a lot of stuff in the FILE struct */
+
+typedef struct {
+	unsigned flags;
+	unsigned char *rpos, *rend;
+	int (*close)(FILE *);
+	unsigned char *wend, *wpos;
+	unsigned char *mustbezero_1;
+	unsigned char *wbase;
+	size_t (*read)(FILE *, unsigned char *, size_t);
+	size_t (*write)(FILE *, const unsigned char *, size_t);
+	off_t (*seek)(FILE *, off_t, int);
+	unsigned char *buf;
+	size_t buf_size;
+	FILE *prev, *next;
+	int fd;
+	int pipe_pid;
+	long lockcount;
+	int mode;
+	volatile int lock;
+	int lbf;
+	void *cookie;
+	off_t off;
+	char *getln_buf;
+	void *mustbezero_2;
+	unsigned char *shend;
+	off_t shlim, shcnt;
+	FILE *prev_locked, *next_locked;
+	struct __locale_struct *locale;
+}_MUSL_FILE;
+
+
+
 typedef long long fpos_t;
 #ifndef NULL
 #ifdef __cplusplus
@@ -143,13 +178,11 @@ extern int	pclose(FILE *);
 extern int asprintf(char**, const char *, ...);
 extern int vasprintf(char **, const char *, va_list);
 
-/* from gnulib et al */
+extern _MUSL_FILE *fmemopen(void *, size_t, const char *);
+extern _MUSL_FILE *open_memstream(char **, size_t *);
 
-// extern char *asnprintf(char *, size_t, const char *, ...);
-extern FILE *fmemopen(void *, size_t, const char *);
-extern ssize_t getdelim(char **restrict, size_t *restrict, int, FILE *restrict);
-extern ssize_t getline (char **restrict, size_t *restrict, FILE *restrict);
-// extern char *vasnprintf(char **, size_t *, char *, va_list);
+extern ssize_t getdelim(char **, size_t *, int, FILE *);
+extern ssize_t getline (char **, size_t *, FILE *);
 
 
 #ifdef __cplusplus

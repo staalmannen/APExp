@@ -44,18 +44,26 @@ DIRS= conf\
 default:V:	all
 
 install all:V:
-	for(i in $DIRS arch/$objtype)@{
+	for(i in $DIRS)@{
 		echo $i
 		cd $i
 		mk $MKFLAGS $target
 	}
+	for(j in $objtype)@{
+		echo arch/$j
+		cd arch/$j
+		mk $MKFLAGS $target
+	}
+
 
 installall:V:
-	for(objtype in $CPUS) mk $MKFLAGS install
+	for(objtype in $CPUS)@{
+		mk $MKFLAGS install
+	}
 
 
 clean nuke:V:
-	for(i in $DIRS arch/$CPUS)@{
+	for(i in $DIRS)@{
 		echo $i
 		cd $i
 		mk $MKFLAGS $target

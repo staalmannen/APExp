@@ -35,7 +35,7 @@ OFILES=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-c $CFLAGS -D_POSIX_SOURCE -D_PLAN9_SOURCE
+CFLAGS=-c $CFLAGS -D_POSIX_SOURCE -D_PLAN9_SOURCE -I.
 
 %.0:	mips/%.s
 	$AS $prereq

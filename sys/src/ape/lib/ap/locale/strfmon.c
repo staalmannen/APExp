@@ -5,6 +5,7 @@
 #include <errno.h>
 #include "locale_impl.h"
 
+
 static ssize_t vstrfmon_l(char *s, size_t n, locale_t loc, const char *fmt, va_list ap)
 {
 	size_t l;
@@ -75,7 +76,7 @@ static ssize_t vstrfmon_l(char *s, size_t n, locale_t loc, const char *fmt, va_l
 	return s-s0;
 }
 
-ssize_t strfmon_l(char *restrict s, size_t n, locale_t loc, const char *restrict fmt, ...)
+ssize_t strfmon_l(char *s, size_t n, locale_t loc, const char *fmt, ...)
 {
 	va_list ap;
 	ssize_t ret;
@@ -88,13 +89,16 @@ ssize_t strfmon_l(char *restrict s, size_t n, locale_t loc, const char *restrict
 }
 
 
-ssize_t strfmon(char *restrict s, size_t n, const char *restrict fmt, ...)
+ssize_t strfmon(char *s, size_t n, const char *fmt, ...)
 {
 	va_list ap;
 	ssize_t ret;
 
+// TODO: figure out how to set this to "UTF-8"
+	locale_t loc;
+
 	va_start(ap, fmt);
-	ret = vstrfmon_l(s, n, CURRENT_LOCALE, fmt, ap);
+	ret = vstrfmon_l(s, n, loc, fmt, ap);
 	va_end(ap);
 
 	return ret;

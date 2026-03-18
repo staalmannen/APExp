@@ -56,10 +56,12 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 extern char *mktemp(char *);
 extern int mkstemp(char *template);
 
-#define realpath(x, y) x
-
 /* from musl */
 typedef struct { long long quot, rem; } lldiv_t;
+extern int clearenv(void);
+extern int setenv(const char *, const char *, int);
+extern int unsetenv(const char *);
+extern char *realpath(const char *, char *);
 
 #ifdef __cplusplus
 }

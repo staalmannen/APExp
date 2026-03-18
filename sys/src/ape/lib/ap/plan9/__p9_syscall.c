@@ -35,14 +35,6 @@
 #include <time.h>
 #include <signal.h>
 
-/* nfds_t: POSIX type for poll() fd count. APE does not define this
- * in its poll headers; unsigned int is correct per POSIX (it must
- * be able to represent any non-negative fd count). */
-#ifndef _NFDS_T_DEFINED
-#define _NFDS_T_DEFINED
-typedef unsigned int nfds_t;
-#endif
-
 /* ------------------------------------------------------------------ */
 /* Internal helpers                                                    */
 /* ------------------------------------------------------------------ */

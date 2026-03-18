@@ -2,6 +2,7 @@
 #define __LOCALE
 #pragma lib "/$M/lib/ape/libap.a"
 
+#include <alltypes.h>
 #include <stddef.h>
 #include <langinfo.h>
 
@@ -42,6 +43,21 @@ extern struct lconv *localeconv(void);
 
 /* from gnulib */
 #define LC_MESSAGES 1729
+
+/* from musl */
+#include <nl_types.h>
+extern int catclose(nl_catd);
+extern int cmp(void,void);
+extern char *catgets(nl_catd, int, int, const char *);
+extern nl_catd catopen(const char *, int);
+static ssize_t vstrfmon_l(char *, size_t, locale_t, const char *, va_list);
+extern ssize_t strfmon_l(char *, size_t, locale_t, const char *, ...);
+extern ssize_t strfmon(char *, size_t, const char *, ...);
+extern float strtof_l(const char *, char **, locale_t);
+extern double strtod_l(const char *, char **, locale_t);
+extern long double strtold_l(const char *, char **, locale_t);
+
+
 
 
 #ifdef __cplusplus

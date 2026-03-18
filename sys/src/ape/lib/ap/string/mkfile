@@ -56,7 +56,10 @@ OFILES=\
 	strverscmp.$O\
 	strtok_r.$O\
 	stpcpy.$O\
-	stpncpy.$O
+	stpncpy.$O\
+	strtod.$O\
+	strtold.$O\
+	strtof.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
