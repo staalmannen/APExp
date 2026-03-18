@@ -176,26 +176,40 @@ extern long __p9_syscall(long n, long a1, long a2, long a3,
                          long a4, long a5, long a6);
 
 /* ------------------------------------------------------------------ */
-/* __syscall variadic macro                                            */
+/* __syscall numbered macros                                           */
 /*                                                                     */
-/* Pads missing arguments with 0 so __p9_syscall always gets 6 args.  */
-/* The ## before __VA_ARGS__ suppresses the comma when args is empty.  */
+/* We do not use a variadic __syscall() macro because the             */
+/* ## __VA_ARGS__ GNU extension for comma suppression is not          */
+/* supported by Plan9's APE compiler.                                 */
+/*                                                                     */
+/* Instead, musl call sites use the explicit __syscallN() forms.      */
+/* __syscall() itself is defined as __syscall6 with explicit zeros    */
+/* so that any remaining uses still compile.                          */
 /* ------------------------------------------------------------------ */
-#define __syscall(n, ...) \
-	__p9_syscall((long)(n), ##__VA_ARGS__, 0L, 0L, 0L, 0L, 0L, 0L)
+#define __syscall0(n) \
+	__p9_syscall((long)(n),0L,0L,0L,0L,0L,0L)
+#define __syscall1(n,a) \
+	__p9_syscall((long)(n),(long)(a),0L,0L,0L,0L,0L)
+#define __syscall2(n,a,b) \
+	__p9_syscall((long)(n),(long)(a),(long)(b),0L,0L,0L,0L)
+#define __syscall3(n,a,b,c) \
+	__p9_syscall((long)(n),(long)(a),(long)(b),(long)(c),0L,0L,0L)
+#define __syscall4(n,a,b,c,d) \
+	__p9_syscall((long)(n),(long)(a),(long)(b),(long)(c),(long)(d),0L,0L)
+#define __syscall5(n,a,b,c,d,e) \
+	__p9_syscall((long)(n),(long)(a),(long)(b),(long)(c),(long)(d),(long)(e),0L)
+#define __syscall6(n,a,b,c,d,e,f) \
+	__p9_syscall((long)(n),(long)(a),(long)(b),(long)(c),(long)(d),(long)(e),(long)(f))
 
-#define syscall(n, ...) \
-	__syscall_ret((unsigned long)__syscall((n), ##__VA_ARGS__))
+/* __syscall() with explicit 6-arg form — avoids variadic macros entirely.
+ * Call sites that use __syscall(n) with fewer than 6 args should be
+ * changed to use the appropriate __syscallN() form instead. */
+#define __syscall(n,a,b,c,d,e,f) \
+	__p9_syscall((long)(n),(long)(a),(long)(b),(long)(c),(long)(d),(long)(e),(long)(f))
 
-/* ------------------------------------------------------------------ */
-/* Convenience typed wrappers used by some musl internals              */
-/* ------------------------------------------------------------------ */
-#define __syscall1(n,a)         __p9_syscall((long)(n),(long)(a),0,0,0,0,0)
-#define __syscall2(n,a,b)       __p9_syscall((long)(n),(long)(a),(long)(b),0,0,0,0)
-#define __syscall3(n,a,b,c)     __p9_syscall((long)(n),(long)(a),(long)(b),(long)(c),0,0,0)
-#define __syscall4(n,a,b,c,d)   __p9_syscall((long)(n),(long)(a),(long)(b),(long)(c),(long)(d),0,0)
-#define __syscall5(n,a,b,c,d,e) __p9_syscall((long)(n),(long)(a),(long)(b),(long)(c),(long)(d),(long)(e),0)
-#define __syscall6(n,a,b,c,d,e,f) __p9_syscall((long)(n),(long)(a),(long)(b),(long)(c),(long)(d),(long)(e),(long)(f))
+/* syscall() public interface — also explicit 6-arg to avoid ## __VA_ARGS__ */
+#define syscall(n,a,b,c,d,e,f) \
+	__syscall_ret((unsigned long)__syscall((n),(a),(b),(c),(d),(e),(f)))
 
 #ifdef __cplusplus
 }
