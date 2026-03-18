@@ -1320,6 +1320,14 @@ struct
 	"__pure__",		LNAME,		0,
 	"__nonnull__",		LNAME,		0,
 
+	/*
+	 * C99 _Complex and _Imaginary.
+	 * Also accept GCC's __complex__ spelling.
+	 */
+	"_Complex",		LCOMPLEX,	0,
+	"__complex__",		LCOMPLEX,	0,
+	"_Imaginary",		LIMAGINARY,	0,
+
 	0
 };
 

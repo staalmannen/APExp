@@ -64,7 +64,7 @@
 %token	LIF LINT LLONG LREGISTER LRETURN LSHORT LSIZEOF LUSED
 %token	LSTATIC LSTRUCT LSWITCH LTYPEDEF LTYPESTR LUNION LUNSIGNED
 %token	LWHILE LVOID LENUM LSIGNED LCONSTNT LVOLATILE LSET LSIGNOF
-%token	LRESTRICT LINLINE LNORET LDOTDOTDOT
+%token	LRESTRICT LINLINE LNORET LDOTDOTDOT LCOMPLEX LIMAGINARY
 %%
 prog:
 |	prog xdecl
@@ -1093,6 +1093,45 @@ complex:
 |	LTYPE
 	{
 		$$ = tcopy($1->type);
+	}
+|	LCOMPLEX
+	{
+		/* bare _Complex defaults to _Complex double */
+		$$ = types[TCDOUBLE];
+	}
+|	LCOMPLEX LDOUBLE
+	{
+		$$ = types[TCDOUBLE];
+	}
+|	LCOMPLEX LFLOAT
+	{
+		$$ = types[TCFLOAT];
+	}
+|	LCOMPLEX LINT
+	{
+		/* _Complex int: not required by C99 but accepted; map to double */
+		$$ = types[TCDOUBLE];
+	}
+|	LDOUBLE LCOMPLEX
+	{
+		$$ = types[TCDOUBLE];
+	}
+|	LFLOAT LCOMPLEX
+	{
+		$$ = types[TCFLOAT];
+	}
+|	LIMAGINARY
+	{
+		/* _Imaginary: treat as _Complex double */
+		$$ = types[TCDOUBLE];
+	}
+|	LIMAGINARY LDOUBLE
+	{
+		$$ = types[TCDOUBLE];
+	}
+|	LIMAGINARY LFLOAT
+	{
+		$$ = types[TCFLOAT];
 	}
 
 gctnlist:

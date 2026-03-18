@@ -12,6 +12,7 @@ OFILES=\
 	pickle.$O\
 	bits.$O\
 	com.$O\
+	cmplx.$O\
 	scon.$O\
 	funct.$O\
 	sub.$O\

@@ -322,6 +322,11 @@ enum
 	TDOT,
 	NTYPE,
 
+	/* C99 complex number types */
+	TCFLOAT		= NTYPE,	/* float _Complex  (2 floats,  8 bytes) */
+	TCDOUBLE,			/* double _Complex (2 doubles, 16 bytes) */
+	NCTYPE,				/* total type codes including complex */
+
 	TAUTO	= NTYPE,
 	TEXTERN,
 	TSTATIC,
@@ -469,7 +474,7 @@ EXTERN	int	thechar;
 EXTERN	char*	thestring;
 EXTERN	Type*	thisfn;
 EXTERN	Node*	thisfnnode;
-EXTERN	Type*	types[NTYPE];
+EXTERN	Type*	types[NCTYPE];		/* extended to hold TCFLOAT, TCDOUBLE */
 EXTERN	Type*	fntypes[NTYPE];
 EXTERN	Node*	initlist;
 EXTERN	Term	term[NTERM];
@@ -513,7 +518,18 @@ extern	char	typechlpfd[];
 
 EXTERN	char*	typeswitch;
 EXTERN	char*	typeword;
-EXTERN	char*	typecmplx;
+EXTERN	char*	typecmplx;		/* points into typesuv; covers TCFLOAT/TCDOUBLE too */
+EXTERN	char	typecmplxv[NCTYPE];	/* separate predicate: only TCFLOAT and TCDOUBLE */
+
+#define	iscmplx(et)	((et) == TCFLOAT || (et) == TCDOUBLE)
+
+/* C99 _Complex support — cmplx.c */
+Type*	cplxbase(int);		/* TCFLOAT->types[TFLOAT], TCDOUBLE->types[TDOUBLE] */
+Type*	mkcplxtype(int);	/* given real or complex etype, return complex type */
+Node*	cplxre(Node*);		/* lvalue node for real component */
+Node*	cplxim(Node*);		/* lvalue node for imaginary component */
+Node*	cplxcast(Node*, Type*);	/* promote real node to complex, or recast */
+void	cplxarith(Node*);	/* expand complex arithmetic node in-place */
 
 extern	ulong	thash1;
 extern	ulong	thash2;

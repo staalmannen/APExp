@@ -107,6 +107,20 @@ tcomo(Node *n, int f)
 				goto bad;
 		if(isfunct(n))
 			break;
+		if(iscmplx(n->type->etype)) {
+			/* cast to complex type: promote operand */
+			Node *c = cplxcast(l, n->type);
+			*n = *c;
+			break;
+		}
+		if(l->type != T && iscmplx(l->type->etype)) {
+			/* cast from complex to real: extract real part */
+			Node *re = cplxre(l);
+			Node *cast = new1(OCAST, re, Z);
+			cast->type = n->type;
+			*n = *cast;
+			break;
+		}
 		if(tcompat(n, l->type, n->type, tcast))
 			goto bad;
 		break;
@@ -155,6 +169,13 @@ tcomo(Node *n, int f)
 			goto bad;
 		if(isfunct(n))
 			break;
+		if(iscmplx(l->type->etype) && !iscmplx(r->type->etype)) {
+			/* assigning real value to complex variable: promote rhs */
+			r = cplxcast(r, l->type);
+			n->right = r;
+			n->type = l->type;
+			break;
+		}
 		typeext(l->type, r);
 		if(tcompat(n, l->type, r->type, tasign))
 			goto bad;
@@ -176,6 +197,11 @@ tcomo(Node *n, int f)
 			goto bad;
 		if(isfunct(n))
 			break;
+		if(iscmplx(l->type->etype)) {
+			n->type = l->type;
+			cplxarith(n);
+			break;
+		}
 		typeext1(l->type, r);
 		if(tcompat(n, l->type, r->type, tasadd))
 			goto bad;
@@ -206,6 +232,14 @@ tcomo(Node *n, int f)
 			goto bad;
 		if(isfunct(n))
 			break;
+		if(iscmplx(l->type->etype)) {
+			n->type = l->type;
+			if(n->op == OASMUL || n->op == OASDIV)
+				cplxarith(n);
+			else
+				diag(n, "complex ldiv/lmul not supported");
+			break;
+		}
 		typeext1(l->type, r);
 		if(tcompat(n, l->type, r->type, tmul))
 			goto bad;
@@ -315,6 +349,12 @@ tcomo(Node *n, int f)
 			goto bad;
 		if(isfunct(n))
 			break;
+		if(iscmplx(l->type->etype) || iscmplx(r->type->etype)) {
+			n->type = mkcplxtype(iscmplx(l->type->etype) ? l->type->etype : r->type->etype);
+			cplxarith(n);
+			n->type = types[TINT];
+			break;
+		}
 		typeext(l->type, r);
 		typeext(r->type, l);
 		if(tcompat(n, l->type, r->type, trel))
@@ -374,6 +414,11 @@ tcomo(Node *n, int f)
 			goto bad;
 		if(isfunct(n))
 			break;
+		if(iscmplx(l->type->etype) || iscmplx(r->type->etype)) {
+			n->type = mkcplxtype(iscmplx(l->type->etype) ? l->type->etype : r->type->etype);
+			cplxarith(n);
+			break;
+		}
 		if(tcompat(n, l->type, r->type, tadd))
 			goto bad;
 		arith(n, 1);
@@ -385,6 +430,11 @@ tcomo(Node *n, int f)
 			goto bad;
 		if(isfunct(n))
 			break;
+		if(iscmplx(l->type->etype) || iscmplx(r->type->etype)) {
+			n->type = mkcplxtype(iscmplx(l->type->etype) ? l->type->etype : r->type->etype);
+			cplxarith(n);
+			break;
+		}
 		if(tcompat(n, l->type, r->type, tsub))
 			goto bad;
 		arith(n, 1);
@@ -399,6 +449,11 @@ tcomo(Node *n, int f)
 			goto bad;
 		if(isfunct(n))
 			break;
+		if(iscmplx(l->type->etype) || iscmplx(r->type->etype)) {
+			n->type = mkcplxtype(iscmplx(l->type->etype) ? l->type->etype : r->type->etype);
+			cplxarith(n);
+			break;
+		}
 		if(tcompat(n, l->type, r->type, tmul))
 			goto bad;
 		arith(n, 1);
@@ -482,7 +537,11 @@ tcomo(Node *n, int f)
 			goto bad;
 		if(isfunct(n))
 			break;
-
+		if(iscmplx(l->type->etype)) {
+			n->type = l->type;
+			cplxarith(n);
+			break;
+		}
 		if(!machcap(n)) {
 			r = l;
 			l = new(OCONST, Z, Z);

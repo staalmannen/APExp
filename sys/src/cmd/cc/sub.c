@@ -1597,10 +1597,10 @@ int	typeuinit[] =
 	TUCHAR, TUSHORT, TUINT, TULONG, TUVLONG, TIND, -1,
 };
 
-char	typesuv[NTYPE];
+char	typesuv[NCTYPE];
 int	typesuvinit[] =
 {
-	TVLONG, TUVLONG, TSTRUCT, TUNION, -1,
+	TVLONG, TUVLONG, TSTRUCT, TUNION, TCFLOAT, TCDOUBLE, -1,
 };
 
 char	typeilp[NTYPE];
@@ -1653,10 +1653,10 @@ int	typevinit[] =
 	TVLONG,	TUVLONG, -1,
 };
 
-char	typefd[NTYPE];
+char	typefd[NCTYPE];
 int	typefdinit[] =
 {
-	TFLOAT, TDOUBLE, -1,
+	TFLOAT, TDOUBLE, TCFLOAT, TCDOUBLE, -1,
 };
 
 char	typeaf[NTYPE];
@@ -2036,6 +2036,46 @@ tinit(void)
 	typeword = typechlp;
 	typeswitch = typechl;
 	typecmplx = typesuv;
+
+	/*
+	 * C99 complex number types.
+	 * Layout: two consecutive base floats ({re, im}).
+	 * typesuvinit[] includes TCFLOAT/TCDOUBLE so pgen.c uses the
+	 * hidden-pointer return ABI for complex-returning functions.
+	 */
+	types[TCFLOAT] = alloc(sizeof(*types[TCFLOAT]));
+	types[TCFLOAT]->etype = TCFLOAT;
+	types[TCFLOAT]->width = 2 * ewidth[TFLOAT];
+
+	types[TCDOUBLE] = alloc(sizeof(*types[TCDOUBLE]));
+	types[TCDOUBLE]->etype = TCDOUBLE;
+	types[TCDOUBLE]->width = 2 * ewidth[TDOUBLE];
+
+	/* fill in the separate iscmplx() predicate array */
+	typecmplxv[TCFLOAT]  = 1;
+	typecmplxv[TCDOUBLE] = 1;
+}
+
+/*
+ * cplxbase: return the real base type for a complex etype.
+ */
+Type*
+cplxbase(int etype)
+{
+	if(etype == TCFLOAT)
+		return types[TFLOAT];
+	return types[TDOUBLE];
+}
+
+/*
+ * mkcplxtype: given a real or complex etype, return the complex type.
+ */
+Type*
+mkcplxtype(int etype)
+{
+	if(etype == TFLOAT || etype == TCFLOAT)
+		return types[TCFLOAT];
+	return types[TCDOUBLE];
 }
 
 /*
