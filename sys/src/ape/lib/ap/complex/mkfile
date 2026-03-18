@@ -1,0 +1,80 @@
+APEXPROOT=../../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+OFILES=\
+	__cexp.$O\
+	__cexpf.$O\
+	cabs.$O\
+	cabsf.$O\
+	cabsl.$O\
+	cacos.$O\
+	cacosf.$O\
+	cacosh.$O\
+	cacoshf.$O\
+	cacoshl.$O\
+	cacosl.$O\
+	carg.$O\
+	cargf.$O\
+	cargl.$O\
+	casin.$O\
+	casinf.$O\
+	casinh.$O\
+	casinhf.$O\
+	casinhl.$O\
+	casinl.$O\
+	catan.$O\
+	catanf.$O\
+	catanh.$O\
+	catanhf.$O\
+	catanhl.$O\
+	catanl.$O\
+	ccos.$O\
+	ccosf.$O\
+	ccosh.$O\
+	ccoshf.$O\
+	ccoshl.$O\
+	ccosl.$O\
+	cexp.$O\
+	cexpf.$O\
+	cexpl.$O\
+	cimag.$O\
+	cimagf.$O\
+	cimagl.$O\
+	clog.$O\
+	clogf.$O\
+	clogl.$O\
+	conj.$O\
+	conjf.$O\
+	conjl.$O\
+	cpow.$O\
+	cpowf.$O\
+	cpowl.$O\
+	cproj.$O\
+	cprojf.$O\
+	cprojl.$O\
+	creal.$O\
+	crealf.$O\
+	creall.$O\
+	csin.$O\
+	csinf.$O\
+	csinh.$O\
+	csinhf.$O\
+	csinhl.$O\
+	csinl.$O\
+	csqrt.$O\
+	csqrtf.$O\
+	csqrtl.$O\
+	ctan.$O\
+	ctanf.$O\
+	ctanh.$O\
+	ctanhf.$O\
+	ctanhl.$O\
+	ctanl.$O\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape \
+	-I$APEXPROOT/$objtype/include/ape\
+	-D_POSIX_SOURCE -D_BSD_EXTENSION -D_PLAN9_SOURCE\
+	-I../plan9 -I../include
