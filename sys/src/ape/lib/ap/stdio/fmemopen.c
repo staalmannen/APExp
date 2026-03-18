@@ -13,7 +13,7 @@ struct cookie {
 };
 
 #undef FILE
-#define FILE _IO_FILE
+#define FILE _MUSL_FILE
 
 struct mem_FILE {
 	FILE f;
@@ -25,13 +25,18 @@ static off_t mseek(FILE *f, off_t off, int whence)
 {
 	ssize_t base;
 	struct cookie *c = f->cookie;
-	if (whence>2U) {
-fail:
+	switch (whence) {
+	case SEEK_SET: base = 0;       break;
+	case SEEK_CUR: base = c->pos;  break;
+	case SEEK_END: base = c->len;  break;
+	default:
 		errno = EINVAL;
 		return -1;
 	}
-	base = (size_t [3]){0, c->pos, c->len}[whence];
-	if (off < -base || off > (ssize_t)c->size-base) goto fail;
+	if (off < -base || off > (ssize_t)c->size-base) {
+		errno = EINVAL;
+		return -1;
+	}
 	return c->pos = base+off;
 }
 

@@ -1,12 +1,9 @@
-#include "../include/stdio_impl.h"
+#include "stdio_impl.h"
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
 #include <stdlib.h>
-#include "../include/musl.h"
-
-#undef FILE
-#define FILE _IO_FILE
+#include "libc.h"
 
 struct cookie {
 	char **bufp;
@@ -27,13 +24,18 @@ static off_t ms_seek(FILE *f, off_t off, int whence)
 {
 	ssize_t base;
 	struct cookie *c = f->cookie;
-	if (whence>2U) {
-fail:
+	switch (whence) {
+	case SEEK_SET: base = 0;       break;
+	case SEEK_CUR: base = c->pos;  break;
+	case SEEK_END: base = c->len;  break;
+	default:
 		errno = EINVAL;
 		return -1;
 	}
-	base = (size_t [3]){0, c->pos, c->len}[whence];
-	if (off < -base || off > SSIZE_MAX-base) goto fail;
+	if (off < -base || off > SSIZE_MAX-base) {
+		errno = EINVAL;
+		return -1;
+	}
 	return c->pos = base+off;
 }
 
