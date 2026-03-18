@@ -83,7 +83,8 @@ cplxim(Node *n)
 	pt = typ(TIND, bt);
 	addr = new(OADDR, n, Z);
 	addr->type = pt;
-	off = nodconst(bt->width);
+	off = new(OCONST, Z, Z);
+	off->vconst = bt->width;
 	off->type = types[TLONG];
 	add = new(OADD, addr, off);
 	add->type = pt;
