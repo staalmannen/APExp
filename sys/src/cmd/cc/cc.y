@@ -969,7 +969,7 @@ types:
 	}
 |	tname LCOMPLEXD
 	{
-		/* e.g. long double _Complex after "long double" reduced to tname */
+		/* e.g. double _Complex after "double" reduced to tname */
 		$$.t = types[TCDOUBLE];
 		$$.c = CXXX;
 	}
@@ -977,6 +977,17 @@ types:
 	{
 		$$.t = types[TCFLOAT];
 		$$.c = CXXX;
+	}
+|	tname gctnlist LCOMPLEXD
+	{
+		/* e.g. long double _Complex: tname=long, gctnlist=double, LCOMPLEXD */
+		$$.t = types[TCDOUBLE];
+		$$.c = simplec($2);
+	}
+|	tname gctnlist LCOMPLEXF
+	{
+		$$.t = types[TCFLOAT];
+		$$.c = simplec($2);
 	}
 |	gcnlist complex zgnlist
 	{
@@ -995,6 +1006,26 @@ types:
 		$$.t = simplet(typebitor($2, $3));
 		$$.c = simplec($1|$3);
 		$$.t = garbt($$.t, $1|$3);
+	}
+|	gcnlist tname gctnlist LCOMPLEXD
+	{
+		$$.t = types[TCDOUBLE];
+		$$.c = simplec($1|$3);
+	}
+|	gcnlist tname gctnlist LCOMPLEXF
+	{
+		$$.t = types[TCFLOAT];
+		$$.c = simplec($1|$3);
+	}
+|	gcnlist tname LCOMPLEXD
+	{
+		$$.t = types[TCDOUBLE];
+		$$.c = simplec($1);
+	}
+|	gcnlist tname LCOMPLEXF
+	{
+		$$.t = types[TCFLOAT];
+		$$.c = simplec($1);
 	}
 
 tlist:
