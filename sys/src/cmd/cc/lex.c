@@ -815,8 +815,6 @@ talph:
 	    strcmp(s->name, "__extension__") == 0 ||
 	    strcmp(s->name, "__asm__")       == 0 ||
 	    strcmp(s->name, "__asm")         == 0 ||
-	    strcmp(s->name, "asm")           == 0 ||
-	    strcmp(s->name, "typeof")        == 0 ||
 	    strcmp(s->name, "__typeof")      == 0 ||
 	    strcmp(s->name, "__typeof__")    == 0 ||
 	    strcmp(s->name, "__alignof__")   == 0 ||
@@ -840,7 +838,9 @@ talph:
 			/* no argument list (e.g. bare __extension__); put char back */
 			unget(ac);
 		}
-		lasttok = 0;
+		/* Do NOT reset lasttok here: the swallowed keyword is invisible
+		 * to the parser, so the previous type keyword (e.g. LDOUBLE before
+		 * __asm__("sym") _Complex) must still be visible for _Complex combining. */
 		goto l0;	/* fetch next real token */
 	}
 	/*
@@ -1384,13 +1384,14 @@ struct
 	"__extension__",	LNAME,		0,
 
 	/*
-	 * __asm__ / asm / __asm: inline assembly specifier used as a
+	 * __asm__ / __asm: inline assembly specifier used as a
 	 * function or variable qualifier, e.g.:
 	 *   int foo(void) __asm__("_foo");
 	 *   extern int errno __asm__("errno");
 	 * Registered as LNAME; yylex() swallows the argument list.
+	 * Note: bare "asm" is NOT listed here — it may be used as an
+	 * identifier in C89 code and must not be treated as a keyword.
 	 */
-	"asm",			LNAME,		0,
 	"__asm",		LNAME,		0,
 	"__asm__",		LNAME,		0,
 
@@ -1402,10 +1403,11 @@ struct
 	"_Thread_local",	LNAME,		0,
 
 	/*
-	 * typeof / __typeof__ / __typeof: GCC type-of extension.
+	 * __typeof__ / __typeof: GCC type-of extension.
 	 * Registered as LNAME; yylex() swallows the argument list.
+	 * Note: bare "typeof" is NOT listed — it may be a valid identifier
+	 * in C89 code.
 	 */
-	"typeof",		LNAME,		0,
 	"__typeof",		LNAME,		0,
 	"__typeof__",		LNAME,		0,
 
