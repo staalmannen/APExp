@@ -21,54 +21,16 @@ typedef _Complex double	double_complex;
 
 /*
  * CMPLX: construct a complex value from real and imaginary parts.
- *
- * We cannot use compound literals here (designated initialisers are
- * not supported).  Instead we write to the two halves of the value
- * via a hidden auto, using the component-access pointer trick.
- * This expands to a comma-expression that is valid in any expression
- * context including return statements.
- *
- * The __cmplx_tmp variable is declared inside the macro expansion;
- * each use gets its own unique scope via a statement-expression-like
- * trick using the fact that our creal/cimag macros work on lvalues.
+ * Implemented as library functions to avoid compound literals.
  */
-#define __CMPLX(x, y, t) \
-	( creal( *(_Complex t*)&( (_Complex t){ (t)(x), (t)(y) } ) ) , \
-	  *(_Complex t*)&( (_Complex t){ (t)(x), (t)(y) } ) )
+extern double_complex	__plan9_cmplx(double, double);
+extern float_complex	__plan9_cmplxf(float, float);
 
-/* Simpler form that works without compound literals or designated inits:
- * construct via real assignment. Since _Complex T z = re + im*I requires I,
- * and I requires _Complex_I, define them in terms of each other carefully. */
+#define CMPLX(x,y)	__plan9_cmplx((double)(x), (double)(y))
+#define CMPLXF(x,y)	__plan9_cmplxf((float)(x), (float)(y))
+#define CMPLXL(x,y)	__plan9_cmplx((double)(x), (double)(y))
 
-/*
- * __CMPLXD / __CMPLXF: implemented as inline functions to avoid
- * compound literal issues. Declared here; the compiler sees them as
- * ordinary function calls which return a complex value by hidden pointer.
- */
-static inline double_complex __builtin_cmplx(double re, double im)
-{
-	double_complex z;
-	*(double*)&z = re;
-	*((double*)&z+1) = im;
-	return z;
-}
-static inline float_complex __builtin_cmplxf(float re, float im)
-{
-	float_complex z;
-	*(float*)&z = re;
-	*((float*)&z+1) = im;
-	return z;
-}
-
-#define CMPLX(x,y)	__builtin_cmplx((double)(x), (double)(y))
-#define CMPLXF(x,y)	__builtin_cmplxf((float)(x), (float)(y))
-#define CMPLXL(x,y)	__builtin_cmplx((double)(x), (double)(y))
-
-/*
- * _Complex_I: the imaginary unit 0+1i, built via the same helper.
- * Must be defined AFTER __builtin_cmplx.
- */
-#define	_Complex_I	__builtin_cmplx(0.0, 1.0)
+#define	_Complex_I	__plan9_cmplx(0.0, 1.0)
 #define	I		_Complex_I
 
 /* libm prototypes */

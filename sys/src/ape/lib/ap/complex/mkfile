@@ -2,7 +2,9 @@ APEXPROOT=../../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+
 OFILES=\
+	plan9_cmplx.$O\
 	__cexp.$O\
 	__cexpf.$O\
 	cabs.$O\
