@@ -64,7 +64,7 @@
 %token	LIF LINT LLONG LREGISTER LRETURN LSHORT LSIZEOF LUSED
 %token	LSTATIC LSTRUCT LSWITCH LTYPEDEF LTYPESTR LUNION LUNSIGNED
 %token	LWHILE LVOID LENUM LSIGNED LCONSTNT LVOLATILE LSET LSIGNOF
-%token	LRESTRICT LINLINE LNORET LDOTDOTDOT LCOMPLEX LIMAGINARY
+%token	LRESTRICT LINLINE LNORET LDOTDOTDOT LCOMPLEX LIMAGINARY LCOMPLEXF LCOMPLEXD
 %%
 prog:
 |	prog xdecl
@@ -680,7 +680,7 @@ xuexpr:
 		dodecl(NODECL, CXXX, $2, $3);
 		$$ = compoundlit(lastdcl, new(OINIT, invert($6), Z));
 	}
-|	'(' tlist abdecor ')' '{' ilist ',' '}'
++|	'(' tlist abdecor ')' '{' ilist ',' '}'
 	{
 		/* trailing-comma variant */
 		dodecl(NODECL, CXXX, $2, $3);
@@ -1109,38 +1109,21 @@ complex:
 	}
 |	LCOMPLEX LINT
 	{
-		/* _Complex int: not required by C99 but accepted; map to double */
+		/* _Complex int -> _Complex double */
 		$$ = types[TCDOUBLE];
 	}
-|	LDOUBLE LCOMPLEX
+|	LCOMPLEXF
 	{
-		$$ = types[TCDOUBLE];
-	}
-|	LFLOAT LCOMPLEX
-	{
+		/* float _Complex (combined by lexer) */
 		$$ = types[TCFLOAT];
 	}
-|	LLONG LDOUBLE LCOMPLEX
+|	LCOMPLEXD
 	{
-		/* long double _Complex -> _Complex double (long double == double here) */
-		$$ = types[TCDOUBLE];
-	}
-|	LLONG LCOMPLEX
-	{
-		/* long _Complex -> _Complex double */
-		$$ = types[TCDOUBLE];
-	}
-|	LCOMPLEX LLONG LDOUBLE
-	{
-		$$ = types[TCDOUBLE];
-	}
-|	LCOMPLEX LLONG
-	{
+		/* double _Complex, long double _Complex, long _Complex (combined by lexer) */
 		$$ = types[TCDOUBLE];
 	}
 |	LIMAGINARY
 	{
-		/* _Imaginary: treat as _Complex double */
 		$$ = types[TCDOUBLE];
 	}
 |	LIMAGINARY LDOUBLE

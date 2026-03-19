@@ -820,6 +820,129 @@ talph:
 		}
 		goto l0;	/* fetch next real token */
 	}
+	/*
+	 * _Complex lookahead for type keywords.
+	 *
+	 * C99 allows _Complex in either order: "float _Complex" or
+	 * "_Complex float".  The "_Complex first" forms are handled by the
+	 * grammar (complex: rule).  The "type first" forms — including the
+	 * three-token "long double _Complex" — are handled here in the lexer
+	 * to avoid shift/reduce conflicts.
+	 *
+	 * When we see a base-type keyword (LFLOAT, LDOUBLE, LLONG) that could
+	 * start a complex type, we scan forward over whitespace and read the
+	 * next identifier.  If it is _Complex or __complex__, we consume it
+	 * and return LCOMPLEXF or LCOMPLEXD.  Otherwise we inject the peeked
+	 * identifier back into the input stream as a fresh Io buffer.
+	 *
+	 * "long double _Complex": we scan LLONG, peek → "double", consume it,
+	 * peek again → "_Complex", consume it, return LCOMPLEXD.
+	 * "long _Complex": we scan LLONG, peek → "_Complex", return LCOMPLEXD.
+	 * "double _Complex": we scan LDOUBLE, peek → "_Complex", return LCOMPLEXD.
+	 * "float _Complex": we scan LFLOAT, peek → "_Complex", return LCOMPLEXF.
+	 */
+	if(s->lexical == LFLOAT || s->lexical == LDOUBLE || s->lexical == LLONG) {
+		int basetok, nc, ni;
+		char nbuf[NSYMB];
+		Sym *ns;
+
+		basetok = s->lexical;
+
+		/* skip horizontal whitespace */
+		do { nc = GETC(); } while(nc == ' ' || nc == '\t');
+
+		if(!isalpha(nc) && nc != '_') {
+			/* not an identifier — nothing to do */
+			unget(nc);
+			goto retlex;
+		}
+
+		/* collect the identifier */
+		ni = 0;
+		while((isalnum(nc) || nc == '_') && ni < NSYMB-1) {
+			nbuf[ni++] = nc;
+			nc = GETC();
+		}
+		nbuf[ni] = 0;
+		unget(nc);
+
+		/*
+		 * "long" followed by "double": consume "double" and peek again
+		 * for "_Complex".
+		 */
+		if(basetok == LLONG &&
+		   (strcmp(nbuf, "double") == 0 || strcmp(nbuf, "long") == 0)) {
+			int nc2, ni2;
+			char nbuf2[NSYMB];
+
+			/* consumed "double"/"long"; now peek for _Complex */
+			do { nc2 = GETC(); } while(nc2 == ' ' || nc2 == '\t');
+
+			if(!isalpha(nc2) && nc2 != '_') {
+				unget(nc2);
+				/* not _Complex: inject "double"/"long" back, return LLONG */
+				newio();
+				memmove(ionext->b, nbuf, ni);
+				ionext->b[ni] = 0;
+				pushio();
+				ionext->link = iostack;
+				iostack = ionext;
+				fi.p = ionext->b;
+				fi.c = ni;
+				goto retlex;
+			}
+
+			ni2 = 0;
+			while((isalnum(nc2) || nc2 == '_') && ni2 < NSYMB-1) {
+				nbuf2[ni2++] = nc2;
+				nc2 = GETC();
+			}
+			nbuf2[ni2] = 0;
+			unget(nc2);
+
+			if(strcmp(nbuf2, "_Complex") == 0 ||
+			   strcmp(nbuf2, "__complex__") == 0)
+				return LCOMPLEXD;
+
+			/*
+			 * Not _Complex: inject nbuf2 back, then nbuf, return LLONG.
+			 * We use two nested Io pushes.
+			 */
+			newio();
+			memmove(ionext->b, nbuf2, ni2);
+			ionext->b[ni2] = ' ';
+			memmove(ionext->b+ni2+1, nbuf, ni);
+			ionext->b[ni2+1+ni] = 0;
+			pushio();
+			ionext->link = iostack;
+			iostack = ionext;
+			fi.p = ionext->b;
+			fi.c = ni2+1+ni;
+			goto retlex;
+		}
+
+		/* Single base type followed by _Complex or __complex__ */
+		if(strcmp(nbuf, "_Complex") == 0 ||
+		   strcmp(nbuf, "__complex__") == 0) {
+			if(basetok == LFLOAT)
+				return LCOMPLEXF;
+			return LCOMPLEXD;	/* double or long */
+		}
+
+		/*
+		 * Peeked word is something else entirely.
+		 * Inject it back and return the original token.
+		 */
+		newio();
+		memmove(ionext->b, nbuf, ni);
+		ionext->b[ni] = 0;
+		pushio();
+		ionext->link = iostack;
+		iostack = ionext;
+		fi.p = ionext->b;
+		fi.c = ni;
+	}
+retlex:
 	return s->lexical;
 
 tnum:
