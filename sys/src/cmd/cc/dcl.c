@@ -32,7 +32,7 @@ compoundlit(Type *t, Node *initnode)
 	static long litseq;
 	char  name[32];
 	Sym  *s;
-	Node *var, *init, *seq;
+	Node *var, *init, *seq, *p, *q;
 	Decl *d;
 
 	/* Unique hidden name; leading '.' follows Plan 9 convention
@@ -59,6 +59,38 @@ compoundlit(Type *t, Node *initnode)
 
 	/* Generate assignment tree from the already-parsed ilist. */
 	init = doinit(s, t, 0L, initnode);
+
+	/*
+	 * doinit() returns a tree of OLIST(OASI, OLIST(OASI, ...)) nodes.
+	 * gen() (the statement generator) handles OLIST, but cgen() (the
+	 * expression generator) does not — it only handles OCOMMA in that
+	 * role.  Our OCOMMA(init, var) wrapper puts the init tree into
+	 * expression context, so convert any OLIST chain to a left-leaning
+	 * OCOMMA chain here.
+	 *
+	 *   OLIST(a, OLIST(b, c))  ->  OCOMMA(OCOMMA(a, b), c)
+	 */
+	if(init != Z && init->op == OLIST) {
+		seq = Z;
+		for(p = init; p != Z; ) {
+			if(p->op == OLIST) {
+				q = p->left;
+				p = p->right;
+			} else {
+				q = p;
+				p = Z;
+			}
+			if(q == Z)
+				continue;
+			if(seq == Z)
+				seq = q;
+			else {
+				seq = new(OCOMMA, seq, q);
+				seq->type = q->type != T ? q->type : t;
+			}
+		}
+		init = seq;
+	}
 
 	if(init != Z) {
 		seq       = new(OCOMMA, init, var);
