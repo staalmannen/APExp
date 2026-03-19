@@ -477,7 +477,10 @@ align(long i, Type *t, int op)
 	case Ael1:	/* initial align of struct element */
 		for(v=t; v->etype==TARRAY; v=v->link)
 			;
-		w = ewidth[v->etype];
+		if(v->etype == TCFLOAT || v->etype == TCDOUBLE)
+			w = SZ_VLONG;
+		else
+			w = ewidth[v->etype];
 		if(w <= 0 || w >= SZ_VLONG)
 			w = SZ_VLONG;
 		if(packflg)
@@ -489,13 +492,17 @@ align(long i, Type *t, int op)
 		break;
 
 	case Aarg0:	/* initial passbyptr argument in arg list */
-		if(typesu[t->etype]) {
+		if(typesu[t->etype] || t->etype == TCFLOAT || t->etype == TCDOUBLE) {
 			o = align(o, types[TIND], Aarg1);
 			o = align(o, types[TIND], Aarg2);
 		}
 		break;
 
 	case Aarg1:	/* initial align of parameter */
+		if(t->etype == TCFLOAT || t->etype == TCDOUBLE) {
+			w = SZ_VLONG;
+			break;
+		}
 		w = ewidth[t->etype];
 		if(w <= 0 || w >= SZ_VLONG) {
 			w = SZ_VLONG;
