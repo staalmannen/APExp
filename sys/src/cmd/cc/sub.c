@@ -125,7 +125,16 @@ typ(int et, Type *d)
 	t->link = d;
 	t->down = T;
 	t->sym = S;
-	t->width = ewidth[et];
+	/*
+	 * Complex types (TCFLOAT, TCDOUBLE) are >= NTYPE so they are
+	 * out of bounds for ewidth[].  Use the base float widths.
+	 */
+	if(et == TCFLOAT)
+		t->width = 2 * ewidth[TFLOAT];
+	else if(et == TCDOUBLE)
+		t->width = 2 * ewidth[TDOUBLE];
+	else
+		t->width = ewidth[et];
 	t->offset = 0;
 	t->shift = 0;
 	t->nbits = 0;
@@ -640,7 +649,9 @@ nilcast(Type *t1, Type *t2)
 	if(et1 == et2)
 		return 1;
 	if(typefd[et1] && typefd[et2]) {
-		if(ewidth[et1] < ewidth[et2])
+		long w1 = (et1==TCFLOAT)? 2*ewidth[TFLOAT] : (et1==TCDOUBLE)? 2*ewidth[TDOUBLE] : ewidth[et1];
+		long w2 = (et2==TCFLOAT)? 2*ewidth[TFLOAT] : (et2==TCDOUBLE)? 2*ewidth[TDOUBLE] : ewidth[et2];
+		if(w1 < w2)
 			return 1;
 		return 0;
 	}
