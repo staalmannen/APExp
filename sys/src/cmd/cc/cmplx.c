@@ -23,6 +23,19 @@ static int cplxtmpno;
 /*
  * cplxtmp: allocate a fresh anonymous auto of complex type ct.
  * Each call produces a unique name to prevent aliasing.
+ *
+ * We use adecl(CAUTO, ct, s) exactly as compoundlit() and mkvlasym() do:
+ *   - adecl() calls push1(s) to save sym state on dclstack so that
+ *     revertdcl() at the enclosing block exit restores the sym and
+ *     reclaims the frame slot.
+ *   - adecl() bumps autoffset/stkoff and assigns s->offset = -autoffset,
+ *     giving each temp a unique, correctly-sized slot in the stack frame.
+ *   - adecl() sets s->aused = 0; we set it to 1 immediately after (must
+ *     follow adecl) to suppress the "auto declared and not used" warning
+ *     for these hidden temporaries.
+ *
+ * The old code set s->offset = 0 and never called adecl(), so all .cx temps
+ * aliased each other at offset 0 and the stack frame was never grown.
  */
 static Node*
 cplxtmp(Type *ct)
@@ -33,16 +46,17 @@ cplxtmp(Type *ct)
 
 	snprint(buf, sizeof buf, ".cx%d", cplxtmpno++);
 	s = slookup(buf);
-	if(s->type == T) {
-		s->class = CAUTO;
-		s->type = ct;
-		s->offset = 0;
-	}
+
+	/* Assign a real stack slot; push1(s) is called inside adecl() for CAUTO. */
+	adecl(CAUTO, ct, s);
+	s->aused = 1;	/* suppress "auto declared and not used" — must follow adecl() */
+
 	n = new(ONAME, Z, Z);
-	n->sym = s;
-	n->type = ct;
-	n->etype = ct->etype;
-	n->class = CAUTO;
+	n->sym     = s;
+	n->type    = ct;
+	n->etype   = ct->etype;
+	n->xoffset = s->offset;	/* real frame offset assigned by adecl() */
+	n->class   = CAUTO;
 	n->addable = 1;
 	return n;
 }
