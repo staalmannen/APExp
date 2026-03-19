@@ -3,8 +3,8 @@
 
 #include <stdint.h>
 
-// atomic_arch.h uses inline asm how does that work on pcc?
-//#include "atomic_arch.h"
+// hack with a "generic" atomic_arch.h made by copilot
+#include "atomic_arch.h"
 
 #ifdef a_ll
 

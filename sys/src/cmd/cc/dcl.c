@@ -43,10 +43,16 @@ compoundlit(Type *t, Node *initnode)
 	/* Save sym state for revertdcl() at enclosing block exit. */
 	d = push1(s);
 	d->val   = DAUTO;
-	s->aused = 1;		/* suppress "declared and not used" warning */
 
 	/* Assign a stack slot; sets s->class, s->block, s->offset, stkoff. */
 	adecl(CAUTO, t, s);
+
+	/* Must come AFTER adecl() — adecl() unconditionally clears s->aused=0
+	 * for CAUTO symbols (dcl.c ~line 1495), so setting aused before the
+	 * call is silently overwritten.  Set it here to correctly suppress the
+	 * "auto declared and not used" warning for hidden compound-literal
+	 * temporaries (.clit0, .clit1, …). */
+	s->aused = 1;		/* suppress "declared and not used" warning */
 
 	/* Build the ONAME node callers and postfix operators will use. */
 	var          = new(ONAME, Z, Z);
