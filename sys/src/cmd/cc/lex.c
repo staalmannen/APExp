@@ -450,20 +450,6 @@ yylex(void)
 	char *cp;
 	Rune rune;
 	Sym *s;
-	static long lasttok;	/* previous token returned, for _Complex combining */
-	static long pendtok;	/* one pending token to return before lexing */
-
-	/*
-	 * Pending token: used to re-inject a token that was already
-	 * consumed as part of a _Complex combination but needs to be
-	 * returned separately (e.g. if we decided not to combine).
-	 */
-	if(pendtok) {
-		t = pendtok;
-		pendtok = 0;
-		lasttok = t;
-		return t;
-	}
 
 	if(peekc != IGN) {
 		c = peekc;
@@ -838,9 +824,7 @@ talph:
 			/* no argument list (e.g. bare __extension__); put char back */
 			unget(ac);
 		}
-		/* Do NOT reset lasttok here: the swallowed keyword is invisible
-		 * to the parser, so the previous type keyword (e.g. LDOUBLE before
-		 * __asm__("sym") _Complex) must still be visible for _Complex combining.
+		/* The swallowed keyword is invisible to the parser.
 		 * Consume peekc before goto to avoid losing a character. */
 		if(peekc != IGN) {
 			c = peekc;
@@ -852,8 +836,6 @@ talph:
 	/*
 	 * GNU/C11 storage class and visibility qualifiers that Plan 9 ignores.
 	 * Drop silently and re-lex the next token.
-	 * Reset lasttok so a dropped qualifier cannot spuriously trigger
-	 * _Complex combining on the next token.
 	 */
 	if(s->lexical == LNAME && (
 	    strcmp(s->name, "__thread")      == 0 ||
@@ -866,12 +848,6 @@ talph:
 	    strcmp(s->name, "__leaf__")      == 0 ||
 	    strcmp(s->name, "__pure__")      == 0 ||
 	    strcmp(s->name, "__nonnull__")   == 0)) {
-		lasttok = 0;
-		/*
-		 * talph set peekc to the first char after the identifier.
-		 * goto l0 bypasses the peekc check at the top of yylex,
-		 * which would lose that character.  Consume it via l1 instead.
-		 */
 		if(peekc != IGN) {
 			c = peekc;
 			peekc = IGN;
@@ -880,38 +856,109 @@ talph:
 		goto l0;
 	}
 	/*
-	 * _Complex combining: when we see LCOMPLEX or LIMAGINARY, check what
-	 * the previous token was.  If it was a float/double/long type keyword,
-	 * combine them into a single LCOMPLEXF or LCOMPLEXD token, consuming
-	 * the _Complex keyword silently.  This avoids multi-token grammar rules
-	 * like "LLONG LDOUBLE LCOMPLEX" which cause shift/reduce conflicts.
+	 * _Complex combining: when we are about to return LFLOAT, LDOUBLE,
+	 * or LLONG, peek forward over whitespace to see if the next token
+	 * is _Complex or the macro 'complex' (which expands to _Complex).
+	 * If so, consume it now and return a combined LCOMPLEXF or LCOMPLEXD.
 	 *
-	 * Cases handled:
-	 *   float _Complex        -> LCOMPLEXF  (lasttok == LFLOAT)
-	 *   double _Complex       -> LCOMPLEXD  (lasttok == LDOUBLE)
-	 *   long _Complex         -> LCOMPLEXD  (lasttok == LLONG)
-	 *   long double _Complex  -> LCOMPLEXD  (lasttok == LDOUBLE, before that LLONG)
-	 *                           The "long double" -> LDOUBLE path via simplet()
-	 *                           means lasttok will be LDOUBLE when _Complex arrives.
+	 * We do this at the RETURN point (not when we see _Complex) to avoid
+	 * grammar conflicts: the yacc grammar has no "tname complex" rule,
+	 * so LDOUBLE followed by LCOMPLEXD as a lookahead would fail.
+	 * By combining eagerly here, the parser sees only a single token.
 	 *
-	 * For "_Complex float" / "_Complex double" (prefix form), the grammar
-	 * rules "LCOMPLEX LFLOAT" / "LCOMPLEX LDOUBLE" handle them; we do not
-	 * combine those here (lasttok won't be a type keyword when _Complex is first).
+	 * Cases handled (postfix form):
+	 *   float _Complex        -> LCOMPLEXF
+	 *   double _Complex       -> LCOMPLEXD
+	 *   long _Complex         -> LCOMPLEXD
+	 *   long double _Complex  -> handled naturally: LLONG returned first,
+	 *                            then LDOUBLE peek+combine -> LCOMPLEXD
+	 *
+	 * The prefix forms "_Complex float" etc. are handled by grammar rules
+	 * "LCOMPLEX LFLOAT" / "LCOMPLEX LDOUBLE" / "LCOMPLEXD" / "LCOMPLEXF"
+	 * and need no special treatment here.
 	 */
-	if(s->lexical == LCOMPLEX || s->lexical == LIMAGINARY) {
-		if(lasttok == LFLOAT) {
-			lasttok = LCOMPLEXF;
-			return LCOMPLEXF;
+	if(s->lexical == LFLOAT || s->lexical == LDOUBLE || s->lexical == LLONG) {
+		int nc, ni;
+		char nbuf[NSYMB];
+		Sym *ns;
+
+		/* skip horizontal whitespace */
+		nc = peekc != IGN ? peekc : GETC();
+		peekc = IGN;
+		while(nc == ' ' || nc == '\t')
+			nc = GETC();
+
+		if(isalpha(nc) || nc == '_') {
+			/* read the next identifier */
+			ni = 0;
+			while((isalnum(nc) || nc == '_') && ni < NSYMB-1) {
+				nbuf[ni++] = nc;
+				nc = GETC();
+			}
+			nbuf[ni] = 0;
+			/* put back the char after the identifier */
+			unget(nc);
+
+			/* check if it is _Complex, __complex__, or the macro 'complex' */
+			ns = nil;
+			if(strcmp(nbuf, "_Complex") == 0 ||
+			   strcmp(nbuf, "__complex__") == 0)
+				ns = slookup(nbuf);
+			else if(strcmp(nbuf, "complex") == 0) {
+				/* 'complex' might be a macro expanding to _Complex */
+				ns = slookup(nbuf);
+				if(ns->macro) {
+					/* expand and check the result is _Complex */
+					char ebuf[NSYMB];
+					if(macexpand(ns, ebuf, sizeof(ebuf)-1)) {
+						/* strip whitespace */
+						char *ep = ebuf;
+						while(*ep == ' ' || *ep == '\t') ep++;
+						int elen = strlen(ep);
+						while(elen > 0 && (ep[elen-1]==' '||ep[elen-1]=='\t'))
+							ep[--elen] = 0;
+						if(strcmp(ep, "_Complex") == 0 ||
+						   strcmp(ep, "__complex__") == 0)
+							goto iscmplx;
+					}
+					/* macro doesn't expand to _Complex; put it back */
+					newio();
+					memmove(ionext->b, nbuf, ni);
+					ionext->b[ni] = 0;
+					pushio();
+					ionext->link = iostack;
+					iostack = ionext;
+					fi.p = ionext->b;
+					fi.c = ni;
+					goto retlex;
+				}
+				ns = nil; /* bare 'complex' non-macro: treat as identifier */
+			}
+
+			if(ns != nil && (ns->lexical == LCOMPLEX ||
+			   strcmp(nbuf,"_Complex")==0 || strcmp(nbuf,"__complex__")==0)) {
+			iscmplx:
+				/* consumed _Complex: return combined token */
+				if(s->lexical == LFLOAT)
+					return LCOMPLEXF;
+				return LCOMPLEXD;
+			}
+
+			/* not _Complex: inject nbuf back into the input stream */
+			newio();
+			memmove(ionext->b, nbuf, ni);
+			ionext->b[ni] = 0;
+			pushio();
+			ionext->link = iostack;
+			iostack = ionext;
+			fi.p = ionext->b;
+			fi.c = ni;
+		} else {
+			/* not an identifier: put the character back */
+			unget(nc);
 		}
-		if(lasttok == LDOUBLE || lasttok == LLONG) {
-			lasttok = LCOMPLEXD;
-			return LCOMPLEXD;
-		}
-		/* prefix form: _Complex appears before the type word; return as-is */
-		lasttok = s->lexical;
-		return s->lexical;
 	}
-	lasttok = s->lexical;
+retlex:
 	return s->lexical;
 
 tnum:
