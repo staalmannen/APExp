@@ -603,11 +603,20 @@ tcomo(Node *n, int f)
 		n->type = types[TINT];
 		break;
 
+	case OLIST:		/* compound literal initialiser list */
 	case OCOMMA:
 		o = tcom(l);
 		if(o | tcom(r))
 			goto bad;
 		n->type = r->type;
+		break;
+
+	case OINIT:		/* compound literal initialiser */
+		if(l != Z)
+			if(tcom(l))
+				goto bad;
+		if(n->type == T)
+			n->type = l != Z && l->type != T ? l->type : types[TINT];
 		break;
 
 

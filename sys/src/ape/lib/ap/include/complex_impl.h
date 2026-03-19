@@ -16,7 +16,7 @@
 #define CMPLXF(x, y) __CMPLX(x, y, float)
 #define CMPLXL(x, y) __CMPLX(x, y, long double)
 
-hidden double complex __ldexp_cexp(double complex,int);
-hidden float complex __ldexp_cexpf(float complex,int);
+double complex __ldexp_cexp(double complex,int);
+float complex __ldexp_cexpf(float complex,int);
 
 #endif
