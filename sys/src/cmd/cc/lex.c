@@ -812,7 +812,15 @@ talph:
 	    strcmp(s->name, "__attribute__") == 0 ||
 	    strcmp(s->name, "__attribute")   == 0 ||
 	    strcmp(s->name, "__declspec")    == 0 ||
-	    strcmp(s->name, "__extension__") == 0)) {
+	    strcmp(s->name, "__extension__") == 0 ||
+	    strcmp(s->name, "__asm__")       == 0 ||
+	    strcmp(s->name, "__asm")         == 0 ||
+	    strcmp(s->name, "asm")           == 0 ||
+	    strcmp(s->name, "typeof")        == 0 ||
+	    strcmp(s->name, "__typeof")      == 0 ||
+	    strcmp(s->name, "__typeof__")    == 0 ||
+	    strcmp(s->name, "__alignof__")   == 0 ||
+	    strcmp(s->name, "__alignof")     == 0)) {
 		int ac, depth;
 		/* skip whitespace to see if '(' follows */
 		do { ac = GETC(); } while(ac == ' ' || ac == '\t');
@@ -832,7 +840,28 @@ talph:
 			/* no argument list (e.g. bare __extension__); put char back */
 			unget(ac);
 		}
+		lasttok = 0;
 		goto l0;	/* fetch next real token */
+	}
+	/*
+	 * GNU/C11 storage class and visibility qualifiers that Plan 9 ignores.
+	 * Drop silently and re-lex the next token.
+	 * Reset lasttok so a dropped qualifier cannot spuriously trigger
+	 * _Complex combining on the next token.
+	 */
+	if(s->lexical == LNAME && (
+	    strcmp(s->name, "__thread")      == 0 ||
+	    strcmp(s->name, "_Thread_local") == 0 ||
+	    strcmp(s->name, "__hidden")      == 0 ||
+	    strcmp(s->name, "__visible")     == 0 ||
+	    strcmp(s->name, "hidden")        == 0 ||
+	    strcmp(s->name, "visible")       == 0 ||
+	    strcmp(s->name, "__used")        == 0 ||
+	    strcmp(s->name, "__leaf__")      == 0 ||
+	    strcmp(s->name, "__pure__")      == 0 ||
+	    strcmp(s->name, "__nonnull__")   == 0)) {
+		lasttok = 0;
+		goto l0;	/* drop silently, fetch next real token */
 	}
 	/*
 	 * _Complex combining: when we see LCOMPLEX or LIMAGINARY, check what
@@ -1355,11 +1384,46 @@ struct
 	"__extension__",	LNAME,		0,
 
 	/*
+	 * __asm__ / asm / __asm: inline assembly specifier used as a
+	 * function or variable qualifier, e.g.:
+	 *   int foo(void) __asm__("_foo");
+	 *   extern int errno __asm__("errno");
+	 * Registered as LNAME; yylex() swallows the argument list.
+	 */
+	"asm",			LNAME,		0,
+	"__asm",		LNAME,		0,
+	"__asm__",		LNAME,		0,
+
+	/*
+	 * __thread / _Thread_local: thread-local storage class.
+	 * Plan 9 has no TLS; silently drop the qualifier.
+	 */
+	"__thread",		LNAME,		0,
+	"_Thread_local",	LNAME,		0,
+
+	/*
+	 * typeof / __typeof__ / __typeof: GCC type-of extension.
+	 * Registered as LNAME; yylex() swallows the argument list.
+	 */
+	"typeof",		LNAME,		0,
+	"__typeof",		LNAME,		0,
+	"__typeof__",		LNAME,		0,
+
+	/*
+	 * __alignof__ / __alignof: GCC alignment query.
+	 * Registered as LNAME; yylex() swallows the argument list.
+	 */
+	"__alignof__",		LNAME,		0,
+	"__alignof",		LNAME,		0,
+
+	/*
 	 * GNU visibility / linkage hints.
 	 * These appear as function/variable attributes.  When used as
 	 * plain identifiers (not inside __attribute__) they are harmless
 	 * LNAME tokens the parser ignores in declaration-specifier position.
 	 */
+	"hidden",		LNAME,		0,
+	"visible",		LNAME,		0,
 	"__hidden",		LNAME,		0,
 	"__visible",		LNAME,		0,
 	"__used",		LNAME,		0,
