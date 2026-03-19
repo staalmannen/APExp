@@ -840,7 +840,13 @@ talph:
 		}
 		/* Do NOT reset lasttok here: the swallowed keyword is invisible
 		 * to the parser, so the previous type keyword (e.g. LDOUBLE before
-		 * __asm__("sym") _Complex) must still be visible for _Complex combining. */
+		 * __asm__("sym") _Complex) must still be visible for _Complex combining.
+		 * Consume peekc before goto to avoid losing a character. */
+		if(peekc != IGN) {
+			c = peekc;
+			peekc = IGN;
+			goto l1;
+		}
 		goto l0;	/* fetch next real token */
 	}
 	/*
@@ -861,7 +867,17 @@ talph:
 	    strcmp(s->name, "__pure__")      == 0 ||
 	    strcmp(s->name, "__nonnull__")   == 0)) {
 		lasttok = 0;
-		goto l0;	/* drop silently, fetch next real token */
+		/*
+		 * talph set peekc to the first char after the identifier.
+		 * goto l0 bypasses the peekc check at the top of yylex,
+		 * which would lose that character.  Consume it via l1 instead.
+		 */
+		if(peekc != IGN) {
+			c = peekc;
+			peekc = IGN;
+			goto l1;
+		}
+		goto l0;
 	}
 	/*
 	 * _Complex combining: when we see LCOMPLEX or LIMAGINARY, check what
