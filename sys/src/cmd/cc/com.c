@@ -133,6 +133,17 @@ tcomo(Node *n, int f)
 		}
 		if(tcom(l))
 			goto bad;
+		if(iscmplx(n->type->etype)) {
+			/* returning complex: promote real to complex if needed */
+			if(!iscmplx(l->type->etype)) {
+				l = cplxcast(l, n->type);
+				n->left = l;
+			} else if(!sametype(n->type, l->type)) {
+				l = cplxcast(l, n->type);
+				n->left = l;
+			}
+			break;
+		}
 		typeext(n->type, l);
 		if(tcompat(n, n->type, l->type, tasign))
 			break;
