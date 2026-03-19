@@ -1120,6 +1120,24 @@ complex:
 	{
 		$$ = types[TCFLOAT];
 	}
+|	LLONG LDOUBLE LCOMPLEX
+	{
+		/* long double _Complex -> _Complex double (long double == double here) */
+		$$ = types[TCDOUBLE];
+	}
+|	LLONG LCOMPLEX
+	{
+		/* long _Complex -> _Complex double */
+		$$ = types[TCDOUBLE];
+	}
+|	LCOMPLEX LLONG LDOUBLE
+	{
+		$$ = types[TCDOUBLE];
+	}
+|	LCOMPLEX LLONG
+	{
+		$$ = types[TCDOUBLE];
+	}
 |	LIMAGINARY
 	{
 		/* _Imaginary: treat as _Complex double */
