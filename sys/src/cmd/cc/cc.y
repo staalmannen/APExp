@@ -680,7 +680,7 @@ xuexpr:
 		dodecl(NODECL, CXXX, $2, $3);
 		$$ = compoundlit(lastdcl, new(OINIT, invert($6), Z));
 	}
-|	'(' tlist abdecor ')' '{' ilist ',' '}'
++|	'(' tlist abdecor ')' '{' ilist ',' '}'
 	{
 		/* trailing-comma variant */
 		dodecl(NODECL, CXXX, $2, $3);
@@ -1120,6 +1120,26 @@ complex:
 |	LCOMPLEXD
 	{
 		/* double _Complex, long _Complex, long double _Complex, combined by lexer */
+		$$ = types[TCDOUBLE];
+	}
+|	LDOUBLE LCOMPLEXD
+	{
+		/* double _Complex where lasttok combined after parser read LDOUBLE */
+		$$ = types[TCDOUBLE];
+	}
+|	LFLOAT LCOMPLEXF
+	{
+		/* float _Complex where lasttok combined after parser read LFLOAT */
+		$$ = types[TCFLOAT];
+	}
+|	LFLOAT LCOMPLEXD
+	{
+		/* float _Complex falling back to double complex */
+		$$ = types[TCDOUBLE];
+	}
+|	LLONG LCOMPLEXD
+	{
+		/* long _Complex or long double _Complex */
 		$$ = types[TCDOUBLE];
 	}
 |	LIMAGINARY
