@@ -967,6 +967,17 @@ types:
 		$$.c = simplec($2);
 		$$.t = garbt($$.t, $2);
 	}
+|	tname LCOMPLEXD
+	{
+		/* e.g. long double _Complex after "long double" reduced to tname */
+		$$.t = types[TCDOUBLE];
+		$$.c = CXXX;
+	}
+|	tname LCOMPLEXF
+	{
+		$$.t = types[TCFLOAT];
+		$$.c = CXXX;
+	}
 |	gcnlist complex zgnlist
 	{
 		$$.t = $2;
