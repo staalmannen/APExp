@@ -33,9 +33,9 @@ static inline int a_cas(volatile int *p, int t, int s)
 #define a_swap a_swap
 static inline int a_swap(volatile int *p, int v)
 {
-	int old;
+	long old;
 	a_pre_llsc();
-	do old = a_ll(p);
+	do old = a_ll((atomic_long_t *) p);
 	while (!a_sc(p, v));
 	a_post_llsc();
 	return old;
@@ -149,7 +149,7 @@ static inline int a_fetch_or(volatile int *p, int v)
 
 #ifndef a_and
 #define a_and a_and
-static inline void a_and(volatile int *p, int v)
+static inline void a_and(atomic_uint_t *p, unsigned int v)
 {
 	a_fetch_and(p, v);
 }
@@ -157,7 +157,7 @@ static inline void a_and(volatile int *p, int v)
 
 #ifndef a_or
 #define a_or a_or
-static inline void a_or(volatile int *p, int v)
+static inline void a_or(atomic_uint_t *p, unsigned int v)
 {
 	a_fetch_or(p, v);
 }
@@ -165,7 +165,7 @@ static inline void a_or(volatile int *p, int v)
 
 #ifndef a_inc
 #define a_inc a_inc
-static inline void a_inc(volatile int *p)
+static inline void a_inc(atomic_long_t *p)
 {
 	a_fetch_add(p, 1);
 }
@@ -173,7 +173,7 @@ static inline void a_inc(volatile int *p)
 
 #ifndef a_dec
 #define a_dec a_dec
-static inline void a_dec(volatile int *p)
+static inline void a_dec(atomic_long_t *p)
 {
 	a_fetch_add(p, -1);
 }
@@ -197,7 +197,7 @@ static inline void a_store(volatile int *p, int v)
 #define a_barrier a_barrier
 static inline void a_barrier()
 {
-	volatile int tmp = 0;
+	atomic_long_t tmp = 0;
 	a_cas(&tmp, 0, 0);
 }
 #endif
@@ -211,8 +211,8 @@ static inline void a_barrier()
 static inline void a_and_64(volatile uint64_t *p, uint64_t v)
 {
 	union { uint64_t v; uint32_t r[2]; } u = { v };
-	if (u.r[0]+1) a_and((int *)p, u.r[0]);
-	if (u.r[1]+1) a_and((int *)p+1, u.r[1]);
+	if (u.r[0]+1) a_and((atomic_uint_t *)p, u.r[0]);
+	if (u.r[1]+1) a_and((atomic_uint_t *)p+1, u.r[1]);
 }
 #endif
 
@@ -221,8 +221,8 @@ static inline void a_and_64(volatile uint64_t *p, uint64_t v)
 static inline void a_or_64(volatile uint64_t *p, uint64_t v)
 {
 	union { uint64_t v; uint32_t r[2]; } u = { v };
-	if (u.r[0]) a_or((int *)p, u.r[0]);
-	if (u.r[1]) a_or((int *)p+1, u.r[1]);
+	if (u.r[0]) a_or((atomic_uint_t *)p, u.r[0]);
+	if (u.r[1]) a_or((atomic_uint_t *)p+1, u.r[1]);
 }
 #endif
 

@@ -18,13 +18,16 @@
 
 // put in defines here that will be picked up by atomic.h
 
-#define a_cas atomic_cas_int
+#define a_ll atomic_load_long
+#define a_ll_p atomic_load_ptr
+#define a_cas atomic_cas_long
 #define a_cas_p atomic_cas_ptr
-#define a_fetch_add atomic_fetch_add_int
+#define a_fetch_add atomic_fetch_add_long
 #define a_fetch_and atomic_fetch_and_uint
 #define a_fetch_or atomic_fetch_or_uint
-#define a_store atomic_store_int
-
+#define a_store atomic_store_long
+// no idea what it corresponds to
+int a_sc(int *, int) { return 0; } 
 
 
 

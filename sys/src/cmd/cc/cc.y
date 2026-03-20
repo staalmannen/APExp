@@ -680,7 +680,7 @@ xuexpr:
 		dodecl(NODECL, CXXX, $2, $3);
 		$$ = compoundlit(lastdcl, new(OINIT, invert($6), Z));
 	}
-+|	'(' tlist abdecor ')' '{' ilist ',' '}'
+|	'(' tlist abdecor ')' '{' ilist ',' '}'
 	{
 		/* trailing-comma variant */
 		dodecl(NODECL, CXXX, $2, $3);

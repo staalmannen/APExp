@@ -5,7 +5,11 @@
 #include <float.h>
 #include <math.h>
 #include <endian.h>
-// #include "fp_arch.h" just an empty file in arch/generic !
+//#include "fp_arch.h"
+
+#define hidden /* nothing */
+#define double_t double
+#define float_t float
 
 #if LDBL_MANT_DIG == 53 && LDBL_MAX_EXP == 1024
 #elif LDBL_MANT_DIG == 64 && LDBL_MAX_EXP == 16384 && __BYTE_ORDER == __LITTLE_ENDIAN
@@ -230,6 +234,8 @@ do {                                              \
   (d) = asfloat(w);                               \
 } while (0)
 
+#define hidden /* nothing */
+
 hidden int    __rem_pio2_large(double*,double*,int,int,int);
 
 hidden int    __rem_pio2(double,double*);
@@ -272,3 +278,6 @@ hidden long double __math_invalidl(long double);
 #endif
 
 #endif
+
+
+

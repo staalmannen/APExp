@@ -33,8 +33,8 @@ float log1pf(float x)
 	if (ix < 0x3ed413d0 || ix>>31) {  /* 1+x < sqrt(2)+  */
 		if (ix >= 0xbf800000) {  /* x <= -1.0 */
 			if (x == -1)
-				return x/0.0f; /* log1p(-1)=+inf */
-			return (x-x)/0.0f;     /* log1p(x<-1)=NaN */
+				return INFINITY; /* log1p(-1)=+inf */
+			return NAN;     /* log1p(x<-1)=NaN */
 		}
 		if (ix<<1 < 0x33800000<<1) {   /* |x| < 2**-24 */
 			/* underflow if subnormal */

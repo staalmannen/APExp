@@ -5,7 +5,8 @@ APE=$APEXPROOT/sys/src/ape
 # libap and libbsd have been merged
 # source code re-organized like the musl src directory
 
-DIRS= complex\
+DIRS=\
+#	complex\
 	conf\
 	ctype\
 	dirent\

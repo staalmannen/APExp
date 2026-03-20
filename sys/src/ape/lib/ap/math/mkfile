@@ -30,14 +30,14 @@ OFILES=\
 	__cos.$O\
 	__cosdf.$O\
 	__cosl.$O\
-#	__expo2.$O\
-#	__expo2f.$O\
+	__expo2.$O\
+	__expo2f.$O\
 	__fpclassify.$O\
 	__fpclassifyf.$O\
 	__fpclassifyl.$O\
 	__invtrigl.$O\
-#	__math_divzero.$O\
-#	__math_divzerof.$O\
+	__math_divzero.$O\
+	__math_divzerof.$O\
 	__math_invalid.$O\
 	__math_invalidf.$O\
 	__math_invalidl.$O\
@@ -58,20 +58,20 @@ OFILES=\
 	__sin.$O\
 	__sindf.$O\
 	__sinl.$O\
-#	__tan.$O\
+	__tan.$O\
 	__tandf.$O\
 	__tanl.$O\
-#	acosf.$O\
+	acosf.$O\
 	acosh.$O\
 	acoshf.$O\
 	acoshl.$O\
 	acosl.$O\
-#	asinf.$O\
+	asinf.$O\
 	asinh.$O\
 	asinhf.$O\
 	asinhl.$O\
 	asinl.$O\
-#	atan2f.$O\
+	atan2f.$O\
 	atan2l.$O\
 	atanh.$O\
 	atanhf.$O\
@@ -84,22 +84,22 @@ OFILES=\
 	copysign.$O\
 	copysignf.$O\
 	copysignl.$O\
-#	cosf.$O\
+	cosf.$O\
 	cosh.$O\
 	coshf.$O\
 	coshl.$O\
 	cosl.$O\
-#	erff.$O\
+	erff.$O\
 	erfl.$O\
 	exp10.$O\
 	exp10f.$O\
 	exp10l.$O\
-#	exp2.$O\
-#	exp2f.$O\
-#	exp2f_data.$O\
+	exp2.$O\
+	exp2f.$O\
+	exp2f_data.$O\
 	exp2l.$O\
-#	exp_data.$O\
-#	expf.$O\
+	exp_data.$O\
+	expf.$O\
 	expl.$O\
 	expm1.$O\
 	expm1f.$O\
@@ -109,7 +109,7 @@ OFILES=\
 	fdim.$O\
 	fdimf.$O\
 	fdiml.$O\
-#	fma.$O\
+	fma.$O\
 	fmaf.$O\
 	fmal.$O\
 	fmax.$O\
@@ -129,9 +129,9 @@ OFILES=\
 	ilogb.$O\
 	ilogbf.$O\
 	ilogbl.$O\
-#	j0f.$O\
-#	j1f.$O\
-#	jnf.$O\
+	j0f.$O\
+	j1f.$O\
+	jnf.$O\
 	ldexp.$O\
 	ldexpf.$O\
 	ldexpl.$O\
@@ -146,23 +146,23 @@ OFILES=\
 	llround.$O\
 	llroundf.$O\
 	llroundl.$O\
-#	log10f.$O\
+	log10f.$O\
 	log10l.$O\
-#	log1p.$O\
-#	log1pf.$O\
+	log1p.$O\
+	log1pf.$O\
 	log1pl.$O\
-#	log2_data.$O\
-#	log2f.$O\
-#	log2f_data.$O\
+	log2_data.$O\
+	log2f.$O\
+	log2f_data.$O\
 	log2l.$O\
 	log_data.$O\
 	logb.$O\
 	logbf.$O\
 	logbl.$O\
-#	logf.$O\
-#	logf_data.$O\
+	logf.$O\
+	logf_data.$O\
 	logl.$O\
-#	lrint.$O\
+	lrint.$O\
 	lrintf.$O\
 	lrintl.$O\
 	lround.$O\
@@ -171,8 +171,8 @@ OFILES=\
 	modf.$O\
 	modff.$O\
 	modfl.$O\
-#	nanf.$O\
-#	nanl.$O\
+	nanf.$O\
+	nanl.$O\
 	nearbyint.$O\
 	nearbyintf.$O\
 	nearbyintl.$O\
@@ -183,7 +183,7 @@ OFILES=\
 	nexttowardf.$O\
 	nexttowardl.$O\
 	pow_data.$O\
-#	powf.$O\
+	powf.$O\
 	powf_data.$O\
 	powl.$O\
 	remainder.$O\
@@ -217,7 +217,7 @@ OFILES=\
 	sinhl.$O\
 	sinl.$O\
 	sqrt_data.$O\
-#	sqrtf.$O\
+	sqrtf.$O\
 	sqrtl.$O\
 #	tanf.$O\
 	tanhf.$O\
@@ -236,12 +236,7 @@ CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -D_POSIX_SOURCE\
 	-I$APEXPROOT/$objtype/include/ape -D_BSD_SOURCE\
 	-D_PLAN9_SOURCE -I../include -I../plan9
 
-# use assembly files if present. Most architectures used c files with inline
-# asm which we cannot use.
 
-# install:V:
-#	if ($objtype = amd64) mk -f amd64/mkfile install
-#	if ($objtype = 386) mk -f 386/mkfile install
 
 
 

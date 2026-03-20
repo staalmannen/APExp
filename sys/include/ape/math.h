@@ -8,6 +8,7 @@
 
 #define INFINITY HUGE_VAL
 #define HUGE_VALF HUGE_VAL
+#define NAN NaN()
 
 #define double_t double
 #define float_t float

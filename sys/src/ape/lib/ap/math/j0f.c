@@ -108,7 +108,7 @@ float y0f(float x)
 
 	GET_FLOAT_WORD(ix, x);
 	if ((ix & 0x7fffffff) == 0)
-		return -1/0.0f;
+		return -INFINITY;
 	if (ix>>31)
 		return 0/0.0f;
 	if (ix >= 0x7f800000)

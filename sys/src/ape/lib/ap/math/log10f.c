@@ -40,7 +40,7 @@ float log10f(float x)
 		if (ix<<1 == 0)
 			return -1/(x*x);  /* log(+-0)=-inf */
 		if (ix>>31)
-			return (x-x)/0.0f; /* log(-#) = NaN */
+			return NAN; /* log(-#) = NaN */
 		/* subnormal number, scale up x */
 		k -= 25;
 		x *= 0x1p25f;

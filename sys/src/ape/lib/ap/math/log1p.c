@@ -78,8 +78,8 @@ double log1p(double x)
 	if (hx < 0x3fda827a || hx>>31) {  /* 1+x < sqrt(2)+ */
 		if (hx >= 0xbff00000) {  /* x <= -1.0 */
 			if (x == -1)
-				return x/0.0; /* log1p(-1) = -inf */
-			return (x-x)/0.0;     /* log1p(x<-1) = NaN */
+				return -INFINITY; /* log1p(-1) = -inf */
+			return NAN;     /* log1p(x<-1) = NaN */
 		}
 		if (hx<<1 < 0x3ca00000<<1) {  /* |x| < 2**-53 */
 			/* underflow if subnormal */
