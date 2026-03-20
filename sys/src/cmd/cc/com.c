@@ -1315,6 +1315,10 @@ loop:
 		ccom(r);
 		t = vconst(r);
 		if(t == 0) {
+			/* IEEE 754: float/double division by zero is well-defined
+			 * (yields +-Inf or NaN); suppress the diagnostic for fp types. */
+			if(n->type != T && typefd[n->type->etype])
+				goto common;
 			diag(n, "divide check");
 			*n = *r;
 			break;
