@@ -178,11 +178,14 @@ extern int	pclose(FILE *);
 extern int asprintf(char**, const char *, ...);
 extern int vasprintf(char **, const char *, va_list);
 
-extern _MUSL_FILE *fmemopen(void *, size_t, const char *);
-extern _MUSL_FILE *open_memstream(char **, size_t *);
+extern FILE *fmemopen(void *, size_t, const char *);
+extern FILE *open_memstream(char **, size_t *);
 
 extern ssize_t getdelim(char **, size_t *, int, FILE *);
 extern ssize_t getline (char **, size_t *, FILE *);
+
+extern int dprintf(int, const char *, ...);
+extern int vdprintf(int, const char *, va_list);
 
 
 #ifdef __cplusplus

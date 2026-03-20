@@ -19,8 +19,8 @@ extern int memcmp(const void *, const void *, size_t);
 extern int strcmp(const char *, const char *);
 extern int strcoll(const char *, const char *);
 extern int strverscmp(const char *, const char *);
-extern char *strdup(char*);
-extern char *strndup(char*, size_t);
+extern char *strdup(const char*);
+extern char *strndup(const char*, size_t);
 extern int strncmp(const char *, const char *, size_t);
 extern size_t strxfrm(char *, const char *, size_t);
 extern void *memchr(const void *, int, size_t);
@@ -36,13 +36,23 @@ extern char *strerror(int);
 extern size_t strlen(const char *);
 extern size_t strnlen(const char *, size_t);
 
-extern int strerror_r(int, char *, unsigned long);
+extern int strerror_r(int, char *, size_t);
 extern char *strtok_r(char *, const char *, char **);
 
 #include <bsd.h>
 
 /* from musl */
 extern char *strchrnul(const char*, int);
+
+void *memmem(const void *, size_t, const void *, size_t);
+void *memrchr(const void *, int, size_t);
+char *stpcpy(char *, const char *);
+char *stpncpy(char *, const char *, size_t);
+char *strsignal(int);
+char *strsep(char **, const char *);
+char *strcasestr(const char *, const char *);
+char *strfry(char *);
+void *mempcpy(void *, const void *, size_t);
 
 
 #ifdef __cplusplus

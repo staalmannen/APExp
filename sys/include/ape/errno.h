@@ -54,6 +54,7 @@ extern int *_errnoloc;
 #define EAFNOSUPPORT	39
 #define ENOBUFS		40
 #define EOPNOTSUPP	41
+#define ENOTSUP EOPNOTSUPP   /* alias is acceptable */
 #define EADDRINUSE	42
 #define EDESTADDRREQ	43
 #define EMSGSIZE	44
@@ -91,5 +92,11 @@ extern int *_errnoloc;
 
 #define EOVERFLOW	66
 #define ELOOP		67
+
+#define EILSEQ  68
+
+#define ENOTRECOVERABLE 69
+#define EOWNERDEAD      70
+
 
 #endif /* __ERRNO */

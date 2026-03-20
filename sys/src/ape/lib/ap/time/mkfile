@@ -17,6 +17,9 @@ OFILES=\
 	tzset.$O\
 #	musl\
 	__map_file.$O\
+#	hacks\
+	strptime.$O\
+	timegm.$O\
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib

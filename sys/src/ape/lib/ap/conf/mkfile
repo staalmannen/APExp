@@ -2,11 +2,14 @@ APEXPROOT=../../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+
 OFILES=\
 	getpagesize.$O\
-	getdtablesize.$O\
 	pathconf.$O\
 	sysconf.$O
+#	hacks\
+	getdtablesize.$O\
+	confstr.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

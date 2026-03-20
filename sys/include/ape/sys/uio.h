@@ -16,9 +16,9 @@ extern "C" {
  */
 
 struct iovec {
-	char	*iov_base;
-	int	iov_len;
-};
+      void  *iov_base;   /* was char * */
+      size_t iov_len;    /* was int */
+  };
 
 extern int writev(int, struct iovec*, int);
 extern int readv(int, struct iovec*, int);

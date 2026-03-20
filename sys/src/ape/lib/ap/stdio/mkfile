@@ -66,9 +66,11 @@ OFILES=\
 # musl \
 	asprintf.$O\
 	vasprintf.$O\
-#	fmemopen.$O\
-#	getdelim.$O\
+	fmemopen.$O\
+	getdelim.$O\
 	getline.$O\
+# hacks \
+	dprintf.$O\
 
 
 

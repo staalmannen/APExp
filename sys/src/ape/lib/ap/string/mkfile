@@ -60,6 +60,9 @@ OFILES=\
 	strtod.$O\
 	strtold.$O\
 	strtof.$O\
+# hacks\
+	strtoumax.$O\
+
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

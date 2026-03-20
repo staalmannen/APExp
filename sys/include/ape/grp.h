@@ -20,6 +20,11 @@ extern "C" {
 extern struct group *getgrgid(gid_t);
 extern struct group *getgrnam(const char *);
 
+// hacks or musl
+extern struct group *getgrent(void);
+extern void setgrent(void);
+extern void endgrent(void);
+
 #ifdef __cplusplus
 }
 #endif

@@ -105,6 +105,10 @@
 #define B9600	13
 #define B19200	14
 #define B38400	15
+#define B57600  16
+#define B115200 17
+#define B230400 18
+#define B460800 19
 
 /* optional actions for tcsetattr */
 #define TCSANOW	  1
@@ -129,6 +133,7 @@ extern speed_t cfgetospeed(const struct termios *);
 extern int cfsetospeed(struct termios *, speed_t);
 extern speed_t cfgetispeed(const struct termios *);
 extern int cfsetispeed(struct termios *, speed_t);
+extern void cfmakeraw(struct termios *);
 extern int tcgetattr(int, struct termios *);
 extern int tcsetattr(int, int, const struct termios *);
 extern pid_t tcgetpgrp(int);
@@ -136,3 +141,4 @@ extern int tcsetpgrp(int, pid_t);
 extern int tcdrain(int);
 extern int tcflush(int, int);
 extern int tcflow(int, int);
+extern int tcsendbreak(int, int);

@@ -6,6 +6,8 @@ OFILES=\
 	_exit.$O\
 	atexit.$O\
 	exit.$O\
+#	hacks\
+	quick_exit.$O\
 
 
 UPDATE=\

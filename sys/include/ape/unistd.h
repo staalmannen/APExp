@@ -118,6 +118,7 @@ extern int setpgid(pid_t, pid_t);
 extern pid_t setsid(void);
 
 /* files and directories */
+extern int fsync(int);
 extern int chdir(const char *);
 extern int chroot(const char *);
 extern int link(const char *, const char *);
@@ -157,8 +158,16 @@ extern char *getlogin_r(char *, int);
 extern int getpagesize(void);
 extern int gethostname(char *, size_t);
 
+/* musl */
+extern int truncate(const char *, off_t);
+extern int getdtablesize(void);
+
 /* stubs and hacks */
 # include <sys/stat.h> /* readlink */
+extern int symlink(const char *, const char *);
+extern ssize_t readlink(const char *, char *, size_t);
+extern int usleep(unsigned int);
+extern size_t confstr(int, char *, size_t);
 
 #ifdef __cplusplus
 }

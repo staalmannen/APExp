@@ -34,7 +34,6 @@ typedef unsigned short in_port_t;
 /*
  * Option flags per-socket.
  */
-#ifdef HAVE_SOCK_OPTS
 #define	SO_DEBUG	0x0001		/* turn on debugging info recording */
 #define	SO_ACCEPTCONN	0x0002		/* socket has had listen() */
 #define	SO_REUSEADDR	0x0004		/* allow local address reuse */
@@ -44,7 +43,6 @@ typedef unsigned short in_port_t;
 #define	SO_USELOOPBACK	0x0040		/* bypass hardware when possible */
 #define	SO_LINGER	0x0080		/* linger on close if data present */
 #define	SO_OOBINLINE	0x0100		/* leave received OOB data in line */
-#endif
 
 /*
  * Additional options, not kept in so_options.
@@ -172,6 +170,7 @@ struct msghdr {
 #define	MSG_OOB		0x1		/* process out-of-band data */
 #define	MSG_PEEK	0x2		/* peek at incoming message */
 #define	MSG_DONTROUTE	0x4		/* send without using routing tables */
+#define MSG_NOSIGNAL 0x4000
 
 #define	MSG_MAXIOVLEN	16
 

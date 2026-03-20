@@ -53,7 +53,7 @@ struct pthread_key {
 #define PTHREAD_ONCE_INIT		{ 0 }
 #define PTHREAD_MUTEX_INITIALIZER	{ 0 }
 #define PTHREAD_MUTEX_DEFAULT		0
-#define PTHREAD_MUTEX_NORAML		1
+#define PTHREAD_MUTEX_NORMAL		1
 #define PTHREAD_MUTEX_RECURSIVE	2
 #define PTHREAD_COND_INITIALIZER	{ 0 }
 
@@ -97,6 +97,20 @@ extern int	pthread_setcancelstate(int, int*);
 #include <signal.h>
 extern int	pthread_sigmask(int, const sigset_t*, sigset_t*);
 #endif
+
+// stubs?
+extern int pthread_attr_init(pthread_attr_t *);
+extern int pthread_attr_destroy(pthread_attr_t *);
+extern int pthread_attr_setdetachstate(pthread_attr_t *, int);
+extern int pthread_attr_getdetachstate(const pthread_attr_t *, int *);
+extern int pthread_attr_setstacksize(pthread_attr_t *, size_t);
+extern int pthread_attr_getstacksize(const pthread_attr_t *, size_t *);
+
+#define PTHREAD_CREATE_JOINABLE  0
+#define PTHREAD_CREATE_DETACHED  1
+
+extern int pthread_detach(pthread_t);
+
 
 #ifdef __cplusplus
 }

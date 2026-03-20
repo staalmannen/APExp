@@ -43,7 +43,12 @@ typedef int sig_atomic_t;
 #define SIGVTALRM 22 /* virtual alarm clock */
 #define SIGPROF 23  /* profiling alarm clock */
 
-#define NSIG 24
+#define SIGTRAP   24  /* not supported, defined for compatibility */
+#define SIGURG    25
+#define SIGXCPU   26
+#define SIGXFSZ   27
+
+#define NSIG 28
 
 #ifdef __cplusplus
 extern "C" {
@@ -51,6 +56,8 @@ extern "C" {
 
 extern void (*signal(int, void (*)()))();
 extern int raise(int);
+extern char *strsignal(int);
+extern void psignal(int, const char *);
 
 #ifdef __cplusplus
 }
@@ -63,12 +70,12 @@ struct sigaction {
 	int		sa_flags;
 };
 /* values for sa_flags */
-#define SA_NOCLDSTOP	1
-#define SA_ONSTACK	2
-#define SA_RESETHAND	3
-#define SA_RESTART	4
-#define SA_RESTORER	5
-#define SA_NODEFER 0
+  #define SA_NOCLDSTOP  0x001
+  #define SA_ONSTACK    0x002
+  #define SA_RESETHAND  0x004   /* was 3, should be a bit */
+  #define SA_RESTART    0x008   /* was 4 */
+  #define SA_RESTORER   0x010   /* was 5 */
+  #define SA_NODEFER    0x020   /* was 0 — this is the dangerous one */
 
 /* first argument to sigprocmask */
 #define SIG_BLOCK	1

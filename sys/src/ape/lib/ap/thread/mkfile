@@ -29,6 +29,10 @@ OFILES=\
 	setcancelstate.$O\
 	pthread_setspecific.$O\
 	pthread_sigmask.$O\
+# hacks \
+	semaphore.$O\
+	pthread_ext.$O\
+
 
 HFILES=lib.h
 

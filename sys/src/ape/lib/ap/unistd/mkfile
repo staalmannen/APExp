@@ -39,6 +39,11 @@ OFILES=\
 	unlink.$O\
 	writev.$O\
 	write.$O\
+#	hacks\
+	at_functions.$O\
+	truncate.$O\
+	symlink.$O\
+	usleep.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

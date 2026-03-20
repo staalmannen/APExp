@@ -63,6 +63,18 @@ extern int setenv(const char *, const char *, int);
 extern int unsetenv(const char *);
 extern char *realpath(const char *, char *);
 
+extern long long llabs(long long);
+#ifndef lldiv_t
+typedef struct { long long quot, rem; } lldiv_t;
+#endif
+extern lldiv_t lldiv(long long, long long);
+
+extern int at_quick_exit(void (*)(void));
+extern _Noreturn void quick_exit(int);
+
+extern int posix_memalign(void **, size_t, size_t);
+
+
 #ifdef __cplusplus
 }
 #endif

@@ -11,6 +11,12 @@
 
 #define CLOCK_REALTIME 0
 #define CLOCK_MONOTONIC 1
+#ifndef CLOCK_PROCESS_CPUTIME_ID
+#define CLOCK_PROCESS_CPUTIME_ID 2
+#endif
+#ifndef CLOCK_THREAD_CPUTIME_ID
+#define CLOCK_THREAD_CPUTIME_ID  3
+#endif
 
 #ifndef _CLOCK_T
 #define _CLOCK_T
@@ -53,13 +59,13 @@ extern size_t strftime(char *, size_t, const char *, const struct tm *);
 extern int clock_gettime(clockid_t, struct timespec *);
 extern int clock_settime(clockid_t, struct timespec *);
 
-#ifdef _REENTRANT_SOURCE
 extern struct tm *gmtime_r(const time_t *, struct tm *);
 extern struct tm *localtime_r(const time_t *, struct tm *);
 extern char *ctime_r(const time_t *, char *);
-#endif
 
-#ifdef _POSIX_SOURCE
+extern char *strptime(const char *, const char *, struct tm *);
+extern time_t timegm(struct tm *);
+
 extern void tzset(void);
 
 struct timespec {
@@ -67,17 +73,14 @@ struct timespec {
 	long tv_nsec;
 };
 extern int nanosleep(const struct timespec *req, struct timespec *rem);
-#endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#ifdef _POSIX_SOURCE
 extern char *tzname[2];
 extern long timezone;
 extern long altzone;
 extern int daylight;
-#endif
 
 #endif /* __TIME_H */

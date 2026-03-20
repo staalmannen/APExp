@@ -13,6 +13,8 @@ OFILES=\
 	utime.$O\
 # stubs\
 	fchown-stub.$O
+# hacks\
+	fchmod.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
