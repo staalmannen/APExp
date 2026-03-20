@@ -209,17 +209,17 @@ OFILES=\
 	signgam.$O\
 	significand.$O\
 	significandf.$O\
-#	sincos.$O\
-#	sincosf.$O\
+	sincos.$O\
+	sincosf.$O\
 	sincosl.$O\
-#	sinf.$O\
+	sinf.$O\
 	sinhf.$O\
 	sinhl.$O\
 	sinl.$O\
 	sqrt_data.$O\
 	sqrtf.$O\
 	sqrtl.$O\
-#	tanf.$O\
+	tanf.$O\
 	tanhf.$O\
 	tanhl.$O\
 	tanl.$O\
