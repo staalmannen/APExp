@@ -67,33 +67,48 @@ compoundlit(Type *t, Node *initnode)
 	init = doinit(s, t, 0L, initnode);
 
 	/*
-	 * doinit() returns a tree of OLIST(OASI, OLIST(OASI, ...)) nodes.
-	 * gen() (the statement generator) handles OLIST, but cgen() (the
-	 * expression generator) does not — it only handles OCOMMA in that
-	 * role.  Our OCOMMA(init, var) wrapper puts the init tree into
-	 * expression context, so convert any OLIST chain to a left-leaning
-	 * OCOMMA chain here.
+	 * doinit() builds the init tree with newlist(), which left-folds:
+	 *   1 member:  OASI_a
+	 *   2 members: OLIST(OASI_a, OASI_b)
+	 *   3 members: OLIST(OLIST(OASI_a, OASI_b), OASI_c)   -- left-leaning
+	 *   4 members: OLIST(OLIST(OLIST(a,b), c), d)
 	 *
-	 *   OLIST(a, OLIST(b, c))  ->  OCOMMA(OCOMMA(a, b), c)
+	 * gen() (statement generator) handles OLIST, but cgen() (expression
+	 * generator) does not.  Our OCOMMA(init, var) wrapper puts the whole
+	 * init tree into expression context, so we must convert every OLIST
+	 * node to OCOMMA before returning.
+	 *
+	 * The old code walked only the right spine and missed left-child OLIST
+	 * nodes present in trees with 3+ members, causing "unknown op in cgen: LIST".
+	 *
+	 * Fix: iterative in-order traversal (simulated with an explicit stack)
+	 * that visits every leaf in left-to-right order and chains them into a
+	 * left-leaning OCOMMA sequence.
 	 */
 	if(init != Z && init->op == OLIST) {
+		Node *stk[256];
+		int top;
+		top = 0;
 		seq = Z;
-		for(p = init; p != Z; ) {
-			if(p->op == OLIST) {
-				q = p->left;
-				p = p->right;
-			} else {
-				q = p;
-				p = Z;
+		p = init;
+		for(;;) {
+			while(p != Z && p->op == OLIST) {
+				if(top < 256)
+					stk[top++] = p;
+				p = p->left;
 			}
-			if(q == Z)
-				continue;
-			if(seq == Z)
-				seq = q;
-			else {
-				seq = new(OCOMMA, seq, q);
-				seq->type = q->type != T ? q->type : t;
+			q = p;
+			if(q != Z) {
+				if(seq == Z)
+					seq = q;
+				else {
+					seq = new(OCOMMA, seq, q);
+					seq->type = q->type != T ? q->type : t;
+				}
 			}
+			if(top == 0)
+				break;
+			p = stk[--top]->right;
 		}
 		init = seq;
 	}
