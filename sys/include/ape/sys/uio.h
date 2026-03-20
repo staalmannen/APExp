@@ -1,15 +1,11 @@
 #ifndef __SYS_UIO_H__
 #define __SYS_UIO_H__
 
-#ifndef _BSD_EXTENSION
-    This header file is an extension to ANSI/POSIX
-#endif
-
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-#pragma lib "/$M/lib/ape/libbsd.a"
+#pragma lib "/$M/lib/ape/libap.a"
 
 /*
  * Copyright (c) 1982, 1986 Regents of the University of California.

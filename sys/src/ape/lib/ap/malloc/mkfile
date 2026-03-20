@@ -6,7 +6,9 @@ LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 	calloc.$O\
 	malloc.$O\
+	setmalloctag.$O\
+	setrealloctag.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -I../include
+CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../include -I../plan9

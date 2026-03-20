@@ -16,6 +16,15 @@ struct	dirent {
 	struct stat d_stat;
 };
 
+/* d_ino compatibility macro: map to the inode field in d_stat */
+#define d_ino d_stat.st_ino
+/* d_type is not available on Plan9; define DT_ constants as stubs */
+#define d_type d_stat.st_mode
+#define DT_UNKNOWN 0
+#define DT_DIR     4
+#define DT_REG     8
+#define DT_LNK     10
+
 typedef struct _dirdesc {
 	int	dd_fd;		/* file descriptor */
 	long	dd_loc;		/* buf offset of entry from last readdir() */
@@ -24,6 +33,7 @@ typedef struct _dirdesc {
 	void *dirs;
 	int	dirsize;
 	int	dirloc;
+	long	dd_seek;	/* entry count for telldir/seekdir */
 } DIR;
 
 
@@ -38,9 +48,15 @@ DIR		*opendir(const char *);
 struct dirent	*readdir(DIR *);
 void		rewinddir(DIR *);
 int		closedir(DIR *);
-
-//stub
-int dirfd(DIR *) { return -1; }
+int		dirfd(DIR *);
+int		readdir_r(DIR *, struct dirent *, struct dirent **);
+void		seekdir(DIR *, long);
+long		telldir(DIR *);
+int		scandir(const char *, struct dirent ***,
+			int (*)(const struct dirent *),
+			int (*)(const struct dirent **, const struct dirent **));
+int		alphasort(const struct dirent **, const struct dirent **);
+int		versionsort(const struct dirent **, const struct dirent **);
 
 #ifdef __cplusplus
 }

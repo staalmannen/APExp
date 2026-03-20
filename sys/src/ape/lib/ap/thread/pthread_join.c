@@ -30,7 +30,7 @@ _wait(void)
 		return nil;
 	}
 	buf[n] = '\0';
-	if(getfields(buf, fld, nelem(fld)) != nelem(fld)){
+	if(getfields(buf, fld, nelem(fld), 1, " \t") != nelem(fld)){
 		errno = ENOBUFS;
 		return nil;
 	}

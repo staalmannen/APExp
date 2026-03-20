@@ -78,7 +78,6 @@ extern int chmod(const char *, mode_t);
 extern int fchown (int fd, uid_t uid, gid_t gid);
 extern int fchmod (int fd, mode_t mode);
 
-#pragma lib "/$M/lib/ape/libbsd.a"
 extern int	lstat(char *, struct stat *);
 extern int	symlink(char *, char *);
 extern int	readlink(char *, char*, int);

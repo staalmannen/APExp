@@ -19,6 +19,7 @@ OFILES=\
 	getservbyaddr.$O\
 	getservbyname.$O\
 	getsockname.$O\
+	idn.$O\
 	in6_addr.$O\
 	inet_addr.$O\
 	inet_aton.$O\

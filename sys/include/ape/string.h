@@ -18,6 +18,7 @@ extern char *strncat(char *, const char *, size_t);
 extern int memcmp(const void *, const void *, size_t);
 extern int strcmp(const char *, const char *);
 extern int strcoll(const char *, const char *);
+extern int strverscmp(const char *, const char *);
 extern char *strdup(char*);
 extern char *strndup(char*, size_t);
 extern int strncmp(const char *, const char *, size_t);

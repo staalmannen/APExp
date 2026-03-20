@@ -31,7 +31,7 @@ newwindow(char *str)
 			return -1;
 		}
 	} else {
-		if(bind("/mnt/wsys", "/dev", MBEFORE) == -1)
+		if(p9bind("/mnt/wsys", "/dev", MBEFORE) == -1)
 			return -1;
 	}
 	return 0;

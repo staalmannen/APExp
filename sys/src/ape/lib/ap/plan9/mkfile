@@ -40,6 +40,31 @@ OFILES=\
 	nap.$O\
 # musl/linux syscall compatibility hack\
 	__p9_syscall.$O\
+# lib9\
+	argv0.$O\
+	p9bind.$O\
+	crypt.$O\
+	p9gmtime.$O\
+	errstr.$O\
+	rerrstr.$O\
+	getcallerpc.$O\
+	getfcr.$O\
+	getfields.$O\
+	mount.$O\
+	nsec.$O\
+	rendezvous.$O\
+	rfork.$O\
+	segattach.$O\
+	segdetach.$O\
+	segflush.$O\
+	segfree.$O\
+	sysfatal.$O\
+	tokenize.$O\
+	u16.$O\
+	u32.$O\
+	u64.$O\
+	unmount.$O\
+	fd2path.$O\
 
 
 UPDATE=\
@@ -51,10 +76,16 @@ UPDATE=\
 
 CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I$APEXPROOT/$objtype/include/ape\
 	-D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION\
-	-D_RESEARCH_SOURCE -D_NET_EXTENSION -I../include
+	-D_RESEARCH_SOURCE -D_NET_EXTENSION -I../include -I.
 
 $OFILES: lib.h
 
 %.$O:	plan9/%.c
+	$CC $CFLAGS $prereq
+
+%.$O:	$objtype/%.s
+	$AS $prereq
+
+%.$O:	$objtype/%.c
 	$CC $CFLAGS $prereq
 

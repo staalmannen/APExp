@@ -2,8 +2,14 @@ APEXPROOT=../../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+
 OFILES=\
+	dirfd.$O\
 	opendir.$O\
+	readdir_r.$O\
+	scandir.$O\
+	seekdir.$O\
+
 
 UPDATE=\
 	mkfile\

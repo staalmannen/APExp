@@ -1,6 +1,6 @@
 #ifndef __QLOCK_H_
 #define __QLOCK_H_
-#pragma lib "/$M/lib/ape/lib9.a"
+#pragma lib "/$M/lib/ape/libap.a"
 
 #include <u.h>
 #include <lock.h>

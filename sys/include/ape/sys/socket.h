@@ -1,7 +1,7 @@
 #ifndef __SYS_SOCKET_H__
 #define __SYS_SOCKET_H__
 
-#pragma lib "/$M/lib/ape/libbsd.a"
+#pragma lib "/$M/lib/ape/libap.a"
 
 #ifdef __cplusplus
 extern "C" {

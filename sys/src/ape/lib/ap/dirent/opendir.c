@@ -48,6 +48,7 @@ Nomem:
 	d->dirs = NULL;
 	d->dirsize = 0;
 	d->dirloc = 0;
+	d->dd_seek = 0;	/* entry count for telldir/seekdir */
 	return d;
 }
 
@@ -75,6 +76,7 @@ rewinddir(DIR *d)
 	d->dd_size = 0;
 	d->dirsize = 0;
 	d->dirloc = 0;
+	d->dd_seek = 0;
 	free(d->dirs);
 	d->dirs = NULL;
 	if(_SEEK(d->dd_fd, 0, 0) < 0){
@@ -121,5 +123,6 @@ readdir(DIR *d)
 	}
 	dr = (struct dirent*)(d->dd_buf+d->dd_loc);
 	d->dd_loc += sizeof(struct dirent);
+	d->dd_seek++;
 	return dr;
 }
