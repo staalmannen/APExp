@@ -12,7 +12,7 @@ OFILES=\
 	umask.$O\
 	utime.$O\
 # stubs\
-	fchown-stub.$O
+	fchown-stub.$O\
 # hacks\
 	fchmod.$O\
 

@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <signal.h>
 
 /*
  * posix_spawn / posix_spawnp - spawn a process

@@ -1,5 +1,3 @@
-#define _POSIX_SOURCE
-#define _RESEARCH_SOURCE
 #include <stdio.h>
 #include <signal.h>
 #include <limits.h>

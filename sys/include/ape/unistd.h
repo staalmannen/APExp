@@ -165,7 +165,6 @@ extern int getdtablesize(void);
 /* stubs and hacks */
 # include <sys/stat.h> /* readlink */
 extern int symlink(const char *, const char *);
-extern ssize_t readlink(const char *, char *, size_t);
 extern int usleep(unsigned int);
 extern size_t confstr(int, char *, size_t);
 

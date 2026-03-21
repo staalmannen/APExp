@@ -36,13 +36,14 @@ extern char *strerror(int);
 extern size_t strlen(const char *);
 extern size_t strnlen(const char *, size_t);
 
-extern int strerror_r(int, char *, size_t);
 extern char *strtok_r(char *, const char *, char **);
 
 #include <bsd.h>
 
 /* from musl */
 extern char *strchrnul(const char*, int);
+#define __strchrnul strchrnul
+extern int strerror_r(int, char *, size_t);
 
 void *memmem(const void *, size_t, const void *, size_t);
 void *memrchr(const void *, int, size_t);

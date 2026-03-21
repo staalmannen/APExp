@@ -86,7 +86,7 @@ static int do_nftw(char *path, int (*fn)(const char *, const struct stat *, int,
 			errno = err;
 			return -1;
 		}
-		DIR *d = fdopendir(dfd);
+		DIR *d = opendir(path);
 		if (d) {
 			struct dirent *de;
 			while ((de = readdir(d))) {

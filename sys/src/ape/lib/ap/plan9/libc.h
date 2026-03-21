@@ -1,10 +1,7 @@
 #define _LOCK_EXTENSION
 #define _QLOCK_EXTENSION
-#define _BSD_EXTENSION
 
-#ifdef _NET_EXTENSION
 #include <libnet.h>
-#endif
 
 #include <stdint.h>
 #include <sys/types.h>

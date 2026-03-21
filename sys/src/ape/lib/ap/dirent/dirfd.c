@@ -1,4 +1,5 @@
 #include "lib.h"
+#include <unistd.h>
 #include <dirent.h>
 #include <errno.h>
 

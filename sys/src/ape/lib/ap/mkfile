@@ -38,6 +38,7 @@ DIRS=\
 	syscall\
 	temp\
 	termios\
+	thread\
 	time\
 	unistd\
 	wchar

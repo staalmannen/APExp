@@ -26,7 +26,8 @@ extern char	*_progname;
 extern int	nap(int);
 
 extern char	*setfields(char *);
-extern int	getfields(char *, char **, int);
+extern int getfields(char *, char **, int, int, char *); // getfields from lib9
+extern int	getfields3(char *, char **, int); //old getfields from libv
 extern int	getmfields(char *, char **, int);
 
 

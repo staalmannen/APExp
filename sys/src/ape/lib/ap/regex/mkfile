@@ -14,4 +14,4 @@ OFILES=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -I../include -Dhidden=/*nothing*/ -Drestrict=/*nothing*/
+CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -I../include -I. -Drestrict=/**/

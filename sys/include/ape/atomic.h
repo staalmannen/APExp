@@ -163,7 +163,7 @@ static inline long a_fetch_add(volatile long *p, long v)
    a_fetch_and / a_fetch_or
    ------------------------------ */
 
-static inline unsigned int a_fetch_and(volatile unsigned int *p, unsigned int v)
+static inline unsigned int a_fetch_and(atomic_uint_t *p, unsigned int v)
 {
     atomic_uint_t *obj = (atomic_uint_t *)p;
     unsigned int old;
@@ -174,7 +174,7 @@ static inline unsigned int a_fetch_and(volatile unsigned int *p, unsigned int v)
     return old;
 }
 
-static inline unsigned int a_fetch_or(volatile unsigned int *p, unsigned int v)
+static inline unsigned int a_fetch_or(atomic_uint_t *p, unsigned int v)
 {
     atomic_uint_t *obj = (atomic_uint_t *)p;
     unsigned int old;
@@ -189,12 +189,12 @@ static inline unsigned int a_fetch_or(volatile unsigned int *p, unsigned int v)
    High-level helpers
    ------------------------------ */
 
-static inline void a_and(volatile unsigned int *p, unsigned int v)
+static inline void a_and(atomic_uint_t *p, unsigned int v)
 {
     a_fetch_and(p, v);
 }
 
-static inline void a_or(volatile unsigned int *p, unsigned int v)
+static inline void a_or(atomic_uint_t *p, unsigned int v)
 {
     a_fetch_or(p, v);
 }
@@ -233,6 +233,16 @@ static inline void a_crash()
 {
 	*(volatile char *)0=0;
 }
+
+static inline int a_ctz_32(uint32_t x)
+{
+	static const char debruijn32[32] = {
+		0, 1, 23, 2, 29, 24, 19, 3, 30, 27, 25, 11, 20, 8, 4, 13,
+		31, 22, 28, 18, 26, 10, 7, 12, 21, 17, 9, 6, 16, 5, 15, 14
+	};
+	return debruijn32[(x&-x)*0x076be629 >> 27];
+}
+
 
 static inline int a_ctz_64(uint64_t x)
 {
@@ -277,10 +287,6 @@ static inline int a_clz_64(uint64_t x)
 	return a_clz_32(x) + 32;
 }
 
-static inline int a_ctz_32(uint32_t x)
-{
-	return 31-a_clz_32(x&-x);
-}
 
 
 #endif /* ATOMIC_H */
