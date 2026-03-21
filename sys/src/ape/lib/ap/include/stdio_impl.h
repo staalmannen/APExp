@@ -36,16 +36,16 @@
 struct _IO_FILE {
 	unsigned flags;
 	unsigned char *rpos, *rend;
-	int (*close)(FILE *);
+	int (*close)(struct _IO_FILE *);
 	unsigned char *wend, *wpos;
 	unsigned char *mustbezero_1;
 	unsigned char *wbase;
-	size_t (*read)(FILE *, unsigned char *, size_t);
-	size_t (*write)(FILE *, const unsigned char *, size_t);
-	off_t (*seek)(FILE *, off_t, int);
+	size_t (*read)(struct _IO_FILE *, unsigned char *, size_t);
+	size_t (*write)(struct _IO_FILE *, const unsigned char *, size_t);
+	off_t (*seek)(struct _IO_FILE *, off_t, int);
 	unsigned char *buf;
 	size_t buf_size;
-	FILE *prev, *next;
+	struct _IO_FILE *prev, *next;
 	int fd;
 	int pipe_pid;
 	long lockcount;
@@ -58,13 +58,15 @@ struct _IO_FILE {
 	void *mustbezero_2;
 	unsigned char *shend;
 	off_t shlim, shcnt;
-	FILE *prev_locked, *next_locked;
+	struct _IO_FILE *prev_locked, *next_locked;
 	struct __locale_struct *locale;
 };
 
-extern hidden FILE *volatile __stdin_used;
-extern hidden FILE *volatile __stdout_used;
-extern hidden FILE *volatile __stderr_used;
+typedef struct _IO_FILE _MUSL_FILE;
+
+extern hidden struct _IO_FILE *volatile __stdin_used;
+extern hidden struct _IO_FILE *volatile __stdout_used;
+extern hidden struct _IO_FILE *volatile __stderr_used;
 
 /* APExp: __lockfile/__unlockfile -- APE has no thread support so these
  * are no-op stubs. The lock field is retained in the struct (layout must
@@ -72,17 +74,17 @@ extern hidden FILE *volatile __stderr_used;
  * Note: __lockfile returns 1 (not 0) so that FUNLOCK actually calls
  * __unlockfile -- matching musl's convention where a nonzero return
  * means "I took the lock and you must release it". */
-static inline int  __lockfile(FILE *f)   { (void)f; return 1; }
-static inline void __unlockfile(FILE *f) { (void)f; }
+static inline int  __lockfile(struct _IO_FILE *f)   { (void)f; return 1; }
+static inline void __unlockfile(struct _IO_FILE *f) { (void)f; }
 
-hidden size_t __stdio_read(FILE *, unsigned char *, size_t);
-hidden size_t __stdio_write(FILE *, const unsigned char *, size_t);
-hidden size_t __stdout_write(FILE *, const unsigned char *, size_t);
-hidden off_t __stdio_seek(FILE *, off_t, int);
-hidden int __stdio_close(FILE *);
+hidden size_t __stdio_read(struct _IO_FILE *, unsigned char *, size_t);
+hidden size_t __stdio_write(struct _IO_FILE *, const unsigned char *, size_t);
+hidden size_t __stdout_write(struct _IO_FILE *, const unsigned char *, size_t);
+hidden off_t __stdio_seek(struct _IO_FILE *, off_t, int);
+hidden int __stdio_close(struct _IO_FILE *);
 
-hidden int __toread(FILE *);
-hidden int __towrite(FILE *);
+hidden int __toread(struct _IO_FILE *);
+hidden int __towrite(struct _IO_FILE *);
 
 hidden void __stdio_exit(void);
 hidden void __stdio_exit_needed(void);
@@ -90,20 +92,20 @@ hidden void __stdio_exit_needed(void);
 #if defined(__PIC__) && (100*__GNUC__+__GNUC_MINOR__ >= 303)
 __attribute__((visibility("protected")))
 #endif
-int __overflow(FILE *, int), __uflow(FILE *);
+int __overflow(struct _IO_FILE *, int), __uflow(struct _IO_FILE *);
 
-hidden int __fseeko(FILE *, off_t, int);
-hidden int __fseeko_unlocked(FILE *, off_t, int);
-hidden off_t __ftello(FILE *);
-hidden off_t __ftello_unlocked(FILE *);
-hidden size_t __fwritex(const unsigned char *, size_t, FILE *);
-hidden int __putc_unlocked(int, FILE *);
+hidden int __fseeko(struct _IO_FILE *, off_t, int);
+hidden int __fseeko_unlocked(struct _IO_FILE *, off_t, int);
+hidden off_t __ftello(struct _IO_FILE *);
+hidden off_t __ftello_unlocked(struct _IO_FILE *);
+hidden size_t __fwritex(const unsigned char *, size_t, struct _IO_FILE *);
+hidden int __putc_unlocked(int, struct _IO_FILE *);
 
-hidden FILE *__fdopen(int, const char *);
+hidden struct _IO_FILE *__fdopen(int, const char *);
 hidden int __fmodeflags(const char *);
 
-hidden FILE *__ofl_add(FILE *f);
-hidden FILE **__ofl_lock(void);
+hidden struct _IO_FILE *__ofl_add(struct _IO_FILE *f);
+hidden struct _IO_FILE **__ofl_lock(void);
 hidden void __ofl_unlock(void);
 
 /* APExp: pthread/locked-file tracking omitted -- no thread support in APE.
@@ -127,7 +129,7 @@ hidden void __getopt_msg(const char *, const char *, const char *, size_t);
 	: __overflow((f),(unsigned char)(c)) )
 
 /* Caller-allocated FILE * operations */
-hidden FILE *__fopen_rb_ca(const char *, FILE *, unsigned char *, size_t);
-hidden int __fclose_ca(FILE *);
+hidden struct _IO_FILE *__fopen_rb_ca(const char *, struct _IO_FILE *, unsigned char *, size_t);
+hidden int __fclose_ca(struct _IO_FILE *);
 
 #endif
