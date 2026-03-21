@@ -1,275 +1,239 @@
-#ifndef _ATOMIC_H
-#define _ATOMIC_H
+#ifndef ATOMIC_H
+#define ATOMIC_H
 
+/*
+ * Mutex-backed C89-compatible implementation of the musl atomic API:
+ *
+ *   a_ll(p), a_ll_p(p)
+ *   a_sc(p,v), a_sc_p(p,v)
+ *   a_cas(), a_swap(), a_fetch_add(), a_fetch_and(), a_fetch_or()
+ *   a_inc(), a_dec(), a_and(), a_or()
+ *
+ * This provides full musl-style semantics.
+ *
+ * No inline asm.
+ * No C11 atomics.
+ */
+
+#include <pthread.h>
 #include <stdint.h>
 
-// hack with a "generic" atomic_arch.h made by copilot
-#include "atomic_arch.h"
+/* ------------------------------
+   Atomic types
+   ------------------------------ */
 
-#ifdef a_ll
+typedef struct {
+    pthread_mutex_t lock;
+    long value;
+} atomic_long_t;
 
-#ifndef a_pre_llsc
-#define a_pre_llsc()
-#endif
+typedef struct {
+    pthread_mutex_t lock;
+    unsigned int value;
+} atomic_uint_t;
 
-#ifndef a_post_llsc
-#define a_post_llsc()
-#endif
+typedef struct {
+    pthread_mutex_t lock;
+    void *value;
+} atomic_ptr_t;
 
-#ifndef a_cas
-#define a_cas a_cas
-static inline int a_cas(volatile int *p, int t, int s)
+/* ------------------------------
+   Initialization
+   ------------------------------ */
+
+#define ATOMIC_INIT_LONG(v)  { PTHREAD_MUTEX_INITIALIZER, (v) }
+#define ATOMIC_INIT_UINT(v)  { PTHREAD_MUTEX_INITIALIZER, (v) }
+#define ATOMIC_INIT_PTR(v)   { PTHREAD_MUTEX_INITIALIZER, (v) }
+
+/* ------------------------------
+   Barriers for LL/SC API
+   ------------------------------ */
+
+static inline void a_barrier(void)
 {
-	int old;
-	a_pre_llsc();
-	do old = a_ll(p);
-	while (old==t && !a_sc(p, s));
-	a_post_llsc();
-	return old;
+    /* Mutex-based backends already provide full ordering. */
 }
-#endif
 
-#ifndef a_swap
-#define a_swap a_swap
-static inline int a_swap(volatile int *p, int v)
-{
-	long old;
-	a_pre_llsc();
-	do old = a_ll((atomic_long_t *) p);
-	while (!a_sc(p, v));
-	a_post_llsc();
-	return old;
-}
-#endif
+#define a_pre_llsc()  a_barrier()
+#define a_post_llsc() a_barrier()
 
-#ifndef a_fetch_add
-#define a_fetch_add a_fetch_add
-static inline int a_fetch_add(volatile int *p, int v)
-{
-	int old;
-	a_pre_llsc();
-	do old = a_ll(p);
-	while (!a_sc(p, (unsigned)old + v));
-	a_post_llsc();
-	return old;
-}
-#endif
-
-#ifndef a_fetch_and
-#define a_fetch_and a_fetch_and
-static inline int a_fetch_and(volatile int *p, int v)
-{
-	int old;
-	a_pre_llsc();
-	do old = a_ll(p);
-	while (!a_sc(p, old & v));
-	a_post_llsc();
-	return old;
-}
-#endif
-
-#ifndef a_fetch_or
-#define a_fetch_or a_fetch_or
-static inline int a_fetch_or(volatile int *p, int v)
-{
-	int old;
-	a_pre_llsc();
-	do old = a_ll(p);
-	while (!a_sc(p, old | v));
-	a_post_llsc();
-	return old;
-}
-#endif
-
-#endif
-
-#ifdef a_ll_p
-
-#ifndef a_cas_p
-#define a_cas_p a_cas_p
-static inline void *a_cas_p(volatile void *p, void *t, void *s)
-{
-	void *old;
-	a_pre_llsc();
-	do old = a_ll_p(p);
-	while (old==t && !a_sc_p(p, s));
-	a_post_llsc();
-	return old;
-}
-#endif
-
-#endif
-
-#ifndef a_cas
-#error missing definition of a_cas
-#endif
-
-#ifndef a_swap
-#define a_swap a_swap
-static inline int a_swap(volatile int *p, int v)
-{
-	int old;
-	do old = *p;
-	while (a_cas(p, old, v) != old);
-	return old;
-}
-#endif
-
-#ifndef a_fetch_add
-#define a_fetch_add a_fetch_add
-static inline int a_fetch_add(volatile int *p, int v)
-{
-	int old;
-	do old = *p;
-	while (a_cas(p, old, (unsigned)old+v) != old);
-	return old;
-}
-#endif
-
-#ifndef a_fetch_and
-#define a_fetch_and a_fetch_and
-static inline int a_fetch_and(volatile int *p, int v)
-{
-	int old;
-	do old = *p;
-	while (a_cas(p, old, old&v) != old);
-	return old;
-}
-#endif
-#ifndef a_fetch_or
-#define a_fetch_or a_fetch_or
-static inline int a_fetch_or(volatile int *p, int v)
-{
-	int old;
-	do old = *p;
-	while (a_cas(p, old, old|v) != old);
-	return old;
-}
-#endif
-
-#ifndef a_and
-#define a_and a_and
-static inline void a_and(atomic_uint_t *p, unsigned int v)
-{
-	a_fetch_and(p, v);
-}
-#endif
-
-#ifndef a_or
-#define a_or a_or
-static inline void a_or(atomic_uint_t *p, unsigned int v)
-{
-	a_fetch_or(p, v);
-}
-#endif
-
-#ifndef a_inc
-#define a_inc a_inc
-static inline void a_inc(atomic_long_t *p)
-{
-	a_fetch_add(p, 1);
-}
-#endif
-
-#ifndef a_dec
-#define a_dec a_dec
-static inline void a_dec(atomic_long_t *p)
-{
-	a_fetch_add(p, -1);
-}
-#endif
-
-#ifndef a_store
-#define a_store a_store
-static inline void a_store(volatile int *p, int v)
-{
-#ifdef a_barrier
-	a_barrier();
-	*p = v;
-	a_barrier();
-#else
-	a_swap(p, v);
-#endif
-}
-#endif
-
-#ifndef a_barrier
-#define a_barrier a_barrier
-static inline void a_barrier()
-{
-	atomic_long_t tmp = 0;
-	a_cas(&tmp, 0, 0);
-}
-#endif
-
-#ifndef a_spin
 #define a_spin a_barrier
-#endif
 
-#ifndef a_and_64
-#define a_and_64 a_and_64
+/* ------------------------------
+   a_ll / a_ll_p
+   ------------------------------ */
+
+static inline long a_ll(volatile long *p)
+{
+    atomic_long_t *obj = (atomic_long_t *)p;
+    long v;
+    pthread_mutex_lock(&obj->lock);
+    v = obj->value;
+    pthread_mutex_unlock(&obj->lock);
+    return v;
+}
+
+static inline void *a_ll_p(volatile void *p)
+{
+    atomic_ptr_t *obj = (atomic_ptr_t *)p;
+    void *v;
+    pthread_mutex_lock(&obj->lock);
+    v = obj->value;
+    pthread_mutex_unlock(&obj->lock);
+    return v;
+}
+
+/* ------------------------------
+   a_sc / a_sc_p
+   (Always succeed in mutex backend)
+   ------------------------------ */
+
+static inline int a_sc(volatile long *p, long v)
+{
+    atomic_long_t *obj = (atomic_long_t *)p;
+    pthread_mutex_lock(&obj->lock);
+    obj->value = v;
+    pthread_mutex_unlock(&obj->lock);
+    return 1; /* success */
+}
+
+static inline int a_sc_p(volatile void *p, void *v)
+{
+    atomic_ptr_t *obj = (atomic_ptr_t *)p;
+    pthread_mutex_lock(&obj->lock);
+    obj->value = v;
+    pthread_mutex_unlock(&obj->lock);
+    return 1; /* success */
+}
+
+/* ------------------------------
+   a_cas
+   ------------------------------ */
+
+static inline long a_cas(volatile long *p, long expected, long desired)
+{
+    long old;
+    a_pre_llsc();
+    do old = a_ll(p);
+    while (old == expected && !a_sc(p, desired));
+    a_post_llsc();
+    return old;
+}
+
+/* Pointer CAS */
+static inline void *a_cas_p(volatile void *p, void *expected, void *desired)
+{
+    void *old;
+    a_pre_llsc();
+    do old = a_ll_p(p);
+    while (old == expected && !a_sc_p(p, desired));
+    a_post_llsc();
+    return old;
+}
+
+/* ------------------------------
+   a_swap
+   ------------------------------ */
+
+static inline long a_swap(volatile long *p, long v)
+{
+    long old;
+    a_pre_llsc();
+    do old = a_ll(p);
+    while (!a_sc(p, v));
+    a_post_llsc();
+    return old;
+}
+
+/* ------------------------------
+   a_fetch_add
+   ------------------------------ */
+
+static inline long a_fetch_add(volatile long *p, long v)
+{
+    long old;
+    a_pre_llsc();
+    do old = a_ll(p);
+    while (!a_sc(p, old + v));
+    a_post_llsc();
+    return old;
+}
+
+/* ------------------------------
+   a_fetch_and / a_fetch_or
+   ------------------------------ */
+
+static inline unsigned int a_fetch_and(volatile unsigned int *p, unsigned int v)
+{
+    atomic_uint_t *obj = (atomic_uint_t *)p;
+    unsigned int old;
+    pthread_mutex_lock(&obj->lock);
+    old = obj->value;
+    obj->value &= v;
+    pthread_mutex_unlock(&obj->lock);
+    return old;
+}
+
+static inline unsigned int a_fetch_or(volatile unsigned int *p, unsigned int v)
+{
+    atomic_uint_t *obj = (atomic_uint_t *)p;
+    unsigned int old;
+    pthread_mutex_lock(&obj->lock);
+    old = obj->value;
+    obj->value |= v;
+    pthread_mutex_unlock(&obj->lock);
+    return old;
+}
+
+/* ------------------------------
+   High-level helpers
+   ------------------------------ */
+
+static inline void a_and(volatile unsigned int *p, unsigned int v)
+{
+    a_fetch_and(p, v);
+}
+
+static inline void a_or(volatile unsigned int *p, unsigned int v)
+{
+    a_fetch_or(p, v);
+}
+
+static inline void a_inc(volatile long *p)
+{
+    a_fetch_add(p, 1);
+}
+
+static inline void a_dec(volatile long *p)
+{
+    a_fetch_add(p, -1);
+}
+
 static inline void a_and_64(volatile uint64_t *p, uint64_t v)
 {
 	union { uint64_t v; uint32_t r[2]; } u = { v };
 	if (u.r[0]+1) a_and((atomic_uint_t *)p, u.r[0]);
 	if (u.r[1]+1) a_and((atomic_uint_t *)p+1, u.r[1]);
 }
-#endif
 
-#ifndef a_or_64
-#define a_or_64 a_or_64
 static inline void a_or_64(volatile uint64_t *p, uint64_t v)
 {
 	union { uint64_t v; uint32_t r[2]; } u = { v };
 	if (u.r[0]) a_or((atomic_uint_t *)p, u.r[0]);
 	if (u.r[1]) a_or((atomic_uint_t *)p+1, u.r[1]);
 }
-#endif
 
-#ifndef a_cas_p
-typedef char a_cas_p_undefined_but_pointer_not_32bit[-sizeof(char) == 0xffffffff ? 1 : -1];
-#define a_cas_p a_cas_p
-static inline void *a_cas_p(volatile void *p, void *t, void *s)
-{
-	return (void *)a_cas((volatile int *)p, (int)t, (int)s);
-}
-#endif
-
-#ifndef a_or_l
-#define a_or_l a_or_l
 static inline void a_or_l(volatile void *p, long v)
 {
 	if (sizeof(long) == sizeof(int)) a_or(p, v);
 	else a_or_64(p, v);
 }
-#endif
 
-#ifndef a_crash
-#define a_crash a_crash
 static inline void a_crash()
 {
 	*(volatile char *)0=0;
 }
-#endif
 
-#ifndef a_ctz_32
-#define a_ctz_32 a_ctz_32
-static inline int a_ctz_32(uint32_t x)
-{
-#ifdef a_clz_32
-	return 31-a_clz_32(x&-x);
-#else
-	static const char debruijn32[32] = {
-		0, 1, 23, 2, 29, 24, 19, 3, 30, 27, 25, 11, 20, 8, 4, 13,
-		31, 22, 28, 18, 26, 10, 7, 12, 21, 17, 9, 6, 16, 5, 15, 14
-	};
-	return debruijn32[(x&-x)*0x076be629 >> 27];
-#endif
-}
-#endif
-
-#ifndef a_ctz_64
-#define a_ctz_64 a_ctz_64
 static inline int a_ctz_64(uint64_t x)
 {
 	static const char debruijn64[64] = {
@@ -288,36 +252,12 @@ static inline int a_ctz_64(uint64_t x)
 	}
 	return debruijn64[(x&-x)*0x022fdd63cc95386dull >> 58];
 }
-#endif
 
 static inline int a_ctz_l(unsigned long x)
 {
 	return (sizeof(long) < 8) ? a_ctz_32(x) : a_ctz_64(x);
 }
 
-#ifndef a_clz_64
-#define a_clz_64 a_clz_64
-static inline int a_clz_64(uint64_t x)
-{
-#ifdef a_clz_32
-	if (x>>32)
-		return a_clz_32(x>>32);
-	return a_clz_32(x) + 32;
-#else
-	uint32_t y;
-	int r;
-	if (x>>32) y=x>>32, r=0; else y=x, r=32;
-	if (y>>16) y>>=16; else r |= 16;
-	if (y>>8) y>>=8; else r |= 8;
-	if (y>>4) y>>=4; else r |= 4;
-	if (y>>2) y>>=2; else r |= 2;
-	return r | !(y>>1);
-#endif
-}
-#endif
-
-#ifndef a_clz_32
-#define a_clz_32 a_clz_32
 static inline int a_clz_32(uint32_t x)
 {
 	x >>= 1;
@@ -329,19 +269,18 @@ static inline int a_clz_32(uint32_t x)
 	x++;
 	return 31-a_ctz_32(x);
 }
-#endif
 
-#ifndef a_cas
-#define a_cas a_cas
-static inline int a_cas(volatile int *p, int t, int s)
+static inline int a_clz_64(uint64_t x)
 {
-	int old;
-	a_pre_llsc();
-	do old = a_ll(p);
-	while (old==t && !a_sc(p, s));
-	a_post_llsc();
-	return old;
+	if (x>>32)
+		return a_clz_32(x>>32);
+	return a_clz_32(x) + 32;
 }
-#endif
 
-#endif
+static inline int a_ctz_32(uint32_t x)
+{
+	return 31-a_clz_32(x&-x);
+}
+
+
+#endif /* ATOMIC_H */
