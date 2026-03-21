@@ -2,23 +2,25 @@
 #define ATOMIC_ARCH_H
 
 /*
- * Pure C89, portable "atomic" implementation that matches
- * the LL/SC API required by atomic.h:
+ * Mutex-backed C89-compatible implementation of the musl atomic API:
  *
- *   a_ll(p)      - load-linked
- *   a_ll_p(p)    - load-linked for pointers
- *   a_sc(p, v)   - store-conditional
- *   a_sc_p(p, v) - store-conditional for pointers
+ *   a_ll(p), a_ll_p(p)
+ *   a_sc(p,v), a_sc_p(p,v)
+ *   a_cas(), a_swap(), a_fetch_add(), a_fetch_and(), a_fetch_or()
+ *   a_inc(), a_dec(), a_and(), a_or()
  *
- * Implemented using pthread mutexes (always succeed).
+ * This provides full musl-style semantics.
  *
  * No inline asm.
  * No C11 atomics.
  */
 
 #include <pthread.h>
+#include <stdint.h>
 
-/* ---- Atomic wrappers ---- */
+/* ------------------------------
+   Atomic types
+   ------------------------------ */
 
 typedef struct {
     pthread_mutex_t lock;
@@ -27,21 +29,38 @@ typedef struct {
 
 typedef struct {
     pthread_mutex_t lock;
+    unsigned int value;
+} atomic_uint_t;
+
+typedef struct {
+    pthread_mutex_t lock;
     void *value;
 } atomic_ptr_t;
 
-
-/* ---- Initialization macros ---- */
+/* ------------------------------
+   Initialization
+   ------------------------------ */
 
 #define ATOMIC_INIT_LONG(v)  { PTHREAD_MUTEX_INITIALIZER, (v) }
+#define ATOMIC_INIT_UINT(v)  { PTHREAD_MUTEX_INITIALIZER, (v) }
 #define ATOMIC_INIT_PTR(v)   { PTHREAD_MUTEX_INITIALIZER, (v) }
 
+/* ------------------------------
+   Barriers for LL/SC API
+   ------------------------------ */
 
-/* ============================================================
-   LL / SC API required by atomic.h
-   ============================================================ */
+static inline void a_barrier(void)
+{
+    /* Mutex-based backends already provide full ordering. */
+}
 
-/* ---- a_ll: load-linked for int/long ---- */
+#define a_pre_llsc()  a_barrier()
+#define a_post_llsc() a_barrier()
+
+/* ------------------------------
+   a_ll / a_ll_p
+   ------------------------------ */
+
 static inline long a_ll(volatile long *p)
 {
     atomic_long_t *obj = (atomic_long_t *)p;
@@ -52,7 +71,6 @@ static inline long a_ll(volatile long *p)
     return v;
 }
 
-/* ---- a_ll_p: load-linked for pointers ---- */
 static inline void *a_ll_p(volatile void *p)
 {
     atomic_ptr_t *obj = (atomic_ptr_t *)p;
@@ -63,39 +81,130 @@ static inline void *a_ll_p(volatile void *p)
     return v;
 }
 
-/* ---- a_sc: store-conditional for int/long ---- */
-/* Always succeeds in this mutex-based backend */
+/* ------------------------------
+   a_sc / a_sc_p
+   (Always succeed in mutex backend)
+   ------------------------------ */
+
 static inline int a_sc(volatile long *p, long v)
 {
     atomic_long_t *obj = (atomic_long_t *)p;
     pthread_mutex_lock(&obj->lock);
     obj->value = v;
     pthread_mutex_unlock(&obj->lock);
-    return 1;   /* always succeeds */
+    return 1; /* success */
 }
 
-/* ---- a_sc_p: store-conditional for pointers ---- */
 static inline int a_sc_p(volatile void *p, void *v)
 {
     atomic_ptr_t *obj = (atomic_ptr_t *)p;
     pthread_mutex_lock(&obj->lock);
     obj->value = v;
     pthread_mutex_unlock(&obj->lock);
-    return 1;   /* always succeeds */
+    return 1; /* success */
 }
 
+/* ------------------------------
+   a_cas
+   ------------------------------ */
 
-/* ============================================================
-   Optional helpers used by atomic.h barriers/spin
-   ============================================================ */
-
-static inline void a_barrier(void)
+static inline long a_cas(volatile long *p, long expected, long desired)
 {
-    /* A full mutex lock/unlock implies a full memory barrier,
-       so this is a cheap dummy barrier. */
+    long old;
+    a_pre_llsc();
+    do old = a_ll(p);
+    while (old == expected && !a_sc(p, desired));
+    a_post_llsc();
+    return old;
 }
 
-#define a_pre_llsc()   a_barrier()
-#define a_post_llsc()  a_barrier()
+/* Pointer CAS */
+static inline void *a_cas_p(volatile void *p, void *expected, void *desired)
+{
+    void *old;
+    a_pre_llsc();
+    do old = a_ll_p(p);
+    while (old == expected && !a_sc_p(p, desired));
+    a_post_llsc();
+    return old;
+}
+
+/* ------------------------------
+   a_swap
+   ------------------------------ */
+
+static inline long a_swap(volatile long *p, long v)
+{
+    long old;
+    a_pre_llsc();
+    do old = a_ll(p);
+    while (!a_sc(p, v));
+    a_post_llsc();
+    return old;
+}
+
+/* ------------------------------
+   a_fetch_add
+   ------------------------------ */
+
+static inline long a_fetch_add(volatile long *p, long v)
+{
+    long old;
+    a_pre_llsc();
+    do old = a_ll(p);
+    while (!a_sc(p, old + v));
+    a_post_llsc();
+    return old;
+}
+
+/* ------------------------------
+   a_fetch_and / a_fetch_or
+   ------------------------------ */
+
+static inline unsigned int a_fetch_and(volatile unsigned int *p, unsigned int v)
+{
+    atomic_uint_t *obj = (atomic_uint_t *)p;
+    unsigned int old;
+    pthread_mutex_lock(&obj->lock);
+    old = obj->value;
+    obj->value &= v;
+    pthread_mutex_unlock(&obj->lock);
+    return old;
+}
+
+static inline unsigned int a_fetch_or(volatile unsigned int *p, unsigned int v)
+{
+    atomic_uint_t *obj = (atomic_uint_t *)p;
+    unsigned int old;
+    pthread_mutex_lock(&obj->lock);
+    old = obj->value;
+    obj->value |= v;
+    pthread_mutex_unlock(&obj->lock);
+    return old;
+}
+
+/* ------------------------------
+   High-level helpers
+   ------------------------------ */
+
+static inline void a_and(volatile unsigned int *p, unsigned int v)
+{
+    a_fetch_and(p, v);
+}
+
+static inline void a_or(volatile unsigned int *p, unsigned int v)
+{
+    a_fetch_or(p, v);
+}
+
+static inline void a_inc(volatile long *p)
+{
+    a_fetch_add(p, 1);
+}
+
+static inline void a_dec(volatile long *p)
+{
+    a_fetch_add(p, -1);
+}
 
 #endif /* ATOMIC_ARCH_H */
