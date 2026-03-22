@@ -18,7 +18,8 @@ CC=pcc
 CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_BSD_SOURCE\
 		-I$APEXPROOT/sys/include/ape -I$APEXPROOT/$objtype/include/ape
 
-# todo: figure out how to build fenv.$O with .s in supported archs
+
+
 
 
 

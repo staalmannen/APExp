@@ -2,16 +2,14 @@ APEXPROOT=../../../../../../
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-DIRS=port $CPUS
+DIRS=port
 
 default:V:	all
 
 install all:V:
-	for(i in port $objtype)@{
-		echo $i
-		cd $i
+		echo port
+		cd port
 		mk $MKFLAGS $target
-	}
 
 nuke:V: clean
 	rm -f $APEXPROOT/$objtype/lib/ape/libap.a
@@ -26,15 +24,7 @@ clean:V:
 installall:V:
 	for(objtype in $CPUS) mk $MKFLAGS install
 
-everything:V:
-	rm -f */*.[$OS]
-	for(objtype in 386)@{
-		echo $objtype
-		mk $MKFLAGS install
-	}
-	rm -f */*.[$OS]
-
-test.$O: test.c /sys/include/ape/mp.h port/dat.h
+test.$O: test.c $APEXPROOT/sys/include/ape/mp.h port/dat.h
 	$CC -c -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../plan9 -I./port test.c
 
 $O.test: test.$O $APEXPROOT/$objtype/lib/ape/libap.a

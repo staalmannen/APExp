@@ -47,8 +47,6 @@ OFILES=\
 	p9gmtime.$O\
 	errstr.$O\
 	rerrstr.$O\
-	getcallerpc.$O\
-	getfcr.$O\
 	getfields.$O\
 	mount.$O\
 	nsec.$O\
@@ -78,12 +76,5 @@ CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I$APEXPROOT/$objtype/include/ape
 	-D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION\
 	-D_RESEARCH_SOURCE -D_NET_EXTENSION -I../include -I.
 
-%.$O:	plan9/%.c
-	$CC $CFLAGS $prereq
 
-%.$O:	$objtype/%.s
-	$AS $prereq
-
-%.$O:	$objtype/%.c
-	$CC $CFLAGS $prereq
 

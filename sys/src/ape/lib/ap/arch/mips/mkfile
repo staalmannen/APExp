@@ -4,7 +4,6 @@ APE=$APEXPROOT/sys/src/ape
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 	cycles.$O\
-	getfcr.$O\
 	lock.$O\
 	main9.$O\
 	main9p.$O\
@@ -20,6 +19,17 @@ OFILES=\
 	tas.$O\
 	vlop.$O\
 	vlrt.$O\
+# lib9\
+	getcallerpc.$O\
+	getfcr.$O\
+# libmp\
+	mpvecadd.$O\
+	mpvecsub.$O\
+	mpvecdigmuladd.$O\
+	mpvecdigmulsub.$O\
+#	mpdigdiv.$O\
+# fenv\
+	fenv.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

@@ -17,6 +17,16 @@ OFILES=\
 	tas.$O\
 	vlop.$O\
 	vlrt.$O\
+# lib9\
+	getcallerpc.$O\
+	getfcr.$O\
+# libmp\
+	mpvecadd.$O\
+	mpvecsub.$O\
+	mpvecdigmuladd.$O\
+	mpvecdigmulsub.$O\
+# fenv\
+	fenv.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

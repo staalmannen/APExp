@@ -1,9 +1,0 @@
-APEXPROOT=../../../../../../../
-APE=$APEXPROOT/sys/src/ape
-<$APE/config
-
-objtype=power64
-</$objtype/mkfile
-
-install clean all update:V:
-	
