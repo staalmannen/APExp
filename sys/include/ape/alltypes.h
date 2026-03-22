@@ -29,20 +29,15 @@ typedef unsigned id_t;
 typedef int key_t;
 typedef unsigned useconds_t;
 
-typedef int pthread_spinlock_t;
-typedef struct { unsigned __attr; } pthread_barrierattr_t;
-typedef struct { unsigned __attr[2]; } pthread_rwlockattr_t;
-
 typedef va_list __isoc_va_list;
 
 struct iovec { void *iov_base; size_t iov_len; };
 
 struct winsize { unsigned short ws_row, ws_col, ws_xpixel, ws_ypixel; };
 
-typedef struct { union { int __i[sizeof(long)==8?10:6]; volatile int __vi[sizeof(long)==8?10:6]; volatile void *volatile __p[sizeof(long)==8?5:6]; } __u; } mtx_t;
 typedef struct { union { int __i[12]; volatile int __vi[12]; void *__p[12*sizeof(int)/sizeof(void*)]; } __u; } cnd_t;
-typedef struct { union { int __i[sizeof(long)==8?14:8]; volatile int __vi[sizeof(long)==8?14:8]; void *__p[sizeof(long)==8?7:8]; } __u; } pthread_rwlock_t;
-typedef struct { union { int __i[sizeof(long)==8?8:5]; volatile int __vi[sizeof(long)==8?8:5]; void *__p[sizeof(long)==8?4:5]; } __u; } pthread_barrier_t;
+
+typedef struct { union { int __i[sizeof(long)==8?10:6]; volatile int __vi[sizeof(long)==8?10:6]; volatile void *volatile __p[sizeof(long)==8?5:6]; } __u; } mtx_t;
 
 #endif /* ALLTYPES_H */
 

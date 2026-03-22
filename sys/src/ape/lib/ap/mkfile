@@ -21,6 +21,7 @@ DIRS=\
 	malloc\
 	math\
 	misc\
+	mp\
 	multibyte\
 	network\
 	passwd\

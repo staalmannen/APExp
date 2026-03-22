@@ -2,7 +2,6 @@
 #include <wchar.h>
 #include <errno.h>
 #include "internal.h"
-#define EILSEQ ERANGE
 
 size_t mbrtowc(wchar_t * wc, const char * src, size_t n, mbstate_t * st)
 {

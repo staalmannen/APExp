@@ -1,3 +1,8 @@
+#ifndef SYS9_H
+#define SYS9_H
+
+#include <lib9.h>
+
 typedef
 struct Waitmsg
 {
@@ -58,21 +63,7 @@ struct Waitmsg
 #define DMEXEC		0x1		/* mode bit for execute permission */
 
 /* rfork */
-enum
-{
-	RFNAMEG		= (1<<0),
-	RFENVG		= (1<<1),
-	RFFDG		= (1<<2),
-	RFNOTEG		= (1<<3),
-	RFPROC		= (1<<4),
-	RFMEM		= (1<<5),
-	RFNOWAIT	= (1<<6),
-	RFCNAMEG	= (1<<10),
-	RFCENVG		= (1<<11),
-	RFCFDG		= (1<<12),
-	RFREND		= (1<<13),
-	RFNOMNT		= (1<<14)
-};
+// getting this from lib9.h
 
 extern	int	_AWAIT(char*, int);
 extern	int	_ALARM(unsigned long);
@@ -119,3 +110,9 @@ extern	int	__creat(char *, int);
 extern	int	__link(char *, int);
 extern	int	__stat(char *, struct stat *);
 extern	int	__unlink(char *);
+
+
+#endif /* SYS9_H */
+
+
+

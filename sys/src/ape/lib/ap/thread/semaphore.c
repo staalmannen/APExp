@@ -3,6 +3,7 @@
 #include <errno.h>
 #include <time.h>
 #include "sys9.h"
+#include <string.h>
 
 /*
  * POSIX semaphore implementation for APExp / Plan9 9front

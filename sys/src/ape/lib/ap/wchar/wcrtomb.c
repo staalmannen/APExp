@@ -3,8 +3,6 @@
 #include <errno.h>
 #include "internal.h"
 
-#define EILSEQ ERANGE
-
 size_t wcrtomb(char * s, wchar_t wc, mbstate_t * st)
 {
 	if (!s) return 1;

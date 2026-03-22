@@ -79,8 +79,8 @@ extern int fchown (int fd, uid_t uid, gid_t gid);
 extern int fchmod (int fd, mode_t mode);
 
 extern int	lstat(char *, struct stat *);
-extern int	symlink(char *, char *);
-extern int	readlink(char *, char*, int);
+extern int	symlink(const char *, const char *);
+extern ssize_t readlink(const char *, char*, size_t);
 
 #ifdef __cplusplus
 }

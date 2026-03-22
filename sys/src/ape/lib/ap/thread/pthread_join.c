@@ -7,13 +7,7 @@
 #include <libv.h>
 #include "lib.h"
 
-typedef
-struct Waitmsg
-{
-	int	pid;	/* of loved one */
-	ulong	time[3];	/* of loved one & descendants */
-	char	*msg;
-} Waitmsg;
+// Waitmsg from lib.h --> ../plan9/sys9.h
 
 extern int	_AWAIT(char*, int);
 

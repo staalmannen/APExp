@@ -16,7 +16,7 @@ OFILES=\
 	times.$O\
 	tzset.$O\
 #	musl\
-	__map_file.$O\
+#	__map_file.$O\
 #	hacks\
 	strptime.$O\
 	timegm.$O\

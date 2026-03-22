@@ -60,7 +60,7 @@ extern char *argv0;
 #define	ARGC()		_argc
 
 extern	int	errstr(char*, unsigned int);
-extern	int	bind(char*, char*, int);
+extern	int	p9bind(char*, char*, int);
 extern	int	mount(int, int, char*, int, char*);
 extern	int	unmount(char*, char*);
 extern	int	rfork(int);

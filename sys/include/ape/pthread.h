@@ -1,6 +1,6 @@
 #ifndef __PTHREAD_H
 #define __PTHREAD_H
-#pragma lib "/$M/lib/ape/libpthread.a"
+#pragma lib "/$M/lib/ape/libap.a"
 
 #define _LOCK_EXTENSION
 #define _QLOCK_EXTENSION
@@ -50,12 +50,23 @@ struct pthread_key {
 	int n;
 };
 
+typedef int pthread_spinlock_t;
+typedef struct { unsigned __attr; } pthread_barrierattr_t;
+typedef struct { unsigned __attr[2]; } pthread_rwlockattr_t;
+
+
+typedef struct { union { int __i[sizeof(long)==8?14:8]; volatile int __vi[sizeof(long)==8?14:8]; void *__p[sizeof(long)==8?7:8]; } __u; } pthread_rwlock_t;
+
+typedef struct { union { int __i[sizeof(long)==8?8:5]; volatile int __vi[sizeof(long)==8?8:5]; void *__p[sizeof(long)==8?4:5]; } __u; } pthread_barrier_t;
+
+
 #define PTHREAD_ONCE_INIT		{ 0 }
 #define PTHREAD_MUTEX_INITIALIZER	{ 0 }
 #define PTHREAD_MUTEX_DEFAULT		0
 #define PTHREAD_MUTEX_NORMAL		1
 #define PTHREAD_MUTEX_RECURSIVE	2
 #define PTHREAD_COND_INITIALIZER	{ 0 }
+#define PTHREAD_BARRIER_SERIAL_THREAD (-1)
 
 #ifdef __cplusplus
 extern "C" {
