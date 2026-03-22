@@ -41,7 +41,7 @@ CFILES = des.c desmodes.c desECB.c desCBC.c des3ECB.c des3CBC.c\
 	secp384r1.c\
 	secp256k1.c\
 
-CLEANFILES=secp256r1.c secp384r1.c secp256k1.c jacobian.c
+# CLEANFILES=secp256r1.c secp384r1.c secp256k1.c jacobian.c
 
 ALLOFILES=${CFILES:%.c=%.$O}
 
@@ -59,8 +59,9 @@ UPDATE=mkfile\
 
 CFLAGS=-TVwc -+ -D_POSIX_SOURCE -D_PLAN9_SOURCE -I. -I../../ap/plan9 -I../../ap/mp/port 
 
-%.c:D:	%.mp
-	@{ mk $stem.c}
+# no idea how this works and it got messed up when I reorganized sources.
+#%.c:D:	%.mp
+#	@{ mk $stem.c}
 
 %.$O:	%.c
 	$CC $CFLAGS $stem.c

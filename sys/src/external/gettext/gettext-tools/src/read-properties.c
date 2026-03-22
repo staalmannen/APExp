@@ -10,7 +10,7 @@
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU General Public License for more details. hidden
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
@@ -624,6 +624,8 @@ properties_parse (abstract_catalog_reader_ty *this, FILE *file,
     {
       int c;
       bool comment;
+// compiler drops hidden due to keywords
+#define hidden Hidden
       bool hidden;
 
       c = phase2_getc ();

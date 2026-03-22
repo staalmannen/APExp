@@ -106,6 +106,8 @@ static int label_length = 0;
 static int labels = 0;
 static int label_fmt = 0;
 static int label_line = 0;
+//we ignore the hidden keyword
+#define hidden Hidden
 static bool hidden = FALSE;
 
 #define MAX_LABEL_LENGTH 32

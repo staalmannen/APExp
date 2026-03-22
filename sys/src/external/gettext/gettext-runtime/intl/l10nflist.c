@@ -51,19 +51,6 @@
 /* @@ end of prolog @@ */
 
 #ifdef _LIBC
-/* Rename the non ANSI C functions.  This is required by the standard
-   because some ANSI C functions will require linking with this object
-   file and the name space must not be polluted.  */
-# ifndef stpcpy
-#  define stpcpy(dest, src) __stpcpy(dest, src)
-# endif
-#else
-# ifndef HAVE_STPCPY
-static char *stpcpy (char *dest, const char *src);
-# endif
-#endif
-
-#ifdef _LIBC
 # define IS_ABSOLUTE_FILE_NAME(P) ((P)[0] == '/')
 # define IS_RELATIVE_FILE_NAME(P) (! IS_ABSOLUTE_FILE_NAME (P))
 #else
@@ -403,16 +390,4 @@ _nl_normalize_codeset (const char *codeset, size_t name_len)
 
 /* @@ begin of epilog @@ */
 
-/* We don't want libintl.a to depend on any other library.  So we
-   avoid the non-standard function stpcpy.  In GNU C Library this
-   function is available, though.  Also allow the symbol HAVE_STPCPY
-   to be defined.  */
-#if !_LIBC && !HAVE_STPCPY
-static char *
-stpcpy (char *dest, const char *src)
-{
-  while ((*dest++ = *src++) != '\0')
-    /* Do nothing. */ ;
-  return dest - 1;
-}
-#endif
+

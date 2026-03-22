@@ -147,12 +147,6 @@ extern int errno;
 #   define getcwd(buf, max) (getcwd) (buf, max, 0)
 #  endif
 # endif
-# ifndef HAVE_STPCPY
-static char *stpcpy (char *dest, const char *src);
-# endif
-# ifndef HAVE_MEMPCPY
-static void *mempcpy (void *dest, const void *src, size_t n);
-# endif
 #endif
 
 #include <search.h>
@@ -1710,23 +1704,6 @@ get_output_charset (struct binding *domainbinding)
    avoid the non-standard function stpcpy.  In GNU C Library this
    function is available, though.  Also allow the symbol HAVE_STPCPY
    to be defined.  */
-#if !_LIBC && !HAVE_STPCPY
-static char *
-stpcpy (char *dest, const char *src)
-{
-  while ((*dest++ = *src++) != '\0')
-    /* Do nothing. */ ;
-  return dest - 1;
-}
-#endif
-
-#if !_LIBC && !HAVE_MEMPCPY
-static void *
-mempcpy (void *dest, const void *src, size_t n)
-{
-  return (void *) ((char *) memcpy (dest, src, n) + n);
-}
-#endif
 
 
 #ifdef _LIBC

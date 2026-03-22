@@ -67,9 +67,6 @@
 /* Define if dup2() preserves the close-on-exec flag (ultrix does this) */
 #define DUP2_BROKEN 1
 
-/* Define as good substitute value for EILSEQ. */
-#define EILSEQ ENOENT
-
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
 #define ENABLE_NLS 1
@@ -229,7 +226,11 @@
 
 /* Define to 1 if you have the declaration of `setenv', and to 0 if you don't.
    */
-#define HAVE_DECL_SETENV 0
+#define HAVE_DECL_SETENV 1
+
+
+#define HAVE_STPCPY 1
+
 
 /* Define to 1 if you have the declaration of `strerror', and to 0 if you
    don't. */
@@ -237,7 +238,7 @@
 
 /* Define to 1 if you have the declaration of `strerror_r', and to 0 if you
    don't. */
-#define HAVE_DECL_STRERROR_R 0
+#define HAVE_DECL_STRERROR_R 1
 
 /* Define to 1 if you have the declaration of `strndup', and to 0 if you
    don't. */
