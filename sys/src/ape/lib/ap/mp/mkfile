@@ -1,4 +1,4 @@
-APEXPROOT=../../../../../
+APEXPROOT=../../../../../../
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
@@ -14,7 +14,7 @@ install all:V:
 	}
 
 nuke:V: clean
-	rm -f $APEXPROOT/$objtype/lib/ape/libmp.a
+	rm -f $APEXPROOT/$objtype/lib/ape/libap.a
 
 clean:V:
 	for(i in $DIRS)@{
@@ -35,15 +35,15 @@ everything:V:
 	rm -f */*.[$OS]
 
 test.$O: test.c /sys/include/ape/mp.h port/dat.h
-	$CC -c -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../9 -I./port test.c
+	$CC -c -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../plan9 -I./port test.c
 
-$O.test: test.$O $APEXPROOT/$objtype/lib/ape/libmp.a
+$O.test: test.$O $APEXPROOT/$objtype/lib/ape/libap.a
 	$LD -o $O.test test.$O
 
 bigtest.$O: bigtest.c /sys/include/ape/mp.h port/dat.h
 	$CC -c -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../9 -I./port bigtest.c
 
-$O.bigtest: bigtest.$O $APEXPROOT/$objtype/lib/ape/libmp.a
+$O.bigtest: bigtest.$O $APEXPROOT/$objtype/lib/ape/libap.a
 	$LD -o $O.bigtest bigtest.$O
 
 allout:

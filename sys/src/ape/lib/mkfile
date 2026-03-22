@@ -7,7 +7,6 @@ _CORE_LIBS=\
 	draw\
 	plumb\
 	sec\
-	mp\
 
 _CORE_APP_DEPENDENCIES=\
 	flex\

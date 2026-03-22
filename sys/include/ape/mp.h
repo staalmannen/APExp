@@ -1,12 +1,7 @@
-#ifndef _PLAN9_SOURCE
-  This header file is an extension to ANSI/POSIX
-#endif
-
 #ifndef __LIBMP_H_
 #define __LIBMP_H_
 
-#pragma	src	"/sys/src/ape/lib/mp"
-#pragma	lib	"/$M/lib/ape/libmp.a"
+#pragma	lib	"/$M/lib/ape/libap.a"
 
 #include <u.h>
 #include <fmt.h>

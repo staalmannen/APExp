@@ -1,14 +1,15 @@
-APEXPROOT=../../../../../../
+APEXPROOT=../../../../../../../
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=$APEXPROOT/$objtype/lib/ape/libmp.a
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
 SFILES=\
 	mpvecadd.s\
 	mpvecsub.s\
 	mpvecdigmuladd.s\
 	mpvecdigmulsub.s\
+#	mpdigdiv.s\
 
 HFILES=\
 	$APEXPROOT/sys/include/ape/mp.h\
