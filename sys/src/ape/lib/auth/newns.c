@@ -10,7 +10,7 @@ enum
 	MAXARG	= 10*ANAMELEN,	/* max length of an argument */
 };
 
-static int	setenv(char*, char*);
+static int	auth_setenv(char*, char*);
 static char	*expandarg(char*, char*);
 static int	splitargs(char*, char*[], char*, int);
 static int	nsfile(char*, Biobuf *, AuthRpc *, int);
@@ -30,10 +30,10 @@ freecloserpc(AuthRpc *rpc)
 }
 
 static int
-buildns(int newns, char *user, char *file)
+buildns(int newns, const char *user, char *file)
 {
 	Biobuf *b;
-	char home[4*ANAMELEN];
+	const char home[4*ANAMELEN];
 	int afd, cdroot, dfd;
 	char *path;
 	AuthRpc *rpc;
@@ -70,9 +70,9 @@ buildns(int newns, char *user, char *file)
 	}
 	if(newns){
 		rfork(RFENVG|RFCNAMEG);
-		setenv("user", user);
+		auth_setenv("user", user);
 		snprint(home, sizeof home, "/usr/%s", user);
-		setenv("home", home);
+		auth_setenv("home", home);
 	}
 
 	cdroot = nsfile(newns ? "newns" : "addns", b, rpc, dfd);
@@ -368,7 +368,7 @@ expandarg(char *arg, char *buf)
 }
 
 static int
-setenv(char *name, char *val)
+auth_setenv(char *name, char *val)
 {
 	int f;
 	char ename[ANAMELEN+6];

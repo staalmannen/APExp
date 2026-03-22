@@ -57,7 +57,7 @@ UPDATE=mkfile\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-TVwc -+ -D_POSIX_SOURCE -D_PLAN9_SOURCE -I. -I/sys/src/9 -I/sys/src/libmp/port -I$APE/lib/9
+CFLAGS=-TVwc -+ -D_POSIX_SOURCE -D_PLAN9_SOURCE -I. -I../../ap/plan9 -I../../ap/mp/port 
 
 %.c:D:	%.mp
 	@{ mk $stem.c}

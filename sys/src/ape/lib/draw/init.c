@@ -437,15 +437,17 @@ doflush(Display *d)
 	return 1;
 }
 
+// visible might be dropped just like hidden
+
 int
-flushimage(Display *d, int visible)
+flushimage(Display *d, int Visible)
 {
 	int rc;
 
 	if(d == nil)
 		return 0;
 	_lockdisplay(d);
-	if(visible){
+	if(Visible){
 		*d->bufp++ = 'v';	/* five bytes always reserved for this */
 		if(d->_isnewdisplay){
 			BPLONG(d->bufp, d->screenimage->id);

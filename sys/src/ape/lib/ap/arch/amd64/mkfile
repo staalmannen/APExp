@@ -23,8 +23,8 @@ OFILES=\
 	mpvecdigmulsub.$O\
 	mpvecsub.$O\
 	mpdigdiv.$O\
-# fenv\
-	fenv.$O\
+# fenv formatting issue in converted .s file?\
+#	fenv.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
