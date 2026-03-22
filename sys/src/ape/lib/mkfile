@@ -1,6 +1,40 @@
 </$objtype/mkfile
 
-DIRS=`{echo */}
+_CORE_LIBS=\
+	ap\
+	auth\
+	bio\
+	draw\
+	plumb\
+	sec\
+	mp\
+
+_CORE_APP_DEPENDENCIES=\
+	flex\
+
+_OPTIONAL_LIBS=\
+	bz2\
+	curses\
+	edit\
+	fortran\
+	fts\
+	gettextpo\
+	iconv\
+	intl\
+	l\
+	lua\
+	lzma\
+	pascal\
+	pcre2\
+	textstyle\
+	xml2\
+	z\
+
+DIRS=\
+	$_CORE_LIBS\
+	$_CORE_APP_DEPENDENCIES\
+	$_OPTIONAL_LIBS\
+
 
 none:V:
 	echo mk all, install, installall, clean, or nuke

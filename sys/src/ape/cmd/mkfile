@@ -2,9 +2,7 @@ APE=../../ape
 <$APE/config
 APEXPROOT=../../../..
 
-
-#some stuff needs flex and byacc to build
-DIRS=\
+_CORE_APPS=\
 # parsing/editing source etc \
 	as\
 	lex\
@@ -21,7 +19,8 @@ DIRS=\
 	pcregrep\
 	iconv\
 	expr\
-# stuff below this line is optional bloat\
+
+_OPTIONAL_APPS=\
 # archivers \
 	bzip2\
 	clzip\
@@ -41,6 +40,10 @@ DIRS=\
 	diff\
 	patch\
 	mkmk\
+
+DIRS=\
+	$_CORE_APPS\
+	$_OPTIONAL_APPS\
 # always last :) \
 	celebrate_finish
 
