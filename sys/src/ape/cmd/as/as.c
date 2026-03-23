@@ -670,6 +670,64 @@ static OpcMap opcode_map[] = {
 	{ "fnop",    "FNOP"   },
 	/* GNU "fwait" is an explicit wait — Plan 9 spells it FWAIT */
 	{ "fwait",   "FWAIT"  },
+	/*
+	 * x87 no-operand instructions (ynone in 6l optab).
+	 * These must be in opcode_map so the suffix-inference pass skips them.
+	 * The GNU names are identical to Plan 9 names; we just list them
+	 * here to prevent spurious suffix letters being appended.
+	 */
+	{ "fld1",    "FLD1"    }, { "fldl2e",  "FLDL2E"  },
+	{ "fldl2t",  "FLDL2T"  }, { "fldlg2",  "FLDLG2"  },
+	{ "fldln2",  "FLDLN2"  }, { "fldpi",   "FLDPI"   },
+	{ "fldz",    "FLDZ"    },
+	{ "fabs",    "FABS"    }, { "fchs",    "FCHS"    },
+	{ "fsqrt",   "FSQRT"   },
+	{ "fcos",    "FCOS"    }, { "fsin",    "FSIN"    },
+	{ "fsincos", "FSINCOS" },
+	{ "fpatan",  "FPATAN"  }, { "fptan",   "FPTAN"   },
+	{ "fprem",   "FPREM"   }, { "fprem1",  "FPREM1"  },
+	{ "frndint", "FRNDINT" }, { "fscale",  "FSCALE"  },
+	{ "fxtract", "FXTRACT" }, { "f2xm1",  "F2XM1"   },
+	{ "fyl2x",   "FYL2X"   }, { "fyl2xp1","FYL2XP1" },
+	{ "ftst",    "FTST"    }, { "fxam",   "FXAM"    },
+	{ "fdecstp", "FDECSTP" }, { "fincstp","FINCSTP"  },
+	{ "ffree",   "FFREE"   }, { "finit",  "FINIT"   },
+	/*
+	 * x87 register-register instructions.
+	 * GNU: fadd/fsub/fmul/fdiv with %st() operands — these use the
+	 * double-precision register form in Plan 9 (FADDD/FSUBD/etc).
+	 * fxch %st(n) → FXCHD F(n)   [NOT FXCHQ]
+	 * These are listed here so suffix inference doesn't add Q/L.
+	 * The operand translation is handled specially in translate_line_att
+	 * via the fpu_register_op() helper below.
+	 *
+	 * Note: faddp/fmulp etc. (pop variants) are already in opcode_map
+	 * above as FADDDP/FMULDP and are handled by the FPU map entries.
+	 */
+	{ "fxch",    "FXCHD"   },
+	{ "fadd",    "FADDD"   },
+	{ "fmul",    "FMULD"   },
+	{ "fsub",    "FSUBD"   },
+	{ "fsubr",   "FSUBRD"  },
+	{ "fdiv",    "FDIVD"   },
+	{ "fdivr",   "FDIVRD"  },
+	{ "fcom",    "FCOMD"   },
+	{ "fcomp",   "FCOMDP"  },
+	{ "fdivp",   "FDIVDP"  },
+	{ "fdivrp",  "FDIVRDP" },
+	/*
+	 * fstp/fst with %st(n) operand: store F0 to Fn (and pop).
+	 * The memory forms (fstpl, fstps, fstpt) are already in opcode_map
+	 * above.  The register form is handled specially below.
+	 */
+	{ "fstp",    "FMOVDP"  },
+	{ "fst",     "FMOVD"   },
+	/*
+	 * fld %st(n) — push a copy of FP register Fn onto the FP stack.
+	 * Plan 9: FMOVD F(n)   (single operand, destination is implicit F0)
+	 * Already in opcode_map via "fldl"→"FMOVD" for memory forms,
+	 * but the %st() register form needs the same name.
+	 */
 	{ NULL, NULL }
 };
 
@@ -2475,10 +2533,26 @@ opcode_needs_no_suffix(const char *mlow)
 		"pushf","pushfq","popf","popfq",
 		"lahf","sahf",
 		"cbw","cwde","cdqe","cwd","cdq","cqo",
+		/* x87 no-wait forms (map to Plan9 names without FN) */
 		"fnclex","fwait","fnop",
-		"fnstsw","fnsave","fnstenv","fnstcw",
-		"fstsw","fclex","fstcw","fstenv","fsave","finit","fninit",
+		"fnstsw","fnsave","fnstenv","fnstcw","fninit",
+		/* x87 Plan9 names (no suffix ever) */
+		"fstsw","fclex","fstcw","fstenv","fsave","finit",
 		"frstor","fldenv","fldcw",
+		/* x87 no-operand instructions */
+		"fld1","fldl2e","fldl2t","fldlg2","fldln2","fldpi","fldz",
+		"fabs","fchs","fsqrt",
+		"fcos","fsin","fsincos",
+		"fpatan","fptan","fprem","fprem1",
+		"frndint","fscale","fxtract","f2xm1",
+		"fyl2x","fyl2xp1",
+		"ftst","fxam",
+		"fdecstp","fincstp","ffree",
+		/* x87 register-operand instructions (suffix is D not Q) */
+		"fxch",
+		"fadd","fmul","fsub","fsubr","fdiv","fdivr","fcom","fcomp",
+		"faddp","fmulp","fsubp","fsubrp","fdivp","fdivrp","fcompp",
+		/* SSE/misc no-suffix */
 		"stmxcsr","ldmxcsr","fxsave","fxrstor",
 		"mfence","lfence","sfence",
 		"rdtsc","rdtscp","rdmsr","wrmsr","rdpmc",
@@ -2489,6 +2563,11 @@ opcode_needs_no_suffix(const char *mlow)
 	int i;
 	for (i = 0; nosuf[i]; i++)
 		if (strcmp(nosuf[i], mlow) == 0) return 1;
+	/* Also block any mnemonic starting with 'f' from getting integer
+	 * size suffixes — x87 instructions use their own D/F/L/W suffixes
+	 * that are baked into the opcode name, never appended by inference */
+	if (mlow[0] == 'f' && mlow[1] != '\0')
+		return 1;
 	return 0;
 }
 
@@ -2595,9 +2674,27 @@ translate_operand_att(const char *in, char *out, int outsz)
 		return;
 	}
 
-	/* Bare symbol or label — might be a branch target or data reference */
-	/* In Plan 9: bare label reference stays bare; symbol+offset(SB) for data */
-	snprintf(out, outsz, "%s", p);
+	/* Bare symbol or label.
+	 * Strip ELF relocation suffixes: @PLT, @GOT, @GOTPCREL, @TLSGD etc.
+	 * Plan 9 linker handles position-independence internally; just use sym(SB).
+	 * Branch targets (labels) have no @ so they pass through unchanged.
+	 */
+	{
+		char sym[MAXLINE];
+		strncpy(sym, p, sizeof(sym)-1);
+		sym[sizeof(sym)-1] = '\0';
+		char *at = strchr(sym, '@');
+		if (at) {
+			*at = '\0';
+			/* If non-empty symbol after stripping, make it sym(SB) */
+			if (*sym)
+				snprintf(out, outsz, "%s(SB)", sym);
+			else
+				snprintf(out, outsz, "%s", p);
+			return;
+		}
+		snprintf(out, outsz, "%s", p);
+	}
 }
 
 /* ------------------------------------------------------------------ */
@@ -3210,6 +3307,77 @@ translate_line_att(const char *line, FILE *out)
 		translate_numlabel_ref(ops[i], tmp_op, sizeof(tmp_op), cur_lineno);
 		/* Then translate the operand (register, memory, immediate) */
 		translate_operand_att(tmp_op, tops[i], MAXLINE);
+	}
+
+	/*
+	 * x87 FPU register-operand instructions.
+	 *
+	 * GNU AT&T uses %st(n) for FP stack registers. Plan 9 uses Fn.
+	 * The translate_operand_att path already converts %st(n) → Fn via
+	 * the att_regs table. But these instructions also need special
+	 * opcode handling:
+	 *
+	 * fxch %st(n)          → FXCHD F(n)
+	 * fadd %st(n)          → FADDD F(n), F0   (one-arg: st(0) += st(n))
+	 * fadd %st(n),%st(0)   → FADDD F(n), F0
+	 * fadd %st(0),%st(n)   → FADDD F0, F(n)
+	 * faddp                → FADDDP            (already handled via opcode_map)
+	 * faddp %st,%st(n)     → FADDDP F0, F(n)
+	 * fld  %st(n)          → FMOVD F(n)       (push copy of st(n))
+	 *
+	 * These are all covered because:
+	 * - opcode_map maps fxch→FXCHD, fadd→FADDD, etc.
+	 * - opcode_needs_no_suffix blocks spurious Q/L suffix
+	 * - translate_operand_att already maps %st(n) → Fn
+	 *
+	 * Special case: "fld %st(n)" — the GNU "fld" mnemonic is used for
+	 * both memory loads (fldt, fldl, flds — handled by opcode_map) and
+	 * register copy (fld %st(n)). When the operand starts with %st,
+	 * emit FMOVD F(n) instead of trying the memory load path.
+	 */
+	if (arch_is_x86(arch)) {
+		strlower(mnem, mlow, sizeof(mlow));
+
+		/* fld %st(n) — push copy of st(n) onto FP stack */
+		if (strcmp(mlow, "fld") == 0 && nops == 1) {
+			char tmp_op[MAXLINE];
+			translate_numlabel_ref(ops[0], tmp_op, sizeof(tmp_op), cur_lineno);
+			const char *raw = tmp_op;
+			while (isspace((unsigned char)*raw)) raw++;
+			if (strncasecmp(raw, "%st", 3) == 0) {
+				char fn[16];
+				translate_operand_att(tmp_op, fn, sizeof(fn));
+				fprintf(out, "\t%sFMOVD\t%s\n", prefix, fn);
+				return;
+			}
+		}
+
+		/*
+		 * fstp %st(n) → FMOVDP F0, Fn  (store F0 to Fn and pop)
+		 * fst  %st(n) → FMOVD  F0, Fn  (store F0 to Fn, no pop)
+		 */
+		if ((strcmp(mlow, "fstp") == 0 || strcmp(mlow, "fst") == 0) && nops == 1) {
+			char tmp_op[MAXLINE];
+			translate_numlabel_ref(ops[0], tmp_op, sizeof(tmp_op), cur_lineno);
+			const char *raw = tmp_op;
+			while (isspace((unsigned char)*raw)) raw++;
+			if (strncasecmp(raw, "%st", 3) == 0) {
+				char fn[16];
+				translate_operand_att(tmp_op, fn, sizeof(fn));
+				const char *op9 = (strcmp(mlow, "fstp") == 0) ? "FMOVDP" : "FMOVD";
+				fprintf(out, "\t%s%s\tF0, %s\n", prefix, op9, fn);
+				return;
+			}
+		}
+
+		/*
+		 * One-arg fadd/fsub/fmul/fdiv with %st(n) operand:
+		 * GNU AT&T one-arg form means st(0) op= st(n).
+		 * Plan 9: FADDD Fn, F0  (operands already translated to Fn by translate_operand_att)
+		 * The generic emit path handles this correctly since translate_operand_att
+		 * converts %st(n) → Fn, and opcode_map gives FADDD etc.
+		 * No special handling needed — the generic path is correct.
+		 */
 	}
 
 	/* Emit */
