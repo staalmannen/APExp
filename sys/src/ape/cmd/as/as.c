@@ -105,16 +105,169 @@ static int arch_is_x86(Arch a) { return a == ARCH_AMD64 || a == ARCH_386; }
 /* Return 1 if arch uses 68k-style Dn/An register naming */
 static int arch_is_68k(Arch a) { return a == ARCH_68000 || a == ARCH_68020; }
 
-static Arch   arch    = ARCH_AMD64;
-static Syntax syntax  = SYN_AUTO;
-static int    verbose = 0;
-static char  *outfile = NULL;
+static Arch   arch         = ARCH_AMD64;
+static Syntax syntax       = SYN_AUTO;
+static int    verbose      = 0;
+static int    convert_only = 0;   /* -S: translate to Plan 9 .s, don't assemble */
+static char  *outfile      = NULL;
 static char  *incdirs[MAXINC];
-static int    ninc    = 0;
+static int    ninc         = 0;
 static char  *defines[MAXDEF];
-static int    ndef    = 0;
+static int    ndef         = 0;
 static char  *infiles[MAXFILES];
-static int    nfiles  = 0;
+static int    nfiles       = 0;
+
+/* ------------------------------------------------------------------ */
+/* Numeric local label resolution                                      */
+/* ------------------------------------------------------------------ */
+
+/*
+ * GNU GAS allows numeric labels like "1:" to be defined multiple times
+ * in a single file.  Jumps use "1f" (next forward definition of "1:")
+ * or "1b" (nearest backward definition of "1:").
+ *
+ * Plan 9 assemblers require every label to be unique.
+ *
+ * Strategy: two-pass translation.
+ *
+ * Pass 1 (collect): read the file line by line; every time we see a
+ *   numeric label "N:" record its line number and a unique serial
+ *   index.  Build a flat array of (linenum, digit, serial).
+ *
+ * Pass 2 (translate): when emitting a line that contains a numeric
+ *   label "N:", replace it with ".Lnum_N_<serial>:".  When we see a
+ *   reference "Nf" in an operand, find the first collected label with
+ *   digit==N whose line number is > current line.  When we see "Nb",
+ *   find the last one with line number < current line.
+ */
+
+#define MAX_NUMLABELS 1024
+
+typedef struct {
+	int linenum;   /* 1-based line number where "N:" appears */
+	int digit;     /* the N in "N:" */
+	int serial;    /* unique serial for this occurrence */
+} NumLabel;
+
+static NumLabel numlabels[MAX_NUMLABELS];
+static int      nnumlabels = 0;
+
+/* serial counter per digit (0..9), used to assign unique serials */
+static int numlabel_serial[10];
+
+/*
+ * Collect all numeric labels from a file.
+ * Called before translation begins.
+ */
+static void
+collect_numlabels(const char *filename)
+{
+	FILE *f;
+	char line[MAXLINE];
+	int  lineno = 0;
+
+	nnumlabels = 0;
+	memset(numlabel_serial, 0, sizeof(numlabel_serial));
+
+	f = fopen(filename, "r");
+	if (!f) return;
+
+	while (fgets(line, sizeof(line), f)) {
+		char *p = line;
+		lineno++;
+
+		/* skip leading whitespace */
+		while (isspace((unsigned char)*p)) p++;
+
+		/* Look for a numeric label: a single digit followed by ':' */
+		/* It can appear at start of line or after a previous label+colon */
+		while (*p) {
+			if (isdigit((unsigned char)*p) && p[1] == ':') {
+				int d = *p - '0';
+				if (nnumlabels < MAX_NUMLABELS) {
+					numlabels[nnumlabels].linenum = lineno;
+					numlabels[nnumlabels].digit   = d;
+					numlabels[nnumlabels].serial  = numlabel_serial[d]++;
+					nnumlabels++;
+				}
+				/* don't break — there could be more on this line */
+				p += 2;
+				continue;
+			}
+			p++;
+		}
+	}
+	fclose(f);
+}
+
+/*
+ * Given a reference like "1f" or "1b" at the current translation line,
+ * return the Plan 9 label name it should resolve to.
+ * Returns pointer to a static buffer.
+ */
+static const char *
+resolve_numlabel(int digit, int forward, int cur_lineno)
+{
+	static char buf[64];
+	int i;
+
+	if (forward) {
+		/* first label with this digit at a line > cur_lineno */
+		for (i = 0; i < nnumlabels; i++) {
+			if (numlabels[i].digit == digit &&
+			    numlabels[i].linenum > cur_lineno) {
+				snprintf(buf, sizeof(buf), ".Lnum%d_%d",
+				         digit, numlabels[i].serial);
+				return buf;
+			}
+		}
+	} else {
+		/* last label with this digit at a line <= cur_lineno */
+		for (i = nnumlabels - 1; i >= 0; i--) {
+			if (numlabels[i].digit == digit &&
+			    numlabels[i].linenum <= cur_lineno) {
+				snprintf(buf, sizeof(buf), ".Lnum%d_%d",
+				         digit, numlabels[i].serial);
+				return buf;
+			}
+		}
+	}
+
+	/* not found — return something that will cause an obvious error */
+	snprintf(buf, sizeof(buf), ".Lnum%d_MISSING", digit);
+	return buf;
+}
+
+/*
+ * Translate a numeric label reference in an operand token in-place.
+ * e.g. "1f" → ".Lnum1_3"   "2b" → ".Lnum2_1"
+ * Modifies out[outsz] to hold the translated operand.
+ * cur_lineno: 1-based current line being translated.
+ */
+static void
+translate_numlabel_ref(const char *in, char *out, int outsz, int cur_lineno)
+{
+	const char *p = in;
+	/* skip whitespace */
+	while (isspace((unsigned char)*p)) p++;
+
+	/* Pattern: optional sign/hash, then a digit followed by 'f' or 'b' */
+	if (isdigit((unsigned char)*p) &&
+	    (p[1] == 'f' || p[1] == 'b') &&
+	    (p[2] == '\0' || isspace((unsigned char)p[2]))) {
+		int d = *p - '0';
+		int fwd = (p[1] == 'f');
+		const char *resolved = resolve_numlabel(d, fwd, cur_lineno);
+		snprintf(out, outsz, "%s", resolved);
+		return;
+	}
+	snprintf(out, outsz, "%s", in);
+}
+
+/*
+ * Current line number during translation (set by translate_file).
+ */
+static int cur_lineno = 0;
 
 /* ------------------------------------------------------------------ */
 /* Register name tables */
@@ -167,6 +320,15 @@ static RegMap att_regs[] = {
  * Intel syntax register names (no % prefix, same names but uppercase/lowercase)
  * We normalise to lowercase before lookup in the same table.
  */
+
+/* Forward declarations (RISC translators reference common utilities) */
+static char *trim(char *s);
+static void strlower(const char *src, char *buf, int sz);
+static const char *lookup_in_table(const RegMap *tab, const char *name);
+static int split_operands(const char *s, char ops[][MAXLINE], int maxops);
+static void translate_line_att(const char *line, FILE *out);
+static const char *resolve_numlabel(int digit, int forward, int cur_lineno);
+static const char *translate_opcode(const char *mnem);
 
 /* ================================================================
  * RISC / non-x86 register alias tables
@@ -495,6 +657,1149 @@ static OpcMap opcode_map[] = {
 	{ "cwd",    "CWD"     }, { "cdq",    "CDQ"      }, { "cqo",  "CQO"  },
 	{ NULL, NULL }
 };
+
+/* ------------------------------------------------------------------ */
+/* ARM64 (7a) opcode special-case table                               */
+/* ------------------------------------------------------------------ */
+
+/*
+ * ARM64 instructions whose Plan 9 name differs from the GNU uppercase,
+ * or whose operand handling needs special treatment.
+ *
+ * The "special" field is a hint to translate_line_arm64():
+ *   0  = just rename, standard operand order (src → dst)
+ *   'R' = reverse all operands (GNU dst,s1,s2 → Plan9 s2,s1,dst)
+ *   'M' = MRS/MSR: sysreg operand stays first in Plan9
+ *   'S' = STP/LDP: register-pair syntax
+ *   'B' = B.cond: strip the dot, map condition suffix
+ *   'I' = MOV with immediate: add size suffix from register width
+ */
+typedef struct { const char *gas; const char *p9; int special; } Arm64OpcMap;
+
+static Arm64OpcMap arm64_opcode_map[] = {
+	/* system register access — operand order is reversed in Plan9 */
+	{ "mrs",   "MRS",   'M' },
+	{ "msr",   "MSR",   'M' },
+	/* three-operand data processing — GNU: dst,s1,s2 → Plan9: s2,s1,dst */
+	{ "bic",   "BIC",   'R' },
+	{ "orn",   "ORN",   'R' },
+	{ "eon",   "EON",   'R' },
+	{ "orr",   "ORR",   'R' },
+	{ "and",   "AND",   'R' },
+	{ "eor",   "EOR",   'R' },
+	{ "add",   "ADD",   'R' },
+	{ "adds",  "ADDS",  'R' },
+	{ "sub",   "SUB",   'R' },
+	{ "subs",  "SUBS",  'R' },
+	{ "mul",   "MUL",   'R' },
+	{ "udiv",  "UDIV",  'R' },
+	{ "sdiv",  "SDIV",  'R' },
+	{ "lsl",   "LSL",   'R' },
+	{ "lsr",   "LSR",   'R' },
+	{ "asr",   "ASR",   'R' },
+	{ "ror",   "ROR",   'R' },
+	/* two-operand (dst, src) → Plan9 (src, dst) */
+	{ "mov",   "MOVD",  'I' },  /* size resolved from register */
+	{ "mvn",   "MVN",   0   },
+	{ "neg",   "NEG",   0   },
+	{ "negs",  "NEGS",  0   },
+	/* compare — GNU: reg,imm → Plan9: $imm,reg */
+	{ "cmp",   "CMP",   0   },
+	{ "cmn",   "CMN",   0   },
+	{ "tst",   "TST",   0   },
+	/* load/store pairs */
+	{ "stp",   "STP",   'S' },
+	{ "ldp",   "LDP",   'S' },
+	/* conditional branch b.cond */
+	{ "b.eq",  "BEQ",   'B' },
+	{ "b.ne",  "BNE",   'B' },
+	{ "b.cs",  "BCS",   'B' },
+	{ "b.cc",  "BCC",   'B' },
+	{ "b.hs",  "BCS",   'B' },  /* hs = unsigned >= = cs */
+	{ "b.lo",  "BCC",   'B' },  /* lo = unsigned <  = cc */
+	{ "b.mi",  "BMI",   'B' },
+	{ "b.pl",  "BPL",   'B' },
+	{ "b.vs",  "BVS",   'B' },
+	{ "b.vc",  "BVC",   'B' },
+	{ "b.hi",  "BHI",   'B' },
+	{ "b.ls",  "BLS",   'B' },
+	{ "b.ge",  "BGE",   'B' },
+	{ "b.lt",  "BLT",   'B' },
+	{ "b.gt",  "BGT",   'B' },
+	{ "b.le",  "BLE",   'B' },
+	{ "b.al",  "B",     'B' },
+	{ "b.nv",  "B",     'B' },
+	/* ret/bl/b — no suffix needed */
+	{ "ret",   "RET",   0   },
+	{ "bl",    "BL",    0   },
+	{ "blr",   "BLR",   0   },
+	{ "b",     "B",     0   },
+	{ "br",    "B",     0   },
+	/* load/store */
+	{ "ldr",   "MOVD",  'I' },
+	{ "ldrw",  "MOVW",  0   },
+	{ "ldrh",  "MOVH",  0   },
+	{ "ldrb",  "MOVB",  0   },
+	{ "str",   "MOVD",  'I' },
+	{ "strw",  "MOVW",  0   },
+	{ "strh",  "MOVH",  0   },
+	{ "strb",  "MOVB",  0   },
+	/* NOP */
+	{ "nop",   "NOP",   0   },
+	{ NULL, NULL, 0 }
+};
+
+/*
+ * Determine Plan 9 size suffix for an ARM64 register name.
+ * w-registers → 'W' (32-bit), x-registers → 'D' (64-bit), others → 'D'.
+ */
+static char
+arm64_reg_suffix(const char *regname)
+{
+	char low[32];
+	strlower(regname, low, sizeof(low));
+	if (low[0] == 'w') return 'W';
+	return 'D';
+}
+
+/*
+ * Translate a single ARM64 register token (no % prefix in GNU ARM64).
+ * Input: "x0", "w1", "xzr", "sp", "fpcr", "fpsr", etc.
+ * Output: Plan9 form in buf.
+ */
+static void
+translate_arm64_reg(const char *in, char *out, int outsz)
+{
+	char low[32];
+	const char *r;
+
+	while (isspace((unsigned char)*in)) in++;
+	strlower(in, low, sizeof(low));
+	/* strip trailing non-alnum (e.g. comma remnants) */
+	char *e = low;
+	while (*e && (isalnum((unsigned char)*e) || *e == '_')) e++;
+	*e = '\0';
+
+	r = lookup_in_table(arm64_aliases, low);
+	if (r) { snprintf(out, outsz, "%s", r); return; }
+	/* system registers: fpcr, fpsr — pass uppercase */
+	if (strcmp(low, "fpcr") == 0) { snprintf(out, outsz, "FPCR"); return; }
+	if (strcmp(low, "fpsr") == 0) { snprintf(out, outsz, "FPSR"); return; }
+	if (strcmp(low, "nzcv") == 0) { snprintf(out, outsz, "NZCV"); return; }
+	/* fallback: uppercase */
+	char tmp[32];
+	int i;
+	for (i = 0; low[i] && i < (int)sizeof(tmp)-1; i++)
+		tmp[i] = toupper((unsigned char)low[i]);
+	tmp[i] = '\0';
+	snprintf(out, outsz, "%s", tmp);
+}
+
+/*
+ * Translate an ARM64 memory operand "[xN]" or "[xN, #off]" → "off(RN)".
+ */
+static void
+translate_arm64_mem(const char *in, char *out, int outsz)
+{
+	char inner[256];
+	const char *p = in;
+	char *q = inner;
+
+	while (*p == '[' || isspace((unsigned char)*p)) p++;
+	while (*p && *p != ']') *q++ = *p++;
+	*q = '\0';
+	trim(inner);
+
+	/* split on comma */
+	char *comma = strchr(inner, ',');
+	char base_s[64] = "", off_s[64] = "0";
+	if (comma) {
+		*comma = '\0';
+		strncpy(base_s, trim(inner),  sizeof(base_s)-1);
+		strncpy(off_s,  trim(comma+1), sizeof(off_s)-1);
+		/* strip leading # from immediate offset */
+		char *os = off_s;
+		while (isspace((unsigned char)*os)) os++;
+		if (*os == '#') memmove(off_s, os+1, strlen(os));
+	} else {
+		strncpy(base_s, trim(inner), sizeof(base_s)-1);
+	}
+
+	char base_p9[32];
+	translate_arm64_reg(base_s, base_p9, sizeof(base_p9));
+	snprintf(out, outsz, "%s(%s)", off_s, base_p9);
+}
+
+/*
+ * Translate a single ARM64 operand token.
+ * Could be: register, #immediate, [mem], or label.
+ */
+static void
+translate_arm64_operand(const char *in, char *out, int outsz)
+{
+	const char *p = in;
+	while (isspace((unsigned char)*p)) p++;
+
+	/* immediate: #N */
+	if (*p == '#') {
+		snprintf(out, outsz, "$%s", p+1);
+		return;
+	}
+	/* memory: [base, ...] */
+	if (*p == '[') {
+		translate_arm64_mem(p, out, outsz);
+		return;
+	}
+	/* numeric label ref */
+	if (isdigit((unsigned char)*p) &&
+	    (p[1] == 'f' || p[1] == 'b') &&
+	    (p[2] == '\0' || isspace((unsigned char)p[2]))) {
+		int d = *p - '0';
+		int fwd = (p[1] == 'f');
+		snprintf(out, outsz, "%s", resolve_numlabel(d, fwd, cur_lineno));
+		return;
+	}
+	/* register */
+	translate_arm64_reg(p, out, outsz);
+}
+
+/*
+ * Translate a full ARM64 assembly line to Plan 9.
+ */
+static void
+translate_line_arm64(const char *line, FILE *out)
+{
+	char buf[MAXLINE];
+	strncpy(buf, line, sizeof(buf)-1);
+	char *p = buf;
+	static int in_block_comment = 0;
+
+	/* block comment continuation */
+	if (in_block_comment) {
+		char *end = strstr(p, "*/");
+		if (end) { in_block_comment = 0; p = end + 2; }
+		else { fprintf(out, "\n"); return; }
+	}
+
+	/* strip line and block comments */
+	{
+		char *lc = strstr(p, "//");
+		if (lc) *lc = '\0';
+		char *bc = strstr(p, "/*");
+		if (bc) {
+			char *ec = strstr(bc+2, "*/");
+			if (ec) { memmove(bc, ec+2, strlen(ec+2)+1); }
+			else { in_block_comment = 1; *bc = '\0'; }
+		}
+	}
+
+	p = trim(p);
+	if (!*p) { fprintf(out, "\n"); return; }
+
+	/* preprocessor */
+	if (*p == '#') { fprintf(out, "%s\n", p); return; }
+
+	/* label */
+	char *colon = strchr(p, ':');
+	if (colon) {
+		int llen = colon - p;
+		char lbl[256] = "";
+		if (llen < (int)sizeof(lbl)-1 && llen > 0) {
+			memcpy(lbl, p, llen);
+			lbl[llen] = '\0';
+			int ok = 1;
+			for (int i = 0; lbl[i]; i++)
+				if (!isalnum((unsigned char)lbl[i]) && lbl[i] != '_' && lbl[i] != '.')
+					{ ok = 0; break; }
+			if (ok) {
+				/* numeric label? */
+				if (llen == 1 && isdigit((unsigned char)lbl[0])) {
+					int d = lbl[0] - '0';
+					int serial = -1;
+					for (int j = 0; j < nnumlabels; j++) {
+						if (numlabels[j].digit == d &&
+						    numlabels[j].linenum == cur_lineno) {
+							serial = numlabels[j].serial;
+							break;
+						}
+					}
+					if (serial >= 0)
+						snprintf(lbl, sizeof(lbl), ".Lnum%d_%d", d, serial);
+				}
+				fprintf(out, "%s:\n", lbl);
+				p = colon + 1;
+				while (isspace((unsigned char)*p)) p++;
+			}
+		}
+	}
+	if (!*p) return;
+
+	/* directives */
+	if (*p == '.') {
+		/* reuse AT&T directive handler */
+		translate_line_att(p, out);
+		return;
+	}
+
+	/* extract mnemonic (may contain dot: b.eq) */
+	char mnem[32] = "";
+	int  mi = 0;
+	while (*p && !isspace((unsigned char)*p) && mi < (int)sizeof(mnem)-1)
+		mnem[mi++] = *p++;
+	mnem[mi] = '\0';
+	while (isspace((unsigned char)*p)) p++;
+
+	/* split operands */
+	char ops[8][MAXLINE];
+	int  nops = split_operands(p, ops, 8);
+
+	/* look up in arm64 opcode table */
+	char mlow[32];
+	strlower(mnem, mlow, sizeof(mlow));
+	int found = 0;
+	int special = 0;
+	const char *p9op = NULL;
+	for (int i = 0; arm64_opcode_map[i].gas; i++) {
+		if (strcmp(arm64_opcode_map[i].gas, mlow) == 0) {
+			p9op   = arm64_opcode_map[i].p9;
+			special = arm64_opcode_map[i].special;
+			found  = 1;
+			break;
+		}
+	}
+	if (!found) {
+		/* default: uppercase */
+		static char ubuf[32];
+		int i;
+		for (i = 0; mlow[i] && i < (int)sizeof(ubuf)-1; i++)
+			ubuf[i] = toupper((unsigned char)mlow[i]);
+		ubuf[i] = '\0';
+		p9op = ubuf;
+	}
+
+	char tops[8][MAXLINE];
+
+	switch (special) {
+	case 'M':
+		/*
+		 * MRS/MSR: in GNU, "mrs xN, sysreg" / "msr sysreg, xN"
+		 * Plan9 7a wants: "MRS SYSREG, RN" / "MSR RN, SYSREG"
+		 * i.e. sysreg is always first in Plan9.
+		 * GNU MRS: ops[0]=dst-reg, ops[1]=sysreg → swap
+		 * GNU MSR: ops[0]=sysreg, ops[1]=src-reg → keep order
+		 */
+		if (nops == 2) {
+			char t0[MAXLINE], t1[MAXLINE];
+			translate_arm64_operand(ops[0], t0, MAXLINE);
+			translate_arm64_operand(ops[1], t1, MAXLINE);
+			if (strcmp(mlow, "mrs") == 0)
+				/* GNU: dst, sysreg → Plan9: sysreg, dst */
+				fprintf(out, "\t%s\t%s, %s\n", p9op, t1, t0);
+			else
+				/* GNU: sysreg, src → Plan9: src, sysreg — keep */
+				fprintf(out, "\t%s\t%s, %s\n", p9op, t0, t1);
+		} else {
+			fprintf(out, "\t%s\n", p9op);
+		}
+		return;
+
+	case 'R':
+		/*
+		 * Three-operand data-processing: GNU: dst, s1, s2 → Plan9: s2, s1, dst
+		 * Two-operand: dst, src → Plan9: src, dst
+		 */
+		for (int i = 0; i < nops; i++)
+			translate_arm64_operand(ops[i], tops[i], MAXLINE);
+		if (nops == 3)
+			fprintf(out, "\t%s\t%s, %s, %s\n", p9op, tops[2], tops[1], tops[0]);
+		else if (nops == 2)
+			fprintf(out, "\t%s\t%s, %s\n", p9op, tops[1], tops[0]);
+		else
+			fprintf(out, "\t%s\n", p9op);
+		return;
+
+	case 'I': {
+		/*
+		 * MOV/LDR/STR with size from register width.
+		 * GNU MOV: dst, src — Plan9: src, dst (reversed)
+		 * Size: w-reg → MOVW, x-reg → MOVD
+		 */
+		static char ibuf[32];
+		/* determine size from first operand (dst in GNU) */
+		char low0[32];
+		strlower(ops[0], low0, sizeof(low0));
+		char sfx = arm64_reg_suffix(low0);
+		snprintf(ibuf, sizeof(ibuf), "MOV%c", sfx);
+		p9op = ibuf;
+		for (int i = 0; i < nops; i++)
+			translate_arm64_operand(ops[i], tops[i], MAXLINE);
+		if (nops == 2)
+			fprintf(out, "\t%s\t%s, %s\n", p9op, tops[1], tops[0]);
+		else {
+			fprintf(out, "\t%s", p9op);
+			for (int i = 0; i < nops; i++)
+				fprintf(out, "%s%s", i==0?"\t":", ", tops[i]);
+			fprintf(out, "\n");
+		}
+		return;
+	}
+
+	case 'S':
+		/*
+		 * STP/LDP register-pair syntax.
+		 * GNU STP: "stp w1, w2, [x0]"   → Plan9: "STP (R1, R2), 0(R0)"
+		 * GNU LDP: "ldp w1, w2, [x0]"   → Plan9: "LDP 0(R0), (R1, R2)"
+		 */
+		if (nops == 3) {
+			char r1[32], r2[32], mem[64];
+			translate_arm64_operand(ops[0], r1,  sizeof(r1));
+			translate_arm64_operand(ops[1], r2,  sizeof(r2));
+			translate_arm64_mem(ops[2], mem, sizeof(mem));
+			if (strcmp(mlow, "stp") == 0)
+				fprintf(out, "\tSTP\t(%s, %s), %s\n", r1, r2, mem);
+			else
+				fprintf(out, "\tLDP\t%s, (%s, %s)\n", mem, r1, r2);
+		} else {
+			fprintf(out, "\t%s", p9op);
+			for (int i = 0; i < nops; i++) {
+				translate_arm64_operand(ops[i], tops[i], MAXLINE);
+				fprintf(out, "%s%s", i==0?"\t":", ", tops[i]);
+			}
+			fprintf(out, "\n");
+		}
+		return;
+
+	case 'B':
+		/* B.cond label — already looked up the Plan9 mnemonic (BEQ etc.) */
+		if (nops == 1) {
+			char ltmp[MAXLINE];
+			translate_arm64_operand(ops[0], ltmp, MAXLINE);
+			fprintf(out, "\t%s\t%s\n", p9op, ltmp);
+		} else {
+			fprintf(out, "\t%s\n", p9op);
+		}
+		return;
+
+	default:
+		/*
+		 * Standard: CMP, CMN, TST — GNU: reg, #imm → Plan9: $imm, reg
+		 * Other two-operand: GNU src,dst order (RISC is opposite of x86 Intel)
+		 * For ARM64 GNU AT&T-like: most two-operand: dst, src → Plan9: src, dst
+		 */
+		for (int i = 0; i < nops; i++)
+			translate_arm64_operand(ops[i], tops[i], MAXLINE);
+		/* CMP/CMN/TST: keep as-is (reg first is already right for Plan9 after swap) */
+		if (nops == 2) {
+			/* GNU: dst, src → Plan9: src, dst */
+			fprintf(out, "\t%s\t%s, %s\n", p9op, tops[1], tops[0]);
+		} else if (nops == 1) {
+			fprintf(out, "\t%s\t%s\n", p9op, tops[0]);
+		} else if (nops == 0) {
+			fprintf(out, "\t%s\n", p9op);
+		} else {
+			fprintf(out, "\t%s", p9op);
+			for (int i = 0; i < nops; i++)
+				fprintf(out, "%s%s", i==0?"\t":", ", tops[i]);
+			fprintf(out, "\n");
+		}
+		return;
+	}
+}
+
+/* ------------------------------------------------------------------ */
+/* MIPS (va) special translation                                      */
+/* ------------------------------------------------------------------ */
+
+/*
+ * MIPS GNU uses $N (numeric) or $name for registers.
+ * The translate_operand_att path handles %-prefixed regs; for MIPS
+ * we need to handle $-prefixed operands separately.
+ *
+ * Also handles: li, jr, lw, sw, cfc1, ctc1, andi, ori, xori, addiu, beq.
+ */
+
+/* Map a MIPS $reg token (without $) to a Plan9 name */
+static const char *
+lookup_mips_dollar_reg(const char *name)
+{
+	char low[32];
+	strlower(name, low, sizeof(low));
+	/* numeric: $0..$31 */
+	if (isdigit((unsigned char)low[0])) {
+		char *end;
+		long n = strtol(low, &end, 10);
+		if (end != low && *end == '\0' && n >= 0 && n <= 31) {
+			static char buf[8];
+			snprintf(buf, sizeof(buf), "R%ld", n);
+			return buf;
+		}
+	}
+	/* named */
+	return lookup_in_table(mips_aliases, low);
+}
+
+/*
+ * Translate a MIPS operand token.
+ * Could be: $reg, $name, number (bare immediate), N($reg) (memory).
+ */
+static void
+translate_mips_operand(const char *in, char *out, int outsz)
+{
+	const char *p = in;
+	while (isspace((unsigned char)*p)) p++;
+
+	/* $register */
+	if (*p == '$') {
+		char rname[32];
+		const char *rp = p+1;
+		int i = 0;
+		while (*rp && (isalnum((unsigned char)*rp) || *rp=='_') && i < (int)sizeof(rname)-1)
+			rname[i++] = *rp++;
+		rname[i] = '\0';
+		const char *r = lookup_mips_dollar_reg(rname);
+		if (r) { snprintf(out, outsz, "%s", r); return; }
+		snprintf(out, outsz, "%s", p); /* unknown, pass through */
+		return;
+	}
+
+	/* memory: N($reg) */
+	if (strchr(p, '(')) {
+		char disp[64] = "0", base[32] = "";
+		const char *q = p;
+		char *dp = disp;
+		while (*q && *q != '(') *dp++ = *q++;
+		*dp = '\0';
+		if (*q == '(') {
+			q++;
+			char rname[32]; int i = 0;
+			/* strip $ */
+			if (*q == '$') q++;
+			while (*q && *q != ')' && i < (int)sizeof(rname)-1)
+				rname[i++] = *q++;
+			rname[i] = '\0';
+			const char *r = lookup_mips_dollar_reg(rname);
+			snprintf(base, sizeof(base), "%s", r ? r : rname);
+		}
+		trim(disp);
+		if (!*disp || strcmp(disp,"0")==0)
+			snprintf(out, outsz, "0(%s)", base);
+		else
+			snprintf(out, outsz, "%s(%s)", disp, base);
+		return;
+	}
+
+	/* numeric label ref */
+	if (isdigit((unsigned char)*p) &&
+	    (p[1] == 'f' || p[1] == 'b') &&
+	    (p[2] == '\0' || isspace((unsigned char)p[2]))) {
+		int d = *p - '0';
+		int fwd = (p[1] == 'f');
+		snprintf(out, outsz, "%s", resolve_numlabel(d, fwd, cur_lineno));
+		return;
+	}
+
+	/* bare immediate (hex or decimal) — add $ */
+	{
+		char *end;
+		strtol(p, &end, 0);
+		if (end != p && (*end == '\0' || isspace((unsigned char)*end))) {
+			snprintf(out, outsz, "$%s", p);
+			return;
+		}
+	}
+
+	/* label or symbol */
+	snprintf(out, outsz, "%s", p);
+}
+
+/*
+ * Translate a MIPS/va instruction line to Plan 9.
+ */
+static void
+translate_line_mips(const char *line, FILE *out)
+{
+	char buf[MAXLINE];
+	strncpy(buf, line, sizeof(buf)-1);
+	char *p = buf;
+	static int in_block_comment = 0;
+
+	if (in_block_comment) {
+		char *end = strstr(p, "*/");
+		if (end) { in_block_comment = 0; p = end+2; }
+		else { fprintf(out, "\n"); return; }
+	}
+
+	/* strip comments */
+	{
+		char *hsh = strchr(p, '#');
+		/* Don't strip # that starts a preprocessor line */
+		char *tp = p;
+		while (isspace((unsigned char)*tp)) tp++;
+		if (hsh && hsh != tp) *hsh = '\0';
+		char *lc = strstr(p, "//");
+		if (lc) *lc = '\0';
+		char *bc = strstr(p, "/*");
+		if (bc) {
+			char *ec = strstr(bc+2, "*/");
+			if (ec) memmove(bc, ec+2, strlen(ec+2)+1);
+			else { in_block_comment = 1; *bc = '\0'; }
+		}
+	}
+
+	p = trim(p);
+	if (!*p) { fprintf(out, "\n"); return; }
+
+	/* preprocessor */
+	if (*p == '#') { fprintf(out, "%s\n", p); return; }
+
+	/* label */
+	char *colon = strchr(p, ':');
+	if (colon) {
+		int llen = colon - p;
+		char lbl[256] = "";
+		if (llen < (int)sizeof(lbl)-1 && llen > 0) {
+			memcpy(lbl, p, llen); lbl[llen] = '\0';
+			int ok = 1;
+			for (int i = 0; lbl[i]; i++)
+				if (!isalnum((unsigned char)lbl[i]) && lbl[i]!='_' && lbl[i]!='.')
+					{ ok = 0; break; }
+			if (ok) {
+				if (llen == 1 && isdigit((unsigned char)lbl[0])) {
+					int d = lbl[0] - '0', serial = -1;
+					for (int j = 0; j < nnumlabels; j++)
+						if (numlabels[j].digit==d && numlabels[j].linenum==cur_lineno)
+							{ serial=numlabels[j].serial; break; }
+					if (serial >= 0) snprintf(lbl, sizeof(lbl), ".Lnum%d_%d", d, serial);
+				}
+				fprintf(out, "%s:\n", lbl);
+				p = colon+1;
+				while (isspace((unsigned char)*p)) p++;
+			}
+		}
+	}
+	if (!*p) return;
+
+	/* directives */
+	if (*p == '.') { translate_line_att(p, out); return; }
+
+	/* extract mnemonic */
+	char mnem[32] = "";
+	int mi = 0;
+	while (*p && !isspace((unsigned char)*p) && mi < (int)sizeof(mnem)-1)
+		mnem[mi++] = *p++;
+	mnem[mi] = '\0';
+	while (isspace((unsigned char)*p)) p++;
+
+	char mlow[32];
+	strlower(mnem, mlow, sizeof(mlow));
+
+	/* split operands */
+	char ops[8][MAXLINE];
+	int nops = split_operands(p, ops, 8);
+
+	char tops[8][MAXLINE];
+	for (int i = 0; i < nops; i++)
+		translate_mips_operand(ops[i], tops[i], MAXLINE);
+
+	/*
+	 * MIPS special instruction translations:
+	 */
+
+	/* jr $ra → RET */
+	if (strcmp(mlow, "jr") == 0 && nops == 1 &&
+	    (strcmp(tops[0], "R31") == 0 || strcmp(tops[0], "RA") == 0)) {
+		fprintf(out, "\tRET\n");
+		return;
+	}
+	/* jr $reg → JMP (reg) */
+	if (strcmp(mlow, "jr") == 0 && nops == 1) {
+		fprintf(out, "\tJMP\t(%s)\n", tops[0]);
+		return;
+	}
+
+	/* li $dst, imm → MOVW $imm, Rdst */
+	if (strcmp(mlow, "li") == 0 && nops == 2) {
+		fprintf(out, "\tMOVW\t%s, %s\n", tops[1], tops[0]);
+		return;
+	}
+
+	/* lw $dst, off($base) → MOVW off(Rbase), Rdst */
+	if (strcmp(mlow, "lw") == 0 && nops == 2) {
+		fprintf(out, "\tMOVW\t%s, %s\n", tops[1], tops[0]);
+		return;
+	}
+	/* sw $src, off($base) → MOVW Rsrc, off(Rbase) */
+	if (strcmp(mlow, "sw") == 0 && nops == 2) {
+		fprintf(out, "\tMOVW\t%s, %s\n", tops[0], tops[1]);
+		return;
+	}
+
+	/* cfc1 $dst, $31 → MOVW FCR31, Rdst */
+	if (strcmp(mlow, "cfc1") == 0 && nops == 2) {
+		/* ops[1] is the FP control reg number (usually $31) */
+		char fcrname[16];
+		snprintf(fcrname, sizeof(fcrname), "FCR%s",
+		         ops[1][0]=='$' ? ops[1]+1 : ops[1]);
+		/* uppercase fcrname */
+		for (int i = 0; fcrname[i]; i++)
+			fcrname[i] = toupper((unsigned char)fcrname[i]);
+		fprintf(out, "\tMOVW\t%s, %s\n", fcrname, tops[0]);
+		return;
+	}
+	/* ctc1 $src, $31 → MOVW Rsrc, FCR31 */
+	if (strcmp(mlow, "ctc1") == 0 && nops == 2) {
+		char fcrname[16];
+		snprintf(fcrname, sizeof(fcrname), "FCR%s",
+		         ops[1][0]=='$' ? ops[1]+1 : ops[1]);
+		for (int i = 0; fcrname[i]; i++)
+			fcrname[i] = toupper((unsigned char)fcrname[i]);
+		fprintf(out, "\tMOVW\t%s, %s\n", tops[0], fcrname);
+		return;
+	}
+
+	/* andi/ori/xori $dst,$src,imm → AND/OR/XOR $imm, Rsrc, Rdst */
+	if ((strcmp(mlow,"andi")==0 || strcmp(mlow,"ori")==0 || strcmp(mlow,"xori")==0)
+	    && nops == 3) {
+		const char *p9 = (mlow[0]=='a') ? "AND" : (mlow[0]=='o') ? "OR" : "XOR";
+		fprintf(out, "\t%s\t%s, %s, %s\n", p9, tops[2], tops[1], tops[0]);
+		return;
+	}
+
+	/* addiu $dst, $src, imm → ADD $imm, Rsrc, Rdst */
+	if ((strcmp(mlow,"addiu")==0 || strcmp(mlow,"addi")==0) && nops == 3) {
+		fprintf(out, "\tADD\t%s, %s, %s\n", tops[2], tops[1], tops[0]);
+		return;
+	}
+
+	/* beq $r1, $r2, label → BEQ R1, R2, label  (Plan9 va: BEQ Rsrc, label) */
+	if (strcmp(mlow,"beq")==0 && nops == 3) {
+		/* Plan9 va: BEQ doesn't take two-register form cleanly;
+		 * if $r2 == $0 emit "BEQ Rsrc, label", else emit a comment warning */
+		if (strcmp(tops[1],"R0")==0)
+			fprintf(out, "\tBEQ\t%s, %s\n", tops[0], tops[2]);
+		else
+			fprintf(out, "\tBEQ\t%s, %s\t// was: beq %s, %s, %s\n",
+			        tops[0], tops[2], ops[0], ops[1], ops[2]);
+		return;
+	}
+
+	/* nop (in delay slot) */
+	if (strcmp(mlow, "nop") == 0) { fprintf(out, "\tNOP\n"); return; }
+
+	/* three-operand: and/or/xor/add/sub $dst, $s1, $s2 → OP Rs2, Rs1, Rdst
+	 * MIPS GNU: dst, s1, s2 (like ARM)
+	 * Plan9 va: s2, s1, dst (reversed) for three-operand, or s, dst for two */
+	if (nops == 3) {
+		const char *p9op = translate_opcode(mnem); /* uppercase */
+		fprintf(out, "\t%s\t%s, %s, %s\n", p9op, tops[2], tops[1], tops[0]);
+		return;
+	}
+
+	/* default: uppercase, keep operand order */
+	{
+		const char *p9op = translate_opcode(mnem);
+		fprintf(out, "\t%s", p9op);
+		for (int i = 0; i < nops; i++)
+			fprintf(out, "%s%s", i==0?"\t":", ", tops[i]);
+		fprintf(out, "\n");
+	}
+}
+
+/* ------------------------------------------------------------------ */
+/* PowerPC (9a/qa) special translation                                */
+/* ------------------------------------------------------------------ */
+
+/*
+ * PPC GNU uses bare integer register numbers with no prefix: "3", "9", "1".
+ * Context distinguishes registers from immediates: in "addi 1,1,16",
+ * the first two "1"s are R1 (register), the third is 16 (immediate).
+ * This is instruction-specific.  We use a per-opcode operand-type table.
+ *
+ * Strategy: for each opcode, define which operand positions are registers
+ * vs immediates.  Positions not listed are treated as immediates (get $).
+ * 'r' = register, 'i' = immediate, 'm' = memory disp(reg), 'f' = FP reg.
+ */
+
+typedef struct {
+	const char *gas;
+	const char *p9;
+	const char *optypes; /* string of 'r','i','f','m' per operand; NULL=all-regs */
+	int reverse;         /* 1 = reverse operand order for Plan9 */
+} PPCOpcMap;
+
+static PPCOpcMap ppc_opcode_map[] = {
+	/* data movement */
+	{ "li",    "MOVW",  "ri",  1 },  /* li Rdst, imm → MOVW $imm, Rdst */
+	{ "lis",   "MOVW",  "ri",  1 },  /* lis Rdst, imm (high) */
+	{ "mr",    "MOVW",  "rr",  1 },  /* mr Rdst, Rsrc → MOVW Rsrc, Rdst */
+	{ "mflr",  "MOVW",  "r",   0 },  /* mflr Rdst — special, emits MOVW LR, Rdst */
+	{ "mtlr",  "MOVW",  "r",   0 },  /* mtlr Rsrc — special, emits MOVW Rsrc, LR */
+	{ "mfctr", "MOVW",  "r",   0 },
+	{ "mtctr", "MOVW",  "r",   0 },
+	{ "mffs",  "FMOVD", "f",   0 },  /* mffs Fdst — FMOVD FPSCR, Fdst */
+	{ "mtfsf", "MTFSF", "if",  0 },  /* mtfsf mask, Fsrc */
+	/* load/store */
+	{ "lwz",   "MOVWZ", "rm",  1 },  /* lwz Rdst, off(Rbase) → MOVWZ off(Rbase),Rdst */
+	{ "lfd",   "FMOVD", "fm",  1 },  /* lfd Fdst, off(Rbase) → FMOVD off(Rbase),Fdst */
+	{ "stw",   "MOVW",  "rm",  0 },  /* stw Rsrc, off(Rbase) → MOVW Rsrc, off(Rbase) */
+	{ "stfd",  "FMOVD", "fm",  0 },  /* stfd Fsrc, off(Rbase) → FMOVD Fsrc, off(Rbase) */
+	{ "stwu",  "MOVWU", "rm",  0 },  /* stwu Rsrc, off(Rbase) */
+	/* arithmetic */
+	{ "addi",  "ADD",   "rri", 0 },  /* addi Rdst, Rs1, imm → ADD $imm, Rs1, Rdst */
+	{ "addis", "ADDIS", "rri", 0 },
+	{ "add",   "ADD",   "rrr", 0 },  /* add Rdst, Rs1, Rs2 → ADD Rs2, Rs1, Rdst */
+	{ "subf",  "SUB",   "rrr", 0 },
+	/* logical */
+	{ "and",   "AND",   "rrr", 0 },
+	{ "andc",  "ANDN",  "rrr", 0 },
+	{ "or",    "OR",    "rrr", 0 },
+	{ "xor",   "XOR",   "rrr", 0 },
+	{ "ori",   "OR",    "rri", 0 },
+	{ "oris",  "ORIS",  "rri", 0 },
+	{ "andi",  "AND",   "rri", 0 },  /* andi. handled via dot stripping */
+	{ "andis", "ANDIS", "rri", 0 },
+	{ "nor",   "NOR",   "rrr", 0 },
+	/* shift/rotate */
+	{ "slwi",  "SLW",   "rri", 0 },
+	{ "srwi",  "SRW",   "rri", 0 },
+	{ "srawi", "SRAW",  "rri", 0 },
+	{ "clrlwi","RLWNM", "rri", 0 }, /* simplified — emit RLWNM comment */
+	{ "clrrwi","RLWNM", "rri", 0 },
+	/* compare */
+	{ "cmpwi", "CMPW",  "ri",  1 },  /* cmpwi Rsrc, imm → CMPW $imm, Rsrc */
+	{ "cmpw",  "CMPW",  "rr",  1 },
+	{ "cmplwi","CMPU",  "ri",  1 },
+	{ "cmplw", "CMPU",  "rr",  1 },
+	/* branch */
+	{ "b",     "BR",    NULL,  0 },
+	{ "bl",    "BL",    NULL,  0 },
+	{ "blr",   "RET",   NULL,  0 },
+	{ "bctr",  "BL",    NULL,  0 },  /* branch to CTR */
+	{ "bctrl", "BL",    NULL,  0 },
+	{ "beq",   "BEQ",   NULL,  0 },
+	{ "bne",   "BNE",   NULL,  0 },
+	{ "blt",   "BLT",   NULL,  0 },
+	{ "bgt",   "BGT",   NULL,  0 },
+	{ "ble",   "BLE",   NULL,  0 },
+	{ "bge",   "BGE",   NULL,  0 },
+	{ "bso",   "BVS",   NULL,  0 },
+	/* NOP */
+	{ "nop",   "NOP",   NULL,  0 },
+	{ NULL, NULL, NULL, 0 }
+};
+
+/*
+ * Translate a PPC operand.
+ * type: 'r' = register (bare number → R#), 'f' = FP reg (bare → F#),
+ *       'i' = immediate (bare number gets $), 'm' = disp(reg).
+ */
+static void
+translate_ppc_operand(const char *in, char type, char *out, int outsz)
+{
+	const char *p = in;
+	while (isspace((unsigned char)*p)) p++;
+
+	/* already has $ or R prefix from prior processing? pass through */
+	if (*p == '$' || *p == 'R' || *p == 'F') {
+		snprintf(out, outsz, "%s", p);
+		return;
+	}
+
+	/* memory: N(M) */
+	if (strchr(p, '(') && type == 'm') {
+		char disp[64]="0", base[32]="";
+		const char *q = p;
+		char *dp = disp;
+		while (*q && *q != '(') *dp++ = *q++;
+		*dp = '\0';
+		if (*q == '(') {
+			q++;
+			char rn[16]; int i=0;
+			while (*q && *q != ')' && i < (int)sizeof(rn)-1)
+				rn[i++] = *q++;
+			rn[i] = '\0';
+			/* bare number → R# */
+			char *end; long rv = strtol(rn, &end, 10);
+			if (end != rn && *end == '\0')
+				snprintf(base, sizeof(base), "R%ld", rv);
+			else {
+				/* named reg */
+				const char *r2 = lookup_in_table(ppc_aliases, rn);
+				snprintf(base, sizeof(base), "%s", r2 ? r2 : rn);
+			}
+		}
+		trim(disp);
+		snprintf(out, outsz, "%s(%s)", *disp ? disp : "0", base);
+		return;
+	}
+
+	/* numeric label ref */
+	if (isdigit((unsigned char)*p) &&
+	    (p[1] == 'f' || p[1] == 'b') &&
+	    (p[2] == '\0' || isspace((unsigned char)p[2]))) {
+		int d = *p - '0';
+		int fwd = (p[1] == 'f');
+		snprintf(out, outsz, "%s", resolve_numlabel(d, fwd, cur_lineno));
+		return;
+	}
+
+	/* bare number */
+	{
+		char *end;
+		long v = strtol(p, &end, 0);
+		if (end != p && (*end == '\0' || isspace((unsigned char)*end))) {
+			if (type == 'r')
+				snprintf(out, outsz, "R%ld", v);
+			else if (type == 'f')
+				snprintf(out, outsz, "F%ld", v);
+			else
+				snprintf(out, outsz, "$%ld", v);
+			return;
+		}
+	}
+
+	/* named register or label */
+	{
+		char low[32];
+		strlower(p, low, sizeof(low));
+		const char *r2 = lookup_in_table(ppc_aliases, low);
+		if (r2) { snprintf(out, outsz, "%s", r2); return; }
+	}
+
+	snprintf(out, outsz, "%s", p);
+}
+
+/*
+ * Translate a PPC/9a instruction line to Plan 9.
+ */
+static void
+translate_line_ppc(const char *line, FILE *out)
+{
+	char buf[MAXLINE];
+	strncpy(buf, line, sizeof(buf)-1);
+	char *p = buf;
+	static int in_block_comment = 0;
+
+	if (in_block_comment) {
+		char *end = strstr(p, "*/");
+		if (end) { in_block_comment = 0; p = end+2; }
+		else { fprintf(out, "\n"); return; }
+	}
+
+	/* strip comments */
+	{
+		char *lc = strstr(p, "//");
+		if (lc) *lc = '\0';
+		char *bc = strstr(p, "/*");
+		if (bc) {
+			char *ec = strstr(bc+2, "*/");
+			if (ec) memmove(bc, ec+2, strlen(ec+2)+1);
+			else { in_block_comment = 1; *bc = '\0'; }
+		}
+	}
+
+	p = trim(p);
+	if (!*p) { fprintf(out, "\n"); return; }
+
+	/* preprocessor */
+	if (*p == '#') { fprintf(out, "%s\n", p); return; }
+
+	/* label: could be "1:" or "sym:" */
+	char *colon = strchr(p, ':');
+	if (colon) {
+		int llen = colon - p;
+		char lbl[256] = "";
+		if (llen < (int)sizeof(lbl)-1 && llen > 0) {
+			memcpy(lbl, p, llen); lbl[llen] = '\0';
+			int ok = 1;
+			for (int i = 0; lbl[i]; i++)
+				if (!isalnum((unsigned char)lbl[i]) && lbl[i]!='_' && lbl[i]!='.')
+					{ ok = 0; break; }
+			if (ok) {
+				if (llen == 1 && isdigit((unsigned char)lbl[0])) {
+					int d = lbl[0]-'0', serial = -1;
+					for (int j = 0; j < nnumlabels; j++)
+						if (numlabels[j].digit==d && numlabels[j].linenum==cur_lineno)
+							{ serial=numlabels[j].serial; break; }
+					if (serial >= 0) snprintf(lbl, sizeof(lbl), ".Lnum%d_%d", d, serial);
+				}
+				fprintf(out, "%s:\n", lbl);
+				p = colon+1;
+				while (isspace((unsigned char)*p)) p++;
+			}
+		}
+	}
+	if (!*p) return;
+
+	/* directives */
+	if (*p == '.') {
+		/* .zero N — emit N zero bytes */
+		if (strncmp(p, ".zero", 5) == 0) {
+			char *arg = p+5;
+			while (isspace((unsigned char)*arg)) arg++;
+			long n = strtol(arg, NULL, 0);
+			for (long i = 0; i < n; i++)
+				fprintf(out, "\tBYTE\t$0\n");
+			return;
+		}
+		translate_line_att(p, out);
+		return;
+	}
+
+	/* extract mnemonic; strip dot-suffix (sets CR) and branch hints (+/-) */
+	char mnem[32] = "";
+	int mi = 0;
+	while (*p && !isspace((unsigned char)*p) && mi < (int)sizeof(mnem)-1)
+		mnem[mi++] = *p++;
+	mnem[mi] = '\0';
+	while (isspace((unsigned char)*p)) p++;
+
+	/* strip branch prediction hints: beq+, beq- */
+	{
+		int n = strlen(mnem);
+		if (n > 1 && (mnem[n-1]=='+' || mnem[n-1]=='-'))
+			mnem[n-1] = '\0';
+	}
+
+	/* dot-suffix: andis. → ANDISCC, beq. → BEQCC, etc. */
+	char p9suffix[8] = "";
+	{
+		int n = strlen(mnem);
+		if (n > 1 && mnem[n-1] == '.') {
+			mnem[n-1] = '\0';
+			strncpy(p9suffix, "CC", sizeof(p9suffix));
+		}
+	}
+
+	char mlow[32];
+	strlower(mnem, mlow, sizeof(mlow));
+
+	/* split operands */
+	char ops[8][MAXLINE];
+	int nops = split_operands(p, ops, 8);
+
+	/* look up in PPC table */
+	PPCOpcMap *mp = NULL;
+	for (int i = 0; ppc_opcode_map[i].gas; i++) {
+		if (strcmp(ppc_opcode_map[i].gas, mlow) == 0) {
+			mp = &ppc_opcode_map[i];
+			break;
+		}
+	}
+
+	/* special cases first */
+
+	/* blr → RET */
+	if (strcmp(mlow, "blr") == 0) {
+		fprintf(out, "\tRET\n");
+		return;
+	}
+
+	/* mflr Rdst → MOVW LR, Rdst */
+	if (strcmp(mlow, "mflr") == 0 && nops == 1) {
+		char t[MAXLINE];
+		translate_ppc_operand(ops[0], 'r', t, MAXLINE);
+		fprintf(out, "\tMOVW\tLR, %s\n", t);
+		return;
+	}
+	/* mtlr Rsrc → MOVW Rsrc, LR */
+	if (strcmp(mlow, "mtlr") == 0 && nops == 1) {
+		char t[MAXLINE];
+		translate_ppc_operand(ops[0], 'r', t, MAXLINE);
+		fprintf(out, "\tMOVW\t%s, LR\n", t);
+		return;
+	}
+
+	/* mffs Fdst → FMOVD FPSCR, Fdst */
+	if (strcmp(mlow, "mffs") == 0 && nops == 1) {
+		char t[MAXLINE];
+		translate_ppc_operand(ops[0], 'f', t, MAXLINE);
+		fprintf(out, "\tFMOVD\tFPSCR, %s\n", t);
+		return;
+	}
+
+	/* addi Rdst, Rs1, imm → ADD $imm, Rs1, Rdst */
+	if ((strcmp(mlow,"addi")==0 || strcmp(mlow,"addis")==0) && nops == 3) {
+		char t0[32], t1[32], t2[32];
+		translate_ppc_operand(ops[0], 'r', t0, sizeof(t0));
+		translate_ppc_operand(ops[1], 'r', t1, sizeof(t1));
+		translate_ppc_operand(ops[2], 'i', t2, sizeof(t2));
+		const char *p9 = strcmp(mlow,"addis")==0 ? "ADDIS" : "ADD";
+		fprintf(out, "\t%s\t%s, %s, %s\n", p9, t2, t1, t0);
+		return;
+	}
+
+	/* cmpwi Rsrc, imm → CMPW $imm, Rsrc */
+	if ((strcmp(mlow,"cmpwi")==0 || strcmp(mlow,"cmplwi")==0) && nops == 2) {
+		char t0[32], t1[32];
+		translate_ppc_operand(ops[0], 'r', t0, sizeof(t0));
+		translate_ppc_operand(ops[1], 'i', t1, sizeof(t1));
+		const char *p9 = strcmp(mlow,"cmplwi")==0 ? "CMPU" : "CMPW";
+		fprintf(out, "\t%s\t%s, %s\n", p9, t1, t0);
+		return;
+	}
+
+	/* clrlwi / clrrwi — complex rotate; emit as RLWNM comment */
+	if (strcmp(mlow,"clrlwi")==0 || strcmp(mlow,"clrrwi")==0) {
+		fprintf(out, "\t// %s %s (complex rotate — translate manually)\n", mnem, p);
+		return;
+	}
+
+	if (mp) {
+		const char *optypes = mp->optypes ? mp->optypes : "rrrrr";
+		char tops[8][MAXLINE];
+		for (int i = 0; i < nops; i++) {
+			char ot = (i < (int)strlen(optypes)) ? optypes[i] : 'r';
+			translate_ppc_operand(ops[i], ot, tops[i], MAXLINE);
+		}
+
+		/* Build Plan9 op name */
+		char p9name[32];
+		snprintf(p9name, sizeof(p9name), "%s%s", mp->p9, p9suffix);
+
+		/* Emit based on nops and operand semantic */
+		if (nops == 0) {
+			fprintf(out, "\t%s\n", p9name);
+		} else if (nops == 1) {
+			fprintf(out, "\t%s\t%s\n", p9name, tops[0]);
+		} else if (nops == 2) {
+			if (mp->reverse)
+				fprintf(out, "\t%s\t%s, %s\n", p9name, tops[1], tops[0]);
+			else
+				fprintf(out, "\t%s\t%s, %s\n", p9name, tops[0], tops[1]);
+		} else if (nops == 3) {
+			/* three-operand: GNU dst,s1,s2 or dst,s1,imm */
+			/* Plan9 PPC: src2/imm, src1, dst */
+			fprintf(out, "\t%s\t%s, %s, %s\n", p9name, tops[2], tops[1], tops[0]);
+		} else {
+			fprintf(out, "\t%s", p9name);
+			for (int i = 0; i < nops; i++)
+				fprintf(out, "%s%s", i==0?"\t":", ", tops[i]);
+			fprintf(out, "\n");
+		}
+		return;
+	}
+
+	/* default: uppercase, treat all operands as registers */
+	{
+		char p9name[32];
+		char upmnem[32];
+		int i;
+		for (i = 0; mnem[i] && i < (int)sizeof(upmnem)-1; i++)
+			upmnem[i] = toupper((unsigned char)mnem[i]);
+		upmnem[i] = '\0';
+		snprintf(p9name, sizeof(p9name), "%s%s", upmnem, p9suffix);
+
+		char tops[8][MAXLINE];
+		for (i = 0; i < nops; i++)
+			translate_ppc_operand(ops[i], 'r', tops[i], MAXLINE);
+
+		fprintf(out, "\t%s", p9name);
+		for (i = 0; i < nops; i++)
+			fprintf(out, "%s%s", i==0?"\t":", ", tops[i]);
+		fprintf(out, "\n");
+	}
+}
 
 /* ------------------------------------------------------------------ */
 /* Directive translation */
@@ -1060,6 +2365,182 @@ translate_mem_intel(const char *in, char *out, int outsz)
 /* AT&T operand → Plan 9 */
 /* ------------------------------------------------------------------ */
 
+/* ------------------------------------------------------------------ */
+/* AT&T size-suffix inference                                          */
+/* ------------------------------------------------------------------ */
+
+/*
+ * In GNU AT&T syntax, size suffixes (b/w/l/q) on the mnemonic are
+ * mandatory for most instructions.  However, some GAS source files
+ * omit the suffix when the operand size is unambiguous from the
+ * register name (e.g. "inc %rdi" — clearly 64-bit).
+ *
+ * Plan 9 assemblers are strict: "INC DI" is ambiguous; the correct
+ * form is "INCQ DI" for the 64-bit case.
+ *
+ * This function examines up to two operands (the register operands in
+ * an AT&T instruction) and returns the appropriate Plan 9 size suffix
+ * character ('B', 'W', 'L', 'Q') or '\0' if it cannot determine one.
+ *
+ * We only call this for x86/amd64; RISC arches don't need it.
+ */
+static char
+infer_suffix_from_regs(const char *op1, const char *op2)
+{
+	/* We look at register operands only — skip $imm, mem, etc. */
+	const char *ops[2];
+	int nops = 0;
+	ops[0] = op1;
+	ops[1] = op2;
+
+	/*
+	 * Map of lowercase AT&T register name → suffix character.
+	 * Only the first match found is used.
+	 */
+	static const struct { const char *name; char sfx; } rmap[] = {
+		/* 64-bit → Q */
+		{ "rax",'Q' }, { "rcx",'Q' }, { "rdx",'Q' }, { "rbx",'Q' },
+		{ "rsp",'Q' }, { "rbp",'Q' }, { "rsi",'Q' }, { "rdi",'Q' },
+		{ "r8", 'Q' }, { "r9", 'Q' }, { "r10",'Q' }, { "r11",'Q' },
+		{ "r12",'Q' }, { "r13",'Q' }, { "r14",'Q' }, { "r15",'Q' },
+		/* 32-bit → L */
+		{ "eax",'L' }, { "ecx",'L' }, { "edx",'L' }, { "ebx",'L' },
+		{ "esp",'L' }, { "ebp",'L' }, { "esi",'L' }, { "edi",'L' },
+		{ "r8d",'L'  }, { "r9d",'L'  }, { "r10d",'L' }, { "r11d",'L' },
+		{ "r12d",'L' }, { "r13d",'L' }, { "r14d",'L' }, { "r15d",'L' },
+		/* 16-bit → W */
+		{ "ax", 'W' }, { "cx", 'W' }, { "dx", 'W' }, { "bx", 'W' },
+		{ "sp", 'W' }, { "bp", 'W' }, { "si", 'W' }, { "di", 'W' },
+		{ "r8w",'W' }, { "r9w",'W' }, { "r10w",'W'}, { "r11w",'W'},
+		{ "r12w",'W'}, { "r13w",'W'}, { "r14w",'W'}, { "r15w",'W'},
+		/* 8-bit → B */
+		{ "al", 'B' }, { "cl", 'B' }, { "dl", 'B' }, { "bl", 'B' },
+		{ "ah", 'B' }, { "ch", 'B' }, { "dh", 'B' }, { "bh", 'B' },
+		{ "spl",'B' }, { "bpl",'B' }, { "sil",'B' }, { "dil",'B' },
+		{ "r8b",'B' }, { "r9b",'B' }, { "r10b",'B'}, { "r11b",'B'},
+		{ "r12b",'B'}, { "r13b",'B'}, { "r14b",'B'}, { "r15b",'B'},
+		{ NULL, '\0' }
+	};
+	int oi, ri;
+
+	for (oi = 0; oi < nops; oi++) {
+		const char *o = ops[oi];
+		if (!o || !*o) continue;
+		while (isspace((unsigned char)*o)) o++;
+		if (*o == '%') {
+			char tmp[32];
+			strlower(o+1, tmp, sizeof(tmp));
+			/* strip trailing non-alnum (e.g. from "ch," remnants) */
+			char *e = tmp;
+			while (*e && (isalnum((unsigned char)*e))) e++;
+			*e = '\0';
+			for (ri = 0; rmap[ri].name; ri++) {
+				if (strcmp(rmap[ri].name, tmp) == 0)
+					return rmap[ri].sfx;
+			}
+		}
+	}
+	/* default for arch */
+	return (arch == ARCH_AMD64) ? 'Q' : 'L';
+}
+
+/*
+ * Opcodes that never take a size suffix in Plan 9 even when the
+ * AT&T source omits one — these are already handled in opcode_map,
+ * but we need to skip suffix-inference for them.
+ */
+static int
+opcode_needs_no_suffix(const char *mlow)
+{
+	static const char *nosuf[] = {
+		"ret","retl","retq","retf","retfq",
+		"nop","nopl","nopw",
+		"hlt","pause","leave","leaveq","leavel",
+		"cpuid","syscall","sysret",
+		"int3","int","cli","sti","cld","std","clc","stc","cmc",
+		"pushf","pushfq","popf","popfq",
+		"lahf","sahf",
+		"cbw","cwde","cdqe","cwd","cdq","cqo",
+		"fnclex","fwait","fnop",
+		"fnstsw","fnsave","fnstenv","fnstcw",
+		"frstor","fldenv","fldcw",
+		"fninit",
+		"stmxcsr","ldmxcsr","fxsave","fxrstor",
+		"mfence","lfence","sfence",
+		"rdtsc","rdtscp","rdmsr","wrmsr","rdpmc",
+		"iret","iretq","iretl",
+		"lock","rep","repe","repz","repne","repnz",
+		NULL
+	};
+	int i;
+	for (i = 0; nosuf[i]; i++)
+		if (strcmp(nosuf[i], mlow) == 0) return 1;
+	return 0;
+}
+
+/*
+ * Given an AT&T mnemonic with no size suffix (e.g. "inc", "add", "or"),
+ * and the raw operand strings, return the Plan 9 mnemonic with the
+ * appropriate suffix appended.
+ * Returns pointer to a static buffer.
+ */
+static const char *
+infer_att_opcode(const char *mnem, const char *op1, const char *op2)
+{
+	static char buf[80];
+	char mlow[64];
+	char sfx;
+	const char *p9base;
+
+	strlower(mnem, mlow, sizeof(mlow));
+
+	/* If the mnemonic already ends with a known size suffix letter,
+	 * it doesn't need inference — just translate normally. */
+	{
+		int n = strlen(mlow);
+		if (n > 1) {
+			char last = mlow[n-1];
+			/* b/w/l/q are the AT&T size suffixes */
+			if (last == 'b' || last == 'w' || last == 'l' || last == 'q') {
+				/* verify the stem without suffix is a "real" mnemonic
+				 * by checking it's not something like "sub" (ends in 'b') */
+				/* heuristic: if the suffix-stripped form is >= 2 chars
+				 * and differs from the common false-positives, treat it as suffixed */
+				static const char *false_suffix[] = {
+					"sub","and","or","xor","add","mov","cmp","test",
+					"call","imul","div","idiv","mul","neg","not",
+					"push","pop","shl","shr","sar","rol","ror",
+					"inc","dec","lea","xchg",
+					/* FPU: all fXXX */
+					NULL
+				};
+				char stem[64];
+				strncpy(stem, mlow, n-1);
+				stem[n-1] = '\0';
+				int is_false = 0;
+				int j;
+				for (j = 0; false_suffix[j]; j++)
+					if (strcmp(false_suffix[j], stem) == 0) { is_false = 1; break; }
+				if (!is_false) {
+					/* it's a genuinely suffixed mnemonic like "addl", "movq" */
+					return translate_opcode(mnem);
+				}
+			}
+		}
+	}
+
+	if (opcode_needs_no_suffix(mlow))
+		return translate_opcode(mnem);
+
+	sfx = infer_suffix_from_regs(op1, op2);
+	p9base = translate_opcode(mnem); /* uppercased base */
+
+	snprintf(buf, sizeof(buf), "%s%c", p9base, sfx);
+	return buf;
+}
+
+/* ------------------------------------------------------------------ */
+
 static void
 translate_operand_att(const char *in, char *out, int outsz)
 {
@@ -1449,23 +2930,52 @@ translate_line_att(const char *line, FILE *out)
 		if (llen < (int)sizeof(label)-1) {
 			memcpy(label, p, llen);
 			label[llen] = '\0';
-			/* a label should be alphanumeric+underscore+dot */
-			int ok = 1;
-			for (int i = 0; label[i]; i++)
-				if (!isalnum((unsigned char)label[i]) && label[i] != '_' && label[i] != '.' && label[i] != '$')
-					{ ok = 0; break; }
-			if (ok) {
+			/*
+			 * Numeric local label: a single decimal digit.
+			 * Look up its serial number from our pre-collected table
+			 * and emit ".Lnum{d}_{serial}:" instead.
+			 */
+			if (llen == 1 && isdigit((unsigned char)label[0])) {
+				int d = label[0] - '0';
+				int serial = -1;
+				int j;
+				/* find the entry matching this line number */
+				for (j = 0; j < nnumlabels; j++) {
+					if (numlabels[j].digit == d &&
+					    numlabels[j].linenum == cur_lineno) {
+						serial = numlabels[j].serial;
+						break;
+					}
+				}
+				if (serial >= 0) {
+					snprintf(label, sizeof(label), ".Lnum%d_%d", d, serial);
+				} else {
+					snprintf(label, sizeof(label), ".Lnum%d_?", d);
+				}
 				p = colon+1;
 				while (isspace((unsigned char)*p)) p++;
-				if (in_data_section) {
-					/* flush GLOBL for previous data symbol if any */
-					FLUSH_DATA_GLOBL();
-					/* record this label for the upcoming data directives */
-					strncpy(data_label, label, sizeof(data_label)-1);
-					data_label[sizeof(data_label)-1] = '\0';
-					data_offset = 0;
-				} else {
-					fprintf(out, "%s:\n", label);
+				fprintf(out, "%s:\n", label);
+				label[0] = '\0'; /* already emitted */
+			} else {
+				/* a label should be alphanumeric+underscore+dot */
+				int ok = 1;
+				for (int i = 0; label[i]; i++)
+					if (!isalnum((unsigned char)label[i]) && label[i] != '_' && label[i] != '.' && label[i] != '$')
+						{ ok = 0; break; }
+				if (ok) {
+					p = colon+1;
+					while (isspace((unsigned char)*p)) p++;
+					if (in_data_section) {
+						/* flush GLOBL for previous data symbol if any */
+						FLUSH_DATA_GLOBL();
+						/* record this label for the upcoming data directives */
+						strncpy(data_label, label, sizeof(data_label)-1);
+						data_label[sizeof(data_label)-1] = '\0';
+						data_offset = 0;
+					} else {
+						fprintf(out, "%s:\n", label);
+					}
+					label[0] = '\0'; /* already emitted or consumed */
 				}
 			}
 			(void)tmp2;
@@ -1609,6 +3119,45 @@ translate_line_att(const char *line, FILE *out)
 	char ops[8][MAXLINE];
 	int nops = split_operands(p, ops, 8);
 
+	/*
+	 * AT&T suffix inference:
+	 * When the mnemonic has no explicit size suffix but Plan 9 requires one,
+	 * infer the suffix from the register operands.
+	 * Only for x86/amd64 and only when the mnemonic is in the explicit
+	 * opcode_map (which means it already has the right Plan 9 form) OR
+	 * when the uppercased mnemonic will be ambiguous to the assembler.
+	 *
+	 * We use infer_att_opcode() which checks whether a suffix is already
+	 * present and only adds one when needed.
+	 */
+	if (arch_is_x86(arch)) {
+		char mlow_tmp[64];
+		strlower(mnem, mlow_tmp, sizeof(mlow_tmp));
+		/* Only infer when the mnemonic has NO explicit suffix character */
+		int n = strlen(mlow_tmp);
+		char last = n > 0 ? mlow_tmp[n-1] : 0;
+		int already_has_suffix = (last == 'b' || last == 'w' ||
+		                          last == 'l' || last == 'q') &&
+		                         n >= 2;
+		if (!already_has_suffix && !opcode_needs_no_suffix(mlow_tmp)) {
+			/* Check if it's in the explicit opcode_map — if so, trust that */
+			int in_map = 0;
+			int mi;
+			for (mi = 0; opcode_map[mi].gas; mi++) {
+				if (strcmp(opcode_map[mi].gas, mlow_tmp) == 0) {
+					in_map = 1;
+					break;
+				}
+			}
+			if (!in_map) {
+				/* Infer suffix from operands */
+				const char *op1 = nops > 0 ? ops[0] : "";
+				const char *op2 = nops > 1 ? ops[1] : "";
+				p9op = infer_att_opcode(mnem, op1, op2);
+			}
+		}
+	}
+
 	/* AT&T operand order: src, dst — Plan 9 is also src, dst — same!
 	 * Exception: CMP and TEST. Plan 9 grammar requires the register first
 	 * even when the immediate is the "source" in AT&T.
@@ -1632,10 +3181,15 @@ translate_line_att(const char *line, FILE *out)
 		}
 	}
 
-	/* Translate each operand */
+	/* Translate each operand, resolving numeric label refs (Nf/Nb) */
 	char tops[8][MAXLINE];
-	for (i = 0; i < nops; i++)
-		translate_operand_att(ops[i], tops[i], MAXLINE);
+	for (i = 0; i < nops; i++) {
+		char tmp_op[MAXLINE];
+		/* First resolve any numeric label reference */
+		translate_numlabel_ref(ops[i], tmp_op, sizeof(tmp_op), cur_lineno);
+		/* Then translate the operand (register, memory, immediate) */
+		translate_operand_att(tmp_op, tops[i], MAXLINE);
+	}
 
 	/* Emit */
 	fprintf(out, "\t%s%s", prefix, p9op);
@@ -1834,8 +3388,8 @@ translate_file(const char *infile, const char *outfile_path, Syntax syn)
 	char line[MAXLINE];
 
 	/*
-	 * Plan 9 pass-through: copy verbatim into the temp file so the
-	 * rest of the pipeline (invoke_assembler, cleanup) stays uniform.
+	 * Plan 9 pass-through: copy verbatim so the rest of the pipeline
+	 * (invoke_assembler, cleanup) stays uniform.
 	 */
 	if (syn == SYN_PLAN9) {
 		in  = fopen(infile,       "rb");
@@ -1851,26 +3405,51 @@ translate_file(const char *infile, const char *outfile_path, Syntax syn)
 		return;
 	}
 
+	/*
+	 * Pass 1: collect all numeric local labels (1:, 2:, etc.) so we
+	 * can resolve forward (1f) and backward (1b) references in pass 2.
+	 * Done for all arches since numeric labels are universal GAS syntax.
+	 */
+	collect_numlabels(infile);
+
 	in  = fopen(infile,       "r");
 	out = fopen(outfile_path, "w");
 	if (!in)  die("cannot open input: %s: %s",  infile,      strerror(errno));
 	if (!out) die("cannot open output: %s: %s", outfile_path, strerror(errno));
 
+	cur_lineno = 0;
 	while (fgets(line, sizeof(line), in)) {
-		if (syn == SYN_INTEL)
-			translate_line_intel(line, out);
-		else
-			translate_line_att(line, out);
+		cur_lineno++;
+		switch (arch) {
+		case ARCH_ARM64:
+			translate_line_arm64(line, out);
+			break;
+		case ARCH_MIPS:
+			translate_line_mips(line, out);
+			break;
+		case ARCH_PPC64:
+		case ARCH_POWER:
+			translate_line_ppc(line, out);
+			break;
+		default:
+			if (syn == SYN_INTEL)
+				translate_line_intel(line, out);
+			else
+				translate_line_att(line, out);
+			break;
+		}
 	}
 
 	/* Flush any pending data section GLOBL at end of file */
-	if (syn != SYN_INTEL)
+	if (syn != SYN_INTEL &&
+	    arch != ARCH_ARM64 && arch != ARCH_MIPS &&
+	    arch != ARCH_PPC64 && arch != ARCH_POWER)
 		translate_line_att(NULL, out);
 
 	fclose(in);
 	fclose(out);
 
-	/* Verbose: re-read the translated file and print to stderr */
+	/* Verbose: dump translated output to stderr */
 	if (verbose) {
 		FILE *f = fopen(outfile_path, "r");
 		if (f) {
@@ -1981,6 +3560,8 @@ usage(void)
 		"usage: as [options] file.s ...\n"
 		"options:\n"
 		"  -o outfile         output file\n"
+		"  -S                 convert to Plan 9 syntax only, do not assemble\n"
+		"                     output goes to outfile (or stdout if no -o)\n"
 		"  -att               force AT&T syntax input\n"
 		"  -intel             force Intel syntax input\n"
 		"  -plan9             force Plan 9 syntax (pass through)\n"
@@ -1999,7 +3580,7 @@ usage(void)
 		"other:\n"
 		"  -I dir             add include directory\n"
 		"  -D sym[=val]       define symbol\n"
-		"  -v                 verbose\n"
+		"  -v                 verbose (dump translated Plan 9 output to stderr)\n"
 	);
 	exit(1);
 }
@@ -2053,6 +3634,8 @@ main(int argc, char *argv[])
 			outfile = argv[i];
 		} else if (strncmp(a, "-o", 2) == 0) {
 			outfile = a+2;
+		} else if (strcmp(a, "-S") == 0) {
+			convert_only = 1;
 		} else if (strcmp(a, "-att") == 0 || strcmp(a, "--att") == 0) {
 			syntax = SYN_ATT;
 		} else if (strcmp(a, "-intel") == 0 || strcmp(a, "--intel") == 0) {
@@ -2137,6 +3720,50 @@ main(int argc, char *argv[])
 
 		if (syn == SYN_AUTO)
 			syn = detect_syntax(infile);
+
+		if (convert_only) {
+			/*
+			 * -S: translate to Plan 9 syntax only; write to outfile
+			 * or stdout.  No temp file, no assembler invocation.
+			 */
+			const char *dst = outfile ? outfile : "-";
+			FILE *out_f;
+			if (strcmp(dst, "-") == 0) {
+				out_f = stdout;
+			} else {
+				out_f = fopen(dst, "w");
+				if (!out_f) die("cannot open output: %s: %s", dst, strerror(errno));
+			}
+
+			/* collect numeric labels */
+			collect_numlabels(infile);
+			FILE *in_f = fopen(infile, "r");
+			if (!in_f) die("cannot open input: %s: %s", infile, strerror(errno));
+			char cvline[MAXLINE];
+			cur_lineno = 0;
+			while (fgets(cvline, sizeof(cvline), in_f)) {
+				cur_lineno++;
+				switch (arch) {
+				case ARCH_ARM64: translate_line_arm64(cvline, out_f); break;
+				case ARCH_MIPS:  translate_line_mips(cvline, out_f);  break;
+				case ARCH_PPC64:
+				case ARCH_POWER: translate_line_ppc(cvline, out_f);   break;
+				default:
+					if (syn == SYN_INTEL)
+						translate_line_intel(cvline, out_f);
+					else
+						translate_line_att(cvline, out_f);
+					break;
+				}
+			}
+			if (syn != SYN_INTEL &&
+			    arch != ARCH_ARM64 && arch != ARCH_MIPS &&
+			    arch != ARCH_PPC64 && arch != ARCH_POWER)
+				translate_line_att(NULL, out_f);
+			fclose(in_f);
+			if (out_f != stdout) fclose(out_f);
+			continue;
+		}
 
 		const char *tmpname = make_tmpname(infile);
 		translate_file(infile, tmpname, syn);
