@@ -1,11 +1,7 @@
-#ifndef _PLAN9_SOURCE
-  This header file is an extension to ANSI/POSIX
-#endif
-
 #ifndef __FMT_H_
 #define __FMT_H_
-#pragma src "/sys/src/ape/lib/fmt"
-#pragma lib "/$M/lib/ape/libfmt.a"
+
+#pragma lib "/$M/lib/ape/libap.a"
 
 #include <u.h>
 
