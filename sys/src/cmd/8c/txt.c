@@ -21,6 +21,12 @@ ginit(void)
 	tfield = types[TLONG];
 
 	typeswitch = typechlv;
+	typecmplx = typesuv;
+
+	/* TO DO */
+	memmove(typechlpv, typechlp, sizeof(typechlpv));
+	typechlpv[TVLONG] = 1;
+	typechlpv[TUVLONG] = 1;
 
 	zprog.link = P;
 	zprog.as = AGOK;
@@ -185,7 +191,7 @@ garg1(Node *n, Node *tn1, Node *tn2, int f, Node **fnxp)
 		}
 		return;
 	}
-	if(typesu[n->type->etype] || typev[n->type->etype]) {
+	if(typesu[n->type->etype] || typev[n->type->etype] || iscmplx(n->type->etype)) {
 		regaalloc(tn2, n);
 		if(n->complex >= FNX) {
 			sugen(*fnxp, tn2, n->type->width);
