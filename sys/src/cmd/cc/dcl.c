@@ -533,6 +533,8 @@ init1(Sym *s, Type *t, long o, int exflag)
 	case TUVLONG:
 	case TFLOAT:
 	case TDOUBLE:
+	case TCFLOAT:
+	case TCDOUBLE:
 	case TIND:
 	single:
 		if(a->op == OARRAY || a->op == OELEM)
