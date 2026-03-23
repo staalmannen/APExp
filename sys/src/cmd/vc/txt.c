@@ -29,6 +29,10 @@ ginit(void)
 	typechlpv[TVLONG] = 1;
 	typechlpv[TUVLONG] = 1;
 
+	typeword = typechlvp;
+	typeswitch = typechlv;
+	typecmplx = typesuv;
+
 	zprog.link = P;
 	zprog.as = AGOK;
 	zprog.reg = NREG;

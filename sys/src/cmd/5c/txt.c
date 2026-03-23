@@ -24,11 +24,6 @@ ginit(void)
 	typeswitch = typechlv;
 	typecmplx = typesuv;
 
-	/* TO DO */
-	memmove(typechlpv, typechlp, sizeof(typechlpv));
-	typechlpv[TVLONG] = 1;
-	typechlpv[TUVLONG] = 1;
-
 	zprog.link = P;
 	zprog.as = AGOK;
 	zprog.reg = NREG;
