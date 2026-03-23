@@ -21,7 +21,7 @@ cgen(Node *n, Node *nn)
 	}
 	if(n == Z || n->type == T)
 		return;
-	if(typesu[n->type->etype]) {
+	if(typesu[n->type->etype] || iscmplx(n->type->etype)) {
 		sugen(n, nn, n->type->width);
 		return;
 	}
