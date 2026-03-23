@@ -200,8 +200,6 @@ gclean(void)
 			diag(Z, "missing F%d", i);
 	}
 
-	if(vlanest > 0)
-		gvla_epilogue();
 	while(mnstring)
 		outstring("", 1L);
 	symstring->type->width = nstring;
@@ -940,76 +938,3 @@ long	ncast[NTYPE] =
 	BUNION,				/* [TUNION] */
 	0,				/* [TENUM] */
 };
-
-/*
- * VLA frame management for Motorola 68k (1c/2c).
- *
- * The 68k linker emits "LINK A6,#-framesize / UNLK A6" for every
- * function, so A6 is already the frame pointer.  SP = A7.
- *
- * We use A5 (D_A0+5) as the VLA stack anchor.  A5 sits just above
- * the allocatable address register range and is callee-saved in the
- * 68k ABI.  We claim it by incrementing aregused[5] so the register
- * allocator will not touch it.
- *
- * gvla_prologue – at function entry when vlanest > 0:
- *   Save A5, then set A5 = A7 to anchor the pre-VLA stack top.
- *
- * gvla_epilogue – before every RET when vlanest > 0:
- *   Restore A7 from A5, restore A5.
- *
- * gret – wrapper that inserts the epilogue before RETURN.
- */
-void
-gvla_prologue(void)
-{
-	int sp, fp;
-
-	sp = D_A0 + 7;		/* A7 = SP */
-	fp = D_A0 + 5;		/* A5 = VLA frame anchor */
-	aregused[5]++;		/* claim A5 */
-
-	/* MOVL A5, -(A7)  — push A5 onto stack */
-	nextpc();
-	p->as = AMOVL;
-	p->from.type = fp;
-	p->to.type = sp | I_INDIR | I_PREDEC;
-
-	/* MOVL A7, A5  — A5 = current SP (pre-VLA anchor) */
-	nextpc();
-	p->as = AMOVL;
-	p->from.type = sp;
-	p->to.type = fp;
-}
-
-void
-gvla_epilogue(void)
-{
-	int sp, fp;
-
-	sp = D_A0 + 7;
-	fp = D_A0 + 5;
-
-	/* MOVL A5, A7  — restore SP to pre-VLA position */
-	nextpc();
-	p->as = AMOVL;
-	p->from.type = fp;
-	p->to.type = sp;
-
-	/* MOVL (A7)+, A5  — pop saved A5 */
-	nextpc();
-	p->as = AMOVL;
-	p->from.type = sp | I_INDIR | I_POSTINC;
-	p->to.type = fp;
-
-	aregused[5]--;
-}
-
-void
-gret(void)
-{
-	if(vlanest > 0)
-		gvla_epilogue();
-	gbranch(ORETURN);
-}
-

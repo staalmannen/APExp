@@ -72,33 +72,6 @@ cgen(Node *n, Node *nn)
 		diag(n, "unknown op in cgen: %O", o);
 		break;
 
-	case OALLOCA:
-		/*
-		 * VLA stack allocation for MIPS64 (vc, 32-bit pointer ABI).
-		 * Round size up to 8-byte alignment (MIPS64 ABI requirement),
-		 * subtract from SP (R29), store new SP in nn.
-		 *
-		 *   ADDU  $7, size, tmp
-		 *   AND   $-8, tmp, tmp
-		 *   SUBU  tmp, SP, SP
-		 *   MOV   SP, nn
-		 */
-		{
-			Node nsize, nsp;
-			regalloc(&nsize, l, Z);
-			cgen(l, &nsize);
-			gopcode(OADD, nodconst(7), Z, &nsize);
-			gopcode(OAND, nodconst(-8), Z, &nsize);
-			nodreg(&nsp, &regnode, REGSP);
-			gopcode(OSUB, &nsize, Z, &nsp);
-			regfree(&nsize);
-			if(nn != Z) {
-				nodreg(&nsp, n, REGSP);
-				gmove(&nsp, nn);
-			}
-		}
-		break;
-
 	case OAS:
 		if(l->op == OBIT)
 			goto bitas;

@@ -47,51 +47,6 @@ cgen(Node *n, int result, Node *nn)
 		diag(n, "unknown op in cgen: %O", o);
 		break;
 
-	case OALLOCA:
-		/*
-		 * VLA stack allocation for 68000/68020.
-		 * A7 = SP. Subtract rounded size from A7, return new A7.
-		 * Alignment: 4 bytes (long-word).
-		 *
-		 *   MOVL  size, Dn
-		 *   ADDL  $3,   Dn
-		 *   ANDL  $-4,  Dn
-		 *   SUBL  Dn,   A7
-		 *   MOVL  A7,   result
-		 */
-		{
-			int rg, sp;
-
-			rg = regalloc(l->type, result);
-			cgen(l, rg, l);
-			nextpc();
-			p->as = AADDL;
-			p->from.type = D_CONST;
-			p->from.offset = 3;
-			p->to.type = rg;
-			nextpc();
-			p->as = AANDL;
-			p->from.type = D_CONST;
-			p->from.offset = -4;
-			p->to.type = rg;
-			sp = D_A0 + 7;
-			nextpc();
-			p->as = ASUBL;
-			p->from.type = rg;
-			p->to.type = sp;
-			if(result != D_NONE) {
-				nextpc();
-				p->as = AMOVL;
-				p->from.type = sp;
-				if(nn != Z)
-					naddr(nn, &p->to);
-				else
-					p->to.type = result;
-			}
-			regfree(rg);
-		}
-		break;
-
 	case OAS:
 		if(l->op == OBIT)
 			goto bitas;
@@ -722,6 +677,14 @@ cgen(Node *n, int result, Node *nn)
 	case OADDR:
 		if(result == D_NONE) {
 			nullwarn(l, Z);
+			break;
+		}
+		if(l->op == OINDEX && l->scale == 4 && result != D_TOS) {
+			/* index scaled by 1, add is better */
+			nod = *l;
+			nod.op = OADD;
+			nod.addable = 0;
+			cgen(&nod, result, nn);
 			break;
 		}
 		lcgen(l, result, nn);

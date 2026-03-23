@@ -119,6 +119,8 @@ gclean(void)
 	for(i=NREG; i<NREG+NREG; i++)
 		if(reg[i] && !resvreg[i])
 			diag(Z, "freg %d left allocated", i-NREG);
+	if(vlanest > 0)
+		gvla_epilogue();
 	while(mnstring)
 		outstring("", 1L);
 	symstring->type->width = nstring;
@@ -1410,3 +1412,71 @@ long	ncast[NTYPE] =
 	BUNION,				/* [TUNION] */
 	0,				/* [TENUM] */
 };
+
+/*
+ * VLA frame management for PowerPC (32-bit).
+ *
+ * PPC has no dedicated frame-pointer register.  We use R30 as a
+ * callee-saved VLA frame anchor (R30 is callee-saved in the PPC ABI
+ * and is not used by the Plan 9 9c register allocator).
+ *
+ * gvla_prologue – at function entry when vlanest > 0:
+ *   Save R30, then set R30 = SP so it anchors the pre-VLA frame top.
+ *
+ * gvla_epilogue – before every RET when vlanest > 0:
+ *   Restore SP from R30, then restore R30.
+ *
+ * gret – wrapper that inserts the epilogue before RETURN.
+ */
+enum { REGVFP = 30 };	/* VLA frame pointer register */
+
+void
+gvla_prologue(void)
+{
+	Node nfp, nsp, noff;
+
+	/* reserve R30 for the duration of this function */
+	reg[REGVFP]++;
+
+	nodreg(&nfp, &regnode, REGVFP);
+	nodreg(&nsp, &regnode, REGSP);
+
+	/* MOVW R30, -4(SP) — save R30 on stack */
+	noff = nsp;
+	noff.op = OINDREG;
+	noff.xoffset = -4;
+	noff.type = types[TLONG];
+	gmove(&nfp, &noff);
+
+	/* MOVW SP, R30 — anchor the pre-VLA frame */
+	gmove(&nsp, &nfp);
+}
+
+void
+gvla_epilogue(void)
+{
+	Node nfp, nsp, noff;
+
+	nodreg(&nfp, &regnode, REGVFP);
+	nodreg(&nsp, &regnode, REGSP);
+
+	/* MOVW R30, SP — restore SP to pre-VLA position */
+	gmove(&nfp, &nsp);
+
+	/* MOVW -4(SP), R30 — restore saved R30 */
+	noff = nsp;
+	noff.op = OINDREG;
+	noff.xoffset = -4;
+	noff.type = types[TLONG];
+	gmove(&noff, &nfp);
+
+	reg[REGVFP]--;
+}
+
+void
+gret(void)
+{
+	if(vlanest > 0)
+		gvla_epilogue();
+	gbranch(ORETURN);
+}

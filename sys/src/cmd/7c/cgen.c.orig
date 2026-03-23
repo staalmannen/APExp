@@ -1,14 +1,18 @@
 #include "gc.h"
 
-static void genasop(int, Node*, Node*, Node*);
-
 void
 cgen(Node *n, Node *nn)
+{
+	cgenrel(n, nn, 0);
+}
+
+void
+cgenrel(Node *n, Node *nn, int inrel)
 {
 	Node *l, *r;
 	Prog *p1;
 	Node nod, nod1, nod2, nod3, nod4;
-	int o;
+	int o, t;
 	long v, curs;
 
 	if(debug['g']) {
@@ -17,7 +21,7 @@ cgen(Node *n, Node *nn)
 	}
 	if(n == Z || n->type == T)
 		return;
-	if(typesuv[n->type->etype]) {
+	if(typesu[n->type->etype]) {
 		sugen(n, nn, n->type->width);
 		return;
 	}
@@ -46,6 +50,9 @@ cgen(Node *n, Node *nn)
 	if(r != Z && r->complex >= FNX)
 	switch(o) {
 	default:
+		if(cond(o) && typesu[l->type->etype])
+			break;
+
 		regret(&nod, r);
 		cgen(r, &nod);
 
@@ -72,38 +79,24 @@ cgen(Node *n, Node *nn)
 		diag(n, "unknown op in cgen: %O", o);
 		break;
 
-	case OALLOCA:
-		/*
-		 * VLA stack allocation for MIPS64 (vc, 32-bit pointer ABI).
-		 * Round size up to 8-byte alignment (MIPS64 ABI requirement),
-		 * subtract from SP (R29), store new SP in nn.
-		 *
-		 *   ADDU  $7, size, tmp
-		 *   AND   $-8, tmp, tmp
-		 *   SUBU  tmp, SP, SP
-		 *   MOV   SP, nn
-		 */
-		{
-			Node nsize, nsp;
-			regalloc(&nsize, l, Z);
-			cgen(l, &nsize);
-			gopcode(OADD, nodconst(7), Z, &nsize);
-			gopcode(OAND, nodconst(-8), Z, &nsize);
-			nodreg(&nsp, &regnode, REGSP);
-			gopcode(OSUB, &nsize, Z, &nsp);
-			regfree(&nsize);
-			if(nn != Z) {
-				nodreg(&nsp, n, REGSP);
-				gmove(&nsp, nn);
-			}
+	case ONEG:
+	case OCOM:
+		if(nn == Z) {
+			nullwarn(l, Z);
+			break;
 		}
+		regalloc(&nod, l, nn);
+		cgen(l, &nod);
+		gopcode(o, &nod, Z, &nod);
+		gmove(&nod, nn);
+		regfree(&nod);
 		break;
 
 	case OAS:
 		if(l->op == OBIT)
 			goto bitas;
 		if(l->addable >= INDEXED && l->complex < FNX) {
-			if(nn != Z || r->addable < INDEXED) {
+			if(nn != Z || r->addable < INDEXED) {	/* || hardconst(r) */
 				if(r->complex >= FNX && nn == Z)
 					regret(&nod, r);
 				else
@@ -118,8 +111,9 @@ cgen(Node *n, Node *nn)
 			break;
 		}
 		if(l->complex >= r->complex) {
+			/* TO DO: see 6c for OINDEX && immconst(r) */
 			reglcgen(&nod1, l, Z);
-			if(r->addable >= INDEXED) {
+			if(r->addable >= INDEXED) {	/* && !hardconst(r) */
 				gmove(r, &nod1);
 				if(nn != Z)
 					gmove(r, nn);
@@ -165,11 +159,47 @@ cgen(Node *n, Node *nn)
 		regfree(&nod);
 		break;
 
-	case OADD:
+	case ODIV:
+	case OMOD:
+		if(nn != Z)
+		if((t = vlog(r)) >= 0) {
+			/* signed div/mod by constant power of 2 */
+			cgen(l, nn);
+			gopcode(OGE, nodconst(0), nn, Z);
+			p1 = p;
+			if(o == ODIV) {
+				gopcode(OADD, nodconst((1<<t)-1), Z, nn);
+				patch(p1, pc);
+				gopcode(OASHR, nodconst(t), Z, nn);
+			} else {
+				gopcode(ONEG, nn, Z, nn);
+				gopcode(OAND, nodconst((1<<t)-1), Z, nn);
+				gopcode(ONEG, nn, Z, nn);
+				gbranch(OGOTO);
+				patch(p1, pc);
+				p1 = p;
+				gopcode(OAND, nodconst((1<<t)-1), Z, nn);
+				patch(p1, pc);
+			}
+			break;
+		}
+		goto muldiv;
+
+	case OXOR:
+#ifdef NOTYET
+		if(nn != Z)
+		if(r->op == OCONST && r->vconst == -1){
+			cgen(l, nn);
+			gopcode(OCOM, nn, Z, nn);
+			break;
+		}
+#endif
+
 	case OSUB:
+	case OADD:
 	case OAND:
 	case OOR:
-	case OXOR:
+	case OROL:
 	case OLSHR:
 	case OASHL:
 	case OASHR:
@@ -192,8 +222,7 @@ cgen(Node *n, Node *nn)
 	case OLDIV:
 	case OLMOD:
 	case OMUL:
-	case ODIV:
-	case OMOD:
+	muldiv:
 		if(nn == Z) {
 			nullwarn(l, r);
 			break;
@@ -205,11 +234,11 @@ cgen(Node *n, Node *nn)
 		if(l->complex >= r->complex) {
 			regalloc(&nod, l, nn);
 			cgen(l, &nod);
-			regalloc(&nod1, r, Z);
+			regalloc(&nod1, l, Z);		/* note: l used for type, so shifts work! */
 			cgen(r, &nod1);
 			gopcode(o, &nod1, Z, &nod);
 		} else {
-			regalloc(&nod, r, nn);
+			regalloc(&nod, l, nn);		/* note: l used for type, so shifts work! */
 			cgen(r, &nod);
 			regalloc(&nod1, l, Z);
 			cgen(l, &nod1);
@@ -237,18 +266,17 @@ cgen(Node *n, Node *nn)
 				reglcgen(&nod2, l, Z);
 			else
 				nod2 = *l;
-			regalloc(&nod, l, nn);
+			regalloc(&nod, l, nn);		/* note: l used for type, so shifts work! */
 			gopcode(OAS, &nod2, Z, &nod);
 			gopcode(o, r, Z, &nod);
 			gopcode(OAS, &nod, Z, &nod2);
-	
+			if(nn != Z)
+				gmove(&nod, nn);
 			regfree(&nod);
 			if(l->addable < INDEXED)
 				regfree(&nod2);
 			break;
 		}
-		genasop(o, l, r, nn);
-		break;
 
 	case OASLMUL:
 	case OASLDIV:
@@ -258,17 +286,49 @@ cgen(Node *n, Node *nn)
 	case OASMOD:
 		if(l->op == OBIT)
 			goto asbitop;
-		genasop(o, l, r, nn);
+		if(l->complex >= r->complex) {
+			if(l->addable < INDEXED)
+				reglcgen(&nod2, l, Z);
+			else
+				nod2 = *l;
+			regalloc(&nod1, r, Z);
+			cgen(r, &nod1);
+		} else {
+			regalloc(&nod1, r, Z);
+			cgen(r, &nod1);
+			if(l->addable < INDEXED)
+				reglcgen(&nod2, l, Z);
+			else
+				nod2 = *l;
+		}
+		if(nod1.type->etype == nod2.type->etype || !typefd[nod1.type->etype])
+			regalloc(&nod, &nod2, nn);
+		else
+			regalloc(&nod, &nod1, Z);
+		gopcode(OAS, &nod2, Z, &nod);
+		if(nod1.type->etype != nod.type->etype){
+			regalloc(&nod3, &nod, Z);
+			gmove(&nod1, &nod3);
+			regfree(&nod1);
+			nod1 = nod3;
+		}
+		gopcode(o, &nod1, &nod, &nod);
+		gmove(&nod, &nod2);
+		if(nn != Z)
+			gmove(&nod, nn);
+		regfree(&nod);
+		regfree(&nod1);
+		if(l->addable < INDEXED)
+			regfree(&nod2);
 		break;
 
 	asbitop:
 		regalloc(&nod4, n, nn);
+		regalloc(&nod3, r, Z);
 		if(l->complex >= r->complex) {
 			bitload(l, &nod, &nod1, &nod2, &nod4);
-			regalloc(&nod3, r, Z);
 			cgen(r, &nod3);
 		} else {
-			regalloc(&nod3, r, Z);
 			cgen(r, &nod3);
 			bitload(l, &nod, &nod1, &nod2, &nod4);
 		}
@@ -309,7 +369,8 @@ cgen(Node *n, Node *nn)
 
 			return;
 		}
-		o = reg[REGARG];
+		if(REGARG >= 0)
+			o = reg[REGARG];
 		gargs(r, &nod, &nod1);
 		if(l->addable < INDEXED) {
 			reglcgen(&nod, l, Z);
@@ -317,7 +378,7 @@ cgen(Node *n, Node *nn)
 			regfree(&nod);
 		} else
 			gopcode(OFUNC, Z, Z, l);
-		if(REGARG)
+		if(REGARG >= 0)
 			if(o != reg[REGARG])
 				reg[REGARG]--;
 		if(nn != Z) {
@@ -336,7 +397,7 @@ cgen(Node *n, Node *nn)
 		r = l;
 		while(r->op == OADD)
 			r = r->right;
-		if(sconst(r)) {
+		if(usableoffset(n, nod.xoffset, r)){
 			v = r->vconst;
 			r->vconst = 0;
 			cgen(l, &nod);
@@ -394,16 +455,33 @@ cgen(Node *n, Node *nn)
 		/*
 		 * convert from types l->n->nn
 		 */
-		if(nocast(l->type, n->type)) {
-			if(nocast(n->type, nn->type)) {
-				cgen(l, nn);
+		if(nocast(l->type, n->type) && nocast(n->type, nn->type)) {
+			/* both null, gen l->nn */
+			cgen(l, nn);
+			break;
+		}
+		if(ewidth[n->type->etype] < ewidth[l->type->etype]){
+			if(l->type->etype == TIND && typechlp[n->type->etype])
+				warn(n, "conversion of pointer to shorter integer");
+		}else if(0){
+			if(nocast(n->type, nn->type) || castup(n->type, nn->type)){
+				if(typefd[l->type->etype] != typefd[nn->type->etype])
+					regalloc(&nod, l, nn);
+				else
+					regalloc(&nod, nn, nn);
+				cgen(l, &nod);
+				gmove(&nod, nn);
+				regfree(&nod);
 				break;
 			}
 		}
 		regalloc(&nod, l, nn);
 		cgen(l, &nod);
 		regalloc(&nod1, n, &nod);
-		gopcode(OAS, &nod, Z, &nod1);
+		if(inrel)
+			gmover(&nod, &nod1);
+		else
+			gopcode(OAS, &nod, Z, &nod1);
 		gopcode(OAS, &nod1, Z, nn);
 		regfree(&nod1);
 		regfree(&nod);
@@ -507,7 +585,7 @@ cgen(Node *n, Node *nn)
 		} else
 			gopcode(OADD, nodconst(v), Z, &nod);
 		gopcode(OAS, &nod, Z, &nod2);
-		if(nn != Z) {
+		if(nn != Z){
 			gmove(&nod, nn);
 			if(l->op == ONAME)	/* in x=++i, emit USED(i) */
 				gins(ANOP, l, Z);
@@ -531,43 +609,7 @@ cgen(Node *n, Node *nn)
 		break;
 	}
 	cursafe = curs;
-}
-
-static void
-genasop(int o, Node *l, Node *r, Node *nn)
-{
-	Node nod, nod1, nod2;
-	int hardleft;
-
-	hardleft = l->addable < INDEXED || l->complex >= FNX;
-	if(l->complex >= r->complex) {
-		if(hardleft)
-			reglcgen(&nod2, l, Z);
-		else
-			nod2 = *l;
-		regalloc(&nod1, r, Z);
-		cgen(r, &nod1);
-	} else {
-		regalloc(&nod1, r, Z);
-		cgen(r, &nod1);
-		if(hardleft)
-			reglcgen(&nod2, l, Z);
-		else
-			nod2 = *l;
-	}
-	if(nod1.type == nod2.type || !typefd[nod1.type->etype])
-		regalloc(&nod, &nod2, nn);
-	else
-		regalloc(&nod, &nod1, Z);
-	gmove(&nod2, &nod);
-	gopcode(o, &nod1, Z, &nod);
-	gmove(&nod, &nod2);
-	if(nn != Z)
-		gmove(&nod2, nn);
-	regfree(&nod);
-	regfree(&nod1);
-	if(hardleft)
-		regfree(&nod2);
+	return;
 }
 
 void
@@ -581,12 +623,27 @@ reglcgen(Node *t, Node *n, Node *nn)
 		r = n->left;
 		while(r->op == OADD)
 			r = r->right;
-		if(sconst(r)) {
+		if(usableoffset(n, t->xoffset, r)) {
 			v = r->vconst;
 			r->vconst = 0;
 			lcgen(n, t);
 			t->xoffset += v;
 			r->vconst = v;
+			regind(t, n);
+			return;
+		}
+	} else if(n->op == OINDREG) {
+		if(usableoffset(n, t->xoffset+n->xoffset, nil)) {
+			Type *tt = n->type;
+			n->type = types[TIND];
+			n->op = OREGISTER;
+			v = n->xoffset;
+			n->xoffset = 0;
+			cgen(n, t);
+			t->xoffset += v;
+			n->xoffset = v;
+			n->op = OINDREG;
+			n->type = tt;
 			regind(t, n);
 			return;
 		}
@@ -677,25 +734,18 @@ boolgen(Node *n, int true, Node *nn)
 	default:
 		regalloc(&nod, n, nn);
 		cgen(n, &nod);
-		if(nn == Z || typefd[n->type->etype]) {
-			o = ONE;
-			if(true)
-				o = comrel[relindex(o)];
-			if(typefd[n->type->etype]) {
-				nodreg(&nod1, n, NREG+FREGZERO);
-				gopcode(o, &nod, &nod1, Z);
-			} else
-				gopcode(o, &nod, Z, Z);
-			regfree(&nod);
-			goto com;
-		}
+		o = ONE;
 		if(true)
-			gopcode(OCOND, &nod, nodconst(0), &nod);
-		else
-			gopcode(OCOND, nodconst(1), &nod, &nod);
-		gopcode(OAS, &nod, Z, nn);
+			o = OEQ;
+		if(typefd[n->type->etype]) {
+			regalloc(&nod1, n, Z);
+			gmove(nodfconst(0.0), &nod1);
+			gopcode(true ? o | BTRUE : o, &nod1, &nod, Z);
+			regfree(&nod1);
+		}else
+			gopcode(o, nodconst(0), &nod, Z);
 		regfree(&nod);
-		break;
+		goto com;
 
 	case OCONST:
 		o = vconst(n);
@@ -777,7 +827,7 @@ boolgen(Node *n, int true, Node *nn)
 			o = comrel[relindex(o)];
 		if(l->complex >= FNX && r->complex >= FNX) {
 			regret(&nod, r);
-			cgen(r, &nod);
+			cgenrel(r, &nod, 1);
 			regsalloc(&nod1, r);
 			gopcode(OAS, &nod, Z, &nod1);
 			regfree(&nod);
@@ -786,107 +836,33 @@ boolgen(Node *n, int true, Node *nn)
 			boolgen(&nod, true, nn);
 			break;
 		}
-		if(nn != Z && !typefd[l->type->etype]) {
-			if(l->complex >= r->complex) {
-				regalloc(&nod1, l, nn);
-				cgen(l, &nod1);
-				regalloc(&nod, r, Z);
-				cgen(r, &nod);
-			} else {
-				regalloc(&nod, r, nn);
-				cgen(r, &nod);
-				regalloc(&nod1, l, Z);
-				cgen(l, &nod1);
-			}
-			switch(o) {
-			case OEQ:
-				gopcode(OSUB, &nod1, &nod, &nod);
-				gopcode(OCOND, &nod, nodconst(0), &nod);
-				break;
-			case ONE:
-				gopcode(OSUB, &nod1, &nod, &nod);
-				gopcode(OCOND, nodconst(1), &nod, &nod);
-				break;
-			case OLE:
-				gopcode(OCOMMA, &nod1, &nod, &nod);
-				break;
-			case OGT:
-				gopcode(OCOMMA, &nod1, &nod, &nod);
-				gopcode(OXOR, nodconst(1), &nod, &nod);
-				break;
-			case OLT:
-				gopcode(OCOMMA, &nod, &nod1, &nod);
-				gopcode(OXOR, nodconst(1), &nod, &nod);
-				break;
-			case OGE:
-				gopcode(OCOMMA, &nod, &nod1, &nod);
-				break;
-			case OLS:
-				gopcode(OCOND, &nod1, &nod, &nod);
-				break;
-			case OHI:
-				gopcode(OCOND, &nod1, &nod, &nod);
-				gopcode(OXOR, nodconst(1), &nod, &nod);
-				break;
-			case OLO:
-				gopcode(OCOND, &nod, &nod1, &nod);
-				gopcode(OXOR, nodconst(1), &nod, &nod);
-				break;
-			case OHS:
-				gopcode(OCOND, &nod, &nod1, &nod);
-				break;
-			}
-			gopcode(OAS, &nod, Z, nn);
-			regfree(&nod);
-			regfree(&nod1);
-			break;
-		}
 		if(sconst(l)) {
-			switch(o) {
-			default:
-				if(l->vconst != 0)
-					break;
-
-			case OGT:
-			case OHI:
-			case OLE:
-			case OLS:
-				regalloc(&nod, r, nn);
-				cgen(r, &nod);
-				gopcode(o, l, &nod, Z);
-				regfree(&nod);
-				goto com;
-			}
+			regalloc(&nod, r, nn);
+			cgenrel(r, &nod, 1);
+			o = invrel[relindex(o)];
+			gopcode(true ? o | BTRUE : o, l, &nod, Z);
+			regfree(&nod);
+			goto com;
 		}
 		if(sconst(r)) {
-			switch(o) {
-			default:
-				if(r->vconst != 0)
-					break;
-
-			case OGE:
-			case OHS:
-			case OLT:
-			case OLO:
-				regalloc(&nod, l, nn);
-				cgen(l, &nod);
-				gopcode(o, &nod, r, Z);
-				regfree(&nod);
-				goto com;
-			}
+			regalloc(&nod, l, nn);
+			cgenrel(l, &nod, 1);
+			gopcode(true ? o | BTRUE : o, r, &nod, Z);
+			regfree(&nod);
+			goto com;
 		}
 		if(l->complex >= r->complex) {
 			regalloc(&nod1, l, nn);
-			cgen(l, &nod1);
+			cgenrel(l, &nod1, 1);
 			regalloc(&nod, r, Z);
-			cgen(r, &nod);
+			cgenrel(r, &nod, 1);
 		} else {
 			regalloc(&nod, r, nn);
-			cgen(r, &nod);
+			cgenrel(r, &nod, 1);
 			regalloc(&nod1, l, Z);
-			cgen(l, &nod1);
+			cgenrel(l, &nod1, 1);
 		}
-		gopcode(o, &nod1, &nod, Z);
+		gopcode(true ? o | BTRUE : o, &nod, &nod1, Z);
 		regfree(&nod);
 		regfree(&nod1);
 
@@ -980,7 +956,7 @@ sugen(Node *n, Node *nn, long w)
 		if(nn != Z && side(nn)) {
 			nod1 = *n;
 			nod1.type = typ(TIND, n->type);
-			regalloc(&nod2, &nod1, Z);
+			regret(&nod2, &nod1);
 			lcgen(nn, &nod2);
 			regsalloc(&nod0, &nod1);
 			gopcode(OAS, &nod2, Z, &nod0);
@@ -1071,7 +1047,6 @@ sugen(Node *n, Node *nn, long w)
 		} else
 			nn = nn->left;
 		n = new(OFUNC, n->left, new(OLIST, nn, n->right));
-		n->complex = FNX;
 		n->type = types[TVOID];
 		n->left->type = types[TVOID];
 		cgen(n, Z);
@@ -1122,6 +1097,7 @@ copy:
 		return;
 	}
 
+	/* TO DO: use AMOV/VLONG when possible */
 	if(n->complex > nn->complex) {
 		t = n->type;
 		n->type = types[TLONG];
@@ -1142,6 +1118,22 @@ copy:
 		n->type = types[TLONG];
 		reglcgen(&nod1, n, Z);
 		n->type = t;
+	}
+
+	if((m = w % SZ_LONG) > 0){
+		nod1.xoffset += w - m;
+		nod2.xoffset += w - m;
+		regalloc(&nod3, &regnode, Z);
+		do{
+			gins(AMOVB, &nod1, &nod3);
+			gins(AMOVB, &nod3, &nod2);
+			nod1.xoffset++;
+			nod2.xoffset++;
+			w--;
+		}while(--m > 0);
+		regfree(&nod3);
+		nod1.xoffset -= w - m;
+		nod2.xoffset -= w - m;
 	}
 
 	w /= SZ_LONG;
@@ -1172,14 +1164,19 @@ copy:
 	pc1 = pc;
 	layout(&nod1, &nod2, c, 0, Z);
 
-	gopcode(OSUB, nodconst(1), Z, &nod3);
+	gopcode(OSUB, nodconst(1L), Z, &nod3);
 	nod1.op = OREGISTER;
+	t = nod1.type;
+	nod1.type = types[TIND];
 	gopcode(OADD, nodconst(c*SZ_LONG), Z, &nod1);
+	nod1.type = t;
 	nod2.op = OREGISTER;
+	t = nod2.type;
+	nod2.type = types[TIND];
 	gopcode(OADD, nodconst(c*SZ_LONG), Z, &nod2);
+	nod2.type = t;
 	
-	gopcode(OEQ, &nod3, Z, Z);
-	p->as = ABGTZ;
+	gopcode(OGT, nodconst(0), &nod3, Z);
 	patch(p, pc1);
 
 	regfree(&nod3);
@@ -1200,8 +1197,6 @@ layout(Node *f, Node *t, int c, int cv, Node *cn)
 
 	regalloc(&t1, &regnode, Z);
 	regalloc(&t2, &regnode, Z);
-	t1.type = types[TLONG];
-	t2.type = types[TLONG];
 	if(c > 0) {
 		gopcode(OAS, f, Z, &t1);
 		f->xoffset += SZ_LONG;
@@ -1230,4 +1225,64 @@ layout(Node *f, Node *t, int c, int cv, Node *cn)
 	}
 	regfree(&t1);
 	regfree(&t2);
+}
+
+/*
+ * if a constant and vlong, doesn't fit as 32-bit signed immediate
+ */
+int
+hardconst(Node *n)
+{
+	return n->op == OCONST && !sconst(n);
+}
+
+/*
+ * casting up to t2 covers an intermediate cast to t1
+ */
+int
+castup(Type *t1, Type *t2)
+{
+	int ft;
+
+	if(!nilcast(t1, t2))
+		return 0;
+	/* known to be small to large */
+	ft = t1->etype;
+	switch(t2->etype){
+	case TINT:
+	case TLONG:
+		return ft == TLONG || ft == TINT || ft == TSHORT || ft == TCHAR;
+	case TUINT:
+	case TULONG:
+		return ft == TULONG || ft == TUINT || ft == TUSHORT || ft == TUCHAR;
+	case TVLONG:
+		return ft == TLONG || ft == TINT || ft == TSHORT;
+	case TUVLONG:
+		return ft == TULONG || ft == TUINT || ft == TUSHORT;
+	}
+	return 0;
+}
+
+int
+cond(int op)
+{
+	switch(op) {
+	case OANDAND:
+	case OOROR:
+	case ONOT:
+		return 1;
+
+	case OEQ:
+	case ONE:
+	case OLE:
+	case OLT:
+	case OGE:
+	case OGT:
+	case OHI:
+	case OHS:
+	case OLO:
+	case OLS:
+		return 1;
+	}
+	return 0;
 }

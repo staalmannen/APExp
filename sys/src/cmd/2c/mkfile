@@ -2,6 +2,7 @@
 APEXPROOT=../../../..
 TARG=2c
 OFILES=\
+	2c_vla.$O\
 	cgen.$O\
 	reg.$O\
 	txt.$O\

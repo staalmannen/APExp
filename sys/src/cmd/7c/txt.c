@@ -107,6 +107,8 @@ gclean(void)
 	for(i=NREG; i<NREG+NFREG; i++)
 		if(reg[i] && !resvreg[i])
 			diag(Z, "freg %d left allocated", i-NREG);
+	if(vlanest > 0)
+		gvla_epilogue();
 	while(mnstring)
 		outstring("", 1L);
 	symstring->type->width = nstring;
@@ -1455,3 +1457,87 @@ long	ncast[NTYPE] =
 	BUNION,				/* [TUNION] */
 	0,				/* [TENUM] */
 };
+
+/*
+ * VLA frame management for AArch64.
+ *
+ * AArch64 mandates 16-byte SP alignment.  Any function that allocates a
+ * VLA needs a stable frame pointer so the epilogue can restore SP
+ * regardless of how many VLA frames were pushed.
+ *
+ * gvla_prologue – called at function entry when vlanest > 0:
+ *   Saves FP (R29) and LR (R30) as a pair onto the stack, then sets
+ *   FP = SP so it anchors the pre-VLA stack top.
+ *
+ * gvla_epilogue – called before every RET when vlanest > 0:
+ *   Restores SP from FP, then pops the saved FP/LR pair.
+ *
+ * gret – wrapper for gbranch(ORETURN) that inserts the epilogue first.
+ */
+void
+gvla_prologue(void)
+{
+	Node nfp, nsp;
+
+	nodreg(&nfp, &qregnode, REGFP);	/* R29 */
+	nodreg(&nsp, &qregnode, REGSP);
+	reg[REGFP]++;
+	/*
+	 * STP (FP, LR), [SP, #-16]!  — push pair, decrement SP
+	 * Encoded as AMOVP with pre-index; use two separate stores
+	 * via the assembler pseudo-ops available in the 7a/7l toolchain.
+	 * We emit: MOVP (R29, R30), -16(SP)
+	 */
+	{
+		Node nlr, noff;
+		nodreg(&nlr, &qregnode, REGLINK);	/* R30 */
+		/* emit: SUB $16, SP */
+		gins(ASUB, nodconst(16), &nsp);
+		/* emit: MOV R29, 0(SP) */
+		noff = nsp;
+		noff.op = OINDREG;
+		noff.xoffset = 0;
+		noff.type = types[TVLONG];
+		gmove(&nfp, &noff);
+		/* emit: MOV R30, 8(SP) */
+		noff.xoffset = 8;
+		gmove(&nlr, &noff);
+	}
+	/* FP = SP */
+	gmove(&nsp, &nfp);
+}
+
+void
+gvla_epilogue(void)
+{
+	Node nfp, nsp, noff;
+
+	nodreg(&nfp, &qregnode, REGFP);
+	nodreg(&nsp, &qregnode, REGSP);
+	/* SP = FP */
+	gmove(&nfp, &nsp);
+	/* pop saved FP */
+	noff = nsp;
+	noff.op = OINDREG;
+	noff.xoffset = 0;
+	noff.type = types[TVLONG];
+	gmove(&noff, &nfp);
+	/* pop saved LR */
+	{
+		Node nlr;
+		nodreg(&nlr, &qregnode, REGLINK);
+		noff.xoffset = 8;
+		gmove(&noff, &nlr);
+	}
+	/* ADD $16, SP */
+	gins(AADD, nodconst(16), &nsp);
+	reg[REGFP]--;
+}
+
+void
+gret(void)
+{
+	if(vlanest > 0)
+		gvla_epilogue();
+	gbranch(ORETURN);
+}

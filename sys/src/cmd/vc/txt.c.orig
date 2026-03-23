@@ -4,16 +4,14 @@ void
 ginit(void)
 {
 	int i;
-	Type *t;
 
-	thechar = 'k';
-	thestring = "sparc";
+	thechar = 'v';
+	thestring = "mips";
 	exregoffset = REGEXT;
 	exfregoffset = FREGEXT;
 	listinit();
 	nstring = 0;
 	mnstring = 0;
-	nrathole = 0;
 	pc = 0;
 	breakpc = -1;
 	continpc = -1;
@@ -32,7 +30,7 @@ ginit(void)
 
 	regnode.op = OREGISTER;
 	regnode.class = CEXREG;
-	regnode.reg = 0;
+	regnode.reg = REGTMP;
 	regnode.complex = 0;
 	regnode.addable = 11;
 	regnode.type = types[TLONG];
@@ -56,19 +54,6 @@ ginit(void)
 	nodsafe->class = CAUTO;
 	complex(nodsafe);
 
-	t = typ(TARRAY, types[TCHAR]);
-	symrathole = slookup(".rathole");
-	symrathole->class = CGLOBL;
-	symrathole->type = t;
-
-	nodrat = new(ONAME, Z, Z);
-	nodrat->sym = symrathole;
-	nodrat->type = types[TIND];
-	nodrat->etype = TVOID;
-	nodrat->class = CGLOBL;
-	complex(nodrat);
-	nodrat->type = t;
-
 	nodret = new(ONAME, Z, Z);
 	nodret->sym = slookup(".ret");
 	nodret->type = types[TIND];
@@ -79,12 +64,12 @@ ginit(void)
 
 	com64init();
 
-	memset(reg, 0, sizeof(reg));
-	reg[REGZERO] = 1;
-	reg[REGLINK] = 1;
-	reg[REGTMP] = 1;
-	for(i=NREG; i<NREG+NREG; i+=2)
-		reg[i+1] = 1;
+	for(i=0; i<nelem(reg); i++) {
+		reg[i] = 0;
+		if(i == REGZERO ||
+		  (i >= NREG && ((i-NREG)&1)))
+			reg[i] = 1;
+	}
 }
 
 void
@@ -94,18 +79,15 @@ gclean(void)
 	Sym *s;
 
 	for(i=0; i<NREG; i++)
-		if(i != REGZERO && i != REGTMP && i != REGLINK)
-		if(reg[i])
-			diag(Z, "reg %d left allocated", i);
+		if(i != REGZERO)
+			if(reg[i])
+				diag(Z, "reg %d left allocated", i);
 	for(i=NREG; i<NREG+NREG; i+=2)
 		if(reg[i])
 			diag(Z, "freg %d left allocated", i-NREG);
-	if(vlanest > 0)
-		gvla_epilogue();
 	while(mnstring)
 		outstring("", 1L);
 	symstring->type->width = nstring;
-	symrathole->type->width = nrathole;
 	for(i=0; i<NHASH; i++)
 	for(s = hash[i]; s != S; s = s->link) {
 		if(s->type == T)
@@ -218,16 +200,16 @@ garg1(Node *n, Node *tn1, Node *tn2, int f, Node **fnxp)
 }
 
 Node*
-nod32const(vlong v)
+nodconst(long v)
 {
-	constnode.vconst = v & MASK(32);
+	constnode.vconst = v;
 	return &constnode;
 }
 
 Node*
-nodconst(long v)
+nod32const(vlong v)
 {
-	constnode.vconst = v;
+	constnode.vconst = v & MASK(32);
 	return &constnode;
 }
 
@@ -257,6 +239,18 @@ regret(Node *n, Node *nn)
 		r = FREGRET+NREG;
 	nodreg(n, nn, r);
 	reg[r]++;
+}
+
+int
+tmpreg(void)
+{
+	int i;
+
+	for(i=REGRET+1; i<NREG; i++)
+		if(reg[i] == 0)
+			return i;
+	diag(Z, "out of fixed registers");
+	return 0;
 }
 
 void
@@ -301,7 +295,7 @@ regalloc(Node *n, Node *tn, Node *o)
 			if(i >= NREG && i < NREG+NREG)
 				goto out;
 		}
-		j = lasti*2 + NREG;
+		j = 0*2 + NREG;
 		for(i=NREG; i<NREG+NREG; i+=2) {
 			if(j >= NREG+NREG)
 				j = NREG;
@@ -316,10 +310,10 @@ regalloc(Node *n, Node *tn, Node *o)
 	}
 	diag(tn, "unknown type in regalloc: %T", tn->type);
 err:
-	i = 0;
+	nodreg(n, tn, 0);
+	return;
 out:
-	if(i)
-		reg[i]++;
+	reg[i]++;
 	lasti++;
 	if(lasti >= 5)
 		lasti = 0;
@@ -541,12 +535,15 @@ void
 gmove(Node *f, Node *t)
 {
 	int ft, tt, a;
-	Node nod;
+	Node nod, nod1, nod2;
 	Prog *p1;
 	double d;
 
 	ft = f->type->etype;
 	tt = t->type->etype;
+	if(debug['M'])
+		print("gop: %O %O[%s],%O[%s]\n", OAS,
+			f->op, tnames[ft], t->op, tnames[tt]);
 
 	if(ft == TDOUBLE && f->op == OCONST) {
 		d = f->fconst;
@@ -613,9 +610,9 @@ gmove(Node *f, Node *t)
 				/* special case can load mem to Freg */
 				regalloc(&nod, t, t);
 				gins(AMOVW, f, &nod);
-				a = AFMOVWD;
+				a = AMOVWD;
 				if(tt == TFLOAT)
-					a = AFMOVWF;
+					a = AMOVWF;
 				gins(a, &nod, &nod);
 				gmove(&nod, t);
 				regfree(&nod);
@@ -624,10 +621,10 @@ gmove(Node *f, Node *t)
 			a = AMOVW;
 			break;
 		case TFLOAT:
-			a = AFMOVF;
+			a = AMOVF;
 			break;
 		case TDOUBLE:
-			a = AFMOVD;
+			a = AMOVD;
 			break;
 		case TCHAR:
 			a = AMOVB;
@@ -642,7 +639,10 @@ gmove(Node *f, Node *t)
 			a = AMOVHU;
 			break;
 		}
-		regalloc(&nod, f, t);
+		if(typechlp[ft] && typeilp[tt])
+			regalloc(&nod, t, t);
+		else
+			regalloc(&nod, f, t);
 		gins(a, f, &nod);
 		gmove(&nod, t);
 		regfree(&nod);
@@ -657,17 +657,6 @@ gmove(Node *f, Node *t)
 	if(t->op == ONAME || t->op == OINDREG || t->op == OIND) {
 		switch(tt) {
 		default:
-			if(typefd[ft]) {
-				/* special case can store mem from Freg */
-				regalloc(&nod, f, Z);
-				a = AFMOVDW;
-				if(ft == TFLOAT)
-					a = AFMOVFW;
-				gins(a, f, &nod);
-				gins(AMOVW, &nod, t);
-				regfree(&nod);
-				return;
-			}
 			a = AMOVW;
 			break;
 		case TUCHAR:
@@ -683,11 +672,10 @@ gmove(Node *f, Node *t)
 			a = AMOVH;
 			break;
 		case TFLOAT:
-			a = AFMOVF;
+			a = AMOVF;
 			break;
-		case TVLONG:
 		case TDOUBLE:
-			a = AFMOVD;
+			a = AMOVD;
 			break;
 		}
 		if(!typefd[ft] && vconst(f) == 0) {
@@ -715,35 +703,101 @@ gmove(Node *f, Node *t)
 		switch(tt) {
 		case TDOUBLE:
 		case TVLONG:
-			a = AFMOVD;
+			a = AMOVD;
 			if(ft == TFLOAT)
-				a = AFMOVFD;
+				a = AMOVFD;
 			break;
 		case TFLOAT:
-			a = AFMOVDF;
+			a = AMOVDF;
 			if(ft == TFLOAT)
-				a = AFMOVF;
+				a = AMOVF;
 			break;
+		case TINT:
+		case TUINT:
 		case TLONG:
 		case TULONG:
 		case TIND:
-		case TINT:
-		case TUINT:
 		case TSHORT:
 		case TUSHORT:
 		case TCHAR:
 		case TUCHAR:
-			regalloc(&nod, f, Z);	/* should be type float */
-			a = AFMOVDW;
+			if(fproundflg) {
+				/* convert f, t */
+				regalloc(&nod, f, Z);
+				gins(AMOVDW, f, &nod);
+				if(ft == TFLOAT)
+					p->as = AMOVFW;
+				gins(AMOVW, &nod, t);
+				regfree(&nod);
+				gins(AMOVW, t, t);
+				return;
+			}
+			regalloc(&nod1, &regnode, Z);
+			regalloc(&nod2, &regnode, Z);
+
+			/* movw fcr, rx */
+			gins(AMOVW, Z, &nod1);
+			p->from.type = D_FCREG;
+			p->from.reg = 31;
+
+			/* nop */
+			gins(ANOR, nodconst(0), nodconst(0));
+			p->to.type = D_REG;
+			p->to.reg = 0;
+
+			/* nop */
+			gins(ANOR, nodconst(0), nodconst(0));
+			p->to.type = D_REG;
+			p->to.reg = 0;
+
+			/* or $3, rx, ry */
+			gins(AOR, nodconst(3), &nod2);
+			p->reg = nod1.reg;
+
+			/* xor $2, ry */
+			gins(AXOR, nodconst(2), &nod2);
+
+			/* movw ry, fcr */
+			gins(AMOVW, &nod2, Z);
+			p->to.type = D_FCREG;
+			p->to.reg = 31;
+
+			/* nop */
+			gins(ANOR, nodconst(0), nodconst(0));
+			p->to.type = D_REG;
+			p->to.reg = 0;
+
+			/* nop */
+			gins(ANOR, nodconst(0), nodconst(0));
+			p->to.type = D_REG;
+			p->to.reg = 0;
+
+			/* convert f, t */
+			regalloc(&nod, f, Z);
+			gins(AMOVDW, f, &nod);
 			if(ft == TFLOAT)
-				a = AFMOVFW;
-			gins(a, f, &nod);
-			gins(AFMOVF, &nod, nodrat);
+				p->as = AMOVFW;
+			gins(AMOVW, &nod, t);
 			regfree(&nod);
-			gins(AMOVW, nodrat, t);
-			gmove(t, t);
-			if(nrathole < SZ_LONG)
-				nrathole = SZ_LONG;
+			gins(AMOVW, t, t);
+
+			/* movw rx, fcr */
+			gins(AMOVW, &nod1, Z);
+			p->to.type = D_FCREG;
+			p->to.reg = 31;
+
+			/* nop */
+			gins(ANOR, nodconst(0), nodconst(0));
+			p->to.type = D_REG;
+			p->to.reg = 0;
+
+			/* nop */
+			gins(ANOR, nodconst(0), nodconst(0));
+			p->to.type = D_REG;
+			p->to.reg = 0;
+
+			regfree(&nod1);
+			regfree(&nod2);
 			return;
 		}
 		break;
@@ -755,12 +809,39 @@ gmove(Node *f, Node *t)
 		switch(tt) {
 		case TDOUBLE:
 		case TVLONG:
+			gins(AMOVW, f, t);
+			gins(AMOVWD, t, t);
+			if(ft == TULONG || ft == TUINT) {
+				regalloc(&nod, t, Z);
+				gins(ACMPGED, t, Z);
+				p->reg = FREGZERO;
+				gins(ABFPT, Z, Z);
+				p1 = p;
+				gins(AMOVD, nodfconst(4294967296.), &nod);
+				gins(AADDD, &nod, t);
+				patch(p1, pc);
+				regfree(&nod);
+			}
+			return;
 		case TFLOAT:
-			goto fxtofl;
-		case TLONG:
-		case TULONG:
+			gins(AMOVW, f, t);
+			gins(AMOVWF, t, t);
+			if(ft == TULONG || ft == TUINT) {
+				regalloc(&nod, t, Z);
+				gins(ACMPGEF, t, Z);
+				p->reg = FREGZERO;
+				gins(ABFPT, Z, Z);
+				p1 = p;
+				gins(AMOVF, nodfconst(4294967296.), &nod);
+				gins(AADDF, &nod, t);
+				patch(p1, pc);
+				regfree(&nod);
+			}
+			return;
 		case TINT:
 		case TUINT:
+		case TLONG:
+		case TULONG:
 		case TIND:
 		case TSHORT:
 		case TUSHORT:
@@ -774,12 +855,23 @@ gmove(Node *f, Node *t)
 		switch(tt) {
 		case TDOUBLE:
 		case TVLONG:
+			regalloc(&nod, f, Z);
+			gins(AMOVH, f, &nod);
+			gins(AMOVW, &nod, t);
+			gins(AMOVWD, t, t);
+			regfree(&nod);
+			return;
 		case TFLOAT:
-			goto fxtofl;
-		case TUINT:
+			regalloc(&nod, f, Z);
+			gins(AMOVH, f, &nod);
+			gins(AMOVW, &nod, t);
+			gins(AMOVWF, t, t);
+			regfree(&nod);
+			return;
 		case TINT:
-		case TULONG:
+		case TUINT:
 		case TLONG:
+		case TULONG:
 		case TIND:
 			a = AMOVH;
 			break;
@@ -795,8 +887,19 @@ gmove(Node *f, Node *t)
 		switch(tt) {
 		case TDOUBLE:
 		case TVLONG:
+			regalloc(&nod, f, Z);
+			gins(AMOVHU, f, &nod);
+			gins(AMOVW, &nod, t);
+			gins(AMOVWD, t, t);
+			regfree(&nod);
+			return;
 		case TFLOAT:
-			goto fxtofl;
+			regalloc(&nod, f, Z);
+			gins(AMOVHU, f, &nod);
+			gins(AMOVW, &nod, t);
+			gins(AMOVWF, t, t);
+			regfree(&nod);
+			return;
 		case TINT:
 		case TUINT:
 		case TLONG:
@@ -816,8 +919,19 @@ gmove(Node *f, Node *t)
 		switch(tt) {
 		case TDOUBLE:
 		case TVLONG:
+			regalloc(&nod, f, Z);
+			gins(AMOVB, f, &nod);
+			gins(AMOVW, &nod, t);
+			gins(AMOVWD, t, t);
+			regfree(&nod);
+			return;
 		case TFLOAT:
-			goto fxtofl;
+			regalloc(&nod, f, Z);
+			gins(AMOVB, f, &nod);
+			gins(AMOVW, &nod, t);
+			gins(AMOVWF, t, t);
+			regfree(&nod);
+			return;
 		case TINT:
 		case TUINT:
 		case TLONG:
@@ -837,40 +951,18 @@ gmove(Node *f, Node *t)
 		switch(tt) {
 		case TDOUBLE:
 		case TVLONG:
-		case TFLOAT:
-		fxtofl:
-			regalloc(&nod, t, t);	/* should be type float */
-			gins(AMOVW, f, nodrat);
-			gins(AFMOVF, nodrat, &nod);
-			a = AFMOVWD;
-			if(tt == TFLOAT)
-				a = AFMOVWF;
-			gins(a, &nod, t);
+			regalloc(&nod, f, Z);
+			gins(AMOVBU, f, &nod);
+			gins(AMOVW, &nod, t);
+			gins(AMOVWD, t, t);
 			regfree(&nod);
-			if(nrathole < SZ_LONG)
-				nrathole = SZ_LONG;
-			if(ft == TULONG) {
-				regalloc(&nod, t, Z);
-				if(tt == TFLOAT) {
-					gins(AFCMPF, t, Z);
-					p->to.type = D_FREG;
-					p->to.reg = FREGZERO;
-					gins(AFBGE, Z, Z);
-					p1 = p;
-					gins(AFMOVF, nodfconst(4294967296.), &nod);
-					gins(AFADDF, &nod, t);
-				} else {
-					gins(AFCMPD, t, Z);
-					p->to.type = D_FREG;
-					p->to.reg = FREGZERO;
-					gins(AFBGE, Z, Z);
-					p1 = p;
-					gins(AFMOVD, nodfconst(4294967296.), &nod);
-					gins(AFADDD, &nod, t);
-				}
-				patch(p1, pc);
-				regfree(&nod);
-			}
+			return;
+		case TFLOAT:
+			regalloc(&nod, f, Z);
+			gins(AMOVBU, f, &nod);
+			gins(AMOVW, &nod, t);
+			gins(AMOVWF, t, t);
+			regfree(&nod);
 			return;
 		case TINT:
 		case TUINT:
@@ -890,7 +982,7 @@ gmove(Node *f, Node *t)
 	}
 	if(a == AGOK)
 		diag(Z, "bad opcode in gmove %T -> %T", f->type, t->type);
-	if(a == AMOVW || a == AFMOVF || a == AFMOVD)
+	if(a == AMOVW || a == AMOVF || a == AMOVD)
 	if(samaddr(f, t))
 		return;
 	gins(a, f, t);
@@ -927,22 +1019,22 @@ gopcode(int o, Node *f1, Node *f2, Node *t)
 
 	case OASADD:
 	case OADD:
-		a = AADD;
+		a = AADDU;
 		if(et == TFLOAT)
-			a = AFADDF;
+			a = AADDF;
 		else
 		if(et == TDOUBLE || et == TVLONG)
-			a = AFADDD;
+			a = AADDD;
 		break;
 
 	case OASSUB:
 	case OSUB:
-		a = ASUB;
+		a = ASUBU;
 		if(et == TFLOAT)
-			a = AFSUBF;
+			a = ASUBF;
 		else
 		if(et == TDOUBLE || et == TVLONG)
-			a = AFSUBD;
+			a = ASUBD;
 		break;
 
 	case OASOR:
@@ -976,124 +1068,188 @@ gopcode(int o, Node *f1, Node *f2, Node *t)
 		break;
 
 	case OFUNC:
-		a = AJMPL;
+		a = AJAL;
 		break;
 
-	case OASLMUL:
-	case OLMUL:
+	case OCOND:
+		a = ASGTU;
+		break;
+
+	case OCOMMA:
+		a = ASGT;
+		break;
+
 	case OASMUL:
 	case OMUL:
 		if(et == TFLOAT) {
-			a = AFMULF;
+			a = AMULF;
 			break;
 		} else
 		if(et == TDOUBLE || et == TVLONG) {
-			a = AFMULD;
+			a = AMULD;
 			break;
 		}
 		a = AMUL;
-		break;
+		goto muldiv;
 
 	case OASDIV:
 	case ODIV:
 		if(et == TFLOAT) {
-			a = AFDIVF;
+			a = ADIVF;
 			break;
 		} else
 		if(et == TDOUBLE || et == TVLONG) {
-			a = AFDIVD;
+			a = ADIVD;
 			break;
 		}
 		a = ADIV;
-		break;
+		goto muldiv;
 
 	case OASMOD:
 	case OMOD:
-		a = AMOD;
-		break;
+		a = ADIV;
+		o = OMOD;
+		goto muldiv;
+
+	case OASLMUL:
+	case OLMUL:
+		a = AMULU;
+		goto muldiv;
 
 	case OASLMOD:
 	case OLMOD:
-		a = AMODL;
-		break;
+		a = ADIVU;
+		o = OMOD;
+		goto muldiv;
 
 	case OASLDIV:
 	case OLDIV:
-		a = ADIVL;
-		break;
+		a = ADIVU;
+		goto muldiv;
 
-	case OEQ:
-		a = ABE;
-		if(typefd[et])
-			a = AFBE;
-		goto cmp;
-
-	case ONE:
-		a = ABNE;
-		if(typefd[et])
-			a = AFBLG;
-		goto cmp;
-
-	case OLT:
-		a = ABL;
-		if(typefd[et])
-			a = AFBL;
-		goto cmp;
-
-	case OLE:
-		a = ABLE;
-		if(typefd[et])
-			a = AFBLE;
-		goto cmp;
-
-	case OGE:
-		a = ABGE;
-		if(typefd[et])
-			a = AFBGE;
-		goto cmp;
-
-	case OGT:
-		a = ABG;
-		if(typefd[et])
-			a = AFBG;
-		goto cmp;
-
-	case OLO:
-		a = ABCS;
-		goto cmp;
-
-	case OLS:
-		a = ABLEU;
-		goto cmp;
-
-	case OHS:
-		a = ABCC;
-		goto cmp;
-
-	case OHI:
-		a = ABGU;
-		goto cmp;
-
-	cmp:
+	muldiv:
 		nextpc();
-		p->as = ACMP;
-		if(et == TFLOAT)
-			p->as = AFCMPF;
+		naddr(f1, &p->from);
+		if(f2 == Z)
+			raddr(t, p);
 		else
-		if(et == TDOUBLE || et == TVLONG)
-			p->as = AFCMPD;
-		if(f1 != Z)
-			naddr(f1, &p->from);
-		if(t != Z)
-			naddr(t, &p->to);
-		if(f1 == Z || t == Z || f2 != Z)
-			diag(Z, "bad cmp in gopcode %O", o);
+			raddr(f2, p);
+		p->as = a;
 		if(debug['g'])
 			print("%P\n", p);
-		f1 = Z;
-		f2 = Z;
-		t = Z;
-		break;
+
+		nextpc();
+		p->as = AMOVW;
+		a = D_LO;
+		if(o == OMOD)
+			a = D_HI;
+		p->from.type = a;
+		naddr(t, &p->to);
+		if(debug['g'])
+			print("%P\n", p);
+		return;
+
+	case OEQ:
+		if(!typefd[et]) {
+			a = ABEQ;
+			break;
+		}
+
+	case ONE:
+		if(!typefd[et]) {
+			a = ABNE;
+			break;
+		}
+
+	case OLT:
+	case OLE:
+	case OGE:
+	case OGT:
+		if(typefd[et]) {
+			nextpc();
+			if(et == TFLOAT) {
+				a = ACMPGTF;
+				if(o == OEQ || o == ONE)
+					a = ACMPEQF;
+				else
+				if(o == OLT || o == OGE)
+					a = ACMPGEF;
+			} else {
+				a = ACMPGTD;
+				if(o == OEQ || o == ONE)
+					a = ACMPEQD;
+				else
+				if(o == OLT || o == OGE)
+					a = ACMPGED;
+			}
+			p->as = a;
+			naddr(f1, &p->from);
+			raddr(f2, p);
+			if(debug['g'])
+				print("%P\n", p);
+			nextpc();
+			a = ABFPF;
+			if(o == OEQ || o == OGE || o == OGT)
+				a = ABFPT;
+			p->as = a;
+			if(debug['g'])
+				print("%P\n", p);
+			return;
+		}
+		if(vconst(f1) == 0 || vconst(f2) == 0) {
+			if(vconst(f1) == 0) {
+				o = invrel[relindex(o)];
+				f1 = f2;
+			}
+			switch(o) {
+			case OLT:
+				a = ABLTZ;
+				break;
+			case OLE:
+				a = ABLEZ;
+				break;
+			case OGE:
+				a = ABGEZ;
+				break;
+			case OGT:
+				a = ABGTZ;
+				break;
+			}
+			f2 = Z;
+			break;
+		}
+
+	case OLO:
+	case OLS:
+	case OHS:
+	case OHI:
+		nextpc();
+		if(o == OLE || o == OGT || o == OLS || o == OHI) {
+			naddr(f1, &p->from);
+			raddr(f2, p);
+		} else {
+			naddr(f2, &p->from);
+			raddr(f1, p);
+		}
+		naddr(&regnode, &p->to);
+		p->to.reg = tmpreg();
+		a = ASGT;
+		if(o == OLO || o == OLS || o == OHS || o == OHI)
+			a = ASGTU;
+		p->as = a;
+		if(debug['g'])
+			print("%P\n", p);
+
+		nextpc();
+		naddr(&regnode, &p->from);
+		p->from.reg = tmpreg();
+		a = ABEQ;
+		if(o == OLT || o == OGT || o == OLO || o == OHI)
+			a = ABNE;
+		p->as = a;
+		if(debug['g'])
+			print("%P\n", p);
+		return;
 	}
 	if(a == AGOK)
 		diag(Z, "bad in gopcode %O", o);
@@ -1137,7 +1293,7 @@ gbranch(int o)
 	a = AGOK;
 	switch(o) {
 	case ORETURN:
-		a = ARETURN;
+		a = ARET;
 		break;
 	case OGOTO:
 		a = AJMP;
@@ -1178,15 +1334,6 @@ gpseudo(int a, Sym *s, Node *n)
 }
 
 int
-sval(long v)
-{
-
-	if(v >= -(1<<12) && v < (1<<12))
-		return 1;
-	return 0;
-}
-
-int
 sconst(Node *n)
 {
 	vlong vv;
@@ -1194,10 +1341,18 @@ sconst(Node *n)
 	if(n->op == OCONST) {
 		if(!typefd[n->type->etype]) {
 			vv = n->vconst;
-			if(vv >= -(vlong)(1<<12) && vv < (vlong)(1<<12))
+			if(vv >= (vlong)(-32766) && vv < (vlong)32766)
 				return 1;
 		}
 	}
+	return 0;
+}
+
+int
+sval(long v)
+{
+	if(v >= -32766L && v < 32766L)
+		return 1;
 	return 0;
 }
 
@@ -1207,7 +1362,7 @@ exreg(Type *t)
 	long o;
 
 	if(typechlp[t->etype]) {
-		if(exregoffset <= 3)
+		if(exregoffset <= 16)
 			return 0;
 		o = exregoffset;
 		exregoffset--;
@@ -1270,70 +1425,3 @@ long	ncast[NTYPE] =
 	BUNION,				/* [TUNION] */
 	0,				/* [TENUM] */
 };
-
-/*
- * VLA frame management for SPARC.
- *
- * SPARC uses a register-window ABI where SAVE establishes the frame.
- * SP (%o6, R1 in Plan9 kc numbering) can be further decremented for
- * dynamic allocation.  We use R30 (a local register, callee-saved
- * across the SAVE/RESTORE window pair) as the VLA frame anchor.
- *
- * gvla_prologue – at function entry when vlanest > 0:
- *   Save R30, then set R30 = SP to anchor the pre-VLA stack top.
- *
- * gvla_epilogue – before every RET when vlanest > 0:
- *   Restore SP from R30, restore R30.
- *
- * gret – wrapper that inserts the epilogue before RETURN.
- */
-enum { REGVFP = 30 };	/* VLA frame pointer: callee-saved local reg */
-
-void
-gvla_prologue(void)
-{
-	Node nfp, nsp, noff;
-
-	reg[REGVFP]++;
-	nodreg(&nfp, &regnode, REGVFP);
-	nodreg(&nsp, &regnode, REGSP);
-
-	/* save R30 below current SP */
-	noff = nsp;
-	noff.op = OINDREG;
-	noff.xoffset = -4;
-	noff.type = types[TLONG];
-	gmove(&nfp, &noff);
-
-	/* R30 = SP — frame anchor */
-	gmove(&nsp, &nfp);
-}
-
-void
-gvla_epilogue(void)
-{
-	Node nfp, nsp, noff;
-
-	nodreg(&nfp, &regnode, REGVFP);
-	nodreg(&nsp, &regnode, REGSP);
-
-	/* SP = R30 */
-	gmove(&nfp, &nsp);
-
-	/* restore saved R30 */
-	noff = nsp;
-	noff.op = OINDREG;
-	noff.xoffset = -4;
-	noff.type = types[TLONG];
-	gmove(&noff, &nfp);
-
-	reg[REGVFP]--;
-}
-
-void
-gret(void)
-{
-	if(vlanest > 0)
-		gvla_epilogue();
-	gbranch(ORETURN);
-}

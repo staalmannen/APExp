@@ -79,6 +79,38 @@ cgenrel(Node *n, Node *nn, int inrel)
 		diag(n, "unknown op in cgen: %O", o);
 		break;
 
+	case OALLOCA:
+		/*
+		 * VLA stack allocation for AArch64: subtract rounded-up size
+		 * from SP, store new SP in nn.
+		 *
+		 * AArch64 requires 16-byte SP alignment at all times.
+		 *
+		 *   ADD  $15, size, tmp
+		 *   AND  $-16, tmp, tmp
+		 *   SUB  tmp, SP, SP
+		 *   MOV  SP, nn
+		 *
+		 * SP is REGSP (31); we use gopcode with vlong type to get
+		 * 64-bit AADD/ASUB, and address SP via nodreg(REGSP).
+		 */
+		{
+			Node nsize, nsp;
+			regalloc(&nsize, l, Z);
+			cgen(l, &nsize);
+			gopcode(OADD, nodconst(15), Z, &nsize);
+			gopcode(OAND, nodconst(-16), Z, &nsize);
+			nodreg(&nsp, &qregnode, REGSP);
+			nsp.type = types[TVLONG];
+			gopcode(OSUB, &nsize, Z, &nsp);
+			regfree(&nsize);
+			if(nn != Z) {
+				nodreg(&nsp, n, REGSP);
+				gmove(&nsp, nn);
+			}
+		}
+		break;
+
 	case ONEG:
 	case OCOM:
 		if(nn == Z) {

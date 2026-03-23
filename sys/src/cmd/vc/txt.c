@@ -85,6 +85,8 @@ gclean(void)
 	for(i=NREG; i<NREG+NREG; i+=2)
 		if(reg[i])
 			diag(Z, "freg %d left allocated", i-NREG);
+	if(vlanest > 0)
+		gvla_epilogue();
 	while(mnstring)
 		outstring("", 1L);
 	symstring->type->width = nstring;
@@ -1425,3 +1427,69 @@ long	ncast[NTYPE] =
 	BUNION,				/* [TUNION] */
 	0,				/* [TENUM] */
 };
+
+/*
+ * VLA frame management for MIPS64 (vc).
+ *
+ * MIPS has no dedicated frame-pointer register in the Plan9 compiler.
+ * We use R30 ($fp / $s8), which is callee-saved in the MIPS ABI and
+ * is not used by the vc register allocator.
+ *
+ * gvla_prologue – at function entry when vlanest > 0:
+ *   Save R30, then set R30 = SP to anchor the pre-VLA frame top.
+ *
+ * gvla_epilogue – before every RET when vlanest > 0:
+ *   Restore SP from R30, restore R30.
+ *
+ * gret – wrapper that inserts the epilogue before RETURN.
+ */
+enum { REGVFP = 30 };	/* VLA frame pointer: $fp / $s8 */
+
+void
+gvla_prologue(void)
+{
+	Node nfp, nsp, noff;
+
+	reg[REGVFP]++;
+	nodreg(&nfp, &regnode, REGVFP);
+	nodreg(&nsp, &regnode, REGSP);
+
+	/* MOVW R30, -4(SP) */
+	noff = nsp;
+	noff.op = OINDREG;
+	noff.xoffset = -4;
+	noff.type = types[TLONG];
+	gmove(&nfp, &noff);
+
+	/* MOVW SP, R30 */
+	gmove(&nsp, &nfp);
+}
+
+void
+gvla_epilogue(void)
+{
+	Node nfp, nsp, noff;
+
+	nodreg(&nfp, &regnode, REGVFP);
+	nodreg(&nsp, &regnode, REGSP);
+
+	/* MOVW R30, SP */
+	gmove(&nfp, &nsp);
+
+	/* MOVW -4(SP), R30 */
+	noff = nsp;
+	noff.op = OINDREG;
+	noff.xoffset = -4;
+	noff.type = types[TLONG];
+	gmove(&noff, &nfp);
+
+	reg[REGVFP]--;
+}
+
+void
+gret(void)
+{
+	if(vlanest > 0)
+		gvla_epilogue();
+	gbranch(ORETURN);
+}

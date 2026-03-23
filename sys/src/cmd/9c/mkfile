@@ -2,6 +2,7 @@
 APEXPROOT=../../../..
 TARG=9c
 OFILES=\
+	9c_vla.$O\
 	cgen.$O\
 	enam.$O\
 	list.$O\

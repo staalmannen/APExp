@@ -28,8 +28,8 @@ ginit(void)
 {
 	int i, j, si, sj;
 
-	thestring = "68020";
-	thechar = '2';
+	thestring = "68000";
+	thechar = '1';
 	exregoffset = 7;
 	exaregoffset = 5;
 	exfregoffset = 7;
@@ -68,6 +68,7 @@ ginit(void)
 			} else {
 				if(sj == 2)
 					txtp->postext = AEXTBW;
+				else
 				if(sj == 4)
 					if(si == 1)
 						txtp->postext = AEXTBL;
@@ -154,7 +155,6 @@ ginit(void)
 	zprog.link = P;
 	zprog.as = AGOK;
 	zprog.from.type = D_NONE;
-	zprog.from.index = D_NONE;
 	zprog.to = zprog.from;
 
 	nodret = new(ONAME, Z, Z);
@@ -200,8 +200,6 @@ gclean(void)
 			diag(Z, "missing F%d", i);
 	}
 
-	if(vlanest > 0)
-		gvla_epilogue();
 	while(mnstring)
 		outstring("", 1L);
 	symstring->type->width = nstring;
@@ -338,25 +336,6 @@ naddr(Node *n, Adr *a, int x)
 		}
 		goto bad;
 
-	case OINDEX:
-		naddr(n->left, a, x);
-		switch(n->left->addable) {
-		default:
-			goto bad;
-		case 1:
-		case 12:
-			a->index = x | I_INDEX1;
-			a->type &= D_MASK;
-			break;
-		case 2:
-		case 10:
-		case 11:
-			a->index = x | I_INDEX2;
-			break;
-		}
-		a->scale = n->scale;
-		break;
-
 	case OCONST:
 		a->displace = 0;
 		if(typefd[n->type->etype]) {
@@ -382,6 +361,7 @@ naddr(Node *n, Adr *a, int x)
 			goto add;
 		}
 		goto bad;
+
 	noadd:
 		v = 0;
 	add:
@@ -401,8 +381,6 @@ naddr(Node *n, Adr *a, int x)
 			a->type &= D_MASK;
 			a->type |= I_ADDR;
 			break;
-		case 13:
-			a->index = D_NONE|I_INDEX3;
 		case 10:
 		case 11:
 		case 20:
@@ -640,7 +618,6 @@ void
 gopcode(int o, Type *ty, int gf, Node *f, int gt, Node *t)
 {
 	int i, fidx, tidx;
-	long v;
 
 	if(o == OAS)
 		if(gf == gt)
@@ -648,22 +625,7 @@ gopcode(int o, Type *ty, int gf, Node *f, int gt, Node *t)
 				return;
 
 	fidx = D_NONE;
-	if(gf == D_TREE) {
-		if(f->op == OINDEX) {
-			fidx = regalloc(types[TIND], fidx);
-			cgen(f->right, fidx, f->right);
-		}
-	}
 	tidx = D_NONE;
-	if(gt == D_TREE) {
-		if(t->op == OINDEX) {
-			v = argoff;
-			tidx = regalloc(types[TIND], tidx);
-			cgen(t->right, tidx, t->right);
-			if(gf == D_TOS)
-				adjsp(v - argoff);
-		}
-	}
 	i = 0;
 	if(ty != T) {
 		i = ty->etype;
@@ -740,7 +702,7 @@ asopt(void)
 	 * ==>
 	 * pea (...)
 	 */
-	if(p->as == AMOVL && p->to.type == D_TOS && p->from.index == D_NONE)
+	if(p->as == AMOVL && p->to.type == D_TOS)
 	switch(p->from.type) {
 	case D_CONST:
 		p->from.type |= I_INDIR;
@@ -841,8 +803,6 @@ gpseudo(int a, Sym *s, int g, long v)
 	if(a == ADATA)
 		pc--;
 	p->as = a;
-	if(g == D_TREE)
-		abort();	/* obsolete */
 	p->to.type = g;
 	p->to.offset = v;
 	p->from.sym = s;
@@ -854,6 +814,7 @@ gpseudo(int a, Sym *s, int g, long v)
 void
 gpseudotree(int a, Sym *s, Node *n)
 {
+
 	nextpc();
 	if(a == ADATA)
 		pc--;
@@ -940,76 +901,3 @@ long	ncast[NTYPE] =
 	BUNION,				/* [TUNION] */
 	0,				/* [TENUM] */
 };
-
-/*
- * VLA frame management for Motorola 68k (1c/2c).
- *
- * The 68k linker emits "LINK A6,#-framesize / UNLK A6" for every
- * function, so A6 is already the frame pointer.  SP = A7.
- *
- * We use A5 (D_A0+5) as the VLA stack anchor.  A5 sits just above
- * the allocatable address register range and is callee-saved in the
- * 68k ABI.  We claim it by incrementing aregused[5] so the register
- * allocator will not touch it.
- *
- * gvla_prologue – at function entry when vlanest > 0:
- *   Save A5, then set A5 = A7 to anchor the pre-VLA stack top.
- *
- * gvla_epilogue – before every RET when vlanest > 0:
- *   Restore A7 from A5, restore A5.
- *
- * gret – wrapper that inserts the epilogue before RETURN.
- */
-void
-gvla_prologue(void)
-{
-	int sp, fp;
-
-	sp = D_A0 + 7;		/* A7 = SP */
-	fp = D_A0 + 5;		/* A5 = VLA frame anchor */
-	aregused[5]++;		/* claim A5 */
-
-	/* MOVL A5, -(A7)  — push A5 onto stack */
-	nextpc();
-	p->as = AMOVL;
-	p->from.type = fp;
-	p->to.type = sp | I_INDIR | I_PREDEC;
-
-	/* MOVL A7, A5  — A5 = current SP (pre-VLA anchor) */
-	nextpc();
-	p->as = AMOVL;
-	p->from.type = sp;
-	p->to.type = fp;
-}
-
-void
-gvla_epilogue(void)
-{
-	int sp, fp;
-
-	sp = D_A0 + 7;
-	fp = D_A0 + 5;
-
-	/* MOVL A5, A7  — restore SP to pre-VLA position */
-	nextpc();
-	p->as = AMOVL;
-	p->from.type = fp;
-	p->to.type = sp;
-
-	/* MOVL (A7)+, A5  — pop saved A5 */
-	nextpc();
-	p->as = AMOVL;
-	p->from.type = sp | I_INDIR | I_POSTINC;
-	p->to.type = fp;
-
-	aregused[5]--;
-}
-
-void
-gret(void)
-{
-	if(vlanest > 0)
-		gvla_epilogue();
-	gbranch(ORETURN);
-}
-

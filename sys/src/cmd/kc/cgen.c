@@ -72,6 +72,34 @@ cgen(Node *n, Node *nn)
 		diag(n, "unknown op in cgen: %O", o);
 		break;
 
+	case OALLOCA:
+		/*
+		 * VLA stack allocation for SPARC.
+		 * Round size up to 8-byte alignment (SPARC double-word
+		 * alignment requirement), subtract from SP (R1 in Plan9
+		 * kc numbering), store new SP in nn.
+		 *
+		 *   ADD  $7, size, tmp
+		 *   AND  $-8, tmp, tmp
+		 *   SUB  tmp, SP, SP
+		 *   MOV  SP, nn
+		 */
+		{
+			Node nsize, nsp;
+			regalloc(&nsize, l, Z);
+			cgen(l, &nsize);
+			gopcode(OADD, nodconst(7), Z, &nsize);
+			gopcode(OAND, nodconst(-8), Z, &nsize);
+			nodreg(&nsp, &regnode, REGSP);
+			gopcode(OSUB, &nsize, Z, &nsp);
+			regfree(&nsize);
+			if(nn != Z) {
+				nodreg(&nsp, n, REGSP);
+				gmove(&nsp, nn);
+			}
+		}
+		break;
+
 	case OAS:
 		if(l->op == OBIT)
 			goto bitas;

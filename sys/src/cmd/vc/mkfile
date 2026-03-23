@@ -2,9 +2,11 @@
 APEXPROOT=../../../..
 TARG=vc
 OFILES=\
+	vc_vla.$O\
 	cgen.$O\
 	enam.$O\
 	list.$O\
+	machcap.$O\
 	mul.$O\
 	peep.$O\
 	pgen.$O\

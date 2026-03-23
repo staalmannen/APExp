@@ -100,8 +100,6 @@ gclean(void)
 	for(i=NREG; i<NREG+NREG; i+=2)
 		if(reg[i])
 			diag(Z, "freg %d left allocated", i-NREG);
-	if(vlanest > 0)
-		gvla_epilogue();
 	while(mnstring)
 		outstring("", 1L);
 	symstring->type->width = nstring;
@@ -1270,70 +1268,3 @@ long	ncast[NTYPE] =
 	BUNION,				/* [TUNION] */
 	0,				/* [TENUM] */
 };
-
-/*
- * VLA frame management for SPARC.
- *
- * SPARC uses a register-window ABI where SAVE establishes the frame.
- * SP (%o6, R1 in Plan9 kc numbering) can be further decremented for
- * dynamic allocation.  We use R30 (a local register, callee-saved
- * across the SAVE/RESTORE window pair) as the VLA frame anchor.
- *
- * gvla_prologue – at function entry when vlanest > 0:
- *   Save R30, then set R30 = SP to anchor the pre-VLA stack top.
- *
- * gvla_epilogue – before every RET when vlanest > 0:
- *   Restore SP from R30, restore R30.
- *
- * gret – wrapper that inserts the epilogue before RETURN.
- */
-enum { REGVFP = 30 };	/* VLA frame pointer: callee-saved local reg */
-
-void
-gvla_prologue(void)
-{
-	Node nfp, nsp, noff;
-
-	reg[REGVFP]++;
-	nodreg(&nfp, &regnode, REGVFP);
-	nodreg(&nsp, &regnode, REGSP);
-
-	/* save R30 below current SP */
-	noff = nsp;
-	noff.op = OINDREG;
-	noff.xoffset = -4;
-	noff.type = types[TLONG];
-	gmove(&nfp, &noff);
-
-	/* R30 = SP — frame anchor */
-	gmove(&nsp, &nfp);
-}
-
-void
-gvla_epilogue(void)
-{
-	Node nfp, nsp, noff;
-
-	nodreg(&nfp, &regnode, REGVFP);
-	nodreg(&nsp, &regnode, REGSP);
-
-	/* SP = R30 */
-	gmove(&nfp, &nsp);
-
-	/* restore saved R30 */
-	noff = nsp;
-	noff.op = OINDREG;
-	noff.xoffset = -4;
-	noff.type = types[TLONG];
-	gmove(&noff, &nfp);
-
-	reg[REGVFP]--;
-}
-
-void
-gret(void)
-{
-	if(vlanest > 0)
-		gvla_epilogue();
-	gbranch(ORETURN);
-}

@@ -1,8 +1,7 @@
 </$objtype/mkfile
 APEXPROOT=../../../..
-TARG=1c
+TARG=2c
 OFILES=\
-	1c_vla.$O\
 	cgen.$O\
 	reg.$O\
 	txt.$O\
@@ -15,7 +14,7 @@ OFILES=\
 
 HFILES=\
 	gc.h\
-	../2c/2.out.h\
+	2.out.h\
 	../cc/compat.h\
 	../cc/cc.h\
 

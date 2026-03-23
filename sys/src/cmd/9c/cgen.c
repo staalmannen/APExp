@@ -94,6 +94,33 @@ cgen(Node *n, Node *nn)
 		diag(n, "unknown op in cgen: %O", o);
 		break;
 
+	case OALLOCA:
+		/*
+		 * VLA stack allocation for PowerPC (32-bit).
+		 * Round size up to 4-byte alignment, subtract from SP (R1),
+		 * store new SP in nn.
+		 *
+		 *   ADD   $3, size, tmp
+		 *   AND   $-4, tmp, tmp
+		 *   SUB   tmp, SP, SP
+		 *   MOVW  SP, nn
+		 */
+		{
+			Node nsize, nsp;
+			regalloc(&nsize, l, Z);
+			cgen(l, &nsize);
+			gopcode(OADD, nodconst(3), Z, &nsize);
+			gopcode(OAND, nodconst(-4), Z, &nsize);
+			nodreg(&nsp, &regnode, REGSP);
+			gopcode(OSUB, &nsize, Z, &nsp);
+			regfree(&nsize);
+			if(nn != Z) {
+				nodreg(&nsp, n, REGSP);
+				gmove(&nsp, nn);
+			}
+		}
+		break;
+
 	case OAS:
 		if(l->op == OBIT)
 			goto bitas;
