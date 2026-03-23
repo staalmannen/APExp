@@ -655,6 +655,21 @@ static OpcMap opcode_map[] = {
 	{ "lahf",   "LAHF"    }, { "sahf",   "SAHF"     },
 	{ "cbw",    "CBW"     }, { "cwde",   "CWDE"     }, { "cdqe", "CDQE" },
 	{ "cwd",    "CWD"     }, { "cdq",    "CDQ"      }, { "cqo",  "CQO"  },
+	/*
+	 * x87 FPU: Plan 9 6a has no "FN" (no-wait) prefix variants.
+	 * All FPU instructions use the same name regardless of wait/no-wait.
+	 * GNU "FNSTSW" → Plan 9 "FSTSW", "FNCLEX" → "FCLEX", etc.
+	 * Also note Plan 9 uses FSTSW/FSTCW/FSTENV (no leading F dropped).
+	 */
+	{ "fnstsw",  "FSTSW"  }, { "fnstsw", "FSTSW"   },
+	{ "fnclex",  "FCLEX"  },
+	{ "fnstcw",  "FSTCW"  },
+	{ "fnstenv", "FSTENV" },
+	{ "fnsave",  "FSAVE"  },
+	{ "fninit",  "FINIT"  },
+	{ "fnop",    "FNOP"   },
+	/* GNU "fwait" is an explicit wait — Plan 9 spells it FWAIT */
+	{ "fwait",   "FWAIT"  },
 	{ NULL, NULL }
 };
 
@@ -2389,7 +2404,6 @@ infer_suffix_from_regs(const char *op1, const char *op2)
 {
 	/* We look at register operands only — skip $imm, mem, etc. */
 	const char *ops[2];
-	int nops = 0;
 	ops[0] = op1;
 	ops[1] = op2;
 
@@ -2423,7 +2437,7 @@ infer_suffix_from_regs(const char *op1, const char *op2)
 	};
 	int oi, ri;
 
-	for (oi = 0; oi < nops; oi++) {
+	for (oi = 0; oi < 2; oi++) {
 		const char *o = ops[oi];
 		if (!o || !*o) continue;
 		while (isspace((unsigned char)*o)) o++;
@@ -2463,8 +2477,8 @@ opcode_needs_no_suffix(const char *mlow)
 		"cbw","cwde","cdqe","cwd","cdq","cqo",
 		"fnclex","fwait","fnop",
 		"fnstsw","fnsave","fnstenv","fnstcw",
+		"fstsw","fclex","fstcw","fstenv","fsave","finit","fninit",
 		"frstor","fldenv","fldcw",
-		"fninit",
 		"stmxcsr","ldmxcsr","fxsave","fxrstor",
 		"mfence","lfence","sfence",
 		"rdtsc","rdtscp","rdmsr","wrmsr","rdpmc",
@@ -2494,41 +2508,24 @@ infer_att_opcode(const char *mnem, const char *op1, const char *op2)
 
 	strlower(mnem, mlow, sizeof(mlow));
 
-	/* If the mnemonic already ends with a known size suffix letter,
-	 * it doesn't need inference — just translate normally. */
-	{
-		int n = strlen(mlow);
-		if (n > 1) {
-			char last = mlow[n-1];
-			/* b/w/l/q are the AT&T size suffixes */
-			if (last == 'b' || last == 'w' || last == 'l' || last == 'q') {
-				/* verify the stem without suffix is a "real" mnemonic
-				 * by checking it's not something like "sub" (ends in 'b') */
-				/* heuristic: if the suffix-stripped form is >= 2 chars
-				 * and differs from the common false-positives, treat it as suffixed */
-				static const char *false_suffix[] = {
-					"sub","and","or","xor","add","mov","cmp","test",
-					"call","imul","div","idiv","mul","neg","not",
-					"push","pop","shl","shr","sar","rol","ror",
-					"inc","dec","lea","xchg",
-					/* FPU: all fXXX */
-					NULL
-				};
-				char stem[64];
-				strncpy(stem, mlow, n-1);
-				stem[n-1] = '\0';
-				int is_false = 0;
-				int j;
-				for (j = 0; false_suffix[j]; j++)
-					if (strcmp(false_suffix[j], stem) == 0) { is_false = 1; break; }
-				if (!is_false) {
-					/* it's a genuinely suffixed mnemonic like "addl", "movq" */
-					return translate_opcode(mnem);
-				}
-			}
-		}
-	}
-
+	/*
+	 * If the mnemonic already ends with a known AT&T size suffix and the
+	 * stem (mnemonic minus last char) is NOT a bare instruction name,
+	 * treat it as already suffixed and just uppercase it.
+	 * Example: "movq" → last='q', stem="mov" which IS a bare name
+	 *          → still needs inference? No — "movq" IS explicitly suffixed.
+	 * So the rule is: if last char is b/w/l/q AND the stem+suffix form
+	 * is a genuine GAS suffixed mnemonic (i.e. stem is a known base),
+	 * return it uppercased directly.
+	 * We identify this by checking: does the caller's needs_inference[]
+	 * list contain the stem? If stem is in the list AND last char is a
+	 * suffix → it's a genuinely suffixed mnemonic like "movq","addl".
+	 * If stem is NOT in the list → last char is part of the opcode name.
+	 *
+	 * Simpler heuristic that works for all cases in practice:
+	 * If the mnemonic was passed here, the caller already decided it needs
+	 * inference OR it's a genuinely unsuffixed name. Just infer from regs.
+	 */
 	if (opcode_needs_no_suffix(mlow))
 		return translate_opcode(mnem);
 
@@ -3133,16 +3130,41 @@ translate_line_att(const char *line, FILE *out)
 	if (arch_is_x86(arch)) {
 		char mlow_tmp[64];
 		strlower(mnem, mlow_tmp, sizeof(mlow_tmp));
-		/* Only infer when the mnemonic has NO explicit suffix character */
-		int n = strlen(mlow_tmp);
-		char last = n > 0 ? mlow_tmp[n-1] : 0;
-		int already_has_suffix = (last == 'b' || last == 'w' ||
-		                          last == 'l' || last == 'q') &&
-		                         n >= 2;
-		if (!already_has_suffix && !opcode_needs_no_suffix(mlow_tmp)) {
-			/* Check if it's in the explicit opcode_map — if so, trust that */
-			int in_map = 0;
-			int mi;
+		/*
+		 * Explicit whitelist of bare (unsuffixed) AT&T mnemonics that
+		 * need a size suffix added.  The old character-based check
+		 * ("ends in b/w/l/q?") caused false positives: "shl" ends in
+		 * 'l' and would be skipped, emitting bare SHL which 6a rejects.
+		 * Strategy: if in the whitelist → always infer.  Otherwise if
+		 * the mnemonic ends in a real suffix char → trust it as-is.
+		 */
+		static const char *needs_inference[] = {
+			"add","sub","and","or","xor","not","neg",
+			"cmp","test","mov","lea","xchg",
+			"inc","dec","mul","imul","div","idiv",
+			/* shifts: shl/shr/sal/sar/rol/ror end in 'l'/'r'
+			 * which looks like a suffix letter but isn't */
+			"shl","shr","sal","sar","rol","ror","rcl","rcr",
+			"push","pop","call",
+			NULL
+		};
+		int needs_infer = 0, ni;
+		for (ni = 0; needs_inference[ni]; ni++) {
+			if (strcmp(needs_inference[ni], mlow_tmp) == 0) {
+				needs_infer = 1;
+				break;
+			}
+		}
+		/* Also run inference for mnemonics not ending in b/w/l/q
+		 * (their last char can't be a suffix, so they're bare) */
+		if (!needs_infer) {
+			int n = strlen(mlow_tmp);
+			char last = n > 0 ? mlow_tmp[n-1] : 0;
+			if (!((last=='b'||last=='w'||last=='l'||last=='q') && n>=2))
+				needs_infer = 1;
+		}
+		if (needs_infer && !opcode_needs_no_suffix(mlow_tmp)) {
+			int in_map = 0, mi;
 			for (mi = 0; opcode_map[mi].gas; mi++) {
 				if (strcmp(opcode_map[mi].gas, mlow_tmp) == 0) {
 					in_map = 1;
@@ -3150,7 +3172,6 @@ translate_line_att(const char *line, FILE *out)
 				}
 			}
 			if (!in_map) {
-				/* Infer suffix from operands */
 				const char *op1 = nops > 0 ? ops[0] : "";
 				const char *op2 = nops > 1 ? ops[1] : "";
 				p9op = infer_att_opcode(mnem, op1, op2);
