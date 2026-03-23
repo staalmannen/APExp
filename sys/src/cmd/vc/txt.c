@@ -24,11 +24,6 @@ ginit(void)
 	typeswitch = typechlv;
 	typecmplx = typesuv;
 
-	/* TO DO */
-	memmove(typechlpv, typechlp, sizeof(typechlpv));
-	typechlpv[TVLONG] = 1;
-	typechlpv[TUVLONG] = 1;
-
 	typeword = typechlvp;
 	typeswitch = typechlv;
 	typecmplx = typesuv;
