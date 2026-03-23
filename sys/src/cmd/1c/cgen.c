@@ -84,7 +84,7 @@ cgen(Node *n, int result, Node *nn)
 				p->as = AMOVL;
 				p->from.type = sp;
 				if(nn != Z)
-					naddr(nn, &p->to);
+					naddr(nn, &p->to, D_NONE);
 				else
 					p->to.type = result;
 			}

@@ -973,7 +973,7 @@ gvla_prologue(void)
 	nextpc();
 	p->as = AMOVL;
 	p->from.type = fp;
-	p->to.type = sp | I_INDIR | I_PREDEC;
+	p->to.type = sp | I_INDDEC;
 
 	/* MOVL A7, A5  — A5 = current SP (pre-VLA anchor) */
 	nextpc();
@@ -999,7 +999,7 @@ gvla_epilogue(void)
 	/* MOVL (A7)+, A5  — pop saved A5 */
 	nextpc();
 	p->as = AMOVL;
-	p->from.type = sp | I_INDIR | I_POSTINC;
+	p->from.type = sp | I_INDINC;
 	p->to.type = fp;
 
 	aregused[5]--;
