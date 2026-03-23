@@ -5,13 +5,41 @@
 extern "C" {
 #endif
 
-#define complex _Complex
-#ifdef __GNUC__
-#define _Complex_I (__extension__ (0.0f+1.0fi))
-#else
-#define _Complex_I (0.0f+1.0fi)
-#endif
-#define I _Complex_I
+/*
+ * Plan9/9front port of C99 <complex.h>.
+ * _Complex is a built-in keyword in the Plan9 compiler (6c, 8c, 5c).
+ * We avoid compound literals, designated initialisers, and imaginary
+ * literal suffixes (1.0fi) which the Plan9 compiler does not support.
+ */
+
+#define complex		_Complex
+#define imaginary	_Imaginary
+
+/*
+ * Component access via pointer cast to the underlying pair layout.
+ * _Complex T is stored as two consecutive T values: {re, im}.
+ */
+#define creal(z)	(*(double*)&(z))
+#define crealf(z)	(*(float*)&(z))
+#define creall(z)	((long double)creal(z))
+#define cimag(z)	(*((double*)&(z)+1))
+#define cimagf(z)	(*((float*)&(z)+1))
+#define cimagl(z)	((long double)cimag(z))
+
+/*
+ * CMPLX: construct a complex value from real and imaginary parts.
+ * Implemented as library functions to avoid compound literals.
+ * See plan9_cmplx.c in the musl math library.
+ */
+extern double complex	__plan9_cmplx(double, double);
+extern float complex	__plan9_cmplxf(float, float);
+
+#define CMPLX(x, y)	__plan9_cmplx((double)(x), (double)(y))
+#define CMPLXF(x, y)	__plan9_cmplxf((float)(x), (float)(y))
+#define CMPLXL(x, y)	__plan9_cmplx((double)(x), (double)(y))
+
+#define _Complex_I	__plan9_cmplx(0.0, 1.0)
+#define I		_Complex_I
 
 double complex cacos(double complex);
 float complex cacosf(float complex);
@@ -85,10 +113,6 @@ double carg(double complex);
 float cargf(float complex);
 long double cargl(long double complex);
 
-double cimag(double complex);
-float cimagf(float complex);
-long double cimagl(long double complex);
-
 double complex conj(double complex);
 float complex conjf(float complex);
 long double complex conjl(long double complex);
@@ -96,36 +120,6 @@ long double complex conjl(long double complex);
 double complex cproj(double complex);
 float complex cprojf(float complex);
 long double complex cprojl(long double complex);
-
-double creal(double complex);
-float crealf(float complex);
-long double creall(long double complex);
-
-#ifndef __cplusplus
-#define __CIMAG(x, t) \
-	(+(union { _Complex t __z; t __xy[2]; }){(_Complex t)(x)}.__xy[1])
-
-#define creal(x) ((double)(x))
-#define crealf(x) ((float)(x))
-#define creall(x) ((long double)(x))
-
-#define cimag(x) __CIMAG(x, double)
-#define cimagf(x) __CIMAG(x, float)
-#define cimagl(x) __CIMAG(x, long double)
-#endif
-
-#if __STDC_VERSION__ >= 201112L
-#if defined(_Imaginary_I)
-#define __CMPLX(x, y, t) ((t)(x) + _Imaginary_I*(t)(y))
-#elif defined(__clang__)
-#define __CMPLX(x, y, t) (+(_Complex t){ (t)(x), (t)(y) })
-#else
-#define __CMPLX(x, y, t) (__builtin_complex((t)(x), (t)(y)))
-#endif
-#define CMPLX(x, y) __CMPLX(x, y, double)
-#define CMPLXF(x, y) __CMPLX(x, y, float)
-#define CMPLXL(x, y) __CMPLX(x, y, long double)
-#endif
 
 #ifdef __cplusplus
 }
