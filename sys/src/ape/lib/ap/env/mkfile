@@ -4,7 +4,6 @@ APE=$APEXPROOT/sys/src/ape
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
 OFILES=\
-	_envsetup.$O\
 	getenv.$O\
 	putenv.$O\
 #	musl\

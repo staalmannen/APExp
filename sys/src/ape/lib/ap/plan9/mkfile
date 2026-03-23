@@ -5,6 +5,7 @@ LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 	_buf.$O\
 	_dirconv.$O\
+	_envsetup.$O\
 	_fdinfo.$O\
 	_getpw.$O\
 	_nap.$O\
@@ -74,7 +75,7 @@ UPDATE=\
 
 CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I$APEXPROOT/$objtype/include/ape\
 	-D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION\
-	-D_RESEARCH_SOURCE -D_NET_EXTENSION -I../include -I.
+	-D_RESEARCH_SOURCE -D_NET_EXTENSION -I../include -I../plan9
 
 
 

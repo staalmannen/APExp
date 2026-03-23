@@ -21,6 +21,7 @@ OFILES=\
 	strcpy.$O\
 	strcspn.$O\
 	strdup.$O\
+	strerror.$O\
 	strftime.$O\
 	strlen.$O\
 	strncasecmp.$O\

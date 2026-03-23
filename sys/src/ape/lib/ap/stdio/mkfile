@@ -55,7 +55,6 @@ OFILES=\
 	sprintf.$O\
 	sscanf.$O\
 	stdio.$O\
-	strerror.$O\
 	tmpnam.$O\
 	ungetc.$O\
 	vfprintf.$O\
