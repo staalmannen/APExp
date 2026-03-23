@@ -285,6 +285,19 @@ stcompat(Node *n, Type *t1, Type *t2, long ttab[])
 	int i;
 	ulong b;
 
+	/*
+	 * Complex types (TCFLOAT, TCDOUBLE) have etype >= NTYPE and are
+	 * not present in the ttab[] arrays (which have NTYPE entries).
+	 * Accessing ttab[TCFLOAT] or ttab[TCDOUBLE] would be out of bounds.
+	 * Compatibility for complex types is handled in com.c before tcompat
+	 * is called; report compatible (return 0) here so we never fire
+	 * the "incompatible type" diagnostic for complex operands.
+	 */
+	if(t1 != T && iscmplx(t1->etype))
+		return 0;
+	if(t2 != T && iscmplx(t2->etype))
+		return 0;
+
 	i = 0;
 	if(t2 != T)
 		i = t2->etype;
@@ -1667,7 +1680,7 @@ int	typevinit[] =
 char	typefd[NCTYPE];
 int	typefdinit[] =
 {
-	TFLOAT, TDOUBLE, TCFLOAT, TCDOUBLE, -1,
+	TFLOAT, TDOUBLE, -1,
 };
 
 char	typeaf[NTYPE];
