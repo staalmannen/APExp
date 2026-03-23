@@ -31,7 +31,7 @@ OFILES=\
 	mpvecsub.$O\
 	mpdigdiv.$O\
 # fenv\
-#	fenv.$O\
+	fenv.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

@@ -1,82 +1,82 @@
-
+#if !defined(_SOFT_FLOAT) && !defined(__NO_FPRS__)
 // GLOBL feclearexcept
 // .type feclearexcept,@function
 feclearexcept:
-	ANDIS.	3, 3, 0x3e00
+	ANDISCC	$15872, R3, R3
 
-	ANDIS.	0, 3, 0x2000
-	STWU	1, -16(1)
-	BEQ-	0, 1f
-	ORIS	3, 3, 0x01f8
-	ORI	3, 3, 0x0700
-1:
-
-
+	ANDISCC	$8192, R3, R0
+	MOVWU	R1, -16(R1)
+	BEQ	R0, .Lnum1_0
+	ORIS	$504, R3, R3
+	OR	$1792, R3, R3
+.Lnum1_0:
 
 
 
 
-	MFFS	0
-	STFD	0, 8(1)
-	LWZ	9, 12(1)
-	ANDC	9, 9, 3
-	STW	9, 12(1)
-	LFD	0, 8(1)
-	MTFSF	255, 0
 
 
-	LI	3, 0
-	ADDI	1, 1, 16
-	BLR
+	FMOVD	FPSCR, F0
+	FMOVD	F0, 8(R1)
+	MOVWZ	12(R1), R9
+	ANDN	R3, R9, R9
+	MOVW	R9, 12(R1)
+	FMOVD	8(R1), F0
+	MTFSF	$255, F0
+
+
+	MOVW	$0, R3
+	ADD	$16, R1, R1
+	RET
 
 // GLOBL feraiseexcept
 // .type feraiseexcept,@function
 feraiseexcept:
-	ANDIS.	3, 3, 0x3e00
+	ANDISCC	$15872, R3, R3
 
-	ANDIS.	0, 3, 0x2000
-	STWU	1, -16(1)
-	BEQ-	0, 1f
-	ORI	3, 3, 0x0400
-1:
+	ANDISCC	$8192, R3, R0
+	MOVWU	R1, -16(R1)
+	BEQ	R0, .Lnum1_1
+	OR	$1024, R3, R3
+.Lnum1_1:
 
-	MFFS	0
-	STFD	0, 8(1)
-	LWZ	9, 12(1)
-	OR	9, 9, 3
-	STW	9, 12(1)
-	LFD	0, 8(1)
-	MTFSF	255, 0
+	FMOVD	FPSCR, F0
+	FMOVD	F0, 8(R1)
+	MOVWZ	12(R1), R9
+	OR	R3, R9, R9
+	MOVW	R9, 12(R1)
+	FMOVD	8(R1), F0
+	MTFSF	$255, F0
 
 
-	LI	3, 0
-	ADDI	1, 1, 16
-	BLR
+	MOVW	$0, R3
+	ADD	$16, R1, R1
+	RET
 
 // GLOBL fetestexcept
 // .type fetestexcept,@function
 fetestexcept:
-	ANDIS.	3, 3, 0x3e00
+	ANDISCC	$15872, R3, R3
 
-	STWU	1, -16(1)
-	MFFS	0
-	STFD	0, 8(1)
-	LWZ	9, 12(1)
-	ADDI	1, 1, 16
-	AND	3, 3, 9
-	BLR
+	MOVWU	R1, -16(R1)
+	FMOVD	FPSCR, F0
+	FMOVD	F0, 8(R1)
+	MOVWZ	12(R1), R9
+	ADD	$16, R1, R1
+	AND	R9, R3, R3
+	RET
 
 // GLOBL fegetround
 // .type fegetround,@function
 fegetround:
 
-	STWU	1, -16(1)
-	MFFS	0
-	STFD	0, 8(1)
-	LWZ	3, 12(1)
-	ADDI	1, 1, 16
-	CLRLWI	3, 3, 30
-	BLR
+	MOVWU	R1, -16(R1)
+	FMOVD	FPSCR, F0
+	FMOVD	F0, 8(R1)
+	MOVWZ	12(R1), R3
+	ADD	$16, R1, R1
+	// clrlwi 3,3,30 (complex rotate — translate manually)
+	RET
 
 // GLOBL __fesetround
 // .hidden __fesetround
@@ -86,48 +86,53 @@ __fesetround:
 
 
 
-	STWU	1, -16(1)
-	MFFS	0
-	STFD	0, 8(1)
-	LWZ	9, 12(1)
-	CLRRWI	9, 9, 2
-	OR	9, 9, 3
-	STW	9, 12(1)
-	LFD	0, 8(1)
-	MTFSF	255, 0
+	MOVWU	R1, -16(R1)
+	FMOVD	FPSCR, F0
+	FMOVD	F0, 8(R1)
+	MOVWZ	12(R1), R9
+	// clrrwi 9,9,2 (complex rotate — translate manually)
+	OR	R3, R9, R9
+	MOVW	R9, 12(R1)
+	FMOVD	8(R1), F0
+	MTFSF	$255, F0
 
 
-	LI	3, 0
-	ADDI	1, 1, 16
-	BLR
+	MOVW	$0, R3
+	ADD	$16, R1, R1
+	RET
 
 // GLOBL fegetenv
 // .type fegetenv,@function
 fegetenv:
 
-	MFFS	0
-	STFD	0, 0(3)
+	FMOVD	FPSCR, F0
+	FMOVD	F0, 0(R3)
 
-	LI	3, 0
-	BLR
+	MOVW	$0, R3
+	RET
 
 // GLOBL fesetenv
 // .type fesetenv,@function
 fesetenv:
-	CMPWI	3, -1
-	BNE	1f
-	MFLR	4
-	BL	2f
-// .zero 8
-2:
-	MFLR	3
-	MTLR	4
-1:
-	LFD	0, 0(3)
-	MTFSF	255, 0
+	CMPW	$-1, R3
+	BNE	.Lnum1_2
+	MOVW	LR, R4
+	BL	.Lnum2_0
+	BYTE	$0
+	BYTE	$0
+	BYTE	$0
+	BYTE	$0
+	BYTE	$0
+	BYTE	$0
+	BYTE	$0
+	BYTE	$0
+.Lnum2_0:
+	MOVW	LR, R3
+	MOVW	R4, LR
+.Lnum1_2:
+	FMOVD	0(R3), F0
+	MTFSF	$255, F0
 
-	LI	3, 0
-	BLR
-
-
-
+	MOVW	$0, R3
+	RET
+#endif

@@ -1,71 +1,69 @@
 // GLOBL fegetround
 // .type fegetround,%function
 fegetround:
-	MRS	x0, fpcr
-	AND	w0, w0
+	MRS	FPCR, R0
+	AND	$0xc00000, R0, R0
 	RET
 
 // GLOBL __fesetround
 // .hidden __fesetround
 // .type __fesetround,%function
 __fesetround:
-	MRS	x1, fpcr
-	BIC	w1, w1
-	ORR	w1, w1, w0
-	MSR	fpcr, x1
-	MOV	w0
+	MRS	FPCR, R1
+	BIC	$0xc00000, R1, R1
+	ORR	R0, R1, R1
+	MSR	FPCR, R1
+	MOVW	$0, R0
 	RET
 
 // GLOBL fetestexcept
 // .type fetestexcept,%function
 fetestexcept:
-	AND	w0, w0
-	MRS	x1, fpsr
-	AND	w0, w0, w1
+	AND	$0x1f, R0, R0
+	MRS	FPSR, R1
+	AND	R1, R0, R0
 	RET
 
 // GLOBL feclearexcept
 // .type feclearexcept,%function
 feclearexcept:
-	AND	w0, w0
-	MRS	x1, fpsr
-	BIC	w1, w1, w0
-	MSR	fpsr, x1
-	MOV	w0
+	AND	$0x1f, R0, R0
+	MRS	FPSR, R1
+	BIC	R0, R1, R1
+	MSR	FPSR, R1
+	MOVW	$0, R0
 	RET
 
 // GLOBL feraiseexcept
 // .type feraiseexcept,%function
 feraiseexcept:
-	AND	w0, w0
-	MRS	x1, fpsr
-	ORR	w1, w1, w0
-	MSR	fpsr, x1
-	MOV	w0
+	AND	$0x1f, R0, R0
+	MRS	FPSR, R1
+	ORR	R0, R1, R1
+	MSR	FPSR, R1
+	MOVW	$0, R0
 	RET
 
 // GLOBL fegetenv
 // .type fegetenv,%function
 fegetenv:
-	MRS	x1, fpcr
-	MRS	x2, fpsr
-	STP	w1, w2, [x0]
-	MOV	w0
+	MRS	FPCR, R1
+	MRS	FPSR, R2
+	STP	(R1, R2), 0(R0)
+	MOVW	$0, R0
 	RET
 
 
 // GLOBL fesetenv
 // .type fesetenv,%function
 fesetenv:
-	MOV	x1
-	MOV	x2
-	CMN	x0
-	B.EQ	1f
-	LDP	w1, w2, [x0]
-1:
-	MSR	fpcr, x1
-	MSR	fpsr, x2
-	MOV	w0
+	MOVD	$0, R1
+	MOVD	$0, R2
+	CMN	$1, R0
+	BEQ	.Lnum1_0
+	LDP	0(R0), (R1, R2)
+.Lnum1_0:
+	MSR	FPCR, R1
+	MSR	FPSR, R2
+	MOVW	$0, R0
 	RET
-
-

@@ -3,179 +3,177 @@
 // GLOBL feclearexcept
 // .type feclearexcept,@function
 feclearexcept:
-	MOV	4(SP), CX
-	AND	$0x3f, CX
-	FNSTSW	AX
+	MOVL	4(SP), CX
+	ANDL	$0x3f, CX
+	FSTSW	AX
 
-	CALL	1f
-1:
+	CALLL	.Lnum1_0
+.Lnum1_0:
 	ADDL	$__hwcap-1b, (SP)
-	POP	DX
+	POPL	DX
 	TESTL	(DX), $0x02000000
-	JEQ	2f
+	JEQ	.Lnum2_0
 
-	TEST	AX, CX
-	JEQ	1f
-	FNCLEX
-1:
-	PUSH	DX
+	TESTL	AX, CX
+	JEQ	.Lnum1_1
+	FCLEX
+.Lnum1_1:
+	PUSHL	DX
 	STMXCSR	(SP)
-	POP	DX
-	AND	$0x3f, AX
-	OR	AX, DX
-	TEST	DX, CX
-	JEQ	1f
-	NOT	CX
-	AND	CX, DX
-	PUSH	DX
+	POPL	DX
+	ANDL	$0x3f, AX
+	ORL	AX, DX
+	TESTL	DX, CX
+	JEQ	.Lnum1_2
+	NOTL	CX
+	ANDL	CX, DX
+	PUSHL	DX
 	LDMXCSR	(SP)
-	POP	DX
-1:
-	XOR	AX, AX
+	POPL	DX
+.Lnum1_2:
+	XORL	AX, AX
 	RET
 
-2:
-	TEST	AX, CX
-	JEQ	1b
-	NOT	CX
-	AND	CX, AX
-	TEST	AX, $0x3f
-	JEQ	1f
-	FNCLEX
-	JMP	1b
-1:
-	SUB	$32, SP
-	FNSTENV	(SP)
-	MOV	AL, 4(SP)
+.Lnum2_0:
+	TESTL	AX, CX
+	JEQ	.Lnum1_2
+	NOTL	CX
+	ANDL	CX, AX
+	TESTL	AX, $0x3f
+	JEQ	.Lnum1_3
+	FCLEX
+	JMPL	.Lnum1_2
+.Lnum1_3:
+	SUBL	$32, SP
+	FSTENV	(SP)
+	MOVB	AL, 4(SP)
 	FLDENV	(SP)
-	ADD	$32, SP
-	XOR	AX, AX
+	ADDL	$32, SP
+	XORL	AX, AX
 	RET
 
 // GLOBL feraiseexcept
 // .type feraiseexcept,@function
 feraiseexcept:
-	MOV	4(SP), AX
-	AND	$0x3f, AX
-	SUB	$32, SP
-	FNSTENV	(SP)
-	OR	AL, 4(SP)
+	MOVL	4(SP), AX
+	ANDL	$0x3f, AX
+	SUBL	$32, SP
+	FSTENV	(SP)
+	ORB	AL, 4(SP)
 	FLDENV	(SP)
-	ADD	$32, SP
-	XOR	AX, AX
+	ADDL	$32, SP
+	XORL	AX, AX
 	RET
 
 // GLOBL __fesetround
 // .hidden __fesetround
 // .type __fesetround,@function
 __fesetround:
-	MOV	4(SP), CX
-	PUSH	AX
-	XOR	AX, AX
-	FNSTCW	(SP)
+	MOVL	4(SP), CX
+	PUSHL	AX
+	XORL	AX, AX
+	FSTCW	(SP)
 	ANDB	$0xf3, 1(SP)
-	OR	CH, 1(SP)
+	ORB	CH, 1(SP)
 	FLDCW	(SP)
 
-	CALL	1f
-1:
+	CALLL	.Lnum1_4
+.Lnum1_4:
 	ADDL	$__hwcap-1b, (SP)
-	POP	DX
+	POPL	DX
 	TESTL	(DX), $0x02000000
-	JEQ	1f
+	JEQ	.Lnum1_5
 	STMXCSR	(SP)
-	SHL	$3, CH
+	SHLB	$3, CH
 	ANDB	$0x9f, 1(SP)
-	OR	CH, 1(SP)
+	ORB	CH, 1(SP)
 	LDMXCSR	(SP)
-1:
-	POP	CX
+.Lnum1_5:
+	POPL	CX
 	RET
 
 // GLOBL fegetround
 // .type fegetround,@function
 fegetround:
-	PUSH	AX
-	FNSTCW	(SP)
-	POP	AX
-	AND	$0xc00, AX
+	PUSHL	AX
+	FSTCW	(SP)
+	POPL	AX
+	ANDL	$0xc00, AX
 	RET
 
 // GLOBL fegetenv
 // .type fegetenv,@function
 fegetenv:
-	MOV	4(SP), CX
-	XOR	AX, AX
-	FNSTENV	(CX)
+	MOVL	4(SP), CX
+	XORL	AX, AX
+	FSTENV	(CX)
 
-	CALL	1f
-1:
+	CALLL	.Lnum1_6
+.Lnum1_6:
 	ADDL	$__hwcap-1b, (SP)
-	POP	DX
+	POPL	DX
 	TESTL	(DX), $0x02000000
-	JEQ	1f
-	PUSH	AX
+	JEQ	.Lnum1_7
+	PUSHL	AX
 	STMXCSR	(SP)
-	POP	DX
-	AND	$0x3f, DX
-	OR	DX, 4(CX)
-1:
+	POPL	DX
+	ANDL	$0x3f, DX
+	ORL	DX, 4(CX)
+.Lnum1_7:
 	RET
 
 // GLOBL fesetenv
 // .type fesetenv,@function
 fesetenv:
-	MOV	4(SP), CX
-	XOR	AX, AX
-	INC	CX
-	JEQ	1f
+	MOVL	4(SP), CX
+	XORL	AX, AX
+	INCL	CX
+	JEQ	.Lnum1_8
 	FLDENV	-1(CX)
 	MOVL	-1(CX), CX
-	JMP	2f
-1:
-	PUSH	AX
-	PUSH	AX
-	PUSH	AX
-	PUSH	AX
+	JMPL	.Lnum2_1
+.Lnum1_8:
+	PUSHL	AX
+	PUSHL	AX
+	PUSHL	AX
+	PUSHL	AX
 	PUSHL	$0xffff
-	PUSH	AX
+	PUSHL	AX
 	PUSHL	$0x37f
 	FLDENV	(SP)
-	ADD	$28, SP
+	ADDL	$28, SP
 
-2:
-	CALL	1f
-1:
+.Lnum2_1:
+	CALLL	.Lnum1_9
+.Lnum1_9:
 	ADDL	$__hwcap-1b, (SP)
-	POP	DX
+	POPL	DX
 	TESTL	(DX), $0x02000000
-	JEQ	1f
+	JEQ	.Lnum1_10
 
-	AND	$0xc00, CX
-	SHL	$3, CX
-	OR	$0x1f80, CX
-	MOV	CX, 4(SP)
+	ANDL	$0xc00, CX
+	SHLL	$3, CX
+	ORL	$0x1f80, CX
+	MOVL	CX, 4(SP)
 	LDMXCSR	4(SP)
-1:
+.Lnum1_10:
 	RET
 
 // GLOBL fetestexcept
 // .type fetestexcept,@function
 fetestexcept:
-	MOV	4(SP), CX
-	AND	$0x3f, CX
-	FNSTSW	AX
+	MOVL	4(SP), CX
+	ANDL	$0x3f, CX
+	FSTSW	AX
 
-	CALL	1f
-1:
+	CALLL	.Lnum1_11
+.Lnum1_11:
 	ADDL	$__hwcap-1b, (SP)
-	POP	DX
+	POPL	DX
 	TESTL	(DX), $0x02000000
-	JEQ	1f
+	JEQ	.Lnum1_12
 	STMXCSR	4(SP)
-	OR	4(SP), AX
-1:
-	AND	CX, AX
+	ORL	4(SP), AX
+.Lnum1_12:
+	ANDL	CX, AX
 	RET
-
-
