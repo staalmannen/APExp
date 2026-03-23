@@ -3,7 +3,7 @@ APEXPROOT=../../../../..
 TARG=byacc
 BIN=$APEXPROOT/$objtype/bin/ape
 HFILES=config.h
-LIB=$APEXPROOT/$objtype/lib/ape/libap.a $APEXPROOT/$objtype/lib/ape/libutf.a
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=	closure.$O\
 		error.$O\
 		graph.$O\

@@ -21,7 +21,12 @@ _ARCHS=	386\
 
 all:V:
 
+# we still have the issue with missing _apemain
+# still do the hack of copying host libap.a first
+
 install:V:
+	rm -f $objtype/lib/ape/libap.a
+	cp /$objtype/lib/ape/libap.a $objtype/lib/ape/
 	for (i in $_ARCHS)
 		@{ mkdir -p $i/lib/ape/ ; mkdir -p $i/bin/ape }
 	mkdir -p sys/man/1

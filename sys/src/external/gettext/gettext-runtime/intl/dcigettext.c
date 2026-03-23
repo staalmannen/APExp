@@ -1,5 +1,5 @@
 /* Implementation of the internal dcigettext function.
-   Copyright (C) 1995-2023 Free Software Foundation, Inc.
+   Copyright (C) 1995-2023 Free Software Foundation, Inc. pcpy
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -62,6 +62,23 @@ extern int errno;
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+
+#define mempcpy __mempcpy
+#define stpcpy __stpcpy
+
+static char *__stpcpy(char * dest, const char *src)
+{
+	while ((*dest++ = *src++) != '\0')
+		/* do nothing */
+	return dest -1;
+}
+
+
+static void *__mempcpy(void *dest, const void *src, size_t n)
+{
+	return (void *) ((char *) __mempcpy(dest, src, n) + n);
+}
+
 
 #if defined HAVE_UNISTD_H || defined _LIBC
 # include <unistd.h>

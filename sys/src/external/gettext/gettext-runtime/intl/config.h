@@ -1,4 +1,4 @@
-/* config.h.  Generated from config.h.in by configure.  */
+/* config.h.  Generated from config.h.in by configure. PCPY */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Witness that <config.h> has been included.  */
@@ -421,7 +421,7 @@
 #define HAVE_MBSTATE_T 1
 
 /* Define to 1 if you have the 'mempcpy' function. */
-/* #undef HAVE_MEMPCPY */
+#define HAVE_MEMPCPY 1
 
 /* Define to 1 if you have the <minix/config.h> header file. */
 /* #undef HAVE_MINIX_CONFIG_H */
@@ -508,7 +508,7 @@
 #define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the 'stpcpy' function. */
-/* #undef HAVE_STPCPY */
+#define HAVE_STPCPY 1
 
 /* Define to 1 if you have the 'strcasecmp' function. */
 #define HAVE_STRCASECMP 1

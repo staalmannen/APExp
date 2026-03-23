@@ -7,7 +7,7 @@
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   but WITHOUT ANY WARRANTY; without even the implied warranty of pcpy
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU Lesser General Public License for more details.
 
@@ -56,6 +56,17 @@
 #else
 # include "filename.h"
 #endif
+
+
+#define stpcpy __stpcpy
+
+static char *__stpcpy(char * dest, const char *src)
+{
+	while ((*dest++ = *src++) != '\0')
+		/* do nothing */
+	return dest -1;
+}
+
 
 /* Return number of bits set in X.  */
 #ifndef ARCH_POP

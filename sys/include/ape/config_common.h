@@ -403,7 +403,7 @@
 #define HAVE_MEMMOVE 1
 
 /* Define to 1 if you have the `mempcpy' function. */
-#undef HAVE_MEMPCPY
+#define HAVE_MEMPCPY 1
 
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
