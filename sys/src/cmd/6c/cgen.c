@@ -19,7 +19,7 @@ cgen(Node *n, Node *nn)
 	}
 	if(n == Z || n->type == T)
 		return;
-	if(typesu[n->type->etype]) {
+	if(typesu[n->type->etype] || iscmplx(n->type->etype)) {
 		sugen(n, nn, n->type->width);
 		return;
 	}
@@ -47,7 +47,7 @@ cgen(Node *n, Node *nn)
 	if(r != Z && r->complex >= FNX)
 	switch(o) {
 	default:
-		if(cond(o) && typesu[l->type->etype])
+		if(cond(o) && (typesu[l->type->etype] || iscmplx(l->type->etype)))
 			break;
 
 		regret(&nod, r);
@@ -1018,7 +1018,8 @@ cgen(Node *n, Node *nn)
 			cgen(l, nn);
 			break;
 		}
-		if(ewidth[n->type->etype] < ewidth[l->type->etype]){
+		if(!iscmplx(n->type->etype) && !iscmplx(l->type->etype) &&
+		   ewidth[n->type->etype] < ewidth[l->type->etype]){
 			if(l->type->etype == TIND && typechlp[n->type->etype])
 				warn(n, "conversion of pointer to shorter integer");
 		}else if(0){
