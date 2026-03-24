@@ -317,7 +317,7 @@ loop2:
 	
 	nregion = 0;
 	if(region == nil){
-		maxregion = 300;
+		maxregion = 600;
 		region = alloc(maxregion * sizeof(Rgn));
 	}
 	for(r = firstr; r != R; r = r->link) {
