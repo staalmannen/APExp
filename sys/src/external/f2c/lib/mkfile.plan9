@@ -129,6 +129,7 @@ xwsne.$O:	fmt.h
 # we need to remove an old copy sometimes.
 arith.h: arithchk.c
 	rm -f arithchk
+	rm -f aruthchk.$O
 	pcc -DNO_FPINIT -o arithchk arithchk.c
 	arithchk >$target
 	rm arithchk

@@ -1624,7 +1624,7 @@ int	typeuinit[] =
 char	typesuv[NCTYPE];
 int	typesuvinit[] =
 {
-	TVLONG, TUVLONG, TSTRUCT, TUNION, TCFLOAT, TCDOUBLE, -1,
+	TSTRUCT, TUNION, TCFLOAT, TCDOUBLE, -1,
 };
 
 char	typeilp[NTYPE];
