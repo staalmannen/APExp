@@ -1006,8 +1006,8 @@ ncu:
 		goto ncu;
 	}
 	/* GCC imaginary suffix: consume trailing 'i' or 'j' */
-	if(c == 'i' || c == 'j')
-		c = GETC();
+	/* if(c == 'i' || c == 'j')
+		c = GETC(); */
 	*cp = 0;
 	peekc = c;
 
