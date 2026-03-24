@@ -71,7 +71,7 @@ announce(char *addr, char *dir)
  *  listen for an incoming call
  */
 int
-listen(char *dir, char *newdir)
+p9listen(char *dir, char *newdir)
 {
 	int ctl, n, m;
 	char buf[3*NAMELEN];
@@ -112,7 +112,7 @@ listen(char *dir, char *newdir)
  *  accept a call, return an fd to the open data file
  */
 int
-accept(int ctl, char *dir)
+p9accept(int ctl, char *dir)
 {
 	char buf[128];
 	char *num;

@@ -67,7 +67,6 @@ OFILES=\
 	vasprintf.$O\
 	fmemopen.$O\
 	getdelim.$O\
-	getline.$O\
 # hacks \
 	dprintf.$O\
 

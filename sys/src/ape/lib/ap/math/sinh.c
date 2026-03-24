@@ -8,8 +8,6 @@
 	A series is used for arguments smaller in magnitude than 0.5.
 	The coefficients are #2029 from Hart & Cheney. (20.36D)
 
-	cosh(arg) is computed from the exponential function for
-	all arguments.
 */
 
 #include <math.h>
@@ -55,17 +53,5 @@ sinh(double arg)
 	return sign*temp;
 }
 
-double
-cosh(double arg)
-{
-	if(arg < 0)
-		arg = - arg;
-	if(arg > 21) {
-		if(arg >= HUGE_VAL){
-			errno = ERANGE;
-			return HUGE_VAL;
-		} else
-			return(exp(arg)/2);
-	}
-	return (exp(arg) + exp(-arg))/2;
-}
+/ * cosh deleted, replaced by musl function */
+

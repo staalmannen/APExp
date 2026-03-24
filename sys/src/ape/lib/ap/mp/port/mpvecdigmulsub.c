@@ -39,31 +39,37 @@ mpdigmul(mpdigit a, mpdigit b, mpdigit *p)
 }
 
 // prereq: p must have room for n+1 digits
-void
-mpvecdigmuladd(mpdigit *b, int n, mpdigit m, mpdigit *p)
+int
+mpvecdigmulsub(mpdigit *b, int n, mpdigit m, mpdigit *p)
 {
 	int i;
-	mpdigit carry, x, y, part[2];
+	mpdigit x, y, part[2], borrow;
 
-	carry = 0;
+	borrow = 0;
 	part[1] = 0;
 	for(i = 0; i < n; i++){
-		x = part[1] + carry;
-		if(x < carry)
-			carry = 1;
+		x = *p;
+		y = x - borrow;
+		if(y > x)
+			borrow = 1;
 		else
-			carry = 0;
-		y = *p;
+			borrow = 0;
+		x = part[1];
 		mpdigmul(*b++, m, part);
 		x += part[0];
 		if(x < part[0])
-			carry++;
-		x += y;
-		if(x < y)
-			carry++;
+			borrow++;
+		x = y - x;
+		if(x > y)
+			borrow++;
 		*p++ = x;
 	}
-	*p = part[1] + carry;
+
+	x = *p;
+	y = x - borrow - part[1];
+	*p = y;
+	if(y > x)
+		return -1;
+	else
+		return 1;
 }
-
-

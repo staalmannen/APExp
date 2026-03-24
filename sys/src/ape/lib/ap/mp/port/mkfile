@@ -25,6 +25,7 @@ FILES=\
 	mpvecadd\
 	mpvecsub\
 	mpvecdigmuladd\
+	mpvecdigmulsub\
 	mpveccmp\
 	mpvectscmp\
 	mpdigdiv\

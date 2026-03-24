@@ -2,7 +2,7 @@
 
 #define	N	256
 
-char*
+static char*
 strtok_r(char *s, const char *b, char **last)
 {
 	char map[N], *os;

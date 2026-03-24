@@ -69,7 +69,7 @@ sigsetjmp(sigjmp_buf buf, int savemask)
 /*
  * BUG: improper handling of process signal mask
  */
-int
+static int
 sigaction(int sig, struct sigaction *act, struct sigaction *oact)
 {
 	if(sig <= 0 || sig > MAXSIG || sig == SIGKILL){
