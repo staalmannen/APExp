@@ -53,5 +53,5 @@ sinh(double arg)
 	return sign*temp;
 }
 
-/ * cosh deleted, replaced by musl function */
+/* cosh deleted, replaced by musl function */
 

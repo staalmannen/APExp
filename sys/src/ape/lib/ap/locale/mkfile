@@ -5,6 +5,7 @@ LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 	locale.$O\
 # musl \
+	__lctrans.$O\
 	catclose.$O\
 	catgets.$O\
 	catopen.$O\

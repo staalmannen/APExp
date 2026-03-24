@@ -66,27 +66,6 @@ sigsetjmp(sigjmp_buf buf, int savemask)
 }
 */
 
-/*
- * BUG: improper handling of process signal mask
- */
-static int
-sigaction(int sig, struct sigaction *act, struct sigaction *oact)
-{
-	if(sig <= 0 || sig > MAXSIG || sig == SIGKILL){
-		errno = EINVAL;
-		return -1;
-	}
-	if(oact){
-		oact->sa_handler = _sighdlr[sig];
-		oact->sa_mask = _psigblocked;
-		oact->sa_flags = 0;
-	}
-	if(act){
-		_sighdlr[sig] = act->sa_handler;
-	}
-	return 0;
-}
-
 /* this is registered in _envsetup */
 int
 _notehandler(Ureg *u, char *msg)

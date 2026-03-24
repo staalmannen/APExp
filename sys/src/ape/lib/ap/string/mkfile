@@ -45,6 +45,8 @@ OFILES=\
 	bcopy.$O\
 	bzero.$O\
 	index.$O\
+	memcpy.$O\
+	mempcpy.$O\
 	memmem.$O\
 	memrchr.$O\
 	strcasestr.$O\

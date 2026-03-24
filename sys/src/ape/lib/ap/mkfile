@@ -42,7 +42,7 @@ DIRS=\
 	thread\
 	time\
 	unistd\
-	wchar
+	wchar\
 
 
 default:V:	all

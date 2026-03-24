@@ -3,7 +3,7 @@
 #define	N	256
 
 static char*
-strtok_r(char *s, const char *b, char **last)
+__strtok_r(char *s, const char *b, char **last)
 {
 	char map[N], *os;
 
@@ -32,5 +32,5 @@ strtok(char *s, const char *b)
 {
 	static char *under_rock;
 
-	return strtok_r(s, b, &under_rock);
+	return __strtok_r(s, b, &under_rock);
 }
