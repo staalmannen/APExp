@@ -2,7 +2,8 @@
 
 APEXPROOT=.
 
-DIRS=	sys/src/cmd\
+DIRS= \
+		sys/src/cmd\
 		sys/src/ape/9src\
 		sys/src/ape/lib\
 		sys/src/ape/cmd

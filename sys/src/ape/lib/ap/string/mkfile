@@ -69,4 +69,4 @@ OFILES=\
 
 CFLAGS=$CFLAGS -c -I$APEXPROOT/sys/include/ape -I../include\
 	-I$APEXPROOT/$objtype/include/ape -D_POSIX_SOURCE\
-	-D_BSD_EXTENSION -D_PLAN9_SOURCE -I../plan9
+	-D_BSD_EXTENSION -D_PLAN9_SOURCE -I../plan9 -I../stdio

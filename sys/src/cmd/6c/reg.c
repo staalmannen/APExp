@@ -38,7 +38,7 @@ regopt(Prog *p)
 	Rgn *rgp;
 	Reg *r, *r1, *r2;
 	Prog *p1;
-	int i, z, nregion;
+	int i, z, nregion = 0;
 	long initpc, val, npc;
 	ulong vreg;
 	Bits bit;
@@ -507,7 +507,7 @@ loop2:
 		r->act = zbits;
 	nregion = 0;
 	if(region == nil){
-		maxregion = 300;
+		maxregion = 600;
 		region = alloc(maxregion * sizeof(Rgn));
 	}
 	for(r = firstr; r != R; r = r->link) {

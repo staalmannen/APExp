@@ -1005,9 +1005,6 @@ ncu:
 		c1 |= Numlong;
 		goto ncu;
 	}
-	/* GCC imaginary suffix: consume trailing 'i' or 'j' */
-	/* if(c == 'i' || c == 'j')
-		c = GETC(); */
 	*cp = 0;
 	peekc = c;
 
@@ -1131,15 +1128,6 @@ caseout:
 		c = GETC();
 		c1 |= Numflt;
 	}
-	/*
-	 * GCC imaginary literal suffix: 1.0fi, 1.0i, 1.0Li etc.
-	 * Consume the trailing 'i' or 'j' and treat as a plain
-	 * real constant (imaginary literals are not supported, but
-	 * silently accepting them avoids spurious LNAME(i) tokens
-	 * that corrupt the parse stream).
-	 */
-	if(c == 'i' || c == 'j')
-		c = GETC();
 	*cp = 0;
 	peekc = c;
 	yylval.dval = strtod(symb, nil);
