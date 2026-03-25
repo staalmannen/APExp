@@ -17,6 +17,7 @@ OFILES=\
 	wctrans.$O\
 	wctype.$O\
 	wcwidth.$O\
+	internal.$O\
 
 HFILES=\
 	$APEXPROOT/sys/include/ape/utf.h\
