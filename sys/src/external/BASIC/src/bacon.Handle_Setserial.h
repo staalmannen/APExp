@@ -1,116 +1,59 @@
 /* Created with Shell BaCon 5.0.3 - (c) Peter van Eerten - MIT License */
-#undef __b2c__exitval
-#define __b2c__exitval
-void Handle_Setserial( char *__b2c_arg__b2c__string_var) {
- char*arg__b2c__string_var = NULL; arg__b2c__string_var = __b2c_Copy_String(NULL, __b2c_arg__b2c__string_var); __b2c__catch_set_backup = __b2c__catch_set; __b2c__catch_set = 0;
-#line 3491 "bacon.bac"
-char *desc__b2c__string_var = NULL;
-char *value__b2c__string_var = NULL;
-static char *param__b2c__string_var  = NULL;
-param__b2c__string_var  = __b2c_Copy_String(param__b2c__string_var ,  "0");
-static char *not__b2c__string_var  = NULL;
-not__b2c__string_var  = __b2c_Copy_String(not__b2c__string_var ,  "0");
-long which = 0;
-#line 3494 "bacon.bac"
-if( NOT(REGEX(arg__b2c__string_var, " IMODE | OMODE | CMODE | LMODE | OTHER | SPEED ")) ){
-#line 3495 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: no mode specified in SETSERIAL statement at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 3496 "bacon.bac"
-exit(1);
-#line 3497 "bacon.bac"
-}
-#line 3499 "bacon.bac"
-desc__b2c__string_var = __b2c_Copy_String(desc__b2c__string_var, (char*) LEFT__b2c__string_var(arg__b2c__string_var, INSTR(arg__b2c__string_var, " ")));
-#line 3502 "bacon.bac"
-if( INSTR(arg__b2c__string_var, " OTHER ") ){
-#line 3503 "bacon.bac"
-value__b2c__string_var = F_MID__b2c__string_var(value__b2c__string_var,arg__b2c__string_var, INSTRREV(arg__b2c__string_var, "OTHER ")+6);
-#line 3504 "bacon.bac"
-} else if( INSTR(arg__b2c__string_var, " SPEED ") ){
-#line 3505 "bacon.bac"
-value__b2c__string_var = F_MID__b2c__string_var(value__b2c__string_var,arg__b2c__string_var, INSTRREV(arg__b2c__string_var, "SPEED ")+6);
-#line 3506 "bacon.bac"
-} else {
-#line 3507 "bacon.bac"
-value__b2c__string_var = F_MID__b2c__string_var(value__b2c__string_var,arg__b2c__string_var, INSTRREV(arg__b2c__string_var, "MODE ")+5);
-#line 3508 "bacon.bac"
-}
-#line 3510 "bacon.bac"
-if( INSTR(arg__b2c__string_var, "IMODE") ){
-#line 3511 "bacon.bac"
-which=(
-long)( 0);
-#line 3512 "bacon.bac"
-} else if( INSTR(arg__b2c__string_var, "OMODE") ){
-#line 3513 "bacon.bac"
-which=(
-long)( 1);
-#line 3514 "bacon.bac"
-} else if( INSTR(arg__b2c__string_var, "CMODE") ){
-#line 3515 "bacon.bac"
-which=(
-long)( 2);
-#line 3516 "bacon.bac"
-} else if( INSTR(arg__b2c__string_var, "LMODE") ){
-#line 3517 "bacon.bac"
-which=(
-long)( 3);
-#line 3518 "bacon.bac"
-} else if( INSTR(arg__b2c__string_var, "OTHER") ){
-#line 3519 "bacon.bac"
-which=(
-long)( 4);
-#line 3520 "bacon.bac"
-param__b2c__string_var = __b2c_Copy_String(param__b2c__string_var, (char*) TOKEN__b2c__string_var(value__b2c__string_var, 1, "="));
-#line 3521 "bacon.bac"
-value__b2c__string_var = __b2c_Copy_String(value__b2c__string_var, (char*) TOKEN__b2c__string_var(value__b2c__string_var, 2, "="));
-#line 3522 "bacon.bac"
-} else if( INSTR(arg__b2c__string_var, "SPEED") ){
-#line 3523 "bacon.bac"
-which=(
-long)( 5);
-#line 3524 "bacon.bac"
-}
-#line 3526 "bacon.bac"
-if( INSTR(value__b2c__string_var, "~") ){
-not__b2c__string_var = __b2c_Copy_String(not__b2c__string_var, (char*) "1");
-}
-#line 3528 "bacon.bac"
-__b2c__assign = (char*)"ERROR = __b2c_setserial("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) desc__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( which), g_CFILE);
-__b2c__assign = (char*) ", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) param__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) value__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) not__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 3529 "bacon.bac"
-__b2c__assign = (char*)"if(ERROR){ RUNTIMEERROR(\"SETSERIAL\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 3531 "bacon.bac"
-if( __b2c__STRCMP(g_CATCHGOTO__b2c__string_var ,  "__B2C__PROGRAM__EXIT") == 0 ){
-g_CATCH_USED=(long)( 1);
-}
-#line 3533 "bacon.bac"
+#undef b2c_exitval
+#define b2c_exitval
+void Handle_Setserial( char *arg_in) {
+    char*arg = NULL; arg = b2c_CopyString(NULL, arg_in); b2c_catch_set_backup = b2c_catch_set; b2c_catch_set = 0;
+    char *desc = NULL;
+    char *value = NULL;
+    static char *param  = NULL;
+    param  = b2c_CopyString(param ,  "0");
+    static char *not  = NULL;
+    not  = b2c_CopyString(not ,  "0");
+    long which = 0;
+    if( NOT(REGEX(arg, " IMODE | OMODE | CMODE | LMODE | OTHER | SPEED ")) ){
+    fprintf(stderr, "%sSyntax error: no mode specified in SETSERIAL statement at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+        exit(1);
+    }
+    desc = b2c_CopyString(desc, (char*) LEFT(arg, INSTR(arg, " ")));
+    if( INSTR(arg, " OTHER ") ){
+        value = F_MID(value,arg, INSTRREV(arg, "OTHER ")+6);
+    } else if( INSTR(arg, " SPEED ") ){
+        value = F_MID(value,arg, INSTRREV(arg, "SPEED ")+6);
+    } else {
+        value = F_MID(value,arg, INSTRREV(arg, "MODE ")+5);
+    }
+    if( INSTR(arg, "IMODE") ){
+        which=(
+        long)( 0);
+    } else if( INSTR(arg, "OMODE") ){
+        which=(
+        long)( 1);
+    } else if( INSTR(arg, "CMODE") ){
+        which=(
+        long)( 2);
+    } else if( INSTR(arg, "LMODE") ){
+        which=(
+        long)( 3);
+    } else if( INSTR(arg, "OTHER") ){
+        which=(
+        long)( 4);
+        param = b2c_CopyString(param, (char*) TOKEN(value, 1, "="));
+        value = b2c_CopyString(value, (char*) TOKEN(value, 2, "="));
+    } else if( INSTR(arg, "SPEED") ){
+        which=(
+        long)( 5);
+    }
+    if( INSTR(value, "~") ){
+        not = b2c_CopyString(not, (char*) "1");
+    }
+fprintf(g_CFILE, "ERROR = __b2c_setserial(%s, %s, %s, %s, %s);\n", desc, STR( which), param, value, not);
+fprintf(g_CFILE, "if(ERROR){ RUNTIMEERROR(\"SETSERIAL\", %s, \"%s\", ERROR, %s); }\n", STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+    if( __b2c__STRCMP(g_CATCHGOTO ,  "__B2C__PROGRAM__EXIT") == 0 ){
+        g_CATCH_USED=(long)( 1);
+    }
 
-__b2c__STRFREE(arg__b2c__string_var);
-__b2c__STRFREE(desc__b2c__string_var);
-__b2c__STRFREE(value__b2c__string_var);
-__b2c__catch_set = __b2c__catch_set_backup;
+    __b2c__STRFREE(arg);
+    __b2c__STRFREE(desc);
+    __b2c__STRFREE(value);
+    b2c_catch_set = b2c_catch_set_backup;
 }

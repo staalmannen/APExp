@@ -1,140 +1,63 @@
 /* Created with Shell BaCon 5.0.3 - (c) Peter van Eerten - MIT License */
-#undef __b2c__exitval
-#define __b2c__exitval
-void Handle_Putbyte( char *__b2c_arg__b2c__string_var) {
- char*arg__b2c__string_var = NULL; arg__b2c__string_var = __b2c_Copy_String(NULL, __b2c_arg__b2c__string_var); __b2c__catch_set_backup = __b2c__catch_set; __b2c__catch_set = 0; char **match__b2c__string_var = NULL; long match__b2c__string_var__b2c_array = 0;
-#line 1051 "bacon.bac"
-char *var__b2c__string_var = NULL;
-char *to__b2c__string_var = NULL;
-char *size__b2c__string_var = NULL;
-char *type__b2c__string_var = NULL;
-char *chunk__b2c__string_var = NULL;
-long total = 0;
-#line 1054 "bacon.bac"
-if( NOT(ISTOKEN(arg__b2c__string_var, "TO")) ){
-#line 1055 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: missing TO in PUTBYTE statement at line at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 1056 "bacon.bac"
-exit(1);
-#line 1057 "bacon.bac"
-}
-#line 1060 "bacon.bac"
-if( MATCH(COLLAPSE__b2c__string_var(arg__b2c__string_var), "* CHUNK *") ){
-#line 1061 "bacon.bac"
-__b2c__parse(&match__b2c__string_var, 1, &match__b2c__string_var__b2c_array, COLLAPSE__b2c__string_var(arg__b2c__string_var), "PUTBYTE * TO * CHUNK * SIZE *", __b2c__option_delim);
-total = match__b2c__string_var__b2c_array;
-#line 1062 "bacon.bac"
-chunk__b2c__string_var = __b2c_Copy_String(chunk__b2c__string_var, (char*) match__b2c__string_var[(uint64_t)3]);
-#line 1063 "bacon.bac"
-size__b2c__string_var = __b2c_Copy_String(size__b2c__string_var, (char*) IIF__b2c__string_var((total )> 3, match__b2c__string_var[(uint64_t)4]));
-#line 1064 "bacon.bac"
-arg__b2c__string_var = __b2c_Copy_String(arg__b2c__string_var, (char*) HEAD__b2c__string_var(arg__b2c__string_var, ISTOKEN(arg__b2c__string_var, "CHUNK")-1));
-#line 1065 "bacon.bac"
-} else if( MATCH(COLLAPSE__b2c__string_var(arg__b2c__string_var), "* SIZE *") ){
-#line 1066 "bacon.bac"
-__b2c__parse(&match__b2c__string_var, 1, &match__b2c__string_var__b2c_array, COLLAPSE__b2c__string_var(arg__b2c__string_var), "PUTBYTE * TO * SIZE *", __b2c__option_delim);
-#line 1067 "bacon.bac"
-size__b2c__string_var = __b2c_Copy_String(size__b2c__string_var, (char*) match__b2c__string_var[(uint64_t)3]);
-#line 1068 "bacon.bac"
-arg__b2c__string_var = __b2c_Copy_String(arg__b2c__string_var, (char*) HEAD__b2c__string_var(arg__b2c__string_var, ISTOKEN(arg__b2c__string_var, "SIZE")-1));
-#line 1069 "bacon.bac"
-}
-#line 1070 "bacon.bac"
-__b2c__parse(&match__b2c__string_var, 1, &match__b2c__string_var__b2c_array, COLLAPSE__b2c__string_var(arg__b2c__string_var), "PUTBYTE * TO *", __b2c__option_delim);
-#line 1071 "bacon.bac"
-var__b2c__string_var = __b2c_Copy_String(var__b2c__string_var, (char*) match__b2c__string_var[(uint64_t)1]);
-#line 1072 "bacon.bac"
-to__b2c__string_var = __b2c_Copy_String(to__b2c__string_var, (char*) match__b2c__string_var[(uint64_t)2]);
-#line 1075 "bacon.bac"
-if( LEN(size__b2c__string_var) ){
-#line 1076 "bacon.bac"
-if( LEN(chunk__b2c__string_var) == 0 ){
-#line 1077 "bacon.bac"
-chunk__b2c__string_var = __b2c_Copy_String(chunk__b2c__string_var, (char*) size__b2c__string_var);
-#line 1078 "bacon.bac"
-size__b2c__string_var = __b2c_Copy_String(size__b2c__string_var, (char*) "__b2c__counter");
-#line 1079 "bacon.bac"
-}
-#line 1080 "bacon.bac"
-} else {
-#line 1081 "bacon.bac"
-if( LEN(chunk__b2c__string_var) == 0 ){
-chunk__b2c__string_var = __b2c_Copy_String(chunk__b2c__string_var, (char*) "1");
-}
-#line 1082 "bacon.bac"
-size__b2c__string_var = __b2c_Copy_String(size__b2c__string_var, (char*) "__b2c__counter");
-#line 1083 "bacon.bac"
-}
-#line 1086 "bacon.bac"
-if( LEN(size__b2c__string_var)  AND  __b2c__STRCMP(size__b2c__string_var ,  "__b2c__counter") != 0 ){
-Register_Numeric(size__b2c__string_var, "default");
-}
-#line 1089 "bacon.bac"
-type__b2c__string_var = __b2c_Copy_String(type__b2c__string_var, (char*) Get_Var__b2c__string_var(to__b2c__string_var, g_FUNCNAME__b2c__string_var));
-#line 1092 "bacon.bac"
-__b2c__assign = (char*)"if(!__b2c__memory__check((char*)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) var__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"PUTBYTE\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 1093 "bacon.bac"
-if( INSTR(type__b2c__string_var, "int") ){
-#line 1094 "bacon.bac"
-__b2c__assign = (char*)"if(("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) size__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = write("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) to__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", (void*)("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) var__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "), "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) chunk__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")) < 0) { ERROR = 34; RUNTIMEERROR(\"PUTBYTE\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 1095 "bacon.bac"
-} else {
-#line 1096 "bacon.bac"
-__b2c__assign = (char*)size__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = fwrite((void*)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) var__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", sizeof(__b2c__MEMTYPE), "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) chunk__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) to__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); fflush("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) to__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 1097 "bacon.bac"
-}
-#line 1098 "bacon.bac"
-if( __b2c__STRCMP(g_CATCHGOTO__b2c__string_var ,  "__B2C__PROGRAM__EXIT") == 0 ){
-g_CATCH_USED=(long)( 1);
-}
-#line 1100 "bacon.bac"
- __b2c__free_str_array_members(&match__b2c__string_var, 1, match__b2c__string_var__b2c_array);
-__b2c__STRFREE(arg__b2c__string_var);
-__b2c__STRFREE(var__b2c__string_var);
-__b2c__STRFREE(to__b2c__string_var);
-__b2c__STRFREE(size__b2c__string_var);
-__b2c__STRFREE(type__b2c__string_var);
-__b2c__STRFREE(chunk__b2c__string_var);
-__b2c__STRFREE(match__b2c__string_var);
-__b2c__catch_set = __b2c__catch_set_backup;
+#undef b2c_exitval
+#define b2c_exitval
+void Handle_Putbyte( char *arg_in) {
+    char*arg = NULL; arg = b2c_CopyString(NULL, arg_in); b2c_catch_set_backup = b2c_catch_set; b2c_catch_set = 0; char **match = NULL; long match__b2c_array = 0;
+    char *var = NULL;
+    char *to = NULL;
+    char *size = NULL;
+    char *type = NULL;
+    char *chunk = NULL;
+    long total = 0;
+    if( NOT(ISTOKEN(arg, "TO")) ){
+    fprintf(stderr, "%sSyntax error: missing TO in PUTBYTE statement at line at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+        exit(1);
+    }
+    if( MATCH(COLLAPSE(arg), "* CHUNK *") ){
+        b2c_parse(&match, 1, &match__b2c_array, COLLAPSE(arg), "PUTBYTE * TO * CHUNK * SIZE *", b2c_option_delim);
+        total = match__b2c_array;
+        chunk = b2c_CopyString(chunk, (char*) match[(uint64_t)3]);
+        size = b2c_CopyString(size, (char*) IIF((total )> 3, match[(uint64_t)4]));
+        arg = b2c_CopyString(arg, (char*) HEAD(arg, ISTOKEN(arg, "CHUNK")-1));
+    } else if( MATCH(COLLAPSE(arg), "* SIZE *") ){
+        b2c_parse(&match, 1, &match__b2c_array, COLLAPSE(arg), "PUTBYTE * TO * SIZE *", b2c_option_delim);
+        size = b2c_CopyString(size, (char*) match[(uint64_t)3]);
+        arg = b2c_CopyString(arg, (char*) HEAD(arg, ISTOKEN(arg, "SIZE")-1));
+    }
+    b2c_parse(&match, 1, &match__b2c_array, COLLAPSE(arg), "PUTBYTE * TO *", b2c_option_delim);
+    var = b2c_CopyString(var, (char*) match[(uint64_t)1]);
+    to = b2c_CopyString(to, (char*) match[(uint64_t)2]);
+    if( LEN(size) ){
+        if( LEN(chunk) == 0 ){
+            chunk = b2c_CopyString(chunk, (char*) size);
+            size = b2c_CopyString(size, (char*) "b2c_counter");
+        }
+    } else {
+        if( LEN(chunk) == 0 ){
+            chunk = b2c_CopyString(chunk, (char*) "1");
+        }
+        size = b2c_CopyString(size, (char*) "b2c_counter");
+    }
+    if( LEN(size)  AND  __b2c__STRCMP(size ,  "b2c_counter") != 0 ){
+        Register_Numeric(size, "default");
+    }
+    type = b2c_CopyString(type, (char*) Get_Var(to, g_FUNCNAME));
+fprintf(g_CFILE, "if(!b2c_memory__check((char*)%s, sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"PUTBYTE\", %s, \"%s\", ERROR, %s); }\n", var, STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+    if( INSTR(type, "int") ){
+    fprintf(g_CFILE, "if((%s = write(%s, (void*)(%s), %s)) < 0) { ERROR = 34; RUNTIMEERROR(\"PUTBYTE\", %s, \"%s\", ERROR, %s); }\n", size, to, var, chunk, STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+    } else {
+    fprintf(g_CFILE, "%s = fwrite((void*)%s, sizeof(__b2c__MEMTYPE), %s, %s); fflush(%s);\n", size, var, chunk, to, to);
+    }
+    if( __b2c__STRCMP(g_CATCHGOTO ,  "__B2C__PROGRAM__EXIT") == 0 ){
+        g_CATCH_USED=(long)( 1);
+    }
+    b2c_free_str_array_members(&match, 1, match__b2c_array);
+    __b2c__STRFREE(arg);
+    __b2c__STRFREE(var);
+    __b2c__STRFREE(to);
+    __b2c__STRFREE(size);
+    __b2c__STRFREE(type);
+    __b2c__STRFREE(chunk);
+    __b2c__STRFREE(match);
+    b2c_catch_set = b2c_catch_set_backup;
 }

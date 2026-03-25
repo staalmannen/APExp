@@ -1,163 +1,80 @@
 /* Created with Shell BaCon 5.0.3 - (c) Peter van Eerten - MIT License */
-#undef __b2c__exitval
-#define __b2c__exitval
+#undef b2c_exitval
+#define b2c_exitval
 void Handle_Endsub( void) {
- __b2c__catch_set_backup = __b2c__catch_set; __b2c__catch_set = 0; int __b2c__forin_element__b2c__string_var_ptr = 0; char* __b2c__forin_element__b2c__string_var_string = NULL; char* __b2c__forin_element__b2c__string_var_string_org = NULL; char* __b2c__forin_element__b2c__string_var_step = NULL;
-#line 2623 "bacon.bac"
-FILE* tmp_HFILE = NULL;
-#line 2624 "bacon.bac"
-char *line__b2c__string_var = NULL;
-char *element__b2c__string_var = NULL;
-char *tfil__b2c__string_var = NULL;
-#line 2627 "bacon.bac"
-if( NOT(LEN(g_FUNCNAME__b2c__string_var)) ){
-#line 2628 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: ENDSUB outside SUB at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 2629 "bacon.bac"
-exit(1);
-#line 2630 "bacon.bac"
-}
-#line 2633 "bacon.bac"
-fclose(g_CFILE);
-#line 2636 "bacon.bac"
-if( NOT(INSTR(g_PROTOTYPE__b2c__string_var, "::")) ){
-__b2c__assign = (char*)"void "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) g_PROTOTYPE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-}
-#line 2637 "bacon.bac"
-g_PROTOTYPE__b2c__string_var = __b2c_Copy_String(g_PROTOTYPE__b2c__string_var, (char*) "");
-#line 2640 "bacon.bac"
-tfil__b2c__string_var = F_MID__b2c__string_var(tfil__b2c__string_var,g_CURFILE__b2c__string_var, INSTRREV(g_CURFILE__b2c__string_var, "/") + 1);
-#line 2641 "bacon.bac"
-tmp_HFILE = fopen((const char*)CONCAT__b2c__string_var( g_TEMPDIR__b2c__string_var , "/" , LEFT__b2c__string_var(tfil__b2c__string_var, INSTR(tfil__b2c__string_var, ".bac")) , g_FUNCNAME__b2c__string_var , ".h" ), "w");
+    b2c_catch_set_backup = b2c_catch_set; b2c_catch_set = 0; int b2c_forin_element_ptr = 0; char* b2c_forin_element_string = NULL; char* b2c_forin_element_string_org = NULL; char* b2c_forin_element_step = NULL;
+    FILE* tmp_HFILE = NULL;
+    char *line = NULL;
+    char *element = NULL;
+    char *tfil = NULL;
+    if( NOT(LEN(g_FUNCNAME)) ){
+    fprintf(stderr, "%sSyntax error: ENDSUB outside SUB at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+        exit(1);
+    }
+    fclose(g_CFILE);
+    if( NOT(INSTR(g_PROTOTYPE, "::")) ){
+    fprintf(g_HFILE, "void %s;\n", g_PROTOTYPE);
+    }
+    g_PROTOTYPE = b2c_CopyString(g_PROTOTYPE, (char*) "");
+    tfil = F_MID(tfil,g_CURFILE, INSTRREV(g_CURFILE, "/") + 1);
+    tmp_HFILE = fopen((const char*)CONCAT( g_TEMPDIR , "/" , LEFT(tfil, INSTR(tfil, ".bac")) , g_FUNCNAME , ".h" ), "w");
 if(tmp_HFILE == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR WRITING", 2641, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
-#line 2644 "bacon.bac"
-__b2c__assign = (char*)"/* Created with BaCon "; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-__b2c__assign = (char*) g_VERSION__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-__b2c__assign = (char*) " - (c) Peter van Eerten - MIT License */"; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-fputs("\n", tmp_HFILE);
-#line 2645 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__exitval"; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-fputs("\n", tmp_HFILE);
-#line 2646 "bacon.bac"
-__b2c__assign = (char*)"#define __b2c__exitval"; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-fputs("\n", tmp_HFILE);
-#line 2647 "bacon.bac"
-if( INSTR(g_ORIGFUNCNAME__b2c__string_var, " (") ){
-#line 2648 "bacon.bac"
-__b2c__assign = (char*)"void "; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-__b2c__assign = (char*) g_ORIGFUNCNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-__b2c__assign = (char*) " {"; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-fputs("\n", tmp_HFILE);
-#line 2649 "bacon.bac"
-} else if( INSTR(g_ORIGFUNCNAME__b2c__string_var, "(") ){
-#line 2650 "bacon.bac"
-__b2c__assign = (char*)"void "; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-__b2c__assign = (char*) g_ORIGFUNCNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-__b2c__assign = (char*) " {"; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-fputs("\n", tmp_HFILE);
-#line 2651 "bacon.bac"
-} else {
-#line 2652 "bacon.bac"
-__b2c__assign = (char*)"void "; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-__b2c__assign = (char*) g_FUNCNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-__b2c__assign = (char*) "(void) {"; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-fputs("\n", tmp_HFILE);
-#line 2653 "bacon.bac"
-}
-#line 2656 "bacon.bac"
-__b2c__assign = (char*)g_STRINGARGS__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-fputs("\n", tmp_HFILE);
-#line 2657 "bacon.bac"
-g_CFILE = fopen((const char*)g_CFILE__b2c__string_var, "r");
+fprintf(tmp_HFILE, "/* Created with BaCon %s - (c) Peter van Eerten - MIT License */\n", g_VERSION);
+fputs("#undef b2c_exitval\n", tmp_HFILE);
+fputs("#define b2c_exitval\n", tmp_HFILE);
+    if( INSTR(g_ORIGFUNCNAME, " (") ){
+    fprintf(tmp_HFILE, "void %s {\n", g_ORIGFUNCNAME);
+    } else if( INSTR(g_ORIGFUNCNAME, "(") ){
+    fprintf(tmp_HFILE, "void %s {\n", g_ORIGFUNCNAME);
+    } else {
+    fprintf(tmp_HFILE, "void %s(void) {\n", g_FUNCNAME);
+    }
+fprintf(tmp_HFILE, "%s\n", g_STRINGARGS);
+    g_CFILE = fopen((const char*)g_CFILE, "r");
 if(g_CFILE == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR READING", 2657, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
-#line 2658 "bacon.bac"
-while( NOT(ENDFILE(g_CFILE)) ){
-#line 2659 "bacon.bac"
-__b2c__readln(&__b2c__assign, g_CFILE);
-line__b2c__string_var = __b2c_Copy_String(line__b2c__string_var, __b2c__assign);
-__b2c__STRFREE(__b2c__assign); __b2c__assign = NULL;
-#line 2660 "bacon.bac"
-if( NOT(ENDFILE(g_CFILE)) ){
-__b2c__assign = (char*)line__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-fputs("\n", tmp_HFILE);
-}
-#line 2661 "bacon.bac"
-}
-#line 2662 "bacon.bac"
-fclose(g_CFILE);
-#line 2665 "bacon.bac"
-__b2c__assign = (char*)g_STRINGARRAYS__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-fputs("\n", tmp_HFILE);
-#line 2666 "bacon.bac"
-__b2c__forin_element__b2c__string_var_string = __b2c_Copy_String(__b2c__forin_element__b2c__string_var_string, g_LOCALSTRINGS__b2c__string_var); __b2c__forin_element__b2c__string_var_string_org = __b2c__forin_element__b2c__string_var_string;
-__b2c__forin_element__b2c__string_var_step = __b2c_Copy_String(__b2c__forin_element__b2c__string_var_step, __b2c__option_delim);
-__b2c__forin_element__b2c__string_var_ptr = __b2c__for_amount(__b2c__forin_element__b2c__string_var_string, __b2c__forin_element__b2c__string_var_step);
-for(; __b2c__forin_element__b2c__string_var_ptr > 0; __b2c__forin_element__b2c__string_var_ptr--) { __b2c__for_item(&__b2c__forin_element__b2c__string_var_string_org, __b2c__forin_element__b2c__string_var_step, &element__b2c__string_var);
-#line 2667 "bacon.bac"
-if( (LEN(element__b2c__string_var) )> 0 ){
-__b2c__assign = (char*)"__b2c__STRFREE("; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-__b2c__assign = (char*) element__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-fputs("\n", tmp_HFILE);
-}
-#line 2668 "bacon.bac"
-}
-#line 2669 "bacon.bac"
-if( g_CATCH_USED == 1 ){
-__b2c__assign = (char*)"__B2C__PROGRAM__EXIT: ;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-fputs("\n", tmp_HFILE);
-}
-#line 2670 "bacon.bac"
-__b2c__assign = (char*)"__b2c__catch_set = __b2c__catch_set_backup;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-fputs("\n", tmp_HFILE);
-#line 2671 "bacon.bac"
-__b2c__assign = (char*)"}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, tmp_HFILE); }
-fputs("\n", tmp_HFILE);
-#line 2673 "bacon.bac"
-fclose(tmp_HFILE);
-#line 2676 "bacon.bac"
-if( NOT(INSTR(g_INCLUDE_FILES__b2c__string_var, CONCAT__b2c__string_var( LEFT__b2c__string_var(tfil__b2c__string_var, INSTR(tfil__b2c__string_var, ".bac")) , g_FUNCNAME__b2c__string_var , ".h") )) ){
-#line 2677 "bacon.bac"
-g_INCLUDE_FILES__b2c__string_var = F_CONCAT__b2c__string_var(g_INCLUDE_FILES__b2c__string_var, g_INCLUDE_FILES__b2c__string_var , " " , LEFT__b2c__string_var(tfil__b2c__string_var, INSTR(tfil__b2c__string_var, ".bac")) , g_FUNCNAME__b2c__string_var , ".h") ;
-#line 2678 "bacon.bac"
-}
-#line 2681 "bacon.bac"
-g_TMP_FILES__b2c__string_var = F_CONCAT__b2c__string_var(g_TMP_FILES__b2c__string_var, g_TMP_FILES__b2c__string_var , " " , g_TEMPDIR__b2c__string_var , "/" , LEFT__b2c__string_var(tfil__b2c__string_var, INSTR(tfil__b2c__string_var, ".bac")) , g_FUNCNAME__b2c__string_var , ".h") ;
-#line 2684 "bacon.bac"
-if(unlink(g_CFILE__b2c__string_var)==-1){ ERROR = 7; RUNTIMEERROR("DELETE", 2684, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
-#line 2687 "bacon.bac"
-g_CFILE__b2c__string_var = __b2c_Copy_String(g_CFILE__b2c__string_var, (char*) g_COPY_CFILE__b2c__string_var);
-#line 2688 "bacon.bac"
-g_CFILE = fopen((const char*)g_CFILE__b2c__string_var, "a");
+    while( NOT(ENDFILE(g_CFILE)) ){
+        b2c_readln(&b2c_assign, g_CFILE);
+        line = b2c_CopyString(line, b2c_assign);
+        __b2c__STRFREE(b2c_assign); b2c_assign = NULL;
+        if( NOT(ENDFILE(g_CFILE)) ){
+        fprintf(tmp_HFILE, "%s\n", line);
+        }
+    }
+    fclose(g_CFILE);
+fprintf(tmp_HFILE, "%s\n", g_STRINGARRAYS);
+    b2c_forin_element_string = b2c_CopyString(b2c_forin_element_string, g_LOCALSTRINGS); b2c_forin_element_string_org = b2c_forin_element_string;
+    b2c_forin_element_step = b2c_CopyString(b2c_forin_element_step, b2c_option_delim);
+    b2c_forin_element_ptr = b2c_for_amount(b2c_forin_element_string, b2c_forin_element_step);
+    for(; b2c_forin_element_ptr > 0; b2c_forin_element_ptr--) { b2c_for_item(&b2c_forin_element_string_org, b2c_forin_element_step, &element);
+        if( (LEN(element) )> 0 ){
+        fprintf(tmp_HFILE, "__b2c__STRFREE(%s);\n", element);
+        }
+    }
+    if( g_CATCH_USED == 1 ){
+    fputs("__B2C__PROGRAM__EXIT: ;\n", tmp_HFILE);
+    }
+fputs("b2c_catch_set = b2c_catch_set_backup;\n", tmp_HFILE);
+fputs("}\n", tmp_HFILE);
+    fclose(tmp_HFILE);
+    if( NOT(INSTR(g_INCLUDE_FILES, CONCAT( LEFT(tfil, INSTR(tfil, ".bac")) , g_FUNCNAME , ".h") )) ){
+        g_INCLUDE_FILES = F_CONCAT(g_INCLUDE_FILES, g_INCLUDE_FILES , " " , LEFT(tfil, INSTR(tfil, ".bac")) , g_FUNCNAME , ".h") ;
+    }
+    g_TMP_FILES = F_CONCAT(g_TMP_FILES, g_TMP_FILES , " " , g_TEMPDIR , "/" , LEFT(tfil, INSTR(tfil, ".bac")) , g_FUNCNAME , ".h") ;
+if(unlink(g_CFILE)==-1){ ERROR = 7; RUNTIMEERROR("DELETE", 2684, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
+    g_CFILE = b2c_CopyString(g_CFILE, (char*) g_COPY_CFILE);
+    g_CFILE = fopen((const char*)g_CFILE, "a");
 if(g_CFILE == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR APPENDING", 2688, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
-#line 2691 "bacon.bac"
-g_CATCHGOTO__b2c__string_var = __b2c_Copy_String(g_CATCHGOTO__b2c__string_var, (char*) g_ORIGCATCHGOTO__b2c__string_var);
-#line 2692 "bacon.bac"
-g_CATCH_USED=(long)( g_ORIGCATCH_USED);
-#line 2695 "bacon.bac"
-g_ORIGFUNCNAME__b2c__string_var = __b2c_Copy_String(g_ORIGFUNCNAME__b2c__string_var, (char*) "");
-#line 2696 "bacon.bac"
-g_FUNCNAME__b2c__string_var = __b2c_Copy_String(g_FUNCNAME__b2c__string_var, (char*) "");
-#line 2697 "bacon.bac"
-g_LOCALSTRINGS__b2c__string_var = __b2c_Copy_String(g_LOCALSTRINGS__b2c__string_var, (char*) "");
-#line 2698 "bacon.bac"
-g_STRINGARRAYS__b2c__string_var = __b2c_Copy_String(g_STRINGARRAYS__b2c__string_var, (char*) "");
-#line 2699 "bacon.bac"
-g_STRINGARGS__b2c__string_var = __b2c_Copy_String(g_STRINGARGS__b2c__string_var, (char*) "");
-#line 2701 "bacon.bac"
- __b2c__STRFREE(__b2c__forin_element__b2c__string_var_string); __b2c__forin_element__b2c__string_var_string = NULL; __b2c__STRFREE(__b2c__forin_element__b2c__string_var_step); __b2c__forin_element__b2c__string_var_step = NULL;
-__b2c__STRFREE(line__b2c__string_var);
-__b2c__STRFREE(element__b2c__string_var);
-__b2c__STRFREE(tfil__b2c__string_var);
-__B2C__PROGRAM__EXIT: ;
-__b2c__catch_set = __b2c__catch_set_backup;
+    g_CATCHGOTO = b2c_CopyString(g_CATCHGOTO, (char*) g_ORIGCATCHGOTO);
+    g_CATCH_USED=(long)( g_ORIGCATCH_USED);
+    g_ORIGFUNCNAME = b2c_CopyString(g_ORIGFUNCNAME, (char*) "");
+    g_FUNCNAME = b2c_CopyString(g_FUNCNAME, (char*) "");
+    g_LOCALSTRINGS = b2c_CopyString(g_LOCALSTRINGS, (char*) "");
+    g_STRINGARRAYS = b2c_CopyString(g_STRINGARRAYS, (char*) "");
+    g_STRINGARGS = b2c_CopyString(g_STRINGARGS, (char*) "");
+    __b2c__STRFREE(b2c_forin_element_string); b2c_forin_element_string = NULL; __b2c__STRFREE(b2c_forin_element_step); b2c_forin_element_step = NULL;
+    __b2c__STRFREE(line);
+    __b2c__STRFREE(element);
+    __b2c__STRFREE(tfil);
+    __B2C__PROGRAM__EXIT: ;
+    b2c_catch_set = b2c_catch_set_backup;
 }

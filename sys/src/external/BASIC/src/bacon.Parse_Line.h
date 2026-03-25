@@ -1,4361 +1,1636 @@
 /* Created with Shell BaCon 5.0.3 - (c) Peter van Eerten - MIT License */
-#undef __b2c__exitval
-#define __b2c__exitval
-void Parse_Line( char *__b2c_statement__b2c__string_var) {
- char*statement__b2c__string_var = NULL; statement__b2c__string_var = __b2c_Copy_String(NULL, __b2c_statement__b2c__string_var); __b2c__catch_set_backup = __b2c__catch_set; __b2c__catch_set = 0; char **element__b2c__string_var = NULL; long element__b2c__string_var__b2c_array = 0; char *__b2c__select_4250__b2c__string_var = NULL; char *__b2c__select_4459__b2c__string_var = NULL; char *__b2c__select_4580__b2c__string_var = NULL; int __b2c__forin_str__b2c__string_var_ptr = 0; char* __b2c__forin_str__b2c__string_var_string = NULL; char* __b2c__forin_str__b2c__string_var_string_org = NULL; char* __b2c__forin_str__b2c__string_var_step = NULL; char **match__b2c__string_var = NULL; long match__b2c__string_var__b2c_array = 0; int __b2c__forin_sym__b2c__string_var_ptr = 0; char* __b2c__forin_sym__b2c__string_var_string = NULL; char* __b2c__forin_sym__b2c__string_var_string_org = NULL; char* __b2c__forin_sym__b2c__string_var_step = NULL; char *__b2c__select_5433__b2c__string_var = NULL; char **symbol__b2c__string_var = NULL; long symbol__b2c__string_var__b2c_array = 0; int __b2c__forin_exp__b2c__string_var_ptr = 0; char* __b2c__forin_exp__b2c__string_var_string = NULL; char* __b2c__forin_exp__b2c__string_var_string_org = NULL; char* __b2c__forin_exp__b2c__string_var_step = NULL;
-#line 4207 "bacon.bac"
-char *inc__b2c__string_var = NULL;
-char *copy_curfile__b2c__string_var = NULL;
-char *total__b2c__string_var = NULL;
-char *txt__b2c__string_var = NULL;
-char *sym__b2c__string_var = NULL;
-char *exp__b2c__string_var = NULL;
-char *then__b2c__string_var = NULL;
-char *lft__b2c__string_var = NULL;
-char *str__b2c__string_var = NULL;
-char *newfeed__b2c__string_var = NULL;
-char *token__b2c__string_var = NULL;
-char *rel__b2c__string_var = NULL;
-char *uniq__b2c__string_var = NULL;
-#line 4208 "bacon.bac"
-long dim = 0;
-long i = 0;
-long found = 0;
-long copy_counter = 0;
-long to_parse = 0;
-long size = 0;
-long trc_backup = 0;
-#line 4209 "bacon.bac"
-FILE* newfile = NULL;
-FILE* src_tmp = NULL;
-FILE* src_in = NULL;
-FILE* src_out = NULL;
-#line 4211 "bacon.bac"
-__b2c__split_by(&element__b2c__string_var, 1, &element__b2c__string_var__b2c_array, statement__b2c__string_var, __b2c__option_delim);
-dim = element__b2c__string_var__b2c_array;
-#line 4213 "bacon.bac"
-if( (dim )> 0 ){
-#line 4216 "bacon.bac"
-if( ISTRUE(g_USE_C) ){
-#line 4217 "bacon.bac"
-if( __b2c__STRCMP(LEFT__b2c__string_var(statement__b2c__string_var, 8) ,  "END USEC") == 0  OR  __b2c__STRCMP(element__b2c__string_var[(uint64_t)1] ,  "ENDUSEC") == 0 ){
-#line 4218 "bacon.bac"
-g_USE_C=(long)( 0);
-#line 4219 "bacon.bac"
-} else if( __b2c__STRCMP(LEFT__b2c__string_var(statement__b2c__string_var, 8) ,  "END ENUM") == 0  OR  __b2c__STRCMP(element__b2c__string_var[(uint64_t)1] ,  "ENDENUM") == 0 ){
-#line 4220 "bacon.bac"
-g_USE_C=(long)( 0);
-#line 4221 "bacon.bac"
-__b2c__assign = (char*)"};"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4222 "bacon.bac"
-} else {
-#line 4223 "bacon.bac"
-__b2c__assign = (char*)statement__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4224 "bacon.bac"
+#undef b2c_exitval
+#define b2c_exitval
+void Parse_Line( char *__b2c_statement) {
+    char*statement = NULL; statement = b2c_CopyString(NULL, __b2c_statement); b2c_catch_set_backup = b2c_catch_set; b2c_catch_set = 0; char **element = NULL; long element__b2c_array = 0; char *b2c_select_4250 = NULL; char *b2c_select_4459 = NULL; char *b2c_select_4580 = NULL; int b2c_forin_str_ptr = 0; char* b2c_forin_str_string = NULL; char* b2c_forin_str_string_org = NULL; char* b2c_forin_str_step = NULL; char **match = NULL; long match__b2c_array = 0; int b2c_forin_sym_ptr = 0; char* b2c_forin_sym_string = NULL; char* b2c_forin_sym_string_org = NULL; char* b2c_forin_sym_step = NULL; char *b2c_select_5433 = NULL; char **symbol = NULL; long symbol__b2c_array = 0; int b2c_forin_exp_ptr = 0; char* b2c_forin_exp_string = NULL; char* b2c_forin_exp_string_org = NULL; char* b2c_forin_exp_step = NULL;
+    char *inc = NULL;
+    char *copy_curfile = NULL;
+    char *total = NULL;
+    char *txt = NULL;
+    char *sym = NULL;
+    char *exp = NULL;
+    char *then = NULL;
+    char *lft = NULL;
+    char *str = NULL;
+    char *newfeed = NULL;
+    char *token = NULL;
+    char *rel = NULL;
+    char *uniq = NULL;
+    long dim = 0;
+    long i = 0;
+    long found = 0;
+    long copy_counter = 0;
+    long to_parse = 0;
+    long size = 0;
+    long trc_backup = 0;
+    FILE* newfile = NULL;
+    FILE* src_tmp = NULL;
+    FILE* src_in = NULL;
+    FILE* src_out = NULL;
+    b2c_split_by(&element, 1, &element__b2c_array, statement, b2c_option_delim);
+    dim = element__b2c_array;
+    if( (dim )> 0 ){
+        if( ISTRUE(g_USE_C) ){
+            if( __b2c__STRCMP(LEFT(statement, 8) ,  "END USEC") == 0  OR  __b2c__STRCMP(element[(uint64_t)1] ,  "ENDUSEC") == 0 ){
+                g_USE_C=(long)( 0);
+            } else if( __b2c__STRCMP(LEFT(statement, 8) ,  "END ENUM") == 0  OR  __b2c__STRCMP(element[(uint64_t)1] ,  "ENDENUM") == 0 ){
+                g_USE_C=(long)( 0);
+            fputs("};\n", g_CFILE);
+            } else {
+            fprintf(g_CFILE, "%s\n", statement);
+            }
+        } else if( ISTRUE(g_USE_H) ){
+            if( REGEX(statement, "END.*USEH") ){
+                g_USE_H=(long)( 0);
+            } else if( REGEX(statement, "END.*ENUM")  OR  REGEX(statement, "END.*CLASS") ){
+                g_USE_H=(long)( 0);
+            fputs("};\n", g_HFILE);
+            } else {
+            fprintf(g_HFILE, "%s\n", statement);
+            }
+        } else if( __b2c__STRCMP(LEFT(element[(uint64_t)1], 2) ,  "#!") == 0 ){
+        } else if( __b2c__STRCMP(LEFT(element[(uint64_t)1], 1) ,  "'") == 0 ){
+        } else if( __b2c__STRCMP(RIGHT(element[(uint64_t)dim], 2) ,  "*/") == 0 ){
+            g_COMMENT=(long)( FALSE);
+        } else if( __b2c__STRCMP(LEFT(element[(uint64_t)1], 2) ,  "/*") == 0 ){
+            g_COMMENT=(long)( TRUE);
+            } else if( g_COMMENT == FALSE ){
+            b2c_select_4250 = b2c_CopyString(b2c_select_4250, element[(uint64_t)1]);
+            if ( !b2c_strcmp(b2c_select_4250, "USEC")){
+            g_USE_C=(long)( 1);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "USEH")){
+            g_USE_H=(long)( 1);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "CLASS")){
+            g_USE_H=(long)( 1);
+            fprintf(g_HFILE, "class %s{\n", LAST(statement));
+            } else  if ( !b2c_strcmp(b2c_select_4250, "PRINT")){
+            Handle_Print(statement, "stdout");
+            } else  if ( !b2c_strcmp(b2c_select_4250, "EPRINT")){
+            Handle_Print(MID(statement, 2), "stderr");
+            } else  if ( !b2c_strcmp(b2c_select_4250, "INPUT")){
+            Handle_Input(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "FOR")){
+            g_LOOPCTR = g_LOOPCTR + (1);
+            Handle_For(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "NEXT")){
+            fputs("}\n", g_CFILE);
+            if( (g_LOOPCTR )> 0  AND  g_OPTION_BREAK ){
+            g_LOOPCTR = g_LOOPCTR - (1);
+            if( (g_LOOPCTR )> 0 ){
+            fputs("if(b2c_break_ctr) {b2c_break_ctr--; if (!b2c_break_ctr){if(b2c_break_flag == 1) break; else continue;} else break; }\n", g_CFILE);
+            }
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "IF")){
+            if( NOT(ISTOKEN(statement, "THEN")) ){
+            fprintf(stderr, "%sSyntax error: missing THEN in IF statement at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            } else {
+            then = F_CHOP(then,LAST(statement, ISTOKEN(statement, "THEN")));
+            sym = b2c_CopyString(sym, (char*) HEAD(statement, ISTOKEN(statement, "THEN")-1));
+            exp = F_CHOP(exp,LAST(sym, ISTOKEN(sym, "IF")));
+            fprintf(g_CFILE, "if(%s){\n", Parse_Equation(exp));
+            if( (LEN(then) )> 0 ){
+            trc_backup=(
+            long)( g_TRACE);
+            g_TRACE=(long)( 0);
+            Tokenize(then);
+            g_TRACE=(long)( trc_backup);
+            fputs("}\n", g_CFILE);
+            }
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "ELIF")){
+            if( NOT(ISTOKEN(statement, "THEN")) ){
+            fprintf(stderr, "%sSyntax error: missing THEN in ELIF statement at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            } else {
+            then = F_CHOP(then,LAST(statement, ISTOKEN(statement, "THEN")));
+            sym = b2c_CopyString(sym, (char*) HEAD(statement, ISTOKEN(statement, "THEN")-1));
+            exp = F_CHOP(exp,LAST(sym, ISTOKEN(sym, "ELIF")));
+            if( (LEN(then) )> 0 ){
+            if( g_TRACE == 1 ){
+            g_TRACE_PREFIX = F_CONCAT(g_TRACE_PREFIX, "RUNTIMEDEBUG(" , g_CURFILE , ", " , STR(g_COUNTER) , ", \"" , REPLACE(statement, CONCAT( CHR(34) , CHR(92)) , CONCAT( CHR(39) , CHR(47)) , 2) , "\")") ;
+            fprintf(g_CFILE, "else if(!(%s)){ ; }\n", g_TRACE_PREFIX);
+            }
+            fprintf(g_CFILE, "else if(%s){\n", Parse_Equation(exp));
+            Tokenize(then);
+            fputs("}\n", g_CFILE);
+            } else {
+            if( g_TRACE == 1 ){
+            g_TRACE_PREFIX = F_CONCAT(g_TRACE_PREFIX, "RUNTIMEDEBUG(" , g_CURFILE , ", " , STR(g_COUNTER) , ", \"ELIF " , REPLACE(exp, CONCAT( CHR(34) , CHR(92)) , CONCAT( CHR(39) , CHR(47)) , 2) , "\")") ;
+            fprintf(g_CFILE, "} else if(!(%s)){ ;\n", g_TRACE_PREFIX);
+            }
+            fprintf(g_CFILE, "} else if(%s){\n", Parse_Equation(exp));
+            if( g_TRACE == 1 ){
+            g_TRACE_PREFIX = b2c_CopyString(g_TRACE_PREFIX, (char*) "");
+            }
+            }
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "ELSE")){
+            exp = F_CHOP(exp,LAST(statement, ISTOKEN(statement, "ELSE")));
+            if( (LEN(exp) )> 0 ){
+            if( g_TRACE == 1 ){
+            g_TRACE_PREFIX = F_CONCAT(g_TRACE_PREFIX, "RUNTIMEDEBUG(" , g_CURFILE , ", " , STR(g_COUNTER) , ", \"" , REPLACE(statement, CONCAT( CHR(34) , CHR(92)) , CONCAT( CHR(39) , CHR(47)) , 2) , "\")") ;
+            fprintf(g_CFILE, "else if(!(%s)){ ; }\n", g_TRACE_PREFIX);
+            }
+            fputs("else {\n", g_CFILE);
+            Tokenize(exp);
+            fputs("}\n", g_CFILE);
+            } else {
+            if( g_TRACE == 1 ){
+            g_TRACE_PREFIX = F_CONCAT(g_TRACE_PREFIX, "RUNTIMEDEBUG(" , g_CURFILE , ", " , STR(g_COUNTER) , ", \"ELSE\")") ;
+            fprintf(g_CFILE, "} else if(!(%s)){ ;\n", g_TRACE_PREFIX);
+            }
+            fputs("} else {\n", g_CFILE);
+            if( g_TRACE == 1 ){
+            g_TRACE_PREFIX = b2c_CopyString(g_TRACE_PREFIX, (char*) "");
+            }
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "FI")){
+            fputs("}\n", g_CFILE);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "DOTIMES")){
+            if( dim == 1 ){
+            fprintf(stderr, "%sSyntax error: empty DOTIMES at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            } else {
+            fprintf(g_HFILE, "long __do_times_%s = 0;\n", STR( g_DOTIMES));
+            fprintf(g_CFILE, "for(__do_times_%s = 0; __do_times_%s<%s; __do_times_%s++) { _ = __do_times_%s+1;\n", STR( g_DOTIMES), STR( g_DOTIMES), MID(statement, INSTR(statement, "DOTIMES") + 7), STR( g_DOTIMES), STR( g_DOTIMES));
+            g_DOTIMES = g_DOTIMES + (1);
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "DO")){
+            fputs("{\n", g_CFILE);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "DONE")){
+            fputs("}\n", g_CFILE);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "WHILE")){
+            g_LOOPCTR = g_LOOPCTR + (1);
+            Handle_While(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "WEND")){
+            fputs("}\n", g_CFILE);
+            if( (g_LOOPCTR )> 0  AND  g_OPTION_BREAK ){
+            g_LOOPCTR = g_LOOPCTR - (1);
+            if( (g_LOOPCTR )> 0 ){
+            fputs("if(b2c_break_ctr) {b2c_break_ctr--; if (!b2c_break_ctr){if(b2c_break_flag == 1) break; else continue;} else break; }\n", g_CFILE);
+            }
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "BREAK")){
+            if( g_OPTION_BREAK ){
+            if( (dim )> 1  AND  VAL(MID(statement, INSTR(statement, "BREAK") + 5)) != 0 ){
+            fprintf(g_CFILE, "b2c_break_ctr = %s-1; b2c_break_flag = 1;\n", MID(statement, INSTR(statement, "BREAK") + 5));
+            }
+            fputs("break;\n", g_CFILE);
+            } else {
+            fprintf(stderr, "%sSyntax error: use of BREAK at line %s in file '%s' was disbaled!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "CONTINUE")){
+            if( (dim )> 1  AND  VAL(MID(statement, INSTR(statement, "CONTINUE") + 8)) != 0 ){
+            fprintf(g_CFILE, "b2c_break_ctr = %s-1; b2c_break_flag = 2;\n", MID(statement, INSTR(statement, "CONTINUE") + 8));
+            }
+            if( (VAL(MID(statement, INSTR(statement, "CONTINUE") + 8)) )> 1 ){
+            fputs("break;\n", g_CFILE);
+            } else {
+            fputs("continue;\n", g_CFILE);
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "REPEAT")){
+            g_LOOPCTR = g_LOOPCTR + (1);
+            fputs("do{\n", g_CFILE);
+            } else  if ( !b2c_strcmp(b2c_select_4250,  "UNTIL")){
+            if( dim == 1 ){
+            fprintf(stderr, "%sSyntax error: empty UNTIL at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            } else {
+            exp = b2c_CopyString(exp, (char*) Parse_Equation(MID(statement, INSTR(statement, "UNTIL") + 5) ));
+            fprintf(g_CFILE, "} while(!(%s));\n", exp);
+            if( (g_LOOPCTR )> 0  AND  g_OPTION_BREAK ){
+            g_LOOPCTR = g_LOOPCTR - (1);
+            if( (g_LOOPCTR )> 0 ){
+            fputs("if(b2c_break_ctr) {b2c_break_ctr--; if (!b2c_break_ctr){if(b2c_break_flag == 1) break; else continue;} else break; }\n", g_CFILE);
+            }
+            }
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "LET")){
+            Handle_Let(MID(statement, INSTR(statement, "LET") + 3));
+            } else  if ( !b2c_strcmp(b2c_select_4250, "SYSTEM")){
+            if( dim == 1 ){
+            fprintf(stderr, "%sSyntax error: empty SYSTEM at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            } else {
+            fprintf(g_CFILE, "RETVAL = system(%s); if(WIFEXITED(RETVAL)) { RETVAL = WEXITSTATUS(RETVAL); }\n", LAST(statement));
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "SLEEP")){
+            if( dim == 1 ){
+            fprintf(stderr, "%sSyntax error: empty SLEEP at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            } else {
+            fprintf(g_CFILE, "usleep(%s*1000);\n", MID(statement, INSTR(statement, "SLEEP") + 5));
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "OPEN")){
+            Handle_Open(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "CLOSE")){
+            if( (dim )< 3 ){
+            fprintf(stderr, "%sSyntax error: empty CLOSE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            } else {
+            exp = b2c_CopyString(exp, (char*) LAST(statement));
+            b2c_select_4459 = b2c_CopyString(b2c_select_4459, element[(uint64_t)2]);
+            if ( !b2c_strcmp(b2c_select_4459, "FILE")){
+            exp = b2c_CopyString(exp, (char*) LAST(exp));
+            while( LEN(exp) ){
+            token = b2c_CopyString(token, (char*) Mini_Parser(exp));
+            fprintf(g_CFILE, "fclose(%s);\n", token);
+            exp = F_MID(exp,exp, LEN(token)+2);
+            token = F_CHOP(token,token);
+            b2c_hash_del(assoc_g_SEMANTIC_OPENCLOSE, token);
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4459, "DIRECTORY")){
+            exp = b2c_CopyString(exp, (char*) LAST(exp));
+            while( LEN(exp) ){
+            token = b2c_CopyString(token, (char*) Mini_Parser(exp));
+            fprintf(g_CFILE, "closedir(%s);\n", token);
+            exp = F_MID(exp,exp, LEN(token)+2);
+            token = F_CHOP(token,token);
+            b2c_hash_del(assoc_g_SEMANTIC_OPENCLOSE, token);
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4459, "MEMORY")){
+            exp = b2c_CopyString(exp, (char*) LAST(exp));
+            while( LEN(exp) ){
+            token = b2c_CopyString(token, (char*) Mini_Parser(exp));
+            fprintf(g_CFILE, "%s = NULL;\n", token);
+            exp = F_MID(exp,exp, LEN(token)+2);
+            token = F_CHOP(token,token);
+            b2c_hash_del(assoc_g_SEMANTIC_OPENCLOSE, token);
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4459, "LIBRARY")){
+            exp = b2c_CopyString(exp, (char*) LAST(exp));
+            while( LEN(exp) ){
+            token = b2c_CopyString(token, (char*) Mini_Parser(exp));
+            fprintf(g_CFILE, "if(b2c_dlopen__pointer_%s != NULL) {dlclose(b2c_dlopen__pointer_%s); b2c_dlopen__pointer_%s = NULL;}\n", EXTRACT(token, "[[:punct:]]", TRUE), EXTRACT(token, "[[:punct:]]", TRUE), EXTRACT(token, "[[:punct:]]", TRUE));
+            exp = F_MID(exp,exp, LEN(token)+2);
+            token = F_CHOP(token,token);
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4459, "NETWORK") || !b2c_strcmp(b2c_select_4459, "SERVER") || !b2c_strcmp(b2c_select_4459, "UDP") || !b2c_strcmp(b2c_select_4459, "DEVICE")){
+            exp = b2c_CopyString(exp, (char*) LAST(exp));
+            while( LEN(exp) ){
+            token = b2c_CopyString(token, (char*) Mini_Parser(exp));
+            if( g_OPTION_TLS ){
+            if( NOT(TALLY(g_LIB_TLS, "gnutls")) ){
+            fprintf(g_CFILE, "if(fcntl((uintptr_t)%s,F_GETFL,0) == -1 && errno == EBADF) { close(SSL_get_fd((SSL*)(uintptr_t)%s));\n", token, token);
+            fprintf(g_CFILE, "SSL_CTX_free(SSL_get_SSL_CTX((SSL*)(uintptr_t)%s)); SSL_shutdown((SSL*)(uintptr_t)%s);\n", token, token);
+            fprintf(g_CFILE, "SSL_free((SSL*)(uintptr_t)%s); } else { close((uintptr_t)%s); }\n", token, token);
+            } else {
+            fprintf(g_CFILE, "if(fcntl((uintptr_t)%s,F_GETFL,0) == -1 && errno == EBADF) { BIO_get_fd( ((SSL*)(uintptr_t)%s)->gnutls_state, &b2c_counter);\n", token, token);
+            fprintf(g_CFILE, "close(b2c_counter); free(((SSL*)(uintptr_t)%s)->ctx->certfile); free(((SSL*)(uintptr_t)%s)->ctx->keyfile);\n", token, token);
+            fprintf(g_CFILE, "SSL_CTX_free(((SSL*)(uintptr_t)%s)->ctx); SSL_shutdown((SSL*)(uintptr_t)%s); SSL_free((SSL*)(uintptr_t)%s); gnutls_global_deinit(); }\n", token, token, token);
+            fprintf(g_CFILE, "else { close((uintptr_t)%s); }\n", token);
+            }
+            } else {
+            fprintf(g_CFILE, "shutdown((uintptr_t)%s, SHUT_RDWR);\n", token);
+            fprintf(g_CFILE, "close((uintptr_t)%s);\n", token);
+            }
+            exp = F_MID(exp,exp, LEN(token)+2);
+            token = F_CHOP(token,token);
+            b2c_hash_del(assoc_g_SEMANTIC_OPENCLOSE, token);
+            }
+            } else {
+            fprintf(stderr, "%sSyntax error: erroneous CLOSE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            }
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "REWIND")){
+            if( dim == 1 ){
+            fprintf(stderr, "%sSyntax error: empty REWIND at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            } else {
+            fprintf(g_CFILE, "rewind(%s);\n", element[(uint64_t)2]);
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "MEMREWIND")){
+            if( dim == 1 ){
+            fprintf(stderr, "%sSyntax error: empty MEMREWIND at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            } else {
+            fprintf(g_CFILE, "%s = (char*)__b2c_mem_%s;\n", element[(uint64_t)2], element[(uint64_t)2]);
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "SEEK")){
+            Handle_Seek(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "READLN")){
+            Handle_Readln(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "WRITELN")){
+            Handle_Writeln(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "GETBYTE")){
+            Handle_Getbyte(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "PUTBYTE")){
+            Handle_Putbyte(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "GETFILE")){
+            Handle_Getfile(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "GETLINE")){
+            Handle_Getline(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "PUTLINE")){
+            Handle_Putline(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "END") || !b2c_strcmp(b2c_select_4250, "ENDIF") || !b2c_strcmp(b2c_select_4250, "ENDSUB") || !b2c_strcmp(b2c_select_4250, "ENDFUNC") || !b2c_strcmp(b2c_select_4250, "ENDWITH") || !b2c_strcmp(b2c_select_4250, "ENDFORK") || !b2c_strcmp(b2c_select_4250, "ENDRECORD") || !b2c_strcmp(b2c_select_4250, "ENDSELECT") || !b2c_strcmp(b2c_select_4250, "ENDFUNCTION")){
+            exp = b2c_CopyString(exp, (char*) IIF((dim )> 1, element[(uint64_t)2], MID(element[(uint64_t)1], 4)));
+            b2c_select_4580 = b2c_CopyString(b2c_select_4580, exp);
+            if ( !b2c_strcmp(b2c_select_4580, "IF")){
+            fputs("}\n", g_CFILE);
+            } else  if ( !b2c_strcmp(b2c_select_4580, "RECORD")){
+            if( (LEN(g_FUNCNAME) )> 0 ){
+            fprintf(g_CFILE, "}%s;\n", g_RECORDNAME);
+            fprintf(g_CFILE, "typedef %s %s_type;\n", g_RECORDNAME, EXTRACT(g_RECORDNAME, "_TYPE"));
+            if( LEN(g_RECORDARRAY) ){
+            fprintf(g_CFILE, "%s *%s = (%s*)calloc(%s+%s, sizeof(%s));\n", g_RECORDNAME, LEFT(g_RECORDVAR, INSTR(g_RECORDVAR, "[")-1), g_RECORDNAME, g_RECORDARRAY, STR( g_OPTION_BASE), g_RECORDNAME);
+            g_LOCALSTRINGS = F_CONCAT(g_LOCALSTRINGS, g_LOCALSTRINGS , " " , LEFT(g_RECORDVAR, INSTR(g_RECORDVAR, "[")-1)) ;
+            g_RECORDEND_BODY = F_CONCAT(g_RECORDEND_BODY, " long __b2c_record_" , EXTRACT(g_RECORDNAME, "_TYPE") , " = " , g_RECORDARRAY , "+" , STR(g_OPTION_BASE) , ";" , g_RECORDEND_BODY) ;
+            } else {
+            fprintf(g_CFILE, "%s %s = { 0 } ;\n", g_RECORDNAME, REPLACE(g_RECORDVAR, "]", CONCAT( "+" , STR(g_OPTION_BASE) , "]") ));
+            }
+            } else {
+            fprintf(g_HFILE, "}%s;\n", g_RECORDNAME);
+            fprintf(g_HFILE, "typedef %s %s_type;\n", g_RECORDNAME, EXTRACT(g_RECORDNAME, "_TYPE"));
+            if( LEN(g_RECORDARRAY) ){
+            fprintf(g_HFILE, "%s *%s;\n", g_RECORDNAME, LEFT(g_RECORDVAR, INSTR(g_RECORDVAR, "[")-1));
+            fprintf(g_CFILE, "%s = (%s*)calloc(%s+%s, sizeof(%s));\n", LEFT(g_RECORDVAR, INSTR(g_RECORDVAR, "[")-1), g_RECORDNAME, g_RECORDARRAY, STR( g_OPTION_BASE), g_RECORDNAME);
+            g_GLOBALARRAYS = F_CONCAT(g_GLOBALARRAYS, g_GLOBALARRAYS , "free(" , LEFT(g_RECORDVAR, INSTR(g_RECORDVAR, "[")-1) , ");") ;
+            fprintf(g_HFILE, "%s\n", CONCAT( "long __b2c_record_" , EXTRACT(g_RECORDNAME, "_TYPE") , ";" ));
+            g_RECORDEND_BODY = F_CONCAT(g_RECORDEND_BODY, g_RECORDEND_BODY , " __b2c_record_" , EXTRACT(g_RECORDNAME, "_TYPE") , " = " , g_RECORDARRAY , "+" , STR(g_OPTION_BASE) , ";") ;
+            } else {
+            fprintf(g_HFILE, "%s %s = { 0 } ;\n", g_RECORDNAME, REPLACE(g_RECORDVAR, "]", CONCAT( "+" , STR(g_OPTION_BASE) , "]") ));
+            }
+            fprintf(g_HFILE, "%s\n", g_RECORDEND_HEADER);
+            }
+            fprintf(g_CFILE, "%s\n", g_RECORDEND_BODY);
+            g_RECORDNAME = b2c_CopyString(g_RECORDNAME, (char*) "");
+            g_RECORDVAR = b2c_CopyString(g_RECORDVAR, (char*) "");
+            g_RECORDEND_BODY = b2c_CopyString(g_RECORDEND_BODY, (char*) "");
+            g_RECORDEND_HEADER = b2c_CopyString(g_RECORDEND_HEADER, (char*) "");
+            g_RECORDARRAY = b2c_CopyString(g_RECORDARRAY, (char*) "");
+            if( (LEN(g_RECORDCACHE) )> 0 ){
+            g_FUNCNAME = b2c_CopyString(g_FUNCNAME, (char*) g_RECORDCACHE);
+            g_RECORDCACHE = b2c_CopyString(g_RECORDCACHE, (char*) "");
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4580, "FUNC") || !b2c_strcmp(b2c_select_4580,  "FUNCTION")){
+            Handle_Endfunction();
+            } else  if ( !b2c_strcmp(b2c_select_4580, "SUB")){
+            Handle_Endsub();
+            } else  if ( !b2c_strcmp(b2c_select_4580, "WITH")){
+            g_WITHVAR = b2c_CopyString(g_WITHVAR, (char*) "");
+            } else  if ( !b2c_strcmp(b2c_select_4580, "SELECT")){
+            if( g_SELECTVAR_CTR == 0 ){
+            fprintf(stderr, "%sSyntax error: invalid END SELECT at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            } else {
+            fputs("}\n", g_CFILE);
+            g_SELECTVAR[(uint64_t)g_SELECTVAR_CTR] = b2c_CopyString(g_SELECTVAR[(uint64_t)g_SELECTVAR_CTR], (char*) "");
+            g_IN_CASE[(uint64_t)g_SELECTVAR_CTR] = 0;
+            g_CASE_FALL = b2c_CopyString(g_CASE_FALL, (char*) "");
+            g_CASE_CONT = b2c_CopyString(g_CASE_CONT, (char*) "");
+            g_SELECTVAR_CTR = g_SELECTVAR_CTR - (1);
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4580, "FORK")){
+            if( g_DEBUG == 1 ){
+            fputs("__b2c_str_realloc_debug_string();\n", g_CFILE);
+            fputs("__b2c_mempool_realloc_debug();\n", g_CFILE);
+            }
+            fputs("__b2c_str_free();\n", g_CFILE);
+            if( (dim )> 2 ){
+            fprintf(g_CFILE, "_exit(%s);\n", MID(statement, INSTR(statement, "FORK")+4));
+            } else {
+            fputs("_exit(EXIT_SUCCESS);\n", g_CFILE);
+            }
+            } else {
+            if( g_DEBUG == 1 ){
+            fputs("__b2c_str_realloc_debug_string();\n", g_CFILE);
+            fputs("__b2c_mempool_realloc_debug();\n", g_CFILE);
+            }
+            fprintf(g_CFILE, "exit(%s);\n", IIF((dim )> 1, MID(statement, INSTR(statement, "END")+3), "EXIT_SUCCESS"));
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "SUB")){
+            Handle_SubFunc(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "CALL")){
+            Handle_Call(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "FUNCTION")){
+            Handle_SubFunc(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "FUNC")){
+            Handle_SubFunc(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "RETURN")){
+            Handle_Return(MID(statement, INSTR(statement, "RETURN") + 6));
+            } else  if ( !b2c_strcmp(b2c_select_4250, "IMPORT")){
+            Handle_Import(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "DECLARE")){
+            Handle_Declare(MID(statement, INSTR(statement, "DECLARE") + 7));
+            } else  if ( !b2c_strcmp(b2c_select_4250, "GLOBAL")){
+            Handle_Declare(MID(statement, INSTR(statement, "GLOBAL") + 6));
+            } else  if ( !b2c_strcmp(b2c_select_4250, "LOCAL")){
+            Handle_Local(MID(statement, INSTR(statement, "LOCAL") + 5));
+            } else  if ( !b2c_strcmp(b2c_select_4250, "DATA")){
+            Handle_Data(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "RESTORE")){
+            if( dim == 1 ){
+            fputs("b2c_floatarray_ptr = 0;\n", g_CFILE);
+            fputs("b2c_stringarray_ptr = 0;\n", g_CFILE);
+            } else {
+            fprintf(g_CFILE, "b2c_floatarray_ptr = b2c_label_floatarray_%s;\n", element[(uint64_t)2]);
+            fprintf(g_CFILE, "b2c_stringarray_ptr = b2c_label_stringarray_%s;\n", element[(uint64_t)2]);
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "READ")){
+            Handle_Read(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "PUSH")){
+            Handle_Push(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "PULL")){
+            Handle_Pull(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "SEED")){
+            if( dim == 1 ){
+            fprintf(stderr, "%sSyntax error: empty SEED at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            } else {
+            fprintf(g_CFILE, "srandom((unsigned int)%s);\n", MID(statement, INSTR(statement, " ")+1));
+            }
+            } else  if ( !b2c_strcmp(b2c_select_4250, "DEF")){
+            Handle_Deffn(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "CONST")){
+            Handle_Const(statement);
+            } else  if ( !b2c_strcmp(b2c_select_4250, "INCLUDE")){
+            inc = b2c_CopyString(inc, (char*) EXTRACT((CHOP(MID(statement, INSTR(statement, " ") + 1))), CHR(34)));
+            if( INSTR(inc, ",") ){
+            b2c_split_by(&element, 1, &element__b2c_array, MID(inc, INSTR(inc, ",")+1), ",");
+            size = element__b2c_array;
+            for(i=1; i <= size; i+=1){
+            element[(uint64_t)i] = b2c_CopyString(element[(uint64_t)i], (char*) EXTRACT(element[(uint64_t)i], g_STRINGSIGN));
+            }
+            inc = F_MID(inc,inc, 1, INSTR(inc, ",")-1);
+            } else {
+            to_parse=(
+            long)( 2);
+            }
+            if( __b2c__STRCMP(RIGHT(inc, 4) ,  ".bac") != 0 ){
+            inc = F_CONCAT(inc, inc , ".bac");
+            }
+            if( NOT(FILEEXISTS(inc))  OR  dim == 1  OR  (FILETYPE(inc) != 1  AND  FILETYPE(inc) != 6) ){
+            fprintf(stderr, "%sSystem error: missing file '%s' for INCLUDE at line %s in file '%s'!\n", NL, inc, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+            } else {
+            fprintf(stdout, "%s%s", CR, EL);
+            fflush(stdout);
+            if( ISTRUE(g_CPP) ){
+            if( ISTRUE(LEN(EXEC("command -v cpp 2>/dev/null"))) ){
+            fprintf(stdout, "Preprocessing '%s'... ", inc);
+            fflush(stdout);
+            src_tmp = fopen((const char*)CONCAT( inc , ".tmp" ), "w");
+            if(src_tmp == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR WRITING", 4747, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
+            src_in = fopen((const char*)inc, "r");
+            if(src_in == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR READING", 4748, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
+            while( NOT(ENDFILE(src_in)) ){
+            b2c_readln(&b2c_assign, src_in);
+            txt = b2c_CopyString(txt, b2c_assign);
+            __b2c__STRFREE(b2c_assign); b2c_assign = NULL;
+            if( __b2c__STRCMP(LEFT(txt, 1) ,  "#") == 0 ){
+            fprintf(src_tmp, "%s\n", txt);
+            } else {
+            fprintf(src_tmp, "%s\n", CONCAT( "@" , txt , "@" ));
+            }
+            }
+            fclose(src_in);
+            fclose( src_tmp);
+            RETVAL = system(CONCAT( "cpp -P -w " , inc , ".tmp " , inc , ".cpp") ); if(WIFEXITED(RETVAL)) { RETVAL = WEXITSTATUS(RETVAL); }
+            src_cpp = fopen((const char*)CONCAT( inc , ".cpp" ), "r");
+            if(src_cpp == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR READING", 4760, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
+            src_out = fopen((const char*)CONCAT( inc , ".bac2" ), "w");
+            if(src_out == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR WRITING", 4761, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
+            while( NOT(ENDFILE(src_cpp)) ){
+            b2c_readln(&b2c_assign, src_cpp);
+            txt = b2c_CopyString(txt, b2c_assign);
+            __b2c__STRFREE(b2c_assign); b2c_assign = NULL;
+            fprintf(src_out, "%s\n", MID(txt, 2, LEN(txt)-2));
+            }
+            fclose(src_out);
+            fclose( src_cpp);
+            newfeed = F_CONCAT(newfeed, inc , ".bac2") ;
+            g_TMP_FILES = F_CONCAT(g_TMP_FILES, g_TMP_FILES , " " , inc , ".cpp" , " " , inc , ".tmp" , " " , inc , ".bac2") ;
+            fputs("done.\n", stdout);
+            } else {
+            fputs("System error: the C Preprocessor 'cpp' not found on this system! Exiting...\n", stderr);
+            exit(1);
+            }
+            } else {
+            newfeed = b2c_CopyString(newfeed, (char*) inc);
+            }
+            g_TMP_FILES = F_CONCAT(g_TMP_FILES, g_TMP_FILES , " " , inc) ;
+            copy_counter=(
+            long)( g_COUNTER);
+            g_COUNTER=(long)( 1);
+            copy_curfile = b2c_CopyString(copy_curfile, (char*) g_CURFILE);
+            g_CURFILE = b2c_CopyString(g_CURFILE, (char*) newfeed);
+            newfile = fopen((const char*)newfeed, "r");
+            if(newfile == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR READING", 4786, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
+            do{
+            b2c_readln(&b2c_assign, newfile);
+            txt = b2c_CopyString(txt, b2c_assign);
+            __b2c__STRFREE(b2c_assign); b2c_assign = NULL;
+            txt = F_CHOP(txt,txt);
+            if( (size )> 0 ){
+            for(i=1; i <= size; i+=1){
+            if( ( to_parse == 0  AND  REGEX(CHOP(MID(txt, INSTR(txt, " "))), CONCAT( "^" , CHOP(element[(uint64_t)i])) )  AND  REGEX(txt, "SUB|FUNCTION") )  OR  REGEX(txt, "INCLUDE$") ){
+            to_parse=(
+            long)( 1);
+            break;
+            }
+            }
+            if(b2c_break_ctr) {b2c_break_ctr--; if (!b2c_break_ctr){if(b2c_break_flag == 1) break; else continue;} else break; }
+            }
+            if( (LEN(txt) )> 0  AND  (to_parse )> 0 ){
+            if( NOT(g_QUIET) ){
+            fprintf(stdout, "\rConverting '%s'... %s%s", newfeed, STR( g_COUNTER), EL);
+            fflush(stdout);
+            }
+            if( __b2c__STRCMP(RIGHT(txt, 2) ,  " \\") == 0  AND  __b2c__STRCMP(LEFT(txt, 1) ,  CHR(39)) != 0  AND  NOT(REGEX(line, "^REM[[:space:]]+")) ){
+            total = F_CONCAT(total, total , LEFT(txt, LEN(txt)-1)) ;
+            } else {
+            total = F_CONCAT(total, total , txt) ;
+            if( __b2c__STRCMP(LEFT(total, 1) ,  CHR(39)) != 0 ){
+            if( g_DEBUG ){
+            fprintf(g_CFILE, "/* line %s \"%s\" */\n", STR( g_COUNTER), newfeed);
+        fprintf(g_HFILE, "/* line %s \"%s\" */\n", STR( g_COUNTER), newfeed);
+        } else {
+        fprintf(g_CFILE, "#line %s \"%s\"\n", STR( g_COUNTER), newfeed);
+        fprintf(g_HFILE, "#line %s \"%s\"\n", STR( g_COUNTER), newfeed);
+        }
+        Tokenize(total);
+        total = b2c_CopyString(total, (char*) EXTRACT(total, "\\\\"));
+        total = b2c_CopyString(total, (char*) EXTRACT(total, "\\\""));
+        g_DEPEND = F_CONCAT(g_DEPEND, g_DEPEND , EXTRACT(total, "\"[^\"]*\"", TRUE) , NL) ;
+    }
+    total = b2c_CopyString(total, (char*) "");
+}
+}
+if( to_parse == 1  AND  INSTR(txt, "END")  AND  REGEX(txt, "SUB|FUNCTION") ){
+    to_parse=(
+    long)( 0);
 }
-#line 4226 "bacon.bac"
-} else if( ISTRUE(g_USE_H) ){
-#line 4227 "bacon.bac"
-if( REGEX(statement__b2c__string_var, "END.*USEH") ){
-#line 4228 "bacon.bac"
-g_USE_H=(long)( 0);
-#line 4229 "bacon.bac"
-} else if( REGEX(statement__b2c__string_var, "END.*ENUM")  OR  REGEX(statement__b2c__string_var, "END.*CLASS") ){
-#line 4230 "bacon.bac"
-g_USE_H=(long)( 0);
-#line 4231 "bacon.bac"
-__b2c__assign = (char*)"};"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 4232 "bacon.bac"
-} else {
-#line 4233 "bacon.bac"
-__b2c__assign = (char*)statement__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 4234 "bacon.bac"
-}
-#line 4236 "bacon.bac"
-} else if( __b2c__STRCMP(LEFT__b2c__string_var(element__b2c__string_var[(uint64_t)1], 2) ,  "#!") == 0 ){
-#line 4239 "bacon.bac"
-} else if( __b2c__STRCMP(LEFT__b2c__string_var(element__b2c__string_var[(uint64_t)1], 1) ,  "'") == 0 ){
-#line 4242 "bacon.bac"
-} else if( __b2c__STRCMP(RIGHT__b2c__string_var(element__b2c__string_var[(uint64_t)dim], 2) ,  "*/") == 0 ){
-#line 4243 "bacon.bac"
-g_COMMENT=(long)( FALSE);
-#line 4245 "bacon.bac"
-} else if( __b2c__STRCMP(LEFT__b2c__string_var(element__b2c__string_var[(uint64_t)1], 2) ,  "/*") == 0 ){
-#line 4246 "bacon.bac"
-g_COMMENT=(long)( TRUE);
-#line 4248 "bacon.bac"
-} else if( g_COMMENT == FALSE ){
-#line 4250 "bacon.bac"
-__b2c__select_4250__b2c__string_var = __b2c_Copy_String(__b2c__select_4250__b2c__string_var, element__b2c__string_var[(uint64_t)1]);
-#line 4251 "bacon.bac"
- if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "USEC")){
-#line 4252 "bacon.bac"
-g_USE_C=(long)( 1);
-#line 4254 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "USEH")){
-#line 4255 "bacon.bac"
-g_USE_H=(long)( 1);
-#line 4257 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "CLASS")){
-#line 4258 "bacon.bac"
-g_USE_H=(long)( 1);
-#line 4259 "bacon.bac"
-__b2c__assign = (char*)"class "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) LAST__b2c__string_var(statement__b2c__string_var); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) "{"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 4261 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "PRINT")){
-#line 4262 "bacon.bac"
-Handle_Print(statement__b2c__string_var, "stdout");
-#line 4264 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "EPRINT")){
-#line 4265 "bacon.bac"
-Handle_Print(MID__b2c__string_var(statement__b2c__string_var, 2), "stderr");
-#line 4267 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "INPUT")){
-#line 4268 "bacon.bac"
-Handle_Input(statement__b2c__string_var);
-#line 4270 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "FOR")){
-#line 4271 "bacon.bac"
-g_LOOPCTR = g_LOOPCTR + (1);
-#line 4272 "bacon.bac"
-Handle_For(statement__b2c__string_var);
-#line 4274 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "NEXT")){
-#line 4275 "bacon.bac"
-__b2c__assign = (char*)"}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4276 "bacon.bac"
-if( (g_LOOPCTR )> 0  AND  g_OPTION_BREAK ){
-#line 4277 "bacon.bac"
-g_LOOPCTR = g_LOOPCTR - (1);
-#line 4278 "bacon.bac"
-if( (g_LOOPCTR )> 0 ){
-#line 4279 "bacon.bac"
-__b2c__assign = (char*)"if(__b2c__break_ctr) {__b2c__break_ctr--; if (!__b2c__break_ctr){if(__b2c__break_flag == 1) break; else continue;} else break; }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4280 "bacon.bac"
-}
-#line 4281 "bacon.bac"
-}
-#line 4283 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "IF")){
-#line 4285 "bacon.bac"
-if( NOT(ISTOKEN(statement__b2c__string_var, "THEN")) ){
-#line 4286 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: missing THEN in IF statement at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4287 "bacon.bac"
-exit(1);
-#line 4288 "bacon.bac"
-} else {
-#line 4290 "bacon.bac"
-then__b2c__string_var = F_CHOP__b2c__string_var(then__b2c__string_var,LAST__b2c__string_var(statement__b2c__string_var, ISTOKEN(statement__b2c__string_var, "THEN")));
-#line 4291 "bacon.bac"
-sym__b2c__string_var = __b2c_Copy_String(sym__b2c__string_var, (char*) HEAD__b2c__string_var(statement__b2c__string_var, ISTOKEN(statement__b2c__string_var, "THEN")-1));
-#line 4292 "bacon.bac"
-exp__b2c__string_var = F_CHOP__b2c__string_var(exp__b2c__string_var,LAST__b2c__string_var(sym__b2c__string_var, ISTOKEN(sym__b2c__string_var, "IF")));
-#line 4293 "bacon.bac"
-__b2c__assign = (char*)"if("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) Parse_Equation__b2c__string_var(exp__b2c__string_var); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "){"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4294 "bacon.bac"
-if( (LEN(then__b2c__string_var) )> 0 ){
-#line 4295 "bacon.bac"
-trc_backup=(
-long)( g_TRACE);
-#line 4296 "bacon.bac"
-g_TRACE=(long)( 0);
-#line 4297 "bacon.bac"
-Tokenize(then__b2c__string_var);
-#line 4298 "bacon.bac"
-g_TRACE=(long)( trc_backup);
-#line 4299 "bacon.bac"
-__b2c__assign = (char*)"}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4300 "bacon.bac"
-}
-#line 4301 "bacon.bac"
-}
-#line 4303 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ELIF")){
-#line 4305 "bacon.bac"
-if( NOT(ISTOKEN(statement__b2c__string_var, "THEN")) ){
-#line 4306 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: missing THEN in ELIF statement at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4307 "bacon.bac"
-exit(1);
-#line 4308 "bacon.bac"
-} else {
-#line 4310 "bacon.bac"
-then__b2c__string_var = F_CHOP__b2c__string_var(then__b2c__string_var,LAST__b2c__string_var(statement__b2c__string_var, ISTOKEN(statement__b2c__string_var, "THEN")));
-#line 4311 "bacon.bac"
-sym__b2c__string_var = __b2c_Copy_String(sym__b2c__string_var, (char*) HEAD__b2c__string_var(statement__b2c__string_var, ISTOKEN(statement__b2c__string_var, "THEN")-1));
-#line 4312 "bacon.bac"
-exp__b2c__string_var = F_CHOP__b2c__string_var(exp__b2c__string_var,LAST__b2c__string_var(sym__b2c__string_var, ISTOKEN(sym__b2c__string_var, "ELIF")));
-#line 4313 "bacon.bac"
-if( (LEN(then__b2c__string_var) )> 0 ){
-#line 4314 "bacon.bac"
-if( g_TRACE == 1 ){
-#line 4315 "bacon.bac"
-g_TRACE_PREFIX__b2c__string_var = F_CONCAT__b2c__string_var(g_TRACE_PREFIX__b2c__string_var, "RUNTIMEDEBUG(" , g_CURFILE__b2c__string_var , ", " , STR__b2c__string_var(g_COUNTER) , ", \"" , REPLACE__b2c__string_var(statement__b2c__string_var, CONCAT__b2c__string_var( CHR__b2c__string_var(34) , CHR__b2c__string_var(92)) , CONCAT__b2c__string_var( CHR__b2c__string_var(39) , CHR__b2c__string_var(47)) , 2) , "\")") ;
-#line 4316 "bacon.bac"
-__b2c__assign = (char*)"else if(!("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_TRACE_PREFIX__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")){ ; }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4317 "bacon.bac"
-}
-#line 4318 "bacon.bac"
-__b2c__assign = (char*)"else if("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) Parse_Equation__b2c__string_var(exp__b2c__string_var); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "){"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4319 "bacon.bac"
-Tokenize(then__b2c__string_var);
-#line 4320 "bacon.bac"
-__b2c__assign = (char*)"}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4321 "bacon.bac"
-} else {
-#line 4322 "bacon.bac"
-if( g_TRACE == 1 ){
-#line 4323 "bacon.bac"
-g_TRACE_PREFIX__b2c__string_var = F_CONCAT__b2c__string_var(g_TRACE_PREFIX__b2c__string_var, "RUNTIMEDEBUG(" , g_CURFILE__b2c__string_var , ", " , STR__b2c__string_var(g_COUNTER) , ", \"ELIF " , REPLACE__b2c__string_var(exp__b2c__string_var, CONCAT__b2c__string_var( CHR__b2c__string_var(34) , CHR__b2c__string_var(92)) , CONCAT__b2c__string_var( CHR__b2c__string_var(39) , CHR__b2c__string_var(47)) , 2) , "\")") ;
-#line 4324 "bacon.bac"
-__b2c__assign = (char*)"} else if(!("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_TRACE_PREFIX__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")){ ;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4325 "bacon.bac"
-}
-#line 4326 "bacon.bac"
-__b2c__assign = (char*)"} else if("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) Parse_Equation__b2c__string_var(exp__b2c__string_var); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "){"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4327 "bacon.bac"
-if( g_TRACE == 1 ){
-g_TRACE_PREFIX__b2c__string_var = __b2c_Copy_String(g_TRACE_PREFIX__b2c__string_var, (char*) "");
-}
-#line 4328 "bacon.bac"
-}
-#line 4329 "bacon.bac"
-}
-#line 4331 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ELSE")){
-#line 4333 "bacon.bac"
-exp__b2c__string_var = F_CHOP__b2c__string_var(exp__b2c__string_var,LAST__b2c__string_var(statement__b2c__string_var, ISTOKEN(statement__b2c__string_var, "ELSE")));
-#line 4334 "bacon.bac"
-if( (LEN(exp__b2c__string_var) )> 0 ){
-#line 4335 "bacon.bac"
-if( g_TRACE == 1 ){
-#line 4336 "bacon.bac"
-g_TRACE_PREFIX__b2c__string_var = F_CONCAT__b2c__string_var(g_TRACE_PREFIX__b2c__string_var, "RUNTIMEDEBUG(" , g_CURFILE__b2c__string_var , ", " , STR__b2c__string_var(g_COUNTER) , ", \"" , REPLACE__b2c__string_var(statement__b2c__string_var, CONCAT__b2c__string_var( CHR__b2c__string_var(34) , CHR__b2c__string_var(92)) , CONCAT__b2c__string_var( CHR__b2c__string_var(39) , CHR__b2c__string_var(47)) , 2) , "\")") ;
-#line 4337 "bacon.bac"
-__b2c__assign = (char*)"else if(!("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_TRACE_PREFIX__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")){ ; }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4338 "bacon.bac"
-}
-#line 4339 "bacon.bac"
-__b2c__assign = (char*)"else {"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4340 "bacon.bac"
-Tokenize(exp__b2c__string_var);
-#line 4341 "bacon.bac"
-__b2c__assign = (char*)"}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4342 "bacon.bac"
-} else {
-#line 4343 "bacon.bac"
-if( g_TRACE == 1 ){
-#line 4344 "bacon.bac"
-g_TRACE_PREFIX__b2c__string_var = F_CONCAT__b2c__string_var(g_TRACE_PREFIX__b2c__string_var, "RUNTIMEDEBUG(" , g_CURFILE__b2c__string_var , ", " , STR__b2c__string_var(g_COUNTER) , ", \"ELSE\")") ;
-#line 4345 "bacon.bac"
-__b2c__assign = (char*)"} else if(!("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_TRACE_PREFIX__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")){ ;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4346 "bacon.bac"
-}
-#line 4347 "bacon.bac"
-__b2c__assign = (char*)"} else {"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4348 "bacon.bac"
-if( g_TRACE == 1 ){
-g_TRACE_PREFIX__b2c__string_var = __b2c_Copy_String(g_TRACE_PREFIX__b2c__string_var, (char*) "");
-}
-#line 4349 "bacon.bac"
-}
-#line 4351 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "FI")){
-#line 4352 "bacon.bac"
-__b2c__assign = (char*)"}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4354 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "DOTIMES")){
-#line 4356 "bacon.bac"
-if( dim == 1 ){
-#line 4357 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty DOTIMES at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4358 "bacon.bac"
-exit(1);
-#line 4359 "bacon.bac"
-} else {
-#line 4360 "bacon.bac"
-__b2c__assign = (char*)"long __do_times_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs(STR__b2c__string_var( g_DOTIMES), g_HFILE);
-__b2c__assign = (char*) " = 0;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 4361 "bacon.bac"
-__b2c__assign = (char*)"for(__do_times_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_DOTIMES), g_CFILE);
-__b2c__assign = (char*) " = 0; __do_times_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_DOTIMES), g_CFILE);
-__b2c__assign = (char*) "<"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "DOTIMES") + 7); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "; __do_times_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_DOTIMES), g_CFILE);
-__b2c__assign = (char*) "++) { _ = __do_times_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_DOTIMES), g_CFILE);
-__b2c__assign = (char*) "+1;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4362 "bacon.bac"
-g_DOTIMES = g_DOTIMES + (1);
-#line 4363 "bacon.bac"
-}
-#line 4365 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "DO")){
-#line 4366 "bacon.bac"
-__b2c__assign = (char*)"{"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4368 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "DONE")){
-#line 4369 "bacon.bac"
-__b2c__assign = (char*)"}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4371 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "WHILE")){
-#line 4372 "bacon.bac"
-g_LOOPCTR = g_LOOPCTR + (1);
-#line 4373 "bacon.bac"
-Handle_While(statement__b2c__string_var);
-#line 4375 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "WEND")){
-#line 4376 "bacon.bac"
-__b2c__assign = (char*)"}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4377 "bacon.bac"
-if( (g_LOOPCTR )> 0  AND  g_OPTION_BREAK ){
-#line 4378 "bacon.bac"
-g_LOOPCTR = g_LOOPCTR - (1);
-#line 4379 "bacon.bac"
-if( (g_LOOPCTR )> 0 ){
-#line 4380 "bacon.bac"
-__b2c__assign = (char*)"if(__b2c__break_ctr) {__b2c__break_ctr--; if (!__b2c__break_ctr){if(__b2c__break_flag == 1) break; else continue;} else break; }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4381 "bacon.bac"
-}
-#line 4382 "bacon.bac"
-}
-#line 4384 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "BREAK")){
-#line 4386 "bacon.bac"
-if( g_OPTION_BREAK ){
-#line 4387 "bacon.bac"
-if( (dim )> 1  AND  VAL(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "BREAK") + 5)) != 0 ){
-#line 4388 "bacon.bac"
-__b2c__assign = (char*)"__b2c__break_ctr = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "BREAK") + 5); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "-1; __b2c__break_flag = 1;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4389 "bacon.bac"
-}
-#line 4390 "bacon.bac"
-__b2c__assign = (char*)"break;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4391 "bacon.bac"
-} else {
-#line 4392 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: use of BREAK at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "' was disbaled!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4393 "bacon.bac"
-exit(1);
-#line 4394 "bacon.bac"
-}
-#line 4396 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "CONTINUE")){
-#line 4398 "bacon.bac"
-if( (dim )> 1  AND  VAL(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "CONTINUE") + 8)) != 0 ){
-#line 4399 "bacon.bac"
-__b2c__assign = (char*)"__b2c__break_ctr = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "CONTINUE") + 8); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "-1; __b2c__break_flag = 2;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4400 "bacon.bac"
-}
-#line 4401 "bacon.bac"
-if( (VAL(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "CONTINUE") + 8)) )> 1 ){
-#line 4402 "bacon.bac"
-__b2c__assign = (char*)"break;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4403 "bacon.bac"
-} else {
-#line 4404 "bacon.bac"
-__b2c__assign = (char*)"continue;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4405 "bacon.bac"
-}
-#line 4407 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "REPEAT")){
-#line 4408 "bacon.bac"
-g_LOOPCTR = g_LOOPCTR + (1);
-#line 4409 "bacon.bac"
-__b2c__assign = (char*)"do{"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4411 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var,  "UNTIL")){
-#line 4413 "bacon.bac"
-if( dim == 1 ){
-#line 4414 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty UNTIL at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4415 "bacon.bac"
-exit(1);
-#line 4416 "bacon.bac"
-} else {
-#line 4418 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) Parse_Equation__b2c__string_var(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "UNTIL") + 5) ));
-#line 4419 "bacon.bac"
-__b2c__assign = (char*)"} while(!("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "));"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4420 "bacon.bac"
-if( (g_LOOPCTR )> 0  AND  g_OPTION_BREAK ){
-#line 4421 "bacon.bac"
-g_LOOPCTR = g_LOOPCTR - (1);
-#line 4422 "bacon.bac"
-if( (g_LOOPCTR )> 0 ){
-#line 4423 "bacon.bac"
-__b2c__assign = (char*)"if(__b2c__break_ctr) {__b2c__break_ctr--; if (!__b2c__break_ctr){if(__b2c__break_flag == 1) break; else continue;} else break; }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4424 "bacon.bac"
-}
-#line 4425 "bacon.bac"
-}
-#line 4426 "bacon.bac"
-}
-#line 4428 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "LET")){
-#line 4429 "bacon.bac"
-Handle_Let(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "LET") + 3));
-#line 4431 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SYSTEM")){
-#line 4433 "bacon.bac"
-if( dim == 1 ){
-#line 4434 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty SYSTEM at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4435 "bacon.bac"
-exit(1);
-#line 4436 "bacon.bac"
-} else {
-#line 4437 "bacon.bac"
-__b2c__assign = (char*)"RETVAL = system("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) LAST__b2c__string_var(statement__b2c__string_var); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); if(WIFEXITED(RETVAL)) { RETVAL = WEXITSTATUS(RETVAL); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4438 "bacon.bac"
-}
-#line 4440 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SLEEP")){
-#line 4442 "bacon.bac"
-if( dim == 1 ){
-#line 4443 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty SLEEP at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4444 "bacon.bac"
-exit(1);
-#line 4445 "bacon.bac"
-} else {
-#line 4446 "bacon.bac"
-__b2c__assign = (char*)"usleep("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "SLEEP") + 5); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "*1000);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4447 "bacon.bac"
-}
-#line 4449 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "OPEN")){
-#line 4450 "bacon.bac"
-Handle_Open(statement__b2c__string_var);
-#line 4452 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "CLOSE")){
-#line 4454 "bacon.bac"
-if( (dim )< 3 ){
-#line 4455 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty CLOSE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4456 "bacon.bac"
-exit(1);
-#line 4457 "bacon.bac"
-} else {
-#line 4458 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) LAST__b2c__string_var(statement__b2c__string_var));
-#line 4459 "bacon.bac"
-__b2c__select_4459__b2c__string_var = __b2c_Copy_String(__b2c__select_4459__b2c__string_var, element__b2c__string_var[(uint64_t)2]);
-#line 4460 "bacon.bac"
- if ( !__b2c__strcmp(__b2c__select_4459__b2c__string_var, "FILE")){
-#line 4461 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) LAST__b2c__string_var(exp__b2c__string_var));
-#line 4462 "bacon.bac"
-while( LEN(exp__b2c__string_var) ){
-#line 4463 "bacon.bac"
-token__b2c__string_var = __b2c_Copy_String(token__b2c__string_var, (char*) Mini_Parser__b2c__string_var(exp__b2c__string_var));
-#line 4464 "bacon.bac"
-__b2c__assign = (char*)"fclose("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4465 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,exp__b2c__string_var, LEN(token__b2c__string_var)+2);
-#line 4466 "bacon.bac"
-token__b2c__string_var = F_CHOP__b2c__string_var(token__b2c__string_var,token__b2c__string_var);
-#line 4467 "bacon.bac"
-__b2c__hash_del(__b2c__assoc_g_SEMANTIC_OPENCLOSE__b2c__string_var, token__b2c__string_var);
-#line 4468 "bacon.bac"
-}
-#line 4469 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4459__b2c__string_var, "DIRECTORY")){
-#line 4470 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) LAST__b2c__string_var(exp__b2c__string_var));
-#line 4471 "bacon.bac"
-while( LEN(exp__b2c__string_var) ){
-#line 4472 "bacon.bac"
-token__b2c__string_var = __b2c_Copy_String(token__b2c__string_var, (char*) Mini_Parser__b2c__string_var(exp__b2c__string_var));
-#line 4473 "bacon.bac"
-__b2c__assign = (char*)"closedir("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4474 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,exp__b2c__string_var, LEN(token__b2c__string_var)+2);
-#line 4475 "bacon.bac"
-token__b2c__string_var = F_CHOP__b2c__string_var(token__b2c__string_var,token__b2c__string_var);
-#line 4476 "bacon.bac"
-__b2c__hash_del(__b2c__assoc_g_SEMANTIC_OPENCLOSE__b2c__string_var, token__b2c__string_var);
-#line 4477 "bacon.bac"
-}
-#line 4478 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4459__b2c__string_var, "MEMORY")){
-#line 4479 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) LAST__b2c__string_var(exp__b2c__string_var));
-#line 4480 "bacon.bac"
-while( LEN(exp__b2c__string_var) ){
-#line 4481 "bacon.bac"
-token__b2c__string_var = __b2c_Copy_String(token__b2c__string_var, (char*) Mini_Parser__b2c__string_var(exp__b2c__string_var));
-#line 4482 "bacon.bac"
-__b2c__assign = (char*)token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = NULL;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4483 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,exp__b2c__string_var, LEN(token__b2c__string_var)+2);
-#line 4484 "bacon.bac"
-token__b2c__string_var = F_CHOP__b2c__string_var(token__b2c__string_var,token__b2c__string_var);
-#line 4485 "bacon.bac"
-__b2c__hash_del(__b2c__assoc_g_SEMANTIC_OPENCLOSE__b2c__string_var, token__b2c__string_var);
-#line 4486 "bacon.bac"
-}
-#line 4487 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4459__b2c__string_var, "LIBRARY")){
-#line 4488 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) LAST__b2c__string_var(exp__b2c__string_var));
-#line 4489 "bacon.bac"
-while( LEN(exp__b2c__string_var) ){
-#line 4490 "bacon.bac"
-token__b2c__string_var = __b2c_Copy_String(token__b2c__string_var, (char*) Mini_Parser__b2c__string_var(exp__b2c__string_var));
-#line 4491 "bacon.bac"
-__b2c__assign = (char*)"if(__b2c__dlopen__pointer_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) EXTRACT__b2c__string_var(token__b2c__string_var, "[[:punct:]]", TRUE); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " != NULL) {dlclose(__b2c__dlopen__pointer_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) EXTRACT__b2c__string_var(token__b2c__string_var, "[[:punct:]]", TRUE); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); __b2c__dlopen__pointer_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) EXTRACT__b2c__string_var(token__b2c__string_var, "[[:punct:]]", TRUE); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = NULL;}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4492 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,exp__b2c__string_var, LEN(token__b2c__string_var)+2);
-#line 4493 "bacon.bac"
-token__b2c__string_var = F_CHOP__b2c__string_var(token__b2c__string_var,token__b2c__string_var);
-#line 4494 "bacon.bac"
-}
-#line 4495 "bacon.bac"
-#line 4496 "bacon.bac"
-#line 4497 "bacon.bac"
-#line 4498 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4459__b2c__string_var, "NETWORK") || !__b2c__strcmp(__b2c__select_4459__b2c__string_var, "SERVER") || !__b2c__strcmp(__b2c__select_4459__b2c__string_var, "UDP") || !__b2c__strcmp(__b2c__select_4459__b2c__string_var, "DEVICE")){
-#line 4499 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) LAST__b2c__string_var(exp__b2c__string_var));
-#line 4500 "bacon.bac"
-while( LEN(exp__b2c__string_var) ){
-#line 4501 "bacon.bac"
-token__b2c__string_var = __b2c_Copy_String(token__b2c__string_var, (char*) Mini_Parser__b2c__string_var(exp__b2c__string_var));
-#line 4503 "bacon.bac"
-if( g_OPTION_TLS ){
-#line 4504 "bacon.bac"
-if( NOT(TALLY(g_LIB_TLS__b2c__string_var, "gnutls")) ){
-#line 4505 "bacon.bac"
-__b2c__assign = (char*)"if(fcntl((uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ",F_GETFL,0) == -1 && errno == EBADF) { close(SSL_get_fd((SSL*)(uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "));"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4506 "bacon.bac"
-__b2c__assign = (char*)"SSL_CTX_free(SSL_get_SSL_CTX((SSL*)(uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")); SSL_shutdown((SSL*)(uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4507 "bacon.bac"
-__b2c__assign = (char*)"SSL_free((SSL*)(uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); } else { close((uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4508 "bacon.bac"
-} else {
-#line 4509 "bacon.bac"
-__b2c__assign = (char*)"if(fcntl((uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ",F_GETFL,0) == -1 && errno == EBADF) { BIO_get_fd( ((SSL*)(uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")->gnutls_state, &__b2c__counter);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4510 "bacon.bac"
-__b2c__assign = (char*)"close(__b2c__counter); free(((SSL*)(uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")->ctx->certfile); free(((SSL*)(uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")->ctx->keyfile);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4511 "bacon.bac"
-__b2c__assign = (char*)"SSL_CTX_free(((SSL*)(uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")->ctx); SSL_shutdown((SSL*)(uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); SSL_free((SSL*)(uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); gnutls_global_deinit(); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4512 "bacon.bac"
-__b2c__assign = (char*)"else { close((uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4513 "bacon.bac"
-}
-#line 4514 "bacon.bac"
-} else {
-#line 4515 "bacon.bac"
-__b2c__assign = (char*)"shutdown((uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", SHUT_RDWR);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4516 "bacon.bac"
-__b2c__assign = (char*)"close((uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4517 "bacon.bac"
-}
-#line 4518 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,exp__b2c__string_var, LEN(token__b2c__string_var)+2);
-#line 4519 "bacon.bac"
-token__b2c__string_var = F_CHOP__b2c__string_var(token__b2c__string_var,token__b2c__string_var);
-#line 4520 "bacon.bac"
-__b2c__hash_del(__b2c__assoc_g_SEMANTIC_OPENCLOSE__b2c__string_var, token__b2c__string_var);
-#line 4521 "bacon.bac"
-}
-#line 4522 "bacon.bac"
-} else {
-#line 4523 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: erroneous CLOSE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4524 "bacon.bac"
-exit(1);
-#line 4525 "bacon.bac"
-}
-#line 4526 "bacon.bac"
-}
-#line 4528 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "REWIND")){
-#line 4530 "bacon.bac"
-if( dim == 1 ){
-#line 4531 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty REWIND at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4532 "bacon.bac"
-exit(1);
-#line 4533 "bacon.bac"
-} else {
-#line 4534 "bacon.bac"
-__b2c__assign = (char*)"rewind("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4535 "bacon.bac"
-}
-#line 4537 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "MEMREWIND")){
-#line 4539 "bacon.bac"
-if( dim == 1 ){
-#line 4540 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty MEMREWIND at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4541 "bacon.bac"
-exit(1);
-#line 4542 "bacon.bac"
-} else {
-#line 4543 "bacon.bac"
-__b2c__assign = (char*)element__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = (char*)__b2c_mem_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4544 "bacon.bac"
-}
-#line 4546 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SEEK")){
-#line 4547 "bacon.bac"
-Handle_Seek(statement__b2c__string_var);
-#line 4549 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "READLN")){
-#line 4550 "bacon.bac"
-Handle_Readln(statement__b2c__string_var);
-#line 4552 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "WRITELN")){
-#line 4553 "bacon.bac"
-Handle_Writeln(statement__b2c__string_var);
-#line 4555 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "GETBYTE")){
-#line 4556 "bacon.bac"
-Handle_Getbyte(statement__b2c__string_var);
-#line 4558 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "PUTBYTE")){
-#line 4559 "bacon.bac"
-Handle_Putbyte(statement__b2c__string_var);
-#line 4561 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "GETFILE")){
-#line 4562 "bacon.bac"
-Handle_Getfile(statement__b2c__string_var);
-#line 4564 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "GETLINE")){
-#line 4565 "bacon.bac"
-Handle_Getline(statement__b2c__string_var);
-#line 4567 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "PUTLINE")){
-#line 4568 "bacon.bac"
-Handle_Putline(statement__b2c__string_var);
-#line 4570 "bacon.bac"
-#line 4571 "bacon.bac"
-#line 4572 "bacon.bac"
-#line 4573 "bacon.bac"
-#line 4574 "bacon.bac"
-#line 4575 "bacon.bac"
-#line 4576 "bacon.bac"
-#line 4577 "bacon.bac"
-#line 4578 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "END") || !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ENDIF") || !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ENDSUB") || !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ENDFUNC") || !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ENDWITH") || !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ENDFORK") || !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ENDRECORD") || !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ENDSELECT") || !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ENDFUNCTION")){
-#line 4579 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) IIF__b2c__string_var((dim )> 1, element__b2c__string_var[(uint64_t)2], MID__b2c__string_var(element__b2c__string_var[(uint64_t)1], 4)));
-#line 4580 "bacon.bac"
-__b2c__select_4580__b2c__string_var = __b2c_Copy_String(__b2c__select_4580__b2c__string_var, exp__b2c__string_var);
-#line 4581 "bacon.bac"
- if ( !__b2c__strcmp(__b2c__select_4580__b2c__string_var, "IF")){
-#line 4582 "bacon.bac"
-__b2c__assign = (char*)"}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4583 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4580__b2c__string_var, "RECORD")){
-#line 4584 "bacon.bac"
-if( (LEN(g_FUNCNAME__b2c__string_var) )> 0 ){
-#line 4585 "bacon.bac"
-__b2c__assign = (char*)"}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_RECORDNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4586 "bacon.bac"
-__b2c__assign = (char*)"typedef "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_RECORDNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) EXTRACT__b2c__string_var(g_RECORDNAME__b2c__string_var, "_TYPE"); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "_type;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4587 "bacon.bac"
-if( LEN(g_RECORDARRAY__b2c__string_var) ){
-#line 4588 "bacon.bac"
-__b2c__assign = (char*)g_RECORDNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " *"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) LEFT__b2c__string_var(g_RECORDVAR__b2c__string_var, INSTR(g_RECORDVAR__b2c__string_var, "[")-1); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = ("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_RECORDNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "*)calloc("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_RECORDARRAY__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "+"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_OPTION_BASE), g_CFILE);
-__b2c__assign = (char*) ", sizeof("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_RECORDNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "));"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4589 "bacon.bac"
-g_LOCALSTRINGS__b2c__string_var = F_CONCAT__b2c__string_var(g_LOCALSTRINGS__b2c__string_var, g_LOCALSTRINGS__b2c__string_var , " " , LEFT__b2c__string_var(g_RECORDVAR__b2c__string_var, INSTR(g_RECORDVAR__b2c__string_var, "[")-1)) ;
-#line 4590 "bacon.bac"
-g_RECORDEND_BODY__b2c__string_var = F_CONCAT__b2c__string_var(g_RECORDEND_BODY__b2c__string_var, " long __b2c_record_" , EXTRACT__b2c__string_var(g_RECORDNAME__b2c__string_var, "_TYPE") , " = " , g_RECORDARRAY__b2c__string_var , "+" , STR__b2c__string_var(g_OPTION_BASE) , ";" , g_RECORDEND_BODY__b2c__string_var) ;
-#line 4591 "bacon.bac"
-} else {
-#line 4592 "bacon.bac"
-__b2c__assign = (char*)g_RECORDNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) REPLACE__b2c__string_var(g_RECORDVAR__b2c__string_var, "]", CONCAT__b2c__string_var( "+" , STR__b2c__string_var(g_OPTION_BASE) , "]") ); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = { 0 } ;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4593 "bacon.bac"
-}
-#line 4594 "bacon.bac"
-} else {
-#line 4595 "bacon.bac"
-__b2c__assign = (char*)"}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) g_RECORDNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 4596 "bacon.bac"
-__b2c__assign = (char*)"typedef "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) g_RECORDNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) EXTRACT__b2c__string_var(g_RECORDNAME__b2c__string_var, "_TYPE") ; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) "_type;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 4597 "bacon.bac"
-if( LEN(g_RECORDARRAY__b2c__string_var) ){
-#line 4598 "bacon.bac"
-__b2c__assign = (char*)g_RECORDNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " *"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) LEFT__b2c__string_var(g_RECORDVAR__b2c__string_var, INSTR(g_RECORDVAR__b2c__string_var, "[")-1); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 4599 "bacon.bac"
-__b2c__assign = (char*)LEFT__b2c__string_var(g_RECORDVAR__b2c__string_var, INSTR(g_RECORDVAR__b2c__string_var, "[")-1); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = ("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_RECORDNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "*)calloc("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_RECORDARRAY__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "+"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_OPTION_BASE), g_CFILE);
-__b2c__assign = (char*) ", sizeof("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_RECORDNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "));"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4600 "bacon.bac"
-g_GLOBALARRAYS__b2c__string_var = F_CONCAT__b2c__string_var(g_GLOBALARRAYS__b2c__string_var, g_GLOBALARRAYS__b2c__string_var , "free(" , LEFT__b2c__string_var(g_RECORDVAR__b2c__string_var, INSTR(g_RECORDVAR__b2c__string_var, "[")-1) , ");") ;
-#line 4601 "bacon.bac"
-__b2c__assign = (char*)CONCAT__b2c__string_var( "long __b2c_record_" , EXTRACT__b2c__string_var(g_RECORDNAME__b2c__string_var, "_TYPE") , ";" ); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 4602 "bacon.bac"
-g_RECORDEND_BODY__b2c__string_var = F_CONCAT__b2c__string_var(g_RECORDEND_BODY__b2c__string_var, g_RECORDEND_BODY__b2c__string_var , " __b2c_record_" , EXTRACT__b2c__string_var(g_RECORDNAME__b2c__string_var, "_TYPE") , " = " , g_RECORDARRAY__b2c__string_var , "+" , STR__b2c__string_var(g_OPTION_BASE) , ";") ;
-#line 4603 "bacon.bac"
-} else {
-#line 4604 "bacon.bac"
-__b2c__assign = (char*)g_RECORDNAME__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) REPLACE__b2c__string_var(g_RECORDVAR__b2c__string_var, "]", CONCAT__b2c__string_var( "+" , STR__b2c__string_var(g_OPTION_BASE) , "]") ); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " = { 0 } ;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 4605 "bacon.bac"
-}
-#line 4606 "bacon.bac"
-__b2c__assign = (char*)g_RECORDEND_HEADER__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 4607 "bacon.bac"
-}
-#line 4608 "bacon.bac"
-__b2c__assign = (char*)g_RECORDEND_BODY__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4609 "bacon.bac"
-g_RECORDNAME__b2c__string_var = __b2c_Copy_String(g_RECORDNAME__b2c__string_var, (char*) "");
-#line 4610 "bacon.bac"
-g_RECORDVAR__b2c__string_var = __b2c_Copy_String(g_RECORDVAR__b2c__string_var, (char*) "");
-#line 4611 "bacon.bac"
-g_RECORDEND_BODY__b2c__string_var = __b2c_Copy_String(g_RECORDEND_BODY__b2c__string_var, (char*) "");
-#line 4612 "bacon.bac"
-g_RECORDEND_HEADER__b2c__string_var = __b2c_Copy_String(g_RECORDEND_HEADER__b2c__string_var, (char*) "");
-#line 4613 "bacon.bac"
-g_RECORDARRAY__b2c__string_var = __b2c_Copy_String(g_RECORDARRAY__b2c__string_var, (char*) "");
-#line 4615 "bacon.bac"
-if( (LEN(g_RECORDCACHE__b2c__string_var) )> 0 ){
-#line 4616 "bacon.bac"
-g_FUNCNAME__b2c__string_var = __b2c_Copy_String(g_FUNCNAME__b2c__string_var, (char*) g_RECORDCACHE__b2c__string_var);
-#line 4617 "bacon.bac"
-g_RECORDCACHE__b2c__string_var = __b2c_Copy_String(g_RECORDCACHE__b2c__string_var, (char*) "");
-#line 4618 "bacon.bac"
-}
-#line 4619 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4580__b2c__string_var, "FUNC") || !__b2c__strcmp(__b2c__select_4580__b2c__string_var,  "FUNCTION")){
-#line 4620 "bacon.bac"
-Handle_Endfunction();
-#line 4621 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4580__b2c__string_var, "SUB")){
-#line 4622 "bacon.bac"
-Handle_Endsub();
-#line 4623 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4580__b2c__string_var, "WITH")){
-#line 4624 "bacon.bac"
-g_WITHVAR__b2c__string_var = __b2c_Copy_String(g_WITHVAR__b2c__string_var, (char*) "");
-#line 4625 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4580__b2c__string_var, "SELECT")){
-#line 4626 "bacon.bac"
-if( g_SELECTVAR_CTR == 0 ){
-#line 4627 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid END SELECT at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4628 "bacon.bac"
-exit(1);
-#line 4629 "bacon.bac"
-} else {
-#line 4630 "bacon.bac"
-__b2c__assign = (char*)"}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4631 "bacon.bac"
-g_SELECTVAR__b2c__string_var[(uint64_t)g_SELECTVAR_CTR] = __b2c_Copy_String(g_SELECTVAR__b2c__string_var[(uint64_t)g_SELECTVAR_CTR], (char*) "");
-#line 4632 "bacon.bac"
-g_IN_CASE[(uint64_t)g_SELECTVAR_CTR] = 0;
-#line 4633 "bacon.bac"
-g_CASE_FALL__b2c__string_var = __b2c_Copy_String(g_CASE_FALL__b2c__string_var, (char*) "");
-#line 4634 "bacon.bac"
-g_CASE_CONT__b2c__string_var = __b2c_Copy_String(g_CASE_CONT__b2c__string_var, (char*) "");
-#line 4635 "bacon.bac"
-g_SELECTVAR_CTR = g_SELECTVAR_CTR - (1);
-#line 4636 "bacon.bac"
-}
-#line 4637 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4580__b2c__string_var, "FORK")){
-#line 4638 "bacon.bac"
-if( g_DEBUG == 1 ){
-#line 4639 "bacon.bac"
-__b2c__assign = (char*)"__b2c_str_realloc_debug_string();"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4640 "bacon.bac"
-__b2c__assign = (char*)"__b2c_mempool_realloc_debug();"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4641 "bacon.bac"
-}
-#line 4642 "bacon.bac"
-__b2c__assign = (char*)"__b2c_str_free();"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4643 "bacon.bac"
-if( (dim )> 2 ){
-#line 4644 "bacon.bac"
-__b2c__assign = (char*)"_exit("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "FORK")+4); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4645 "bacon.bac"
-} else {
-#line 4646 "bacon.bac"
-__b2c__assign = (char*)"_exit(EXIT_SUCCESS);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4647 "bacon.bac"
-}
-#line 4648 "bacon.bac"
-} else {
-#line 4649 "bacon.bac"
-if( g_DEBUG == 1 ){
-#line 4650 "bacon.bac"
-__b2c__assign = (char*)"__b2c_str_realloc_debug_string();"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4651 "bacon.bac"
-__b2c__assign = (char*)"__b2c_mempool_realloc_debug();"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4652 "bacon.bac"
-}
-#line 4653 "bacon.bac"
-__b2c__assign = (char*)"exit("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) IIF__b2c__string_var((dim )> 1, MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "END")+3), "EXIT_SUCCESS"); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4654 "bacon.bac"
-}
-#line 4656 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SUB")){
-#line 4657 "bacon.bac"
-Handle_SubFunc(statement__b2c__string_var);
-#line 4659 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "CALL")){
-#line 4660 "bacon.bac"
-Handle_Call(statement__b2c__string_var);
-#line 4662 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "FUNCTION")){
-#line 4663 "bacon.bac"
-Handle_SubFunc(statement__b2c__string_var);
-#line 4665 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "FUNC")){
-#line 4666 "bacon.bac"
-Handle_SubFunc(statement__b2c__string_var);
-#line 4668 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "RETURN")){
-#line 4669 "bacon.bac"
-Handle_Return(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "RETURN") + 6));
-#line 4671 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "IMPORT")){
-#line 4672 "bacon.bac"
-Handle_Import(statement__b2c__string_var);
-#line 4674 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "DECLARE")){
-#line 4675 "bacon.bac"
-Handle_Declare(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "DECLARE") + 7));
-#line 4677 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "GLOBAL")){
-#line 4678 "bacon.bac"
-Handle_Declare(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "GLOBAL") + 6));
-#line 4680 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "LOCAL")){
-#line 4681 "bacon.bac"
-Handle_Local(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "LOCAL") + 5));
-#line 4683 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "DATA")){
-#line 4684 "bacon.bac"
-Handle_Data(statement__b2c__string_var);
-#line 4686 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "RESTORE")){
-#line 4687 "bacon.bac"
-if( dim == 1 ){
-#line 4688 "bacon.bac"
-__b2c__assign = (char*)"__b2c__floatarray_ptr = 0;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4689 "bacon.bac"
-__b2c__assign = (char*)"__b2c__stringarray_ptr = 0;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4690 "bacon.bac"
-} else {
-#line 4691 "bacon.bac"
-__b2c__assign = (char*)"__b2c__floatarray_ptr = __b2c__label_floatarray_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4692 "bacon.bac"
-__b2c__assign = (char*)"__b2c__stringarray_ptr = __b2c__label_stringarray_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4693 "bacon.bac"
-}
-#line 4695 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "READ")){
-#line 4696 "bacon.bac"
-Handle_Read(statement__b2c__string_var);
-#line 4698 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "PUSH")){
-#line 4699 "bacon.bac"
-Handle_Push(statement__b2c__string_var);
-#line 4701 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "PULL")){
-#line 4702 "bacon.bac"
-Handle_Pull(statement__b2c__string_var);
-#line 4704 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SEED")){
-#line 4706 "bacon.bac"
-if( dim == 1 ){
-#line 4707 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty SEED at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4708 "bacon.bac"
-exit(1);
-#line 4709 "bacon.bac"
-} else {
-#line 4710 "bacon.bac"
-__b2c__assign = (char*)"srandom((unsigned int)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, " ")+1); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4711 "bacon.bac"
-}
-#line 4713 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "DEF")){
-#line 4714 "bacon.bac"
-Handle_Deffn(statement__b2c__string_var);
-#line 4716 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "CONST")){
-#line 4717 "bacon.bac"
-Handle_Const(statement__b2c__string_var);
-#line 4719 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "INCLUDE")){
-#line 4721 "bacon.bac"
-inc__b2c__string_var = __b2c_Copy_String(inc__b2c__string_var, (char*) EXTRACT__b2c__string_var((CHOP__b2c__string_var(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, " ") + 1))), CHR__b2c__string_var(34)));
-#line 4723 "bacon.bac"
-if( INSTR(inc__b2c__string_var, ",") ){
-#line 4724 "bacon.bac"
-__b2c__split_by(&element__b2c__string_var, 1, &element__b2c__string_var__b2c_array, MID__b2c__string_var(inc__b2c__string_var, INSTR(inc__b2c__string_var, ",")+1), ",");
-size = element__b2c__string_var__b2c_array;
-#line 4725 "bacon.bac"
-for(i=1; i <= size; i+=1){
-#line 4726 "bacon.bac"
-element__b2c__string_var[(uint64_t)i] = __b2c_Copy_String(element__b2c__string_var[(uint64_t)i], (char*) EXTRACT__b2c__string_var(element__b2c__string_var[(uint64_t)i], g_STRINGSIGN__b2c__string_var));
-#line 4727 "bacon.bac"
-}
-#line 4728 "bacon.bac"
-inc__b2c__string_var = F_MID__b2c__string_var(inc__b2c__string_var,inc__b2c__string_var, 1, INSTR(inc__b2c__string_var, ",")-1);
-#line 4729 "bacon.bac"
-} else {
-#line 4730 "bacon.bac"
-to_parse=(
-long)( 2);
-#line 4731 "bacon.bac"
-}
-#line 4733 "bacon.bac"
-if( __b2c__STRCMP(RIGHT__b2c__string_var(inc__b2c__string_var, 4) ,  ".bac") != 0 ){
-inc__b2c__string_var = F_CONCAT__b2c__string_var(inc__b2c__string_var, inc__b2c__string_var , ".bac");
-}
-#line 4736 "bacon.bac"
-if( NOT(FILEEXISTS(inc__b2c__string_var))  OR  dim == 1  OR  (FILETYPE(inc__b2c__string_var) != 1  AND  FILETYPE(inc__b2c__string_var) != 6) ){
-#line 4737 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "System error: missing file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) inc__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "' for INCLUDE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4738 "bacon.bac"
-exit(1);
-#line 4739 "bacon.bac"
-} else {
-#line 4741 "bacon.bac"
-__b2c__assign = (char*)CR__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stdout); }
-__b2c__assign = (char*) EL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stdout); }
-fflush(stdout);
-#line 4743 "bacon.bac"
-if( ISTRUE(g_CPP) ){
-#line 4744 "bacon.bac"
-if( ISTRUE(LEN(EXEC__b2c__string_var("command -v cpp 2>/dev/null"))) ){
-#line 4745 "bacon.bac"
-__b2c__assign = (char*)"Preprocessing '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stdout); }
-__b2c__assign = (char*) inc__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stdout); }
-__b2c__assign = (char*) "'... "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stdout); }
-fflush(stdout);
-#line 4747 "bacon.bac"
-src_tmp = fopen((const char*)CONCAT__b2c__string_var( inc__b2c__string_var , ".tmp" ), "w");
-if(src_tmp == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR WRITING", 4747, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
-#line 4748 "bacon.bac"
-src_in = fopen((const char*)inc__b2c__string_var, "r");
-if(src_in == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR READING", 4748, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
-#line 4749 "bacon.bac"
-while( NOT(ENDFILE(src_in)) ){
-#line 4750 "bacon.bac"
-__b2c__readln(&__b2c__assign, src_in);
-txt__b2c__string_var = __b2c_Copy_String(txt__b2c__string_var, __b2c__assign);
-__b2c__STRFREE(__b2c__assign); __b2c__assign = NULL;
-#line 4751 "bacon.bac"
-if( __b2c__STRCMP(LEFT__b2c__string_var(txt__b2c__string_var, 1) ,  "#") == 0 ){
-#line 4752 "bacon.bac"
-__b2c__assign = (char*)txt__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, src_tmp); }
-fputs("\n", src_tmp);
-#line 4753 "bacon.bac"
-} else {
-#line 4754 "bacon.bac"
-__b2c__assign = (char*)CONCAT__b2c__string_var( "@" , txt__b2c__string_var , "@" ); if(__b2c__assign != NULL) { fputs(__b2c__assign, src_tmp); }
-fputs("\n", src_tmp);
-#line 4755 "bacon.bac"
-}
-#line 4756 "bacon.bac"
-}
-#line 4757 "bacon.bac"
-fclose(src_in);
-fclose( src_tmp);
-#line 4758 "bacon.bac"
-RETVAL = system(CONCAT__b2c__string_var( "cpp -P -w " , inc__b2c__string_var , ".tmp " , inc__b2c__string_var , ".cpp") ); if(WIFEXITED(RETVAL)) { RETVAL = WEXITSTATUS(RETVAL); }
-#line 4760 "bacon.bac"
-src_cpp = fopen((const char*)CONCAT__b2c__string_var( inc__b2c__string_var , ".cpp" ), "r");
-if(src_cpp == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR READING", 4760, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
-#line 4761 "bacon.bac"
-src_out = fopen((const char*)CONCAT__b2c__string_var( inc__b2c__string_var , ".bac2" ), "w");
-if(src_out == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR WRITING", 4761, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
-#line 4762 "bacon.bac"
-while( NOT(ENDFILE(src_cpp)) ){
-#line 4763 "bacon.bac"
-__b2c__readln(&__b2c__assign, src_cpp);
-txt__b2c__string_var = __b2c_Copy_String(txt__b2c__string_var, __b2c__assign);
-__b2c__STRFREE(__b2c__assign); __b2c__assign = NULL;
-#line 4764 "bacon.bac"
-__b2c__assign = (char*)MID__b2c__string_var(txt__b2c__string_var, 2, LEN(txt__b2c__string_var)-2); if(__b2c__assign != NULL) { fputs(__b2c__assign, src_out); }
-fputs("\n", src_out);
-#line 4765 "bacon.bac"
-}
-#line 4766 "bacon.bac"
-fclose(src_out);
-fclose( src_cpp);
-#line 4767 "bacon.bac"
-newfeed__b2c__string_var = F_CONCAT__b2c__string_var(newfeed__b2c__string_var, inc__b2c__string_var , ".bac2") ;
-#line 4768 "bacon.bac"
-g_TMP_FILES__b2c__string_var = F_CONCAT__b2c__string_var(g_TMP_FILES__b2c__string_var, g_TMP_FILES__b2c__string_var , " " , inc__b2c__string_var , ".cpp" , " " , inc__b2c__string_var , ".tmp" , " " , inc__b2c__string_var , ".bac2") ;
-#line 4769 "bacon.bac"
-__b2c__assign = (char*)"done."; if(__b2c__assign != NULL) { fputs(__b2c__assign, stdout); }
-fputs("\n", stdout);
-#line 4770 "bacon.bac"
-} else {
-#line 4771 "bacon.bac"
-__b2c__assign = (char*)"System error: the C Preprocessor 'cpp' not found on this system! Exiting..."; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4772 "bacon.bac"
-exit(1);
-#line 4773 "bacon.bac"
-}
-#line 4774 "bacon.bac"
-} else {
-#line 4775 "bacon.bac"
-newfeed__b2c__string_var = __b2c_Copy_String(newfeed__b2c__string_var, (char*) inc__b2c__string_var);
-#line 4776 "bacon.bac"
-}
-#line 4777 "bacon.bac"
-g_TMP_FILES__b2c__string_var = F_CONCAT__b2c__string_var(g_TMP_FILES__b2c__string_var, g_TMP_FILES__b2c__string_var , " " , inc__b2c__string_var) ;
-#line 4779 "bacon.bac"
-copy_counter=(
-long)( g_COUNTER);
-#line 4780 "bacon.bac"
-g_COUNTER=(long)( 1);
-#line 4782 "bacon.bac"
-copy_curfile__b2c__string_var = __b2c_Copy_String(copy_curfile__b2c__string_var, (char*) g_CURFILE__b2c__string_var);
-#line 4784 "bacon.bac"
-g_CURFILE__b2c__string_var = __b2c_Copy_String(g_CURFILE__b2c__string_var, (char*) newfeed__b2c__string_var);
-#line 4786 "bacon.bac"
-newfile = fopen((const char*)newfeed__b2c__string_var, "r");
-if(newfile == NULL){ ERROR = 2; RUNTIMEERROR("OPEN FOR READING", 4786, "../bacon.bac", ERROR, __B2C__PROGRAM__EXIT); }
-#line 4787 "bacon.bac"
-do{
-#line 4788 "bacon.bac"
-__b2c__readln(&__b2c__assign, newfile);
-txt__b2c__string_var = __b2c_Copy_String(txt__b2c__string_var, __b2c__assign);
-__b2c__STRFREE(__b2c__assign); __b2c__assign = NULL;
-#line 4789 "bacon.bac"
-txt__b2c__string_var = F_CHOP__b2c__string_var(txt__b2c__string_var,txt__b2c__string_var);
-#line 4791 "bacon.bac"
-if( (size )> 0 ){
-#line 4792 "bacon.bac"
-for(i=1; i <= size; i+=1){
-#line 4793 "bacon.bac"
-if( ( to_parse == 0  AND  REGEX(CHOP__b2c__string_var(MID__b2c__string_var(txt__b2c__string_var, INSTR(txt__b2c__string_var, " "))), CONCAT__b2c__string_var( "^" , CHOP__b2c__string_var(element__b2c__string_var[(uint64_t)i])) )  AND  REGEX(txt__b2c__string_var, "SUB|FUNCTION") )  OR  REGEX(txt__b2c__string_var, "INCLUDE$") ){
-#line 4794 "bacon.bac"
-to_parse=(
-long)( 1);
-#line 4795 "bacon.bac"
-break;
-#line 4796 "bacon.bac"
-}
-#line 4797 "bacon.bac"
-}
-if(__b2c__break_ctr) {__b2c__break_ctr--; if (!__b2c__break_ctr){if(__b2c__break_flag == 1) break; else continue;} else break; }
-#line 4798 "bacon.bac"
-}
-#line 4800 "bacon.bac"
-if( (LEN(txt__b2c__string_var) )> 0  AND  (to_parse )> 0 ){
-#line 4801 "bacon.bac"
-if( NOT(g_QUIET) ){
-__b2c__assign = (char*)"\rConverting '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stdout); }
-__b2c__assign = (char*) newfeed__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stdout); }
-__b2c__assign = (char*) "'... "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stdout); }
-fputs(STR__b2c__string_var( g_COUNTER), stdout);
-__b2c__assign = (char*) EL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stdout); }
-fflush(stdout);
-}
-#line 4802 "bacon.bac"
-if( __b2c__STRCMP(RIGHT__b2c__string_var(txt__b2c__string_var, 2) ,  " \\") == 0  AND  __b2c__STRCMP(LEFT__b2c__string_var(txt__b2c__string_var, 1) ,  CHR__b2c__string_var(39)) != 0  AND  NOT(REGEX(line__b2c__string_var, "^REM[[:space:]]+")) ){
-#line 4803 "bacon.bac"
-total__b2c__string_var = F_CONCAT__b2c__string_var(total__b2c__string_var, total__b2c__string_var , LEFT__b2c__string_var(txt__b2c__string_var, LEN(txt__b2c__string_var)-1)) ;
-#line 4804 "bacon.bac"
-} else {
-#line 4805 "bacon.bac"
-total__b2c__string_var = F_CONCAT__b2c__string_var(total__b2c__string_var, total__b2c__string_var , txt__b2c__string_var) ;
-#line 4806 "bacon.bac"
-if( __b2c__STRCMP(LEFT__b2c__string_var(total__b2c__string_var, 1) ,  CHR__b2c__string_var(39)) != 0 ){
-#line 4807 "bacon.bac"
-if( g_DEBUG ){
-#line 4808 "bacon.bac"
-__b2c__assign = (char*)"/* line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) " \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) newfeed__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\" */"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4809 "bacon.bac"
-__b2c__assign = (char*)"/* line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_HFILE);
-__b2c__assign = (char*) " \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) newfeed__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) "\" */"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 4810 "bacon.bac"
-} else {
-#line 4811 "bacon.bac"
-__b2c__assign = (char*)"#line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) " \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) newfeed__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4812 "bacon.bac"
-__b2c__assign = (char*)"#line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_HFILE);
-__b2c__assign = (char*) " \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) newfeed__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) "\""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 4813 "bacon.bac"
-}
-#line 4814 "bacon.bac"
-Tokenize(total__b2c__string_var);
-#line 4816 "bacon.bac"
-total__b2c__string_var = __b2c_Copy_String(total__b2c__string_var, (char*) EXTRACT__b2c__string_var(total__b2c__string_var, "\\\\"));
-#line 4817 "bacon.bac"
-total__b2c__string_var = __b2c_Copy_String(total__b2c__string_var, (char*) EXTRACT__b2c__string_var(total__b2c__string_var, "\\\""));
-#line 4818 "bacon.bac"
-g_DEPEND__b2c__string_var = F_CONCAT__b2c__string_var(g_DEPEND__b2c__string_var, g_DEPEND__b2c__string_var , EXTRACT__b2c__string_var(total__b2c__string_var, "\"[^\"]*\"", TRUE) , NL__b2c__string_var) ;
-#line 4819 "bacon.bac"
-}
-#line 4820 "bacon.bac"
-total__b2c__string_var = __b2c_Copy_String(total__b2c__string_var, (char*) "");
-#line 4821 "bacon.bac"
-}
-#line 4822 "bacon.bac"
-}
-#line 4824 "bacon.bac"
-if( to_parse == 1  AND  INSTR(txt__b2c__string_var, "END")  AND  REGEX(txt__b2c__string_var, "SUB|FUNCTION") ){
-to_parse=(
-long)( 0);
-}
-#line 4826 "bacon.bac"
 g_COUNTER = g_COUNTER + (1);
-#line 4827 "bacon.bac"
 } while(!( ENDFILE(newfile) ));
-#line 4828 "bacon.bac"
 fclose(newfile);
-#line 4831 "bacon.bac"
 g_TOTAL_LINES = g_TOTAL_LINES + ( g_COUNTER);
-#line 4833 "bacon.bac"
 g_COUNTER=(long)( copy_counter);
-#line 4835 "bacon.bac"
-g_CURFILE__b2c__string_var = __b2c_Copy_String(g_CURFILE__b2c__string_var, (char*) copy_curfile__b2c__string_var);
-#line 4837 "bacon.bac"
-__b2c__assign = (char*)"__b2c__stringarray_ptr = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_CCTR), g_CFILE);
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4838 "bacon.bac"
-__b2c__assign = (char*)"__b2c__floatarray_ptr = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_FCTR), g_CFILE);
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4839 "bacon.bac"
+g_CURFILE = b2c_CopyString(g_CURFILE, (char*) copy_curfile);
+fprintf(g_CFILE, "b2c_stringarray_ptr = %s;\n", STR( g_CCTR));
+fprintf(g_CFILE, "b2c_floatarray_ptr = %s;\n", STR( g_FCTR));
 }
-#line 4841 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "POKE")){
-#line 4843 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "POKE")){
 if( dim == 1 ){
-#line 4844 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty POKE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4845 "bacon.bac"
-exit(1);
-#line 4846 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty POKE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 4847 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,statement__b2c__string_var, INSTR(statement__b2c__string_var, "POKE") + 4);
-#line 4848 "bacon.bac"
-if( TALLY(exp__b2c__string_var, " SIZE ") ){
-#line 4849 "bacon.bac"
-str__b2c__string_var = __b2c_Copy_String(str__b2c__string_var, (char*) TOKEN__b2c__string_var(exp__b2c__string_var, 2, " SIZE "));
-#line 4850 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) TOKEN__b2c__string_var(exp__b2c__string_var, 1, " SIZE "));
-#line 4851 "bacon.bac"
-token__b2c__string_var = __b2c_Copy_String(token__b2c__string_var, (char*) Mini_Parser__b2c__string_var(exp__b2c__string_var));
-#line 4852 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,exp__b2c__string_var, LEN(token__b2c__string_var)+2);
-#line 4853 "bacon.bac"
-__b2c__assign = (char*)"if(!__b2c__memory__check((char*)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) CONCAT__b2c__string_var( ", (" , str__b2c__string_var , ")*sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"POKE\", ") ; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4854 "bacon.bac"
-__b2c__assign = (char*)CONCAT__b2c__string_var( "memset((void*)(__b2c__MEMTYPE*)(" , token__b2c__string_var , "), " , exp__b2c__string_var , ", (" , str__b2c__string_var , ")*sizeof(__b2c__MEMTYPE));" ); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4855 "bacon.bac"
-} else {
-#line 4856 "bacon.bac"
-token__b2c__string_var = __b2c_Copy_String(token__b2c__string_var, (char*) Mini_Parser__b2c__string_var(exp__b2c__string_var));
-#line 4857 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,exp__b2c__string_var, LEN(token__b2c__string_var)+2);
-#line 4858 "bacon.bac"
-__b2c__assign = (char*)"if(!__b2c__memory__check((char*)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"POKE\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4859 "bacon.bac"
-__b2c__assign = (char*)"*(__b2c__MEMTYPE*)("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ") = ( __b2c__MEMTYPE)("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4860 "bacon.bac"
+    exp = F_MID(exp,statement, INSTR(statement, "POKE") + 4);
+    if( TALLY(exp, " SIZE ") ){
+        str = b2c_CopyString(str, (char*) TOKEN(exp, 2, " SIZE "));
+        exp = b2c_CopyString(exp, (char*) TOKEN(exp, 1, " SIZE "));
+        token = b2c_CopyString(token, (char*) Mini_Parser(exp));
+        exp = F_MID(exp,exp, LEN(token)+2);
+    fprintf(g_CFILE, "if(!b2c_memory__check((char*)%s%s%s, \"%s\", ERROR, %s); }\n", token, CONCAT( ", (" , str , ")*sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"POKE\", "), STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+    fprintf(g_CFILE, "%s\n", CONCAT( "memset((void*)(__b2c__MEMTYPE*)(" , token , "), " , exp , ", (" , str , ")*sizeof(__b2c__MEMTYPE));" ));
+    } else {
+        token = b2c_CopyString(token, (char*) Mini_Parser(exp));
+        exp = F_MID(exp,exp, LEN(token)+2);
+    fprintf(g_CFILE, "if(!b2c_memory__check((char*)%s, sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"POKE\", %s, \"%s\", ERROR, %s); }\n", token, STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+    fprintf(g_CFILE, "*(__b2c__MEMTYPE*)(%s) = ( __b2c__MEMTYPE)(%s);\n", token, exp);
+    }
+    if( __b2c__STRCMP(g_CATCHGOTO ,  "__B2C__PROGRAM__EXIT") == 0 ){
+        g_CATCH_USED=(long)( 1);
+    }
 }
-#line 4861 "bacon.bac"
-if( __b2c__STRCMP(g_CATCHGOTO__b2c__string_var ,  "__B2C__PROGRAM__EXIT") == 0 ){
-g_CATCH_USED=(long)( 1);
-}
-#line 4862 "bacon.bac"
-}
-#line 4864 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "RESIZE")){
-#line 4866 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "RESIZE")){
 if( dim == 1 ){
-#line 4867 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty RESIZE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4868 "bacon.bac"
-exit(1);
-#line 4869 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty RESIZE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 4870 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,statement__b2c__string_var, INSTR(statement__b2c__string_var, "RESIZE") + 6);
-#line 4871 "bacon.bac"
-lft__b2c__string_var = F_CHOP__b2c__string_var(lft__b2c__string_var,TOKEN__b2c__string_var(exp__b2c__string_var, 1, " TO "));
-#line 4872 "bacon.bac"
-str__b2c__string_var = F_CHOP__b2c__string_var(str__b2c__string_var,TOKEN__b2c__string_var(exp__b2c__string_var, 2, " TO "));
-#line 4873 "bacon.bac"
-__b2c__assign = (char*)"if(!__b2c__memory__check((char*)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) lft__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"RESIZE\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4874 "bacon.bac"
-__b2c__assign = (char*)lft__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = ("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) Get_Var__b2c__string_var(EXTRACT__b2c__string_var(lft__b2c__string_var, "."), g_FUNCNAME__b2c__string_var); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")realloc((void*)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) lft__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", sizeof(__b2c__MEMTYPE)*("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) str__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "+1));"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4875 "bacon.bac"
-__b2c__assign = (char*)"if((void*)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) lft__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " == NULL) { ERROR=6; RUNTIMEERROR(\"RESIZE\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4876 "bacon.bac"
-if( __b2c__STRCMP(g_CATCHGOTO__b2c__string_var ,  "__B2C__PROGRAM__EXIT") == 0 ){
-g_CATCH_USED=(long)( 1);
+    exp = F_MID(exp,statement, INSTR(statement, "RESIZE") + 6);
+    lft = F_CHOP(lft,TOKEN(exp, 1, " TO "));
+    str = F_CHOP(str,TOKEN(exp, 2, " TO "));
+fprintf(g_CFILE, "if(!b2c_memory__check((char*)%s, sizeof(__b2c__MEMTYPE))) { ERROR=1; RUNTIMEERROR(\"RESIZE\", %s, \"%s\", ERROR, %s); }\n", lft, STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+fprintf(g_CFILE, "%s = (%s)realloc((void*)%s, sizeof(__b2c__MEMTYPE)*(%s+1));\n", lft, Get_Var(EXTRACT(lft, "."), g_FUNCNAME), lft, str);
+fprintf(g_CFILE, "if((void*)%s == NULL) { ERROR=6; RUNTIMEERROR(\"RESIZE\", %s, \"%s\", ERROR, %s); }\n", lft, STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+    if( __b2c__STRCMP(g_CATCHGOTO ,  "__B2C__PROGRAM__EXIT") == 0 ){
+        g_CATCH_USED=(long)( 1);
+    }
 }
-#line 4877 "bacon.bac"
-}
-#line 4879 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "COPY")){
-#line 4880 "bacon.bac"
-Handle_Copy(statement__b2c__string_var);
-#line 4882 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "DELETE")){
-#line 4884 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "COPY")){
+Handle_Copy(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "DELETE")){
 if( dim == 1 ){
-#line 4885 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty DELETE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4886 "bacon.bac"
-exit(1);
-#line 4887 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty DELETE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 4889 "bacon.bac"
-if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "FILE") == 0 ){
-#line 4890 "bacon.bac"
-__b2c__assign = (char*)"if(unlink("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, " FILE ") + 6); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")==-1){ ERROR = 7; RUNTIMEERROR(\"DELETE\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4891 "bacon.bac"
-if( __b2c__STRCMP(g_CATCHGOTO__b2c__string_var ,  "__B2C__PROGRAM__EXIT") == 0 ){
-g_CATCH_USED=(long)( 1);
+    if( __b2c__STRCMP(element[(uint64_t)2] ,  "FILE") == 0 ){
+    fprintf(g_CFILE, "if(unlink(%s)==-1){ ERROR = 7; RUNTIMEERROR(\"DELETE\", %s, \"%s\", ERROR, %s); }\n", MID(statement, INSTR(statement, " FILE ") + 6), STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+        if( __b2c__STRCMP(g_CATCHGOTO ,  "__B2C__PROGRAM__EXIT") == 0 ){
+            g_CATCH_USED=(long)( 1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "DIRECTORY") == 0 ){
+    fprintf(g_CFILE, "if(rmdir(%s) == -1){ ERROR = 20; RUNTIMEERROR(\"DELETE\", %s, \"%s\", ERROR, %s); }\n", MID(statement, INSTR(statement, " DIRECTORY ") + 11), STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+        if( __b2c__STRCMP(g_CATCHGOTO ,  "__B2C__PROGRAM__EXIT") == 0 ){
+            g_CATCH_USED=(long)( 1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "RECURSIVE") == 0 ){
+    fprintf(g_CFILE, "b2c_rmrecursive(__LINE__, __FILE__, %s);\n", MID(statement, INSTR(statement, " RECURSIVE ") + 11));
+    } else if( ISTOKEN(statement, "FROM") ){
+        sym = F_CHOP(sym,LAST(statement, ISTOKEN(statement, "FROM")));
+        exp = b2c_CopyString(exp, (char*) HEAD(statement, ISTOKEN(statement, "FROM")-1));
+        exp = b2c_CopyString(exp, (char*) LAST(exp, ISTOKEN(exp, "DELETE")));
+        txt = b2c_CopyString(txt, (char*) Get_Var( CONCAT("b2c_tree_" , sym) , g_FUNCNAME));
+        uniq = F_CONCAT(uniq, "__b2c__" , sym , "_" , STR(g_COUNTER) , "_" , STR(RND)) ;
+        if( __b2c__STRCMP(TOKEN(txt, 2, ":") ,  "char*") == 0 ){
+        fprintf(g_CFILE, "char *%s = %s; b2c_assign2 = tfind((void*)%s, &%s, %s); if(b2c_assign2) { b2c_assign = *b2c_assign2; tdelete((void*)%s, &%s, %s); __b2c__STRFREE(b2c_assign); }\n", uniq, exp, uniq, sym, TOKEN(txt, 1, ":"), uniq, sym, TOKEN(txt, 1, ":"));
+        } else {
+        fprintf(g_CFILE, "%s *%s = (%s*)malloc(sizeof(%s)); *%s = (%s)%s; b2c_assign2 = tfind((void*)%s, &%s, %s); if(b2c_assign2) { b2c_assign = *b2c_assign2; tdelete((void*)%s, &%s, %s); free(b2c_assign); } free(%s);\n", TOKEN(txt, 2, ":"), uniq, TOKEN(txt, 2, ":"), TOKEN(txt, 2, ":"), uniq, TOKEN(txt, 2, ":"), exp, uniq, sym, TOKEN(txt, 1, ":"), uniq, sym, TOKEN(txt, 1, ":"), uniq);
+        }
+    } else {
+    fprintf(stderr, "%sSyntax error: erronuous argument for DELETE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+        exit(1);
+    }
 }
-#line 4892 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "DIRECTORY") == 0 ){
-#line 4893 "bacon.bac"
-__b2c__assign = (char*)"if(rmdir("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, " DIRECTORY ") + 11); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ") == -1){ ERROR = 20; RUNTIMEERROR(\"DELETE\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4894 "bacon.bac"
-if( __b2c__STRCMP(g_CATCHGOTO__b2c__string_var ,  "__B2C__PROGRAM__EXIT") == 0 ){
-g_CATCH_USED=(long)( 1);
-}
-#line 4895 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "RECURSIVE") == 0 ){
-#line 4896 "bacon.bac"
-__b2c__assign = (char*)"__b2c__rmrecursive(__LINE__, __FILE__, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, " RECURSIVE ") + 11); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4897 "bacon.bac"
-} else if( ISTOKEN(statement__b2c__string_var, "FROM") ){
-#line 4898 "bacon.bac"
-sym__b2c__string_var = F_CHOP__b2c__string_var(sym__b2c__string_var,LAST__b2c__string_var(statement__b2c__string_var, ISTOKEN(statement__b2c__string_var, "FROM")));
-#line 4899 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) HEAD__b2c__string_var(statement__b2c__string_var, ISTOKEN(statement__b2c__string_var, "FROM")-1));
-#line 4900 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) LAST__b2c__string_var(exp__b2c__string_var, ISTOKEN(exp__b2c__string_var, "DELETE")));
-#line 4901 "bacon.bac"
-txt__b2c__string_var = __b2c_Copy_String(txt__b2c__string_var, (char*) Get_Var__b2c__string_var( CONCAT__b2c__string_var("__b2c__tree_" , sym__b2c__string_var) , g_FUNCNAME__b2c__string_var));
-#line 4902 "bacon.bac"
-uniq__b2c__string_var = F_CONCAT__b2c__string_var(uniq__b2c__string_var, "__b2c__" , sym__b2c__string_var , "_" , STR__b2c__string_var(g_COUNTER) , "_" , STR__b2c__string_var(RND)) ;
-#line 4903 "bacon.bac"
-if( __b2c__STRCMP(TOKEN__b2c__string_var(txt__b2c__string_var, 2, ":") ,  "char*") == 0 ){
-#line 4904 "bacon.bac"
-__b2c__assign = (char*)"char *"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) uniq__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "; __b2c__assign2 = tfind((void*)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) uniq__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", &"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) sym__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) TOKEN__b2c__string_var(txt__b2c__string_var, 1, ":"); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); if(__b2c__assign2) { __b2c__assign = *__b2c__assign2; tdelete((void*)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) uniq__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", &"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) sym__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) TOKEN__b2c__string_var(txt__b2c__string_var, 1, ":"); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); __b2c__STRFREE(__b2c__assign); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4905 "bacon.bac"
-} else {
-#line 4906 "bacon.bac"
-__b2c__assign = (char*)TOKEN__b2c__string_var(txt__b2c__string_var, 2, ":"); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " *"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) uniq__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = ("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) TOKEN__b2c__string_var(txt__b2c__string_var, 2, ":"); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "*)malloc(sizeof("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) TOKEN__b2c__string_var(txt__b2c__string_var, 2, ":"); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")); *"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) uniq__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = ("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) TOKEN__b2c__string_var(txt__b2c__string_var, 2, ":"); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "; __b2c__assign2 = tfind((void*)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) uniq__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", &"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) sym__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) TOKEN__b2c__string_var(txt__b2c__string_var, 1, ":"); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); if(__b2c__assign2) { __b2c__assign = *__b2c__assign2; tdelete((void*)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) uniq__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", &"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) sym__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) TOKEN__b2c__string_var(txt__b2c__string_var, 1, ":"); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); free(__b2c__assign); } free("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) uniq__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4907 "bacon.bac"
-}
-#line 4908 "bacon.bac"
-} else {
-#line 4909 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: erronuous argument for DELETE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4910 "bacon.bac"
-exit(1);
-#line 4911 "bacon.bac"
-}
-#line 4912 "bacon.bac"
-}
-#line 4914 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "RENAME")){
-#line 4915 "bacon.bac"
-Handle_Rename(statement__b2c__string_var);
-#line 4917 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "MAKEDIR")){
-#line 4919 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "RENAME")){
+Handle_Rename(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "MAKEDIR")){
 if( dim == 1 ){
-#line 4920 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty MAKEDIR at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4921 "bacon.bac"
-exit(1);
-#line 4922 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty MAKEDIR at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 4924 "bacon.bac"
-__b2c__assign = (char*)"ERROR = __b2c__makedir("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) LAST__b2c__string_var(statement__b2c__string_var); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); if(ERROR){ RUNTIMEERROR(\"MAKEDIR\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4925 "bacon.bac"
-if( __b2c__STRCMP(g_CATCHGOTO__b2c__string_var ,  "__B2C__PROGRAM__EXIT") == 0 ){
-g_CATCH_USED=(long)( 1);
+fprintf(g_CFILE, "ERROR = b2c_makedir(%s); if(ERROR){ RUNTIMEERROR(\"MAKEDIR\", %s, \"%s\", ERROR, %s); }\n", LAST(statement), STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+    if( __b2c__STRCMP(g_CATCHGOTO ,  "__B2C__PROGRAM__EXIT") == 0 ){
+        g_CATCH_USED=(long)( 1);
+    }
 }
-#line 4926 "bacon.bac"
-}
-#line 4928 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "CHANGEDIR")){
-#line 4930 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "CHANGEDIR")){
 if( dim == 1 ){
-#line 4931 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty CHANGEDIR at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4932 "bacon.bac"
-exit(1);
-#line 4933 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty CHANGEDIR at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 4935 "bacon.bac"
-__b2c__assign = (char*)"if("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) LAST__b2c__string_var(statement__b2c__string_var); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " == NULL || chdir("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) LAST__b2c__string_var(statement__b2c__string_var); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ") == -1){ ERROR = 22; RUNTIMEERROR(\"CHANGEDIR\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4936 "bacon.bac"
-if( __b2c__STRCMP(g_CATCHGOTO__b2c__string_var ,  "__B2C__PROGRAM__EXIT") == 0 ){
-g_CATCH_USED=(long)( 1);
+fprintf(g_CFILE, "if(%s == NULL || chdir(%s) == -1){ ERROR = 22; RUNTIMEERROR(\"CHANGEDIR\", %s, \"%s\", ERROR, %s); }\n", LAST(statement), LAST(statement), STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+    if( __b2c__STRCMP(g_CATCHGOTO ,  "__B2C__PROGRAM__EXIT") == 0 ){
+        g_CATCH_USED=(long)( 1);
+    }
 }
-#line 4937 "bacon.bac"
-}
-#line 4939 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "FREE")){
-#line 4941 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "FREE")){
 if( dim == 1 ){
-#line 4942 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty FREE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4943 "bacon.bac"
-exit(1);
-#line 4944 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty FREE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 4946 "bacon.bac"
-if( REGEX(statement__b2c__string_var, "[a-zA-Z]+\\(.*\\)$") ){
-#line 4948 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) LAST__b2c__string_var(statement__b2c__string_var));
-#line 4949 "bacon.bac"
-while( LEN(exp__b2c__string_var) ){
-#line 4950 "bacon.bac"
-token__b2c__string_var = F_CHOP__b2c__string_var(token__b2c__string_var,LEFT__b2c__string_var(exp__b2c__string_var, INSTR(exp__b2c__string_var, "(")-1));
-#line 4951 "bacon.bac"
-str__b2c__string_var = F_CHOP__b2c__string_var(str__b2c__string_var,Mini_Parser__b2c__string_var(exp__b2c__string_var));
-#line 4952 "bacon.bac"
-txt__b2c__string_var = F_MID__b2c__string_var(txt__b2c__string_var,str__b2c__string_var, INSTR(str__b2c__string_var, "(")+1);
-#line 4953 "bacon.bac"
-__b2c__assign = (char*)"__b2c__hash_del(__b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) LEFT__b2c__string_var(txt__b2c__string_var, LEN(txt__b2c__string_var)-1); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4954 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,exp__b2c__string_var, LEN(str__b2c__string_var)+2);
-#line 4955 "bacon.bac"
+    if( REGEX(statement, "[a-zA-Z]+\\(.*\\)$") ){
+        exp = b2c_CopyString(exp, (char*) LAST(statement));
+        while( LEN(exp) ){
+            token = F_CHOP(token,LEFT(exp, INSTR(exp, "(")-1));
+            str = F_CHOP(str,Mini_Parser(exp));
+            txt = F_MID(txt,str, INSTR(str, "(")+1);
+        fprintf(g_CFILE, "b2c_hash_del(assoc_%s, %s);\n", token, LEFT(txt, LEN(txt)-1));
+            exp = F_MID(exp,exp, LEN(str)+2);
+        }
+    } else {
+        b2c_forin_str_string = b2c_CopyString(b2c_forin_str_string, EXTRACT(LAST(statement), " ")); b2c_forin_str_string_org = b2c_forin_str_string;
+        b2c_forin_str_step = b2c_CopyString(b2c_forin_str_step, ",");
+        b2c_forin_str_ptr = b2c_for_amount(b2c_forin_str_string, b2c_forin_str_step);
+        for(; b2c_forin_str_ptr > 0; b2c_forin_str_ptr--) { b2c_for_item(&b2c_forin_str_string_org, b2c_forin_str_step, &str);
+            if( LEN(Get_Var( CONCAT("assoc_" , str) ))  OR  LEN(Get_Var( CONCAT("assoc_" , str) , g_FUNCNAME)) ){
+            fprintf(g_CFILE, "b2c_hash_clear(assoc_%s);\n", str);
+            } else {
+            fprintf(g_CFILE, "if(!b2c_memory__check((char *)%s, sizeof(__b2c__MEMTYPE)))\n", str);
+            fprintf(g_CFILE, "{ ERROR=1; RUNTIMEERROR(\"FREE\", %s, \"%s\", ERROR, %s); } free((void*)%s);\n", STR( g_COUNTER), g_CURFILE, g_CATCHGOTO, str);
+                b2c_hash_del(assoc_g_SEMANTIC_MEMFREE, str);
+            }
+        }
+        if( __b2c__STRCMP(g_CATCHGOTO ,  "__B2C__PROGRAM__EXIT") == 0 ){
+            g_CATCH_USED=(long)( 1);
+        }
+    }
 }
-#line 4956 "bacon.bac"
-} else {
-#line 4957 "bacon.bac"
-__b2c__forin_str__b2c__string_var_string = __b2c_Copy_String(__b2c__forin_str__b2c__string_var_string, EXTRACT__b2c__string_var(LAST__b2c__string_var(statement__b2c__string_var), " ")); __b2c__forin_str__b2c__string_var_string_org = __b2c__forin_str__b2c__string_var_string;
-__b2c__forin_str__b2c__string_var_step = __b2c_Copy_String(__b2c__forin_str__b2c__string_var_step, ",");
-__b2c__forin_str__b2c__string_var_ptr = __b2c__for_amount(__b2c__forin_str__b2c__string_var_string, __b2c__forin_str__b2c__string_var_step);
-for(; __b2c__forin_str__b2c__string_var_ptr > 0; __b2c__forin_str__b2c__string_var_ptr--) { __b2c__for_item(&__b2c__forin_str__b2c__string_var_string_org, __b2c__forin_str__b2c__string_var_step, &str__b2c__string_var);
-#line 4958 "bacon.bac"
-if( LEN(Get_Var__b2c__string_var( CONCAT__b2c__string_var("__b2c__assoc_" , str__b2c__string_var) ))  OR  LEN(Get_Var__b2c__string_var( CONCAT__b2c__string_var("__b2c__assoc_" , str__b2c__string_var) , g_FUNCNAME__b2c__string_var)) ){
-#line 4959 "bacon.bac"
-__b2c__assign = (char*)"__b2c__hash_clear(__b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) str__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4960 "bacon.bac"
-} else {
-#line 4961 "bacon.bac"
-__b2c__assign = (char*)"if(!__b2c__memory__check((char *)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) str__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", sizeof(__b2c__MEMTYPE)))"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4962 "bacon.bac"
-__b2c__assign = (char*)"{ ERROR=1; RUNTIMEERROR(\"FREE\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); } free((void*)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) str__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4963 "bacon.bac"
-__b2c__hash_del(__b2c__assoc_g_SEMANTIC_MEMFREE__b2c__string_var, str__b2c__string_var);
-#line 4964 "bacon.bac"
-}
-#line 4965 "bacon.bac"
-}
-#line 4966 "bacon.bac"
-if( __b2c__STRCMP(g_CATCHGOTO__b2c__string_var ,  "__B2C__PROGRAM__EXIT") == 0 ){
-g_CATCH_USED=(long)( 1);
-}
-#line 4967 "bacon.bac"
-}
-#line 4968 "bacon.bac"
-}
-#line 4970 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ON")){
-#line 4972 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "ON")){
 if( dim == 1 ){
-#line 4973 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty ON at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4974 "bacon.bac"
-exit(1);
-#line 4975 "bacon.bac"
-} else if( NOT(ISTOKEN(statement__b2c__string_var, "GOTO"))  AND  NOT(INSTR(statement__b2c__string_var, "CALL")) ){
-#line 4976 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: ON without CALL/GOTO at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 4977 "bacon.bac"
-exit(1);
-#line 4978 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty ON at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
+} else if( NOT(ISTOKEN(statement, "GOTO"))  AND  NOT(INSTR(statement, "CALL")) ){
+fprintf(stderr, "%sSyntax error: ON without CALL/GOTO at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 4979 "bacon.bac"
-__b2c__parse(&match__b2c__string_var, 1, &match__b2c__string_var__b2c_array, COLLAPSE__b2c__string_var(statement__b2c__string_var), CONCAT__b2c__string_var( "ON * " , IIF__b2c__string_var(ISTOKEN(statement__b2c__string_var, "CALL"), "CALL", "GOTO") , " *" ), __b2c__option_delim);
-#line 4981 "bacon.bac"
-i=(
-long)( 1);
-#line 4982 "bacon.bac"
-__b2c__assign = (char*)"switch("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) match__b2c__string_var[(uint64_t)1]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "){"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4983 "bacon.bac"
-while( LEN(match__b2c__string_var[(uint64_t)2]) ){
-#line 4984 "bacon.bac"
-token__b2c__string_var = __b2c_Copy_String(token__b2c__string_var, (char*) Mini_Parser__b2c__string_var(match__b2c__string_var[(uint64_t)2]));
-#line 4985 "bacon.bac"
-if( ISTOKEN(statement__b2c__string_var, "GOTO") ){
-#line 4986 "bacon.bac"
-__b2c__assign = (char*)"case "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( i), g_CFILE);
-__b2c__assign = (char*) ": goto "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "; break;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4987 "bacon.bac"
-} else {
-#line 4988 "bacon.bac"
-if( NOT(REGEX(token__b2c__string_var, "\\(.*\\)$")) ){
-#line 4989 "bacon.bac"
-__b2c__assign = (char*)"case "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( i), g_CFILE);
-__b2c__assign = (char*) ": "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "(); break;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4990 "bacon.bac"
-} else {
-#line 4991 "bacon.bac"
-__b2c__assign = (char*)"case "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( i), g_CFILE);
-__b2c__assign = (char*) ": "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "; break;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4992 "bacon.bac"
+    b2c_parse(&match, 1, &match__b2c_array, COLLAPSE(statement), CONCAT( "ON * " , IIF(ISTOKEN(statement, "CALL"), "CALL", "GOTO") , " *" ), b2c_option_delim);
+    i=(
+    long)( 1);
+fprintf(g_CFILE, "switch(%s){\n", match[(uint64_t)1]);
+    while( LEN(match[(uint64_t)2]) ){
+        token = b2c_CopyString(token, (char*) Mini_Parser(match[(uint64_t)2]));
+        if( ISTOKEN(statement, "GOTO") ){
+        fprintf(g_CFILE, "case %s: goto %s; break;\n", STR( i), token);
+        } else {
+            if( NOT(REGEX(token, "\\(.*\\)$")) ){
+            fprintf(g_CFILE, "case %s: %s(); break;\n", STR( i), token);
+            } else {
+            fprintf(g_CFILE, "case %s: %s; break;\n", STR( i), token);
+            }
+        }
+        match[(uint64_t)2] = F_MID(match[(uint64_t)2],match[(uint64_t)2], LEN(token)+2);
+        i = i + (1);
+    }
+fputs("}\n", g_CFILE);
 }
-#line 4993 "bacon.bac"
-}
-#line 4994 "bacon.bac"
-match__b2c__string_var[(uint64_t)2] = F_MID__b2c__string_var(match__b2c__string_var[(uint64_t)2],match__b2c__string_var[(uint64_t)2], LEN(token__b2c__string_var)+2);
-#line 4995 "bacon.bac"
-i = i + (1);
-#line 4996 "bacon.bac"
-}
-#line 4997 "bacon.bac"
-__b2c__assign = (char*)"}"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 4998 "bacon.bac"
-}
-#line 5000 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "GOTO")){
-#line 5002 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "GOTO")){
 if( dim == 1 ){
-#line 5003 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty GOTO at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5004 "bacon.bac"
-exit(1);
-#line 5005 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty GOTO at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5007 "bacon.bac"
-__b2c__assign = (char*)"goto "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5008 "bacon.bac"
+fprintf(g_CFILE, "goto %s;\n", element[(uint64_t)2]);
 }
-#line 5010 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "GOSUB")){
-#line 5012 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "GOSUB")){
 if( dim == 1 ){
-#line 5013 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty GOSUB at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5014 "bacon.bac"
-exit(1);
-#line 5015 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty GOSUB at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5017 "bacon.bac"
-__b2c__assign = (char*)"__b2c__gosub_buffer_ptr++; if (__b2c__gosub_buffer_ptr >= "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_MAX_RBUFFERS), g_CFILE);
-__b2c__assign = (char*) ") { ERROR=31; RUNTIMEERROR(\"GOSUB\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5018 "bacon.bac"
-__b2c__assign = (char*)"if(!setjmp(__b2c__gosub_buffer[__b2c__gosub_buffer_ptr])) goto "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5019 "bacon.bac"
-__b2c__assign = (char*)"__b2c__gosub_buffer_ptr--; if(__b2c__gosub_buffer_ptr < -1) __b2c__gosub_buffer_ptr = -1;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5020 "bacon.bac"
-if( __b2c__STRCMP(g_CATCHGOTO__b2c__string_var ,  "__B2C__PROGRAM__EXIT") == 0 ){
-g_CATCH_USED=(long)( 1);
+fprintf(g_CFILE, "b2c_gosub_buffer_ptr++; if (b2c_gosub_buffer_ptr >= %s) { ERROR=31; RUNTIMEERROR(\"GOSUB\", %s, \"%s\", ERROR, %s); }\n", STR( g_MAX_RBUFFERS), STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+fprintf(g_CFILE, "if(!setjmp(b2c_gosub_buffer[b2c_gosub_buffer_ptr])) goto %s;\n", element[(uint64_t)2]);
+fputs("b2c_gosub_buffer_ptr--; if(b2c_gosub_buffer_ptr < -1) b2c_gosub_buffer_ptr = -1;\n", g_CFILE);
+    if( __b2c__STRCMP(g_CATCHGOTO ,  "__B2C__PROGRAM__EXIT") == 0 ){
+        g_CATCH_USED=(long)( 1);
+    }
 }
-#line 5021 "bacon.bac"
-}
-#line 5023 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "LABEL")){
-#line 5025 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "LABEL")){
 if( dim == 1 ){
-#line 5026 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty LABEL at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5027 "bacon.bac"
-exit(1);
-#line 5028 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty LABEL at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5030 "bacon.bac"
-__b2c__assign = (char*)element__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ":"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5031 "bacon.bac"
-__b2c__assign = (char*)";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5033 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__label_floatarray_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5034 "bacon.bac"
-__b2c__assign = (char*)"#define __b2c__label_floatarray_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs(STR__b2c__string_var( g_FCTR), g_HFILE);
-fputs("\n", g_HFILE);
-#line 5035 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__label_stringarray_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5036 "bacon.bac"
-__b2c__assign = (char*)"#define __b2c__label_stringarray_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs(STR__b2c__string_var( g_CCTR), g_HFILE);
-fputs("\n", g_HFILE);
-#line 5037 "bacon.bac"
+fprintf(g_CFILE, "%s:\n", element[(uint64_t)2]);
+fputs(";\n", g_CFILE);
+fprintf(g_HFILE, "#undef b2c_label_floatarray_%s \n", element[(uint64_t)2]);
+fprintf(g_HFILE, "#define b2c_label_floatarray_%s %s\n", element[(uint64_t)2], STR( g_FCTR));
+fprintf(g_HFILE, "#undef b2c_label_stringarray_%s \n", element[(uint64_t)2]);
+fprintf(g_HFILE, "#define b2c_label_stringarray_%s %s\n", element[(uint64_t)2], STR( g_CCTR));
 }
-#line 5039 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "TRAP")){
-#line 5041 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "TRAP")){
 if( dim == 1 ){
-#line 5042 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty TRAP at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5043 "bacon.bac"
-exit(1);
-#line 5044 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty TRAP at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5045 "bacon.bac"
-if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "LOCAL") == 0 ){
-#line 5046 "bacon.bac"
-__b2c__assign = (char*)"/* Error catching is enabled */"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5047 "bacon.bac"
-__b2c__assign = (char*)"__b2c__trap = 1;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5048 "bacon.bac"
-__b2c__assign = (char*)"signal(SIGILL, __b2c__catch_signal);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5049 "bacon.bac"
-__b2c__assign = (char*)"signal(SIGABRT, __b2c__catch_signal);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5050 "bacon.bac"
-__b2c__assign = (char*)"signal(SIGFPE, __b2c__catch_signal);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5051 "bacon.bac"
-__b2c__assign = (char*)"signal(SIGSEGV, __b2c__catch_signal);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5052 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "SYSTEM") == 0 ){
-#line 5053 "bacon.bac"
-__b2c__assign = (char*)"/* Error catching is disabled */"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5054 "bacon.bac"
-__b2c__assign = (char*)"__b2c__trap = 0;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5055 "bacon.bac"
-__b2c__assign = (char*)"signal(SIGILL, SIG_DFL);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5056 "bacon.bac"
-__b2c__assign = (char*)"signal(SIGABRT, SIG_DFL);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5057 "bacon.bac"
-__b2c__assign = (char*)"signal(SIGFPE, SIG_DFL);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5058 "bacon.bac"
-__b2c__assign = (char*)"signal(SIGSEGV, SIG_DFL);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5059 "bacon.bac"
-} else {
-#line 5060 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument for TRAP at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5061 "bacon.bac"
-exit(1);
-#line 5062 "bacon.bac"
+    if( __b2c__STRCMP(element[(uint64_t)2] ,  "LOCAL") == 0 ){
+    fputs("/* Error catching is enabled */\n", g_CFILE);
+    fputs("b2c_trap = 1;\n", g_CFILE);
+    fputs("signal(SIGILL, b2c_catch_signal);\n", g_CFILE);
+    fputs("signal(SIGABRT, b2c_catch_signal);\n", g_CFILE);
+    fputs("signal(SIGFPE, b2c_catch_signal);\n", g_CFILE);
+    fputs("signal(SIGSEGV, b2c_catch_signal);\n", g_CFILE);
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "SYSTEM") == 0 ){
+    fputs("/* Error catching is disabled */\n", g_CFILE);
+    fputs("b2c_trap = 0;\n", g_CFILE);
+    fputs("signal(SIGILL, SIG_DFL);\n", g_CFILE);
+    fputs("signal(SIGABRT, SIG_DFL);\n", g_CFILE);
+    fputs("signal(SIGFPE, SIG_DFL);\n", g_CFILE);
+    fputs("signal(SIGSEGV, SIG_DFL);\n", g_CFILE);
+    } else {
+    fprintf(stderr, "%sSyntax error: invalid argument for TRAP at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+        exit(1);
+    }
 }
-#line 5063 "bacon.bac"
-}
-#line 5065 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "CATCH")){
-#line 5067 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "CATCH")){
 if( dim == 1 ){
-#line 5068 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty CATCH at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5069 "bacon.bac"
-exit(1);
-#line 5070 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "GOTO") == 0 ){
-#line 5071 "bacon.bac"
-__b2c__assign = (char*)"__b2c__catch_set = 1;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5072 "bacon.bac"
-g_CATCHGOTO__b2c__string_var = __b2c_Copy_String(g_CATCHGOTO__b2c__string_var, (char*) element__b2c__string_var[(uint64_t)3]);
-#line 5073 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "ERROR") == 0 ){
-#line 5074 "bacon.bac"
-__b2c__assign = (char*)"__b2c__error_callback = & "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)3]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5075 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "RESET") == 0 ){
-#line 5076 "bacon.bac"
-__b2c__assign = (char*)"__b2c__catch_set = 0;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5077 "bacon.bac"
-g_CATCHGOTO__b2c__string_var = __b2c_Copy_String(g_CATCHGOTO__b2c__string_var, (char*) "__B2C__PROGRAM__EXIT");
-#line 5078 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty CATCH at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
+} else if( __b2c__STRCMP(element[(uint64_t)2] ,  "GOTO") == 0 ){
+fputs("b2c_catch_set = 1;\n", g_CFILE);
+    g_CATCHGOTO = b2c_CopyString(g_CATCHGOTO, (char*) element[(uint64_t)3]);
+} else if( __b2c__STRCMP(element[(uint64_t)2] ,  "ERROR") == 0 ){
+fprintf(g_CFILE, "b2c_error_callback = & %s;\n", element[(uint64_t)3]);
+} else if( __b2c__STRCMP(element[(uint64_t)2] ,  "RESET") == 0 ){
+fputs("b2c_catch_set = 0;\n", g_CFILE);
+    g_CATCHGOTO = b2c_CopyString(g_CATCHGOTO, (char*) "__B2C__PROGRAM__EXIT");
 } else {
-#line 5079 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: CATCH without GOTO or RESET at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5080 "bacon.bac"
-exit(1);
-#line 5081 "bacon.bac"
+fprintf(stderr, "%sSyntax error: CATCH without GOTO or RESET at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 }
-#line 5083 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "RESUME")){
-#line 5084 "bacon.bac"
-__b2c__assign = (char*)"if(jmp_buf_is_used(__b2c__jump)) { longjmp(__b2c__jump, 1); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5086 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "CLEAR")){
-#line 5087 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stdout,\"\\033[2J\"); fprintf(stdout,\"\\033[0;0f\");fflush(stdout);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5089 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "COLOR")){
-#line 5090 "bacon.bac"
-Handle_Color(statement__b2c__string_var);
-#line 5092 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "TYPE")){
-#line 5093 "bacon.bac"
-Handle_Type(statement__b2c__string_var);
-#line 5095 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SCREEN")){
-#line 5097 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "RESUME")){
+fputs("if(jmp_buf_is_used(b2c_jump)) { longjmp(b2c_jump, 1); }\n", g_CFILE);
+} else  if ( !b2c_strcmp(b2c_select_4250, "CLEAR")){
+fputs("fprintf(stdout,\"\\033[2J\"); fprintf(stdout,\"\\033[0;0f\");fflush(stdout);\n", g_CFILE);
+} else  if ( !b2c_strcmp(b2c_select_4250, "COLOR")){
+Handle_Color(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "TYPE")){
+Handle_Type(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "SCREEN")){
 if( dim == 1 ){
-#line 5098 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty SCREEN at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5099 "bacon.bac"
-exit(1);
-#line 5100 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty SCREEN at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5101 "bacon.bac"
-if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "SAVE") == 0 ){
-#line 5102 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stdout,\"\\033[?47h\"); fflush(stdout);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5103 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "RESTORE") == 0 ){
-#line 5104 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stdout,\"\\033[?47l\"); fflush(stdout);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5105 "bacon.bac"
-} else {
-#line 5106 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument for SCREEN at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5107 "bacon.bac"
-exit(1);
-#line 5108 "bacon.bac"
+    if( __b2c__STRCMP(element[(uint64_t)2] ,  "SAVE") == 0 ){
+    fputs("fprintf(stdout,\"\\033[?47h\"); fflush(stdout);\n", g_CFILE);
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "RESTORE") == 0 ){
+    fputs("fprintf(stdout,\"\\033[?47l\"); fflush(stdout);\n", g_CFILE);
+    } else {
+    fprintf(stderr, "%sSyntax error: invalid argument for SCREEN at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+        exit(1);
+    }
 }
-#line 5109 "bacon.bac"
-}
-#line 5111 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "GOTOXY")){
-#line 5112 "bacon.bac"
-Handle_Gotoxy(statement__b2c__string_var);
-#line 5114 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "RECEIVE")){
-#line 5115 "bacon.bac"
-Handle_Receive(CHOP__b2c__string_var(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "RECEIVE") + 7)));
-#line 5117 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SEND")){
-#line 5118 "bacon.bac"
-Handle_Send(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "SEND") + 4));
-#line 5120 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "RECORD")){
-#line 5122 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "GOTOXY")){
+Handle_Gotoxy(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "RECEIVE")){
+Handle_Receive(CHOP(MID(statement, INSTR(statement, "RECEIVE") + 7)));
+} else  if ( !b2c_strcmp(b2c_select_4250, "SEND")){
+Handle_Send(MID(statement, INSTR(statement, "SEND") + 4));
+} else  if ( !b2c_strcmp(b2c_select_4250, "RECORD")){
 if( dim == 1 ){
-#line 5123 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty RECORD at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5124 "bacon.bac"
-exit(1);
-#line 5125 "bacon.bac"
-} else if( ISTRUE(LEN(g_RECORDNAME__b2c__string_var)) ){
-#line 5126 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: cannot define a record within a record!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5127 "bacon.bac"
-exit(1);
-#line 5128 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty RECORD at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
+} else if( ISTRUE(LEN(g_RECORDNAME)) ){
+fprintf(stderr, "%sSyntax error: cannot define a record within a record!\n", NL);
+    exit(1);
 } else {
-#line 5130 "bacon.bac"
-g_RECORDVAR__b2c__string_var = F_MID__b2c__string_var(g_RECORDVAR__b2c__string_var,statement__b2c__string_var, INSTR(statement__b2c__string_var, "RECORD")+6);
-#line 5131 "bacon.bac"
-if( INSTR(g_RECORDVAR__b2c__string_var, " ARRAY ") ){
-#line 5132 "bacon.bac"
-g_RECORDARRAY__b2c__string_var = F_MID__b2c__string_var(g_RECORDARRAY__b2c__string_var,g_RECORDVAR__b2c__string_var, INSTR(g_RECORDVAR__b2c__string_var, "ARRAY")+5);
-#line 5133 "bacon.bac"
-g_RECORDVAR__b2c__string_var = F_CONCAT__b2c__string_var(g_RECORDVAR__b2c__string_var, CHOP__b2c__string_var(LEFT__b2c__string_var(g_RECORDVAR__b2c__string_var, INSTR(g_RECORDVAR__b2c__string_var, "ARRAY")-1)) , "[" , g_RECORDARRAY__b2c__string_var , "]") ;
-#line 5134 "bacon.bac"
+    g_RECORDVAR = F_MID(g_RECORDVAR,statement, INSTR(statement, "RECORD")+6);
+    if( INSTR(g_RECORDVAR, " ARRAY ") ){
+        g_RECORDARRAY = F_MID(g_RECORDARRAY,g_RECORDVAR, INSTR(g_RECORDVAR, "ARRAY")+5);
+        g_RECORDVAR = F_CONCAT(g_RECORDVAR, CHOP(LEFT(g_RECORDVAR, INSTR(g_RECORDVAR, "ARRAY")-1)) , "[" , g_RECORDARRAY , "]") ;
+    }
+    if( ISTRUE(LEN(g_FUNCNAME)) ){
+        g_RECORDNAME = F_CONCAT(g_RECORDNAME, LEFT(g_RECORDVAR, INSTR(g_RECORDVAR, "[")-1) , "_TYPE") ;
+    fputs("typedef struct {\n", g_CFILE);
+        Save_Func_Var("", g_FUNCNAME, g_RECORDNAME);
+    } else {
+        g_RECORDNAME = F_CONCAT(g_RECORDNAME, LEFT(g_RECORDVAR, INSTR(g_RECORDVAR, "[")-1) , "_TYPE") ;
+    fputs("typedef struct {\n", g_HFILE);
+        Save_Main_Var("", g_RECORDNAME);
+    }
 }
-#line 5136 "bacon.bac"
-if( ISTRUE(LEN(g_FUNCNAME__b2c__string_var)) ){
-#line 5137 "bacon.bac"
-g_RECORDNAME__b2c__string_var = F_CONCAT__b2c__string_var(g_RECORDNAME__b2c__string_var, LEFT__b2c__string_var(g_RECORDVAR__b2c__string_var, INSTR(g_RECORDVAR__b2c__string_var, "[")-1) , "_TYPE") ;
-#line 5138 "bacon.bac"
-__b2c__assign = (char*)"typedef struct {"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5139 "bacon.bac"
-Save_Func_Var("", g_FUNCNAME__b2c__string_var, g_RECORDNAME__b2c__string_var);
-#line 5140 "bacon.bac"
-} else {
-#line 5141 "bacon.bac"
-g_RECORDNAME__b2c__string_var = F_CONCAT__b2c__string_var(g_RECORDNAME__b2c__string_var, LEFT__b2c__string_var(g_RECORDVAR__b2c__string_var, INSTR(g_RECORDVAR__b2c__string_var, "[")-1) , "_TYPE") ;
-#line 5142 "bacon.bac"
-__b2c__assign = (char*)"typedef struct {"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5143 "bacon.bac"
-Save_Main_Var("", g_RECORDNAME__b2c__string_var);
-#line 5144 "bacon.bac"
-}
-#line 5145 "bacon.bac"
-}
-#line 5147 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "WITH")){
-#line 5149 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "WITH")){
 if( dim == 1 ){
-#line 5150 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty WITH at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5151 "bacon.bac"
-exit(1);
-#line 5152 "bacon.bac"
-} else if( ISTRUE(LEN(g_RECORDNAME__b2c__string_var)) ){
-#line 5153 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: cannot define a WITH within a WITH!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5154 "bacon.bac"
-exit(1);
-#line 5155 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty WITH at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
+} else if( ISTRUE(LEN(g_RECORDNAME)) ){
+fprintf(stderr, "%sSyntax error: cannot define a WITH within a WITH!\n", NL);
+    exit(1);
 } else {
-#line 5156 "bacon.bac"
-g_WITHVAR__b2c__string_var = __b2c_Copy_String(g_WITHVAR__b2c__string_var, (char*) element__b2c__string_var[(uint64_t)2]);
-#line 5157 "bacon.bac"
+    g_WITHVAR = b2c_CopyString(g_WITHVAR, (char*) element[(uint64_t)2]);
 }
-#line 5159 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SPLIT")){
-#line 5160 "bacon.bac"
-Handle_Split(statement__b2c__string_var);
-#line 5162 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "JOIN")){
-#line 5163 "bacon.bac"
-Handle_Join(statement__b2c__string_var);
-#line 5165 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SELECT")){
-#line 5167 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "SPLIT")){
+Handle_Split(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "JOIN")){
+Handle_Join(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "SELECT")){
 if( dim == 1 ){
-#line 5168 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty SELECT at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5169 "bacon.bac"
-exit(1);
-#line 5170 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty SELECT at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5171 "bacon.bac"
-g_SELECTVAR_CTR = g_SELECTVAR_CTR + (1);
-#line 5172 "bacon.bac"
-if( Check_String_Type(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "SELECT") + 6)) ){
-#line 5173 "bacon.bac"
-g_SELECTVAR__b2c__string_var[(uint64_t)g_SELECTVAR_CTR] = F_CONCAT__b2c__string_var(g_SELECTVAR__b2c__string_var[(uint64_t)g_SELECTVAR_CTR], "__b2c__select_" , STR__b2c__string_var(g_COUNTER) , g_STRINGSIGN__b2c__string_var) ;
-#line 5174 "bacon.bac"
-if( LEN(g_FUNCNAME__b2c__string_var) ){
-#line 5175 "bacon.bac"
-g_STRINGARGS__b2c__string_var = F_CONCAT__b2c__string_var(g_STRINGARGS__b2c__string_var, g_STRINGARGS__b2c__string_var , " char* " , g_SELECTVAR__b2c__string_var[g_SELECTVAR_CTR] , " = NULL;") ;
-#line 5176 "bacon.bac"
-g_LOCALSTRINGS__b2c__string_var = F_CONCAT__b2c__string_var(g_LOCALSTRINGS__b2c__string_var, g_LOCALSTRINGS__b2c__string_var , " " , g_SELECTVAR__b2c__string_var[g_SELECTVAR_CTR]) ;
-#line 5177 "bacon.bac"
-} else {
-#line 5178 "bacon.bac"
-__b2c__assign = (char*)"char* "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) g_SELECTVAR__b2c__string_var[(uint64_t)g_SELECTVAR_CTR]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " = NULL;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5179 "bacon.bac"
+    g_SELECTVAR_CTR = g_SELECTVAR_CTR + (1);
+    if( Check_String_Type(MID(statement, INSTR(statement, "SELECT") + 6)) ){
+        g_SELECTVAR[(uint64_t)g_SELECTVAR_CTR] = F_CONCAT(g_SELECTVAR[(uint64_t)g_SELECTVAR_CTR], "b2c_select_" , STR(g_COUNTER) , g_STRINGSIGN) ;
+        if( LEN(g_FUNCNAME) ){
+            g_STRINGARGS = F_CONCAT(g_STRINGARGS, g_STRINGARGS , " char* " , g_SELECTVAR[g_SELECTVAR_CTR] , " = NULL;") ;
+            g_LOCALSTRINGS = F_CONCAT(g_LOCALSTRINGS, g_LOCALSTRINGS , " " , g_SELECTVAR[g_SELECTVAR_CTR]) ;
+        } else {
+        fprintf(g_HFILE, "char* %s = NULL;\n", g_SELECTVAR[(uint64_t)g_SELECTVAR_CTR]);
+        }
+    fprintf(g_CFILE, "%s= b2c_CopyString(%s,%s);\n", g_SELECTVAR[(uint64_t)g_SELECTVAR_CTR], g_SELECTVAR[(uint64_t)g_SELECTVAR_CTR], MID(statement, INSTR(statement, "SELECT") + 6));
+    } else {
+        g_SELECTVAR[(uint64_t)g_SELECTVAR_CTR] = F_CONCAT(g_SELECTVAR[(uint64_t)g_SELECTVAR_CTR], "b2c_select_" , STR(g_COUNTER)) ;
+    fprintf(g_HFILE, "double %s = 0;\n", g_SELECTVAR[(uint64_t)g_SELECTVAR_CTR]);
+    fprintf(g_CFILE, "%s = (double)%s;\n", g_SELECTVAR[(uint64_t)g_SELECTVAR_CTR], MID(statement, INSTR(statement, "SELECT") + 6));
+    }
+    g_IN_CASE[(uint64_t)g_SELECTVAR_CTR] = 0;
+    g_CASE_FALL = b2c_CopyString(g_CASE_FALL, (char*) "");
+    g_CASE_CONT = b2c_CopyString(g_CASE_CONT, (char*)"");
 }
-#line 5180 "bacon.bac"
-__b2c__assign = (char*)g_SELECTVAR__b2c__string_var[(uint64_t)g_SELECTVAR_CTR]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "= __b2c_Copy_String("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_SELECTVAR__b2c__string_var[(uint64_t)g_SELECTVAR_CTR]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ","; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "SELECT") + 6); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5181 "bacon.bac"
-} else {
-#line 5182 "bacon.bac"
-g_SELECTVAR__b2c__string_var[(uint64_t)g_SELECTVAR_CTR] = F_CONCAT__b2c__string_var(g_SELECTVAR__b2c__string_var[(uint64_t)g_SELECTVAR_CTR], "__b2c__select_" , STR__b2c__string_var(g_COUNTER)) ;
-#line 5183 "bacon.bac"
-__b2c__assign = (char*)"double "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) g_SELECTVAR__b2c__string_var[(uint64_t)g_SELECTVAR_CTR]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " = 0;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5184 "bacon.bac"
-__b2c__assign = (char*)g_SELECTVAR__b2c__string_var[(uint64_t)g_SELECTVAR_CTR]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = (double)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "SELECT") + 6); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5185 "bacon.bac"
-}
-#line 5186 "bacon.bac"
-g_IN_CASE[(uint64_t)g_SELECTVAR_CTR] = 0;
-#line 5187 "bacon.bac"
-g_CASE_FALL__b2c__string_var = __b2c_Copy_String(g_CASE_FALL__b2c__string_var, (char*) "");
-#line 5188 "bacon.bac"
-g_CASE_CONT__b2c__string_var = __b2c_Copy_String(g_CASE_CONT__b2c__string_var, (char*)"");
-#line 5189 "bacon.bac"
-}
-#line 5191 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "CASE")){
-#line 5193 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "CASE")){
 if( dim == 1 ){
-#line 5194 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty CASE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5195 "bacon.bac"
-exit(1);
-#line 5196 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty CASE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5198 "bacon.bac"
+    if( ISTRUE(g_IN_CASE[(uint64_t)g_SELECTVAR_CTR]) ){
+        g_CASE_CONT = b2c_CopyString(g_CASE_CONT, (char*) "} else ");
+    }
+    if( Check_String_Type(g_SELECTVAR[(uint64_t)g_SELECTVAR_CTR]) ){
+        exp = F_MID(exp,statement, INSTR(statement, "CASE") + 4);
+        if( __b2c__STRCMP(RIGHT(statement, 1) ,  ";") == 0 ){
+            g_CASE_FALL = F_CONCAT(g_CASE_FALL, g_CASE_FALL , "!b2c_strcmp(" , g_SELECTVAR[g_SELECTVAR_CTR] , ", " , LEFT(exp, LEN(exp)-1) , ") ||") ;
+        } else {
+            while( LEN(exp) ){
+                str = b2c_CopyString(str, (char*) Mini_Parser(exp));
+                g_CASE_FALL = F_CONCAT(g_CASE_FALL, g_CASE_FALL , "!b2c_strcmp(" , g_SELECTVAR[g_SELECTVAR_CTR] , ", " , str , ") ") ;
+                exp = F_MID(exp,exp, LEN(str)+2);
+                if( LEN(exp) ){
+                    g_CASE_FALL = F_CONCAT(g_CASE_FALL, g_CASE_FALL , "||");
+                }
+            }
+        fprintf(g_CFILE, "%s%s){\n", CONCAT( g_CASE_CONT , "if ("), g_CASE_FALL);
+            g_IN_CASE[(uint64_t)g_SELECTVAR_CTR] = 1;
+            g_CASE_FALL = b2c_CopyString(g_CASE_FALL, (char*) "");
+        }
+    } else {
+        exp = F_MID(exp,statement, INSTR(statement, "CASE") + 4);
+        if( __b2c__STRCMP(RIGHT(statement, 1) ,  ";") == 0 ){
+            g_CASE_FALL = F_CONCAT(g_CASE_FALL, g_CASE_FALL , "(" , g_SELECTVAR[g_SELECTVAR_CTR] , ") == (" , LEFT(exp, LEN(exp)-1) , ") ||") ;
+        } else {
+            while( LEN(exp) ){
+                str = b2c_CopyString(str, (char*) Mini_Parser(exp));
+                g_CASE_FALL = F_CONCAT(g_CASE_FALL, g_CASE_FALL , "(" , g_SELECTVAR[g_SELECTVAR_CTR] , ") == (" , str , ")") ;
+                exp = F_MID(exp,exp, LEN(str)+2);
+                if( LEN(exp) ){
+                    g_CASE_FALL = F_CONCAT(g_CASE_FALL, g_CASE_FALL , "||");
+                }
+            }
+        fprintf(g_CFILE, "%s%s){\n", CONCAT( g_CASE_CONT , "if ("), g_CASE_FALL);
+            g_IN_CASE[(uint64_t)g_SELECTVAR_CTR] = 1;
+            g_CASE_FALL = b2c_CopyString(g_CASE_FALL, (char*) "");
+        }
+    }
+}
+} else  if ( !b2c_strcmp(b2c_select_4250, "DEFAULT")){
 if( ISTRUE(g_IN_CASE[(uint64_t)g_SELECTVAR_CTR]) ){
-g_CASE_CONT__b2c__string_var = __b2c_Copy_String(g_CASE_CONT__b2c__string_var, (char*) "} else ");
-}
-#line 5200 "bacon.bac"
-if( Check_String_Type(g_SELECTVAR__b2c__string_var[(uint64_t)g_SELECTVAR_CTR]) ){
-#line 5201 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,statement__b2c__string_var, INSTR(statement__b2c__string_var, "CASE") + 4);
-#line 5202 "bacon.bac"
-if( __b2c__STRCMP(RIGHT__b2c__string_var(statement__b2c__string_var, 1) ,  ";") == 0 ){
-#line 5203 "bacon.bac"
-g_CASE_FALL__b2c__string_var = F_CONCAT__b2c__string_var(g_CASE_FALL__b2c__string_var, g_CASE_FALL__b2c__string_var , "!__b2c__strcmp(" , g_SELECTVAR__b2c__string_var[g_SELECTVAR_CTR] , ", " , LEFT__b2c__string_var(exp__b2c__string_var, LEN(exp__b2c__string_var)-1) , ") ||") ;
-#line 5204 "bacon.bac"
+fputs("} else {\n", g_CFILE);
 } else {
-#line 5205 "bacon.bac"
-while( LEN(exp__b2c__string_var) ){
-#line 5206 "bacon.bac"
-str__b2c__string_var = __b2c_Copy_String(str__b2c__string_var, (char*) Mini_Parser__b2c__string_var(exp__b2c__string_var));
-#line 5207 "bacon.bac"
-g_CASE_FALL__b2c__string_var = F_CONCAT__b2c__string_var(g_CASE_FALL__b2c__string_var, g_CASE_FALL__b2c__string_var , "!__b2c__strcmp(" , g_SELECTVAR__b2c__string_var[g_SELECTVAR_CTR] , ", " , str__b2c__string_var , ") ") ;
-#line 5208 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,exp__b2c__string_var, LEN(str__b2c__string_var)+2);
-#line 5209 "bacon.bac"
-if( LEN(exp__b2c__string_var) ){
-g_CASE_FALL__b2c__string_var = F_CONCAT__b2c__string_var(g_CASE_FALL__b2c__string_var, g_CASE_FALL__b2c__string_var , "||");
+fprintf(stderr, "%sSyntax error: cannot use DEFAULT without previous CASE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 }
-#line 5210 "bacon.bac"
-}
-#line 5211 "bacon.bac"
-__b2c__assign = (char*)CONCAT__b2c__string_var( g_CASE_CONT__b2c__string_var , "if (") ; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CASE_FALL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "){"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5212 "bacon.bac"
-g_IN_CASE[(uint64_t)g_SELECTVAR_CTR] = 1;
-#line 5213 "bacon.bac"
-g_CASE_FALL__b2c__string_var = __b2c_Copy_String(g_CASE_FALL__b2c__string_var, (char*) "");
-#line 5214 "bacon.bac"
-}
-#line 5215 "bacon.bac"
-} else {
-#line 5216 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,statement__b2c__string_var, INSTR(statement__b2c__string_var, "CASE") + 4);
-#line 5217 "bacon.bac"
-if( __b2c__STRCMP(RIGHT__b2c__string_var(statement__b2c__string_var, 1) ,  ";") == 0 ){
-#line 5218 "bacon.bac"
-g_CASE_FALL__b2c__string_var = F_CONCAT__b2c__string_var(g_CASE_FALL__b2c__string_var, g_CASE_FALL__b2c__string_var , "(" , g_SELECTVAR__b2c__string_var[g_SELECTVAR_CTR] , ") == (" , LEFT__b2c__string_var(exp__b2c__string_var, LEN(exp__b2c__string_var)-1) , ") ||") ;
-#line 5219 "bacon.bac"
-} else {
-#line 5220 "bacon.bac"
-while( LEN(exp__b2c__string_var) ){
-#line 5221 "bacon.bac"
-str__b2c__string_var = __b2c_Copy_String(str__b2c__string_var, (char*) Mini_Parser__b2c__string_var(exp__b2c__string_var));
-#line 5222 "bacon.bac"
-g_CASE_FALL__b2c__string_var = F_CONCAT__b2c__string_var(g_CASE_FALL__b2c__string_var, g_CASE_FALL__b2c__string_var , "(" , g_SELECTVAR__b2c__string_var[g_SELECTVAR_CTR] , ") == (" , str__b2c__string_var , ")") ;
-#line 5223 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,exp__b2c__string_var, LEN(str__b2c__string_var)+2);
-#line 5224 "bacon.bac"
-if( LEN(exp__b2c__string_var) ){
-g_CASE_FALL__b2c__string_var = F_CONCAT__b2c__string_var(g_CASE_FALL__b2c__string_var, g_CASE_FALL__b2c__string_var , "||");
-}
-#line 5225 "bacon.bac"
-}
-#line 5226 "bacon.bac"
-__b2c__assign = (char*)CONCAT__b2c__string_var( g_CASE_CONT__b2c__string_var , "if (") ; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CASE_FALL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "){"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5227 "bacon.bac"
-g_IN_CASE[(uint64_t)g_SELECTVAR_CTR] = 1;
-#line 5228 "bacon.bac"
-g_CASE_FALL__b2c__string_var = __b2c_Copy_String(g_CASE_FALL__b2c__string_var, (char*) "");
-#line 5229 "bacon.bac"
-}
-#line 5230 "bacon.bac"
-}
-#line 5231 "bacon.bac"
-}
-#line 5233 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "DEFAULT")){
-#line 5234 "bacon.bac"
-if( ISTRUE(g_IN_CASE[(uint64_t)g_SELECTVAR_CTR]) ){
-#line 5235 "bacon.bac"
-__b2c__assign = (char*)"} else {"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5236 "bacon.bac"
-} else {
-#line 5237 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: cannot use DEFAULT without previous CASE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5238 "bacon.bac"
-exit(1);
-#line 5239 "bacon.bac"
-}
-#line 5240 "bacon.bac"
 g_IN_CASE[(uint64_t)g_SELECTVAR_CTR] = 0;
-#line 5241 "bacon.bac"
-g_CASE_FALL__b2c__string_var = __b2c_Copy_String(g_CASE_FALL__b2c__string_var, (char*) "");
-#line 5243 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SETENVIRON")){
-#line 5245 "bacon.bac"
+g_CASE_FALL = b2c_CopyString(g_CASE_FALL, (char*) "");
+} else  if ( !b2c_strcmp(b2c_select_4250, "SETENVIRON")){
 if( dim == 1 ){
-#line 5246 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty SETENVIRON at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5247 "bacon.bac"
-exit(1);
-#line 5248 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty SETENVIRON at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5250 "bacon.bac"
-__b2c__assign = (char*)"SETENVIRON("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) LAST__b2c__string_var(statement__b2c__string_var); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5251 "bacon.bac"
+fprintf(g_CFILE, "SETENVIRON(%s);\n", LAST(statement));
 }
-#line 5253 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SORT")){
-#line 5254 "bacon.bac"
-Handle_Sort(statement__b2c__string_var);
-#line 5256 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "STOP")){
-#line 5258 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "SORT")){
+Handle_Sort(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "STOP")){
 if( dim == 1 ){
-#line 5259 "bacon.bac"
-__b2c__assign = (char*)"kill(getpid(), SIGSTOP);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5260 "bacon.bac"
+fputs("kill(getpid(), SIGSTOP);\n", g_CFILE);
 } else {
-#line 5261 "bacon.bac"
-__b2c__assign = (char*)"kill(getpid(),"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) EXTRACT__b2c__string_var(LAST__b2c__string_var(statement__b2c__string_var), CHR__b2c__string_var(34)); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5262 "bacon.bac"
+fprintf(g_CFILE, "kill(getpid(),%s);\n", EXTRACT(LAST(statement), CHR(34)));
 }
-#line 5264 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "TRACE")){
-#line 5266 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "TRACE")){
 if( dim == 1 ){
-#line 5267 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty TRACE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5268 "bacon.bac"
-exit(1);
-#line 5269 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty TRACE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5270 "bacon.bac"
-if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "MONITOR") == 0 ){
-#line 5271 "bacon.bac"
-g_TRACE=(long)( 1);
-#line 5272 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stderr, \"File '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "' line %d: TRACE ON - press <SPACE> to execute the program step by step, <ESC> to exit.\\n\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5273 "bacon.bac"
-g_MONITOR__b2c__string_var = __b2c_Copy_String(g_MONITOR__b2c__string_var, (char*) "");
-#line 5274 "bacon.bac"
-__b2c__forin_sym__b2c__string_var_string = __b2c_Copy_String(__b2c__forin_sym__b2c__string_var_string, MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "MONITOR")+7)); __b2c__forin_sym__b2c__string_var_string_org = __b2c__forin_sym__b2c__string_var_string;
-__b2c__forin_sym__b2c__string_var_step = __b2c_Copy_String(__b2c__forin_sym__b2c__string_var_step, ",");
-__b2c__forin_sym__b2c__string_var_ptr = __b2c__for_amount(__b2c__forin_sym__b2c__string_var_string, __b2c__forin_sym__b2c__string_var_step);
-for(; __b2c__forin_sym__b2c__string_var_ptr > 0; __b2c__forin_sym__b2c__string_var_ptr--) { __b2c__for_item(&__b2c__forin_sym__b2c__string_var_string_org, __b2c__forin_sym__b2c__string_var_step, &sym__b2c__string_var);
-#line 5275 "bacon.bac"
-sym__b2c__string_var = F_CHOP__b2c__string_var(sym__b2c__string_var,EXTRACT__b2c__string_var(sym__b2c__string_var,"\\(.*", TRUE));
-#line 5276 "bacon.bac"
-if( Check_String_Type(sym__b2c__string_var) ){
-#line 5277 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) REPLACE__b2c__string_var(sym__b2c__string_var, g_STRINGSIGN__b2c__string_var, "$"));
-#line 5278 "bacon.bac"
-g_MONITOR__b2c__string_var = F_CONCAT__b2c__string_var(g_MONITOR__b2c__string_var, g_MONITOR__b2c__string_var , "&& (" , sym__b2c__string_var , "== NULL ? fprintf(stderr, \"MONITOR: " , exp__b2c__string_var , " = NULL\\n\") : fprintf(stderr, \"MONITOR: " , exp__b2c__string_var , " = %s\\n\", " , sym__b2c__string_var , ") )") ;
-#line 5279 "bacon.bac"
-} else {
-#line 5280 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) REPLACE__b2c__string_var(sym__b2c__string_var, g_FLOATSIGN__b2c__string_var, "#"));
-#line 5281 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) REPLACE__b2c__string_var(exp__b2c__string_var, g_LONGSIGN__b2c__string_var, "%"));
-#line 5282 "bacon.bac"
-g_MONITOR__b2c__string_var = F_CONCAT__b2c__string_var(g_MONITOR__b2c__string_var, g_MONITOR__b2c__string_var , "&& fprintf(stderr, \"MONITOR: " , exp__b2c__string_var , " = %s\\n\", STR" , g_STRINGSIGN__b2c__string_var , "(" , sym__b2c__string_var , "))") ;
-#line 5283 "bacon.bac"
+    if( __b2c__STRCMP(element[(uint64_t)2] ,  "MONITOR") == 0 ){
+        g_TRACE=(long)( 1);
+    fprintf(g_CFILE, "fprintf(stderr, \"File '%s' line %d: TRACE ON - press <SPACE> to execute the program step by step, <ESC> to exit.\\n\", %s);\n", g_CURFILE, STR( g_COUNTER));
+        g_MONITOR = b2c_CopyString(g_MONITOR, (char*) "");
+        b2c_forin_sym_string = b2c_CopyString(b2c_forin_sym_string, MID(statement, INSTR(statement, "MONITOR")+7)); b2c_forin_sym_string_org = b2c_forin_sym_string;
+        b2c_forin_sym_step = b2c_CopyString(b2c_forin_sym_step, ",");
+        b2c_forin_sym_ptr = b2c_for_amount(b2c_forin_sym_string, b2c_forin_sym_step);
+        for(; b2c_forin_sym_ptr > 0; b2c_forin_sym_ptr--) { b2c_for_item(&b2c_forin_sym_string_org, b2c_forin_sym_step, &sym);
+            sym = F_CHOP(sym,EXTRACT(sym,"\\(.*", TRUE));
+            if( Check_String_Type(sym) ){
+                exp = b2c_CopyString(exp, (char*) REPLACE(sym, g_STRINGSIGN, "$"));
+                g_MONITOR = F_CONCAT(g_MONITOR, g_MONITOR , "&& (" , sym , "== NULL ? fprintf(stderr, \"MONITOR: " , exp , " = NULL\\n\") : fprintf(stderr, \"MONITOR: " , exp , " = %s\\n\", " , sym , ") )") ;
+            } else {
+                exp = b2c_CopyString(exp, (char*) REPLACE(sym, g_FLOATSIGN, "#"));
+                exp = b2c_CopyString(exp, (char*) REPLACE(exp, g_LONGSIGN, "%"));
+                g_MONITOR = F_CONCAT(g_MONITOR, g_MONITOR , "&& fprintf(stderr, \"MONITOR: " , exp , " = %s\\n\", STR" , g_STRINGSIGN , "(" , sym , "))") ;
+            }
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "ON") == 0 ){
+        g_TRACE=(long)( 1);
+    fprintf(g_CFILE, "fprintf(stderr, \"File '%s' line %d: TRACE ON - press <SPACE> to execute the program step by step, <ESC> to exit.\\n\", %s);\n", g_CURFILE, STR( g_COUNTER));
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "OFF") == 0 ){
+        g_MONITOR = b2c_CopyString(g_MONITOR, (char*) "");
+        g_TRACE=(long)( 0);
+    }
 }
-#line 5284 "bacon.bac"
-}
-#line 5285 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "ON") == 0 ){
-#line 5286 "bacon.bac"
-g_TRACE=(long)( 1);
-#line 5287 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stderr, \"File '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "' line %d: TRACE ON - press <SPACE> to execute the program step by step, <ESC> to exit.\\n\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5288 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "OFF") == 0 ){
-#line 5289 "bacon.bac"
-g_MONITOR__b2c__string_var = __b2c_Copy_String(g_MONITOR__b2c__string_var, (char*) "");
-#line 5290 "bacon.bac"
-g_TRACE=(long)( 0);
-#line 5291 "bacon.bac"
-}
-#line 5292 "bacon.bac"
-}
-#line 5294 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "OPTION")){
-#line 5296 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "OPTION")){
 if( dim == 1 ){
-#line 5297 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty OPTION at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5298 "bacon.bac"
-exit(1);
-#line 5299 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty OPTION at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5300 "bacon.bac"
-if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "BASE") == 0  AND  dim == 3 ){
-#line 5301 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-9]") ){
-#line 5302 "bacon.bac"
-g_OPTION_BASE=(long)( VAL(element__b2c__string_var[(uint64_t)3]));
-#line 5303 "bacon.bac"
-} else {
-#line 5304 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION BASE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5305 "bacon.bac"
-exit(1);
-#line 5306 "bacon.bac"
+    if( __b2c__STRCMP(element[(uint64_t)2] ,  "BASE") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-9]") ){
+            g_OPTION_BASE=(long)( VAL(element[(uint64_t)3]));
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION BASE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "COMPARE") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
+        fprintf(g_CFILE, "b2c_option_compare = %s;\n", element[(uint64_t)3]);
+        fputs("#undef __b2c__STRCMP\n", g_CFILE);
+            if( REGEX(element[(uint64_t)3], "1|TRUE") ){
+            fputs("#define __b2c__STRCMP b2c_strcasecmp\n", g_CFILE);
+            } else {
+            fputs("#define __b2c__STRCMP b2c_strcmp\n", g_CFILE);
+            }
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION COMPARE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "QUOTED") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
+        fprintf(g_CFILE, "b2c_option_quoted = %s;\n", element[(uint64_t)3]);
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION QUOTED at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "UTF8") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
+        fprintf(g_CFILE, "b2c_option_utf8 = %s;\n", element[(uint64_t)3]);
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION UTF8 at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "TLS") == 0  AND  dim >= 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
+            if( __b2c__STRCMP(element[(uint64_t)3] ,  "1") == 0  OR  __b2c__STRCMP(element[(uint64_t)3] ,  "TRUE") == 0 ){
+                g_OPTION_TLS=(long)( TRUE);
+            fputs("b2c_option_tls = 1;\n", g_CFILE);
+                g_INC_TLS = F_CONCAT(g_INC_TLS, "#include <openssl/ssl.h>" , NL , "#include <openssl/err.h>") ;
+                g_LIB_TLS = F_CHOP(g_LIB_TLS,EXEC("pkg-config --libs openssl"));
+            } else {
+                g_OPTION_TLS=(long)( FALSE);
+            fputs("b2c_option_tls = 0;\n", g_CFILE);
+            }
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION TLS at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "EVAL") == 0  AND  dim >= 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
+            g_CCFLAGS = F_CONCAT(g_CCFLAGS, g_CCFLAGS , " " , CHOP(EXEC("pkg-config --cflags libmatheval"))) ;
+            g_LDFLAGS = F_CONCAT(g_LDFLAGS, g_LDFLAGS , " " , CHOP(EXEC("pkg-config --libs libmatheval"))) ;
+            g_OPTION_EVAL=(long)( TRUE);
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION EVAL at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "PROPER") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
+        fprintf(g_CFILE, "b2c_option_proper = %s;\n", element[(uint64_t)3]);
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION PROPER at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "DELIM") == 0  AND  (dim )> 2 ){
+    fprintf(g_CFILE, "b2c_option_delim = %s;\n", MID(statement, INSTR(statement, "DELIM") + 6));
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "INPUT") == 0  AND  (dim )> 2 ){
+        g_OPTION_INPUT = b2c_CopyString(g_OPTION_INPUT, (char*) element[(uint64_t)3]);
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "DQ") == 0  AND  (dim )> 2 ){
+    fprintf(g_CFILE, "b2c_option_dq = %s&255;\n", MID(statement, INSTR(statement, "DQ") + 3));
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "NO_C_ESC") == 0  AND  (dim )> 2 ){
+        if( __b2c__STRCMP(element[(uint64_t)3] ,  "TRUE") == 0  OR  __b2c__STRCMP(element[(uint64_t)3] ,  "1") == 0 ){
+            g_OPTION_DISABLE_C_ESCAPE=(long)( 1);
+        } else {
+            g_OPTION_DISABLE_C_ESCAPE=(long)( 0);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "ESC") == 0  AND  (dim )> 2 ){
+    fprintf(g_CFILE, "b2c_option_esc = %s&255;\n", MID(statement, INSTR(statement, "ESC") + 4));
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "SOCKET") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-9]") ){
+            g_OPTION_SOCKET=(long)( VAL(element[(uint64_t)3]));
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION SOCKET at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "BREAK") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
+            g_OPTION_BREAK=(long)( IIF(__b2c__STRCMP(element[(uint64_t)3] ,  "TRUE") == 0, 1, VAL(element[(uint64_t)3])));
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION BREAK at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "MEMSTREAM") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
+        fprintf(g_CFILE, "b2c_option_memstream = %s;\n", element[(uint64_t)3]);
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION MEMSTREAM at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "MEMTYPE") == 0  AND  (dim )> 2 ){
+    fputs("#undef __b2c__MEMTYPE\n", g_CFILE);
+    fprintf(g_CFILE, "#define __b2c__MEMTYPE %s\n", MID(statement, INSTR(statement, "MEMTYPE")+8));
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "PRIORITY") == 0  AND  (dim )> 2 ){
+        g_PRIORITY = b2c_CopyString(g_PRIORITY, (char*) element[(uint64_t)3]);
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "COLLAPSE") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
+        fprintf(g_CFILE, "b2c_collapse = %s;\n", element[(uint64_t)3]);
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION COLLAPSE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "DEVICE") == 0  AND  dim >= 3 ){
+    fprintf(g_CFILE, "b2c_option_open = (%s);\n", element[(uint64_t)3]);
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "STARTPOINT") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
+        fprintf(g_CFILE, "b2c_option_startpoint = %s;\n", element[(uint64_t)3]);
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION STARTPOINT at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "INTERNATIONAL") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "1|TRUE") ){
+        fputs("#include <libintl.h>\n", g_HFILE);
+        fputs("setlocale(LC_ALL, \"\");\n", g_CFILE);
+        fprintf(g_CFILE, "if(bindtextdomain(\"%s\",\"/usr/share/locale\")==NULL){ ERROR = 6; RUNTIMEERROR(\"OPTION INTERNATIONAL\", %s, \"%s\", ERROR, %s); }\n", LEFT(g_SOURCEFILE, INSTR(g_SOURCEFILE, ".")-1), STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+        fprintf(g_CFILE, "if(textdomain(\"%s\")==NULL){ ERROR = 6; RUNTIMEERROR(\"OPTION INTERNATIONAL\", %s, \"%s\", ERROR, %s); }\n", LEFT(g_SOURCEFILE, INSTR(g_SOURCEFILE, ".")-1), STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+            if( __b2c__STRCMP(g_CATCHGOTO ,  "__B2C__PROGRAM__EXIT") == 0 ){
+                g_CATCH_USED=(long)( 1);
+            }
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION INTERNATIONAL at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "NETWORK") == 0  AND  dim >= 3 ){
+        b2c_select_5433 = b2c_CopyString(b2c_select_5433, element[(uint64_t)3]);
+        if ( !b2c_strcmp(b2c_select_5433, "TCP")){
+            g_NETWORKTYPE = b2c_CopyString(g_NETWORKTYPE, (char*) "TCP");
+            g_SOCKTYPE = b2c_CopyString(g_SOCKTYPE, (char*) "SOCK_STREAM");
+        } else  if ( !b2c_strcmp(b2c_select_5433, "UDP")){
+            g_NETWORKTYPE = b2c_CopyString(g_NETWORKTYPE, (char*) "UDP");
+            g_SOCKTYPE = b2c_CopyString(g_SOCKTYPE, (char*) "SOCK_DGRAM");
+        } else  if ( !b2c_strcmp(b2c_select_5433, "BROADCAST")){
+            g_NETWORKTYPE = b2c_CopyString(g_NETWORKTYPE, (char*) "BROADCAST");
+            g_SOCKTYPE = b2c_CopyString(g_SOCKTYPE, (char*) "SOCK_DGRAM");
+        } else  if ( !b2c_strcmp(b2c_select_5433, "MULTICAST")){
+            g_NETWORKTYPE = b2c_CopyString(g_NETWORKTYPE, (char*) "MULTICAST");
+            g_SOCKTYPE = b2c_CopyString(g_SOCKTYPE, (char*) "SOCK_DGRAM");
+            if( dim == 4  AND  REGEX(element[(uint64_t)4], "[0-9]") ){
+                g_MULTICAST_TTL=(long)( VAL(element[(uint64_t)4]));
+            }
+        } else  if ( !b2c_strcmp(b2c_select_5433, "SCTP")){
+            g_INCFILES = F_CONCAT(g_INCFILES, g_INCFILES , " <netinet/sctp.h>") ;
+        fputs("struct sctp_initmsg b2c_initmsg;\n", g_HFILE);
+            g_NETWORKTYPE = b2c_CopyString(g_NETWORKTYPE, (char*) "SCTP");
+            g_SOCKTYPE = b2c_CopyString(g_SOCKTYPE, (char*) "SOCK_STREAM");
+            g_LDFLAGS = F_CONCAT(g_LDFLAGS, g_LDFLAGS , " -lsctp") ;
+            if( dim == 4  AND  REGEX(element[(uint64_t)4], "[0-9]") ){
+                g_SCTP_STREAMS=(long)( VAL(element[(uint64_t)4]));
+            }
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION NETWORK at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "PARSE") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
+            g_IGNORE_PARSE = b2c_CopyString(g_IGNORE_PARSE, (char*) element[(uint64_t)3]);
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION PARSE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "EXPLICIT") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
+            g_OPTION_EXPLICIT = b2c_CopyString(g_OPTION_EXPLICIT, (char*) element[(uint64_t)3]);
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION EXPLICIT at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "LOCAL") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
+            g_OPTION_LOCAL = b2c_CopyString(g_OPTION_LOCAL, (char*) element[(uint64_t)3]);
+        } else {
+        fprintf(stderr, "%sSyntax error: invalid argument to OPTION LOCAL at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "VARTYPE") == 0  AND  (dim )> 2 ){
+        g_VARTYPE = F_MID(g_VARTYPE,statement, INSTR(statement, "VARTYPE")+8);
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "GUI") == 0  AND  dim == 3 ){
+        if( REGEX(element[(uint64_t)3], "1|TRUE") ){
+        fputs("#define b2c_gui_xaw\n", g_GENERIC);
+        fputs("#ifdef b2c_gui_xaw\n", g_HFILE);
+        fputs("#include <AllWidgets.h>\n", g_HFILE);
+        fputs("#include <AsciiText.h>\n", g_HFILE);
+        fputs("#include <Box.h>\n", g_HFILE);
+        fputs("#include <Dialog.h>\n", g_HFILE);
+        fputs("#include <Command.h>\n", g_HFILE);
+        fputs("#include <Form.h>\n", g_HFILE);
+        fputs("#include <Grip.h>\n", g_HFILE);
+        fputs("#include <List.h>\n", g_HFILE);
+        fputs("#include <MenuButton.h>\n", g_HFILE);
+        fputs("#include <MultiSink.h>\n", g_HFILE);
+        fputs("#include <Paned.h>\n", g_HFILE);
+        fputs("#include <Panner.h>\n", g_HFILE);
+        fputs("#include <Porthole.h>\n", g_HFILE);
+        fputs("#include <Repeater.h>\n", g_HFILE);
+        fputs("#include <Scrollbar.h>\n", g_HFILE);
+        fputs("#include <SimpleMenu.h>\n", g_HFILE);
+        fputs("#include <SmeBSB.h>\n", g_HFILE);
+        fputs("#include <SmeLine.h>\n", g_HFILE);
+        fputs("#include <StripChart.h>\n", g_HFILE);
+        fputs("#include <Tip.h>\n", g_HFILE);
+        fputs("#include <Toggle.h>\n", g_HFILE);
+        fputs("#include <Tree.h>\n", g_HFILE);
+        fputs("#include <Viewport.h>\n", g_HFILE);
+        fputs("#include <X11/Intrinsic.h>\n", g_HFILE);
+        fputs("#include <X11/Shell.h>\n", g_HFILE);
+        fputs("#include <X11/StringDefs.h>\n", g_HFILE);
+        fputs("#endif\n", g_HFILE);
+            g_CCFLAGS = F_CONCAT(g_CCFLAGS, g_CCFLAGS , " -I/usr/include/X11/Xaw") ;
+            g_INCLUDE_FILES = F_CONCAT(g_INCLUDE_FILES, g_INCLUDE_FILES , " " , MID(g_SOURCEFILE, INSTRREV(g_SOURCEFILE, "/") + 1) , ".gui.h") ;
+            g_LDFLAGS = F_CONCAT(g_LDFLAGS,  g_LDFLAGS , " -lXaw -lXmu -lXt -lX11") ;
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "ERROR") == 0  AND  dim == 3 ){
+    fputs("WARNING: OPTION ERROR is deprecated.\n", stdout);
+    } else {
+    fprintf(stderr, "%sSyntax error: argument to OPTION at line %s in file '%s' not recognized!\n", NL, STR( g_COUNTER), g_CURFILE);
+        exit(1);
+    }
 }
-#line 5307 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "COMPARE") == 0  AND  dim == 3 ){
-#line 5308 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
-#line 5309 "bacon.bac"
-__b2c__assign = (char*)"__b2c__option_compare = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)3]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5310 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__STRCMP"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5311 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "1|TRUE") ){
-#line 5312 "bacon.bac"
-__b2c__assign = (char*)"#define __b2c__STRCMP __b2c__strcasecmp"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5313 "bacon.bac"
-} else {
-#line 5314 "bacon.bac"
-__b2c__assign = (char*)"#define __b2c__STRCMP __b2c__strcmp"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5315 "bacon.bac"
-}
-#line 5316 "bacon.bac"
-} else {
-#line 5317 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION COMPARE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5318 "bacon.bac"
-exit(1);
-#line 5319 "bacon.bac"
-}
-#line 5320 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "QUOTED") == 0  AND  dim == 3 ){
-#line 5321 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
-#line 5322 "bacon.bac"
-__b2c__assign = (char*)"__b2c__option_quoted = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)3]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5323 "bacon.bac"
-} else {
-#line 5324 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION QUOTED at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5325 "bacon.bac"
-exit(1);
-#line 5326 "bacon.bac"
-}
-#line 5327 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "UTF8") == 0  AND  dim == 3 ){
-#line 5328 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
-#line 5329 "bacon.bac"
-__b2c__assign = (char*)"__b2c__option_utf8 = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)3]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5330 "bacon.bac"
-} else {
-#line 5331 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION UTF8 at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5332 "bacon.bac"
-exit(1);
-#line 5333 "bacon.bac"
-}
-#line 5334 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "TLS") == 0  AND  dim >= 3 ){
-#line 5335 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
-#line 5336 "bacon.bac"
-if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)3] ,  "1") == 0  OR  __b2c__STRCMP(element__b2c__string_var[(uint64_t)3] ,  "TRUE") == 0 ){
-#line 5337 "bacon.bac"
-g_OPTION_TLS=(long)( TRUE);
-#line 5338 "bacon.bac"
-__b2c__assign = (char*)"__b2c__option_tls = 1;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5339 "bacon.bac"
-g_INC_TLS__b2c__string_var = F_CONCAT__b2c__string_var(g_INC_TLS__b2c__string_var, "#include <openssl/ssl.h>" , NL__b2c__string_var , "#include <openssl/err.h>") ;
-#line 5340 "bacon.bac"
-g_LIB_TLS__b2c__string_var = F_CHOP__b2c__string_var(g_LIB_TLS__b2c__string_var,EXEC__b2c__string_var("pkg-config --libs openssl"));
-#line 5341 "bacon.bac"
-} else {
-#line 5342 "bacon.bac"
-g_OPTION_TLS=(long)( FALSE);
-#line 5343 "bacon.bac"
-__b2c__assign = (char*)"__b2c__option_tls = 0;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5344 "bacon.bac"
-}
-#line 5345 "bacon.bac"
-} else {
-#line 5346 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION TLS at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5347 "bacon.bac"
-exit(1);
-#line 5348 "bacon.bac"
-}
-#line 5349 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "EVAL") == 0  AND  dim >= 3 ){
-#line 5350 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
-#line 5351 "bacon.bac"
-g_CCFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_CCFLAGS__b2c__string_var, g_CCFLAGS__b2c__string_var , " " , CHOP__b2c__string_var(EXEC__b2c__string_var("pkg-config --cflags libmatheval"))) ;
-#line 5352 "bacon.bac"
-g_LDFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_LDFLAGS__b2c__string_var, g_LDFLAGS__b2c__string_var , " " , CHOP__b2c__string_var(EXEC__b2c__string_var("pkg-config --libs libmatheval"))) ;
-#line 5353 "bacon.bac"
-g_OPTION_EVAL=(long)( TRUE);
-#line 5354 "bacon.bac"
-} else {
-#line 5355 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION EVAL at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5356 "bacon.bac"
-exit(1);
-#line 5357 "bacon.bac"
-}
-#line 5358 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "PROPER") == 0  AND  dim == 3 ){
-#line 5359 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
-#line 5360 "bacon.bac"
-__b2c__assign = (char*)"__b2c__option_proper = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)3]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5361 "bacon.bac"
-} else {
-#line 5362 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION PROPER at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5363 "bacon.bac"
-exit(1);
-#line 5364 "bacon.bac"
-}
-#line 5365 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "DELIM") == 0  AND  (dim )> 2 ){
-#line 5366 "bacon.bac"
-__b2c__assign = (char*)"__b2c__option_delim = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "DELIM") + 6); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5367 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "INPUT") == 0  AND  (dim )> 2 ){
-#line 5368 "bacon.bac"
-g_OPTION_INPUT__b2c__string_var = __b2c_Copy_String(g_OPTION_INPUT__b2c__string_var, (char*) element__b2c__string_var[(uint64_t)3]);
-#line 5369 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "DQ") == 0  AND  (dim )> 2 ){
-#line 5370 "bacon.bac"
-__b2c__assign = (char*)"__b2c__option_dq = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "DQ") + 3); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "&255;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5371 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "NO_C_ESC") == 0  AND  (dim )> 2 ){
-#line 5372 "bacon.bac"
-if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)3] ,  "TRUE") == 0  OR  __b2c__STRCMP(element__b2c__string_var[(uint64_t)3] ,  "1") == 0 ){
-#line 5373 "bacon.bac"
-g_OPTION_DISABLE_C_ESCAPE=(long)( 1);
-#line 5374 "bacon.bac"
-} else {
-#line 5375 "bacon.bac"
-g_OPTION_DISABLE_C_ESCAPE=(long)( 0);
-#line 5376 "bacon.bac"
-}
-#line 5377 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "ESC") == 0  AND  (dim )> 2 ){
-#line 5378 "bacon.bac"
-__b2c__assign = (char*)"__b2c__option_esc = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "ESC") + 4); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "&255;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5379 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "SOCKET") == 0  AND  dim == 3 ){
-#line 5380 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-9]") ){
-#line 5381 "bacon.bac"
-g_OPTION_SOCKET=(long)( VAL(element__b2c__string_var[(uint64_t)3]));
-#line 5382 "bacon.bac"
-} else {
-#line 5383 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION SOCKET at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5384 "bacon.bac"
-exit(1);
-#line 5385 "bacon.bac"
-}
-#line 5386 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "BREAK") == 0  AND  dim == 3 ){
-#line 5387 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
-#line 5388 "bacon.bac"
-g_OPTION_BREAK=(long)( IIF(__b2c__STRCMP(element__b2c__string_var[(uint64_t)3] ,  "TRUE") == 0, 1, VAL(element__b2c__string_var[(uint64_t)3])));
-#line 5389 "bacon.bac"
-} else {
-#line 5390 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION BREAK at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5391 "bacon.bac"
-exit(1);
-#line 5392 "bacon.bac"
-}
-#line 5393 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "MEMSTREAM") == 0  AND  dim == 3 ){
-#line 5394 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
-#line 5395 "bacon.bac"
-__b2c__assign = (char*)"__b2c__option_memstream = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)3]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5396 "bacon.bac"
-} else {
-#line 5397 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION MEMSTREAM at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5398 "bacon.bac"
-exit(1);
-#line 5399 "bacon.bac"
-}
-#line 5400 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "MEMTYPE") == 0  AND  (dim )> 2 ){
-#line 5401 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__MEMTYPE"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5402 "bacon.bac"
-__b2c__assign = (char*)"#define __b2c__MEMTYPE "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "MEMTYPE")+8); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5403 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "PRIORITY") == 0  AND  (dim )> 2 ){
-#line 5404 "bacon.bac"
-g_PRIORITY__b2c__string_var = __b2c_Copy_String(g_PRIORITY__b2c__string_var, (char*) element__b2c__string_var[(uint64_t)3]);
-#line 5405 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "COLLAPSE") == 0  AND  dim == 3 ){
-#line 5406 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
-#line 5407 "bacon.bac"
-__b2c__assign = (char*)"__b2c__collapse = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)3]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5408 "bacon.bac"
-} else {
-#line 5409 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION COLLAPSE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5410 "bacon.bac"
-exit(1);
-#line 5411 "bacon.bac"
-}
-#line 5412 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "DEVICE") == 0  AND  dim >= 3 ){
-#line 5413 "bacon.bac"
-__b2c__assign = (char*)"__b2c__option_open = ("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)3]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5414 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "STARTPOINT") == 0  AND  dim == 3 ){
-#line 5415 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
-#line 5416 "bacon.bac"
-__b2c__assign = (char*)"__b2c__option_startpoint = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) element__b2c__string_var[(uint64_t)3]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5417 "bacon.bac"
-} else {
-#line 5418 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION STARTPOINT at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5419 "bacon.bac"
-exit(1);
-#line 5420 "bacon.bac"
-}
-#line 5421 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "INTERNATIONAL") == 0  AND  dim == 3 ){
-#line 5422 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "1|TRUE") ){
-#line 5423 "bacon.bac"
-__b2c__assign = (char*)"#include <libintl.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5424 "bacon.bac"
-__b2c__assign = (char*)"setlocale(LC_ALL, \"\");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5425 "bacon.bac"
-__b2c__assign = (char*)"if(bindtextdomain(\""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) LEFT__b2c__string_var(g_SOURCEFILE__b2c__string_var, INSTR(g_SOURCEFILE__b2c__string_var, ".")-1); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\",\"/usr/share/locale\")==NULL){ ERROR = 6; RUNTIMEERROR(\"OPTION INTERNATIONAL\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5426 "bacon.bac"
-__b2c__assign = (char*)"if(textdomain(\""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) LEFT__b2c__string_var(g_SOURCEFILE__b2c__string_var, INSTR(g_SOURCEFILE__b2c__string_var, ".")-1); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\")==NULL){ ERROR = 6; RUNTIMEERROR(\"OPTION INTERNATIONAL\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5427 "bacon.bac"
-if( __b2c__STRCMP(g_CATCHGOTO__b2c__string_var ,  "__B2C__PROGRAM__EXIT") == 0 ){
-g_CATCH_USED=(long)( 1);
-}
-#line 5428 "bacon.bac"
-} else {
-#line 5429 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION INTERNATIONAL at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5430 "bacon.bac"
-exit(1);
-#line 5431 "bacon.bac"
-}
-#line 5432 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "NETWORK") == 0  AND  dim >= 3 ){
-#line 5433 "bacon.bac"
-__b2c__select_5433__b2c__string_var = __b2c_Copy_String(__b2c__select_5433__b2c__string_var, element__b2c__string_var[(uint64_t)3]);
-#line 5434 "bacon.bac"
- if ( !__b2c__strcmp(__b2c__select_5433__b2c__string_var, "TCP")){
-#line 5435 "bacon.bac"
-g_NETWORKTYPE__b2c__string_var = __b2c_Copy_String(g_NETWORKTYPE__b2c__string_var, (char*) "TCP");
-#line 5436 "bacon.bac"
-g_SOCKTYPE__b2c__string_var = __b2c_Copy_String(g_SOCKTYPE__b2c__string_var, (char*) "SOCK_STREAM");
-#line 5437 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_5433__b2c__string_var, "UDP")){
-#line 5438 "bacon.bac"
-g_NETWORKTYPE__b2c__string_var = __b2c_Copy_String(g_NETWORKTYPE__b2c__string_var, (char*) "UDP");
-#line 5439 "bacon.bac"
-g_SOCKTYPE__b2c__string_var = __b2c_Copy_String(g_SOCKTYPE__b2c__string_var, (char*) "SOCK_DGRAM");
-#line 5440 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_5433__b2c__string_var, "BROADCAST")){
-#line 5441 "bacon.bac"
-g_NETWORKTYPE__b2c__string_var = __b2c_Copy_String(g_NETWORKTYPE__b2c__string_var, (char*) "BROADCAST");
-#line 5442 "bacon.bac"
-g_SOCKTYPE__b2c__string_var = __b2c_Copy_String(g_SOCKTYPE__b2c__string_var, (char*) "SOCK_DGRAM");
-#line 5443 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_5433__b2c__string_var, "MULTICAST")){
-#line 5444 "bacon.bac"
-g_NETWORKTYPE__b2c__string_var = __b2c_Copy_String(g_NETWORKTYPE__b2c__string_var, (char*) "MULTICAST");
-#line 5445 "bacon.bac"
-g_SOCKTYPE__b2c__string_var = __b2c_Copy_String(g_SOCKTYPE__b2c__string_var, (char*) "SOCK_DGRAM");
-#line 5446 "bacon.bac"
-if( dim == 4  AND  REGEX(element__b2c__string_var[(uint64_t)4], "[0-9]") ){
-#line 5447 "bacon.bac"
-g_MULTICAST_TTL=(long)( VAL(element__b2c__string_var[(uint64_t)4]));
-#line 5448 "bacon.bac"
-}
-#line 5449 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_5433__b2c__string_var, "SCTP")){
-#line 5450 "bacon.bac"
-g_INCFILES__b2c__string_var = F_CONCAT__b2c__string_var(g_INCFILES__b2c__string_var, g_INCFILES__b2c__string_var , " <netinet/sctp.h>") ;
-#line 5451 "bacon.bac"
-__b2c__assign = (char*)"struct sctp_initmsg __b2c__initmsg;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5452 "bacon.bac"
-g_NETWORKTYPE__b2c__string_var = __b2c_Copy_String(g_NETWORKTYPE__b2c__string_var, (char*) "SCTP");
-#line 5453 "bacon.bac"
-g_SOCKTYPE__b2c__string_var = __b2c_Copy_String(g_SOCKTYPE__b2c__string_var, (char*) "SOCK_STREAM");
-#line 5454 "bacon.bac"
-g_LDFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_LDFLAGS__b2c__string_var, g_LDFLAGS__b2c__string_var , " -lsctp") ;
-#line 5455 "bacon.bac"
-if( dim == 4  AND  REGEX(element__b2c__string_var[(uint64_t)4], "[0-9]") ){
-#line 5456 "bacon.bac"
-g_SCTP_STREAMS=(long)( VAL(element__b2c__string_var[(uint64_t)4]));
-#line 5457 "bacon.bac"
-}
-#line 5458 "bacon.bac"
-} else {
-#line 5459 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION NETWORK at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5460 "bacon.bac"
-exit(1);
-#line 5461 "bacon.bac"
-}
-#line 5462 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "PARSE") == 0  AND  dim == 3 ){
-#line 5463 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
-#line 5464 "bacon.bac"
-g_IGNORE_PARSE__b2c__string_var = __b2c_Copy_String(g_IGNORE_PARSE__b2c__string_var, (char*) element__b2c__string_var[(uint64_t)3]);
-#line 5465 "bacon.bac"
-} else {
-#line 5466 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION PARSE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5467 "bacon.bac"
-exit(1);
-#line 5468 "bacon.bac"
-}
-#line 5469 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "EXPLICIT") == 0  AND  dim == 3 ){
-#line 5470 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
-#line 5471 "bacon.bac"
-g_OPTION_EXPLICIT__b2c__string_var = __b2c_Copy_String(g_OPTION_EXPLICIT__b2c__string_var, (char*) element__b2c__string_var[(uint64_t)3]);
-#line 5472 "bacon.bac"
-} else {
-#line 5473 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION EXPLICIT at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5474 "bacon.bac"
-exit(1);
-#line 5475 "bacon.bac"
-}
-#line 5476 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "LOCAL") == 0  AND  dim == 3 ){
-#line 5477 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "[0-1]|TRUE|FALSE") ){
-#line 5478 "bacon.bac"
-g_OPTION_LOCAL__b2c__string_var = __b2c_Copy_String(g_OPTION_LOCAL__b2c__string_var, (char*) element__b2c__string_var[(uint64_t)3]);
-#line 5479 "bacon.bac"
-} else {
-#line 5480 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: invalid argument to OPTION LOCAL at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5481 "bacon.bac"
-exit(1);
-#line 5482 "bacon.bac"
-}
-#line 5483 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "VARTYPE") == 0  AND  (dim )> 2 ){
-#line 5484 "bacon.bac"
-g_VARTYPE__b2c__string_var = F_MID__b2c__string_var(g_VARTYPE__b2c__string_var,statement__b2c__string_var, INSTR(statement__b2c__string_var, "VARTYPE")+8);
-#line 5485 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "GUI") == 0  AND  dim == 3 ){
-#line 5486 "bacon.bac"
-if( REGEX(element__b2c__string_var[(uint64_t)3], "1|TRUE") ){
-#line 5487 "bacon.bac"
-__b2c__assign = (char*)"#define __b2c__gui_xaw"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_GENERIC); }
-fputs("\n", g_GENERIC);
-#line 5488 "bacon.bac"
-__b2c__assign = (char*)"#ifdef __b2c__gui_xaw"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5489 "bacon.bac"
-__b2c__assign = (char*)"#include <AllWidgets.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5490 "bacon.bac"
-__b2c__assign = (char*)"#include <AsciiText.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5491 "bacon.bac"
-__b2c__assign = (char*)"#include <Box.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5492 "bacon.bac"
-__b2c__assign = (char*)"#include <Dialog.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5493 "bacon.bac"
-__b2c__assign = (char*)"#include <Command.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5494 "bacon.bac"
-__b2c__assign = (char*)"#include <Form.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5495 "bacon.bac"
-__b2c__assign = (char*)"#include <Grip.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5496 "bacon.bac"
-__b2c__assign = (char*)"#include <List.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5497 "bacon.bac"
-__b2c__assign = (char*)"#include <MenuButton.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5498 "bacon.bac"
-__b2c__assign = (char*)"#include <MultiSink.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5499 "bacon.bac"
-__b2c__assign = (char*)"#include <Paned.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5500 "bacon.bac"
-__b2c__assign = (char*)"#include <Panner.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5501 "bacon.bac"
-__b2c__assign = (char*)"#include <Porthole.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5502 "bacon.bac"
-__b2c__assign = (char*)"#include <Repeater.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5503 "bacon.bac"
-__b2c__assign = (char*)"#include <Scrollbar.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5504 "bacon.bac"
-__b2c__assign = (char*)"#include <SimpleMenu.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5505 "bacon.bac"
-__b2c__assign = (char*)"#include <SmeBSB.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5506 "bacon.bac"
-__b2c__assign = (char*)"#include <SmeLine.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5507 "bacon.bac"
-__b2c__assign = (char*)"#include <StripChart.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5508 "bacon.bac"
-__b2c__assign = (char*)"#include <Tip.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5509 "bacon.bac"
-__b2c__assign = (char*)"#include <Toggle.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5510 "bacon.bac"
-__b2c__assign = (char*)"#include <Tree.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5511 "bacon.bac"
-__b2c__assign = (char*)"#include <Viewport.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5512 "bacon.bac"
-__b2c__assign = (char*)"#include <X11/Intrinsic.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5513 "bacon.bac"
-__b2c__assign = (char*)"#include <X11/Shell.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5514 "bacon.bac"
-__b2c__assign = (char*)"#include <X11/StringDefs.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5515 "bacon.bac"
-__b2c__assign = (char*)"#endif"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5516 "bacon.bac"
-g_CCFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_CCFLAGS__b2c__string_var, g_CCFLAGS__b2c__string_var , " -I/usr/include/X11/Xaw") ;
-#line 5517 "bacon.bac"
-g_INCLUDE_FILES__b2c__string_var = F_CONCAT__b2c__string_var(g_INCLUDE_FILES__b2c__string_var, g_INCLUDE_FILES__b2c__string_var , " " , MID__b2c__string_var(g_SOURCEFILE__b2c__string_var, INSTRREV(g_SOURCEFILE__b2c__string_var, "/") + 1) , ".gui.h") ;
-#line 5518 "bacon.bac"
-g_LDFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_LDFLAGS__b2c__string_var,  g_LDFLAGS__b2c__string_var , " -lXaw -lXmu -lXt -lX11") ;
-#line 5519 "bacon.bac"
-}
-#line 5520 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "ERROR") == 0  AND  dim == 3 ){
-#line 5521 "bacon.bac"
-__b2c__assign = (char*)"WARNING: OPTION ERROR is deprecated."; if(__b2c__assign != NULL) { fputs(__b2c__assign, stdout); }
-fputs("\n", stdout);
-#line 5522 "bacon.bac"
-} else {
-#line 5523 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: argument to OPTION at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "' not recognized!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5524 "bacon.bac"
-exit(1);
-#line 5525 "bacon.bac"
-}
-#line 5526 "bacon.bac"
-}
-#line 5528 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "PROTO")){
-#line 5530 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "PROTO")){
 if( dim == 1 ){
-#line 5531 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty PROTO at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5532 "bacon.bac"
-exit(1);
-#line 5533 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty PROTO at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5534 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) EXTRACT__b2c__string_var(LAST__b2c__string_var(statement__b2c__string_var), CHR__b2c__string_var(34)));
-#line 5536 "bacon.bac"
-if( ISTOKEN(exp__b2c__string_var, "ALIAS") ){
-#line 5537 "bacon.bac"
-__b2c__assign = (char*)"#define "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) CHOP__b2c__string_var(TOKEN__b2c__string_var(exp__b2c__string_var, 2, "ALIAS")); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) CHOP__b2c__string_var(TOKEN__b2c__string_var(exp__b2c__string_var, 1, "ALIAS")); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5538 "bacon.bac"
-g_IMPORTED__b2c__string_var = F_CONCAT__b2c__string_var(g_IMPORTED__b2c__string_var, TOKEN__b2c__string_var(exp__b2c__string_var, 2, "ALIAS") , " " , g_IMPORTED__b2c__string_var) ;
-#line 5539 "bacon.bac"
-g_IMPORTED__b2c__string_var = F_CONCAT__b2c__string_var(g_IMPORTED__b2c__string_var, TOKEN__b2c__string_var(exp__b2c__string_var, 1, "ALIAS") , " " , g_IMPORTED__b2c__string_var) ;
-#line 5540 "bacon.bac"
-} else if( ISTOKEN(exp__b2c__string_var, "TYPE") ){
-#line 5541 "bacon.bac"
-__b2c__assign = (char*)TOKEN__b2c__string_var(exp__b2c__string_var, 2, "TYPE"); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) TOKEN__b2c__string_var(exp__b2c__string_var, 1, "TYPE"); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5542 "bacon.bac"
-} else {
-#line 5543 "bacon.bac"
-g_IMPORTED__b2c__string_var = F_CONCAT__b2c__string_var(g_IMPORTED__b2c__string_var, REPLACE__b2c__string_var(exp__b2c__string_var, ",", " ") , " " , g_IMPORTED__b2c__string_var) ;
-#line 5544 "bacon.bac"
+    exp = b2c_CopyString(exp, (char*) EXTRACT(LAST(statement), CHR(34)));
+    if( ISTOKEN(exp, "ALIAS") ){
+    fprintf(g_HFILE, "#define %s %s\n", CHOP(TOKEN(exp, 2, "ALIAS")), CHOP(TOKEN(exp, 1, "ALIAS")));
+        g_IMPORTED = F_CONCAT(g_IMPORTED, TOKEN(exp, 2, "ALIAS") , " " , g_IMPORTED) ;
+        g_IMPORTED = F_CONCAT(g_IMPORTED, TOKEN(exp, 1, "ALIAS") , " " , g_IMPORTED) ;
+    } else if( ISTOKEN(exp, "TYPE") ){
+    fprintf(g_HFILE, "%s %s;\n", TOKEN(exp, 2, "TYPE"), TOKEN(exp, 1, "TYPE"));
+    } else {
+        g_IMPORTED = F_CONCAT(g_IMPORTED, REPLACE(exp, ",", " ") , " " , g_IMPORTED) ;
+    }
 }
-#line 5545 "bacon.bac"
-}
-#line 5547 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "INCR")){
-#line 5549 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "INCR")){
 if( dim == 1 ){
-#line 5550 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty INCR at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5551 "bacon.bac"
-exit(1);
-#line 5552 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty INCR at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5554 "bacon.bac"
-token__b2c__string_var = __b2c_Copy_String(token__b2c__string_var, (char*) Mini_Parser__b2c__string_var(statement__b2c__string_var));
-#line 5556 "bacon.bac"
-exp__b2c__string_var = F_CHOP__b2c__string_var(exp__b2c__string_var,MID__b2c__string_var(statement__b2c__string_var, LEN(token__b2c__string_var)+2));
-#line 5557 "bacon.bac"
-if( NOT(LEN(exp__b2c__string_var)) ){
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) "1");
+    token = b2c_CopyString(token, (char*) Mini_Parser(statement));
+    exp = F_CHOP(exp,MID(statement, LEN(token)+2));
+    if( NOT(LEN(exp)) ){
+        exp = b2c_CopyString(exp, (char*) "1");
+    }
+    token = F_CHOP(token,MID(token, INSTR(token, " ")));
+    if( REGEX(token, "[a-zA-Z]+\\(.*\\)$") ){
+        lft = b2c_CopyString(lft, (char*) LEFT(token, INSTR(token, "(") - 1));
+        str = b2c_CopyString(str, (char*) INBETWEEN(token, "(", ")", 2));
+    fprintf(g_CFILE, "assoc_%s_eval = %s + (%s); b2c_hash_add(assoc_%s, &assoc_%s_eval, %s);\n", lft, token, exp, lft, lft, str);
+        Relate_Recurse(lft, str, CONCAT( token , "+(" , exp , ")") , -1);
+    } else {
+        if( REGEX(exp, "[0-9]\\.[0-9]") ){
+            Register_Numeric(token, "double");
+        } else if( NOT(LEN(Get_Var(token, g_FUNCNAME))) ){
+            Register_Numeric(token, "default");
+        }
+    fprintf(g_CFILE, "%s = %s + (%s);\n", token, token, exp);
+    }
 }
-#line 5558 "bacon.bac"
-token__b2c__string_var = F_CHOP__b2c__string_var(token__b2c__string_var,MID__b2c__string_var(token__b2c__string_var, INSTR(token__b2c__string_var, " ")));
-#line 5560 "bacon.bac"
-if( REGEX(token__b2c__string_var, "[a-zA-Z]+\\(.*\\)$") ){
-#line 5561 "bacon.bac"
-lft__b2c__string_var = __b2c_Copy_String(lft__b2c__string_var, (char*) LEFT__b2c__string_var(token__b2c__string_var, INSTR(token__b2c__string_var, "(") - 1));
-#line 5562 "bacon.bac"
-str__b2c__string_var = __b2c_Copy_String(str__b2c__string_var, (char*) INBETWEEN__b2c__string_var(token__b2c__string_var, "(", ")", 2));
-#line 5563 "bacon.bac"
-__b2c__assign = (char*)"__b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) lft__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "_eval = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " + ("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); __b2c__hash_add(__b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) lft__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", &__b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) lft__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "_eval, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) str__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5565 "bacon.bac"
-Relate_Recurse(lft__b2c__string_var, str__b2c__string_var, CONCAT__b2c__string_var( token__b2c__string_var , "+(" , exp__b2c__string_var , ")") , -1);
-#line 5566 "bacon.bac"
-} else {
-#line 5568 "bacon.bac"
-if( REGEX(exp__b2c__string_var, "[0-9]\\.[0-9]") ){
-#line 5569 "bacon.bac"
-Register_Numeric(token__b2c__string_var, "double");
-#line 5570 "bacon.bac"
-} else if( NOT(LEN(Get_Var__b2c__string_var(token__b2c__string_var, g_FUNCNAME__b2c__string_var))) ){
-#line 5571 "bacon.bac"
-Register_Numeric(token__b2c__string_var, "default");
-#line 5572 "bacon.bac"
-}
-#line 5573 "bacon.bac"
-__b2c__assign = (char*)token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " + ("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5574 "bacon.bac"
-}
-#line 5575 "bacon.bac"
-}
-#line 5577 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "DECR")){
-#line 5579 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "DECR")){
 if( dim == 1 ){
-#line 5580 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty DECR at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5581 "bacon.bac"
-exit(1);
-#line 5582 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty DECR at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5584 "bacon.bac"
-token__b2c__string_var = __b2c_Copy_String(token__b2c__string_var, (char*) Mini_Parser__b2c__string_var(statement__b2c__string_var));
-#line 5586 "bacon.bac"
-exp__b2c__string_var = F_CHOP__b2c__string_var(exp__b2c__string_var,MID__b2c__string_var(statement__b2c__string_var, LEN(token__b2c__string_var)+2));
-#line 5587 "bacon.bac"
-if( NOT(LEN(exp__b2c__string_var)) ){
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) "1");
+    token = b2c_CopyString(token, (char*) Mini_Parser(statement));
+    exp = F_CHOP(exp,MID(statement, LEN(token)+2));
+    if( NOT(LEN(exp)) ){
+        exp = b2c_CopyString(exp, (char*) "1");
+    }
+    token = F_CHOP(token,MID(token, INSTR(token, " ")));
+    if( REGEX(token, "[a-zA-Z]+\\(.*\\)$") ){
+        lft = b2c_CopyString(lft, (char*) LEFT(token, INSTR(token, "(") - 1));
+        str = b2c_CopyString(str, (char*) INBETWEEN(token, "(", ")", 2));
+    fprintf(g_CFILE, "assoc_%s_eval = %s - (%s); b2c_hash_add(assoc_%s, &assoc_%s_eval, %s);\n", lft, token, exp, lft, lft, str);
+        Relate_Recurse(lft, str, CONCAT( token , "+(" , exp , ")") , -1);
+    } else {
+        if( REGEX(exp, "[0-9]\\.[0-9]") ){
+            Register_Numeric(token, "double");
+        } else if( NOT(LEN(Get_Var(token, g_FUNCNAME))) ){
+            Register_Numeric(token, "default");
+        }
+    fprintf(g_CFILE, "%s = %s - (%s);\n", token, token, exp);
+    }
 }
-#line 5588 "bacon.bac"
-token__b2c__string_var = F_CHOP__b2c__string_var(token__b2c__string_var,MID__b2c__string_var(token__b2c__string_var, INSTR(token__b2c__string_var, " ")));
-#line 5590 "bacon.bac"
-if( REGEX(token__b2c__string_var, "[a-zA-Z]+\\(.*\\)$") ){
-#line 5591 "bacon.bac"
-lft__b2c__string_var = __b2c_Copy_String(lft__b2c__string_var, (char*) LEFT__b2c__string_var(token__b2c__string_var, INSTR(token__b2c__string_var, "(") - 1));
-#line 5592 "bacon.bac"
-str__b2c__string_var = __b2c_Copy_String(str__b2c__string_var, (char*) INBETWEEN__b2c__string_var(token__b2c__string_var, "(", ")", 2));
-#line 5593 "bacon.bac"
-__b2c__assign = (char*)"__b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) lft__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "_eval = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " - ("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); __b2c__hash_add(__b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) lft__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", &__b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) lft__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "_eval, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) str__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5595 "bacon.bac"
-Relate_Recurse(lft__b2c__string_var, str__b2c__string_var, CONCAT__b2c__string_var( token__b2c__string_var , "+(" , exp__b2c__string_var , ")") , -1);
-#line 5596 "bacon.bac"
-} else {
-#line 5598 "bacon.bac"
-if( REGEX(exp__b2c__string_var, "[0-9]\\.[0-9]") ){
-#line 5599 "bacon.bac"
-Register_Numeric(token__b2c__string_var, "double");
-#line 5600 "bacon.bac"
-} else if( NOT(LEN(Get_Var__b2c__string_var(token__b2c__string_var, g_FUNCNAME__b2c__string_var))) ){
-#line 5601 "bacon.bac"
-Register_Numeric(token__b2c__string_var, "default");
-#line 5602 "bacon.bac"
-}
-#line 5603 "bacon.bac"
-__b2c__assign = (char*)token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " - ("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5604 "bacon.bac"
-}
-#line 5605 "bacon.bac"
-}
-#line 5607 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ALARM")){
-#line 5609 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "ALARM")){
 if( dim == 1 ){
-#line 5610 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty ALARM at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5611 "bacon.bac"
-exit(1);
-#line 5612 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty ALARM at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5613 "bacon.bac"
-str__b2c__string_var = __b2c_Copy_String(str__b2c__string_var, (char*) EXTRACT__b2c__string_var(TOKEN__b2c__string_var(statement__b2c__string_var, 1, ","), "^ALARM ", TRUE));
-#line 5614 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) TOKEN__b2c__string_var(statement__b2c__string_var, 2, ","));
-#line 5615 "bacon.bac"
-__b2c__assign = (char*)"__b2c__alarm((void*)(uintptr_t)(&"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) str__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "), "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5616 "bacon.bac"
+    str = b2c_CopyString(str, (char*) EXTRACT(TOKEN(statement, 1, ","), "^ALARM ", TRUE));
+    exp = b2c_CopyString(exp, (char*) TOKEN(statement, 2, ","));
+fprintf(g_CFILE, "b2c_alarm((void*)(uintptr_t)(&%s), %s);\n", str, exp);
 }
-#line 5618 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SIGNAL")){
-#line 5620 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "SIGNAL")){
 if( dim == 1 ){
-#line 5621 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty SIGNAL at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5622 "bacon.bac"
-exit(1);
-#line 5623 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty SIGNAL at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5625 "bacon.bac"
-__b2c__split_by(&symbol__b2c__string_var, 1, &symbol__b2c__string_var__b2c_array, LAST__b2c__string_var(statement__b2c__string_var), ",");
-dim = symbol__b2c__string_var__b2c_array;
-#line 5626 "bacon.bac"
-if( dim == 2 ){
-#line 5627 "bacon.bac"
-if( ISTOKEN(symbol__b2c__string_var[(uint64_t)1], "SIG_DFL")  OR  ISTOKEN(symbol__b2c__string_var[(uint64_t)1], "SIG_IGN") ){
-#line 5628 "bacon.bac"
-__b2c__assign = (char*)"__b2c__signal((void*)(uintptr_t)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) symbol__b2c__string_var[(uint64_t)1]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) symbol__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5629 "bacon.bac"
-} else {
-#line 5630 "bacon.bac"
-__b2c__assign = (char*)"__b2c__signal((void*)(uintptr_t)(&"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) symbol__b2c__string_var[(uint64_t)1]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "), "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) symbol__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5631 "bacon.bac"
+    b2c_split_by(&symbol, 1, &symbol__b2c_array, LAST(statement), ",");
+    dim = symbol__b2c_array;
+    if( dim == 2 ){
+        if( ISTOKEN(symbol[(uint64_t)1], "SIG_DFL")  OR  ISTOKEN(symbol[(uint64_t)1], "SIG_IGN") ){
+        fprintf(g_CFILE, "b2c_signal((void*)(uintptr_t)%s, %s);\n", symbol[(uint64_t)1], symbol[(uint64_t)2]);
+        } else {
+        fprintf(g_CFILE, "b2c_signal((void*)(uintptr_t)(&%s), %s);\n", symbol[(uint64_t)1], symbol[(uint64_t)2]);
+        }
+    } else {
+    fprintf(stderr, "%sSyntax error: missing argument in SIGNAL at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+        exit(1);
+    }
 }
-#line 5632 "bacon.bac"
-} else {
-#line 5633 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: missing argument in SIGNAL at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5634 "bacon.bac"
-exit(1);
-#line 5635 "bacon.bac"
-}
-#line 5636 "bacon.bac"
-}
-#line 5638 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "CURSOR")){
-#line 5640 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "CURSOR")){
 if( dim == 1 ){
-#line 5641 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty CURSOR at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5642 "bacon.bac"
-exit(1);
-#line 5643 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty CURSOR at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5644 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) IIF__b2c__string_var(dim == 3, element__b2c__string_var[(uint64_t)3], "1"));
-#line 5645 "bacon.bac"
-if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "ON") == 0 ){
-#line 5646 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stdout,\"\\033[?25h\"); fflush(stdout);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5647 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "OFF") == 0 ){
-#line 5648 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stdout,\"\\033[?25l\"); fflush(stdout);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5649 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "UP") == 0 ){
-#line 5650 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stdout,\"\\033[%ldA\", (long)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); fflush(stdout);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5651 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "DOWN") == 0 ){
-#line 5652 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stdout,\"\\033[%ldB\", (long)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); fflush(stdout);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5653 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "FORWARD") == 0 ){
-#line 5654 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stdout,\"\\033[%ldC\", (long)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); fflush(stdout);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5655 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "BACK") == 0 ){
-#line 5656 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stdout,\"\\033[%ldD\", (long)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); fflush(stdout);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5657 "bacon.bac"
+    exp = b2c_CopyString(exp, (char*) IIF(dim == 3, element[(uint64_t)3], "1"));
+    if( __b2c__STRCMP(element[(uint64_t)2] ,  "ON") == 0 ){
+    fputs("fprintf(stdout,\"\\033[?25h\"); fflush(stdout);\n", g_CFILE);
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "OFF") == 0 ){
+    fputs("fprintf(stdout,\"\\033[?25l\"); fflush(stdout);\n", g_CFILE);
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "UP") == 0 ){
+    fprintf(g_CFILE, "fprintf(stdout,\"\\033[%ldA\", (long)%s); fflush(stdout);\n", exp);
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "DOWN") == 0 ){
+    fprintf(g_CFILE, "fprintf(stdout,\"\\033[%ldB\", (long)%s); fflush(stdout);\n", exp);
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "FORWARD") == 0 ){
+    fprintf(g_CFILE, "fprintf(stdout,\"\\033[%ldC\", (long)%s); fflush(stdout);\n", exp);
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "BACK") == 0 ){
+    fprintf(g_CFILE, "fprintf(stdout,\"\\033[%ldD\", (long)%s); fflush(stdout);\n", exp);
+    }
 }
-#line 5658 "bacon.bac"
-}
-#line 5660 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SCROLL")){
-#line 5661 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "SCROLL")){
 if( dim == 1 ){
-#line 5662 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty SCROLL at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5663 "bacon.bac"
-exit(1);
-#line 5664 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty SCROLL at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5665 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) IIF__b2c__string_var(dim == 3, element__b2c__string_var[(uint64_t)3], "1"));
-#line 5666 "bacon.bac"
-if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "UP") == 0 ){
-#line 5667 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stdout,\"\\033[%ldS\", (long)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); fflush(stdout);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5668 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "DOWN") == 0 ){
-#line 5669 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stdout,\"\\033[%ldT\", (long)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); fflush(stdout);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5670 "bacon.bac"
+    exp = b2c_CopyString(exp, (char*) IIF(dim == 3, element[(uint64_t)3], "1"));
+    if( __b2c__STRCMP(element[(uint64_t)2] ,  "UP") == 0 ){
+    fprintf(g_CFILE, "fprintf(stdout,\"\\033[%ldS\", (long)%s); fflush(stdout);\n", exp);
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "DOWN") == 0 ){
+    fprintf(g_CFILE, "fprintf(stdout,\"\\033[%ldT\", (long)%s); fflush(stdout);\n", exp);
+    }
 }
-#line 5671 "bacon.bac"
-}
-#line 5673 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ALIAS")){
-#line 5674 "bacon.bac"
-Handle_Alias(statement__b2c__string_var);
-#line 5676 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "LOOKUP")){
-#line 5677 "bacon.bac"
-Handle_Lookup(statement__b2c__string_var);
-#line 5679 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "RELATE")){
-#line 5680 "bacon.bac"
-Handle_Relate(CHOP__b2c__string_var(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "RELATE") + 6)));
-#line 5682 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "TEXTDOMAIN")){
-#line 5684 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "ALIAS")){
+Handle_Alias(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "LOOKUP")){
+Handle_Lookup(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "RELATE")){
+Handle_Relate(CHOP(MID(statement, INSTR(statement, "RELATE") + 6)));
+} else  if ( !b2c_strcmp(b2c_select_4250, "TEXTDOMAIN")){
 if( dim == 1 ){
-#line 5685 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty TEXTDOMAIN at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5686 "bacon.bac"
-exit(1);
-#line 5687 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty TEXTDOMAIN at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5689 "bacon.bac"
-__b2c__split_by(&symbol__b2c__string_var, 1, &symbol__b2c__string_var__b2c_array, CHOP__b2c__string_var(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "TEXTDOMAIN") + 10)), ",");
-dim = symbol__b2c__string_var__b2c_array;
-#line 5690 "bacon.bac"
-if( dim == 2 ){
-#line 5691 "bacon.bac"
-__b2c__assign = (char*)"if(bindtextdomain("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) symbol__b2c__string_var[(uint64_t)1]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ","; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) symbol__b2c__string_var[(uint64_t)2]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")==NULL){ ERROR = 6; RUNTIMEERROR(\"TEXTDOMAIN\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5692 "bacon.bac"
-__b2c__assign = (char*)"if(textdomain("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) symbol__b2c__string_var[(uint64_t)1]; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ")==NULL){ ERROR = 6; RUNTIMEERROR(\"TEXTDOMAIN\", "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs(STR__b2c__string_var( g_COUNTER), g_CFILE);
-__b2c__assign = (char*) ", \""; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "\", ERROR, "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_CATCHGOTO__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5693 "bacon.bac"
-if( __b2c__STRCMP(g_CATCHGOTO__b2c__string_var ,  "__B2C__PROGRAM__EXIT") == 0 ){
-g_CATCH_USED=(long)( 1);
+    b2c_split_by(&symbol, 1, &symbol__b2c_array, CHOP(MID(statement, INSTR(statement, "TEXTDOMAIN") + 10)), ",");
+    dim = symbol__b2c_array;
+    if( dim == 2 ){
+    fprintf(g_CFILE, "if(bindtextdomain(%s,%s)==NULL){ ERROR = 6; RUNTIMEERROR(\"TEXTDOMAIN\", %s, \"%s\", ERROR, %s); }\n", symbol[(uint64_t)1], symbol[(uint64_t)2], STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+    fprintf(g_CFILE, "if(textdomain(%s)==NULL){ ERROR = 6; RUNTIMEERROR(\"TEXTDOMAIN\", %s, \"%s\", ERROR, %s); }\n", symbol[(uint64_t)1], STR( g_COUNTER), g_CURFILE, g_CATCHGOTO);
+        if( __b2c__STRCMP(g_CATCHGOTO ,  "__B2C__PROGRAM__EXIT") == 0 ){
+            g_CATCH_USED=(long)( 1);
+        }
+    } else {
+    fprintf(stderr, "%sSyntax error: missing argument in TEXTDOMAIN at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+        exit(1);
+    }
 }
-#line 5694 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "REDIM")){
+Handle_Redim(CHOP(MID(statement, INSTR(statement, "REDIM") + 5)));
+} else  if ( !b2c_strcmp(b2c_select_4250, "EXIT")){
+if( LEN(g_FUNCNAME) == 0 ){
+fprintf(stderr, "%sSyntax error: EXIT not in FUNCTION or SUB at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
+}
+fprintf(g_CFILE, "%s\n", g_STRINGARRAYS);
+b2c_forin_exp_string = b2c_CopyString(b2c_forin_exp_string, g_LOCALSTRINGS); b2c_forin_exp_string_org = b2c_forin_exp_string;
+b2c_forin_exp_step = b2c_CopyString(b2c_forin_exp_step, b2c_option_delim);
+b2c_forin_exp_ptr = b2c_for_amount(b2c_forin_exp_string, b2c_forin_exp_step);
+for(; b2c_forin_exp_ptr > 0; b2c_forin_exp_ptr--) { b2c_for_item(&b2c_forin_exp_string_org, b2c_forin_exp_step, &exp);
+fprintf(g_CFILE, "__b2c__STRFREE(%s);\n", exp);
+}
+fputs("b2c_catch_set = b2c_catch_set_backup;\n", g_CFILE);
+if( INSTR(g_FUNCNAME, g_STRINGSIGN) ){
+fputs("return(NULL);\n", g_CFILE);
 } else {
-#line 5695 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: missing argument in TEXTDOMAIN at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5696 "bacon.bac"
-exit(1);
-#line 5697 "bacon.bac"
+fputs("return b2c_exitval;\n", g_CFILE);
 }
-#line 5698 "bacon.bac"
-}
-#line 5700 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "REDIM")){
-#line 5701 "bacon.bac"
-Handle_Redim(CHOP__b2c__string_var(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "REDIM") + 5)));
-#line 5703 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "EXIT")){
-#line 5704 "bacon.bac"
-if( LEN(g_FUNCNAME__b2c__string_var) == 0 ){
-#line 5705 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: EXIT not in FUNCTION or SUB at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5706 "bacon.bac"
-exit(1);
-#line 5707 "bacon.bac"
-}
-#line 5709 "bacon.bac"
-__b2c__assign = (char*)g_STRINGARRAYS__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5710 "bacon.bac"
-__b2c__forin_exp__b2c__string_var_string = __b2c_Copy_String(__b2c__forin_exp__b2c__string_var_string, g_LOCALSTRINGS__b2c__string_var); __b2c__forin_exp__b2c__string_var_string_org = __b2c__forin_exp__b2c__string_var_string;
-__b2c__forin_exp__b2c__string_var_step = __b2c_Copy_String(__b2c__forin_exp__b2c__string_var_step, __b2c__option_delim);
-__b2c__forin_exp__b2c__string_var_ptr = __b2c__for_amount(__b2c__forin_exp__b2c__string_var_string, __b2c__forin_exp__b2c__string_var_step);
-for(; __b2c__forin_exp__b2c__string_var_ptr > 0; __b2c__forin_exp__b2c__string_var_ptr--) { __b2c__for_item(&__b2c__forin_exp__b2c__string_var_string_org, __b2c__forin_exp__b2c__string_var_step, &exp__b2c__string_var);
-#line 5711 "bacon.bac"
-__b2c__assign = (char*)"__b2c__STRFREE("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5712 "bacon.bac"
-}
-#line 5713 "bacon.bac"
-__b2c__assign = (char*)"__b2c__catch_set = __b2c__catch_set_backup;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5715 "bacon.bac"
-if( INSTR(g_FUNCNAME__b2c__string_var, g_STRINGSIGN__b2c__string_var) ){
-#line 5716 "bacon.bac"
-__b2c__assign = (char*)"return(NULL);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5717 "bacon.bac"
-} else {
-#line 5718 "bacon.bac"
-__b2c__assign = (char*)"return __b2c__exitval;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5719 "bacon.bac"
-}
-#line 5721 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "PRAGMA")){
-#line 5723 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "PRAGMA")){
 if( dim == 1 ){
-#line 5724 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty PRAGMA at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5725 "bacon.bac"
-exit(1);
-#line 5726 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty PRAGMA at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5727 "bacon.bac"
-if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "OPTIONS") == 0  AND  dim >= 3 ){
-#line 5728 "bacon.bac"
-for(i=3; i <= dim; i+=1){
-#line 5729 "bacon.bac"
-g_CCFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_CCFLAGS__b2c__string_var, g_CCFLAGS__b2c__string_var , " " , element__b2c__string_var[i]) ;
-#line 5730 "bacon.bac"
+    if( __b2c__STRCMP(element[(uint64_t)2] ,  "OPTIONS") == 0  AND  dim >= 3 ){
+        for(i=3; i <= dim; i+=1){
+            g_CCFLAGS = F_CONCAT(g_CCFLAGS, g_CCFLAGS , " " , element[i]) ;
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "COMPILER") == 0  AND  dim == 3 ){
+        g_CCNAME = b2c_CopyString(g_CCNAME, (char*) element[(uint64_t)3]);
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "FRAMEWORK") == 0  AND  dim >= 3 ){
+        for(i=3; i <= dim; i+=1){
+            g_LDFLAGS = F_CONCAT(g_LDFLAGS, g_LDFLAGS , " -framework " , element[i]) ;
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "RE") == 0  AND  dim >= 3 ){
+        g_PRAGMA_REGEX = F_MID(g_PRAGMA_REGEX,statement, INSTR(statement, "RE")+3);
+        if( NOT(REGEX(g_PRAGMA_REGEX, " LDFLAGS ")) ){
+            exp = b2c_CopyString(exp, (char*) HEAD(g_PRAGMA_REGEX));
+            if( INSTR(exp, "tre") ){
+                g_LDFLAGS = F_CONCAT(g_LDFLAGS, g_LDFLAGS , " " , CHOP(EXEC("pkg-config --libs tre"))) ;
+            } else if( INSTR(exp, "pcre") ){
+                g_LDFLAGS = F_CONCAT(g_LDFLAGS, g_LDFLAGS , " " , CHOP(EXEC("pkg-config --libs libpcreposix"))) ;
+            } else if( INSTR(exp, "onig") ){
+                g_LDFLAGS = F_CONCAT(g_LDFLAGS, g_LDFLAGS , " " , CHOP(EXEC("pkg-config --libs oniguruma"))) ;
+            }
+        } else {
+            exp = F_MID(exp,g_PRAGMA_REGEX, INSTR(g_PRAGMA_REGEX, " LDFLAGS ")+9);
+            g_LDFLAGS = F_CONCAT(g_LDFLAGS, exp , " " , g_LDFLAGS) ;
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "TLS") == 0  AND  dim >= 3 ){
+        g_LIB_TLS = F_MID(g_LIB_TLS,statement, INSTR(statement, "TLS")+4);
+        g_OPTION_TLS=(long)( TRUE);
+    fputs("b2c_option_tls = 1;\n", g_CFILE);
+        if( NOT(REGEX(g_LIB_TLS, " LDFLAGS ")) ){
+            exp = b2c_CopyString(exp, (char*) HEAD(g_LIB_TLS));
+            if( TALLY(exp, "openssl") ){
+                g_LIB_TLS = F_CHOP(g_LIB_TLS,EXEC("pkg-config --libs openssl"));
+                g_INC_TLS = F_CONCAT(g_INC_TLS, "#include <openssl/ssl.h>" , NL , "#include <openssl/err.h>") ;
+            } else if( TALLY(exp, "gnutls") ){
+                g_LIB_TLS = F_CONCAT(g_LIB_TLS, CHOP(EXEC("pkg-config --libs gnutls")) , " -lgnutls-openssl") ;
+                g_INC_TLS = b2c_CopyString(g_INC_TLS, (char*) "#include <gnutls/openssl.h>");
+            } else if( INSTR(exp, "wolfssl") ){
+                g_LIB_TLS = F_CHOP(g_LIB_TLS,EXEC("pkg-config --libs wolfssl"));
+                g_INC_TLS = F_CONCAT(g_INC_TLS, "#include <wolfssl/options.h>" , NL , "#include <wolfssl/openssl/ssl.h>") ;
+            }
+        } else {
+            g_INC_TLS = b2c_CopyString(g_INC_TLS, (char*) LEFT(g_LIB_TLS, INSTR(g_LIB_TLS, " LDFLAGS ")-1));
+            g_LIB_TLS = F_MID(g_LIB_TLS,g_LIB_TLS, INSTR(g_LIB_TLS, " LDFLAGS ")+9);
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "GUI") == 0  AND  dim >= 3 ){
+        exp = F_MID(exp,statement, INSTR(statement, "GUI")+4);
+        if( NOT(INSTR(exp, " LDFLAGS ")) ){
+            if( __b2c__STRCMP(LCASE(HEAD(exp)) ,  "xaw3d") == 0 ){
+            fputs("#include <ThreeD.h>\n", g_HFILE);
+                g_LDFLAGS = b2c_CopyString(g_LDFLAGS, (char*) REPLACE(g_LDFLAGS, "-lXaw", "-lXaw3d"));
+                g_CCFLAGS = b2c_CopyString(g_CCFLAGS, (char*) REPLACE(g_CCFLAGS, "-I/usr/include/X11/Xaw", "-I/usr/include/X11/Xaw3d"));
+            } else if( __b2c__STRCMP(LCASE(HEAD(exp)) ,  "motif") == 0 ){
+            fputs("#undef b2c_gui_xaw\n", g_GENERIC);
+            fputs("#include <Xm/XmAll.h>\n", g_HFILE);
+                g_LDFLAGS = b2c_CopyString(g_LDFLAGS, (char*) REPLACE(g_LDFLAGS, "-lXaw", "-lXm"));
+                g_CCFLAGS = b2c_CopyString(g_CCFLAGS, (char*) EXTRACT(g_CCFLAGS, "-I/usr/include/X11/Xaw"));
+            } else if( __b2c__STRCMP(LCASE(HEAD(exp)) ,  "uil") == 0 ){
+            fputs("#undef b2c_gui_xaw\n", g_GENERIC);
+            fputs("#define b2c_gui_uil\n", g_GENERIC);
+            fputs("#include <Xm/XmAll.h>\n", g_HFILE);
+            fputs("#include <Mrm/MrmAppl.h>\n", g_HFILE);
+                g_LDFLAGS = b2c_CopyString(g_LDFLAGS, (char*) REPLACE(g_LDFLAGS, "-lXaw", "-lMrm -lXm"));
+                g_CCFLAGS = b2c_CopyString(g_CCFLAGS, (char*) EXTRACT(g_CCFLAGS, "-I/usr/include/X11/Xaw"));
+            } else if( __b2c__STRCMP(LCASE(HEAD(exp)) ,  "gtk2") == 0 ){
+            fputs("#undef b2c_gui_xaw\n", g_GENERIC);
+            fputs("#include <gtk/gtk.h>\n", g_HFILE);
+                g_LDFLAGS = b2c_CopyString(g_LDFLAGS, (char*) REPLACE(g_LDFLAGS, "-lXaw -lXmu -lXt -lX11", "`pkg-config --libs gtk+-2.0`"));
+                g_CCFLAGS = b2c_CopyString(g_CCFLAGS, (char*) REPLACE(g_CCFLAGS, "-I/usr/include/X11/Xaw", "`pkg-config --cflags gtk+-2.0`"));
+                g_WHICH_GUI=(long)( 1);
+            } else if( __b2c__STRCMP(LCASE(HEAD(exp)) ,  "gtk3") == 0 ){
+            fputs("#undef b2c_gui_xaw\n", g_GENERIC);
+            fputs("#include <gtk/gtk.h>\n", g_HFILE);
+                g_LDFLAGS = b2c_CopyString(g_LDFLAGS, (char*) REPLACE(g_LDFLAGS, "-lXaw -lXmu -lXt -lX11", "`pkg-config --libs gtk+-3.0`"));
+                g_CCFLAGS = b2c_CopyString(g_CCFLAGS, (char*) REPLACE(g_CCFLAGS, "-I/usr/include/X11/Xaw", "`pkg-config --cflags gtk+-3.0`"));
+                g_WHICH_GUI=(long)( 1);
+            } else if( __b2c__STRCMP(LCASE(HEAD(exp)) ,  "gtk4") == 0 ){
+            fputs("#undef b2c_gui_xaw\n", g_GENERIC);
+            fputs("#include <gtk/gtk.h>\n", g_HFILE);
+                g_LDFLAGS = b2c_CopyString(g_LDFLAGS, (char*) REPLACE(g_LDFLAGS, "-lXaw -lXmu -lXt -lX11", "`pkg-config --libs gtk4`"));
+                g_CCFLAGS = b2c_CopyString(g_CCFLAGS, (char*) REPLACE(g_CCFLAGS, "-I/usr/include/X11/Xaw", "`pkg-config --cflags gtk4`"));
+                g_WHICH_GUI=(long)( 3);
+            } else if( __b2c__STRCMP(LCASE(HEAD(exp)) ,  "cdk") == 0 ){
+            fputs("#undef b2c_gui_xaw\n", g_GENERIC);
+            fputs("#include <cdk.h>\n", g_HFILE);
+                g_LDFLAGS = b2c_CopyString(g_LDFLAGS, (char*) REPLACE(g_LDFLAGS, "-lXaw -lXmu -lXt -lX11", "-lncurses -lcdk"));
+                g_CCFLAGS = b2c_CopyString(g_CCFLAGS, (char*) REPLACE(g_CCFLAGS, "-I/usr/include/X11/Xaw", "-I/usr/include/cdk"));
+                g_WHICH_GUI=(long)( 2);
+            } else if( __b2c__STRCMP(LCASE(HEAD(exp)) ,  "tk") == 0 ){
+            fputs("#undef b2c_gui_xaw\n", g_GENERIC);
+            fputs("#include <tcl.h>\n", g_HFILE);
+            fputs("#include <tk.h>\n", g_HFILE);
+                g_LDFLAGS = b2c_CopyString(g_LDFLAGS, (char*) REPLACE(g_LDFLAGS, "-lXaw -lXmu -lXt -lX11", "`pkg-config --libs tk tcl`"));
+                g_CCFLAGS = b2c_CopyString(g_CCFLAGS, (char*) REPLACE(g_CCFLAGS, "-I/usr/include/X11/Xaw", "`pkg-config --cflags tk tcl`"));
+                g_WHICH_GUI=(long)( 4);
+            }
+            if( g_WHICH_GUI == 1 ){
+            fputs("#define GTKINIT gtk_init(NULL,NULL)\n", g_HFILE);
+            fputs("#define GTKMAINITERATION gtk_main_iteration()\n", g_HFILE);
+            fputs("#define GTKWIDGETSHOW gtk_widget_show_all\n", g_HFILE);
+            fputs("#define GTKCONTAINERADD(x,y) gtk_container_add(GTK_CONTAINER(x), GTK_WIDGET(y))\n", g_HFILE);
+            } else if( g_WHICH_GUI == 3 ){
+            fputs("#define GTKINIT gtk_init()\n", g_HFILE);
+            fputs("#define GTKMAINITERATION g_main_context_iteration(NULL,1)\n", g_HFILE);
+            fputs("#define GTKWIDGETSHOW gtk_widget_show\n", g_HFILE);
+            fputs("#define GTKCONTAINERADD(x,y) (GTK_IS_BOX(x) ? gtk_box_append(GTK_BOX(x), GTK_WIDGET(y)) : g_object_set(GTK_WIDGET(x), \"child\", GTK_WIDGET(y), NULL))\n", g_HFILE);
+            }
+        } else {
+            g_LDFLAGS = b2c_CopyString(g_LDFLAGS, (char*) REPLACE(g_LDFLAGS, "-lXaw", TOKEN(exp, 2, " LDFLAGS ")));
+            g_CCFLAGS = b2c_CopyString(g_CCFLAGS, (char*) REPLACE(g_CCFLAGS, "-I/usr/include/X11/Xaw", TOKEN(TOKEN(exp, 1, " LDFLAGS "), 2, " OPTIONS ")));
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "LDFLAGS") == 0  AND  dim >= 3 ){
+        if( TALLY(TOKEN(statement, 2, "LDFLAGS"), "pkg-config")  OR  TALLY(TOKEN(statement, 2, "LDFLAGS"), "fltk-config") ){
+            g_LDFLAGS = F_CONCAT(g_LDFLAGS, TOKEN(statement, 2, "LDFLAGS") , " " , g_LDFLAGS) ;
+        } else {
+            for(i=3; i <= dim; i+=1){
+                if( __b2c__STRCMP(element[(uint64_t)i] ,  "TRUE") == 0 ){
+                    found=(
+                    long)( TRUE);
+                    break;
+                } else if( __b2c__STRCMP(LEFT(element[(uint64_t)i], 1) ,  "-") == 0  OR  __b2c__STRCMP(RIGHT(element[(uint64_t)i], 2) ,  ".a") == 0 ){
+                    exp = F_CONCAT(exp, exp , " " , element[i]) ;
+                } else {
+                    exp = F_CONCAT(exp, exp , " -l" , element[i]) ;
+                }
+            }
+            if( found ){
+                g_LDFLAGS = F_CONCAT(g_LDFLAGS, exp , " " , g_LDFLAGS) ;
+            } else {
+                g_LDFLAGS = F_CONCAT(g_LDFLAGS, g_LDFLAGS , " " , exp) ;
+            }
+        }
+    } else if( __b2c__STRCMP(element[(uint64_t)2] ,  "INCLUDE") == 0  AND  dim >= 3 ){
+        for(i=3; i <= dim; i+=1){
+            if( __b2c__STRCMP(LEFT(element[(uint64_t)i], 1) ,  "/") == 0  OR  __b2c__STRCMP(LEFT(element[(uint64_t)i], 2) ,  "./") == 0 ){
+                g_PRAGMA_INCLUDE = F_CONCAT(g_PRAGMA_INCLUDE, g_PRAGMA_INCLUDE , NL , "#include " , CHR(34) , element[(uint64_t)i] , CHR(34)) ;
+            } else if( __b2c__STRCMP(LEFT(element[(uint64_t)i], 1) ,  "<") == 0 ){
+                g_PRAGMA_INCLUDE = F_CONCAT(g_PRAGMA_INCLUDE, g_PRAGMA_INCLUDE , NL , "#include " , element[(uint64_t)i]) ;
+            } else {
+                g_PRAGMA_INCLUDE = F_CONCAT(g_PRAGMA_INCLUDE, g_PRAGMA_INCLUDE , NL , "#include " , CHR(34) , CURDIR , "/" , element[(uint64_t)i] , CHR(34)) ;
+            }
+        }
+    } else {
+    fprintf(g_CFILE, "#pragma %s\n", CHOP(MID(statement, INSTR(statement, "PRAGMA") + 6)));
+    }
 }
-#line 5731 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "COMPILER") == 0  AND  dim == 3 ){
-#line 5732 "bacon.bac"
-g_CCNAME__b2c__string_var = __b2c_Copy_String(g_CCNAME__b2c__string_var, (char*) element__b2c__string_var[(uint64_t)3]);
-#line 5733 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "FRAMEWORK") == 0  AND  dim >= 3 ){
-#line 5734 "bacon.bac"
-for(i=3; i <= dim; i+=1){
-#line 5735 "bacon.bac"
-g_LDFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_LDFLAGS__b2c__string_var, g_LDFLAGS__b2c__string_var , " -framework " , element__b2c__string_var[i]) ;
-#line 5736 "bacon.bac"
-}
-#line 5737 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "RE") == 0  AND  dim >= 3 ){
-#line 5738 "bacon.bac"
-g_PRAGMA_REGEX__b2c__string_var = F_MID__b2c__string_var(g_PRAGMA_REGEX__b2c__string_var,statement__b2c__string_var, INSTR(statement__b2c__string_var, "RE")+3);
-#line 5739 "bacon.bac"
-if( NOT(REGEX(g_PRAGMA_REGEX__b2c__string_var, " LDFLAGS ")) ){
-#line 5740 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) HEAD__b2c__string_var(g_PRAGMA_REGEX__b2c__string_var));
-#line 5741 "bacon.bac"
-if( INSTR(exp__b2c__string_var, "tre") ){
-#line 5742 "bacon.bac"
-g_LDFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_LDFLAGS__b2c__string_var, g_LDFLAGS__b2c__string_var , " " , CHOP__b2c__string_var(EXEC__b2c__string_var("pkg-config --libs tre"))) ;
-#line 5743 "bacon.bac"
-} else if( INSTR(exp__b2c__string_var, "pcre") ){
-#line 5744 "bacon.bac"
-g_LDFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_LDFLAGS__b2c__string_var, g_LDFLAGS__b2c__string_var , " " , CHOP__b2c__string_var(EXEC__b2c__string_var("pkg-config --libs libpcreposix"))) ;
-#line 5745 "bacon.bac"
-} else if( INSTR(exp__b2c__string_var, "onig") ){
-#line 5746 "bacon.bac"
-g_LDFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_LDFLAGS__b2c__string_var, g_LDFLAGS__b2c__string_var , " " , CHOP__b2c__string_var(EXEC__b2c__string_var("pkg-config --libs oniguruma"))) ;
-#line 5747 "bacon.bac"
-}
-#line 5748 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "SWAP")){
+Handle_Swap(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "SETSERIAL")){
+Handle_Setserial(CHOP(MID(statement, INSTR(statement, "SETSERIAL") + 9)));
+} else  if ( !b2c_strcmp(b2c_select_4250, "ENUM")){
+if( NOT(LEN(g_FUNCNAME)) ){
+fputs("enum {\n", g_HFILE);
+    g_USE_H=(long)( 1);
 } else {
-#line 5749 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,g_PRAGMA_REGEX__b2c__string_var, INSTR(g_PRAGMA_REGEX__b2c__string_var, " LDFLAGS ")+9);
-#line 5750 "bacon.bac"
-g_LDFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_LDFLAGS__b2c__string_var, exp__b2c__string_var , " " , g_LDFLAGS__b2c__string_var) ;
-#line 5751 "bacon.bac"
+fputs("enum {\n", g_CFILE);
+    g_USE_C=(long)( 1);
 }
-#line 5752 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "TLS") == 0  AND  dim >= 3 ){
-#line 5753 "bacon.bac"
-g_LIB_TLS__b2c__string_var = F_MID__b2c__string_var(g_LIB_TLS__b2c__string_var,statement__b2c__string_var, INSTR(statement__b2c__string_var, "TLS")+4);
-#line 5754 "bacon.bac"
-g_OPTION_TLS=(long)( TRUE);
-#line 5755 "bacon.bac"
-__b2c__assign = (char*)"__b2c__option_tls = 1;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5756 "bacon.bac"
-if( NOT(REGEX(g_LIB_TLS__b2c__string_var, " LDFLAGS ")) ){
-#line 5757 "bacon.bac"
-exp__b2c__string_var = __b2c_Copy_String(exp__b2c__string_var, (char*) HEAD__b2c__string_var(g_LIB_TLS__b2c__string_var));
-#line 5758 "bacon.bac"
-if( TALLY(exp__b2c__string_var, "openssl") ){
-#line 5759 "bacon.bac"
-g_LIB_TLS__b2c__string_var = F_CHOP__b2c__string_var(g_LIB_TLS__b2c__string_var,EXEC__b2c__string_var("pkg-config --libs openssl"));
-#line 5760 "bacon.bac"
-g_INC_TLS__b2c__string_var = F_CONCAT__b2c__string_var(g_INC_TLS__b2c__string_var, "#include <openssl/ssl.h>" , NL__b2c__string_var , "#include <openssl/err.h>") ;
-#line 5761 "bacon.bac"
-} else if( TALLY(exp__b2c__string_var, "gnutls") ){
-#line 5762 "bacon.bac"
-g_LIB_TLS__b2c__string_var = F_CONCAT__b2c__string_var(g_LIB_TLS__b2c__string_var, CHOP__b2c__string_var(EXEC__b2c__string_var("pkg-config --libs gnutls")) , " -lgnutls-openssl") ;
-#line 5763 "bacon.bac"
-g_INC_TLS__b2c__string_var = __b2c_Copy_String(g_INC_TLS__b2c__string_var, (char*) "#include <gnutls/openssl.h>");
-#line 5764 "bacon.bac"
-} else if( INSTR(exp__b2c__string_var, "wolfssl") ){
-#line 5765 "bacon.bac"
-g_LIB_TLS__b2c__string_var = F_CHOP__b2c__string_var(g_LIB_TLS__b2c__string_var,EXEC__b2c__string_var("pkg-config --libs wolfssl"));
-#line 5766 "bacon.bac"
-g_INC_TLS__b2c__string_var = F_CONCAT__b2c__string_var(g_INC_TLS__b2c__string_var, "#include <wolfssl/options.h>" , NL__b2c__string_var , "#include <wolfssl/openssl/ssl.h>") ;
-#line 5767 "bacon.bac"
-}
-#line 5768 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "RUN")){
+Handle_Run(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "SAVE")){
+Handle_Save(0, CHOP(MID(statement, INSTR(statement, "SAVE") + 4)));
+} else  if ( !b2c_strcmp(b2c_select_4250, "BSAVE")){
+Handle_Save(1, CHOP(MID(statement, INSTR(statement, "BSAVE") + 5)));
+} else  if ( !b2c_strcmp(b2c_select_4250, "APPEND")){
+exp = F_MID(exp,statement, INSTR(statement, "APPEND") + 6);
+if( NOT(ISTOKEN(exp, "TO"))  AND  HASDELIM(exp, ",") ){
+fprintf(g_CFILE, "%s= F_CONCAT%s(%s,%s);\n", TOKEN(exp, 1, ","), g_STRINGSIGN, TOKEN(exp, 1, ","), exp);
 } else {
-#line 5769 "bacon.bac"
-g_INC_TLS__b2c__string_var = __b2c_Copy_String(g_INC_TLS__b2c__string_var, (char*) LEFT__b2c__string_var(g_LIB_TLS__b2c__string_var, INSTR(g_LIB_TLS__b2c__string_var, " LDFLAGS ")-1));
-#line 5770 "bacon.bac"
-g_LIB_TLS__b2c__string_var = F_MID__b2c__string_var(g_LIB_TLS__b2c__string_var,g_LIB_TLS__b2c__string_var, INSTR(g_LIB_TLS__b2c__string_var, " LDFLAGS ")+9);
-#line 5771 "bacon.bac"
+    Handle_Save(2, CHOP(MID(statement, INSTR(statement, "APPEND") + 6)));
 }
-#line 5772 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "GUI") == 0  AND  dim >= 3 ){
-#line 5773 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,statement__b2c__string_var, INSTR(statement__b2c__string_var, "GUI")+4);
-#line 5774 "bacon.bac"
-if( NOT(INSTR(exp__b2c__string_var, " LDFLAGS ")) ){
-#line 5775 "bacon.bac"
-if( __b2c__STRCMP(LCASE__b2c__string_var(HEAD__b2c__string_var(exp__b2c__string_var)) ,  "xaw3d") == 0 ){
-#line 5776 "bacon.bac"
-__b2c__assign = (char*)"#include <ThreeD.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5777 "bacon.bac"
-g_LDFLAGS__b2c__string_var = __b2c_Copy_String(g_LDFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_LDFLAGS__b2c__string_var, "-lXaw", "-lXaw3d"));
-#line 5778 "bacon.bac"
-g_CCFLAGS__b2c__string_var = __b2c_Copy_String(g_CCFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_CCFLAGS__b2c__string_var, "-I/usr/include/X11/Xaw", "-I/usr/include/X11/Xaw3d"));
-#line 5779 "bacon.bac"
-} else if( __b2c__STRCMP(LCASE__b2c__string_var(HEAD__b2c__string_var(exp__b2c__string_var)) ,  "motif") == 0 ){
-#line 5780 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__gui_xaw"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_GENERIC); }
-fputs("\n", g_GENERIC);
-#line 5781 "bacon.bac"
-__b2c__assign = (char*)"#include <Xm/XmAll.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5782 "bacon.bac"
-g_LDFLAGS__b2c__string_var = __b2c_Copy_String(g_LDFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_LDFLAGS__b2c__string_var, "-lXaw", "-lXm"));
-#line 5783 "bacon.bac"
-g_CCFLAGS__b2c__string_var = __b2c_Copy_String(g_CCFLAGS__b2c__string_var, (char*) EXTRACT__b2c__string_var(g_CCFLAGS__b2c__string_var, "-I/usr/include/X11/Xaw"));
-#line 5784 "bacon.bac"
-} else if( __b2c__STRCMP(LCASE__b2c__string_var(HEAD__b2c__string_var(exp__b2c__string_var)) ,  "uil") == 0 ){
-#line 5785 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__gui_xaw"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_GENERIC); }
-fputs("\n", g_GENERIC);
-#line 5786 "bacon.bac"
-__b2c__assign = (char*)"#define __b2c__gui_uil"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_GENERIC); }
-fputs("\n", g_GENERIC);
-#line 5787 "bacon.bac"
-__b2c__assign = (char*)"#include <Xm/XmAll.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5788 "bacon.bac"
-__b2c__assign = (char*)"#include <Mrm/MrmAppl.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5789 "bacon.bac"
-g_LDFLAGS__b2c__string_var = __b2c_Copy_String(g_LDFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_LDFLAGS__b2c__string_var, "-lXaw", "-lMrm -lXm"));
-#line 5790 "bacon.bac"
-g_CCFLAGS__b2c__string_var = __b2c_Copy_String(g_CCFLAGS__b2c__string_var, (char*) EXTRACT__b2c__string_var(g_CCFLAGS__b2c__string_var, "-I/usr/include/X11/Xaw"));
-#line 5791 "bacon.bac"
-} else if( __b2c__STRCMP(LCASE__b2c__string_var(HEAD__b2c__string_var(exp__b2c__string_var)) ,  "gtk2") == 0 ){
-#line 5792 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__gui_xaw"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_GENERIC); }
-fputs("\n", g_GENERIC);
-#line 5793 "bacon.bac"
-__b2c__assign = (char*)"#include <gtk/gtk.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5794 "bacon.bac"
-g_LDFLAGS__b2c__string_var = __b2c_Copy_String(g_LDFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_LDFLAGS__b2c__string_var, "-lXaw -lXmu -lXt -lX11", "`pkg-config --libs gtk+-2.0`"));
-#line 5795 "bacon.bac"
-g_CCFLAGS__b2c__string_var = __b2c_Copy_String(g_CCFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_CCFLAGS__b2c__string_var, "-I/usr/include/X11/Xaw", "`pkg-config --cflags gtk+-2.0`"));
-#line 5796 "bacon.bac"
-g_WHICH_GUI=(long)( 1);
-#line 5797 "bacon.bac"
-} else if( __b2c__STRCMP(LCASE__b2c__string_var(HEAD__b2c__string_var(exp__b2c__string_var)) ,  "gtk3") == 0 ){
-#line 5798 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__gui_xaw"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_GENERIC); }
-fputs("\n", g_GENERIC);
-#line 5799 "bacon.bac"
-__b2c__assign = (char*)"#include <gtk/gtk.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5800 "bacon.bac"
-g_LDFLAGS__b2c__string_var = __b2c_Copy_String(g_LDFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_LDFLAGS__b2c__string_var, "-lXaw -lXmu -lXt -lX11", "`pkg-config --libs gtk+-3.0`"));
-#line 5801 "bacon.bac"
-g_CCFLAGS__b2c__string_var = __b2c_Copy_String(g_CCFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_CCFLAGS__b2c__string_var, "-I/usr/include/X11/Xaw", "`pkg-config --cflags gtk+-3.0`"));
-#line 5802 "bacon.bac"
-g_WHICH_GUI=(long)( 1);
-#line 5803 "bacon.bac"
-} else if( __b2c__STRCMP(LCASE__b2c__string_var(HEAD__b2c__string_var(exp__b2c__string_var)) ,  "gtk4") == 0 ){
-#line 5804 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__gui_xaw"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_GENERIC); }
-fputs("\n", g_GENERIC);
-#line 5805 "bacon.bac"
-__b2c__assign = (char*)"#include <gtk/gtk.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5806 "bacon.bac"
-g_LDFLAGS__b2c__string_var = __b2c_Copy_String(g_LDFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_LDFLAGS__b2c__string_var, "-lXaw -lXmu -lXt -lX11", "`pkg-config --libs gtk4`"));
-#line 5807 "bacon.bac"
-g_CCFLAGS__b2c__string_var = __b2c_Copy_String(g_CCFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_CCFLAGS__b2c__string_var, "-I/usr/include/X11/Xaw", "`pkg-config --cflags gtk4`"));
-#line 5808 "bacon.bac"
-g_WHICH_GUI=(long)( 3);
-#line 5809 "bacon.bac"
-} else if( __b2c__STRCMP(LCASE__b2c__string_var(HEAD__b2c__string_var(exp__b2c__string_var)) ,  "cdk") == 0 ){
-#line 5810 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__gui_xaw"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_GENERIC); }
-fputs("\n", g_GENERIC);
-#line 5811 "bacon.bac"
-__b2c__assign = (char*)"#include <cdk.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5812 "bacon.bac"
-g_LDFLAGS__b2c__string_var = __b2c_Copy_String(g_LDFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_LDFLAGS__b2c__string_var, "-lXaw -lXmu -lXt -lX11", "-lncurses -lcdk"));
-#line 5813 "bacon.bac"
-g_CCFLAGS__b2c__string_var = __b2c_Copy_String(g_CCFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_CCFLAGS__b2c__string_var, "-I/usr/include/X11/Xaw", "-I/usr/include/cdk"));
-#line 5814 "bacon.bac"
-g_WHICH_GUI=(long)( 2);
-#line 5815 "bacon.bac"
-} else if( __b2c__STRCMP(LCASE__b2c__string_var(HEAD__b2c__string_var(exp__b2c__string_var)) ,  "tk") == 0 ){
-#line 5816 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__gui_xaw"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_GENERIC); }
-fputs("\n", g_GENERIC);
-#line 5817 "bacon.bac"
-__b2c__assign = (char*)"#include <tcl.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5818 "bacon.bac"
-__b2c__assign = (char*)"#include <tk.h>"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5819 "bacon.bac"
-g_LDFLAGS__b2c__string_var = __b2c_Copy_String(g_LDFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_LDFLAGS__b2c__string_var, "-lXaw -lXmu -lXt -lX11", "`pkg-config --libs tk tcl`"));
-#line 5820 "bacon.bac"
-g_CCFLAGS__b2c__string_var = __b2c_Copy_String(g_CCFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_CCFLAGS__b2c__string_var, "-I/usr/include/X11/Xaw", "`pkg-config --cflags tk tcl`"));
-#line 5821 "bacon.bac"
-g_WHICH_GUI=(long)( 4);
-#line 5822 "bacon.bac"
-}
-#line 5823 "bacon.bac"
-if( g_WHICH_GUI == 1 ){
-#line 5824 "bacon.bac"
-__b2c__assign = (char*)"#define GTKINIT gtk_init(NULL,NULL)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5825 "bacon.bac"
-__b2c__assign = (char*)"#define GTKMAINITERATION gtk_main_iteration()"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5826 "bacon.bac"
-__b2c__assign = (char*)"#define GTKWIDGETSHOW gtk_widget_show_all"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5827 "bacon.bac"
-__b2c__assign = (char*)"#define GTKCONTAINERADD(x,y) gtk_container_add(GTK_CONTAINER(x), GTK_WIDGET(y))"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5828 "bacon.bac"
-} else if( g_WHICH_GUI == 3 ){
-#line 5829 "bacon.bac"
-__b2c__assign = (char*)"#define GTKINIT gtk_init()"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5830 "bacon.bac"
-__b2c__assign = (char*)"#define GTKMAINITERATION g_main_context_iteration(NULL,1)"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5831 "bacon.bac"
-__b2c__assign = (char*)"#define GTKWIDGETSHOW gtk_widget_show"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5832 "bacon.bac"
-__b2c__assign = (char*)"#define GTKCONTAINERADD(x,y) (GTK_IS_BOX(x) ? gtk_box_append(GTK_BOX(x), GTK_WIDGET(y)) : g_object_set(GTK_WIDGET(x), \"child\", GTK_WIDGET(y), NULL))"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5833 "bacon.bac"
-}
-#line 5834 "bacon.bac"
-} else {
-#line 5835 "bacon.bac"
-g_LDFLAGS__b2c__string_var = __b2c_Copy_String(g_LDFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_LDFLAGS__b2c__string_var, "-lXaw", TOKEN__b2c__string_var(exp__b2c__string_var, 2, " LDFLAGS ")));
-#line 5836 "bacon.bac"
-g_CCFLAGS__b2c__string_var = __b2c_Copy_String(g_CCFLAGS__b2c__string_var, (char*) REPLACE__b2c__string_var(g_CCFLAGS__b2c__string_var, "-I/usr/include/X11/Xaw", TOKEN__b2c__string_var(TOKEN__b2c__string_var(exp__b2c__string_var, 1, " LDFLAGS "), 2, " OPTIONS ")));
-#line 5837 "bacon.bac"
-}
-#line 5838 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "LDFLAGS") == 0  AND  dim >= 3 ){
-#line 5839 "bacon.bac"
-if( TALLY(TOKEN__b2c__string_var(statement__b2c__string_var, 2, "LDFLAGS"), "pkg-config")  OR  TALLY(TOKEN__b2c__string_var(statement__b2c__string_var, 2, "LDFLAGS"), "fltk-config") ){
-#line 5840 "bacon.bac"
-g_LDFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_LDFLAGS__b2c__string_var, TOKEN__b2c__string_var(statement__b2c__string_var, 2, "LDFLAGS") , " " , g_LDFLAGS__b2c__string_var) ;
-#line 5841 "bacon.bac"
-} else {
-#line 5842 "bacon.bac"
-for(i=3; i <= dim; i+=1){
-#line 5843 "bacon.bac"
-if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)i] ,  "TRUE") == 0 ){
-#line 5844 "bacon.bac"
-found=(
-long)( TRUE);
-#line 5845 "bacon.bac"
-break;
-#line 5846 "bacon.bac"
-} else if( __b2c__STRCMP(LEFT__b2c__string_var(element__b2c__string_var[(uint64_t)i], 1) ,  "-") == 0  OR  __b2c__STRCMP(RIGHT__b2c__string_var(element__b2c__string_var[(uint64_t)i], 2) ,  ".a") == 0 ){
-#line 5847 "bacon.bac"
-exp__b2c__string_var = F_CONCAT__b2c__string_var(exp__b2c__string_var, exp__b2c__string_var , " " , element__b2c__string_var[i]) ;
-#line 5848 "bacon.bac"
-} else {
-#line 5849 "bacon.bac"
-exp__b2c__string_var = F_CONCAT__b2c__string_var(exp__b2c__string_var, exp__b2c__string_var , " -l" , element__b2c__string_var[i]) ;
-#line 5850 "bacon.bac"
-}
-#line 5851 "bacon.bac"
-}
-#line 5852 "bacon.bac"
-if( found ){
-#line 5853 "bacon.bac"
-g_LDFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_LDFLAGS__b2c__string_var, exp__b2c__string_var , " " , g_LDFLAGS__b2c__string_var) ;
-#line 5854 "bacon.bac"
-} else {
-#line 5855 "bacon.bac"
-g_LDFLAGS__b2c__string_var = F_CONCAT__b2c__string_var(g_LDFLAGS__b2c__string_var, g_LDFLAGS__b2c__string_var , " " , exp__b2c__string_var) ;
-#line 5856 "bacon.bac"
-}
-#line 5857 "bacon.bac"
-}
-#line 5858 "bacon.bac"
-} else if( __b2c__STRCMP(element__b2c__string_var[(uint64_t)2] ,  "INCLUDE") == 0  AND  dim >= 3 ){
-#line 5859 "bacon.bac"
-for(i=3; i <= dim; i+=1){
-#line 5860 "bacon.bac"
-if( __b2c__STRCMP(LEFT__b2c__string_var(element__b2c__string_var[(uint64_t)i], 1) ,  "/") == 0  OR  __b2c__STRCMP(LEFT__b2c__string_var(element__b2c__string_var[(uint64_t)i], 2) ,  "./") == 0 ){
-#line 5861 "bacon.bac"
-g_PRAGMA_INCLUDE__b2c__string_var = F_CONCAT__b2c__string_var(g_PRAGMA_INCLUDE__b2c__string_var, g_PRAGMA_INCLUDE__b2c__string_var , NL__b2c__string_var , "#include " , CHR__b2c__string_var(34) , element__b2c__string_var[(uint64_t)i] , CHR__b2c__string_var(34)) ;
-#line 5862 "bacon.bac"
-} else if( __b2c__STRCMP(LEFT__b2c__string_var(element__b2c__string_var[(uint64_t)i], 1) ,  "<") == 0 ){
-#line 5863 "bacon.bac"
-g_PRAGMA_INCLUDE__b2c__string_var = F_CONCAT__b2c__string_var(g_PRAGMA_INCLUDE__b2c__string_var, g_PRAGMA_INCLUDE__b2c__string_var , NL__b2c__string_var , "#include " , element__b2c__string_var[(uint64_t)i]) ;
-#line 5864 "bacon.bac"
-} else {
-#line 5865 "bacon.bac"
-g_PRAGMA_INCLUDE__b2c__string_var = F_CONCAT__b2c__string_var(g_PRAGMA_INCLUDE__b2c__string_var, g_PRAGMA_INCLUDE__b2c__string_var , NL__b2c__string_var , "#include " , CHR__b2c__string_var(34) , CURDIR__b2c__string_var , "/" , element__b2c__string_var[(uint64_t)i] , CHR__b2c__string_var(34)) ;
-#line 5866 "bacon.bac"
-}
-#line 5867 "bacon.bac"
-}
-#line 5868 "bacon.bac"
-} else {
-#line 5869 "bacon.bac"
-__b2c__assign = (char*)"#pragma "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) CHOP__b2c__string_var(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "PRAGMA") + 6)); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5870 "bacon.bac"
-}
-#line 5871 "bacon.bac"
-}
-#line 5873 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SWAP")){
-#line 5874 "bacon.bac"
-Handle_Swap(statement__b2c__string_var);
-#line 5876 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SETSERIAL")){
-#line 5877 "bacon.bac"
-Handle_Setserial(CHOP__b2c__string_var(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "SETSERIAL") + 9)));
-#line 5879 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "ENUM")){
-#line 5880 "bacon.bac"
-if( NOT(LEN(g_FUNCNAME__b2c__string_var)) ){
-#line 5881 "bacon.bac"
-__b2c__assign = (char*)"enum {"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 5882 "bacon.bac"
-g_USE_H=(long)( 1);
-#line 5883 "bacon.bac"
-} else {
-#line 5884 "bacon.bac"
-__b2c__assign = (char*)"enum {"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5885 "bacon.bac"
-g_USE_C=(long)( 1);
-#line 5886 "bacon.bac"
-}
-#line 5888 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "RUN")){
-#line 5889 "bacon.bac"
-Handle_Run(statement__b2c__string_var);
-#line 5891 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "SAVE")){
-#line 5892 "bacon.bac"
-Handle_Save(0, CHOP__b2c__string_var(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "SAVE") + 4)));
-#line 5894 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "BSAVE")){
-#line 5895 "bacon.bac"
-Handle_Save(1, CHOP__b2c__string_var(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "BSAVE") + 5)));
-#line 5897 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "APPEND")){
-#line 5898 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,statement__b2c__string_var, INSTR(statement__b2c__string_var, "APPEND") + 6);
-#line 5899 "bacon.bac"
-if( NOT(ISTOKEN(exp__b2c__string_var, "TO"))  AND  HASDELIM(exp__b2c__string_var, ",") ){
-#line 5900 "bacon.bac"
-__b2c__assign = (char*)TOKEN__b2c__string_var(exp__b2c__string_var, 1, ","); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "= F_CONCAT"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) g_STRINGSIGN__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) TOKEN__b2c__string_var(exp__b2c__string_var, 1, ","); if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ","; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) exp__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ");"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5901 "bacon.bac"
-} else {
-#line 5902 "bacon.bac"
-Handle_Save(2, CHOP__b2c__string_var(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "APPEND") + 6)));
-#line 5903 "bacon.bac"
-}
-#line 5905 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "BAPPEND")){
-#line 5906 "bacon.bac"
-Handle_Save(3, CHOP__b2c__string_var(MID__b2c__string_var(statement__b2c__string_var, INSTR(statement__b2c__string_var, "BAPPEND") + 7)));
-#line 5908 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "MAP")){
-#line 5909 "bacon.bac"
-Handle_Map(statement__b2c__string_var);
-#line 5911 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "RESET")){
-#line 5912 "bacon.bac"
-__b2c__assign = (char*)"fprintf(stdout,\"\\033c\"); fflush(stdout);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5914 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "CERTIFICATE")){
-#line 5916 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "BAPPEND")){
+Handle_Save(3, CHOP(MID(statement, INSTR(statement, "BAPPEND") + 7)));
+} else  if ( !b2c_strcmp(b2c_select_4250, "MAP")){
+Handle_Map(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "RESET")){
+fputs("fprintf(stdout,\"\\033c\"); fflush(stdout);\n", g_CFILE);
+} else  if ( !b2c_strcmp(b2c_select_4250, "CERTIFICATE")){
 if( dim == 1 ){
-#line 5917 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: empty CERTIFICATE at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "'!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 5918 "bacon.bac"
-exit(1);
-#line 5919 "bacon.bac"
+fprintf(stderr, "%sSyntax error: empty CERTIFICATE at line %s in file '%s'!\n", NL, STR( g_COUNTER), g_CURFILE);
+    exit(1);
 } else {
-#line 5920 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,statement__b2c__string_var, INSTR(statement__b2c__string_var, "CERTIFICATE") + 11);
-#line 5921 "bacon.bac"
-token__b2c__string_var = __b2c_Copy_String(token__b2c__string_var, (char*) Mini_Parser__b2c__string_var(exp__b2c__string_var));
-#line 5922 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__caprivate"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5923 "bacon.bac"
-__b2c__assign = (char*)"#define __b2c__caprivate "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5924 "bacon.bac"
-exp__b2c__string_var = F_MID__b2c__string_var(exp__b2c__string_var,exp__b2c__string_var, LEN(token__b2c__string_var)+2);
-#line 5925 "bacon.bac"
-token__b2c__string_var = __b2c_Copy_String(token__b2c__string_var, (char*) Mini_Parser__b2c__string_var(exp__b2c__string_var));
-#line 5926 "bacon.bac"
-__b2c__assign = (char*)"#undef __b2c__caserver"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5927 "bacon.bac"
-__b2c__assign = (char*)"#define __b2c__caserver "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) token__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5928 "bacon.bac"
+    exp = F_MID(exp,statement, INSTR(statement, "CERTIFICATE") + 11);
+    token = b2c_CopyString(token, (char*) Mini_Parser(exp));
+fputs("#undef b2c_caprivate\n", g_CFILE);
+fprintf(g_CFILE, "#define b2c_caprivate %s\n", token);
+    exp = F_MID(exp,exp, LEN(token)+2);
+    token = b2c_CopyString(token, (char*) Mini_Parser(exp));
+fputs("#undef b2c_caserver\n", g_CFILE);
+fprintf(g_CFILE, "#define b2c_caserver %s\n", token);
 }
-#line 5930 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "TREE")){
-#line 5931 "bacon.bac"
-Handle_Tree(statement__b2c__string_var);
-#line 5933 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "COLLECT")){
-#line 5934 "bacon.bac"
-Handle_Collect(statement__b2c__string_var);
-#line 5936 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "PARSE")){
-#line 5937 "bacon.bac"
-Handle_Parse(statement__b2c__string_var);
-#line 5939 "bacon.bac"
-} else  if ( !__b2c__strcmp(__b2c__select_4250__b2c__string_var, "GETKEY")){
-#line 5940 "bacon.bac"
-__b2c__assign = (char*)"__b2c__getch();"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5942 "bacon.bac"
+} else  if ( !b2c_strcmp(b2c_select_4250, "TREE")){
+Handle_Tree(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "COLLECT")){
+Handle_Collect(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "PARSE")){
+Handle_Parse(statement);
+} else  if ( !b2c_strcmp(b2c_select_4250, "GETKEY")){
+fputs("b2c_getch();\n", g_CFILE);
 } else {
-#line 5944 "bacon.bac"
-if( INSTR(element__b2c__string_var[(uint64_t)1], "(") ){
-element__b2c__string_var[(uint64_t)1] = __b2c_Copy_String(element__b2c__string_var[(uint64_t)1], (char*) TOKEN__b2c__string_var(element__b2c__string_var[(uint64_t)1], 1, "("));
+if( INSTR(element[(uint64_t)1], "(") ){
+    element[(uint64_t)1] = b2c_CopyString(element[(uint64_t)1], (char*) TOKEN(element[(uint64_t)1], 1, "("));
 }
-#line 5946 "bacon.bac"
-if( ISTOKEN(g_IMPORTED__b2c__string_var, element__b2c__string_var[(uint64_t)1]) ){
-#line 5947 "bacon.bac"
-if( REGEX(statement__b2c__string_var, "\\(.*\\)") ){
-#line 5948 "bacon.bac"
-__b2c__assign = (char*)statement__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) ";"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5949 "bacon.bac"
+if( ISTOKEN(g_IMPORTED, element[(uint64_t)1]) ){
+    if( REGEX(statement, "\\(.*\\)") ){
+    fprintf(g_CFILE, "%s;\n", statement);
+    } else {
+    fprintf(g_CFILE, "%s();\n", statement);
+    }
 } else {
-#line 5950 "bacon.bac"
-__b2c__assign = (char*)statement__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "();"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 5951 "bacon.bac"
+    Handle_Let(statement);
 }
-#line 5952 "bacon.bac"
-} else {
-#line 5953 "bacon.bac"
-Handle_Let(statement__b2c__string_var);
-#line 5954 "bacon.bac"
 }
-#line 5955 "bacon.bac"
 }
-#line 5956 "bacon.bac"
 }
-#line 5957 "bacon.bac"
-}
-#line 5959 "bacon.bac"
- __b2c__free_str_array_members(&element__b2c__string_var, 1, element__b2c__string_var__b2c_array); __b2c__STRFREE(__b2c__forin_str__b2c__string_var_string); __b2c__forin_str__b2c__string_var_string = NULL; __b2c__STRFREE(__b2c__forin_str__b2c__string_var_step); __b2c__forin_str__b2c__string_var_step = NULL; __b2c__free_str_array_members(&match__b2c__string_var, 1, match__b2c__string_var__b2c_array); __b2c__STRFREE(__b2c__forin_sym__b2c__string_var_string); __b2c__forin_sym__b2c__string_var_string = NULL; __b2c__STRFREE(__b2c__forin_sym__b2c__string_var_step); __b2c__forin_sym__b2c__string_var_step = NULL; __b2c__free_str_array_members(&symbol__b2c__string_var, 1, symbol__b2c__string_var__b2c_array); __b2c__STRFREE(__b2c__forin_exp__b2c__string_var_string); __b2c__forin_exp__b2c__string_var_string = NULL; __b2c__STRFREE(__b2c__forin_exp__b2c__string_var_step); __b2c__forin_exp__b2c__string_var_step = NULL;
-__b2c__STRFREE(statement__b2c__string_var);
-__b2c__STRFREE(inc__b2c__string_var);
-__b2c__STRFREE(copy_curfile__b2c__string_var);
-__b2c__STRFREE(total__b2c__string_var);
-__b2c__STRFREE(txt__b2c__string_var);
-__b2c__STRFREE(sym__b2c__string_var);
-__b2c__STRFREE(exp__b2c__string_var);
-__b2c__STRFREE(then__b2c__string_var);
-__b2c__STRFREE(lft__b2c__string_var);
-__b2c__STRFREE(str__b2c__string_var);
-__b2c__STRFREE(newfeed__b2c__string_var);
-__b2c__STRFREE(token__b2c__string_var);
-__b2c__STRFREE(rel__b2c__string_var);
-__b2c__STRFREE(uniq__b2c__string_var);
-__b2c__STRFREE(element__b2c__string_var);
-__b2c__STRFREE(__b2c__select_4250__b2c__string_var);
-__b2c__STRFREE(__b2c__select_4459__b2c__string_var);
-__b2c__STRFREE(__b2c__select_4580__b2c__string_var);
-__b2c__STRFREE(match__b2c__string_var);
-__b2c__STRFREE(__b2c__select_5433__b2c__string_var);
-__b2c__STRFREE(symbol__b2c__string_var);
+b2c_free_str_array_members(&element, 1, element__b2c_array); __b2c__STRFREE(b2c_forin_str_string); b2c_forin_str_string = NULL; __b2c__STRFREE(b2c_forin_str_step); b2c_forin_str_step = NULL; b2c_free_str_array_members(&match, 1, match__b2c_array); __b2c__STRFREE(b2c_forin_sym_string); b2c_forin_sym_string = NULL; __b2c__STRFREE(b2c_forin_sym_step); b2c_forin_sym_step = NULL; b2c_free_str_array_members(&symbol, 1, symbol__b2c_array); __b2c__STRFREE(b2c_forin_exp_string); b2c_forin_exp_string = NULL; __b2c__STRFREE(b2c_forin_exp_step); b2c_forin_exp_step = NULL;
+__b2c__STRFREE(statement);
+__b2c__STRFREE(inc);
+__b2c__STRFREE(copy_curfile);
+__b2c__STRFREE(total);
+__b2c__STRFREE(txt);
+__b2c__STRFREE(sym);
+__b2c__STRFREE(exp);
+__b2c__STRFREE(then);
+__b2c__STRFREE(lft);
+__b2c__STRFREE(str);
+__b2c__STRFREE(newfeed);
+__b2c__STRFREE(token);
+__b2c__STRFREE(rel);
+__b2c__STRFREE(uniq);
+__b2c__STRFREE(element);
+__b2c__STRFREE(b2c_select_4250);
+__b2c__STRFREE(b2c_select_4459);
+__b2c__STRFREE(b2c_select_4580);
+__b2c__STRFREE(match);
+__b2c__STRFREE(b2c_select_5433);
+__b2c__STRFREE(symbol);
 __B2C__PROGRAM__EXIT: ;
-__b2c__catch_set = __b2c__catch_set_backup;
+b2c_catch_set = b2c_catch_set_backup;
 }

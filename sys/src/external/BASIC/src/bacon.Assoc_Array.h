@@ -1,110 +1,42 @@
 /* Created with Shell BaCon 5.0.3 - (c) Peter van Eerten - MIT License */
-#undef __b2c__exitval
-#define __b2c__exitval
-void Assoc_Array( char *__b2c_var__b2c__string_var, char *__b2c_type__b2c__string_var, int by_local) {
- char*var__b2c__string_var = NULL; var__b2c__string_var = __b2c_Copy_String(NULL, __b2c_var__b2c__string_var); char*type__b2c__string_var = NULL; type__b2c__string_var = __b2c_Copy_String(NULL, __b2c_type__b2c__string_var); __b2c__catch_set_backup = __b2c__catch_set; __b2c__catch_set = 0; int __b2c__forin_str__b2c__string_var_ptr = 0; char* __b2c__forin_str__b2c__string_var_string = NULL; char* __b2c__forin_str__b2c__string_var_string_org = NULL; char* __b2c__forin_str__b2c__string_var_step = NULL;
-#line 1526 "bacon.bac"
-char *str__b2c__string_var = NULL;
-char *value__b2c__string_var = NULL;
-#line 1528 "bacon.bac"
-__b2c__forin_str__b2c__string_var_string = __b2c_Copy_String(__b2c__forin_str__b2c__string_var_string, var__b2c__string_var); __b2c__forin_str__b2c__string_var_string_org = __b2c__forin_str__b2c__string_var_string;
-__b2c__forin_str__b2c__string_var_step = __b2c_Copy_String(__b2c__forin_str__b2c__string_var_step, ",");
-__b2c__forin_str__b2c__string_var_ptr = __b2c__for_amount(__b2c__forin_str__b2c__string_var_string, __b2c__forin_str__b2c__string_var_step);
-for(; __b2c__forin_str__b2c__string_var_ptr > 0; __b2c__forin_str__b2c__string_var_ptr--) { __b2c__for_item(&__b2c__forin_str__b2c__string_var_string_org, __b2c__forin_str__b2c__string_var_step, &str__b2c__string_var);
-#line 1529 "bacon.bac"
-value__b2c__string_var = F_CHOP__b2c__string_var(value__b2c__string_var,str__b2c__string_var);
-#line 1532 "bacon.bac"
-if( LEN(g_FUNCNAME__b2c__string_var)  AND  LEN(Get_Var__b2c__string_var( CONCAT__b2c__string_var("__b2c__assoc_" , value__b2c__string_var) )) ){
-#line 1533 "bacon.bac"
-__b2c__assign = (char*)NL__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "Syntax error: associative array '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) value__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "' in LOCAL statement at line "; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs(STR__b2c__string_var( g_COUNTER), stderr);
-__b2c__assign = (char*) " in file '"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) g_CURFILE__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-__b2c__assign = (char*) "' was defined previously!"; if(__b2c__assign != NULL) { fputs(__b2c__assign, stderr); }
-fputs("\n", stderr);
-#line 1534 "bacon.bac"
-exit(1);
-#line 1535 "bacon.bac"
-}
-#line 1537 "bacon.bac"
-if( by_local ){
-#line 1538 "bacon.bac"
-__b2c__assign = (char*)type__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " __b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) value__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) "_eval;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 1539 "bacon.bac"
-Save_Func_Var( CONCAT__b2c__string_var("__b2c__assoc_" , value__b2c__string_var) , g_FUNCNAME__b2c__string_var, type__b2c__string_var);
-#line 1540 "bacon.bac"
-g_STRINGARRAYS__b2c__string_var = F_CONCAT__b2c__string_var(g_STRINGARRAYS__b2c__string_var, g_STRINGARRAYS__b2c__string_var , " __b2c__hash_clear(__b2c__assoc_" , value__b2c__string_var , "); free(__b2c__assoc_" , value__b2c__string_var , "); __b2c__assoc_" , value__b2c__string_var , " = NULL;") ;
-#line 1541 "bacon.bac"
-} else {
-#line 1542 "bacon.bac"
-__b2c__assign = (char*)type__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " __b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) value__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) "_eval;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 1543 "bacon.bac"
-Save_Main_Var( CONCAT__b2c__string_var("__b2c__assoc_" , value__b2c__string_var) , type__b2c__string_var);
-#line 1544 "bacon.bac"
-g_GLOBALARRAYS__b2c__string_var = F_CONCAT__b2c__string_var(g_GLOBALARRAYS__b2c__string_var, g_GLOBALARRAYS__b2c__string_var , " __b2c__hash_clear(__b2c__assoc_" , value__b2c__string_var , "); free(__b2c__assoc_" , value__b2c__string_var , "); __b2c__assoc_" , value__b2c__string_var , " = NULL;") ;
-#line 1545 "bacon.bac"
-}
-#line 1546 "bacon.bac"
-__b2c__assign = (char*)"__b2c__htable *__b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) value__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) ", *__b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) value__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) "_orig;"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 1547 "bacon.bac"
-__b2c__assign = (char*)"__b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) value__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-__b2c__assign = (char*) " = __b2c__hash_new();"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_CFILE); }
-fputs("\n", g_CFILE);
-#line 1549 "bacon.bac"
-__b2c__assign = (char*)type__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) " __b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) value__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) "_func(const char *key){void *result; result = __b2c__hash_find_value(__b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) value__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) ", key);"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 1550 "bacon.bac"
-if( INSTR(value__b2c__string_var, g_STRINGSIGN__b2c__string_var)  OR  REGEX(type__b2c__string_var, "STRING|char\\*$") ){
-#line 1551 "bacon.bac"
-__b2c__assign = (char*)"if(result == NULL) { return(NULL); } return(("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) type__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) ")result); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 1552 "bacon.bac"
-} else {
-#line 1553 "bacon.bac"
-__b2c__assign = (char*)"if(result == NULL) { return(0); } return(*("; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) type__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) "*)result); }"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 1554 "bacon.bac"
-}
-#line 1555 "bacon.bac"
-__b2c__assign = (char*)"#define "; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) value__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) "(...) __b2c__assoc_"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) value__b2c__string_var; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-__b2c__assign = (char*) "_func(__b2c__KEYCOLLECT(__VA_ARGS__))"; if(__b2c__assign != NULL) { fputs(__b2c__assign, g_HFILE); }
-fputs("\n", g_HFILE);
-#line 1556 "bacon.bac"
-}
-#line 1558 "bacon.bac"
- __b2c__STRFREE(__b2c__forin_str__b2c__string_var_string); __b2c__forin_str__b2c__string_var_string = NULL; __b2c__STRFREE(__b2c__forin_str__b2c__string_var_step); __b2c__forin_str__b2c__string_var_step = NULL;
-__b2c__STRFREE(var__b2c__string_var);
-__b2c__STRFREE(type__b2c__string_var);
-__b2c__STRFREE(str__b2c__string_var);
-__b2c__STRFREE(value__b2c__string_var);
-__b2c__catch_set = __b2c__catch_set_backup;
+#undef b2c_exitval
+#define b2c_exitval
+void Assoc_Array( char *__b2c_var, char *__b2c_type, int by_local) {
+    char*var = NULL; var = b2c_CopyString(NULL, __b2c_var); char*type = NULL; type = b2c_CopyString(NULL, __b2c_type); b2c_catch_set_backup = b2c_catch_set; b2c_catch_set = 0; int b2c_forin_str_ptr = 0; char* b2c_forin_str_string = NULL; char* b2c_forin_str_string_org = NULL; char* b2c_forin_str_step = NULL;
+    char *str = NULL;
+    char *value = NULL;
+    b2c_forin_str_string = b2c_CopyString(b2c_forin_str_string, var); b2c_forin_str_string_org = b2c_forin_str_string;
+    b2c_forin_str_step = b2c_CopyString(b2c_forin_str_step, ",");
+    b2c_forin_str_ptr = b2c_for_amount(b2c_forin_str_string, b2c_forin_str_step);
+    for(; b2c_forin_str_ptr > 0; b2c_forin_str_ptr--) { b2c_for_item(&b2c_forin_str_string_org, b2c_forin_str_step, &str);
+        value = F_CHOP(value,str);
+        if( LEN(g_FUNCNAME)  AND  LEN(Get_Var( CONCAT("assoc_" , value) )) ){
+        fprintf(stderr, "%sSyntax error: associative array '%s' in LOCAL statement at line %s in file '%s' was defined previously!\n", NL, value, STR( g_COUNTER), g_CURFILE);
+            exit(1);
+        }
+        if( by_local ){
+        fprintf(g_CFILE, "%s assoc_%s_eval;\n", type, value);
+            Save_Func_Var( CONCAT("assoc_" , value) , g_FUNCNAME, type);
+            g_STRINGARRAYS = F_CONCAT(g_STRINGARRAYS, g_STRINGARRAYS , " b2c_hash_clear(assoc_" , value , "); free(assoc_" , value , "); assoc_" , value , " = NULL;") ;
+        } else {
+        fprintf(g_HFILE, "%s assoc_%s_eval;\n", type, value);
+            Save_Main_Var( CONCAT("assoc_" , value) , type);
+            g_GLOBALARRAYS = F_CONCAT(g_GLOBALARRAYS, g_GLOBALARRAYS , " b2c_hash_clear(assoc_" , value , "); free(assoc_" , value , "); assoc_" , value , " = NULL;") ;
+        }
+    fprintf(g_HFILE, "b2c_htable *assoc_%s, *assoc_%s_orig;\n", value, value);
+    fprintf(g_CFILE, "assoc_%s = b2c_hash_new();\n", value);
+    fprintf(g_HFILE, "%s assoc_%s_func(const char *key){void *result; result = b2c_hash_find_value(assoc_%s, key);\n", type, value, value);
+        if( INSTR(value, g_STRINGSIGN)  OR  REGEX(type, "STRING|char\\*$") ){
+        fprintf(g_HFILE, "if(result == NULL) { return(NULL); } return((%s)result); }\n", type);
+        } else {
+        fprintf(g_HFILE, "if(result == NULL) { return(0); } return(*(%s*)result); }\n", type);
+        }
+    fprintf(g_HFILE, "#define %s(...) assoc_%s_func(__b2c__KEYCOLLECT(__VA_ARGS__))\n", value, value);
+    }
+    __b2c__STRFREE(b2c_forin_str_string); b2c_forin_str_string = NULL; __b2c__STRFREE(b2c_forin_str_step); b2c_forin_str_step = NULL;
+    __b2c__STRFREE(var);
+    __b2c__STRFREE(type);
+    __b2c__STRFREE(str);
+    __b2c__STRFREE(value);
+    b2c_catch_set = b2c_catch_set_backup;
 }

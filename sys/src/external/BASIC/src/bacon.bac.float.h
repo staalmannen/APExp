@@ -1,2 +1,2 @@
-double __b2c__floatarray[] = {
- 0.0};
+double b2c_floatarray[] = {
+0.0};
