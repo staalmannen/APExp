@@ -13,11 +13,13 @@ OFILES=\
 	setprogname.$O\
 	syslog.$O\
 	uname.$O\
-#	musl\
+# musl\
 	a64l.$O\
 	realpath.$O\
 	getopt_long.$O\
 	nftw.$O\
+# fts-standalone\
+	fts.$O\
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib

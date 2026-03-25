@@ -16,7 +16,6 @@ _OPTIONAL_LIBS=\
 	curses\
 	edit\
 	fortran\
-	fts\
 	gettextpo\
 	iconv\
 	intl\

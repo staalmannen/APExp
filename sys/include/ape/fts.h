@@ -35,7 +35,7 @@
 #ifndef	_FTS_H_
 #define	_FTS_H_
 
-#pragma lib "/$M/lib/ape/libfts.a"
+#pragma lib "/$M/lib/ape/libap.a"
 
 
 typedef struct {
