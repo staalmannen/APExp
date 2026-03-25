@@ -1,0 +1,6 @@
+project-specific switches:
+--------------------------
+	--with-preferred-host-ar
+	--with-preferred-host-as
+	--with-preferred-host-nm
+	--with-preferred-host-ranlib

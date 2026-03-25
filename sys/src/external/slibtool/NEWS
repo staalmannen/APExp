@@ -1,0 +1,661 @@
+0.7.4:
+
+This patch release includes several advances in the area of slibtoolize,
+as well two important adjustments in the ar backend, owing to llvm-ar's
+deduplication of long-name strings.
+
+ar:          properly handle llvm-ar's long-name deduplication.
+ar:          store string table size for internal use.
+ar:          calculate the required size of long-name data.
+aux:         LTDL_SET_PRELOADED_SYMBOLS is now provided by libsltdl.
+slibtool.m4: fix propagation of user's SLIBTOOL environment variable.
+slibtool.m4: SLIBTOOL propagation: handle deeply-nested sub-directories.
+slibtool.m4: further enhance the _slibtool_util and _slibtool_args logic.
+slibtool.m4: slibtool_set_flavor(): fix wildcard notation in case statement.
+slibtool.m4: _slibtool_args logic: elegantly handle --prefer-sltdl.
+
+0.7.3:
+
+This patch release presents several minor fixes and small improvements.
+
+config:      slbt_output_config_mkvars(): also output the shrext_cmds variable.
+driver:      slbt_split_argv(): special-case argv[0].
+driver:      slbt_split_argv(): properly handle --mode=execute.
+project:     added config/cfgdefs.usage.
+project:     added the --m4-dir switch (install aux files to a custom location).
+project:     do not prepend $(DESTDIR) to the SLBT_PACKAGE_DATADIR CFLAGS macro.
+slibtool.m4: implemented SLIBTOOL_PROG_RC and synonym macros.
+slibtoolize: fully support installation of .m4 files to a separate location.
+
+0.7.2:
+
+The purpose of this patch release, with only four small changes since the
+previous tagged release, is to accelerate testing of slibtool and slibtoolize
+integration on Adelie Linux.
+
+m4/slibtool.m4: SLIBTOOL: avoid a trailing space when SLIBTOOL_FLAGS is not set.
+m4/slibtool.m4: AR, NM, RANLIB: special-case identical ${build} and ${host}.
+slbt_init_host_params(): --mkvars=... code path: enable heuristics as needed.
+slbt_get_mkvars_var(): optimmize the code path for set but empty variables.
+
+0.7.1:
+
+This patch release enhances the slibtoolize's ability to serve as
+a libtoolize drop-in replacement. In terms of new features, it is
+now possible to configure the default binary tool (ar, as, nm, ranlib)
+to be invoked by slibtool (as opposed to the non-prefixed tools that
+are mandated by posix) when performing a native build.
+
+
+project:     new configure options: --with-preferred-host-{ar|as|nm|ranlib}
+slibtool.m4: provide the LT_CONFIG_LTDL_DIR macro.
+slibtool.m4: provide the LTDL_INIT macro.
+slibtool.m4, m4/sltdl.m4: provide the LIBLTDL, LTDLINCL, and LTDLDEPS vars.
+slibtoolize: fully support --ltdl, LTDL_INIT, and LT_CONFIG_LTDL_DIR.
+
+0.7.0:
+
+This minor release follows the initial release of sltdl alongside
+several corresponding fixes to and enhancements in slibtool.m4 and
+the slibtoolize command execution mode.
+
+To seamlessly use slibtool as a libtool drop-in replacement with projects
+that utilize the ltdl interfaces, it is recommended that you first install
+sltdl (obtain a release tarball from dl.foss21.org/sltdl/, or otherwise
+clone the git repository from https://git.foss21.org/cross/sltdl), and
+then _autoreconf_ the source tree of the project being built. For further
+details, please see sltdl's initial release notes.
+
+- driver: slbt_get_lconf_flags(): also parse the sltdl preference option.
+- driver: slbt_output_config_mkvars(): also export the sltdl preference option.
+- driver: slibtoolize mode: added 'libtoolize' as a synonym for 'slibtoolize'.
+- driver: --prefer-sltdl: implementation and link-mode integration.
+- slibtoolize: slbt_stoolie_options[]: fix typo.
+- slibtoolize: prefer libsltdl unless invoked with the --system-ltdl argument.
+- slibtoolize: reimplement --system-ltdl by way of an informative tag file.
+- slibtool.m4: fix embedding of the SLIBTOOL_SYSROOT & SLIBTOOL_FLAGS variables.
+
+0.6.1:
+
+This patch release fixes incorrect formatted printing of
+address offsets on 32-bit hosts, and likewise works around
+non-conformant definitions of type_t and/or st.st_ino.
+
+- ar: slbt_ar_merge_archives(), slbt_tmpfile(): guard against 32-bit time_t types.
+- ar: slbt_ar_merge_archives(): properly handle 32-bit pointers vs. 64-bit formats.
+- ar: slbt_ar_store_archive(): guard against 32-bit time_t types.
+- ar: slbt_ar_store_archive(): guard against 32-bit st_ino types.
+- slibtool.m4: slibtool_set_flavor(): define shared and static suffix variables.
+- slibtoolize: compatibility: install (copy or symlink) a no-op ar-lib as needed.
+- driver: heuristics: ignore errors if invoked with any of the -print commands.
+- driver: added the -print-shared-ext and -print-static-ext output commands.
+
+0.6.0:
+
+This minor release introduces the slibtoolize execution mode,
+as well as completion of the core slibtool.m4 functionality.
+In addition, this release entails several enhancements and
+fixes in other areas.
+
+- slibtoolize: new execution mode, driver integration, and symlink.
+- slibtoolize: added a no-op, yet backward compatible ltmain.sh.
+- slibtoolize: auxiliary files: added slibtool.sh (optional wrapper).
+- driver: --mkvars: implementation and integration.
+- driver: --mkvars: special case the SLIBTOOL make variable.
+- driver: --heuristics: added slibtool.cfg prioritized support.
+- driver: detect slibtool.cfg in non-heuristics mode where applicable.
+- driver: slbt_output_raw_vector(): refactor and prettify.
+- host: derive as from ranlib as needed.
+- host: derive windres and dlltool from ranlib as needed.
+- host: detect a native build environment based on ar(1).
+- host: set native mode based on the detected ar(1) as needed.
+- host: cfgmeta: mark tools derived from ranlib as such.
+- util: PE/COFF: list is target neutral, process all syms.
+- util: properly set weak aliases of strong symbols.
+- ar: yaml output: initial implementation.
+- ar: internally bind the meta ctx to the archive ctx.
+- ar: sort the syminfo vector in a coff-aware manner.
+- ar: PE/COFF: properly set weak aliases of strong symbols.
+- ar: symbol mapfile: properly set strong aliases of weak symbols.
+- ar: symbol vector: include weak aliases of strong symbols.
+- ar: symbol file: include weak aliases of strong symbols.
+
+0.5.36:
+
+This (pinky promise, for real now) absolutely final patch release
+in the 0.5.x entails a large number of semantic fixes, several bug
+fixes, and also the entirely new slibtool-ar execution mode. We
+would still like to consider it a patch release since much of the
+above was needed for slibtool to correctly act as a gnu libtool
+drop-in replacement. As of this patch release, slibtool can be
+used with virtually all packages covered by a common Gentoo world
+build (as tested by @orbea, consisting of more than 900 packages
+and pending some fixes of incorrect usage bugs that were exposed
+by slibtool and filed with the respective upstream projects).
+Then again, slibtool continues to successfully build all packages
+included in a typical Midipix distro build, as well as all other
+packages that we have been able to test. Due to the large number
+of commits between the previous patch release and this one, only
+the most significant changes are listed below.
+
+- ar api:  new in-memory archiver backend (parse & merge).
+- ar mode: new execution mode: archiver front-end.
+- driver:  heuristics: support argv of ar, nm, dlltool, etc.
+- driver:  correct precedence of heuristics-derived flag bits.
+- driver:  added --info mode.
+- driver:  corrected --config mode to be backward compatible.
+- compile mode: added --tag=ASM.
+- compile mode: properly handle custom compiler drivers.
+- compile mode: de-duplicate header search directory arguments.
+- link mode: general overhaul and refactoring of the code.
+- link mode: correct object selection with -static and -shared.
+- link mode: enhanced, tracebale dependency files.
+- link mode: support -export-symbols and -export-symbols-regex.
+- link mode: support -dlopen and -dlpreopen (self, force, libfoo).
+- link mode: handle convenience libraries using correct semantics.
+- link mode: cygwin & mingw support: enhanced dlltool semantics.
+- link mode: darwin support: implemented additional special cases.
+- execute mode: send informational output to stderr.
+- execute mode: reimplemented with well-formed semantics.
+- install mode: refactor, properly handle .so placeholder symlinks.
+- install mode: enhanced logging of file operation errors.
+- library: refactored, introduced secondary interface name-spaces.
+- library: utilize the visibility attribute on non-PE targets.
+
+0.5.35:
+
+This post-last patch release in the 0.5.x series includes fixes to
+bugs that were discovered since release 0.5.34. In addition, this
+release introduces several new features in slibtool's driver, as
+well as some minor improvements in the implementation of existing
+program functionality.
+
+- driver: properly handle --help after --mode.
+- driver: handle --version as only (repeated) argument more elegantly.
+- driver: modify the cfgnmachine string for accuracy (-dumpmachine or --cchost).
+- driver: added --dumpmachine support.
+- driver: added -weak support, currently a no-op.
+- driver: added -objectlist support.
+- driver: -version-info suport: strictly verify the version info argument.
+- helper: added slbt_map_input(), slbt_unmap_input().
+
+0.5.34:
+
+This is the last patch release in the 0.5.x series. As of this release,
+there are no known problems pertaining to slibtool's core functionality
+or compatibility with the historic libtool implementation. Outstanding
+features that are not covered by this release are the internal
+implementation of archive merging (as opposed to using ar(1) and MRI
+scripts), as well as the internal implementation, integration, and
+support of -dlpreopen.
+
+Included with this release is also m4/slibtool.m4, which by now has
+been tested against, and may be successfully used with legacy autoconf
+versions (such as 2.64), as well as more recent ones (2.69 or later).
+A new invocation mode, --mode=slibtoolize (or the slibtoolize symlink)
+is currently under development, and will be included with the next
+release.
+
+- driver: slbt_get_driver_ctx(): properly record the envp parameter.
+- driver api: slbt_get_flavor_settings(): initial implementation.
+- driver: added explicit --sysroot support.
+- link mode: set the -soname linker flag alongside the -avoid-version argument.
+- link mode: slbt_exec_link_create_executable(): enclose $DL_PATH in quotes.
+- link mode: slbt_exec_link_create_executable(): replace backtick with $().
+- link mode: -module without -rpath is an executable, not a dynamic library.
+- link mode: legacy libtool compatibility: support linking against -module libs.
+- link mode: slbt_exec_link(): properly support non-default shared-object suffix.
+- link mode: slbt_exec_link_create_archive(): eliminate the libfoo.a symlink.
+- link mode: static-only libfoo.la: account for non-default shared-object suffix.
+- link mode: always create libfoo.so.def.{host|flavor} and related tags.
+- link mode: PE targets: -release: fix names used for and in import libraries.
+- link mode: slbt_exec_link_create_executable(): place .exe.wrapper under .libs/.
+- install mode: driver: added (referential) --sysroot support.
+- install mode: slbt_exec_install_entry: properly handle fussix flavors.
+- install mode: libfoo.la and ibfoo.so.def.host: properly handle -release.
+- install mode: slbt_exec_install_entry(): remove dead code.
+- install mode: libfoo.la installation: early detect static-only operation mode.
+- uninstall mode: driver: added (referential) --sysroot support.
+- heuristics: slbt_get_lconf_flags(): added missing 'else' in if-then block.
+- heuristics: slbt_get_lconf_flags(): enhanced the string-scanning logic.
+- library: replace all uses of open() with openat().
+- library: replace all uses of chmod() with fchmodat().
+- library: replace all uses of unlink() with unlinkat().
+- library: replace all uses of rmdir() with unlinkat().
+- library: replace all uses of rename() with renameat().
+- library: replace all uses of symlink() with symlinkat().
+- library: replace all uses of [slbt_]readlink() with [slbt_]readlinkat().
+- library: replace all uses of stat() and lstat() with fstatat() counterparts.
+- library: replace all uses of getcwd() with slbt_realpath().
+- library: eliminate use of the external environ variable.
+
+0.5.33:
+
+This patch release provides several bug fixes and improvements, as well as
+added support for the NO_COLOR environment variable.
+
+- driver: always respect the NO_COLOR envvar & SLBT_DRIVER_ANNOTATE_NEVER flag.
+- driver: a heuristics-based -disable-shared now overrides --tag=disable-static.
+- driver: --tag=disable-shared now overrides a heuristics-based -disable-static.
+- link mode: always include deplib dirs in ldpathenv.
+- link mode: enclose vnames in wrapper script in braces.
+- link mode: always include explicit -L dirs in ldpathenv.
+- link mode: shared: use .deps of a static-only .la input argument as needed.
+- link mode: require dependency list to be present for all .la input arguments.
+- execute mode: fix NULL ptr deref with only one argument.
+- execute mode: handle relative -L pathnames & cwd-relative wrapper scripts.
+- install mode: slbt_exec_install(): added legacy shtool support.
+- install mode: account for a libfoo.a that was created with -disable-static.
+- install mode: always respect the SLBT_DRIVER_ANNOTATE_NEVER flag.
+- uninstall mode: always respect the SLBT_DRIVER_ANNOTATE_NEVER flag.
+- argv.h: tty colors: added argv_usage_plain().
+
+0.5.32:
+
+This patch release provides several bug fixes as well as the new (or proper)
+implementation of previously missing features.
+
+- driver: added -Xlinker support.
+- driver: support -static-libtool-libs (currently as a no-op).
+- driver: slbt_init_flavor_settings(): properly handle the -shrext argument.
+- driver: --version: update the git repository reference to the https variant.
+- link mode: check for and properly support -version-info with -release.
+- link mode: .def file name: added proper -release support.
+- link mode: slbt_exec_link(): record the -shrext argument for the install step.
+- install mode: support wrapping of /path/to/sh /path/to/install-sh.
+- install mode: slbt_exec_install_entry(): added -shrext support.
+- uninstall mode: remove hard-coded shell logic, revisit later as needed.
+- heuristics: support finding arbitrarily named scripts up the build tree.
+- heuristics: added (annotated) trace output.
+- heuristics: slbt_lconf_open(): added (annotated) trace_result().
+- output: print out the recorded not-found path.
+- output: added slbt_output_fdcwd().
+- internals: error tracing: record the not-found path upon ENOENT as needed.
+- library: compile & link modes: properly record the not-found path upon error.
+- helper api: added slbt_realpath().
+- build system: ccenv_{tool|attr}_epilog(): properly handle long output strings.
+- project: added BUGS and a note on where to report bugs and issues.
+- project: config.project: update $mb_pkgrep to the https variant.
+
+0.5.31:
+
+This patch release fixes a regression in the 0.5.29 release,
+specifically in the implementation of the -module semantics,
+as well as a latent bug in the algorithm for finding a build
+project's generated libtool script.
+
+- link mode: properly handle .la targets built with -module.
+- libtool finder: exit loop upon reaching the root directory.
+
+0.5.30:
+
+This patch release fixes sed usage ('\s' vs '[[:space:]]') in
+slibtool's own build system. Release immediately in order to
+prevent build errors in strict build environments.
+
+- build system: ccenv_output_defs(): use conformant sed construct.
+
+0.5.29:
+
+This patch release provides a few important additions and bug fixes,
+as well as several improvements in slibtool's own build system. In
+addition, it denotes the (semantic) transition from midipix.org
+to foss21.org.
+
+- driver: added F77 support.
+- driver: added -XCClinker support.
+- driver: added FC support.
+- driver: host flavors: added suffixed suffixes support.
+- driver: --heuristics: respect explicit --disable-shared and/or -static.
+- driver: resolve conflicting and/or incompatible command-line arguments.
+- driver, link mode: properly implement the -module semantics.
+- driver, compile & link mode: support arbitrary & known compiler wrappers.
+- link mode: host flavors: properly support suffixed suffixes.
+- install mode: host flavors: properly support suffixed suffixes.
+
+0.5.28:
+
+This patch release allows the enhanced target-ar logic that was
+introduced in the previous patch release to properly work on legacy
+systems with a tricky posix_spawnp() implementation.
+
+- driver: enhanced target-ar logic: accommodate legacy systems.
+
+0.5.27:
+
+This patch release provides an important enhancement with respect to the
+identification of the ar tool to be invoked in slibtool's link mode. More
+specifically, rather than relying on the presence of <target>-ar, slibtool
+will now attempt to invoke, as needed, several alternate ar tools in the
+following order: <target>-ar, <target>-<compiler>-ar, and, in the case
+of the native target, also <compiler>-ar and ar.
+
+- driver: slbt_init_host_params(): enhance the target-ar related logic.
+
+0.5.26:
+
+This patch release follows significant improvements in, as well as additions
+to slibtool's functionality. Most notably, with the additions of --heuristics
+and the rlibtool convenience symlink, slibtool may now automagically operate
+in the exact same mode (static only, shared only, or both) as the generated
+libtool script for which it serves as a surrogate.
+
+- utility: --heuristics support: added the 'rlibtool' convenience symlink.
+- utility: convenience symlinks: added rclibtool, rdlibtool, and rdclibtool.
+- link mode: properly handle local archives.
+- link mode: remove placeholder arguments.
+- link mode: remove redundant -l arguments.
+- link mode: remove redundant -L arguments.
+- compile mode: remove placeholder arguments.
+- driver: added --heuristics support.
+- driver: slbt_get_driver_ctx(): support stack-based argv.
+- driver: output error vector upon post-argv-parsing failures.
+- driver: execution context: added slbt_reset_argvector().
+- driver: properly normalize --library-path=<path> arguments.
+- internals: slbt_mkdir() now uses the context's fdcwd.
+- internals: slbt_adjust_linker_argument() now uses the context's fdcwd.
+- internals: -shared/-static heuristics: added slbt_get_lconf_flags().
+
+0.5.25:
+
+This patch release follows several important enhancements in slibtool's
+functionality, including proper support of explicit .a and .so input
+arguments in link mode, and use of validly alternate (non-)pic objects.
+With respect to compiler and target flavors, slibtool now accommodates
+clang's debated approach towards the -fPIC switch in always-pic targets.
+Last but not least, and following much discussion and consideration of
+the various trade-offs, this release redefines _XOPEN_SOURCE to 700. With
+that said, slibtool could still be easily built on older systems for as
+long as they provide openat, faccessat, and (the soon-to-be-used) fexecve.
+
+- driver: added --tag=RC support.
+- driver: added --windres support.
+- driver: use a compiler --target argument also as a tool argument.
+- driver: if no --tag had been defined in compile mode, set --tag to CC.
+- link mode: properly handle explicit archive input arguments.
+- link mode: properly handle external archives and libraries.
+- link mode: process dependencies also for non-pic .la args.
+- link mode: support validly alternate (non-)pic objects.
+- target flavors: accommodate conceptually challenged, PICky targets.
+- target flavors: flavor detection: associate -windows- with mingw.
+- target flavors: further eliminate compiler -dumpmachine invocations.
+
+0.5.24:
+
+This patch release explicitly requests definition of AT_FDCWD via definition
+of _POSIX_C_SOURCE in translation units that refer to it.
+
+0.5.23:
+
+This patch releases fixes a couple of minor issues in slibtool's own build
+system.
+
+build system: all-shared front-end variant: fix ordering of -l$(PACKAGE).
+build system: all-shared binary: added missing build-dep on $(SHARED_SOLINK).
+
+0.5.22:
+
+This patch release explicitly requests the openat() interface via definition
+of _POSIX_C_SOURCE in translation units that need it.
+
+0.5.21:
+
+This patch release follows important enhancements in slibtool's library
+interfaces and API contract. In particular, slibtool now no longer uses
+streams, but rather pure file descriptors. In addition, i/o operations
+now robustly handle interruption by signals, and thus do not depend on
+the underlying system calls being restartable. Last but not least,
+slibtool now installs a pkgconfig configuration file when applicable.
+
+- argv.h: output usage and errors using [argv_]dprintf rather than fprint.
+- argv.h: argv_get(): be consistent between forward decl. and impl.
+- argv.h: move definition of struct argv_meta_impl to the implementation block.
+- internals: added slbt_mapped_readline().
+- internals: added slbt_map_file(), slbt_unmap_file().
+- internals: added slbt_dprintf(), a signal-resilient dprintf implementation.
+- driver: argv usage and error output: use the signal-resilient slbt_dprintf().
+- driver: support alternate fd's for input/output/error/log.
+- driver: slbt_init_host_params(): propagate failure of <compiler> -dumpmachine.
+- driver: slbt_init_host_params(): do not set fnative when !fdumpmachine.
+- driver: struct slbt_fd_ctx: added .fdcwd and .fddst.
+- library: invocations of openat() now use the context's fdcwd.
+- project: added initial pkgconfig support.
+
+0.5.20:
+
+This patch release includes several important bug fixes pertaining to both
+the link and compile mode, as well as the addition of a compatible --features
+output.
+
+- driver: added slbt_output_features(), providing compatible --features output.
+- driver: compatibility: have -{shared|static} imply -disable-{static|shared}.
+- link mode: properly handle the combination of -release and -version-info.
+- link mode: slbt_exec_link_create_dep_file(): record top-level -L arguments.
+- link mode: --disable-{shared|static}: use differently-named placeholders.
+
+0.5.19:
+
+This patch release includes several improvements in the driver logic,
+as well as one important fix to the compile mode logic.
+
+- driver: support -export-dynamic.
+- driver: allow flavor-based use of native tools (ar,ranlib,etc.)
+- driver: slbt_init_host_params(): improve native target detection logic.
+- driver: -shrext support: only use the extension portion of the extension.
+- compile mode: gnu libtool compatibility: do not add -c to compiler arguments.
+
+0.5.18:
+
+This patch release includes several important fixes to the link mode
+and driver logic. In addition, it adds mdso support to midipix targets,
+as well as updates slibtool's own build system.
+
+- link mode: re-implemented slbt_exec_link_finalize_argument_vector().
+- link mode: import library generation: added mdso support.
+- link mode: use -fpic objects with -disable-static.
+- driver: added --mdso and --implib support.
+- driver: added initial -dlpreopen support.
+- driver: support -thread-safe more elegantly.
+- driver: properly handle -thread-safe (no-op, compatibility).
+
+0.5.17:
+
+This patch release fixes a subtle bug in the newly added support for
+packages that depend on the reordering of linker arguments.
+
+0.5.16:
+
+This patch release fixes a subtle bug in slibtool-shared's
+generation of dependency lists when creating convenience
+library archives. Beginning with this release, the mesa
+package can be built with slibtool in its entirety.
+
+- slibtool-shared: properly handle .la arguments when creating an archive.
+- slbt_exec_link_create_dep_file(): properly initialize and track fdeps.
+
+0.5.15:
+
+This patch release provides seamless support for the building of
+packages which rely on the ordering of linker arguments. With
+slibtool, reordering takes place only when deemed necessary.
+
+- link mode: support packages that rely on argument reordering.
+- error trace: remove and fix inadvertent calls to strerror(3).
+
+0.5.14:
+
+This patch release provides several fixes at the driver level, as well as
+several improvements to slibtool's own internals. Addition of extended
+variable support to slibtool's ./configure now makes it fully compatible
+with (distro) build systems that pass those variable to ./configure by
+default.
+
+- link mode: fix fdepfile construction when determining dynlib dependency.
+- link mode: static archives: always have ar(1) act as ranlib(1).
+- driver: refine handling of --target.
+- build system: added extended dir variables.
+
+0.5.13:
+
+This patch release ensures successful installation of a shared library with
+which no accompanying static archive was created. The release also includes
+two improvements in slibtool's own build system.
+
+- link mode: create an archive /dev/null symlink placeholder as needed.
+- PE soname support: added the designated LDFLAGS_SONAME variable.
+- build system: configure: pass --sysroot to the linker as a compiler argument.
+
+0.5.12:
+
+This patch release includes a variety of fixes and improvements in slibtool's
+functionality, as well as several enhancements to slibtool's own build system.
+
+- driver: added support for -dlopen (currently a no-op).
+- error trace: improved and extended the initial interface.
+- error trace: added descriptive error strings for custom errors.
+- link mode: properly determine whether -L and -ldeplib are needed.
+- link mode: do not respect -disable-static without -rpath.
+- link mode: respect -disable-static.
+- link mode: properly handle indirect dependencies of .a archives.
+- link mode: confirm need for archive import; limit .a deps to external deps.
+- compile mode: respect -disable-static and -disable-shared.
+- install mode: respect -disable-static.
+- legacy wrappers: implemented compatible library and objects wrappers.
+- build system: added support for cygwin's, mingw's, and msys's semantics.
+
+0.5.11:
+
+This patch release provides -portbld- support for systems that still need
+it, as well as an initial implementation of the --uninstall mode. In addition,
+this release includes a few important bug fixes, as well as adds --source-dir
+support to slibtool's own build system.
+
+- driver: accommodate hosts that occasionally use '-portbld-' in their triple.
+- link mode: properly handle -all-static when creating an executable image.
+- link mode: add -L.libs for current-directory .la input arguments.
+- uninstall mode: initial implementation.
+- build system: support setting an external folder as the source directory.
+
+0.5.10:
+
+This patch release fixes the following subtle link-mode bugs:
+
+- link mode: archive creation: .la-associated objects are always under .libs/.
+- link mode: soname: properly handle -module when output begins with dso prefix.
+
+0.5.9:
+
+This patch release enhances support of indirect dependencies, as well
+the handling of direct invocation of executables (as opposed to passing
+an executable to gdb or similar as an argument).
+
+- execute mode: properly handle direct program invocation.
+- link mode: account for directory depth when generating .deps for .la wrapper.
+- link mode: properly handle sub-directories in indirect .la wrapper dependency.
+- link mode: properly handle dependency information in current-dir .la wrappers.
+
+0.5.8:
+
+This patch release follows several important bug-fixes, as well as the
+addition and integration of error trace support.
+
+- install mode: support the -f (force copy) command line argument.
+- link mode: properly use dependency information associated with .la wrappers.
+- link mode: ignore -rpath when deciding whether to create an executable.
+- utility: added error trace support, integration, and annotated output.
+- library: added public error trace interfaces.
+- argv.h: error message formatting: handle lonely long options.
+
+0.5.7:
+
+This patch release contains one future-looking change in the project's
+design, as well as a few improvements in slibtool's own build system.
+
+- utility: added slbt_main() as a public interface, refactored accordingly.
+- utility: improved box integration, removed need for build-time macro.
+- build system: warn only upon failure to detect native size of pointer.
+- build system: add a test for legacy gcc versions.
+
+0.5.6:
+
+This patch release contains a few important fixed to program logic,
+as well as one addition to slibtool's own build system.
+
+- driver: added --finish support.
+- link mode: properly handle empty dependency files.
+- link mode: properly handle absolute path when joining archives.
+- build system: support project-specific overrides of OS and toolchain defs.
+
+0.5.5:
+
+This patch release contains a couple of important fixed to program logic,
+and a few minor improvements in slibtool's own build system.
+
+- link mode: support over-linking for an .la wrapper linker input argument.
+- execute mode: properly handle the current working directory.
+- build system: added support for [C|LD]FLAGS_LAST and [C|LD]FLAGS_ONCE.
+- build system: avoid side effects on the build system due to git-status.
+
+0.5.4:
+
+This patch release includes a few fixes to the program logic and output,
+as well as several improvements in slibtool's own build system.
+
+- link mode: always create the .libs directory.
+- output: flush stdout upon return from output functions.
+- build system: remove generic dependency of object files on version.tag.
+- build system: moved core definition files to a designated folder.
+- build system: PE targets: handle subsystem setting in pe.mk.
+- build system: added --avoid-version support.
+
+0.5.3:
+
+This patch release includes a few minor fixes and several improvements, all
+related to slibtool's own build system.
+
+- build system: app.tag: avoid unconditional step execution.
+- build system: configure: added --strict, --ccstrict, --ldstrict support.
+- build system: Makefile: added the .conf convenience target.
+- build system: Makefile: added the .display_cc convenience target.
+- build system: Makefile: added the -display_cflags convenience target.
+- build system: Makefile: added custom header installation support.
+
+0.5.2:
+
+This patch release includes several fixes of bugs that were discovered while
+testing slibtool as the primary libtool in a pkgsrc comprehensive build. In
+addition, the release includes several improvements to slibtool's own build
+system.
+
+- link mode: legabits: generate a perfectly compatible wrapper.
+- install mode: legabits: install a perfectly compatible wrapper.
+- project: by default, slibtool is now an application-only package.
+- build system: added support of --disable-shared and --disable-static.
+- build system: added support of --all-shared and --all-static.
+- build system: properly handle user inclusion of -static in LDFLAGS.
+
+0.5.1:
+
+This patch release includes several small fixes, as well as the addition of
+an optional (opt-in at runtime) yet important compatibility feature, namely
+the installation of .la wrappers. Changes in this release include:
+
+- driver: added --legabits support.
+- install mode: optional installation of .la wrappers.
+- project: added compatibility symlinks (clibtool, clibtool-[shared|static])
+- build system: removed the endian.h test.
+- build system: proper use of any-os.mk.
+
+0.5.0:
+
+This is the first tagged release of slibtool. It is the result of two months of
+intensive development, and follows rigorous testing on several systems. As of
+this initial release, slibtool is known to successfully build an entire Exherbo
+Linux system from source, build the midipix cross compilation toolchain from
+source, and likewise build many other packages.
+
+Support for the ELF/default host flavor is complete, and does not appear to have
+any errors. Support for the PE/midipix flavor is also complete, and includes not
+only static archives and shared libraries, but also import libraries with
+version support. Support for the Darwin host flavor already exists too, yet it
+is currently semantically incorrect, and so will be fixed in the next release.

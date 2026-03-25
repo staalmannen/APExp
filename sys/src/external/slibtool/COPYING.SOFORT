@@ -1,0 +1,87 @@
+/*****************************************************************************/
+/*                                                                           */
+/*  sofort: portable software project skeleton                               */
+/*                                                                           */
+/*  Copyright (C) 2015--2025  SysDeer Technologies, LLC                      */
+/*                                                                           */
+/*  sofort provides a build system that can be incorporated into Works       */
+/*  which may or may not be covered by a copyleft license. THE FOLLOWING     */
+/*  LICENSE THEREFORE GOVERNS ONLY THOSE FILES WHICH ARE EXPLICITLY          */
+/*  LISTED HEREWITHIN.                                                       */
+/*                                                                           */
+/* ./configure                                                               */
+/* ./config.usage                                                            */
+/* ./Makefile.in                                                             */
+/*                                                                           */
+/* ./sofort/ccenv/ccenv.in                                                   */
+/* ./sofort/ccenv/ccenv.sh                                                   */
+/* ./sofort/ccenv/ccenv.usage                                                */
+/* ./sofort/ccenv/ccenv.vars                                                 */
+/* ./sofort/ccenv/ccswitch.strs                                              */
+/* ./sofort/ccenv/pedefs.in                                                  */
+/* ./sofort/cfgtest/cfgtest.sh                                               */
+/* ./sofort/cfgtest/snippets/builtins/bitops.m4                              */
+/* ./sofort/cfgtest/snippets/builtins/other.m4                               */
+/* ./sofort/cfgtest/snippets/builtins/overflow.m4                            */
+/* ./sofort/cfgtest/snippets/funcs/fnapi.m4                                  */
+/* ./sofort/config/cfgdefs.in                                                */
+/* ./sofort/config/config.vars                                               */
+/* ./sofort/config/flag.vars                                                 */
+/* ./sofort/config/opt.vars                                                  */
+/* ./sofort/config/testcfg.in                                                */
+/* ./sofort/core/_flavor/flavor_app_frontend_disabled.mk                     */
+/* ./sofort/core/_flavor/flavor_app_frontend_enabled.mk                      */
+/* ./sofort/core/_flavor/flavor_app_linking_all_shared.mk                    */
+/* ./sofort/core/_flavor/flavor_app_linking_all_static.mk                    */
+/* ./sofort/core/_flavor/flavor_app_linking_default.mk                       */
+/* ./sofort/core/_flavor/flavor_install_headers_custom.mk                    */
+/* ./sofort/core/_flavor/flavor_install_headers_default.mk                   */
+/* ./sofort/core/_flavor/flavor_shared_library_disabled.mk                   */
+/* ./sofort/core/_flavor/flavor_shared_library_enabled.mk                    */
+/* ./sofort/core/_flavor/flavor_static_library_disabled.mk                   */
+/* ./sofort/core/_flavor/flavor_static_library_enabled.mk                    */
+/* ./sofort/core/_infer/infer_modern.mk                                      */
+/* ./sofort/core/_infer/infer_posix.mk                                       */
+/* ./sofort/core/_version/_soname/version_soname_copy.mk                     */
+/* ./sofort/core/_version/_soname/version_soname_symlink.mk                  */
+/* ./sofort/core/_version/version_none.mk                                    */
+/* ./sofort/core/_version/version_used.mk                                    */
+/* ./sofort/core/defs.mk                                                     */
+/* ./sofort/core/flavor.mk                                                   */
+/* ./sofort/core/infer.mk                                                    */
+/* ./sofort/core/modern.m4                                                   */
+/* ./sofort/core/pkgconf.mk                                                  */
+/* ./sofort/core/version.mk                                                  */
+/* ./sofort/exrules/_pe/pe_mdso_version_none.mk                              */
+/* ./sofort/exrules/_pe/pe_mdso_version_used.mk                              */
+/* ./sofort/exrules/_pe/pe_version_none.mk                                   */
+/* ./sofort/exrules/_pe/pe_version_used.mk                                   */
+/* ./sofort/exrules/default.mk                                               */
+/* ./sofort/exrules/pe-common.mk                                             */
+/* ./sofort/exrules/pe-dlltool.mk                                            */
+/* ./sofort/exrules/pe-mdso.mk                                               */
+/* ./sofort/exrules/pe-version.mk                                            */
+/* ./sofort/tools/pkgconf.sh                                                 */
+/* ./sofort/tools/srctree.sh                                                 */
+/* ./sofort/tools/version.sh                                                 */
+/*                                                                           */
+/*  Permission is hereby granted, free of charge, to any person obtaining    */
+/*  a copy of this software and associated documentation files (the          */
+/*  "Software"), to deal in the Software without restriction, including      */
+/*  without limitation the rights to use, copy, modify, merge, publish,      */
+/*  distribute, sublicense, and/or sell copies of the Software, and to       */
+/*  permit persons to whom the Software is furnished to do so, subject to    */
+/*  the following conditions:                                                */
+/*                                                                           */
+/*  The above copyright notice and this permission notice shall be included  */
+/*  in all copies or substantial portions of the Software.                   */
+/*                                                                           */
+/*  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS  */
+/*  OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF               */
+/*  MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.   */
+/*  IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY     */
+/*  CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,     */
+/*  TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE        */
+/*  SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.                   */
+/*                                                                           */
+/*****************************************************************************/

@@ -1,0 +1,48 @@
+0.6.0:
+
+The project owes much of the progress leading to this slibtool[ize]
+release to @orbea, who contineus to tirelessly test, identify bugs
+and areas for improvement, and bring all the dots together. So once
+again, thank you so much!
+
+0.5.36:
+
+Getting slibtool to the point where it could build a vast number of
+packages while applying correct semantics would have never been
+possible if it weren't for @orbea, who's still the true engine behind
+the project. Many thanks also to Sam James from the Gentoo community
+for following up on many of the issues that were encountered and
+fixed throughout the process, and likewise to Redfoxmoon for filing
+incorrect-usage bugs with upstream projects, and for helping everyone
+retain the great spirit on slibtool's irc channel.
+
+0.5.33:
+
+This release (as well as the previous one) follows extensive testing
+against all of Gentoo's packages. A huge thank you to @orbea for
+being the engine behind this process, and special kudos to the
+one and only Lucio Andrés Illanes Albornoz for the excellent
+contributed patches.
+
+0.5.12:
+
+Thanks to everyone who has been using and testing slibtool since
+its initial release, and especially to Felix Janda for building
+a large number of packages with slibtool and catching several
+bugs. Last but not least, a huge thanks to Kylie McClain for
+running slibtool-based Exherbo world builds night after night.
+
+0.5.0:
+
+The initial rapid development of slibtool, and likewise the
+relatively short time from inception to first release, would not have
+been possible without the shared wisdom and tremendous help that was
+provided by Kylie McClain, a renowned Exherbo Linux developer and build
+system wizard. Kylie tirelessly tested slibtool by running the Exherbo
+world build time and again around the clock until there no more visible
+failures (read: until she finally stopped jinxing it), handling the
+tediousness of the task with a cool spirit and a great sense of humor.
+
+Thanks also to Ørjan Malde (the one and only), who readily turned
+himself into a Somemulator and helped debugging a race condition in
+slibtool's compile mode translation unit (commit cd7387f).

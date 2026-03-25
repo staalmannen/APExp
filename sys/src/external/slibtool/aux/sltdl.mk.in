@@ -1,0 +1,26 @@
+# a stub Makefile for the build's libltdl (or LT_CONFIG_LTDL_DIR) directory.
+# copied from (or symlinked to) the installed sltdl.mk.in by slibtoolize.
+
+all:
+check:
+clean:
+cscope:
+cscopelist:
+ctags:
+distcheck:
+distclean:
+distcleancheck:
+distdir:
+distuninstallcheck:
+dvi:
+html:
+info:
+install:
+installcheck:
+installdirs:
+mostlyclean:
+pdf:
+ps:
+tags:
+uninstall:
+	@true

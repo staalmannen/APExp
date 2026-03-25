@@ -1,0 +1,27 @@
+#!/bin/sh
+
+#####################################################################
+##  slibtool: a strong libtool implementation, written in C        ##
+##  Copyright (C) 2016--2025  SysDeer Technologies, LLC            ##
+##  Released under the Standard MIT License; see COPYING.SLIBTOOL. ##
+#####################################################################
+
+#####################################################################
+## ar-lib: a placeholder script, currently not implemented         ##
+## -------------------------------------------------------         ##
+#####################################################################
+
+set -eu
+
+error_msg()
+{
+	printf '%s\n' "$@" >&2
+}
+
+error_not_implemented()
+{
+	error_msg 'ar-lib: this script is a placeholder.'
+	exit 2
+}
+
+error_not_implemented

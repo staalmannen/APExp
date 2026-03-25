@@ -1,0 +1,28 @@
+Permissively licensed components of the midipix project currently
+accept contributions in the form of gpg-signed patches. The requirement
+that all contributions be gpg-signed helps to ensure a repository's
+reliability and license integrity, and is thus considered worth of
+the (small) trouble that it might entail.
+
+Please note that patch submission is only one of the many ways to
+advance the development of a software component, and that assistance
+in the following areas is always needed, and greatly appreciated:
+
+* brainstorming.
+* expressing needs, requesting features.
+* sharing knowledge about your favorite system.
+* lurking on irc, reviewing commits and patches.
+* testing release candidates on different systems.
+* building from source, testing bleeding-edge versions.
+
+
+If you would like to submit code, then the following how-to is for you.
+
+1. discuss your proposed changes on the project's libera irc channel.
+2. if the changes you propose are not trivial to accept, start a discussion
+   on the project's mailing list.
+3. obtain as much help as needed on irc; post early versions of your work.
+4. finalize your patch together with the project maintainer.
+5. commit the patch to your local repository.
+6. verify that everything builds, and that nothing breaks.
+7  run contrib.sh, then sign and submit your patch.

@@ -1,0 +1,238 @@
+.Dd October 24, 2020
+.Dt SAMU 1
+.Os
+.Sh NAME
+.Nm samu
+.Nd ninja-compatible build tool
+.Sh SYNOPSIS
+.Nm
+.Op Fl C Ar dir
+.Op Fl d Ar debugflag
+.Op Fl f Ar buildfile
+.Op Fl j Ar maxjobs
+.Op Fl k Ar maxfail
+.Op Fl w Ar warnflag=action
+.Op Fl nv
+.Op Ar target...
+.Nm
+.Op Fl C Ar dir
+.Op Fl f Ar buildfile
+.Fl t Cm clean
+.Op Fl gr
+.Op Ar target...
+.Nm
+.Op Fl C Ar dir
+.Op Fl f Ar buildfile
+.Fl t Cm compdb
+.Op Fl x
+.Op Ar rule...
+.Nm
+.Op Fl C Ar dir
+.Op Fl f Ar buildfile
+.Fl t Cm commands
+.Op Ar target...
+.Nm
+.Op Fl C Ar dir
+.Op Fl f Ar buildfile
+.Fl t Cm query
+.Op Ar target...
+.Nm
+.Op Fl C Ar dir
+.Op Fl f Ar buildfile
+.Fl t Cm targets
+.Op Cm depth Op Ar maxdepth
+.Nm
+.Op Fl C Ar dir
+.Op Fl f Ar buildfile
+.Fl t Cm targets
+.Cm rule
+.Op Ar rulename
+.Nm
+.Op Fl C Ar dir
+.Op Fl f Ar buildfile
+.Fl t Cm targets
+.Cm all
+.Nm
+.Fl t Cm list
+.Sh DESCRIPTION
+.Nm
+loads a build manifest from
+.Ar buildfile
+and rebuilds
+.Ar targets
+if they are out of date.
+If no targets are specified, the manifest's default targets are built.
+If there are no default targets, the leaf nodes of the dependency graph are
+built (outputs that have no consuming action).
+.Pp
+Targets are out of date if they are older than the generating action's newest
+input, they have no entry in the build log, or if the command to build the
+target differs from what was used previously.
+Targets built with
+.Cm generator
+rules are not rebuilt if the command changes.
+.Pp
+If the
+.Cm clean
+tool is used, the targets are cleaned instead.
+When a target is cleaned, it is removed and are all of its inputs are cleaned.
+Targets with no generating actions are never removed.
+Targets built with
+.Sy generator
+rules are only removed if
+.Fl g
+is specified.
+.Pp
+If the
+.Cm commands
+tool is used, a list of shell commands used to build the specified
+(or default) targets is printed.
+.Pp
+If the
+.Cm compdb
+tool is used, a compilation database
+.Lk ( https://clang.llvm.org/docs/JSONCompilationDatabase.html )
+is printed instead.
+.Pp
+If the
+.Cm query
+tool is used, the inputs and outputs of the targets are printed instead.
+.Pp
+If the
+.Cm targets
+tool is used, a list of targets will be displayed, either by rule or by depth.
+The first argument determines how the targets will be displayed:
+.Bl -tag -width Ds
+.It Cm depth
+An indented tree of targets will be displayed, starting by the root targets
+(those with no dependent targets), up to the depth specified by
+.Ar maxdepth
+(defaults to 1).
+.It Cm rule
+If
+.Ar rulename
+is given, a list of targets using the given rule will be displayed.
+Otherwise, a list of source files will be displayed.
+.It Cm all
+A list of all targets will be displayed.
+.El
+.Pp
+If the
+.Cm list
+tool is used, a list of available tools is displayed.
+.Sh OPTIONS
+.Bl -tag -width Ds
+.It Fl C
+Switch working directory to
+.Ar dir
+before building.
+.It Fl d
+Enable a debugging option.
+This flag may be specified multiple times to enable multiple debugging options.
+Possible values for
+.Ar debugflag
+are:
+.Bl -tag -width keepdepfile
+.It Cm explain
+Print messages explaining why outputs were dirty.
+.It Cm keepdepfile
+Don't remove $depfile after it was parsed.
+.It Cm keeprsp
+Don't remove $rspfile after job completion or failure.
+.El
+.It Fl f
+Load manifest from
+.Ar buildfile
+instead of build.ninja.
+.It Fl j
+Run up to
+.Ar maxjobs
+jobs in parallel (default based on number of CPUs).
+If zero, allow unlimited concurrent jobs.
+.It Fl k
+Allow up to
+.Ar maxfail
+job failures.
+If negative or zero, allow any number of job failures.
+.It Fl n
+Do not actually execute the commands or update the log.
+.It Fl v
+Print full commands instead of just
+.Sy description .
+.It Fl w
+Control how certain errors are handled.
+If
+.Ar warnflag
+is
+.Cm dupbuild ,
+.Ar action
+specifies what to do if an output is listed in multiple build edges.
+If
+.Ar action
+is
+.Cm err ,
+treat it like an error and fail.
+If
+.Ar action
+is
+.Cm warn ,
+only print a diagnostic message.
+.It Fl t
+Instead of building, invoke a subtool.
+All arguments and flags after the subtool are interpreted by the subtool.
+The currently supported subtools are
+.Cm clean ,
+.Cm compdb ,
+and
+.Cm targets .
+.It Fl g
+When cleaning, also clean outputs of
+.Sy generator
+actions.
+.It Fl r
+.Ar targets
+are interpreted as rules, and all outputs of actions with the specified rule
+types will be cleaned instead.
+.It Fl x
+When printing a compilation database, replace @$rspfile with $rspfile_content (with <blank> in place of <newline>).
+.El
+.Sh ENVIRONMENT
+.Bl -tag -width NINJA_STATUS
+.It Ev SAMUFLAGS
+Options for
+.Nm
+that get applied before those specified on the command-line.
+The only options allowed in
+.Ev SAMUFLAGS
+are
+.Fl v
+and
+.Fl j .
+.It Ev NINJA_STATUS
+The status output printed to the left of each rule description, using printf-like conversion specifiers.
+If unset, the default is "[%s/%t] ".
+.Pp
+Available conversion specifiers:
+.Bl -tag -width Ds
+.It Cm %s
+Number of started jobs.
+.It Cm %f
+Number of finished jobs.
+.It Cm %t
+Total number of jobs.
+.It Cm %r
+Number of running jobs.
+.It Cm %u
+Number of remaining jobs.
+.It Cm %p
+Percentage of completed jobs.
+.It Cm %o
+Rate of finished jobs per second (to 1 decimal place).
+.It Cm %e
+Elapsed time in seconds (to 3 decimal places).
+.It Cm %%
+The '%' character.
+.El
+.El
+.Sh SEE ALSO
+.Xr make 1

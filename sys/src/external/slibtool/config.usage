@@ -1,0 +1,202 @@
+configure: common usage
+
+supported switches:
+-------------------
+	--help
+
+	--nickname
+	--program-prefix
+	--avoid-version
+	--source-dir
+	--srcdir
+
+	--pkgname
+	--pkgdesc
+	--pkgusrc
+	--pkgrepo
+	--pkgpsrc
+	--pkgdurl
+	--pkgdefs
+	--pkglibs
+
+	--srcinfo
+	--srcsite
+
+	--pgprkey
+	--pgpskey
+
+	--rawball
+	--rawball-url
+	--rawball-sha256
+	--modball
+	--modball-url
+	--modball-sha256
+	--srcball
+	--srcball-url
+	--srcball-sha256
+
+	--prefix
+	--exec-prefix
+	--bindir
+	--sbindir
+	--libdir
+	--includedir
+	--oldincludedir
+	--mandir
+	--docdir
+	--libexecdir
+
+	--sysconfdir
+	--sharedstatedir
+	--localstatedir
+	--runstatedir
+	--datarootdir
+	--pkgdatadir
+	--datadir
+	--infodir
+	--localedir
+	--htmldir
+	--dvidir
+	--pdfdir
+	--psdir
+
+	--testcfgdir
+	--testdatadir
+
+	--make
+	--makemode
+
+	--build
+	--host
+	--cchost
+	--cfghost
+	--target
+	--arch
+	--compiler
+	--toolchain
+	--sysroot
+	--cross-compile
+	--shell
+	--debug
+
+	--pkgconf
+	--pkgconfig
+
+	--strict
+	--ccstrict
+	--ldstrict
+
+	--all-static
+	--all-shared
+	--enable-static
+	--enable-shared
+	--disable-static
+	--disable-shared
+
+	--enable-app
+	--enable-frontend
+	--disable-app
+	--disable-frontend
+
+	--enable-dependency-tracking
+	--disable-dependency-tracking
+
+
+supported variables:
+--------------------
+	NICKNAME
+	SOURCE_DIR
+
+	PREFIX
+	EXEC_PREFIX
+	BINDIR
+	SBINDIR
+	LIBDIR
+	INCLUDEDIR
+	MANDIR
+	DOCDIR
+	LIBEXECDIR
+
+	SYSCONFDIR
+	SHAREDSTATEDIR
+	LOCALSTATEDIR
+	RUNSTATEDIR
+	DATAROOTDIR
+	PKGDATADIR
+	DATADIR
+	INFODIR
+	LOCALEDIR
+	HTMLDIR
+	DVIDIR
+	PDFDIR
+	PSDIR
+
+	TESTCFGDIR
+	TESTDATADIR
+
+	CC
+	CPP
+	CXX
+
+	MAKE
+	MAKEMODE
+
+	BUILD
+	HOST
+	CCHOST
+	CFGHOST
+	TARGET
+	ARCH
+	COMPILER
+	TOOLCHAIN
+	SYSROOT
+	CROSS_COMPILE
+	CONFIG_SHELL
+
+	PKGCONF
+	PKGCONFIG
+
+	CFLAGS
+	CFLAGS_DEBUG
+	CFLAGS_COMMON
+	CFLAGS_CMDLINE
+	CFLAGS_CONFIG
+	CFLAGS_SYSROOT
+	CFLAGS_OS
+	CFLAGS_SITE
+	CFLAGS_PATH
+	CFLAGS_STRICT
+	CFLAGS_UTIL
+	CFLAGS_LAST
+	CFLAGS_ONCE
+
+	LDFLAGS
+	LDFLAGS_DEBUG
+	LDFLAGS_COMMON
+	LDFLAGS_CMDLINE
+	LDFLAGS_CONFIG
+	LDFLAGS_SYSROOT
+	LDFLAGS_PATH
+	LDFLAGS_STRICT
+	LDFLAGS_UTIL
+	LDFLAGS_LAST
+	LDFLAGS_ONCE
+
+	PE_SUBSYSTEM
+	PE_IMAGE_BASE
+
+	NATIVE_CC
+	NATIVE_CPP
+	NATIVE_CXX
+
+	NATIVE_HOST
+	NATIVE_CFGHOST
+	NATIVE_CFLAGS
+	NATIVE_LDFLAGS
+
+	NATIVE_PKGCONF
+	NATIVE_PKGCONFIG
+
+	NATIVE_OS
+	NATIVE_OS_BITS
+	NATIVE_OS_UNDERSCORE
