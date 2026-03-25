@@ -235,7 +235,7 @@ build_wcs_buffer (re_string_t *pstr)
 	}
       else
 	p = (const char *) pstr->raw_mbs + pstr->raw_mbs_idx + byte_idx;
-      mbclen = __mbrtowc (&wc, p, remain_len, (struct _6_ *) &pstr->cur_state);
+      mbclen = __mbrtowc (&wc, p, remain_len, (struct _9_ *) &pstr->cur_state);
       if (__glibc_unlikely (mbclen == (size_t) -1 || mbclen == 0
 			    || (mbclen == (size_t) -2
 				&& pstr->bufs_len >= pstr->len)))
@@ -311,7 +311,7 @@ build_wcs_upper_buffer (re_string_t *pstr)
 	  prev_st = pstr->cur_state;
 	  mbclen = __mbrtowc (&wc,
 			      ((const char *) pstr->raw_mbs + pstr->raw_mbs_idx
-			       + byte_idx), remain_len, (struct _6_ *) &pstr->cur_state);
+			       + byte_idx), remain_len, (struct _9_ *) &pstr->cur_state);
 	  if (__glibc_likely (0 < mbclen && mbclen < (size_t) -2))
 	    {
 	      wchar_t wcu = __towupper (wc);
@@ -379,7 +379,7 @@ build_wcs_upper_buffer (re_string_t *pstr)
 	  }
 	else
 	  p = (const char *) pstr->raw_mbs + pstr->raw_mbs_idx + src_idx;
-	mbclen = __mbrtowc (&wc, p, remain_len, (struct _6_ *) &pstr->cur_state);
+	mbclen = __mbrtowc (&wc, p, remain_len, (struct _9_ *) &pstr->cur_state);
 	if (__glibc_likely (0 < mbclen && mbclen < (size_t) -2))
 	  {
 	    wchar_t wcu = __towupper (wc);
@@ -501,7 +501,7 @@ re_string_skip_chars (re_string_t *pstr, Idx new_raw_idx, wint_t *last_wc)
       Idx remain_len = pstr->raw_len - rawbuf_idx;
       prev_st = pstr->cur_state;
       mbclen = __mbrtowc (&wc2, (const char *) pstr->raw_mbs + rawbuf_idx,
-			  remain_len, (struct _6_ *) &pstr->cur_state);
+			  remain_len, (struct _9_ *) &pstr->cur_state);
       if (__glibc_unlikely (mbclen == (size_t) -2 || mbclen == (size_t) -1
 			    || mbclen == 0))
 	{
@@ -733,7 +733,7 @@ re_string_reconstruct (re_string_t *pstr, Idx idx, int eflags)
 			     to use (UTF-8 -> UCS4).  */
 			  memset (&cur_state, 0, sizeof (cur_state));
 			  mbclen = __mbrtowc (&wc2, (const char *) pp, mlen,
-					      (struct _6_ *) &cur_state);
+					      (struct _9_ *) &cur_state);
 			  if (raw + offset - p <= mbclen
 			      && mbclen < (size_t) -2)
 			    {

@@ -18,6 +18,11 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
+
+//block namespace conflicts
+#define _UTF_H_ 1
+#define __U_H
+
 #include <stdio.h>
 
 typedef int Rune;
