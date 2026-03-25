@@ -46,7 +46,7 @@ FLEXSRC=../../../external/flex
 CC=pcc
 LD=pcc
 CFLAGS=-c -I. -I$FLEXSRC/flex/src -B -D_POSIX_SOURCE -D_SUSV2_SOURCE \
-	-D_BSD_EXTENSION -DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"
+	-D_BSD_EXTENSION -DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"\
 
 
 install:V:

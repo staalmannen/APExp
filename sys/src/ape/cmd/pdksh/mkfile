@@ -30,7 +30,7 @@ OFILES=\
 	version.$O
 
 # Autolib doesn't get this right on the alpha, and I don't understand why. -rsc
-LIB=$APEXPROOT/$objtype/lib/ape/libap.a $APEXPROOT/$objtype/lib/ape/libbsd.a
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
 <$APEXPROOT/sys/src/cmd/mkone
 

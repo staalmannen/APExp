@@ -5,7 +5,6 @@
 
 #define SHLIBEXT ".a"
 #define DEFLIBPATH "/sys/lib/ape/awk"
-#define PTRDIFF_MAX LLONG_MAX
 
 /* Name of package */
 #define PACKAGE "gawk"

@@ -1,8 +1,9 @@
 APE=../..
 <$APE/config
 APEXPROOT=../../../../..
-LIB=$APEXPROOT/$objtype/lib/ape/libutf.a
+
 TARG=gmake
+
 OFILES=	\
 # src \
 	ar.$O\

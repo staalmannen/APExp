@@ -3,6 +3,8 @@ APE=../../ape
 APEXPROOT=../../../..
 
 _CORE_APPS=\
+# shell\
+	pdksh\
 # parsing/editing source etc \
 	as\
 	lex\
@@ -15,7 +17,6 @@ _CORE_APPS=\
 	gettext\
 # core utilities \
 	base\
-	pdksh\
 	pcregrep\
 	iconv\
 	expr\
