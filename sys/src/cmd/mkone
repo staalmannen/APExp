@@ -14,12 +14,6 @@ $O.out:	$OFILES $LIB
 %.$O:	%.c
 	$CC $CFLAGS $stem.c
 
-%.$O:	%.C
-	c++/$CC $CFLAGS $stem.C
-
-%.$O:	%.cpp
-	c++/$CC $CFLAGS $stem.cpp
-
 %.$O:	%.s
 	$AS $AFLAGS $stem.s
 
@@ -28,6 +22,8 @@ y.tab.h y.tab.c:D:	$YFILES
 
 lex.yy.c:	$LFILES
 	$LEX $LFLAGS $prereq
+
+<./transpilers
 
 install:V:	$BIN/$TARG
 

@@ -1,0 +1,17 @@
+</$objtype/mkfile
+
+LIB=/$objtype/lib/ape/libc++.a
+
+OFILES=generic.$O
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-FV -I.
+# if the user is only running mk
+# if cfront is installed: CCX=cfront
+CCX=../../src/$O.out
+CC=pcc
+
+%.c: %.cpp
+	$CCX $prereq >%.c
+

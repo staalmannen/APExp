@@ -1,0 +1,7 @@
+This is a brief changelog for things implemented in the "C4" fork of cfront
+
+2026-03-x : Initial commit of the C4 changes
+    - claude.ai generated translations of .cpp files to .c files
+    - claude.ai also patched sources to work on multiple architectures (cfront-3 did not work on 64-bit)
+    - cleaned up the source tree, added documentation
+

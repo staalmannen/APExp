@@ -1,0 +1,18 @@
+BUILTINS=
+</$objtype/mkfile
+
+$O.out:	patch.$O dtors.$O _main.$O
+	$LD $prereq
+
+install:V:	$O.out
+	mv $O.out /$objtype/bin/c++/patch
+
+installall:V:
+	for(objtype in $CPUS)
+		mk install
+
+%.$O:	%.c
+	$CC -w $stem.c
+
+clean:V:
+	rm -f *.[$OS] [$OS].out y.tab.?

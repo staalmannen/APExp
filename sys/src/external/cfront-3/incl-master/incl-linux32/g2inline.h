@@ -1,1 +1,0 @@
-SC/g2inline.h

@@ -1,0 +1,17 @@
+</$objtype/mkfile
+
+szal: szal.c
+	pcc szal.c -o szal
+
+$O.sz:V: szal
+	szal | sort > $O.sz
+
+install:V: $O.sz
+	cp $O.sz /sys/lib/c++
+
+installall:V:
+	for(objtype in $CPUS)
+		mk install
+
+clean:V:
+	rm -f szal *.[$OS] [$OS].sz y.tab.?

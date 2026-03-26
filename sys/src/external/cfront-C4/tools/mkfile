@@ -1,0 +1,21 @@
+</$objtype/mkfile
+
+DIRS=\
+	patch\
+	munch\
+	pt\
+	demangler\
+	szal\
+
+none:V:
+	echo mk all, install, installall, clean, or nuke
+
+install installall:V:
+	mkdir -p /$objtype/bin/c++
+	mkdir -p /sys/lib/c++
+
+all clean nuke install installall:V:
+	for (i in $DIRS) @{
+		cd $i
+		mk $target
+	}

@@ -1,0 +1,21 @@
+</$objtype/mkfile
+
+DIRS=\
+	src\
+	tools\
+	lib\
+
+none:V:
+	echo mk all, install, installall, clean, or nuke
+
+demo:V:
+	mk -f demo/mkfile
+
+test:V:
+	mk -f demo/mkfile
+
+all clean nuke install installall:V:
+	for (i in $DIRS) @{
+		cd $i
+		mk $target
+	}

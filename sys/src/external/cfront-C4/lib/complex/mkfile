@@ -1,0 +1,20 @@
+</$objtype/mkfile
+
+LIB=/$objtype/lib/ape/libc++.a
+
+OFILES=abs.$O arg.$O cos.$O error.$O exp.$O io.$O \
+	log.$O oper.$O polar.$O pow.$O sin.$O sqrt.$O 
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-FV -I./complex
+# if the user is only running mk
+# if cfront is installed: CCX=cfront
+CCX=../../src/$O.out
+CC=pcc
+
+%.c: complex/%.cpp
+	$CCX $prereq >%.c
+
+
+

@@ -24,6 +24,8 @@ all:VQ:
 %.$O:	%.s
 	$AS $AFLAGS $stem.s
 
+<./transpilers
+
 $O.%:V:	%.$O $OFILES $LIB
 	$LD $LDFLAGS -o $target $prereq
 

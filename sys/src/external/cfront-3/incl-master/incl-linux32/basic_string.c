@@ -1,1 +1,0 @@
-SC/basic_string.c

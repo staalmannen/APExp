@@ -1,1 +1,0 @@
-SC/Array_alg.h

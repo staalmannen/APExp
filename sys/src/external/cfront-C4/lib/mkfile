@@ -1,0 +1,21 @@
+BUILTINS=
+</$objtype/mkfile
+
+broken=task 
+dirs=new generic complex stream
+
+install:V:
+	for(i in $dirs) @{
+		cd $i
+		mk install
+	}
+
+installall:V:
+	for(objtype in $CPUS)
+		mk install
+
+clean:V:
+	for(i in $dirs) @{
+		cd $i
+		mk clean
+	}

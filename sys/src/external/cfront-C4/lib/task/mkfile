@@ -1,0 +1,23 @@
+</$objtype/mkfile
+
+LIB=/$objtype/lib/ape/libc++.a
+
+OFILES=erand.$O hw_stack.$O obj.$O qhead.$O \
+	qtail.$O sched.$O sim.$O swap_supp.$O task.$O \
+	task_compat.$O timer.$O 
+
+NOT_IMPLEMENTED = event.$O 
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-FV -I./task -D_POSIX_SOURCE -D_BSD_EXTENSION
+# if the user is only running mk
+# if cfront is installed: CCX=cfront
+CCX=../../src/$O.out
+CC=pcc
+
+%.c: task/%.cpp
+	$CCX $prereq >%.c
+
+
+

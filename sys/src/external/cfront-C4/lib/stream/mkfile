@@ -1,0 +1,19 @@
+</$objtype/mkfile
+
+LIB=/$objtype/lib/ape/libc++.a
+
+OFILES=cstreams.$O filebuf.$O flt.$O fstream.$O in.$O \
+	intin.$O ios_compat.$O manip.$O oldformat.$O \
+	out.$O rawin.$O sbuf.dbp.$O stdiobuf.$O stream.$O \
+	streambuf.$O strstream.$O swstdio.$O 
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-FV -I.
+# if the user is only running mk
+# if cfront is installed: CCX=cfront
+CCX=../../src/$O.out
+CC=pcc
+
+%.c: %.cpp
+	$CCX $prereq >%.c

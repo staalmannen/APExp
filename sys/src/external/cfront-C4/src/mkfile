@@ -1,0 +1,25 @@
+</$objtype/mkfile
+
+OFILES=Bits.$O alloc.$O block.$O dcl.$O dcl2.$O dcl3.$O \
+	dcl4.$O del.$O discrim.$O error.$O expand.$O expr.$O \
+	expr2.$O expr3.$O find.$O hash.$O lalex.$O lex.$O \
+	main.$O norm2.$O print.$O print2.$O repr.$O \
+	simpl.$O simpl2.$O size.$O table.$O template.$O \
+	tree_copy.$O tree_walk.$O typ.$O typ2.$O norm.$O y-tab.$O
+
+TARG=cfront
+
+CC=pcc
+CLD=$LD
+LD=pcc
+
+BIN=/$objtype/bin/
+
+CFLAGS=-FV
+
+</sys/src/cmd/mkone
+
+
+$OFILES:	cfront.h token.h typedef.h
+
+

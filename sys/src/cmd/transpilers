@@ -1,0 +1,26 @@
+CXX=cfront
+OBJC=objc1
+F77=f2c
+FC=f2c
+PC=p2c
+BASIC=bacon
+
+
+%.c:	%.C
+	$CXX $stem.C >$stem.c
+
+%.c:	%.cpp
+	$CXX $stem.cpp >$stem.c
+
+%.c:	%.m
+	$OBJC $stem.m
+
+%.c:	%.f
+	$F77 $stem.f
+
+%.c:	%.p
+	$PC $stem.p
+
+%.bac.c:	%.bac
+	$BASIC $stem.bac
+

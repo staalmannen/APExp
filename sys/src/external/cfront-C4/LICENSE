@@ -1,0 +1,41 @@
+*** (Cfront-3) ***
+
+As noted in the headers of several files, the shared code
+is proprietary and should be considered NON-FREE. Back in
+1994 (the last version, 3.03), the copyright holder was
+AT&T. Ever since then , the code has basically been abandonware.
+It would be great if the current copyright holder could be
+tracked down so that they could release the code under a free
+license.
+
+My interpretation is that the claude.ai cpp --> c translated
+(rewritten) files still fall under this copyright. There
+is currently an active debate about AI "license washing"
+but my interpretation is the careful one.
+
+
+*** Cfront-C4 ***
+
+In anticipation of a future open source release of cfront-3,
+I make sure that my changes are as permissively licensed as
+possible. This would normally mean public domain, but this is
+not universally recognized so I am instead opting for the
+BSD0 license below.
+
+Zero-Clause BSD
+=============
+
+Permission to use, copy, modify, and/or distribute this software for
+any purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED “AS IS” AND THE AUTHOR DISCLAIMS ALL
+WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES
+OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE
+FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY
+DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN
+AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT
+OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+
+
+
+

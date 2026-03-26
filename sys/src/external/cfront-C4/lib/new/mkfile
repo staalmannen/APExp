@@ -1,0 +1,18 @@
+</$objtype/mkfile
+
+LIB=/$objtype/lib/ape/libc++.a
+
+OFILES=_arr_map.$O _delete.$O _handler.$O _main.$O \
+	_new.$O _vec.$O placenew.$O 
+
+</sys/src/cmd/mksyslib
+
+CFLAGS=-FV -I.
+# if the user is only running mk
+# if cfront is installed: CCX=cfront
+CCX=../../src/$O.out
+CC=pcc
+
+%.c: %.cpp
+	$CCX $prereq >%.c
+
