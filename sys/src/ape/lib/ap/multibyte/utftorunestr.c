@@ -1,5 +1,5 @@
 /* See LICENSE file for copyright and license details. */
-#include "../utf.h"
+#include "utf.h"
 
 size_t
 utftorunestr(const char *str, Rune *r)

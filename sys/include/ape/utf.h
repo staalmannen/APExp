@@ -2,6 +2,8 @@
 #define _UTF_H_ 1
 #pragma lib "/$M/lib/ape/libap.a"
 
+#include <stdio.h>
+
 #if defined(__cplusplus)
 extern "C" { 
 #endif

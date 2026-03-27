@@ -15,7 +15,7 @@ TARG= \
 		false\
 #		find\
 		kill\
-		ls\
+#		ls\
 		printf\
 		sort\
 #		test\

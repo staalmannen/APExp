@@ -7,7 +7,7 @@ OBJCSRC=../../../external/Objc
 TARG=objc1\
 	postlink\
 
-LIB=$APEXPROOT/$objtype/lib/ape/_prelink.$O
+PRELINK=$APEXPROOT/$objtype/lib/ape/_prelink.$O
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
@@ -143,8 +143,10 @@ $O.objc1: $OBJS $OBJC1OBJS
 
 $O.postlink: $OBJS $PLINKOBJS
 
-$LIB: $OBJCSRC/bootstrap/_prelink.c
-    $CC $CFLAGS $OBJCSRC/bootstrap/$stem.c
-	cp _prelink.$O $LIB
+$PRELINK: $OBJCSRC/bootstrap/_prelink.c
+    $CC $CFLAGS $OBJCSRC/bootstrap/_prelink.c
+	cp _prelink.$O $PRELINK
+
+install installall: $PRELINK
 
 
