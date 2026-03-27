@@ -54,6 +54,28 @@ extern	int	isspacerune(Rune);
 extern	int	istitlerune(Rune);
 extern	int	isupperrune(Rune);
 
+/* from sbase */
+extern int charntorune(Rune *, const char *, size_t);
+extern size_t utfmemlen(const char *, size_t);
+
+extern int isalnumrune(Rune);
+extern int isblankrune(Rune);
+extern int iscntrlrune(Rune);
+extern int isdigitrune(Rune);
+extern int isgraphrune(Rune);
+extern int isprintrune(Rune);
+extern int ispunctrune(Rune);
+extern int isxdigitrune(Rune);
+
+extern size_t utftorunestr(const char *, Rune *);
+extern size_t utfntorunestr(const char *, size_t, Rune *);
+
+extern int fgetrune(Rune *, FILE *);
+extern int efgetrune(Rune *, FILE *, const char *);
+extern int fputrune(const Rune *, FILE *);
+extern int efputrune(const Rune *, FILE *, const char *);
+
+
 #if defined(__cplusplus)
 }
 #endif

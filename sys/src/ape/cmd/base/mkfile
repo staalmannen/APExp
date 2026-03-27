@@ -4,7 +4,6 @@ APE=$APEXPROOT/sys/src/ape
 
 LIB=\
 	libutil.a$O\
-	libutf.a$O\
 	$APEXPROOT/$objtype/lib/ape/libap.a\
 
 TARG= \
@@ -65,24 +64,9 @@ UTIL_OBJS=\
 		unescape.$O\
 		writeall.$O
 
-UTF_OBJS=\
-		fgetrune.$O\
-		fputrune.$O\
-		isalnumrune.$O\
-		isblankrune.$O\
-		iscntrlrune.$O\
-		isdigitrune.$O\
-		isgraphrune.$O\
-		isprintrune.$O\
-		ispunctrune.$O\
-		istitlerune.$O\
-		isxdigitrune.$O\
-		runetype.$O\
-		utftorunestr.$O\
-		charntorune.$O\
-
 
 BIN=$APEXPROOT/$objtype/bin/ape
+
 <$APEXPROOT/sys/src/cmd/mkmany
 
 SBASESRC=../../../external/sbase
@@ -104,9 +88,6 @@ SBASE_CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil -I$SBASESRC/../gnulib 
 
 libutil.a$O: $UTIL_OBJS
 			ar vu libutil.a$O $UTIL_OBJS
-
-libutf.a$O: $UTF_OBJS
-			ar vu libutf.a$O $UTF_OBJS
 
 %.$O: $SBASESRC/%.c
 	$CC $SBASE_CFLAGS $SBASESRC/$stem.c

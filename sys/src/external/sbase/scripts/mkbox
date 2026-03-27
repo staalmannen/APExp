@@ -23,7 +23,6 @@ struct cmd {
 	char *name;
 	int (*fn)(int, char **);
 } cmds[] = {
-	{"install", xinstall_main},
 	{"[", test_main},
 $(grep -l ^main *.c |
 while read f
@@ -33,7 +32,9 @@ do
 		s/main/'${f%.c}'_main/
 		s/-/_/g
 		w build/'$f'
-		s/\(^.*\)(.*)/	{"'${f%.c}'", \1},/p
+		s/\(^.*\)(.*)/	{"'${f%.c}'", \1},/
+		s/xinstall/install/
+		p
 		d
 	}
 	w 'build/$f $f

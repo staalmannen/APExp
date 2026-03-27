@@ -25,24 +25,3 @@
 #include "/sys/include/ape/utf.h"
 
 
-int charntorune(Rune *, const char *, size_t);
-char *utfecpy(char *, char *, const char *);
-size_t utfmemlen(const char *, size_t);
-
-int isalnumrune(Rune);
-int isalpharune(Rune);
-int isblankrune(Rune);
-int iscntrlrune(Rune);
-int isdigitrune(Rune);
-int isgraphrune(Rune);
-int isprintrune(Rune);
-int ispunctrune(Rune);
-int isxdigitrune(Rune);
-
-size_t utftorunestr(const char *, Rune *);
-size_t utfntorunestr(const char *, size_t, Rune *);
-
-int fgetrune(Rune *, FILE *);
-int efgetrune(Rune *, FILE *, const char *);
-int fputrune(const Rune *, FILE *);
-int efputrune(const Rune *, FILE *, const char *);

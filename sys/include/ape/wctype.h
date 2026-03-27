@@ -30,21 +30,23 @@ extern int iswpunct(Rune);
 extern int iswspace(Rune);
 extern int iswupper(Rune);
 extern int iswxdigit(Rune);
+extern int iswtitle(Rune);
 extern int towlower(Rune);
 extern int towupper(Rune);
 
-#define iswalnum(c) isalnum((int) c)
+#define iswalnum(c) isalnumrune(c)
 #define iswalpha(c) isalpharune(c)
-#define iswblank(c) isblank((int) c)
-#define iswcntrl(c) iscntrl((int) c)
-#define iswdigit(c) isdigit((int) c)
-#define iswgraph(c) isgraph((int) c)
+#define iswblank(c) isblankrune(c)
+#define iswcntrl(c) iscntrlrune(c)
+#define iswdigit(c) isdigitrune(c)
+#define iswgraph(c) isgraphrune(c)
 #define iswlower(c) islowerrune(c)
-#define iswprint(c) isprint((int) c)
-#define iswpunct(c) ispunct((int) c)
+#define iswprint(c) isprintrune(c)
+#define iswpunct(c) ispunctrune(c)
 #define iswspace(c) isspacerune(c)
 #define iswupper(c) isupperrune(c)
-#define iswxdigit(c) isxdigit((int) c)
+#define iswxdigit(c) isxdigitrune(c)
+#define iswtitle(c) istitlerune(c)
 #define towlower(c) tolowerrune(c)
 #define towupper(c) toupperrune(c)
 

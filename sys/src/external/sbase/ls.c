@@ -1,4 +1,4 @@
-/* See LICENSE file for copyright and license details.*/
+/* See LICENSE file for copyright and license details. */
 #include <sys/stat.h>
 #include <sys/types.h>
 #ifndef major
@@ -13,8 +13,6 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-#include <stdint.h>
-#define u_int32_t uint32_t
 
 #include "utf.h"
 #include "util.h"
@@ -26,7 +24,7 @@ struct entry {
 	uid_t   uid;
 	gid_t   gid;
 	off_t   size;
-	time_t	t;
+	struct timespec t;
 	dev_t   dev;
 	dev_t   rdev;
 	ino_t   ino, tino;
@@ -35,7 +33,7 @@ struct entry {
 static struct {
 	dev_t dev;
 	ino_t ino;
-} tree[PATH_MAX];
+} *tree;
 
 static int ret   = 0;
 static int Aflag = 0;
@@ -78,11 +76,11 @@ mkent(struct entry *ent, char *path, int dostat, int follow)
 	ent->gid   = st.st_gid;
 	ent->size  = st.st_size;
 	if (cflag)
-		ent->t = st.st_ctime;
+		ent->t = st.st_ctim;
 	else if (uflag)
-		ent->t = st.st_atime;
+		ent->t = st.st_atim;
 	else
-		ent->t = st.st_mtime;
+		ent->t = st.st_mtim;
 	ent->dev   = st.st_dev;
 	ent->rdev  = st.st_rdev;
 	ent->ino   = st.st_ino;
@@ -192,15 +190,15 @@ output(const struct entry *ent)
 	else
 		snprintf(grname, sizeof(grname), "%d", ent->gid);
 
-	if (time(NULL) > ent->t + (180 * 24 * 60 * 60)) /* 6 months ago? */
+	if (time(NULL) > ent->t.tv_sec + (180 * 24 * 60 * 60)) /* 6 months ago? */
 		fmt = "%b %d  %Y";
 	else
 		fmt = "%b %d %H:%M";
 
-	if ((tm = localtime(&ent->t)))
+	if ((tm = localtime(&ent->t.tv_sec)))
 		strftime(buf, sizeof(buf), fmt, tm);
 	else
-		snprintf(buf, sizeof(buf), "%lld", (long long)(ent->t));
+		snprintf(buf, sizeof(buf), "%lld", (long long)(ent->t.tv_sec));
 	printf("%s %4ld %-8.8s %-8.8s ", mode, (long)ent->nlink, pwname, grname);
 
 	if (S_ISBLK(ent->mode) || S_ISCHR(ent->mode))
@@ -232,8 +230,8 @@ entcmp(const void *va, const void *vb)
 		cmp = b->size - a->size;
 		break;
 	case 't':
-		if (!(cmp = b->t - a->t))
-			cmp = b->t - a->t;
+		if (!(cmp = b->t.tv_sec - a->t.tv_sec))
+			cmp = b->t.tv_nsec - a->t.tv_nsec;
 		break;
 	}
 
@@ -372,6 +370,8 @@ main(int argc, char *argv[])
 {
 	struct entry ent, *dents, *fents;
 	size_t i, ds, fs;
+
+	tree = ereallocarray(NULL, PATH_MAX, sizeof(*tree));
 
 	ARGBEGIN {
 	case '1':

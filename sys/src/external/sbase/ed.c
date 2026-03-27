@@ -49,7 +49,7 @@ static regmatch_t matchs[10];
 static String lastre;
 
 static int optverbose, optprompt, exstatus, optdiag = 1;
-static int marks['z' - 'a'];
+static int marks['z' - 'a' + 1];
 static int nlines, line1, line2;
 static int curln, lastln, ocurln, olastln;
 static jmp_buf savesp;
@@ -69,7 +69,6 @@ static char *rhs;
 static char *lastmatch;
 static struct undo udata;
 static int newcmd;
-static int eol, bol;
 
 static sig_atomic_t intr, hup;
 
@@ -244,6 +243,7 @@ gettxt(int line)
 		return addchar('\0', &text);
 
 repeat:
+	chksignals();
 	if (!csize || off < lasto || off - lasto >= csize) {
 		block = off & ~(CACHESIZ-1);
 		if (lseek(scratch, block, SEEK_SET) < 0 ||
@@ -257,7 +257,7 @@ repeat:
 		++off;
 		addchar(*p, &text);
 	}
-	if (csize && p == buf + csize)
+	if (csize == CACHESIZ && p == buf + csize)
 		goto repeat;
 
 	addchar('\n', &text);
@@ -402,15 +402,11 @@ compile(int delim)
 	if (!isgraph(delim))
 		error("invalid pattern delimiter");
 
-	eol = bol = bracket = lastre.siz = 0;
+	bracket = lastre.siz = 0;
 	for (n = 0;; ++n) {
 		c = input();
 		if (c == delim && !bracket || c == '\0') {
 			break;
-		} else if (c == '^') {
-			bol = 1;
-		} else if (c == '$') {
-			eol = 1;
 		} else if (c == '\\') {
 			addchar(c, &lastre);
 			c = input();
@@ -432,7 +428,7 @@ compile(int delim)
 		regfree(pattern);
 	if (!pattern && (!(pattern = malloc(sizeof(*pattern)))))
 		error("out of memory");
-	if ((ret = regcomp(pattern, lastre.str, REG_NEWLINE))) {
+	if ((ret = regcomp(pattern, lastre.str, 0))) {
 		regerror(ret, pattern, buf, sizeof(buf));
 		error(buf);
 	}
@@ -441,21 +437,57 @@ compile(int delim)
 static int
 match(int num)
 {
+	int r;
+
 	lastmatch = gettxt(num);
-	return !regexec(pattern, lastmatch, 10, matchs, 0);
+	text.str[text.siz - 2] = '\0';
+	r = !regexec(pattern, lastmatch, 10, matchs, 0);
+	text.str[text.siz - 2] = '\n';
+
+	return r;
 }
 
 static int
 rematch(int num)
 {
 	regoff_t off = matchs[0].rm_eo;
+	regmatch_t *m;
+	int r;
 
-	if (!regexec(pattern, lastmatch + off, 10, matchs, 0)) {
+	text.str[text.siz - 2] = '\0';
+	r = !regexec(pattern, lastmatch + off, 10, matchs, REG_NOTBOL);
+	text.str[text.siz - 2] = '\n';
+
+	if (!r)
+		return 0;
+
+	if (matchs[0].rm_eo > 0) {
 		lastmatch += off;
 		return 1;
 	}
 
-	return 0;
+	/* Zero width match was found at the end of the input, done */
+	if (lastmatch[off] == '\n') {
+		lastmatch += off;
+		return 0;
+	}
+
+	/* Zero width match at the current posiion, find the next one */
+	text.str[text.siz - 2] = '\0';
+	r = !regexec(pattern, lastmatch + off + 1, 10, matchs, REG_NOTBOL);
+	text.str[text.siz - 2] = '\n';
+
+	if (!r)
+		return 0;
+
+	/* Re-adjust matches to account for +1 in regexec */
+	for (m = matchs; m < &matchs[10]; m++) {
+		m->rm_so += 1;
+		m->rm_eo += 1;
+	}
+	lastmatch += off;
+
+	return 1;
 }
 
 static int
@@ -672,10 +704,8 @@ getinput(void)
 		if (ch == '\\') {
 			if ((ch = getchar()) == EOF)
 				break;
-			if (ch != '\n') {
-				ungetc(ch, stdin);
-				ch = '\\';
-			}
+			if (ch != '\n')
+				addchar('\\', &cmdline);
 		}
 		addchar(ch, &cmdline);
 	}
@@ -746,6 +776,51 @@ chksignals(void)
 	}
 }
 
+static const char *
+expandcmd(void)
+{
+	static String cmd;
+	char *p;
+	int c, repl = 0;
+
+	skipblank();
+	if ((c = input()) != '!') {
+		back(c);
+		string(&cmd);
+	} else if (cmd.siz) {
+		--cmd.siz;
+		repl = 1;
+	} else {
+		error("no previous command");
+	}
+
+	while ((c = input()) != '\0') {
+		switch (c) {
+		case '%':
+			if (savfname[0] == '\0')
+				error("no current filename");
+			repl = 1;
+			for (p = savfname; *p; ++p)
+				addchar(*p, &cmd);
+			break;
+		case '\\':
+			c = input();
+			if (c != '%') {
+				back(c);
+				c = '\\';
+			}
+		default:
+			addchar(c, &cmd);
+		}
+	}
+	addchar('\0', &cmd);
+
+	if (repl)
+		puts(cmd.str);
+
+	return cmd.str;
+}
+
 static void
 dowrite(const char *fname, int trunc)
 {
@@ -754,20 +829,21 @@ dowrite(const char *fname, int trunc)
 	FILE *aux;
 	static int sh;
 	static FILE *fp;
+	char *mode;
 
 	if (fp) {
 		sh ? pclose(fp) : fclose(fp);
 		fp = NULL;
 	}
 
-	if(fname[0] == '!') {
+	if (fname[0] == '!') {
 		sh = 1;
-		fname++;
-		if((fp = popen(fname, "w")) == NULL)
+		if((fp = popen(expandcmd(), "w")) == NULL)
 			error("bad exec");
 	} else {
 		sh = 0;
-		if ((fp = fopen(fname, "w")) == NULL)
+		mode = (trunc) ? "w" : "a";
+		if ((fp = fopen(fname, mode)) == NULL)
 			error("cannot open input file");
 	}
 
@@ -788,7 +864,8 @@ dowrite(const char *fname, int trunc)
 	if (r)
 		error("input/output error");
 	strcpy(savfname, fname);
-	modflag = 0;
+	if (!sh)
+		modflag = 0;
 	curln = line;
 	if (optdiag)
 		printf("%zu\n", bytecount);
@@ -797,28 +874,40 @@ dowrite(const char *fname, int trunc)
 static void
 doread(const char *fname)
 {
+	int r;
 	size_t cnt;
-	ssize_t n;
+	ssize_t len;
 	char *p;
 	FILE *aux;
-	static size_t len;
+	static size_t n;
+	static int sh;
 	static char *s;
 	static FILE *fp;
 
-	if (fp)
-		fclose(fp);
-	if ((fp = fopen(fname, "r")) == NULL)
+	if (fp) {
+		sh ? pclose(fp) : fclose(fp);
+		fp = NULL;
+	}
+
+	if(fname[0] == '!') {
+		sh = 1;
+		if((fp = popen(expandcmd(), "r")) == NULL)
+			error("bad exec");
+	} else if ((fp = fopen(fname, "r")) == NULL) {
 		error("cannot open input file");
+	}
 
 	curln = line2;
-	for (cnt = 0; (n = getline(&s, &len, fp)) > 0; cnt += (size_t)n) {
+	for (cnt = 0; (len = getline(&s, &n, fp)) > 0; cnt += (size_t)len) {
 		chksignals();
-		if (s[n-1] != '\n') {
-			if (len == SIZE_MAX || !(p = realloc(s, ++len)))
-				error("out of memory");
-			s = p;
-			s[n-1] = '\n';
-			s[n] = '\0';
+		if (s[len-1] != '\n') {
+			if (len+1 >= n) {
+				if (n == SIZE_MAX || !(p = realloc(s, ++n)))
+					error("out of memory");
+				s = p;
+			}
+			s[len] = '\n';
+			s[len+1] = '\0';
 		}
 		inject(s, AFTER);
 	}
@@ -827,7 +916,8 @@ doread(const char *fname)
 
 	aux = fp;
 	fp = NULL;
-	if (fclose(aux))
+	r = sh ? pclose(aux) : fclose(aux);
+	if (r)
 		error("input/output error");
 }
 
@@ -909,6 +999,10 @@ getfname(int comm)
 	static char fname[FILENAME_MAX];
 
 	skipblank();
+	if ((c = input()) == '!') {
+		return strcpy(fname, "!");
+	}
+	back(c);
 	for (bp = fname; bp < &fname[FILENAME_MAX]; *bp++ = c) {
 		if ((c = input()) == '\0')
 			break;
@@ -917,16 +1011,16 @@ getfname(int comm)
 		if (savfname[0] == '\0')
 			error("no current filename");
 		return savfname;
-	} else if (bp == &fname[FILENAME_MAX]) {
-		error("file name too long");
-	} else {
-		*bp = '\0';
-		if (savfname[0] == '\0' || comm == 'e' || comm == 'f')
-			strcpy(savfname, fname);
-		return fname;
 	}
+	if (bp == &fname[FILENAME_MAX])
+		error("file name too long");
+	*bp = '\0';
 
-	return NULL; /* not reached */
+	if (fname[0] == '!')
+		return fname;
+	if (savfname[0] == '\0' || comm == 'e' || comm == 'f')
+		strcpy(savfname, fname);
+	return fname;
 }
 
 static void
@@ -1010,7 +1104,6 @@ join(void)
 	addchar('\0', &s);
 	delete(line1, line2);
 	inject(s.str, BEFORE);
-	free(s.str);
 }
 
 static void
@@ -1055,45 +1148,7 @@ copy(int where)
 static void
 execsh(void)
 {
-	static String cmd;
-	char *p;
-	int c, repl = 0;
-
-	skipblank();
-	if ((c = input()) != '!') {
-		back(c);
-		string(&cmd);
-	} else if (cmd.siz) {
-		--cmd.siz;
-		repl = 1;
-	} else {
-		error("no previous command");
-	}
-
-	while ((c = input()) != '\0') {
-		switch (c) {
-		case '%':
-			if (savfname[0] == '\0')
-				error("no current filename");
-			repl = 1;
-			for (p = savfname; *p; ++p)
-				addchar(*p, &cmd);
-			break;
-		case '\\':
-			c = input();
-			if (c != '%') {
-				back(c);
-				c = '\\';
-			}
-		default:
-			addchar(c, &cmd);
-		}
-	}
-	addchar('\0', &cmd);
-
-	if (repl)
-		puts(cmd.str);
-	system(cmd.str);
+	system(expandcmd());
 	if (optdiag)
 		puts("!");
 }
@@ -1208,12 +1263,10 @@ subline(int num, int nth)
 
 	string(&s);
 	i = changed = 0;
-	for (m = match(num); m; m = rematch(num)) {
+	for (m = match(num); m; m = (nth < 0 || i < nth) && rematch(num)) {
 		chksignals();
 		addpre(&s);
 		changed |= addsub(&s, nth, ++i);
-		if (eol || bol)
-			break;
 	}
 	if (!changed)
 		return;
@@ -1249,6 +1302,7 @@ subst(int nth)
 static void
 docmd(void)
 {
+	char *var;
 	int cmd, c, line3, num, trunc;
 
 repeat:
@@ -1385,11 +1439,16 @@ repeat:
 	case 'z':
 		if (nlines > 1)
 			goto bad_address;
+
+		num = 0;
 		if (isdigit(back(input())))
 			num = getnum();
-		else
-			num = 24;
+		else if ((var = getenv("LINES")) != NULL)
+			num = atoi(var) - 1;
+		if (num <= 0)
+			num = 23;
 		chkprint(1);
+		deflines(curln, curln);
 		scroll(num);
 		break;
 	case 'k':
@@ -1407,13 +1466,22 @@ repeat:
 		chkprint(1);
 		optprompt ^= 1;
 		break;
+	case 'x':
+		trunc = 1;
+	case 'X':
+		ensureblank();
+		if (nlines > 0)
+			goto unexpected;
+		exstatus = 0;
+		deflines(nextln(0), lastln);
+		dowrite(getfname(cmd), trunc);
 	case 'Q':
-		modflag = 0;
 	case 'q':
 		if (nlines > 0)
 			goto unexpected;
-		if (modflag)
+		if (cmd != 'Q' && modflag)
 			goto modified;
+		modflag = 0;
 		quit();
 		break;
 	case 'f':
@@ -1427,18 +1495,17 @@ repeat:
 		chkprint(0);
 		break;
 	case 'E':
-		modflag = 0;
 	case 'e':
 		ensureblank();
 		if (nlines > 0)
 			goto unexpected;
-		if (modflag)
+		if (cmd == 'e' && modflag)
 			goto modified;
-		getfname(cmd);
 		setscratch();
 		deflines(curln, curln);
-		doread(savfname);
+		doread(getfname(cmd));
 		clearundo();
+		modflag = 0;
 		break;
 	default:
 		error("unknown command");
@@ -1518,7 +1585,7 @@ savecmd(void)
 static void
 doglobal(void)
 {
-	int cnt, ln, k, idx;
+	int cnt, ln, k, idx, c;
 
 	skipblank();
 	gflag = 1;
@@ -1537,7 +1604,12 @@ doglobal(void)
 			if (!uflag) {
 				idx = inputidx;
 				getlst();
-				docmd();
+				for (;;) {
+					docmd();
+					if (!(c = input()))
+						break;
+					back(c);
+				}
 				inputidx = idx;
 				continue;
 			}

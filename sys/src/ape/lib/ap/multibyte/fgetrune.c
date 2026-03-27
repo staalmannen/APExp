@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../utf.h"
+#include <utf.h>
 
 int
 fgetrune(Rune *r, FILE *fp)

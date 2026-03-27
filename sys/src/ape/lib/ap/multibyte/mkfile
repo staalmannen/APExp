@@ -5,6 +5,7 @@ APE=$APEXPROOT/sys/src/ape
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
 OFILES=\
+# libutf\
 	rune.$O\
 	runestrcat.$O\
 	runestrchr.$O\
@@ -25,6 +26,21 @@ OFILES=\
 	utfrrune.$O\
 	utfrune.$O\
 	utfutf.$O\
+# sbase libutf\
+	fgetrune.$O\
+	fputrune.$O\
+	isalnumrune.$O\
+	isblankrune.$O\
+	iscntrlrune.$O\
+	isdigitrune.$O\
+	isgraphrune.$O\
+	isprintrune.$O\
+	ispunctrune.$O\
+	istitlerune.$O\
+	isxdigitrune.$O\
+	runecmp.$O\
+	utftorunestr.$O\
+	charntorune.$O\
 
 HFILES=\
 	$APEXPROOT/sys/include/ape/utf.h\

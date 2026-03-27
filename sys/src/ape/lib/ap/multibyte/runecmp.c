@@ -19,7 +19,7 @@
  * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
  * DEALINGS IN THE SOFTWARE.
  */
-#include "../utf.h"
+#include <utf.h>
 
 int
 rune1cmp(const void *v1, const void *v2)
