@@ -1,4 +1,4 @@
-/* config.h.  Generated from config.h.in by configure.  */
+/* config.h.  Generated from config.h.in by configure. UC_RE */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
 /* Define if building universal (internal helper macro) */
@@ -24,9 +24,6 @@
 
 /* Define to 1 if // is a file system root distinct from /. */
 /* #undef DOUBLE_SLASH_IS_DISTINCT_ROOT */
-
-/* Define as good substitute value for EILSEQ. */
-#define EILSEQ ENOENT
 
 /* Define to 1 to enable a few rarely used encodings. */
 /* #undef ENABLE_EXTRA */
@@ -1439,22 +1436,6 @@
 
 /* Define to `int' if <sys/types.h> doesn't define. */
 /* #undef uid_t */
-
-
-  /* This definition is a duplicate of the one in unitypes.h.
-     It is here so that we can cope with an older version of unitypes.h
-     that does not contain this definition and that is pre-installed among
-     the public header files.  */
-  # if defined __restrict \
-       || 2 < __GNUC__ + (95 <= __GNUC_MINOR__) \
-       || __clang_major__ >= 3
-  #  define _UC_RESTRICT __restrict
-  # elif 199901L <= __STDC_VERSION__ || defined restrict
-  #  define _UC_RESTRICT restrict
-  # else
-  #  define _UC_RESTRICT
-  # endif
-  
 
 
 /* On Windows, variables that may be in a DLL must be marked specially.  */

@@ -24,7 +24,7 @@ all:VQ:
 %.$O:	%.s
 	$AS $AFLAGS $stem.s
 
-<./transpilers
+<$APEXPROOT/sys/src/cmd/transpilers
 
 $O.%:V:	%.$O $OFILES $LIB
 	$LD $LDFLAGS -o $target $prereq

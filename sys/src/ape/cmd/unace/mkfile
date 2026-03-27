@@ -64,7 +64,7 @@ OFILES=\
 CC=pcc
 LD=pcc
 CFLAGS= -c -D_POSIX_SOURCE -D_BSD_EXTENSION -I$ACESRC -I$ACESRC/src\
-		-I$ACESRC/lib -Dstrsep=strtok
+		-I$ACESRC/lib
 
 %.$O: $ACESRC/src/%.c
     $CC $CFLAGS $ACESRC/src/$stem.c

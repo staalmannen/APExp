@@ -16,7 +16,7 @@ $LIB:V:	$OFILES			# force archive even when not needed
 %.$O:	%.s
 	$AS $AFLAGS $stem.s
 
-<./transpilers
+<$APEXPROOT/sys/src/cmd/transpilers
 
 install:V: $LIB
 

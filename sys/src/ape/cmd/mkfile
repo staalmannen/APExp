@@ -19,7 +19,7 @@ _CORE_APPS=\
 	base\
 	pcregrep\
 	iconv\
-	expr\
+#	expr\
 
 _OPTIONAL_APPS=\
 # archivers \

@@ -25,7 +25,7 @@ y.tab.h y.tab.c:	$YFILES
 lex.yy.c:	$LFILES
 	$LEX $LFLAGS $prereq
 
-<./transpilers
+<$APEXPROOT/sys/src/cmd/transpilers
 
 %.install:V:	$BIN/%
 

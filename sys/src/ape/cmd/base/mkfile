@@ -69,22 +69,18 @@ UTF_OBJS=\
 		fgetrune.$O\
 		fputrune.$O\
 		isalnumrune.$O\
-		isalpharune.$O\
 		isblankrune.$O\
 		iscntrlrune.$O\
 		isdigitrune.$O\
 		isgraphrune.$O\
 		isprintrune.$O\
 		ispunctrune.$O\
-		isspacerune.$O\
 		istitlerune.$O\
 		isxdigitrune.$O\
-		lowerrune.$O\
-		rune.$O\
 		runetype.$O\
-		upperrune.$O\
-		utf.$O\
-		utftorunestr.$O
+		utftorunestr.$O\
+		charntorune.$O\
+
 
 BIN=$APEXPROOT/$objtype/bin/ape
 <$APEXPROOT/sys/src/cmd/mkmany

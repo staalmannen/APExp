@@ -22,7 +22,7 @@ $LIB:	$LIBOBJ
 y.tab.h y.tab.c:	$YFILES
 	yacc $YFLAGS $prereq
 
-<./transpilers
+<$APEXPROOT/sys/src/cmd/transpilers
 
 $LIB(%.$O):N:	%.$O
 
