@@ -161,6 +161,8 @@ Yes, the default build is "bloated" because I enable everything that I believe w
 
 ***Post scriptum***
 
-The unofficial mascot of the project is the [Rabbit of Caerbannog](https://en.wikipedia.org/wiki/Rabbit_of_Caerbannog),
-which fits both with the bunny theme of Glenda and the Monty Python Holy Grail reference and "killing knights".
+The unofficial mascot of the project are the rabbit knights riding snails in medieval art.
+![a jousting rabbit riding a snail with a human head](rabbit_riding_snail.jpg)
+
+It would be fun to have a Glenda-themed variant of this.
 
