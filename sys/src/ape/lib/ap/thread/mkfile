@@ -35,8 +35,8 @@ OFILES=\
 	pthread_ext.$O\
 
 
-HFILES=lib.h
+HFILES=../include/lib.h
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-c -D_POSIX_SOURCE -FTVw -D_SUSV2_SOURCE -D_PLAN9_SOURCE -I. -I../plan9
+CFLAGS=-c -D_POSIX_SOURCE -FTVw -D_SUSV2_SOURCE -D_PLAN9_SOURCE -I../include

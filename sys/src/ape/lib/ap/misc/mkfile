@@ -24,4 +24,4 @@ OFILES=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-c -I$APEXPROOT/sys/include/ape -D_POSIX_SOURCE -D_BSD_EXTENSION -D_PLAN9_SOURCE -I../plan9 -I../include
+CFLAGS=-c -D_POSIX_SOURCE -D_BSD_EXTENSION -D_PLAN9_SOURCE -I../include
