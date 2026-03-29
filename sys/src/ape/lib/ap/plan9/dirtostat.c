@@ -14,6 +14,8 @@ _dirtostat(struct stat *s, Dir *d, Fdinfo *fi)
 	s->st_dev = (d->type<<8)|(d->dev&0xFF);
 	s->st_ino = d->qid.path;
 	s->st_mode = d->mode&0777;
+	st->st_blksize = 8192;       /* reasonable default for Plan9 */
+	st->st_blocks = (d->length + 511) / 512;
 	if(fi && (fi->flags&FD_ISTTY))
 		s->st_mode |= S_IFCHR;
 	else if(d->mode & 0x80000000)

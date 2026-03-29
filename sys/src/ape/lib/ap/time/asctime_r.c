@@ -4,7 +4,7 @@
 #include "locale_impl.h"
 #include "atomic.h"
 
-char *__asctime_r(const struct tm *restrict tm, char *restrict buf)
+char *__asctime_r(const struct tm *tm, char *buf)
 {
 	if (snprintf(buf, 26, "%.3s %.3s%3d %.2d:%.2d:%.2d %d\n",
 		__nl_langinfo_l(ABDAY_1+tm->tm_wday, C_LOCALE),
