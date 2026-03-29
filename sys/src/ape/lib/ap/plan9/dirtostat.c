@@ -32,9 +32,12 @@ _dirtostat(struct stat *s, Dir *d, Fdinfo *fi)
 		s->st_size = fi->buf->n;
 	else
 		s->st_size = d->length;
-	s->st_atime = d->atime;
-	s->st_mtime = d->mtime;
-	s->st_ctime = d->mtime;
+		st->st_atim.tv_sec  = d->atime;
+		st->st_atim.tv_nsec = 0;
+		st->st_mtim.tv_sec  = d->mtime;
+		st->st_mtim.tv_nsec = 0;
+		st->st_ctim.tv_sec  = d->mtime;
+		st->st_ctim.tv_nsec = 0;
 	if(fi && fi->uid != -2){
 		s->st_uid = fi->uid;
 		s->st_gid = fi->gid;

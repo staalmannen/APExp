@@ -54,7 +54,7 @@ the most capable web browser available on Plan9.
 ***Starting material :*** Imported the latest 9front APE sources from git [7] (date: 2024-04-24; rebased 2026-01-29, which included the bitfield patch from @jamoson (bitfield support in kencc) [8]).
 In addition, several patches from @lufia [9, 10] to build libressl and curl
 (introduces pthread, include_next cpp support, etc) has been applied to the
-sources. To get more C99 compatibility, vibe-coded (claude.ai) patches have been introduced (hex float support). This served as a base to add ports of third party libraries and utilities to enhance compatibility.
+sources. To get more C99 compatibility, vibe-coded (claude.ai) patches have been introduced (VLA, hex float support, complex support, compound literals, division by 0, dropping keywords). This served as a base to add ports of third party libraries and utilities to enhance compatibility.
 
 
 Install paths have been modified so that libraries and binaries are installed in the local directory structure of APExp. A bind script (apexp-sh) in the root of APExp can be used to overlay APExp over the native APE.

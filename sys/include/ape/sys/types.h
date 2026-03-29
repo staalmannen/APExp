@@ -16,6 +16,8 @@ typedef unsigned short	u_short;
 typedef unsigned int	u_int;
 typedef unsigned long	u_long;
 typedef unsigned int	in_addr_t;
+typedef long      blksize_t;   /* preferred I/O block size */
+typedef long long blkcnt_t;    /* count of file system blocks */
 
 #ifndef _SIZE_T
 #define _SIZE_T
@@ -36,7 +38,7 @@ typedef long time_t;
 typedef int clockid_t;
 #endif
 
-#ifdef _BSD_EXTENSION
+
 #ifndef _CADDR_T
 #define _CADDR_T
 typedef char * caddr_t;
@@ -53,7 +55,6 @@ typedef struct fd_set {
 #define FD_ZERO(p)	((p)->fds_bits[0] =0, (p)->fds_bits[1] =0, (p)->fds_bits[2] =0)
 #ifndef FD_SETSIZE
 #define FD_SETSIZE	96
-#endif
 #endif
 #endif
 
