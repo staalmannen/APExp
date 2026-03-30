@@ -12,4 +12,4 @@ OFILES=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=$CFLAGS -c -I../include -D_POSIX_SOURCE
+CFLAGS=$CFLAGS -c -I../include -D_POSIX_SOURCE -D_PLAN9_SOURCE

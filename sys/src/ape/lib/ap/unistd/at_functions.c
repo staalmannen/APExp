@@ -1,4 +1,4 @@
-#include "../plan9/lib.h"
+#include "../include/lib.h"
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/stat.h>

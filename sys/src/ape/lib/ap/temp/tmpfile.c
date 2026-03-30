@@ -3,7 +3,7 @@
 #include <string.h>
 #include "sys9.h"
 #undef OPEN
-#include "../stdio/iolib.h"
+#include "../include/iolib.h"
 #include "lib.h"
 #include "dir.h"
 

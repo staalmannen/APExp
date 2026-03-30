@@ -1,10 +1,10 @@
-#include "../plan9/lib.h"
+#include "../include/lib.h"
 #include <sys/types.h>
 #include <unistd.h>
 #include <fcntl.h>
 #include <errno.h>
-#include "../plan9/dir.h"
-#include "../plan9/sys9.h"
+#include "../include/dir.h"
+#include "../include/sys9.h"
 
 int
 truncate(const char *path, off_t length)

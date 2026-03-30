@@ -1,7 +1,7 @@
-#include "../plan9/lib.h"
+#include "../include/lib.h"
 #include <unistd.h>
 #include <time.h>
-#include "../plan9/sys9.h"
+#include "../include/sys9.h"
 
 int
 usleep(unsigned int usec)

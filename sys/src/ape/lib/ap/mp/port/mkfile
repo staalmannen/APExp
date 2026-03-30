@@ -67,7 +67,7 @@ UPDATE=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-TVwc -+ -D_POSIX_SOURCE -D_PLAN9_SOURCE -I. -I../../plan9
+CFLAGS=-TVwc -+ -D_POSIX_SOURCE -D_PLAN9_SOURCE -I. -I../../include
 
 %.$O:	%.c
 	$CC $CFLAGS $stem.c

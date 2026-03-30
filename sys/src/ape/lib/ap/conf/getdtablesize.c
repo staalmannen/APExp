@@ -1,5 +1,5 @@
 #include <unistd.h>
-#include "../plan9/lib.h"
+#include "../include/lib.h"
 
 /*
  * getdtablesize - return maximum number of open file descriptors.

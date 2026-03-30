@@ -1,4 +1,4 @@
-#include <lib9.h>
+#include "/sys/include/ape/lib9.h"
 
 const char *
 getprogname(void)

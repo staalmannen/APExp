@@ -1,8 +1,8 @@
 //#define _PLAN9_SOURCE
-#include "../plan9/lib.h"
+#include "../include/lib.h"
 #include <sys/types.h>
 #include <time.h>
-#include "../plan9/sys9.h"
+#include "../include/sys9.h"
 
 int
 nanosleep(struct timespec *req, struct timespec *rem)

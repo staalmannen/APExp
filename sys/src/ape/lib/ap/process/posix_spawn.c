@@ -1,4 +1,4 @@
-#include "../plan9/lib.h"
+#include "../include/lib.h"
 #include <errno.h>
 #include <stdlib.h>
 #include <unistd.h>

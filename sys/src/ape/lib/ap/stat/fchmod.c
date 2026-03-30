@@ -1,9 +1,9 @@
-#include "../plan9/lib.h"
+#include "../include/lib.h"
 #include <sys/stat.h>
 #include <errno.h>
 #include <stdlib.h>
-#include "../plan9/sys9.h"
-#include "../plan9/dir.h"
+#include "../include/sys9.h"
+#include "../include/dir.h"
 
 int
 fchmod(int fd, mode_t mode)

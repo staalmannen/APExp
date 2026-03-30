@@ -1,7 +1,7 @@
 #ifndef SYS9_H
 #define SYS9_H
 
-#include <lib9.h>
+#include "/sys/include/ape/lib9.h"
 
 typedef
 struct Waitmsg

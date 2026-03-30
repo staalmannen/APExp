@@ -14,8 +14,8 @@ _dirtostat(struct stat *s, Dir *d, Fdinfo *fi)
 	s->st_dev = (d->type<<8)|(d->dev&0xFF);
 	s->st_ino = d->qid.path;
 	s->st_mode = d->mode&0777;
-	st->st_blksize = 8192;       /* reasonable default for Plan9 */
-	st->st_blocks = (d->length + 511) / 512;
+	s->st_blksize = 8192;       /* reasonable default for Plan9 */
+	s->st_blocks = (d->length + 511) / 512;
 	if(fi && (fi->flags&FD_ISTTY))
 		s->st_mode |= S_IFCHR;
 	else if(d->mode & 0x80000000)
@@ -34,12 +34,12 @@ _dirtostat(struct stat *s, Dir *d, Fdinfo *fi)
 		s->st_size = fi->buf->n;
 	else
 		s->st_size = d->length;
-		st->st_atim.tv_sec  = d->atime;
-		st->st_atim.tv_nsec = 0;
-		st->st_mtim.tv_sec  = d->mtime;
-		st->st_mtim.tv_nsec = 0;
-		st->st_ctim.tv_sec  = d->mtime;
-		st->st_ctim.tv_nsec = 0;
+		s->st_atim.tv_sec  = d->atime;
+		s->st_atim.tv_nsec = 0;
+		s->st_mtim.tv_sec  = d->mtime;
+		s->st_mtim.tv_nsec = 0;
+		s->st_ctim.tv_sec  = d->mtime;
+		s->st_ctim.tv_nsec = 0;
 	if(fi && fi->uid != -2){
 		s->st_uid = fi->uid;
 		s->st_gid = fi->gid;

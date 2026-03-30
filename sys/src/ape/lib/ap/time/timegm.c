@@ -1,4 +1,4 @@
-#include "../plan9/lib.h"
+#include "../include/lib.h"
 #include <time.h>
 #include <string.h>
 #include <stdlib.h>
