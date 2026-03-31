@@ -5,6 +5,7 @@ _CORE_LIBS=\
 	auth\
 	bio\
 	draw\
+	l\
 	plumb\
 	sec\
 
@@ -17,9 +18,7 @@ _OPTIONAL_LIBS=\
 	edit\
 	fortran\
 	gettextpo\
-#	iconv\
 	intl\
-	l\
 	lua\
 	lzma\
 	pascal\

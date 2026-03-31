@@ -224,10 +224,11 @@ static unsigned uni_to_jis(unsigned c)
 	}
 }
 
-size_t iconv(iconv_t cd, char **restrict in, size_t *restrict inb, char **restrict out, size_t *restrict outb)
+size_t iconv(iconv_t cd, char **in, size_t *inb, char **out, size_t *restrict outb)
 {
 	char *hkscs_in;
 	size_t hkscs_inb, hkscs_outb, tmpx;
+	locale_t *ploc, loc;
 	size_t x=0;
 	struct stateful_cd *scd=0;
 	if (!((size_t)cd & 1)) {
@@ -245,7 +246,8 @@ size_t iconv(iconv_t cd, char **restrict in, size_t *restrict inb, char **restri
 	int err;
 	unsigned char type = map[-1];
 	unsigned char totype = tomap[-1];
-	locale_t *ploc = &CURRENT_LOCALE, loc = *ploc;
+	*ploc = (locale_t) UTF8_LOCALE;
+	loc = *ploc;
 
 	if (!in || !*in || !*inb) return 0;
 

@@ -178,7 +178,6 @@ LIB=\
 	$APEXPROOT/$objtype/lib/ape/libgettextpo.a\
 	$APEXPROOT/$objtype/lib/ape/libintl.a\
 	$APEXPROOT/$objtype/lib/ape/libxml.a\
-	$APEXPROOT/$objtype/lib/ape/libiconv.a\
 	$APEXPROOT/$objtype/lib/ape/libcurses.a\
 
 

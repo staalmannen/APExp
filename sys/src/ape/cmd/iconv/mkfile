@@ -3,58 +3,20 @@ APEXPROOT=../../../../..
 
 TARG=iconv
 
-OFILES= iconv.$O\
-#srclib \
-		canonicalize-lgpl.$O\
-		error.$O\
-		mempcpy.$O\
-		progname.$O\
-		progreloc.$O\
-		_relocatable.$O\
-		rawmemchr.$O\
-		safe-read.$O\
-		strerror.$O\
-		strerror-override.$O\
-		xmalloc.$O\
-#srclib/malloc \
-		scratch_buffer_grow.$O\
-		scratch_buffer_grow_preserve.$O\
-		scratch_buffer_dupfree.$O\
-		scratch_buffer_set_array_size.$O\
-#srclib/uniwidth \
-		width.$O
-
-LIB=$APEXPROOT/$objtype/lib/ape/libiconv.a $APEXPROOT/$objtype/lib/ape/libintl.a
+OFILES= iconv.$O
 
 BIN=$APEXPROOT/$objtype/bin/ape
-HFILES=$APEXPROOT/sys/include/ape/iconv.h
+HFILES=hacks.h
 
 <$APEXPROOT/sys/src/cmd/mkone
-
-ICONVSRC=../../../external/libiconv
 
 #during building from scratch, the new pcc is not picked up and compilation
 #fails on include_next
 CC=$APEXPROOT/$objtype/bin/pcc
 
-CFLAGS=-c -I$ICONVSRC -I$ICONVSRC/src -I$ICONVSRC/include -I$ICONVSRC/srclib\
-		-I$ICONVSRC/srclib/uniwidth -DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION\
-		-DENABLE_NLS -DENABLE_RELOCATABLE -DINSTALLDIR="/bin" \
-		-DDEPENDS_ON_LIBINTL\
+CFLAGS=-c -D_POSIX_SOURCE -D_BSD_EXTENSION\
 		-DLOCALEDIR="/sys/lib/ape/locale"\
-		-DTARGET_PROGRAM_NAME="iconv" -DEXEEXT=""
 
-%.$O: $ICONVSRC/src/%.c
-	$CC $CFLAGS $ICONVSRC/src/$stem.c
-
-%.$O: $ICONVSRC/srclib/%.c
-	$CC $CFLAGS $ICONVSRC/srclib/$stem.c
-
-%.$O: $ICONVSRC/srclib/malloc/%.c
-	$CC $CFLAGS $ICONVSRC/srclib/malloc/$stem.c
-
-%.$O: $ICONVSRC/srclib/uniwidth/%.c
-	$CC $CFLAGS $ICONVSRC/srclib/uniwidth/$stem.c
 
 install:V:
 	

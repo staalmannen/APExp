@@ -18,7 +18,6 @@ _CORE_APPS=\
 # core utilities \
 	base\
 	pcregrep\
-	iconv\
 #	expr\
 
 _OPTIONAL_APPS=\

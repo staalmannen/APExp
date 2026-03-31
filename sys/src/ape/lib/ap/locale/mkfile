@@ -6,6 +6,7 @@ OFILES=\
 	locale.$O\
 # musl \
 	__lctrans.$O\
+	c_locale.$O\
 	catclose.$O\
 	catgets.$O\
 	catopen.$O\
@@ -14,6 +15,9 @@ OFILES=\
 	langinfo.$O\
 	strtod_l.$O\
 	strfmon.$O\
+# stub\
+	locale_charset.$O\
+
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
