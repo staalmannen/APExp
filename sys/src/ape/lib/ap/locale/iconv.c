@@ -226,6 +226,8 @@ static unsigned uni_to_jis(unsigned c)
 
 size_t iconv(iconv_t cd, char **restrict in, size_t *restrict inb, char **restrict out, size_t *restrict outb)
 {
+	char *hkscs_in;
+	size_t hkscs_inb, hkscs_outb, tmpx;
 	size_t x=0;
 	struct stateful_cd *scd=0;
 	if (!((size_t)cd & 1)) {
@@ -470,13 +472,17 @@ size_t iconv(iconv_t cd, char **restrict in, size_t *restrict inb, char **restri
 						wchar_t wc[2];
 					} tmp;
 					char *ptmp = tmp.c;
-					size_t tmpx = iconv(combine_to_from(to, find_charmap("utf8")),
-						&(char *){"\303\212\314\204"
-						"\303\212\314\214"
-						"\303\252\314\204"
-						"\303\252\314\214"
-						+c%256}, &(size_t){4},
-						&ptmp, &(size_t){sizeof tmp});
+					static const char hkscs_pairs[] =
+					"\303\212\314\204"
+					"\303\212\314\214"
+					"\303\252\314\204"
+					"\303\252\314\214";
+					char *hkscs_in = (char *)(hkscs_pairs + c%256);
+					hkscs_inb = 4;
+					hkscs_outb = sizeof tmp;
+					tmpx = iconv(combine_to_from(to, find_charmap("utf8")),
+					&hkscs_in, &hkscs_inb,
+					&ptmp, &hkscs_outb);
 					size_t tmplen = ptmp - tmp.c;
 					if (tmplen > *outb) goto toobig;
 					if (tmpx) x++;
