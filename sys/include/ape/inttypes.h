@@ -1,6 +1,8 @@
 #ifndef _INTTYPES_H_
 #define _INTTYPES_H_ 1
 
+#pragma lib "/$M/lib/ape/libap.a"
+
 #include <stdint.h>
 
 #define PRId8 "d"

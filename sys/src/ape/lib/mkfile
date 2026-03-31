@@ -17,7 +17,7 @@ _OPTIONAL_LIBS=\
 	edit\
 	fortran\
 	gettextpo\
-	iconv\
+#	iconv\
 	intl\
 	l\
 	lua\

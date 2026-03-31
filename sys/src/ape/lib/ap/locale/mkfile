@@ -9,6 +9,8 @@ OFILES=\
 	catclose.$O\
 	catgets.$O\
 	catopen.$O\
+	iconv.$O\
+	iconv_close.$O\
 	langinfo.$O\
 	strtod_l.$O\
 	strfmon.$O\
