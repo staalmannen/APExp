@@ -90,7 +90,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - system awk has been replaced by GNU awk (version 5.3.0) as ape/awk
 - GNU m4 (version 1.4.19) has been added
 - GNU gettext utilities (version 0.22.5) have been added
-- iconv utility has been added from nbase (NetBSD) [13]
+- A "musl" iconv utility has been added from alpine linux.
 - system yacc has been replaced by byacc (version 20240109) as ape/yacc
 - system lex has been replaced by flex (version 2.6.4) as ape/lex
 - vibe-coded (claude.ai) GAS-compatible "as" front end to native $Oa assemblers.

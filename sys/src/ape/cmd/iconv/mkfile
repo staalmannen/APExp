@@ -6,7 +6,6 @@ TARG=iconv
 OFILES= iconv.$O
 
 BIN=$APEXPROOT/$objtype/bin/ape
-HFILES=hacks.h
 
 <$APEXPROOT/sys/src/cmd/mkone
 

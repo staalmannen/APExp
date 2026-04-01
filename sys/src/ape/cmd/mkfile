@@ -14,6 +14,7 @@ _CORE_APPS=\
 # often invoked during make \
 	make\
 	m4\
+	iconv\
 	gettext\
 # core utilities \
 	base\
