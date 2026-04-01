@@ -29,7 +29,11 @@
 
 #include <sys/cdefs.h>
 
+#include <bsd.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include <err.h>
+#include <errno.h>
 #include <stdarg.h>
 
 void

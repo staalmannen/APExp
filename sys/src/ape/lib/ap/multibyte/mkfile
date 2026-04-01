@@ -36,7 +36,6 @@ OFILES=\
 	isgraphrune.$O\
 	isprintrune.$O\
 	ispunctrune.$O\
-	istitlerune.$O\
 	isxdigitrune.$O\
 	runecmp.$O\
 	utftorunestr.$O\
