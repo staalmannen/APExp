@@ -27,11 +27,8 @@
  */
 
 #include <sys/cdefs.h>
-#if defined(LIBC_SCCS) && !defined(lint)
-__RCSID("$NetBSD: iconv.c,v 1.19 2013/10/07 02:00:46 dholland Exp $");
-#endif /* LIBC_SCCS and not lint */
 
-#include <error.h>
+#include <err.h>
 #include <errno.h>
 #include <iconv.h>
 #include <langinfo.h>
