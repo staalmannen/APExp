@@ -1,7 +1,16 @@
 </$objtype/mkfile
 
-all:V:
-	mk -f mkfile.bootstrap $target
+install:V:
+	mk -f mkfile.bootstrap install
+
+installall:V:
+	mk -f mkfile.bootstrap installall
+
+clean:V:
+	mk -f mkfile.bootstrap clean
+
+nuke:V:
+	mk -f mkfile.bootstrap nuke
 
 # placeholder until I have made mkfile.rebuild work ...
 #	if (test -e /$objtype/ape/bin/objc1) mk -f mkfile.rebuild $target

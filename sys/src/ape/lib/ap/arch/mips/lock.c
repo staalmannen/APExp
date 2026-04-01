@@ -1,7 +1,7 @@
 #define _LOCK_EXTENSION
 #include <stdlib.h>
 #include <string.h>
-#include "../plan9/sys9.h"
+#include "../../include/sys9.h"
 #include <lock.h>
 
 enum

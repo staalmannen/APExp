@@ -2,6 +2,7 @@ APEXPROOT=../../../../../../../
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+
 OFILES=\
 	cycles.$O\
 	lock.$O\
@@ -35,5 +36,5 @@ OFILES=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-c -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../../plan9
+CFLAGS=-c -D_POSIX_SOURCE -D_PLAN9_SOURCE -I../../include
 

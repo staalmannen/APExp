@@ -25,7 +25,7 @@ OFILES=\
 HFILES=\
 	$APEXPROOT/sys/include/ape/auth.h\
 	authlocal.h\
-	../ap/plan9/libc.h
+	../ap/include/libc.h
 
 UPDATE=\
 	mkfile\
@@ -35,7 +35,7 @@ UPDATE=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-TVwc -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_NET_EXTENSION -I. -I../ap/plan9
+CFLAGS=-TVwc -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_NET_EXTENSION -I. -I../ap/include
 
 %.$O:	%.c
 	$CC $CFLAGS $stem.c

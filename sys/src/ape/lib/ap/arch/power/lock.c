@@ -1,5 +1,5 @@
-#include "../plan9/lib.h"
-#include "../plan9/sys9.h"
+#include "../../include/lib.h"
+#include "../../include/sys9.h"
 #define _LOCK_EXTENSION
 #include <lock.h>
 

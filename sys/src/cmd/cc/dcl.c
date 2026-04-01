@@ -116,7 +116,7 @@ compoundlit(Type *t, Node *initnode)
 	if(init != Z) {
 		seq          = new(OCOMMA, init, var);
 		seq->type    = t;
-		seq->addable = 1;	/* compound literal is an lvalue (C99 §6.5.2.5p4) */
+//		seq->addable = 1;	/* compound literal is an lvalue (C99 §6.5.2.5p4) */
 		return seq;
 	}
 	return var;

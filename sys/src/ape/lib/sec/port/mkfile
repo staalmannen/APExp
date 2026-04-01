@@ -57,7 +57,7 @@ UPDATE=mkfile\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-TVwc -+ -D_POSIX_SOURCE -D_PLAN9_SOURCE -I. -I../../ap/plan9 -I../../ap/mp/port 
+CFLAGS=-TVwc -+ -D_POSIX_SOURCE -D_PLAN9_SOURCE -I. -I../../ap/include -I../../ap/mp/port 
 
 # no idea how this works and it got messed up when I reorganized sources.
 #%.c:D:	%.mp

@@ -5,7 +5,6 @@ LIB=libgnu.a$O\
 	$APEXPROOT/$objtype/lib/ape/libintl.a\
 	$APEXPROOT/$objtype/lib/ape/libgettextpo.a\
 	$APEXPROOT/$objtype/lib/ape/libtextstyle.a\
-	$APEXPROOT/$objtype/lib/ape/libiconv.a\
 	$APEXPROOT/$objtype/lib/ape/libxml.a
 
 OFILES=\
@@ -118,7 +117,7 @@ UNRPL= -Drpl_readlink=readlink -Drpl_lseek=lseek -Drpl_posix_spawn_file_actions_
 		-Drpl_fcntl=fcntl -Drpl_mkstemp=mkstemp
 
 
-CFLAGS=-c -B -I. -I$M4SRC -I$M4SRC/src  -I$M4SRC/lib -DHAVE_CONFIG_H  -Doption=gnu_option\
+CFLAGS=-c -B -I. -I$M4SRC -I$M4SRC/src  -I$M4SRC/lib -DHAVE_CONFIG_H\
 	-D__USE_GNU -D_REGEX_LARGE_OFFSETS -D_POSIX_SOURCE -DO_BINARY=0\
 	-D_BSD_EXTENSION -DSETLOCALE_NULL_MAX=(256+1) $UNRPL
 

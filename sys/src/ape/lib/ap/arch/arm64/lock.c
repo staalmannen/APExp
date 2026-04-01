@@ -1,5 +1,5 @@
 #define _LOCK_EXTENSION
-#include "../plan9/sys9.h"
+#include "../../include/sys9.h"
 #include <lock.h>
 
 extern int	tas(int*);
