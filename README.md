@@ -62,20 +62,22 @@ Install paths have been modified so that libraries and binaries are installed in
 
 ***Libraries and headers***
 
-- libap, libbsd, libutf, libfmt, libv and libnet are merged, 3rd party libc functions from musl libc
+- libap, lib9, libbsd, libutf, libfmt, libv, libmp and libnet are merged
+- 3rd party libc functions primarily from musl libc, but also some from NetBSD (fts-standalone, libnbcompat)
 - sys/src/ape/lib/ap has been reorganized like the musl src directory
-- imported several math, regex, search and other functions from musl libc
+- imported several fenv, math, regex, search and other functions from musl libc
+- err.h provided by libnbcompat (NetBSD) [11]
 - regex.h provided by musl libc
+- iconv.h provided by musl libc
 - OpenBSD sys/queue.h copied from suckless sbase
 - getopt.h gnu getopt_long from musl libc
 - strings.h shim pointing to bsd.h
 - stdio.h : added fmemopen, getdelim/getline from musl libc
 - fchown/fchmod stubs introduced
-- wchar.h/wctype.h provided by the thin "libwtf" [11], integrated in libutf
+- wchar.h/wctype.h provided by the thin "libwtf" [12]
 
 
 - curses.h, term.h, panel.h provided by PDCursesMod (built with wchar)
-- iconv.h provided by GNU libiconv (version 1.17 )
 - gettext libintl from GNU (version 0.22.5 )
 
 
@@ -88,11 +90,11 @@ Install paths have been modified so that libraries and binaries are installed in
 - system awk has been replaced by GNU awk (version 5.3.0) as ape/awk
 - GNU m4 (version 1.4.19) has been added
 - GNU gettext utilities (version 0.22.5) have been added
-- GNU iconv utility (version 1.17) has been added
+- iconv utility has been added from nbase (NetBSD) [13]
 - system yacc has been replaced by byacc (version 20240109) as ape/yacc
 - system lex has been replaced by flex (version 2.6.4) as ape/lex
 - vibe-coded (claude.ai) GAS-compatible "as" front end to native $Oa assemblers.
-- the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" et al. have been built from suckless sbase under ape
+- the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" et al. have been built from suckless sbase [14]
 - steve's mkmk (/n/sources/contrib) imported to APExp
 - copied "head", "which", and "printenv" rc scripts from steve (/n/sources/contrib)
 
@@ -155,7 +157,13 @@ Yes, the default build is "bloated" because I enable everything that I believe w
 
 [10] https://inbox.vuxu.org/9front/0e170f2c1818fb21b795c2151e52adaf.squirrel@mx.sdf.org/
 
-[11] https://github.com/staalmannen/libwtf
+[11] https://github.com/archiecobbs/libnbcompat
+
+[12] https://github.com/staalmannen/libwtf
+
+[13] https://github.com/cheusov/nbase
+
+[14] https://core.suckless.org/sbase/
 
 
 

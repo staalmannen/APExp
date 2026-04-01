@@ -2,6 +2,6 @@
 #include	<limits.h>
 #include	<string.h>
 
-char *locale_charset(void) { return "UTF8"; }
+char *locale_charset(void) { return "UTF-8"; }
 
 
