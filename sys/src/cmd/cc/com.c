@@ -620,6 +620,7 @@ tcomo(Node *n, int f)
 		if(o | tcom(r))
 			goto bad;
 		n->type = r->type;
+		n->addable = r->addable;	/* compound literal lvalue: propagate addressability */
 		break;
 
 	case OINIT:		/* compound literal initialiser */
