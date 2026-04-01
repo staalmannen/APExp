@@ -11,19 +11,37 @@ TARG= \
 		cat\
 		cmp\
 		cut\
+		comm\
+#		cols\
 		dirname\
+#		ed\
+		expand\
 		false\
 #		find\
+		head\
 		kill\
-#		ls\
+		ls\
+		od\
+#		paste\
+		printenv\
 		printf\
+		rev\
+		seq\
 		sort\
-#		test\
+		sponge\
+		strings\
+		tail\
+		test\
 		true\
 		tr\
 		tsort\
 		uname\
+		uniq\
+		unexpand\
+#		which\
+		whoami\
 		xargs\
+		xinstall\
 		yes
 
 UTIL_OBJS=\
@@ -84,7 +102,7 @@ CPPFLAGS =\
 	-D_FILE_OFFSET_BITS=64
 
 SBASE_CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil -I$SBASESRC/../gnulib -D_POSIX_SOURCE -D_BSD_EXTENSION \
-		-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE -DAT_EACCESS=NULL -DAT_FDCWD=NULL
+		-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE -DAT_EACCESS=NULL -DAT_FDCWD=NULL -Dlchown=chown
 
 libutil.a$O: $UTIL_OBJS
 			ar vu libutil.a$O $UTIL_OBJS
