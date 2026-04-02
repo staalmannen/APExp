@@ -512,7 +512,7 @@ unsigned char myesc (unsigned char array[])
 			c = array[sptr];
 			array[sptr] = '\0';
 
-			esc_char = (unsigned char) strtoul ( (const char *) (array + 1), NULL, 8);
+			esc_char = (unsigned char) strtoul (array + 1, NULL, 8);
 
 			array[sptr] = c;
 
@@ -534,7 +534,7 @@ unsigned char myesc (unsigned char array[])
 			c = array[sptr];
 			array[sptr] = '\0';
 
-			esc_char = (unsigned char) strtoul ((const char *) (array + 2), NULL, 16);
+			esc_char = (unsigned char) strtoul (array + 2, NULL, 16);
 
 			array[sptr] = c;
 
