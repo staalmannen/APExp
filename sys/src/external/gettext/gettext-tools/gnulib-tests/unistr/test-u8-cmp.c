@@ -1,5 +1,5 @@
 /* Test of u8_cmp() function.
-   Copyright (C) 2010-2024 Free Software Foundation, Inc.
+   Copyright (C) 2010-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -41,5 +41,5 @@ main ()
     ASSERT (U_CMP (input2, input1, 4) < 0);
   }
 
-  return 0;
+  return test_exit_status;
 }

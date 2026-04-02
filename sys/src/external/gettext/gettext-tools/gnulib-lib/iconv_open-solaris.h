@@ -1,5 +1,5 @@
-/* ANSI-C code produced by gperf version 3.2 */
-/* Command-line: gperf -m 10 ./iconv_open-solaris.gperf  */
+/* ANSI-C code produced by gperf version 3.3 */
+/* Command-line: gperf -m 10 iconv_open-solaris.gperf  */
 /* Computed positions: -k'10' */
 
 #if !((' ' == 32) && ('!' == 33) && ('"' == 34) && ('#' == 35) \
@@ -29,7 +29,7 @@
 #error "gperf generated tables don't work with this execution character set. Please report a bug to <bug-gperf@gnu.org>."
 #endif
 
-#line 17 "./iconv_open-solaris.gperf"
+#line 17 "iconv_open-solaris.gperf"
 struct mapping { int standard_name; const char vendor_name[10 + 1]; };
 
 #define TOTAL_KEYWORDS 13
@@ -84,9 +84,9 @@ mapping_hash (register const char *str, register size_t len)
     {
       default:
         hval += asso_values[(unsigned char)str[9]];
-#if defined __cplusplus && (__cplusplus >= 201703L || (__cplusplus >= 201103L && defined __clang_major__ && defined __clang_minor__ && __clang_major__ + (__clang_minor__ >= 9) > 3))
+#if (defined __cplusplus && (__cplusplus >= 201703L || (__cplusplus >= 201103L && defined __clang__ && __clang_major__ + (__clang_minor__ >= 9) > 3))) || (defined __STDC_VERSION__ && __STDC_VERSION__ >= 202000L && ((defined __GNUC__ && __GNUC__ >= 10) || (defined __clang__ && __clang_major__ >= 9)))
       [[fallthrough]];
-#elif defined __GNUC__ && __GNUC__ >= 7
+#elif (defined __GNUC__ && __GNUC__ >= 7) || (defined __clang__ && __clang_major__ >= 10)
       __attribute__ ((__fallthrough__));
 #endif
       /*FALLTHROUGH*/
@@ -134,37 +134,44 @@ static const struct stringpool_t stringpool_contents =
   };
 #define stringpool ((const char *) &stringpool_contents)
 
+#if (defined __GNUC__ && __GNUC__ + (__GNUC_MINOR__ >= 6) > 4) || (defined __clang__ && __clang_major__ >= 3)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+#endif
 static const struct mapping mappings[] =
   {
     {-1}, {-1}, {-1}, {-1}, {-1},
-#line 35 "./iconv_open-solaris.gperf"
+#line 35 "iconv_open-solaris.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str5, "646"},
-#line 46 "./iconv_open-solaris.gperf"
+#line 46 "iconv_open-solaris.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str6, "ansi-1251"},
-#line 34 "./iconv_open-solaris.gperf"
+#line 34 "iconv_open-solaris.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str7},
     {-1}, {-1},
-#line 36 "./iconv_open-solaris.gperf"
+#line 36 "iconv_open-solaris.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str10, "ISO8859-1"},
-#line 45 "./iconv_open-solaris.gperf"
+#line 45 "iconv_open-solaris.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str11, "ISO8859-15"},
-#line 44 "./iconv_open-solaris.gperf"
+#line 44 "iconv_open-solaris.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str12, "ISO8859-9"},
-#line 43 "./iconv_open-solaris.gperf"
+#line 43 "iconv_open-solaris.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str13, "ISO8859-8"},
-#line 42 "./iconv_open-solaris.gperf"
+#line 42 "iconv_open-solaris.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str14, "ISO8859-7"},
-#line 41 "./iconv_open-solaris.gperf"
+#line 41 "iconv_open-solaris.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str15, "ISO8859-6"},
-#line 40 "./iconv_open-solaris.gperf"
+#line 40 "iconv_open-solaris.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str16, "ISO8859-5"},
-#line 39 "./iconv_open-solaris.gperf"
+#line 39 "iconv_open-solaris.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str17, "ISO8859-4"},
-#line 38 "./iconv_open-solaris.gperf"
+#line 38 "iconv_open-solaris.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str18, "ISO8859-3"},
-#line 37 "./iconv_open-solaris.gperf"
+#line 37 "iconv_open-solaris.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str19, "ISO8859-2"}
   };
+#if (defined __GNUC__ && __GNUC__ + (__GNUC_MINOR__ >= 6) > 4) || (defined __clang__ && __clang_major__ >= 3)
+#pragma GCC diagnostic pop
+#endif
 
 const struct mapping *
 mapping_lookup (register const char *str, register size_t len)
@@ -185,5 +192,5 @@ mapping_lookup (register const char *str, register size_t len)
             }
         }
     }
-  return 0;
+  return (struct mapping *) 0;
 }

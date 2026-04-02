@@ -1,5 +1,5 @@
 /* Auxiliary functions for the creation of subprocesses.  OS/2 kLIBC API.
-   Copyright (C) 2001, 2003-2024 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
@@ -28,11 +28,17 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include <process.h>
+#include <dlfcn.h>
+#if HAVE_LIBCX_SPAWN2_H
+# include <libcx/spawn2.h>
+#endif
+
 #include "cloexec.h"
 #include <error.h>
 #include "gettext.h"
 
-#define _(str) gettext (str)
+#define _(msgid) dgettext (GNULIB_TEXT_DOMAIN, msgid)
 
 
 /* Duplicates a file handle, making the copy uninheritable.
@@ -94,16 +100,14 @@ undup_safer_noinherit (int tempfd, int origfd)
 const char **
 prepare_spawn (const char * const *argv, char **mem_to_free)
 {
-  size_t argc;
-  const char **new_argv;
-  size_t i;
-
   /* Count number of arguments.  */
+  size_t argc;
   for (argc = 0; argv[argc] != NULL; argc++)
     ;
 
   /* Allocate new argument vector.  */
-  new_argv = (const char **) malloc ((1 + argc + 1) * sizeof (const char *));
+  const char **new_argv =
+    (const char **) malloc ((1 + argc + 1) * sizeof (const char *));
   if (new_argv == NULL)
     return NULL;
 
@@ -114,7 +118,7 @@ prepare_spawn (const char * const *argv, char **mem_to_free)
 
   /* Put quoted arguments into the new argument vector.  */
   size_t needed_size = 0;
-  for (i = 0; i < argc; i++)
+  for (size_t i = 0; i < argc; i++)
     {
       const char *string = argv[i];
       const char *quoted_string = (string[0] == '\0' ? "\"\"" : string);
@@ -138,7 +142,7 @@ prepare_spawn (const char * const *argv, char **mem_to_free)
     }
   *mem_to_free = mem;
 
-  for (i = 0; i < argc; i++)
+  for (size_t i = 0; i < argc; i++)
     {
       const char *string = argv[i];
 
@@ -151,4 +155,86 @@ prepare_spawn (const char * const *argv, char **mem_to_free)
   new_argv[1 + argc] = NULL;
 
   return new_argv;
+}
+
+int
+spawnpvech (int mode,
+            const char *progname, const char * const *argv,
+            const char * const *envp,
+            const char *currdir,
+            int new_stdin, int new_stdout, int new_stderr)
+{
+#if HAVE_LIBCX_SPAWN2_H
+  static int (*libcx_spawn2) (int mode,
+                              const char *name, const char * const argv[],
+                              const char *cwd, const char * const envp[],
+                              const int stdfds[]) = NULL;
+  static int libcx_spawn2_loaded = -1;
+#else
+  static int libcx_spawn2_loaded = 0;
+#endif
+
+#if HAVE_LIBCX_SPAWN2_H
+  if (libcx_spawn2_loaded == -1)
+    {
+      void *libcx_handle;
+
+      libcx_handle = dlopen ("libcx0", RTLD_LAZY);
+      if (libcx_handle != NULL)
+        libcx_spawn2 = dlsym (libcx_handle, "_spawn2");
+
+      libcx_spawn2_loaded = libcx_handle != NULL && libcx_spawn2 != NULL;
+    }
+#endif
+
+  if (!(libcx_spawn2_loaded
+        || (currdir == NULL || streq (currdir, "."))))
+    {
+      errno = EINVAL;
+      return -1;
+    }
+
+  /* Save standard file handles.  */
+  /* 0 means no changes. This is a behavior of spawn2().  */
+  int saved_stdin = STDIN_FILENO;
+  if (new_stdin != 0)
+    saved_stdin = dup_safer_noinherit (STDIN_FILENO);
+
+  int saved_stdout = STDOUT_FILENO;
+  if (!(new_stdout == 0 || new_stdout == 1))
+    saved_stdout = dup_safer_noinherit (STDOUT_FILENO);
+
+  int saved_stderr = STDERR_FILENO;
+  if (!(new_stderr == 0 || new_stderr == 2))
+    saved_stderr = dup_safer_noinherit (STDERR_FILENO);
+
+  int ret = -1;
+  if ((saved_stdin == STDIN_FILENO || dup2 (new_stdin, STDIN_FILENO) >= 0)
+      && (saved_stdout == STDOUT_FILENO
+          || dup2 (new_stdout, STDOUT_FILENO) >= 0)
+      && (saved_stderr == STDERR_FILENO
+          || dup2 (new_stderr, STDERR_FILENO) >= 0))
+    {
+      if (!libcx_spawn2_loaded
+          || (currdir == NULL || streq (currdir, ".")))
+        ret = spawnvpe (mode, progname, (char * const *) argv,
+                        (char * const *) envp);
+#if HAVE_LIBCX_SPAWN2_H
+      else
+        ret = libcx_spawn2 (mode | P_2_THREADSAFE, progname, argv, currdir,
+                            envp, NULL);
+#endif
+    }
+
+  /* Restores standard file handles.  */
+  if (saved_stderr > STDERR_FILENO)
+    undup_safer_noinherit (saved_stderr, STDERR_FILENO);
+
+  if (saved_stdout > STDOUT_FILENO)
+    undup_safer_noinherit (saved_stdout, STDOUT_FILENO);
+
+  if (saved_stdin > STDIN_FILENO)
+    undup_safer_noinherit (saved_stdin, STDIN_FILENO);
+
+  return ret;
 }

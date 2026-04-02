@@ -1,5 +1,5 @@
 ## Makefile for the gnulib-local directory of GNU gettext
-## Copyright (C) 2006-2008, 2010-2012, 2014-2023 Free Software Foundation, Inc.
+## Copyright (C) 2006-2025 Free Software Foundation, Inc.
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -30,12 +30,15 @@ lib/error.in.h.diff \
 lib/error-progname.c \
 lib/error-progname.h \
 lib/exitfail.h.diff \
+lib/getlocalename_l-unsafe.c.diff \
 lib/getopt-core.h.diff \
 lib/gettext.h \
 lib/gl_array_list.h.diff \
+lib/gl_carray_list.h.diff \
+lib/gl_hash_map.h.diff \
+lib/gl_hash_set.h.diff \
 lib/gl_linkedhash_list.h.diff \
-lib/hash.c.diff \
-lib/hash.h.diff \
+lib/gl_linked_list.h.diff \
 lib/libxml/buf.c \
 lib/libxml/buf.h \
 lib/libxml/c14n.c \
@@ -138,21 +141,20 @@ lib/libxml/xpointer.c \
 lib/libxml/xpointer.in.h \
 lib/markup.c \
 lib/markup.h \
-lib/mem-hash-map.c \
-lib/mem-hash-map.h \
 lib/obstack.h.diff \
 lib/progname.h.diff \
 lib/regex_internal.h.diff \
 lib/unistd.in.h.diff \
 lib/xerror.c \
 lib/xerror.h \
-lib/xgetcwd.c \
-lib/xgetcwd.h \
 m4/backupfile.m4 \
+m4/d.m4 \
 m4/java.m4 \
 m4/libxml.m4 \
+m4/modula2.m4 \
 modules/backupfile \
 modules/closeout \
+modules/d \
 modules/error-progname \
 modules/gettext-runtime-intl-misc \
 modules/gettext-runtime-misc \
@@ -161,9 +163,9 @@ modules/java \
 modules/libtextstyle-dummy \
 modules/libxml \
 modules/markup \
-modules/mem-hash-map \
+modules/modula2 \
 modules/xerror \
-modules/xgetcwd
+modules/xgetcwd.diff
 
 # Extra files to be installed.
 

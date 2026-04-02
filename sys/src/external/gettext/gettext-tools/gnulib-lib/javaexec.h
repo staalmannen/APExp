@@ -1,5 +1,5 @@
 /* Execute a Java program.
-   Copyright (C) 2001-2002, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2001-2002, 2009-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,11 @@
 
 #ifndef _JAVAEXEC_H
 #define _JAVAEXEC_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 typedef bool execute_fn (const char *progname,
                          const char *prog_path, const char * const *prog_argv,
@@ -44,5 +49,10 @@ extern bool execute_java_class (const char *class_name,
                                 const char * const *args,
                                 bool verbose, bool quiet,
                                 execute_fn *executer, void *private_data);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _JAVAEXEC_H */

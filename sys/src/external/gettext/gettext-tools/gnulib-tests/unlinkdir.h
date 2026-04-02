@@ -1,6 +1,6 @@
 /* unlinkdir.h - determine (and maybe change) whether we can unlink directories
 
-   Copyright (C) 2005, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,8 +17,16 @@
 
 /* Written by Paul Eggert and Jim Meyering.  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #if UNLINK_CANNOT_UNLINK_DIR
 # define cannot_unlink_dir() true
 #else
 bool cannot_unlink_dir (void);
+#endif
+
+#ifdef __cplusplus
+}
 #endif

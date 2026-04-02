@@ -1,5 +1,5 @@
 /* Test of getline() function.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -90,5 +90,5 @@ main (void)
   free (line);
   fclose (f);
   remove ("test-getline.txt");
-  return 0;
+  return test_exit_status;
 }

@@ -1,5 +1,5 @@
 /* Waiting for a subprocess to finish.
-   Copyright (C) 2001-2003, 2005-2024 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003, 2005-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -34,7 +34,7 @@
 #include "xalloc.h"
 #include "gettext.h"
 
-#define _(str) gettext (str)
+#define _(msgid) dgettext (GNULIB_TEXT_DOMAIN, msgid)
 
 #define SIZEOF(a) (sizeof(a) / sizeof(a[0]))
 
@@ -48,6 +48,39 @@
    by CreateProcess().  Therefore we can kill it using TerminateProcess.  */
 # define kill(pid,sig) TerminateProcess ((HANDLE) (pid), sig)
 
+#endif
+
+#ifdef __KLIBC__
+# include <dlfcn.h>
+
+# undef waitpid
+
+/* Replacement of waitpid() to support spawn2() of LIBCx which is the kLIBC
+   extension library. See for details:
+   <https://github.com/bitwiseworks/libcx/blob/master/src/spawn/libcx/spawn2.h#L194>.
+   */
+static pid_t
+klibc_waitpid (pid_t pid, int *statusp, int options)
+{
+  static pid_t (*waitpid_pfn) (pid_t, int *, int) = NULL;
+
+  if (waitpid_pfn == NULL)
+    {
+      /* Try to use waitpid() of LIBCx first if available because it can
+         process the return value of spawn-family of kLIBC as well as spawn2()
+         of LIBCx.  */
+      void *libcx_handle = dlopen ("libcx0", RTLD_LAZY);
+      if (libcx_handle != NULL)
+        waitpid_pfn = dlsym (libcx_handle, "_waitpid");
+      /* If not available, falls back to waitpid() of kLIBC.  */
+      if (waitpid_pfn == NULL)
+        waitpid_pfn = waitpid;
+    }
+
+  return waitpid_pfn (pid, statusp, options);
+}
+
+# define waitpid klibc_waitpid
 #endif
 
 
@@ -204,20 +237,21 @@ wait_subprocess (pid_t child, const char *progname,
                  bool slave_process, bool exit_on_error,
                  int *termsigp)
 {
+  if (termsigp != NULL)
+    *termsigp = 0;
+
 #if HAVE_WAITID && defined WNOWAIT && 0
   /* Commented out because waitid() without WEXITED and with WNOWAIT doesn't
-     work: On Solaris 7 and OSF/1 4.0, it returns -1 and sets errno = ECHILD,
-     and on HP-UX 10.20 it just hangs.  */
+     work: On Solaris 7, it returns -1 and sets errno = ECHILD, and on
+     HP-UX 10.20 it just hangs.  */
   /* Use of waitid() with WNOWAIT avoids a race condition: If slave_process is
      true, and this process sleeps a very long time between the return from
      waitpid() and the execution of unregister_slave_subprocess(), and
      meanwhile another process acquires the same PID as child, and then - still
      before unregister_slave_subprocess() - this process gets a fatal signal,
      it would kill the other totally unrelated process.  */
-  siginfo_t info;
 
-  if (termsigp != NULL)
-    *termsigp = 0;
+  siginfo_t info;
   for (;;)
     {
       if (waitid (P_PID, child, &info, WEXITED | (slave_process ? WNOWAIT : 0))
@@ -297,11 +331,8 @@ wait_subprocess (pid_t child, const char *progname,
     }
 #else
   /* waitpid() is just as portable as wait() nowadays.  */
-  int status;
 
-  if (termsigp != NULL)
-    *termsigp = 0;
-  status = 0;
+  int status = 0;
   for (;;)
     {
       int result = waitpid (child, &status, 0);

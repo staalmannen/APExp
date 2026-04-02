@@ -1,5 +1,5 @@
 /* Test of lseek() function.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ main (int argc, char **argv)
          the current offset.  But BeOS sets it to 0.  */
       ASSERT (lseek (0, (off_t)0, SEEK_CUR) == 2);
 #endif
-#if 0 /* leads to SIGSYS on IRIX 6.5 */
+#if 0 /* unportable test */
       ASSERT (lseek (0, (off_t)0, (SEEK_SET | SEEK_CUR | SEEK_END) + 1) == -1);
       ASSERT (errno == EINVAL);
 #endif
@@ -61,7 +61,7 @@ main (int argc, char **argv)
          the current offset.  But BeOS sets it to 0.  */
       ASSERT (lseek (1, (off_t)0, SEEK_CUR) == 2);
 #endif
-#if 0 /* leads to SIGSYS on IRIX 6.5 */
+#if 0 /* unportable test */
       ASSERT (lseek (1, (off_t)0, (SEEK_SET | SEEK_CUR | SEEK_END) + 1) == -1);
       ASSERT (errno == EINVAL);
 #endif
@@ -105,5 +105,5 @@ main (int argc, char **argv)
     default:
       return 1;
     }
-  return 0;
+  return test_exit_status;
 }

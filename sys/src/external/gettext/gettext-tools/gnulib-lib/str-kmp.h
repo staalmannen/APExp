@@ -1,6 +1,6 @@
 /* Substring search in a NUL terminated string of UNIT elements,
    using the Knuth-Morris-Pratt algorithm.
-   Copyright (C) 2005-2024 Free Software Foundation, Inc.
+   Copyright (C) 2005-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2005.
 
    This file is free software.
@@ -66,13 +66,13 @@ knuth_morris_pratt (const UNIT *haystack,
           forall 0 <= x < table[i]: rhaystack[x..x+m-1] != needle[0..m-1].
      table[0] remains uninitialized.  */
   {
-    size_t i, j;
+    size_t j;
 
     /* i = 1: Nothing to verify for x = 0.  */
     table[1] = 1;
     j = 0;
 
-    for (i = 2; i < m; i++)
+    for (size_t i = 2; i < m; i++)
       {
         /* Here: j = i-1 - table[i-1].
            The inequality needle[x..i-1] != needle[0..i-1-x] is known to hold
@@ -119,14 +119,10 @@ knuth_morris_pratt (const UNIT *haystack,
 
   /* Search, using the table to accelerate the processing.  */
   {
-    size_t j;
-    const UNIT *rhaystack;
-    const UNIT *phaystack;
-
     *resultp = NULL;
-    j = 0;
-    rhaystack = haystack;
-    phaystack = haystack;
+    size_t j = 0;
+    const UNIT *rhaystack = haystack;
+    const UNIT *phaystack = haystack;
     /* Invariant: phaystack = rhaystack + j.  */
     while (*phaystack != 0)
       if (CANON_ELEMENT (needle[j]) == CANON_ELEMENT (*phaystack))

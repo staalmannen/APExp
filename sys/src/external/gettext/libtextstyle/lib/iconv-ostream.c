@@ -5,8 +5,7 @@
 #endif
 #line 1 "iconv-ostream.oo.c"
 /* Output stream that converts the output to another encoding.
-   Copyright (C) 2006-2007, 2010, 2019-2020 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,6 +20,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Written by Bruno Haible.  */
+
 #include <config.h>
 
 /* Specification.  */
@@ -33,8 +34,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <error.h>
 #include "c-strcase.h"
-#include "error.h"
 #include "xalloc.h"
 #include "gettext.h"
 
@@ -42,7 +43,7 @@
 
 #endif /* HAVE_ICONV */
 
-#line 46 "iconv-ostream.c"
+#line 47 "iconv-ostream.c"
 #include "iconv_ostream.priv.h"
 
 const typeinfo_t iconv_ostream_typeinfo = { "iconv_ostream" };
@@ -52,7 +53,7 @@ static const typeinfo_t * const iconv_ostream_superclasses[] =
 
 #define super ostream_vtable
 
-#line 56 "iconv-ostream.oo.c"
+#line 57 "iconv-ostream.oo.c"
 
 #if HAVE_ICONV
 
@@ -65,9 +66,7 @@ iconv_ostream__write_mem (iconv_ostream_t stream, const void *data, size_t len)
     {
       #define BUFFERSIZE 256
       char inbuffer[BUFFERSIZE];
-      size_t inbufcount;
-
-      inbufcount = stream->buflen;
+      size_t inbufcount = stream->buflen;
       if (inbufcount > 0)
         memcpy (inbuffer, stream->buf, inbufcount);
       for (;;)
@@ -98,12 +97,13 @@ iconv_ostream__write_mem (iconv_ostream_t stream, const void *data, size_t len)
             size_t res = iconv (stream->cd,
                                 (ICONV_CONST char **) &inptr, &insize,
                                 &outptr, &outsize);
-            #if !defined _LIBICONV_VERSION \
+            #if !(defined _LIBICONV_VERSION && !(_LIBICONV_VERSION == 0x10b && defined __APPLE__)) \
                 && !(defined __GLIBC__ && !defined __UCLIBC__)
             /* Irix iconv() inserts a NUL byte if it cannot convert.
                NetBSD iconv() inserts a question mark if it cannot convert.
-               Only GNU libiconv and GNU libc are known to prefer to fail rather
-               than doing a lossy conversion.  */
+               Only GNU libiconv (excluding the bastard Apple iconv) and
+               GNU libc are known to prefer to fail rather than doing a lossy
+               conversion.  */
             if (res > 0)
               {
                 errno = EILSEQ;
@@ -154,11 +154,6 @@ iconv_ostream__free (iconv_ostream_t stream)
   /* Silently ignore the few bytes in stream->buf[] that don't correspond to a
      character.  */
 
-  /* Avoid glibc-2.1 bug and Solaris 2.7 bug.  */
-  #if defined _LIBICONV_VERSION \
-      || !(((__GLIBC__ - 0 == 2 && __GLIBC_MINOR__ - 0 <= 1) \
-            && !defined __UCLIBC__) \
-           || defined __sun)
   {
     char outbuffer[2048];
     char *outptr = outbuffer;
@@ -172,7 +167,6 @@ iconv_ostream__free (iconv_ostream_t stream)
       ostream_write_mem (stream->destination,
                          outbuffer, sizeof (outbuffer) - outsize);
   }
-  #endif
 
   iconv_close (stream->cd);
   free (stream->from_encoding);
@@ -187,22 +181,12 @@ iconv_ostream_create (const char *from_encoding, const char *to_encoding,
                       ostream_t destination)
 {
   iconv_ostream_t stream = XMALLOC (struct iconv_ostream_representation);
-
   stream->base.vtable = &iconv_ostream_vtable;
   stream->destination = destination;
   stream->from_encoding = xstrdup (from_encoding);
   stream->to_encoding = xstrdup (to_encoding);
 
-  /* Avoid glibc-2.1 bug with EUC-KR.  */
-  #if ((__GLIBC__ - 0 == 2 && __GLIBC_MINOR__ - 0 <= 1) \
-       && !defined __UCLIBC__) \
-      && !defined _LIBICONV_VERSION
-  if (c_strcasecmp (from_encoding, "EUC-KR") == 0
-      || c_strcasecmp (to_encoding, "EUC-KR") == 0)
-    stream->cd = (iconv_t)(-1):
-  else
-  #endif
-    stream->cd = iconv_open (to_encoding, from_encoding);
+  stream->cd = iconv_open (to_encoding, from_encoding);
   if (stream->cd == (iconv_t)(-1))
     {
       if (iconv_open ("UTF-8", from_encoding) == (iconv_t)(-1))
@@ -259,7 +243,7 @@ iconv_ostream__write_mem (iconv_ostream_t stream, const void *data, size_t len)
 }
 
 static void
-iconv_ostream__flush (iconv_ostream_t stream)
+iconv_ostream__flush (iconv_ostream_t stream, ostream_flush_scope_t scope)
 {
   abort ();
 }
@@ -300,7 +284,7 @@ is_instance_of_iconv_ostream (ostream_t stream)
 
 #endif /* HAVE_ICONV */
 
-#line 304 "iconv-ostream.c"
+#line 288 "iconv-ostream.c"
 
 const struct iconv_ostream_implementation iconv_ostream_vtable =
 {

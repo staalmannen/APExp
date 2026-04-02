@@ -1,6 +1,5 @@
 /* Test of public API for GNU gettext PO files.
-   Copyright (C) 2010, 2020 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2010.
+   Copyright (C) 2010-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,9 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+/* Written by Bruno Haible.  */
+
+#include <config.h>
 
 #include "gettext-po.h"
 
@@ -256,7 +255,24 @@ main (int argc, char *argv[])
         ASSERT (!po_message_is_fuzzy (msg));
         ASSERT (!po_message_is_format (msg, "c-format"));
         ASSERT (!po_message_is_format (msg, "java-format"));
+        ASSERT (po_message_get_format (msg, "c-format") == -1);
+        ASSERT (po_message_get_format (msg, "java-format") == -1);
         ASSERT (!po_message_is_range (msg, &min, &max));
+        ASSERT (!po_message_has_workflow_flag (msg, "fuzzy"));
+        {
+          po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+          ASSERT (po_flag_next (fiter) == NULL);
+          po_flag_iterator_free (fiter);
+        }
+        ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "java-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+        {
+          po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+          ASSERT (po_flag_next (fiter) == NULL);
+          po_flag_iterator_free (fiter);
+        }
       }
       {
         po_message_t msg = po_next_message (iter);
@@ -285,7 +301,26 @@ main (int argc, char *argv[])
         ASSERT (po_message_is_fuzzy (msg));
         ASSERT (po_message_is_format (msg, "c-format"));
         ASSERT (!po_message_is_format (msg, "java-format"));
+        ASSERT (po_message_get_format (msg, "c-format") == 1);
+        ASSERT (po_message_get_format (msg, "java-format") == -1);
         ASSERT (!po_message_is_range (msg, &min, &max));
+        ASSERT (po_message_has_workflow_flag (msg, "fuzzy"));
+        {
+          po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+          ASSERT (strcmp (po_flag_next (fiter), "fuzzy") == 0);
+          ASSERT (po_flag_next (fiter) == NULL);
+          po_flag_iterator_free (fiter);
+        }
+        ASSERT (po_message_has_sticky_flag (msg, "c-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "java-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+        {
+          po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+          ASSERT (strcmp (po_flag_next (fiter), "c-format") == 0);
+          ASSERT (po_flag_next (fiter) == NULL);
+          po_flag_iterator_free (fiter);
+        }
       }
       {
         po_message_t msg = po_next_message (iter);
@@ -326,7 +361,25 @@ main (int argc, char *argv[])
         ASSERT (!po_message_is_fuzzy (msg));
         ASSERT (po_message_is_format (msg, "c-format"));
         ASSERT (!po_message_is_format (msg, "java-format"));
+        ASSERT (po_message_get_format (msg, "c-format") == 1);
+        ASSERT (po_message_get_format (msg, "java-format") == -1);
         ASSERT (!po_message_is_range (msg, &min, &max));
+        ASSERT (!po_message_has_workflow_flag (msg, "fuzzy"));
+        {
+          po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+          ASSERT (po_flag_next (fiter) == NULL);
+          po_flag_iterator_free (fiter);
+        }
+        ASSERT (po_message_has_sticky_flag (msg, "c-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "java-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+        {
+          po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+          ASSERT (strcmp (po_flag_next (fiter), "c-format") == 0);
+          ASSERT (po_flag_next (fiter) == NULL);
+          po_flag_iterator_free (fiter);
+        }
       }
       {
         po_message_t msg = po_next_message (iter);
@@ -348,7 +401,24 @@ main (int argc, char *argv[])
         ASSERT (!po_message_is_fuzzy (msg));
         ASSERT (!po_message_is_format (msg, "c-format"));
         ASSERT (!po_message_is_format (msg, "java-format"));
+        ASSERT (po_message_get_format (msg, "c-format") == -1);
+        ASSERT (po_message_get_format (msg, "java-format") == -1);
         ASSERT (!po_message_is_range (msg, &min, &max));
+        ASSERT (!po_message_has_workflow_flag (msg, "fuzzy"));
+        {
+          po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+          ASSERT (po_flag_next (fiter) == NULL);
+          po_flag_iterator_free (fiter);
+        }
+        ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "java-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+        {
+          po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+          ASSERT (po_flag_next (fiter) == NULL);
+          po_flag_iterator_free (fiter);
+        }
       }
       {
         po_message_t msg = po_next_message (iter);
@@ -377,7 +447,25 @@ main (int argc, char *argv[])
         ASSERT (!po_message_is_fuzzy (msg));
         ASSERT (!po_message_is_format (msg, "c-format"));
         ASSERT (po_message_is_format (msg, "java-format"));
+        ASSERT (po_message_get_format (msg, "c-format") == -1);
+        ASSERT (po_message_get_format (msg, "java-format") == 1);
         ASSERT (!po_message_is_range (msg, &min, &max));
+        ASSERT (!po_message_has_workflow_flag (msg, "fuzzy"));
+        {
+          po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+          ASSERT (po_flag_next (fiter) == NULL);
+          po_flag_iterator_free (fiter);
+        }
+        ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+        ASSERT (po_message_has_sticky_flag (msg, "java-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+        {
+          po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+          ASSERT (strcmp (po_flag_next (fiter), "java-format") == 0);
+          ASSERT (po_flag_next (fiter) == NULL);
+          po_flag_iterator_free (fiter);
+        }
       }
       {
         po_message_t msg = po_next_message (iter);
@@ -398,7 +486,24 @@ main (int argc, char *argv[])
         ASSERT (!po_message_is_fuzzy (msg));
         ASSERT (!po_message_is_format (msg, "c-format"));
         ASSERT (!po_message_is_format (msg, "java-format"));
+        ASSERT (po_message_get_format (msg, "c-format") == -1);
+        ASSERT (po_message_get_format (msg, "java-format") == -1);
         ASSERT (!po_message_is_range (msg, &min, &max));
+        ASSERT (!po_message_has_workflow_flag (msg, "fuzzy"));
+        {
+          po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+          ASSERT (po_flag_next (fiter) == NULL);
+          po_flag_iterator_free (fiter);
+        }
+        ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "java-format"));
+        ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+        {
+          po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+          ASSERT (po_flag_next (fiter) == NULL);
+          po_flag_iterator_free (fiter);
+        }
       }
       {
         po_message_t msg = po_next_message (iter);
@@ -898,12 +1003,96 @@ main (int argc, char *argv[])
   {
     po_message_t msg = po_message_create ();
     ASSERT (!po_message_is_fuzzy (msg));
+    ASSERT (!po_message_has_workflow_flag (msg, "fuzzy"));
+    {
+      po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
     po_message_set_fuzzy (msg, 1);
     ASSERT (po_message_is_fuzzy (msg));
+    ASSERT (po_message_has_workflow_flag (msg, "fuzzy"));
+    {
+      po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "fuzzy") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
     po_message_set_fuzzy (msg, 1);
     ASSERT (po_message_is_fuzzy (msg));
+    ASSERT (po_message_has_workflow_flag (msg, "fuzzy"));
+    {
+      po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "fuzzy") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
     po_message_set_fuzzy (msg, 0);
     ASSERT (!po_message_is_fuzzy (msg));
+    ASSERT (!po_message_has_workflow_flag (msg, "fuzzy"));
+    {
+      po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+  }
+
+  /* Test po_message_set_workflow_flag.  */
+  {
+    po_message_t msg = po_message_create ();
+    ASSERT (!po_message_is_fuzzy (msg));
+    ASSERT (!po_message_has_workflow_flag (msg, "fuzzy"));
+    {
+      po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
+    po_message_set_workflow_flag (msg, "fuzzy", 1);
+    ASSERT (po_message_is_fuzzy (msg));
+    ASSERT (po_message_has_workflow_flag (msg, "fuzzy"));
+    {
+      po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "fuzzy") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
+    po_message_set_workflow_flag (msg, "fuzzy", 1);
+    ASSERT (po_message_is_fuzzy (msg));
+    ASSERT (po_message_has_workflow_flag (msg, "fuzzy"));
+    {
+      po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "fuzzy") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
+    po_message_set_workflow_flag (msg, "review", 1);
+    ASSERT (po_message_is_fuzzy (msg));
+    ASSERT (po_message_has_workflow_flag (msg, "fuzzy"));
+    /* This will change in 2027.  */
+    ASSERT (!po_message_has_workflow_flag (msg, "review"));
+    {
+      po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "fuzzy") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
+    po_message_set_workflow_flag (msg, "fuzzy", 0);
+    ASSERT (!po_message_is_fuzzy (msg));
+    ASSERT (!po_message_has_workflow_flag (msg, "fuzzy"));
+    {
+      po_flag_iterator_t fiter = po_message_workflow_flags_iterator (msg);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+  }
+  {
+    po_flag_iterator_t fiter = po_message_workflow_flags_iterator (NULL);
+    ASSERT (po_flag_next (fiter) == NULL);
+    po_flag_iterator_free (fiter);
   }
 
   /* Test po_message_set_format.  */
@@ -912,26 +1101,354 @@ main (int argc, char *argv[])
     ASSERT (!po_message_is_format (msg, "c-format"));
     ASSERT (!po_message_is_format (msg, "java-format"));
     ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == -1);
+    ASSERT (po_message_get_format (msg, "java-format") == -1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
     po_message_set_format (msg, "c-format", 1);
     ASSERT (po_message_is_format (msg, "c-format"));
     ASSERT (!po_message_is_format (msg, "java-format"));
     ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 1);
+    ASSERT (po_message_get_format (msg, "java-format") == -1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "c-format") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
     po_message_set_format (msg, "c-format", 1);
     ASSERT (po_message_is_format (msg, "c-format"));
     ASSERT (!po_message_is_format (msg, "java-format"));
     ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 1);
+    ASSERT (po_message_get_format (msg, "java-format") == -1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "c-format") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
     po_message_set_format (msg, "java-format", 1);
     ASSERT (po_message_is_format (msg, "c-format"));
     ASSERT (po_message_is_format (msg, "java-format"));
     ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 1);
+    ASSERT (po_message_get_format (msg, "java-format") == 1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "c-format") == 0);
+      ASSERT (strcmp (po_flag_next (fiter), "java-format") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
     po_message_set_format (msg, "c-format", 0);
     ASSERT (!po_message_is_format (msg, "c-format"));
     ASSERT (po_message_is_format (msg, "java-format"));
     ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 0);
+    ASSERT (po_message_get_format (msg, "java-format") == 1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "no-c-format") == 0);
+      ASSERT (strcmp (po_flag_next (fiter), "java-format") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
     po_message_set_format (msg, "xyzzy-format", 1);
     ASSERT (!po_message_is_format (msg, "c-format"));
     ASSERT (po_message_is_format (msg, "java-format"));
     ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 0);
+    ASSERT (po_message_get_format (msg, "java-format") == 1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    /* This will change in 2027.  */
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "no-c-format") == 0);
+      ASSERT (strcmp (po_flag_next (fiter), "java-format") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
+    po_message_set_format (msg, "java-format", -1);
+    ASSERT (!po_message_is_format (msg, "c-format"));
+    ASSERT (!po_message_is_format (msg, "java-format"));
+    ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 0);
+    ASSERT (po_message_get_format (msg, "java-format") == -1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "no-c-format") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+  }
+
+  /* Test po_message_set_sticky_flag.  */
+  {
+    po_message_t msg = po_message_create ();
+    ASSERT (!po_message_is_format (msg, "c-format"));
+    ASSERT (!po_message_is_format (msg, "java-format"));
+    ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == -1);
+    ASSERT (po_message_get_format (msg, "java-format") == -1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-wrap"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
+    po_message_set_sticky_flag (msg, "c-format", 1);
+    ASSERT (po_message_is_format (msg, "c-format"));
+    ASSERT (!po_message_is_format (msg, "java-format"));
+    ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 1);
+    ASSERT (po_message_get_format (msg, "java-format") == -1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-wrap"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "c-format") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
+    po_message_set_sticky_flag (msg, "c-format", 1);
+    ASSERT (po_message_is_format (msg, "c-format"));
+    ASSERT (!po_message_is_format (msg, "java-format"));
+    ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 1);
+    ASSERT (po_message_get_format (msg, "java-format") == -1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-wrap"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "c-format") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
+    po_message_set_sticky_flag (msg, "java-format", 1);
+    ASSERT (po_message_is_format (msg, "c-format"));
+    ASSERT (po_message_is_format (msg, "java-format"));
+    ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 1);
+    ASSERT (po_message_get_format (msg, "java-format") == 1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-wrap"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "c-format") == 0);
+      ASSERT (strcmp (po_flag_next (fiter), "java-format") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
+    po_message_set_sticky_flag (msg, "no-c-format", 1);
+    ASSERT (!po_message_is_format (msg, "c-format"));
+    ASSERT (po_message_is_format (msg, "java-format"));
+    ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 0);
+    ASSERT (po_message_get_format (msg, "java-format") == 1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-wrap"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "no-c-format") == 0);
+      ASSERT (strcmp (po_flag_next (fiter), "java-format") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
+    po_message_set_sticky_flag (msg, "no-wrap", 1);
+    ASSERT (!po_message_is_format (msg, "c-format"));
+    ASSERT (po_message_is_format (msg, "java-format"));
+    ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 0);
+    ASSERT (po_message_get_format (msg, "java-format") == 1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "no-wrap"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "no-c-format") == 0);
+      ASSERT (strcmp (po_flag_next (fiter), "java-format") == 0);
+      ASSERT (strcmp (po_flag_next (fiter), "no-wrap") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
+    po_message_set_sticky_flag (msg, "python-format", 0);
+    ASSERT (!po_message_is_format (msg, "c-format"));
+    ASSERT (po_message_is_format (msg, "java-format"));
+    ASSERT (!po_message_is_format (msg, "python-format"));
+    ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 0);
+    ASSERT (po_message_get_format (msg, "java-format") == 1);
+    ASSERT (po_message_get_format (msg, "python-format") == -1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "python-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-python-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "no-wrap"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "no-c-format") == 0);
+      ASSERT (strcmp (po_flag_next (fiter), "java-format") == 0);
+      ASSERT (strcmp (po_flag_next (fiter), "no-wrap") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
+    po_message_set_sticky_flag (msg, "xyzzy-format", 1);
+    ASSERT (!po_message_is_format (msg, "c-format"));
+    ASSERT (po_message_is_format (msg, "java-format"));
+    ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 0);
+    ASSERT (po_message_get_format (msg, "java-format") == 1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    /* This will change in 2027.  */
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "no-wrap"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "no-c-format") == 0);
+      ASSERT (strcmp (po_flag_next (fiter), "java-format") == 0);
+      ASSERT (strcmp (po_flag_next (fiter), "no-wrap") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+
+    po_message_set_sticky_flag (msg, "java-format", 0);
+    ASSERT (!po_message_is_format (msg, "c-format"));
+    ASSERT (!po_message_is_format (msg, "java-format"));
+    ASSERT (!po_message_is_format (msg, "xyzzy-format"));
+    ASSERT (po_message_get_format (msg, "c-format") == 0);
+    ASSERT (po_message_get_format (msg, "java-format") == -1);
+    ASSERT (po_message_get_format (msg, "xyzzy-format") == -1);
+    ASSERT (!po_message_has_sticky_flag (msg, "c-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "no-c-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-java-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "xyzzy-format"));
+    ASSERT (!po_message_has_sticky_flag (msg, "no-xyzzy-format"));
+    ASSERT (po_message_has_sticky_flag (msg, "no-wrap"));
+    {
+      po_flag_iterator_t fiter = po_message_sticky_flags_iterator (msg);
+      ASSERT (strcmp (po_flag_next (fiter), "no-c-format") == 0);
+      ASSERT (strcmp (po_flag_next (fiter), "no-wrap") == 0);
+      ASSERT (po_flag_next (fiter) == NULL);
+      po_flag_iterator_free (fiter);
+    }
+  }
+  {
+    po_flag_iterator_t fiter = po_message_sticky_flags_iterator (NULL);
+    ASSERT (po_flag_next (fiter) == NULL);
+    po_flag_iterator_free (fiter);
   }
 
   /* Test po_message_set_range.  */

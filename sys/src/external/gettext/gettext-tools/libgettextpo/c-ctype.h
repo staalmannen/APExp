@@ -5,7 +5,7 @@
    <ctype.h> functions' behaviour depends on the current locale set via
    setlocale.
 
-   Copyright (C) 2000-2003, 2006, 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2000-2003, 2006, 2008-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -72,10 +72,10 @@ extern "C" {
 /* The character set is ASCII or one of its variants or extensions, not EBCDIC.
    Testing the value of '\n' and '\r' is not relevant.  */
 # define C_CTYPE_ASCII 1
-//#elif ! (' ' == '\x40' && '0' == '\xf0'                     \
-//         && 'A' == '\xc1' && 'J' == '\xd1' && 'S' == '\xe2' \
-//         && 'a' == '\x81' && 'j' == '\x91' && 's' == '\xa2')
-//# error "Only ASCII and EBCDIC are supported"
+#elif ! (' ' == '\x40' && '0' == '\xf0'                     \
+         && 'A' == '\xc1' && 'J' == '\xd1' && 'S' == '\xe2' \
+         && 'a' == '\x81' && 'j' == '\x91' && 's' == '\xa2')
+# error "Only ASCII and EBCDIC are supported"
 #endif
 
 #if 'A' < 0

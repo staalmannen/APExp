@@ -1,8 +1,10 @@
-# locale-de.m4 serial 3
-dnl Copyright (C) 2003-2023 Free Software Foundation, Inc.
+# locale-de.m4
+# serial 4
+dnl Copyright (C) 2003-2024 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl From Bruno Haible.
 
@@ -92,7 +94,7 @@ int main () {
             # "ge"(!) or "deu"(!) as "German" or "German_Germany.1252",
             # "ja" as "Japanese" or "Japanese_Japan.932",
             # and similar.
-            mingw*)
+            mingw* | windows*)
               # Test for the hypothetical native Windows locale name.
               if (LC_ALL=German_Germany.65001 LC_TIME= LC_CTYPE= ./conftest; exit) 2>/dev/null; then
                 gt_cv_locale_de_utf8=German_Germany.65001
@@ -114,7 +116,7 @@ int main () {
                 if (LC_ALL=de_DE.UTF-8 LC_TIME= LC_CTYPE= ./conftest; exit) 2>/dev/null; then
                   gt_cv_locale_de_utf8=de_DE.UTF-8
                 else
-                  # Test for the Solaris 7 locale name.
+                  # Test for the Solaris 10 locale name.
                   if (LC_ALL=de.UTF-8 LC_TIME= LC_CTYPE= ./conftest; exit) 2>/dev/null; then
                     gt_cv_locale_de_utf8=de.UTF-8
                   else

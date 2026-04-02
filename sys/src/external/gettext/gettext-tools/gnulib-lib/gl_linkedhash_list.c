@@ -1,5 +1,5 @@
 /* Sequential list data type implemented by a hash table with a linked list.
-   Copyright (C) 2006, 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2008-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This file is free software: you can redistribute it and/or modify
@@ -57,9 +57,8 @@ static void
 remove_from_bucket (gl_list_t list, gl_list_node_t node)
 {
   size_t bucket = node->h.hashcode % list->table_size;
-  gl_hash_entry_t *p;
 
-  for (p = &list->table[bucket]; ; p = &(*p)->hash_next)
+  for (gl_hash_entry_t *p = &list->table[bucket]; ; p = &(*p)->hash_next)
     {
       if (*p == &node->h)
         {

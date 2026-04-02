@@ -1,13 +1,13 @@
 /* Iteration over virtual memory areas.
-   Copyright (C) 2011-2024 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2011.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published
+   by the Free Software Foundation; either version 2 of the License,
+   or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
@@ -57,7 +57,7 @@ extern int vma_iterate (vma_iterate_callback_fn callback, void *data);
    this platform.
    Note that even when this macro is defined, vma_iterate() may still fail to
    find any virtual memory area, for example if /proc is not mounted.  */
-#if defined __linux__ || defined __ANDROID__ || defined __GNU__ || defined __FreeBSD_kernel__ || defined __FreeBSD__ || defined __DragonFly__ || defined __NetBSD__ || defined _AIX || defined __sgi || defined __osf__ || defined __sun || HAVE_PSTAT_GETPROCVM || (defined __APPLE__ && defined __MACH__) || defined _WIN32 || defined __CYGWIN__ || defined __BEOS__ || defined __HAIKU__ || defined __minix || HAVE_MQUERY
+#if defined __linux__ || defined __ANDROID__ || defined __gnu_hurd__ || defined __FreeBSD_kernel__ || defined __FreeBSD__ || defined __DragonFly__ || defined __NetBSD__ || defined _AIX || defined __sun || HAVE_PSTAT_GETPROCVM || (defined __APPLE__ && defined __MACH__) || defined _WIN32 || defined __CYGWIN__ || defined __BEOS__ || defined __HAIKU__ || defined __minix || HAVE_MQUERY
 # define VMA_ITERATE_SUPPORTED 1
 #endif
 

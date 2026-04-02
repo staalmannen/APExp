@@ -1,5 +1,5 @@
 /* Sequential list data type implemented by a linked list.
-   Copyright (C) 2006, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This file is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 extern "C" {
 #endif
 
-extern const struct gl_list_implementation gl_linked_list_implementation;
+extern DLL_VARIABLE const struct gl_list_implementation gl_linked_list_implementation;
 #define GL_LINKED_LIST &gl_linked_list_implementation
 
 #ifdef __cplusplus

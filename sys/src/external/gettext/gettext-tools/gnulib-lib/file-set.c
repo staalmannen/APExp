@@ -1,5 +1,5 @@
 /* Specialized functions to manipulate a set of files.
-   Copyright (C) 2007, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include <config.h>
 #include "file-set.h"
 
-#include "hash-triple.h"
+#include "hashcode-file.h"
 #include "xalloc.h"
 
 /* Record file, FILE, and dev/ino from *STATS, in the hash table, HT.
@@ -28,12 +28,10 @@
 void
 record_file (Hash_table *ht, char const *file, struct stat const *stats)
 {
-  struct F_triple *ent;
-
   if (ht == NULL)
     return;
 
-  ent = xmalloc (sizeof *ent);
+  struct F_triple *ent = xmalloc (sizeof *ent);
   ent->name = xstrdup (file);
   ent->st_ino = stats->st_ino;
   ent->st_dev = stats->st_dev;
@@ -61,11 +59,11 @@ bool
 seen_file (Hash_table const *ht, char const *file,
            struct stat const *stats)
 {
-  struct F_triple new_ent;
 
   if (ht == NULL)
     return false;
 
+  struct F_triple new_ent;
   new_ent.name = (char *) file;
   new_ent.st_ino = stats->st_ino;
   new_ent.st_dev = stats->st_dev;

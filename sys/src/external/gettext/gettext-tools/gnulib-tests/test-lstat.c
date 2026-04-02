@@ -1,5 +1,5 @@
 /* Test of lstat() function.
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -55,5 +55,6 @@ main (void)
   /* Remove any leftovers from a previous partial run.  */
   ignore_value (system ("rm -rf " BASE "*"));
 
-  return test_lstat_func (do_lstat, true);
+  int result = test_lstat_func (do_lstat, true);
+  return (result ? result : test_exit_status);
 }

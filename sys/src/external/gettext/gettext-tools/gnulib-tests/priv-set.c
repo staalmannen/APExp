@@ -1,6 +1,6 @@
 /* Query, remove, or restore a Solaris privilege.
 
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,10 +17,8 @@
 
    Written by David Bartley.  */
 
-#include <config.h>
-
 #define PRIV_SET_INLINE _GL_EXTERN_INLINE
-
+#include <config.h>
 #include "priv-set.h"
 
 #if HAVE_GETPPRIV && HAVE_PRIV_H

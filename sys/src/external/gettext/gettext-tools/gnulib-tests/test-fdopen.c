@@ -1,5 +1,5 @@
 /* Test opening a stream with a file descriptor.
-   Copyright (C) 2011-2024 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -39,8 +39,7 @@ main (void)
     #define COUNT 1000
   #endif
 
-  int i;
-  for (i = 0; i < COUNT; i++)
+  for (int i = 0; i < COUNT; i++)
     {
       errno = 0;
       if (! fdopen (STDOUT_FILENO, "w"))
@@ -50,5 +49,5 @@ main (void)
         }
     }
 
-  return 0;
+  return test_exit_status;
 }

@@ -1,5 +1,5 @@
 /* Test of opening a file descriptor.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,7 +25,12 @@ SIGNATURE_CHECK (open, int, (char const *, int, ...));
 
 #include <errno.h>
 #include <stdio.h>
+#include <sys/stat.h>
 #include <unistd.h>
+
+#if HAVE_DECL_ALARM
+# include <signal.h>
+#endif
 
 #include "macros.h"
 
@@ -36,5 +41,6 @@ SIGNATURE_CHECK (open, int, (char const *, int, ...));
 int
 main (void)
 {
-  return test_open (open, true);
+  int result = test_open (open, true);
+  return (result ? result : test_exit_status);
 }

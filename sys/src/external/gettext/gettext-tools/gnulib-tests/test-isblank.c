@@ -1,5 +1,5 @@
 /* Test of isblank() function.
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,8 +31,6 @@ SIGNATURE_CHECK (isblank, int, (int));
 int
 main ()
 {
-  unsigned int c;
-
   /* Verify the property in the "C" locale.
      POSIX specifies in
        <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap07.html>
@@ -42,9 +40,9 @@ main ()
        - in the "POSIX" locale (which is usually the same as the "C" locale),
          the blank characters include only the ASCII <space> and <tab>
          characters.  */
-  for (c = 0; c <= UCHAR_MAX; c++)
+  for (unsigned int c = 0; c <= UCHAR_MAX; c++)
     ASSERT (!isblank (c) == !(c == ' ' || c == '\t'));
   ASSERT (!isblank (EOF));
 
-  return 0;
+  return test_exit_status;
 }

@@ -1,5 +1,5 @@
 /* Test of c32width() function.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,12 +33,10 @@ SIGNATURE_CHECK (c32width, int, (char32_t));
 int
 main ()
 {
-  char32_t wc;
-
 #if !GNULIB_WCHAR_SINGLE_LOCALE
 # ifdef C_CTYPE_ASCII
   /* Test width of ASCII characters.  */
-  for (wc = 0x20; wc < 0x7F; wc++)
+  for (char32_t wc = 0x20; wc < 0x7F; wc++)
     ASSERT (c32width (wc) == 1);
 # endif
 #endif
@@ -53,7 +51,7 @@ main ()
       && strcmp (locale_charset (), "UTF-8") == 0)
     {
       /* Test width of ASCII characters.  */
-      for (wc = 0x20; wc < 0x7F; wc++)
+      for (char32_t wc = 0x20; wc < 0x7F; wc++)
         ASSERT (c32width (wc) == 1);
 
       /* Test width of some non-spacing characters.  */
@@ -94,11 +92,11 @@ main ()
       ASSERT (c32width (0x3000) == 2);
       ASSERT (c32width (0xB250) == 2);
       ASSERT (c32width (0xFF1A) == 2);
-      #if !(defined __FreeBSD__ && __FreeBSD__ < 13 && !defined __GLIBC__)
+      #if !((defined __FreeBSD__ && __FreeBSD__ < 13 && !defined __GLIBC__) || defined __sun)
       ASSERT (c32width (0x20369) == 2);
       ASSERT (c32width (0x2F876) == 2);
       #endif
     }
 
-  return 0;
+  return test_exit_status;
 }

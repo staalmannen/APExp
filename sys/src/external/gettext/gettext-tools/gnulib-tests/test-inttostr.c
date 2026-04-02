@@ -1,5 +1,5 @@
 /* Test inttostr functions, and incidentally, INT_BUFSIZE_BOUND
-   Copyright (C) 2010-2024 Free Software Foundation, Inc.
+   Copyright (C) 2010-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -76,19 +76,20 @@ main (void)
   /* Ideally we would rely on the snprintf-posix module, in which case
      this guard would not be required, but due to limitations in gnulib's
      implementation (see modules/snprintf-posix), we cannot.  */
-  if (snprintf (b, b_size, "%ju", (uintmax_t) 3) == 1
-      && b[0] == '3' && b[1] == '\0')
+  if (!(snprintf (b, b_size, "%ju", (uintmax_t) 3) == 1
+        && b[0] == '3' && b[1] == '\0'))
     {
-      CK (int,          inttostr);
-      CK (unsigned int, uinttostr);
-      CK (off_t,        offtostr);
-      CK (uintmax_t,    umaxtostr);
-      CK (intmax_t,     imaxtostr);
+      /* snprintf doesn't accept %ju; skip this test.  */
       free (b);
-      return 0;
+      fputs ("Skipping test: %ju format directive not supported\n", stderr);
+      return 77;
     }
 
-  /* snprintf doesn't accept %ju; skip this test.  */
+  CK (int,          inttostr);
+  CK (unsigned int, uinttostr);
+  CK (off_t,        offtostr);
+  CK (uintmax_t,    umaxtostr);
+  CK (intmax_t,     imaxtostr);
   free (b);
-  return 77;
+  return test_exit_status;
 }

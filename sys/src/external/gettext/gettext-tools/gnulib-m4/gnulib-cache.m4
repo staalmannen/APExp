@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2024 Free Software Foundation, Inc.
+# Copyright (C) 2002-2026 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,8 @@
 
 
 # Specification in the form of a command-line invocation:
-# gnulib-tool --import --local-dir=gnulib-local \
+# gnulib-tool --import \
+#  --local-dir=gnulib-local \
 #  --lib=libgettextlib \
 #  --source-base=gnulib-lib \
 #  --m4-base=gnulib-m4 \
@@ -39,136 +40,232 @@
 #  --no-conditional-dependencies \
 #  --libtool \
 #  --macro-prefix=gl \
+#  --avoid=float-h-tests \
+#  --avoid=hashcode-string1 \
 #  --avoid=fdutimensat-tests \
 #  --avoid=futimens-tests \
 #  --avoid=utime-tests \
 #  --avoid=utimens-tests \
 #  --avoid=utimensat-tests \
 #  --avoid=array-list-tests \
+#  --avoid=array-map-tests \
+#  --avoid=array-oset-tests \
+#  --avoid=carray-list-tests \
 #  --avoid=linked-list-tests \
 #  --avoid=linkedhash-list-tests \
+#  --avoid=uninorm/decomposing-form-tests \
 #  --avoid=unilbrk/u8-possible-linebreaks-tests \
 #  --avoid=unilbrk/ulc-width-linebreaks-tests \
 #  --avoid=unistr/u8-mbtouc-tests \
 #  --avoid=unistr/u8-mbtouc-unsafe-tests \
 #  --avoid=uniwidth/width-tests \
+#  absolute-header \
+#  alignasof \
 #  alloca-opt \
 #  ansi-c++-opt \
+#  assert-h \
 #  atexit \
 #  attribute \
 #  backupfile \
 #  basename-lgpl \
+#  bcp47 \
 #  binary-io \
 #  bison \
 #  bison-i18n \
+#  bool \
+#  btowc \
+#  builtin-expect \
 #  byteswap \
 #  c-ctype \
 #  c-strcase \
 #  c-strcasestr \
 #  c-strstr \
+#  c99 \
+#  calloc-gnu \
+#  calloc-posix \
+#  carray-list \
 #  clean-temp \
+#  cloexec \
+#  close \
 #  closedir \
 #  closeout \
-#  configmake \
 #  copy-file \
 #  csharpcomp \
 #  csharpcomp-script \
 #  csharpexec \
 #  csharpexec-script \
+#  cygpath \
+#  d \
+#  dcomp-script \
+#  double-slash-root \
+#  dup2 \
+#  errno-h \
 #  error \
+#  error-h \
 #  error-progname \
 #  execute \
+#  exitfail \
 #  extensions \
+#  extensions-aix \
+#  extern-inline \
+#  fcntl \
+#  fcntl-h \
+#  fd-hook \
 #  filename \
 #  findprog \
 #  flexmember \
 #  fnmatch \
 #  fopen \
 #  free-posix \
+#  fstat \
 #  fstrcmp \
 #  full-write \
 #  fwriteerror \
 #  gcd \
+#  gen-header \
 #  getaddrinfo \
+#  getdtablesize \
 #  getline \
-#  getopt-gnu \
-#  gettext \
+#  getprogname \
+#  getrusage \
 #  gettext-h \
 #  gettext-tools-misc \
+#  gnulib-i18n \
+#  gocomp-script \
+#  hard-locale \
+#  hash-map \
+#  hash-set \
+#  hashkey-string \
+#  ialloc \
 #  iconv \
+#  idx \
 #  include_next \
+#  intprops \
+#  inttypes-h-incomplete \
+#  iswblank \
+#  iswctype \
+#  iswdigit \
+#  iswpunct \
+#  iswxdigit \
 #  java \
 #  javacomp \
 #  javacomp-script \
 #  javaexec \
 #  javaexec-script \
+#  largefile \
+#  libc-config \
 #  libunistring-optional \
 #  libxml \
+#  limits-h \
 #  localcharset \
-#  locale \
+#  locale-h \
+#  localeconv \
 #  localename \
 #  localtime \
 #  lock \
+#  lstat \
+#  malloc-gnu \
 #  malloc-posix \
+#  malloca \
 #  manywarnings \
 #  mbrtowc \
 #  mbsinit \
+#  mbszero \
+#  mbtowc \
 #  mem-hash-map \
 #  memchr \
+#  memcmp \
 #  memmove \
 #  memset \
 #  minmax \
 #  mkdir \
+#  modula2 \
+#  modula2comp-script \
+#  msvc-inval \
+#  msvc-nothrow \
 #  multiarch \
+#  next-prime \
 #  noreturn \
 #  obstack \
+#  once \
 #  open \
 #  opendir \
 #  openmp-init \
+#  options \
+#  pathmax \
 #  pipe-filter-ii \
 #  progname \
 #  propername \
+#  pthread-h \
+#  pthread-once \
 #  read-file \
 #  readdir \
+#  realloc-posix \
+#  reallocarray \
 #  relocatable-prog \
 #  relocatable-script \
+#  sched-h \
+#  set \
 #  setlocale \
 #  setlocale-null \
+#  setlocale-null-unlocked \
+#  sf-istream \
 #  sh-filename \
 #  sh-quote \
 #  sigpipe \
 #  sigprocmask \
+#  snippet/_Noreturn \
 #  snippet/arg-nonnull \
 #  snippet/c++defs \
 #  snippet/warn-on-use \
 #  spawn-pipe \
 #  ssize_t \
-#  stdbool \
-#  stddef \
-#  stdint \
-#  stdio \
-#  stdlib \
+#  stat \
+#  stat-time \
+#  std-gnu11 \
+#  stdckdint-h \
+#  stddef-h \
+#  stdint-h \
+#  stdio-h \
+#  stdlib-h \
 #  stpcpy \
 #  stpncpy \
+#  str_startswith \
 #  strchrnul \
 #  strcspn \
 #  streq \
 #  strerror \
+#  strerror-override \
 #  string-desc \
+#  string-h \
+#  strnlen \
 #  strpbrk \
 #  strtol \
 #  strtoul \
 #  supersede \
-#  sys_select \
-#  sys_stat \
-#  sys_time \
+#  sys_select-h \
+#  sys_stat-h \
+#  sys_time-h \
+#  sys_types-h \
+#  test-xfail \
+#  threadlib \
+#  time-h \
 #  trim \
+#  unicase/u8-casefold \
 #  unictype/ctype-space \
+#  unictype/property-white-space \
+#  unictype/property-xid-continue \
+#  unictype/property-xid-start \
 #  unictype/syntax-java-whitespace \
 #  unilbrk/ulc-width-linebreaks \
 #  uniname/uniname \
-#  unistd \
+#  uninorm/nfc \
+#  unistd-h \
+#  unistr/u16-check \
 #  unistr/u16-mbtouc \
+#  unistr/u16-to-u8 \
+#  unistr/u32-check \
+#  unistr/u32-to-u8 \
 #  unistr/u8-check \
 #  unistr/u8-mbtouc \
 #  unistr/u8-mbtoucr \
@@ -176,10 +273,13 @@
 #  uniwidth/width \
 #  unlocked-io \
 #  unsetenv \
+#  vararrays \
 #  vasprintf \
+#  vc-mtime \
 #  verify \
 #  wait-process \
-#  wchar \
+#  wchar-h \
+#  wctype \
 #  wctype-h \
 #  windows-mutex \
 #  windows-once \
@@ -187,135 +287,234 @@
 #  windows-rwlock \
 #  write \
 #  xalloc \
+#  xalloc-die \
+#  xalloc-oversized \
 #  xconcat-filename \
 #  xerror \
+#  xlist \
 #  xmalloca \
+#  xmap \
 #  xmemdup0 \
+#  xset \
 #  xsetenv \
+#  xstrerror \
 #  xstriconv \
 #  xstriconveh \
+#  xstring-buffer \
+#  xstring-buffer-reversed \
+#  xstring-desc \
 #  xvasprintf
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([../gnulib-local])
 gl_MODULES([
+  absolute-header
+  alignasof
   alloca-opt
   ansi-c++-opt
+  assert-h
   atexit
   attribute
   backupfile
   basename-lgpl
+  bcp47
   binary-io
   bison
   bison-i18n
+  bool
+  btowc
+  builtin-expect
   byteswap
   c-ctype
   c-strcase
   c-strcasestr
   c-strstr
+  c99
+  calloc-gnu
+  calloc-posix
+  carray-list
   clean-temp
+  cloexec
+  close
   closedir
   closeout
-  configmake
   copy-file
   csharpcomp
   csharpcomp-script
   csharpexec
   csharpexec-script
+  cygpath
+  d
+  dcomp-script
+  double-slash-root
+  dup2
+  errno-h
   error
+  error-h
   error-progname
   execute
+  exitfail
   extensions
+  extensions-aix
+  extern-inline
+  fcntl
+  fcntl-h
+  fd-hook
   filename
   findprog
   flexmember
   fnmatch
   fopen
   free-posix
+  fstat
   fstrcmp
   full-write
   fwriteerror
   gcd
+  gen-header
   getaddrinfo
+  getdtablesize
   getline
-  getopt-gnu
-  gettext
+  getprogname
+  getrusage
   gettext-h
   gettext-tools-misc
+  gnulib-i18n
+  gocomp-script
+  hard-locale
+  hash-map
+  hash-set
+  hashkey-string
+  ialloc
   iconv
+  idx
   include_next
+  intprops
+  inttypes-h-incomplete
+  iswblank
+  iswctype
+  iswdigit
+  iswpunct
+  iswxdigit
   java
   javacomp
   javacomp-script
   javaexec
   javaexec-script
+  largefile
+  libc-config
   libunistring-optional
   libxml
+  limits-h
   localcharset
-  locale
+  locale-h
+  localeconv
   localename
   localtime
   lock
+  lstat
+  malloc-gnu
   malloc-posix
+  malloca
   manywarnings
   mbrtowc
   mbsinit
+  mbszero
+  mbtowc
   mem-hash-map
   memchr
+  memcmp
   memmove
   memset
   minmax
   mkdir
+  modula2
+  modula2comp-script
+  msvc-inval
+  msvc-nothrow
   multiarch
+  next-prime
   noreturn
   obstack
+  once
   open
   opendir
   openmp-init
+  options
+  pathmax
   pipe-filter-ii
   progname
   propername
+  pthread-h
+  pthread-once
   read-file
   readdir
+  realloc-posix
+  reallocarray
   relocatable-prog
   relocatable-script
+  sched-h
+  set
   setlocale
   setlocale-null
+  setlocale-null-unlocked
+  sf-istream
   sh-filename
   sh-quote
   sigpipe
   sigprocmask
+  snippet/_Noreturn
   snippet/arg-nonnull
   snippet/c++defs
   snippet/warn-on-use
   spawn-pipe
   ssize_t
-  stdbool
-  stddef
-  stdint
-  stdio
-  stdlib
+  stat
+  stat-time
+  std-gnu11
+  stdckdint-h
+  stddef-h
+  stdint-h
+  stdio-h
+  stdlib-h
   stpcpy
   stpncpy
+  str_startswith
   strchrnul
   strcspn
   streq
   strerror
+  strerror-override
   string-desc
+  string-h
+  strnlen
   strpbrk
   strtol
   strtoul
   supersede
-  sys_select
-  sys_stat
-  sys_time
+  sys_select-h
+  sys_stat-h
+  sys_time-h
+  sys_types-h
+  test-xfail
+  threadlib
+  time-h
   trim
+  unicase/u8-casefold
   unictype/ctype-space
+  unictype/property-white-space
+  unictype/property-xid-continue
+  unictype/property-xid-start
   unictype/syntax-java-whitespace
   unilbrk/ulc-width-linebreaks
   uniname/uniname
-  unistd
+  uninorm/nfc
+  unistd-h
+  unistr/u16-check
   unistr/u16-mbtouc
+  unistr/u16-to-u8
+  unistr/u32-check
+  unistr/u32-to-u8
   unistr/u8-check
   unistr/u8-mbtouc
   unistr/u8-mbtoucr
@@ -323,10 +522,13 @@ gl_MODULES([
   uniwidth/width
   unlocked-io
   unsetenv
+  vararrays
   vasprintf
+  vc-mtime
   verify
   wait-process
-  wchar
+  wchar-h
+  wctype
   wctype-h
   windows-mutex
   windows-once
@@ -334,16 +536,25 @@ gl_MODULES([
   windows-rwlock
   write
   xalloc
+  xalloc-die
+  xalloc-oversized
   xconcat-filename
   xerror
+  xlist
   xmalloca
+  xmap
   xmemdup0
+  xset
   xsetenv
+  xstrerror
   xstriconv
   xstriconveh
+  xstring-buffer
+  xstring-buffer-reversed
+  xstring-desc
   xvasprintf
 ])
-gl_AVOID([ fdutimensat-tests futimens-tests utime-tests utimens-tests utimensat-tests array-list-tests linked-list-tests linkedhash-list-tests unilbrk/u8-possible-linebreaks-tests unilbrk/ulc-width-linebreaks-tests unistr/u8-mbtouc-tests unistr/u8-mbtouc-unsafe-tests uniwidth/width-tests])
+gl_AVOID([float-h-tests hashcode-string1 fdutimensat-tests futimens-tests utime-tests utimens-tests utimensat-tests array-list-tests array-map-tests array-oset-tests carray-list-tests linked-list-tests linkedhash-list-tests uninorm/decomposing-form-tests unilbrk/u8-possible-linebreaks-tests unilbrk/ulc-width-linebreaks-tests unistr/u8-mbtouc-tests unistr/u8-mbtouc-unsafe-tests uniwidth/width-tests])
 gl_SOURCE_BASE([gnulib-lib])
 gl_M4_BASE([gnulib-m4])
 gl_PO_BASE([])

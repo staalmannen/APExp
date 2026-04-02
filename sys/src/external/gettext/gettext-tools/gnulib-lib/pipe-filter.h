@@ -1,5 +1,5 @@
 /* Filtering of data through a subprocess.  -*- coding: utf-8 -*-
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2009,
    and Paolo Bonzini <bonzini@gnu.org>, 2009.
 
@@ -185,7 +185,7 @@ extern int
    - If exit_on_error is true, any error will cause the main process to
      exit with an error status.
    If the subprocess does not start correctly, exit if exit_on_error is
-   true, otherwise return NULL and set errno.
+   true.
 
    The caller will write to the subprocess through pipe_filter_gi_write
    and finally call pipe_filter_gi_close.  During such calls, the

@@ -1,6 +1,6 @@
 ## DO NOT EDIT! GENERATED AUTOMATICALLY!
 ## Process this file with automake to produce Makefile.in.
-# Copyright (C) 2002-2024 Free Software Foundation, Inc.
+# Copyright (C) 2002-2026 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ EXTRA_PROGRAMS =
 noinst_HEADERS =
 noinst_LIBRARIES =
 check_LIBRARIES = libtests.a
+pkgdata_DATA =
 EXTRA_DIST =
 BUILT_SOURCES =
 SUFFIXES =
@@ -43,8 +44,9 @@ CLEANFILES =
 DISTCLEANFILES =
 MAINTAINERCLEANFILES =
 
+AM_CFLAGS += @GL_CFLAG_ALLOW_WARNINGS@ $(GL_CFLAG_GNULIB_WARNINGS)
+
 CFLAGS = @GL_CFLAG_ALLOW_WARNINGS@ $(GL_CFLAG_GNULIB_WARNINGS) @CFLAGS@
-CXXFLAGS = @GL_CXXFLAG_ALLOW_WARNINGS@ @CXXFLAGS@
 
 AM_CPPFLAGS = \
   -D@ltstests_WITNESS@=1 \
@@ -61,6 +63,7 @@ EXTRA_libtests_a_SOURCES =
 AM_LIBTOOLFLAGS = --preserve-dup-deps
 
 TESTS_ENVIRONMENT += EXEEXT='@EXEEXT@' srcdir='$(srcdir)'
+IGNORE_SKIPPED_LOGS = 1
 
 ## begin gnulib module gen-header
 
@@ -77,6 +80,7 @@ SED_HEADER_STDOUT = sed -e 1h -e '1$(SED_HEADER_NOEDIT)' -e 1G
 SED_HEADER_TO_AT_t = $(SED_HEADER_STDOUT) -n -e 'w $@-t'
 
 # Use $(gl_V_at) instead of $(AM_V_GEN) or $(AM_V_at) on a line that
+# is its recipe's first line if and only if @NMD@ lines are absent.
 gl_V_at = $(AM_V_GEN)
 
 ## end   gnulib module gen-header
@@ -143,7 +147,7 @@ TESTS += test-term-ostream-xterm.sh
 TESTS_ENVIRONMENT += srcdir='$(srcdir)'
 check_PROGRAMS += test-term-ostream
 test_term_ostream_LDADD = $(LIBTERMCAP) $(LDADD)
-EXTRA_DIST += test-term-ostream.c test-term-ostream-xterm.sh test-term-ostream-xterm-r6.out test-term-ostream-xterm-xf86-v32.out test-term-ostream-xterm-basic.out test-term-ostream-xterm-basic-italic.out test-term-ostream-xterm-freebsd101.out test-term-ostream-xterm-freebsd-italic.out test-term-ostream-xterm-8bit.out test-term-ostream-xterm-linux-debian.out test-term-ostream-xterm-linux-mandriva.out test-term-ostream-xterm-netbsd3.out test-term-ostream-xterm-solaris10.out test-term-ostream-xterm-aix51.out test-term-ostream-xterm-osf51.out test-term-ostream-xterm-irix65.out test-term-ostream-xterm-mingw.out test-term-ostream-xterm-16color.out test-term-ostream-xterm-88color.out test-term-ostream-xterm-256color.out
+EXTRA_DIST += test-term-ostream.c test-term-ostream-xterm.sh test-term-ostream-xterm-r6.out test-term-ostream-xterm-xf86-v32.out test-term-ostream-xterm-basic.out test-term-ostream-xterm-basic-italic.out test-term-ostream-xterm-freebsd101.out test-term-ostream-xterm-freebsd-italic.out test-term-ostream-xterm-8bit.out test-term-ostream-xterm-linux-debian.out test-term-ostream-xterm-linux-mandriva.out test-term-ostream-xterm-netbsd3.out test-term-ostream-xterm-solaris10.out test-term-ostream-xterm-aix51.out test-term-ostream-xterm-osf51.out test-term-ostream-xterm-irix65.out test-term-ostream-xterm-mingw.out test-term-ostream-xterm-msys2.out test-term-ostream-xterm-16color.out test-term-ostream-xterm-88color.out test-term-ostream-xterm-256color.out
 
 ## end   gnulib module term-ostream-tests
 

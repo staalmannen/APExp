@@ -1,5 +1,5 @@
 /* Test of copying of files.
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ main (int argc, char *argv[])
   if (null_stderr)
     ASSERT (qcopy_file_preserving (file1, file2) == 0);
   else
-    copy_file_preserving (file1, file2);
+    xcopy_file_preserving (file1, file2);
 
-  return 0;
+  return test_exit_status;
 }

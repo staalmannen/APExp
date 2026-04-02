@@ -1,5 +1,5 @@
 /* Test of 32-bit wide character properties.
-   Copyright (C) 2023-2024 Free Software Foundation, Inc.
+   Copyright (C) 2023-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -166,5 +166,5 @@ main (int argc, char *argv[])
   ASSERT (! c32_apply_type_test ((char32_t) '\0', desc));
   ASSERT (! c32_apply_type_test (WEOF, desc));
 
-  return 0;
+  return test_exit_status;
 }

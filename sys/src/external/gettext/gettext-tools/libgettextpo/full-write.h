@@ -1,6 +1,6 @@
 /* An interface to write() that writes all it is asked to write.
 
-   Copyright (C) 2002-2003, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2002-2003, 2009-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -17,6 +17,7 @@
 
 #include <stddef.h>
 
+#include "idx.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -26,7 +27,7 @@ extern "C" {
 /* Write COUNT bytes at BUF to descriptor FD, retrying if interrupted
    or if partial writes occur.  Return the number of bytes successfully
    written, setting errno if that is less than COUNT.  */
-extern size_t full_write (int fd, const void *buf, size_t count);
+extern idx_t full_write (int fd, const void *buf, idx_t count);
 
 
 #ifdef __cplusplus

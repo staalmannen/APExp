@@ -1,5 +1,4 @@
-/* Copyright (C) 1995-2023 Free Software Foundation, Inc.
-   Contributed by Ulrich Drepper <drepper@gnu.ai.mit.edu>, 1995.
+/* Copyright (C) 1995-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -7,12 +6,14 @@
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of pcpy
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU Lesser General Public License for more details.
 
    You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Ulrich Drepper and Bruno Haible.  */
 
 /* Tell glibc's <string.h> to provide a prototype for stpcpy().
    This must come before <config.h> because <config.h> may include
@@ -51,22 +52,24 @@
 /* @@ end of prolog @@ */
 
 #ifdef _LIBC
+/* Rename the non ANSI C functions.  This is required by the standard
+   because some ANSI C functions will require linking with this object
+   file and the name space must not be polluted.  */
+# ifndef stpcpy
+#  define stpcpy(dest, src) __stpcpy(dest, src)
+# endif
+#else
+# ifndef HAVE_STPCPY
+static char *stpcpy (char *dest, const char *src);
+# endif
+#endif
+
+#ifdef _LIBC
 # define IS_ABSOLUTE_FILE_NAME(P) ((P)[0] == '/')
 # define IS_RELATIVE_FILE_NAME(P) (! IS_ABSOLUTE_FILE_NAME (P))
 #else
 # include "filename.h"
 #endif
-
-
-#define stpcpy __stpcpy
-
-static char *__stpcpy(char * dest, const char *src)
-{
-	while ((*dest++ = *src++) != '\0')
-		/* do nothing */
-	return dest -1;
-}
-
 
 /* Return number of bits set in X.  */
 #ifndef ARCH_POP
@@ -401,4 +404,16 @@ _nl_normalize_codeset (const char *codeset, size_t name_len)
 
 /* @@ begin of epilog @@ */
 
-
+/* We don't want libintl.a to depend on any other library.  So we
+   avoid the non-standard function stpcpy.  In GNU C Library this
+   function is available, though.  Also allow the symbol HAVE_STPCPY
+   to be defined.  */
+#if !_LIBC && !HAVE_STPCPY
+static char *
+stpcpy (char *dest, const char *src)
+{
+  while ((*dest++ = *src++) != '\0')
+    /* Do nothing. */ ;
+  return dest - 1;
+}
+#endif

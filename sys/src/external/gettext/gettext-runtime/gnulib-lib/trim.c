@@ -1,5 +1,5 @@
 /* Removes leading and/or trailing whitespaces
-   Copyright (C) 2006-2024 Free Software Foundation, Inc.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -45,11 +45,12 @@ trim2 (const char *s, int how)
 #if GNULIB_MCEL_PREFER
       /* Skip leading whitespace. */
       if (how != TRIM_TRAILING)
-        for (mcel_t g; *start; start += g.len)
+        for (; *start; )
           {
-            g = mcel_scanz (start);
+            mcel_t g = mcel_scanz (start);
             if (!c32isspace (g.ch))
               break;
+            start += g.len;
           }
 
       /* Find start of any trailing whitespace.  */

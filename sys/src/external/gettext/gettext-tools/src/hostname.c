@@ -1,6 +1,5 @@
 /* Display hostname in various forms.
-   Copyright (C) 2001-2003, 2006-2007, 2012, 2014, 2018-2023 Free Software Foundation, Inc.
-   Written by Bruno Haible <haible@clisp.cons.org>, 2001.
+   Copyright (C) 2001-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,13 +14,12 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Written by Bruno Haible.  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+
+#include <config.h>
 
 #include <errno.h>
-#include <getopt.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -95,9 +93,10 @@
 /* Include this after <sys/socket.h>, to avoid a syntax error on BeOS.  */
 #include <stdbool.h>
 
+#include <error.h>
+#include "options.h"
 #include "noreturn.h"
 #include "closeout.h"
-#include "error.h"
 #include "error-progname.h"
 #include "progname.h"
 #include "relocatable.h"
@@ -112,18 +111,6 @@
 /* Output format.  */
 static enum { default_format, short_format, long_format, ip_format } format;
 
-/* Long options.  */
-static const struct option long_options[] =
-{
-  { "fqdn", no_argument, NULL, 'f' },
-  { "help", no_argument, NULL, 'h' },
-  { "ip-address", no_argument, NULL, 'i' },
-  { "long", no_argument, NULL, 'f' },
-  { "short", no_argument, NULL, 's' },
-  { "version", no_argument, NULL, 'V' },
-  { NULL, 0, NULL, 0 }
-};
-
 
 /* Forward declaration of local functions.  */
 _GL_NORETURN_FUNC static void usage (int status);
@@ -132,10 +119,6 @@ static void print_hostname (void);
 int
 main (int argc, char *argv[])
 {
-  int optchar;
-  bool do_help;
-  bool do_version;
-
   /* Set program name for messages.  */
   set_program_name (argv[0]);
   error_print_progname = maybe_print_progname;
@@ -145,42 +128,57 @@ main (int argc, char *argv[])
 
   /* Set the text message domain.  */
   bindtextdomain (PACKAGE, relocate (LOCALEDIR));
+  bindtextdomain ("gnulib", relocate (GNULIB_LOCALEDIR));
   textdomain (PACKAGE);
 
   /* Ensure that write errors on stdout are detected.  */
   atexit (close_stdout);
 
-  /* Set default values for variables.  */
-  do_help = false;
-  do_version = false;
+  /* Default values for command line options.  */
+  bool do_help = false;
+  bool do_version = false;
   format = default_format;
 
   /* Parse command line options.  */
-  while ((optchar = getopt_long (argc, argv, "fhisV", long_options, NULL))
-         != EOF)
-    switch (optchar)
-    {
-    case '\0':          /* Long option.  */
-      break;
-    case 'f':
-      format = long_format;
-      break;
-    case 's':
-      format = short_format;
-      break;
-    case 'i':
-      format = ip_format;
-      break;
-    case 'h':
-      do_help = true;
-      break;
-    case 'V':
-      do_version = true;
-      break;
-    default:
-      usage (EXIT_FAILURE);
-      /* NOTREACHED */
-    }
+  BEGIN_ALLOW_OMITTING_FIELD_INITIALIZERS
+  static const struct program_option options[] =
+  {
+    { "fqdn",       'f', no_argument },
+    { "help",       'h', no_argument },
+    { "ip-address", 'i', no_argument },
+    { "long",       'f', no_argument },
+    { "short",      's', no_argument },
+    { "version",    'V', no_argument },
+  };
+  END_ALLOW_OMITTING_FIELD_INITIALIZERS
+  start_options (argc, argv, options, MOVE_OPTIONS_FIRST, 0);
+  {
+    int optchar;
+    while ((optchar = get_next_option ()) != -1)
+      switch (optchar)
+        {
+        case '\0':          /* Long option with key == 0.  */
+          break;
+        case 'f':
+          format = long_format;
+          break;
+        case 's':
+          format = short_format;
+          break;
+        case 'i':
+          format = ip_format;
+          break;
+        case 'h':
+          do_help = true;
+          break;
+        case 'V':
+          do_version = true;
+          break;
+        default:
+          usage (EXIT_FAILURE);
+          /* NOTREACHED */
+        }
+  }
 
   /* Version information requested.  */
   if (do_version)
@@ -193,7 +191,7 @@ License GPLv3+: GNU GPL version 3 or later <%s>\n\
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n\
 "),
-              "2001-2023", "https://gnu.org/licenses/gpl.html");
+              "2001-2026", "https://gnu.org/licenses/gpl.html");
       printf (_("Written by %s.\n"), proper_name ("Bruno Haible"));
       exit (EXIT_SUCCESS);
     }
@@ -250,7 +248,7 @@ Informative output:\n"));
          email address for this package.  Please add _another line_ saying
          "Report translation bugs to <...>\n" with the address for translation
          bugs (typically your translation team's web or email address).  */
-      printf(_("\
+      printf (_("\
 Report bugs in the bug tracker at <%s>\n\
 or by email to <%s>.\n"),
              "https://savannah.gnu.org/projects/gettext",
@@ -267,22 +265,22 @@ xgethostname ()
 #ifdef WIN32_NATIVE
   char hostname[MAX_COMPUTERNAME_LENGTH+1];
   DWORD size = sizeof (hostname);
-
   if (!GetComputerName (hostname, &size))
     error (EXIT_FAILURE, 0, _("could not get host name"));
+
   return xstrdup (hostname);
 #elif HAVE_GETHOSTNAME
   char hostname[MAXHOSTNAMELEN+1];
-
   if (gethostname (hostname, MAXHOSTNAMELEN) < 0)
     error (EXIT_FAILURE, errno, _("could not get host name"));
   hostname[MAXHOSTNAMELEN] = '\0';
+
   return xstrdup (hostname);
 #else
   struct utsname utsname;
-
   if (uname (&utsname) < 0)
     error (EXIT_FAILURE, errno, _("could not get host name"));
+
   return xstrdup (utsname.nodename);
 #endif
 }
@@ -351,10 +349,7 @@ ipv6_is_linklocal (const struct in6_addr *addr)
 static void
 print_hostname ()
 {
-  char *hostname;
-  char *dot;
-
-  hostname = xgethostname ();
+  char *hostname = xgethostname ();
 
   switch (format)
     {
@@ -365,9 +360,11 @@ print_hostname ()
 
     case short_format:
       /* Print only the part before the first dot.  */
-      dot = strchr (hostname, '.');
-      if (dot != NULL)
-        *dot = '\0';
+      {
+        char *dot = strchr (hostname, '.');
+        if (dot != NULL)
+          *dot = '\0';
+      }
       printf ("%s\n", hostname);
       break;
 
@@ -377,21 +374,17 @@ print_hostname ()
          getnameinfo() is not even needed.  */
       {
         struct addrinfo hints;
-        struct addrinfo *res;
-        int ret;
-
         memset (&hints, 0, sizeof (hints));
         hints.ai_family = AF_UNSPEC; /* either AF_INET or AF_INET6 is ok */
         hints.ai_socktype = SOCK_STREAM; /* or SOCK_DGRAM or 0 */
         hints.ai_protocol = 0; /* any protocol is ok */
         hints.ai_flags = AI_CANONNAME;
 
-        ret = getaddrinfo (hostname, NULL, &hints, &res);
+        struct addrinfo *res;
+        int ret = getaddrinfo (hostname, NULL, &hints, &res);
         if (ret == 0)
           {
-            struct addrinfo *p;
-
-            for (p = res; p != NULL; p = p->ai_next)
+            for (struct addrinfo *p = res; p != NULL; p = p->ai_next)
               {
                 /* Typically p->ai_socktype == SOCK_STREAM, p->ai_protocol == IPPROTO_TCP,
                    or        p->ai_socktype == SOCK_DGRAM, p->ai_protocol == IPPROTO_UDP.  */
@@ -408,15 +401,12 @@ print_hostname ()
 #elif HAVE_GETHOSTBYNAME
       /* Look for netwide usable hostname and aliases using gethostbyname().  */
       {
-        struct hostent *h;
-        size_t i;
-
-        h = gethostbyname (hostname);
+        struct hostent *h = gethostbyname (hostname);
         if (h != NULL)
           {
             printf ("%s\n", h->h_name);
             if (h->h_aliases != NULL)
-              for (i = 0; h->h_aliases[i] != NULL; i++)
+              for (size_t i = 0; h->h_aliases[i] != NULL; i++)
                 printf ("%s\n", h->h_aliases[i]);
           }
         else
@@ -433,22 +423,17 @@ print_hostname ()
          getnameinfo().  */
       {
         struct addrinfo hints;
-        struct addrinfo *res;
-        int ret;
-        char host[1025];
-
         memset (&hints, 0, sizeof (hints));
         hints.ai_family = AF_UNSPEC; /* either AF_INET or AF_INET6 is ok */
         hints.ai_socktype = SOCK_STREAM; /* or SOCK_DGRAM */
         hints.ai_protocol = 0; /* any protocol is ok */
         hints.ai_flags = 0;
 
-        ret = getaddrinfo (hostname, NULL, &hints, &res);
+        struct addrinfo *res;
+        int ret = getaddrinfo (hostname, NULL, &hints, &res);
         if (ret == 0)
           {
-            struct addrinfo *p;
-
-            for (p = res; p != NULL; p = p->ai_next)
+            for (struct addrinfo *p = res; p != NULL; p = p->ai_next)
               {
                 /* Typically p->ai_socktype == SOCK_STREAM, p->ai_protocol == IPPROTO_TCP,
                    or        p->ai_socktype == SOCK_DGRAM, p->ai_protocol == IPPROTO_UDP.  */
@@ -461,14 +446,17 @@ print_hostname ()
                           && ipv6_is_linklocal (&((const struct sockaddr_in6 *) p->ai_addr)->sin6_addr))
 # endif
                    ) )
-                  if (getnameinfo (p->ai_addr, p->ai_addrlen,
-                                   host, sizeof (host),
-                                   NULL, 0,
-                                   NI_NUMERICHOST)
-                      == 0)
-                    {
-                      printf ("[%.*s]\n", (int) sizeof (host), host);
-                    }
+                  {
+                    char host[1025];
+                    if (getnameinfo (p->ai_addr, p->ai_addrlen,
+                                     host, sizeof (host),
+                                     NULL, 0,
+                                     NI_NUMERICHOST)
+                        == 0)
+                      {
+                        printf ("[%.*s]\n", (int) sizeof (host), host);
+                      }
+                  }
               }
 
             freeaddrinfo (res);
@@ -477,12 +465,9 @@ print_hostname ()
 #elif HAVE_GETHOSTBYNAME
       /* Look for netwide usable IP addresses using gethostbyname().  */
       {
-        struct hostent *h;
-        size_t i;
-
-        h = gethostbyname (hostname);
+        struct hostent *h = gethostbyname (hostname);
         if (h != NULL && h->h_addr_list != NULL)
-          for (i = 0; h->h_addr_list[i] != NULL; i++)
+          for (size_t i = 0; h->h_addr_list[i] != NULL; i++)
             {
 # if HAVE_IPV6
               if (h->h_addrtype == AF_INET6)
@@ -507,4 +492,6 @@ print_hostname ()
     default:
       abort ();
     }
+
+  free (hostname);
 }

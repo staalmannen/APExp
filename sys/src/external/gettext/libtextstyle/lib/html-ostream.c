@@ -5,8 +5,7 @@
 #endif
 #line 1 "html-ostream.oo.c"
 /* Output stream that produces HTML output.
-   Copyright (C) 2006-2009, 2019-2020 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,6 +19,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible.  */
 
 #include <config.h>
 
@@ -36,7 +37,7 @@
 #include "unistr.h"
 #include "xalloc.h"
 
-#line 40 "html-ostream.c"
+#line 41 "html-ostream.c"
 #include "html_ostream.priv.h"
 
 const typeinfo_t html_ostream_typeinfo = { "html_ostream" };
@@ -46,7 +47,7 @@ static const typeinfo_t * const html_ostream_superclasses[] =
 
 #define super ostream_vtable
 
-#line 51 "html-ostream.oo.c"
+#line 52 "html-ostream.oo.c"
 
 /* Emit an HTML attribute value.
    quote is either '"' or '\''.  */
@@ -127,9 +128,7 @@ emit_pending_spans (html_ostream_t stream, bool shrink_stack)
 {
   if (stream->curr_class_stack_size > stream->last_class_stack_size)
     {
-      size_t i;
-
-      for (i = stream->last_class_stack_size; i < stream->curr_class_stack_size; i++)
+      for (size_t i = stream->last_class_stack_size; i < stream->curr_class_stack_size; i++)
         {
           char *classname = (char *) gl_list_get_at (stream->class_stack, i);
 
@@ -141,9 +140,7 @@ emit_pending_spans (html_ostream_t stream, bool shrink_stack)
     }
   else if (stream->curr_class_stack_size < stream->last_class_stack_size)
     {
-      size_t i;
-
-      for (i = stream->last_class_stack_size; i > stream->curr_class_stack_size; i--)
+      for (size_t i = stream->last_class_stack_size; i > stream->curr_class_stack_size; i--)
         ostream_write_str (stream->destination, "</span>");
       stream->last_class_stack_size = stream->curr_class_stack_size;
       if (shrink_stack)
@@ -161,9 +158,7 @@ html_ostream__write_mem (html_ostream_t stream, const void *data, size_t len)
     {
       #define BUFFERSIZE 2048
       char inbuffer[BUFFERSIZE];
-      size_t inbufcount;
-
-      inbufcount = stream->buflen;
+      size_t inbufcount = stream->buflen;
       if (inbufcount > 0)
         memcpy (inbuffer, stream->buf, inbufcount);
       for (;;)
@@ -189,16 +184,14 @@ html_ostream__write_mem (html_ostream_t stream, const void *data, size_t len)
 
             while (insize > 0)
               {
-                unsigned char c0;
-                ucs4_t uc;
-                int nbytes;
-
-                c0 = ((const unsigned char *) inptr)[0];
+                unsigned char c0 = ((const unsigned char *) inptr)[0];
                 if (insize < (c0 < 0xc0 ? 1 : c0 < 0xe0 ? 2 : c0 < 0xf0 ? 3 :
                               c0 < 0xf8 ? 4 : c0 < 0xfc ? 5 : 6))
                   break;
 
-                nbytes = u8_mbtouc (&uc, (const unsigned char *) inptr, insize);
+                ucs4_t uc;
+                int nbytes =
+                  u8_mbtouc (&uc, (const unsigned char *) inptr, insize);
 
                 if (uc == '\n')
                   {
@@ -423,7 +416,6 @@ html_ostream_t
 html_ostream_create (ostream_t destination)
 {
   html_ostream_t stream = XMALLOC (struct html_ostream_representation);
-
   stream->base.vtable = &html_ostream_vtable;
   stream->destination = destination;
   stream->hyperlink_ref = NULL;
@@ -452,7 +444,7 @@ is_instance_of_html_ostream (ostream_t stream)
   return IS_INSTANCE (stream, ostream, html_ostream);
 }
 
-#line 456 "html-ostream.c"
+#line 448 "html-ostream.c"
 
 const struct html_ostream_implementation html_ostream_vtable =
 {

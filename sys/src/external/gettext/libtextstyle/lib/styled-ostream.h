@@ -2,8 +2,7 @@
 
 #line 1 "styled-ostream.oo.h"
 /* Abstract output stream for CSS styled text.
-   Copyright (C) 2006, 2019-2020 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,6 +17,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Written by Bruno Haible.  */
+
 #ifndef _STYLED_OSTREAM_H
 #define _STYLED_OSTREAM_H
 
@@ -31,7 +32,7 @@
    where the rendering of the CSS classes is defined through a CSS (cascading
    style sheet).  */
 
-#line 35 "styled-ostream.h"
+#line 36 "styled-ostream.h"
 struct styled_ostream_representation;
 /* styled_ostream_t is defined as a pointer to struct styled_ostream_representation.
    In C++ mode, we use a smart pointer class.
@@ -186,7 +187,7 @@ extern const typeinfo_t styled_ostream_typeinfo;
 
 extern const struct styled_ostream_implementation styled_ostream_vtable;
 
-#line 58 "styled-ostream.oo.h"
+#line 59 "styled-ostream.oo.h"
 
 #ifdef __cplusplus
 extern "C" {

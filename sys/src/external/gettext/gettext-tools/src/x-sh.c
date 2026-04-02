@@ -1,6 +1,5 @@
 /* xgettext sh backend.
-   Copyright (C) 2003, 2005-2009, 2014, 2018-2023 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2003.
+   Copyright (C) 2003-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,9 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+/* Written by Bruno Haible.  */
+
+#include <config.h>
 
 /* Specification.  */
 #include "x-sh.h"
@@ -29,6 +28,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <error.h>
 #include "attribute.h"
 #include "message.h"
 #include "xgettext.h"
@@ -38,8 +38,7 @@
 #include "xg-arglist-callshape.h"
 #include "xg-arglist-parser.h"
 #include "xg-message.h"
-#include "error.h"
-#include "error-progname.h"
+#include "if-error.h"
 #include "xalloc.h"
 #include "mem-hash-map.h"
 #include "../../gettext-runtime/src/escapes.h"
@@ -64,6 +63,9 @@
    - Strings are enclosed in "..."; command substitution, variable
      substitution and arithmetic substitution are performed here as well.
    - '...' is a string without substitutions.
+   - $'...' is a string with escapes but without substitutions.
+     <https://pubs.opengroup.org/onlinepubs/9799919799/utilities/V3_chap02.html#tag_19_02_04>
+     <https://www.gnu.org/software/bash/manual/html_node/ANSI_002dC-Quoting.html>
    - The list of resulting words is split into commands by semicolon and
      newline.
    - '#' at the beginning of a word introduces a comment until end of line.
@@ -93,18 +95,16 @@ x_sh_keyword (const char *name)
     default_keywords = false;
   else
     {
-      const char *end;
-      struct callshape shape;
-      const char *colon;
-
       if (keywords.table == NULL)
         hash_init (&keywords, 100);
 
+      const char *end;
+      struct callshape shape;
       split_keywordspec (name, &end, &shape);
 
       /* The characters between name and end should form a valid C identifier.
          A colon means an invalid parse in split_keywordspec().  */
-      colon = strchr (name, ':');
+      const char *colon = strchr (name, ':');
       if (colon == NULL || colon >= end)
         insert_keyword_callshape (&keywords, name, end - name, &shape);
     }
@@ -121,6 +121,8 @@ init_keywords ()
          xgettext.texi!  */
       x_sh_keyword ("gettext");
       x_sh_keyword ("ngettext:1,2");
+      x_sh_keyword ("printf_gettext");
+      x_sh_keyword ("printf_ngettext:1,2");
       /* Note: There is also special handling for 'gettext' and 'ngettext'
          in read_command, below.  */
       x_sh_keyword ("eval_gettext");
@@ -135,14 +137,21 @@ void
 init_flag_table_sh ()
 {
   xgettext_record_flag ("gettext:1:pass-sh-format");
+  xgettext_record_flag ("gettext:1:pass-sh-printf-format");
   xgettext_record_flag ("ngettext:1:pass-sh-format");
+  xgettext_record_flag ("ngettext:1:pass-sh-printf-format");
   xgettext_record_flag ("ngettext:2:pass-sh-format");
+  xgettext_record_flag ("ngettext:2:pass-sh-printf-format");
   xgettext_record_flag ("eval_gettext:1:sh-format");
   xgettext_record_flag ("eval_ngettext:1:sh-format");
   xgettext_record_flag ("eval_ngettext:2:sh-format");
   xgettext_record_flag ("eval_pgettext:2:sh-format");
   xgettext_record_flag ("eval_npgettext:2:sh-format");
   xgettext_record_flag ("eval_npgettext:3:sh-format");
+  xgettext_record_flag ("printf:1:sh-printf-format");
+  xgettext_record_flag ("printf_gettext:1:sh-printf-format");
+  xgettext_record_flag ("printf_ngettext:1:sh-printf-format");
+  xgettext_record_flag ("printf_ngettext:2:sh-printf-format");
 }
 
 
@@ -182,7 +191,7 @@ do_ungetc (int c)
 
 /* Remove backslash followed by newline from the input stream.  */
 
-static int phase1_pushback[2];
+static int phase1_pushback[9];
 static int phase1_pushback_length;
 
 static int
@@ -212,7 +221,7 @@ phase1_getc ()
     }
 }
 
-/* Supports only one pushback character.  */
+/* Supports 9 pushback characters.  */
 static void
 phase1_ungetc (int c)
 {
@@ -231,59 +240,6 @@ phase1_ungetc (int c)
       phase1_pushback[phase1_pushback_length++] = c;
       break;
     }
-}
-
-
-/* ========================== Reading of tokens.  ========================== */
-
-
-/* A token consists of a sequence of characters.  */
-struct token
-{
-  int allocated;                /* number of allocated 'token_char's */
-  int charcount;                /* number of used 'token_char's */
-  char *chars;                  /* the token's constituents */
-};
-
-/* Initialize a 'struct token'.  */
-static inline void
-init_token (struct token *tp)
-{
-  tp->allocated = 10;
-  tp->chars = XNMALLOC (tp->allocated, char);
-  tp->charcount = 0;
-}
-
-/* Free the memory pointed to by a 'struct token'.  */
-static inline void
-free_token (struct token *tp)
-{
-  free (tp->chars);
-}
-
-/* Ensure there is enough room in the token for one more character.  */
-static inline void
-grow_token (struct token *tp)
-{
-  if (tp->charcount == tp->allocated)
-    {
-      tp->allocated *= 2;
-      tp->chars = (char *) xrealloc (tp->chars, tp->allocated * sizeof (char));
-    }
-}
-
-/* Convert a struct token * to a char*.  */
-static char *
-string_of_token (const struct token *tp)
-{
-  char *str;
-  int n;
-
-  n = tp->charcount;
-  str = XNMALLOC (n + 1, char);
-  memcpy (str, tp->chars, n);
-  str[n] = '\0';
-  return str;
 }
 
 
@@ -447,8 +403,8 @@ enum word_type
 struct word
 {
   enum word_type type;
-  struct token *token;          /* for t_string */
-  int line_number_at_start;     /* for t_string */
+  struct mixed_string_buffer *token; /* for t_string */
+  int line_number_at_start;          /* for t_string */
 };
 
 /* Free the memory pointed to by a 'struct word'.  */
@@ -457,43 +413,9 @@ free_word (struct word *wp)
 {
   if (wp->type == t_string)
     {
-      free_token (wp->token);
+      mixed_string_buffer_destroy (wp->token);
       free (wp->token);
     }
-}
-
-/* Convert a t_string token to a char*.  */
-static char *
-string_of_word (const struct word *wp)
-{
-  char *str;
-  int n;
-
-  if (!(wp->type == t_string))
-    abort ();
-  n = wp->token->charcount;
-  str = XNMALLOC (n + 1, char);
-  memcpy (str, wp->token->chars, n);
-  str[n] = '\0';
-  return str;
-}
-
-/* Convert a t_string token to a char*, ignoring the first OFFSET bytes.  */
-static char *
-substring_of_word (const struct word *wp, size_t offset)
-{
-  char *str;
-  int n;
-
-  if (!(wp->type == t_string))
-    abort ();
-  n = wp->token->charcount;
-  if (!(offset <= n))
-    abort ();
-  str = XNMALLOC (n - offset + 1, char);
-  memcpy (str, wp->token->chars + offset, n - offset);
-  str[n - offset] = '\0';
-  return str;
 }
 
 
@@ -541,7 +463,7 @@ static int phase2_pushback_length;
    The result is QUOTED(c) for some unsigned char c, if the next character
    is escaped sufficiently often to make it a regular constituent character,
    or simply an 'unsigned char' if it has its special meaning (of special,
-   whitespace or operator charcter), or OPENING_BACKQUOTE, CLOSING_BACKQUOTE,
+   whitespace or operator character), or OPENING_BACKQUOTE, CLOSING_BACKQUOTE,
    EOF.
    It's the caller's responsibility to update the state.  */
 static int
@@ -587,15 +509,16 @@ phase2_getc ()
          final output.  */
       unsigned int expected_count =
         (unsigned int) 1 << debackslashify;
+
       /* Number of backslashes found.  */
       unsigned int count;
-
       for (count = 1; count < expected_count; count++)
         {
           c = phase1_getc ();
           if (c != '\\')
             break;
         }
+
       if (count == expected_count)
         return '\\';
 
@@ -743,7 +666,7 @@ static int nesting_depth;
 
 /* Forward declaration of local functions.  */
 static enum word_type read_command_list (int looking_for,
-                                         flag_context_ty outer_context);
+                                         flag_region_ty *outer_region);
 
 
 
@@ -751,11 +674,9 @@ static enum word_type read_command_list (int looking_for,
    'looking_for' denotes a parse terminator, either CLOSING_BACKQUOTE, ')'
    or '\0'.  */
 static void
-read_word (struct word *wp, int looking_for, flag_context_ty context)
+read_word (struct word *wp, int looking_for, flag_region_ty *region)
 {
   int c;
-  bool all_unquoted_digits;
-  bool all_unquoted_name_characters;
 
   do
     {
@@ -859,17 +780,18 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
     }
 
   wp->type = t_string;
-  wp->token = XMALLOC (struct token);
-  init_token (wp->token);
+  wp->token = XMALLOC (struct mixed_string_buffer);
+  mixed_string_buffer_init (wp->token, lc_string,
+                            logical_file_name, line_number);
   wp->line_number_at_start = line_number;
   /* True while all characters in the token seen so far are digits.  */
-  all_unquoted_digits = true;
+  bool all_unquoted_digits = true;
   /* True while all characters in the token seen so far form a "name":
      all characters are unquoted underscores, digits, or alphabetics from the
      portable character set, and the first character is not a digit.  Cf.
      <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap03.html#tag_03_235>
    */
-  all_unquoted_name_characters = true;
+  bool all_unquoted_name_characters = true;
 
   for (;; c = phase2_getc ())
     {
@@ -894,7 +816,7 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
             phase2_ungetc (c2);
 
           wp->type = t_redirect;
-          free_token (wp->token);
+          mixed_string_buffer_destroy (wp->token);
           free (wp->token);
 
           last_non_comment_line = line_number;
@@ -904,7 +826,9 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
 
       all_unquoted_digits = all_unquoted_digits && (c >= '0' && c <= '9');
 
-      if (all_unquoted_name_characters && wp->token->charcount > 0 && c == '=')
+      if (all_unquoted_name_characters
+          && !mixed_string_buffer_is_empty (wp->token)
+          && c == '=')
         {
           wp->type = t_assignment;
           continue;
@@ -913,12 +837,11 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
       all_unquoted_name_characters =
          all_unquoted_name_characters
          && ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || c == '_'
-             || (wp->token->charcount > 0 && c >= '0' && c <= '9'));
+             || (!mixed_string_buffer_is_empty (wp->token)
+                 && c >= '0' && c <= '9'));
 
       if (c == '$')
         {
-          int c2;
-
           /* An unquoted dollar indicates we are not inside '...'.  */
           if (open_singlequote)
             abort ();
@@ -926,6 +849,9 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
              character from an earlier lookahead.  */
           if (phase2_pushback_length > 0)
             abort ();
+
+          int c2;
+
           /* Therefore we can use phase1 without interfering with phase2.
              We need to recognize $( outside and inside double-quotes.
              It would be incorrect to do
@@ -935,21 +861,18 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
           c2 = phase1_getc ();
           if (c2 == '(')
             {
-              bool saved_open_doublequote;
-              int c3;
-
               phase1_ungetc (c2);
 
               /* The entire inner command or arithmetic expression is read
                  ignoring possible surrounding double-quotes.  */
-              saved_open_doublequote = open_doublequote;
+              bool saved_open_doublequote = open_doublequote;
               open_doublequote = false;
 
               c2 = phase2_getc ();
               if (c2 != '(')
                 abort ();
 
-              c3 = phase2_getc ();
+              int c3 = phase2_getc ();
               if (c3 == '(')
                 {
                   /* Arithmetic expression (Bash syntax).  Skip until the
@@ -972,7 +895,7 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
                   /* Command substitution (Bash syntax).  */
                   phase2_ungetc (c3);
                   ++nesting_depth;
-                  read_command_list (')', context);
+                  read_command_list (')', region);
                   nesting_depth--;
                 }
 
@@ -985,7 +908,8 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
 
               if (c2 == '\'' && !open_singlequote)
                 {
-                  /* Bash builtin for string with ANSI-C escape sequences.  */
+                  /* $'...': POSIX dollar-single-quoted string.  Also known as
+                     bash builtin for string with ANSI-C escape sequences.  */
                   for (;;)
                     {
                       /* We have to use phase1 throughout this loop,
@@ -1040,6 +964,41 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
                               c = '\v';
                               break;
 
+                            case 'c':
+                              c = phase1_getc ();
+                              if (c >= 'A' && c <= 'Z')
+                                c = c - 'A' + 0x01;
+                              else if (c >= 'a' && c <= 'z')
+                                c = c - 'a' + 0x01;
+                              else if (c == '[')
+                                c = 0x1b; /* ESC */
+                              else if (c == '\\')
+                                {
+                                  c = phase1_getc ();
+                                  if (c == '\\')
+                                    c = 0x1c; /* FS */
+                                  else
+                                    {
+                                      phase1_ungetc (c);
+                                      phase1_ungetc ('\\');
+                                      c = 'c';
+                                    }
+                                }
+                              else if (c == ']')
+                                c = 0x1d; /* GS */
+                              else if (c == '^')
+                                c = 0x1e; /* RS */
+                              else if (c == '_')
+                                c = 0x1f; /* US */
+                              else if (c == '?')
+                                c = 0x7f; /* DEL */
+                              else
+                                {
+                                  phase1_ungetc (c);
+                                  c = 'c';
+                                }
+                              break;
+
                             case 'x':
                               c = phase1_getc ();
                               if ((c >= '0' && c <= '9')
@@ -1047,7 +1006,6 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
                                   || (c >= 'a' && c <= 'f'))
                                 {
                                   int n;
-
                                   if (c >= '0' && c <= '9')
                                     n = c - '0';
                                   else if (c >= 'A' && c <= 'F')
@@ -1106,29 +1064,72 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
                                 c = n;
                               }
                               break;
+
+                            case 'u': case 'U':
+                              {
+                                unsigned char buf[8];
+                                int j;
+
+                                unsigned int n = 0;
+                                for (j = 0; j < (c == 'u' ? 4 : 8); j++)
+                                  {
+                                    int c1 = phase1_getc ();
+
+                                    if (c1 >= '0' && c1 <= '9')
+                                      n = (n << 4) + (c1 - '0');
+                                    else if (c1 >= 'A' && c1 <= 'F')
+                                      n = (n << 4) + (c1 - 'A' + 10);
+                                    else if (c1 >= 'a' && c1 <= 'f')
+                                      n = (n << 4) + (c1 - 'a' + 10);
+                                    else
+                                      {
+                                        phase1_ungetc (c1);
+                                        break;
+                                      }
+
+                                    buf[j] = c1;
+                                  }
+                                if (j > 0)
+                                  {
+                                    if (n < 0x110000 && !(n >= 0xD800 && n <= 0xDFFF))
+                                      {
+                                        if (wp->type == t_string)
+                                          mixed_string_buffer_append_unicode (wp->token, n);
+                                        goto done_escape_sequence;
+                                      }
+                                    if_error (IF_SEVERITY_WARNING,
+                                              logical_file_name, line_number, (size_t)(-1), false,
+                                               _("invalid Unicode character"));
+                                    while (--j >= 0)
+                                      phase1_ungetc (buf[j]);
+                                  }
+                                phase1_ungetc (c);
+                                c = '\\';
+                                break;
+                              }
                             }
                         }
                       if (wp->type == t_string)
-                        {
-                          grow_token (wp->token);
-                          wp->token->chars[wp->token->charcount++] =
-                            (unsigned char) c;
-                        }
+                        mixed_string_buffer_append_char (wp->token,
+                                                         (unsigned char) c);
+                     done_escape_sequence: ;
                     }
                   /* The result is a literal string.  Don't change wp->type.  */
                   continue;
                 }
               else if (c2 == '"' && !open_doublequote)
                 {
-                  /* Bash builtin for internationalized string.  */
-                  lex_pos_ty pos;
-                  struct token string;
-
+                  /* $"...": Bash builtin for internationalized string.  */
                   saw_opening_singlequote ();
                   open_singlequote_terminator = '"';
+
+                  lex_pos_ty pos;
                   pos.file_name = logical_file_name;
                   pos.line_number = line_number;
-                  init_token (&string);
+
+                  struct mixed_string_buffer string;
+                  mixed_string_buffer_init (&string, lc_string,
+                                            logical_file_name, line_number);
                   for (;;)
                     {
                       c = phase2_getc ();
@@ -1139,18 +1140,17 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
                           saw_closing_singlequote ();
                           break;
                         }
-                      grow_token (&string);
-                      string.chars[string.charcount++] = (unsigned char) c;
+                      mixed_string_buffer_append_char (&string, (unsigned char) c);
                     }
-                  remember_a_message (mlp, NULL, string_of_token (&string),
-                                      false, false, context, &pos,
+                  remember_a_message (mlp, NULL,
+                                      mixed_string_contents_free1 (
+                                        mixed_string_buffer_result (&string)),
+                                      true, false, region, &pos,
                                       NULL, savable_comment, false);
-                  free_token (&string);
 
-                  error_with_progname = false;
-                  error (0, 0, _("%s:%lu: warning: the syntax $\"...\" is deprecated due to security reasons; use eval_gettext instead"),
-                         pos.file_name, (unsigned long) pos.line_number);
-                  error_with_progname = true;
+                  if_error (IF_SEVERITY_WARNING,
+                            pos.file_name, pos.line_number, (size_t)(-1), false,
+                            _("the syntax $\"...\" is deprecated due to security reasons; use eval_gettext instead"));
 
                   /* The result at runtime is not constant. Therefore we
                      change wp->type.  */
@@ -1203,7 +1203,7 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
           saw_opening_backquote ();
 
           ++nesting_depth;
-          read_command_list (CLOSING_BACKQUOTE, context);
+          read_command_list (CLOSING_BACKQUOTE, region);
           nesting_depth--;
 
           wp->type = t_other;
@@ -1214,18 +1214,16 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
 
       if (c == '<' || c == '>')
         {
-          int c2;
-
           /* An unquoted c indicates we are not inside '...' nor "...".  */
           if (open_singlequote || open_doublequote)
             abort ();
 
-          c2 = phase2_getc ();
+          int c2 = phase2_getc ();
           if (c2 == '(')
             {
               /* Process substitution (Bash syntax).  */
               ++nesting_depth;
-              read_command_list (')', context);
+              read_command_list (')', region);
               nesting_depth--;
 
               wp->type = t_other;
@@ -1240,17 +1238,14 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
         break;
 
       if (wp->type == t_string)
-        {
-          grow_token (wp->token);
-          wp->token->chars[wp->token->charcount++] = (unsigned char) c;
-        }
+        mixed_string_buffer_append_char (wp->token, (unsigned char) c);
     }
 
   phase2_ungetc (c);
 
   if (wp->type != t_string)
     {
-      free_token (wp->token);
+      mixed_string_buffer_destroy (wp->token);
       free (wp->token);
     }
   last_non_comment_line = line_number;
@@ -1262,7 +1257,7 @@ read_word (struct word *wp, int looking_for, flag_context_ty context)
    or '\0'.
    Returns the type of the word that terminated the command.  */
 static enum word_type
-read_command (int looking_for, flag_context_ty outer_context)
+read_command (int looking_for, flag_region_ty *outer_region)
 {
   /* Read the words that make up the command.
      Here we completely ignore field splitting at whitespace and wildcard
@@ -1284,18 +1279,17 @@ read_command (int looking_for, flag_context_ty outer_context)
 
   for (;;)
     {
-      struct word inner;
-      flag_context_ty inner_context;
-
+      flag_region_ty *inner_region;
       if (arg == 0)
-        inner_context = null_context;
+        inner_region = null_context_region ();
       else
-        inner_context =
-          inherited_context (outer_context,
+        inner_region =
+          inheriting_region (outer_region,
                              flag_context_list_iterator_advance (
                                &context_iter));
 
-      read_word (&inner, looking_for, inner_context);
+      struct word inner;
+      read_word (&inner, looking_for, inner_region);
 
       /* Recognize end of command.  */
       if (inner.type == t_separator
@@ -1304,6 +1298,7 @@ read_command (int looking_for, flag_context_ty outer_context)
         {
           if (argparser != NULL)
             arglist_parser_done (argparser, arg);
+          unref_region (inner_region);
           return inner.type;
         }
 
@@ -1312,11 +1307,13 @@ read_command (int looking_for, flag_context_ty outer_context)
           if (inner.type == t_string)
             {
               lex_pos_ty pos;
-
               pos.file_name = logical_file_name;
               pos.line_number = inner.line_number_at_start;
-              remember_a_message (mlp, NULL, string_of_word (&inner), false,
-                                  false, inner_context, &pos,
+
+              remember_a_message (mlp, NULL,
+                                  mixed_string_contents_free1 (
+                                    mixed_string_buffer_cloned_result (inner.token)),
+                                  true, false, inner_region, &pos,
                                   NULL, savable_comment, false);
             }
         }
@@ -1348,7 +1345,9 @@ read_command (int looking_for, flag_context_ty outer_context)
                 }
               else if (inner.type == t_string)
                 {
-                  char *function_name = string_of_word (&inner);
+                  char *function_name =
+                    mixed_string_contents_free1 (
+                      mixed_string_buffer_cloned_result (inner.token));
 
                   if (strcmp (function_name, "env") == 0)
                     {
@@ -1360,7 +1359,6 @@ read_command (int looking_for, flag_context_ty outer_context)
                   else
                     {
                       void *keyword_value;
-
                       if (hash_find_entry (&keywords,
                                            function_name,
                                            strlen (function_name),
@@ -1391,7 +1389,11 @@ read_command (int looking_for, flag_context_ty outer_context)
                     ((argparser->keyword_len == 7
                       && memcmp (argparser->keyword, "gettext", 7) == 0)
                      || (argparser->keyword_len == 8
-                         && memcmp (argparser->keyword, "ngettext", 8) == 0));
+                         && memcmp (argparser->keyword, "ngettext", 8) == 0)
+                     || (argparser->keyword_len == 14
+                         && memcmp (argparser->keyword, "printf_gettext", 14) == 0)
+                     || (argparser->keyword_len == 15
+                         && memcmp (argparser->keyword, "printf_ngettext", 15) == 0));
                   bool accepts_expand =
                     ((argparser->keyword_len == 7
                       && memcmp (argparser->keyword, "gettext", 7) == 0)
@@ -1399,60 +1401,47 @@ read_command (int looking_for, flag_context_ty outer_context)
                          && memcmp (argparser->keyword, "ngettext", 8) == 0));
                   if (accepts_context && argparser->next_is_msgctxt)
                     {
-                      char *s = string_of_word (&inner);
-                      mixed_string_ty *ms =
-                        mixed_string_alloc_simple (s, lc_string,
-                                                   logical_file_name,
-                                                   inner.line_number_at_start);
-                      free (s);
+                      mixed_string_ty *ms = mixed_string_buffer_cloned_result (inner.token);
                       argparser->next_is_msgctxt = false;
                       arglist_parser_remember_msgctxt (argparser, ms,
-                                                       inner_context,
+                                                       inner_region,
                                                        logical_file_name,
                                                        inner.line_number_at_start);
                       matters_for_argparser = false;
                     }
                   else if (accepts_context
-                           && ((inner.token->charcount == 2
-                                && memcmp (inner.token->chars, "-c", 2) == 0)
-                               || (inner.token->charcount == 9
-                                   && memcmp (inner.token->chars, "--context", 9) == 0)))
+                           && (mixed_string_buffer_equals (inner.token, "-c")
+                               || mixed_string_buffer_equals (inner.token, "--context")))
                     {
                       argparser->next_is_msgctxt = true;
                       matters_for_argparser = false;
                     }
                   else if (accepts_context
-                           && (inner.token->charcount >= 10
-                               && memcmp (inner.token->chars, "--context=", 10) == 0))
+                           && mixed_string_buffer_startswith (inner.token, "--context="))
                     {
-                      char *s = substring_of_word (&inner, 10);
-                      mixed_string_ty *ms =
-                        mixed_string_alloc_simple (s, lc_string,
-                                                   logical_file_name,
-                                                   inner.line_number_at_start);
-                      free (s);
+                      mixed_string_ty *ms = mixed_string_buffer_cloned_result (inner.token);
+                      mixed_string_remove_prefix (ms, 10);
                       argparser->next_is_msgctxt = false;
                       arglist_parser_remember_msgctxt (argparser, ms,
-                                                       inner_context,
+                                                       inner_region,
                                                        logical_file_name,
                                                        inner.line_number_at_start);
                       matters_for_argparser = false;
                     }
                   else if (accepts_expand
-                           && inner.token->charcount == 2
-                           && memcmp (inner.token->chars, "-e", 2) == 0)
+                           && mixed_string_buffer_equals (inner.token, "-e"))
                     {
                       must_expand_arg_strings = true;
                       matters_for_argparser = false;
                     }
                   else
                     {
-                      char *s = string_of_word (&inner);
-                      mixed_string_ty *ms;
+                      mixed_string_ty *ms = mixed_string_buffer_cloned_result (inner.token);
 
                       /* When '-e' was specified, expand escape sequences in s.  */
                       if (accepts_expand && must_expand_arg_strings)
                         {
+                          char *s = mixed_string_contents (ms);
                           bool expands_backslash_c =
                             (argparser->keyword_len == 7
                              && memcmp (argparser->keyword, "gettext", 7) == 0);
@@ -1463,16 +1452,19 @@ read_command (int looking_for, flag_context_ty outer_context)
                           /* We can ignore the value of expands_backslash_c, because
                              here we don't support the gettext '-s' option.  */
                           if (expanded != s)
-                            free (s);
-                          s = expanded;
+                            {
+                              mixed_string_ty *expanded_ms =
+                                mixed_string_alloc_utf8 (expanded, ms->lcontext,
+                                                         ms->logical_file_name,
+                                                         ms->line_number);
+                              mixed_string_free (ms);
+                              ms = expanded_ms;
+                            }
+                          free (s);
                         }
 
-                      ms = mixed_string_alloc_simple (s, lc_string,
-                                                      logical_file_name,
-                                                      inner.line_number_at_start);
-                      free (s);
                       arglist_parser_remember (argparser, arg, ms,
-                                               inner_context,
+                                               inner_region,
                                                logical_file_name,
                                                inner.line_number_at_start,
                                                savable_comment, false);
@@ -1494,6 +1486,7 @@ read_command (int looking_for, flag_context_ty outer_context)
             arg++;
         }
 
+      unref_region (inner_region);
       free_word (&inner);
     }
 }
@@ -1504,19 +1497,15 @@ read_command (int looking_for, flag_context_ty outer_context)
    or '\0'.
    Returns the type of the word that terminated the command list.  */
 static enum word_type
-read_command_list (int looking_for, flag_context_ty outer_context)
+read_command_list (int looking_for, flag_region_ty *outer_region)
 {
   if (nesting_depth > MAX_NESTING_DEPTH)
-    {
-      error_with_progname = false;
-      error (EXIT_FAILURE, 0, _("%s:%d: error: too deeply nested command list"),
-             logical_file_name, line_number);
-    }
+    if_error (IF_SEVERITY_FATAL_ERROR,
+              logical_file_name, line_number, (size_t)(-1), false,
+              _("too deeply nested command list"));
   for (;;)
     {
-      enum word_type terminator;
-
-      terminator = read_command (looking_for, outer_context);
+      enum word_type terminator = read_command (looking_for, outer_region);
       if (terminator != t_separator)
         return terminator;
     }
@@ -1554,7 +1543,7 @@ extract_sh (FILE *f,
   init_keywords ();
 
   /* Eat tokens until eof is seen.  */
-  read_command_list ('\0', null_context);
+  read_command_list ('\0', null_context_region ());
 
   fp = NULL;
   real_file_name = NULL;

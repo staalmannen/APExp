@@ -67,7 +67,7 @@ extern int __gettextdebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 42 "plural.y"
+#line 48 "plural.y"
 
   unsigned long int num;
   enum expression_operator op;

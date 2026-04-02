@@ -1,5 +1,5 @@
 /* Atomic integers.  Useful for testing multithreaded locking primitives.
-   Copyright (C) 2005, 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -87,8 +87,7 @@ static void
 init_atomic_int (struct atomic_int *ai)
 {
   sem_t *s;
-  unsigned int count;
-  for (count = 0; ; count++)
+  for (unsigned int count = 0; ; count++)
     {
       char name[80];
       /* Use getpid() in the name, so that different processes running at the

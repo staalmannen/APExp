@@ -1,5 +1,5 @@
 /* Compile a Java program.
-   Copyright (C) 2001-2002, 2006, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2001-2002, 2006, 2009-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -18,33 +18,37 @@
 #ifndef _JAVACOMP_H
 #define _JAVACOMP_H
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /* Compile a Java source file to bytecode.
    java_sources is an array of source file names.
    classpaths is a list of pathnames to be prepended to the CLASSPATH.
 
    source_version can be:    support for
-             1.6             assert keyword (1.4), generic classes and methods (1.5)
-             1.7             switch(string)
              1.8             lambdas
              9               private interface methods
             10               type inference for local variables
             11               'var' in parameters of lambda expressions
             ...
-   If source-version 1.3 or 1.4 or 1.5 is requested, it gets mapped to 1.6, for
-   backward compatibility. (Currently the minimum Java and javac version we need
-   to support is Java 1.6, since that's the default Java version on Solaris 10.)
+   If source-version 1.3 or 1.4 or 1.5 or 1.6 or 1.7 is requested, it gets
+   mapped to 1.8, for backward compatibility. (Currently the minimum Java and
+   javac version we need to support is Java 1.8, since older versions are
+   out-of-support, see
+   <https://en.wikipedia.org/wiki/Java_version_history#Release_table>.)
 
    target_version can be:  classfile version:
-             1.6                 50.0
-             1.7                 51.0
              1.8                 52.0
              9                   53.0
             10                   54.0
             11                   55.0
             ...                  ...
-   If a target-version below 1.6 is requested, it gets mapped to 1.6, for
-   backward compatibility. (Currently the minimum Java and javac version we need
-   to support is Java 1.6, since that's the default Java version on Solaris 10.)
+   If a target-version below 1.8 is requested, it gets mapped to 1.8, for
+   backward compatibility. (Currently the minimum Java and javac version we
+   need to support is Java 1.8, since older versions are out-of-support, see
+   <https://en.wikipedia.org/wiki/Java_version_history#Release_table>.)
    target_version can also be given as NULL. In this case, the required
    target_version is determined from the found JVM (see javaversion.h).
    Specifying target_version is useful when building a library (.jar) that is
@@ -84,5 +88,10 @@ extern bool compile_java_class (const char * const *java_sources,
                                 bool optimize, bool debug,
                                 bool use_minimal_classpath,
                                 bool verbose);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _JAVACOMP_H */

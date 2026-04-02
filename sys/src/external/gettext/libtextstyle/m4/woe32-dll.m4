@@ -1,8 +1,10 @@
-# woe32-dll.m4 serial 6
-dnl Copyright (C) 2005-2006, 2011, 2018, 2020 Free Software Foundation, Inc.
+# woe32-dll.m4
+# serial 7
+dnl Copyright (C) 2005-2024 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl From Bruno Haible.
 
@@ -30,7 +32,7 @@ AC_DEFUN([gl_WOE32_DLL],
 [
   AC_REQUIRE([AC_CANONICAL_HOST])
   case "$host_os" in
-    mingw* | cygwin*)
+    mingw* | windows* | cygwin*)
       AC_CACHE_CHECK([for auto-import of symbols],
         [gl_cv_ld_autoimport],
         [dnl --disable-auto-import is unsupported in MSVC and in MSVC/clang.

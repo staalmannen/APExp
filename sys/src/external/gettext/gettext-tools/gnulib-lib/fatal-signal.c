@@ -1,5 +1,5 @@
 /* Emergency actions in case of a fatal signal.
-   Copyright (C) 2003-2004, 2006-2024 Free Software Foundation, Inc.
+   Copyright (C) 2003-2004, 2006-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This file is free software: you can redistribute it and/or modify
@@ -26,6 +26,7 @@
 #include <unistd.h>
 
 #include "glthread/lock.h"
+#include "glthread/once.h"
 #include "thread-optim.h"
 #include "sig-handler.h"
 
@@ -92,9 +93,7 @@ init_fatal_signals (void)
   static bool fatal_signals_initialized = false;
   if (!fatal_signals_initialized)
     {
-      size_t i;
-
-      for (i = 0; i < num_fatal_signals; i++)
+      for (size_t i = 0; i < num_fatal_signals; i++)
         {
           struct sigaction action;
 
@@ -138,9 +137,7 @@ static struct sigaction saved_sigactions[64];
 static _GL_ASYNC_SAFE void
 uninstall_handlers (void)
 {
-  size_t i;
-
-  for (i = 0; i < num_fatal_signals; i++)
+  for (size_t i = 0; i < num_fatal_signals; i++)
     if (fatal_signals[i] >= 0)
       {
         int sig = fatal_signals[i];
@@ -183,7 +180,6 @@ fatal_signal_handler (int sig)
 static void
 install_handlers (void)
 {
-  size_t i;
   struct sigaction action;
 
   action.sa_handler = &fatal_signal_handler;
@@ -192,7 +188,7 @@ install_handlers (void)
      SA_RESETHAND.  */
   action.sa_flags = SA_NODEFER;
   sigemptyset (&action.sa_mask);
-  for (i = 0; i < num_fatal_signals; i++)
+  for (size_t i = 0; i < num_fatal_signals; i++)
     if (fatal_signals[i] >= 0)
       {
         int sig = fatal_signals[i];
@@ -243,11 +239,10 @@ at_fatal_signal (action_t action)
           goto done;
         }
 
-      size_t k;
       /* Don't use memcpy() here, because memcpy takes non-volatile arguments
          and is therefore not guaranteed to complete all memory stores before
          the next statement.  */
-      for (k = 0; k < old_actions_allocated; k++)
+      for (size_t k = 0; k < old_actions_allocated; k++)
         new_actions[k] = old_actions[k];
       actions = new_actions;
       actions_allocated = new_actions_allocated;
@@ -284,12 +279,10 @@ static sigset_t fatal_signal_set;
 static void
 do_init_fatal_signal_set (void)
 {
-  size_t i;
-
   init_fatal_signals ();
 
   sigemptyset (&fatal_signal_set);
-  for (i = 0; i < num_fatal_signals; i++)
+  for (size_t i = 0; i < num_fatal_signals; i++)
     if (fatal_signals[i] >= 0)
       sigaddset (&fatal_signal_set, fatal_signals[i]);
 }
@@ -354,9 +347,8 @@ get_fatal_signals (int signals[64])
 
   {
     int *p = signals;
-    size_t i;
 
-    for (i = 0; i < num_fatal_signals; i++)
+    for (size_t i = 0; i < num_fatal_signals; i++)
       if (fatal_signals[i] >= 0)
         *p++ = fatal_signals[i];
     return p - signals;

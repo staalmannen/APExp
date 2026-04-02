@@ -1,7 +1,5 @@
 /* xgettext Emacs Lisp backend.
-   Copyright (C) 2001-2003, 2005-2009, 2018-2023 Free Software Foundation, Inc.
-
-   This file was written by Bruno Haible <haible@clisp.cons.org>, 2001-2002.
+   Copyright (C) 2001-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,9 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+/* Written by Bruno Haible.  */
+
+#include <config.h>
 
 /* Specification.  */
 #include "x-elisp.h"
@@ -29,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <error.h>
 #include "attribute.h"
 #include "message.h"
 #include "xgettext.h"
@@ -38,8 +37,7 @@
 #include "xg-arglist-callshape.h"
 #include "xg-arglist-parser.h"
 #include "xg-message.h"
-#include "error.h"
-#include "error-progname.h"
+#include "if-error.h"
 #include "xalloc.h"
 #include "mem-hash-map.h"
 #include "c-ctype.h"
@@ -89,18 +87,17 @@ x_elisp_keyword (const char *name)
     default_keywords = false;
   else
     {
-      const char *end;
-      struct callshape shape;
-      const char *colon;
 
       if (keywords.table == NULL)
         hash_init (&keywords, 100);
 
+      const char *end;
+      struct callshape shape;
       split_keywordspec (name, &end, &shape);
 
       /* The characters between name and end should form a valid Lisp
          symbol.  */
-      colon = strchr (name, ':');
+      const char *colon = strchr (name, ':');
       if (colon == NULL || colon >= end)
         insert_keyword_callshape (&keywords, name, end - name, &shape);
     }
@@ -223,9 +220,7 @@ static inline bool
 is_float (const char *p)
 {
   enum { LEAD_INT = 1, DOT_CHAR = 2, TRAIL_INT = 4, E_CHAR = 8, EXP_INT = 16 };
-  int state;
-
-  state = 0;
+  int state = 0;
   if (*p == '+' || *p == '-')
     p++;
   if (*p >= '0' && *p <= '9')
@@ -281,14 +276,12 @@ is_float (const char *p)
 static bool
 read_token (struct token *tp, int first)
 {
-  int c;
-  bool quoted = false;
-
   init_token (tp);
 
-  c = first;
+  int c;
 
-  for (;; c = do_getc ())
+  bool quoted = false;
+  for (c = first;; c = do_getc ())
     {
       if (c == EOF)
         break;
@@ -416,15 +409,14 @@ free_object (struct object *op)
 static char *
 string_of_object (const struct object *op)
 {
-  char *str;
-  int n;
-
   if (!(op->type == t_symbol || op->type == t_string))
     abort ();
-  n = op->token->charcount;
-  str = XNMALLOC (n + 1, char);
+  int n = op->token->charcount;
+
+  char *str = XNMALLOC (n + 1, char);
   memcpy (str, op->token->chars, n);
   str[n] = '\0';
+
   return str;
 }
 
@@ -447,11 +439,9 @@ static int
 do_getc_escaped (int c, bool in_string)
 {
   if (escape_nesting_depth > MAX_NESTING_DEPTH)
-    {
-      error_with_progname = false;
-      error (EXIT_FAILURE, 0, _("%s:%d: error: too deeply nested escape sequence"),
-             logical_file_name, line_number);
-    }
+    if_error (IF_SEVERITY_FATAL_ERROR,
+              logical_file_name, line_number, (size_t)(-1), false,
+              _("too deeply nested escape sequence"));
   switch (c)
     {
     case 'a':
@@ -641,14 +631,12 @@ do_getc_escaped (int c, bool in_string)
    backquote syntax and new backquote syntax.  */
 static void
 read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
-             flag_context_ty outer_context)
+             flag_region_ty *outer_region)
 {
   if (nesting_depth > MAX_NESTING_DEPTH)
-    {
-      error_with_progname = false;
-      error (EXIT_FAILURE, 0, _("%s:%d: error: too deeply nested objects"),
-             logical_file_name, line_number);
-    }
+    if_error (IF_SEVERITY_FATAL_ERROR,
+              logical_file_name, line_number, (size_t)(-1), false,
+              _("too deeply nested objects"));
   for (;;)
     {
       int ch;
@@ -678,20 +666,19 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
 
             for (;; arg++)
               {
-                struct object inner;
-                flag_context_ty inner_context;
-
+                flag_region_ty *inner_region;
                 if (arg == 0)
-                  inner_context = null_context;
+                  inner_region = null_context_region ();
                 else
-                  inner_context =
-                    inherited_context (outer_context,
+                  inner_region =
+                    inheriting_region (outer_region,
                                        flag_context_list_iterator_advance (
                                          &context_iter));
 
                 ++nesting_depth;
+                struct object inner;
                 read_object (&inner, arg == 0, new_backquote_flag,
-                             inner_context);
+                             inner_region);
                 nesting_depth--;
 
                 /* Recognize end of list.  */
@@ -702,6 +689,7 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
                     last_non_comment_line = line_number;
                     if (argparser != NULL)
                       arglist_parser_done (argparser, arg);
+                    unref_region (inner_region);
                     return;
                   }
 
@@ -718,8 +706,8 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
                     if (inner.type == t_symbol)
                       {
                         char *symbol_name = string_of_object (&inner);
-                        void *keyword_value;
 
+                        void *keyword_value;
                         if (hash_find_entry (&keywords,
                                              symbol_name, strlen (symbol_name),
                                              &keyword_value)
@@ -751,13 +739,14 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
                                                      inner.line_number_at_start);
                         free (s);
                         arglist_parser_remember (argparser, arg, ms,
-                                                 inner_context,
+                                                 inner_region,
                                                  logical_file_name,
                                                  inner.line_number_at_start,
                                                  savable_comment, false);
                       }
                   }
 
+                unref_region (inner_region);
                 free_object (&inner);
               }
 
@@ -779,10 +768,10 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
           {
             for (;;)
               {
-                struct object inner;
-
                 ++nesting_depth;
-                read_object (&inner, false, new_backquote_flag, null_context);
+                struct object inner;
+                read_object (&inner, false, new_backquote_flag,
+                             null_context_region ());
                 nesting_depth--;
 
                 /* Recognize end of vector.  */
@@ -815,10 +804,10 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
 
         case '\'':
           {
-            struct object inner;
-
             ++nesting_depth;
-            read_object (&inner, false, new_backquote_flag, null_context);
+            struct object inner;
+            read_object (&inner, false, new_backquote_flag,
+                         null_context_region ());
             nesting_depth--;
 
             /* Dots and EOF are not allowed here.  But be tolerant.  */
@@ -834,10 +823,9 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
           if (first_in_list)
             goto default_label;
           {
-            struct object inner;
-
             ++nesting_depth;
-            read_object (&inner, false, true, null_context);
+            struct object inner;
+            read_object (&inner, false, true, null_context_region ());
             nesting_depth--;
 
             /* Dots and EOF are not allowed here.  But be tolerant.  */
@@ -860,10 +848,9 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
               do_ungetc (c);
           }
           {
-            struct object inner;
-
             ++nesting_depth;
-            read_object (&inner, false, false, null_context);
+            struct object inner;
+            read_object (&inner, false, false, null_context_region ());
             nesting_depth--;
 
             /* Dots and EOF are not allowed here.  But be tolerant.  */
@@ -877,10 +864,9 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
 
         case ';':
           {
-            bool all_semicolons = true;
-
             last_comment_line = line_number;
             comment_start ();
+            bool all_semicolons = true;
             for (;;)
               {
                 int c = do_getc ();
@@ -942,11 +928,11 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
             if (extract_all)
               {
                 lex_pos_ty pos;
-
                 pos.file_name = logical_file_name;
                 pos.line_number = op->line_number_at_start;
+
                 remember_a_message (mlp, NULL, string_of_object (op), false,
-                                    false, null_context, &pos,
+                                    false, null_context_region (), &pos,
                                     NULL, savable_comment, false);
               }
             last_non_comment_line = line_number;
@@ -1002,11 +988,10 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
                       /* Read a char table, same syntax as a vector.  */
                       for (;;)
                         {
-                          struct object inner;
-
                           ++nesting_depth;
+                          struct object inner;
                           read_object (&inner, false, new_backquote_flag,
-                                       null_context);
+                                       null_context_region ());
                           nesting_depth--;
 
                           /* Recognize end of vector.  */
@@ -1045,7 +1030,7 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
                   struct object length;
                   ++nesting_depth;
                   read_object (&length, first_in_list, new_backquote_flag,
-                               null_context);
+                               null_context_region ());
                   nesting_depth--;
                   /* Dots and EOF are not allowed here.
                      But be tolerant.  */
@@ -1058,7 +1043,7 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
                       struct object string;
                       ++nesting_depth;
                       read_object (&string, first_in_list, new_backquote_flag,
-                                   null_context);
+                                   null_context_region ());
                       nesting_depth--;
                       free_object (&string);
                     }
@@ -1075,10 +1060,11 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
               case '(':
                 /* Read a string with properties, same syntax as a list.  */
                 {
-                  struct object inner;
                   do_ungetc (dmc);
                   ++nesting_depth;
-                  read_object (&inner, false, new_backquote_flag, null_context);
+                  struct object inner;
+                  read_object (&inner, false, new_backquote_flag,
+                               null_context_region ());
                   nesting_depth--;
                   /* Dots and EOF are not allowed here.
                      But be tolerant.  */
@@ -1120,9 +1106,10 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
               case ':':
               case 'S': case 's': /* XEmacs only */
                 {
-                  struct object inner;
                   ++nesting_depth;
-                  read_object (&inner, false, new_backquote_flag, null_context);
+                  struct object inner;
+                  read_object (&inner, false, new_backquote_flag,
+                               null_context_region ());
                   nesting_depth--;
                   /* Dots and EOF are not allowed here.
                      But be tolerant.  */
@@ -1153,7 +1140,7 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
                   if (c == '=')
                     {
                       ++nesting_depth;
-                      read_object (op, false, new_backquote_flag, outer_context);
+                      read_object (op, false, new_backquote_flag, outer_region);
                       nesting_depth--;
                       last_non_comment_line = line_number;
                       return;
@@ -1226,9 +1213,10 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
               case '-': /* XEmacs only */
                 /* Simply assume every feature expression is true.  */
                 {
-                  struct object inner;
                   ++nesting_depth;
-                  read_object (&inner, false, new_backquote_flag, null_context);
+                  struct object inner;
+                  read_object (&inner, false, new_backquote_flag,
+                               null_context_region ());
                   nesting_depth--;
                   /* Dots and EOF are not allowed here.
                      But be tolerant.  */
@@ -1268,10 +1256,8 @@ read_object (struct object *op, bool first_in_list, bool new_backquote_flag,
             continue;
           /* Read a token.  */
           {
-            bool symbol;
-
             op->token = XMALLOC (struct token);
-            symbol = read_token (op->token, ch);
+            bool symbol = read_token (op->token, ch);
             if (symbol)
               {
                 op->type = t_symbol;
@@ -1320,7 +1306,7 @@ extract_elisp (FILE *f,
     {
       struct object toplevel_object;
 
-      read_object (&toplevel_object, false, false, null_context);
+      read_object (&toplevel_object, false, false, null_context_region ());
 
       if (toplevel_object.type == t_eof)
         break;

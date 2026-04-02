@@ -1,5 +1,5 @@
 /* Provide a netdb.h header file for systems lacking it (read: MinGW).
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
    Written by Simon Josefsson.
 
    This file is free software: you can redistribute it and/or modify
@@ -41,8 +41,8 @@
  #error "Please include config.h first."
 #endif
 
-/* Get <netdb.h> definitions such as 'socklen_t' on IRIX 6.5 and OSF/1 4.0 and
-   'struct hostent' on MinGW.  */
+/* Get <netdb.h> definitions such as 'socklen_t' and 'struct hostent'
+   on MinGW.  */
 #include <sys/socket.h>
 
 /* The definitions of _GL_FUNCDECL_RPL etc. are copied here.  */
@@ -53,6 +53,14 @@
 
 /* Declarations for a platform that lacks <netdb.h>, or where it is
    incomplete.  */
+
+/* Maximum length of a fully-qualified domain name.  */
+#undef NI_MAXHOST
+#define NI_MAXHOST 1025
+
+/* Maximum length of a service.  */
+#undef NI_MAXSERV
+#define NI_MAXSERV 32
 
 #if @GNULIB_GETADDRINFO@
 
@@ -91,12 +99,11 @@ struct addrinfo
 # ifndef AI_CANONNAME
 #  define AI_CANONNAME  0x0002  /* Request for canonical name.  */
 # endif
-# ifndef AI_NUMERICSERV
-#  define AI_NUMERICSERV        0x0400  /* Don't use name resolution.  */
+# ifndef AI_NUMERICHOST
+#  define AI_NUMERICHOST 0x0004  /* Return numeric host address as name.  */
 # endif
-
-# if 0
-#  define AI_NUMERICHOST        0x0004  /* Don't use name resolution.  */
+# ifndef AI_NUMERICSERV
+#  define AI_NUMERICSERV 0x0400  /* Return service number as service name.  */
 # endif
 
 /* These symbolic constants are required to be present by POSIX, but
@@ -176,7 +183,7 @@ _GL_FUNCDECL_RPL (getaddrinfo, int,
                   (const char *restrict nodename,
                    const char *restrict servname,
                    const struct addrinfo *restrict hints,
-                   struct addrinfo **restrict res)
+                   struct addrinfo **restrict res),
                   _GL_ARG_NONNULL ((4)));
 _GL_CXXALIAS_RPL (getaddrinfo, int,
                   (const char *restrict nodename,
@@ -189,7 +196,7 @@ _GL_FUNCDECL_SYS (getaddrinfo, int,
                   (const char *restrict nodename,
                    const char *restrict servname,
                    const struct addrinfo *restrict hints,
-                   struct addrinfo **restrict res)
+                   struct addrinfo **restrict res),
                   _GL_ARG_NONNULL ((4)));
 #  endif
 _GL_CXXALIAS_SYS (getaddrinfo, int,
@@ -208,12 +215,12 @@ _GL_CXXALIASWARN (getaddrinfo);
 #   undef freeaddrinfo
 #   define freeaddrinfo rpl_freeaddrinfo
 #  endif
-_GL_FUNCDECL_RPL (freeaddrinfo, void, (struct addrinfo *ai)
+_GL_FUNCDECL_RPL (freeaddrinfo, void, (struct addrinfo *ai),
                                       _GL_ARG_NONNULL ((1)));
 _GL_CXXALIAS_RPL (freeaddrinfo, void, (struct addrinfo *ai));
 # else
 #  if !@HAVE_DECL_FREEADDRINFO@
-_GL_FUNCDECL_SYS (freeaddrinfo, void, (struct addrinfo *ai)
+_GL_FUNCDECL_SYS (freeaddrinfo, void, (struct addrinfo *ai),
                                       _GL_ARG_NONNULL ((1)));
 #  endif
 _GL_CXXALIAS_SYS (freeaddrinfo, void, (struct addrinfo *ai));
@@ -225,14 +232,14 @@ _GL_CXXALIASWARN (freeaddrinfo);
 #   undef gai_strerror
 #   define gai_strerror rpl_gai_strerror
 #  endif
-_GL_FUNCDECL_RPL (gai_strerror, const char *, (int ecode));
+_GL_FUNCDECL_RPL (gai_strerror, const char *, (int ecode), );
 _GL_CXXALIAS_RPL (gai_strerror, const char *, (int ecode));
 # else
 #  if !@HAVE_DECL_GAI_STRERROR@
 /* Convert error return from getaddrinfo() to a string.
    For more details, see the POSIX:2008 specification
    <https://pubs.opengroup.org/onlinepubs/9699919799/functions/gai_strerror.html>.  */
-_GL_FUNCDECL_SYS (gai_strerror, const char *, (int ecode));
+_GL_FUNCDECL_SYS (gai_strerror, const char *, (int ecode), );
 #  endif
 _GL_CXXALIAS_SYS (gai_strerror, const char *, (int ecode));
 # endif
@@ -248,7 +255,7 @@ _GL_FUNCDECL_SYS (getnameinfo, int,
                   (const struct sockaddr *restrict sa, socklen_t salen,
                    char *restrict node, socklen_t nodelen,
                    char *restrict service, socklen_t servicelen,
-                   int flags)
+                   int flags),
                   _GL_ARG_NONNULL ((1)));
 # endif
 /* Need to cast, because on glibc systems, the seventh parameter is
@@ -270,25 +277,21 @@ _GL_CXXALIASWARN (getnameinfo);
 
 #elif defined GNULIB_POSIXCHECK
 
-# undef getaddrinfo
 # if HAVE_RAW_DECL_GETADDRINFO
 _GL_WARN_ON_USE (getaddrinfo, "getaddrinfo is unportable - "
                  "use gnulib module getaddrinfo for portability");
 # endif
 
-# undef freeaddrinfo
 # if HAVE_RAW_DECL_FREEADDRINFO
 _GL_WARN_ON_USE (freeaddrinfo, "freeaddrinfo is unportable - "
                  "use gnulib module getaddrinfo for portability");
 # endif
 
-# undef gai_strerror
 # if HAVE_RAW_DECL_GAI_STRERROR
 _GL_WARN_ON_USE (gai_strerror, "gai_strerror is unportable - "
                  "use gnulib module getaddrinfo for portability");
 # endif
 
-# undef getnameinfo
 # if HAVE_RAW_DECL_GETNAMEINFO
 _GL_WARN_ON_USE (getnameinfo, "getnameinfo is unportable - "
                  "use gnulib module getaddrinfo for portability");

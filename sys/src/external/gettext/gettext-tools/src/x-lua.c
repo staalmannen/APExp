@@ -1,7 +1,5 @@
 /* xgettext Lua backend.
-   Copyright (C) 2012-2013, 2016, 2018-2023 Free Software Foundation, Inc.
-
-   This file was written by Ľubomír Remák <lubomirr@lubomirr.eu>, 2012.
+   Copyright (C) 2012-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,9 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
+/* Written by Ľubomír Remák and Bruno Haible.  */
+
+#include <config.h>
 
 /* Specification.  */
 #include "x-lua.h"
@@ -28,6 +26,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define SB_NO_APPENDF
+#include <error.h>
 #include "attribute.h"
 #include "message.h"
 #include "rc-str-list.h"
@@ -38,9 +38,9 @@
 #include "xg-arglist-callshape.h"
 #include "xg-arglist-parser.h"
 #include "xg-message.h"
-#include "error.h"
-#include "error-progname.h"
+#include "if-error.h"
 #include "xalloc.h"
+#include "string-buffer.h"
 #include "gettext.h"
 #include "po-charset.h"
 
@@ -75,18 +75,16 @@ x_lua_keyword (const char *name)
     default_keywords = false;
   else
     {
-      const char *end;
-      struct callshape shape;
-      const char *colon;
-
       if (keywords.table == NULL)
         hash_init (&keywords, 100);
 
+      const char *end;
+      struct callshape shape;
       split_keywordspec (name, &end, &shape);
 
       /* The characters between name and end should form a valid C identifier.
          A colon means an invalid parse in split_keywordspec().  */
-      colon = strchr (name, ':');
+      const char *colon = strchr (name, ':');
       if (colon == NULL || colon >= end)
         insert_keyword_callshape (&keywords, name, end - name, &shape);
     }
@@ -268,7 +266,6 @@ static int
 phase2_getc ()
 {
   int c;
-  int lineno;
 
   c = phase1_getc ();
 
@@ -300,7 +297,7 @@ phase2_getc ()
                   bool end = false;
                   int esigns2 = 0;
 
-                  lineno = line_number;
+                  int lineno = line_number;
                   comment_start ();
                   while (!end)
                     {
@@ -353,7 +350,7 @@ phase2_getc ()
               else
                 {
                   /* One line (short) comment, starting with '--[=...='.  */
-                  lineno = last_comment_line;
+                  int lineno = last_comment_line;
                   comment_start ();
                   comment_add ('[');
                   while (esigns--)
@@ -367,7 +364,7 @@ phase2_getc ()
           else
             {
               /* One line (short) comment.  */
-              lineno = line_number;
+              int lineno = line_number;
               comment_start ();
               phase1_ungetc (c);
               eat_comment_line ();
@@ -428,41 +425,6 @@ free_token (token_ty *tp)
     drop_reference (tp->comment);
 }
 
-/* Our current string.  */
-static int string_buf_length;
-static int string_buf_alloc;
-static char *string_buf;
-
-static void
-string_start ()
-{
-  string_buf_length = 0;
-}
-
-static void
-string_add (int c)
-{
-  if (string_buf_length >= string_buf_alloc)
-    {
-      string_buf_alloc = 2 * string_buf_alloc + 10;
-      string_buf = xrealloc (string_buf, string_buf_alloc);
-    }
-
-  string_buf[string_buf_length++] = c;
-}
-
-static void
-string_end ()
-{
-  if (string_buf_length >= string_buf_alloc)
-    {
-      string_buf_alloc = string_buf_alloc + 1;
-      string_buf = xrealloc (string_buf, string_buf_alloc);
-    }
-
-  string_buf[string_buf_length] = '\0';
-}
-
 
 /* We need 3 pushback tokens for string optimization.  */
 static int phase3_pushback_length;
@@ -483,15 +445,13 @@ phase3_unget (token_ty *tp)
 static void
 phase3_get (token_ty *tp)
 {
-  int c;
-  int c2;
-  int c_start;
-
   if (phase3_pushback_length)
     {
       *tp = phase3_pushback[--phase3_pushback_length];
       return;
     }
+
+  int c;
 
   tp->string = NULL;
 
@@ -527,21 +487,25 @@ phase3_get (token_ty *tp)
         case '<':
         case '>':
         case '=':
-          c2 = phase1_getc ();
-          if (c2 != '=')
-            phase1_ungetc (c2);
-          tp->type = token_type_operator2;
-          return;
+          {
+            int c2 = phase1_getc ();
+            if (c2 != '=')
+              phase1_ungetc (c2);
+            tp->type = token_type_operator2;
+            return;
+          }
         case '~':
-          c2 = phase1_getc ();
-          if (c2 == '=')
-            {
-              tp->type = token_type_operator2;
-              return;
-            }
-          else
-            phase1_ungetc (c2);
-          continue;
+          {
+            int c2 = phase1_getc ();
+            if (c2 == '=')
+              {
+                tp->type = token_type_operator2;
+                return;
+              }
+            else
+              phase1_ungetc (c2);
+            continue;
+          }
         case '(':
           tp->type = token_type_lparen;
           return;
@@ -593,217 +557,220 @@ phase3_get (token_ty *tp)
 
         case '"':
         case '\'':
-          c_start = c;
-          string_start ();
+          {
+            int c_start = c;
+            struct string_buffer buffer;
+            sb_init (&buffer);
 
-          for (;;)
-            {
-              /* We need unprocessed characters from phase 1.  */
-              c = phase1_getc ();
+            for (;;)
+              {
+                /* We need unprocessed characters from phase 1.  */
+                c = phase1_getc ();
 
-              if (c == EOF || c == c_start || c == '\n')
-                {
-                  /* End of string.  */
-                  string_end ();
-                  tp->string = xstrdup (string_buf);
-                  tp->comment = add_reference (savable_comment);
-                  tp->type = token_type_string;
-                  return;
-                }
+                if (c == EOF || c == c_start || c == '\n')
+                  {
+                    /* End of string.  */
+                    tp->string = sb_xdupfree_c (&buffer);
+                    tp->comment = add_reference (savable_comment);
+                    tp->type = token_type_string;
+                    return;
+                  }
 
-              /* We got '\', this is probably an escape sequence.  */
-              if (c == '\\')
-                {
-                  c = phase1_getc ();
-                  switch (c)
-                    {
-                    case 'a':
-                      string_add ('\a');
-                      break;
-                    case 'b':
-                      string_add ('\b');
-                      break;
-                    case 'f':
-                      string_add ('\f');
-                      break;
-                    case 'n':
-                      string_add ('\n');
-                      break;
-                    case 'r':
-                      string_add ('\r');
-                      break;
-                    case 't':
-                      string_add ('\t');
-                      break;
-                    case 'v':
-                      string_add ('\v');
-                      break;
-                    case 'x':
+                /* We got '\', this is probably an escape sequence.  */
+                if (c == '\\')
+                  {
+                    c = phase1_getc ();
+                    switch (c)
                       {
-                        int num = 0;
-                        int i = 0;
-
-                        for (i = 0; i < 2; i++)
-                          {
-                            c = phase1_getc ();
-                            if (c >= '0' && c <= '9')
-                              num += c - '0';
-                            else if (c >= 'a' && c <= 'f')
-                              num += c - 'a' + 10;
-                            else if (c >= 'A' && c <= 'F')
-                              num += c - 'A' + 10;
-                            else
-                              {
-                                phase1_ungetc (c);
-                                break;
-                              }
-
-                            if (i == 0)
-                              num *= 16;
-                          }
-
-                        if (i == 2)
-                          string_add (num);
-                      }
-
-                      break;
-                    case 'z':
-                      /* Ignore the following whitespace.  */
-                      do
-                        {
-                          c = phase1_getc ();
-                        }
-                      while (c == ' ' || c == '\n' || c == '\t' || c == '\r'
-                             || c == '\f' || c == '\v');
-
-                      phase1_ungetc (c);
-
-                      break;
-                    default:
-                      /* Check if it's a '\ddd' sequence.  */
-                      if (c >= '0' && c <= '9')
+                      case 'a':
+                        sb_xappend1 (&buffer, '\a');
+                        break;
+                      case 'b':
+                        sb_xappend1 (&buffer, '\b');
+                        break;
+                      case 'f':
+                        sb_xappend1 (&buffer, '\f');
+                        break;
+                      case 'n':
+                        sb_xappend1 (&buffer, '\n');
+                        break;
+                      case 'r':
+                        sb_xappend1 (&buffer, '\r');
+                        break;
+                      case 't':
+                        sb_xappend1 (&buffer, '\t');
+                        break;
+                      case 'v':
+                        sb_xappend1 (&buffer, '\v');
+                        break;
+                      case 'x':
                         {
                           int num = 0;
-                          int i = 0;
+                          int i;
 
-                          while (c >= '0' && c <= '9' && i < 3)
+                          for (i = 0; i < 2; i++)
                             {
-                              num *= 10;
-                              num += (c - '0');
                               c = phase1_getc ();
-                              i++;
+                              if (c >= '0' && c <= '9')
+                                num += c - '0';
+                              else if (c >= 'a' && c <= 'f')
+                                num += c - 'a' + 10;
+                              else if (c >= 'A' && c <= 'F')
+                                num += c - 'A' + 10;
+                              else
+                                {
+                                  phase1_ungetc (c);
+                                  break;
+                                }
+
+                              if (i == 0)
+                                num *= 16;
                             }
 
-                          /* The last read character is either a
-                             non-number or another number after our
-                             '\ddd' sequence.  We need to ungetc it.  */
-                          phase1_ungetc (c);
-
-                          /* The sequence number is too big, this
-                             causes a lexical error.  Ignore it.  */
-                          if (num < 256)
-                            string_add (num);
+                          if (i == 2)
+                            sb_xappend1 (&buffer, num);
                         }
-                      else
-                        string_add (c);
-                    }
-                }
-              else
-                string_add (c);
-            }
+
+                        break;
+                      case 'z':
+                        /* Ignore the following whitespace.  */
+                        do
+                          {
+                            c = phase1_getc ();
+                          }
+                        while (c == ' ' || c == '\n' || c == '\t' || c == '\r'
+                               || c == '\f' || c == '\v');
+
+                        phase1_ungetc (c);
+
+                        break;
+                      default:
+                        /* Check if it's a '\ddd' sequence.  */
+                        if (c >= '0' && c <= '9')
+                          {
+                            int num = 0;
+                            int i = 0;
+
+                            while (c >= '0' && c <= '9' && i < 3)
+                              {
+                                num *= 10;
+                                num += (c - '0');
+                                c = phase1_getc ();
+                                i++;
+                              }
+
+                            /* The last read character is either a
+                               non-number or another number after our
+                               '\ddd' sequence.  We need to ungetc it.  */
+                            phase1_ungetc (c);
+
+                            /* The sequence number is too big, this
+                               causes a lexical error.  Ignore it.  */
+                            if (num < 256)
+                              sb_xappend1 (&buffer, num);
+                          }
+                        else
+                          sb_xappend1 (&buffer, c);
+                      }
+                  }
+                else
+                  sb_xappend1 (&buffer, c);
+              }
+          }
           break;
 
         case '[':
-          c = phase1_getc ();
+          {
+            c = phase1_getc ();
 
-          /* Count the number of equal signs.  */
-          int esigns = 0;
-          while (c == '=')
-            {
-              esigns++;
-              c = phase1_getc ();
-            }
+            /* Count the number of equal signs.  */
+            int esigns = 0;
+            while (c == '=')
+              {
+                esigns++;
+                c = phase1_getc ();
+              }
 
-          if (c != '[')
-            {
-              /* We did not find what we were looking for, ungetc it.  */
+            if (c != '[')
+              {
+                /* We did not find what we were looking for, ungetc it.  */
+                phase1_ungetc (c);
+                if (esigns == 0)
+                  {
+                    /* Our current character isn't '[' and we got 0 equal
+                       signs, so the first '[' must have been a left
+                       bracket.  */
+                    tp->type = token_type_lbracket;
+                    return;
+                  }
+                else
+                  /* Lexical error, ignore it.  */
+                  continue;
+              }
+
+            /* Found an opening long bracket.  */
+            /* See if it is immediately followed by a newline.  */
+            c = phase1_getc ();
+            if (c != '\n')
               phase1_ungetc (c);
-              if (esigns == 0)
-                {
-                  /* Our current character isn't '[' and we got 0 equal
-                     signs, so the first '[' must have been a left
-                     bracket.  */
-                  tp->type = token_type_lbracket;
-                  return;
-                }
-              else
-                /* Lexical error, ignore it.  */
-                continue;
-            }
 
-          /* Found an opening long bracket.  */
-          string_start ();
+            struct string_buffer buffer;
+            sb_init (&buffer);
 
-          /* See if it is immediately followed by a newline.  */
-          c = phase1_getc ();
-          if (c != '\n')
-            phase1_ungetc (c);
+            for (;;)
+              {
+                c = phase1_getc ();
 
-          for (;;)
-            {
-              c = phase1_getc ();
+                if (c == EOF)
+                  {
+                    tp->string = sb_xdupfree_c (&buffer);
+                    tp->comment = add_reference (savable_comment);
+                    tp->type = token_type_string;
+                    return;
+                  }
+                if (c == ']')
+                  {
+                    c = phase1_getc ();
 
-              if (c == EOF)
-                {
-                  string_end ();
-                  tp->string = xstrdup (string_buf);
-                  tp->comment = add_reference (savable_comment);
-                  tp->type = token_type_string;
-                  return;
-                }
-              if (c == ']')
-                {
-                  c = phase1_getc ();
+                    /* Count the number of equal signs.  */
+                    int esigns2 = 0;
+                    while (c == '=')
+                      {
+                        esigns2++;
+                        c = phase1_getc ();
+                      }
 
-                  /* Count the number of equal signs.  */
-                  int esigns2 = 0;
-                  while (c == '=')
-                    {
-                      esigns2++;
-                      c = phase1_getc ();
-                    }
+                    if (c == ']' && esigns == esigns2)
+                      {
+                        /* We got ']==...==]', where the number of equal
+                           signs matches the number of equal signs in
+                           the opening bracket.  */
+                        tp->string = sb_xdupfree_c (&buffer);
+                        tp->comment = add_reference (savable_comment);
+                        tp->type = token_type_string;
+                        return;
+                      }
+                    else
+                      {
+                        /* Otherwise we got either ']==' garbage or
+                           ']==...==]' with a different number of equal
+                           signs.
 
-                  if (c == ']' && esigns == esigns2)
-                    {
-                      /* We got ']==...==]', where the number of equal
-                         signs matches the number of equal signs in
-                         the opening bracket.  */
-                      string_end ();
-                      tp->string = xstrdup (string_buf);
-                      tp->comment = add_reference (savable_comment);
-                      tp->type = token_type_string;
-                      return;
-                    }
-                  else
-                    {
-                      /* Otherwise we got either ']==' garbage or
-                         ']==...==]' with a different number of equal
-                         signs.
+                           Add ']' and equal signs to the string, and
+                           ungetc the current character, because the
+                           second ']' might be a part of another closing
+                           long bracket, e.g. '==]===]'.  */
+                        phase1_ungetc (c);
 
-                         Add ']' and equal signs to the string, and
-                         ungetc the current character, because the
-                         second ']' might be a part of another closing
-                         long bracket, e.g. '==]===]'.  */
-                      phase1_ungetc (c);
-
-                      string_add (']');
-                      while (esigns2--)
-                        string_add ('=');
-                    }
-                }
-              else
-                string_add (c);
-            }
+                        sb_xappend1 (&buffer, ']');
+                        while (esigns2--)
+                          sb_xappend1 (&buffer, '=');
+                      }
+                  }
+                else
+                  sb_xappend1 (&buffer, c);
+              }
+          }
           break;
 
         case ']':
@@ -839,25 +806,36 @@ phase3_get (token_ty *tp)
           else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
                    || c == '_')
             {
-              string_start ();
+              struct string_buffer buffer;
+              sb_init (&buffer);
+
               while ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z')
                      || c == '_' || (c >= '0' && c <= '9'))
                 {
-                  string_add (c);
+                  sb_xappend1 (&buffer, c);
                   c = phase1_getc ();
                 }
-              string_end ();
               phase1_ungetc (c);
 
-              if (strcmp (string_buf, "not") == 0)
-                tp->type = token_type_operator1;
-              else if (strcmp (string_buf, "and") == 0)
-                tp->type = token_type_operator2;
-              else if (strcmp (string_buf, "or") == 0)
-                tp->type = token_type_operator2;
+              const char *contents = sb_xcontents_c (&buffer);
+              if (strcmp (contents, "not") == 0)
+                {
+                  sb_free (&buffer);
+                  tp->type = token_type_operator1;
+                }
+              else if (strcmp (contents, "and") == 0)
+                {
+                  sb_free (&buffer);
+                  tp->type = token_type_operator2;
+                }
+              else if (strcmp (contents, "or") == 0)
+                {
+                  sb_free (&buffer);
+                  tp->type = token_type_operator2;
+                }
               else
                 {
-                  tp->string = xstrdup (string_buf);
+                  tp->string = sb_xdupfree_c (&buffer);
                   tp->type = token_type_symbol;
                 }
               return;
@@ -911,18 +889,18 @@ phase4_get (token_ty *tp)
       for (;;)
         {
           token_ty token2;
-
           phase3_get (&token2);
+
           if (token2.type == token_type_doubledot)
             {
               token_ty token3;
-
               phase3_get (&token3);
+
               if (token3.type == token_type_string)
                 {
                   token_ty token_after;
-
                   phase3_get (&token_after);
+
                   if (token_after.type != token_type_operator1)
                     {
                       char *addend = token3.string;
@@ -967,13 +945,13 @@ phase5_get (token_ty *tp)
       for (;;)
         {
           token_ty token2;
-
           phase4_get (&token2);
+
           if (token2.type == token_type_dot)
             {
               token_ty token3;
-
               phase4_get (&token3);
+
               if (token3.type == token_type_symbol)
                 {
                   char *addend = token3.string;
@@ -1041,7 +1019,7 @@ static int bracket_nesting_depth;
    Return true upon eof, false upon closing parenthesis or bracket.  */
 static bool
 extract_balanced (message_list_ty *mlp, token_type_ty delim,
-                  flag_context_ty outer_context,
+                  flag_region_ty *outer_region,
                   flag_context_list_iterator_ty context_iter,
                   struct arglist_parser *argparser)
 {
@@ -1054,9 +1032,9 @@ extract_balanced (message_list_ty *mlp, token_type_ty delim,
   /* Context iterator that will be used if the next token is a '('.  */
   flag_context_list_iterator_ty next_context_iter =
     passthrough_context_list_iterator;
-  /* Current context.  */
-  flag_context_ty inner_context =
-    inherited_context (outer_context,
+  /* Current region.  */
+  flag_region_ty *inner_region =
+    inheriting_region (outer_region,
                        flag_context_list_iterator_advance (&context_iter));
 
   /* Start state is 0.  */
@@ -1065,7 +1043,6 @@ extract_balanced (message_list_ty *mlp, token_type_ty delim,
   for (;;)
     {
       token_ty token;
-
       x_lua_lex (&token);
 
       switch (token.type)
@@ -1073,7 +1050,6 @@ extract_balanced (message_list_ty *mlp, token_type_ty delim,
         case token_type_symbol:
           {
             void *keyword_value;
-
             if (hash_find_entry (&keywords, token.string, strlen (token.string),
                                  &keyword_value)
                 == 0)
@@ -1090,21 +1066,20 @@ extract_balanced (message_list_ty *mlp, token_type_ty delim,
                 flag_context_list_table,
                 token.string, strlen (token.string)));
           free (token.string);
-          continue;
+          break;
 
         case token_type_lparen:
           if (++paren_nesting_depth > MAX_NESTING_DEPTH)
-            {
-              error_with_progname = false;
-              error (EXIT_FAILURE, 0, _("%s:%d: error: too many open parentheses"),
-                     logical_file_name, line_number);
-            }
+            if_error (IF_SEVERITY_FATAL_ERROR,
+                      logical_file_name, line_number, (size_t)(-1), false,
+                      _("too many open parentheses"));
           if (extract_balanced (mlp, token_type_rparen,
-                                inner_context, next_context_iter,
+                                inner_region, next_context_iter,
                                 arglist_parser_alloc (mlp,
                                                       state ? next_shapes : NULL)))
             {
               arglist_parser_done (argparser, arg);
+              unref_region (inner_region);
               return true;
             }
           paren_nesting_depth--;
@@ -1116,25 +1091,26 @@ extract_balanced (message_list_ty *mlp, token_type_ty delim,
           if (delim == token_type_rparen || delim == token_type_eof)
             {
               arglist_parser_done (argparser, arg);
+              unref_region (inner_region);
               return false;
             }
 
           next_context_iter = null_context_list_iterator;
           state = 0;
-          continue;
+          break;
 
         case token_type_lbracket:
           if (++bracket_nesting_depth > MAX_NESTING_DEPTH)
-            {
-              error_with_progname = false;
-              error (EXIT_FAILURE, 0, _("%s:%d: error: too many open brackets"),
-                     logical_file_name, line_number);
-            }
+            if_error (IF_SEVERITY_FATAL_ERROR,
+                      logical_file_name, line_number, (size_t)(-1), false,
+                      _("too many open brackets"));
           if (extract_balanced (mlp, token_type_rbracket,
-                                null_context, null_context_list_iterator,
+                                null_context_region (),
+                                null_context_list_iterator,
                                 arglist_parser_alloc (mlp, NULL)))
             {
               arglist_parser_done (argparser, arg);
+              unref_region (inner_region);
               return true;
             }
           bracket_nesting_depth--;
@@ -1146,25 +1122,28 @@ extract_balanced (message_list_ty *mlp, token_type_ty delim,
           if (delim == token_type_rbracket || delim == token_type_eof)
             {
               arglist_parser_done (argparser, arg);
+              unref_region (inner_region);
               return false;
             }
 
           next_context_iter = null_context_list_iterator;
           state = 0;
-          continue;
+          break;
 
         case token_type_comma:
           arg++;
-          inner_context =
-            inherited_context (outer_context,
+          unref_region (inner_region);
+          inner_region =
+            inheriting_region (outer_region,
                                flag_context_list_iterator_advance (
                                  &context_iter));
           next_context_iter = passthrough_context_list_iterator;
           state = 0;
-          continue;
+          break;
 
         case token_type_eof:
           arglist_parser_done (argparser, arg);
+          unref_region (inner_region);
           return true;
 
         case token_type_string:
@@ -1175,7 +1154,7 @@ extract_balanced (message_list_ty *mlp, token_type_ty delim,
 
             if (extract_all)
               remember_a_message (mlp, NULL, token.string, false, false,
-                                  inner_context, &pos,
+                                  inner_region, &pos,
                                   NULL, token.comment, false);
             else
               {
@@ -1190,14 +1169,14 @@ extract_balanced (message_list_ty *mlp, token_type_ty delim,
                     tmp_argparser = arglist_parser_alloc (mlp, next_shapes);
 
                     arglist_parser_remember (tmp_argparser, 1, ms,
-                                             inner_context,
+                                             inner_region,
                                              pos.file_name, pos.line_number,
                                              token.comment, false);
                     arglist_parser_done (tmp_argparser, 1);
                   }
                 else
                   arglist_parser_remember (argparser, arg, ms,
-                                           inner_context,
+                                           inner_region,
                                            pos.file_name, pos.line_number,
                                            token.comment, false);
               }
@@ -1205,7 +1184,7 @@ extract_balanced (message_list_ty *mlp, token_type_ty delim,
           drop_reference (token.comment);
           next_context_iter = null_context_list_iterator;
           state = 0;
-          continue;
+          break;
 
         case token_type_dot:
         case token_type_doubledot:
@@ -1215,7 +1194,7 @@ extract_balanced (message_list_ty *mlp, token_type_ty delim,
         case token_type_other:
           next_context_iter = null_context_list_iterator;
           state = 0;
-          continue;
+          break;
 
         default:
           abort ();
@@ -1256,7 +1235,7 @@ extract_lua (FILE *f,
   /* Eat tokens until eof is seen.  When extract_parenthesized returns
      due to an unbalanced closing parenthesis, just restart it.  */
   while (!extract_balanced (mlp, token_type_eof,
-                            null_context, null_context_list_iterator,
+                            null_context_region (), null_context_list_iterator,
                             arglist_parser_alloc (mlp, NULL)))
     ;
 

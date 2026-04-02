@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2024 Free Software Foundation, Inc.
+# Copyright (C) 2002-2026 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,8 @@
 
 
 # Specification in the form of a command-line invocation:
-# gnulib-tool --import --local-dir=gnulib-local \
+# gnulib-tool --import \
+#  --local-dir=gnulib-local \
 #  --lib=libgnu \
 #  --source-base=gnulib-lib \
 #  --m4-base=gnulib-m4 \
@@ -42,19 +43,24 @@
 #  bison \
 #  filename \
 #  flexmember \
+#  getcwd-lgpl \
 #  gettext-runtime-intl-misc \
 #  havelib \
+#  iconv \
 #  lib-symbol-visibility \
 #  localcharset \
-#  locale \
+#  locale-h \
 #  localename \
+#  localename-environ \
 #  lock \
 #  manywarnings \
-#  relocatable-lib-lgpl \
+#  setlocale-fixes \
 #  setlocale-null \
+#  stringeq \
 #  tsearch \
 #  vasnprintf-posix \
-#  vasnwprintf-posix
+#  vasnwprintf-posix \
+#  wgetcwd-lgpl
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([../../gnulib-local])
@@ -63,19 +69,24 @@ gl_MODULES([
   bison
   filename
   flexmember
+  getcwd-lgpl
   gettext-runtime-intl-misc
   havelib
+  iconv
   lib-symbol-visibility
   localcharset
-  locale
+  locale-h
   localename
+  localename-environ
   lock
   manywarnings
-  relocatable-lib-lgpl
+  setlocale-fixes
   setlocale-null
+  stringeq
   tsearch
   vasnprintf-posix
   vasnwprintf-posix
+  wgetcwd-lgpl
 ])
 gl_AVOID([])
 gl_SOURCE_BASE([gnulib-lib])

@@ -1,5 +1,5 @@
 /* Test of lstat() function.
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -63,6 +63,14 @@ test_lstat_func (int (*func) (char const *, struct stat *), bool print)
   errno = 0;
   ASSERT (func (BASE "file/", &st1) == -1);
   ASSERT (errno == ENOTDIR);
+
+  /* /dev/null is a character device.
+     Except on Solaris, where it is a symlink.  */
+  ASSERT (func ("/dev/null", &st1) == 0);
+  ASSERT (!S_ISREG (st1.st_mode));
+#if !defined __sun
+  ASSERT (S_ISCHR (st1.st_mode));
+#endif
 
   /* Now for some symlink tests, where supported.  We set up:
      link1 -> directory

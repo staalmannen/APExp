@@ -1,5 +1,5 @@
 /* Test of conversion of string to wide string.
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -83,20 +83,15 @@ main (int argc, char *argv[])
 
   if (argc > 1)
     {
-      int unlimited;
-
-      for (unlimited = 0; unlimited < 2; unlimited++)
+      for (int unlimited = 0; unlimited < 2; unlimited++)
         {
           #define BUFSIZE 10
           wchar_t buf[BUFSIZE];
           const char *src;
           mbstate_t temp_state;
 
-          {
-            size_t i;
-            for (i = 0; i < BUFSIZE; i++)
-              buf[i] = (wchar_t) 0xBADFACE;
-          }
+          for (size_t i = 0; i < BUFSIZE; i++)
+            buf[i] = (wchar_t) 0xBADFACE;
 
           switch (argv[1][0])
             {
@@ -130,11 +125,10 @@ main (int argc, char *argv[])
                 ASSERT (mbsinit (&state));
               }
               {
-                int c;
                 char input[2];
 
                 memset (&state, '\0', sizeof (mbstate_t));
-                for (c = 0; c < 0x100; c++)
+                for (int c = 0; c < 0x100; c++)
                   if (c != 0)
                     {
                       /* We are testing all nonnull bytes.  */
@@ -361,7 +355,7 @@ main (int argc, char *argv[])
             }
         }
 
-      return 0;
+      return test_exit_status;
     }
 
   return 1;

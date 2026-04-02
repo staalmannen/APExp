@@ -1,5 +1,5 @@
 /* Tests of mkdir.
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -42,5 +42,6 @@ main (void)
   /* Clean up any trash from prior testsuite runs.  */
   ignore_value (system ("rm -rf " BASE "*"));
 
-  return test_mkdir (mkdir, true);
+  int result = test_mkdir (mkdir, true);
+  return (result ? result : test_exit_status);
 }

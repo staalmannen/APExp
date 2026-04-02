@@ -1,6 +1,5 @@
 /* Miscellaneous public API.
-   Copyright (C) 2019, 2021 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2019.
+   Copyright (C) 2019-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,6 +13,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible.  */
 
 #include <config.h>
 
@@ -30,9 +31,8 @@ styled_ostream_t
 styled_ostream_create (int fd, const char *filename, ttyctl_t tty_control,
                        const char *css_filename)
 {
-  styled_ostream_t stream;
-
-  stream = term_styled_ostream_create (fd, filename, tty_control, css_filename);
+  styled_ostream_t stream =
+    term_styled_ostream_create (fd, filename, tty_control, css_filename);
   if (stream == NULL)
     stream =
       noop_styled_ostream_create (fd_ostream_create (fd, filename, true), true);

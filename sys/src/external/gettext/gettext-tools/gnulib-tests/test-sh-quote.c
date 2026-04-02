@@ -1,5 +1,5 @@
 /* Test of sh-quote module.
-   Copyright (C) 2012-2024 Free Software Foundation, Inc.
+   Copyright (C) 2012-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -57,8 +57,6 @@ main (void)
 {
   /* Check the shell_quote_length, shell_quote_copy, shell_quote functions.  */
   {
-    int c;
-
     /* Empty argument.  */
     check_one ("", "''");
 
@@ -156,7 +154,7 @@ main (void)
     check_one ("foo'bar\"baz", "'foo'\\''bar\"baz'"); /* or "\"foo'bar\\\"baz\"" */
 
     /* All other characters don't need quoting.  */
-    for (c = 1; c <= UCHAR_MAX; c++)
+    for (int c = 1; c <= UCHAR_MAX; c++)
       if (strchr ("\t\n\r !\"#$&'()*;<=>?^[\\]`{|}~", c) == NULL)
         {
           char s[5];
@@ -199,5 +197,5 @@ main (void)
     free (result);
   }
 
-  return 0;
+  return test_exit_status;
 }

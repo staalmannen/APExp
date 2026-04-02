@@ -1,6 +1,6 @@
 /* Open a file, without destroying an old file with the same name.
 
-   Copyright (C) 2020-2024 Free Software Foundation, Inc.
+   Copyright (C) 2020-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -79,7 +79,6 @@ open_supersede (const char *filename, int flags, mode_t mode,
                 bool supersede_if_exists, bool supersede_if_does_not_exist,
                 struct supersede_final_action *action)
 {
-  int fd;
   /* Extra flags for existing devices.  */
   int extra_flags =
     #if defined __sun || (defined _WIN32 && !defined __CYGWIN__)
@@ -97,10 +96,11 @@ open_supersede (const char *filename, int flags, mode_t mode,
     #endif
 
 #if defined _WIN32 && ! defined __CYGWIN__
-  if (strcmp (filename, "/dev/null") == 0)
+  if (streq (filename, "/dev/null"))
     filename = "NUL";
 #endif
 
+  int fd;
   if (supersede_if_exists)
     {
       if (supersede_if_does_not_exist)
@@ -293,9 +293,9 @@ after_close_actions (int ret, const struct supersede_final_action *action)
              file.  */
           {
             struct timespec ts[2];
-
             ts[0] = get_stat_atime (&dest_statbuf);
             ts[1] = get_stat_mtime (&temp_statbuf);
+
             ignore_value (utimens (action->final_rename_temp, ts));
           }
 

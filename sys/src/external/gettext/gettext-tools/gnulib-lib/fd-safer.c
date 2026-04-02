@@ -1,6 +1,6 @@
 /* Return a safer copy of a file descriptor.
 
-   Copyright (C) 2005-2006, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2005-2006, 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -39,9 +39,9 @@ fd_safer (int fd)
   if (STDIN_FILENO <= fd && fd <= STDERR_FILENO)
     {
       int f = dup_safer (fd);
-      int e = errno;
+      int saved_errno = errno;
       close (fd);
-      errno = e;
+      errno = saved_errno;
       fd = f;
     }
 

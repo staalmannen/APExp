@@ -1,27 +1,25 @@
 ;;; po-compat.el --- basic support of PO translation files -*- coding: latin-1; -*-
 
-;; Copyright (C) 1995-2002, 2010, 2016, 2019 Free Software Foundation, Inc.
-
-;; Authors: François Pinard <pinard@iro.umontreal.ca>,
-;;          Greg McGary <gkm@magilla.cichlid.com>,
-;;          Bruno Haible <bruno@clisp.org>.
-;; Keywords: i18n, files
-
+;; Copyright (C) 1995-2026 Free Software Foundation, Inc.
+;;
 ;; This file is part of GNU gettext.
-
+;;
 ;; GNU gettext is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2, or (at your option)
 ;; any later version.
-
+;;
 ;; GNU gettext is distributed in the hope that it will be useful,
 ;; but WITHOUT ANY WARRANTY; without even the implied warranty of
 ;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 ;; GNU General Public License for more details.
-
+;;
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, see
 ;; <https://www.gnu.org/licenses/>.
+
+;; Authors: FranÃ§ois Pinard, Greg McGary, Ulrich Drepper, Bruno Haible.
+;; Keywords: i18n, files
 
 ;;; Commentary:
 
@@ -154,7 +152,7 @@ Return a Mule (DECODING . ENCODING) pair, according to PO file charset.
 Called through file-coding-system-alist, before the file is visited for real."
   (and (eq operation 'insert-file-contents)
        (file-exists-p filename)
-       (po-with-temp-buffer
+       (with-temp-buffer
         (let* ((coding-system-for-read 'no-conversion)
                (charset (or (po-find-charset filename) "ascii"))
                (charset-upper (upcase charset))

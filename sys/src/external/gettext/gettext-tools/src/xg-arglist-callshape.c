@@ -1,6 +1,6 @@
 /* Resolving ambiguity of argument lists: Information given through
    command-line options.
-   Copyright (C) 2001-2018 Free Software Foundation, Inc.
+   Copyright (C) 2001-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,9 +15,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+/* Written by Bruno Haible.  */
+
+#include <config.h>
 
 /* Specification.  */
 #include "xg-arglist-callshape.h"
@@ -34,7 +34,6 @@ void
 split_keywordspec (const char *spec,
                    const char **endp, struct callshape *shapep)
 {
-  const char *p;
   int argnum1 = 0;
   int argnum2 = 0;
   int argnumc = 0;
@@ -42,11 +41,10 @@ split_keywordspec (const char *spec,
   bool argnum2_glib_context = false;
   int argtotal = 0;
   string_list_ty xcomments;
-
   string_list_init (&xcomments);
 
   /* Start parsing from the end.  */
-  p = spec + strlen (spec);
+  const char *p = spec + strlen (spec);
   while (p > spec)
     {
       if (isdigit ((unsigned char) p[-1])
@@ -96,27 +94,23 @@ split_keywordspec (const char *spec,
         }
       else if (p[-1] == '"')
         {
-          const char *xcomment_end;
-
           p--;
-          xcomment_end = p;
+          const char *xcomment_end = p;
 
           while (p > spec && p[-1] != '"')
             p--;
 
           if (p > spec /* && p[-1] == '"' */)
             {
-              const char *xcomment_start;
-
-              xcomment_start = p;
+              const char *xcomment_start = p;
               p--;
               if (p > spec && (p[-1] == ',' || p[-1] == ':'))
                 {
                   size_t xcomment_len = xcomment_end - xcomment_start;
                   char *xcomment = XNMALLOC (xcomment_len + 1, char);
-
                   memcpy (xcomment, xcomment_start, xcomment_len);
                   xcomment[xcomment_len] = '\0';
+
                   string_list_append (&xcomments, xcomment);
                 }
               else
@@ -134,8 +128,6 @@ split_keywordspec (const char *spec,
       p--;
       if (*p == ':')
         {
-          size_t i;
-
           if (argnum1 == 0 && argnum2 == 0)
             /* At least one non-context argument must be given.  */
             break;
@@ -152,7 +144,7 @@ split_keywordspec (const char *spec,
           shapep->argtotal = argtotal;
           /* Reverse the order of the xcomments.  */
           string_list_init (&shapep->xcomments);
-          for (i = xcomments.nitems; i > 0; )
+          for (size_t i = xcomments.nitems; i > 0; )
             string_list_append (&shapep->xcomments, xcomments.item[--i]);
           string_list_destroy (&xcomments);
           return;
@@ -197,11 +189,9 @@ insert_keyword_callshape (hash_table *table,
       /* Found a 'struct callshapes'.  See whether it already contains the
          desired shape.  */
       struct callshapes *old_shapes = (struct callshapes *) old_value;
-      bool found;
-      size_t i;
 
-      found = false;
-      for (i = 0; i < old_shapes->nshapes; i++)
+      bool found = false;
+      for (size_t i = 0; i < old_shapes->nshapes; i++)
         if (old_shapes->shapes[i].argnum1 == shape->argnum1
             && old_shapes->shapes[i].argnum2 == shape->argnum2
             && old_shapes->shapes[i].argnumc == shape->argnumc
@@ -228,9 +218,12 @@ insert_keyword_callshape (hash_table *table,
           shapes->keyword = old_shapes->keyword;
           shapes->keyword_len = old_shapes->keyword_len;
           shapes->nshapes = old_shapes->nshapes + 1;
-          for (i = 0; i < old_shapes->nshapes; i++)
-            shapes->shapes[i] = old_shapes->shapes[i];
-          shapes->shapes[i] = *shape;
+          {
+            size_t i;
+            for (i = 0; i < old_shapes->nshapes; i++)
+              shapes->shapes[i] = old_shapes->shapes[i];
+            shapes->shapes[i] = *shape;
+          }
           if (hash_set_value (table, keyword, keyword_len, shapes))
             abort ();
           free (old_shapes);

@@ -1,6 +1,6 @@
 /* Test of concatenation of two arbitrary file names.
 
-   Copyright (C) 1996-2007, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 1996-2007, 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -47,10 +47,9 @@ main (_GL_UNUSED int argc, char *argv[])
       {"a", "//b",  "a//b"},
       {"", "a", "a"},  /* this might deserve a diagnostic */
     };
-  unsigned int i;
   bool fail = false;
 
-  for (i = 0; i < sizeof tests / sizeof tests[0]; i++)
+  for (unsigned int i = 0; i < sizeof tests / sizeof tests[0]; i++)
     {
       char *base_in_result;
       char const *const *t = tests[i];

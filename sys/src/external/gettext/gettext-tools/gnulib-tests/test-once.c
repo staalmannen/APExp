@@ -1,5 +1,5 @@
 /* Test of once-only execution in multithreaded situations.
-   Copyright (C) 2018-2024 Free Software Foundation, Inc.
+   Copyright (C) 2018-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 
 #include <config.h>
 
-#include "glthread/lock.h"
+#include "glthread/once.h"
 
 #include "macros.h"
 
@@ -39,5 +39,5 @@ main ()
 
   ASSERT (a == 42);
 
-  return 0;
+  return test_exit_status;
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2008-2024 Free Software Foundation, Inc.
+ * Copyright (C) 2008-2026 Free Software Foundation, Inc.
  * Written by Eric Blake and Bruno Haible
  *
  * This program is free software: you can redistribute it and/or modify
@@ -28,13 +28,9 @@ SIGNATURE_CHECK (memrchr, void *, (void const *, int, size_t));
 #include "macros.h"
 
 /* Work around GCC bug 101494.  */
-#if 4 < __GNUC__ + (7 <= __GNUC_MINOR__) && __GNUC__ < 12
+#if _GL_GNUC_PREREQ (4, 7) && __GNUC__ < 12
 # pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
-
-/* Calculating void * + int is not portable, so this wrapper converts
-   to char * to make the tests easier to write.  */
-#define MEMRCHR (char *) memrchr
 
 int
 main (void)
@@ -51,22 +47,22 @@ main (void)
   input[0] = 'a';
 
   /* Basic behavior tests.  */
-  ASSERT (MEMRCHR (input, 'a', n) == input + n - 1);
+  ASSERT (memrchr (input, 'a', n) == input + n - 1);
 
-  ASSERT (MEMRCHR (input, 'a', 0) == NULL);
+  ASSERT (memrchr (input, 'a', 0) == NULL);
   void *page_boundary = zerosize_ptr ();
   if (page_boundary)
-    ASSERT (MEMRCHR (page_boundary, 'a', 0) == NULL);
+    ASSERT (memrchr (page_boundary, 'a', 0) == NULL);
 
-  ASSERT (MEMRCHR (input, 'b', n) == input + n - 2);
-  ASSERT (MEMRCHR (input, 'c', n) == input + n - 3);
-  ASSERT (MEMRCHR (input, 'd', n) == input + n - 1027);
+  ASSERT (memrchr (input, 'b', n) == input + n - 2);
+  ASSERT (memrchr (input, 'c', n) == input + n - 3);
+  ASSERT (memrchr (input, 'd', n) == input + n - 1027);
 
-  ASSERT (MEMRCHR (input, 'a', n - 1) == input);
-  ASSERT (MEMRCHR (input, 'e', n - 1) == input + 1);
+  ASSERT (memrchr (input, 'a', n - 1) == input);
+  ASSERT (memrchr (input, 'e', n - 1) == input + 1);
 
-  ASSERT (MEMRCHR (input, 'f', n) == NULL);
-  ASSERT (MEMRCHR (input, '\0', n) == NULL);
+  ASSERT (memrchr (input, 'f', n) == NULL);
+  ASSERT (memrchr (input, '\0', n) == NULL);
 
   /* Check that a very long haystack is handled quickly if the byte is
      found near the end.  */
@@ -74,25 +70,22 @@ main (void)
     size_t repeat = 10000;
     for (; repeat > 0; repeat--)
       {
-        ASSERT (MEMRCHR (input, 'c', n) == input + n - 3);
+        ASSERT (memrchr (input, 'c', n) == input + n - 3);
       }
   }
 
   /* Alignment tests.  */
-  {
-    int i, j;
-    for (i = 0; i < 32; i++)
-      {
-        for (j = 0; j < 256; j++)
-          input[i + j] = j;
-        for (j = 0; j < 256; j++)
-          {
-            ASSERT (MEMRCHR (input + i, j, 256) == input + i + j);
-          }
-      }
-  }
+  for (int i = 0; i < 32; i++)
+    {
+      for (int j = 0; j < 256; j++)
+        input[i + j] = j;
+      for (int j = 0; j < 256; j++)
+        {
+          ASSERT (memrchr (input + i, j, 256) == input + i + j);
+        }
+    }
 
   free (input);
 
-  return 0;
+  return test_exit_status;
 }

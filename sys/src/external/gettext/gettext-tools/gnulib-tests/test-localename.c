@@ -1,5 +1,5 @@
 /* Test of gl_locale_name function and its variants.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 
 #include "macros.h"
 
-#if HAVE_WORKING_NEWLOCALE && HAVE_WORKING_USELOCALE && !HAVE_FAKE_LOCALES
+#if HAVE_WORKING_USELOCALE && !HAVE_FAKE_LOCALES
 # define HAVE_GOOD_USELOCALE 1
 #endif
 
@@ -36,7 +36,7 @@
 #endif
 
 /* Suppress GCC false positive.  */
-#if __GNUC__ >= 12
+#if _GL_GNUC_PREREQ (12, 0)
 # pragma GCC diagnostic ignored "-Wanalyzer-use-of-uninitialized-value"
 #endif
 
@@ -244,38 +244,32 @@ test_locale_name (void)
 
   /* Check that gl_locale_name distinguishes different categories of the
      thread locale, and that the name is the right one for each.  */
-  {
-    unsigned int i;
-
-    for (i = 0; i < SIZEOF (categories); i++)
-      {
-        int category_mask = categories[i].mask;
-        locale_t loc = newlocale (LC_ALL_MASK, "fr_FR.UTF-8", NULL);
-        if (loc != NULL)
-          {
-            locale_t locale = newlocale (category_mask, "de_DE.UTF-8", loc);
-            if (locale == NULL)
-              freelocale (loc);
-            else
-              {
-                unsigned int j;
-
-                uselocale (locale);
-                for (j = 0; j < SIZEOF (categories); j++)
-                  {
-                    const char *name_j =
-                      gl_locale_name (categories[j].cat, categories[j].string);
-                    if (j == i)
-                      ASSERT (strcmp (name_j, "de_DE.UTF-8") == 0);
-                    else
-                      ASSERT (strcmp (name_j, "fr_FR.UTF-8") == 0);
-                  }
-                uselocale (LC_GLOBAL_LOCALE);
-                freelocale (locale);
-              }
-          }
-      }
-  }
+  for (unsigned int i = 0; i < SIZEOF (categories); i++)
+    {
+      int category_mask = categories[i].mask;
+      locale_t loc = newlocale (LC_ALL_MASK, "fr_FR.UTF-8", NULL);
+      if (loc != NULL)
+        {
+          locale_t locale = newlocale (category_mask, "de_DE.UTF-8", loc);
+          if (locale == NULL)
+            freelocale (loc);
+          else
+            {
+              uselocale (locale);
+              for (unsigned int j = 0; j < SIZEOF (categories); j++)
+                {
+                  const char *name_j =
+                    gl_locale_name (categories[j].cat, categories[j].string);
+                  if (j == i)
+                    ASSERT (strcmp (name_j, "de_DE.UTF-8") == 0);
+                  else
+                    ASSERT (strcmp (name_j, "fr_FR.UTF-8") == 0);
+                }
+              uselocale (LC_GLOBAL_LOCALE);
+              freelocale (locale);
+            }
+        }
+    }
 #endif
 }
 
@@ -312,39 +306,33 @@ test_locale_name_thread (void)
 
   /* Check that gl_locale_name_thread distinguishes different categories of the
      thread locale, and that the name is the right one for each.  */
-  {
-    unsigned int i;
-
-    for (i = 0; i < SIZEOF (categories); i++)
-      {
-        int category_mask = categories[i].mask;
-        locale_t loc = newlocale (LC_ALL_MASK, "fr_FR.UTF-8", NULL);
-        if (loc != NULL)
-          {
-            locale_t locale = newlocale (category_mask, "de_DE.UTF-8", loc);
-            if (locale == NULL)
-              freelocale (loc);
-            else
-              {
-                unsigned int j;
-
-                uselocale (locale);
-                for (j = 0; j < SIZEOF (categories); j++)
-                  {
-                    const char *name_j =
-                      gl_locale_name_thread (categories[j].cat,
-                                             categories[j].string);
-                    if (j == i)
-                      ASSERT (strcmp (name_j, "de_DE.UTF-8") == 0);
-                    else
-                      ASSERT (strcmp (name_j, "fr_FR.UTF-8") == 0);
-                  }
-                uselocale (LC_GLOBAL_LOCALE);
-                freelocale (locale);
-              }
-          }
-      }
-  }
+  for (unsigned int i = 0; i < SIZEOF (categories); i++)
+    {
+      int category_mask = categories[i].mask;
+      locale_t loc = newlocale (LC_ALL_MASK, "fr_FR.UTF-8", NULL);
+      if (loc != NULL)
+        {
+          locale_t locale = newlocale (category_mask, "de_DE.UTF-8", loc);
+          if (locale == NULL)
+            freelocale (loc);
+          else
+            {
+              uselocale (locale);
+              for (unsigned int j = 0; j < SIZEOF (categories); j++)
+                {
+                  const char *name_j =
+                    gl_locale_name_thread (categories[j].cat,
+                                           categories[j].string);
+                  if (j == i)
+                    ASSERT (strcmp (name_j, "de_DE.UTF-8") == 0);
+                  else
+                    ASSERT (strcmp (name_j, "fr_FR.UTF-8") == 0);
+                }
+              uselocale (LC_GLOBAL_LOCALE);
+              freelocale (locale);
+            }
+        }
+    }
 
   /* Check that gl_locale_name_thread returns a string that is allocated with
      indefinite extent.  */
@@ -463,18 +451,15 @@ test_locale_name_thread (void)
     /* Array of remembered results of gl_locale_name_thread, stored in safe
        memory.  */
     char *saved_names[SIZEOF (choices)][SIZEOF (categories)];
-    unsigned int j;
 
-    for (j = 0; j < SIZEOF (choices); j++)
+    for (unsigned int j = 0; j < SIZEOF (choices); j++)
       {
         locale_t locale = newlocale (LC_ALL_MASK, choices[j], NULL);
         available[j] = (locale != NULL);
         if (locale != NULL)
           {
-            unsigned int i;
-
             uselocale (locale);
-            for (i = 0; i < SIZEOF (categories); i++)
+            for (unsigned int i = 0; i < SIZEOF (categories); i++)
               {
                 unsaved_names[j][i] = gl_locale_name_thread (categories[i].cat, categories[i].string);
                 saved_names[j][i] = strdup (unsaved_names[j][i]);
@@ -484,27 +469,24 @@ test_locale_name_thread (void)
           }
       }
     /* Verify the unsaved_names are still valid.  */
-    for (j = 0; j < SIZEOF (choices); j++)
+    for (unsigned int j = 0; j < SIZEOF (choices); j++)
       if (available[j])
         {
-          unsigned int i;
-
-          for (i = 0; i < SIZEOF (categories); i++)
+          for (unsigned int i = 0; i < SIZEOF (categories); i++)
             ASSERT (strcmp (unsaved_names[j][i], saved_names[j][i]) == 0);
         }
     /* Allocate many locales, without freeing them.  This is an attempt at
        overwriting as much of the previously allocated memory as possible.  */
-    for (j = SIZEOF (choices); j > 0; )
+    for (unsigned int j = SIZEOF (choices); j > 0; )
       {
         j--;
         if (available[j])
           {
             locale_t locale = newlocale (LC_ALL_MASK, choices[j], NULL);
-            unsigned int i;
 
             ASSERT (locale != NULL);
             uselocale (locale);
-            for (i = 0; i < SIZEOF (categories); i++)
+            for (unsigned int i = 0; i < SIZEOF (categories); i++)
               {
                 const char *name = gl_locale_name_thread (categories[i].cat, categories[i].string);
                 ASSERT (strcmp (unsaved_names[j][i], name) == 0);
@@ -514,12 +496,10 @@ test_locale_name_thread (void)
           }
       }
     /* Verify the unsaved_names are still valid.  */
-    for (j = 0; j < SIZEOF (choices); j++)
+    for (unsigned int j = 0; j < SIZEOF (choices); j++)
       if (available[j])
         {
-          unsigned int i;
-
-          for (i = 0; i < SIZEOF (categories); i++)
+          for (unsigned int i = 0; i < SIZEOF (categories); i++)
             {
               ASSERT (strcmp (unsaved_names[j][i], saved_names[j][i]) == 0);
               free (saved_names[j][i]);
@@ -838,5 +818,5 @@ main ()
   test_locale_name_environ ();
   test_locale_name_default ();
 
-  return 0;
+  return test_exit_status;
 }

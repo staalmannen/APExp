@@ -1,7 +1,6 @@
 %{
 /* Expression parsing for plural form selection.
-   Copyright (C) 2000-2020 Free Software Foundation, Inc.
-   Written by Ulrich Drepper <drepper@cygnus.com>, 2000.
+   Copyright (C) 2000-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -15,6 +14,8 @@
 
    You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Ulrich Drepper, Bruno Haible, and Daiki Ueno.  */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -31,6 +32,11 @@
 #ifndef _LIBC
 # define __gettextparse PLURAL_PARSE
 #endif
+
+/* Later we provide those prototypes.  Without these macros, bison may
+   generate its own prototypes with possible conflicts.  */
+#define YYLEX_IS_DECLARED
+#define YYERROR_IS_DECLARED
 
 %}
 %require "3.0"
@@ -200,7 +206,6 @@ exp:	  exp '?' exp ':' exp
 %%
 
 void
-internal_function
 FREE_EXPRESSION (struct expression *exp)
 {
   if (exp == NULL)

@@ -1,5 +1,5 @@
 /* Guts of POSIX spawn interface.  Generic POSIX.1 version.
-   Copyright (C) 2000-2006, 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2000-2006, 2008-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    This file is free software: you can redistribute it and/or modify
@@ -185,9 +185,8 @@ do_remaining_delayed_dup2 (struct inheritable_handles *inh_handles,
                            HANDLE curr_process)
 {
   size_t handles_count = inh_handles->count;
-  int newfd;
 
-  for (newfd = 0; newfd < handles_count; newfd++)
+  for (int newfd = 0; newfd < handles_count; newfd++)
     if (inh_handles->ih[newfd].handle != INVALID_HANDLE_VALUE
         && (inh_handles->ih[newfd].flags & DELAYED_DUP2_NEWFD) != 0)
       if (do_delayed_dup2 (newfd, inh_handles, curr_process) < 0)
@@ -204,9 +203,8 @@ shrink_inheritable_handles (struct inheritable_handles *inh_handles)
 {
   struct IHANDLE *ih = inh_handles->ih;
   size_t handles_count = inh_handles->count;
-  unsigned int fd;
 
-  for (fd = 0; fd < handles_count; fd++)
+  for (unsigned int fd = 0; fd < handles_count; fd++)
     {
       HANDLE handle = ih[fd].handle;
 
@@ -232,9 +230,8 @@ close_inheritable_handles (struct inheritable_handles *inh_handles)
 {
   struct IHANDLE *ih = inh_handles->ih;
   size_t handles_count = inh_handles->count;
-  unsigned int fd;
 
-  for (fd = 0; fd < handles_count; fd++)
+  for (unsigned int fd = 0; fd < handles_count; fd++)
     {
       HANDLE handle = ih[fd].handle;
 
@@ -328,7 +325,7 @@ static HANDLE
 open_handle (const char *name, int flags, mode_t mode)
 {
   /* To ease portability.  Like in open.c.  */
-  if (strcmp (name, "/dev/null") == 0)
+  if (streq (name, "/dev/null"))
     name = "NUL";
 
   /* POSIX <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_13>
@@ -665,7 +662,7 @@ __spawni (pid_t *pid, const char *prog_filename,
     envblock = NULL;
   else
     {
-      envblock = compose_envblock (envp);
+      envblock = compose_envblock (envp, NULL);
       if (envblock == NULL)
         {
           free (command);
@@ -691,9 +688,8 @@ __spawni (pid_t *pid, const char *prog_filename,
   if (file_actions != NULL)
     {
       HANDLE curr_process = GetCurrentProcess ();
-      int cnt;
 
-      for (cnt = 0; cnt < file_actions->_used; ++cnt)
+      for (int cnt = 0; cnt < file_actions->_used; ++cnt)
         {
           struct __spawn_action *action = &file_actions->_actions[cnt];
 
@@ -869,11 +865,6 @@ __spawni (pid_t *pid, const char *file,
           const posix_spawnattr_t *attrp, const char *const argv[],
           const char *const envp[], int use_path)
 {
-  pid_t new_pid;
-  char *path, *p, *name;
-  size_t len;
-  size_t pathlen;
-
   /* Do this once.  */
   short int flags = attrp == NULL ? 0 : attrp->_flags;
 
@@ -881,13 +872,49 @@ __spawni (pid_t *pid, const char *file,
        "variable 'flags' might be clobbered by 'longjmp' or 'vfork'"  */
   (void) &flags;
 
+  use_path = use_path && strchr (file, '/') == NULL;
+
+  /* Prepare a stack-allocated copy of $PATH and FILE, for iterating through
+     $PATH.  We do this already in the parent, because on Linux/SPARC,
+     Linux/ppc64, Linux/ppc64le, and Solaris/SPARC, it causes a SIGBUS or
+     SIGSEGV when done in the child process after vfork() and when $PATH is long
+     (ca. 4 KB or so).  */
+  char *path;
+  char *name;
+  if (use_path)
+    {
+      /* We have to search for FILE on the path.  */
+      path = getenv ("PATH");
+      if (path == NULL)
+        {
+#if HAVE_CONFSTR
+          /* There is no 'PATH' in the environment.
+             The default search path is the current directory
+             followed by the path 'confstr' returns for '_CS_PATH'.  */
+          size_t len = confstr (_CS_PATH, (char *) NULL, 0);
+          path = (char *) alloca (1 + len);
+          path[0] = ':';
+          (void) confstr (_CS_PATH, path + 1, len);
+#else
+          /* Pretend that the PATH contains only the current directory.  */
+          path = "";
+#endif
+        }
+
+      size_t len = strlen (file) + 1;
+      size_t pathlen = strlen (path);
+      name = alloca (pathlen + len + 1);
+      /* Copy the file name at the top.  */
+      name = (char *) memcpy (name + pathlen + 1, file, len);
+      /* And add the slash.  */
+      *--name = '/';
+    }
+
   /* Generate the new process.  */
+  pid_t new_pid;
 #if HAVE_VFORK
   if ((flags & POSIX_SPAWN_USEVFORK) != 0
-      /* If no major work is done, allow using vfork.  Note that we
-         might perform the path searching.  But this would be done by
-         a call to execvp(), too, and such a call must be OK according
-         to POSIX.  */
+      /* If no major work is done, allow using vfork.  */
       || ((flags & (POSIX_SPAWN_SETSIGMASK | POSIX_SPAWN_SETSIGDEF
                     | POSIX_SPAWN_SETSCHEDPARAM | POSIX_SPAWN_SETSCHEDULER
                     | POSIX_SPAWN_SETPGROUP | POSIX_SPAWN_RESETIDS)) == 0
@@ -921,13 +948,12 @@ __spawni (pid_t *pid, const char *file,
          done better but it requires system specific solutions since
          the sigset_t data type can be very different on different
          architectures.  */
-      int sig;
       struct sigaction sa;
 
       memset (&sa, '\0', sizeof (sa));
       sa.sa_handler = SIG_DFL;
 
-      for (sig = 1; sig <= NSIG; ++sig)
+      for (int sig = 1; sig < NSIG; ++sig)
         if (sigismember (&attrp->_sd, sig) != 0
             && sigaction (sig, &sa, NULL) != 0)
           _exit (SPAWN_ERROR);
@@ -964,106 +990,76 @@ __spawni (pid_t *pid, const char *file,
 
   /* Execute the file actions.  */
   if (file_actions != NULL)
-    {
-      int cnt;
+    for (int cnt = 0; cnt < file_actions->_used; ++cnt)
+      {
+        struct __spawn_action *action = &file_actions->_actions[cnt];
 
-      for (cnt = 0; cnt < file_actions->_used; ++cnt)
-        {
-          struct __spawn_action *action = &file_actions->_actions[cnt];
+        switch (action->tag)
+          {
+          case spawn_do_close:
+            if (close_not_cancel (action->action.close_action.fd) != 0)
+              /* Signal the error.  */
+              _exit (SPAWN_ERROR);
+            break;
 
-          switch (action->tag)
+          case spawn_do_open:
             {
-            case spawn_do_close:
-              if (close_not_cancel (action->action.close_action.fd) != 0)
-                /* Signal the error.  */
+              int new_fd = open_not_cancel (action->action.open_action.path,
+                                            action->action.open_action.oflag
+                                            | O_LARGEFILE,
+                                            action->action.open_action.mode);
+
+              if (new_fd == -1)
+                /* The 'open' call failed.  */
                 _exit (SPAWN_ERROR);
-              break;
 
-            case spawn_do_open:
-              {
-                int new_fd = open_not_cancel (action->action.open_action.path,
-                                              action->action.open_action.oflag
-                                              | O_LARGEFILE,
-                                              action->action.open_action.mode);
+              /* Make sure the desired file descriptor is used.  */
+              if (new_fd != action->action.open_action.fd)
+                {
+                  if (dup2 (new_fd, action->action.open_action.fd)
+                      != action->action.open_action.fd)
+                    /* The 'dup2' call failed.  */
+                    _exit (SPAWN_ERROR);
 
-                if (new_fd == -1)
-                  /* The 'open' call failed.  */
-                  _exit (SPAWN_ERROR);
-
-                /* Make sure the desired file descriptor is used.  */
-                if (new_fd != action->action.open_action.fd)
-                  {
-                    if (dup2 (new_fd, action->action.open_action.fd)
-                        != action->action.open_action.fd)
-                      /* The 'dup2' call failed.  */
-                      _exit (SPAWN_ERROR);
-
-                    if (close_not_cancel (new_fd) != 0)
-                      /* The 'close' call failed.  */
-                      _exit (SPAWN_ERROR);
-                  }
-              }
-              break;
-
-            case spawn_do_dup2:
-              if (dup2 (action->action.dup2_action.fd,
-                        action->action.dup2_action.newfd)
-                  != action->action.dup2_action.newfd)
-                /* The 'dup2' call failed.  */
-                _exit (SPAWN_ERROR);
-              break;
-
-            case spawn_do_chdir:
-              if (chdir (action->action.chdir_action.path) < 0)
-                /* The 'chdir' call failed.  */
-                _exit (SPAWN_ERROR);
-              break;
-
-            case spawn_do_fchdir:
-              if (fchdir (action->action.fchdir_action.fd) < 0)
-                /* The 'fchdir' call failed.  */
-                _exit (SPAWN_ERROR);
-              break;
+                  if (close_not_cancel (new_fd) != 0)
+                    /* The 'close' call failed.  */
+                    _exit (SPAWN_ERROR);
+                }
             }
-        }
-    }
+            break;
 
-  if (! use_path || strchr (file, '/') != NULL)
+          case spawn_do_dup2:
+            if (dup2 (action->action.dup2_action.fd,
+                      action->action.dup2_action.newfd)
+                != action->action.dup2_action.newfd)
+              /* The 'dup2' call failed.  */
+              _exit (SPAWN_ERROR);
+            break;
+
+          case spawn_do_chdir:
+            if (chdir (action->action.chdir_action.path) < 0)
+              /* The 'chdir' call failed.  */
+              _exit (SPAWN_ERROR);
+            break;
+
+          case spawn_do_fchdir:
+            if (fchdir (action->action.fchdir_action.fd) < 0)
+              /* The 'fchdir' call failed.  */
+              _exit (SPAWN_ERROR);
+            break;
+          }
+      }
+
+  if (! use_path)
     {
-      /* The FILE parameter is actually a path.  */
+      /* No need to iterate through $PATH.  Use FILE directly.  */
       execve (file, (char * const *) argv, (char * const *) envp);
 
       /* Oh, oh.  'execve' returns.  This is bad.  */
       _exit (SPAWN_ERROR);
     }
 
-  /* We have to search for FILE on the path.  */
-  path = getenv ("PATH");
-  if (path == NULL)
-    {
-#if HAVE_CONFSTR
-      /* There is no 'PATH' in the environment.
-         The default search path is the current directory
-         followed by the path 'confstr' returns for '_CS_PATH'.  */
-      len = confstr (_CS_PATH, (char *) NULL, 0);
-      path = (char *) alloca (1 + len);
-      path[0] = ':';
-      (void) confstr (_CS_PATH, path + 1, len);
-#else
-      /* Pretend that the PATH contains only the current directory.  */
-      path = "";
-#endif
-    }
-
-  len = strlen (file) + 1;
-  pathlen = strlen (path);
-  name = alloca (pathlen + len + 1);
-  /* Copy the file name at the top.  */
-  name = (char *) memcpy (name + pathlen + 1, file, len);
-  /* And add the slash.  */
-  *--name = '/';
-
-  p = path;
+  char *p = path;
   do
     {
       char *startp;

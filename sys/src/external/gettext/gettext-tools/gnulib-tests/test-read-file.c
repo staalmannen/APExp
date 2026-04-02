@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2006-2007, 2010-2024 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2007, 2010-2026 Free Software Foundation, Inc.
  * Written by Simon Josefsson
  *
  * This program is free software: you can redistribute it and/or modify
@@ -120,5 +120,5 @@ main (void)
   ASSERT (!test_read_file (RF_SENSITIVE));
   ASSERT (!test_read_file (RF_BINARY | RF_SENSITIVE));
 
-  return 0;
+  return test_exit_status;
 }

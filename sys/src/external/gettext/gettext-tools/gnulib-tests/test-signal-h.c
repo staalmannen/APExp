@@ -1,5 +1,5 @@
 /* Test of <signal.h> substitute.
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,6 +19,9 @@
 #include <config.h>
 
 #include <signal.h>
+
+/* Check that SIG2STR_MAX is defined to a positive integer.  */
+static_assert (0 < SIG2STR_MAX);
 
 /* Check for required types.  */
 struct

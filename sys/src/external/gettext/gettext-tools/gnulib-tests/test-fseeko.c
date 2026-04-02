@@ -1,5 +1,5 @@
 /* Test of fseeko() function.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -56,6 +56,8 @@ main (int argc, _GL_UNUSED char **argv)
         {
           if (FUNC_UNGETC_BROKEN)
             {
+              if (test_exit_status != EXIT_SUCCESS)
+                return test_exit_status;
               fputs ("Skipping test: ungetc cannot handle arbitrary bytes\n",
                      stderr);
               return 77;
@@ -70,5 +72,5 @@ main (int argc, _GL_UNUSED char **argv)
       ASSERT (fseeko (stdin, 0, SEEK_END) == 0);
       ASSERT (!feof (stdin));
     }
-  return 0;
+  return test_exit_status;
 }

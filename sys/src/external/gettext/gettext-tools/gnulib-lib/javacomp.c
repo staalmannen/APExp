@@ -1,5 +1,5 @@
 /* Compile a Java program.
-   Copyright (C) 2001-2003, 2006-2024 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003, 2006-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
@@ -50,7 +50,7 @@
 #include "c-strstr.h"
 #include "gettext.h"
 
-#define _(str) gettext (str)
+#define _(msgid) dgettext (GNULIB_TEXT_DOMAIN, msgid)
 
 
 /* Survey of Java compilers.
@@ -94,18 +94,18 @@ default_target_version (void)
       /* Determine the version from the found JVM.  */
       java_version_cache = javaexec_version ();
       if (java_version_cache == NULL)
-        java_version_cache = "1.6";
+        java_version_cache = "1.8";
       else if (java_version_cache[0] == '1'
                && java_version_cache[1] == '.'
-               && java_version_cache[2] >= '1' && java_version_cache[2] <= '5'
+               && java_version_cache[2] >= '1' && java_version_cache[2] <= '7'
                && java_version_cache[3] == '\0')
         {
           error (0, 0, _("The java program is too old. Cannot compile Java code for this old version any more."));
-          java_version_cache = "1.6";
+          java_version_cache = "1.8";
         }
       else if ((java_version_cache[0] == '1'
                 && java_version_cache[1] == '.'
-                && java_version_cache[2] >= '6' && java_version_cache[2] <= '8'
+                && java_version_cache[2] == '8'
                 && java_version_cache[3] == '\0')
                || (java_version_cache[0] == '9'
                    && java_version_cache[1] == '\0')
@@ -120,7 +120,7 @@ default_target_version (void)
            determined from the JVM, we do that.  */
         ;
       else
-        java_version_cache = "1.6";
+        java_version_cache = "1.8";
     }
   return java_version_cache;
 }
@@ -128,22 +128,21 @@ default_target_version (void)
 /* ======================= Source version dependent ======================= */
 
 /* Convert a source version to an index.  */
-#define SOURCE_VERSION_BOUND 94 /* exclusive upper bound */
+#define SOURCE_VERSION_BOUND 92 /* exclusive upper bound */
 static unsigned int
 source_version_index (const char *source_version)
 {
   if (source_version[0] == '1' && source_version[1] == '.')
     {
-      if ((source_version[2] >= '6' && source_version[2] <= '8')
-          && source_version[3] == '\0')
-        return source_version[2] - '6';
+      if (source_version[2] == '8' && source_version[3] == '\0')
+        return 0;
     }
   else if (source_version[0] == '9' && source_version[1] == '\0')
-    return 3;
+    return 1;
   else if ((source_version[0] >= '1' && source_version[0] <= '9')
            && (source_version[1] >= '0' && source_version[1] <= '9')
            && source_version[2] == '\0')
-    return (source_version[0] - '1') * 10 + source_version[1] - '0' + 4;
+    return (source_version[0] - '1') * 10 + source_version[1] - '0' + 2;
   error (EXIT_FAILURE, 0, _("invalid source_version argument to compile_java_class"));
   return 0;
 }
@@ -151,20 +150,19 @@ source_version_index (const char *source_version)
 /* ======================= Target version dependent ======================= */
 
 /* Convert a target version to an index.  */
-#define TARGET_VERSION_BOUND 94 /* exclusive upper bound */
+#define TARGET_VERSION_BOUND 92 /* exclusive upper bound */
 static unsigned int
 target_version_index (const char *target_version)
 {
   if (target_version[0] == '1' && target_version[1] == '.'
-      && (target_version[2] >= '6' && target_version[2] <= '8')
-      && target_version[3] == '\0')
-    return target_version[2] - '6';
+      && target_version[2] == '8' && target_version[3] == '\0')
+    return 0;
   else if (target_version[0] == '9' && target_version[1] == '\0')
-    return 3;
+    return 1;
   else if ((target_version[0] >= '1' && target_version[0] <= '9')
            && (target_version[1] >= '0' && target_version[1] <= '9')
            && target_version[2] == '\0')
-    return (target_version[0] - '1') * 10 + target_version[1] - '0' + 4;
+    return (target_version[0] - '1') * 10 + target_version[1] - '0' + 2;
   error (EXIT_FAILURE, 0, _("invalid target_version argument to compile_java_class"));
   return 0;
 }
@@ -185,68 +183,64 @@ compile_using_envjavac (const char *javac,
      shell.  Because $JAVAC has been set by the user, we leave all
      environment variables in place, including JAVA_HOME, and we don't
      erase the user's CLASSPATH.  */
-  bool err;
-  unsigned int command_length;
-  char *command;
-  const char *argv[4];
-  int exitstatus;
-  unsigned int i;
-  char *p;
 
-  command_length = strlen (javac);
+  unsigned int command_length = strlen (javac);
   if (optimize)
     command_length += 3;
   if (debug)
     command_length += 3;
   if (directory != NULL)
     command_length += 4 + shell_quote_length (directory);
-  for (i = 0; i < java_sources_count; i++)
+  for (unsigned int i = 0; i < java_sources_count; i++)
     command_length += 1 + shell_quote_length (java_sources[i]);
   command_length += 1;
 
-  command = (char *) xmalloca (command_length);
-  p = command;
-  /* Don't shell_quote $JAVAC, because it may consist of a command
-     and options.  */
-  memcpy (p, javac, strlen (javac));
-  p += strlen (javac);
-  if (optimize)
-    {
-      memcpy (p, " -O", 3);
-      p += 3;
-    }
-  if (debug)
-    {
-      memcpy (p, " -g", 3);
-      p += 3;
-    }
-  if (directory != NULL)
-    {
-      memcpy (p, " -d ", 4);
-      p += 4;
-      p = shell_quote_copy (p, directory);
-    }
-  for (i = 0; i < java_sources_count; i++)
-    {
-      *p++ = ' ';
-      p = shell_quote_copy (p, java_sources[i]);
-    }
-  *p++ = '\0';
-  /* Ensure command_length was correctly calculated.  */
-  if (p - command > command_length)
-    abort ();
+  char *command = (char *) xmalloca (command_length);
+  {
+    char *p = command;
+    /* Don't shell_quote $JAVAC, because it may consist of a command
+       and options.  */
+    memcpy (p, javac, strlen (javac));
+    p += strlen (javac);
+    if (optimize)
+      {
+        memcpy (p, " -O", 3);
+        p += 3;
+      }
+    if (debug)
+      {
+        memcpy (p, " -g", 3);
+        p += 3;
+      }
+    if (directory != NULL)
+      {
+        memcpy (p, " -d ", 4);
+        p += 4;
+        p = shell_quote_copy (p, directory);
+      }
+    for (unsigned int i = 0; i < java_sources_count; i++)
+      {
+        *p++ = ' ';
+        p = shell_quote_copy (p, java_sources[i]);
+      }
+    *p++ = '\0';
+    /* Ensure command_length was correctly calculated.  */
+    if (p - command > command_length)
+      abort ();
+  }
 
   if (verbose)
     printf ("%s\n", command);
 
+  const char *argv[4];
   argv[0] = BOURNE_SHELL;
   argv[1] = "-c";
   argv[2] = command;
   argv[3] = NULL;
-  exitstatus = execute (javac, BOURNE_SHELL, argv, NULL,
-                        false, false, false, null_stderr,
-                        true, true, NULL);
-  err = (exitstatus != 0);
+  int exitstatus = execute (javac, BOURNE_SHELL, argv, NULL, NULL,
+                            false, false, false, null_stderr,
+                            true, true, NULL);
+  bool err = (exitstatus != 0);
 
   freea (command);
 
@@ -265,48 +259,42 @@ compile_using_javac (const char * const *java_sources,
                      bool optimize, bool debug,
                      bool verbose, bool null_stderr)
 {
-  bool err;
-  unsigned int argc;
-  const char **argv;
-  const char **argp;
-  int exitstatus;
-  unsigned int i;
-
-  argc =
+  unsigned int argc =
     1 + (nowarn_option != NULL ? 1 : 0) + (source_option ? 2 : 0)
     + (target_option ? 2 : 0) + (optimize ? 1 : 0) + (debug ? 1 : 0)
     + (directory != NULL ? 2 : 0) + java_sources_count;
-  argv = (const char **) xmalloca ((argc + 1) * sizeof (const char *));
-
-  argp = argv;
-  *argp++ = "javac";
-  if (nowarn_option != NULL)
-    *argp++ = nowarn_option;
-  if (source_option)
-    {
-      *argp++ = "-source";
-      *argp++ = source_version;
-    }
-  if (target_option)
-    {
-      *argp++ = "-target";
-      *argp++ = target_version;
-    }
-  if (optimize)
-    *argp++ = "-O";
-  if (debug)
-    *argp++ = "-g";
-  if (directory != NULL)
-    {
-      *argp++ = "-d";
-      *argp++ = directory;
-    }
-  for (i = 0; i < java_sources_count; i++)
-    *argp++ = java_sources[i];
-  *argp = NULL;
-  /* Ensure argv length was correctly calculated.  */
-  if (argp - argv != argc)
-    abort ();
+  const char **argv = (const char **) xmalloca ((argc + 1) * sizeof (const char *));
+  {
+    const char **argp = argv;
+    *argp++ = "javac";
+    if (nowarn_option != NULL)
+      *argp++ = nowarn_option;
+    if (source_option)
+      {
+        *argp++ = "-source";
+        *argp++ = source_version;
+      }
+    if (target_option)
+      {
+        *argp++ = "-target";
+        *argp++ = target_version;
+      }
+    if (optimize)
+      *argp++ = "-O";
+    if (debug)
+      *argp++ = "-g";
+    if (directory != NULL)
+      {
+        *argp++ = "-d";
+        *argp++ = directory;
+      }
+    for (unsigned int i = 0; i < java_sources_count; i++)
+      *argp++ = java_sources[i];
+    *argp = NULL;
+    /* Ensure argv length was correctly calculated.  */
+    if (argp - argv != argc)
+      abort ();
+  }
 
   if (verbose)
     {
@@ -315,10 +303,10 @@ compile_using_javac (const char * const *java_sources,
       free (command);
     }
 
-  exitstatus = execute ("javac", "javac", argv, NULL,
-                        false, false, false,
-                        null_stderr, true, true, NULL);
-  err = (exitstatus != 0);
+  int exitstatus = execute ("javac", "javac", argv, NULL, NULL,
+                            false, false, false,
+                            null_stderr, true, true, NULL);
+  bool err = (exitstatus != 0);
 
   freea (argv);
 
@@ -334,55 +322,47 @@ static char *
 execute_and_read_line (const char *progname,
                        const char *prog_path, const char * const *prog_argv)
 {
-  pid_t child;
-  int fd[1];
-  FILE *fp;
-  char *line;
-  size_t linesize;
-  size_t linelen;
-  int exitstatus;
-
   /* Open a pipe to the program.  */
-  child = create_pipe_in (progname, prog_path, prog_argv, NULL,
-                          DEV_NULL, false, true, false, fd);
+  int fd[1];
+  pid_t child = create_pipe_in (progname, prog_path, prog_argv, NULL, NULL,
+                                DEV_NULL, false, true, false, fd);
 
   if (child == -1)
     return NULL;
 
   /* Retrieve its result.  */
-  fp = fdopen (fd[0], "r");
+  FILE *fp = fdopen (fd[0], "r");
   if (fp == NULL)
-    {
-      error (0, errno, _("fdopen() failed"));
-      return NULL;
-    }
+    error (EXIT_FAILURE, errno, _("fdopen() failed"));
 
-  line = NULL; linesize = 0;
-  linelen = getline (&line, &linesize, fp);
+  char *line = NULL;
+  size_t linesize = 0;
+  size_t linelen = getline (&line, &linesize, fp);
   if (linelen == (size_t)(-1))
     {
       error (0, 0, _("%s subprocess I/O error"), progname);
-      return NULL;
+      fclose (fp);
+      wait_subprocess (child, progname, true, false, true, false, NULL);
     }
-  if (linelen > 0 && line[linelen - 1] == '\n')
-    line[linelen - 1] = '\0';
-
-  /* Read until EOF (otherwise the child process may get a SIGPIPE signal).  */
-  while (getc (fp) != EOF)
-    ;
-
-  fclose (fp);
-
-  /* Remove zombie process from process list, and retrieve exit status.  */
-  exitstatus =
-    wait_subprocess (child, progname, true, false, true, false, NULL);
-  if (exitstatus != 0)
+  else
     {
-      free (line);
-      return NULL;
-    }
+      if (linelen > 0 && line[linelen - 1] == '\n')
+        line[linelen - 1] = '\0';
 
-  return line;
+      /* Read until EOF (otherwise the child process may get a SIGPIPE signal).  */
+      while (getc (fp) != EOF)
+        ;
+
+      fclose (fp);
+
+      /* Remove zombie process from process list, and retrieve exit status.  */
+      int exitstatus =
+        wait_subprocess (child, progname, true, false, true, false, NULL);
+      if (exitstatus == 0)
+        return line;
+    }
+  free (line);
+  return NULL;
 }
 
 /* Executes a program, assumed to be a Java compiler with '-version' option.
@@ -396,7 +376,7 @@ get_compiler_version (const char *progname,
     return 0;
 
   /* Search the first digit in line.  */
-  char *version_start = line;
+  char *version_start;
   for (version_start = line; ; version_start++)
     {
       if (*version_start == '\0')
@@ -415,7 +395,7 @@ get_compiler_version (const char *progname,
     version_end++;
   *version_end = '\0';
 
-  /* Map 1.6.0_85 to 6, 1.8.0_151 to 8.  Map 9.0.4 to 9, 10.0.2 to 10, etc.  */
+  /* Map 1.8.0_151 to 8.  Map 9.0.4 to 9, 10.0.2 to 10, etc.  */
   if (version_start[0] == '1' && version_start[1] == '.')
     version_start += 2;
   version_end = strchr (version_start, '.');
@@ -450,10 +430,8 @@ static bool
 write_temp_file (struct temp_dir *tmpdir, const char *file_name,
                  const char *contents)
 {
-  FILE *fp;
-
   register_temp_file (tmpdir, file_name);
-  fp = fopen_temp (file_name, "we", false);
+  FILE *fp = fopen_temp (file_name, "we", false);
   if (fp == NULL)
     {
       error (0, errno, _("failed to create \"%s\""), file_name);
@@ -473,14 +451,13 @@ write_temp_file (struct temp_dir *tmpdir, const char *file_name,
 static int
 get_classfile_version (const char *compiled_file_name)
 {
-  unsigned char header[8];
-  int fd;
 
   /* Open the class file.  */
-  fd = open (compiled_file_name, O_RDONLY | O_BINARY | O_CLOEXEC, 0);
+  int fd = open (compiled_file_name, O_RDONLY | O_BINARY | O_CLOEXEC, 0);
   if (fd >= 0)
     {
       /* Read its first 8 bytes.  */
+      unsigned char header[8];
       if (safe_read (fd, header, 8) == 8)
         {
           /* Verify the class file signature.  */
@@ -526,24 +503,17 @@ is_envjavac_usable (const char *javac,
     {
       /* Canonicalize source_version and target_version, for easier
          arithmetic.  */
-      int try_source_version = 6 + source_version_index (source_version);
-      int try_target_version = 6 + target_version_index (target_version);
+      int try_source_version = 8 + source_version_index (source_version);
+      int try_target_version = 8 + target_version_index (target_version);
       /* Sanity check.  */
       if (try_source_version <= try_target_version)
         {
           /* Try $JAVAC.  */
-          struct temp_dir *tmpdir;
-          char *conftest_file_name;
-          char *compiled_file_name;
-          const char *java_sources[1];
-          const char *nowarn_option;
-          struct stat statbuf;
-
-          tmpdir = create_temp_dir ("java", NULL, false);
+          struct temp_dir *tmpdir = create_temp_dir ("java", NULL, false);
           if (tmpdir == NULL)
             return true;
 
-          conftest_file_name =
+          char *conftest_file_name =
             xconcatenated_filename (tmpdir->dir_name, "conftest.java", NULL);
           if (write_temp_file (tmpdir, conftest_file_name, "class conftest {}"))
             {
@@ -552,16 +522,18 @@ is_envjavac_usable (const char *javac,
               return true;
             }
 
-          compiled_file_name =
+          char *compiled_file_name =
             xconcatenated_filename (tmpdir->dir_name, "conftest.class", NULL);
           register_temp_file (tmpdir, compiled_file_name);
 
           /* See the discussion in javacomp.m4.  */
-          nowarn_option = " -Xlint:-options";
+          const char *nowarn_option = " -Xlint:-options";
           char *javac_nowarn = xasprintf ("%s%s", javac, nowarn_option);
           assume (javac_nowarn != NULL);
 
+          const char *java_sources[1];
           java_sources[0] = conftest_file_name;
+          struct stat statbuf;
           if ((!compile_using_envjavac (javac_nowarn,
                                         java_sources, 1, tmpdir->dir_name,
                                         false, false, false, true)
@@ -642,8 +614,8 @@ is_envjavac_usable (const char *javac,
                     command = (char *) xmalloca (command_length);
                     {
                       char *p = command;
-                      p = (char *) stpcpy (p, javac);
-                      p = (char *) stpcpy (p, " -version");
+                      p = stpcpy (p, javac);
+                      p = stpcpy (p, " -version");
                       *p++ = '\0';
                       /* Ensure command_length was correctly calculated.  */
                       if (p - command > command_length)
@@ -761,13 +733,11 @@ is_javac_present (void)
     {
       /* Test for presence of javac: "javac 2> /dev/null ; test $? -le 2"  */
       const char *argv[2];
-      int exitstatus;
-
       argv[0] = "javac";
       argv[1] = NULL;
-      exitstatus = execute ("javac", "javac", argv, NULL,
-                            false, false, true, true,
-                            true, false, NULL);
+      int exitstatus = execute ("javac", "javac", argv, NULL, NULL,
+                                false, false, true, true,
+                                true, false, NULL);
       javac_present = (exitstatus == 0 || exitstatus == 1 || exitstatus == 2);
       javac_tested = true;
     }
@@ -802,24 +772,17 @@ is_javac_usable (const char *source_version, const char *target_version,
     {
       /* Canonicalize source_version and target_version, for easier
          arithmetic.  */
-      int try_source_version = 6 + source_version_index (source_version);
-      int try_target_version = 6 + target_version_index (target_version);
+      int try_source_version = 8 + source_version_index (source_version);
+      int try_target_version = 8 + target_version_index (target_version);
       /* Sanity check.  */
       if (try_source_version <= try_target_version)
         {
           /* Try javac.  */
-          struct temp_dir *tmpdir;
-          char *conftest_file_name;
-          char *compiled_file_name;
-          const char *java_sources[1];
-          const char *nowarn_option;
-          struct stat statbuf;
-
-          tmpdir = create_temp_dir ("java", NULL, false);
+          struct temp_dir *tmpdir = create_temp_dir ("java", NULL, false);
           if (tmpdir == NULL)
             return true;
 
-          conftest_file_name =
+          char *conftest_file_name =
             xconcatenated_filename (tmpdir->dir_name, "conftest.java", NULL);
           if (write_temp_file (tmpdir, conftest_file_name, "class conftest {}"))
             {
@@ -828,14 +791,16 @@ is_javac_usable (const char *source_version, const char *target_version,
               return true;
             }
 
-          compiled_file_name =
+          char *compiled_file_name =
             xconcatenated_filename (tmpdir->dir_name, "conftest.class", NULL);
           register_temp_file (tmpdir, compiled_file_name);
 
           /* See the discussion in javacomp.m4.  */
-          nowarn_option = "-Xlint:-options";
+          const char *nowarn_option = "-Xlint:-options";
 
+          const char *java_sources[1];
           java_sources[0] = conftest_file_name;
+          struct stat statbuf;
           if ((!compile_using_javac (java_sources, 1,
                                      nowarn_option,
                                      false, source_version,
@@ -908,7 +873,6 @@ is_javac_usable (const char *source_version, const char *target_version,
 
                   {
                     const char *argv[3];
-
                     argv[0] = "javac";
                     argv[1] = "-version";
                     argv[2] = NULL;
@@ -1011,21 +975,20 @@ compile_java_class (const char * const *java_sources,
                     bool use_minimal_classpath,
                     bool verbose)
 {
-  bool err = false;
-  char *old_JAVA_HOME;
-
-  /* Map source_version 1.1 ... 1.5 to 1.6.  */
+  /* Map source_version 1.1 ... 1.7 to 1.8.  */
   if (source_version[0] == '1' && source_version[1] == '.'
-      && (source_version[2] >= '1' && source_version[2] <= '5')
+      && (source_version[2] >= '1' && source_version[2] <= '7')
       && source_version[3] == '\0')
-    source_version = "1.6";
+    source_version = "1.8";
 
-  /* Map target_version 1.1 ... 1.5 to 1.6.  */
+  /* Map target_version 1.1 ... 1.7 to 1.8.  */
   if (target_version != NULL
       && target_version[0] == '1' && target_version[1] == '.'
-      && (target_version[2] >= '1' && target_version[2] <= '5')
+      && (target_version[2] >= '1' && target_version[2] <= '7')
       && target_version[3] == '\0')
-    target_version = "1.6";
+    target_version = "1.8";
+
+  bool err = false;
 
   {
     const char *javac = getenv ("JAVAC");
@@ -1079,7 +1042,7 @@ compile_java_class (const char * const *java_sources,
   }
 
   /* Unset the JAVA_HOME environment variable.  */
-  old_JAVA_HOME = getenv ("JAVA_HOME");
+  char *old_JAVA_HOME = getenv ("JAVA_HOME");
   if (old_JAVA_HOME != NULL)
     {
       old_JAVA_HOME = xstrdup (old_JAVA_HOME);
@@ -1107,13 +1070,11 @@ compile_java_class (const char * const *java_sources,
 
       if (usable)
         {
-          char *old_classpath;
-
           /* Set CLASSPATH.  We don't use the "-classpath ..." option because
              in JDK 1.1.x its argument should also contain the JDK's
              classes.zip, but we don't know its location.  (In JDK 1.3.0 it
              would work.)  */
-          old_classpath =
+          char *old_classpath =
             set_classpath (classpaths, classpaths_count, use_minimal_classpath,
                            verbose);
 

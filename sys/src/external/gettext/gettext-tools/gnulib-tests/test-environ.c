@@ -1,5 +1,5 @@
 /* Test of environ variable.
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ main ()
 
   for (; (string = *remaining_variables) != NULL; remaining_variables++)
     {
-      if (strncmp (string, "PATH=", 5) == 0)
+      if (str_startswith (string, "PATH="))
         /* Found the PATH environment variable.  */
         return 0;
     }

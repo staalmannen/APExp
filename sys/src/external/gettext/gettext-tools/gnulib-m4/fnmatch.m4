@@ -1,9 +1,12 @@
-# Check for fnmatch - serial 20  -*- coding: utf-8 -*-
+# fnmatch.m4
+# serial 21
+dnl Copyright (C) 2000-2007, 2009-2026 Free Software Foundation, Inc.
+dnl This file is free software; the Free Software Foundation
+dnl gives unlimited permission to copy and/or distribute it,
+dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
-# Copyright (C) 2000-2007, 2009-2024 Free Software Foundation, Inc.
-# This file is free software; the Free Software Foundation
-# gives unlimited permission to copy and/or distribute it,
-# with or without modifications, as long as this notice is preserved.
+# Check for fnmatch
 
 # Autoconf defines AC_FUNC_FNMATCH, but that is obsolescent.
 # New applications should use the macros below instead.
@@ -78,7 +81,7 @@ AC_DEFUN([gl_FUNC_FNMATCH_POSIX],
                 return 1;
               if (!n ("*x", ".x", FNM_PERIOD))
                 return 1;
-              /* glibc bug <https://sourceware.org/bugzilla/show_bug.cgi?id=361>
+              /* glibc bug <https://sourceware.org/PR361>
                  exists in glibc 2.3.3, fixed in glibc 2.5.  */
               if (!y (Apat, "\\\\", 0))
                 result |= 2;
@@ -104,14 +107,14 @@ AC_DEFUN([gl_FUNC_FNMATCH_POSIX],
                 result |= 2;
               if (!(n (apat, bs01, 0) == ('a' < '\\\\')))
                 result |= 2;
-              /* glibc bug <https://sourceware.org/bugzilla/show_bug.cgi?id=12378>
+              /* glibc bug <https://sourceware.org/PR12378>
                  exists in glibc 2.12, fixed in glibc 2.13.  */
               if (!y ("[/b", "[/b", 0)) /*"]]"*/
                 result |= 4;
-              /* glibc bug <https://sourceware.org/bugzilla/show_bug.cgi?id=17062>
+              /* glibc bug <https://sourceware.org/PR17062>
                  is fixed in glibc 2.20.
-                 glibc bugs <https://sourceware.org/bugzilla/show_bug.cgi?id=18032>
-                            <https://sourceware.org/bugzilla/show_bug.cgi?id=18036>
+                 glibc bugs <https://sourceware.org/PR18032>
+                            <https://sourceware.org/PR18036>
                  are fixed in glibc 2.22.
                  These bugs are not easy to test for reliably (without mmap),
                  therefore test the glibc version.  */
@@ -119,7 +122,7 @@ AC_DEFUN([gl_FUNC_FNMATCH_POSIX],
               if (__GLIBC__ == 2 && __GLIBC_MINOR__ < 22)
                 result |= 4;
               #endif
-              /* This test fails on FreeBSD 13.2, NetBSD 9.3, Cygwin 3.4.6.  */
+              /* This test fails on FreeBSD 13.2, NetBSD 10.0, Cygwin 3.4.6.  */
               if (!y ("[[:alnum:]]", "a", 0))
                 result |= 8;
               $gl_fnmatch_gnu_start /* ==== Start of GNU extensions tests ==== */
@@ -145,7 +148,7 @@ AC_DEFUN([gl_FUNC_FNMATCH_POSIX],
                   if (!n ("[!a-z]", "", 0))
                     result |= 16;
                 }
-              /* This test fails on NetBSD 9.3, Android 13.  */
+              /* This test fails on NetBSD 10.0, Android 13.  */
               if (setlocale (LC_ALL, "C.UTF-8") != NULL)
                 {
                   if (!y ("x?y", "x\\303\\274y", 0))

@@ -1,7 +1,7 @@
-This is autosprintf.info, produced by makeinfo version 6.8 from
+This is autosprintf.info, produced by makeinfo version 7.1 from
 autosprintf.texi.
 
-   Copyright (C) 2002-2003, 2006-2007, 2018-2019 Free Software
+   Copyright (C) 2002-2003, 2006-2007, 2018-2019, 2025 Free Software
 Foundation, Inc.
 
    This manual is free documentation.  It is dually licensed under the
@@ -10,7 +10,7 @@ manual under either of these two licenses, at your choice.
 
    This manual is covered by the GNU FDL. Permission is granted to copy,
 distribute and/or modify this document under the terms of the GNU Free
-Documentation License (FDL), either version 1.2 of the License, or (at
+Documentation License (FDL), either version 1.3 of the License, or (at
 your option) any later version published by the Free Software Foundation
 (FSF); with no Invariant Sections, with no Front-Cover Text, and with no
 Back-Cover Texts.  A copy of the license is at
@@ -26,7 +26,7 @@ START-INFO-DIR-ENTRY
 * autosprintf: (autosprintf).   Support for printf format strings in C++.
 END-INFO-DIR-ENTRY
 
-   This file provides documentation for GNU 'autosprintf' library.
+   This file provides documentation for GNU ‘autosprintf’ library.
 
 
 File: autosprintf.info,  Node: Top,  Next: Introduction,  Up: (dir)
@@ -39,8 +39,8 @@ GNU autosprintf
 * Menu:
 
 * Introduction::                Introduction
-* Class autosprintf::           The 'autosprintf' class
-* Using autosprintf::           Using 'autosprintf' in own programs
+* Class autosprintf::           The ‘autosprintf’ class
+* Using autosprintf::           Using ‘autosprintf’ in own programs
 * Licenses::
 
 
@@ -49,9 +49,9 @@ File: autosprintf.info,  Node: Introduction,  Next: Class autosprintf,  Prev: To
 1 Introduction
 **************
 
-   This package makes the C formatted output routines ('fprintf' et al.)
-usable in C++ programs, for use with the '<string>' strings and the
-'<iostream>' streams.
+   This package makes the C formatted output routines (‘fprintf’ et al.)
+usable in C++ programs, for use with the ‘<string>’ strings and the
+‘<iostream>’ streams.
 
    It allows to write code like
 
@@ -63,65 +63,96 @@ instead of
 
    The benefits of the autosprintf syntax are:
 
-   * It reuses the standard POSIX printf facility.  Easy migration from
+   • It reuses the standard POSIX printf facility.  Easy migration from
      C to C++.
 
-   * English sentences are kept together.
+   • English sentences are kept together.
 
-   * It makes internationalization possible.  Internationalization
+   • It makes internationalization possible.  Internationalization
      requires format strings, because in some cases the translator needs
      to change the order of a sentence, and more generally it is easier
      for the translator to work with a single string for a sentence than
      with multiple string pieces.
 
-   * It reduces the risk of programming errors due to forgotten state in
-     the output stream (e.g. 'cout << hex;' not followed by 'cout <<
-     dec;').
+   • It reduces the risk of programming errors due to forgotten state in
+     the output stream (e.g. ‘cout << hex;’ not followed by ‘cout <<
+     dec;’).
 
 
 File: autosprintf.info,  Node: Class autosprintf,  Next: Using autosprintf,  Prev: Introduction,  Up: Top
 
-2 The 'autosprintf' class
+2 The ‘autosprintf’ class
 *************************
 
-   An instance of class 'autosprintf' just contains a string with the
+   An instance of class ‘autosprintf’ just contains a string with the
 formatted output result.  Such an instance is usually allocated as an
-automatic storage variable, i.e. on the stack, not with 'new' on the
+automatic storage variable, i.e. on the stack, not with ‘new’ on the
 heap.
 
-   The constructor 'autosprintf (const char *format, ...)' takes a
-format string and additional arguments, like the C function 'printf'.
+   The constructor ‘autosprintf (const char *format, ...)’ takes a
+format string and additional arguments, like the C function ‘printf’.
 
-   Conversions to 'char *' and 'std::string' are defined that return the
-encapsulated string.  The conversion to 'char *' returns a freshly
+   Conversions to ‘char *’ and ‘std::string’ are defined that return the
+encapsulated string.  The conversion to ‘char *’ returns a freshly
 allocated copy of the encapsulated string; it needs to be freed using
-'delete[]'.  The conversion to 'std::string' returns a copy of the
+‘delete[]’.  The conversion to ‘std::string’ returns a copy of the
 encapsulated string, with automatic memory management.
 
-   The destructor '~autosprintf ()' destroys the encapsulated string.
+   The destructor ‘~autosprintf ()’ destroys the encapsulated string.
 
-   An 'operator <<' is provided that outputs the encapsulated string to
-the given 'ostream'.
+   An ‘operator <<’ is provided that outputs the encapsulated string to
+the given ‘ostream’.
 
 
 File: autosprintf.info,  Node: Using autosprintf,  Next: Licenses,  Prev: Class autosprintf,  Up: Top
 
-3 Using 'autosprintf' in own programs
+3 Using ‘autosprintf’ in own programs
 *************************************
 
-   To use the 'autosprintf' class in your programs, you need to add
+   To use the ‘autosprintf’ class in your programs, you need to make
+changes in the source code and in the build system.
+
+* Menu:
+
+* Source code changes::
+* Build system changes::
+
+
+File: autosprintf.info,  Node: Source code changes,  Next: Build system changes,  Up: Using autosprintf
+
+3.1 Source code changes
+=======================
+
+   In source code files that shall use ‘autosprintf’, add
 
      #include "autosprintf.h"
      using gnu::autosprintf;
 
-to your source code.  The include file defines the class 'autosprintf',
-in a namespace called 'gnu'.  The 'using' statement makes it possible to
-use the class without the (otherwise natural) 'gnu::' prefix.
+   The include file defines the class ‘autosprintf’, in a namespace
+called ‘gnu’.  The ‘using’ statement makes it possible to use the class
+without the (otherwise natural) ‘gnu::’ prefix.
 
-   When linking your program, you need to link with 'libasprintf',
-because that's where the class is defined.  In projects using GNU
-'autoconf', this means adding 'AC_LIB_LINKFLAGS([asprintf])' to
-'configure.in' or 'configure.ac', and using the @LIBASPRINTF@ Makefile
+
+File: autosprintf.info,  Node: Build system changes,  Prev: Source code changes,  Up: Using autosprintf
+
+3.2 Build system changes
+========================
+
+   When compiling your program with ‘g++’, use the warning option
+‘-Wall’.  This is needed so that you get a compiler warning when
+attempting to pass an ‘std::string’ as argument.  For example, if you
+accidentally write
+     std::string s = ...;
+     cout << autosprintf ("Look at %s\n", s);
+you want to get a compiler warning about passing an ‘std::string’
+through a variadic argument list, so that you can correct your code to
+     std::string s = ...;
+     cout << autosprintf ("Look at %s\n", s.c_str ());
+
+   When linking your program, you need to link with ‘libasprintf’,
+because that's where the class is defined.  In projects that use GNU
+‘autoconf’, this means adding ‘AC_LIB_LINKFLAGS([asprintf])’ to
+‘configure.in’ or ‘configure.ac’, and using the @LIBASPRINTF@ Makefile
 variable that it provides.
 
 
@@ -133,13 +164,13 @@ Appendix A Licenses
    The files of this package are covered by the licenses indicated in
 each particular file or directory.  Here is a summary:
 
-   * The 'libasprintf' library is covered by the GNU Lesser General
+   • The ‘libasprintf’ library is covered by the GNU Lesser General
      Public License (LGPL), either version 2.1 of the License, or (at
      your option) any later version published by the Free Software
      Foundation (FSF). A copy of the license is included in *note GNU
      LGPL::.
 
-   * This manual is free documentation.  It is dually licensed under the
+   • This manual is free documentation.  It is dually licensed under the
      GNU FDL and the GNU GPL. This means that you can redistribute this
      manual under either of these two licenses, at your choice.
      This manual is covered by the GNU FDL. Permission is granted to
@@ -169,8 +200,8 @@ A.1 GNU LESSER GENERAL PUBLIC LICENSE
 
                       Version 2.1, February 1999
 
-     Copyright (C) 1991, 1999 Free Software Foundation, Inc.
-     51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA
+     Copyright © 1991, 1999 Free Software Foundation, Inc.
+     <https://fsf.org/>
 
      Everyone is permitted to copy and distribute verbatim copies
      of this license document, but changing it is not allowed.
@@ -248,7 +279,7 @@ combination fits its criteria of freedom.  The Lesser General Public
 License permits more lax criteria for linking other code with the
 library.
 
-   We call this license the "Lesser" General Public License because it
+   We call this license the “Lesser” General Public License because it
 does _Less_ to protect the user's freedom than the ordinary General
 Public License.  It also provides other free software developers Less of
 an advantage over competing non-free programs.  These disadvantages are
@@ -615,12 +646,12 @@ TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
   15. BECAUSE THE LIBRARY IS LICENSED FREE OF CHARGE, THERE IS NO
      WARRANTY FOR THE LIBRARY, TO THE EXTENT PERMITTED BY APPLICABLE
-     LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS
+     LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS
      AND/OR OTHER PARTIES PROVIDE THE LIBRARY "AS IS" WITHOUT WARRANTY
      OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
      LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-     FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND
-     PERFORMANCE OF THE LIBRARY IS WITH YOU. SHOULD THE LIBRARY PROVE
+     FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND
+     PERFORMANCE OF THE LIBRARY IS WITH YOU.  SHOULD THE LIBRARY PROVE
      DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR
      OR CORRECTION.
 
@@ -667,9 +698,7 @@ found.
      Lesser General Public License for more details.
 
      You should have received a copy of the GNU Lesser General Public
-     License along with this library; if not, write to the Free Software
-     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301,
-     USA.
+     License along with this library; if not, see <https://www.gnu.org/licenses/>.
 
    Also add information on how to contact you by electronic and paper
 mail.
@@ -681,8 +710,8 @@ if necessary.  Here is a sample; alter the names:
      Yoyodyne, Inc., hereby disclaims all copyright interest in the library
      `Frob' (a library for tweaking knobs) written by James Random Hacker.
 
-     SIGNATURE OF TY COON, 1 April 1990
-     Ty Coon, President of Vice
+     SIGNATURE OF MOE GHOUL, 1 April 1990
+     Moe Ghoul, President of Vice
 
    That's all there is to it!
 
@@ -694,8 +723,8 @@ A.2 GNU GENERAL PUBLIC LICENSE
 
                          Version 2, June 1991
 
-     Copyright (C) 1989, 1991 Free Software Foundation, Inc.
-     51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
+     Copyright © 1989, 1991 Free Software Foundation, Inc.
+     <https://fsf.org/>
 
      Everyone is permitted to copy and distribute verbatim copies
      of this license document, but changing it is not allowed.
@@ -962,12 +991,12 @@ TERMS AND CONDITIONS FOR COPYING, DISTRIBUTION AND MODIFICATION
 
   11. BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO
      WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE
-     LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS
+     LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE COPYRIGHT HOLDERS
      AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS" WITHOUT WARRANTY
      OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING, BUT NOT
      LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-     FOR A PARTICULAR PURPOSE. THE ENTIRE RISK AS TO THE QUALITY AND
-     PERFORMANCE OF THE PROGRAM IS WITH YOU. SHOULD THE PROGRAM PROVE
+     FOR A PARTICULAR PURPOSE.  THE ENTIRE RISK AS TO THE QUALITY AND
+     PERFORMANCE OF THE PROGRAM IS WITH YOU.  SHOULD THE PROGRAM PROVE
      DEFECTIVE, YOU ASSUME THE COST OF ALL NECESSARY SERVICING, REPAIR
      OR CORRECTION.
 
@@ -1011,8 +1040,7 @@ convey the exclusion of warranty; and each file should have at least the
      GNU General Public License for more details.
 
      You should have received a copy of the GNU General Public License
-     along with this program; if not, write to the Free Software
-     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+     along with this program; if not, see <https://www.gnu.org/licenses/>.
 
    Also add information on how to contact you by electronic and paper
 mail.
@@ -1025,10 +1053,10 @@ this when it starts in an interactive mode:
      This is free software, and you are welcome to redistribute it
      under certain conditions; type `show c' for details.
 
-   The hypothetical commands 'show w' and 'show c' should show the
+   The hypothetical commands ‘show w’ and ‘show c’ should show the
 appropriate parts of the General Public License.  Of course, the
-commands you use may be called something other than 'show w' and 'show
-c'; they could even be mouse-clicks or menu items--whatever suits your
+commands you use may be called something other than ‘show w’ and ‘show
+c’; they could even be mouse-clicks or menu items--whatever suits your
 program.
 
    You should also get your employer (if you work as a programmer) or
@@ -1038,8 +1066,8 @@ if necessary.  Here is a sample; alter the names:
      Yoyodyne, Inc., hereby disclaims all copyright interest in the program
      `Gnomovision' (which makes passes at compilers) written by James Hacker.
 
-     SIGNATURE OF TY COON, 1 April 1989
-     Ty Coon, President of Vice
+     SIGNATURE OF MOE GHOUL, 1 April 1989
+     Moe Ghoul, President of Vice
 
    This General Public License does not permit incorporating your
 program into proprietary programs.  If your program is a subroutine
@@ -1053,10 +1081,10 @@ File: autosprintf.info,  Node: GNU FDL,  Prev: GNU GPL,  Up: Licenses
 A.3 GNU Free Documentation License
 ==================================
 
-                      Version 1.2, November 2002
+                     Version 1.3, 3 November 2008
 
-     Copyright (C) 2000,2001,2002 Free Software Foundation, Inc.
-     51 Franklin St, Fifth Floor, Boston, MA  02110-1301, USA
+     Copyright © 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
+     <https://fsf.org/>
 
      Everyone is permitted to copy and distribute verbatim copies
      of this license document, but changing it is not allowed.
@@ -1064,7 +1092,7 @@ A.3 GNU Free Documentation License
   0. PREAMBLE
 
      The purpose of this License is to make a manual, textbook, or other
-     functional and useful document "free" in the sense of freedom: to
+     functional and useful document “free” in the sense of freedom: to
      assure everyone the effective freedom to copy and redistribute it,
      with or without modifying it, either commercially or
      noncommercially.  Secondarily, this License preserves for the
@@ -1157,6 +1185,9 @@ A.3 GNU Free Documentation License
      works in formats which do not have any title page as such, "Title
      Page" means the text near the most prominent appearance of the
      work's title, preceding the beginning of the body of the text.
+
+     The "publisher" means any person or entity that distributes copies
+     of the Document to the public.
 
      A section "Entitled XYZ" means a named subunit of the Document
      whose title either is precisely XYZ or contains XYZ in parentheses
@@ -1420,12 +1451,29 @@ A.3 GNU Free Documentation License
   9. TERMINATION
 
      You may not copy, modify, sublicense, or distribute the Document
-     except as expressly provided for under this License.  Any other
-     attempt to copy, modify, sublicense or distribute the Document is
-     void, and will automatically terminate your rights under this
-     License.  However, parties who have received copies, or rights,
-     from you under this License will not have their licenses terminated
-     so long as such parties remain in full compliance.
+     except as expressly provided under this License.  Any attempt
+     otherwise to copy, modify, sublicense, or distribute it is void,
+     and will automatically terminate your rights under this License.
+
+     However, if you cease all violation of this License, then your
+     license from a particular copyright holder is reinstated (a)
+     provisionally, unless and until the copyright holder explicitly and
+     finally terminates your license, and (b) permanently, if the
+     copyright holder fails to notify you of the violation by some
+     reasonable means prior to 60 days after the cessation.
+
+     Moreover, your license from a particular copyright holder is
+     reinstated permanently if the copyright holder notifies you of the
+     violation by some reasonable means, this is the first time you have
+     received notice of violation of this License (for any work) from
+     that copyright holder, and you cure the violation prior to 30 days
+     after your receipt of the notice.
+
+     Termination of your rights under this section does not terminate
+     the licenses of parties who have received copies or rights from you
+     under this License.  If your rights have been terminated and not
+     permanently reinstated, receipt of a copy of some or all of the
+     same material does not give you any rights to use it.
 
   10. FUTURE REVISIONS OF THIS LICENSE
 
@@ -1433,7 +1481,7 @@ A.3 GNU Free Documentation License
      the GNU Free Documentation License from time to time.  Such new
      versions will be similar in spirit to the present version, but may
      differ in detail to address new problems or concerns.  See
-     <https://www.gnu.org/copyleft/>.
+     <https://www.gnu.org/licenses/>.
 
      Each version of the License is given a distinguishing version
      number.  If the Document specifies that a particular numbered
@@ -1443,7 +1491,40 @@ A.3 GNU Free Documentation License
      published (not as a draft) by the Free Software Foundation.  If the
      Document does not specify a version number of this License, you may
      choose any version ever published (not as a draft) by the Free
-     Software Foundation.
+     Software Foundation.  If the Document specifies that a proxy can
+     decide which future versions of this License can be used, that
+     proxy's public statement of acceptance of a version permanently
+     authorizes you to choose that version for the Document.
+
+  11. RELICENSING
+
+     "Massive Multiauthor Collaboration Site" (or "MMC Site") means any
+     World Wide Web server that publishes copyrightable works and also
+     provides prominent facilities for anybody to edit those works.  A
+     public wiki that anybody can edit is an example of such a server.
+     A "Massive Multiauthor Collaboration" (or "MMC") contained in the
+     site means any set of copyrightable works thus published on the MMC
+     site.
+
+     "CC-BY-SA" means the Creative Commons Attribution-Share Alike 3.0
+     license published by Creative Commons Corporation, a not-for-profit
+     corporation with a principal place of business in San Francisco,
+     California, as well as future copyleft versions of that license
+     published by that same organization.
+
+     "Incorporate" means to publish or republish a Document, in whole or
+     in part, as part of another Document.
+
+     An MMC is "eligible for relicensing" if it is licensed under this
+     License, and if all works that were first published under this
+     License somewhere other than this MMC, and subsequently
+     incorporated in whole or in part into the MMC, (1) had no cover
+     texts or invariant sections, and (2) were thus incorporated prior
+     to November 1, 2008.
+
+     The operator of an MMC Site may republish an MMC contained in the
+     site under CC-BY-SA on the same site at any time before August 1,
+     2009, provided the MMC is eligible for relicensing.
 
 ADDENDUM: How to use this License for your documents
 ====================================================
@@ -1454,14 +1535,14 @@ notices just after the title page:
 
        Copyright (C)  YEAR  YOUR NAME.
        Permission is granted to copy, distribute and/or modify this document
-       under the terms of the GNU Free Documentation License, Version 1.2
+       under the terms of the GNU Free Documentation License, Version 1.3
        or any later version published by the Free Software Foundation;
        with no Invariant Sections, no Front-Cover Texts, and no Back-Cover
        Texts.  A copy of the license is included in the section entitled ``GNU
        Free Documentation License''.
 
    If you have Invariant Sections, Front-Cover Texts and Back-Cover
-Texts, replace the "with...Texts."  line with this:
+Texts, replace the "with...Texts." line with this:
 
          with the Invariant Sections being LIST THEIR TITLES, with
          the Front-Cover Texts being LIST, and with the Back-Cover Texts
@@ -1479,14 +1560,16 @@ their use in free software.
 
 
 Tag Table:
-Node: Top1355
-Node: Introduction1717
-Node: Class autosprintf2873
-Node: Using autosprintf3887
-Node: Licenses4702
-Node: GNU LGPL6447
-Node: GNU GPL34574
-Node: GNU FDL53833
+Node: Top1365
+Node: Introduction1735
+Node: Class autosprintf2919
+Node: Using autosprintf3985
+Node: Source code changes4356
+Node: Build system changes4840
+Node: Licenses5844
+Node: GNU LGPL7597
+Node: GNU GPL35614
+Node: GNU FDL54778
 
 End Tag Table
 

@@ -1,6 +1,5 @@
-/* Copyright (C) 1996-2023 Free Software Foundation, Inc.
+/* Copyright (C) 1996-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
-   Contributed by Ulrich Drepper <drepper@cygnus.com>, 1996.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -14,6 +13,8 @@
 
    You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Ulrich Drepper and Bruno Haible.  */
 
 #ifndef _LOADINFO_H
 #define _LOADINFO_H	1
@@ -30,12 +31,8 @@
    in gettextP.h.
  */
 
-#ifndef internal_function
-# define internal_function
-#endif
-
-#ifndef LIBINTL_DLL_EXPORTED
-# define LIBINTL_DLL_EXPORTED
+#ifndef LIBINTL_SHLIB_EXPORTED
+# define LIBINTL_SHLIB_EXPORTED
 #endif
 
 /* Tell the compiler when a conditional or integer expression is
@@ -130,7 +127,7 @@ _nl_make_l10nflist (struct loaded_l10nfile **l10nfile_list,
    NAME is not a locale alias (but possibly a real locale name).
    The return value is statically allocated and must not be freed.  */
 /* Part of the libintl ABI only for the sake of the gettext.m4 macro.  */
-extern LIBINTL_DLL_EXPORTED const char *_nl_expand_alias (const char *name);
+extern LIBINTL_SHLIB_EXPORTED const char *_nl_expand_alias (const char *name);
 
 /* Split a locale name NAME into its pieces: language, modifier,
    territory, codeset.

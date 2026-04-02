@@ -2,8 +2,7 @@
 
 #line 1 "term-ostream.oo.h"
 /* Output stream for attributed text, producing ANSI escape sequences.
-   Copyright (C) 2006, 2019-2020 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,6 +16,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible.  */
 
 #ifndef _TERM_OSTREAM_H
 #define _TERM_OSTREAM_H
@@ -67,7 +68,7 @@ typedef enum
 #define term_style_user_data term_ostream_representation
 #include "term-style-control.h"
 
-#line 71 "term-ostream.h"
+#line 72 "term-ostream.h"
 struct term_ostream_representation;
 /* term_ostream_t is defined as a pointer to struct term_ostream_representation.
    In C++ mode, we use a smart pointer class.
@@ -352,7 +353,7 @@ extern const typeinfo_t term_ostream_typeinfo;
 
 extern const struct term_ostream_implementation term_ostream_vtable;
 
-#line 118 "term-ostream.oo.h"
+#line 119 "term-ostream.oo.h"
 
 
 #ifdef __cplusplus

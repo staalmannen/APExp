@@ -1,5 +1,5 @@
 /* Determine the program name of a given process.
-   Copyright (C) 2016-2024 Free Software Foundation, Inc.
+   Copyright (C) 2016-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2019.
 
    This file is free software: you can redistribute it and/or modify
@@ -24,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#if defined __linux__ || defined __ANDROID__ || (defined __FreeBSD_kernel__ && !defined __FreeBSD__) || defined __GNU__ || defined __NetBSD__ || defined __FreeBSD__ /* Linux, GNU/kFreeBSD, GNU/Hurd, NetBSD, FreeBSD */
+#if defined __linux__ || defined __ANDROID__ || (defined __FreeBSD_kernel__ && !defined __FreeBSD__) || defined __gnu_hurd__ || defined __NetBSD__ || defined __FreeBSD__ /* Linux, GNU/kFreeBSD, GNU/Hurd, NetBSD, FreeBSD */
 # include <unistd.h>
 # if defined __ANDROID__
 #  include <fcntl.h>
@@ -66,12 +66,6 @@ extern int proc_pidinfo (int, int, uint64_t, void *, int) WEAK_IMPORT_ATTRIBUTE;
 # include <sys/pstat.h>
 #endif
 
-#if defined __sgi                                           /* IRIX */
-# include <unistd.h>
-# include <fcntl.h>
-# include <sys/procfs.h>
-#endif
-
 #if defined __CYGWIN__                                      /* Cygwin */
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h> /* needed to get 'struct external_pinfo' defined */
@@ -85,26 +79,23 @@ extern int proc_pidinfo (int, int, uint64_t, void *, int) WEAK_IMPORT_ATTRIBUTE;
 char *
 get_progname_of (pid_t pid)
 {
-#if defined __linux__ || defined __ANDROID__ || (defined __FreeBSD_kernel__ && !defined __FreeBSD__) || defined __GNU__ || defined __NetBSD__ /* Linux, GNU/kFreeBSD, GNU/Hurd, NetBSD */
+#if defined __linux__ || defined __ANDROID__ || (defined __FreeBSD_kernel__ && !defined __FreeBSD__) || defined __gnu_hurd__ || defined __NetBSD__ /* Linux, GNU/kFreeBSD, GNU/Hurd, NetBSD */
 /* GNU/kFreeBSD mounts /proc as linprocfs, which looks like a Linux /proc
    file system.  */
 
   /* Read the symlink /proc/<pid>/exe.  */
   {
     char filename[6 + 10 + 4 + 1];
-    char linkbuf[1024 + 1];
-    ssize_t linklen;
-
     sprintf (filename, "/proc/%u/exe", (unsigned int) pid);
-    linklen = readlink (filename, linkbuf, sizeof (linkbuf) - 1);
+
+    char linkbuf[1024 + 1];
+    ssize_t linklen = readlink (filename, linkbuf, sizeof (linkbuf) - 1);
     if (linklen > 0)
       {
-        char *slash;
-
         /* NUL-terminate the link.  */
         linkbuf[linklen] = '\0';
         /* Find the portion after the last slash.  */
-        slash = strrchr (linkbuf, '/');
+        char *slash = strrchr (linkbuf, '/');
         return strdup (slash != NULL ? slash + 1 : linkbuf);
       }
   }
@@ -114,10 +105,8 @@ get_progname_of (pid_t pid)
      read the contents of /proc/<pid>/cmdline into memory.  */
   {
     char filename[6 + 10 + 8 + 1];
-    int fd;
-
     sprintf (filename, "/proc/%u/cmdline", (unsigned int) pid);
-    fd = open (filename, O_RDONLY | O_CLOEXEC);
+    int fd = open (filename, O_RDONLY | O_CLOEXEC);
     if (fd >= 0)
       {
         char buf[4096 + 1];
@@ -125,14 +114,12 @@ get_progname_of (pid_t pid)
         close (fd);
         if (nread >= 0)
           {
-            char *slash;
-
             /* NUL-terminate the buffer (just in case it does not have the
                expected format).  */
             buf[nread] = '\0';
             /* The program name and each argument is followed by a NUL byte.  */
             /* Find the portion after the last slash.  */
-            slash = strrchr (buf, '/');
+            char *slash = strrchr (buf, '/');
             return strdup (slash != NULL ? slash + 1 : buf);
           }
       }
@@ -145,19 +132,16 @@ get_progname_of (pid_t pid)
 
   /* Read the symlink /proc/<pid>/file.  */
   char filename[6 + 10 + 5 + 1];
-  char linkbuf[1024 + 1];
-  ssize_t linklen;
-
   sprintf (filename, "/proc/%u/file", (unsigned int) pid);
-  linklen = readlink (filename, linkbuf, sizeof (linkbuf) - 1);
+
+  char linkbuf[1024 + 1];
+  ssize_t linklen = readlink (filename, linkbuf, sizeof (linkbuf) - 1);
   if (linklen > 0)
     {
-      char *slash;
-
       /* NUL-terminate the link.  */
       linkbuf[linklen] = '\0';
       /* Find the portion after the last slash.  */
-      slash = strrchr (linkbuf, '/');
+      char *slash = strrchr (linkbuf, '/');
       return strdup (slash != NULL ? slash + 1 : linkbuf);
     }
 
@@ -167,10 +151,8 @@ get_progname_of (pid_t pid)
 
   /* Read the contents of /proc/<pid>/psinfo into memory.  */
   char filename[6 + 10 + 7 + 1];
-  int fd;
-
   sprintf (filename, "/proc/%u/psinfo", (unsigned int) pid);
-  fd = open (filename, O_RDONLY | O_CLOEXEC);
+  int fd = open (filename, O_RDONLY | O_CLOEXEC);
   if (fd >= 0)
     {
       char buf[4096 + 1];
@@ -178,15 +160,12 @@ get_progname_of (pid_t pid)
       close (fd);
       if (nread >= 0)
         {
-          char *p;
-          int count;
-
           /* NUL-terminate the buffer.  */
           buf[nread] = '\0';
 
           /* Search for the 4th space-separated field.  */
-          p = strchr (buf, ' ');
-          for (count = 1; p != NULL && count < 3; count++)
+          char *p = strchr (buf, ' ');
+          for (int count = 1; p != NULL && count < 3; count++)
             p = strchr (p + 1, ' ');
           if (p != NULL)
             {
@@ -209,19 +188,16 @@ get_progname_of (pid_t pid)
      When it succeeds, it doesn't truncate.  */
   {
     char filename[6 + 10 + 11 + 1];
-    char linkbuf[1024 + 1];
-    ssize_t linklen;
-
     sprintf (filename, "/proc/%u/path/a.out", (unsigned int) pid);
-    linklen = readlink (filename, linkbuf, sizeof (linkbuf) - 1);
+
+    char linkbuf[1024 + 1];
+    ssize_t linklen = readlink (filename, linkbuf, sizeof (linkbuf) - 1);
     if (linklen > 0)
       {
-        char *slash;
-
         /* NUL-terminate the link.  */
         linkbuf[linklen] = '\0';
         /* Find the portion after the last slash.  */
-        slash = strrchr (linkbuf, '/');
+        char *slash = strrchr (linkbuf, '/');
         return strdup (slash != NULL ? slash + 1 : linkbuf);
       }
   }
@@ -232,10 +208,8 @@ get_progname_of (pid_t pid)
      memory.  But it contains a lot of information that we don't need.  */
   {
     char filename[6 + 10 + 7 + 1];
-    int fd;
-
     sprintf (filename, "/proc/%u/psinfo", (unsigned int) pid);
-    fd = open (filename, O_RDONLY | O_CLOEXEC);
+    int fd = open (filename, O_RDONLY | O_CLOEXEC);
     if (fd >= 0)
       {
         /* The contents is a 'struct psinfo'.  But since 'struct psinfo'
@@ -269,9 +243,7 @@ get_progname_of (pid_t pid)
   int info_path[] =
     { CTL_KERN, KERN_PROC, KERN_PROC_PID, pid, sizeof (struct kinfo_proc), 1 };
   struct kinfo_proc info;
-  size_t len;
-
-  len = sizeof (info);
+  size_t len = sizeof (info);
   if (sysctl (info_path, 6, &info, &len, NULL, 0) >= 0 && len == sizeof (info))
     return strdup (info.p_comm);
 
@@ -347,7 +319,7 @@ get_progname_of (pid_t pid)
           else
             p = cmd;
           if (strlen (p) > PST_UCOMMLEN - 1
-              && memcmp (p, ucomm, PST_UCOMMLEN - 1) == 0)
+              && memeq (p, ucomm, PST_UCOMMLEN - 1))
             /* p is less truncated than ucomm.  */
             ;
           else
@@ -383,7 +355,7 @@ get_progname_of (pid_t pid)
               else
                 p = cmd;
               if (strlen (p) > PST_UCOMMLEN - 1
-                  && memcmp (p, ucomm, PST_UCOMMLEN - 1) == 0)
+                  && memeq (p, ucomm, PST_UCOMMLEN - 1))
                 /* p is less truncated than ucomm.  */
                 ;
               else
@@ -397,36 +369,6 @@ get_progname_of (pid_t pid)
     }
   if (p != NULL)
     return strdup (p);
-
-#endif
-
-#if defined __sgi                                           /* IRIX */
-
-  char filename[12 + 10 + 1];
-  int fd;
-
-  sprintf (filename, "/proc/pinfo/%u", pid);
-  fd = open (filename, O_RDONLY | O_CLOEXEC);
-  if (0 <= fd)
-    {
-      prpsinfo_t buf;
-      int ioctl_ok = 0 <= ioctl (fd, PIOCPSINFO, &buf);
-      close (fd);
-      if (ioctl_ok)
-        {
-          char *name = buf.pr_fname;
-          size_t namesize = sizeof buf.pr_fname;
-          /* It may not be NUL-terminated.  */
-          char *namenul = memchr (name, '\0', namesize);
-          size_t namelen = namenul ? namenul - name : namesize;
-          char *namecopy = malloc (namelen + 1);
-          if (namecopy)
-            {
-              namecopy[namelen] = '\0';
-              return memcpy (namecopy, name, namelen);
-            }
-        }
-    }
 
 #endif
 

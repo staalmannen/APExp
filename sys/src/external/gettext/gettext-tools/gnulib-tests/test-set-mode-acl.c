@@ -1,5 +1,5 @@
 /* Test of setting an ACL equivalent to a mode.
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,7 +35,7 @@ main (int argc, char *argv[])
   file = argv[1];
   mode = strtol (argv[2], NULL, 8);
 
-  set_acl (file, -1, mode);
+  xset_acl (file, -1, mode);
 
-  return 0;
+  return test_exit_status;
 }

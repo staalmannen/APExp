@@ -1,5 +1,5 @@
 /* Auxiliary functions for the creation of subprocesses.  Native Windows API.
-   Copyright (C) 2001, 2003-2024 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This file is free software: you can redistribute it and/or modify
@@ -38,6 +38,7 @@
 #include <process.h>
 
 #include "findprog.h"
+#include "windows-path.h"
 
 /* Don't assume that UNICODE is not defined.  */
 #undef STARTUPINFO
@@ -53,15 +54,12 @@ static size_t
 quoted_arg_length (const char *string)
 {
   bool quote_around = (strpbrk (string, SHELL_SPACE_CHARS) != NULL);
-  size_t length;
-  unsigned int backslashes;
-  const char *s;
 
-  length = 0;
-  backslashes = 0;
+  size_t length = 0;
+  unsigned int backslashes = 0;
   if (quote_around)
     length++;
-  for (s = string; *s != '\0'; s++)
+  for (const char *s = string; *s != '\0'; s++)
     {
       char c = *s;
       if (c == '"')
@@ -86,23 +84,17 @@ static char *
 quoted_arg_string (const char *string, char *mem)
 {
   bool quote_around = (strpbrk (string, SHELL_SPACE_CHARS) != NULL);
-  char *p;
-  unsigned int backslashes;
-  const char *s;
 
-  p = mem;
-  backslashes = 0;
+  char *p = mem;
+  unsigned int backslashes = 0;
   if (quote_around)
     *p++ = '"';
-  for (s = string; *s != '\0'; s++)
+  for (const char *s = string; *s != '\0'; s++)
     {
       char c = *s;
       if (c == '"')
-        {
-          unsigned int j;
-          for (j = backslashes + 1; j > 0; j--)
-            *p++ = '\\';
-        }
+        for (unsigned int j = backslashes + 1; j > 0; j--)
+          *p++ = '\\';
       *p++ = c;
       if (c == '\\')
         backslashes++;
@@ -111,8 +103,7 @@ quoted_arg_string (const char *string, char *mem)
     }
   if (quote_around)
     {
-      unsigned int j;
-      for (j = backslashes; j > 0; j--)
+      for (unsigned int j = backslashes; j > 0; j--)
         *p++ = '\\';
       *p++ = '"';
     }
@@ -124,16 +115,14 @@ quoted_arg_string (const char *string, char *mem)
 const char **
 prepare_spawn (const char * const *argv, char **mem_to_free)
 {
-  size_t argc;
-  const char **new_argv;
-  size_t i;
-
   /* Count number of arguments.  */
+  size_t argc;
   for (argc = 0; argv[argc] != NULL; argc++)
     ;
 
   /* Allocate new argument vector.  */
-  new_argv = (const char **) malloc ((1 + argc + 1) * sizeof (const char *));
+  const char **new_argv =
+    (const char **) malloc ((1 + argc + 1) * sizeof (const char *));
 
   /* Add an element upfront that can be used when argv[0] turns out to be a
      script, not a program.
@@ -145,17 +134,18 @@ prepare_spawn (const char * const *argv, char **mem_to_free)
 
   /* Put quoted arguments into the new argument vector.  */
   size_t needed_size = 0;
-  for (i = 0; i < argc; i++)
+  for (size_t i = 0; i < argc; i++)
     {
       const char *string = argv[i];
-      size_t length;
 
+      size_t length;
       if (string[0] == '\0')
         length = strlen ("\"\"");
       else if (strpbrk (string, SHELL_SPECIAL_CHARS) != NULL)
         length = quoted_arg_length (string);
       else
         length = strlen (string);
+
       needed_size += length + 1;
     }
 
@@ -175,7 +165,7 @@ prepare_spawn (const char * const *argv, char **mem_to_free)
     }
   *mem_to_free = mem;
 
-  for (i = 0; i < argc; i++)
+  for (size_t i = 0; i < argc; i++)
     {
       const char *string = argv[i];
 
@@ -206,18 +196,18 @@ char *
 compose_command (const char * const *argv)
 {
   /* Just concatenate the argv[] strings, separated by spaces.  */
-  char *command;
 
   /* Determine the size of the needed block of memory.  */
   size_t total_size = 0;
-  const char * const *ap;
-  const char *p;
-  for (ap = argv; (p = *ap) != NULL; ap++)
-    total_size += strlen (p) + 1;
+  {
+    const char *p;
+    for (const char * const *ap = argv; (p = *ap) != NULL; ap++)
+      total_size += strlen (p) + 1;
+  }
   size_t command_size = (total_size > 0 ? total_size : 1);
 
   /* Allocate the block of memory.  */
-  command = (char *) malloc (command_size);
+  char *command = (char *) malloc (command_size);
   if (command == NULL)
     {
       errno = ENOMEM;
@@ -228,7 +218,8 @@ compose_command (const char * const *argv)
   if (total_size > 0)
     {
       char *cp = command;
-      for (ap = argv; (p = *ap) != NULL; ap++)
+      const char *p;
+      for (const char * const *ap = argv; (p = *ap) != NULL; ap++)
         {
           size_t size = strlen (p) + 1;
           memcpy (cp, p, size - 1);
@@ -244,7 +235,7 @@ compose_command (const char * const *argv)
 }
 
 char *
-compose_envblock (const char * const *envp)
+compose_envblock (const char * const *envp, const char *new_PATH)
 {
   /* This is a bit hairy, because we don't have a lock that would prevent other
      threads from making modifications in ENVP.  So, just make sure we don't
@@ -255,10 +246,14 @@ compose_envblock (const char * const *envp)
     /* Guess the size of the needed block of memory.
        The guess will be exact if other threads don't make modifications.  */
     size_t total_size = 0;
-    const char * const *ep;
-    const char *p;
-    for (ep = envp; (p = *ep) != NULL; ep++)
-      total_size += strlen (p) + 1;
+    if (new_PATH != NULL)
+      total_size += strlen (new_PATH) + 1;
+    {
+      const char *p;
+      for (const char * const *ep = envp; (p = *ep) != NULL; ep++)
+        if (!(new_PATH != NULL && strncmp (p, "PATH=", 5) == 0))
+          total_size += strlen (p) + 1;
+    }
     size_t envblock_size = total_size;
 
     /* Allocate the block of memory.  */
@@ -269,34 +264,45 @@ compose_envblock (const char * const *envp)
         return NULL;
       }
     size_t envblock_used = 0;
-    for (ep = envp; (p = *ep) != NULL; ep++)
+    if (new_PATH != NULL)
       {
-        size_t size = strlen (p) + 1;
-        if (envblock_used + size > envblock_size)
-          {
-            /* Other threads did modifications.  Need more memory.  */
-            envblock_size += envblock_size / 2;
-            if (envblock_used + size > envblock_size)
-              envblock_size = envblock_used + size;
-
-            char *new_envblock = (char *) realloc (envblock, envblock_size + 1);
-            if (new_envblock == NULL)
-              {
-                free (envblock);
-                errno = ENOMEM;
-                return NULL;
-              }
-            envblock = new_envblock;
-          }
-        memcpy (envblock + envblock_used, p, size);
+        size_t size = strlen (new_PATH) + 1;
+        memcpy (envblock + envblock_used, new_PATH, size);
         envblock_used += size;
-        if (envblock[envblock_used - 1] != '\0')
-          {
-            /* Other threads did modifications.  Restart.  */
-            free (envblock);
-            goto retry;
-          }
       }
+    {
+      const char *p;
+      for (const char * const *ep = envp; (p = *ep) != NULL; ep++)
+        if (!(new_PATH != NULL && strncmp (p, "PATH=", 5) == 0))
+          {
+            size_t size = strlen (p) + 1;
+            if (envblock_used + size > envblock_size)
+              {
+                /* Other threads did modifications.  Need more memory.  */
+                envblock_size += envblock_size / 2;
+                if (envblock_used + size > envblock_size)
+                  envblock_size = envblock_used + size;
+
+                char *new_envblock =
+                  (char *) realloc (envblock, envblock_size + 1);
+                if (new_envblock == NULL)
+                  {
+                    free (envblock);
+                    errno = ENOMEM;
+                    return NULL;
+                  }
+              envblock = new_envblock;
+            }
+            memcpy (envblock + envblock_used, p, size);
+            envblock_used += size;
+            if (envblock[envblock_used - 1] != '\0')
+              {
+                /* Other threads did modifications.  Restart.  */
+                free (envblock);
+                goto retry;
+              }
+          }
+    }
     envblock[envblock_used] = '\0';
     return envblock;
   }
@@ -358,8 +364,7 @@ init_inheritable_handles (struct inheritable_handles *inh_handles,
   /* Fill in the array.  */
   {
     HANDLE curr_process = (duplicate ? GetCurrentProcess () : INVALID_HANDLE_VALUE);
-    unsigned int fd;
-    for (fd = 0; fd < handles_count; fd++)
+    for (unsigned int fd = 0; fd < handles_count; fd++)
       {
         ih[fd].handle = INVALID_HANDLE_VALUE;
         /* _get_osfhandle
@@ -388,8 +393,7 @@ init_inheritable_handles (struct inheritable_handles *inh_handles,
                                               curr_process, &ih[fd].handle,
                                               0, TRUE, DUPLICATE_SAME_ACCESS))
                           {
-                            unsigned int i;
-                            for (i = 0; i < fd; i++)
+                            for (unsigned int i = 0; i < fd; i++)
                               if (ih[i].handle != INVALID_HANDLE_VALUE
                                   && !(ih[i].flags & KEEP_OPEN_IN_PARENT))
                                 CloseHandle (ih[i].handle);
@@ -474,53 +478,50 @@ compose_handles_block (const struct inheritable_handles *inh_handles,
                 & - (uintptr_t) sizeof (HANDLE));
 
   * (unsigned int *) hblock = handles_count;
-  {
-    unsigned int fd;
-    for (fd = 0; fd < handles_count; fd++)
-      {
-        handles_aligned[fd] = INVALID_HANDLE_VALUE;
-        flags[fd] = 0;
+  for (unsigned int fd = 0; fd < handles_count; fd++)
+    {
+      handles_aligned[fd] = INVALID_HANDLE_VALUE;
+      flags[fd] = 0;
 
-        HANDLE handle = inh_handles->ih[fd].handle;
-        if (handle != INVALID_HANDLE_VALUE
-            /* The first three are possibly already passed above.
-               But they need to passed here as well, if they have some flags.  */
-            && (fd >= 3 || (unsigned char) inh_handles->ih[fd].flags != 0))
-          {
-            DWORD hflags;
-            /* GetHandleInformation
-               <https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-gethandleinformation>  */
-            if (GetHandleInformation (handle, &hflags))
-              {
-                if ((hflags & HANDLE_FLAG_INHERIT) != 0)
-                  {
-                    /* fd denotes an inheritable descriptor.  */
-                    handles_aligned[fd] = handle;
-                    /* On Microsoft Windows, it would be sufficient to set
-                       flags[fd] = 1.  But on ReactOS or Wine, adding the bit
-                       that indicates the handle type may be necessary.  So,
-                       just do it everywhere.  */
-                    flags[fd] = 1 | (unsigned char) inh_handles->ih[fd].flags;
-                    switch (GetFileType (handle))
-                      {
-                      case FILE_TYPE_CHAR:
-                        flags[fd] |= 64;
-                        break;
-                      case FILE_TYPE_PIPE:
-                        flags[fd] |= 8;
-                        break;
-                      default:
-                        break;
-                      }
-                  }
-                else
-                  /* We shouldn't have any non-inheritable handles in
-                     inh_handles->handles.  */
-                  abort ();
-              }
-          }
-      }
-  }
+      HANDLE handle = inh_handles->ih[fd].handle;
+      if (handle != INVALID_HANDLE_VALUE
+          /* The first three are possibly already passed above.
+             But they need to passed here as well, if they have some flags.  */
+          && (fd >= 3 || (unsigned char) inh_handles->ih[fd].flags != 0))
+        {
+          DWORD hflags;
+          /* GetHandleInformation
+             <https://docs.microsoft.com/en-us/windows/win32/api/handleapi/nf-handleapi-gethandleinformation>  */
+          if (GetHandleInformation (handle, &hflags))
+            {
+              if ((hflags & HANDLE_FLAG_INHERIT) != 0)
+                {
+                  /* fd denotes an inheritable descriptor.  */
+                  handles_aligned[fd] = handle;
+                  /* On Microsoft Windows, it would be sufficient to set
+                     flags[fd] = 1.  But on ReactOS or Wine, adding the bit
+                     that indicates the handle type may be necessary.  So,
+                     just do it everywhere.  */
+                  flags[fd] = 1 | (unsigned char) inh_handles->ih[fd].flags;
+                  switch (GetFileType (handle))
+                    {
+                    case FILE_TYPE_CHAR:
+                      flags[fd] |= 64;
+                      break;
+                    case FILE_TYPE_PIPE:
+                      flags[fd] |= 8;
+                      break;
+                    default:
+                      break;
+                    }
+                }
+              else
+                /* We shouldn't have any non-inheritable handles in
+                   inh_handles->handles.  */
+                abort ();
+            }
+        }
+    }
   if (handles != (char *) handles_aligned)
     memmove (handles, (char *) handles_aligned, handles_count * sizeof (HANDLE));
 
@@ -548,30 +549,24 @@ convert_CreateProcess_error (DWORD error)
     case ERROR_INVALID_NAME:
     case ERROR_DIRECTORY:
       return ENOENT;
-      break;
 
     case ERROR_ACCESS_DENIED:
     case ERROR_SHARING_VIOLATION:
       return EACCES;
-      break;
 
     case ERROR_OUTOFMEMORY:
       return ENOMEM;
-      break;
 
     case ERROR_BUFFER_OVERFLOW:
     case ERROR_FILENAME_EXCED_RANGE:
       return ENAMETOOLONG;
-      break;
 
     case ERROR_BAD_FORMAT:
     case ERROR_BAD_EXE_FORMAT:
       return ENOEXEC;
-      break;
 
     default:
       return EINVAL;
-      break;
     }
 }
 
@@ -579,6 +574,7 @@ intptr_t
 spawnpvech (int mode,
             const char *progname, const char * const *argv,
             const char * const *envp,
+            const char * const *dll_dirs,
             const char *currdir,
             HANDLE stdin_handle, HANDLE stdout_handle, HANDLE stderr_handle)
 {
@@ -606,11 +602,23 @@ spawnpvech (int mode,
 
   /* Copy *ENVP into a contiguous block of memory.  */
   char *envblock;
-  if (envp == NULL)
+  if (envp == NULL && !(dll_dirs != NULL && dll_dirs[0] != NULL))
     envblock = NULL;
   else
     {
-      envblock = compose_envblock (envp);
+      if (envp == NULL)
+        /* Documentation:
+           <https://learn.microsoft.com/en-us/cpp/c-runtime-library/environ-wenviron>  */
+        envp = (const char **) _environ;
+      char *new_PATH = NULL;
+      if (dll_dirs != NULL && dll_dirs[0] != NULL)
+        {
+          new_PATH = extended_PATH (dll_dirs);
+          if (new_PATH == NULL)
+            goto out_of_memory_2;
+        }
+      envblock = compose_envblock (envp, new_PATH);
+      free (new_PATH);
       if (envblock == NULL)
         goto out_of_memory_2;
     }

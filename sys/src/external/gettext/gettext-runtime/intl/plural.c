@@ -72,11 +72,10 @@
 #define yynerrs         __gettextnerrs
 
 /* First part of user prologue.  */
-//#line 1 "plural.y"
+#line 1 "plural.y"
 
 /* Expression parsing for plural form selection.
-   Copyright (C) 2000-2020 Free Software Foundation, Inc.
-   Written by Ulrich Drepper <drepper@cygnus.com>, 2000.
+   Copyright (C) 2000-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -90,6 +89,8 @@
 
    You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Ulrich Drepper, Bruno Haible, and Daiki Ueno.  */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -107,8 +108,13 @@
 # define __gettextparse PLURAL_PARSE
 #endif
 
+/* Later we provide those prototypes.  Without these macros, bison may
+   generate its own prototypes with possible conflicts.  */
+#define YYLEX_IS_DECLARED
+#define YYERROR_IS_DECLARED
 
-#line 112 "plural.c"
+
+#line 118 "plural.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -160,7 +166,7 @@ typedef enum yysymbol_kind_t yysymbol_kind_t;
 
 
 /* Second part of user prologue.  */
-#line 48 "plural.y"
+#line 54 "plural.y"
 
 /* Prototypes for local functions.  */
 static int yylex (YYSTYPE *lval, struct parse_args *arg);
@@ -237,7 +243,7 @@ new_exp_3 (enum expression_operator op, struct expression *bexp,
 }
 
 
-#line 241 "plural.c"
+#line 247 "plural.c"
 
 
 #ifdef short
@@ -620,8 +626,8 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,   145,   145,   153,   157,   161,   165,   169,   173,   177,
-     181,   185,   189,   194
+       0,   151,   151,   159,   163,   167,   171,   175,   179,   183,
+     187,   191,   195,   200
 };
 #endif
 
@@ -1205,106 +1211,106 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* start: exp  */
-#line 146 "plural.y"
+#line 152 "plural.y"
           {
 	    if ((yyvsp[0].exp) == NULL)
 	      YYABORT;
 	    arg->res = (yyvsp[0].exp);
 	  }
-#line 1215 "plural.c"
+#line 1221 "plural.c"
     break;
 
   case 3: /* exp: exp '?' exp ':' exp  */
-#line 154 "plural.y"
+#line 160 "plural.y"
           {
 	    (yyval.exp) = new_exp_3 (qmop, (yyvsp[-4].exp), (yyvsp[-2].exp), (yyvsp[0].exp));
 	  }
-#line 1223 "plural.c"
+#line 1229 "plural.c"
     break;
 
   case 4: /* exp: exp '|' exp  */
-#line 158 "plural.y"
+#line 164 "plural.y"
           {
 	    (yyval.exp) = new_exp_2 (lor, (yyvsp[-2].exp), (yyvsp[0].exp));
 	  }
-#line 1231 "plural.c"
+#line 1237 "plural.c"
     break;
 
   case 5: /* exp: exp '&' exp  */
-#line 162 "plural.y"
+#line 168 "plural.y"
           {
 	    (yyval.exp) = new_exp_2 (land, (yyvsp[-2].exp), (yyvsp[0].exp));
 	  }
-#line 1239 "plural.c"
+#line 1245 "plural.c"
     break;
 
   case 6: /* exp: exp EQUOP2 exp  */
-#line 166 "plural.y"
+#line 172 "plural.y"
           {
 	    (yyval.exp) = new_exp_2 ((yyvsp[-1].op), (yyvsp[-2].exp), (yyvsp[0].exp));
 	  }
-#line 1247 "plural.c"
+#line 1253 "plural.c"
     break;
 
   case 7: /* exp: exp CMPOP2 exp  */
-#line 170 "plural.y"
+#line 176 "plural.y"
           {
 	    (yyval.exp) = new_exp_2 ((yyvsp[-1].op), (yyvsp[-2].exp), (yyvsp[0].exp));
 	  }
-#line 1255 "plural.c"
+#line 1261 "plural.c"
     break;
 
   case 8: /* exp: exp ADDOP2 exp  */
-#line 174 "plural.y"
+#line 180 "plural.y"
           {
 	    (yyval.exp) = new_exp_2 ((yyvsp[-1].op), (yyvsp[-2].exp), (yyvsp[0].exp));
 	  }
-#line 1263 "plural.c"
+#line 1269 "plural.c"
     break;
 
   case 9: /* exp: exp MULOP2 exp  */
-#line 178 "plural.y"
+#line 184 "plural.y"
           {
 	    (yyval.exp) = new_exp_2 ((yyvsp[-1].op), (yyvsp[-2].exp), (yyvsp[0].exp));
 	  }
-#line 1271 "plural.c"
+#line 1277 "plural.c"
     break;
 
   case 10: /* exp: '!' exp  */
-#line 182 "plural.y"
+#line 188 "plural.y"
           {
 	    (yyval.exp) = new_exp_1 (lnot, (yyvsp[0].exp));
 	  }
-#line 1279 "plural.c"
+#line 1285 "plural.c"
     break;
 
   case 11: /* exp: 'n'  */
-#line 186 "plural.y"
+#line 192 "plural.y"
           {
 	    (yyval.exp) = new_exp_0 (var);
 	  }
-#line 1287 "plural.c"
+#line 1293 "plural.c"
     break;
 
   case 12: /* exp: NUMBER  */
-#line 190 "plural.y"
+#line 196 "plural.y"
           {
 	    if (((yyval.exp) = new_exp_0 (num)) != NULL)
 	      (yyval.exp)->val.num = (yyvsp[0].num);
 	  }
-#line 1296 "plural.c"
+#line 1302 "plural.c"
     break;
 
   case 13: /* exp: '(' exp ')'  */
-#line 195 "plural.y"
+#line 201 "plural.y"
           {
 	    (yyval.exp) = (yyvsp[-1].exp);
 	  }
-#line 1304 "plural.c"
+#line 1310 "plural.c"
     break;
 
 
-#line 1308 "plural.c"
+#line 1314 "plural.c"
 
       default: break;
     }
@@ -1497,11 +1503,10 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 200 "plural.y"
+#line 206 "plural.y"
 
 
 void
-internal_function
 FREE_EXPRESSION (struct expression *exp)
 {
   if (exp == NULL)

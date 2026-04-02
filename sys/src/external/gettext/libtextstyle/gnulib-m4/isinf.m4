@@ -1,8 +1,10 @@
-# isinf.m4 serial 14
-dnl Copyright (C) 2007-2024 Free Software Foundation, Inc.
+# isinf.m4
+# serial 16
+dnl Copyright (C) 2007-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_DEFUN([gl_ISINF],
 [
@@ -17,7 +19,8 @@ AC_DEFUN([gl_ISINF],
       #endif
     ]])
   if test "$ac_cv_have_decl_isinf" = yes; then
-    gl_CHECK_MATH_LIB([ISINF_LIBM], [x = isinf (x) + isinf ((float) x);])
+    gl_CHECK_MATH_LIB([ISINF_LIBM], [double],
+      [x = isinf (x) + isinf ((float) x);])
     if test "$ISINF_LIBM" != missing; then
       dnl Test whether isinf() on 'long double' works.
       gl_ISINFL_WORKS
@@ -62,17 +65,6 @@ AC_DEFUN([gl_ISINFL_WORKS],
   ((sizeof (long double) + sizeof (unsigned int) - 1) / sizeof (unsigned int))
 typedef union { unsigned int word[NWORDS]; long double value; }
         memory_long_double;
-/* On Irix 6.5, gcc 3.4.3 can't compute compile-time NaN, and needs the
-   runtime type conversion.  */
-#ifdef __sgi
-static long double NaNl ()
-{
-  double zero = 0.0;
-  return zero / zero;
-}
-#else
-# define NaNl() (0.0L / 0.0L)
-#endif
 int main ()
 {
   int result = 0;
@@ -88,7 +80,7 @@ int main ()
        in the mantissa bits.  The xor operation twiddles a bit that can only be
        a sign bit or a mantissa bit (since the exponent never extends to
        bit 31).  */
-    m.value = NaNl ();
+    m.value = 0.0L / 0.0L;
     m.word[NWORDS / 2] ^= (unsigned int) 1 << (sizeof (unsigned int) * CHAR_BIT - 1);
     for (i = 0; i < NWORDS; i++)
       m.word[i] |= 1;

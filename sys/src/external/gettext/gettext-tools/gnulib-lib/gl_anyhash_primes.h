@@ -1,5 +1,5 @@
 /* Table of primes, for use by hash tables.
-   Copyright (C) 2006, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This file is free software: you can redistribute it and/or modify
@@ -78,9 +78,7 @@ static const size_t primes[] =
 static size_t
 next_prime (size_t estimate)
 {
-  size_t i;
-
-  for (i = 0; i < sizeof (primes) / sizeof (primes[0]); i++)
+  for (size_t i = 0; i < sizeof (primes) / sizeof (primes[0]); i++)
     if (primes[i] >= estimate)
       return primes[i];
   return SIZE_MAX; /* not a prime, but better than nothing */

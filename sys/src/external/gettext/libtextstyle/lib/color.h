@@ -1,6 +1,5 @@
 /* Color and styling handling.
-   Copyright (C) 2006, 2019 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,6 +14,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Written by Bruno Haible.  */
+
 #ifndef _COLOR_H
 #define _COLOR_H
 
@@ -27,14 +28,14 @@ extern "C" {
 
 
 /* Whether to output a test page.  */
-extern bool color_test_mode;
+extern LIBTEXTSTYLE_DLL_VARIABLE bool color_test_mode;
 
 /* Color option.  */
 enum color_option { color_no, color_tty, color_yes, color_html };
-extern enum color_option color_mode;
+extern LIBTEXTSTYLE_DLL_VARIABLE enum color_option color_mode;
 
 /* Style to use when coloring.  */
-extern const char *style_file_name;
+extern LIBTEXTSTYLE_DLL_VARIABLE const char *style_file_name;
 
 /* --color argument handling.  Return an error indicator.  */
 extern bool handle_color_option (const char *option);

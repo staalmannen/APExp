@@ -1,5 +1,5 @@
 /* Test of filtering of data through a subprocess.
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2009.
 
    This program is free software: you can redistribute it and/or modify
@@ -72,9 +72,8 @@ done_read (void *data_read, size_t num_bytes_read, void *private_data)
   struct locals *l = (struct locals *) private_data;
   const char *p = l->input + l->nread;
   const char *q = (const char *) data_read;
-  size_t i;
 
-  for (i = 0; i < num_bytes_read; i++, q++)
+  for (size_t i = 0; i < num_bytes_read; i++, q++)
     {
       /* Handle conversion NL -> CRLF possibly done by the child process.  */
       if (!(O_BINARY && *q == '\r'))
@@ -132,5 +131,5 @@ main (int argc, char *argv[])
 
   free (input);
 
-  return 0;
+  return test_exit_status;
 }

@@ -1,7 +1,5 @@
 /* xgettext common functions.
-   Copyright (C) 2001-2003, 2005-2006, 2008-2009, 2011, 2013-2014, 2018, 2020, 2023 Free Software Foundation, Inc.
-   Written by Peter Miller <millerp@canb.auug.org.au>
-   and Bruno Haible <haible@clisp.cons.org>, 2001.
+   Copyright (C) 2001-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,6 +13,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Ulrich Drepper, Peter Miller, and Bruno Haible.  */
 
 #ifndef _XGETTEXT_H
 #define _XGETTEXT_H
@@ -53,14 +53,8 @@ extern int xgettext_omit_header;
 /* Be more verbose.  */
 extern int verbose;
 
+/* Syntax checks enabled through a command-line option or by default.  */
 extern enum is_syntax_check default_syntax_check[NSYNTAXCHECKS];
-
-/* Language dependent format string parser.
-   NULL if the language has no notion of format strings.  */
-extern struct formatstring_parser *current_formatstring_parser1;
-extern struct formatstring_parser *current_formatstring_parser2;
-extern struct formatstring_parser *current_formatstring_parser3;
-extern struct formatstring_parser *current_formatstring_parser4;
 
 
 /* Record a flag in the appropriate backend's table.

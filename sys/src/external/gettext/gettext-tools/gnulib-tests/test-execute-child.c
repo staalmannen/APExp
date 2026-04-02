@@ -1,5 +1,5 @@
 /* Child program invoked by test-execute-main.
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -56,6 +56,7 @@ is_device (int fd)
 #endif
 
 /* In this file, we use only system functions, no overrides from gnulib.  */
+#undef abort
 #undef atoi
 #undef close
 #undef fcntl
@@ -74,6 +75,12 @@ is_device (int fd)
 #undef strlen
 #undef strstr
 #undef write
+
+/* macOS 12's "warning: 'sprintf' is deprecated" is pointless,
+   as sprintf is used safely here.  */
+#if defined __APPLE__ && defined __MACH__ && _GL_GNUC_PREREQ (4, 2)
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 #include "qemu.h"
 
@@ -178,8 +185,7 @@ main (int argc, char *argv[])
         char buf[300];
         buf[0] = '\0';
         char *p = buf;
-        int fd;
-        for (fd = 0; fd < 20; fd++)
+        for (int fd = 0; fd < 20; fd++)
           if (is_open (fd) && !(is_qemu && fd == 3))
             {
               sprintf (p, "%d ", fd);

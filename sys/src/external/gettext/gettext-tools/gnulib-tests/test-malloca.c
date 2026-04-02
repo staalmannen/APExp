@@ -1,5 +1,5 @@
 /* Test of safe automatic memory allocation.
-   Copyright (C) 2005, 2007, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2007, 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -35,13 +35,11 @@ void (*func) (int) = do_allocation;
 int
 main ()
 {
-  int i;
-
   /* This slows down malloc a lot.  */
   unsetenv ("MALLOC_PERTURB_");
 
   /* Repeat a lot of times, to make sure there's no memory leak.  */
-  for (i = 0; i < 50000; i++)
+  for (int i = 0; i < 50000; i++)
     {
       /* Try various values.
          n = 0 gave a crash on Alpha with gcc-2.5.8.

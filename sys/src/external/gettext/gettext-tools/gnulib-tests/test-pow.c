@@ -1,5 +1,5 @@
 /* Test of pow() function.
-   Copyright (C) 2010-2024 Free Software Foundation, Inc.
+   Copyright (C) 2010-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,5 +38,5 @@ main ()
   z = pow (x, y);
   ASSERT (z >= 728.9999999 && z <= 729.0000001);
 
-  return 0;
+  return test_exit_status;
 }

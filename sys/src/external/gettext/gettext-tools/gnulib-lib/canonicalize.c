@@ -1,5 +1,5 @@
 /* Return the canonical absolute name of a given file.
-   Copyright (C) 1996-2024 Free Software Foundation, Inc.
+   Copyright (C) 1996-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -31,8 +31,15 @@
 
 #include "attribute.h"
 #include "file-set.h"
-#include "hash-triple.h"
+#include "hashcode-file.h"
 #include "xalloc.h"
+
+/* Suppress bogus GCC -Wmaybe-uninitialized warnings.  */
+#if defined GCC_LINT || defined lint
+# define IF_LINT(Code) Code
+#else
+# define IF_LINT(Code) /* empty */
+#endif
 
 #ifndef DOUBLE_SLASH_IS_DISTINCT_ROOT
 # define DOUBLE_SLASH_IS_DISTINCT_ROOT false
@@ -45,7 +52,7 @@
 #endif
 
 /* Avoid false GCC warning "'end_idx' may be used uninitialized".  */
-#if __GNUC__ + (__GNUC_MINOR__ >= 7) > 4
+#if _GL_GNUC_PREREQ (4, 7)
 # pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
 #endif
 
@@ -173,13 +180,6 @@ static char *
 canonicalize_filename_mode_stk (const char *name, canonicalize_mode_t can_mode,
                                 struct realpath_bufs *bufs)
 {
-  char *dest;
-  char const *start;
-  char const *end;
-  Hash_table *ht = NULL;
-  bool logical = (can_mode & CAN_NOLINKS) != 0;
-  int num_links = 0;
-
   canonicalize_mode_t can_exist = can_mode & CAN_MODE_MASK;
   if (multiple_bits_set (can_exist))
     {
@@ -200,12 +200,16 @@ canonicalize_filename_mode_stk (const char *name, canonicalize_mode_t can_mode,
     }
 
   char *rname = bufs->rname.data;
-  bool end_in_extra_buffer = false;
-  bool failed = true;
 
   /* This is always zero for Posix hosts, but can be 2 for MS-Windows
      and MS-DOS X:/foo/bar file names.  */
-  idx_t prefix_len = FILE_SYSTEM_PREFIX_LEN (name);
+  idx_t prefix_len;
+
+  char *dest;
+  char const *start;
+
+  Hash_table *ht = NULL;
+  bool failed = true;
 
   if (!IS_ABSOLUTE_FILE_NAME (name))
     {
@@ -232,7 +236,8 @@ canonicalize_filename_mode_stk (const char *name, canonicalize_mode_t can_mode,
     }
   else
     {
-      dest = (char *) mempcpy (rname, name, prefix_len);
+      prefix_len = FILE_SYSTEM_PREFIX_LEN (name);
+      dest = mempcpy (rname, name, prefix_len);
       *dest++ = '/';
       if (DOUBLE_SLASH_IS_DISTINCT_ROOT)
         {
@@ -269,13 +274,19 @@ canonicalize_filename_mode_stk (const char *name, canonicalize_mode_t can_mode,
       start = name + prefix_len;
     }
 
-  for ( ; *start; start = end)
+  bool logical = (can_mode & CAN_NOLINKS) != 0;
+
+  int num_links = 0;
+  bool end_in_extra_buffer = false;
+
+  for (; *start;)
     {
       /* Skip sequence of multiple file name separators.  */
       while (ISSLASH (*start))
         ++start;
 
       /* Find end of component.  */
+      char const *end;
       for (end = start; *end && !ISSLASH (*end); ++end)
         /* Nothing.  */;
 
@@ -313,7 +324,7 @@ canonicalize_filename_mode_stk (const char *name, canonicalize_mode_t can_mode,
               dest = rname + dest_offset;
             }
 
-          dest = (char *) mempcpy (dest, start, startlen);
+          dest = mempcpy (dest, start, startlen);
           *dest = '\0';
 
           char *buf;
@@ -358,7 +369,7 @@ canonicalize_filename_mode_stk (const char *name, canonicalize_mode_t can_mode,
                   if (seen_triple (&ht, start, &st))
                     {
                       if (can_exist == CAN_MISSING)
-                        continue;
+                        goto next_component;
                       errno = ELOOP;
                       goto error;
                     }
@@ -367,7 +378,7 @@ canonicalize_filename_mode_stk (const char *name, canonicalize_mode_t can_mode,
               buf[n] = '\0';
 
               char *extra_buf = bufs->extra.data;
-              idx_t end_idx;
+              idx_t end_idx IF_LINT (= 0);
               if (end_in_extra_buffer)
                 end_idx = end - extra_buf;
               size_t len = strlen (end);
@@ -391,7 +402,7 @@ canonicalize_filename_mode_stk (const char *name, canonicalize_mode_t can_mode,
                 {
                   idx_t pfxlen = FILE_SYSTEM_PREFIX_LEN (buf);
 
-                  dest = (char *) mempcpy (rname, buf, pfxlen);
+                  dest = mempcpy (rname, buf, pfxlen);
                   *dest++ = '/'; /* It's an absolute symlink */
                   if (DOUBLE_SLASH_IS_DISTINCT_ROOT)
                     {
@@ -425,6 +436,9 @@ canonicalize_filename_mode_stk (const char *name, canonicalize_mode_t can_mode,
                           && !end[strspn (end, SLASHES)])))
             goto error;
         }
+
+     next_component:
+      start = end;
     }
   if (dest > rname + prefix_len + 1 && ISSLASH (dest[-1]))
     --dest;
@@ -461,9 +475,12 @@ canonicalize_filename_mode (const char *name, canonicalize_mode_t can_mode)
   scratch_buffer_init (&bufs.rname);
   scratch_buffer_init (&bufs.extra);
   scratch_buffer_init (&bufs.link);
+
   char *result = canonicalize_filename_mode_stk (name, can_mode, &bufs);
+
   scratch_buffer_free (&bufs.link);
   scratch_buffer_free (&bufs.extra);
   scratch_buffer_free (&bufs.rname);
+
   return result;
 }

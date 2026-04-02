@@ -1,5 +1,5 @@
 /* Iterating through multibyte strings: macros for multi-byte encodings.
-   Copyright (C) 2001, 2005, 2007, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2005, 2007, 2009-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -110,6 +110,11 @@ _GL_INLINE_HEADER_BEGIN
 # define MBUITER_INLINE _GL_INLINE _GL_ATTRIBUTE_ALWAYS_INLINE
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 struct mbuiter_multi
 {
   #if !GNULIB_MBRTOC32_REGULAR
@@ -161,7 +166,7 @@ mbuiter_multi_next (struct mbuiter_multi *iter)
       iter->in_shift = true;
     with_shift:
       #endif
-      iter->cur.bytes = mbrtoc32 ((unsigned int *) &iter->cur.wc, iter->cur.ptr,
+      iter->cur.bytes = mbrtoc32 (&iter->cur.wc, iter->cur.ptr,
                                   strnlen1 (iter->cur.ptr, iter->cur_max),
                                   &iter->state);
       if (iter->cur.bytes == (size_t) -1)
@@ -261,6 +266,11 @@ typedef struct mbuiter_multi mbui_iterator_t;
 
 /* Copying an iterator.  */
 #define mbui_copy mbuiter_multi_copy
+
+
+#ifdef __cplusplus
+}
+#endif
 
 _GL_INLINE_HEADER_END
 

@@ -1,8 +1,10 @@
-# atomic-cas.m4 serial 1
-dnl Copyright (C) 2024 Free Software Foundation, Inc.
+# atomic-cas.m4
+# serial 1
+dnl Copyright (C) 2024-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 # Determines whether the atomic compare-and-swap operations, officially
 # supported in GCC >= 4.1 and clang >= 3.0, are actually available.

@@ -1,6 +1,6 @@
 /* A GNU-like <iconv.h>.
 
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -48,7 +48,7 @@
 #   define iconv_open rpl_iconv_open
 #  endif
 _GL_FUNCDECL_RPL (iconv_open, iconv_t,
-                  (const char *tocode, const char *fromcode)
+                  (const char *tocode, const char *fromcode),
                   _GL_ARG_NONNULL ((1, 2)));
 _GL_CXXALIAS_RPL (iconv_open, iconv_t,
                   (const char *tocode, const char *fromcode));
@@ -58,7 +58,6 @@ _GL_CXXALIAS_SYS (iconv_open, iconv_t,
 # endif
 _GL_CXXALIASWARN (iconv_open);
 #elif defined GNULIB_POSIXCHECK
-# undef iconv_open
 # if HAVE_RAW_DECL_ICONV_OPEN
 _GL_WARN_ON_USE (iconv_open, "iconv_open is not working correctly everywhere - "
                  "use gnulib module iconv for portability");
@@ -87,7 +86,7 @@ _GL_FUNCDECL_RPL (iconv, size_t,
                   (iconv_t cd,
                    @ICONV_CONST@ char **restrict inbuf,
                    size_t *restrict inbytesleft,
-                   char **restrict outbuf, size_t *restrict outbytesleft));
+                   char **restrict outbuf, size_t *restrict outbytesleft), );
 _GL_CXXALIAS_RPL (iconv, size_t,
                   (iconv_t cd,
                    @ICONV_CONST@ char **restrict inbuf,
@@ -107,7 +106,6 @@ _GL_CXXALIASWARN (iconv);
 #  define ICONV_CONST @ICONV_CONST@
 # endif
 #elif defined GNULIB_POSIXCHECK
-# undef iconv
 # if HAVE_RAW_DECL_ICONV
 _GL_WARN_ON_USE (iconv, "iconv is not working correctly everywhere - "
                  "use gnulib module iconv for portability");
@@ -119,7 +117,7 @@ _GL_WARN_ON_USE (iconv, "iconv is not working correctly everywhere - "
 #  if !(defined __cplusplus && defined GNULIB_NAMESPACE)
 #   define iconv_close rpl_iconv_close
 #  endif
-_GL_FUNCDECL_RPL (iconv_close, int, (iconv_t cd));
+_GL_FUNCDECL_RPL (iconv_close, int, (iconv_t cd), );
 _GL_CXXALIAS_RPL (iconv_close, int, (iconv_t cd));
 # else
 _GL_CXXALIAS_SYS (iconv_close, int, (iconv_t cd));

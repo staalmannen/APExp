@@ -1,5 +1,5 @@
 /* Line breaking of strings.
-   Copyright (C) 2001-2003, 2006-2024 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003, 2006-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2001.
 
    This file is free software.
@@ -68,11 +68,10 @@ ulc_width_linebreaks_internal (const char *s, size_t n,
 
           if (offsets != NULL)
             {
-              uint8_t *t;
               size_t m;
-
-              t = u8_conv_from_encoding (encoding, iconveh_question_mark,
-                                         s, n, offsets, NULL, &m);
+              uint8_t *t =
+                u8_conv_from_encoding (encoding, iconveh_question_mark,
+                                       s, n, offsets, NULL, &m);
               if (t != NULL)
                 {
                   char *memory =
@@ -82,25 +81,23 @@ ulc_width_linebreaks_internal (const char *s, size_t n,
                     {
                       char *q = (char *) memory;
                       char *o8 = (o != NULL ? (char *) (q + m) : NULL);
-                      int res_column;
-                      size_t i;
 
                       /* Translate the overrides to the UTF-8 string.  */
                       if (o != NULL)
                         {
                           memset (o8, UC_BREAK_UNDEFINED, m);
-                          for (i = 0; i < n; i++)
+                          for (size_t i = 0; i < n; i++)
                             if (offsets[i] != (size_t)(-1))
                               o8[offsets[i]] = o[i];
                         }
 
                       /* Determine the line breaks of the UTF-8 string.  */
-                      res_column =
+                      int res_column =
                         u8_width_linebreaks_internal (t, m, width, start_column, at_end_columns, o8, encoding, cr, q);
 
                       /* Translate the result back to the original string.  */
                       memset (p, UC_BREAK_PROHIBITED, n);
-                      for (i = 0; i < n; i++)
+                      for (size_t i = 0; i < n; i++)
                         if (offsets[i] != (size_t)(-1))
                           p[i] = q[offsets[i]];
 
@@ -195,7 +192,6 @@ read_file (FILE *stream)
   char *buf = NULL;
   int alloc = 0;
   int size = 0;
-  int count;
 
   while (! feof (stream))
     {
@@ -211,7 +207,7 @@ read_file (FILE *stream)
               exit (1);
             }
         }
-      count = fread (buf + size, 1, BUFSIZE, stream);
+      int count = fread (buf + size, 1, BUFSIZE, stream);
       if (count == 0)
         {
           if (ferror (stream))
@@ -245,11 +241,10 @@ main (int argc, char * argv[])
       char *input = read_file (stdin);
       int length = strlen (input);
       char *breaks = malloc (length);
-      int i;
 
       ulc_width_linebreaks_v2 (input, length, width, 0, 0, NULL, locale_charset (), breaks);
 
-      for (i = 0; i < length; i++)
+      for (int i = 0; i < length; i++)
         {
           switch (breaks[i])
             {

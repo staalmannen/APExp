@@ -1,5 +1,5 @@
 /* Pattern Matcher for Fixed String search.
-   Copyright (C) 1992, 1998, 2000, 2005-2006, 2010, 2013, 2020, 2023 Free Software Foundation, Inc.
+   Copyright (C) 1992-2025 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,9 +14,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 /* Specification.  */
 #include "libgrep.h"
@@ -28,7 +26,7 @@
 #include <string.h>
 #include <wchar.h>
 
-#include "error.h"
+#include <error.h>
 #include "exitfail.h"
 #include "xalloc.h"
 #include "kwset.h"
@@ -80,7 +78,6 @@ Fcompile (const char *pattern, size_t pattern_size,
 {
   struct compiled_kwset *ckwset;
   const char *beg;
-  const char *err;
 
   ckwset = XMALLOC (struct compiled_kwset);
   kwsinit (ckwset, match_icase, match_words, match_lines, eolbyte);
@@ -92,16 +89,14 @@ Fcompile (const char *pattern, size_t pattern_size,
 
       for (lim = beg; lim < pattern + pattern_size && *lim != '\n'; ++lim)
         ;
-      if ((err = kwsincr (ckwset->kwset, beg, lim - beg)) != NULL)
-        error (exit_failure, 0, "%s", err);
+      kwsincr (ckwset->kwset, beg, lim - beg);
       if (lim < pattern + pattern_size)
         ++lim;
       beg = lim;
     }
   while (beg < pattern + pattern_size);
 
-  if ((err = kwsprep (ckwset->kwset)) != NULL)
-    error (exit_failure, 0, "%s", err);
+  kwsprep (ckwset->kwset);
   return ckwset;
 }
 
@@ -125,7 +120,7 @@ check_multibyte_string (const char *buf, size_t buf_size)
   for (i = 0; i < buf_size ;)
     {
       size_t mbclen;
-//      mbclen = mbrlen (buf + i, buf_size - i, &cur_state);
+      mbclen = mbrlen (buf + i, buf_size - i, &cur_state);
 
       if (mbclen == (size_t) -1 || mbclen == (size_t) -2 || mbclen == 0)
         {
@@ -159,16 +154,17 @@ Fexecute (const void *compiled_pattern, const char *buf, size_t buf_size,
   for (beg = buf; beg <= buflim; ++beg)
     {
       struct kwsmatch kwsmatch;
-      size_t offset = kwsexec (ckwset->kwset, beg, buflim - beg, &kwsmatch);
-      if (offset == (size_t) -1)
+      ptrdiff_t offset = kwsexec (ckwset->kwset, beg, buflim - beg,
+                                  &kwsmatch, true);
+      if (offset == -1)
         {
           free (mb_properties);
-          return offset;
+          return -1;
         }
       if (MB_CUR_MAX > 1 && mb_properties[offset+beg-buf] == 0)
         continue; /* It is a part of multibyte character.  */
       beg += offset;
-      len = kwsmatch.size[0];
+      len = kwsmatch.size;
       if (exact)
         {
           *match_size = len;
@@ -193,14 +189,15 @@ Fexecute (const void *compiled_pattern, const char *buf, size_t buf_size,
               if (curr + len < buflim
                   && IS_WORD_CONSTITUENT ((unsigned char) curr[len]))
                 {
-                  offset = kwsexec (ckwset->kwset, beg, --len, &kwsmatch);
-                  if (offset == (size_t) -1)
+                  offset = kwsexec (ckwset->kwset, beg, --len,
+                                    &kwsmatch, true);
+                  if (offset == -1)
                     {
                       free (mb_properties);
-                      return offset;
+                      return -1;
                     }
                   curr = beg + offset;
-                  len = kwsmatch.size[0];
+                  len = kwsmatch.size;
                 }
               else
                 goto success;

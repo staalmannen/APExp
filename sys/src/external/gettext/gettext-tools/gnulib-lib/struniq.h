@@ -1,5 +1,5 @@
 /* Define a file-local string uniquification function.
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -30,7 +30,7 @@
 
      flexmember
      lock
-     stdbool
+     bool
      thread-optim
  */
 
@@ -80,14 +80,11 @@ struniq (const char *string)
 {
   size_t hashcode = string_hash (string);
   size_t slot = hashcode % STRUNIQ_HASH_TABLE_SIZE;
-  size_t size;
-  struct struniq_hash_node *new_node;
-  struct struniq_hash_node *p;
-  for (p = struniq_hash_table[slot]; p != NULL; p = p->next)
-    if (strcmp (p->contents, string) == 0)
+  for (struct struniq_hash_node *p = struniq_hash_table[slot]; p != NULL; p = p->next)
+    if (streq (p->contents, string))
       return p->contents;
-  size = strlen (string) + 1;
-  new_node =
+  size_t size = strlen (string) + 1;
+  struct struniq_hash_node *new_node =
     (struct struniq_hash_node *)
     malloc (FLEXSIZEOF (struct struniq_hash_node, contents, size));
   if (new_node == NULL)
@@ -100,8 +97,8 @@ struniq (const char *string)
     if (mt) gl_lock_lock (struniq_lock);
     /* Check whether another thread already added the string while we were
        waiting on the lock.  */
-    for (p = struniq_hash_table[slot]; p != NULL; p = p->next)
-      if (strcmp (p->contents, string) == 0)
+    for (struct struniq_hash_node *p = struniq_hash_table[slot]; p != NULL; p = p->next)
+      if (streq (p->contents, string))
         {
           free (new_node);
           new_node = p;

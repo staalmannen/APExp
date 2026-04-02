@@ -1,5 +1,5 @@
 /* String descriptors.
-   Copyright (C) 2023-2024 Free Software Foundation, Inc.
+   Copyright (C) 2023-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -16,19 +16,18 @@
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2023.  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
-
 #define GL_STRING_DESC_INLINE _GL_EXTERN_INLINE
+#include <config.h>
 
 /* Specification and inline definitions.  */
 #include "string-desc.h"
 
+#include <limits.h>
 #include <stdarg.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "c-ctype.h"
 #include "ialloc.h"
 #include "full-write.h"
 
@@ -37,78 +36,100 @@
 
 /* Return true if A and B are equal.  */
 bool
-string_desc_equals (string_desc_t a, string_desc_t b)
+_sd_equals (idx_t a_nbytes, const char *a_data,
+            idx_t b_nbytes, const char *b_data)
 {
-  return (a._nbytes == b._nbytes
-          && (a._nbytes == 0 || memcmp (a._data, b._data, a._nbytes) == 0));
+  return (a_nbytes == b_nbytes
+          && (a_nbytes == 0 || memeq (a_data, b_data, a_nbytes)));
 }
 
 bool
-string_desc_startswith (string_desc_t s, string_desc_t prefix)
+_sd_startswith (idx_t s_nbytes, const char *s_data,
+                idx_t prefix_nbytes, const char *prefix_data)
 {
-  return (s._nbytes >= prefix._nbytes
-          && (prefix._nbytes == 0
-              || memcmp (s._data, prefix._data, prefix._nbytes) == 0));
+  return (s_nbytes >= prefix_nbytes
+          && (prefix_nbytes == 0
+              || memeq (s_data, prefix_data, prefix_nbytes)));
 }
 
 bool
-string_desc_endswith (string_desc_t s, string_desc_t suffix)
+_sd_endswith (idx_t s_nbytes, const char *s_data,
+                idx_t suffix_nbytes, const char *suffix_data)
 {
-  return (s._nbytes >= suffix._nbytes
-          && (suffix._nbytes == 0
-              || memcmp (s._data + (s._nbytes - suffix._nbytes), suffix._data,
-                         suffix._nbytes) == 0));
+  return (s_nbytes >= suffix_nbytes
+          && (suffix_nbytes == 0
+              || memeq (s_data + (s_nbytes - suffix_nbytes), suffix_data,
+                        suffix_nbytes)));
 }
 
 int
-string_desc_cmp (string_desc_t a, string_desc_t b)
+_sd_cmp (idx_t a_nbytes, const char *a_data,
+         idx_t b_nbytes, const char *b_data)
 {
-  if (a._nbytes > b._nbytes)
+  if (a_nbytes > b_nbytes)
     {
-      if (b._nbytes == 0)
+      if (b_nbytes == 0)
         return 1;
-      return (memcmp (a._data, b._data, b._nbytes) < 0 ? -1 : 1);
+      return (memcmp (a_data, b_data, b_nbytes) < 0 ? -1 : 1);
     }
-  else if (a._nbytes < b._nbytes)
+  else if (a_nbytes < b_nbytes)
     {
-      if (a._nbytes == 0)
+      if (a_nbytes == 0)
         return -1;
-      return (memcmp (a._data, b._data, a._nbytes) > 0 ? 1 : -1);
+      return (memcmp (a_data, b_data, a_nbytes) > 0 ? 1 : -1);
     }
-  else /* a._nbytes == b._nbytes */
+  else /* a_nbytes == b_nbytes */
     {
-      if (a._nbytes == 0)
+      if (a_nbytes == 0)
         return 0;
-      return memcmp (a._data, b._data, a._nbytes);
+      return memcmp (a_data, b_data, a_nbytes);
     }
 }
 
-ptrdiff_t
-string_desc_index (string_desc_t s, char c)
+int
+_sd_c_casecmp (idx_t a_nbytes, const char *a_data,
+               idx_t b_nbytes, const char *b_data)
 {
-  if (s._nbytes > 0)
+  /* Don't use memcasecmp here, since it uses the current locale, not the
+     "C" locale.  */
+  idx_t n = (a_nbytes < b_nbytes ? a_nbytes : b_nbytes);
+  for (idx_t i = 0; i < n; i++)
     {
-      void *found = memchr (s._data, (unsigned char) c, s._nbytes);
+      int ac = c_tolower ((unsigned char) a_data[i]);
+      int bc = c_tolower ((unsigned char) b_data[i]);
+      if (ac != bc)
+        return (UCHAR_MAX <= INT_MAX ? ac - bc : _GL_CMP (ac, bc));
+    }
+  /* Found n = min (a_nbytes, b_nbytes) equal characters.  */
+  return _GL_CMP (a_nbytes, b_nbytes);
+}
+
+ptrdiff_t
+_sd_index (idx_t s_nbytes, const char *s_data, char c)
+{
+  if (s_nbytes > 0)
+    {
+      char const *found = memchr (s_data, (unsigned char) c, s_nbytes);
       if (found != NULL)
-        return (char *) found - s._data;
+        return found - s_data;
     }
   return -1;
 }
 
 ptrdiff_t
-string_desc_last_index (string_desc_t s, char c)
+_sd_last_index (idx_t s_nbytes, const char *s_data, char c)
 {
-  if (s._nbytes > 0)
+  if (s_nbytes > 0)
     {
-      void *found = memrchr (s._data, (unsigned char) c, s._nbytes);
+      void *found = memrchr (s_data, (unsigned char) c, s_nbytes);
       if (found != NULL)
-        return (char *) found - s._data;
+        return (char *) found - s_data;
     }
   return -1;
 }
 
 string_desc_t
-string_desc_new_empty (void)
+sd_new_empty (void)
 {
   string_desc_t result;
 
@@ -116,11 +137,52 @@ string_desc_new_empty (void)
   result._data = NULL;
 
   return result;
+}
 
+#if __GNUC__ >= 5
+# pragma GCC diagnostic push
+# pragma GCC diagnostic ignored "-Wdiscarded-qualifiers"
+#endif
+
+string_desc_t
+_sd_new_addr (idx_t n, const char *addr)
+{
+  string_desc_t result;
+
+  result._nbytes = n;
+  /* No, it is not a good idea to canonicalize (0, non-NULL) to (0, NULL).
+     Some functions that return a string_desc_t use a return value of (0, NULL)
+     to denote failure.  */
+#if 0
+  if (n == 0)
+    result._data = NULL;
+  else
+#endif
+    result._data = (char *) addr;
+
+  return result;
+}
+rw_string_desc_t
+_rwsd_new_addr (idx_t n, /*!*/const/*!*/ char *addr)
+{
+  rw_string_desc_t result;
+
+  result._nbytes = n;
+  /* No, it is not a good idea to canonicalize (0, non-NULL) to (0, NULL).
+     Some functions that return a rw_string_desc_t use a return value of
+     (0, NULL) to denote failure.  */
+#if 0
+  if (n == 0)
+    result._data = NULL;
+  else
+#endif
+    result._data = (char *) addr;
+
+  return result;
 }
 
 string_desc_t
-string_desc_from_c (const char *s)
+sd_from_c (const char *s)
 {
   string_desc_t result;
 
@@ -130,36 +192,25 @@ string_desc_from_c (const char *s)
   return result;
 }
 
-string_desc_t
-string_desc_substring (string_desc_t s, idx_t start, idx_t end)
-{
-  string_desc_t result;
-
-  if (!(start >= 0 && start <= end))
-    /* Invalid arguments.  */
-    abort ();
-
-  result._nbytes = end - start;
-  result._data = s._data + start;
-
-  return result;
-}
+#if __GNUC__ >= 5
+# pragma GCC diagnostic pop
+#endif
 
 int
-string_desc_write (int fd, string_desc_t s)
+_sd_write (int fd, idx_t s_nbytes, const char *s_data)
 {
-  if (s._nbytes > 0)
-    if (full_write (fd, s._data, s._nbytes) != s._nbytes)
+  if (s_nbytes > 0)
+    if (full_write (fd, s_data, s_nbytes) != s_nbytes)
       /* errno is set here.  */
       return -1;
   return 0;
 }
 
 int
-string_desc_fwrite (FILE *fp, string_desc_t s)
+_sd_fwrite (FILE *fp, idx_t s_nbytes, const char *s_data)
 {
-  if (s._nbytes > 0)
-    if (fwrite (s._data, 1, s._nbytes, fp) != s._nbytes)
+  if (s_nbytes > 0)
+    if (fwrite (s_data, 1, s_nbytes, fp) != s_nbytes)
       return -1;
   return 0;
 }
@@ -168,13 +219,13 @@ string_desc_fwrite (FILE *fp, string_desc_t s)
 /* ==== Memory-allocating operations on string descriptors ==== */
 
 int
-string_desc_new (string_desc_t *resultp, idx_t n)
+sd_new (rw_string_desc_t *resultp, idx_t n)
 {
-  string_desc_t result;
-
   if (!(n >= 0))
     /* Invalid argument.  */
     abort ();
+
+  rw_string_desc_t result;
 
   result._nbytes = n;
   if (n == 0)
@@ -191,24 +242,10 @@ string_desc_new (string_desc_t *resultp, idx_t n)
   return 0;
 }
 
-string_desc_t
-string_desc_new_addr (idx_t n, char *addr)
-{
-  string_desc_t result;
-
-  result._nbytes = n;
-  if (n == 0)
-    result._data = NULL;
-  else
-    result._data = addr;
-
-  return result;
-}
-
 int
-string_desc_new_filled (string_desc_t *resultp, idx_t n, char c)
+sd_new_filled (rw_string_desc_t *resultp, idx_t n, char c)
 {
-  string_desc_t result;
+  rw_string_desc_t result;
 
   result._nbytes = n;
   if (n == 0)
@@ -227,21 +264,20 @@ string_desc_new_filled (string_desc_t *resultp, idx_t n, char c)
 }
 
 int
-string_desc_copy (string_desc_t *resultp, string_desc_t s)
+_sd_copy (rw_string_desc_t *resultp, idx_t s_nbytes, const char *s_data)
 {
-  string_desc_t result;
-  idx_t n = s._nbytes;
+  rw_string_desc_t result;
 
-  result._nbytes = n;
-  if (n == 0)
+  result._nbytes = s_nbytes;
+  if (s_nbytes == 0)
     result._data = NULL;
   else
     {
-      result._data = (char *) imalloc (n);
+      result._data = (char *) imalloc (s_nbytes);
       if (result._data == NULL)
         /* errno is set here.  */
         return -1;
-      memcpy (result._data, s._data, n);
+      memcpy (result._data, s_data, s_nbytes);
     }
 
   *resultp = result;
@@ -249,52 +285,50 @@ string_desc_copy (string_desc_t *resultp, string_desc_t s)
 }
 
 int
-string_desc_concat (string_desc_t *resultp, idx_t n, string_desc_t string1, ...)
+sd_concat (rw_string_desc_t *resultp, idx_t n, /* [rw_]string_desc_t string1, */ ...)
 {
   if (n <= 0)
     /* Invalid argument.  */
     abort ();
 
   idx_t total = 0;
-  total += string1._nbytes;
-  if (n > 1)
-    {
-      va_list other_strings;
-      idx_t i;
-
-      va_start (other_strings, string1);
-      for (i = n - 1; i > 0; i--)
+  {
+    va_list strings;
+    va_start (strings, n);
+    string_desc_t string1 = va_arg (strings, string_desc_t);
+    total += string1._nbytes;
+    if (n > 1)
+      for (idx_t i = n - 1; i > 0; i--)
         {
-          string_desc_t arg = va_arg (other_strings, string_desc_t);
+          string_desc_t arg = va_arg (strings, string_desc_t);
           total += arg._nbytes;
         }
-      va_end (other_strings);
-    }
+    va_end (strings);
+  }
 
   char *combined = (char *) imalloc (total);
   if (combined == NULL)
     /* errno is set here.  */
     return -1;
   idx_t pos = 0;
-  memcpy (combined, string1._data, string1._nbytes);
-  pos += string1._nbytes;
-  if (n > 1)
-    {
-      va_list other_strings;
-      idx_t i;
-
-      va_start (other_strings, string1);
-      for (i = n - 1; i > 0; i--)
+  {
+    va_list strings;
+    va_start (strings, n);
+    string_desc_t string1 = va_arg (strings, string_desc_t);
+    memcpy (combined, string1._data, string1._nbytes);
+    pos += string1._nbytes;
+    if (n > 1)
+      for (idx_t i = n - 1; i > 0; i--)
         {
-          string_desc_t arg = va_arg (other_strings, string_desc_t);
+          string_desc_t arg = va_arg (strings, string_desc_t);
           if (arg._nbytes > 0)
             memcpy (combined + pos, arg._data, arg._nbytes);
           pos += arg._nbytes;
         }
-      va_end (other_strings);
-    }
+    va_end (strings);
+  }
 
-  string_desc_t result;
+  rw_string_desc_t result;
   result._nbytes = total;
   result._data = combined;
 
@@ -303,15 +337,15 @@ string_desc_concat (string_desc_t *resultp, idx_t n, string_desc_t string1, ...)
 }
 
 char *
-string_desc_c (string_desc_t s)
+_sd_c (idx_t s_nbytes, const char *s_data)
 {
-  idx_t n = s._nbytes;
+  idx_t n = s_nbytes;
   char *result = (char *) imalloc (n + 1);
   if (result == NULL)
     /* errno is set here.  */
     return NULL;
   if (n > 0)
-    memcpy (result, s._data, n);
+    memcpy (result, s_data, n);
   result[n] = '\0';
 
   return result;
@@ -321,7 +355,7 @@ string_desc_c (string_desc_t s)
 /* ==== Operations with side effects on string descriptors ==== */
 
 void
-string_desc_set_char_at (string_desc_t s, idx_t i, char c)
+sd_set_char_at (rw_string_desc_t s, idx_t i, char c)
 {
   if (!(i >= 0 && i < s._nbytes))
     /* Invalid argument.  */
@@ -330,7 +364,7 @@ string_desc_set_char_at (string_desc_t s, idx_t i, char c)
 }
 
 void
-string_desc_fill (string_desc_t s, idx_t start, idx_t end, char c)
+sd_fill (rw_string_desc_t s, idx_t start, idx_t end, char c)
 {
   if (!(start >= 0 && start <= end))
     /* Invalid arguments.  */
@@ -341,18 +375,18 @@ string_desc_fill (string_desc_t s, idx_t start, idx_t end, char c)
 }
 
 void
-string_desc_overwrite (string_desc_t s, idx_t start, string_desc_t t)
+_sd_overwrite (rw_string_desc_t s, idx_t start, idx_t t_nbytes, const char *t_data)
 {
-  if (!(start >= 0 && start + t._nbytes <= s._nbytes))
+  if (!(start >= 0 && start + t_nbytes <= s._nbytes))
     /* Invalid arguments.  */
     abort ();
 
-  if (t._nbytes > 0)
-    memcpy (s._data + start, t._data, t._nbytes);
+  if (t_nbytes > 0)
+    memcpy (s._data + start, t_data, t_nbytes);
 }
 
 void
-string_desc_free (string_desc_t s)
+sd_free (rw_string_desc_t s)
 {
   free (s._data);
 }

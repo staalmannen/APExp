@@ -1,5 +1,5 @@
 /* bitrotate.h - Rotate bits in integers
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -32,6 +32,11 @@ _GL_INLINE_HEADER_BEGIN
 #ifndef BITROTATE_INLINE
 # define BITROTATE_INLINE _GL_INLINE
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #ifdef UINT64_MAX
 /* Given an unsigned 64-bit argument X, return the value corresponding
@@ -134,6 +139,11 @@ rotr8 (uint8_t x, int n)
 {
   return (((unsigned int) x >> n) | ((unsigned int) x << (8 - n))) & UINT8_MAX;
 }
+
+
+#ifdef __cplusplus
+}
+#endif
 
 _GL_INLINE_HEADER_END
 

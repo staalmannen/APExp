@@ -1,6 +1,5 @@
 /* Sentence handling.
-   Copyright (C) 2015 Free Software Foundation, Inc.
-   Written by Daiki Ueno <ueno@gnu.org>, 2015.
+   Copyright (C) 2015-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,9 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+/* Written by Daiki Ueno.  */
+
+#include <config.h>
 
 /* Specification.  */
 #include "sentence.h"
@@ -82,10 +81,8 @@ sentence_end (const char *string, ucs4_t *ending_charp)
             }
 
           str += length;
-          continue;
         }
-
-      if (state == 1)
+      else if (state == 1)
         {
           switch (uc)
             {
@@ -120,10 +117,8 @@ sentence_end (const char *string, ucs4_t *ending_charp)
             }
 
           str += length;
-          continue;
         }
-
-      if (state == 2)
+      else if (state == 2)
         {
           switch (uc)
             {
@@ -157,10 +152,8 @@ sentence_end (const char *string, ucs4_t *ending_charp)
             }
 
           str += length;
-          continue;
         }
-
-      if (state == 4)
+      else if (state == 4)
         {
           switch (uc)
             {
@@ -185,7 +178,6 @@ sentence_end (const char *string, ucs4_t *ending_charp)
             }
 
           str += length;
-          continue;
         }
     }
 

@@ -1,5 +1,5 @@
 /* Test of getting random bytes.
-   Copyright (C) 2020-2024 Free Software Foundation, Inc.
+   Copyright (C) 2020-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -84,9 +84,11 @@ main (void)
   if (getrandom (buf1, 1, 0) < 1)
     if (getrandom (buf1, 1, GRND_RANDOM) < 1)
       {
+        if (test_exit_status != EXIT_SUCCESS)
+          return test_exit_status;
         fputs ("Skipping test: getrandom is ineffective\n", stderr);
         return 77;
       }
 
-  return 0;
+  return test_exit_status;
 }

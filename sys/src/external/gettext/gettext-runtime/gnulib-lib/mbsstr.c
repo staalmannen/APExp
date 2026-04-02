@@ -1,5 +1,5 @@
 /* Searching in a string.  -*- coding: utf-8 -*-
-   Copyright (C) 2005-2024 Free Software Foundation, Inc.
+   Copyright (C) 2005-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2005.
 
    This file is free software: you can redistribute it and/or modify
@@ -15,6 +15,9 @@
    You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Don't use the const-improved function macros in this compilation unit.  */
+#define _GL_NO_CONST_GENERICS
+
 #include <config.h>
 
 /* Specification.  */
@@ -28,7 +31,7 @@
 #if GNULIB_MCEL_PREFER
 # include "mcel.h"
 typedef mcel_t mbchar_t;
-static bool mb_equal (mcel_t a, mcel_t b) { return mcel_cmp (a, b) == 0; }
+static bool mb_equal (mcel_t a, mcel_t b) { return mcel_eq (a, b); }
 #else
 # include "mbuiter.h"
 #endif
@@ -56,11 +59,10 @@ knuth_morris_pratt_multibyte (const char *haystack, const char *needle,
   /* Allocate room for needle_mbchars and the table.  */
   void *memory = nmalloca (m + !!extra_align,
                            sizeof (mbchar_t) + sizeof (size_t));
-  void *table_memory;
   if (memory == NULL)
     return false;
   needle_mbchars = memory;
-  table_memory = needle_mbchars + m;
+  void *table_memory = needle_mbchars + m;
   char *aligned = table_memory;
   aligned += extra_align;
   aligned -= (uintptr_t) aligned % alignof (size_t);
@@ -73,9 +75,7 @@ knuth_morris_pratt_multibyte (const char *haystack, const char *needle,
 #else
   {
     mbui_iterator_t iter;
-    size_t j;
-
-    j = 0;
+    size_t j = 0;
     for (mbui_init (iter, needle); mbui_avail (iter); mbui_advance (iter), j++)
       mb_copy (&needle_mbchars[j], &mbui_cur (iter));
   }
@@ -97,13 +97,13 @@ knuth_morris_pratt_multibyte (const char *haystack, const char *needle,
           forall 0 <= x < table[i]: rhaystack[x..x+m-1] != needle[0..m-1].
      table[0] remains uninitialized.  */
   {
-    size_t i, j;
+    size_t j;
 
     /* i = 1: Nothing to verify for x = 0.  */
     table[1] = 1;
     j = 0;
 
-    for (i = 2; i < m; i++)
+    for (size_t i = 2; i < m; i++)
       {
         /* Here: j = i-1 - table[i-1].
            The inequality needle[x..i-1] != needle[0..i-1-x] is known to hold
@@ -151,11 +151,10 @@ knuth_morris_pratt_multibyte (const char *haystack, const char *needle,
   /* Search, using the table to accelerate the processing.  */
   {
 #if GNULIB_MCEL_PREFER
-    size_t j;
     char const *rhaystack = haystack;
     char const *phaystack = haystack;
 
-    j = 0;
+    size_t j = 0;
     /* Invariant: phaystack = rhaystack + j.  */
     for (;;)
       {
@@ -165,7 +164,7 @@ knuth_morris_pratt_multibyte (const char *haystack, const char *needle,
             break;
           }
         mcel_t g = mcel_scanz (phaystack);
-        if (mcel_cmp (needle_mbchars[j], g) == 0)
+        if (mcel_eq (needle_mbchars[j], g))
           {
             j++;
             /* Exit loop successfully if the entire needle has been found.  */
@@ -190,13 +189,11 @@ knuth_morris_pratt_multibyte (const char *haystack, const char *needle,
       }
     *resultp = rhaystack;
 #else
-    size_t j;
-    mbui_iterator_t rhaystack;
-    mbui_iterator_t phaystack;
-
     *resultp = NULL;
-    j = 0;
+    size_t j = 0;
+    mbui_iterator_t rhaystack;
     mbui_init (rhaystack, haystack);
+    mbui_iterator_t phaystack;
     mbui_init (phaystack, haystack);
     /* Invariant: phaystack = rhaystack + j.  */
     while (mbui_avail (phaystack))
@@ -280,7 +277,7 @@ mbsstr (const char *haystack, const char *needle)
 
       char const *iter_haystack = haystack;
 
-      for (mcel_t hg; *iter_haystack; iter_haystack += hg.len)
+      for (; *iter_haystack; )
         {
           /* See whether it's advisable to use an asymptotically faster
              algorithm.  */
@@ -309,8 +306,8 @@ mbsstr (const char *haystack, const char *needle)
 
           outer_loop_count++;
           comparison_count++;
-          hg = mcel_scanz (iter_haystack);
-          if (mcel_cmp (hg, ng) == 0)
+          mcel_t hg = mcel_scanz (iter_haystack);
+          if (mcel_eq (hg, ng))
             /* The first character matches.  */
             {
               char const *rhaystack = iter_haystack + hg.len;
@@ -326,14 +323,15 @@ mbsstr (const char *haystack, const char *needle)
                   rng = mcel_scanz (rneedle); rneedle += rng.len;
                   comparison_count++;
                 }
-              while (mcel_cmp (rhg, rng) == 0);
+              while (mcel_eq (rhg, rng));
             }
+
+          iter_haystack += hg.len;
         }
 
       return NULL;
 #else
       mbui_iterator_t iter_needle;
-
       mbui_init (iter_needle, needle);
       if (mbui_avail (iter_needle))
         {
@@ -355,11 +353,11 @@ mbsstr (const char *haystack, const char *needle)
           size_t outer_loop_count = 0;
           size_t comparison_count = 0;
           size_t last_ccount = 0;                  /* last comparison count */
+
           mbui_iterator_t iter_needle_last_ccount; /* = needle + last_ccount */
+          mbui_init (iter_needle_last_ccount, needle);
 
           mbui_iterator_t iter_haystack;
-
-          mbui_init (iter_needle_last_ccount, needle);
           mbui_init (iter_haystack, haystack);
           for (;; mbui_advance (iter_haystack))
             {
@@ -400,11 +398,10 @@ mbsstr (const char *haystack, const char *needle)
                 /* The first character matches.  */
                 {
                   mbui_iterator_t rhaystack;
-                  mbui_iterator_t rneedle;
-
                   memcpy (&rhaystack, &iter_haystack, sizeof (mbui_iterator_t));
                   mbui_advance (rhaystack);
 
+                  mbui_iterator_t rneedle;
                   mbui_init (rneedle, needle);
                   if (!mbui_avail (rneedle))
                     abort ();

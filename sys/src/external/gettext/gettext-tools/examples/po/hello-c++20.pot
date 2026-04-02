@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: hello-c++20 0\n"
 "Report-Msgid-Bugs-To: bug-gettext@gnu.org\n"
-"POT-Creation-Date: 2023-09-18 23:32+0200\n"
+"POT-Creation-Date: 2025-10-01 13:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: hello-c++20/hello.cc:36
+#: hello-c++20/hello.cc:48
 msgid "Hello, world!"
 msgstr ""
 
-#: hello-c++20/hello.cc:37
+#: hello-c++20/hello.cc:50 hello-c++20/hello.cc:53
 #, c++-format
 msgid "This program is running as process number {:d}."
 msgstr ""

@@ -66,7 +66,7 @@ CLASSPATH=../../../gettext-runtime/intl-java/libintl.jar ${JAVACOMP} -d . Progra
 ${XGETTEXT} -o prog.tmp --omit-header --no-location Program.java || Exit 1
 LC_ALL=C tr -d '\r' < prog.tmp > prog.pot || Exit 1
 
-cat <<EOF > prog.ok
+cat <<\EOF > prog.ok
 msgid "'Your command, please?', asked the waiter."
 msgstr ""
 
@@ -160,7 +160,7 @@ LC_ALL=C tr -d '\r' < fr.po.tmp > fr.po.new || Exit 1
 ${DIFF} fr.po fr.po.new || Exit 1
 
 : ${MSGFMT=msgfmt}
-${MSGFMT} -j -d . -r prog -l fr fr.po || Exit 1
+${MSGFMT} -c -j -d . -r prog -l fr fr.po || Exit 1
 
 # Test which of the fr_FR locales are installed.
 : ${LOCALE_FR=fr_FR}
@@ -212,15 +212,29 @@ EOF
 
 : ${LOCALE_FR=fr_FR}
 : ${LOCALE_FR_UTF8=fr_FR.UTF-8}
+# Java on Windows (a native Windows program) does not support the native Windows
+# locale name French_France.65001. It produces ISO-8859-1 encoded output
+# nevertheless.
+case "$host_os" in
+  mingw* | windows*) LOCALE_FR_UTF8=none ;;
+esac
 : ${JAVAEXEC="/bin/sh ../../javaexec.sh"}
 if test $LOCALE_FR != none; then
-  prepare_locale_ fr $LOCALE_FR
-  LANGUAGE= LC_ALL=$LOCALE_FR CLASSPATH=.:../../../gettext-runtime/intl-java/libintl.jar ${JAVAEXEC} Program 2 ISO-8859-1 > prog.out || Exit 1
+  LANGUAGE= LC_ALL=$LOCALE_FR CLASSPATH=".${CLASSPATH_SEPARATOR}../../../gettext-runtime/intl-java/libintl.jar" ${JAVAEXEC} Program 2 ISO-8859-1 > prog.tmp || Exit 1
+  case "$host_os" in
+    mingw* | windows*)
+      LC_ALL=C tr -d '\r' < prog.tmp > prog.out || Exit 1 ;;
+    *) cp prog.tmp prog.out || Exit 1 ;;
+  esac
   ${DIFF} prog.ok prog.out || Exit 1
 fi
 if test $LOCALE_FR_UTF8 != none; then
-  prepare_locale_ fr $LOCALE_FR_UTF8
-  LANGUAGE= LC_ALL=$LOCALE_FR_UTF8 CLASSPATH=.:../../../gettext-runtime/intl-java/libintl.jar ${JAVAEXEC} Program 2 UTF-8 > prog.out || Exit 1
+  LANGUAGE= LC_ALL=$LOCALE_FR_UTF8 CLASSPATH=".${CLASSPATH_SEPARATOR}../../../gettext-runtime/intl-java/libintl.jar" ${JAVAEXEC} Program 2 UTF-8 > prog.tmp || Exit 1
+  case "$host_os" in
+    mingw* | windows*)
+      LC_ALL=C tr -d '\r' < prog.tmp > prog.out || Exit 1 ;;
+    *) cp prog.tmp prog.out || Exit 1 ;;
+  esac
   ${DIFF} prog.oku prog.out || Exit 1
 fi
 

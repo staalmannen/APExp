@@ -1,5 +1,5 @@
 /* Multithread-safety test for setlocale_null_r (LC_xxx, ...).
-   Copyright (C) 2019-2024 Free Software Foundation, Inc.
+   Copyright (C) 2019-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 #include <config.h>
 
 /* Work around GCC bug 44511.  */
-#if 4 < __GNUC__ + (3 <= __GNUC_MINOR__)
+#if _GL_GNUC_PREREQ (4, 3)
 # pragma GCC diagnostic ignored "-Wreturn-type"
 #endif
 
@@ -51,9 +51,7 @@
 # define ENGLISH "en_US"
 # define GERMAN  "de_DE"
 # define FRENCH  "fr_FR"
-# if defined __sgi
-#  define ENCODING ".ISO8859-15"
-# elif defined __hpux
+# if defined __hpux
 #  define ENCODING ".utf8"
 # else
 #  define ENCODING ".UTF-8"
@@ -160,7 +158,6 @@ NetBSD               OK
 OpenBSD              crash < 1 sec
 AIX                  crash < 2 sec
 HP-UX                OK
-IRIX                 OK
 Solaris 10           OK
 Solaris 11.0         OK
 Solaris 11.4         OK

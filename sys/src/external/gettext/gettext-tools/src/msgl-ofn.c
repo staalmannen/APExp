@@ -1,5 +1,5 @@
 /* Message list test for ordinary file names.
-   Copyright (C) 2021 Free Software Foundation, Inc.
+   Copyright (C) 2021-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,12 +14,10 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-/* Written by Bruno Haible <bruno@clisp.org>, 2021.  */
+/* Written by Bruno Haible.  */
 
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+#include <config.h>
 
 /* Specification.  */
 #include "msgl-ofn.h"
@@ -28,12 +26,11 @@
 
 
 bool
-message_has_filenames_with_spaces (message_ty *mp)
+message_has_filenames_with_spaces (const message_ty *mp)
 {
   size_t n = mp->filepos_count;
-  size_t i;
 
-  for (i = 0; i < n; i++)
+  for (size_t i = 0; i < n; i++)
     if (pos_filename_has_spaces (&mp->filepos[i]))
       return true;
 
@@ -41,11 +38,9 @@ message_has_filenames_with_spaces (message_ty *mp)
 }
 
 bool
-message_list_has_filenames_with_spaces (message_list_ty *mlp)
+message_list_has_filenames_with_spaces (const message_list_ty *mlp)
 {
-  size_t j;
-
-  for (j = 0; j < mlp->nitems; j++)
+  for (size_t j = 0; j < mlp->nitems; j++)
     if (message_has_filenames_with_spaces (mlp->item[j]))
       return true;
 
@@ -53,11 +48,9 @@ message_list_has_filenames_with_spaces (message_list_ty *mlp)
 }
 
 bool
-msgdomain_list_has_filenames_with_spaces (msgdomain_list_ty *mdlp)
+msgdomain_list_has_filenames_with_spaces (const msgdomain_list_ty *mdlp)
 {
-  size_t k;
-
-  for (k = 0; k < mdlp->nitems; k++)
+  for (size_t k = 0; k < mdlp->nitems; k++)
     if (message_list_has_filenames_with_spaces (mdlp->item[k]->messages))
       return true;
 

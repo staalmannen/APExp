@@ -1,5 +1,5 @@
 /* Test of test for initial conversion state.
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,7 +38,7 @@ main (int argc, char *argv[])
 
   if (argc > 1)
     {
-      static const char input[1] = "\303";
+      static const char input[1] = {'\303'};
       wchar_t wc;
       size_t ret;
 
@@ -51,5 +51,5 @@ main (int argc, char *argv[])
       ASSERT (!mbsinit (&state));
     }
 
-  return 0;
+  return test_exit_status;
 }

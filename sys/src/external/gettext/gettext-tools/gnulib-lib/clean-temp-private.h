@@ -1,5 +1,5 @@
 /* Private interface between modules 'clean-temp-simple' and 'clean-temp'.
-   Copyright (C) 2006-2024 Free Software Foundation, Inc.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -67,9 +67,6 @@ struct closeable_fd
 };
 #define descriptors clean_temp_descriptors
 extern gl_list_t /* <closeable_fd *> */ volatile descriptors;
-
-extern bool clean_temp_string_equals (const void *x1, const void *x2);
-extern size_t clean_temp_string_hash (const void *x);
 
 extern _GL_ASYNC_SAFE int clean_temp_asyncsafe_close (struct closeable_fd *element);
 extern void clean_temp_init_asyncsafe_close (void);

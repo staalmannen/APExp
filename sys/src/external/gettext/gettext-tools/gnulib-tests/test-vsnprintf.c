@@ -1,5 +1,5 @@
 /* Test of vsnprintf() function.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -44,13 +44,12 @@ int
 main (int argc, char *argv[])
 {
   char buf[8];
-  int size;
   int retval;
 
   retval = my_snprintf (NULL, 0, "%d", 12345);
   ASSERT (retval == 5);
 
-  for (size = 0; size <= 8; size++)
+  for (int size = 0; size <= 8; size++)
     {
       memcpy (buf, "DEADBEEF", 8);
       retval = my_snprintf (buf, size, "%d", 12345);
@@ -81,5 +80,5 @@ main (int argc, char *argv[])
     ASSERT (retval == strlen (result));
   }
 
-  return 0;
+  return test_exit_status;
 }

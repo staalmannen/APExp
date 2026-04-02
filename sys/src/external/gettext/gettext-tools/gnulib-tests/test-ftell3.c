@@ -1,5 +1,5 @@
 /* Test of ftell() function.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -69,10 +69,12 @@ main (void)
   /* The file's contents is now "foogarsh!".  */
 
   remove (TESTFILE);
-  return 0;
+  return test_exit_status;
 
  skip:
-  fprintf (stderr, "Skipping test: prerequisite file operations failed.\n");
   remove (TESTFILE);
+  if (test_exit_status != EXIT_SUCCESS)
+    return test_exit_status;
+  fprintf (stderr, "Skipping test: prerequisite file operations failed.\n");
   return 77;
 }

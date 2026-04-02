@@ -1,5 +1,5 @@
 /* Test of posix_spawn() function with 'open' action and O_APPEND flag.
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -38,7 +38,9 @@ static int
 parent_main (void)
 {
   FILE *fp;
-  char *argv[3] = { CHILD_PROGRAM_FILENAME, "-child", NULL };
+  char argv0[] = CHILD_PROGRAM_FILENAME;
+  char argv1[] = "-child";
+  char *argv[] = { argv0, argv1, NULL };
   posix_spawn_file_actions_t actions;
   bool actions_allocated;
   int err;

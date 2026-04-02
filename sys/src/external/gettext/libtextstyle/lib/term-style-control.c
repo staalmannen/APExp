@@ -1,5 +1,5 @@
 /* Terminal control for outputting styled text to a terminal.
-   Copyright (C) 2006-2008, 2017, 2019-2024 Free Software Foundation, Inc.
+   Copyright (C) 2006-2008, 2017, 2019-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2019.
 
    This program is free software: you can redistribute it and/or modify
@@ -119,10 +119,6 @@ static _GL_ASYNC_SAFE void
 sprintf_integer (char *str, int x)
 {
   unsigned int y;
-  char buf[20];
-  char *p;
-  size_t n;
-
   if (x < 0)
     {
       *str++ = '-';
@@ -131,14 +127,15 @@ sprintf_integer (char *str, int x)
   else
     y = x;
 
-  p = buf + sizeof (buf);
+  char buf[20];
+  char *p = buf + sizeof (buf);
   do
     {
       *--p = '0' + (y % 10);
       y = y / 10;
     }
   while (y > 0);
-  n = buf + sizeof (buf) - p;
+  size_t n = buf + sizeof (buf) - p;
   memcpy (str, p, n);
   str[n] = '\0';
 }
@@ -555,15 +552,14 @@ init_relevant_signal_set ()
     {
       int fatal_signals[64];
       size_t num_fatal_signals;
-      size_t i;
 
       num_fatal_signals = get_fatal_signals (fatal_signals);
 
       sigemptyset (&relevant_signal_set);
-      for (i = 0; i < num_fatal_signals; i++)
+      for (size_t i = 0; i < num_fatal_signals; i++)
         sigaddset (&relevant_signal_set, fatal_signals[i]);
       #if defined SIGCONT
-      for (i = 0; i < num_job_control_signals; i++)
+      for (size_t i = 0; i < num_job_control_signals; i++)
         sigaddset (&relevant_signal_set, job_control_signals[i]);
       #endif
 
@@ -658,15 +654,13 @@ fatal_or_stopping_signal_handler (int sig)
   if (active_controller != NULL
       && active_control_data->tty_control != TTYCTL_NONE)
     {
-      unsigned int i;
-
       /* Block the relevant signals.  This is needed, because the output
          of escape sequences below (usually through tputs invocations) is
          not reentrant.  */
       block_relevant_signals ();
 
       /* Restore the terminal to the default state.  */
-      for (i = 0; i < 2; i++)
+      for (unsigned int i = 0; i < 2; i++)
         active_controller->async_restore (active_user_data);
       #if HAVE_TCGETATTR
       if (active_control_data->tty_control == TTYCTL_FULL)
@@ -735,27 +729,23 @@ continuing_signal_handler (int sigcont)
       && active_control_data->tty_control != TTYCTL_NONE)
     {
       /* Reinstall the signals handlers removed in stopping_signal_handler.  */
-      {
-        unsigned int i;
+      for (unsigned int i = 0; i < num_job_control_signals; i++)
+        {
+          int sig = job_control_signals[i];
 
-        for (i = 0; i < num_job_control_signals; i++)
-          {
-            int sig = job_control_signals[i];
-
-            if (sig != SIGCONT && !is_ignored (sig))
-              {
-                struct sigaction action;
-                action.sa_handler = &stopping_signal_handler;
-                /* If we get a stopping or continuing signal while executing
-                   stopping_signal_handler or continuing_signal_handler, enter
-                   it recursively, since it is reentrant.
-                   Hence no SA_RESETHAND.  */
-                action.sa_flags = SA_NODEFER;
-                sigemptyset (&action.sa_mask);
-                sigaction (sig, &action, NULL);
-              }
-          }
-      }
+          if (sig != SIGCONT && !is_ignored (sig))
+            {
+              struct sigaction action;
+              action.sa_handler = &stopping_signal_handler;
+              /* If we get a stopping or continuing signal while executing
+                 stopping_signal_handler or continuing_signal_handler, enter
+                 it recursively, since it is reentrant.
+                 Hence no SA_RESETHAND.  */
+              action.sa_flags = SA_NODEFER;
+              sigemptyset (&action.sa_mask);
+              sigaction (sig, &action, NULL);
+            }
+        }
 
       /* Block the relevant signals.  This is needed, because the output of
          escape sequences done inside the async_set_attributes_from_default
@@ -822,37 +812,33 @@ ensure_other_signal_handlers (void)
       #if defined SIGCONT
 
       /* Install the handlers for the stopping and continuing signals.  */
-      {
-        unsigned int i;
+      for (unsigned int i = 0; i < num_job_control_signals; i++)
+        {
+          int sig = job_control_signals[i];
 
-        for (i = 0; i < num_job_control_signals; i++)
-          {
-            int sig = job_control_signals[i];
-
-            if (sig == SIGCONT)
-              /* Already handled in ensure_continuing_signal_handler.  */
-              ;
-            else if (!is_ignored (sig))
-              {
-                struct sigaction action;
-                action.sa_handler = &stopping_signal_handler;
-                /* If we get a stopping or continuing signal while executing
-                   stopping_signal_handler, enter it recursively, since it is
-                   reentrant.  Hence no SA_RESETHAND.  */
-                action.sa_flags = SA_NODEFER;
-                sigemptyset (&action.sa_mask);
-                sigaction (sig, &action, NULL);
-              }
-            #if DEBUG_SIGNALS
-            else
-              {
-                fprintf (stderr, "Signal %d is ignored. Not installing a handler!\n",
-                         sig);
-                fflush (stderr);
-              }
-            #endif
-          }
-      }
+          if (sig == SIGCONT)
+            /* Already handled in ensure_continuing_signal_handler.  */
+            ;
+          else if (!is_ignored (sig))
+            {
+              struct sigaction action;
+              action.sa_handler = &stopping_signal_handler;
+              /* If we get a stopping or continuing signal while executing
+                 stopping_signal_handler, enter it recursively, since it is
+                 reentrant.  Hence no SA_RESETHAND.  */
+              action.sa_flags = SA_NODEFER;
+              sigemptyset (&action.sa_mask);
+              sigaction (sig, &action, NULL);
+            }
+          #if DEBUG_SIGNALS
+          else
+            {
+              fprintf (stderr, "Signal %d is ignored. Not installing a handler!\n",
+                       sig);
+              fflush (stderr);
+            }
+          #endif
+        }
 
       #endif
 

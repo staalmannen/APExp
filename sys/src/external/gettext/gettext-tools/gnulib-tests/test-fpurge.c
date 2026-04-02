@@ -1,5 +1,5 @@
 /* Test of fpurge() function.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,9 +32,7 @@
 int
 main (void)
 {
-  int check_filepos;
-
-  for (check_filepos = 0; check_filepos <= 1; check_filepos++)
+  for (int check_filepos = 0; check_filepos <= 1; check_filepos++)
     {
       FILE *fp;
 
@@ -125,10 +123,12 @@ main (void)
     }
 
   remove (TESTFILE);
-  return 0;
+  return test_exit_status;
 
  skip:
-  fprintf (stderr, "Skipping test: prerequisite file operations failed.\n");
   remove (TESTFILE);
+  if (test_exit_status != EXIT_SUCCESS)
+    return test_exit_status;
+  fprintf (stderr, "Skipping test: prerequisite file operations failed.\n");
   return 77;
 }

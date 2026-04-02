@@ -1,5 +1,5 @@
 /* Return the canonical absolute name of a given file.
-   Copyright (C) 1996-2024 Free Software Foundation, Inc.
+   Copyright (C) 1996-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
@@ -191,11 +191,6 @@ struct realpath_bufs
 static char *
 realpath_stk (const char *name, char *resolved, struct realpath_bufs *bufs)
 {
-  char *dest;
-  char const *start;
-  char const *end;
-  int num_links = 0;
-
   if (name == NULL)
     {
       /* As per Single Unix Specification V2 we must return an error if
@@ -215,12 +210,15 @@ realpath_stk (const char *name, char *resolved, struct realpath_bufs *bufs)
     }
 
   char *rname = bufs->rname.data;
-  bool end_in_extra_buffer = false;
-  bool failed = true;
 
   /* This is always zero for Posix hosts, but can be 2 for MS-Windows
      and MS-DOS X:/foo/bar file names.  */
-  idx_t prefix_len = FILE_SYSTEM_PREFIX_LEN (name);
+  idx_t prefix_len;
+
+  char *dest;
+  char const *start;
+
+  bool failed = true;
 
   if (!IS_ABSOLUTE_FILE_NAME (name))
     {
@@ -235,13 +233,14 @@ realpath_stk (const char *name, char *resolved, struct realpath_bufs *bufs)
             return NULL;
           rname = bufs->rname.data;
         }
-      dest = (char *) __rawmemchr (rname, '\0');
+      dest = __rawmemchr (rname, '\0');
       start = name;
       prefix_len = FILE_SYSTEM_PREFIX_LEN (rname);
     }
   else
     {
-      dest = (char *) __mempcpy (rname, name, prefix_len);
+      prefix_len = FILE_SYSTEM_PREFIX_LEN (name);
+      dest = __mempcpy (rname, name, prefix_len);
       *dest++ = '/';
       if (DOUBLE_SLASH_IS_DISTINCT_ROOT)
         {
@@ -253,13 +252,17 @@ realpath_stk (const char *name, char *resolved, struct realpath_bufs *bufs)
       start = name + prefix_len;
     }
 
-  for ( ; *start; start = end)
+  int num_links = 0;
+  bool end_in_extra_buffer = false;
+
+  for (; *start;)
     {
       /* Skip sequence of multiple file name separators.  */
       while (ISSLASH (*start))
         ++start;
 
       /* Find end of component.  */
+      char const *end;
       for (end = start; *end && !ISSLASH (*end); ++end)
         /* Nothing.  */;
 
@@ -297,7 +300,7 @@ realpath_stk (const char *name, char *resolved, struct realpath_bufs *bufs)
               dest = rname + dest_offset;
             }
 
-          dest = (char *) __mempcpy (dest, start, startlen);
+          dest = __mempcpy (dest, start, startlen);
           *dest = '\0';
 
           char *buf;
@@ -350,7 +353,7 @@ realpath_stk (const char *name, char *resolved, struct realpath_bufs *bufs)
                 {
                   idx_t pfxlen = FILE_SYSTEM_PREFIX_LEN (buf);
 
-                  dest = (char *) __mempcpy (rname, buf, pfxlen);
+                  dest = __mempcpy (rname, buf, pfxlen);
                   *dest++ = '/'; /* It's an absolute symlink */
                   if (DOUBLE_SLASH_IS_DISTINCT_ROOT)
                     {
@@ -378,6 +381,8 @@ realpath_stk (const char *name, char *resolved, struct realpath_bufs *bufs)
                       : errno == EINVAL))
             goto error;
         }
+
+      start = end;
     }
   if (dest > rname + prefix_len + 1 && ISSLASH (dest[-1]))
     --dest;

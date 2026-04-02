@@ -1,5 +1,5 @@
 /* Test of c32isalpha() function.
-   Copyright (C) 2020-2024 Free Software Foundation, Inc.
+   Copyright (C) 2020-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -68,66 +68,62 @@ main (int argc, char *argv[])
        - in the "POSIX" locale (which is usually the same as the "C" locale),
          the alphabetic characters include only the ASCII A ... Z and a ... z
          characters.  */
-  {
-    int c;
-
-    for (c = 0; c < 0x100; c++)
-      switch (c)
-        {
-        case '\t': case '\v': case '\f':
-        case ' ': case '!': case '"': case '#': case '%':
-        case '&': case '\'': case '(': case ')': case '*':
-        case '+': case ',': case '-': case '.': case '/':
-        case '0': case '1': case '2': case '3': case '4':
-        case '5': case '6': case '7': case '8': case '9':
-        case ':': case ';': case '<': case '=': case '>':
-        case '?':
-        case 'A': case 'B': case 'C': case 'D': case 'E':
-        case 'F': case 'G': case 'H': case 'I': case 'J':
-        case 'K': case 'L': case 'M': case 'N': case 'O':
-        case 'P': case 'Q': case 'R': case 'S': case 'T':
-        case 'U': case 'V': case 'W': case 'X': case 'Y':
-        case 'Z':
-        case '[': case '\\': case ']': case '^': case '_':
-        case 'a': case 'b': case 'c': case 'd': case 'e':
-        case 'f': case 'g': case 'h': case 'i': case 'j':
-        case 'k': case 'l': case 'm': case 'n': case 'o':
-        case 'p': case 'q': case 'r': case 's': case 't':
-        case 'u': case 'v': case 'w': case 'x': case 'y':
-        case 'z': case '{': case '|': case '}': case '~':
-          /* c is in the ISO C "basic character set".  */
-          buf[0] = (unsigned char) c;
-          is = for_character (buf, 1);
-          switch (c)
-            {
-            case 'A': case 'B': case 'C': case 'D': case 'E':
-            case 'F': case 'G': case 'H': case 'I': case 'J':
-            case 'K': case 'L': case 'M': case 'N': case 'O':
-            case 'P': case 'Q': case 'R': case 'S': case 'T':
-            case 'U': case 'V': case 'W': case 'X': case 'Y':
-            case 'Z':
-            case 'a': case 'b': case 'c': case 'd': case 'e':
-            case 'f': case 'g': case 'h': case 'i': case 'j':
-            case 'k': case 'l': case 'm': case 'n': case 'o':
-            case 'p': case 'q': case 'r': case 's': case 't':
-            case 'u': case 'v': case 'w': case 'x': case 'y':
-            case 'z':
-              ASSERT (is != 0);
-              break;
-            default:
-              ASSERT (is == 0);
-              break;
-            }
-          break;
-        }
-  }
+  for (int c = 0; c < 0x100; c++)
+    switch (c)
+      {
+      case '\t': case '\v': case '\f':
+      case ' ': case '!': case '"': case '#': case '%':
+      case '&': case '\'': case '(': case ')': case '*':
+      case '+': case ',': case '-': case '.': case '/':
+      case '0': case '1': case '2': case '3': case '4':
+      case '5': case '6': case '7': case '8': case '9':
+      case ':': case ';': case '<': case '=': case '>':
+      case '?':
+      case 'A': case 'B': case 'C': case 'D': case 'E':
+      case 'F': case 'G': case 'H': case 'I': case 'J':
+      case 'K': case 'L': case 'M': case 'N': case 'O':
+      case 'P': case 'Q': case 'R': case 'S': case 'T':
+      case 'U': case 'V': case 'W': case 'X': case 'Y':
+      case 'Z':
+      case '[': case '\\': case ']': case '^': case '_':
+      case 'a': case 'b': case 'c': case 'd': case 'e':
+      case 'f': case 'g': case 'h': case 'i': case 'j':
+      case 'k': case 'l': case 'm': case 'n': case 'o':
+      case 'p': case 'q': case 'r': case 's': case 't':
+      case 'u': case 'v': case 'w': case 'x': case 'y':
+      case 'z': case '{': case '|': case '}': case '~':
+        /* c is in the ISO C "basic character set".  */
+        buf[0] = (unsigned char) c;
+        is = for_character (buf, 1);
+        switch (c)
+          {
+          case 'A': case 'B': case 'C': case 'D': case 'E':
+          case 'F': case 'G': case 'H': case 'I': case 'J':
+          case 'K': case 'L': case 'M': case 'N': case 'O':
+          case 'P': case 'Q': case 'R': case 'S': case 'T':
+          case 'U': case 'V': case 'W': case 'X': case 'Y':
+          case 'Z':
+          case 'a': case 'b': case 'c': case 'd': case 'e':
+          case 'f': case 'g': case 'h': case 'i': case 'j':
+          case 'k': case 'l': case 'm': case 'n': case 'o':
+          case 'p': case 'q': case 'r': case 's': case 't':
+          case 'u': case 'v': case 'w': case 'x': case 'y':
+          case 'z':
+            ASSERT (is != 0);
+            break;
+          default:
+            ASSERT (is == 0);
+            break;
+          }
+        break;
+      }
 
   if (argc > 1)
     switch (argv[1][0])
       {
       case '0':
         /* C locale; tested above.  */
-        return 0;
+        return test_exit_status;
 
       case '1':
         /* Locale encoding is ISO-8859-1 or ISO-8859-15.  */
@@ -139,7 +135,7 @@ main (int argc, char *argv[])
           is = for_character ("\330", 1);
           ASSERT (is != 0);
         }
-        return 0;
+        return test_exit_status;
 
       case '2':
         /* Locale encoding is EUC-JP.  */
@@ -169,7 +165,7 @@ main (int argc, char *argv[])
           ASSERT (is != 0);
         #endif
         }
-        return 0;
+        return test_exit_status;
 
       case '3':
         /* Locale encoding is UTF-8.  */
@@ -186,7 +182,7 @@ main (int argc, char *argv[])
           /* U+3001 IDEOGRAPHIC COMMA */
           is = for_character ("\343\200\201", 3);
           ASSERT (is == 0);
-        #if !(defined __GLIBC__ || defined MUSL_LIBC || (defined __APPLE__ && defined __MACH__) || defined __FreeBSD__ || defined __NetBSD__ || defined _AIX || defined __sun || defined __CYGWIN__)
+        #if !(defined __GLIBC__ || defined MUSL_LIBC || (defined __APPLE__ && defined __MACH__) || defined __FreeBSD__ || defined __NetBSD__ || defined __OpenBSD__ || defined _AIX || defined __sun || defined __CYGWIN__ || defined __ANDROID__)
           /* U+FF11 FULLWIDTH DIGIT ONE */
           is = for_character ("\357\274\221", 3);
           ASSERT (is == 0);
@@ -206,11 +202,13 @@ main (int argc, char *argv[])
           is = for_character ("\363\240\201\241", 4);
           ASSERT (is == 0);
         }
-        return 0;
+        return test_exit_status;
 
       case '4':
         /* Locale encoding is GB18030.  */
         #if (defined __GLIBC__ && __GLIBC__ == 2 && __GLIBC_MINOR__ >= 13 && __GLIBC_MINOR__ <= 15) || (GL_CHAR32_T_IS_UNICODE && (defined __FreeBSD__ || defined __NetBSD__ || defined __sun))
+        if (test_exit_status != EXIT_SUCCESS)
+          return test_exit_status;
         fputs ("Skipping test: The GB18030 converter in this system's iconv is broken.\n", stderr);
         return 77;
         #endif
@@ -218,7 +216,7 @@ main (int argc, char *argv[])
           /* U+00D7 MULTIPLICATION SIGN */
           is = for_character ("\241\301", 2);
           ASSERT (is == 0);
-        #if !(defined __FreeBSD__ || defined __DragonFly__ || defined __sun)
+        #if !((defined __APPLE__ && defined __MACH__) || defined __FreeBSD__ || defined __DragonFly__ || defined __sun)
           /* U+00D8 LATIN CAPITAL LETTER O WITH STROKE */
           is = for_character ("\201\060\211\061", 4);
           ASSERT (is != 0);
@@ -229,7 +227,7 @@ main (int argc, char *argv[])
           /* U+3001 IDEOGRAPHIC COMMA */
           is = for_character ("\241\242", 2);
           ASSERT (is == 0);
-        #if !(defined __GLIBC__ || (defined __APPLE__ && defined __MACH__) || defined __FreeBSD__)
+        #if !(defined __GLIBC__ || (defined __APPLE__ && defined __MACH__) || defined __FreeBSD__ || defined __CYGWIN__)
           /* U+FF11 FULLWIDTH DIGIT ONE */
           is = for_character ("\243\261", 2);
           ASSERT (is == 0);
@@ -251,7 +249,7 @@ main (int argc, char *argv[])
           is = for_character ("\323\066\237\065", 4);
           ASSERT (is == 0);
         }
-        return 0;
+        return test_exit_status;
 
       }
 

@@ -1,5 +1,5 @@
 /* Test of opening a file stream.
-   Copyright (C) 2020-2024 Free Software Foundation, Inc.
+   Copyright (C) 2020-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -84,5 +84,5 @@ main (void)
   ASSERT (unlink (BASE "file") == 0);
   ASSERT (unlink (BASE "binary") == 0);
 
-  return 0;
+  return test_exit_status;
 }

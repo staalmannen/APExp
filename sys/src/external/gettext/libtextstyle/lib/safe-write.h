@@ -1,5 +1,5 @@
 /* An interface to write() that retries after interrupts.
-   Copyright (C) 2002, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2009-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -23,15 +23,28 @@
        SA_RESTART.
      - The process receives a signal for which a signal handler was installed
        with signal() and for which no call to siginterrupt(sig,0) was done,
-       on some platforms: AIX, HP-UX, IRIX, OSF/1, Solaris.
+       on some platforms: AIX, HP-UX, Solaris.
 
    This module provides a wrapper around write() that handles EINTR.  */
 
 #include <stddef.h>
 
-#define SAFE_WRITE_ERROR ((size_t) -1)
+#include "idx.h"
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
+/* This is present for backward compatibility with older versions of this code
+   where safe_read returned size_t, so SAFE_WRITE_ERROR was SIZE_MAX.  */
+#define SAFE_WRITE_ERROR ((ptrdiff_t) -1)
 
 /* Write up to COUNT bytes at BUF to descriptor FD, retrying if interrupted.
-   Return the actual number of bytes written, zero for EOF, or SAFE_WRITE_ERROR
-   upon error.  */
-extern size_t safe_write (int fd, const void *buf, size_t count);
+   Return the number of bytes written, zero for EOF, or -1 upon error.  */
+extern ptrdiff_t safe_write (int fd, const void *buf, idx_t count);
+
+
+#ifdef __cplusplus
+}
+#endif

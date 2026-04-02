@@ -1,6 +1,6 @@
 /* Initialize OpenMP.
 
-   Copyright (C) 2017-2024 Free Software Foundation, Inc.
+   Copyright (C) 2017-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -31,10 +31,8 @@
 static unsigned long int
 parse_omp_threads (char const* threads)
 {
-  unsigned long int ret = 0;
-
   if (threads == NULL)
-    return ret;
+    return 0;
 
   /* The OpenMP spec says that the value assigned to the environment variables
      "may have leading and trailing white space".  */
@@ -44,23 +42,19 @@ parse_omp_threads (char const* threads)
   /* Convert it from positive decimal to 'unsigned long'.  */
   if (c_isdigit (*threads))
     {
-      char *endptr = NULL;
+      char *endptr;
       unsigned long int value = strtoul (threads, &endptr, 10);
-
-      if (endptr != NULL)
-        {
-          while (*endptr != '\0' && c_isspace (*endptr))
-            endptr++;
-          if (*endptr == '\0')
-            return value;
-          /* Also accept the first value in a nesting level,
-             since we can't determine the nesting level from env vars.  */
-          else if (*endptr == ',')
-            return value;
-        }
+      while (*endptr != '\0' && c_isspace (*endptr))
+        endptr++;
+      if (*endptr == '\0')
+        return value;
+      /* Also accept the first value in a nesting level,
+         since we can't determine the nesting level from env vars.  */
+      else if (*endptr == ',')
+        return value;
     }
 
-  return ret;
+  return 0;
 }
 
 #endif

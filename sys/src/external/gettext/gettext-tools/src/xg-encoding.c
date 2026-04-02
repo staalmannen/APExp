@@ -1,5 +1,5 @@
 /* Keeping track of the encoding of strings to be extracted.
-   Copyright (C) 2001-2023 Free Software Foundation, Inc.
+   Copyright (C) 2001-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,9 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+/* Written by Bruno Haible.  */
+
+#include <config.h>
 
 /* Specification.  */
 #include "xg-encoding.h"
@@ -63,13 +63,12 @@ non_ascii_error_message (lexical_context_ty lcontext,
                          const char *file_name, size_t line_number)
 {
   char buffer[22];
-  char *errmsg;
-
   if (line_number == (size_t)(-1))
     buffer[0] = '\0';
   else
     sprintf (buffer, ":%ld", (long) line_number);
 
+  char *errmsg;
   switch (lcontext)
     {
     case lc_outside:
@@ -103,13 +102,12 @@ non_utf8_error_message (lexical_context_ty lcontext,
                         const char *file_name, size_t line_number)
 {
   char buffer[22];
-  char *errmsg;
-
   if (line_number == (size_t)(-1))
     buffer[0] = '\0';
   else
     sprintf (buffer, ":%ld", (long) line_number);
 
+  char *errmsg;
   switch (lcontext)
     {
     case lc_outside:
@@ -178,14 +176,13 @@ from_current_source_encoding (const char *string,
     {
 #if HAVE_ICONV
       struct conversion_context context;
-
       context.from_code = xgettext_current_source_encoding;
       context.to_code = po_charset_utf8;
       context.from_filename = file_name;
       context.message = NULL;
 
-      string = convert_string_directly (xgettext_current_source_iconv, string,
-                                        &context);
+      return convert_string_directly (xgettext_current_source_iconv, string,
+                                      &context);
 #else
       /* If we don't have iconv(), the only supported values for
          xgettext_global_source_encoding and thus also for
@@ -199,7 +196,7 @@ from_current_source_encoding (const char *string,
 }
 
 /* Like from_current_source_encoding, for a string that may contain NULs.  */
-string_desc_t
+rw_string_desc_t
 string_desc_from_current_source_encoding (string_desc_t string,
                                           lexical_context_ty lcontext,
                                           const char *file_name,
@@ -220,8 +217,7 @@ string_desc_from_current_source_encoding (string_desc_t string,
     }
   else if (xgettext_current_source_encoding == po_charset_utf8)
     {
-      if (u8_check ((const uint8_t *) string_desc_data (string),
-                    string_desc_length (string))
+      if (u8_check ((const uint8_t *) sd_data (string), sd_length (string))
           != NULL)
         {
           multiline_error (xstrdup (""),
@@ -237,14 +233,13 @@ string_desc_from_current_source_encoding (string_desc_t string,
     {
 #if HAVE_ICONV
       struct conversion_context context;
-
       context.from_code = xgettext_current_source_encoding;
       context.to_code = po_charset_utf8;
       context.from_filename = file_name;
       context.message = NULL;
 
-      string = convert_string_desc_directly (xgettext_current_source_iconv,
-                                             string, &context);
+      return convert_string_desc_directly (xgettext_current_source_iconv,
+                                           string, &context);
 #else
       /* If we don't have iconv(), the only supported values for
          xgettext_global_source_encoding and thus also for
@@ -254,5 +249,5 @@ string_desc_from_current_source_encoding (string_desc_t string,
 #endif
     }
 
-  return string;
+  return sd_readwrite (string);
 }

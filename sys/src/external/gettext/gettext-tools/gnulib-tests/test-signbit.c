@@ -1,5 +1,5 @@
 /* Test of signbit() substitute.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -131,5 +131,5 @@ main ()
   test_signbitf ();
   test_signbitd ();
   test_signbitl ();
-  return 0;
+  return test_exit_status;
 }

@@ -1,6 +1,5 @@
 /* xgettext Ruby backend.
-   Copyright (C) 2020 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2020.
+   Copyright (C) 2020-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,9 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+/* Written by Bruno Haible.  */
+
+#include <config.h>
 
 /* Specification.  */
 #include "x-ruby.h"
@@ -28,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <error.h>
 #include "message.h"
 #include "sh-quote.h"
 #include "spawn-pipe.h"
@@ -37,14 +37,14 @@
 #include "xgettext.h"
 #include "xg-message.h"
 #include "c-strstr.h"
-#include "read-catalog-abstract.h"
-#include "error.h"
+#include "read-catalog-special.h"
 #include "gettext.h"
 
 /* A convenience macro.  I don't like writing gettext() every time.  */
 #define _(str) gettext (str)
 
 /* The Ruby syntax is defined in
+   https://en.wikibooks.org/wiki/Ruby_Programming/Syntax
    https://ruby-doc.org/core-2.7.1/doc/syntax_rdoc.html
    https://ruby-doc.org/core-2.7.1/doc/syntax/comments_rdoc.html
    https://ruby-doc.org/core-2.7.1/doc/syntax/literals_rdoc.html
@@ -75,6 +75,12 @@ init_flag_table_ruby (void)
 
 /* ========================= Extracting strings.  ========================== */
 
+static bool
+is_not_header (const message_ty *mp)
+{
+  return !is_header (mp);
+}
+
 void
 extract_ruby (const char *found_in_dir, const char *real_filename,
               const char *logical_filename,
@@ -82,43 +88,36 @@ extract_ruby (const char *found_in_dir, const char *real_filename,
               msgdomain_list_ty *mdlp)
 {
   const char *progname = "rxgettext";
-  char *dummy_filename;
-  msgdomain_list_ty *mdlp2;
-  int pass;
 
-  dummy_filename = xasprintf (_("(output from '%s')"), progname);
+  char *dummy_filename = xasprintf (_("(output from '%s')"), progname);
 
   /* Invoke rgettext twice:
      1. to get the messages, without ruby-format flags.
      2. to get the 'xgettext:' comments that guide us while adding
         [no-]ruby-format flags.  */
-  mdlp2 = msgdomain_list_alloc (true);
-  for (pass = 0; pass < 2; pass++)
+  msgdomain_list_ty *mdlp2 = msgdomain_list_alloc (true);
+  for (int pass = 0; pass < 2; pass++)
     {
-      const char *argv[4];
-      unsigned int i;
-      pid_t child;
-      int fd[1];
-      FILE *fp;
-      int exitstatus;
-
       /* Prepare arguments.  */
-      argv[0] = progname;
-      i = 1;
+      const char *argv[4];
+      {
+        argv[0] = progname;
+        unsigned int i = 1;
 
-      if (pass > 0)
-        argv[i++] = "--add-comments=xgettext:";
-      else
-        {
-          if (add_all_comments)
-            argv[i++] = "--add-comments";
-          else if (comment_tag != NULL)
-            argv[i++] = xasprintf ("--add-comments=%s", comment_tag);
-        }
+        if (pass > 0)
+          argv[i++] = "--add-comments=xgettext:";
+        else
+          {
+            if (add_all_comments)
+              argv[i++] = "--add-comments";
+            else if (comment_tag != NULL)
+              argv[i++] = xasprintf ("--add-comments=%s", comment_tag);
+          }
 
-      argv[i++] = logical_filename;
+        argv[i++] = logical_filename;
 
-      argv[i] = NULL;
+        argv[i] = NULL;
+      }
 
       if (verbose)
         {
@@ -127,10 +126,11 @@ extract_ruby (const char *found_in_dir, const char *real_filename,
           free (command);
         }
 
-      child = create_pipe_in (progname, progname, argv, found_in_dir,
-                              DEV_NULL, false, true, true, fd);
+      int fd[1];
+      pid_t child = create_pipe_in (progname, progname, argv, NULL, found_in_dir,
+                                    DEV_NULL, false, true, true, fd);
 
-      fp = fdopen (fd[0], "r");
+      FILE *fp = fdopen (fd[0], "r");
       if (fp == NULL)
         error (EXIT_FAILURE, errno, _("fdopen() failed"));
 
@@ -141,7 +141,7 @@ extract_ruby (const char *found_in_dir, const char *real_filename,
       fclose (fp);
 
       /* Remove zombie process from process list, and retrieve exit status.  */
-      exitstatus =
+      int exitstatus =
         wait_subprocess (child, progname, false, false, true, true, NULL);
       if (exitstatus != 0)
         error (EXIT_FAILURE, 0, _("%s subprocess failed with exit code %d"),
@@ -154,9 +154,8 @@ extract_ruby (const char *found_in_dir, const char *real_filename,
     {
       message_list_ty *mlp = mdlp->item[0]->messages;
       message_list_ty *mlp2 = mdlp2->item[0]->messages;
-      size_t j;
 
-      for (j = 0; j < mlp->nitems; j++)
+      for (size_t j = 0; j < mlp->nitems; j++)
         {
           message_ty *mp = mlp->item[j];
 
@@ -169,9 +168,8 @@ extract_ruby (const char *found_in_dir, const char *real_filename,
               if (mp2 != NULL && mp2->comment_dot != NULL)
                 {
                   string_list_ty *mp2_comment_dot = mp2->comment_dot;
-                  size_t k;
 
-                  for (k = 0; k < mp2_comment_dot->nitems; k++)
+                  for (size_t k = 0; k < mp2_comment_dot->nitems; k++)
                     {
                       const char *s = mp2_comment_dot->item[k];
 
@@ -181,22 +179,19 @@ extract_ruby (const char *found_in_dir, const char *real_filename,
                       const char *t = c_strstr (s, "xgettext:");
                       if (t != NULL)
                         {
+                          t += strlen ("xgettext:");
+
                           bool tmp_fuzzy;
                           enum is_format tmp_format[NFORMATS];
                           struct argument_range tmp_range;
                           enum is_wrap tmp_wrap;
                           enum is_syntax_check tmp_syntax_check[NSYNTAXCHECKS];
-                          bool interesting;
-                          size_t i;
+                          parse_comment_special (t, &tmp_fuzzy, tmp_format,
+                                                 &tmp_range, &tmp_wrap,
+                                                 tmp_syntax_check);
 
-                          t += strlen ("xgettext:");
-
-                          po_parse_comment_special (t, &tmp_fuzzy, tmp_format,
-                                                    &tmp_range, &tmp_wrap,
-                                                    tmp_syntax_check);
-
-                          interesting = false;
-                          for (i = 0; i < NFORMATS; i++)
+                          bool interesting = false;
+                          for (size_t i = 0; i < NFORMATS; i++)
                             if (tmp_format[i] != undecided)
                               {
                                 mp->is_format[i] = tmp_format[i];
@@ -212,7 +207,7 @@ extract_ruby (const char *found_in_dir, const char *real_filename,
                               mp->do_wrap = tmp_wrap;
                               interesting = true;
                             }
-                          for (i = 0; i < NSYNTAXCHECKS; i++)
+                          for (size_t i = 0; i < NSYNTAXCHECKS; i++)
                             if (tmp_syntax_check[i] != undecided)
                               {
                                 mp->do_syntax_check[i] = tmp_syntax_check[i];
@@ -247,4 +242,11 @@ extract_ruby (const char *found_in_dir, const char *real_filename,
   msgdomain_list_free (mdlp2);
 
   free (dummy_filename);
+
+  if (xgettext_omit_header)
+    {
+      /* Remove the header entry.  */
+      if (mdlp->nitems > 0)
+        message_list_remove_if_not (mdlp->item[0]->messages, is_not_header);
+    }
 }

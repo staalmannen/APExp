@@ -5,8 +5,7 @@
 #endif
 #line 1 "html-styled-ostream.oo.c"
 /* Output stream for CSS styled text, producing HTML output.
-   Copyright (C) 2006-2007, 2019-2020 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,6 +19,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible.  */
 
 #include <config.h>
 
@@ -38,7 +39,7 @@
 # define O_TEXT 0
 #endif
 
-#include "error.h"
+#include <error.h>
 #include "safe-read.h"
 #include "xalloc.h"
 #include "gettext.h"
@@ -46,7 +47,7 @@
 #define _(str) gettext (str)
 
 
-#line 50 "html-styled-ostream.c"
+#line 51 "html-styled-ostream.c"
 #include "html_styled_ostream.priv.h"
 
 const typeinfo_t html_styled_ostream_typeinfo = { "html_styled_ostream" };
@@ -56,7 +57,7 @@ static const typeinfo_t * const html_styled_ostream_superclasses[] =
 
 #define super styled_ostream_vtable
 
-#line 55 "html-styled-ostream.oo.c"
+#line 56 "html-styled-ostream.oo.c"
 
 /* Implementation of ostream_t methods.  */
 
@@ -136,7 +137,6 @@ html_styled_ostream_create (ostream_t destination, const char *css_filename)
 {
   html_styled_ostream_t stream =
     XMALLOC (struct html_styled_ostream_representation);
-
   stream->base.base.vtable = &html_styled_ostream_vtable;
   stream->destination = destination;
   stream->css_filename = xstrdup (css_filename);
@@ -165,10 +165,7 @@ html_styled_ostream_create (ostream_t destination, const char *css_filename)
 
       /* Include the contents of CSS_FILENAME literally.  */
       {
-        int fd;
-        char buf[4096];
-
-        fd = open (css_filename, O_RDONLY | O_TEXT);
+        int fd = open (css_filename, O_RDONLY | O_TEXT);
         if (fd < 0)
           error (EXIT_FAILURE, errno,
                  _("error while opening \"%s\" for reading"),
@@ -176,6 +173,7 @@ html_styled_ostream_create (ostream_t destination, const char *css_filename)
 
         for (;;)
           {
+            char buf[4096];
             size_t n_read = safe_read (fd, buf, sizeof (buf));
             if (n_read == SAFE_READ_ERROR)
               error (EXIT_FAILURE, errno, _("error reading \"%s\""),
@@ -228,7 +226,7 @@ is_instance_of_html_styled_ostream (ostream_t stream)
   return IS_INSTANCE (stream, ostream, html_styled_ostream);
 }
 
-#line 232 "html-styled-ostream.c"
+#line 230 "html-styled-ostream.c"
 
 const struct html_styled_ostream_implementation html_styled_ostream_vtable =
 {

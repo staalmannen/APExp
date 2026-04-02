@@ -1,5 +1,5 @@
 /* Test random_r.
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,31 +20,32 @@
 
 #include "signature.h"
 SIGNATURE_CHECK (srandom_r, int, (unsigned int, struct random_data *));
+#if !defined __HAIKU__
 SIGNATURE_CHECK (initstate_r, int, (unsigned int, char *, size_t,
                                     struct random_data *));
 SIGNATURE_CHECK (setstate_r, int, (char *, struct random_data *));
+#endif
 SIGNATURE_CHECK (random_r, int, (struct random_data *, int32_t *));
 
 #include <time.h>
 
 #include "macros.h"
 
-/* Note: This test crashes on glibc/SPARC systems.
-   Reported at <https://sourceware.org/bugzilla/show_bug.cgi?id=30584>.  */
+/* Note: This test crashes on glibc/SPARC systems with glibc < 2.41.
+   Reported at <https://sourceware.org/PR30584>.  */
 
 static int
 test_failed (int alignment)
 {
   struct random_data rand_state;
   char buf[128 + sizeof (int32_t)];
-  unsigned int i;
   unsigned int n_big = 0;
 
   rand_state.state = NULL;
   if (initstate_r (time (NULL), buf + alignment, sizeof buf - alignment,
                    &rand_state))
     return 1;
-  for (i = 0; i < 1000; i++)
+  for (unsigned int i = 0; i < 1000; i++)
     {
       int32_t r;
       ASSERT (random_r (&rand_state, &r) == 0);
@@ -60,9 +61,8 @@ test_failed (int alignment)
 int
 main ()
 {
-  int alignment;
-  for (alignment = 0; alignment < sizeof (int32_t); alignment++)
+  for (int alignment = 0; alignment < sizeof (int32_t); alignment++)
     if (test_failed (alignment))
       return 1;
-  return 0;
+  return test_exit_status;
 }

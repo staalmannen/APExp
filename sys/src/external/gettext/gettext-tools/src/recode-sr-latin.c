@@ -1,6 +1,5 @@
 /* Recode Serbian text from Cyrillic to Latin script.
-   Copyright (C) 2006-2007, 2010, 2012, 2018-2023 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,12 +14,11 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+/* Written by Bruno Haible.  */
+
+#include <config.h>
 
 #include <errno.h>
-#include <getopt.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,9 +28,10 @@
 #include <iconv.h>
 #endif
 
+#include <error.h>
+#include "options.h"
 #include "noreturn.h"
 #include "closeout.h"
-#include "error.h"
 #include "progname.h"
 #include "relocatable.h"
 #include "basename-lgpl.h"
@@ -47,14 +46,6 @@
 #define _(str) gettext (str)
 
 
-/* Long options.  */
-static const struct option long_options[] =
-{
-  { "help", no_argument, NULL, 'h' },
-  { "version", no_argument, NULL, 'V' },
-  { NULL, 0, NULL, 0 }
-};
-
 /* Forward declaration of local functions.  */
 _GL_NORETURN_FUNC static void usage (int status);
 static void process (FILE *stream);
@@ -62,12 +53,6 @@ static void process (FILE *stream);
 int
 main (int argc, char *argv[])
 {
-  /* Default values for command line options.  */
-  bool do_help = false;
-  bool do_version = false;
-
-  int opt;
-
   /* Set program name for message texts.  */
   set_program_name (argv[0]);
 
@@ -76,26 +61,42 @@ main (int argc, char *argv[])
 
   /* Set the text message domain.  */
   bindtextdomain (PACKAGE, relocate (LOCALEDIR));
+  bindtextdomain ("gnulib", relocate (GNULIB_LOCALEDIR));
   textdomain (PACKAGE);
 
   /* Ensure that write errors on stdout are detected.  */
   atexit (close_stdout);
 
+  /* Default values for command line options.  */
+  bool do_help = false;
+  bool do_version = false;
+
   /* Parse command line options.  */
-  while ((opt = getopt_long (argc, argv, "hV", long_options, NULL)) != EOF)
-    switch (opt)
-    {
-    case '\0':          /* Long option.  */
-      break;
-    case 'h':
-      do_help = true;
-      break;
-    case 'V':
-      do_version = true;
-      break;
-    default:
-      usage (EXIT_FAILURE);
-    }
+  BEGIN_ALLOW_OMITTING_FIELD_INITIALIZERS
+  static const struct program_option options[] =
+  {
+    { "help",    'h', no_argument },
+    { "version", 'V', no_argument },
+  };
+  END_ALLOW_OMITTING_FIELD_INITIALIZERS
+  start_options (argc, argv, options, MOVE_OPTIONS_FIRST, 0);
+  {
+    int opt;
+    while ((opt = get_next_option ()) != -1)
+      switch (opt)
+        {
+        case '\0':          /* Long option with key == 0.  */
+          break;
+        case 'h':
+          do_help = true;
+          break;
+        case 'V':
+          do_version = true;
+          break;
+        default:
+          usage (EXIT_FAILURE);
+        }
+  }
 
   /* Version information is requested.  */
   if (do_version)
@@ -108,7 +109,7 @@ License GPLv3+: GNU GPL version 3 or later <%s>\n\
 This is free software: you are free to change and redistribute it.\n\
 There is NO WARRANTY, to the extent permitted by law.\n\
 "),
-              "2006-2023", "https://gnu.org/licenses/gpl.html");
+              "2006-2026", "https://gnu.org/licenses/gpl.html");
       printf (_("Written by %s and %s.\n"),
               /* TRANSLATORS: This is a proper name. The last name is
                  (with Unicode escapes) "\u0160egan" or (with HTML entities)
@@ -168,7 +169,7 @@ Informative output:\n"));
          email address for this package.  Please add _another line_ saying
          "Report translation bugs to <...>\n" with the address for translation
          bugs (typically your translation team's web or email address).  */
-      printf(_("\
+      printf (_("\
 Report bugs in the bug tracker at <%s>\n\
 or by email to <%s>.\n"),
              "https://savannah.gnu.org/projects/gettext",
@@ -258,6 +259,8 @@ static void
 process (FILE *stream)
 {
   struct linebuffer lb;
+  init_linebuffer (&lb);
+
   const char *locale_code = locale_charset ();
   bool need_code_conversion = (c_strcasecmp (locale_code, "UTF-8") != 0);
 #if HAVE_ICONV
@@ -269,22 +272,13 @@ process (FILE *stream)
   size_t last_backconv_line_len;
 #endif
 
-  init_linebuffer (&lb);
-
   /* Initialize the conversion descriptors.  */
   if (need_code_conversion)
     {
 #if HAVE_ICONV
-      /* Avoid glibc-2.1 bug with EUC-KR.  */
-# if ((__GLIBC__ == 2 && __GLIBC_MINOR__ <= 1) && !defined __UCLIBC__) \
-     && !defined _LIBICONV_VERSION
-      if (strcmp (locale_code, "EUC-KR") != 0)
-# endif
-        {
-          conv_to_utf8 = iconv_open ("UTF-8", locale_code);
-          /* TODO:  Maybe append //TRANSLIT here?  */
-          conv_from_utf8 = iconv_open (locale_code, "UTF-8");
-        }
+      conv_to_utf8 = iconv_open ("UTF-8", locale_code);
+      /* TODO:  Maybe append //TRANSLIT here?  */
+      conv_from_utf8 = iconv_open (locale_code, "UTF-8");
       if (conv_to_utf8 == (iconv_t)(-1))
         error (EXIT_FAILURE, 0,
                _("Cannot convert from \"%s\" to \"%s\". %s relies on iconv(), and iconv() does not support this conversion."),
@@ -310,16 +304,11 @@ process (FILE *stream)
      in a whole chunk would take an excessive amount of memory.  */
   for (;;)
     {
-      char *line;
-      size_t line_len;
-      char *filtered_line;
-      size_t filtered_line_len;
-
       /* Read a line.  */
       if (read_linebuffer (&lb, stream) == NULL)
         break;
-      line = lb.buffer;
-      line_len = lb.length;
+      char *line = lb.buffer;
+      size_t line_len = lb.length;
       /* read_linebuffer always returns a non-void result.  */
       if (line_len == 0)
         abort ();
@@ -350,6 +339,8 @@ process (FILE *stream)
 #endif
 
       /* Apply the filter.  */
+      char *filtered_line;
+      size_t filtered_line_len;
       serbian_to_latin (line, line_len, &filtered_line, &filtered_line_len);
 
 #if HAVE_ICONV

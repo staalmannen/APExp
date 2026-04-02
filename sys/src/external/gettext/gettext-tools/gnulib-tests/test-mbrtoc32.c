@@ -1,5 +1,5 @@
 /* Test of conversion of multibyte character to 32-bit wide character.
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -67,11 +67,10 @@ main (int argc, char *argv[])
 
   /* Test single-byte input.  */
   {
-    int c;
     char buf[1];
 
     memset (&state, '\0', sizeof (mbstate_t));
-    for (c = 0; c < 0x100; c++)
+    for (int c = 0; c < 0x100; c++)
       switch (c)
         {
         case '\t': case '\v': case '\f':
@@ -141,11 +140,10 @@ main (int argc, char *argv[])
       case '1':
         /* C or POSIX locale.  */
         {
-          int c;
           char buf[1];
 
           memset (&state, '\0', sizeof (mbstate_t));
-          for (c = 0; c < 0x100; c++)
+          for (int c = 0; c < 0x100; c++)
             if (c != 0)
               {
                 /* We are testing all nonnull bytes.  */
@@ -172,7 +170,7 @@ main (int argc, char *argv[])
                 ASSERT (mbsinit (&state));
               }
         }
-        return 0;
+        return test_exit_status;
 
       case '2':
         /* Locale encoding is ISO-8859-1 or ISO-8859-15.  */
@@ -225,7 +223,7 @@ main (int argc, char *argv[])
           ASSERT (wc == 'r');
           ASSERT (mbsinit (&state));
         }
-        return 0;
+        return test_exit_status;
 
       case '3':
         /* Locale encoding is UTF-8.  */
@@ -291,7 +289,34 @@ main (int argc, char *argv[])
           ASSERT (wc == '!');
           ASSERT (mbsinit (&state));
         }
-        return 0;
+        { /* \360\237\220\203 = U+0001F403 */
+          memset (&state, '\0', sizeof (mbstate_t));
+
+          wc = (char32_t) 0xBADFACE;
+          ret = mbrtoc32 (&wc, "\360", 1, &state);
+          ASSERT (ret == (size_t)(-2));
+          ASSERT (wc == (char32_t) 0xBADFACE);
+          ASSERT (!mbsinit (&state));
+
+          wc = (char32_t) 0xBADFACE;
+          ret = mbrtoc32 (&wc, "\237", 1, &state);
+          ASSERT (ret == (size_t)(-2));
+          ASSERT (wc == (char32_t) 0xBADFACE);
+          ASSERT (!mbsinit (&state));
+
+          wc = (char32_t) 0xBADFACE;
+          ret = mbrtoc32 (&wc, "\220", 1, &state);
+          ASSERT (ret == (size_t)(-2));
+          ASSERT (wc == (char32_t) 0xBADFACE);
+          ASSERT (!mbsinit (&state));
+
+          wc = (char32_t) 0xBADFACE;
+          ret = mbrtoc32 (&wc, "\203", 1, &state);
+          ASSERT (ret == 1);
+          ASSERT (wc == 0x1F403); /* expect Unicode encoding */
+          ASSERT (mbsinit (&state));
+        }
+        return test_exit_status;
 
       case '4':
         /* Locale encoding is EUC-JP.  */
@@ -356,11 +381,13 @@ main (int argc, char *argv[])
           ASSERT (wc == '>');
           ASSERT (mbsinit (&state));
         }
-        return 0;
+        return test_exit_status;
 
       case '5':
         /* Locale encoding is GB18030.  */
         #if (defined __GLIBC__ && __GLIBC__ == 2 && __GLIBC_MINOR__ >= 13 && __GLIBC_MINOR__ <= 15) || (GL_CHAR32_T_IS_UNICODE && (defined __FreeBSD__ || defined __NetBSD__ || defined __sun))
+        if (test_exit_status != EXIT_SUCCESS)
+          return test_exit_status;
         fputs ("Skipping test: The GB18030 converter in this system's iconv is broken.\n", stderr);
         return 77;
         #endif
@@ -434,7 +461,36 @@ main (int argc, char *argv[])
           ASSERT (wc == '!');
           ASSERT (mbsinit (&state));
         }
-        return 0;
+        { /* \224\071\311\067 = U+0001F403 */
+          memset (&state, '\0', sizeof (mbstate_t));
+
+          wc = (char32_t) 0xBADFACE;
+          ret = mbrtoc32 (&wc, "\224", 1, &state);
+          ASSERT (ret == (size_t)(-2));
+          ASSERT (wc == (char32_t) 0xBADFACE);
+          ASSERT (!mbsinit (&state));
+
+          wc = (char32_t) 0xBADFACE;
+          ret = mbrtoc32 (&wc, "\071", 1, &state);
+          ASSERT (ret == (size_t)(-2));
+          ASSERT (wc == (char32_t) 0xBADFACE);
+          ASSERT (!mbsinit (&state));
+
+          wc = (char32_t) 0xBADFACE;
+          ret = mbrtoc32 (&wc, "\311", 1, &state);
+          ASSERT (ret == (size_t)(-2));
+          ASSERT (wc == (char32_t) 0xBADFACE);
+          ASSERT (!mbsinit (&state));
+
+          wc = (char32_t) 0xBADFACE;
+          ret = mbrtoc32 (&wc, "\067", 1, &state);
+          ASSERT (ret == 1);
+          #if GL_CHAR32_T_IS_UNICODE
+          ASSERT (wc == 0x1F403); /* expect Unicode encoding */
+          #endif
+          ASSERT (mbsinit (&state));
+        }
+        return test_exit_status;
       }
 
   return 1;

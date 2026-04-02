@@ -1,5 +1,5 @@
 /* Open a stream with a given file descriptor.
-   Copyright (C) 2011-2024 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -57,10 +57,9 @@ FILE *
 rpl_fdopen (int fd, const char *mode)
 {
   int saved_errno = errno;
-  FILE *fp;
 
   errno = 0;
-  fp = fdopen_nothrow (fd, mode);
+  FILE *fp = fdopen_nothrow (fd, mode);
   if (fp == NULL)
     {
       if (errno == 0)

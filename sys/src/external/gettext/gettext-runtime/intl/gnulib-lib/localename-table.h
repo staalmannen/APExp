@@ -1,5 +1,5 @@
 /* Table that maps a locale object to the names of the locale categories.
-   Copyright (C) 2018-2024 Free Software Foundation, Inc.
+   Copyright (C) 2018-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -23,9 +23,12 @@
 
 # include "glthread/lock.h"
 
+/* Smallest among the six LC_* category values.  */
+# define LCMIN (LC_ALL == 0 ? 1 : 0)
+
 struct locale_categories_names
   {
-    /* Locale category -> name (allocated with indefinite extent).  */
+    /* (Locale category - LCMIN) -> name (allocated with indefinite extent).  */
     const char *category_name[6];
   };
 

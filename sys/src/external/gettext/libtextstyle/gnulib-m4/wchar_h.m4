@@ -1,13 +1,14 @@
-dnl A placeholder for ISO C99 <wchar.h>, for platforms that have issues.
-
-dnl Copyright (C) 2007-2024 Free Software Foundation, Inc.
+# wchar_h.m4
+# serial 66
+dnl Copyright (C) 2007-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
+
+dnl A placeholder for ISO C99 <wchar.h>, for platforms that have issues.
 
 dnl Written by Eric Blake.
-
-# wchar_h.m4 serial 63
 
 AC_DEFUN_ONCE([gl_WCHAR_H],
 [
@@ -64,8 +65,8 @@ dnl Check whether <wchar.h> is usable at all.
 AC_DEFUN([gl_WCHAR_H_INLINE_OK],
 [
   dnl Test whether <wchar.h> suffers due to the transition from '__inline' to
-  dnl 'gnu_inline'. See <https://sourceware.org/bugzilla/show_bug.cgi?id=4022>
-  dnl and <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=42440>. In summary,
+  dnl 'gnu_inline'. See <https://sourceware.org/PR4022>
+  dnl and <https://gcc.gnu.org/PR42440>. In summary,
   dnl glibc version 2.5 or older, together with gcc version 4.3 or newer and
   dnl the option -std=c99 or -std=gnu99, leads to a broken <wchar.h>.
   AC_REQUIRE([AC_CANONICAL_HOST])
@@ -238,7 +239,7 @@ AC_DEFUN([gl_WCHAR_H_DEFAULTS],
   HAVE_WCSTOK=1;        AC_SUBST([HAVE_WCSTOK])
   HAVE_WCSWIDTH=1;      AC_SUBST([HAVE_WCSWIDTH])
   HAVE_WCSFTIME=1;      AC_SUBST([HAVE_WCSFTIME])
-  HAVE_DECL_WCTOB=1;    AC_SUBST([HAVE_DECL_WCTOB])
+  HAVE_WCTOB=1;         AC_SUBST([HAVE_WCTOB])
   HAVE_DECL_WCSDUP=1;   AC_SUBST([HAVE_DECL_WCSDUP])
   HAVE_DECL_WCWIDTH=1;  AC_SUBST([HAVE_DECL_WCWIDTH])
   REPLACE_MBSTATE_T=0;  AC_SUBST([REPLACE_MBSTATE_T])
@@ -256,6 +257,7 @@ AC_DEFUN([gl_WCHAR_H_DEFAULTS],
   REPLACE_WCSWIDTH=0;   AC_SUBST([REPLACE_WCSWIDTH])
   REPLACE_WCSFTIME=0;   AC_SUBST([REPLACE_WCSFTIME])
   REPLACE_WCSCMP=0;     AC_SUBST([REPLACE_WCSCMP])
+  REPLACE_WCSNCAT=0;    AC_SUBST([REPLACE_WCSNCAT])
   REPLACE_WCSNCMP=0;    AC_SUBST([REPLACE_WCSNCMP])
   REPLACE_WCSSTR=0;     AC_SUBST([REPLACE_WCSSTR])
   REPLACE_WCSTOK=0;     AC_SUBST([REPLACE_WCSTOK])

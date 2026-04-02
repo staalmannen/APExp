@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (C) 2003-2005, 2012-2014, 2018-2019 Free Software Foundation, Inc.
+# Copyright (C) 2003-2026 Free Software Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# Written by Bruno Haible and Daiki Ueno.
 
 # Usage: xsmallpot.sh srcdir hello-foo [hello-foobar.pot]
 
@@ -64,17 +66,31 @@ EOF
     make hello.rsj
     ;;
   *)
-    grep '^\(AC_INIT\|AC_CONFIG\|AC_PROG_\|AC_SUBST(.*OBJC\|AM_INIT\|AM_CONDITIONAL\|AM_GNU_GETTEXT\|AM_PO_SUBDIRS\|AC_OUTPUT\)' configure.ac > tmp-configure.ac
+    # Create an "essential" configure.ac, that does not check for build
+    # dependencies (specific programs and libraries).
+    grep '^\(AC_INIT\|AC_CONFIG\|AC_PROG_\|AC_SUBST(.*OBJC\|m4_\|AM_INIT\|AM_CONDITIONAL\|AM_GNU_GETTEXT\|AM_PO_SUBDIRS\|AC_OUTPUT\)' configure.ac > tmp-configure.ac
     mv -f tmp-configure.ac configure.ac
     ./autogen.sh
     ./configure
     ;;
 esac
 cd po
-make $potfile
-sed -e "/^#:/ {
+if make $potfile; then
+  sed -e "/^#:/ {
 s, \\([^ ]\\), $directory/\\1,g
 }" < $potfile > "$abs_srcdir"/$potfile
+else
+  case $directory in
+    hello-ruby)
+      # Creating hello-ruby.pot fails if 'rxgettext' is not installed.
+      # To work around it, we are putting hello-ruby.pot under version control.
+      ;;
+    *)
+      echo "Failed to create $potfile." 1>&2
+      exit 1
+      ;;
+  esac
+fi
 cd ..
 cd ..
 rm -rf tmp-$directory

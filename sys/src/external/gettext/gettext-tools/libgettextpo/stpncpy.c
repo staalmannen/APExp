@@ -1,4 +1,4 @@
-/* Copyright (C) 1993, 1995-1997, 2002-2003, 2005-2007, 2009-2024 Free Software
+/* Copyright (C) 1993, 1995-1997, 2002-2003, 2005-2007, 2009-2026 Free Software
  * Foundation, Inc.
 
    NOTE: The canonical source of this file is maintained with the GNU C Library.
@@ -33,7 +33,6 @@
 char *
 (__stpncpy) (char *dest, const char *src, size_t n)
 {
-  char c;
   char *s = dest;
 
   if (n >= 4)
@@ -42,22 +41,30 @@ char *
 
       for (;;)
         {
-          c = *src++;
-          *dest++ = c;
-          if (c == '\0')
-            break;
-          c = *src++;
-          *dest++ = c;
-          if (c == '\0')
-            break;
-          c = *src++;
-          *dest++ = c;
-          if (c == '\0')
-            break;
-          c = *src++;
-          *dest++ = c;
-          if (c == '\0')
-            break;
+          {
+            char c = *src++;
+            *dest++ = c;
+            if (c == '\0')
+              break;
+          }
+          {
+            char c = *src++;
+            *dest++ = c;
+            if (c == '\0')
+              break;
+          }
+          {
+            char c = *src++;
+            *dest++ = c;
+            if (c == '\0')
+              break;
+          }
+          {
+            char c = *src++;
+            *dest++ = c;
+            if (c == '\0')
+              break;
+          }
           if (--n4 == 0)
             goto last_chars;
         }
@@ -72,7 +79,7 @@ char *
 
   for (;;)
     {
-      c = *src++;
+      char c = *src++;
       --n;
       *dest++ = c;
       if (c == '\0')

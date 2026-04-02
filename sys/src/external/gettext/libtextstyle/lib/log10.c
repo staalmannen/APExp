@@ -1,5 +1,5 @@
 /* Base 10 logarithmic function.
-   Copyright (C) 2012-2024 Free Software Foundation, Inc.
+   Copyright (C) 2012-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -23,16 +23,11 @@ double
 log10 (double x)
 #undef log10
 {
-  if (x <= 0.0)
+  if (x < 0.0)
     {
-      /* Work around the OSF/1 5.1 bug.  */
-      if (x == 0.0)
-        /* Return -Infinity.  */
-        return -1.0 / 0.0;
       /* Work around the NetBSD 5.1, Solaris 11.0 bug.  */
-      else /* x < 0.0 */
-        /* Return NaN.  */
-        return 0.0 / 0.0;
+      /* Return NaN.  */
+      return 0.0 / 0.0;
     }
   return log10 (x);
 }

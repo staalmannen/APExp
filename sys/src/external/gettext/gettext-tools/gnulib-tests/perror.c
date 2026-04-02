@@ -1,5 +1,5 @@
 /* Print a message describing error code.
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
    Written by Bruno Haible and Simon Josefsson.
 
    This file is free software: you can redistribute it and/or modify
@@ -33,12 +33,11 @@ void
 perror (const char *string)
 {
   char stackbuf[STACKBUF_LEN];
-  int ret;
 
   /* Our implementation guarantees that this will be a non-empty
      string, even if it returns EINVAL; and stackbuf should be sized
      large enough to avoid ERANGE.  */
-  ret = strerror_r (errno, stackbuf, sizeof stackbuf);
+  int ret = strerror_r (errno, stackbuf, sizeof stackbuf);
   if (ret == ERANGE)
     abort ();
 

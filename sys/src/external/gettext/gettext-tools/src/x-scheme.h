@@ -1,6 +1,5 @@
 /* xgettext Scheme backend.
-   Copyright (C) 2004, 2006, 2014, 2018, 2020 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2004.
+   Copyright (C) 2004-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,6 +14,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Written by Bruno Haible.  */
+
 
 #include <stdio.h>
 
@@ -28,10 +29,12 @@ extern "C" {
 
 
 #define EXTENSIONS_SCHEME \
-  { "scm",       "Scheme"     },                                        \
+  { "scm",       "Guile"      },                                        \
 
 #define SCANNERS_SCHEME \
   { "Scheme",           extract_scheme, NULL,                             \
+                        &flag_table_scheme, &formatstring_scheme, NULL }, \
+  { "Guile",            extract_guile, NULL,                              \
                         &flag_table_scheme, &formatstring_scheme, NULL }, \
 
 /* Scan a Scheme file and add its translatable strings to mdlp.  */
@@ -39,6 +42,12 @@ extern void extract_scheme (FILE *fp, const char *real_filename,
                             const char *logical_filename,
                             flag_context_list_table_ty *flag_table,
                             msgdomain_list_ty *mdlp);
+
+/* Scan a Guile file and add its translatable strings to mdlp.  */
+extern void extract_guile (FILE *fp, const char *real_filename,
+                           const char *logical_filename,
+                           flag_context_list_table_ty *flag_table,
+                           msgdomain_list_ty *mdlp);
 
 
 /* Handling of options specific to this language.  */

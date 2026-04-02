@@ -1,6 +1,6 @@
 /* timespec -- System time interface
 
-   Copyright (C) 2000, 2002, 2004-2005, 2007, 2009-2024 Free Software
+   Copyright (C) 2000, 2002, 2004-2005, 2007, 2009-2026 Free Software
    Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
@@ -20,7 +20,7 @@
 #define TIMESPEC_H
 
 /* This file uses _GL_INLINE_HEADER_BEGIN, _GL_INLINE, _GL_ATTRIBUTE_CONST,
-   _GL_ATTRIBUTE_PURE, _GL_CMP.  */
+   _GL_CMP.  */
 #if !_GL_CONFIG_H_INCLUDED
  #error "Please include config.h first."
 #endif
@@ -55,15 +55,12 @@ enum { LOG10_TIMESPEC_RESOLUTION = LOG10_TIMESPEC_HZ };
 _GL_TIMESPEC_INLINE struct timespec
 make_timespec (time_t s, long int ns)
 {
-  struct timespec x;
-  x.tv_sec=s;
-  x.tv_nsec=ns;
-  return x;
+  return (struct timespec) { .tv_sec = s, .tv_nsec = ns };
 }
 
 /* Return negative, zero, positive if A < B, A == B, A > B, respectively.  */
 
-_GL_TIMESPEC_INLINE int _GL_ATTRIBUTE_PURE
+_GL_TIMESPEC_INLINE int _GL_ATTRIBUTE_CONST
 timespec_cmp (struct timespec a, struct timespec b)
 {
   return 2 * _GL_CMP (a.tv_sec, b.tv_sec) + _GL_CMP (a.tv_nsec, b.tv_nsec);
@@ -71,10 +68,10 @@ timespec_cmp (struct timespec a, struct timespec b)
 
 /* Return -1, 0, 1, depending on the sign of A.  A.tv_nsec must be
    nonnegative.  */
-_GL_TIMESPEC_INLINE int _GL_ATTRIBUTE_PURE
+_GL_TIMESPEC_INLINE int _GL_ATTRIBUTE_CONST
 timespec_sign (struct timespec a)
 {
-  return _GL_CMP (a.tv_sec, 0) + (!a.tv_sec & !!a.tv_nsec);
+  return _GL_CMP (a.tv_sec | a.tv_nsec, 0);
 }
 
 struct timespec timespec_add (struct timespec, struct timespec)

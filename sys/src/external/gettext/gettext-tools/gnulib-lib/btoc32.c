@@ -1,5 +1,5 @@
 /* Convert unibyte character to 32-bit wide character.
-   Copyright (C) 2020-2024 Free Software Foundation, Inc.
+   Copyright (C) 2020-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -36,17 +36,16 @@ _GL_EXTERN_INLINE
 wint_t
 btoc32 (int c)
 {
-#if HAVE_WORKING_MBRTOC32 && !_GL_WCHAR_T_IS_UCS4
+#if HAVE_WORKING_MBRTOC32 && HAVE_WORKING_C32RTOMB && !_GL_WCHAR_T_IS_UCS4
   /* The char32_t encoding of a multibyte character may be different than its
      wchar_t encoding.  */
   if (c != EOF)
     {
       mbstate_t state;
-      char s[1];
-      char32_t wc;
-
       mbszero (&state);
+      char s[1];
       s[0] = (unsigned char) c;
+      char32_t wc;
       if (mbrtoc32 (&wc, s, 1, &state) <= 1)
         return wc;
     }

@@ -1,7 +1,5 @@
 /* xgettext Desktop Entry backend.
-   Copyright (C) 2014, 2018-2020, 2023 Free Software Foundation, Inc.
-
-   This file was written by Daiki Ueno <ueno@gnu.org>, 2014.
+   Copyright (C) 2014-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,9 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+/* Written by Daiki Ueno.  */
+
+#include <config.h>
 
 /* Specification.  */
 #include "x-desktop.h"
@@ -29,11 +27,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <error.h>
 #include "message.h"
 #include "xgettext.h"
 #include "xg-message.h"
-#include "error.h"
-#include "error-progname.h"
 #include "xalloc.h"
 #include "xvasprintf.h"
 #include "mem-hash-map.h"
@@ -117,8 +114,8 @@ extract_desktop_handle_pair (struct desktop_reader_ty *reader,
 {
   extract_desktop_reader_ty *extract_reader =
     (extract_desktop_reader_ty *) reader;
-  void *keyword_value;
 
+  void *keyword_value;
   if (!locale                   /* Skip already translated entry.  */
       && hash_find_entry (&keywords, key, strlen (key), &keyword_value) == 0)
     {
@@ -126,7 +123,7 @@ extract_desktop_handle_pair (struct desktop_reader_ty *reader,
 
       remember_a_message (extract_reader->mlp, NULL,
                           desktop_unescape_string (value, is_list), false,
-                          false, null_context, key_pos,
+                          false, null_context_region (), key_pos,
                           NULL, savable_comment, false);
     }
   savable_comment_reset ();
@@ -189,6 +186,4 @@ extract_desktop (FILE *f,
 
   desktop_parse (reader, f, real_filename, logical_filename);
   desktop_reader_free (reader);
-
-  reader = NULL;
 }

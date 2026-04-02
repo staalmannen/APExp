@@ -1,5 +1,5 @@
 /* Information about terminal capabilities.
-   Copyright (C) 2006-2024 Free Software Foundation, Inc.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -85,8 +85,7 @@ extern char * tparam (const char *str, void *buf, int bufsize, ...);
 
 /* API provided by
      - GNU ncurses in <term.h>, <curses.h>, <ncurses.h>,
-     - OSF/1 curses in <term.h>, <curses.h>,
-     - Solaris, AIX, HP-UX, IRIX curses in <term.h>,
+     - Solaris, AIX, HP-UX curses in <term.h>,
      - gnulib's replacement.  */
 
 /* Instantiates a string capability with format strings.

@@ -1,6 +1,5 @@
 /* Java printf format strings.
-   Copyright (C) 2001-2004, 2006-2007, 2009-2010, 2018-2020, 2023 Free Software Foundation, Inc.
-   Written by Bruno Haible <haible@clisp.cons.org>, 2001.
+   Copyright (C) 2001-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,9 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+/* Written by Bruno Haible.  */
+
+#include <config.h>
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -107,83 +106,63 @@ enum
 
 struct numbered_arg
 {
-  unsigned int number;
+  size_t number;
   format_arg_type_t type;
 };
 
 struct spec
 {
-  unsigned int directives;
-  unsigned int numbered_arg_count;
+  size_t directives;
+  size_t numbered_arg_count;
   struct numbered_arg *numbered;
 };
-
-/* Locale independent test for a decimal digit.
-   Argument can be  'char' or 'unsigned char'.  (Whereas the argument of
-   <ctype.h> isdigit must be an 'unsigned char'.)  */
-#undef isdigit
-#define isdigit(c) ((unsigned int) ((c) - '0') < 10)
 
 
 static int
 numbered_arg_compare (const void *p1, const void *p2)
 {
-  unsigned int n1 = ((const struct numbered_arg *) p1)->number;
-  unsigned int n2 = ((const struct numbered_arg *) p2)->number;
+  size_t n1 = ((const struct numbered_arg *) p1)->number;
+  size_t n2 = ((const struct numbered_arg *) p2)->number;
 
   return (n1 > n2 ? 1 : n1 < n2 ? -1 : 0);
 }
 
 #define INVALID_LAST_ARG(directive_number) \
-  xasprintf (_("In the directive number %u, the reference to the argument of the previous directive is invalid."), directive_number)
-
-#define INVALID_PRECISION_MISSING(directive_number) \
-  xasprintf (_("In the directive number %u, the precision is missing."), directive_number)
-
-#define INVALID_FLAG_FOR(directive_number,flag_char,conv_char) \
-  xasprintf (_("In the directive number %u, the flag '%c' is invalid for the conversion '%c'."), directive_number, flag_char, conv_char)
+  xasprintf (_("In the directive number %zu, the reference to the argument of the previous directive is invalid."), directive_number)
 
 #define INVALID_WIDTH_FOR(directive_number,conv_char) \
-  xasprintf (_("In the directive number %u, a width is invalid for the conversion '%c'."), directive_number, conv_char)
+  xasprintf (_("In the directive number %zu, a width is invalid for the conversion '%c'."), directive_number, conv_char)
 
 #define INVALID_PRECISION_FOR(directive_number,conv_char) \
-  xasprintf (_("In the directive number %u, a precision is invalid for the conversion '%c'."), directive_number, conv_char)
+  xasprintf (_("In the directive number %zu, a precision is invalid for the conversion '%c'."), directive_number, conv_char)
 
 #define INVALID_DATETIME_CONVERSION_SUFFIX(directive_number,conv_char,suffix_char) \
   (c_isprint (conv_char) \
-   ? xasprintf (_("In the directive number %u, for the conversion '%c', the character '%c' is not a valid conversion suffix."), directive_number, conv_char, suffix_char) \
-   : xasprintf (_("The character that terminates the directive number %u, for the conversion '%c', is not a valid conversion suffix."), directive_number, conv_char))
+   ? xasprintf (_("In the directive number %zu, for the conversion '%c', the character '%c' is not a valid conversion suffix."), directive_number, conv_char, suffix_char) \
+   : xasprintf (_("The character that terminates the directive number %zu, for the conversion '%c', is not a valid conversion suffix."), directive_number, conv_char))
 
 static void *
 format_parse (const char *format, bool translated, char *fdi,
               char **invalid_reason)
 {
   const char *const format_start = format;
-  struct spec spec;
-  unsigned int numbered_allocated;
-  struct spec *result;
-  unsigned int unnumbered_arg_count;
-  unsigned int last_arg_number;
 
+  struct spec spec;
   spec.directives = 0;
   spec.numbered_arg_count = 0;
   spec.numbered = NULL;
-  numbered_allocated = 0;
-  unnumbered_arg_count = 0;
-  last_arg_number = 0;
+  size_t numbered_allocated = 0;
+  size_t unnumbered_arg_count = 0;
+  size_t last_arg_number = 0;
 
   for (; *format != '\0';)
     if (*format++ == '%')
       {
         /* A directive.  */
-        unsigned int number = 0;
-        unsigned int flags;
-        format_arg_type_t type;
-        unsigned int invalid_flags;
-
         FDI_SET (format - 1, FMTDIR_START);
         spec.directives++;
 
+        size_t number = 0;
         if (*format == '<')
           {
             if (last_arg_number == 0)
@@ -195,17 +174,17 @@ format_parse (const char *format, bool translated, char *fdi,
             number = last_arg_number;
             format++;
           }
-        else if (isdigit (*format))
+        else if (c_isdigit (*format))
           {
             const char *f = format;
-            unsigned int m = 0;
+            size_t m = 0;
 
             do
               {
                 m = 10 * m + (*f - '0');
                 f++;
               }
-            while (isdigit (*f));
+            while (c_isdigit (*f));
 
             if (*f == '$')
               {
@@ -220,9 +199,8 @@ format_parse (const char *format, bool translated, char *fdi,
               }
           }
 
-        flags = 0;
-
         /* Parse flags.  */
+        unsigned int flags = 0;
         for (;;)
           {
             if (*format == '#')
@@ -265,9 +243,9 @@ format_parse (const char *format, bool translated, char *fdi,
           }
 
         /* Parse width.  */
-        if (isdigit (*format))
+        if (c_isdigit (*format))
           {
-            do format++; while (isdigit (*format));
+            do format++; while (c_isdigit (*format));
             flags |= FAT_WIDTH;
           }
 
@@ -276,7 +254,7 @@ format_parse (const char *format, bool translated, char *fdi,
           {
             format++;
 
-            if (!isdigit (*format))
+            if (!c_isdigit (*format))
               {
                 if (*format == '\0')
                   {
@@ -291,11 +269,13 @@ format_parse (const char *format, bool translated, char *fdi,
                 goto bad_format;
               }
 
-            do format++; while (isdigit (*format));
+            do format++; while (c_isdigit (*format));
             flags |= FAT_PRECISION;
           }
 
         /* Parse conversion.  */
+        format_arg_type_t type;
+        unsigned int invalid_flags;
         switch (*format)
           {
           case '%':
@@ -476,21 +456,19 @@ format_parse (const char *format, bool translated, char *fdi,
   /* Sort the numbered argument array, and eliminate duplicates.  */
   if (spec.numbered_arg_count > 1)
     {
-      unsigned int i, j;
-      bool err;
-
       qsort (spec.numbered, spec.numbered_arg_count,
              sizeof (struct numbered_arg), numbered_arg_compare);
 
       /* Remove duplicates: Copy from i to j, keeping 0 <= j <= i.  */
-      err = false;
+      bool err = false;
+      size_t i, j;
       for (i = j = 0; i < spec.numbered_arg_count; i++)
         if (j > 0 && spec.numbered[i].number == spec.numbered[j-1].number)
           {
             enum format_arg_type type1 = spec.numbered[i].type;
             enum format_arg_type type2 = spec.numbered[j-1].type;
-            enum format_arg_type type_both;
 
+            enum format_arg_type type_both;
             if (type1 == type2)
               type_both = type1;
             else
@@ -520,7 +498,7 @@ format_parse (const char *format, bool translated, char *fdi,
         goto bad_format;
     }
 
-  result = XMALLOC (struct spec);
+  struct spec *result = XMALLOC (struct spec);
   *result = spec;
   return result;
 
@@ -550,7 +528,7 @@ format_get_number_of_directives (void *descr)
 
 static bool
 format_check (void *msgid_descr, void *msgstr_descr, bool equality,
-              formatstring_error_logger_t error_logger,
+              formatstring_error_logger_t error_logger, void *error_logger_data,
               const char *pretty_msgid, const char *pretty_msgstr)
 {
   struct spec *spec1 = (struct spec *) msgid_descr;
@@ -559,65 +537,73 @@ format_check (void *msgid_descr, void *msgstr_descr, bool equality,
 
   if (spec1->numbered_arg_count + spec2->numbered_arg_count > 0)
     {
-      unsigned int i, j;
-      unsigned int n1 = spec1->numbered_arg_count;
-      unsigned int n2 = spec2->numbered_arg_count;
+      size_t n1 = spec1->numbered_arg_count;
+      size_t n2 = spec2->numbered_arg_count;
 
       /* Check that the argument numbers are the same.
          Both arrays are sorted.  We search for the first difference.  */
-      for (i = 0, j = 0; i < n1 || j < n2; )
-        {
-          int cmp = (i >= n1 ? 1 :
-                     j >= n2 ? -1 :
-                     spec1->numbered[i].number > spec2->numbered[j].number ? 1 :
-                     spec1->numbered[i].number < spec2->numbered[j].number ? -1 :
-                     0);
+      {
+        size_t i, j;
+        for (i = 0, j = 0; i < n1 || j < n2; )
+          {
+            int cmp = (i >= n1 ? 1 :
+                       j >= n2 ? -1 :
+                       spec1->numbered[i].number > spec2->numbered[j].number ? 1 :
+                       spec1->numbered[i].number < spec2->numbered[j].number ? -1 :
+                       0);
 
-          if (cmp > 0)
+            if (cmp > 0)
+              {
+                if (error_logger)
+                  error_logger (error_logger_data,
+                                _("a format specification for argument %zu, as in '%s', doesn't exist in '%s'"),
+                                spec2->numbered[j].number, pretty_msgstr,
+                                pretty_msgid);
+                err = true;
+                break;
+              }
+            else if (cmp < 0)
+              {
+                if (equality)
+                  {
+                    if (error_logger)
+                      error_logger (error_logger_data,
+                                    _("a format specification for argument %zu doesn't exist in '%s'"),
+                                    spec1->numbered[i].number, pretty_msgstr);
+                    err = true;
+                    break;
+                  }
+                else
+                  i++;
+              }
+            else
+              j++, i++;
+          }
+      }
+      /* Check the argument types are the same.  */
+      if (!err)
+        {
+          size_t i, j;
+          for (i = 0, j = 0; j < n2; )
             {
-              if (error_logger)
-                error_logger (_("a format specification for argument %u, as in '%s', doesn't exist in '%s'"),
-                              spec2->numbered[j].number, pretty_msgstr,
-                              pretty_msgid);
-              err = true;
-              break;
-            }
-          else if (cmp < 0)
-            {
-              if (equality)
+              if (spec1->numbered[i].number == spec2->numbered[j].number)
                 {
-                  if (error_logger)
-                    error_logger (_("a format specification for argument %u doesn't exist in '%s'"),
-                                  spec1->numbered[i].number, pretty_msgstr);
-                  err = true;
-                  break;
+                  if (spec1->numbered[i].type != spec2->numbered[j].type)
+                    {
+                      if (error_logger)
+                        error_logger (error_logger_data,
+                                      _("format specifications in '%s' and '%s' for argument %zu are not the same"),
+                                      pretty_msgid, pretty_msgstr,
+                                      spec2->numbered[j].number);
+                      err = true;
+                      break;
+                    }
+                  j++, i++;
                 }
               else
                 i++;
             }
-          else
-            j++, i++;
         }
-      /* Check the argument types are the same.  */
-      if (!err)
-        for (i = 0, j = 0; j < n2; )
-          {
-            if (spec1->numbered[i].number == spec2->numbered[j].number)
-              {
-                if (spec1->numbered[i].type != spec2->numbered[j].type)
-                  {
-                    if (error_logger)
-                      error_logger (_("format specifications in '%s' and '%s' for argument %u are not the same"),
-                                    pretty_msgid, pretty_msgstr,
-                                    spec2->numbered[j].number);
-                    err = true;
-                    break;
-                  }
-                j++, i++;
-              }
-            else
-              i++;
-          }
     }
 
   return err;
@@ -645,7 +631,6 @@ static void
 format_print (void *descr)
 {
   struct spec *spec = (struct spec *) descr;
-  unsigned int i;
 
   if (spec == NULL)
     {
@@ -654,7 +639,7 @@ format_print (void *descr)
     }
 
   printf ("(");
-  for (i = 0; i < spec->numbered_arg_count; i++)
+  for (size_t i = 0; i < spec->numbered_arg_count; i++)
     {
       if (i > 0)
         printf (" ");
@@ -689,18 +674,14 @@ main ()
     {
       char *line = NULL;
       size_t line_size = 0;
-      int line_len;
-      char *invalid_reason;
-      void *descr;
-
-      line_len = getline (&line, &line_size, stdin);
+      int line_len = getline (&line, &line_size, stdin);
       if (line_len < 0)
         break;
       if (line_len > 0 && line[line_len - 1] == '\n')
         line[--line_len] = '\0';
 
-      invalid_reason = NULL;
-      descr = format_parse (line, false, NULL, &invalid_reason);
+      char *invalid_reason = NULL;
+      void *descr = format_parse (line, false, NULL, &invalid_reason);
 
       format_print (descr);
       printf ("\n");
@@ -717,7 +698,7 @@ main ()
 /*
  * For Emacs M-x compile
  * Local Variables:
- * compile-command: "/bin/sh ../libtool --tag=CC --mode=link gcc -o a.out -static -O -g -Wall -I.. -I../gnulib-lib -I../../gettext-runtime/intl -DHAVE_CONFIG_H -DTEST format-java-printf.c ../gnulib-lib/libgettextlib.la"
+ * compile-command: "/bin/sh ../libtool --tag=CC --mode=link gcc -o a.out -static -O -g -Wall -I.. -I../gnulib-lib -I../../gettext-runtime/intl -DTEST format-java-printf.c ../gnulib-lib/libgettextlib.la"
  * End:
  */
 

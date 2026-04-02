@@ -1,5 +1,5 @@
 dnl Configuration for the gettext-runtime directory of GNU gettext
-dnl Copyright (C) 1995-2010, 2012-2015, 2018-2023 Free Software Foundation, Inc.
+dnl Copyright (C) 1995-2026 Free Software Foundation, Inc.
 dnl
 dnl This program is free software: you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -17,16 +17,20 @@ dnl along with this program.  If not, see <https://www.gnu.org/licenses/>.
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.64])
-AC_INIT([gettext-runtime],
-	m4_esyscmd([../build-aux/git-version-gen ../.tarball-version]),
-	[bug-gettext@gnu.org])
+AC_INIT([gettext-runtime], [package], [bug-gettext@gnu.org])
 AC_CONFIG_SRCDIR([intl/dcigettext.c])
 AC_CONFIG_AUX_DIR([../build-aux])
+VERSION_NUMBER=`cd $srcdir/.. \
+                && build-aux/git-version-gen .tarball-version`
+gl_INIT_PACKAGE_VERSION([$VERSION_NUMBER])
 AM_INIT_AUTOMAKE([1.11.1 silent-rules parallel-tests])
 AC_CONFIG_HEADERS([config.h])
 
 dnl Installation directories.
 test "$docdir" != '${datarootdir}/doc/${PACKAGE_TARNAME}' || docdir='${datarootdir}/doc/gettext'
+
+dnl Define bindir_c and bindir_c_make.
+gl_BUILD_TO_HOST_BINDIR
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -34,7 +38,7 @@ AC_PROG_INSTALL
 
 gt_JAVA_CHOICE
 AS_IF([test "$JAVA_CHOICE" != no], [
-  gt_JAVACOMP([1.5], [1.6])
+  gt_JAVACOMP([1.8], [1.8])
   AC_CHECK_PROG([JAR], [jar], [jar])
   if test -n "$HAVE_JAVACOMP" && test -n "$JAR"; then
     BUILDJAVA=yes
@@ -55,6 +59,20 @@ else
   BUILDCSHARP=no
 fi
 AC_SUBST([BUILDCSHARP])
+
+gt_D_CHOICE
+AS_IF([test "$D_CHOICE" != no],
+  [gt_DCOMP
+   if test -n "$DC"; then
+     BUILDD=yes
+   else
+     BUILDD=no
+   fi
+  ],
+  [BUILDD=no
+  ])
+AC_SUBST([BUILDD])
+AM_CONDITIONAL([BUILD_D], [test $BUILDD = yes])
 
 dnl Check for host type.
 AC_CANONICAL_HOST
@@ -85,10 +103,10 @@ dnl Prepares the libtool configuration for handling of Windows resources, and
 dnl sets the RC variable to a program that compiles Windows resource files.
 LT_LANG([Windows Resource])
 
-dnl On mingw and Cygwin, we can activate special Makefile rules which add
-dnl version information to the shared libraries and executables.
+dnl On native Windows and Cygwin, we can activate special Makefile rules which
+dnl add version information to the shared libraries and executables.
 case "$host_os" in
-  mingw* | cygwin*) is_woe32=yes ;;
+  mingw* | windows* | cygwin*) is_woe32=yes ;;
   *) is_woe32=no ;;
 esac
 AM_CONDITIONAL([WOE32], [test $is_woe32 = yes])
@@ -99,7 +117,7 @@ fi
 
 dnl Some code is only meant to be compiled on native Windows.
 case "$host_os" in
-  mingw*) is_windows_native=yes ;;
+  mingw* | windows*) is_windows_native=yes ;;
   *) is_windows_native=no ;;
 esac
 AM_CONDITIONAL([WINDOWS_NATIVE], [test $is_windows_native = yes])
@@ -113,9 +131,9 @@ AM_GNU_GETTEXT([use-libtool], [need-ngettext], [\${top_builddir}/intl])
 dnl Checks for header files, functions and declarations.
 gl_INIT
 AC_TYPE_SIZE_T
-AC_CHECK_FUNCS([setlocale])
 
-dnl Compilation on mingw and Cygwin needs special Makefile rules, because
+dnl Compilation on native Windows and Cygwin needs special Makefile rules,
+dnl because
 dnl 1. when we install a shared library, we must arrange to export
 dnl    auxiliary pointer variables for every exported variable,
 dnl 2. when we install a shared library and a static library simultaneously,
@@ -124,7 +142,7 @@ dnl    must arrange to define the auxiliary pointer variables for the
 dnl    exported variables _also_ in the static library.
 if test "$enable_shared" = yes; then
   case "$host_os" in
-    mingw* | cygwin*) is_woe32dll=yes ;;
+    mingw* | windows* | cygwin*) is_woe32dll=yes ;;
     *) is_woe32dll=no ;;
   esac
 else
@@ -133,25 +151,63 @@ fi
 AM_CONDITIONAL([WOE32DLL], [test $is_woe32dll = yes])
 if test $is_woe32dll = yes; then
   AC_DEFINE([WOE32DLL], [1],
-    [Define when --enable-shared is used on mingw or Cygwin.])
+    [Define when --enable-shared is used on Windows.])
 fi
 
 dnl Put some default definitions into config.h.
 AH_BOTTOM([
 /* On Windows, variables that may be in a DLL must be marked specially.
-   But here, the only such variable is 'exit_failure', and it is always
-   built into a static library, never into a shared library.  */
-#if defined WOE32DLL && !defined IN_RELOCWRAPPER && 0
-# define DLL_VARIABLE __declspec (dllimport)
-#else
-# define DLL_VARIABLE
-#endif
+   The symbols marked with DLL_VARIABLE should be exported if and only if the
+   object file gets included in a DLL.  Libtool, on Windows platforms, defines
+   the C macro DLL_EXPORT (together with PIC) when compiling for a shared
+   library (called DLL under Windows) and does not define it when compiling
+   an object file meant to be linked statically into some executable.  */
+/* But in the scope of this configure file (gettext-runtime/ without intl and
+   libasprintf), there is no shared library.  So it's simple.  */
+#define DLL_VARIABLE
 
 /* Extra OS/2 (emx+gcc) defines.  */
 #if defined __EMX__ && !defined __KLIBC__
 # include "intl/os2compat.h"
 #endif
 ])
+
+gt_MODULA2_CHOICE
+AS_IF([test "$MODULA2_CHOICE" != no],
+  [gt_MODULA2COMP
+   AS_IF([test -n "$M2C"],
+     [BUILDMODULA2=yes
+      AC_COMPUTE_INT([VALUE_OF_LC_ALL],      [LC_ALL],      [#include <locale.h>])
+      AC_COMPUTE_INT([VALUE_OF_LC_CTYPE],    [LC_CTYPE],    [#include <locale.h>])
+      AC_COMPUTE_INT([VALUE_OF_LC_NUMERIC],  [LC_NUMERIC],  [#include <locale.h>])
+      AC_COMPUTE_INT([VALUE_OF_LC_TIME],     [LC_TIME],     [#include <locale.h>])
+      AC_COMPUTE_INT([VALUE_OF_LC_COLLATE],  [LC_COLLATE],  [#include <locale.h>])
+      AC_COMPUTE_INT([VALUE_OF_LC_MONETARY], [LC_MONETARY], [#include <locale.h>])
+      AC_COMPUTE_INT([VALUE_OF_LC_MESSAGES], [LC_MESSAGES], [
+        #include <locale.h>
+        #if defined _WIN32 && !defined __CYGWIN__
+        # define LC_MESSAGES 1729
+        #endif
+      ])
+      AC_SUBST([VALUE_OF_LC_ALL])
+      AC_SUBST([VALUE_OF_LC_CTYPE])
+      AC_SUBST([VALUE_OF_LC_NUMERIC])
+      AC_SUBST([VALUE_OF_LC_TIME])
+      AC_SUBST([VALUE_OF_LC_COLLATE])
+      AC_SUBST([VALUE_OF_LC_MONETARY])
+      AC_SUBST([VALUE_OF_LC_MESSAGES])
+      AC_REQUIRE([AC_LIB_RPATH])
+      M2SHLIBEXT="$acl_shlibext"
+      AC_SUBST([M2SHLIBEXT])
+     ],
+     [BUILDMODULA2=no
+     ])
+  ],
+  [BUILDMODULA2=no
+  ])
+AC_SUBST([BUILDMODULA2])
+AM_CONDITIONAL([BUILD_MODULA2], [test $BUILDMODULA2 = yes])
+AM_CONDITIONAL([USE_INCLUDED_LIBINTL], [test $USE_INCLUDED_LIBINTL = yes])
 
 dnl Check for tools needed for formatting the documentation.
 ac_aux_dir_abs=`cd $ac_aux_dir && pwd`
@@ -163,17 +219,6 @@ AC_SUBST([CROSS_COMPILING])
 
 dnl Checks for optional programs for the tests/lang-* tests.
 gl_PROG_ANSI_CXX([CXX], [ANSICXX])
-
-dnl Checks for special libraries for the tests/test-lock test.
-dnl On some systems, sched_yield is in librt, rather than in libpthread.
-LIBSCHED=
-if test $gl_threads_api = posix; then
-  dnl Solaris has sched_yield in librt, not in libpthread or libc.
-  AC_CHECK_LIB([rt], [sched_yield], [LIBSCHED=-lrt],
-    [dnl Solaris 2.5.1, 2.6 has sched_yield in libposix4, not librt.
-     AC_CHECK_LIB([posix4], [sched_yield], [LIBSCHED=-lposix4])])
-fi
-AC_SUBST([LIBSCHED])
 
 dnl Determine whether to build libasprintf.
 AC_ARG_ENABLE([libasprintf],
@@ -193,11 +238,32 @@ dnl Determine variables used by uninstalled-config.sh.
 ENABLE_SHARED="$enable_shared"
 AC_SUBST([ENABLE_SHARED])
 
+dnl Test for features used in install-tests.
+dnl shlibpath_var and PATH_SEPARATOR are set by LT_INIT.
+if test $USE_INCLUDED_LIBINTL = yes; then
+  INSTALLED_LIBINTL="-lintl $LIBICONV $INTL_MACOSX_LIBS $INTL_WINDOWS_LIBS"
+else
+  INSTALLED_LIBINTL=
+fi
+AC_SUBST([INSTALLED_LIBINTL])
+AC_SUBST([PATH_SEPARATOR])
+if test -n "${shlibpath_var}"; then
+  if test "${shlibpath_var}" = PATH; then
+    AUGMENT_SHLIBPATH="PATH='\$(bindir)'${PATH_SEPARATOR}\"\$\$PATH\";"
+  else
+    AUGMENT_SHLIBPATH="${shlibpath_var}='\$(libdir)':\"\$\$${shlibpath_var}\"; export ${shlibpath_var};"
+  fi
+else
+  AUGMENT_SHLIBPATH=
+fi
+AC_SUBST([AUGMENT_SHLIBPATH])
+
 AC_CONFIG_SUBDIRS([intl])
 
 AC_CONFIG_SUBDIRS([libasprintf])
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile],
+                [FIX_MAKEFILE_DISTRIB])
 AC_CONFIG_FILES([uninstalled-config.sh])
 
 AC_CONFIG_FILES([doc/Makefile])
@@ -206,6 +272,11 @@ AC_CONFIG_FILES([intl-java/Makefile])
 
 AC_CONFIG_FILES([intl-csharp/Makefile])
 
+AC_CONFIG_FILES([intl-d/Makefile])
+
+AC_CONFIG_FILES([intl-modula2/Makefile])
+AC_CONFIG_FILES([intl-modula2/Libintl.def])
+
 AC_CONFIG_FILES([gnulib-lib/Makefile])
 
 AC_CONFIG_FILES([src/Makefile])
@@ -213,12 +284,13 @@ AC_CONFIG_FILES([src/gettext.sh], [chmod a+x src/gettext.sh])
 
 AC_CONFIG_FILES([po/Makefile.in])
 
-AC_CONFIG_FILES([man/Makefile],
-                [FIX_MAKEFILE_DISTRIB])
+AC_CONFIG_FILES([man/Makefile])
 AC_CONFIG_FILES([man/x-to-1])
 
 AC_CONFIG_FILES([m4/Makefile])
 
 AC_CONFIG_FILES([tests/Makefile])
+
+AC_CONFIG_FILES([install-tests/Makefile])
 
 AC_OUTPUT

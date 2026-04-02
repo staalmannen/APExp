@@ -1,6 +1,6 @@
 /* qset-acl.c - set access control list equivalent to a mode
 
-   Copyright (C) 2002-2003, 2005-2024 Free Software Foundation, Inc.
+   Copyright (C) 2002-2003, 2005-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,10 +19,10 @@
 
 #include <config.h>
 
-#define ACL_INTERNAL_INLINE _GL_EXTERN_INLINE
+/* Specification. */
+#include "acl.h"
 
 #include <string.h>
-#include "acl.h"
 
 #include "acl-internal.h"
 
@@ -39,11 +39,12 @@ int
 qset_acl (char const *name, int desc, mode_t mode)
 {
   struct permission_context ctx;
-  int ret;
-
   memset (&ctx, 0, sizeof ctx);
   ctx.mode = mode;
-  ret = set_permissions (&ctx, name, desc);
+
+  int ret = set_permissions (&ctx, name, desc);
+
   free_permission_context (&ctx);
+
   return ret;
 }

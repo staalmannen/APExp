@@ -1,5 +1,5 @@
 /* Test of getcwd() function.
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -30,10 +30,6 @@
 #include "qemu.h"
 #include "macros.h"
 
-#if !(HAVE_GETPAGESIZE || defined getpagesize)
-# define getpagesize() 0
-#endif
-
 /* This size is chosen to be larger than PATH_MAX (4k), yet smaller than
    the 16kB pagesize on ia64 linux.  Those conditions make the code below
    trigger a bug in glibc's getcwd implementation before 2.4.90-10.  */
@@ -53,10 +49,10 @@ test_abort_bug (void)
   size_t initial_cwd_len;
   int fail = 0;
 
-  /* The bug is triggered when PATH_MAX < getpagesize (), so skip
+  /* The bug is triggered when PATH_MAX < page size, so skip
      this relatively expensive and invasive test if that's not true.  */
-#ifdef PATH_MAX
-  int bug_possible = PATH_MAX < getpagesize ();
+#if defined PATH_MAX && defined _SC_PAGESIZE
+  int bug_possible = PATH_MAX < sysconf (_SC_PAGESIZE);
 #else
   int bug_possible = 0;
 #endif
@@ -244,11 +240,9 @@ test_long_name (void)
      So clean up here, right away, even though the driving
      shell script would also clean up.  */
   {
-    size_t i;
-
     /* Try rmdir first, in case the chdir failed.  */
     rmdir (DIR_NAME);
-    for (i = 0; i <= n_chdirs; i++)
+    for (size_t i = 0; i <= n_chdirs; i++)
       {
         if (chdir ("..") < 0)
           break;
@@ -266,5 +260,6 @@ main ()
 {
   int err1 = test_abort_bug ();
   int err2 = test_long_name ();
-  return err1 * 10 + (err1 != 0 && err2 == 77 ? 0 : err2);
+  int result = err1 * 10 + (err1 != 0 && err2 == 77 ? 0 : err2);
+  return (result ? result : test_exit_status);
 }

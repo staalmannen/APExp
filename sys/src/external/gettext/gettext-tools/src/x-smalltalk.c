@@ -1,7 +1,5 @@
 /* xgettext Smalltalk backend.
-   Copyright (C) 2002-2003, 2005-2009, 2011, 2018-2020 Free Software Foundation, Inc.
-
-   This file was written by Bruno Haible <haible@clisp.cons.org>, 2002.
+   Copyright (C) 2002-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,9 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+/* Written by Bruno Haible.  */
+
+#include <config.h>
 
 /* Specification.  */
 #include "x-smalltalk.h"
@@ -27,13 +25,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define SB_NO_APPENDF
+#include <error.h>
 #include "attribute.h"
 #include "message.h"
 #include "xgettext.h"
 #include "xg-pos.h"
 #include "xg-message.h"
-#include "error.h"
 #include "xalloc.h"
+#include "string-buffer.h"
 #include "gettext.h"
 
 #define _(s) gettext(s)
@@ -171,8 +171,19 @@ struct token_ty
 {
   token_type_ty type;
   char *string;         /* for token_type_string_literal, token_type_symbol */
+  refcounted_string_list_ty *comment;  /* for token_type_string_literal */
   int line_number;
 };
+
+/* Free the memory pointed to by a 'struct token_ty'.  */
+static inline void
+free_token (token_ty *tp)
+{
+  if (tp->type == token_type_string_literal || tp->type == token_type_symbol)
+    free (tp->string);
+  if (tp->type == token_type_string_literal)
+    drop_reference (tp->comment);
+}
 
 
 /* 2. Combine characters into tokens.  Discard comments and whitespace.  */
@@ -183,11 +194,6 @@ static int phase2_pushback_length;
 static void
 phase2_get (token_ty *tp)
 {
-  static char *buffer;
-  static int bufmax;
-  int bufpos;
-  int c;
-
   if (phase2_pushback_length)
     {
       *tp = phase2_pushback[--phase2_pushback_length];
@@ -198,6 +204,8 @@ phase2_get (token_ty *tp)
 
   for (;;)
     {
+      int c;
+
       tp->line_number = line_number;
       c = phase1_getc ();
       switch (c)
@@ -209,10 +217,8 @@ phase2_get (token_ty *tp)
         case '"':
           {
             /* Comment.  */
-            int lineno;
-
             comment_start ();
-            lineno = line_number;
+            int lineno = line_number;
             for (;;)
               {
                 c = phase1_getc ();
@@ -252,36 +258,29 @@ phase2_get (token_ty *tp)
         {
         case '\'':
           /* String literal.  */
-          bufpos = 0;
-          for (;;)
-            {
-              c = phase1_getc ();
-              if (c == EOF)
-                break;
-              if (c == '\'')
-                {
-                  c = phase1_getc ();
-                  if (c != '\'')
-                    {
-                      phase1_ungetc (c);
-                      break;
-                    }
-                }
-              if (bufpos >= bufmax)
-                {
-                  bufmax = 2 * bufmax + 10;
-                  buffer = xrealloc (buffer, bufmax);
-                }
-              buffer[bufpos++] = c;
-            }
-          if (bufpos >= bufmax)
-            {
-              bufmax = 2 * bufmax + 10;
-              buffer = xrealloc (buffer, bufmax);
-            }
-          buffer[bufpos] = 0;
-          tp->type = token_type_string_literal;
-          tp->string = xstrdup (buffer);
+          {
+            struct string_buffer buffer;
+            sb_init (&buffer);
+            for (;;)
+              {
+                c = phase1_getc ();
+                if (c == EOF)
+                  break;
+                if (c == '\'')
+                  {
+                    c = phase1_getc ();
+                    if (c != '\'')
+                      {
+                        phase1_ungetc (c);
+                        break;
+                      }
+                  }
+                sb_xappend1 (&buffer, c);
+              }
+            tp->type = token_type_string_literal;
+            tp->string = sb_xdupfree_c (&buffer);
+            tp->comment = add_reference (savable_comment);
+          }
           return;
 
         case '+':
@@ -300,7 +299,6 @@ phase2_get (token_ty *tp)
         case '%':
         case '\\':
           {
-            char *name;
             int c2 = phase1_getc ();
             switch (c2)
               {
@@ -318,18 +316,20 @@ phase2_get (token_ty *tp)
               case '@':
               case '?':
               case '%':
-                name = XNMALLOC (3, char);
-                name[0] = c;
-                name[1] = c2;
-                name[2] = '\0';
-                tp->type = token_type_symbol;
-                tp->string = name;
-                return;
+                {
+                  char *name = XNMALLOC (3, char);
+                  name[0] = c;
+                  name[1] = c2;
+                  name[2] = '\0';
+                  tp->type = token_type_symbol;
+                  tp->string = name;
+                  return;
+                }
               default:
                 phase1_ungetc (c2);
                 break;
               }
-            name = XNMALLOC (2, char);
+            char *name = XNMALLOC (2, char);
             name[0] = c;
             name[1] = '\0';
             tp->type = token_type_symbol;
@@ -348,71 +348,60 @@ phase2_get (token_ty *tp)
         case 's': case 't': case 'u': case 'v': case 'w': case 'x':
         case 'y': case 'z':
           /* Recognize id or id":"[id":"]* or id":"[id":"]*id.  */
-          bufpos = 0;
-          for (;;)
-            {
-              if (bufpos >= bufmax)
-                {
-                  bufmax = 2 * bufmax + 10;
-                  buffer = xrealloc (buffer, bufmax);
-                }
-              buffer[bufpos++] = c;
-              c = phase1_getc ();
-              switch (c)
-                {
-                case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-                case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
-                case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
-                case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
-                case 'Y': case 'Z':
-                case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-                case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
-                case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
-                case 's': case 't': case 'u': case 'v': case 'w': case 'x':
-                case 'y': case 'z':
-                case '0': case '1': case '2': case '3': case '4':
-                case '5': case '6': case '7': case '8': case '9':
-                  continue;
-                case ':':
-                  if (bufpos >= bufmax)
-                    {
-                      bufmax = 2 * bufmax + 10;
-                      buffer = xrealloc (buffer, bufmax);
-                    }
-                  buffer[bufpos++] = c;
-                  c = phase1_getc ();
-                  switch (c)
-                    {
-                    case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-                    case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
-                    case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
-                    case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
-                    case 'Y': case 'Z':
-                    case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-                    case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
-                    case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
-                    case 's': case 't': case 'u': case 'v': case 'w': case 'x':
-                    case 'y': case 'z':
-                      continue;
-                    default:
-                      phase1_ungetc (c);
-                      break;
-                    }
-                  break;
-                default:
-                  phase1_ungetc (c);
-                  break;
-                }
-              break;
-            }
-          if (bufpos >= bufmax)
-            {
-              bufmax = 2 * bufmax + 10;
-              buffer = xrealloc (buffer, bufmax);
-            }
-          buffer[bufpos] = '\0';
-          tp->string = xstrdup (buffer);
-          tp->type = token_type_symbol;
+          {
+            struct string_buffer buffer;
+            sb_init (&buffer);
+            for (;;)
+              {
+                sb_xappend1 (&buffer, c);
+                c = phase1_getc ();
+                switch (c)
+                  {
+                  case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+                  case 'G': case 'H': case 'I': case 'J': case 'K': case 'L':
+                  case 'M': case 'N': case 'O': case 'P': case 'Q': case 'R':
+                  case 'S': case 'T': case 'U': case 'V': case 'W': case 'X':
+                  case 'Y': case 'Z':
+                  case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+                  case 'g': case 'h': case 'i': case 'j': case 'k': case 'l':
+                  case 'm': case 'n': case 'o': case 'p': case 'q': case 'r':
+                  case 's': case 't': case 'u': case 'v': case 'w': case 'x':
+                  case 'y': case 'z':
+                  case '0': case '1': case '2': case '3': case '4':
+                  case '5': case '6': case '7': case '8': case '9':
+                    continue;
+                  case ':':
+                    sb_xappend1 (&buffer, c);
+                    c = phase1_getc ();
+                    switch (c)
+                      {
+                      case 'A': case 'B': case 'C': case 'D': case 'E':
+                      case 'F': case 'G': case 'H': case 'I': case 'J':
+                      case 'K': case 'L': case 'M': case 'N': case 'O':
+                      case 'P': case 'Q': case 'R': case 'S': case 'T':
+                      case 'U': case 'V': case 'W': case 'X': case 'Y':
+                      case 'Z':
+                      case 'a': case 'b': case 'c': case 'd': case 'e':
+                      case 'f': case 'g': case 'h': case 'i': case 'j':
+                      case 'k': case 'l': case 'm': case 'n': case 'o':
+                      case 'p': case 'q': case 'r': case 's': case 't':
+                      case 'u': case 'v': case 'w': case 'x': case 'y':
+                      case 'z':
+                        continue;
+                      default:
+                        phase1_ungetc (c);
+                        break;
+                      }
+                    break;
+                  default:
+                    phase1_ungetc (c);
+                    break;
+                  }
+                break;
+              }
+            tp->string = sb_xdupfree_c (&buffer);
+            tp->type = token_type_symbol;
+          }
           return;
 
         case '#':
@@ -447,7 +436,7 @@ phase2_unget (token_ty *tp)
 
 /* 3. Combine "# string_literal" and "# symbol" to a single token.  */
 
-static token_ty phase3_pushback[1];
+static token_ty phase3_pushback[2];
 static int phase3_pushback_length;
 
 static void
@@ -463,20 +452,23 @@ phase3_get (token_ty *tp)
   if (tp->type == token_type_uniq)
     {
       token_ty token2;
-
       phase2_get (&token2);
+
       if (token2.type == token_type_symbol
           || token2.type == token_type_string_literal)
         {
+          if (token2.type == token_type_string_literal)
+            drop_reference (token2.comment);
           tp->type = token_type_string_literal;
           tp->string = token2.string;
+          tp->comment = add_reference (savable_comment);
         }
       else
         phase2_unget (&token2);
     }
 }
 
-/* Supports only one pushback token.  */
+/* Supports 2 pushback tokens.  */
 static void
 phase3_unget (token_ty *tp)
 {
@@ -485,6 +477,81 @@ phase3_unget (token_ty *tp)
       if (phase3_pushback_length == SIZEOF (phase3_pushback))
         abort ();
       phase3_pushback[phase3_pushback_length++] = *tp;
+    }
+}
+
+
+/* 4. String literal concatenation:
+   Combine "string1" , "string2" to "string1string2".  */
+
+/* Concatenates two strings, and frees the first argument.  */
+static char *
+string_concat_free1 (char *s1, const char *s2)
+{
+  size_t len1 = strlen (s1);
+  size_t len2 = strlen (s2);
+  size_t len = len1 + len2 + 1;
+  char *result = XNMALLOC (len, char);
+  memcpy (result, s1, len1);
+  memcpy (result + len1, s2, len2 + 1);
+  free (s1);
+  return result;
+}
+
+static token_ty phase4_pushback[1];
+static int phase4_pushback_length;
+
+static void
+phase4_get (token_ty *tp)
+{
+  if (phase4_pushback_length)
+    {
+      *tp = phase4_pushback[--phase4_pushback_length];
+      return;
+    }
+
+  phase3_get (tp);
+  if (tp->type == token_type_string_literal)
+    {
+      char *sum = tp->string;
+
+      for (;;)
+        {
+          token_ty token2;
+          phase3_get (&token2);
+
+          if (token2.type == token_type_symbol
+              && strcmp (token2.string, ",") == 0)
+            {
+              token_ty token3;
+              phase3_get (&token3);
+
+              if (token3.type == token_type_string_literal)
+                {
+                  sum = string_concat_free1 (sum, token3.string);
+
+                  free_token (&token3);
+                  free_token (&token2);
+                  continue;
+                }
+              phase3_unget (&token3);
+            }
+          phase3_unget (&token2);
+          break;
+        }
+      tp->string = sum;
+    }
+}
+
+/* Supports only one pushback token.  */
+static void
+phase4_unget (token_ty *tp)
+{
+  if (tp->type != token_type_eof)
+    {
+      if (phase4_pushback_length == SIZEOF (phase4_pushback))
+        abort ();
+      phase4_pushback[phase4_pushback_length++] = *tp;
     }
 }
 
@@ -520,6 +587,7 @@ extract_smalltalk (FILE *f,
 
   phase2_pushback_length = 0;
   phase3_pushback_length = 0;
+  phase4_pushback_length = 0;
 
   /* Eat tokens until eof is seen.  */
   {
@@ -540,8 +608,7 @@ extract_smalltalk (FILE *f,
     for (;;)
       {
         token_ty token;
-
-        phase3_get (&token);
+        phase4_get (&token);
 
         switch (token.type)
           {
@@ -551,7 +618,7 @@ extract_smalltalk (FILE *f,
                      strcmp (token.string, "at:") == 0 && state == 1 ? 3 :
                      strcmp (token.string, "plural:") == 0 && state == 4 ? 5 :
                      0);
-            free (token.string);
+            free_token (&token);
             break;
 
           case token_type_string_literal:
@@ -561,29 +628,28 @@ extract_smalltalk (FILE *f,
                 pos.file_name = logical_file_name;
                 pos.line_number = token.line_number;
                 remember_a_message (mlp, NULL, token.string, false, false,
-                                    null_context, &pos, NULL, savable_comment,
-                                    false);
+                                    null_context_region (), &pos,
+                                    NULL, token.comment, false);
                 state = 0;
                 break;
               }
             if (state == 3)
               {
                 lex_pos_ty pos;
-                token_ty token2;
-
                 pos.file_name = logical_file_name;
                 pos.line_number = token.line_number;
 
-                phase3_get (&token2);
+                token_ty token2;
+                phase4_get (&token2);
 
                 plural_mp =
                   remember_a_message (mlp, NULL, token.string, false,
                                       token2.type == token_type_symbol
                                       && strcmp (token.string, "plural:") == 0,
-                                      null_context, &pos,
-                                      NULL, savable_comment, false);
+                                      null_context_region (), &pos,
+                                      NULL, token.comment, false);
 
-                phase3_unget (&token2);
+                phase4_unget (&token2);
 
                 state = 4;
                 break;
@@ -595,13 +661,13 @@ extract_smalltalk (FILE *f,
                 pos.line_number = token.line_number;
                 if (plural_mp != NULL)
                   remember_a_message_plural (plural_mp, token.string, false,
-                                             null_context, &pos,
-                                             savable_comment, false);
+                                             null_context_region (), &pos,
+                                             token.comment, false);
                 state = 0;
                 break;
               }
             state = 0;
-            free (token.string);
+            free_token (&token);
             break;
 
           case token_type_uniq:

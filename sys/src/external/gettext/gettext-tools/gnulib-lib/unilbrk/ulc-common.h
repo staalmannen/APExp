@@ -1,5 +1,5 @@
 /* Line breaking auxiliary functions.
-   Copyright (C) 2001-2003, 2006-2024 Free Software Foundation, Inc.
+   Copyright (C) 2001-2003, 2006-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2001.
 
    This file is free software.
@@ -28,6 +28,11 @@
 
 #include "c-ctype.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #define is_utf8_encoding unilbrk_is_utf8_encoding
 extern int is_utf8_encoding (const char *encoding);
 
@@ -37,3 +42,8 @@ extern int is_utf8_encoding (const char *encoding);
 extern int is_all_ascii (const char *s, size_t n);
 
 #endif /* C_CTYPE_ASCII */
+
+
+#ifdef __cplusplus
+}
+#endif

@@ -1,6 +1,6 @@
 /* Query, remove, or restore a Solaris privilege.
 
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,6 +32,11 @@ _GL_INLINE_HEADER_BEGIN
 
 # include <priv.h>
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
+
 int priv_set_ismember (const char *priv);
 int priv_set_remove (const char *priv);
 int priv_set_restore (const char *priv);
@@ -61,6 +66,11 @@ priv_set_restore_linkdir (void)
 {
   return -1;
 }
+
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif
 

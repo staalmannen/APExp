@@ -1,6 +1,5 @@
 /* Message list character set conversion.
-   Copyright (C) 2001-2003, 2005-2006, 2009, 2023 Free Software Foundation, Inc.
-   Written by Bruno Haible <haible@clisp.cons.org>, 2001.
+   Copyright (C) 2001-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,6 +14,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Written by Bruno Haible.  */
+
 #ifndef _MSGL_ICONV_H
 #define _MSGL_ICONV_H
 
@@ -26,6 +27,7 @@
 #include "string-desc.h"
 
 #include "message.h"
+#include "xerror-handler.h"
 
 
 #ifdef __cplusplus
@@ -48,7 +50,7 @@ struct conversion_context
    Assumes that either FROM_CODE or TO_CODE is UTF-8.  */
 extern char *convert_string_directly (iconv_t cd, const char *string,
                                       const struct conversion_context* context);
-extern string_desc_t
+extern rw_string_desc_t
        convert_string_desc_directly (iconv_t cd, string_desc_t string,
                                      const struct conversion_context* context);
 
@@ -63,7 +65,8 @@ extern bool
        iconv_message_list (message_list_ty *mlp,
                            const char *canon_from_code,
                            const char *canon_to_code,
-                           const char *from_filename);
+                           const char *from_filename,
+                           xerror_handler_ty xerror_handler);
 
 /* Converts all the message lists in MDLP to the encoding TO_CODE.
    UPDATE_HEADER specifies whether to update the "charset=..." specification
@@ -72,7 +75,8 @@ extern msgdomain_list_ty *
        iconv_msgdomain_list (msgdomain_list_ty *mdlp,
                              const char *to_code,
                              bool update_header,
-                             const char *from_filename);
+                             const char *from_filename,
+                             xerror_handler_ty xerror_handler);
 
 /* Tests whether the message list MLP could be converted to CANON_TO_CODE.
    The (already canonicalized) encoding before conversion can be passed as

@@ -5,8 +5,7 @@
 #endif
 #line 1 "term-ostream.oo.c"
 /* Output stream for attributed text, producing ANSI escape sequences.
-   Copyright (C) 2006-2008, 2017, 2019-2020, 2022-2023 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,6 +19,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible.  */
 
 #include <config.h>
 
@@ -42,7 +43,7 @@
 # include <windows.h>
 #endif
 
-#include "error.h"
+#include <error.h>
 #include "full-write.h"
 #include "get_ppid_of.h"
 #include "get_progname_of.h"
@@ -202,18 +203,14 @@ color_distance (const hsv_t *color1, const hsv_t *color2)
 static unsigned int
 nearest_color (rgb_t given, const rgb_t *table, unsigned int table_size)
 {
-  hsv_t given_hsv;
-  unsigned int best_index;
-  float best_distance;
-  unsigned int i;
-
   assert (table_size > 0);
 
+  hsv_t given_hsv;
   rgb_to_hsv (given, &given_hsv);
 
-  best_index = 0;
-  best_distance = 1000000.0f;
-  for (i = 0; i < table_size; i++)
+  unsigned int best_index = 0;
+  float best_distance = 1000000.0f;
+  for (unsigned int i = 0; i < table_size; i++)
     {
       hsv_t i_hsv;
 
@@ -309,9 +306,9 @@ static inline term_color_t
 rgb_to_color_common8 (int r, int g, int b)
 {
   rgb_t color;
-  hsv_t hsv;
-
   color.red = r; color.green = g; color.blue = b;
+
+  hsv_t hsv;
   rgb_to_hsv (color, &hsv);
 
   if (hsv.saturation < 0.065f)
@@ -367,9 +364,9 @@ static inline term_color_t
 rgb_to_color_xterm8 (int r, int g, int b)
 {
   rgb_t color;
-  hsv_t hsv;
-
   color.red = r; color.green = g; color.blue = b;
+
+  hsv_t hsv;
   rgb_to_hsv (color, &hsv);
 
   if (hsv.saturation < 0.065f)
@@ -415,9 +412,9 @@ static inline term_color_t
 rgb_to_color_xterm16 (int r, int g, int b)
 {
   rgb_t color;
-  hsv_t hsv;
-
   color.red = r; color.green = g; color.blue = b;
+
+  hsv_t hsv;
   rgb_to_hsv (color, &hsv);
 
   if (hsv.saturation < 0.065f)
@@ -541,9 +538,9 @@ static inline term_color_t
 rgb_to_color_xterm88 (int r, int g, int b)
 {
   rgb_t color;
-  hsv_t hsv;
-
   color.red = r; color.green = g; color.blue = b;
+
+  hsv_t hsv;
   rgb_to_hsv (color, &hsv);
 
   if (hsv.saturation < 0.065f)
@@ -853,9 +850,9 @@ static inline term_color_t
 rgb_to_color_xterm256 (int r, int g, int b)
 {
   rgb_t color;
-  hsv_t hsv;
-
   color.red = r; color.green = g; color.blue = b;
+
+  hsv_t hsv;
   rgb_to_hsv (color, &hsv);
 
   if (hsv.saturation < 0.065f)
@@ -1035,7 +1032,7 @@ nonintr_tcdrain (int fd)
 
 /* ============================ term_ostream_t ============================ */
 
-#line 1039 "term-ostream.c"
+#line 1036 "term-ostream.c"
 #include "term_ostream.priv.h"
 
 const typeinfo_t term_ostream_typeinfo = { "term_ostream" };
@@ -1045,7 +1042,7 @@ static const typeinfo_t * const term_ostream_superclasses[] =
 
 #define super ostream_vtable
 
-#line 1109 "term-ostream.oo.c"
+#line 1106 "term-ostream.oo.c"
 
 static struct term_style_control_data *
 get_control_data (term_ostream_t stream)
@@ -1104,12 +1101,10 @@ generate_hyperlink_id (term_ostream_t stream)
       stream->id_serial
     };
   char *p = id;
-  unsigned int i;
-  for (i = 0; i < 4; i++)
+  for (unsigned int i = 0; i < 4; i++)
     {
       uint32_t word = words[i];
-      unsigned int j;
-      for (j = 0; j < 32 / 4; j++)
+      for (unsigned int j = 0; j < 32 / 4; j++)
         *p++ = hexdigits[(word >> (32 - 4 * (j + 1))) & 0x0f];
     }
   *p = '\0';
@@ -1138,8 +1133,8 @@ static int
 out_char (int c)
 {
   char bytes[1];
-
   bytes[0] = (char)c;
+
   /* We have to write directly to the file descriptor, not to a buffer with
      the same destination, because of the padding and sleeping that tputs()
      does.  */
@@ -1148,15 +1143,35 @@ out_char (int c)
   return 0;
 }
 
+/* Output an entire string (not an escape sequence) to out_fd.  */
+static void
+out_data_string (const char *s)
+{
+  size_t n = strlen (s);
+  if (n > 0)
+    if (full_write (out_fd, s, n) < n)
+      out_error ();
+}
+
 /* Output a single char to out_fd.  Ignore errors.  */
 static _GL_ASYNC_SAFE int
 out_char_unchecked (int c)
 {
   char bytes[1];
-
   bytes[0] = (char)c;
+
   full_write (out_fd, bytes, 1);
   return 0;
+}
+
+/* Output an entire string (not an escape sequence) to out_fd.
+   Ignore errors.  */
+static _GL_ASYNC_SAFE void
+out_data_string_unchecked (const char *s)
+{
+  size_t n = strlen (s);
+  if (n > 0)
+    full_write (out_fd, s, n);
 }
 
 /* Output escape sequences to switch the foreground color to NEW_COLOR.  */
@@ -1232,11 +1247,10 @@ out_color_change (term_ostream_t stream, term_color_t new_color,
       assert (new_color >= 0 && new_color < 88);
       {
         char bytes[10];
-        char *p;
         bytes[0] = 0x1B; bytes[1] = '[';
         bytes[2] = '3'; bytes[3] = '8'; bytes[4] = ';';
         bytes[5] = '5'; bytes[6] = ';';
-        p = bytes + 7;
+        char *p = bytes + 7;
         if (new_color >= 10)
           *p++ = '0' + (new_color / 10);
         *p++ = '0' + (new_color % 10);
@@ -1250,11 +1264,10 @@ out_color_change (term_ostream_t stream, term_color_t new_color,
       assert (new_color >= 0 && new_color < 256);
       {
         char bytes[11];
-        char *p;
         bytes[0] = 0x1B; bytes[1] = '[';
         bytes[2] = '3'; bytes[3] = '8'; bytes[4] = ';';
         bytes[5] = '5'; bytes[6] = ';';
-        p = bytes + 7;
+        char *p = bytes + 7;
         if (new_color >= 100)
           *p++ = '0' + (new_color / 100);
         if (new_color >= 10)
@@ -1270,14 +1283,13 @@ out_color_change (term_ostream_t stream, term_color_t new_color,
       assert (new_color >= 0 && new_color < 0x1000000);
       {
         char bytes[19];
-        char *p;
         unsigned int r = (new_color >> 16) & 0xff;
         unsigned int g = (new_color >> 8) & 0xff;
         unsigned int b = new_color & 0xff;
         bytes[0] = 0x1B; bytes[1] = '[';
         bytes[2] = '3'; bytes[3] = '8'; bytes[4] = ';';
         bytes[5] = '2'; bytes[6] = ';';
-        p = bytes + 7;
+        char *p = bytes + 7;
         if (r >= 100)
           *p++ = '0' + (r / 100);
         if (r >= 10)
@@ -1383,11 +1395,10 @@ out_bgcolor_change (term_ostream_t stream, term_color_t new_bgcolor,
       assert (new_bgcolor >= 0 && new_bgcolor < 88);
       {
         char bytes[10];
-        char *p;
         bytes[0] = 0x1B; bytes[1] = '[';
         bytes[2] = '4'; bytes[3] = '8'; bytes[4] = ';';
         bytes[5] = '5'; bytes[6] = ';';
-        p = bytes + 7;
+        char *p = bytes + 7;
         if (new_bgcolor >= 10)
           *p++ = '0' + (new_bgcolor / 10);
         *p++ = '0' + (new_bgcolor % 10);
@@ -1401,11 +1412,10 @@ out_bgcolor_change (term_ostream_t stream, term_color_t new_bgcolor,
       assert (new_bgcolor >= 0 && new_bgcolor < 256);
       {
         char bytes[11];
-        char *p;
         bytes[0] = 0x1B; bytes[1] = '[';
         bytes[2] = '4'; bytes[3] = '8'; bytes[4] = ';';
         bytes[5] = '5'; bytes[6] = ';';
-        p = bytes + 7;
+        char *p = bytes + 7;
         if (new_bgcolor >= 100)
           *p++ = '0' + (new_bgcolor / 100);
         if (new_bgcolor >= 10)
@@ -1421,14 +1431,13 @@ out_bgcolor_change (term_ostream_t stream, term_color_t new_bgcolor,
       assert (new_bgcolor >= 0 && new_bgcolor < 0x1000000);
       {
         char bytes[19];
-        char *p;
         unsigned int r = (new_bgcolor >> 16) & 0xff;
         unsigned int g = (new_bgcolor >> 8) & 0xff;
         unsigned int b = new_bgcolor & 0xff;
         bytes[0] = 0x1B; bytes[1] = '[';
         bytes[2] = '4'; bytes[3] = '8'; bytes[4] = ';';
         bytes[5] = '2'; bytes[6] = ';';
-        p = bytes + 7;
+        char *p = bytes + 7;
         if (r >= 100)
           *p++ = '0' + (r / 100);
         if (r >= 10)
@@ -1523,11 +1532,23 @@ out_hyperlink_change (term_ostream_t stream, hyperlink_t *new_hyperlink,
   if (new_hyperlink != NULL)
     {
       assert (new_hyperlink->real_id != NULL);
-      tputs ("\033]8;id=",           1, out_ch);
-      tputs (new_hyperlink->real_id, 1, out_ch);
-      tputs (";",                    1, out_ch);
-      tputs (new_hyperlink->ref,     1, out_ch);
-      tputs ("\033\\",               1, out_ch);
+      /* We need to output the hyperlink's id and ref directly, not through
+         tputs(), because
+           - The tputs() documentation says that its first argument "must be
+             a terminfo string variable or the return value from tparm,
+             tgetstr, or tgoto."
+           - Some ncurses versions do special processing if the first argument
+             starts with a digit. Cf. BSD_TPUTS in the ncurses source code.
+         Maybe we should better pass the entire escape sequence to a single
+         tputs() call.  But this would require a memory allocation, which can
+         fail.  (The length limits on id and ref are not enforced.)  */
+      void (*out_string) (const char *) =
+        (async_safe ? out_data_string_unchecked : out_data_string);
+      tputs ("\033]8;id=", 1, out_ch);
+      out_string (new_hyperlink->real_id);
+      out_string (";");
+      out_string (new_hyperlink->ref);
+      tputs ("\033\\", 1, out_ch);
     }
   else
     tputs ("\033]8;;\033\\", 1, out_ch);
@@ -1572,8 +1593,6 @@ out_attr_change (term_ostream_t stream, attributes_t new_attr)
   else
   #endif
     {
-      bool cleared_attributes;
-
       /* For out_char to work.  */
       out_stream = stream;
       out_fd = stream->fd;
@@ -1610,7 +1629,7 @@ out_attr_change (term_ostream_t stream, attributes_t new_attr)
          The variable 'cleared_attributes' tells whether an escape sequence
          has been output that may have cleared all attributes and all color
          settings.  */
-      cleared_attributes = false;
+      bool cleared_attributes = false;
       if (old_attr.posture != POSTURE_NORMAL
           && new_attr.posture == POSTURE_NORMAL
           && stream->exit_italics_mode != NULL)
@@ -1807,35 +1826,33 @@ activate_default_attr (term_ostream_t stream)
 static void
 output_buffer (term_ostream_t stream, attributes_t goal_attr)
 {
-  const char *cp;
-  const attributes_t *ap;
-  size_t len;
-  size_t n;
+  const char *cp = stream->buffer;
+  const attributes_t *ap = stream->attrbuffer;
+  size_t len = stream->buflen;
 
-  cp = stream->buffer;
-  ap = stream->attrbuffer;
-  len = stream->buflen;
-
-  /* See how much we can output without blocking signals.  */
-  for (n = 0; n < len && equal_attributes (ap[n], stream->active_attr); n++)
-    ;
-  if (n > 0)
-    {
-      if (full_write (stream->fd, cp, n) < n)
-        {
-          int error_code = errno;
-          /* Do output to stderr only after we have switched back to the
-             default attributes.  Otherwise this output may come out with
-             the wrong text attributes.  */
-          if (!equal_attributes (stream->active_attr, stream->default_attr))
-            activate_default_attr (stream);
-          error (EXIT_FAILURE, error_code, _("error writing to %s"),
-                 stream->filename);
-        }
-      cp += n;
-      ap += n;
-      len -= n;
-    }
+  {
+    /* See how much we can output without blocking signals.  */
+    size_t n;
+    for (n = 0; n < len && equal_attributes (ap[n], stream->active_attr); n++)
+      ;
+    if (n > 0)
+      {
+        if (full_write (stream->fd, cp, n) < n)
+          {
+            int error_code = errno;
+            /* Do output to stderr only after we have switched back to the
+               default attributes.  Otherwise this output may come out with
+               the wrong text attributes.  */
+            if (!equal_attributes (stream->active_attr, stream->default_attr))
+              activate_default_attr (stream);
+            error (EXIT_FAILURE, error_code, _("error writing to %s"),
+                   stream->filename);
+          }
+        cp += n;
+        ap += n;
+        len -= n;
+      }
+  }
   if (len > 0)
     {
       if (!equal_attributes (*ap, stream->default_attr))
@@ -1847,6 +1864,7 @@ output_buffer (term_ostream_t stream, attributes_t goal_attr)
           out_attr_change (stream, *ap);
           /* See how many characters we can output without further attribute
              changes.  */
+          size_t n;
           for (n = 1; n < len && equal_attributes (ap[n], stream->active_attr); n++)
             ;
           if (full_write (stream->fd, cp, n) < n)
@@ -1884,8 +1902,7 @@ output_buffer (term_ostream_t stream, attributes_t goal_attr)
   {
     size_t count = stream->hyperlinks_count;
     size_t j = 0;
-    size_t i;
-    for (i = 0; i < count; i++)
+    for (size_t i = 0; i < count; i++)
       {
         /* Here 0 <= j <= i.  */
         hyperlink_t *hyperlink = stream->hyperlinks_array[i];
@@ -2040,8 +2057,7 @@ term_ostream__free (term_ostream_t stream)
   if (stream->hyperlinks_array != NULL)
     {
       size_t count = stream->hyperlinks_count;
-      size_t i;
-      for (i = 0; i < count; i++)
+      for (size_t i = 0; i < count; i++)
         free_hyperlink (stream->hyperlinks_array[i]);
       free (stream->hyperlinks_array);
     }
@@ -2141,7 +2157,6 @@ term_ostream__set_hyperlink (term_ostream_t stream,
     {
       /* Create a new hyperlink_t object.  */
       hyperlink_t *hyperlink = XMALLOC (hyperlink_t);
-
       hyperlink->ref = xstrdup (ref);
       if (id != NULL)
         {
@@ -2259,7 +2274,7 @@ should_enable_hyperlinks (const char *term)
            --------------------+-------------+---------------------
            emacs-terminal 26.1 | eterm-color | produces garbage
        */
-      if (strncmp (term, "eterm", 5) == 0)
+      if (str_startswith (term, "eterm"))
         return false;
 
       /* xterm-compatible terminal emulators:
@@ -2276,13 +2291,13 @@ should_enable_hyperlinks (const char *term)
 
          TODO: Revisit this table periodically.
        */
-      if (strncmp (term, "xterm", 5) == 0)
+      if (str_startswith (term, "xterm"))
         {
           char *progname = get_terminal_emulator_progname ();
           if (progname != NULL)
             {
               bool known_buggy =
-                strncmp (progname, "python", 6) == 0 /* guake */
+                str_startswith (progname, "python") /* guake */
                 || strcmp (progname, "lilyterm") == 0
                 || strcmp (progname, "lterm") == 0
                 || strcmp (progname, "lxterminal") == 0
@@ -2316,7 +2331,6 @@ term_ostream_t
 term_ostream_create (int fd, const char *filename, ttyctl_t tty_control)
 {
   term_ostream_t stream = XMALLOC (struct term_ostream_representation);
-
   stream->base.vtable = &term_ostream_vtable;
   stream->fd = fd;
   #if HAVE_WINDOWS_CONSOLES
@@ -2329,12 +2343,12 @@ term_ostream_create (int fd, const char *filename, ttyctl_t tty_control)
            <https://docs.microsoft.com/en-us/windows/console/getconsolemode>  */
         && GetConsoleMode (stream->handle, &mode) != 0)
       {
-        CONSOLE_SCREEN_BUFFER_INFO info;
         BOOL ok;
 
         /* GetConsoleScreenBufferInfo
            <https://docs.microsoft.com/en-us/windows/console/getconsolescreenbufferinfo>
            <https://docs.microsoft.com/en-us/windows/console/console-screen-buffer-info-str>  */
+        CONSOLE_SCREEN_BUFFER_INFO info;
         ok = GetConsoleScreenBufferInfo (stream->handle, &info);
         if (!ok)
           {
@@ -2435,10 +2449,8 @@ term_ostream_create (int fd, const char *filename, ttyctl_t tty_control)
   else
   #endif
     {
-      const char *term;
-
       /* Retrieve the terminal type.  */
-      term = getenv ("TERM");
+      const char *term = getenv ("TERM");
       if (term != NULL && term[0] != '\0')
         {
           /* When the terminfo function are available, we prefer them over the
@@ -2473,11 +2485,10 @@ term_ostream_create (int fd, const char *filename, ttyctl_t tty_control)
              bytes long.  <https://tldp.org/LDP/lpg/node91.html> suggests a
              buffer size of 2048 bytes.  */
           struct { char buf[2048]; char canary[4]; } termcapbuf;
-          int retval;
 
           /* Call tgetent, being defensive against buffer overflow.  */
           memcpy (termcapbuf.canary, "CnRy", 4);
-          retval = tgetent (termcapbuf.buf, term);
+          int retval = tgetent (termcapbuf.buf, term);
           if (memcmp (termcapbuf.canary, "CnRy", 4) != 0)
             /* Buffer overflow!  */
             abort ();
@@ -2585,15 +2596,21 @@ term_ostream_create (int fd, const char *filename, ttyctl_t tty_control)
             && (/* Recognize xterm-16color, xterm-88color, xterm-256color.  */
                 (strlen (term) >= 5 && memcmp (term, "xterm", 5) == 0)
                 || /* Recognize *-16color.  */
-                   (strlen (term) > 8
-                    && strcmp (term + strlen (term) - 8, "-16color") == 0)
+                   (strlen (term) > 8 && str_endswith (term, "-16color"))
                 || /* Recognize *-256color.  */
-                   (strlen (term) > 9
-                    && strcmp (term + strlen (term) - 9, "-256color") == 0)
+                   (strlen (term) > 9 && str_endswith (term, "-256color"))
                 || /* Recognize *-direct.  */
-                   (strlen (term) > 8
-                    && strcmp (term + strlen (term) - 8, "-direct") == 0))
-            ? (stream->max_colors >= 0x7fff ? cm_xtermrgb :
+                   (strlen (term) > 7 && str_endswith (term, "-direct")))
+            ? (/* Note: For recognizing cm_xtermrgb,
+                  <https://github.com/termstandard/colors> recommends to test
+                  getenv ("COLORTERM"), but it does not seem like a good idea.
+                  It's more of a quick hack that causes long-term problems.  */
+               /* Note: The strange test against 0x7fff is because ncurses
+                  versions < 6.1 did not support 32-bit values as result of
+                  tgetnum(), see <https://stackoverflow.com/questions/36158093/>
+                  and <https://invisible-island.net/ncurses/announce-6.1.html>.
+                */
+               stream->max_colors >= 0x7fff ? cm_xtermrgb :
                stream->max_colors == 256 ? cm_xterm256 :
                stream->max_colors == 88 ? cm_xterm88 :
                stream->max_colors == 16 ? cm_xterm16 :
@@ -2611,7 +2628,10 @@ term_ostream_create (int fd, const char *filename, ttyctl_t tty_control)
         (stream->enter_underline_mode != NULL
          && (stream->exit_underline_mode != NULL
              || stream->exit_attribute_mode != NULL));
-      /* TODO: Use a terminfo capability, once ncurses implements it.  */
+      /* TODO: Use a terminfo capability, once ncurses implements it.
+         Reported at
+         <https://lists.gnu.org/archive/html/bug-ncurses/2025-01/msg00002.html>
+       */
       stream->supports_hyperlink = should_enable_hyperlinks (term);
 
       /* Infer the restore strings.  */
@@ -2647,8 +2667,7 @@ term_ostream_create (int fd, const char *filename, ttyctl_t tty_control)
         uint32_t h = 0;
         if (hostname != NULL)
           {
-            const char *p;
-            for (p = hostname; *p; p++)
+            for (const char *p = hostname; *p; p++)
               h = (unsigned char) *p + ((h << 9) | (h >> (32 - 9)));
           }
         stream->hostname_hash = h;
@@ -2736,7 +2755,7 @@ is_instance_of_term_ostream (ostream_t stream)
   return IS_INSTANCE (stream, ostream, term_ostream);
 }
 
-#line 2740 "term-ostream.c"
+#line 2759 "term-ostream.c"
 
 const struct term_ostream_implementation term_ostream_vtable =
 {

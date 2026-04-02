@@ -1,6 +1,6 @@
 ## Makefile for the gettext-runtime/intl and gettext-tools/intl subdirectories
 ## of GNU gettext.
-## Copyright (C) 1995-1998, 2000-2007, 2009-2023 Free Software Foundation, Inc.
+## Copyright (C) 1995-2026 Free Software Foundation, Inc.
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU Lesser General Public License as published by
@@ -17,7 +17,7 @@
 
 ## Process this file with automake to produce Makefile.in.
 
-AUTOMAKE_OPTIONS = 1.10 gnu no-dependencies
+AUTOMAKE_OPTIONS = 1.10 gnu
 ACLOCAL_AMFLAGS = -I ../../m4 -I ../m4 -I gnulib-m4
 
 SUBDIRS = gnulib-lib
@@ -30,14 +30,15 @@ DISTCLEANFILES =
 MAINTAINERCLEANFILES =
 SUFFIXES =
 
-# -DBUILDING_LIBINTL: Change expansion of LIBINTL_DLL_EXPORTED macro.
-# -DBUILDING_DLL: Change expansion of RELOCATABLE_DLL_EXPORTED macro.
-# -DBUILDING_DLL: Change expansion of DLL_EXPORTED macro. We're compiling
-#                 a library. Exporting the relevant symbols is desired.
+# Note that Automake's $(DEFAULT_INCLUDES) already contains
+# -I. -I$(srcdir) -I$(top_builddir).
+# -DBUILDING_LIBINTL: Change expansion of LIBINTL_SHLIB_EXPORTED macro.
+# -DBUILDING_LIBRARY: Change expansion of SHLIB_EXPORTED macro. We're compiling
+#                     a library. Exporting the relevant symbols is desired.
 AM_CPPFLAGS = \
   -Ignulib-lib -I$(srcdir)/gnulib-lib \
-  -DLOCALEDIR=$(localedir_c_make) -DLOCALE_ALIAS_PATH=\"$(aliaspath)\" \
-  -DLIBDIR=\"$(libdir)\" -DBUILDING_LIBINTL -DBUILDING_DLL
+  -DLOCALEDIR=$(localedir_c_make) \
+  -DLIBDIR=\"$(libdir)\" -DBUILDING_LIBINTL -DBUILDING_LIBRARY
 
 if WOE32
 # On mingw, disable the declarations of *printf functions as aliases to the
@@ -62,9 +63,6 @@ AM_CFLAGS += @CFLAG_VISIBILITY@
 if WOE32DLL
 AM_LDFLAGS = -Wl,--export-all-symbols
 endif
-
-# Support building libintl.a with -fPIC (needed by GCC).
-AM_CFLAGS += @PICFLAG@
 
 
 # Library include file and code.
@@ -115,7 +113,7 @@ EXTRA_DIST += \
 #                       libintl_freelocale
 #   setlocale.c:        libintl_newlocale
 #                       libintl_setlocale
-#   relocatable.c:      libintl_set_relocation_prefix
+#   compat.c:           libintl_set_relocation_prefix
 #
 # The following files implement private API.
 #   gettextP.h:     dcigettext.c:       libintl_dcigettext
@@ -204,7 +202,8 @@ LIBINTLSOURCES = \
   setlocale.c \
   version.c \
   osdep.c \
-  intl-compat.c
+  intl-compat.c \
+  compat.c
 
 # We must not install the libintl.h/libintl.la files if we are on a
 # system which has the GNU gettext() function in its C library or in a
@@ -223,35 +222,41 @@ endif
 EXTRA_DIST += export.h
 
 libgnuintl.h: $(srcdir)/libgnuintl.in.h $(srcdir)/export.h
-	sed -e '/IN_LIBGLOCALE/d' \
-	    -e 's,@''HAVE_POSIX_PRINTF''@,@HAVE_POSIX_PRINTF@,g' \
+	sed -e 's,@''HAVE_POSIX_PRINTF''@,@HAVE_POSIX_PRINTF@,g' \
 	    -e 's,@''HAVE_ASPRINTF''@,@HAVE_ASPRINTF@,g' \
 	    -e 's,@''HAVE_SNPRINTF''@,@HAVE_SNPRINTF@,g' \
 	    -e 's,@''HAVE_WPRINTF''@,@HAVE_WPRINTF@,g' \
 	    -e 's,@''HAVE_NEWLOCALE''@,@HAVE_NEWLOCALE@,g' \
 	    -e 's,@''ENHANCE_LOCALE_FUNCS''@,@ENHANCE_LOCALE_FUNCS@,g' \
 	  < $(srcdir)/libgnuintl.in.h \
-	| if test '@WOE32DLL@' = yes; then \
+	| if test '@WOE32DLL@' = 1; then \
 	    sed -e 's/extern \([^()]*\);/extern __declspec (dllimport) \1;/'; \
 	  else \
 	    cat; \
 	  fi \
-	| sed -e 's/extern \([^"]\)/extern LIBINTL_DLL_EXPORTED \1/' \
+	| sed -e 's/extern \([^"]\)/extern LIBINTL_SHLIB_EXPORTED \1/' \
 	      -e "/#define _LIBINTL_H/r $(srcdir)/export.h" \
 	| sed -e '/#define _LIBINTL_H/,/[*][/]$$/{/#define _LIBINTL_H/!d;}' \
 	| sed -e 's,@''HAVE_VISIBILITY''@,@HAVE_VISIBILITY@,g' \
+	| sed -e 's,@''WOE32DLL''@,@WOE32DLL@,g' \
 	  > libgnuintl.h
+BUILT_SOURCES += libgnuintl.h
 MOSTLYCLEANFILES += libgnuintl.h
 
 libintl.h: $(srcdir)/libgnuintl.in.h
-	sed -e '/IN_LIBGLOCALE/d' \
-	    -e 's,@''HAVE_POSIX_PRINTF''@,@HAVE_POSIX_PRINTF@,g' \
+	sed -e 's,@''HAVE_POSIX_PRINTF''@,@HAVE_POSIX_PRINTF@,g' \
 	    -e 's,@''HAVE_ASPRINTF''@,@HAVE_ASPRINTF@,g' \
 	    -e 's,@''HAVE_SNPRINTF''@,@HAVE_SNPRINTF@,g' \
 	    -e 's,@''HAVE_WPRINTF''@,@HAVE_WPRINTF@,g' \
 	    -e 's,@''HAVE_NEWLOCALE''@,@HAVE_NEWLOCALE@,g' \
 	    -e 's,@''ENHANCE_LOCALE_FUNCS''@,@ENHANCE_LOCALE_FUNCS@,g' \
-	  < $(srcdir)/libgnuintl.in.h > libintl.h
+	  < $(srcdir)/libgnuintl.in.h \
+	| if test '@WOE32DLL@' = 1; then \
+	    sed -e 's/extern \([^()]*\);/extern __declspec (dllimport) \1;/'; \
+	  else \
+	    cat; \
+	  fi \
+	| cat > libintl.h
 MOSTLYCLEANFILES += libintl.h
 
 # The Automake generated .y.c rule is broken: When executed in a VPATH build,
@@ -361,6 +366,8 @@ osdep.lo: $(srcdir)/osdep.c
 	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $(srcdir)/osdep.c
 intl-compat.lo: $(srcdir)/intl-compat.c
 	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $(srcdir)/intl-compat.c
+compat.lo: $(srcdir)/compat.c
+	$(AM_V_CC)$(LTCOMPILE) -c -o $@ $(srcdir)/compat.c
 
 # Dependencies.
 
@@ -387,13 +394,14 @@ dngettext.lo:        ../config.h $(srcdir)/gettextP.h libgnuintl.h $(srcdir)/gmo
 ngettext.lo:         ../config.h $(srcdir)/gettextP.h libgnuintl.h $(srcdir)/gmo.h $(srcdir)/loadinfo.h
 plural.lo:           ../config.h $(srcdir)/plural-exp.h $(PLURAL_DEPS)
 plural-exp.lo:       ../config.h $(srcdir)/plural-exp.h
-langprefs.lo:        ../config.h
-log.lo:              ../config.h
+langprefs.lo:        ../config.h $(srcdir)/gettextP.h libgnuintl.h $(srcdir)/gmo.h $(srcdir)/loadinfo.h
+log.lo:              ../config.h $(srcdir)/gettextP.h libgnuintl.h $(srcdir)/gmo.h $(srcdir)/loadinfo.h
 printf.lo:           ../config.h
 setlocale.lo:        ../config.h $(srcdir)/gettextP.h libgnuintl.h $(srcdir)/gmo.h $(srcdir)/loadinfo.h
 version.lo:          ../config.h libgnuintl.h
 osdep.lo:            ../config.h $(srcdir)/intl-exports.c $(srcdir)/os2compat.c
 intl-compat.lo:      ../config.h $(srcdir)/gettextP.h libgnuintl.h $(srcdir)/gmo.h $(srcdir)/loadinfo.h
+compat.lo:           ../config.h libgnuintl.h
 
 # Version information according to Woe32 conventions.
 EXTRA_DIST += libintl.rc
@@ -439,7 +447,7 @@ endif
 # Before making a gettext release, you must change this according to the
 # libtool documentation, section "Library interface versions".
 LTV_CURRENT=12
-LTV_REVISION=0
+LTV_REVISION=6
 LTV_AGE=4
 
 # How to build libintl.la and libgnuintl.la.
@@ -462,7 +470,7 @@ install-exec-local: install-exec-libintl
 install-exec-libintl: libintl.la
 	$(mkdir_p) $(DESTDIR)$(libdir)
 	$(LIBTOOL) --mode=install \
-	  $(INSTALL_DATA) libintl.la $(DESTDIR)$(libdir)/libintl.la; \
+	  $(INSTALL) libintl.la $(DESTDIR)$(libdir)/libintl.la; \
 	if test "@RELOCATABLE@" = yes; then \
 	  dependencies=`sed -n -e 's,^dependency_libs=\(.*\),\1,p' < $(DESTDIR)$(libdir)/libintl.la | sed -e "s,^',," -e "s,'\$$,,"`; \
 	  if test -n "$$dependencies"; then \
@@ -503,57 +511,6 @@ installdirs-preloadable:
 uninstall-local: uninstall-preloadable
 uninstall-preloadable:
 	rm -f $(DESTDIR)$(libdir)/preloadable_libintl.so
-
-endif
-
-
-# Installation of locale.alias.
-
-EXTRA_DIST += locale.alias ref-add.sin ref-del.sin
-
-if USE_INCLUDED_LIBINTL
-
-all-local: ref-add.sed ref-del.sed
-
-ref-add.sed: $(srcdir)/ref-add.sin
-	sed -e '/^#/d' -e 's/@''PACKAGE''@/@PACKAGE@/g' $(srcdir)/ref-add.sin > t-ref-add.sed
-	mv t-ref-add.sed ref-add.sed
-MOSTLYCLEANFILES += ref-add.sed
-
-ref-del.sed: $(srcdir)/ref-del.sin
-	sed -e '/^#/d' -e 's/@''PACKAGE''@/@PACKAGE@/g' $(srcdir)/ref-del.sin > t-ref-del.sed
-	mv t-ref-del.sed ref-del.sed
-MOSTLYCLEANFILES += ref-del.sed
-
-install-data-local: install-data-aliasfile
-install-data-aliasfile: ref-add.sed
-	$(mkdir_p) $(DESTDIR)$(localedir)
-	test -f $(DESTDIR)$(localedir)/locale.alias \
-	  && orig=$(DESTDIR)$(localedir)/locale.alias \
-	  || orig=$(srcdir)/locale.alias; \
-	temp=$(DESTDIR)$(localedir)/t-locale.alias; \
-	dest=$(DESTDIR)$(localedir)/locale.alias; \
-	sed -f ref-add.sed $$orig > $$temp; \
-	$(INSTALL_DATA) $$temp $$dest; \
-	rm -f $$temp
-
-installdirs-local: installdirs-aliasfile
-installdirs-aliasfile:
-	$(mkdir_p) $(DESTDIR)$(localedir)
-
-uninstall-local: uninstall-aliasfile
-uninstall-aliasfile: ref-del.sed
-	if test -f $(DESTDIR)$(localedir)/locale.alias; then \
-	  temp=$(DESTDIR)$(localedir)/t-locale.alias; \
-	  dest=$(DESTDIR)$(localedir)/locale.alias; \
-	  sed -f ref-del.sed $$dest > $$temp; \
-	  if grep '^# Packages using this file: $$' $$temp > /dev/null; then \
-	    rm -f $$dest; \
-	  else \
-	    $(INSTALL_DATA) $$temp $$dest; \
-	  fi; \
-	  rm -f $$temp; \
-	fi
 
 endif
 

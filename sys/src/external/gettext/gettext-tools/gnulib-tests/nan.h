@@ -1,22 +1,21 @@
 /* Macros for quiet not-a-number.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation, either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _GL_NAN_H
 #define _GL_NAN_H
-
 
 /* IBM z/OS supports both hexadecimal and IEEE floating-point formats. The
    former does not support NaN and its isnan() implementation returns zero
@@ -24,6 +23,11 @@
 #if defined __MVS__ && defined __IBMC__ && !defined __BFP__
 # error "NaN is not supported with IBM's hexadecimal floating-point format; please re-compile with -qfloat=ieee"
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 /* NaNf () returns a 'float' not-a-number.  */
 
@@ -67,22 +71,14 @@ NaNd ()
 
 /* NaNl () returns a 'long double' not-a-number.  */
 
-/* On Irix 6.5, gcc 3.4.3 can't compute compile-time NaN, and needs the
-   runtime type conversion.
-   The Microsoft MSVC 9 compiler chokes on the expression 0.0L / 0.0L.
+/* The Microsoft MSVC 9 compiler chokes on the expression 0.0L / 0.0L.
    The IBM XL C compiler on z/OS complains.
    PGI 16.10 complains.
    Avoid possible incorrect constant-folding on mips.  */
-#ifdef __sgi
-static long double NaNl ()
-{
-  double zero = 0.0;
-  return zero / zero;
-}
-#elif (defined _MSC_VER \
-       || (defined __MVS__ && defined __IBMC__) \
-       || defined __PGI \
-       || defined __mips__)
+#if (defined _MSC_VER \
+     || (defined __MVS__ && defined __IBMC__) \
+     || defined __PGI \
+     || defined __mips__)
 static long double
 NaNl ()
 {
@@ -93,5 +89,9 @@ NaNl ()
 # define NaNl() (0.0L / 0.0L)
 #endif
 
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _GL_NAN_H */

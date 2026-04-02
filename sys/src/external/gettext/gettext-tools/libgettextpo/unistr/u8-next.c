@@ -1,5 +1,5 @@
 /* Iterate over next character in UTF-8 string.
-   Copyright (C) 2002, 2006, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2006, 2009-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2002.
 
    This file is free software.
@@ -23,6 +23,9 @@
    License and of the GNU General Public License along with this
    program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Don't use the const-improved function macros in this compilation unit.  */
+#define _LIBUNISTRING_NO_CONST_GENERICS
+
 #include <config.h>
 
 /* Specification.  */
@@ -31,9 +34,7 @@
 const uint8_t *
 u8_next (ucs4_t *puc, const uint8_t *s)
 {
-  int count;
-
-  count = u8_strmbtouc (puc, s);
+  int count = u8_strmbtouc (puc, s);
   if (count > 0)
     return s + count;
   else

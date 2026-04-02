@@ -1,6 +1,6 @@
 /* Test the getaddrinfo module.
 
-   Copyright (C) 2006-2024 Free Software Foundation, Inc.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@ SIGNATURE_CHECK (getaddrinfo, int, (char const *, char const *,
 #endif
 
 #include <arpa/inet.h>
+#include <ctype.h>
 #include <errno.h>
 #include <netinet/in.h>
 #include <stdio.h>
@@ -60,12 +61,13 @@ SIGNATURE_CHECK (getaddrinfo, int, (char const *, char const *,
 #endif
 
 static int
-simple (char const *host, char const *service)
+simple (int pass, char const *host, char const *service)
 {
   char buf[BUFSIZ];
   static int skip = 0;
   struct addrinfo hints;
-  struct addrinfo *ai0, *ai;
+  struct addrinfo *hints_p;
+  struct addrinfo *ai0;
   int res;
   int err;
 
@@ -75,17 +77,37 @@ simple (char const *host, char const *service)
 
   dbgprintf ("Finding %s service %s...\n", host, service);
 
-  /* This initializes "hints" but does not use it.  Is there a reason
-     for this?  If so, please fix this comment.  */
-  memset (&hints, 0, sizeof (hints));
-  hints.ai_flags = AI_CANONNAME;
-  hints.ai_family = AF_UNSPEC;
-  hints.ai_socktype = SOCK_STREAM;
+  if (pass == 1)
+    hints_p = NULL;
+  else
+    {
+      memset (&hints, 0, sizeof (hints));
+      hints.ai_flags = AI_CANONNAME
+                       | (pass == 3 ? AI_NUMERICHOST : 0)
+                       | (pass == 4 ? AI_NUMERICSERV : 0);
+      hints.ai_family = AF_UNSPEC;
+      hints.ai_socktype = SOCK_STREAM;
+      hints_p = &hints;
+    }
 
-  res = getaddrinfo (host, service, 0, &ai0);
+  res = getaddrinfo (host, service, hints_p, &ai0);
   err = errno;
 
   dbgprintf ("res %d: %s\n", res, gai_strerror (res));
+
+  if ((pass == 3 && ! isdigit (host[0]))
+      || (pass == 4 && ! isdigit (service[0])))
+    {
+      if (res != EAI_NONAME)
+        {
+          fprintf (stderr,
+                   "Test case pass=%d, host=%s, service=%s failed: "
+                   "expected EAI_NONAME, got %d\n",
+                   pass, host, service, res);
+          return 1;
+        }
+      return 0;
+    }
 
   if (res != 0)
     {
@@ -98,10 +120,6 @@ simple (char const *host, char const *service)
           fprintf (stderr, "skipping getaddrinfo test: no network?\n");
           return 77;
         }
-      /* IRIX reports EAI_NONAME for "https".  Don't fail the test
-         merely because of this.  */
-      if (res == EAI_NONAME)
-        return 0;
       /* Solaris reports EAI_SERVICE for "http" and "https".  Don't
          fail the test merely because of this.  */
       if (res == EAI_SERVICE)
@@ -116,10 +134,14 @@ simple (char const *host, char const *service)
       if (res == EAI_SYSTEM)
         fprintf (stderr, "system error: %s\n", strerror (err));
 
+      fprintf (stderr,
+               "Test case pass=%d, host=%s, service=%s failed: "
+               "expected 0, got %d\n",
+               pass, host, service, res);
       return 1;
     }
 
-  for (ai = ai0; ai; ai = ai->ai_next)
+  for (struct addrinfo *ai = ai0; ai; ai = ai->ai_next)
     {
       void *ai_addr = ai->ai_addr;
       struct sockaddr_in *sock_addr = ai_addr;
@@ -166,13 +188,49 @@ simple (char const *host, char const *service)
 #define SERV3 "http"
 #define HOST4 "google.org"
 #define SERV4 "ldap"
+#if HAVE_IPV4
+# define NUMERICHOSTV4 "1.2.3.4"
+#endif
+#if HAVE_IPV6
+# define NUMERICHOSTV6 "2001:db8:3333:4444:CCCC:DDDD:EEEE:FFFF"
+#endif
 
 int main (void)
 {
   (void) gl_sockets_startup (SOCKETS_1_1);
 
-  return simple (HOST1, SERV1)
-    + simple (HOST2, SERV2)
-    + simple (HOST3, SERV3)
-    + simple (HOST4, SERV4);
+  return (  simple (1, HOST1, SERV1)
+          + simple (1, HOST1, "80")
+          + simple (1, HOST2, SERV2)
+          + simple (1, HOST2, "443")
+          + simple (1, HOST3, SERV3)
+          + simple (1, HOST3, "80")
+          + simple (1, HOST4, SERV4)
+          + simple (1, HOST4, "389")
+          + simple (2, HOST1, SERV1)
+          + simple (2, HOST2, SERV2)
+          + simple (2, HOST3, SERV3)
+          + simple (2, HOST4, SERV4)
+#if HAVE_IPV4
+          + simple (3, NUMERICHOSTV4, SERV1)
+#endif
+#if HAVE_IPV6
+          + simple (3, NUMERICHOSTV6, SERV1)
+#endif
+#if !defined __GLIBC__
+          /* avoid glibc bug, possibly
+             <https://sourceware.org/PR32465> */
+          + simple (3, HOST1, SERV1)
+          + simple (3, HOST2, SERV2)
+          + simple (3, HOST3, SERV3)
+          + simple (3, HOST4, SERV4)
+#endif
+          + simple (4, HOST1, SERV1)
+          + simple (4, HOST1, "80")
+          + simple (4, HOST2, SERV2)
+          + simple (4, HOST2, "443")
+          + simple (4, HOST3, SERV3)
+          + simple (4, HOST3, "80")
+          + simple (4, HOST4, SERV4)
+          + simple (4, HOST4, "389"));
 }

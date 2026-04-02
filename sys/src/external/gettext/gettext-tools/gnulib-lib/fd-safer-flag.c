@@ -1,7 +1,7 @@
 /* Adjust a file descriptor result so that it avoids clobbering
    STD{IN,OUT,ERR}_FILENO, with specific flags.
 
-   Copyright (C) 2005-2006, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2005-2006, 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -42,9 +42,9 @@ fd_safer_flag (int fd, int flag)
   if (STDIN_FILENO <= fd && fd <= STDERR_FILENO)
     {
       int f = dup_safer_flag (fd, flag);
-      int e = errno;
+      int saved_errno = errno;
       close (fd);
-      errno = e;
+      errno = saved_errno;
       fd = f;
     }
 

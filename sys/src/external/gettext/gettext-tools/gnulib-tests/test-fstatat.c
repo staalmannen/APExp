@@ -1,5 +1,5 @@
 /* Tests of fstatat.
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,6 +33,11 @@ SIGNATURE_CHECK (fstatat, int, (int, char const *, struct stat *, int));
 #include "same-inode.h"
 #include "ignore-value.h"
 #include "macros.h"
+
+/* This program tests deprecated functions 'statat' and 'lstatat'.  */
+#if _GL_GNUC_PREREQ (4, 3)
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
 
 #ifndef BASE
 # define BASE "test-fstatat.t"
@@ -78,7 +83,7 @@ main (_GL_UNUSED int argc, _GL_UNUSED char *argv[])
     struct stat statbuf;
 
     errno = 0;
-    ASSERT (fstatat (-1, "foo", &statbuf, 0) == -1);
+    ASSERT (fstatat (AT_FDCWD == -2 ? -1 : -2, "foo", &statbuf, 0) == -1);
     ASSERT (errno == EBADF);
   }
   {
@@ -103,5 +108,5 @@ main (_GL_UNUSED int argc, _GL_UNUSED char *argv[])
   if (result == 77)
     fputs ("skipping test: symlinks not supported on this file system\n",
            stderr);
-  return result;
+  return (result ? result : test_exit_status);
 }

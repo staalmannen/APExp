@@ -1,6 +1,5 @@
 /* Library functions for class autosprintf.
-   Copyright (C) 2002-2003, 2018 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2002.
+   Copyright (C) 2002-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -15,9 +14,9 @@
    You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+/* Written by Bruno Haible.  */
+
+#include <config.h>
 
 #if HAVE_VASPRINTF && HAVE_POSIX_PRINTF
 

@@ -1,5 +1,5 @@
 /* Test of <bitrotate.h> substitute.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -275,5 +275,5 @@ main (void)
   ASSERT (rotr64 (16045690984503098046ULL, 63) == 13644637895296644477ULL);
 #endif /* UINT64_MAX */
 
-  return 0;
+  return test_exit_status;
 }

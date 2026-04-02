@@ -1,5 +1,5 @@
 ## Makefile for the gettext-tools/gnulib-lib subdirectory of GNU gettext
-## Copyright (C) 1995-1998, 2000-2006, 2009, 2016, 2019, 2021, 2023 Free Software Foundation, Inc.
+## Copyright (C) 1995-2025 Free Software Foundation, Inc.
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 
 ## Process this file with automake to produce Makefile.in.
 
-AUTOMAKE_OPTIONS = 1.5 gnits subdir-objects no-dependencies
+AUTOMAKE_OPTIONS = 1.5 gnits subdir-objects
 EXTRA_DIST =
 BUILT_SOURCES =
 MOSTLYCLEANFILES = core *.stackdump
@@ -35,12 +35,17 @@ noinst_LTLIBRARIES =
 pkgdatadir = $(datadir)/gettext
 pkgdata_DATA =
 
+# Note that Automake's $(DEFAULT_INCLUDES) already contains
+# -I. -I$(srcdir) -I$(top_builddir).
 AM_CPPFLAGS =
 
-# Hmm... is this still necessary?
-AM_CPPFLAGS += -I$(top_builddir)/../gettext-runtime/intl -I$(top_srcdir)/../gettext-runtime/intl
-# Needed so that config.h and woe32dll/export.h are found.
-AM_CPPFLAGS += -I$(top_builddir) -I$(top_srcdir)
+# Needed for the gnulib source code that does '#include "gettext.h"'.
+AM_CPPFLAGS += -I../../gettext-runtime/intl
+# Needed so that woe32dll/export.h is found.
+AM_CPPFLAGS += -I$(top_srcdir)
+
+# Needed for the expansion of DLL_VARIABLE on MSVC.
+AM_CPPFLAGS += -DIN_LIBGETTEXTLIB
 
 # Parametrization of the 'relocatable' module.
 AM_CPPFLAGS += -DDEPENDS_ON_LIBICONV=1 -DDEPENDS_ON_LIBINTL=1
@@ -57,6 +62,34 @@ AM_CFLAGS = @WARN_CFLAGS@
 
 # Rules generated and collected by gnulib-tool.
 include Makefile.gnulib
+
+# Version information according to Woe32 conventions.
+EXTRA_DIST += libgettextlib.rc
+if WOE32
+WOE32_LIBADD = libgettextlib.res.lo
+# This rule is executed only on Woe32 systems.
+# Use $(RC) with libtool, $(WINDRES) when not using libtool.
+# The following sed expressions come from the windres-options script. They are
+# inlined here, so that they can be written in a Makefile without requiring a
+# temporary file. They must contain literal newlines rather than semicolons,
+# so that they work with the sed-3.02 that is shipped with MSYS.
+libgettextlib.res.lo: $(srcdir)/libgettextlib.rc
+	nlinit=`echo 'nl="'; echo '"'`; eval "$$nlinit"; \
+	sed_extract_major='/^[0-9]/{'$${nl}'s/^\([0-9]*\).*/\1/p'$${nl}q$${nl}'}'$${nl}'c\'$${nl}0$${nl}q; \
+	sed_extract_minor='/^[0-9][0-9]*[.][0-9]/{'$${nl}'s/^[0-9]*[.]\([0-9]*\).*/\1/p'$${nl}q$${nl}'}'$${nl}'c\'$${nl}0$${nl}q; \
+	sed_extract_subminor='/^[0-9][0-9]*[.][0-9][0-9]*[.][0-9]/{'$${nl}'s/^[0-9]*[.][0-9]*[.]\([0-9]*\).*/\1/p'$${nl}q$${nl}'}'$${nl}'c\'$${nl}0$${nl}q; \
+	$(LIBTOOL) --tag=RC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(RC) \
+	  "-DPACKAGE_VERSION_STRING=\\\"$(VERSION)\\\"" \
+	  "-DPACKAGE_VERSION_MAJOR="`echo '$(VERSION)' | sed -n -e "$$sed_extract_major"` \
+	  "-DPACKAGE_VERSION_MINOR="`echo '$(VERSION)' | sed -n -e "$$sed_extract_minor"` \
+	  "-DPACKAGE_VERSION_SUBMINOR="`echo '$(VERSION)' | sed -n -e "$$sed_extract_subminor"` \
+	  -i $(srcdir)/libgettextlib.rc -o libgettextlib.res.lo --output-format=coff
+MOSTLYCLEANFILES += libgettextlib.res.lo
+else
+WOE32_LIBADD =
+endif
+libgettextlib_la_LIBADD       += $(WOE32_LIBADD)
+libgettextlib_la_DEPENDENCIES += $(WOE32_LIBADD)
 
 # OS/2 does not support a DLL name longer than 8 characters.
 if OS2

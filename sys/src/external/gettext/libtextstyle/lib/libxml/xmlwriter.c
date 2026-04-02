@@ -43,7 +43,6 @@
 #include <libxml/parser.h>
 #include <libxml/uri.h>
 #include <libxml/HTMLtree.h>
-#include <libxml/xmlIO.h>
 
 #ifdef LIBXML_WRITER_ENABLED
 
@@ -272,7 +271,7 @@ xmlNewTextWriterFilename(const char *uri, int compression)
     xmlTextWriterPtr ret;
     xmlOutputBufferPtr out;
 
-    out = (xmlOutputBufferPtr) xmlOutputBufferCreateFilename(uri, NULL, compression);
+    out = xmlOutputBufferCreateFilename(uri, NULL, compression);
     if (out == NULL) {
         xmlWriterErrMsg(NULL, XML_IO_EIO,
                         "xmlNewTextWriterFilename : cannot open uri\n");
@@ -309,7 +308,7 @@ xmlNewTextWriterMemory(xmlBufferPtr buf, int compression ATTRIBUTE_UNUSED)
     xmlOutputBufferPtr out;
 
 /*::todo handle compression */
-    out = (xmlOutputBufferPtr) xmlOutputBufferCreateBuffer(buf, NULL);
+    out = xmlOutputBufferCreateBuffer(buf, NULL);
 
     if (out == NULL) {
         xmlWriterErrMsg(NULL, XML_ERR_NO_MEMORY,
@@ -353,7 +352,7 @@ xmlNewTextWriterPushParser(xmlParserCtxtPtr ctxt,
         return NULL;
     }
 
-    out = (xmlOutputBufferPtr) xmlOutputBufferCreateIO(xmlTextWriterWriteDocCallback,
+    out = xmlOutputBufferCreateIO(xmlTextWriterWriteDocCallback,
                                   xmlTextWriterCloseDocCallback,
                                   (void *) ctxt, NULL);
     if (out == NULL) {
@@ -397,7 +396,7 @@ xmlNewTextWriterDoc(xmlDocPtr * doc, int compression)
     saxHandler.startElement = xmlSAX2StartElement;
     saxHandler.endElement = xmlSAX2EndElement;
 
-    ctxt = (xmlParserCtxtPtr) xmlCreatePushParserCtxt(&saxHandler, NULL, NULL, 0, NULL);
+    ctxt = xmlCreatePushParserCtxt(&saxHandler, NULL, NULL, 0, NULL);
     if (ctxt == NULL) {
         xmlWriterErrMsg(NULL, XML_ERR_INTERNAL_ERROR,
                 "xmlNewTextWriterDoc : error at xmlCreatePushParserCtxt!\n");
@@ -466,7 +465,7 @@ xmlNewTextWriterTree(xmlDocPtr doc, xmlNodePtr node, int compression)
     saxHandler.startElement = xmlSAX2StartElement;
     saxHandler.endElement = xmlSAX2EndElement;
 
-    ctxt = (xmlParserCtxtPtr) xmlCreatePushParserCtxt(&saxHandler, NULL, NULL, 0, NULL);
+    ctxt = xmlCreatePushParserCtxt(&saxHandler, NULL, NULL, 0, NULL);
     if (ctxt == NULL) {
         xmlWriterErrMsg(NULL, XML_ERR_INTERNAL_ERROR,
                         "xmlNewTextWriterDoc : error at xmlCreatePushParserCtxt!\n");

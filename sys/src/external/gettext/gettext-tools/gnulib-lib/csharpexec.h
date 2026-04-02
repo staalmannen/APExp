@@ -1,5 +1,5 @@
 /* Execute a C# program.
-   Copyright (C) 2003, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2009-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
@@ -17,6 +17,11 @@
 
 #ifndef _CSHARPEXEC_H
 #define _CSHARPEXEC_H
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 typedef bool execute_fn (const char *progname,
                          const char *prog_path, const char * const *prog_argv,
@@ -37,5 +42,10 @@ extern bool execute_csharp_program (const char *assembly_path,
                                     const char * const *args,
                                     bool verbose, bool quiet,
                                     execute_fn *executer, void *private_data);
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _CSHARPEXEC_H */

@@ -1,13 +1,13 @@
-/* hash - implement simple hashing table where the keys are memory blocks.
-   Copyright (C) 1994-1995, 2000-2006, 2018, 2020, 2023 Free Software Foundation, Inc.
+/* Simple hash table (no removals) where the keys are memory blocks.
+   Copyright (C) 1994-2026 Free Software Foundation, Inc.
    Written by Ulrich Drepper <drepper@gnu.ai.mit.edu>, October 1994.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published
+   by the Free Software Foundation, either version 3 of the License,
+   or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
@@ -26,6 +26,8 @@
 #include <limits.h>
 #include <sys/types.h>
 
+#include "next-prime.h"
+
 /* Since this simple implementation of hash tables allows only insertion, no
    removal of entries, the right data structure for the memory holding all keys
    is an obstack.  */
@@ -40,7 +42,7 @@
 
 typedef struct hash_entry
 {
-  unsigned long used;  /* Hash code of the key, or 0 for an unused entry.  */
+  size_t used;         /* Hash code of the key, or 0 for an unused entry.  */
   const void *key;     /* Key.  */
   size_t keylen;
   void *data;          /* Value.  */
@@ -49,44 +51,11 @@ typedef struct hash_entry
 hash_entry;
 
 
-/* Given an odd CANDIDATE > 1, return true if it is a prime number.  */
-static int
-is_prime (unsigned long int candidate)
-{
-  /* No even number and none less than 10 will be passed here.  */
-  unsigned long int divn = 3;
-  unsigned long int sq = divn * divn;
-
-  while (sq < candidate && candidate % divn != 0)
-    {
-      ++divn;
-      sq += 4 * divn;
-      ++divn;
-    }
-
-  return candidate % divn != 0;
-}
-
-
-/* Given SEED > 1, return the smallest odd prime number >= SEED.  */
-unsigned long
-next_prime (unsigned long int seed)
-{
-  /* Make it definitely odd.  */
-  seed |= 1;
-
-  while (!is_prime (seed))
-    seed += 2;
-
-  return seed;
-}
-
-
 /* Initialize a hash table.  INIT_SIZE > 1 is the initial number of available
    entries.
    Return 0 always.  */
 int
-hash_init (hash_table *htab, unsigned long int init_size)
+hash_init (hash_table *htab, size_t init_size)
 {
   /* We need the size to be a prime.  */
   init_size = next_prime (init_size);
@@ -116,23 +85,20 @@ hash_destroy (hash_table *htab)
 
 /* Compute a hash code for a key consisting of KEYLEN bytes starting at KEY
    in memory.  */
-static unsigned long
+static size_t
 compute_hashval (const void *key, size_t keylen)
 {
-  size_t cnt;
-  unsigned long int hval;
-
   /* Compute the hash value for the given string.  The algorithm
      is taken from [Aho,Sethi,Ullman], fixed according to
      https://haible.de/bruno/hashfunc.html.  */
-  cnt = 0;
-  hval = keylen;
+  size_t cnt = 0;
+  size_t hval = keylen;
   while (cnt < keylen)
     {
-      hval = (hval << 9) | (hval >> (sizeof (unsigned long) * CHAR_BIT - 9));
-      hval += (unsigned long int) *(((const char *) key) + cnt++);
+      hval = (hval << 9) | (hval >> (sizeof (size_t) * CHAR_BIT - 9));
+      hval += (size_t) *(((const char *) key) + cnt++);
     }
-  return hval != 0 ? hval : ~((unsigned long) 0);
+  return hval != 0 ? hval : ~((size_t) 0);
 }
 
 
@@ -144,23 +110,21 @@ compute_hashval (const void *key, size_t keylen)
    Return the index of the entry, if present, or otherwise the index a free
    entry where it could be inserted.  */
 static size_t
-lookup (hash_table *htab,
+lookup (const hash_table *htab,
         const void *key, size_t keylen,
-        unsigned long int hval)
+        size_t hval)
 {
-  unsigned long int hash;
-  size_t idx;
   hash_entry *table = htab->table;
 
   /* First hash function: simply take the modul but prevent zero.  */
-  hash = 1 + hval % htab->size;
+  size_t hash = 1 + hval % htab->size;
 
-  idx = hash;
+  size_t idx = hash;
 
   if (table[idx].used)
     {
       if (table[idx].used == hval && table[idx].keylen == keylen
-          && memcmp (table[idx].key, key, keylen) == 0)
+          && memeq (table[idx].key, key, keylen))
         return idx;
 
       /* Second hash function as suggested in [Knuth].  */
@@ -175,7 +139,7 @@ lookup (hash_table *htab,
 
           /* If entry is found use it.  */
           if (table[idx].used == hval && table[idx].keylen == keylen
-              && memcmp (table[idx].key, key, keylen) == 0)
+              && memeq (table[idx].key, key, keylen))
             return idx;
         }
       while (table[idx].used);
@@ -187,7 +151,7 @@ lookup (hash_table *htab,
 /* Look up the value of a key in the given table.
    If found, return 0 and set *RESULT to it.  Otherwise return -1.  */
 int
-hash_find_entry (hash_table *htab, const void *key, size_t keylen,
+hash_find_entry (const hash_table *htab, const void *key, size_t keylen,
                  void **result)
 {
   hash_entry *table = htab->table;
@@ -207,7 +171,7 @@ hash_find_entry (hash_table *htab, const void *key, size_t keylen,
 static void
 insert_entry_2 (hash_table *htab,
                 const void *key, size_t keylen,
-                unsigned long int hval, size_t idx, void *data)
+                size_t hval, size_t idx, void *data)
 {
   hash_entry *table = htab->table;
 
@@ -237,16 +201,15 @@ insert_entry_2 (hash_table *htab,
 static void
 resize (hash_table *htab)
 {
-  unsigned long int old_size = htab->size;
+  size_t old_size = htab->size;
   hash_entry *table = htab->table;
-  size_t idx;
 
   htab->size = next_prime (htab->size * 2);
   htab->filled = 0;
   htab->first = NULL;
   htab->table = XCALLOC (1 + htab->size, hash_entry);
 
-  for (idx = 1; idx <= old_size; ++idx)
+  for (size_t idx = 1; idx <= old_size; ++idx)
     if (table[idx].used)
       insert_entry_2 (htab, table[idx].key, table[idx].keylen,
                       table[idx].used,
@@ -267,7 +230,7 @@ hash_insert_entry (hash_table *htab,
                    const void *key, size_t keylen,
                    void *data)
 {
-  unsigned long int hval = compute_hashval (key, keylen);
+  size_t hval = compute_hashval (key, keylen);
   hash_entry *table = htab->table;
   size_t idx = lookup (htab, key, keylen, hval);
 
@@ -294,7 +257,7 @@ hash_set_value (hash_table *htab,
                 const void *key, size_t keylen,
                 void *data)
 {
-  unsigned long int hval = compute_hashval (key, keylen);
+  size_t hval = compute_hashval (key, keylen);
   hash_entry *table = htab->table;
   size_t idx = lookup (htab, key, keylen, hval);
 

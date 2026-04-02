@@ -1,6 +1,6 @@
 /* An interface to read and write that retries (if necessary) until complete.
 
-   Copyright (C) 1993-1994, 1997-2006, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 1993-1994, 1997-2006, 2009-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -54,16 +54,16 @@
    When writing, set errno if fewer than COUNT bytes are written.
    When reading, if fewer than COUNT bytes are read, you must examine
    errno to distinguish failure from EOF (errno == 0).  */
-size_t
-full_rw (int fd, const void *buf, size_t count)
+idx_t
+full_rw (int fd, const void *buf, idx_t count)
 {
-  size_t total = 0;
+  idx_t total = 0;
   const char *ptr = (const char *) buf;
 
   while (count > 0)
     {
-      size_t n_rw = safe_rw (fd, ptr, count);
-      if (n_rw == (size_t) -1)
+      ptrdiff_t n_rw = safe_rw (fd, ptr, count);
+      if (n_rw < 0)
         break;
       if (n_rw == 0)
         {

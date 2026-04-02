@@ -1,6 +1,5 @@
 /* xgettext C# backend.
-   Copyright (C) 2003-2009, 2011, 2014, 2018-2023 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2003.
+   Copyright (C) 2003-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,9 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+/* Written by Bruno Haible.  */
+
+#include <config.h>
 
 /* Specification.  */
 #include "x-csharp.h"
@@ -28,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <error.h>
 #include "attribute.h"
 #include "message.h"
 #include "rc-str-list.h"
@@ -40,8 +40,8 @@
 #include "xg-arglist-parser.h"
 #include "xg-message.h"
 #include "c-ctype.h"
-#include "error.h"
-#include "error-progname.h"
+#include "if-error.h"
+#include "xstrerror.h"
 #include "xalloc.h"
 #include "xerror.h"
 #include "xvasprintf.h"
@@ -55,7 +55,9 @@
 #define SIZEOF(a) (sizeof(a) / sizeof(a[0]))
 
 
-/* The C# syntax is defined in ECMA-334, second edition.  */
+/* The C# syntax is defined in ECMA-334, second edition.
+   Strings with embedded expressions are defined in
+   <https://learn.microsoft.com/en-us/dotnet/csharp/how-to/concatenate-multiple-strings#string-interpolation>.  */
 
 
 /* ====================== Keyword set customization.  ====================== */
@@ -83,19 +85,17 @@ x_csharp_keyword (const char *name)
     default_keywords = false;
   else
     {
-      const char *end;
-      struct callshape shape;
-      const char *colon;
-
       if (keywords.table == NULL)
         hash_init (&keywords, 100);
 
+      const char *end;
+      struct callshape shape;
       split_keywordspec (name, &end, &shape);
 
       /* The characters between name and end should form a valid C#
          identifier sequence with dots.
          A colon means an invalid parse in split_keywordspec().  */
-      colon = strchr (name, ':');
+      const char *colon = strchr (name, ':');
       if (colon == NULL || colon >= end)
         insert_keyword_callshape (&keywords, name, end - name, &shape);
     }
@@ -279,8 +279,6 @@ Please specify the correct source encoding through --from-code.\n"),
               else if (errno == EINVAL)
                 {
                   /* An incomplete multibyte character.  */
-                  int c;
-
                   if (bufcount == MAX_PHASE1_PUSHBACK)
                     {
                       /* An overlong incomplete multibyte sequence was
@@ -294,7 +292,7 @@ Please specify the correct source encoding through --from-code.\n"),
                     }
 
                   /* Read one more byte and retry iconv.  */
-                  c = phase1_getc ();
+                  int c = phase1_getc ();
                   if (c == EOF)
                     {
                       multiline_error (xstrdup (""),
@@ -316,14 +314,14 @@ Please specify the correct source encoding through --from-code.\n"),
                   buf[bufcount++] = (unsigned char) c;
                 }
               else
-                error (EXIT_FAILURE, errno, _("%s:%d: iconv failure"),
-                       real_file_name, line_number);
+                if_error (IF_SEVERITY_FATAL_ERROR,
+                          real_file_name, line_number, (size_t)(-1), false,
+                          "%s", xstrerror (_("iconv failure"), errno));
             }
           else
             {
               size_t outbytes = sizeof (scratchbuf) - outsize;
               size_t bytes = bufcount - insize;
-              ucs4_t uc;
 
               /* We expect that one character has been produced.  */
               if (bytes == 0)
@@ -334,6 +332,7 @@ Please specify the correct source encoding through --from-code.\n"),
               while (insize > 0)
                 phase1_ungetc (buf[--insize]);
               /* Convert the character from UTF-8 to UCS-4.  */
+              ucs4_t uc;
               if (u8_mbtoucr (&uc, scratchbuf, outbytes) < (int) outbytes)
                 {
                   /* scratchbuf contains an out-of-range Unicode character
@@ -361,7 +360,6 @@ Please specify the source encoding through --from-code.\n"),
       unsigned char buf[6];
       unsigned int count;
       int c;
-      ucs4_t uc;
 
       c = phase1_getc ();
       if (c == EOF)
@@ -424,6 +422,7 @@ Please specify the source encoding through --from-code.\n"),
           count = 6;
         }
 
+      ucs4_t uc;
       u8_mbtouc (&uc, buf, count);
       return uc;
     }
@@ -580,11 +579,9 @@ static int last_non_comment_line;
 static int
 phase4_getc ()
 {
-  int c0;
   int c;
-  bool last_was_star;
 
-  c0 = phase3_getc ();
+  int c0 = phase3_getc ();
   if (c0 != '/')
     return c0;
   c = phase3_getc ();
@@ -595,45 +592,47 @@ phase4_getc ()
       return c0;
 
     case '*':
-      /* C style comment.  */
-      comment_start ();
-      last_was_star = false;
-      for (;;)
-        {
-          c = phase3_getc ();
-          if (c == UEOF)
+      {
+        /* C style comment.  */
+        comment_start ();
+        bool last_was_star = false;
+        for (;;)
+          {
+            c = phase3_getc ();
+            if (c == UEOF)
+              break;
+            /* We skip all leading white space, but not EOLs.  */
+            if (!(comment_at_start () && (c == ' ' || c == '\t')))
+              comment_add (c);
+            switch (c)
+              {
+              case UNL:
+                comment_line_end (1);
+                comment_start ();
+                last_was_star = false;
+                continue;
+
+              case '*':
+                last_was_star = true;
+                continue;
+
+              case '/':
+                if (last_was_star)
+                  {
+                    comment_line_end (2);
+                    break;
+                  }
+                FALLTHROUGH;
+
+              default:
+                last_was_star = false;
+                continue;
+              }
             break;
-          /* We skip all leading white space, but not EOLs.  */
-          if (!(comment_at_start () && (c == ' ' || c == '\t')))
-            comment_add (c);
-          switch (c)
-            {
-            case UNL:
-              comment_line_end (1);
-              comment_start ();
-              last_was_star = false;
-              continue;
-
-            case '*':
-              last_was_star = true;
-              continue;
-
-            case '/':
-              if (last_was_star)
-                {
-                  comment_line_end (2);
-                  break;
-                }
-              FALLTHROUGH;
-
-            default:
-              last_was_star = false;
-              continue;
-            }
-          break;
-        }
-      last_comment_line = logical_line_number;
-      return ' ';
+          }
+        last_comment_line = logical_line_number;
+        return ' ';
+      }
 
     case '/':
       /* C++ style comment.  */
@@ -1196,10 +1195,10 @@ static int phase5_pushback_length;
 static int
 phase5_getc ()
 {
-  int c;
-
   if (phase5_pushback_length)
     return phase5_pushback[--phase5_pushback_length];
+
+  int c;
 
   c = phase4_getc ();
   if (c != UNL)
@@ -1225,8 +1224,7 @@ phase5_getc ()
     }
 }
 
-#ifdef unused
-static void
+MAYBE_UNUSED static void
 phase5_ungetc (int c)
 {
   if (c != UEOF)
@@ -1236,7 +1234,6 @@ phase5_ungetc (int c)
       phase5_pushback[phase5_pushback_length++] = c;
     }
 }
-#endif
 
 
 /* ========================== Reading of tokens.  ========================== */
@@ -1251,6 +1248,10 @@ enum token_type_ty
   token_type_comma,             /* , */
   token_type_dot,               /* . */
   token_type_string_literal,    /* "abc", @"abc" */
+  token_type_template,          /* $"abc" */
+  token_type_ltemplate,         /* left part of template: $"abc{ */
+  token_type_mtemplate,         /* middle part of template: }abc{ */
+  token_type_rtemplate,         /* right part of template: }abc" */
   token_type_number,            /* 1.23 */
   token_type_symbol,            /* identifier, keyword, null */
   token_type_plus,              /* + */
@@ -1263,8 +1264,8 @@ struct token_ty
 {
   token_type_ty type;
   char *string;                         /* for token_type_symbol */
-  mixed_string_ty *mixed_string;        /* for token_type_string_literal */
-  refcounted_string_list_ty *comment;   /* for token_type_string_literal */
+  mixed_string_ty *mixed_string;        /* for token_type_string_literal, token_type_template */
+  refcounted_string_list_ty *comment;   /* for token_type_string_literal, token_type_template */
   int line_number;
   int logical_line_number;
 };
@@ -1276,7 +1277,7 @@ free_token (token_ty *tp)
 {
   if (tp->type == token_type_symbol)
     free (tp->string);
-  if (tp->type == token_type_string_literal)
+  if (tp->type == token_type_string_literal || tp->type == token_type_template)
     {
       mixed_string_free (tp->mixed_string);
       drop_reference (tp->comment);
@@ -1298,13 +1299,12 @@ do_getc_unicode_escaped (bool (*predicate) (int))
     return '\\';
   if (c == 'u' || c == 'U')
     {
+      int expect = (c == 'U' ? 8 : 4);
+
       unsigned char buf[8];
-      int expect;
-      unsigned int n;
       int i;
 
-      expect = (c == 'U' ? 8 : 4);
-      n = 0;
+      unsigned int n = 0;
       for (i = 0; i < expect; i++)
         {
           int c1 = phase3_getc ();
@@ -1328,12 +1328,9 @@ do_getc_unicode_escaped (bool (*predicate) (int))
         }
 
       if (n >= 0x110000)
-        {
-          error_with_progname = false;
-          error (0, 0, _("%s:%d: warning: invalid Unicode character"),
-                 logical_file_name, line_number);
-          error_with_progname = true;
-        }
+        if_error (IF_SEVERITY_WARNING,
+                  logical_file_name, line_number, (size_t)(-1), false,
+                  _("invalid Unicode character"));
       else if (predicate (n))
         return n;
 
@@ -1351,8 +1348,6 @@ static int
 do_getc_escaped ()
 {
   int c;
-  int n;
-  int i;
 
   /* Use phase 3, because phase 4 elides comments.  */
   c = phase3_getc ();
@@ -1383,44 +1378,46 @@ do_getc_escaped ()
     case '0':
       return 0x0000;
     case 'x':
-      c = phase3_getc ();
-      switch (c)
-        {
-        default:
-          phase3_ungetc (c);
-          phase3_ungetc ('x');
-          return '\\';
+      {
+        c = phase3_getc ();
+        switch (c)
+          {
+          default:
+            phase3_ungetc (c);
+            phase3_ungetc ('x');
+            return '\\';
 
-        case '0': case '1': case '2': case '3': case '4':
-        case '5': case '6': case '7': case '8': case '9':
-        case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-        case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-          break;
-        }
-      n = 0;
-      for (i = 0;; i++)
-        {
-          switch (c)
-            {
-            default:
-              phase3_ungetc (c);
-              return n;
-            case '0': case '1': case '2': case '3': case '4':
-            case '5': case '6': case '7': case '8': case '9':
-              n = n * 16 + c - '0';
-              break;
-            case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
-              n = n * 16 + 10 + c - 'A';
-              break;
-            case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
-              n = n * 16 + 10 + c - 'a';
-              break;
-            }
-          if (i == 3)
+          case '0': case '1': case '2': case '3': case '4':
+          case '5': case '6': case '7': case '8': case '9':
+          case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+          case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
             break;
-          c = phase3_getc ();
-        }
-      return n;
+          }
+        int n = 0;
+        for (int i = 0;; i++)
+          {
+             switch (c)
+              {
+              default:
+                phase3_ungetc (c);
+                return n;
+              case '0': case '1': case '2': case '3': case '4':
+              case '5': case '6': case '7': case '8': case '9':
+                n = n * 16 + c - '0';
+                break;
+              case 'A': case 'B': case 'C': case 'D': case 'E': case 'F':
+                n = n * 16 + 10 + c - 'A';
+                break;
+              case 'a': case 'b': case 'c': case 'd': case 'e': case 'f':
+                n = n * 16 + 10 + c - 'a';
+                break;
+              }
+            if (i == 3)
+              break;
+            c = phase3_getc ();
+          }
+        return n;
+      }
     case 'u': case 'U':
       phase3_ungetc (c);
       return do_getc_unicode_escaped (is_any_character);
@@ -1432,9 +1429,11 @@ do_getc_escaped ()
 }
 
 /* Read a regular string literal or character literal.
-   See ECMA-334 sections 9.4.4.4., 9.4.4.5.  */
-static void
-accumulate_escaped (struct mixed_string_buffer *literal, int delimiter)
+   See ECMA-334 sections 9.4.4.4., 9.4.4.5.
+   Returns one of UEOF, delimiter, delimiter2, UNL.  */
+static int
+accumulate_escaped (struct mixed_string_buffer *literal,
+                    int delimiter, int delimiter2)
 {
   int c;
 
@@ -1442,19 +1441,19 @@ accumulate_escaped (struct mixed_string_buffer *literal, int delimiter)
     {
       /* Use phase 3, because phase 4 elides comments.  */
       c = phase3_getc ();
-      if (c == UEOF || c == delimiter)
+      if (c == UEOF || c == delimiter || c == delimiter2)
         break;
       if (c == UNL)
         {
           phase3_ungetc (c);
-          error_with_progname = false;
           if (delimiter == '\'')
-            error (0, 0, _("%s:%d: warning: unterminated character constant"),
-                   logical_file_name, line_number);
+            if_error (IF_SEVERITY_WARNING,
+                      logical_file_name, line_number, (size_t)(-1), false,
+                      _("unterminated character constant"));
           else
-            error (0, 0, _("%s:%d: warning: unterminated string constant"),
-                   logical_file_name, line_number);
-          error_with_progname = true;
+            if_error (IF_SEVERITY_WARNING,
+                      logical_file_name, line_number, (size_t)(-1), false,
+                      _("unterminated string constant"));
           break;
         }
       if (c == '\\')
@@ -1462,6 +1461,7 @@ accumulate_escaped (struct mixed_string_buffer *literal, int delimiter)
       if (literal)
         mixed_string_buffer_append_unicode (literal, c);
     }
+  return c;
 }
 
 
@@ -1471,11 +1471,33 @@ accumulate_escaped (struct mixed_string_buffer *literal, int delimiter)
 static token_ty phase6_pushback[4];
 static int phase6_pushback_length;
 
+/* Number of open template literals $"...{  */
+static int template_literal_depth;
+
+/* Number of open '{' tokens, at each template literal level.
+   The "current" element is brace_depths[template_literal_depth].  */
+static int *brace_depths;
+/* Number of allocated elements in brace_depths.  */
+static size_t brace_depths_alloc;
+
+/* Adds a new brace_depths level after template_literal_depth was
+   incremented.  */
+static void
+new_brace_depth_level (void)
+{
+  if (template_literal_depth == brace_depths_alloc)
+    {
+      brace_depths_alloc = 2 * brace_depths_alloc + 1;
+      /* Now template_literal_depth < brace_depths_alloc.  */
+      brace_depths =
+        (int *) xrealloc (brace_depths, brace_depths_alloc * sizeof (int));
+    }
+  brace_depths[template_literal_depth] = 0;
+}
+
 static void
 phase6_get (token_ty *tp)
 {
-  int c;
-
   if (phase6_pushback_length)
     {
       *tp = phase6_pushback[--phase6_pushback_length];
@@ -1485,6 +1507,8 @@ phase6_get (token_ty *tp)
 
   for (;;)
     {
+      int c;
+
       tp->line_number = line_number;
       tp->logical_line_number = logical_line_number;
       c = phase5_getc ();
@@ -1518,14 +1542,6 @@ phase6_get (token_ty *tp)
 
         case ')':
           tp->type = token_type_rparen;
-          return;
-
-        case '{':
-          tp->type = token_type_lbrace;
-          return;
-
-        case '}':
-          tp->type = token_type_rbrace;
           return;
 
         case ',':
@@ -1582,13 +1598,14 @@ phase6_get (token_ty *tp)
           /* Regular string literal.  */
           {
             struct mixed_string_buffer literal;
-
             lexical_context = lc_string;
             mixed_string_buffer_init (&literal,
                                       lexical_context,
                                       logical_file_name,
                                       logical_line_number);
-            accumulate_escaped (&literal, '"');
+
+            accumulate_escaped (&literal, '"', '"');
+
             tp->mixed_string = mixed_string_buffer_result (&literal);
             tp->comment = add_reference (savable_comment);
             lexical_context = lc_outside;
@@ -1596,10 +1613,47 @@ phase6_get (token_ty *tp)
             return;
           }
 
+        case '$':
+          c = phase4_getc ();
+          if (c != '"')
+            {
+              phase4_ungetc (c);
+              /* Misc. operator.  */
+              tp->type = token_type_other;
+              return;
+            }
+          /* String with embedded expressions, a.k.a. "interpolated string".  */
+          {
+            struct mixed_string_buffer msb;
+            lexical_context = lc_string;
+            /* Start accumulating the string.  */
+            mixed_string_buffer_init (&msb, lexical_context,
+                                      logical_file_name, logical_line_number);
+
+            c = accumulate_escaped (&msb, '"', '{');
+
+            /* Keep line_number in sync.  */
+            msb.line_number = logical_line_number;
+            if (c == '{')
+              {
+                mixed_string_buffer_destroy (&msb);
+                tp->type = token_type_ltemplate;
+                template_literal_depth++;
+                new_brace_depth_level ();
+              }
+            else
+              {
+                tp->mixed_string = mixed_string_buffer_result (&msb);
+                tp->comment = add_reference (savable_comment);
+                tp->type = token_type_template;
+              }
+            return;
+          }
+
         case '\'':
           /* Character literal.  */
           {
-            accumulate_escaped (NULL, '\'');
+            accumulate_escaped (NULL, '\'', '\'');
             tp->type = token_type_other;
             return;
           }
@@ -1620,13 +1674,36 @@ phase6_get (token_ty *tp)
             }
           return;
 
+        case '{':
+          brace_depths[template_literal_depth]++;
+          tp->type = token_type_lbrace;
+          return;
+
+        case '}':
+          if (brace_depths[template_literal_depth] > 0)
+            brace_depths[template_literal_depth]--;
+          else if (template_literal_depth > 0)
+            {
+              /* Middle or right part of string with embedded expressions.  */
+              c = accumulate_escaped (NULL, '"', '{');
+              if (c == '{')
+                tp->type = token_type_mtemplate;
+              else
+                {
+                  tp->type = token_type_rtemplate;
+                  template_literal_depth--;
+                }
+              return;
+            }
+          tp->type = token_type_rbrace;
+          return;
+
         case '@':
           c = phase4_getc ();
           if (c == '"')
             {
               /* Verbatim string literal.  */
               struct mixed_string_buffer literal;
-
               lexical_context = lc_string;
               mixed_string_buffer_init (&literal, lexical_context,
                                         logical_file_name, logical_line_number);
@@ -1663,8 +1740,6 @@ phase6_get (token_ty *tp)
           if (is_identifier_start (c))
             {
               struct mixed_string_buffer buffer;
-              mixed_string_ty *mixed_string;
-
               mixed_string_buffer_init (&buffer, lexical_context,
                                         logical_file_name, logical_line_number);
               for (;;)
@@ -1677,7 +1752,7 @@ phase6_get (token_ty *tp)
                     break;
                 }
               phase4_ungetc (c);
-              mixed_string = mixed_string_buffer_result (&buffer);
+              mixed_string_ty *mixed_string = mixed_string_buffer_result (&buffer);
               tp->string = mixed_string_contents (mixed_string);
               mixed_string_free (mixed_string);
               tp->type = token_type_symbol;
@@ -1731,18 +1806,18 @@ phase7_get (token_ty *tp)
       for (;;)
         {
           token_ty token2;
-
           phase6_get (&token2);
+
           if (token2.type == token_type_plus)
             {
               token_ty token3;
-
               phase6_get (&token3);
+
               if (token3.type == token_type_string_literal)
                 {
                   token_ty token_after;
-
                   phase6_get (&token_after);
+
                   if (token_after.type != token_type_dot)
                     {
                       sum = mixed_string_concat_free1 (sum, token3.mixed_string);
@@ -1826,7 +1901,7 @@ static int brace_nesting_depth;
    Return true upon eof, false upon closing parenthesis or brace.  */
 static bool
 extract_parenthesized (message_list_ty *mlp, token_type_ty terminator,
-                       flag_context_ty outer_context,
+                       flag_region_ty *outer_region,
                        flag_context_list_iterator_ty context_iter,
                        struct arglist_parser *argparser)
 {
@@ -1839,9 +1914,9 @@ extract_parenthesized (message_list_ty *mlp, token_type_ty terminator,
   /* Context iterator that will be used if the next token is a '('.  */
   flag_context_list_iterator_ty next_context_iter =
     passthrough_context_list_iterator;
-  /* Current context.  */
-  flag_context_ty inner_context =
-    inherited_context (outer_context,
+  /* Current region.  */
+  flag_region_ty *inner_region =
+    inheriting_region (outer_region,
                        flag_context_list_iterator_advance (&context_iter));
 
   /* Start state is 0.  */
@@ -1863,19 +1938,17 @@ extract_parenthesized (message_list_ty *mlp, token_type_ty terminator,
                symbolJ.....symbolN with J > I.  */
             char *sum = token.string;
             size_t sum_len = strlen (sum);
-            const char *dottedname;
-            flag_context_list_ty *context_list;
 
             for (;;)
               {
                 token_ty token2;
-
                 x_csharp_lex (&token2);
+
                 if (token2.type == token_type_dot)
                   {
                     token_ty token3;
-
                     x_csharp_lex (&token3);
+
                     if (token3.type == token_type_symbol)
                       {
                         char *addend = token3.string;
@@ -1897,10 +1970,9 @@ extract_parenthesized (message_list_ty *mlp, token_type_ty terminator,
                 break;
               }
 
-            for (dottedname = sum;;)
+            for (const char *dottedname = sum;;)
               {
                 void *keyword_value;
-
                 if (hash_find_entry (&keywords, dottedname, strlen (dottedname),
                                      &keyword_value)
                     == 0)
@@ -1919,7 +1991,8 @@ extract_parenthesized (message_list_ty *mlp, token_type_ty terminator,
                 dottedname++;
               }
 
-            for (dottedname = sum;;)
+            flag_context_list_ty *context_list;
+            for (const char *dottedname = sum;;)
               {
                 context_list =
                   flag_context_list_table_lookup (
@@ -1936,98 +2009,92 @@ extract_parenthesized (message_list_ty *mlp, token_type_ty terminator,
             next_context_iter = flag_context_list_iterator (context_list);
 
             free (sum);
-            continue;
+            break;
           }
 
         case token_type_lparen:
           if (++paren_nesting_depth > MAX_NESTING_DEPTH)
-            {
-              error_with_progname = false;
-              error (EXIT_FAILURE, 0, _("%s:%d: error: too many open parentheses"),
-                     logical_file_name, line_number);
-            }
+            if_error (IF_SEVERITY_FATAL_ERROR,
+                      logical_file_name, line_number, (size_t)(-1), false,
+                      _("too many open parentheses"));
           if (extract_parenthesized (mlp, token_type_rparen,
-                                     inner_context, next_context_iter,
+                                     inner_region, next_context_iter,
                                      arglist_parser_alloc (mlp,
                                                            state ? next_shapes : NULL)))
             {
               arglist_parser_done (argparser, arg);
+              unref_region (inner_region);
               return true;
             }
           paren_nesting_depth--;
           next_context_iter = null_context_list_iterator;
           state = 0;
-          continue;
+          break;
 
         case token_type_rparen:
           if (terminator == token_type_rparen)
             {
               arglist_parser_done (argparser, arg);
+              unref_region (inner_region);
               return false;
             }
           if (terminator == token_type_rbrace)
-            {
-              error_with_progname = false;
-              error (0, 0,
-                     _("%s:%d: warning: ')' found where '}' was expected"),
-                     logical_file_name, token.line_number);
-              error_with_progname = true;
-            }
+            if_error (IF_SEVERITY_WARNING,
+                      logical_file_name, token.line_number, (size_t)(-1), false,
+                      _("')' found where '}' was expected"));
           next_context_iter = null_context_list_iterator;
           state = 0;
-          continue;
+          break;
 
         case token_type_lbrace:
           if (++brace_nesting_depth > MAX_NESTING_DEPTH)
-            {
-              error_with_progname = false;
-              error (EXIT_FAILURE, 0, _("%s:%d: error: too many open braces"),
-                     logical_file_name, line_number);
-            }
+            if_error (IF_SEVERITY_FATAL_ERROR,
+                      logical_file_name, line_number, (size_t)(-1), false,
+                      _("too many open braces"));
           if (extract_parenthesized (mlp, token_type_rbrace,
-                                     null_context, null_context_list_iterator,
+                                     null_context_region (),
+                                     null_context_list_iterator,
                                      arglist_parser_alloc (mlp, NULL)))
             {
               arglist_parser_done (argparser, arg);
+              unref_region (inner_region);
               return true;
             }
           brace_nesting_depth--;
           next_context_iter = null_context_list_iterator;
           state = 0;
-          continue;
+          break;
 
         case token_type_rbrace:
           if (terminator == token_type_rbrace)
             {
               arglist_parser_done (argparser, arg);
+              unref_region (inner_region);
               return false;
             }
           if (terminator == token_type_rparen)
-            {
-              error_with_progname = false;
-              error (0, 0,
-                     _("%s:%d: warning: '}' found where ')' was expected"),
-                     logical_file_name, token.line_number);
-              error_with_progname = true;
-            }
+            if_error (IF_SEVERITY_WARNING,
+                      logical_file_name, token.line_number, (size_t)(-1), false,
+                      _("'}' found where ')' was expected"));
           next_context_iter = null_context_list_iterator;
           state = 0;
-          continue;
+          break;
 
         case token_type_comma:
           arg++;
-          inner_context =
-            inherited_context (outer_context,
+          unref_region (inner_region);
+          inner_region =
+            inheriting_region (outer_region,
                                flag_context_list_iterator_advance (
                                  &context_iter));
           next_context_iter = passthrough_context_list_iterator;
           state = 0;
-          continue;
+          break;
 
         case token_type_string_literal:
+        case token_type_template:
           {
             lex_pos_ty pos;
-
             pos.file_name = logical_file_name;
             pos.line_number = token.line_number;
 
@@ -2036,31 +2103,35 @@ extract_parenthesized (message_list_ty *mlp, token_type_ty terminator,
                 char *string = mixed_string_contents (token.mixed_string);
                 mixed_string_free (token.mixed_string);
                 remember_a_message (mlp, NULL, string, true, false,
-                                    inner_context, &pos,
+                                    inner_region, &pos,
                                     NULL, token.comment, true);
               }
             else
               arglist_parser_remember (argparser, arg, token.mixed_string,
-                                       inner_context,
+                                       inner_region,
                                        pos.file_name, pos.line_number,
                                        token.comment, true);
           }
           drop_reference (token.comment);
           next_context_iter = null_context_list_iterator;
           state = 0;
-          continue;
+          break;
 
         case token_type_eof:
           arglist_parser_done (argparser, arg);
+          unref_region (inner_region);
           return true;
 
+        case token_type_ltemplate:
+        case token_type_mtemplate:
+        case token_type_rtemplate:
         case token_type_dot:
         case token_type_number:
         case token_type_plus:
         case token_type_other:
           next_context_iter = null_context_list_iterator;
           state = 0;
-          continue;
+          break;
 
         default:
           abort ();
@@ -2097,6 +2168,8 @@ extract_csharp (FILE *f,
 
   phase5_pushback_length = 0;
   phase6_pushback_length = 0;
+  template_literal_depth = 0;
+  new_brace_depth_level ();
   phase7_pushback_length = 0;
 
   flag_context_list_table = flag_table;
@@ -2108,7 +2181,8 @@ extract_csharp (FILE *f,
   /* Eat tokens until eof is seen.  When extract_parenthesized returns
      due to an unbalanced closing parenthesis, just restart it.  */
   while (!extract_parenthesized (mlp, token_type_eof,
-                                 null_context, null_context_list_iterator,
+                                 null_context_region (),
+                                 null_context_list_iterator,
                                  arglist_parser_alloc (mlp, NULL)))
     ;
 

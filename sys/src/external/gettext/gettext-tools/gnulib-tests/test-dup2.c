@@ -1,5 +1,5 @@
 /* Test duplicating file descriptors.
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ SIGNATURE_CHECK (dup2, int, (int, int));
 #include "macros.h"
 
 /* Tell GCC not to warn about the specific edge cases tested here.  */
-#if __GNUC__ >= 13
+#if _GL_GNUC_PREREQ (13, 0)
 # pragma GCC diagnostic ignored "-Wanalyzer-fd-leak"
 # pragma GCC diagnostic ignored "-Wanalyzer-fd-use-without-check"
 #endif
@@ -228,5 +228,5 @@ main (void)
   ASSERT (close (fd) == 0);
   ASSERT (unlink (file) == 0);
 
-  return 0;
+  return test_exit_status;
 }

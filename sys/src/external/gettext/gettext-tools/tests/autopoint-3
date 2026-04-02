@@ -42,17 +42,12 @@ ${AUTOMAKE} --add-missing >/dev/null 2>/dev/null \
 
 rm -f configure.ac Makefile.am
 
-: ${MAKE=make}
-${MAKE} --version >/dev/null 2>/dev/null \
-  || { echo "Skipping test: make not found"; Exit 77; }
-
-gettext_datadir=$top_builddir/misc
+gettext_datadir=$top_builddir/autotools
 export gettext_datadir
 
 cat <<EOF >configure.ac
 AC_INIT([hello], [0.0.0], [bug-gnu-gettext@gnu.org])
 AM_INIT_AUTOMAKE([foreign])
-LT_INIT
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -88,7 +83,7 @@ DEFS = -DLOCALEDIR=\"$(localedir)\" @DEFS@
 AM_CPPFLAGS = -I. -I$(srcdir)
 
 # Link time dependencies.
-LDADD = @LTLIBINTL@
+LDADD = @LIBINTL@
 EOF
 
 cp -p "$abs_top_srcdir"/gnulib-lib/gettext.h .
@@ -119,18 +114,41 @@ fi
 ${AUTOCONF} >/dev/null 2>autopoint.err
 test $? = 0 || { cat autopoint.err; Exit 1; }
 
-# If ltmain.sh is not present, some installations of Automake fail with an
-# error "configure.ac:3: error: required file './ltmain.sh' not found".
-touch ltmain.sh
+# Avoid an Automake 1.16.5 failure, in the presence of Autoconf 2.71, on an ext4
+# file system:
+#   PREFIX/share/automake-1.16/am/depend2.am: error: am__fastdepCC does not appear in AM_CONDITIONAL
+#   PREFIX/share/automake-1.16/am/depend2.am:   The usual way to define 'am__fastdepCC' is to add 'AC_PROG_CC'
+#   PREFIX/share/automake-1.16/am/depend2.am:   to 'configure.ac' and run 'aclocal' and 'autoconf' again
+#   PREFIX/share/automake-1.16/am/depend2.am: error: AMDEP does not appear in AM_CONDITIONAL
+#   PREFIX/share/automake-1.16/am/depend2.am:   The usual way to define 'AMDEP' is to add one of the compiler tests
+#   PREFIX/share/automake-1.16/am/depend2.am:     AC_PROG_CC, AC_PROG_CXX, AC_PROG_OBJC, AC_PROG_OBJCXX,
+#   PREFIX/share/automake-1.16/am/depend2.am:     AM_PROG_AS, AM_PROG_GCJ, AM_PROG_UPC
+#   PREFIX/share/automake-1.16/am/depend2.am:   to 'configure.ac' and run 'aclocal' and 'autoconf' again
+# The cause is described in
+# <https://lists.gnu.org/archive/html/bug-automake/2023-07/msg00020.html>.
+rm -rf autom4te.cache
 
 ${AUTOMAKE} -a -c >/dev/null 2>autopoint.err
 test $? = 0 || { cat autopoint.err; Exit 1; }
 
 # Check that it all compiles.
 : ${CONFIG_SHELL=${SHELL-/bin/sh}}
-${CONFIG_SHELL} ./configure >/dev/null 2>autpoint.err
+${CONFIG_SHELL} ./configure >/dev/null 2>autopoint.err
 test $? = 0 || { cat autopoint.err; Exit 1; }
 
+# The po/Makefile requires GNU make on specific platforms.
+if test -z "${MAKE}"; then
+  case "$host_os" in
+    darwin* | solaris* | aix*)
+      if (gmake --version >/dev/null) 2>/dev/null; then
+        MAKE=gmake
+      else
+        MAKE=make
+      fi
+      ;;
+    *) MAKE=make ;;
+  esac
+fi
 ${MAKE} >/dev/null 2>autopoint.err
 test $? = 0 || { cat autopoint.err; Exit 1; }
 

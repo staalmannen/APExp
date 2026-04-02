@@ -1,7 +1,5 @@
 /* xgettext Lisp backend.
-   Copyright (C) 2001-2003, 2005-2009, 2018-2023 Free Software Foundation, Inc.
-
-   This file was written by Bruno Haible <haible@clisp.cons.org>, 2001.
+   Copyright (C) 2001-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,9 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+/* Written by Bruno Haible.  */
+
+#include <config.h>
 
 /* Specification.  */
 #include "x-lisp.h"
@@ -29,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <error.h>
 #include "attribute.h"
 #include "message.h"
 #include "xgettext.h"
@@ -38,8 +37,7 @@
 #include "xg-arglist-callshape.h"
 #include "xg-arglist-parser.h"
 #include "xg-message.h"
-#include "error.h"
-#include "error-progname.h"
+#include "if-error.h"
 #include "xalloc.h"
 #include "mem-hash-map.h"
 #include "gettext.h"
@@ -132,21 +130,16 @@ x_lisp_keyword (const char *name)
     default_keywords = false;
   else
     {
-      const char *end;
-      struct callshape shape;
-      const char *colon;
-      size_t len;
-      char *symname;
-      size_t i;
-
       if (keywords.table == NULL)
         hash_init (&keywords, 100);
 
+      const char *end;
+      struct callshape shape;
       split_keywordspec (name, &end, &shape);
 
       /* The characters between name and end should form a valid Lisp symbol.
          Extract the symbol name part.  */
-      colon = strchr (name, ':');
+      const char *colon = strchr (name, ':');
       if (colon != NULL && colon < end)
         {
           name = colon + 1;
@@ -158,9 +151,9 @@ x_lisp_keyword (const char *name)
         }
 
       /* Uppercase it.  */
-      len = end - name;
-      symname = XNMALLOC (len, char);
-      for (i = 0; i < len; i++)
+      size_t len = end - name;
+      char *symname = XNMALLOC (len, char);
+      for (size_t i = 0; i < len; i++)
         symname[i] =
           (name[i] >= 'a' && name[i] <= 'z' ? name[i] - 'a' + 'A' : name[i]);
 
@@ -394,13 +387,11 @@ grow_token (struct token *tp)
 static void
 read_token (struct token *tp, const struct char_syntax *first)
 {
-  bool multiple_escape_flag;
-  struct char_syntax curr;
-
   init_token (tp);
   tp->with_escape = false;
 
-  multiple_escape_flag = false;
+  bool multiple_escape_flag = false;
+  struct char_syntax curr;
   if (first)
     curr = *first;
   else
@@ -490,9 +481,8 @@ static inline bool
 has_a_dot (const struct token *tp)
 {
   int n = tp->charcount;
-  int i;
 
-  for (i = 0; i < n; i++)
+  for (int i = 0; i < n; i++)
     if (tp->chars[i].attribute == a_dot)
       return true;
   return false;
@@ -502,9 +492,8 @@ static inline bool
 all_a_number (const struct token *tp)
 {
   int n = tp->charcount;
-  int i;
 
-  for (i = 0; i < n; i++)
+  for (int i = 0; i < n; i++)
     if (!is_number_attribute (tp->chars[i].attribute))
       return false;
   return true;
@@ -514,9 +503,8 @@ static inline void
 a_letter_to_digit (const struct token *tp, int base)
 {
   int n = tp->charcount;
-  int i;
 
-  for (i = 0; i < n; i++)
+  for (int i = 0; i < n; i++)
     if (is_letter_attribute (tp->chars[i].attribute))
       {
         int c = tp->chars[i].ch;
@@ -533,9 +521,8 @@ static inline bool
 has_a_digit (const struct token *tp)
 {
   int n = tp->charcount;
-  int i;
 
-  for (i = 0; i < n; i++)
+  for (int i = 0; i < n; i++)
     if (tp->chars[i].attribute == a_digit
         || tp->chars[i].attribute == a_letterdigit
         || tp->chars[i].attribute == a_expodigit)
@@ -547,9 +534,8 @@ static inline bool
 has_adjacent_letters (const struct token *tp)
 {
   int n = tp->charcount;
-  int i;
 
-  for (i = 1; i < n; i++)
+  for (int i = 1; i < n; i++)
     if (is_letter_attribute (tp->chars[i-1].attribute)
         && is_letter_attribute (tp->chars[i].attribute))
       return true;
@@ -605,9 +591,6 @@ enum number_type
 static enum number_type
 is_number (const struct token *tp, int *basep)
 {
-  struct token_char *ptr_limit;
-  struct token_char *ptr1;
-
   if (!is_potential_number (tp, basep))
     return n_none;
 
@@ -616,8 +599,8 @@ is_number (const struct token *tp, int *basep)
      - there is at least one a_digit or a_letterdigit or a_expodigit, and
      - if there is an a_dot, then *basep = 10.  */
 
-  ptr1 = &tp->chars[0];
-  ptr_limit = &tp->chars[tp->charcount];
+  struct token_char *ptr1 = &tp->chars[0];
+  struct token_char *ptr_limit = &tp->chars[tp->charcount];
 
   if (ptr1->attribute == a_sign)
     ptr1++;
@@ -629,9 +612,8 @@ is_number (const struct token *tp, int *basep)
   {
     bool seen_a_ratio = false;
     bool seen_a_digit = false;  /* seen a digit in last digit block? */
-    struct token_char *ptr;
 
-    for (ptr = ptr1;; ptr++)
+    for (struct token_char *ptr = ptr1;; ptr++)
       {
         if (ptr >= ptr_limit)
           {
@@ -747,9 +729,8 @@ static void
 upcase_token (struct token *tp)
 {
   int n = tp->charcount;
-  int i;
 
-  for (i = 0; i < n; i++)
+  for (int i = 0; i < n; i++)
     if (tp->chars[i].attribute != a_escaped)
       {
         unsigned char c = tp->chars[i].ch;
@@ -762,9 +743,8 @@ static void
 downcase_token (struct token *tp)
 {
   int n = tp->charcount;
-  int i;
 
-  for (i = 0; i < n; i++)
+  for (int i = 0; i < n; i++)
     if (tp->chars[i].attribute != a_escaped)
       {
         unsigned char c = tp->chars[i].ch;
@@ -776,9 +756,6 @@ downcase_token (struct token *tp)
 static void
 case_convert_token (struct token *tp)
 {
-  int n = tp->charcount;
-  int i;
-
   switch (readtable_case)
     {
     case case_upcase:
@@ -794,9 +771,10 @@ case_convert_token (struct token *tp)
 
     case case_invert:
       {
+        int n = tp->charcount;
         bool seen_uppercase = false;
         bool seen_lowercase = false;
-        for (i = 0; i < n; i++)
+        for (int i = 0; i < n; i++)
           if (tp->chars[i].attribute != a_escaped)
             {
               unsigned char c = tp->chars[i].ch;
@@ -911,19 +889,17 @@ free_object (struct object *op)
 static char *
 string_of_object (const struct object *op)
 {
-  char *str;
-  const struct token_char *p;
-  char *q;
-  int n;
-
   if (!(op->type == t_symbol || op->type == t_string))
     abort ();
-  n = op->token->charcount;
-  str = XNMALLOC (n + 1, char);
-  q = str;
-  for (p = op->token->chars; n > 0; p++, n--)
-    *q++ = p->ch;
-  *q = '\0';
+  int n = op->token->charcount;
+  char *str = XNMALLOC (n + 1, char);
+  {
+    const struct token_char *p;
+    char *q = str;
+    for (p = op->token->chars; n > 0; p++, n--)
+      *q++ = p->ch;
+    *q = '\0';
+  }
   return str;
 }
 
@@ -941,18 +917,15 @@ static int nesting_depth;
 
 /* Read the next object.  */
 static void
-read_object (struct object *op, flag_context_ty outer_context)
+read_object (struct object *op, flag_region_ty *outer_region)
 {
   if (nesting_depth > MAX_NESTING_DEPTH)
-    {
-      error_with_progname = false;
-      error (EXIT_FAILURE, 0, _("%s:%d: error: too deeply nested objects"),
-             logical_file_name, line_number);
-    }
+    if_error (IF_SEVERITY_FATAL_ERROR,
+              logical_file_name, line_number, (size_t)(-1), false,
+              _("too deeply nested objects"));
   for (;;)
     {
       struct char_syntax curr;
-
       read_char_syntax (&curr);
 
       switch (curr.scode)
@@ -1000,7 +973,6 @@ read_object (struct object *op, flag_context_ty outer_context)
           /* Number.  */
           {
             int base = read_base;
-
             if (is_number (op->token, &base) != n_none)
               {
                 free_token (op->token);
@@ -1030,19 +1002,18 @@ read_object (struct object *op, flag_context_ty outer_context)
 
                 for (;; arg++)
                   {
-                    struct object inner;
-                    flag_context_ty inner_context;
-
+                    flag_region_ty *inner_region;
                     if (arg == 0)
-                      inner_context = null_context;
+                      inner_region = null_context_region ();
                     else
-                      inner_context =
-                        inherited_context (outer_context,
+                      inner_region =
+                        inheriting_region (outer_region,
                                            flag_context_list_iterator_advance (
                                              &context_iter));
 
                     ++nesting_depth;
-                    read_object (&inner, inner_context);
+                    struct object inner;
+                    read_object (&inner, inner_region);
                     nesting_depth--;
 
                     /* Recognize end of list.  */
@@ -1053,6 +1024,7 @@ read_object (struct object *op, flag_context_ty outer_context)
                         last_non_comment_line = line_number;
                         if (argparser != NULL)
                           arglist_parser_done (argparser, arg);
+                        unref_region (inner_region);
                         return;
                       }
 
@@ -1070,17 +1042,18 @@ read_object (struct object *op, flag_context_ty outer_context)
                         if (inner.type == t_symbol)
                           {
                             char *symbol_name = string_of_object (&inner);
-                            int i;
-                            int prefix_len;
-                            void *keyword_value;
 
                             /* Omit any package name.  */
-                            i = inner.token->charcount;
-                            while (i > 0
-                                   && inner.token->chars[i-1].attribute != a_pack_m)
-                              i--;
-                            prefix_len = i;
+                            int prefix_len;
+                            {
+                              int i = inner.token->charcount;
+                              while (i > 0
+                                     && inner.token->chars[i-1].attribute != a_pack_m)
+                                i--;
+                              prefix_len = i;
+                            }
 
+                            void *keyword_value;
                             if (hash_find_entry (&keywords,
                                                  symbol_name + prefix_len,
                                                  strlen (symbol_name + prefix_len),
@@ -1113,13 +1086,14 @@ read_object (struct object *op, flag_context_ty outer_context)
                                                          inner.line_number_at_start);
                             free (s);
                             arglist_parser_remember (argparser, arg, ms,
-                                                     inner_context,
+                                                     inner_region,
                                                      logical_file_name,
                                                      inner.line_number_at_start,
                                                      savable_comment, false);
                           }
                       }
 
+                    unref_region (inner_region);
                     free_object (&inner);
                   }
 
@@ -1150,10 +1124,9 @@ read_object (struct object *op, flag_context_ty outer_context)
             case '\'':
             case '`':
               {
-                struct object inner;
-
                 ++nesting_depth;
-                read_object (&inner, null_context);
+                struct object inner;
+                read_object (&inner, null_context_region ());
                 nesting_depth--;
 
                 /* Dots and EOF are not allowed here.  But be tolerant.  */
@@ -1167,10 +1140,9 @@ read_object (struct object *op, flag_context_ty outer_context)
 
             case ';':
               {
-                bool all_semicolons = true;
-
                 last_comment_line = line_number;
                 comment_start ();
+                bool all_semicolons = true;
                 for (;;)
                   {
                     int c = do_getc ();
@@ -1217,11 +1189,11 @@ read_object (struct object *op, flag_context_ty outer_context)
                 if (extract_all)
                   {
                     lex_pos_ty pos;
-
                     pos.file_name = logical_file_name;
                     pos.line_number = op->line_number_at_start;
+
                     remember_a_message (mlp, NULL, string_of_object (op), false,
-                                        false, null_context, &pos,
+                                        false, null_context_region (), &pos,
                                         NULL, savable_comment, false);
                   }
                 last_non_comment_line = line_number;
@@ -1261,9 +1233,9 @@ read_object (struct object *op, flag_context_ty outer_context)
                   case 'P': case 'p':
                   case 'S': case 's':
                     {
-                      struct object inner;
                       ++nesting_depth;
-                      read_object (&inner, null_context);
+                      struct object inner;
+                      read_object (&inner, null_context_region ());
                       nesting_depth--;
                       /* Dots and EOF are not allowed here.
                          But be tolerant.  */
@@ -1381,9 +1353,9 @@ read_object (struct object *op, flag_context_ty outer_context)
                   case '-':
                     /* Simply assume every feature expression is true.  */
                     {
-                      struct object inner;
                       ++nesting_depth;
-                      read_object (&inner, null_context);
+                      struct object inner;
+                      read_object (&inner, null_context_region ());
                       nesting_depth--;
                       /* Dots and EOF are not allowed here.
                          But be tolerant.  */
@@ -1440,7 +1412,7 @@ extract_lisp (FILE *f,
     {
       struct object toplevel_object;
 
-      read_object (&toplevel_object, null_context);
+      read_object (&toplevel_object, null_context_region ());
 
       if (toplevel_object.type == t_eof)
         break;

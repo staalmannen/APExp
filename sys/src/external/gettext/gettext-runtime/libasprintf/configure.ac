@@ -1,5 +1,5 @@
 dnl Configuration for the GNU libasprintf library
-dnl Copyright (C) 2002-2012, 2016, 2018-2023 Free Software Foundation, Inc.
+dnl Copyright (C) 2002-2024 Free Software Foundation, Inc.
 dnl
 dnl This program is free software: you can redistribute it and/or modify
 dnl it under the terms of the GNU General Public License as published by
@@ -53,10 +53,10 @@ dnl Prepares the libtool configuration for handling of Windows resources, and
 dnl sets the RC variable to a program that compiles Windows resource files.
 LT_LANG([Windows Resource])
 
-dnl On mingw and Cygwin, we can activate special Makefile rules which add
-dnl version information to the shared libraries and executables.
+dnl On native Windows and Cygwin, we can activate special Makefile rules which
+dnl add version information to the shared libraries and executables.
 case "$host_os" in
-  mingw* | cygwin*) is_woe32=yes ;;
+  mingw* | windows* | cygwin*) is_woe32=yes ;;
   *) is_woe32=no ;;
 esac
 AM_CONDITIONAL([WOE32], [test $is_woe32 = yes])
@@ -64,7 +64,7 @@ AM_CONDITIONAL([WOE32], [test $is_woe32 = yes])
 case "$host_os" in
   # On Cygwin, without -no-undefined, a warning is emitted and only a static
   # library is built.
-  beos* | mingw* | cygwin* | os2*) LTNOUNDEF='-no-undefined' ;;
+  beos* | mingw* | windows* | cygwin* | os2*) LTNOUNDEF='-no-undefined' ;;
   *) LTNOUNDEF='' ;;
 esac
 AC_SUBST([LTNOUNDEF])
@@ -78,7 +78,6 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_INLINE
 AC_TYPE_SIZE_T
 AC_TYPE_LONG_LONG_INT
-gt_TYPE_WCHAR_T
 gt_TYPE_WINT_T
 AC_TYPE_MBSTATE_T
 AC_CHECK_TYPE([ptrdiff_t], ,
@@ -86,7 +85,6 @@ AC_CHECK_TYPE([ptrdiff_t], ,
      [Define as the type of the result of subtracting two pointers, if the system doesn't define it.])
   ])
 gl_AC_TYPE_INTMAX_T
-gl_XSIZE
 
 dnl Checks for library functions.
 
@@ -95,7 +93,14 @@ AC_CHECK_FUNCS([snprintf vasprintf strnlen wcslen wcsnlen mbrtowc wcrtomb])
 dnl Use the _snprintf function only if it is declared (because on NetBSD it
 dnl is defined as a weak alias of snprintf; we prefer to use the latter).
 AC_CHECK_DECLS([_snprintf], , , [#include <stdio.h>])
-gt_PRINTF_POSIX
+
+gl_PRINTF_POSITIONS
+case "$gl_cv_func_printf_positions" in
+  *yes)
+    AC_DEFINE([HAVE_POSIX_PRINTF], [1],
+      [Define if your printf() function supports format strings with positions.])
+    ;;
+esac
 
 dnl Hide undesired symbols from the global namespace, by prefixing them with
 dnl "libasprintf_".

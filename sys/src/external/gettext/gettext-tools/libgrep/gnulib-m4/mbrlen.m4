@@ -1,8 +1,10 @@
-# mbrlen.m4 serial 12  -*- coding: utf-8 -*-
-dnl Copyright (C) 2008, 2010-2024 Free Software Foundation, Inc.
+# mbrlen.m4
+# serial 15
+dnl Copyright (C) 2008, 2010-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_DEFUN([gl_FUNC_MBRLEN],
 [
@@ -49,10 +51,10 @@ AC_DEFUN([gl_MBRLEN_INCOMPLETE_STATE],
       dnl is present.
 changequote(,)dnl
       case "$host_os" in
-                     # Guess no on AIX and OSF/1.
-        aix* | osf*) gl_cv_func_mbrlen_incomplete_state="guessing no" ;;
-                     # Guess yes otherwise.
-        *)           gl_cv_func_mbrlen_incomplete_state="guessing yes" ;;
+              # Guess no on AIX.
+        aix*) gl_cv_func_mbrlen_incomplete_state="guessing no" ;;
+              # Guess yes otherwise.
+        *)    gl_cv_func_mbrlen_incomplete_state="guessing yes" ;;
       esac
 changequote([,])dnl
       if test $LOCALE_JA != none; then
@@ -90,7 +92,7 @@ dnl Result is gl_cv_func_mbrlen_retval.
 AC_DEFUN([gl_MBRLEN_RETVAL],
 [
   AC_REQUIRE([AC_PROG_CC])
-  AC_REQUIRE([gt_LOCALE_FR_UTF8])
+  AC_REQUIRE([gt_LOCALE_EN_UTF8])
   AC_REQUIRE([gt_LOCALE_JA])
   AC_REQUIRE([AC_CANONICAL_HOST]) dnl for cross-compiles
   AC_CACHE_CHECK([whether mbrlen has a correct return value],
@@ -106,7 +108,7 @@ changequote(,)dnl
         *)                gl_cv_func_mbrlen_retval="guessing yes" ;;
       esac
 changequote([,])dnl
-      if test $LOCALE_FR_UTF8 != none || test $LOCALE_JA != none; then
+      if test "$LOCALE_EN_UTF8" != none || test $LOCALE_JA != none; then
         AC_RUN_IFELSE(
           [AC_LANG_SOURCE([[
 #include <locale.h>
@@ -116,8 +118,8 @@ int main ()
 {
   int result = 0;
   /* This fails on Solaris.  */
-  if (strcmp ("$LOCALE_FR_UTF8", "none") != 0
-      && setlocale (LC_ALL, "$LOCALE_FR_UTF8") != NULL)
+  if (strcmp ("$LOCALE_EN_UTF8", "none") != 0
+      && setlocale (LC_ALL, "$LOCALE_EN_UTF8") != NULL)
     {
       char input[] = "B\303\274\303\237er"; /* "Büßer" */
       mbstate_t state;

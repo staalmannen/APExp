@@ -1,6 +1,6 @@
 /* set-acl.c - set access control list equivalent to a mode
 
-   Copyright (C) 2002-2003, 2005-2024 Free Software Foundation, Inc.
+   Copyright (C) 2002-2003, 2005-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #include "quote.h"
 #include <error.h>
 #include "gettext.h"
-#define _(msgid) gettext (msgid)
+#define _(msgid) dgettext (GNULIB_TEXT_DOMAIN, msgid)
 
 /* Set the access control lists of a file to match *exactly* MODE (this might
    remove inherited ACLs). Note chmod() tends to honor inherited/default
@@ -39,10 +39,16 @@
     return -1.  */
 
 int
-set_acl (char const *name, int desc, mode_t mode)
+xset_acl (char const *name, int desc, mode_t mode)
 {
   int ret = qset_acl (name, desc, mode);
   if (ret != 0)
     error (0, errno, _("setting permissions for %s"), quote (name));
   return ret;
+}
+
+int
+set_acl (char const *name, int desc, mode_t mode)
+{
+  return xset_acl (name, desc, mode);
 }

@@ -1,5 +1,5 @@
 /* Message list test for ordinary file names.
-   Copyright (C) 2021 Free Software Foundation, Inc.
+   Copyright (C) 2021-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,7 +14,7 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-/* Written by Bruno Haible <bruno@clisp.org>, 2021.  */
+/* Written by Bruno Haible.  */
 
 #ifndef _MSGL_OFN_H
 #define _MSGL_OFN_H
@@ -31,11 +31,11 @@ extern "C" {
 /* Tests whether some of the file names in the message locations has spaces.  */
 
 extern bool
-       message_has_filenames_with_spaces (message_ty *mp);
+       message_has_filenames_with_spaces (const message_ty *mp);
 extern bool
-       message_list_has_filenames_with_spaces (message_list_ty *mlp);
+       message_list_has_filenames_with_spaces (const message_list_ty *mlp);
 extern bool
-       msgdomain_list_has_filenames_with_spaces (msgdomain_list_ty *mdlp);
+       msgdomain_list_has_filenames_with_spaces (const msgdomain_list_ty *mdlp);
 
 
 #ifdef __cplusplus

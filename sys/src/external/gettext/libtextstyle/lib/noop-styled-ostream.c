@@ -5,8 +5,7 @@
 #endif
 #line 1 "noop-styled-ostream.oo.c"
 /* Output stream with no-op styling.
-   Copyright (C) 2006, 2019-2020 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2019.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -21,6 +20,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Written by Bruno Haible.  */
+
 #include <config.h>
 
 /* Specification.  */
@@ -29,7 +30,7 @@
 #include "xalloc.h"
 
 
-#line 33 "noop-styled-ostream.c"
+#line 34 "noop-styled-ostream.c"
 #include "noop_styled_ostream.priv.h"
 
 const typeinfo_t noop_styled_ostream_typeinfo = { "noop_styled_ostream" };
@@ -39,7 +40,7 @@ static const typeinfo_t * const noop_styled_ostream_superclasses[] =
 
 #define super styled_ostream_vtable
 
-#line 36 "noop-styled-ostream.oo.c"
+#line 37 "noop-styled-ostream.oo.c"
 
 /* Implementation of ostream_t methods.  */
 
@@ -119,7 +120,6 @@ noop_styled_ostream_create (ostream_t destination, bool pass_ownership)
 {
   noop_styled_ostream_t stream =
     XMALLOC (struct noop_styled_ostream_representation);
-
   stream->base.base.vtable = &noop_styled_ostream_vtable;
   stream->destination = destination;
   stream->own_destination = pass_ownership;

@@ -5,8 +5,7 @@
 #endif
 #line 1 "fd-ostream.oo.c"
 /* Output stream referring to a file descriptor.
-   Copyright (C) 2006-2007, 2019-2020 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -20,6 +19,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible.  */
 
 #include <config.h>
 
@@ -35,14 +36,14 @@
 # include <termios.h>
 #endif
 
-#include "error.h"
+#include <error.h>
 #include "full-write.h"
 #include "xalloc.h"
 #include "gettext.h"
 
 #define _(str) gettext (str)
 
-#line 46 "fd-ostream.c"
+#line 47 "fd-ostream.c"
 #include "fd_ostream.priv.h"
 
 const typeinfo_t fd_ostream_typeinfo = { "fd_ostream" };
@@ -52,7 +53,7 @@ static const typeinfo_t * const fd_ostream_superclasses[] =
 
 #define super ostream_vtable
 
-#line 47 "fd-ostream.oo.c"
+#line 48 "fd-ostream.oo.c"
 
 #define BUFSIZE 4096
 
@@ -237,7 +238,7 @@ is_instance_of_fd_ostream (ostream_t stream)
   return IS_INSTANCE (stream, ostream, fd_ostream);
 }
 
-#line 241 "fd-ostream.c"
+#line 242 "fd-ostream.c"
 
 const struct fd_ostream_implementation fd_ostream_vtable =
 {

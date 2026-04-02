@@ -1,9 +1,9 @@
 /* Set the current locale.  -*- coding: utf-8 -*-
-   Copyright (C) 2009, 2011-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009, 2011-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
-   published by the Free Software Foundation, either version 3 of the
+   published by the Free Software Foundation; either version 2.1 of the
    License, or (at your option) any later version.
 
    This file is distributed in the hope that it will be useful,
@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "setlocale-fixes.h"
 #include "localename.h"
 
 #if HAVE_CFLOCALECOPYPREFERREDLANGUAGES || HAVE_CFPREFERENCESCOPYAPPVALUE
@@ -45,6 +46,11 @@
 # include <CoreFoundation/CFArray.h>
 # include <CoreFoundation/CFString.h>
 extern void gl_locale_name_canonicalize (char *name);
+#endif
+
+#if defined _WIN32 && !defined __CYGWIN__
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
 #endif
 
 #if 1
@@ -458,7 +464,7 @@ static const struct table_entry language_table[] =
 
 /* Table from ISO 3166 country code to English name.
    Keep in sync with the gl_locale_name_from_win32_LANGID function in
-   localename.c!  */
+   localename-unsafe.c!  */
 static const struct table_entry country_table[] =
   {
     { "AE", "U.A.E." },
@@ -632,31 +638,23 @@ search (const struct table_entry *table, size_t table_size, const char *string,
           /* Found an i with
                strcmp (language_table[i].code, string) == 0.
              Find the entire interval of such i.  */
-          {
-            size_t i;
-
-            for (i = mid; i > lo; )
-              {
-                i--;
-                if (strcmp (table[i].code, string) < 0)
-                  {
-                    lo = i + 1;
-                    break;
-                  }
-              }
-          }
-          {
-            size_t i;
-
-            for (i = mid + 1; i < hi; i++)
-              {
-                if (strcmp (table[i].code, string) > 0)
-                  {
-                    hi = i;
-                    break;
-                  }
-              }
-          }
+          for (size_t i = mid; i > lo; )
+            {
+              i--;
+              if (strcmp (table[i].code, string) < 0)
+                {
+                  lo = i + 1;
+                  break;
+                }
+            }
+          for (size_t i = mid + 1; i < hi; i++)
+            {
+              if (strcmp (table[i].code, string) > 0)
+                {
+                  hi = i;
+                  break;
+                }
+            }
           /* The set of i with
                strcmp (language_table[i].code, string) == 0
              is the interval [lo, hi-1].  */
@@ -672,24 +670,31 @@ search (const struct table_entry *table, size_t table_size, const char *string,
 static char *
 setlocale_unixlike (int category, const char *locale)
 {
-  char *result;
-  char llCC_buf[64];
-  char ll_buf[64];
-  char CC_buf[64];
+  int is_utf8 = (GetACP () == 65001);
 
   /* The native Windows implementation of setlocale understands the special
      locale name "C", but not "POSIX".  Therefore map "POSIX" to "C".  */
-  if (locale != NULL && strcmp (locale, "POSIX") == 0)
+  if (locale != NULL && streq (locale, "POSIX"))
     locale = "C";
 
+  /* The native Windows implementation of setlocale, in the UTF-8 environment,
+     does not understand the locale names "C.UTF-8" or "C.utf8" or "C.65001",
+     but it understands "English_United States.65001", which is functionally
+     equivalent.  */
+  if (locale != NULL
+      && ((is_utf8 && streq (locale, "C"))
+          || streq (locale, "C.UTF-8")))
+    locale = "English_United States.65001";
+
   /* First, try setlocale with the original argument unchanged.  */
-  result = setlocale_mtsafe (category, locale);
+  char *result = setlocale_mtsafe (category, locale);
   if (result != NULL)
     return result;
 
   /* Otherwise, assume the argument is in the form
        language[_territory][.codeset][@modifier]
      and try to map it using the tables.  */
+  char llCC_buf[64];
   if (strlen (locale) < sizeof (llCC_buf))
     {
       /* Second try: Remove the codeset part.  */
@@ -712,26 +717,41 @@ setlocale_unixlike (int category, const char *locale)
       /* llCC_buf now contains
            language[_territory][@modifier]
        */
-      if (strcmp (llCC_buf, locale) != 0)
+      if (!streq (llCC_buf, locale))
         {
-          result = setlocale (category, llCC_buf);
+          if (is_utf8)
+            {
+              char buf[64+6];
+              strcpy (buf, llCC_buf);
+              strcat (buf, ".65001");
+              result = setlocale (category, buf);
+            }
+          else
+            result = setlocale (category, llCC_buf);
           if (result != NULL)
             return result;
         }
       /* Look it up in language_table.  */
       {
         range_t range;
-        size_t i;
 
         search (language_table,
                 sizeof (language_table) / sizeof (language_table[0]),
                 llCC_buf,
                 &range);
 
-        for (i = range.lo; i < range.hi; i++)
+        for (size_t i = range.lo; i < range.hi; i++)
           {
             /* Try the replacement in language_table[i].  */
-            result = setlocale (category, language_table[i].english);
+            if (is_utf8)
+              {
+                char buf[64+6];
+                strcpy (buf, language_table[i].english);
+                strcat (buf, ".65001");
+                result = setlocale (category, buf);
+              }
+            else
+              result = setlocale (category, language_table[i].english);
             if (result != NULL)
               return result;
           }
@@ -749,9 +769,11 @@ setlocale_unixlike (int category, const char *locale)
             if (territory_end == NULL)
               territory_end = territory_start + strlen (territory_start);
 
+            char ll_buf[64];
             memcpy (ll_buf, llCC_buf, underscore - llCC_buf);
             strcpy (ll_buf + (underscore - llCC_buf), territory_end);
 
+            char CC_buf[64];
             memcpy (CC_buf, territory_start, territory_end - territory_start);
             CC_buf[territory_end - territory_start] = '\0';
 
@@ -773,48 +795,49 @@ setlocale_unixlike (int category, const char *locale)
                           CC_buf,
                           &country_range);
                   if (country_range.lo < country_range.hi)
-                    {
-                      size_t i;
-                      size_t j;
+                    for (size_t i = language_range.lo; i < language_range.hi; i++)
+                      for (size_t j = country_range.lo; j < country_range.hi; j++)
+                        {
+                          /* Concatenate the replacements.  */
+                          const char *part1 = language_table[i].english;
+                          size_t part1_len = strlen (part1);
+                          const char *part2 = country_table[j].english;
+                          size_t part2_len = strlen (part2) + 1;
+                          char buf[64+64+6];
 
-                      for (i = language_range.lo; i < language_range.hi; i++)
-                        for (j = country_range.lo; j < country_range.hi; j++)
-                          {
-                            /* Concatenate the replacements.  */
-                            const char *part1 = language_table[i].english;
-                            size_t part1_len = strlen (part1);
-                            const char *part2 = country_table[j].english;
-                            size_t part2_len = strlen (part2) + 1;
-                            char buf[64+64];
+                          if (!(part1_len + 1 + part2_len + 6 <= sizeof (buf)))
+                            abort ();
+                          memcpy (buf, part1, part1_len);
+                          buf[part1_len] = '_';
+                          memcpy (buf + part1_len + 1, part2, part2_len);
+                          if (is_utf8)
+                            strcat (buf, ".65001");
 
-                            if (!(part1_len + 1 + part2_len <= sizeof (buf)))
-                              abort ();
-                            memcpy (buf, part1, part1_len);
-                            buf[part1_len] = '_';
-                            memcpy (buf + part1_len + 1, part2, part2_len);
-
-                            /* Try the concatenated replacements.  */
-                            result = setlocale (category, buf);
-                            if (result != NULL)
-                              return result;
-                          }
-                    }
+                          /* Try the concatenated replacements.  */
+                          result = setlocale (category, buf);
+                          if (result != NULL)
+                            return result;
+                        }
 
                   /* Try omitting the country entirely.  This may set a locale
                      corresponding to the wrong country, but is better than
                      failing entirely.  */
-                  {
-                    size_t i;
-
-                    for (i = language_range.lo; i < language_range.hi; i++)
-                      {
-                        /* Try only the language replacement.  */
+                  for (size_t i = language_range.lo; i < language_range.hi; i++)
+                    {
+                      /* Try only the language replacement.  */
+                      if (is_utf8)
+                        {
+                          char buf[64+6];
+                          strcpy (buf, language_table[i].english);
+                          strcat (buf, ".65001");
+                          result = setlocale (category, buf);
+                        }
+                      else
                         result =
                           setlocale (category, language_table[i].english);
-                        if (result != NULL)
-                          return result;
-                      }
-                  }
+                      if (result != NULL)
+                        return result;
+                    }
                 }
             }
           }
@@ -831,7 +854,7 @@ setlocale_unixlike (int category, const char *locale)
 static char *
 setlocale_unixlike (int category, const char *locale)
 {
-  char *result = setlocale_mtsafe (category, locale);
+  char *result = setlocale_fixed (category, locale);
   if (result == NULL)
     switch (category)
       {
@@ -848,7 +871,7 @@ setlocale_unixlike (int category, const char *locale)
       case LC_TELEPHONE:
       case LC_MEASUREMENT:
         if (locale == NULL
-            || strcmp (locale, "C") == 0 || strcmp (locale, "POSIX") == 0)
+            || streq (locale, "C") || streq (locale, "POSIX"))
           result = (char *) "C";
         break;
       default:
@@ -864,22 +887,12 @@ setlocale_unixlike (int category, const char *locale)
 
 #  if LC_MESSAGES == 1729
 
-/* The system does not store an LC_MESSAGES locale category.  Do it here.  */
-static char lc_messages_name[64] = "C";
-
 /* Like setlocale, but support also LC_MESSAGES.  */
 static char *
 setlocale_single (int category, const char *locale)
 {
   if (category == LC_MESSAGES)
-    {
-      if (locale != NULL)
-        {
-          lc_messages_name[sizeof (lc_messages_name) - 1] = '\0';
-          strncpy (lc_messages_name, locale, sizeof (lc_messages_name) - 1);
-        }
-      return lc_messages_name;
-    }
+    return setlocale_messages (locale);
   else
     return setlocale_unixlike (category, locale);
 }
@@ -928,7 +941,7 @@ static char const locales_with_principal_territory[][6 + 1] =
     "cr_CA",    /* Cree         Canada */
     /* Don't put "crh_UZ" or "crh_UA" here.  That would be asking for fruitless
        political discussion.  */
-    "cs_CZ",    /* Czech        Czech Republic */
+    "cs_CZ",    /* Czech        Czechia */
     "csb_PL",   /* Kashubian    Poland */
     "cy_GB",    /* Welsh        Britain */
     "da_DK",    /* Danish       Denmark */
@@ -955,6 +968,7 @@ static char const locales_with_principal_territory[][6 + 1] =
     "fy_NL",    /* Western Frisian      Netherlands */
     "ga_IE",    /* Irish        Ireland */
     "gd_GB",    /* Scottish Gaelic      Britain */
+    "gl_ES",    /* Galician     Spain */
     "gon_IN",   /* Gondi        India */
     "gsw_CH",   /* Swiss German Switzerland */
     "gu_IN",    /* Gujarati     India */
@@ -1073,6 +1087,7 @@ static char const locales_with_principal_territory[][6 + 1] =
     "suk_TZ",   /* Sukuma       Tanzania */
     "sus_GN",   /* Susu         Guinea */
     "sv_SE",    /* Swedish      Sweden */
+    "ta_IN",    /* Tamil        India */
     "te_IN",    /* Telugu       India */
     "tem_SL",   /* Timne        Sierra Leone */
     "tet_ID",   /* Tetum        Indonesia */
@@ -1106,9 +1121,6 @@ static int
 langcmp (const char *locale1, const char *locale2)
 {
   size_t locale1_len;
-  size_t locale2_len;
-  int cmp;
-
   {
     const char *locale1_end = strchr (locale1, '_');
     if (locale1_end != NULL)
@@ -1116,6 +1128,7 @@ langcmp (const char *locale1, const char *locale2)
     else
       locale1_len = strlen (locale1);
   }
+  size_t locale2_len;
   {
     const char *locale2_end = strchr (locale2, '_');
     if (locale2_end != NULL)
@@ -1124,6 +1137,7 @@ langcmp (const char *locale1, const char *locale2)
       locale2_len = strlen (locale2);
   }
 
+  int cmp;
   if (locale1_len < locale2_len)
     {
       cmp = memcmp (locale1, locale2, locale1_len);
@@ -1233,7 +1247,7 @@ static char const locales_with_principal_language[][6 + 1] =
     "es_CU",    /* Spanish      Cuba */
     /* Curaçao has three official languages: "nl_CW", "pap_CW", "en_CW".  */
     "el_CY",    /* Greek        Cyprus */
-    "cs_CZ",    /* Czech        Czech Republic */
+    "cs_CZ",    /* Czech        Czechia */
     "de_DE",    /* German       Germany */
     /* Djibouti has two official languages: "ar_DJ" and "fr_DJ".  */
     "da_DK",    /* Danish       Denmark */
@@ -1427,12 +1441,9 @@ setlocale_improved (int category, const char *locale)
               LC_MONETARY,
               LC_MESSAGES
             };
-          char *saved_locale;
-          const char *base_name;
-          unsigned int i;
 
           /* Back up the old locale, in case one of the steps fails.  */
-          saved_locale = setlocale (LC_ALL, NULL);
+          char *saved_locale = setlocale (LC_ALL, NULL);
           if (saved_locale == NULL)
             return NULL;
           saved_locale = strdup (saved_locale);
@@ -1442,11 +1453,12 @@ setlocale_improved (int category, const char *locale)
           /* Set LC_CTYPE category.  Set all other categories (except possibly
              LC_MESSAGES) to the same value in the same call; this is likely to
              save calls.  */
-          base_name =
+          const char *base_name =
             gl_locale_name_environ (LC_CTYPE, category_to_name (LC_CTYPE));
           if (base_name == NULL)
             base_name = gl_locale_name_default ();
 
+          unsigned int i;
           if (setlocale_unixlike (LC_ALL, base_name) != NULL)
             {
               /* LC_CTYPE category already set.  */
@@ -1467,22 +1479,21 @@ setlocale_improved (int category, const char *locale)
              LC_CTYPE category to an invalid value ("C") when it does not
              support the specified encoding.  Report a failure instead.  */
           if (strchr (base_name, '.') != NULL
-              && strcmp (setlocale (LC_CTYPE, NULL), "C") == 0)
+              && streq (setlocale (LC_CTYPE, NULL), "C"))
             goto fail;
 #  endif
 
           for (; i < sizeof (categories) / sizeof (categories[0]); i++)
             {
               int cat = categories[i];
-              const char *name;
-
-              name = gl_locale_name_environ (cat, category_to_name (cat));
+              const char *name =
+                gl_locale_name_environ (cat, category_to_name (cat));
               if (name == NULL)
                 name = gl_locale_name_default ();
 
               /* If name is the same as base_name, it has already been set
                  through the setlocale call before the loop.  */
-              if (strcmp (name, base_name) != 0
+              if (!streq (name, base_name)
 #  if LC_MESSAGES == 1729
                   || cat == LC_MESSAGES
 #  endif
@@ -1608,7 +1619,7 @@ setlocale_improved (int category, const char *locale)
 
           /* All steps were successful.  */
           free (saved_locale);
-          return setlocale (LC_ALL, NULL);
+          goto ret_all;
 
         fail:
           if (saved_locale[0] != '\0') /* don't risk an endless recursion */
@@ -1628,44 +1639,154 @@ setlocale_improved (int category, const char *locale)
     }
   else
     {
-#  if defined _WIN32 && ! defined __CYGWIN__
-      if (category == LC_ALL && locale != NULL && strchr (locale, '.') != NULL)
+#  if LC_MESSAGES == 1729
+      if (locale != NULL)
         {
-          char *saved_locale;
+          char truncated_locale[SETLOCALE_NULL_ALL_MAX];
+          const char *native_locale;
+          const char *messages_locale;
 
-          /* Back up the old locale.  */
-          saved_locale = setlocale (LC_ALL, NULL);
-          if (saved_locale == NULL)
-            return NULL;
-          saved_locale = strdup (saved_locale);
-          if (saved_locale == NULL)
-            return NULL;
-
-          if (setlocale_unixlike (LC_ALL, locale) == NULL)
+          if (strncmp (locale, "LC_COLLATE=", 11) == 0)
             {
-              free (saved_locale);
-              return NULL;
+              /* The locale argument indicates a mixed locale.  It must be of
+                 the form
+                 "LC_COLLATE=...;LC_CTYPE=...;LC_MONETARY=...;LC_NUMERIC=...;LC_TIME=...;LC_MESSAGES=..."
+                 since that is what this function returns (see ret_all below).
+                 Decompose it.  */
+              const char *last_semicolon = strrchr (locale, ';');
+              if (!(last_semicolon != NULL
+                    && strncmp (last_semicolon + 1, "LC_MESSAGES=", 12) == 0))
+                return NULL;
+              if (category == LC_MESSAGES)
+                return setlocale_single (category, last_semicolon + 13);
+              size_t truncated_locale_len = last_semicolon - locale;
+              if (truncated_locale_len >= sizeof (truncated_locale))
+                return NULL;
+              memcpy (truncated_locale, locale, truncated_locale_len);
+              truncated_locale[truncated_locale_len] = '\0';
+              native_locale = truncated_locale;
+              messages_locale = last_semicolon + 13;
+            }
+          else
+            {
+              native_locale = locale;
+              messages_locale = locale;
             }
 
-          /* On native Windows, setlocale(LC_ALL,...) may succeed but set the
-             LC_CTYPE category to an invalid value ("C") when it does not
-             support the specified encoding.  Report a failure instead.  */
-          if (strcmp (setlocale (LC_CTYPE, NULL), "C") == 0)
+          if (category == LC_ALL)
             {
-              if (saved_locale[0] != '\0') /* don't risk an endless recursion */
-                setlocale (LC_ALL, saved_locale);
-              free (saved_locale);
-              return NULL;
-            }
+              /* In the underlying implementation, LC_ALL does not contain
+                 LC_MESSAGES.  Therefore we need to handle LC_MESSAGES
+                 separately.  */
+              char *result;
 
-          /* It was really successful.  */
-          free (saved_locale);
-          return setlocale (LC_ALL, NULL);
+#   if defined _WIN32 && ! defined __CYGWIN__
+              if (strchr (native_locale, '.') != NULL)
+                {
+                  char *saved_locale;
+
+                  /* Back up the old locale.  */
+                  saved_locale = setlocale (LC_ALL, NULL);
+                  if (saved_locale == NULL)
+                    return NULL;
+                  saved_locale = strdup (saved_locale);
+                  if (saved_locale == NULL)
+                    return NULL;
+
+                  if (setlocale_unixlike (LC_ALL, native_locale) == NULL)
+                    {
+                      free (saved_locale);
+                      return NULL;
+                    }
+
+                  /* On native Windows, setlocale(LC_ALL,...) may succeed but
+                     set the LC_CTYPE category to an invalid value ("C") when
+                     it does not support the specified encoding.  Report a
+                     failure instead.  */
+                  if (streq (setlocale (LC_CTYPE, NULL), "C"))
+                    {
+                      /* Don't risk an endless recursion.  */
+                      if (saved_locale[0] != '\0')
+                        setlocale (LC_ALL, saved_locale);
+                      free (saved_locale);
+                      return NULL;
+                    }
+
+                  /* It was really successful.  */
+                  free (saved_locale);
+                  result = setlocale (LC_ALL, NULL);
+                }
+              else
+#   endif
+                result = setlocale_single (LC_ALL, native_locale);
+              if (result == NULL)
+                return NULL;
+
+              setlocale_single (LC_MESSAGES, messages_locale);
+
+              goto ret_all;
+            }
+          else
+            {
+              if (category == LC_MESSAGES)
+                return setlocale_single (category, messages_locale);
+              else
+                return setlocale_single (category, native_locale);
+            }
         }
-      else
+      else /* locale == NULL */
+        {
+          if (category == LC_ALL)
+            goto ret_all;
+          else
+            return setlocale_single (category, NULL);
+        }
+#  else
+      return setlocale_single (category, locale);
 #  endif
-        return setlocale_single (category, locale);
     }
+
+ ret_all:
+  /* Return the name of all categories of the current locale.  */
+#  if LC_MESSAGES == 1729 /* native Windows */
+  /* The locale name for mixed locales looks like this:
+     "LC_COLLATE=...;LC_CTYPE=...;LC_MONETARY=...;LC_NUMERIC=...;LC_TIME=..."
+     If necessary, add ";LC_MESSAGES=..." at the end.  */
+  {
+    char *name1 = setlocale (LC_ALL, NULL);
+    char *name2 = setlocale_single (LC_MESSAGES, NULL);
+    if (streq (name1, name2))
+      /* Not a mixed locale.  */
+      return name1;
+    else
+      {
+        static char resultbuf[SETLOCALE_NULL_ALL_MAX];
+        /* Prepare the result in a stack-allocated buffer, in order to reduce
+           race conditions in a multithreaded situation.  */
+        char stackbuf[SETLOCALE_NULL_ALL_MAX];
+        if (strncmp (name1, "LC_COLLATE=", 11) == 0)
+          {
+            if (strlen (name1) + strlen (name2) + 13 >= sizeof (stackbuf))
+              return NULL;
+            sprintf (stackbuf, "%s;LC_MESSAGES=%s", name1, name2);
+          }
+        else
+          {
+            if (5 * strlen (name1) + strlen (name2) + 68 >= sizeof (stackbuf))
+              return NULL;
+            sprintf (stackbuf,
+                     "LC_COLLATE=%s;LC_CTYPE=%s;LC_MONETARY=%s;LC_NUMERIC=%s;LC_TIME=%s;LC_MESSAGES=%s",
+                     name1, name1, name1, name1, name1, name2);
+          }
+        strcpy (resultbuf, stackbuf);
+        return resultbuf;
+      }
+  }
+#  elif defined __ANDROID__
+  return setlocale_fixed_null (LC_ALL);
+#  else
+  return setlocale (LC_ALL, NULL);
+#  endif
 }
 
 # endif /* NEED_SETLOCALE_IMPROVED */

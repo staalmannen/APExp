@@ -1,5 +1,5 @@
 /* Hash table for sequential list, set, and map data type.
-   Copyright (C) 2006, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This file is free software: you can redistribute it and/or modify
@@ -31,19 +31,17 @@ hash_resize (CONTAINER_T container, size_t estimate)
   if (new_size > container->table_size)
     {
       gl_hash_entry_t *old_table = container->table;
-      /* Allocate the new table.  */
-      gl_hash_entry_t *new_table;
-      size_t i;
 
+      /* Allocate the new table.  */
       if (size_overflow_p (xtimes (new_size, sizeof (gl_hash_entry_t))))
         goto fail;
-      new_table =
+      gl_hash_entry_t *new_table =
         (gl_hash_entry_t *) calloc (new_size, sizeof (gl_hash_entry_t));
       if (new_table == NULL)
         goto fail;
 
       /* Iterate through the entries of the old table.  */
-      for (i = container->table_size; i > 0; )
+      for (size_t i = container->table_size; i > 0; )
         {
           gl_hash_entry_t node = old_table[--i];
 

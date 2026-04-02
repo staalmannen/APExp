@@ -29,7 +29,11 @@ print(_["nope"])
 print(_("\097"))
 print(_("\x3F\z  	
 \x2a"))
+-- String concatenation in regular contexts.
 print(_("abc" .. "def"))
+-- String concatenation *not* happening when the parentheses are omitted.
+print(_"hello" " world")
+
 print(speed / 1000 .. 'Mbps')
 EOF
 
@@ -38,7 +42,7 @@ ${XGETTEXT} --omit-header --no-location --add-comments=TRANSLATORS: \
   -d xg-lu-1.tmp xg-lu-1.lua || Exit 1
 LC_ALL=C tr -d '\r' < xg-lu-1.tmp.po > xg-lu-1.po || Exit 1
 
-cat <<EOF > xg-lu-1.ok
+cat <<\EOF > xg-lu-1.ok
 msgid "This is a test string."
 msgstr ""
 
@@ -92,6 +96,9 @@ msgid "?*"
 msgstr ""
 
 msgid "abcdef"
+msgstr ""
+
+msgid "hello"
 msgstr ""
 EOF
 

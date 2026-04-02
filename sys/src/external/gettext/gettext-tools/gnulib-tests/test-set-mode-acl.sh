@@ -65,7 +65,7 @@ cd "$builddir" ||
   # Classification of the platform according to the programs available for
   # manipulating ACLs.
   # Possible values are:
-  #   linux, cygwin, freebsd, solaris, hpux, hpuxjfs, osf1, aix, macosx, irix, none.
+  #   linux, cygwin, freebsd, solaris, hpux, hpuxjfs, aix, macosx, none.
   # TODO: Support also native Windows platforms (mingw).
   acl_flavor=none
   if (getfacl tmpfile0 >/dev/null) 2>/dev/null; then
@@ -92,7 +92,7 @@ cd "$builddir" ||
   else
     if (lsacl / >/dev/null) 2>/dev/null; then
       # Platforms with the lsacl and chacl programs.
-      # HP-UX, sometimes also IRIX.
+      # HP-UX.
       if (getacl tmpfile0 >/dev/null) 2>/dev/null; then
         # HP-UX 11.11 or newer.
         acl_flavor=hpuxjfs
@@ -102,14 +102,8 @@ cd "$builddir" ||
       fi
     else
       if (getacl tmpfile0 >/dev/null) 2>/dev/null; then
-        # Tru64, NonStop Kernel.
-        if (getacl -m tmpfile0 >/dev/null) 2>/dev/null; then
-          # Tru64.
-          acl_flavor=osf1
-        else
-          # NonStop Kernel.
-          acl_flavor=nsk
-        fi
+        # NonStop Kernel.
+        acl_flavor=nsk
       else
         if (aclget tmpfile0 >/dev/null) 2>/dev/null; then
           # AIX.
@@ -118,11 +112,6 @@ cd "$builddir" ||
           if (fsaclctl -v >/dev/null) 2>/dev/null; then
             # Mac OS X.
             acl_flavor=macosx
-          else
-            if test -f /sbin/chacl; then
-              # IRIX.
-              acl_flavor=irix
-            fi
           fi
         fi
       fi
@@ -183,7 +172,9 @@ cd "$builddir" ||
             setfacl -m user:$auid:1 tmpfile0
             ;;
           cygwin)
-            setfacl -m group:0:1 tmpfile0
+            # Group 1 in Cygwin corresponds to the DIALUP users (cf.
+            # <https://learn.microsoft.com/en-us/windows/win32/secauthz/well-known-sids>).
+            setfacl -m group:1:1 tmpfile0
             ;;
           hpux)
             orig=`lsacl tmpfile0 | sed -e 's/ tmpfile0$//'`
@@ -194,9 +185,6 @@ cd "$builddir" ||
             chacl -r "${orig}($auid.%,--x)" tmpfile0 \
               || setacl -m user:$auid:1 tmpfile0
             ;;
-          osf1)
-            setacl -u user:$auid:1 tmpfile0
-            ;;
           nsk)
             setacl -m user:$auid:1 tmpfile0
             ;;
@@ -205,9 +193,6 @@ cd "$builddir" ||
             ;;
           macosx)
             /bin/chmod +a "user:daemon allow execute" tmpfile0
-            ;;
-          irix)
-            /sbin/chacl user::rw-,group::---,other::---,user:$auid:--x tmpfile0
             ;;
         esac
 

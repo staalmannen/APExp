@@ -1,5 +1,5 @@
 /* Test of c32isblank() function.
-   Copyright (C) 2020-2024 Free Software Foundation, Inc.
+   Copyright (C) 2020-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -67,54 +67,52 @@ main (int argc, char *argv[])
        - in the "POSIX" locale (which is usually the same as the "C" locale),
          the blank characters include only the ASCII <space> and <tab>
          characters.  */
-  {
-    int c;
-
-    for (c = 0; c < 0x100; c++)
-      switch (c)
-        {
-        case '\t':
-        #if !(defined __FreeBSD__ || defined __NetBSD__)
-        case '\v':
-        #endif
-        case '\f':
-        case ' ': case '!': case '"': case '#': case '%':
-        case '&': case '\'': case '(': case ')': case '*':
-        case '+': case ',': case '-': case '.': case '/':
-        case '0': case '1': case '2': case '3': case '4':
-        case '5': case '6': case '7': case '8': case '9':
-        case ':': case ';': case '<': case '=': case '>':
-        case '?':
-        case 'A': case 'B': case 'C': case 'D': case 'E':
-        case 'F': case 'G': case 'H': case 'I': case 'J':
-        case 'K': case 'L': case 'M': case 'N': case 'O':
-        case 'P': case 'Q': case 'R': case 'S': case 'T':
-        case 'U': case 'V': case 'W': case 'X': case 'Y':
-        case 'Z':
-        case '[': case '\\': case ']': case '^': case '_':
-        case 'a': case 'b': case 'c': case 'd': case 'e':
-        case 'f': case 'g': case 'h': case 'i': case 'j':
-        case 'k': case 'l': case 'm': case 'n': case 'o':
-        case 'p': case 'q': case 'r': case 's': case 't':
-        case 'u': case 'v': case 'w': case 'x': case 'y':
-        case 'z': case '{': case '|': case '}': case '~':
-          /* c is in the ISO C "basic character set".  */
-          buf[0] = (unsigned char) c;
-          is = for_character (buf, 1);
-          if (c == '\t' || c == ' ')
-            ASSERT (is != 0);
-          else
-            ASSERT (is == 0);
-          break;
-        }
-  }
+  for (int c = 0; c < 0x100; c++)
+    switch (c)
+      {
+      case '\t':
+      #if !(defined __FreeBSD__ || defined __NetBSD__)
+      case '\v':
+      #endif
+      #if !defined __NetBSD__
+      case '\f':
+      #endif
+      case ' ': case '!': case '"': case '#': case '%':
+      case '&': case '\'': case '(': case ')': case '*':
+      case '+': case ',': case '-': case '.': case '/':
+      case '0': case '1': case '2': case '3': case '4':
+      case '5': case '6': case '7': case '8': case '9':
+      case ':': case ';': case '<': case '=': case '>':
+      case '?':
+      case 'A': case 'B': case 'C': case 'D': case 'E':
+      case 'F': case 'G': case 'H': case 'I': case 'J':
+      case 'K': case 'L': case 'M': case 'N': case 'O':
+      case 'P': case 'Q': case 'R': case 'S': case 'T':
+      case 'U': case 'V': case 'W': case 'X': case 'Y':
+      case 'Z':
+      case '[': case '\\': case ']': case '^': case '_':
+      case 'a': case 'b': case 'c': case 'd': case 'e':
+      case 'f': case 'g': case 'h': case 'i': case 'j':
+      case 'k': case 'l': case 'm': case 'n': case 'o':
+      case 'p': case 'q': case 'r': case 's': case 't':
+      case 'u': case 'v': case 'w': case 'x': case 'y':
+      case 'z': case '{': case '|': case '}': case '~':
+        /* c is in the ISO C "basic character set".  */
+        buf[0] = (unsigned char) c;
+        is = for_character (buf, 1);
+        if (c == '\t' || c == ' ')
+          ASSERT (is != 0);
+        else
+          ASSERT (is == 0);
+        break;
+      }
 
   if (argc > 1)
     switch (argv[1][0])
       {
       case '0':
         /* C locale; tested above.  */
-        return 0;
+        return test_exit_status;
 
       case '1':
         /* Locale encoding is ISO-8859-1 or ISO-8859-15.  */
@@ -128,7 +126,7 @@ main (int argc, char *argv[])
           is = for_character ("\267", 1);
           ASSERT (is == 0);
         }
-        return 0;
+        return test_exit_status;
 
       case '2':
         /* Locale encoding is EUC-JP.  */
@@ -137,7 +135,7 @@ main (int argc, char *argv[])
           is = for_character ("\241\243", 2);
           ASSERT (is == 0);
         }
-        return 0;
+        return test_exit_status;
 
       case '3':
         /* Locale encoding is UTF-8.  */
@@ -165,11 +163,13 @@ main (int argc, char *argv[])
           is = for_character ("\363\240\200\240", 4);
           ASSERT (is == 0);
         }
-        return 0;
+        return test_exit_status;
 
       case '4':
         /* Locale encoding is GB18030.  */
         #if (defined __GLIBC__ && __GLIBC__ == 2 && __GLIBC_MINOR__ >= 13 && __GLIBC_MINOR__ <= 15) || (GL_CHAR32_T_IS_UNICODE && (defined __FreeBSD__ || defined __NetBSD__ || defined __sun))
+        if (test_exit_status != EXIT_SUCCESS)
+          return test_exit_status;
         fputs ("Skipping test: The GB18030 converter in this system's iconv is broken.\n", stderr);
         return 77;
         #endif
@@ -197,7 +197,7 @@ main (int argc, char *argv[])
           is = for_character ("\323\066\231\060", 4);
           ASSERT (is == 0);
         }
-        return 0;
+        return test_exit_status;
 
       }
 

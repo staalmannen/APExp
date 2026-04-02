@@ -1,8 +1,10 @@
-# libunistring-base.m4 serial 8
-dnl Copyright (C) 2010-2024 Free Software Foundation, Inc.
+# libunistring-base.m4
+# serial 10
+dnl Copyright (C) 2010-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl From Paolo Bonzini and Bruno Haible.
 
@@ -39,8 +41,10 @@ dnl     (This is necessary because this token must be present in the .h files
 dnl     when the .h files get installed.)
 dnl   - When building gnulib or application code it expands to
 dnl       - LIBUNISTRING_DLL_VARIABLE by default,
-dnl       - empty if the automake conditional LIBUNISTRING_COMPILE_$MODULE
-dnl         evaluates to true.
+dnl       - if the automake conditional LIBUNISTRING_COMPILE_$MODULE evaluates
+dnl         to true: the value of
+dnl         ${module_indicator_prefix}_GNULIB_LIBUNISTRING_DLL_VARIABLE_NAME
+dnl         (which usually is empty, unless explicitly set in configure.ac).
 dnl     (This is necessary because when the conditional evaluates to false,
 dnl     the application code expects to use the declared variable from the
 dnl     installed libunistring; it's in this case that the
@@ -54,7 +58,7 @@ AC_DEFUN([gl_LIBUNISTRING_MODULE_WITH_VARIABLE],
   gl_LIBUNISTRING_MODULE([$1], [$2])
   m4_ifndef([gl_IN_LIBUNISTRING],
     [if test -z "${AS_TR_CPP([LIBUNISTRING_COMPILE_$2])_TRUE}"; then
-       GL_MODULE_INDICATOR_PREFIX[]_GNULIB_[]AS_TR_CPP([$2_DLL_VARIABLE])=
+       GL_MODULE_INDICATOR_PREFIX[]_GNULIB_[]AS_TR_CPP([$2_DLL_VARIABLE])=$GL_MODULE_INDICATOR_PREFIX[]_GNULIB_LIBUNISTRING_DLL_VARIABLE_NAME
      fi
     ])
 ])
@@ -152,6 +156,10 @@ dnl gl_LIBUNISTRING_VERSION_CMP([VERSION])
 dnl Expands to a shell statement that evaluates to true if LIBUNISTRING_VERSION
 dnl is less than the VERSION argument.
 AC_DEFUN([gl_LIBUNISTRING_VERSION_CMP],
+[dnl VERSION = 999.9 means to evaluates to true always, i.e. to ignore
+dnl the installed libunistring regardless of its version.
+m4_if([$1], [999.9],
+[true],
 [ { test "$HAVE_LIBUNISTRING" != yes \
     || {
          dnl AS_LITERAL_IF exists and works fine since autoconf-2.59 at least.
@@ -189,7 +197,7 @@ AC_DEFUN([gl_LIBUNISTRING_VERSION_CMP],
                }
            ])
        }
-  }])
+  }])])
 
 dnl gl_LIBUNISTRING_ARG_OR_ZERO([ARG], [ORIG]) expands to ARG if it is not the
 dnl same as ORIG, otherwise to 0.

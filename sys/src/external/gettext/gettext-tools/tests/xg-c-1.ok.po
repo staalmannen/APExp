@@ -22,7 +22,7 @@ msgid ""
 msgstr ""
 
 #, c-format
-msgid "Written by %s.\n"
+msgid "Written by %s and %s.\n"
 msgstr ""
 
 #, c-format
@@ -124,8 +124,8 @@ msgstr ""
 
 #, c-format
 msgid ""
-"  -d, --default-domain=NAME   use NAME.po for output (instead of messages."
-"po)\n"
+"  -d, --default-domain=NAME   use NAME.po for output (instead of "
+"messages.po)\n"
 msgstr ""
 
 #, c-format
@@ -148,13 +148,18 @@ msgstr ""
 #, c-format
 msgid ""
 "  -L, --language=NAME         recognise the specified language\n"
-"                                (C, C++, ObjectiveC, PO, Shell, Python, "
-"Lisp,\n"
-"                                EmacsLisp, librep, Scheme, Smalltalk, Java,\n"
-"                                JavaProperties, C#, awk, YCP, Tcl, Perl, "
-"PHP,\n"
-"                                Ruby, GCC-source, NXStringTable, RST, RSJ,\n"
-"                                Glade, Lua, JavaScript, Vala, Desktop)\n"
+"                                (C, C++, ObjectiveC, PO, Python, Java,\n"
+"                                JavaProperties, C#, JavaScript, TypeScript, "
+"TSX,\n"
+"                                Scheme, Guile, Lisp, EmacsLisp, librep, "
+"Rust,\n"
+"                                Go, Ruby, Shell, awk, Lua, Modula-2, D, "
+"OCaml,\n"
+"                                Smalltalk, Vala, Tcl, Perl, PHP, GCC-"
+"source,\n"
+"                                YCP, NXStringTable, RST, RSJ, Glade, "
+"GSettings,\n"
+"                                Desktop)\n"
 msgstr ""
 
 #, c-format
@@ -211,6 +216,12 @@ msgstr ""
 
 #, c-format
 msgid ""
+"      --no-check=NAME         don't perform syntax check on messages\n"
+"                                (url, email)\n"
+msgstr ""
+
+#, c-format
+msgid ""
 "      --sentence-end=TYPE     type describing the end of sentence\n"
 "                                (single-space, which is the default, \n"
 "                                 or double-space)\n"
@@ -226,11 +237,14 @@ msgstr ""
 
 #, c-format
 msgid ""
-"                                (only languages C, C++, ObjectiveC, Shell,\n"
-"                                Python, Lisp, EmacsLisp, librep, Scheme, "
-"Java,\n"
-"                                C#, awk, Tcl, Perl, PHP, GCC-source, Glade,\n"
-"                                Lua, JavaScript, Vala)\n"
+"                                (only languages C, C++, ObjectiveC, Python,\n"
+"                                Java, C#, JavaScript, TypeScript, TSX, "
+"Scheme,\n"
+"                                Guile, Lisp, EmacsLisp, librep, Rust, Go, "
+"Shell,\n"
+"                                awk, Lua, Modula-2, D, OCaml, Vala, Tcl, "
+"Perl,\n"
+"                                PHP, GCC-source, Glade, GSettings)\n"
 msgstr ""
 
 #, c-format
@@ -241,11 +255,14 @@ msgstr ""
 
 #, c-format
 msgid ""
-"                                (only languages C, C++, ObjectiveC, Shell,\n"
-"                                Python, Lisp, EmacsLisp, librep, Scheme, "
-"Java,\n"
-"                                C#, awk, Tcl, Perl, PHP, GCC-source, Glade,\n"
-"                                Lua, JavaScript, Vala, Desktop)\n"
+"                                (only languages C, C++, ObjectiveC, Python,\n"
+"                                Java, C#, JavaScript, TypeScript, TSX, "
+"Scheme,\n"
+"                                Guile, Lisp, EmacsLisp, librep, Rust, Go, "
+"Shell,\n"
+"                                awk, Lua, Modula-2, D, OCaml, Vala, Tcl, "
+"Perl,\n"
+"                                PHP, GCC-source, Glade, GSettings, Desktop)\n"
 msgstr ""
 
 #, c-format
@@ -257,11 +274,25 @@ msgstr ""
 
 #, c-format
 msgid ""
-"                                (only languages C, C++, ObjectiveC, Shell,\n"
-"                                Python, Lisp, EmacsLisp, librep, Scheme, "
-"Java,\n"
-"                                C#, awk, YCP, Tcl, Perl, PHP, GCC-source,\n"
-"                                Lua, JavaScript, Vala)\n"
+"                                (only languages C, C++, ObjectiveC, Python,\n"
+"                                Java, C#, JavaScript, TypeScript, TSX, "
+"Scheme,\n"
+"                                Guile, Lisp, EmacsLisp, librep, Rust, Go, "
+"Shell,\n"
+"                                awk, Lua, Modula-2, D, OCaml, Vala, Tcl, "
+"Perl,\n"
+"                                PHP, GCC-source, YCP)\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"      --tag=WORD:FORMAT       defines the behaviour of tagged template "
+"literals\n"
+"                              with tag WORD\n"
+msgstr ""
+
+#, c-format
+msgid "                                (only language JavaScript)\n"
 msgstr ""
 
 #, c-format
@@ -269,7 +300,9 @@ msgid "  -T, --trigraphs             understand ANSI C trigraphs for input\n"
 msgstr ""
 
 #, c-format
-msgid "                                (only languages C, C++, ObjectiveC)\n"
+msgid ""
+"                                (deprecated; only languages C, C++, "
+"ObjectiveC)\n"
 msgstr ""
 
 #, c-format
@@ -386,6 +419,13 @@ msgid ""
 msgstr ""
 
 #, c-format
+msgid ""
+"      --no-git                don't use the git program to produce a\n"
+"                              reproducible 'POT-Creation-Date' field in the\n"
+"                              output.\n"
+msgstr ""
+
+#, c-format
 msgid "      --copyright-holder=STRING  set copyright holder in output\n"
 msgstr ""
 
@@ -405,6 +445,22 @@ msgstr ""
 #, c-format
 msgid ""
 "      --msgid-bugs-address=EMAIL@ADDRESS  set report address for msgid bugs\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"      --generated=FILE        Declares that the given FILE is generated and\n"
+"                              therefore should not have an influence on the\n"
+"                              'POT-Creation-Date' field in the output.\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"      --reference=FILE        Declares that the output depends on the "
+"contents\n"
+"                              of the given FILE.  This has an influence on "
+"the\n"
+"                              'POT-Creation-Date' field in the output.\n"
 msgstr ""
 
 #, c-format
@@ -467,6 +523,15 @@ msgid ""
 msgstr ""
 
 #, c-format
+msgid ""
+"Determining the POT-Creation-Date through the\n"
+"version-control (git) history took %.2f seconds.\n"
+"If you want to speed this up and produce a less\n"
+"reproducible POT-Creation-Date instead, without 'git',\n"
+"pass the option '%s'.\n"
+msgstr ""
+
+#, c-format
 msgid "language '%s' unknown"
 msgstr ""
 
@@ -479,7 +544,15 @@ msgid "invalid endianness: %s"
 msgstr ""
 
 #, c-format
+msgid "Written by %s, %s, and %s.\n"
+msgstr ""
+
+#, c-format
 msgid "no input file should be given if %s and %s are specified"
+msgstr ""
+
+#, c-format
+msgid "%s is only valid with %s"
 msgstr ""
 
 #, c-format
@@ -688,6 +761,13 @@ msgstr ""
 
 #, c-format
 msgid "  --template=TEMPLATE         an XML file used as a template\n"
+msgstr ""
+
+#, c-format
+msgid ""
+"  --replace-text              output XML with translated text replacing the\n"
+"                              original text, not augmenting the original "
+"text\n"
 msgstr ""
 
 #, c-format

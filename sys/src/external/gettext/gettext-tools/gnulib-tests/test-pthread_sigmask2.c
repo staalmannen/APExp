@@ -1,5 +1,5 @@
 /* Test of pthread_sigmask in a multi-threaded program.
-   Copyright (C) 2011-2024 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <unistd.h>
 
+#include "virtualbox.h"
 #include "macros.h"
 
 #if USE_POSIX_THREADS || USE_ISOC_AND_POSIX_THREADS
@@ -51,6 +52,16 @@ sigint_handler (_GL_UNUSED int sig)
 int
 main ()
 {
+  /* This test occasionally fails on Linux (glibc or musl libc), in a
+     VirtualBox VM with paravirtualization = Default or KVM, with ≥ 2 CPUs.
+     Skip the test in this situation.  */
+  if (is_running_under_virtualbox_kvm () && num_cpus () > 1)
+    {
+      fputs ("Skipping test: avoiding VirtualBox bug with KVM paravirtualization\n",
+             stderr);
+      return 77;
+    }
+
   sigset_t set;
 
   signal (SIGINT, sigint_handler);
@@ -90,7 +101,7 @@ main ()
      from "gcc -fsanitize=thread".  */
   ASSERT (pthread_join (killer_thread, NULL) == 0);
 
-  return 0;
+  return test_exit_status;
 }
 
 #else

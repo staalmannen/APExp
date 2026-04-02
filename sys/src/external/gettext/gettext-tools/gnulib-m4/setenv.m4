@@ -1,8 +1,10 @@
-# setenv.m4 serial 33
-dnl Copyright (C) 2001-2004, 2006-2024 Free Software Foundation, Inc.
+# setenv.m4
+# serial 36
+dnl Copyright (C) 2001-2004, 2006-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_DEFUN([gl_FUNC_SETENV],
 [
@@ -83,8 +85,6 @@ AC_DEFUN([gl_FUNC_UNSETENV],
       [AC_COMPILE_IFELSE(
          [AC_LANG_PROGRAM(
             [[
-#undef _BSD
-#define _BSD 1 /* unhide unsetenv declaration in OSF/1 5.1 <stdlib.h> */
 #include <stdlib.h>
 extern
 #ifdef __cplusplus
@@ -154,6 +154,7 @@ AC_DEFUN([gl_PREREQ_SETENV],
   AC_REQUIRE([gl_ENVIRON])
   AC_CHECK_HEADERS_ONCE([unistd.h])
   AC_CHECK_HEADERS([search.h])
+  AC_CHECK_DECLS_ONCE([_putenv])
   gl_CHECK_FUNCS_ANDROID([tsearch], [[#include <search.h>]])
 ])
 
@@ -162,4 +163,5 @@ AC_DEFUN([gl_PREREQ_UNSETENV],
 [
   AC_REQUIRE([gl_ENVIRON])
   AC_CHECK_HEADERS_ONCE([unistd.h])
+  AC_CHECK_DECLS_ONCE([_putenv])
 ])

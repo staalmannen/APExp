@@ -1,7 +1,7 @@
-This is libtextstyle.info, produced by makeinfo version 6.8 from
+This is libtextstyle.info, produced by makeinfo version 7.1 from
 libtextstyle.texi.
 
-   Copyright (C) 2018-2020 Free Software Foundation, Inc.
+   Copyright (C) 2018-2024 Free Software Foundation, Inc.
 
    This manual is free documentation.  It is dually licensed under the
 GNU FDL and the GNU GPL. This means that you can redistribute this
@@ -25,7 +25,7 @@ START-INFO-DIR-ENTRY
 * GNU libtextstyle: (libtextstyle).     Output of styled text.
 END-INFO-DIR-ENTRY
 
-   This manual provides documentation for the GNU 'libtextstyle'
+   This manual provides documentation for the GNU ‘libtextstyle’
 library.
 
 
@@ -34,7 +34,7 @@ File: libtextstyle.info,  Node: Top,  Next: Introduction,  Up: (dir)
 GNU libtextstyle
 ****************
 
-   This manual documents the GNU libtextstyle library, version 0.22.5.
+   This manual documents the GNU libtextstyle library, version 1.0.
 
 * Menu:
 
@@ -81,20 +81,20 @@ programs.
    The older approach to user-customizable text styling is that the user
 associates patterns with escape sequences in an environment variable or
 a command-line argument.  This is the approach used, for example, by the
-GNU 'ls' program in combination with the 'dircolors' program.  The
+GNU ‘ls’ program in combination with the ‘dircolors’ program.  The
 processing is distributed across several steps:
   1. There is default style definition that is hard-coded in the
-     'dircolors' program.  The user can also define their own
-     definitions in a file such as '~/.dir_colors'.  This style
+     ‘dircolors’ program.  The user can also define their own
+     definitions in a file such as ‘~/.dir_colors’.  This style
      definition contains explicit terminal escape sequences; thus, it
      can only be used with consoles and terminal emulators, and each
      style definition applies only to a certain class of
      mostly-compatible terminal emulators.
-  2. The 'dircolors' program, when invoked, translates such a style
+  2. The ‘dircolors’ program, when invoked, translates such a style
      definition to a sequence of shell statements that sets an
-     environment variable 'LS_COLORS'.
+     environment variable ‘LS_COLORS’.
   3. The shell executes these statements, and thus sets the environment
-     variable 'LS_COLORS'.
+     variable ‘LS_COLORS’.
   4. The program looks at the environment variable and emits the listed
      escape sequences.
 
@@ -106,19 +106,19 @@ processing is distributed across several steps:
   2. The program looks at the environment variable, parses the CSS file,
      translates the styling specifications to the form that is
      appropriate for the output device (escape sequences for terminal
-     emulators, inline CSS and '<span>' elements for HTML output), and
+     emulators, inline CSS and ‘<span>’ elements for HTML output), and
      emits it.
 
    Thus, with GNU libtextstyle, the styling has the following
 properties:
-   * It is easier for the user to define their own styling, because the
+   • It is easier for the user to define their own styling, because the
      file format is standardized and supported by numerous syntax aware
      editors.
-   * A styling file does not depend on the particular output device.  An
+   • A styling file does not depend on the particular output device.  An
      HTML output and a black-on-white terminal emulator can use the same
      styling file.  A white-on-black (or even green-on-black) terminal
      emulator will need different styling, though.
-   * It is simpler: There is no need for a program that converts the
+   • It is simpler: There is no need for a program that converts the
      style specification from one format to another.
 
 
@@ -128,10 +128,10 @@ File: libtextstyle.info,  Node: Built-in versus separate styling,  Prev: Style d
 ====================================
 
    There are generally two approaches for adding styling to text:
-   * The program that generates the text adds the styling.  It does so
+   • The program that generates the text adds the styling.  It does so
      through interleaved statements that turn on or off specific
      attributes.
-   * The styling gets added by a separate program, that postprocesses
+   • The styling gets added by a separate program, that postprocesses
      the output.  This separate program usually uses regular expressions
      to determine which text regions to style with a certain set of text
      attributes.
@@ -159,18 +159,18 @@ File: libtextstyle.info,  Node: The user's view,  Next: The programmer's view,  
 window.
 
    The stylable program will typically have the following options:
-'--color'
+‘--color’
      Use colors and other text attributes always.
-'--color=WHEN'
+‘--color=WHEN’
      Use colors and other text attributes if WHEN.  WHEN may be
-     'always', 'never', 'auto', or 'html'.
-'--style=STYLE-FILE'
-     Specify the CSS style rule file for '--color'.
+     ‘always’, ‘never’, ‘auto’, or ‘html’.
+‘--style=STYLE-FILE’
+     Specify the CSS style rule file for ‘--color’.
 
    For more details, see the sections *note The --color option:: and
 *note The --style option:: below.
 
-   If the output does not fit on a screen, you can use 'less -R' to
+   If the output does not fit on a screen, you can use ‘less -R’ to
 scroll around in the styled output.  For example:
      PROGRAM --color ARGUMENTS | less -R
 
@@ -186,23 +186,23 @@ scroll around in the styled output.  For example:
 
 File: libtextstyle.info,  Node: The TERM variable,  Next: The NO_COLOR variable,  Up: The user's view
 
-2.1 The environment variable 'TERM'
+2.1 The environment variable ‘TERM’
 ===================================
 
-   The environment variable 'TERM' contains a identifier for the text
+   The environment variable ‘TERM’ contains a identifier for the text
 window's capabilities.  You can get a detailed list of these
-cababilities by using the 'infocmp' command (for example: 'infocmp -L1
-xterm'), using 'man 5 terminfo' as a reference.
+cababilities by using the ‘infocmp’ command (for example: ‘infocmp -L1
+xterm’), using ‘man 5 terminfo’ as a reference.
 
    When producing text with embedded color directives, a
-'libtextstyle'-enabled program looks at the 'TERM' variable.  Text
+‘libtextstyle’-enabled program looks at the ‘TERM’ variable.  Text
 windows today typically support at least 8 colors.  Often, however, the
-text window supports 16 or more colors, even though the 'TERM' variable
+text window supports 16 or more colors, even though the ‘TERM’ variable
 is set to a identifier denoting only 8 supported colors.  It can be
-worth setting the 'TERM' variable to a different value in these cases.
+worth setting the ‘TERM’ variable to a different value in these cases.
 
-   After setting 'TERM', you can verify how well it works by invoking
-'PROGRAM --color=test', where 'PROGRAM' is any 'libtextstyle'-enabled
+   After setting ‘TERM’, you can verify how well it works by invoking
+‘PROGRAM --color=test’, where ‘PROGRAM’ is any ‘libtextstyle’-enabled
 program, and seeing whether the output looks like a reasonable color
 map.
 
@@ -218,47 +218,47 @@ File: libtextstyle.info,  Node: Terminal emulators,  Next: Consoles,  Up: The TE
 --------------------------------
 
    The following terminal emulator programs support 256 colors and set
-'TERM=xterm-256color' accordingly:
+‘TERM=xterm-256color’ accordingly:
 
-   * In GNOME: 'gnome-terminal', 'tilda'.
-   * 'rxvt-unicode' (sets 'TERM=rxvt-unicode-256color').
-   * 'st' (sets 'TERM=st-256color').
-   * 'QTerminal'.
-   * On macOS: 'Terminal', 'iTerm2'.
+   • In GNOME: ‘gnome-terminal’, ‘tilda’.
+   • ‘rxvt-unicode’ (sets ‘TERM=rxvt-unicode-256color’).
+   • ‘st’ (sets ‘TERM=st-256color’).
+   • ‘QTerminal’.
+   • On macOS: ‘Terminal’, ‘iTerm2’.
 
    The following terminal emulator programs support 256 colors.  You
-only need to set 'TERM=xterm-256color' or similar; the programs by
-default set 'TERM' to a value that supports only 8 colors.
+only need to set ‘TERM=xterm-256color’ or similar; the programs by
+default set ‘TERM’ to a value that supports only 8 colors.
 
-   * 'xterm' is in many cases built with support for 256 colors.  But it
-     sets 'TERM=xterm'.  You need to set 'TERM=xterm-256color'.
-   * In GNOME: 'guake' (sets 'TERM=xterm').  You need to set
-     'TERM=xterm-256color'.
-   * In KDE: 'konsole' (sets 'TERM=xterm').  You need to set
-     'TERM=xterm-256color' or 'TERM=konsole-256color'.
-   * In KDE: 'yakuake' (sets 'TERM=xterm').  You need to set
-     'TERM=xterm-256color'.
-   * In Enlightenment: 'Eterm' (sets 'TERM=Eterm').  You need to set
-     'TERM=Eterm-256color'.
-   * 'mlterm' (sets 'TERM=mlterm').  You need to set
-     'TERM=mlterm-256color'.
-   * On Windows: 'PuTTY' (sets 'TERM=xterm').  You need to set
-     'TERM=xterm-256color' or 'TERM=putty-256color'.
-   * On Windows: 'TeraTerm' (sets 'TERM=xterm').  You need to set
-     'TERM=xterm-256color'.
+   • ‘xterm’ is in many cases built with support for 256 colors.  But it
+     sets ‘TERM=xterm’.  You need to set ‘TERM=xterm-256color’.
+   • In GNOME: ‘guake’ (sets ‘TERM=xterm’).  You need to set
+     ‘TERM=xterm-256color’.
+   • In KDE: ‘konsole’ (sets ‘TERM=xterm’).  You need to set
+     ‘TERM=xterm-256color’ or ‘TERM=konsole-256color’.
+   • In KDE: ‘yakuake’ (sets ‘TERM=xterm’).  You need to set
+     ‘TERM=xterm-256color’.
+   • In Enlightenment: ‘Eterm’ (sets ‘TERM=Eterm’).  You need to set
+     ‘TERM=Eterm-256color’.
+   • ‘mlterm’ (sets ‘TERM=mlterm’).  You need to set
+     ‘TERM=mlterm-256color’.
+   • On Windows: ‘PuTTY’ (sets ‘TERM=xterm’).  You need to set
+     ‘TERM=xterm-256color’ or ‘TERM=putty-256color’.
+   • On Windows: ‘TeraTerm’ (sets ‘TERM=xterm’).  You need to set
+     ‘TERM=xterm-256color’.
 
    A couple of terminal emulator programs support even the entire RGB
 color space (16 million colors).  To get this to work, at this date
 (2019), you need three things:
-   * The 'ncurses' library version 6.1 or newer must be installed.
-   * You need a recent version of the respective terminal emulator
-     program.  See <https://gist.github.com/XVilka/8346728> for the most
+   • The ‘ncurses’ library version 6.1 or newer must be installed.
+   • You need a recent version of the respective terminal emulator
+     program.  See <https://github.com/termstandard/colors> for the most
      recent developments in this area.
-   * You need to set the 'TERM' environment variable to the
-     corresponding value: 'TERM=xterm-direct' instead of 'TERM=xterm' or
-     'TERM=xterm-256color', 'TERM=konsole-direct' in 'konsole',
-     'TERM=st-direct' in 'st', 'TERM=mlterm-direct' in 'mlterm', or
-     'TERM=iterm2-direct' in 'iTerm2' on macOS.
+   • You need to set the ‘TERM’ environment variable to the
+     corresponding value: ‘TERM=xterm-direct’ instead of ‘TERM=xterm’ or
+     ‘TERM=xterm-256color’, ‘TERM=konsole-direct’ in ‘konsole’,
+     ‘TERM=st-direct’ in ‘st’, ‘TERM=mlterm-direct’ in ‘mlterm’, or
+     ‘TERM=iterm2-direct’ in ‘iTerm2’ on macOS.
 
 
 File: libtextstyle.info,  Node: Consoles,  Prev: Terminal emulators,  Up: The TERM variable
@@ -266,41 +266,41 @@ File: libtextstyle.info,  Node: Consoles,  Prev: Terminal emulators,  Up: The TE
 2.1.2 Consoles
 --------------
 
-   On OpenBSD 6 consoles, 'TERM=xterm' produces better results than the
-default 'TERM=vt220'.
+   On OpenBSD 6 consoles, ‘TERM=xterm’ produces better results than the
+default ‘TERM=vt220’.
 
-   On NetBSD 8 consoles, 'TERM=netbsd6' produces better results than the
-default 'TERM=vt100'.
+   On NetBSD 8 consoles, ‘TERM=netbsd6’ produces better results than the
+default ‘TERM=vt100’.
 
-   On Windows consoles, no 'TERM' setting is needed.
+   On Windows consoles, no ‘TERM’ setting is needed.
 
 
 File: libtextstyle.info,  Node: The NO_COLOR variable,  Next: The NO_TERM_HYPERLINKS variable,  Prev: The TERM variable,  Up: The user's view
 
-2.2 The environment variable 'NO_COLOR'
+2.2 The environment variable ‘NO_COLOR’
 =======================================
 
-   The environment variable 'NO_COLOR' can be used to suppress styling
+   The environment variable ‘NO_COLOR’ can be used to suppress styling
 in the textual output.  When this environment variable is set (to any
-value), 'libtextstyle'-enabled programs will not emit colors and other
+value), ‘libtextstyle’-enabled programs will not emit colors and other
 text styling.
 
    This environment variable can be overridden by passing the
-command-line option '--color=always' (see *note The --color option::).
+command-line option ‘--color=always’ (see *note The --color option::).
 
 
 File: libtextstyle.info,  Node: The NO_TERM_HYPERLINKS variable,  Next: Emacs,  Prev: The NO_COLOR variable,  Up: The user's view
 
-2.3 The environment variable 'NO_TERM_HYPERLINKS'
+2.3 The environment variable ‘NO_TERM_HYPERLINKS’
 =================================================
 
-   The environment variable 'NO_TERM_HYPERLINKS' can be used to suppress
+   The environment variable ‘NO_TERM_HYPERLINKS’ can be used to suppress
 hyperlinks in the textual output.  When this environment variable is set
-(to any value), 'libtextstyle'-enabled programs will not emit
+(to any value), ‘libtextstyle’-enabled programs will not emit
 hyperlinks.  This may be useful for terminal emulators which produce
 garbage output when they receive the escape sequence for a hyperlink.
-Currently (as of 2019), this affects some versions of 'konsole',
-'emacs', 'lxterminal', 'guake', 'yakuake', 'rxvt'.
+Currently (as of 2019), this affects some versions of ‘konsole’,
+‘emacs’, ‘lxterminal’, ‘guake’, ‘yakuake’, ‘rxvt’.
 
 
 File: libtextstyle.info,  Node: Emacs,  Next: The --color option,  Prev: The NO_TERM_HYPERLINKS variable,  Up: The user's view
@@ -308,78 +308,78 @@ File: libtextstyle.info,  Node: Emacs,  Next: The --color option,  Prev: The NO_
 2.4 Emacs as a terminal emulator
 ================================
 
-   Emacs has several terminal emulators: 'M-x shell' and 'M-x term'.
-'M-x term' has good support for styling, whereas in 'M-x shell' most of
+   Emacs has several terminal emulators: ‘M-x shell’ and ‘M-x term’.
+‘M-x term’ has good support for styling, whereas in ‘M-x shell’ most of
 the styling gets lost.
 
 
 File: libtextstyle.info,  Node: The --color option,  Next: The --style option,  Prev: Emacs,  Up: The user's view
 
-2.5 The '--color' option
+2.5 The ‘--color’ option
 ========================
 
-   The '--color=WHEN' option specifies under which conditions styled
+   The ‘--color=WHEN’ option specifies under which conditions styled
 (colorized) output should be generated.  The WHEN part can be one of the
 following:
 
-'always'
-'yes'
+‘always’
+‘yes’
      The output will be colorized.
 
-'never'
-'no'
+‘never’
+‘no’
      The output will not be colorized.
 
-'auto'
-'tty'
+‘auto’
+‘tty’
      The output will be colorized if the output device is a tty, i.e.
      when the output goes directly to a text screen or terminal emulator
      window.
 
-'html'
+‘html’
      The output will be colorized and be in HTML format.  This value is
      only supported by some programs.
 
-'test'
+‘test’
      This is a special value, understood only by some programs.  It is
      explained in the section (*note The TERM variable::) above.
 
-'--color' is equivalent to '--color=yes'.  The default is
-'--color=auto'.
+‘--color’ is equivalent to ‘--color=yes’.  The default is
+‘--color=auto’.
 
-   Thus, a command that invokes a 'libtextstyle'-enabled program will
+   Thus, a command that invokes a ‘libtextstyle’-enabled program will
 produce colorized output when called by itself in a command window.
-Whereas in a pipe, such as 'PROGRAM ARGUMENTS | less -R', it will not
+Whereas in a pipe, such as ‘PROGRAM ARGUMENTS | less -R’, it will not
 produce colorized output.  To get colorized output in this situation
-nevertheless, use the command 'PROGRAM --color ARGUMENTS | less -R'.
+nevertheless, use the command ‘PROGRAM --color ARGUMENTS | less -R’.
 
-   The '--color=html' option will produce output that can be viewed in a
+   The ‘--color=html’ option will produce output that can be viewed in a
 browser.  This can be useful, for example, for Indic languages, because
 the renderic of Indic scripts in browsers is usually better than in
 terminal emulators.
 
-   Note that the output produced with the '--color' option is _not_
+   Note that the output produced with the ‘--color’ option is _not_
 consumable by programs that expect the raw text.  It contains additional
 terminal-specific escape sequences or HTML tags.  For example, an XML
 parser will give a syntax error when confronted with a colored XML
-output.  Except for the '--color=html' case, you therefore normally
-don't need to save output produced with the '--color' option in a file.
+output.  Except for the ‘--color=html’ case, you therefore normally
+don't need to save output produced with the ‘--color’ option in a file.
 
 
 File: libtextstyle.info,  Node: The --style option,  Prev: The --color option,  Up: The user's view
 
-2.6 The '--style' option
+2.6 The ‘--style’ option
 ========================
 
-   The '--style=STYLE_FILE' option specifies the style file to use when
-colorizing.  It has an effect only when the '--color' option is
+   The ‘--style=STYLE_FILE’ option specifies the style file to use when
+colorizing.  It has an effect only when the ‘--color’ option is
 effective.
 
-   If the '--style' option is not specified, the program may consider
+   If the ‘--style’ option is not specified, the program may consider
 the value of an environment variable.  It is meant to point to the
 user's preferred style for such output.  The name of such an environment
 variable, if supported, is documented in the documentation of the
-'libtextstyle'-enabled program.
+‘libtextstyle’-enabled program.
 
    You can also design your own styles.  This is described in the next
 section.
@@ -397,21 +397,21 @@ File: libtextstyle.info,  Node: Style rules,  Next: Debugging style files,  Up: 
 
    The same style file can be used for styling a certain type of output,
 for terminal output and for HTML output.  It is written in CSS
-(Cascading Style Sheet) syntax.  See
-<https://www.w3.org/TR/css2/cover.html> for a formal definition of CSS.
-Many HTML authoring tutorials also contain explanations of CSS.
+(Cascading Style Sheet) syntax.  See <https://www.w3.org/TR/CSS2/> for a
+formal definition of CSS. Many HTML authoring tutorials also contain
+explanations of CSS.
 
    In the case of HTML output, the style file is embedded in the HTML
 output.  In the case of text output, the style file is interpreted by
-the 'libtextstyle'-enabled program.
+the ‘libtextstyle’-enabled program.
 
-   You should avoid '@import' statements, because
-   - In the case of HTML output, the files referenced by the '@import'
+   You should avoid ‘@import’ statements, because
+   − In the case of HTML output, the files referenced by the ‘@import’
      statements would not be embedded in the HTML output.  In fact,
      relative file names would be interpreted relative to the resulting
      HTML file.
-   - In the case of text output, '@import's are not supported, due to a
-     limitation in 'libcroco'.
+   − In the case of text output, ‘@import’s are not supported, due to a
+     limitation in ‘libcroco’.
 
    CSS rules are built up from selectors and declarations.  The
 declarations specify graphical properties; the selectors specify when
@@ -419,12 +419,12 @@ they apply.
 
    GNU libtextstyle supports simple selectors based on "CSS classes",
 see the CSS2 spec, section 5.8.3.  The set of CSS classes that are
-supported by a 'libtextstyle'-enabled program are documented in the
+supported by a ‘libtextstyle’-enabled program are documented in the
 documentation of that program.
 
    These selectors can be combined to hierarchical selectors.  For
-example, assume a program supports the CSS classes 'string' (that
-matches a string) and 'non-ascii' (that matches a word with non-ASCII
+example, assume a program supports the CSS classes ‘string’ (that
+matches a string) and ‘non-ascii’ (that matches a word with non-ASCII
 characters), you could write
 
      .string .non-ascii { color: red; }
@@ -440,24 +440,24 @@ attribute supported by the browsers can be used.
    The declarations in text mode are limited to the following
 properties.  Other properties will be silently ignored.
 
-'color' (CSS2 spec, section 14.1)
-'background-color' (CSS2 spec, section 14.2.1)
+‘color’ (CSS2 spec, section 14.1)
+‘background-color’ (CSS2 spec, section 14.2.1)
      These properties are supported.  Colors will be adjusted to match
      the terminal's capabilities.  Note that many terminals support only
      8 colors.
 
-'font-weight' (CSS2 spec, section 15.2.3)
+‘font-weight’ (CSS2 spec, section 15.2.3)
      This property is supported, but most terminals can only render two
-     different weights: 'normal' and 'bold'.  Values >= 600 are rendered
-     as 'bold'.
+     different weights: ‘normal’ and ‘bold’.  Values >= 600 are rendered
+     as ‘bold’.
 
-'font-style' (CSS2 spec, section 15.2.3)
-     This property is supported.  The values 'italic' and 'oblique' are
+‘font-style’ (CSS2 spec, section 15.2.3)
+     This property is supported.  The values ‘italic’ and ‘oblique’ are
      rendered the same way.
 
-'text-decoration' (CSS2 spec, section 16.3.1)
-     This property is supported, limited to the values 'none' and
-     'underline'.
+‘text-decoration’ (CSS2 spec, section 16.3.1)
+     This property is supported, limited to the values ‘none’ and
+     ‘underline’.
 
 
 File: libtextstyle.info,  Node: Debugging style files,  Prev: Style rules,  Up: The --style option
@@ -468,14 +468,14 @@ File: libtextstyle.info,  Node: Debugging style files,  Prev: Style rules,  Up: 
    If you want to understand why the style rules in a style file produce
 the output that you see, you can do so in three steps:
 
-  1. Run the program with the command-line option '--color=html',
+  1. Run the program with the command-line option ‘--color=html’,
      redirecting the output to a file.
   2. Open the resulting HTML file in a browser.
   3. Use the browser's built-in CSS debugging tool.
-        * In Firefox: From the pop-up menu, select "Inspect Element".
+        • In Firefox: From the pop-up menu, select "Inspect Element".
           Click somewhere in the DOM tree ("Inspector" tab) and look at
           the CSS declarations in the "Rules" tab.
-        * In Chromium: From the pop-up menu, select "Inspect".  Click
+        • In Chromium: From the pop-up menu, select "Inspect".  Click
           somewhere in the DOM tree ("Elements" tab) and look at the CSS
           declarations in the "Styles" tab.
 
@@ -494,13 +494,13 @@ File: libtextstyle.info,  Node: The programmer's view,  Next: Licenses,  Prev: T
   2. Define the CSS classes that the user can use in the CSS file.  Each
      CSS class corresponds to a text role; each CSS class can be given a
      different styling by the user.
-  3. Change the output routines so that they take an 'ostream_t' object
-     as argument instead of a 'FILE *'.
-  4. Insert paired invocations to 'styled_ostream_begin_css_class',
-     'styled_ostream_end_css_class' around each run of text with a
+  3. Change the output routines so that they take an ‘ostream_t’ object
+     as argument instead of a ‘FILE *’.
+  4. Insert paired invocations to ‘styled_ostream_begin_css_class’,
+     ‘styled_ostream_end_css_class’ around each run of text with a
      specific text role.
-  5. Link with 'libtextstyle'.  If your package is using GNU autoconf,
-     you can use the 'libtextstyle.m4' macro from Gnulib.
+  5. Link with ‘libtextstyle’.  If your package is using GNU autoconf,
+     you can use the ‘libtextstyle.m4’ macro from Gnulib.
   6. Prepare a default style file.
   7. Update the documentation of your package.
 
@@ -542,16 +542,16 @@ statement:
        styled_ostream_free (stream);
 
    Before this snippet, your code needs to determine the name of the
-style file to use ('style_file_name').  If no styling is desired - the
-precise condition depends on the value of 'color_mode' but also on your
-application logic -, you should set 'style_file_name' to 'NULL'.
+style file to use (‘style_file_name’).  If no styling is desired - the
+precise condition depends on the value of ‘color_mode’ but also on your
+application logic -, you should set ‘style_file_name’ to ‘NULL’.
 
-   An object of type 'styled_ostream_t' is allocated.  The function
-'styled_ostream_create' allocates it; the function 'styled_ostream_free'
+   An object of type ‘styled_ostream_t’ is allocated.  The function
+‘styled_ostream_create’ allocates it; the function ‘styled_ostream_free’
 deallocates it.
 
-   Such 'styled_ostream_t' supports output operations
-('ostream_write_str'), interleaved with adding and removing CSS classes.
+   Such ‘styled_ostream_t’ supports output operations
+(‘ostream_write_str’), interleaved with adding and removing CSS classes.
 The CSS class in effect when an output operation is performed
 determines, through the style file, the text attributes associated with
 that piece of text.
@@ -570,12 +570,13 @@ File: libtextstyle.info,  Node: Hyperlinks,  Up: Basic use
 through an escape sequence, specified at Hyperlinks in terminal
 emulators
 (https://gist.github.com/egmontkob/eb114294efbcd5adb1944c9f3cb5feda).
-Currently (as of 2019), they are displayed only in 'gnome-terminal'
-version 3.26 or above.  More terminal emulators will support hyperlinks
-in the future.  Terminal emulators which don't support hyperlinks ignore
-it, except for a few terminal emulators, for which users may need to
-disable the hyperlinks (see *note The NO_TERM_HYPERLINKS variable::) if
-the heuristic built into 'libtextstyle' does not already disable them.
+Currently (as of 2024), they are displayed in many modern terminals, see
+OSC8-Adoption (https://github.com/Alhadis/OSC8-Adoption).  More terminal
+emulators will support hyperlinks in the future.  Terminal emulators
+which don't support hyperlinks ignore it, except for a few terminal
+emulators, for which users may need to disable the hyperlinks (see *note
+The NO_TERM_HYPERLINKS variable::) if the heuristic built into
+‘libtextstyle’ does not already disable them.
 
    To emit a hyperlink, use code like this:
 
@@ -599,7 +600,7 @@ File: libtextstyle.info,  Node: Include files,  Next: Link options,  Prev: Basic
 3.2 Include files
 =================
 
-   The include file '<textstyle.h>' declares all facilities defined by
+   The include file ‘<textstyle.h>’ declares all facilities defined by
 the library.
 
 
@@ -608,34 +609,34 @@ File: libtextstyle.info,  Node: Link options,  Next: Command-line options,  Prev
 3.3 Link options
 ================
 
-   The library to link with is called 'libtextstyle', with a
+   The library to link with is called ‘libtextstyle’, with a
 system-dependent suffix.  You link with it though link options of the
-form '-ltextstyle' for a library installed in system locations, or
-'-LLIBDIR -ltextstyle' for a static library installed in other
-locations, or '-LLIBDIR -ltextstyle -Wl,-rpath,LIBDIR' for a shared
+form ‘-ltextstyle’ for a library installed in system locations, or
+‘-LLIBDIR -ltextstyle’ for a static library installed in other
+locations, or ‘-LLIBDIR -ltextstyle -Wl,-rpath,LIBDIR’ for a shared
 library installed in other locations (assuming a GCC compatible compiler
-and linker and no 'libtool'), or '-LLIBDIR -ltextstyle -RLIBDIR' for a
-shared library installed in other locations (with 'libtool').
+and linker and no ‘libtool’), or ‘-LLIBDIR -ltextstyle -RLIBDIR’ for a
+shared library installed in other locations (with ‘libtool’).
 Additionally, the link options may need to include the dependencies:
-'-lm', and '-lncurses' or (on NetBSD) '-ltermcap' or (on AIX)
-'-lxcurses' or (on HP-UX) '-lcurses', and on some systems also
-'-liconv'.
+‘-lm’, and ‘-lncurses’ or (on NetBSD) ‘-ltermcap’ or (on AIX)
+‘-lxcurses’ or (on HP-UX) ‘-lcurses’, and on some systems also
+‘-liconv’.
 
    It is a bit complicated to determine the right link options in a
 portable way.  Therefore an Autoconf macro is provided in the file
-'libtextstyle.m4' in Gnulib, that makes this task easier.  Assuming the
+‘libtextstyle.m4’ in Gnulib, that makes this task easier.  Assuming the
 build system of your package is based on GNU Autoconf, you invoke it
-through 'gl_LIBTEXTSTYLE'.  It searches for an installed 'libtextstyle'.
-If found, it sets and AC_SUBSTs 'HAVE_LIBTEXTSTYLE=yes' and the
-'LIBTEXTSTYLE' and 'LTLIBTEXTSTYLE' variables, and augments the
-'CPPFLAGS' variable, and #defines 'HAVE_LIBTEXTSTYLE' to 1.  Otherwise,
-it sets and AC_SUBSTs 'HAVE_LIBTEXTSTYLE=no' and 'LIBTEXTSTYLE' and
-'LTLIBTEXTSTYLE' to empty.  In link commands that use 'libtool', use
-'LTLIBTEXTSTYLE'; in link commands that don't use 'libtool', use
-'LIBTEXTSTYLE'.
+through ‘gl_LIBTEXTSTYLE’.  It searches for an installed ‘libtextstyle’.
+If found, it sets and AC_SUBSTs ‘HAVE_LIBTEXTSTYLE=yes’ and the
+‘LIBTEXTSTYLE’ and ‘LTLIBTEXTSTYLE’ variables, and augments the
+‘CPPFLAGS’ variable, and #defines ‘HAVE_LIBTEXTSTYLE’ to 1.  Otherwise,
+it sets and AC_SUBSTs ‘HAVE_LIBTEXTSTYLE=no’ and ‘LIBTEXTSTYLE’ and
+‘LTLIBTEXTSTYLE’ to empty.  In link commands that use ‘libtool’, use
+‘LTLIBTEXTSTYLE’; in link commands that don't use ‘libtool’, use
+‘LIBTEXTSTYLE’.
 
    If you use GNU Automake, the proper place to use the link options is
-'PROGRAM_LDADD' for programs and 'LIBRARY_LIBADD' for libraries.
+‘PROGRAM_LDADD’ for programs and ‘LIBRARY_LIBADD’ for libraries.
 
 
 File: libtextstyle.info,  Node: Command-line options,  Next: The output stream hierarchy,  Prev: Link options,  Up: The programmer's view
@@ -647,16 +648,16 @@ File: libtextstyle.info,  Node: Command-line options,  Next: The output stream h
 styling of the output, it is good if different GNU programs use the same
 command-line options for this purpose.  These options are described in
 the sections *note The --color option:: and *note The --style option::.
-To achieve this, use the following API (declared in '<textstyle.h>'):
+To achieve this, use the following API (declared in ‘<textstyle.h>’):
 
  -- Variable: bool color_test_mode
-     True if a '--color' option with value 'test' has been seen.
+     True if a ‘--color’ option with value ‘test’ has been seen.
 
  -- Variable: enum color_option color_mode
-     Stores the value of the '--color' option.
+     Stores the value of the ‘--color’ option.
 
  -- Variable: const char * style_file_name
-     Stores the value of the '--style' option.
+     Stores the value of the ‘--style’ option.
 
    Note: These variables, like any variables exported from shared
 libraries, can only be used in executable code.  You _cannot_ portably
@@ -666,38 +667,38 @@ platforms.
 
  -- Function: bool handle_color_option (const char *OPTION)
      You invoke this function when, during argument parsing, you have
-     encountered a '--color' or '--color=...' option.  The return value
-     is an error indicator: 'true' means an invalid option.
+     encountered a ‘--color’ or ‘--color=...’ option.  The return value
+     is an error indicator: ‘true’ means an invalid option.
 
  -- Function: void handle_style_option (const char *OPTION)
      You invoke this function when, during argument parsing, you have
-     encountered a '--style' or '--style=...' option.
+     encountered a ‘--style’ or ‘--style=...’ option.
 
  -- Function: void print_color_test (void)
      Prints a color test page.  You invoke this function after argument
-     parsing, when the 'color_test_mode' variable is true.
+     parsing, when the ‘color_test_mode’ variable is true.
 
  -- Function: void style_file_prepare (const char *STYLE_FILE_ENVVAR,
           const char *STYLESDIR_ENVVAR,
           const char *STYLESDIR_AFTER_INSTALL,
           const char *DEFAULT_STYLE_FILE)
-     Assigns a default value to 'style_file_name' if necessary.  You
-     invoke this function after argument parsing, when 'color_test_mode'
+     Assigns a default value to ‘style_file_name’ if necessary.  You
+     invoke this function after argument parsing, when ‘color_test_mode’
      is false.
 
-     'STYLE_FILE_ENVVAR' is an environment variable that, when set to a
+     ‘STYLE_FILE_ENVVAR’ is an environment variable that, when set to a
      non-empty value, specifies the style file to use.  This environment
      variable is meant to be set by the user.
 
-     'STYLESDIR_ENVVAR' is an environment variable that, when set to a
+     ‘STYLESDIR_ENVVAR’ is an environment variable that, when set to a
      non-empty value, specifies the directory with the style files, or
-     'NULL'.  This is necessary for running the testsuite before 'make
-     install'.
+     ‘NULL’.  This is necessary for running the testsuite before ‘make
+     install’.
 
-     'STYLESDIR_AFTER_INSTALL' is the directory with the style files
-     after 'make install'.
+     ‘STYLESDIR_AFTER_INSTALL’ is the directory with the style files
+     after ‘make install’.
 
-     'DEFAULT_STYLE_FILE' is the file name of the default style file,
+     ‘DEFAULT_STYLE_FILE’ is the file name of the default style file,
      relative to STYLESDIR.
 
 
@@ -714,22 +715,22 @@ definitions are preprocessed down to C. As a consequence, GNU
 libtextstyle is a C library and does not need to link with the C++
 standard library.
 
-   All these classes are declared in '<textstyle.h>'.
+   All these classes are declared in ‘<textstyle.h>’.
 
-   The base output stream type is 'ostream_t'.  It is a pointer type to
+   The base output stream type is ‘ostream_t’.  It is a pointer type to
 a (hidden) implementation type.  Similarly for the subclasses.
 
-   When we say that 'some_ostream_t' is a subclass of 'ostream_t', what
+   When we say that ‘some_ostream_t’ is a subclass of ‘ostream_t’, what
 we mean is:
-   * Every 'some_ostream_t' object can be converted to an 'ostream_t',
+   • Every ‘some_ostream_t’ object can be converted to an ‘ostream_t’,
      by virtue of a simple assignment.  No cast is needed.
-   * The opposite conversion, from 'ostream_t' to 'some_ostream_t', can
+   • The opposite conversion, from ‘ostream_t’ to ‘some_ostream_t’, can
      also be performed, provided that the object is actually an instance
-     of 'some_ostream_t'.  You can test whether an object is an instance
-     of 'some_ostream_t' by invoking the method 'bool
-     is_instance_of_some_ostream (ostream_t stream)'.
-   * Every method 'ostream_FOOBAR' exists also as a method
-     'some_ostream_FOOBAR' with compatible argument types and a
+     of ‘some_ostream_t’.  You can test whether an object is an instance
+     of ‘some_ostream_t’ by invoking the method ‘bool
+     is_instance_of_some_ostream (ostream_t stream)’.
+   • Every method ‘ostream_FOOBAR’ exists also as a method
+     ‘some_ostream_FOOBAR’ with compatible argument types and a
      compatible return type.
 
 * Menu:
@@ -743,10 +744,10 @@ we mean is:
 
 File: libtextstyle.info,  Node: The ostream class,  Next: The styled_ostream class,  Up: The output stream hierarchy
 
-3.5.1 The abstract 'ostream' class
+3.5.1 The abstract ‘ostream’ class
 ----------------------------------
 
-   The base output stream type is 'ostream_t'.
+   The base output stream type is ‘ostream_t’.
 
    It has the following methods:
 
@@ -777,66 +778,66 @@ File: libtextstyle.info,  Node: The ostream class,  Next: The styled_ostream cla
 
 File: libtextstyle.info,  Node: The styled_ostream class,  Next: ostream subclasses without styling,  Prev: The ostream class,  Up: The output stream hierarchy
 
-3.5.2 The abstract 'styled_ostream' class
+3.5.2 The abstract ‘styled_ostream’ class
 -----------------------------------------
 
-   The type for a styled output stream is 'styled_ostream_t'.  It is a
-subclass of 'ostream_t' that adds the following methods:
+   The type for a styled output stream is ‘styled_ostream_t’.  It is a
+subclass of ‘ostream_t’ that adds the following methods:
 
  -- Function: void styled_ostream_begin_use_class
           (styled_ostream_t STREAM, const char *CLASSNAME)
-     Starts a run of text belonging to 'CLASSNAME'.  The 'CLASSNAME' is
+     Starts a run of text belonging to ‘CLASSNAME’.  The ‘CLASSNAME’ is
      the name of a CSS class.  It can be chosen arbitrarily and
      customized through the CSS file.
 
  -- Function: void styled_ostream_end_use_class
           (styled_ostream_t STREAM, const char *CLASSNAME)
-     Ends a run of text belonging to 'CLASSNAME'.  The
-     'styled_ostream_begin_use_class' / 'styled_ostream_end_use_class'
+     Ends a run of text belonging to ‘CLASSNAME’.  The
+     ‘styled_ostream_begin_use_class’ / ‘styled_ostream_end_use_class’
      calls must match properly.
 
  -- Function: const char * styled_ostream_get_hyperlink_ref
           (styled_ostream_t STREAM)
-     Returns the referred URL of the currently set hyperlink, or 'NULL'
+     Returns the referred URL of the currently set hyperlink, or ‘NULL’
      if no hyperlink attribute is currently set.
 
      Note: The returned string is only valid up to the next invocation
-     of 'styled_ostream_set_hyperlink'.
+     of ‘styled_ostream_set_hyperlink’.
 
  -- Function: const char * styled_ostream_get_hyperlink_id
           (styled_ostream_t STREAM)
-     Returns the id of the currently set hyperlink, or 'NULL' if no
+     Returns the id of the currently set hyperlink, or ‘NULL’ if no
      hyperlink attribute is currently set.
 
      Note: The returned string is only valid up to the next invocation
-     of 'styled_ostream_set_hyperlink'.
+     of ‘styled_ostream_set_hyperlink’.
 
  -- Function: void styled_ostream_set_hyperlink
           (styled_ostream_t STREAM, const char *REF, const char *ID)
      Sets or removes a hyperlink attribute.
 
-     To set a hyperlink attribute, pass a non-'NULL' REF.  REF is an
+     To set a hyperlink attribute, pass a non-‘NULL’ REF.  REF is an
      URL; it should be at most 2083 bytes long.  Non-ASCII characters
      should be URI-escaped (using the %nn syntax).  ID is an optional
      identifier.  On terminal output, multiple hyperlinks with the same
      ID will be highlighted together.  If specified, ID should be at
      most 250 bytes long.
 
-     To remove a hyperlink attribute, pass 'NULL' for REF and ID.
+     To remove a hyperlink attribute, pass ‘NULL’ for REF and ID.
 
      Hyperlinks don't nest.  That is, a hyperlink attribute is enabled
-     only up to the next invocation of 'styled_ostream_set_hyperlink'.
+     only up to the next invocation of ‘styled_ostream_set_hyperlink’.
 
  -- Function: void styled_ostream_flush_to_current_style
           (styled_ostream_t STREAM)
-     This function acts like 'ostream_flush (STREAM,
-     FLUSH_THIS_STREAM)', except that it leaves the destination with the
+     This function acts like ‘ostream_flush (STREAM,
+     FLUSH_THIS_STREAM)’, except that it leaves the destination with the
      current text style enabled, instead of with the default text style.
 
      After calling this function, you can output strings without
      newlines(!)  to the underlying stream, and they will be rendered
-     like strings passed to 'ostream_write_mem', 'ostream_write_str', or
-     'ostream_printf'.
+     like strings passed to ‘ostream_write_mem’, ‘ostream_write_str’, or
+     ‘ostream_printf’.
 
 
 File: libtextstyle.info,  Node: ostream subclasses without styling,  Next: styled_ostream subclasses,  Prev: The styled_ostream class,  Up: The output stream hierarchy
@@ -856,73 +857,73 @@ File: libtextstyle.info,  Node: ostream subclasses without styling,  Next: style
 
 File: libtextstyle.info,  Node: The file_ostream class,  Next: The fd_ostream class,  Up: ostream subclasses without styling
 
-3.5.3.1 The 'file_ostream' class
+3.5.3.1 The ‘file_ostream’ class
 ................................
 
-   The 'file_ostream' class supports output to an '<stdio.h>' 'FILE'
-stream.  Its type is 'file_ostream_t'.  It is a subclass of 'ostream_t'
+   The ‘file_ostream’ class supports output to an ‘<stdio.h>’ ‘FILE’
+stream.  Its type is ‘file_ostream_t’.  It is a subclass of ‘ostream_t’
 that adds no methods.
 
    It can be instantiated through this function:
 
  -- Function: file_ostream_t file_ostream_create (FILE *FP)
-     Creates an output stream referring to 'FP'.
+     Creates an output stream referring to ‘FP’.
 
-     Note: The resulting stream must be closed before 'FP' can be
+     Note: The resulting stream must be closed before ‘FP’ can be
      closed.
 
 
 File: libtextstyle.info,  Node: The fd_ostream class,  Next: The term_ostream class,  Prev: The file_ostream class,  Up: ostream subclasses without styling
 
-3.5.3.2 The 'fd_ostream' class
+3.5.3.2 The ‘fd_ostream’ class
 ..............................
 
-   The 'file_ostream' class supports output to a file descriptor.  Its
-type is 'fd_ostream_t'.  It is a subclass of 'ostream_t' that adds no
+   The ‘file_ostream’ class supports output to a file descriptor.  Its
+type is ‘fd_ostream_t’.  It is a subclass of ‘ostream_t’ that adds no
 methods.
 
    It can be instantiated through this function:
 
  -- Function: fd_ostream_t fd_ostream_create (int FD,
           const char *FILENAME, bool BUFFERED)
-     Creates an output stream referring to the file descriptor 'FD'.
+     Creates an output stream referring to the file descriptor ‘FD’.
 
-     'FILENAME' is used only for error messages.
+     ‘FILENAME’ is used only for error messages.
 
-     Note: The resulting stream must be closed before 'FD' can be
+     Note: The resulting stream must be closed before ‘FD’ can be
      closed.
 
 
 File: libtextstyle.info,  Node: The term_ostream class,  Next: The html_ostream class,  Prev: The fd_ostream class,  Up: ostream subclasses without styling
 
-3.5.3.3 The 'term_ostream' class
+3.5.3.3 The ‘term_ostream’ class
 ................................
 
-   The 'term_ostream' class supports output to a file descriptor that is
+   The ‘term_ostream’ class supports output to a file descriptor that is
 connected to a terminal emulator or console.  Its type is
-'term_ostream_t'.  It is a subclass of 'ostream_t'.
+‘term_ostream_t’.  It is a subclass of ‘ostream_t’.
 
    It can be instantiated through this function:
 
  -- Function: term_ostream_t term_ostream_create (int FD,
           const char *FILENAME, ttyctl_t TTY_CONTROL)
-     Creates an output stream referring to the file descriptor 'FD'.
+     Creates an output stream referring to the file descriptor ‘FD’.
 
-     'FILENAME' is used only for error messages.
+     ‘FILENAME’ is used only for error messages.
 
-     'TTY_CONTROL' specifies the amount of control to take over the
+     ‘TTY_CONTROL’ specifies the amount of control to take over the
      underlying tty.
 
      The resulting stream will be line-buffered.
 
-     Note: The resulting stream must be closed before 'FD' can be
+     Note: The resulting stream must be closed before ‘FD’ can be
      closed.
 
    The class adds the following methods:
 
  -- Function: term_color_t term_ostream_rgb_to_color
           (term_ostream_t STREAM, int RED, int GREEN, int BLUE)
-     Converts an RGB value ('RED', 'GREEN', 'BLUE' in [0..255]) to a
+     Converts an RGB value (‘RED’, ‘GREEN’, ‘BLUE’ in [0..255]) to a
      color, valid for this stream only.
 
  -- Function: term_color_t term_ostream_get_color
@@ -957,125 +958,125 @@ connected to a terminal emulator or console.  Its type is
 
  -- Function: const char * term_ostream_get_hyperlink_ref
           (term_ostream_t STREAM)
-     Returns the referred URL of the currently set hyperlink, or 'NULL'
+     Returns the referred URL of the currently set hyperlink, or ‘NULL’
      if no hyperlink attribute is currently set.
 
      Note: The returned string is only valid up to the next invocation
-     of 'term_ostream_set_hyperlink'.
+     of ‘term_ostream_set_hyperlink’.
 
  -- Function: const char * term_ostream_get_hyperlink_id
           (term_ostream_t STREAM)
-     Returns the id of the currently set hyperlink, or 'NULL' if no
+     Returns the id of the currently set hyperlink, or ‘NULL’ if no
      hyperlink attribute is currently set.
 
      Note: The returned string is only valid up to the next invocation
-     of 'term_ostream_set_hyperlink'.
+     of ‘term_ostream_set_hyperlink’.
 
  -- Function: void term_ostream_set_hyperlink (term_ostream_t STREAM,
           const char *REF, const char *ID)
      Sets or removes a hyperlink attribute.
 
-     To set a hyperlink attribute, pass a non-'NULL' REF.  REF is an
+     To set a hyperlink attribute, pass a non-‘NULL’ REF.  REF is an
      URL; it should be at most 2083 bytes long.  Non-ASCII characters
      should be URI-escaped (using the %nn syntax).  ID is an optional
      identifier.  Multiple hyperlinks with the same ID will be
      highlighted together.  If specified, ID should be at most 250 bytes
      long.
 
-     To remove a hyperlink attribute, pass 'NULL' for REF and ID.
+     To remove a hyperlink attribute, pass ‘NULL’ for REF and ID.
 
      Hyperlinks don't nest.  That is, a hyperlink attribute is enabled
-     only up to the next invocation of 'styled_ostream_set_hyperlink'.
+     only up to the next invocation of ‘styled_ostream_set_hyperlink’.
 
  -- Function: void term_ostream_flush_to_current_style
           (term_ostream_t STREAM)
-     This function acts like 'ostream_flush (STREAM,
-     FLUSH_THIS_STREAM)', except that it leaves the terminal with the
+     This function acts like ‘ostream_flush (STREAM,
+     FLUSH_THIS_STREAM)’, except that it leaves the terminal with the
      current text attributes enabled, instead of with the default text
      attributes.
 
      After calling this function, you can output strings without
      newlines(!)  to the underlying file descriptor, and they will be
-     rendered like strings passed to 'ostream_write_mem',
-     'ostream_write_str', or 'ostream_printf'.
+     rendered like strings passed to ‘ostream_write_mem’,
+     ‘ostream_write_str’, or ‘ostream_printf’.
 
 
 File: libtextstyle.info,  Node: The html_ostream class,  Next: The memory_ostream class,  Prev: The term_ostream class,  Up: ostream subclasses without styling
 
-3.5.3.4 The 'html_ostream' class
+3.5.3.4 The ‘html_ostream’ class
 ................................
 
-   The 'html_ostream' class supports output to any destination, in HTML
-syntax.  Its type is 'html_ostream_t'.  It is a subclass of 'ostream_t'.
+   The ‘html_ostream’ class supports output to any destination, in HTML
+syntax.  Its type is ‘html_ostream_t’.  It is a subclass of ‘ostream_t’.
 
    It can be instantiated through this function:
 
  -- Function: html_ostream_t html_ostream_create (ostream_t DESTINATION)
      Creates an output stream that takes input in the UTF-8 encoding and
-     writes it in HTML form on 'DESTINATION'.
+     writes it in HTML form on ‘DESTINATION’.
 
      This stream produces a sequence of lines.  The caller is
-     responsible for opening the '<body><html>' elements before and for
+     responsible for opening the ‘<body><html>’ elements before and for
      closing them after the use of this stream.
 
-     Note: The resulting stream must be closed before 'DESTINATION' can
+     Note: The resulting stream must be closed before ‘DESTINATION’ can
      be closed.
 
    The class adds the following methods:
 
  -- Function: void html_ostream_begin_span (html_ostream_t STREAM,
           const char *CLASSNAME)
-     Starts a '<span class="CLASSNAME">' element.  The 'CLASSNAME' is
+     Starts a ‘<span class="CLASSNAME">’ element.  The ‘CLASSNAME’ is
      the name of a CSS class.  It can be chosen arbitrarily and
      customized through the CSS file.
 
  -- Function: void html_ostream_end_span (html_ostream_t STREAM,
           const char *CLASSNAME)
-     Ends a '<span class="CLASSNAME">' element.
+     Ends a ‘<span class="CLASSNAME">’ element.
 
-     The 'html_ostream_begin_span' / 'html_ostream_end_span' calls must
+     The ‘html_ostream_begin_span’ / ‘html_ostream_end_span’ calls must
      match properly.
 
  -- Function: const char * html_ostream_get_hyperlink_ref
           (html_ostream_t STREAM)
-     Returns the referred URL of the currently set hyperlink, or 'NULL'
+     Returns the referred URL of the currently set hyperlink, or ‘NULL’
      if no hyperlink attribute is currently set.
 
      Note: The returned string is only valid up to the next invocation
-     of 'html_ostream_set_hyperlink_ref'.
+     of ‘html_ostream_set_hyperlink_ref’.
 
  -- Function: void html_ostream_set_hyperlink_ref
           (html_ostream_t STREAM, const char *REF)
      Sets or removes a hyperlink attribute.
 
-     To set a hyperlink attribute, pass a non-'NULL' REF.  REF is an
+     To set a hyperlink attribute, pass a non-‘NULL’ REF.  REF is an
      URL; it should be at most 2083 bytes long.  Non-ASCII characters
      should be URI-escaped (using the %nn syntax).
 
-     To remove a hyperlink attribute, pass 'NULL' for REF.
+     To remove a hyperlink attribute, pass ‘NULL’ for REF.
 
      Hyperlinks don't nest.  That is, a hyperlink attribute is enabled
-     only up to the next invocation of 'html_ostream_set_hyperlink_ref'.
+     only up to the next invocation of ‘html_ostream_set_hyperlink_ref’.
 
  -- Function: void html_ostream_flush_to_current_style
           (html_ostream_t STREAM)
-     This function acts like 'ostream_flush (STREAM,
-     FLUSH_THIS_STREAM)', except that it leaves the destination with the
+     This function acts like ‘ostream_flush (STREAM,
+     FLUSH_THIS_STREAM)’, except that it leaves the destination with the
      current text style enabled, instead of with the default text style.
 
      After calling this function, you can output strings without
      newlines(!)  to the underlying stream, and they will be rendered
-     like strings passed to 'ostream_write_mem', 'ostream_write_str', or
-     'ostream_printf'.
+     like strings passed to ‘ostream_write_mem’, ‘ostream_write_str’, or
+     ‘ostream_printf’.
 
 
 File: libtextstyle.info,  Node: The memory_ostream class,  Next: The iconv_ostream class,  Prev: The html_ostream class,  Up: ostream subclasses without styling
 
-3.5.3.5 The 'memory_ostream' class
+3.5.3.5 The ‘memory_ostream’ class
 ..................................
 
-   The 'memory_ostream' class supports output to an in-memory buffer.
-Its type is 'memory_ostream_t'.  It is a subclass of 'ostream_t'.
+   The ‘memory_ostream’ class supports output to an in-memory buffer.
+Its type is ‘memory_ostream_t’.  It is a subclass of ‘ostream_t’.
 
    It can be instantiated through this function:
 
@@ -1088,7 +1089,7 @@ Its type is 'memory_ostream_t'.  It is a subclass of 'ostream_t'.
  -- Function: void memory_ostream_contents (memory_ostream_t STREAM,
           const void **BUFP, size_t *BUFLENP)
      Returns a pointer to the output accumulated so far and its size.
-     It stores them in '*BUFP' and '*BUFLENP', respectively.
+     It stores them in ‘*BUFP’ and ‘*BUFLENP’, respectively.
 
      Note: These two return values become invalid when more output is
      done to the stream or when the stream is freed.
@@ -1096,11 +1097,11 @@ Its type is 'memory_ostream_t'.  It is a subclass of 'ostream_t'.
 
 File: libtextstyle.info,  Node: The iconv_ostream class,  Prev: The memory_ostream class,  Up: ostream subclasses without styling
 
-3.5.3.6 The 'iconv_ostream' class
+3.5.3.6 The ‘iconv_ostream’ class
 .................................
 
-   The 'iconv_ostream' class supports output to any destination.  Its
-type is 'iconv_ostream_t'.  It is a subclass of 'ostream_t' that adds no
+   The ‘iconv_ostream’ class supports output to any destination.  Its
+type is ‘iconv_ostream_t’.  It is a subclass of ‘ostream_t’ that adds no
 methods.
 
    It can be instantiated through this function:
@@ -1108,16 +1109,16 @@ methods.
  -- Function: iconv_ostream_t iconv_ostream_create
           (const char *FROM_ENCODING, const char *TO_ENCODING,
           ostream_t DESTINATION)
-     Creates an output stream that converts from 'FROM_ENCODING' to
-     'TO_ENCODING', writing the result to 'DESTINATION'.
+     Creates an output stream that converts from ‘FROM_ENCODING’ to
+     ‘TO_ENCODING’, writing the result to ‘DESTINATION’.
 
-     Note: The resulting stream must be closed before 'DESTINATION' can
+     Note: The resulting stream must be closed before ‘DESTINATION’ can
      be closed.
 
 
 File: libtextstyle.info,  Node: styled_ostream subclasses,  Next: Accessors,  Prev: ostream subclasses without styling,  Up: The output stream hierarchy
 
-3.5.4 Concrete 'styled_ostream' subclasses
+3.5.4 Concrete ‘styled_ostream’ subclasses
 ------------------------------------------
 
 * Menu:
@@ -1129,94 +1130,94 @@ File: libtextstyle.info,  Node: styled_ostream subclasses,  Next: Accessors,  Pr
 
 File: libtextstyle.info,  Node: The term_styled_ostream class,  Next: The html_styled_ostream class,  Up: styled_ostream subclasses
 
-3.5.4.1 The 'term_styled_ostream' class
+3.5.4.1 The ‘term_styled_ostream’ class
 .......................................
 
-   The 'term_styled_ostream' class supports styled output to a file
+   The ‘term_styled_ostream’ class supports styled output to a file
 descriptor that is connected to a terminal emulator or console.  Its
-type is 'term_styled_ostream_t'.  It is a subclass of
-'styled_ostream_t'.
+type is ‘term_styled_ostream_t’.  It is a subclass of
+‘styled_ostream_t’.
 
    It can be instantiated through this function:
 
  -- Function: term_styled_ostream_t term_styled_ostream_create (int FD,
           const char *FILENAME, ttyctl_t TTY_CONTROL,
           const char *CSS_FILENAME)
-     Creates an output stream referring to the file descriptor 'FD',
-     styled with the file 'CSS_FILENAME'.
+     Creates an output stream referring to the file descriptor ‘FD’,
+     styled with the file ‘CSS_FILENAME’.
 
-     'FILENAME' is used only for error messages.
+     ‘FILENAME’ is used only for error messages.
 
-     'TTY_CONTROL' specifies the amount of control to take over the
+     ‘TTY_CONTROL’ specifies the amount of control to take over the
      underlying tty.
 
-     Note: The resulting stream must be closed before 'FD' can be
+     Note: The resulting stream must be closed before ‘FD’ can be
      closed.
 
-     Returns 'NULL' upon failure.
+     Returns ‘NULL’ upon failure.
 
    The following is a variant of this function.  Upon failure, it does
-not return 'NULL'; instead, it returns a styled 'fd_stream' on which the
+not return ‘NULL’; instead, it returns a styled ‘fd_stream’ on which the
 styling operations exist but are no-ops.
 
  -- Function: styled_ostream_t styled_ostream_create (int FD,
           const char *FILENAME, ttyctl_t TTY_CONTROL,
           const char *CSS_FILENAME)
-     Creates an output stream referring to the file descriptor 'FD',
-     styled with the file 'CSS_FILENAME' if possible.
+     Creates an output stream referring to the file descriptor ‘FD’,
+     styled with the file ‘CSS_FILENAME’ if possible.
 
-     'FILENAME' is used only for error messages.
+     ‘FILENAME’ is used only for error messages.
 
-     'TTY_CONTROL' specifies the amount of control to take over the
+     ‘TTY_CONTROL’ specifies the amount of control to take over the
      underlying tty.
 
-     Note: The resulting stream must be closed before 'FD' can be
+     Note: The resulting stream must be closed before ‘FD’ can be
      closed.
 
 
 File: libtextstyle.info,  Node: The html_styled_ostream class,  Next: The noop_styled_ostream class,  Prev: The term_styled_ostream class,  Up: styled_ostream subclasses
 
-3.5.4.2 The 'html_styled_ostream' class
+3.5.4.2 The ‘html_styled_ostream’ class
 .......................................
 
-   The 'html_styled_ostream' class supports styled output to any
-destination, in HTML syntax.  Its type is 'html_styled_ostream_t'.  It
-is a subclass of 'styled_ostream_t'.
+   The ‘html_styled_ostream’ class supports styled output to any
+destination, in HTML syntax.  Its type is ‘html_styled_ostream_t’.  It
+is a subclass of ‘styled_ostream_t’.
 
    It can be instantiated through this function:
 
  -- Function: html_styled_ostream_t html_styled_ostream_create
           (ostream_t DESTINATION, const char *CSS_FILENAME)
      Creates an output stream that takes input in the UTF-8 encoding and
-     writes it in HTML form on 'DESTINATION', styled with the file
-     'CSS_FILENAME'.
+     writes it in HTML form on ‘DESTINATION’, styled with the file
+     ‘CSS_FILENAME’.
 
-     Note: The resulting stream must be closed before 'DESTINATION' can
+     Note: The resulting stream must be closed before ‘DESTINATION’ can
      be closed.
 
 
 File: libtextstyle.info,  Node: The noop_styled_ostream class,  Prev: The html_styled_ostream class,  Up: styled_ostream subclasses
 
-3.5.4.3 The 'noop_styled_ostream' class
+3.5.4.3 The ‘noop_styled_ostream’ class
 .......................................
 
-   The 'noop_styled_ostream' class supports the styled output operations
+   The ‘noop_styled_ostream’ class supports the styled output operations
 to any destination.  The text is output to the given destination; the
 styling operations, however, do nothing.  Its type is
-'noop_styled_ostream_t'.  It is a subclass of 'styled_ostream_t'.
+‘noop_styled_ostream_t’.  It is a subclass of ‘styled_ostream_t’.
 
    It can be instantiated through this function:
 
  -- Function: noop_styled_ostream_t noop_styled_ostream_create
           (ostream_t DESTINATION, bool PASS_OWNERSHIP)
-     Creates an output stream that delegates to 'DESTINATION' and that
+     Creates an output stream that delegates to ‘DESTINATION’ and that
      supports the styling operations as no-ops.
 
-     If 'PASS_OWNERSHIP' is 'true', closing the resulting stream will
-     automatically close the 'DESTINATION'.
+     If ‘PASS_OWNERSHIP’ is ‘true’, closing the resulting stream will
+     automatically close the ‘DESTINATION’.
 
-     Note: If 'PASS_OWNERSHIP' is 'false', the resulting stream must be
-     closed before 'DESTINATION' can be closed.
+     Note: If ‘PASS_OWNERSHIP’ is ‘false’, the resulting stream must be
+     closed before ‘DESTINATION’ can be closed.
 
 
 File: libtextstyle.info,  Node: Accessors,  Prev: styled_ostream subclasses,  Up: The output stream hierarchy
@@ -1233,18 +1234,18 @@ operate on both the stream and its underlying destination stream at the
 same time.  Doing so can lead to undesired interactions between the two
 streams.
 
-   The 'file_ostream' class has this accessor method:
+   The ‘file_ostream’ class has this accessor method:
 
  -- Function: FILE * file_ostream_get_stdio_stream
           (file_ostream_t STREAM)
 
-   The 'fd_ostream' class has these accessor methods:
+   The ‘fd_ostream’ class has these accessor methods:
 
  -- Function: int fd_ostream_get_descriptor (fd_ostream_t STREAM)
  -- Function: const char * fd_ostream_get_filename (fd_ostream_t STREAM)
  -- Function: bool fd_ostream_is_buffered (fd_ostream_t STREAM)
 
-   The 'term_ostream' class has these accessor methods:
+   The ‘term_ostream’ class has these accessor methods:
 
  -- Function: int term_ostream_get_descriptor (term_ostream_t STREAM)
  -- Function: const char * term_ostream_get_filename
@@ -1254,9 +1255,9 @@ streams.
  -- Function: ttyctl_t term_ostream_get_effective_tty_control
           (term_ostream_t STREAM)
      Returns the effective tty control of the stream (not
-     'TTYCTL_AUTO').
+     ‘TTYCTL_AUTO’).
 
-   The 'iconv_ostream' class has these accessor methods:
+   The ‘iconv_ostream’ class has these accessor methods:
 
  -- Function: const char * iconv_ostream_get_from_encoding
           (iconv_ostream_t STREAM)
@@ -1265,19 +1266,19 @@ streams.
  -- Function: ostream_t iconv_ostream_get_destination
           (iconv_ostream_t STREAM)
 
-   The 'html_ostream' class has this accessor method:
+   The ‘html_ostream’ class has this accessor method:
 
  -- Function: ostream_t html_ostream_get_destination
           (html_ostream_t STREAM)
 
-   The 'term_styled_ostream' class has these accessor methods:
+   The ‘term_styled_ostream’ class has these accessor methods:
 
  -- Function: term_ostream_t term_styled_ostream_get_destination
           (term_styled_ostream_t STREAM)
  -- Function: const char * term_styled_ostream_get_css_filename
           (term_styled_ostream_t STREAM)
 
-   The 'html_styled_ostream' class has these accessor methods:
+   The ‘html_styled_ostream’ class has these accessor methods:
 
  -- Function: ostream_t html_styled_ostream_get_destination
           (html_styled_ostream_t STREAM)
@@ -1286,7 +1287,7 @@ streams.
  -- Function: const char * html_styled_ostream_get_css_filename
           (html_styled_ostream_t STREAM)
 
-   The 'noop_styled_ostream' class has these accessor methods:
+   The ‘noop_styled_ostream’ class has these accessor methods:
 
  -- Function: ostream_t noop_styled_ostream_get_destination
           (noop_styled_ostream_t STREAM)
@@ -1302,10 +1303,10 @@ File: libtextstyle.info,  Node: Debugging the styling code,  Next: What to docum
    If you want to understand which output of your program is associated
 with which CSS classes, the simplest way is as follows:
 
-  1. Run the program with the command-line option '--color=html',
+  1. Run the program with the command-line option ‘--color=html’,
      redirecting the output to a file.
   2. Then inspect this output.  Text regions associated with a CSS class
-     are surrounded by '<span class="CSS-CLASS">'...'</span>'.
+     are surrounded by ‘<span class="CSS-CLASS">’...‘</span>’.
 
 
 File: libtextstyle.info,  Node: What to document,  Prev: Debugging the styling code,  Up: The programmer's view
@@ -1315,17 +1316,17 @@ File: libtextstyle.info,  Node: What to document,  Prev: Debugging the styling c
 
    To make the text styling support available to the end user of your
 package, the following need to be documented:
-   * The command-line options.  This typically needs to be done in
-     several places: in the '--help' output, in the 'man' pages (if
+   • The command-line options.  This typically needs to be done in
+     several places: in the ‘--help’ output, in the ‘man’ pages (if
      present), and in the documentation.
-   * Which programs support '--color=test'?
-   * The list of CSS classes and their meaning.  This is necessary, so
+   • Which programs support ‘--color=test’?
+   • The list of CSS classes and their meaning.  This is necessary, so
      that the user can create their own style file; the CSS classes are
      part of the selectors in the CSS rules.
-   * The location of the default style file.  This is a convenience, so
+   • The location of the default style file.  This is a convenience, so
      that the user, when creating their own style file, can start from
      the default one.
-   * The environment variable, called 'STYLE_FILE_ENVVAR' above, that,
+   • The environment variable, called ‘STYLE_FILE_ENVVAR’ above, that,
      when set to a non-empty value, specifies the style file to use.
 
 
@@ -1337,11 +1338,11 @@ Appendix A Licenses
    The files of this package are covered by the licenses indicated in
 each particular file or directory.  Here is a summary:
 
-   * The 'libtextstyle' library and the example programs are covered by
+   • The ‘libtextstyle’ library and the example programs are covered by
      the GNU General Public License (GPL). A copy of the license is
      included in *note GNU GPL::.
 
-   * This manual is free documentation.  It is dually licensed under the
+   • This manual is free documentation.  It is dually licensed under the
      GNU FDL and the GNU GPL. This means that you can redistribute this
      manual under either of these two licenses, at your choice.
      This manual is covered by the GNU FDL. Permission is granted to
@@ -1370,7 +1371,7 @@ A.1 GNU GENERAL PUBLIC LICENSE
 
                         Version 3, 29 June 2007
 
-     Copyright (C) 2007 Free Software Foundation, Inc. <https://fsf.org/>
+     Copyright © 2007 Free Software Foundation, Inc. <https://fsf.org/>
 
      Everyone is permitted to copy and distribute verbatim copies of this
      license document, but changing it is not allowed.
@@ -2057,11 +2058,11 @@ mail.
 notice like this when it starts in an interactive mode:
 
      PROGRAM Copyright (C) YEAR NAME OF AUTHOR
-     This program comes with ABSOLUTELY NO WARRANTY; for details type 'show w'.
+     This program comes with ABSOLUTELY NO WARRANTY; for details type ‘show w’.
      This is free software, and you are welcome to redistribute it
-     under certain conditions; type 'show c' for details.
+     under certain conditions; type ‘show c’ for details.
 
-   The hypothetical commands 'show w' and 'show c' should show the
+   The hypothetical commands ‘show w’ and ‘show c’ should show the
 appropriate parts of the General Public License.  Of course, your
 program's commands might be different; for a GUI interface, you would
 use an "about box".
@@ -2086,7 +2087,7 @@ A.2 GNU Free Documentation License
 
                      Version 1.3, 3 November 2008
 
-     Copyright (C) 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
+     Copyright © 2000, 2001, 2002, 2007, 2008 Free Software Foundation, Inc.
      <https://fsf.org/>
 
      Everyone is permitted to copy and distribute verbatim copies
@@ -2095,7 +2096,7 @@ A.2 GNU Free Documentation License
   0. PREAMBLE
 
      The purpose of this License is to make a manual, textbook, or other
-     functional and useful document "free" in the sense of freedom: to
+     functional and useful document “free” in the sense of freedom: to
      assure everyone the effective freedom to copy and redistribute it,
      with or without modifying it, either commercially or
      noncommercially.  Secondarily, this License preserves for the
@@ -2484,7 +2485,7 @@ A.2 GNU Free Documentation License
      the GNU Free Documentation License from time to time.  Such new
      versions will be similar in spirit to the present version, but may
      differ in detail to address new problems or concerns.  See
-     <https://www.gnu.org/copyleft/>.
+     <https://www.gnu.org/licenses/>.
 
      Each version of the License is given a distinguishing version
      number.  If the Document specifies that a particular numbered
@@ -2636,6 +2637,7 @@ Function Index
 * ostream_write_mem:                     The ostream class.    (line 10)
 * ostream_write_str:                     The ostream class.    (line 14)
 * print_color_test:                      Command-line options. (line 36)
+* style_file_prepare:                    Command-line options. (line 40)
 * styled_ostream_begin_use_class:        The styled_ostream class.
                                                                (line  9)
 * styled_ostream_create:                 The term_styled_ostream class.
@@ -2650,7 +2652,6 @@ Function Index
                                                                (line 21)
 * styled_ostream_set_hyperlink:          The styled_ostream class.
                                                                (line 37)
-* style_file_prepare:                    Command-line options. (line 40)
 * term_ostream_create:                   The term_ostream class.
                                                                (line 12)
 * term_ostream_flush_to_current_style:   The term_ostream class.
@@ -2735,50 +2736,50 @@ General Index
 
 
 Tag Table:
-Node: Top1338
-Node: Introduction1749
-Node: Style definitions2423
-Node: Built-in versus separate styling5067
-Node: The user's view6253
-Node: The TERM variable7237
-Node: Terminal emulators8335
-Node: Consoles10542
-Node: The NO_COLOR variable10913
-Node: The NO_TERM_HYPERLINKS variable11500
-Node: Emacs12198
-Node: The --color option12560
-Node: The --style option14493
-Node: Style rules15312
-Node: Debugging style files18143
-Node: The programmer's view19153
-Node: Basic use20389
-Node: Hyperlinks21861
-Node: Include files23151
-Node: Link options23389
-Node: Command-line options25198
-Node: The output stream hierarchy27917
-Node: The ostream class29582
-Node: The styled_ostream class30695
-Node: ostream subclasses without styling33545
-Node: The file_ostream class34189
-Node: The fd_ostream class34788
-Node: The term_ostream class35512
-Node: The html_ostream class39720
-Node: The memory_ostream class42558
-Node: The iconv_ostream class43536
-Node: styled_ostream subclasses44303
-Node: The term_styled_ostream class44736
-Node: The html_styled_ostream class46425
-Node: The noop_styled_ostream class47277
-Node: Accessors48281
-Node: Debugging the styling code51157
-Node: What to document51758
-Node: Licenses52786
-Node: GNU GPL54379
-Node: GNU FDL91909
-Node: Function Index117015
-Node: Variable Index125801
-Node: Index126530
+Node: Top1342
+Node: Introduction1750
+Node: Style definitions2424
+Node: Built-in versus separate styling5106
+Node: The user's view6296
+Node: The TERM variable7316
+Node: Terminal emulators8466
+Node: Consoles10909
+Node: The NO_COLOR variable11300
+Node: The NO_TERM_HYPERLINKS variable11903
+Node: Emacs12637
+Node: The --color option13015
+Node: The --style option15028
+Node: Style rules15867
+Node: Debugging style files18772
+Node: The programmer's view19790
+Node: Basic use21050
+Node: Hyperlinks22558
+Node: Include files23892
+Node: Link options24134
+Node: Command-line options26063
+Node: The output stream hierarchy28862
+Node: The ostream class30585
+Node: The styled_ostream class31706
+Node: ostream subclasses without styling34632
+Node: The file_ostream class35276
+Node: The fd_ostream class35907
+Node: The term_ostream class36659
+Node: The html_ostream class40955
+Node: The memory_ostream class43877
+Node: The iconv_ostream class44879
+Node: styled_ostream subclasses45678
+Node: The term_styled_ostream class46115
+Node: The html_styled_ostream class47872
+Node: The noop_styled_ostream class48752
+Node: Accessors49800
+Node: Debugging the styling code52712
+Node: What to document53325
+Node: Licenses54379
+Node: GNU GPL55980
+Node: GNU FDL93525
+Node: Function Index118634
+Node: Variable Index127420
+Node: Index128149
 
 End Tag Table
 

@@ -1,4 +1,4 @@
-# Copyright (C) 2002-2024 Free Software Foundation, Inc.
+# Copyright (C) 2002-2026 Free Software Foundation, Inc.
 #
 # This file is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -27,7 +27,8 @@
 
 
 # Specification in the form of a command-line invocation:
-# gnulib-tool --import --local-dir=gnulib-local \
+# gnulib-tool --import \
+#  --local-dir=gnulib-local \
 #  --lib=libgrt \
 #  --source-base=gnulib-lib \
 #  --m4-base=gnulib-m4 \
@@ -42,30 +43,46 @@
 #  attribute \
 #  basename-lgpl \
 #  binary-io \
+#  bool \
+#  c-ctype \
+#  c-strtold \
 #  closeout \
 #  csharpcomp-script \
+#  d \
+#  dcomp-script \
 #  error \
-#  getopt-gnu \
+#  fzprintf-posix \
 #  gettext-h \
 #  gettext-runtime-misc \
 #  havelib \
 #  java \
 #  javacomp-script \
 #  manywarnings \
+#  mbrtoc32 \
+#  mbszero \
 #  memmove \
+#  modula2 \
+#  modula2comp-script \
 #  noreturn \
+#  options \
 #  progname \
 #  propername \
+#  quote \
 #  relocatable-prog \
 #  setlocale \
 #  sigpipe \
-#  stdbool \
-#  stdio \
-#  stdlib \
+#  stdint-h \
+#  stdio-h \
+#  stdlib-h \
+#  strtoimax \
+#  strtold \
 #  strtoul \
-#  unistd \
+#  strtoumax \
+#  unistd-h \
 #  unlocked-io \
-#  xalloc
+#  xalloc \
+#  xstring-buffer \
+#  xstrtold
 
 # Specification in the form of a few gnulib-tool.m4 macro invocations:
 gl_LOCAL_DIR([../gnulib-local])
@@ -75,30 +92,46 @@ gl_MODULES([
   attribute
   basename-lgpl
   binary-io
+  bool
+  c-ctype
+  c-strtold
   closeout
   csharpcomp-script
+  d
+  dcomp-script
   error
-  getopt-gnu
+  fzprintf-posix
   gettext-h
   gettext-runtime-misc
   havelib
   java
   javacomp-script
   manywarnings
+  mbrtoc32
+  mbszero
   memmove
+  modula2
+  modula2comp-script
   noreturn
+  options
   progname
   propername
+  quote
   relocatable-prog
   setlocale
   sigpipe
-  stdbool
-  stdio
-  stdlib
+  stdint-h
+  stdio-h
+  stdlib-h
+  strtoimax
+  strtold
   strtoul
-  unistd
+  strtoumax
+  unistd-h
   unlocked-io
   xalloc
+  xstring-buffer
+  xstrtold
 ])
 gl_AVOID([])
 gl_SOURCE_BASE([gnulib-lib])

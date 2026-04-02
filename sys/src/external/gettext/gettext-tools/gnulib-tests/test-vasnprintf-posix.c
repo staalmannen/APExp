@@ -1,5 +1,5 @@
 /* Test of POSIX compatible vasnprintf() and asnprintf() functions.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -93,11 +93,10 @@ static void
 test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
 {
   char buf[8];
-  int size;
 
   /* Test return value convention.  */
 
-  for (size = 0; size <= 8; size++)
+  for (int size = 0; size <= 8; size++)
     {
       size_t length = size;
       char *result = my_asnprintf (NULL, &length, "%d", 12345);
@@ -107,7 +106,7 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
       free (result);
     }
 
-  for (size = 0; size <= 8; size++)
+  for (int size = 0; size <= 8; size++)
     {
       size_t length;
       char *result;
@@ -783,7 +782,7 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
 
   { /* Rounding can turn a ...FFF into a ...000.
        This shows a Mac OS X 10.3.9 (Darwin 7.9) bug and a
-       glibc 2.4 bug <https://sourceware.org/bugzilla/show_bug.cgi?id=2908>.  */
+       glibc 2.4 bug <https://sourceware.org/PR2908>.  */
     size_t length;
     char *result =
       my_asnprintf (NULL, &length, "%.1La %d", 1.999L, 33, 44, 55);
@@ -1065,8 +1064,7 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
         { 1.234321234321234e35, "123432123432123*********************.000000" },
         { 1.234321234321234e36, "123432123432123**********************.000000" }
       };
-    size_t k;
-    for (k = 0; k < SIZEOF (data); k++)
+    for (size_t k = 0; k < SIZEOF (data); k++)
       {
         size_t length;
         char *result =
@@ -1397,8 +1395,7 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
         { 1.234321234321234e35L, "123432123432123*********************.000000" },
         { 1.234321234321234e36L, "123432123432123**********************.000000" }
       };
-    size_t k;
-    for (k = 0; k < SIZEOF (data); k++)
+    for (size_t k = 0; k < SIZEOF (data); k++)
       {
         size_t length;
         char *result =
@@ -2118,8 +2115,7 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
         { 1.234321234321234e35, "1.234321e+35" },
         { 1.234321234321234e36, "1.234321e+36" }
       };
-    size_t k;
-    for (k = 0; k < SIZEOF (data); k++)
+    for (size_t k = 0; k < SIZEOF (data); k++)
       {
         size_t length;
         char *result =
@@ -2486,8 +2482,7 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
         { 1.234321234321234e35L, "1.234321e+35" },
         { 1.234321234321234e36L, "1.234321e+36" }
       };
-    size_t k;
-    for (k = 0; k < SIZEOF (data); k++)
+    for (size_t k = 0; k < SIZEOF (data); k++)
       {
         size_t length;
         char *result =
@@ -2936,8 +2931,7 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
         { 1.234321234321234e35, "1.23432e+35" },
         { 1.234321234321234e36, "1.23432e+36" }
       };
-    size_t k;
-    for (k = 0; k < SIZEOF (data); k++)
+    for (size_t k = 0; k < SIZEOF (data); k++)
       {
         size_t length;
         char *result =
@@ -3290,8 +3284,7 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
         { 1.234321234321234e35L, "1.23432e+35" },
         { 1.234321234321234e36L, "1.23432e+36" }
       };
-    size_t k;
-    for (k = 0; k < SIZEOF (data); k++)
+    for (size_t k = 0; k < SIZEOF (data); k++)
       {
         size_t length;
         char *result =
@@ -3630,6 +3623,7 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     free (result);
   }
 
+#if NEED_PRINTF_WITH_N_DIRECTIVE
   /* Test the support of the %n format directive.  */
 
   {
@@ -3643,6 +3637,7 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     ASSERT (count == 4);
     free (result);
   }
+#endif
 
   /* Test the support of the POSIX/XSI format strings with positions.  */
 
@@ -3706,9 +3701,8 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     size_t length;
     char *result =
       my_asnprintf (NULL, &length, "%.4000d %d", 1234567, 99);
-    size_t i;
     ASSERT (result != NULL);
-    for (i = 0; i < 4000 - 7; i++)
+    for (size_t i = 0; i < 4000 - 7; i++)
       ASSERT (result[i] == '0');
     ASSERT (strcmp (result + 4000 - 7, "1234567 99") == 0);
     ASSERT (length == strlen (result));
@@ -3719,9 +3713,8 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     size_t length;
     char *result =
       my_asnprintf (NULL, &length, "%.*d %d", 4000, 1234567, 99);
-    size_t i;
     ASSERT (result != NULL);
-    for (i = 0; i < 4000 - 7; i++)
+    for (size_t i = 0; i < 4000 - 7; i++)
       ASSERT (result[i] == '0');
     ASSERT (strcmp (result + 4000 - 7, "1234567 99") == 0);
     ASSERT (length == strlen (result));
@@ -3732,10 +3725,9 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     size_t length;
     char *result =
       my_asnprintf (NULL, &length, "%.4000d %d", -1234567, 99);
-    size_t i;
     ASSERT (result != NULL);
     ASSERT (result[0] == '-');
-    for (i = 0; i < 4000 - 7; i++)
+    for (size_t i = 0; i < 4000 - 7; i++)
       ASSERT (result[1 + i] == '0');
     ASSERT (strcmp (result + 1 + 4000 - 7, "1234567 99") == 0);
     ASSERT (length == strlen (result));
@@ -3746,9 +3738,8 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     size_t length;
     char *result =
       my_asnprintf (NULL, &length, "%.4000u %d", 1234567, 99);
-    size_t i;
     ASSERT (result != NULL);
-    for (i = 0; i < 4000 - 7; i++)
+    for (size_t i = 0; i < 4000 - 7; i++)
       ASSERT (result[i] == '0');
     ASSERT (strcmp (result + 4000 - 7, "1234567 99") == 0);
     ASSERT (length == strlen (result));
@@ -3759,9 +3750,8 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     size_t length;
     char *result =
       my_asnprintf (NULL, &length, "%.4000o %d", 1234567, 99);
-    size_t i;
     ASSERT (result != NULL);
-    for (i = 0; i < 4000 - 7; i++)
+    for (size_t i = 0; i < 4000 - 7; i++)
       ASSERT (result[i] == '0');
     ASSERT (strcmp (result + 4000 - 7, "4553207 99") == 0);
     ASSERT (length == strlen (result));
@@ -3772,9 +3762,8 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     size_t length;
     char *result =
       my_asnprintf (NULL, &length, "%.4000x %d", 1234567, 99);
-    size_t i;
     ASSERT (result != NULL);
-    for (i = 0; i < 4000 - 6; i++)
+    for (size_t i = 0; i < 4000 - 6; i++)
       ASSERT (result[i] == '0');
     ASSERT (strcmp (result + 4000 - 6, "12d687 99") == 0);
     ASSERT (length == strlen (result));
@@ -3785,11 +3774,10 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     size_t length;
     char *result =
       my_asnprintf (NULL, &length, "%#.4000x %d", 1234567, 99);
-    size_t i;
     ASSERT (result != NULL);
     ASSERT (result[0] == '0');
     ASSERT (result[1] == 'x');
-    for (i = 0; i < 4000 - 6; i++)
+    for (size_t i = 0; i < 4000 - 6; i++)
       ASSERT (result[2 + i] == '0');
     ASSERT (strcmp (result + 2 + 4000 - 6, "12d687 99") == 0);
     ASSERT (length == strlen (result));
@@ -3800,11 +3788,10 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     size_t length;
     char *result =
       my_asnprintf (NULL, &length, "%.4000f %d", 1.0, 99);
-    size_t i;
     ASSERT (result != NULL);
     ASSERT (result[0] == '1');
     ASSERT (result[1] == '.');
-    for (i = 0; i < 4000; i++)
+    for (size_t i = 0; i < 4000; i++)
       ASSERT (result[2 + i] == '0');
     ASSERT (strcmp (result + 2 + 4000, " 99") == 0);
     ASSERT (length == strlen (result));
@@ -3815,11 +3802,10 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     size_t length;
     char *result =
       my_asnprintf (NULL, &length, "%.511f %d", 1.0, 99);
-    size_t i;
     ASSERT (result != NULL);
     ASSERT (result[0] == '1');
     ASSERT (result[1] == '.');
-    for (i = 0; i < 511; i++)
+    for (size_t i = 0; i < 511; i++)
       ASSERT (result[2 + i] == '0');
     ASSERT (strcmp (result + 2 + 511, " 99") == 0);
     ASSERT (length == strlen (result));
@@ -3885,7 +3871,6 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     free (result);
   }
 
-#if HAVE_WCHAR_T
   static wchar_t L_xyz[4] = { 'x', 'y', 'z', 0 };
 
   { /* Width.  */
@@ -3927,57 +3912,44 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     ASSERT (length == strlen (result));
     free (result);
   }
-#endif
 
   /* To verify that these tests succeed, it is necessary to run them under
      a tool that checks against invalid memory accesses, such as ElectricFence
      or "valgrind --tool=memcheck".  */
-  {
-    size_t i;
+  for (size_t i = 1; i <= 8; i++)
+    {
+      char *block;
+      size_t length;
+      char *result;
 
-    for (i = 1; i <= 8; i++)
-      {
-        char *block;
-        size_t length;
-        char *result;
+      block = (char *) malloc (i);
+      memcpy (block, "abcdefgh", i);
+      result = my_asnprintf (NULL, &length, "%.*s", (int) i, block);
+      ASSERT (result != NULL);
+      ASSERT (memcmp (result, block, i) == 0);
+      ASSERT (result[i] == '\0');
+      ASSERT (length == strlen (result));
+      free (result);
+      free (block);
+    }
+  for (size_t i = 1; i <= 8; i++)
+    {
+      wchar_t *block;
+      size_t length;
+      char *result;
 
-        block = (char *) malloc (i);
-        memcpy (block, "abcdefgh", i);
-        result = my_asnprintf (NULL, &length, "%.*s", (int) i, block);
-        ASSERT (result != NULL);
-        ASSERT (memcmp (result, block, i) == 0);
-        ASSERT (result[i] == '\0');
-        ASSERT (length == strlen (result));
-        free (result);
-        free (block);
-      }
-  }
-#if HAVE_WCHAR_T
-  {
-    size_t i;
+      block = (wchar_t *) malloc (i * sizeof (wchar_t));
+      for (size_t j = 0; j < i; j++)
+        block[j] = "abcdefgh"[j];
+      result = my_asnprintf (NULL, &length, "%.*ls", (int) i, block);
+      ASSERT (result != NULL);
+      ASSERT (memcmp (result, "abcdefgh", i) == 0);
+      ASSERT (result[i] == '\0');
+      ASSERT (length == strlen (result));
+      free (result);
+      free (block);
+    }
 
-    for (i = 1; i <= 8; i++)
-      {
-        wchar_t *block;
-        size_t j;
-        size_t length;
-        char *result;
-
-        block = (wchar_t *) malloc (i * sizeof (wchar_t));
-        for (j = 0; j < i; j++)
-          block[j] = "abcdefgh"[j];
-        result = my_asnprintf (NULL, &length, "%.*ls", (int) i, block);
-        ASSERT (result != NULL);
-        ASSERT (memcmp (result, "abcdefgh", i) == 0);
-        ASSERT (result[i] == '\0');
-        ASSERT (length == strlen (result));
-        free (result);
-        free (block);
-      }
-  }
-#endif
-
-#if HAVE_WCHAR_T
   /* Test that converting an invalid wchar_t[] to char[] fails with EILSEQ.  */
   {
     static const wchar_t input[] = { (wchar_t) 1702057263, 114, 0 };
@@ -4015,7 +3987,6 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     else
       free (result);
   }
-#endif
 
   /* Test the support of the %c format directive.  */
 
@@ -4083,7 +4054,6 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
     free (result);
   }
 
-#if HAVE_WCHAR_T
   static wint_t L_x = (wchar_t) 'x';
 
   { /* Width.  */
@@ -4167,7 +4137,6 @@ test_function (char * (*my_asnprintf) (char *, size_t *, const char *, ...))
       my_asnprintf (NULL, &length, "%10lc %d", L_invalid, 33, 44, 55);
     free (result);
   }
-#endif
 
   /* Test the support of the 'x' conversion specifier for hexadecimal output of
      integers.  */
@@ -5269,5 +5238,5 @@ main (int argc, char *argv[])
 {
   test_vasnprintf ();
   test_asnprintf ();
-  return 0;
+  return test_exit_status;
 }

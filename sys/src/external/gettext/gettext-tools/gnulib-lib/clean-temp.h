@@ -1,5 +1,5 @@
 /* Temporary directories and temporary files with automatic cleanup.
-   Copyright (C) 2006, 2011-2024 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2011-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This program is free software: you can redistribute it and/or modify
@@ -57,7 +57,7 @@ extern "C" {
    is done entirely automatically by the functions of this module.
 
    Limitations: Files or directories can still be left over if
-     - the program is dies from a fatal signal such as SIGQUIT, SIGKILL, or
+     - the program dies from a fatal signal such as SIGQUIT, SIGKILL, or
        SIGABRT, SIGSEGV, SIGBUS, SIGILL, SIGFPE, or
      - in a multithreaded program, the fatal signal handler is already running
        while another thread of the program creates a new temporary directory

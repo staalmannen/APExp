@@ -1,5 +1,5 @@
 /* Determine name of the currently selected locale.
-   Copyright (C) 1995-2024 Free Software Foundation, Inc.
+   Copyright (C) 1995-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -71,19 +71,21 @@ gl_locale_name_posix (int category, const char *categoryname)
 const char *
 gl_locale_name (int category, const char *categoryname)
 {
-  const char *retval;
-
   if (category == LC_ALL)
     /* Invalid argument.  */
     abort ();
 
-  retval = gl_locale_name_thread (category, categoryname);
-  if (retval != NULL)
-    return retval;
+  {
+    const char *retval = gl_locale_name_thread (category, categoryname);
+    if (retval != NULL)
+      return retval;
+  }
 
-  retval = gl_locale_name_posix (category, categoryname);
-  if (retval != NULL)
-    return retval;
+  {
+    const char *retval = gl_locale_name_posix (category, categoryname);
+    if (retval != NULL)
+      return retval;
+  }
 
   return gl_locale_name_default ();
 }

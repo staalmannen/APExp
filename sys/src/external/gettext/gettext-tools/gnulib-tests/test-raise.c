@@ -1,5 +1,5 @@
 /* Test raising a signal.
-   Copyright (C) 2011-2024 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ SIGNATURE_CHECK (raise, int, (int));
 static _Noreturn void
 handler (_GL_UNUSED int sig)
 {
-  _exit (0);
+  _exit (test_exit_status);
 }
 
 int

@@ -1,5 +1,5 @@
 /* Child program invoked by test-spawn-pipe-main.
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,11 +37,13 @@
 
 #define BACKUP_STDERR_FILENO 10
 #define ASSERT_STREAM myerr
+#undef CONTINUE_AFTER_ASSERT
 #include "macros.h"
 
 static FILE *myerr;
 
 /* In this file, we use only system functions, no overrides from gnulib.  */
+#undef abort
 #undef atoi
 #undef close
 #undef fcntl
@@ -128,7 +130,7 @@ main (int argc, char *argv[])
       /* Expect fd 2 is closed.
          But on HP-UX 11, fd 2 gets automatically re-opened to /dev/null if it
          was closed.  Similarly on Android and on native Windows.  Future POSIX
-         will allow this, see <http://austingroupbugs.net/view.php?id=173>.  */
+         will allow this, see <https://austingroupbugs.net/view.php?id=173>.  */
 #if !(defined __hpux || defined __ANDROID__ || (defined _WIN32 && ! defined __CYGWIN__))
       if (!is_qemu)
         ASSERT (! is_open (STDERR_FILENO));
@@ -138,8 +140,7 @@ main (int argc, char *argv[])
       ASSERT (0);
     }
 
-  int fd;
-  for (fd = 3; fd < 7; fd++)
+  for (int fd = 3; fd < 7; fd++)
     if (!(is_qemu && fd == 3))
       {
         errno = 0;
@@ -147,5 +148,5 @@ main (int argc, char *argv[])
         ASSERT (errno == EBADF);
       }
 
-  return 0;
+  return test_exit_status;
 }

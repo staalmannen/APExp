@@ -1,5 +1,5 @@
 /* Test random.
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -32,11 +32,10 @@ int
 main ()
 {
   char buf[128];
-  unsigned int i;
   unsigned int n_big = 0;
 
   initstate (time (NULL), buf, sizeof buf);
-  for (i = 0; i < 1000; i++)
+  for (unsigned int i = 0; i < 1000; i++)
     {
       long r = random ();
       ASSERT (0 <= r);
@@ -45,5 +44,7 @@ main ()
     }
 
   /* Fail if none of the numbers were larger than RAND_MAX / 2.  */
-  return !n_big;
+  if (!n_big)
+    return 1;
+  return test_exit_status;
 }

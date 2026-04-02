@@ -1,6 +1,5 @@
 /* Abstract output stream data type.
-   Copyright (C) 2006, 2019 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,6 +13,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible.  */
 
 #include <config.h>
 
@@ -41,11 +42,9 @@ ptrdiff_t
 ostream_printf (ostream_t stream, const char *format, ...)
 {
   va_list args;
-  char *temp_string;
-  ptrdiff_t ret;
-
   va_start (args, format);
-  ret = vasprintf (&temp_string, format, args);
+  char *temp_string;
+  ptrdiff_t ret = vasprintf (&temp_string, format, args);
   va_end (args);
   if (ret >= 0)
     {

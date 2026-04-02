@@ -1,5 +1,5 @@
 /* Provide relocatable packages.
-   Copyright (C) 2003, 2005, 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2005, 2008-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This file is free software: you can redistribute it and/or modify
@@ -109,6 +109,8 @@ extern char * compute_curr_prefix (const char *orig_installprefix,
 #else
 
 /* By default, we use the hardwired pathnames.  */
+#define set_relocation_prefix(orig_prefix, curr_prefix) \
+  ((void) (orig_prefix), (void) (curr_prefix))
 #define relocate(pathname) (pathname)
 #define relocate2(pathname,allocatedp) (*(allocatedp) = NULL, (pathname))
 

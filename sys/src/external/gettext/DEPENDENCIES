@@ -2,7 +2,7 @@ The following packages should be installed before GNU gettext is installed
 (runtime dependencies that are also build dependencies):
 
 * GNU libiconv
-  + Not needed on systems with glibc, on macOS, and NetBSD.
+  + Not needed on systems with glibc and on NetBSD.
     But highly recommended on all other systems.
     Needed for character set conversion of PO files from/to Unicode
     and for the iconv_ostream class of libtextstyle.
@@ -16,6 +16,8 @@ The following packages should be installed before GNU gettext is installed
     - Other: https://repology.org/project/libiconv/versions
   + If it is installed in a nonstandard directory, pass the option
     --with-libiconv-prefix=DIR to 'configure'.
+  + On mingw, a slim alternative is the 'win-iconv' package version 0.0.8
+    from https://github.com/win-iconv/win-iconv .
 
 * GNU ncurses (preferred)
   or libtermcap (discouraged) or a curses library (legacy).
@@ -31,19 +33,18 @@ The following packages should be installed before GNU gettext is installed
     - On Red Hat distributions: ncurses-devel.
     - Other: https://repology.org/project/ncurses/versions
   + If it is installed in a nonstandard directory, pass the option
-    --with-ncurses-prefix=DIR or --with-libtermcap-prefix to 'configure'.
+    --with-libncurses-prefix=DIR or --with-libtermcap-prefix to 'configure'.
 
 * libxml2
   + Recommended.
-    Needed for 'xgettext' and 'msgfmt', so that it can parse XML
-    files.  Also needed for the --color option of the various
-    programs.
+    Needed for 'xgettext' and 'msgfmt', so that it can parse XML files.
+    Also needed for the --color option of the various programs.
     If not present, a subset of libxml2 (included in this package) will be
     compiled into libgettextlib.
   + Homepage:
-    http://xmlsoft.org/
+    https://gitlab.gnome.org/GNOME/libxml2/-/wikis/home
   + Download:
-    ftp://xmlsoft.org/libxml2/
+    https://download.gnome.org/sources/libxml2/
   + Pre-built package name:
     - On Debian and Debian-based systems: libxml2-dev,
     - On Red Hat distributions: libxml2-devel.
@@ -51,8 +52,38 @@ The following packages should be installed before GNU gettext is installed
   + If it is installed in a nonstandard directory, pass the option
     --with-libxml2-prefix=DIR to 'configure'.
 
-* libacl
+* libjson-c 0.13 or newer
   + Recommended.
+    Needed for machine translation.
+    If not present, 'spit' will be a Python script instead of an executable.
+  + Homepage:
+    https://github.com/json-c/json-c/wiki
+  + Download:
+    https://s3.amazonaws.com/json-c_releases/releases/index.html
+  + Pre-built package name:
+    - On Debian and Debian-based systems: libjson-c-dev,
+    - On Red Hat distributions: json-c-devel.
+    - Other: https://repology.org/project/json-c/versions
+  + When building with the MS Visual C/C++ tool chain, version 0.19 or newer
+    is required.
+
+* libcurl
+  + Recommended.
+    Needed for machine translation.
+    If not present, 'spit' will be a Python script instead of an executable.
+  + Homepage:
+    https://curl.se/libcurl/
+  + Download:
+    https://curl.se/download.html
+  + Pre-built package name:
+    - On Debian and Debian-based systems: libcurl4-gnutls-dev or libcurl4-openssl-dev,
+    - On Red Hat distributions: libcurl-devel.
+    - Other: https://repology.org/project/curl/versions
+  + When building against a static libcurl on Windows, you need to include
+    "-DCURL_STATICLIB" in the CPPFLAGS.
+
+* libacl
+  + Recommended on Linux systems.
     Needed so that the creation of backup files respects the access control
     lists (ACLs) set on the original files.
   + Homepage:
@@ -63,6 +94,19 @@ The following packages should be installed before GNU gettext is installed
     - On Debian and Debian-based systems: acl, libacl1-dev,
     - On Red Hat distributions: acl, libacl-devel.
     - Other: https://repology.org/project/acl/versions
+
+* libattr
+  + Recommended on Linux systems.
+    Needed so that the creation of backup files respects the access control
+    lists (ACLs) set on the original files, with fewer system calls.
+  + Homepage:
+    https://savannah.nongnu.org/projects/attr/
+  + Download:
+    https://download.savannah.nongnu.org/releases/attr/
+  + Pre-built package name:
+    - On Debian and Debian-based systems: libattr1-dev,
+    - On Red Hat distributions: libattr-devel.
+    - Other: https://repology.org/project/attr/versions
 
 * A Java runtime and compiler (e.g. OpenJDK, AdoptOpenJDK, or kaffe).
   + Recommended.
@@ -81,20 +125,73 @@ The following packages should be installed before GNU gettext is installed
       java-11-openjdk or java-1.8.0-openjdk or java-1.7.0-openjdk.
     - Other: https://repology.org/project/openjdk/versions
 
-* A C# runtime and compiler (e.g. mono).
+* A C# runtime and compiler (e.g. mono or dotnet).
   + Recommended.
     Needed for building GNU.Gettext.dll. Also needed for 'msgfmt' and
     'msgunfmt', so that they can handle C# resources and assemblies.
-  + Homepage:
-    http://www.mono-project.com/
-  + Download:
-    http://www.mono-project.com/download/
-  + Pre-built package name:
-    - On Debian and Debian-based systems: mono-runtime,
-    - On Red Hat distributions: mono.
-    - Other: https://repology.org/project/mono/versions
+  o Mono:
+    + Homepage:
+      https://www.mono-project.com/
+    + Download:
+      https://www.mono-project.com/download/
+    + Pre-built package name:
+      - On Debian and Debian-based systems: mono-runtime,
+      - On Red Hat distributions: mono.
+      - Other: https://repology.org/project/mono/versions
+  o dotnet:
+    + Homepage:
+      https://dotnet.microsoft.com/
+    + Download:
+      https://dotnet.microsoft.com/en-us/download
+    + Pre-built package name:
+      - On Debian and Debian-based systems: dotnet7 or dotnet8,
+      - On Red Hat distributions: dotnet7.0 or dotnet8.0.
+      - Other: https://repology.org/project/dotnet/versions
   + If more than one C# is installed, pass the option --enable-csharp=IMPL
     to 'configure', to disambiguate.
+
+* A D compiler and runtime (e.g. gdc, ldc2, or dmd).
+  + Recommended.
+    Needed for building libintl_d.a.
+  o gdc:
+    + Homepage:
+      https://wiki.dlang.org/GDC
+      https://gcc.gnu.org/
+    + Pre-built package name:
+      - On Debian and Debian-based systems: gdc,
+      - On Red Hat distributions: gcc-gdc.
+      - Other: --
+  o ldc2:
+    + Homepage:
+      https://wiki.dlang.org/LDC
+    + Download:
+      https://github.com/ldc-developers/ldc/tags
+    + Pre-built package name:
+      - On Debian and Debian-based systems: ldc,
+      - On Red Hat distributions: ldc.
+      - Other: https://repology.org/project/ldc/versions
+  o dmd:
+    + Homepage:
+      https://wiki.dlang.org/DMD
+    + Download:
+      https://dlang.org/download.html
+    + Pre-built package name:
+      - On Debian and Debian-based systems: --,
+      - On Red Hat distributions: --.
+      - Other: https://repology.org/project/dmd/versions
+  + If more than one D compiler is installed, set the environment variable
+    DC, to disambiguate.
+
+* The GNU Modula-2 compiler and runtime.
+  + Recommended.
+    Needed for building libintl_m2.so.
+  + Homepage:
+    https://www.nongnu.org/gm2/about.html
+    https://gcc.gnu.org/
+  + Pre-built package name:
+    - On Debian and Debian-based systems: gm2,
+    - On Red Hat distributions: gcc-gm2, libgm2.
+    - Other: https://repology.org/project/gcc-gm2/versions
 
 * git 1.6 or newer
   + Recommended.
@@ -190,7 +287,36 @@ The following packages should be installed before GNU gettext is installed
 The following packages should be installed when GNU gettext is installed
 (runtime dependencies, but not build dependencies):
 
-None.
+* The Gnulib localizations.
+  + Recommended.
+    Needed for localization of some of the programs to the user's language.
+  + Documentation:
+    https://www.gnu.org/software/gnulib/manual/html_node/Localization.html
+  + Download:
+    https://ftp.gnu.org/gnu/gnulib/gnulib-l10n-*
+
+* Python 3.7 or newer.
+  + Recommended if GNU Gettext was built without libjson-c or without libcurl.
+    Needed for machine translation.
+  + Homepage:
+    https://www.python.org/
+  + Download:
+    https://www.python.org/downloads/
+  + Pre-built package name:
+    - On Debian and Debian-based systems: python3,
+    - On Red Hat distributions: python3.
+    - Other: https://repology.org/project/python/versions
+* The Python module 'requests'.
+  + Recommended if GNU Gettext was built without libjson-c or without libcurl.
+    Needed for machine translation.
+  + Homepage:
+    https://pypi.org/project/requests/
+  + Download:
+    https://pypi.org/project/requests/#files
+  + Pre-built package name:
+    - On Debian and Debian-based systems: python3-requests,
+    - On Red Hat distributions: python-requests.
+    - Other: https://repology.org/project/python%3Arequests/versions
 
 
 The following should be installed when GNU gettext is built, but are not
@@ -199,7 +325,7 @@ dependencies):
 
 * A C runtime, compiler, linker, etc.
   + Mandatory.
-    Either the platform's native 'cc', or GCC 3.1 or newer.
+    Either the platform's native 'cc', or GCC 4.4 or newer.
   + GCC Homepage:
     https://gcc.gnu.org/
   + Download:

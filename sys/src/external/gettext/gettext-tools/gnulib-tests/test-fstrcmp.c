@@ -1,5 +1,5 @@
 /* Test of fuzzy string comparison.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -71,5 +71,5 @@ main (int argc, char *argv[])
   ASSERT (check_fstrcmp ("George Bush", "Abraham Lincoln", 2./13.));
   ASSERT (check_fstrcmp ("George Bush", "George \"Bugs\" Moran", 2./3.));
 
-  return 0;
+  return test_exit_status;
 }

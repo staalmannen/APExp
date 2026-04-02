@@ -1,5 +1,5 @@
 /* Test setsockopt() function.
-   Copyright (C) 2011-2024 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -51,5 +51,5 @@ main (void)
     ASSERT (errno == EBADF);
   }
 
-  return 0;
+  return test_exit_status;
 }

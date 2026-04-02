@@ -2,8 +2,7 @@
 
 #line 1 "iconv-ostream.oo.h"
 /* Output stream that converts the output to another encoding.
-   Copyright (C) 2006, 2020 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,6 +17,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Written by Bruno Haible.  */
+
 #ifndef _ICONV_OSTREAM_H
 #define _ICONV_OSTREAM_H
 
@@ -29,7 +30,7 @@
 #include "ostream.h"
 
 
-#line 33 "iconv-ostream.h"
+#line 34 "iconv-ostream.h"
 struct iconv_ostream_representation;
 /* iconv_ostream_t is defined as a pointer to struct iconv_ostream_representation.
    In C++ mode, we use a smart pointer class.
@@ -154,7 +155,7 @@ extern const typeinfo_t iconv_ostream_typeinfo;
 
 extern const struct iconv_ostream_implementation iconv_ostream_vtable;
 
-#line 37 "iconv-ostream.oo.h"
+#line 38 "iconv-ostream.oo.h"
 
 
 #ifdef __cplusplus

@@ -1,5 +1,5 @@
 /* Test of uN_set() functions.
-   Copyright (C) 2010-2024 Free Software Foundation, Inc.
+   Copyright (C) 2010-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -19,26 +19,21 @@
 int
 main ()
 {
-  {
 #define NMAX 7
-    size_t n;
+  for (size_t n = 0; n <= NMAX; n++)
+    {
+      UNIT dest[1 + NMAX + 1] =
+        { MAGIC, MAGIC, MAGIC, MAGIC, MAGIC, MAGIC, MAGIC, MAGIC, MAGIC };
+      UNIT *ret;
 
-    for (n = 0; n <= NMAX; n++)
-      {
-        UNIT dest[1 + NMAX + 1] =
-          { MAGIC, MAGIC, MAGIC, MAGIC, MAGIC, MAGIC, MAGIC, MAGIC, MAGIC };
-        UNIT *ret;
-        size_t i;
-
-        ret = U_SET (dest + 1, VALUE, n);
-        ASSERT (ret == dest + 1);
-        ASSERT (dest[0] == MAGIC);
-        for (i = 0; i < n; i++)
-          ASSERT (dest[1 + i] == VALUE);
-        ASSERT (dest[1 + n] == MAGIC);
-      }
+      ret = U_SET (dest + 1, VALUE, n);
+      ASSERT (ret == dest + 1);
+      ASSERT (dest[0] == MAGIC);
+      for (size_t i = 0; i < n; i++)
+        ASSERT (dest[1 + i] == VALUE);
+      ASSERT (dest[1 + n] == MAGIC);
+    }
 #undef NMAX
-  }
 
-  return 0;
+  return test_exit_status;
 }

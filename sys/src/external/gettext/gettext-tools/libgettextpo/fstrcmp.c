@@ -1,5 +1,5 @@
 /* Functions to make fuzzy comparisons between strings
-   Copyright (C) 1988-1989, 1992-1993, 1995, 2001-2003, 2006, 2008-2024 Free
+   Copyright (C) 1988-1989, 1992-1993, 1995, 2001-2003, 2006, 2008-2026 Free
    Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -28,7 +28,7 @@
 #include <stdlib.h>
 #include <limits.h>
 
-#include "glthread/lock.h"
+#include "glthread/once.h"
 #include "glthread/tls.h"
 #include "minmax.h"
 #include "xalloc.h"
@@ -77,10 +77,8 @@ gl_once_define(static, keys_init_once)
 void
 fstrcmp_free_resources (void)
 {
-  ptrdiff_t *buffer;
-
   gl_once (keys_init_once, keys_init);
-  buffer = gl_tls_get (buffer_key);
+  ptrdiff_t *buffer = gl_tls_get (buffer_key);
   if (buffer != NULL)
     {
       gl_tls_set (buffer_key, NULL);
@@ -100,15 +98,9 @@ fstrcmp_free_resources (void)
 double
 fstrcmp_bounded (const char *string1, const char *string2, double lower_bound)
 {
-  struct context ctxt;
   size_t xvec_length = strlen (string1);
   size_t yvec_length = strlen (string2);
   size_t length_sum = xvec_length + yvec_length;
-  ptrdiff_t i;
-
-  ptrdiff_t fdiag_len;
-  ptrdiff_t *buffer;
-  uintptr_t bufmax;
 
   /* short-circuit obvious comparisons */
   if (xvec_length == 0 || yvec_length == 0) /* Prob: 1% */
@@ -167,25 +159,23 @@ fstrcmp_bounded (const char *string1, const char *string2, double lower_bound)
                     / (xvec_length + yvec_length).
            */
           ptrdiff_t occ_diff[UCHAR_MAX + 1]; /* array C -> OCC(X,C) - OCC(Y,C) */
-          ptrdiff_t sum;
-          double dsum;
 
           /* Determine the occurrence counts in X.  */
           memset (occ_diff, 0, sizeof (occ_diff));
-          for (i = xvec_length - 1; i >= 0; i--)
+          for (ptrdiff_t i = xvec_length - 1; i >= 0; i--)
             occ_diff[(unsigned char) string1[i]]++;
           /* Subtract the occurrence counts in Y.  */
-          for (i = yvec_length - 1; i >= 0; i--)
+          for (ptrdiff_t i = yvec_length - 1; i >= 0; i--)
             occ_diff[(unsigned char) string2[i]]--;
           /* Sum up the absolute values.  */
-          sum = 0;
-          for (i = 0; i <= UCHAR_MAX; i++)
+          ptrdiff_t sum = 0;
+          for (ptrdiff_t i = 0; i <= UCHAR_MAX; i++)
             {
               ptrdiff_t d = occ_diff[i];
               sum += (d >= 0 ? d : -d);
             }
 
-          dsum = sum;
+          double dsum = sum;
           upper_bound = 1.0 - dsum / length_sum;
 
           if (upper_bound < lower_bound) /* Prob: 66% */
@@ -196,22 +186,23 @@ fstrcmp_bounded (const char *string1, const char *string2, double lower_bound)
     }
 
   /* set the info for each string.  */
+  struct context ctxt;
   ctxt.xvec = string1;
   ctxt.yvec = string2;
 
   /* Set TOO_EXPENSIVE to be approximate square root of input size,
      bounded below by 4096.  */
   ctxt.too_expensive = 1;
-  for (i = xvec_length + yvec_length; i != 0; i >>= 2)
+  for (ptrdiff_t i = xvec_length + yvec_length; i != 0; i >>= 2)
     ctxt.too_expensive <<= 1;
   if (ctxt.too_expensive < 4096)
     ctxt.too_expensive = 4096;
 
   /* Allocate memory for fdiag and bdiag from a thread-local pool.  */
-  fdiag_len = length_sum + 3;
+  ptrdiff_t fdiag_len = length_sum + 3;
   gl_once (keys_init_once, keys_init);
-  buffer = gl_tls_get (buffer_key);
-  bufmax = (uintptr_t) gl_tls_get (bufmax_key);
+  ptrdiff_t *buffer = gl_tls_get (buffer_key);
+  uintptr_t bufmax = (uintptr_t) gl_tls_get (bufmax_key);
   if (fdiag_len > bufmax)
     {
       /* Need more memory.  */

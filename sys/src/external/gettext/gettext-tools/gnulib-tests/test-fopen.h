@@ -1,5 +1,5 @@
 /* Test of opening a file stream.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #include "macros.h"
 
 /* Tell GCC not to warn about the specific edge cases tested here.  */
-#if __GNUC__ >= 10
+#if _GL_GNUC_PREREQ (10, 0)
 # pragma GCC diagnostic ignored "-Wanalyzer-file-leak"
 #endif
 

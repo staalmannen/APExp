@@ -2,8 +2,7 @@
 
 #line 1 "ostream.oo.h"
 /* Abstract output stream data type.
-   Copyright (C) 2006, 2019 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006, 2019-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -17,6 +16,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible.  */
 
 #ifndef _OSTREAM_H
 #define _OSTREAM_H
@@ -48,7 +49,7 @@ typedef enum
 
 /* An output stream is an object to which one can feed a sequence of bytes.  */
 
-#line 52 "ostream.h"
+#line 53 "ostream.h"
 struct any_ostream_representation;
 /* ostream_t is defined as a pointer to struct any_ostream_representation.
    In C++ mode, we use a smart pointer class.
@@ -140,7 +141,7 @@ extern const typeinfo_t ostream_typeinfo;
 
 extern const struct ostream_implementation ostream_vtable;
 
-#line 61 "ostream.oo.h"
+#line 62 "ostream.oo.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -153,13 +154,13 @@ extern void ostream_write_str (ostream_t stream, const char *string);
    Returns the size of formatted output, or a negative value in case of an
    error.  */
 extern ptrdiff_t ostream_printf (ostream_t stream, const char *format, ...)
-#if (__GNUC__ == 3 && __GNUC_MINOR__ >= 1) || __GNUC__ > 3
+#if (__GNUC__ == 3 && __GNUC_MINOR__ >= 1) || __GNUC__ > 3 || defined __clang__
   __attribute__ ((__format__ (__printf__, 2, 3)))
 #endif
   ;
 extern ptrdiff_t ostream_vprintf (ostream_t stream,
                                   const char *format, va_list args)
-#if (__GNUC__ == 3 && __GNUC_MINOR__ >= 1) || __GNUC__ > 3
+#if (__GNUC__ == 3 && __GNUC_MINOR__ >= 1) || __GNUC__ > 3 || defined __clang__
   __attribute__ ((__format__ (__printf__, 2, 0)))
 #endif
   ;

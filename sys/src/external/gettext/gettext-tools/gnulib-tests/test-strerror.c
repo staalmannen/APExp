@@ -1,5 +1,5 @@
 /* Test of strerror() function.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -53,7 +53,7 @@ main (void)
   /* POSIX requires strerror (0) to succeed.  Reject use of "Unknown
      error", but allow "Success", "No error", or even Solaris' "Error
      0" which are distinct patterns from true out-of-range strings.
-     http://austingroupbugs.net/view.php?id=382  */
+     https://austingroupbugs.net/view.php?id=382  */
   errno = 0;
   str = strerror (0);
   ASSERT (str);
@@ -71,5 +71,5 @@ main (void)
   ASSERT (*str);
   ASSERT (errno == 0 || errno == EINVAL);
 
-  return 0;
+  return test_exit_status;
 }

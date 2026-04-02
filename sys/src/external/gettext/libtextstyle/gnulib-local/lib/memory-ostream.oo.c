@@ -1,6 +1,5 @@
 /* Output stream that accumulates the output in memory.
-   Copyright (C) 2006-2007, 2019-2020, 2023 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,6 +14,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Written by Bruno Haible.  */
+
 #include <config.h>
 
 /* Specification.  */
@@ -23,7 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "error.h"
+#include <error.h>
 #include "xalloc.h"
 #include "xsize.h"
 #include "gettext.h"
@@ -91,7 +92,6 @@ memory_ostream_t
 memory_ostream_create (void)
 {
   memory_ostream_t stream = XMALLOC (struct memory_ostream_representation);
-
   stream->base.vtable = &memory_ostream_vtable;
   stream->allocated = 250;
   stream->buffer = XNMALLOC (stream->allocated, char);

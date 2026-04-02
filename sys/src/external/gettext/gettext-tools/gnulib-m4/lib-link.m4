@@ -1,8 +1,10 @@
-# lib-link.m4 serial 34
-dnl Copyright (C) 2001-2024 Free Software Foundation, Inc.
+# lib-link.m4
+# serial 35
+dnl Copyright (C) 2001-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl From Bruno Haible.
 
@@ -168,7 +170,7 @@ AC_DEFUN([AC_LIB_FROMPACKAGE],
   pushdef([PACKUP],[m4_translit(PACK,[abcdefghijklmnopqrstuvwxyz./+-],
                                      [ABCDEFGHIJKLMNOPQRSTUVWXYZ____])])
   define([acl_libsinpackage_]PACKUP,
-    m4_ifdef([acl_libsinpackage_]PACKUP, [m4_defn([acl_libsinpackage_]PACKUP)[, ]],)[lib$1])
+    m4_ifdef([acl_libsinpackage_]PACKUP, [m4_defn([acl_libsinpackage_]PACKUP)[[, ]]],)[lib$1])
   popdef([PACKUP])
   popdef([PACK])
 ])

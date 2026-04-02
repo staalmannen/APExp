@@ -1,5 +1,5 @@
 /* Test intprops.h.
-   Copyright (C) 2011-2024 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,19 +16,20 @@
 
 /* Written by Paul Eggert.  */
 
+#include <config.h>
+
+#if _GL_GNUC_PREREQ (4, 3)
+
 /* Tell gcc not to warn about the long expressions that the overflow
    macros expand to, or about the (X < 0) expressions.  */
-#if 4 < __GNUC__ + (3 <= __GNUC_MINOR__)
 # pragma GCC diagnostic ignored "-Woverlength-strings"
 # pragma GCC diagnostic ignored "-Wtype-limits"
 
 /* Work around a bug in GCC 6.1 and earlier; see:
-   https://gcc.gnu.org/bugzilla/show_bug.cgi?id=68971  */
+   https://gcc.gnu.org/PR68971  */
 # pragma GCC diagnostic ignored "-Woverflow"
 
 #endif
-
-#include <config.h>
 
 #ifdef TEST_STDCKDINT
 # include <stdckdint.h>
@@ -60,6 +61,21 @@
 #endif
 
 #define DONTCARE __LINE__
+
+#ifndef TEST_STDCKDINT
+/* Check that INT_PROMOTE promotes to int.
+   GCC < 4.9 lacks _Generic even though it may claim C11 conformance.  */
+# if (201112 <= __STDC_VERSION__ \
+      && (!defined __GNUC__ || 4 < __GNUC__ + (9 <= __GNUC_MINOR__) \
+          || defined __clang__))
+int check_INT_PROMOTE = _Generic (INT_PROMOTE ((short int) 0), int: 0);
+# endif
+/* For other compilers, check the size and sign of INT_PROMOTE (x).  */
+int check_INT_PROMOTE_size
+    [2 * (sizeof (INT_PROMOTE ((short int) 0)) == sizeof (int)) - 1];
+int check_INT_PROMOTE_sign
+    [2 * (INT_PROMOTE ((short int) -1) < 0) - 1];
+#endif
 
 int int_minus_2 = -2;
 int int_1 = 1;
@@ -103,6 +119,9 @@ main (void)
   ASSERT (TYPE_SIGNED (float));
   ASSERT (TYPE_SIGNED (double));
   ASSERT (TYPE_SIGNED (long double));
+
+  /* Check that INT_PROMOTE is a no-op on floats.  */
+  ASSERT (INT_PROMOTE (2.71828) > 2);
 
   /* Integer representation.  Check that it is two's complement.  */
   VERIFY (INT_MIN + INT_MAX < 0);
@@ -444,5 +463,5 @@ main (void)
   CHECK_REMAINDER (37*39u - 1, -39, true);
   CHECK_REMAINDER (LONG_MAX, -INT_MAX, false);
 
-  return 0;
+  return test_exit_status;
 }

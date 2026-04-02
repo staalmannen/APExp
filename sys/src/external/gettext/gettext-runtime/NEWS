@@ -1,3 +1,22 @@
+Version 0.26 - July 2025
+
+* Two new programs 'printf_gettext' and 'printf_ngettext' are provided,
+  that do formatted output with a localized format string in a more
+  efficient way (without spawning a subshell).
+
+Version 0.25 - April 2025
+
+* New library: libintl_d.a contains the runtime for using GNU gettext
+  message catalogs in the D programming language.
+* New library: libintl_m2.so contains the runtime for using GNU gettext
+  message catalogs in the Modula-2 programming language.
+
+Version 0.23 - December 2023
+
+* In the C.UTF-8 locale, like in the C locale, the *gettext() functions
+  now return the msgid untranslated. This is relevant for GNU systems,
+  Linux with musl libc, FreeBSD, NetBSD, OpenBSD, Cygwin, and Android.
+
 Version 0.22.5 - February 2024
 
 * The replacements for the printf()/fprintf()/... functions that are

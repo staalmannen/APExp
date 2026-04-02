@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright (C) 2003-2004, 2009 Free Software Foundation, Inc.
+# Copyright (C) 2003-2026 Free Software Foundation, Inc.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,6 +14,8 @@
 #
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+# Written by Bruno Haible.
 
 # Usage: mmsmallpo.sh hello-foo ll
 
@@ -23,7 +25,7 @@ test $# = 2  || { echo "Usage: mmsmallpo.sh hello-foo ll" 1>&2; exit 1; }
 directory=$1
 language=$2
 
-msgmerge --quiet --force-po $language.po $directory.pot -o - | \
+msgmerge --quiet --force-po $language.gpo $directory.pot -o - | \
 msgattrib --no-obsolete | \
 sed -e "s, $directory/, ,g" | sed -e "s,gettext-examples,$directory," | \
 sed -e '/^"POT-Creation-Date: .*"$/{

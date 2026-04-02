@@ -1,5 +1,5 @@
 /* Test of searching in a string.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -198,9 +198,8 @@ main ()
       "with_multilib_list\n";
     size_t h_len = strlen (h);
     char *haystack = malloc (h_len + 1);
-    size_t i;
     ASSERT (haystack);
-    for (i = 0; i < h_len - strlen (needle); i++)
+    for (size_t i = 0; i < h_len - strlen (needle); i++)
       {
         const char *p;
         memcpy (haystack, h, h_len + 1);
@@ -242,5 +241,5 @@ main ()
     free (haystack);
   }
 
-  return 0;
+  return test_exit_status;
 }

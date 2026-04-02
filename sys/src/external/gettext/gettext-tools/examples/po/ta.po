@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gettext-examples 0.22\n"
 "Report-Msgid-Bugs-To: bug-gettext@gnu.org\n"
-"POT-Creation-Date: 2023-09-18 23:34+0200\n"
+"POT-Creation-Date: 2023-06-09 02:16+0200\n"
 "PO-Revision-Date: 2023-06-19 00:06+0100\n"
 "Last-Translator: Arun Isaac <arunisaac@systemreboot.net>\n"
 "Language-Team: Tamil <tamil@systemreboot.net>\n"
@@ -42,8 +42,9 @@ msgstr "வணக்கம், உலகு!"
 #: hello-c++-gnome/hello.cc:60 hello-c++-wxwidgets/hello.cc:76
 #: hello-objc/hello.m:36 hello-objc-gnustep/Hello.m:58
 #: hello-objc-gnome/hello.m:57 hello-librep/hello.jl.in:14
-#: hello-gawk/hello.awk:12 hello-pascal/hello.running_as hello-tcl/hello.tcl:12
-#: hello-tcl-tk/hello.tcl:16 hello-perl/hello-1.pl.in:19 hello-php/hello.php:14
+#: hello-gawk/hello.awk:12 hello-pascal/hello.running_as
+#: hello-tcl/hello.tcl:12 hello-tcl-tk/hello.tcl:16
+#: hello-perl/hello-1.pl.in:19 hello-php/hello.php:14
 #, php-format
 msgid "This program is running as process number %d."
 msgstr "இந்நிரல் செயலாக்க எண் %d ஆக இயங்கிக்கொண்டிருக்கிறது."
@@ -86,7 +87,6 @@ msgid "Whether to use XML markup in the text."
 msgstr "உரையில் XML குறிமொழியைப் பயன்படுத்துவதா."
 
 #: hello-c++20/hello.cc:37
-#, c++-format
 msgid "This program is running as process number {:d}."
 msgstr "இந்நிரல் செயலாக்க எண் {:d} ஆக இயங்கிக்கொண்டிருக்கிறது."
 

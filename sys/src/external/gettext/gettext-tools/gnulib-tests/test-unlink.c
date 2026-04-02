@@ -1,5 +1,5 @@
 /* Tests of unlink.
-   Copyright (C) 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -44,5 +44,6 @@ main (void)
   /* Remove any leftovers from a previous partial run.  */
   ignore_value (system ("rm -rf " BASE "*"));
 
-  return test_unlink_func (unlink, true);
+  int result = test_unlink_func (unlink, true);
+  return (result ? result : test_exit_status);
 }

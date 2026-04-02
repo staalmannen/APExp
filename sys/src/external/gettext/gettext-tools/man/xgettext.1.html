@@ -108,11 +108,12 @@ input file language: <br>
 -L</b>, <b>--language</b>=<i>NAME</i></p>
 
 <p style="margin-left:22%;">recognise the specified
-language (C, C++, ObjectiveC, PO, Shell, Python, Lisp,
-EmacsLisp, librep, Scheme, Smalltalk, Java, JavaProperties,
-C#, awk, YCP, Tcl, Perl, PHP, Ruby, GCC-source,
-NXStringTable, RST, RSJ, Glade, Lua, JavaScript, Vala,
-Desktop)</p>
+language (C, C++, ObjectiveC, PO, Python, Java,
+JavaProperties, C#, JavaScript, TypeScript, TSX, Scheme,
+Guile, Lisp, EmacsLisp, librep, Rust, Go, Ruby, Shell, awk,
+Lua, Modula-2, D, OCaml, Smalltalk, Vala, Tcl, Perl,
+PHP, GCC-source, YCP, NXStringTable, RST, RSJ, Glade,
+GSettings, Desktop)</p>
 
 <p style="margin-left:11%;"><b>-C</b>,
 <b>--c</b>++</p>
@@ -170,6 +171,12 @@ messages (ellipsis-unicode, space-ellipsis,</p>
 bullet-unicode)</p>
 
 
+<p style="margin-left:11%;"><b>--no-check</b>=<i>NAME</i></p>
+
+<p style="margin-left:22%;">don&rsquo;t perform syntax
+check on messages (url, email)</p>
+
+
 <p style="margin-left:11%;"><b>--sentence-end</b>=<i>TYPE</i></p>
 
 <p style="margin-left:22%;">type describing the end of
@@ -183,9 +190,10 @@ specific options: <br>
 -a</b>, <b>--extract-all</b></p>
 
 <p style="margin-left:22%;">extract all strings (only
-languages C, C++, ObjectiveC, Shell, Python, Lisp,
-EmacsLisp, librep, Scheme, Java, C#, awk, Tcl, Perl, PHP,
-GCC-source, Glade, Lua, JavaScript, Vala)</p>
+languages C, C++, ObjectiveC, Python, Java, C#, JavaScript,
+TypeScript, TSX, Scheme, Guile, Lisp, EmacsLisp, librep,
+Rust, Go, Shell, awk, Lua, Modula-2, D, OCaml, Vala,
+Tcl, Perl, PHP, GCC-source, Glade, GSettings)</p>
 
 <p style="margin-left:11%;"><b>-kWORD</b>,
 <b>--keyword</b>=<i>WORD</i></p>
@@ -197,9 +205,11 @@ keyword</p>
 <b>--keyword</b></p>
 
 <p style="margin-left:22%;">do not to use default keywords
-(only languages C, C++, ObjectiveC, Shell, Python, Lisp,
-EmacsLisp, librep, Scheme, Java, C#, awk, Tcl, Perl, PHP,
-GCC-source, Glade, Lua, JavaScript, Vala, Desktop)</p>
+(only languages C, C++, ObjectiveC, Python, Java, C#,
+JavaScript, TypeScript, TSX, Scheme, Guile, Lisp, EmacsLisp,
+librep, Rust, Go, Shell, awk, Lua, Modula-2, D, OCaml,
+Vala, Tcl, Perl, PHP, GCC-source, Glade, GSettings,
+Desktop)</p>
 
 
 <p style="margin-left:11%;"><b>--flag</b>=<i>WORD</i>:ARG:FLAG</p>
@@ -208,17 +218,27 @@ GCC-source, Glade, Lua, JavaScript, Vala, Desktop)</p>
 inside the argument number ARG of keyword WORD</p>
 
 <p style="margin-left:11%;">(only languages C, C++,
-ObjectiveC, Shell,</p>
+ObjectiveC, Python,</p>
 
-<p style="margin-left:22%;">Python, Lisp, EmacsLisp,
-librep, Scheme, Java, C#, awk, YCP, Tcl, Perl, PHP,
-GCC-source, Lua, JavaScript, Vala)</p>
+<p style="margin-left:22%;">Java, C#, JavaScript,
+TypeScript, TSX, Scheme, Guile, Lisp, EmacsLisp, librep,
+Rust, Go, Shell, awk, Lua, Modula-2, D, OCaml, Vala,
+Tcl, Perl, PHP, GCC-source, YCP)</p>
+
+
+<p style="margin-left:11%;"><b>--tag</b>=<i>WORD</i>:FORMAT</p>
+
+<p style="margin-left:22%;">defines the behaviour of tagged
+template literals with tag WORD</p>
+
+<p style="margin-left:22%; margin-top: 1em">(only language
+JavaScript)</p>
 
 <p style="margin-left:11%;"><b>-T</b>,
 <b>--trigraphs</b></p>
 
 <p style="margin-left:22%;">understand ANSI C trigraphs for
-input (only languages C, C++, ObjectiveC)</p>
+input (deprecated; only languages C, C++, ObjectiveC)</p>
 
 
 <p style="margin-left:11%;"><b>--its</b>=<i>FILE</i></p>
@@ -376,6 +396,14 @@ location</p>
 &rsquo;msgid &quot;&quot;&rsquo; entry</p>
 
 
+<p style="margin-left:11%;"><b>--no-git</b></p>
+
+<p style="margin-left:22%;">don&rsquo;t use the git program
+to produce a reproducible
+&rsquo;POT-Creation-Date&rsquo; field in the
+output.</p>
+
+
 <p style="margin-left:11%;"><b>--copyright-holder</b>=<i>STRING</i></p>
 
 <p style="margin-left:22%;">set copyright holder in
@@ -403,6 +431,22 @@ output</p>
 
 <p style="margin-left:22%;">set report address for msgid
 bugs</p>
+
+
+<p style="margin-left:11%;"><b>--generated</b>=<i>FILE</i></p>
+
+<p style="margin-left:22%;">Declares that the given FILE is
+generated and therefore should not have an influence on the
+&rsquo;POT-Creation-Date&rsquo; field in the
+output.</p>
+
+
+<p style="margin-left:11%;"><b>--reference</b>=<i>FILE</i></p>
+
+<p style="margin-left:22%;">Declares that the output
+depends on the contents of the given FILE. This has an
+influence on the &rsquo;POT-Creation-Date&rsquo;
+field in the output.</p>
 
 <p style="margin-left:11%;"><b>-m[STRING]</b>,
 <b>--msgstr-prefix</b>[=<i>STRING</i>]</p>
@@ -439,7 +483,7 @@ exit</p>
 
 
 <p style="margin-left:11%; margin-top: 1em">Written by
-Ulrich Drepper.</p>
+Ulrich Drepper and Bruno Haible.</p>
 
 <h2>REPORTING BUGS
 <a name="REPORTING BUGS"></a>
@@ -457,7 +501,7 @@ email to &lt;bug-gettext@gnu.org&gt;.</p>
 
 
 <p style="margin-left:11%; margin-top: 1em">Copyright
-&copy; 1995-2023 Free Software Foundation, Inc.
+&copy; 1995-2026 Free Software Foundation, Inc.
 License GPLv3+: GNU GPL version 3 or later
 &lt;https://gnu.org/licenses/gpl.html&gt; <br>
 This is free software: you are free to change and

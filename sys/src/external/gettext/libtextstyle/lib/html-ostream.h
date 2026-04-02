@@ -2,8 +2,7 @@
 
 #line 1 "html-ostream.oo.h"
 /* Output stream that produces HTML output.
-   Copyright (C) 2006, 2019-2020 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2006.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -18,6 +17,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Written by Bruno Haible.  */
+
 #ifndef _HTML_OSTREAM_H
 #define _HTML_OSTREAM_H
 
@@ -26,7 +27,7 @@
 #include "ostream.h"
 
 
-#line 30 "html-ostream.h"
+#line 31 "html-ostream.h"
 struct html_ostream_representation;
 /* html_ostream_t is defined as a pointer to struct html_ostream_representation.
    In C++ mode, we use a smart pointer class.
@@ -181,7 +182,7 @@ extern const typeinfo_t html_ostream_typeinfo;
 
 extern const struct html_ostream_implementation html_ostream_vtable;
 
-#line 54 "html-ostream.oo.h"
+#line 55 "html-ostream.oo.h"
 
 
 #ifdef __cplusplus

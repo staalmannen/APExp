@@ -58,7 +58,7 @@ ${CONFIG_SHELL} "$top_builddir"/libtool --quiet --tag=CC --mode=link \
 ${XGETTEXT} -o prog.tmp --omit-header --no-location -k_ prog.c || Exit 1
 LC_ALL=C tr -d '\r' < prog.tmp > prog.pot || Exit 1
 
-cat <<EOF > prog.ok
+cat <<\EOF > prog.ok
 #, c-format
 msgid "'Your command, please?', asked the waiter."
 msgstr ""
@@ -111,7 +111,7 @@ test -d fr || mkdir fr
 test -d fr/LC_MESSAGES || mkdir fr/LC_MESSAGES
 
 : ${MSGFMT=msgfmt}
-${MSGFMT} -o fr/LC_MESSAGES/prog.mo fr.po
+${MSGFMT} -c -o fr/LC_MESSAGES/prog.mo fr.po
 
 : ${DIFF=diff}
 cat <<\EOF > prog.ok
@@ -128,11 +128,11 @@ EOF
 : ${LOCALE_FR=fr_FR}
 : ${LOCALE_FR_UTF8=fr_FR.UTF-8}
 if test $LOCALE_FR != none; then
-  prepare_locale_ fr $LOCALE_FR
   LANGUAGE= ./prog $LOCALE_FR 2 > prog.tmp
   case $? in
     0) case "$host_os" in
-         mingw*) LC_ALL=C tr -d '\r' < prog.tmp > prog.out || Exit 1 ;;
+         mingw* | windows*)
+           LC_ALL=C tr -d '\r' < prog.tmp > prog.out || Exit 1 ;;
          *) cp prog.tmp prog.out || Exit 1 ;;
        esac
        ${DIFF} prog.ok prog.out || Exit 1;;
@@ -141,11 +141,11 @@ if test $LOCALE_FR != none; then
   esac
 fi
 if test $LOCALE_FR_UTF8 != none; then
-  prepare_locale_ fr $LOCALE_FR_UTF8
   LANGUAGE= ./prog $LOCALE_FR_UTF8 2 > prog.tmp
   case $? in
     0) case "$host_os" in
-         mingw*) LC_ALL=C tr -d '\r' < prog.tmp > prog.out || Exit 1 ;;
+         mingw* | windows*)
+           LC_ALL=C tr -d '\r' < prog.tmp > prog.out || Exit 1 ;;
          *) cp prog.tmp prog.out || Exit 1 ;;
        esac
        ${DIFF} prog.oku prog.out || Exit 1;;

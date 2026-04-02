@@ -1,5 +1,5 @@
 /* Test of u8_mblen() function.
-   Copyright (C) 2010-2024 Free Software Foundation, Inc.
+   Copyright (C) 2010-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -43,10 +43,9 @@ main ()
 
   /* Test ISO 646 unit input.  */
   {
-    ucs4_t c;
     uint8_t buf[1];
 
-    for (c = 1; c < 0x80; c++)
+    for (ucs4_t c = 1; c < 0x80; c++)
       {
         buf[0] = c;
         ret = u8_mblen (buf, 1);
@@ -151,5 +150,5 @@ main ()
     ASSERT (ret == -1);
   }
 
-  return 0;
+  return test_exit_status;
 }

@@ -69,23 +69,18 @@
 /* First part of user prologue.  */
 #line 19 "cldr-plural.y"
 
-#ifdef HAVE_CONFIG_H
-# include <config.h>
-#endif
+#include <config.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <unistd.h>
+
+#define SB_NO_APPENDF
 #include "unistr.h"
 #include "xalloc.h"
+#include "string-buffer.h"
 
 #include "cldr-plural-exp.h"
-#include "cldr-plural.h"
-
-/* Prototypes for local functions.  */
-static int yylex (YYSTYPE *lval, struct cldr_plural_parse_args *arg);
-static void yyerror (struct cldr_plural_parse_args *arg, const char *str);
 
 /* Allocation of expressions.  */
 
@@ -171,7 +166,26 @@ new_range (struct cldr_plural_operand_ty *start,
   return result;
 }
 
-#line 175 "cldr-plural.c"
+/* Internal state of the Bison-generated parser.  */
+
+struct cldr_plural_parse_args
+{
+  /* The lifetime of cp, cp_end is limited to the cldr_plural_parse
+     invocation.  */
+  const char *cp;
+  const char *cp_end;
+
+  struct cldr_plural_rule_list_ty *result;
+};
+
+#include "cldr-plural.h"
+
+/* Prototypes for local functions, that must come after the rules.  */
+static int yylex (YYSTYPE *lval, struct cldr_plural_parse_args *arg);
+static void yyerror (struct cldr_plural_parse_args *arg, const char *str);
+
+
+#line 189 "cldr-plural.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -623,10 +637,10 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,   161,   161,   162,   165,   178,   181,   185,   191,   195,
-     203,   207,   213,   217,   223,   230,   236,   240,   246,   253,
-     256,   257,   260,   261,   264,   266,   267,   269,   270,   273,
-     275,   277,   279
+       0,   175,   175,   176,   179,   192,   195,   199,   205,   209,
+     217,   221,   227,   231,   237,   244,   250,   254,   260,   267,
+     270,   271,   274,   275,   278,   280,   281,   283,   284,   287,
+     289,   291,   293
 };
 #endif
 
@@ -963,69 +977,69 @@ yydestruct (const char *yymsg,
   switch (yykind)
     {
     case YYSYMBOL_KEYWORD: /* KEYWORD  */
-#line 140 "cldr-plural.y"
+#line 154 "cldr-plural.y"
             { free (((*yyvaluep).sval)); }
-#line 969 "cldr-plural.c"
+#line 983 "cldr-plural.c"
         break;
 
     case YYSYMBOL_INTEGER: /* INTEGER  */
-#line 145 "cldr-plural.y"
+#line 159 "cldr-plural.y"
             { free (((*yyvaluep).oval)); }
-#line 975 "cldr-plural.c"
+#line 989 "cldr-plural.c"
         break;
 
     case YYSYMBOL_DECIMAL: /* DECIMAL  */
-#line 145 "cldr-plural.y"
+#line 159 "cldr-plural.y"
             { free (((*yyvaluep).oval)); }
-#line 981 "cldr-plural.c"
+#line 995 "cldr-plural.c"
         break;
 
     case YYSYMBOL_OPERAND: /* OPERAND  */
-#line 147 "cldr-plural.y"
+#line 161 "cldr-plural.y"
             { }
-#line 987 "cldr-plural.c"
+#line 1001 "cldr-plural.c"
         break;
 
     case YYSYMBOL_condition: /* condition  */
-#line 141 "cldr-plural.y"
+#line 155 "cldr-plural.y"
             { cldr_plural_condition_free (((*yyvaluep).cval)); }
-#line 993 "cldr-plural.c"
+#line 1007 "cldr-plural.c"
         break;
 
     case YYSYMBOL_and_condition: /* and_condition  */
-#line 141 "cldr-plural.y"
+#line 155 "cldr-plural.y"
             { cldr_plural_condition_free (((*yyvaluep).cval)); }
-#line 999 "cldr-plural.c"
+#line 1013 "cldr-plural.c"
         break;
 
     case YYSYMBOL_relation: /* relation  */
-#line 142 "cldr-plural.y"
+#line 156 "cldr-plural.y"
             { cldr_plural_relation_free (((*yyvaluep).lval)); }
-#line 1005 "cldr-plural.c"
+#line 1019 "cldr-plural.c"
         break;
 
     case YYSYMBOL_expression: /* expression  */
-#line 143 "cldr-plural.y"
+#line 157 "cldr-plural.y"
             { free (((*yyvaluep).eval)); }
-#line 1011 "cldr-plural.c"
+#line 1025 "cldr-plural.c"
         break;
 
     case YYSYMBOL_range_list: /* range_list  */
-#line 146 "cldr-plural.y"
+#line 160 "cldr-plural.y"
             { cldr_plural_range_list_free (((*yyvaluep).rval)); }
-#line 1017 "cldr-plural.c"
+#line 1031 "cldr-plural.c"
         break;
 
     case YYSYMBOL_range_or_integer: /* range_or_integer  */
-#line 144 "cldr-plural.y"
+#line 158 "cldr-plural.y"
             { cldr_plural_range_free (((*yyvaluep).gval)); }
-#line 1023 "cldr-plural.c"
+#line 1037 "cldr-plural.c"
         break;
 
     case YYSYMBOL_range: /* range  */
-#line 144 "cldr-plural.y"
+#line 158 "cldr-plural.y"
             { cldr_plural_range_free (((*yyvaluep).gval)); }
-#line 1029 "cldr-plural.c"
+#line 1043 "cldr-plural.c"
         break;
 
       default:
@@ -1299,7 +1313,7 @@ yyreduce:
   switch (yyn)
     {
   case 4: /* rule: KEYWORD ':' condition samples  */
-#line 166 "cldr-plural.y"
+#line 180 "cldr-plural.y"
         {
           struct cldr_plural_rule_ty *rule = new_rule ((yyvsp[-3].sval), (yyvsp[-1].cval));
           struct cldr_plural_rule_list_ty *result = arg->result;
@@ -1312,144 +1326,144 @@ yyreduce:
             }
           result->items[result->nitems++] = rule;
         }
-#line 1316 "cldr-plural.c"
+#line 1330 "cldr-plural.c"
     break;
 
   case 6: /* condition: and_condition  */
-#line 182 "cldr-plural.y"
+#line 196 "cldr-plural.y"
         {
           (yyval.cval) = (yyvsp[0].cval);
         }
-#line 1324 "cldr-plural.c"
+#line 1338 "cldr-plural.c"
     break;
 
   case 7: /* condition: condition OR and_condition  */
-#line 186 "cldr-plural.y"
+#line 200 "cldr-plural.y"
         {
           (yyval.cval) = new_branch_condition (CLDR_PLURAL_CONDITION_OR, (yyvsp[-2].cval), (yyvsp[0].cval));
         }
-#line 1332 "cldr-plural.c"
+#line 1346 "cldr-plural.c"
     break;
 
   case 8: /* and_condition: relation  */
-#line 192 "cldr-plural.y"
+#line 206 "cldr-plural.y"
         {
           (yyval.cval) = new_leaf_condition ((yyvsp[0].lval));
         }
-#line 1340 "cldr-plural.c"
+#line 1354 "cldr-plural.c"
     break;
 
   case 9: /* and_condition: and_condition AND relation  */
-#line 196 "cldr-plural.y"
+#line 210 "cldr-plural.y"
         {
           (yyval.cval) = new_branch_condition (CLDR_PLURAL_CONDITION_AND,
                                      (yyvsp[-2].cval),
                                      new_leaf_condition ((yyvsp[0].lval)));
         }
-#line 1350 "cldr-plural.c"
+#line 1364 "cldr-plural.c"
     break;
 
   case 10: /* relation: expression '=' range_list  */
-#line 204 "cldr-plural.y"
+#line 218 "cldr-plural.y"
         {
           (yyval.lval) = new_relation ((yyvsp[-2].eval), CLDR_PLURAL_RELATION_EQUAL, (yyvsp[0].rval));
         }
-#line 1358 "cldr-plural.c"
+#line 1372 "cldr-plural.c"
     break;
 
   case 11: /* relation: expression '!' range_list  */
-#line 208 "cldr-plural.y"
+#line 222 "cldr-plural.y"
         {
           (yyval.lval) = new_relation ((yyvsp[-2].eval), CLDR_PLURAL_RELATION_NOT_EQUAL, (yyvsp[0].rval));
         }
-#line 1366 "cldr-plural.c"
+#line 1380 "cldr-plural.c"
     break;
 
   case 12: /* expression: OPERAND  */
-#line 214 "cldr-plural.y"
+#line 228 "cldr-plural.y"
         {
           (yyval.eval) = new_expression ((yyvsp[0].ival), 0);
         }
-#line 1374 "cldr-plural.c"
+#line 1388 "cldr-plural.c"
     break;
 
   case 13: /* expression: OPERAND '%' INTEGER  */
-#line 218 "cldr-plural.y"
+#line 232 "cldr-plural.y"
         {
           (yyval.eval) = new_expression ((yyvsp[-2].ival), (yyvsp[0].oval)->value.ival);
         }
-#line 1382 "cldr-plural.c"
+#line 1396 "cldr-plural.c"
     break;
 
   case 14: /* range_list: range_or_integer  */
-#line 224 "cldr-plural.y"
+#line 238 "cldr-plural.y"
         {
           struct cldr_plural_range_list_ty *ranges =
             XMALLOC (struct cldr_plural_range_list_ty);
           memset (ranges, 0, sizeof (struct cldr_plural_range_list_ty));
           (yyval.rval) = add_range (ranges, (yyvsp[0].gval));
         }
-#line 1393 "cldr-plural.c"
+#line 1407 "cldr-plural.c"
     break;
 
   case 15: /* range_list: range_list ',' range_or_integer  */
-#line 231 "cldr-plural.y"
+#line 245 "cldr-plural.y"
         {
           (yyval.rval) = add_range ((yyvsp[-2].rval), (yyvsp[0].gval));
         }
-#line 1401 "cldr-plural.c"
+#line 1415 "cldr-plural.c"
     break;
 
   case 16: /* range_or_integer: range  */
-#line 237 "cldr-plural.y"
+#line 251 "cldr-plural.y"
         {
           (yyval.gval) = (yyvsp[0].gval);
         }
-#line 1409 "cldr-plural.c"
+#line 1423 "cldr-plural.c"
     break;
 
   case 17: /* range_or_integer: INTEGER  */
-#line 241 "cldr-plural.y"
+#line 255 "cldr-plural.y"
         {
           (yyval.gval) = new_range ((yyvsp[0].oval), (yyvsp[0].oval));
         }
-#line 1417 "cldr-plural.c"
-    break;
-
-  case 18: /* range: INTEGER RANGE INTEGER  */
-#line 247 "cldr-plural.y"
-        {
-          (yyval.gval) = new_range ((yyvsp[-2].oval), (yyvsp[0].oval));
-        }
-#line 1425 "cldr-plural.c"
-    break;
-
-  case 29: /* sample_range: DECIMAL  */
-#line 274 "cldr-plural.y"
-        { free ((yyvsp[0].oval)); }
 #line 1431 "cldr-plural.c"
     break;
 
+  case 18: /* range: INTEGER RANGE INTEGER  */
+#line 261 "cldr-plural.y"
+        {
+          (yyval.gval) = new_range ((yyvsp[-2].oval), (yyvsp[0].oval));
+        }
+#line 1439 "cldr-plural.c"
+    break;
+
+  case 29: /* sample_range: DECIMAL  */
+#line 288 "cldr-plural.y"
+        { free ((yyvsp[0].oval)); }
+#line 1445 "cldr-plural.c"
+    break;
+
   case 30: /* sample_range: DECIMAL '~' DECIMAL  */
-#line 276 "cldr-plural.y"
+#line 290 "cldr-plural.y"
         { free ((yyvsp[-2].oval)); free ((yyvsp[0].oval)); }
-#line 1437 "cldr-plural.c"
+#line 1451 "cldr-plural.c"
     break;
 
   case 31: /* sample_range: INTEGER  */
-#line 278 "cldr-plural.y"
+#line 292 "cldr-plural.y"
         { free ((yyvsp[0].oval)); }
-#line 1443 "cldr-plural.c"
+#line 1457 "cldr-plural.c"
     break;
 
   case 32: /* sample_range: INTEGER '~' INTEGER  */
-#line 280 "cldr-plural.y"
+#line 294 "cldr-plural.y"
         { free ((yyvsp[-2].oval)); free ((yyvsp[0].oval)); }
-#line 1449 "cldr-plural.c"
+#line 1463 "cldr-plural.c"
     break;
 
 
-#line 1453 "cldr-plural.c"
+#line 1467 "cldr-plural.c"
 
       default: break;
     }
@@ -1642,8 +1656,10 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 283 "cldr-plural.y"
+#line 297 "cldr-plural.y"
 
+
+/* Functions invoked by the Bison-generated parser.  */
 
 static int
 yylex (YYSTYPE *lval, struct cldr_plural_parse_args *arg)
@@ -1652,9 +1668,6 @@ yylex (YYSTYPE *lval, struct cldr_plural_parse_args *arg)
   ucs4_t uc;
   int length;
   int result;
-  static char *buffer;
-  static size_t bufmax;
-  size_t bufpos;
 
   while (1)
     {
@@ -1676,27 +1689,27 @@ yylex (YYSTYPE *lval, struct cldr_plural_parse_args *arg)
       arg->cp = exp + length;
       return ELLIPSIS;
     }
-  else if (strncmp ("...", exp, 3) == 0)
+  else if (str_startswith (exp, "..."))
     {
       arg->cp = exp + 3;
       return ELLIPSIS;
     }
-  else if (strncmp ("..", exp, 2) == 0)
+  else if (str_startswith (exp, ".."))
     {
       arg->cp = exp + 2;
       return RANGE;
     }
-  else if (strncmp ("other", exp, 5) == 0)
+  else if (str_startswith (exp, "other"))
     {
       arg->cp = exp + 5;
       return OTHER;
     }
-  else if (strncmp ("@integer", exp, 8) == 0)
+  else if (str_startswith (exp, "@integer"))
     {
       arg->cp = exp + 8;
       return AT_INTEGER;
     }
-  else if (strncmp ("@decimal", exp, 8) == 0)
+  else if (str_startswith (exp, "@decimal"))
     {
       arg->cp = exp + 8;
       return AT_DECIMAL;
@@ -1747,67 +1760,65 @@ yylex (YYSTYPE *lval, struct cldr_plural_parse_args *arg)
     case 'h': case 'i': case 'j': case 'k': case 'l': case 'm': case 'n':
     case 'o': case 'p': case 'q': case 'r': case 's': case 't': case 'u':
     case 'v': case 'w': case 'x': case 'y': case 'z':
-      bufpos = 0;
-      for (;;)
-        {
-          if (bufpos >= bufmax)
-            {
-              bufmax = 2 * bufmax + 10;
-              buffer = xrealloc (buffer, bufmax);
-            }
-          buffer[bufpos++] = result;
-          result = *exp;
-          switch (result)
-            {
-            case 'a': case 'b': case 'c': case 'd': case 'e':
-            case 'f': case 'g': case 'h': case 'i': case 'j':
-            case 'k': case 'l': case 'm': case 'n': case 'o':
-            case 'p': case 'q': case 'r': case 's': case 't':
-            case 'u': case 'v': case 'w': case 'x': case 'y':
-            case 'z':
-              ++exp;
-              continue;
-            default:
-              break;
-            }
-          break;
-        }
+      {
+        struct string_buffer buffer;
 
-      if (bufpos >= bufmax)
-        {
-          bufmax = 2 * bufmax + 10;
-          buffer = xrealloc (buffer, bufmax);
-        }
-      buffer[bufpos] = '\0';
+        sb_init (&buffer);
+        for (;;)
+          {
+            sb_xappend1 (&buffer, result);
+            result = *exp;
+            switch (result)
+              {
+              case 'a': case 'b': case 'c': case 'd': case 'e':
+              case 'f': case 'g': case 'h': case 'i': case 'j':
+              case 'k': case 'l': case 'm': case 'n': case 'o':
+              case 'p': case 'q': case 'r': case 's': case 't':
+              case 'u': case 'v': case 'w': case 'x': case 'y':
+              case 'z':
+                ++exp;
+                continue;
+              default:
+                break;
+              }
+            break;
+          }
 
-      /* Operands.  */
-      if (bufpos == 1)
-        {
-          switch (buffer[0])
-            {
-            case 'n': case 'i': case 'f': case 't': case 'v': case 'w':
-              arg->cp = exp;
-              lval->ival = buffer[0];
-              return OPERAND;
-            default:
-              break;
-            }
-        }
+        const char *ident = sb_xcontents_c (&buffer);
 
-      /* Keywords.  */
-      if (strcmp (buffer, "and") == 0)
-        {
-          arg->cp = exp;
-          return AND;
-        }
-      else if (strcmp (buffer, "or") == 0)
-        {
-          arg->cp = exp;
-          return OR;
-        }
+        /* Operands.  */
+        if (strlen (ident) == 1)
+          {
+            switch (ident[0])
+              {
+              // See https://unicode.org/reports/tr35/tr35-numbers.html#table-plural-operand-meanings
+              case 'n': case 'i': case 'f': case 't': case 'v': case 'w': case 'c': case 'e':
+                arg->cp = exp;
+                lval->ival = ident[0];
+                sb_free (&buffer);
+                return OPERAND;
+              default:
+                break;
+              }
+          }
 
-      lval->sval = xstrdup (buffer);
-      result = KEYWORD;
+        /* Keywords.  */
+        if (strcmp (ident, "and") == 0)
+          {
+            arg->cp = exp;
+            sb_free (&buffer);
+            return AND;
+          }
+        else if (strcmp (ident, "or") == 0)
+          {
+            arg->cp = exp;
+            sb_free (&buffer);
+            return OR;
+          }
+
+        lval->sval = sb_xdupfree_c (&buffer);
+        result = KEYWORD;
+      }
       break;
     case '!':
       if (exp[0] == '=')
@@ -1831,4 +1842,23 @@ static void
 yyerror (struct cldr_plural_parse_args *arg, char const *s)
 {
   fprintf (stderr, "%s\n", s);
+}
+
+/* Entry point to the parser.  */
+
+struct cldr_plural_rule_list_ty *
+cldr_plural_parse (const char *input)
+{
+  struct cldr_plural_parse_args arg;
+
+  memset (&arg, 0, sizeof (struct cldr_plural_parse_args));
+  arg.cp = input;
+  arg.cp_end = input + strlen (input);
+  arg.result = XMALLOC (struct cldr_plural_rule_list_ty);
+  memset (arg.result, 0, sizeof (struct cldr_plural_rule_list_ty));
+
+  if (yyparse (&arg) != 0)
+    return NULL;
+
+  return arg.result;
 }

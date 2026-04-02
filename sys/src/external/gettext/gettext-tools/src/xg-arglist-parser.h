@@ -1,6 +1,6 @@
 /* Resolving ambiguity of argument lists: Progressive parsing of an
    argument list, keeping track of all possibilities.
-   Copyright (C) 2001-2023 Free Software Foundation, Inc.
+   Copyright (C) 2001-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,6 +14,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible.  */
 
 #ifndef _XGETTEXT_ARGLIST_PARSER_H
 #define _XGETTEXT_ARGLIST_PARSER_H
@@ -48,12 +50,12 @@ struct partial_call
   mixed_string_ty *msgctxt;     /* context - owned mixed_string, or NULL */
   lex_pos_ty msgctxt_pos;
   mixed_string_ty *msgid;       /* msgid - owned mixed_string, or NULL */
-  flag_context_ty msgid_context;
+  flag_region_ty *msgid_region;
   lex_pos_ty msgid_pos;
   refcounted_string_list_ty *msgid_comment;
   bool msgid_comment_is_utf8;
   mixed_string_ty *msgid_plural; /* msgid_plural - owned mixed_string, or NULL */
-  flag_context_ty msgid_plural_context;
+  flag_region_ty *msgid_plural_region;
   lex_pos_ty msgid_plural_pos;
 };
 
@@ -85,7 +87,7 @@ extern struct arglist_parser * arglist_parser_clone (struct arglist_parser *ap);
  */
 extern void arglist_parser_remember (struct arglist_parser *ap,
                                      int argnum, mixed_string_ty *string,
-                                     flag_context_ty context,
+                                     flag_region_ty *region,
                                      const char *file_name, size_t line_number,
                                      refcounted_string_list_ty *comment,
                                      bool comment_is_utf8);
@@ -95,7 +97,7 @@ extern void arglist_parser_remember (struct arglist_parser *ap,
    FILE_NAME must be allocated with indefinite extent.  */
 extern void arglist_parser_remember_msgctxt (struct arglist_parser *ap,
                                              mixed_string_ty *string,
-                                             flag_context_ty context,
+                                             flag_region_ty *region,
                                              const char *file_name, size_t line_number);
 /* Tests whether an arglist_parser has is not waiting for more arguments after
    argument ARGNUM.  */

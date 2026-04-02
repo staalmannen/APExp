@@ -1,5 +1,5 @@
 ## Makefile for the gettext-tools/src subdirectory of GNU gettext
-## Copyright (C) 1995-1998, 2000-2023 Free Software Foundation, Inc.
+## Copyright (C) 1995-2026 Free Software Foundation, Inc.
 ##
 ## This program is free software: you can redistribute it and/or modify
 ## it under the terms of the GNU General Public License as published by
@@ -16,7 +16,7 @@
 
 ## Process this file with automake to produce Makefile.in.
 
-AUTOMAKE_OPTIONS = 1.5 gnits no-dependencies subdir-objects
+AUTOMAKE_OPTIONS = 1.5 gnits subdir-objects
 EXTRA_DIST =
 BUILT_SOURCES =
 MOSTLYCLEANFILES = core *.stackdump
@@ -27,11 +27,20 @@ MAINTAINERCLEANFILES =
 RM = rm -f
 
 bin_PROGRAMS = \
-msgcmp msgfmt msgmerge msgunfmt xgettext \
-msgattrib msgcat msgcomm msgconv msgen msgexec msgfilter msggrep msginit msguniq \
-recode-sr-latin
+  msgcmp msgfmt msgmerge msgunfmt xgettext \
+  msgattrib msgcat msgcomm msgconv msgen msgexec msgfilter msggrep msginit \
+  msgpre msguniq \
+  recode-sr-latin
+if BUILD_SPIT_IN_C
+bin_PROGRAMS += spit
+endif
 
 noinst_PROGRAMS = hostname urlget cldr-plurals
+
+noinst_SCRIPTS = spit.py
+if !BUILD_SPIT_IN_C
+noinst_SCRIPTS += spit
+endif
 
 if INSTALL_PRIVATE_LIBRARIES
 # Specify that libgettextsrc should be installed in $(libdir).
@@ -41,16 +50,21 @@ else
 noinst_LTLIBRARIES = libgettextsrc.la
 endif
 
+noinst_LIBRARIES = libxgettextx.a $(LIBXGETTEXTTS)
+
 noinst_HEADERS = \
-  pos.h message.h po-error.h po-xerror.h po-gram.h po-charset.h \
-  po-lex.h open-catalog.h read-catalog-abstract.h read-catalog.h \
+  pos.h message.h po-error.h xerror-handler.h po-xerror.h \
+  read-po-internal.h po-charset.h read-po-lex.h \
+  open-catalog.h read-catalog-special.h \
+  read-catalog-abstract.h read-catalog.h read-catalog-file.h \
   read-po.h read-properties.h read-stringtable.h \
   str-list.h \
   write-catalog.h write-po.h write-properties.h write-stringtable.h \
-  dir-list.h file-list.h po-gram-gen.h po-gram-gen2.h cldr-plural.h \
-  cldr-plural-exp.h locating-rule.h its.h search-path.h \
+  dir-list.h file-list.h read-po-gram.h cldr-plural.h \
+  cldr-plural-exp.h locating-rules.h its.h search-path.h \
   msgl-charset.h msgl-equal.h msgl-iconv.h msgl-ascii.h msgl-ofn.h msgl-cat.h \
-  msgl-header.h msgl-english.h msgl-check.h msgl-fsearch.h msgfmt.h msgunfmt.h \
+  msgl-header.h msgl-english.h msgl-check.h msgl-fsearch.h msgl-merge.h \
+  msgfmt.h msgunfmt.h \
   plural-count.h plural-eval.h plural-distrib.h \
   read-mo.h write-mo.h \
   read-java.h write-java.h \
@@ -60,24 +74,34 @@ noinst_HEADERS = \
   write-qt.h \
   read-desktop.h write-desktop.h \
   write-xml.h \
-  po-time.h plural-table.h lang-table.h format.h filters.h \
+  po-time.h plural-table.h lang-table.h country-table.h format.h filters.h \
   xgettext.h \
-  rc-str-list.h xg-pos.h xg-encoding.h xg-mixed-string.h xg-arglist-context.h \
-  xg-arglist-callshape.h xg-arglist-parser.h xg-message.h \
+  if-error.h \
+  rc-str-list.h xg-pos.h xg-encoding.h xg-mixed-string.h xg-formatstring.h \
+  xg-arglist-context.h xg-arglist-callshape.h xg-arglist-parser.h xg-message.h \
+  xg-check.h \
   x-po.h x-properties.h x-stringtable.h \
   x-c.h \
   x-python.h \
   x-java.h \
   x-csharp.h \
   x-javascript.h \
+  x-typescript.h \
+  x-typescriptx.h \
+  x-typescript-impl.h \
   x-scheme.h \
   x-lisp.h \
   x-elisp.h \
   x-librep.h \
+  x-rust.h \
+  x-go.h \
   x-ruby.h \
   x-sh.h \
   x-awk.h \
   x-lua.h \
+  x-modula2.h \
+  x-d.h html5-entities.h \
+  x-ocaml.h \
   x-smalltalk.h \
   x-vala.h \
   x-tcl.h \
@@ -90,26 +114,34 @@ noinst_HEADERS = \
 
 EXTRA_DIST += FILES project-id
 
-aliaspath = $(localedir)
-jardir = $(datadir)/gettext
-pkgdatadir = $(datadir)/gettext
+# The following are already set through configmake.m4 and configure.ac:
+#pkgdatadir = $(datadir)/gettext
+#pkglibdir = $(libdir)/gettext
+#pkglibexecdir = $(libexecdir)/gettext
+jardir = $(pkgdatadir)
+jardir_c_make = $(pkgdatadir_c_make)
 projectsdir = $(pkgdatadir)/projects
-pkglibdir = $(libdir)/gettext
+projectsdir_c_make = $(pkgdatadir_c_make)\"/projects\"
+schemadir = $(pkgdatadir)/schema
 
+# Note that Automake's $(DEFAULT_INCLUDES) already contains
+# -I. -I$(srcdir) -I$(top_builddir).
+# The option -I$(top_srcdir) is needed so that woe32dll/export.h is found.
 AM_CPPFLAGS = \
-  -I. -I$(srcdir) \
-  -I.. -I$(top_srcdir) \
-  -I$(top_srcdir)/libgrep \
+  -I$(top_srcdir) \
+  -I$(top_srcdir)/tree-sitter-$(TREE_SITTER_VERSION)/lib/include \
+  -I../libgrep -I$(top_srcdir)/libgrep \
   -I../gnulib-lib -I$(top_srcdir)/gnulib-lib \
   -I../../gettext-runtime/intl -I$(top_srcdir)/../gettext-runtime/intl
 DEFS = \
-  -DLOCALEDIR=$(localedir_c_make) -DBISON_LOCALEDIR=\"$(BISON_LOCALEDIR)\" \
-  -DLOCALE_ALIAS_PATH=\"$(aliaspath)\" \
+  -DLOCALEDIR=$(localedir_c_make) \
   -DUSEJAVA=$(USEJAVA) \
-  -DGETTEXTJAR=\"$(jardir)/gettext.jar\" \
-  -DLIBDIR=\"$(libdir)\" \
-  -DGETTEXTDATADIR=\"$(pkgdatadir)\" \
-  -DPROJECTSDIR=\"$(projectsdir)\" \
+  -DGETTEXTJAR=$(jardir_c_make)\"/gettext.jar\" \
+  -DBINDIR=$(bindir_c_make) \
+  -DLIBDIR=$(libdir_c_make) \
+  -DLIBEXECDIR=$(libexecdir_c_make) \
+  -DGETTEXTDATADIR=$(pkgdatadir_c_make) \
+  -DPROJECTSDIR=$(projectsdir_c_make) \
   -DEXEEXT=\"@EXEEXT@\" @DEFS@
 
 # Enable more warning options in this directory.
@@ -133,14 +165,30 @@ CSHARPCOMPFLAGS = @CSHARPCOMPFLAGS@
 # All programs must read PO files. (msgunfmt also, for read-java.c,
 # read-csharp.c and read-resources.c.)
 # message.c -> str-list.c.
-# (read-catalog-abstract.c <--> po-gram-gen.y <--> po-lex.c) -> str-list.c.
-# (read-catalog-abstract.c <--> po-gram-gen.y <--> po-lex.c) -> open-catalog.c -> dir-list.c -> str-list.c.
-# (read-catalog-abstract.c <--> po-gram-gen.y <--> po-lex.c) -> po-charset.c.
-# (read-catalog-abstract.c <--> po-gram-gen.y <--> po-lex.c) -> message.c -> str-list.c.
-COMMON_SOURCE = message.c pos.c po-error.c po-xerror.c \
-read-catalog-abstract.c po-lex.c po-gram-gen.y po-charset.c \
-read-po.c read-properties.c read-stringtable.c open-catalog.c \
-dir-list.c str-list.c
+# (read-catalog-abstract.c <--> read-po-gram.y <--> read-po-lex.c) -> str-list.c.
+# (read-catalog-abstract.c <--> read-po-gram.y <--> read-po-lex.c) -> po-charset.c.
+# (read-catalog-abstract.c <--> read-po-gram.y <--> read-po-lex.c) -> message.c -> str-list.c.
+# read-catalog-file.c -> open-catalog.c -> dir-list.c -> str-list.c.
+COMMON_SOURCE = \
+  message.c \
+  pos.c \
+  po-error.c
+if !WOE32DLL
+COMMON_SOURCE += xerror-handler.c
+else
+COMMON_SOURCE += ../woe32dll/c++xerror-handler.cc
+endif
+COMMON_SOURCE += \
+  read-catalog-abstract.c \
+  read-po-lex.c \
+  read-po-gram.y \
+  po-charset.c \
+  read-po.c \
+  read-properties.c \
+  read-stringtable.c \
+  open-catalog.c \
+  dir-list.c \
+  str-list.c
 
 # xgettext and msgfmt deal with format strings.
 if !WOE32DLL
@@ -162,11 +210,17 @@ FORMAT_SOURCE += \
   format-lisp.c \
   format-elisp.c \
   format-librep.c \
+  format-rust.c \
+  format-go.c \
   format-ruby.c \
   format-sh.c \
+  format-sh-printf.c \
   format-awk.c \
   format-lua.c \
   format-pascal.c \
+  format-modula2.c \
+  format-d.c \
+  format-ocaml.c \
   format-smalltalk.c \
   format-qt.c \
   format-qt-plural.c \
@@ -180,10 +234,12 @@ FORMAT_SOURCE += \
   format-gcc-internal.c \
   format-gfc-internal.c
 
-# libgettextsrc contains all code that is needed by at least two programs.
+# libgettextsrc contains all code that is needed by at least two programs
+# and that does not use OpenMP.
 libgettextsrc_la_SOURCES = \
   $(COMMON_SOURCE) \
-  read-catalog.c \
+  read-catalog-special.c \
+  read-catalog.c read-catalog-file.c \
   write-catalog.c write-properties.c write-stringtable.c write-po.c \
   msgl-ascii.c \
   msgl-ofn.c \
@@ -195,17 +251,59 @@ libgettextsrc_la_SOURCES = \
   msgl-check.c \
   file-list.c \
   msgl-charset.c \
+  msgl-fsearch.c \
+  lang-table.c \
   po-time.c \
   plural-exp.c plural-eval.c plural-table.c \
+  plural-count.c \
   quote.h \
   sentence.h sentence.c \
   $(FORMAT_SOURCE) \
   read-desktop.c \
-  locating-rule.c its.c \
+  locating-rules.c its.c \
   search-path.c
 
+# xgettext has some tree-sitter based backends.
+LIBXGETTEXTTS = libxgettextts2.a libxgettextts3.a libxgettextts4.a libxgettextts5.a libxgettextts1.a
+libxgettextts1_a_SOURCES = \
+  ../tree-sitter-$(TREE_SITTER_VERSION)/lib/src/lib.c
+libxgettextts1_a_CPPFLAGS = \
+  -I$(top_srcdir)/tree-sitter-$(TREE_SITTER_VERSION)/lib/include \
+  -I$(top_srcdir)/tree-sitter-$(TREE_SITTER_VERSION)/lib/src
+libxgettextts1_a_CFLAGS = $(AM_CFLAGS) @FOREIGN_WARN_CFLAGS@ @NO_EXPENSIVE_WARN_CFLAGS@
+libxgettextts2_a_SOURCES = \
+  ../tree-sitter-rust-$(TREE_SITTER_RUST_VERSION)/src/rust-parser.c \
+  ../tree-sitter-rust-$(TREE_SITTER_RUST_VERSION)/src/rust-scanner.c \
+  ../tree-sitter-go-$(TREE_SITTER_GO_VERSION)/src/go-parser.c \
+  ../tree-sitter-d-$(TREE_SITTER_D_VERSION)/src/d-parser.c \
+  ../tree-sitter-d-$(TREE_SITTER_D_VERSION)/src/d-scanner.c
+libxgettextts2_a_CPPFLAGS = \
+  -I$(top_srcdir)/tree-sitter-$(TREE_SITTER_VERSION)/lib/include
+libxgettextts2_a_CFLAGS = $(AM_CFLAGS) @FOREIGN_WARN_CFLAGS@ @NO_EXPENSIVE_WARN_CFLAGS@
+libxgettextts3_a_SOURCES = \
+  ../tree-sitter-typescript-$(TREE_SITTER_TYPESCRIPT_VERSION)/typescript/src/ts-parser.c \
+  ../tree-sitter-typescript-$(TREE_SITTER_TYPESCRIPT_VERSION)/typescript/src/ts-scanner.c
+libxgettextts3_a_CPPFLAGS = \
+  -I$(top_srcdir)/tree-sitter-typescript-$(TREE_SITTER_TYPESCRIPT_VERSION)/typescript/src \
+  -I$(top_srcdir)/tree-sitter-$(TREE_SITTER_VERSION)/lib/include
+libxgettextts3_a_CFLAGS = $(AM_CFLAGS) @FOREIGN_WARN_CFLAGS@ @NO_EXPENSIVE_WARN_CFLAGS@
+libxgettextts4_a_SOURCES = \
+  ../tree-sitter-typescript-$(TREE_SITTER_TYPESCRIPT_VERSION)/tsx/src/tsx-parser.c \
+  ../tree-sitter-typescript-$(TREE_SITTER_TYPESCRIPT_VERSION)/tsx/src/tsx-scanner.c
+libxgettextts4_a_CPPFLAGS = \
+  -I$(top_srcdir)/tree-sitter-typescript-$(TREE_SITTER_TYPESCRIPT_VERSION)/tsx/src \
+  -I$(top_srcdir)/tree-sitter-$(TREE_SITTER_VERSION)/lib/include
+libxgettextts4_a_CFLAGS = $(AM_CFLAGS) @FOREIGN_WARN_CFLAGS@ @NO_EXPENSIVE_WARN_CFLAGS@
+libxgettextts5_a_SOURCES = \
+  ../tree-sitter-ocaml-$(TREE_SITTER_OCAML_VERSION)/grammars/ocaml/src/ocaml-parser.c \
+  ../tree-sitter-ocaml-$(TREE_SITTER_OCAML_VERSION)/grammars/ocaml/src/ocaml-scanner.c
+libxgettextts5_a_CPPFLAGS = \
+  -I$(top_srcdir)/tree-sitter-ocaml-$(TREE_SITTER_OCAML_VERSION)/grammars/ocaml/src \
+  -I$(top_srcdir)/tree-sitter-$(TREE_SITTER_VERSION)/lib/include
+libxgettextts5_a_CFLAGS = $(AM_CFLAGS) @FOREIGN_WARN_CFLAGS@ @NO_EXPENSIVE_WARN_CFLAGS@
+
 # msggrep needs pattern matching.
-LIBGREP = ../libgrep/libgrep.a
+LIBGREP = ../libgrep/libgrep.a ../libgrep/gnulib-lib/libgnu.a
 
 # Source dependencies.
 msgcmp_SOURCES = msgcmp.c
@@ -220,7 +318,7 @@ msgmerge_SOURCES = msgmerge.c
 else
 msgmerge_SOURCES = ../woe32dll/c++msgmerge.cc
 endif
-msgmerge_SOURCES += msgl-fsearch.c lang-table.c plural-count.c
+msgmerge_SOURCES += msgl-merge.c
 msgunfmt_SOURCES = msgunfmt.c
 msgunfmt_SOURCES += \
   read-mo.c read-java.c read-csharp.c read-resources.c read-tcl.c \
@@ -231,25 +329,34 @@ else
 xgettext_SOURCES = ../woe32dll/c++xgettext.cc
 endif
 xgettext_SOURCES += \
+  if-error.c \
   xg-pos.c \
   xg-encoding.c \
   xg-mixed-string.c \
+  xg-formatstring.c \
   xg-arglist-context.c xg-arglist-callshape.c xg-arglist-parser.c \
   xg-message.c \
+  xg-check.c \
   x-po.c \
   x-c.c \
   x-python.c \
   x-java.c \
   x-csharp.c \
   x-javascript.c \
+  x-typescript.c \
+  x-typescriptx.c \
   x-scheme.c \
   x-lisp.c \
   x-elisp.c \
   x-librep.c \
+  x-rust.c \
   x-ruby.c \
   x-sh.c ../../gettext-runtime/src/escapes.h \
   x-awk.c \
   x-lua.c \
+  x-modula2.c \
+  x-d.c \
+  x-ocaml.c \
   x-smalltalk.c \
   x-vala.c \
   x-tcl.c \
@@ -258,6 +365,12 @@ xgettext_SOURCES += \
   x-ycp.c \
   x-rst.c \
   x-desktop.c
+# x-go.c cannot be compiled by GCC 11 with '-fanalyzer' in 1 GB of RAM.
+# Therefore use special CFLAGS for this compilation unit.
+libxgettextx_a_SOURCES = \
+  x-go.c
+libxgettextx_a_CPPFLAGS = $(xgettext_CPPFLAGS)
+libxgettextx_a_CFLAGS = $(AM_CFLAGS) @NO_EXPENSIVE_WARN_CFLAGS@
 if !WOE32DLL
 msgattrib_SOURCES = msgattrib.c
 else
@@ -297,14 +410,19 @@ else
 msggrep_SOURCES = ../woe32dll/c++msggrep.cc
 endif
 msginit_SOURCES = msginit.c
-msginit_SOURCES += lang-table.c plural-count.c
+msginit_SOURCES += msgl-merge.c
 msginit_SOURCES += ../../gettext-runtime/intl/localealias.c
+msgpre_SOURCES = msgpre.c
 if !WOE32DLL
 msguniq_SOURCES = msguniq.c
 else
 msguniq_SOURCES = ../woe32dll/c++msguniq.cc
 endif
 recode_sr_latin_SOURCES = recode-sr-latin.c filter-sr-latin.c
+if BUILD_SPIT_IN_C
+spit_SOURCES = spit.c country-table.c
+spit_CFLAGS = $(AM_CFLAGS) $(INCJSON_C) $(INCCURL)
+endif
 hostname_SOURCES = hostname.c
 urlget_SOURCES = urlget.c
 cldr_plurals_SOURCES = cldr-plural.y cldr-plural-exp.c cldr-plurals.c
@@ -315,15 +433,43 @@ if USE_INSTALLED_LIBTEXTSTYLE
 LT_LIBTEXTSTYLE = @LTLIBTEXTSTYLE@
 else
 # How to get the include files of libtextstyle.
-textstyle.h textstyle/stdbool.h textstyle/version.h textstyle/woe32dll.h:
+textstyle.h textstyle/version.h textstyle/woe32dll.h:
 	here=`pwd`; \
 	cd ../../libtextstyle/lib && \
-	  $(MAKE) install-nobase_includeHEADERS install-nobase_nodist_includeHEADERS includedir="$$here"
-BUILT_SOURCES    += textstyle.h textstyle/stdbool.h textstyle/version.h textstyle/woe32dll.h
-MOSTLYCLEANFILES += textstyle.h textstyle/stdbool.h textstyle/version.h textstyle/woe32dll.h
+	  $(MAKE) install-nobase_includeHEADERS install-nobase_nodist_includeHEADERS DESTDIR= includedir="$$here"
+BUILT_SOURCES    += textstyle.h textstyle/version.h textstyle/woe32dll.h
+MOSTLYCLEANFILES += textstyle.h textstyle/version.h textstyle/woe32dll.h
 # Where to find the built libtextstyle library.
 LT_LIBTEXTSTYLE = ../../libtextstyle/lib/libtextstyle.la
 endif
+
+# Version information according to Woe32 conventions.
+EXTRA_DIST += libgettextsrc.rc
+if WOE32
+WOE32_LIBADD = libgettextsrc.res.lo
+# This rule is executed only on Woe32 systems.
+# Use $(RC) with libtool, $(WINDRES) when not using libtool.
+# The following sed expressions come from the windres-options script. They are
+# inlined here, so that they can be written in a Makefile without requiring a
+# temporary file. They must contain literal newlines rather than semicolons,
+# so that they work with the sed-3.02 that is shipped with MSYS.
+libgettextsrc.res.lo: $(srcdir)/libgettextsrc.rc
+	nlinit=`echo 'nl="'; echo '"'`; eval "$$nlinit"; \
+	sed_extract_major='/^[0-9]/{'$${nl}'s/^\([0-9]*\).*/\1/p'$${nl}q$${nl}'}'$${nl}'c\'$${nl}0$${nl}q; \
+	sed_extract_minor='/^[0-9][0-9]*[.][0-9]/{'$${nl}'s/^[0-9]*[.]\([0-9]*\).*/\1/p'$${nl}q$${nl}'}'$${nl}'c\'$${nl}0$${nl}q; \
+	sed_extract_subminor='/^[0-9][0-9]*[.][0-9][0-9]*[.][0-9]/{'$${nl}'s/^[0-9]*[.][0-9]*[.]\([0-9]*\).*/\1/p'$${nl}q$${nl}'}'$${nl}'c\'$${nl}0$${nl}q; \
+	$(LIBTOOL) --tag=RC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(RC) \
+	  "-DPACKAGE_VERSION_STRING=\\\"$(VERSION)\\\"" \
+	  "-DPACKAGE_VERSION_MAJOR="`echo '$(VERSION)' | sed -n -e "$$sed_extract_major"` \
+	  "-DPACKAGE_VERSION_MINOR="`echo '$(VERSION)' | sed -n -e "$$sed_extract_minor"` \
+	  "-DPACKAGE_VERSION_SUBMINOR="`echo '$(VERSION)' | sed -n -e "$$sed_extract_subminor"` \
+	  -i $(srcdir)/libgettextsrc.rc -o libgettextsrc.res.lo --output-format=coff
+MOSTLYCLEANFILES += libgettextsrc.res.lo
+else
+WOE32_LIBADD =
+endif
+libgettextsrc_la_LIBADD       = $(WOE32_LIBADD)
+libgettextsrc_la_DEPENDENCIES = $(WOE32_LIBADD)
 
 # How to build libgettextsrc.la.
 # Need ../gnulib-lib/libgettextlib.la.
@@ -331,8 +477,8 @@ endif
 # taken from libunistring, when the configure option --with-libunistring-prefix
 # was given.
 # Need @LTLIBINTL@ because many source files use gettext().
-# Need @LTLIBICONV@ because po-charset.c, po-lex.c, msgl-iconv.c, write-po.c
-# use iconv().
+# Need @LTLIBICONV@ because po-charset.c, read-po-lex.c, msgl-iconv.c,
+# write-po.c use iconv().
 libgettextsrc_la_LDFLAGS = \
   -release @VERSION@ \
   ../gnulib-lib/libgettextlib.la $(LTLIBUNISTRING) $(LT_LIBTEXTSTYLE) @LTLIBINTL@ @LTLIBICONV@ -lc -no-undefined
@@ -344,11 +490,14 @@ endif
 
 libgettextsrc_la_CPPFLAGS = $(AM_CPPFLAGS) $(INCXML)
 
+# Needed for the expansion of LIBGETTEXTSRC_DLL_VARIABLE on MSVC.
+libgettextsrc_la_CPPFLAGS += -DIN_LIBGETTEXTSRC
+
 # Tell the mingw or Cygwin linker which symbols to export.
 if WOE32DLL
-libgettextsrc_la_SOURCES += ../woe32dll/gettextsrc-exports.c
+if !WINDOWS_MSVC
 libgettextsrc_la_LDFLAGS += -Wl,--export-all-symbols
-libgettextsrc_la_CPPFLAGS += $(GETTEXTLIB_EXPORTS_FLAGS)
+endif
 endif
 
 # Specify installation directory, for --enable-relocatable.
@@ -360,6 +509,18 @@ endif
 # Compile-time flags for particular source files.
 msgmerge_CFLAGS = $(AM_CFLAGS) $(OPENMP_CFLAGS)
 msgmerge_CXXFLAGS = $(AM_CXXFLAGS) $(OPENMP_CFLAGS)
+msginit_CFLAGS = $(AM_CFLAGS) $(OPENMP_CFLAGS)
+msginit_CXXFLAGS = $(AM_CXXFLAGS) $(OPENMP_CFLAGS)
+# On mingw, the compiler option '-fno-threadsafe-statics' avoids requiring
+# the symbols __cxa_guard_acquire and __cxa_guard_release, which in turn
+# avoids a dependency towards libstdc++.
+if WOE32DLL
+if WINDOWS_NATIVE
+if !WINDOWS_MSVC
+xgettext_CXXFLAGS = $(AM_CXXFLAGS) -fno-threadsafe-statics
+endif
+endif
+endif
 
 # Link dependencies.
 # INTL_MACOSX_LIBS is needed because the programs depend on libintl.la
@@ -369,7 +530,7 @@ msgcmp_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ @MSGMERGE_LIBM@ $(WOE32_LDADD
 msgfmt_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
 msgmerge_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ @MSGMERGE_LIBM@ $(WOE32_LDADD) $(OPENMP_CFLAGS)
 msgunfmt_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
-xgettext_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ @LTLIBICONV@ $(WOE32_LDADD)
+xgettext_LDADD = libxgettextx.a $(LIBXGETTEXTTS) libgettextsrc.la @INTL_MACOSX_LIBS@ @LTLIBICONV@ $(WOE32_LDADD)
 msgattrib_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
 msgcat_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
 msgcomm_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
@@ -379,7 +540,11 @@ msgexec_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
 msgfilter_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
 msggrep_LDADD = $(LIBGREP) libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
 msginit_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
+msgpre_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
 msguniq_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(WOE32_LDADD)
+if BUILD_SPIT_IN_C
+spit_LDADD = libgettextsrc.la @INTL_MACOSX_LIBS@ $(LIBJSON_C) $(LIBCURL) $(WOE32_LDADD)
+endif
 hostname_LDADD = $(LDADD) $(GETADDRINFO_LIB)
 
 # Specify when to relink the programs.
@@ -387,7 +552,7 @@ msgcmp_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LD
 msgfmt_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 msgmerge_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 msgunfmt_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
-xgettext_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
+xgettext_DEPENDENCIES = libxgettextx.a $(LIBXGETTEXTTS) libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 msgattrib_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 msgcat_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 msgcomm_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
@@ -397,31 +562,39 @@ msgexec_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_L
 msgfilter_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 msggrep_DEPENDENCIES = $(LIBGREP) libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 msginit_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
+msgpre_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 msguniq_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
 recode_sr_latin_DEPENDENCIES = $(OTHERPROGDEPENDENCIES)
+if BUILD_SPIT_IN_C
+spit_DEPENDENCIES = libgettextsrc.la ../gnulib-lib/libgettextlib.la $(WOE32_LDADD)
+endif
 hostname_DEPENDENCIES = $(OTHERPROGDEPENDENCIES)
 urlget_DEPENDENCIES = $(OTHERPROGDEPENDENCIES)
 
 # Specify installation directory, for --enable-relocatable.
-msgcmp_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-msgfmt_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-msgmerge_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-msgunfmt_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-xgettext_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-msgattrib_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-msgcat_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-msgcomm_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-msgconv_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-msgen_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-msgexec_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-msgfilter_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-msggrep_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-msginit_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-msguniq_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-recode_sr_latin_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(bindir)\"
-hostname_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(pkglibdir)\"
-urlget_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(pkglibdir)\"
-cldr_plurals_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=\"$(pkglibdir)\"
+msgcmp_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msgfmt_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msgmerge_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msgunfmt_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+xgettext_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msgattrib_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msgcat_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msgcomm_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msgconv_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msgen_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msgexec_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msgfilter_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msggrep_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msginit_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msgpre_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+msguniq_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+recode_sr_latin_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+if BUILD_SPIT_IN_C
+spit_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(bindir_c_make)
+endif
+hostname_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(pkglibexecdir_c_make)
+urlget_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(pkglibexecdir_c_make)
+cldr_plurals_CPPFLAGS = $(AM_CPPFLAGS) -DINSTALLDIR=$(pkglibexecdir_c_make)
 if RELOCATABLE_VIA_LD
 msgcmp_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
 msgfmt_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
@@ -437,11 +610,26 @@ msgexec_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
 msgfilter_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
 msggrep_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
 msginit_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
+msgpre_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
 msguniq_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
 recode_sr_latin_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
-hostname_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(pkglibdir)`
-urlget_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(pkglibdir)`
-cldr_plurals_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(pkglibdir)`
+if BUILD_SPIT_IN_C
+spit_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(bindir)`
+endif
+hostname_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(pkglibexecdir)`
+urlget_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(pkglibexecdir)`
+cldr_plurals_LDFLAGS = `$(RELOCATABLE_LDFLAGS) $(pkglibexecdir)`
+else
+xgettext_LDFLAGS =
+endif
+
+# Link-time flags for particular programs.
+# With MSVC 14/x86_64, the default stack size of 1 MB is sufficient only for
+# a recursion depth in "xgettext -L Rust" invocations of 501. To guarantee a
+# recursion depth of 1000, we need to increase the stack size. Cf.
+# <https://learn.microsoft.com/en-us/cpp/build/reference/f-set-stack-size>.
+if PLATFORM_IS_MSVC
+xgettext_LDFLAGS += -Wl,-F4000000
 endif
 
 # Linking with C++ libraries is needed _only_ on mingw and Cygwin.
@@ -568,39 +756,25 @@ endif
 # postprocess the generated files and we don't want that unpostprocessed files
 # remain in place if the user interrupts the build through Ctrl-C.
 
-po-gram-gen.c po-gram-gen.h: po-gram-gen.y
-	$(AM_V_YACC)$(BISON) -d $(YFLAGS) $(AM_YFLAGS) $(srcdir)/po-gram-gen.y \
+read-po-gram.c read-po-gram.h: read-po-gram.y
+	$(AM_V_YACC)$(BISON) -d $(YFLAGS) $(AM_YFLAGS) $(srcdir)/read-po-gram.y \
 	&& test ':' = '$(BISON)' || { \
-	  sed -e 's|".*/po-gram-gen\.y"|"po-gram-gen.y"|' \
-	      -e 's|"po-gram-gen\.tab\.c"|"po-gram-gen.c"|' \
-	      -e 's|"po-gram-gen\.tab\.h"|"po-gram-gen.h"|' \
-	      < po-gram-gen.tab.c > po-gram-gen.c-tmp \
-	  && sed -e 's|".*/po-gram-gen\.y"|"po-gram-gen.y"|' \
-	         -e 's|"po-gram-gen\.tab\.h"|"po-gram-gen.h"|' \
-	         < po-gram-gen.tab.h > po-gram-gen.h-tmp \
-	  && rm -f po-gram-gen.tab.c po-gram-gen.tab.h \
-	  && mv po-gram-gen.c-tmp $(srcdir)/po-gram-gen.c \
-	  && mv po-gram-gen.h-tmp $(srcdir)/po-gram-gen.h; \
+	  sed -e 's|".*/read-po-gram\.y"|"read-po-gram.y"|' \
+	      -e 's|"read-po-gram\.tab\.c"|"read-po-gram.c"|' \
+	      -e 's|"read-po-gram\.tab\.h"|"read-po-gram.h"|' \
+	      < read-po-gram.tab.c > read-po-gram.c-tmp \
+	  && sed -e 's|".*/read-po-gram\.y"|"read-po-gram.y"|' \
+	         -e 's|"read-po-gram\.tab\.h"|"read-po-gram.h"|' \
+	         < read-po-gram.tab.h > read-po-gram.h-tmp \
+	  && rm -f read-po-gram.tab.c read-po-gram.tab.h \
+	  && mv read-po-gram.c-tmp $(srcdir)/read-po-gram.c \
+	  && mv read-po-gram.h-tmp $(srcdir)/read-po-gram.h; \
 	}
-BUILT_SOURCES += po-gram-gen.c po-gram-gen.h
-MOSTLYCLEANFILES += po-gram-gen.tab.c po-gram-gen.tab.h po-gram-gen.c-tmp po-gram-gen.h-tmp
-MAINTAINERCLEANFILES += po-gram-gen.c po-gram-gen.h
-EXTRA_DIST += po-gram-gen.c po-gram-gen.h
+BUILT_SOURCES += read-po-gram.c read-po-gram.h
+MOSTLYCLEANFILES += read-po-gram.tab.c read-po-gram.tab.h read-po-gram.c-tmp read-po-gram.h-tmp
+MAINTAINERCLEANFILES += read-po-gram.c read-po-gram.h
+EXTRA_DIST += read-po-gram.c read-po-gram.h
 
-
-# po-gram-gen2.h is generated from po-gram-gen.h and is also distributed in the
-# tarballs (just for convenience).
-po-gram-gen2.h: po-gram-gen.h
-	$(SED) -e 's/yy/po_gram_/g' -e 's/extern /extern DLL_VARIABLE /' \
-	       -e 's|"po-gram-gen\.h"|"po-gram-gen2.h"|' \
-	       < $(srcdir)/po-gram-gen.h > po-gram-gen2.h-tmp \
-	&& mv po-gram-gen2.h-tmp $(srcdir)/po-gram-gen2.h
-BUILT_SOURCES += po-gram-gen2.h
-MOSTLYCLEANFILES += po-gram-gen2.h-tmp
-MAINTAINERCLEANFILES += po-gram-gen2.h
-EXTRA_DIST += po-gram-gen2.h
-
-po-lex.o po-lex.lo: po-gram-gen2.h
 
 cldr-plural.c cldr-plural.h: cldr-plural.y
 	$(AM_V_YACC)$(BISON) -d $(YFLAGS) $(AM_YFLAGS) $(srcdir)/cldr-plural.y \
@@ -622,27 +796,52 @@ MAINTAINERCLEANFILES += cldr-plural.c cldr-plural.h
 EXTRA_DIST += cldr-plural.c cldr-plural.h
 
 
-# Special rules for installation of auxiliary programs.
+if !BUILD_SPIT_IN_C
+# Ensure that the program 'spit' is available as a script,
+# so that its manual page can be generated through 'help2man'.
+spit: spit.py
+	cp spit.py spit
+BUILT_SOURCES += spit
+MOSTLYCLEANFILES += spit
+endif
+
+
+# This is implicit in "make all", but is needed explicitly before other target
+# invocations.
+built-sources: $(BUILT_SOURCES)
+
+
+# Special rules for installation of 'spit' and auxiliary programs.
 
 install-exec-local:
-	$(MKDIR_P) $(DESTDIR)$(pkglibdir)
-	$(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) hostname$(EXEEXT) $(DESTDIR)$(pkglibdir)/hostname$(EXEEXT)
-	$(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) urlget$(EXEEXT) $(DESTDIR)$(pkglibdir)/urlget$(EXEEXT)
-	$(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) cldr-plurals$(EXEEXT) $(DESTDIR)$(pkglibdir)/cldr-plurals$(EXEEXT)
-	$(INSTALL_SCRIPT) user-email $(DESTDIR)$(pkglibdir)/user-email
-	$(INSTALL_SCRIPT) $(srcdir)/project-id $(DESTDIR)$(pkglibdir)/project-id
+if !BUILD_SPIT_IN_C
+	$(MKDIR_P) $(DESTDIR)$(bindir)
+	$(INSTALL_SCRIPT) spit.py $(DESTDIR)$(bindir)/spit
+endif
+	$(MKDIR_P) $(DESTDIR)$(pkglibexecdir)
+	$(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) hostname$(EXEEXT) $(DESTDIR)$(pkglibexecdir)/hostname$(EXEEXT)
+	$(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) urlget$(EXEEXT) $(DESTDIR)$(pkglibexecdir)/urlget$(EXEEXT)
+	$(INSTALL_PROGRAM_ENV) $(LIBTOOL) --mode=install $(INSTALL_PROGRAM) cldr-plurals$(EXEEXT) $(DESTDIR)$(pkglibexecdir)/cldr-plurals$(EXEEXT)
+	$(INSTALL_SCRIPT) user-email $(DESTDIR)$(pkglibexecdir)/user-email
+	$(INSTALL_SCRIPT) $(srcdir)/project-id $(DESTDIR)$(pkglibexecdir)/project-id
 
 installdirs-local:
-	$(MKDIR_P) $(DESTDIR)$(pkglibdir)
+if !BUILD_SPIT_IN_C
+	$(MKDIR_P) $(DESTDIR)$(bindir)
+endif
+	$(MKDIR_P) $(DESTDIR)$(pkglibexecdir)
 
 uninstall-local:
-	$(RM) $(DESTDIR)$(pkglibdir)/hostname$(EXEEXT)
-	$(RM) $(DESTDIR)$(pkglibdir)/urlget$(EXEEXT)
-	$(RM) $(DESTDIR)$(pkglibdir)/cldr-plurals$(EXEEXT)
-	$(RM) $(DESTDIR)$(pkglibdir)/user-email
-	$(RM) $(DESTDIR)$(pkglibdir)/project-id
+if !BUILD_SPIT_IN_C
+	$(RM) $(DESTDIR)$(bindir)/spit
+endif
+	$(RM) $(DESTDIR)$(pkglibexecdir)/hostname$(EXEEXT)
+	$(RM) $(DESTDIR)$(pkglibexecdir)/urlget$(EXEEXT)
+	$(RM) $(DESTDIR)$(pkglibexecdir)/cldr-plurals$(EXEEXT)
+	$(RM) $(DESTDIR)$(pkglibexecdir)/user-email
+	$(RM) $(DESTDIR)$(pkglibexecdir)/project-id
 
-DISTCLEANFILES += user-email
+DISTCLEANFILES += spit.py user-email
 
 
 # Special rules for Java compilation.
@@ -662,7 +861,7 @@ gnu/gettext/GetURL.class: $(srcdir)/gnu/gettext/GetURL.java
 	$(JAVACOMP) -d . $(srcdir)/gnu/gettext/GetURL.java
 
 gettext.jar: gnu/gettext/DumpResource.class gnu/gettext/GetURL.class
-	$(JAR) cf $@ gnu/gettext/DumpResource*.class gnu/gettext/GetURL*.class
+	$(top_srcdir)/../build-aux/jar-cf '$(JAR)' '$(top_srcdir)/..' $@ gnu/gettext/DumpResource*.class gnu/gettext/GetURL*.class
 
 EXTRA_DIST += gnu/gettext/DumpResource.java gnu/gettext/GetURL.java
 
@@ -689,8 +888,8 @@ uninstall-java-no:
 EXTRA_DIST += msgfmt.cs msgunfmt.cs
 
 CLEANFILES += \
-  msgfmt.net.exe msgfmt.net.exe.mdb \
-  msgunfmt.net.exe msgunfmt.net.exe.mdb
+  msgfmt.net.exe msgfmt.net.exe.mdb msgfmt.net.pdb \
+  msgunfmt.net.exe msgunfmt.net.exe.mdb msgunfmt.net.pdb
 
 all-local: all-csharp-@BUILDCSHARP@
 all-csharp-yes: msgfmt.net.exe msgunfmt.net.exe
@@ -744,6 +943,14 @@ uninstall-tcl:
 	$(RM) $(DESTDIR)$(pkgdatadir)/msgunfmt.tcl
 
 
+# Special rules for XML schemas.
+
+schema_DATA = \
+  its.xsd10 its.xsd11 its-extensions.xsd \
+  locating-rules.xsd10 locating-rules.xsd11
+EXTRA_DIST += $(schema_DATA)
+
+
 # Support for relocatability.
 RELOCATABLE_LIBRARY_PATH = $(libdir)
 RELOCATABLE_SRC_DIR = $(top_srcdir)/gnulib-lib
@@ -764,7 +971,7 @@ endif
 
 
 # This Makefile contains rules which don't work with parallel make,
-# namely those which build textstyle.h, po-gram-gen.c, cldr-plural.c.
+# namely those which build textstyle.h, read-po-gram.c, cldr-plural.c.
 # See <https://lists.gnu.org/archive/html/bug-make/2019-05/msg00011.html>.
 # So, turn off parallel execution in this Makefile.
 .NOTPARALLEL:

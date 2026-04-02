@@ -1,8 +1,10 @@
-# mbswidth.m4 serial 19
-dnl Copyright (C) 2000-2002, 2004, 2006-2024 Free Software Foundation, Inc.
+# mbswidth.m4
+# serial 20
+dnl Copyright (C) 2000-2002, 2004, 2006-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl autoconf tests required for use of mbswidth.c
 dnl From Bruno Haible.
@@ -10,7 +12,7 @@ dnl From Bruno Haible.
 AC_DEFUN([gl_MBSWIDTH],
 [
   AC_CHECK_HEADERS_ONCE([wchar.h])
-  AC_CHECK_FUNCS_ONCE([isascii mbsinit])
+  AC_CHECK_FUNCS_ONCE([mbsinit])
 
   dnl UnixWare 7.1.1 <wchar.h> has a declaration of a function mbswidth()
   dnl that clashes with ours.

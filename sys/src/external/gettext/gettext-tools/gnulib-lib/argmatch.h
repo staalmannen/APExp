@@ -1,6 +1,6 @@
 /* argmatch.h -- definitions and prototypes for argmatch.c
 
-   Copyright (C) 1990, 1998-1999, 2001-2002, 2004-2005, 2009-2024 Free Software
+   Copyright (C) 1990, 1998-1999, 2001-2002, 2004-2005, 2009-2026 Free Software
    Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -30,7 +30,7 @@
 # include <limits.h>
 # include <stddef.h>
 # include <stdio.h>
-# include <string.h> /* memcmp */
+# include <string.h> /* memeq */
 
 # include "gettext.h"
 # include "quote.h"
@@ -210,7 +210,7 @@ char const *argmatch_to_argument (void const *value,
           else if (res == -1)                                           \
             /* First nonexact match found.  */                          \
             res = i;                                                    \
-          else if (memcmp (&g->args[res].val, &g->args[i].val, size))   \
+          else if (!memeq (&g->args[res].val, &g->args[i].val, size))   \
             /* Second nonexact match found.  */                         \
             /* There is a real ambiguity, or we could not               \
                disambiguate. */                                         \
@@ -225,7 +225,7 @@ char const *argmatch_to_argument (void const *value,
     const argmatch_##Name##_group_type *g = &argmatch_##Name##_group;   \
     size_t size = argmatch_##Name##_size;                               \
     for (size_t i = 0; g->args[i].arg; i++)                             \
-      if (!memcmp (val, &g->args[i].val, size))                         \
+      if (memeq (val, &g->args[i].val, size))                           \
         return g->args[i].arg;                                          \
     return NULL;                                                        \
   }                                                                     \
@@ -239,10 +239,10 @@ char const *argmatch_to_argument (void const *value,
                                                                         \
     /* Try to put synonyms on the same line.  Synonyms are expected     \
        to follow each other. */                                         \
-    fputs (gettext ("Valid arguments are:"), out);                      \
+    fputs (dgettext (GNULIB_TEXT_DOMAIN, "Valid arguments are:"), out); \
     for (int i = 0; g->args[i].arg; i++)                                \
       if (i == 0                                                        \
-          || memcmp (&g->args[i-1].val, &g->args[i].val, size))         \
+          || !memeq (&g->args[i-1].val, &g->args[i].val, size))         \
         fprintf (out, "\n  - %s", quote (g->args[i].arg));              \
       else                                                              \
         fprintf (out, ", %s", quote (g->args[i].arg));                  \
@@ -281,7 +281,7 @@ char const *argmatch_to_argument (void const *value,
         else                                                            \
           /* Genuine argument, display it with its synonyms. */         \
           for (int j = 0; g->args[j].arg; ++j)                          \
-            if (! memcmp (&g->args[ival].val, &g->args[j].val, size))   \
+            if (memeq (&g->args[ival].val, &g->args[j].val, size))      \
               col += (col == 4 ? 0 : 2) + strlen (g->args[j].arg);      \
         if (res <= col)                                                 \
           res = col <= 20 ? col : 20;                                   \
@@ -312,7 +312,7 @@ char const *argmatch_to_argument (void const *value,
         else                                                            \
           /* Genuine argument, display it with its synonyms. */         \
           for (int j = 0; g->args[j].arg; ++j)                          \
-            if (! memcmp (&g->args[ival].val, &g->args[j].val, size))   \
+            if (memeq (&g->args[ival].val, &g->args[j].val, size))      \
               {                                                         \
                 if (!first                                              \
                     && screen_width < col + 2 + strlen (g->args[j].arg)) \

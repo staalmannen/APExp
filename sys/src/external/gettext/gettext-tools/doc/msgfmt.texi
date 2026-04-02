@@ -1,5 +1,5 @@
 @c This file is part of the GNU gettext manual.
-@c Copyright (C) 1995-2023 Free Software Foundation, Inc.
+@c Copyright (C) 1995-2024 Free Software Foundation, Inc.
 @c See the file gettext.texi for copying conditions.
 
 @pindex msgfmt
@@ -176,7 +176,7 @@ Specify the base directory of @file{.msg} message catalogs.
 The @samp{-l} and @samp{-d} options are mandatory.  The @file{.msg} file is
 written in the specified directory.
 
-@subsection Desktop Entry mode operations
+@subsection Desktop Entry mode options
 
 @table @samp
 @item --template=@var{template}
@@ -227,7 +227,7 @@ variable.
 For either operation modes, the @samp{-o} and @samp{--template}
 options are mandatory.
 
-@subsection XML mode operations
+@subsection XML mode options
 
 @table @samp
 @item --template=@var{template}
@@ -252,6 +252,12 @@ or a combined language and country specification of the form @var{ll_CC}.
 @opindex -d@r{, @code{msgfmt} option}
 Specify the base directory of @file{.po} message catalogs.
 
+@item --replace-text
+@opindex --replace-text@r{, @code{msgfmt} option}
+Output XML with translated text replacing the original text,
+not augmenting the original text.
+With this option, @code{msgfmt} produces a mono-lingual XML file.
+Without this option, it produces a multi-lingual XML file.
 @end table
 
 To generate an XML file for a single locale, you can use it as follows.
@@ -275,6 +281,18 @@ variable.
 
 For either operation modes, the @samp{-o} and @samp{--template}
 options are mandatory.
+
+If your XML file is not of one of the types covered by the system-wide
+installed *.its files,
+you need a particular *.its file and a corresponding *.loc file
+(@pxref{Preparing ITS Rules}).
+Furthermore you need to store these files
+in a directory @file{@var{parent_dir}/its/}
+@vindex GETTEXTDATADIRS@r{, environment variable}
+and set the environment variable @code{GETTEXTDATADIRS} to include
+@code{@var{parent_dir}}.
+More generally, the value of @code{GETTEXTDATADIRS} should be
+a colon-separated list of directory names.
 
 @subsection Input file syntax
 

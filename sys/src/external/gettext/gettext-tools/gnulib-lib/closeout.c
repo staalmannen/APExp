@@ -1,5 +1,5 @@
 /* closeout.c - close standard output and standard error
-   Copyright (C) 1998-2007, 2012 Free Software Foundation, Inc.
+   Copyright (C) 1998-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,6 +14,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Written by Jim Meyering and Bruno Haible.  */
+
 #include <config.h>
 
 /* Specification.  */
@@ -23,7 +25,7 @@
 #include <stdlib.h>
 #include <errno.h>
 
-#include "error.h"
+#include <error.h>
 #include "fwriteerror.h"
 #include "gettext.h"
 

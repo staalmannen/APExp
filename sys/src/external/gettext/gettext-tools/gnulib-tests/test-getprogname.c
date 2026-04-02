@@ -1,5 +1,5 @@
 /* Test the gnulib getprogname module.
-   Copyright (C) 2016-2024 Free Software Foundation, Inc.
+   Copyright (C) 2016-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ main (void)
      with "lt-" (depends on the platform).  But the name of the temporary
      executable is a detail that should not be visible to the end user and to
      the test suite.  Remove this "lt-" prefix here.  */
-  if (strncmp (p, "lt-", 3) == 0)
+  if (str_startswith (p, "lt-"))
     p += 3;
 
   /* Note: You can make this test fail

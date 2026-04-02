@@ -1,5 +1,5 @@
 /* Auxiliary functions for the creation of subprocesses.  OS/2 kLIBC API.
-   Copyright (C) 2001, 2003-2024 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
@@ -29,5 +29,11 @@ extern void undup_safer_noinherit (int tempfd, int origfd);
 /* Prepares an argument vector before calling spawn().  */
 extern const char ** prepare_spawn (const char * const *argv,
                                     char **mem_to_free);
+
+/* Creates a subprocess.  */
+extern int spawnpvech (int mode, const char *progname,
+                       const char * const *argv, const char * const *envp,
+                       const char *currdir,
+                       int stdin_fd, int stdout_fd, int stderr_fd);
 
 #endif /* _OS2_SPAWN_H */

@@ -1,5 +1,5 @@
 /* vasprintf and asprintf with out-of-memory checking.
-   Copyright (C) 1999, 2002-2004, 2006, 2009-2024 Free Software Foundation,
+   Copyright (C) 1999, 2002-2004, 2006, 2009-2026 Free Software Foundation,
    Inc.
 
    This program is free software: you can redistribute it and/or modify
@@ -24,10 +24,8 @@ char *
 xasprintf (const char *format, ...)
 {
   va_list args;
-  char *result;
-
   va_start (args, format);
-  result = xvasprintf (format, args);
+  char *result = xvasprintf (format, args);
   va_end (args);
 
   return result;

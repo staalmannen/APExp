@@ -1,5 +1,5 @@
 /* GLIB - Library of useful routines for C programming
- * Copyright (C) 2006-2023 Free Software Foundation, Inc.
+ * Copyright (C) 2006-2026 Free Software Foundation, Inc.
  *
  * This file is not part of the GNU gettext program, but is used with
  * GNU gettext.
@@ -210,9 +210,10 @@ gchar*
 g_strdup_vprintf (const gchar *format,
 		  va_list      args)
 {
-  gchar *string = NULL;
+  gchar *string;
 
-  g_vasprintf (&string, format, args);
+  if (g_vasprintf (&string, format, args) < 0)
+    return NULL;
 
   return string;
 }
@@ -2609,7 +2610,7 @@ g_strjoin (const gchar  *separator,
  * Return value: a pointer to the found occurrence, or
  *    %NULL if not found.
  **/
-gchar *
+const gchar *
 g_strstr_len (const gchar *haystack,
 	      gssize       haystack_len,
 	      const gchar *needle)

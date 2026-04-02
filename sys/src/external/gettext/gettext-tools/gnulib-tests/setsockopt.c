@@ -1,6 +1,6 @@
 /* setsockopt.c --- wrappers for Windows setsockopt function
 
-   Copyright (C) 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This file is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as
@@ -35,8 +35,6 @@ int
 rpl_setsockopt (int fd, int level, int optname, const void *optval, socklen_t optlen)
 {
   SOCKET sock = FD_TO_SOCKET (fd);
-  int r;
-
   if (sock == INVALID_SOCKET)
     {
       errno = EBADF;
@@ -44,6 +42,8 @@ rpl_setsockopt (int fd, int level, int optname, const void *optval, socklen_t op
     }
   else
     {
+      int r;
+
       if (level == SOL_SOCKET
           && (optname == SO_RCVTIMEO || optname == SO_SNDTIMEO))
         {

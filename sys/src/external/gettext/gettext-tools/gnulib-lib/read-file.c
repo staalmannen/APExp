@@ -1,5 +1,5 @@
 /* read-file.c -- read file contents into a string
-   Copyright (C) 2006, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009-2026 Free Software Foundation, Inc.
    Written by Simon Josefsson and Bruno Haible.
 
    This file is free software: you can redistribute it and/or modify
@@ -51,7 +51,6 @@
 char *
 fread_file (FILE *stream, int flags, size_t *length)
 {
-  char *buf = NULL;
   size_t alloc = BUFSIZ;
 
   /* For a regular file, allocate a buffer that has exactly the right
@@ -79,7 +78,8 @@ fread_file (FILE *stream, int flags, size_t *length)
       }
   }
 
-  if (!(buf = malloc (alloc)))
+  char *buf = malloc (alloc);
+  if (!buf)
     return NULL; /* errno is ENOMEM.  */
 
   {
@@ -191,7 +191,6 @@ read_file (const char *filename, int flags, size_t *length)
 {
   const char *mode = (flags & RF_BINARY) ? "rbe" : "re";
   FILE *stream = fopen (filename, mode);
-  char *out;
 
   if (!stream)
     return NULL;
@@ -199,7 +198,7 @@ read_file (const char *filename, int flags, size_t *length)
   if (flags & RF_SENSITIVE)
     setvbuf (stream, NULL, _IONBF, 0);
 
-  out = fread_file (stream, flags, length);
+  char *out = fread_file (stream, flags, length);
 
   if (fclose (stream) != 0)
     {

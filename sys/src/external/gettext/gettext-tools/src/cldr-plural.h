@@ -73,7 +73,7 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 129 "cldr-plural.y"
+#line 143 "cldr-plural.y"
 
   char *sval;
   struct cldr_plural_condition_ty *cval;

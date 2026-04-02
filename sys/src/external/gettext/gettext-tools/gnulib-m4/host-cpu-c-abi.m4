@@ -1,8 +1,10 @@
-# host-cpu-c-abi.m4 serial 17
-dnl Copyright (C) 2002-2024 Free Software Foundation, Inc.
+# host-cpu-c-abi.m4
+# serial 20
+dnl Copyright (C) 2002-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl From Bruno Haible and Sam Steingold.
 
@@ -35,7 +37,7 @@ dnl * The same canonical name is used for different endiannesses. You can
 dnl   determine the endianness through preprocessor symbols:
 dnl   - 'arm': test __ARMEL__.
 dnl   - 'mips', 'mipsn32', 'mips64': test _MIPSEB vs. _MIPSEL.
-dnl   - 'powerpc64': test _BIG_ENDIAN vs. _LITTLE_ENDIAN.
+dnl   - 'powerpc64': test __BIG_ENDIAN__ vs. __LITTLE_ENDIAN__.
 dnl * The same name 'i386' is used for CPUs of type i386, i486, i586
 dnl   (Pentium), AMD K7, Pentium II, Pentium IV, etc., because
 dnl   - Instructions that do not exist on all of these CPUs (cmpxchg,
@@ -140,7 +142,7 @@ changequote([,])dnl
             else
               gl_cv_host_cpu_c_abi=arm
             fi
-            rm -f conftest*
+            rm -fr conftest*
            ])
          ;;
 
@@ -382,6 +384,9 @@ EOF
 #ifndef __ia64__
 #undef __ia64__
 #endif
+#ifndef __loongarch32__
+#undef __loongarch32__
+#endif
 #ifndef __loongarch64__
 #undef __loongarch64__
 #endif
@@ -501,9 +506,9 @@ changequote([,])dnl
          if test -n "$gl_cv_host_cpu_c_abi"; then
            dnl gl_HOST_CPU_C_ABI has already been run. Use its result.
            case "$gl_cv_host_cpu_c_abi" in
-             i386 | x86_64-x32 | arm | armhf | arm64-ilp32 | hppa | ia64-ilp32 | mips | mipsn32 | powerpc | riscv*-ilp32* | s390 | sparc)
+             i386 | x86_64-x32 | arm | armhf | arm64-ilp32 | hppa | ia64-ilp32 | loongarch32 | mips | mipsn32 | powerpc | riscv*-ilp32* | s390 | sparc)
                gl_cv_host_cpu_c_abi_32bit=yes ;;
-             x86_64 | alpha | arm64 | aarch64c | hppa64 | ia64 | mips64 | powerpc64 | powerpc64-elfv2 | riscv*-lp64* | s390x | sparc64 )
+             x86_64 | alpha | arm64 | aarch64c | hppa64 | ia64 | loongarch64 | mips64 | powerpc64 | powerpc64-elfv2 | riscv*-lp64* | s390x | sparc64 )
                gl_cv_host_cpu_c_abi_32bit=no ;;
              *)
                gl_cv_host_cpu_c_abi_32bit=unknown ;;

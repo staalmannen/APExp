@@ -9,15 +9,15 @@ msgid ""
 msgstr ""
 "Project-Id-Version: gettext-runtime 0.22\n"
 "Report-Msgid-Bugs-To: bug-gettext@gnu.org\n"
-"POT-Creation-Date: 2024-02-21 11:49+0100\n"
+"POT-Creation-Date: 2023-06-15 20:33+0200\n"
 "PO-Revision-Date: 2023-06-24 09:08+0700\n"
 "Last-Translator: Trần Ngọc Quân <vnwildman@gmail.com>\n"
 "Language-Team: Vietnamese <translation-team-vi@lists.sourceforge.net>\n"
 "Language: vi\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Bugs: Report translation errors to the Language-Team address.\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
 #: gnulib-lib/closeout.c:66
@@ -28,37 +28,37 @@ msgstr "lỗi ghi"
 msgid "Unknown system error"
 msgstr "Lỗi hệ thống không rõ"
 
-#: gnulib-lib/getopt.c:282
+#: gnulib-lib/getopt.c:278
 #, c-format
 msgid "%s: option '%s%s' is ambiguous\n"
 msgstr "%s: tùy chọn “%s%s” chưa rõ ràng\n"
 
-#: gnulib-lib/getopt.c:288
+#: gnulib-lib/getopt.c:284
 #, c-format
 msgid "%s: option '%s%s' is ambiguous; possibilities:"
 msgstr "%s: tùy chọn “%s%s” chưa rõ ràng; khả năng là:"
 
-#: gnulib-lib/getopt.c:322
+#: gnulib-lib/getopt.c:319
 #, c-format
 msgid "%s: unrecognized option '%s%s'\n"
 msgstr "%s: không nhận ra tùy chọn “%s%s”\n"
 
-#: gnulib-lib/getopt.c:348
+#: gnulib-lib/getopt.c:345
 #, c-format
 msgid "%s: option '%s%s' doesn't allow an argument\n"
 msgstr "%s: tùy chọn “%s%s” không cho phép có đối số\n"
 
-#: gnulib-lib/getopt.c:363
+#: gnulib-lib/getopt.c:360
 #, c-format
 msgid "%s: option '%s%s' requires an argument\n"
 msgstr "%s: tùy chọn “%s%s” yêu cầu một đối số\n"
 
-#: gnulib-lib/getopt.c:624
+#: gnulib-lib/getopt.c:621
 #, c-format
 msgid "%s: invalid option -- '%c'\n"
 msgstr "%s: tùy chọn không hợp lệ -- “%c”\n"
 
-#: gnulib-lib/getopt.c:639 gnulib-lib/getopt.c:685
+#: gnulib-lib/getopt.c:636 gnulib-lib/getopt.c:682
 #, c-format
 msgid "%s: option requires an argument -- '%c'\n"
 msgstr "%s: tùy chọn yêu cầu một đối số -- “%c”\n"
@@ -254,8 +254,7 @@ msgstr "  -h, --help                hiển thị trợ giúp này rồi thoát\n
 #: src/gettext.c:279 src/ngettext.c:246
 #, c-format
 msgid "  -V, --version             display version information and exit\n"
-msgstr ""
-"  -V, --version             hiển thị các thông tin về phiên bản rồi thoát\n"
+msgstr "  -V, --version             hiển thị các thông tin về phiên bản rồi thoát\n"
 
 #: src/gettext.c:283
 #, c-format, no-wrap
@@ -300,24 +299,18 @@ msgstr "  -d, --domain=TEXTDOMAIN   lấy chuỗi đã dịch từ TEXTDOMAIN\n"
 
 #: src/ngettext.c:235
 #, c-format
-msgid ""
-"  [TEXTDOMAIN]              retrieve translated message from TEXTDOMAIN\n"
+msgid "  [TEXTDOMAIN]              retrieve translated message from TEXTDOMAIN\n"
 msgstr "  [TEXTDOMAIN]              lấy chuỗi đã dịch từ TEXTDOMAIN\n"
 
 #: src/ngettext.c:237
 #, c-format
-msgid ""
-"  MSGID MSGID-PLURAL        translate MSGID (singular) / MSGID-PLURAL "
-"(plural)\n"
-msgstr ""
-"  MSGID MSGID-PLURAL        dịch MSGID (số ít) / MSGID-PLURAL (số nhiều)\n"
+msgid "  MSGID MSGID-PLURAL        translate MSGID (singular) / MSGID-PLURAL (plural)\n"
+msgstr "  MSGID MSGID-PLURAL        dịch MSGID (số ít) / MSGID-PLURAL (số nhiều)\n"
 
 #: src/ngettext.c:239
 #, c-format
-msgid ""
-"  COUNT                     choose singular/plural form based on this value\n"
-msgstr ""
-"  COUNT                     chọn dạng số ít/số nhiều dựa trên giá trị này\n"
+msgid "  COUNT                     choose singular/plural form based on this value\n"
+msgstr "  COUNT                     chọn dạng số ít/số nhiều dựa trên giá trị này\n"
 
 #: src/ngettext.c:250
 #, c-format, no-wrap
@@ -352,8 +345,7 @@ msgstr ""
 #~ msgid "Report bugs to <bug-gnu-gettext@gnu.org>.\n"
 #~ msgstr ""
 #~ "Hãy thông báo lỗi nào cho <bug-gnu-gettext@gnu.org>.\n"
-#~ "Hãy thông báo lỗi dịch nào cho <http://translationproject.org/team/vi."
-#~ "html>.\n"
+#~ "Hãy thông báo lỗi dịch nào cho <http://translationproject.org/team/vi.html>.\n"
 
 #~ msgid ""
 #~ "  -d, --domain=TEXTDOMAIN   retrieve translated messages from TEXTDOMAIN\n"
@@ -381,10 +373,8 @@ msgstr ""
 #~ "  -h, --help                display this help and exit\n"
 #~ "  -V, --version             display version information and exit\n"
 #~ "  [TEXTDOMAIN]              retrieve translated message from TEXTDOMAIN\n"
-#~ "  MSGID MSGID-PLURAL        translate MSGID (singular) / MSGID-PLURAL "
-#~ "(plural)\n"
-#~ "  COUNT                     choose singular/plural form based on this "
-#~ "value\n"
+#~ "  MSGID MSGID-PLURAL        translate MSGID (singular) / MSGID-PLURAL (plural)\n"
+#~ "  COUNT                     choose singular/plural form based on this value\n"
 #~ msgstr ""
 #~ "  -d, --domain=MIỀN_VĂN_BẢN lấy chuỗi đã dịch từ “MIỀN_VĂN_BẢN” này\n"
 #~ "  -e                        cho phép mở rộng một số kiểu thoát chuỗi\n"

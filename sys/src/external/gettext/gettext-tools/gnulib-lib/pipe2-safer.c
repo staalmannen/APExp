@@ -1,5 +1,5 @@
 /* Invoke pipe2, but avoid some glitches.
-   Copyright (C) 2005-2006, 2009-2024 Free Software Foundation, Inc.
+   Copyright (C) 2005-2006, 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -33,15 +33,14 @@ pipe2_safer (int fd[2], int flags)
   /* This is a generalization of the pipe_safer implementation.  */
   if (pipe2 (fd, flags) == 0)
     {
-      int i;
-      for (i = 0; i < 2; i++)
+      for (int i = 0; i < 2; i++)
         {
           fd[i] = fd_safer_flag (fd[i], flags);
           if (fd[i] < 0)
             {
-              int e = errno;
+              int saved_errno = errno;
               close (fd[1 - i]);
-              errno = e;
+              errno = saved_errno;
               return -1;
             }
         }

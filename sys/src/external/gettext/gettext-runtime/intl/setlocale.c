@@ -1,6 +1,5 @@
 /* setlocale() function that respects the locale chosen by the user.
-   Copyright (C) 2009, 2011, 2013, 2018-2019, 2022-2023 Free Software Foundation, Inc.
-   Written by Bruno Haible <bruno@clisp.org>, 2009.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU Lesser General Public License as published by
@@ -14,6 +13,8 @@
 
    You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible.  */
 
 #ifdef HAVE_CONFIG_H
 # include <config.h>
@@ -33,30 +34,31 @@
 #include <stdlib.h>
 #include <string.h>
 
-/* When building a DLL, we must export some functions.  Note that because
-   the functions are only defined for binary backward compatibility, we
-   don't need to use __declspec(dllimport) in any case.  */
-#if HAVE_VISIBILITY && BUILDING_DLL
-# define DLL_EXPORTED __attribute__((__visibility__("default")))
-#elif defined _MSC_VER && BUILDING_DLL
+/* When building a shared library, we must export some functions.
+   Note that because this is a .c file, not a .h file, we don't need to use
+   __declspec(dllimport) in any case.  */
+#if HAVE_VISIBILITY && BUILDING_LIBRARY
+# define SHLIB_EXPORTED __attribute__((__visibility__("default")))
+#elif defined _MSC_VER && BUILDING_LIBRARY
 /* When building with MSVC, exporting a symbol means that the object file
    contains a "linker directive" of the form /EXPORT:symbol.  This can be
    inspected through the "objdump -s --section=.drectve FILE" or
    "dumpbin /directives FILE" commands.
    The symbols from this file should be exported if and only if the object
    file gets included in a DLL.  Libtool, on Windows platforms, defines
-   the C macro DLL_EXPORT (together with PIC) when compiling for a DLL
-   and does not define it when compiling an object file meant to be linked
-   statically into some executable.  */
+   the C macro DLL_EXPORT (together with PIC) when compiling for a shared
+   library (called DLL under Windows) and does not define it when compiling
+   an object file meant to be linked statically into some executable.  */
 # if defined DLL_EXPORT
-#  define DLL_EXPORTED __declspec(dllexport)
+#  define SHLIB_EXPORTED __declspec(dllexport)
 # else
-#  define DLL_EXPORTED
+#  define SHLIB_EXPORTED
 # endif
 #else
-# define DLL_EXPORTED
+# define SHLIB_EXPORTED
 #endif
 
+#include "setlocale-fixes.h"
 #include "localename.h"
 
 #if HAVE_CFLOCALECOPYPREFERREDLANGUAGES || HAVE_CFPREFERENCESCOPYAPPVALUE
@@ -69,6 +71,11 @@
 # include <CoreFoundation/CFArray.h>
 # include <CoreFoundation/CFString.h>
 extern void gl_locale_name_canonicalize (char *name);
+#endif
+
+#if defined _WIN32 && !defined __CYGWIN__
+# define WIN32_LEAN_AND_MEAN
+# include <windows.h>
 #endif
 
 /* Get _nl_msg_cat_cntr declaration.  */
@@ -669,6 +676,7 @@ search (const struct table_entry *table, size_t table_size, const char *string,
 static char *
 setlocale_unixlike (int category, const char *locale)
 {
+  int is_utf8 = (GetACP () == 65001);
   char *result;
   char llCC_buf[64];
   char ll_buf[64];
@@ -678,6 +686,15 @@ setlocale_unixlike (int category, const char *locale)
      locale name "C", but not "POSIX".  Therefore map "POSIX" to "C".  */
   if (locale != NULL && strcmp (locale, "POSIX") == 0)
     locale = "C";
+
+  /* The native Windows implementation of setlocale, in the UTF-8 environment,
+     does not understand the locale names "C.UTF-8" or "C.utf8" or "C.65001",
+     but it understands "English_United States.65001", which is functionally
+     equivalent.  */
+  if (locale != NULL
+      && ((is_utf8 && strcmp (locale, "C") == 0)
+          || strcmp (locale, "C.UTF-8") == 0))
+    locale = "English_United States.65001";
 
   /* First, try setlocale with the original argument unchanged.  */
   result = setlocale (category, locale);
@@ -711,7 +728,15 @@ setlocale_unixlike (int category, const char *locale)
        */
       if (strcmp (llCC_buf, locale) != 0)
         {
-          result = setlocale (category, llCC_buf);
+          if (is_utf8)
+            {
+              char buf[64+6];
+              strcpy (buf, llCC_buf);
+              strcat (buf, ".65001");
+              result = setlocale (category, buf);
+            }
+          else
+            result = setlocale (category, llCC_buf);
           if (result != NULL)
             return result;
         }
@@ -728,7 +753,15 @@ setlocale_unixlike (int category, const char *locale)
         for (i = range.lo; i < range.hi; i++)
           {
             /* Try the replacement in language_table[i].  */
-            result = setlocale (category, language_table[i].english);
+            if (is_utf8)
+              {
+                char buf[64+6];
+                strcpy (buf, language_table[i].english);
+                strcat (buf, ".65001");
+                result = setlocale (category, buf);
+              }
+            else
+              result = setlocale (category, language_table[i].english);
             if (result != NULL)
               return result;
           }
@@ -782,13 +815,15 @@ setlocale_unixlike (int category, const char *locale)
                             size_t part1_len = strlen (part1);
                             const char *part2 = country_table[j].english;
                             size_t part2_len = strlen (part2) + 1;
-                            char buf[64+64];
+                            char buf[64+64+6];
 
-                            if (!(part1_len + 1 + part2_len <= sizeof (buf)))
+                            if (!(part1_len + 1 + part2_len + 6 <= sizeof (buf)))
                               abort ();
                             memcpy (buf, part1, part1_len);
                             buf[part1_len] = '_';
                             memcpy (buf + part1_len + 1, part2, part2_len);
+                            if (is_utf8)
+                              strcat (buf, ".65001");
 
                             /* Try the concatenated replacements.  */
                             result = setlocale (category, buf);
@@ -806,8 +841,16 @@ setlocale_unixlike (int category, const char *locale)
                     for (i = language_range.lo; i < language_range.hi; i++)
                       {
                         /* Try only the language replacement.  */
-                        result =
-                          setlocale (category, language_table[i].english);
+                        if (is_utf8)
+                          {
+                            char buf[64+6];
+                            strcpy (buf, language_table[i].english);
+                            strcat (buf, ".65001");
+                            result = setlocale (category, buf);
+                          }
+                        else
+                          result =
+                            setlocale (category, language_table[i].english);
                         if (result != NULL)
                           return result;
                       }
@@ -828,7 +871,7 @@ setlocale_unixlike (int category, const char *locale)
 static char *
 setlocale_unixlike (int category, const char *locale)
 {
-  char *result = setlocale (category, locale);
+  char *result = setlocale_fixed (category, locale);
   if (result == NULL)
     switch (category)
       {
@@ -861,22 +904,12 @@ setlocale_unixlike (int category, const char *locale)
 
 # if LC_MESSAGES == 1729
 
-/* The system does not store an LC_MESSAGES locale category.  Do it here.  */
-static char lc_messages_name[64] = "C";
-
 /* Like setlocale, but support also LC_MESSAGES.  */
 static char *
 setlocale_single (int category, const char *locale)
 {
   if (category == LC_MESSAGES)
-    {
-      if (locale != NULL)
-        {
-          lc_messages_name[sizeof (lc_messages_name) - 1] = '\0';
-          strncpy (lc_messages_name, locale, sizeof (lc_messages_name) - 1);
-        }
-      return lc_messages_name;
-    }
+    return setlocale_messages (locale);
   else
     return setlocale_unixlike (category, locale);
 }
@@ -952,6 +985,7 @@ static char const locales_with_principal_territory[][6 + 1] =
     "fy_NL",    /* Western Frisian      Netherlands */
     "ga_IE",    /* Irish        Ireland */
     "gd_GB",    /* Scottish Gaelic      Britain */
+    "gl_ES",    /* Galician     Spain */
     "gon_IN",   /* Gondi        India */
     "gsw_CH",   /* Swiss German Switzerland */
     "gu_IN",    /* Gujarati     India */
@@ -1070,6 +1104,7 @@ static char const locales_with_principal_territory[][6 + 1] =
     "suk_TZ",   /* Sukuma       Tanzania */
     "sus_GN",   /* Susu         Guinea */
     "sv_SE",    /* Swedish      Sweden */
+    "ta_IN",    /* Tamil        India */
     "te_IN",    /* Telugu       India */
     "tem_SL",   /* Timne        Sierra Leone */
     "tet_ID",   /* Tetum        Indonesia */
@@ -1406,7 +1441,7 @@ get_main_locale_with_same_territory (const char *locale)
 
 # endif
 
-DLL_EXPORTED
+SHLIB_EXPORTED
 char *
 libintl_setlocale (int category, const char *locale)
 {
@@ -1572,7 +1607,7 @@ libintl_setlocale (int category, const char *locale)
                            For LC_COLLATE, the application should use the locale
                            properties kCFLocaleCollationIdentifier,
                            kCFLocaleCollatorIdentifier.
-                           For LC_MONETARY, the applicationshould use the locale
+                           For LC_MONETARY, the application should use the locale
                            properties kCFLocaleCurrencySymbol,
                            kCFLocaleCurrencyCode.
                            But since most applications don't have macOS specific
@@ -1607,7 +1642,7 @@ libintl_setlocale (int category, const char *locale)
           /* All steps were successful.  */
           ++_nl_msg_cat_cntr;
           free (saved_locale);
-          return setlocale (LC_ALL, NULL);
+          goto ret_all;
 
         fail:
           if (saved_locale[0] != '\0') /* don't risk an endless recursion */
@@ -1631,55 +1666,165 @@ libintl_setlocale (int category, const char *locale)
     }
   else
     {
-# if defined _WIN32 && ! defined __CYGWIN__
-      if (category == LC_ALL && locale != NULL && strchr (locale, '.') != NULL)
+# if LC_MESSAGES == 1729
+      if (locale != NULL)
         {
-          char *saved_locale;
+          char truncated_locale[SETLOCALE_NULL_ALL_MAX];
+          const char *native_locale;
+          const char *messages_locale;
 
-          /* Back up the old locale.  */
-          saved_locale = setlocale (LC_ALL, NULL);
-          if (saved_locale == NULL)
-            return NULL;
-          saved_locale = strdup (saved_locale);
-          if (saved_locale == NULL)
-            return NULL;
-
-          if (setlocale_unixlike (LC_ALL, locale) == NULL)
+          if (strncmp (locale, "LC_COLLATE=", 11) == 0)
             {
-              free (saved_locale);
-              return NULL;
+              /* The locale argument indicates a mixed locale.  It must be of
+                 the form
+                 "LC_COLLATE=...;LC_CTYPE=...;LC_MONETARY=...;LC_NUMERIC=...;LC_TIME=...;LC_MESSAGES=..."
+                 since that is what this function returns (see ret_all below).
+                 Decompose it.  */
+              const char *last_semicolon = strrchr (locale, ';');
+              if (!(last_semicolon != NULL
+                    && strncmp (last_semicolon + 1, "LC_MESSAGES=", 12) == 0))
+                return NULL;
+              if (category == LC_MESSAGES)
+                return setlocale_single (category, last_semicolon + 13);
+              size_t truncated_locale_len = last_semicolon - locale;
+              if (truncated_locale_len >= sizeof (truncated_locale))
+                return NULL;
+              memcpy (truncated_locale, locale, truncated_locale_len);
+              truncated_locale[truncated_locale_len] = '\0';
+              native_locale = truncated_locale;
+              messages_locale = last_semicolon + 13;
+            }
+          else
+            {
+              native_locale = locale;
+              messages_locale = locale;
             }
 
-          /* On native Windows, setlocale(LC_ALL,...) may succeed but set the
-             LC_CTYPE category to an invalid value ("C") when it does not
-             support the specified encoding.  Report a failure instead.  */
-          if (strcmp (setlocale (LC_CTYPE, NULL), "C") == 0)
+          if (category == LC_ALL)
             {
-              if (saved_locale[0] != '\0') /* don't risk an endless recursion */
-                setlocale (LC_ALL, saved_locale);
-              free (saved_locale);
-              return NULL;
-            }
+              /* In the underlying implementation, LC_ALL does not contain
+                 LC_MESSAGES.  Therefore we need to handle LC_MESSAGES
+                 separately.  */
+              char *result;
 
-          /* It was really successful.  */
-          ++_nl_msg_cat_cntr;
-          free (saved_locale);
-          return setlocale (LC_ALL, NULL);
+#  if defined _WIN32 && ! defined __CYGWIN__
+              if (strchr (native_locale, '.') != NULL)
+                {
+                  char *saved_locale;
+
+                  /* Back up the old locale.  */
+                  saved_locale = setlocale (LC_ALL, NULL);
+                  if (saved_locale == NULL)
+                    return NULL;
+                  saved_locale = strdup (saved_locale);
+                  if (saved_locale == NULL)
+                    return NULL;
+
+                  if (setlocale_unixlike (LC_ALL, native_locale) == NULL)
+                    {
+                      free (saved_locale);
+                      return NULL;
+                    }
+
+                  /* On native Windows, setlocale(LC_ALL,...) may succeed but
+                     set the LC_CTYPE category to an invalid value ("C") when
+                     it does not support the specified encoding.  Report a
+                     failure instead.  */
+                  if (strcmp (setlocale (LC_CTYPE, NULL), "C") == 0)
+                    {
+                      /* Don't risk an endless recursion.  */
+                      if (saved_locale[0] != '\0')
+                        setlocale (LC_ALL, saved_locale);
+                      free (saved_locale);
+                      return NULL;
+                    }
+
+                  /* It was really successful.  */
+                  free (saved_locale);
+                  result = setlocale (LC_ALL, NULL);
+                }
+              else
+#  endif
+                result = setlocale_single (LC_ALL, native_locale);
+              if (result == NULL)
+                return NULL;
+
+              setlocale_single (LC_MESSAGES, messages_locale);
+
+              ++_nl_msg_cat_cntr;
+              goto ret_all;
+            }
+          else
+            {
+              char *result;
+
+              if (category == LC_MESSAGES)
+                result = setlocale_single (category, messages_locale);
+              else
+                result = setlocale_single (category, native_locale);
+              if (result != NULL)
+                ++_nl_msg_cat_cntr;
+              return result;
+            }
         }
-      else
+      else /* locale == NULL */
+        {
+          if (category == LC_ALL)
+            goto ret_all;
+          else
+            return setlocale_single (category, NULL);
+        }
+# else
+      return setlocale_single (category, locale);
 # endif
-        {
-          char *result = setlocale_single (category, locale);
-          if (result != NULL)
-            ++_nl_msg_cat_cntr;
-          return result;
-        }
     }
+
+ ret_all:
+  /* Return the name of all categories of the current locale.  */
+# if LC_MESSAGES == 1729 /* native Windows */
+  /* The locale name for mixed locales looks like this:
+     "LC_COLLATE=...;LC_CTYPE=...;LC_MONETARY=...;LC_NUMERIC=...;LC_TIME=..."
+     If necessary, add ";LC_MESSAGES=..." at the end.  */
+  {
+    char *name1 = setlocale (LC_ALL, NULL);
+    char *name2 = setlocale_single (LC_MESSAGES, NULL);
+    if (strcmp (name1, name2) == 0)
+      /* Not a mixed locale.  */
+      return name1;
+    else
+      {
+        static char resultbuf[SETLOCALE_NULL_ALL_MAX];
+        /* Prepare the result in a stack-allocated buffer, in order to reduce
+           race conditions in a multithreaded situation.  */
+        char stackbuf[SETLOCALE_NULL_ALL_MAX];
+        if (strncmp (name1, "LC_COLLATE=", 11) == 0)
+          {
+            if (strlen (name1) + strlen (name2) + 13 >= sizeof (stackbuf))
+              return NULL;
+            sprintf (stackbuf, "%s;LC_MESSAGES=%s", name1, name2);
+          }
+        else
+          {
+            if (5 * strlen (name1) + strlen (name2) + 68 >= sizeof (stackbuf))
+              return NULL;
+            sprintf (stackbuf,
+                     "LC_COLLATE=%s;LC_CTYPE=%s;LC_MONETARY=%s;LC_NUMERIC=%s;LC_TIME=%s;LC_MESSAGES=%s",
+                     name1, name1, name1, name1, name1, name2);
+          }
+        strcpy (resultbuf, stackbuf);
+        return resultbuf;
+      }
+  }
+# elif defined __ANDROID__
+  return setlocale_fixed_null (LC_ALL);
+# else
+  return setlocale (LC_ALL, NULL);
+# endif
 }
 
 # if HAVE_NEWLOCALE
 
-DLL_EXPORTED
+SHLIB_EXPORTED
 locale_t
 libintl_newlocale (int category_mask, const char *locale, locale_t base)
 {

@@ -1,5 +1,5 @@
 /* Sequential list data type implemented by an array.
-   Copyright (C) 2006-2024 Free Software Foundation, Inc.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
    This file is free software: you can redistribute it and/or modify
@@ -222,9 +222,7 @@ gl_array_indexof_from_to (gl_list_t list, size_t start_index, size_t end_index,
       gl_listelement_equals_fn equals = list->base.equals_fn;
       if (equals != NULL)
         {
-          size_t i;
-
-          for (i = start_index;;)
+          for (size_t i = start_index;;)
             {
               if (equals (elt, list->elements[i]))
                 return i;
@@ -235,9 +233,7 @@ gl_array_indexof_from_to (gl_list_t list, size_t start_index, size_t end_index,
         }
       else
         {
-          size_t i;
-
-          for (i = start_index;;)
+          for (size_t i = start_index;;)
             {
               if (elt == list->elements[i])
                 return i;
@@ -263,17 +259,13 @@ gl_array_search_from_to (gl_list_t list, size_t start_index, size_t end_index,
 static int
 grow (gl_list_t list)
 {
-  size_t new_allocated;
-  size_t memory_size;
-  const void **memory;
-
-  new_allocated = xtimes (list->allocated, 2);
+  size_t new_allocated = xtimes (list->allocated, 2);
   new_allocated = xsum (new_allocated, 1);
-  memory_size = xtimes (new_allocated, sizeof (const void *));
+  size_t memory_size = xtimes (new_allocated, sizeof (const void *));
   if (size_overflow_p (memory_size))
     /* Overflow, would lead to out of memory.  */
     return -1;
-  memory = (const void **) realloc (list->elements, memory_size);
+  const void **memory = (const void **) realloc (list->elements, memory_size);
   if (memory == NULL)
     /* Out of memory.  */
     return -1;
@@ -286,14 +278,12 @@ static gl_list_node_t
 gl_array_nx_add_first (gl_list_t list, const void *elt)
 {
   size_t count = list->count;
-  const void **elements;
-  size_t i;
 
   if (count == list->allocated)
     if (grow (list) < 0)
       return NULL;
-  elements = list->elements;
-  for (i = count; i > 0; i--)
+  const void **elements = list->elements;
+  for (size_t i = count; i > 0; i--)
     elements[i] = elements[i - 1];
   elements[0] = elt;
   list->count = count + 1;
@@ -318,19 +308,16 @@ gl_array_nx_add_before (gl_list_t list, gl_list_node_t node, const void *elt)
 {
   size_t count = list->count;
   uintptr_t index = NODE_TO_INDEX (node);
-  size_t position;
-  const void **elements;
-  size_t i;
 
   if (!(index < count))
     /* Invalid argument.  */
     abort ();
-  position = index;
+  size_t position = index;
   if (count == list->allocated)
     if (grow (list) < 0)
       return NULL;
-  elements = list->elements;
-  for (i = count; i > position; i--)
+  const void **elements = list->elements;
+  for (size_t i = count; i > position; i--)
     elements[i] = elements[i - 1];
   elements[position] = elt;
   list->count = count + 1;
@@ -342,19 +329,16 @@ gl_array_nx_add_after (gl_list_t list, gl_list_node_t node, const void *elt)
 {
   size_t count = list->count;
   uintptr_t index = NODE_TO_INDEX (node);
-  size_t position;
-  const void **elements;
-  size_t i;
 
   if (!(index < count))
     /* Invalid argument.  */
     abort ();
-  position = index + 1;
+  size_t position = index + 1;
   if (count == list->allocated)
     if (grow (list) < 0)
       return NULL;
-  elements = list->elements;
-  for (i = count; i > position; i--)
+  const void **elements = list->elements;
+  for (size_t i = count; i > position; i--)
     elements[i] = elements[i - 1];
   elements[position] = elt;
   list->count = count + 1;
@@ -365,8 +349,6 @@ static gl_list_node_t
 gl_array_nx_add_at (gl_list_t list, size_t position, const void *elt)
 {
   size_t count = list->count;
-  const void **elements;
-  size_t i;
 
   if (!(position <= count))
     /* Invalid argument.  */
@@ -374,8 +356,8 @@ gl_array_nx_add_at (gl_list_t list, size_t position, const void *elt)
   if (count == list->allocated)
     if (grow (list) < 0)
       return NULL;
-  elements = list->elements;
-  for (i = count; i > position; i--)
+  const void **elements = list->elements;
+  for (size_t i = count; i > position; i--)
     elements[i] = elements[i - 1];
   elements[position] = elt;
   list->count = count + 1;
@@ -387,18 +369,15 @@ gl_array_remove_node (gl_list_t list, gl_list_node_t node)
 {
   size_t count = list->count;
   uintptr_t index = NODE_TO_INDEX (node);
-  size_t position;
-  const void **elements;
-  size_t i;
 
   if (!(index < count))
     /* Invalid argument.  */
     abort ();
-  position = index;
-  elements = list->elements;
+  size_t position = index;
+  const void **elements = list->elements;
   if (list->base.dispose_fn != NULL)
     list->base.dispose_fn (elements[position]);
-  for (i = position + 1; i < count; i++)
+  for (size_t i = position + 1; i < count; i++)
     elements[i - 1] = elements[i];
   list->count = count - 1;
   return true;
@@ -408,16 +387,14 @@ static bool
 gl_array_remove_at (gl_list_t list, size_t position)
 {
   size_t count = list->count;
-  const void **elements;
-  size_t i;
 
   if (!(position < count))
     /* Invalid argument.  */
     abort ();
-  elements = list->elements;
+  const void **elements = list->elements;
   if (list->base.dispose_fn != NULL)
     list->base.dispose_fn (elements[position]);
-  for (i = position + 1; i < count; i++)
+  for (size_t i = position + 1; i < count; i++)
     elements[i - 1] = elements[i];
   list->count = count - 1;
   return true;
@@ -527,7 +504,7 @@ gl_array_iterator_next (gl_list_iterator_t *iterator,
 }
 
 static void
-gl_array_iterator_free (_GL_ATTRIBUTE_MAYBE_UNUSED gl_list_iterator_t *iterator)
+gl_array_iterator_free (gl_list_iterator_t *_GL_UNNAMED (iterator))
 {
 }
 

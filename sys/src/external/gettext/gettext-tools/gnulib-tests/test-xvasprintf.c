@@ -1,5 +1,5 @@
 /* Test of xvasprintf() and xasprintf() functions.
-   Copyright (C) 2007-2024 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,14 +16,14 @@
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2007.  */
 
+#include <config.h>
+
 /* Tell GCC not to warn about the specific edge cases tested here.  */
-#if (__GNUC__ == 4 && 3 <= __GNUC_MINOR__) || 4 < __GNUC__
+#if _GL_GNUC_PREREQ (4, 3)
 # pragma GCC diagnostic ignored "-Wformat-zero-length"
 # pragma GCC diagnostic ignored "-Wformat-nonliteral"
 # pragma GCC diagnostic ignored "-Wformat-security"
 #endif
-
-#include <config.h>
 
 #include "xvasprintf.h"
 
@@ -48,10 +48,9 @@ my_xasprintf (const char *format, ...)
 static void
 test_xvasprintf (void)
 {
-  int repeat;
   char *result;
 
-  for (repeat = 0; repeat <= 8; repeat++)
+  for (int repeat = 0; repeat <= 8; repeat++)
     {
       result = my_xasprintf ("%d", 12345);
       ASSERT (result != NULL);
@@ -87,10 +86,9 @@ test_xvasprintf (void)
 static void
 test_xasprintf (void)
 {
-  int repeat;
   char *result;
 
-  for (repeat = 0; repeat <= 8; repeat++)
+  for (int repeat = 0; repeat <= 8; repeat++)
     {
       result = xasprintf ("%d", 12345);
       ASSERT (result != NULL);
@@ -131,5 +129,5 @@ main (_GL_UNUSED int argc, char *argv[])
   test_xvasprintf ();
   test_xasprintf ();
 
-  return 0;
+  return test_exit_status;
 }

@@ -1,5 +1,5 @@
 /* hash - hashing table processing.
-   Copyright (C) 1998-1999, 2001, 2003, 2009-2024 Free Software Foundation,
+   Copyright (C) 1998-1999, 2001, 2003, 2009-2026 Free Software Foundation,
    Inc.
    Written by Jim Meyering <meyering@ascend.com>, 1998.
 
@@ -130,24 +130,30 @@ typedef bool (*Hash_processor) (void *entry, void *processor_data);
 extern size_t hash_do_for_each (const Hash_table *table,
                                 Hash_processor processor, void *processor_data);
 
+/* Return a hash code of ENTRY, in the range 0..TABLE_SIZE-1.
+   This hash code function must have the property that if the comparator of
+   ENTRY1 and ENTRY2 returns true, the hasher returns the same value for ENTRY1
+   and for ENTRY2.
+   The hash code function typically computes an unsigned integer and at the end
+   performs a % TABLE_SIZE modulo operation.  This modulo operation is performed
+   as part of this hash code function, not by the caller, because in some cases
+   the unsigned integer will be a 'size_t', in other cases an 'uintmax_t' or
+   even larger.  */
+typedef size_t (*Hash_hasher) (const void *entry, size_t table_size);
+
+/* Compare two entries, ENTRY1 (being looked up or being inserted) and
+   ENTRY2 (already in the table) for equality.  Return true for equal,
+   false otherwise.  */
+typedef bool (*Hash_comparator) (const void *entry1, const void *entry2);
+
+/* This function is invoked when an ENTRY is removed from the hash table.  */
+typedef void (*Hash_data_freer) (void *entry);
+
 /*
  * Allocation and clean-up.
  */
 
-#if 0
-
-/* Return a hash index for a NUL-terminated STRING between 0 and N_BUCKETS-1.
-   This is a convenience routine for constructing other hashing functions.  */
-extern size_t hash_string (const char *string, size_t n_buckets)
-       _GL_ATTRIBUTE_PURE;
-
-#endif
-
 extern void hash_reset_tuning (Hash_tuning *tuning);
-
-typedef size_t (*Hash_hasher) (const void *entry, size_t table_size);
-typedef bool (*Hash_comparator) (const void *entry1, const void *entry2);
-typedef void (*Hash_data_freer) (void *entry);
 
 /* Reclaim all storage associated with a hash table.  If a data_freer
    function has been supplied by the user when the hash table was created,
@@ -265,10 +271,11 @@ extern int hash_insert_if_absent (Hash_table *table, const void *entry,
    table, don't modify the table and return NULL.  */
 extern void *hash_remove (Hash_table *table, const void *entry);
 
-/* Same as hash_remove.  This interface is deprecated.
-   FIXME: Remove in 2022.  */
-_GL_ATTRIBUTE_DEPRECATED
-extern void *hash_delete (Hash_table *table, const void *entry);
+
+# if GNULIB_HASHCODE_STRING1
+/* Include declarations of module 'hashcode-string1'.  */
+#  include "hashcode-string1.h"
+# endif
 
 # ifdef __cplusplus
 }

@@ -1,5 +1,5 @@
 /* Extracting a message.  Accumulating the message list.
-   Copyright (C) 2001-2020 Free Software Foundation, Inc.
+   Copyright (C) 2001-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,6 +13,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible.  */
 
 #ifndef _XGETTEXT_MESSAGE_H
 #define _XGETTEXT_MESSAGE_H
@@ -52,7 +54,7 @@ extern message_ty *remember_a_message (message_list_ty *mlp,
                                        char *msgid,
                                        bool is_utf8,
                                        bool pluralp,
-                                       flag_context_ty context,
+                                       flag_region_ty *region,
                                        lex_pos_ty *pos,
                                        const char *extracted_comment,
                                        refcounted_string_list_ty *comment,
@@ -71,10 +73,11 @@ extern message_ty *remember_a_message (message_list_ty *mlp,
 extern void remember_a_message_plural (message_ty *mp,
                                        char *string,
                                        bool is_utf8,
-                                       flag_context_ty context,
+                                       flag_region_ty *region,
                                        lex_pos_ty *pos,
                                        refcounted_string_list_ty *comment,
                                        bool comment_is_utf8);
+
 
 /* The following functions are used by remember_a_message.
    Most extractors don't need to invoke them explicitly.  */
@@ -90,6 +93,15 @@ extern void decide_do_wrap (message_ty *mp);
 
 /* Eliminates the 'undecided' values in mp->syntax_check.  */
 extern void decide_syntax_check (message_ty *mp);
+
+
+/* Updates the is_format[] flag for the given format string index FI
+   depending on the information given in the region's context.
+   This can be called long after remember_a_message.  */
+extern void set_format_flag_from_context (message_ty *mp, bool plural,
+                                          lex_pos_ty *pos,
+                                          size_t fi,
+                                          flag_region_ty const *region);
 
 
 #ifdef __cplusplus

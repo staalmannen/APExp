@@ -1,5 +1,5 @@
 /* Detect write error on a stream.
-   Copyright (C) 2003-2006, 2008-2024 Free Software Foundation, Inc.
+   Copyright (C) 2003-2006, 2008-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
@@ -139,38 +139,36 @@ main ()
       8191, 8192, 8193
     };
   static char dummy[8193];
-  unsigned int i, j;
 
-  for (i = 0; i < sizeof (sizes) / sizeof (sizes[0]); i++)
+  for (unsigned int i = 0; i < sizeof (sizes) / sizeof (sizes[0]); i++)
     {
       size_t size = sizes[i];
 
-      for (j = 0; j < 2; j++)
+      for (unsigned int j = 0; j < 2; j++)
         {
           /* Run a test depending on i and j:
              Write size bytes and then calls fflush if j==1.  */
           FILE *stream = fopen (UNWRITABLE_FILE, "w");
 
           if (stream == NULL)
-            {
-              fprintf (stderr, "Test %u:%u: could not open file\n", i, j);
-              continue;
-            }
-
-          fwrite (dummy, 347, 1, stream);
-          fwrite (dummy, size - 347, 1, stream);
-          if (j)
-            fflush (stream);
-
-          if (fwriteerror (stream) == -1)
-            {
-              if (errno != ENOSPC)
-                fprintf (stderr, "Test %u:%u: fwriteerror ok, errno = %d\n",
-                         i, j, errno);
-            }
+            fprintf (stderr, "Test %u:%u: could not open file\n", i, j);
           else
-            fprintf (stderr, "Test %u:%u: fwriteerror found no error!\n",
-                     i, j);
+            {
+              fwrite (dummy, 347, 1, stream);
+              fwrite (dummy, size - 347, 1, stream);
+              if (j)
+                fflush (stream);
+
+              if (fwriteerror (stream) == -1)
+                {
+                  if (errno != ENOSPC)
+                    fprintf (stderr, "Test %u:%u: fwriteerror ok, errno = %d\n",
+                             i, j, errno);
+                }
+              else
+                fprintf (stderr, "Test %u:%u: fwriteerror found no error!\n",
+                         i, j);
+            }
         }
     }
 

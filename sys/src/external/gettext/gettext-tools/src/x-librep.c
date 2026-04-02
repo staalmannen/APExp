@@ -1,7 +1,5 @@
 /* xgettext librep backend.
-   Copyright (C) 2001-2003, 2005-2009, 2018-2023 Free Software Foundation, Inc.
-
-   This file was written by Bruno Haible <haible@clisp.cons.org>, 2001.
+   Copyright (C) 2001-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -16,9 +14,9 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
-#ifdef HAVE_CONFIG_H
-# include "config.h"
-#endif
+/* Written by Bruno Haible.  */
+
+#include <config.h>
 
 /* Specification.  */
 #include "x-librep.h"
@@ -29,6 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <error.h>
 #include "attribute.h"
 #include "c-ctype.h"
 #include "message.h"
@@ -39,8 +38,7 @@
 #include "xg-arglist-callshape.h"
 #include "xg-arglist-parser.h"
 #include "xg-message.h"
-#include "error.h"
-#include "error-progname.h"
+#include "if-error.h"
 #include "xalloc.h"
 #include "mem-hash-map.h"
 #include "gettext.h"
@@ -91,18 +89,16 @@ x_librep_keyword (const char *name)
     default_keywords = false;
   else
     {
-      const char *end;
-      struct callshape shape;
-      const char *colon;
-
       if (keywords.table == NULL)
         hash_init (&keywords, 100);
 
+      const char *end;
+      struct callshape shape;
       split_keywordspec (name, &end, &shape);
 
       /* The characters between name and end should form a valid Lisp
          symbol.  */
-      colon = strchr (name, ':');
+      const char *colon = strchr (name, ':');
       if (colon == NULL || colon >= end)
         insert_keyword_callshape (&keywords, name, end - name, &shape);
     }
@@ -208,7 +204,15 @@ grow_token (struct token *tp)
 static bool
 read_token (struct token *tp, const int *first)
 {
+  init_token (tp);
+
   int c;
+
+  if (first)
+    c = *first;
+  else
+    c = do_getc ();
+
   /* Variables for speculative number parsing:  */
   int radix = -1;
   int nfirst = 0;
@@ -217,13 +221,6 @@ read_token (struct token *tp, const int *first)
   bool exponent = false;
   bool had_sign = false;
   bool expecting_prefix = false;
-
-  init_token (tp);
-
-  if (first)
-    c = *first;
-  else
-    c = do_getc ();
 
   for (;; c = do_getc ())
     {
@@ -496,15 +493,14 @@ free_object (struct object *op)
 static char *
 string_of_object (const struct object *op)
 {
-  char *str;
-  int n;
-
   if (!(op->type == t_symbol || op->type == t_string))
     abort ();
-  n = op->token->charcount;
-  str = XNMALLOC (n + 1, char);
+  int n = op->token->charcount;
+
+  char *str = XNMALLOC (n + 1, char);
   memcpy (str, op->token->chars, n);
   str[n] = '\0';
+
   return str;
 }
 
@@ -598,14 +594,12 @@ do_getc_escaped (int c)
 
 /* Read the next object.  */
 static void
-read_object (struct object *op, flag_context_ty outer_context)
+read_object (struct object *op, flag_region_ty *outer_region)
 {
   if (nesting_depth > MAX_NESTING_DEPTH)
-    {
-      error_with_progname = false;
-      error (EXIT_FAILURE, 0, _("%s:%d: error: too deeply nested objects"),
-             logical_file_name, line_number);
-    }
+    if_error (IF_SEVERITY_FATAL_ERROR,
+              logical_file_name, line_number, (size_t)(-1), false,
+              _("too deeply nested objects"));
   for (;;)
     {
       int ch;
@@ -638,19 +632,18 @@ read_object (struct object *op, flag_context_ty outer_context)
 
             for (;; arg++)
               {
-                struct object inner;
-                flag_context_ty inner_context;
-
+                flag_region_ty *inner_region;
                 if (arg == 0)
-                  inner_context = null_context;
+                  inner_region = null_context_region ();
                 else
-                  inner_context =
-                    inherited_context (outer_context,
+                  inner_region =
+                    inheriting_region (outer_region,
                                        flag_context_list_iterator_advance (
                                          &context_iter));
 
                 ++nesting_depth;
-                read_object (&inner, inner_context);
+                struct object inner;
+                read_object (&inner, inner_region);
                 nesting_depth--;
 
                 /* Recognize end of list.  */
@@ -661,6 +654,7 @@ read_object (struct object *op, flag_context_ty outer_context)
                     last_non_comment_line = line_number;
                     if (argparser != NULL)
                       arglist_parser_done (argparser, arg);
+                    unref_region (inner_region);
                     return;
                   }
 
@@ -677,8 +671,8 @@ read_object (struct object *op, flag_context_ty outer_context)
                     if (inner.type == t_symbol)
                       {
                         char *symbol_name = string_of_object (&inner);
-                        void *keyword_value;
 
+                        void *keyword_value;
                         if (hash_find_entry (&keywords,
                                              symbol_name, strlen (symbol_name),
                                              &keyword_value)
@@ -710,13 +704,14 @@ read_object (struct object *op, flag_context_ty outer_context)
                                                      inner.line_number_at_start);
                         free (s);
                         arglist_parser_remember (argparser, arg, ms,
-                                                 inner_context,
+                                                 inner_region,
                                                  logical_file_name,
                                                  inner.line_number_at_start,
                                                  savable_comment, false);
                       }
                   }
 
+                unref_region (inner_region);
                 free_object (&inner);
               }
 
@@ -731,10 +726,9 @@ read_object (struct object *op, flag_context_ty outer_context)
           {
             for (;;)
               {
-                struct object inner;
-
                 ++nesting_depth;
-                read_object (&inner, null_context);
+                struct object inner;
+                read_object (&inner, null_context_region ());
                 nesting_depth--;
 
                 /* Recognize end of vector.  */
@@ -777,10 +771,9 @@ read_object (struct object *op, flag_context_ty outer_context)
         case '\'':
         case '`':
           {
-            struct object inner;
-
             ++nesting_depth;
-            read_object (&inner, null_context);
+            struct object inner;
+            read_object (&inner, null_context_region ());
             nesting_depth--;
 
             /* Dots and EOF are not allowed here.  But be tolerant.  */
@@ -794,10 +787,9 @@ read_object (struct object *op, flag_context_ty outer_context)
 
         case ';':
           {
-            bool all_semicolons = true;
-
             last_comment_line = line_number;
             comment_start ();
+            bool all_semicolons = true;
             for (;;)
               {
                 int c = do_getc ();
@@ -859,11 +851,11 @@ read_object (struct object *op, flag_context_ty outer_context)
             if (extract_all)
               {
                 lex_pos_ty pos;
-
                 pos.file_name = logical_file_name;
                 pos.line_number = op->line_number_at_start;
+
                 remember_a_message (mlp, NULL, string_of_object (op), false,
-                                    false, null_context, &pos,
+                                    false, null_context_region (), &pos,
                                     NULL, savable_comment, false);
               }
             last_non_comment_line = line_number;
@@ -940,9 +932,9 @@ read_object (struct object *op, flag_context_ty outer_context)
               case '\'':
               case ':':
                 {
-                  struct object inner;
                   ++nesting_depth;
-                  read_object (&inner, null_context);
+                  struct object inner;
+                  read_object (&inner, null_context_region ());
                   nesting_depth--;
                   /* Dots and EOF are not allowed here.
                      But be tolerant.  */
@@ -955,10 +947,10 @@ read_object (struct object *op, flag_context_ty outer_context)
               case '[':
               case '(':
                 {
-                  struct object inner;
                   do_ungetc (dmc);
                   ++nesting_depth;
-                  read_object (&inner, null_context);
+                  struct object inner;
+                  read_object (&inner, null_context_region ());
                   nesting_depth--;
                   /* Dots and EOF are not allowed here.
                      But be tolerant.  */
@@ -1059,11 +1051,10 @@ read_object (struct object *op, flag_context_ty outer_context)
               case 'E': case 'e':
               case 'I': case 'i':
                 {
-                  struct token token;
                   do_ungetc (dmc);
                   {
-                    int c;
-                    c = '#';
+                    struct token token;
+                    int c = '#';
                     read_token (&token, &c);
                     free_token (&token);
                   }
@@ -1086,10 +1077,8 @@ read_object (struct object *op, flag_context_ty outer_context)
         default:
           /* Read a token.  */
           {
-            bool symbol;
-
             op->token = XMALLOC (struct token);
-            symbol = read_token (op->token, &ch);
+            bool symbol = read_token (op->token, &ch);
             if (op->token->charcount == 1 && op->token->chars[0] == '.')
               {
                 free_token (op->token);
@@ -1111,10 +1100,9 @@ read_object (struct object *op, flag_context_ty outer_context)
               int c = do_getc ();
               if (c == '#')
                 {
-                  struct token second_token;
-
                   free_token (op->token);
                   free (op->token);
+                  struct token second_token;
                   read_token (&second_token, NULL);
                   free_token (&second_token);
                   op->type = t_other;
@@ -1163,7 +1151,7 @@ extract_librep (FILE *f,
     {
       struct object toplevel_object;
 
-      read_object (&toplevel_object, null_context);
+      read_object (&toplevel_object, null_context_region ());
 
       if (toplevel_object.type == t_eof)
         break;
