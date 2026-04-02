@@ -131,6 +131,7 @@ extern long pathconf(const char *, int);
 extern long fpathconf(int, int);
 extern int fchdir(int);
 extern int chown(const char *, uid_t, gid_t);
+#define lchown chown
 
 
 /* input and output primitives */

@@ -14,8 +14,8 @@ TARG= \
 		comm\
 #		cols\
 		dirname\
-#		ed\
 		expand\
+		expr\
 		false\
 #		find\
 		head\
@@ -36,7 +36,6 @@ TARG= \
 		tr\
 		tsort\
 		uname\
-		uniq\
 		unexpand\
 #		which\
 		whoami\
@@ -46,7 +45,7 @@ TARG= \
 
 UTIL_OBJS=\
 		concat.$O\
-#		cp.$O\
+		_cp.$O\
 		crypt.$O\
 		ealloc.$O\
 		enmasse.$O\
@@ -101,8 +100,10 @@ CPPFLAGS =\
 	-D_XOPEN_SOURCE=700 \
 	-D_FILE_OFFSET_BITS=64
 
-SBASE_CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil -I$SBASESRC/../gnulib -D_POSIX_SOURCE -D_BSD_EXTENSION \
-		-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE -DAT_EACCESS=NULL -DAT_FDCWD=NULL -Dlchown=chown
+SBASE_CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil\
+	-I$SBASESRC/../gnulib -D_POSIX_SOURCE -D_BSD_EXTENSION \
+	-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE -DAT_EACCESS=NULL\
+	-DAT_FDCWD=NULL -DAT_SYMLINK_NOFOLLOW=1
 
 libutil.a$O: $UTIL_OBJS
 			ar vu libutil.a$O $UTIL_OBJS

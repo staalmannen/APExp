@@ -54,6 +54,9 @@ char *strsep(char **, const char *);
 char *strcasestr(const char *, const char *);
 char *strfry(char *);
 void *mempcpy(void *, const void *, size_t);
+size_t strlcat(char *, const char *, size_t);
+#define estrlcat strlcat
+#define xstrlcat strlcat
 
 
 #ifdef __cplusplus
