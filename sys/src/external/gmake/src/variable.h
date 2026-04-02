@@ -20,7 +20,6 @@ struct file;
 
 /* Codes in a variable definition saying where the definition came from.
    Increasing numeric values signify less-overridable definitions.  */
-#define variable_origin __variable_origin
 enum variable_origin
   {
     o_default,          /* Variable from the default set.  */
