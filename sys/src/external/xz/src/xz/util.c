@@ -12,6 +12,10 @@
 #include "private.h"
 #include <stdarg.h>
 
+#if defined(_WIN32) && !defined(__CYGWIN__)
+#	include <io.h>
+#endif
+
 
 /// Buffers for uint64_to_str() and uint64_to_nicestr()
 static char bufs[4][128];
@@ -25,7 +29,11 @@ static char bufs[4][128];
 // for DJGPP builds.
 //
 // MSVC doesn't support thousand separators.
-#if defined(__DJGPP__) || defined(_MSC_VER)
+//
+// MinGW-w64 supports thousand separators only with its own stdio functions
+// which our sysdefs.h disables when _UCRT && HAVE_SMALL.
+#if defined(__DJGPP__) || defined(_MSC_VER) \
+		|| (defined(__MINGW32__) && __USE_MINGW_ANSI_STDIO == 0)
 #	define FORMAT_THOUSAND_SEP(prefix, suffix) prefix suffix
 #	define check_thousand_sep(slot) do { } while (0)
 #else
@@ -103,8 +111,8 @@ str_to_uint64(const char *name, const char *value, uint64_t min, uint64_t max)
 		return max;
 
 	if (*value < '0' || *value > '9')
-		message_fatal(_("%s: Value is not a non-negative "
-				"decimal integer"), value);
+		message_fatal(_("%s: %s"), value,
+			_("Value is not a non-negative decimal integer"));
 
 	do {
 		// Don't overflow.
@@ -167,7 +175,6 @@ error:
 	message_fatal(_("Value of the option '%s' must be in the range "
 				"[%" PRIu64 ", %" PRIu64 "]"),
 				name, min, max);
-	return result;
 }
 
 

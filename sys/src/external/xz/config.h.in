@@ -64,6 +64,9 @@
 /* Define to 1 if you have the <cpuid.h> header file. */
 #undef HAVE_CPUID_H
 
+/* Define to 1 if the 32-bit x86 CRC assembly files are used. */
+#undef HAVE_CRC_X86_ASM
+
 /* Define if the GNU dcgettext() function is already present or preinstalled.
    */
 #undef HAVE_DCGETTEXT
@@ -168,8 +171,14 @@
 /* Define to 1 if you have the 'getopt_long' function. */
 #undef HAVE_GETOPT_LONG
 
+/* Define to 1 if you have the 'getrlimit' function. */
+#undef HAVE_GETRLIMIT
+
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #undef HAVE_GETTEXT
+
+/* Define to 1 if 'HWCAP_CRC32' is declared in <sys/auxv.h>. */
+#undef HAVE_HWCAP_CRC32
 
 /* Define if you have the iconv() function and it works. */
 #undef HAVE_ICONV
@@ -183,6 +192,9 @@
 /* Define to 1 if Linux Landlock is supported. See configure.ac for details.
    */
 #undef HAVE_LINUX_LANDLOCK
+
+/* Define to 1 if 64-bit LoongArch CRC32 instructions are supported. */
+#undef HAVE_LOONGARCH_CRC32
 
 /* Define to 1 if .lz (lzip) decompression support is enabled. */
 #undef HAVE_LZIP_DECODER
@@ -324,6 +336,9 @@
 /* Define to 1 if you have the 'utimes' function. */
 #undef HAVE_UTIMES
 
+/* Define to 1 if you have the 'vasprintf' function. */
+#undef HAVE_VASPRINTF
+
 /* Define to 1 or 0, depending whether the compiler supports simple visibility
    declarations. */
 #undef HAVE_VISIBILITY
@@ -461,6 +476,10 @@
 /* Enable extensions on AIX, Interix, z/OS.  */
 #ifndef _ALL_SOURCE
 # undef _ALL_SOURCE
+#endif
+/* Enable extensions on Cosmopolitan Libc. */
+#ifndef _COSMO_SOURCE
+# undef _COSMO_SOURCE
 #endif
 /* Enable general extensions on macOS.  */
 #ifndef _DARWIN_C_SOURCE

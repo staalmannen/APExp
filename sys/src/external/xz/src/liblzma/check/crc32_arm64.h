@@ -7,7 +7,7 @@
 //
 //  Authors:    Chenxi Mao
 //              Jia Tan
-//              Hans Jansen
+//              Lasse Collin
 //
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -23,7 +23,8 @@
 // If both versions are going to be built, we need runtime detection
 // to check if the instructions are supported.
 #if defined(CRC32_GENERIC) && defined(CRC32_ARCH_OPTIMIZED)
-#	if defined(HAVE_GETAUXVAL) || defined(HAVE_ELF_AUX_INFO)
+#	if (defined(HAVE_GETAUXVAL) && defined(HAVE_HWCAP_CRC32)) \
+			|| defined(HAVE_ELF_AUX_INFO)
 #		include <sys/auxv.h>
 #	elif defined(_WIN32)
 #		include <processthreadsapi.h>
@@ -49,25 +50,50 @@ crc32_arch_optimized(const uint8_t *buf, size_t size, uint32_t crc)
 {
 	crc = ~crc;
 
-	// Align the input buffer because this was shown to be
-	// significantly faster than unaligned accesses.
-	const size_t align_amount = my_min(size, (0U - (uintptr_t)buf) & 7);
+	if (size >= 8) {
+		// Align the input buffer because this was shown to be
+		// significantly faster than unaligned accesses.
+		const size_t align = (0 - (uintptr_t)buf) & 7;
 
-	for (const uint8_t *limit = buf + align_amount; buf < limit; ++buf)
-		crc = __crc32b(crc, *buf);
+		if (align & 1)
+			crc = __crc32b(crc, *buf++);
 
-	size -= align_amount;
+		if (align & 2) {
+			crc = __crc32h(crc, aligned_read16le(buf));
+			buf += 2;
+		}
 
-	// Process 8 bytes at a time. The end point is determined by
-	// ignoring the least significant three bits of size to ensure
-	// we do not process past the bounds of the buffer. This guarantees
-	// that limit is a multiple of 8 and is strictly less than size.
-	for (const uint8_t *limit = buf + (size & ~(size_t)7);
-			buf < limit; buf += 8)
-		crc = __crc32d(crc, aligned_read64le(buf));
+		if (align & 4) {
+			crc = __crc32w(crc, aligned_read32le(buf));
+			buf += 4;
+		}
+
+		size -= align;
+
+		// Process 8 bytes at a time. The end point is determined by
+		// ignoring the least significant three bits of size to
+		// ensure we do not process past the bounds of the buffer.
+		// This guarantees that limit is a multiple of 8 and is
+		// strictly less than size.
+		for (const uint8_t *limit = buf + (size & ~(size_t)7);
+				buf < limit; buf += 8)
+			crc = __crc32d(crc, aligned_read64le(buf));
+
+		size &= 7;
+	}
 
 	// Process the remaining bytes that are not 8 byte aligned.
-	for (const uint8_t *limit = buf + (size & 7); buf < limit; ++buf)
+	if (size & 4) {
+		crc = __crc32w(crc, aligned_read32le(buf));
+		buf += 4;
+	}
+
+	if (size & 2) {
+		crc = __crc32h(crc, aligned_read16le(buf));
+		buf += 2;
+	}
+
+	if (size & 1)
 		crc = __crc32b(crc, *buf);
 
 	return ~crc;
@@ -78,7 +104,7 @@ crc32_arch_optimized(const uint8_t *buf, size_t size, uint32_t crc)
 static inline bool
 is_arch_extension_supported(void)
 {
-#if defined(HAVE_GETAUXVAL)
+#if defined(HAVE_GETAUXVAL) && defined(HAVE_HWCAP_CRC32)
 	return (getauxval(AT_HWCAP) & HWCAP_CRC32) != 0;
 
 #elif defined(HAVE_ELF_AUX_INFO)
