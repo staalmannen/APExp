@@ -1,18 +1,18 @@
 /* sockets.c --- wrappers for Windows socket functions
 
-   Copyright (C) 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Simon Josefsson */
@@ -46,11 +46,10 @@ close_fd_maybe_socket (const struct fd_hook *remaining_list,
      our calls to closesocket() and the primary close(), some other thread
      could make system calls that allocate precisely the same HANDLE value
      as sock; then the primary close() would call CloseHandle() on it.  */
-  SOCKET sock;
-  WSANETWORKEVENTS ev;
 
   /* Test whether fd refers to a socket.  */
-  sock = FD_TO_SOCKET (fd);
+  SOCKET sock = FD_TO_SOCKET (fd);
+  WSANETWORKEVENTS ev;
   ev.lNetworkEvents = 0xDEADBEEF;
   WSAEnumNetworkEvents (sock, NULL, &ev);
   if (ev.lNetworkEvents != 0xDEADBEEF)
@@ -83,11 +82,9 @@ ioctl_fd_maybe_socket (const struct fd_hook *remaining_list,
                        gl_ioctl_fn primary,
                        int fd, int request, void *arg)
 {
-  SOCKET sock;
-  WSANETWORKEVENTS ev;
-
   /* Test whether fd refers to a socket.  */
-  sock = FD_TO_SOCKET (fd);
+  SOCKET sock = FD_TO_SOCKET (fd);
+  WSANETWORKEVENTS ev;
   ev.lNetworkEvents = 0xDEADBEEF;
   WSAEnumNetworkEvents (sock, NULL, &ev);
   if (ev.lNetworkEvents != 0xDEADBEEF)
@@ -113,15 +110,13 @@ static int initialized_sockets_version /* = 0 */;
 #endif /* WINDOWS_SOCKETS */
 
 int
-gl_sockets_startup (int version _GL_UNUSED)
+gl_sockets_startup (_GL_UNUSED int version)
 {
 #if WINDOWS_SOCKETS
   if (version > initialized_sockets_version)
     {
       WSADATA data;
-      int err;
-
-      err = WSAStartup (version, &data);
+      int err = WSAStartup (version, &data);
       if (err != 0)
         return 1;
 
@@ -146,13 +141,11 @@ int
 gl_sockets_cleanup (void)
 {
 #if WINDOWS_SOCKETS
-  int err;
-
   initialized_sockets_version = 0;
 
   unregister_fd_hook (&fd_sockets_hook);
 
-  err = WSACleanup ();
+  int err = WSACleanup ();
   if (err != 0)
     return 1;
 #endif

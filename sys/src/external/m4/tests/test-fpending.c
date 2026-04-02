@@ -1,6 +1,6 @@
 /* Ensure that __fpending works.
 
-   Copyright (C) 2004, 2007-2021 Free Software Foundation, Inc.
+   Copyright (C) 2004, 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,5 +37,5 @@ main (void)
   fflush (stdout);
   ASSERT (__fpending (stdout) == 0);
 
-  exit (0);
+  return test_exit_status;
 }

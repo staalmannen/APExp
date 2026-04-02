@@ -1,9 +1,9 @@
 /* Test of uc_width() function.
-   Copyright (C) 2007-2021 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -25,10 +25,8 @@
 int
 main ()
 {
-  ucs4_t uc;
-
   /* Test width of ASCII characters.  */
-  for (uc = 0x0020; uc < 0x007F; uc++)
+  for (ucs4_t uc = 0x0020; uc < 0x007F; uc++)
     ASSERT (uc_width (uc, "ISO-8859-2") == 1);
 
   /* Test width of some non-spacing characters.  */
@@ -52,5 +50,5 @@ main ()
   ASSERT (uc_width (0x20369, "UTF-8") == 2);
   ASSERT (uc_width (0x2F876, "UTF-8") == 2);
 
-  return 0;
+  return test_exit_status;
 }

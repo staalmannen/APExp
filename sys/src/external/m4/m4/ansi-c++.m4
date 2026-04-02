@@ -1,8 +1,10 @@
-# ansi-c++.m4 serial 12
-dnl Copyright (C) 2002-2003, 2005, 2010-2021 Free Software Foundation, Inc.
+# ansi-c++.m4
+# serial 13
+dnl Copyright (C) 2002-2003, 2005, 2010-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl From Bruno Haible.
 
@@ -49,7 +51,7 @@ AC_DEFUN([gl_PROG_ANSI_CXX],
 [
   AC_REQUIRE([gl_CXX_CHOICE])
   m4_if([$1], [CXX], [],
-    [gl_save_CXX="$CXX"])
+    [gl_saved_CXX="$CXX"])
   if test "$CXX_CHOICE" = no; then
     CXX=no
   fi
@@ -111,7 +113,7 @@ EOF
   fi
   m4_if([$1], [CXX], [],
     [$1="$CXX"
-     CXX="$gl_save_CXX"])
+     CXX="$gl_saved_CXX"])
   AC_SUBST([$1])
 
   AM_CONDITIONAL([$2], [test "$$1" != no])

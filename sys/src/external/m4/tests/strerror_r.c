@@ -1,18 +1,18 @@
 /* strerror_r.c --- POSIX compatible system error routine
 
-   Copyright (C) 2010-2021 Free Software Foundation, Inc.
+   Copyright (C) 2010-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2010.  */
@@ -34,34 +34,27 @@
 
 #include "strerror-override.h"
 
-#if (__GLIBC__ >= 2 || defined __UCLIBC__ || defined __CYGWIN__) && HAVE___XPG_STRERROR_R /* glibc >= 2.3.4, cygwin >= 1.7.9 */
+#if STRERROR_R_CHAR_P && !defined _AIX
 
-# define USE_XPG_STRERROR_R 1
-extern
-#ifdef __cplusplus
-"C"
-#endif
-int __xpg_strerror_r (int errnum, char *buf, size_t buflen);
+# if HAVE___XPG_STRERROR_R
+_GL_EXTERN_C int __xpg_strerror_r (int errnum, char *buf, size_t buflen);
+# endif
 
-#elif HAVE_DECL_STRERROR_R && !(__GLIBC__ >= 2 || defined __UCLIBC__ || defined __CYGWIN__)
+#elif HAVE_DECL_STRERROR_R
 
-/* The system's strerror_r function is OK, except that its third argument
+/* The system's strerror_r function's API is OK, except that its third argument
    is 'int', not 'size_t', or its return type is wrong.  */
 
 # include <limits.h>
 
-# define USE_SYSTEM_STRERROR_R 1
-
-#else /* (__GLIBC__ >= 2 || defined __UCLIBC__ || defined __CYGWIN__ ? !HAVE___XPG_STRERROR_R : !HAVE_DECL_STRERROR_R) */
+#else
 
 /* Use the system's strerror().  Exclude glibc and cygwin because the
    system strerror_r has the wrong return type, and cygwin 1.7.9
    strerror_r clobbers strerror.  */
 # undef strerror
 
-# define USE_SYSTEM_STRERROR 1
-
-# if defined __NetBSD__ || defined __hpux || (defined _WIN32 && !defined __CYGWIN__) || defined __sgi || (defined __sun && !defined _LP64) || defined __CYGWIN__
+# if defined __NetBSD__ || defined __hpux || (defined _WIN32 && !defined __CYGWIN__) || (defined __sun && !defined _LP64) || defined __CYGWIN__
 
 /* No locking needed.  */
 
@@ -74,9 +67,8 @@ int __xpg_strerror_r (int errnum, char *buf, size_t buflen);
 extern "C" {
 #endif
 
-/* Get sys_nerr, sys_errlist on HP-UX (otherwise only declared in C++ mode).
-   Get sys_nerr, sys_errlist on IRIX (otherwise only declared with _SGIAPI).  */
-#  if defined __hpux || defined __sgi
+/* Get sys_nerr, sys_errlist on HP-UX (otherwise only declared in C++ mode).  */
+#  if defined __hpux
 extern int sys_nerr;
 extern char *sys_errlist[];
 #  endif
@@ -111,10 +103,8 @@ static int
 local_snprintf (char *buf, size_t buflen, const char *format, ...)
 {
   va_list args;
-  int result;
-
   va_start (args, format);
-  result = _vsnprintf (buf, buflen, format, args);
+  int result = _vsnprintf (buf, buflen, format, args);
   va_end (args);
   if (buflen > 0 && (result < 0 || result >= buflen))
     buf[buflen - 1] = '\0';
@@ -166,22 +156,34 @@ strerror_r (int errnum, char *buf, size_t buflen)
     int ret;
     int saved_errno = errno;
 
-#if USE_XPG_STRERROR_R
+    /* Due to the '#undef strerror_r' above, on AIX, we're always using
+       the POSIX-compatible strerror_r function, regardless whether
+       _LINUX_SOURCE_COMPAT is defined or not.  */
+#if STRERROR_R_CHAR_P && !defined _AIX
 
     {
+      ret = 0;
+
+# if HAVE___XPG_STRERROR_R
       ret = __xpg_strerror_r (errnum, buf, buflen);
-      if (ret < 0)
-        ret = errno;
+      /* ret is 0 upon success, or EINVAL or ERANGE upon failure.  */
+# endif
+
       if (!*buf)
         {
-          /* glibc 2.13 would not touch buf on err, so we have to fall
-             back to GNU strerror_r which always returns a thread-safe
-             untruncated string to (partially) copy into our buf.  */
-          safe_copy (buf, buflen, strerror_r (errnum, buf, buflen));
+          /* glibc 2.13 ... 2.34 (at least) don't touch buf upon failure.
+             Therefore we have to fall back to strerror_r which, for valid
+             errnum, returns a thread-safe untruncated string.  For invalid
+             errnum, though, it returns a truncated string, which does not
+             allow us to determine whether to return ERANGE or 0.  Thus we
+             need to pass a sufficiently large buffer.  */
+          char stackbuf[80];
+          char *errstring = strerror_r (errnum, stackbuf, sizeof stackbuf);
+          ret = errstring ? safe_copy (buf, buflen, errstring) : errno;
         }
     }
 
-#elif USE_SYSTEM_STRERROR_R
+#elif HAVE_DECL_STRERROR_R
 
     if (buflen > INT_MAX)
       buflen = INT_MAX;
@@ -218,9 +220,8 @@ strerror_r (int errnum, char *buf, size_t buflen)
     if (!ret && strlen (buf) == buflen - 1)
       {
         char stackbuf[STACKBUF_LEN];
-        size_t len;
         strerror_r (errnum, stackbuf, sizeof stackbuf);
-        len = strlen (stackbuf);
+        size_t len = strlen (stackbuf);
         /* STACKBUF_LEN should have been large enough.  */
         if (len + 1 == sizeof stackbuf)
           abort ();
@@ -245,7 +246,7 @@ strerror_r (int errnum, char *buf, size_t buflen)
       }
 # endif
 
-#else /* USE_SYSTEM_STRERROR */
+#else /* strerror_r is not declared.  */
 
     /* Try to do what strerror (errnum) does, but without clobbering the
        buffer used by strerror().  */
@@ -289,7 +290,7 @@ strerror_r (int errnum, char *buf, size_t buflen)
     else
       ret = EINVAL;
 
-# elif defined __sgi || (defined __sun && !defined _LP64) /* IRIX, Solaris <= 9 32-bit */
+# elif defined __sun && !defined _LP64 /* Solaris <= 9 32-bit */
 
     /* For a valid error number, the system's strerror() function returns
        a pointer to a not copied string, not to a buffer.  */
@@ -312,10 +313,9 @@ strerror_r (int errnum, char *buf, size_t buflen)
     {
       char *errmsg = strerror (errnum);
 
-      /* For invalid error numbers, strerror() on
-           - IRIX 6.5 returns NULL,
-           - HP-UX 11 returns an empty string.  */
-      if (errmsg == NULL || *errmsg == '\0')
+      /* For invalid error numbers, strerror() on HP-UX 11 returns an empty
+         string.  */
+      if (*errmsg == '\0')
         ret = EINVAL;
       else
         ret = safe_copy (buf, buflen, errmsg);
@@ -438,12 +438,20 @@ strerror_r (int errnum, char *buf, size_t buflen)
 
     if (ret == EINVAL && !*buf)
       {
+        /* gcc 14 produces a
+           "warning: 'Unknown error ' directive output truncated
+            writing 14 bytes into a region of size 2"
+           Thanks for the warning, but here the truncation is intentional.  */
+#if _GL_GNUC_PREREQ (7, 1)
+# pragma GCC diagnostic ignored "-Wformat-truncation"
+#endif
 #if defined __HAIKU__
         /* For consistency with perror().  */
         snprintf (buf, buflen, "Unknown Application Error (%d)", errnum);
 #else
         snprintf (buf, buflen, "Unknown error %d", errnum);
 #endif
+        buf[buflen - 1] = '\0';
       }
 
     errno = saved_errno;

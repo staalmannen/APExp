@@ -1,4 +1,4 @@
-dnl @ ../doc/m4.texi:4251: Origin of test
+dnl @ ../doc/m4.texi:4293: Origin of test
 dnl @ expected status: 0
 dnl @ extra options: 
 dnl @ Copyright (C) 2006, 2007, 2008, 2009 Free Software
@@ -7,11 +7,9 @@ dnl @ This file is free software; the Free Software Foundation
 dnl @ gives unlimited permission to copy and/or distribute it
 dnl @ with or without modifications, as long as this notice
 dnl @ is preserved.
-define(`a', `b')
+changequote(`[', `]')
 dnl @result{}
-«a»
-dnl @result{}«b»
-changequote(`«', `»')
+define([foo], [Macro [foo].])
 dnl @result{}
-«a»
-dnl @result{}a
+foo
+dnl @result{}Macro foo.

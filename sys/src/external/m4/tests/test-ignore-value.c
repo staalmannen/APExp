@@ -1,10 +1,10 @@
 /* Test the "ignore-value" module.
 
-   Copyright (C) 2011-2021 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -26,11 +26,11 @@
 #include "attribute.h"
 
 struct s { int i; };
-static char doChar (void) NODISCARD;
-static int doInt (void) NODISCARD;
-static off_t doOff (void) NODISCARD;
-static void *doPtr (void) NODISCARD;
-static struct s doStruct (void) NODISCARD;
+NODISCARD static char doChar (void);
+NODISCARD static int doInt (void);
+NODISCARD static off_t doOff (void);
+NODISCARD static void *doPtr (void);
+NODISCARD static struct s doStruct (void);
 
 static char
 doChar (void)

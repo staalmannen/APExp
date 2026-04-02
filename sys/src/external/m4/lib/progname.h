@@ -1,10 +1,10 @@
 /* Program name management.
-   Copyright (C) 2001-2004, 2006, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2001-2004, 2006, 2009-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2001.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -22,6 +22,7 @@
      set_program_name (argv[0]);
  */
 
+#include "arg-nonnull.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -34,7 +35,8 @@ extern const char *program_name;
 /* Set program_name, based on argv[0].
    argv0 must be a string allocated with indefinite extent, and must not be
    modified after this call.  */
-extern void set_program_name (const char *argv0);
+extern void set_program_name (const char *argv0)
+  _GL_ARG_NONNULL ((1));
 
 #if ENABLE_RELOCATABLE
 

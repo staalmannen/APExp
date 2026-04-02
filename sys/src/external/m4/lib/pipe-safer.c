@@ -1,9 +1,9 @@
 /* Invoke pipe, but avoid some glitches.
-   Copyright (C) 2005-2006, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005-2006, 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -32,8 +32,7 @@ pipe_safer (int fd[2])
 {
   if (pipe (fd) == 0)
     {
-      int i;
-      for (i = 0; i < 2; i++)
+      for (int i = 0; i < 2; i++)
         {
           fd[i] = fd_safer (fd[i]);
           if (fd[i] < 0)

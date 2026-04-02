@@ -1,22 +1,22 @@
 /* Declarations for getopt.
-   Copyright (C) 1989-2021 Free Software Foundation, Inc.
+   Copyright (C) 1989-2026 Free Software Foundation, Inc.
    This file is part of gnulib.
    Unlike most of the getopt implementation, it is NOT shared
    with the GNU C Library, which supplies a different version of
    this file.
 
-   This file is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as
-   published by the Free Software Foundation; either version 3 of
-   the License, or (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This file is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
+   This file is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public
-   License along with gnulib; if not, see <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _@GUARD_PREFIX@_GETOPT_H
 
@@ -30,7 +30,12 @@
    <getopt.h>; our definitions will be present soon enough.  */
 #if @HAVE_GETOPT_H@
 # define _GL_SYSTEM_GETOPT
+/* Rename the system's 'struct option' to 'struct sys_option',
+   so that we don't have to rename ours to 'struct rpl_option'
+   (which would cause significant trouble in C++ mode).  */
+# define option sys_option
 # @INCLUDE_NEXT@ @NEXT_GETOPT_H@
+# undef option
 # undef _GL_SYSTEM_GETOPT
 #endif
 

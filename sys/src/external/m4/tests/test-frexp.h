@@ -1,9 +1,9 @@
 /* Test of splitting a double into fraction and mantissa.
-   Copyright (C) 2012-2021 Free Software Foundation, Inc.
+   Copyright (C) 2012-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -27,7 +27,6 @@ my_ldexp (DOUBLE x, int d)
 static void
 test_function (void)
 {
-  int i;
   VOLATILE DOUBLE x;
 
   { /* NaN.  */
@@ -74,100 +73,104 @@ test_function (void)
     ASSERT (signbit (mantissa));
   }
 
-  for (i = 1, x = L_(1.0); i <= MAX_EXP; i++, x *= L_(2.0))
-    {
-      int exp = -9999;
-      DOUBLE mantissa = FREXP (x, &exp);
-      ASSERT (exp == i);
-      ASSERT (mantissa == L_(0.5));
-    }
-  for (i = 1, x = L_(1.0); i >= MIN_NORMAL_EXP; i--, x *= L_(0.5))
-    {
-      int exp = -9999;
-      DOUBLE mantissa = FREXP (x, &exp);
-      ASSERT (exp == i);
-      ASSERT (mantissa == L_(0.5));
-    }
-  for (; i >= MIN_EXP - 100 && x > L_(0.0); i--, x *= L_(0.5))
-    {
-      int exp = -9999;
-      DOUBLE mantissa = FREXP (x, &exp);
-      ASSERT (exp == i);
-      ASSERT (mantissa == L_(0.5));
-    }
+  {
+    int i;
 
-  for (i = 1, x = - L_(1.0); i <= MAX_EXP; i++, x *= L_(2.0))
-    {
-      int exp = -9999;
-      DOUBLE mantissa = FREXP (x, &exp);
-      ASSERT (exp == i);
-      ASSERT (mantissa == - L_(0.5));
-    }
-  for (i = 1, x = - L_(1.0); i >= MIN_NORMAL_EXP; i--, x *= L_(0.5))
-    {
-      int exp = -9999;
-      DOUBLE mantissa = FREXP (x, &exp);
-      ASSERT (exp == i);
-      ASSERT (mantissa == - L_(0.5));
-    }
-  for (; i >= MIN_EXP - 100 && x < L_(0.0); i--, x *= L_(0.5))
-    {
-      int exp = -9999;
-      DOUBLE mantissa = FREXP (x, &exp);
-      ASSERT (exp == i);
-      ASSERT (mantissa == - L_(0.5));
-    }
+    for (i = 1, x = L_(1.0); i <= MAX_EXP; i++, x *= L_(2.0))
+      {
+        int exp = -9999;
+        DOUBLE mantissa = FREXP (x, &exp);
+        ASSERT (exp == i);
+        ASSERT (mantissa == L_(0.5));
+      }
+    for (i = 1, x = L_(1.0); i >= MIN_NORMAL_EXP; i--, x *= L_(0.5))
+      {
+        int exp = -9999;
+        DOUBLE mantissa = FREXP (x, &exp);
+        ASSERT (exp == i);
+        ASSERT (mantissa == L_(0.5));
+      }
+    for (; i >= MIN_EXP - 100 && x > L_(0.0); i--, x *= L_(0.5))
+      {
+        int exp = -9999;
+        DOUBLE mantissa = FREXP (x, &exp);
+        ASSERT (exp == i);
+        ASSERT (mantissa == L_(0.5));
+      }
 
-  for (i = 1, x = L_(1.01); i <= MAX_EXP; i++, x *= L_(2.0))
-    {
-      int exp = -9999;
-      DOUBLE mantissa = FREXP (x, &exp);
-      ASSERT (exp == i);
-      ASSERT (mantissa == L_(0.505));
-    }
-  for (i = 1, x = L_(1.01); i >= MIN_NORMAL_EXP; i--, x *= L_(0.5))
-    {
-      int exp = -9999;
-      DOUBLE mantissa = FREXP (x, &exp);
-      ASSERT (exp == i);
-      ASSERT (mantissa == L_(0.505));
-    }
-  for (; i >= MIN_EXP - 100 && x > L_(0.0); i--, x *= L_(0.5))
-    {
-      int exp = -9999;
-      DOUBLE mantissa = FREXP (x, &exp);
-      ASSERT (exp == i);
-      ASSERT (mantissa >= L_(0.5));
-      ASSERT (mantissa < L_(1.0));
-      ASSERT (mantissa == my_ldexp (x, - exp));
-    }
+    for (i = 1, x = - L_(1.0); i <= MAX_EXP; i++, x *= L_(2.0))
+      {
+        int exp = -9999;
+        DOUBLE mantissa = FREXP (x, &exp);
+        ASSERT (exp == i);
+        ASSERT (mantissa == - L_(0.5));
+      }
+    for (i = 1, x = - L_(1.0); i >= MIN_NORMAL_EXP; i--, x *= L_(0.5))
+      {
+        int exp = -9999;
+        DOUBLE mantissa = FREXP (x, &exp);
+        ASSERT (exp == i);
+        ASSERT (mantissa == - L_(0.5));
+      }
+    for (; i >= MIN_EXP - 100 && x < L_(0.0); i--, x *= L_(0.5))
+      {
+        int exp = -9999;
+        DOUBLE mantissa = FREXP (x, &exp);
+        ASSERT (exp == i);
+        ASSERT (mantissa == - L_(0.5));
+      }
 
-  for (i = 1, x = L_(1.73205); i <= MAX_EXP; i++, x *= L_(2.0))
-    {
-      int exp = -9999;
-      DOUBLE mantissa = FREXP (x, &exp);
-      ASSERT (exp == i);
-      ASSERT (mantissa == L_(0.866025));
-    }
-  for (i = 1, x = L_(1.73205); i >= MIN_NORMAL_EXP; i--, x *= L_(0.5))
-    {
-      int exp = -9999;
-      DOUBLE mantissa = FREXP (x, &exp);
-      ASSERT (exp == i);
-      ASSERT (mantissa == L_(0.866025));
-    }
-  for (; i >= MIN_EXP - 100 && x > L_(0.0); i--, x *= L_(0.5))
-    {
-      int exp = -9999;
-      DOUBLE mantissa = FREXP (x, &exp);
-      ASSERT (exp == i || exp == i + 1);
-      ASSERT (mantissa >= L_(0.5));
-      ASSERT (mantissa < L_(1.0));
-      ASSERT (mantissa == my_ldexp (x, - exp));
-    }
+    for (i = 1, x = L_(1.01); i <= MAX_EXP; i++, x *= L_(2.0))
+      {
+        int exp = -9999;
+        DOUBLE mantissa = FREXP (x, &exp);
+        ASSERT (exp == i);
+        ASSERT (mantissa == L_(0.505));
+      }
+    for (i = 1, x = L_(1.01); i >= MIN_NORMAL_EXP; i--, x *= L_(0.5))
+      {
+        int exp = -9999;
+        DOUBLE mantissa = FREXP (x, &exp);
+        ASSERT (exp == i);
+        ASSERT (mantissa == L_(0.505));
+      }
+    for (; i >= MIN_EXP - 100 && x > L_(0.0); i--, x *= L_(0.5))
+      {
+        int exp = -9999;
+        DOUBLE mantissa = FREXP (x, &exp);
+        ASSERT (exp == i);
+        ASSERT (mantissa >= L_(0.5));
+        ASSERT (mantissa < L_(1.0));
+        ASSERT (mantissa == my_ldexp (x, - exp));
+      }
+
+    for (i = 1, x = L_(1.73205); i <= MAX_EXP; i++, x *= L_(2.0))
+      {
+        int exp = -9999;
+        DOUBLE mantissa = FREXP (x, &exp);
+        ASSERT (exp == i);
+        ASSERT (mantissa == L_(0.866025));
+      }
+    for (i = 1, x = L_(1.73205); i >= MIN_NORMAL_EXP; i--, x *= L_(0.5))
+      {
+        int exp = -9999;
+        DOUBLE mantissa = FREXP (x, &exp);
+        ASSERT (exp == i);
+        ASSERT (mantissa == L_(0.866025));
+      }
+    for (; i >= MIN_EXP - 100 && x > L_(0.0); i--, x *= L_(0.5))
+      {
+        int exp = -9999;
+        DOUBLE mantissa = FREXP (x, &exp);
+        ASSERT (exp == i || exp == i + 1);
+        ASSERT (mantissa >= L_(0.5));
+        ASSERT (mantissa < L_(1.0));
+        ASSERT (mantissa == my_ldexp (x, - exp));
+      }
+  }
 
   /* Randomized tests.  */
-  for (i = 0; i < SIZEOF (RANDOM); i++)
+  for (int i = 0; i < SIZEOF (RANDOM); i++)
     {
       x = L_(20.0) * RANDOM[i] - L_(10.0); /* -10.0 <= x <= 10.0 */
       {

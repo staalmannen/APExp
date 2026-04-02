@@ -1,18 +1,18 @@
 /* Locking in multithreaded situations.
-   Copyright (C) 2005-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005-2026 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
-   any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2005.
    Based on GCC's gthr-posix.h, gthr-posix95.h.  */
@@ -240,8 +240,6 @@ glthread_recursive_lock_destroy (gl_recursive_lock_t *lock)
   return 0;
 }
 
-/* -------------------------- gl_once_t datatype -------------------------- */
-
 #endif
 
 /* ========================================================================= */
@@ -257,21 +255,19 @@ glthread_recursive_lock_destroy (gl_recursive_lock_t *lock)
 #  if defined PTHREAD_RWLOCK_INITIALIZER || defined PTHREAD_RWLOCK_INITIALIZER_NP
 
 #   if !HAVE_PTHREAD_RWLOCK_RDLOCK_PREFER_WRITER
-     /* glibc with bug https://sourceware.org/bugzilla/show_bug.cgi?id=13701 */
+     /* glibc with bug https://sourceware.org/PR13701 */
 
 int
 glthread_rwlock_init_for_glibc (pthread_rwlock_t *lock)
 {
   pthread_rwlockattr_t attributes;
-  int err;
-
-  err = pthread_rwlockattr_init (&attributes);
+  int err = pthread_rwlockattr_init (&attributes);
   if (err != 0)
     return err;
   /* Note: PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP is the only value that
      causes the writer to be preferred. PTHREAD_RWLOCK_PREFER_WRITER_NP does not
      do this; see
-     http://man7.org/linux/man-pages/man3/pthread_rwlockattr_setkind_np.3.html */
+     https://man7.org/linux/man-pages/man3/pthread_rwlockattr_setkind_np.3.html */
   err = pthread_rwlockattr_setkind_np (&attributes,
                                        PTHREAD_RWLOCK_PREFER_WRITER_NONRECURSIVE_NP);
   if (err == 0)
@@ -288,9 +284,7 @@ glthread_rwlock_init_for_glibc (pthread_rwlock_t *lock)
 int
 glthread_rwlock_init_multithreaded (gl_rwlock_t *lock)
 {
-  int err;
-
-  err = pthread_rwlock_init (&lock->rwlock, NULL);
+  int err = pthread_rwlock_init (&lock->rwlock, NULL);
   if (err != 0)
     return err;
   lock->initialized = 1;
@@ -302,9 +296,7 @@ glthread_rwlock_rdlock_multithreaded (gl_rwlock_t *lock)
 {
   if (!lock->initialized)
     {
-      int err;
-
-      err = pthread_mutex_lock (&lock->guard);
+      int err = pthread_mutex_lock (&lock->guard);
       if (err != 0)
         return err;
       if (!lock->initialized)
@@ -328,9 +320,7 @@ glthread_rwlock_wrlock_multithreaded (gl_rwlock_t *lock)
 {
   if (!lock->initialized)
     {
-      int err;
-
-      err = pthread_mutex_lock (&lock->guard);
+      int err = pthread_mutex_lock (&lock->guard);
       if (err != 0)
         return err;
       if (!lock->initialized)
@@ -360,11 +350,9 @@ glthread_rwlock_unlock_multithreaded (gl_rwlock_t *lock)
 int
 glthread_rwlock_destroy_multithreaded (gl_rwlock_t *lock)
 {
-  int err;
-
   if (!lock->initialized)
     return EINVAL;
-  err = pthread_rwlock_destroy (&lock->rwlock);
+  int err = pthread_rwlock_destroy (&lock->rwlock);
   if (err != 0)
     return err;
   lock->initialized = 0;
@@ -378,9 +366,7 @@ glthread_rwlock_destroy_multithreaded (gl_rwlock_t *lock)
 int
 glthread_rwlock_init_multithreaded (gl_rwlock_t *lock)
 {
-  int err;
-
-  err = pthread_mutex_init (&lock->lock, NULL);
+  int err = pthread_mutex_init (&lock->lock, NULL);
   if (err != 0)
     return err;
   err = pthread_cond_init (&lock->waiting_readers, NULL);
@@ -397,9 +383,7 @@ glthread_rwlock_init_multithreaded (gl_rwlock_t *lock)
 int
 glthread_rwlock_rdlock_multithreaded (gl_rwlock_t *lock)
 {
-  int err;
-
-  err = pthread_mutex_lock (&lock->lock);
+  int err = pthread_mutex_lock (&lock->lock);
   if (err != 0)
     return err;
   /* Test whether only readers are currently running, and whether the runcount
@@ -424,9 +408,7 @@ glthread_rwlock_rdlock_multithreaded (gl_rwlock_t *lock)
 int
 glthread_rwlock_wrlock_multithreaded (gl_rwlock_t *lock)
 {
-  int err;
-
-  err = pthread_mutex_lock (&lock->lock);
+  int err = pthread_mutex_lock (&lock->lock);
   if (err != 0)
     return err;
   /* Test whether no readers or writers are currently running.  */
@@ -451,9 +433,7 @@ glthread_rwlock_wrlock_multithreaded (gl_rwlock_t *lock)
 int
 glthread_rwlock_unlock_multithreaded (gl_rwlock_t *lock)
 {
-  int err;
-
-  err = pthread_mutex_lock (&lock->lock);
+  int err = pthread_mutex_lock (&lock->lock);
   if (err != 0)
     return err;
   if (lock->runcount < 0)
@@ -507,9 +487,7 @@ glthread_rwlock_unlock_multithreaded (gl_rwlock_t *lock)
 int
 glthread_rwlock_destroy_multithreaded (gl_rwlock_t *lock)
 {
-  int err;
-
-  err = pthread_mutex_destroy (&lock->lock);
+  int err = pthread_mutex_destroy (&lock->lock);
   if (err != 0)
     return err;
   err = pthread_cond_destroy (&lock->waiting_readers);
@@ -533,9 +511,7 @@ int
 glthread_recursive_lock_init_multithreaded (gl_recursive_lock_t *lock)
 {
   pthread_mutexattr_t attributes;
-  int err;
-
-  err = pthread_mutexattr_init (&attributes);
+  int err = pthread_mutexattr_init (&attributes);
   if (err != 0)
     return err;
   err = pthread_mutexattr_settype (&attributes, PTHREAD_MUTEX_RECURSIVE);
@@ -562,9 +538,7 @@ int
 glthread_recursive_lock_init_multithreaded (gl_recursive_lock_t *lock)
 {
   pthread_mutexattr_t attributes;
-  int err;
-
-  err = pthread_mutexattr_init (&attributes);
+  int err = pthread_mutexattr_init (&attributes);
   if (err != 0)
     return err;
   err = pthread_mutexattr_settype (&attributes, PTHREAD_MUTEX_RECURSIVE);
@@ -591,9 +565,7 @@ glthread_recursive_lock_lock_multithreaded (gl_recursive_lock_t *lock)
 {
   if (!lock->initialized)
     {
-      int err;
-
-      err = pthread_mutex_lock (&lock->guard);
+      int err = pthread_mutex_lock (&lock->guard);
       if (err != 0)
         return err;
       if (!lock->initialized)
@@ -623,11 +595,9 @@ glthread_recursive_lock_unlock_multithreaded (gl_recursive_lock_t *lock)
 int
 glthread_recursive_lock_destroy_multithreaded (gl_recursive_lock_t *lock)
 {
-  int err;
-
   if (!lock->initialized)
     return EINVAL;
-  err = pthread_mutex_destroy (&lock->recmutex);
+  int err = pthread_mutex_destroy (&lock->recmutex);
   if (err != 0)
     return err;
   lock->initialized = 0;
@@ -641,9 +611,7 @@ glthread_recursive_lock_destroy_multithreaded (gl_recursive_lock_t *lock)
 int
 glthread_recursive_lock_init_multithreaded (gl_recursive_lock_t *lock)
 {
-  int err;
-
-  err = pthread_mutex_init (&lock->mutex, NULL);
+  int err = pthread_mutex_init (&lock->mutex, NULL);
   if (err != 0)
     return err;
   lock->owner = (pthread_t) 0;
@@ -657,9 +625,7 @@ glthread_recursive_lock_lock_multithreaded (gl_recursive_lock_t *lock)
   pthread_t self = pthread_self ();
   if (lock->owner != self)
     {
-      int err;
-
-      err = pthread_mutex_lock (&lock->mutex);
+      int err = pthread_mutex_lock (&lock->mutex);
       if (err != 0)
         return err;
       lock->owner = self;
@@ -694,46 +660,6 @@ glthread_recursive_lock_destroy_multithreaded (gl_recursive_lock_t *lock)
   if (lock->owner != (pthread_t) 0)
     return EBUSY;
   return pthread_mutex_destroy (&lock->mutex);
-}
-
-# endif
-
-/* -------------------------- gl_once_t datatype -------------------------- */
-
-static const pthread_once_t fresh_once = PTHREAD_ONCE_INIT;
-
-int
-glthread_once_singlethreaded (pthread_once_t *once_control)
-{
-  /* We don't know whether pthread_once_t is an integer type, a floating-point
-     type, a pointer type, or a structure type.  */
-  char *firstbyte = (char *)once_control;
-  if (*firstbyte == *(const char *)&fresh_once)
-    {
-      /* First time use of once_control.  Invert the first byte.  */
-      *firstbyte = ~ *(const char *)&fresh_once;
-      return 1;
-    }
-  else
-    return 0;
-}
-
-# if !(PTHREAD_IN_USE_DETECTION_HARD || USE_POSIX_THREADS_WEAK)
-
-int
-glthread_once_multithreaded (pthread_once_t *once_control,
-                             void (*init_function) (void))
-{
-  int err = pthread_once (once_control, init_function);
-  if (err == ENOSYS)
-    {
-      /* This happens on FreeBSD 11: The pthread_once function in libc returns
-         ENOSYS.  */
-      if (glthread_once_singlethreaded (once_control))
-        init_function ();
-      return 0;
-    }
-  return err;
 }
 
 # endif

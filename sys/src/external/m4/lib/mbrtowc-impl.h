@@ -1,17 +1,17 @@
 /* Convert multibyte character to wide character.
-   Copyright (C) 1999-2002, 2005-2021 Free Software Foundation, Inc.
+   Copyright (C) 1999-2002, 2005-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2008.  */
@@ -41,8 +41,6 @@
     char buf[4];
     const char *p;
     size_t m;
-    enc_t enc;
-    int res;
 
     switch (nstate)
       {
@@ -75,7 +73,8 @@
 
     /* Here m > 0.  */
 
-    enc = locale_encoding_classification ();
+    enc_t enc = locale_encoding_classification ();
+    int res;
 
     if (enc == enc_utf8) /* UTF-8 */
       {
@@ -89,17 +88,19 @@
       {
         /* The hidden internal state of mbtowc would make this function not
            multi-thread safe.  Achieve multi-thread safety through a lock.  */
-        wchar_t wc;
-        res = mbtowc_with_lock (&wc, p, m);
+        {
+          wchar_t wc;
+          res = mbtowc_with_lock (&wc, p, m);
 
-        if (res >= 0)
-          {
-            if ((wc == 0) != (res == 0))
-              abort ();
-            if (pwc != NULL)
-              *pwc = wc;
-            goto success;
-          }
+          if (res >= 0)
+            {
+              if ((wc == 0) != (res == 0))
+                abort ();
+              if (pwc != NULL)
+                *pwc = wc;
+              goto success;
+            }
+        }
 
         /* mbtowc does not distinguish between invalid and incomplete multibyte
            sequences.  But mbrtowc needs to make this distinction.

@@ -1,9 +1,9 @@
 /* Multithread-safety test for nl_langinfo().
-   Copyright (C) 2019-2021 Free Software Foundation, Inc.
+   Copyright (C) 2019-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -19,7 +19,7 @@
 #include <config.h>
 
 /* Work around GCC bug 44511.  */
-#if 4 < __GNUC__ + (3 <= __GNUC_MINOR__)
+#if _GL_GNUC_PREREQ (4, 3)
 # pragma GCC diagnostic ignored "-Wreturn-type"
 #endif
 
@@ -48,9 +48,7 @@
 # define ENGLISH "en_US"
 # define FRENCH  "fr_FR"
 # define GERMAN  "de_DE"
-# if defined __sgi
-#  define ENCODING ".ISO8859-15"
-# elif defined __hpux
+# if defined __hpux
 #  define ENCODING ".utf8"
 # else
 #  define ENCODING ".UTF-8"

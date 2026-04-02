@@ -1,8 +1,10 @@
-# strstr.m4 serial 23
-dnl Copyright (C) 2008-2021 Free Software Foundation, Inc.
+# strstr.m4
+# serial 25
+dnl Copyright (C) 2008-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl Check that strstr works.
 AC_DEFUN([gl_FUNC_STRSTR_SIMPLE],
@@ -12,13 +14,13 @@ AC_DEFUN([gl_FUNC_STRSTR_SIMPLE],
   if test $REPLACE_MEMCHR = 1; then
     REPLACE_STRSTR=1
   else
-    dnl Detect https://sourceware.org/bugzilla/show_bug.cgi?id=12092
-    dnl and https://sourceware.org/bugzilla/show_bug.cgi?id=23637.
+    dnl Detect https://sourceware.org/PR12092
+    dnl and https://sourceware.org/PR23637.
     AC_CACHE_CHECK([whether strstr works],
       [gl_cv_func_strstr_works_always],
       [AC_RUN_IFELSE(
          [AC_LANG_PROGRAM([[
-#include <string.h> /* for strstr */
+#include <string.h> /* for __GNU_LIBRARY__, strstr */
 #ifdef __GNU_LIBRARY__
  #include <features.h>
  #if __GLIBC__ == 2 && __GLIBC_MINOR__ == 28
@@ -40,6 +42,7 @@ AC_DEFUN([gl_FUNC_STRSTR_SIMPLE],
           dnl linear.
           AC_EGREP_CPP([Lucky user],
             [
+#include <string.h> /* for __GNU_LIBRARY__ */
 #ifdef __GNU_LIBRARY__
  #include <features.h>
  #if ((__GLIBC__ == 2 && __GLIBC_MINOR__ > 12) || (__GLIBC__ > 2)) \
@@ -93,7 +96,7 @@ static void quit (int sig) { _exit (sig + 128); }
     char *haystack = (char *) malloc (2 * m + 2);
     char *needle = (char *) malloc (m + 2);
     /* Failure to compile this test due to missing alarm is okay,
-       since all such platforms (mingw) also have quadratic strstr.  */
+       since all such platforms (mingw, MSVC) also have quadratic strstr.  */
     signal (SIGALRM, quit);
     alarm (5);
     /* Check for quadratic performance.  */

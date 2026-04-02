@@ -1,4 +1,4 @@
-dnl @ ../doc/m4.texi:3705: Origin of test
+dnl @ ../doc/m4.texi:3703: Origin of test
 dnl @ expected status: 0
 dnl @ extra options: 
 dnl @ Copyright (C) 2006, 2007, 2008, 2009 Free Software
@@ -7,21 +7,27 @@ dnl @ This file is free software; the Free Software Foundation
 dnl @ gives unlimited permission to copy and/or distribute it
 dnl @ with or without modifications, as long as this notice
 dnl @ is preserved.
-include(`curry.m4')include(`stack.m4')
-dnl @result{}
-define(`rename', `copy($@)undefine(`$1')')dnl
-define(`copy', `ifdef(`$2', `errprint(`$2 already defined
-')m4exit(`1')',
-   `stack_foreach(`$1', `curry(`pushdef', `$2')')')')dnl
-pushdef(`a', `1')pushdef(`a', defn(`divnum'))pushdef(`a', `2')
-dnl @result{}
-copy(`a', `b')
-dnl @result{}
-rename(`b', `c')
-dnl @result{}
-a b c
-dnl @result{}2 b 2
-popdef(`a', `c')c a
-dnl @result{} 0
-popdef(`a', `c')a c
-dnl @result{}1 1
+undivert(`curry.m4')dnl
+dnl @result{}divert(`-1')
+dnl @result{}# curry(macro, args...)
+dnl @result{}# Perform partial argument application on the given macro.  This
+dnl @result{}# expands to an unspecified macro name that accepts one or more extra
+dnl @result{}# arguments, and appends those to the args supplied to the original
+dnl @result{}# curry call as the overall set of arguments to pass to macro.  That
+dnl @result{}# is, curry(`macro', args1...)(args2...) is the same as invoking
+dnl @result{}# macro(args1..., args2...).
+dnl @result{}#
+dnl @result{}# Most often, argument currying comes in handy when given a context
+dnl @result{}# that normally takes a macro name to call with one argument, but
+dnl @result{}# where you want to combine that variable argument with other fixed
+dnl @result{}# arguments to forward to a macro that takes multiple arguments.  For
+dnl @result{}# example, given a "foreach" macro that calls its first argument once
+dnl @result{}# for each successive argument, "foreach(`curry(`mult', 3)', 1, 2, 3)"
+dnl @result{}# would behave the same as "mult(3, 1), mult(3, 2), mult(3, 3)".
+dnl @result{}#
+dnl @result{}# It is also possible to create a named function curry.  For example:
+dnl @result{}# define(`mult3', `curry(`mult', 3)($1)')
+dnl @result{}# Later use of mult3(value) will compute the same as mult(3, value).
+dnl @result{}define(`curry', `$1(shift($@,)_curry')
+dnl @result{}define(`_curry', `$@)')
+dnl @result{}divert`'dnl

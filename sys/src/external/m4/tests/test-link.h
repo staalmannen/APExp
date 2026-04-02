@@ -1,9 +1,9 @@
 /* Test of link() function.
-   Copyright (C) 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -40,24 +40,29 @@ test_link (int (*func) (char const *, char const *), bool print)
      file systems, but there, st_nlink and st_ino are reliable.  */
   ret = func (BASE "a", BASE "b");
   if (!ret)
-  {
-    struct stat st;
-    ASSERT (stat (BASE "b", &st) == 0);
-    if (st.st_ino && st.st_nlink != 2)
-      {
-        ASSERT (unlink (BASE "b") == 0);
-        errno = EPERM;
-        ret = -1;
-      }
-  }
+    {
+      struct stat st;
+      ASSERT (stat (BASE "b", &st) == 0);
+      if (st.st_ino && st.st_nlink != 2)
+        {
+          ASSERT (unlink (BASE "b") == 0);
+          errno = EPERM;
+          ret = -1;
+        }
+    }
   if (ret == -1)
     {
       /* If the device does not support hard links, errno is
-         EPERM on Linux, EOPNOTSUPP on FreeBSD.  */
+         EPERM on Linux,
+         EOPNOTSUPP on FreeBSD,
+         EACCES on Android within Termux.  */
       switch (errno)
         {
         case EPERM:
         case EOPNOTSUPP:
+        #if defined __ANDROID__
+        case EACCES:
+        #endif
           if (print)
             fputs ("skipping test: "
                    "hard links not supported on this file system\n",

@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: m4 1.4o\n"
 "Report-Msgid-Bugs-To: bug-m4@gnu.org\n"
-"POT-Creation-Date: 2021-05-28 13:49-0500\n"
+"POT-Creation-Date: 2026-02-06 13:55-0600\n"
 "PO-Revision-Date: 2005-02-09 11:27-0500\n"
 "Last-Translator: Kevin Patrick Scannell <scannell@SLU.EDU>\n"
 "Language-Team: Irish <ga@li.org>\n"
@@ -16,107 +16,110 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Bugs: Report translation errors to the Language-Team address.\n"
 
-#: lib/clean-temp.c:235
-#, c-format
+#: lib/clean-temp.c:230
+#, fuzzy, c-format
 msgid "cannot find a temporary directory, try setting $TMPDIR"
-msgstr ""
+msgstr "Níl comhadlann eile ann"
 
-#: lib/clean-temp.c:250
-#, c-format
+#: lib/clean-temp.c:245
+#, fuzzy, c-format
 msgid "cannot create a temporary directory using template \"%s\""
-msgstr ""
+msgstr "ní féidir cáipéis shealadach a chruthú don cháipéis leabaithe: %s"
 
-#: lib/clean-temp.c:371
+#: lib/clean-temp.c:364
 #, fuzzy, c-format
 msgid "cannot remove temporary directory %s"
-msgstr "EARRÁID: Ní féidir comhad sealadach a chruthú le haghaidh atreoraithe"
+msgstr "Níl comhadlann eile ann"
 
-#: lib/closein.c:100
+#: lib/closein.c:99
+#, fuzzy
 msgid "error closing file"
-msgstr ""
+msgstr "EARRÁID: Comhad ionsáite á léamh"
 
-#: lib/closeout.c:122
+#: lib/closeout.c:121
 msgid "write error"
-msgstr ""
+msgstr "earráid sa scríobh"
 
-#: lib/c-stack.c:187
+#: lib/c-stack.c:190
+#, fuzzy
 msgid "program error"
-msgstr ""
+msgstr "earráid ríomhchláraithe"
 
-#: lib/c-stack.c:188
+#: lib/c-stack.c:191
+#, fuzzy
 msgid "stack overflow"
-msgstr ""
+msgstr "Gannsreabhadh na cruaiche athchúrsála"
 
-#: lib/clean-temp-simple.c:297
+#: lib/clean-temp-simple.c:266
 #, fuzzy, c-format
 msgid "cannot remove temporary file %s"
-msgstr "Ní féidir an comhad earráide a shocrú: %s"
+msgstr "%s: ní féidir comhad sealadach a oscailt: %s"
 
-#: lib/error.c:195
+#: lib/error.c:208
 msgid "Unknown system error"
-msgstr ""
+msgstr "Earráid anaithnid chórais"
 
-#: lib/execute.c:348 lib/spawn-pipe.c:597 lib/wait-process.c:291
-#: lib/wait-process.c:365
-#, c-format
+#: lib/execute.c:378 lib/spawn-pipe.c:597 lib/wait-process.c:325
+#: lib/wait-process.c:396
+#, fuzzy, c-format
 msgid "%s subprocess failed"
-msgstr ""
+msgstr "%s: theip ar inlib"
 
-#: lib/getopt.c:278
-#, fuzzy, c-format
+#: lib/getopt.c:283
+#, c-format
 msgid "%s: option '%s%s' is ambiguous\n"
-msgstr "%s: Tá an rogha `%s' débhríoch\n"
+msgstr "%s: tá rogha '%s%s' débhríoch\n"
 
-#: lib/getopt.c:284
-#, fuzzy, c-format
+#: lib/getopt.c:289
+#, c-format
 msgid "%s: option '%s%s' is ambiguous; possibilities:"
-msgstr "%s: Tá an rogha `%s' débhríoch\n"
+msgstr "%s: tá rogha '%s%s' débhríoch; féidearthachtaí:"
 
-#: lib/getopt.c:319
-#, fuzzy, c-format
+#: lib/getopt.c:323
+#, c-format
 msgid "%s: unrecognized option '%s%s'\n"
-msgstr "%s: rogha anaithnid `%c%s'\n"
+msgstr "%s: rogha anaithnid '%s%s'\n"
 
-#: lib/getopt.c:345
-#, fuzzy, c-format
+#: lib/getopt.c:349
+#, c-format
 msgid "%s: option '%s%s' doesn't allow an argument\n"
-msgstr "%s: ní cheadaítear argóint i ndiaidh na rogha `%c%s'\n"
+msgstr "%s: ní cheadaítear argóint i ndiaidh rogha '%s%s'\n"
 
-#: lib/getopt.c:360
-#, fuzzy, c-format
+#: lib/getopt.c:364
+#, c-format
 msgid "%s: option '%s%s' requires an argument\n"
-msgstr "%s: ní foláir argóint don rogha `%s'\n"
+msgstr "%s: tá argóint de dhíth i ndiaidh rogha '%s%s'\n"
 
-#: lib/getopt.c:621
-#, fuzzy, c-format
+#: lib/getopt.c:624
+#, c-format
 msgid "%s: invalid option -- '%c'\n"
-msgstr "%s: rogha neamhbhailí -- %c\n"
+msgstr "%s: rogha neamhbhailí -- '%c'\n"
 
-#: lib/getopt.c:636 lib/getopt.c:682
-#, fuzzy, c-format
+#: lib/getopt.c:639 lib/getopt.c:685
+#, c-format
 msgid "%s: option requires an argument -- '%c'\n"
-msgstr "%s: ní foláir argóint don rogha -- %c\n"
+msgstr "%s: tá argóint de dhíth i ndiaidh na rogha -- '%c'\n"
 
-#: lib/obstack.c:338 lib/obstack.c:340 lib/xalloc-die.c:34
+#: lib/obstack.c:351 lib/obstack.c:353 lib/xalloc-die.c:34
 msgid "memory exhausted"
 msgstr "cuimhne ídithe"
 
 #: lib/openat-die.c:38
 #, c-format
 msgid "unable to record current working directory"
-msgstr ""
+msgstr "ní féidir an chomhadlann oibre a fháil"
 
 #: lib/openat-die.c:57
 #, c-format
 msgid "failed to return to initial working directory"
-msgstr ""
+msgstr "níorbh fhéidir filleadh ar an mbunchomhadlann oibre"
 
-#: lib/os2-spawn.c:46
+#: lib/os2-spawn.c:51
 #, c-format
 msgid "_open_osfhandle failed"
 msgstr ""
 
-#: lib/os2-spawn.c:83
+#: lib/os2-spawn.c:88
 #, c-format
 msgid "cannot restore fd %d: dup2 failed"
 msgstr ""
@@ -142,102 +145,101 @@ msgstr ""
 #. If you don't know what to put here, please see
 #. <https://en.wikipedia.org/wiki/Quotation_marks_in_other_languages>
 #. and use glyphs suitable for your language.
-#: lib/quotearg.c:355
+#: lib/quotearg.c:357
 msgid "`"
-msgstr ""
+msgstr "`"
 
-#: lib/quotearg.c:356
+#: lib/quotearg.c:358
 msgid "'"
-msgstr ""
+msgstr "'"
 
-#: lib/regcomp.c:135
+#: lib/regcomp.c:122
 msgid "Success"
 msgstr "Bua!"
 
-#: lib/regcomp.c:138
+#: lib/regcomp.c:125
 msgid "No match"
 msgstr "Níl a leithéid ann"
 
-#: lib/regcomp.c:141
+#: lib/regcomp.c:128
 msgid "Invalid regular expression"
 msgstr "Slonn ionadaíochta neamhbhailí"
 
-#: lib/regcomp.c:144
+#: lib/regcomp.c:131
 msgid "Invalid collation character"
 msgstr "Carachtar neamhbhailí cóimheasa"
 
-#: lib/regcomp.c:147
+#: lib/regcomp.c:134
 msgid "Invalid character class name"
 msgstr "Aicme neamhbhailí charachtair"
 
-#: lib/regcomp.c:150
+#: lib/regcomp.c:137
 msgid "Trailing backslash"
 msgstr "Cúlslais ag deireadh"
 
-#: lib/regcomp.c:153
+#: lib/regcomp.c:140
 msgid "Invalid back reference"
 msgstr "Cúltagairt neamhbhailí"
 
-#: lib/regcomp.c:156
-#, fuzzy
+#: lib/regcomp.c:143
 msgid "Unmatched [, [^, [:, [., or [="
-msgstr "[ nó [^ corr"
+msgstr "[, [^, [:, [., nó [= corr"
 
-#: lib/regcomp.c:159
+#: lib/regcomp.c:146
 msgid "Unmatched ( or \\("
 msgstr "( nó \\( corr"
 
-#: lib/regcomp.c:162
+#: lib/regcomp.c:149
 msgid "Unmatched \\{"
 msgstr "\\{ corr"
 
-#: lib/regcomp.c:165
+#: lib/regcomp.c:152
 msgid "Invalid content of \\{\\}"
 msgstr "Ábhar neamhbhailí idir \\{\\}"
 
-#: lib/regcomp.c:168
+#: lib/regcomp.c:155
 msgid "Invalid range end"
 msgstr "Deireadh raoin neamhbhailí"
 
-#: lib/regcomp.c:171
+#: lib/regcomp.c:158
 msgid "Memory exhausted"
 msgstr "Cuimhne ídithe"
 
-#: lib/regcomp.c:174
+#: lib/regcomp.c:161
 msgid "Invalid preceding regular expression"
 msgstr "Is neamhbhailí an slonn ionadaíochta roimhe seo"
 
-#: lib/regcomp.c:177
+#: lib/regcomp.c:164
 msgid "Premature end of regular expression"
 msgstr "Deireadh le slonn ionadaíochta gan choinne"
 
-#: lib/regcomp.c:180
+#: lib/regcomp.c:167
 msgid "Regular expression too big"
 msgstr "Slonn ionadaíochta rómhór"
 
-#: lib/regcomp.c:183
+#: lib/regcomp.c:170
 msgid "Unmatched ) or \\)"
 msgstr ") nó \\) corr"
 
-#: lib/regcomp.c:676
+#: lib/regcomp.c:650
 msgid "No previous regular expression"
 msgstr "Níl aon slonn ionadaíochta roimhe seo"
 
 #: lib/siglist.h:31
 msgid "Hangup"
-msgstr ""
+msgstr "Crochadh"
 
 #: lib/siglist.h:34
 msgid "Interrupt"
-msgstr ""
+msgstr "Idirbhriseadh"
 
 #: lib/siglist.h:37
 msgid "Quit"
-msgstr ""
+msgstr "Scoir"
 
 #: lib/siglist.h:40
 msgid "Illegal instruction"
-msgstr ""
+msgstr "Treoir mídhleathach"
 
 #: lib/siglist.h:43
 msgid "Trace/breakpoint trap"
@@ -249,47 +251,49 @@ msgstr ""
 
 #: lib/siglist.h:49
 msgid "Floating point exception"
-msgstr ""
+msgstr "Eisceacht snámhphointe"
 
 #: lib/siglist.h:52
 msgid "Killed"
-msgstr ""
+msgstr "Maraithe"
 
 #: lib/siglist.h:55
 msgid "Bus error"
-msgstr ""
+msgstr "Earráid bhus"
 
 #: lib/siglist.h:58
 msgid "Segmentation fault"
-msgstr ""
+msgstr "Fabht deighilte"
 
 #: lib/siglist.h:61
 msgid "Broken pipe"
-msgstr ""
+msgstr "Píopa briste"
 
 #: lib/siglist.h:64
 msgid "Alarm clock"
-msgstr ""
+msgstr "Clog aláraim"
 
 #: lib/siglist.h:67
 msgid "Terminated"
-msgstr ""
+msgstr "Críochnaithe"
 
 #: lib/siglist.h:70
+#, fuzzy
 msgid "Urgent I/O condition"
-msgstr ""
+msgstr "Staid phráinneach I/A"
 
 #: lib/siglist.h:73
 msgid "Stopped (signal)"
-msgstr ""
+msgstr "Stoptha (comhartha)"
 
 #: lib/siglist.h:76
 msgid "Stopped"
-msgstr ""
+msgstr "Stoptha"
 
 #: lib/siglist.h:79
+#, fuzzy
 msgid "Continued"
-msgstr ""
+msgstr "Lean ar aghaidh"
 
 #: lib/siglist.h:82
 msgid "Child exited"
@@ -297,11 +301,11 @@ msgstr ""
 
 #: lib/siglist.h:85
 msgid "Stopped (tty input)"
-msgstr ""
+msgstr "Stoptha (ionchur teirminéil)"
 
 #: lib/siglist.h:88
 msgid "Stopped (tty output)"
-msgstr ""
+msgstr "Stoptha (aschur teirminéil)"
 
 #: lib/siglist.h:91
 msgid "I/O possible"
@@ -327,17 +331,17 @@ msgstr ""
 
 #: lib/siglist.h:106
 msgid "Window changed"
-msgstr ""
+msgstr "Fuinneog athraithe"
 
 #: lib/siglist.h:109
 #, fuzzy
 msgid "User defined signal 1"
-msgstr "Ainm %s gan sainmhíniú"
+msgstr "Comhartha úsáideora 1"
 
 #: lib/siglist.h:112
 #, fuzzy
 msgid "User defined signal 2"
-msgstr "Ainm %s gan sainmhíniú"
+msgstr "Comhartha úsáideora 2"
 
 #: lib/siglist.h:117
 msgid "EMT trap"
@@ -345,29 +349,30 @@ msgstr ""
 
 #: lib/siglist.h:120
 msgid "Bad system call"
-msgstr ""
+msgstr "Droch-ghlaoch córais"
 
 #: lib/siglist.h:123
+#, fuzzy
 msgid "Stack fault"
-msgstr ""
+msgstr "Fabht deighilte"
 
 #: lib/siglist.h:126
 msgid "Information request"
-msgstr ""
+msgstr "Iarratas faisnéise"
 
 #: lib/siglist.h:128
+#, fuzzy
 msgid "Power failure"
-msgstr ""
+msgstr "teip chumhachta ar tí tarlú"
 
 #: lib/siglist.h:131
 msgid "Resource lost"
 msgstr ""
 
-#: lib/spawn-pipe.c:217 lib/spawn-pipe.c:220 lib/spawn-pipe.c:459
-#: lib/spawn-pipe.c:462
-#, c-format
+#: lib/spawn-pipe.c:218 lib/spawn-pipe.c:221
+#, fuzzy, c-format
 msgid "cannot create pipe"
-msgstr ""
+msgstr "%s: ní féidir cruthú: %s"
 
 #: lib/strsignal.c:114
 #, c-format
@@ -375,58 +380,58 @@ msgid "Real-time signal %d"
 msgstr ""
 
 #: lib/strsignal.c:118
-#, c-format
+#, fuzzy, c-format
 msgid "Unknown signal %d"
-msgstr ""
-
-#: lib/verror.c:76
-#, c-format
-msgid "unable to display error message"
-msgstr ""
+msgstr "Comhartha neamhaithnid #%d"
 
 #: lib/version-etc.c:73
 #, c-format
 msgid "Packaged by %s (%s)\n"
-msgstr ""
+msgstr "Arna phacáistiú ag %s (%s)\n"
 
 #: lib/version-etc.c:76
 #, c-format
 msgid "Packaged by %s\n"
-msgstr ""
+msgstr "Arna phacáistiú ag %s\n"
 
 #. TRANSLATORS: Translate "(C)" to the copyright symbol
 #. (C-in-a-circle), if this symbol is available in the user's
 #. locale.  Otherwise, do not translate "(C)"; leave it as-is.
 #: lib/version-etc.c:83
 msgid "(C)"
-msgstr ""
+msgstr "©"
 
 #. TRANSLATORS: The %s placeholder is the web address of the GPL license.
 #: lib/version-etc.c:88
-#, c-format
+#, fuzzy, c-format
 msgid ""
 "License GPLv3+: GNU GPL version 3 or later <%s>.\n"
 "This is free software: you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
+"\n"
+"Ceadúnas GPLv3+: GNU GPL leagan 3 nó níos nuaí <http://gnu.org/licenses/"
+"gpl.html>.\n"
+"Is saorbhogearra é seo: ceadaítear duit é a athrú agus a athdháileadh.\n"
+"Níl baránta AR BITH ann, an oiread atá ceadaithe de réir dlí.\n"
 
 #. TRANSLATORS: %s denotes an author name.
 #: lib/version-etc.c:105
 #, c-format
 msgid "Written by %s.\n"
-msgstr ""
+msgstr "Scríofa ag %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #: lib/version-etc.c:109
 #, c-format
 msgid "Written by %s and %s.\n"
-msgstr ""
+msgstr "Scríofa ag %s agus %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #: lib/version-etc.c:113
 #, c-format
 msgid "Written by %s, %s, and %s.\n"
-msgstr ""
+msgstr "Scríofa ag %s, %s, agus %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -437,6 +442,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "and %s.\n"
 msgstr ""
+"Scríofa ag %s, %s, %s,\n"
+"agus %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -447,6 +454,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, and %s.\n"
 msgstr ""
+"Scríofa ag %s, %s, %s,\n"
+"%s, agus %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -457,6 +466,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, %s, and %s.\n"
 msgstr ""
+"Scríofa ag %s, %s, %s,\n"
+"%s, %s, agus %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -467,6 +478,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, %s, %s, and %s.\n"
 msgstr ""
+"Scríofa ag %s, %s, %s,\n"
+"%s, %s, %s, agus %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -478,6 +491,9 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "and %s.\n"
 msgstr ""
+"Scríofa ag %s, %s, %s,\n"
+"%s, %s, %s, %s,\n"
+"agus %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -489,6 +505,9 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "%s, and %s.\n"
 msgstr ""
+"Scríofa ag %s, %s, %s,\n"
+"%s, %s, %s, %s,\n"
+"%s, agus %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -500,44 +519,48 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "%s, %s, and others.\n"
 msgstr ""
+"Scríofa ag %s, %s, %s,\n"
+"%s, %s, %s, %s,\n"
+"%s, %s, agus daoine eile nach iad.\n"
 
 #. TRANSLATORS: The placeholder indicates the bug-reporting address
 #. for this package.  Please add _another line_ saying
 #. "Report translation bugs to <...>\n" with the address for translation
 #. bugs (typically your translation team's web or email address).
-#: lib/version-etc.c:249
+#: lib/version-etc.c:248
 #, fuzzy, c-format
 msgid "Report bugs to: %s\n"
 msgstr ""
 "\n"
-"Seol tuairiscí fabhtanna chuig <bug-m4@gnu.org>.\n"
+"Seol tuairiscí ar fhabhtanna chuig: %s\n"
 
-#: lib/version-etc.c:251
+#: lib/version-etc.c:250
 #, c-format
 msgid "Report %s bugs to: %s\n"
-msgstr ""
+msgstr "Seol tuairiscí ar fhabhtanna i %s chuig: %s\n"
 
-#: lib/version-etc.c:255 lib/version-etc.c:257
+#: lib/version-etc.c:254 lib/version-etc.c:256
 #, c-format
 msgid "%s home page: <%s>\n"
-msgstr ""
+msgstr "Leathanach baile %s: <%s>\n"
 
-#: lib/version-etc.c:260
-#, c-format
+#: lib/version-etc.c:259
+#, fuzzy, c-format
 msgid "General help using GNU software: <%s>\n"
 msgstr ""
+"Cabhair ghinearálta maidir le bogearraí GNU: <http://www.gnu.org/gethelp/>\n"
 
-#: lib/wait-process.c:232 lib/wait-process.c:264 lib/wait-process.c:326
-#, c-format
+#: lib/wait-process.c:266 lib/wait-process.c:298 lib/wait-process.c:357
+#, fuzzy, c-format
 msgid "%s subprocess"
-msgstr ""
+msgstr "%s: theip ar inlib"
 
-#: lib/wait-process.c:283 lib/wait-process.c:355
-#, c-format
+#: lib/wait-process.c:317 lib/wait-process.c:386
+#, fuzzy, c-format
 msgid "%s subprocess got fatal signal %d"
-msgstr ""
+msgstr "%s: theip ar inlib"
 
-#: lib/xprintf.c:50 lib/xprintf.c:76
+#: lib/xprintf.c:47 lib/xprintf.c:68
 #, c-format
 msgid "cannot perform formatted output"
 msgstr ""
@@ -547,157 +570,163 @@ msgstr ""
 msgid "--warn-macro-sequence: bad regular expression `%s': %s"
 msgstr "Slonn ionadaíochta neamhbhailí `%s': %s"
 
-#: src/builtin.c:320
+#: src/builtin.c:298
+#, c-format
+msgid "truncating macro `%s' definition to INT_MAX bytes"
+msgstr ""
+
+#: src/builtin.c:333
 #, c-format
 msgid "Warning: definition of `%s' contains sequence `%s'"
 msgstr ""
 
-#: src/builtin.c:327
+#: src/builtin.c:340
 #, c-format
 msgid "error checking --warn-macro-sequence for macro `%s'"
 msgstr ""
 
-#: src/builtin.c:388
+#: src/builtin.c:401
 #, fuzzy, c-format
 msgid "Warning: too few arguments to builtin `%s'"
 msgstr "Rabhadh: Níl go leor argóint ann don fheidhm insuite `%s'"
 
-#: src/builtin.c:394
+#: src/builtin.c:407
 #, fuzzy, c-format
 msgid "Warning: excess arguments to builtin `%s' ignored"
 msgstr ""
 "Rabhadh: ag déanamh neamhshuim ar argóintí breise don fheidhm insuite `%s'"
 
-#: src/builtin.c:415 src/builtin.c:1114
-#, c-format
+#: src/builtin.c:428 src/builtin.c:1155
+#, fuzzy, c-format
 msgid "empty string treated as 0 in builtin `%s'"
-msgstr ""
+msgstr "Argóint neamhuimhriúil don fheidhm insuite `%s'"
 
-#: src/builtin.c:425 src/builtin.c:1243
+#: src/builtin.c:438 src/builtin.c:1285
 #, fuzzy, c-format
 msgid "non-numeric argument to builtin `%s'"
 msgstr "Argóint neamhuimhriúil don fheidhm insuite `%s'"
 
-#: src/builtin.c:431
-#, c-format
+#: src/builtin.c:444
+#, fuzzy, c-format
 msgid "leading whitespace ignored in builtin `%s'"
-msgstr ""
+msgstr "Argóint neamhuimhriúil don fheidhm insuite `%s'"
 
-#: src/builtin.c:435
+#: src/builtin.c:448
 #, fuzzy, c-format
 msgid "numeric overflow detected in builtin `%s'"
 msgstr "Argóint neamhuimhriúil don fheidhm insuite `%s'"
 
-#: src/builtin.c:552 src/builtin.c:815 src/builtin.c:856
-#, c-format
+#: src/builtin.c:566 src/builtin.c:829 src/builtin.c:870
+#, fuzzy, c-format
 msgid "Warning: %s: invalid macro name ignored"
-msgstr ""
+msgstr "%s: ainm neamhbhailí gnímh"
 
-#: src/builtin.c:752 src/builtin.c:864
+#: src/builtin.c:765 src/builtin.c:877
 #, fuzzy, c-format
 msgid "undefined macro `%s'"
 msgstr "Ainm `%s' gan sainmhíniú"
 
-#: src/builtin.c:823
+#: src/builtin.c:836
 #, fuzzy, c-format
 msgid "undefined builtin `%s'"
 msgstr "Ainm `%s' gan sainmhíniú"
 
-#: src/builtin.c:914 src/builtin.c:2208
+#: src/builtin.c:928 src/builtin.c:2260
 #, c-format
 msgid "builtin `%s' requested by frozen file is not supported"
 msgstr ""
 
-#: src/builtin.c:918
+#: src/builtin.c:932
 #, fuzzy, c-format
 msgid "Warning: cannot concatenate builtin `%s'"
 msgstr "Rabhadh: Níl go leor argóint ann don fheidhm insuite `%s'"
 
-#: src/builtin.c:978 src/builtin.c:1015 src/builtin.c:1028 src/builtin.c:1063
+#: src/builtin.c:1003 src/builtin.c:1053 src/builtin.c:1066 src/builtin.c:1101
 #, fuzzy, c-format
 msgid "cannot run command `%s'"
 msgstr "Ní féidir píopa a oscailt go hordú `%s'"
 
-#: src/builtin.c:1051
+#: src/builtin.c:1089
+#, fuzzy
 msgid "cannot read pipe"
-msgstr ""
+msgstr "%s: ní féidir léamh: %s"
 
-#: src/builtin.c:1098
-#, c-format
+#: src/builtin.c:1140
+#, fuzzy, c-format
 msgid "radix %d in builtin `%s' out of range"
-msgstr ""
+msgstr "%s: %s as raon"
 
-#: src/builtin.c:1108
+#: src/builtin.c:1149
 #, fuzzy, c-format
 msgid "negative width to builtin `%s'"
 msgstr "Leithead diúltach i eval"
 
-#: src/builtin.c:1252
+#: src/builtin.c:1294
 #, fuzzy, c-format
 msgid "error undiverting `%s'"
 msgstr "Ní féidir %s a dí-atreorú"
 
-#: src/builtin.c:1256
+#: src/builtin.c:1298
 #, fuzzy, c-format
 msgid "cannot undivert `%s'"
 msgstr "Ní féidir %s a dí-atreorú"
 
-#: src/builtin.c:1366 src/freeze.c:115 src/m4.c:379
+#: src/builtin.c:1408 src/freeze.c:115 src/m4.c:382
 #, fuzzy, c-format
 msgid "cannot open `%s'"
 msgstr "Ní féidir %s a oscailt"
 
-#: src/builtin.c:1429
+#: src/builtin.c:1471
 #, fuzzy, c-format
 msgid "%s: cannot create tempfile `%s'"
-msgstr "EARRÁID: ní féidir modúl a dhúnadh: `%s'"
+msgstr "%s: ní féidir comhad sealadach a oscailt: %s"
 
-#: src/builtin.c:1464
+#: src/builtin.c:1507
 msgid "recommend using mkstemp instead"
 msgstr ""
 
-#: src/builtin.c:1557
-#, c-format
+#: src/builtin.c:1600
+#, fuzzy, c-format
 msgid "exit status out of range: `%d'"
-msgstr ""
+msgstr "%s as raon"
 
-#: src/builtin.c:1681
+#: src/builtin.c:1726
 #, c-format
 msgid "Debugmode: bad debug flags: `%s'"
 msgstr "Mód dífhabhtaithe: drochbhratacha dífhabhtaithe: `%s'"
 
-#: src/builtin.c:1722 src/m4.c:625 src/m4.c:689
+#: src/builtin.c:1767 src/m4.c:633 src/m4.c:700
 #, fuzzy, c-format
 msgid "cannot set debug file `%s'"
 msgstr "Ní féidir an comhad earráide a shocrú: %s"
 
-#: src/builtin.c:1988
+#: src/builtin.c:2034
 #, fuzzy
 msgid "Warning: \\0 will disappear, use \\& instead in replacements"
 msgstr ""
 "RABHADH: Rachaidh \\0 as radharc, úsáid \\& ina ionad i dteaghráin "
 "ionadaíochta"
 
-#: src/builtin.c:2004
+#: src/builtin.c:2057
 #, c-format
 msgid "Warning: sub-expression %d not present"
 msgstr ""
 
-#: src/builtin.c:2013
+#: src/builtin.c:2066
 msgid "Warning: trailing \\ ignored in replacement"
 msgstr ""
 
-#: src/builtin.c:2079
+#: src/builtin.c:2132
 #, fuzzy, c-format
 msgid "bad regular expression: `%s': %s"
 msgstr "Slonn ionadaíochta neamhbhailí `%s': %s"
 
-#: src/builtin.c:2091 src/builtin.c:2161
+#: src/builtin.c:2144 src/builtin.c:2214
 #, fuzzy, c-format
 msgid "error matching regular expression `%s'"
 msgstr "Earráid le linn cuardaigh ar shlonn ionadaíochta `%s'"
 
-#: src/builtin.c:2139 src/input.c:792
+#: src/builtin.c:2192 src/input.c:795
 #, fuzzy, c-format
 msgid "bad regular expression `%s': %s"
 msgstr "Slonn ionadaíochta neamhbhailí `%s': %s"
@@ -706,136 +735,144 @@ msgstr "Slonn ionadaíochta neamhbhailí `%s': %s"
 msgid "error writing to debug stream"
 msgstr ""
 
-#: src/eval.c:318
+#: src/eval.c:485
+msgid "Warning: recommend ==, not =, for equality operator"
+msgstr ""
+
+#: src/eval.c:569
 #, fuzzy, c-format
 msgid "bad expression in eval (missing right parenthesis): %s"
 msgstr "Slonn neamhbhailí i eval (lúibín deas ar iarraidh): %s"
 
-#: src/eval.c:324
+#: src/eval.c:574
 #, fuzzy, c-format
 msgid "bad expression in eval: %s"
 msgstr "Slonn neamhbhailí i eval: %s"
 
-#: src/eval.c:329
+#: src/eval.c:579
 #, fuzzy, c-format
 msgid "bad expression in eval (bad input): %s"
 msgstr "Slonn neamhbhailí i eval (droch-ionchur): %s"
 
-#: src/eval.c:334
+#: src/eval.c:584
 #, fuzzy, c-format
 msgid "bad expression in eval (excess input): %s"
 msgstr "Slonn neamhbhailí i eval (ionchur sa bhreis): %s"
 
-#: src/eval.c:339
+#: src/eval.c:588
+#, fuzzy, c-format
+msgid "invalid number in eval: %s"
+msgstr "Nialas san ainmneoir i eval: %s"
+
+#: src/eval.c:592
 #, fuzzy, c-format
 msgid "invalid operator in eval: %s"
 msgstr "Nialas san ainmneoir i eval: %s"
 
-#: src/eval.c:345
+#: src/eval.c:597
 #, fuzzy, c-format
 msgid "divide by zero in eval: %s"
 msgstr "Nialas san ainmneoir i eval: %s"
 
-#: src/eval.c:350
+#: src/eval.c:601
 #, fuzzy, c-format
 msgid "modulo by zero in eval: %s"
 msgstr "Modulo le nialas i eval: %s"
 
-#: src/eval.c:355
+#: src/eval.c:605
 #, fuzzy, c-format
 msgid "negative exponent in eval: %s"
 msgstr "Slonn neamhbhailí i eval: %s"
 
-#: src/eval.c:538
-msgid "Warning: recommend ==, not =, for equality operator"
-msgstr ""
-
-#: src/format.c:40 src/format.c:64 src/format.c:88
+#: src/format.c:39 src/format.c:63 src/format.c:87
 msgid "empty string treated as 0"
 msgstr ""
 
-#: src/format.c:46 src/format.c:70 src/format.c:94
+#: src/format.c:45 src/format.c:69 src/format.c:93
 #, fuzzy, c-format
 msgid "non-numeric argument %s"
 msgstr "Argóint neamhuimhriúil chun %s"
 
-#: src/format.c:48 src/format.c:72 src/format.c:96
+#: src/format.c:47 src/format.c:71 src/format.c:95
 msgid "leading whitespace ignored"
 msgstr ""
 
-#: src/format.c:50 src/format.c:74 src/format.c:98
+#: src/format.c:49 src/format.c:73 src/format.c:97
+#, fuzzy
 msgid "numeric overflow detected"
-msgstr ""
+msgstr "Argóint neamhuimhriúil don fheidhm insuite `%s'"
 
-#: src/format.c:308
+#: src/format.c:309
 #, fuzzy, c-format
 msgid "Warning: unrecognized specifier in `%s'"
 msgstr "%s: rogha anaithnid `%c%s'\n"
 
-#: src/freeze.c:156
+#: src/freeze.c:157
 msgid "unable to create frozen state"
 msgstr ""
 
-#: src/freeze.c:167
+#: src/freeze.c:168
 #, fuzzy
 msgid "expecting line feed in frozen file"
 msgstr "Ag súil le fotha líne i gcomhad sioctha"
 
-#: src/freeze.c:169
+#: src/freeze.c:170
 #, fuzzy, c-format
 msgid "expecting character `%c' in frozen file"
 msgstr "Ag súil le carachtar `%c' i gcomhad sioctha"
 
-#: src/freeze.c:215
+#: src/freeze.c:216
 #, fuzzy
 msgid "integer overflow in frozen file"
 msgstr "Ag súil le fotha líne i gcomhad sioctha"
 
-#: src/freeze.c:257
+#: src/freeze.c:258
 #, fuzzy
 msgid "premature end of frozen file"
 msgstr "Comhadchríoch gan choinne i gcomhad sioctha"
 
-#: src/freeze.c:270
+#: src/freeze.c:271
 #, fuzzy, c-format
 msgid "cannot open %s"
 msgstr "Ní féidir %s a oscailt"
 
-#: src/freeze.c:285
+#: src/freeze.c:286
 #, c-format
 msgid "frozen file version %d greater than max supported of 1"
 msgstr ""
 
-#: src/freeze.c:288
+#: src/freeze.c:289
 msgid "ill-formed frozen file, version directive expected"
 msgstr ""
 
-#: src/freeze.c:297
+#: src/freeze.c:298
 #, fuzzy
 msgid "ill-formed frozen file"
 msgstr "Comhad sioctha míchumtha"
 
-#: src/freeze.c:385
+#: src/freeze.c:387
 msgid "unable to read frozen state"
 msgstr ""
 
 #: src/input.c:359
+#, fuzzy
 msgid "read error"
-msgstr ""
+msgstr "earráid sa scríobh"
 
 #: src/input.c:366
+#, fuzzy
 msgid "error reading file"
-msgstr ""
+msgstr "EARRÁID: Comhad ionsáite á léamh"
 
-#: src/input.c:589
+#: src/input.c:590
 msgid "Warning: end of file treated as newline"
 msgstr ""
 
-#: src/input.c:881
+#: src/input.c:899
 msgid "ERROR: end of file in comment"
 msgstr ""
 
-#: src/input.c:1001
+#: src/input.c:1023
 #, fuzzy
 msgid "ERROR: end of file in string"
 msgstr "EARRÁID: EOF i dteaghrán"
@@ -924,7 +961,7 @@ msgid ""
 "Limits control:\n"
 "  -g, --gnu                    override -G to re-enable GNU extensions\n"
 "  -G, --traditional            suppress all GNU extensions\n"
-"  -H, --hashsize=PRIME         set symbol lookup hash table size [509]\n"
+"  -H, --hashsize=PRIME         set symbol lookup hash table size [%d]\n"
 "  -L, --nesting-limit=NUMBER   change nesting limit, 0 for unlimited [%d]\n"
 msgstr ""
 "\n"
@@ -996,115 +1033,140 @@ msgid ""
 "mismatch, or whatever value was passed to the m4exit macro.\n"
 msgstr ""
 
-#: src/m4.c:436
+#: src/m4.c:443
 #, c-format
 msgid "internal error detected; please report this bug to <%s>"
 msgstr ""
 
-#: src/m4.c:489
+#: src/m4.c:497
 #, c-format
 msgid "warning: `m4 -%c' may be removed in a future release"
 msgstr ""
 
-#: src/m4.c:496
-#, c-format
+#: src/m4.c:504
+#, fuzzy, c-format
 msgid "warning: `m4 %s' is deprecated"
-msgstr ""
+msgstr "Tá an t-ordú `egrep' imithe i léig; úsáid `grep -E' ina ionad.\n"
 
-#: src/m4.c:572
+#: src/m4.c:580
 #, fuzzy, c-format
 msgid "bad debug flags: `%s'"
 msgstr "Bratacha neamhbhailí dífhabhtaithe: `%s'"
 
-#: src/m4.c:578
-#, c-format
+#: src/m4.c:586
+#, fuzzy, c-format
 msgid "warning: `m4 -e' is deprecated, use `-i' instead"
-msgstr ""
+msgstr "Tá an t-ordú `egrep' imithe i léig; úsáid `grep -E' ina ionad.\n"
 
-#: src/m4.c:690
+#: src/m4.c:701
 msgid "stderr"
 msgstr ""
 
-#: src/macro.c:196
+#: src/macro.c:178 src/macro.c:225
+#, fuzzy
+msgid "Warning: cannot concatenate builtin tokens"
+msgstr "Rabhadh: Níl go leor argóint ann don fheidhm insuite `%s'"
+
+#: src/macro.c:205
 #, fuzzy
 msgid "ERROR: end of file in argument list"
 msgstr "EARRÁID: EOF i liosta na n-argóintí"
 
-#: src/macro.c:332
+#: src/macro.c:348
 #, fuzzy, c-format
 msgid "recursion limit of %d exceeded, use -L<N> to change it"
 msgstr ""
 "EARRÁID: Doimhneacht athchúrsála níos mó ná an t-uasmhéid %d, úsáid -L<N> "
 "chun é a athrú"
 
-#: src/output.c:172 src/output.c:898 src/output.c:901
+#: src/output.c:178 src/output.c:933 src/output.c:936
 #, fuzzy
 msgid "cannot clean temporary file for diversion"
 msgstr "EARRÁID: Ní féidir comhad sealadach a chruthú le haghaidh atreoraithe"
 
-#: src/output.c:222 src/output.c:231 src/output.c:265 src/output.c:360
+#: src/output.c:230 src/output.c:239 src/output.c:273 src/output.c:370
 #, fuzzy
 msgid "cannot create temporary file for diversion"
 msgstr "EARRÁID: Ní féidir comhad sealadach a chruthú le haghaidh atreoraithe"
 
-#: src/output.c:250 src/output.c:257 src/output.c:269
+#: src/output.c:258 src/output.c:265 src/output.c:277
 #, fuzzy
 msgid "cannot seek within diversion"
 msgstr "Ní féidir atreorú a `stat'"
 
-#: src/output.c:341 src/output.c:353 src/output.c:502 src/output.c:733
+#: src/output.c:350 src/output.c:363 src/output.c:512 src/output.c:768
 #, fuzzy
 msgid "cannot close temporary file for diversion"
 msgstr "EARRÁID: Ní féidir comhad sealadach a chruthú le haghaidh atreoraithe"
 
-#: src/output.c:474
+#: src/output.c:484
 #, fuzzy
 msgid "ERROR: cannot flush diversion to temporary file"
 msgstr "EARRÁID: Ní féidir atreorú a shruthlú go comhad sealadach"
 
-#: src/output.c:568
+#: src/output.c:579
 #, fuzzy
 msgid "ERROR: copying inserted file"
 msgstr "EARRÁID: Comhad ionsáite á chóipeáil"
 
-#: src/output.c:816
+#: src/output.c:851
 #, fuzzy
 msgid "error reading inserted file"
 msgstr "EARRÁID: Comhad ionsáite á léamh"
 
-#: src/output.c:983
+#: src/output.c:1018
 #, fuzzy
 msgid "cannot stat diversion"
 msgstr "Ní féidir atreorú a `stat'"
 
-#: src/output.c:987
+#: src/output.c:1022
 #, fuzzy
 msgid "diversion too large"
 msgstr "Atreorú rómhór"
 
-#, c-format
+#~ msgid "%s: option `%s' is ambiguous\n"
+#~ msgstr "%s: Tá an rogha `%s' débhríoch\n"
+
 #~ msgid "%s: option `--%s' doesn't allow an argument\n"
 #~ msgstr "%s: ní cheadaítear argóint i ndiaidh na rogha `--%s'\n"
 
-#, c-format
+#~ msgid "%s: option `%c%s' doesn't allow an argument\n"
+#~ msgstr "%s: ní cheadaítear argóint i ndiaidh na rogha `%c%s'\n"
+
+#~ msgid "%s: option `%s' requires an argument\n"
+#~ msgstr "%s: ní foláir argóint don rogha `%s'\n"
+
 #~ msgid "%s: unrecognized option `--%s'\n"
 #~ msgstr "%s: rogha anaithnid `--%s'\n"
 
-#, c-format
+#, fuzzy
+#~ msgid "%s: unrecognized option `%c%s'\n"
+#~ msgstr "%s: rogha anaithnid `--%s'\n"
+
 #~ msgid "%s: illegal option -- %c\n"
 #~ msgstr "%s: rogha neamhcheadaithe -- %c\n"
 
-#, c-format
+#~ msgid "%s: invalid option -- %c\n"
+#~ msgstr "%s: rogha neamhbhailí -- %c\n"
+
+#~ msgid "%s: option requires an argument -- %c\n"
+#~ msgstr "%s: ní foláir argóint don rogha -- %c\n"
+
 #~ msgid "%s: option `-W %s' is ambiguous\n"
 #~ msgstr "%s: Tá an rogha `-W %s' débhríoch\n"
 
-#, c-format
 #~ msgid "%s: option `-W %s' doesn't allow an argument\n"
 #~ msgstr "%s: ní cheadaítear argóint i ndiaidh na rogha `-W %s'\n"
+
+#~ msgid "Unmatched [ or [^"
+#~ msgstr "[ nó [^ corr"
 
 #~ msgid "INTERNAL ERROR: Bad token data type in define_macro ()"
 #~ msgstr ""
 #~ "EARRÁID INMHEÁNACH: Droch-chineál sonraí comhartha i define_macro ()"
+
+#~ msgid "Undefined name %s"
+#~ msgstr "Ainm %s gan sainmhíniú"
 
 #~ msgid "INTERNAL ERROR: Builtin not found in builtin table!"
 #~ msgstr "EARRÁID INMHEÁNACH: Níor aimsíodh feidhm insuite sa tábla insuite!"
@@ -1112,16 +1174,26 @@ msgstr "Atreorú rómhór"
 #~ msgid "INTERNAL ERROR: Bad token data type in m4_dumpdef ()"
 #~ msgstr "EARRÁID INMHEÁNACH: Droch-chineál sonraí comhartha i m4_dumpdef ()"
 
+#, fuzzy
+#~ msgid "Undefined name `%s'"
+#~ msgstr "Ainm %s gan sainmhíniú"
+
 #~ msgid "INTERNAL ERROR: Bad symbol type in m4_defn ()"
 #~ msgstr "EARRÁID INMHEÁNACH: Droch-chineál siombaile i m4_defn ()"
 
-#, c-format
 #~ msgid "Radix in eval out of range (radix = %d)"
 #~ msgstr "Bunuimhir as raon i eval (bunuimhir = %d)"
 
-#, c-format
 #~ msgid "Undefined syntax code %c"
 #~ msgstr "Cód comhréire %c gan sainmhíniú"
+
+#, fuzzy
+#~ msgid "Cannot open %s"
+#~ msgstr "Ní féidir %s a oscailt"
+
+#, fuzzy
+#~ msgid "Bad regular expression `%s': %s"
+#~ msgstr "Slonn ionadaíochta neamhbhailí `%s': %s"
 
 #~ msgid "INTERNAL ERROR: Builtin not found in builtin table! (trace_pre ())"
 #~ msgstr ""
@@ -1150,15 +1222,12 @@ msgstr "Atreorú rómhór"
 #~ msgstr ""
 #~ "EARRÁID INMHEÁNACH: Droch-chineál sonraí comhartha i freeze_one_symbol ()"
 
-#, c-format
 #~ msgid "`%s' from frozen file not found in builtin table!"
 #~ msgstr "Níor aimsíodh `%s' as comhad sioctha sa tábla insuite!"
 
-#, c-format
 #~ msgid "Input reverted to %s, line %d"
 #~ msgstr "D'fhill an t-ionchur ar %s, líne %d"
 
-#, c-format
 #~ msgid "Input read from %s"
 #~ msgstr "Léadh an t-ionchur ó %s"
 
@@ -1252,11 +1321,16 @@ msgstr "Atreorú rómhór"
 #~ "  i   taispeáin athruithe in inchomhaid\n"
 #~ "  V   gach ceann acu seo thuas\n"
 
-#, c-format
+#~ msgid ""
+#~ "\n"
+#~ "Report bugs to <bug-m4@gnu.org>.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "Seol tuairiscí fabhtanna chuig <bug-m4@gnu.org>.\n"
+
 #~ msgid "ERROR: failed to add search directory `%s'"
 #~ msgstr "EARRÁID: theip ar chur comhadlann chuardaigh `%s' leis"
 
-#, c-format
 #~ msgid "ERROR: failed to add search directory `%s': %s"
 #~ msgstr "EARRÁID: theip ar chur comhadlann chuardaigh `%s' leis: %s"
 
@@ -1275,32 +1349,42 @@ msgstr "Atreorú rómhór"
 #~ msgid "INTERNAL ERROR: Bad symbol type in call_macro ()"
 #~ msgstr "EARRÁID INMHEÁNACH: Droch-chineál siombaile i call_macro ()"
 
-#, c-format
 #~ msgid "ERROR: failed to initialise modules: %s"
 #~ msgstr "EARRÁID: theip ar thúsú modúil: %s"
 
-#, c-format
 #~ msgid "ERROR: cannot find module: `%s'"
 #~ msgstr "EARRÁID: modúl gan aimsiú: `%s'"
 
-#, c-format
 #~ msgid "ERROR: cannot find module: `%s': %s"
 #~ msgstr "EARRÁID: modúl gan aimsiú: `%s': %s"
 
 #~ msgid "ERROR: cannot close modules"
 #~ msgstr "EARRÁID: ní féidir modúil a dhúnadh"
 
-#, c-format
 #~ msgid "ERROR: cannot cannot close modules: %s"
 #~ msgstr "EARRÁID: ní féidir modúil a dhúnadh: %s"
 
-#, c-format
+#~ msgid "ERROR: cannot close module: `%s'"
+#~ msgstr "EARRÁID: ní féidir modúl a dhúnadh: `%s'"
+
 #~ msgid "ERROR: cannot cannot close module: `%s': %s"
 #~ msgstr "EARRÁID: ní féidir modúl a dhúnadh: `%s': %s"
 
-#, c-format
+#, fuzzy
+#~ msgid "ERROR: Cannot create temporary file for diversion"
+#~ msgstr ""
+#~ "EARRÁID: Ní féidir comhad sealadach a chruthú le haghaidh atreoraithe"
+
+#, fuzzy
+#~ msgid "ERROR: Reading inserted file"
+#~ msgstr "EARRÁID: Comhad ionsáite á chóipeáil"
+
 #~ msgid "Path search for `%s' found `%s'"
 #~ msgstr "D'aimsigh cuardach conaire ar `%s' seo a leanas: `%s'"
+
+#, fuzzy
+#~ msgid "VMEM limit exceeded?\n"
+#~ msgstr "Teorainn VMEM sáraithe?\n"
 
 #~ msgid ""
 #~ "Memory bounds violation detected (SIGSEGV).  Either a stack overflow\n"
@@ -1315,6 +1399,5 @@ msgstr "Atreorú rómhór"
 #~ msgid "INTERNAL ERROR: Illegal mode to symbol_lookup ()"
 #~ msgstr "EARRÁID INMHEÁNACH: Mód neamhcheadaithe i symbol_lookup ()"
 
-#, c-format
 #~ msgid "Name `%s' is unknown\n"
 #~ msgstr "Ainm `%s' anaithnid\n"

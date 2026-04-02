@@ -1,19 +1,19 @@
 /* Emulate link on platforms that lack it, namely native Windows platforms.
 
-   Copyright (C) 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
-   any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -70,10 +70,6 @@ initialize (void)
 int
 link (const char *file1, const char *file2)
 {
-  char *dir;
-  size_t len1 = strlen (file1);
-  size_t len2 = strlen (file2);
-
 #  if !(_WIN32_WINNT >= _WIN32_WINNT_WINXP)
   if (!initialized)
     initialize ();
@@ -85,29 +81,34 @@ link (const char *file1, const char *file2)
       errno = EPERM;
       return -1;
     }
+
   /* Reject trailing slashes on non-directories; native Windows does not
      support hard-linking directories.  */
-  if ((len1 && (file1[len1 - 1] == '/' || file1[len1 - 1] == '\\'))
-      || (len2 && (file2[len2 - 1] == '/' || file2[len2 - 1] == '\\')))
-    {
-      /* If stat() fails, then link() should fail for the same reason.  */
-      struct stat st;
-      if (stat (file1, &st))
-        {
-          if (errno == EOVERFLOW)
-            /* It's surely a file, not a directory (see stat-w32.c).  */
-            errno = ENOTDIR;
-          return -1;
-        }
-      if (!S_ISDIR (st.st_mode))
-        errno = ENOTDIR;
-      else
-        errno = EPERM;
-      return -1;
-    }
+  {
+    size_t len1 = strlen (file1);
+    size_t len2 = strlen (file2);
+    if ((len1 && (file1[len1 - 1] == '/' || file1[len1 - 1] == '\\'))
+        || (len2 && (file2[len2 - 1] == '/' || file2[len2 - 1] == '\\')))
+      {
+        /* If stat() fails, then link() should fail for the same reason.  */
+        struct stat st;
+        if (stat (file1, &st))
+          {
+            if (errno == EOVERFLOW)
+              /* It's surely a file, not a directory (see stat-w32.c).  */
+              errno = ENOTDIR;
+            return -1;
+          }
+        if (!S_ISDIR (st.st_mode))
+          errno = ENOTDIR;
+        else
+          errno = EPERM;
+        return -1;
+      }
+  }
   /* CreateHardLink("b/.","a",NULL) creates file "b", so we must check
      that dirname(file2) exists.  */
-  dir = strdup (file2);
+  char *dir = strdup (file2);
   if (!dir)
     return -1;
   {
@@ -182,8 +183,6 @@ link (const char *file1, const char *file2)
 int
 rpl_link (char const *file1, char const *file2)
 {
-  size_t len1;
-  size_t len2;
   struct stat st;
 
   /* Don't allow IRIX to dereference dangling file2 symlink.  */
@@ -194,8 +193,8 @@ rpl_link (char const *file1, char const *file2)
     }
 
   /* Reject trailing slashes on non-directories.  */
-  len1 = strlen (file1);
-  len2 = strlen (file2);
+  size_t len1 = strlen (file1);
+  size_t len2 = strlen (file2);
   if ((len1 && file1[len1 - 1] == '/')
       || (len2 && file2[len2 - 1] == '/'))
     {
@@ -215,12 +214,11 @@ rpl_link (char const *file1, char const *file2)
     {
       /* Fix Cygwin 1.5.x bug where link("a","b/.") creates file "b".  */
       char *dir = strdup (file2);
-      char *p;
       if (!dir)
         return -1;
       /* We already know file2 does not end in slash.  Strip off the
          basename, then check that the dirname exists.  */
-      p = strrchr (dir, '/');
+      char *p = strrchr (dir, '/');
       if (p)
         {
           *p = '\0';

@@ -1,4 +1,4 @@
-dnl @ ../doc/m4.texi:3666: Origin of test
+dnl @ ../doc/m4.texi:3674: Origin of test
 dnl @ expected status: 0
 dnl @ extra options: 
 dnl @ Copyright (C) 2006, 2007, 2008, 2009 Free Software
@@ -7,11 +7,18 @@ dnl @ This file is free software; the Free Software Foundation
 dnl @ gives unlimited permission to copy and/or distribute it
 dnl @ with or without modifications, as long as this notice
 dnl @ is preserved.
-undivert(`curry.m4')dnl
-dnl @result{}divert(`-1')
-dnl @result{}# curry(macro, args)
-dnl @result{}# Expand to a macro call that takes one argument, then invoke
-dnl @result{}# macro(args, extra).
-dnl @result{}define(`curry', `$1(shift($@,)_$0')
-dnl @result{}define(`_curry', ``$1')')
-dnl @result{}divert`'dnl
+include(`curry.m4')include(`stack.m4')
+dnl @result{}
+define(`reverse', `ifelse(`$#', `0', , `$#', `1', ``$1'',
+                          `reverse(shift($@)), `$1'')')
+dnl @result{}
+pushdef(`a', `1')pushdef(`a', `2')pushdef(`a', `3')
+dnl @result{}
+stack_foreach(`a', `:curry(`reverse', `4')')
+dnl @result{}:1, 4:2, 4:3, 4
+stack_foreach(`a', `:curry(`reverse', `4', `5')')
+dnl @result{}:1, 5, 4:2, 5, 4:3, 5, 4
+curry(`curry', `reverse', `1')(`2')(`3')
+dnl @result{}3, 2, 1
+curry(`reverse', `1')(`2', `3')
+dnl @result{}3, 2, 1

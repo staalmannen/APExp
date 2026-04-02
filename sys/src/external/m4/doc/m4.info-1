@@ -1,9 +1,9 @@
-This is m4.info, produced by makeinfo version 6.7 from m4.texi.
+This is m4.info, produced by makeinfo version 7.2 from m4.texi.
 
-This manual (28 May 2021) is for GNU M4 (version 1.4.19), a package
+This manual (6 February 2026) is for GNU M4 (version 1.4.21), a package
 containing an implementation of the m4 macro language.
 
-   Copyright © 1989–1994, 2004–2014, 2016–2017, 2020–2021 Free Software
+   Copyright © 1989-1994, 2004-2014, 2016-2017, 2020-2026 Free Software
 Foundation, Inc.
 
      Permission is granted to copy, distribute and/or modify this
@@ -11,7 +11,7 @@ Foundation, Inc.
      Version 1.3 or any later version published by the Free Software
      Foundation; with no Invariant Sections, no Front-Cover Texts, and
      no Back-Cover Texts.  A copy of the license is included in the
-     section entitled “GNU Free Documentation License.”
+     section entitled "GNU Free Documentation License."
 INFO-DIR-SECTION Text creation and manipulation
 START-INFO-DIR-ENTRY
 * M4: (m4).                     A powerful macro processor.
@@ -23,10 +23,10 @@ File: m4.info,  Node: Top,  Next: Preliminaries,  Up: (dir)
 GNU M4
 ******
 
-This manual (28 May 2021) is for GNU M4 (version 1.4.19), a package
+This manual (6 February 2026) is for GNU M4 (version 1.4.21), a package
 containing an implementation of the m4 macro language.
 
-   Copyright © 1989–1994, 2004–2014, 2016–2017, 2020–2021 Free Software
+   Copyright © 1989-1994, 2004-2014, 2016-2017, 2020-2026 Free Software
 Foundation, Inc.
 
      Permission is granted to copy, distribute and/or modify this
@@ -34,7 +34,7 @@ Foundation, Inc.
      Version 1.3 or any later version published by the Free Software
      Foundation; with no Invariant Sections, no Front-Cover Texts, and
      no Back-Cover Texts.  A copy of the license is included in the
-     section entitled “GNU Free Documentation License.”
+     section entitled "GNU Free Documentation License."
 
    GNU ‘m4’ is an implementation of the traditional UNIX macro
 processor.  It is mostly SVR4 compatible, although it has some
@@ -45,10 +45,10 @@ generating ‘configure’ scripts, but not for running them.
 
    GNU ‘m4’ was originally written by René Seindal, with subsequent
 changes by François Pinard and other volunteers on the Internet.  All
-names and email addresses can be found in the files ‘m4-1.4.19/AUTHORS’
-and ‘m4-1.4.19/THANKS’ from the GNU M4 distribution.
+names and email addresses can be found in the files ‘m4-1.4.21/AUTHORS’
+and ‘m4-1.4.21/THANKS’ from the GNU M4 distribution.
 
-   This is release 1.4.19.  It is now considered stable: future releases
+   This is release 1.4.21.  It is now considered stable: future releases
 in the 1.4.x series are only meant to fix bugs, increase speed, or
 improve documentation.  However...
 
@@ -90,7 +90,7 @@ and _you should not count on it_.
 * Copying This Manual::         How to make copies of this manual
 * Indices::                     Indices of concepts and macros
 
- — The Detailed Node Listing —
+ -- The Detailed Node Listing --
 
 Introduction and preliminaries
 
@@ -237,7 +237,6 @@ Indices of concepts and macros
 * Macro index::                 Index for all ‘m4’ macros
 * Concept index::               Index for many concepts
 
-
 
 File: m4.info,  Node: Preliminaries,  Next: Invoking m4,  Prev: Top,  Up: Top
 
@@ -300,25 +299,25 @@ Macro languages were invented early in the history of computing.  In the
 1950s Alan Perlis suggested that the macro language be independent of
 the language being processed.  Techniques such as conditional and
 recursive macros, and using macros to define other macros, were
-described by Doug McIlroy of Bell Labs in “Macro Instruction Extensions
-of Compiler Languages”, _Communications of the ACM_ 3, 4 (1960), 214–20,
+described by Doug McIlroy of Bell Labs in "Macro Instruction Extensions
+of Compiler Languages", _Communications of the ACM_ 3, 4 (1960), 214-20,
 <https://dl.acm.org/doi/10.1145/367177.367223>.
 
-   An important precursor of ‘m4’ was GPM; see C. Strachey, “A general
-purpose macrogenerator”, _Computer Journal_ 8, 3 (1965), 225–41,
+   An important precursor of ‘m4’ was GPM; see C. Strachey, "A general
+purpose macrogenerator", _Computer Journal_ 8, 3 (1965), 225-41,
 <https://academic.oup.com/comjnl/article/8/3/225/336044>.  GPM is also
-succinctly described in David Gries’s book _Compiler Construction for
+succinctly described in David Gries's book _Compiler Construction for
 Digital Computers_, Wiley (1971).  Strachey was a brilliant programmer:
 GPM fit into 250 machine instructions!
 
-   Inspired by GPM while visiting Strachey’s Lab in 1968, McIlroy wrote
+   Inspired by GPM while visiting Strachey's Lab in 1968, McIlroy wrote
 a model preprocessor in that fit into a page of Snobol 3 code, and
 McIlroy and Robert Morris developed a series of further models at Bell
 Labs.  Andrew D. Hall followed up with M6, a general purpose macro
 processor used to port the Fortran source code of the Altran computer
-algebra system; see Hall’s “The M6 Macro Processor”, Computing Science
+algebra system; see Hall's "The M6 Macro Processor", Computing Science
 Technical Report #2, Bell Labs (1972),
-<http://cm.bell-labs.com/cm/cs/cstr/2.pdf>.  M6’s source code consisted
+<http://cm.bell-labs.com/cm/cs/cstr/2.pdf>.  M6's source code consisted
 of about 600 Fortran statements.  Its name was the first of the ‘m4’
 line.
 
@@ -328,7 +327,7 @@ language, which inspired Dennis Ritchie to write ‘m3’, a macro processor
 for the AP-3 minicomputer.
 
    Kernighan and Ritchie then joined forces to develop the original
-‘m4’, described in “The M4 Macro Processor”, Bell Laboratories (1977),
+‘m4’, described in "The M4 Macro Processor", Bell Laboratories (1977),
 <https://wolfram.schneider.org/bsd/7thEdManVol2/m4/m4.pdf>.  It had only
 21 builtin macros.
 
@@ -348,8 +347,8 @@ traditional ‘m4’ implementations, such as maximum line length, macro
 size, or number of macros.
 
    The late Professor A. Dain Samples described and implemented a
-further evolution in the form of ‘M5’: “User’s Guide to the M5 Macro
-Language: 2nd edition”, Electronic Announcement on comp.compilers
+further evolution in the form of ‘M5’: "User's Guide to the M5 Macro
+Language: 2nd edition", Electronic Announcement on comp.compilers
 newsgroup (1992).
 
    François Pinard took over maintenance of GNU ‘m4’ in 1992, until 1994
@@ -364,7 +363,7 @@ addressed some long standing bugs in the venerable 1.4 release.  Then in
 1.4 that were floating around the net and released 1.4.3 and 1.4.4.  And
 in 2006, Eric Blake joined the team and prepared patches for the release
 of 1.4.5, with subsequent releases through intervening years, as recent
-as 1.4.18 in 2016.
+as 1.4.20 in 2025.
 
    Meanwhile, development has continued on new features for ‘m4’, such
 as dynamic module loading and additional builtins.  When complete, GNU
@@ -376,11 +375,11 @@ File: m4.info,  Node: Bugs,  Next: Manual,  Prev: History,  Up: Preliminaries
 1.3 Problems and bugs
 =====================
 
-If you have problems with GNU M4 or think you’ve found a bug, please
-report it.  Before reporting a bug, make sure you’ve actually found a
+If you have problems with GNU M4 or think you've found a bug, please
+report it.  Before reporting a bug, make sure you've actually found a
 real bug.  Carefully reread the documentation and see if it really says
-you can do what you’re trying to do.  If it’s not clear whether you
-should be able to do something or not, report that too; it’s a bug in
+you can do what you're trying to do.  If it's not clear whether you
+should be able to do something or not, report that too; it's a bug in
 the documentation!
 
    Before reporting a bug or trying to fix it yourself, try to isolate
@@ -389,7 +388,7 @@ Then send us the input file and the exact results ‘m4’ gave you.  Also
 say what you expected to occur; this will help us decide whether the
 problem was really in the documentation.
 
-   Once you’ve got a precise problem, send e-mail to <bug-m4@gnu.org>.
+   Once you've got a precise problem, send e-mail to <bug-m4@gnu.org>.
 Please include the version number of ‘m4’ you are using.  You can get
 this information with the command ‘m4 --version’.  Also provide details
 about the platform you are executing on.
@@ -431,13 +430,13 @@ the examples assume that your current directory is located where you
 unpacked the installation, so if you plan on following along, you may
 find it helpful to do this now:
 
-     $ cd m4-1.4.19
+     $ cd m4-1.4.21
 
    As each of the predefined macros in ‘m4’ is described, a prototype
 call of the macro will be shown, giving descriptive names to the
 arguments, e.g.,
 
- -- Composite: example (STRING, [COUNT = ‘1’], [ARGUMENT]...)
+ -- Composite: example(STRING, [COUNT = 1], [ARGUMENT]...)
      This is a sample prototype.  There is not really a macro named
      ‘example’, but this documents that if there were, it would be a
      Composite macro, rather than a Builtin.  It requires at least one
@@ -927,7 +926,7 @@ File: m4.info,  Node: Comments,  Next: Other tokens,  Prev: Quoted strings,  Up:
 Comments in ‘m4’ are normally delimited by the characters ‘#’ and
 newline.  All characters between the comment delimiters are ignored, but
 the entire comment (including the delimiters) is passed through to the
-output—comments are _not_ discarded by ‘m4’.
+output--comments are _not_ discarded by ‘m4’.
 
    Comments cannot be nested, so the first newline after a ‘#’ ends the
 comment.  The commenting effect of the begin-comment string can be
@@ -966,7 +965,7 @@ As ‘m4’ reads the input token by token, it will copy each token directly
 to the output immediately.
 
    The exception is when it finds a word with a macro definition.  In
-that case ‘m4’ will calculate the macro’s expansion, possibly reading
+that case ‘m4’ will calculate the macro's expansion, possibly reading
 more input to get the arguments.  It then inserts the expansion in front
 of the remaining input.  In other words, the resulting text from a macro
 call will be read and parsed into tokens again.
@@ -1011,11 +1010,11 @@ attempt looks like this:
          GNULIB_]translit([$1],[a-z],[A-Z])[=1
        ])dnl
        gl_STRING_MODULE_INDICATOR([strcase])
-     ⇒  
+     ⇒ 
      ⇒        GNULIB_strcase=1
-     ⇒  
+     ⇒ 
 
-   Oops – the argument did not get capitalized.  And although the manual
+   Oops - the argument did not get capitalized.  And although the manual
 is not able to easily show it, both lines that appear empty actually
 contain two trailing spaces.  By stepping through the parse, it is easy
 to see what happened.  First, ‘m4’ sees the token ‘changequote’, which
@@ -1173,7 +1172,7 @@ File: m4.info,  Node: Inhibiting Invocation,  Next: Macro Arguments,  Prev: Invo
 ===============================
 
 An innovation of the ‘m4’ language, compared to some of its predecessors
-(like Strachey’s ‘GPM’, for example), is the ability to recognize macro
+(like Strachey's ‘GPM’, for example), is the ability to recognize macro
 calls without resorting to any special, prefixed invocation character.
 While generally useful, this feature might sometimes be the source of
 spurious, unwanted macro calls.  So, GNU ‘m4’ offers several mechanisms
@@ -1184,7 +1183,7 @@ without arguments.  As a GNU extension, for any of these macros,
 whenever an opening parenthesis does not immediately follow their name,
 the builtin macro call is not triggered.  This solves the most usual
 cases, like for ‘include’ or ‘eval’.  Later in this document, the
-sentence “This macro is recognized only with parameters” refers to this
+sentence "This macro is recognized only with parameters" refers to this
 specific provision of GNU M4, also known as a blind builtin macro.  For
 the builtins defined by POSIX that bear this disclaimer, POSIX
 specifically states that invoking those builtins without arguments is
@@ -1363,7 +1362,7 @@ To understand why the first argument contains whitespace, remember that
 unquoted leading whitespace is never part of an argument, but trailing
 whitespace always is.
 
-   It is possible for a macro’s definition to change during argument
+   It is possible for a macro's definition to change during argument
 collection, in which case the expansion uses the definition that was in
 effect at the time the opening ‘(’ was seen.
 
@@ -1400,7 +1399,7 @@ unquoted parentheses.  *Note Pseudo Arguments::, for examples.
 
    It is common practice to quote all arguments to macros, unless you
 are sure you want the arguments expanded.  Thus, in the above example
-with the parentheses, the ‘right’ way to do it is like this:
+with the parentheses, the 'right' way to do it is like this:
 
      foo(`() (() (')
 
@@ -1444,7 +1443,7 @@ When the arguments, if any, to a macro call have been collected, the
 macro is expanded, and the expansion text is pushed back onto the input
 (unquoted), and reread.  The expansion text from one macro call might
 therefore result in more macros being called, if the calls are included,
-completely or partially, in the first macro calls’ expansion.
+completely or partially, in the first macro calls' expansion.
 
    Taking a very simple example, if FOO expands to ‘bar’, and BAR
 expands to ‘Hello’, the input
@@ -1487,7 +1486,7 @@ File: m4.info,  Node: Define,  Next: Arguments,  Up: Definitions
 The normal way to define or redefine macros is to use the builtin
 ‘define’:
 
- -- Builtin: define (NAME, [EXPANSION])
+ -- Builtin: define(NAME, [EXPANSION])
      Defines NAME to expand to EXPANSION.  If EXPANSION is not given, it
      is taken to be empty.
 
@@ -1533,8 +1532,8 @@ the name is not recognized.  It can only be referenced by the builtins
    Arrays and associative arrays can be simulated by using non-standard
 macro names.
 
- -- Composite: array (INDEX)
- -- Composite: array_set (INDEX, [VALUE])
+ -- Composite: array(INDEX)
+ -- Composite: array_set(INDEX, [VALUE])
      Provide access to entries within an array.  ‘array’ reads the entry
      at location INDEX, and ‘array_set’ assigns VALUE to location INDEX.
 
@@ -1565,7 +1564,7 @@ macro is expanded.  Replacement of arguments happens before rescanning,
 regardless of how many nesting levels of quoting appear in the
 expansion.  Here is an example of a macro with two arguments.
 
- -- Composite: exch (ARG1, ARG2)
+ -- Composite: exch(ARG1, ARG2)
      Expands to ARG2 followed by ARG1, effectively exchanging their
      order.
 
@@ -1663,7 +1662,7 @@ and for all the actual arguments.
    The number of actual arguments in a macro call is denoted by ‘$#’ in
 the expansion text.
 
- -- Composite: nargs (...)
+ -- Composite: nargs(...)
      Expands to a count of the number of arguments supplied.
 
      define(`nargs', `$#')
@@ -1792,7 +1791,7 @@ File: m4.info,  Node: Undefine,  Next: Defn,  Prev: Pseudo Arguments,  Up: Defin
 
 A macro definition can be removed with ‘undefine’:
 
- -- Builtin: undefine (NAME...)
+ -- Builtin: undefine(NAME...)
      For each argument, remove the macro NAME.  The macro names must
      necessarily be quoted, since they will be expanded otherwise.
 
@@ -1814,7 +1813,7 @@ A macro definition can be removed with ‘undefine’:
      foo bar blah
      ⇒foo bar blah
 
-   Undefining a macro inside that macro’s expansion is safe; the macro
+   Undefining a macro inside that macro's expansion is safe; the macro
 still expands to the definition that was in effect at the ‘(’.
 
      define(`f', ``$0':$1')
@@ -1836,18 +1835,19 @@ File: m4.info,  Node: Defn,  Next: Pushdef,  Prev: Undefine,  Up: Definitions
 It is possible to rename an already defined macro.  To do this, you need
 the builtin ‘defn’:
 
- -- Builtin: defn (NAME...)
+ -- Builtin: defn(NAME...)
      Expands to the _quoted definition_ of each NAME.  If an argument is
      not a defined macro, the expansion for that argument is empty.
 
      If NAME is a user-defined macro, the quoted definition is simply
      the quoted expansion text.  If, instead, there is only one NAME and
      it is a builtin, the expansion is a special token, which points to
-     the builtin’s internal definition.  This token is only meaningful
+     the builtin's internal definition.  This token is only meaningful
      as the second argument to ‘define’ (and ‘pushdef’), and is silently
-     converted to an empty string in most other contexts.  Combining a
-     builtin with anything else is not supported; a warning is issued
-     and the builtin is omitted from the final expansion.
+     converted to an empty string in most other contexts.  When defining
+     a macro, combining a builtin with anything else is not supported; a
+     warning is issued and the builtin is omitted from the final
+     definition (other implementations may do other unexpected things).
 
      The macro ‘defn’ is recognized only with parameters.
 
@@ -1866,7 +1866,7 @@ definitions of builtin macros.  Even if the original macro is removed,
 the other name can still be used to access the definition.
 
    The fact that macro definitions can be transferred also explains why
-you should use ‘$0’, rather than retyping a macro’s name in its
+you should use ‘$0’, rather than retyping a macro's name in its
 definition:
 
      define(`foo', `This is `$0'')
@@ -1883,7 +1883,7 @@ avoid unwanted expansion of the text:
      ')
      ⇒
      string
-     ⇒The macro 
+     ⇒The macro
      defn(`string')
      ⇒The macro dnl is very useful
      ⇒
@@ -1891,7 +1891,7 @@ avoid unwanted expansion of the text:
    However, it is important to remember that ‘m4’ rescanning is purely
 textual.  If an unbalanced end-quote string occurs in a macro
 definition, the rescan will see that embedded quote as the termination
-of the quoted string, and the remainder of the macro’s definition will
+of the quoted string, and the remainder of the macro's definition will
 be rescanned unquoted.  Thus it is a good idea to avoid unbalanced
 end-quotes in macro definitions or arguments to macros.
 
@@ -1942,6 +1942,10 @@ such tokens are silently converted to the empty string.
      ⇒0
      len(defn(`divnum'))
      ⇒0
+     eval(`1'defn(`divnum')) eval(defn(`divnum')8)
+     ⇒1 8
+     ifelse(defn(`divnum'), defn(`define'), `indistinguishable')
+     ⇒indistinguishable
 
    Also note that ‘defn’ with multiple arguments can only join text
 macros, not builtins, although a future version of GNU M4 may lift this
@@ -1962,6 +1966,12 @@ restriction.
      error→m4trace: -2- defn(`divnum', `divnum')
      error→m4trace: -1- define(`mydivnum', `')
      ⇒
+     define(`mydivnum+', defn(`divnum')`+'defn(`divnum'))mydivnum+
+     error→m4trace: -2- defn(`divnum')
+     error→m4trace: -2- defn(`divnum')
+     error→m4:stdin:5: Warning: cannot concatenate builtin tokens
+     error→m4trace: -1- define(`mydivnum+', `+')
+     ⇒+
      traceoff(`defn', `define')
      ⇒
 
@@ -1975,8 +1985,8 @@ It is possible to redefine a macro temporarily, reverting to the
 previous definition at a later time.  This is done with the builtins
 ‘pushdef’ and ‘popdef’:
 
- -- Builtin: pushdef (NAME, [EXPANSION])
- -- Builtin: popdef (NAME...)
+ -- Builtin: pushdef(NAME, [EXPANSION])
+ -- Builtin: popdef(NAME...)
      Analogous to ‘define’ and ‘undefine’.
 
      These macros work in a stack-like fashion.  A macro is temporarily
@@ -2060,14 +2070,14 @@ File: m4.info,  Node: Indir,  Next: Builtin,  Prev: Pushdef,  Up: Definitions
 
 Any macro can be called indirectly with ‘indir’:
 
- -- Builtin: indir (NAME, [ARGS...])
+ -- Builtin: indir(NAME, [ARGS...])
      Results in a call to the macro NAME, which is passed the rest of
      the arguments ARGS.  If NAME is not defined, an error message is
      printed, and the expansion is void.
 
      The macro ‘indir’ is recognized only with parameters.
 
-   This can be used to call macros with computed or “invalid” names
+   This can be used to call macros with computed or "invalid" names
 (‘define’ allows such names to be defined):
 
      define(`$$internal$macro', `Internal macro (name `$0')')
@@ -2125,7 +2135,7 @@ File: m4.info,  Node: Builtin,  Prev: Indir,  Up: Definitions
 
 Builtin macros can be called indirectly with ‘builtin’:
 
- -- Builtin: builtin (NAME, [ARGS...])
+ -- Builtin: builtin(NAME, [ARGS...])
      Results in a call to the builtin NAME, which is passed the rest of
      the arguments ARGS.  If NAME does not name a builtin, an error
      message is printed, and the expansion is void.
@@ -2235,7 +2245,7 @@ File: m4.info,  Node: Ifdef,  Next: Ifelse,  Up: Conditionals
 There are two different builtin conditionals in ‘m4’.  The first is
 ‘ifdef’:
 
- -- Builtin: ifdef (NAME, STRING-1, [STRING-2])
+ -- Builtin: ifdef(NAME, STRING-1, [STRING-2])
      If NAME is defined as a macro, ‘ifdef’ expands to STRING-1,
      otherwise to STRING-2.  If STRING-2 is omitted, it is taken to be
      the empty string (according to the normal rules).
@@ -2262,9 +2272,9 @@ The other conditional, ‘ifelse’, is much more powerful.  It can be used
 as a way to introduce a long comment, as an if-else construct, or as a
 multibranch, depending on the number of arguments supplied:
 
- -- Builtin: ifelse (COMMENT)
- -- Builtin: ifelse (STRING-1, STRING-2, EQUAL, [NOT-EQUAL])
- -- Builtin: ifelse (STRING-1, STRING-2, EQUAL-1, STRING-3, STRING-4,
+ -- Builtin: ifelse(COMMENT)
+ -- Builtin: ifelse(STRING-1, STRING-2, EQUAL, [NOT-EQUAL])
+ -- Builtin: ifelse(STRING-1, STRING-2, EQUAL-1, STRING-3, STRING-4,
           EQUAL-2, ..., [NOT-EQUAL])
      Used with only one argument, the ‘ifelse’ simply discards it and
      produces no output.
@@ -2359,7 +2369,7 @@ described previously.
    There is a builtin macro, ‘shift’, which can, among other things, be
 used for iterating through the actual arguments to a macro:
 
- -- Builtin: shift (ARG1, ...)
+ -- Builtin: shift(ARG1, ...)
      Takes any number of arguments, and expands to all its arguments
      except ARG1, separated by commas, with each argument quoted.
 
@@ -2374,7 +2384,7 @@ used for iterating through the actual arguments to a macro:
 
    An example of the use of ‘shift’ is this macro:
 
- -- Composite: reverse (...)
+ -- Composite: reverse(...)
      Takes any number of arguments, and reverses their order.
 
    It is implemented as:
@@ -2394,7 +2404,7 @@ be made with ‘shift’, ‘ifelse’ and recursion.  It also shows that
 ‘shift’ is usually used with ‘$@’.  Another example of this is an
 implementation of a short-circuiting conditional operator.
 
- -- Composite: cond (TEST-1, STRING-1, EQUAL-1, [TEST-2], [STRING-2],
+ -- Composite: cond(TEST-1, STRING-1, EQUAL-1, [TEST-2], [STRING-2],
           [EQUAL-2], ..., [NOT-EQUAL])
      Similar to ‘ifelse’, where an equal comparison between the first
      two strings results in the third, otherwise the first three
@@ -2445,14 +2455,14 @@ with ‘ifelse’, compared with only the relevant effects with ‘cond’.
    Another common task that requires iteration is joining a list of
 arguments into a single string.
 
- -- Composite: join ([SEPARATOR], [ARGS...])
- -- Composite: joinall ([SEPARATOR], [ARGS...])
+ -- Composite: join([SEPARATOR], [ARGS...])
+ -- Composite: joinall([SEPARATOR], [ARGS...])
      Generate a single-quoted string, consisting of each ARG separated
      by SEPARATOR.  While ‘joinall’ always outputs a SEPARATOR between
      arguments, ‘join’ avoids the SEPARATOR for an empty ARG.
 
    Here are some examples of its usage, based on the implementation
-‘m4-1.4.19/examples/join.m4’ distributed in this package:
+‘m4-1.4.21/examples/join.m4’ distributed in this package:
 
      $ m4 -I examples
      include(`join.m4')
@@ -2520,7 +2530,7 @@ discarding ‘$1’ by iterating with ‘$0(shift($@))’, the macro discards
 
    Next, notice that it is possible to compare more than one condition
 in a single ‘ifelse’ test.  The test of ‘$#$2’ against ‘2’ allows
-‘_join’ to iterate for two separate reasons—either there are still more
+‘_join’ to iterate for two separate reasons--either there are still more
 than two arguments, or there are exactly two arguments but the last
 argument is not empty.
 
@@ -2536,9 +2546,9 @@ arguments.
    Sometimes, a recursive algorithm requires adding quotes to each
 element, or treating multiple arguments as a single element:
 
- -- Composite: quote (...)
- -- Composite: dquote (...)
- -- Composite: dquote_elt (...)
+ -- Composite: quote(...)
+ -- Composite: dquote(...)
+ -- Composite: dquote_elt(...)
      Takes any number of arguments, and adds quoting.  With ‘quote’,
      only one level of quoting is added, effectively removing whitespace
      after commas and turning multiple arguments into a single string.
@@ -2547,7 +2557,7 @@ element, or treating multiple arguments as a single element:
      levels of quoting are added around each element.
 
    An actual implementation of these three macros is distributed as
-‘m4-1.4.19/examples/quote.m4’ in this package.  First, let’s examine
+‘m4-1.4.21/examples/quote.m4’ in this package.  First, let's examine
 their usage:
 
      $ m4 -I examples
@@ -2599,7 +2609,7 @@ arbitrary argument (usually greater than the ninth argument), without
 relying on the GNU extension of multi-digit arguments (*note
 Arguments::).
 
- -- Composite: argn (N, ...)
+ -- Composite: argn(N, ...)
      Expands to argument N out of the remaining arguments.  N must be a
      positive number.  Usually invoked as ‘argn(`N',$@)’.
 
@@ -2623,7 +2633,7 @@ File: m4.info,  Node: Forloop,  Next: Foreach,  Prev: Shift,  Up: Conditionals
 
 Here is an example of a loop macro that implements a simple for loop.
 
- -- Composite: forloop (ITERATOR, START, END, TEXT)
+ -- Composite: forloop(ITERATOR, START, END, TEXT)
      Takes the name in ITERATOR, which must be a valid macro name, and
      successively assign it each integer value from START to END,
      inclusive.  For each assignment to ITERATOR, append TEXT to the
@@ -2636,7 +2646,7 @@ Here is an example of a loop macro that implements a simple for loop.
      include(`forloop.m4')
      ⇒
      forloop(`i', `1', `8', `i ')
-     ⇒1 2 3 4 5 6 7 8 
+     ⇒1 2 3 4 5 6 7 8
 
    For-loops can be nested, like:
 
@@ -2662,7 +2672,7 @@ finished, it increments the iterator (using the predefined macro ‘incr’,
 *note Incr::), and recurses.
 
    Here is an actual implementation of ‘forloop’, distributed as
-‘m4-1.4.19/examples/forloop.m4’ in this package:
+‘m4-1.4.21/examples/forloop.m4’ in this package:
 
      $ m4 -I examples
      undivert(`forloop.m4')dnl
@@ -2689,8 +2699,8 @@ File: m4.info,  Node: Foreach,  Next: Stacks,  Prev: Forloop,  Up: Conditionals
 
 Here is an example of a loop macro that implements list iteration.
 
- -- Composite: foreach (ITERATOR, PAREN-LIST, TEXT)
- -- Composite: foreachq (ITERATOR, QUOTE-LIST, TEXT)
+ -- Composite: foreach(ITERATOR, PAREN-LIST, TEXT)
+ -- Composite: foreachq(ITERATOR, QUOTE-LIST, TEXT)
      Takes the name in ITERATOR, which must be a valid macro name, and
      successively assign it each value from PAREN-LIST or QUOTE-LIST.
      In ‘foreach’, PAREN-LIST is a comma-separated list of elements
@@ -2702,8 +2712,8 @@ Here is an example of a loop macro that implements list iteration.
 
    As an example, this displays each word in a list inside of a
 sentence, using an implementation of ‘foreach’ distributed as
-‘m4-1.4.19/examples/foreach.m4’, and ‘foreachq’ in
-‘m4-1.4.19/examples/foreachq.m4’.
+‘m4-1.4.21/examples/foreach.m4’, and ‘foreachq’ in
+‘m4-1.4.21/examples/foreachq.m4’.
 
      $ m4 -I examples
      include(`foreach.m4')
@@ -2842,8 +2852,8 @@ in ‘m4’.  Normally, only the topmost definition in a stack is important,
 but sometimes, it is desirable to manipulate the entire definition
 stack.
 
- -- Composite: stack_foreach (MACRO, ACTION)
- -- Composite: stack_foreach_lifo (MACRO, ACTION)
+ -- Composite: stack_foreach(MACRO, ACTION)
+ -- Composite: stack_foreach_lifo(MACRO, ACTION)
      For each of the ‘pushdef’ definitions associated with MACRO, invoke
      the macro ACTION with a single argument of that definition.
      ‘stack_foreach’ visits the oldest definition first, while
@@ -2853,7 +2863,7 @@ stack.
      parameter.
 
    A sample implementation of these macros is distributed in the file
-‘m4-1.4.19/examples/stack.m4’.
+‘m4-1.4.21/examples/stack.m4’.
 
      $ m4 -I examples
      include(`stack.m4')
@@ -2916,7 +2926,7 @@ Since m4 is a macro language, it is possible to write macros that can
 build other macros.  First on the list is a way to automate the creation
 of blind macros.
 
- -- Composite: define_blind (NAME, [VALUE])
+ -- Composite: define_blind(NAME, [VALUE])
      Defines NAME as a blind macro, such that NAME will expand to VALUE
      only when given explicit arguments.  VALUE should not be the result
      of ‘defn’ (*note Defn::).  This macro is only recognized with
@@ -2942,7 +2952,7 @@ builtin, then it would result in an attempt to define a macro consisting
 of both text and a builtin token; this is not supported, and the builtin
 token is flattened to an empty string.
 
-   With that explanation, here’s the definition, and some sample usage.
+   With that explanation, here's the definition, and some sample usage.
 Notice that ‘define_blind’ is itself a blind macro.
 
      $ m4 -d
@@ -2970,20 +2980,25 @@ Notice that ‘define_blind’ is itself a blind macro.
      ⇒ifelse(`$#', `0', ``$0'', `arguments were $*')
 
    Another interesting composition tactic is argument “currying”, or
-factoring a macro that takes multiple arguments for use in a context
-that provides exactly one argument.
+wrapping a macro that normally takes multiple arguments in a way that
+the initial arguments can be supplied early, and the remaining arguments
+are applied later in a context that normally expects a macro name that
+accepts fewer arguments (often just one).
 
- -- Composite: curry (MACRO, ...)
-     Expand to a macro call that takes exactly one argument, then
-     appends that argument to the original arguments and invokes MACRO
-     with the resulting list of arguments.
+ -- Composite: curry(MACRO, ...)
+     Accept a list of early arguments, then expand to an unspecified
+     macro name that takes one or more late arguments, appends those
+     extra arguments to the earlier, and finally invokes MACRO with the
+     resulting list of arguments.
 
    A demonstration of currying makes the intent of this macro a little
 more obvious.  The macro ‘stack_foreach’ mentioned earlier is an example
 of a context that provides exactly one argument to a macro name.  But
-coupled with currying, we can invoke ‘reverse’ with two arguments for
-each definition of a macro stack.  This example uses the file
-‘m4-1.4.19/examples/curry.m4’ included in the distribution.
+coupled with currying, we can invoke ‘reverse’ with two or more
+arguments for each definition of a macro stack (that is, we factor out
+the early argument ‘`4'’ and couple it with a different late argument
+for each member of the stack ‘a’).  This example uses the file
+‘m4-1.4.21/examples/curry.m4’ included in the distribution.
 
      $ m4 -I examples
      include(`curry.m4')include(`stack.m4')
@@ -2995,26 +3010,46 @@ each definition of a macro stack.  This example uses the file
      ⇒
      stack_foreach(`a', `:curry(`reverse', `4')')
      ⇒:1, 4:2, 4:3, 4
+     stack_foreach(`a', `:curry(`reverse', `4', `5')')
+     ⇒:1, 5, 4:2, 5, 4:3, 5, 4
      curry(`curry', `reverse', `1')(`2')(`3')
+     ⇒3, 2, 1
+     curry(`reverse', `1')(`2', `3')
      ⇒3, 2, 1
 
    Now for the implementation.  Notice how ‘curry’ leaves off with a
 macro name but no open parenthesis, while still in the middle of
 collecting arguments for ‘$1’.  The macro ‘_curry’ is the helper macro
-that takes one argument, then adds it to the list and finally supplies
-the closing parenthesis.  The use of a comma inside the ‘shift’ call
-allows currying to also work for a macro that takes one argument,
+that takes one or more late arguments, then adds to the list and finally
+supplies the closing parenthesis.  The use of a comma inside the ‘shift’
+call allows currying to also work for a macro that takes one argument,
 although it often makes more sense to invoke that macro directly rather
 than going through ‘curry’.
 
      $ m4 -I examples
      undivert(`curry.m4')dnl
      ⇒divert(`-1')
-     ⇒# curry(macro, args)
-     ⇒# Expand to a macro call that takes one argument, then invoke
-     ⇒# macro(args, extra).
-     ⇒define(`curry', `$1(shift($@,)_$0')
-     ⇒define(`_curry', ``$1')')
+     ⇒# curry(macro, args...)
+     ⇒# Perform partial argument application on the given macro.  This
+     ⇒# expands to an unspecified macro name that accepts one or more extra
+     ⇒# arguments, and appends those to the args supplied to the original
+     ⇒# curry call as the overall set of arguments to pass to macro.  That
+     ⇒# is, curry(`macro', args1...)(args2...) is the same as invoking
+     ⇒# macro(args1..., args2...).
+     ⇒#
+     ⇒# Most often, argument currying comes in handy when given a context
+     ⇒# that normally takes a macro name to call with one argument, but
+     ⇒# where you want to combine that variable argument with other fixed
+     ⇒# arguments to forward to a macro that takes multiple arguments.  For
+     ⇒# example, given a "foreach" macro that calls its first argument once
+     ⇒# for each successive argument, "foreach(`curry(`mult', 3)', 1, 2, 3)"
+     ⇒# would behave the same as "mult(3, 1), mult(3, 2), mult(3, 3)".
+     ⇒#
+     ⇒# It is also possible to create a named function curry.  For example:
+     ⇒# define(`mult3', `curry(`mult', 3)($1)')
+     ⇒# Later use of mult3(value) will compute the same as mult(3, value).
+     ⇒define(`curry', `$1(shift($@,)_curry')
+     ⇒define(`_curry', `$@)')
      ⇒divert`'dnl
 
    Unfortunately, with M4 1.4.x, ‘curry’ is unable to handle builtin
@@ -3025,8 +3060,8 @@ release of M4.
    Putting the last few concepts together, it is possible to copy or
 rename an entire stack of macro definitions.
 
- -- Composite: copy (SOURCE, DEST)
- -- Composite: rename (SOURCE, DEST)
+ -- Composite: copy(SOURCE, DEST)
+ -- Composite: rename(SOURCE, DEST)
      Ensure that DEST is undefined, then define it to the same stack of
      definitions currently in SOURCE.  ‘copy’ leaves SOURCE unchanged,
      while ‘rename’ undefines SOURCE.  There are only a few macros, such
@@ -3084,7 +3119,7 @@ File: m4.info,  Node: Dumpdef,  Next: Trace,  Up: Debugging
 If you want to see what a name expands into, you can use the builtin
 ‘dumpdef’:
 
- -- Builtin: dumpdef ([NAMES...])
+ -- Builtin: dumpdef([NAMES...])
      Accepts any number of arguments.  If called without any arguments,
      it displays the definitions of all known names, otherwise it
      displays the definitions of the NAMES given.  The output is printed
@@ -3097,9 +3132,11 @@ If you want to see what a name expands into, you can use the builtin
      define(`foo', `Hello world.')
      ⇒
      dumpdef(`foo')
-     error→foo: ⇒
+     error→foo: `Hello world.'
+     ⇒
      dumpdef(`define')
-     error→define: ⇒
+     error→define: <define>
+     ⇒
 
    The last example shows how builtin macros definitions are displayed.
 The definition that is dumped corresponds to what would occur if the
@@ -3110,7 +3147,8 @@ still live due to redefining a macro during argument collection.
      pushdef(`f', ``$0'1')pushdef(`f', ``$0'2')
      ⇒
      f(popdef(`f')dumpdef(`f'))
-     error→f: ⇒f2
+     error→f: ``$0'1'
+     ⇒f2
      f(popdef(`f')dumpdef(`f'))
      error→m4:stdin:3: undefined macro `f'
      ⇒f1
@@ -3127,8 +3165,8 @@ File: m4.info,  Node: Trace,  Next: Debug Levels,  Prev: Dumpdef,  Up: Debugging
 It is possible to trace macro calls and expansions through the builtins
 ‘traceon’ and ‘traceoff’:
 
- -- Builtin: traceon ([NAMES...])
- -- Builtin: traceoff ([NAMES...])
+ -- Builtin: traceon([NAMES...])
+ -- Builtin: traceoff([NAMES...])
      When called without any arguments, ‘traceon’ and ‘traceoff’ will
      turn tracing on and off, respectively, for all currently defined
      macros.
@@ -3308,7 +3346,7 @@ lines.
      ‘m4’, regardless of the settings of ‘traceon’.
 
 ‘x’
-     In trace output, add a unique ‘macro call id’ to each line of the
+     In trace output, add a unique 'macro call id' to each line of the
      trace output.  This is useful in connection with the ‘c’ flag
      above.
 
@@ -3321,7 +3359,7 @@ The examples throughout this manual assume the default flags.
    There is a builtin macro ‘debugmode’, which allows on-the-fly control
 of the debugging output format:
 
- -- Builtin: debugmode ([FLAGS])
+ -- Builtin: debugmode([FLAGS])
      The argument FLAGS should be a subset of the letters listed above.
      As special cases, if the argument starts with a ‘+’, the flags are
      added to the current debug flags, and if it starts with a ‘-’, they
@@ -3391,7 +3429,7 @@ Debug and tracing output can be redirected to files using either the
 ‘--debugfile’ option to ‘m4’ (*note Invoking m4: Debugging options.), or
 with the builtin macro ‘debugfile’:
 
- -- Builtin: debugfile ([FILE])
+ -- Builtin: debugfile([FILE])
      Sends all further debug and trace output to FILE, opened in append
      mode.  If FILE is the empty string, debug and trace output are
      discarded.  If ‘debugfile’ is called without any arguments, debug
@@ -3443,7 +3481,7 @@ File: m4.info,  Node: Dnl,  Next: Changequote,  Up: Input Control
 8.1 Deleting whitespace in input
 ================================
 
-The builtin ‘dnl’ stands for “Discard to Next Line”:
+The builtin ‘dnl’ stands for "Discard to Next Line":
 
  -- Builtin: dnl
      All characters, up to and including the next newline, are discarded
@@ -3498,7 +3536,7 @@ File: m4.info,  Node: Changequote,  Next: Changecom,  Prev: Dnl,  Up: Input Cont
 The default quote delimiters can be changed with the builtin
 ‘changequote’:
 
- -- Builtin: changequote ([START = ‘`’], [END = ‘'’])
+ -- Builtin: changequote([START = `], [END = '])
      This sets START as the new begin-quote delimiter and END as the new
      end-quote delimiter.  If both arguments are missing, the default
      quotes (‘`’ and ‘'’) are used.  If START is void, then quoting is
@@ -3570,6 +3608,40 @@ quote characters have to be defined.  To achieve this, two calls of
 ‘changequote’ must be made, one for the temporary quotes and one for the
 new quotes.
 
+   The following is an example of how to use ‘changequote’ to output
+what would normally be an unmatched quote string:
+
+ -- Composite: lquo(IGNORED...)
+ -- Composite: rquo(IGNORED...)
+     Output the normal left or right quote string.
+
+     define(`lquo', `ifelse(`$#', `0', ``$0'', `changequote(`[', `]')`dnl'
+     changequote([`], ['])')')
+     ⇒
+     define(`rquo', `ifelse(`$#', `0', ``$0'', `changequote(`[', `]')dnl`
+     'changequote([`], ['])')')
+     ⇒
+     Quotes in reverse: rquo:rquo() lquo:lquo()
+     ⇒Quotes in reverse: rquo:' lquo:`
+     define(`hi', `HELLO')dnl
+     lquo()hi`'rquo()
+     ⇒`HELLO'
+     substr(`-hi-', 1, 2) substr(`-`hi'-', `1', `4')
+     ⇒HELLO hi
+     substr(`-'lquo()`hi'rquo()`-', `1', `4')
+     ⇒hi
+     substr(`-'lquo()hi`'rquo()`-', `1', `2')rquo()'
+     ⇒Hrquo()
+
+   The example chose to require an ignored parameter so that ‘lquo’ or
+‘rquo’ are not recognized without ‘()’; but the use of ‘ifelse’ to make
+the macros blind is not strictly needed.  On the other hand, the use of
+‘dnl’ in the macro bodies was essential for proper quote nesting during
+the ‘define’.  Note that the output of these macros do not directly
+behave as quote strings; however, any context where expanded text is
+rescanned back in the normal choice of quote strings does not care if
+the quotes were supplied literally or via these macros.
+
    Macros are recognized in preference to the begin-quote string, so if
 a prefix of START can be recognized as part of a potential macro name,
 the quoting mechanism is effectively disabled.  Unless you use
@@ -3632,7 +3704,7 @@ a good idea to avoid ‘(’, ‘,’, and ‘)’ as the first character in STA
      ⇒1:HIhibye:
 
    However, if you are not worried about portability, using ‘(’ and ‘)’
-as quoting characters has an interesting property—you can use it to
+as quoting characters has an interesting property--you can use it to
 compute a quoted string containing the expansion of any quoted text, as
 long as the expansion results in both balanced quotes and balanced
 parentheses.  The trick is realizing ‘expand’ uses ‘$1’ unquoted, to
@@ -3682,6 +3754,50 @@ often.
      "hi"hi"hi"
      ⇒hiHIhi
 
+   During macro expansion, instances of ‘$@’ in the macro's definition
+will use the quotation strings that are in effect at the end of argument
+collection, even if this is different than the quotation strings in
+effect when the macro was defined.  When combined with ‘translit’ (*note
+Translit::), this can be exploited for splitting a string containing
+multiple instances of a single-byte separator into a macro call on each
+token of the string with linear scaling (a naive loop that uses ‘index’
+to search for the first instance of the separator, followed by ‘substr’
+to process the rest of the input string, scales quadratically, since
+each iteration of the loop can only process one substring before
+re-processing an average of half of the overall input to get to the next
+substring, instead of getting at all substrings in a single pass).
+However, note that this trick cannot prevent premature expansion of
+tokens within the string.
+
+     define(`some', `several')
+     ⇒
+     define(`text', `long.string.with.some.separators')
+     ⇒
+     define(`display', ``<$1>'')
+     ⇒
+     display(text)
+     ⇒<long.string.with.several.separators>
+     display(defn(`text'))
+     ⇒<long.string.with.some.separators>
+     dnl quotes are still `' at the time requote is defined:
+     define(`requote', `"[$@]')
+     ⇒
+     define(`tokenized', requote(translit(defn(`text'), `.',
+     changequote(`"[', `]')"[,])))
+     ⇒
+     dnl but quotes are "[] at the time $@ in requote is computed
+     changequote
+     ⇒
+     dnl quotes are back to `', yet the content of tokenized still has "[]
+     dnl however, this form of tokenizing already expanded "some"
+     tokenized
+     ⇒"[long],"[string],"[with],"[several],"[separators]
+     define(`a', ` display(`$1')')
+     ⇒
+     dnl now it is possible to call `a' on each token
+     translit(defn(`tokenized'), `"[],', `a()')
+     ⇒ <long> <string> <with> <several> <separators>
+
    It is an error if the end of file occurs within a quoted string.
 
      `hello world'
@@ -3703,7 +3819,7 @@ File: m4.info,  Node: Changecom,  Next: Changeword,  Prev: Changequote,  Up: Inp
 The default comment delimiters can be changed with the builtin macro
 ‘changecom’:
 
- -- Builtin: changecom ([START], [END = ‘<NL>’])
+ -- Builtin: changecom([START], [END = <NL>])
      This sets START as the new begin-comment delimiter and END as the
      new end-comment delimiter.  If both arguments are missing, or START
      is void, then comments are disabled.  Otherwise, if END is missing
@@ -3845,7 +3961,7 @@ Initially a word is defined by the following regular expression:
 
    Using ‘changeword’, you can change this regular expression:
 
- -- Optional builtin: changeword (REGEX)
+ -- Optional builtin: changeword(REGEX)
      Changes the regular expression for recognizing macro names to be
      REGEX.  If REGEX is empty, use ‘[_a-zA-Z][_a-zA-Z0-9]*’.  REGEX
      must obey the constraint that every prefix of the desired final
@@ -3885,40 +4001,40 @@ prevent accidental call of builtins, for example:
 
    Because ‘m4’ constructs its words a character at a time, there is a
 restriction on the regular expressions that may be passed to
-‘changeword’.  This is that if your regular expression accepts ‘foo’, it
-must also accept ‘f’ and ‘fo’.
+‘changeword’.  This is that if your regular expression accepts ‘abc’, it
+must also accept ‘a’ and ‘ab’.
 
      ifdef(`changeword', `', `errprint(` skipping: no changeword support
      ')m4exit(`77')')dnl
-     define(`foo
+     define(`abc
      ', `bar
      ')
      ⇒
-     dnl This example wants to recognize changeword, dnl, and `foo\n'.
+     dnl This example wants to recognize changeword, dnl, and `abc\n'.
      dnl First, we check that our regexp will match.
-     regexp(`changeword', `[cd][a-z]*\|foo[
+     regexp(`changeword', `[cd][a-z]*\|abc[
      ]')
      ⇒0
-     regexp(`foo
-     ', `[cd][a-z]*\|foo[
+     regexp(`abc
+     ', `[cd][a-z]*\|abc[
      ]')
      ⇒0
-     regexp(`f', `[cd][a-z]*\|foo[
+     regexp(`a', `[cd][a-z]*\|abc[
      ]')
      ⇒-1
-     foo
-     ⇒foo
-     changeword(`[cd][a-z]*\|foo[
+     abc
+     ⇒abc
+     changeword(`[cd][a-z]*\|abc[
      ]')
      ⇒
-     dnl Even though `foo\n' matches, we forgot to allow `f'.
-     foo
-     ⇒foo
-     changeword(`[cd][a-z]*\|fo*[
+     dnl Even though `abc\n' matches, we forgot to allow `ab'.
+     abc
+     ⇒abc
+     changeword(`[cd][a-z]*\|ab?c?[
      ]?')
      ⇒
-     dnl Now we can call `foo\n'.
-     foo
+     dnl Now we can call `abc\n'.
+     abc
      ⇒bar
 
    ‘changeword’ has another function.  If the regular expression
@@ -3988,14 +4104,14 @@ File: m4.info,  Node: M4wrap,  Prev: Changeword,  Up: Input Control
 8.5 Saving text until end of input
 ==================================
 
-It is possible to ‘save’ some text until the end of the normal input has
+It is possible to 'save' some text until the end of the normal input has
 been seen.  Text can be saved, to be read again by ‘m4’ when the normal
 input has been exhausted.  This feature is normally used to initiate
 cleanup actions before normal exit, e.g., deleting temporary files.
 
    To save input text, use the builtin ‘m4wrap’:
 
- -- Builtin: m4wrap (STRING, ...)
+ -- Builtin: m4wrap(STRING, ...)
      Stores STRING in a safe place, to be reread when end of input is
      reached.  As a GNU extension, additional arguments are concatenated
      with a space to the STRING.
@@ -4019,12 +4135,12 @@ and not if ‘m4exit’ is used to exit ‘m4’.
    It is safe to call ‘m4wrap’ from saved text, but then the order in
 which the saved text is reread is undefined.  If ‘m4wrap’ is not used
 recursively, the saved pieces of text are reread in the opposite order
-in which they were saved (LIFO—last in, first out).  However, this
+in which they were saved (LIFO--last in, first out).  However, this
 behavior is likely to change in a future release, to match POSIX, so you
 should not depend on this order.
 
    It is possible to emulate POSIX behavior even with older versions of
-GNU M4 by including the file ‘m4-1.4.19/examples/wrapfifo.m4’ from the
+GNU M4 by including the file ‘m4-1.4.21/examples/wrapfifo.m4’ from the
 distribution:
 
      $ m4 -I examples
@@ -4049,7 +4165,7 @@ distribution:
 
    It is likewise possible to emulate LIFO behavior without resorting to
 the GNU M4 extension of ‘builtin’, by including the file
-‘m4-1.4.19/examples/wraplifo.m4’ from the distribution.  (Unfortunately,
+‘m4-1.4.21/examples/wraplifo.m4’ from the distribution.  (Unfortunately,
 both examples shown here share some subtle bugs.  See if you can find
 and correct them; or *note Answers: Improved m4wrap.).
 
@@ -4125,8 +4241,8 @@ File: m4.info,  Node: Include,  Next: Search Path,  Up: File Inclusion
 
 There are two builtin macros in ‘m4’ for including files:
 
- -- Builtin: include (FILE)
- -- Builtin: sinclude (FILE)
+ -- Builtin: include(FILE)
+ -- Builtin: sinclude(FILE)
      Both macros cause the file named FILE to be read by ‘m4’.  When the
      end of the file is reached, input is resumed from the previous
      input file.
@@ -4155,8 +4271,8 @@ There are two builtin macros in ‘m4’ for including files:
 
    The rest of this section assumes that ‘m4’ is invoked with the ‘-I’
 option (*note Invoking m4: Preprocessor features.) pointing to the
-‘m4-1.4.19/examples’ directory shipped as part of the GNU ‘m4’ package.
-The file ‘m4-1.4.19/examples/incl.m4’ in the distribution contains the
+‘m4-1.4.21/examples’ directory shipped as part of the GNU ‘m4’ package.
+The file ‘m4-1.4.21/examples/incl.m4’ in the distribution contains the
 lines:
 
      $ cat examples/incl.m4
@@ -4247,7 +4363,7 @@ than the input was read.  It is possible to implement topological
 sorting dependencies.  For example, GNU Autoconf makes use of diversions
 under the hood to ensure that the expansion of a prerequisite macro
 appears in the output prior to the expansion of a dependent macro,
-regardless of which order the two macros were invoked in the user’s
+regardless of which order the two macros were invoked in the user's
 input file.
 
 * Menu:
@@ -4265,7 +4381,7 @@ File: m4.info,  Node: Divert,  Next: Undivert,  Up: Diversions
 
 Output is diverted using ‘divert’:
 
- -- Builtin: divert ([NUMBER = ‘0’])
+ -- Builtin: divert([NUMBER = 0])
      The current diversion is changed to NUMBER.  If NUMBER is left out
      or empty, it is assumed to be zero.  If NUMBER cannot be parsed,
      the diversion is unchanged.
@@ -4348,7 +4464,7 @@ File: m4.info,  Node: Undivert,  Next: Divnum,  Prev: Divert,  Up: Diversions
 
 Diverted text can be undiverted explicitly using the builtin ‘undivert’:
 
- -- Builtin: undivert ([DIVERSIONS...])
+ -- Builtin: undivert([DIVERSIONS...])
      Undiverts the numeric DIVERSIONS given by the arguments, in the
      order given.  If no arguments are supplied, all diversions are
      undiverted, in numerical order.
@@ -4511,7 +4627,7 @@ No output is produced at all.
 
    Clearing selected diversions can be done with the following macro:
 
- -- Composite: cleardivert ([DIVERSIONS...])
+ -- Composite: cleardivert([DIVERSIONS...])
      Discard the contents of each of the listed numeric DIVERSIONS.
 
      define(`cleardivert',
@@ -4550,7 +4666,7 @@ File: m4.info,  Node: Len,  Next: Index macro,  Up: Text handling
 
 The length of a string can be calculated by ‘len’:
 
- -- Builtin: len (STRING)
+ -- Builtin: len(STRING)
      Expands to the length of STRING, as a decimal number.
 
      The macro ‘len’ is recognized only with parameters.
@@ -4568,7 +4684,7 @@ File: m4.info,  Node: Index macro,  Next: Regexp,  Prev: Len,  Up: Text handling
 
 Searching for substrings is done with ‘index’:
 
- -- Builtin: index (STRING, SUBSTRING)
+ -- Builtin: index(STRING, SUBSTRING)
      Expands to the index of the first occurrence of SUBSTRING in
      STRING.  The first character in STRING has index 0.  If SUBSTRING
      does not occur in STRING, ‘index’ expands to ‘-1’.
@@ -4599,12 +4715,20 @@ File: m4.info,  Node: Regexp,  Next: Substr,  Prev: Index macro,  Up: Text handl
 
 Searching for regular expressions is done with the builtin ‘regexp’:
 
- -- Builtin: regexp (STRING, REGEXP, [REPLACEMENT])
+ -- Builtin: regexp(STRING, REGEXP, [REPLACEMENT])
      Searches for REGEXP in STRING.  The syntax for regular expressions
-     is the same as in GNU Emacs, which is similar to BRE, Basic Regular
-     Expressions in POSIX. *Note Syntax of Regular Expressions:
-     (emacs)Regexps.  Support for ERE, Extended Regular Expressions is
-     not available, but will be added in GNU M4 2.0.
+     is closest to older GNU Emacs (grouping via ‘\(’ and ‘\)’,
+     alternation via ‘\|’, one-or-more matching via ‘+’, zero-or-one
+     matching via ‘?’), although for backwards compatibility reasons, M4
+     1.4.x does not enable intervals (that is, both ‘{’ and ‘\{’ match a
+     literal ‘{’), nor character classes (that is, ‘[[:alpha:]]’ matches
+     a sequence of one of six bytes followed by a literal close bracket,
+     rather than all letters, the same as ‘[[ahlp:]’ followed by ‘]’).
+     *Note Syntax of Regular Expressions: (emacs)Regexps.  Support for
+     intervals, character classes, non-greedy matches, or even
+     alternative regular expression syntax (such as POSIX Basic or
+     Extended Regular Expressions) are likely to be added in a future
+     version of GNU M4.
 
      If REPLACEMENT is omitted, ‘regexp’ expands to the index of the
      first match of REGEXP in STRING.  If REGEXP does not match anywhere
@@ -4664,7 +4788,7 @@ File: m4.info,  Node: Substr,  Next: Translit,  Prev: Regexp,  Up: Text handling
 
 Substrings are extracted with ‘substr’:
 
- -- Builtin: substr (STRING, FROM, [LENGTH])
+ -- Builtin: substr(STRING, FROM, [LENGTH])
      Expands to the substring of STRING, which starts at index FROM, and
      extends for LENGTH characters, or to the end of STRING, if LENGTH
      is omitted.  The starting index of a string is always 0.  The
@@ -4695,7 +4819,7 @@ File: m4.info,  Node: Translit,  Next: Patsubst,  Prev: Substr,  Up: Text handli
 
 Character translation is done with ‘translit’:
 
- -- Builtin: translit (STRING, CHARS, [REPLACEMENT])
+ -- Builtin: translit(STRING, CHARS, [REPLACEMENT])
      Expands to STRING, with each character that occurs in CHARS
      translated into the character from REPLACEMENT with the same index.
 
@@ -4714,7 +4838,7 @@ Character translation is done with ‘translit’:
      REPLACEMENT, place it first or last in the entire string, or as the
      last character of a range.  Back-to-back ranges can share a common
      endpoint.  It is not an error for the last character in the range
-     to be ‘larger’ than the first.  In that case, the range runs
+     to be 'larger' than the first.  In that case, the range runs
      backwards, i.e., ‘9-0’ means the string ‘9876543210’.  The
      expansion of a range is dependent on the underlying encoding of
      characters, so using ranges is not always portable between
@@ -4735,7 +4859,7 @@ Character translation is done with ‘translit’:
 
    In the ASCII encoding, the first example deletes all uppercase
 letters, the second converts lowercase to uppercase, and the third
-‘mirrors’ all uppercase letters, while converting them to lowercase.
+'mirrors' all uppercase letters, while converting them to lowercase.
 The two first cases are by far the most common, even though they are not
 portable to EBCDIC or other encodings.  The fourth example shows a range
 ending in ‘-’, as well as back-to-back ranges.  The final example shows
@@ -4756,10 +4880,10 @@ File: m4.info,  Node: Patsubst,  Next: Format,  Prev: Translit,  Up: Text handli
 
 Global substitution in a string is done by ‘patsubst’:
 
- -- Builtin: patsubst (STRING, REGEXP, [REPLACEMENT])
+ -- Builtin: patsubst(STRING, REGEXP, [REPLACEMENT])
      Searches STRING for matches of REGEXP, and substitutes REPLACEMENT
      for each match.  The syntax for regular expressions is the same as
-     in GNU Emacs (*note Regexp::).
+     in the ‘regexp’ builtin (*note Regexp::).
 
      The parts of STRING that are not covered by any match of REGEXP are
      copied to the expansion.  Whenever a match is found, the search
@@ -4791,7 +4915,7 @@ Global substitution in a string is done by ‘patsubst’:
      patsubst(`GNUs not Unix', `\w+', `(\&)')
      ⇒(GNUs) (not) (Unix)
      patsubst(`GNUs not Unix', `[A-Z][a-z]+')
-     ⇒GN not 
+     ⇒GN not
      patsubst(`GNUs not Unix', `not', `NOT\')
      error→m4:stdin:6: Warning: trailing \ ignored in replacement
      ⇒GNUs NOT Unix
@@ -4800,16 +4924,16 @@ Global substitution in a string is done by ‘patsubst’:
 individual words or whole sentences, by substituting calls of the macros
 ‘upcase’ and ‘downcase’ into the strings.
 
- -- Composite: upcase (TEXT)
- -- Composite: downcase (TEXT)
- -- Composite: capitalize (TEXT)
+ -- Composite: upcase(TEXT)
+ -- Composite: downcase(TEXT)
+ -- Composite: capitalize(TEXT)
      Expand to TEXT, but with capitalization changed: ‘upcase’ changes
      all letters to upper case, ‘downcase’ changes all letters to lower
      case, and ‘capitalize’ changes the first character of each word to
      upper case and the remaining characters to lower case.
 
    First, an example of their usage, using implementations distributed
-in ‘m4-1.4.19/examples/capitalize.m4’.
+in ‘m4-1.4.21/examples/capitalize.m4’.
 
      $ m4 -I examples
      include(`capitalize.m4')
@@ -4876,7 +5000,7 @@ File: m4.info,  Node: Format,  Prev: Patsubst,  Up: Text handling
 
 Formatted output can be made with ‘format’:
 
- -- Builtin: format (FORMAT-STRING, ...)
+ -- Builtin: format(FORMAT-STRING, ...)
      Works much like the C function ‘printf’.  The first argument
      FORMAT-STRING can contain ‘%’ specifications which are satisfied by
      additional arguments, and the expansion of ‘format’ is the
@@ -4938,7 +5062,7 @@ recognized.  Items not yet supported include positional arguments, the
 modifiers, and any platform extensions available in the native ‘printf’.
 For more details on the functioning of ‘printf’, see the C Library
 Manual, or the POSIX specification (for example, ‘%a’ is supported even
-on platforms that haven’t yet implemented C99 hexadecimal floating point
+on platforms that haven't yet implemented C99 hexadecimal floating point
 output natively).
 
    Unrecognized specifiers result in a warning.  It is anticipated that
@@ -4974,8 +5098,8 @@ File: m4.info,  Node: Incr,  Next: Eval,  Up: Arithmetic
 Increment and decrement of integers are supported using the builtins
 ‘incr’ and ‘decr’:
 
- -- Builtin: incr (NUMBER)
- -- Builtin: decr (NUMBER)
+ -- Builtin: incr(NUMBER)
+ -- Builtin: decr(NUMBER)
      Expand to the numerical value of NUMBER, incremented or
      decremented, respectively, by one.  Except for the empty string,
      the expansion is empty if NUMBER could not be parsed.
@@ -4993,6 +5117,32 @@ Increment and decrement of integers are supported using the builtins
      error→m4:stdin:4: empty string treated as 0 in builtin `decr'
      ⇒-1
 
+   It is possible to use ‘incr’ to write a macro that produces a
+different value each time it is invoked:
+
+ -- Composite: counter([SEED])
+     When invoked with one argument, reset the counter to SEED (where an
+     empty seed is silently treated like 0), without output.  Without
+     arguments, output and increment the internal counter.
+
+     define(`_counter', `-1')dnl
+     define(`counter', `ifelse(`$#', `0', `define(`_$0', incr(_$0))_$0`'',
+     `define(`_$0', eval(`$1-1'))')')
+     ⇒
+     counter counter counter
+     ⇒0 1 2
+     counter(`42')
+     ⇒
+     counter counter
+     ⇒42 43
+     counter()counter
+     ⇒0
+
+   It is worth noting how the implementation treats a default empty
+string as ‘0’ - this is done by storing one less than SEED into the
+internal counter ‘_counter’, by using ‘eval’ in a way that works even
+when ‘$1’ is blank.
+
 
 File: m4.info,  Node: Eval,  Prev: Incr,  Up: Arithmetic
 
@@ -5001,7 +5151,7 @@ File: m4.info,  Node: Eval,  Prev: Incr,  Up: Arithmetic
 
 Integer expressions are evaluated with ‘eval’:
 
- -- Builtin: eval (EXPRESSION, [RADIX = ‘10’], [WIDTH])
+ -- Builtin: eval(EXPRESSION, [RADIX = 10], [WIDTH])
      Expands to the value of EXPRESSION.  The expansion is empty if a
      problem is encountered while parsing the arguments.  If specified,
      RADIX and WIDTH control the format of the output.
@@ -5061,6 +5211,9 @@ using ‘=’ to check equality is not portable.
      eval(`0 |= 1')
      error→m4:stdin:3: invalid operator in eval: 0 |= 1
      ⇒
+     eval(`(1 += 2)')
+     error→m4:stdin:4: invalid operator in eval: (1 += 2)
+     ⇒
 
    Note that some older ‘m4’ implementations use ‘^’ as an alternate
 operator for the exponentiation, although POSIX requires the C behavior
@@ -5095,15 +5248,21 @@ result:
      ⇒0
      eval(`+ + - ~ ! ~ 0')
      ⇒1
+     eval(`1 / 0 + 1')
+     error→m4:stdin:8: divide by zero in eval: 1 / 0 + 1
+     ⇒
+     eval(`1 / 0 || 1 / 0')
+     error→m4:stdin:9: divide by zero in eval: 1 / 0 || 1 / 0
+     ⇒
      eval(`2 || 1 / 0')
      ⇒1
      eval(`0 || 1 / 0')
-     error→m4:stdin:9: divide by zero in eval: 0 || 1 / 0
+     error→m4:stdin:11: divide by zero in eval: 0 || 1 / 0
      ⇒
-     eval(`0 && 1 % 0')
+     eval(`0 && (1 % 0)')
      ⇒0
-     eval(`2 && 1 % 0')
-     error→m4:stdin:11: modulo by zero in eval: 2 && 1 % 0
+     eval(`2 && (1 % 0)')
+     error→m4:stdin:13: modulo by zero in eval: 2 && (1 % 0)
      ⇒
 
    As a GNU extension, the operator ‘**’ performs integral
@@ -5162,10 +5321,19 @@ relation return ‘0’.
      ⇒81
      square(square(`5')` + 1')
      ⇒676
+     eval(`1+')
+     error→m4:stdin:10: bad expression in eval: 1+
+     ⇒
+     eval(`0x')
+     error→m4:stdin:11: invalid number in eval: 0x
+     ⇒
+     eval(`01239')
+     error→m4:stdin:12: invalid number in eval: 01239
+     ⇒
      define(`foo', `666')
      ⇒
      eval(`foo / 6')
-     error→m4:stdin:11: bad expression in eval: foo / 6
+     error→m4:stdin:14: bad expression in eval (bad input): foo / 6
      ⇒
      eval(foo / 6)
      ⇒111
@@ -5335,7 +5503,7 @@ File: m4.info,  Node: Syscmd,  Next: Esyscmd,  Prev: Platform macros,  Up: Shell
 
 Any shell command can be executed, using ‘syscmd’:
 
- -- Builtin: syscmd (SHELL-COMMAND)
+ -- Builtin: syscmd(SHELL-COMMAND)
      Executes SHELL-COMMAND as a shell command.
 
      The expansion of ‘syscmd’ is void, _not_ the output from
@@ -5391,7 +5559,7 @@ File: m4.info,  Node: Esyscmd,  Next: Sysval,  Prev: Syscmd,  Up: Shell commands
 
 If you want ‘m4’ to read the output of a shell command, use ‘esyscmd’:
 
- -- Builtin: esyscmd (SHELL-COMMAND)
+ -- Builtin: esyscmd(SHELL-COMMAND)
      Expands to the standard output of the shell command SHELL-COMMAND.
 
      Prior to executing the command, ‘m4’ flushes its buffers.  The
@@ -5479,7 +5647,8 @@ result is the signal number shifted left by eight bits.
      ')m4exit(`77')')dnl
      changequote(`[', `]')
      ⇒
-     syscmd([/bin/sh -c 'kill -9 $$'; st=$?; test $st = 137 || test $st = 265])
+     syscmd([{ /bin/sh -c 'kill -9 $$'; } 2>/dev/null; st=$?;
+     test $st = 137 || test $st = 265])
      ⇒
      ifelse(sysval, [0], , [errprint([ skipping: shell does not send signal 9
      ])m4exit([77])])dnl
@@ -5506,8 +5675,8 @@ Commands specified to ‘syscmd’ or ‘esyscmd’ might need a temporary file,
 for output or for some other purpose.  There is a builtin macro,
 ‘mkstemp’, for making a temporary file:
 
- -- Builtin: mkstemp (TEMPLATE)
- -- Builtin: maketemp (TEMPLATE)
+ -- Builtin: mkstemp(TEMPLATE)
+ -- Builtin: maketemp(TEMPLATE)
      Expands to the quoted name of a new, empty file, made from the
      string TEMPLATE, which should end with the string ‘XXXXXX’.  The
      six ‘X’ characters are then replaced with random characters
@@ -5613,7 +5782,7 @@ File: m4.info,  Node: Errprint,  Next: Location,  Up: Miscellaneous
 
 You can print error messages using ‘errprint’:
 
- -- Builtin: errprint (MESSAGE, ...)
+ -- Builtin: errprint(MESSAGE, ...)
      Prints MESSAGE and the rest of the arguments to standard error,
      separated by spaces.  Standard error is used, regardless of the
      ‘--debugfile’ option (*note Invoking m4: Debugging options.).
@@ -5688,7 +5857,7 @@ expansion was triggered, regardless of how many newline characters the
 expansion text contains.  As of GNU M4 1.4.8, the location of text
 wrapped with ‘m4wrap’ (*note M4wrap::) is the point at which the
 ‘m4wrap’ was invoked.  Previous versions, however, behaved as though
-wrapped text came from line 0 of the file “”.
+wrapped text came from line 0 of the file "".
 
      define(`echo', `$@')
      ⇒
@@ -5738,7 +5907,7 @@ File: m4.info,  Node: M4exit,  Prev: Location,  Up: Miscellaneous
 If you need to exit from ‘m4’ before the entire input has been read, you
 can use ‘m4exit’:
 
- -- Builtin: m4exit ([CODE = ‘0’])
+ -- Builtin: m4exit([CODE = 0])
      Causes ‘m4’ to exit, with exit status CODE.  If CODE is left out,
      the exit status is zero.  If CODE cannot be parsed, or is outside
      the range of 0 to 255, the exit status is one.  No further input is
@@ -5753,7 +5922,7 @@ can use ‘m4exit’:
 
    A common use of this is to abort processing:
 
- -- Composite: fatal_error (MESSAGE)
+ -- Composite: fatal_error(MESSAGE)
      Abort processing with an error message and non-zero status.  Prefix
      MESSAGE with details about where the error occurred, and print the
      resulting string to standard error.
@@ -5791,7 +5960,7 @@ File: m4.info,  Node: Frozen files,  Next: Compatibility,  Prev: Miscellaneous, 
 Some bigger ‘m4’ applications may be built over a common base containing
 hundreds of definitions and other costly initializations.  Usually, the
 common base is kept in one or more declarative files, which files are
-listed on each ‘m4’ invocation prior to the user’s input file, or else
+listed on each ‘m4’ invocation prior to the user's input file, or else
 each input file uses ‘include’.
 
    Reading the common base of a big application, over and over again,
@@ -5939,7 +6108,7 @@ directives are:
      the same name, and its order, along with ‘F’, is important.
 
 ‘V NUMBER <NL>’
-     Confirms the format of the file.  ‘m4’ 1.4.19 only creates and
+     Confirms the format of the file.  ‘m4’ 1.4.21 only creates and
      understands frozen files where NUMBER is 1.  This directive must be
      the first non-comment in the file, and may not appear more than
      once.
@@ -6336,7 +6505,7 @@ The ‘forloop’ macro (*note Forloop::) as presented earlier can go into
 an infinite loop if given an iterator that is not parsed as a macro
 name.  It does not do any sanity checking on its numeric bounds, and
 only permits decimal numbers for bounds.  Here is an improved version,
-shipped as ‘m4-1.4.19/examples/forloop2.m4’; this version also optimizes
+shipped as ‘m4-1.4.21/examples/forloop2.m4’; this version also optimizes
 overhead by calling four macros instead of six per iteration (excluding
 those in TEXT), by not dereferencing the ITERATOR in the helper
 ‘_forloop’.
@@ -6368,12 +6537,12 @@ those in TEXT), by not dereferencing the ITERATOR in the helper
      ⇒
 
    One other change to notice is that the improved version used ‘_$0’
-rather than ‘_foreach’ to invoke the helper routine.  In general, this
+rather than ‘_forloop’ to invoke the helper routine.  In general, this
 is a good practice to follow, because then the set of macros can be
 uniformly transformed.  The following example shows a transformation
 that doubles the current quoting and appends a suffix ‘2’ to each
-transformed macro.  If ‘foreach’ refers to the literal ‘_foreach’, then
-‘foreach2’ invokes ‘_foreach’ instead of the intended ‘_foreach2’, and
+transformed macro.  If ‘forloop’ refers to the literal ‘_forloop’, then
+‘forloop2’ invokes ‘_forloop’ instead of the intended ‘_forloop2’, and
 the mixing of quoting paradigms leads to an infinite recursion loop in
 this example.
 
@@ -6411,9 +6580,9 @@ to pass the current iterator value as a single argument.  Coupled with
 helper macros if the argument is needed in more than one place in the
 expansion, the output can be generated with three, rather than four,
 macros of overhead per iteration.  Notice how the file
-‘m4-1.4.19/examples/forloop3.m4’ rearranges the arguments of the helper
+‘m4-1.4.21/examples/forloop3.m4’ rearranges the arguments of the helper
 ‘_forloop’ to take two arguments that are placed around the current
-value.  By splitting a balanced set of parantheses across multiple
+value.  By splitting a balanced set of parentheses across multiple
 arguments, the helper macro can now be shared by ‘forloop’ and the new
 ‘forloop_arg’.
 
@@ -6503,7 +6672,7 @@ fewer arguments, rather than adding additional quoted uses of ‘shift’.
 By doing so, ‘m4’ uses less memory, invokes fewer macros, is less likely
 to run into machine limits, and most importantly, performs faster.  The
 fixed version of ‘foreachq’ can be found in
-‘m4-1.4.19/examples/foreachq2.m4’:
+‘m4-1.4.21/examples/foreachq2.m4’:
 
      $ m4 -I examples
      include(`foreachq2.m4')
@@ -6552,7 +6721,7 @@ operate on an unboxed list in the first place, and by using the
 fixed-length ‘$#’ instead of an arbitrary length list as the key to end
 recursion.  The result is an overhead of six macro invocations per loop
 (excluding any macros in TEXT), instead of eight.  This alternative
-approach is available as ‘m4-1.4.19/examples/foreach3.m4’:
+approach is available as ‘m4-1.4.21/examples/foreach3.m4’:
 
      $ m4 -I examples
      include(`foreachq3.m4')
@@ -6661,7 +6830,7 @@ supported.
      ⇒4
 
    For yet another approach, the improved version of ‘foreach’,
-available in ‘m4-1.4.19/examples/foreach2.m4’, simply overquotes the
+available in ‘m4-1.4.21/examples/foreach2.m4’, simply overquotes the
 arguments to ‘_foreach’ to begin with, using ‘dquote_elt’.  Then
 ‘_foreach’ can just use ‘_arg1’ to remove the extra layer of quoting
 that was added up front:
@@ -6707,7 +6876,7 @@ As a final demonstration, both list styles are now able to handle
 several scenarios that would wreak havoc on one or both of the original
 implementations.  This points out one other difference between the list
 styles.  ‘foreach’ evaluates unquoted list elements only once, in
-preparation for calling ‘_foreach’, similary for ‘foreachq’ as provided
+preparation for calling ‘_foreach’, similarly for ‘foreachq’ as provided
 by ‘foreachq3.m4’ or ‘foreachq4.m4’.  But ‘foreachq’, as provided by
 ‘foreachq2.m4’, evaluates unquoted list elements twice while visiting
 the first list element, once in ‘_arg1q’ and once in ‘_rest’.  When
@@ -6722,7 +6891,7 @@ detrimental effects.
      ⇒
      dnl 0-element list:
      foreach(`x', `', `<x>') / foreachq(`x', `', `<x>')
-     ⇒ / 
+     ⇒ /
      dnl 1-element list of empty element
      foreach(`x', `()', `<x>') / foreachq(`x', ``'', `<x>')
      ⇒<> / <>
@@ -6800,8 +6969,8 @@ that takes exactly one argument, we can write a new macro that lets us
 form the exact two-argument ‘pushdef’ call sequence needed, so that we
 are no longer passing a builtin token through a text macro.
 
- -- Composite: stack_foreach_sep (MACRO, PRE, POST, SEP)
- -- Composite: stack_foreach_sep_lifo (MACRO, PRE, POST, SEP)
+ -- Composite: stack_foreach_sep(MACRO, PRE, POST, SEP)
+ -- Composite: stack_foreach_sep_lifo(MACRO, PRE, POST, SEP)
      For each of the ‘pushdef’ definitions associated with MACRO, expand
      the sequence ‘PRE`'definition`'POST’.  Additionally, expand SEP
      between definitions.  ‘stack_foreach_sep’ visits the oldest
@@ -6830,7 +6999,7 @@ argument in the recursive call; while the other approach would give the
 same output, it does so at the expense of increasing the argument size
 on each iteration of ‘_stack_reverse_sep’, which results in quadratic
 instead of linear execution time.  The improved stack walking macros are
-available in ‘m4-1.4.19/examples/stack_sep.m4’:
+available in ‘m4-1.4.21/examples/stack_sep.m4’:
 
      $ m4 -I examples
      include(`stack_sep.m4')
@@ -6910,7 +7079,7 @@ in an undefined state.
 arguments to ‘m4wrap’, separated by a space, rather than saving just the
 first argument.  This is done with the ‘join’ macro documented
 previously (*note Shift::).  The improved LIFO example is shipped as
-‘m4-1.4.19/examples/wraplifo2.m4’, and can easily be converted to a FIFO
+‘m4-1.4.21/examples/wraplifo2.m4’, and can easily be converted to a FIFO
 solution by swapping the adjacent invocations of ‘joinall’ and ‘defn’.
 
      $ m4 -I examples
@@ -7044,7 +7213,7 @@ that means the replacement text has unbalanced quotes, necessitating
 another round of ‘changequote’.
 
    In the fixed version below, (also shipped as
-‘m4-1.4.19/examples/capitalize2.m4’), ‘capitalize’ uses the alternate
+‘m4-1.4.21/examples/capitalize2.m4’), ‘capitalize’ uses the alternate
 quotes of ‘<<[’ and ‘]>>’ (the longer strings are chosen so as to be
 less likely to appear in the text being converted).  The helpers
 ‘_to_alt’ and ‘_from_alt’ merely reduce the number of characters
@@ -7149,7 +7318,7 @@ and other kinds of works.
    The licenses for most software and other practical works are designed
 to take away your freedom to share and change the works.  By contrast,
 the GNU General Public License is intended to guarantee your freedom to
-share and change all versions of a program—to make sure it remains free
+share and change all versions of a program--to make sure it remains free
 software for all its users.  We, the Free Software Foundation, use the
 GNU General Public License for most of our software; it applies also to
 any other work released this way by its authors.  You can apply it to
@@ -7177,16 +7346,16 @@ know their rights.
 (1) assert copyright on the software, and (2) offer you this License
 giving you legal permission to copy, distribute and/or modify it.
 
-   For the developers’ and authors’ protection, the GPL clearly explains
-that there is no warranty for this free software.  For both users’ and
-authors’ sake, the GPL requires that modified versions be marked as
+   For the developers' and authors' protection, the GPL clearly explains
+that there is no warranty for this free software.  For both users' and
+authors' sake, the GPL requires that modified versions be marked as
 changed, so that their problems will not be attributed erroneously to
 authors of previous versions.
 
    Some devices are designed to deny users access to install or run
 modified versions of the software inside them, although the manufacturer
 can do so.  This is fundamentally incompatible with the aim of
-protecting users’ freedom to change the software.  The systematic
+protecting users' freedom to change the software.  The systematic
 pattern of such abuse occurs in the area of products for individuals to
 use, which is precisely where it is most unacceptable.  Therefore, we
 have designed this version of the GPL to prohibit the practice for those
@@ -7209,25 +7378,25 @@ TERMS AND CONDITIONS
 
   0. Definitions.
 
-     “This License” refers to version 3 of the GNU General Public
+     "This License" refers to version 3 of the GNU General Public
      License.
 
-     “Copyright” also means copyright-like laws that apply to other
+     "Copyright" also means copyright-like laws that apply to other
      kinds of works, such as semiconductor masks.
 
-     “The Program” refers to any copyrightable work licensed under this
-     License.  Each licensee is addressed as “you”.  “Licensees” and
-     “recipients” may be individuals or organizations.
+     "The Program" refers to any copyrightable work licensed under this
+     License.  Each licensee is addressed as "you".  "Licensees" and
+     "recipients" may be individuals or organizations.
 
-     To “modify” a work means to copy from or adapt all or part of the
+     To "modify" a work means to copy from or adapt all or part of the
      work in a fashion requiring copyright permission, other than the
-     making of an exact copy.  The resulting work is called a “modified
-     version” of the earlier work or a work “based on” the earlier work.
+     making of an exact copy.  The resulting work is called a "modified
+     version" of the earlier work or a work "based on" the earlier work.
 
-     A “covered work” means either the unmodified Program or a work
+     A "covered work" means either the unmodified Program or a work
      based on the Program.
 
-     To “propagate” a work means to do anything with it that, without
+     To "propagate" a work means to do anything with it that, without
      permission, would make you directly or secondarily liable for
      infringement under applicable copyright law, except executing it on
      a computer or modifying a private copy.  Propagation includes
@@ -7235,12 +7404,12 @@ TERMS AND CONDITIONS
      available to the public, and in some countries other activities as
      well.
 
-     To “convey” a work means any kind of propagation that enables other
+     To "convey" a work means any kind of propagation that enables other
      parties to make or receive copies.  Mere interaction with a user
      through a computer network, with no transfer of a copy, is not
      conveying.
 
-     An interactive user interface displays “Appropriate Legal Notices”
+     An interactive user interface displays "Appropriate Legal Notices"
      to the extent that it includes a convenient and prominently visible
      feature that (1) displays an appropriate copyright notice, and (2)
      tells the user that there is no warranty for the work (except to
@@ -7252,33 +7421,33 @@ TERMS AND CONDITIONS
 
   1. Source Code.
 
-     The “source code” for a work means the preferred form of the work
-     for making modifications to it.  “Object code” means any non-source
+     The "source code" for a work means the preferred form of the work
+     for making modifications to it.  "Object code" means any non-source
      form of a work.
 
-     A “Standard Interface” means an interface that either is an
+     A "Standard Interface" means an interface that either is an
      official standard defined by a recognized standards body, or, in
      the case of interfaces specified for a particular programming
      language, one that is widely used among developers working in that
      language.
 
-     The “System Libraries” of an executable work include anything,
+     The "System Libraries" of an executable work include anything,
      other than the work as a whole, that (a) is included in the normal
      form of packaging a Major Component, but which is not part of that
      Major Component, and (b) serves only to enable use of the work with
      that Major Component, or to implement a Standard Interface for
      which an implementation is available to the public in source code
-     form.  A “Major Component”, in this context, means a major
+     form.  A "Major Component", in this context, means a major
      essential component (kernel, window system, and so on) of the
      specific operating system (if any) on which the executable work
      runs, or a compiler used to produce the work, or an object code
      interpreter used to run it.
 
-     The “Corresponding Source” for a work in object code form means all
+     The "Corresponding Source" for a work in object code form means all
      the source code needed to generate, install, and (for an executable
      work) run the object code and to modify the work, including scripts
      to control those activities.  However, it does not include the
-     work’s System Libraries, or general-purpose tools or generally
+     work's System Libraries, or general-purpose tools or generally
      available free programs which are used unmodified in performing
      those activities but which are not part of the work.  For example,
      Corresponding Source includes interface definition files associated
@@ -7322,7 +7491,7 @@ TERMS AND CONDITIONS
      the conditions stated below.  Sublicensing is not allowed; section
      10 makes it unnecessary.
 
-  3. Protecting Users’ Legal Rights From Anti-Circumvention Law.
+  3. Protecting Users' Legal Rights From Anti-Circumvention Law.
 
      No covered work shall be deemed part of an effective technological
      measure under any applicable law fulfilling obligations under
@@ -7335,12 +7504,12 @@ TERMS AND CONDITIONS
      circumvention is effected by exercising rights under this License
      with respect to the covered work, and you disclaim any intention to
      limit operation or modification of the work as a means of
-     enforcing, against the work’s users, your or third parties’ legal
+     enforcing, against the work's users, your or third parties' legal
      rights to forbid circumvention of technological measures.
 
   4. Conveying Verbatim Copies.
 
-     You may convey verbatim copies of the Program’s source code as you
+     You may convey verbatim copies of the Program's source code as you
      receive it, in any medium, provided that you conspicuously and
      appropriately publish on each copy an appropriate copyright notice;
      keep intact all notices stating that this License and any
@@ -7364,7 +7533,7 @@ TERMS AND CONDITIONS
        b. The work must carry prominent notices stating that it is
           released under this License and any conditions added under
           section 7.  This requirement modifies the requirement in
-          section 4 to “keep intact all notices”.
+          section 4 to "keep intact all notices".
 
        c. You must license the entire work, as a whole, under this
           License to anyone who comes into possession of a copy.  This
@@ -7384,9 +7553,9 @@ TERMS AND CONDITIONS
      works, which are not by their nature extensions of the covered
      work, and which are not combined with it such as to form a larger
      program, in or on a volume of a storage or distribution medium, is
-     called an “aggregate” if the compilation and its resulting
+     called an "aggregate" if the compilation and its resulting
      copyright are not used to limit the access or legal rights of the
-     compilation’s users beyond what the individual works permit.
+     compilation's users beyond what the individual works permit.
      Inclusion of a covered work in an aggregate does not cause this
      License to apply to the other parts of the aggregate.
 
@@ -7444,13 +7613,13 @@ TERMS AND CONDITIONS
      excluded from the Corresponding Source as a System Library, need
      not be included in conveying the object code work.
 
-     A “User Product” is either (1) a “consumer product”, which means
+     A "User Product" is either (1) a "consumer product", which means
      any tangible personal property which is normally used for personal,
      family, or household purposes, or (2) anything designed or sold for
      incorporation into a dwelling.  In determining whether a product is
      a consumer product, doubtful cases shall be resolved in favor of
      coverage.  For a particular product received by a particular user,
-     “normally used” refers to a typical or common use of that class of
+     "normally used" refers to a typical or common use of that class of
      product, regardless of the status of the particular user or of the
      way in which the particular user actually uses, or expects or is
      expected to use, the product.  A product is a consumer product
@@ -7458,7 +7627,7 @@ TERMS AND CONDITIONS
      industrial or non-consumer uses, unless such uses represent the
      only significant mode of use of the product.
 
-     “Installation Information” for a User Product means any methods,
+     "Installation Information" for a User Product means any methods,
      procedures, authorization keys, or other information required to
      install and execute modified versions of a covered work in that
      User Product from a modified version of its Corresponding Source.
@@ -7494,7 +7663,7 @@ TERMS AND CONDITIONS
 
   7. Additional Terms.
 
-     “Additional permissions” are terms that supplement the terms of
+     "Additional permissions" are terms that supplement the terms of
      this License by making exceptions from one or more of its
      conditions.  Additional permissions that are applicable to the
      entire Program shall be treated as though they were included in
@@ -7539,8 +7708,8 @@ TERMS AND CONDITIONS
           the recipient, for any liability that these contractual
           assumptions directly impose on those licensors and authors.
 
-     All other non-permissive additional terms are considered “further
-     restrictions” within the meaning of section 10.  If the Program as
+     All other non-permissive additional terms are considered "further
+     restrictions" within the meaning of section 10.  If the Program as
      you received it, or any part of it, contains a notice stating that
      it is governed by this License along with a term that is a further
      restriction, you may remove that term.  If a license document
@@ -7606,12 +7775,12 @@ TERMS AND CONDITIONS
      responsible for enforcing compliance by third parties with this
      License.
 
-     An “entity transaction” is a transaction transferring control of an
+     An "entity transaction" is a transaction transferring control of an
      organization, or substantially all assets of one, or subdividing an
      organization, or merging organizations.  If propagation of a
      covered work results from an entity transaction, each party to that
      transaction who receives a copy of the work also receives whatever
-     licenses to the work the party’s predecessor in interest had or
+     licenses to the work the party's predecessor in interest had or
      could give under the previous paragraph, plus a right to possession
      of the Corresponding Source of the work from the predecessor in
      interest, if the predecessor has it or can get it with reasonable
@@ -7628,31 +7797,31 @@ TERMS AND CONDITIONS
 
   11. Patents.
 
-     A “contributor” is a copyright holder who authorizes use under this
+     A "contributor" is a copyright holder who authorizes use under this
      License of the Program or a work on which the Program is based.
-     The work thus licensed is called the contributor’s “contributor
-     version”.
+     The work thus licensed is called the contributor's "contributor
+     version".
 
-     A contributor’s “essential patent claims” are all patent claims
+     A contributor's "essential patent claims" are all patent claims
      owned or controlled by the contributor, whether already acquired or
      hereafter acquired, that would be infringed by some manner,
      permitted by this License, of making, using, or selling its
      contributor version, but do not include claims that would be
      infringed only as a consequence of further modification of the
-     contributor version.  For purposes of this definition, “control”
+     contributor version.  For purposes of this definition, "control"
      includes the right to grant patent sublicenses in a manner
      consistent with the requirements of this License.
 
      Each contributor grants you a non-exclusive, worldwide,
-     royalty-free patent license under the contributor’s essential
+     royalty-free patent license under the contributor's essential
      patent claims, to make, use, sell, offer for sale, import and
      otherwise run, modify and propagate the contents of its contributor
      version.
 
-     In the following three paragraphs, a “patent license” is any
+     In the following three paragraphs, a "patent license" is any
      express agreement or commitment, however denominated, not to
      enforce a patent (such as an express permission to practice a
-     patent or covenant not to sue for patent infringement).  To “grant”
+     patent or covenant not to sue for patent infringement).  To "grant"
      such a patent license to a party means to make such an agreement or
      commitment not to enforce a patent against the party.
 
@@ -7665,9 +7834,9 @@ TERMS AND CONDITIONS
      yourself of the benefit of the patent license for this particular
      work, or (3) arrange, in a manner consistent with the requirements
      of this License, to extend the patent license to downstream
-     recipients.  “Knowingly relying” means you have actual knowledge
+     recipients.  "Knowingly relying" means you have actual knowledge
      that, but for the patent license, your conveying the covered work
-     in a country, or your recipient’s use of the covered work in a
+     in a country, or your recipient's use of the covered work in a
      country, would infringe one or more identifiable patents in that
      country that you have reason to believe are valid.
 
@@ -7679,7 +7848,7 @@ TERMS AND CONDITIONS
      patent license you grant is automatically extended to all
      recipients of the covered work and works based on it.
 
-     A patent license is “discriminatory” if it does not include within
+     A patent license is "discriminatory" if it does not include within
      the scope of its coverage, prohibits the exercise of, or is
      conditioned on the non-exercise of one or more of the rights that
      are specifically granted under this License.  You may not convey a
@@ -7699,7 +7868,7 @@ TERMS AND CONDITIONS
      any implied license or other defenses to infringement that may
      otherwise be available to you under applicable patent law.
 
-  12. No Surrender of Others’ Freedom.
+  12. No Surrender of Others' Freedom.
 
      If conditions are imposed on you (whether by court order, agreement
      or otherwise) that contradict the conditions of this License, they
@@ -7732,7 +7901,7 @@ TERMS AND CONDITIONS
 
      Each version is given a distinguishing version number.  If the
      Program specifies that a certain numbered version of the GNU
-     General Public License “or any later version” applies to it, you
+     General Public License "or any later version" applies to it, you
      have the option of following the terms and conditions either of
      that numbered version or of any later version published by the Free
      Software Foundation.  If the Program does not specify a version
@@ -7741,7 +7910,7 @@ TERMS AND CONDITIONS
 
      If the Program specifies that a proxy can decide which future
      versions of the GNU General Public License can be used, that
-     proxy’s public statement of acceptance of a version permanently
+     proxy's public statement of acceptance of a version permanently
      authorizes you to choose that version for the Program.
 
      Later license versions may give you additional or different
@@ -7753,7 +7922,7 @@ TERMS AND CONDITIONS
 
      THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
      APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE
-     COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM “AS IS”
+     COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS"
      WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED,
      INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
      MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE
@@ -7797,7 +7966,7 @@ terms.
    To do so, attach the following notices to the program.  It is safest
 to attach them to the start of each source file to most effectively
 state the exclusion of warranty; and each file should have at least the
-“copyright” line and a pointer to where the full notice is found.
+"copyright" line and a pointer to where the full notice is found.
 
      ONE LINE TO GIVE THE PROGRAM'S NAME AND A BRIEF IDEA OF WHAT IT DOES.
      Copyright (C) YEAR NAME OF AUTHOR
@@ -7828,11 +7997,11 @@ notice like this when it starts in an interactive mode:
 
    The hypothetical commands ‘show w’ and ‘show c’ should show the
 appropriate parts of the General Public License.  Of course, your
-program’s commands might be different; for a GUI interface, you would
-use an “about box”.
+program's commands might be different; for a GUI interface, you would
+use an "about box".
 
    You should also get your employer (if you work as a programmer) or
-school, if any, to sign a “copyright disclaimer” for the program, if
+school, if any, to sign a "copyright disclaimer" for the program, if
 necessary.  For more information on this, and how to apply and follow
 the GNU GPL, see <https://www.gnu.org/licenses/>.
 

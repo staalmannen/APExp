@@ -1,9 +1,9 @@
 /* Test of execution of file name canonicalization.
-   Copyright (C) 2007-2021 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -129,7 +129,7 @@ main (void)
     /* This test works only if the canonicalize_file_name implementation
        comes from gnulib.  If it comes from libc, we have no way to prevent
        gcc from "optimizing" the null_ptr function in invalid ways.  See
-       <https://gcc.gnu.org/bugzilla/show_bug.cgi?id=93156>.  */
+       <https://gcc.gnu.org/PR93156>.  */
 #if GNULIB_defined_canonicalize_file_name
     errno = 0;
     result1 = canonicalize_file_name (null_ptr ());
@@ -181,6 +181,8 @@ main (void)
     {
       ASSERT (remove (BASE "/tra") == 0);
       ASSERT (rmdir (BASE) == 0);
+      if (test_exit_status != EXIT_SUCCESS)
+        return test_exit_status;
       fputs ("skipping test: symlinks not supported on this file system\n",
              stderr);
       return 77;
@@ -202,8 +204,7 @@ main (void)
   {
     char *result1 = canonicalize_filename_mode (BASE "/huk", CAN_NOLINKS);
     ASSERT (result1 != NULL);
-    ASSERT (strcmp (result1 + strlen (result1) - strlen ("/" BASE "/huk"),
-                    "/" BASE "/huk") == 0);
+    ASSERT (str_endswith (result1, "/" BASE "/huk"));
     free (result1);
   }
 
@@ -217,8 +218,7 @@ main (void)
     ASSERT (result3 != NULL);
     ASSERT (strcmp (result1, result2) == 0);
     ASSERT (strcmp (result2, result3) == 0);
-    ASSERT (strcmp (result1 + strlen (result1) - strlen ("/" BASE "/tra"),
-                    "/" BASE "/tra") == 0);
+    ASSERT (str_endswith (result1, "/" BASE "/tra"));
     free (result1);
     free (result2);
     free (result3);
@@ -237,8 +237,7 @@ main (void)
     ASSERT (strcmp (result1, result2) == 0);
     ASSERT (strcmp (result2, result3) == 0);
     ASSERT (strcmp (result3, result4) == 0);
-    ASSERT (strcmp (result1 + strlen (result1) - strlen ("/" BASE "/lum"),
-                    "/" BASE "/lum") == 0);
+    ASSERT (str_endswith (result1, "/" BASE "/lum"));
     free (result1);
     free (result2);
     free (result3);
@@ -328,8 +327,7 @@ main (void)
     ASSERT (strcmp (result1, result2) == 0);
     ASSERT (strcmp (result2, result3) == 0);
     ASSERT (strcmp (result3, result4) == 0);
-    ASSERT (strcmp (result1 + strlen (result1) - strlen ("/" BASE "/zzz"),
-                    "/" BASE "/zzz") == 0);
+    ASSERT (str_endswith (result1, "/" BASE "/zzz"));
     free (result1);
     free (result2);
     free (result3);
@@ -349,8 +347,7 @@ main (void)
     ASSERT (strcmp (result1, result2) == 0);
     ASSERT (strcmp (result2, result3) == 0);
     ASSERT (strcmp (result3, result4) == 0);
-    ASSERT (strcmp (result1 + strlen (result1) - strlen ("/" BASE "/wum"),
-                    "/" BASE "/wum") == 0);
+    ASSERT (str_endswith (result1, "/" BASE "/wum"));
     free (result1);
     free (result2);
     free (result3);
@@ -363,7 +360,7 @@ main (void)
     char *result2 = canonicalize_filename_mode ("t-can.zzz/zzz", CAN_MISSING);
     ASSERT (result1 == NULL);
     ASSERT (result2 != NULL);
-    ASSERT (strcmp (result2 + strlen (result2) - 14, "/t-can.zzz/zzz") == 0);
+    ASSERT (str_endswith (result2, "/t-can.zzz/zzz"));
     free (result2);
   }
 
@@ -393,7 +390,13 @@ main (void)
     ASSERT (result4);
     ASSERT (stat ("/", &st1) == 0);
     ASSERT (stat ("//", &st2) == 0);
-    if (SAME_INODE (st1, st2))
+    bool same = psame_inode (&st1, &st2);
+#if defined __MVS__
+    /* On IBM z/OS, "/" and "//" both canonicalize to themselves, yet they both
+       have st_dev == st_ino == 1.  */
+    same = false;
+#endif
+    if (same)
       {
         ASSERT (strcmp (result1, "/") == 0);
         ASSERT (strcmp (result2, "/") == 0);
@@ -413,6 +416,17 @@ main (void)
     free (result4);
   }
 
+#if !(defined _WIN32 && !defined __CYGWIN__)
+  /* Check a device file.  */
+  {
+    char *result1 = canonicalize_file_name ("/dev/null");
+    char *result2 = canonicalize_filename_mode ("/dev/null", CAN_ALL_BUT_LAST);
+    ASSERT (result1 != NULL);
+    ASSERT (result2 != NULL);
+    ASSERT (strcmp (result1, result2) == 0);
+  }
+#endif
+
   /* Cleanup.  */
   ASSERT (remove (BASE "/droot") == 0);
   ASSERT (remove (BASE "/d/1") == 0);
@@ -430,5 +444,5 @@ main (void)
   ASSERT (remove (BASE) == 0);
   ASSERT (remove ("ise") == 0);
 
-  return 0;
+  return test_exit_status;
 }

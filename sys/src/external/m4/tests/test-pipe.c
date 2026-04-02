@@ -1,9 +1,9 @@
 /* Test of pipe.
-   Copyright (C) 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
+   the Free Software Foundation, either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -22,7 +22,6 @@
 SIGNATURE_CHECK (pipe, int, (int[2]));
 
 #include <fcntl.h>
-#include <stdbool.h>
 
 #if defined _WIN32 && ! defined __CYGWIN__
 /* Get declarations of the native Windows API functions.  */
@@ -104,5 +103,5 @@ main ()
   ASSERT (!is_nonblocking (fd[0]));
   ASSERT (!is_nonblocking (fd[1]));
 
-  return 0;
+  return test_exit_status;
 }

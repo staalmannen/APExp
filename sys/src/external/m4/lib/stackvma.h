@@ -1,10 +1,10 @@
 /* Determine the virtual memory area of a given address.
-   Copyright (C) 2002-2021  Bruno Haible <bruno@clisp.org>
+   Copyright (C) 2002-2026 Free Software Foundation, Inc.
    Copyright (C) 2003-2006  Paolo Bonzini <bonzini@gnu.org>
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -14,6 +14,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible and Paolo Bonzini.  */
 
 #ifndef _STACKVMA_H
 #define _STACKVMA_H
@@ -52,7 +54,7 @@ extern int sigsegv_get_vma (uintptr_t address, struct vma_struct *vma);
     || defined __FreeBSD_kernel__ || defined __FreeBSD__ || defined __DragonFly__ \
     || defined __NetBSD__ || defined __OpenBSD__ \
     || (defined __APPLE__ && defined __MACH__) \
-    || defined _AIX || defined __sgi || defined __sun \
+    || defined _AIX || defined __sun \
     || defined __CYGWIN__ || defined __HAIKU__
 # define HAVE_STACKVMA 1
 #endif

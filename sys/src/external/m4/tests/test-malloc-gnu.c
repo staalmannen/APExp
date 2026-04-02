@@ -1,9 +1,9 @@
 /* Test of malloc function.
-   Copyright (C) 2010-2021 Free Software Foundation, Inc.
+   Copyright (C) 2010-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -24,11 +24,17 @@
 
 #include "macros.h"
 
+/* Work around clang bug
+   <https://github.com/llvm/llvm-project/issues/114772>.  */
+void *(*volatile my_malloc) (size_t) = malloc;
+#undef malloc
+#define malloc my_malloc
+
 int
-main (int argc, char **argv)
+main (int argc, _GL_UNUSED char **argv)
 {
   /* Check that malloc (0) is not a NULL pointer.  */
-  void *volatile p = malloc (0);
+  void *p = malloc (0);
   ASSERT (p != NULL);
   free (p);
 
@@ -41,5 +47,5 @@ main (int argc, char **argv)
       ASSERT (errno == ENOMEM);
     }
 
-  return 0;
+  return test_exit_status;
 }

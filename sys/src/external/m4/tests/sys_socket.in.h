@@ -1,20 +1,20 @@
 /* Provide a sys/socket header file for systems lacking it (read: MinGW)
    and for systems where it is incomplete.
-   Copyright (C) 2005-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005-2026 Free Software Foundation, Inc.
    Written by Simon Josefsson.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
-   any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* This file is supposed to be used on platforms that lack <sys/socket.h>,
    on platforms where <sys/socket.h> cannot be included standalone, and on
@@ -27,7 +27,7 @@
 #endif
 @PRAGMA_COLUMNS@
 
-#if defined _GL_ALREADY_INCLUDING_SYS_SOCKET_H
+#if defined _@GUARD_PREFIX@_ALREADY_INCLUDING_SYS_SOCKET_H
 /* Special invocation convention:
    - On Cygwin 1.5.x we have a sequence of nested includes
      <sys/socket.h> -> <cygwin/socket.h> -> <asm/socket.h> -> <cygwin/if.h>,
@@ -43,7 +43,7 @@
 
 #if @HAVE_SYS_SOCKET_H@
 
-# define _GL_ALREADY_INCLUDING_SYS_SOCKET_H
+# define _@GUARD_PREFIX@_ALREADY_INCLUDING_SYS_SOCKET_H
 
 /* On many platforms, <sys/socket.h> assumes prior inclusion of
    <sys/types.h>.  */
@@ -56,16 +56,19 @@
 /* The include_next requires a split double-inclusion guard.  */
 # @INCLUDE_NEXT@ @NEXT_SYS_SOCKET_H@
 
-# undef _GL_ALREADY_INCLUDING_SYS_SOCKET_H
+# undef _@GUARD_PREFIX@_ALREADY_INCLUDING_SYS_SOCKET_H
 
 #endif
 
 #ifndef _@GUARD_PREFIX@_SYS_SOCKET_H
 #define _@GUARD_PREFIX@_SYS_SOCKET_H
 
-#ifndef _GL_INLINE_HEADER_BEGIN
+/* This file uses _GL_INLINE_HEADER_BEGIN, _GL_INLINE, GNULIB_POSIXCHECK,
+   HAVE_RAW_DECL_*, alignof.  */
+#if !_GL_CONFIG_H_INCLUDED
  #error "Please include config.h first."
 #endif
+
 _GL_INLINE_HEADER_BEGIN
 #ifndef _GL_SYS_SOCKET_INLINE
 # define _GL_SYS_SOCKET_INLINE _GL_INLINE
@@ -97,7 +100,6 @@ typedef unsigned char   sa_family_t;
 #  endif
 # endif
 #else
-# include <stdalign.h>
 /* Code taken from glibc sysdeps/unix/sysv/linux/bits/socket.h on
    2009-05-08, licensed under LGPLv2.1+, plus portability fixes. */
 # define __ss_aligntype unsigned long int
@@ -200,6 +202,7 @@ struct sockaddr_storage
 
 /* Rudimentary 'struct msghdr'; this works as long as you don't try to
    access msg_control or msg_controllen.  */
+# if !defined GNULIB_defined_struct_msghdr
 struct msghdr {
   void *msg_name;
   socklen_t msg_namelen;
@@ -207,6 +210,8 @@ struct msghdr {
   int msg_iovlen;
   int msg_flags;
 };
+#  define GNULIB_defined_struct_msghdr 1
+# endif
 
 #endif
 
@@ -230,11 +235,10 @@ struct msghdr {
 _GL_SYS_SOCKET_INLINE int
 rpl_fd_isset (SOCKET fd, fd_set * set)
 {
-  u_int i;
   if (set == NULL)
     return 0;
 
-  for (i = 0; i < set->fd_count; i++)
+  for (u_int i = 0; i < set->fd_count; i++)
     if (set->fd_array[i] == fd)
       return 1;
 
@@ -287,17 +291,18 @@ rpl_fd_isset (SOCKET fd, fd_set * set)
 #   undef socket
 #   define socket rpl_socket
 #  endif
-_GL_FUNCDECL_RPL (socket, int, (int domain, int type, int protocol));
+_GL_FUNCDECL_RPL (socket, int, (int domain, int type, int protocol), );
 _GL_CXXALIAS_RPL (socket, int, (int domain, int type, int protocol));
 # else
 _GL_CXXALIAS_SYS (socket, int, (int domain, int type, int protocol));
 # endif
 _GL_CXXALIASWARN (socket);
 #elif @HAVE_WINSOCK2_H@
-# undef socket
-# define socket socket_used_without_requesting_gnulib_module_socket
+# if !GNULIB_SOCKET
+#  undef socket
+#  define socket socket_used_without_requesting_gnulib_module_socket
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef socket
 # if HAVE_RAW_DECL_SOCKET
 _GL_WARN_ON_USE (socket, "socket is not always POSIX compliant - "
                  "use gnulib module socket for portability");
@@ -311,7 +316,7 @@ _GL_WARN_ON_USE (socket, "socket is not always POSIX compliant - "
 #   define connect rpl_connect
 #  endif
 _GL_FUNCDECL_RPL (connect, int,
-                  (int fd, const struct sockaddr *addr, socklen_t addrlen)
+                  (int fd, const struct sockaddr *addr, socklen_t addrlen),
                   _GL_ARG_NONNULL ((2)));
 _GL_CXXALIAS_RPL (connect, int,
                   (int fd, const struct sockaddr *addr, socklen_t addrlen));
@@ -324,10 +329,11 @@ _GL_CXXALIAS_SYS_CAST (connect, int,
 # endif
 _GL_CXXALIASWARN (connect);
 #elif @HAVE_WINSOCK2_H@
-# undef connect
-# define connect socket_used_without_requesting_gnulib_module_connect
+# if !GNULIB_CONNECT
+#  undef connect
+#  define connect connect_used_without_requesting_gnulib_module_connect
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef connect
 # if HAVE_RAW_DECL_CONNECT
 _GL_WARN_ON_USE (connect, "connect is not always POSIX compliant - "
                  "use gnulib module connect for portability");
@@ -343,7 +349,7 @@ _GL_WARN_ON_USE (connect, "connect is not always POSIX compliant - "
 _GL_FUNCDECL_RPL (accept, int,
                   (int fd,
                    struct sockaddr *restrict addr,
-                   socklen_t *restrict addrlen));
+                   socklen_t *restrict addrlen), );
 _GL_CXXALIAS_RPL (accept, int,
                   (int fd,
                    struct sockaddr *restrict addr,
@@ -356,12 +362,15 @@ _GL_CXXALIAS_SYS_CAST (accept, int,
                         struct sockaddr *restrict addr,
                         socklen_t *restrict addrlen));
 # endif
+# if __GLIBC__ >= 2
 _GL_CXXALIASWARN (accept);
+# endif
 #elif @HAVE_WINSOCK2_H@
-# undef accept
-# define accept accept_used_without_requesting_gnulib_module_accept
+# if !GNULIB_ACCEPT
+#  undef accept
+#  define accept accept_used_without_requesting_gnulib_module_accept
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef accept
 # if HAVE_RAW_DECL_ACCEPT
 _GL_WARN_ON_USE (accept, "accept is not always POSIX compliant - "
                  "use gnulib module accept for portability");
@@ -375,7 +384,7 @@ _GL_WARN_ON_USE (accept, "accept is not always POSIX compliant - "
 #   define bind rpl_bind
 #  endif
 _GL_FUNCDECL_RPL (bind, int,
-                  (int fd, const struct sockaddr *addr, socklen_t addrlen)
+                  (int fd, const struct sockaddr *addr, socklen_t addrlen),
                   _GL_ARG_NONNULL ((2)));
 _GL_CXXALIAS_RPL (bind, int,
                   (int fd, const struct sockaddr *addr, socklen_t addrlen));
@@ -388,10 +397,11 @@ _GL_CXXALIAS_SYS_CAST (bind, int,
 # endif
 _GL_CXXALIASWARN (bind);
 #elif @HAVE_WINSOCK2_H@
-# undef bind
-# define bind bind_used_without_requesting_gnulib_module_bind
+# if !GNULIB_BIND
+#  undef bind
+#  define bind bind_used_without_requesting_gnulib_module_bind
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef bind
 # if HAVE_RAW_DECL_BIND
 _GL_WARN_ON_USE (bind, "bind is not always POSIX compliant - "
                  "use gnulib module bind for portability");
@@ -406,7 +416,7 @@ _GL_WARN_ON_USE (bind, "bind is not always POSIX compliant - "
 #  endif
 _GL_FUNCDECL_RPL (getpeername, int,
                   (int fd, struct sockaddr *restrict addr,
-                   socklen_t *restrict addrlen)
+                   socklen_t *restrict addrlen),
                   _GL_ARG_NONNULL ((2, 3)));
 _GL_CXXALIAS_RPL (getpeername, int,
                   (int fd, struct sockaddr *restrict addr,
@@ -418,12 +428,15 @@ _GL_CXXALIAS_SYS_CAST (getpeername, int,
                        (int fd, struct sockaddr *restrict addr,
                         socklen_t *restrict addrlen));
 # endif
+# if __GLIBC__ >= 2
 _GL_CXXALIASWARN (getpeername);
+# endif
 #elif @HAVE_WINSOCK2_H@
-# undef getpeername
-# define getpeername getpeername_used_without_requesting_gnulib_module_getpeername
+# if !GNULIB_GETPEERNAME
+#  undef getpeername
+#  define getpeername getpeername_used_without_requesting_gnulib_module_getpeername
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef getpeername
 # if HAVE_RAW_DECL_GETPEERNAME
 _GL_WARN_ON_USE (getpeername, "getpeername is not always POSIX compliant - "
                  "use gnulib module getpeername for portability");
@@ -438,7 +451,7 @@ _GL_WARN_ON_USE (getpeername, "getpeername is not always POSIX compliant - "
 #  endif
 _GL_FUNCDECL_RPL (getsockname, int,
                   (int fd, struct sockaddr *restrict addr,
-                   socklen_t *restrict addrlen)
+                   socklen_t *restrict addrlen),
                   _GL_ARG_NONNULL ((2, 3)));
 _GL_CXXALIAS_RPL (getsockname, int,
                   (int fd, struct sockaddr *restrict addr,
@@ -450,12 +463,15 @@ _GL_CXXALIAS_SYS_CAST (getsockname, int,
                        (int fd, struct sockaddr *restrict addr,
                         socklen_t *restrict addrlen));
 # endif
+# if __GLIBC__ >= 2
 _GL_CXXALIASWARN (getsockname);
+# endif
 #elif @HAVE_WINSOCK2_H@
-# undef getsockname
-# define getsockname getsockname_used_without_requesting_gnulib_module_getsockname
+# if !GNULIB_GETSOCKNAME
+#  undef getsockname
+#  define getsockname getsockname_used_without_requesting_gnulib_module_getsockname
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef getsockname
 # if HAVE_RAW_DECL_GETSOCKNAME
 _GL_WARN_ON_USE (getsockname, "getsockname is not always POSIX compliant - "
                  "use gnulib module getsockname for portability");
@@ -470,7 +486,7 @@ _GL_WARN_ON_USE (getsockname, "getsockname is not always POSIX compliant - "
 #  endif
 _GL_FUNCDECL_RPL (getsockopt, int,
                   (int fd, int level, int optname,
-                   void *restrict optval, socklen_t *restrict optlen)
+                   void *restrict optval, socklen_t *restrict optlen),
                   _GL_ARG_NONNULL ((4, 5)));
 _GL_CXXALIAS_RPL (getsockopt, int,
                   (int fd, int level, int optname,
@@ -484,10 +500,11 @@ _GL_CXXALIAS_SYS_CAST (getsockopt, int,
 # endif
 _GL_CXXALIASWARN (getsockopt);
 #elif @HAVE_WINSOCK2_H@
-# undef getsockopt
-# define getsockopt getsockopt_used_without_requesting_gnulib_module_getsockopt
+# if !GNULIB_GETSOCKOPT
+#  undef getsockopt
+#  define getsockopt getsockopt_used_without_requesting_gnulib_module_getsockopt
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef getsockopt
 # if HAVE_RAW_DECL_GETSOCKOPT
 _GL_WARN_ON_USE (getsockopt, "getsockopt is not always POSIX compliant - "
                  "use gnulib module getsockopt for portability");
@@ -500,17 +517,18 @@ _GL_WARN_ON_USE (getsockopt, "getsockopt is not always POSIX compliant - "
 #   undef listen
 #   define listen rpl_listen
 #  endif
-_GL_FUNCDECL_RPL (listen, int, (int fd, int backlog));
+_GL_FUNCDECL_RPL (listen, int, (int fd, int backlog), );
 _GL_CXXALIAS_RPL (listen, int, (int fd, int backlog));
 # else
 _GL_CXXALIAS_SYS (listen, int, (int fd, int backlog));
 # endif
 _GL_CXXALIASWARN (listen);
 #elif @HAVE_WINSOCK2_H@
-# undef listen
-# define listen listen_used_without_requesting_gnulib_module_listen
+# if !GNULIB_LISTEN
+#  undef listen
+#  define listen listen_used_without_requesting_gnulib_module_listen
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef listen
 # if HAVE_RAW_DECL_LISTEN
 _GL_WARN_ON_USE (listen, "listen is not always POSIX compliant - "
                  "use gnulib module listen for portability");
@@ -523,7 +541,7 @@ _GL_WARN_ON_USE (listen, "listen is not always POSIX compliant - "
 #   undef recv
 #   define recv rpl_recv
 #  endif
-_GL_FUNCDECL_RPL (recv, ssize_t, (int fd, void *buf, size_t len, int flags)
+_GL_FUNCDECL_RPL (recv, ssize_t, (int fd, void *buf, size_t len, int flags),
                                  _GL_ARG_NONNULL ((2)));
 _GL_CXXALIAS_RPL (recv, ssize_t, (int fd, void *buf, size_t len, int flags));
 # else
@@ -534,10 +552,11 @@ _GL_CXXALIAS_SYS_CAST (recv, ssize_t, (int fd, void *buf, size_t len, int flags)
 # endif
 _GL_CXXALIASWARN (recv);
 #elif @HAVE_WINSOCK2_H@
-# undef recv
-# define recv recv_used_without_requesting_gnulib_module_recv
+# if !GNULIB_RECV
+#  undef recv
+#  define recv recv_used_without_requesting_gnulib_module_recv
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef recv
 # if HAVE_RAW_DECL_RECV
 _GL_WARN_ON_USE (recv, "recv is not always POSIX compliant - "
                  "use gnulib module recv for portability");
@@ -551,7 +570,7 @@ _GL_WARN_ON_USE (recv, "recv is not always POSIX compliant - "
 #   define send rpl_send
 #  endif
 _GL_FUNCDECL_RPL (send, ssize_t,
-                  (int fd, const void *buf, size_t len, int flags)
+                  (int fd, const void *buf, size_t len, int flags),
                   _GL_ARG_NONNULL ((2)));
 _GL_CXXALIAS_RPL (send, ssize_t,
                   (int fd, const void *buf, size_t len, int flags));
@@ -564,10 +583,11 @@ _GL_CXXALIAS_SYS_CAST (send, ssize_t,
 # endif
 _GL_CXXALIASWARN (send);
 #elif @HAVE_WINSOCK2_H@
-# undef send
-# define send send_used_without_requesting_gnulib_module_send
+# if !GNULIB_SEND
+#  undef send
+#  define send send_used_without_requesting_gnulib_module_send
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef send
 # if HAVE_RAW_DECL_SEND
 _GL_WARN_ON_USE (send, "send is not always POSIX compliant - "
                  "use gnulib module send for portability");
@@ -583,7 +603,7 @@ _GL_WARN_ON_USE (send, "send is not always POSIX compliant - "
 _GL_FUNCDECL_RPL (recvfrom, ssize_t,
                   (int fd, void *restrict buf, size_t len, int flags,
                    struct sockaddr *restrict from,
-                   socklen_t *restrict fromlen)
+                   socklen_t *restrict fromlen),
                   _GL_ARG_NONNULL ((2)));
 _GL_CXXALIAS_RPL (recvfrom, ssize_t,
                   (int fd, void *restrict buf, size_t len, int flags,
@@ -597,12 +617,15 @@ _GL_CXXALIAS_SYS_CAST (recvfrom, ssize_t,
                         struct sockaddr *restrict from,
                         socklen_t *restrict fromlen));
 # endif
+# if __GLIBC__ >= 2
 _GL_CXXALIASWARN (recvfrom);
+# endif
 #elif @HAVE_WINSOCK2_H@
-# undef recvfrom
-# define recvfrom recvfrom_used_without_requesting_gnulib_module_recvfrom
+# if !GNULIB_RECVFROM
+#  undef recvfrom
+#  define recvfrom recvfrom_used_without_requesting_gnulib_module_recvfrom
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef recvfrom
 # if HAVE_RAW_DECL_RECVFROM
 _GL_WARN_ON_USE (recvfrom, "recvfrom is not always POSIX compliant - "
                  "use gnulib module recvfrom for portability");
@@ -617,7 +640,7 @@ _GL_WARN_ON_USE (recvfrom, "recvfrom is not always POSIX compliant - "
 #  endif
 _GL_FUNCDECL_RPL (sendto, ssize_t,
                   (int fd, const void *buf, size_t len, int flags,
-                   const struct sockaddr *to, socklen_t tolen)
+                   const struct sockaddr *to, socklen_t tolen),
                   _GL_ARG_NONNULL ((2)));
 _GL_CXXALIAS_RPL (sendto, ssize_t,
                   (int fd, const void *buf, size_t len, int flags,
@@ -631,10 +654,11 @@ _GL_CXXALIAS_SYS_CAST (sendto, ssize_t,
 # endif
 _GL_CXXALIASWARN (sendto);
 #elif @HAVE_WINSOCK2_H@
-# undef sendto
-# define sendto sendto_used_without_requesting_gnulib_module_sendto
+# if !GNULIB_SENDTO
+#  undef sendto
+#  define sendto sendto_used_without_requesting_gnulib_module_sendto
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef sendto
 # if HAVE_RAW_DECL_SENDTO
 _GL_WARN_ON_USE (sendto, "sendto is not always POSIX compliant - "
                  "use gnulib module sendto for portability");
@@ -648,7 +672,7 @@ _GL_WARN_ON_USE (sendto, "sendto is not always POSIX compliant - "
 #   define setsockopt rpl_setsockopt
 #  endif
 _GL_FUNCDECL_RPL (setsockopt, int, (int fd, int level, int optname,
-                                    const void * optval, socklen_t optlen)
+                                    const void * optval, socklen_t optlen),
                                    _GL_ARG_NONNULL ((4)));
 _GL_CXXALIAS_RPL (setsockopt, int, (int fd, int level, int optname,
                                     const void * optval, socklen_t optlen));
@@ -661,10 +685,11 @@ _GL_CXXALIAS_SYS_CAST (setsockopt, int,
 # endif
 _GL_CXXALIASWARN (setsockopt);
 #elif @HAVE_WINSOCK2_H@
-# undef setsockopt
-# define setsockopt setsockopt_used_without_requesting_gnulib_module_setsockopt
+# if !GNULIB_SETSOCKOPT
+#  undef setsockopt
+#  define setsockopt setsockopt_used_without_requesting_gnulib_module_setsockopt
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef setsockopt
 # if HAVE_RAW_DECL_SETSOCKOPT
 _GL_WARN_ON_USE (setsockopt, "setsockopt is not always POSIX compliant - "
                  "use gnulib module setsockopt for portability");
@@ -677,17 +702,18 @@ _GL_WARN_ON_USE (setsockopt, "setsockopt is not always POSIX compliant - "
 #   undef shutdown
 #   define shutdown rpl_shutdown
 #  endif
-_GL_FUNCDECL_RPL (shutdown, int, (int fd, int how));
+_GL_FUNCDECL_RPL (shutdown, int, (int fd, int how), );
 _GL_CXXALIAS_RPL (shutdown, int, (int fd, int how));
 # else
 _GL_CXXALIAS_SYS (shutdown, int, (int fd, int how));
 # endif
 _GL_CXXALIASWARN (shutdown);
 #elif @HAVE_WINSOCK2_H@
-# undef shutdown
-# define shutdown shutdown_used_without_requesting_gnulib_module_shutdown
+# if !GNULIB_SHUTDOWN
+#  undef shutdown
+#  define shutdown shutdown_used_without_requesting_gnulib_module_shutdown
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef shutdown
 # if HAVE_RAW_DECL_SHUTDOWN
 _GL_WARN_ON_USE (shutdown, "shutdown is not always POSIX compliant - "
                  "use gnulib module shutdown for portability");
@@ -706,21 +732,20 @@ _GL_WARN_ON_USE (shutdown, "shutdown is not always POSIX compliant - "
 #  endif
 _GL_FUNCDECL_RPL (accept4, int,
                   (int sockfd, struct sockaddr *addr, socklen_t *addrlen,
-                   int flags));
+                   int flags), );
 _GL_CXXALIAS_RPL (accept4, int,
                   (int sockfd, struct sockaddr *addr, socklen_t *addrlen,
                    int flags));
 # else
 _GL_FUNCDECL_SYS (accept4, int,
                   (int sockfd, struct sockaddr *addr, socklen_t *addrlen,
-                   int flags));
+                   int flags), );
 _GL_CXXALIAS_SYS (accept4, int,
                   (int sockfd, struct sockaddr *addr, socklen_t *addrlen,
                    int flags));
 # endif
 _GL_CXXALIASWARN (accept4);
 #elif defined GNULIB_POSIXCHECK
-# undef accept4
 # if HAVE_RAW_DECL_ACCEPT4
 _GL_WARN_ON_USE (accept4, "accept4 is unportable - "
                  "use gnulib module accept4 for portability");

@@ -1,9 +1,9 @@
 /* Test of reallocarray function.
-   Copyright (C) 2010-2021 Free Software Foundation, Inc.
+   Copyright (C) 2010-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -27,6 +27,12 @@ SIGNATURE_CHECK (reallocarray, void *, (void *, size_t, size_t));
 
 #include "macros.h"
 
+/* Work around clang bug
+   <https://github.com/llvm/llvm-project/issues/114772>.  */
+void *(*volatile my_reallocarray) (void *, size_t, size_t) = reallocarray;
+#undef reallocarray
+#define reallocarray my_reallocarray
+
 int
 main ()
 {
@@ -34,11 +40,14 @@ main ()
      of memory larger than PTRDIFF_MAX or SIZE_MAX bytes.  */
   for (size_t n = 2; n != 0; n <<= 1)
     {
-      void *volatile p = NULL;
+      void *p = NULL;
 
-      p = reallocarray (p, PTRDIFF_MAX / n + 1, n);
-      ASSERT (p == NULL);
-      ASSERT (errno == ENOMEM);
+      if (PTRDIFF_MAX / n + 1 <= SIZE_MAX)
+        {
+          p = reallocarray (p, PTRDIFF_MAX / n + 1, n);
+          ASSERT (p == NULL);
+          ASSERT (errno == ENOMEM);
+        }
 
       p = reallocarray (p, SIZE_MAX / n + 1, n);
       ASSERT (p == NULL);
@@ -51,5 +60,5 @@ main ()
       free (p);
     }
 
-  return 0;
+  return test_exit_status;
 }

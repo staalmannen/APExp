@@ -1,18 +1,18 @@
 /* Guts of POSIX spawn interface.  Generic POSIX.1 version.
-   Copyright (C) 2000-2006, 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2000-2006, 2008-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -89,11 +89,16 @@
 #if defined _WIN32 && ! defined __CYGWIN__
 /* Native Windows API.  */
 
+/* Define to 1 to enable DuplicateHandle optimization.
+   Define to 0 to disable this optimization.  */
+# ifndef SPAWN_INTERNAL_OPTIMIZE_DUPLICATEHANDLE
+#  define SPAWN_INTERNAL_OPTIMIZE_DUPLICATEHANDLE 1
+# endif
+
 /* Get declarations of the native Windows API functions.  */
 # define WIN32_LEAN_AND_MEAN
 # include <windows.h>
 
-# include <stdbool.h>
 # include <stdio.h>
 
 # include "filename.h"
@@ -121,60 +126,118 @@ grow_inheritable_handles (struct inheritable_handles *inh_handles, int newfd)
       size_t new_allocated = 2 * inh_handles->allocated + 1;
       if (new_allocated <= newfd)
         new_allocated = newfd + 1;
-      HANDLE *new_handles_array =
-        (HANDLE *)
-        realloc (inh_handles->handles, new_allocated * sizeof (HANDLE));
-      if (new_handles_array == NULL)
+      struct IHANDLE *new_ih =
+        (struct IHANDLE *)
+        realloc (inh_handles->ih, new_allocated * sizeof (struct IHANDLE));
+      if (new_ih == NULL)
         {
-          errno = ENOMEM;
-          return -1;
-        }
-      unsigned char *new_flags_array =
-        (unsigned char *)
-        realloc (inh_handles->flags, new_allocated * sizeof (unsigned char));
-      if (new_flags_array == NULL)
-        {
-          free (new_handles_array);
           errno = ENOMEM;
           return -1;
         }
       inh_handles->allocated = new_allocated;
-      inh_handles->handles = new_handles_array;
-      inh_handles->flags = new_flags_array;
+      inh_handles->ih = new_ih;
     }
 
-  HANDLE *handles = inh_handles->handles;
+  struct IHANDLE *ih = inh_handles->ih;
 
   for (; inh_handles->count <= newfd; inh_handles->count++)
-    handles[inh_handles->count] = INVALID_HANDLE_VALUE;
+    ih[inh_handles->count].handle = INVALID_HANDLE_VALUE;
 
   return 0;
 }
 
-/* Reduces inh_handles->count to the minimum needed.  */
+# if SPAWN_INTERNAL_OPTIMIZE_DUPLICATEHANDLE
+
+/* Assuming inh_handles->ih[newfd].handle != INVALID_HANDLE_VALUE
+   and      (inh_handles->ih[newfd].flags & DELAYED_DUP2_NEWFD) != 0,
+   actually performs the delayed dup2 (oldfd, newfd).
+   Returns 0 upon success.  In case of failure, -1 is returned, with errno set.
+ */
+static int
+do_delayed_dup2 (int newfd, struct inheritable_handles *inh_handles,
+                 HANDLE curr_process)
+{
+  int oldfd = inh_handles->ih[newfd].linked_fd;
+  /* Check invariants.  */
+  if (!((inh_handles->ih[oldfd].flags & DELAYED_DUP2_OLDFD) != 0
+        && newfd == inh_handles->ih[oldfd].linked_fd
+        && inh_handles->ih[newfd].handle == inh_handles->ih[oldfd].handle))
+    abort ();
+  /* Duplicate the handle now.  */
+  if (!DuplicateHandle (curr_process, inh_handles->ih[oldfd].handle,
+                        curr_process, &inh_handles->ih[newfd].handle,
+                        0, TRUE, DUPLICATE_SAME_ACCESS))
+    {
+      errno = EBADF; /* arbitrary */
+      return -1;
+    }
+  inh_handles->ih[oldfd].flags &= ~DELAYED_DUP2_OLDFD;
+  inh_handles->ih[newfd].flags =
+    (unsigned char) inh_handles->ih[oldfd].flags | KEEP_OPEN_IN_CHILD;
+  return 0;
+}
+
+/* Performs the remaining delayed dup2 (oldfd, newfd).
+   Returns 0 upon success.  In case of failure, -1 is returned, with errno set.
+ */
+static int
+do_remaining_delayed_dup2 (struct inheritable_handles *inh_handles,
+                           HANDLE curr_process)
+{
+  size_t handles_count = inh_handles->count;
+
+  for (int newfd = 0; newfd < handles_count; newfd++)
+    if (inh_handles->ih[newfd].handle != INVALID_HANDLE_VALUE
+        && (inh_handles->ih[newfd].flags & DELAYED_DUP2_NEWFD) != 0)
+      if (do_delayed_dup2 (newfd, inh_handles, curr_process) < 0)
+        return -1;
+  return 0;
+}
+
+# endif
+
+/* Closes the handles in inh_handles that are not meant to be preserved in the
+   child process, and reduces inh_handles->count to the minimum needed.  */
 static void
 shrink_inheritable_handles (struct inheritable_handles *inh_handles)
 {
-  HANDLE *handles = inh_handles->handles;
+  struct IHANDLE *ih = inh_handles->ih;
+  size_t handles_count = inh_handles->count;
 
-  while (inh_handles->count > 3
-         && handles[inh_handles->count - 1] == INVALID_HANDLE_VALUE)
-    inh_handles->count--;
+  for (unsigned int fd = 0; fd < handles_count; fd++)
+    {
+      HANDLE handle = ih[fd].handle;
+
+      if (handle != INVALID_HANDLE_VALUE
+          && (ih[fd].flags & KEEP_OPEN_IN_CHILD) == 0)
+        {
+          if (!(ih[fd].flags & KEEP_OPEN_IN_PARENT))
+            CloseHandle (handle);
+          ih[fd].handle = INVALID_HANDLE_VALUE;
+        }
+    }
+
+  while (handles_count > 3
+         && ih[handles_count - 1].handle == INVALID_HANDLE_VALUE)
+    handles_count--;
+
+  inh_handles->count = handles_count;
 }
 
 /* Closes all handles in inh_handles.  */
 static void
 close_inheritable_handles (struct inheritable_handles *inh_handles)
 {
-  HANDLE *handles = inh_handles->handles;
+  struct IHANDLE *ih = inh_handles->ih;
   size_t handles_count = inh_handles->count;
-  unsigned int fd;
 
-  for (fd = 0; fd < handles_count; fd++)
+  for (unsigned int fd = 0; fd < handles_count; fd++)
     {
-      HANDLE handle = handles[fd];
+      HANDLE handle = ih[fd].handle;
 
-      if (handle != INVALID_HANDLE_VALUE)
+      if (handle != INVALID_HANDLE_VALUE
+          && !(ih[fd].flags & DELAYED_DUP2_NEWFD)
+          && !(ih[fd].flags & KEEP_OPEN_IN_PARENT))
         CloseHandle (handle);
     }
 }
@@ -198,13 +261,71 @@ sigisempty (const sigset_t *s)
   return memiszero (s, sizeof (sigset_t));
 }
 
-/* Opens a HANDLE to a file.
+/* Executes a 'close' action.
+   Returns 0 upon success.  In case of failure, -1 is returned, with errno set.
+ */
+static int
+do_close (struct inheritable_handles *inh_handles, int fd, bool ignore_EBADF)
+{
+  if (!(fd >= 0 && fd < inh_handles->count
+        && inh_handles->ih[fd].handle != INVALID_HANDLE_VALUE))
+    {
+      if (ignore_EBADF)
+        return 0;
+      else
+        {
+          errno = EBADF;
+          return -1;
+        }
+    }
+
+# if SPAWN_INTERNAL_OPTIMIZE_DUPLICATEHANDLE
+  if ((inh_handles->ih[fd].flags & DELAYED_DUP2_NEWFD) != 0)
+    {
+      int dup2_oldfd = inh_handles->ih[fd].linked_fd;
+      /* Check invariants.  */
+      if (!((inh_handles->ih[dup2_oldfd].flags & DELAYED_DUP2_OLDFD) != 0
+            && fd == inh_handles->ih[dup2_oldfd].linked_fd
+            && inh_handles->ih[fd].handle == inh_handles->ih[dup2_oldfd].handle))
+        abort ();
+      /* Annihilate a delayed dup2 (..., fd) call.  */
+      inh_handles->ih[dup2_oldfd].flags &= ~DELAYED_DUP2_OLDFD;
+    }
+  else if ((inh_handles->ih[fd].flags & DELAYED_DUP2_OLDFD) != 0)
+    {
+      int dup2_newfd = inh_handles->ih[fd].linked_fd;
+      /* Check invariants.  */
+      if (!((inh_handles->ih[dup2_newfd].flags & DELAYED_DUP2_NEWFD) != 0
+            && fd == inh_handles->ih[dup2_newfd].linked_fd
+            && inh_handles->ih[fd].handle == inh_handles->ih[dup2_newfd].handle))
+        abort ();
+      /* Optimize a delayed dup2 (fd, ...) call.  */
+      inh_handles->ih[dup2_newfd].flags =
+        (inh_handles->ih[fd].flags & ~DELAYED_DUP2_OLDFD) | KEEP_OPEN_IN_CHILD;
+    }
+  else
+# endif
+    {
+      if (!(inh_handles->ih[fd].flags & KEEP_OPEN_IN_PARENT)
+          && !CloseHandle (inh_handles->ih[fd].handle))
+        {
+          inh_handles->ih[fd].handle = INVALID_HANDLE_VALUE;
+          errno = EIO;
+          return -1;
+        }
+    }
+  inh_handles->ih[fd].handle = INVALID_HANDLE_VALUE;
+
+  return 0;
+}
+
+/* Opens an inheritable HANDLE to a file.
    Upon failure, returns INVALID_HANDLE_VALUE with errno set.  */
 static HANDLE
 open_handle (const char *name, int flags, mode_t mode)
 {
   /* To ease portability.  Like in open.c.  */
-  if (strcmp (name, "/dev/null") == 0)
+  if (streq (name, "/dev/null"))
     name = "NUL";
 
   /* POSIX <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/V1_chap04.html#tag_04_13>
@@ -274,13 +395,17 @@ open_handle (const char *name, int flags, mode_t mode)
      CreateFile
      <https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-createfilea>
      <https://docs.microsoft.com/en-us/windows/desktop/FileIO/creating-and-opening-files>  */
+  SECURITY_ATTRIBUTES sec_attr;
+  sec_attr.nLength = sizeof (SECURITY_ATTRIBUTES);
+  sec_attr.lpSecurityDescriptor = NULL;
+  sec_attr.bInheritHandle = TRUE;
   HANDLE handle =
     CreateFile (rname,
                 ((flags & (O_WRONLY | O_RDWR)) != 0
                  ? GENERIC_READ | GENERIC_WRITE
                  : GENERIC_READ),
                 FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
-                NULL,
+                &sec_attr,
                 ((flags & O_CREAT) != 0
                  ? ((flags & O_EXCL) != 0
                     ? CREATE_NEW
@@ -363,7 +488,7 @@ open_handle (const char *name, int flags, mode_t mode)
 static int
 do_open (struct inheritable_handles *inh_handles, int newfd,
          const char *filename, const char *directory,
-         int flags, mode_t mode, HANDLE curr_process)
+         int flags, mode_t mode)
 {
   if (!(newfd >= 0 && newfd < _getmaxstdio ()))
     {
@@ -372,12 +497,8 @@ do_open (struct inheritable_handles *inh_handles, int newfd,
     }
   if (grow_inheritable_handles (inh_handles, newfd) < 0)
     return -1;
-  if (inh_handles->handles[newfd] != INVALID_HANDLE_VALUE
-      && !CloseHandle (inh_handles->handles[newfd]))
-    {
-      errno = EIO;
-      return -1;
-    }
+  if (do_close (inh_handles, newfd, true) < 0)
+    return -1;
   if (filename == NULL)
     {
       errno = EINVAL;
@@ -402,16 +523,9 @@ do_open (struct inheritable_handles *inh_handles, int newfd,
       return -1;
     }
   free (filename_to_free);
-  /* Duplicate the handle, so that it becomes inheritable.  */
-  if (!DuplicateHandle (curr_process, handle,
-                        curr_process, &inh_handles->handles[newfd],
-                        0, TRUE,
-                        DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS))
-    {
-      errno = EBADF; /* arbitrary */
-      return -1;
-    }
-  inh_handles->flags[newfd] = ((flags & O_APPEND) != 0 ? 32 : 0);
+  inh_handles->ih[newfd].handle = handle;
+  inh_handles->ih[newfd].flags =
+    ((flags & O_APPEND) != 0 ? 32 : 0) | KEEP_OPEN_IN_CHILD;
   return 0;
 }
 
@@ -423,7 +537,7 @@ do_dup2 (struct inheritable_handles *inh_handles, int oldfd, int newfd,
          HANDLE curr_process)
 {
   if (!(oldfd >= 0 && oldfd < inh_handles->count
-        && inh_handles->handles[oldfd] != INVALID_HANDLE_VALUE))
+        && inh_handles->ih[oldfd].handle != INVALID_HANDLE_VALUE))
     {
       errno = EBADF;
       return -1;
@@ -437,44 +551,56 @@ do_dup2 (struct inheritable_handles *inh_handles, int oldfd, int newfd,
     {
       if (grow_inheritable_handles (inh_handles, newfd) < 0)
         return -1;
-      if (inh_handles->handles[newfd] != INVALID_HANDLE_VALUE
-          && !CloseHandle (inh_handles->handles[newfd]))
-        {
-          errno = EIO;
+      if (do_close (inh_handles, newfd, true) < 0)
+        return -1;
+      /* We may need to duplicate the handle, so that a forthcoming do_close
+         action on oldfd has no effect on newfd.  */
+# if SPAWN_INTERNAL_OPTIMIZE_DUPLICATEHANDLE
+      /* But try to not do it now; delay it if possible.  In many cases, the
+         DuplicateHandle call can be optimized away.  */
+      if ((inh_handles->ih[oldfd].flags & DELAYED_DUP2_NEWFD) != 0)
+        if (do_delayed_dup2 (oldfd, inh_handles, curr_process) < 0)
           return -1;
+      if ((inh_handles->ih[oldfd].flags & DELAYED_DUP2_OLDFD) != 0)
+        {
+          /* Check invariants.  */
+          int dup2_newfd = inh_handles->ih[oldfd].linked_fd;
+          if (!((inh_handles->ih[dup2_newfd].flags & DELAYED_DUP2_NEWFD) != 0
+                && oldfd == inh_handles->ih[dup2_newfd].linked_fd
+                && inh_handles->ih[oldfd].handle == inh_handles->ih[dup2_newfd].handle))
+            abort ();
+          /* We can't delay two or more dup2 calls from the same oldfd.  */
+          if (!DuplicateHandle (curr_process, inh_handles->ih[oldfd].handle,
+                                curr_process, &inh_handles->ih[newfd].handle,
+                                0, TRUE, DUPLICATE_SAME_ACCESS))
+            {
+              errno = EBADF; /* arbitrary */
+              return -1;
+            }
+          inh_handles->ih[newfd].flags =
+            (unsigned char) inh_handles->ih[oldfd].flags | KEEP_OPEN_IN_CHILD;
         }
-      /* Duplicate the handle, so that it a forthcoming do_close action on oldfd
-         has no effect on newfd.  */
-      if (!DuplicateHandle (curr_process, inh_handles->handles[oldfd],
-                            curr_process, &inh_handles->handles[newfd],
+      else
+        {
+          /* Delay the dup2 (oldfd, newfd) action.  */
+          inh_handles->ih[oldfd].flags |= DELAYED_DUP2_OLDFD;
+          inh_handles->ih[oldfd].linked_fd = newfd;
+          inh_handles->ih[newfd].handle = inh_handles->ih[oldfd].handle;
+          inh_handles->ih[newfd].flags = DELAYED_DUP2_NEWFD;
+          inh_handles->ih[newfd].linked_fd = oldfd;
+        }
+# else
+      if (!DuplicateHandle (curr_process, inh_handles->ih[oldfd].handle,
+                            curr_process, &inh_handles->ih[newfd].handle,
                             0, TRUE, DUPLICATE_SAME_ACCESS))
         {
           errno = EBADF; /* arbitrary */
           return -1;
         }
-      inh_handles->flags[newfd] = 0;
+      inh_handles->ih[newfd].flags =
+        (unsigned char) inh_handles->ih[oldfd].flags | KEEP_OPEN_IN_CHILD;
+# endif
     }
-  return 0;
-}
-
-/* Executes a 'close' action.
-   Returns 0 upon success.  In case of failure, -1 is returned, with errno set.
- */
-static int
-do_close (struct inheritable_handles *inh_handles, int fd)
-{
-  if (!(fd >= 0 && fd < inh_handles->count
-        && inh_handles->handles[fd] != INVALID_HANDLE_VALUE))
-    {
-      errno = EBADF;
-      return -1;
-    }
-  if (!CloseHandle (inh_handles->handles[fd]))
-    {
-      errno = EIO;
-      return -1;
-    }
-  inh_handles->handles[fd] = INVALID_HANDLE_VALUE;
   return 0;
 }
 
@@ -536,7 +662,7 @@ __spawni (pid_t *pid, const char *prog_filename,
     envblock = NULL;
   else
     {
-      envblock = compose_envblock (envp);
+      envblock = compose_envblock (envp, NULL);
       if (envblock == NULL)
         {
           free (command);
@@ -562,9 +688,8 @@ __spawni (pid_t *pid, const char *prog_filename,
   if (file_actions != NULL)
     {
       HANDLE curr_process = GetCurrentProcess ();
-      int cnt;
 
-      for (cnt = 0; cnt < file_actions->_used; ++cnt)
+      for (int cnt = 0; cnt < file_actions->_used; ++cnt)
         {
           struct __spawn_action *action = &file_actions->_actions[cnt];
 
@@ -573,7 +698,7 @@ __spawni (pid_t *pid, const char *prog_filename,
             case spawn_do_close:
               {
                 int fd = action->action.close_action.fd;
-                if (do_close (&inh_handles, fd) < 0)
+                if (do_close (&inh_handles, fd, false) < 0)
                   goto failed_2;
               }
               break;
@@ -585,7 +710,7 @@ __spawni (pid_t *pid, const char *prog_filename,
                 int flags = action->action.open_action.oflag;
                 mode_t mode = action->action.open_action.mode;
                 if (do_open (&inh_handles, newfd, filename, directory,
-                             flags, mode, curr_process)
+                             flags, mode)
                     < 0)
                   goto failed_2;
               }
@@ -622,9 +747,16 @@ __spawni (pid_t *pid, const char *prog_filename,
               goto failed_2;
             }
         }
+
+# if SPAWN_INTERNAL_OPTIMIZE_DUPLICATEHANDLE
+      /* Do the remaining delayed dup2 invocations.  */
+      if (do_remaining_delayed_dup2 (&inh_handles, curr_process) < 0)
+        goto failed_2;
+# endif
     }
 
-  /* Reduce inh_handles.count to the minimum needed.  */
+  /* Close the handles in inh_handles that are not meant to be preserved in the
+     child process, and reduce inh_handles.count to the minimum needed.  */
   shrink_inheritable_handles (&inh_handles);
 
   /* CreateProcess
@@ -718,6 +850,13 @@ __spawni (pid_t *pid, const char *prog_filename,
 #else
 
 
+/* The warning "warning: 'vfork' is deprecated: Use posix_spawn or fork" seen
+   on macOS 12 is pointless, as we use vfork only when it is safe or when the
+   user has explicitly requested it.  Silence this warning.  */
+#if _GL_GNUC_PREREQ (4, 2)
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
 /* Spawn a new process executing PATH with the attributes describes in *ATTRP.
    Before running the process perform the actions described in FILE-ACTIONS. */
 int
@@ -726,11 +865,6 @@ __spawni (pid_t *pid, const char *file,
           const posix_spawnattr_t *attrp, const char *const argv[],
           const char *const envp[], int use_path)
 {
-  pid_t new_pid;
-  char *path, *p, *name;
-  size_t len;
-  size_t pathlen;
-
   /* Do this once.  */
   short int flags = attrp == NULL ? 0 : attrp->_flags;
 
@@ -738,13 +872,49 @@ __spawni (pid_t *pid, const char *file,
        "variable 'flags' might be clobbered by 'longjmp' or 'vfork'"  */
   (void) &flags;
 
+  use_path = use_path && strchr (file, '/') == NULL;
+
+  /* Prepare a stack-allocated copy of $PATH and FILE, for iterating through
+     $PATH.  We do this already in the parent, because on Linux/SPARC,
+     Linux/ppc64, Linux/ppc64le, and Solaris/SPARC, it causes a SIGBUS or
+     SIGSEGV when done in the child process after vfork() and when $PATH is long
+     (ca. 4 KB or so).  */
+  char *path;
+  char *name;
+  if (use_path)
+    {
+      /* We have to search for FILE on the path.  */
+      path = getenv ("PATH");
+      if (path == NULL)
+        {
+#if HAVE_CONFSTR
+          /* There is no 'PATH' in the environment.
+             The default search path is the current directory
+             followed by the path 'confstr' returns for '_CS_PATH'.  */
+          size_t len = confstr (_CS_PATH, (char *) NULL, 0);
+          path = (char *) alloca (1 + len);
+          path[0] = ':';
+          (void) confstr (_CS_PATH, path + 1, len);
+#else
+          /* Pretend that the PATH contains only the current directory.  */
+          path = "";
+#endif
+        }
+
+      size_t len = strlen (file) + 1;
+      size_t pathlen = strlen (path);
+      name = alloca (pathlen + len + 1);
+      /* Copy the file name at the top.  */
+      name = (char *) memcpy (name + pathlen + 1, file, len);
+      /* And add the slash.  */
+      *--name = '/';
+    }
+
   /* Generate the new process.  */
+  pid_t new_pid;
 #if HAVE_VFORK
   if ((flags & POSIX_SPAWN_USEVFORK) != 0
-      /* If no major work is done, allow using vfork.  Note that we
-         might perform the path searching.  But this would be done by
-         a call to execvp(), too, and such a call must be OK according
-         to POSIX.  */
+      /* If no major work is done, allow using vfork.  */
       || ((flags & (POSIX_SPAWN_SETSIGMASK | POSIX_SPAWN_SETSIGDEF
                     | POSIX_SPAWN_SETSCHEDPARAM | POSIX_SPAWN_SETSCHEDULER
                     | POSIX_SPAWN_SETPGROUP | POSIX_SPAWN_RESETIDS)) == 0
@@ -778,13 +948,12 @@ __spawni (pid_t *pid, const char *file,
          done better but it requires system specific solutions since
          the sigset_t data type can be very different on different
          architectures.  */
-      int sig;
       struct sigaction sa;
 
       memset (&sa, '\0', sizeof (sa));
       sa.sa_handler = SIG_DFL;
 
-      for (sig = 1; sig <= NSIG; ++sig)
+      for (int sig = 1; sig < NSIG; ++sig)
         if (sigismember (&attrp->_sd, sig) != 0
             && sigaction (sig, &sa, NULL) != 0)
           _exit (SPAWN_ERROR);
@@ -821,106 +990,76 @@ __spawni (pid_t *pid, const char *file,
 
   /* Execute the file actions.  */
   if (file_actions != NULL)
-    {
-      int cnt;
+    for (int cnt = 0; cnt < file_actions->_used; ++cnt)
+      {
+        struct __spawn_action *action = &file_actions->_actions[cnt];
 
-      for (cnt = 0; cnt < file_actions->_used; ++cnt)
-        {
-          struct __spawn_action *action = &file_actions->_actions[cnt];
+        switch (action->tag)
+          {
+          case spawn_do_close:
+            if (close_not_cancel (action->action.close_action.fd) != 0)
+              /* Signal the error.  */
+              _exit (SPAWN_ERROR);
+            break;
 
-          switch (action->tag)
+          case spawn_do_open:
             {
-            case spawn_do_close:
-              if (close_not_cancel (action->action.close_action.fd) != 0)
-                /* Signal the error.  */
+              int new_fd = open_not_cancel (action->action.open_action.path,
+                                            action->action.open_action.oflag
+                                            | O_LARGEFILE,
+                                            action->action.open_action.mode);
+
+              if (new_fd == -1)
+                /* The 'open' call failed.  */
                 _exit (SPAWN_ERROR);
-              break;
 
-            case spawn_do_open:
-              {
-                int new_fd = open_not_cancel (action->action.open_action.path,
-                                              action->action.open_action.oflag
-                                              | O_LARGEFILE,
-                                              action->action.open_action.mode);
+              /* Make sure the desired file descriptor is used.  */
+              if (new_fd != action->action.open_action.fd)
+                {
+                  if (dup2 (new_fd, action->action.open_action.fd)
+                      != action->action.open_action.fd)
+                    /* The 'dup2' call failed.  */
+                    _exit (SPAWN_ERROR);
 
-                if (new_fd == -1)
-                  /* The 'open' call failed.  */
-                  _exit (SPAWN_ERROR);
-
-                /* Make sure the desired file descriptor is used.  */
-                if (new_fd != action->action.open_action.fd)
-                  {
-                    if (dup2 (new_fd, action->action.open_action.fd)
-                        != action->action.open_action.fd)
-                      /* The 'dup2' call failed.  */
-                      _exit (SPAWN_ERROR);
-
-                    if (close_not_cancel (new_fd) != 0)
-                      /* The 'close' call failed.  */
-                      _exit (SPAWN_ERROR);
-                  }
-              }
-              break;
-
-            case spawn_do_dup2:
-              if (dup2 (action->action.dup2_action.fd,
-                        action->action.dup2_action.newfd)
-                  != action->action.dup2_action.newfd)
-                /* The 'dup2' call failed.  */
-                _exit (SPAWN_ERROR);
-              break;
-
-            case spawn_do_chdir:
-              if (chdir (action->action.chdir_action.path) < 0)
-                /* The 'chdir' call failed.  */
-                _exit (SPAWN_ERROR);
-              break;
-
-            case spawn_do_fchdir:
-              if (fchdir (action->action.fchdir_action.fd) < 0)
-                /* The 'fchdir' call failed.  */
-                _exit (SPAWN_ERROR);
-              break;
+                  if (close_not_cancel (new_fd) != 0)
+                    /* The 'close' call failed.  */
+                    _exit (SPAWN_ERROR);
+                }
             }
-        }
-    }
+            break;
 
-  if (! use_path || strchr (file, '/') != NULL)
+          case spawn_do_dup2:
+            if (dup2 (action->action.dup2_action.fd,
+                      action->action.dup2_action.newfd)
+                != action->action.dup2_action.newfd)
+              /* The 'dup2' call failed.  */
+              _exit (SPAWN_ERROR);
+            break;
+
+          case spawn_do_chdir:
+            if (chdir (action->action.chdir_action.path) < 0)
+              /* The 'chdir' call failed.  */
+              _exit (SPAWN_ERROR);
+            break;
+
+          case spawn_do_fchdir:
+            if (fchdir (action->action.fchdir_action.fd) < 0)
+              /* The 'fchdir' call failed.  */
+              _exit (SPAWN_ERROR);
+            break;
+          }
+      }
+
+  if (! use_path)
     {
-      /* The FILE parameter is actually a path.  */
+      /* No need to iterate through $PATH.  Use FILE directly.  */
       execve (file, (char * const *) argv, (char * const *) envp);
 
       /* Oh, oh.  'execve' returns.  This is bad.  */
       _exit (SPAWN_ERROR);
     }
 
-  /* We have to search for FILE on the path.  */
-  path = getenv ("PATH");
-  if (path == NULL)
-    {
-#if HAVE_CONFSTR
-      /* There is no 'PATH' in the environment.
-         The default search path is the current directory
-         followed by the path 'confstr' returns for '_CS_PATH'.  */
-      len = confstr (_CS_PATH, (char *) NULL, 0);
-      path = (char *) alloca (1 + len);
-      path[0] = ':';
-      (void) confstr (_CS_PATH, path + 1, len);
-#else
-      /* Pretend that the PATH contains only the current directory.  */
-      path = "";
-#endif
-    }
-
-  len = strlen (file) + 1;
-  pathlen = strlen (path);
-  name = alloca (pathlen + len + 1);
-  /* Copy the file name at the top.  */
-  name = (char *) memcpy (name + pathlen + 1, file, len);
-  /* And add the slash.  */
-  *--name = '/';
-
-  p = path;
+  char *p = path;
   do
     {
       char *startp;

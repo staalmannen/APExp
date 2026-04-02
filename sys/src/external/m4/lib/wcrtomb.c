@@ -1,18 +1,18 @@
 /* Convert wide character to multibyte character.
-   Copyright (C) 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -29,14 +29,14 @@ wcrtomb (char *s, wchar_t wc, mbstate_t *ps)
 #undef wcrtomb
 {
   /* This implementation of wcrtomb supports only stateless encodings.
-     ps must be in the initial state.  */
+     ps must be in an initial state.  */
   if (ps != NULL && !mbsinit (ps))
     {
       errno = EINVAL;
       return (size_t)(-1);
     }
 
-#if !HAVE_WCRTOMB                       /* IRIX 6.5 */ \
+#if !HAVE_WCRTOMB                       /* HP-UX 11.00, mingw */ \
     || WCRTOMB_RETVAL_BUG               /* Solaris 11.3, MSVC */ \
     || WCRTOMB_C_LOCALE_BUG             /* Android */
   if (s == NULL)
@@ -62,7 +62,7 @@ wcrtomb (char *s, wchar_t wc, mbstate_t *ps)
 # else
       return wcrtomb (s, wc, ps);
 # endif
-#else                                   /* IRIX 6.5 */
+#else                                   /* HP-UX 11.00, mingw */
       /* Fallback for platforms that don't have wcrtomb().
          Implement on top of wctomb().
          This code is not multithread-safe.  */

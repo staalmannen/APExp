@@ -1,9 +1,9 @@
 /* Test of ftello() function.
-   Copyright (C) 2011-2021 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -33,11 +33,13 @@ main (int argc, char **argv)
   {
     FILE *fp = fopen (filename, "r");
     ASSERT (fp != NULL);
+    #if !defined __ANDROID__ /* fdsan */
     setvbuf (fp, NULL, _IONBF, 0);
     ASSERT (close (fileno (fp)) == 0);
     errno = 0;
     ASSERT (ftello (fp) == (off_t)-1);
     ASSERT (errno == EBADF);
+    #endif
     fclose (fp);
   }
 
@@ -66,5 +68,5 @@ main (int argc, char **argv)
       }
   }
 
-  return 0;
+  return test_exit_status;
 }

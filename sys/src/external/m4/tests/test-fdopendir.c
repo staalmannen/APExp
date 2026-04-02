@@ -1,9 +1,9 @@
 /* Test opening a directory stream from a file descriptor.
-   Copyright (C) 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -30,7 +30,7 @@ SIGNATURE_CHECK (fdopendir, DIR *, (int));
 #include "macros.h"
 
 int
-main (int argc _GL_UNUSED, char *argv[])
+main ()
 {
   DIR *d;
   int fd;
@@ -56,6 +56,13 @@ main (int argc _GL_UNUSED, char *argv[])
     ASSERT (fdopendir (99) == NULL);
     ASSERT (errno == EBADF);
   }
+#ifdef AT_FDCWD
+  {
+    errno = 0;
+    ASSERT (fdopendir (AT_FDCWD) == NULL);
+    ASSERT (errno == EBADF);
+  }
+#endif
 
   /* This should work.  */
   fd = open (".", O_RDONLY);
@@ -76,5 +83,5 @@ main (int argc _GL_UNUSED, char *argv[])
   ASSERT (dup2 (fd, fd) == -1);
   ASSERT (errno == EBADF);
 
-  return 0;
+  return test_exit_status;
 }

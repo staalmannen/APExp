@@ -10,7 +10,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: m4 1.4.18d\n"
 "Report-Msgid-Bugs-To: bug-m4@gnu.org\n"
-"POT-Creation-Date: 2021-05-28 13:49-0500\n"
+"POT-Creation-Date: 2026-02-06 13:55-0600\n"
 "PO-Revision-Date: 2021-05-13 15:07-0400\n"
 "Last-Translator: Boyuan Yang <073plan@gmail.com>\n"
 "Language-Team: Chinese (simplified) <i18n-zh@googlegroups.com>\n"
@@ -21,88 +21,88 @@ msgstr ""
 "X-Bugs: Report translation errors to the Language-Team address.\n"
 "X-Generator: Poedit 2.4.2\n"
 
-#: lib/clean-temp.c:235
+#: lib/clean-temp.c:230
 #, c-format
 msgid "cannot find a temporary directory, try setting $TMPDIR"
 msgstr "无法找到临时目录，尝试设置 $TMPDIR"
 
-#: lib/clean-temp.c:250
+#: lib/clean-temp.c:245
 #, c-format
 msgid "cannot create a temporary directory using template \"%s\""
 msgstr "无法使用模板“%s”创建临时目录"
 
-#: lib/clean-temp.c:371
+#: lib/clean-temp.c:364
 #, c-format
 msgid "cannot remove temporary directory %s"
 msgstr "无法移除临时目录 %s"
 
-#: lib/closein.c:100
+#: lib/closein.c:99
 msgid "error closing file"
 msgstr "关闭文件出错"
 
-#: lib/closeout.c:122
+#: lib/closeout.c:121
 msgid "write error"
 msgstr "写错误"
 
-#: lib/c-stack.c:187
+#: lib/c-stack.c:190
 msgid "program error"
 msgstr "程序错误"
 
-#: lib/c-stack.c:188
+#: lib/c-stack.c:191
 msgid "stack overflow"
 msgstr "栈溢出"
 
-#: lib/clean-temp-simple.c:297
+#: lib/clean-temp-simple.c:266
 #, c-format
 msgid "cannot remove temporary file %s"
 msgstr "无法移除临时文件 %s"
 
-#: lib/error.c:195
+#: lib/error.c:208
 msgid "Unknown system error"
 msgstr "未知的系统错误"
 
-#: lib/execute.c:348 lib/spawn-pipe.c:597 lib/wait-process.c:291
-#: lib/wait-process.c:365
+#: lib/execute.c:378 lib/spawn-pipe.c:597 lib/wait-process.c:325
+#: lib/wait-process.c:396
 #, c-format
 msgid "%s subprocess failed"
 msgstr "%s 子进程失败"
 
-#: lib/getopt.c:278
+#: lib/getopt.c:283
 #, c-format
 msgid "%s: option '%s%s' is ambiguous\n"
 msgstr "%s：选项“%s%s”有歧义\n"
 
-#: lib/getopt.c:284
+#: lib/getopt.c:289
 #, c-format
 msgid "%s: option '%s%s' is ambiguous; possibilities:"
 msgstr "%s：选项“%s%s”有歧义；可能原因："
 
-#: lib/getopt.c:319
+#: lib/getopt.c:323
 #, c-format
 msgid "%s: unrecognized option '%s%s'\n"
 msgstr "%s：无法识别的选项“%s%s”\n"
 
-#: lib/getopt.c:345
+#: lib/getopt.c:349
 #, c-format
 msgid "%s: option '%s%s' doesn't allow an argument\n"
 msgstr "%s：选项“%s%s”不允许带参数\n"
 
-#: lib/getopt.c:360
+#: lib/getopt.c:364
 #, c-format
 msgid "%s: option '%s%s' requires an argument\n"
 msgstr "%s：选项“%s%s”需要一个参数\n"
 
-#: lib/getopt.c:621
+#: lib/getopt.c:624
 #, c-format
 msgid "%s: invalid option -- '%c'\n"
 msgstr "%s：无效选项 -- “%c”\n"
 
-#: lib/getopt.c:636 lib/getopt.c:682
+#: lib/getopt.c:639 lib/getopt.c:685
 #, c-format
 msgid "%s: option requires an argument -- '%c'\n"
 msgstr "%s：选项需要一个参数 -- “%c”\n"
 
-#: lib/obstack.c:338 lib/obstack.c:340 lib/xalloc-die.c:34
+#: lib/obstack.c:351 lib/obstack.c:353 lib/xalloc-die.c:34
 msgid "memory exhausted"
 msgstr "内存耗尽"
 
@@ -116,12 +116,12 @@ msgstr "无法记录当前工作目录"
 msgid "failed to return to initial working directory"
 msgstr "无法返回起始工作目录"
 
-#: lib/os2-spawn.c:46
+#: lib/os2-spawn.c:51
 #, c-format
 msgid "_open_osfhandle failed"
 msgstr "_open_osfhandle 失败"
 
-#: lib/os2-spawn.c:83
+#: lib/os2-spawn.c:88
 #, c-format
 msgid "cannot restore fd %d: dup2 failed"
 msgstr "无法恢复文件描述符 %d：dup2 失败"
@@ -147,83 +147,83 @@ msgstr "无法恢复文件描述符 %d：dup2 失败"
 #. If you don't know what to put here, please see
 #. <https://en.wikipedia.org/wiki/Quotation_marks_in_other_languages>
 #. and use glyphs suitable for your language.
-#: lib/quotearg.c:355
+#: lib/quotearg.c:357
 msgid "`"
 msgstr "‘"
 
-#: lib/quotearg.c:356
+#: lib/quotearg.c:358
 msgid "'"
 msgstr "’"
 
-#: lib/regcomp.c:135
+#: lib/regcomp.c:122
 msgid "Success"
 msgstr "成功"
 
-#: lib/regcomp.c:138
+#: lib/regcomp.c:125
 msgid "No match"
 msgstr "无匹配"
 
-#: lib/regcomp.c:141
+#: lib/regcomp.c:128
 msgid "Invalid regular expression"
 msgstr "无效的正规表达式"
 
-#: lib/regcomp.c:144
+#: lib/regcomp.c:131
 msgid "Invalid collation character"
 msgstr "无效的 collation 字符"
 
-#: lib/regcomp.c:147
+#: lib/regcomp.c:134
 msgid "Invalid character class name"
 msgstr "无效的字符类名"
 
-#: lib/regcomp.c:150
+#: lib/regcomp.c:137
 msgid "Trailing backslash"
 msgstr "末尾的反斜线"
 
-#: lib/regcomp.c:153
+#: lib/regcomp.c:140
 msgid "Invalid back reference"
 msgstr "无效的向后引用"
 
-#: lib/regcomp.c:156
+#: lib/regcomp.c:143
 msgid "Unmatched [, [^, [:, [., or [="
 msgstr "[, [^, [:, [.或[= 不匹配"
 
-#: lib/regcomp.c:159
+#: lib/regcomp.c:146
 msgid "Unmatched ( or \\("
 msgstr "不匹配的 ( 或 \\("
 
-#: lib/regcomp.c:162
+#: lib/regcomp.c:149
 msgid "Unmatched \\{"
 msgstr "不匹配的 \\{"
 
-#: lib/regcomp.c:165
+#: lib/regcomp.c:152
 msgid "Invalid content of \\{\\}"
 msgstr "\\{\\} 的内容无效"
 
-#: lib/regcomp.c:168
+#: lib/regcomp.c:155
 msgid "Invalid range end"
 msgstr "无效的范围结束"
 
-#: lib/regcomp.c:171
+#: lib/regcomp.c:158
 msgid "Memory exhausted"
 msgstr "内存耗尽"
 
-#: lib/regcomp.c:174
+#: lib/regcomp.c:161
 msgid "Invalid preceding regular expression"
 msgstr "无效的前置正规表达式"
 
-#: lib/regcomp.c:177
+#: lib/regcomp.c:164
 msgid "Premature end of regular expression"
 msgstr "不完整的正规表达式"
 
-#: lib/regcomp.c:180
+#: lib/regcomp.c:167
 msgid "Regular expression too big"
 msgstr "正规表达式过大"
 
-#: lib/regcomp.c:183
+#: lib/regcomp.c:170
 msgid "Unmatched ) or \\)"
 msgstr "不匹配的 ) 或 \\)"
 
-#: lib/regcomp.c:676
+#: lib/regcomp.c:650
 msgid "No previous regular expression"
 msgstr "没有上一个正规表达式"
 
@@ -363,8 +363,7 @@ msgstr "电源失效"
 msgid "Resource lost"
 msgstr "资源丢失"
 
-#: lib/spawn-pipe.c:217 lib/spawn-pipe.c:220 lib/spawn-pipe.c:459
-#: lib/spawn-pipe.c:462
+#: lib/spawn-pipe.c:218 lib/spawn-pipe.c:221
 #, c-format
 msgid "cannot create pipe"
 msgstr "无法创建管道"
@@ -378,11 +377,6 @@ msgstr "实时信号 %d"
 #, c-format
 msgid "Unknown signal %d"
 msgstr "未知信号 %d"
-
-#: lib/verror.c:76
-#, c-format
-msgid "unable to display error message"
-msgstr "无法显示错误信息"
 
 #: lib/version-etc.c:73
 #, c-format
@@ -525,37 +519,37 @@ msgstr ""
 #. for this package.  Please add _another line_ saying
 #. "Report translation bugs to <...>\n" with the address for translation
 #. bugs (typically your translation team's web or email address).
-#: lib/version-etc.c:249
+#: lib/version-etc.c:248
 #, c-format
 msgid "Report bugs to: %s\n"
 msgstr "请将错误报告给：%s。翻译问题请报告至 <i18n-zh@googlegroups.com>。\n"
 
-#: lib/version-etc.c:251
+#: lib/version-etc.c:250
 #, c-format
 msgid "Report %s bugs to: %s\n"
 msgstr "请将 %s 错误报告给: %s\n"
 
-#: lib/version-etc.c:255 lib/version-etc.c:257
+#: lib/version-etc.c:254 lib/version-etc.c:256
 #, c-format
 msgid "%s home page: <%s>\n"
 msgstr "%s 主页: <%s>\n"
 
-#: lib/version-etc.c:260
+#: lib/version-etc.c:259
 #, c-format
 msgid "General help using GNU software: <%s>\n"
 msgstr "GNU 软件的通用帮助: <%s>\n"
 
-#: lib/wait-process.c:232 lib/wait-process.c:264 lib/wait-process.c:326
+#: lib/wait-process.c:266 lib/wait-process.c:298 lib/wait-process.c:357
 #, c-format
 msgid "%s subprocess"
 msgstr "%s 子进程"
 
-#: lib/wait-process.c:283 lib/wait-process.c:355
+#: lib/wait-process.c:317 lib/wait-process.c:386
 #, c-format
 msgid "%s subprocess got fatal signal %d"
 msgstr "%s 子进程收到了致命信号 %d"
 
-#: lib/xprintf.c:50 lib/xprintf.c:76
+#: lib/xprintf.c:47 lib/xprintf.c:68
 #, c-format
 msgid "cannot perform formatted output"
 msgstr "无法进行格式化输出"
@@ -565,154 +559,159 @@ msgstr "无法进行格式化输出"
 msgid "--warn-macro-sequence: bad regular expression `%s': %s"
 msgstr "--warn-macro-sequence：错误的正规表达式“%s”：%s"
 
-#: src/builtin.c:320
+#: src/builtin.c:298
+#, c-format
+msgid "truncating macro `%s' definition to INT_MAX bytes"
+msgstr ""
+
+#: src/builtin.c:333
 #, c-format
 msgid "Warning: definition of `%s' contains sequence `%s'"
 msgstr "警告：“%s”的定义包含序列“%s”"
 
-#: src/builtin.c:327
+#: src/builtin.c:340
 #, c-format
 msgid "error checking --warn-macro-sequence for macro `%s'"
 msgstr "为宏“%s”检查 --warn-macro-sequence 时出错"
 
-#: src/builtin.c:388
+#: src/builtin.c:401
 #, c-format
 msgid "Warning: too few arguments to builtin `%s'"
 msgstr "警告：内置宏“%s”的参数不足"
 
-#: src/builtin.c:394
+#: src/builtin.c:407
 #, c-format
 msgid "Warning: excess arguments to builtin `%s' ignored"
 msgstr "警告：忽略内置宏“%s”的额外参数"
 
-#: src/builtin.c:415 src/builtin.c:1114
+#: src/builtin.c:428 src/builtin.c:1155
 #, fuzzy, c-format
 msgid "empty string treated as 0 in builtin `%s'"
 msgstr "内置宏“%s”的非数值参数"
 
-#: src/builtin.c:425 src/builtin.c:1243
+#: src/builtin.c:438 src/builtin.c:1285
 #, fuzzy, c-format
 msgid "non-numeric argument to builtin `%s'"
 msgstr "内置宏“%s”的非数值参数"
 
-#: src/builtin.c:431
+#: src/builtin.c:444
 #, c-format
 msgid "leading whitespace ignored in builtin `%s'"
 msgstr "在内置“%s”中忽略行首空白符号"
 
-#: src/builtin.c:435
+#: src/builtin.c:448
 #, c-format
 msgid "numeric overflow detected in builtin `%s'"
 msgstr "在内置“%s”中探测到数值溢出"
 
-#: src/builtin.c:552 src/builtin.c:815 src/builtin.c:856
+#: src/builtin.c:566 src/builtin.c:829 src/builtin.c:870
 #, c-format
 msgid "Warning: %s: invalid macro name ignored"
 msgstr "警告：%s：忽略无效的宏名称"
 
-#: src/builtin.c:752 src/builtin.c:864
+#: src/builtin.c:765 src/builtin.c:877
 #, c-format
 msgid "undefined macro `%s'"
 msgstr "未定义的宏“%s”"
 
-#: src/builtin.c:823
+#: src/builtin.c:836
 #, c-format
 msgid "undefined builtin `%s'"
 msgstr "未定义的内置“%s”"
 
-#: src/builtin.c:914 src/builtin.c:2208
+#: src/builtin.c:928 src/builtin.c:2260
 #, fuzzy, c-format
 msgid "builtin `%s' requested by frozen file is not supported"
 msgstr "%s: 不支持嵌套条件"
 
-#: src/builtin.c:918
+#: src/builtin.c:932
 #, c-format
 msgid "Warning: cannot concatenate builtin `%s'"
 msgstr "警告：无法连接内置“%s”"
 
-#: src/builtin.c:978 src/builtin.c:1015 src/builtin.c:1028 src/builtin.c:1063
+#: src/builtin.c:1003 src/builtin.c:1053 src/builtin.c:1066 src/builtin.c:1101
 #, c-format
 msgid "cannot run command `%s'"
 msgstr "无法运行命令“%s”"
 
-#: src/builtin.c:1051
+#: src/builtin.c:1089
 msgid "cannot read pipe"
 msgstr "无法读取管道"
 
-#: src/builtin.c:1098
+#: src/builtin.c:1140
 #, c-format
 msgid "radix %d in builtin `%s' out of range"
 msgstr ""
 
-#: src/builtin.c:1108
+#: src/builtin.c:1149
 #, c-format
 msgid "negative width to builtin `%s'"
 msgstr "内置“%s”的负宽度"
 
-#: src/builtin.c:1252
+#: src/builtin.c:1294
 #, fuzzy, c-format
 msgid "error undiverting `%s'"
 msgstr "无法反转换 %s"
 
-#: src/builtin.c:1256
+#: src/builtin.c:1298
 #, fuzzy, c-format
 msgid "cannot undivert `%s'"
 msgstr "无法反转换 %s"
 
-#: src/builtin.c:1366 src/freeze.c:115 src/m4.c:379
+#: src/builtin.c:1408 src/freeze.c:115 src/m4.c:382
 #, c-format
 msgid "cannot open `%s'"
 msgstr "无法打开“%s”"
 
-#: src/builtin.c:1429
+#: src/builtin.c:1471
 #, c-format
 msgid "%s: cannot create tempfile `%s'"
 msgstr "%s：无法创建临时文件“%s”"
 
-#: src/builtin.c:1464
+#: src/builtin.c:1507
 msgid "recommend using mkstemp instead"
 msgstr "推荐使用 mkstemp 作为替代"
 
-#: src/builtin.c:1557
+#: src/builtin.c:1600
 #, c-format
 msgid "exit status out of range: `%d'"
 msgstr "退出状态码超出范围：“%d”"
 
-#: src/builtin.c:1681
+#: src/builtin.c:1726
 #, c-format
 msgid "Debugmode: bad debug flags: `%s'"
 msgstr "调试模式：错误的调试标志：“%s”"
 
-#: src/builtin.c:1722 src/m4.c:625 src/m4.c:689
+#: src/builtin.c:1767 src/m4.c:633 src/m4.c:700
 #, c-format
 msgid "cannot set debug file `%s'"
 msgstr "无法设置调试文件“%s”"
 
-#: src/builtin.c:1988
+#: src/builtin.c:2034
 #, fuzzy
 msgid "Warning: \\0 will disappear, use \\& instead in replacements"
 msgstr "警告：\\\\0 将消失，用 \\\\& 作为替代"
 
-#: src/builtin.c:2004
+#: src/builtin.c:2057
 #, c-format
 msgid "Warning: sub-expression %d not present"
 msgstr ""
 
-#: src/builtin.c:2013
+#: src/builtin.c:2066
 msgid "Warning: trailing \\ ignored in replacement"
 msgstr ""
 
-#: src/builtin.c:2079
+#: src/builtin.c:2132
 #, c-format
 msgid "bad regular expression: `%s': %s"
 msgstr "错误的正规表达式“%s”：%s"
 
-#: src/builtin.c:2091 src/builtin.c:2161
+#: src/builtin.c:2144 src/builtin.c:2214
 #, c-format
 msgid "error matching regular expression `%s'"
 msgstr "匹配正规表达式“%s”出错"
 
-#: src/builtin.c:2139 src/input.c:792
+#: src/builtin.c:2192 src/input.c:795
 #, c-format
 msgid "bad regular expression `%s': %s"
 msgstr "错误的正规表达式“%s”：%s"
@@ -721,117 +720,122 @@ msgstr "错误的正规表达式“%s”：%s"
 msgid "error writing to debug stream"
 msgstr "写入调试流出错"
 
-#: src/eval.c:318
+#: src/eval.c:485
+msgid "Warning: recommend ==, not =, for equality operator"
+msgstr "警告：推荐使用 == 而不是 = 作为相等操作符"
+
+#: src/eval.c:569
 #, fuzzy, c-format
 msgid "bad expression in eval (missing right parenthesis): %s"
 msgstr "求值错误的表达式 (缺少右括号)：%s"
 
-#: src/eval.c:324
+#: src/eval.c:574
 #, c-format
 msgid "bad expression in eval: %s"
 msgstr "求值中出现错误的表达式：%s"
 
-#: src/eval.c:329
+#: src/eval.c:579
 #, fuzzy, c-format
 msgid "bad expression in eval (bad input): %s"
 msgstr "求值错误的表达式 (错误的输入)：%s"
 
-#: src/eval.c:334
+#: src/eval.c:584
 #, fuzzy, c-format
 msgid "bad expression in eval (excess input): %s"
 msgstr "求值错误的表达式 (过多的输入)：%s"
 
-#: src/eval.c:339
+#: src/eval.c:588
+#, fuzzy, c-format
+msgid "invalid number in eval: %s"
+msgstr "求值中出现无效操作符：%s"
+
+#: src/eval.c:592
 #, c-format
 msgid "invalid operator in eval: %s"
 msgstr "求值中出现无效操作符：%s"
 
-#: src/eval.c:345
+#: src/eval.c:597
 #, c-format
 msgid "divide by zero in eval: %s"
 msgstr "求值中出现除以零：%s"
 
-#: src/eval.c:350
+#: src/eval.c:601
 #, fuzzy, c-format
 msgid "modulo by zero in eval: %s"
 msgstr "求值中按零取模：%s"
 
-#: src/eval.c:355
+#: src/eval.c:605
 #, fuzzy, c-format
 msgid "negative exponent in eval: %s"
 msgstr "求值错误的表达式：%s"
 
-#: src/eval.c:538
-msgid "Warning: recommend ==, not =, for equality operator"
-msgstr "警告：推荐使用 == 而不是 = 作为相等操作符"
-
-#: src/format.c:40 src/format.c:64 src/format.c:88
+#: src/format.c:39 src/format.c:63 src/format.c:87
 msgid "empty string treated as 0"
 msgstr ""
 
-#: src/format.c:46 src/format.c:70 src/format.c:94
+#: src/format.c:45 src/format.c:69 src/format.c:93
 #, fuzzy, c-format
 msgid "non-numeric argument %s"
 msgstr "%s 的非数值参数"
 
-#: src/format.c:48 src/format.c:72 src/format.c:96
+#: src/format.c:47 src/format.c:71 src/format.c:95
 msgid "leading whitespace ignored"
 msgstr "已忽略行首空白字符"
 
-#: src/format.c:50 src/format.c:74 src/format.c:98
+#: src/format.c:49 src/format.c:73 src/format.c:97
 msgid "numeric overflow detected"
 msgstr "探测到数值溢出"
 
-#: src/format.c:308
+#: src/format.c:309
 #, c-format
 msgid "Warning: unrecognized specifier in `%s'"
 msgstr "警告：“%s”中无法识别的说明符"
 
-#: src/freeze.c:156
+#: src/freeze.c:157
 #, fuzzy
 msgid "unable to create frozen state"
 msgstr "无法在服务器上创建进程"
 
-#: src/freeze.c:167
+#: src/freeze.c:168
 #, fuzzy
 msgid "expecting line feed in frozen file"
 msgstr "在冻结文件中应为换行符"
 
-#: src/freeze.c:169
+#: src/freeze.c:170
 #, fuzzy, c-format
 msgid "expecting character `%c' in frozen file"
 msgstr "在冻结文件中应为字符“%c”"
 
-#: src/freeze.c:215
+#: src/freeze.c:216
 #, fuzzy
 msgid "integer overflow in frozen file"
 msgstr "整数溢出"
 
-#: src/freeze.c:257
+#: src/freeze.c:258
 #, fuzzy
 msgid "premature end of frozen file"
 msgstr "不完整的冻结文件"
 
-#: src/freeze.c:270
+#: src/freeze.c:271
 #, c-format
 msgid "cannot open %s"
 msgstr "无法打开 %s"
 
-#: src/freeze.c:285
+#: src/freeze.c:286
 #, c-format
 msgid "frozen file version %d greater than max supported of 1"
 msgstr ""
 
-#: src/freeze.c:288
+#: src/freeze.c:289
 msgid "ill-formed frozen file, version directive expected"
 msgstr ""
 
-#: src/freeze.c:297
+#: src/freeze.c:298
 #, fuzzy
 msgid "ill-formed frozen file"
 msgstr "冻结文件的格式错误"
 
-#: src/freeze.c:385
+#: src/freeze.c:387
 #, fuzzy
 msgid "unable to read frozen state"
 msgstr "无法释放参数"
@@ -844,15 +848,15 @@ msgstr "写错误"
 msgid "error reading file"
 msgstr "读取文件出错"
 
-#: src/input.c:589
+#: src/input.c:590
 msgid "Warning: end of file treated as newline"
 msgstr "警告：EOF 视为新行"
 
-#: src/input.c:881
+#: src/input.c:899
 msgid "ERROR: end of file in comment"
 msgstr "错误：注释中的 EOF"
 
-#: src/input.c:1001
+#: src/input.c:1023
 msgid "ERROR: end of file in string"
 msgstr "错误：字符串中的 EOF"
 
@@ -940,7 +944,7 @@ msgid ""
 "Limits control:\n"
 "  -g, --gnu                    override -G to re-enable GNU extensions\n"
 "  -G, --traditional            suppress all GNU extensions\n"
-"  -H, --hashsize=PRIME         set symbol lookup hash table size [509]\n"
+"  -H, --hashsize=PRIME         set symbol lookup hash table size [%d]\n"
 "  -L, --nesting-limit=NUMBER   change nesting limit, 0 for unlimited [%d]\n"
 msgstr ""
 "\n"
@@ -1010,86 +1014,95 @@ msgid ""
 "mismatch, or whatever value was passed to the m4exit macro.\n"
 msgstr ""
 
-#: src/m4.c:436
+#: src/m4.c:443
 #, c-format
 msgid "internal error detected; please report this bug to <%s>"
 msgstr "探测到内部错误：请将本问题报告至 <%s>"
 
-#: src/m4.c:489
+#: src/m4.c:497
 #, c-format
 msgid "warning: `m4 -%c' may be removed in a future release"
 msgstr "警告：“m4 -%c”可能在未来的版本中移除"
 
-#: src/m4.c:496
+#: src/m4.c:504
 #, c-format
 msgid "warning: `m4 %s' is deprecated"
 msgstr "警告：“m4 %s”已弃用"
 
-#: src/m4.c:572
+#: src/m4.c:580
 #, c-format
 msgid "bad debug flags: `%s'"
 msgstr "错误的调试标志：“%s”"
 
-#: src/m4.c:578
+#: src/m4.c:586
 #, c-format
 msgid "warning: `m4 -e' is deprecated, use `-i' instead"
 msgstr "警告：“m4 -e”已弃用，请使用“-i”作为替代"
 
-#: src/m4.c:690
+#: src/m4.c:701
 msgid "stderr"
 msgstr ""
 
-#: src/macro.c:196
+#: src/macro.c:178 src/macro.c:225
+#, fuzzy
+msgid "Warning: cannot concatenate builtin tokens"
+msgstr "警告：无法连接内置“%s”"
+
+#: src/macro.c:205
 msgid "ERROR: end of file in argument list"
 msgstr "错误：参数列表中出现 EOF"
 
-#: src/macro.c:332
+#: src/macro.c:348
 #, fuzzy, c-format
 msgid "recursion limit of %d exceeded, use -L<N> to change it"
 msgstr "错误：超出递归上限 %d，使用 -L<N> 以改变此上限"
 
-#: src/output.c:172 src/output.c:898 src/output.c:901
+#: src/output.c:178 src/output.c:933 src/output.c:936
 #, fuzzy
 msgid "cannot clean temporary file for diversion"
 msgstr "错误：无法为转换创建临时文件"
 
-#: src/output.c:222 src/output.c:231 src/output.c:265 src/output.c:360
+#: src/output.c:230 src/output.c:239 src/output.c:273 src/output.c:370
 #, fuzzy
 msgid "cannot create temporary file for diversion"
 msgstr "错误：无法为转换创建临时文件"
 
-#: src/output.c:250 src/output.c:257 src/output.c:269
+#: src/output.c:258 src/output.c:265 src/output.c:277
 #, fuzzy
 msgid "cannot seek within diversion"
 msgstr "无法获取转换的状态"
 
-#: src/output.c:341 src/output.c:353 src/output.c:502 src/output.c:733
+#: src/output.c:350 src/output.c:363 src/output.c:512 src/output.c:768
 #, fuzzy
 msgid "cannot close temporary file for diversion"
 msgstr "错误：无法为转换创建临时文件"
 
-#: src/output.c:474
+#: src/output.c:484
 #, fuzzy
 msgid "ERROR: cannot flush diversion to temporary file"
 msgstr "错误：无法将转换刷新到临时文件"
 
-#: src/output.c:568
+#: src/output.c:579
 msgid "ERROR: copying inserted file"
 msgstr "错误：复制已插入的文件"
 
-#: src/output.c:816
+#: src/output.c:851
 msgid "error reading inserted file"
 msgstr "读取已插入的文件出错"
 
-#: src/output.c:983
+#: src/output.c:1018
 #, fuzzy
 msgid "cannot stat diversion"
 msgstr "无法获取转换的状态"
 
-#: src/output.c:987
+#: src/output.c:1022
 #, fuzzy
 msgid "diversion too large"
 msgstr "转换过大"
+
+#, c-format
+#~ msgid "unable to display error message"
+#~ msgstr "无法显示错误信息"
 
 #~ msgid "%s: option `%s' is ambiguous\n"
 #~ msgstr "%s：选项“%s”有二义性\n"

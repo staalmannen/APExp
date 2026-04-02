@@ -1,12 +1,14 @@
-# getcwd.m4 - check for working getcwd that is compatible with glibc
-
-# Copyright (C) 2001, 2003-2007, 2009-2021 Free Software Foundation, Inc.
-# This file is free software; the Free Software Foundation
-# gives unlimited permission to copy and/or distribute it,
-# with or without modifications, as long as this notice is preserved.
+# getcwd.m4
+# serial 22
+dnl Copyright (C) 2001, 2003-2007, 2009-2026 Free Software Foundation, Inc.
+dnl This file is free software; the Free Software Foundation
+dnl gives unlimited permission to copy and/or distribute it,
+dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 # Written by Paul Eggert.
-# serial 19
+
+# Check for working getcwd that is compatible with glibc
 
 AC_DEFUN([gl_FUNC_GETCWD_NULL],
   [
@@ -21,11 +23,8 @@ AC_DEFUN([gl_FUNC_GETCWD_NULL],
 #        else /* on Windows with MSVC */
 #         include <direct.h>
 #        endif
-         ]GL_MDA_DEFINES[
-#        ifndef getcwd
-         char *getcwd ();
-#        endif
-]], [[
+         ]GL_MDA_DEFINES],
+         [[
 #if defined _WIN32 && ! defined __CYGWIN__
 /* mingw cwd does not start with '/', but _getcwd does allocate.
    However, mingw fails to honor non-zero size.  */
@@ -53,6 +52,8 @@ AC_DEFUN([gl_FUNC_GETCWD_NULL],
             *-gnu* | gnu*) gl_cv_func_getcwd_null="guessing yes";;
                            # Guess yes on musl systems.
             *-musl*)       gl_cv_func_getcwd_null="guessing yes";;
+                           # Guess yes on systems that emulate the Linux system calls.
+            midipix*)      gl_cv_func_getcwd_null="guessing yes";;
                            # Guess yes on Cygwin.
             cygwin*)       gl_cv_func_getcwd_null="guessing yes";;
                            # If we don't know, obey --enable-cross-guesses.
@@ -114,7 +115,7 @@ AC_DEFUN([gl_FUNC_GETCWD],
 
   gl_abort_bug=no
   case "$host_os" in
-    mingw*)
+    mingw* | windows*)
       gl_cv_func_getcwd_path_max=yes
       ;;
     *)

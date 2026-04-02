@@ -1,18 +1,18 @@
 /* Spin locks for communication between threads and signal handlers.
-   Copyright (C) 2020-2021 Free Software Foundation, Inc.
+   Copyright (C) 2020-2026 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
-   any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2020.  */
 
@@ -28,9 +28,9 @@
    both in regular multithreaded code and in signal handlers:
 
        sigset_t saved_mask;
-       asyncsafe_spin_lock (&lock, &mask, &saved_mask);
+       asyncsafe_spin_lock (&lock, from_signal_handler, &mask, &saved_mask);
        do_something_contentious ();
-       asyncsafe_spin_unlock (&lock, &saved_mask);
+       asyncsafe_spin_unlock (&lock, from_signal_handler, &saved_mask);
 
    The mask you specify here is the set of signals whose handlers might want to
    take the same lock.
@@ -42,14 +42,10 @@
 
 #include <signal.h>
 
-#if defined _WIN32 && ! defined __CYGWIN__
-# include "windows-spin.h"
-typedef glwthread_spinlock_t asyncsafe_spinlock_t;
-# define ASYNCSAFE_SPIN_INIT GLWTHREAD_SPIN_INIT
-#else
-typedef unsigned int asyncsafe_spinlock_t;
-# define ASYNCSAFE_SPIN_INIT 0
-#endif
+#include "glthread/spin.h"
+
+typedef gl_spinlock_t asyncsafe_spinlock_t;
+#define ASYNCSAFE_SPIN_INIT gl_spinlock_initializer
 
 #ifdef __cplusplus
 extern "C" {
@@ -57,8 +53,10 @@ extern "C" {
 
 extern void asyncsafe_spin_init (asyncsafe_spinlock_t *lock);
 extern void asyncsafe_spin_lock (asyncsafe_spinlock_t *lock,
+                                 bool from_signal_handler,
                                  const sigset_t *mask, sigset_t *saved_mask);
 extern void asyncsafe_spin_unlock (asyncsafe_spinlock_t *lock,
+                                   bool from_signal_handler,
                                    const sigset_t *saved_mask);
 extern void asyncsafe_spin_destroy (asyncsafe_spinlock_t *lock);
 

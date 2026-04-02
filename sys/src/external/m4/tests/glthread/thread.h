@@ -1,18 +1,18 @@
 /* Creating and controlling threads.
-   Copyright (C) 2005-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005-2026 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
-   any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2005.
    Based on GCC's gthr-posix.h, gthr-posix95.h, gthr-win32.h.  */
@@ -70,25 +70,24 @@
 #ifndef _GLTHREAD_THREAD_H
 #define _GLTHREAD_THREAD_H
 
+/* This file uses _Noreturn, HAVE_THREADS_H, HAVE_PTHREAD_ATFORK.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
+
 #include <errno.h>
 #include <stdlib.h>
 
 #if !defined c11_threads_in_use
-# if HAVE_THREADS_H && USE_POSIX_THREADS_WEAK
+# if HAVE_THREADS_H && USE_POSIX_THREADS_FROM_LIBC
+#  define c11_threads_in_use() 1
+# elif HAVE_THREADS_H && USE_POSIX_THREADS_WEAK
 #  include <threads.h>
 #  pragma weak thrd_exit
 #  define c11_threads_in_use() (thrd_exit != NULL)
 # else
 #  define c11_threads_in_use() 0
 # endif
-#endif
-
-#ifndef _GL_INLINE_HEADER_BEGIN
- #error "Please include config.h first."
-#endif
-_GL_INLINE_HEADER_BEGIN
-#ifndef _GLTHREAD_THREAD_INLINE
-# define _GLTHREAD_THREAD_INLINE _GL_INLINE
 #endif
 
 /* ========================================================================= */
@@ -131,10 +130,8 @@ extern _Noreturn void gl_thread_exit (void *return_value);
 
 # include <pthread.h>
 
-/* On IRIX, pthread_atfork is declared in <unistd.h>, not in <pthread.h>.  */
-# if defined __sgi
-#  include <unistd.h>
-# endif
+/* Get intptr_t.  */
+# include <stdint.h>
 
 # if USE_POSIX_THREADS_WEAK
 /* Compilers other than GCC need to see the declaration of pthread_sigmask
@@ -234,7 +231,7 @@ extern const gl_thread_t gl_null_thread;
 #  define gl_thread_self() \
      (pthread_in_use () ? pthread_self () : (pthread_t) 0)
 #  define gl_thread_self_pointer() \
-     (pthread_in_use () ? (void *) pthread_self () : NULL)
+     (pthread_in_use () ? (void *) (intptr_t) (pthread_t) pthread_self () : NULL)
 # endif
 # define gl_thread_exit(RETVAL) \
     (void) (pthread_in_use () ? (pthread_exit (RETVAL), 0) : 0)
@@ -314,17 +311,7 @@ typedef int gl_thread_t;
 extern "C" {
 #endif
 
-_GLTHREAD_THREAD_INLINE gl_thread_t
-gl_thread_create (void *(*func) (void *arg), void *arg)
-{
-  gl_thread_t thread;
-  int ret;
-
-  ret = glthread_create (&thread, func, arg);
-  if (ret != 0)
-    abort ();
-  return thread;
-}
+extern gl_thread_t gl_thread_create (void *(*func) (void *arg), void *arg);
 #define gl_thread_sigmask(HOW, SET, OSET)     \
    do                                         \
      {                                        \
@@ -350,7 +337,5 @@ gl_thread_create (void *(*func) (void *arg), void *arg)
 #ifdef __cplusplus
 }
 #endif
-
-_GL_INLINE_HEADER_END
 
 #endif /* _GLTHREAD_THREAD_H */

@@ -1,9 +1,9 @@
 /* Test of fread() function.
-   Copyright (C) 2011-2021 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
+   the Free Software Foundation, either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -32,7 +32,7 @@ SIGNATURE_CHECK (fread, size_t, (void *, size_t, size_t, FILE *));
 #include "macros.h"
 
 int
-main (int argc, char **argv)
+main ()
 {
   const char *filename = "test-fread.txt";
 
@@ -54,6 +54,7 @@ main (int argc, char **argv)
 
   /* Test that fread() sets errno if someone else closes the stream
      fd behind the back of stdio.  */
+  #if !defined __ANDROID__ /* fdsan */
   {
     FILE *fp = fopen (filename, "r");
     char buf[5];
@@ -65,6 +66,7 @@ main (int argc, char **argv)
     ASSERT (ferror (fp));
     fclose (fp);
   }
+  #endif
 
   /* Test that fread() sets errno if the stream was constructed with
      an invalid file descriptor.  */
@@ -98,5 +100,5 @@ main (int argc, char **argv)
   /* Clean up.  */
   unlink (filename);
 
-  return 0;
+  return test_exit_status;
 }

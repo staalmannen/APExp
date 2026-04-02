@@ -1,17 +1,17 @@
-/* Copyright (C) 2000, 2009-2021 Free Software Foundation, Inc.
+/* Copyright (C) 2000, 2009-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -33,10 +33,8 @@ posix_spawn_file_actions_destroy (posix_spawn_file_actions_t *file_actions)
 #if !REPLACE_POSIX_SPAWN
   return posix_spawn_file_actions_destroy (file_actions);
 #else
-  int i;
-
   /* Free the paths in the open actions.  */
-  for (i = 0; i < file_actions->_used; ++i)
+  for (int i = 0; i < file_actions->_used; ++i)
     {
       struct __spawn_action *sa = &file_actions->_actions[i];
       switch (sa->tag)

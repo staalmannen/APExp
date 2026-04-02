@@ -1,4 +1,4 @@
-dnl @ ../doc/m4.texi:4961: Origin of test
+dnl @ ../doc/m4.texi:5010: Origin of test
 dnl @ expected status: 0
 dnl @ extra options: 
 dnl @ Copyright (C) 2006, 2007, 2008, 2009 Free Software
@@ -7,9 +7,11 @@ dnl @ This file is free software; the Free Software Foundation
 dnl @ gives unlimited permission to copy and/or distribute it
 dnl @ with or without modifications, as long as this notice
 dnl @ is preserved.
-define(`aa', `AA
+define(`cleanup', `This is the `cleanup' action.
 ')
 dnl @result{}
-m4wrap(`a')m4wrap(`a')
+m4wrap(`cleanup')
 dnl @result{}
-dnl @result{}AA
+This is the first and last normal input line.
+dnl @result{}This is the first and last normal input line.
+dnl @result{}This is the cleanup action.

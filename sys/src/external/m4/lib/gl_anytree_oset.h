@@ -1,18 +1,18 @@
 /* Ordered set data type implemented by a binary tree.
-   Copyright (C) 2006-2007, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2009-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Common code of gl_avltree_oset.c and gl_rbtree_oset.c.  */
@@ -95,9 +95,8 @@ static bool
 gl_tree_search (gl_oset_t set, const void *elt)
 {
   gl_setelement_compar_fn compar = set->base.compar_fn;
-  gl_oset_node_t node;
 
-  for (node = set->root; node != NULL; )
+  for (gl_oset_node_t node = set->root; node != NULL; )
     {
       int cmp = (compar != NULL
                  ? compar (node->value, elt)
@@ -121,9 +120,7 @@ gl_tree_search_atleast (gl_oset_t set,
                         const void *threshold,
                         const void **eltp)
 {
-  gl_oset_node_t node;
-
-  for (node = set->root; node != NULL; )
+  for (gl_oset_node_t node = set->root; node != NULL; )
     {
       if (! threshold_fn (node->value, threshold))
         node = node->right;
@@ -154,9 +151,8 @@ static gl_oset_node_t
 gl_tree_search_node (gl_oset_t set, const void *elt)
 {
   gl_setelement_compar_fn compar = set->base.compar_fn;
-  gl_oset_node_t node;
 
-  for (node = set->root; node != NULL; )
+  for (gl_oset_node_t node = set->root; node != NULL; )
     {
       int cmp = (compar != NULL
                  ? compar (node->value, elt)
@@ -177,7 +173,6 @@ gl_tree_search_node (gl_oset_t set, const void *elt)
 static int
 gl_tree_nx_add (gl_oset_t set, const void *elt)
 {
-  gl_setelement_compar_fn compar;
   gl_oset_node_t node = set->root;
 
   if (node == NULL)
@@ -187,7 +182,7 @@ gl_tree_nx_add (gl_oset_t set, const void *elt)
       return true;
     }
 
-  compar = set->base.compar_fn;
+  gl_setelement_compar_fn compar = set->base.compar_fn;
 
   for (;;)
     {
@@ -259,12 +254,11 @@ gl_tree_update (gl_oset_t set, const void *elt,
                   && (next_node == NULL || next_node->value > elt)))
             {
               /* old_node needs to move in the tree.  */
-              gl_oset_node_t node;
 
               /* Remove the node from the tree.  Don't free it.  */
               gl_tree_remove_node_no_free (set, old_node);
 
-              node = set->root;
+              gl_oset_node_t node = set->root;
 
               for (;;)
                 {
@@ -354,16 +348,17 @@ static gl_oset_iterator_t _GL_ATTRIBUTE_PURE
 gl_tree_iterator (gl_oset_t set)
 {
   gl_oset_iterator_t result;
-  gl_oset_node_t node;
 
   result.vtable = set->base.vtable;
   result.set = set;
-  /* Start node is the leftmost node.  */
-  node = set->root;
-  if (node != NULL)
-    while (node->left != NULL)
-      node = node->left;
-  result.p = node;
+  {
+    /* Start node is the leftmost node.  */
+    gl_oset_node_t node = set->root;
+    if (node != NULL)
+      while (node->left != NULL)
+        node = node->left;
+    result.p = node;
+  }
   /* End point is past the rightmost node.  */
   result.q = NULL;
 #if defined GCC_LINT || defined lint
@@ -381,7 +376,6 @@ gl_tree_iterator_atleast (gl_oset_t set,
                           const void *threshold)
 {
   gl_oset_iterator_t result;
-  gl_oset_node_t node;
 
   result.vtable = set->base.vtable;
   result.set = set;
@@ -393,7 +387,7 @@ gl_tree_iterator_atleast (gl_oset_t set,
   result.count = 0;
 #endif
 
-  for (node = set->root; node != NULL; )
+  for (gl_oset_node_t node = set->root; node != NULL; )
     {
       if (! threshold_fn (node->value, threshold))
         node = node->right;
@@ -438,6 +432,6 @@ gl_tree_iterator_next (gl_oset_iterator_t *iterator, const void **eltp)
 }
 
 static void
-gl_tree_iterator_free (gl_oset_iterator_t *iterator _GL_ATTRIBUTE_MAYBE_UNUSED)
+gl_tree_iterator_free (gl_oset_iterator_t *_GL_UNNAMED (iterator))
 {
 }

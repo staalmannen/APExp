@@ -1,5 +1,5 @@
 # Configure template for GNU M4.           -*-Autoconf-*-
-# Copyright (C) 1991, 1993-1994, 2004-2014, 2016-2017, 2020-2021 Free
+# Copyright (C) 1991, 1993-1994, 2004-2014, 2016-2017, 2020-2026 Free
 # Software Foundation, Inc.
 #
 # This file is part of GNU M4.
@@ -17,12 +17,12 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-AC_PREREQ([2.64])
+AC_PREREQ([2.69])
 AC_INIT([GNU M4], m4_esyscmd([build-aux/git-version-gen .tarball-version]),
   [bug-m4@gnu.org])
 AC_CONFIG_AUX_DIR([build-aux])
 
-AM_INIT_AUTOMAKE([1.11.6 dist-bzip2 dist-xz color-tests parallel-tests
+AM_INIT_AUTOMAKE([1.14 dist-bzip2 dist-xz color-tests parallel-tests
 silent-rules subdir-objects gnu])
 AM_SILENT_RULES([yes]) # make --enable-silent-rules the default.
 
@@ -96,19 +96,6 @@ if test "$gl_gcc_warnings" = yes; then
   # gcc 4.4.6 complains enum-compare is C++ only; gcc 4.7.0 implies it in -Wall
   nw="$nw -Wenum-compare"
 
-  # Gnulib uses '#pragma GCC diagnostic push' to silence some
-  # warnings, but older gcc doesn't support this.
-  AC_CACHE_CHECK([whether pragma GCC diagnostic push works],
-    [M4_cv_gcc_pragma_push_works], [
-    save_CFLAGS=$CFLAGS
-    CFLAGS='-Wunknown-pragmas -Werror'
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-      #pragma GCC diagnostic push
-      #pragma GCC diagnostic pop
-    ]])],
-    [M4_cv_gcc_pragma_push_works=yes],
-    [M4_cv_gcc_pragma_push_works=no])
-    CFLAGS=$save_CFLAGS])
   if test $M4_cv_gcc_pragma_push_works = no; then
     nw="$nw -Wmissing-prototypes"
     nw="$nw -Wmissing-declarations"
@@ -133,10 +120,26 @@ if test "$gl_gcc_warnings" = yes; then
   [/* Enable compile-time and run-time bounds-checking, and some warnings,
       without upsetting newer glibc. */
    #if defined __OPTIMIZE__ && __OPTIMIZE__
-   # define _FORTIFY_SOURCE 2
+   # ifndef _FORTIFY_SOURCE
+   #  define _FORTIFY_SOURCE 2
+   # endif
    #endif
   ])
 fi
+
+# Git tends to change the mtime of files according to when you clone or
+# checkout a different commit, rather than the time the commit was created.
+# But for reproducible builds, we want the generated doc/version.texi to
+# reflect the timestamp of the commit, not when git was used.
+AC_MSG_CHECKING([for timestamps of last git commit])
+st_touch=skipped
+if test -e "$srcdir"/.git && command -v git > /dev/null; then
+  if st_touch=$(env TZ=UTC0 git log -1 --format=%cd \
+             --date=format-local:%Y%m%d%H%M.%S); then
+    env TZ=UTC0 touch -m -t "$st_touch" "$srcdir"/doc/$PACKAGE.texi
+  fi
+fi
+AC_MSG_RESULT(touch $st_touch)
 
 # Tandem/NSK is broken - it has 'long long int' but not
 # 'unsigned long long int', which confuses assumptions made by gnulib.

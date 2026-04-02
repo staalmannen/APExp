@@ -1,9 +1,9 @@
 /* Test of posix_spawn() function with 'open' action.
-   Copyright (C) 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -31,14 +31,13 @@ SIGNATURE_CHECK (posix_spawn, int, (pid_t *, char const *,
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 
-#define CHILD_PROGRAM_FILENAME "test-posix_spawn-open1"
+#define CHILD_PROGRAM_FILENAME "test-posix_spawn-open1" EXEEXT
 #define DATA_FILENAME "t!#$%&'()*+,-;=?@[\\]^_`{|}~.tmp"
 /* On Windows (including Cygwin), '*' '?' '\\' '|' cannot be used in file
    names.  */
@@ -51,7 +50,9 @@ static int
 parent_main (void)
 {
   FILE *fp;
-  char *argv[3] = { CHILD_PROGRAM_FILENAME, "-child", NULL };
+  char argv0[] = CHILD_PROGRAM_FILENAME;
+  char argv1[] = "-child";
+  char *argv[] = { argv0, argv1, NULL };
   posix_spawn_file_actions_t actions;
   bool actions_allocated;
   int err;

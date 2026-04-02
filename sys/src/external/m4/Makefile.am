@@ -1,6 +1,6 @@
 ## Makefile.am - template for generating Makefile via Automake
 ##
-## Copyright (C) 2000-2001, 2003-2014, 2016-2017, 2020-2021 Free
+## Copyright (C) 2000-2001, 2003-2014, 2016-2017, 2020-2026 Free
 ## Software Foundation, Inc.
 ##
 ## This file is part of GNU M4.
@@ -35,7 +35,7 @@ MAINTAINERCLEANFILES = INSTALL Makefile.in aclocal.m4 \
 ACLOCAL_AMFLAGS = -I m4
 ## Enough users install GNU M4 as gm4 that we make sure 'make installcheck'
 ## will handle that, prior to making a release.
-DISTCHECK_CONFIGURE_FLAGS = --enable-changeword --program-prefix=g \
+AM_DISTCHECK_CONFIGURE_FLAGS = --enable-changeword --program-prefix=g \
 	--enable-gcc-warnings --enable-silent-rules --enable-cxx
 
 # Generate the ChangeLog from git history.
@@ -63,6 +63,19 @@ $(srcdir)/ChangeLog:
 BUILT_SOURCES = $(top_srcdir)/.version
 $(top_srcdir)/.version:
 	echo $(VERSION) > $@-t && mv $@-t $@
+
+# Ensure that the manual page is up-to-date when "make dist" runs.
+BUILT_SOURCES += doc/m4.1
+doc/m4.1: $(top_srcdir)/src/m4.c
+	$(AM_V_GEN)(cd lib && $(MAKE) $(AM_MAKEFLAGS)) \
+	  && (cd src && $(MAKE) $(AM_MAKEFLAGS) m4$(EXEEXT)) \
+	  && (cd doc && $(MAKE) $(AM_MAKEFLAGS) m4.1)
+
+# Ensure that the checks/*[0-9][0-9][0-9].* files exist when "make dist" runs.
+BUILT_SOURCES += checks-files
+.PHONY: checks-files
+checks-files:
+	cd checks && $(MAKE) $(AM_MAKEFLAGS)
 
 # Arrange so that .tarball-version appears only in the distribution
 # tarball, and never in a checked-out repository.

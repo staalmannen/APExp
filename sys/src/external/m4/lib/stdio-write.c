@@ -1,18 +1,18 @@
 /* POSIX compatible FILE stream write function.
-   Copyright (C) 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -107,10 +107,9 @@
     return (EXPRESSION);                                                      \
   else                                                                        \
     {                                                                         \
-      RETTYPE ret;                                                            \
       CLEAR_ERRNO                                                             \
       CLEAR_LastError                                                         \
-      ret = (EXPRESSION);                                                     \
+      RETTYPE ret = (EXPRESSION);                                             \
       if (FAILED)                                                             \
         {                                                                     \
           HANDLE_ENOSPC                                                       \
@@ -124,11 +123,9 @@
 int
 printf (const char *format, ...)
 {
-  int retval;
   va_list args;
-
   va_start (args, format);
-  retval = vfprintf (stdout, format, args);
+  int retval = vfprintf (stdout, format, args);
   va_end (args);
 
   return retval;
@@ -139,11 +136,9 @@ printf (const char *format, ...)
 int
 fprintf (FILE *stream, const char *format, ...)
 {
-  int retval;
   va_list args;
-
   va_start (args, format);
-  retval = vfprintf (stream, format, args);
+  int retval = vfprintf (stream, format, args);
   va_end (args);
 
   return retval;
@@ -162,6 +157,9 @@ vprintf (const char *format, va_list args)
 int
 vfprintf (FILE *stream, const char *format, va_list args)
 #undef vfprintf
+#if defined __MINGW32__ && !defined _UCRT && __USE_MINGW_ANSI_STDIO
+# define vfprintf gl_consolesafe_vfprintf
+#endif
 {
   CALL_WITH_SIGPIPE_EMULATION (int, vfprintf (stream, format, args), ret == EOF)
 }
@@ -198,6 +196,9 @@ puts (const char *string)
 size_t
 fwrite (const void *ptr, size_t s, size_t n, FILE *stream)
 #undef fwrite
+#if (defined _WIN32 && !defined __CYGWIN__) && !defined _UCRT
+# define fwrite gl_consolesafe_fwrite
+#endif
 {
   CALL_WITH_SIGPIPE_EMULATION (size_t, fwrite (ptr, s, n, stream), ret < n)
 }

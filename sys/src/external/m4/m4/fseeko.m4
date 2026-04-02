@@ -1,8 +1,10 @@
-# fseeko.m4 serial 20
-dnl Copyright (C) 2007-2021 Free Software Foundation, Inc.
+# fseeko.m4
+# serial 21
+dnl Copyright (C) 2007-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_DEFUN([gl_FUNC_FSEEKO],
 [
@@ -68,6 +70,10 @@ AC_DEFUN([gl_STDIN_LARGE_OFFSET],
 # Prerequisites of lib/fseeko.c.
 AC_DEFUN([gl_PREREQ_FSEEKO],
 [
+  if test $gl_cv_func_fseeko != no; then
+    AC_DEFINE([HAVE_FSEEKO], [1],
+      [Define to 1 if the system has the fseeko function.])
+  fi
   dnl Native Windows has the function _fseeki64. mingw hides it in some
   dnl circumstances, but mingw64 makes it usable again.
   AC_CHECK_FUNCS([_fseeki64])

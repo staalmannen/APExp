@@ -1,18 +1,18 @@
 /* Invalid parameter handler for MSVC runtime libraries.
-   Copyright (C) 2011-2021 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
-   any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with this program; if not, see <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _MSVC_INVAL_H
 #define _MSVC_INVAL_H
@@ -51,6 +51,11 @@
      * The way for libraries that make no "hairy" calls:
        AC_DEFINE([MSVC_INVALID_PARAMETER_HANDLING], [SANE_LIBRARY_HANDLING])
  */
+
+/* This file uses HAVE_MSVC_INVALID_PARAMETER_HANDLER.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
 
 #define DEFAULT_HANDLING       0
 #define HAIRY_LIBRARY_HANDLING 1
@@ -174,9 +179,9 @@ extern struct gl_msvc_inval_per_thread *gl_msvc_inval_current (void);
 #   define TRY_MSVC_INVAL \
       do                                                                       \
         {                                                                      \
-          struct gl_msvc_inval_per_thread *msvc_inval_current;                 \
           gl_msvc_inval_ensure_handler ();                                     \
-          msvc_inval_current = gl_msvc_inval_current ();                       \
+          struct gl_msvc_inval_per_thread *msvc_inval_current =                \
+            gl_msvc_inval_current ();                                          \
           /* First, initialize gl_msvc_inval_restart.  */                      \
           if (setjmp (msvc_inval_current->restart) == 0)                       \
             {                                                                  \

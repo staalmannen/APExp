@@ -1,17 +1,17 @@
 /* A GNU-like <sched.h>.
-   Copyright (C) 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _@GUARD_PREFIX@_SCHED_H
@@ -20,6 +20,13 @@
 @PRAGMA_SYSTEM_HEADER@
 #endif
 @PRAGMA_COLUMNS@
+
+/* This file uses #include_next of a system file that defines time_t.
+   For the 'year2038' module to work right, <config.h> needs to have been
+   included before.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
 
 /* The include_next requires a split double-inclusion guard.  */
 #if @HAVE_SCHED_H@
@@ -32,9 +39,14 @@
 #ifndef _@GUARD_PREFIX@_SCHED_H
 #define _@GUARD_PREFIX@_SCHED_H
 
+/* This file uses GNULIB_POSIXCHECK, HAVE_RAW_DECL_*.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
+
 /* Get pid_t.
    This is needed on glibc 2.11 (see
-   glibc bug <https://sourceware.org/bugzilla/show_bug.cgi?id=13198>)
+   glibc bug <https://sourceware.org/PR13198>)
    and Mac OS X 10.5.  */
 #include <sys/types.h>
 
@@ -76,11 +88,11 @@ struct sched_param
 #   undef sched_yield
 #   define sched_yield rpl_sched_yield
 #  endif
-_GL_FUNCDECL_RPL (sched_yield, int, (void));
+_GL_FUNCDECL_RPL (sched_yield, int, (void), );
 _GL_CXXALIAS_RPL (sched_yield, int, (void));
 # else
 #  if !@HAVE_SCHED_YIELD@
-_GL_FUNCDECL_SYS (sched_yield, int, (void));
+_GL_FUNCDECL_SYS (sched_yield, int, (void), );
 #  endif
 _GL_CXXALIAS_SYS (sched_yield, int, (void));
 # endif
@@ -88,7 +100,6 @@ _GL_CXXALIAS_SYS (sched_yield, int, (void));
 _GL_CXXALIASWARN (sched_yield);
 # endif
 #elif defined GNULIB_POSIXCHECK
-# undef sched_yield
 # if HAVE_RAW_DECL_SCHED_YIELD
 _GL_WARN_ON_USE (sched_yield, "sched_yield is not portable - "
                  "use gnulib module sched_yield for portability");

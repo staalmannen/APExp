@@ -1,4 +1,4 @@
-dnl @ ../doc/m4.texi:4393: Origin of test
+dnl @ ../doc/m4.texi:4412: Origin of test
 dnl @ expected status: 0
 dnl @ extra options: 
 dnl @ Copyright (C) 2006, 2007, 2008, 2009 Free Software
@@ -7,14 +7,27 @@ dnl @ This file is free software; the Free Software Foundation
 dnl @ gives unlimited permission to copy and/or distribute it
 dnl @ with or without modifications, as long as this notice
 dnl @ is preserved.
-changequote(`[', `]')dnl
-define([a], [1, (b)])dnl
-define([b], [2])dnl
-define([quote], [[$*]])dnl
-define([expand], [_$0(($1))])dnl
-define([_expand],
-  [changequote([(], [)])$1changequote`'changequote(`[', `]')])dnl
-expand([a, a, [a, a], [[a, a]]])
-dnl @result{}1, (2), 1, (2), a, a, [a, a]
-quote(a, a, [a, a], [[a, a]])
-dnl @result{}1,(2),1,(2),a, a,[a, a]
+define(`echo', `$@')
+dnl @result{}
+define(`hi', `HI')
+dnl @result{}
+changequote(`q', `Q')
+dnl @result{}
+q hi Q hi
+dnl @result{}q HI Q HI
+echo(hi)
+dnl @result{}qHIQ
+changequote
+dnl @result{}
+changequote(`-', `EOF')
+dnl @result{}
+- hi EOF hi
+dnl @result{} hi  HI
+changequote
+dnl @result{}
+changequote(`1', `2')
+dnl @result{}
+hi1hi2
+dnl @result{}hi1hi2
+hi 1hi2
+dnl @result{}HI hi

@@ -1,106 +1,106 @@
 # Korean translation of the GNU m4 package.
 # Copyright (C) 2021 Free Software Foundation, Inc.
 # This file is distributed under the same license as the m4 package.
-# Seong-ho Cho <darkcircle.0426@gmail.com>, 2021.
+# Seong-ho Cho <darkcircle.0426@gmail.com>, 2021, 2025.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: GNU m4 1.4.18d\n"
+"Project-Id-Version: GNU m4 1.4.19.60\n"
 "Report-Msgid-Bugs-To: bug-m4@gnu.org\n"
-"POT-Creation-Date: 2021-05-28 13:49-0500\n"
-"PO-Revision-Date: 2021-05-14 15:42+0900\n"
+"POT-Creation-Date: 2026-02-06 13:55-0600\n"
+"PO-Revision-Date: 2025-04-14 13:08+0900\n"
 "Last-Translator: Seong-ho Cho <darkcircle.0426@gmail.com>\n"
 "Language-Team: Korean <translation-team-ko@googlegroups.com>\n"
 "Language: ko\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Bugs: Report translation errors to the Language-Team address.\n"
-"X-Generator: Poedit 2.2.1\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
+"X-Generator: Poedit 3.6\n"
 
-#: lib/clean-temp.c:235
+#: lib/clean-temp.c:230
 #, c-format
 msgid "cannot find a temporary directory, try setting $TMPDIR"
 msgstr "임시 디렉터리를 찾을 수 없습니다. $TMPDIR 변수를 설정해보십시오"
 
-#: lib/clean-temp.c:250
+#: lib/clean-temp.c:245
 #, c-format
 msgid "cannot create a temporary directory using template \"%s\""
 msgstr "\"%s\" 양식으로 임시 디렉터리를 만들 수 없습니다"
 
-#: lib/clean-temp.c:371
+#: lib/clean-temp.c:364
 #, c-format
 msgid "cannot remove temporary directory %s"
 msgstr "%s 임시 디렉터리를 제거할 수 없습니다"
 
-#: lib/closein.c:100
+#: lib/closein.c:99
 msgid "error closing file"
 msgstr "파일 닫는 중 오류"
 
-#: lib/closeout.c:122
+#: lib/closeout.c:121
 msgid "write error"
 msgstr "쓰기 오류"
 
-#: lib/c-stack.c:187
+#: lib/c-stack.c:190
 msgid "program error"
 msgstr "프로그램 오류"
 
-#: lib/c-stack.c:188
+#: lib/c-stack.c:191
 msgid "stack overflow"
 msgstr "스택 넘침"
 
-#: lib/clean-temp-simple.c:297
+#: lib/clean-temp-simple.c:266
 #, c-format
 msgid "cannot remove temporary file %s"
 msgstr "%s 임시 파일을 제거할 수 없습니다"
 
-#: lib/error.c:195
+#: lib/error.c:208
 msgid "Unknown system error"
 msgstr "알 수 없는 시스템 오류"
 
-#: lib/execute.c:348 lib/spawn-pipe.c:597 lib/wait-process.c:291
-#: lib/wait-process.c:365
+#: lib/execute.c:378 lib/spawn-pipe.c:597 lib/wait-process.c:325
+#: lib/wait-process.c:396
 #, c-format
 msgid "%s subprocess failed"
 msgstr "%s 하위 프로세스 처리 실패"
 
-#: lib/getopt.c:278
+#: lib/getopt.c:283
 #, c-format
 msgid "%s: option '%s%s' is ambiguous\n"
 msgstr "%s: '%s%s' 옵션이 모호합니다\n"
 
-#: lib/getopt.c:284
+#: lib/getopt.c:289
 #, c-format
 msgid "%s: option '%s%s' is ambiguous; possibilities:"
 msgstr "%s: '%s%s' 옵션이 모호합니다. 가능한 옵션:"
 
-#: lib/getopt.c:319
+#: lib/getopt.c:323
 #, c-format
 msgid "%s: unrecognized option '%s%s'\n"
 msgstr "%s: 인식할 수 없는 '%s%s' 옵션\n"
 
-#: lib/getopt.c:345
+#: lib/getopt.c:349
 #, c-format
 msgid "%s: option '%s%s' doesn't allow an argument\n"
 msgstr "%s: '%s%s' 옵션은 인자를 허용하지 않습니다\n"
 
-#: lib/getopt.c:360
+#: lib/getopt.c:364
 #, c-format
 msgid "%s: option '%s%s' requires an argument\n"
 msgstr "%s: '%s%s' 옵션에 인자가 필요합니다\n"
 
-#: lib/getopt.c:621
+#: lib/getopt.c:624
 #, c-format
 msgid "%s: invalid option -- '%c'\n"
 msgstr "%s: 부적절한 옵션 -- '%c'\n"
 
-#: lib/getopt.c:636 lib/getopt.c:682
+#: lib/getopt.c:639 lib/getopt.c:685
 #, c-format
 msgid "%s: option requires an argument -- '%c'\n"
 msgstr "%s: 옵션에 인자가 필요합니다 -- '%c'\n"
 
-#: lib/obstack.c:338 lib/obstack.c:340 lib/xalloc-die.c:34
+#: lib/obstack.c:351 lib/obstack.c:353 lib/xalloc-die.c:34
 msgid "memory exhausted"
 msgstr "메모리가 바닥남"
 
@@ -114,12 +114,12 @@ msgstr "현재 작업 디렉터리를 기록할 수 없습니다"
 msgid "failed to return to initial working directory"
 msgstr "초기 작업 디렉터리로 되돌아갈 수 없습니다"
 
-#: lib/os2-spawn.c:46
+#: lib/os2-spawn.c:51
 #, c-format
 msgid "_open_osfhandle failed"
 msgstr "_open_osfhandle 실패"
 
-#: lib/os2-spawn.c:83
+#: lib/os2-spawn.c:88
 #, c-format
 msgid "cannot restore fd %d: dup2 failed"
 msgstr "파일 서술자 %d번을 복원할 수 없음: dup2 실패"
@@ -145,83 +145,83 @@ msgstr "파일 서술자 %d번을 복원할 수 없음: dup2 실패"
 #. If you don't know what to put here, please see
 #. <https://en.wikipedia.org/wiki/Quotation_marks_in_other_languages>
 #. and use glyphs suitable for your language.
-#: lib/quotearg.c:355
+#: lib/quotearg.c:357
 msgid "`"
 msgstr "`"
 
-#: lib/quotearg.c:356
+#: lib/quotearg.c:358
 msgid "'"
 msgstr "'"
 
-#: lib/regcomp.c:135
+#: lib/regcomp.c:122
 msgid "Success"
 msgstr "성공"
 
-#: lib/regcomp.c:138
+#: lib/regcomp.c:125
 msgid "No match"
 msgstr "일치하지 않음"
 
-#: lib/regcomp.c:141
+#: lib/regcomp.c:128
 msgid "Invalid regular expression"
 msgstr "부적절한 정규 표현식"
 
-#: lib/regcomp.c:144
+#: lib/regcomp.c:131
 msgid "Invalid collation character"
 msgstr "부적절한 조합 문자"
 
-#: lib/regcomp.c:147
+#: lib/regcomp.c:134
 msgid "Invalid character class name"
 msgstr "부적절한 문자 클래스 이름"
 
-#: lib/regcomp.c:150
+#: lib/regcomp.c:137
 msgid "Trailing backslash"
 msgstr "백 슬래시 문자가 따라옴"
 
-#: lib/regcomp.c:153
+#: lib/regcomp.c:140
 msgid "Invalid back reference"
 msgstr "잘못된 후위 참조"
 
-#: lib/regcomp.c:156
+#: lib/regcomp.c:143
 msgid "Unmatched [, [^, [:, [., or [="
 msgstr "일치하지 않는 [, [^, [:, [., [="
 
-#: lib/regcomp.c:159
+#: lib/regcomp.c:146
 msgid "Unmatched ( or \\("
 msgstr "일치하지 않는 ( 또는 \\( 괄호"
 
-#: lib/regcomp.c:162
+#: lib/regcomp.c:149
 msgid "Unmatched \\{"
 msgstr "일치하지 않는 \\{ 괄호"
 
-#: lib/regcomp.c:165
+#: lib/regcomp.c:152
 msgid "Invalid content of \\{\\}"
 msgstr "부적절한 \\{\\} 내용"
 
-#: lib/regcomp.c:168
+#: lib/regcomp.c:155
 msgid "Invalid range end"
 msgstr "부적절한 범위 끝"
 
-#: lib/regcomp.c:171
+#: lib/regcomp.c:158
 msgid "Memory exhausted"
 msgstr "메모리가 바닥남"
 
-#: lib/regcomp.c:174
+#: lib/regcomp.c:161
 msgid "Invalid preceding regular expression"
 msgstr "부적절한 선행 정규 표현식"
 
-#: lib/regcomp.c:177
+#: lib/regcomp.c:164
 msgid "Premature end of regular expression"
 msgstr "정규 표현식 마감 표현이 앞서있습니다"
 
-#: lib/regcomp.c:180
+#: lib/regcomp.c:167
 msgid "Regular expression too big"
 msgstr "정규 표현식이 너무 깁니다"
 
-#: lib/regcomp.c:183
+#: lib/regcomp.c:170
 msgid "Unmatched ) or \\)"
 msgstr "일치하지 않는 ) 또는 \\) 괄호"
 
-#: lib/regcomp.c:676
+#: lib/regcomp.c:650
 msgid "No previous regular expression"
 msgstr "이전 정규 표현식이 없습니다"
 
@@ -361,8 +361,7 @@ msgstr "전원 고장"
 msgid "Resource lost"
 msgstr "자원 분실"
 
-#: lib/spawn-pipe.c:217 lib/spawn-pipe.c:220 lib/spawn-pipe.c:459
-#: lib/spawn-pipe.c:462
+#: lib/spawn-pipe.c:218 lib/spawn-pipe.c:221
 #, c-format
 msgid "cannot create pipe"
 msgstr "파이프를 만들 수 없습니다"
@@ -376,11 +375,6 @@ msgstr "실시간 시그널 %d"
 #, c-format
 msgid "Unknown signal %d"
 msgstr "알 수 없는 시그널 %d"
-
-#: lib/verror.c:76
-#, c-format
-msgid "unable to display error message"
-msgstr "오류 메시지를 표시할 수 없습니다"
 
 #: lib/version-etc.c:73
 #, c-format
@@ -524,37 +518,37 @@ msgstr ""
 #. for this package.  Please add _another line_ saying
 #. "Report translation bugs to <...>\n" with the address for translation
 #. bugs (typically your translation team's web or email address).
-#: lib/version-etc.c:249
+#: lib/version-etc.c:248
 #, c-format
 msgid "Report bugs to: %s\n"
 msgstr "버그 보고 주소: %s\n"
 
-#: lib/version-etc.c:251
+#: lib/version-etc.c:250
 #, c-format
 msgid "Report %s bugs to: %s\n"
 msgstr "%s 버그 보고 주소: %s\n"
 
-#: lib/version-etc.c:255 lib/version-etc.c:257
+#: lib/version-etc.c:254 lib/version-etc.c:256
 #, c-format
 msgid "%s home page: <%s>\n"
 msgstr "%s 홈페이지: <%s>\n"
 
-#: lib/version-etc.c:260
+#: lib/version-etc.c:259
 #, c-format
 msgid "General help using GNU software: <%s>\n"
 msgstr "GNU 소프트웨어 활용 일반 도움말: <%s>\n"
 
-#: lib/wait-process.c:232 lib/wait-process.c:264 lib/wait-process.c:326
+#: lib/wait-process.c:266 lib/wait-process.c:298 lib/wait-process.c:357
 #, c-format
 msgid "%s subprocess"
 msgstr "%s 하위 프로세스"
 
-#: lib/wait-process.c:283 lib/wait-process.c:355
+#: lib/wait-process.c:317 lib/wait-process.c:386
 #, c-format
 msgid "%s subprocess got fatal signal %d"
 msgstr "%s 하위 프로세스에 치명적인 시그널 %d번이 나타났습니다"
 
-#: lib/xprintf.c:50 lib/xprintf.c:76
+#: lib/xprintf.c:47 lib/xprintf.c:68
 #, c-format
 msgid "cannot perform formatted output"
 msgstr "포매팅 출력을 수행할 수 없습니다"
@@ -564,153 +558,158 @@ msgstr "포매팅 출력을 수행할 수 없습니다"
 msgid "--warn-macro-sequence: bad regular expression `%s': %s"
 msgstr "--warn-macro-sequence: 잘못된 정규 표현식 `%s': %s"
 
-#: src/builtin.c:320
+#: src/builtin.c:298
+#, c-format
+msgid "truncating macro `%s' definition to INT_MAX bytes"
+msgstr "`%s' 매크로 정의를 INT_MAX 바이트 만큼 자릅니다"
+
+#: src/builtin.c:333
 #, c-format
 msgid "Warning: definition of `%s' contains sequence `%s'"
 msgstr "경고: `%s' 정의에 `%s' 시퀀스가 있습니다"
 
-#: src/builtin.c:327
+#: src/builtin.c:340
 #, c-format
 msgid "error checking --warn-macro-sequence for macro `%s'"
 msgstr "`%s' 매크로의 --warn-macro-sequence 검사 중 오류"
 
-#: src/builtin.c:388
+#: src/builtin.c:401
 #, c-format
 msgid "Warning: too few arguments to builtin `%s'"
 msgstr "경고: `%s' 내장 요소의 인자가 너무 적습니다"
 
-#: src/builtin.c:394
+#: src/builtin.c:407
 #, c-format
 msgid "Warning: excess arguments to builtin `%s' ignored"
 msgstr "경고: `%s' 내장요소의 갯수 초과 인자를 무시했습니다"
 
-#: src/builtin.c:415 src/builtin.c:1114
+#: src/builtin.c:428 src/builtin.c:1155
 #, c-format
 msgid "empty string treated as 0 in builtin `%s'"
 msgstr "`%s' 내장 요소의 빈 문자열을 0값으로 취급합니다"
 
-#: src/builtin.c:425 src/builtin.c:1243
+#: src/builtin.c:438 src/builtin.c:1285
 #, c-format
 msgid "non-numeric argument to builtin `%s'"
 msgstr "`%s' 내장 요소에 비 숫자 인자값이 있습니다"
 
-#: src/builtin.c:431
+#: src/builtin.c:444
 #, c-format
 msgid "leading whitespace ignored in builtin `%s'"
 msgstr "`%s' 내장 요소에 뒤따라오는 공백 문자를 무시했습니다"
 
-#: src/builtin.c:435
+#: src/builtin.c:448
 #, c-format
 msgid "numeric overflow detected in builtin `%s'"
 msgstr "`%s' 내장 요소에 숫자값 넘침을 감지했습니다"
 
-#: src/builtin.c:552 src/builtin.c:815 src/builtin.c:856
+#: src/builtin.c:566 src/builtin.c:829 src/builtin.c:870
 #, c-format
 msgid "Warning: %s: invalid macro name ignored"
 msgstr "경고: %s: 부적절한 매크로 이름을 무시했습니다"
 
-#: src/builtin.c:752 src/builtin.c:864
+#: src/builtin.c:765 src/builtin.c:877
 #, c-format
 msgid "undefined macro `%s'"
 msgstr "정의하지 않은 매크로 `%s'"
 
-#: src/builtin.c:823
+#: src/builtin.c:836
 #, c-format
 msgid "undefined builtin `%s'"
 msgstr "정의하지 않은 내장요소 `%s'"
 
-#: src/builtin.c:914 src/builtin.c:2208
+#: src/builtin.c:928 src/builtin.c:2260
 #, c-format
 msgid "builtin `%s' requested by frozen file is not supported"
 msgstr "`%s' 내장 요소를 지원하지 않는 프리징 파일에서 요청했습니다"
 
-#: src/builtin.c:918
+#: src/builtin.c:932
 #, c-format
 msgid "Warning: cannot concatenate builtin `%s'"
 msgstr "경고: `%s' 내장요소를 결합할 수 없습니다"
 
-#: src/builtin.c:978 src/builtin.c:1015 src/builtin.c:1028 src/builtin.c:1063
+#: src/builtin.c:1003 src/builtin.c:1053 src/builtin.c:1066 src/builtin.c:1101
 #, c-format
 msgid "cannot run command `%s'"
 msgstr "`%s' 명령을 실행할 수 없습니다"
 
-#: src/builtin.c:1051
+#: src/builtin.c:1089
 msgid "cannot read pipe"
 msgstr "파이프를 읽을 수 없습니다"
 
-#: src/builtin.c:1098
+#: src/builtin.c:1140
 #, c-format
 msgid "radix %d in builtin `%s' out of range"
 msgstr "`%2$s' 내장 요소의 기수 %1$d 번이 범위를 벗어났습니다"
 
-#: src/builtin.c:1108
+#: src/builtin.c:1149
 #, c-format
 msgid "negative width to builtin `%s'"
 msgstr "`%s' 내장 요소에 음수 너비 값"
 
-#: src/builtin.c:1252
+#: src/builtin.c:1294
 #, c-format
 msgid "error undiverting `%s'"
 msgstr "`%s' 우회 취소 오류"
 
-#: src/builtin.c:1256
+#: src/builtin.c:1298
 #, c-format
 msgid "cannot undivert `%s'"
 msgstr "`%s'을(를) 우회 취소할 수 없습니다"
 
-#: src/builtin.c:1366 src/freeze.c:115 src/m4.c:379
+#: src/builtin.c:1408 src/freeze.c:115 src/m4.c:382
 #, c-format
 msgid "cannot open `%s'"
 msgstr "`%s'을(를) 열 수 없습니다"
 
-#: src/builtin.c:1429
+#: src/builtin.c:1471
 #, c-format
 msgid "%s: cannot create tempfile `%s'"
 msgstr "%s: `%s' 임시 파일을 만들 수 없습니다"
 
-#: src/builtin.c:1464
+#: src/builtin.c:1507
 msgid "recommend using mkstemp instead"
 msgstr "대신 mkstamp 활용을 추천합니다"
 
-#: src/builtin.c:1557
+#: src/builtin.c:1600
 #, c-format
 msgid "exit status out of range: `%d'"
 msgstr "종료 코드 상태 값이 범위를 벗어났습니다: `%d'"
 
-#: src/builtin.c:1681
+#: src/builtin.c:1726
 #, c-format
 msgid "Debugmode: bad debug flags: `%s'"
 msgstr "디버깅모드: 잘못된 디버깅 플래그: `%s'"
 
-#: src/builtin.c:1722 src/m4.c:625 src/m4.c:689
+#: src/builtin.c:1767 src/m4.c:633 src/m4.c:700
 #, c-format
 msgid "cannot set debug file `%s'"
 msgstr "`%s' 디버깅 파일을 지정할 수 없습니다"
 
-#: src/builtin.c:1988
+#: src/builtin.c:2034
 msgid "Warning: \\0 will disappear, use \\& instead in replacements"
 msgstr "경고: \\0를 없앱니다, 대용으로 \\&를 대신 활용하십시오"
 
-#: src/builtin.c:2004
+#: src/builtin.c:2057
 #, c-format
 msgid "Warning: sub-expression %d not present"
 msgstr "경고: %d 하위 표현식이 없습니다"
 
-#: src/builtin.c:2013
+#: src/builtin.c:2066
 msgid "Warning: trailing \\ ignored in replacement"
 msgstr "경고: 뒤따라오는 문자를 \\ 대체 요소에서 무시했습니다"
 
-#: src/builtin.c:2079
+#: src/builtin.c:2132
 #, c-format
 msgid "bad regular expression: `%s': %s"
 msgstr "잘못된 정규 표현식: `%s': %s"
 
-#: src/builtin.c:2091 src/builtin.c:2161
+#: src/builtin.c:2144 src/builtin.c:2214
 #, c-format
 msgid "error matching regular expression `%s'"
 msgstr "`%s' 정규 표현식 일치 오류"
 
-#: src/builtin.c:2139 src/input.c:792
+#: src/builtin.c:2192 src/input.c:795
 #, c-format
 msgid "bad regular expression `%s': %s"
 msgstr "잘못된 정규 표현식 `%s': %s"
@@ -719,112 +718,117 @@ msgstr "잘못된 정규 표현식 `%s': %s"
 msgid "error writing to debug stream"
 msgstr "디버깅 스트림 기록 오류"
 
-#: src/eval.c:318
+#: src/eval.c:485
+msgid "Warning: recommend ==, not =, for equality operator"
+msgstr "경고: 등호 연산자에 = 이 아닌 == 을 추천합니다"
+
+#: src/eval.c:569
 #, c-format
 msgid "bad expression in eval (missing right parenthesis): %s"
 msgstr "수식에 잘못된 표현식 (우측 괄호 빠짐): %s"
 
-#: src/eval.c:324
+#: src/eval.c:574
 #, c-format
 msgid "bad expression in eval: %s"
 msgstr "수식에 잘못된 표현식: %s"
 
-#: src/eval.c:329
+#: src/eval.c:579
 #, c-format
 msgid "bad expression in eval (bad input): %s"
 msgstr "수식에 잘못된 표현식 (잘못된 입력): %s"
 
-#: src/eval.c:334
+#: src/eval.c:584
 #, c-format
 msgid "bad expression in eval (excess input): %s"
 msgstr "수식에 잘못된 표현식 (입력양 초과): %s"
 
-#: src/eval.c:339
+#: src/eval.c:588
+#, fuzzy, c-format
+msgid "invalid number in eval: %s"
+msgstr "수식에 부적절한 연산자: %s"
+
+#: src/eval.c:592
 #, c-format
 msgid "invalid operator in eval: %s"
 msgstr "수식에 부적절한 연산자: %s"
 
-#: src/eval.c:345
+#: src/eval.c:597
 #, c-format
 msgid "divide by zero in eval: %s"
 msgstr "수식에서 0 나누기 오류: %s"
 
-#: src/eval.c:350
+#: src/eval.c:601
 #, c-format
 msgid "modulo by zero in eval: %s"
 msgstr "수식에 0 나누기 나머지 오류: %s"
 
-#: src/eval.c:355
+#: src/eval.c:605
 #, c-format
 msgid "negative exponent in eval: %s"
 msgstr "수식에 음수 지수: %s"
 
-#: src/eval.c:538
-msgid "Warning: recommend ==, not =, for equality operator"
-msgstr "경고: 등호 연산자에 = 이 아닌 == 을 추천합니다"
-
-#: src/format.c:40 src/format.c:64 src/format.c:88
+#: src/format.c:39 src/format.c:63 src/format.c:87
 msgid "empty string treated as 0"
 msgstr "빈 문자열을 0 값으로 취급합니다"
 
-#: src/format.c:46 src/format.c:70 src/format.c:94
+#: src/format.c:45 src/format.c:69 src/format.c:93
 #, c-format
 msgid "non-numeric argument %s"
 msgstr "비 숫자 인자값 %s"
 
-#: src/format.c:48 src/format.c:72 src/format.c:96
+#: src/format.c:47 src/format.c:71 src/format.c:95
 msgid "leading whitespace ignored"
 msgstr "뒤 따라오는 공백문자 무시"
 
-#: src/format.c:50 src/format.c:74 src/format.c:98
+#: src/format.c:49 src/format.c:73 src/format.c:97
 msgid "numeric overflow detected"
 msgstr "숫자값 넘침을 발견했습니다"
 
-#: src/format.c:308
+#: src/format.c:309
 #, c-format
 msgid "Warning: unrecognized specifier in `%s'"
 msgstr "경고: `%s'에서 인식하지 못한 지정자"
 
-#: src/freeze.c:156
+#: src/freeze.c:157
 msgid "unable to create frozen state"
 msgstr "프리징 상태를 만들 수 없습니다"
 
-#: src/freeze.c:167
+#: src/freeze.c:168
 msgid "expecting line feed in frozen file"
 msgstr "프리징 파일에 라인 피드가 필요합니다"
 
-#: src/freeze.c:169
+#: src/freeze.c:170
 #, c-format
 msgid "expecting character `%c' in frozen file"
 msgstr "프리징 파일에 `%c' 문자가 필요합니다"
 
-#: src/freeze.c:215
+#: src/freeze.c:216
 msgid "integer overflow in frozen file"
 msgstr "프리징 파일에 정수 넘침"
 
-#: src/freeze.c:257
+#: src/freeze.c:258
 msgid "premature end of frozen file"
 msgstr "프리징 파일이 너무 빨리 끝났습니다"
 
-#: src/freeze.c:270
+#: src/freeze.c:271
 #, c-format
 msgid "cannot open %s"
 msgstr "%s을(를) 열 수 없습니다"
 
-#: src/freeze.c:285
+#: src/freeze.c:286
 #, c-format
 msgid "frozen file version %d greater than max supported of 1"
 msgstr "프리징 파일 버전 %d번이 지원 버전 1보다 큽니다"
 
-#: src/freeze.c:288
+#: src/freeze.c:289
 msgid "ill-formed frozen file, version directive expected"
 msgstr "잘못 구성한 프리징 파일. 버전 지시문이 필요합니다"
 
-#: src/freeze.c:297
+#: src/freeze.c:298
 msgid "ill-formed frozen file"
 msgstr "잘못 구성한 프리징 파일"
 
-#: src/freeze.c:385
+#: src/freeze.c:387
 msgid "unable to read frozen state"
 msgstr "프리징 상태를 읽을 수 없습니다"
 
@@ -836,15 +840,15 @@ msgstr "읽기 오류"
 msgid "error reading file"
 msgstr "파일 읽는 중 오류"
 
-#: src/input.c:589
+#: src/input.c:590
 msgid "Warning: end of file treated as newline"
 msgstr "경고: 파일 끝을 개행 문자로 처리합니다"
 
-#: src/input.c:881
+#: src/input.c:899
 msgid "ERROR: end of file in comment"
 msgstr "오류: 설명에 파일 끝 문자"
 
-#: src/input.c:1001
+#: src/input.c:1023
 msgid "ERROR: end of file in string"
 msgstr "오류: 문자열에 파일 끝 문자"
 
@@ -941,13 +945,13 @@ msgid ""
 "Limits control:\n"
 "  -g, --gnu                    override -G to re-enable GNU extensions\n"
 "  -G, --traditional            suppress all GNU extensions\n"
-"  -H, --hashsize=PRIME         set symbol lookup hash table size [509]\n"
+"  -H, --hashsize=PRIME         set symbol lookup hash table size [%d]\n"
 "  -L, --nesting-limit=NUMBER   change nesting limit, 0 for unlimited [%d]\n"
 msgstr ""
 "한계 제어:\n"
 "  -g, --gnu                    -G 대신 적용하여 GNU 확장을 재적용\n"
 "  -G, --traditional            모든 GNU 확장을 숨깁니다\n"
-"  -H, --hashsize=<소수>        심볼 탐색 해시 테이블 크기 설정 [509]\n"
+"  -H, --hashsize=<소수>        심볼 탐색 해시 테이블 크기 설정 [%d]\n"
 "  -L, --nesting-limit=<숫자>   중첩 한계를 바꿉니다. 0 값은 무제한을 의미 "
 "[%d]\n"
 
@@ -1023,76 +1027,85 @@ msgstr ""
 "종료 상태 코드 0은 성공, 1은 실패, 63은 프리징 파일 버전 불일치, 그리고 기타 "
 "코드는 m4exit 매크로에 전달한 값입니다.\n"
 
-#: src/m4.c:436
+#: src/m4.c:443
 #, c-format
 msgid "internal error detected; please report this bug to <%s>"
 msgstr "내부 에러 발견. <%s>에 버그를 보고하십시오"
 
-#: src/m4.c:489
+#: src/m4.c:497
 #, c-format
 msgid "warning: `m4 -%c' may be removed in a future release"
 msgstr "경고: `m4 -%c' 옵션은 다음 릴리스에서 제거 예정입니다"
 
-#: src/m4.c:496
+#: src/m4.c:504
 #, c-format
 msgid "warning: `m4 %s' is deprecated"
 msgstr "경고: `m4 %s' 옵션이 오래됐습니다"
 
-#: src/m4.c:572
+#: src/m4.c:580
 #, c-format
 msgid "bad debug flags: `%s'"
 msgstr "잘못된 디버깅 플래그: `%s'"
 
-#: src/m4.c:578
+#: src/m4.c:586
 #, c-format
 msgid "warning: `m4 -e' is deprecated, use `-i' instead"
 msgstr "경고: `m4 -e' 옵션이 오래되었으니 `-i'를 대신 사용하십시오"
 
-#: src/m4.c:690
+#: src/m4.c:701
 msgid "stderr"
 msgstr "stderr"
 
-#: src/macro.c:196
+#: src/macro.c:178 src/macro.c:225
+#, fuzzy
+msgid "Warning: cannot concatenate builtin tokens"
+msgstr "경고: `%s' 내장요소를 결합할 수 없습니다"
+
+#: src/macro.c:205
 msgid "ERROR: end of file in argument list"
 msgstr "오류: 인자 목록에 파일 끝 문자"
 
-#: src/macro.c:332
+#: src/macro.c:348
 #, c-format
 msgid "recursion limit of %d exceeded, use -L<N> to change it"
 msgstr "재귀 한계 단계 %d 번 초과. 바꾸려면 -L<N> 옵션을 사용하십시오"
 
-#: src/output.c:172 src/output.c:898 src/output.c:901
+#: src/output.c:178 src/output.c:933 src/output.c:936
 msgid "cannot clean temporary file for diversion"
 msgstr "우회 임시 파일을 지울 수 없습니다"
 
-#: src/output.c:222 src/output.c:231 src/output.c:265 src/output.c:360
+#: src/output.c:230 src/output.c:239 src/output.c:273 src/output.c:370
 msgid "cannot create temporary file for diversion"
 msgstr "우회 임시 파일을 만들 수 없습니다"
 
-#: src/output.c:250 src/output.c:257 src/output.c:269
+#: src/output.c:258 src/output.c:265 src/output.c:277
 msgid "cannot seek within diversion"
 msgstr "우회 값 범위를 탐색할 수 없습니다"
 
-#: src/output.c:341 src/output.c:353 src/output.c:502 src/output.c:733
+#: src/output.c:350 src/output.c:363 src/output.c:512 src/output.c:768
 msgid "cannot close temporary file for diversion"
 msgstr "우회용 임시 파일을 닫을 수 없습니다"
 
-#: src/output.c:474
+#: src/output.c:484
 msgid "ERROR: cannot flush diversion to temporary file"
 msgstr "오류: 임시 파일에 우회 값을 플러싱할 수 없습니다"
 
-#: src/output.c:568
+#: src/output.c:579
 msgid "ERROR: copying inserted file"
 msgstr "오류: 추가 파일 복사 중"
 
-#: src/output.c:816
+#: src/output.c:851
 msgid "error reading inserted file"
 msgstr "추가 파일 읽기 오류"
 
-#: src/output.c:983
+#: src/output.c:1018
 msgid "cannot stat diversion"
 msgstr "우회 상태 정보를 가져올 수 없습니다"
 
-#: src/output.c:987
+#: src/output.c:1022
 msgid "diversion too large"
 msgstr "우회 값이 너무 큽니다"
+
+#, c-format
+#~ msgid "unable to display error message"
+#~ msgstr "오류 메시지를 표시할 수 없습니다"

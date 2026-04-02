@@ -1,15 +1,17 @@
-# pthread-thread.m4 serial 2
-dnl Copyright (C) 2019-2021 Free Software Foundation, Inc.
+# pthread-thread.m4
+# serial 3
+dnl Copyright (C) 2019-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_DEFUN([gl_PTHREAD_THREAD],
 [
   AC_REQUIRE([gl_PTHREAD_H])
   AC_REQUIRE([AC_CANONICAL_HOST])
 
-  if { case "$host_os" in mingw*) true;; *) false;; esac; } \
+  if { case "$host_os" in mingw* | windows*) true;; *) false;; esac; } \
      && test $gl_threads_api = windows; then
     dnl Choose function names that don't conflict with the mingw-w64 winpthreads
     dnl library.

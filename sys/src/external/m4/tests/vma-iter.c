@@ -1,13 +1,13 @@
 /* Iteration over virtual memory areas.
-   Copyright (C) 2011-2021 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2011-2017.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published
+   by the Free Software Foundation; either version 2 of the License,
+   or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
@@ -20,6 +20,7 @@
 /* On Solaris in 32-bit mode, when gnulib module 'largefile' is in use,
    prevent a compilation error
      "Cannot use procfs in the large file compilation environment"
+   while also preventing <sys/types.h> from not defining off_t.
    On Android, when targeting Android 4.4 or older with a GCC toolchain,
    prevent a compilation error
      "error: call to 'mmap' declared with attribute error: mmap is not
@@ -28,7 +29,11 @@
       switch to Clang."
    The files that we access in this compilation unit are less than 2 GB
    large.  */
-#if defined __sun || defined __ANDROID__
+#if defined __sun && !defined _LP64 && _FILE_OFFSET_BITS == 64
+# undef _FILE_OFFSET_BITS
+# define _FILE_OFFSET_BITS 32
+#endif
+#ifdef __ANDROID__
 # undef _FILE_OFFSET_BITS
 #endif
 
@@ -44,6 +49,11 @@
 # include <limits.h> /* PATH_MAX */
 #endif
 
+#if defined __linux__ || defined __ANDROID__
+# include <sys/ioctl.h> /* ioctl */
+# include <linux/fs.h> /* PROCMAP_QUERY, struct procmap_query */
+#endif
+
 #if defined __linux__ || defined __ANDROID__ || defined __FreeBSD_kernel__ || defined __FreeBSD__ || defined __DragonFly__ || defined __NetBSD__ || defined __minix /* || defined __CYGWIN__ */
 # include <sys/types.h>
 # include <sys/mman.h> /* mmap, munmap */
@@ -55,6 +65,7 @@
 #if defined __FreeBSD__ || defined __FreeBSD_kernel__ /* FreeBSD, GNU/kFreeBSD */
 # include <sys/types.h>
 # include <sys/mman.h> /* mmap, munmap */
+# include <sys/param.h> /* prerequisite of <sys/user.h> */
 # include <sys/user.h> /* struct kinfo_vmentry */
 # include <sys/sysctl.h> /* sysctl */
 #endif
@@ -64,11 +75,11 @@
 # include <sys/sysctl.h> /* sysctl, struct kinfo_vmentry */
 #endif
 
-#if defined __sgi || defined __osf__ /* IRIX, OSF/1 */
+#if defined _AIX /* AIX */
 # include <string.h> /* memcpy */
 # include <sys/types.h>
 # include <sys/mman.h> /* mmap, munmap */
-# include <sys/procfs.h> /* PIOC*, prmap_t */
+# include <sys/procfs.h> /* prmap_t */
 #endif
 
 #if defined __sun /* Solaris */
@@ -88,7 +99,7 @@
 # include <mach/mach.h>
 #endif
 
-#if defined __GNU__ /* GNU/Hurd */
+#if defined __gnu_hurd__ /* GNU/Hurd */
 # include <mach/mach.h>
 #endif
 
@@ -104,10 +115,6 @@
 # include <sys/types.h>
 # include <sys/mman.h> /* mquery */
 #endif
-
-/* Note: On AIX, there is a /proc/$pic/map file, that contains records of type
-   prmap_t, defined in <sys/procfs.h>.  But it lists only the virtual memory
-   areas that are connected to a file, not the anonymous ones.  */
 
 
 /* Support for reading text files in the /proc file system.  */
@@ -170,19 +177,15 @@ struct rofile
 static int
 rof_open (struct rofile *rof, const char *filename)
 {
-  int fd;
-  unsigned long pagesize;
-  size_t size;
-
-  fd = open (filename, O_RDONLY | O_CLOEXEC);
+  int fd = open (filename, O_RDONLY | O_CLOEXEC);
   if (fd < 0)
     return -1;
   rof->position = 0;
   rof->eof_seen = 0;
   /* Try the static buffer first.  */
-  pagesize = 0;
+  unsigned long pagesize = 0;
   rof->buffer = rof->stack_allocated_buffer;
-  size = sizeof (rof->stack_allocated_buffer);
+  size_t size = sizeof (rof->stack_allocated_buffer);
   rof->auxmap = NULL;
   rof->auxmap_start = 0;
   rof->auxmap_end = 0;
@@ -359,30 +362,31 @@ vma_iterate_proc (vma_iterate_callback_fn callback, void *data)
 
       for (;;)
         {
-          unsigned long start, end;
-          unsigned int flags;
-          int c;
-
           /* Parse one line.  First start and end.  */
+          unsigned long start, end;
           if (!(rof_scanf_lx (&rof, &start) >= 0
                 && rof_getchar (&rof) == '-'
                 && rof_scanf_lx (&rof, &end) >= 0))
             break;
           /* Then the flags.  */
-          do
+          unsigned int flags;
+          {
+            int c;
+            do
+              c = rof_getchar (&rof);
+            while (c == ' ');
+            flags = 0;
+            if (c == 'r')
+              flags |= VMA_PROT_READ;
             c = rof_getchar (&rof);
-          while (c == ' ');
-          flags = 0;
-          if (c == 'r')
-            flags |= VMA_PROT_READ;
-          c = rof_getchar (&rof);
-          if (c == 'w')
-            flags |= VMA_PROT_WRITE;
-          c = rof_getchar (&rof);
-          if (c == 'x')
-            flags |= VMA_PROT_EXECUTE;
-          while (c = rof_getchar (&rof), c != -1 && c != '\n')
-            ;
+            if (c == 'w')
+              flags |= VMA_PROT_WRITE;
+            c = rof_getchar (&rof);
+            if (c == 'x')
+              flags |= VMA_PROT_EXECUTE;
+            while (c = rof_getchar (&rof), c != -1 && c != '\n')
+              ;
+          }
 
           if (start <= auxmap_start && auxmap_end - 1 <= end - 1)
             {
@@ -423,60 +427,68 @@ vma_iterate_proc (vma_iterate_callback_fn callback, void *data)
 
       for (;;)
         {
-          unsigned long start, end;
-          unsigned int flags;
-          int c;
-
           /* Parse one line.  First start.  */
+          unsigned long start;
           if (!(rof_getchar (&rof) == '0'
                 && rof_getchar (&rof) == 'x'
                 && rof_scanf_lx (&rof, &start) >= 0))
             break;
-          while (c = rof_peekchar (&rof), c == ' ' || c == '\t')
-            rof_getchar (&rof);
+          {
+            int c;
+            while (c = rof_peekchar (&rof), c == ' ' || c == '\t')
+              rof_getchar (&rof);
+          }
           /* Then end.  */
+          unsigned long end;
           if (!(rof_getchar (&rof) == '0'
                 && rof_getchar (&rof) == 'x'
                 && rof_scanf_lx (&rof, &end) >= 0))
             break;
 # if defined __FreeBSD__ || defined __DragonFly__
-          /* Then the resident pages count.  */
-          do
-            c = rof_getchar (&rof);
-          while (c == ' ');
-          do
-            c = rof_getchar (&rof);
-          while (c != -1 && c != '\n' && c != ' ');
-          /* Then the private resident pages count.  */
-          do
-            c = rof_getchar (&rof);
-          while (c == ' ');
-          do
-            c = rof_getchar (&rof);
-          while (c != -1 && c != '\n' && c != ' ');
-          /* Then some kernel address.  */
-          do
-            c = rof_getchar (&rof);
-          while (c == ' ');
-          do
-            c = rof_getchar (&rof);
-          while (c != -1 && c != '\n' && c != ' ');
+          {
+            int c;
+            /* Then the resident pages count.  */
+            do
+              c = rof_getchar (&rof);
+            while (c == ' ');
+            do
+              c = rof_getchar (&rof);
+            while (c != -1 && c != '\n' && c != ' ');
+            /* Then the private resident pages count.  */
+            do
+              c = rof_getchar (&rof);
+            while (c == ' ');
+            do
+              c = rof_getchar (&rof);
+            while (c != -1 && c != '\n' && c != ' ');
+            /* Then some kernel address.  */
+            do
+              c = rof_getchar (&rof);
+            while (c == ' ');
+            do
+              c = rof_getchar (&rof);
+            while (c != -1 && c != '\n' && c != ' ');
+          }
 # endif
           /* Then the flags.  */
-          do
+          unsigned int flags;
+          {
+            int c;
+            do
+              c = rof_getchar (&rof);
+            while (c == ' ');
+            flags = 0;
+            if (c == 'r')
+              flags |= VMA_PROT_READ;
             c = rof_getchar (&rof);
-          while (c == ' ');
-          flags = 0;
-          if (c == 'r')
-            flags |= VMA_PROT_READ;
-          c = rof_getchar (&rof);
-          if (c == 'w')
-            flags |= VMA_PROT_WRITE;
-          c = rof_getchar (&rof);
-          if (c == 'x')
-            flags |= VMA_PROT_EXECUTE;
-          while (c = rof_getchar (&rof), c != -1 && c != '\n')
-            ;
+            if (c == 'w')
+              flags |= VMA_PROT_WRITE;
+            c = rof_getchar (&rof);
+            if (c == 'x')
+              flags |= VMA_PROT_EXECUTE;
+            while (c = rof_getchar (&rof), c != -1 && c != '\n')
+              ;
+          }
 
           if (start <= auxmap_start && auxmap_end - 1 <= end - 1)
             {
@@ -508,11 +520,8 @@ static int
 vma_iterate_proc (vma_iterate_callback_fn callback, void *data)
 {
   char fnamebuf[6+10+4+1];
-  char *fname;
-  struct rofile rof;
-
   /* Construct fname = sprintf (fnamebuf+i, "/proc/%u/map", getpid ()).  */
-  fname = fnamebuf + sizeof (fnamebuf) - (4 + 1);
+  char *fname = fnamebuf + sizeof (fnamebuf) - (4 + 1);
   memcpy (fname, "/map", 4 + 1);
   {
     unsigned int value = getpid ();
@@ -524,6 +533,7 @@ vma_iterate_proc (vma_iterate_callback_fn callback, void *data)
   memcpy (fname, "/proc/", 6);
 
   /* Open the current process' maps file.  It describes one VMA per line.  */
+  struct rofile rof;
   if (rof_open (&rof, fname) >= 0)
     {
       unsigned long auxmap_start = rof.auxmap_start;
@@ -531,30 +541,31 @@ vma_iterate_proc (vma_iterate_callback_fn callback, void *data)
 
       for (;;)
         {
-          unsigned long start, end;
-          unsigned int flags;
-          int c;
-
           /* Parse one line.  First start and end.  */
+          unsigned long start, end;
           if (!(rof_scanf_lx (&rof, &start) >= 0
                 && rof_getchar (&rof) == '-'
                 && rof_scanf_lx (&rof, &end) >= 0))
             break;
           /* Then the flags.  */
-          do
+          unsigned int flags;
+          {
+            int c;
+            do
+              c = rof_getchar (&rof);
+            while (c == ' ');
+            flags = 0;
+            if (c == 'r')
+              flags |= VMA_PROT_READ;
             c = rof_getchar (&rof);
-          while (c == ' ');
-          flags = 0;
-          if (c == 'r')
-            flags |= VMA_PROT_READ;
-          c = rof_getchar (&rof);
-          if (c == 'w')
-            flags |= VMA_PROT_WRITE;
-          c = rof_getchar (&rof);
-          if (c == 'x')
-            flags |= VMA_PROT_EXECUTE;
-          while (c = rof_getchar (&rof), c != -1 && c != '\n')
-            ;
+            if (c == 'w')
+              flags |= VMA_PROT_WRITE;
+            c = rof_getchar (&rof);
+            if (c == 'x')
+              flags |= VMA_PROT_EXECUTE;
+            while (c = rof_getchar (&rof), c != -1 && c != '\n')
+              ;
+          }
 
           if (start <= auxmap_start && auxmap_end - 1 <= end - 1)
             {
@@ -600,17 +611,7 @@ vma_iterate_bsd (vma_iterate_callback_fn callback, void *data)
 {
   /* Documentation: https://www.freebsd.org/cgi/man.cgi?sysctl(3)  */
   int info_path[] = { CTL_KERN, KERN_PROC, KERN_PROC_VMMAP, getpid () };
-  size_t len;
-  size_t pagesize;
-  size_t memneed;
-  void *auxmap;
-  unsigned long auxmap_start;
-  unsigned long auxmap_end;
-  char *mem;
-  char *p;
-  char *p_end;
-
-  len = 0;
+  size_t len = 0;
   if (sysctl (info_path, 4, NULL, &len, NULL, 0) < 0)
     return -1;
   /* Allow for small variations over time.  In a multithreaded program
@@ -621,53 +622,55 @@ vma_iterate_bsd (vma_iterate_callback_fn callback, void *data)
      We also cannot use malloc here, because a malloc() call may call mmap()
      and thus pre-allocate available memory.
      So use mmap(), and ignore the resulting VMA.  */
-  pagesize = getpagesize ();
-  memneed = len;
+  size_t pagesize = getpagesize ();
+  size_t memneed = len;
   memneed = ((memneed - 1) / pagesize + 1) * pagesize;
-  auxmap = (void *) mmap ((void *) 0, memneed, PROT_READ | PROT_WRITE,
-                          MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+  void *auxmap = (void *) mmap ((void *) 0, memneed, PROT_READ | PROT_WRITE,
+                                MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
   if (auxmap == (void *) -1)
     return -1;
-  auxmap_start = (unsigned long) auxmap;
-  auxmap_end = auxmap_start + memneed;
-  mem = (char *) auxmap;
+  unsigned long auxmap_start = (unsigned long) auxmap;
+  unsigned long auxmap_end = auxmap_start + memneed;
+  char *mem = (char *) auxmap;
   if (sysctl (info_path, 4, mem, &len, NULL, 0) < 0)
     {
       munmap (auxmap, memneed);
       return -1;
     }
-  p = mem;
-  p_end = mem + len;
-  while (p < p_end)
-    {
-      struct kinfo_vmentry *kve = (struct kinfo_vmentry *) p;
-      unsigned long start = kve->kve_start;
-      unsigned long end = kve->kve_end;
-      unsigned int flags = 0;
-      if (kve->kve_protection & KVME_PROT_READ)
-        flags |= VMA_PROT_READ;
-      if (kve->kve_protection & KVME_PROT_WRITE)
-        flags |= VMA_PROT_WRITE;
-      if (kve->kve_protection & KVME_PROT_EXEC)
-        flags |= VMA_PROT_EXECUTE;
-      if (start <= auxmap_start && auxmap_end - 1 <= end - 1)
-        {
-          /* Consider [start,end-1] \ [auxmap_start,auxmap_end-1]
-             = [start,auxmap_start-1] u [auxmap_end,end-1].  */
-          if (start < auxmap_start)
-            if (callback (data, start, auxmap_start, flags))
+  {
+    char *p = mem;
+    char *p_end = mem + len;
+    while (p < p_end)
+      {
+        struct kinfo_vmentry *kve = (struct kinfo_vmentry *) p;
+        unsigned long start = kve->kve_start;
+        unsigned long end = kve->kve_end;
+        unsigned int flags = 0;
+        if (kve->kve_protection & KVME_PROT_READ)
+          flags |= VMA_PROT_READ;
+        if (kve->kve_protection & KVME_PROT_WRITE)
+          flags |= VMA_PROT_WRITE;
+        if (kve->kve_protection & KVME_PROT_EXEC)
+          flags |= VMA_PROT_EXECUTE;
+        if (start <= auxmap_start && auxmap_end - 1 <= end - 1)
+          {
+            /* Consider [start,end-1] \ [auxmap_start,auxmap_end-1]
+               = [start,auxmap_start-1] u [auxmap_end,end-1].  */
+            if (start < auxmap_start)
+              if (callback (data, start, auxmap_start, flags))
+                break;
+            if (auxmap_end - 1 < end - 1)
+              if (callback (data, auxmap_end, end, flags))
+                break;
+          }
+        else
+          {
+            if (callback (data, start, end, flags))
               break;
-          if (auxmap_end - 1 < end - 1)
-            if (callback (data, auxmap_end, end, flags))
-              break;
-        }
-      else
-        {
-          if (callback (data, start, end, flags))
-            break;
-        }
-      p += kve->kve_structsize;
-    }
+          }
+        p += kve->kve_structsize;
+      }
+  }
   munmap (auxmap, memneed);
   return 0;
 }
@@ -684,17 +687,7 @@ vma_iterate_bsd (vma_iterate_callback_fn callback, void *data)
        parts of each entry.  */
     offsetof (struct kinfo_vmentry, kve_path);
   int info_path[] = { CTL_VM, VM_PROC, VM_PROC_MAP, getpid (), entry_size };
-  size_t len;
-  size_t pagesize;
-  size_t memneed;
-  void *auxmap;
-  unsigned long auxmap_start;
-  unsigned long auxmap_end;
-  char *mem;
-  char *p;
-  char *p_end;
-
-  len = 0;
+  size_t len = 0;
   if (sysctl (info_path, 5, NULL, &len, NULL, 0) < 0)
     return -1;
   /* Allow for small variations over time.  In a multithreaded program
@@ -711,16 +704,16 @@ vma_iterate_bsd (vma_iterate_callback_fn callback, void *data)
      We also cannot use malloc here, because a malloc() call may call mmap()
      and thus pre-allocate available memory.
      So use mmap(), and ignore the resulting VMA.  */
-  pagesize = getpagesize ();
-  memneed = len;
+  size_t pagesize = getpagesize ();
+  size_t memneed = len;
   memneed = ((memneed - 1) / pagesize + 1) * pagesize;
-  auxmap = (void *) mmap ((void *) 0, memneed, PROT_READ | PROT_WRITE,
-                          MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+  void *auxmap = (void *) mmap ((void *) 0, memneed, PROT_READ | PROT_WRITE,
+                                MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
   if (auxmap == (void *) -1)
     return -1;
-  auxmap_start = (unsigned long) auxmap;
-  auxmap_end = auxmap_start + memneed;
-  mem = (char *) auxmap;
+  unsigned long auxmap_start = (unsigned long) auxmap;
+  unsigned long auxmap_end = auxmap_start + memneed;
+  char *mem = (char *) auxmap;
   if (sysctl (info_path, 5, mem, &len, NULL, 0) < 0
       || len > 0x100000 - entry_size)
     {
@@ -728,38 +721,40 @@ vma_iterate_bsd (vma_iterate_callback_fn callback, void *data)
       munmap (auxmap, memneed);
       return -1;
     }
-  p = mem;
-  p_end = mem + len;
-  while (p < p_end)
-    {
-      struct kinfo_vmentry *kve = (struct kinfo_vmentry *) p;
-      unsigned long start = kve->kve_start;
-      unsigned long end = kve->kve_end;
-      unsigned int flags = 0;
-      if (kve->kve_protection & KVME_PROT_READ)
-        flags |= VMA_PROT_READ;
-      if (kve->kve_protection & KVME_PROT_WRITE)
-        flags |= VMA_PROT_WRITE;
-      if (kve->kve_protection & KVME_PROT_EXEC)
-        flags |= VMA_PROT_EXECUTE;
-      if (start <= auxmap_start && auxmap_end - 1 <= end - 1)
-        {
-          /* Consider [start,end-1] \ [auxmap_start,auxmap_end-1]
-             = [start,auxmap_start-1] u [auxmap_end,end-1].  */
-          if (start < auxmap_start)
-            if (callback (data, start, auxmap_start, flags))
+  {
+    char *p = mem;
+    char *p_end = mem + len;
+    while (p < p_end)
+      {
+        struct kinfo_vmentry *kve = (struct kinfo_vmentry *) p;
+        unsigned long start = kve->kve_start;
+        unsigned long end = kve->kve_end;
+        unsigned int flags = 0;
+        if (kve->kve_protection & KVME_PROT_READ)
+          flags |= VMA_PROT_READ;
+        if (kve->kve_protection & KVME_PROT_WRITE)
+          flags |= VMA_PROT_WRITE;
+        if (kve->kve_protection & KVME_PROT_EXEC)
+          flags |= VMA_PROT_EXECUTE;
+        if (start <= auxmap_start && auxmap_end - 1 <= end - 1)
+          {
+            /* Consider [start,end-1] \ [auxmap_start,auxmap_end-1]
+               = [start,auxmap_start-1] u [auxmap_end,end-1].  */
+            if (start < auxmap_start)
+              if (callback (data, start, auxmap_start, flags))
+                break;
+            if (auxmap_end - 1 < end - 1)
+              if (callback (data, auxmap_end, end, flags))
+                break;
+          }
+        else
+          {
+            if (callback (data, start, end, flags))
               break;
-          if (auxmap_end - 1 < end - 1)
-            if (callback (data, auxmap_end, end, flags))
-              break;
-        }
-      else
-        {
-          if (callback (data, start, end, flags))
-            break;
-        }
-      p += entry_size;
-    }
+          }
+        p += entry_size;
+      }
+  }
   munmap (auxmap, memneed);
   return 0;
 }
@@ -771,17 +766,7 @@ vma_iterate_bsd (vma_iterate_callback_fn callback, void *data)
 {
   /* Documentation: https://man.openbsd.org/sysctl.2  */
   int info_path[] = { CTL_KERN, KERN_PROC_VMMAP, getpid () };
-  size_t len;
-  size_t pagesize;
-  size_t memneed;
-  void *auxmap;
-  unsigned long auxmap_start;
-  unsigned long auxmap_end;
-  char *mem;
-  char *p;
-  char *p_end;
-
-  len = 0;
+  size_t len = 0;
   if (sysctl (info_path, 3, NULL, &len, NULL, 0) < 0)
     return -1;
   /* Allow for small variations over time.  In a multithreaded program
@@ -793,60 +778,85 @@ vma_iterate_bsd (vma_iterate_callback_fn callback, void *data)
   /* And the system call rejects lengths that are not a multiple of
      sizeof (struct kinfo_vmentry).  */
   len = (len / sizeof (struct kinfo_vmentry)) * sizeof (struct kinfo_vmentry);
+  /* Here len >= 2 * sizeof (struct kinfo_vmentry).  This is important, because
+       * The system call rejects len == 0.
+       * len == 1 * sizeof (struct kinfo_vmentry)
+         would produce just one entry, with
+           kve_start = kve_end = 0x1000,
+           kve_protection = 0,
+         and thus lead to an endless loop.  */
   /* Allocate memneed bytes of memory.
      We cannot use alloca here, because not much stack space is guaranteed.
      We also cannot use malloc here, because a malloc() call may call mmap()
      and thus pre-allocate available memory.
      So use mmap(), and ignore the resulting VMA.  */
-  pagesize = getpagesize ();
-  memneed = len;
+  size_t pagesize = getpagesize ();
+  size_t memneed = len;
   memneed = ((memneed - 1) / pagesize + 1) * pagesize;
-  auxmap = (void *) mmap ((void *) 0, memneed, PROT_READ | PROT_WRITE,
-                          MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+  void *auxmap = (void *) mmap ((void *) 0, memneed, PROT_READ | PROT_WRITE,
+                                MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
   if (auxmap == (void *) -1)
     return -1;
-  auxmap_start = (unsigned long) auxmap;
-  auxmap_end = auxmap_start + memneed;
-  mem = (char *) auxmap;
-  if (sysctl (info_path, 3, mem, &len, NULL, 0) < 0
-      || len > 0x10000 - sizeof (struct kinfo_vmentry))
+  unsigned long auxmap_start = (unsigned long) auxmap;
+  unsigned long auxmap_end = auxmap_start + memneed;
+  char *mem = (char *) auxmap;
+
+  for (;;)
     {
-      /* sysctl failed, or the list of VMAs is possibly truncated.  */
-      munmap (auxmap, memneed);
-      return -1;
-    }
-  p = mem;
-  p_end = mem + len;
-  while (p < p_end)
-    {
-      struct kinfo_vmentry *kve = (struct kinfo_vmentry *) p;
-      unsigned long start = kve->kve_start;
-      unsigned long end = kve->kve_end;
-      unsigned int flags = 0;
-      if (kve->kve_protection & KVE_PROT_READ)
-        flags |= VMA_PROT_READ;
-      if (kve->kve_protection & KVE_PROT_WRITE)
-        flags |= VMA_PROT_WRITE;
-      if (kve->kve_protection & KVE_PROT_EXEC)
-        flags |= VMA_PROT_EXECUTE;
-      if (start <= auxmap_start && auxmap_end - 1 <= end - 1)
+      size_t rlen = len;
+      if (sysctl (info_path, 3, mem, &rlen, NULL, 0) < 0)
         {
-          /* Consider [start,end-1] \ [auxmap_start,auxmap_end-1]
-             = [start,auxmap_start-1] u [auxmap_end,end-1].  */
-          if (start < auxmap_start)
-            if (callback (data, start, auxmap_start, flags))
-              break;
-          if (auxmap_end - 1 < end - 1)
-            if (callback (data, auxmap_end, end, flags))
-              break;
+          /* sysctl failed.  */
+          munmap (auxmap, memneed);
+          return -1;
         }
-      else
-        {
-          if (start != end)
-            if (callback (data, start, end, flags))
-              break;
-        }
-      p += sizeof (struct kinfo_vmentry);
+      if (rlen == 0)
+        break;
+      char *p_end = mem + rlen;
+      {
+        char *p = mem;
+        while (p < p_end)
+          {
+            struct kinfo_vmentry *kve = (struct kinfo_vmentry *) p;
+            unsigned long start = kve->kve_start;
+            unsigned long end = kve->kve_end;
+            unsigned int flags = 0;
+            if (kve->kve_protection & KVE_PROT_READ)
+              flags |= VMA_PROT_READ;
+            if (kve->kve_protection & KVE_PROT_WRITE)
+              flags |= VMA_PROT_WRITE;
+            if (kve->kve_protection & KVE_PROT_EXEC)
+              flags |= VMA_PROT_EXECUTE;
+            if (start <= auxmap_start && auxmap_end - 1 <= end - 1)
+              {
+                /* Consider [start,end-1] \ [auxmap_start,auxmap_end-1]
+                   = [start,auxmap_start-1] u [auxmap_end,end-1].  */
+                if (start < auxmap_start)
+                  if (callback (data, start, auxmap_start, flags))
+                    break;
+                if (auxmap_end - 1 < end - 1)
+                  if (callback (data, auxmap_end, end, flags))
+                    break;
+              }
+            else
+              {
+                if (start != end)
+                  if (callback (data, start, end, flags))
+                    break;
+              }
+            p += sizeof (struct kinfo_vmentry);
+          }
+      }
+      if (rlen < len)
+        break;
+      /* sysctl returned exactly len entries, which means that another sysctl
+         invocation is needed.  */
+      unsigned long end_so_far = ((struct kinfo_vmentry *) p_end)[-1].kve_end;
+      if (end_so_far == 0)
+        /* Wrapped around.  Avoid an endless loop.  */
+        break;
+      /* Prepare for the next sysctl invocation.  */
+      ((struct kinfo_vmentry *) mem)[0].kve_start = end_so_far;
     }
   munmap (auxmap, memneed);
   return 0;
@@ -863,9 +873,85 @@ vma_iterate_bsd (vma_iterate_callback_fn callback, void *data)
 #endif
 
 
+/* Support for reading the info from the Linux ioctl() PROCMAP_QUERY
+   system call.  */
+
+#if (defined __linux__ || defined __ANDROID__) && defined PROCMAP_QUERY /* Linux >= 6.11 */
+
+static int
+vma_iterate_procmap_query (vma_iterate_callback_fn callback, void *data)
+{
+  /* Documentation: <linux/fs.h>
+     This implementation is more than twice as fast as vma_iterate_proc.
+     It does not return the [vsyscall] memory area at 0xFFFFFFFFFF600000,
+     but this is not a serious drawback, since that memory area is not
+     controlled by userspace anyway.  */
+  int fd = open ("/proc/self/maps", O_RDONLY | O_CLOEXEC);
+  if (fd < 0)
+    return -1;
+
+  unsigned long addr = 0;
+  do
+    {
+      /* Clear all fields, just in case some 'in' fields are added later.  */
+      struct procmap_query pq = {0};
+      pq.size = sizeof (pq);
+      pq.query_flags = PROCMAP_QUERY_COVERING_OR_NEXT_VMA;
+      pq.query_addr = addr;
+      pq.vma_name_size = 0;
+      pq.vma_name_addr = 0;
+
+      int ret = ioctl (fd, PROCMAP_QUERY, &pq);
+      if (ret == -1)
+        {
+          if (addr == 0)
+            {
+              /* Likely errno == ENOTTY.  */
+              close (fd);
+              return -1;
+            }
+          else
+            /* Likely errno == ENOENT.  */
+            break;
+        }
+
+      unsigned long start = pq.vma_start;
+      unsigned long end = pq.vma_end;
+      unsigned int flags = 0;
+      if (pq.vma_flags & PROCMAP_QUERY_VMA_READABLE)
+        flags |= VMA_PROT_READ;
+      if (pq.vma_flags & PROCMAP_QUERY_VMA_WRITABLE)
+        flags |= VMA_PROT_WRITE;
+      if (pq.vma_flags & PROCMAP_QUERY_VMA_EXECUTABLE)
+        flags |= VMA_PROT_EXECUTE;
+      if (callback (data, start, end, flags))
+        break;
+
+      addr = pq.vma_end;
+    }
+  while (addr != 0);
+
+  close (fd);
+  return 0;
+}
+
+#endif
+
+
 int
 vma_iterate (vma_iterate_callback_fn callback, void *data)
 {
+#if (defined __linux__ || defined __ANDROID__) && defined PROCMAP_QUERY
+  /* Linux >= 6.11 */
+  /* This implementation is more than twice as fast as vma_iterate_proc,
+     when supported by the kernel.  Therefore try it first.  */
+  {
+    int retval = vma_iterate_procmap_query (callback, data);
+    if (retval == 0)
+      return 0;
+  }
+#endif
+
 #if defined __linux__ || defined __ANDROID__ || defined __FreeBSD_kernel__ || defined __FreeBSD__ || defined __DragonFly__ || defined __NetBSD__ || defined __minix /* || defined __CYGWIN__ */
 
 # if defined __FreeBSD__
@@ -876,7 +962,7 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
      So use vma_iterate_proc only as a fallback.  */
   int retval = vma_iterate_bsd (callback, data);
   if (retval == 0)
-      return 0;
+    return 0;
 
   return vma_iterate_proc (callback, data);
 # else
@@ -884,37 +970,24 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
      as a fallback.  */
   int retval = vma_iterate_proc (callback, data);
   if (retval == 0)
-      return 0;
+    return 0;
 
   return vma_iterate_bsd (callback, data);
 # endif
 
-#elif defined __sgi || defined __osf__ /* IRIX, OSF/1 */
+#elif defined _AIX /* AIX */
 
-  size_t pagesize;
-  char fnamebuf[6+10+1];
-  char *fname;
-  int fd;
-  int nmaps;
-  size_t memneed;
-# if HAVE_MAP_ANONYMOUS
-#  define zero_fd -1
-#  define map_flags MAP_ANONYMOUS
-# else
-  int zero_fd;
-#  define map_flags 0
-# endif
-  void *auxmap;
-  unsigned long auxmap_start;
-  unsigned long auxmap_end;
-  prmap_t* maps;
-  prmap_t* mp;
+  /* On AIX, there is a /proc/$pic/map file, that contains records of type
+     prmap_t, defined in <sys/procfs.h>.  In older versions of AIX, it lists
+     only the virtual memory areas that are connected to a file, not the
+     anonymous ones.  But at least since AIX 7.1, it is well usable.  */
 
-  pagesize = getpagesize ();
+  size_t pagesize = getpagesize ();
 
-  /* Construct fname = sprintf (fnamebuf+i, "/proc/%u", getpid ()).  */
-  fname = fnamebuf + sizeof (fnamebuf) - 1;
-  *fname = '\0';
+  char fnamebuf[6+10+4+1];
+  /* Construct fname = sprintf (fnamebuf+i, "/proc/%u/map", getpid ()).  */
+  char *fname = fnamebuf + sizeof (fnamebuf) - (4+1);
+  memcpy (fname, "/map", 4+1);
   {
     unsigned int value = getpid ();
     do
@@ -924,82 +997,173 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
   fname -= 6;
   memcpy (fname, "/proc/", 6);
 
-  fd = open (fname, O_RDONLY | O_CLOEXEC);
+  int fd = open (fname, O_RDONLY | O_CLOEXEC);
   if (fd < 0)
     return -1;
 
-  if (ioctl (fd, PIOCNMAP, &nmaps) < 0)
-    goto fail2;
+  /* The contents of /proc/<pid>/map contains a number of prmap_t entries,
+     then an entirely null prmap_t entry, then a heap of NUL terminated
+     strings.
+     Documentation: https://www.ibm.com/docs/en/aix/7.1?topic=files-proc-file
+     We read the entire contents, but look only at the prmap_t entries and
+     ignore the tail part.  */
 
-  memneed = (nmaps + 10) * sizeof (prmap_t);
-  /* Allocate memneed bytes of memory.
-     We cannot use alloca here, because not much stack space is guaranteed.
-     We also cannot use malloc here, because a malloc() call may call mmap()
-     and thus pre-allocate available memory.
-     So use mmap(), and ignore the resulting VMA.  */
-  memneed = ((memneed - 1) / pagesize + 1) * pagesize;
-# if !HAVE_MAP_ANONYMOUS
-  zero_fd = open ("/dev/zero", O_RDONLY | O_CLOEXEC, 0644);
-  if (zero_fd < 0)
-    goto fail2;
-# endif
-  auxmap = (void *) mmap ((void *) 0, memneed, PROT_READ | PROT_WRITE,
-                          map_flags | MAP_PRIVATE, zero_fd, 0);
-# if !HAVE_MAP_ANONYMOUS
-  close (zero_fd);
-# endif
-  if (auxmap == (void *) -1)
-    goto fail2;
-  auxmap_start = (unsigned long) auxmap;
-  auxmap_end = auxmap_start + memneed;
-  maps = (prmap_t *) auxmap;
-
-  if (ioctl (fd, PIOCMAP, maps) < 0)
-    goto fail1;
-
-  for (mp = maps;;)
+  for (size_t memneed = 2 * pagesize; ; memneed = 2 * memneed)
     {
-      unsigned long start, end;
-      unsigned int flags;
-
-      start = (unsigned long) mp->pr_vaddr;
-      end = start + mp->pr_size;
-      if (start == 0 && end == 0)
-        break;
-      flags = 0;
-      if (mp->pr_mflags & MA_READ)
-        flags |= VMA_PROT_READ;
-      if (mp->pr_mflags & MA_WRITE)
-        flags |= VMA_PROT_WRITE;
-      if (mp->pr_mflags & MA_EXEC)
-        flags |= VMA_PROT_EXECUTE;
-      mp++;
-      if (start <= auxmap_start && auxmap_end - 1 <= end - 1)
+      /* Allocate memneed bytes of memory.
+         We cannot use alloca here, because not much stack space is guaranteed.
+         We also cannot use malloc here, because a malloc() call may call mmap()
+         and thus pre-allocate available memory.
+         So use mmap(), and ignore the resulting VMA if it occurs among the
+         resulting VMAs.  (Normally it doesn't, because it was allocated after
+         the open() call.)  */
+      void *auxmap = (void *) mmap ((void *) 0, memneed, PROT_READ | PROT_WRITE,
+                                    MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+      if (auxmap == (void *) -1)
         {
-          /* Consider [start,end-1] \ [auxmap_start,auxmap_end-1]
-             = [start,auxmap_start-1] u [auxmap_end,end-1].  */
-          if (start < auxmap_start)
-            if (callback (data, start, auxmap_start, flags))
-              break;
-          if (auxmap_end - 1 < end - 1)
-            if (callback (data, auxmap_end, end, flags))
-              break;
+          close (fd);
+          return -1;
+        }
+      unsigned long auxmap_start = (unsigned long) auxmap;
+      unsigned long auxmap_end = auxmap_start + memneed;
+
+      /* Read the contents of /proc/<pid>/map in a single system call.
+         This guarantees a consistent result (no duplicated or omitted
+         entries).  */
+     retry: ;
+      ssize_t nbytes;
+      do
+        nbytes = read (fd, auxmap, memneed);
+      while (nbytes < 0 && errno == EINTR);
+      if (nbytes <= 0)
+        {
+          munmap (auxmap, memneed);
+          close (fd);
+          return -1;
+        }
+      if (nbytes == memneed)
+        {
+          /* Need more memory.  */
+          munmap (auxmap, memneed);
+          if (lseek (fd, 0, SEEK_SET) < 0)
+            {
+              close (fd);
+              return -1;
+            }
         }
       else
         {
-          if (callback (data, start, end, flags))
-            break;
+          if (read (fd, (char *) auxmap + nbytes, 1) > 0)
+            {
+              /* Oops, we had a short read.  Retry.  */
+              if (lseek (fd, 0, SEEK_SET) < 0)
+                {
+                  munmap (auxmap, memneed);
+                  close (fd);
+                  return -1;
+                }
+              goto retry;
+            }
+
+          /* We now have the entire contents of /proc/<pid>/map in memory.  */
+          prmap_t *maps = (prmap_t *) auxmap;
+
+          /* The entries are not sorted by address.  Therefore
+             1. Extract the relevant information into an array.
+             2. Sort the array in ascending order.
+             3. Invoke the callback.  */
+          typedef struct
+            {
+              uintptr_t start;
+              uintptr_t end;
+              unsigned int flags;
+            }
+          vma_t;
+          /* Since 2 * sizeof (vma_t) <= sizeof (prmap_t), we can reuse the
+             same memory.  */
+          vma_t *vmas = (vma_t *) auxmap;
+
+          vma_t *vp = vmas;
+          for (prmap_t *mp = maps;;)
+            {
+              unsigned long start = (unsigned long) mp->pr_vaddr;
+              unsigned long end = start + mp->pr_size;
+              if (start == 0 && end == 0 && mp->pr_mflags == 0)
+                break;
+              /* Discard empty VMAs and kernel VMAs.  */
+              if (start < end && (mp->pr_mflags & MA_KERNTEXT) == 0)
+                {
+                  unsigned int flags = 0;
+                  if (mp->pr_mflags & MA_READ)
+                    flags |= VMA_PROT_READ;
+                  if (mp->pr_mflags & MA_WRITE)
+                    flags |= VMA_PROT_WRITE;
+                  if (mp->pr_mflags & MA_EXEC)
+                    flags |= VMA_PROT_EXECUTE;
+
+                  if (start <= auxmap_start && auxmap_end - 1 <= end - 1)
+                    {
+                      /* Consider [start,end-1] \ [auxmap_start,auxmap_end-1]
+                         = [start,auxmap_start-1] u [auxmap_end,end-1].  */
+                      if (start < auxmap_start)
+                        {
+                          vp->start = start;
+                          vp->end = auxmap_start;
+                          vp->flags = flags;
+                          vp++;
+                        }
+                      if (auxmap_end - 1 < end - 1)
+                        {
+                          vp->start = auxmap_end;
+                          vp->end = end;
+                          vp->flags = flags;
+                          vp++;
+                        }
+                    }
+                  else
+                    {
+                      vp->start = start;
+                      vp->end = end;
+                      vp->flags = flags;
+                      vp++;
+                    }
+                }
+              mp++;
+            }
+
+          size_t nvmas = vp - vmas;
+          /* Sort the array in ascending order.
+             Better not call qsort(), since it may call malloc().
+             Insertion-sort is OK in this case, despite its worst-case running
+             time of O(N²), since the number of VMAs will rarely be larger than
+             1000.  */
+          for (size_t i = 1; i < nvmas; i++)
+            {
+              /* Invariant: Here vmas[0..i-1] is sorted.  */
+              for (size_t j = i; j > 0 && vmas[j - 1].start > vmas[j].start; j--)
+                {
+                  vma_t tmp = vmas[j - 1];
+                  vmas[j - 1] = vmas[j];
+                  vmas[j] = tmp;
+                }
+              /* Invariant: Here vmas[0..i] is sorted.  */
+            }
+
+          /* Invoke the callback.  */
+          for (size_t i = 0; i < nvmas; i++)
+            {
+              vma_t *vpi = &vmas[i];
+              if (callback (data, vpi->start, vpi->end, vpi->flags))
+                break;
+            }
+
+          munmap (auxmap, memneed);
+          break;
         }
     }
-  munmap (auxmap, memneed);
+
   close (fd);
   return 0;
-
- fail1:
-  munmap (auxmap, memneed);
- fail2:
-  close (fd);
-  return -1;
 
 #elif defined __sun /* Solaris */
 
@@ -1016,29 +1180,11 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
 # if defined PIOCNMAP && defined PIOCMAP
   /* We must use the older /proc interface.  */
 
-  size_t pagesize;
+  size_t pagesize = getpagesize ();
+
   char fnamebuf[6+10+1];
-  char *fname;
-  int fd;
-  int nmaps;
-  size_t memneed;
-#  if HAVE_MAP_ANONYMOUS
-#   define zero_fd -1
-#   define map_flags MAP_ANONYMOUS
-#  else /* Solaris <= 7 */
-  int zero_fd;
-#   define map_flags 0
-#  endif
-  void *auxmap;
-  unsigned long auxmap_start;
-  unsigned long auxmap_end;
-  prmap_t* maps;
-  prmap_t* mp;
-
-  pagesize = getpagesize ();
-
   /* Construct fname = sprintf (fnamebuf+i, "/proc/%u", getpid ()).  */
-  fname = fnamebuf + sizeof (fnamebuf) - 1;
+  char *fname = fnamebuf + sizeof (fnamebuf) - 1;
   *fname = '\0';
   {
     unsigned int value = getpid ();
@@ -1049,49 +1195,39 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
   fname -= 6;
   memcpy (fname, "/proc/", 6);
 
-  fd = open (fname, O_RDONLY | O_CLOEXEC);
+  int fd = open (fname, O_RDONLY | O_CLOEXEC);
   if (fd < 0)
     return -1;
 
+  int nmaps;
   if (ioctl (fd, PIOCNMAP, &nmaps) < 0)
     goto fail2;
 
-  memneed = (nmaps + 10) * sizeof (prmap_t);
+  size_t memneed = (nmaps + 10) * sizeof (prmap_t);
   /* Allocate memneed bytes of memory.
      We cannot use alloca here, because not much stack space is guaranteed.
      We also cannot use malloc here, because a malloc() call may call mmap()
      and thus pre-allocate available memory.
      So use mmap(), and ignore the resulting VMA.  */
   memneed = ((memneed - 1) / pagesize + 1) * pagesize;
-#  if !HAVE_MAP_ANONYMOUS
-  zero_fd = open ("/dev/zero", O_RDONLY | O_CLOEXEC, 0644);
-  if (zero_fd < 0)
-    goto fail2;
-#  endif
-  auxmap = (void *) mmap ((void *) 0, memneed, PROT_READ | PROT_WRITE,
-                          map_flags | MAP_PRIVATE, zero_fd, 0);
-#  if !HAVE_MAP_ANONYMOUS
-  close (zero_fd);
-#  endif
+  void *auxmap = (void *) mmap ((void *) 0, memneed, PROT_READ | PROT_WRITE,
+                                MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
   if (auxmap == (void *) -1)
     goto fail2;
-  auxmap_start = (unsigned long) auxmap;
-  auxmap_end = auxmap_start + memneed;
-  maps = (prmap_t *) auxmap;
+  unsigned long auxmap_start = (unsigned long) auxmap;
+  unsigned long auxmap_end = auxmap_start + memneed;
+  prmap_t *maps = (prmap_t *) auxmap;
 
   if (ioctl (fd, PIOCMAP, maps) < 0)
     goto fail1;
 
-  for (mp = maps;;)
+  for (prmap_t *mp = maps;;)
     {
-      unsigned long start, end;
-      unsigned int flags;
-
-      start = (unsigned long) mp->pr_vaddr;
-      end = start + mp->pr_size;
+      unsigned long start = (unsigned long) mp->pr_vaddr;
+      unsigned long end = start + mp->pr_size;
       if (start == 0 && end == 0)
         break;
-      flags = 0;
+      unsigned int flags = 0;
       if (mp->pr_mflags & MA_READ)
         flags |= VMA_PROT_READ;
       if (mp->pr_mflags & MA_WRITE)
@@ -1134,30 +1270,11 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
      prmap_t.  These are different in 32-bit and 64-bit processes,
      but here we are fortunately accessing only the current process.  */
 
-  size_t pagesize;
+  size_t pagesize = getpagesize ();
+
   char fnamebuf[6+10+4+1];
-  char *fname;
-  int fd;
-  int nmaps;
-  size_t memneed;
-#  if HAVE_MAP_ANONYMOUS
-#   define zero_fd -1
-#   define map_flags MAP_ANONYMOUS
-#  else /* Solaris <= 7 */
-  int zero_fd;
-#   define map_flags 0
-#  endif
-  void *auxmap;
-  unsigned long auxmap_start;
-  unsigned long auxmap_end;
-  prmap_t* maps;
-  prmap_t* maps_end;
-  prmap_t* mp;
-
-  pagesize = getpagesize ();
-
   /* Construct fname = sprintf (fnamebuf+i, "/proc/%u/map", getpid ()).  */
-  fname = fnamebuf + sizeof (fnamebuf) - 1 - 4;
+  char *fname = fnamebuf + sizeof (fnamebuf) - 1 - 4;
   memcpy (fname, "/map", 4 + 1);
   {
     unsigned int value = getpid ();
@@ -1168,10 +1285,11 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
   fname -= 6;
   memcpy (fname, "/proc/", 6);
 
-  fd = open (fname, O_RDONLY | O_CLOEXEC);
+  int fd = open (fname, O_RDONLY | O_CLOEXEC);
   if (fd < 0)
     return -1;
 
+  int nmaps;
   {
     struct stat statbuf;
     if (fstat (fd, &statbuf) < 0)
@@ -1179,30 +1297,23 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
     nmaps = statbuf.st_size / sizeof (prmap_t);
   }
 
-  memneed = (nmaps + 10) * sizeof (prmap_t);
+  size_t memneed = (nmaps + 10) * sizeof (prmap_t);
   /* Allocate memneed bytes of memory.
      We cannot use alloca here, because not much stack space is guaranteed.
      We also cannot use malloc here, because a malloc() call may call mmap()
      and thus pre-allocate available memory.
      So use mmap(), and ignore the resulting VMA.  */
   memneed = ((memneed - 1) / pagesize + 1) * pagesize;
-#  if !HAVE_MAP_ANONYMOUS
-  zero_fd = open ("/dev/zero", O_RDONLY | O_CLOEXEC, 0644);
-  if (zero_fd < 0)
-    goto fail2;
-#  endif
-  auxmap = (void *) mmap ((void *) 0, memneed, PROT_READ | PROT_WRITE,
-                          map_flags | MAP_PRIVATE, zero_fd, 0);
-#  if !HAVE_MAP_ANONYMOUS
-  close (zero_fd);
-#  endif
+  void *auxmap = (void *) mmap ((void *) 0, memneed, PROT_READ | PROT_WRITE,
+                                MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
   if (auxmap == (void *) -1)
     goto fail2;
-  auxmap_start = (unsigned long) auxmap;
-  auxmap_end = auxmap_start + memneed;
-  maps = (prmap_t *) auxmap;
+  unsigned long auxmap_start = (unsigned long) auxmap;
+  unsigned long auxmap_end = auxmap_start + memneed;
+  prmap_t *maps = (prmap_t *) auxmap;
 
   /* Read up to memneed bytes from fd into maps.  */
+  prmap_t *maps_end;
   {
     size_t remaining = memneed;
     size_t total_read = 0;
@@ -1230,14 +1341,11 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
     maps_end = maps + nmaps;
   }
 
-  for (mp = maps; mp < maps_end; mp++)
+  for (prmap_t *mp = maps; mp < maps_end; mp++)
     {
-      unsigned long start, end;
-      unsigned int flags;
-
-      start = (unsigned long) mp->pr_vaddr;
-      end = start + mp->pr_size;
-      flags = 0;
+      unsigned long start = (unsigned long) mp->pr_vaddr;
+      unsigned long end = start + mp->pr_size;
+      unsigned int flags = 0;
       if (mp->pr_mflags & MA_READ)
         flags |= VMA_PROT_READ;
       if (mp->pr_mflags & MA_WRITE)
@@ -1276,9 +1384,8 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
 #elif HAVE_PSTAT_GETPROCVM /* HP-UX */
 
   unsigned long pagesize = getpagesize ();
-  int i;
 
-  for (i = 0; ; i++)
+  for (int i = 0; ; i++)
     {
       struct pst_vm_status info;
       int ret = pstat_getprocvm (&info, sizeof (info), 0, i);
@@ -1305,14 +1412,12 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
 #elif defined __APPLE__ && defined __MACH__ /* Mac OS X */
 
   task_t task = mach_task_self ();
-  vm_address_t address;
   vm_size_t size;
 
-  for (address = VM_MIN_ADDRESS;; address += size)
+  for (vm_address_t address = VM_MIN_ADDRESS;; address += size)
     {
       int more;
       mach_port_t object_name;
-      unsigned int flags;
       /* In Mac OS X 10.5, the types vm_address_t, vm_offset_t, vm_size_t have
          32 bits in 32-bit processes and 64 bits in 64-bit processes. Whereas
          mach_vm_address_t and mach_vm_size_t are always 64 bits large.
@@ -1352,7 +1457,7 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
         mach_port_deallocate (mach_task_self (), object_name);
       if (!more)
         break;
-      flags = 0;
+      unsigned int flags = 0;
       if (info.protection & VM_PROT_READ)
         flags |= VMA_PROT_READ;
       if (info.protection & VM_PROT_WRITE)
@@ -1364,7 +1469,7 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
     }
   return 0;
 
-#elif defined __GNU__ /* GNU/Hurd */
+#elif defined __gnu_hurd__ /* GNU/Hurd */
 
   /* The Hurd has a /proc/self/maps that looks like the Linux one, but it
      lacks the VMAs created through anonymous mmap.  Therefore use the Mach
@@ -1373,25 +1478,23 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
      https://www.gnu.org/software/hurd/gnumach-doc/Memory-Attributes.html */
 
   task_t task = mach_task_self ();
-  vm_address_t address;
-  vm_size_t size;
 
-  for (address = 0;; address += size)
+  for (vm_address_t address = 0;; )
     {
+      vm_size_t size;
       vm_prot_t protection;
       vm_prot_t max_protection;
       vm_inherit_t inheritance;
       boolean_t shared;
       memory_object_name_t object_name;
       vm_offset_t offset;
-      unsigned int flags;
 
       if (!(vm_region (task, &address, &size, &protection, &max_protection,
-                         &inheritance, &shared, &object_name, &offset)
+                       &inheritance, &shared, &object_name, &offset)
             == KERN_SUCCESS))
         break;
       mach_port_deallocate (task, object_name);
-      flags = 0;
+      unsigned int flags = 0;
       if (protection & VM_PROT_READ)
         flags |= VMA_PROT_READ;
       if (protection & VM_PROT_WRITE)
@@ -1400,15 +1503,16 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
         flags |= VMA_PROT_EXECUTE;
       if (callback (data, address, address + size, flags))
         break;
+
+      address += size;
     }
   return 0;
 
 #elif defined _WIN32 || defined __CYGWIN__
   /* Windows platform.  Use the native Windows API.  */
 
-  MEMORY_BASIC_INFORMATION info;
   uintptr_t address = 0;
-
+  MEMORY_BASIC_INFORMATION info;
   while (VirtualQuery ((void*)address, &info, sizeof(info)) == sizeof(info))
     {
       if (info.State != MEM_FREE)
@@ -1418,11 +1522,9 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
            distinguished from areas reserved for future malloc().  */
         if (info.State != MEM_RESERVE)
           {
-            uintptr_t start, end;
+            uintptr_t start = (uintptr_t)info.BaseAddress;
+            uintptr_t end = start + info.RegionSize;
             unsigned int flags;
-
-            start = (uintptr_t)info.BaseAddress;
-            end = start + info.RegionSize;
             switch (info.Protect & ~(PAGE_GUARD|PAGE_NOCACHE))
               {
               case PAGE_READONLY:
@@ -1458,22 +1560,19 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
 #elif defined __BEOS__ || defined __HAIKU__
   /* Use the BeOS specific API.  */
 
+  ssize_t cookie = 0;
   area_info info;
-  ssize_t cookie;
-
-  cookie = 0;
   while (get_next_area_info (0, &cookie, &info) == B_OK)
     {
-      unsigned long start, end;
-      unsigned int flags;
-
-      start = (unsigned long) info.address;
-      end = start + info.size;
-      flags = 0;
+      unsigned long start = (unsigned long) info.address;
+      unsigned long end = start + info.size;
+      unsigned int flags = 0;
       if (info.protection & B_READ_AREA)
-        flags |= VMA_PROT_READ | VMA_PROT_EXECUTE;
+        flags |= VMA_PROT_READ;
       if (info.protection & B_WRITE_AREA)
         flags |= VMA_PROT_WRITE;
+      if (info.protection & B_EXECUTE_AREA)
+        flags |= VMA_PROT_EXECUTE;
 
       if (callback (data, start, end, flags))
         break;
@@ -1483,8 +1582,11 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
 #elif HAVE_MQUERY /* OpenBSD */
 
 # if defined __OpenBSD__
-  /* Try sysctl() first.  It is more efficient than the mquery() loop below
-     and also provides the flags.  */
+  /* Try sysctl() first.  It
+       - is more efficient than the mquery() loop below,
+       - also provides the flags, and
+       - does not return areas that are merely reserved, such as ca. 8 GB
+         near the first VMA on OpenBSD 7.6/x86_64.  */
   {
     int retval = vma_iterate_bsd (callback, data);
     if (retval == 0)
@@ -1493,15 +1595,11 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
 # endif
 
   {
-    uintptr_t pagesize;
-    uintptr_t address;
-    int /*bool*/ address_known_mapped;
-
-    pagesize = getpagesize ();
+    uintptr_t pagesize = getpagesize ();
     /* Avoid calling mquery with a NULL first argument, because this argument
        value has a specific meaning.  We know the NULL page is unmapped.  */
-    address = pagesize;
-    address_known_mapped = 0;
+    uintptr_t address = pagesize;
+    int /*bool*/ address_known_mapped = 0;
     for (;;)
       {
         /* Test whether the page at address is mapped.  */
@@ -1512,20 +1610,24 @@ vma_iterate (vma_iterate_callback_fn callback, void *data)
             /* The page at address is mapped.
                This is the start of an interval.  */
             uintptr_t start = address;
-            uintptr_t end;
 
             /* Find the end of the interval.  */
-            end = (uintptr_t) mquery ((void *) address, pagesize, 0, 0, -1, 0);
+            uintptr_t end =
+              (uintptr_t) mquery ((void *) address, pagesize, 0, 0, -1, 0);
             if (end == (uintptr_t) (void *) -1)
               end = 0; /* wrap around */
+
             address = end;
+
+            /* When wrapping around, OpenBSD 7.6/x86_64 produces an interval
+               start = 0x7f7fffffc000, end = 0x0, that is not real (not
+               returned by sysctl()).  Ignore this interval.  */
+            if (address < pagesize) /* wrap around? */
+              break;
 
             /* It's too complicated to find out about the flags.
                Just pass 0.  */
             if (callback (data, start, end, 0))
-              break;
-
-            if (address < pagesize) /* wrap around? */
               break;
           }
         /* Here we know that the page at address is unmapped.  */

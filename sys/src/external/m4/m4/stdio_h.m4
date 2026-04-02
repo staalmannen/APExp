@@ -1,12 +1,24 @@
-# stdio_h.m4 serial 56
-dnl Copyright (C) 2007-2021 Free Software Foundation, Inc.
+# stdio_h.m4
+# serial 75
+dnl Copyright (C) 2007-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
-AC_DEFUN_ONCE([gl_STDIO_H],
+AC_DEFUN([gl_STDIO_H_EARLY],
 [
-  AC_REQUIRE([gl_STDIO_H_DEFAULTS])
+  dnl Defining __USE_MINGW_ANSI_STDIO to 1 must be done early, because
+  dnl the results of several configure tests depend on it: The tests
+  dnl   - checking whether snprintf returns a byte count as in C99...
+  dnl   - checking whether snprintf truncates the result as in C99...
+  dnl   - checking whether printf supports the 'F' directive...
+  dnl   - checking whether printf supports the grouping flag...
+  dnl   - checking whether printf supports the zero flag correctly...
+  dnl   - checking whether printf supports infinite 'double' arguments...
+  dnl   - checking whether printf supports large precisions...
+  dnl report 'yes' if __USE_MINGW_ANSI_STDIO is 1 but 'no' if
+  dnl __USE_MINGW_ANSI_STDIO is not set.
   AH_VERBATIM([MINGW_ANSI_STDIO],
 [/* Use GNU style printf and scanf.  */
 #ifndef __USE_MINGW_ANSI_STDIO
@@ -14,6 +26,11 @@ AC_DEFUN_ONCE([gl_STDIO_H],
 #endif
 ])
   AC_DEFINE([__USE_MINGW_ANSI_STDIO])
+])
+
+AC_DEFUN_ONCE([gl_STDIO_H],
+[
+  AC_REQUIRE([gl_STDIO_H_DEFAULTS])
   gl_NEXT_HEADERS([stdio.h])
 
   dnl Determine whether __USE_MINGW_ANSI_STDIO makes printf and
@@ -40,41 +57,35 @@ AC_DEFUN_ONCE([gl_STDIO_H],
        attribute "__gnu_printf__" instead of "__printf__"])
   fi
 
-  dnl This ifdef is necessary to avoid an error "missing file lib/stdio-read.c"
-  dnl "expected source file, required through AC_LIBSOURCES, not found". It is
-  dnl also an optimization, to avoid performing a configure check whose result
-  dnl is not used. But it does not make the test of GNULIB_STDIO_H_NONBLOCKING
-  dnl or GNULIB_NONBLOCKING redundant.
+  dnl For defining _PRINTF_NAN_LEN_MAX.
+  gl_MUSL_LIBC
+
+  dnl This ifdef is an optimization, to avoid performing a configure check whose
+  dnl result is not used. But it does not make the test of
+  dnl GNULIB_STDIO_H_NONBLOCKING or GNULIB_NONBLOCKING redundant.
   m4_ifdef([gl_NONBLOCKING_IO], [
     gl_NONBLOCKING_IO
     if test $gl_cv_have_nonblocking != yes; then
       REPLACE_STDIO_READ_FUNCS=1
-      AC_LIBOBJ([stdio-read])
     fi
   ])
 
-  dnl This ifdef is necessary to avoid an error "missing file lib/stdio-write.c"
-  dnl "expected source file, required through AC_LIBSOURCES, not found". It is
-  dnl also an optimization, to avoid performing a configure check whose result
-  dnl is not used. But it does not make the test of GNULIB_STDIO_H_SIGPIPE or
-  dnl GNULIB_SIGPIPE redundant.
+  dnl This ifdef is an optimization, to avoid performing a configure check whose
+  dnl result is not used. But it does not make the test of
+  dnl GNULIB_STDIO_H_SIGPIPE or GNULIB_SIGPIPE redundant.
   m4_ifdef([gl_SIGNAL_SIGPIPE], [
     gl_SIGNAL_SIGPIPE
     if test $gl_cv_header_signal_h_SIGPIPE != yes; then
       REPLACE_STDIO_WRITE_FUNCS=1
-      AC_LIBOBJ([stdio-write])
     fi
   ])
-  dnl This ifdef is necessary to avoid an error "missing file lib/stdio-write.c"
-  dnl "expected source file, required through AC_LIBSOURCES, not found". It is
-  dnl also an optimization, to avoid performing a configure check whose result
-  dnl is not used. But it does not make the test of GNULIB_STDIO_H_NONBLOCKING
-  dnl or GNULIB_NONBLOCKING redundant.
+  dnl This ifdef is an optimization, to avoid performing a configure check whose
+  dnl result is not used. But it does not make the test of
+  dnl GNULIB_STDIO_H_NONBLOCKING or GNULIB_NONBLOCKING redundant.
   m4_ifdef([gl_NONBLOCKING_IO], [
     gl_NONBLOCKING_IO
     if test $gl_cv_have_nonblocking != yes; then
       REPLACE_STDIO_WRITE_FUNCS=1
-      AC_LIBOBJ([stdio-write])
     fi
   ])
 
@@ -90,6 +101,16 @@ AC_DEFUN_ONCE([gl_STDIO_H],
   AC_CHECK_DECLS_ONCE([fcloseall])
   if test $ac_cv_have_decl_fcloseall = no; then
     HAVE_DECL_FCLOSEALL=0
+  fi
+
+  AC_CHECK_DECLS_ONCE([getw])
+  if test $ac_cv_have_decl_getw = no; then
+    HAVE_DECL_GETW=0
+  fi
+
+  AC_CHECK_DECLS_ONCE([putw])
+  if test $ac_cv_have_decl_putw = no; then
+    HAVE_DECL_PUTW=0
   fi
 ])
 
@@ -113,12 +134,14 @@ AC_DEFUN([gl_STDIO_H_REQUIRE_DEFAULTS],
 [
   m4_defun(GL_MODULE_INDICATOR_PREFIX[_STDIO_H_MODULE_INDICATOR_DEFAULTS], [
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_DPRINTF])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_DZPRINTF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FCLOSE])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FDOPEN])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FFLUSH])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FGETC])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FGETS])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FOPEN])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FOPEN_GNU])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FPRINTF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FPRINTF_POSIX])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FPURGE])
@@ -132,12 +155,14 @@ AC_DEFUN([gl_STDIO_H_REQUIRE_DEFAULTS],
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FTELL])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FTELLO])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FWRITE])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_FZPRINTF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_GETC])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_GETCHAR])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_GETDELIM])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_GETLINE])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_OBSTACK_PRINTF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_OBSTACK_PRINTF_POSIX])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_OBSTACK_ZPRINTF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_PCLOSE])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_PERROR])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_POPEN])
@@ -151,20 +176,29 @@ AC_DEFUN([gl_STDIO_H_REQUIRE_DEFAULTS],
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_RENAMEAT])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_SCANF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_SNPRINTF])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_SNZPRINTF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_SPRINTF_POSIX])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_STDIO_H_NONBLOCKING])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_STDIO_H_SIGPIPE])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_SZPRINTF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_TMPFILE])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VASPRINTF])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VASZPRINTF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VFSCANF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VSCANF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VDPRINTF])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VDZPRINTF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VFPRINTF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VFPRINTF_POSIX])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VFZPRINTF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VPRINTF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VPRINTF_POSIX])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VSNPRINTF])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VSNZPRINTF])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VSPRINTF_POSIX])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VSZPRINTF])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_VZPRINTF])
+    gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_ZPRINTF])
     dnl Support Microsoft deprecated alias function names by default.
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_MDA_FCLOSEALL], [1])
     gl_MODULE_INDICATOR_INIT_VARIABLE([GNULIB_MDA_FDOPEN], [1])
@@ -186,7 +220,9 @@ AC_DEFUN([gl_STDIO_H_DEFAULTS],
   HAVE_DECL_FTELLO=1;            AC_SUBST([HAVE_DECL_FTELLO])
   HAVE_DECL_GETDELIM=1;          AC_SUBST([HAVE_DECL_GETDELIM])
   HAVE_DECL_GETLINE=1;           AC_SUBST([HAVE_DECL_GETLINE])
+  HAVE_DECL_GETW=1;              AC_SUBST([HAVE_DECL_GETW])
   HAVE_DECL_OBSTACK_PRINTF=1;    AC_SUBST([HAVE_DECL_OBSTACK_PRINTF])
+  HAVE_DECL_PUTW=1;              AC_SUBST([HAVE_DECL_PUTW])
   HAVE_DECL_SNPRINTF=1;          AC_SUBST([HAVE_DECL_SNPRINTF])
   HAVE_DECL_VSNPRINTF=1;         AC_SUBST([HAVE_DECL_VSNPRINTF])
   HAVE_DPRINTF=1;                AC_SUBST([HAVE_DPRINTF])
@@ -202,6 +238,7 @@ AC_DEFUN([gl_STDIO_H_DEFAULTS],
   REPLACE_FDOPEN=0;              AC_SUBST([REPLACE_FDOPEN])
   REPLACE_FFLUSH=0;              AC_SUBST([REPLACE_FFLUSH])
   REPLACE_FOPEN=0;               AC_SUBST([REPLACE_FOPEN])
+  REPLACE_FOPEN_FOR_FOPEN_GNU=0; AC_SUBST([REPLACE_FOPEN_FOR_FOPEN_GNU])
   REPLACE_FPRINTF=0;             AC_SUBST([REPLACE_FPRINTF])
   REPLACE_FPURGE=0;              AC_SUBST([REPLACE_FPURGE])
   REPLACE_FREOPEN=0;             AC_SUBST([REPLACE_FREOPEN])

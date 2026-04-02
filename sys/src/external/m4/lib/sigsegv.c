@@ -1,10 +1,10 @@
 /* Page fault handling library.
-   Copyright (C) 1993-2021  Bruno Haible <bruno@clisp.org>
+   Copyright (C) 1993-2026 Free Software Foundation, Inc.
    Copyright (C) 2018  Nylon Chen <nylon7@andestech.com>
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -14,6 +14,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible and Nylon Chen.  */
 
 #include <config.h>
 
@@ -59,7 +61,7 @@ int libsigsegv_version = LIBSIGSEGV_VERSION;
           occurred.
  */
 
-#if defined __linux__ || defined __ANDROID__ /* Linux */
+#if defined __linux__ && !defined __ANDROID__ /* Linux */
 
 # define SIGSEGV_FAULT_HANDLER_ARGLIST  int sig, siginfo_t *sip, void *ucp
 # define SIGSEGV_FAULT_ADDRESS  sip->si_addr
@@ -166,6 +168,15 @@ int libsigsegv_version = LIBSIGSEGV_VERSION;
    because $bsp and $bspstore never differ by more than ca. 1 KB.  */
 #  define SIGSEGV_FAULT_BSP_POINTER  ((ucontext_t *) ucp)->uc_mcontext.sc_ar_bsp
 
+# elif defined __loongarch__
+
+/* See <sys/ucontext.h>.
+   Note that the 'mcontext_t' defined in <sys/ucontext.h>
+   and the 'struct sigcontext' defined in <bits/sigcontext.h>
+   (see also <asm/sigcontext.h>) are effectively the same.  */
+
+#  define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext.__gregs[3]
+
 # elif defined __m68k__
 
 /* See glibc/sysdeps/unix/sysv/linux/m68k/sys/ucontext.h
@@ -216,11 +227,28 @@ int libsigsegv_version = LIBSIGSEGV_VERSION;
 #  if defined __powerpc64__ || defined __powerpc64_elfv2__ /* 64-bit */
 #   define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext.gp_regs[1]
 #  else /* 32-bit */
-/* both should be equivalent */
-#   if 0
-#    define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext.regs->gpr[1]
+#   if MUSL_LIBC
+/* musl libc has a different structure of ucontext_t in
+   musl/arch/powerpc/bits/signal.h.  */
+/* The glibc comments say:
+     "Different versions of the kernel have stored the registers on signal
+      delivery at different offsets from the ucontext struct.  Programs should
+      thus use the uc_mcontext.uc_regs pointer to find where the registers are
+      actually stored."  */
+#    if 0
+#     define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext.gregs[1]
+#    else
+#     define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_regs->gregs[1]
+#    endif
 #   else
-#    define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext.uc_regs->gregs[1]
+/* Assume the structure of ucontext_t in
+   glibc/sysdeps/unix/sysv/linux/powerpc/sys/ucontext.h.  */
+/* Because of the union, both definitions should be equivalent.  */
+#    if 0
+#     define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext.regs->gpr[1]
+#    else
+#     define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext.uc_regs->gregs[1]
+#    endif
 #   endif
 #  endif
 
@@ -320,21 +348,80 @@ int libsigsegv_version = LIBSIGSEGV_VERSION;
 
 #endif
 
-#if defined __GNU__ /* Hurd */
+#if defined __ANDROID__ /* Android */
+/* A platform that supports the POSIX:2008 (XPG 7) way, without
+   'struct sigcontext' nor 'ucontext_t'.  */
 
-# define SIGSEGV_FAULT_HANDLER_ARGLIST  int sig, int code, struct sigcontext *scp
+# define SIGSEGV_FAULT_HANDLER_ARGLIST  int sig, siginfo_t *sip, void *context
+# define SIGSEGV_FAULT_ADDRESS  sip->si_addr
+# define SIGSEGV_FAULT_CONTEXT  context
+# define SIGSEGV_FAULT_ADDRESS_FROM_SIGINFO
+
+#endif
+
+#if defined __gnu_hurd__ /* Hurd */
+
+# define SIGSEGV_FAULT_HANDLER_ARGLIST  int sig, long code, struct sigcontext *scp
 # define SIGSEGV_FAULT_ADDRESS  (unsigned long) code
 # define SIGSEGV_FAULT_CONTEXT  scp
 
-# if defined __i386__
+# if defined __x86_64__
+/* 64 bit registers */
+
+/* scp points to a 'struct sigcontext' (defined in
+   glibc/sysdeps/mach/hurd/x86_64/bits/sigcontext.h).
+   The registers, at the moment the signal occurred, get pushed on the kernel
+   stack through gnumach/x86_64/locore.S:alltraps. They are denoted by a
+   'struct i386_saved_state' (defined in gnumach/i386/i386/thread.h).
+   Upon invocation of the Mach interface function thread_get_state
+   <https://www.gnu.org/software/hurd/gnumach-doc/Thread-Execution.html>
+   (= __thread_get_state in glibc), defined in gnumach/kern/thread.c,
+   the function thread_getstatus, defined in gnumach/i386/i386/pcb.c, copies the
+   register values in a different arrangement into a 'struct i386_thread_state',
+   defined in gnumach/i386/include/mach/i386/thread_status.h. (Different
+   arrangement: trapno, err get dropped; different order of r8...r15; also rsp
+   gets set to 0.)
+   This 'struct i386_thread_state' is actually the 'basic' part of a
+   'struct machine_thread_all_state', defined in
+   glibc/sysdeps/mach/x86/thread_state.h.
+   From there, the function _hurd_setup_sighandler, defined in
+   glibc/sysdeps/mach/hurd/x86/trampoline.c,
+   1. sets rsp to the same value as ursp,
+   2. copies the 'struct i386_thread_state' into the appropriate part of a
+      'struct sigcontext', defined in
+      glibc/sysdeps/mach/hurd/x86_64/bits/sigcontext.h.  */
+/* Both sc_rsp and sc_ursp have the same value.
+   It appears more reliable to use sc_ursp because sc_rsp is marked as
+   "not used".  */
+#  define SIGSEGV_FAULT_STACKPOINTER  scp->sc_ursp
+
+# elif defined __i386__
+/* 32 bit registers */
 
 /* scp points to a 'struct sigcontext' (defined in
    glibc/sysdeps/mach/hurd/i386/bits/sigcontext.h).
-   The registers of this struct get pushed on the stack through
-   gnumach/i386/i386/locore.S:trapall.  */
-/* Both sc_esp and sc_uesp appear to have the same value.
-   It appears more reliable to use sc_uesp because it is labelled as
-   "old esp, if trapped from user".  */
+   The registers, at the moment the signal occurred, get pushed on the kernel
+   stack through gnumach/i386/i386/locore.S:alltraps. They are denoted by a
+   'struct i386_saved_state' (defined in gnumach/i386/i386/thread.h).
+   Upon invocation of the Mach interface function thread_get_state
+   <https://www.gnu.org/software/hurd/gnumach-doc/Thread-Execution.html>
+   (= __thread_get_state in glibc), defined in gnumach/kern/thread.c,
+   the function thread_getstatus, defined in gnumach/i386/i386/pcb.c, copies the
+   register values in a different arrangement into a 'struct i386_thread_state',
+   defined in gnumach/i386/include/mach/i386/thread_status.h. (Different
+   arrangement: trapno, err get dropped; also esp gets set to 0.)
+   This 'struct i386_thread_state' is actually the 'basic' part of a
+   'struct machine_thread_all_state', defined in
+   glibc/sysdeps/mach/x86/thread_state.h.
+   From there, the function _hurd_setup_sighandler, defined in
+   glibc/sysdeps/mach/hurd/x86/trampoline.c,
+   1. sets esp to the same value as uesp,
+   2. copies the 'struct i386_thread_state' into the appropriate part of a
+      'struct sigcontext', defined in
+      glibc/sysdeps/mach/hurd/i386/bits/sigcontext.h.  */
+/* Both sc_esp and sc_uesp have the same value.
+   It appears more reliable to use sc_uesp because sc_esp is marked as
+   "not used".  */
 #  define SIGSEGV_FAULT_STACKPOINTER  scp->sc_uesp
 
 # endif
@@ -343,17 +430,21 @@ int libsigsegv_version = LIBSIGSEGV_VERSION;
 
 #if defined __FreeBSD_kernel__ || defined __FreeBSD__ || defined __DragonFly__ /* GNU/kFreeBSD, FreeBSD */
 
-# if defined __arm__ || defined __armhf__ || defined __arm64__
+# if defined __arm__ || defined __armhf__ || (defined __arm64__ || defined __aarch64__)
 
 #  define SIGSEGV_FAULT_HANDLER_ARGLIST  int sig, siginfo_t *sip, void *ucp
 #  define SIGSEGV_FAULT_ADDRESS  sip->si_addr
 #  define SIGSEGV_FAULT_CONTEXT  ((ucontext_t *) ucp)
 
-#  if defined __arm64__ /* 64-bit */
+#  if defined __arm64__ || defined __aarch64__ /* 64-bit */
 
 /* See sys/arm64/include/ucontext.h.  */
 
-#   define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext.mc_gpregs.gp_sp
+#   if defined __CHERI_PURE_CAPABILITY__
+#    define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext.mc_capregs.cap_sp
+#   else
+#    define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext.mc_gpregs.gp_sp
+#   endif
 
 #  elif defined __arm__ || defined __armhf__ /* 32-bit */
 
@@ -425,7 +516,7 @@ int libsigsegv_version = LIBSIGSEGV_VERSION;
 
 /* _UC_MACHINE_SP is a platform independent macro.
    Defined in <machine/mcontext.h>, see
-     http://cvsweb.netbsd.org/bsdweb.cgi/src/sys/arch/$arch/include/mcontext.h
+     https://cvsweb.netbsd.org/bsdweb.cgi/src/sys/arch/$arch/include/mcontext.h
    Supported on alpha, amd64, i386, ia64, m68k, mips, powerpc, sparc since
    NetBSD 2.0.
    On i386, _UC_MACHINE_SP is the same as ->uc_mcontext.__gregs[_REG_UESP],
@@ -509,7 +600,14 @@ int libsigsegv_version = LIBSIGSEGV_VERSION;
 
 #  define SIGSEGV_FAULT_STACKPOINTER  scp->sc_regs[29]
 
-# elif defined __powerpc__ || defined __powerpc64__
+# elif defined __powerpc64__
+
+/* See the definition of 'struct sigcontext' in
+   openbsd-src/sys/arch/powerpc64/include/signal.h.  */
+
+#  define SIGSEGV_FAULT_STACKPOINTER  scp->sc_sp
+
+# elif defined __powerpc__
 
 /* See the definition of 'struct sigcontext' and 'struct trapframe' in
    openbsd-src/sys/arch/powerpc/include/signal.h.  */
@@ -586,7 +684,12 @@ int libsigsegv_version = LIBSIGSEGV_VERSION;
      - 'ucontext_t' and 'struct __darwin_ucontext' in <sys/_structs.h>,
      - 'struct __darwin_mcontext' in <ppc/_structs.h>, and
      - 'struct __darwin_ppc_thread_state' in <mach/ppc/_structs.h>.  */
-#  define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext->__ss.__r1
+#  if !(defined _STRUCT_MCONTEXT || defined _STRUCT_MCONTEXT32 || defined _STRUCT_MCONTEXT64)
+/* Mac OS X 10.4 and earlier omitted the underscores.  */
+#   define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext->ss.r1
+#  else
+#   define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext->__ss.__r1
+#  endif
 
 # endif
 
@@ -601,18 +704,6 @@ int libsigsegv_version = LIBSIGSEGV_VERSION;
 
 # if defined __powerpc__ || defined __powerpc64__
 #  define SIGSEGV_FAULT_STACKPOINTER  ((ucontext_t *) ucp)->uc_mcontext.jmp_context.gpr[1]
-# endif
-
-#endif
-
-#if defined __sgi /* IRIX */
-
-# define SIGSEGV_FAULT_HANDLER_ARGLIST  int sig, int code, struct sigcontext *scp
-# define SIGSEGV_FAULT_ADDRESS  (unsigned long) scp->sc_badvaddr
-# define SIGSEGV_FAULT_CONTEXT  scp
-
-# if defined __mips__ || defined __mipsn32__ || defined __mips64__
-#  define SIGSEGV_FAULT_STACKPOINTER  scp->sc_regs[29]
 # endif
 
 #endif
@@ -727,12 +818,24 @@ int libsigsegv_version = LIBSIGSEGV_VERSION;
 
 /* List of signals that are sent when an invalid virtual memory address
    is accessed, or when the stack overflows.  */
-#if defined __GNU__ \
+#if defined __gnu_hurd__ \
     || defined __FreeBSD_kernel__ || defined __FreeBSD__ || defined __DragonFly__ \
     || defined __NetBSD__ || defined __OpenBSD__ \
     || (defined __APPLE__ && defined __MACH__)
-# define SIGSEGV_FOR_ALL_SIGNALS(var,body) \
-    { int var; var = SIGSEGV; { body } var = SIGBUS; { body } }
+# if defined __CHERI__
+#  define SIGSEGV_FOR_ALL_SIGNALS(var,body) \
+     { int var;                             \
+       var = SIGSEGV; { body }              \
+       var = SIGBUS; { body }               \
+       var = SIGPROT; { body }              \
+     }
+# else
+#  define SIGSEGV_FOR_ALL_SIGNALS(var,body) \
+     { int var;                             \
+       var = SIGSEGV; { body }              \
+       var = SIGBUS; { body }               \
+     }
+# endif
 #else
 # define SIGSEGV_FOR_ALL_SIGNALS(var,body) \
     { int var; var = SIGSEGV; { body } }
@@ -820,7 +923,7 @@ static void sigsegv_reset_onstack_flag (void);
 
 /* -------------------------- leave-sigaltstack.c -------------------------- */
 
-# if defined __GNU__ \
+# if defined __gnu_hurd__ \
      || defined __FreeBSD_kernel__ || defined __FreeBSD__ || defined __DragonFly__ \
      || defined __NetBSD__ || defined __OpenBSD__
 
@@ -838,7 +941,7 @@ sigsegv_reset_onstack_flag (void)
 
 /* --------------------------- leave-setcontext.c --------------------------- */
 
-# elif defined __sgi || defined __sun /* IRIX, Solaris */
+# elif defined __sun /* Solaris */
 
 #  include <ucontext.h>
 
@@ -946,12 +1049,9 @@ sigsegv_handler (SIGSEGV_FAULT_HANDLER_ARGLIST)
           if (stack_top)
             {
               /* Determine stack bounds.  */
-              int saved_errno;
+              int saved_errno = errno;
               struct vma_struct vma;
-              int ret;
-
-              saved_errno = errno;
-              ret = sigsegv_get_vma (stack_top, &vma);
+              int ret = sigsegv_get_vma (stack_top, &vma);
               errno = saved_errno;
               if (ret >= 0)
                 {
@@ -983,9 +1083,8 @@ sigsegv_handler (SIGSEGV_FAULT_HANDLER_ARGLIST)
                   /* Heuristic BC: If the stack size has reached its maximal size,
                      and old_sp is near the low end, we consider it a stack
                      overflow.  */
-                  struct rlimit rl;
-
                   saved_errno = errno;
+                  struct rlimit rl;
                   ret = getrlimit (RLIMIT_STACK, &rl);
                   errno = saved_errno;
                   if (ret >= 0)
@@ -1056,7 +1155,7 @@ sigsegv_handler (SIGSEGV_FAULT_HANDLER_ARGLIST)
           /* Handler declined responsibility for real.  */
 
           /* Remove ourselves and dump core.  */
-          SIGSEGV_FOR_ALL_SIGNALS (sig, signal (sig, SIG_DFL);)
+          SIGSEGV_FOR_ALL_SIGNALS (signo, signal (signo, SIG_DFL);)
         }
 
 # if HAVE_STACK_OVERFLOW_RECOVERY
@@ -1089,12 +1188,9 @@ sigsegv_handler (int sig)
       if (stack_top)
         {
           /* Determine stack bounds.  */
-          int saved_errno;
+          int saved_errno = errno;
           struct vma_struct vma;
-          int ret;
-
-          saved_errno = errno;
-          ret = sigsegv_get_vma (stack_top, &vma);
+          int ret = sigsegv_get_vma (stack_top, &vma);
           errno = saved_errno;
           if (ret >= 0)
             {
@@ -1102,9 +1198,8 @@ sigsegv_handler (int sig)
               /* Heuristic BC: If the stack size has reached its maximal size,
                  and old_sp is near the low end, we consider it a stack
                  overflow.  */
-              struct rlimit rl;
-
               saved_errno = errno;
+              struct rlimit rl;
               ret = getrlimit (RLIMIT_STACK, &rl);
               errno = saved_errno;
               if (ret >= 0)
@@ -1151,7 +1246,7 @@ sigsegv_handler (int sig)
     }
 
   /* Remove ourselves and dump core.  */
-  SIGSEGV_FOR_ALL_SIGNALS (sig, signal (sig, SIG_DFL);)
+  SIGSEGV_FOR_ALL_SIGNALS (signo, signal (signo, SIG_DFL);)
 }
 
 #endif
@@ -1165,7 +1260,7 @@ install_for (int sig)
   struct sigaction action;
 
 # ifdef SIGSEGV_FAULT_ADDRESS_FROM_SIGINFO
-  action.sa_sigaction = &sigsegv_handler;
+  action.sa_sigaction = (void (*) (int, siginfo_t *, void *)) &sigsegv_handler;
 # else
   action.sa_handler = (void (*) (int)) &sigsegv_handler;
 # endif
@@ -1323,13 +1418,8 @@ stackoverflow_install_handler (stackoverflow_handler_t handler,
   stk_extra_stack_size = extra_stack_size;
   {
     stack_t ss;
-# if SIGALTSTACK_SS_REVERSED
-    ss.ss_sp = (char *) extra_stack + extra_stack_size - sizeof (void *);
-    ss.ss_size = extra_stack_size - sizeof (void *);
-# else
     ss.ss_sp = extra_stack;
     ss.ss_size = extra_stack_size;
-# endif
     ss.ss_flags = 0; /* no SS_DISABLE */
     if (sigaltstack (&ss, (stack_t*)0) < 0)
       return -1;

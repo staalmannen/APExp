@@ -1,18 +1,18 @@
 /* Substitute for <sys/random.h>.
-   Copyright (C) 2020-2021 Free Software Foundation, Inc.
+   Copyright (C) 2020-2026 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
-   any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 # if __GNUC__ >= 3
 @PRAGMA_SYSTEM_HEADER@
@@ -23,8 +23,10 @@
 
 #if @HAVE_SYS_RANDOM_H@
 
-/* On uClibc, <sys/random.h> assumes prior inclusion of <stddef.h>.  */
-# if defined __UCLIBC__
+/* On uClibc < 1.0.35, <sys/random.h> assumes prior inclusion of <stddef.h>.
+   Do not use __UCLIBC__ here, as it might not be defined yet.
+   But avoid namespace pollution on glibc systems.  */
+# ifndef __GLIBC__
 #  include <stddef.h>
 # endif
 /* On Mac OS X 10.5, <sys/random.h> assumes prior inclusion of <sys/types.h>.
@@ -42,6 +44,12 @@
 
 #ifndef _@GUARD_PREFIX@_SYS_RANDOM_H
 #define _@GUARD_PREFIX@_SYS_RANDOM_H
+
+/* This file uses _GL_ATTRIBUTE_NODISCARD, GNULIB_POSIXCHECK,
+   HAVE_RAW_DECL_*.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
 
 #include <sys/types.h>
 
@@ -69,22 +77,23 @@
 #   define getrandom rpl_getrandom
 #  endif
 _GL_FUNCDECL_RPL (getrandom, ssize_t,
-                  (void *buffer, size_t length, unsigned int flags)
-                  _GL_ARG_NONNULL ((1)));
+                  (void *buffer, size_t length, unsigned int flags),
+                  _GL_ARG_NONNULL ((1)) _GL_ATTRIBUTE_NODISCARD);
 _GL_CXXALIAS_RPL (getrandom, ssize_t,
                   (void *buffer, size_t length, unsigned int flags));
 # else
 #  if !@HAVE_GETRANDOM@
 _GL_FUNCDECL_SYS (getrandom, ssize_t,
-                  (void *buffer, size_t length, unsigned int flags)
-                  _GL_ARG_NONNULL ((1)));
+                  (void *buffer, size_t length, unsigned int flags),
+                  _GL_ARG_NONNULL ((1)) _GL_ATTRIBUTE_NODISCARD);
 #  endif
 _GL_CXXALIAS_SYS (getrandom, ssize_t,
                   (void *buffer, size_t length, unsigned int flags));
 # endif
+# if __GLIBC__ + (__GLIBC_MINOR__ >= 25) > 2
 _GL_CXXALIASWARN (getrandom);
+# endif
 #elif defined GNULIB_POSIXCHECK
-# undef getrandom
 # if HAVE_RAW_DECL_GETRANDOM
 _GL_WARN_ON_USE (getrandom, "getrandom is unportable - "
                  "use gnulib module getrandom for portability");

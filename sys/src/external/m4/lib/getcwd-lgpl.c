@@ -1,17 +1,17 @@
-/* Copyright (C) 2011-2021 Free Software Foundation, Inc.
+/* Copyright (C) 2011-2026 Free Software Foundation, Inc.
    This file is part of gnulib.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -45,12 +45,10 @@ typedef int dummy;
 char *
 rpl_getcwd (char *buf, size_t size)
 {
-  char *ptr;
-  char *result;
-
   /* Handle single size operations.  */
   if (buf)
     {
+      /* Check SIZE argument.  */
       if (!size)
         {
           errno = EINVAL;
@@ -67,7 +65,7 @@ rpl_getcwd (char *buf, size_t size)
           errno = ENOMEM;
           return NULL;
         }
-      result = getcwd (buf, size);
+      char *result = getcwd (buf, size);
       if (!result)
         free (buf);
       return result;
@@ -79,10 +77,10 @@ rpl_getcwd (char *buf, size_t size)
   {
     char tmp[4032];
     size = sizeof tmp;
-    ptr = getcwd (tmp, size);
+    char *ptr = getcwd (tmp, size);
     if (ptr)
       {
-        result = strdup (ptr);
+        char *result = strdup (ptr);
         if (!result)
           errno = ENOMEM;
         return result;
@@ -92,10 +90,11 @@ rpl_getcwd (char *buf, size_t size)
   }
 
   /* My what a large directory name we have.  */
+  char *result;
   do
     {
       size <<= 1;
-      ptr = realloc (buf, size);
+      char *ptr = realloc (buf, size);
       if (ptr == NULL)
         {
           free (buf);

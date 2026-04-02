@@ -1,18 +1,18 @@
 /* Ordered set data type implemented by an array.
-   Copyright (C) 2006-2007, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2006-2007, 2009-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -182,17 +182,13 @@ gl_array_search_atleast (gl_oset_t set,
 static int
 grow (gl_oset_t set)
 {
-  size_t new_allocated;
-  size_t memory_size;
-  const void **memory;
-
-  new_allocated = xtimes (set->allocated, 2);
+  size_t new_allocated = xtimes (set->allocated, 2);
   new_allocated = xsum (new_allocated, 1);
-  memory_size = xtimes (new_allocated, sizeof (const void *));
+  size_t memory_size = xtimes (new_allocated, sizeof (const void *));
   if (size_overflow_p (memory_size))
     /* Overflow, would lead to out of memory.  */
     return -1;
-  memory = (const void **) realloc (set->elements, memory_size);
+  const void **memory = (const void **) realloc (set->elements, memory_size);
   if (memory == NULL)
     /* Out of memory.  */
     return -1;
@@ -208,14 +204,11 @@ static int
 gl_array_nx_add_at (gl_oset_t set, size_t position, const void *elt)
 {
   size_t count = set->count;
-  const void **elements;
-  size_t i;
-
   if (count == set->allocated)
     if (grow (set) < 0)
       return -1;
-  elements = set->elements;
-  for (i = count; i > position; i--)
+  const void **elements = set->elements;
+  for (size_t i = count; i > position; i--)
     elements[i] = elements[i - 1];
   elements[position] = elt;
   set->count = count + 1;
@@ -228,13 +221,10 @@ static void
 gl_array_remove_at (gl_oset_t set, size_t position)
 {
   size_t count = set->count;
-  const void **elements;
-  size_t i;
-
-  elements = set->elements;
+  const void **elements = set->elements;
   if (set->base.dispose_fn != NULL)
     set->base.dispose_fn (elements[position]);
-  for (i = position + 1; i < count; i++)
+  for (size_t i = position + 1; i < count; i++)
     elements[i - 1] = elements[i];
   set->count = count - 1;
 }
@@ -368,9 +358,8 @@ gl_array_update (gl_oset_t set, const void *elt,
               /* Move the element from old_index to low.  */
               size_t new_index = low;
               const void **elements = set->elements;
-              size_t i;
 
-              for (i = old_index; i > new_index; i--)
+              for (size_t i = old_index; i > new_index; i--)
                 elements[i] = elements[i - 1];
               elements[new_index] = elt;
               return true;
@@ -384,9 +373,8 @@ gl_array_update (gl_oset_t set, const void *elt,
               if (new_index > old_index)
                 {
                   const void **elements = set->elements;
-                  size_t i;
 
-                  for (i = old_index; i < new_index; i++)
+                  for (size_t i = old_index; i < new_index; i++)
                     elements[i] = elements[i + 1];
                   elements[new_index] = elt;
                   return true;
@@ -488,7 +476,7 @@ gl_array_iterator_next (gl_oset_iterator_t *iterator, const void **eltp)
 }
 
 static void
-gl_array_iterator_free (gl_oset_iterator_t *iterator _GL_ATTRIBUTE_MAYBE_UNUSED)
+gl_array_iterator_free (gl_oset_iterator_t *_GL_UNNAMED (iterator))
 {
 }
 

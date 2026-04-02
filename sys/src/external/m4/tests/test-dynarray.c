@@ -1,5 +1,5 @@
 /* Test of type-safe arrays that grow dynamically.
-   Copyright (C) 2021 Free Software Foundation, Inc.
+   Copyright (C) 2021-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -37,17 +37,16 @@ int
 main ()
 {
   struct int_sequence s;
-  int i;
 
   intseq_init (&s);
-  for (i = 0; i < N; i++)
+  for (int i = 0; i < N; i++)
     intseq_add (&s, value_at (i));
-  for (i = N - 1; i >= N / 2; i--)
+  for (int i = N - 1; i >= N / 2; i--)
     {
       ASSERT (* intseq_at (&s, i) == value_at (i));
       intseq_remove_last (&s);
     }
   intseq_free (&s);
 
-  return 0;
+  return test_exit_status;
 }

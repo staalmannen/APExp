@@ -1,6 +1,6 @@
 /* GNU m4 -- A simple macro processor
 
-   Copyright (C) 1989-1994, 2000, 2004, 2006-2014, 2016-2017, 2020-2021
+   Copyright (C) 1989-1994, 2000, 2004, 2006-2014, 2016-2017, 2020-2026
    Free Software Foundation, Inc.
 
    This file is part of GNU M4.
@@ -32,6 +32,7 @@
 #include "wait-process.h"
 
 #define ARG(i) (argc > (i) ? TOKEN_DATA_TEXT (argv[i]) : "")
+#define ARGLEN(i) (argc > (i) ? TOKEN_DATA_LEN (argv[i]) : 0)
 
 /* Initialization of builtin and predefined macros.  The table
    "builtin_tab" is both used for initialization, and by the "builtin"
@@ -90,91 +91,89 @@ DECLARE (m4_undivert);
 
 #undef DECLARE
 
-static builtin const builtin_tab[] =
-{
+static builtin const builtin_tab[] = {
 
   /* name               GNUext  macros  blind   function */
 
-  { "__file__",         true,   false,  false,  m4___file__ },
-  { "__line__",         true,   false,  false,  m4___line__ },
-  { "__program__",      true,   false,  false,  m4___program__ },
-  { "builtin",          true,   true,   true,   m4_builtin },
-  { "changecom",        false,  false,  false,  m4_changecom },
-  { "changequote",      false,  false,  false,  m4_changequote },
+  {"__file__", true, false, false, m4___file__},
+  {"__line__", true, false, false, m4___line__},
+  {"__program__", true, false, false, m4___program__},
+  {"builtin", true, true, true, m4_builtin},
+  {"changecom", false, false, false, m4_changecom},
+  {"changequote", false, false, false, m4_changequote},
 #ifdef ENABLE_CHANGEWORD
-  { "changeword",       true,   false,  true,   m4_changeword },
+  {"changeword", true, false, true, m4_changeword},
 #endif
-  { "debugmode",        true,   false,  false,  m4_debugmode },
-  { "debugfile",        true,   false,  false,  m4_debugfile },
-  { "decr",             false,  false,  true,   m4_decr },
-  { "define",           false,  true,   true,   m4_define },
-  { "defn",             false,  false,  true,   m4_defn },
-  { "divert",           false,  false,  false,  m4_divert },
-  { "divnum",           false,  false,  false,  m4_divnum },
-  { "dnl",              false,  false,  false,  m4_dnl },
-  { "dumpdef",          false,  false,  false,  m4_dumpdef },
-  { "errprint",         false,  false,  true,   m4_errprint },
-  { "esyscmd",          true,   false,  true,   m4_esyscmd },
-  { "eval",             false,  false,  true,   m4_eval },
-  { "format",           true,   false,  true,   m4_format },
-  { "ifdef",            false,  false,  true,   m4_ifdef },
-  { "ifelse",           false,  false,  true,   m4_ifelse },
-  { "include",          false,  false,  true,   m4_include },
-  { "incr",             false,  false,  true,   m4_incr },
-  { "index",            false,  false,  true,   m4_index },
-  { "indir",            true,   true,   true,   m4_indir },
-  { "len",              false,  false,  true,   m4_len },
-  { "m4exit",           false,  false,  false,  m4_m4exit },
-  { "m4wrap",           false,  false,  true,   m4_m4wrap },
-  { "maketemp",         false,  false,  true,   m4_maketemp },
-  { "mkstemp",          false,  false,  true,   m4_mkstemp },
-  { "patsubst",         true,   false,  true,   m4_patsubst },
-  { "popdef",           false,  false,  true,   m4_popdef },
-  { "pushdef",          false,  true,   true,   m4_pushdef },
-  { "regexp",           true,   false,  true,   m4_regexp },
-  { "shift",            false,  false,  true,   m4_shift },
-  { "sinclude",         false,  false,  true,   m4_sinclude },
-  { "substr",           false,  false,  true,   m4_substr },
-  { "syscmd",           false,  false,  true,   m4_syscmd },
-  { "sysval",           false,  false,  false,  m4_sysval },
-  { "traceoff",         false,  false,  false,  m4_traceoff },
-  { "traceon",          false,  false,  false,  m4_traceon },
-  { "translit",         false,  false,  true,   m4_translit },
-  { "undefine",         false,  false,  true,   m4_undefine },
-  { "undivert",         false,  false,  false,  m4_undivert },
+  {"debugmode", true, false, false, m4_debugmode},
+  {"debugfile", true, false, false, m4_debugfile},
+  {"decr", false, false, true, m4_decr},
+  {"define", false, true, true, m4_define},
+  {"defn", false, false, true, m4_defn},
+  {"divert", false, false, false, m4_divert},
+  {"divnum", false, false, false, m4_divnum},
+  {"dnl", false, false, false, m4_dnl},
+  {"dumpdef", false, false, false, m4_dumpdef},
+  {"errprint", false, false, true, m4_errprint},
+  {"esyscmd", true, false, true, m4_esyscmd},
+  {"eval", false, false, true, m4_eval},
+  {"format", true, false, true, m4_format},
+  {"ifdef", false, false, true, m4_ifdef},
+  {"ifelse", false, false, true, m4_ifelse},
+  {"include", false, false, true, m4_include},
+  {"incr", false, false, true, m4_incr},
+  {"index", false, false, true, m4_index},
+  {"indir", true, true, true, m4_indir},
+  {"len", false, false, true, m4_len},
+  {"m4exit", false, false, false, m4_m4exit},
+  {"m4wrap", false, false, true, m4_m4wrap},
+  {"maketemp", false, false, true, m4_maketemp},
+  {"mkstemp", false, false, true, m4_mkstemp},
+  {"patsubst", true, false, true, m4_patsubst},
+  {"popdef", false, false, true, m4_popdef},
+  {"pushdef", false, true, true, m4_pushdef},
+  {"regexp", true, false, true, m4_regexp},
+  {"shift", false, false, true, m4_shift},
+  {"sinclude", false, false, true, m4_sinclude},
+  {"substr", false, false, true, m4_substr},
+  {"syscmd", false, false, true, m4_syscmd},
+  {"sysval", false, false, false, m4_sysval},
+  {"traceoff", false, false, false, m4_traceoff},
+  {"traceon", false, false, false, m4_traceon},
+  {"translit", false, false, true, m4_translit},
+  {"undefine", false, false, true, m4_undefine},
+  {"undivert", false, false, false, m4_undivert},
 
-  { 0,                  false,  false,  false,  0 },
+  {NULL, false, false, false, NULL},
 
   /* placeholder is intentionally stuck after the table end delimiter,
      so that we can easily find it, while not treating it as a real
      builtin.  */
-  { "placeholder",      true,   false,  false,  m4_placeholder },
+  {"placeholder", true, false, false, m4_placeholder},
 };
 
-static predefined const predefined_tab[] =
-{
+static predefined const predefined_tab[] = {
 #if UNIX
-  { "unix",     "__unix__",     "" },
+  {"unix", "__unix__", ""},
 #endif
 #if W32_NATIVE
-  { "windows",  "__windows__",  "" },
+  {"windows", "__windows__", ""},
 #endif
 #if OS2
-  { "os2",      "__os2__",      "" },
+  {"os2", "__os2__", ""},
 #endif
 #if !UNIX && !W32_NATIVE && !OS2
 # warning Platform macro not provided
 #endif
-  { NULL,       "__gnu__",      "" },
+  {NULL, "__gnu__", ""},
 
-  { NULL,       NULL,           NULL },
+  {NULL, NULL, NULL},
 };
 
 /*----------------------------------------.
 | Find the builtin, which lives on ADDR.  |
 `----------------------------------------*/
 
-const builtin * ATTRIBUTE_PURE
+const builtin *ATTRIBUTE_PURE
 find_builtin_by_addr (builtin_func *func)
 {
   const builtin *bp;
@@ -192,7 +191,7 @@ find_builtin_by_addr (builtin_func *func)
 | placeholder builtin.                                      |
 `----------------------------------------------------------*/
 
-const builtin * ATTRIBUTE_PURE
+const builtin *ATTRIBUTE_PURE
 find_builtin_by_name (const char *name)
 {
   const builtin *bp;
@@ -213,7 +212,7 @@ define_builtin (const char *name, const builtin *bp, symbol_lookup mode)
 {
   symbol *sym;
 
-  sym = lookup_symbol (name, mode);
+  sym = lookup_symbol (name, strlen (name), mode);
   SYMBOL_TYPE (sym) = TOKEN_FUNC;
   SYMBOL_MACRO_ARGS (sym) = bp->groks_macro_args;
   SYMBOL_BLIND_NO_ARGS (sym) = bp->blind_if_no_args;
@@ -251,7 +250,7 @@ set_macro_sequence (const char *regexp)
 {
   const char *msg;
 
-  if (! regexp)
+  if (!regexp)
     regexp = DEFAULT_MACRO_SEQUENCE;
   else if (regexp[0] == '\0')
     {
@@ -261,11 +260,12 @@ set_macro_sequence (const char *regexp)
 
   msg = re_compile_pattern (regexp, strlen (regexp), &macro_sequence_buf);
   if (msg != NULL)
-    m4_failure (0, _("--warn-macro-sequence: bad regular expression `%s': %s"),
+    m4_failure (0,
+                _("--warn-macro-sequence: bad regular expression `%s': %s"),
                 regexp, msg);
   re_set_registers (&macro_sequence_buf, &macro_sequence_regs,
-                    macro_sequence_regs.num_regs,
-                    macro_sequence_regs.start, macro_sequence_regs.end);
+                    macro_sequence_regs.num_regs, macro_sequence_regs.start,
+                    macro_sequence_regs.end);
   macro_sequence_inuse = true;
 }
 
@@ -286,41 +286,54 @@ free_macro_sequence (void)
 `-----------------------------------------------------------------*/
 
 void
-define_user_macro (const char *name, const char *text, symbol_lookup mode)
+define_user_macro (const char *name, int name_len, const char *text,
+                   size_t text_len, symbol_lookup mode)
 {
   symbol *s;
-  char *defn = xstrdup (text ? text : "");
+  char *defn = xmemdup0 (text ? text : "", text_len);
 
-  s = lookup_symbol (name, mode);
+  if (text_len > INT_MAX)
+    {
+      M4ERROR ((warning_status, 0,
+                _("truncating macro `%s' definition to INT_MAX bytes"),
+                name));
+      text_len = INT_MAX;
+    }
+
+  s = lookup_symbol (name, name_len, mode);
   if (SYMBOL_TYPE (s) == TOKEN_TEXT)
     free (SYMBOL_TEXT (s));
 
   SYMBOL_TYPE (s) = TOKEN_TEXT;
   SYMBOL_TEXT (s) = defn;
+  SYMBOL_TEXT_LEN (s) = text_len;
 
   /* Implement --warn-macro-sequence.  */
   if (macro_sequence_inuse && text)
     {
       regoff_t offset = 0;
-      size_t len = strlen (defn);
 
-      while ((offset = re_search (&macro_sequence_buf, defn, len, offset,
-                                  len - offset, &macro_sequence_regs)) >= 0)
+      while ((offset = re_search (&macro_sequence_buf, defn, text_len, offset,
+                                  text_len - offset,
+                                  &macro_sequence_regs)) >= 0)
         {
+          char tmp;
+
           /* Skip empty matches.  */
           if (macro_sequence_regs.start[0] == macro_sequence_regs.end[0])
-            offset++;
-          else
             {
-              char tmp;
-              offset = macro_sequence_regs.end[0];
-              tmp = defn[offset];
-              defn[offset] = '\0';
-              M4ERROR ((warning_status, 0,
-                        _("Warning: definition of `%s' contains sequence `%s'"),
-                        name, defn + macro_sequence_regs.start[0]));
-              defn[offset] = tmp;
+              offset++;
+              continue;
             }
+
+          offset = macro_sequence_regs.end[0];
+          tmp = defn[offset];
+          defn[offset] = '\0';
+          M4ERROR ((warning_status, 0,
+                    _("Warning: definition of `%s' contains sequence `%s'"),
+                    name, defn + macro_sequence_regs.start[0]));
+          defn[offset] = tmp;
+
         }
       if (offset == -2)
         M4ERROR ((warning_status, 0,
@@ -345,9 +358,7 @@ builtin_init (void)
       {
         if (prefix_all_builtins)
           {
-            string = (char *) xmalloc (strlen (bp->name) + 4);
-            strcpy (string, "m4_");
-            strcat (string, bp->name);
+            string = xasprintf ("m4_%s", bp->name);
             define_builtin (string, bp, SYMBOL_INSERT);
             free (string);
           }
@@ -359,12 +370,14 @@ builtin_init (void)
     if (no_gnu_extensions)
       {
         if (pp->unix_name != NULL)
-          define_user_macro (pp->unix_name, pp->func, SYMBOL_INSERT);
+          define_user_macro (pp->unix_name, strlen (pp->unix_name), pp->func,
+                             strlen (pp->func), SYMBOL_INSERT);
       }
     else
       {
         if (pp->gnu_name != NULL)
-          define_user_macro (pp->gnu_name, pp->func, SYMBOL_INSERT);
+          define_user_macro (pp->gnu_name, strlen (pp->gnu_name), pp->func,
+                             strlen (pp->func), SYMBOL_INSERT);
       }
 }
 
@@ -447,7 +460,7 @@ numeric_arg (token_data *macro, const char *arg, int *valuep)
 static char const digits[] = "0123456789abcdefghijklmnopqrstuvwxyz";
 
 const char *
-ntoa (int32_t value, int radix)
+ntoa (int32_t value, int radix, const char **end)
 {
   bool negative;
   uint32_t uvalue;
@@ -455,6 +468,8 @@ ntoa (int32_t value, int radix)
   char *s = &str[sizeof str];
 
   *--s = '\0';
+  if (end)
+    *end = s;
 
   if (value < 0)
     {
@@ -488,9 +503,10 @@ static void
 shipout_int (struct obstack *obs, int val)
 {
   const char *s;
+  const char *e;
 
-  s = ntoa ((int32_t) val, 10);
-  obstack_grow (obs, s, strlen (s));
+  s = ntoa ((int32_t) val, 10, &e);
+  obstack_grow (obs, s, e - s);
 }
 
 /*-------------------------------------------------------------------.
@@ -500,19 +516,17 @@ shipout_int (struct obstack *obs, int val)
 
 static void
 dump_args (struct obstack *obs, int argc, token_data **argv,
-           const char *sep, bool quoted)
+           char sep, bool quoted)
 {
   int i;
-  size_t len = strlen (sep);
 
   for (i = 1; i < argc; i++)
     {
       if (i > 1)
-        obstack_grow (obs, sep, len);
+        obstack_1grow (obs, sep);
       if (quoted)
         obstack_grow (obs, lquote.string, lquote.length);
-      obstack_grow (obs, TOKEN_DATA_TEXT (argv[i]),
-                    strlen (TOKEN_DATA_TEXT (argv[i])));
+      obstack_grow (obs, TOKEN_DATA_TEXT (argv[i]), TOKEN_DATA_LEN (argv[i]));
       if (quoted)
         obstack_grow (obs, rquote.string, rquote.length);
     }
@@ -528,7 +542,7 @@ dump_args (struct obstack *obs, int argc, token_data **argv,
    individual arguments to the macro.  Please note that in general
    argv[argc] != NULL.  */
 
-/* The first section are macros for definining, undefining, examining,
+/* The first section are macros for defining, undefining, examining,
    changing, ... other macros.  */
 
 /*-------------------------------------------------------------------.
@@ -555,14 +569,14 @@ define_macro (int argc, token_data **argv, symbol_lookup mode)
 
   if (argc == 2)
     {
-      define_user_macro (ARG (1), "", mode);
+      define_user_macro (ARG (1), ARGLEN (1), "", 0, mode);
       return;
     }
 
   switch (TOKEN_DATA_TYPE (argv[2]))
     {
     case TOKEN_TEXT:
-      define_user_macro (ARG (1), ARG (2), mode);
+      define_user_macro (ARG (1), ARGLEN (1), ARG (2), ARGLEN (2), mode);
       break;
 
     case TOKEN_FUNC:
@@ -594,13 +608,13 @@ m4_undefine (struct obstack *obs MAYBE_UNUSED, int argc, token_data **argv)
   if (bad_argc (argv[0], argc, 2, -1))
     return;
   for (i = 1; i < argc; i++)
-    lookup_symbol (ARG (i), SYMBOL_DELETE);
+    lookup_symbol (ARG (i), ARGLEN (i), SYMBOL_DELETE);
 }
 
 static void
 m4_pushdef (struct obstack *obs MAYBE_UNUSED, int argc, token_data **argv)
 {
-  define_macro (argc, argv,  SYMBOL_PUSHDEF);
+  define_macro (argc, argv, SYMBOL_PUSHDEF);
 }
 
 static void
@@ -610,7 +624,7 @@ m4_popdef (struct obstack *obs MAYBE_UNUSED, int argc, token_data **argv)
   if (bad_argc (argv[0], argc, 2, -1))
     return;
   for (i = 1; i < argc; i++)
-    lookup_symbol (ARG (i), SYMBOL_POPDEF);
+    lookup_symbol (ARG (i), ARGLEN (i), SYMBOL_POPDEF);
 }
 
 /*---------------------.
@@ -621,27 +635,25 @@ static void
 m4_ifdef (struct obstack *obs, int argc, token_data **argv)
 {
   symbol *s;
-  const char *result;
+  int result = 0;
 
   if (bad_argc (argv[0], argc, 3, 4))
     return;
-  s = lookup_symbol (ARG (1), SYMBOL_LOOKUP);
+  s = lookup_symbol (ARG (1), ARGLEN (1), SYMBOL_LOOKUP);
 
   if (s != NULL && SYMBOL_TYPE (s) != TOKEN_VOID)
-    result = ARG (2);
+    result = 2;
   else if (argc >= 4)
-    result = ARG (3);
-  else
-    result = NULL;
+    result = 3;
 
-  if (result != NULL)
-    obstack_grow (obs, result, strlen (result));
+  if (result)
+    obstack_grow (obs, ARG (result), ARGLEN (result));
 }
 
 static void
 m4_ifelse (struct obstack *obs, int argc, token_data **argv)
 {
-  const char *result;
+  int result;
   token_data *me = argv[0];
 
   if (argc == 2)
@@ -656,11 +668,11 @@ m4_ifelse (struct obstack *obs, int argc, token_data **argv)
   argv++;
   argc--;
 
-  result = NULL;
-  while (result == NULL)
+  result = 0;
+  while (!result)
 
     if (STREQ (ARG (0), ARG (1)))
-      result = ARG (2);
+      result = 2;
 
     else
       switch (argc)
@@ -670,7 +682,7 @@ m4_ifelse (struct obstack *obs, int argc, token_data **argv)
 
         case 4:
         case 5:
-          result = ARG (3);
+          result = 3;
           break;
 
         default:
@@ -678,7 +690,7 @@ m4_ifelse (struct obstack *obs, int argc, token_data **argv)
           argv += 3;
         }
 
-  obstack_grow (obs, result, strlen (result));
+  obstack_grow (obs, ARG (result), ARGLEN (result));
 }
 
 /*-------------------------------------------------------------------.
@@ -715,8 +727,8 @@ dump_symbol (symbol *sym, void *arg)
 static int
 dumpdef_cmp (const void *s1, const void *s2)
 {
-  return strcmp (SYMBOL_NAME (* (symbol *const *) s1),
-                 SYMBOL_NAME (* (symbol *const *) s2));
+  return strcmp (SYMBOL_NAME (*(symbol * const *) s1),
+                 SYMBOL_NAME (*(symbol * const *) s2));
 }
 
 /*-------------------------------------------------------------.
@@ -744,7 +756,8 @@ m4_dumpdef (struct obstack *obs, int argc, token_data **argv)
     {
       for (i = 1; i < argc; i++)
         {
-          s = lookup_symbol (TOKEN_DATA_TEXT (argv[i]), SYMBOL_LOOKUP);
+          s = lookup_symbol (TOKEN_DATA_TEXT (argv[i]),
+                             TOKEN_DATA_LEN (argv[i]), SYMBOL_LOOKUP);
           if (s != NULL && SYMBOL_TYPE (s) != TOKEN_VOID)
             dump_symbol (s, &data);
           else
@@ -768,7 +781,8 @@ m4_dumpdef (struct obstack *obs, int argc, token_data **argv)
         case TOKEN_TEXT:
           if (debug_level & DEBUG_TRACE_QUOTE)
             DEBUG_PRINT3 ("%s%s%s\n",
-                          lquote.string, SYMBOL_TEXT (data.base[0]), rquote.string);
+                          lquote.string, SYMBOL_TEXT (data.base[0]),
+                          rquote.string);
           else
             DEBUG_PRINT1 ("%s\n", SYMBOL_TEXT (data.base[0]));
           break;
@@ -819,17 +833,17 @@ m4_builtin (struct obstack *obs, int argc, token_data **argv)
   name = ARG (1);
   bp = find_builtin_by_name (name);
   if (bp->func == m4_placeholder)
-    M4ERROR ((warning_status, 0,
-              _("undefined builtin `%s'"), name));
+    M4ERROR ((warning_status, 0, _("undefined builtin `%s'"), name));
   else
     {
       int i;
-      if (! bp->groks_macro_args)
+      if (!bp->groks_macro_args)
         for (i = 2; i < argc; i++)
           if (TOKEN_DATA_TYPE (argv[i]) != TOKEN_TEXT)
             {
               TOKEN_DATA_TYPE (argv[i]) = TOKEN_TEXT;
               TOKEN_DATA_TEXT (argv[i]) = (char *) "";
+              TOKEN_DATA_LEN (argv[i]) = 0;
             }
       bp->func (obs, argc - 1, argv + 1);
     }
@@ -858,19 +872,19 @@ m4_indir (struct obstack *obs, int argc, token_data **argv)
     }
 
   name = ARG (1);
-  s = lookup_symbol (name, SYMBOL_LOOKUP);
+  s = lookup_symbol (name, ARGLEN (1), SYMBOL_LOOKUP);
   if (s == NULL || SYMBOL_TYPE (s) == TOKEN_VOID)
-    M4ERROR ((warning_status, 0,
-              _("undefined macro `%s'"), name));
+    M4ERROR ((warning_status, 0, _("undefined macro `%s'"), name));
   else
     {
       int i;
-      if (! SYMBOL_MACRO_ARGS (s))
+      if (!SYMBOL_MACRO_ARGS (s))
         for (i = 2; i < argc; i++)
           if (TOKEN_DATA_TYPE (argv[i]) != TOKEN_TEXT)
             {
               TOKEN_DATA_TYPE (argv[i]) = TOKEN_TEXT;
               TOKEN_DATA_TEXT (argv[i]) = (char *) "";
+              TOKEN_DATA_LEN (argv[i]) = 0;
             }
       call_macro (s, argc - 1, argv + 1, obs);
     }
@@ -887,16 +901,16 @@ m4_defn (struct obstack *obs, int argc, token_data **argv)
 {
   symbol *s;
   builtin_func *b;
-  unsigned int i;
+  int i;
 
   if (bad_argc (argv[0], argc, 2, -1))
     return;
 
   assert (0 < argc);
-  for (i = 1; i < (unsigned) argc; i++)
+  for (i = 1; i < argc; i++)
     {
-      const char *arg = ARG((int) i);
-      s = lookup_symbol (arg, SYMBOL_LOOKUP);
+      const char *arg = ARG (i);
+      s = lookup_symbol (arg, ARGLEN (i), SYMBOL_LOOKUP);
       if (s == NULL)
         continue;
 
@@ -904,7 +918,7 @@ m4_defn (struct obstack *obs, int argc, token_data **argv)
         {
         case TOKEN_TEXT:
           obstack_grow (obs, lquote.string, lquote.length);
-          obstack_grow (obs, SYMBOL_TEXT (s), strlen (SYMBOL_TEXT (s)));
+          obstack_grow (obs, SYMBOL_TEXT (s), SYMBOL_TEXT_LEN (s));
           obstack_grow (obs, rquote.string, rquote.length);
           break;
 
@@ -915,8 +929,7 @@ m4_defn (struct obstack *obs, int argc, token_data **argv)
 builtin `%s' requested by frozen file is not supported"), arg));
           else if (argc != 2)
             M4ERROR ((warning_status, 0,
-                      _("Warning: cannot concatenate builtin `%s'"),
-                      arg));
+                      _("Warning: cannot concatenate builtin `%s'"), arg));
           else
             push_macro (b);
           break;
@@ -945,6 +958,7 @@ static void
 m4_syscmd (struct obstack *obs MAYBE_UNUSED, int argc, token_data **argv)
 {
   const char *cmd = ARG (1);
+  char *xcmd = NULL;
   int status;
   int sig_status;
   const char *prog_args[4] = { "sh", "-c" };
@@ -961,11 +975,22 @@ m4_syscmd (struct obstack *obs MAYBE_UNUSED, int argc, token_data **argv)
     {
       prog_args[0] = "cmd";
       prog_args[1] = "/c";
+      prog_args[2] = cmd;
     }
+  else
 #endif
-  prog_args[2] = cmd;
+    {
+      /* If cmd starts with '-' or '+', 'sh -c "$cmd"' is not guaranteed to
+         work.  If we could assume a POSIX compliant SYSCMD_SHELL, we could use
+         'sh -c -- "$cmd"'.  But it does not work with /bin/sh on FreeBSD 13
+         and AIX 7, and on these platforms 'bash' is not guaranteed to be
+         installed.  Therefore use 'sh -c " $cmd"' instead.  */
+      xcmd = xasprintf (" %s", cmd);
+      prog_args[2] = xcmd;
+    }
+  prog_args[3] = NULL;
   errno = 0;
-  status = execute (ARG (0), SYSCMD_SHELL, prog_args, NULL, false,
+  status = execute (ARG (0), SYSCMD_SHELL, prog_args, NULL, NULL, false,
                     false, false, false, true, false, &sig_status);
   if (sig_status)
     {
@@ -978,12 +1003,14 @@ m4_syscmd (struct obstack *obs MAYBE_UNUSED, int argc, token_data **argv)
         M4ERROR ((warning_status, errno, _("cannot run command `%s'"), cmd));
       sysval = status;
     }
+  free (xcmd);
 }
 
 static void
 m4_esyscmd (struct obstack *obs, int argc, token_data **argv)
 {
   const char *cmd = ARG (1);
+  char *xcmd = NULL;
   const char *prog_args[4] = { "sh", "-c" };
   pid_t child;
   int fd;
@@ -1004,11 +1031,22 @@ m4_esyscmd (struct obstack *obs, int argc, token_data **argv)
     {
       prog_args[0] = "cmd";
       prog_args[1] = "/c";
+      prog_args[2] = cmd;
     }
+  else
 #endif
-  prog_args[2] = cmd;
+    {
+      /* If cmd starts with '-' or '+', 'sh -c "$cmd"' is not guaranteed to
+         work.  If we could assume a POSIX compliant SYSCMD_SHELL, we could use
+         'sh -c -- "$cmd"'.  But it does not work with /bin/sh on FreeBSD 13
+         and AIX 7, and on these platforms 'bash' is not guaranteed to be
+         installed.  Therefore use 'sh -c " $cmd"' instead.  */
+      xcmd = xasprintf (" %s", cmd);
+      prog_args[2] = xcmd;
+    }
+  prog_args[3] = NULL;
   errno = 0;
-  child = create_pipe_in (ARG (0), SYSCMD_SHELL, prog_args, NULL,
+  child = create_pipe_in (ARG (0), SYSCMD_SHELL, prog_args, NULL, NULL,
                           NULL, false, true, false, &fd);
   if (child == -1)
     {
@@ -1063,6 +1101,7 @@ m4_esyscmd (struct obstack *obs, int argc, token_data **argv)
         M4ERROR ((warning_status, errno, _("cannot run command `%s'"), cmd));
       sysval = status;
     }
+  free (xcmd);
 }
 
 static void
@@ -1085,18 +1124,20 @@ m4_eval (struct obstack *obs, int argc, token_data **argv)
   int radix = 10;
   int min = 1;
   const char *s;
+  const char *e;
+  const char *expr = ARG (1);
+  const char *base = ARG (2);
 
   if (bad_argc (argv[0], argc, 2, 4))
     return;
 
-  if (*ARG (2) && !numeric_arg (argv[0], ARG (2), &radix))
+  if (*base && !numeric_arg (argv[0], base, &radix))
     return;
 
-  if (radix < 1 || radix > (int) strlen (digits))
+  if (radix < 1 || radix > 36)
     {
       M4ERROR ((warning_status, 0,
-                _("radix %d in builtin `%s' out of range"),
-                radix, ARG (0)));
+                _("radix %d in builtin `%s' out of range"), radix, ARG (0)));
       return;
     }
 
@@ -1109,10 +1150,10 @@ m4_eval (struct obstack *obs, int argc, token_data **argv)
       return;
     }
 
-  if (!*ARG (1))
+  if (!*expr)
     M4ERROR ((warning_status, 0,
               _("empty string treated as 0 in builtin `%s'"), ARG (0)));
-  else if (evaluate (ARG (1), &value))
+  else if (evaluate (expr, &value))
     return;
 
   if (radix == 1)
@@ -1131,17 +1172,17 @@ m4_eval (struct obstack *obs, int argc, token_data **argv)
       return;
     }
 
-  s = ntoa (value, radix);
+  s = ntoa (value, radix, &e);
 
   if (*s == '-')
     {
       obstack_1grow (obs, '-');
       s++;
     }
-  for (min -= strlen (s); --min >= 0;)
+  for (min -= e - s; --min >= 0;)
     obstack_1grow (obs, '0');
 
-  obstack_grow (obs, s, strlen (s));
+  obstack_grow (obs, s, e - s);
 }
 
 static void
@@ -1235,25 +1276,26 @@ m4_undivert (struct obstack *obs MAYBE_UNUSED, int argc, token_data **argv)
   else
     for (i = 1; i < argc; i++)
       {
-        file = strtol (ARG (i), &endp, 10);
-        if (*endp == '\0' && !c_isspace (*ARG (i)))
+        const char *arg = ARG (i);
+        file = strtol (arg, &endp, 10);
+        if (*endp == '\0' && !c_isspace (*arg))
           insert_diversion (file);
         else if (no_gnu_extensions)
           M4ERROR ((warning_status, 0,
                     _("non-numeric argument to builtin `%s'"), ARG (0)));
         else
           {
-            fp = m4_path_search (ARG (i), NULL);
+            fp = m4_path_search (arg, false, NULL);
             if (fp != NULL)
               {
                 insert_file (fp);
                 if (fclose (fp) == EOF)
                   M4ERROR ((warning_status, errno,
-                            _("error undiverting `%s'"), ARG (i)));
+                            _("error undiverting `%s'"), arg));
               }
             else
               M4ERROR ((warning_status, errno,
-                        _("cannot undivert `%s'"), ARG (i)));
+                        _("cannot undivert `%s'"), arg));
           }
       }
 }
@@ -1286,7 +1328,7 @@ m4_shift (struct obstack *obs, int argc, token_data **argv)
 {
   if (bad_argc (argv[0], argc, 2, -1))
     return;
-  dump_args (obs, argc - 1, argv + 1, ",", true);
+  dump_args (obs, argc - 1, argv + 1, ',', true);
 }
 
 /*--------------------------------------------------------------------------.
@@ -1294,15 +1336,14 @@ m4_shift (struct obstack *obs, int argc, token_data **argv)
 `--------------------------------------------------------------------------*/
 
 static void
-m4_changequote (struct obstack *obs MAYBE_UNUSED, int argc,
-                token_data **argv)
+m4_changequote (struct obstack *obs MAYBE_UNUSED, int argc, token_data **argv)
 {
   if (bad_argc (argv[0], argc, 1, 3))
     return;
 
   /* Explicit NULL distinguishes between empty and missing argument.  */
   set_quotes ((argc >= 2) ? TOKEN_DATA_TEXT (argv[1]) : NULL,
-             (argc >= 3) ? TOKEN_DATA_TEXT (argv[2]) : NULL);
+              (argc >= 3) ? TOKEN_DATA_TEXT (argv[2]) : NULL);
 }
 
 /*-----------------------------------------------------------------.
@@ -1354,16 +1395,17 @@ include (int argc, token_data **argv, bool silent)
 {
   FILE *fp;
   char *name;
+  const char *arg = ARG (1);
 
   if (bad_argc (argv[0], argc, 2, 2))
     return;
 
-  fp = m4_path_search (ARG (1), &name);
+  fp = m4_path_search (arg, false, &name);
   if (fp == NULL)
     {
       if (!silent)
         {
-          M4ERROR ((warning_status, errno, _("cannot open `%s'"), ARG (1)));
+          M4ERROR ((warning_status, errno, _("cannot open `%s'"), arg));
           retcode = EXIT_FAILURE;
         }
       return;
@@ -1451,23 +1493,24 @@ m4_maketemp (struct obstack *obs, int argc, token_data **argv)
          are in traditional mode.
 
          For reference, Solaris m4 does:
-           maketemp() -> `'
-           maketemp(X) -> `X'
-           maketemp(XX) -> `Xn', where n is last digit of pid
-           maketemp(XXXXXXXX) -> `X00nnnnn', where nnnnn is 16-bit pid
-      */
+         maketemp() -> `'
+         maketemp(X) -> `X'
+         maketemp(XX) -> `Xn', where n is last digit of pid
+         maketemp(XXXXXXXX) -> `X00nnnnn', where nnnnn is 16-bit pid
+       */
       const char *str = ARG (1);
-      int len = strlen (str);
+      int len = ARGLEN (1);
       int i;
       int len2;
+      const char *e;
 
       M4ERROR ((warning_status, 0, _("recommend using mkstemp instead")));
       for (i = len; i > 1; i--)
         if (str[i - 1] != 'X')
           break;
       obstack_grow (obs, str, i);
-      str = ntoa ((int32_t) getpid (), 10);
-      len2 = strlen (str);
+      str = ntoa ((int32_t) getpid (), 10, &e);
+      len2 = e - str;
       if (len2 > len - i)
         obstack_grow0 (obs, str + len2 - (len - i), len - i);
       else
@@ -1478,7 +1521,7 @@ m4_maketemp (struct obstack *obs, int argc, token_data **argv)
         }
     }
   else
-    mkstemp_helper (obs, ARG (0), ARG (1), strlen (ARG (1)));
+    mkstemp_helper (obs, ARG (0), ARG (1), ARGLEN (1));
 }
 
 static void
@@ -1486,7 +1529,7 @@ m4_mkstemp (struct obstack *obs, int argc, token_data **argv)
 {
   if (bad_argc (argv[0], argc, 2, 2))
     return;
-  mkstemp_helper (obs, ARG (0), ARG (1), strlen (ARG (1)));
+  mkstemp_helper (obs, ARG (0), ARG (1), ARGLEN (1));
 }
 
 /*----------------------------------------.
@@ -1498,7 +1541,7 @@ m4_errprint (struct obstack *obs, int argc, token_data **argv)
 {
   if (bad_argc (argv[0], argc, 2, -1))
     return;
-  dump_args (obs, argc, argv, " ", false);
+  dump_args (obs, argc, argv, ' ', false);
   obstack_1grow (obs, '\0');
   debug_flush_files ();
   xfprintf (stderr, "%s", (char *) obstack_finish (obs));
@@ -1581,9 +1624,9 @@ m4_m4wrap (struct obstack *obs, int argc, token_data **argv)
   if (bad_argc (argv[0], argc, 2, -1))
     return;
   if (no_gnu_extensions)
-    obstack_grow (obs, ARG (1), strlen (ARG (1)));
+    obstack_grow (obs, ARG (1), ARGLEN (1));
   else
-    dump_args (obs, argc, argv, " ", false);
+    dump_args (obs, argc, argv, ' ', false);
   obstack_1grow (obs, '\0');
   push_wrapup ((char *) obstack_finish (obs));
 }
@@ -1604,7 +1647,7 @@ set_trace (symbol *sym, void *data)
   SYMBOL_TRACED (sym) = data != NULL;
   /* Remove placeholder from table if macro is undefined and untraced.  */
   if (SYMBOL_TYPE (sym) == TOKEN_VOID && data == NULL)
-    lookup_symbol (SYMBOL_NAME (sym), SYMBOL_POPDEF);
+    lookup_symbol (SYMBOL_NAME (sym), SYMBOL_NAME_LEN (sym), SYMBOL_POPDEF);
 }
 
 static void
@@ -1618,9 +1661,9 @@ m4_traceon (struct obstack *obs, int argc, token_data **argv)
   else
     for (i = 1; i < argc; i++)
       {
-        s = lookup_symbol (ARG (i), SYMBOL_LOOKUP);
+        s = lookup_symbol (ARG (i), ARGLEN (i), SYMBOL_LOOKUP);
         if (!s)
-          s = lookup_symbol (ARG (i), SYMBOL_INSERT);
+          s = lookup_symbol (ARG (i), ARGLEN (i), SYMBOL_INSERT);
         set_trace (s, obs);
       }
 }
@@ -1640,7 +1683,8 @@ m4_traceoff (struct obstack *obs MAYBE_UNUSED, int argc, token_data **argv)
   else
     for (i = 1; i < argc; i++)
       {
-        s = lookup_symbol (TOKEN_DATA_TEXT (argv[i]), SYMBOL_LOOKUP);
+        s = lookup_symbol (TOKEN_DATA_TEXT (argv[i]),
+                           TOKEN_DATA_LEN (argv[i]), SYMBOL_LOOKUP);
         if (s != NULL)
           set_trace (s, NULL);
       }
@@ -1657,6 +1701,7 @@ m4_debugmode (struct obstack *obs MAYBE_UNUSED, int argc, token_data **argv)
 {
   int new_debug_level;
   int change_flag;
+  const char *str = ARG (1);
 
   if (bad_argc (argv[0], argc, 1, 2))
     return;
@@ -1665,20 +1710,20 @@ m4_debugmode (struct obstack *obs MAYBE_UNUSED, int argc, token_data **argv)
     debug_level = 0;
   else
     {
-      if (ARG (1)[0] == '+' || ARG (1)[0] == '-')
+      if (str[0] == '+' || str[0] == '-')
         {
-          change_flag = ARG (1)[0];
-          new_debug_level = debug_decode (ARG (1) + 1);
+          change_flag = str[0];
+          new_debug_level = debug_decode (str + 1);
         }
       else
         {
           change_flag = 0;
-          new_debug_level = debug_decode (ARG (1));
+          new_debug_level = debug_decode (str);
         }
 
       if (new_debug_level < 0)
         M4ERROR ((warning_status, 0,
-                  _("Debugmode: bad debug flags: `%s'"), ARG (1)));
+                  _("Debugmode: bad debug flags: `%s'"), str));
       else
         {
           switch (change_flag)
@@ -1735,7 +1780,7 @@ m4_len (struct obstack *obs, int argc, token_data **argv)
 {
   if (bad_argc (argv[0], argc, 2, 2))
     return;
-  shipout_int (obs, strlen (ARG (1)));
+  shipout_int (obs, ARGLEN (1));
 }
 
 /*-------------------------------------------------------------------.
@@ -1783,11 +1828,11 @@ m4_substr (struct obstack *obs, int argc, token_data **argv)
     {
       /* builtin(`substr') is blank, but substr(`abc') is abc.  */
       if (argc == 2)
-        obstack_grow (obs, ARG (1), strlen (ARG (1)));
+        obstack_grow (obs, ARG (1), ARGLEN (1));
       return;
     }
 
-  length = avail = strlen (ARG (1));
+  length = avail = ARGLEN (1);
   if (!numeric_arg (argv[0], ARG (2), &start))
     return;
 
@@ -1860,6 +1905,7 @@ static void
 m4_translit (struct obstack *obs, int argc, token_data **argv)
 {
   const char *data = ARG (1);
+  int datalen = ARGLEN (1);
   const char *from = ARG (2);
   const char *to;
   char map[UCHAR_MAX + 1];
@@ -1870,7 +1916,7 @@ m4_translit (struct obstack *obs, int argc, token_data **argv)
     {
       /* builtin(`translit') is blank, but translit(`abc') is abc.  */
       if (2 <= argc)
-        obstack_grow (obs, data, strlen (data));
+        obstack_grow (obs, data, datalen);
       return;
     }
 
@@ -1887,7 +1933,7 @@ m4_translit (struct obstack *obs, int argc, token_data **argv)
   if (!from[1] || !from[2])
     {
       const char *p;
-      size_t len = strlen (data);
+      size_t len = datalen;
       while ((p = (char *) memchr2 (data, from[0], from[1], len)))
         {
           obstack_grow (obs, data, p - data);
@@ -1919,9 +1965,9 @@ m4_translit (struct obstack *obs, int argc, token_data **argv)
      hence the found map.  */
   memset (map, 0, sizeof map);
   memset (found, 0, sizeof found);
-  for ( ; (ch = *from) != '\0'; from++)
+  for (; (ch = *from) != '\0'; from++)
     {
-      if (! found[ch])
+      if (!found[ch])
         {
           found[ch] = 1;
           map[ch] = *to;
@@ -1932,7 +1978,7 @@ m4_translit (struct obstack *obs, int argc, token_data **argv)
 
   for (data = ARG (1); (ch = *data) != '\0'; data++)
     {
-      if (! found[ch])
+      if (!found[ch])
         obstack_1grow (obs, ch);
       else if (map[ch])
         obstack_1grow (obs, map[ch]);
@@ -1996,8 +2042,15 @@ Warning: \\0 will disappear, use \\& instead in replacements")));
           repl++;
           break;
 
-        case '1': case '2': case '3': case '4': case '5': case '6':
-        case '7': case '8': case '9':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
           ind = ch -= '0';
           if (regs->num_regs - 1 <= ind)
             M4ERROR ((warning_status, 0,
@@ -2071,7 +2124,7 @@ m4_regexp (struct obstack *obs, int argc, token_data **argv)
   regexp = TOKEN_DATA_TEXT (argv[2]);
 
   init_pattern_buffer (&buf, &regs);
-  msg = re_compile_pattern (regexp, strlen (regexp), &buf);
+  msg = re_compile_pattern (regexp, ARGLEN (2), &buf);
 
   if (msg != NULL)
     {
@@ -2081,7 +2134,7 @@ m4_regexp (struct obstack *obs, int argc, token_data **argv)
       return;
     }
 
-  length = strlen (victim);
+  length = ARGLEN (1);
   /* Avoid overhead of allocating regs if we won't use it.  */
   startpos = re_search (&buf, victim, length, 0, length,
                         argc == 3 ? NULL : &regs);
@@ -2101,7 +2154,7 @@ m4_regexp (struct obstack *obs, int argc, token_data **argv)
 }
 
 /*--------------------------------------------------------------------------.
-| Substitute all matches of a regexp occuring in a string.  Each match of   |
+| Substitute all matches of a regexp occurring in a string.  Each match of  |
 | the second argument (a regexp) in the first argument is changed to the    |
 | third argument, with \& substituted by the matched text, and \N           |
 | substituted by the text matched by the Nth parenthesized sub-expression.  |
@@ -2124,14 +2177,14 @@ m4_patsubst (struct obstack *obs, int argc, token_data **argv)
     {
       /* builtin(`patsubst') is blank, but patsubst(`abc') is abc.  */
       if (argc == 2)
-        obstack_grow (obs, ARG (1), strlen (ARG (1)));
+        obstack_grow (obs, ARG (1), ARGLEN (1));
       return;
     }
 
   regexp = TOKEN_DATA_TEXT (argv[2]);
 
   init_pattern_buffer (&buf, &regs);
-  msg = re_compile_pattern (regexp, strlen (regexp), &buf);
+  msg = re_compile_pattern (regexp, ARGLEN (2), &buf);
 
   if (msg != NULL)
     {
@@ -2142,7 +2195,7 @@ m4_patsubst (struct obstack *obs, int argc, token_data **argv)
     }
 
   victim = TOKEN_DATA_TEXT (argv[1]);
-  length = strlen (victim);
+  length = ARGLEN (1);
 
   offset = 0;
   while (offset <= length)
@@ -2202,8 +2255,7 @@ m4_patsubst (struct obstack *obs, int argc, token_data **argv)
 `--------------------------------------------------------------------*/
 
 void
-m4_placeholder (struct obstack *obs MAYBE_UNUSED, int argc,
-                token_data **argv)
+m4_placeholder (struct obstack *obs MAYBE_UNUSED, int argc, token_data **argv)
 {
   M4ERROR ((warning_status, 0, _("\
 builtin `%s' requested by frozen file is not supported"), ARG (0)));
@@ -2222,21 +2274,30 @@ expand_user_macro (struct obstack *obs, symbol *sym,
                    int argc, token_data **argv)
 {
   const char *text = SYMBOL_TEXT (sym);
+  const char *end = text + SYMBOL_TEXT_LEN (sym);
   int i;
   while (1)
     {
       const char *dollar = strchr (text, '$');
       if (!dollar)
         {
-          obstack_grow (obs, text, strlen (text));
+          obstack_grow (obs, text, end - text);
           return;
         }
       obstack_grow (obs, text, dollar - text);
       text = dollar;
       switch (*++text)
         {
-        case '0': case '1': case '2': case '3': case '4':
-        case '5': case '6': case '7': case '8': case '9':
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
           if (no_gnu_extensions)
             {
               i = *text++ - '0';
@@ -2244,21 +2305,19 @@ expand_user_macro (struct obstack *obs, symbol *sym,
           else
             {
               for (i = 0; c_isdigit (*text); text++)
-                i = i*10 + (*text - '0');
+                i = i * 10 + (*text - '0');
             }
-          if (i < argc)
-            obstack_grow (obs, TOKEN_DATA_TEXT (argv[i]),
-                          strlen (TOKEN_DATA_TEXT (argv[i])));
+          obstack_grow (obs, ARG (i), ARGLEN (i));
           break;
 
-        case '#': /* number of arguments */
+        case '#':              /* number of arguments */
           shipout_int (obs, argc - 1);
           text++;
           break;
 
-        case '*': /* all arguments */
-        case '@': /* ... same, but quoted */
-          dump_args (obs, argc, argv, ",", *text == '@');
+        case '*':              /* all arguments */
+        case '@':              /* ... same, but quoted */
+          dump_args (obs, argc, argv, ',', *text == '@');
           text++;
           break;
 

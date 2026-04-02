@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: m4 1.4o\n"
 "Report-Msgid-Bugs-To: bug-m4@gnu.org\n"
-"POT-Creation-Date: 2021-05-28 13:49-0500\n"
+"POT-Creation-Date: 2026-02-06 13:55-0600\n"
 "PO-Revision-Date: 2002-07-24 21:21GMT+0700\n"
 "Last-Translator: Tedi Heriyanto <tedi_h@gmx.net>\n"
 "Language-Team: Indonesian <translation-team-id@lists.sourceforge.net>\n"
@@ -17,107 +17,108 @@ msgstr ""
 "X-Bugs: Report translation errors to the Language-Team address.\n"
 "X-Generator: KBabel 0.9.5\n"
 
-#: lib/clean-temp.c:235
-#, c-format
+#: lib/clean-temp.c:230
+#, fuzzy, c-format
 msgid "cannot find a temporary directory, try setting $TMPDIR"
-msgstr ""
+msgstr "tidak dapat membuat berkas sementara"
 
-#: lib/clean-temp.c:250
-#, c-format
+#: lib/clean-temp.c:245
+#, fuzzy, c-format
 msgid "cannot create a temporary directory using template \"%s\""
-msgstr ""
+msgstr "tidak dapat membuat berkas sementara"
 
-#: lib/clean-temp.c:371
+#: lib/clean-temp.c:364
 #, fuzzy, c-format
 msgid "cannot remove temporary directory %s"
-msgstr "KESALAHAN: tidak dapat membuat file temporer untuk diversi"
+msgstr "tidak dapat membuat berkas sementara"
 
-#: lib/closein.c:100
+#: lib/closein.c:99
+#, fuzzy
 msgid "error closing file"
-msgstr ""
+msgstr "error ketika menutup berkas keluaran"
 
-#: lib/closeout.c:122
+#: lib/closeout.c:121
 msgid "write error"
-msgstr ""
+msgstr "kesalahan tulis"
 
-#: lib/c-stack.c:187
+#: lib/c-stack.c:190
 msgid "program error"
-msgstr ""
+msgstr "kesalahan program"
 
-#: lib/c-stack.c:188
+#: lib/c-stack.c:191
 msgid "stack overflow"
-msgstr ""
+msgstr "stack overflow"
 
-#: lib/clean-temp-simple.c:297
+#: lib/clean-temp-simple.c:266
 #, fuzzy, c-format
 msgid "cannot remove temporary file %s"
-msgstr "Tidak dapat menset error file: %s"
+msgstr "tidak dapat membuat berkas sementara"
 
-#: lib/error.c:195
+#: lib/error.c:208
 msgid "Unknown system error"
-msgstr ""
+msgstr "Kesalahan sistem tidak dikenal"
 
-#: lib/execute.c:348 lib/spawn-pipe.c:597 lib/wait-process.c:291
-#: lib/wait-process.c:365
-#, c-format
+#: lib/execute.c:378 lib/spawn-pipe.c:597 lib/wait-process.c:325
+#: lib/wait-process.c:396
+#, fuzzy, c-format
 msgid "%s subprocess failed"
-msgstr ""
+msgstr "cap_set_proc gagal"
 
-#: lib/getopt.c:278
-#, fuzzy, c-format
+#: lib/getopt.c:283
+#, c-format
 msgid "%s: option '%s%s' is ambiguous\n"
-msgstr "%s: option `%s' rancu\n"
+msgstr "%s: opsi '%s%s' ambigu\n"
 
-#: lib/getopt.c:284
-#, fuzzy, c-format
+#: lib/getopt.c:289
+#, c-format
 msgid "%s: option '%s%s' is ambiguous; possibilities:"
-msgstr "%s: option `%s' rancu\n"
+msgstr "%s: opsi '%s%s' ambigu; kemungkinan:"
 
-#: lib/getopt.c:319
-#, fuzzy, c-format
+#: lib/getopt.c:323
+#, c-format
 msgid "%s: unrecognized option '%s%s'\n"
-msgstr "%s: option tidak dikenal `%c%s'\n"
+msgstr "%s: opsi tidak dikenal '%s%s'\n"
 
-#: lib/getopt.c:345
-#, fuzzy, c-format
+#: lib/getopt.c:349
+#, c-format
 msgid "%s: option '%s%s' doesn't allow an argument\n"
-msgstr "%s: option `%c%s' tidak membolehkan sebuah argumen\n"
+msgstr "%s: opsi '%s%s' tidak mengizinkan sebuah argumen\n"
 
-#: lib/getopt.c:360
-#, fuzzy, c-format
+#: lib/getopt.c:364
+#, c-format
 msgid "%s: option '%s%s' requires an argument\n"
-msgstr "%s: option `%s' membutuhkan sebuah argumen\n"
+msgstr "%s: opsi '%s%s' membutuhkan sebuah argumen\n"
 
-#: lib/getopt.c:621
-#, fuzzy, c-format
+#: lib/getopt.c:624
+#, c-format
 msgid "%s: invalid option -- '%c'\n"
-msgstr "%s: option tidak valid -- %c\n"
+msgstr "%s: opsi tidak valid -- %c\n"
 
-#: lib/getopt.c:636 lib/getopt.c:682
-#, fuzzy, c-format
+#: lib/getopt.c:639 lib/getopt.c:685
+#, c-format
 msgid "%s: option requires an argument -- '%c'\n"
-msgstr "%s: option membutuhkan sebuah argumen -- %c\n"
+msgstr "%s: opsi membutuhkan sebuah argumen -- %c\n"
 
-#: lib/obstack.c:338 lib/obstack.c:340 lib/xalloc-die.c:34
+#: lib/obstack.c:351 lib/obstack.c:353 lib/xalloc-die.c:34
 msgid "memory exhausted"
 msgstr "memori habis"
 
 #: lib/openat-die.c:38
 #, c-format
 msgid "unable to record current working directory"
-msgstr ""
+msgstr "tidak bisa merekam direktori kerja sekarang"
 
 #: lib/openat-die.c:57
 #, c-format
 msgid "failed to return to initial working directory"
-msgstr ""
+msgstr "gagal kembali ke direktori kerja sekarang"
 
-#: lib/os2-spawn.c:46
-#, c-format
+#: lib/os2-spawn.c:51
+#, fuzzy, c-format
 msgid "_open_osfhandle failed"
-msgstr ""
+msgstr "pembacaan dari header ELF gagal"
 
-#: lib/os2-spawn.c:83
+#: lib/os2-spawn.c:88
 #, c-format
 msgid "cannot restore fd %d: dup2 failed"
 msgstr ""
@@ -143,264 +144,253 @@ msgstr ""
 #. If you don't know what to put here, please see
 #. <https://en.wikipedia.org/wiki/Quotation_marks_in_other_languages>
 #. and use glyphs suitable for your language.
-#: lib/quotearg.c:355
+#: lib/quotearg.c:357
 msgid "`"
-msgstr ""
+msgstr "'"
 
-#: lib/quotearg.c:356
+#: lib/quotearg.c:358
 msgid "'"
-msgstr ""
+msgstr "'"
 
-#: lib/regcomp.c:135
+#: lib/regcomp.c:122
 msgid "Success"
 msgstr "Sukses"
 
-#: lib/regcomp.c:138
+#: lib/regcomp.c:125
 msgid "No match"
 msgstr "Tidak ada kecocokan"
 
-#: lib/regcomp.c:141
+#: lib/regcomp.c:128
 msgid "Invalid regular expression"
 msgstr "Ekspresi Reguler tidak valid"
 
-#: lib/regcomp.c:144
+#: lib/regcomp.c:131
 msgid "Invalid collation character"
 msgstr "Karakter kolasi tidak valid"
 
-#: lib/regcomp.c:147
+#: lib/regcomp.c:134
 msgid "Invalid character class name"
 msgstr "Nama kelas karakter tidak valid"
 
-#: lib/regcomp.c:150
+#: lib/regcomp.c:137
 msgid "Trailing backslash"
 msgstr "Trailing backslash"
 
-#: lib/regcomp.c:153
+#: lib/regcomp.c:140
 msgid "Invalid back reference"
 msgstr "Referensi balik tidak valid"
 
-#: lib/regcomp.c:156
-#, fuzzy
+#: lib/regcomp.c:143
 msgid "Unmatched [, [^, [:, [., or [="
-msgstr "[ atau [^ tidak cocok"
+msgstr "[, [^, [:, [., atau [= tanpa pasangan"
 
-#: lib/regcomp.c:159
+#: lib/regcomp.c:146
 msgid "Unmatched ( or \\("
 msgstr "( atau \\( tidak cocok"
 
-#: lib/regcomp.c:162
+#: lib/regcomp.c:149
 msgid "Unmatched \\{"
 msgstr "\\{ tidak cocok"
 
-#: lib/regcomp.c:165
+#: lib/regcomp.c:152
 msgid "Invalid content of \\{\\}"
 msgstr "Isi \\{\\} tidak valid"
 
-#: lib/regcomp.c:168
+#: lib/regcomp.c:155
 msgid "Invalid range end"
 msgstr "Akhir range tidak valid"
 
-#: lib/regcomp.c:171
+#: lib/regcomp.c:158
 msgid "Memory exhausted"
 msgstr "Memori habis"
 
-#: lib/regcomp.c:174
+#: lib/regcomp.c:161
 msgid "Invalid preceding regular expression"
 msgstr "Regular ekspresi sebelumnya tidak valid"
 
-#: lib/regcomp.c:177
+#: lib/regcomp.c:164
 msgid "Premature end of regular expression"
 msgstr "Akhir regular ekspresi yang prematur"
 
-#: lib/regcomp.c:180
+#: lib/regcomp.c:167
 msgid "Regular expression too big"
 msgstr "Regular ekspresi terlalu besar"
 
-#: lib/regcomp.c:183
+#: lib/regcomp.c:170
 msgid "Unmatched ) or \\)"
 msgstr ") atau \\) tidak cocok"
 
-#: lib/regcomp.c:676
+#: lib/regcomp.c:650
 msgid "No previous regular expression"
 msgstr "Tidak ada regular ekspresi sebelumnya"
 
 #: lib/siglist.h:31
 msgid "Hangup"
-msgstr ""
+msgstr "Memutuskan"
 
 #: lib/siglist.h:34
 msgid "Interrupt"
-msgstr ""
+msgstr "Interupsi"
 
 #: lib/siglist.h:37
 msgid "Quit"
-msgstr ""
+msgstr "Berhenti"
 
 #: lib/siglist.h:40
 msgid "Illegal instruction"
-msgstr ""
+msgstr "Instruksi tidak legal"
 
 #: lib/siglist.h:43
 msgid "Trace/breakpoint trap"
-msgstr ""
+msgstr "Jejak/titik-putus jebakan"
 
 #: lib/siglist.h:46
 msgid "Aborted"
-msgstr ""
+msgstr "Dibatalkan"
 
 #: lib/siglist.h:49
 msgid "Floating point exception"
-msgstr ""
+msgstr "Eksepsi titik pecahan"
 
 #: lib/siglist.h:52
 msgid "Killed"
-msgstr ""
+msgstr "Terbunuh"
 
 #: lib/siglist.h:55
 msgid "Bus error"
-msgstr ""
+msgstr "Bus error"
 
 #: lib/siglist.h:58
 msgid "Segmentation fault"
-msgstr ""
+msgstr "Kerusakan segmentasi"
 
 #: lib/siglist.h:61
 msgid "Broken pipe"
-msgstr ""
+msgstr "Pipa rusak"
 
 #: lib/siglist.h:64
 msgid "Alarm clock"
-msgstr ""
+msgstr "Jam alarm"
 
 #: lib/siglist.h:67
 msgid "Terminated"
-msgstr ""
+msgstr "Terakhiri"
 
 #: lib/siglist.h:70
 msgid "Urgent I/O condition"
-msgstr ""
+msgstr "Kondisi I/O penting"
 
 #: lib/siglist.h:73
 msgid "Stopped (signal)"
-msgstr ""
+msgstr "Terhenti (sinyal)"
 
 #: lib/siglist.h:76
 msgid "Stopped"
-msgstr ""
+msgstr "Terhenti"
 
 #: lib/siglist.h:79
 msgid "Continued"
-msgstr ""
+msgstr "Dilanjutkan"
 
 #: lib/siglist.h:82
 msgid "Child exited"
-msgstr ""
+msgstr "Anak keluar"
 
 #: lib/siglist.h:85
 msgid "Stopped (tty input)"
-msgstr ""
+msgstr "Terhenti (masukan tty)"
 
 #: lib/siglist.h:88
 msgid "Stopped (tty output)"
-msgstr ""
+msgstr "Terhenti (keluaran tty)"
 
 #: lib/siglist.h:91
 msgid "I/O possible"
-msgstr ""
+msgstr "kemungkinan I/O"
 
 #: lib/siglist.h:94
-#, fuzzy
 msgid "CPU time limit exceeded"
-msgstr "Batas VMEM terlampaui?\n"
+msgstr "batas waktu CPU terlampaui"
 
 #: lib/siglist.h:97
-#, fuzzy
 msgid "File size limit exceeded"
-msgstr "Batas VMEM terlampaui?\n"
+msgstr "Batas ukuran berkas terlampaui"
 
 #: lib/siglist.h:100
 msgid "Virtual timer expired"
-msgstr ""
+msgstr "Pewaktu maya ekspired"
 
 #: lib/siglist.h:103
 msgid "Profiling timer expired"
-msgstr ""
+msgstr "Pewaktu profiling ekspired"
 
 #: lib/siglist.h:106
 msgid "Window changed"
-msgstr ""
+msgstr "Jendela berubah"
 
 #: lib/siglist.h:109
-#, fuzzy
 msgid "User defined signal 1"
-msgstr "Nama yang tak terdefinisi %s"
+msgstr "Sinyal 1 terdefinisi oleh pengguna"
 
 #: lib/siglist.h:112
-#, fuzzy
 msgid "User defined signal 2"
-msgstr "Nama yang tak terdefinisi %s"
+msgstr "Sinyal 2 terdefinisi oleh pengguna"
 
 #: lib/siglist.h:117
 msgid "EMT trap"
-msgstr ""
+msgstr "jebakan EMT"
 
 #: lib/siglist.h:120
 msgid "Bad system call"
-msgstr ""
+msgstr "Pemanggilan sistem buruk"
 
 #: lib/siglist.h:123
 msgid "Stack fault"
-msgstr ""
+msgstr "Kegagalan stack"
 
 #: lib/siglist.h:126
 msgid "Information request"
-msgstr ""
+msgstr "Permintaan informasi"
 
 #: lib/siglist.h:128
 msgid "Power failure"
-msgstr ""
+msgstr "Kegagalan power"
 
 #: lib/siglist.h:131
 msgid "Resource lost"
-msgstr ""
+msgstr "Sumber daya hilang"
 
-#: lib/spawn-pipe.c:217 lib/spawn-pipe.c:220 lib/spawn-pipe.c:459
-#: lib/spawn-pipe.c:462
-#, c-format
+#: lib/spawn-pipe.c:218 lib/spawn-pipe.c:221
+#, fuzzy, c-format
 msgid "cannot create pipe"
-msgstr ""
+msgstr "tidak dapat membuat daftar scope"
 
 #: lib/strsignal.c:114
 #, c-format
 msgid "Real-time signal %d"
-msgstr ""
+msgstr "Sinyal waktu-nyata %d"
 
 #: lib/strsignal.c:118
 #, c-format
 msgid "Unknown signal %d"
-msgstr ""
-
-#: lib/verror.c:76
-#, c-format
-msgid "unable to display error message"
-msgstr ""
+msgstr "Sinyal %d tidak dikenal"
 
 #: lib/version-etc.c:73
 #, c-format
 msgid "Packaged by %s (%s)\n"
-msgstr ""
+msgstr "Dipaketkan oleh %s (%s)\n"
 
 #: lib/version-etc.c:76
 #, c-format
 msgid "Packaged by %s\n"
-msgstr ""
+msgstr "Dipaketkan oleh %s \n"
 
 #. TRANSLATORS: Translate "(C)" to the copyright symbol
 #. (C-in-a-circle), if this symbol is available in the user's
 #. locale.  Otherwise, do not translate "(C)"; leave it as-is.
 #: lib/version-etc.c:83
 msgid "(C)"
-msgstr ""
+msgstr "(C)"
 
 #. TRANSLATORS: The %s placeholder is the web address of the GPL license.
 #: lib/version-etc.c:88
@@ -410,24 +400,29 @@ msgid ""
 "This is free software: you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
+"Lisensi GPLv3+; GNU GPL versi 3 atau lebih lanjut <%s>.\n"
+"Ini adalah aplikasi bebas; Anda bebas untuk mengubah dan "
+"meredistribusikannya.\n"
+"TIDAK ADA GARANSI disini, sampai batas yang diijinkan oleh hukum yang "
+"berlaku.\n"
 
 #. TRANSLATORS: %s denotes an author name.
 #: lib/version-etc.c:105
 #, c-format
 msgid "Written by %s.\n"
-msgstr ""
+msgstr "Ditulis oleh %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #: lib/version-etc.c:109
 #, c-format
 msgid "Written by %s and %s.\n"
-msgstr ""
+msgstr "Ditulis oleh %s dan %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #: lib/version-etc.c:113
 #, c-format
 msgid "Written by %s, %s, and %s.\n"
-msgstr ""
+msgstr "Ditulis oleh %s, %s, and %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -438,6 +433,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "and %s.\n"
 msgstr ""
+"Ditulis oleh %s, %s, %s,\n"
+"dan %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -448,6 +445,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, and %s.\n"
 msgstr ""
+"Ditulis oleh %s, %s, %s,\n"
+"%s, dan %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -458,6 +457,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, %s, and %s.\n"
 msgstr ""
+"Ditulis oleh %s, %s, %s,\n"
+"%s, %s, dan %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -468,6 +469,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, %s, %s, and %s.\n"
 msgstr ""
+"Ditulis oleh %s, %s, %s,\n"
+"%s, %s, %s, dan %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -479,6 +482,9 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "and %s.\n"
 msgstr ""
+"Ditulis oleh %s, %s, %s,\n"
+"%s, %s, %s, %s,\n"
+"dan %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -490,6 +496,9 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "%s, and %s.\n"
 msgstr ""
+"Ditulis oleh %s, %s, %s,\n"
+"%s, %s, %s, %s,\n"
+"%s, dan %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -501,339 +510,357 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "%s, %s, and others.\n"
 msgstr ""
+"Ditulis oleh %s, %s, %s,\n"
+"%s, %s, %s, %s,\n"
+"%s, %s, dan yang lain.\n"
 
 #. TRANSLATORS: The placeholder indicates the bug-reporting address
 #. for this package.  Please add _another line_ saying
 #. "Report translation bugs to <...>\n" with the address for translation
 #. bugs (typically your translation team's web or email address).
-#: lib/version-etc.c:249
-#, fuzzy, c-format
+#: lib/version-etc.c:248
+#, c-format
 msgid "Report bugs to: %s\n"
-msgstr ""
-"\n"
-"Laporkan bug ke <bug-m4@gnu.org>.\n"
+msgstr "Laporkan kutu ke: %s\n"
 
-#: lib/version-etc.c:251
+#: lib/version-etc.c:250
 #, c-format
 msgid "Report %s bugs to: %s\n"
-msgstr ""
+msgstr "Laporkan kutu %s ke: %s\n"
 
-#: lib/version-etc.c:255 lib/version-etc.c:257
+#: lib/version-etc.c:254 lib/version-etc.c:256
 #, c-format
 msgid "%s home page: <%s>\n"
-msgstr ""
+msgstr "Laman web %s: <%s>\n"
 
-#: lib/version-etc.c:260
+#: lib/version-etc.c:259
 #, c-format
 msgid "General help using GNU software: <%s>\n"
-msgstr ""
+msgstr "Bantuan umum menggunakan aplikasi GNU: <%s>\n"
 
-#: lib/wait-process.c:232 lib/wait-process.c:264 lib/wait-process.c:326
-#, c-format
+#: lib/wait-process.c:266 lib/wait-process.c:298 lib/wait-process.c:357
+#, fuzzy, c-format
 msgid "%s subprocess"
-msgstr ""
+msgstr "Tidak ada proses seperti itu"
 
-#: lib/wait-process.c:283 lib/wait-process.c:355
-#, c-format
+#: lib/wait-process.c:317 lib/wait-process.c:386
+#, fuzzy, c-format
 msgid "%s subprocess got fatal signal %d"
-msgstr ""
+msgstr "%s: C preprosesor gagal dengan sinyal %d\n"
 
-#: lib/xprintf.c:50 lib/xprintf.c:76
-#, c-format
+#: lib/xprintf.c:47 lib/xprintf.c:68
+#, fuzzy, c-format
 msgid "cannot perform formatted output"
-msgstr ""
+msgstr "tidak dapat menghasilkan berkas keluaran"
 
 #: src/builtin.c:264
 #, fuzzy, c-format
 msgid "--warn-macro-sequence: bad regular expression `%s': %s"
 msgstr "Ekspresi Reguler yang buruk `%s': %s"
 
-#: src/builtin.c:320
+#: src/builtin.c:298
+#, c-format
+msgid "truncating macro `%s' definition to INT_MAX bytes"
+msgstr ""
+
+#: src/builtin.c:333
 #, c-format
 msgid "Warning: definition of `%s' contains sequence `%s'"
 msgstr ""
 
-#: src/builtin.c:327
+#: src/builtin.c:340
 #, c-format
 msgid "error checking --warn-macro-sequence for macro `%s'"
 msgstr ""
 
-#: src/builtin.c:388
+#: src/builtin.c:401
 #, fuzzy, c-format
 msgid "Warning: too few arguments to builtin `%s'"
 msgstr "Peringatan: Argumen terlalu sedikit untuk built-in `%s'"
 
-#: src/builtin.c:394
+#: src/builtin.c:407
 #, fuzzy, c-format
 msgid "Warning: excess arguments to builtin `%s' ignored"
 msgstr "Peringatan: Argumen terlalu banyak untuk built-in `%s'"
 
-#: src/builtin.c:415 src/builtin.c:1114
-#, c-format
+#: src/builtin.c:428 src/builtin.c:1155
+#, fuzzy, c-format
 msgid "empty string treated as 0 in builtin `%s'"
-msgstr ""
+msgstr "Argumen non-numerik untuk built-in `%s'"
 
-#: src/builtin.c:425 src/builtin.c:1243
+#: src/builtin.c:438 src/builtin.c:1285
 #, fuzzy, c-format
 msgid "non-numeric argument to builtin `%s'"
 msgstr "Argumen non-numerik untuk built-in `%s'"
 
-#: src/builtin.c:431
-#, c-format
+#: src/builtin.c:444
+#, fuzzy, c-format
 msgid "leading whitespace ignored in builtin `%s'"
-msgstr ""
+msgstr "Argumen non-numerik untuk built-in `%s'"
 
-#: src/builtin.c:435
+#: src/builtin.c:448
 #, fuzzy, c-format
 msgid "numeric overflow detected in builtin `%s'"
 msgstr "Argumen non-numerik untuk built-in `%s'"
 
-#: src/builtin.c:552 src/builtin.c:815 src/builtin.c:856
-#, c-format
+#: src/builtin.c:566 src/builtin.c:829 src/builtin.c:870
+#, fuzzy, c-format
 msgid "Warning: %s: invalid macro name ignored"
-msgstr ""
+msgstr "karakter tidak valid: pesan diabaikan"
 
-#: src/builtin.c:752 src/builtin.c:864
+#: src/builtin.c:765 src/builtin.c:877
 #, fuzzy, c-format
 msgid "undefined macro `%s'"
 msgstr "Nama yang tak terdefinisi `%s'"
 
-#: src/builtin.c:823
+#: src/builtin.c:836
 #, fuzzy, c-format
 msgid "undefined builtin `%s'"
 msgstr "Nama yang tak terdefinisi `%s'"
 
-#: src/builtin.c:914 src/builtin.c:2208
-#, c-format
+#: src/builtin.c:928 src/builtin.c:2260
+#, fuzzy, c-format
 msgid "builtin `%s' requested by frozen file is not supported"
-msgstr ""
+msgstr "%s: nested kondisional tidak didukung"
 
-#: src/builtin.c:918
+#: src/builtin.c:932
 #, fuzzy, c-format
 msgid "Warning: cannot concatenate builtin `%s'"
 msgstr "Peringatan: Argumen terlalu sedikit untuk built-in `%s'"
 
-#: src/builtin.c:978 src/builtin.c:1015 src/builtin.c:1028 src/builtin.c:1063
+#: src/builtin.c:1003 src/builtin.c:1053 src/builtin.c:1066 src/builtin.c:1101
 #, fuzzy, c-format
 msgid "cannot run command `%s'"
 msgstr "Tidak dapat membuka pipe untuk perintah `%s'"
 
-#: src/builtin.c:1051
+#: src/builtin.c:1089
+#, fuzzy
 msgid "cannot read pipe"
-msgstr ""
+msgstr "tidak dapat membaca header"
 
-#: src/builtin.c:1098
+#: src/builtin.c:1140
 #, c-format
 msgid "radix %d in builtin `%s' out of range"
 msgstr ""
 
-#: src/builtin.c:1108
+#: src/builtin.c:1149
 #, fuzzy, c-format
 msgid "negative width to builtin `%s'"
 msgstr "Lebar negatif untuk eval"
 
-#: src/builtin.c:1252
+#: src/builtin.c:1294
 #, fuzzy, c-format
 msgid "error undiverting `%s'"
 msgstr "Tidak dapat mendivert %s"
 
-#: src/builtin.c:1256
+#: src/builtin.c:1298
 #, fuzzy, c-format
 msgid "cannot undivert `%s'"
 msgstr "Tidak dapat mendivert %s"
 
-#: src/builtin.c:1366 src/freeze.c:115 src/m4.c:379
-#, fuzzy, c-format
+#: src/builtin.c:1408 src/freeze.c:115 src/m4.c:382
+#, c-format
 msgid "cannot open `%s'"
-msgstr "Tidak dapat membuka %s"
+msgstr "tidak dapat membuka `%s'"
 
-#: src/builtin.c:1429
+#: src/builtin.c:1471
 #, fuzzy, c-format
 msgid "%s: cannot create tempfile `%s'"
-msgstr "ERROR: tidak dapat menutup modul: `%s'"
+msgstr "tidak dapat membuat berkas sementara"
 
-#: src/builtin.c:1464
+#: src/builtin.c:1507
 msgid "recommend using mkstemp instead"
 msgstr ""
 
-#: src/builtin.c:1557
-#, c-format
+#: src/builtin.c:1600
+#, fuzzy, c-format
 msgid "exit status out of range: `%d'"
-msgstr ""
+msgstr "Hasil numerik diluar dari jangkauan"
 
-#: src/builtin.c:1681
+#: src/builtin.c:1726
 #, c-format
 msgid "Debugmode: bad debug flags: `%s'"
 msgstr "Debugmode: flag debug buruk: `%s'"
 
-#: src/builtin.c:1722 src/m4.c:625 src/m4.c:689
+#: src/builtin.c:1767 src/m4.c:633 src/m4.c:700
 #, fuzzy, c-format
 msgid "cannot set debug file `%s'"
-msgstr "Tidak dapat menset error file: %s"
+msgstr "tidak dapat membuka berkas masukan `%s'"
 
-#: src/builtin.c:1988
+#: src/builtin.c:2034
 #, fuzzy
 msgid "Warning: \\0 will disappear, use \\& instead in replacements"
 msgstr "PERINGATAN: \\0 akan hilang, gunakan \\& sebagai gantinya"
 
-#: src/builtin.c:2004
+#: src/builtin.c:2057
 #, c-format
 msgid "Warning: sub-expression %d not present"
 msgstr ""
 
-#: src/builtin.c:2013
+#: src/builtin.c:2066
 msgid "Warning: trailing \\ ignored in replacement"
 msgstr ""
 
-#: src/builtin.c:2079
+#: src/builtin.c:2132
 #, fuzzy, c-format
 msgid "bad regular expression: `%s': %s"
 msgstr "Ekspresi Reguler yang buruk `%s': %s"
 
-#: src/builtin.c:2091 src/builtin.c:2161
+#: src/builtin.c:2144 src/builtin.c:2214
 #, fuzzy, c-format
 msgid "error matching regular expression `%s'"
 msgstr "Kesalahan mencocokkan ekspresi reguler `%s'"
 
-#: src/builtin.c:2139 src/input.c:792
+#: src/builtin.c:2192 src/input.c:795
 #, fuzzy, c-format
 msgid "bad regular expression `%s': %s"
 msgstr "Ekspresi Reguler yang buruk `%s': %s"
 
 #: src/debug.c:136 src/debug.c:157
+#, fuzzy
 msgid "error writing to debug stream"
+msgstr "Error menulis ke keluaran standar"
+
+#: src/eval.c:485
+msgid "Warning: recommend ==, not =, for equality operator"
 msgstr ""
 
-#: src/eval.c:318
+#: src/eval.c:569
 #, fuzzy, c-format
 msgid "bad expression in eval (missing right parenthesis): %s"
 msgstr "Ekspresi buruk dalam eval (tanda kurung kanan tidak ada): %s"
 
-#: src/eval.c:324
+#: src/eval.c:574
 #, fuzzy, c-format
 msgid "bad expression in eval: %s"
 msgstr "Ekspresi buruk dalam eval: %s"
 
-#: src/eval.c:329
+#: src/eval.c:579
 #, fuzzy, c-format
 msgid "bad expression in eval (bad input): %s"
 msgstr "Ekspresi buruk dalam eval (input buruk): %s"
 
-#: src/eval.c:334
+#: src/eval.c:584
 #, fuzzy, c-format
 msgid "bad expression in eval (excess input): %s"
 msgstr "Ekspresi buruk dalam eval (input berlebih): %s"
 
-#: src/eval.c:339
+#: src/eval.c:588
+#, fuzzy, c-format
+msgid "invalid number in eval: %s"
+msgstr "Pembagian dengan nol dalam eval: %s"
+
+#: src/eval.c:592
 #, fuzzy, c-format
 msgid "invalid operator in eval: %s"
 msgstr "Pembagian dengan nol dalam eval: %s"
 
-#: src/eval.c:345
+#: src/eval.c:597
 #, fuzzy, c-format
 msgid "divide by zero in eval: %s"
 msgstr "Pembagian dengan nol dalam eval: %s"
 
-#: src/eval.c:350
+#: src/eval.c:601
 #, fuzzy, c-format
 msgid "modulo by zero in eval: %s"
 msgstr "Modulus dengan nol dalam eval: %s"
 
-#: src/eval.c:355
+#: src/eval.c:605
 #, fuzzy, c-format
 msgid "negative exponent in eval: %s"
 msgstr "Ekspresi buruk dalam eval: %s"
 
-#: src/eval.c:538
-msgid "Warning: recommend ==, not =, for equality operator"
-msgstr ""
-
-#: src/format.c:40 src/format.c:64 src/format.c:88
+#: src/format.c:39 src/format.c:63 src/format.c:87
 msgid "empty string treated as 0"
 msgstr ""
 
-#: src/format.c:46 src/format.c:70 src/format.c:94
+#: src/format.c:45 src/format.c:69 src/format.c:93
 #, fuzzy, c-format
 msgid "non-numeric argument %s"
 msgstr "Argumen non-numerik untuk %s"
 
-#: src/format.c:48 src/format.c:72 src/format.c:96
+#: src/format.c:47 src/format.c:71 src/format.c:95
 msgid "leading whitespace ignored"
 msgstr ""
 
-#: src/format.c:50 src/format.c:74 src/format.c:98
+#: src/format.c:49 src/format.c:73 src/format.c:97
+#, fuzzy
 msgid "numeric overflow detected"
-msgstr ""
+msgstr "Argumen non-numerik untuk built-in `%s'"
 
-#: src/format.c:308
+#: src/format.c:309
 #, fuzzy, c-format
 msgid "Warning: unrecognized specifier in `%s'"
 msgstr "%s: option tidak dikenal `%c%s'\n"
 
-#: src/freeze.c:156
+#: src/freeze.c:157
+#, fuzzy
 msgid "unable to create frozen state"
-msgstr ""
+msgstr "Tidak dapat membuat proses di server"
 
-#: src/freeze.c:167
+#: src/freeze.c:168
 #, fuzzy
 msgid "expecting line feed in frozen file"
 msgstr "Mengharapkan line feed dalam frozen file"
 
-#: src/freeze.c:169
+#: src/freeze.c:170
 #, fuzzy, c-format
 msgid "expecting character `%c' in frozen file"
 msgstr "Mengharapkan karakter `%c' dalam frozen file"
 
-#: src/freeze.c:215
+#: src/freeze.c:216
 #, fuzzy
 msgid "integer overflow in frozen file"
 msgstr "Mengharapkan line feed dalam frozen file"
 
-#: src/freeze.c:257
+#: src/freeze.c:258
 #, fuzzy
 msgid "premature end of frozen file"
 msgstr "Akhir frozen file prematur"
 
-#: src/freeze.c:270
+#: src/freeze.c:271
 #, fuzzy, c-format
 msgid "cannot open %s"
-msgstr "Tidak dapat membuka %s"
+msgstr "tidak dapat membuka `%s'"
 
-#: src/freeze.c:285
+#: src/freeze.c:286
 #, c-format
 msgid "frozen file version %d greater than max supported of 1"
 msgstr ""
 
-#: src/freeze.c:288
+#: src/freeze.c:289
 msgid "ill-formed frozen file, version directive expected"
 msgstr ""
 
-#: src/freeze.c:297
+#: src/freeze.c:298
 #, fuzzy
 msgid "ill-formed frozen file"
 msgstr "Frozen file dalam format buruk"
 
-#: src/freeze.c:385
+#: src/freeze.c:387
+#, fuzzy
 msgid "unable to read frozen state"
-msgstr ""
+msgstr "tidak dapat membebaskan argumen"
 
 #: src/input.c:359
+#, fuzzy
 msgid "read error"
-msgstr ""
+msgstr "kesalahan tulis"
 
 #: src/input.c:366
+#, fuzzy
 msgid "error reading file"
-msgstr ""
+msgstr "%s: Error membaca %s\n"
 
-#: src/input.c:589
+#: src/input.c:590
 msgid "Warning: end of file treated as newline"
 msgstr ""
 
-#: src/input.c:881
+#: src/input.c:899
 msgid "ERROR: end of file in comment"
 msgstr ""
 
-#: src/input.c:1001
+#: src/input.c:1023
 #, fuzzy
 msgid "ERROR: end of file in string"
 msgstr "KESALAHAN: EOF dalam string"
@@ -865,10 +892,13 @@ msgstr ""
 "Jika tidak ada FILE atau jika FILE adalah `-', baca dari std input.\n"
 
 #: src/m4.c:219
+#, fuzzy
 msgid ""
 "Mandatory or optional arguments to long options are mandatory or optional\n"
 "for short options too.\n"
 msgstr ""
+"Argumen wajib atau opsional untuk pilihan panjang juga wajib atau opsional "
+"untuk pilihan pendek yang berhubungan."
 
 #: src/m4.c:224
 msgid ""
@@ -921,7 +951,7 @@ msgid ""
 "Limits control:\n"
 "  -g, --gnu                    override -G to re-enable GNU extensions\n"
 "  -G, --traditional            suppress all GNU extensions\n"
-"  -H, --hashsize=PRIME         set symbol lookup hash table size [509]\n"
+"  -H, --hashsize=PRIME         set symbol lookup hash table size [%d]\n"
 "  -L, --nesting-limit=NUMBER   change nesting limit, 0 for unlimited [%d]\n"
 msgstr ""
 "\n"
@@ -991,112 +1021,141 @@ msgid ""
 "mismatch, or whatever value was passed to the m4exit macro.\n"
 msgstr ""
 
-#: src/m4.c:436
+#: src/m4.c:443
 #, c-format
 msgid "internal error detected; please report this bug to <%s>"
 msgstr ""
 
-#: src/m4.c:489
+#: src/m4.c:497
 #, c-format
 msgid "warning: `m4 -%c' may be removed in a future release"
 msgstr ""
 
-#: src/m4.c:496
+#: src/m4.c:504
 #, c-format
 msgid "warning: `m4 %s' is deprecated"
 msgstr ""
 
-#: src/m4.c:572
+#: src/m4.c:580
 #, fuzzy, c-format
 msgid "bad debug flags: `%s'"
 msgstr "Flag debug buruk: `%s'"
 
-#: src/m4.c:578
+#: src/m4.c:586
 #, c-format
 msgid "warning: `m4 -e' is deprecated, use `-i' instead"
 msgstr ""
 
-#: src/m4.c:690
+#: src/m4.c:701
 msgid "stderr"
 msgstr ""
 
-#: src/macro.c:196
+#: src/macro.c:178 src/macro.c:225
+#, fuzzy
+msgid "Warning: cannot concatenate builtin tokens"
+msgstr "Peringatan: Argumen terlalu sedikit untuk built-in `%s'"
+
+#: src/macro.c:205
 #, fuzzy
 msgid "ERROR: end of file in argument list"
 msgstr "KESALAHAN: EOF dalam daftar argumen"
 
-#: src/macro.c:332
+#: src/macro.c:348
 #, fuzzy, c-format
 msgid "recursion limit of %d exceeded, use -L<N> to change it"
 msgstr "KESALAHAN: batas rekursi %d terlampaui, gunakan -L<N> untuk merubahnya"
 
-#: src/output.c:172 src/output.c:898 src/output.c:901
+#: src/output.c:178 src/output.c:933 src/output.c:936
 #, fuzzy
 msgid "cannot clean temporary file for diversion"
 msgstr "KESALAHAN: tidak dapat membuat file temporer untuk diversi"
 
-#: src/output.c:222 src/output.c:231 src/output.c:265 src/output.c:360
+#: src/output.c:230 src/output.c:239 src/output.c:273 src/output.c:370
 #, fuzzy
 msgid "cannot create temporary file for diversion"
 msgstr "KESALAHAN: tidak dapat membuat file temporer untuk diversi"
 
-#: src/output.c:250 src/output.c:257 src/output.c:269
+#: src/output.c:258 src/output.c:265 src/output.c:277
 #, fuzzy
 msgid "cannot seek within diversion"
 msgstr "Tidak dapat mendiversi"
 
-#: src/output.c:341 src/output.c:353 src/output.c:502 src/output.c:733
+#: src/output.c:350 src/output.c:363 src/output.c:512 src/output.c:768
 #, fuzzy
 msgid "cannot close temporary file for diversion"
 msgstr "KESALAHAN: tidak dapat membuat file temporer untuk diversi"
 
-#: src/output.c:474
+#: src/output.c:484
 #, fuzzy
 msgid "ERROR: cannot flush diversion to temporary file"
 msgstr "KESALAHAN: tidak dapat memflush diversi ke file temporer"
 
-#: src/output.c:568
+#: src/output.c:579
 #, fuzzy
 msgid "ERROR: copying inserted file"
 msgstr "KESALAHAN: menyalinkan file yang disisipkan"
 
-#: src/output.c:816
+#: src/output.c:851
 #, fuzzy
 msgid "error reading inserted file"
 msgstr "KESALAHAN: membaca file yang disisipkan"
 
-#: src/output.c:983
+#: src/output.c:1018
 #, fuzzy
 msgid "cannot stat diversion"
 msgstr "Tidak dapat mendiversi"
 
-#: src/output.c:987
+#: src/output.c:1022
 #, fuzzy
 msgid "diversion too large"
 msgstr "Diversi terlalu besar"
 
-#, c-format
+#, fuzzy, c-format
+#~ msgid "unable to display error message"
+#~ msgstr "tidak dapat membebaskan argumen"
+
+#~ msgid "%s: option `%s' is ambiguous\n"
+#~ msgstr "%s: option `%s' rancu\n"
+
 #~ msgid "%s: option `--%s' doesn't allow an argument\n"
 #~ msgstr "%s: option `--%s' tidak membolehkan sebuah argumen\n"
 
-#, c-format
+#~ msgid "%s: option `%c%s' doesn't allow an argument\n"
+#~ msgstr "%s: option `%c%s' tidak membolehkan sebuah argumen\n"
+
+#~ msgid "%s: option `%s' requires an argument\n"
+#~ msgstr "%s: option `%s' membutuhkan sebuah argumen\n"
+
 #~ msgid "%s: unrecognized option `--%s'\n"
 #~ msgstr "%s: option tidak dikenal `--%s'\n"
 
-#, c-format
+#, fuzzy
+#~ msgid "%s: unrecognized option `%c%s'\n"
+#~ msgstr "%s: option tidak dikenal `--%s'\n"
+
 #~ msgid "%s: illegal option -- %c\n"
 #~ msgstr "%s: option ilegal -- %c\n"
 
-#, c-format
+#~ msgid "%s: invalid option -- %c\n"
+#~ msgstr "%s: option tidak valid -- %c\n"
+
+#~ msgid "%s: option requires an argument -- %c\n"
+#~ msgstr "%s: option membutuhkan sebuah argumen -- %c\n"
+
 #~ msgid "%s: option `-W %s' is ambiguous\n"
 #~ msgstr "%s: option `-W %s' rancu\n"
 
-#, c-format
 #~ msgid "%s: option `-W %s' doesn't allow an argument\n"
 #~ msgstr "%s: option `-W %s' tidak membolehkan sebuah argumen\n"
 
+#~ msgid "Unmatched [ or [^"
+#~ msgstr "[ atau [^ tidak cocok"
+
 #~ msgid "INTERNAL ERROR: Bad token data type in define_macro ()"
 #~ msgstr "KESALAHAN INTERNAL: Tipe data token buruk dalam define_macro()"
+
+#~ msgid "Undefined name %s"
+#~ msgstr "Nama yang tak terdefinisi %s"
 
 #~ msgid "INTERNAL ERROR: Builtin not found in builtin table!"
 #~ msgstr "KESALAHAN INTERNAL: Builtin tidak ditemukan dalam tabel builtin!"
@@ -1104,16 +1163,28 @@ msgstr "Diversi terlalu besar"
 #~ msgid "INTERNAL ERROR: Bad token data type in m4_dumpdef ()"
 #~ msgstr "KESALAHAN INTERNAL: tipe token data buruk dalam m4_dumpdef ()"
 
+#, fuzzy
+#~ msgid "Undefined name `%s'"
+#~ msgstr "Nama yang tak terdefinisi %s"
+
 #~ msgid "INTERNAL ERROR: Bad symbol type in m4_defn ()"
 #~ msgstr "KESALAHAN INTERNAL: tipe simbol buruk dalam m4_defn ()"
 
-#, c-format
 #~ msgid "Radix in eval out of range (radix = %d)"
 #~ msgstr "Radix dalam eval di luar jangkauan (radix = %d)"
 
-#, c-format
 #~ msgid "Undefined syntax code %c"
 #~ msgstr "Kode sintaks %c tak terdefinisi"
+
+#~ msgid "Cannot open %s"
+#~ msgstr "Tidak dapat membuka %s"
+
+#~ msgid "Cannot set error file: %s"
+#~ msgstr "Tidak dapat menset error file: %s"
+
+#, fuzzy
+#~ msgid "Bad regular expression `%s': %s"
+#~ msgstr "Ekspresi Reguler yang buruk `%s': %s"
 
 #~ msgid "INTERNAL ERROR: Builtin not found in builtin table! (trace_pre ())"
 #~ msgstr ""
@@ -1141,15 +1212,12 @@ msgstr "Diversi terlalu besar"
 #~ msgid "INTERNAL ERROR: Bad token data type in freeze_one_symbol ()"
 #~ msgstr "KESALAHAN INTERNAL: tipe data token buruk dalam freeze_one_symbol()"
 
-#, c-format
 #~ msgid "`%s' from frozen file not found in builtin table!"
 #~ msgstr "`%s' dari frozen file tidak ditemukan dalam tabel builtin!"
 
-#, c-format
 #~ msgid "Input reverted to %s, line %d"
 #~ msgstr "Input dikembalikan ke %s, baris %d"
 
-#, c-format
 #~ msgid "Input read from %s"
 #~ msgstr "Input membaca dari %s"
 
@@ -1237,11 +1305,16 @@ msgstr "Diversi terlalu besar"
 #~ "  i  tampilkan perubahan dalam file input\n"
 #~ "  V  kependekan untuk seluruh flag di atas\n"
 
-#, c-format
+#~ msgid ""
+#~ "\n"
+#~ "Report bugs to <bug-m4@gnu.org>.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "Laporkan bug ke <bug-m4@gnu.org>.\n"
+
 #~ msgid "ERROR: failed to add search directory `%s'"
 #~ msgstr "ERROR: gagal menambah direktori pencarian `%s'"
 
-#, c-format
 #~ msgid "ERROR: failed to add search directory `%s': %s"
 #~ msgstr "ERROR: gagal menambah direktori pencarian`%s': %s"
 
@@ -1260,32 +1333,40 @@ msgstr "Diversi terlalu besar"
 #~ msgid "INTERNAL ERROR: Bad symbol type in call_macro ()"
 #~ msgstr "KESALAHAN INTERNAL: tipe simbol buruk dalam call_macro()"
 
-#, c-format
 #~ msgid "ERROR: failed to initialise modules: %s"
 #~ msgstr "ERROR: gagal inisialisasi modul: %s"
 
-#, c-format
 #~ msgid "ERROR: cannot find module: `%s'"
 #~ msgstr "ERROR: tidak dapat menemukan modul: `%s'"
 
-#, c-format
 #~ msgid "ERROR: cannot find module: `%s': %s"
 #~ msgstr "ERROR: tidak dapat menemukan modul `%s':%s"
 
 #~ msgid "ERROR: cannot close modules"
 #~ msgstr "ERROR: tidak dapat menutup modul "
 
-#, c-format
 #~ msgid "ERROR: cannot cannot close modules: %s"
 #~ msgstr "ERROR: tidak dapat menutup modul %s"
 
-#, c-format
+#~ msgid "ERROR: cannot close module: `%s'"
+#~ msgstr "ERROR: tidak dapat menutup modul: `%s'"
+
 #~ msgid "ERROR: cannot cannot close module: `%s': %s"
 #~ msgstr "ERROR: tidak dapat menutup modul: `%s': %s"
 
-#, c-format
+#, fuzzy
+#~ msgid "ERROR: Cannot create temporary file for diversion"
+#~ msgstr "KESALAHAN: tidak dapat membuat file temporer untuk diversi"
+
+#, fuzzy
+#~ msgid "ERROR: Reading inserted file"
+#~ msgstr "KESALAHAN: menyalinkan file yang disisipkan"
+
 #~ msgid "Path search for `%s' found `%s'"
 #~ msgstr "Mencari path untuk `%s' menemukan `%s'"
+
+#~ msgid "VMEM limit exceeded?\n"
+#~ msgstr "Batas VMEM terlampaui?\n"
 
 #~ msgid ""
 #~ "Memory bounds violation detected (SIGSEGV).  Either a stack overflow\n"
@@ -1300,6 +1381,5 @@ msgstr "Diversi terlalu besar"
 #~ msgid "INTERNAL ERROR: Illegal mode to symbol_lookup ()"
 #~ msgstr "KESALAHAN INTERNAL: mode ilegal untuk symbol_lookup()"
 
-#, c-format
 #~ msgid "Name `%s' is unknown\n"
 #~ msgstr "Nama `%s' tidak dikenal\n"

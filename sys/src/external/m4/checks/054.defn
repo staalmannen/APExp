@@ -1,4 +1,4 @@
-dnl @ ../doc/m4.texi:2371: Origin of test
+dnl @ ../doc/m4.texi:2372: Origin of test
 dnl @ expected status: 0
 dnl @ extra options: 
 dnl @ Copyright (C) 2006, 2007, 2008, 2009 Free Software
@@ -7,19 +7,16 @@ dnl @ This file is free software; the Free Software Foundation
 dnl @ gives unlimited permission to copy and/or distribute it
 dnl @ with or without modifications, as long as this notice
 dnl @ is preserved.
-define(`a', `A')define(`AA', `b')
+defn(`defn')
 dnl @result{}
-traceon(`defn', `define')
+define(defn(`divnum'), `cannot redefine a builtin token')
+dnl @error{}m4:stdin:2: Warning: define: invalid macro name ignored
 dnl @result{}
-defn(`a', `divnum', `a')
-dnl @error{}m4:stdin:3: Warning: cannot concatenate builtin `divnum'
-dnl @error{}m4trace: -1- defn(`a', `divnum', `a') -> ``A'`A''
-dnl @result{}AA
-define(`mydivnum', defn(`divnum', `divnum'))mydivnum
-dnl @error{}m4:stdin:4: Warning: cannot concatenate builtin `divnum'
-dnl @error{}m4:stdin:4: Warning: cannot concatenate builtin `divnum'
-dnl @error{}m4trace: -2- defn(`divnum', `divnum')
-dnl @error{}m4trace: -1- define(`mydivnum', `')
-dnl @result{}
-traceoff(`defn', `define')
-dnl @result{}
+divnum
+dnl @result{}0
+len(defn(`divnum'))
+dnl @result{}0
+eval(`1'defn(`divnum')) eval(defn(`divnum')8)
+dnl @result{}1 8
+ifelse(defn(`divnum'), defn(`define'), `indistinguishable')
+dnl @result{}indistinguishable

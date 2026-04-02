@@ -1,9 +1,9 @@
 /* Test duplicating file descriptors.
-   Copyright (C) 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -50,6 +50,12 @@ SIGNATURE_CHECK (dup2, int, (int, int));
 
 #include "macros.h"
 
+/* Tell GCC not to warn about the specific edge cases tested here.  */
+#if _GL_GNUC_PREREQ (13, 0)
+# pragma GCC diagnostic ignored "-Wanalyzer-fd-leak"
+# pragma GCC diagnostic ignored "-Wanalyzer-fd-use-without-check"
+#endif
+
 /* Return non-zero if FD is open.  */
 static int
 is_open (int fd)
@@ -92,8 +98,12 @@ is_inheritable (int fd)
 #endif /* GNULIB_TEST_CLOEXEC */
 
 #if !O_BINARY
-# define set_binary_mode(f,m) zero ()
-static int zero (void) { return 0; }
+# define set_binary_mode my_set_binary_mode
+static int
+set_binary_mode (_GL_UNUSED int fd, _GL_UNUSED int mode)
+{
+  return 0;
+}
 #endif
 
 /* Return non-zero if FD is open in the given MODE, which is either
@@ -218,5 +228,5 @@ main (void)
   ASSERT (close (fd) == 0);
   ASSERT (unlink (file) == 0);
 
-  return 0;
+  return test_exit_status;
 }

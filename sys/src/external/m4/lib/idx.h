@@ -1,18 +1,18 @@
 /* A type for indices and sizes.
-   Copyright (C) 2020-2021 Free Software Foundation, Inc.
+   Copyright (C) 2020-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
    The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
+   modify it under the terms of the GNU Lesser General Public
    License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
+   version 2.1 of the License, or (at your option) any later version.
 
    The GNU C Library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
+   Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public
+   You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, see
    <https://www.gnu.org/licenses/>.  */
 
@@ -56,6 +56,26 @@
      * Because 'size_t' is an unsigned type, and a signed type is better.
        See above.
 
+   Why not use 'ssize_t'?
+
+     * 'ptrdiff_t' is more portable; it is standardized by ISO C
+       whereas 'ssize_t' is standardized only by POSIX.
+
+     * 'ssize_t' is not required to be as wide as 'size_t', and some
+       now-obsolete POSIX platforms had 'size_t' wider than 'ssize_t'.
+
+     * Conversely, some now-obsolete platforms had 'ptrdiff_t' wider
+       than 'size_t', which can be a win and conforms to POSIX.
+
+   Won't this cause a problem with objects larger than PTRDIFF_MAX?
+
+     * Typical modern or large platforms do not allocate such objects,
+       so this is not much of a problem in practice; for example, you
+       can safely write 'idx_t len = strlen (s);'.  To port to older
+       small platforms where allocations larger than PTRDIFF_MAX could
+       in theory be a problem, you can use Gnulib's ialloc module, or
+       functions like ximalloc in Gnulib's xalloc module.
+
    Why not use 'ptrdiff_t' directly?
 
      * Maintainability: When reading and modifying code, it helps to know that
@@ -91,6 +111,11 @@
        help producing good code and good warnings.  The type 'idx_t' could
        then be typedef'ed to a range type that is signed after promotion.  */
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /* In the future, idx_t could be typedef'ed to a signed range type.
    The clang "extended integer types", supported in Clang 11 or newer
    <https://clang.llvm.org/docs/LanguageExtensions.html#extended-integer-types>,
@@ -110,5 +135,10 @@ typedef ptrdiff_t idx_t;
 /* So far no need has been found for an IDX_WIDTH macro.
    Perhaps there should be another macro IDX_VALUE_BITS that does not
    count the sign bit and is therefore one less than PTRDIFF_WIDTH.  */
+
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* _IDX_H */

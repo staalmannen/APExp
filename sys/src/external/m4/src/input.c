@@ -1,6 +1,6 @@
 /* GNU m4 -- A simple macro processor
 
-   Copyright (C) 1989-1994, 2004-2014, 2016-2017, 2020-2021 Free
+   Copyright (C) 1989-1994, 2004-2014, 2016-2017, 2020-2026 Free
    Software Foundation, Inc.
 
    This file is part of GNU M4.
@@ -61,14 +61,14 @@
    accordingly.  */
 
 #ifdef ENABLE_CHANGEWORD
-#include "regex.h"
+# include "regex.h"
 #endif
 
 enum input_type
 {
-  INPUT_STRING,         /* String resulting from macro expansion.  */
-  INPUT_FILE,           /* File from command line or include.  */
-  INPUT_MACRO           /* Builtin resulting from defn.  */
+  INPUT_STRING,                 /* String resulting from macro expansion.  */
+  INPUT_FILE,                   /* File from command line or include.  */
+  INPUT_MACRO                   /* Builtin resulting from defn.  */
 };
 
 typedef enum input_type input_type;
@@ -80,29 +80,29 @@ struct input_block
   const char *file;             /* file where this input is from */
   int line;                     /* line where this input is from */
   union
+  {
+    struct
     {
-      struct
-        {
-          char *string;         /* remaining string value */
-          char *end;            /* terminating NUL of string */
-        }
-        u_s;    /* INPUT_STRING */
-      struct
-        {
-          FILE *fp;                  /* input file handle */
-          bool_bitfield end : 1;     /* true if peek has seen EOF */
-          bool_bitfield close : 1;   /* true if we should close file on pop */
-          bool_bitfield advance : 1; /* track previous start_of_input_line */
-        }
-        u_f;    /* INPUT_FILE */
-      builtin_func *func;       /* pointer to macro's function */
+      char *string;             /* remaining string value */
+      char *end;                /* terminating NUL of string */
     }
+    u_s;                        /* INPUT_STRING */
+    struct
+    {
+      FILE *fp;                 /* input file handle */
+      bool_bitfield end:1;      /* true if peek has seen EOF */
+      bool_bitfield close:1;    /* true if we should close file on pop */
+      bool_bitfield advance:1;  /* track previous start_of_input_line */
+    }
+    u_f;                        /* INPUT_FILE */
+    builtin_func *func;         /* pointer to macro's function */
+  }
   u;
 };
 
 typedef struct input_block input_block;
-
 
+
 /* Current input file name.  */
 const char *current_file;
 
@@ -154,6 +154,7 @@ STRING ecomm;
 
 # define DEFAULT_WORD_REGEXP "[_a-zA-Z][_a-zA-Z0-9]*"
 
+static char word_start[256];
 static struct re_pattern_buffer word_regexp;
 static int default_word_regexp;
 static struct re_registers regs;
@@ -167,8 +168,8 @@ static const char *token_type_string (token_type);
 #endif
 
 static void pop_input (void);
-
 
+
 
 /*-------------------------------------------------------------------.
 | push_file () pushes an input file on the input stack, saving the   |
@@ -248,8 +249,7 @@ push_string_init (void)
 {
   if (next != NULL)
     {
-      M4ERROR ((warning_status, 0,
-                "INTERNAL ERROR: recursive push_string!"));
+      M4ERROR ((warning_status, 0, "INTERNAL ERROR: recursive push_string!"));
       abort ();
     }
 
@@ -291,7 +291,7 @@ push_string_finish (void)
       next->u.u_s.end = next->u.u_s.string + len;
       next->prev = isp;
       isp = next;
-      ret = isp->u.u_s.string; /* for immediate use only */
+      ret = isp->u.u_s.string;  /* for immediate use only */
       input_change = true;
     }
   else
@@ -376,7 +376,7 @@ pop_input (void)
       abort ();
     }
   obstack_free (current_input, isp);
-  next = NULL; /* might be set in push_string_init () */
+  next = NULL;                  /* might be set in push_string_init () */
 
   isp = tmp;
   input_change = true;
@@ -554,7 +554,8 @@ next_char_1 (void)
           break;
 
         case INPUT_MACRO:
-          pop_input (); /* INPUT_MACRO input sources has only one token */
+          /* INPUT_MACRO input sources has only one token */
+          pop_input ();
           return CHAR_MACRO;
 
         default:
@@ -615,17 +616,17 @@ match_input (const char *s, bool consume)
 
   ch = peek_input ();
   if (ch != to_uchar (*s))
-    return false;                       /* fail */
+    return false;               /* fail */
 
   if (s[1] == '\0')
     {
       if (consume)
         next_char ();
-      return true;                      /* short match */
+      return true;              /* short match */
     }
 
   next_char ();
-  for (n = 1, t = s++; peek_input () == to_uchar (*s++); )
+  for (n = 1, t = s++; peek_input () == to_uchar (*s++);)
     {
       next_char ();
       n++;
@@ -772,6 +773,8 @@ set_comment (const char *bc, const char *ec)
 void
 set_word_regexp (const char *regexp)
 {
+  int i;
+  char test[2] = "";
   const char *msg;
   struct re_pattern_buffer new_word_regexp;
 
@@ -806,6 +809,20 @@ set_word_regexp (const char *regexp)
     assert (false);
 
   default_word_regexp = false;
+
+  /* The fastmap contains any byte that can start a word. But we still
+     need to know which bytes can be matched as a word in isolation
+     (although the documentations requires that all prefixes of a
+     user's desired words to also be matched, this catches when a user
+     did not follow that limitation).  */
+  for (i = 1; i < 256; i++)
+    {
+      if (word_regexp.fastmap[i])
+        {
+          test[0] = i;
+          word_start[i] = re_search (&word_regexp, test, 1, 0, 0, NULL) >= 0;
+        }
+    }
 }
 
 #endif /* ENABLE_CHANGEWORD */
@@ -843,7 +860,7 @@ next_token (token_data *td, int *line)
   if (!line)
     line = &dummy;
 
- /* Can't consume character until after CHAR_MACRO is handled.  */
+  /* Can't consume character until after CHAR_MACRO is handled.  */
   ch = peek_input ();
   if (ch == CHAR_EOF)
     {
@@ -864,7 +881,7 @@ next_token (token_data *td, int *line)
       return TOKEN_MACDEF;
     }
 
-  next_char (); /* Consume character we already peeked at.  */
+  next_char ();                 /* Consume character we already peeked at.  */
   file = current_file;
   *line = current_line;
   if (MATCH (ch, bcomm.string, true))
@@ -878,14 +895,16 @@ next_token (token_data *td, int *line)
       else
         /* current_file changed to "" if we see CHAR_EOF, use the
            previous value we stored earlier.  */
-        m4_failure_at_line (0, file, *line, _("ERROR: end of file in comment"));
+        m4_failure_at_line (0, file, *line,
+                            _("ERROR: end of file in comment"));
 
       type = TOKEN_STRING;
     }
   else if (default_word_regexp && (c_isalpha (ch) || ch == '_'))
     {
       obstack_1grow (&token_stack, ch);
-      while ((ch = peek_input ()) != CHAR_EOF && (c_isalnum (ch) || ch == '_'))
+      while ((ch = peek_input ()) != CHAR_EOF
+             && (c_isalnum (ch) || ch == '_'))
         {
           obstack_1grow (&token_stack, ch);
           next_char ();
@@ -895,7 +914,7 @@ next_token (token_data *td, int *line)
 
 #ifdef ENABLE_CHANGEWORD
 
-  else if (!default_word_regexp && word_regexp.fastmap[ch])
+  else if (!default_word_regexp && word_start[ch])
     {
       obstack_1grow (&token_stack, ch);
       while (1)
@@ -909,10 +928,13 @@ next_token (token_data *td, int *line)
                                 obstack_object_size (&token_stack), 0, 0,
                                 &regs);
           if (startpos ||
-              regs.end [0] != (regoff_t) obstack_object_size (&token_stack))
+              regs.end[0] != (regoff_t) obstack_object_size (&token_stack))
             {
               *(((char *) obstack_base (&token_stack)
                  + obstack_object_size (&token_stack)) - 1) = '\0';
+              re_search (&word_regexp,
+                         (char *) obstack_base (&token_stack),
+                         obstack_object_size (&token_stack) - 1, 0, 0, &regs);
               break;
             }
           next_char ();
@@ -921,11 +943,11 @@ next_token (token_data *td, int *line)
       obstack_1grow (&token_stack, '\0');
       orig_text = (char *) obstack_finish (&token_stack);
 
-      if (regs.start[1] != -1)
-        obstack_grow (&token_stack,orig_text + regs.start[1],
+      if (regs.num_regs && regs.start[1] != -1)
+        obstack_grow (&token_stack, orig_text + regs.start[1],
                       regs.end[1] - regs.start[1]);
       else
-        obstack_grow (&token_stack, orig_text,regs.end[0]);
+        obstack_grow (&token_stack, orig_text, regs.end[0]);
 
       type = TOKEN_WORD;
     }
@@ -1020,6 +1042,7 @@ next_token (token_data *td, int *line)
   obstack_1grow (&token_stack, '\0');
 
   TOKEN_DATA_TYPE (td) = TOKEN_TEXT;
+  TOKEN_DATA_LEN (td) = obstack_object_size (&token_stack) - 1;
   TOKEN_DATA_TEXT (td) = (char *) obstack_finish (&token_stack);
 #ifdef ENABLE_CHANGEWORD
   if (orig_text == NULL)
@@ -1057,9 +1080,9 @@ peek_token (void)
     }
   else if ((default_word_regexp && (c_isalpha (ch) || ch == '_'))
 #ifdef ENABLE_CHANGEWORD
-           || (! default_word_regexp && word_regexp.fastmap[ch])
+           || (!default_word_regexp && word_start[ch])
 #endif /* ENABLE_CHANGEWORD */
-           )
+    )
     {
       result = TOKEN_WORD;
     }
@@ -1095,8 +1118,8 @@ peek_token (void)
 static const char *
 token_type_string (token_type t)
 {
- switch (t)
-    { /* TOKSW */
+  switch (t)
+    {                           /* TOKSW */
     case TOKEN_EOF:
       return "EOF";
     case TOKEN_STRING:
@@ -1116,14 +1139,14 @@ token_type_string (token_type t)
     default:
       abort ();
     }
- }
+}
 
 static void
 print_token (const char *s, token_type t, token_data *td)
 {
   xfprintf (stderr, "%s: ", s);
   switch (t)
-    { /* TOKSW */
+    {                           /* TOKSW */
     case TOKEN_OPEN:
     case TOKEN_COMMA:
     case TOKEN_CLOSE:

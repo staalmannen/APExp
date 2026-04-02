@@ -1,23 +1,22 @@
 /* Private interface between modules 'clean-temp-simple' and 'clean-temp'.
-   Copyright (C) 2006-2021 Free Software Foundation, Inc.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _CLEAN_TEMP_PRIVATE_H
 #define _CLEAN_TEMP_PRIVATE_H
 
-#include <stdbool.h>
 #include <stddef.h>
 #include "gl_list.h"
 #include "asyncsafe-spin.h"
@@ -68,9 +67,6 @@ struct closeable_fd
 };
 #define descriptors clean_temp_descriptors
 extern gl_list_t /* <closeable_fd *> */ volatile descriptors;
-
-extern bool clean_temp_string_equals (const void *x1, const void *x2);
-extern size_t clean_temp_string_hash (const void *x);
 
 extern _GL_ASYNC_SAFE int clean_temp_asyncsafe_close (struct closeable_fd *element);
 extern void clean_temp_init_asyncsafe_close (void);

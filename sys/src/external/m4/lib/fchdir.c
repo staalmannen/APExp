@@ -1,17 +1,17 @@
 /* fchdir replacement.
-   Copyright (C) 2006-2021 Free Software Foundation, Inc.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation, either version 3 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -22,7 +22,6 @@
 #include <dirent.h>
 #include <errno.h>
 #include <fcntl.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
@@ -49,7 +48,6 @@
 typedef struct
 {
   char *name;       /* Absolute name of the directory, or NULL.  */
-  /* FIXME - add a DIR* member to make dirfd possible on mingw?  */
 } dir_info_t;
 static dir_info_t *dirs;
 static size_t dirs_allocated;
@@ -64,13 +62,10 @@ ensure_dirs_slot (size_t fd)
     free (dirs[fd].name);
   else
     {
-      size_t new_allocated;
-      dir_info_t *new_dirs;
-
-      new_allocated = 2 * dirs_allocated + 1;
+      size_t new_allocated = 2 * dirs_allocated + 1;
       if (new_allocated <= fd)
         new_allocated = fd + 1;
-      new_dirs =
+      dir_info_t *new_dirs =
         (dirs != NULL
          ? (dir_info_t *) realloc (dirs, new_allocated * sizeof *dirs)
          : (dir_info_t *) malloc (new_allocated * sizeof *dirs));
@@ -89,18 +84,15 @@ ensure_dirs_slot (size_t fd)
 static char *
 get_name (char const *dir)
 {
-  char *cwd;
-  char *result;
-
   if (IS_ABSOLUTE_FILE_NAME (dir))
     return strdup (dir);
 
   /* We often encounter "."; treat it as a special case.  */
-  cwd = getcwd (NULL, 0);
+  char *cwd = getcwd (NULL, 0);
   if (!cwd || (dir[0] == '.' && dir[1] == '\0'))
     return cwd;
 
-  result = mfile_name_concat (cwd, dir, NULL);
+  char *result = mfile_name_concat (cwd, dir, NULL);
   free (cwd);
   return result;
 }
@@ -128,9 +120,9 @@ _gl_unregister_fd (int fd)
 int
 _gl_register_fd (int fd, const char *filename)
 {
-  struct stat statbuf;
-
   assure (0 <= fd);
+
+  struct stat statbuf;
   if (REPLACE_OPEN_DIRECTORY
       || (fstat (fd, &statbuf) == 0 && S_ISDIR (statbuf.st_mode)))
     {

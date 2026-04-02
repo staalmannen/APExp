@@ -1,8 +1,10 @@
-# sparcv8+.m4 serial 1
-dnl Copyright (C) 2020-2021 Free Software Foundation, Inc.
+# sparcv8+.m4
+# serial 2
+dnl Copyright (C) 2020-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl When compiling for SPARC in 32-bit mode, make sure that instructions for
 dnl SPARC v8+ are accepted.  This is necessary for multiprocessing (for
@@ -18,8 +20,8 @@ AC_DEFUN([gl_SPARC_V8PLUS],
 [
   AC_REQUIRE([AC_CANONICAL_HOST])
 
-  case "$host_cpu" in
-    sparc*)
+  case "$host" in
+    sparc*-*-solaris*)
       if test -n "$GCC"; then
         AC_CACHE_CHECK([whether SPARC v8+ instructions are supported],
           [gl_cv_sparc_v8plus],

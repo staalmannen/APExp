@@ -1,6 +1,6 @@
 # source this file; set up for tests
 
-# Copyright (C) 2009-2021 Free Software Foundation, Inc.
+# Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -103,7 +103,11 @@ warn_ ()
   case $IFS in
     ' '*) printf '%s\n' "$*" >&2
           test $stderr_fileno_ = 2 \
-            || { printf '%s\n' "$*" | sed 1q >&$stderr_fileno_ ; } ;;
+            || { local args=$*
+                 local firstline=${args%%"$gl_init_sh_nl_"*}
+                 printf '%s\n' "$firstline" >&$stderr_fileno_
+               }
+          ;;
     *) (IFS=' '; warn_ "$@");;
   esac
 }
@@ -160,12 +164,12 @@ fi
 #  ? - not ok
 gl_shell_test_script_='
 test $(echo y) = y || exit 1
-LC_ALL=en_US.UTF-8 printf "\\351" 2>/dev/null \
-  | LC_ALL=C tr "\\351" x | LC_ALL=C grep "^x$" > /dev/null \
-  || exit 1
-printf "\\351" 2>/dev/null \
-  | LC_ALL=C tr "\\351" x | LC_ALL=C grep "^x$" > /dev/null \
-  || exit 1
+case $({ LC_ALL=en_US.UTF-8 printf "\\351"
+         printf "\\351\\n"
+       } 2>/dev/null | LC_ALL=C tr "\\351" x) in
+  xx) ;;
+  *) exit 1;;
+esac
 f_local_() { local v=1; }; f_local_ || exit 1
 f_dash_local_fail_() { local t=$(printf " 1"); }; f_dash_local_fail_
 score_=10
@@ -267,17 +271,28 @@ test -n "$EXEEXT" && test -n "$BASH_VERSION" && shopt -s expand_aliases
 # Create a temporary directory, much like mktemp -d does.
 # Written by Jim Meyering.
 #
-# Usage: mktempd_ /tmp phoey.XXXXXXXXXX
+# Usage: mktempd_ /tmp template.XXXXXXXXXX
 #
 # First, try to use the mktemp program.
 # Failing that, we'll roll our own mktemp-like function:
-#  - try to get random bytes from /dev/urandom
+#  - try to get random bytes from /dev/urandom, mapping them to file-name bytes
 #  - failing that, generate output from a combination of quickly-varying
-#      sources and gzip.  Ignore non-varying gzip header, and extract
-#      "random" bits from there.
-#  - given those bits, map to file-name bytes using tr, and try to create
-#      the desired directory.
+#      sources and awk.
+#  - try to create the desired directory.
 #  - make only $MAX_TRIES_ attempts
+
+# mkdir on msys2 does not support the '-m' option.
+case `(uname -o) 2>/dev/null` in
+  Msys)
+    mkdir ()
+    {
+      if test " $1" = " -m"; then
+        shift; shift
+      fi
+      /bin/mkdir "$@"
+    }
+    ;;
+esac
 
 # Helper function.  Print $N pseudo-random bytes from a-zA-Z0-9.
 rand_bytes_ ()
@@ -296,20 +311,27 @@ rand_bytes_ ()
     return
   fi
 
-  n_plus_50_=`expr $n_ + 50`
-  cmds_='date; date +%N; free; who -a; w; ps auxww; ps -ef'
-  data_=` (eval "$cmds_") 2>&1 | gzip `
+  # Fall back on quickly-varying sources + awk.
+  # Limit awk program to 7th Edition Unix so that it works even on Solaris 10.
 
-  # Ensure that $data_ has length at least 50+$n_
-  while :; do
-    len_=`echo "$data_"|wc -c`
-    test $n_plus_50_ -le $len_ && break;
-    data_=` (echo "$data_"; eval "$cmds_") 2>&1 | gzip `
-  done
-
-  echo "$data_" \
-    | dd bs=1 skip=50 count=$n_ 2>/dev/null \
-    | LC_ALL=C tr -c $chars_ 01234567$chars_$chars_$chars_
+  (date; date +%N; free; who -a; w; ps auxww; ps -ef) 2>&1 | awk '
+     BEGIN {
+       n = '"$n_"'
+       for (i = 0; i < 256; i++)
+         ordinal[sprintf ("%c", i)] = i
+     }
+     {
+       for (i = 1; i <= length; i++)
+         a[ai++ % n] += ordinal[substr ($0, i, 1)]
+     }
+     END {
+       chars = "'"$chars_"'"
+       charslen = length (chars)
+       for (i = 0; i < n; i++)
+         printf "%s", substr (chars, a[i] % charslen + 1, 1)
+       printf "\n"
+     }
+  '
 }
 
 mktempd_ ()
@@ -333,13 +355,17 @@ mktempd_ ()
   esac
 
   case $template_ in
+  -*) fail_ \
+       "invalid template: $template_ (must not begin with '-')";;
   *XXXX) ;;
   *) fail_ \
        "invalid template: $template_ (must have a suffix of at least 4 X's)";;
   esac
 
-  # First, try to use mktemp.
-  d=`unset TMPDIR; { mktemp -d -t -p "$destdir_" "$template_"; } 2>/dev/null` &&
+  # First, try GNU mktemp, where -t has no option-argument.
+  # Put -t last, as GNU mktemp allows, so that the incompatible NetBSD mktemp
+  # (where -t has an option-argument) fails instead of creating a junk dir.
+  d=`unset TMPDIR; { mktemp -d -p "$destdir_" "$template_" -t; } 2>/dev/null` &&
 
   # The resulting name must be in the specified directory.
   case $d in "$destdir_slash_"*) :;; *) false;; esac &&
@@ -372,7 +398,7 @@ mktempd_ ()
     err_=`mkdir -m 0700 "$candidate_dir_" 2>&1` \
       && { echo "$candidate_dir_"; return; }
     test $MAX_TRIES_ -le $i_ && break;
-    i_=`expr $i_ + 1`
+    i_=`expr $i_ + 1` || break
   done
   fail_ "$err_"
 }
@@ -389,7 +415,7 @@ setup_ ()
   if test "$VERBOSE" = yes; then
     # Test whether set -x may cause the selected shell to corrupt an
     # application's stderr.  Many do, including zsh-4.3.10 and the /bin/sh
-    # from SunOS 5.11, OpenBSD 4.7 and Irix 6.5.
+    # from SunOS 5.11 and OpenBSD 4.7.
     # If enabling verbose output this way would cause trouble, simply
     # issue a warning and refrain.
     if $gl_set_x_corrupts_stderr_; then
@@ -426,6 +452,23 @@ setup_ ()
   for sig_ in 1 2 3 13 15; do
     eval "trap 'Exit $(expr $sig_ + 128)' $sig_"
   done
+
+  # Remove relative and non-accessible directories from PATH, including '.'
+  # and Zero-length entries.
+  saved_IFS="$IFS"; IFS="$PATH_SEPARATOR"
+  new_PATH=
+  for dir in $PATH; do
+    IFS="$saved_IFS"
+    case "$dir" in
+      [\\/]* | ?:[\\/]*)
+        test -d "$dir/." || continue
+        new_PATH="${new_PATH}${new_PATH:+$PATH_SEPARATOR}${dir}"
+        ;;
+    esac
+  done
+  IFS="$saved_IFS"
+  PATH="$new_PATH"
+  export PATH
 }
 
 # This is a stub function that is run upon trap (upon regular exit and
@@ -445,8 +488,11 @@ remove_tmp_ ()
     # cd out of the directory we're about to remove
     cd "$initial_cwd_" || cd / || cd /tmp
     chmod -R u+rwx "$test_dir_"
-    # If removal fails and exit status was to be 0, then change it to 1.
-    rm -rf "$test_dir_" || { test $__st = 0 && __st=1; }
+    # If the first removal fails, wait for subprocesses to exit and try again.
+    # If that fails and exit status was to be 0, change it to 1.
+    rm -rf "$test_dir_" 2>/dev/null \
+      || { sleep 1 && rm -rf "$test_dir_"; } \
+      || { test $__st = 0 && __st=1; }
   fi
   exit $__st
 }
@@ -569,9 +615,10 @@ fi
 # I.e., just doing `command ... &&fail=1` will not catch
 # a segfault in command for example.  With this helper you
 # instead check an explicit exit code like
-#   returns_ 1 command ... || fail
+#   returns_ 1 command ... || fail=1
 returns_ () {
   # Disable tracing so it doesn't interfere with stderr of the wrapped command
+  { local is_tracing=`{ :; } 2>&1`; } 2>/dev/null
   { set +x; } 2>/dev/null
 
   local exp_exit="$1"
@@ -579,7 +626,8 @@ returns_ () {
   "$@"
   test $? -eq $exp_exit && ret_=0 || ret_=1
 
-  if test "$VERBOSE" = yes && test "$gl_set_x_corrupts_stderr_" = false; then
+  # Restore tracing if it was enabled.
+  if test -n "$is_tracing"; then
     set -x
   fi
   { return $ret_; } 2>/dev/null
@@ -598,7 +646,7 @@ emit_diff_u_header_ ()
 }
 
 # Arrange not to let diff or cmp operate on /dev/null,
-# since on some systems (at least OSF/1 5.1), that doesn't work.
+# since on some old systems, that doesn't work.
 # When there are not two arguments, or no argument is /dev/null, return 2.
 # When one argument is /dev/null and the other is not empty,
 # cat the nonempty file to stderr and return 1.
@@ -624,18 +672,40 @@ compare_dev_null_ ()
 
 for diff_opt_ in -u -U3 -c '' no; do
   test "$diff_opt_" != no &&
-    diff_out_=`exec 2>/dev/null; diff $diff_opt_ "$0" "$0" < /dev/null` &&
+    diff_out_=`exec 2>/dev/null
+      LC_ALL=C diff $diff_opt_ "$0" "$0" < /dev/null` &&
     break
 done
 if test "$diff_opt_" != no; then
   if test -z "$diff_out_"; then
-    compare_ () { diff $diff_opt_ "$@"; }
+    # diff on msys2 does not support the '-' argument for denoting stdin.
+    case `(uname -o) 2>/dev/null` in
+      Msys)
+        compare_ ()
+        {
+          if test " $1" = " -"; then
+            cat > '(stdin)'
+            LC_ALL=C diff $diff_opt_ '(stdin)' "$2"
+          elif test " $2" = " -"; then
+            cat > '(stdin)'
+            LC_ALL=C diff $diff_opt_ "$1" '(stdin)'
+          else
+            LC_ALL=C diff $diff_opt_ "$@"
+          fi
+        }
+        ;;
+      *)
+        compare_ ()
+        {
+          LC_ALL=C diff $diff_opt_ "$@"
+        }
+    esac
   else
     compare_ ()
     {
       # If no differences were found, AIX and HP-UX 'diff' produce output
       # like "No differences encountered".  Hide this output.
-      diff $diff_opt_ "$@" > diff.out
+      LC_ALL=C diff $diff_opt_ "$@" > diff.out
       diff_status_=$?
       test $diff_status_ -eq 0 || cat diff.out || diff_status_=2
       rm -f diff.out || diff_status_=2
@@ -680,4 +750,4 @@ test -f "$srcdir/init.cfg" \
 setup_ "$@"
 # This trap is here, rather than in the setup_ function, because some
 # shells run the exit trap at shell function exit, rather than script exit.
-trap remove_tmp_ 0
+trap remove_tmp_ EXIT

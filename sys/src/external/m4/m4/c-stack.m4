@@ -1,21 +1,21 @@
+# c-stack.m4
+# serial 25
+dnl Copyright (C) 2002-2004, 2008-2026 Free Software Foundation, Inc.
+dnl This file is free software; the Free Software Foundation
+dnl gives unlimited permission to copy and/or distribute it,
+dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
+
 # Check prerequisites for compiling lib/c-stack.c.
 
-# Copyright (C) 2002-2004, 2008-2021 Free Software Foundation, Inc.
-# This file is free software; the Free Software Foundation
-# gives unlimited permission to copy and/or distribute it,
-# with or without modifications, as long as this notice is preserved.
-
 # Written by Paul Eggert.
-
-# serial 23
 
 AC_DEFUN([gl_C_STACK],
 [
   dnl 'c-stack' needs -lsigsegv if and only if the 'sigsegv' module needs it.
-  if test "$with_libsigsegv" = yes; then
-    if test "$gl_cv_lib_sigsegv" = yes; then
-      AC_SUBST([LIBCSTACK], [$LIBSIGSEGV])
-      AC_SUBST([LTLIBCSTACK], [$LTLIBSIGSEGV])
-    fi
+  AC_REQUIRE([gl_SIGSEGV])
+  if test $gl_sigsegv_uses_libsigsegv = yes; then
+    AC_SUBST([LIBCSTACK], [$LIBSIGSEGV])
+    AC_SUBST([LTLIBCSTACK], [$LTLIBSIGSEGV])
   fi
 ])

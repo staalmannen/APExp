@@ -1,9 +1,9 @@
 /* Test truncating a file.
-   Copyright (C) 2011-2021 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -27,7 +27,7 @@ SIGNATURE_CHECK (ftruncate, int, (int, off_t));
 #include "macros.h"
 
 int
-main (int argc, char *argv[])
+main (_GL_UNUSED int argc, char *argv[])
 {
   const char *filename = argv[1];
 
@@ -56,5 +56,5 @@ main (int argc, char *argv[])
     close (fd);
   }
 
-  return 0;
+  return test_exit_status;
 }

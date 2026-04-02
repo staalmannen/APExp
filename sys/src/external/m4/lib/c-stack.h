@@ -1,10 +1,10 @@
 /* Stack overflow handling.
 
-   Copyright (C) 2002, 2004, 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2002, 2004, 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -15,6 +15,15 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* This file uses _GL_ASYNC_SAFE.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 /* Set up ACTION so that it is invoked on C stack overflow and on other,
    stack-unrelated, segmentation violation.
@@ -47,3 +56,7 @@
    signal or exercise other system dependent exception handling APIs.  */
 
 extern int c_stack_action (_GL_ASYNC_SAFE void (* /*action*/) (int));
+
+#ifdef __cplusplus
+}
+#endif

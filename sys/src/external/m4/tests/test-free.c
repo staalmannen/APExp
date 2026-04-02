@@ -1,9 +1,9 @@
 /* Test of free() function.
-   Copyright (C) 2020-2021 Free Software Foundation, Inc.
+   Copyright (C) 2020-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -37,14 +37,9 @@
    a GCC optimization.  Without it, when optimizing, GCC would "know" that errno
    is unchanged by calling free(ptr), when ptr was the result of a malloc(...)
    call in the same function.  */
-static int
-get_errno (void)
-{
-  volatile int err = errno;
-  return err;
-}
-
-static int (* volatile get_errno_func) (void) = get_errno;
+void (*volatile my_free) (void *) = free;
+#undef free
+#define free my_free
 
 int
 main ()
@@ -53,51 +48,54 @@ main ()
   {
     errno = 1789; /* Liberté, égalité, fraternité.  */
     free (NULL);
-    ASSERT_NO_STDIO (get_errno_func () == 1789);
+    ASSERT_NO_STDIO (errno == 1789);
   }
   { /* Small memory allocations.  */
     #define N 10000
-    void * volatile ptrs[N];
-    size_t i;
-    for (i = 0; i < N; i++)
+    void *ptrs[N];
+    for (size_t i = 0; i < N; i++)
       ptrs[i] = malloc (15);
-    for (i = 0; i < N; i++)
+    for (size_t i = 0; i < N; i++)
       {
         errno = 1789;
         free (ptrs[i]);
-        ASSERT_NO_STDIO (get_errno_func () == 1789);
+        ASSERT_NO_STDIO (errno == 1789);
       }
     #undef N
   }
   { /* Medium memory allocations.  */
     #define N 1000
-    void * volatile ptrs[N];
-    size_t i;
-    for (i = 0; i < N; i++)
+    void *ptrs[N];
+    for (size_t i = 0; i < N; i++)
       ptrs[i] = malloc (729);
-    for (i = 0; i < N; i++)
+    for (size_t i = 0; i < N; i++)
       {
         errno = 1789;
         free (ptrs[i]);
-        ASSERT_NO_STDIO (get_errno_func () == 1789);
+        ASSERT_NO_STDIO (errno == 1789);
       }
     #undef N
   }
   { /* Large memory allocations.  */
     #define N 10
-    void * volatile ptrs[N];
-    size_t i;
-    for (i = 0; i < N; i++)
+    void *ptrs[N];
+    for (size_t i = 0; i < N; i++)
       ptrs[i] = malloc (5318153);
-    for (i = 0; i < N; i++)
+    for (size_t i = 0; i < N; i++)
       {
         errno = 1789;
         free (ptrs[i]);
-        ASSERT_NO_STDIO (get_errno_func () == 1789);
+        ASSERT_NO_STDIO (errno == 1789);
       }
     #undef N
   }
 
+  /* Skip this test when an address sanitizer is in use, because it would report
+     a "heap buffer overflow".  */
+  #ifndef __has_feature
+   #define __has_feature(a) 0
+  #endif
+  #if !(defined __SANITIZE_ADDRESS__ || __has_feature (address_sanitizer))
   /* Test a less common code path.
      When malloc() is based on mmap(), free() can sometimes call munmap().
      munmap() usually succeeds, but fails in a particular situation: when
@@ -115,7 +113,7 @@ main ()
   if (open ("/proc/sys/vm/max_map_count", O_RDONLY) >= 0)
     {
       /* Preparations.  */
-      size_t pagesize = getpagesize ();
+      size_t pagesize = sysconf (_SC_PAGESIZE);
       void *firstpage_backup = malloc (pagesize);
       void *lastpage_backup = malloc (pagesize);
       /* Allocate a large memory area, as a bumper, so that the MAP_FIXED
@@ -132,7 +130,7 @@ main ()
         {
           /* Do a large memory allocation.  */
           size_t big_size = 0x1000000;
-          void * volatile ptr = malloc (big_size - 0x100);
+          void *ptr = malloc (big_size - 0x100);
           char *ptr_aligned = (char *) ((uintptr_t) ptr & ~(pagesize - 1));
           /* This large memory allocation allocated a memory area
              from ptr_aligned to ptr_aligned + big_size.
@@ -151,8 +149,7 @@ main ()
               /* Now add as many mappings as we can.
                  Stop at 65536, in order not to crash the machine (in case the
                  limit has been increased by the system administrator).  */
-              size_t i;
-              for (i = 0; i < 65536; i++)
+              for (size_t i = 0; i < 65536; i++)
                 if (mmap (NULL, pagesize, PROT_READ, MAP_FILE | MAP_PRIVATE, fd, 0)
                     == (void *)(-1))
                   break;
@@ -165,11 +162,12 @@ main ()
                  which increases the number of VMAs by 1, which is supposed
                  to fail.  */
               free (ptr);
-              ASSERT_NO_STDIO (get_errno_func () == 1789);
+              ASSERT_NO_STDIO (errno == 1789);
             }
         }
     }
   #endif
+  #endif
 
-  return 0;
+  return test_exit_status;
 }

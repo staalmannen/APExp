@@ -1,9 +1,9 @@
 /* Page fault handling library.
-   Copyright (C) 1998-2021  Bruno Haible <bruno@clisp.org>
+   Copyright (C) 1998-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation; either version 2 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -14,6 +14,8 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Written by Bruno Haible.  */
+
 #ifndef _SIGSEGV_H
 #define _SIGSEGV_H
 
@@ -21,7 +23,7 @@
 #include <stddef.h>
 
 /* Define the fault context structure.  */
-#if defined __linux__ || defined __ANDROID__ \
+#if (defined __linux__ && !defined __ANDROID__) \
     || (defined __FreeBSD__ && (defined __arm__ || defined __armhf__ || defined __arm64__)) \
     || defined __NetBSD__ \
     || defined _AIX || defined __sun \
@@ -62,27 +64,27 @@
 
 /* HAVE_SIGSEGV_RECOVERY
    is defined if the system supports catching SIGSEGV.  */
-#if defined __linux__ || defined __ANDROID__ || defined __GNU__ \
+#if defined __linux__ || defined __ANDROID__ || defined __gnu_hurd__ \
     || defined __FreeBSD_kernel__ || (defined __FreeBSD__ && !(defined __sparc__ || defined __sparc64__)) || defined __DragonFly__ \
     || defined __NetBSD__ \
     || defined __OpenBSD__ \
     || (defined __APPLE__ && defined __MACH__) \
-    || defined _AIX || defined __sgi || defined __sun \
+    || defined _AIX || defined __sun \
     || defined __CYGWIN__ || defined __HAIKU__
-/* Linux, Hurd, GNU/kFreeBSD, FreeBSD, NetBSD, OpenBSD, macOS, AIX, IRIX, Solaris, Cygwin, Haiku */
+/* Linux, Hurd, GNU/kFreeBSD, FreeBSD, NetBSD, OpenBSD, macOS, AIX, Solaris, Cygwin, Haiku */
 # define HAVE_SIGSEGV_RECOVERY 1
 #endif
 
 /* HAVE_STACK_OVERFLOW_RECOVERY
    is defined if stack overflow can be caught.  */
-#if defined __linux__ || defined __ANDROID__ || defined __GNU__ \
+#if defined __linux__ || defined __ANDROID__ || defined __gnu_hurd__ \
     || defined __FreeBSD_kernel__ || (defined __FreeBSD__ && !(defined __sparc__ || defined __sparc64__)) || defined __DragonFly__ \
     || (defined __NetBSD__ && !(defined __sparc__ || defined __sparc64__)) \
     || defined __OpenBSD__ \
     || (defined __APPLE__ && defined __MACH__) \
-    || defined _AIX || defined __sgi || defined __sun \
+    || defined _AIX || defined __sun \
     || defined __CYGWIN__ || defined __HAIKU__
-/* Linux, Hurd, GNU/kFreeBSD, FreeBSD, NetBSD, OpenBSD, macOS, AIX, IRIX, Solaris, Cygwin, Haiku */
+/* Linux, Hurd, GNU/kFreeBSD, FreeBSD, NetBSD, OpenBSD, macOS, AIX, Solaris, Cygwin, Haiku */
 # define HAVE_STACK_OVERFLOW_RECOVERY 1
 #endif
 
@@ -103,7 +105,7 @@ extern int libsigsegv_version;       /* Likewise */
  * to a global SIGSEGV handler.
  * On some platforms, the precise fault address is not known, only the memory
  * page into which the fault address falls. This is apparently allowed by POSIX:
- * <http://pubs.opengroup.org/onlinepubs/9699919799/basedefs/signal.h.html>
+ * <https://pubs.opengroup.org/onlinepubs/9699919799/basedefs/signal.h.html>
  * says: "For some implementations, the value of si_addr may be inaccurate."
  * In this case, the returned fault address is rounded down to a multiple of
  * getpagesize() = sysconf(_SC_PAGESIZE).
@@ -178,16 +180,16 @@ extern int sigsegv_leave_handler (void (*continuation) (void*, void*, void*), vo
  * on some platforms it is a 'struct sigcontext *', on others merely an
  * opaque 'void *'.
  */
-# if defined __linux__ || defined __ANDROID__ \
+# if (defined __linux__ && !defined __ANDROID__) \
      || (defined __FreeBSD__ && (defined __arm__ || defined __armhf__ || defined __arm64__)) \
      || defined __NetBSD__ \
      || (defined __APPLE__ && defined __MACH__) \
      || defined _AIX || defined __sun \
      || defined __CYGWIN__ || defined __HAIKU__
 typedef ucontext_t *stackoverflow_context_t;
-# elif defined __GNU__ \
-       || defined __FreeBSD_kernel__ || (defined __FreeBSD__ && !(defined __sparc__ || defined __sparc64__)) \
-       || defined __OpenBSD__ || defined __sgi
+# elif defined __gnu_hurd__ \
+       || defined __FreeBSD_kernel__ || (defined __FreeBSD__ && !(defined __sparc__ || defined __sparc64__)) || defined __DragonFly__ \
+       || defined __OpenBSD__
 typedef struct sigcontext *stackoverflow_context_t;
 # else
 typedef void *stackoverflow_context_t;
@@ -212,7 +214,7 @@ typedef void (*stackoverflow_handler_t) (int emergency, stackoverflow_context_t 
  * Installs a stack overflow handler.
  * The extra_stack argument is a pointer to a pre-allocated area used as a
  * stack for executing the handler. It typically comes from a static variable
- * or from heap-allocated memoty; placing it on the main stack may fail on
+ * or from heap-allocated memory; placing it on the main stack may fail on
  * some operating systems.
  * Its size, passed in extra_stack_size, should be sufficiently large.  The
  * following code determines an appropriate size:

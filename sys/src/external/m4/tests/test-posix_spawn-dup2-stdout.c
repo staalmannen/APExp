@@ -1,9 +1,9 @@
 /* Test of posix_spawn() function: reading from a subprocess.
-   Copyright (C) 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -45,7 +45,6 @@ SIGNATURE_CHECK (posix_spawn_file_actions_adddup2, int,
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -73,7 +72,9 @@ fd_safer (int fd)
 int
 main ()
 {
-  char *argv[3] = { (char *) BOURNE_SHELL, (char *) CHILD_PROGRAM_FILENAME, NULL };
+  char argv0[] = BOURNE_SHELL;
+  char argv1[] = CHILD_PROGRAM_FILENAME;
+  char *argv[] = { argv0, argv1, NULL };
   int ifd[2];
   sigset_t blocked_signals;
   sigset_t fatal_signal_set;

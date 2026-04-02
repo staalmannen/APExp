@@ -1,9 +1,9 @@
 /* Test of opening a file descriptor.
-   Copyright (C) 2007-2021 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -16,6 +16,11 @@
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2007.  */
 
+/* Tell GCC not to warn about the specific edge cases tested here.  */
+#if _GL_GNUC_PREREQ (13, 0)
+# pragma GCC diagnostic ignored "-Wanalyzer-fd-leak"
+#endif
+
 /* Make test_open always inline if we're using Fortify, which defines
    __always_inline to do that.  Do nothing otherwise.  This works
    around a glibc bug whereby 'open' cannot be used as a function
@@ -27,8 +32,9 @@
 # define ALWAYS_INLINE
 #endif
 
-/* This file is designed to test both open(n,buf[,mode]) and
-   openat(AT_FDCWD,n,buf[,mode]).  FUNC is the function to test.
+/* This file is designed to test open(n,buf[,mode]),
+   openat(dfd,n,buf[,mode]), and openat2(dfd,n,how,size).
+   FUNC is the function to test; for openat and openat2 it is a wrapper.
    Assumes that BASE and ASSERT are already defined, and that
    appropriate headers are already included.  If PRINT, warn before
    skipping symlink tests with status 77.  */
@@ -36,9 +42,18 @@
 static ALWAYS_INLINE int
 test_open (int (*func) (char const *, int, ...), bool print)
 {
+#if HAVE_DECL_ALARM
+  /* Declare failure if test takes too long, by using default abort
+     caused by SIGALRM.  */
+  int alarm_value = 5;
+  signal (SIGALRM, SIG_DFL);
+  alarm (alarm_value);
+#endif
+
   int fd;
 
   /* Remove anything from prior partial run.  */
+  unlink (BASE "fifo");
   unlink (BASE "file");
   unlink (BASE "e.exe");
   unlink (BASE "link");
@@ -63,6 +78,43 @@ test_open (int (*func) (char const *, int, ...), bool print)
   errno = 0;
   ASSERT (func (BASE "file/", O_RDONLY) == -1);
   ASSERT (errno == ENOTDIR || errno == EISDIR || errno == EINVAL);
+
+  /* Cannot open regular file with O_DIRECTORY.  */
+  errno = 0;
+  ASSERT (func (BASE "file", O_RDONLY | O_DIRECTORY) == -1);
+  ASSERT (errno == ENOTDIR);
+
+  /* Cannot open /dev/null with trailing slash or O_DIRECTORY.  */
+  errno = 0;
+  ASSERT (func ("/dev/null/", O_RDONLY) == -1);
+#if defined _WIN32 && !defined __CYGWIN__
+  ASSERT (errno == ENOENT);
+#else
+  ASSERT (errno == ENOTDIR || errno == EISDIR || errno == EINVAL);
+#endif
+
+  errno = 0;
+  ASSERT (func ("/dev/null", O_RDONLY | O_DIRECTORY) == -1);
+  ASSERT (errno == ENOTDIR);
+
+  /* Cannot open /dev/tty with trailing slash or O_DIRECTORY,
+     though errno may differ as there may not be a controlling tty.  */
+  ASSERT (func ("/dev/tty/", O_RDONLY) == -1);
+  ASSERT (func ("/dev/tty", O_RDONLY | O_DIRECTORY) == -1);
+
+  /* Cannot open fifo with trailing slash or O_DIRECTORY.  */
+  if (mkfifo (BASE "fifo", 0666) == 0)
+    {
+      errno = 0;
+      ASSERT (func (BASE "fifo/", O_RDONLY) == -1);
+      ASSERT (errno == ENOTDIR || errno == EISDIR || errno == EINVAL);
+
+      errno = 0;
+      ASSERT (func (BASE "fifo", O_RDONLY | O_DIRECTORY) == -1);
+      ASSERT (errno == ENOTDIR);
+
+      ASSERT (unlink (BASE "fifo") == 0);
+    }
 
   /* Directories cannot be opened for writing.  */
   errno = 0;
@@ -93,9 +145,7 @@ test_open (int (*func) (char const *, int, ...), bool print)
     {
       /* Since the O_CLOEXEC handling goes through a special code path at its
          first invocation, test it twice.  */
-      int i;
-
-      for (i = 0; i < 2; i++)
+      for (int i = 0; i < 2; i++)
         {
           int flags;
 

@@ -1,8 +1,10 @@
-# ftello.m4 serial 14
-dnl Copyright (C) 2007-2021 Free Software Foundation, Inc.
+# ftello.m4
+# serial 17
+dnl Copyright (C) 2007-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_DEFUN([gl_FUNC_FTELLO],
 [
@@ -37,13 +39,24 @@ AC_DEFUN([gl_FUNC_FTELLO],
     if test $gl_cv_var_stdin_large_offset = no; then
       REPLACE_FTELLO=1
     fi
+    AC_REQUIRE([AC_CANONICAL_HOST])
+    if test $REPLACE_FTELLO = 0; then
+      dnl On native Windows, in some circumstances, ftell(), ftello(),
+      dnl fgetpos(), lseek(), _lseeki64() all succeed on devices of type
+      dnl FILE_TYPE_PIPE. However, to match POSIX behaviour, we want
+      dnl ftell(), ftello(), fgetpos(), lseek() to fail when the argument fd
+      dnl designates a pipe. See also
+      dnl https://github.com/python/cpython/issues/78961#issuecomment-1093800325
+      case "$host_os" in
+        mingw* | windows*) REPLACE_FTELLO=1 ;;
+      esac
+    fi
     if test $REPLACE_FTELLO = 0; then
       dnl Detect bug on Solaris.
       dnl ftell and ftello produce incorrect results after putc that followed a
       dnl getc call that reached EOF on Solaris. This is because the _IOREAD
       dnl flag does not get cleared in this case, even though _IOWRT gets set,
       dnl and ftell and ftello look whether the _IOREAD flag is set.
-      AC_REQUIRE([AC_CANONICAL_HOST])
       AC_CACHE_CHECK([whether ftello works],
         [gl_cv_func_ftello_works],
         [
@@ -51,12 +64,12 @@ AC_DEFUN([gl_FUNC_FTELLO],
           dnl be opened.
 changequote(,)dnl
           case "$host_os" in
-                      # Guess no on Solaris.
-            solaris*) gl_cv_func_ftello_works="guessing no" ;;
-                      # Guess yes on native Windows.
-            mingw*)   gl_cv_func_ftello_works="guessing yes" ;;
-                      # Guess yes otherwise.
-            *)        gl_cv_func_ftello_works="guessing yes" ;;
+                               # Guess no on Solaris.
+            solaris*)          gl_cv_func_ftello_works="guessing no" ;;
+                               # Guess yes on native Windows.
+            mingw* | windows*) gl_cv_func_ftello_works="guessing yes" ;;
+                               # Guess yes otherwise.
+            *)                 gl_cv_func_ftello_works="guessing yes" ;;
           esac
 changequote([,])dnl
           AC_RUN_IFELSE(
@@ -145,6 +158,10 @@ main (void)
 # Prerequisites of lib/ftello.c.
 AC_DEFUN([gl_PREREQ_FTELLO],
 [
+  if test $gl_cv_func_ftello != no; then
+    AC_DEFINE([HAVE_FTELLO], [1],
+      [Define to 1 if the system has the ftello function.])
+  fi
   dnl Native Windows has the function _ftelli64. mingw hides it, but mingw64
   dnl makes it usable again.
   AC_CHECK_FUNCS([_ftelli64])

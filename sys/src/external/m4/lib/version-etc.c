@@ -1,17 +1,17 @@
 /* Print --version and bug-reporting information in a consistent format.
-   Copyright (C) 1999-2021 Free Software Foundation, Inc.
+   Copyright (C) 1999-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation, either version 3 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Jim Meyering. */
@@ -29,7 +29,7 @@
 #endif
 
 #include "gettext.h"
-#define _(msgid) gettext (msgid)
+#define _(msgid) dgettext (GNULIB_TEXT_DOMAIN, msgid)
 
 /* If you use AM_INIT_AUTOMAKE's no-define option,
    PACKAGE is not defined.  Use PACKAGE_TARNAME instead.  */
@@ -37,7 +37,7 @@
 # define PACKAGE PACKAGE_TARNAME
 #endif
 
-enum { COPYRIGHT_YEAR = 2021 };
+enum { COPYRIGHT_YEAR = 2026 };
 
 /* The three functions below display the --version information the
    standard way.
@@ -232,7 +232,6 @@ version_etc (FILE *stream,
              const char *version, /* const char *author1, ...*/ ...)
 {
   va_list authors;
-
   va_start (authors, version);
   version_etc_va (stream, command_name, package, version, authors);
   va_end (authors);

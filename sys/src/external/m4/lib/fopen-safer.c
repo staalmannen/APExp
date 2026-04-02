@@ -1,10 +1,10 @@
 /* Invoke fopen, but avoid some glitches.
 
-   Copyright (C) 2001, 2004-2006, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2004-2006, 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -42,18 +42,18 @@ fopen_safer (char const *file, char const *mode)
 
           if (f < 0)
             {
-              int e = errno;
+              int saved_errno = errno;
               fclose (fp);
-              errno = e;
+              errno = saved_errno;
               return NULL;
             }
 
           if (fclose (fp) != 0
               || ! (fp = fdopen (f, mode)))
             {
-              int e = errno;
+              int saved_errno = errno;
               close (f);
-              errno = e;
+              errno = saved_errno;
               return NULL;
             }
         }

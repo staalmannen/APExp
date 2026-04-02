@@ -1,21 +1,23 @@
-# serial 21
+# ftruncate.m4
+# serial 24
+dnl Copyright (C) 2000-2001, 2003-2007, 2009-2026 Free Software Foundation,
+dnl Inc.
+dnl This file is free software; the Free Software Foundation
+dnl gives unlimited permission to copy and/or distribute it,
+dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 # See if we need to emulate a missing ftruncate function using _chsize.
-
-# Copyright (C) 2000-2001, 2003-2007, 2009-2021 Free Software Foundation, Inc.
-# This file is free software; the Free Software Foundation
-# gives unlimited permission to copy and/or distribute it,
-# with or without modifications, as long as this notice is preserved.
 
 AC_DEFUN([gl_FUNC_FTRUNCATE],
 [
   AC_REQUIRE([gl_UNISTD_H_DEFAULTS])
-  AC_CHECK_FUNCS_ONCE([ftruncate])
+  gl_CHECK_FUNCS_ANDROID([ftruncate], [[#include <unistd.h>]])
   if test $ac_cv_func_ftruncate = yes; then
     m4_ifdef([gl_LARGEFILE], [
       AC_REQUIRE([AC_CANONICAL_HOST])
       case "$host_os" in
-        mingw*)
+        mingw* | windows*)
           dnl Native Windows, and Large File Support is requested.
           dnl The MSVCRT _chsize() function only accepts a 32-bit file size,
           dnl and the mingw64 ftruncate64() function is unreliable (it may
@@ -30,6 +32,9 @@ AC_DEFUN([gl_FUNC_FTRUNCATE],
     ])
   else
     HAVE_FTRUNCATE=0
+    case "$gl_cv_onwards_func_ftruncate" in
+      future*) REPLACE_FTRUNCATE=1 ;;
+    esac
   fi
 ])
 

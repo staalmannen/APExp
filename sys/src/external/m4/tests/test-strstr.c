@@ -1,10 +1,10 @@
 /*
- * Copyright (C) 2004, 2007-2021 Free Software Foundation, Inc.
+ * Copyright (C) 2004, 2007-2026 Free Software Foundation, Inc.
  * Written by Bruno Haible and Eric Blake
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 3 of the License, or
+ * the Free Software Foundation, either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -261,9 +261,8 @@ main (int argc, char *argv[])
       "with_multilib_list\n";
     size_t h_len = strlen (h);
     char *haystack = malloc (h_len + 1);
-    size_t i;
     ASSERT (haystack);
-    for (i = 0; i < h_len - strlen (needle); i++)
+    for (size_t i = 0; i < h_len - strlen (needle); i++)
       {
         const char *p;
         memcpy (haystack, h, h_len + 1);
@@ -273,6 +272,14 @@ main (int argc, char *argv[])
         ASSERT (p - haystack == i);
       }
     free (haystack);
+  }
+
+  /* Test case from Yves Bastide.
+     <https://www.openwall.com/lists/musl/2014/04/18/2>  */
+  {
+    const char input[] = "playing play play play always";
+    const char *result = strstr (input, "play play play");
+    ASSERT (result == input + 8);
   }
 
   /* Test long needles.  */
@@ -297,5 +304,5 @@ main (int argc, char *argv[])
     free (haystack);
   }
 
-  return 0;
+  return test_exit_status;
 }

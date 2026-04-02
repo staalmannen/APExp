@@ -1,9 +1,9 @@
 /* Test of pthread_sigmask in a single-threaded program.
-   Copyright (C) 2011-2021 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -24,10 +24,12 @@
 SIGNATURE_CHECK (pthread_sigmask, int, (int, const sigset_t *, sigset_t *));
 
 #include <errno.h>
+#include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 
+#include "virtualbox.h"
 #include "macros.h"
 
 #if !(defined _WIN32 && !defined __CYGWIN__)
@@ -35,16 +37,26 @@ SIGNATURE_CHECK (pthread_sigmask, int, (int, const sigset_t *, sigset_t *));
 static volatile int sigint_occurred;
 
 static void
-sigint_handler (int sig)
+sigint_handler (_GL_UNUSED int sig)
 {
   sigint_occurred++;
 }
 
 int
-main (int argc, char *argv[])
+main ()
 {
+  /* This test occasionally fails on Linux (glibc or musl libc), in a
+     VirtualBox VM with paravirtualization = Default or KVM, with ≥ 2 CPUs.
+     Skip the test in this situation.  */
+  if (is_running_under_virtualbox_kvm () && num_cpus () > 1)
+    {
+      fputs ("Skipping test: avoiding VirtualBox bug with KVM paravirtualization\n",
+             stderr);
+      return 77;
+    }
+
   sigset_t set;
-  int pid = getpid ();
+  intmax_t pid = getpid ();
   char command[80];
 
   signal (SIGINT, sigint_handler);
@@ -59,7 +71,7 @@ main (int argc, char *argv[])
   ASSERT (pthread_sigmask (SIG_BLOCK, &set, NULL) == 0);
 
   /* Request a SIGINT signal from outside.  */
-  sprintf (command, "sh -c 'sleep 1; kill -%d %d' &", SIGINT, pid);
+  sprintf (command, "sh -c 'sleep 1; kill -INT %"PRIdMAX"' &", pid);
   ASSERT (system (command) == 0);
 
   /* Wait.  */
@@ -77,7 +89,7 @@ main (int argc, char *argv[])
         before the call to pthread_sigmask() returns."  */
   ASSERT (sigint_occurred == 1);
 
-  return 0;
+  return test_exit_status;
 }
 
 #else

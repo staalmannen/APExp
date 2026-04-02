@@ -1,19 +1,19 @@
 /* On some systems, mkdir ("foo/", 0700) fails because of the trailing
    slash.  On those systems, this wrapper removes the trailing slash.
 
-   Copyright (C) 2001, 2003, 2006, 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2001, 2003, 2006, 2008-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* written by Jim Meyering */
@@ -48,12 +48,11 @@
 /* This function is required at least for NetBSD 1.5.2.  */
 
 int
-rpl_mkdir (char const *dir, mode_t mode maybe_unused)
+rpl_mkdir (char const *dir, maybe_unused mode_t mode)
 {
-  int ret_val;
-  char *tmp_dir;
   size_t len = strlen (dir);
 
+  char *tmp_dir;
   if (len && dir[len - 1] == '/')
     {
       tmp_dir = strdup (dir);
@@ -69,6 +68,7 @@ rpl_mkdir (char const *dir, mode_t mode maybe_unused)
     {
       tmp_dir = (char *) dir;
     }
+
 #if FUNC_MKDIR_DOT_BUG
   /* Additionally, cygwin 1.5 mistakenly creates a directory "d/./".  */
   {
@@ -84,7 +84,7 @@ rpl_mkdir (char const *dir, mode_t mode maybe_unused)
   }
 #endif /* FUNC_MKDIR_DOT_BUG */
 
-  ret_val = mkdir (tmp_dir, mode);
+  int ret_val = mkdir (tmp_dir, mode);
 
   if (tmp_dir != dir)
     free (tmp_dir);

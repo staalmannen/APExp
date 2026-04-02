@@ -1,10 +1,10 @@
 /* Invoke stdlib.h functions, but avoid some glitches.
 
-   Copyright (C) 2005, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -16,6 +16,11 @@
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert.  */
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 int mkstemp_safer (char *);
 
@@ -29,4 +34,9 @@ int mkostemps_safer (char *, int, int);
 
 #if GNULIB_MKSTEMPS
 int mkstemps_safer (char *, int);
+#endif
+
+
+#ifdef __cplusplus
+}
 #endif

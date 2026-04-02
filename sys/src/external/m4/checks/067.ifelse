@@ -1,4 +1,4 @@
-dnl @ ../doc/m4.texi:2779: Origin of test
+dnl @ ../doc/m4.texi:2797: Origin of test
 dnl @ expected status: 0
 dnl @ extra options: 
 dnl @ Copyright (C) 2006, 2007, 2008, 2009 Free Software
@@ -7,13 +7,8 @@ dnl @ This file is free software; the Free Software Foundation
 dnl @ gives unlimited permission to copy and/or distribute it
 dnl @ with or without modifications, as long as this notice
 dnl @ is preserved.
-ifelse(`foo', `bar', `true')
+ifelse(`some comments')
 dnl @result{}
-ifelse(`foo', `foo', `true')
-dnl @result{}true
-define(`foo', `bar')
+ifelse(`foo', `bar')
+dnl @error{}m4:stdin:2: Warning: too few arguments to builtin `ifelse'
 dnl @result{}
-ifelse(foo, `bar', `true', `false')
-dnl @result{}true
-ifelse(foo, `foo', `true', `false')
-dnl @result{}false

@@ -1,9 +1,9 @@
 /* Test of spin locks for communication between threads and signal handlers.
-   Copyright (C) 2005, 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -56,10 +56,10 @@
 #include "asyncsafe-spin.h"
 #if !ENABLE_LOCKING
 # define asyncsafe_spin_init(lock) (void)(lock)
-# define asyncsafe_spin_lock(lock, mask, saved_mask) \
-    ((void)(lock), (void)(mask), (void)(saved_mask))
-# define asyncsafe_spin_unlock(lock, saved_mask) \
-    ((void)(lock), (void)(saved_mask))
+# define asyncsafe_spin_lock(lock, from, mask, saved_mask) \
+    ((void)(lock), (void)(from), (void)(mask), (void)(saved_mask))
+# define asyncsafe_spin_unlock(lock, from, saved_mask) \
+    ((void)(lock), (void)(from), (void)(saved_mask))
 # define asyncsafe_spin_destroy(lock) (void)(lock)
 #endif
 
@@ -95,16 +95,16 @@ static int account[ACCOUNT_COUNT];
 static int
 random_account (void)
 {
-  return ((unsigned int) rand () >> 3) % ACCOUNT_COUNT;
+  return ((unsigned long) random () >> 3) % ACCOUNT_COUNT;
 }
 
 static void
 check_accounts (void)
 {
-  int i, sum;
+  int sum;
 
   sum = 0;
-  for (i = 0; i < ACCOUNT_COUNT; i++)
+  for (int i = 0; i < ACCOUNT_COUNT; i++)
     sum += account[i];
   if (sum != ACCOUNT_COUNT * 1000)
     abort ();
@@ -122,31 +122,29 @@ static asyncsafe_spinlock_t my_lock;
 static void *
 lock_mutator_thread (void *arg)
 {
-  int repeat;
-
-  for (repeat = REPEAT_COUNT; repeat > 0; repeat--)
+  for (int repeat = REPEAT_COUNT; repeat > 0; repeat--)
     {
       sigset_t saved_signals;
       int i1, i2, value;
 
       dbgprintf ("Mutator %p before lock\n", gl_thread_self_pointer ());
-      asyncsafe_spin_lock (&my_lock, &signals_to_block, &saved_signals);
+      asyncsafe_spin_lock (&my_lock, false, &signals_to_block, &saved_signals);
       dbgprintf ("Mutator %p after  lock\n", gl_thread_self_pointer ());
 
       i1 = random_account ();
       i2 = random_account ();
-      value = ((unsigned int) rand () >> 3) % 10;
+      value = ((unsigned long) random () >> 3) % 10;
       account[i1] += value;
       account[i2] -= value;
 
       dbgprintf ("Mutator %p before unlock\n", gl_thread_self_pointer ());
-      asyncsafe_spin_unlock (&my_lock, &saved_signals);
+      asyncsafe_spin_unlock (&my_lock, false, &saved_signals);
       dbgprintf ("Mutator %p after  unlock\n", gl_thread_self_pointer ());
 
       dbgprintf ("Mutator %p before check lock\n", gl_thread_self_pointer ());
-      asyncsafe_spin_lock (&my_lock, &signals_to_block, &saved_signals);
+      asyncsafe_spin_lock (&my_lock, false, &signals_to_block, &saved_signals);
       check_accounts ();
-      asyncsafe_spin_unlock (&my_lock, &saved_signals);
+      asyncsafe_spin_unlock (&my_lock, false, &saved_signals);
       dbgprintf ("Mutator %p after  check unlock\n", gl_thread_self_pointer ());
 
       yield ();
@@ -166,9 +164,9 @@ lock_checker_thread (void *arg)
       sigset_t saved_signals;
 
       dbgprintf ("Checker %p before check lock\n", gl_thread_self_pointer ());
-      asyncsafe_spin_lock (&my_lock, &signals_to_block, &saved_signals);
+      asyncsafe_spin_lock (&my_lock, false, &signals_to_block, &saved_signals);
       check_accounts ();
-      asyncsafe_spin_unlock (&my_lock, &saved_signals);
+      asyncsafe_spin_unlock (&my_lock, false, &saved_signals);
       dbgprintf ("Checker %p after  check unlock\n", gl_thread_self_pointer ());
 
       yield ();
@@ -181,23 +179,22 @@ lock_checker_thread (void *arg)
 static void
 test_asyncsafe_spin (void)
 {
-  int i;
   gl_thread_t checkerthread;
   gl_thread_t threads[THREAD_COUNT];
 
   /* Initialization.  */
-  for (i = 0; i < ACCOUNT_COUNT; i++)
+  for (int i = 0; i < ACCOUNT_COUNT; i++)
     account[i] = 1000;
   init_atomic_int (&lock_checker_done);
   set_atomic_int_value (&lock_checker_done, 0);
 
   /* Spawn the threads.  */
   checkerthread = gl_thread_create (lock_checker_thread, NULL);
-  for (i = 0; i < THREAD_COUNT; i++)
+  for (int i = 0; i < THREAD_COUNT; i++)
     threads[i] = gl_thread_create (lock_mutator_thread, NULL);
 
   /* Wait for the threads to terminate.  */
-  for (i = 0; i < THREAD_COUNT; i++)
+  for (int i = 0; i < THREAD_COUNT; i++)
     gl_thread_join (threads[i], NULL);
   set_atomic_int_value (&lock_checker_done, 1);
   gl_thread_join (checkerthread, NULL);

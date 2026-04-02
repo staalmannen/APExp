@@ -1,10 +1,10 @@
 /* Close standard input, rewinding seekable stdin if necessary.
 
-   Copyright (C) 2007, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -20,16 +20,15 @@
 #include "closein.h"
 
 #include <errno.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <unistd.h>
 
 #include "gettext.h"
-#define _(msgid) gettext (msgid)
+#define _(msgid) dgettext (GNULIB_TEXT_DOMAIN, msgid)
 
 #include "close-stream.h"
 #include "closeout.h"
-#include "error.h"
+#include <error.h>
 #include "exitfail.h"
 #include "freadahead.h"
 #include "quotearg.h"

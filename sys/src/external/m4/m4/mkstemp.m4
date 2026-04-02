@@ -1,15 +1,14 @@
-#serial 28
-
-# Copyright (C) 2001, 2003-2007, 2009-2021 Free Software Foundation, Inc.
-# This file is free software; the Free Software Foundation
-# gives unlimited permission to copy and/or distribute it,
-# with or without modifications, as long as this notice is preserved.
+# mkstemp.m4
+# serial 31
+dnl Copyright (C) 2001, 2003-2007, 2009-2026 Free Software Foundation, Inc.
+dnl This file is free software; the Free Software Foundation
+dnl gives unlimited permission to copy and/or distribute it,
+dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 # On some hosts (e.g., HP-UX 10.20, SunOS 4.1.4, Solaris 2.5.1), mkstemp has a
 # silly limit that it can create no more than 26 files from a given template.
 # Other systems lack mkstemp altogether.
-# On OSF1/Tru64 V4.0F, the system-provided mkstemp function can create
-# only 32 files per process.
 # On some hosts, mkstemp creates files with mode 0666, which is a security
 # problem and a violation of POSIX 2008.
 # On systems like the above, arrange to use the replacement function.
@@ -58,14 +57,14 @@ AC_DEFUN([gl_FUNC_MKSTEMP],
           [gl_cv_func_working_mkstemp=yes],
           [gl_cv_func_working_mkstemp=no],
           [case "$host_os" in
-                            # Guess yes on glibc systems.
-             *-gnu* | gnu*) gl_cv_func_working_mkstemp="guessing yes" ;;
-                            # Guess yes on musl systems.
-             *-musl*)       gl_cv_func_working_mkstemp="guessing yes" ;;
-                            # Guess no on native Windows.
-             mingw*)        gl_cv_func_working_mkstemp="guessing no" ;;
-                            # If we don't know, obey --enable-cross-guesses.
-             *)             gl_cv_func_working_mkstemp="$gl_cross_guess_normal" ;;
+                                 # Guess yes on glibc systems.
+             *-gnu* | gnu*)      gl_cv_func_working_mkstemp="guessing yes" ;;
+                                 # Guess yes on musl systems.
+             *-musl* | midipix*) gl_cv_func_working_mkstemp="guessing yes" ;;
+                                 # Guess no on native Windows.
+             mingw* | windows*)  gl_cv_func_working_mkstemp="guessing no" ;;
+                                 # If we don't know, obey --enable-cross-guesses.
+             *)                  gl_cv_func_working_mkstemp="$gl_cross_guess_normal" ;;
            esac
           ])
         rm -rf conftest.mkstemp

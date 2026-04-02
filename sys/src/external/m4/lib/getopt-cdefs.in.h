@@ -1,22 +1,21 @@
 /* getopt-on-non-glibc compatibility macros.
-   Copyright (C) 1989-2021 Free Software Foundation, Inc.
+   Copyright (C) 1989-2026 Free Software Foundation, Inc.
    This file is part of gnulib.
    Unlike most of the getopt implementation, it is NOT shared
    with the GNU C Library.
 
-   This file is free software; you can redistribute it and/or modify it
-   under the terms of the GNU General Public License as
-   published by the Free Software Foundation; either version 3 of
-   the License, or (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This file is distributed in the hope that it will be useful, but
-   WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
+   This file is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public
-   License along with gnulib; if not, see
-   <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _GETOPT_CDEFS_H
 #define _GETOPT_CDEFS_H 1
@@ -47,10 +46,14 @@
 # endif
 #endif
 
+#if defined __clang__
+  /* clang really only groks GNU C 4.2, regardless of its value of __GNUC__.  */
+# undef __GNUC_PREREQ
+# define __GNUC_PREREQ(maj, min) ((maj) < 4 + ((min) <= 2))
+#endif
 #ifndef __GNUC_PREREQ
-# if defined __GNUC__ && defined __GNUC_VERSION__
-# define __GNUC_PREREQ(maj, min) \
-        ((__GNUC__ << 16) + __GNUC_MINOR__ >= ((maj) << 16) + (min))
+# if defined __GNUC__ && defined __GNUC_MINOR__
+#  define __GNUC_PREREQ(maj, min) ((maj) < __GNUC__ + ((min) <= __GNUC_MINOR__))
 # else
 #  define __GNUC_PREREQ(maj, min) 0
 # endif
@@ -58,7 +61,11 @@
 
 #ifndef __THROW
 # if defined __cplusplus && (__GNUC_PREREQ (2,8) || __clang_major__ >= 4)
-#  define __THROW       throw ()
+#  if __cplusplus >= 201103L
+#   define __THROW      noexcept (true)
+#  else
+#   define __THROW      throw ()
+#  endif
 # else
 #  define __THROW
 # endif

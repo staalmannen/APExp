@@ -1,9 +1,9 @@
 /* Test of getcwd() function.
-   Copyright (C) 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -27,11 +27,8 @@
 #include <sys/stat.h>
 
 #include "pathmax.h"
+#include "qemu.h"
 #include "macros.h"
-
-#if !(HAVE_GETPAGESIZE || defined getpagesize)
-# define getpagesize() 0
-#endif
 
 /* This size is chosen to be larger than PATH_MAX (4k), yet smaller than
    the 16kB pagesize on ia64 linux.  Those conditions make the code below
@@ -52,10 +49,10 @@ test_abort_bug (void)
   size_t initial_cwd_len;
   int fail = 0;
 
-  /* The bug is triggered when PATH_MAX < getpagesize (), so skip
+  /* The bug is triggered when PATH_MAX < page size, so skip
      this relatively expensive and invasive test if that's not true.  */
-#ifdef PATH_MAX
-  int bug_possible = PATH_MAX < getpagesize ();
+#if defined PATH_MAX && defined _SC_PAGESIZE
+  int bug_possible = PATH_MAX < sysconf (_SC_PAGESIZE);
 #else
   int bug_possible = 0;
 #endif
@@ -138,6 +135,13 @@ test_long_name (void)
      this should be done in a compile test.  */
   return 0;
 #else
+  /* For a process running under QEMU user-mode, the "/" directory is not
+     really the root directory, but the value of the QEMU_LD_PREFIX environment
+     variable or of the -L command-line option.  This causes the logic from
+     glibc/sysdeps/posix/getcwd.c to fail.  In this case, skip the test.  */
+  if (is_running_under_qemu_user ())
+    return 77;
+
   char buf[PATH_MAX * (DIR_NAME_SIZE / DOTDOTSLASH_LEN + 1)
            + DIR_NAME_SIZE + BUF_SLOP];
   char *cwd = getcwd (buf, PATH_MAX);
@@ -236,11 +240,9 @@ test_long_name (void)
      So clean up here, right away, even though the driving
      shell script would also clean up.  */
   {
-    size_t i;
-
     /* Try rmdir first, in case the chdir failed.  */
     rmdir (DIR_NAME);
-    for (i = 0; i <= n_chdirs; i++)
+    for (size_t i = 0; i <= n_chdirs; i++)
       {
         if (chdir ("..") < 0)
           break;
@@ -254,7 +256,10 @@ test_long_name (void)
 }
 
 int
-main (int argc, char **argv)
+main ()
 {
-  return test_abort_bug () * 10 + test_long_name ();
+  int err1 = test_abort_bug ();
+  int err2 = test_long_name ();
+  int result = err1 * 10 + (err1 != 0 && err2 == 77 ? 0 : err2);
+  return (result ? result : test_exit_status);
 }

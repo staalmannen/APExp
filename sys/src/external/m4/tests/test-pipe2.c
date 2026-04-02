@@ -1,9 +1,9 @@
 /* Test of pipe2.
-   Copyright (C) 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
+   the Free Software Foundation, either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -22,7 +22,6 @@
 SIGNATURE_CHECK (pipe2, int, (int[2], int));
 
 #include <fcntl.h>
-#include <stdbool.h>
 
 #if defined _WIN32 && ! defined __CYGWIN__
 /* Get declarations of the native Windows API functions.  */
@@ -95,11 +94,8 @@ get_nonblocking_flag (int fd)
 int
 main ()
 {
-  int use_nonblocking;
-  int use_cloexec;
-
-  for (use_nonblocking = 0; use_nonblocking <= !!O_NONBLOCK; use_nonblocking++)
-    for (use_cloexec = 0; use_cloexec <= !!O_CLOEXEC; use_cloexec++)
+  for (int use_nonblocking = 0; use_nonblocking <= !!O_NONBLOCK; use_nonblocking++)
+    for (int use_cloexec = 0; use_cloexec <= !!O_CLOEXEC; use_cloexec++)
       {
         int o_flags;
         int fd[2];
@@ -143,5 +139,5 @@ main ()
         ASSERT (close (fd[1]) == 0);
       }
 
-  return 0;
+  return test_exit_status;
 }

@@ -1,8 +1,10 @@
-# wctob.m4 serial 13
-dnl Copyright (C) 2008-2021 Free Software Foundation, Inc.
+# wctob.m4
+# serial 15
+dnl Copyright (C) 2008-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_DEFUN([gl_FUNC_WCTOB],
 [
@@ -11,7 +13,6 @@ AC_DEFUN([gl_FUNC_WCTOB],
   AC_CHECK_FUNCS_ONCE([wctob])
   if test $ac_cv_func_wctob = no; then
     HAVE_WCTOB=0
-    HAVE_DECL_WCTOB=0
   else
     HAVE_WCTOB=1
 
@@ -32,7 +33,7 @@ changequote(,)dnl
           solaris2.[1-9] | solaris2.[1-9].* | cygwin*)
             gl_cv_func_wctob_works="guessing no" ;;
             # Guess no on native Windows.
-          mingw*)
+          mingw* | windows*)
             gl_cv_func_wctob_works="guessing no" ;;
             # Guess yes otherwise.
           *) gl_cv_func_wctob_works="guessing yes" ;;
@@ -90,16 +91,6 @@ int main ()
       *yes) ;;
       *) REPLACE_WCTOB=1 ;;
     esac
-    if test $REPLACE_WCTOB = 0; then
-
-      dnl IRIX 6.5 has the wctob() function but does not declare it.
-      AC_CHECK_DECLS([wctob], [], [], [[
-        #include <wchar.h>
-      ]])
-      if test $ac_cv_have_decl_wctob != yes; then
-        HAVE_DECL_WCTOB=0
-      fi
-    fi
   fi
 ])
 

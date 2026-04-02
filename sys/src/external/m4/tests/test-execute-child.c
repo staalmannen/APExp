@@ -1,9 +1,9 @@
 /* Child program invoked by test-execute-main.
-   Copyright (C) 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
+   the Free Software Foundation, either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -56,7 +56,9 @@ is_device (int fd)
 #endif
 
 /* In this file, we use only system functions, no overrides from gnulib.  */
+#undef abort
 #undef atoi
+#undef close
 #undef fcntl
 #undef fflush
 #undef fgetc
@@ -64,12 +66,23 @@ is_device (int fd)
 #undef fputs
 #undef getcwd
 #undef isatty
+#undef open
 #undef raise
 #undef read
 #undef sprintf
+#undef strcasestr
 #undef strcmp
 #undef strlen
+#undef strstr
 #undef write
+
+/* macOS 12's "warning: 'sprintf' is deprecated" is pointless,
+   as sprintf is used safely here.  */
+#if defined __APPLE__ && defined __MACH__ && _GL_GNUC_PREREQ (4, 2)
+# pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
+
+#include "qemu.h"
 
 #if HAVE_MSVC_INVALID_PARAMETER_HANDLER
 static void __cdecl
@@ -166,12 +179,14 @@ main (int argc, char *argv[])
       _set_invalid_parameter_handler (gl_msvc_invalid_parameter_handler);
       #endif
       {
+        /* QEMU 6.1 in user-mode passes an open fd = 3, that references
+           /dev/urandom.  We need to ignore this fd.  */
+        bool is_qemu = is_running_under_qemu_user ();
         char buf[300];
         buf[0] = '\0';
         char *p = buf;
-        int fd;
-        for (fd = 0; fd < 20; fd++)
-          if (is_open (fd))
+        for (int fd = 0; fd < 20; fd++)
+          if (is_open (fd) && !(is_qemu && fd == 3))
             {
               sprintf (p, "%d ", fd);
               p += strlen (p);
@@ -190,14 +205,14 @@ main (int argc, char *argv[])
          including the file position.  */
       {
         char buf[6];
-        int n = read (10, buf, sizeof (buf));
+        int n = read (15, buf, sizeof (buf));
         return !(n == 4 && memcmp (buf, "obar", 4) == 0);
       }
     case 18:
       /* Check that file descriptors >= 3, open for writing, can be inherited,
          including the file position.  */
       {
-        int n = write (10, "bar", 3);
+        int n = write (15, "bar", 3);
         return !(n == 3);
       }
     case 19:
@@ -208,9 +223,9 @@ main (int argc, char *argv[])
          isatty() property, part 2 (character devices).  */
       {
         #if defined _WIN32 && ! defined __CYGWIN__
-        return 4 + 2 * (_isatty (10) != 0) + (_isatty (11) != 0);
+        return 4 + 2 * (_isatty (15) != 0) + (_isatty (16) != 0);
         #else
-        return 4 + 2 * (isatty (10) != 0) + (isatty (11) != 0);
+        return 4 + 2 * (isatty (15) != 0) + (isatty (16) != 0);
         #endif
       }
     case 21:

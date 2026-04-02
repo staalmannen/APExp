@@ -1,128 +1,148 @@
-# Mesajele �n limba rom�n� pentru m4.
-# Copyright (C) 2003 Free Software Foundation, Inc.
-# Acest fi�ier este distribuit sub aceea�i licen�� ca �i pachetul m4.
-# Laurentiu Buzdugan <buzdugan@voyager.net>, 2003.
+# Romanian translation for m4.
+# Traducere în limba română pentru m4.
+# Copyright (C) 2003, 2022, 2025 Free Software Foundation, Inc.
+# Acest fişier este distribuit sub aceeaşi licenţă ca şi pachetul m4.
+# This file is distributed under the same license as the m4 package.
 #
+# Laurentiu Buzdugan <buzdugan@voyager.net>, 2003.
+# Remus-Gabriel Chelu <remusgabriel.chelu@disroot.org>, 2022, 2025.
+#
+# Cronologia traducerii fișierului „m4”:
+# Traducerea inițială, făcută de LB, pentru versiunea m4 1.4o (rebotezată 1.4.0), apr-2033.
+# Actualizare a mesajelor, de la fișierul „m4-1.4.18d.pot”.
+# Actualizare a codării caracteror, la codarea de caractere UTF-8.
+# Actualizare a diacriticelor de la „cu sedilă” la „cu virgulă”.
+# Actualizare a algoritmului formelor de plural (de la „două” la „trei”).
+# NU și a mesajelor traduse (acestea au rămas neschimbate).
+# Eliminare a mesajelor ce-au dispărut în ultima versiune.
+# Actualizări realizate de Remus-Gabriel Chelu <remusgabriel.chelu@disroot.org>, 15.01.2022.
+# Actualizare a traducerii pentru versiunea 1.4.18d, făcută de R-GC, feb-2022.
+# Actualizare a traducerii pentru versiunea 1.4.19.60, făcută de R-GC, apr-2025.
+# Actualizare a traducerii pentru versiunea Y, făcută de X, Z(luna/anul).
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: m4 1.4o\n"
+"Project-Id-Version: m4 1.4.19.60\n"
 "Report-Msgid-Bugs-To: bug-m4@gnu.org\n"
-"POT-Creation-Date: 2021-05-28 13:49-0500\n"
-"PO-Revision-Date: 2003-04-26 18:00-05\n"
-"Last-Translator: Laurentiu Buzdugan <buzdugan@voyager.net>\n"
+"POT-Creation-Date: 2026-02-06 13:55-0600\n"
+"PO-Revision-Date: 2025-04-13 18:19+0200\n"
+"Last-Translator: Remus-Gabriel Chelu <remusgabriel.chelu@disroot.org>\n"
 "Language-Team: Romanian <translation-team-ro@lists.sourceforge.net>\n"
 "Language: ro\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO-8859-2\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
+"20)) ? 1 : 2);\n"
 "X-Bugs: Report translation errors to the Language-Team address.\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.5\n"
 
-#: lib/clean-temp.c:235
+#: lib/clean-temp.c:230
 #, c-format
 msgid "cannot find a temporary directory, try setting $TMPDIR"
 msgstr ""
+"nu se poate găsi un director temporar, încercați să definiți variabila "
+"$TMPDIR"
 
-#: lib/clean-temp.c:250
+#: lib/clean-temp.c:245
 #, c-format
 msgid "cannot create a temporary directory using template \"%s\""
-msgstr ""
+msgstr "nu se poate crea un director temporar utilizând șablonul „%s”"
 
-#: lib/clean-temp.c:371
-#, fuzzy, c-format
+#: lib/clean-temp.c:364
+#, c-format
 msgid "cannot remove temporary directory %s"
-msgstr "EROARE: Nu pot crea fi�ier temporar pentru diversiune"
+msgstr "nu se poate elimina directorul temporar %s"
 
-#: lib/closein.c:100
+#: lib/closein.c:99
 msgid "error closing file"
-msgstr ""
+msgstr "eroare la închiderea fișierului"
 
-#: lib/closeout.c:122
+#: lib/closeout.c:121
 msgid "write error"
-msgstr ""
+msgstr "eroare de scriere"
 
-#: lib/c-stack.c:187
+#: lib/c-stack.c:190
 msgid "program error"
-msgstr ""
+msgstr "eroare de program"
 
-#: lib/c-stack.c:188
+#: lib/c-stack.c:191
 msgid "stack overflow"
-msgstr ""
+msgstr "debordare de stivă"
 
-#: lib/clean-temp-simple.c:297
-#, fuzzy, c-format
+#: lib/clean-temp-simple.c:266
+#, c-format
 msgid "cannot remove temporary file %s"
-msgstr "Nu pot seta eroare fi�ier: %s"
+msgstr "nu se poate elimina fișierul temporar %s"
 
-#: lib/error.c:195
+#: lib/error.c:208
 msgid "Unknown system error"
-msgstr ""
+msgstr "Eroare de sistem necunoscută"
 
-#: lib/execute.c:348 lib/spawn-pipe.c:597 lib/wait-process.c:291
-#: lib/wait-process.c:365
+#: lib/execute.c:378 lib/spawn-pipe.c:597 lib/wait-process.c:325
+#: lib/wait-process.c:396
 #, c-format
 msgid "%s subprocess failed"
-msgstr ""
+msgstr "subprocesul %s a eșuat"
 
-#: lib/getopt.c:278
-#, fuzzy, c-format
+#: lib/getopt.c:283
+#, c-format
 msgid "%s: option '%s%s' is ambiguous\n"
-msgstr "%s: op�iunea `%s' este ambigu�\n"
+msgstr "%s: opțiunea „%s%s” este ambiguă\n"
 
-#: lib/getopt.c:284
-#, fuzzy, c-format
+#: lib/getopt.c:289
+#, c-format
 msgid "%s: option '%s%s' is ambiguous; possibilities:"
-msgstr "%s: op�iunea `%s' este ambigu�\n"
+msgstr "%s: opțiunea „%s%s” este ambiguă; posibilități:"
 
-#: lib/getopt.c:319
-#, fuzzy, c-format
+#: lib/getopt.c:323
+#, c-format
 msgid "%s: unrecognized option '%s%s'\n"
-msgstr "%s: op�iune nerecunoscut� `%c%s'\n"
+msgstr "%s: opțiune nerecunoscută „%s%s”\n"
 
-#: lib/getopt.c:345
-#, fuzzy, c-format
+#: lib/getopt.c:349
+#, c-format
 msgid "%s: option '%s%s' doesn't allow an argument\n"
-msgstr "%s: op�iunea `%c%s' nu permite un argument\n"
+msgstr "%s: opțiunea „%s%s” nu permite un argument\n"
 
-#: lib/getopt.c:360
-#, fuzzy, c-format
+#: lib/getopt.c:364
+#, c-format
 msgid "%s: option '%s%s' requires an argument\n"
-msgstr "%s: op�iunea `%s' necesit� un argument\n"
+msgstr "%s: opțiunea „%s%s” necesită un argument\n"
 
-#: lib/getopt.c:621
-#, fuzzy, c-format
+#: lib/getopt.c:624
+#, c-format
 msgid "%s: invalid option -- '%c'\n"
-msgstr "%s: op�iune ilegal� -- %c\n"
+msgstr "%s: opțiune nevalidă -- „%c”\n"
 
-#: lib/getopt.c:636 lib/getopt.c:682
-#, fuzzy, c-format
+#: lib/getopt.c:639 lib/getopt.c:685
+#, c-format
 msgid "%s: option requires an argument -- '%c'\n"
-msgstr "%s: op�iunea necesit� un argument -- %c\n"
+msgstr "%s: opțiunea necesită un argument -- „%c”\n"
 
-#: lib/obstack.c:338 lib/obstack.c:340 lib/xalloc-die.c:34
+#: lib/obstack.c:351 lib/obstack.c:353 lib/xalloc-die.c:34
 msgid "memory exhausted"
-msgstr "Memorie epuizat�"
+msgstr "memorie epuizată"
 
 #: lib/openat-die.c:38
 #, c-format
 msgid "unable to record current working directory"
-msgstr ""
+msgstr "nu s-a putut înregistra directorul de lucru curent"
 
 #: lib/openat-die.c:57
 #, c-format
 msgid "failed to return to initial working directory"
-msgstr ""
+msgstr "întoarcerea la directorul de lucru inițial a eșuat"
 
-#: lib/os2-spawn.c:46
+#: lib/os2-spawn.c:51
 #, c-format
 msgid "_open_osfhandle failed"
-msgstr ""
+msgstr "_open_osfhandle a eșuat"
 
-#: lib/os2-spawn.c:83
+#: lib/os2-spawn.c:88
 #, c-format
 msgid "cannot restore fd %d: dup2 failed"
-msgstr ""
+msgstr "nu se poate restaura fd %d: dup2 a eșuat"
 
 #. TRANSLATORS:
 #. Get translations for open and closing quotation marks.
@@ -145,264 +165,262 @@ msgstr ""
 #. If you don't know what to put here, please see
 #. <https://en.wikipedia.org/wiki/Quotation_marks_in_other_languages>
 #. and use glyphs suitable for your language.
-#: lib/quotearg.c:355
+#: lib/quotearg.c:357
 msgid "`"
-msgstr ""
+msgstr "„"
 
-#: lib/quotearg.c:356
+#: lib/quotearg.c:358
 msgid "'"
-msgstr ""
+msgstr "”"
 
-#: lib/regcomp.c:135
+#: lib/regcomp.c:122
 msgid "Success"
 msgstr "Succes"
 
-#: lib/regcomp.c:138
+#: lib/regcomp.c:125
 msgid "No match"
 msgstr "Nici o potrivire"
 
-#: lib/regcomp.c:141
+#: lib/regcomp.c:128
 msgid "Invalid regular expression"
-msgstr "Expresie regular� incorect�"
+msgstr "Expresie regulată nevalidă"
 
-#: lib/regcomp.c:144
+#: lib/regcomp.c:131
 msgid "Invalid collation character"
-msgstr "Colatare de caractere incorect�"
+msgstr "Caracter de colaționare nevalid"
 
-#: lib/regcomp.c:147
+#: lib/regcomp.c:134
 msgid "Invalid character class name"
-msgstr "Nume de clas� de caractere incorect"
+msgstr "Nume de clasă de caracter nevalid"
 
-#: lib/regcomp.c:150
+#: lib/regcomp.c:137
 msgid "Trailing backslash"
-msgstr "Backslash �n coad�"
+msgstr "Bară oblică inversă la sfârșit"
 
-#: lib/regcomp.c:153
+#: lib/regcomp.c:140
 msgid "Invalid back reference"
-msgstr "Referin�� �napoi incorect�"
+msgstr "Referință anterioară nevalidă"
 
-#: lib/regcomp.c:156
-#, fuzzy
+#: lib/regcomp.c:143
 msgid "Unmatched [, [^, [:, [., or [="
-msgstr "[ sau [^ f�r� pereche"
+msgstr "[, [^, [:, [., sau [= fără pereche"
 
-#: lib/regcomp.c:159
+#: lib/regcomp.c:146
 msgid "Unmatched ( or \\("
-msgstr "( sau \\( f�r� pereche"
+msgstr "( sau \\( fără pereche"
 
-#: lib/regcomp.c:162
+#: lib/regcomp.c:149
 msgid "Unmatched \\{"
-msgstr "\\{ f�r� pereche"
+msgstr "\\{ fără pereche"
 
-#: lib/regcomp.c:165
+#: lib/regcomp.c:152
 msgid "Invalid content of \\{\\}"
-msgstr "Con�inut incorect pentru \\{\\}"
+msgstr "Conținut nevalid al \\{\\}"
 
-#: lib/regcomp.c:168
+#: lib/regcomp.c:155
 msgid "Invalid range end"
-msgstr "Sf�r�it de interval incorect"
+msgstr "Sfârșit de interval nevalid"
 
-#: lib/regcomp.c:171
+#: lib/regcomp.c:158
 msgid "Memory exhausted"
-msgstr "Memorie epuizat�"
+msgstr "Memorie epuizată"
 
-#: lib/regcomp.c:174
+#: lib/regcomp.c:161
 msgid "Invalid preceding regular expression"
-msgstr "Expresie regular� precedent� incorect�"
+msgstr "Expresie regulată precedentă nevalidă"
 
-#: lib/regcomp.c:177
+#: lib/regcomp.c:164
 msgid "Premature end of regular expression"
-msgstr "Sf�r�it prematur al expresiei regulare"
+msgstr "Sfârșit prematur al expresiei regulate"
 
-#: lib/regcomp.c:180
+#: lib/regcomp.c:167
 msgid "Regular expression too big"
-msgstr "Expresie regular� prea mare"
+msgstr "Expresie regulată prea lungă"
 
-#: lib/regcomp.c:183
+#: lib/regcomp.c:170
 msgid "Unmatched ) or \\)"
-msgstr ") sau \\) f�r� pereche"
+msgstr ") sau \\) fără pereche"
 
-#: lib/regcomp.c:676
+#: lib/regcomp.c:650
 msgid "No previous regular expression"
-msgstr "Nici o expresie regular� anterioar�"
+msgstr "Nu există o expresie regulată anterioară"
 
+# R-GC, scrie:
+# - http://en.wikipedia.org/wiki/SIGHUP
+# aici, la sfîrșitul articolului, explicația/moti-
+# vația pentru traducerea aleasă.
 #: lib/siglist.h:31
 msgid "Hangup"
-msgstr ""
+msgstr "Deconectare/Terminare anormală(Hangup)"
 
 #: lib/siglist.h:34
 msgid "Interrupt"
-msgstr ""
+msgstr "Întrerupere"
 
 #: lib/siglist.h:37
 msgid "Quit"
-msgstr ""
+msgstr "Termină"
 
 #: lib/siglist.h:40
 msgid "Illegal instruction"
-msgstr ""
+msgstr "Instrucțiune ilegală"
 
 #: lib/siglist.h:43
 msgid "Trace/breakpoint trap"
-msgstr ""
+msgstr "Capturare punct de întrerupere/traseul(execuției)"
 
 #: lib/siglist.h:46
 msgid "Aborted"
-msgstr ""
+msgstr "Renuțare"
 
 #: lib/siglist.h:49
 msgid "Floating point exception"
-msgstr ""
+msgstr "Excepție de virgulă mobilă"
 
 #: lib/siglist.h:52
 msgid "Killed"
-msgstr ""
+msgstr "Omorât"
 
 #: lib/siglist.h:55
 msgid "Bus error"
-msgstr ""
+msgstr "Eroare de magistrală de date(bus)"
 
 #: lib/siglist.h:58
 msgid "Segmentation fault"
-msgstr ""
+msgstr "Eroare de segmentare"
 
 #: lib/siglist.h:61
 msgid "Broken pipe"
-msgstr ""
+msgstr "Conductă(pipe) întreruptă"
 
 #: lib/siglist.h:64
 msgid "Alarm clock"
-msgstr ""
+msgstr "Ceas cu alarmă"
 
 #: lib/siglist.h:67
 msgid "Terminated"
-msgstr ""
+msgstr "Terminat"
 
 #: lib/siglist.h:70
 msgid "Urgent I/O condition"
-msgstr ""
+msgstr "Condiție In/Ieș urgentă"
 
 #: lib/siglist.h:73
 msgid "Stopped (signal)"
-msgstr ""
+msgstr "Oprit (semnal)"
 
 #: lib/siglist.h:76
 msgid "Stopped"
-msgstr ""
+msgstr "Stopat"
 
 #: lib/siglist.h:79
 msgid "Continued"
-msgstr ""
+msgstr "Continuare"
 
 #: lib/siglist.h:82
 msgid "Child exited"
-msgstr ""
+msgstr "Procesul-copil a terminat"
 
 #: lib/siglist.h:85
 msgid "Stopped (tty input)"
-msgstr ""
+msgstr "Oprit (intrare tty)"
 
 #: lib/siglist.h:88
 msgid "Stopped (tty output)"
-msgstr ""
+msgstr "Oprit (ieșire tty)"
 
 #: lib/siglist.h:91
 msgid "I/O possible"
-msgstr ""
+msgstr "In/Ieș posibilă"
 
 #: lib/siglist.h:94
-#, fuzzy
 msgid "CPU time limit exceeded"
-msgstr "Limit� VMEM dep�it�?\n"
+msgstr "S-a depășit limita de timp CPU"
 
 #: lib/siglist.h:97
-#, fuzzy
 msgid "File size limit exceeded"
-msgstr "Limit� VMEM dep�it�?\n"
+msgstr "S-a depășit limita de dimensiune a fișierului"
 
 #: lib/siglist.h:100
 msgid "Virtual timer expired"
-msgstr ""
+msgstr "Cronometrul virtual a expirat"
 
 #: lib/siglist.h:103
 msgid "Profiling timer expired"
-msgstr ""
+msgstr "Cronometrul de creare a profilului a expirat"
 
 #: lib/siglist.h:106
 msgid "Window changed"
-msgstr ""
+msgstr "Fereastră schimbată"
 
+# R-GC, scrie:
+# la sugestia lui DȘ, am schimbat stilul de marcare de la „»«”, la „«»”.
+# Stilul folosit anterior, era pentru a diferenția
+# marcarea șirurilor de comenzi, eventual
+# acompaniate de opțiunile lor, de marcarea unor lucruri diferite de acestea.
 #: lib/siglist.h:109
-#, fuzzy
 msgid "User defined signal 1"
-msgstr "Nume nedefinit %s"
+msgstr "Semnalul «1» definit de utilizator"
 
 #: lib/siglist.h:112
-#, fuzzy
 msgid "User defined signal 2"
-msgstr "Nume nedefinit %s"
+msgstr "Semnalul «2» definit de utilizator"
 
 #: lib/siglist.h:117
 msgid "EMT trap"
-msgstr ""
+msgstr "Detectare EMT"
 
 #: lib/siglist.h:120
 msgid "Bad system call"
-msgstr ""
+msgstr "Apel de sistem greșit"
 
 #: lib/siglist.h:123
 msgid "Stack fault"
-msgstr ""
+msgstr "Eroare de stivă"
 
 #: lib/siglist.h:126
 msgid "Information request"
-msgstr ""
+msgstr "Cerere de informații"
 
 #: lib/siglist.h:128
 msgid "Power failure"
-msgstr ""
+msgstr "Pană de curent"
 
 #: lib/siglist.h:131
 msgid "Resource lost"
-msgstr ""
+msgstr "Resursă pierdută"
 
-#: lib/spawn-pipe.c:217 lib/spawn-pipe.c:220 lib/spawn-pipe.c:459
-#: lib/spawn-pipe.c:462
+#: lib/spawn-pipe.c:218 lib/spawn-pipe.c:221
 #, c-format
 msgid "cannot create pipe"
-msgstr ""
+msgstr "nu se poate crea conducta"
 
 #: lib/strsignal.c:114
 #, c-format
 msgid "Real-time signal %d"
-msgstr ""
+msgstr "Semnal în timp real %d"
 
 #: lib/strsignal.c:118
 #, c-format
 msgid "Unknown signal %d"
-msgstr ""
-
-#: lib/verror.c:76
-#, c-format
-msgid "unable to display error message"
-msgstr ""
+msgstr "Semnal necunoscut %d"
 
 #: lib/version-etc.c:73
 #, c-format
 msgid "Packaged by %s (%s)\n"
-msgstr ""
+msgstr "Împachetat de %s (%s)\n"
 
 #: lib/version-etc.c:76
 #, c-format
 msgid "Packaged by %s\n"
-msgstr ""
+msgstr "Împachetat de %s\n"
 
 #. TRANSLATORS: Translate "(C)" to the copyright symbol
 #. (C-in-a-circle), if this symbol is available in the user's
 #. locale.  Otherwise, do not translate "(C)"; leave it as-is.
 #: lib/version-etc.c:83
 msgid "(C)"
-msgstr ""
+msgstr "©"
 
 #. TRANSLATORS: The %s placeholder is the web address of the GPL license.
 #: lib/version-etc.c:88
@@ -412,24 +430,28 @@ msgid ""
 "This is free software: you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
+"Licența GPLv3+: GNU GPL versiunea 3 sau mai mare <%s>.\n"
+"Acesta este software liber: sunteți liber să îl modificați și să îl "
+"redistribuiți.\n"
+"NU există NICIO GARANȚIE, în măsura permisă de lege.\n"
 
 #. TRANSLATORS: %s denotes an author name.
 #: lib/version-etc.c:105
 #, c-format
 msgid "Written by %s.\n"
-msgstr ""
+msgstr "Scris de %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #: lib/version-etc.c:109
 #, c-format
 msgid "Written by %s and %s.\n"
-msgstr ""
+msgstr "Scris de %s și %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #: lib/version-etc.c:113
 #, c-format
 msgid "Written by %s, %s, and %s.\n"
-msgstr ""
+msgstr "Scris de %s, %s și %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -440,6 +462,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "and %s.\n"
 msgstr ""
+"Scris de %s, %s, %s,\n"
+"și %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -450,6 +474,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, and %s.\n"
 msgstr ""
+"Scris de %s, %s, %s,\n"
+"%s, și %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -460,6 +486,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, %s, and %s.\n"
 msgstr ""
+"Scris de %s, %s, %s,\n"
+"%s, %s, și %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -470,6 +498,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, %s, %s, and %s.\n"
 msgstr ""
+"Scris de %s, %s, %s,\n"
+"%s, %s, %s, și %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -481,6 +511,9 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "and %s.\n"
 msgstr ""
+"Scris de %s, %s, %s,\n"
+"%s, %s, %s, %s,\n"
+"și %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -492,6 +525,9 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "%s, and %s.\n"
 msgstr ""
+"Scris de %s, %s, %s,\n"
+"%s, %s, %s, %s,\n"
+"%s, și %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -503,375 +539,386 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "%s, %s, and others.\n"
 msgstr ""
+"Scris de %s, %s, %s,\n"
+"%s, %s, %s, %s,\n"
+"%s, %s, și alții.\n"
 
 #. TRANSLATORS: The placeholder indicates the bug-reporting address
 #. for this package.  Please add _another line_ saying
 #. "Report translation bugs to <...>\n" with the address for translation
 #. bugs (typically your translation team's web or email address).
-#: lib/version-etc.c:249
-#, fuzzy, c-format
+#: lib/version-etc.c:248
+#, c-format
 msgid "Report bugs to: %s\n"
-msgstr ""
-"\n"
-"Raporta�i bug-uri la <bug-m4@gnu.org>.\n"
+msgstr "Raportați erorile la: %s\n"
 
-#: lib/version-etc.c:251
+#: lib/version-etc.c:250
 #, c-format
 msgid "Report %s bugs to: %s\n"
-msgstr ""
+msgstr "Raportați erorile %s la: %s\n"
 
-#: lib/version-etc.c:255 lib/version-etc.c:257
+#: lib/version-etc.c:254 lib/version-etc.c:256
 #, c-format
 msgid "%s home page: <%s>\n"
-msgstr ""
+msgstr "Pagina oficială a %s: <%s>\n"
 
-#: lib/version-etc.c:260
+#: lib/version-etc.c:259
 #, c-format
 msgid "General help using GNU software: <%s>\n"
-msgstr ""
+msgstr "Ajutor general utilizând software GNU: <%s>\n"
 
-#: lib/wait-process.c:232 lib/wait-process.c:264 lib/wait-process.c:326
+#: lib/wait-process.c:266 lib/wait-process.c:298 lib/wait-process.c:357
 #, c-format
 msgid "%s subprocess"
-msgstr ""
+msgstr "subprocesul %s"
 
-#: lib/wait-process.c:283 lib/wait-process.c:355
+#: lib/wait-process.c:317 lib/wait-process.c:386
 #, c-format
 msgid "%s subprocess got fatal signal %d"
-msgstr ""
+msgstr "subprocesul %s a primit semnalul fatal %d"
 
-#: lib/xprintf.c:50 lib/xprintf.c:76
+#: lib/xprintf.c:47 lib/xprintf.c:68
 #, c-format
 msgid "cannot perform formatted output"
-msgstr ""
+msgstr "nu se poate afișa ieșirea formatată"
 
 #: src/builtin.c:264
-#, fuzzy, c-format
+#, c-format
 msgid "--warn-macro-sequence: bad regular expression `%s': %s"
-msgstr "Expresie regular� incorect� `%s': %s"
+msgstr "--warn-macro-sequence: expresie regulată greșită „%s”: %s"
 
-#: src/builtin.c:320
+#: src/builtin.c:298
+#, c-format
+msgid "truncating macro `%s' definition to INT_MAX bytes"
+msgstr "se trunchiază definiția macrocomenzii „%s” la INT_MAX octeți"
+
+#: src/builtin.c:333
 #, c-format
 msgid "Warning: definition of `%s' contains sequence `%s'"
-msgstr ""
+msgstr "Avertisment: definiția lui „%s” conține secvența „%s”"
 
-#: src/builtin.c:327
+#: src/builtin.c:340
 #, c-format
 msgid "error checking --warn-macro-sequence for macro `%s'"
 msgstr ""
+"eroare la verificarea cu --warn-macro-sequence pentru macrocomanda „%s”"
 
-#: src/builtin.c:388
-#, fuzzy, c-format
+#: src/builtin.c:401
+#, c-format
 msgid "Warning: too few arguments to builtin `%s'"
-msgstr "Avertisment: Prea pu�ine argumente pentru built-in `%s'"
+msgstr "Avertisment: prea puține argumente pentru funcția încorporată „%s”"
 
-#: src/builtin.c:394
-#, fuzzy, c-format
+#: src/builtin.c:407
+#, c-format
 msgid "Warning: excess arguments to builtin `%s' ignored"
-msgstr "Avertisment: Argumente �n exces pentru built-in `%s' ignorate"
+msgstr "Avertisment: exces de argumente pentru funcția încorporată „%s”"
 
-#: src/builtin.c:415 src/builtin.c:1114
+#: src/builtin.c:428 src/builtin.c:1155
 #, c-format
 msgid "empty string treated as 0 in builtin `%s'"
-msgstr ""
+msgstr "șir gol tratat ca 0 în funcția încorporată „%s”"
 
-#: src/builtin.c:425 src/builtin.c:1243
-#, fuzzy, c-format
+#: src/builtin.c:438 src/builtin.c:1285
+#, c-format
 msgid "non-numeric argument to builtin `%s'"
-msgstr "Argumen non-numeric pentru `%s'"
+msgstr "argument nenumeric în funcția încorporată „%s”"
 
-#: src/builtin.c:431
+#: src/builtin.c:444
 #, c-format
 msgid "leading whitespace ignored in builtin `%s'"
-msgstr ""
+msgstr "spații inițiale ignorate în funcția încorporată „%s”"
 
-#: src/builtin.c:435
-#, fuzzy, c-format
+#: src/builtin.c:448
+#, c-format
 msgid "numeric overflow detected in builtin `%s'"
-msgstr "Argumen non-numeric pentru `%s'"
+msgstr "s-a detectat depășire numerică în funcția încorporată „%s”"
 
-#: src/builtin.c:552 src/builtin.c:815 src/builtin.c:856
+#: src/builtin.c:566 src/builtin.c:829 src/builtin.c:870
 #, c-format
 msgid "Warning: %s: invalid macro name ignored"
-msgstr ""
+msgstr "Avertisment: %s: nume de macrocomandă nevalid ignorat"
 
-#: src/builtin.c:752 src/builtin.c:864
-#, fuzzy, c-format
+#: src/builtin.c:765 src/builtin.c:877
+#, c-format
 msgid "undefined macro `%s'"
-msgstr "Nume nedefinit `%s'"
+msgstr "macrocomandă nedefinită „%s”"
 
-#: src/builtin.c:823
-#, fuzzy, c-format
+#: src/builtin.c:836
+#, c-format
 msgid "undefined builtin `%s'"
-msgstr "Nume nedefinit `%s'"
+msgstr "funcția încorporată nedefinită „%s”"
 
-#: src/builtin.c:914 src/builtin.c:2208
+#: src/builtin.c:928 src/builtin.c:2260
 #, c-format
 msgid "builtin `%s' requested by frozen file is not supported"
 msgstr ""
+"funcția încorporată „%s” (solicitată de fișierul înghețat) nu este suportată"
 
-#: src/builtin.c:918
-#, fuzzy, c-format
+#: src/builtin.c:932
+#, c-format
 msgid "Warning: cannot concatenate builtin `%s'"
-msgstr "Avertisment: Prea pu�ine argumente pentru built-in `%s'"
+msgstr "Avertisment: prea puține argumente pentru funcția încorporată „%s”"
 
-#: src/builtin.c:978 src/builtin.c:1015 src/builtin.c:1028 src/builtin.c:1063
-#, fuzzy, c-format
+#: src/builtin.c:1003 src/builtin.c:1053 src/builtin.c:1066 src/builtin.c:1101
+#, c-format
 msgid "cannot run command `%s'"
-msgstr "Nu pot deschide pipe c�tre comanda `%s'"
+msgstr "nu se poate rula comanda „%s”"
 
-#: src/builtin.c:1051
+#: src/builtin.c:1089
 msgid "cannot read pipe"
-msgstr ""
+msgstr "nu se poate citi conducta"
 
-#: src/builtin.c:1098
+#: src/builtin.c:1140
 #, c-format
 msgid "radix %d in builtin `%s' out of range"
-msgstr ""
+msgstr "baza %d este în afara intervalului în funcția încorporată „%s”"
 
-#: src/builtin.c:1108
-#, fuzzy, c-format
+#: src/builtin.c:1149
+#, c-format
 msgid "negative width to builtin `%s'"
-msgstr "L��ime negativ� pentru eval"
+msgstr "lățime negativă pentru funcția încorporată „%s”"
 
-#: src/builtin.c:1252
-#, fuzzy, c-format
+#: src/builtin.c:1294
+#, c-format
 msgid "error undiverting `%s'"
-msgstr "Nu pot de-abate %s"
+msgstr "eroare la anularea deviației „%s”"
 
-#: src/builtin.c:1256
-#, fuzzy, c-format
+#: src/builtin.c:1298
+#, c-format
 msgid "cannot undivert `%s'"
-msgstr "Nu pot de-abate %s"
+msgstr "nu se poate anula deviația „%s”"
 
-#: src/builtin.c:1366 src/freeze.c:115 src/m4.c:379
-#, fuzzy, c-format
+#: src/builtin.c:1408 src/freeze.c:115 src/m4.c:382
+#, c-format
 msgid "cannot open `%s'"
-msgstr "Nu pot deschide %s"
+msgstr "nu se poate deschide „%s”"
 
-#: src/builtin.c:1429
-#, fuzzy, c-format
+#: src/builtin.c:1471
+#, c-format
 msgid "%s: cannot create tempfile `%s'"
-msgstr "EROARE: nu pot �nchide modulul: `%s'"
+msgstr "%s: nu se poate crea fișierul temporar „%s”"
 
-#: src/builtin.c:1464
+#: src/builtin.c:1507
 msgid "recommend using mkstemp instead"
-msgstr ""
+msgstr "se recomandă să utilizați în schimb «mkstemp»"
 
-#: src/builtin.c:1557
+#: src/builtin.c:1600
 #, c-format
 msgid "exit status out of range: `%d'"
-msgstr ""
+msgstr "starea de ieșire în afara intervalului: „%d”"
 
-#: src/builtin.c:1681
+#: src/builtin.c:1726
 #, c-format
 msgid "Debugmode: bad debug flags: `%s'"
-msgstr "Moddepanare: flag-uri depanare incorecte: `%s'"
+msgstr "Modul de depanare: opțiuni de depanare incorecte: „%s”"
 
-#: src/builtin.c:1722 src/m4.c:625 src/m4.c:689
-#, fuzzy, c-format
+#: src/builtin.c:1767 src/m4.c:633 src/m4.c:700
+#, c-format
 msgid "cannot set debug file `%s'"
-msgstr "Nu pot seta eroare fi�ier: %s"
+msgstr "nu se poate configura fișierul de depanare „%s”"
 
-#: src/builtin.c:1988
-#, fuzzy
+#: src/builtin.c:2034
 msgid "Warning: \\0 will disappear, use \\& instead in replacements"
-msgstr "AVERTISMENT: \\0 va dispare, folosi�i �n schimb \\& �n �nlocuiri"
+msgstr "Avertisment: „\\0” va dispărea, utilizați în schimb „\\&” în înlocuiri"
 
-#: src/builtin.c:2004
+#: src/builtin.c:2057
 #, c-format
 msgid "Warning: sub-expression %d not present"
-msgstr ""
+msgstr "Avertisment: sub-expresia %d nu este prezentă"
 
-#: src/builtin.c:2013
+#: src/builtin.c:2066
 msgid "Warning: trailing \\ ignored in replacement"
-msgstr ""
+msgstr "Avertisment: caracterul final „\\” este ignorat în înlocuire"
 
-#: src/builtin.c:2079
-#, fuzzy, c-format
+#: src/builtin.c:2132
+#, c-format
 msgid "bad regular expression: `%s': %s"
-msgstr "Expresie regular� incorect� `%s': %s"
+msgstr "expresie regulată greșită: „%s”: %s"
 
-#: src/builtin.c:2091 src/builtin.c:2161
-#, fuzzy, c-format
+#: src/builtin.c:2144 src/builtin.c:2214
+#, c-format
 msgid "error matching regular expression `%s'"
-msgstr "Eroare potrivire expresie regular� `%s'"
+msgstr "eroare la compararea expresiei regulate „%s”"
 
-#: src/builtin.c:2139 src/input.c:792
-#, fuzzy, c-format
+#: src/builtin.c:2192 src/input.c:795
+#, c-format
 msgid "bad regular expression `%s': %s"
-msgstr "Expresie regular� incorect� `%s': %s"
+msgstr "expresie regulată greșită: „%s”: %s"
 
 #: src/debug.c:136 src/debug.c:157
 msgid "error writing to debug stream"
-msgstr ""
+msgstr "eroare la scrierea în fluxul de depanare"
 
-#: src/eval.c:318
-#, fuzzy, c-format
-msgid "bad expression in eval (missing right parenthesis): %s"
-msgstr "Expresie incorect� �n eval (lipse�te paranteza din dreapta): %s"
-
-#: src/eval.c:324
-#, fuzzy, c-format
-msgid "bad expression in eval: %s"
-msgstr "Expresie incorect� �n eval: %s"
-
-#: src/eval.c:329
-#, fuzzy, c-format
-msgid "bad expression in eval (bad input): %s"
-msgstr "Expresie incorect� �n eval (intrare incorect�): %s"
-
-#: src/eval.c:334
-#, fuzzy, c-format
-msgid "bad expression in eval (excess input): %s"
-msgstr "Expresie incorect� �n eval (prea multe intr�ri): %s"
-
-#: src/eval.c:339
-#, fuzzy, c-format
-msgid "invalid operator in eval: %s"
-msgstr "�mp�r�ire cu zero �n eval: %s"
-
-#: src/eval.c:345
-#, fuzzy, c-format
-msgid "divide by zero in eval: %s"
-msgstr "�mp�r�ire cu zero �n eval: %s"
-
-#: src/eval.c:350
-#, fuzzy, c-format
-msgid "modulo by zero in eval: %s"
-msgstr "Modulo cu zero �n eval: %s"
-
-#: src/eval.c:355
-#, fuzzy, c-format
-msgid "negative exponent in eval: %s"
-msgstr "Expresie incorect� �n eval: %s"
-
-#: src/eval.c:538
+#: src/eval.c:485
 msgid "Warning: recommend ==, not =, for equality operator"
-msgstr ""
+msgstr "Atenție: se recomandă ==, nu =, pentru operatorul de egalitate"
 
-#: src/format.c:40 src/format.c:64 src/format.c:88
+#: src/eval.c:569
+#, c-format
+msgid "bad expression in eval (missing right parenthesis): %s"
+msgstr "expresie greșită în evaluarea (lipsește paranteza din dreapta): %s"
+
+#: src/eval.c:574
+#, c-format
+msgid "bad expression in eval: %s"
+msgstr "expresie greșită în evaluarea: %s"
+
+#: src/eval.c:579
+#, c-format
+msgid "bad expression in eval (bad input): %s"
+msgstr "expresie greșită în evaluarea (intrare greșită): %s"
+
+#: src/eval.c:584
+#, c-format
+msgid "bad expression in eval (excess input): %s"
+msgstr "expresie greșită în evaluarea (prea multe intrări): %s"
+
+#: src/eval.c:588
+#, fuzzy, c-format
+msgid "invalid number in eval: %s"
+msgstr "operator nevalid în evaluarea: %s"
+
+#: src/eval.c:592
+#, c-format
+msgid "invalid operator in eval: %s"
+msgstr "operator nevalid în evaluarea: %s"
+
+#: src/eval.c:597
+#, c-format
+msgid "divide by zero in eval: %s"
+msgstr "împărțire la zero în evaluarea: %s"
+
+#: src/eval.c:601
+#, c-format
+msgid "modulo by zero in eval: %s"
+msgstr "rest când se împarte la 0 în evaluarea: %s"
+
+#: src/eval.c:605
+#, c-format
+msgid "negative exponent in eval: %s"
+msgstr "exponent negativ în evaluarea: %s"
+
+#: src/format.c:39 src/format.c:63 src/format.c:87
 msgid "empty string treated as 0"
-msgstr ""
+msgstr "șir gol tratat ca 0"
 
-#: src/format.c:46 src/format.c:70 src/format.c:94
-#, fuzzy, c-format
+#: src/format.c:45 src/format.c:69 src/format.c:93
+#, c-format
 msgid "non-numeric argument %s"
-msgstr "Argument non-numeric pentru %s"
+msgstr "argument nenumeric %s"
 
-#: src/format.c:48 src/format.c:72 src/format.c:96
+#: src/format.c:47 src/format.c:71 src/format.c:95
 msgid "leading whitespace ignored"
-msgstr ""
+msgstr "spații inițiale ignorate"
 
-#: src/format.c:50 src/format.c:74 src/format.c:98
+#: src/format.c:49 src/format.c:73 src/format.c:97
 msgid "numeric overflow detected"
-msgstr ""
+msgstr "s-a detectat depășire numerică"
 
-#: src/format.c:308
-#, fuzzy, c-format
+#: src/format.c:309
+#, c-format
 msgid "Warning: unrecognized specifier in `%s'"
-msgstr "%s: op�iune nerecunoscut� `%c%s'\n"
+msgstr "Avertisment: specificator nerecunoscut în „%s”"
 
-#: src/freeze.c:156
+#: src/freeze.c:157
 msgid "unable to create frozen state"
-msgstr ""
+msgstr "nu se poate crea starea de înghețare"
 
-#: src/freeze.c:167
-#, fuzzy
+#: src/freeze.c:168
 msgid "expecting line feed in frozen file"
-msgstr "A�tept line feed �n fi�ier blocat"
+msgstr "se aștepta un avans de linie în fișierul înghețat"
 
-#: src/freeze.c:169
-#, fuzzy, c-format
+#: src/freeze.c:170
+#, c-format
 msgid "expecting character `%c' in frozen file"
-msgstr "A�tept caracter `%c' �n fi�ier blocat"
+msgstr "se aștepta caracterul „%c” în fișierul înghețat"
 
-#: src/freeze.c:215
-#, fuzzy
+#: src/freeze.c:216
 msgid "integer overflow in frozen file"
-msgstr "A�tept line feed �n fi�ier blocat"
+msgstr "depășire întreg în fișierul înghețat"
 
-#: src/freeze.c:257
-#, fuzzy
+#: src/freeze.c:258
 msgid "premature end of frozen file"
-msgstr "Sf�r�it prematur de fi�ier blocat"
+msgstr "sfârșit prematur al fișierului înghețat"
 
-#: src/freeze.c:270
-#, fuzzy, c-format
+#: src/freeze.c:271
+#, c-format
 msgid "cannot open %s"
-msgstr "Nu pot deschide %s"
+msgstr "nu se poate deschide %s"
 
-#: src/freeze.c:285
+#: src/freeze.c:286
 #, c-format
 msgid "frozen file version %d greater than max supported of 1"
 msgstr ""
+"versiunea fișierului înghețat %d este mai mare decât cea maximă acceptată de "
+"1"
 
-#: src/freeze.c:288
+#: src/freeze.c:289
 msgid "ill-formed frozen file, version directive expected"
 msgstr ""
+"fișier înghețat formatat necorespunzător, se aștepta directiva de versiune"
 
-#: src/freeze.c:297
-#, fuzzy
+#: src/freeze.c:298
 msgid "ill-formed frozen file"
-msgstr "Fi�ier blocat formatat incorect"
+msgstr "fișier înghețat formatat necorespunzător"
 
-#: src/freeze.c:385
+#: src/freeze.c:387
 msgid "unable to read frozen state"
-msgstr ""
+msgstr "nu se poate citi starea înghețată"
 
 #: src/input.c:359
 msgid "read error"
-msgstr ""
+msgstr "eroare de citire"
 
 #: src/input.c:366
 msgid "error reading file"
-msgstr ""
+msgstr "eroare la citirea fișierului"
 
-#: src/input.c:589
+#: src/input.c:590
 msgid "Warning: end of file treated as newline"
-msgstr ""
+msgstr "Avertisment: sfârșitul fișierului este tratat ca linie nouă"
 
-#: src/input.c:881
+#: src/input.c:899
 msgid "ERROR: end of file in comment"
-msgstr ""
+msgstr "EROARE: sfârșit de fișier în comentariu"
 
-#: src/input.c:1001
-#, fuzzy
+#: src/input.c:1023
 msgid "ERROR: end of file in string"
-msgstr "EROARE: EOF �n �ir"
+msgstr "EROARE: sfârșit de fișier în șir"
 
 #. TRANSLATORS: This is a non-ASCII name: The first name is (with
 #. Unicode escapes) "Ren\u00e9" or (with HTML entities) "Ren&eacute;".
 #. This is a proper name. See the gettext manual, section Names.
 #: src/m4.c:41
 msgid "Rene' Seindal"
-msgstr ""
+msgstr "René Seindal"
 
 #: src/m4.c:207
-#, fuzzy, c-format
+#, c-format
 msgid "Try `%s --help' for more information."
-msgstr "�ncerca�i `%s --help' pentru informa�ii suplimentare.\n"
+msgstr "Încercați «%s --help» pentru informații suplimentare."
 
 #: src/m4.c:213
 #, c-format
 msgid "Usage: %s [OPTION]... [FILE]...\n"
-msgstr "Folosire: %s [OP�IUNE]... FI�IER...\n"
+msgstr "Utilizare: %s [OPȚIUNE]... [FIȘIER]...\n"
 
 #: src/m4.c:214
-#, fuzzy
 msgid ""
 "Process macros in FILEs.  If no FILE or if FILE is `-', standard input\n"
 "is read.\n"
 msgstr ""
-"\n"
-"Dac� nici un FI�IER sau dac� FI�IER este `-', este citit� intrarea "
-"standard.\n"
+"Procesează macrocomenzi în FIȘIERe. Dacă nu există FIȘIER sau dacă\n"
+"FIȘIER este „-”, se citește intrarea standard.\n"
 
 #: src/m4.c:219
 msgid ""
 "Mandatory or optional arguments to long options are mandatory or optional\n"
 "for short options too.\n"
 msgstr ""
+"Argumentele obligatorii sau opționale pentru opțiunile lungi sunt de "
+"asemenea\n"
+"obligatorii sau opționale pentru opțiunile scurte corespunzătoare.\n"
 
 #: src/m4.c:224
 msgid ""
@@ -879,6 +926,9 @@ msgid ""
 "      --help                   display this help and exit\n"
 "      --version                output version information and exit\n"
 msgstr ""
+"Modul de lucru:\n"
+"      --help                   afișează acest ajutor și iese\n"
+"      --version                afișează informații despre versiune și iese\n"
 
 #: src/m4.c:229
 msgid ""
@@ -888,6 +938,18 @@ msgid ""
 "  -P, --prefix-builtins        force a `m4_' prefix to all builtins\n"
 "  -Q, --quiet, --silent        suppress some warnings for builtins\n"
 msgstr ""
+"  -E, --fatal-warnings         opțiune unică: avertismentele devin erori; "
+"opțiune\n"
+"                               dublă(--fatal-warnings --fatal-warnings) "
+"oprește\n"
+"                               la prima eroare\n"
+"  -i, --interactive            nu utilizează memoria tampon pentru ieșire, "
+"ignoră\n"
+"                               întreruperile\n"
+"  -P, --prefix-builtins        adăugă prefixul „m4_” tuturor funcțiilor "
+"încorporate\n"
+"  -Q, --quiet, --silent        suprimă unele avertismente ale funcțiilor "
+"încorporate\n"
 
 #: src/m4.c:236
 #, c-format
@@ -896,14 +958,19 @@ msgid ""
 "                               warn if macro definition matches REGEXP,\n"
 "                                 default %s\n"
 msgstr ""
+"      --warn-macro-sequence[=EXPREG]\n"
+"                               avertizează dacă definiția macrocomenzii se\n"
+"                               potrivește cu expresia regulată (implicit "
+"%s)\n"
 
 #: src/m4.c:242
 msgid "  -W, --word-regexp=REGEXP     use REGEXP for macro name syntax\n"
 msgstr ""
-"  -W, --word-regexp=REGEXP     folose�te REGEXP pentru sintax� nume macro\n"
+"  -W, --word-regexp=EXPREG     utilizează această expresie regulată pentru "
+"sintaxa\n"
+"                               numelui macrocomenzii\n"
 
 #: src/m4.c:247
-#, fuzzy
 msgid ""
 "Preprocessor features:\n"
 "  -D, --define=NAME[=VALUE]    define NAME as having VALUE, or empty\n"
@@ -911,44 +978,60 @@ msgid ""
 "  -s, --synclines              generate `#line NUM \"FILE\"' lines\n"
 "  -U, --undefine=NAME          undefine NAME\n"
 msgstr ""
-"\n"
-"Capabilit��i preprocesor:\n"
-"  -I, --include=DIRECTOR       caut� �i acest director pentru includeri\n"
-"  -D, --define=NUME[=VALOARE]  NUME definit ca av�nd VALOARE, sau gol\n"
-"  -U, --undefine=NUME          �terge builtin NUME\n"
-"  -s, --synclines              genereaz� `#linie NO \"FI�IER\"' linii\n"
+"Opțiuni preprocesor:\n"
+"  -D, --define=NUME[=VALOARE]  definește NUME(le) ca având VALOARE(a) sau "
+"gol\n"
+"  -I, --include=DIRECTOR       caută, de asemenea, fișierele încorporate în "
+"acest\n"
+"                               DIRECTOR\n"
+"  -s, --synclines              generează linii „#NR linie \"FIȘIER\"”\n"
+"  -U, --undefine=NUME          elimină funcția încorporată cu acest NUME\n"
 
 #: src/m4.c:255
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Limits control:\n"
 "  -g, --gnu                    override -G to re-enable GNU extensions\n"
 "  -G, --traditional            suppress all GNU extensions\n"
-"  -H, --hashsize=PRIME         set symbol lookup hash table size [509]\n"
+"  -H, --hashsize=PRIME         set symbol lookup hash table size [%d]\n"
 "  -L, --nesting-limit=NUMBER   change nesting limit, 0 for unlimited [%d]\n"
 msgstr ""
-"\n"
-"Control limite:\n"
-"  -G, --traditional           elimin� toate extensiile GNU\n"
-"  -H, --hashsize=PRIM         seteaz� dimensiunea tabel de c�utare "
+"Restricții:\n"
+"  -g, --gnu                    suprascrie -G pentru a reactiva extensiile "
+"GNU\n"
+"  -G, --traditional            elimină toate extensiile GNU\n"
+"  -H, --hashsize=NR_PRIM       stabilește dimensiunea tabelului pentru "
 "simboluri\n"
-"  -L, --nesting-limit=NUM�R   schimb� limita artificial� de �ncuibare\n"
+"                               [implicit NR_PRIM=%d]\n"
+"  -L, --nesting-limit=NUMĂR    modifică limita de adăugări la intrare, la "
+"acest\n"
+"                               NUMĂR de ori, 0 - limita este dezactivată "
+"[%d]\n"
 
+# R-GC, scrie:
+# traducerile făcute de Alexander Shopov
+# (echipa bulgară) și de Benno Schulenberg
+# (echipa olandeză) pentru acest mesaj, în
+# special, dar și celelalte făcute pentru
+# mesajele de opțiuni ale «m4», m-au ajutat
+# mult să „plăsmuiesc”, traducerile făcute
+# în română ale acestor mesaje.
+# Mulțumesc, băieți!
 #: src/m4.c:263
-#, fuzzy
 msgid ""
 "Frozen state files:\n"
 "  -F, --freeze-state=FILE      produce a frozen state on FILE at end\n"
 "  -R, --reload-state=FILE      reload a frozen state from FILE at start\n"
 msgstr ""
-"\n"
-"Fi�iere stare blocat�:\n"
-"  -F, --freeze-state=FI�IER  creaz� o stare blocat� �n FI�IER la sf�r�it\n"
-"  -R, --reload-state=FI�IER  re�ncarc� o stare blocat� din FI�IER la "
-"�nceput\n"
+"Fișiere de stare congelată:\n"
+"  -F, --freeze-state=FIȘIER    salvează starea actuală „o îngheață” în "
+"FIȘIER\n"
+"                               la sfârșitul lucrării\n"
+"  -R, --reload-state=FIȘIER    reîncarcă starea salvată „înghețată” din "
+"FIȘIER la\n"
+"                               începutul lucrării\n"
 
 #: src/m4.c:269
-#, fuzzy
 msgid ""
 "Debugging:\n"
 "  -d, --debug[=FLAGS]          set debug level (no FLAGS implies `aeq')\n"
@@ -957,13 +1040,18 @@ msgid ""
 "  -l, --arglength=NUM          restrict macro tracing size\n"
 "  -t, --trace=NAME             trace NAME when it is defined\n"
 msgstr ""
-"\n"
 "Depanare:\n"
-"  -d, --debug=[FLAGS]          seteaz� nivel depanare (nici un FLAG implic� "
-"`aeq')\n"
-"  -t, --trace=NUME             urm�re�te NUME c�nd va fi definit\n"
-"  -l, --arglength=NUM          restric�ioneaz� dimensiune macro urm�rire\n"
-"  -o, --error-output=FI�IER    redirecteaz� ie�ire depanare �i urm�rire\n"
+"  -d, --debug=[FANIOANE]       stabilește nivelul de depanare (nici un "
+"FANION im-\n"
+"                               plică „aeq”)\n"
+"      --debugfile[=FIȘIER]     redirecționează depanarea și urmărirea "
+"ieșirii către\n"
+"                               FIȘIER (implicită este ieșirea de eroare "
+"standard,\n"
+"                               ignorată cu un argument gol)\n"
+"  -l, --arglength=NUMĂR        restricționează dimensiunea macrocomenzii de "
+"urmărire\n"
+"  -t, --trace=NUME             urmărește NUME când acesta este definit\n"
 
 #: src/m4.c:278
 msgid ""
@@ -974,6 +1062,12 @@ msgid ""
 "  f   say current input file name\n"
 "  i   show changes in input files\n"
 msgstr ""
+"FANIOANE este oricare dintre:\n"
+"  a   afișează argumentele reale\n"
+"  c   arată înainte de colectare, după colectare și după apel\n"
+"  e   arată expansiunea\n"
+"  f   afișează numele fișierului de intrare curent\n"
+"  i   afișează modificările fișierelor de intrare\n"
 
 #: src/m4.c:286
 msgid ""
@@ -984,332 +1078,111 @@ msgid ""
 "  x   add a unique macro call id, useful with c flag\n"
 "  V   shorthand for all of the above flags\n"
 msgstr ""
+"  l   indică numărul curent al liniei de intrare\n"
+"  p   afișează rezultatele căutărilor de căi\n"
+"  q   citează valorile dacă este necesar (cu fanionul „a” sau „e”)\n"
+"  t   urmărește toate apelurile macro, nu doar cele cu „traceon”\n"
+"  x   afișează un id unic de macrocomandă (util cu fanionul „c”)\n"
+"  V   toate fanioanele de mai sus la un loc (V = a c e ... q t x)\n"
 
 #: src/m4.c:295
 msgid ""
 "If defined, the environment variable `M4PATH' is a colon-separated list\n"
 "of directories included after any specified by `-I'.\n"
 msgstr ""
+"Dacă este definită, variabila de mediu „M4PATH” este o listă de directoare\n"
+"(separate prin două puncte) care vor fi căutate după cele date la opțiunea „-"
+"I”.\n"
 
 #: src/m4.c:300
 msgid ""
 "Exit status is 0 for success, 1 for failure, 63 for frozen file version\n"
 "mismatch, or whatever value was passed to the m4exit macro.\n"
 msgstr ""
+"Starea de ieșire este 0 pentru succes, 1 pentru eșec, 63 pentru\n"
+"nepotrivirea versiunii fișierului înghețat sau orice valoare ce-a\n"
+"fost transmisă macrocomenzii m4exit.\n"
 
-#: src/m4.c:436
+#: src/m4.c:443
 #, c-format
 msgid "internal error detected; please report this bug to <%s>"
-msgstr ""
+msgstr "eroare internă detectată; raportați această eroare la <%s>"
 
-#: src/m4.c:489
+#: src/m4.c:497
 #, c-format
 msgid "warning: `m4 -%c' may be removed in a future release"
-msgstr ""
+msgstr "avertisment: «m4 -%c» poate să fie eliminată într-o versiune viitoare"
 
-#: src/m4.c:496
+#: src/m4.c:504
 #, c-format
 msgid "warning: `m4 %s' is deprecated"
-msgstr ""
+msgstr "avertisment: «m4 %s» este depreciat"
 
-#: src/m4.c:572
-#, fuzzy, c-format
+#: src/m4.c:580
+#, c-format
 msgid "bad debug flags: `%s'"
-msgstr "Flag-uri depanare incorecte: `%s'"
+msgstr "opțiuni de depanare greșite: „%s”"
 
-#: src/m4.c:578
+#: src/m4.c:586
 #, c-format
 msgid "warning: `m4 -e' is deprecated, use `-i' instead"
-msgstr ""
+msgstr "avertisment: «m4 -e» este depreciată, utilizați „-i” în schimb"
 
-#: src/m4.c:690
+#: src/m4.c:701
 msgid "stderr"
-msgstr ""
+msgstr "stderr(ieșirea standard de erori)"
 
-#: src/macro.c:196
+#: src/macro.c:178 src/macro.c:225
 #, fuzzy
-msgid "ERROR: end of file in argument list"
-msgstr "EROARE: EOF �n list� argumente"
+msgid "Warning: cannot concatenate builtin tokens"
+msgstr "Avertisment: prea puține argumente pentru funcția încorporată „%s”"
 
-#: src/macro.c:332
-#, fuzzy, c-format
+#: src/macro.c:205
+msgid "ERROR: end of file in argument list"
+msgstr "EROARE: sfârșitul fișierului în lista de argumente"
+
+#: src/macro.c:348
+#, c-format
 msgid "recursion limit of %d exceeded, use -L<N> to change it"
 msgstr ""
-"EROARE: Limita de %d chem�ri recursive dep�it�, folosi�i -L<N> pentru a o "
-"schimba"
+"limita recursiunii %d a fost depășită; utilizați -L<NUMĂR> pentru a o schimba"
 
-#: src/output.c:172 src/output.c:898 src/output.c:901
-#, fuzzy
+#: src/output.c:178 src/output.c:933 src/output.c:936
 msgid "cannot clean temporary file for diversion"
-msgstr "EROARE: Nu pot crea fi�ier temporar pentru diversiune"
+msgstr "nu se poate curăța fișierul temporar pentru deviere"
 
-#: src/output.c:222 src/output.c:231 src/output.c:265 src/output.c:360
-#, fuzzy
+#: src/output.c:230 src/output.c:239 src/output.c:273 src/output.c:370
 msgid "cannot create temporary file for diversion"
-msgstr "EROARE: Nu pot crea fi�ier temporar pentru diversiune"
+msgstr "nu se poate crea fișierul temporar pentru deviere"
 
-#: src/output.c:250 src/output.c:257 src/output.c:269
-#, fuzzy
+#: src/output.c:258 src/output.c:265 src/output.c:277
 msgid "cannot seek within diversion"
-msgstr "Nu pot afla statistici despre diversiune"
+msgstr "nu se poate face o „căutare” într-o deviere"
 
-#: src/output.c:341 src/output.c:353 src/output.c:502 src/output.c:733
-#, fuzzy
+#: src/output.c:350 src/output.c:363 src/output.c:512 src/output.c:768
 msgid "cannot close temporary file for diversion"
-msgstr "EROARE: Nu pot crea fi�ier temporar pentru diversiune"
+msgstr "nu se poate închide fișierul temporar pentru deviere"
 
-#: src/output.c:474
-#, fuzzy
+#: src/output.c:484
 msgid "ERROR: cannot flush diversion to temporary file"
-msgstr "EROARE: Nu pot flush diversiunea �n fi�ier temporar"
+msgstr "EROARE: nu se poate salva devierea în fișierul temporar"
 
-#: src/output.c:568
-#, fuzzy
+#: src/output.c:579
 msgid "ERROR: copying inserted file"
-msgstr "EROARE: Copiez fi�ier inserat"
+msgstr "Eroare la copierea fișierului introdus"
 
-#: src/output.c:816
-#, fuzzy
+#: src/output.c:851
 msgid "error reading inserted file"
-msgstr "EROARE: Citesc fi�ier inserat"
+msgstr "eroare la citirea fișierului introdus"
 
-#: src/output.c:983
-#, fuzzy
+#: src/output.c:1018
 msgid "cannot stat diversion"
-msgstr "Nu pot afla statistici despre diversiune"
+msgstr "nu se poate obține starea de deviere"
 
-#: src/output.c:987
-#, fuzzy
+#: src/output.c:1022
 msgid "diversion too large"
-msgstr "Diversiune prea mare"
+msgstr "devierea este prea mare"
 
 #, c-format
-#~ msgid "%s: option `--%s' doesn't allow an argument\n"
-#~ msgstr "%s: op�iunea `--%s' nu permite un argument\n"
-
-#, c-format
-#~ msgid "%s: unrecognized option `--%s'\n"
-#~ msgstr "%s: op�iune nerecunoscut� `--%s'\n"
-
-#, c-format
-#~ msgid "%s: illegal option -- %c\n"
-#~ msgstr "%s: op�iune ilegal� -- %c\n"
-
-#, c-format
-#~ msgid "%s: option `-W %s' is ambiguous\n"
-#~ msgstr "%s: op�iunea `-W %s' este ambigu�\n"
-
-#, c-format
-#~ msgid "%s: option `-W %s' doesn't allow an argument\n"
-#~ msgstr "%s: op�iunea `-W %s' nu permite un argument\n"
-
-#~ msgid "INTERNAL ERROR: Bad token data type in define_macro ()"
-#~ msgstr "EROARE INTERN�: Tip dat� token incorect �n define_macro ()"
-
-#~ msgid "INTERNAL ERROR: Builtin not found in builtin table!"
-#~ msgstr "EROARE INTERN�: Builtin nu a fost g�sit �n tabelul builtin!"
-
-#~ msgid "INTERNAL ERROR: Bad token data type in m4_dumpdef ()"
-#~ msgstr "EROARE INTERN�: Tip dat� token incorect �n m4_dumpdef ()"
-
-#~ msgid "INTERNAL ERROR: Bad symbol type in m4_defn ()"
-#~ msgstr "EROARE INTERN�: Tip simbol incorect �n m4_defn ()"
-
-#, c-format
-#~ msgid "Radix in eval out of range (radix = %d)"
-#~ msgstr "Radix (baz�, r�d�cin�) �n eval �n afara intervalului (radix = %d)"
-
-#, c-format
-#~ msgid "Undefined syntax code %c"
-#~ msgstr "Cod sintax� nedefinit %c"
-
-#~ msgid "INTERNAL ERROR: Builtin not found in builtin table! (trace_pre ())"
-#~ msgstr ""
-#~ "EROARE INTERN�: Builtin nu a fost g�sit �n tabelul builtin! (trace_pre ())"
-
-#~ msgid "INTERNAL ERROR: Bad token data type (trace_pre ())"
-#~ msgstr "EROARE INTERN�: Tip dat� token incorect (trace_pre ())"
-
-#~ msgid "INTERNAL ERROR: Bad error code in evaluate ()"
-#~ msgstr "EROARE INTERN�: Cod eroare incorect �n evaluate ()"
-
-#~ msgid "INTERNAL ERROR: Bad comparison operator in cmp_term ()"
-#~ msgstr "EROARE INTERN�: Operator compara�ie incorect �n cmp_term ()"
-
-#~ msgid "INTERNAL ERROR: Bad shift operator in shift_term ()"
-#~ msgstr "EROARE INTERN�: Operator shift incorect �n shift_term ()"
-
-#~ msgid "INTERNAL ERROR: Bad operator in mult_term ()"
-#~ msgstr "EROARE INTERN�: Operator incorect �n mult_term ()"
-
-#~ msgid "INTERNAL ERROR: Built-in not found in builtin table!"
-#~ msgstr "EROARE INTERN�: Built-in nu a fost g�sit �n tabelul builtin!"
-
-#~ msgid "INTERNAL ERROR: Bad token data type in freeze_one_symbol ()"
-#~ msgstr "EROARE INTERN�: Tip dat� token incorect �n freeze_one_symbol ()"
-
-#, c-format
-#~ msgid "`%s' from frozen file not found in builtin table!"
-#~ msgstr "`%s' din fi�ier blocat nu a fost g�sit �n tabelul builtin!"
-
-#, c-format
-#~ msgid "Input reverted to %s, line %d"
-#~ msgstr "Intrare reschimbat� ca %s, linia %d"
-
-#, c-format
-#~ msgid "Input read from %s"
-#~ msgstr "Intrare citit� de la %s"
-
-#~ msgid "INTERNAL ERROR: Recursive push_string!"
-#~ msgstr "EROARE INTERN�: push_string recursiv!"
-
-#~ msgid "INTERNAL ERROR: Bad call to init_macro_token ()"
-#~ msgstr "EROARE INTERN�: Apel incorect al func�iei init_macro_token ()"
-
-#~ msgid "INTERNAL ERROR: Input stack botch in next_char ()"
-#~ msgstr "EROARE INTERN�: Stiv� intrare resolit� �n next_char ()"
-
-#~ msgid "INTERNAL ERROR: Input stack botch in peek_input ()"
-#~ msgstr "EROARE INTERN�: Stiv� intrare rasolit� �n peek_input ()"
-
-#~ msgid "NONE"
-#~ msgstr "NIMIC"
-
-#~ msgid "ERROR: Stack overflow.  (Infinite define recursion?)"
-#~ msgstr "EROARE: Dep�ire de stiv�.  (definire recursiv� infinit�?)"
-
-#~ msgid ""
-#~ "Mandatory or optional arguments to long options are mandatory or "
-#~ "optional\n"
-#~ "for short options too.\n"
-#~ "\n"
-#~ "Operation modes:\n"
-#~ "      --help                   display this help and exit\n"
-#~ "      --version                output version information and exit\n"
-#~ "  -e, --interactive            unbuffer output, ignore interrupts\n"
-#~ "  -E, --fatal-warnings         stop execution after first warning\n"
-#~ "  -Q, --quiet, --silent        suppress some warnings for builtins\n"
-#~ "  -P, --prefix-builtins        force a `m4_' prefix to all builtins\n"
-#~ msgstr ""
-#~ "Argumentele obligatorii sau op�ionale pentru op�iunile lungi sunt "
-#~ "obligatorii sau op�ionale �i pentru op�iunile scurte.\n"
-#~ "\n"
-#~ "Moduri operare:\n"
-#~ "      --help                  afi�eaz� acest mesaj �i termin�\n"
-#~ "      --version               afi�eaz� informa�ie despre versiune �i "
-#~ "termin�\n"
-#~ "  -e, --interactive           ie�ire f�r� buffer, ignor� �ntreruperi\n"
-#~ "  -E, --fatal-warnings        opre�te execu�ia dup� primul avertisment\n"
-#~ "  -Q, --quiet, --silent       elimin� c�teva avertismente pentru "
-#~ "builtins\n"
-#~ "  -P, --prefix-builtins       for�eaz� un prefix `m4_' pentru toate "
-#~ "builtins\n"
-
-#~ msgid ""
-#~ "\n"
-#~ "Dynamic loading features:\n"
-#~ "  -m, --module-directory=DIRECTORY  add DIRECTORY to the module search "
-#~ "path\n"
-#~ "  -M, --load-module=MODULE          load dynamic MODULE from M4MODPATH\n"
-#~ msgstr ""
-#~ "\n"
-#~ "Capabilit��i �nc�rcare dinamic�:\n"
-#~ "  -m, --module-directory=DIRECTOR   adaug� DIRECTOR la calea de c�utare "
-#~ "module\n"
-#~ "  -M, --load-module=MODUL           �ncarc� dinamic MODUL din M4MODPATH\n"
-
-#~ msgid ""
-#~ "\n"
-#~ "FLAGS is any of:\n"
-#~ "  t   trace for all macro calls, not only traceon'ed\n"
-#~ "  a   show actual arguments\n"
-#~ "  e   show expansion\n"
-#~ "  q   quote values as necessary, with a or e flag\n"
-#~ "  c   show before collect, after collect and after call\n"
-#~ "  x   add a unique macro call id, useful with c flag\n"
-#~ "  f   say current input file name\n"
-#~ "  l   say current input line number\n"
-#~ "  p   show results of path searches\n"
-#~ "  i   show changes in input files\n"
-#~ "  V   shorthand for all of the above flags\n"
-#~ msgstr ""
-#~ "\n"
-#~ "FLAGS este oricare din:\n"
-#~ "  t   urm�re�te orice apel macro, nu numai cele activate ca urm�rite\n"
-#~ "  a   arat� argumentele curente\n"
-#~ "  e   arat� expansiune\n"
-#~ "  q   pune ghilimele pentru valori, unde necesar, cu un flag a sau e\n"
-#~ "  c   arat� �nainte de colectare, dup� colectare �i dup� apel\n"
-#~ "  x   adaug� un id de apel unic pentru macro, util cu flag-ul c\n"
-#~ "  f   afi�eaz� numele fi�ierului de intrare curent\n"
-#~ "  l   afi�eaz� num�rul liniei de intrare curente\n"
-#~ "  p   afi�eaz� rezultatele caut�rilor �n c�i (paths)\n"
-#~ "  i   afi�eaz� schimb�rile �n fi�ierele de intrare\n"
-#~ "  V   scurt�tur� pentru toate flag-urile de deasupra\n"
-
-#, c-format
-#~ msgid "ERROR: failed to add search directory `%s'"
-#~ msgstr "EROARE: nu am reu�it s� adaug director c�utare `%s'"
-
-#, c-format
-#~ msgid "ERROR: failed to add search directory `%s': %s"
-#~ msgstr "EROARE: nu am  reu�it s� adaug director c�utare `%s': %s"
-
-#~ msgid " (options:"
-#~ msgstr " (op�iuni:"
-
-#~ msgid "INTERNAL ERROR: Bad code in deferred arguments"
-#~ msgstr "EROARE INTERN�: Cod incorect �n argumente am�nate"
-
-#~ msgid "INTERNAL ERROR: Bad token type in expand_token ()"
-#~ msgstr "EROARE INTERN�: Tip token incorect �n expand_token ()"
-
-#~ msgid "INTERNAL ERROR: Bad token type in expand_argument ()"
-#~ msgstr "EROARE INTERN�: tip token incorect �n expand_argument ()"
-
-#~ msgid "INTERNAL ERROR: Bad symbol type in call_macro ()"
-#~ msgstr "EROARE INTERN�: tip simbol incorect �n call_macro ()"
-
-#, c-format
-#~ msgid "ERROR: failed to initialise modules: %s"
-#~ msgstr "EROARE: am e�uat s� ini�ializez modulele: %s"
-
-#, c-format
-#~ msgid "ERROR: cannot find module: `%s'"
-#~ msgstr "EROARE: nu pot g�si modulul: `%s'"
-
-#, c-format
-#~ msgid "ERROR: cannot find module: `%s': %s"
-#~ msgstr "EROARE: nu pot g�si modulul: `%s': %s"
-
-#~ msgid "ERROR: cannot close modules"
-#~ msgstr "EROARE: nu pot �nchide modulul"
-
-#, c-format
-#~ msgid "ERROR: cannot cannot close modules: %s"
-#~ msgstr "EROARE: nu pot �nchide modulul: %s"
-
-#, c-format
-#~ msgid "ERROR: cannot cannot close module: `%s': %s"
-#~ msgstr "EROARE: nu pot �nchide modulul: `%s': %s"
-
-#, c-format
-#~ msgid "Path search for `%s' found `%s'"
-#~ msgstr "Cale c�utare pentru `%s' a g�sit `%s'"
-
-#~ msgid ""
-#~ "Memory bounds violation detected (SIGSEGV).  Either a stack overflow\n"
-#~ "occurred, or there is a bug in "
-#~ msgstr ""
-#~ "Violare limit� memorie detectat� (SIGSEGV).  Fie a avut loc o dep�ire\n"
-#~ "de stiv�, fie exist� un bug �n "
-
-#~ msgid ".  Check for possible infinite recursion.\n"
-#~ msgstr ".  Verifica�i pentru o eventual� recursivitate infinit�.\n"
-
-#~ msgid "INTERNAL ERROR: Illegal mode to symbol_lookup ()"
-#~ msgstr "EROARE INTERN�: Mod ilegal pentru symbol_lookup ()"
-
-#, c-format
-#~ msgid "Name `%s' is unknown\n"
-#~ msgstr "Nume `%s' este necunoscut\n"
+#~ msgid "unable to display error message"
+#~ msgstr "imposibil de afișat mesajul de eroare"

@@ -1,9 +1,11 @@
-#serial 7
-
-# Copyright (C) 1998-1999, 2001, 2004, 2008-2021 Free Software Foundation, Inc.
-# This file is free software; the Free Software Foundation
-# gives unlimited permission to copy and/or distribute it,
-# with or without modifications, as long as this notice is preserved.
+# assert.m4
+# serial 8
+dnl Copyright (C) 1998-1999, 2001, 2004, 2008-2026 Free Software Foundation,
+dnl Inc.
+dnl This file is free software; the Free Software Foundation
+dnl gives unlimited permission to copy and/or distribute it,
+dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 dnl based on code from Eleftherios Gkioulekas
 dnl Autoconf 2.60 provides AC_HEADER_ASSERT for the same purpose, but
@@ -12,7 +14,7 @@ AC_DEFUN([gl_ASSERT],
 [
   AC_MSG_CHECKING([whether to enable assertions])
   AC_ARG_ENABLE([assert],
-    [AS_HELP_STRING([--disable-assert], [turn off assertions])],
+    [AS_HELP_STRING([[--disable-assert]], [turn off assertions])],
     [AS_IF([test "x$enableval" = xno],
       [AC_DEFINE([NDEBUG], [1],
         [Define to 1 if assertions should be disabled.])],

@@ -1,9 +1,9 @@
 /* Test of strerror_r() function.
-   Copyright (C) 2007-2021 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
+   the Free Software Foundation, either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -57,7 +57,7 @@ main (void)
   /* POSIX requires strerror (0) to succeed.  Reject use of "Unknown
      error", but allow "Success", "No error", or even Solaris' "Error
      0" which are distinct patterns from true out-of-range strings.
-     http://austingroupbugs.net/view.php?id=382  */
+     https://austingroupbugs.net/view.php?id=382  */
   errno = 0;
   buf[0] = '\0';
   ret = strerror_r (0, buf, sizeof buf);
@@ -84,25 +84,23 @@ main (void)
      EINVAL for out-of-range values.  On error, POSIX permits buf to
      be empty, unchanged, or unterminated, but these are not useful,
      so we guarantee NUL-terminated truncated contents for all but
-     size 0.  http://austingroupbugs.net/view.php?id=398.  Also ensure
+     size 0.  https://austingroupbugs.net/view.php?id=398.  Also ensure
      that no out-of-bounds writes occur.  */
   {
     int errs[] = { EACCES, 0, -3, };
-    int j;
 
     buf[sizeof buf - 1] = '\0';
-    for (j = 0; j < SIZEOF (errs); j++)
+    for (int j = 0; j < SIZEOF (errs); j++)
       {
         int err = errs[j];
         char buf2[sizeof buf] = "";
         size_t len;
-        size_t i;
 
         strerror_r (err, buf2, sizeof buf2);
         len = strlen (buf2);
         ASSERT (len < sizeof buf);
 
-        for (i = 0; i <= len; i++)
+        for (size_t i = 0; i <= len; i++)
           {
             memset (buf, '^', sizeof buf - 1);
             errno = 0;
@@ -174,5 +172,5 @@ main (void)
   }
 #endif
 
-  return 0;
+  return test_exit_status;
 }

@@ -1,4 +1,4 @@
-dnl @ ../doc/m4.texi:3641: Origin of test
+dnl @ ../doc/m4.texi:3622: Origin of test
 dnl @ expected status: 0
 dnl @ extra options: 
 dnl @ Copyright (C) 2006, 2007, 2008, 2009 Free Software
@@ -7,14 +7,25 @@ dnl @ This file is free software; the Free Software Foundation
 dnl @ gives unlimited permission to copy and/or distribute it
 dnl @ with or without modifications, as long as this notice
 dnl @ is preserved.
-include(`curry.m4')include(`stack.m4')
+define(`define_blind', `ifelse(`$#', `0', ``$0'',
+`_$0(`$1', `$2', `$'`#', `$'`0')')')
 dnl @result{}
-define(`reverse', `ifelse(`$#', `0', , `$#', `1', ``$1'',
-                          `reverse(shift($@)), `$1'')')
+define(`_define_blind', `define(`$1',
+`ifelse(`$3', `0', ``$4'', `$2')')')
 dnl @result{}
-pushdef(`a', `1')pushdef(`a', `2')pushdef(`a', `3')
+define_blind
+dnl @result{}define_blind
+define_blind(`foo', `arguments were $*')
 dnl @result{}
-stack_foreach(`a', `:curry(`reverse', `4')')
-dnl @result{}:1, 4:2, 4:3, 4
-curry(`curry', `reverse', `1')(`2')(`3')
-dnl @result{}3, 2, 1
+foo
+dnl @result{}foo
+foo(`bar')
+dnl @result{}arguments were bar
+define(`blah', defn(`foo'))
+dnl @result{}
+blah
+dnl @result{}blah
+blah(`a', `b')
+dnl @result{}arguments were a,b
+defn(`blah')
+dnl @result{}ifelse(`$#', `0', ``$0'', `arguments were $*')

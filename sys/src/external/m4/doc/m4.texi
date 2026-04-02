@@ -7,6 +7,7 @@
 @documentencoding UTF-8
 @set txicodequoteundirected
 @set txicodequotebacktick
+@set txidefnamenospace
 @setchapternewpage odd
 @finalout
 
@@ -16,6 +17,7 @@
 @c literal tabs in texinfo lead to formatting issues.
 @macro tabchar
 @	@c
+
 @end macro
 
 @c @ovar{ARG}
@@ -43,7 +45,7 @@ This manual (@value{UPDATED}) is for GNU M4 (version
 @value{VERSION}), a package containing an implementation of the m4 macro
 language.
 
-Copyright @copyright{} 1989--1994, 2004--2014, 2016--2017, 2020--2021
+Copyright @copyright{} 1989--1994, 2004--2014, 2016--2017, 2020--2026
 Free Software Foundation, Inc.
 
 @quotation
@@ -421,7 +423,7 @@ addressed some long standing bugs in the venerable 1.4 release.  Then in
 GNU @code{m4} 1.4 that were floating around the net and
 released 1.4.3 and 1.4.4.  And in 2006, Eric Blake joined the team and
 prepared patches for the release of 1.4.5, with subsequent releases
-through intervening years, as recent as 1.4.18 in 2016.
+through intervening years, as recent as 1.4.20 in 2025.
 
 Meanwhile, development has continued on new features for @code{m4}, such
 as dynamic module loading and additional builtins.  When complete,
@@ -2226,6 +2228,21 @@ f(`bye')
 @result{}f(bye)
 @end example
 
+@ignore
+@comment This example is not worth putting in the manual, but triggers a
+@comment memory corruption regression during tracing in 1.4.19.
+
+@example
+define(`a', `popdef(`a')1')pushdef(`a', `2$*')dnl
+debugmode(`t')a(popdef(`a')a)
+@error{}m4trace: -2- popdef
+@error{}m4trace: -2- a
+@error{}m4trace: -2- popdef
+@error{}m4trace: -1- a
+@result{}21
+@end example
+@end ignore
+
 It is not an error for @var{name} to have no macro definition.  In that
 case, @code{undefine} does nothing.
 
@@ -2250,9 +2267,10 @@ and it is a builtin, the
 expansion is a special token, which points to the builtin's internal
 definition.  This token is only meaningful as the second argument to
 @code{define} (and @code{pushdef}), and is silently converted to an
-empty string in most other contexts.  Combining a builtin with anything
-else is not supported; a warning is issued and the builtin is omitted
-from the final expansion.
+empty string in most other contexts.  When defining a macro, combining a
+builtin with anything else is not supported; a warning is issued and the
+builtin is omitted from the final definition (other implementations may
+do other unexpected things).
 
 The macro @code{defn} is recognized only with parameters.
 @end deffn
@@ -2362,6 +2380,10 @@ divnum
 @result{}0
 len(defn(`divnum'))
 @result{}0
+eval(`1'defn(`divnum')) eval(defn(`divnum')8)
+@result{}1 8
+ifelse(defn(`divnum'), defn(`define'), `indistinguishable')
+@result{}indistinguishable
 @end example
 
 Also note that @code{defn} with multiple arguments can only join text
@@ -2384,6 +2406,12 @@ define(`mydivnum', defn(`divnum', `divnum'))mydivnum
 @error{}m4trace: -2- defn(`divnum', `divnum')
 @error{}m4trace: -1- define(`mydivnum', `')
 @result{}
+define(`mydivnum+', defn(`divnum')`+'defn(`divnum'))mydivnum+
+@error{}m4trace: -2- defn(`divnum')
+@error{}m4trace: -2- defn(`divnum')
+@error{}m4:stdin:5: Warning: cannot concatenate builtin tokens
+@error{}m4trace: -1- define(`mydivnum+', `+')
+@result{}+
 traceoff(`defn', `define')
 @result{}
 @end example
@@ -3620,21 +3648,26 @@ defn(`blah')
 @cindex currying arguments
 @cindex argument currying
 Another interesting composition tactic is argument @dfn{currying}, or
-factoring a macro that takes multiple arguments for use in a context
-that provides exactly one argument.
+wrapping a macro that normally takes multiple arguments in a way that
+the initial arguments can be supplied early, and the remaining arguments
+are applied later in a context that normally expects a macro name that
+accepts fewer arguments (often just one).
 
 @deffn Composite curry (@var{macro}, @dots{})
-Expand to a macro call that takes exactly one argument, then appends
-that argument to the original arguments and invokes @var{macro} with the
+Accept a list of early arguments, then expand to an unspecified macro
+name that takes one or more late arguments, appends those extra
+arguments to the earlier, and finally invokes @var{macro} with the
 resulting list of arguments.
 @end deffn
 
 A demonstration of currying makes the intent of this macro a little more
 obvious.  The macro @code{stack_foreach} mentioned earlier is an example
 of a context that provides exactly one argument to a macro name.  But
-coupled with currying, we can invoke @code{reverse} with two arguments
-for each definition of a macro stack.  This example uses the file
-@file{m4-@value{VERSION}/@/examples/@/curry.m4} included in the
+coupled with currying, we can invoke @code{reverse} with two or more
+arguments for each definition of a macro stack (that is, we factor out
+the early argument @code{`4'} and couple it with a different late
+argument for each member of the stack @code{a}).  This example uses the
+file @file{m4-@value{VERSION}/@/examples/@/curry.m4} included in the
 distribution.
 
 @comment examples
@@ -3649,14 +3682,18 @@ pushdef(`a', `1')pushdef(`a', `2')pushdef(`a', `3')
 @result{}
 stack_foreach(`a', `:curry(`reverse', `4')')
 @result{}:1, 4:2, 4:3, 4
+stack_foreach(`a', `:curry(`reverse', `4', `5')')
+@result{}:1, 5, 4:2, 5, 4:3, 5, 4
 curry(`curry', `reverse', `1')(`2')(`3')
+@result{}3, 2, 1
+curry(`reverse', `1')(`2', `3')
 @result{}3, 2, 1
 @end example
 
 Now for the implementation.  Notice how @code{curry} leaves off with a
 macro name but no open parenthesis, while still in the middle of
 collecting arguments for @samp{$1}.  The macro @code{_curry} is the
-helper macro that takes one argument, then adds it to the list and
+helper macro that takes one or more late arguments, then adds to the list and
 finally supplies the closing parenthesis.  The use of a comma inside the
 @code{shift} call allows currying to also work for a macro that takes
 one argument, although it often makes more sense to invoke that macro
@@ -3667,11 +3704,27 @@ directly rather than going through @code{curry}.
 $ @kbd{m4 -I examples}
 undivert(`curry.m4')dnl
 @result{}divert(`-1')
-@result{}# curry(macro, args)
-@result{}# Expand to a macro call that takes one argument, then invoke
-@result{}# macro(args, extra).
-@result{}define(`curry', `$1(shift($@@,)_$0')
-@result{}define(`_curry', ``$1')')
+@result{}# curry(macro, args...)
+@result{}# Perform partial argument application on the given macro.  This
+@result{}# expands to an unspecified macro name that accepts one or more extra
+@result{}# arguments, and appends those to the args supplied to the original
+@result{}# curry call as the overall set of arguments to pass to macro.  That
+@result{}# is, curry(`macro', args1...)(args2...) is the same as invoking
+@result{}# macro(args1..., args2...).
+@result{}#
+@result{}# Most often, argument currying comes in handy when given a context
+@result{}# that normally takes a macro name to call with one argument, but
+@result{}# where you want to combine that variable argument with other fixed
+@result{}# arguments to forward to a macro that takes multiple arguments.  For
+@result{}# example, given a "foreach" macro that calls its first argument once
+@result{}# for each successive argument, "foreach(`curry(`mult', 3)', 1, 2, 3)"
+@result{}# would behave the same as "mult(3, 1), mult(3, 2), mult(3, 3)".
+@result{}#
+@result{}# It is also possible to create a named function curry.  For example:
+@result{}# define(`mult3', `curry(`mult', 3)($1)')
+@result{}# Later use of mult3(value) will compute the same as mult(3, value).
+@result{}define(`curry', `$1(shift($@@,)_curry')
+@result{}define(`_curry', `$@@)')
 @result{}divert`'dnl
 @end example
 
@@ -4309,6 +4362,44 @@ temporary quote characters have to be defined.  To achieve this, two
 calls of @code{changequote} must be made, one for the temporary quotes
 and one for the new quotes.
 
+The following is an example of how to use @code{changequote} to output
+what would normally be an unmatched quote string:
+
+@deffn Composite lquo (@var{ignored@dots{}})
+@deffnx Composite rquo (@var{ignored@dots{}})
+Output the normal left or right quote string.
+@end deffn
+
+@example
+define(`lquo', `ifelse(`$#', `0', ``$0'', `changequote(`[', `]')`dnl'
+changequote([`], ['])')')
+@result{}
+define(`rquo', `ifelse(`$#', `0', ``$0'', `changequote(`[', `]')dnl`
+'changequote([`], ['])')')
+@result{}
+Quotes in reverse: rquo:rquo() lquo:lquo()
+@result{}Quotes in reverse: rquo:' lquo:`
+define(`hi', `HELLO')dnl
+lquo()hi`'rquo()
+@result{}`HELLO'
+substr(`-hi-', 1, 2) substr(`-`hi'-', `1', `4')
+@result{}HELLO hi
+substr(`-'lquo()`hi'rquo()`-', `1', `4')
+@result{}hi
+substr(`-'lquo()hi`'rquo()`-', `1', `2')rquo()'
+@result{}Hrquo()
+@end example
+
+The example chose to require an ignored parameter so that @code{lquo} or
+@code{rquo} are not recognized without @code{()}; but the use of
+@code{ifelse} to make the macros blind is not strictly needed.  On the
+other hand, the use of @code{dnl} in the macro bodies was essential for
+proper quote nesting during the @code{define}.  Note that the output of
+these macros do not directly behave as quote strings; however, any
+context where expanded text is rescanned back in the normal choice of
+quote strings does not care if the quotes were supplied literally or via
+these macros.
+
 Macros are recognized in preference to the begin-quote string, so if a
 prefix of @var{start} can be recognized as part of a potential macro
 name, the quoting mechanism is effectively disabled.  Unless you use
@@ -4430,6 +4521,52 @@ changequote(`"', `"')
 @result{}
 "hi"hi"hi"
 @result{}hiHIhi
+@end example
+
+During macro expansion, instances of @code{$@@} in the macro's
+definition will use the quotation strings that are in effect at the end
+of argument collection, even if this is different than the quotation
+strings in effect when the macro was defined.  When combined with
+@code{translit} (@pxref{Translit}), this can be exploited for splitting
+a string containing multiple instances of a single-byte separator into a
+macro call on each token of the string with linear scaling (a naive loop
+that uses @code{index} to search for the first instance of the
+separator, followed by @code{substr} to process the rest of the input
+string, scales quadratically, since each iteration of the loop can only
+process one substring before re-processing an average of half of the
+overall input to get to the next substring, instead of getting at all
+substrings in a single pass).  However, note that this trick cannot
+prevent premature expansion of tokens within the string.
+
+@example
+define(`some', `several')
+@result{}
+define(`text', `long.string.with.some.separators')
+@result{}
+define(`display', ``<$1>'')
+@result{}
+display(text)
+@result{}<long.string.with.several.separators>
+display(defn(`text'))
+@result{}<long.string.with.some.separators>
+dnl quotes are still `' at the time requote is defined:
+define(`requote', `"[$@@]')
+@result{}
+define(`tokenized', requote(translit(defn(`text'), `.',
+changequote(`"[', `]')"[,])))
+@result{}
+dnl but quotes are "[] at the time $@@ in requote is computed
+changequote
+@result{}
+dnl quotes are back to `', yet the content of tokenized still has "[]
+dnl however, this form of tokenizing already expanded "some"
+tokenized
+@result{}"[long],"[string],"[with],"[several],"[separators]
+define(`a', ` display(`$1')')
+@result{}
+dnl now it is possible to call `a' on each token
+translit(defn(`tokenized'), `"[],', `a()')
+@result{} <long> <string> <with> <several> <separators>
 @end example
 
 @ignore
@@ -4685,8 +4822,45 @@ _indir(`esyscmd', `echo hi')
 Because @code{m4} constructs its words a character at a time, there
 is a restriction on the regular expressions that may be passed to
 @code{changeword}.  This is that if your regular expression accepts
-@samp{foo}, it must also accept @samp{f} and @samp{fo}.
+@samp{abc}, it must also accept @samp{a} and @samp{ab}.
 
+@example
+ifdef(`changeword', `', `errprint(` skipping: no changeword support
+')m4exit(`77')')dnl
+define(`abc
+', `bar
+')
+@result{}
+dnl This example wants to recognize changeword, dnl, and `abc\n'.
+dnl First, we check that our regexp will match.
+regexp(`changeword', `[cd][a-z]*\|abc[
+]')
+@result{}0
+regexp(`abc
+', `[cd][a-z]*\|abc[
+]')
+@result{}0
+regexp(`a', `[cd][a-z]*\|abc[
+]')
+@result{}-1
+abc
+@result{}abc
+changeword(`[cd][a-z]*\|abc[
+]')
+@result{}
+dnl Even though `abc\n' matches, we forgot to allow `ab'.
+abc
+@result{}abc
+changeword(`[cd][a-z]*\|ab?c?[
+]?')
+@result{}
+dnl Now we can call `abc\n'.
+abc
+@result{}bar
+@end example
+
+@ignore
+@comment Expose a core dump introduced in 1.4.11.
 @example
 ifdef(`changeword', `', `errprint(` skipping: no changeword support
 ')m4exit(`77')')dnl
@@ -4694,35 +4868,11 @@ define(`foo
 ', `bar
 ')
 @result{}
-dnl This example wants to recognize changeword, dnl, and `foo\n'.
-dnl First, we check that our regexp will match.
-regexp(`changeword', `[cd][a-z]*\|foo[
-]')
-@result{}0
-regexp(`foo
-', `[cd][a-z]*\|foo[
-]')
-@result{}0
-regexp(`f', `[cd][a-z]*\|foo[
-]')
-@result{}-1
-foo
-@result{}foo
 changeword(`[cd][a-z]*\|foo[
-]')
-@result{}
-dnl Even though `foo\n' matches, we forgot to allow `f'.
-foo
+]')foo
 @result{}foo
-changeword(`[cd][a-z]*\|fo*[
-]?')
-@result{}
-dnl Now we can call `foo\n'.
-foo
-@result{}bar
 @end example
 
-@ignore
 @comment One more test of including newline in a macro name; but this
 @comment does not need to be displayed in the manual.  This ensures
 @comment that line numbering is correct when dnl cuts across include
@@ -5693,8 +5843,14 @@ Searching for regular expressions is done with the builtin
 
 @deffn Builtin regexp (@var{string}, @var{regexp}, @ovar{replacement})
 Searches for @var{regexp} in @var{string}.  The syntax for regular
-expressions is the same as in GNU Emacs, which is similar to
-BRE, Basic Regular Expressions in POSIX.
+expressions is closest to older GNU Emacs (grouping via @samp{\(} and
+@samp{\)}, alternation via @samp{\|}, one-or-more matching via @samp{+},
+zero-or-one matching via @samp{?}), although for backwards compatibility
+reasons, M4 1.4.x does not enable intervals (that is, both @samp{@{} and
+@samp{\@{} match a literal @samp{@{}), nor character classes (that is,
+@samp{[[:alpha:]]} matches a sequence of one of six bytes followed by a
+literal close bracket, rather than all letters, the same as
+@samp{[[ahlp:]} followed by @samp{]}).
 @ifnothtml
 @xref{Regexps, , Syntax of Regular Expressions, emacs, The GNU Emacs
 Manual}.
@@ -5704,8 +5860,10 @@ See
 @uref{https://www.gnu.org/@/software/@/emacs/@/manual/@/emacs.html#Regexps,
 Syntax of Regular Expressions} in the GNU Emacs Manual.
 @end ifhtml
-Support for ERE, Extended Regular Expressions is not
-available, but will be added in GNU M4 2.0.
+Support for intervals, character classes, non-greedy matches, or even
+alternative regular expression syntax (such as POSIX Basic or Extended
+Regular Expressions) are likely to be added in a future version of GNU
+M4.
 
 If @var{replacement} is omitted, @code{regexp} expands to the index of
 the first match of @var{regexp} in @var{string}.  If @var{regexp} does
@@ -5919,7 +6077,7 @@ Global substitution in a string is done by @code{patsubst}:
 @deffn Builtin patsubst (@var{string}, @var{regexp}, @ovar{replacement})
 Searches @var{string} for matches of @var{regexp}, and substitutes
 @var{replacement} for each match.  The syntax for regular expressions
-is the same as in GNU Emacs (@pxref{Regexp}).
+is the same as in the @code{regexp} builtin (@pxref{Regexp}).
 
 The parts of @var{string} that are not covered by any match of
 @var{regexp} are copied to the expansion.  Whenever a match is found, the
@@ -6194,6 +6352,35 @@ decr()
 @result{}-1
 @end example
 
+It is possible to use @code{incr} to write a macro that produces a
+different value each time it is invoked:
+
+@deffn Composite counter (@ovar{seed})
+When invoked with one argument, reset the counter to @var{seed} (where
+an empty seed is silently treated like 0), without output.  Without
+arguments, output and increment the internal counter.
+@end deffn
+
+@example
+define(`_counter', `-1')dnl
+define(`counter', `ifelse(`$#', `0', `define(`_$0', incr(_$0))_$0`'',
+`define(`_$0', eval(`$1-1'))')')
+@result{}
+counter counter counter
+@result{}0 1 2
+counter(`42')
+@result{}
+counter counter
+@result{}42 43
+counter()counter
+@result{}0
+@end example
+
+It is worth noting how the implementation treats a default empty string
+as @code{0} - this is done by storing one less than @var{seed} into the
+internal counter @code{_counter}, by using @code{eval} in a way that
+works even when @code{$1} is blank.
+
 @node Eval
 @section Evaluating integer expressions
 
@@ -6268,6 +6455,9 @@ eval(`++0')
 eval(`0 |= 1')
 @error{}m4:stdin:3: invalid operator in eval: 0 |= 1
 @result{}
+eval(`(1 += 2)')
+@error{}m4:stdin:4: invalid operator in eval: (1 += 2)
+@result{}
 @end example
 
 Note that some older @code{m4} implementations use @samp{^} as an
@@ -6306,15 +6496,21 @@ eval(`(1 | 1) ^ 1')
 @result{}0
 eval(`+ + - ~ ! ~ 0')
 @result{}1
+eval(`1 / 0 + 1')
+@error{}m4:stdin:8: divide by zero in eval: 1 / 0 + 1
+@result{}
+eval(`1 / 0 || 1 / 0')
+@error{}m4:stdin:9: divide by zero in eval: 1 / 0 || 1 / 0
+@result{}
 eval(`2 || 1 / 0')
 @result{}1
 eval(`0 || 1 / 0')
-@error{}m4:stdin:9: divide by zero in eval: 0 || 1 / 0
+@error{}m4:stdin:11: divide by zero in eval: 0 || 1 / 0
 @result{}
-eval(`0 && 1 % 0')
+eval(`0 && (1 % 0)')
 @result{}0
-eval(`2 && 1 % 0')
-@error{}m4:stdin:11: modulo by zero in eval: 2 && 1 % 0
+eval(`2 && (1 % 0)')
+@error{}m4:stdin:13: modulo by zero in eval: 2 && (1 % 0)
 @result{}
 @end example
 
@@ -6340,6 +6536,22 @@ eval(`4 ** -2')
 @error{}m4:stdin:6: negative exponent in eval: 4 ** -2
 @result{}
 @end example
+
+@ignore
+@comment This test makes sure the algorithm is fast, but does not
+@comment need to be displayed as-is in the manual.
+
+@example
+eval(`3**2000000000')
+@result{}632360961
+define(`loop', `ifelse(`$1', `1000', `pass',
+`loop(eval($1+!!(3**2000000000)))')')loop(0)
+@result{}pass
+define(`check', `ifelse(`$1', `100', `pass', `$2', eval(-3**$1),
+`check(incr($1), eval(-3*$2))', `oops')')check(0, 1)
+@result{}pass
+@end example
+@end ignore
 
 Within @var{expression}, (but not @var{radix} or @var{width}), numbers
 without a special prefix are decimal.  A simple @samp{0} prefix
@@ -6379,10 +6591,19 @@ square(`9')
 @result{}81
 square(square(`5')` + 1')
 @result{}676
+eval(`1+')
+@error{}m4:stdin:10: bad expression in eval: 1+
+@result{}
+eval(`0x')
+@error{}m4:stdin:11: invalid number in eval: 0x
+@result{}
+eval(`01239')
+@error{}m4:stdin:12: invalid number in eval: 01239
+@result{}
 define(`foo', `666')
 @result{}
 eval(`foo / 6')
-@error{}m4:stdin:11: bad expression in eval: foo / 6
+@error{}m4:stdin:14: bad expression in eval (bad input): foo / 6
 @result{}
 eval(foo / 6)
 @result{}111
@@ -6756,7 +6977,8 @@ ifdef(`__unix__', ,
 ')m4exit(`77')')dnl
 changequote(`[', `]')
 @result{}
-syscmd([/bin/sh -c 'kill -9 $$'; st=$?; test $st = 137 || test $st = 265])
+syscmd([@{ /bin/sh -c 'kill -9 $$'; @} 2>/dev/null; st=$?;
+test $st = 137 || test $st = 265])
 @result{}
 ifelse(sysval, [0], , [errprint([ skipping: shell does not send signal 9
 ])m4exit([77])])dnl
@@ -7815,13 +8037,13 @@ forloop(`i', `a', `b', `non-numeric bounds')
 @end example
 
 One other change to notice is that the improved version used @samp{_$0}
-rather than @samp{_foreach} to invoke the helper routine.  In general,
+rather than @samp{_forloop} to invoke the helper routine.  In general,
 this is a good practice to follow, because then the set of macros can be
 uniformly transformed.  The following example shows a transformation
 that doubles the current quoting and appends a suffix @samp{2} to each
-transformed macro.  If @code{foreach} refers to the literal
-@samp{_foreach}, then @code{foreach2} invokes @code{_foreach} instead of
-the intended @code{_foreach2}, and the mixing of quoting paradigms leads
+transformed macro.  If @code{forloop} refers to the literal
+@samp{_forloop}, then @code{forloop2} invokes @code{_forloop} instead of
+the intended @code{_forloop2}, and the mixing of quoting paradigms leads
 to an infinite recursion loop in this example.
 
 @comment options: -L9
@@ -7866,7 +8088,7 @@ macros of overhead per iteration.  Notice how the file
 @file{m4-@value{VERSION}/@/examples/@/forloop3.m4} rearranges the
 arguments of the helper @code{_forloop} to take two arguments that are
 placed around the current value.  By splitting a balanced set of
-parantheses across multiple arguments, the helper macro can now be
+parentheses across multiple arguments, the helper macro can now be
 shared by @code{forloop} and the new @code{forloop_arg}.
 
 @comment examples
@@ -8182,7 +8404,7 @@ As a final demonstration, both list styles are now able to handle
 several scenarios that would wreak havoc on one or both of the original
 implementations.  This points out one other difference between the
 list styles.  @code{foreach} evaluates unquoted list elements only once,
-in preparation for calling @code{@w{_foreach}}, similary for
+in preparation for calling @code{@w{_foreach}}, similarly for
 @code{foreachq} as provided by @file{foreachq3.m4} or
 @file{foreachq4.m4}.  But
 @code{foreachq}, as provided by @file{foreachq2.m4},
@@ -8275,7 +8497,7 @@ foreachq(`x', ```active'', ``active''', `<x>
 @comment examples
 @comment options: -Dlimit=10 -Dverbose
 @example
-$ @kbd {m4 -I examples -Dlimit=10 -Dverbose}
+$ @kbd{m4 -I examples -Dlimit=10 -Dverbose}
 include(`loop.m4')dnl
 @result{} 1 2 3 4 5 6 7 8 9 10
 @end example
@@ -8285,7 +8507,7 @@ include(`loop.m4')dnl
 @comment examples
 @comment options: -Dlimit=10 -Dverbose -Dalt
 @example
-$ @kbd {m4 -I examples -Dlimit=10 -Dverbose -Dalt}
+$ @kbd{m4 -I examples -Dlimit=10 -Dverbose -Dalt}
 include(`loop.m4')dnl
 @result{} 1 2 3 4 5 6 7 8 9 10
 @end example
@@ -8295,7 +8517,7 @@ include(`loop.m4')dnl
 @comment examples
 @comment options: -Dlimit=10 -Dverbose -Dalt=4
 @example
-$ @kbd {m4 -I examples -Dlimit=10 -Dverbose -Dalt=4}
+$ @kbd{m4 -I examples -Dlimit=10 -Dverbose -Dalt=4}
 include(`loop.m4')dnl
 @result{} 1 2 3 4 5 6 7 8 9 10
 @end example
@@ -8303,14 +8525,14 @@ include(`loop.m4')dnl
 @comment examples
 @comment options: -Dlimit=2500 -Dalt=4
 @example
-$ @kbd {m4 -I examples -Dlimit=2500 -Dalt=4}
+$ @kbd{m4 -I examples -Dlimit=2500 -Dalt=4}
 include(`loop.m4')dnl
 @end example
 
 @comment examples
 @comment options: -Dlimit=10000 -Dalt=4
 @example
-$ @kbd {m4 -I examples -Dlimit=10000 -Dalt=4}
+$ @kbd{m4 -I examples -Dlimit=10000 -Dalt=4}
 define(`foo', `divert`'len(popdef(`_foreachq')_foreachq($@@))')dnl
 define(`debug', `pushdef(`_foreachq', defn(`foo'))')
 @result{}
@@ -8419,7 +8641,7 @@ undivert(`stack_sep.m4')dnl
 
 @comment examples
 @example
-$ @kbd {m4 -I examples}
+$ @kbd{m4 -I examples}
 include(`forloop3.m4')include(`stack_sep.m4')dnl
 forloop(`i', `1', `10000', `pushdef(`s', i)')
 @result{}

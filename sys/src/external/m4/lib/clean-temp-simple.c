@@ -1,18 +1,18 @@
 /* Temporary files with automatic cleanup.
-   Copyright (C) 2006-2021 Free Software Foundation, Inc.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2006.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -22,23 +22,23 @@
 #include "clean-temp-private.h"
 
 #include <errno.h>
-#include <limits.h>
 #include <signal.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 
-#include "error.h"
+#include <error.h>
 #include "fatal-signal.h"
 #include "asyncsafe-spin.h"
 #include "glthread/lock.h"
+#include "glthread/once.h"
 #include "thread-optim.h"
 #include "gl_list.h"
 #include "gl_linkedhash_list.h"
+#include "hashkey-string.h"
 #include "gettext.h"
 
-#define _(str) gettext (str)
+#define _(msgid) dgettext (GNULIB_TEXT_DOMAIN, msgid)
 
 
 /* Lock that protects the file_cleanup_list from concurrent modification in
@@ -106,33 +106,6 @@ gl_list_t /* <closeable_fd *> */ volatile descriptors;
         asynchronous signal.
  */
 
-/* String equality and hash code functions used by the lists.  */
-
-bool
-clean_temp_string_equals (const void *x1, const void *x2)
-{
-  const char *s1 = (const char *) x1;
-  const char *s2 = (const char *) x2;
-  return strcmp (s1, s2) == 0;
-}
-
-#define SIZE_BITS (sizeof (size_t) * CHAR_BIT)
-
-/* A hash function for NUL-terminated char* strings using
-   the method described by Bruno Haible.
-   See https://www.haible.de/bruno/hashfunc.html.  */
-size_t
-clean_temp_string_hash (const void *x)
-{
-  const char *s = (const char *) x;
-  size_t h = 0;
-
-  for (; *s; s++)
-    h = *s + ((h << 9) | (h >> (SIZE_BITS - 9)));
-
-  return h;
-}
-
 
 /* The set of fatal signal handlers.
    Cached here because we are not allowed to call get_fatal_signal_set ()
@@ -157,7 +130,7 @@ clean_temp_asyncsafe_close (struct closeable_fd *element)
   int ret;
   int saved_errno;
 
-  asyncsafe_spin_lock (&element->lock, fatal_signal_set, &saved_mask);
+  asyncsafe_spin_lock (&element->lock, true, fatal_signal_set, &saved_mask);
   if (!element->closed)
     {
       ret = close (element->fd);
@@ -169,7 +142,7 @@ clean_temp_asyncsafe_close (struct closeable_fd *element)
       ret = 0;
       saved_errno = 0;
     }
-  asyncsafe_spin_unlock (&element->lock, &saved_mask);
+  asyncsafe_spin_unlock (&element->lock, true, &saved_mask);
   element->done = true;
 
   errno = saved_errno;
@@ -184,20 +157,16 @@ clean_temp_init_asyncsafe_close (void)
 
 /* The signal handler.  It gets called asynchronously.  */
 static _GL_ASYNC_SAFE void
-cleanup_action (int sig _GL_UNUSED)
+cleanup_action (_GL_UNUSED int sig)
 {
-  size_t i;
-
   /* First close all file descriptors to temporary files.  */
   {
     gl_list_t fds = descriptors;
 
     if (fds != NULL)
       {
-        gl_list_iterator_t iter;
+        gl_list_iterator_t iter = gl_list_iterator (fds);
         const void *element;
-
-        iter = gl_list_iterator (fds);
         while (gl_list_iterator_next (&iter, &element, NULL))
           {
             clean_temp_asyncsafe_close ((struct closeable_fd *) element);
@@ -211,10 +180,8 @@ cleanup_action (int sig _GL_UNUSED)
 
     if (files != NULL)
       {
-        gl_list_iterator_t iter;
+        gl_list_iterator_t iter = gl_list_iterator (files);
         const void *element;
-
-        iter = gl_list_iterator (files);
         while (gl_list_iterator_next (&iter, &element, NULL))
           {
             const char *file = (const char *) element;
@@ -224,32 +191,34 @@ cleanup_action (int sig _GL_UNUSED)
       }
   }
 
-  for (i = 0; i < dir_cleanup_list.tempdir_count; i++)
+  for (size_t i = 0; i < dir_cleanup_list.tempdir_count; i++)
     {
       struct tempdir *dir = dir_cleanup_list.tempdir_list[i];
 
       if (dir != NULL)
         {
-          gl_list_iterator_t iter;
-          const void *element;
-
-          /* First cleanup the files in the subdirectories.  */
-          iter = gl_list_iterator (dir->files);
-          while (gl_list_iterator_next (&iter, &element, NULL))
-            {
-              const char *file = (const char *) element;
-              unlink (file);
-            }
-          gl_list_iterator_free (&iter);
-
-          /* Then cleanup the subdirectories.  */
-          iter = gl_list_iterator (dir->subdirs);
-          while (gl_list_iterator_next (&iter, &element, NULL))
-            {
-              const char *subdir = (const char *) element;
-              rmdir (subdir);
-            }
-          gl_list_iterator_free (&iter);
+          {
+            /* First cleanup the files in the subdirectories.  */
+            gl_list_iterator_t iter = gl_list_iterator (dir->files);
+            const void *element;
+            while (gl_list_iterator_next (&iter, &element, NULL))
+              {
+                const char *file = (const char *) element;
+                unlink (file);
+              }
+            gl_list_iterator_free (&iter);
+          }
+          {
+            /* Then cleanup the subdirectories.  */
+            gl_list_iterator_t iter = gl_list_iterator (dir->subdirs);
+            const void *element;
+            while (gl_list_iterator_next (&iter, &element, NULL))
+              {
+                const char *subdir = (const char *) element;
+                rmdir (subdir);
+              }
+            gl_list_iterator_free (&iter);
+          }
 
           /* Then cleanup the temporary directory itself.  */
           rmdir (dir->dirname);
@@ -326,8 +295,8 @@ register_temporary_file (const char *absolute_file_name)
         }
       file_cleanup_list =
         gl_list_nx_create_empty (GL_LINKEDHASH_LIST,
-                                 clean_temp_string_equals,
-                                 clean_temp_string_hash,
+                                 hashkey_string_equals,
+                                 hashkey_string_hash,
                                  NULL, false);
       if (file_cleanup_list == NULL)
         {
@@ -392,9 +361,7 @@ unregister_temporary_file (const char *absolute_file_name)
 int
 cleanup_temporary_file (const char *absolute_file_name, bool cleanup_verbose)
 {
-  int err;
-
-  err = clean_temp_unlink (absolute_file_name, cleanup_verbose);
+  int err = clean_temp_unlink (absolute_file_name, cleanup_verbose);
   unregister_temporary_file (absolute_file_name);
 
   return err;

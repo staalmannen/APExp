@@ -1,9 +1,9 @@
 /* Test of rename() function.
-   Copyright (C) 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -499,11 +499,16 @@ test_rename (int (*func) (char const *, char const *), bool print)
     if (ret == -1)
       {
         /* If the device does not support hard links, errno is
-           EPERM on Linux, EOPNOTSUPP on FreeBSD.  */
+           EPERM on Linux,
+           EOPNOTSUPP on FreeBSD,
+           EACCES on Android within Termux.  */
         switch (errno)
           {
           case EPERM:
           case EOPNOTSUPP:
+          #if defined __ANDROID__
+          case EACCES:
+          #endif
             if (print)
               fputs ("skipping test: "
                      "hard links not supported on this file system\n",

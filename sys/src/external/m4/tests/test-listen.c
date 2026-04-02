@@ -1,9 +1,9 @@
 /* Test listen() function.
-   Copyright (C) 2011-2021 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -27,6 +27,11 @@ SIGNATURE_CHECK (listen, int, (int, int));
 #include "sockets.h"
 #include "macros.h"
 
+/* Tell GCC not to warn about the specific edge cases tested here.  */
+#if _GL_GNUC_PREREQ (13, 0)
+# pragma GCC diagnostic ignored "-Wanalyzer-fd-use-without-check"
+#endif
+
 int
 main (void)
 {
@@ -45,5 +50,5 @@ main (void)
     ASSERT (errno == EBADF);
   }
 
-  return 0;
+  return test_exit_status;
 }

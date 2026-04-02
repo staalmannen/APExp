@@ -1,6 +1,6 @@
 /* GNU m4 -- A simple macro processor
 
-   Copyright (C) 1989-1994, 2006-2007, 2009-2014, 2016-2017, 2020-2021
+   Copyright (C) 1989-1994, 2006-2007, 2009-2014, 2016-2017, 2020-2026
    Free Software Foundation, Inc.
 
    This file is part of GNU M4.
@@ -28,53 +28,65 @@
 
 /* Evaluates token types.  */
 
+#define MIN_PREC 1
+
 typedef enum eval_token
-  {
-    ERROR, BADOP,
-    PLUS, MINUS,
-    EXPONENT,
-    TIMES, DIVIDE, MODULO,
-    ASSIGN, EQ, NOTEQ, GT, GTEQ, LS, LSEQ,
-    LSHIFT, RSHIFT,
-    LNOT, LAND, LOR,
-    NOT, AND, OR, XOR,
-    LEFTP, RIGHTP,
-    NUMBER, EOTEXT
-  }
+{
+  /* Value / 10 is precedence order, if >= MIN_PREC.  */
+  ERROR = 0,
+  BADNUM,
+  BADOP,
+  EOTEXT,
+  LEFTP,
+  RIGHTP,
+  LNOT,
+  NOT,
+  NUMBER,
+  LOR = 10,
+  LAND = 20,
+  OR = 30,
+  XOR = 40,
+  AND = 50,
+  ASSIGN = 60,                  /* deprecated synonym to EQ */
+  EQ,
+  NOTEQ,
+  GT = 70,
+  GTEQ,
+  LS,
+  LSEQ,
+  LSHIFT = 80,
+  RSHIFT,
+  PLUS = 90,                    /* precedence for binary op; also serves as a unary op */
+  MINUS,                        /* precedence for binary op; also serves as a unary op */
+  TIMES = 100,
+  DIVIDE,
+  MODULO,
+  EXPONENT = 110
+}
 eval_token;
 
 /* Error types.  */
 
 typedef enum eval_error
-  {
-    NO_ERROR,
-    DIVIDE_ZERO,
-    MODULO_ZERO,
-    NEGATIVE_EXPONENT,
-    /* All errors prior to SYNTAX_ERROR can be ignored in a dead
-       branch of && and ||.  All errors after are just more details
-       about a syntax error.  */
-    SYNTAX_ERROR,
-    MISSING_RIGHT,
-    UNKNOWN_INPUT,
-    EXCESS_INPUT,
-    INVALID_OPERATOR
-  }
+{
+  NO_ERROR,
+  DIVIDE_ZERO,
+  MODULO_ZERO,
+  NEGATIVE_EXPONENT,
+  /* All errors prior to SYNTAX_ERROR can be ignored in a dead
+     branch of && and ||.  All errors after are just more details
+     about a syntax error.  */
+  SYNTAX_ERROR,
+  MISSING_RIGHT,
+  UNKNOWN_INPUT,
+  EXCESS_INPUT,
+  INVALID_NUMBER,
+  INVALID_OPERATOR
+}
 eval_error;
 
-static eval_error logical_or_term (eval_token, int32_t *);
-static eval_error logical_and_term (eval_token, int32_t *);
-static eval_error or_term (eval_token, int32_t *);
-static eval_error xor_term (eval_token, int32_t *);
-static eval_error and_term (eval_token, int32_t *);
-static eval_error equality_term (eval_token, int32_t *);
-static eval_error cmp_term (eval_token, int32_t *);
-static eval_error shift_term (eval_token, int32_t *);
-static eval_error add_term (eval_token, int32_t *);
-static eval_error mult_term (eval_token, int32_t *);
-static eval_error exp_term (eval_token, int32_t *);
-static eval_error unary_term (eval_token, int32_t *);
-static eval_error simple_term (eval_token, int32_t *);
+static eval_error primary (int32_t *);
+static eval_error parse_expr (int32_t *, eval_error, unsigned);
 
 /*--------------------.
 | Lexical functions.  |
@@ -84,7 +96,7 @@ static eval_error simple_term (eval_token, int32_t *);
 static const char *eval_text;
 
 /* Value of eval_text, from before last call of eval_lex ().  This is so we
-   can back up, if we have read too much.  */
+   can back up, if we have read too much, good for one token lookahead.  */
 static const char *last_text;
 
 static void
@@ -120,6 +132,7 @@ eval_lex (int32_t *val)
          Therefore use an unsigned integer type to avoid undefined behaviour
          when parsing '-2147483648'.  */
       uint32_t value;
+      bool seen_digit = false;
 
       if (*eval_text == '0')
         {
@@ -145,19 +158,20 @@ eval_lex (int32_t *val)
               while (c_isdigit (*eval_text) && base <= 36)
                 base = 10 * base + *eval_text++ - '0';
               if (base == 0 || base > 36 || *eval_text != ':')
-                return ERROR;
+                return BADNUM;
               eval_text++;
               break;
 
             default:
               base = 8;
+              seen_digit = true;
             }
         }
       else
         base = 10;
 
       value = 0;
-      for (; *eval_text; eval_text++)
+      for (; *eval_text; eval_text++, seen_digit = true)
         {
           if (c_isdigit (*eval_text))
             digit = *eval_text - '0';
@@ -175,14 +189,16 @@ eval_lex (int32_t *val)
               else if (digit == 0 && value == 0)
                 continue;
               else
-                break;
+                return BADNUM;
             }
           else if (digit >= base)
-            break;
+            return BADNUM;
           else
             value = value * base + digit;
         }
       *val = value;
+      if (!seen_digit)
+        return BADNUM;
       return NUMBER;
     }
 
@@ -286,6 +302,235 @@ eval_lex (int32_t *val)
     }
 }
 
+/*-----------------------------------------------------.
+| Operator precedence parser (based on Pratt parser).  |
+`-----------------------------------------------------*/
+
+/* Parse `(expr)', unary operators, and numbers.  */
+static eval_error
+primary (int32_t *v1)
+{
+  eval_error er;
+  int32_t v2;
+
+  switch (eval_lex (v1))
+    {
+      /* Number */
+    case NUMBER:
+      return NO_ERROR;
+
+      /* Parenthesis */
+    case LEFTP:
+      er = primary (v1);
+      er = parse_expr (v1, er, MIN_PREC);
+      if (er >= SYNTAX_ERROR)
+        return er;
+      switch (eval_lex (&v2))
+        {
+        case ERROR:
+          return UNKNOWN_INPUT;
+        case BADNUM:
+          return INVALID_NUMBER;
+        case BADOP:
+          return INVALID_OPERATOR;
+        case RIGHTP:
+          return er;
+        default:
+          return MISSING_RIGHT;
+        }
+
+      /* Unary operators */
+      /* Minimize undefined C behavior on overflow.  This code assumes
+         that the implementation-defined overflow when casting
+         unsigned to signed is a silent twos-complement
+         wrap-around.  */
+    case PLUS:
+      return primary (v1);
+    case MINUS:
+      er = primary (v1);
+      *v1 = (int32_t) -(uint32_t) *v1;
+      return er;
+    case NOT:
+      er = primary (v1);
+      *v1 = ~*v1;
+      return er;
+    case LNOT:
+      er = primary (v1);
+      *v1 = *v1 == 0 ? 1 : 0;
+      return er;
+
+      /* Anything else */
+    case ERROR:
+      return UNKNOWN_INPUT;
+    case BADNUM:
+      return INVALID_NUMBER;
+    case BADOP:
+      return INVALID_OPERATOR;
+    default:
+      return SYNTAX_ERROR;
+    }
+}
+
+/* Parse binary operators with at least MIN_PREC precedence.  */
+static eval_error
+parse_expr (int32_t *v1, eval_error er, unsigned min_prec)
+{
+  eval_token et;
+  eval_token et2;
+  eval_error er2;
+  int32_t v2;
+  int32_t v3;
+  uint32_t u1;
+  uint32_t u2;
+  uint32_t u3;
+
+  if (er >= SYNTAX_ERROR)
+    return er;
+  et = eval_lex (&v2);
+  while (et / 10 >= min_prec)
+    {
+      if ((er2 = primary (&v2)) >= SYNTAX_ERROR)
+        return er2;
+      et2 = eval_lex (&v3);
+      /* Handle binary operators of higher precedence or right-associativity */
+      while (et2 / 10 > et / 10 || et2 == EXPONENT)
+        {
+          eval_undo ();
+          if ((er2 = parse_expr (&v2, er2, et2 / 10)) >= SYNTAX_ERROR)
+            return er2;
+          et2 = eval_lex (&v3);
+        }
+      /* Reduce the two values by the given binary operator */
+      switch (et)
+        {
+        case EXPONENT:
+          /* Minimize undefined C behavior on overflow.  This code assumes
+             that the implementation-defined overflow when casting
+             unsigned to signed is a silent twos-complement
+             wrap-around.  */
+          if (v2 < 0)
+            er = NEGATIVE_EXPONENT;
+          else if (*v1 == 0 && v2 == 0)
+            er = DIVIDE_ZERO;
+          else
+            {
+              u1 = *v1;
+              u2 = v2;
+              u3 = 1;
+              while (u2)
+                {
+                  if (u2 & 1)
+                    u3 *= u1;
+                  u1 *= u1;
+                  u2 >>= 1;
+                }
+              *v1 = u3;
+            }
+          break;
+
+        case TIMES:
+          *v1 = (int32_t) ((uint32_t) *v1 * (uint32_t) v2);
+          break;
+        case DIVIDE:
+          if (v2 == 0)
+            er = DIVIDE_ZERO;
+          else if (v2 == -1)
+            /* Avoid overflow, and the x86 SIGFPE on INT_MIN / -1.  */
+            *v1 = (int32_t) -(uint32_t) *v1;
+          else
+            *v1 /= v2;
+          break;
+        case MODULO:
+          if (v2 == 0)
+            er = MODULO_ZERO;
+          else if (v2 == -1)
+            /* Avoid the x86 SIGFPE on INT_MIN % -1.  */
+            *v1 = 0;
+          else
+            *v1 %= v2;
+          break;
+
+        case PLUS:
+          *v1 = (int32_t) ((uint32_t) *v1 + (uint32_t) v2);
+          break;
+        case MINUS:
+          *v1 = (int32_t) ((uint32_t) *v1 - (uint32_t) v2);
+          break;
+
+        case LSHIFT:
+          u1 = *v1;
+          u1 <<= (uint32_t) (v2 & 0x1f);
+          *v1 = u1;
+          break;
+        case RSHIFT:
+          u1 = *v1 < 0 ? ~*v1 : *v1;
+          u1 >>= (uint32_t) (v2 & 0x1f);
+          *v1 = *v1 < 0 ? ~u1 : u1;
+          break;
+
+        case GT:
+          *v1 = *v1 > v2;
+          break;
+        case GTEQ:
+          *v1 = *v1 >= v2;
+          break;
+        case LS:
+          *v1 = *v1 < v2;
+          break;
+        case LSEQ:
+          *v1 = *v1 <= v2;
+          break;
+
+        case ASSIGN:
+          M4ERROR ((warning_status, 0, _("\
+Warning: recommend ==, not =, for equality operator")));
+          FALLTHROUGH;
+        case EQ:
+          *v1 = *v1 == v2;
+          break;
+        case NOTEQ:
+          *v1 = *v1 != v2;
+          break;
+
+        case AND:
+          *v1 &= v2;
+          break;
+
+        case XOR:
+          *v1 ^= v2;
+          break;
+
+        case OR:
+          *v1 |= v2;
+          break;
+
+          /* Implement short-circuiting of valid syntax.  */
+        case LAND:
+          if (!*v1)
+            er2 = NO_ERROR;
+          *v1 = *v1 && v2;
+          break;
+
+        case LOR:
+          if (*v1)
+            er2 = NO_ERROR;
+          *v1 = *v1 || v2;
+          break;
+
+        default:
+          M4ERROR ((warning_status, 0,
+                    "INTERNAL ERROR: unexpected operator in evaluate ()"));
+          abort ();
+        }
+      if (er == NO_ERROR)
+        er = er2;
+      et = et2;
+    }
+
+  eval_undo ();
+  return er;
+}
+
 /*---------------------------------------.
 | Main entry point, called from "eval".  |
 `---------------------------------------*/
@@ -293,19 +538,25 @@ eval_lex (int32_t *val)
 bool
 evaluate (const char *expr, int32_t *val)
 {
-  eval_token et;
   eval_error err;
 
   eval_init_lex (expr);
-  et = eval_lex (val);
-  err = logical_or_term (et, val);
+  err = primary (val);
+  err = parse_expr (val, err, MIN_PREC);
 
   if (err == NO_ERROR && *eval_text != '\0')
     {
-      if (eval_lex (val) == BADOP)
-        err = INVALID_OPERATOR;
-      else
-        err = EXCESS_INPUT;
+      switch (eval_lex (val))
+        {
+        case BADNUM:
+          err = INVALID_NUMBER;
+          break;
+        case BADOP:
+          err = INVALID_OPERATOR;
+          break;
+        default:
+          err = EXCESS_INPUT;
+        }
     }
 
   switch (err)
@@ -320,8 +571,7 @@ evaluate (const char *expr, int32_t *val)
       break;
 
     case SYNTAX_ERROR:
-      M4ERROR ((warning_status, 0,
-                _("bad expression in eval: %s"), expr));
+      M4ERROR ((warning_status, 0, _("bad expression in eval: %s"), expr));
       break;
 
     case UNKNOWN_INPUT:
@@ -334,25 +584,25 @@ evaluate (const char *expr, int32_t *val)
                 _("bad expression in eval (excess input): %s"), expr));
       break;
 
+    case INVALID_NUMBER:
+      M4ERROR ((warning_status, 0, _("invalid number in eval: %s"), expr));
+      break;
+
     case INVALID_OPERATOR:
-      M4ERROR ((warning_status, 0,
-                _("invalid operator in eval: %s"), expr));
+      M4ERROR ((warning_status, 0, _("invalid operator in eval: %s"), expr));
       retcode = EXIT_FAILURE;
       break;
 
     case DIVIDE_ZERO:
-      M4ERROR ((warning_status, 0,
-                _("divide by zero in eval: %s"), expr));
+      M4ERROR ((warning_status, 0, _("divide by zero in eval: %s"), expr));
       break;
 
     case MODULO_ZERO:
-      M4ERROR ((warning_status, 0,
-                _("modulo by zero in eval: %s"), expr));
+      M4ERROR ((warning_status, 0, _("modulo by zero in eval: %s"), expr));
       break;
 
     case NEGATIVE_EXPONENT:
-      M4ERROR ((warning_status, 0,
-                _("negative exponent in eval: %s"), expr));
+      M4ERROR ((warning_status, 0, _("negative exponent in eval: %s"), expr));
       break;
 
     default:
@@ -362,498 +612,4 @@ evaluate (const char *expr, int32_t *val)
     }
 
   return err != NO_ERROR;
-}
-
-/*---------------------------.
-| Recursive descent parser.  |
-`---------------------------*/
-
-static eval_error
-logical_or_term (eval_token et, int32_t *v1)
-{
-  int32_t v2;
-  eval_error er;
-
-  if ((er = logical_and_term (et, v1)) != NO_ERROR)
-    return er;
-
-  while ((et = eval_lex (&v2)) == LOR)
-    {
-      et = eval_lex (&v2);
-      if (et == ERROR)
-        return UNKNOWN_INPUT;
-
-      /* Implement short-circuiting of valid syntax.  */
-      er = logical_and_term (et, &v2);
-      if (er == NO_ERROR)
-        *v1 = *v1 || v2;
-      else if (*v1 != 0 && er < SYNTAX_ERROR)
-        *v1 = 1;
-      else
-        return er;
-    }
-  if (et == ERROR)
-    return UNKNOWN_INPUT;
-
-  eval_undo ();
-  return NO_ERROR;
-}
-
-static eval_error
-logical_and_term (eval_token et, int32_t *v1)
-{
-  int32_t v2;
-  eval_error er;
-
-  if ((er = or_term (et, v1)) != NO_ERROR)
-    return er;
-
-  while ((et = eval_lex (&v2)) == LAND)
-    {
-      et = eval_lex (&v2);
-      if (et == ERROR)
-        return UNKNOWN_INPUT;
-
-      /* Implement short-circuiting of valid syntax.  */
-      er = or_term (et, &v2);
-      if (er == NO_ERROR)
-        *v1 = *v1 && v2;
-      else if (*v1 == 0 && er < SYNTAX_ERROR)
-        ; /* v1 is already 0 */
-      else
-        return er;
-    }
-  if (et == ERROR)
-    return UNKNOWN_INPUT;
-
-  eval_undo ();
-  return NO_ERROR;
-}
-
-static eval_error
-or_term (eval_token et, int32_t *v1)
-{
-  int32_t v2;
-  eval_error er;
-
-  if ((er = xor_term (et, v1)) != NO_ERROR)
-    return er;
-
-  while ((et = eval_lex (&v2)) == OR)
-    {
-      et = eval_lex (&v2);
-      if (et == ERROR)
-        return UNKNOWN_INPUT;
-
-      if ((er = xor_term (et, &v2)) != NO_ERROR)
-        return er;
-
-      *v1 |= v2;
-    }
-  if (et == ERROR)
-    return UNKNOWN_INPUT;
-
-  eval_undo ();
-  return NO_ERROR;
-}
-
-static eval_error
-xor_term (eval_token et, int32_t *v1)
-{
-  int32_t v2;
-  eval_error er;
-
-  if ((er = and_term (et, v1)) != NO_ERROR)
-    return er;
-
-  while ((et = eval_lex (&v2)) == XOR)
-    {
-      et = eval_lex (&v2);
-      if (et == ERROR)
-        return UNKNOWN_INPUT;
-
-      if ((er = and_term (et, &v2)) != NO_ERROR)
-        return er;
-
-      *v1 ^= v2;
-    }
-  if (et == ERROR)
-    return UNKNOWN_INPUT;
-
-  eval_undo ();
-  return NO_ERROR;
-}
-
-static eval_error
-and_term (eval_token et, int32_t *v1)
-{
-  int32_t v2;
-  eval_error er;
-
-  if ((er = equality_term (et, v1)) != NO_ERROR)
-    return er;
-
-  while ((et = eval_lex (&v2)) == AND)
-    {
-      et = eval_lex (&v2);
-      if (et == ERROR)
-        return UNKNOWN_INPUT;
-
-      if ((er = equality_term (et, &v2)) != NO_ERROR)
-        return er;
-
-      *v1 &= v2;
-    }
-  if (et == ERROR)
-    return UNKNOWN_INPUT;
-
-  eval_undo ();
-  return NO_ERROR;
-}
-
-static eval_error
-equality_term (eval_token et, int32_t *v1)
-{
-  eval_token op;
-  int32_t v2;
-  eval_error er;
-
-  if ((er = cmp_term (et, v1)) != NO_ERROR)
-    return er;
-
-  /* In the 1.4.x series, we maintain the traditional behavior that
-     '=' is a synonym for '=='; however, this is contrary to POSIX and
-     we hope to convert '=' to mean assignment in 2.0.  */
-  while ((op = eval_lex (&v2)) == EQ || op == NOTEQ || op == ASSIGN)
-    {
-      et = eval_lex (&v2);
-      if (et == ERROR)
-        return UNKNOWN_INPUT;
-
-      if ((er = cmp_term (et, &v2)) != NO_ERROR)
-        return er;
-
-      if (op == ASSIGN)
-      {
-        M4ERROR ((warning_status, 0, _("\
-Warning: recommend ==, not =, for equality operator")));
-        op = EQ;
-      }
-      *v1 = (op == EQ) == (*v1 == v2);
-    }
-  if (op == ERROR)
-    return UNKNOWN_INPUT;
-
-  eval_undo ();
-  return NO_ERROR;
-}
-
-static eval_error
-cmp_term (eval_token et, int32_t *v1)
-{
-  eval_token op;
-  int32_t v2;
-  eval_error er;
-
-  if ((er = shift_term (et, v1)) != NO_ERROR)
-    return er;
-
-  while ((op = eval_lex (&v2)) == GT || op == GTEQ
-         || op == LS || op == LSEQ)
-    {
-
-      et = eval_lex (&v2);
-      if (et == ERROR)
-        return UNKNOWN_INPUT;
-
-      if ((er = shift_term (et, &v2)) != NO_ERROR)
-        return er;
-
-      switch (op)
-        {
-        case GT:
-          *v1 = *v1 > v2;
-          break;
-
-        case GTEQ:
-          *v1 = *v1 >= v2;
-          break;
-
-        case LS:
-          *v1 = *v1 < v2;
-          break;
-
-        case LSEQ:
-          *v1 = *v1 <= v2;
-          break;
-
-        default:
-          M4ERROR ((warning_status, 0,
-                    "INTERNAL ERROR: bad comparison operator in cmp_term ()"));
-          abort ();
-        }
-    }
-  if (op == ERROR)
-    return UNKNOWN_INPUT;
-
-  eval_undo ();
-  return NO_ERROR;
-}
-
-static eval_error
-shift_term (eval_token et, int32_t *v1)
-{
-  eval_token op;
-  int32_t v2;
-  uint32_t u1;
-  eval_error er;
-
-  if ((er = add_term (et, v1)) != NO_ERROR)
-    return er;
-
-  while ((op = eval_lex (&v2)) == LSHIFT || op == RSHIFT)
-    {
-
-      et = eval_lex (&v2);
-      if (et == ERROR)
-        return UNKNOWN_INPUT;
-
-      if ((er = add_term (et, &v2)) != NO_ERROR)
-        return er;
-
-      /* Minimize undefined C behavior (shifting by a negative number,
-         shifting by the width or greater, left shift overflow, or
-         right shift of a negative number).  Implement Java 32-bit
-         wrap-around semantics.  This code assumes that the
-         implementation-defined overflow when casting unsigned to
-         signed is a silent twos-complement wrap-around.  */
-      switch (op)
-        {
-        case LSHIFT:
-          u1 = *v1;
-          u1 <<= (uint32_t) (v2 & 0x1f);
-          *v1 = u1;
-          break;
-
-        case RSHIFT:
-          u1 = *v1 < 0 ? ~*v1 : *v1;
-          u1 >>= (uint32_t) (v2 & 0x1f);
-          *v1 = *v1 < 0 ? ~u1 : u1;
-          break;
-
-        default:
-          M4ERROR ((warning_status, 0,
-                    "INTERNAL ERROR: bad shift operator in shift_term ()"));
-          abort ();
-        }
-    }
-  if (op == ERROR)
-    return UNKNOWN_INPUT;
-
-  eval_undo ();
-  return NO_ERROR;
-}
-
-static eval_error
-add_term (eval_token et, int32_t *v1)
-{
-  eval_token op;
-  int32_t v2;
-  eval_error er;
-
-  if ((er = mult_term (et, v1)) != NO_ERROR)
-    return er;
-
-  while ((op = eval_lex (&v2)) == PLUS || op == MINUS)
-    {
-      et = eval_lex (&v2);
-      if (et == ERROR)
-        return UNKNOWN_INPUT;
-
-      if ((er = mult_term (et, &v2)) != NO_ERROR)
-        return er;
-
-      /* Minimize undefined C behavior on overflow.  This code assumes
-         that the implementation-defined overflow when casting
-         unsigned to signed is a silent twos-complement
-         wrap-around.  */
-      if (op == PLUS)
-        *v1 = (int32_t) ((uint32_t) *v1 + (uint32_t) v2);
-      else
-        *v1 = (int32_t) ((uint32_t) *v1 - (uint32_t) v2);
-    }
-  if (op == ERROR)
-    return UNKNOWN_INPUT;
-
-  eval_undo ();
-  return NO_ERROR;
-}
-
-static eval_error
-mult_term (eval_token et, int32_t *v1)
-{
-  eval_token op;
-  int32_t v2;
-  eval_error er;
-
-  if ((er = exp_term (et, v1)) != NO_ERROR)
-    return er;
-
-  while ((op = eval_lex (&v2)) == TIMES || op == DIVIDE || op == MODULO)
-    {
-      et = eval_lex (&v2);
-      if (et == ERROR)
-        return UNKNOWN_INPUT;
-
-      if ((er = exp_term (et, &v2)) != NO_ERROR)
-        return er;
-
-      /* Minimize undefined C behavior on overflow.  This code assumes
-         that the implementation-defined overflow when casting
-         unsigned to signed is a silent twos-complement
-         wrap-around.  */
-      switch (op)
-        {
-        case TIMES:
-          *v1 = (int32_t) ((uint32_t) *v1 * (uint32_t) v2);
-          break;
-
-        case DIVIDE:
-          if (v2 == 0)
-            return DIVIDE_ZERO;
-          else if (v2 == -1)
-            /* Avoid overflow, and the x86 SIGFPE on INT_MIN / -1.  */
-            *v1 = (int32_t) -(uint32_t) *v1;
-          else
-            *v1 /= v2;
-          break;
-
-        case MODULO:
-          if (v2 == 0)
-            return MODULO_ZERO;
-          else if (v2 == -1)
-            /* Avoid the x86 SIGFPE on INT_MIN % -1.  */
-            *v1 = 0;
-          else
-            *v1 %= v2;
-          break;
-
-        default:
-          M4ERROR ((warning_status, 0,
-                    "INTERNAL ERROR: bad operator in mult_term ()"));
-          abort ();
-        }
-    }
-  if (op == ERROR)
-    return UNKNOWN_INPUT;
-
-  eval_undo ();
-  return NO_ERROR;
-}
-
-static eval_error
-exp_term (eval_token et, int32_t *v1)
-{
-  uint32_t result;
-  int32_t v2;
-  eval_error er;
-
-  if ((er = unary_term (et, v1)) != NO_ERROR)
-    return er;
-
-  while ((et = eval_lex (&v2)) == EXPONENT)
-    {
-      et = eval_lex (&v2);
-      if (et == ERROR)
-        return UNKNOWN_INPUT;
-
-      if ((er = exp_term (et, &v2)) != NO_ERROR)
-        return er;
-
-      /* Minimize undefined C behavior on overflow.  This code assumes
-         that the implementation-defined overflow when casting
-         unsigned to signed is a silent twos-complement
-         wrap-around.  */
-      result = 1;
-      if (v2 < 0)
-        return NEGATIVE_EXPONENT;
-      if (*v1 == 0 && v2 == 0)
-        return DIVIDE_ZERO;
-      while (v2-- > 0)
-        result *= (uint32_t) *v1;
-      *v1 = result;
-    }
-  if (et == ERROR)
-    return UNKNOWN_INPUT;
-
-  eval_undo ();
-  return NO_ERROR;
-}
-
-static eval_error
-unary_term (eval_token et, int32_t *v1)
-{
-  eval_error er;
-
-  if (et == PLUS || et == MINUS || et == NOT || et == LNOT)
-    {
-      eval_token et2 = eval_lex (v1);
-      if (et2 == ERROR)
-        return UNKNOWN_INPUT;
-
-      if ((er = unary_term (et2, v1)) != NO_ERROR)
-        return er;
-
-      /* Minimize undefined C behavior on overflow.  This code assumes
-         that the implementation-defined overflow when casting
-         unsigned to signed is a silent twos-complement
-         wrap-around.  */
-      if (et == MINUS)
-        *v1 = (int32_t) -(uint32_t) *v1;
-      else if (et == NOT)
-        *v1 = ~*v1;
-      else if (et == LNOT)
-        *v1 = *v1 == 0 ? 1 : 0;
-    }
-  else if ((er = simple_term (et, v1)) != NO_ERROR)
-    return er;
-
-  return NO_ERROR;
-}
-
-static eval_error
-simple_term (eval_token et, int32_t *v1)
-{
-  int32_t v2;
-  eval_error er;
-
-  switch (et)
-    {
-    case LEFTP:
-      et = eval_lex (v1);
-      if (et == ERROR)
-        return UNKNOWN_INPUT;
-
-      if ((er = logical_or_term (et, v1)) != NO_ERROR)
-        return er;
-
-      et = eval_lex (&v2);
-      if (et == ERROR)
-        return UNKNOWN_INPUT;
-
-      if (et != RIGHTP)
-        return MISSING_RIGHT;
-
-      break;
-
-    case NUMBER:
-      break;
-
-    case BADOP:
-      return INVALID_OPERATOR;
-
-    default:
-      return SYNTAX_ERROR;
-    }
-  return NO_ERROR;
 }

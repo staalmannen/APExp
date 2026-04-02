@@ -1,18 +1,18 @@
 /* Locating a program in PATH.
-   Copyright (C) 2001-2004, 2006-2021 Free Software Foundation, Inc.
+   Copyright (C) 2001-2004, 2006-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <haible@clisp.cons.org>, 2001.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 
@@ -21,7 +21,6 @@
 /* Specification.  */
 #include "findprog.h"
 
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -48,16 +47,12 @@ find_in_path (const char *progname)
   return progname;
 #else
   /* Unix */
-  char *path;
-  char *path_rest;
-  char *cp;
-
   if (strchr (progname, '/') != NULL)
     /* If progname contains a slash, it is either absolute or relative to
        the current directory.  PATH is not used.  */
     return progname;
 
-  path = getenv ("PATH");
+  char *path = getenv ("PATH");
   if (path == NULL || *path == '\0')
     /* If PATH is not set, the default search path is implementation
        dependent.  */
@@ -72,17 +67,14 @@ find_in_path (const char *progname)
     /* Out of memory.  */
     return progname;
 # endif
-  for (path_rest = path; ; path_rest = cp + 1)
+  for (char *path_rest = path; ; )
     {
-      const char *dir;
-      bool last;
-      char *progpathname;
-
       /* Extract next directory in PATH.  */
-      dir = path_rest;
+      const char *dir = path_rest;
+      char *cp;
       for (cp = path_rest; *cp != '\0' && *cp != ':'; cp++)
         ;
-      last = (*cp == '\0');
+      bool last = (*cp == '\0');
       *cp = '\0';
 
       /* Empty PATH components designate the current directory.  */
@@ -90,6 +82,7 @@ find_in_path (const char *progname)
         dir = ".";
 
       /* Concatenate dir and progname.  */
+      char *progpathname;
 # if !IN_FINDPROG_LGPL
       progpathname = xconcatenated_filename (dir, progname, NULL);
 # else
@@ -115,7 +108,7 @@ find_in_path (const char *progname)
               && ! S_ISDIR (statbuf.st_mode))
             {
               /* Found!  */
-              if (strcmp (progpathname, progname) == 0)
+              if (streq (progpathname, progname))
                 {
                   free (progpathname);
 
@@ -147,6 +140,8 @@ find_in_path (const char *progname)
 
       if (last)
         break;
+
+      path_rest = cp + 1;
     }
 
   /* Not found in PATH.  An error will be signalled at the first call.  */

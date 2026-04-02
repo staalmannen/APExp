@@ -1,18 +1,18 @@
 /* getdtablesize() function: Return maximum possible file descriptor value + 1.
-   Copyright (C) 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -61,13 +61,10 @@ getdtablesize (void)
     {
       /* We are looking for the number N such that the valid file descriptors
          are 0..N-1.  It can be obtained through a loop as follows:
-           {
-             int fd;
-             for (fd = 3; fd < 65536; fd++)
-               if (dup2 (0, fd) == -1)
-                 break;
-             return fd;
-           }
+           for (int fd = 3; fd < 65536; fd++)
+             if (dup2 (0, fd) == -1)
+               break;
+           return fd;
          On Windows XP, the result is 2048.
          The drawback of this loop is that it allocates memory for a libc
          internal array that is never freed.

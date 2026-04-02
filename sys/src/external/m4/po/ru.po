@@ -1,4 +1,4 @@
-# Локализация m4-1.4n
+# п⌡п╬п╨п╟п╩п╦п╥п╟я├п╦я▐ m4-1.4n
 # Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 # Denis Perchine <dyp@perchine.com>, 1997, 1998, 1999, 2000, 2001, 2002.
 #
@@ -6,119 +6,119 @@ msgid ""
 msgstr ""
 "Project-Id-Version: m4 1.4o\n"
 "Report-Msgid-Bugs-To: bug-m4@gnu.org\n"
-"POT-Creation-Date: 2021-05-28 13:49-0500\n"
+"POT-Creation-Date: 2026-02-06 13:55-0600\n"
 "PO-Revision-Date: 2002-01-07 20:32GMT+06\n"
 "Last-Translator: Denis Perchine <dyp@perchine.com>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=KOI8-R\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Bugs: Report translation errors to the Language-Team address.\n"
 "X-Generator: KBabel 0.9.5\n"
 
-#: lib/clean-temp.c:235
-#, c-format
+#: lib/clean-temp.c:230
+#, fuzzy, c-format
 msgid "cannot find a temporary directory, try setting $TMPDIR"
-msgstr ""
+msgstr "п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ я│п╬п╥п╢п╟я┌я▄ п╡я─п╣п╪п╣п╫п╫я▀п╧ я└п╟п╧п╩: %s"
 
-#: lib/clean-temp.c:250
-#, c-format
+#: lib/clean-temp.c:245
+#, fuzzy, c-format
 msgid "cannot create a temporary directory using template \"%s\""
-msgstr ""
+msgstr "п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ я│п╬п╥п╢п╟я┌я▄ п╡я─п╣п╪п╣п╫п╫я▀п╧ я└п╟п╧п╩: %s"
 
-#: lib/clean-temp.c:371
+#: lib/clean-temp.c:364
 #, fuzzy, c-format
 msgid "cannot remove temporary directory %s"
-msgstr ""
-"ОШИБКА: Ошибка создания временного файла для разветвления макрообработки"
+msgstr "п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ я│п╬п╥п╢п╟я┌я▄ п╡я─п╣п╪п╣п╫п╫я▀п╧ я└п╟п╧п╩: %s"
 
-#: lib/closein.c:100
+#: lib/closein.c:99
+#, fuzzy
 msgid "error closing file"
-msgstr ""
+msgstr "п╬я┬п╦п╠п╨п╟ п©я─п╦ п╥п╟п╨я─я▀я┌п╦п╦ п╡я▀я┘п╬п╢п╫п╬пЁп╬ я└п╟п╧п╩п╟"
 
-#: lib/closeout.c:122
+#: lib/closeout.c:121
 msgid "write error"
-msgstr ""
+msgstr "п╬я┬п╦п╠п╨п╟ п╥п╟п©п╦я│п╦"
 
-#: lib/c-stack.c:187
+#: lib/c-stack.c:190
 msgid "program error"
-msgstr ""
+msgstr "п╬я┬п╦п╠п╨п╟ п©я─п╬пЁя─п╟п╪п╪я▀"
 
-#: lib/c-stack.c:188
+#: lib/c-stack.c:191
 msgid "stack overflow"
-msgstr ""
+msgstr "п©п╣я─п╣п©п╬п╩п╫п╣п╫п╦п╣ я│я┌п╣п╨п╟"
 
-#: lib/clean-temp-simple.c:297
+#: lib/clean-temp-simple.c:266
 #, fuzzy, c-format
 msgid "cannot remove temporary file %s"
-msgstr "Невозможно назначить файл ошибок %s"
+msgstr "п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ я│п╬п╥п╢п╟я┌я▄ п╡я─п╣п╪п╣п╫п╫я▀п╧ я└п╟п╧п╩: %s"
 
-#: lib/error.c:195
+#: lib/error.c:208
 msgid "Unknown system error"
-msgstr ""
+msgstr "п²п╣п╦п╥п╡п╣я│я┌п╫п╟я▐ я│п╦я│я┌п╣п╪п╫п╟я▐ п╬я┬п╦п╠п╨п╟"
 
-#: lib/execute.c:348 lib/spawn-pipe.c:597 lib/wait-process.c:291
-#: lib/wait-process.c:365
-#, c-format
+#: lib/execute.c:378 lib/spawn-pipe.c:597 lib/wait-process.c:325
+#: lib/wait-process.c:396
+#, fuzzy, c-format
 msgid "%s subprocess failed"
-msgstr ""
+msgstr "cap_set_proc п╥п╟п╡п╣я─я┬п╦п╩я│я▐ п╫п╣я┐п╢п╟я┤п╫п╬"
 
-#: lib/getopt.c:278
-#, fuzzy, c-format
+#: lib/getopt.c:283
+#, c-format
 msgid "%s: option '%s%s' is ambiguous\n"
-msgstr "%s: опция `%s' неоднозначна\n"
+msgstr "%s: п╢п╡я┐я│п╪я▀я│п╩п╣п╫п╫я▀п╧ п©п╟я─п╟п╪п╣я┌я─ б╚%s%sб╩\n"
 
-#: lib/getopt.c:284
-#, fuzzy, c-format
+#: lib/getopt.c:289
+#, c-format
 msgid "%s: option '%s%s' is ambiguous; possibilities:"
-msgstr "%s: опция `%s' неоднозначна\n"
+msgstr "%s: п╢п╡я┐я│п╪я▀я│п╩п╣п╫п╫я▀п╧ п©п╟я─п╟п╪п╣я┌я─ б╚%s%sб╩; п╡п╬п╥п╪п╬п╤п╫я▀п╣ п╡п╟я─п╦п╟п╫я┌я▀:"
 
-#: lib/getopt.c:319
-#, fuzzy, c-format
+#: lib/getopt.c:323
+#, c-format
 msgid "%s: unrecognized option '%s%s'\n"
-msgstr "%s: неизвестная опция '%c%s'\n"
+msgstr "%s: п╫п╣я─п╟я│п©п╬п╥п╫п╟п╫п╫я▀п╧ п©п╟я─п╟п╪п╣я┌я─ б╚%s%sб╩\n"
 
-#: lib/getopt.c:345
-#, fuzzy, c-format
+#: lib/getopt.c:349
+#, c-format
 msgid "%s: option '%s%s' doesn't allow an argument\n"
-msgstr "%s: у опции `%c%s' не должно быть аргументов\n"
+msgstr "%s: п╢п╩я▐ п©п╟я─п╟п╪п╣я┌я─п╟ б╚%s%sб╩ п╫п╣п╩я▄п╥я▐ п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ п╟я─пЁя┐п╪п╣п╫я┌\n"
 
-#: lib/getopt.c:360
-#, fuzzy, c-format
+#: lib/getopt.c:364
+#, c-format
 msgid "%s: option '%s%s' requires an argument\n"
-msgstr "%s: у опции `%s' должен быть аргумент\n"
+msgstr "%s: п╢п╩я▐ п©п╟я─п╟п╪п╣я┌я─п╟ б╚%s%sб╩ я┌я─п╣п╠я┐п╣я┌я│я▐ п╟я─пЁя┐п╪п╣п╫я┌\n"
 
-#: lib/getopt.c:621
-#, fuzzy, c-format
+#: lib/getopt.c:624
+#, c-format
 msgid "%s: invalid option -- '%c'\n"
-msgstr "%s: неверная опция -- %c\n"
+msgstr "%s: п╫п╣п╡п╣я─п╫я▀п╧ п©п╟я─п╟п╪п╣я┌я─ б╚%cб╩\n"
 
-#: lib/getopt.c:636 lib/getopt.c:682
-#, fuzzy, c-format
+#: lib/getopt.c:639 lib/getopt.c:685
+#, c-format
 msgid "%s: option requires an argument -- '%c'\n"
-msgstr "%s: опции необходим аргумент -- %c\n"
+msgstr "%s: п©п╟я─п╟п╪п╣я┌я─я┐ я┌я─п╣п╠я┐п╣я┌я│я▐ п╟я─пЁя┐п╪п╣п╫я┌ б╚%cб╩\n"
 
-#: lib/obstack.c:338 lib/obstack.c:340 lib/xalloc-die.c:34
+#: lib/obstack.c:351 lib/obstack.c:353 lib/xalloc-die.c:34
 msgid "memory exhausted"
-msgstr "память исчерпана"
+msgstr "п©п╟п╪я▐я┌я▄ п╦я│я┤п╣я─п©п╟п╫п╟"
 
 #: lib/openat-die.c:38
 #, c-format
 msgid "unable to record current working directory"
-msgstr ""
+msgstr "п╫п╣ я┐п╢п╟п╩п╬я│я▄ п╥п╟п©п╬п╪п╫п╦я┌я▄ я┌п╣п╨я┐я┴п╦п╧ я─п╟п╠п╬я┤п╦п╧ п╨п╟я┌п╟п╩п╬пЁ"
 
 #: lib/openat-die.c:57
 #, c-format
 msgid "failed to return to initial working directory"
-msgstr ""
+msgstr "п╫п╣ я┐п╢п╟п╩п╬я│я▄ п╡п╣я─п╫я┐я┌я▄я│я▐ п╡ п╫п╟я┤п╟п╩я▄п╫я▀п╧ я─п╟п╠п╬я┤п╦п╧ п╨п╟я┌п╟п╩п╬пЁ"
 
-#: lib/os2-spawn.c:46
-#, c-format
+#: lib/os2-spawn.c:51
+#, fuzzy, c-format
 msgid "_open_osfhandle failed"
-msgstr ""
+msgstr "я│я┤п╦я┌я▀п╡п╟п╫п╦п╣ п╥п╟пЁп╬п╩п╬п╡п╨п╟ ELF п╥п╟п╡п╣я─я┬п╦п╩п╬я│я▄ п╫п╣я┐п╢п╟я┤п╫п╬"
 
-#: lib/os2-spawn.c:83
+#: lib/os2-spawn.c:88
 #, c-format
 msgid "cannot restore fd %d: dup2 failed"
 msgstr ""
@@ -144,264 +144,253 @@ msgstr ""
 #. If you don't know what to put here, please see
 #. <https://en.wikipedia.org/wiki/Quotation_marks_in_other_languages>
 #. and use glyphs suitable for your language.
-#: lib/quotearg.c:355
+#: lib/quotearg.c:357
 msgid "`"
-msgstr ""
+msgstr "б╚"
 
-#: lib/quotearg.c:356
+#: lib/quotearg.c:358
 msgid "'"
-msgstr ""
+msgstr "б╩"
 
-#: lib/regcomp.c:135
+#: lib/regcomp.c:122
 msgid "Success"
-msgstr "Успех"
+msgstr "пёя│п©п╣я┘"
 
-#: lib/regcomp.c:138
+#: lib/regcomp.c:125
 msgid "No match"
-msgstr "Совпадений нет"
+msgstr "п║п╬п╡п©п╟п╢п╣п╫п╦п╧ п╫п╣я┌"
 
-#: lib/regcomp.c:141
+#: lib/regcomp.c:128
 msgid "Invalid regular expression"
-msgstr "Неверное регулярное выражение"
+msgstr "п²п╣п╡п╣я─п╫п╬п╣ я─п╣пЁя┐п╩я▐я─п╫п╬п╣ п╡я▀я─п╟п╤п╣п╫п╦п╣"
 
-#: lib/regcomp.c:144
+#: lib/regcomp.c:131
 msgid "Invalid collation character"
-msgstr "Неверный символ сравнения"
+msgstr "п²п╣п╡п╣я─п╫я▀п╧ я│п╦п╪п╡п╬п╩ я│я─п╟п╡п╫п╣п╫п╦я▐"
 
-#: lib/regcomp.c:147
+#: lib/regcomp.c:134
 msgid "Invalid character class name"
-msgstr "Неверное имя класса символов"
+msgstr "п²п╣п╡п╣я─п╫п╬п╣ п╦п╪я▐ п╨п╩п╟я│я│п╟ я│п╦п╪п╡п╬п╩п╬п╡"
 
-#: lib/regcomp.c:150
+#: lib/regcomp.c:137
 msgid "Trailing backslash"
-msgstr "Обратный слэш в конце"
+msgstr "п·п╠я─п╟я┌п╫я▀п╧ я│п╩я█я┬ п╡ п╨п╬п╫я├п╣"
 
-#: lib/regcomp.c:153
+#: lib/regcomp.c:140
 msgid "Invalid back reference"
-msgstr "Неверная ссылка назад"
+msgstr "п²п╣п╡п╣я─п╫п╟я▐ я│я│я▀п╩п╨п╟ п╫п╟п╥п╟п╢"
 
-#: lib/regcomp.c:156
-#, fuzzy
+#: lib/regcomp.c:143
 msgid "Unmatched [, [^, [:, [., or [="
-msgstr "Нет закрывающей [ или [^"
+msgstr "п²п╣п©п╟я─п╫п╟я▐ [, [^, [:, [. п╦п╩п╦ [="
 
-#: lib/regcomp.c:159
+#: lib/regcomp.c:146
 msgid "Unmatched ( or \\("
-msgstr "Не закрывающей ( или \\("
+msgstr "п²п╣ п╥п╟п╨я─я▀п╡п╟я▌я┴п╣п╧ ( п╦п╩п╦ \\("
 
-#: lib/regcomp.c:162
+#: lib/regcomp.c:149
 msgid "Unmatched \\{"
-msgstr "Нет закрывающей \\{"
+msgstr "п²п╣я┌ п╥п╟п╨я─я▀п╡п╟я▌я┴п╣п╧ \\{"
 
-#: lib/regcomp.c:165
+#: lib/regcomp.c:152
 msgid "Invalid content of \\{\\}"
-msgstr "Неверное содержание \\{\\}"
+msgstr "п²п╣п╡п╣я─п╫п╬п╣ я│п╬п╢п╣я─п╤п╟п╫п╦п╣ \\{\\}"
 
-#: lib/regcomp.c:168
+#: lib/regcomp.c:155
 msgid "Invalid range end"
-msgstr "Неверный конец интервала"
+msgstr "п²п╣п╡п╣я─п╫я▀п╧ п╨п╬п╫п╣я├ п╦п╫я┌п╣я─п╡п╟п╩п╟"
 
-#: lib/regcomp.c:171
+#: lib/regcomp.c:158
 msgid "Memory exhausted"
-msgstr "Память исчерпана"
+msgstr "п÷п╟п╪я▐я┌я▄ п╦я│я┤п╣я─п©п╟п╫п╟"
 
-#: lib/regcomp.c:174
+#: lib/regcomp.c:161
 msgid "Invalid preceding regular expression"
-msgstr "Неверное предшедствующее регулярное выражение"
+msgstr "п²п╣п╡п╣я─п╫п╬п╣ п©я─п╣п╢я┬п╣п╢я│я┌п╡я┐я▌я┴п╣п╣ я─п╣пЁя┐п╩я▐я─п╫п╬п╣ п╡я▀я─п╟п╤п╣п╫п╦п╣"
 
-#: lib/regcomp.c:177
+#: lib/regcomp.c:164
 msgid "Premature end of regular expression"
-msgstr "Неожиданный конец предшедствующего регулярного выражения"
+msgstr "п²п╣п╬п╤п╦п╢п╟п╫п╫я▀п╧ п╨п╬п╫п╣я├ п©я─п╣п╢я┬п╣п╢я│я┌п╡я┐я▌я┴п╣пЁп╬ я─п╣пЁя┐п╩я▐я─п╫п╬пЁп╬ п╡я▀я─п╟п╤п╣п╫п╦я▐"
 
-#: lib/regcomp.c:180
+#: lib/regcomp.c:167
 msgid "Regular expression too big"
-msgstr "Регулярное выражение слишком велико"
+msgstr "п═п╣пЁя┐п╩я▐я─п╫п╬п╣ п╡я▀я─п╟п╤п╣п╫п╦п╣ я│п╩п╦я┬п╨п╬п╪ п╡п╣п╩п╦п╨п╬"
 
-#: lib/regcomp.c:183
+#: lib/regcomp.c:170
 msgid "Unmatched ) or \\)"
-msgstr "Не открытая ) или \\)"
+msgstr "п²п╣ п╬я┌п╨я─я▀я┌п╟я▐ ) п╦п╩п╦ \\)"
 
-#: lib/regcomp.c:676
+#: lib/regcomp.c:650
 msgid "No previous regular expression"
-msgstr "Нет предшедствующего регулярного выражения"
+msgstr "п²п╣я┌ п©я─п╣п╢я┬п╣п╢я│я┌п╡я┐я▌я┴п╣пЁп╬ я─п╣пЁя┐п╩я▐я─п╫п╬пЁп╬ п╡я▀я─п╟п╤п╣п╫п╦я▐"
 
 #: lib/siglist.h:31
 msgid "Hangup"
-msgstr ""
+msgstr "п·п╠я─я▀п╡ я┌п╣я─п╪п╦п╫п╟п╩я▄п╫п╬п╧ п╩п╦п╫п╦п╦"
 
 #: lib/siglist.h:34
 msgid "Interrupt"
-msgstr ""
+msgstr "п÷я─п╣я─я▀п╡п╟п╫п╦п╣"
 
 #: lib/siglist.h:37
 msgid "Quit"
-msgstr ""
+msgstr "п▓я▀я┘п╬п╢"
 
 #: lib/siglist.h:40
 msgid "Illegal instruction"
-msgstr ""
+msgstr "п²п╣п╢п╬п©я┐я│я┌п╦п╪п╟я▐ п╦п╫я│я┌я─я┐п╨я├п╦я▐"
 
 #: lib/siglist.h:43
 msgid "Trace/breakpoint trap"
-msgstr ""
+msgstr "п⌡п╬п╡я┐я┬п╨п╟ я┌я─п╟я│я│п╦я─п╬п╡п╨п╦/п╬я│я┌п╟п╫п╬п╡п╟"
 
 #: lib/siglist.h:46
 msgid "Aborted"
-msgstr ""
+msgstr "п░п╡п╟я─п╦п╧п╫я▀п╧ п╬я│я┌п╟п╫п╬п╡"
 
 #: lib/siglist.h:49
 msgid "Floating point exception"
-msgstr ""
+msgstr "п≤я│п╨п╩я▌я┤п╣п╫п╦п╣ п╡ п╬п©п╣я─п╟я├п╦п╦ я│ п©п╩п╟п╡п╟я▌я┴п╣п╧ я┌п╬я┤п╨п╬п╧"
 
 #: lib/siglist.h:52
 msgid "Killed"
-msgstr ""
+msgstr "пёп╠п╦я┌п╬"
 
 #: lib/siglist.h:55
 msgid "Bus error"
-msgstr ""
+msgstr "п·я┬п╦п╠п╨п╟ я┬п╦п╫я▀"
 
 #: lib/siglist.h:58
 msgid "Segmentation fault"
-msgstr ""
+msgstr "п·я┬п╦п╠п╨п╟ я│п╣пЁп╪п╣п╫я┌п╦я─п╬п╡п╟п╫п╦я▐"
 
 #: lib/siglist.h:61
 msgid "Broken pipe"
-msgstr ""
+msgstr "п·п╠я─я▀п╡ п╨п╟п╫п╟п╩п╟"
 
 #: lib/siglist.h:64
 msgid "Alarm clock"
-msgstr ""
+msgstr "п║п╦пЁп╫п╟п╩ я┌п╟п╧п╪п╣я─п╟"
 
 #: lib/siglist.h:67
 msgid "Terminated"
-msgstr ""
+msgstr "п≈п╟п╡п╣я─я┬п╣п╫п╬"
 
 #: lib/siglist.h:70
 msgid "Urgent I/O condition"
-msgstr ""
+msgstr "п║п╦я┌я┐п╟я├п╦я▐ я│я─п╬я┤п╫п╬пЁп╬ п╡п╡п╬п╢п╟/п╡я▀п╡п╬п╢п╟"
 
 #: lib/siglist.h:73
 msgid "Stopped (signal)"
-msgstr ""
+msgstr "п·я│я┌п╟п╫п╬п╡п╩п╣п╫п╬ (я│п╦пЁп╫п╟п╩)"
 
 #: lib/siglist.h:76
 msgid "Stopped"
-msgstr ""
+msgstr "п·я│я┌п╟п╫п╬п╡п╩п╣п╫п╬"
 
 #: lib/siglist.h:79
 msgid "Continued"
-msgstr ""
+msgstr "п÷я─п╬п╢п╬п╩п╤п╣п╫п╬"
 
 #: lib/siglist.h:82
 msgid "Child exited"
-msgstr ""
+msgstr "п■п╬я┤п╣я─п╫п╦п╧ п©я─п╬я├п╣я│я│ п╥п╟п╡п╣я─я┬п╦п╩я│я▐"
 
 #: lib/siglist.h:85
 msgid "Stopped (tty input)"
-msgstr ""
+msgstr "п·я│я┌п╟п╫п╬п╡п╩п╣п╫п╬ (п╡п╡п╬п╢ я│ я┌п╣я─п╪п╦п╫п╟п╩п╟)"
 
 #: lib/siglist.h:88
 msgid "Stopped (tty output)"
-msgstr ""
+msgstr "п·я│я┌п╟п╫п╬п╡п╩п╣п╫п╬ (п╡я▀п╡п╬п╢ п╫п╟ я┌п╣я─п╪п╦п╫п╟п╩)"
 
 #: lib/siglist.h:91
 msgid "I/O possible"
-msgstr ""
+msgstr "п▓п╬п╥п╪п╬п╤п╣п╫ п╡п╡п╬п╢/п╡я▀п╡п╬п╢"
 
 #: lib/siglist.h:94
-#, fuzzy
 msgid "CPU time limit exceeded"
-msgstr "Кончилась виртуальная память?\n"
+msgstr "п÷я─п╣п╡я▀я┬п╣п╫ п╩п╦п╪п╦я┌ п©я─п╬я├п╣я│я│п╬я─п╫п╬пЁп╬ п╡я─п╣п╪п╣п╫п╦"
 
 #: lib/siglist.h:97
-#, fuzzy
 msgid "File size limit exceeded"
-msgstr "Кончилась виртуальная память?\n"
+msgstr "п÷я─п╣п╡я▀я┬п╣п╫ п╩п╦п╪п╦я┌ я─п╟п╥п╪п╣я─п╟ я└п╟п╧п╩п╟"
 
 #: lib/siglist.h:100
 msgid "Virtual timer expired"
-msgstr ""
+msgstr "п▓п╦я─я┌я┐п╟п╩я▄п╫я▀п╧ я┌п╟п╧п╪п╣я─ п╦я│я┌п╣п╨"
 
 #: lib/siglist.h:103
 msgid "Profiling timer expired"
-msgstr ""
+msgstr "п÷я─п╬я└п╦п╩п╦я─п╬п╡п╬я┤п╫я▀п╧ я┌п╟п╧п╪п╣я─ п╦я│я┌п╣п╨"
 
 #: lib/siglist.h:106
 msgid "Window changed"
-msgstr ""
+msgstr "п·п╨п╫п╬ п╦п╥п╪п╣п╫п╦п╩п╬я│я▄"
 
 #: lib/siglist.h:109
-#, fuzzy
 msgid "User defined signal 1"
-msgstr "Имя %s неопределено"
+msgstr "п·п©я─п╣п╢п╣п╩я▐п╣п╪я▀п╧ п©п╬п╩я▄п╥п╬п╡п╟я┌п╣п╩п╣п╪ я│п╦пЁп╫п╟п╩ 1"
 
 #: lib/siglist.h:112
-#, fuzzy
 msgid "User defined signal 2"
-msgstr "Имя %s неопределено"
+msgstr "п·п©я─п╣п╢п╣п╩я▐п╣п╪я▀п╧ п©п╬п╩я▄п╥п╬п╡п╟я┌п╣п╩п╣п╪ я│п╦пЁп╫п╟п╩ 2"
 
 #: lib/siglist.h:117
 msgid "EMT trap"
-msgstr ""
+msgstr "п⌡п╬п╡я┐я┬п╨п╟ EMT"
 
 #: lib/siglist.h:120
 msgid "Bad system call"
-msgstr ""
+msgstr "п²п╣п╡п╣я─п╫я▀п╧ я│п╦я│я┌п╣п╪п╫я▀п╧ п╡я▀п╥п╬п╡"
 
 #: lib/siglist.h:123
 msgid "Stack fault"
-msgstr ""
+msgstr "п·я┬п╦п╠п╨п╟ я│я┌п╣п╨п╟"
 
 #: lib/siglist.h:126
 msgid "Information request"
-msgstr ""
+msgstr "п≈п╟п©я─п╬я│ п╦п╫я└п╬я─п╪п╟я├п╦п╦"
 
 #: lib/siglist.h:128
 msgid "Power failure"
-msgstr ""
+msgstr "п║п╠п╬п╧ п©п╦я┌п╟п╫п╦я▐"
 
 #: lib/siglist.h:131
 msgid "Resource lost"
-msgstr ""
+msgstr "п÷п╬я┌п╣я─я▐ я─п╣я│я┐я─я│п╟"
 
-#: lib/spawn-pipe.c:217 lib/spawn-pipe.c:220 lib/spawn-pipe.c:459
-#: lib/spawn-pipe.c:462
-#, c-format
+#: lib/spawn-pipe.c:218 lib/spawn-pipe.c:221
+#, fuzzy, c-format
 msgid "cannot create pipe"
-msgstr ""
+msgstr "п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ я│п╬п╥п╢п╟я┌я▄ я│п©п╦я│п╬п╨ п╬п╠п╩п╟я│я┌п╣п╧"
 
 #: lib/strsignal.c:114
 #, c-format
 msgid "Real-time signal %d"
-msgstr ""
+msgstr "п║п╦пЁп╫п╟п╩ я─п╣п╟п╩я▄п╫п╬пЁп╬ п╡я─п╣п╪п╣п╫п╦ %d"
 
 #: lib/strsignal.c:118
 #, c-format
 msgid "Unknown signal %d"
-msgstr ""
-
-#: lib/verror.c:76
-#, c-format
-msgid "unable to display error message"
-msgstr ""
+msgstr "п²п╣п╦п╥п╡п╣я│я┌п╫я▀п╧ я│п╦пЁп╫п╟п╩ %d"
 
 #: lib/version-etc.c:73
 #, c-format
 msgid "Packaged by %s (%s)\n"
-msgstr ""
+msgstr "пёп©п╟п╨п╬п╡п╟п╫ %s (%s)\n"
 
 #: lib/version-etc.c:76
 #, c-format
 msgid "Packaged by %s\n"
-msgstr ""
+msgstr "пёп©п╟п╨п╬п╡п╟п╫ %s\n"
 
 #. TRANSLATORS: Translate "(C)" to the copyright symbol
 #. (C-in-a-circle), if this symbol is available in the user's
 #. locale.  Otherwise, do not translate "(C)"; leave it as-is.
 #: lib/version-etc.c:83
 msgid "(C)"
-msgstr ""
+msgstr "(C)"
 
 #. TRANSLATORS: The %s placeholder is the web address of the GPL license.
 #: lib/version-etc.c:88
@@ -411,24 +400,27 @@ msgid ""
 "This is free software: you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
+"п⌡п╦я├п╣п╫п╥п╦я▐ GPLv3+: GNU GPL п╡п╣я─я│п╦п╦ 3 п╦п╩п╦ п╫п╬п╡п╣п╣ <%s>.\n"
+"п╜я┌п╬ я│п╡п╬п╠п╬п╢п╫п╬п╣ п÷п·: п╡я▀ п╪п╬п╤п╣я┌п╣ п╦п╥п╪п╣п╫я▐я┌я▄ п╦ я─п╟я│п©я─п╬я│я┌я─п╟п╫я▐я┌я▄ п╣пЁп╬.\n"
+"п²п╣я┌ п²п≤п п░п п≤п╔ п⌠п░п═п░п²п╒п≤п≥ п╡ п©я─п╣п╢п╣п╩п╟я┘ п╢п╣п╧я│я┌п╡я┐я▌я┴п╣пЁп╬ п╥п╟п╨п╬п╫п╬п╢п╟я┌п╣п╩я▄я│я┌п╡п╟.\n"
 
 #. TRANSLATORS: %s denotes an author name.
 #: lib/version-etc.c:105
 #, c-format
 msgid "Written by %s.\n"
-msgstr ""
+msgstr "п░п╡я┌п╬я─ п©я─п╬пЁя─п╟п╪п╪я▀ Б─■ %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #: lib/version-etc.c:109
 #, c-format
 msgid "Written by %s and %s.\n"
-msgstr ""
+msgstr "п░п╡я┌п╬я─я▀ п©я─п╬пЁя─п╟п╪п╪я▀ Б─■ %s п╦ %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #: lib/version-etc.c:113
 #, c-format
 msgid "Written by %s, %s, and %s.\n"
-msgstr ""
+msgstr "п░п╡я┌п╬я─я▀ п©я─п╬пЁя─п╟п╪п╪я▀ Б─■ %s, %s п╦ %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -439,6 +431,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "and %s.\n"
 msgstr ""
+"п░п╡я┌п╬я─я▀ п©я─п╬пЁя─п╟п╪п╪я▀ Б─■ %s, %s, %s\n"
+"п╦ %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -449,6 +443,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, and %s.\n"
 msgstr ""
+"п░п╡я┌п╬я─я▀ п©я─п╬пЁя─п╟п╪п╪я▀ Б─■ %s, %s, %s,\n"
+"%s п╦ %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -459,6 +455,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, %s, and %s.\n"
 msgstr ""
+"п░п╡я┌п╬я─я▀ п©я─п╬пЁя─п╟п╪п╪я▀ Б─■ %s, %s, %s,\n"
+"%s, %s п╦ %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -469,6 +467,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, %s, %s, and %s.\n"
 msgstr ""
+"п░п╡я┌п╬я─я▀ п©я─п╬пЁя─п╟п╪п╪я▀ Б─■ %s, %s, %s,\n"
+"%s, %s, %s п╦ %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -480,6 +480,9 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "and %s.\n"
 msgstr ""
+"п░п╡я┌п╬я─я▀ п©я─п╬пЁя─п╟п╪п╪я▀ Б─■ %s, %s, %s,\n"
+"%s, %s, %s, %s\n"
+"п╦ %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -491,6 +494,9 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "%s, and %s.\n"
 msgstr ""
+"п░п╡я┌п╬я─я▀ п©я─п╬пЁя─п╟п╪п╪я▀ Б─■ %s, %s, %s,\n"
+"%s, %s, %s, %s,\n"
+"%s п╦ %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -502,344 +508,362 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "%s, %s, and others.\n"
 msgstr ""
+"п░п╡я┌п╬я─я▀ п©я─п╬пЁя─п╟п╪п╪я▀ Б─■ %s, %s, %s,\n"
+"%s, %s, %s, %s,\n"
+"%s, %s п╦ п╢я─я┐пЁп╦п╣.\n"
 
 #. TRANSLATORS: The placeholder indicates the bug-reporting address
 #. for this package.  Please add _another line_ saying
 #. "Report translation bugs to <...>\n" with the address for translation
 #. bugs (typically your translation team's web or email address).
-#: lib/version-etc.c:249
-#, fuzzy, c-format
+#: lib/version-etc.c:248
+#, c-format
 msgid "Report bugs to: %s\n"
-msgstr ""
-"\n"
-"Посылайте отчеты об ошибках на <bug-m4@gnu.org>.\n"
+msgstr "п·п╠ п╬я┬п╦п╠п╨п╟я┘ я│п╬п╬п╠я┴п╟п╧я┌п╣ п©п╬ п╟п╢я─п╣я│я┐: %s\n"
 
-#: lib/version-etc.c:251
+#: lib/version-etc.c:250
 #, c-format
 msgid "Report %s bugs to: %s\n"
-msgstr ""
+msgstr "п·п╠ п╬я┬п╦п╠п╨п╟я┘ п╡ %s я│п╬п╬п╠я┴п╟п╧я┌п╣ п©п╬ п╟п╢я─п╣я│я┐ %s\n"
 
-#: lib/version-etc.c:255 lib/version-etc.c:257
+#: lib/version-etc.c:254 lib/version-etc.c:256
 #, c-format
 msgid "%s home page: <%s>\n"
-msgstr ""
+msgstr "п■п╬п╪п╟я┬п╫я▐я▐ я│я┌я─п╟п╫п╦я├п╟ %s: <%s>\n"
 
-#: lib/version-etc.c:260
+#: lib/version-etc.c:259
 #, c-format
 msgid "General help using GNU software: <%s>\n"
-msgstr ""
+msgstr "п║п©я─п╟п╡п╨п╟ п©п╬ я─п╟п╠п╬я┌п╣ я│ п©я─п╬пЁя─п╟п╪п╪п╟п╪п╦ GNU: <%s>\n"
 
-#: lib/wait-process.c:232 lib/wait-process.c:264 lib/wait-process.c:326
-#, c-format
+#: lib/wait-process.c:266 lib/wait-process.c:298 lib/wait-process.c:357
+#, fuzzy, c-format
 msgid "%s subprocess"
-msgstr ""
+msgstr "п²п╣я┌ я┌п╟п╨п╬пЁп╬ п©я─п╬я├п╣я│я│п╟"
 
-#: lib/wait-process.c:283 lib/wait-process.c:355
-#, c-format
+#: lib/wait-process.c:317 lib/wait-process.c:386
+#, fuzzy, c-format
 msgid "%s subprocess got fatal signal %d"
-msgstr ""
+msgstr "%s: п©я─п╣п©я─п╬я├п╣я│я│п╬я─ п║п╦ п╥п╟п╡п╣я─я┬п╦п╩я│я▐ п╫п╣ я┐я│п©п╣я┬п╫п╬ я│ я│п╦пЁп╫п╟п╩п╬п╪ %d\n"
 
-#: lib/xprintf.c:50 lib/xprintf.c:76
-#, c-format
+#: lib/xprintf.c:47 lib/xprintf.c:68
+#, fuzzy, c-format
 msgid "cannot perform formatted output"
-msgstr ""
+msgstr "п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ я│пЁп╣п╫п╣я─п╦я─п╬п╡п╟я┌я▄ п╡я▀я┘п╬п╢п╫п╬п╧ я└п╟п╧п╩"
 
 #: src/builtin.c:264
 #, fuzzy, c-format
 msgid "--warn-macro-sequence: bad regular expression `%s': %s"
-msgstr "Неверное регулярное выражение: '%s': %s"
+msgstr "п²п╣п╡п╣я─п╫п╬п╣ я─п╣пЁя┐п╩я▐я─п╫п╬п╣ п╡я▀я─п╟п╤п╣п╫п╦п╣: '%s': %s"
 
-#: src/builtin.c:320
+#: src/builtin.c:298
+#, c-format
+msgid "truncating macro `%s' definition to INT_MAX bytes"
+msgstr ""
+
+#: src/builtin.c:333
 #, c-format
 msgid "Warning: definition of `%s' contains sequence `%s'"
 msgstr ""
 
-#: src/builtin.c:327
+#: src/builtin.c:340
 #, c-format
 msgid "error checking --warn-macro-sequence for macro `%s'"
 msgstr ""
 
-#: src/builtin.c:388
+#: src/builtin.c:401
 #, fuzzy, c-format
 msgid "Warning: too few arguments to builtin `%s'"
-msgstr "Предупреждение: Слишком мало аргументов для встроенной лексемы '%s'"
+msgstr "п÷я─п╣п╢я┐п©я─п╣п╤п╢п╣п╫п╦п╣: п║п╩п╦я┬п╨п╬п╪ п╪п╟п╩п╬ п╟я─пЁя┐п╪п╣п╫я┌п╬п╡ п╢п╩я▐ п╡я│я┌я─п╬п╣п╫п╫п╬п╧ п╩п╣п╨я│п╣п╪я▀ '%s'"
 
-#: src/builtin.c:394
+#: src/builtin.c:407
 #, fuzzy, c-format
 msgid "Warning: excess arguments to builtin `%s' ignored"
 msgstr ""
-"Предупреждение: Избыточные аргументы для встроенной лексемы '%s' "
-"проигнорированы"
+"п÷я─п╣п╢я┐п©я─п╣п╤п╢п╣п╫п╦п╣: п≤п╥п╠я▀я┌п╬я┤п╫я▀п╣ п╟я─пЁя┐п╪п╣п╫я┌я▀ п╢п╩я▐ п╡я│я┌я─п╬п╣п╫п╫п╬п╧ п╩п╣п╨я│п╣п╪я▀ '%s' "
+"п©я─п╬п╦пЁп╫п╬я─п╦я─п╬п╡п╟п╫я▀"
 
-#: src/builtin.c:415 src/builtin.c:1114
-#, c-format
+#: src/builtin.c:428 src/builtin.c:1155
+#, fuzzy, c-format
 msgid "empty string treated as 0 in builtin `%s'"
-msgstr ""
+msgstr "п²п╣ я┤п╦я│п╩п╬п╡п╬п╧ п╟я─пЁя┐п╪п╣п╫я┌ п╢п╩я▐ п╡я│я┌я─п╬п╣п╫п╫п╬п╧ п╩п╣п╨я│п╣п╪я▀ '%s'"
 
-#: src/builtin.c:425 src/builtin.c:1243
+#: src/builtin.c:438 src/builtin.c:1285
 #, fuzzy, c-format
 msgid "non-numeric argument to builtin `%s'"
-msgstr "Не числовой аргумент для встроенной лексемы '%s'"
+msgstr "п²п╣ я┤п╦я│п╩п╬п╡п╬п╧ п╟я─пЁя┐п╪п╣п╫я┌ п╢п╩я▐ п╡я│я┌я─п╬п╣п╫п╫п╬п╧ п╩п╣п╨я│п╣п╪я▀ '%s'"
 
-#: src/builtin.c:431
-#, c-format
+#: src/builtin.c:444
+#, fuzzy, c-format
 msgid "leading whitespace ignored in builtin `%s'"
-msgstr ""
+msgstr "п²п╣ я┤п╦я│п╩п╬п╡п╬п╧ п╟я─пЁя┐п╪п╣п╫я┌ п╢п╩я▐ п╡я│я┌я─п╬п╣п╫п╫п╬п╧ п╩п╣п╨я│п╣п╪я▀ '%s'"
 
-#: src/builtin.c:435
+#: src/builtin.c:448
 #, fuzzy, c-format
 msgid "numeric overflow detected in builtin `%s'"
-msgstr "Не числовой аргумент для встроенной лексемы '%s'"
+msgstr "п²п╣ я┤п╦я│п╩п╬п╡п╬п╧ п╟я─пЁя┐п╪п╣п╫я┌ п╢п╩я▐ п╡я│я┌я─п╬п╣п╫п╫п╬п╧ п╩п╣п╨я│п╣п╪я▀ '%s'"
 
-#: src/builtin.c:552 src/builtin.c:815 src/builtin.c:856
-#, c-format
+#: src/builtin.c:566 src/builtin.c:829 src/builtin.c:870
+#, fuzzy, c-format
 msgid "Warning: %s: invalid macro name ignored"
-msgstr ""
+msgstr "п╫п╣п╢п╬п©я┐я│я┌п╦п╪я▀п╧ п╥п╫п╟п╨: я│п╬п╬п╠я┴п╣п╫п╦п╣ п©я─п╬п╦пЁп╫п╬я─п╦я─п╬п╡п╟п╫п╬"
 
-#: src/builtin.c:752 src/builtin.c:864
+#: src/builtin.c:765 src/builtin.c:877
 #, fuzzy, c-format
 msgid "undefined macro `%s'"
-msgstr "Имя `%s' неопределено"
+msgstr "п≤п╪я▐ `%s' п╫п╣п╬п©я─п╣п╢п╣п╩п╣п╫п╬"
 
-#: src/builtin.c:823
+#: src/builtin.c:836
 #, fuzzy, c-format
 msgid "undefined builtin `%s'"
-msgstr "Имя `%s' неопределено"
+msgstr "п≤п╪я▐ `%s' п╫п╣п╬п©я─п╣п╢п╣п╩п╣п╫п╬"
 
-#: src/builtin.c:914 src/builtin.c:2208
-#, c-format
+#: src/builtin.c:928 src/builtin.c:2260
+#, fuzzy, c-format
 msgid "builtin `%s' requested by frozen file is not supported"
-msgstr ""
+msgstr "%s: п╡п╩п╬п╤п╣п╫п╫я▀п╣ я┐я│п╩п╬п╡п╦я▐ п╫п╣ п©п╬п╢п╢п╣я─п╤п╦п╡п╟я▌я┌я│я▐"
 
-#: src/builtin.c:918
+#: src/builtin.c:932
 #, fuzzy, c-format
 msgid "Warning: cannot concatenate builtin `%s'"
-msgstr "Предупреждение: Слишком мало аргументов для встроенной лексемы '%s'"
+msgstr "п÷я─п╣п╢я┐п©я─п╣п╤п╢п╣п╫п╦п╣: п║п╩п╦я┬п╨п╬п╪ п╪п╟п╩п╬ п╟я─пЁя┐п╪п╣п╫я┌п╬п╡ п╢п╩я▐ п╡я│я┌я─п╬п╣п╫п╫п╬п╧ п╩п╣п╨я│п╣п╪я▀ '%s'"
 
-#: src/builtin.c:978 src/builtin.c:1015 src/builtin.c:1028 src/builtin.c:1063
+#: src/builtin.c:1003 src/builtin.c:1053 src/builtin.c:1066 src/builtin.c:1101
 #, fuzzy, c-format
 msgid "cannot run command `%s'"
-msgstr "Невозможно открыть канал для комманды '%s'"
+msgstr "п²п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╬я┌п╨я─я▀я┌я▄ п╨п╟п╫п╟п╩ п╢п╩я▐ п╨п╬п╪п╪п╟п╫п╢я▀ '%s'"
 
-#: src/builtin.c:1051
+#: src/builtin.c:1089
+#, fuzzy
 msgid "cannot read pipe"
-msgstr ""
+msgstr "п╫п╣ я┐п╢п╟п╩п╬я│я▄ п©я─п╬я┤п╦я┌п╟я┌я▄ п╨п╟я─я┌я┐ я│я│я▀п╩п╬п╨"
 
-#: src/builtin.c:1098
+#: src/builtin.c:1140
 #, c-format
 msgid "radix %d in builtin `%s' out of range"
 msgstr ""
 
-#: src/builtin.c:1108
+#: src/builtin.c:1149
 #, fuzzy, c-format
 msgid "negative width to builtin `%s'"
-msgstr "Отрицательная ширина"
+msgstr "п·я┌я─п╦я├п╟я┌п╣п╩я▄п╫п╟я▐ я┬п╦я─п╦п╫п╟"
 
-#: src/builtin.c:1252
+#: src/builtin.c:1294
 #, fuzzy, c-format
 msgid "error undiverting `%s'"
-msgstr "Невозможно вернуть вывод из %s"
+msgstr "п²п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╡п╣я─п╫я┐я┌я▄ п╡я▀п╡п╬п╢ п╦п╥ %s"
 
-#: src/builtin.c:1256
+#: src/builtin.c:1298
 #, fuzzy, c-format
 msgid "cannot undivert `%s'"
-msgstr "Невозможно вернуть вывод из %s"
+msgstr "п²п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╡п╣я─п╫я┐я┌я▄ п╡я▀п╡п╬п╢ п╦п╥ %s"
 
-#: src/builtin.c:1366 src/freeze.c:115 src/m4.c:379
-#, fuzzy, c-format
+#: src/builtin.c:1408 src/freeze.c:115 src/m4.c:382
+#, c-format
 msgid "cannot open `%s'"
-msgstr "Невозможно открыть %s"
+msgstr "п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╬я┌п╨я─я▀я┌я▄ б╚%sб╩"
 
-#: src/builtin.c:1429
+#: src/builtin.c:1471
 #, fuzzy, c-format
 msgid "%s: cannot create tempfile `%s'"
-msgstr "ОШИБКА: не могу закрыть модуль: `%s'"
+msgstr "п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ я│п╬п╥п╢п╟я┌я▄ п╡я─п╣п╪п╣п╫п╫я▀п╧ я└п╟п╧п╩: %s"
 
-#: src/builtin.c:1464
+#: src/builtin.c:1507
 msgid "recommend using mkstemp instead"
 msgstr ""
 
-#: src/builtin.c:1557
-#, c-format
+#: src/builtin.c:1600
+#, fuzzy, c-format
 msgid "exit status out of range: `%d'"
-msgstr ""
+msgstr "я│п╪п╣я┴п╣п╫п╦п╣ UT п╡п╫п╣ п╢п╦п╟п©п╟п╥п╬п╫п╟"
 
-#: src/builtin.c:1681
+#: src/builtin.c:1726
 #, c-format
 msgid "Debugmode: bad debug flags: `%s'"
-msgstr "Режим отладки: неверный флаг отладки: '%s'"
+msgstr "п═п╣п╤п╦п╪ п╬я┌п╩п╟п╢п╨п╦: п╫п╣п╡п╣я─п╫я▀п╧ я└п╩п╟пЁ п╬я┌п╩п╟п╢п╨п╦: '%s'"
 
-#: src/builtin.c:1722 src/m4.c:625 src/m4.c:689
+#: src/builtin.c:1767 src/m4.c:633 src/m4.c:700
 #, fuzzy, c-format
 msgid "cannot set debug file `%s'"
-msgstr "Невозможно назначить файл ошибок %s"
+msgstr "п╫п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╬я┌п╨я─я▀я┌я▄ п╡я┘п╬п╢п╫п╬п╧ я└п╟п╧п╩ б╚%sб╩"
 
-#: src/builtin.c:1988
+#: src/builtin.c:2034
 #, fuzzy
 msgid "Warning: \\0 will disappear, use \\& instead in replacements"
-msgstr "ПРЕДУПРЕЖДЕНИЕ: \\0 исчезнет, используйте \\& в заменах"
+msgstr "п÷п═п∙п■пёп÷п═п∙п√п■п∙п²п≤п∙: \\0 п╦я│я┤п╣п╥п╫п╣я┌, п╦я│п©п╬п╩я▄п╥я┐п╧я┌п╣ \\& п╡ п╥п╟п╪п╣п╫п╟я┘"
 
-#: src/builtin.c:2004
+#: src/builtin.c:2057
 #, c-format
 msgid "Warning: sub-expression %d not present"
 msgstr ""
 
-#: src/builtin.c:2013
+#: src/builtin.c:2066
 msgid "Warning: trailing \\ ignored in replacement"
 msgstr ""
 
-#: src/builtin.c:2079
+#: src/builtin.c:2132
 #, fuzzy, c-format
 msgid "bad regular expression: `%s': %s"
-msgstr "Неверное регулярное выражение: '%s': %s"
+msgstr "п²п╣п╡п╣я─п╫п╬п╣ я─п╣пЁя┐п╩я▐я─п╫п╬п╣ п╡я▀я─п╟п╤п╣п╫п╦п╣: '%s': %s"
 
-#: src/builtin.c:2091 src/builtin.c:2161
+#: src/builtin.c:2144 src/builtin.c:2214
 #, fuzzy, c-format
 msgid "error matching regular expression `%s'"
-msgstr "Ошибка сопоставления регулярного выражения '%s'"
+msgstr "п·я┬п╦п╠п╨п╟ я│п╬п©п╬я│я┌п╟п╡п╩п╣п╫п╦я▐ я─п╣пЁя┐п╩я▐я─п╫п╬пЁп╬ п╡я▀я─п╟п╤п╣п╫п╦я▐ '%s'"
 
-#: src/builtin.c:2139 src/input.c:792
+#: src/builtin.c:2192 src/input.c:795
 #, fuzzy, c-format
 msgid "bad regular expression `%s': %s"
-msgstr "Неверное регулярное выражение: '%s': %s"
+msgstr "п²п╣п╡п╣я─п╫п╬п╣ я─п╣пЁя┐п╩я▐я─п╫п╬п╣ п╡я▀я─п╟п╤п╣п╫п╦п╣: '%s': %s"
 
 #: src/debug.c:136 src/debug.c:157
+#, fuzzy
 msgid "error writing to debug stream"
-msgstr ""
+msgstr "п·я┬п╦п╠п╨п╟ п╥п╟п©п╦я│п╦ п╫п╟ я│я┌п╟п╫п╢п╟я─я┌п╫я▀п╧ п╡я▀п╡п╬п╢"
 
-#: src/eval.c:318
-#, fuzzy, c-format
-msgid "bad expression in eval (missing right parenthesis): %s"
-msgstr "Неверное выражение (отсутствует правые скобки): %s"
-
-#: src/eval.c:324
-#, fuzzy, c-format
-msgid "bad expression in eval: %s"
-msgstr "Неверное выражение: %s"
-
-#: src/eval.c:329
-#, fuzzy, c-format
-msgid "bad expression in eval (bad input): %s"
-msgstr "Неверное выражение (bad input): %s"
-
-#: src/eval.c:334
-#, fuzzy, c-format
-msgid "bad expression in eval (excess input): %s"
-msgstr "Неверное выражение (excess input): %s"
-
-#: src/eval.c:339
-#, fuzzy, c-format
-msgid "invalid operator in eval: %s"
-msgstr "Деление на ноль в выражении: %s"
-
-#: src/eval.c:345
-#, fuzzy, c-format
-msgid "divide by zero in eval: %s"
-msgstr "Деление на ноль в выражении: %s"
-
-#: src/eval.c:350
-#, fuzzy, c-format
-msgid "modulo by zero in eval: %s"
-msgstr "Модульное деление на ноль в выражении: %s"
-
-#: src/eval.c:355
-#, fuzzy, c-format
-msgid "negative exponent in eval: %s"
-msgstr "Неверное выражение: %s"
-
-#: src/eval.c:538
+#: src/eval.c:485
 msgid "Warning: recommend ==, not =, for equality operator"
 msgstr ""
 
-#: src/format.c:40 src/format.c:64 src/format.c:88
+#: src/eval.c:569
+#, fuzzy, c-format
+msgid "bad expression in eval (missing right parenthesis): %s"
+msgstr "п²п╣п╡п╣я─п╫п╬п╣ п╡я▀я─п╟п╤п╣п╫п╦п╣ (п╬я┌я│я┐я┌я│я┌п╡я┐п╣я┌ п©я─п╟п╡я▀п╣ я│п╨п╬п╠п╨п╦): %s"
+
+#: src/eval.c:574
+#, fuzzy, c-format
+msgid "bad expression in eval: %s"
+msgstr "п²п╣п╡п╣я─п╫п╬п╣ п╡я▀я─п╟п╤п╣п╫п╦п╣: %s"
+
+#: src/eval.c:579
+#, fuzzy, c-format
+msgid "bad expression in eval (bad input): %s"
+msgstr "п²п╣п╡п╣я─п╫п╬п╣ п╡я▀я─п╟п╤п╣п╫п╦п╣ (bad input): %s"
+
+#: src/eval.c:584
+#, fuzzy, c-format
+msgid "bad expression in eval (excess input): %s"
+msgstr "п²п╣п╡п╣я─п╫п╬п╣ п╡я▀я─п╟п╤п╣п╫п╦п╣ (excess input): %s"
+
+#: src/eval.c:588
+#, fuzzy, c-format
+msgid "invalid number in eval: %s"
+msgstr "п■п╣п╩п╣п╫п╦п╣ п╫п╟ п╫п╬п╩я▄ п╡ п╡я▀я─п╟п╤п╣п╫п╦п╦: %s"
+
+#: src/eval.c:592
+#, fuzzy, c-format
+msgid "invalid operator in eval: %s"
+msgstr "п■п╣п╩п╣п╫п╦п╣ п╫п╟ п╫п╬п╩я▄ п╡ п╡я▀я─п╟п╤п╣п╫п╦п╦: %s"
+
+#: src/eval.c:597
+#, fuzzy, c-format
+msgid "divide by zero in eval: %s"
+msgstr "п■п╣п╩п╣п╫п╦п╣ п╫п╟ п╫п╬п╩я▄ п╡ п╡я▀я─п╟п╤п╣п╫п╦п╦: %s"
+
+#: src/eval.c:601
+#, fuzzy, c-format
+msgid "modulo by zero in eval: %s"
+msgstr "п°п╬п╢я┐п╩я▄п╫п╬п╣ п╢п╣п╩п╣п╫п╦п╣ п╫п╟ п╫п╬п╩я▄ п╡ п╡я▀я─п╟п╤п╣п╫п╦п╦: %s"
+
+#: src/eval.c:605
+#, fuzzy, c-format
+msgid "negative exponent in eval: %s"
+msgstr "п²п╣п╡п╣я─п╫п╬п╣ п╡я▀я─п╟п╤п╣п╫п╦п╣: %s"
+
+#: src/format.c:39 src/format.c:63 src/format.c:87
 msgid "empty string treated as 0"
 msgstr ""
 
-#: src/format.c:46 src/format.c:70 src/format.c:94
+#: src/format.c:45 src/format.c:69 src/format.c:93
 #, fuzzy, c-format
 msgid "non-numeric argument %s"
-msgstr "Нечисловой аргумент для %s"
+msgstr "п²п╣я┤п╦я│п╩п╬п╡п╬п╧ п╟я─пЁя┐п╪п╣п╫я┌ п╢п╩я▐ %s"
 
-#: src/format.c:48 src/format.c:72 src/format.c:96
+#: src/format.c:47 src/format.c:71 src/format.c:95
 msgid "leading whitespace ignored"
 msgstr ""
 
-#: src/format.c:50 src/format.c:74 src/format.c:98
+#: src/format.c:49 src/format.c:73 src/format.c:97
+#, fuzzy
 msgid "numeric overflow detected"
-msgstr ""
+msgstr "п²п╣ я┤п╦я│п╩п╬п╡п╬п╧ п╟я─пЁя┐п╪п╣п╫я┌ п╢п╩я▐ п╡я│я┌я─п╬п╣п╫п╫п╬п╧ п╩п╣п╨я│п╣п╪я▀ '%s'"
 
-#: src/format.c:308
+#: src/format.c:309
 #, fuzzy, c-format
 msgid "Warning: unrecognized specifier in `%s'"
-msgstr "%s: неизвестная опция '%c%s'\n"
+msgstr "%s: п╫п╣п╦п╥п╡п╣я│я┌п╫п╟я▐ п╬п©я├п╦я▐ '%c%s'\n"
 
-#: src/freeze.c:156
+#: src/freeze.c:157
+#, fuzzy
 msgid "unable to create frozen state"
-msgstr ""
+msgstr "п²п╣ я┐п╢п╟п╩п╬я│я▄ я│п╬п╥п╢п╟я┌я▄ п©я─п╬я├п╣я│я│ п╫п╟ я│п╣я─п╡п╣я─п╣"
 
-#: src/freeze.c:167
+#: src/freeze.c:168
 #, fuzzy
 msgid "expecting line feed in frozen file"
-msgstr "Ожидается перевод строки в файле-образе памяти"
+msgstr "п·п╤п╦п╢п╟п╣я┌я│я▐ п©п╣я─п╣п╡п╬п╢ я│я┌я─п╬п╨п╦ п╡ я└п╟п╧п╩п╣-п╬п╠я─п╟п╥п╣ п©п╟п╪я▐я┌п╦"
 
-#: src/freeze.c:169
+#: src/freeze.c:170
 #, fuzzy, c-format
 msgid "expecting character `%c' in frozen file"
-msgstr "Ожидается символ '%c' в файле-образе памяти"
+msgstr "п·п╤п╦п╢п╟п╣я┌я│я▐ я│п╦п╪п╡п╬п╩ '%c' п╡ я└п╟п╧п╩п╣-п╬п╠я─п╟п╥п╣ п©п╟п╪я▐я┌п╦"
 
-#: src/freeze.c:215
+#: src/freeze.c:216
 #, fuzzy
 msgid "integer overflow in frozen file"
-msgstr "Ожидается перевод строки в файле-образе памяти"
+msgstr "я├п╣п╩п╬я┤п╦я│п╩п╣п╫п╫п╬п╣ п©п╣я─п╣п©п╬п╩п╫п╣п╫п╦п╣"
 
-#: src/freeze.c:257
+#: src/freeze.c:258
 #, fuzzy
 msgid "premature end of frozen file"
-msgstr "Преждевременный конец файла-образа памяти"
+msgstr "п÷я─п╣п╤п╢п╣п╡я─п╣п╪п╣п╫п╫я▀п╧ п╨п╬п╫п╣я├ я└п╟п╧п╩п╟-п╬п╠я─п╟п╥п╟ п©п╟п╪я▐я┌п╦"
 
-#: src/freeze.c:270
-#, fuzzy, c-format
+#: src/freeze.c:271
+#, c-format
 msgid "cannot open %s"
-msgstr "Невозможно открыть %s"
+msgstr "п╫п╣ я┐п╢п╟п╩п╬я│я▄ п╬я┌п╨я─я▀я┌я▄ %s"
 
-#: src/freeze.c:285
+#: src/freeze.c:286
 #, c-format
 msgid "frozen file version %d greater than max supported of 1"
 msgstr ""
 
-#: src/freeze.c:288
+#: src/freeze.c:289
 msgid "ill-formed frozen file, version directive expected"
 msgstr ""
 
-#: src/freeze.c:297
+#: src/freeze.c:298
 #, fuzzy
 msgid "ill-formed frozen file"
-msgstr "Неверный формат файла-образа памяти"
+msgstr "п²п╣п╡п╣я─п╫я▀п╧ я└п╬я─п╪п╟я┌ я└п╟п╧п╩п╟-п╬п╠я─п╟п╥п╟ п©п╟п╪я▐я┌п╦"
 
-#: src/freeze.c:385
+#: src/freeze.c:387
+#, fuzzy
 msgid "unable to read frozen state"
-msgstr ""
+msgstr "п╫п╣ я┐п╢п╟п╩п╬я│я▄ п╡я▀я│п╡п╬п╠п╬п╢п╦я┌я▄ п╥п╟п╫я▐я┌я┐я▌ п╟я─пЁя┐п╪п╣п╫я┌п╟п╪п╦ п©п╟п╪я▐я┌я▄"
 
 #: src/input.c:359
+#, fuzzy
 msgid "read error"
-msgstr ""
+msgstr "п╬я┬п╦п╠п╨п╟ п╥п╟п©п╦я│п╦"
 
 #: src/input.c:366
+#, fuzzy
 msgid "error reading file"
-msgstr ""
+msgstr "%s: п·я┬п╦п╠п╨п╟ я┤я┌п╣п╫п╦я▐ %s\n"
 
-#: src/input.c:589
+#: src/input.c:590
 msgid "Warning: end of file treated as newline"
 msgstr ""
 
-#: src/input.c:881
+#: src/input.c:899
 msgid "ERROR: end of file in comment"
 msgstr ""
 
-#: src/input.c:1001
+#: src/input.c:1023
 #, fuzzy
 msgid "ERROR: end of file in string"
-msgstr "ОШИБКА: Конец файла в строке"
+msgstr "п·п╗п≤п▒п п░: п п╬п╫п╣я├ я└п╟п╧п╩п╟ п╡ я│я┌я─п╬п╨п╣"
 
 #. TRANSLATORS: This is a non-ASCII name: The first name is (with
 #. Unicode escapes) "Ren\u00e9" or (with HTML entities) "Ren&eacute;".
@@ -851,12 +875,12 @@ msgstr ""
 #: src/m4.c:207
 #, fuzzy, c-format
 msgid "Try `%s --help' for more information."
-msgstr "Попробуйте '%s --help' для информации.\n"
+msgstr "п÷п╬п©я─п╬п╠я┐п╧я┌п╣ '%s --help' п╢п╩я▐ п╦п╫я└п╬я─п╪п╟я├п╦п╦.\n"
 
 #: src/m4.c:213
 #, c-format
 msgid "Usage: %s [OPTION]... [FILE]...\n"
-msgstr "Использование: %s [OPTION]... [FILE]...\n"
+msgstr "п≤я│п©п╬п╩я▄п╥п╬п╡п╟п╫п╦п╣: %s [OPTION]... [FILE]...\n"
 
 #: src/m4.c:214
 #, fuzzy
@@ -865,13 +889,16 @@ msgid ""
 "is read.\n"
 msgstr ""
 "\n"
-"Если FILE не существует или FILE это `-', используется стандартный вход.\n"
+"п∙я│п╩п╦ FILE п╫п╣ я│я┐я┴п╣я│я┌п╡я┐п╣я┌ п╦п╩п╦ FILE я█я┌п╬ `-', п╦я│п©п╬п╩я▄п╥я┐п╣я┌я│я▐ я│я┌п╟п╫п╢п╟я─я┌п╫я▀п╧ п╡я┘п╬п╢.\n"
 
 #: src/m4.c:219
+#, fuzzy
 msgid ""
 "Mandatory or optional arguments to long options are mandatory or optional\n"
 "for short options too.\n"
 msgstr ""
+"п·п╠я▐п╥п╟я┌п╣п╩я▄п╫я▀п╣ п╦п╩п╦ п╫п╣п╬п╠я▐п╥п╟я┌п╣п╩я▄п╫я▀п╣ п╟я─пЁя┐п╪п╣п╫я┌я▀ п╢п╩я▐ п╢п╩п╦п╫п╫я▀я┘ п╨п╩я▌я┤п╣п╧ я┌п╟п╨п╤п╣ я▐п╡п╩я▐я▌я┌я│я▐ "
+"п╬п╠я▐п╥п╟я┌п╣п╩я▄п╫я▀п╪п╦ п╦п╩п╦ п╫п╣п╬п╠я▐п╥п╟я┌п╣п╩я▄п╫я▀п╪п╦ п╢п╩я▐ я│п╬п╬я┌п╡п╣я┌я│я┌п╡я┐я▌я┴п╦я┘ п╨п╬я─п╬я┌п╨п╦я┘ п╨п╩я▌я┤п╣п╧."
 
 #: src/m4.c:224
 msgid ""
@@ -900,8 +927,8 @@ msgstr ""
 #: src/m4.c:242
 msgid "  -W, --word-regexp=REGEXP     use REGEXP for macro name syntax\n"
 msgstr ""
-"  -W, --word-regexp=REGEXP     использовать REGEXP для синтаксиса имен "
-"макросов\n"
+"  -W, --word-regexp=REGEXP     п╦я│п©п╬п╩я▄п╥п╬п╡п╟я┌я▄ REGEXP п╢п╩я▐ я│п╦п╫я┌п╟п╨я│п╦я│п╟ п╦п╪п╣п╫ "
+"п╪п╟п╨я─п╬я│п╬п╡\n"
 
 #: src/m4.c:247
 #, fuzzy
@@ -913,11 +940,11 @@ msgid ""
 "  -U, --undefine=NAME          undefine NAME\n"
 msgstr ""
 "\n"
-"Опции препроцессора:\n"
-"  -I, --include=DIRECTORY      искать в подкаталоге включаемые файлы\n"
-"  -D, --define=NAME[=VALUE]    определить, что NAME имеет VALUE, или пуст\n"
-"  -U, --undefine=NAME          удалить встроенную функцию NAME\n"
-"  -s, --synclines              генерировать строки `#line NO \"FILE\"'\n"
+"п·п©я├п╦п╦ п©я─п╣п©я─п╬я├п╣я│я│п╬я─п╟:\n"
+"  -I, --include=DIRECTORY      п╦я│п╨п╟я┌я▄ п╡ п©п╬п╢п╨п╟я┌п╟п╩п╬пЁп╣ п╡п╨п╩я▌я┤п╟п╣п╪я▀п╣ я└п╟п╧п╩я▀\n"
+"  -D, --define=NAME[=VALUE]    п╬п©я─п╣п╢п╣п╩п╦я┌я▄, я┤я┌п╬ NAME п╦п╪п╣п╣я┌ VALUE, п╦п╩п╦ п©я┐я│я┌\n"
+"  -U, --undefine=NAME          я┐п╢п╟п╩п╦я┌я▄ п╡я│я┌я─п╬п╣п╫п╫я┐я▌ я└я┐п╫п╨я├п╦я▌ NAME\n"
+"  -s, --synclines              пЁп╣п╫п╣я─п╦я─п╬п╡п╟я┌я▄ я│я┌я─п╬п╨п╦ `#line NO \"FILE\"'\n"
 
 #: src/m4.c:255
 #, fuzzy, c-format
@@ -925,16 +952,16 @@ msgid ""
 "Limits control:\n"
 "  -g, --gnu                    override -G to re-enable GNU extensions\n"
 "  -G, --traditional            suppress all GNU extensions\n"
-"  -H, --hashsize=PRIME         set symbol lookup hash table size [509]\n"
+"  -H, --hashsize=PRIME         set symbol lookup hash table size [%d]\n"
 "  -L, --nesting-limit=NUMBER   change nesting limit, 0 for unlimited [%d]\n"
 msgstr ""
 "\n"
-"Ограничения:\n"
-"  -G, --traditional            подавлять все GNU расширения\n"
-"  -H, --hashsize=PRIME         установить размер хэш-таблицы для поиска "
-"символов\n"
-"  -L, --nesting-limit=NUMBER   изменить предел глубины интелектуального "
-"поиска\n"
+"п·пЁя─п╟п╫п╦я┤п╣п╫п╦я▐:\n"
+"  -G, --traditional            п©п╬п╢п╟п╡п╩я▐я┌я▄ п╡я│п╣ GNU я─п╟я│я┬п╦я─п╣п╫п╦я▐\n"
+"  -H, --hashsize=PRIME         я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ я─п╟п╥п╪п╣я─ я┘я█я┬-я┌п╟п╠п╩п╦я├я▀ п╢п╩я▐ п©п╬п╦я│п╨п╟ "
+"я│п╦п╪п╡п╬п╩п╬п╡\n"
+"  -L, --nesting-limit=NUMBER   п╦п╥п╪п╣п╫п╦я┌я▄ п©я─п╣п╢п╣п╩ пЁп╩я┐п╠п╦п╫я▀ п╦п╫я┌п╣п╩п╣п╨я┌я┐п╟п╩я▄п╫п╬пЁп╬ "
+"п©п╬п╦я│п╨п╟\n"
 
 #: src/m4.c:263
 #, fuzzy
@@ -944,9 +971,9 @@ msgid ""
 "  -R, --reload-state=FILE      reload a frozen state from FILE at start\n"
 msgstr ""
 "\n"
-"Блокированные файлы:\n"
-"  -F, --freeze-state=FILE      в конце создать образ памяти для FILE\n"
-"  -R, --reload-state=FILE      в начале загружать образ памяти для FILE\n"
+"п▒п╩п╬п╨п╦я─п╬п╡п╟п╫п╫я▀п╣ я└п╟п╧п╩я▀:\n"
+"  -F, --freeze-state=FILE      п╡ п╨п╬п╫я├п╣ я│п╬п╥п╢п╟я┌я▄ п╬п╠я─п╟п╥ п©п╟п╪я▐я┌п╦ п╢п╩я▐ FILE\n"
+"  -R, --reload-state=FILE      п╡ п╫п╟я┤п╟п╩п╣ п╥п╟пЁя─я┐п╤п╟я┌я▄ п╬п╠я─п╟п╥ п©п╟п╪я▐я┌п╦ п╢п╩я▐ FILE\n"
 
 #: src/m4.c:269
 #, fuzzy
@@ -959,13 +986,13 @@ msgid ""
 "  -t, --trace=NAME             trace NAME when it is defined\n"
 msgstr ""
 "\n"
-"Отладка:\n"
-"  -d, --debug=[FLAGS]          установить уровень отладки (по умолчанию "
+"п·я┌п╩п╟п╢п╨п╟:\n"
+"  -d, --debug=[FLAGS]          я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ я┐я─п╬п╡п╣п╫я▄ п╬я┌п╩п╟п╢п╨п╦ (п©п╬ я┐п╪п╬п╩я┤п╟п╫п╦я▌ "
 "FLAGS=`aeq')\n"
-"  -t, --trace=NAME             трассировать NAME когда оно будет определено\n"
-"  -l, --arglength=NUM          установить размер трассировки для макроса\n"
-"  -o, --error-output=FILE      перенаправить отладочный и трассировочный "
-"вывод в файл FILE\n"
+"  -t, --trace=NAME             я┌я─п╟я│я│п╦я─п╬п╡п╟я┌я▄ NAME п╨п╬пЁп╢п╟ п╬п╫п╬ п╠я┐п╢п╣я┌ п╬п©я─п╣п╢п╣п╩п╣п╫п╬\n"
+"  -l, --arglength=NUM          я┐я│я┌п╟п╫п╬п╡п╦я┌я▄ я─п╟п╥п╪п╣я─ я┌я─п╟я│я│п╦я─п╬п╡п╨п╦ п╢п╩я▐ п╪п╟п╨я─п╬я│п╟\n"
+"  -o, --error-output=FILE      п©п╣я─п╣п╫п╟п©я─п╟п╡п╦я┌я▄ п╬я┌п╩п╟п╢п╬я┤п╫я▀п╧ п╦ я┌я─п╟я│я│п╦я─п╬п╡п╬я┤п╫я▀п╧ "
+"п╡я▀п╡п╬п╢ п╡ я└п╟п╧п╩ FILE\n"
 
 #: src/m4.c:278
 msgid ""
@@ -999,187 +1026,227 @@ msgid ""
 "mismatch, or whatever value was passed to the m4exit macro.\n"
 msgstr ""
 
-#: src/m4.c:436
+#: src/m4.c:443
 #, c-format
 msgid "internal error detected; please report this bug to <%s>"
 msgstr ""
 
-#: src/m4.c:489
+#: src/m4.c:497
 #, c-format
 msgid "warning: `m4 -%c' may be removed in a future release"
 msgstr ""
 
-#: src/m4.c:496
-#, c-format
+#: src/m4.c:504
+#, fuzzy, c-format
 msgid "warning: `m4 %s' is deprecated"
 msgstr ""
+"п≈п╟п©я┐я│п╨ п©п╬п╢ п╦п╪п╣п╫п╣п╪ б╚egrepб╩ я┐я│я┌п╟я─п╣п╩; п╡п╪п╣я│я┌п╬ я█я┌п╬пЁп╬ п╦я│п©п╬п╩я▄п╥я┐п╧я┌п╣ б╚grep -Eб╩.\n"
 
-#: src/m4.c:572
+#: src/m4.c:580
 #, fuzzy, c-format
 msgid "bad debug flags: `%s'"
-msgstr "Неверный флаг отладки: '%s'"
+msgstr "п²п╣п╡п╣я─п╫я▀п╧ я└п╩п╟пЁ п╬я┌п╩п╟п╢п╨п╦: '%s'"
 
-#: src/m4.c:578
-#, c-format
+#: src/m4.c:586
+#, fuzzy, c-format
 msgid "warning: `m4 -e' is deprecated, use `-i' instead"
 msgstr ""
+"п≈п╟п©я┐я│п╨ п©п╬п╢ п╦п╪п╣п╫п╣п╪ б╚egrepб╩ я┐я│я┌п╟я─п╣п╩; п╡п╪п╣я│я┌п╬ я█я┌п╬пЁп╬ п╦я│п©п╬п╩я▄п╥я┐п╧я┌п╣ б╚grep -Eб╩.\n"
 
-#: src/m4.c:690
+#: src/m4.c:701
 msgid "stderr"
 msgstr ""
 
-#: src/macro.c:196
+#: src/macro.c:178 src/macro.c:225
+#, fuzzy
+msgid "Warning: cannot concatenate builtin tokens"
+msgstr "п÷я─п╣п╢я┐п©я─п╣п╤п╢п╣п╫п╦п╣: п║п╩п╦я┬п╨п╬п╪ п╪п╟п╩п╬ п╟я─пЁя┐п╪п╣п╫я┌п╬п╡ п╢п╩я▐ п╡я│я┌я─п╬п╣п╫п╫п╬п╧ п╩п╣п╨я│п╣п╪я▀ '%s'"
+
+#: src/macro.c:205
 #, fuzzy
 msgid "ERROR: end of file in argument list"
-msgstr "ОШИБКА: Конец файла в списке аргументов"
+msgstr "п·п╗п≤п▒п п░: п п╬п╫п╣я├ я└п╟п╧п╩п╟ п╡ я│п©п╦я│п╨п╣ п╟я─пЁя┐п╪п╣п╫я┌п╬п╡"
 
-#: src/macro.c:332
+#: src/macro.c:348
 #, fuzzy, c-format
 msgid "recursion limit of %d exceeded, use -L<N> to change it"
 msgstr ""
-"ОШИБКА: Лимит рекурсии %d исчерпан, используйте -L<N> чтобы изменить его"
+"п·п╗п≤п▒п п░: п⌡п╦п╪п╦я┌ я─п╣п╨я┐я─я│п╦п╦ %d п╦я│я┤п╣я─п©п╟п╫, п╦я│п©п╬п╩я▄п╥я┐п╧я┌п╣ -L<N> я┤я┌п╬п╠я▀ п╦п╥п╪п╣п╫п╦я┌я▄ п╣пЁп╬"
 
-#: src/output.c:172 src/output.c:898 src/output.c:901
+#: src/output.c:178 src/output.c:933 src/output.c:936
 #, fuzzy
 msgid "cannot clean temporary file for diversion"
 msgstr ""
-"ОШИБКА: Ошибка создания временного файла для разветвления макрообработки"
+"п·п╗п≤п▒п п░: п·я┬п╦п╠п╨п╟ я│п╬п╥п╢п╟п╫п╦я▐ п╡я─п╣п╪п╣п╫п╫п╬пЁп╬ я└п╟п╧п╩п╟ п╢п╩я▐ я─п╟п╥п╡п╣я┌п╡п╩п╣п╫п╦я▐ п╪п╟п╨я─п╬п╬п╠я─п╟п╠п╬я┌п╨п╦"
 
-#: src/output.c:222 src/output.c:231 src/output.c:265 src/output.c:360
+#: src/output.c:230 src/output.c:239 src/output.c:273 src/output.c:370
 #, fuzzy
 msgid "cannot create temporary file for diversion"
 msgstr ""
-"ОШИБКА: Ошибка создания временного файла для разветвления макрообработки"
+"п·п╗п≤п▒п п░: п·я┬п╦п╠п╨п╟ я│п╬п╥п╢п╟п╫п╦я▐ п╡я─п╣п╪п╣п╫п╫п╬пЁп╬ я└п╟п╧п╩п╟ п╢п╩я▐ я─п╟п╥п╡п╣я┌п╡п╩п╣п╫п╦я▐ п╪п╟п╨я─п╬п╬п╠я─п╟п╠п╬я┌п╨п╦"
 
-#: src/output.c:250 src/output.c:257 src/output.c:269
+#: src/output.c:258 src/output.c:265 src/output.c:277
 #, fuzzy
 msgid "cannot seek within diversion"
-msgstr "Невозможно подсчитать разветвления"
+msgstr "п²п╣п╡п╬п╥п╪п╬п╤п╫п╬ п©п╬п╢я│я┤п╦я┌п╟я┌я▄ я─п╟п╥п╡п╣я┌п╡п╩п╣п╫п╦я▐"
 
-#: src/output.c:341 src/output.c:353 src/output.c:502 src/output.c:733
+#: src/output.c:350 src/output.c:363 src/output.c:512 src/output.c:768
 #, fuzzy
 msgid "cannot close temporary file for diversion"
 msgstr ""
-"ОШИБКА: Ошибка создания временного файла для разветвления макрообработки"
+"п·п╗п≤п▒п п░: п·я┬п╦п╠п╨п╟ я│п╬п╥п╢п╟п╫п╦я▐ п╡я─п╣п╪п╣п╫п╫п╬пЁп╬ я└п╟п╧п╩п╟ п╢п╩я▐ я─п╟п╥п╡п╣я┌п╡п╩п╣п╫п╦я▐ п╪п╟п╨я─п╬п╬п╠я─п╟п╠п╬я┌п╨п╦"
 
-#: src/output.c:474
+#: src/output.c:484
 #, fuzzy
 msgid "ERROR: cannot flush diversion to temporary file"
-msgstr "ОШИБКА: Ошибка записи разветвления во временный файл"
+msgstr "п·п╗п≤п▒п п░: п·я┬п╦п╠п╨п╟ п╥п╟п©п╦я│п╦ я─п╟п╥п╡п╣я┌п╡п╩п╣п╫п╦я▐ п╡п╬ п╡я─п╣п╪п╣п╫п╫я▀п╧ я└п╟п╧п╩"
 
-#: src/output.c:568
+#: src/output.c:579
 #, fuzzy
 msgid "ERROR: copying inserted file"
-msgstr "ОШИБКА: Копирую вставленный файл"
+msgstr "п·п╗п≤п▒п п░: п п╬п©п╦я─я┐я▌ п╡я│я┌п╟п╡п╩п╣п╫п╫я▀п╧ я└п╟п╧п╩"
 
-#: src/output.c:816
+#: src/output.c:851
 #, fuzzy
 msgid "error reading inserted file"
-msgstr "ОШИБКА: Читаю вставленный файл"
+msgstr "п·п╗п≤п▒п п░: п╖п╦я┌п╟я▌ п╡я│я┌п╟п╡п╩п╣п╫п╫я▀п╧ я└п╟п╧п╩"
 
-#: src/output.c:983
+#: src/output.c:1018
 #, fuzzy
 msgid "cannot stat diversion"
-msgstr "Невозможно подсчитать разветвления"
+msgstr "п²п╣п╡п╬п╥п╪п╬п╤п╫п╬ п©п╬п╢я│я┤п╦я┌п╟я┌я▄ я─п╟п╥п╡п╣я┌п╡п╩п╣п╫п╦я▐"
 
-#: src/output.c:987
+#: src/output.c:1022
 #, fuzzy
 msgid "diversion too large"
-msgstr "Слишком большое разветвление"
+msgstr "п║п╩п╦я┬п╨п╬п╪ п╠п╬п╩я▄я┬п╬п╣ я─п╟п╥п╡п╣я┌п╡п╩п╣п╫п╦п╣"
 
-#, c-format
+#, fuzzy, c-format
+#~ msgid "unable to display error message"
+#~ msgstr "п╫п╣ я┐п╢п╟п╩п╬я│я▄ п╡я▀я│п╡п╬п╠п╬п╢п╦я┌я▄ п╥п╟п╫я▐я┌я┐я▌ п╟я─пЁя┐п╪п╣п╫я┌п╟п╪п╦ п©п╟п╪я▐я┌я▄"
+
+#~ msgid "%s: option `%s' is ambiguous\n"
+#~ msgstr "%s: п╬п©я├п╦я▐ `%s' п╫п╣п╬п╢п╫п╬п╥п╫п╟я┤п╫п╟\n"
+
 #~ msgid "%s: option `--%s' doesn't allow an argument\n"
-#~ msgstr "%s: у опции `--%s' не должно быть аргументов\n"
+#~ msgstr "%s: я┐ п╬п©я├п╦п╦ `--%s' п╫п╣ п╢п╬п╩п╤п╫п╬ п╠я▀я┌я▄ п╟я─пЁя┐п╪п╣п╫я┌п╬п╡\n"
 
-#, c-format
+#~ msgid "%s: option `%c%s' doesn't allow an argument\n"
+#~ msgstr "%s: я┐ п╬п©я├п╦п╦ `%c%s' п╫п╣ п╢п╬п╩п╤п╫п╬ п╠я▀я┌я▄ п╟я─пЁя┐п╪п╣п╫я┌п╬п╡\n"
+
+#~ msgid "%s: option `%s' requires an argument\n"
+#~ msgstr "%s: я┐ п╬п©я├п╦п╦ `%s' п╢п╬п╩п╤п╣п╫ п╠я▀я┌я▄ п╟я─пЁя┐п╪п╣п╫я┌\n"
+
 #~ msgid "%s: unrecognized option `--%s'\n"
-#~ msgstr "%s: неизвестная опция `--%s'\n"
+#~ msgstr "%s: п╫п╣п╦п╥п╡п╣я│я┌п╫п╟я▐ п╬п©я├п╦я▐ `--%s'\n"
 
-#, c-format
+#, fuzzy
+#~ msgid "%s: unrecognized option `%c%s'\n"
+#~ msgstr "%s: п╫п╣п╦п╥п╡п╣я│я┌п╫п╟я▐ п╬п©я├п╦я▐ `--%s'\n"
+
 #~ msgid "%s: illegal option -- %c\n"
-#~ msgstr "%s: запрещенная опция -- %c\n"
+#~ msgstr "%s: п╥п╟п©я─п╣я┴п╣п╫п╫п╟я▐ п╬п©я├п╦я▐ -- %c\n"
 
-#, c-format
+#~ msgid "%s: invalid option -- %c\n"
+#~ msgstr "%s: п╫п╣п╡п╣я─п╫п╟я▐ п╬п©я├п╦я▐ -- %c\n"
+
+#~ msgid "%s: option requires an argument -- %c\n"
+#~ msgstr "%s: п╬п©я├п╦п╦ п╫п╣п╬п╠я┘п╬п╢п╦п╪ п╟я─пЁя┐п╪п╣п╫я┌ -- %c\n"
+
 #~ msgid "%s: option `-W %s' is ambiguous\n"
-#~ msgstr "%s: ключ `-W %s' неоднозначен\n"
+#~ msgstr "%s: п╨п╩я▌я┤ `-W %s' п╫п╣п╬п╢п╫п╬п╥п╫п╟я┤п╣п╫\n"
 
-#, c-format
 #~ msgid "%s: option `-W %s' doesn't allow an argument\n"
-#~ msgstr "%s: у ключа `-W %s' не должно быть аргументов\n"
+#~ msgstr "%s: я┐ п╨п╩я▌я┤п╟ `-W %s' п╫п╣ п╢п╬п╩п╤п╫п╬ п╠я▀я┌я▄ п╟я─пЁя┐п╪п╣п╫я┌п╬п╡\n"
+
+#~ msgid "Unmatched [ or [^"
+#~ msgstr "п²п╣я┌ п╥п╟п╨я─я▀п╡п╟я▌я┴п╣п╧ [ п╦п╩п╦ [^"
 
 #~ msgid "INTERNAL ERROR: Bad token data type in define_macro ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверный тип лексемы в define_macro ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫я▀п╧ я┌п╦п© п╩п╣п╨я│п╣п╪я▀ п╡ define_macro ()"
+
+#~ msgid "Undefined name %s"
+#~ msgstr "п≤п╪я▐ %s п╫п╣п╬п©я─п╣п╢п╣п╩п╣п╫п╬"
 
 #~ msgid "INTERNAL ERROR: Builtin not found in builtin table!"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Встроенная лексема не найдена!"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п▓я│я┌я─п╬п╣п╫п╫п╟я▐ п╩п╣п╨я│п╣п╪п╟ п╫п╣ п╫п╟п╧п╢п╣п╫п╟!"
 
 #~ msgid "INTERNAL ERROR: Bad token data type in m4_dumpdef ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверный тип лексемы в m4_dumpdef ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫я▀п╧ я┌п╦п© п╩п╣п╨я│п╣п╪я▀ п╡ m4_dumpdef ()"
+
+#, fuzzy
+#~ msgid "Undefined name `%s'"
+#~ msgstr "п≤п╪я▐ %s п╫п╣п╬п©я─п╣п╢п╣п╩п╣п╫п╬"
 
 #~ msgid "INTERNAL ERROR: Bad symbol type in m4_defn ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверный тип символа в m4_defn ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫я▀п╧ я┌п╦п© я│п╦п╪п╡п╬п╩п╟ п╡ m4_defn ()"
 
-#, c-format
 #~ msgid "Radix in eval out of range (radix = %d)"
-#~ msgstr "Радикс в выражении выходит за пределы (radix = %d)"
+#~ msgstr "п═п╟п╢п╦п╨я│ п╡ п╡я▀я─п╟п╤п╣п╫п╦п╦ п╡я▀я┘п╬п╢п╦я┌ п╥п╟ п©я─п╣п╢п╣п╩я▀ (radix = %d)"
 
-#, c-format
 #~ msgid "Undefined syntax code %c"
-#~ msgstr "Неопределенный синтаксический код %c"
+#~ msgstr "п²п╣п╬п©я─п╣п╢п╣п╩п╣п╫п╫я▀п╧ я│п╦п╫я┌п╟п╨я│п╦я┤п╣я│п╨п╦п╧ п╨п╬п╢ %c"
+
+#~ msgid "Cannot open %s"
+#~ msgstr "п²п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╬я┌п╨я─я▀я┌я▄ %s"
+
+#~ msgid "Cannot set error file: %s"
+#~ msgstr "п²п╣п╡п╬п╥п╪п╬п╤п╫п╬ п╫п╟п╥п╫п╟я┤п╦я┌я▄ я└п╟п╧п╩ п╬я┬п╦п╠п╬п╨ %s"
+
+#, fuzzy
+#~ msgid "Bad regular expression `%s': %s"
+#~ msgstr "п²п╣п╡п╣я─п╫п╬п╣ я─п╣пЁя┐п╩я▐я─п╫п╬п╣ п╡я▀я─п╟п╤п╣п╫п╦п╣: '%s': %s"
 
 #~ msgid "INTERNAL ERROR: Builtin not found in builtin table! (trace_pre ())"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Встроенная лексема не найдена! (trace_pre ())"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п▓я│я┌я─п╬п╣п╫п╫п╟я▐ п╩п╣п╨я│п╣п╪п╟ п╫п╣ п╫п╟п╧п╢п╣п╫п╟! (trace_pre ())"
 
 #~ msgid "INTERNAL ERROR: Bad token data type (trace_pre ())"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверный тип лексемы (trace_pre ())"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫я▀п╧ я┌п╦п© п╩п╣п╨я│п╣п╪я▀ (trace_pre ())"
 
 #~ msgid "INTERNAL ERROR: Bad error code in evaluate ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверный код ошибки в evaluate ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫я▀п╧ п╨п╬п╢ п╬я┬п╦п╠п╨п╦ п╡ evaluate ()"
 
 #~ msgid "INTERNAL ERROR: Bad comparison operator in cmp_term ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверное сравнение в cmp_term ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫п╬п╣ я│я─п╟п╡п╫п╣п╫п╦п╣ п╡ cmp_term ()"
 
 #~ msgid "INTERNAL ERROR: Bad shift operator in shift_term ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверный оператор сдвига в shift_term ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫я▀п╧ п╬п©п╣я─п╟я┌п╬я─ я│п╢п╡п╦пЁп╟ п╡ shift_term ()"
 
 #~ msgid "INTERNAL ERROR: Bad operator in mult_term ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверный оператор в mult_term ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫я▀п╧ п╬п©п╣я─п╟я┌п╬я─ п╡ mult_term ()"
 
 #~ msgid "INTERNAL ERROR: Built-in not found in builtin table!"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Встроенная лексема не найдена!"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п▓я│я┌я─п╬п╣п╫п╫п╟я▐ п╩п╣п╨я│п╣п╪п╟ п╫п╣ п╫п╟п╧п╢п╣п╫п╟!"
 
 #~ msgid "INTERNAL ERROR: Bad token data type in freeze_one_symbol ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверный тип лексемы в freeze_one_symbol ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫я▀п╧ я┌п╦п© п╩п╣п╨я│п╣п╪я▀ п╡ freeze_one_symbol ()"
 
-#, c-format
 #~ msgid "`%s' from frozen file not found in builtin table!"
-#~ msgstr "'%s' из файла-образа памяти не найдена во встроенной таблице!"
+#~ msgstr "'%s' п╦п╥ я└п╟п╧п╩п╟-п╬п╠я─п╟п╥п╟ п©п╟п╪я▐я┌п╦ п╫п╣ п╫п╟п╧п╢п╣п╫п╟ п╡п╬ п╡я│я┌я─п╬п╣п╫п╫п╬п╧ я┌п╟п╠п╩п╦я├п╣!"
 
-#, c-format
 #~ msgid "Input reverted to %s, line %d"
-#~ msgstr "Ввод перенаправлен в %s , строка %d"
+#~ msgstr "п▓п╡п╬п╢ п©п╣я─п╣п╫п╟п©я─п╟п╡п╩п╣п╫ п╡ %s , я│я┌я─п╬п╨п╟ %d"
 
-#, c-format
 #~ msgid "Input read from %s"
-#~ msgstr "Ввод из %s"
+#~ msgstr "п▓п╡п╬п╢ п╦п╥ %s"
 
 #~ msgid "INTERNAL ERROR: Recursive push_string!"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Рекурсивная push_string!"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п═п╣п╨я┐я─я│п╦п╡п╫п╟я▐ push_string!"
 
 #~ msgid "INTERNAL ERROR: Bad call to init_macro_token ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверный вызов init_macro_token ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫я▀п╧ п╡я▀п╥п╬п╡ init_macro_token ()"
 
 #~ msgid "INTERNAL ERROR: Input stack botch in next_char ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Ошибка входного стека в next_char ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п·я┬п╦п╠п╨п╟ п╡я┘п╬п╢п╫п╬пЁп╬ я│я┌п╣п╨п╟ п╡ next_char ()"
 
 #~ msgid "INTERNAL ERROR: Input stack botch in peek_input ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Ошибка входного стека в peek_input ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п·я┬п╦п╠п╨п╟ п╡я┘п╬п╢п╫п╬пЁп╬ я│я┌п╣п╨п╟ п╡ peek_input ()"
 
 #~ msgid "NONE"
-#~ msgstr "НИЧЕГО"
+#~ msgstr "п²п≤п╖п∙п⌠п·"
 
 #~ msgid "ERROR: Stack overflow.  (Infinite define recursion?)"
-#~ msgstr "ОШИБКА: Переполнение стека. (Бесконечное рекурсивное определение?)"
+#~ msgstr "п·п╗п≤п▒п п░: п÷п╣я─п╣п©п╬п╩п╫п╣п╫п╦п╣ я│я┌п╣п╨п╟. (п▒п╣я│п╨п╬п╫п╣я┤п╫п╬п╣ я─п╣п╨я┐я─я│п╦п╡п╫п╬п╣ п╬п©я─п╣п╢п╣п╩п╣п╫п╦п╣?)"
 
 #~ msgid ""
 #~ "Mandatory or optional arguments to long options are mandatory or "
@@ -1194,19 +1261,19 @@ msgstr "Слишком большое разветвление"
 #~ "  -Q, --quiet, --silent        suppress some warnings for builtins\n"
 #~ "  -P, --prefix-builtins        force a `m4_' prefix to all builtins\n"
 #~ msgstr ""
-#~ "Обязательные или необязательные аргументы для длинных опции таковы и для "
-#~ "коротких\n"
+#~ "п·п╠я▐п╥п╟я┌п╣п╩я▄п╫я▀п╣ п╦п╩п╦ п╫п╣п╬п╠я▐п╥п╟я┌п╣п╩я▄п╫я▀п╣ п╟я─пЁя┐п╪п╣п╫я┌я▀ п╢п╩я▐ п╢п╩п╦п╫п╫я▀я┘ п╬п©я├п╦п╦ я┌п╟п╨п╬п╡я▀ п╦ п╢п╩я▐ "
+#~ "п╨п╬я─п╬я┌п╨п╦я┘\n"
 #~ "\n"
-#~ "Режимы работы:\n"
-#~ "      --help                   показать помощь и выйти\n"
-#~ "      --version                вывести информацию о версии и выйти\n"
-#~ "  -e, --interactive            небуферизованный вывод, игнорировать "
-#~ "прерывания\n"
-#~ "  -E, --fatal-warnings         остановиться после первого предупреждения\n"
-#~ "  -Q, --quiet, --silent        подавлять предупреждения для встроенных "
-#~ "функций\n"
-#~ "  -P, --prefix-builtins        добавлять префикс `m4_' для всех "
-#~ "встроенных функций\n"
+#~ "п═п╣п╤п╦п╪я▀ я─п╟п╠п╬я┌я▀:\n"
+#~ "      --help                   п©п╬п╨п╟п╥п╟я┌я▄ п©п╬п╪п╬я┴я▄ п╦ п╡я▀п╧я┌п╦\n"
+#~ "      --version                п╡я▀п╡п╣я│я┌п╦ п╦п╫я└п╬я─п╪п╟я├п╦я▌ п╬ п╡п╣я─я│п╦п╦ п╦ п╡я▀п╧я┌п╦\n"
+#~ "  -e, --interactive            п╫п╣п╠я┐я└п╣я─п╦п╥п╬п╡п╟п╫п╫я▀п╧ п╡я▀п╡п╬п╢, п╦пЁп╫п╬я─п╦я─п╬п╡п╟я┌я▄ "
+#~ "п©я─п╣я─я▀п╡п╟п╫п╦я▐\n"
+#~ "  -E, --fatal-warnings         п╬я│я┌п╟п╫п╬п╡п╦я┌я▄я│я▐ п©п╬я│п╩п╣ п©п╣я─п╡п╬пЁп╬ п©я─п╣п╢я┐п©я─п╣п╤п╢п╣п╫п╦я▐\n"
+#~ "  -Q, --quiet, --silent        п©п╬п╢п╟п╡п╩я▐я┌я▄ п©я─п╣п╢я┐п©я─п╣п╤п╢п╣п╫п╦я▐ п╢п╩я▐ п╡я│я┌я─п╬п╣п╫п╫я▀я┘ "
+#~ "я└я┐п╫п╨я├п╦п╧\n"
+#~ "  -P, --prefix-builtins        п╢п╬п╠п╟п╡п╩я▐я┌я▄ п©я─п╣я└п╦п╨я│ `m4_' п╢п╩я▐ п╡я│п╣я┘ "
+#~ "п╡я│я┌я─п╬п╣п╫п╫я▀я┘ я└я┐п╫п╨я├п╦п╧\n"
 
 #~ msgid ""
 #~ "\n"
@@ -1216,11 +1283,11 @@ msgstr "Слишком большое разветвление"
 #~ "  -M, --load-module=MODULE          load dynamic MODULE from M4MODPATH\n"
 #~ msgstr ""
 #~ "\n"
-#~ "Возможности динамической загрузки:\n"
-#~ "  -m, --module-directory=DIRECTORY  добавить каталог DIRECTORY в пути "
-#~ "поиска модулей\n"
-#~ "  -M, --load-module=MODULE          загрузить динамический модуль MODULE "
-#~ "из M4MODPATH\n"
+#~ "п▓п╬п╥п╪п╬п╤п╫п╬я│я┌п╦ п╢п╦п╫п╟п╪п╦я┤п╣я│п╨п╬п╧ п╥п╟пЁя─я┐п╥п╨п╦:\n"
+#~ "  -m, --module-directory=DIRECTORY  п╢п╬п╠п╟п╡п╦я┌я▄ п╨п╟я┌п╟п╩п╬пЁ DIRECTORY п╡ п©я┐я┌п╦ "
+#~ "п©п╬п╦я│п╨п╟ п╪п╬п╢я┐п╩п╣п╧\n"
+#~ "  -M, --load-module=MODULE          п╥п╟пЁя─я┐п╥п╦я┌я▄ п╢п╦п╫п╟п╪п╦я┤п╣я│п╨п╦п╧ п╪п╬п╢я┐п╩я▄ MODULE "
+#~ "п╦п╥ M4MODPATH\n"
 
 #~ msgid ""
 #~ "\n"
@@ -1239,82 +1306,95 @@ msgstr "Слишком большое разветвление"
 #~ msgstr ""
 #~ "\n"
 #~ "FLAGS is any of:\n"
-#~ "  t   трассировать все вызовы макросов\n"
-#~ "  a   показать текущие аргументы\n"
-#~ "  e   показывать макрорасширение\n"
-#~ "  q   заключать значения в кавычки по необходимости, с a или e флагами\n"
-#~ "  c   показывать перед сбором , после сбора и после вызова\n"
-#~ "  x   добавлять уникальный идентификатор вызова макроса, используется "
-#~ "вместе с флагом c\n"
-#~ "  f   выводить текущее имя входного файла\n"
-#~ "  l   выводить номер текущей строчки\n"
-#~ "  p   показывать результаты поиска по путям\n"
-#~ "  i   показывать изменения во входных файлах\n"
-#~ "  V   сокращение для всех флагов вместе\n"
+#~ "  t   я┌я─п╟я│я│п╦я─п╬п╡п╟я┌я▄ п╡я│п╣ п╡я▀п╥п╬п╡я▀ п╪п╟п╨я─п╬я│п╬п╡\n"
+#~ "  a   п©п╬п╨п╟п╥п╟я┌я▄ я┌п╣п╨я┐я┴п╦п╣ п╟я─пЁя┐п╪п╣п╫я┌я▀\n"
+#~ "  e   п©п╬п╨п╟п╥я▀п╡п╟я┌я▄ п╪п╟п╨я─п╬я─п╟я│я┬п╦я─п╣п╫п╦п╣\n"
+#~ "  q   п╥п╟п╨п╩я▌я┤п╟я┌я▄ п╥п╫п╟я┤п╣п╫п╦я▐ п╡ п╨п╟п╡я▀я┤п╨п╦ п©п╬ п╫п╣п╬п╠я┘п╬п╢п╦п╪п╬я│я┌п╦, я│ a п╦п╩п╦ e я└п╩п╟пЁп╟п╪п╦\n"
+#~ "  c   п©п╬п╨п╟п╥я▀п╡п╟я┌я▄ п©п╣я─п╣п╢ я│п╠п╬я─п╬п╪ , п©п╬я│п╩п╣ я│п╠п╬я─п╟ п╦ п©п╬я│п╩п╣ п╡я▀п╥п╬п╡п╟\n"
+#~ "  x   п╢п╬п╠п╟п╡п╩я▐я┌я▄ я┐п╫п╦п╨п╟п╩я▄п╫я▀п╧ п╦п╢п╣п╫я┌п╦я└п╦п╨п╟я┌п╬я─ п╡я▀п╥п╬п╡п╟ п╪п╟п╨я─п╬я│п╟, п╦я│п©п╬п╩я▄п╥я┐п╣я┌я│я▐ "
+#~ "п╡п╪п╣я│я┌п╣ я│ я└п╩п╟пЁп╬п╪ c\n"
+#~ "  f   п╡я▀п╡п╬п╢п╦я┌я▄ я┌п╣п╨я┐я┴п╣п╣ п╦п╪я▐ п╡я┘п╬п╢п╫п╬пЁп╬ я└п╟п╧п╩п╟\n"
+#~ "  l   п╡я▀п╡п╬п╢п╦я┌я▄ п╫п╬п╪п╣я─ я┌п╣п╨я┐я┴п╣п╧ я│я┌я─п╬я┤п╨п╦\n"
+#~ "  p   п©п╬п╨п╟п╥я▀п╡п╟я┌я▄ я─п╣п╥я┐п╩я▄я┌п╟я┌я▀ п©п╬п╦я│п╨п╟ п©п╬ п©я┐я┌я▐п╪\n"
+#~ "  i   п©п╬п╨п╟п╥я▀п╡п╟я┌я▄ п╦п╥п╪п╣п╫п╣п╫п╦я▐ п╡п╬ п╡я┘п╬п╢п╫я▀я┘ я└п╟п╧п╩п╟я┘\n"
+#~ "  V   я│п╬п╨я─п╟я┴п╣п╫п╦п╣ п╢п╩я▐ п╡я│п╣я┘ я└п╩п╟пЁп╬п╡ п╡п╪п╣я│я┌п╣\n"
 
-#, c-format
+#~ msgid ""
+#~ "\n"
+#~ "Report bugs to <bug-m4@gnu.org>.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "п÷п╬я│я▀п╩п╟п╧я┌п╣ п╬я┌я┤п╣я┌я▀ п╬п╠ п╬я┬п╦п╠п╨п╟я┘ п╫п╟ <bug-m4@gnu.org>.\n"
+
 #~ msgid "ERROR: failed to add search directory `%s'"
-#~ msgstr "ОШИБКА: не могу добавить каталог поиска `%s'"
+#~ msgstr "п·п╗п≤п▒п п░: п╫п╣ п╪п╬пЁя┐ п╢п╬п╠п╟п╡п╦я┌я▄ п╨п╟я┌п╟п╩п╬пЁ п©п╬п╦я│п╨п╟ `%s'"
 
-#, c-format
 #~ msgid "ERROR: failed to add search directory `%s': %s"
-#~ msgstr "ОШИБКА: не могу добавить каталог поиска `%s': %s"
+#~ msgstr "п·п╗п≤п▒п п░: п╫п╣ п╪п╬пЁя┐ п╢п╬п╠п╟п╡п╦я┌я▄ п╨п╟я┌п╟п╩п╬пЁ п©п╬п╦я│п╨п╟ `%s': %s"
 
 #~ msgid " (options:"
-#~ msgstr " (ключи:"
+#~ msgstr " (п╨п╩я▌я┤п╦:"
 
 #~ msgid "INTERNAL ERROR: Bad code in deferred arguments"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверный код в косвенных аргументах"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫я▀п╧ п╨п╬п╢ п╡ п╨п╬я│п╡п╣п╫п╫я▀я┘ п╟я─пЁя┐п╪п╣п╫я┌п╟я┘"
 
 #~ msgid "INTERNAL ERROR: Bad token type in expand_token ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверный тип лексемы в expand_token ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫я▀п╧ я┌п╦п© п╩п╣п╨я│п╣п╪я▀ п╡ expand_token ()"
 
 #~ msgid "INTERNAL ERROR: Bad token type in expand_argument ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверный тип лексемы в expand_argument ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫я▀п╧ я┌п╦п© п╩п╣п╨я│п╣п╪я▀ п╡ expand_argument ()"
 
 #~ msgid "INTERNAL ERROR: Bad symbol type in call_macro ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: Неверный тип символа в call_macro ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п²п╣п╡п╣я─п╫я▀п╧ я┌п╦п© я│п╦п╪п╡п╬п╩п╟ п╡ call_macro ()"
 
-#, c-format
 #~ msgid "ERROR: failed to initialise modules: %s"
-#~ msgstr "ОШИБКА: ошибка инициализации модуля %s"
+#~ msgstr "п·п╗п≤п▒п п░: п╬я┬п╦п╠п╨п╟ п╦п╫п╦я├п╦п╟п╩п╦п╥п╟я├п╦п╦ п╪п╬п╢я┐п╩я▐ %s"
 
-#, c-format
 #~ msgid "ERROR: cannot find module: `%s'"
-#~ msgstr "ОШИБКА: модуль `%s' не найден"
+#~ msgstr "п·п╗п≤п▒п п░: п╪п╬п╢я┐п╩я▄ `%s' п╫п╣ п╫п╟п╧п╢п╣п╫"
 
-#, c-format
 #~ msgid "ERROR: cannot find module: `%s': %s"
-#~ msgstr "ОШИБКА: модуль `%s' не найден: %s"
+#~ msgstr "п·п╗п≤п▒п п░: п╪п╬п╢я┐п╩я▄ `%s' п╫п╣ п╫п╟п╧п╢п╣п╫: %s"
 
 #~ msgid "ERROR: cannot close modules"
-#~ msgstr "ОШИБКА: не могу закрыть модуля"
+#~ msgstr "п·п╗п≤п▒п п░: п╫п╣ п╪п╬пЁя┐ п╥п╟п╨я─я▀я┌я▄ п╪п╬п╢я┐п╩я▐"
 
-#, c-format
 #~ msgid "ERROR: cannot cannot close modules: %s"
-#~ msgstr "ОШИБКА: не могу закрыть модуля: %s"
+#~ msgstr "п·п╗п≤п▒п п░: п╫п╣ п╪п╬пЁя┐ п╥п╟п╨я─я▀я┌я▄ п╪п╬п╢я┐п╩я▐: %s"
 
-#, c-format
+#~ msgid "ERROR: cannot close module: `%s'"
+#~ msgstr "п·п╗п≤п▒п п░: п╫п╣ п╪п╬пЁя┐ п╥п╟п╨я─я▀я┌я▄ п╪п╬п╢я┐п╩я▄: `%s'"
+
 #~ msgid "ERROR: cannot cannot close module: `%s': %s"
-#~ msgstr "ОШИБКА: не могу закрыть модуль: `%s': %s"
+#~ msgstr "п·п╗п≤п▒п п░: п╫п╣ п╪п╬пЁя┐ п╥п╟п╨я─я▀я┌я▄ п╪п╬п╢я┐п╩я▄: `%s': %s"
 
-#, c-format
+#, fuzzy
+#~ msgid "ERROR: Cannot create temporary file for diversion"
+#~ msgstr ""
+#~ "п·п╗п≤п▒п п░: п·я┬п╦п╠п╨п╟ я│п╬п╥п╢п╟п╫п╦я▐ п╡я─п╣п╪п╣п╫п╫п╬пЁп╬ я└п╟п╧п╩п╟ п╢п╩я▐ я─п╟п╥п╡п╣я┌п╡п╩п╣п╫п╦я▐ п╪п╟п╨я─п╬п╬п╠я─п╟п╠п╬я┌п╨п╦"
+
+#, fuzzy
+#~ msgid "ERROR: Reading inserted file"
+#~ msgstr "п·п╗п≤п▒п п░: п п╬п©п╦я─я┐я▌ п╡я│я┌п╟п╡п╩п╣п╫п╫я▀п╧ я└п╟п╧п╩"
+
 #~ msgid "Path search for `%s' found `%s'"
-#~ msgstr "Путь поиска для `%s' найден `%s'"
+#~ msgstr "п÷я┐я┌я▄ п©п╬п╦я│п╨п╟ п╢п╩я▐ `%s' п╫п╟п╧п╢п╣п╫ `%s'"
+
+#~ msgid "VMEM limit exceeded?\n"
+#~ msgstr "п п╬п╫я┤п╦п╩п╟я│я▄ п╡п╦я─я┌я┐п╟п╩я▄п╫п╟я▐ п©п╟п╪я▐я┌я▄?\n"
 
 #~ msgid ""
 #~ "Memory bounds violation detected (SIGSEGV).  Either a stack overflow\n"
 #~ "occurred, or there is a bug in "
 #~ msgstr ""
-#~ "Обнаружен выход за границу памяти (SIGSEGV). Это либо переполнение стека\n"
-#~ "или ошибка в "
+#~ "п·п╠п╫п╟я─я┐п╤п╣п╫ п╡я▀я┘п╬п╢ п╥п╟ пЁя─п╟п╫п╦я├я┐ п©п╟п╪я▐я┌п╦ (SIGSEGV). п╜я┌п╬ п╩п╦п╠п╬ п©п╣я─п╣п©п╬п╩п╫п╣п╫п╦п╣ я│я┌п╣п╨п╟\n"
+#~ "п╦п╩п╦ п╬я┬п╦п╠п╨п╟ п╡ "
 
 #~ msgid ".  Check for possible infinite recursion.\n"
-#~ msgstr ". Проверка на возможную бесконечную рекурсию.\n"
+#~ msgstr ". п÷я─п╬п╡п╣я─п╨п╟ п╫п╟ п╡п╬п╥п╪п╬п╤п╫я┐я▌ п╠п╣я│п╨п╬п╫п╣я┤п╫я┐я▌ я─п╣п╨я┐я─я│п╦я▌.\n"
 
 #~ msgid "INTERNAL ERROR: Illegal mode to symbol_lookup ()"
-#~ msgstr "ВНУТРЕННЯЯ ОШИБКА: неверный режим для symbol_lookup ()"
+#~ msgstr "п▓п²пёп╒п═п∙п²п²п╞п╞ п·п╗п≤п▒п п░: п╫п╣п╡п╣я─п╫я▀п╧ я─п╣п╤п╦п╪ п╢п╩я▐ symbol_lookup ()"
 
-#, c-format
 #~ msgid "Name `%s' is unknown\n"
-#~ msgstr "Имя `%s' неизвестно\n"
+#~ msgstr "п≤п╪я▐ `%s' п╫п╣п╦п╥п╡п╣я│я┌п╫п╬\n"

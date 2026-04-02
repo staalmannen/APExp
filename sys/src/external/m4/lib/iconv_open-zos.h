@@ -1,5 +1,5 @@
 /* ANSI-C code produced by gperf version 3.1 */
-/* Command-line: gperf -m 10 ./iconv_open-zos.gperf  */
+/* Command-line: gperf -m 10 iconv_open-zos.gperf  */
 /* Computed positions: -k'4,$' */
 
 #if !((' ' == 32) && ('!' == 33) && ('"' == 34) && ('#' == 35) \
@@ -29,7 +29,7 @@
 #error "gperf generated tables don't work with this execution character set. Please report a bug to <bug-gperf@gnu.org>."
 #endif
 
-#line 17 "./iconv_open-zos.gperf"
+#line 17 "iconv_open-zos.gperf"
 struct mapping { int standard_name; const char vendor_name[10 + 1]; };
 
 #define TOTAL_KEYWORDS 49
@@ -201,108 +201,108 @@ static const struct stringpool_t stringpool_contents =
 static const struct mapping mappings[] =
   {
     {-1}, {-1}, {-1},
-#line 76 "./iconv_open-zos.gperf"
+#line 76 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str3, "IBM-1386"},
     {-1},
-#line 28 "./iconv_open-zos.gperf"
+#line 28 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str5, "00367"},
     {-1},
-#line 68 "./iconv_open-zos.gperf"
+#line 68 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str7, "IBM-5349"},
-#line 75 "./iconv_open-zos.gperf"
+#line 75 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str8, "IBM-eucKR"},
-#line 72 "./iconv_open-zos.gperf"
+#line 72 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str9, "09449"},
-#line 48 "./iconv_open-zos.gperf"
+#line 48 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str10, "00857"},
-#line 36 "./iconv_open-zos.gperf"
+#line 36 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str11, "05012"},
-#line 31 "./iconv_open-zos.gperf"
+#line 31 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str12, "00913"},
-#line 38 "./iconv_open-zos.gperf"
+#line 38 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str13, "ISO8859-13"},
-#line 35 "./iconv_open-zos.gperf"
+#line 35 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str14, "ISO8859-7"},
-#line 42 "./iconv_open-zos.gperf"
+#line 42 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str15, "IBM-437"},
-#line 63 "./iconv_open-zos.gperf"
+#line 63 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str16, "01129"},
-#line 54 "./iconv_open-zos.gperf"
+#line 54 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str17, "IBM-869"},
-#line 37 "./iconv_open-zos.gperf"
+#line 37 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str18, "ISO8859-9"},
-#line 56 "./iconv_open-zos.gperf"
+#line 56 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str19, "IBM-922"},
-#line 67 "./iconv_open-zos.gperf"
+#line 67 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str20, "IBM-5348"},
-#line 45 "./iconv_open-zos.gperf"
+#line 45 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str21, "IBM-852"},
-#line 65 "./iconv_open-zos.gperf"
+#line 65 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str22, "IBM-5346"},
-#line 44 "./iconv_open-zos.gperf"
+#line 44 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str23, "09042"},
-#line 50 "./iconv_open-zos.gperf"
+#line 50 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str24, "IBM-862"},
-#line 30 "./iconv_open-zos.gperf"
+#line 30 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str25, "ISO8859-2"},
-#line 57 "./iconv_open-zos.gperf"
+#line 57 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str26, "IBM-943"},
-#line 73 "./iconv_open-zos.gperf"
+#line 73 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str27, "IBM-eucCN"},
-#line 70 "./iconv_open-zos.gperf"
+#line 70 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str28, "09447"},
-#line 46 "./iconv_open-zos.gperf"
+#line 46 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str29, "13143"},
-#line 40 "./iconv_open-zos.gperf"
+#line 40 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str30, "00878"},
-#line 62 "./iconv_open-zos.gperf"
+#line 62 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str31, "IBM-1125"},
-#line 52 "./iconv_open-zos.gperf"
+#line 52 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str32, "00865"},
-#line 33 "./iconv_open-zos.gperf"
+#line 33 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str33, "ISO8859-5"},
-#line 39 "./iconv_open-zos.gperf"
+#line 39 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str34, "ISO8859-15"},
-#line 71 "./iconv_open-zos.gperf"
+#line 71 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str35, "09448"},
-#line 47 "./iconv_open-zos.gperf"
+#line 47 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str36, "IBM-856"},
-#line 41 "./iconv_open-zos.gperf"
+#line 41 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str37, "01168"},
-#line 69 "./iconv_open-zos.gperf"
+#line 69 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str38, "IBM-5350"},
-#line 53 "./iconv_open-zos.gperf"
+#line 53 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str39, "04962"},
-#line 34 "./iconv_open-zos.gperf"
+#line 34 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str40, "ISO8859-6"},
-#line 61 "./iconv_open-zos.gperf"
+#line 61 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str41, "IBM-1124"},
-#line 51 "./iconv_open-zos.gperf"
+#line 51 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str42, "IBM-864"},
-#line 32 "./iconv_open-zos.gperf"
+#line 32 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str43, "ISO8859-4"},
-#line 66 "./iconv_open-zos.gperf"
+#line 66 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str44, "IBM-5347"},
-#line 43 "./iconv_open-zos.gperf"
+#line 43 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str45, "00775"},
-#line 58 "./iconv_open-zos.gperf"
+#line 58 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str46, "IBM-943"},
-#line 64 "./iconv_open-zos.gperf"
+#line 64 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str47, "01131"},
-#line 49 "./iconv_open-zos.gperf"
+#line 49 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str48, "IBM-861"},
-#line 29 "./iconv_open-zos.gperf"
+#line 29 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str49, "ISO8859-1"},
-#line 74 "./iconv_open-zos.gperf"
+#line 74 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str50, "01350"},
     {-1},
-#line 59 "./iconv_open-zos.gperf"
+#line 59 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str52, "IBM-1363"},
     {-1}, {-1},
-#line 55 "./iconv_open-zos.gperf"
+#line 55 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str55, "TIS-620"},
     {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
-#line 60 "./iconv_open-zos.gperf"
+#line 60 "iconv_open-zos.gperf"
     {(int)(size_t)&((struct stringpool_t *)0)->stringpool_str64, "IBM-1046"}
   };
 

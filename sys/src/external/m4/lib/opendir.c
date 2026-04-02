@@ -1,17 +1,17 @@
 /* Start reading the entries of a directory.
-   Copyright (C) 2006-2021 Free Software Foundation, Inc.
+   Copyright (C) 2006-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -29,20 +29,19 @@
 
 #else
 
-# include <stdlib.h>
-
-# include "dirent-private.h"
 # include "filename.h"
 
 #endif
 
-#if REPLACE_FCHDIR
-# include <unistd.h>
+#include <stdlib.h>
+#include <string.h>
+
+#if GNULIB_defined_DIR
+# include "dirent-private.h"
 #endif
 
-#ifdef __KLIBC__
-# include <io.h>
-# include <fcntl.h>
+#if REPLACE_FCHDIR
+# include <unistd.h>
 #endif
 
 #if defined _WIN32 && ! defined __CYGWIN__
@@ -57,38 +56,39 @@
 
 DIR *
 opendir (const char *dir_name)
+#undef opendir
 {
-#if HAVE_OPENDIR
-# undef opendir
+#if HAVE_DIRENT_H                       /* equivalent to HAVE_OPENDIR */
   DIR *dirp;
 
+# if GNULIB_defined_DIR
+#  undef DIR
+
+  dirp = (struct gl_directory *) malloc (sizeof (struct gl_directory));
+  if (dirp == NULL)
+    {
+      errno = ENOMEM;
+      return NULL;
+    }
+
+  DIR *real_dirp = opendir (dir_name);
+  if (real_dirp == NULL)
+    {
+      int saved_errno = errno;
+      free (dirp);
+      errno = saved_errno;
+      return NULL;
+    }
+
+  dirp->fd_to_close = -1;
+  dirp->real_dirp = real_dirp;
+# else
   dirp = opendir (dir_name);
   if (dirp == NULL)
     return NULL;
-
-# ifdef __KLIBC__
-  {
-    int fd = open (dir_name, O_RDONLY);
-    if (fd == -1 || _gl_register_dirp_fd (fd, dirp))
-      {
-        int saved_errno = errno;
-
-        close (fd);
-        closedir (dirp);
-
-        errno = saved_errno;
-
-        return NULL;
-      }
-  }
 # endif
-#else
 
-  char dir_name_mask[MAX_PATH + 1 + 1 + 1];
-  int status;
-  HANDLE current;
-  WIN32_FIND_DATA entry;
-  struct gl_directory *dirp;
+#else
 
   if (dir_name[0] == '\0')
     {
@@ -99,6 +99,7 @@ opendir (const char *dir_name)
   /* Make the dir_name absolute, so that we continue reading the same
      directory if the current directory changed between this opendir()
      call and a subsequent rewinddir() call.  */
+  char dir_name_mask[MAX_PATH + 1 + 1 + 1];
   if (!GetFullPathName (dir_name, MAX_PATH, dir_name_mask, NULL))
     {
       errno = EINVAL;
@@ -118,8 +119,9 @@ opendir (const char *dir_name)
   }
 
   /* Start searching the directory.  */
-  status = -1;
-  current = FindFirstFile (dir_name_mask, &entry);
+  int status = -1;
+  WIN32_FIND_DATA entry;
+  HANDLE current = FindFirstFile (dir_name_mask, &entry);
   if (current == INVALID_HANDLE_VALUE)
     {
       switch (GetLastError ())
@@ -143,7 +145,7 @@ opendir (const char *dir_name)
     }
 
   /* Allocate the result.  */
-  dirp =
+  struct gl_directory *dirp =
     (struct gl_directory *)
     malloc (offsetof (struct gl_directory, dir_name_mask[0])
             + strlen (dir_name_mask) + 1);
@@ -154,6 +156,7 @@ opendir (const char *dir_name)
       errno = ENOMEM;
       return NULL;
     }
+  dirp->fd_to_close = -1;
   dirp->status = status;
   dirp->current = current;
   if (status == -1)

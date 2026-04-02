@@ -1,5 +1,5 @@
-dnl @ ../doc/m4.texi:4459: Origin of test
-dnl @ expected status: 1
+dnl @ ../doc/m4.texi:4541: Origin of test
+dnl @ expected status: 0
 dnl @ extra options: 
 dnl @ Copyright (C) 2006, 2007, 2008, 2009 Free Software
 dnl @ Foundation, Inc.
@@ -7,5 +7,31 @@ dnl @ This file is free software; the Free Software Foundation
 dnl @ gives unlimited permission to copy and/or distribute it
 dnl @ with or without modifications, as long as this notice
 dnl @ is preserved.
-ifelse(`dangling quote
-dnl @error{}m4:stdin:1: ERROR: end of file in string
+define(`some', `several')
+dnl @result{}
+define(`text', `long.string.with.some.separators')
+dnl @result{}
+define(`display', ``<$1>'')
+dnl @result{}
+display(text)
+dnl @result{}<long.string.with.several.separators>
+display(defn(`text'))
+dnl @result{}<long.string.with.some.separators>
+dnl quotes are still `' at the time requote is defined:
+define(`requote', `"[$@]')
+dnl @result{}
+define(`tokenized', requote(translit(defn(`text'), `.',
+changequote(`"[', `]')"[,])))
+dnl @result{}
+dnl but quotes are "[] at the time $@ in requote is computed
+changequote
+dnl @result{}
+dnl quotes are back to `', yet the content of tokenized still has "[]
+dnl however, this form of tokenizing already expanded "some"
+tokenized
+dnl @result{}"[long],"[string],"[with],"[several],"[separators]
+define(`a', ` display(`$1')')
+dnl @result{}
+dnl now it is possible to call `a' on each token
+translit(defn(`tokenized'), `"[],', `a()')
+dnl @result{} <long> <string> <with> <several> <separators>

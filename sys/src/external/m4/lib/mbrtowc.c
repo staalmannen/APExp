@@ -1,18 +1,18 @@
 /* Convert multibyte character to wide character.
-   Copyright (C) 1999-2002, 2005-2021 Free Software Foundation, Inc.
+   Copyright (C) 1999-2002, 2005-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2008.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -28,7 +28,11 @@
 # include <stdint.h>
 # include <stdlib.h>
 
-# if defined _WIN32 && !defined __CYGWIN__
+# if AVOID_ANY_THREADS
+
+/* The option '--disable-threads' explicitly requests no locking.  */
+
+# elif defined _WIN32 && !defined __CYGWIN__
 
 #  define WIN32_LEAN_AND_MEAN  /* avoid including junk */
 #  include <windows.h>
@@ -51,11 +55,10 @@
 # endif
 
 # include "attribute.h"
-# include "verify.h"
 # include "lc-charset-dispatch.h"
 # include "mbtowc-lock.h"
 
-verify (sizeof (mbstate_t) >= 4);
+static_assert (sizeof (mbstate_t) >= 4);
 static char internal_state[4];
 
 size_t
@@ -78,10 +81,7 @@ mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
 size_t
 rpl_mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
 {
-  size_t ret;
-  wchar_t wc;
-
-# if MBRTOWC_NULL_ARG2_BUG || MBRTOWC_RETVAL_BUG || MBRTOWC_EMPTY_INPUT_BUG
+# if MBRTOWC_RETVAL_BUG || MBRTOWC_EMPTY_INPUT_BUG
   if (s == NULL)
     {
       pwc = NULL;
@@ -95,6 +95,7 @@ rpl_mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
     return (size_t) -2;
 # endif
 
+  wchar_t wc;
   if (! pwc)
     pwc = &wc;
 
@@ -113,7 +114,7 @@ rpl_mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
         size_t count = 0;
         for (; n > 0; s++, n--)
           {
-            ret = mbrtowc (&wc, s, 1, ps);
+            size_t ret = mbrtowc (&wc, s, 1, ps);
 
             if (ret == (size_t)(-1))
               return (size_t)(-1);
@@ -130,6 +131,7 @@ rpl_mbrtowc (wchar_t *pwc, const char *s, size_t n, mbstate_t *ps)
   }
 # endif
 
+  size_t ret;
 # if MBRTOWC_STORES_INCOMPLETE_BUG
   ret = mbrtowc (&wc, s, n, ps);
   if (ret < (size_t) -2 && pwc != NULL)

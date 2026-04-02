@@ -1,17 +1,17 @@
 /* An ftello() function that works around platform bugs.
-   Copyright (C) 2007, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2007, 2009-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
@@ -20,7 +20,7 @@
 #include <stdio.h>
 
 #include <errno.h>
-#include "intprops.h"
+#include <stdckdint.h>
 
 /* Get lseek.  */
 #include <unistd.h>
@@ -34,7 +34,10 @@ ftello (FILE *fp)
 # undef ftell
 # define ftello ftell
 #endif
-#if _GL_WINDOWS_64_BIT_OFF_T
+#if (defined _WIN32 && !defined __CYGWIN__) \
+    /* We need to test _FILE_OFFSET_BITS for mingw-w64 */   \
+    /* and _GL_WINDOWS_64_BIT_OFF_T for MSVC.  */           \
+    && (_FILE_OFFSET_BITS == 64 || _GL_WINDOWS_64_BIT_OFF_T)
 # undef ftello
 # if HAVE__FTELLI64 /* msvc, mingw64 */
 #  define ftello _ftelli64
@@ -97,7 +100,7 @@ ftello (FILE *fp)
 
       /* Compute pos + buffered, with overflow check.  */
       off_t sum;
-      if (! INT_ADD_OK (pos, buffered, &sum))
+      if (ckd_add (&sum, pos, buffered))
         {
           errno = EOVERFLOW;
           return -1;
@@ -121,13 +124,11 @@ ftello (FILE *fp)
      gets confused by this.  */
   if (fp_->_flag & _IOWRT)
     {
-      off_t pos;
-
       /* Call ftello nevertheless, for the side effects that it does on fp.  */
       ftello (fp);
 
       /* Compute the file position ourselves.  */
-      pos = lseek (fileno (fp), (off_t) 0, SEEK_CUR);
+      off_t pos = lseek (fileno (fp), (off_t) 0, SEEK_CUR);
       if (pos >= 0)
         {
           if ((fp_->_flag & _IONBF) == 0 && fp_->_base != NULL)

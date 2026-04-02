@@ -1,9 +1,9 @@
 /* Test the gnulib dirname module.
-   Copyright (C) 2005-2007, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005-2007, 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -18,7 +18,6 @@
 
 #include "dirname.h"
 
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -131,10 +130,9 @@ static struct test tests[] = {
 int
 main (void)
 {
-  struct test *t;
   bool ok = true;
 
-  for (t = tests; t->name; t++)
+  for (struct test *t = tests; t->name; t++)
     {
       char *dir = dir_name (t->name);
       int dirlen = dir_len (t->name);

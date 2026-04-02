@@ -1,19 +1,19 @@
 /* Getopt for GNU.
-   Copyright (C) 1987-2021 Free Software Foundation, Inc.
+   Copyright (C) 1987-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library and is also part of gnulib.
    Patches to this file should be submitted to both projects.
 
    The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
+   modify it under the terms of the GNU Lesser General Public
    License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
+   version 2.1 of the License, or (at your option) any later version.
 
    The GNU C Library is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
+   Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public
+   You should have received a copy of the GNU Lesser General Public
    License along with the GNU C Library; if not, see
    <https://www.gnu.org/licenses/>.  */
 
@@ -21,7 +21,7 @@
 # include <config.h>
 #endif
 
-#include "getopt.h"
+#include <getopt.h>
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -42,7 +42,7 @@
 # define funlockfile(fp) _IO_funlockfile (fp)
 #else
 # include "gettext.h"
-# define _(msgid) gettext (msgid)
+# define _(msgid) dgettext (GNULIB_TEXT_DOMAIN, msgid)
 /* When used standalone, flockfile and funlockfile might not be
    available.  */
 # if (!defined _POSIX_THREAD_SAFE_FUNCTIONS \
@@ -133,7 +133,6 @@ exchange (char **argv, struct _getopt_data *d)
   int bottom = d->__first_nonopt;
   int middle = d->__last_nonopt;
   int top = d->optind;
-  char *tem;
 
   /* Exchange the shorter segment with the far end of the longer segment.
      That puts the shorter segment into the right place.
@@ -151,7 +150,7 @@ exchange (char **argv, struct _getopt_data *d)
 	  /* Swap it with the top part of the top segment.  */
 	  for (i = 0; i < len; i++)
 	    {
-	      tem = argv[bottom + i];
+	      char *tem = argv[bottom + i];
 	      argv[bottom + i] = argv[top - (middle - bottom) + i];
 	      argv[top - (middle - bottom) + i] = tem;
 	    }
@@ -167,7 +166,7 @@ exchange (char **argv, struct _getopt_data *d)
 	  /* Swap it with the bottom part of the bottom segment.  */
 	  for (i = 0; i < len; i++)
 	    {
-	      tem = argv[bottom + i];
+	      char *tem = argv[bottom + i];
 	      argv[bottom + i] = argv[middle + i];
 	      argv[middle + i] = tem;
 	    }
@@ -196,36 +195,39 @@ process_long_option (int argc, char **argv, const char *optstring,
 		     int long_only, struct _getopt_data *d,
 		     int print_errors, const char *prefix)
 {
-  char *nameend;
-  size_t namelen;
-  const struct option *p;
-  const struct option *pfound = NULL;
-  int n_options;
-  int option_index;
 
+  char *nameend;
   for (nameend = d->__nextchar; *nameend && *nameend != '='; nameend++)
     /* Do nothing.  */ ;
-  namelen = nameend - d->__nextchar;
+  size_t namelen = nameend - d->__nextchar;
 
   /* First look for an exact match, counting the options as a side
      effect.  */
-  for (p = longopts, n_options = 0; p->name; p++, n_options++)
-    if (!strncmp (p->name, d->__nextchar, namelen)
-	&& namelen == strlen (p->name))
-      {
-	/* Exact match found.  */
-	pfound = p;
-	option_index = n_options;
-	break;
-      }
+  const struct option *pfound = NULL;
+  int n_options;
+  int option_index;
+  {
+    const struct option *p;
+    for (p = longopts, n_options = 0; p->name; p++, n_options++)
+      if (!strncmp (p->name, d->__nextchar, namelen)
+	  && namelen == strlen (p->name))
+	{
+	  /* Exact match found.  */
+	  pfound = p;
+	  option_index = n_options;
+	  break;
+	}
+  }
 
   if (pfound == NULL)
     {
       /* Didn't find an exact match, so look for abbreviations.  */
       unsigned char *ambig_set = NULL;
-      int ambig_malloced = 0;
-      int ambig_fallback = 0;
+      /* Use simpler fallback diagnostic if ambig_set == &ambig_fallback.  */
+      unsigned char ambig_fallback;
+      void *ambig_malloced = NULL;
       int indfound = -1;
+      const struct option *p;
 
       for (p = longopts, option_index = 0; p->name; p++, option_index++)
 	if (!strncmp (p->name, d->__nextchar, namelen))
@@ -242,39 +244,42 @@ process_long_option (int argc, char **argv, const char *optstring,
 		     || pfound->val != p->val)
 	      {
 		/* Second or later nonexact match found.  */
-		if (!ambig_fallback)
+		if (ambig_set != &ambig_fallback)
 		  {
 		    if (!print_errors)
 		      /* Don't waste effort tracking the ambig set if
 			 we're not going to print it anyway.  */
-		      ambig_fallback = 1;
+		      ambig_set = &ambig_fallback;
 		    else if (!ambig_set)
 		      {
 			if (__libc_use_alloca (n_options))
 			  ambig_set = alloca (n_options);
-			else if ((ambig_set = malloc (n_options)) == NULL)
-			  /* Fall back to simpler error message.  */
-			  ambig_fallback = 1;
 			else
-			  ambig_malloced = 1;
+			  {
+			    ambig_malloced = malloc (n_options);
+			    /* Fall back to simpler diagnostic if
+			       memory allocation fails.  */
+			    ambig_set = (ambig_malloced ? ambig_malloced
+					 : &ambig_fallback);
+			  }
 
-			if (ambig_set)
+			if (ambig_set != &ambig_fallback)
 			  {
 			    memset (ambig_set, 0, n_options);
 			    ambig_set[indfound] = 1;
 			  }
 		      }
-		    if (ambig_set)
+		    if (ambig_set && ambig_set != &ambig_fallback)
 		      ambig_set[option_index] = 1;
 		  }
 	      }
 	  }
 
-      if (ambig_set || ambig_fallback)
+      if (ambig_set)
 	{
 	  if (print_errors)
 	    {
-	      if (ambig_fallback)
+	      if (ambig_set == &ambig_fallback)
 		fprintf (stderr, _("%s: option '%s%s' is ambiguous\n"),
 			 argv[0], prefix, d->__nextchar);
 	      else
@@ -296,8 +301,7 @@ process_long_option (int argc, char **argv, const char *optstring,
 		  funlockfile (stderr);
 		}
 	    }
-	  if (ambig_malloced)
-	    free (ambig_set);
+	  free (ambig_malloced);
 	  d->__nextchar += strlen (d->__nextchar);
 	  d->optind++;
 	  d->optopt = 0;
@@ -378,8 +382,8 @@ process_long_option (int argc, char **argv, const char *optstring,
 /* Initialize internal data upon the first call to getopt.  */
 
 static const char *
-_getopt_initialize (int argc _GL_UNUSED,
-		    char **argv _GL_UNUSED, const char *optstring,
+_getopt_initialize (_GL_UNUSED int argc,
+		    _GL_UNUSED char **argv, const char *optstring,
 		    struct _getopt_data *d, int posixly_correct)
 {
   /* Start processing options with ARGV-element 1 (since ARGV-element 0
@@ -472,10 +476,10 @@ _getopt_internal_r (int argc, char **argv, const char *optstring,
 		    const struct option *longopts, int *longind,
 		    int long_only, struct _getopt_data *d, int posixly_correct)
 {
-  int print_errors = d->opterr;
-
   if (argc < 1)
     return -1;
+
+  int print_errors = d->opterr;
 
   d->optarg = NULL;
 
@@ -591,11 +595,10 @@ _getopt_internal_r (int argc, char **argv, const char *optstring,
 	  if (long_only && (argv[d->optind][2]
 			    || !strchr (optstring, argv[d->optind][1])))
 	    {
-	      int code;
 	      d->__nextchar = argv[d->optind] + 1;
-	      code = process_long_option (argc, argv, optstring, longopts,
-					  longind, long_only, d,
-					  print_errors, "-");
+	      int code = process_long_option (argc, argv, optstring, longopts,
+					      longind, long_only, d,
+					      print_errors, "-");
 	      if (code != -1)
 		return code;
 	    }
@@ -704,14 +707,12 @@ _getopt_internal (int argc, char **argv, const char *optstring,
 		  const struct option *longopts, int *longind, int long_only,
 		  int posixly_correct)
 {
-  int result;
-
   getopt_data.optind = optind;
   getopt_data.opterr = opterr;
 
-  result = _getopt_internal_r (argc, argv, optstring, longopts,
-			       longind, long_only, &getopt_data,
-			       posixly_correct);
+  int result = _getopt_internal_r (argc, argv, optstring, longopts,
+				   longind, long_only, &getopt_data,
+				   posixly_correct);
 
   optind = getopt_data.optind;
   optarg = getopt_data.optarg;
@@ -720,7 +721,7 @@ _getopt_internal (int argc, char **argv, const char *optstring,
   return result;
 }
 
-/* glibc gets a LSB-compliant getopt and a POSIX-complaint __posix_getopt.
+/* glibc gets a LSB-compliant getopt and a POSIX-compliant __posix_getopt.
    Standalone applications just get a POSIX-compliant getopt.
    POSIX and LSB both require these functions to take 'char *const *argv'
    even though this is incorrect (because of the permutation).  */
@@ -729,7 +730,7 @@ _getopt_internal (int argc, char **argv, const char *optstring,
   NAME (int argc, char *const *argv, const char *optstring)	\
   {								\
     return _getopt_internal (argc, (char **)argv, optstring,	\
-			     0, 0, 0, POSIXLY_CORRECT);		\
+			     NULL, NULL, 0, POSIXLY_CORRECT);	\
   }
 
 #ifdef _LIBC
@@ -748,14 +749,13 @@ GETOPT_ENTRY(getopt, 1)
 int
 main (int argc, char **argv)
 {
-  int c;
   int digit_optind = 0;
 
   while (1)
     {
       int this_option_optind = optind ? optind : 1;
 
-      c = getopt (argc, argv, "abc:d:0123456789");
+      int c = getopt (argc, argv, "abc:d:0123456789");
       if (c == -1)
 	break;
 

@@ -1,17 +1,17 @@
 /* Thread-local storage in multithreaded situations.
-   Copyright (C) 2005, 2007-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005, 2007-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2005.  */
@@ -43,11 +43,18 @@
 #ifndef _TLS_H
 #define _TLS_H
 
+/* This file uses HAVE_THREADS_H.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
+
 #include <errno.h>
 #include <stdlib.h>
 
 #if !defined c11_threads_in_use
-# if HAVE_THREADS_H && USE_POSIX_THREADS_WEAK
+# if HAVE_THREADS_H && USE_POSIX_THREADS_FROM_LIBC
+#  define c11_threads_in_use() 1
+# elif HAVE_THREADS_H && USE_POSIX_THREADS_WEAK
 #  include <threads.h>
 #  pragma weak thrd_exit
 #  define c11_threads_in_use() (thrd_exit != NULL)
@@ -64,6 +71,10 @@
 
 # include <threads.h>
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 /* ------------------------- gl_tls_key_t datatype ------------------------- */
 
 typedef tss_t gl_tls_key_t;
@@ -76,6 +87,10 @@ typedef tss_t gl_tls_key_t;
 # define glthread_tls_key_destroy(KEY) \
     (tss_delete (*(KEY)), 0)
 
+# ifdef __cplusplus
+}
+# endif
+
 #endif
 
 /* ========================================================================= */
@@ -85,6 +100,10 @@ typedef tss_t gl_tls_key_t;
 /* Use the POSIX threads library.  */
 
 # include <pthread.h>
+
+# ifdef __cplusplus
+extern "C" {
+# endif
 
 # if PTHREAD_IN_USE_DETECTION_HARD
 
@@ -144,6 +163,10 @@ typedef union
 # define glthread_tls_key_destroy(KEY) \
     (pthread_in_use () ? pthread_key_delete ((KEY)->key) : 0)
 
+# ifdef __cplusplus
+}
+# endif
+
 #endif
 
 /* ========================================================================= */
@@ -154,6 +177,10 @@ typedef union
 # include <windows.h>
 
 # include "windows-tls.h"
+
+# ifdef __cplusplus
+extern "C" {
+# endif
 
 /* ------------------------- gl_tls_key_t datatype ------------------------- */
 
@@ -167,6 +194,10 @@ typedef glwthread_tls_key_t gl_tls_key_t;
 # define glthread_tls_key_destroy(KEY) \
     glwthread_tls_key_delete (*(KEY))
 
+# ifdef __cplusplus
+}
+# endif
+
 #endif
 
 /* ========================================================================= */
@@ -174,6 +205,10 @@ typedef glwthread_tls_key_t gl_tls_key_t;
 #if !(USE_ISOC_THREADS || USE_POSIX_THREADS || USE_ISOC_AND_POSIX_THREADS || USE_WINDOWS_THREADS)
 
 /* Provide dummy implementation if threads are not supported.  */
+
+# ifdef __cplusplus
+extern "C" {
+# endif
 
 /* ------------------------- gl_tls_key_t datatype ------------------------- */
 
@@ -192,6 +227,10 @@ typedef struct
     ((KEY)->singlethread_value = (POINTER), 0)
 # define glthread_tls_key_destroy(KEY) \
     0
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif
 

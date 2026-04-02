@@ -1,8 +1,10 @@
-# pthread_sigmask.m4 serial 21
-dnl Copyright (C) 2011-2021 Free Software Foundation, Inc.
+# pthread_sigmask.m4
+# serial 24
+dnl Copyright (C) 2011-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_DEFUN([gl_FUNC_PTHREAD_SIGMASK],
 [
@@ -24,7 +26,7 @@ AC_DEFUN([gl_FUNC_PTHREAD_SIGMASK],
        [gl_cv_func_pthread_sigmask_macro=no])
     ])
 
-  LIB_PTHREAD_SIGMASK=
+  PTHREAD_SIGMASK_LIB=
 
   if test $gl_cv_func_pthread_sigmask_macro = yes; then
     dnl pthread_sigmask is a dummy macro.
@@ -47,7 +49,7 @@ AC_DEFUN([gl_FUNC_PTHREAD_SIGMASK],
           if test -n "$LIBMULTITHREAD"; then
             AC_CACHE_CHECK([for pthread_sigmask in $LIBMULTITHREAD],
               [gl_cv_func_pthread_sigmask_in_LIBMULTITHREAD],
-              [gl_save_LIBS="$LIBS"
+              [gl_saved_LIBS="$LIBS"
                LIBS="$LIBS $LIBMULTITHREAD"
                AC_LINK_IFELSE(
                  [AC_LANG_PROGRAM(
@@ -58,11 +60,11 @@ AC_DEFUN([gl_FUNC_PTHREAD_SIGMASK],
                  ],
                  [gl_cv_func_pthread_sigmask_in_LIBMULTITHREAD=yes],
                  [gl_cv_func_pthread_sigmask_in_LIBMULTITHREAD=no])
-               LIBS="$gl_save_LIBS"
+               LIBS="$gl_saved_LIBS"
               ])
             if test $gl_cv_func_pthread_sigmask_in_LIBMULTITHREAD = yes; then
               dnl pthread_sigmask is available with -pthread or -lpthread.
-              LIB_PTHREAD_SIGMASK="$LIBMULTITHREAD"
+              PTHREAD_SIGMASK_LIB="$LIBMULTITHREAD"
             else
               dnl pthread_sigmask is not available at all.
               HAVE_PTHREAD_SIGMASK=0
@@ -95,12 +97,15 @@ AC_DEFUN([gl_FUNC_PTHREAD_SIGMASK],
         HAVE_PTHREAD_SIGMASK=0
         dnl Define the symbol rpl_pthread_sigmask, not pthread_sigmask,
         dnl so as to not accidentally override the system's pthread_sigmask
-        dnl symbol from libpthread. This is necessary on IRIX 6.5.
+        dnl symbol from libpthread.
         REPLACE_PTHREAD_SIGMASK=1
       fi
     ])
   fi
 
+  AC_SUBST([PTHREAD_SIGMASK_LIB])
+  dnl For backward compatibility.
+  LIB_PTHREAD_SIGMASK="$PTHREAD_SIGMASK_LIB"
   AC_SUBST([LIB_PTHREAD_SIGMASK])
   dnl We don't need a variable LTLIB_PTHREAD_SIGMASK, because when
   dnl "$gl_threads_api" = posix, $LTLIBMULTITHREAD and $LIBMULTITHREAD are the
@@ -114,7 +119,7 @@ AC_DEFUN([gl_FUNC_PTHREAD_SIGMASK],
     dnl On FreeBSD 13.0, MidnightBSD 1.1, HP-UX 11.31, Solaris 9, in programs
     dnl that are not linked with -lpthread, the pthread_sigmask() function
     dnl always returns 0 and has no effect.
-    if test -z "$LIB_PTHREAD_SIGMASK"; then
+    if test -z "$PTHREAD_SIGMASK_LIB"; then
       case " $LIBS " in
         *' -pthread '*) ;;
         *' -lpthread '*) ;;
@@ -161,8 +166,8 @@ AC_DEFUN([gl_FUNC_PTHREAD_SIGMASK],
     AC_CACHE_CHECK([whether pthread_sigmask returns error numbers],
       [gl_cv_func_pthread_sigmask_return_works],
       [
-        gl_save_LIBS="$LIBS"
-        LIBS="$LIBS $LIB_PTHREAD_SIGMASK"
+        gl_saved_LIBS="$LIBS"
+        LIBS="$LIBS $PTHREAD_SIGMASK_LIB"
         AC_RUN_IFELSE(
           [AC_LANG_SOURCE([[
 #include <pthread.h>
@@ -185,80 +190,13 @@ int main ()
                gl_cv_func_pthread_sigmask_return_works="guessing yes";;
            esac
           ])
-        LIBS="$gl_save_LIBS"
+        LIBS="$gl_saved_LIBS"
       ])
     case "$gl_cv_func_pthread_sigmask_return_works" in
       *no)
         REPLACE_PTHREAD_SIGMASK=1
         AC_DEFINE([PTHREAD_SIGMASK_FAILS_WITH_ERRNO], [1],
           [Define to 1 if pthread_sigmask(), when it fails, returns -1 and sets errno.])
-        ;;
-    esac
-
-    dnl On IRIX 6.5, in a single-threaded program, pending signals are not
-    dnl immediately delivered when they are unblocked through pthread_sigmask,
-    dnl only a little while later.
-    AC_CACHE_CHECK([whether pthread_sigmask unblocks signals correctly],
-      [gl_cv_func_pthread_sigmask_unblock_works],
-      [
-        case "$host_os" in
-          irix*)
-            gl_cv_func_pthread_sigmask_unblock_works="guessing no";;
-          *)
-            gl_cv_func_pthread_sigmask_unblock_works="guessing yes";;
-        esac
-        m4_ifdef([gl_][THREADLIB],
-          [dnl Link against $LIBMULTITHREAD, not only $LIB_PTHREAD_SIGMASK.
-           dnl Otherwise we get a false positive on those platforms where
-           dnl $gl_cv_func_pthread_sigmask_in_libc_works is "no".
-           gl_save_LIBS=$LIBS
-           LIBS="$LIBS $LIBMULTITHREAD"])
-        AC_RUN_IFELSE(
-          [AC_LANG_SOURCE([[
-#include <pthread.h>
-#include <signal.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-]GL_MDA_DEFINES[
-static volatile int sigint_occurred;
-static void
-sigint_handler (int sig)
-{
-  sigint_occurred++;
-}
-int main ()
-{
-  sigset_t set;
-  int pid = getpid ();
-  char command[80];
-  signal (SIGINT, sigint_handler);
-  sigemptyset (&set);
-  sigaddset (&set, SIGINT);
-  if (!(pthread_sigmask (SIG_BLOCK, &set, NULL) == 0))
-    return 1;
-  sprintf (command, "sh -c 'sleep 1; kill -%d %d' &", SIGINT, pid);
-  if (!(system (command) == 0))
-    return 2;
-  sleep (2);
-  if (!(sigint_occurred == 0))
-    return 3;
-  if (!(pthread_sigmask (SIG_UNBLOCK, &set, NULL) == 0))
-    return 4;
-  if (!(sigint_occurred == 1)) /* This fails on IRIX.  */
-    return 5;
-  return 0;
-}]])],
-          [:],
-          [gl_cv_func_pthread_sigmask_unblock_works=no],
-          [:])
-        m4_ifdef([gl_][THREADLIB], [LIBS=$gl_save_LIBS])
-      ])
-    case "$gl_cv_func_pthread_sigmask_unblock_works" in
-      *no)
-        REPLACE_PTHREAD_SIGMASK=1
-        AC_DEFINE([PTHREAD_SIGMASK_UNBLOCK_BUG], [1],
-          [Define to 1 if pthread_sigmask() unblocks signals incorrectly.])
         ;;
     esac
   fi

@@ -1,18 +1,18 @@
 /* Creating and controlling threads.
-   Copyright (C) 2005-2021 Free Software Foundation, Inc.
+   Copyright (C) 2005-2026 Free Software Foundation, Inc.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
-   any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Bruno Haible <bruno@clisp.org>, 2005.
    Based on GCC's gthr-posix.h, gthr-posix95.h, gthr-win32.h.  */
@@ -20,11 +20,9 @@
 #include <config.h>
 
 /* Specification.  */
-# define _GLTHREAD_THREAD_INLINE _GL_EXTERN_INLINE
 #include "glthread/thread.h"
 
 #include <stdlib.h>
-#include "glthread/lock.h"
 
 /* ========================================================================= */
 
@@ -36,7 +34,7 @@ struct thrd_with_exitvalue
   void * volatile exitvalue;
 };
 
-/* The Thread-Specific Storage (TSS) key that allows to access each thread's
+/* The Thread-Specific Storage (TSS) key that allows accessing each thread's
    'struct thrd_with_exitvalue *' pointer.  */
 static tss_t thrd_with_exitvalue_key;
 
@@ -140,9 +138,11 @@ gl_thread_self (void)
             /* Memory allocation failed.  There is not much we can do.  Have to
                busy-loop, waiting for the availability of memory.  */
             {
-              struct timespec ts;
-              ts.tv_sec = 1;
-              ts.tv_nsec = 0;
+              struct timespec ts =
+                {
+                  .tv_sec = 1,
+                  .tv_nsec = 0
+                };
               thrd_sleep (&ts, NULL);
             }
           }
@@ -203,3 +203,13 @@ const gl_thread_t gl_null_thread /* = { .p = NULL } */;
 #endif
 
 /* ========================================================================= */
+
+gl_thread_t
+gl_thread_create (void *(*func) (void *arg), void *arg)
+{
+  gl_thread_t thread;
+  int ret = glthread_create (&thread, func, arg);
+  if (ret != 0)
+    abort ();
+  return thread;
+}

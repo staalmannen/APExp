@@ -1,9 +1,9 @@
 /* Test of perror() function.
-   Copyright (C) 2011-2021 Free Software Foundation, Inc.
+   Copyright (C) 2011-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
+   the Free Software Foundation, either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -21,6 +21,11 @@
 #include <errno.h>
 #include <string.h>
 #include <unistd.h>
+
+/* Tell GCC not to warn about myerr being leaked.  */
+#if _GL_GNUC_PREREQ (13, 0)
+# pragma GCC diagnostic ignored "-Wanalyzer-fd-leak"
+#endif
 
 /* This test intentionally parses stderr.  So, we arrange to have fd 10
    (outside the range of interesting fd's during the test) set up to
@@ -90,8 +95,7 @@ main (void)
   /* Test that perror uses the same message as strerror.  */
   {
     int errs[] = { EACCES, 0, -3, };
-    int i;
-    for (i = 0; i < SIZEOF (errs); i++)
+    for (int i = 0; i < SIZEOF (errs); i++)
       {
         char buf[256];
         const char *err = strerror (errs[i]);
@@ -121,7 +125,7 @@ main (void)
        https://sourceware.org/ml/newlib/2011/msg00228.html */
     ASSERT (errno > 0);
     /* Commented out until glibc behaves:
-       https://sourceware.org/bugzilla/show_bug.cgi?id=12792 */
+       https://sourceware.org/PR12792 */
     ASSERT (ferror (stderr));
 #endif
   }
@@ -129,5 +133,5 @@ main (void)
   ASSERT (fclose (stderr) == 0);
   ASSERT (remove (BASE ".tmp") == 0);
 
-  return 0;
+  return test_exit_status;
 }

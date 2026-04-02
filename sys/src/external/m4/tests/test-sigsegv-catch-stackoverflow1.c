@@ -1,6 +1,5 @@
 /* Test the stack overflow handler.
-   Copyright (C) 2002-2021  Bruno Haible <bruno@clisp.org>
-   Copyright (C) 2010 Eric Blake <eblake@redhat.com>
+   Copyright (C) 2002-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -15,13 +14,31 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
+/* Written by Bruno Haible and Eric Blake.  */
+
 #include <config.h>
+
+/* On GNU/Hurd, when compiling with _FORTIFY_SOURCE >= 2, avoid an error
+   "*** longjmp causes uninitialized stack frame ***: terminated".
+   Cf. <https://sourceware.org/PR32522>  */
+#ifdef __gnu_hurd__
+# undef _FORTIFY_SOURCE
+# undef __USE_FORTIFY_LEVEL
+#endif
 
 /* Specification.  */
 #include "sigsegv.h"
 
 #include <stdio.h>
 #include <limits.h>
+
+/* Skip this test when an address sanitizer is in use.  */
+#ifndef __has_feature
+# define __has_feature(a) 0
+#endif
+#if defined __SANITIZE_ADDRESS__ || __has_feature (address_sanitizer)
+# undef HAVE_STACK_OVERFLOW_RECOVERY
+#endif
 
 #if HAVE_STACK_OVERFLOW_RECOVERY
 
@@ -43,22 +60,41 @@
 # endif
 # include "altstack-util.h"
 
-jmp_buf mainloop;
-sigset_t mainsigset;
+static jmp_buf mainloop;
+static sigset_t mainsigset;
 
-volatile int pass = 0;
+static volatile int pass = 0;
 
-volatile char *stack_lower_bound;
-volatile char *stack_upper_bound;
+static volatile char *stack_lower_bound;
+static volatile char *stack_upper_bound;
 
 static void
 stackoverflow_handler_continuation (void *arg1, void *arg2, void *arg3)
 {
+#if defined __NetBSD__ && defined __i386__
+  /* On NetBSD 10.0/i386, when built as part of a testdir-all (but not as part
+     of a testdir for just the module 'sigsegv'!) this program crashes.  The
+     cause is that:
+       - The alternate stack is not aligned (which is intentional, see
+         altstack-util.h) and NetBSD does not align the stack pointer while
+         switching to the alternate stack.
+       - When %esp is not aligned, the dynamic linker crashes in function
+         _rtld_bind while resolving the symbol 'longjmp'.
+     We would around this by aligning the stack pointer, to a multiple of 8.  */
+  int *argp;
+  __asm__ __volatile__ ("movl %1,%0" : "=r" (argp) : "r" (&arg1));
+  unsigned long sp;
+  __asm__ __volatile__ ("movl %%esp,%0" : "=r" (sp));
+  sp &= ~7UL;
+  __asm__ __volatile__ ("movl %0,%%esp" : : "r" (sp));
+  int arg = *argp;
+#else
   int arg = (int) (long) arg1;
+#endif
   longjmp (mainloop, arg);
 }
 
-void
+static void
 stackoverflow_handler (int emergency, stackoverflow_context_t scp)
 {
   char dummy;
@@ -72,7 +108,7 @@ stackoverflow_handler (int emergency, stackoverflow_context_t scp)
                          (void *) (long) (emergency ? -1 : pass), NULL, NULL);
 }
 
-volatile int *
+static volatile int *
 recurse_1 (int n, volatile int *p)
 {
   if (n < INT_MAX)
@@ -80,7 +116,7 @@ recurse_1 (int n, volatile int *p)
   return p;
 }
 
-int
+static int
 recurse (volatile int n)
 {
   return *recurse_1 (n, &n);

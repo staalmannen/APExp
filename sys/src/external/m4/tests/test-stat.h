@@ -1,9 +1,9 @@
 /* Tests of stat.
-   Copyright (C) 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -33,16 +33,16 @@ test_stat_func (int (*func) (char const *, struct stat *), bool print)
   ASSERT (func (".", &st1) == 0);
   ASSERT (func ("./", &st2) == 0);
 #if !(defined _WIN32 && !defined __CYGWIN__ && !_GL_WINDOWS_STAT_INODES)
-  ASSERT (SAME_INODE (st1, st2));
+  ASSERT (psame_inode (&st1, &st2));
 #endif
   ASSERT (func (cwd, &st2) == 0);
 #if !(defined _WIN32 && !defined __CYGWIN__ && !_GL_WINDOWS_STAT_INODES)
-  ASSERT (SAME_INODE (st1, st2));
+  ASSERT (psame_inode (&st1, &st2));
 #endif
   ASSERT (func ("/", &st1) == 0);
   ASSERT (func ("///", &st2) == 0);
 #if !(defined _WIN32 && !defined __CYGWIN__ && !_GL_WINDOWS_STAT_INODES)
-  ASSERT (SAME_INODE (st1, st2));
+  ASSERT (psame_inode (&st1, &st2));
 #endif
 
   errno = 0;
@@ -60,6 +60,11 @@ test_stat_func (int (*func) (char const *, struct stat *), bool print)
   errno = 0;
   ASSERT (func (BASE "file/", &st1) == -1);
   ASSERT (errno == ENOTDIR);
+
+  /* /dev/null is a character device.  */
+  ASSERT (func ("/dev/null", &st1) == 0);
+  ASSERT (!S_ISREG (st1.st_mode));
+  ASSERT (S_ISCHR (st1.st_mode));
 
   /* Now for some symlink tests, where supported.  We set up:
      link1 -> directory

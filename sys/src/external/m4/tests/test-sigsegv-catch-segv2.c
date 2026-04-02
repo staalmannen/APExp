@@ -1,5 +1,5 @@
 /* Test that the handler can be exited multiple times.
-   Copyright (C) 2002-2021  Bruno Haible <bruno@clisp.org>
+   Copyright (C) 2002-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,6 +13,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible.  */
 
 #include <config.h>
 
@@ -38,7 +40,7 @@
 
 # if SIGSEGV_FAULT_ADDRESS_ALIGNMENT > 1UL
 #  include <unistd.h>
-#  define SIGSEGV_FAULT_ADDRESS_ROUNDOFF_BITS (getpagesize () - 1)
+#  define SIGSEGV_FAULT_ADDRESS_ROUNDOFF_BITS (sysconf (_SC_PAGESIZE) - 1)
 # else
 #  define SIGSEGV_FAULT_ADDRESS_ROUNDOFF_BITS 0
 # endif
@@ -85,11 +87,6 @@ main ()
   void *p;
   sigset_t emptyset;
 
-  /* Preparations.  */
-# if !HAVE_MAP_ANONYMOUS
-  zero_fd = open ("/dev/zero", O_RDONLY, 0644);
-# endif
-
 # if defined __linux__ && defined __sparc__
   /* On Linux 2.6.26/SPARC64, PROT_READ has the same effect as
      PROT_READ | PROT_WRITE.  */
@@ -98,7 +95,7 @@ main ()
   prot_unwritable = PROT_READ;
 # endif
 
-  /* Setup some mmaped memory.  */
+  /* Setup some mmapped memory.  */
   p = mmap_zeromap ((void *) 0x12340000, 0x4000);
   if (p == (void *)(-1))
     {

@@ -1,9 +1,9 @@
 /* Assist in file system timestamp tests.
-   Copyright (C) 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -20,9 +20,10 @@
 # define GLTEST_NAP_H
 
 # include <limits.h>
-# include <stdbool.h>
+# include <stdckdint.h>
 
-# include <intprops.h>
+# include "concat-filename.h"
+# include "xgetcwd.h"
 
 /* Avoid a conflict with a function called nap() on UnixWare.  */
 # if defined _SCO_DS || (defined __SCO_VERSION__ || defined __sysv5__)  /* OpenServer, UnixWare */
@@ -33,6 +34,9 @@
 
 /* Name of the witness file.  */
 #define TEMPFILE BASE "nap.tmp"
+
+/* Absolute name of the witness file.  */
+static char *nap_file /* = NULL */;
 
 /* File descriptor used for the witness file.  */
 static int nap_fd = -1;
@@ -55,9 +59,9 @@ diff_timespec (struct timespec a, struct timespec b)
   if (! (bs < as || (bs == as && bns < ans)))
     return 0;
 
-  if (INT_SUBTRACT_WRAPV (as, bs, &sdiff)
-      || INT_MULTIPLY_WRAPV (sdiff, 1000000000, &sdiff)
-      || INT_ADD_WRAPV (sdiff, ans - bns, &sdiff))
+  if (ckd_sub (&sdiff, as, bs)
+      || ckd_mul (&sdiff, sdiff, 1000000000)
+      || ckd_add (&sdiff, sdiff, ans - bns))
     return INT_MAX;
 
   return sdiff;
@@ -76,7 +80,7 @@ nap_get_stat (struct stat *st, int do_write)
          is closed. See
          <https://docs.microsoft.com/en-us/windows/desktop/api/fileapi/nf-fileapi-writefile> */
       close (nap_fd);
-      nap_fd = open (TEMPFILE, O_RDWR, 0600);
+      nap_fd = open (nap_file, O_RDWR, 0600);
       ASSERT (nap_fd != -1);
       lseek (nap_fd, 0, SEEK_END);
 #endif
@@ -94,7 +98,7 @@ nap_works (int delay, struct stat old_st)
   struct timespec delay_spec;
   delay_spec.tv_sec = delay / 1000000000;
   delay_spec.tv_nsec = delay % 1000000000;
-  ASSERT (nanosleep (&delay_spec, 0) == 0);
+  ASSERT (nanosleep (&delay_spec, NULL) == 0);
   nap_get_stat (&st, 1);
 
   if (diff_timespec (get_stat_mtime (&st), get_stat_mtime (&old_st)))
@@ -109,7 +113,7 @@ clear_temp_file (void)
   if (0 <= nap_fd)
     {
       ASSERT (close (nap_fd) != -1);
-      ASSERT (unlink (TEMPFILE) != -1);
+      ASSERT (unlink (nap_file) != -1);
     }
 }
 
@@ -128,8 +132,9 @@ nap (void)
 
   if (-1 == nap_fd)
     {
+      nap_file = xconcatenated_filename (xgetcwd (), TEMPFILE, NULL);
       atexit (clear_temp_file);
-      ASSERT ((nap_fd = creat (TEMPFILE, 0600)) != -1);
+      ASSERT ((nap_fd = creat (nap_file, 0600)) != -1);
       nap_get_stat (&old_st, 0);
     }
   else

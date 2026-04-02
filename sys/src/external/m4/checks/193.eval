@@ -1,0 +1,17 @@
+dnl @ ../doc/m4.texi:6544: Origin of test
+dnl @ expected status: 0
+dnl @ extra options: 
+dnl @ Copyright (C) 2006, 2007, 2008, 2009 Free Software
+dnl @ Foundation, Inc.
+dnl @ This file is free software; the Free Software Foundation
+dnl @ gives unlimited permission to copy and/or distribute it
+dnl @ with or without modifications, as long as this notice
+dnl @ is preserved.
+eval(`3**2000000000')
+dnl @result{}632360961
+define(`loop', `ifelse(`$1', `1000', `pass',
+`loop(eval($1+!!(3**2000000000)))')')loop(0)
+dnl @result{}pass
+define(`check', `ifelse(`$1', `100', `pass', `$2', eval(-3**$1),
+`check(incr($1), eval(-3*$2))', `oops')')check(0, 1)
+dnl @result{}pass

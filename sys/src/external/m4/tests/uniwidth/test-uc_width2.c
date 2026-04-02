@@ -1,9 +1,9 @@
 /* Test of uc_width() function.
-   Copyright (C) 2007-2021 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -60,9 +60,7 @@ add_to_interval (ucs4_t uc, char width)
 int
 main ()
 {
-  ucs4_t uc;
-
-  for (uc = 0; uc < 0x110000; uc++)
+  for (ucs4_t uc = 0; uc < 0x110000; uc++)
     {
       int w1 = uc_width (uc, "UTF-8");
       int w2 = uc_width (uc, "GBK");
@@ -82,5 +80,5 @@ main ()
     }
   finish_interval ();
 
-  return 0;
+  return test_exit_status;
 }

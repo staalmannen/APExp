@@ -1,17 +1,17 @@
 /* fflush.c -- allow flushing input streams
-   Copyright (C) 2007-2021 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Eric Blake. */
@@ -28,19 +28,20 @@
 
 #include "stdio-impl.h"
 
-#include "unused-parameter.h"
-
 #undef fflush
 
 
 #if defined _IO_EOF_SEEN || defined _IO_ftrylockfile || __GNU_LIBRARY__ == 1
 /* GNU libc, BeOS, Haiku, Linux libc5 */
+# if !defined __HAIKU__
+#  define fp_ fp
+# endif
 
 /* Clear the stream's ungetc buffer, preserving the value of ftello (fp).  */
 static void
 clear_ungetc_buffer_preserving_position (FILE *fp)
 {
-  if (fp->_flags & _IO_IN_BACKUP)
+  if (fp_->_flags & _IO_IN_BACKUP)
     /* _IO_free_backup_area is a bit complicated.  Simply call fseek.  */
     fseeko (fp, 0, SEEK_CUR);
 }
@@ -52,7 +53,7 @@ static void
 clear_ungetc_buffer (FILE *fp)
 {
 # if defined __sferror || defined __DragonFly__ || defined __ANDROID__
-  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
+  /* FreeBSD, NetBSD, OpenBSD <= 7.7, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
   if (HASUB (fp))
     {
       fp_->_p += fp_->_r;
@@ -64,7 +65,7 @@ clear_ungetc_buffer (FILE *fp)
       fp->_ungetc_count = 0;
       fp->_rcount = - fp->_rcount;
     }
-# elif defined _IOERR               /* Minix, AIX, HP-UX, IRIX, OSF/1, Solaris, OpenServer, UnixWare, mingw, MSVC, NonStop Kernel, OpenVMS */
+# elif defined _IOERR               /* Minix, AIX, HP-UX, Solaris, OpenServer, UnixWare, mingw, MSVC, NonStop Kernel, OpenVMS */
   /* Nothing to do.  */
 # else                              /* other implementations */
   fseeko (fp, 0, SEEK_CUR);
@@ -77,7 +78,7 @@ clear_ungetc_buffer (FILE *fp)
 /* GNU libc, BeOS, Haiku, Linux libc5 */
 
 # if (defined __sferror || defined __DragonFly__ || defined __ANDROID__) && defined __SNPT
-/* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
+/* FreeBSD, NetBSD, OpenBSD <= 7.7, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
 
 static int
 disable_seek_optimization (FILE *fp)
@@ -96,12 +97,12 @@ restore_seek_optimization (FILE *fp, int saved_flags)
 # else
 
 static void
-update_fpos_cache (FILE *fp _GL_UNUSED_PARAMETER,
-                   off_t pos _GL_UNUSED_PARAMETER)
+update_fpos_cache (_GL_ATTRIBUTE_MAYBE_UNUSED FILE *fp,
+                   _GL_ATTRIBUTE_MAYBE_UNUSED off_t pos)
 {
 #  if defined __sferror || defined __DragonFly__ || defined __ANDROID__
-  /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
-#   if defined __CYGWIN__
+  /* FreeBSD, NetBSD, OpenBSD <= 7.7, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
+#   if defined __CYGWIN__ || defined __ANDROID__
   /* fp_->_offset is typed as an integer.  */
   fp_->_offset = pos;
 #   else
@@ -205,7 +206,7 @@ rpl_fflush (FILE *stream)
     }
 
 # if (defined __sferror || defined __DragonFly__ || defined __ANDROID__) && defined __SNPT
-    /* FreeBSD, NetBSD, OpenBSD, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
+    /* FreeBSD, NetBSD, OpenBSD <= 7.7, DragonFly, Mac OS X, Cygwin, Minix 3, Android */
 
     {
       /* Disable seek optimization for the next fseeko call.  This tells the

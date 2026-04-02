@@ -1,9 +1,9 @@
 /* ftruncate emulations for native Windows.
-   Copyright (C) 1992-2021 Free Software Foundation, Inc.
+   Copyright (C) 1992-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
+   the Free Software Foundation, either version 3, or (at your option)
    any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -24,10 +24,14 @@
 
 # include <errno.h>
 
-# if _GL_WINDOWS_64_BIT_OFF_T
+/* We need to test _FILE_OFFSET_BITS for mingw-w64
+   and _GL_WINDOWS_64_BIT_OFF_T for MSVC.  */
+# if (_FILE_OFFSET_BITS == 64 || _GL_WINDOWS_64_BIT_OFF_T)
 
 /* Large File Support: off_t is 64-bit, but _chsize() takes only a 32-bit
-   argument.  So, define a 64-bit safe SetFileSize function ourselves.  */
+   argument.  Some newer versions of the Windows CRT have a _chsize_s function
+   that takes a 64-bit argument, but we cannot rely on that.
+   So, define a 64-bit safe SetFileSize function ourselves.  */
 
 /* Ensure that <windows.h> declares GetFileSizeEx.  */
 #  if !defined _WIN32_WINNT || (_WIN32_WINNT < _WIN32_WINNT_WIN2K)
@@ -92,14 +96,13 @@ SetFileSize (HANDLE h, LONGLONG size)
           static char zero_bytes[1024];
           LONG pos_hi = 0;
           LONG pos_lo = SetFilePointer (tmph, (LONG) 0, &pos_hi, FILE_END);
-          LONGLONG pos;
           if (pos_lo == INVALID_SET_FILE_POINTER
               && GetLastError() != NO_ERROR)
             {
               CloseHandle (tmph);
               return FALSE;
             }
-          pos = ((LONGLONG) pos_hi << 32) | (ULONGLONG) (ULONG) pos_lo;
+          LONGLONG pos = ((LONGLONG) pos_hi << 32) | (ULONGLONG) (ULONG) pos_lo;
           while (pos < size)
             {
               DWORD written;

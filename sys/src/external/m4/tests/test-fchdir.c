@@ -1,9 +1,9 @@
 /* Test changing to a directory named by a file descriptor.
-   Copyright (C) 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2009-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -36,7 +36,6 @@ main (void)
 {
   char *cwd;
   int fd;
-  int i;
 
   cwd = getcwd (NULL, 0);
   ASSERT (cwd);
@@ -56,6 +55,13 @@ main (void)
     ASSERT (fchdir (99) == -1);
     ASSERT (errno == EBADF);
   }
+#ifdef FD_ATCWD
+  {
+    errno = 0;
+    ASSERT (fchdir (FD_ATCWD) == -1);
+    ASSERT (errno == EBADF);
+  }
+#endif
 
   /* Check for other failure cases.  */
   {
@@ -68,7 +74,7 @@ main (void)
   }
 
   /* Repeat test twice, once in '.' and once in '..'.  */
-  for (i = 0; i < 2; i++)
+  for (int i = 0; i < 2; i++)
     {
       ASSERT (chdir (&".."[1 - i]) == 0);
       ASSERT (fchdir (fd) == 0);
@@ -106,5 +112,5 @@ main (void)
     }
 
   free (cwd);
-  return 0;
+  return test_exit_status;
 }

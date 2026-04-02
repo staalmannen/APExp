@@ -1,18 +1,18 @@
 /* ioctl.c --- wrappers for Windows ioctl function
 
-   Copyright (C) 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paolo Bonzini */
@@ -30,11 +30,9 @@
 int
 rpl_ioctl (int fd, int request, ... /* {void *,char *} arg */)
 {
-  void *buf;
   va_list args;
-
   va_start (args, request);
-  buf = va_arg (args, void *);
+  void *buf = va_arg (args, void *);
   va_end (args);
 
   /* Cast 'request' so that when the system's ioctl function takes a 64-bit
@@ -75,11 +73,9 @@ primary_ioctl (int fd, int request, void *arg)
 int
 ioctl (int fd, int request, ... /* {void *,char *} arg */)
 {
-  void *arg;
   va_list args;
-
   va_start (args, request);
-  arg = va_arg (args, void *);
+  void *arg = va_arg (args, void *);
   va_end (args);
 
 # if WINDOWS_SOCKETS

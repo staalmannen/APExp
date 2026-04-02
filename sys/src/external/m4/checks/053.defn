@@ -1,4 +1,4 @@
-dnl @ ../doc/m4.texi:2354: Origin of test
+dnl @ ../doc/m4.texi:2353: Origin of test
 dnl @ expected status: 0
 dnl @ extra options: 
 dnl @ Copyright (C) 2006, 2007, 2008, 2009 Free Software
@@ -7,12 +7,13 @@ dnl @ This file is free software; the Free Software Foundation
 dnl @ gives unlimited permission to copy and/or distribute it
 dnl @ with or without modifications, as long as this notice
 dnl @ is preserved.
-defn(`defn')
+define(`l', `<[>')define(`r', `<]>')
 dnl @result{}
-define(defn(`divnum'), `cannot redefine a builtin token')
-dnl @error{}m4:stdin:2: Warning: define: invalid macro name ignored
+changequote(`[', `]')
 dnl @result{}
-divnum
-dnl @result{}0
-len(defn(`divnum'))
-dnl @result{}0
+defn([l])defn([r])
+])
+dnl @result{}<[>]defn([r])
+dnl @result{})
+defn([l], [r])
+dnl @result{}<[>][<]>

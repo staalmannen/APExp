@@ -1,5 +1,5 @@
 /* Some auxiliary stuff for using mmap & friends.
-   Copyright (C) 2002-2021  Bruno Haible <bruno@clisp.org>
+   Copyright (C) 2002-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,6 +13,8 @@
 
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
+
+/* Written by Bruno Haible.  */
 
 #if defined _WIN32 && !defined __CYGWIN__
 
@@ -71,26 +73,17 @@ mprotect (void *addr, size_t len, int prot)
 # endif
 # define PROT_READ_WRITE  (PROT_READ|PROT_WRITE)
 
-# if HAVE_MAP_ANONYMOUS
-#  define zero_fd -1
-#  define map_flags MAP_ANONYMOUS | MAP_PRIVATE
-# else
-#  ifndef MAP_FILE
-#   define MAP_FILE 0
-#  endif
-static int zero_fd;
-#  define map_flags MAP_FILE | MAP_PRIVATE
-# endif
-
 static void *
 mmap_zeromap (void *map_addr_hint, size_t map_len)
 {
 # ifdef __hpux
   /* HP-UX 10 mmap() often fails when given a hint.  So give the OS complete
      freedom about the address range.  */
-  return (void *) mmap ((void *) 0,    map_len, PROT_READ_WRITE, map_flags, zero_fd, 0);
+  return (void *) mmap ((void *) 0,    map_len, PROT_READ_WRITE,
+                        MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 # else
-  return (void *) mmap (map_addr_hint, map_len, PROT_READ_WRITE, map_flags, zero_fd, 0);
+  return (void *) mmap (map_addr_hint, map_len, PROT_READ_WRITE,
+                        MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
 # endif
 }
 

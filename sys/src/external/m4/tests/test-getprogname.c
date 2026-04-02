@@ -1,9 +1,9 @@
 /* Test the gnulib getprogname module.
-   Copyright (C) 2016-2021 Free Software Foundation, Inc.
+   Copyright (C) 2016-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -16,7 +16,8 @@
 
 #include <config.h>
 
-#include "getprogname.h"
+#include <stdlib.h>
+
 #include <string.h>
 #include <assert.h>
 
@@ -35,7 +36,7 @@ main (void)
      with "lt-" (depends on the platform).  But the name of the temporary
      executable is a detail that should not be visible to the end user and to
      the test suite.  Remove this "lt-" prefix here.  */
-  if (strncmp (p, "lt-", 3) == 0)
+  if (str_startswith (p, "lt-"))
     p += 3;
 
   /* Note: You can make this test fail

@@ -1,18 +1,18 @@
-/* Copyright (C) 1991, 1994-2002, 2005, 2008-2021 Free Software Foundation,
+/* Copyright (C) 1991, 1994-2002, 2005, 2008-2026 Free Software Foundation,
    Inc.
    This file is part of the GNU C Library.
 
-   This program is free software: you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
-   (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
+   You should have received a copy of the GNU Lesser General Public License
    along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #ifndef _LIBC
@@ -30,14 +30,14 @@
 # include <libintl.h>
 #else /* !_LIBC */
 # include "gettext.h"
-# define _(msgid) gettext (msgid)
+# define _(msgid) dgettext (GNULIB_TEXT_DOMAIN, msgid)
 # define N_(msgid) gettext_noop (msgid)
 #endif /* _LIBC */
 
 #ifdef _LIBC
 # include <bits/libc-lock.h>
 #else /* !_LIBC */
-# include "glthread/lock.h"
+# include "glthread/once.h"
 # include "glthread/tls.h"
 # define __libc_once_define(CLASS, NAME) gl_once_define (CLASS, NAME)
 # define __libc_once(NAME, INIT) gl_once ((NAME), (INIT))
@@ -94,12 +94,12 @@ static char *getbuffer (void);
 char *
 strsignal (int signum)
 {
-  const char *desc;
   __libc_once_define (static, once);
 
   /* If we have not yet initialized the buffer do it now.  */
   __libc_once (once, init);
 
+  const char *desc;
   if (
 #ifdef SIGRTMIN
       (signum >= SIGRTMIN && signum <= SIGRTMAX) ||

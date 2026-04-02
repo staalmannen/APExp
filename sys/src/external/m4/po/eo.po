@@ -1,14 +1,14 @@
 # m4: translation to Esperanto (eo)
-# Copyright (C) 2013 Free Software Foundation, Inc.
+# Copyright (C) 2013, 2023 Free Software Foundation, Inc.
 # This file is distributed under the same license as the m4 package.
-# Felipe Castro <fefcas@gmail.com>, 2013.
+# Felipe Castro <fefcas@gmail.com>, 2013, 2023.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: m4 1.4o\n"
+"Project-Id-Version: m4 1.4.18d\n"
 "Report-Msgid-Bugs-To: bug-m4@gnu.org\n"
-"POT-Creation-Date: 2021-05-28 13:49-0500\n"
-"PO-Revision-Date: 2013-01-30 14:03-0300\n"
+"POT-Creation-Date: 2026-02-06 13:55-0600\n"
+"PO-Revision-Date: 2023-01-08 11:11-0300\n"
 "Last-Translator: Felipe Castro <fefcas@gmail.com>\n"
 "Language-Team: Esperanto <translation-team-eo@lists.sourceforge.net>\n"
 "Language: eo\n"
@@ -16,111 +16,112 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Bugs: Report translation errors to the Language-Team address.\n"
+"X-Generator: Poedit 2.4.2\n"
 
-#: lib/clean-temp.c:235
+#: lib/clean-temp.c:230
 #, c-format
 msgid "cannot find a temporary directory, try setting $TMPDIR"
-msgstr ""
+msgstr "malsukcesis trovi provizoran dosierujon, provas $TMPDIR"
 
-#: lib/clean-temp.c:250
+#: lib/clean-temp.c:245
 #, c-format
 msgid "cannot create a temporary directory using template \"%s\""
-msgstr ""
+msgstr "malsukcesis krei provizoran dosierujon per uzo de la ŝablono \"%s\""
 
-#: lib/clean-temp.c:371
-#, fuzzy, c-format
+#: lib/clean-temp.c:364
+#, c-format
 msgid "cannot remove temporary directory %s"
-msgstr "ERARO: ne eblas krei provizoran dosieron por deturno"
+msgstr "malsukcesis forigi provizoran dosierujon %s"
 
-#: lib/closein.c:100
+#: lib/closein.c:99
 msgid "error closing file"
-msgstr ""
+msgstr "eraro dum fermado de dosiero"
 
-#: lib/closeout.c:122
+#: lib/closeout.c:121
 msgid "write error"
-msgstr ""
+msgstr "skrib-eraro"
 
-#: lib/c-stack.c:187
+#: lib/c-stack.c:190
 msgid "program error"
-msgstr ""
+msgstr "programeraro"
 
-#: lib/c-stack.c:188
+#: lib/c-stack.c:191
 msgid "stack overflow"
-msgstr ""
+msgstr "staka troo"
 
-#: lib/clean-temp-simple.c:297
-#, fuzzy, c-format
+#: lib/clean-temp-simple.c:266
+#, c-format
 msgid "cannot remove temporary file %s"
-msgstr "Ne eblas difini erar-dosieron: %s"
+msgstr "malsukcesis forigi provizoran dosieron %s"
 
-#: lib/error.c:195
+#: lib/error.c:208
 msgid "Unknown system error"
-msgstr ""
+msgstr "Nekonata sistemeraro"
 
-#: lib/execute.c:348 lib/spawn-pipe.c:597 lib/wait-process.c:291
-#: lib/wait-process.c:365
+#: lib/execute.c:378 lib/spawn-pipe.c:597 lib/wait-process.c:325
+#: lib/wait-process.c:396
 #, c-format
 msgid "%s subprocess failed"
-msgstr ""
+msgstr "subprocezo %s malsukcesis"
 
-#: lib/getopt.c:278
-#, fuzzy, c-format
+#: lib/getopt.c:283
+#, c-format
 msgid "%s: option '%s%s' is ambiguous\n"
-msgstr "%s: modifilo '%s' estas plursenca\n"
+msgstr "%s: opcio «%s%s» estas ambigua\n"
 
-#: lib/getopt.c:284
-#, fuzzy, c-format
+#: lib/getopt.c:289
+#, c-format
 msgid "%s: option '%s%s' is ambiguous; possibilities:"
-msgstr "%s: modifilo '%s' estas plursenca\n"
+msgstr "%s: opcio «%s%s» estas ambigua; jen ebloj:"
 
-#: lib/getopt.c:319
-#, fuzzy, c-format
+#: lib/getopt.c:323
+#, c-format
 msgid "%s: unrecognized option '%s%s'\n"
-msgstr "%s: nerekonata modifilo '%c%s'\n"
+msgstr "%s: nekonata opcio «%s%s»\n"
 
-#: lib/getopt.c:345
-#, fuzzy, c-format
+#: lib/getopt.c:349
+#, c-format
 msgid "%s: option '%s%s' doesn't allow an argument\n"
-msgstr "%s: modifilo '%c%s' ne permesas argumenton\n"
+msgstr "%s: opcio «%s%s» ne toleras argumenton\n"
 
-#: lib/getopt.c:360
-#, fuzzy, c-format
+#: lib/getopt.c:364
+#, c-format
 msgid "%s: option '%s%s' requires an argument\n"
-msgstr "%s: modifilo '%s' postulas argumenton\n"
+msgstr "%s: opcio «%s%s» bezonas argumenton\n"
 
-#: lib/getopt.c:621
-#, fuzzy, c-format
+#: lib/getopt.c:624
+#, c-format
 msgid "%s: invalid option -- '%c'\n"
-msgstr "%s: malvalida modifilo -- %c\n"
+msgstr "%s: nevalida opcio -- «%c»\n"
 
-#: lib/getopt.c:636 lib/getopt.c:682
-#, fuzzy, c-format
+#: lib/getopt.c:639 lib/getopt.c:685
+#, c-format
 msgid "%s: option requires an argument -- '%c'\n"
-msgstr "%s: modifilo postulas argumenton -- %c\n"
+msgstr "%s: opcio bezonas argumenton -- «%c»\n"
 
-#: lib/obstack.c:338 lib/obstack.c:340 lib/xalloc-die.c:34
+#: lib/obstack.c:351 lib/obstack.c:353 lib/xalloc-die.c:34
 msgid "memory exhausted"
 msgstr "memoro estas plenigita"
 
 #: lib/openat-die.c:38
 #, c-format
 msgid "unable to record current working directory"
-msgstr ""
+msgstr "ne eblas registri aktualan labordosierujon"
 
 #: lib/openat-die.c:57
 #, c-format
 msgid "failed to return to initial working directory"
-msgstr ""
+msgstr "malsukcesis reveni al komenca labordosierujo"
 
-#: lib/os2-spawn.c:46
+#: lib/os2-spawn.c:51
 #, c-format
 msgid "_open_osfhandle failed"
-msgstr ""
+msgstr "_open_osfhandle malsukcesis"
 
-#: lib/os2-spawn.c:83
+#: lib/os2-spawn.c:88
 #, c-format
 msgid "cannot restore fd %d: dup2 failed"
-msgstr ""
+msgstr "ne eblas restarigi fd %d: dup2 malsukcesis"
 
 #. TRANSLATORS:
 #. Get translations for open and closing quotation marks.
@@ -143,264 +144,270 @@ msgstr ""
 #. If you don't know what to put here, please see
 #. <https://en.wikipedia.org/wiki/Quotation_marks_in_other_languages>
 #. and use glyphs suitable for your language.
-#: lib/quotearg.c:355
+#: lib/quotearg.c:357
 msgid "`"
-msgstr ""
+msgstr "«"
 
-#: lib/quotearg.c:356
+#: lib/quotearg.c:358
 msgid "'"
-msgstr ""
+msgstr "»"
 
-#: lib/regcomp.c:135
+#: lib/regcomp.c:122
 msgid "Success"
 msgstr "Sukceso"
 
-#: lib/regcomp.c:138
+#: lib/regcomp.c:125
 msgid "No match"
 msgstr "Neniu kongruo"
 
-#: lib/regcomp.c:141
+#: lib/regcomp.c:128
 msgid "Invalid regular expression"
 msgstr "Malvalida regulesprimo"
 
-#: lib/regcomp.c:144
+#: lib/regcomp.c:131
 msgid "Invalid collation character"
 msgstr "Malvalida ordo-difina signo"
 
-#: lib/regcomp.c:147
+#: lib/regcomp.c:134
 msgid "Invalid character class name"
 msgstr "Malvalida signa klasnomo"
 
-#: lib/regcomp.c:150
+#: lib/regcomp.c:137
 msgid "Trailing backslash"
 msgstr "Vosta retroklino"
 
-#: lib/regcomp.c:153
+#: lib/regcomp.c:140
 msgid "Invalid back reference"
 msgstr "Malvalida retroreferenco"
 
-#: lib/regcomp.c:156
-#, fuzzy
+#: lib/regcomp.c:143
 msgid "Unmatched [, [^, [:, [., or [="
-msgstr "Senpara [ aŭ [^"
+msgstr "Senpara [, [^, [:, [., aŭ [="
 
-#: lib/regcomp.c:159
+#: lib/regcomp.c:146
 msgid "Unmatched ( or \\("
 msgstr "Senpara ( aŭ \\("
 
-#: lib/regcomp.c:162
+#: lib/regcomp.c:149
 msgid "Unmatched \\{"
 msgstr "Senpara \\{"
 
-#: lib/regcomp.c:165
+#: lib/regcomp.c:152
 msgid "Invalid content of \\{\\}"
 msgstr "Malvalida enhavo de \\{\\}"
 
-#: lib/regcomp.c:168
+#: lib/regcomp.c:155
 msgid "Invalid range end"
-msgstr "Malvalida intervalofino"
+msgstr "Malvalida ampleksofino"
 
-#: lib/regcomp.c:171
+#: lib/regcomp.c:158
 msgid "Memory exhausted"
 msgstr "Memoro estas plenigita"
 
-#: lib/regcomp.c:174
+#: lib/regcomp.c:161
 msgid "Invalid preceding regular expression"
 msgstr "Malvalida antaŭa regulesprimo"
 
-#: lib/regcomp.c:177
+#: lib/regcomp.c:164
 msgid "Premature end of regular expression"
 msgstr "Tro frua fino de regulesprimo"
 
-#: lib/regcomp.c:180
+#: lib/regcomp.c:167
 msgid "Regular expression too big"
 msgstr "Regulesprimo tro grandas"
 
-#: lib/regcomp.c:183
+#: lib/regcomp.c:170
 msgid "Unmatched ) or \\)"
 msgstr "Senpara ) aŭ \\)"
 
-#: lib/regcomp.c:676
+#: lib/regcomp.c:650
 msgid "No previous regular expression"
 msgstr "Neniu antaŭa regulesprimo"
 
+# Hangup detected on controlling terminal or death of controlling process.
 #: lib/siglist.h:31
 msgid "Hangup"
-msgstr ""
+msgstr "Malkonekto"
 
+# Interrupt from keyboard.
 #: lib/siglist.h:34
 msgid "Interrupt"
-msgstr ""
+msgstr "Interrompo"
 
+# Quit from keyboard.
 #: lib/siglist.h:37
 msgid "Quit"
-msgstr ""
+msgstr "Forlasigo"
 
 #: lib/siglist.h:40
 msgid "Illegal instruction"
-msgstr ""
+msgstr "Miskomando"
 
 #: lib/siglist.h:43
 msgid "Trace/breakpoint trap"
-msgstr ""
+msgstr "Spurumo-/romppunkto-komando"
 
 #: lib/siglist.h:46
 msgid "Aborted"
-msgstr ""
+msgstr "Abortita"
 
 #: lib/siglist.h:49
 msgid "Floating point exception"
-msgstr ""
+msgstr "Glitkomkalkul-eraro"
 
+# SIGKILL       9       Term    Kill signal
+# Nek kaptebla nek ignorebla (malkiel ABORT)
 #: lib/siglist.h:52
 msgid "Killed"
-msgstr ""
+msgstr "Buĉita"
 
 #: lib/siglist.h:55
 msgid "Bus error"
-msgstr ""
+msgstr "Bus-eraro"
 
+# SIGSEGV      11       Core    Invalid memory reference
 #: lib/siglist.h:58
 msgid "Segmentation fault"
-msgstr ""
+msgstr "Adres-eraro"
 
+# SIGPIPE      13       Term    Broken pipe: write to pipe with no readers
 #: lib/siglist.h:61
 msgid "Broken pipe"
-msgstr ""
+msgstr "Rompita dukto"
 
+# SIGALRM      14       Term    Timer signal from alarm(2)
 #: lib/siglist.h:64
 msgid "Alarm clock"
-msgstr ""
+msgstr "Vekhorloĝo"
 
+# SIGTERM     15       Term    Termination signal
 #: lib/siglist.h:67
 msgid "Terminated"
-msgstr ""
+msgstr "Ĉesigita"
 
 #: lib/siglist.h:70
 msgid "Urgent I/O condition"
-msgstr ""
+msgstr "Urĝa en-eliga stato"
 
+# SIGSTOP   17,19,23    Stop    Stop process
+# Nek kaptebla nek ignorebla (samkiel SIGKILL)
+# Haltu (poste eblos plu iri, vd SIGCONT)
 #: lib/siglist.h:73
 msgid "Stopped (signal)"
-msgstr ""
+msgstr "Paŭzigita (signale)"
 
 #: lib/siglist.h:76
 msgid "Stopped"
-msgstr ""
+msgstr "Paŭzigita (uzule)"
 
 #: lib/siglist.h:79
 msgid "Continued"
-msgstr ""
+msgstr "Daŭrigita"
 
 #: lib/siglist.h:82
 msgid "Child exited"
-msgstr ""
+msgstr "Ido finis"
 
+# SIGTTIN   21,21,26    Stop    tty input for background process
 #: lib/siglist.h:85
 msgid "Stopped (tty input)"
-msgstr ""
+msgstr "Paŭzigita (pro terminalenigo)"
 
+# SIGTTOU   22,22,27    Stop    tty output for background process
 #: lib/siglist.h:88
 msgid "Stopped (tty output)"
-msgstr ""
+msgstr "Paŭzigita (pro terminaleligo)"
 
 #: lib/siglist.h:91
 msgid "I/O possible"
-msgstr ""
+msgstr "En-eligo eblas"
 
 #: lib/siglist.h:94
-#, fuzzy
 msgid "CPU time limit exceeded"
-msgstr "Ĉu VMEM-limo estis atingata?\n"
+msgstr "Limo de procesortempo transpasiĝis"
 
 #: lib/siglist.h:97
-#, fuzzy
 msgid "File size limit exceeded"
-msgstr "Ĉu VMEM-limo estis atingata?\n"
+msgstr "Limo de dosiergrando transpasiĝis"
 
 #: lib/siglist.h:100
 msgid "Virtual timer expired"
-msgstr ""
+msgstr "Virtuala horloĝo transpasis limtempon"
 
 #: lib/siglist.h:103
 msgid "Profiling timer expired"
-msgstr ""
+msgstr "Profilanta horloĝo transpasis limtempon"
 
+# SIGWINCH    28,28,20    Ign     Window resize signal (4.3 BSD, Sun)
 #: lib/siglist.h:106
 msgid "Window changed"
-msgstr ""
+msgstr "Fenestro ŝanĝiĝis"
 
 #: lib/siglist.h:109
-#, fuzzy
 msgid "User defined signal 1"
-msgstr "Nedifinita nomo %s"
+msgstr "Uzula signalo 1"
 
 #: lib/siglist.h:112
-#, fuzzy
 msgid "User defined signal 2"
-msgstr "Nedifinita nomo %s"
+msgstr "Uzula signalo 2"
 
 #: lib/siglist.h:117
 msgid "EMT trap"
-msgstr ""
+msgstr "EMT-komando"
 
+# SIGSYS      12,-,12     Core    Bad argument to routine (SVID)
 #: lib/siglist.h:120
 msgid "Bad system call"
-msgstr ""
+msgstr "Misa sistemvoko"
 
 #: lib/siglist.h:123
 msgid "Stack fault"
-msgstr ""
+msgstr "Stak-eraro"
 
+# SIGINFO      29,-,-             A synonym for SIGPWR
 #: lib/siglist.h:126
 msgid "Information request"
-msgstr ""
+msgstr "Informpeto"
 
 #: lib/siglist.h:128
 msgid "Power failure"
-msgstr ""
+msgstr "Elektra provizo perdiĝis"
 
 #: lib/siglist.h:131
 msgid "Resource lost"
-msgstr ""
+msgstr "Risurco perdiĝis"
 
-#: lib/spawn-pipe.c:217 lib/spawn-pipe.c:220 lib/spawn-pipe.c:459
-#: lib/spawn-pipe.c:462
+#: lib/spawn-pipe.c:218 lib/spawn-pipe.c:221
 #, c-format
 msgid "cannot create pipe"
-msgstr ""
+msgstr "ne eblas krei dukton"
 
 #: lib/strsignal.c:114
 #, c-format
 msgid "Real-time signal %d"
-msgstr ""
+msgstr "Realtempa signalo %d"
 
 #: lib/strsignal.c:118
 #, c-format
 msgid "Unknown signal %d"
-msgstr ""
-
-#: lib/verror.c:76
-#, c-format
-msgid "unable to display error message"
-msgstr ""
+msgstr "Nekonata signalo %d"
 
 #: lib/version-etc.c:73
 #, c-format
 msgid "Packaged by %s (%s)\n"
-msgstr ""
+msgstr "Pakigita far %s (%s)\n"
 
 #: lib/version-etc.c:76
 #, c-format
 msgid "Packaged by %s\n"
-msgstr ""
+msgstr "Pakigita far %s\n"
 
 #. TRANSLATORS: Translate "(C)" to the copyright symbol
 #. (C-in-a-circle), if this symbol is available in the user's
 #. locale.  Otherwise, do not translate "(C)"; leave it as-is.
 #: lib/version-etc.c:83
 msgid "(C)"
-msgstr ""
+msgstr "©"
 
 #. TRANSLATORS: The %s placeholder is the web address of the GPL license.
 #: lib/version-etc.c:88
@@ -410,24 +417,28 @@ msgid ""
 "This is free software: you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
 msgstr ""
+"Ĉi tiu estas libera programaro: vi rajtas ĝin ŝanĝi kaj redistribui.\n"
+"La ĝusta permesilo estas GPLv3+: GNU GPL versio 3 aŭ sekva;\n"
+"por la kompleta (angla) teksto vidu <%s>.\n"
+"Ĉi tiu programaro ne garantiatas, ene de la limoj de la leĝo.\n"
 
 #. TRANSLATORS: %s denotes an author name.
 #: lib/version-etc.c:105
 #, c-format
 msgid "Written by %s.\n"
-msgstr ""
+msgstr "Verkita de %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #: lib/version-etc.c:109
 #, c-format
 msgid "Written by %s and %s.\n"
-msgstr ""
+msgstr "Verkita de %s kaj %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #: lib/version-etc.c:113
 #, c-format
 msgid "Written by %s, %s, and %s.\n"
-msgstr ""
+msgstr "Verkita de %s, %s kaj %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -438,6 +449,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "and %s.\n"
 msgstr ""
+"Verkita de %s, %s, %s\n"
+"kaj %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -448,6 +461,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, and %s.\n"
 msgstr ""
+"Verkita de %s, %s, %s,\n"
+"%s kaj %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -458,6 +473,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, %s, and %s.\n"
 msgstr ""
+"Verkita de %s, %s, %s,\n"
+"%s, %s kaj %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -468,6 +485,8 @@ msgid ""
 "Written by %s, %s, %s,\n"
 "%s, %s, %s, and %s.\n"
 msgstr ""
+"Verkita de %s, %s, %s,\n"
+"%s, %s, %s kaj %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -479,6 +498,9 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "and %s.\n"
 msgstr ""
+"Verkita de %s, %s, %s,\n"
+"%s, %s, %s, %s\n"
+"kaj %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -490,6 +512,9 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "%s, and %s.\n"
 msgstr ""
+"Verkita de %s, %s, %s,\n"
+"%s, %s, %s, %s,\n"
+"%s kaj %s.\n"
 
 #. TRANSLATORS: Each %s denotes an author name.
 #. You can use line breaks, estimating that each author name occupies
@@ -501,354 +526,361 @@ msgid ""
 "%s, %s, %s, %s,\n"
 "%s, %s, and others.\n"
 msgstr ""
+"Verkita de %s, %s, %s,\n"
+"%s, %s, %s, %s,\n"
+"%s, %s kaj aliaj.\n"
 
 #. TRANSLATORS: The placeholder indicates the bug-reporting address
 #. for this package.  Please add _another line_ saying
 #. "Report translation bugs to <...>\n" with the address for translation
 #. bugs (typically your translation team's web or email address).
-#: lib/version-etc.c:249
-#, fuzzy, c-format
+#: lib/version-etc.c:248
+#, c-format
 msgid "Report bugs to: %s\n"
 msgstr ""
-"\n"
-"Raportu programajn misojn al <bug-m4@gnu.org>.\n"
+"Raportu programmisojn al <%s>;\n"
+"sciigu tradukerarojn al <translation-team-eo@lists.sourceforge.net>.\n"
 
-#: lib/version-etc.c:251
+#: lib/version-etc.c:250
 #, c-format
 msgid "Report %s bugs to: %s\n"
-msgstr ""
+msgstr "Raportu programmisojn en %s al: <%s>\n"
 
-#: lib/version-etc.c:255 lib/version-etc.c:257
+#: lib/version-etc.c:254 lib/version-etc.c:256
 #, c-format
 msgid "%s home page: <%s>\n"
-msgstr ""
+msgstr "Hejmpaĝo de «%s»: <%s>\n"
 
-#: lib/version-etc.c:260
+#: lib/version-etc.c:259
 #, c-format
 msgid "General help using GNU software: <%s>\n"
-msgstr ""
+msgstr "Ĝenerala helpo por uzi GNU-programojn: <%s>\n"
 
-#: lib/wait-process.c:232 lib/wait-process.c:264 lib/wait-process.c:326
+#: lib/wait-process.c:266 lib/wait-process.c:298 lib/wait-process.c:357
 #, c-format
 msgid "%s subprocess"
-msgstr ""
+msgstr "subprocezo %s"
 
-#: lib/wait-process.c:283 lib/wait-process.c:355
+#: lib/wait-process.c:317 lib/wait-process.c:386
 #, c-format
 msgid "%s subprocess got fatal signal %d"
-msgstr ""
+msgstr "subprocezo %s ricevis mortigan signalon %d"
 
-#: lib/xprintf.c:50 lib/xprintf.c:76
+#: lib/xprintf.c:47 lib/xprintf.c:68
 #, c-format
 msgid "cannot perform formatted output"
-msgstr ""
+msgstr "ne eblas generi aranĝitan eligon"
 
 #: src/builtin.c:264
-#, fuzzy, c-format
+#, c-format
 msgid "--warn-macro-sequence: bad regular expression `%s': %s"
-msgstr "Malĝusta regulesprimo '%s': %s"
+msgstr "--warn-macro-sequence: malĝusta regulesprimo '%s': %s"
 
-#: src/builtin.c:320
+#: src/builtin.c:298
+#, c-format
+msgid "truncating macro `%s' definition to INT_MAX bytes"
+msgstr ""
+
+#: src/builtin.c:333
 #, c-format
 msgid "Warning: definition of `%s' contains sequence `%s'"
-msgstr ""
+msgstr "Averto: difino de '%s' enhavas sinsekvon '%s'"
 
-#: src/builtin.c:327
+#: src/builtin.c:340
 #, c-format
 msgid "error checking --warn-macro-sequence for macro `%s'"
-msgstr ""
+msgstr "eraro dum kontrolo de --warn-macro-sequence por makroo '%s'"
 
-#: src/builtin.c:388
-#, fuzzy, c-format
+#: src/builtin.c:401
+#, c-format
 msgid "Warning: too few arguments to builtin `%s'"
-msgstr "Averto: tro malmultaj argumentoj por la internaĵo '%s'"
+msgstr "Averto: tro malmulte da argumentoj por la internaĵo '%s'"
 
-#: src/builtin.c:394
-#, fuzzy, c-format
+#: src/builtin.c:407
+#, c-format
 msgid "Warning: excess arguments to builtin `%s' ignored"
-msgstr "Averto: troaj argumentoj por la internaĵo '%s' estas preteratentitaj"
+msgstr "Averto: tro da argumentoj por la internaĵo '%s' estas preteratentitaj"
 
-#: src/builtin.c:415 src/builtin.c:1114
+#: src/builtin.c:428 src/builtin.c:1155
 #, c-format
 msgid "empty string treated as 0 in builtin `%s'"
-msgstr ""
+msgstr "malplena ĉeno procezita kiel 0 en la internaĵo '%s'"
 
-#: src/builtin.c:425 src/builtin.c:1243
-#, fuzzy, c-format
+#: src/builtin.c:438 src/builtin.c:1285
+#, c-format
 msgid "non-numeric argument to builtin `%s'"
-msgstr "Ne-cifera argumento por la internaĵo '%s'"
+msgstr "ne-cifera argumento por la internaĵo '%s'"
 
-#: src/builtin.c:431
+#: src/builtin.c:444
 #, c-format
 msgid "leading whitespace ignored in builtin `%s'"
-msgstr ""
+msgstr "antaŭira blankspaco preteratentita en la internaĵo '%s'"
 
-#: src/builtin.c:435
-#, fuzzy, c-format
+#: src/builtin.c:448
+#, c-format
 msgid "numeric overflow detected in builtin `%s'"
-msgstr "Ne-cifera argumento por la internaĵo '%s'"
+msgstr "cifera troo detektita en la internaĵo '%s'"
 
-#: src/builtin.c:552 src/builtin.c:815 src/builtin.c:856
+#: src/builtin.c:566 src/builtin.c:829 src/builtin.c:870
 #, c-format
 msgid "Warning: %s: invalid macro name ignored"
-msgstr ""
+msgstr "Averto: %s: nevalida makroa nomo estas preteratentita"
 
-#: src/builtin.c:752 src/builtin.c:864
-#, fuzzy, c-format
+#: src/builtin.c:765 src/builtin.c:877
+#, c-format
 msgid "undefined macro `%s'"
-msgstr "Nedifinita nomo '%s'"
+msgstr "nedifinita makroo '%s'"
 
-#: src/builtin.c:823
-#, fuzzy, c-format
+#: src/builtin.c:836
+#, c-format
 msgid "undefined builtin `%s'"
-msgstr "Nedifinita nomo '%s'"
+msgstr "nedifinita internaĵo '%s'"
 
-#: src/builtin.c:914 src/builtin.c:2208
+#: src/builtin.c:928 src/builtin.c:2260
 #, c-format
 msgid "builtin `%s' requested by frozen file is not supported"
-msgstr ""
+msgstr "internaĵo '%s' petita de frostigita dosiero ne subtenatas"
 
-#: src/builtin.c:918
-#, fuzzy, c-format
+#: src/builtin.c:932
+#, c-format
 msgid "Warning: cannot concatenate builtin `%s'"
-msgstr "Averto: tro malmultaj argumentoj por la internaĵo '%s'"
+msgstr "Averto: ne eblas kunmeti la internaĵon '%s'"
 
-#: src/builtin.c:978 src/builtin.c:1015 src/builtin.c:1028 src/builtin.c:1063
-#, fuzzy, c-format
+#: src/builtin.c:1003 src/builtin.c:1053 src/builtin.c:1066 src/builtin.c:1101
+#, c-format
 msgid "cannot run command `%s'"
-msgstr "Ne eblas malfermi dukton al la komando '%s'"
+msgstr "ne eblas plenumigi la komandon '%s'"
 
-#: src/builtin.c:1051
+#: src/builtin.c:1089
 msgid "cannot read pipe"
-msgstr ""
+msgstr "ne eblas legi dukton"
 
-#: src/builtin.c:1098
+#: src/builtin.c:1140
 #, c-format
 msgid "radix %d in builtin `%s' out of range"
-msgstr ""
+msgstr "ona-bazo %d en la internaĵo '%s' estas ekster amplekso"
 
-#: src/builtin.c:1108
-#, fuzzy, c-format
+#: src/builtin.c:1149
+#, c-format
 msgid "negative width to builtin `%s'"
-msgstr "Negativa larĝo por eval"
+msgstr "negativa larĝo por internaĵo '%s'"
 
-#: src/builtin.c:1252
-#, fuzzy, c-format
+#: src/builtin.c:1294
+#, c-format
 msgid "error undiverting `%s'"
-msgstr "Ne eblas mal-deturnigi %s"
+msgstr "eraro dum mal-deturnigo de '%s'"
 
-#: src/builtin.c:1256
-#, fuzzy, c-format
+#: src/builtin.c:1298
+#, c-format
 msgid "cannot undivert `%s'"
-msgstr "Ne eblas mal-deturnigi %s"
+msgstr "ne eblas mal-deturnigi '%s'"
 
-#: src/builtin.c:1366 src/freeze.c:115 src/m4.c:379
-#, fuzzy, c-format
+#: src/builtin.c:1408 src/freeze.c:115 src/m4.c:382
+#, c-format
 msgid "cannot open `%s'"
-msgstr "Ne eblas malfermi %s"
+msgstr "ne eblas malfermi '%s'"
 
-#: src/builtin.c:1429
-#, fuzzy, c-format
+#: src/builtin.c:1471
+#, c-format
 msgid "%s: cannot create tempfile `%s'"
-msgstr "ERARO: ne eblas fermi modulojn: '%s'"
+msgstr "%s: ne eblas krei provizoran dosieron '%s'"
 
-#: src/builtin.c:1464
+#: src/builtin.c:1507
 msgid "recommend using mkstemp instead"
-msgstr ""
+msgstr "rekomendiĝas uzo de mkstemp anstataŭe"
 
-#: src/builtin.c:1557
+#: src/builtin.c:1600
 #, c-format
 msgid "exit status out of range: `%d'"
-msgstr ""
+msgstr "elira stato estas ekster amplekso: '%d'"
 
-#: src/builtin.c:1681
+#: src/builtin.c:1726
 #, c-format
 msgid "Debugmode: bad debug flags: `%s'"
 msgstr "Rafinreĝimo: malĝustaj rafinigaj flagoj: '%s'"
 
-#: src/builtin.c:1722 src/m4.c:625 src/m4.c:689
-#, fuzzy, c-format
+#: src/builtin.c:1767 src/m4.c:633 src/m4.c:700
+#, c-format
 msgid "cannot set debug file `%s'"
-msgstr "Ne eblas difini erar-dosieron: %s"
+msgstr "ne eblas difini rafinigan dosieron '%s'"
 
-#: src/builtin.c:1988
-#, fuzzy
+#: src/builtin.c:2034
 msgid "Warning: \\0 will disappear, use \\& instead in replacements"
-msgstr "AVERTO: \\0 malaperos, uzu \\& en anstataŭigoj"
+msgstr "Averto: \\0 malaperos, prefereble uzu \\& en anstataŭigoj"
 
-#: src/builtin.c:2004
+#: src/builtin.c:2057
 #, c-format
 msgid "Warning: sub-expression %d not present"
-msgstr ""
+msgstr "Averto: subesprimo %d ne ĉeestas"
 
-#: src/builtin.c:2013
+#: src/builtin.c:2066
 msgid "Warning: trailing \\ ignored in replacement"
-msgstr ""
+msgstr "Averto: vosta \\ estas preteratentita en anstataŭigo"
 
-#: src/builtin.c:2079
-#, fuzzy, c-format
+#: src/builtin.c:2132
+#, c-format
 msgid "bad regular expression: `%s': %s"
-msgstr "Malĝusta regulesprimo '%s': %s"
+msgstr "malĝusta regulesprimo: '%s': %s"
 
-#: src/builtin.c:2091 src/builtin.c:2161
-#, fuzzy, c-format
+#: src/builtin.c:2144 src/builtin.c:2214
+#, c-format
 msgid "error matching regular expression `%s'"
-msgstr "Eraro en kongruo de regulesprimo '%s'"
+msgstr "eraro en kongruo de regulesprimo '%s'"
 
-#: src/builtin.c:2139 src/input.c:792
-#, fuzzy, c-format
+#: src/builtin.c:2192 src/input.c:795
+#, c-format
 msgid "bad regular expression `%s': %s"
-msgstr "Malĝusta regulesprimo '%s': %s"
+msgstr "malĝusta regulesprimo '%s': %s"
 
 #: src/debug.c:136 src/debug.c:157
 msgid "error writing to debug stream"
-msgstr ""
+msgstr "eraro dum skribado al rafiniga fluo"
 
-#: src/eval.c:318
-#, fuzzy, c-format
-msgid "bad expression in eval (missing right parenthesis): %s"
-msgstr "Malĝusta esprimo en eval (mankas dekstra kurb-krampo): %s"
-
-#: src/eval.c:324
-#, fuzzy, c-format
-msgid "bad expression in eval: %s"
-msgstr "Malĝusta esprimo en eval: %s"
-
-#: src/eval.c:329
-#, fuzzy, c-format
-msgid "bad expression in eval (bad input): %s"
-msgstr "Malĝusta esprimo en eval (malĝusta enigo): %s"
-
-#: src/eval.c:334
-#, fuzzy, c-format
-msgid "bad expression in eval (excess input): %s"
-msgstr "Malĝusta esprimo en eval (troa enigo): %s"
-
-#: src/eval.c:339
-#, fuzzy, c-format
-msgid "invalid operator in eval: %s"
-msgstr "Divido per nulo en eval: %s"
-
-#: src/eval.c:345
-#, fuzzy, c-format
-msgid "divide by zero in eval: %s"
-msgstr "Divido per nulo en eval: %s"
-
-#: src/eval.c:350
-#, fuzzy, c-format
-msgid "modulo by zero in eval: %s"
-msgstr "Modulo per nulo en eval: %s"
-
-#: src/eval.c:355
-#, fuzzy, c-format
-msgid "negative exponent in eval: %s"
-msgstr "Malĝusta esprimo en eval: %s"
-
-#: src/eval.c:538
+#: src/eval.c:485
 msgid "Warning: recommend ==, not =, for equality operator"
-msgstr ""
+msgstr "Averto: rekomendiĝas ==, ne =, por malegala operacio"
 
-#: src/format.c:40 src/format.c:64 src/format.c:88
+#: src/eval.c:569
+#, c-format
+msgid "bad expression in eval (missing right parenthesis): %s"
+msgstr "malĝusta esprimo en eval (mankas dekstra kurb-krampo): %s"
+
+#: src/eval.c:574
+#, c-format
+msgid "bad expression in eval: %s"
+msgstr "malĝusta esprimo en eval: %s"
+
+#: src/eval.c:579
+#, c-format
+msgid "bad expression in eval (bad input): %s"
+msgstr "malĝusta esprimo en eval (malĝusta enigo): %s"
+
+#: src/eval.c:584
+#, c-format
+msgid "bad expression in eval (excess input): %s"
+msgstr "malĝusta esprimo en eval (tro da enigo): %s"
+
+#: src/eval.c:588
+#, fuzzy, c-format
+msgid "invalid number in eval: %s"
+msgstr "nevalida operaci-simbolo en eval: %s"
+
+#: src/eval.c:592
+#, c-format
+msgid "invalid operator in eval: %s"
+msgstr "nevalida operaci-simbolo en eval: %s"
+
+#: src/eval.c:597
+#, c-format
+msgid "divide by zero in eval: %s"
+msgstr "divido per nulo en eval: %s"
+
+#: src/eval.c:601
+#, c-format
+msgid "modulo by zero in eval: %s"
+msgstr "modulo per nulo en eval: %s"
+
+#: src/eval.c:605
+#, c-format
+msgid "negative exponent in eval: %s"
+msgstr "negativa eksponento en eval: %s"
+
+#: src/format.c:39 src/format.c:63 src/format.c:87
 msgid "empty string treated as 0"
-msgstr ""
+msgstr "malplena ĉeno procezita kiel 0"
 
-#: src/format.c:46 src/format.c:70 src/format.c:94
-#, fuzzy, c-format
+#: src/format.c:45 src/format.c:69 src/format.c:93
+#, c-format
 msgid "non-numeric argument %s"
-msgstr "Ne-cifeca argumento por %s"
+msgstr "ne-cifeca argumento por %s"
 
-#: src/format.c:48 src/format.c:72 src/format.c:96
+#: src/format.c:47 src/format.c:71 src/format.c:95
 msgid "leading whitespace ignored"
-msgstr ""
+msgstr "antaŭira blankspaco estas preteratentita"
 
-#: src/format.c:50 src/format.c:74 src/format.c:98
+#: src/format.c:49 src/format.c:73 src/format.c:97
 msgid "numeric overflow detected"
-msgstr ""
+msgstr "cifera troo estas detektita"
 
-#: src/format.c:308
-#, fuzzy, c-format
+#: src/format.c:309
+#, c-format
 msgid "Warning: unrecognized specifier in `%s'"
-msgstr "%s: nerekonata modifilo '%c%s'\n"
+msgstr "Averto: nerekonata specifigilo en '%s'"
 
-#: src/freeze.c:156
+#: src/freeze.c:157
 msgid "unable to create frozen state"
-msgstr ""
+msgstr "ne eblas krei frostigitan staton"
 
-#: src/freeze.c:167
-#, fuzzy
+#: src/freeze.c:168
 msgid "expecting line feed in frozen file"
-msgstr "Estas atendata linisalto en frostigita dosiero"
+msgstr "atendatas linisalto en frostigita dosiero"
 
-#: src/freeze.c:169
-#, fuzzy, c-format
+#: src/freeze.c:170
+#, c-format
 msgid "expecting character `%c' in frozen file"
-msgstr "Estas atendata signo '%c' en frostigita dosiero"
+msgstr "atendatas signo '%c' en frostigita dosiero"
 
-#: src/freeze.c:215
-#, fuzzy
+#: src/freeze.c:216
 msgid "integer overflow in frozen file"
-msgstr "Estas atendata linisalto en frostigita dosiero"
+msgstr "entjera troo en frostigita dosiero"
 
-#: src/freeze.c:257
-#, fuzzy
+#: src/freeze.c:258
 msgid "premature end of frozen file"
-msgstr "Trofrua fino de frostigita dosiero"
+msgstr "trofrua fino de frostigita dosiero"
 
-#: src/freeze.c:270
-#, fuzzy, c-format
+#: src/freeze.c:271
+#, c-format
 msgid "cannot open %s"
-msgstr "Ne eblas malfermi %s"
+msgstr "ne eblas malfermi %s"
 
-#: src/freeze.c:285
+#: src/freeze.c:286
 #, c-format
 msgid "frozen file version %d greater than max supported of 1"
-msgstr ""
+msgstr "versio %d de frostigita dosiero estas pli ol maksimume 1"
 
-#: src/freeze.c:288
+#: src/freeze.c:289
 msgid "ill-formed frozen file, version directive expected"
-msgstr ""
+msgstr "misformita frostigita dosiero, atendatas versi-direktivo"
 
-#: src/freeze.c:297
-#, fuzzy
+#: src/freeze.c:298
 msgid "ill-formed frozen file"
-msgstr "Aĉe formata frostigita dosiero"
+msgstr "misformita frostigita dosiero"
 
-#: src/freeze.c:385
+#: src/freeze.c:387
 msgid "unable to read frozen state"
-msgstr ""
+msgstr "ne eblas legi frostigitan staton"
 
 #: src/input.c:359
 msgid "read error"
-msgstr ""
+msgstr "leg-eraro"
 
 #: src/input.c:366
 msgid "error reading file"
-msgstr ""
+msgstr "eraro dum legado de dosiero"
 
-#: src/input.c:589
+#: src/input.c:590
 msgid "Warning: end of file treated as newline"
-msgstr ""
+msgstr "Averto: dosierfino procezita kiel novlinio"
 
-#: src/input.c:881
+#: src/input.c:899
 msgid "ERROR: end of file in comment"
-msgstr ""
+msgstr "ERARO: dosierfino en komento"
 
-#: src/input.c:1001
-#, fuzzy
+#: src/input.c:1023
 msgid "ERROR: end of file in string"
-msgstr "ERARO: EOF en ĉeno"
+msgstr "ERARO: dosierfino en ĉeno"
 
 #. TRANSLATORS: This is a non-ASCII name: The first name is (with
 #. Unicode escapes) "Ren\u00e9" or (with HTML entities) "Ren&eacute;".
 #. This is a proper name. See the gettext manual, section Names.
 #: src/m4.c:41
 msgid "Rene' Seindal"
-msgstr ""
+msgstr "René Seindal"
 
 #: src/m4.c:207
-#, fuzzy, c-format
+#, c-format
 msgid "Try `%s --help' for more information."
-msgstr "Provu '%s --help' por pli da informoj.\n"
+msgstr "Provu '%s --help' por pli da informoj."
 
 #: src/m4.c:213
 #, c-format
@@ -856,19 +888,20 @@ msgid "Usage: %s [OPTION]... [FILE]...\n"
 msgstr "Uzmaniero: %s [MODIFILO]... [DOSIERO]...\n"
 
 #: src/m4.c:214
-#, fuzzy
 msgid ""
 "Process macros in FILEs.  If no FILE or if FILE is `-', standard input\n"
 "is read.\n"
 msgstr ""
-"\n"
-"Se mankas DOSIERO aŭ se DOSIERO estas '-', ĉefenigo estos legata.\n"
+"Procezas makroojn en DOSIEROj.  Se mankas DOSIERO aŭ se DOSIERO estas '-',\n"
+"ĉefenigo estos legata.\n"
 
 #: src/m4.c:219
 msgid ""
 "Mandatory or optional arguments to long options are mandatory or optional\n"
 "for short options too.\n"
 msgstr ""
+"Endaj aŭ eblaj argumentoj por longaj opcioj ankaŭ endas aŭ eblas por\n"
+"iuj korespondaj mallongaj opcioj.\n"
 
 #: src/m4.c:224
 msgid ""
@@ -876,6 +909,9 @@ msgid ""
 "      --help                   display this help and exit\n"
 "      --version                output version information and exit\n"
 msgstr ""
+"Operaciaj reĝimoj:\n"
+"      --help                   montri tiun ĉi helpon kaj eliri\n"
+"      --version                eligi versian informon kaj eliri\n"
 
 #: src/m4.c:229
 msgid ""
@@ -885,6 +921,11 @@ msgid ""
 "  -P, --prefix-builtins        force a `m4_' prefix to all builtins\n"
 "  -Q, --quiet, --silent        suppress some warnings for builtins\n"
 msgstr ""
+"  -E, --fatal-warnings         unufoje: avertoj fariĝas eraroj,\n"
+"                                 dufoje: ĉesi ĉe la unua eraro\n"
+"  -i, --interactive            elbufrigi eliron, malatenti interrompojn\n"
+"  -P, --prefix-builtins        aldoni prefikson 'm4_' al ĉiuj internaĵoj\n"
+"  -Q, --quiet, --silent        silentigi kelkajn avertojn por internaĵoj\n"
 
 #: src/m4.c:236
 #, c-format
@@ -893,13 +934,15 @@ msgid ""
 "                               warn if macro definition matches REGEXP,\n"
 "                                 default %s\n"
 msgstr ""
+"      --warn-macro-sequence[=REGESP]\n"
+"                               averti ĉu difino de makroo kongruas al\n"
+"                                 REGEXP, apriore %s\n"
 
 #: src/m4.c:242
 msgid "  -W, --word-regexp=REGEXP     use REGEXP for macro name syntax\n"
 msgstr "  -W, --word-regexp=REGESP     uzi REGESP por makro-noma sintakso\n"
 
 #: src/m4.c:247
-#, fuzzy
 msgid ""
 "Preprocessor features:\n"
 "  -D, --define=NAME[=VALUE]    define NAME as having VALUE, or empty\n"
@@ -907,13 +950,11 @@ msgid ""
 "  -s, --synclines              generate `#line NUM \"FILE\"' lines\n"
 "  -U, --undefine=NAME          undefine NAME\n"
 msgstr ""
-"\n"
 "Antaŭprocezaj trajtoj:\n"
-"  -I, --include=DOSIERUJO      serĉi tiun ĉi dosierujon poste por "
-"inkluzivoj\n"
 "  -D, --define=NOMO[=VALORO]   enigi NOMOn havantan VALOROn, aŭ malplenan\n"
-"  -U, --undefine=NOMO          forigi la internaĵon NOMO\n"
+"  -I, --include=DOSIERUJO      aldoni DOSIERUJOn en inkluzivaj serĉvojoj\n"
 "  -s, --synclines              generi liniojn '#line NUM \"DOSIERO\"'\n"
+"  -U, --undefine=NOMO          maldifini NOMOn\n"
 
 #: src/m4.c:255
 #, fuzzy, c-format
@@ -921,31 +962,29 @@ msgid ""
 "Limits control:\n"
 "  -g, --gnu                    override -G to re-enable GNU extensions\n"
 "  -G, --traditional            suppress all GNU extensions\n"
-"  -H, --hashsize=PRIME         set symbol lookup hash table size [509]\n"
+"  -H, --hashsize=PRIME         set symbol lookup hash table size [%d]\n"
 "  -L, --nesting-limit=NUMBER   change nesting limit, 0 for unlimited [%d]\n"
 msgstr ""
-"\n"
 "Limig-kontrolo:\n"
+"  -g, --gnu                    malŝalti -G por reebligi aldonojn de GNU\n"
 "  -G, --traditional            forigi ĉiujn aldonojn de GNU\n"
 "  -H, --hashsize=PRIMO         difini grandon de simbolserĉa haktabelo\n"
-"  -L, --nesting-limit=NUMERO   ŝanĝi artefarit-nestan limon\n"
+"  -L, --nesting-limit=NUMERO   ŝanĝi artefarit-nestan limon, 0 por "
+"senlima[%d]\n"
 
 #: src/m4.c:263
-#, fuzzy
 msgid ""
 "Frozen state files:\n"
 "  -F, --freeze-state=FILE      produce a frozen state on FILE at end\n"
 "  -R, --reload-state=FILE      reload a frozen state from FILE at start\n"
 msgstr ""
-"\n"
 "Frostitaj stat-dosieroj:\n"
-"  -F, --freeze-state=DOSIERO   produkti frostitan staton ĉe la fino de "
-"DOSIERO\n"
-"  -R, --reload-state=DOSIERO   reŝargi frostitan staton ĉe la komenco de "
-"DOSIERO\n"
+"  -F, --freeze-state=DOSIERO   produkti frostitan staton en DOSIERO ĉe la "
+"fino\n"
+"  -R, --reload-state=DOSIERO   reŝargi frostitan staton el DOSIERO ĉe la "
+"komenco\n"
 
 #: src/m4.c:269
-#, fuzzy
 msgid ""
 "Debugging:\n"
 "  -d, --debug[=FLAGS]          set debug level (no FLAGS implies `aeq')\n"
@@ -954,13 +993,15 @@ msgid ""
 "  -l, --arglength=NUM          restrict macro tracing size\n"
 "  -t, --trace=NAME             trace NAME when it is defined\n"
 msgstr ""
-"\n"
 "Rafinigo:\n"
 "  -d, --debug=[FLAGOJ]         difini rafinigan nivelon (sen FLAGOJ implicas "
 "'aeq')\n"
-"  -t, --trace=NOMO             spursekvi NOMOn kiam ĝi estos difinita\n"
+"      --debugfile[=DOSIERO]    refluigi rafinigan kaj spursekvan aligon al "
+"DOSIERO\n"
+"                                 (apriore stderr, forĵeti se estas malplena "
+"ĉeno)\n"
 "  -l, --arglength=NUM          limigi kiom spursekvi makroojn\n"
-"  -o, --error-output=DOSIERO   alidirekti rafinigan kaj spursekvan eligon\n"
+"  -t, --trace=NOMO             spursekvi NOMOn kiam ĝi estas difinita\n"
 
 #: src/m4.c:278
 msgid ""
@@ -971,6 +1012,12 @@ msgid ""
 "  f   say current input file name\n"
 "  i   show changes in input files\n"
 msgstr ""
+"FLAGOJ estas iun ajn el:\n"
+"  a   montri faktajn argumentojn\n"
+"  c   montri antaŭ kolekti, post kolekti kaj post voki\n"
+"  e   montri disvolviĝon\n"
+"  f   printi nunan enigan dosiernomon\n"
+"  i   montri ŝanĝojn en enigaj dosieroj\n"
 
 #: src/m4.c:286
 msgid ""
@@ -981,125 +1028,154 @@ msgid ""
 "  x   add a unique macro call id, useful with c flag\n"
 "  V   shorthand for all of the above flags\n"
 msgstr ""
+"  l   printi nunan enigan lini-numeron\n"
+"  p   montri rezultojn de serĉoj en vojoj\n"
+"  q   citi valorojn laŭ necese, per flagoj a aŭ e\n"
+"  t   spursekvi ĉiujn makro-vokojn, ne nur jam indikitajn\n"
+"  x   aldoni unikan makro-vokan id, plej utilas kun flago c\n"
+"  V   mallongigo por ŝalti ĉiujn antaŭajn flagojn\n"
 
 #: src/m4.c:295
 msgid ""
 "If defined, the environment variable `M4PATH' is a colon-separated list\n"
 "of directories included after any specified by `-I'.\n"
 msgstr ""
+"Se difinita, la medivariablo 'M4PATH' estas dupunkt-apartita listo de\n"
+"dosierujoj kunmetotaj post iu serĉvojo indikita per '-I'.\n"
 
 #: src/m4.c:300
 msgid ""
 "Exit status is 0 for success, 1 for failure, 63 for frozen file version\n"
 "mismatch, or whatever value was passed to the m4exit macro.\n"
 msgstr ""
+"Elira stato estas 0 por sukceso, 1 por malsukceso, 63 por malkongruo de\n"
+"versio de frostita dosiero, aŭ ia ajn valoro pasita al la makroo m4exit.\n"
 
-#: src/m4.c:436
+#: src/m4.c:443
 #, c-format
 msgid "internal error detected; please report this bug to <%s>"
-msgstr ""
+msgstr "interna eraro detektita; bonvole raportu tiun ĉi eraron al <%s>"
 
-#: src/m4.c:489
+#: src/m4.c:497
 #, c-format
 msgid "warning: `m4 -%c' may be removed in a future release"
-msgstr ""
+msgstr "averto: 'm4 -%c' eble estos forigita en estonta eldono"
 
-#: src/m4.c:496
+#: src/m4.c:504
 #, c-format
 msgid "warning: `m4 %s' is deprecated"
-msgstr ""
+msgstr "averto: 'm4 %s' estas evitinda"
 
-#: src/m4.c:572
-#, fuzzy, c-format
+#: src/m4.c:580
+#, c-format
 msgid "bad debug flags: `%s'"
-msgstr "Malĝustaj rafinigaj flagoj: '%s'"
+msgstr "malĝustaj rafinigaj flagoj: '%s'"
 
-#: src/m4.c:578
+#: src/m4.c:586
 #, c-format
 msgid "warning: `m4 -e' is deprecated, use `-i' instead"
-msgstr ""
+msgstr "averto: 'm4 -e' estas evitinda, uzu '-i' anstataŭe"
 
-#: src/m4.c:690
+#: src/m4.c:701
 msgid "stderr"
-msgstr ""
+msgstr "stderr"
 
-#: src/macro.c:196
+#: src/macro.c:178 src/macro.c:225
 #, fuzzy
+msgid "Warning: cannot concatenate builtin tokens"
+msgstr "Averto: ne eblas kunmeti la internaĵon '%s'"
+
+#: src/macro.c:205
 msgid "ERROR: end of file in argument list"
-msgstr "ERARO: EOF en argument-listo"
+msgstr "ERARO: dosierfino en argument-listo"
 
-#: src/macro.c:332
-#, fuzzy, c-format
+#: src/macro.c:348
+#, c-format
 msgid "recursion limit of %d exceeded, use -L<N> to change it"
-msgstr "ERARO: rekursiga limo de %d estis atingata, uzu -L<N> por ŝanĝi ĝin"
+msgstr "rekursiga limo de %d estis atingata, uzu -L<N> por ŝanĝi ĝin"
 
-#: src/output.c:172 src/output.c:898 src/output.c:901
-#, fuzzy
+#: src/output.c:178 src/output.c:933 src/output.c:936
 msgid "cannot clean temporary file for diversion"
-msgstr "ERARO: ne eblas krei provizoran dosieron por deturno"
+msgstr "ne eblas malplenigi provizoran dosieron por deturno"
 
-#: src/output.c:222 src/output.c:231 src/output.c:265 src/output.c:360
-#, fuzzy
+#: src/output.c:230 src/output.c:239 src/output.c:273 src/output.c:370
 msgid "cannot create temporary file for diversion"
-msgstr "ERARO: ne eblas krei provizoran dosieron por deturno"
+msgstr "ne eblas krei provizoran dosieron por deturno"
 
-#: src/output.c:250 src/output.c:257 src/output.c:269
-#, fuzzy
+#: src/output.c:258 src/output.c:265 src/output.c:277
 msgid "cannot seek within diversion"
-msgstr "Ne eblas apliki stat en deturno"
+msgstr "ne eblas apliki seek en deturno"
 
-#: src/output.c:341 src/output.c:353 src/output.c:502 src/output.c:733
-#, fuzzy
+#: src/output.c:350 src/output.c:363 src/output.c:512 src/output.c:768
 msgid "cannot close temporary file for diversion"
-msgstr "ERARO: ne eblas krei provizoran dosieron por deturno"
+msgstr "ne eblas fermi provizoran dosieron por deturno"
 
-#: src/output.c:474
-#, fuzzy
+#: src/output.c:484
 msgid "ERROR: cannot flush diversion to temporary file"
 msgstr "ERARO: ne eblas elbufrigi deturnon al provizora dosiero"
 
-#: src/output.c:568
-#, fuzzy
+#: src/output.c:579
 msgid "ERROR: copying inserted file"
-msgstr "ERARO: kopio de enmetita dosiero"
+msgstr "ERARO: kopias enmetitan dosieron"
 
-#: src/output.c:816
-#, fuzzy
+#: src/output.c:851
 msgid "error reading inserted file"
-msgstr "ERARO: lego de enmetita dosiero"
+msgstr "eraro dum lego de enmetita dosiero"
 
-#: src/output.c:983
-#, fuzzy
+#: src/output.c:1018
 msgid "cannot stat diversion"
-msgstr "Ne eblas apliki stat en deturno"
+msgstr "ne eblas apliki stat en deturno"
 
-#: src/output.c:987
-#, fuzzy
+#: src/output.c:1022
 msgid "diversion too large"
-msgstr "Deturno tro larĝas"
+msgstr "deturno tro larĝas"
 
 #, c-format
+#~ msgid "unable to display error message"
+#~ msgstr "ne eblas montri erarmesaĝon"
+
+#~ msgid "%s: option `%s' is ambiguous\n"
+#~ msgstr "%s: modifilo '%s' estas plursenca\n"
+
 #~ msgid "%s: option `--%s' doesn't allow an argument\n"
 #~ msgstr "%s: modifilo '--%s' ne permesas argumenton\n"
 
-#, c-format
+#~ msgid "%s: option `%c%s' doesn't allow an argument\n"
+#~ msgstr "%s: modifilo '%c%s' ne permesas argumenton\n"
+
+#~ msgid "%s: option `%s' requires an argument\n"
+#~ msgstr "%s: modifilo '%s' postulas argumenton\n"
+
 #~ msgid "%s: unrecognized option `--%s'\n"
 #~ msgstr "%s: nerekonata modifilo '--%s'\n"
 
-#, c-format
+#, fuzzy
+#~ msgid "%s: unrecognized option `%c%s'\n"
+#~ msgstr "%s: nerekonata modifilo '--%s'\n"
+
 #~ msgid "%s: illegal option -- %c\n"
 #~ msgstr "%s: malpermesata modifilo -- %c\n"
 
-#, c-format
+#~ msgid "%s: invalid option -- %c\n"
+#~ msgstr "%s: malvalida modifilo -- %c\n"
+
+#~ msgid "%s: option requires an argument -- %c\n"
+#~ msgstr "%s: modifilo postulas argumenton -- %c\n"
+
 #~ msgid "%s: option `-W %s' is ambiguous\n"
 #~ msgstr "%s: modifilo '-W %s' estas plursenca\n"
 
-#, c-format
 #~ msgid "%s: option `-W %s' doesn't allow an argument\n"
 #~ msgstr "%s: modifilo '-W %s' ne permesas argumenton\n"
 
+#~ msgid "Unmatched [ or [^"
+#~ msgstr "Senpara [ aŭ [^"
+
 #~ msgid "INTERNAL ERROR: Bad token data type in define_macro ()"
 #~ msgstr "INTERNA ERARO: malĝusta ĵetona datumartipo en define_macro ()"
+
+#~ msgid "Undefined name %s"
+#~ msgstr "Nedifinita nomo %s"
 
 #~ msgid "INTERNAL ERROR: Builtin not found in builtin table!"
 #~ msgstr "INTERNA ERARO: internaĵo ne estis trovata en internaĵ-tabelo!"
@@ -1107,16 +1183,28 @@ msgstr "Deturno tro larĝas"
 #~ msgid "INTERNAL ERROR: Bad token data type in m4_dumpdef ()"
 #~ msgstr "INTERNA ERARO: malĝusta ĵetona datumartipo en m4_dumpdef ()"
 
+#, fuzzy
+#~ msgid "Undefined name `%s'"
+#~ msgstr "Nedifinita nomo %s"
+
 #~ msgid "INTERNAL ERROR: Bad symbol type in m4_defn ()"
 #~ msgstr "INTERNA ERARO: malĝusta simboltipo en m4_defn ()"
 
-#, c-format
 #~ msgid "Radix in eval out of range (radix = %d)"
-#~ msgstr "Bazo en eval estas for de intervalo (bazo = %d)"
+#~ msgstr "Bazo en eval estas ekster amplekso (bazo = %d)"
 
-#, c-format
 #~ msgid "Undefined syntax code %c"
 #~ msgstr "Nedifinita sintaksa kodo %c"
+
+#~ msgid "Cannot open %s"
+#~ msgstr "Ne eblas malfermi %s"
+
+#~ msgid "Cannot set error file: %s"
+#~ msgstr "Ne eblas difini erar-dosieron: %s"
+
+#, fuzzy
+#~ msgid "Bad regular expression `%s': %s"
+#~ msgstr "Malĝusta regulesprimo '%s': %s"
 
 #~ msgid "INTERNAL ERROR: Builtin not found in builtin table! (trace_pre ())"
 #~ msgstr ""
@@ -1144,15 +1232,12 @@ msgstr "Deturno tro larĝas"
 #~ msgid "INTERNAL ERROR: Bad token data type in freeze_one_symbol ()"
 #~ msgstr "INTERNA ERARO: malĝusta ĵetona datumartipo en freeze_one_symbol ()"
 
-#, c-format
 #~ msgid "`%s' from frozen file not found in builtin table!"
 #~ msgstr "'%s' el frostigita dosiero ne estis trovata en internaĵ-tabelo!"
 
-#, c-format
 #~ msgid "Input reverted to %s, line %d"
 #~ msgstr "Enigo revenigita al %s, linio %d"
 
-#, c-format
 #~ msgid "Input read from %s"
 #~ msgstr "Enigo legata el %s"
 
@@ -1243,11 +1328,16 @@ msgstr "Deturno tro larĝas"
 #~ "  i   montri ŝanĝoj en enigaj dosieroj\n"
 #~ "  V   tujmaniero por kunmeti ĉiujn suprajn flagojn\n"
 
-#, c-format
+#~ msgid ""
+#~ "\n"
+#~ "Report bugs to <bug-m4@gnu.org>.\n"
+#~ msgstr ""
+#~ "\n"
+#~ "Raportu programajn misojn al <bug-m4@gnu.org>.\n"
+
 #~ msgid "ERROR: failed to add search directory `%s'"
 #~ msgstr "ERARO: fiasko aldonante la serĉ-dosierujon '%s'"
 
-#, c-format
 #~ msgid "ERROR: failed to add search directory `%s': %s"
 #~ msgstr "ERARO: fiasko aldonante la serĉ-dosierujon '%s': %s"
 
@@ -1266,32 +1356,40 @@ msgstr "Deturno tro larĝas"
 #~ msgid "INTERNAL ERROR: Bad symbol type in call_macro ()"
 #~ msgstr "INTERNA ERARO: malĝusta simbol-tipo en call_macro ()"
 
-#, c-format
 #~ msgid "ERROR: failed to initialise modules: %s"
 #~ msgstr "ERARO: fiaskis ekigo de moduloj: %s"
 
-#, c-format
 #~ msgid "ERROR: cannot find module: `%s'"
 #~ msgstr "ERARO: ne eblas trovi modulon: '%s'"
 
-#, c-format
 #~ msgid "ERROR: cannot find module: `%s': %s"
 #~ msgstr "ERARO: ne eblas trovi modulon: '%s': %s"
 
 #~ msgid "ERROR: cannot close modules"
 #~ msgstr "ERARO: ne eblas fermi modulojn"
 
-#, c-format
 #~ msgid "ERROR: cannot cannot close modules: %s"
 #~ msgstr "ERARO: ne eblas fermi modulojn: %s"
 
-#, c-format
+#~ msgid "ERROR: cannot close module: `%s'"
+#~ msgstr "ERARO: ne eblas fermi modulojn: '%s'"
+
 #~ msgid "ERROR: cannot cannot close module: `%s': %s"
 #~ msgstr "ERARO: ne eblas fermi modulojn: '%s': %s"
 
-#, c-format
+#, fuzzy
+#~ msgid "ERROR: Cannot create temporary file for diversion"
+#~ msgstr "ERARO: ne eblas krei provizoran dosieron por deturno"
+
+#, fuzzy
+#~ msgid "ERROR: Reading inserted file"
+#~ msgstr "ERARO: kopio de enmetita dosiero"
+
 #~ msgid "Path search for `%s' found `%s'"
 #~ msgstr "Voj-serĉo por '%s' trovis '%s'"
+
+#~ msgid "VMEM limit exceeded?\n"
+#~ msgstr "Ĉu VMEM-limo estis atingata?\n"
 
 #~ msgid ""
 #~ "Memory bounds violation detected (SIGSEGV).  Either a stack overflow\n"
@@ -1306,6 +1404,5 @@ msgstr "Deturno tro larĝas"
 #~ msgid "INTERNAL ERROR: Illegal mode to symbol_lookup ()"
 #~ msgstr "INTERNA ERARO: malpermesita reĝimo por symbol_lookup ()"
 
-#, c-format
 #~ msgid "Name `%s' is unknown\n"
 #~ msgstr "La nomo '%s' estas nekonata\n"

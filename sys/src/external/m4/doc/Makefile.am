@@ -1,6 +1,6 @@
 ## Makefile.am - template for generating Makefile via Automake
 ##
-## Copyright (C) 2006-2014, 2016-2017, 2020-2021 Free Software
+## Copyright (C) 2006-2014, 2016-2017, 2020-2026 Free Software
 ## Foundation, Inc.
 ##
 ## This file is part of GNU M4.
@@ -26,6 +26,11 @@ man_MANS = $(srcdir)/m4.1
 EXTRA_DIST = $(man_MANS) gendocs_template
 MAINTAINERCLEANFILES = $(man_MANS) gendocs_template
 SUFFIXES = .1
+
+# The customization variable CHECK_NORMAL_MENU_STRUCTURE is necessary with
+# makeinfo versions ≥ 6.8.
+AM_MAKEINFOFLAGS = -c CHECK_NORMAL_MENU_STRUCTURE=1
+
 HELP2MAN = $(SHELL) $(top_srcdir)/build-aux/missing --run help2man
 
 # Depend on ../.version for version, m4.c for usage text.  Do not depend on

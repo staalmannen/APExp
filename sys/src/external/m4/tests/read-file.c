@@ -1,19 +1,19 @@
 /* read-file.c -- read file contents into a string
-   Copyright (C) 2006, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2006, 2009-2026 Free Software Foundation, Inc.
    Written by Simon Josefsson and Bruno Haible.
 
-   This program is free software; you can redistribute it and/or modify
-   it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3, or (at your option)
-   any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU Lesser General Public License as
+   published by the Free Software Foundation; either version 2.1 of the
+   License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+   GNU Lesser General Public License for more details.
 
-   You should have received a copy of the GNU General Public License
-   along with this program; if not, see <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU Lesser General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #include <config.h>
 
@@ -31,7 +31,7 @@
 /* Get malloc, realloc, free. */
 #include <stdlib.h>
 
-/* Get explicit_bzero, memcpy. */
+/* Get memcpy, memset_explicit. */
 #include <string.h>
 
 /* Get errno. */
@@ -51,7 +51,6 @@
 char *
 fread_file (FILE *stream, int flags, size_t *length)
 {
-  char *buf = NULL;
   size_t alloc = BUFSIZ;
 
   /* For a regular file, allocate a buffer that has exactly the right
@@ -79,12 +78,13 @@ fread_file (FILE *stream, int flags, size_t *length)
       }
   }
 
-  if (!(buf = malloc (alloc)))
+  char *buf = malloc (alloc);
+  if (!buf)
     return NULL; /* errno is ENOMEM.  */
 
   {
     size_t size = 0; /* number of bytes read so far */
-    int save_errno;
+    int saved_errno;
 
     for (;;)
       {
@@ -96,7 +96,7 @@ fread_file (FILE *stream, int flags, size_t *length)
 
         if (count != requested)
           {
-            save_errno = errno;
+            saved_errno = errno;
             if (ferror (stream))
               break;
 
@@ -107,11 +107,11 @@ fread_file (FILE *stream, int flags, size_t *length)
                   {
                     char *smaller_buf = malloc (size + 1);
                     if (smaller_buf == NULL)
-                      explicit_bzero (buf + size, alloc - size);
+                      memset_explicit (buf + size, 0, alloc - size);
                     else
                       {
                         memcpy (smaller_buf, buf, size);
-                        explicit_bzero (buf, alloc);
+                        memset_explicit (buf, 0, alloc);
                         free (buf);
                         buf = smaller_buf;
                       }
@@ -131,11 +131,11 @@ fread_file (FILE *stream, int flags, size_t *length)
 
         {
           char *new_buf;
-          size_t save_alloc = alloc;
+          size_t saved_alloc = alloc;
 
           if (alloc == PTRDIFF_MAX)
             {
-              save_errno = ENOMEM;
+              saved_errno = ENOMEM;
               break;
             }
 
@@ -150,16 +150,16 @@ fread_file (FILE *stream, int flags, size_t *length)
               if (!new_buf)
                 {
                   /* BUF should be cleared below after the loop.  */
-                  save_errno = errno;
+                  saved_errno = errno;
                   break;
                 }
-              memcpy (new_buf, buf, save_alloc);
-              explicit_bzero (buf, save_alloc);
+              memcpy (new_buf, buf, saved_alloc);
+              memset_explicit (buf, 0, saved_alloc);
               free (buf);
             }
           else if (!(new_buf = realloc (buf, alloc)))
             {
-              save_errno = errno;
+              saved_errno = errno;
               break;
             }
 
@@ -168,10 +168,10 @@ fread_file (FILE *stream, int flags, size_t *length)
       }
 
     if (flags & RF_SENSITIVE)
-      explicit_bzero (buf, alloc);
+      memset_explicit (buf, 0, alloc);
 
     free (buf);
-    errno = save_errno;
+    errno = saved_errno;
     return NULL;
   }
 }
@@ -191,7 +191,6 @@ read_file (const char *filename, int flags, size_t *length)
 {
   const char *mode = (flags & RF_BINARY) ? "rbe" : "re";
   FILE *stream = fopen (filename, mode);
-  char *out;
 
   if (!stream)
     return NULL;
@@ -199,14 +198,14 @@ read_file (const char *filename, int flags, size_t *length)
   if (flags & RF_SENSITIVE)
     setvbuf (stream, NULL, _IONBF, 0);
 
-  out = fread_file (stream, flags, length);
+  char *out = fread_file (stream, flags, length);
 
   if (fclose (stream) != 0)
     {
       if (out)
         {
           if (flags & RF_SENSITIVE)
-            explicit_bzero (out, *length);
+            memset_explicit (out, 0, *length);
           free (out);
         }
       return NULL;

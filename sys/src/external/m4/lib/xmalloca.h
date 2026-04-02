@@ -1,10 +1,10 @@
 /* Safe automatic memory allocation with out of memory checking.
-   Copyright (C) 2003, 2005, 2007, 2009-2021 Free Software Foundation, Inc.
+   Copyright (C) 2003, 2005, 2007, 2009-2026 Free Software Foundation, Inc.
    Written by Bruno Haible <bruno@clisp.org>, 2003.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -17,6 +17,12 @@
 
 #ifndef _XMALLOCA_H
 #define _XMALLOCA_H
+
+/* This file uses _GL_ATTRIBUTE_ALLOC_SIZE, _GL_ATTRIBUTE_DEALLOC,
+   _GL_ATTRIBUTE_MALLOC, _GL_ATTRIBUTE_RETURNS_NONNULL, HAVE_ALLOCA.  */
+#if !_GL_CONFIG_H_INCLUDED
+ #error "Please include config.h first."
+#endif
 
 #include "malloca.h"
 #include "xalloc.h"
@@ -39,7 +45,9 @@ extern "C" {
                 + (2 * sa_alignment_max - 1))                                \
                & ~(uintptr_t)(2 * sa_alignment_max - 1))                     \
    : xmmalloca (N))
-extern void * xmmalloca (size_t n);
+extern void * xmmalloca (size_t n)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC (freea, 1)
+  _GL_ATTRIBUTE_ALLOC_SIZE ((1)) _GL_ATTRIBUTE_RETURNS_NONNULL;
 #else
 # define xmalloca(N) \
   xmalloc (N)

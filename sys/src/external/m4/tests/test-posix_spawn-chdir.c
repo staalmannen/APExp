@@ -1,9 +1,9 @@
 /* Test of posix_spawn() function with 'chdir' action.
-   Copyright (C) 2008-2021 Free Software Foundation, Inc.
+   Copyright (C) 2008-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -23,7 +23,6 @@
 #include <errno.h>
 #include <fcntl.h>
 #include <signal.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -133,12 +132,19 @@ test (const char *pwd_prog)
   if (!(line_len == 2 && memcmp (line, "/\n", 2) == 0))
 #if defined _WIN32 && !defined __CYGWIN__
     /* If the pwd program is Cygwin's pwd, its output in the root directory is
-       "/cygdrive/N", where N is a lowercase letter.  */
-    if (!(line_len > 11
-          && memcmp (line, "/cygdrive/", 10) == 0
-          && line[10] >= 'a' && line[10] <= 'z'
-          && ((line_len == 12 && line[11] == '\n')
-              || (line_len == 13 && line[11] == '\r' && line[12] == '\n'))))
+       "/cygdrive/N", where N is a lowercase letter.
+       And if the pwd program is MSYS2 pwd, its output in the root directory is
+       "/N", where N is a lowercase letter.  */
+    if (!((line_len > 11
+           && memcmp (line, "/cygdrive/", 10) == 0
+           && line[10] >= 'a' && line[10] <= 'z'
+           && ((line_len == 12 && line[11] == '\n')
+               || (line_len == 13 && line[11] == '\r' && line[12] == '\n')))
+          || (line_len > 2
+              && line[0] == '/'
+              && line[1] >= 'a' && line[1] <= 'z'
+              && ((line_len == 3 && line[2] == '\n')
+                  || (line_len == 4 && line[2] == '\r' && line[3] == '\n')))))
 #endif
       {
         fprintf (stderr, "read output is not the expected output\n");

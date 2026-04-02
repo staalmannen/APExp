@@ -1,22 +1,22 @@
-/* Copyright (C) 1991-2021 Free Software Foundation, Inc.
+/* Copyright (C) 1991-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
 
-   The GNU C Library is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public
-   License as published by the Free Software Foundation; either
-   version 3 of the License, or (at your option) any later version.
+   This file is free software: you can redistribute it and/or modify
+   it under the terms of the GNU General Public License as published
+   by the Free Software Foundation, either version 3 of the License,
+   or (at your option) any later version.
 
-   The GNU C Library is distributed in the hope that it will be useful,
+   This file is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-   General Public License for more details.
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+   GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public
-   License along with the GNU C Library; if not, see
-   <https://www.gnu.org/licenses/>.  */
+   You should have received a copy of the GNU General Public License
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 #if !_LIBC
 # include <config.h>
+# include <stdio.h>
 # include <unistd.h>
 # include "pathmax.h"
 #else
@@ -29,7 +29,6 @@
 #include <errno.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <stdbool.h>
 #include <stddef.h>
 
 #include <fcntl.h> /* For AT_FDCWD on Solaris 9.  */
@@ -115,13 +114,21 @@
    FIXME - if the kernel ever adds support for multi-thread safety for
    avoiding standard fds, then we should use opendir_safer and
    openat_safer.  */
-#ifdef GNULIB_defined_opendir
+#ifdef GNULIB_defined_DIR
+# undef DIR
 # undef opendir
-#endif
-#ifdef GNULIB_defined_closedir
 # undef closedir
+# undef readdir
+# undef rewinddir
+#else
+# ifdef GNULIB_defined_opendir
+#  undef opendir
+# endif
+# ifdef GNULIB_defined_closedir
+#  undef closedir
+# endif
 #endif
-
+
 #if defined _WIN32 && !defined __CYGWIN__
 # if HAVE_MSVC_INVALID_PARAMETER_HANDLER
 static char *
@@ -174,20 +181,15 @@ __getcwd_generic (char *buf, size_t size)
 #if HAVE_OPENAT_SUPPORT
   int fd = AT_FDCWD;
   bool fd_needs_closing = false;
+# if defined __linux__
+  bool proc_fs_not_mounted = false;
+# endif
 #else
   char dots[DEEP_NESTING * sizeof ".." + BIG_FILE_NAME_COMPONENT_LENGTH + 1];
   char *dotlist = dots;
   size_t dotsize = sizeof dots;
   size_t dotlen = 0;
 #endif
-  DIR *dirstream = NULL;
-  dev_t rootdev, thisdev;
-  ino_t rootino, thisino;
-  char *dir;
-  register char *dirp;
-  struct stat64 st;
-  size_t allocated = size;
-  size_t used;
 
 #if HAVE_MINIMALLY_WORKING_GETCWD
   /* If AT_FDCWD is not defined, the algorithm below is O(N**2) and
@@ -205,9 +207,11 @@ __getcwd_generic (char *buf, size_t size)
      this wrong result with errno = 0.  */
 
 # undef getcwd
-  dir = getcwd_system (buf, size);
-  if (dir || (size && errno == ERANGE))
-    return dir;
+  {
+    char *dir = getcwd_system (buf, size);
+    if (dir || (size && errno == ERANGE))
+      return dir;
+  }
 
   /* Solaris getcwd (NULL, 0) fails with errno == EINVAL, but it has
      internal magic that lets it work even if an ancestor directory is
@@ -216,7 +220,7 @@ __getcwd_generic (char *buf, size_t size)
   if (errno == EINVAL && buf == NULL && size == 0)
     {
       char big_buffer[BIG_FILE_NAME_LENGTH + 1];
-      dir = getcwd_system (big_buffer, sizeof big_buffer);
+      char *dir = getcwd_system (big_buffer, sizeof big_buffer);
       if (dir)
         return strdup (dir);
     }
@@ -228,6 +232,8 @@ __getcwd_generic (char *buf, size_t size)
     return NULL;
 # endif
 #endif
+
+  size_t allocated = size;
   if (size == 0)
     {
       if (buf != NULL)
@@ -239,6 +245,7 @@ __getcwd_generic (char *buf, size_t size)
       allocated = BIG_FILE_NAME_LENGTH + 1;
     }
 
+  char *dir;
   if (buf == NULL)
     {
       dir = malloc (allocated);
@@ -248,56 +255,65 @@ __getcwd_generic (char *buf, size_t size)
   else
     dir = buf;
 
-  dirp = dir + allocated;
+  register char *dirp = dir + allocated;
   *--dirp = '\0';
 
-  if (__lstat64 (".", &st) < 0)
-    goto lose;
-  thisdev = st.st_dev;
-  thisino = st.st_ino;
+  DIR *dirstream = NULL;
 
-  if (__lstat64 ("/", &st) < 0)
-    goto lose;
-  rootdev = st.st_dev;
-  rootino = st.st_ino;
+  dev_t thisdev;
+  ino_t thisino;
+  {
+    struct stat64 st;
+    if (__lstat64 (".", &st) < 0)
+      goto lose;
+    thisdev = st.st_dev;
+    thisino = st.st_ino;
+  }
+
+  dev_t rootdev;
+  ino_t rootino;
+  {
+    struct stat64 st;
+    if (__lstat64 ("/", &st) < 0)
+      goto lose;
+    rootdev = st.st_dev;
+    rootino = st.st_ino;
+  }
 
   while (!(thisdev == rootdev && thisino == rootino))
     {
-      struct dirent64 *d;
+      /* Look at the parent directory.  */
       dev_t dotdev;
       ino_t dotino;
-      bool mount_point;
-      int parent_status;
-      size_t dirroom;
-      size_t namlen;
-      bool use_d_ino = true;
-
-      /* Look at the parent directory.  */
+      {
+        struct stat64 st;
+        int parent_status;
 #if HAVE_OPENAT_SUPPORT
-      fd = __openat64 (fd, "..", O_RDONLY);
-      if (fd < 0)
-        goto lose;
-      fd_needs_closing = true;
-      parent_status = __fstat64 (fd, &st);
-#else
-      dotlist[dotlen++] = '.';
-      dotlist[dotlen++] = '.';
-      dotlist[dotlen] = '\0';
-      parent_status = __lstat64 (dotlist, &st);
-#endif
-      if (parent_status != 0)
-        goto lose;
-
-      if (dirstream && __closedir (dirstream) != 0)
-        {
-          dirstream = NULL;
+        fd = __openat64 (fd, "..", O_RDONLY);
+        if (fd < 0)
           goto lose;
-        }
+        fd_needs_closing = true;
+        parent_status = __fstat64 (fd, &st);
+#else
+        dotlist[dotlen++] = '.';
+        dotlist[dotlen++] = '.';
+        dotlist[dotlen] = '\0';
+        parent_status = __lstat64 (dotlist, &st);
+#endif
+        if (parent_status != 0)
+          goto lose;
 
+        if (dirstream && __closedir (dirstream) != 0)
+          {
+            dirstream = NULL;
+            goto lose;
+          }
+
+        dotdev = st.st_dev;
+        dotino = st.st_ino;
+      }
       /* Figure out if this directory is a mount point.  */
-      dotdev = st.st_dev;
-      dotino = st.st_ino;
-      mount_point = dotdev != thisdev;
+      bool mount_point = dotdev != thisdev;
 
       /* Search for the last directory.  */
 #if HAVE_OPENAT_SUPPORT
@@ -311,6 +327,8 @@ __getcwd_generic (char *buf, size_t size)
         goto lose;
       dotlist[dotlen++] = '/';
 #endif
+      struct dirent64 *d;
+      bool use_d_ino = true;
       for (;;)
         {
           /* Clear errno to distinguish EOF from error if readdir returns
@@ -353,6 +371,7 @@ __getcwd_generic (char *buf, size_t size)
             }
 
           {
+            struct stat64 st;
             int entry_status;
 #if HAVE_OPENAT_SUPPORT
             entry_status = __fstatat64 (fd, d->d_name, &st, AT_SYMLINK_NOFOLLOW);
@@ -405,8 +424,8 @@ __getcwd_generic (char *buf, size_t size)
           }
         }
 
-      dirroom = dirp - dir;
-      namlen = _D_EXACT_NAMLEN (d);
+      size_t dirroom = dirp - dir;
+      size_t namlen = _D_EXACT_NAMLEN (d);
 
       if (dirroom <= namlen)
         {
@@ -439,6 +458,73 @@ __getcwd_generic (char *buf, size_t size)
 
       thisdev = dotdev;
       thisino = dotino;
+
+#if HAVE_OPENAT_SUPPORT
+      /* On some platforms, a system call returns the directory that FD points
+         to.  This is useful if some of the ancestor directories of the
+         directory are unreadable, because in this situation the loop that
+         climbs up the ancestor hierarchy runs into an EACCES error.
+         For example, in some Android app, /data/data/com.termux is readable,
+         but /data/data and /data are not.  */
+# if defined __linux__
+      /* On Linux, in particular, if /proc is mounted,
+           readlink ("/proc/self/fd/<fd>")
+         returns the directory, if its length is < 4096.  (If the length is
+         >= 4096, it fails with error ENAMETOOLONG, even if the buffer that we
+         pass to the readlink function would be large enough.)  */
+      if (!proc_fs_not_mounted)
+        {
+          char namebuf[14 + 10 + 1];
+          sprintf (namebuf, "/proc/self/fd/%u", (unsigned int) fd);
+          char linkbuf[4096];
+          ssize_t linklen = readlink (namebuf, linkbuf, sizeof linkbuf);
+          if (linklen < 0)
+            {
+              if (errno != ENAMETOOLONG)
+                /* If this call was not successful, the next one will likely be
+                   not successful either.  */
+                proc_fs_not_mounted = true;
+            }
+          else
+            {
+              /* *dirp is already a '/' (see above).  Therefore if the directory
+                 ends in a slash, we can remove that slash.  This happens in
+                 particular if the directory is "/".  */
+              if (linklen > 0 && linkbuf[linklen - 1] == '/')
+                linklen--;
+
+              dirroom = dirp - dir;
+              if (dirroom < linklen)
+                {
+                  if (size != 0)
+                    {
+                      __set_errno (ERANGE);
+                      goto lose;
+                    }
+                  else
+                    {
+                      char *tmp;
+                      size_t oldsize = allocated;
+
+                      allocated += linklen - dirroom;
+                      if (allocated < oldsize
+                          || ! (tmp = realloc (dir, allocated)))
+                        goto memory_exhausted;
+
+                      /* Move current contents up to the end of the buffer.  */
+                      dirp = memmove (tmp + dirroom + (allocated - oldsize),
+                                      tmp + dirroom,
+                                      oldsize - dirroom);
+                      dir = tmp;
+                    }
+                }
+              dirp -= linklen;
+              memcpy (dirp, linkbuf, linklen);
+              break;
+            }
+        }
+# endif
+#endif
     }
 
   if (dirstream && __closedir (dirstream) != 0)
@@ -455,7 +541,7 @@ __getcwd_generic (char *buf, size_t size)
     free (dotlist);
 #endif
 
-  used = dir + allocated - dirp;
+  size_t used = dir + allocated - dirp;
   memmove (dir, dirp, used);
 
   if (size == 0)

@@ -1,9 +1,9 @@
 /* Test of wcwidth() function.
-   Copyright (C) 2007-2021 Free Software Foundation, Inc.
+   Copyright (C) 2007-2026 Free Software Foundation, Inc.
 
    This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 3 of the License, or
+   the Free Software Foundation, either version 3 of the License, or
    (at your option) any later version.
 
    This program is distributed in the hope that it will be useful,
@@ -33,12 +33,10 @@ SIGNATURE_CHECK (wcwidth, int, (wchar_t));
 int
 main ()
 {
-  wchar_t wc;
-
 #if !GNULIB_WCHAR_SINGLE_LOCALE
 # ifdef C_CTYPE_ASCII
   /* Test width of ASCII characters.  */
-  for (wc = 0x20; wc < 0x7F; wc++)
+  for (wchar_t wc = 0x20; wc < 0x7F; wc++)
     ASSERT (wcwidth (wc) == 1);
 # endif
 #endif
@@ -53,7 +51,7 @@ main ()
       && strcmp (locale_charset (), "UTF-8") == 0)
     {
       /* Test width of ASCII characters.  */
-      for (wc = 0x20; wc < 0x7F; wc++)
+      for (wchar_t wc = 0x20; wc < 0x7F; wc++)
         ASSERT (wcwidth (wc) == 1);
 
       /* Test width of some non-spacing characters.  */
@@ -102,5 +100,5 @@ main ()
 #endif
     }
 
-  return 0;
+  return test_exit_status;
 }

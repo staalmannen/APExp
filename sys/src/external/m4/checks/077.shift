@@ -1,4 +1,4 @@
-dnl @ ../doc/m4.texi:3171: Origin of test
+dnl @ ../doc/m4.texi:3166: Origin of test
 dnl @ expected status: 0
 dnl @ extra options: 
 dnl @ Copyright (C) 2006, 2007, 2008, 2009 Free Software
@@ -7,13 +7,20 @@ dnl @ This file is free software; the Free Software Foundation
 dnl @ gives unlimited permission to copy and/or distribute it
 dnl @ with or without modifications, as long as this notice
 dnl @ is preserved.
-undivert(`quote.m4')dnl
-dnl @result{}divert(`-1')
-dnl @result{}# quote(args) - convert args to single-quoted string
-dnl @result{}define(`quote', `ifelse(`$#', `0', `', ``$*'')')
-dnl @result{}# dquote(args) - convert args to quoted list of quoted strings
-dnl @result{}define(`dquote', ``$@'')
-dnl @result{}# dquote_elt(args) - convert args to list of double-quoted strings
-dnl @result{}define(`dquote_elt', `ifelse(`$#', `0', `', `$#', `1', ```$1''',
-dnl @result{}                             ```$1'',$0(shift($@))')')
-dnl @result{}divert`'dnl
+include(`quote.m4')
+dnl @result{}
+-quote-dquote-dquote_elt-
+dnl @result{}----
+-quote()-dquote()-dquote_elt()-
+dnl @result{}--`'-`'-
+-quote(`1')-dquote(`1')-dquote_elt(`1')-
+dnl @result{}-1-`1'-`1'-
+-quote(`1', `2')-dquote(`1', `2')-dquote_elt(`1', `2')-
+dnl @result{}-1,2-`1',`2'-`1',`2'-
+define(`n', `$#')dnl
+-n(quote(`1', `2'))-n(dquote(`1', `2'))-n(dquote_elt(`1', `2'))-
+dnl @result{}-1-1-2-
+dquote(dquote_elt(`1', `2'))
+dnl @result{}``1'',``2''
+dquote_elt(dquote(`1', `2'))
+dnl @result{}``1',`2''

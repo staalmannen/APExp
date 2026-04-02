@@ -1,5 +1,5 @@
 # Customize maint.mk.                           -*- makefile -*-
-# Copyright (C) 2003-2014, 2016-2017, 2020-2021 Free Software
+# Copyright (C) 2003-2014, 2016-2017, 2020-2026 Free Software
 # Foundation, Inc.
 
 # This program is free software: you can redistribute it and/or modify
@@ -25,8 +25,6 @@ update-copyright-env = \
 
 # Tests not to run as part of "make syntax-check".
 local-checks-to-skip =
-# We haven't yet turned on i18n
-local-checks-to-skip += sc_bindtextdomain
 # M4 intentionally uses a coding style that compiles under C++.
 local-checks-to-skip += sc_cast_of_x_alloc_return_value
 
@@ -34,7 +32,7 @@ local-checks-to-skip += sc_cast_of_x_alloc_return_value
 config_h_header = "m4\.h"
 
 # Hash of NEWS contents, to ensure we don't add entries to wrong section.
-old_NEWS_hash = 9f7b57774172e11c4a0a9ea4d2e2effe
+old_NEWS_hash = 4bcf31da6270885ae5682b86e837a9ed
 
 # Update m4-latest.tar.* symlinks during 'make stable/beta'.
 GNUPLOADFLAGS = --symlink-regex
@@ -44,8 +42,15 @@ sc_prohibit_tab_based_indentation:
  @re='^ *    '                                               \
  msg='TAB in indentation; use only spaces'                   \
    $(_prohibit_regexp)
+indent_args = --ignore-profile --preprocessor-indentation 1 --no-tabs \
+  -T int32_t -T uint32_t
 
 # List all syntax-check exemptions:
 exclude_file_name_regexp--sc_prohibit_tab_based_indentation = \
   (^(GNU)?Makefile(\.am)?|\.mk|^HACKING|^ChangeLog.*)$$
 exclude_file_name_regexp--update-copyright = ^m4/gnulib-cache.m4$$
+exclude_file_name_regexp--sc_codespell = ^THANKS$$
+exclude_file_name_regexp--sc_trailing_blank = ^examples/barem4.m4$$
+
+# Codespell exemptions:
+codespell_ignore_words_list = ois,WIDTHn

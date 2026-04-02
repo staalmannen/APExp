@@ -1,8 +1,10 @@
-# strtod.m4 serial 26
-dnl Copyright (C) 2002-2003, 2006-2021 Free Software Foundation, Inc.
+# strtod.m4
+# serial 32
+dnl Copyright (C) 2002-2003, 2006-2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
+dnl This file is offered as-is, without any warranty.
 
 AC_DEFUN([gl_FUNC_STRTOD],
 [
@@ -23,11 +25,11 @@ AC_DEFUN([gl_FUNC_STRTOD],
     AC_CACHE_CHECK([whether strtod obeys C99], [gl_cv_func_strtod_works],
       [AC_RUN_IFELSE([AC_LANG_PROGRAM([[
 #include <stdlib.h>
+#include <float.h>
 #include <math.h>
 #include <errno.h>
 /* Compare two numbers with ==.
-   This is a separate function because IRIX 6.5 "cc -O" miscompiles an
-   'x == x' test.  */
+   This is a separate function in order to disable compiler optimizations.  */
 static int
 numeric_equal (double x, double y)
 {
@@ -51,7 +53,7 @@ numeric_equal (double x, double y)
     char *term;
     strtod (string, &term);
     if (term != string && *(term - 1) == 0)
-      result |= 2;
+      result |= 1;
   }
   {
     /* Older glibc and Cygwin mis-parse "-0x".  */
@@ -60,7 +62,7 @@ numeric_equal (double x, double y)
     double value = strtod (string, &term);
     double zero = 0.0;
     if (1.0 / value != -1.0 / zero || term != (string + 2))
-      result |= 4;
+      result |= 2;
   }
   {
     /* Many platforms do not parse hex floats.  */
@@ -68,7 +70,7 @@ numeric_equal (double x, double y)
     char *term;
     double value = strtod (string, &term);
     if (value != 20.0 || term != (string + 6))
-      result |= 8;
+      result |= 4;
   }
   {
     /* Many platforms do not parse infinities.  HP-UX 11.31 parses inf,
@@ -79,7 +81,7 @@ numeric_equal (double x, double y)
     errno = 0;
     value = strtod (string, &term);
     if (value != HUGE_VAL || term != (string + 3) || errno)
-      result |= 16;
+      result |= 8;
   }
   {
     /* glibc 2.7 and cygwin 1.5.24 misparse "nan()".  */
@@ -87,20 +89,55 @@ numeric_equal (double x, double y)
     char *term;
     double value = strtod (string, &term);
     if (numeric_equal (value, value) || term != (string + 5))
-      result |= 32;
+      result |= 16;
   }
   {
-    /* darwin 10.6.1 misparses "nan(".  */
+    /* Darwin 10.6.1 (macOS 10.6.6) misparses "nan(".  */
     const char *string = "nan(";
     char *term;
     double value = strtod (string, &term);
     if (numeric_equal (value, value) || term != (string + 3))
+      result |= 16;
+  }
+#ifndef _MSC_VER /* On MSVC, this is expected behaviour.  */
+  {
+    /* In Cygwin 2.9, strtod does not set errno upon
+       gradual underflow.  */
+    const char *string = "1e-320";
+    char *term;
+    double value;
+    errno = 0;
+    value = strtod (string, &term);
+    if (term != (string + 6)
+        || (value > 0.0 && value <= DBL_MIN && errno != ERANGE))
+      result |= 32;
+  }
+#endif
+  {
+    /* strtod could not set errno upon
+       flush-to-zero underflow.  */
+    const char *string = "1E-100000";
+    char *term;
+    double value;
+    errno = 0;
+    value = strtod (string, &term);
+    if (term != (string + 9) || (value == 0.0L && errno != ERANGE))
       result |= 64;
   }
   return result;
 ]])],
         [gl_cv_func_strtod_works=yes],
-        [gl_cv_func_strtod_works=no],
+        [result=$?
+         if expr $result '>=' 64 >/dev/null; then
+           gl_cv_func_strtod_works="no (underflow problem)"
+         else
+           if expr $result '>=' 32 >/dev/null; then
+             gl_cv_func_strtod_works="no (gradual underflow problem)"
+           else
+             gl_cv_func_strtod_works=no
+           fi
+         fi
+        ],
         [dnl The last known bugs in glibc strtod(), as of this writing,
          dnl were fixed in version 2.8
          AC_EGREP_CPP([Lucky user],
@@ -115,11 +152,13 @@ numeric_equal (double x, double y)
            ],
            [gl_cv_func_strtod_works="guessing yes"],
            [case "$host_os" in
-                       # Guess yes on musl systems.
-              *-musl*) gl_cv_func_strtod_works="guessing yes" ;;
-                       # Guess yes on native Windows.
-              mingw*)  gl_cv_func_strtod_works="guessing yes" ;;
-              *)       gl_cv_func_strtod_works="$gl_cross_guess_normal" ;;
+                                  # Guess yes on musl systems.
+              *-musl* | midipix*) gl_cv_func_strtod_works="guessing yes" ;;
+                                  # Guess 'no (gradual underflow problem)' on Cygwin.
+              cygwin*)            gl_cv_func_strtod_works="guessing no (gradual underflow problem)" ;;
+                                  # Guess yes on native Windows.
+              mingw* | windows*)  gl_cv_func_strtod_works="guessing yes" ;;
+              *)                  gl_cv_func_strtod_works="$gl_cross_guess_normal" ;;
             esac
            ])
         ])
@@ -128,6 +167,16 @@ numeric_equal (double x, double y)
       *yes) ;;
       *)
         REPLACE_STRTOD=1
+        case "$gl_cv_func_strtod_works" in
+          *"no (underflow problem)")
+            AC_DEFINE([STRTOD_HAS_UNDERFLOW_BUG], [1],
+              [Define to 1 if strtod does not set errno upon flush-to-zero underflow.])
+            ;;
+          *"no (gradual underflow problem)")
+            AC_DEFINE([STRTOD_HAS_GRADUAL_UNDERFLOW_PROBLEM], [1],
+              [Define to 1 if strtod does not set errno upon gradual underflow.])
+            ;;
+        esac
         ;;
     esac
   fi
@@ -140,5 +189,5 @@ AC_DEFUN([gl_PREREQ_STRTOD], [
     AC_DEFINE([HAVE_LDEXP_IN_LIBC], [1],
       [Define if the ldexp function is available in libc.])
   fi
-  AC_CHECK_FUNCS([nl_langinfo])
+  gl_CHECK_FUNCS_ANDROID([nl_langinfo], [[#include <langinfo.h>]])
 ])
