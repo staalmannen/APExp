@@ -22,8 +22,6 @@
 #include "config.h"
 #endif
 
-#include <sys/time.h>
-
 #include "bashjmp.h"
 typedef struct _shtimer
 {

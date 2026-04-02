@@ -21,8 +21,6 @@
 
 #define READLINE_LIBRARY
 
-#include <signal.h>
-
 #if defined (__TANDEM)
 #  include <floss.h>
 #endif
@@ -40,6 +38,7 @@
 #  include <unistd.h>
 #endif
 
+#include "rlstdc.h"
 #include "posixselect.h"
 
 #if defined (HAVE_STRING_H)
@@ -47,10 +46,6 @@
 #else /* !HAVE_STRING_H */
 #  include <strings.h>
 #endif /* !HAVE_STRING_H */
-
-#if !defined (strchr) && !defined (__STDC__)
-extern char *strchr (), *strrchr ();
-#endif /* !strchr && !__STDC__ */
 
 #include "readline.h"
 #include "rlprivate.h"

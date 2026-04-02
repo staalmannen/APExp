@@ -107,12 +107,13 @@ static int
 utf8locale (char *lspec)
 {
   char *cp;
-  size_t len;
 
 #if HAVE_LANGINFO_CODESET
   cp = nl_langinfo (CODESET);
   return (STREQ (cp, "UTF-8") || STREQ (cp, "utf8"));
 #else
+  size_t len;
+
   cp = find_codeset (lspec, &len);
 
   if (cp == 0 || len < 4 || len > 5)
@@ -141,6 +142,10 @@ _rl_init_locale (void)
   if (lspec == 0)
     lspec = "";
   ret = setlocale (LC_CTYPE, lspec);	/* ok, since it does not change locale */
+  if (ret == 0 || *ret == 0)
+    ret = setlocale (LC_CTYPE, (char *)NULL);
+  if (ret == 0 || *ret == 0)
+    ret = RL_DEFAULT_LOCALE;
 #else
   ret = (lspec == 0 || *lspec == 0) ? RL_DEFAULT_LOCALE : lspec;
 #endif
