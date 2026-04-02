@@ -1,5 +1,5 @@
 /*  GNU SED, a batch stream editor.
-    Copyright (C) 2003, 2006, 2009 Free Software Foundation, Inc.
+    Copyright (C) 2003-2022 Free Software Foundation, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -12,10 +12,7 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. */
-
-/* find: locale_charset */
+    along with this program; If not, see <https://www.gnu.org/licenses/>. */
 
 #include "sed.h"
 #include <stdlib.h>
@@ -26,32 +23,48 @@
 int mb_cur_max;
 bool is_utf8;
 
-#ifdef HAVE_MBRTOWC
-/* Add a byte to the multibyte character represented by the state
-   CUR_STAT, and answer its length if a character is completed,
-   or -2 if it is yet to be completed.  */
-int brlen (ch, cur_stat)
-     int ch;
-     mbstate_t *cur_stat;
+/* Return non-zero if CH is part of a valid multibyte sequence:
+   Either incomplete yet valid sequence (in case of a leading byte),
+   or the last byte of a valid multibyte sequence.
+
+   Return zero in all other cases:
+    CH is a valid single-byte character (e.g. 0x01-0x7F in UTF-8 locales);
+    CH is an invalid byte in a multibyte sequence for the currentl locale,
+    CH is the NUL byte.
+
+   Reset CUR_STAT in the case of an invalid byte.
+*/
+int
+is_mb_char (int ch, mbstate_t *cur_stat)
 {
-  char c = ch;
+  const char c = ch ;
+  const int mb_pending = !mbsinit (cur_stat);
+  const int result = mbrtowc (NULL, &c, 1, cur_stat);
 
-  /* If we use the generic brlen, then MBRLEN == mbrlen.  */
-  int result = mbrtowc(NULL, &c, 1, cur_stat);
-
-  /* An invalid sequence is treated like a singlebyte character. */
-  if (result == -1)
+  switch (result)
     {
-      memset (cur_stat, 0, sizeof (mbstate_t));
+    case -2: /* Beginning or middle of valid multibyte sequence */
       return 1;
-    }
 
-  return result;
+    case -1: /* Invalid sequence, byte treated like a single-byte character */
+      memset (cur_stat, 0, sizeof (mbstate_t));
+      return 0;
+
+    case 1: /* A valid byte, check if part of on-going multibyte sequence */
+      return mb_pending;
+
+    case 0: /* Special case of mbrtowc(3): the NUL character */
+      /* TODO: test this */
+      return 1;
+
+    default: /* Should never happen, as per mbrtowc(3) documentation */
+      panic ("is_mb_char: mbrtowc (0x%x) returned %d",
+             (unsigned int) ch, result);
+    }
 }
-#endif
 
 void
-initialize_mbcs ()
+initialize_mbcs (void)
 {
   /* For UTF-8, we know that the encoding is stateless.  */
   const char *codeset_name;
@@ -59,10 +72,5 @@ initialize_mbcs ()
   codeset_name = locale_charset ();
   is_utf8 = (strcmp (codeset_name, "UTF-8") == 0);
 
-#ifdef HAVE_MBRTOWC
   mb_cur_max = MB_CUR_MAX;
-#else
-  mb_cur_max = 1;
-#endif
 }
-

@@ -1,6 +1,5 @@
 /*  GNU SED, a batch stream editor.
-    Copyright (C) 1989,90,91,92,93,94,95,98,99,2002,2003
-    Free Software Foundation, Inc.
+    Copyright (C) 1989-2022 Free Software Foundation, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -13,27 +12,22 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. */
+    along with this program; If not, see <https://www.gnu.org/licenses/>. */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
+#include <config.h>
 #include "basicdefs.h"
+#include "dfa.h"
+#include "localeinfo.h"
 #include "regex.h"
-
-#ifndef BOOTSTRAP
 #include <stdio.h>
 #include "unlocked-io.h"
-#endif
 
 #include "utils.h"
 
 /* Struct vector is used to describe a compiled sed program. */
 struct vector {
   struct sed_cmd *v;	/* a dynamically allocated array */
-  size_t v_allocated;	/* ... number slots allocated */
+  size_t v_allocated;	/* ... number of slots allocated */
   size_t v_length;	/* ... number of slots in use */
 };
 
@@ -57,9 +51,17 @@ struct regex {
   regex_t pattern;
   int flags;
   size_t sz;
+  struct dfa *dfa;
+  bool begline;
+  bool endline;
   char re[1];
 };
-  
+
+struct readcmd {
+  char *fname;
+  bool append; /* true: append (default); false: prepend (gnu extension) */
+};
+
 enum replacement_types {
   REPL_ASIS = 0,
   REPL_UPPERCASE = 1,
@@ -128,18 +130,11 @@ struct subst {
   unsigned print : 2;	/* 'p' option given (before/after eval) */
   unsigned eval : 1;	/* 'e' option given */
   unsigned max_id : 4;  /* maximum backreference on the RHS */
+#ifdef lint
+  char* replacement_buffer;
+#endif
 };
 
-#ifdef REG_PERL
-/* This is the structure we store register match data in.  See
-   regex.texinfo for a full description of what registers match.  */
-struct re_registers
-{
-  unsigned num_regs;
-  regoff_t *start;
-  regoff_t *end;
-};
-#endif
 
 
 
@@ -168,7 +163,7 @@ struct sed_cmd {
     countT jump_index;
 
     /* This is used for the r command. */
-    char *fname;
+    struct readcmd readcmd;
 
     /* This is used for the hairy s command. */
     struct subst *cmd_subst;
@@ -176,43 +171,57 @@ struct sed_cmd {
     /* This is used for the w command. */
     struct output *outf;
 
-    /* This is used for the R command. */
-    FILE *fp;
+    /* This is used for the R command.
+       (despite the struct name, it is used for both in and out files). */
+    struct output *inf;
 
     /* This is used for the y command. */
     unsigned char *translate;
     char **translatemb;
+
+    /* This is used for the ':' command (debug only).  */
+    char* label_name;
   } x;
 };
 
 
-
-void bad_prog P_((const char *why));
-size_t normalize_text P_((char *text, size_t len, enum text_types buftype));
-struct vector *compile_string P_((struct vector *, char *str, size_t len));
-struct vector *compile_file P_((struct vector *, const char *cmdfile));
-void check_final_program P_((struct vector *));
-void rewind_read_files P_((void));
-void finish_program P_((struct vector *));
+_Noreturn void bad_prog (const char *why);
+size_t normalize_text (char *text, size_t len, enum text_types buftype);
+struct vector *compile_string (struct vector *, char *str, size_t len);
+struct vector *compile_file (struct vector *, const char *cmdfile);
+void check_final_program (struct vector *);
+void rewind_read_files (void);
+void finish_program (struct vector *);
 
-struct regex *compile_regex P_((struct buffer *b, int flags, int needed_sub));
-int match_regex P_((struct regex *regex,
-		    char *buf, size_t buflen, size_t buf_start_offset,
-		    struct re_registers *regarray, int regsize));
-#ifdef DEBUG_LEAKS
-void release_regex P_((struct regex *));
+struct regex *compile_regex (struct buffer *b, int flags, int needed_sub);
+int match_regex (struct regex *regex,
+                 char *buf, size_t buflen, size_t buf_start_offset,
+                 struct re_registers *regarray, int regsize);
+#ifdef lint
+void release_regex (struct regex *);
 #endif
 
-int process_files P_((struct vector *, char **argv));
+void
+debug_print_command (const struct vector *program, const struct sed_cmd *sc);
+void
+debug_print_program (const struct vector *program);
+void
+debug_print_char (char c);
 
-int main P_((int, char **));
+int process_files (struct vector *, char **argv);
 
-extern void fmt P_ ((const char *line, const char *line_end, int max_length, FILE *output_file));
+int main (int, char **);
+
+extern struct localeinfo localeinfo;
 
 extern int extended_regexp_flags;
 
-/* If set, fflush(stdout) on every line output. */
-extern bool unbuffered_output;
+/* one-byte buffer delimiter */
+extern char buffer_delimiter;
+
+/* If set, fflush(stdout) on every line output,
+   and turn off stream buffering on inputs.  */
+extern bool unbuffered;
 
 /* If set, don't write out the line unless explicitly told to. */
 extern bool no_default_output;
@@ -232,8 +241,9 @@ extern countT lcmd_out_line_len;
 /* How do we edit files in-place? (we don't if NULL) */
 extern char *in_place_extension;
 
-/* The mode to use to read files, either "rt" or "rb".  */
-extern char *read_mode;
+/* The mode to use to read and write files, either "rt"/"w" or "rb"/"wb".  */
+extern char const *read_mode;
+extern char const *write_mode;
 
 /* Should we use EREs? */
 extern bool use_extended_syntax_p;
@@ -242,8 +252,12 @@ extern bool use_extended_syntax_p;
 extern int mb_cur_max;
 extern bool is_utf8;
 
-#ifdef HAVE_MBRTOWC
-#ifdef HAVE_BTOWC
+/* If set, operate in 'sandbox' mode - disable e/r/w commands */
+extern bool sandbox;
+
+/* If set, print debugging information.  */
+extern bool debug;
+
 #define MBRTOWC(pwc, s, n, ps) \
   (mb_cur_max == 1 ? \
    (*(pwc) = btowc (*(unsigned char *) (s)), 1) : \
@@ -253,13 +267,6 @@ extern bool is_utf8;
   (mb_cur_max == 1 ? \
    (*(s) = wctob ((wint_t) (wc)), 1) : \
    wcrtomb ((s), (wc), (ps)))
-#else
-#define MBRTOWC(pwc, s, n, ps) \
-  mbrtowc ((pwc), (s), (n), (ps))
-
-#define WCRTOMB(s, wc, ps) \
-  wcrtomb ((s), (wc), (ps))
-#endif
 
 #define MBSINIT(s) \
   (mb_cur_max == 1 ? 1 : mbsinit ((s)))
@@ -267,15 +274,23 @@ extern bool is_utf8;
 #define MBRLEN(s, n, ps) \
   (mb_cur_max == 1 ? 1 : mbrtowc (NULL, s, n, ps))
 
-#define BRLEN(ch, ps) \
-  (mb_cur_max == 1 ? 1 : brlen (ch, ps))
+#define IS_MB_CHAR(ch, ps)                \
+  (mb_cur_max == 1 ? 0 : is_mb_char (ch, ps))
 
+extern int is_mb_char (int ch, mbstate_t *ps);
+extern void initialize_mbcs (void);
+
+/* Use this to suppress gcc's '...may be used before initialized' warnings. */
+#ifdef lint
+# define IF_LINT(Code) Code
 #else
-#define MBSINIT(s) 1
-#define MBRLEN(s, n, ps) 1
-#define BRLEN(ch, ps) 1
+# define IF_LINT(Code) /* empty */
 #endif
 
-extern int brlen P_ ((int ch, mbstate_t *ps));
-extern void initialize_mbcs P_ ((void));
-
+#ifndef FALLTHROUGH
+# if __GNUC__ < 7
+#  define FALLTHROUGH ((void) 0)
+# else
+#  define FALLTHROUGH __attribute__ ((__fallthrough__))
+# endif
+#endif

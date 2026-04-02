@@ -1,3 +1,257 @@
+GNU sed NEWS                                    -*- outline -*-
+
+* Noteworthy changes in release 4.9 (2022-11-06) [stable]
+
+** Bug fixes
+
+  'sed --follow-symlinks -i' no longer loops forever when its operand
+  is a symbolic link cycle.
+  [bug introduced in sed 4.2]
+
+  a program with an execution line longer than 2GB can no longer trigger
+  an out-of-bounds memory write.
+
+  using the R command to read an input line of length longer than 2GB
+  can no longer trigger an out-of-bounds memory read.
+
+  In locales using UTF-8 encoding, the regular expression '.' no
+  longer sometimes fails to match Unicode characters U+D400 through
+  U+D7FF (some Hangul Syllables, and Hangul Jamo Extended-B) and
+  Unicode characters U+108000 through U+10FFFF (half of Supplemental
+  Private Use Area plane B).
+  [bug introduced in sed 4.8]
+
+  I/O errors involving temp files no longer confuse sed into using a
+  FILE * pointer after fclosing it, which has undefined behavior in C.
+
+** New Features
+
+  The 'r' command now accepts address 0, allowing inserting a file before
+  the first line.
+
+** Changes in behavior
+
+   Sed now prints the less-surprising variant in a corner case of
+   POSIX-unspecified behavior.  Before, this would print "n".
+   Now, it prints "X":
+
+    printf n | sed 'sn\nnXn'; echo
+
+
+* Noteworthy changes in release 4.8 (2020-01-14) [stable]
+
+** Bug fixes
+
+  "sed -i" now creates temporary files with correct umask (limited to u=rwx).
+  Previously sed would incorrectly set umask on temporary files, resulting
+  in problems under certain fuse-like file systems.
+  [bug introduced in sed 4.2.1]
+
+** Release
+
+  distribute gzip-compressed tarballs once again
+
+** Improvements
+
+  a year's worth of gnulib development, including improved DFA performance
+
+
+* Noteworthy changes in release 4.7 (2018-12-20) [stable]
+
+** Bug fixes
+
+  Some uses of \b in the C locale and with the DFA matcher would fail, e.g.,
+  the following would mistakenly print "123-x" instead of "123":
+    echo 123-x|LC_ALL=C sed 's/.\bx//'
+  Using a multibyte locale or certain regexp constructs (some ranges,
+  backreferences) would avoid the bug.  [bug introduced in sed 4.6]
+
+
+* Noteworthy changes in release 4.6 (2018-12-19) [stable]
+
+** Improvements
+
+  sed now prints a clear error message when r/R/w/W (and s///w) commands
+  are missing a filename. Previously, w/W commands would fail with confusing
+  error message, while r/R would be a silent no-op.
+
+  sed now uses fully-buffered output (instead of line-buffered) when
+  writing to files. This should noticeably improve performance of "sed -i"
+  and other write commands.
+  Buffering can be disabled (as before) with "sed -u".
+
+  sed in non-cygwin windows environments (e.g. mingw) now properly handles
+  '\n' newlines in -b/--binary mode.
+
+** Bug fixes
+
+  sed no longer accesses invalid memory (heap overflow) when given invalid
+  backreferences in 's' command [bug#32082, present at least since sed-4.0.6].
+
+  sed no longer adds extraneous NUL when given s/$//n command.
+  [related to bug#32271, present since sed-4.0.7]
+
+  sed no longer accesses invalid memory (heap overflow) with s/$//n regexes.
+  [bug#32271, present since sed-4.3].
+
+** New Features
+
+  New option, --debug: print the input sed script in canonical form
+  and annotate program execution.
+
+
+* Noteworthy changes in release 4.5 (2018-03-31) [stable]
+
+** Bug fixes
+
+  sed now fails when matching very long input lines (>2GB).
+  Before, sed would silently ignore the regex without indicating an
+  error. [Bug present at least since sed-3.02]
+
+  sed no longer rejects comments and closing braces after y/// commands.
+  [Bug existed at least since sed-3.02]
+
+  sed -E --posix no longer ignores special meaning of '+','?','|' .
+  [Bug introduced in the original implementation of --posix option in
+  v4.1a-5-gba68fb4]
+
+  sed -i now creates selinux context based on the context of the symlink
+  instead of the symlink target. [Bug present since at least sed-4.2]
+  sed -i --follow-symlinks remains unchanged.
+
+  sed now treats the sequence '\x5c' (ASCII 92, backslash) as literal
+  backslash character, not as an escape prefix character.
+  [Bug present since sed-3.02.80]
+  Old behavior:
+     $ echo z | sed -E 's/(z)/\x5c1/' # identical to 's/(z)/\1/'
+     z
+  New behavior:
+     $ echo z | sed -E 's/(z)/\x5c1/'
+     \1
+
+
+* Noteworthy changes in release 4.4 (2017-02-03) [stable]
+
+** Bug fixes
+
+  sed could segfault when invoked with specific combination of newlines
+  in the input and regex pattern. [Bug introduced in sed-4.3]
+
+
+* Noteworthy changes in release 4.3 (2016-12-30) [stable]
+
+** Improvements
+
+  sed's regular expression matching is now typically 10x faster
+
+  sed now uses unlocked-io where available, resulting in faster I/O
+  operations.
+
+** Bug fixes
+
+  sed no longer mishandles anchors ^/$ in multiline regex (s///mg)
+  with -z option (NUL terminated lines). [Bug introduced in sed-4.2.2
+  with the initial implementation of -z]
+
+  sed no longer accepts a ":" command without a label; before, it would
+  treat that as defining a label whose name is empty, and subsequent
+  label-free "t" and "b" commands would use that label. Now, sed emits
+  a diagnostic and fails for that invalid construct.
+
+  sed no longer accesses uninitialized memory when processing certain
+  invalid multibyte sequences. Demonstrate with this:
+    echo a | LC_ALL=ja_JP.eucJP valgrind sed/sed 's/a/b\U\xb2c/'
+  The error appears to have been introduced with the sed-4.0a release.
+
+  The 'y' (transliterate) operator once again works with a NUL byte
+  on the RHS.  E.g., sed 'y/b/\x00/' now works like tr b '\0'.  GNU sed
+  has never before recognized \x00 in this context.  However, sed-3.02
+  and prior did accept a literal NUL byte in the RHS, which was possible
+  only when reading a script from a file.  For example, this:
+    echo abc|sed -f <(printf 'y/b/\x00/\n')|cat -A
+  is what stopped working. [bug introduced some time after sed-3.02 and
+  prior to the first sed-4* test release]
+
+  When the closed-above line number ranges of N editing commands
+  overlap (N>1), sed would apply commands 2..N to the line just
+  beyond the largest range endpoint.
+  [bug introduced some time after sed-4.09 and prior to release in sed-4.1]
+  Before, this command would mistakenly modify line 5:
+    $ seq 6|sed '2,4d;2,3s/^/x/;3,4s/^/y/'
+    1
+    yx5
+    6
+  Now, it does not:
+    $ seq 6|sed '2,4d;2,3s/^/x/;3,4s/^/y/'
+    1
+    5
+    6
+
+  An erroneous sed invocation like "echo > F; sed -i s//b/ F" no longer
+  leaves behind a temporary file.  Before, that command would create a file
+  alongside F with a name matching /^sed......$/ and fail to remove it.
+
+  sed --follow-symlinks now works again for stdin.
+  [bug introduced in sed-4.2.2]
+
+  sed no longer elides invalid bytes in a substitution RHS.
+  Now, sed copies such bytes into the output, just as Perl does.
+  [bug introduced in sed-4.1 -- it was also present prior to 4.0.6]
+
+  sed no longer prints extraneous character when a backslash follows \c.
+  '\c\\'  generates control character ^\ (ASCII 0x1C).
+  Other characters after the second backslash are rejected (e.g. '\c\d').
+  [bug introduced in the sed-4.0.* releases]
+
+  sed no longer mishandles incomplete multibyte sequences in s,y commands
+  and valid multibyte SHIFT-JIS characters in character classes.
+  Previously, the following commands would fail:
+    LC_ALL=en_US.UTF-8 sed $'s/\316/X/'
+    LC_ALL=ja_JP.shiftjis sed $'/[\203]/]/p'
+  [bug introduced some time after sed-4.1.5 and before sed-4.2.1]
+
+** Feature removal
+
+  The "L" command (format a paragraph like the fmt(1) command would)
+  has been listed in the documentation as a failed experiment for at
+  least 10 years.  That command is now removed.
+
+** Build-related
+
+  "make dist" now builds .tar.xz files, rather than .tar.gz ones.
+  xz is portable enough and in wide-enough use that distributing
+  only .tar.xz files is enough.  It has been fine for coreutils, grep,
+  diffutils and parted for a few years.
+
+
+** New Features
+
+  new --sandbox option rejects programs with r/w/e commands.
+
+
+* Noteworthy changes in release 4.2.2 (2012-12-22) [stable]
+
+* don't misbehave (truncate input) for lines of length 2^31 and longer
+
+* fix endless loop on incomplete multibyte sequences
+
+* -u also does unbuffered input, rather than unbuffered output only
+
+* New command `F' to print current input file name
+
+* sed -i, s///w, and the `w' and `W' commands also obey the --binary option
+  (and create CR/LF-terminated files if the option is absent)
+
+* --posix fails for scripts (or fragments as passed to the -e option) that
+  end in a backslash, as they are not portable.
+
+* New option -z (--null-data) to separate lines by ASCII NUL characters.
+
+* \x26 (and similar escaped sequences) produces a literal & in the
+  replacement argument of the s/// command, rather than including the
+  matched text.
+
+----------------------------------------------------------------------------
 Sed 4.2.1
 
 * fix parsing of s/[[[[[[[[[]//
@@ -97,7 +351,7 @@ Sed 4.1.1
 
 * yield an error when running -i on terminals or other non regular files
 
-* do not interpret - as stdin when running in in-place editing mode
+* do not interpret - as stdin when using in-place editing mode
 
 * fix bug that prevented 's' command modifiers from working
 
@@ -403,15 +657,15 @@ NUL character.  Had the glibc folk fix a bug in lib/regex.c where
 
 * The s/// command now understands the following escapes
 (in both halves):
-	\a	an "alert" (BEL)
-	\f	a form-feed
-	\n	a newline
-	\r	a carriage-return
-	\t	a horizontal tab
-	\v	a vertical tab
-	\oNNN	a character with the octal value NNN
-	\dNNN	a character with the decimal value NNN
-	\xNN	a character with the hexadecimal value NN
+        \a	an "alert" (BEL)
+        \f	a form-feed
+        \n	a newline
+        \r	a carriage-return
+        \t	a horizontal tab
+        \v	a vertical tab
+        \oNNN	a character with the octal value NNN
+        \dNNN	a character with the decimal value NNN
+        \xNN	a character with the hexadecimal value NN
 This behavior is disabled if POSIXLY_CORRECT is set, at least for the
 time being (until I can be convinced that this behavior does not violate
 the POSIX standard).  (Incidentally, \b (backspace) was omitted because

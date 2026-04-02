@@ -1,5 +1,5 @@
 /*  GNU SED, a batch stream editor.
-    Copyright (C) 1998, 1999, 2002, 2003 Free Software Foundation, Inc.
+    Copyright (C) 1998-2022 Free Software Foundation, Inc.
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -12,33 +12,16 @@
     GNU General Public License for more details.
 
     You should have received a copy of the GNU General Public License
-    along with this program; if not, write to the Free Software
-    Foundation, 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. */
+    along with this program; If not, see <https://www.gnu.org/licenses/>. */
 
 #ifndef BASICDEFS_H
 #define BASICDEFS_H
 
 #include <alloca.h>
-
-#ifdef HAVE_WCHAR_H
-# include <wchar.h>
-#endif
-#ifdef HAVE_LOCALE_H
-# include <locale.h>
-#endif
-#ifdef HAVE_WCTYPE_H
-# include <wctype.h>
-#endif
-
-
-#ifdef BOOTSTRAP
-# define false 0
-# define true 1
-# define bool unsigned
-# define __bool_true_false_are_defined 1
-#else
-# include <stdbool.h>
-#endif
+#include <wchar.h>
+#include <locale.h>
+#include <wctype.h>
+#include <stdbool.h>
 
 #include <gettext.h>
 #define N_(String) gettext_noop(String)
@@ -47,81 +30,27 @@
 /* type countT is used to keep track of line numbers, etc. */
 typedef unsigned long countT;
 
-/* Oftentimes casts are used as an ugly hack to silence warnings
- * from the compiler.  However, sometimes those warnings really
- * do point to something worth avoiding.  I define this
- * dummy marker to make searching for them with a text editor
- * much easier, in case I want to verify that they are all
- * legitimate.  It is defined in the way it is so that it is
- * easy to disable all casts so that the compiler (or lint)
- * can tell me potentially interesting things about what would
- * happen to the code without the explicit casts.
- */
-#ifdef LOUD_LINT
-# define CAST(x)
-#else
-# define CAST(x) (x)
-#endif
+#include "xalloc.h"
 
-
-/* Can the compiler grok function prototypes? */
-#if (defined __STDC__ && __STDC__-0) || defined __GNUC__ || __PROTOTYPES
-# define P_(s)		s
-#else
-# define P_(s)		()
-#endif
-
-/* (VOID *) is the generic pointer type; some ancient compilers
-   don't know about (void *), and typically use (char *) instead.
-   VCAST() is used to cast to and from (VOID *)s --- but if the
-   compiler *does* support (void *) make this a no-op, so that
-   the compiler can detect if we omitted an essential function
-   declaration somewhere.
- */
-#ifndef VOID
-# define VOID		void
-# define VCAST(t)	
-#else
-# define VCAST(t)	(t)
-#endif
-
-/* some basic definitions to avoid undue promulgating of VCAST ugliness */
-#define MALLOC(n,t)	 (VCAST(t *)ck_malloc((n)*sizeof(t)))
-#define REALLOC(x,n,t)	 (VCAST(t *)ck_realloc(VCAST(VOID *)(x),(n)*sizeof(t)))
-#define MEMDUP(x,n,t)	 (VCAST(t *)ck_memdup(VCAST(VOID *)(x),(n)*sizeof(t)))
-#define FREE(x)		 (ck_free(VCAST(VOID *)x))
-#define MEMCPY(d,s,l)	 (memcpy(VCAST(VOID *)(d),VCAST(const VOID *)(s),l))
-#define MEMMOVE(d,s,l)	 (memmove(VCAST(VOID *)(d),VCAST(const VOID *)(s),l))
+/* some basic definitions to avoid undue promulgating of  ugliness */
+#define REALLOC(x,n,t)	 ((t *)xnrealloc((void *)(x),(n),sizeof(t)))
+#define MEMDUP(x,n,t)	 ((t *)xmemdup((x),(n)*sizeof(t)))
 #define OB_MALLOC(o,n,t) ((t *)(void *)obstack_alloc(o,(n)*sizeof(t)))
 
-#define obstack_chunk_alloc  ck_malloc
-#define obstack_chunk_free   ck_free
+#define obstack_chunk_alloc  xzalloc
+#define obstack_chunk_free   free
 
+#define STREQ(a, b) (strcmp (a, b) == 0)
+#define STREQ_LEN(a, b, n) (strncmp (a, b, n) == 0)
+#define STRPREFIX(a, b) (strncmp (a, b, strlen (b)) == 0)
 
-#ifdef HAVE_MEMORY_H
-# include <memory.h>
+/* MAX_PATH is not defined in some platforms, most notably GNU/Hurd.
+   In that case we define it here to some constant.  Note however that
+   this relies in the fact that sed does reallocation if a buffer
+   needs to be larger than PATH_MAX.  */
+#ifndef PATH_MAX
+# define PATH_MAX 200
 #endif
-
-#ifndef HAVE_MEMMOVE
-# ifndef memmove
-   /* ../lib/libsed.a provides a memmove() if the system doesn't.
-      Here is where we declare its return type; we don't prototype
-      it because that sometimes causes problems when we're running in
-      bootstrap mode on a system which really does support memmove(). */
-   extern VOID *memmove();
-# endif
-#endif
-
-#ifndef HAVE_MEMCPY
-# ifndef memcpy
-#  define memcpy(d, s, n)	memmove(d, s, n)
-# endif
-#endif
-
-#ifndef HAVE_STRERROR
- extern char *strerror P_((int e));
-#endif
-
 
 /* handle misdesigned <ctype.h> macros (snarfed from lib/regex.c) */
 /* Jim Meyering writes:
@@ -151,7 +80,7 @@ typedef unsigned long countT;
 
 #undef ISPRINT
 #define ISPRINT(c) (ISASCII (c) && isprint (c))
-#define ISDIGIT(c) (ISASCII (c) && isdigit (c))
+#define ISDIGIT(c) (ISASCII (c) && isdigit ((unsigned char) (c)))
 #define ISALNUM(c) (ISASCII (c) && isalnum (c))
 #define ISALPHA(c) (ISASCII (c) && isalpha (c))
 #define ISCNTRL(c) (ISASCII (c) && iscntrl (c))
@@ -164,7 +93,7 @@ typedef unsigned long countT;
 #ifndef initialize_main
 # ifdef __EMX__
 #  define initialize_main(argcp, argvp) \
-  { _response(argcp, argvp); _wildcard(argcp, argvp); }
+  { _response (argcp, argvp); _wildcard (argcp, argvp); }
 # else /* NOT __EMX__ */
 #  define initialize_main(argcp, argvp)
 # endif
