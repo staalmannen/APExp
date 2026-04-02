@@ -1,6 +1,7 @@
 @load "filefuncs"	# get file functions
 
 # comments/for.awk
+
 BEGIN {
 	for (i = 1; i <= 10; i++) {
 		print i
@@ -29,6 +30,7 @@ BEGIN {
 }
 
 # comments/for0.awk
+
 BEGIN {
 	for (iggy in foo) {
 		# comment 5
@@ -38,6 +40,7 @@ BEGIN {
 }
 
 # comments/for1.awk
+
 BEGIN {
 	for (iggy in foo) {
 		# comment 1
@@ -59,6 +62,7 @@ BEGIN {
 }
 
 # comments/for2.awk
+
 BEGIN {
 	for (;;) {
 		print i
@@ -87,6 +91,7 @@ BEGIN {
 }
 
 # comments/for_del.awk
+
 BEGIN {
 	for (iggy in foo) {
 		delete foo[iggy]
@@ -94,6 +99,7 @@ BEGIN {
 }
 
 # comments/do.awk
+
 BEGIN {
 	do {	# DO comment
 		# LBRACE comment
@@ -104,6 +110,7 @@ BEGIN {
 }
 
 # comments/do2.awk
+
 BEGIN {
 	do {	# DO comment
 		# LBRACE comment
@@ -113,6 +120,7 @@ BEGIN {
 }
 
 # comments2/do.awk
+
 BEGIN {
 	do {	# do comment
 		# lbrace comment
@@ -124,6 +132,7 @@ BEGIN {
 }
 
 # comments2/if.awk
+
 BEGIN {
 	if (a) {
 		# IF comment
@@ -139,6 +148,7 @@ BEGIN {
 }
 
 # comments/if0.awk
+
 BEGIN {
 	if (a) {
 		# nothing
@@ -148,6 +158,7 @@ BEGIN {
 }
 
 # comments/switch.awk
+
 BEGIN {
 	a = 5
 	switch (a) {	# switch EOL comment
@@ -169,6 +180,7 @@ BEGIN {
 }
 
 # comments2/switch.awk
+
 BEGIN {
 	a = 5
 	switch (a) {	# switch EOL comment
@@ -187,6 +199,7 @@ BEGIN {
 }
 
 # comments2/switch0.awk
+
 BEGIN {
 	a = 5
 	switch (a) {
@@ -200,6 +213,7 @@ BEGIN {
 }
 
 # comments2/switch1.awk
+
 BEGIN {
 	a = 5
 	switch (a) {
@@ -214,6 +228,7 @@ BEGIN {
 }
 
 # comments2/while.awk
+
 BEGIN {
 	while (1) {
 		# while comment
@@ -224,6 +239,7 @@ BEGIN {
 }
 
 # comments2/while2.awk
+
 BEGIN {
 	while (1) {
 		# while comment
@@ -239,6 +255,7 @@ BEGIN {
 }
 
 # comments/load.awk
+
 BEGIN {
 	stat("/etc/passwd", data)
 	for (i in data) {
@@ -247,6 +264,7 @@ BEGIN {
 }
 
 # comments/andor.awk
+
 BEGIN {
 	if (a && # and comment
 		 b || # or comment
@@ -256,6 +274,7 @@ BEGIN {
 }
 
 # comments/qmcol-qm.awk
+
 BEGIN {
 	a = 1 ? # qm comment
 		   2 : 3
@@ -263,6 +282,7 @@ BEGIN {
 }
 
 # comments/qmcol-colon.awk
+
 BEGIN {
 	a = 1 ? 2 : # colon comment
 		   3
@@ -270,6 +290,7 @@ BEGIN {
 }
 
 # comments/qmcolboth.awk
+
 BEGIN {
 	a = 1 ? # qm comment
 		   2 : # colon comment
@@ -278,6 +299,7 @@ BEGIN {
 }
 
 # test beginning of line block comments (com2.awk)
+
 BEGIN {
 	print "hi"	# comment 1
 	# comment 2
@@ -289,8 +311,10 @@ BEGIN {
 	}
 }
 
+
 # comments/exp.awk
 # range comment
+
 # range comment 2
 
 # range comment b
@@ -307,6 +331,7 @@ function bar(p1, p2)
 	print "foo"
 }
 
+
 # rbrace eol bar
 
 # rbrace block bar
@@ -321,6 +346,7 @@ function baz(p1, p2)
 	print "foo"
 }
 
+
 # rbrace EOL comment funnyhaha
 
 # rbrace block comment funnyhaha
@@ -333,6 +359,7 @@ function callme(a, b, c)
 		b, # b2 comment
 		c
 }
+
 
 # rbrace eol baz
 
@@ -348,6 +375,7 @@ function funny(param1, param2, param3, param4)
 	# lbrace block comment
 	print "funny"
 }
+
 
 # rbrace EOL comment funny
 

@@ -8,9 +8,7 @@
 
 @namespace "foo"	# this is foo
 
-
 @namespace "bar"	# this is bar
-
 
 @namespace "passwd"	# move to passwd namespace
 
@@ -18,7 +16,6 @@ BEGIN {
 	# tailor this to suit your system
 	Awklib = "/usr/local/libexec/awk/"
 }
-
 
 function awk::endpwent()
 {

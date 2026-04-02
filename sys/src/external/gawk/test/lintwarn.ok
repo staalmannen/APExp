@@ -4,7 +4,6 @@ gawk: lintwarn.awk:4: error: non-redirected `getline' invalid inside `BEGINFILE'
 gawk: lintwarn.awk:8: warning: statement has no effect
 gawk: lintwarn.awk:9: warning: plain `print' in BEGIN or END rule should probably be `print ""'
 gawk: lintwarn.awk:10: error: `nextfile' used in BEGIN action
-gawk: lintwarn.awk:12: warning: `delete(array)' is a non-portable tawk extension
 gawk: lintwarn.awk:13: warning: regular expression on right of assignment
 gawk: lintwarn.awk:14: warning: regular expression on right of comparison
 gawk: lintwarn.awk:14: warning: statement has no effect
@@ -24,8 +23,6 @@ gawk: lintwarn.awk:26: warning: statement has no effect
 gawk: lintwarn.awk:27: warning: regexp constant for parameter #1 yields boolean value
 gawk: lintwarn.awk:28: warning: regexp constant `//' looks like a C++ comment, but is not
 gawk: lintwarn.awk:28: warning: statement has no effect
-gawk: lintwarn.awk:29: warning: regexp constant `/* */' looks like a C comment, but is not
-gawk: lintwarn.awk:29: warning: statement has no effect
 gawk: lintwarn.awk:32: warning: non-redirected `getline' undefined inside END action
 gawk: lintwarn.awk:34: error: function `zz': parameter #2, `aa', duplicates parameter #1
 gawk: lintwarn.awk:38: warning: `include' is a gawk extension

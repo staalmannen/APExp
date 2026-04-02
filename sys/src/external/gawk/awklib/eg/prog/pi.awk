@@ -1,5 +1,9 @@
 # pi.awk --- compute the digits of pi
 #
+# This file and how to use it are described in the manual.
+# Therefore, we respectfully advise you to Read The Fine Manual
+# for more information.
+#
 # Katie Wasserman, katie@wass.net
 # August 2014
 

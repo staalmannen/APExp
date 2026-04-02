@@ -113,8 +113,6 @@ s/^#undef HAVE_STRSIGNAL *$/#define HAVE_STRSIGNAL 1/
 s/^#undef HAVE_STRTOD *$/#define HAVE_STRTOD 1/
 /^#undef HAVE_STRTOUL *$/c\
 #define HAVE_STRTOUL 1
-/^#undef HAVE_STRUCT_STAT_ST_BLKSIZE *$/c\
-#define HAVE_STRUCT_STAT_ST_BLKSIZE 1
 s/^#undef HAVE_SYSTEM *$/#define HAVE_SYSTEM 1/
 /^#undef HAVE_SYS_PARAM_H *$/c\
 #define HAVE_SYS_PARAM_H 1

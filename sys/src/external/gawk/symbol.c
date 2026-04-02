@@ -3,7 +3,8 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2015, 2017-2020, 2022, 2023,
+ * Copyright (C) 1986, 1988, 1989, 1991-2015, 2017-2020, 2022, 2023, 2025,
+ * 2026
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -56,6 +57,8 @@ struct root_pointers {
 	struct block_header nextfree[BLOCK_MAX];
 	int mpfr;
 	bool first;
+	struct extension *ext_list;
+	const char *version_string;
 } *root_pointers = NULL;
 
 /* init_the_tables --- deal with the tables for in memory use */
@@ -95,13 +98,16 @@ init_symbol_table()
 
 		// set up the tables
 		init_the_tables();
+		init_extension_list();
 
 		// save the pointers for the next time.
-		emalloc(root_pointers, struct root_pointers *, sizeof(struct root_pointers), "init_symbol_table");
+		emalloc(root_pointers, struct root_pointers *, sizeof(struct root_pointers));
 		memset(root_pointers, 0, sizeof(struct root_pointers));
 		root_pointers->global_table = global_table;
 		root_pointers->func_table = func_table;
 		root_pointers->symbol_table = symbol_table;
+		root_pointers->ext_list = extension_list;
+		root_pointers->version_string = estrdup(version_string, strlen(version_string));
 		root_pointers->first = true;
 		root_pointers->mpfr = 0;
 		pma_set_root(root_pointers);
@@ -110,12 +116,18 @@ init_symbol_table()
 		global_table = root_pointers->global_table;
 		func_table = root_pointers->func_table;
 		symbol_table = root_pointers->symbol_table;
+		extension_list = root_pointers->ext_list;
 		memcpy(nextfree, root_pointers->nextfree, sizeof(nextfree));
 
 		// still need to set this one up as usual
 		getnode(param_table);
 		memset(param_table, '\0', sizeof(NODE));
 		null_array(param_table);
+		if (strcmp(root_pointers->version_string, version_string) != 0)
+			warning(_("%s was created by version `%s', but the current version is `%s'"),
+					persist_file,
+					root_pointers->version_string,
+					version_string);
 	}
 }
 
@@ -190,7 +202,7 @@ lookup(const char *name)
 		if (assoc_empty(tables[i]))
 			continue;
 
-		if ((do_posix || do_traditional) && tables[i] == global_table)
+		if (do_traditional && tables[i] == global_table)
 			continue;
 
 		n = in_array(tables[i], tmp);
@@ -215,7 +227,7 @@ make_params(char **pnames, int pcount)
 	if (pcount <= 0 || pnames == NULL)
 		return NULL;
 
-	ezalloc(parms, NODE *, pcount * sizeof(NODE), "make_params");
+	ezalloc(parms, NODE *, pcount * sizeof(NODE));
 
 	for (i = 0, p = parms; i < pcount; i++, p++) {
 		p->type = Node_param_list;
@@ -480,7 +492,7 @@ get_symbols(SYMBOL_TYPE what, bool sort)
 		max = the_table->table_size * 2;
 
 		list = assoc_list(the_table, "@unsorted", ASORTI);
-		emalloc(table, NODE **, (the_table->table_size + 1) * sizeof(NODE *), "get_symbols");
+		emalloc(table, NODE **, (the_table->table_size + 1) * sizeof(NODE *));
 
 		for (i = count = 0; i < max; i += 2) {
 			r = list[i+1];
@@ -497,7 +509,7 @@ get_symbols(SYMBOL_TYPE what, bool sort)
 
 		list = assoc_list(the_table, "@unsorted", ASORTI);
 		/* add three: one for FUNCTAB, one for SYMTAB, and one for a final NULL */
-		emalloc(table, NODE **, (the_table->table_size + 1 + 1 + 1) * sizeof(NODE *), "get_symbols");
+		emalloc(table, NODE **, (the_table->table_size + 1 + 1 + 1) * sizeof(NODE *));
 
 		for (i = count = 0; i < max; i += 2) {
 			r = list[i+1];
@@ -600,6 +612,7 @@ append_symbol(NODE *r)
 	NODE *p;
 
 	getnode(p);
+	memset(p, '\0', sizeof(NODE));
 	p->lnode = r;
 	p->rnode = symbol_list->rnode;
 	symbol_list->rnode = p;
@@ -834,7 +847,7 @@ bcalloc(OPCODE op, int size, int srcline)
 		pool->free_space += size;
 	} else {
 		struct instruction_block *block;
-		emalloc(block, struct instruction_block *, sizeof(struct instruction_block), "bcalloc");
+		emalloc(block, struct instruction_block *, sizeof(struct instruction_block));
 		block->next = pool->block_list;
 		pool->block_list = block;
 		cp = &block->i[0];
@@ -855,7 +868,7 @@ new_context()
 {
 	AWK_CONTEXT *ctxt;
 
-	ezalloc(ctxt, AWK_CONTEXT *, sizeof(AWK_CONTEXT), "new_context");
+	ezalloc(ctxt, AWK_CONTEXT *, sizeof(AWK_CONTEXT));
 	ctxt->srcfiles.next = ctxt->srcfiles.prev = & ctxt->srcfiles;
 	ctxt->rule_list.opcode = Op_list;
 	ctxt->rule_list.lasti = & ctxt->rule_list;

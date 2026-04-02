@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2023,
+ * Copyright (C) 1986, 1988, 1989, 1991-2026,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -212,16 +212,17 @@ top:
 
 			case Node_var_new:
 uninitialized_scalar:
-				if (do_lint)
-					lintwarn(isparam ?
-						_("reference to uninitialized argument `%s'") :
-						_("reference to uninitialized variable `%s'"),
+				if (op != Op_push_arg_untyped) {	// not isarray() or typeof()
+					if (do_lint)
+						lintwarn(isparam ?
+							_("reference to uninitialized argument `%s'") :
+							_("reference to uninitialized variable `%s'"),
 								save_symbol->vname);
 
-				if (op != Op_push_arg_untyped) {
 					// convert very original untyped to scalar
 					m->type = Node_var;
 					m->var_value = dupnode(Nnull_string);
+					m->flags &= ~(MPFN | MPZN);
 
 					// set up local param by value
 					m = dupnode(Nnull_string);
@@ -240,8 +241,10 @@ uninitialized_scalar:
 
 				if (op != Op_push_arg_untyped) {
 					// convert very original untyped to scalar
+					elem_new_reset(m);
 					m->type = Node_var;
 					m->var_value = dupnode(Nnull_string);
+					m->flags &= ~(MPFN | MPZN);
 
 					// set up local param by value
 					DEREF(m);
@@ -324,7 +327,6 @@ uninitialized_scalar:
 
 				r = *assoc_lookup(t1, t2);
 			}
-			DEREF(t2);
 
 			/* for SYMTAB, step through to the actual variable */
 			if (t1 == symbol_table) {
@@ -342,6 +344,15 @@ uninitialized_scalar:
 					r = r->var_value;
 				}
 			}
+
+			if (r->type == Node_elem_new && r->elemnew_parent == NULL) {
+				r->elemnew_parent = t1;
+				t2 = force_string(t2);
+				assert(r->elemnew_vname == NULL);
+				r->elemnew_vname = estrdup(t2->stptr, t2->stlen);	/* the subscript in parent array */
+			}
+
+			DEREF(t2);
 
 			if (r->type == Node_val
 			    || r->type == Node_var
@@ -365,8 +376,16 @@ uninitialized_scalar:
 					fatal(_("reference to uninitialized element `%s[\"%.*s\"] is not allowed'"),
 						"SYMTAB", (int) t2->stlen, t2->stptr);
 				} else if (do_lint) {
-					lintwarn(_("reference to uninitialized element `%s[\"%.*s\"]'"),
-						array_vname(t1), (int) t2->stlen, t2->stptr);
+					/*
+					 * 10/2025: We used to do this (copy/pasted from elsewhere):
+					 *
+					 * lintwarn(_("reference to uninitialized element `%s[\"%.*s\"]'"),
+					 *	array_vname(t1), (int) t2->stlen, t2->stptr);
+					 *
+					 * But that's not really right, as this is Op_sub_array, something like
+					 * 	a[1][2] = "foo"
+					 * and there's no easy way to make a[1] be an array.
+					 */
 					if (t2->stlen == 0)
 						lintwarn(_("subscript of array `%s' is null string"), array_vname(t1));
 				}
@@ -382,7 +401,8 @@ uninitialized_scalar:
 				r = force_array(r, false);
 				r->parent_array = t1;
 				t2 = force_string(t2);
-				r->vname = estrdup(t2->stptr, t2->stlen);	/* the subscript in parent array */
+				if (r->vname == NULL)
+					r->vname = estrdup(t2->stptr, t2->stlen);	/* the subscript in parent array */
 			} else if (r->type != Node_var_array) {
 				t2 = force_string(t2);
 				fatal(_("attempt to use scalar `%s[\"%.*s\"]' as an array"),
@@ -782,6 +802,7 @@ mod:
 			 */
 
 			lhs = get_lhs(pc->memory, false);
+
 			unref(*lhs);
 			r = pc->initval;	/* constant initializer */
 			if (r != NULL) {
@@ -841,7 +862,7 @@ mod:
 			if (t1 != t2 && t1->valref == 1 && (t1->flags & (MALLOC|MPFN|MPZN)) == MALLOC) {
 				size_t nlen = t1->stlen + t2->stlen;
 
-				erealloc(t1->stptr, char *, nlen + 1, "r_interpret");
+				erealloc(t1->stptr, char *, nlen + 1);
 				memcpy(t1->stptr + t1->stlen, t2->stptr, t2->stlen);
 				t1->stlen = nlen;
 				t1->stptr[nlen] = '\0';
@@ -857,9 +878,8 @@ mod:
 				if ((t1->flags & WSTRCUR) != 0 && (t2->flags & WSTRCUR) != 0) {
 					size_t wlen = t1->wstlen + t2->wstlen;
 
-					erealloc(t1->wstptr, wchar_t *,
-							sizeof(wchar_t) * (wlen + 1), "r_interpret");
-					memcpy(t1->wstptr + t1->wstlen, t2->wstptr, t2->wstlen * sizeof(wchar_t));
+					erealloc(t1->wstptr, char32_t *, sizeof(char32_t) * (wlen + 1));
+					memcpy(t1->wstptr + t1->wstlen, t2->wstptr, t2->wstlen * sizeof(char32_t));
 					t1->wstlen = wlen;
 					t1->wstptr[wlen] = L'\0';
 				} else
@@ -868,7 +888,7 @@ mod:
 				size_t nlen = t1->stlen + t2->stlen;
 				char *p;
 
-				emalloc(p, char *, nlen + 1, "r_interpret");
+				emalloc(p, char *, nlen + 1);
 				memcpy(p, t1->stptr, t1->stlen);
 				memcpy(p + t1->stlen, t2->stptr, t2->stlen);
 				/* N.B. No NUL-termination required, since make_str_node will do it. */
@@ -1050,6 +1070,7 @@ mod:
 
 arrayfor:
 			getnode(r);
+			memset(r, '\0', sizeof(NODE));
 			r->type = Node_arrayfor;
 			r->for_list = list;
 			r->for_list_size = num_elems;		/* # of elements in list */
@@ -1297,6 +1318,8 @@ match_re:
 					fatal(_("function `%s' not defined"), pc->func_name);
 				pc->func_body = f;     /* save for next call */
 			}
+			if (do_itrace)
+				fprintf(stderr, "++\t%s\n", pc->func_name);
 
 			if (f->type == Node_ext_func) {
 				/* keep in sync with indirect call code */

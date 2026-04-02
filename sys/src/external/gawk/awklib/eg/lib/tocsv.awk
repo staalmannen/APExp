@@ -1,5 +1,9 @@
 # tocsv.awk --- convert data to CSV format
 #
+# This file and how to use it are described in the manual.
+# Therefore, we respectfully advise you to Read The Fine Manual
+# for more information.
+#
 # Arnold Robbins, arnold@skeeve.com, Public Domain
 # April 2023
 
@@ -14,8 +18,8 @@ function tocsv(fields, sep,     i, j, nfields, result)
     for (i = 1; i in fields; i++) {
         nfields[i] = fields[i]
         if (nfields[i] ~ /["\n]/ || index(nfields[i], sep) != 0) {
-            gsub(/"/, "\"\"", nfields[i])       # double up quotes
-            nfields[i] = "\"" nfields[i] "\""   # wrap in quotes
+            gsub(/"/, "\"\"", nfields[i])       # double up the double quotes
+            nfields[i] = "\"" nfields[i] "\""   # wrap in double quotes
         }
     }
 

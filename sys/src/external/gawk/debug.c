@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2004, 2010-2013, 2016-2023 the Free Software Foundation, Inc.
+ * Copyright (C) 2004, 2010-2013, 2016-2026 the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -355,7 +355,8 @@ if (--val) \
 #define CHECK_PROG_RUNNING() \
 	do { \
 		if (! prog_running) { \
-			d_error(_("program not running")); \
+			d_error(_("%s:%d:%s: program not running"), \
+				__FILE__, __LINE__, __func__); \
 			return false; \
 		} \
 	} while (false)
@@ -387,7 +388,7 @@ g_readline(const char *prompt)
 	if (input_from_tty && prompt && *prompt)
 		fprintf(out_fp, "%s", prompt);
 
-	emalloc(line, char *, line_size + 1, "g_readline");
+	emalloc(line, char *, line_size + 1);
 	p = line;
 	end = line + line_size;
 	while ((n = read(input_fd, buf, 1)) > 0) {
@@ -397,7 +398,7 @@ g_readline(const char *prompt)
 			break;
 		}
 		if (p == end) {
-			erealloc(line, char *, 2 * line_size + 1, "g_readline");
+			erealloc(line, char *, 2 * line_size + 1);
 			p = line + line_size;
 			line_size *= 2;
 			end = line + line_size;
@@ -440,9 +441,9 @@ find_lines(SRCFILE *s)
 	int numlines = 0;
 	char lastchar = '\0';
 
-	emalloc(buf, char *, s->bufsize, "find_lines");
+	emalloc(buf, char *, s->bufsize);
 	pos_size = s->srclines;
-	emalloc(s->line_offset, int *, (pos_size + 2) * sizeof(int), "find_lines");
+	emalloc(s->line_offset, int *, (pos_size + 2) * sizeof(int));
 	pos = s->line_offset;
 	pos[0] = 0;
 
@@ -453,7 +454,7 @@ find_lines(SRCFILE *s)
 		while (p < end) {
 			if (*p++ == '\n') {
 				if (++numlines > pos_size) {
-					erealloc(s->line_offset, int *, (2 * pos_size + 2) * sizeof(int), "find_lines");
+					erealloc(s->line_offset, int *, (2 * pos_size + 2) * sizeof(int));
 					pos = s->line_offset + pos_size;
 					pos_size *= 2;
 				}
@@ -507,7 +508,7 @@ source_find(char *src)
 		return cur_srcfile;
 
 	for (s = srcfiles->next; s != srcfiles; s = s->next) {
-		if ((s->stype == SRC_FILE || s->stype == SRC_INC)
+		if ((s->stype == SRC_FILE || s->stype == SRC_INC || s->stype == SRC_NSINC)
 				&& strcmp(s->src, src) == 0)
 			return s;
 	}
@@ -515,7 +516,7 @@ source_find(char *src)
 	path = find_source(src, & sbuf, & errno_val, false);
 	if (path != NULL) {
 		for (s = srcfiles->next; s != srcfiles; s = s->next) {
-			if ((s->stype == SRC_FILE || s->stype == SRC_INC)
+			if ((s->stype == SRC_FILE || s->stype == SRC_INC || s->stype == SRC_NSINC)
 			    		&& files_are_same(path, s)) {
 				efree(path);
 				return s;
@@ -586,10 +587,10 @@ print_lines(char *src, int start_line, int nlines)
 	}
 
 	if (linebuf == NULL) {
-		emalloc(linebuf, char *, s->maxlen + 20, "print_lines"); /* 19 for line # */
+		emalloc(linebuf, char *, s->maxlen + 20); /* 19 for line # */
 		linebuf_len = s->maxlen;
 	} else if (linebuf_len < s->maxlen) {
-		erealloc(linebuf, char *, s->maxlen + 20, "print_lines");
+		erealloc(linebuf, char *, s->maxlen + 20);
 		linebuf_len = s->maxlen;
 	}
 
@@ -760,7 +761,7 @@ do_info(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 		SRCFILE *s;
 		for (s = srcfiles->next; s != srcfiles; s = s->next) {
 			fprintf(out_fp, _("Source file (lines): %s (%d)\n"),
-					(s->stype == SRC_FILE || s->stype == SRC_INC) ? s->src
+					(s->stype == SRC_FILE || s->stype == SRC_INC || s->stype == SRC_NSINC) ? s->src
 			 		                                      : "cmd. line",
 					s->srclines);
 		}
@@ -1084,6 +1085,18 @@ print_field(long field_num)
 	}
 }
 
+/* print_array_names --- print the stack of array names */
+
+static void
+print_array_names(const char **names, size_t num_names, FILE *out_fp)
+{
+	size_t i;
+
+	gprintf(out_fp, "%s", names[0]);
+	for (i = 1; i < num_names; i++)
+		gprintf(out_fp, "[\"%s\"]", names[i]);
+}
+
 /* print_array --- print the contents of an array */
 
 static int
@@ -1097,6 +1110,18 @@ print_array(volatile NODE *arr, char *arr_name)
 	volatile int ret = 0;
 	volatile jmp_buf pager_quit_tag_stack;
 
+	// manage a stack of names for printing deeply nested arrays
+	static const char **names = NULL;
+	static size_t cur_name = 0;
+	static size_t num_names = 0;
+#define INITIAL_NAME_COUNT	10
+
+	if (names == NULL) {
+		emalloc(names, const char **, INITIAL_NAME_COUNT * sizeof(char *));
+		memset(names, 0, INITIAL_NAME_COUNT * sizeof(char *));
+		num_names = INITIAL_NAME_COUNT;
+	}
+
 	if (assoc_empty((NODE *) arr)) {
 		gprintf(out_fp, _("array `%s' is empty\n"), arr_name);
 		return 0;
@@ -1109,13 +1134,28 @@ print_array(volatile NODE *arr, char *arr_name)
 
 	PUSH_BINDING(pager_quit_tag_stack, pager_quit_tag, pager_quit_tag_valid);
 	if (setjmp(pager_quit_tag) == 0) {
+		// push name onto stack
+		if (cur_name >= num_names) {
+			num_names *= 2;
+			erealloc(names, const char **, num_names * sizeof(char *));
+		}
+		names[cur_name++] = arr_name;
+
+		// and print the array
 		for (i = 0; ret == 0 && i < num_elems; i++) {
 			subs = list[i];
 			r = *assoc_lookup((NODE *) arr, subs);
-			if (r->type == Node_var_array)
-				ret = print_array(r, r->vname);
-			else {
-				gprintf(out_fp, "%s[\"%.*s\"] = ", arr_name, (int) subs->stlen, subs->stptr);
+			if (r->type == Node_var_array) {
+				// 12/2023: Use sub->stptr here, not r->vname, since
+				// a subarray could have been created via
+				// split() or some other mechanism where flags has NUMINT in it.
+				// In this case, r->vname can be NULL, so pass in the
+				// subscript itself.  This should be fixed in the code that
+				// builds such arrays.
+				ret = print_array(r, subs->stptr);
+			} else {
+				print_array_names(names, cur_name, out_fp);
+				gprintf(out_fp, "[\"%.*s\"] = ", (int) subs->stlen, subs->stptr);
 				valinfo((NODE *) r, gprintf, out_fp);
 			}
 		}
@@ -1123,6 +1163,7 @@ print_array(volatile NODE *arr, char *arr_name)
 		ret = 1;
 
 	POP_BINDING(pager_quit_tag_stack, pager_quit_tag, pager_quit_tag_valid);
+	cur_name--;
 
 	for (i = 0; i < num_elems; i++)
 		unref(list[i]);
@@ -1400,7 +1441,7 @@ add_item(struct list_item *list, int type, NODE *symbol, char *pname)
 {
 	struct list_item *d;
 
-	ezalloc(d, struct list_item *, sizeof(struct list_item), "add_item");
+	ezalloc(d, struct list_item *, sizeof(struct list_item));
 	d->commands.next = d->commands.prev = &d->commands;
 
 	d->number = ++list->number;
@@ -1463,7 +1504,7 @@ do_add_item(struct list_item *list, CMDARG *arg)
 			int i;
 
 			assert(count > 0);
-			emalloc(subs, NODE **, count * sizeof(NODE *), "do_add_item");
+			emalloc(subs, NODE **, count * sizeof(NODE *));
 			for (i = 0; i < count; i++) {
 				arg = arg->next;
 				subs[i] = dupnode(arg->a_node);
@@ -1641,6 +1682,10 @@ find_subscript(struct list_item *item, NODE **ptr)
 	NODE *symbol = item->symbol;
 	NODE *sub, *r;
 	int i = 0, count = item->num_subs;
+
+	// without this check, in_array() will SEGV...
+	if (symbol->type == Node_var_new || symbol->type == Node_elem_new)
+		return -1;
 
 	r = *ptr = NULL;
 	for (i = 0; i < count; i++) {
@@ -2131,7 +2176,7 @@ mk_breakpoint(char *src, int srcline)
 	BREAKPOINT *b;
 
 	bp = bcalloc(Op_breakpoint, 1, srcline);
-	emalloc(b, BREAKPOINT *, sizeof(BREAKPOINT), "mk_breakpoint");
+	emalloc(b, BREAKPOINT *, sizeof(BREAKPOINT));
 	memset(&b->cndn, 0, sizeof(struct condition));
 	b->commands.next = b->commands.prev = &b->commands;
 	b->silent = false;
@@ -2807,7 +2852,8 @@ debug_prog(INSTRUCTION *pc)
 	for (cur_srcfile = srcfiles->prev; cur_srcfile != srcfiles;
 			cur_srcfile = cur_srcfile->prev) {
 		if (cur_srcfile->stype == SRC_FILE
-			|| cur_srcfile->stype == SRC_INC)
+			|| cur_srcfile->stype == SRC_INC
+			|| cur_srcfile->stype == SRC_NSINC)
 			break;
 	}
 
@@ -4361,10 +4407,10 @@ gprintf(FILE *fp, const char *format, ...)
 #define GPRINTF_BUFSIZ 512
 	if (buf == NULL) {
 		buflen = GPRINTF_BUFSIZ;
-		emalloc(buf, char *, buflen * sizeof(char), "gprintf");
+		emalloc(buf, char *, buflen * sizeof(char));
 	} else if (buflen - bl < GPRINTF_BUFSIZ/2) {
 		buflen += GPRINTF_BUFSIZ;
-		erealloc(buf, char *, buflen * sizeof(char), "gprintf");
+		erealloc(buf, char *, buflen * sizeof(char));
 	}
 #undef GPRINTF_BUFSIZ
 
@@ -4383,7 +4429,7 @@ gprintf(FILE *fp, const char *format, ...)
 
 		/* enlarge buffer, and try again */
 		buflen *= 2;
-		erealloc(buf, char *, buflen * sizeof(char), "gprintf");
+		erealloc(buf, char *, buflen * sizeof(char));
 	}
 
 	bl = 0;
@@ -4462,15 +4508,15 @@ serialize_list(int type)
 	int bl;
 	BREAKPOINT *b = NULL;
 	struct list_item *wd = NULL;
-	HIST_ENTRY **hist_list = NULL;
-	int hist_index = 0;
 	struct dbg_option *opt = NULL;
 	struct commands_item *commands = NULL, *c;
 	int cnum = 0;
 	struct condition *cndn = NULL;
 	void *ptr, *end_ptr;
-#ifdef HAVE_LIBREADLINE
+#if defined(HAVE_LIBREADLINE) && defined(HAVE_HISTORY_LIST)
 	HIST_ENTRY *h = NULL;
+	HIST_ENTRY **hist_list = NULL;
+	int hist_index = 0;
 #endif
 
 	switch (type) {
@@ -4486,6 +4532,7 @@ serialize_list(int type)
 		end_ptr = (void *) &display_list;
 		ptr = (void *) display_list.prev;
 		break;
+#if defined(HAVE_LIBREADLINE) && defined(HAVE_HISTORY_LIST)
 	case HISTORY:
 		hist_list = history_list();
 		if (hist_list == NULL) /* empty history list */
@@ -4493,6 +4540,7 @@ serialize_list(int type)
 		end_ptr = NULL;
 		ptr = (void *) hist_list[0];
 		break;
+#endif
 	case OPTION:
 	{
 		int n;
@@ -4513,7 +4561,7 @@ serialize_list(int type)
 
 	if (buf == NULL) {	/* first time */
 		buflen = SERIALIZE_BUFSIZ;
-		emalloc(buf, char *, buflen + 1, "serialize");
+		emalloc(buf, char *, buflen + 1);
 	}
 	bl = 0;
 
@@ -4522,7 +4570,7 @@ serialize_list(int type)
 		if (buflen - bl < SERIALIZE_BUFSIZ/2) {
 enlarge_buffer:
 			buflen *= 2;
-			erealloc(buf, char *, buflen + 1, "serialize");
+			erealloc(buf, char *, buflen + 1);
 		}
 
 #undef SERIALIZE_BUFSIZ
@@ -4626,7 +4674,7 @@ enlarge_buffer:
 				nchar += (strlen("commands ") + 20 /*cnum*/ + 1 /*CSEP*/ + strlen("end") + 1 /*FSEP*/);
 				if (nchar >= buflen - bl) {
 					buflen = bl + nchar + 1 /*RSEP*/;
-					erealloc(buf, char *, buflen + 1, "serialize_list");
+					erealloc(buf, char *, buflen + 1);
 				}
 				nchar = sprintf(buf + bl, "commands %d", cnum);
 				bl += nchar;
@@ -4663,7 +4711,7 @@ enlarge_buffer:
 				nchar = strlen(cndn->expr);
 				if (nchar + 1 /*FSEP*/ >= buflen - bl) {
 					buflen = bl + nchar + 1 /*FSEP*/ + 1 /*RSEP*/;
-					erealloc(buf, char *, buflen + 1, "serialize_list");
+					erealloc(buf, char *, buflen + 1);
 				}
 				memcpy(buf + bl, cndn->expr, nchar);
 				bl += nchar;
@@ -4677,9 +4725,11 @@ enlarge_buffer:
 		case DISPLAY:
 			ptr = (void *) wd->prev;
 			break;
+#if defined(HAVE_LIBREADLINE) && defined(HAVE_HISTORY_LIST)
 		case HISTORY:
 			ptr = (void *) hist_list[++hist_index];
 			break;
+#endif
 		case OPTION:
 			ptr = (void *) (++opt);
 			break;
@@ -4742,7 +4792,7 @@ unserialize_list_item(struct list_item *list, char **pstr, int *pstr_len, int fi
 		if (type == D_subscript) {
 			int sub_len;
 			sub_cnt = strtol(pstr[3], NULL, 0);
-			emalloc(subs, NODE **, sub_cnt * sizeof(NODE *), "unserialize_list_item");
+			emalloc(subs, NODE **, sub_cnt * sizeof(NODE *));
 			cnt++;
 			for (i = 0; i < sub_cnt; i++) {
 				sub_len = strtol(pstr[cnt], NULL, 0);
@@ -5051,7 +5101,7 @@ do_commands(CMDARG *arg, int cmd)
 
 	assert(commands != NULL);
 
-	emalloc(c, struct commands_item *, sizeof(struct commands_item), "do_commands");
+	emalloc(c, struct commands_item *, sizeof(struct commands_item));
 	c->next = NULL;
 	c->cmd = cmd;
 
@@ -5107,7 +5157,7 @@ do_print_f(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 	/* count maximum required size for tmp */
 	for (a = arg; a != NULL ; a = a->next)
 		count++;
-	emalloc(tmp, NODE **, count * sizeof(NODE *), "do_print_f");
+	emalloc(tmp, NODE **, count * sizeof(NODE *));
 
 	for (i = 0, a = arg; a != NULL ; i++, a = a->next) {
 		switch (a->type) {
@@ -5183,7 +5233,7 @@ do_print_f(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 
 	PUSH_BINDING(fatal_tag_stack, fatal_tag, fatal_tag_valid);
 	if (setjmp(fatal_tag) == 0)
-		r = format_tree(tmp[0]->stptr, tmp[0]->stlen, tmp, i);
+		r = format_args(tmp[0]->stptr, tmp[0]->stlen, tmp, i);
 	else {
 		/* fatal error, restore exit_val of program */
 		exit_val = EXIT_SUCCESS;
@@ -5676,9 +5726,9 @@ do_eval(CMDARG *arg, int cmd ATTRIBUTE_UNUSED)
 
 		if (ecount > 0) {
 			if (pcount == 0)
-				emalloc(this_frame->stack, NODE **, ecount * sizeof(NODE *), "do_eval");
+				emalloc(this_frame->stack, NODE **, ecount * sizeof(NODE *));
 			else
-				erealloc(this_frame->stack, NODE **, (pcount + ecount) * sizeof(NODE *), "do_eval");
+				erealloc(this_frame->stack, NODE **, (pcount + ecount) * sizeof(NODE *));
 
 			sp = this_frame->stack + pcount;
 			for (i = 0; i < ecount; i++) {
@@ -5920,7 +5970,7 @@ push_cmd_src(
 	int eofstatus)
 {
 	struct command_source *cs;
-	emalloc(cs, struct command_source *, sizeof(struct command_source), "push_cmd_src");
+	emalloc(cs, struct command_source *, sizeof(struct command_source));
 	cs->fd = fd;
 	cs->is_tty = istty;
 	cs->read_func = readfunc;

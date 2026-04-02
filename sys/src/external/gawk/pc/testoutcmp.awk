@@ -2,7 +2,7 @@
 # exactly the same, and neither are e+NNN exponents.
 # should run even on old awk
 #
-# Copyright (C) 2011-2015 the Free Software Foundation, Inc.
+# Copyright (C) 2011-2015, 2019, 2024 the Free Software Foundation, Inc.
 # 
 # This file is part of GAWK, the GNU implementation of the
 # AWK Programming Language.
@@ -50,19 +50,26 @@ END {
 			continue
 
 		# For exponents
-		actual1 = gensub(/( ?)([-+]?[0-9.][0-9.]?+e[-+])0([0-9][0-9])/, " \\1\\2\\3", "g", actual)
+		actual1 = gensub(/([ <]?)([-+]?[0-9.][0-9.]?+[eE][-+])0([0-9][0-9])/, " \\1\\2\\3", "g", actual)
 		if (good == actual1)
 		    continue
-		actual1 = gensub(/([-+]?0)([0-9.]+e[-+])0([0-9][0-9])/, "\\10\\2\\3", "g", actual)
+		actual1 = gensub(/([-+]?0)([0-9.]+[eE][-+])0([0-9][0-9])/, "\\10\\2\\3", "g", actual)
 		if (good == actual1)
 		    continue
-		actual1 = gensub(/( ?)([-+]?)([1-9.][0-9.]?+e[-+])0([0-9][0-9])/, "\\1\\20\\3\\4", "g", actual)
+		actual1 = gensub(/( ?)([-+]?)([1-9.][0-9.]?+[eE][-+])0([0-9][0-9])/, "\\1\\20\\3\\4", "g", actual)
 		if (good == actual1)
 		    continue
-		actual1 = gensub(/([-+]?[0-9.]+e[-+])0([0-9][0-9])/, "\\1\\2 ", "g", actual)
+		actual1 = gensub(/([-+]?[0-9.]+[eE][-+])0([0-9][0-9])/, "\\1\\2 ", "g", actual)
 		if (good == actual1)
 		    continue
-		actual1 = gensub(/([-+]?[0-9.]+e[-+])0([0-9][0-9])/, "\\1\\2", "g", actual)
+		actual1 = gensub(/([-+]?[0-9.]+[eE][-+])0([0-9][0-9])/, "\\1\\2", "g", actual)
+		if (good == actual1)
+		    continue
+		# For NaN and Inf
+		actual1 = gensub(/([< \t])([-+])nan/, "\\1\\2NAN", "g", actual)
+		if (good == actual1)
+		    continue
+		actual1 = gensub(/([< \t])([-+])inf/, "\\1\\2INF", "g", actual)
 		if (good == actual1)
 		    continue
 		# For exit test

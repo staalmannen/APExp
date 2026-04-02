@@ -2,6 +2,10 @@
 #
 # Requires getopt() and join() library functions
 #
+# This file and how to use it are described in the manual.
+# Therefore, we respectfully advise you to Read The Fine Manual
+# for more information.
+#
 # Arnold Robbins, arnold@skeeve.com, Public Domain
 # May 1993
 # Updated August 2020 to current POSIX

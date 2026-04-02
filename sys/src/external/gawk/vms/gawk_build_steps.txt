@@ -1,9 +1,10 @@
 From File: gawk_build_steps.txt
 
 Building GAWK on OpenVMS for use with GNV requires a current HP C compiler
-and MMK.
+and MMK.  The X86_64 build is currently only tested with MMS 4.0.
 
-The HP C 7.x compilers were used for building on Alpha and Itanium.
+The VSI/ HP C 7.x compilers were used for building on X86_64, Alpha,
+and Itanium.
 The Compaq C 6.4 compiler is being used on VAX.
 
 MMK was obtained from https://github.com/endlesssoftware/mmk
@@ -43,7 +44,8 @@ ODS-2 characters and case changes prefixed with $ characters.
 gawk kit as provided by the GNV project.
 [gnv.vms_src]gawk-*_vms_src.bck, if present, has the changed files that
 are used for building that are not yet in the gawk source kits
-distributed by the GNU gawk project.
+distributed by the GNU gawk project.  Normally this file will not be
+present.
 
 These backup savesets should be restored to different directory trees on
 an ODS-5 volume(s) which are referenced by concealed rooted logical names,
@@ -150,7 +152,7 @@ same name are the same file, so every file placed in the kit must have a
 unique ODS-2 legal name.  Then a procedure needs to be added to the kit to
 create an alias link on install and remove the link on remove.
 
-While newer versions of PCSI can support ODS-5 filenames, not all verions
+While newer versions of PCSI can support ODS-5 filenames, not all versions
 of PCSI on systems that have ODS-5 filenames do.  So as a post install step,
 the PCSI kit built by these steps does a rename to the correct case.
 
@@ -208,7 +210,8 @@ If there is another kit for this same version of gawk, but for a different
 base platform or operating system version, the product command will prompt
 to the terminal to select which one to compress.
 
-       The following message is normal:
+The following message is normal as I am not aware of how third parties can
+sign PCSI kits so that OpenVMS can validate the signatures.
           %PCSI-I-CANNOTVAL, cannot validate
             EAGLE$DQA0:[stage_root.][kit]GNV-AXPVMS-GAWK-V--1.PCSI;1
           -PCSI-I-NOTSIGNED, product kit is not signed and therefore has

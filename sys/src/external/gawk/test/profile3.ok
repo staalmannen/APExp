@@ -5,7 +5,6 @@
      1  	print @the_func("Hello")
 	}
 
-
 	# Functions, listed alphabetically
 
      1  function p(str)

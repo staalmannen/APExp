@@ -1,3 +1,74 @@
+2026-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.4.0: Release tar ball made.
+
+2026-02-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README.matchers: Updated.
+
+2026-02-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README.matchers: Updated.
+
+2026-02-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README.VMS: Typo fix.
+
+2026-01-28         John E. Malmberg      <wb8tyw@qsl.net>
+
+	* README.VMS: Updated for VSI 9.2 on x86_64.  Removed some VAX
+	details since VAX/VMS is no longer supported.
+
+2026-01-22         Eli Zaretskii  <eliz@gnu.org>
+
+	* README.pc: Update.  Patch by Scott Deifik
+	<scottd.mail@sbcglobal.net>.
+
+2025-12-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README.matchers: Updated.
+
+2025-10-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README.macosx: Updated.
+
+2025-07-06         Eli Zaretskii  <eliz@gnu.org>
+
+	* README.pc: Add note about __USE_MINGW_ANSI_STDIO.
+
+2025-04-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.2: Release tar made.
+
+2025-02-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README.mpfr, README.pc: Small fixes.
+
+2025-02-17         John E. Malmberg      <wb8tyw@qsl.net>
+
+	* README.VMS: Updated for VSI 9.2 on x86_64.  Removed some VAX
+	details since VAX/VMS is no longer supported.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.1: Release tar made.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README.mpfr: Updated.
+
+2024-07-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README.matchers: Updated.
+
+2024-03-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README.matchers: New file.
+
+2024-01-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* README.macosx: Updated.
+
 2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* 5.3.0: Release tar ball made.

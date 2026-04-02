@@ -1,3 +1,731 @@
+2026-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.4.0: Release tar ball made.
+
+2026-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Persistent Memory): Update the example version message.
+
+2026-02-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Persistent Memory): Add FreeBSD 12-15 and MidnightBSD
+	3 and 4 to the list.
+	(Feature History): Ditto.
+	(Manual History): Remove an obsolete index entry.
+
+2026-02-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Persistent Memory): Add NetBSD 11 to the list.
+	Update copyright year.
+	* Makefile.am, gawk.1: Update copyright year.
+
+2026-02-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pm-gawk.texi: Change http to https in the PMA URL.
+	* gawk.texi: Rationalize the VMS text some more and small
+	cleanup in the porting section. Fix a spelling error.
+	* wordlist: Updated.
+
+2026-02-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Minor Texinfo usage fixes and minor style changes.
+	* awkcard.in, doc/gawk.1, doc/gawk.texi, doc/gawkworkflow.texi:
+	Updated in preparation for release.
+	* texinfo.tex: Updated from GNULIB.
+	* wordlist, wordlist3, wordlist4, wordlist7: Updated after
+	spell checking.
+
+2026-02-10         Triallax              <triallax@tutanota.com>
+
+	* gawk.texi (Other Versions): Change the name and URL of phos
+	to dgawk.
+
+2026-02-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Persistent Memory): Add FreeBSD back to the
+	the list of supported systems.
+
+2026-02-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Persistent Memory): Add NetBSD back to the
+	the list of supported systems.
+
+2026-02-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Round Function): Add link to Jason Kwan's version
+	of round().
+
+2026-01-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Persistent Memory): Remove NetBSD and FreeBSD from
+	the list of supported systems. PMA doesn't work on them.
+
+2026-02-03         John E. Malmberg      <wb8tyw@qsl.net>
+
+	* ChangLog: Minor spelling fixes.
+	* gawk.texi: Updated OpenVMS information and minor spelling fixes.
+
+2026-01-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Bug address): Note that neither ad hominem attacks,
+	nor discussion of proprietary software, are appropriate for the
+	gawk lists.
+
+2026-01-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Other Versions): Add an additional opening aphorism
+	and fix a typo.
+
+2026-01-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Other Versions): Add Rust versions. Reorganize the
+	list by language the version is written in. Comment out the
+	QuikTrim version since the websites have been unavailable
+	for a year.
+
+2026-01-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Some small fixes.
+
+2026-01-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkworkflow.texi: Fix references to gawktexi.in. Thanks to
+	Hermann Peifer for the report.
+
+2026-01-04         Eli Zaretskii  <eliz@gnu.org>
+
+	* gawk.texi (Feature History): Mention Windows support for UTF-8.
+	(PC Using): Give details of same.
+
+2025-12-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Fix a typo. Clarify the explanations of hexadecimal
+	floating point data.
+
+2025-12-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Nondecimal Data): Document hexadecimal floating
+	point constants.
+
+2025-12-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Additional Configuration Options): Add text for
+	--enable-builtin-intdiv0 and --enable-O3.
+
+2025-12-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Fix up some tab characters to be spaces and vice versa.
+	Thanks to Antonio Colombo.
+
+2025-12-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Shortest match program): Fix the text of the program
+	to use strongly typed regexps.  Thanks to Antonio Colombo
+	for reporting the problem.
+
+2025-12-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Fix some typos. Thanks to Antonio Colombo.
+
+2025-12-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Bytes vs. Characters): Note that Klingon and
+	Elvish were not accepted for Unicode.
+	(Building the Documentation): Info files are no longer
+	kept in Git.
+
+	Removed info files from the Git repo.
+
+2025-12-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Choosing Matchers): Update the version info.
+	(Feature History): Add a note about MinRX.
+
+2025-11-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (TCP/IP Networking): Note that support for
+	UDP is obsolete and will be removed in gawk 6.0.
+	(Feature History): Ditto.
+	* awkcard.in: Ditto.
+	* gawk.1: Ditto.
+
+2025-11-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Typo fixes. Thanks to Antonio Colombo.
+
+2025-10-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (UPDATE-MONTH): Update.
+	(Options): Remove note that -n may one day disappear.
+	(Nondecimal Data): Add text about hex floating point.
+	And some additional edits.
+	(Persistent Memory): Add NetBSD, sort the list of supported
+	platforms.
+	(POSIX Floating Point Problems): Remove the note that the
+	sign on NaN values can vary. That was fixed a while back.
+	(Feature History): Bring list for the current release up to date.
+
+2025-10-10         G. Branden Robinson <g.branden.robinson@gmail.com>
+
+	* gawk.1: Clarify a comment.
+
+	The `lq` and `rq` strings are not a groffism, but originate in
+	4BSD (1980).  They entered Unix System V with SVR4 (1988 or 1989).
+	mandoc supports them too.  Plan 9 troff is the only implementation
+	I know of that doesn't.
+
+2025-10-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.1: Add more verbiage in the README FIRST section.
+
+2025-10-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.1: For typeof(), removed "undefined". It's "untyped".
+	Thanks again to Petr Slansky <slansky@gmail.com>.
+	* gawk.texi (Requesting Values): Change "undefined" to "untyped".
+
+2025-10-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (String Functions): Clarify that length() turns an
+	untyped variable into a scalar for compatibility with Unix awk.
+	(Undocumented): Small update.
+	* gawk.1: For typeof(), add that "untyped" can also be returned.
+	Thanks to Petr Slansky <slansky@gmail.com> for pointing this out.
+
+2025-09-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Further simplify definition of macros for
+	dark corner and page.
+
+2025-09-10         Antonio Giovanni Colombo   <azc100@gmail.com>
+
+	* gawk.texi: Replace CHAPTER, SECTION, SUBSECTION and COMMONEXT
+	macros with their values, now that they are all the same.
+
+2025-09-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Add some additional glossary and index links
+	for definitions of "d.c." and "c.e." abbreviations. Thanks to
+	Brian Inglis <Brian.Inglis@SystematicSW.ab.ca> for the
+	discussion.
+
+2025-08-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Other Versions): Add more info for embeddable
+	awk interpreter by neacsum.
+
+2025-08-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texinfo.tex: Updated from GNULIB.
+
+2025-07-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (I/O Functions): Update doc on system().
+
+2025-07-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Other Versions): Add entry for `phos', an awk
+	written in Zig.
+
+2025-07-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (String Functions): Note that length(array) is now part
+	of POSIX.
+
+2025-07-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Extension Sample Ord): Add additional info about
+	ord() return value for invalid strings.
+
+2022-08-02  Eli Zaretskii  <eliz@gnu.org>
+
+	* gawk.texi (PC Compiling): Add note about __USE_MINGW_ANSI_STDIO.
+
+2025-06-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Extension Sample Ord): Note that the extension
+	can now handle more than just eight-bit character sets.
+
+2025-06-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.1: Remove note that persistent memory and dynamic extensions
+	cannot be used together.
+	* gawk.texi (Persistent Memory): Document new behavior w.r.t.
+	dynamic functions and version checking.
+	* pm-gawk.1: Ditto.
+
+2025-05-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.1: Note that persistent memory and dynamic extensions cannot
+	be used together.
+	* gawk.texi (Persistent Memory): Ditto.
+	* pm-gawk.1: Ditto.
+
+	Unrelated:
+
+	* gawk.texi (Break Statement): Tweak a bit to be extra clear.
+
+	Unrelated:
+
+	* gawk.texi (Array Functions): Indicate that index for new element
+	should be a string but that gawk will convert it.
+
+2025-05-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Add more index entries for Andrew Schorr. Thanks
+	to Antonio Colombo for the motivation.
+
+2025-05-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: More doc and explanation in ftrans.awk
+	and zerofile.awk library programs.
+
+2025-05-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Input Parsers): Revert change in what field
+	to look at. st_mode is fine, since it also has the file type
+	info in it. Added an explanatory footnote.
+
+2025-05-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: For zerofile.awk and anagram.awk, update comments.
+	For ALL programs, add a blurb in the extracted file pointing
+	people to the manual.  Issue reported by "Stan Marsh" (sic)
+	<gazelle@xmission.com>.
+
+2025-04-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Input Parsers): Change suggestion for checking that
+	a struct stat is empty to checking st_ctime instead of st_mode,
+	since a mode can actually be zero. Pointed out by
+	"Stan Marsh" (sic) <gazelle@xmission.com>.
+
+2025-04-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.2: Release tar made.
+
+2025-03-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Bracket Expressions): Add additional notes about
+	things like \w or \< inside bracket expressions. Thanks to
+	"Jannick" <thirdedition@gmx.net> for the motivation.
+
+2025-03-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (AWKPATH Variable): Path searching and appending .awk
+	are always done, even in compatibility mode.
+
+2025-03-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Add shortest-match.awk demo program and prose.
+
+2025-03-21  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* gawk.1: Don't use \w|...| as bleeding-edge groff complains.
+	Instead, when defining the lq and rq strings, copy what
+	bleeding-edge grep does, as this should be a better match for the
+	various groff and traditional troff versions out there.
+
+2025-03-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Bracket Expressions): Fix the text. A byte can only
+	hold values from 0 to 255, not 256. Ooops.
+
+	* gawk.texi: Continue documenting shortest match operators.
+
+2025-03-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Start documenting shortest match operators.
+
+2025-03-20         Thérèse Godefroy	 <godef.th@free.fr>
+
+	* gawk_api-figure1.jpg, gawk_api-figure1.pdf, gawk_api-figure1.png,
+	gawk_api-figure1.svg, gawk_api-figure2.jpg, gawk_api-figure2.pdf,
+	gawk_api-figure2.png, gawk_api-figure2.svg, gawk_api-figure3.jpg,
+	gawk_api-figure3.pdf, gawk_api-figure3.png, gawk_api-figure3.svg:
+	Updated with reasonable contents.
+
+2025-03-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.1: Revert some of the "improvements" since I got "cannot
+	adjust line" error messages.  Fix up use of ``quotes'' to use
+	the predefined strings that I already had.
+
+	It's a man page, which is secondary; the Source Of Truth is
+	*always* the Texinfo manual.
+
+	Added a note up front that the man page is secondary to the
+	manual, to be absolutely clear, once and for all. Sheesh.
+
+2025-03-09         Bjarni Ingi Gislason	 <bjarniig@simnet.is>
+
+	* gawk.1: Improvements to get through groff's testing
+	and debugging options.
+
+2025-03-05         Thérèse Godefroy	 <godef.th@free.fr>
+
+	* gawk_api-figure1.pdf gawk_api-figure1.png, gawk_api-figure2.pdf,
+	gawk_api-figure2.png, gawk_api-figure3.pdf, gawk_api-figure3.png,
+	gawk_array-elements.pdf, gawk_general-program.pdf,
+	gawk_process-flow.pdf, gawk_statist.jpg, gawk_statist.pdf,
+	lflashlight.pdf, rflashlight.pdf: Modified based on SVG.
+	* gawk_api-figure1.jpg, gawk_api-figure1.svg,
+	gawk_api-figure2.jpg, gawk_api-figure2.svg, gawk_api-figure3.jpg,
+	gawk_api-figure3.svg, gawk_array-elements.jpg,
+	gawk_array-elements.svg, gawk_general-program.jpg,
+	gawk_general-program.svg, gawk_process-flow.jpg,
+	gawk_process-flow.svg, gawk_statist.svg, lflashlight.jpg,
+	lflashlight.svg, rflashlight.jpg, rflashlight.svg: New files.
+
+	* Makefile.am (jpg_images, svg_images): New lists.
+	(EXTRA_DIST): Add the new lists.
+
+2025-02-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pm-gawk.texi: Add updates about ASLR etc.
+
+2025-02-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkcard.in, gawk.1: Update copyright years.
+	* gawk.texi: Update patchlevel, update month.
+	* wordlist: Add new words, remove words no longer needed.
+
+2025-02-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texinfo.tex: Updated from GNULIB.
+
+2025-02-17         John E. Malmberg      <wb8tyw@qls.net>
+
+	* gawk.texi: Update for VSI VMS 9.2 on X86_64.
+
+2025-02-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Add indexing on `@' for typed regexp constants.
+	Add a link to the gawkextlib doc on SourceForge. Thanks to
+	Manuel Collado <mcollado2011@gmail.com> for both updates.
+
+	Unrelated:
+
+	* pm-gawk.texi: Updated from Terence Kelly.
+
+2025-02-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.1: Remove note that persistent memory is experimental.
+	* gawk.texi (Persistent Memory): Remove stuff related to PIE
+	and ASLR.
+
+2025-01-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Persistent Memory): Note that if a Linux system
+	uses ASLR, it can be worked around with setarch -R. Thanks
+	to Terence Kelly for the info.
+
+	The following changes motivated by Alexander Lasky
+	<ALEXANDER.LASKY@sydneywater.com.au>.
+
+	(Nonconstant Fields): Note that string expressions that evaluate
+	to zero also yield $0.
+	(Escape Sequences, Bracket Expressions): Add some clarifications
+	about escape sequences in general and in bracket expressions.
+
+2025-01-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (UPDATE-MONTH): Update.
+	Update output examples of `gawk --version'. Make all
+	IETF URLs point to .html versions. Thanks to Antonio Colombo
+	for the motivation.
+
+2025-01-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Change https URL for cloning the gawk repo.
+	Update all relevant URLs to be https instead of http.
+	Update the copyright year.
+
+2025-01-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Feature History): Note the addition of support
+	for OpenVMS 9.2-2 x86_64.
+
+2024-11-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Assert Function): Add an opening quote.
+
+2024-11-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Bracket Expressions): Add some clarifications
+	about backslash inside [...]. Thanks to Ed Morton
+	for the motivation.
+
+2024-10-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Typo fix. Thanks to Antonio Colombo.
+	* wordlist: Updated.
+
+2024-10-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Bitwise Functions): Document that lshift and rshift
+	now return zero for shifting by too many bits.
+
+2024-10-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi [PVERSION]: Nuked. All uses changed to straight
+	"version". Some other small fixes. Thanks to Antonio Colombo
+	for the motivation.
+
+2024-10-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Gory Details): Use @multitable for the tables
+	instead of hand-crafted tables for each format. Motivated
+	by Thérèse Godefroy <godef.th@free.fr> to improve the HTML.
+
+2024-10-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Contributors): Add Stuart Ferguson.
+
+2024-10-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Shadowed Variables): New section. Original
+	text contributed by John Naman, <gawker@gmail.com>.
+
+2024-10-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Move @cindex lines to be before @enumerate /
+	@itemize.  Thanks to Thérèse Godefroy <godef.th@free.fr>
+	for the report.
+
+2024-10-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Splitting By Content): Some adjustments
+	to quoted-csv.awk.
+
+2024-09-20         Stuart Ferguson       <stuart.fergs@gmail.com>
+
+	* gawk.texi (Splitting By Content): Reworked some more.
+	(More CSV): Removed.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.1: Release tar made.
+
+2024-09-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Setting the rounding mode): Small formatting fix.
+	(UPDATE-MONTH): Updated.
+	* awkcard.in: Bump version, add 2024 to copyright.
+	* gawk.1: Add 2024 to copyright.
+
+2024-09-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* texinfo.tex: Updated from GNULIB.
+	* wordlist: Updated.
+
+2024-09-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Programs Exercises): Add two exercises related
+	to egrep.
+
+2024-09-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Other Versions): Add info about`wak'.
+
+2024-08-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Egrep Program): Small fixes. Add a note for future
+	work to do.
+
+2024-08-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Improve indexing for @nsinclude. Describe it
+	in the feature history.
+
+2024-08-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Improve indexing for @include/@load/@namespace
+	and use "directive" consistently to describe them. Thanks to
+	Antonio Colombo for pointing out the need.
+
+2024-08-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi, gawk.1, awkcard.in: Document @nsinclude.
+
+2024-08-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Small consistency fix.
+
+2024-08-05         Stuart Ferguson       <stuart.fergs@gmail.com>
+
+	* gawk.texi (Splitting By Content, More CSV): Reworked.
+
+2024-07-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Small style edits.
+
+2024-07-29         Andrew J. Schorr      <aschorr@telemetry-investments.com>
+
+	* gawk.texi (Extensions in gawk Not in POSIX awk): Note that
+	typeof and mkbool are also functions unique to gawk.
+	(Naming Rules): Include a reference to the POSIX/GNU node
+	so it's easier to see which gawk extension functions won't work
+	in namespaces without the awk:: scoping.
+
+2024-07-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Computer Arithmetic): Add a relevant quote.
+
+2024-07-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Use @code for getline, not @command. Thanks to
+	Thanks to Antonio Colombo.
+
+2024-07-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Small fixups around use of getline and spelling fixes.
+	* wordlist: Updated.
+
+2024-07-11         Denys Vlasenko        <dvlasenk@redhat.com>
+
+	* gawk.1, gawk.texi, gawkinet.texi: Document getline as a function,
+	not as a statement.
+
+2024-07-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Typo fix.
+
+2024-06-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (GNU Regexp Operators): Add text explaining that
+	gawk doesn't support backreferences. Thanks to
+	Alexander Lasky <ALEXANDER.LASKY@sydneywater.com.au> for
+	suggesting this content.
+
+2024-06-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Update copyright year, patch version. Remove an
+	obsolete paragraph.
+
+2024-06-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi, awkcard.in, gawk.1: Removed hidden references to
+	--nostalgia option.
+
+2024-06-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Feature History): Document removal of support
+	for OSF/1.
+
+2024-05-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Time Functions): Note that the date script does not
+	take advantage of the utc-flag argument to strftime(). Thanks
+	to stbalbach <stbalbach@nym.hush.com> for pointing this out.
+
+2024-05-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* awkcard.in: Mention the help-gawk list.
+
+2024-04-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.1: Mention the help-gawk list.
+
+2024-04-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Choosing Matchers): New section on MinRX vs.
+	the GNU matchers.
+
+2024-03-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Extension Sample Inplace): Document that it
+	helps to redirect stdout in order to get block buffering.
+	Thanks to Ed Morton for pointing this out.
+
+2024-02-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Fix a typo.
+	* wordlist, wordlist3: Updated.
+
+2024-02-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (spellnotes): Give notes.texi its own file.
+	* notes.texi: Fix update month. Thanks, Antonio.
+	* gawk.texi: Spelling fix.
+	* wordlist: Updated.
+	* wordlist3: Updated.
+	* wordlist7: New file.
+
+2024-02-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* notes.texi: Lots of edits and general formatting improvements.
+
+2024-02-12         Tim Rice              <trice@posteo.net>
+
+	* gawk.texi (Extension Sample Inplace): Add a note that
+	symbolic and hard links are replaced with a new file.
+
+2024-01-29         Antonio Giovanni Colombo   <azc100@gmail.com>
+
+	* notes.texi: Added.
+	* Makefile.am: Updated.
+
+2024-01-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Time Functions): Add a note that some versions of
+	strftime accept flags, but that this isn't portable. Thanks
+	to Ed Morton <mortoneccc@comcast.net>.
+
+2023-12-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Requesting Values): Fix a spelling typo.
+	Thanks to Antonio Colombo.
+	* wordlist: Updated.
+
+2023-12-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Requesting Values): Add more text to clarify the
+	behavior.
+
+2023-12-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Change references to gawktexi.in to gawk.texi and
+	remove reference to sidebar.awk.  Thanks to Hermann Peifer for
+	pointing out the problem.
+
+2023-12-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Extension Sample Time): Fix up the text for strptime().
+	Thanks to Hermann Peifer for pointing out the problem.
+
+2023-11-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Small typo fixes. Thanks to Antonio Colombo.
+
+2023-11-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi: Rework documentation on dynamic typing, moving
+	stuff around and adding more information.  Thanks to Andrew Schorr
+	for pointing out the need.
+
+2023-11-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (POSIX/GNU): Mention namespaces and `::'.
+	Thanks to J Naman, <gawker@703n.com> for the report.
+
+	Unrelated:
+
+	* gawk.texi: Go through the whole manual and specify either
+	"double quote" or "single quote". And some other minor
+	cleanups. Thanks to Wolfgang Laun <wolfgang.laun@gmail.com>
+	for the suggestion.
+
+2023-11-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.1: Various fixes and corrections. Thanks to
+	Antonio Colombo.
+
+2023-11-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawk.texi (Numeric Functions): Fix a typo in the name of
+	random number shuffle algorithm. Thanks to Nelson H.F. Beebe.
+
 2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* 5.3.0: Release tar ball made.
@@ -10,11 +738,11 @@
 2023-10-29         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawk.texi (Other Versions): Add indexing for various
-	people. Thanks to Antonio Columbo for the suggestion.
+	people. Thanks to Antonio Colombo for the suggestion.
 
 2023-10-28         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* gawk.texi (Other Versions): Note the existance of
+	* gawk.texi (Other Versions): Note the existence of
 	the new edition of BWK's book and of https://awk.dev.
 
 2023-10-22         Arnold D. Robbins     <arnold@skeeve.com>
@@ -29,7 +757,7 @@
 2023-10-21         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawk.texi: Remove notes at end of the file about sidebars.
-	Thanks to Antonio Columbo for pointing out that it's no
+	Thanks to Antonio Colombo for pointing out that it's no
 	longer needed.
 	(Redirection): Revised discussion of mixing > and >>.
 	Motivated by mails from Hermann Peifer.
@@ -71,7 +799,7 @@
 	did CSV parsing. Whew.
 	* awkcard.in: Ditto.
 
-	Unrelated: 
+	Unrelated:
 	* gawktexi.in (Extension API Informational Variables):
 	Document do_csv variable in API.
 	(Feature History): Mention do_csv API variable and also
@@ -111,9 +839,9 @@
 2023-06-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawk.1: Remove last use of \c and fix a typo reported by
-	Bjarni Ingi Gislasson.
+	Bjarni Ingi Gislason.
 	* gawkbug.1: Fix up formatting of `--'. Also reported by
-	Bjarni Ingi Gislasson.
+	Bjarni Ingi Gislason.
 	* gawktexi.in (Extension Sample Readdir): Added more info
 	to sync with the readdir.3am man page.
 
@@ -176,7 +904,7 @@
 
 	* gawktexi.in (To CSV Function): Fix a typo in the code.
 	Thanks to Andrew Schorr for the catch.
-	
+
 2023-04-07         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in (To CSV Function): New section.
@@ -197,7 +925,7 @@
 
 	* gawktexi.in (Dynamic Typing): Small formatting fix.
 	Add an index entry.
-	* gawktexi.in (Comma Separated Fields): Additonal small
+	* gawktexi.in (Comma Separated Fields): Additional small
 	formatting changes.
 
 2023-03-29         Arnold D. Robbins     <arnold@skeeve.com>
@@ -206,7 +934,7 @@
 	* gawktexi.in (Dynamic Typing): Add a quote.
 	(Common Extensions): Sort the table entries, sort of.
 	* gawktexi.in: Several fixes related to CSV; thanks to
-	Antonio Columbo. Note that `nawk' is BWK awk.
+	Antonio Colombo. Note that `nawk' is BWK awk.
 	(Common Extensions): Add entries to the table for \u and
 	CSV support.
 
@@ -225,7 +953,7 @@
 2023-03-23         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in: Considerable work syncing the doc on CSV parsing
-	with changes in the code. Still stuff to do, maked with FIXMEs.
+	with changes in the code. Still stuff to do, marked with FIXMEs.
 	* wordlist, wordlist3: Updated.
 
 2023-03-19         Arnold D. Robbins     <arnold@skeeve.com>
@@ -281,7 +1009,7 @@
 2023-02-15         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in (EDITION): Bump to 5.3. Thanks to Antonio
-	Columbo for the suggestion.
+	Colombo for the suggestion.
 
 2023-02-10         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -513,7 +1241,7 @@
 	Semi-related:
 
 	* gawktexi.in (Persistent Memory): Add references to and info about
-	the new "Perstistent Memory gawk User Manual" from Terence Kelly.
+	the new "Persistent Memory gawk User Manual" from Terence Kelly.
 	(Distribution contents): Updated and corrected.
 	* pm-gawk.texi: New file.
 	* Makefile.am: Add appropriate stuff to build and install
@@ -571,7 +1299,7 @@
 
 	* gawktexi.in (Library Functions): Remove nextfile from the list
 	of gawk extensions. It's now standard
-	* Persistent Memory: Documnent that PMA and -M don't mix.
+	* Persistent Memory: Document that PMA and -M don't mix.
 
 2022-07-26         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -582,7 +1310,7 @@
 2022-07-19         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in (Persistent Memory): Document the PMA_VERBOSITY
-	environment variable. Eveywhere: do thorough indexing of all
+	environment variable. Everywhere: do thorough indexing of all
 	environment variables.
 
 2022-07-14         Arnold D. Robbins     <arnold@skeeve.com>
@@ -613,7 +1341,7 @@
 2022-07-07         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in: Additional indexing. Thanks to Antonio
-	Columbo for the report.
+	Colombo for the report.
 
 2022-07-06         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -681,7 +1409,7 @@
 2022-05-11         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in: Fix spelling errors. Thanks to Antonio
-	Columbo for the report.
+	Colombo for the report.
 	* wordlist: Updated with new words.
 
 2022-05-10         Arnold D. Robbins     <arnold@skeeve.com>
@@ -734,7 +1462,7 @@
 
 2022-03-01         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* gawktexi.in: Typo fix. Thanks to Antonio Columbo for pointing
+	* gawktexi.in: Typo fix. Thanks to Antonio Colombo for pointing
 	it out.
 
 2022-02-27         Arnold D. Robbins     <arnold@skeeve.com>
@@ -791,7 +1519,7 @@
 2021-11-25         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in: Add missing @item for AWKgo. Thanks to Antonio
-	Columbo. Small fix in Eli Zaretskii's addition.
+	Colombo. Small fix in Eli Zaretskii's addition.
 
 2021-11-24  Eli Zaretskii  <eliz@gnu.org>
 
@@ -852,7 +1580,7 @@
 2021-10-03         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in: Continue clarifying typeof() usage. And other fixes.
-	All thanks to Antonio Columbo.
+	All thanks to Antonio Colombo.
 	(UPDATE-MONTH): Set to October. Also thanks to Antonio.
 
 2021-10-01         Arnold D. Robbins     <arnold@skeeve.com>
@@ -862,13 +1590,13 @@
 
 2021-09-27         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* gawktexi.in: Small cleanups from Antonio Columbo.  General
+	* gawktexi.in: Small cleanups from Antonio Colombo.  General
 	review of usage of @code.
 
 2021-09-24         Arnold D. Robbins     <arnold@skeeve.com>
-	
+
 	* gawktexi.in (Building the Documentation): Improve the text,
-	add info on building the HTML doc.  Thanks to Antonio Columbo
+	add info on building the HTML doc.  Thanks to Antonio Colombo
 	for the encouragement.
 	(Distribution Contents): Update with more files.
 
@@ -904,7 +1632,7 @@
 2021-07-09         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in: Make @EMAIL usage consistent everywhere.
-	Thanks to Antonio Columbo for pointing it out.
+	Thanks to Antonio Colombo for pointing it out.
 
 2021-07-07         Andrew J. Schorr      <aschorr@telemetry-investments.com>
 
@@ -955,7 +1683,7 @@
 2021-06-18         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in (Internationalization): Fix indexing. Thanks to
-	Antonio Columbo for pointing it out.
+	Antonio Colombo for pointing it out.
 
 2021-06-17         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -972,7 +1700,7 @@
 	Additionally, fix some other small mistakes.
 	* gawk.1: Also, fix a small typo.
 
-	Thanks to Antonio Columbo for the reports.
+	Thanks to Antonio Colombo for the reports.
 
 2021-05-27         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -1041,7 +1769,7 @@
 	* gawktexi.in (Strange values): Fix a typo in the awk test
 	program. Make the C and Awk versions print "True" and
 	"False" to match Python, making comparisons easier. Thanks to
-	Antonio Columbo for the suggestions.
+	Antonio Colombo for the suggestions.
 
 2021-01-25         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -1052,7 +1780,7 @@
 2021-01-23         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in: A number of small fixes, thanks to
-	Antonio Columbo.
+	Antonio Colombo.
 
 	Unrelated:
 
@@ -1106,7 +1834,7 @@
 
 	* gawkinet.texi: Lots of cleanup edits. Bump the minor part
 	of the edition.
-	* gawktexi.in: New section on extension philosphy.
+	* gawktexi.in: New section on extension philosophy.
 
 2020-11-28         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -1116,7 +1844,7 @@
 2020-11-20         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in (Strange values): Correct the description of what
-	happens with infinity. Thanks to Antonio Columbo for pointing
+	happens with infinity. Thanks to Antonio Colombo for pointing
 	out the problem.
 
 2020-11-16         Arnold D. Robbins     <arnold@skeeve.com>
@@ -1132,7 +1860,7 @@
 
 2020-11-09         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* gawktexi.in: Samll improvement in strange numbers section.
+	* gawktexi.in: Small improvement in strange numbers section.
 
 2020-11-04         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -1184,14 +1912,14 @@
 
 2020-10-05         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* gawktexi.in: Minor edit related to compatiblity mode and
+	* gawktexi.in: Minor edit related to compatibility mode and
 	unknown options. Thanks to Arkadiusz Drabczyk <arkadiusz@drabczyk.org>
 	for raising the issue.
-	
+
 	Unrelated:
 
 	* gawktexi.in: A number of small fixes, mostly thanks to
-	Antonio Columbo.
+	Antonio Colombo.
 
 2020-10-04         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -1224,7 +1952,7 @@
 
 2020-09-18         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* gawktexi.in: Minor fixes. Thanks to Antonio Columbo for
+	* gawktexi.in: Minor fixes. Thanks to Antonio Colombo for
 	bringing them to my attention.
 
 2020-09-13         Arnold D. Robbins     <arnold@skeeve.com>
@@ -1282,7 +2010,7 @@
 2020-07-28         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in: Change a FIXME into a real cross reference. Thanks
-	to Antonio Columbo for the report.
+	to Antonio Colombo for the report.
 
 2020-07-26         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -1383,7 +2111,7 @@
 
 2020-04-13         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* gawktexi.in: Small typo fixes. Thanks to Antonio Columbo
+	* gawktexi.in: Small typo fixes. Thanks to Antonio Colombo
 	for pointing them out.
 
 2020-04-12         Arnold D. Robbins     <arnold@skeeve.com>
@@ -1407,7 +2135,7 @@
 2020-03-18         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawktexi.in: Fix up references to POSIX standard. Thanks to
-	Antonio Columbo for the pointers.
+	Antonio Colombo for the pointers.
 
 2020-03-15         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -1435,7 +2163,7 @@
 
 2020-01-23         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* gawktexi.in: Document arry sorting by value for FUNCTAB.
+	* gawktexi.in: Document array sorting by value for FUNCTAB.
 	Document that SYMTAB and FUNCTAB cannot be used with
 	asort() or asorti().
 
@@ -1514,8 +2242,8 @@
 2019-07-23         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* gawk.1: Fix typo, update edition. Thanks to Antonio
-	Columbo for the pointers.
-	* gawktexi.in: Update EDITION. Thanks to Antonio Columbo.
+	Colombo for the pointers.
+	* gawktexi.in: Update EDITION. Thanks to Antonio Colombo.
 	Fix two typos. Thanks to Mark Krauze.
 
 2019-07-21         Arnold D. Robbins     <arnold@skeeve.com>
@@ -1594,7 +2322,7 @@
 
 2019-04-22         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* gawktexi.in (Undocumented): Fix a typo. Thanks to Antonio Columbo
+	* gawktexi.in (Undocumented): Fix a typo. Thanks to Antonio Colombo
 	for pointing it out.
 
 2019-04-21         Arnold D. Robbins     <arnold@skeeve.com>

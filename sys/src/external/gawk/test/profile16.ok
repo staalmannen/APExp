@@ -3,9 +3,7 @@ BEGIN {
 	foofoo::xxx()
 }
 
-
 @namespace "foo"
-
 
 function foo_bar()
 {

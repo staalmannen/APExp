@@ -12,6 +12,7 @@
 
 /*
  * Copyright (C) 2012-2014, 2017, 2018, 2019, 2021, 2023,
+ * 2026
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -216,6 +217,8 @@ dir_get_record(char **out, awk_input_buf_t *iobuf, int *errcode,
 #else
 	len = sprintf(the_dir->buf, "%llu", ino);
 #endif
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
 	the_dir->fw.fields[0].len = len;
 	len += (flen = sprintf(the_dir->buf + len, "/%s", dirent->d_name));
 	the_dir->fw.fields[1].len = flen-1;
@@ -223,6 +226,7 @@ dir_get_record(char **out, awk_input_buf_t *iobuf, int *errcode,
 	ftstr = ftype(dirent, iobuf->name);
 	len += (flen = sprintf(the_dir->buf + len, "/%s", ftstr));
 	the_dir->fw.fields[2].len = flen-1;
+#pragma GCC diagnostic pop
 
 	*out = the_dir->buf;
 
@@ -299,9 +303,12 @@ dir_take_control_of(awk_input_buf_t *iobuf)
 	/* pre-populate the field_width struct with constant values: */
 	the_dir->fw.use_chars = awk_false;
 	the_dir->fw.nf = 3;
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
 	the_dir->fw.fields[0].skip = 0;	/* no leading space */
 	the_dir->fw.fields[1].skip = 1;	/* single '/' separator */
 	the_dir->fw.fields[2].skip = 1;	/* single '/' separator */
+#pragma GCC diagnostic pop
 	size = sizeof(struct dirent) + 21 /* max digits in inode */ + 2 /* slashes */;
 	emalloc(the_dir->buf, char *, size, "dir_take_control_of");
 

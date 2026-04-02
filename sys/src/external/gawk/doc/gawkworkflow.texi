@@ -28,10 +28,10 @@
 @c applies to and all the info about who's publishing this edition
 
 @c These apply across the board.
-@set UPDATE-MONTH March, 2023
+@set UPDATE-MONTH January, 2026
 
 @set TITLE Participating in @command{gawk} Development
-@set EDITION 0.75
+@set EDITION 0.76
 
 @iftex
 @set DOCUMENT booklet
@@ -144,13 +144,13 @@ Fax: +1-617-542-2652
 Email: <email>gnu@@gnu.org</email>
 URL: <ulink url="http://www.gnu.org">http://www.gnu.org/</ulink></literallayout>
 
-<literallayout class="normal">Copyright &copy; 2017, 2018, 2019, 2020, 2022, 2023
+<literallayout class="normal">Copyright &copy; 2017, 2018, 2019, 2020, 2022, 2023, 2026
 Free Software Foundation, Inc.
 All Rights Reserved.</literallayout>
 @end docbook
 
 @ifnotdocbook
-Copyright @copyright{} 2017, 2018, 2019, 2020, 2022, 2023
+Copyright @copyright{} 2017, 2018, 2019, 2020, 2022, 2023, 2026
 Free Software Foundation, Inc.
 @end ifnotdocbook
 @sp 2
@@ -1246,7 +1246,7 @@ $ @kbd{git rebase master}                  @ii{``Start over'' from current} mast
 @print{} First, rewinding head to replay your work on top of it...
 @print{} Applying: Demo change.
 @print{} Using index info to reconstruct a base tree...
-@print{} M	main.c
+@print{} M      main.c
 @print{} Falling back to patching base and 3-way merge...
 @print{} Auto-merging main.c
 @print{} CONFLICT (content): Merge conflict in main.c
@@ -1491,9 +1491,9 @@ Update the @file{ChangeLog}.
 
 @item
 @cindex documentation files
-@cindex @file{gawktexi.in} documentation
+@cindex @file{gawk.texi} documentation
 @cindex @file{gawk.1} manual page
-If necessary, update the documentation: @file{doc/gawktexi.in}
+If necessary, update the documentation: @file{doc/gawk.texi}
 and/or @file{doc/gawk.1}.
 
 @cindex @command{git} command @subentry @code{git diff}

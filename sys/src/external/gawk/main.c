@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2023,
+ * Copyright (C) 1986, 1988, 1989, 1991-2026,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -25,7 +25,7 @@
  */
 
 /* FIX THIS BEFORE EVERY RELEASE: */
-#define UPDATE_YEAR	2023
+#define UPDATE_YEAR	2026
 
 #include "awk.h"
 #include "getopt.h"
@@ -50,13 +50,14 @@ static void init_vars(void);
 static NODE *load_environ(void);
 static NODE *load_procinfo(void);
 static void catchsig(int sig);
-static void nostalgia(void) ATTRIBUTE_NORETURN;
 static void version(void) ATTRIBUTE_NORETURN;
 static void init_fds(void);
 static void init_groupset(void);
 static void save_argv(int, char **);
 static const char *platform_name();
+#ifdef USE_PERSISTENT_MALLOC
 static void check_pma_security(const char *pma_file);
+#endif /* USE_PERSISTENT_MALLOC */
 
 /* These nodes store all the special variables AWK uses */
 NODE *ARGC_node, *ARGIND_node, *ARGV_node, *BINMODE_node, *CONVFMT_node;
@@ -134,10 +135,10 @@ static void set_locale_stuff(void);
 static bool stopped_early = false;
 
 bool using_persistent_malloc = false;
+const char *persist_file;
 enum do_flag_values do_flags = DO_FLAG_NONE;
 bool do_itrace = false;			/* provide simple instruction trace */
 bool do_optimize = true;		/* apply default optimizations */
-static int do_nostalgia = false;	/* provide a blast from the past */
 static int do_binary = false;		/* hands off my data! */
 static int do_version = false;		/* print version info */
 static const char *locale = "";		/* default value to setlocale */
@@ -145,6 +146,9 @@ static const char *locale_dir = LOCALEDIR;	/* default locale dir */
 #ifdef USE_PERSISTENT_MALLOC
 const char *get_pma_version(void);
 #endif
+static bool enable_pma(char **argv);
+
+bool use_gnu_matchers = false;	/* Use gnu matchers, not minrx */
 
 int use_lc_numeric = false;	/* obey locale for decimal point */
 
@@ -188,7 +192,6 @@ static const struct option optab[] = {
 #endif
 	{ "non-decimal-data",	no_argument,		NULL,	'n' },
 	{ "no-optimize",	no_argument,		NULL,	's' },
-	{ "nostalgia",		no_argument,		& do_nostalgia,	1 },
 	{ "optimize",		no_argument,		NULL,	'O' },
 #if defined(YYDEBUG) || defined(GAWKDEBUG)
 	{ "parsedebug",		no_argument,		NULL,	'Y' },
@@ -216,28 +219,13 @@ main(int argc, char **argv)
 	bool have_srcfile = false;
 	SRCFILE *s;
 	char *cp;
-	const char *persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file for PMA */
 #if defined(LOCALEDEBUG)
 	const char *initial_locale;
 #endif
 
 	myname = gawk_name(argv[0]);
 
-	check_pma_security(persist_file);
-
-	int pma_result = pma_init(1, persist_file);
-	if (pma_result != 0) {
-		// don't use 'fatal' routine, memory can't be allocated
-		fprintf(stderr, _("%s: fatal: persistent memory allocator failed to initialize: return value %d, pma.c line: %d.\n"),
-				myname, pma_result, pma_errno);
-		exit(EXIT_FATAL);
-	}
-
-	using_persistent_malloc = (persist_file != NULL);
-#ifndef USE_PERSISTENT_MALLOC
-	if (using_persistent_malloc)
-		warning(_("persistent memory is not supported"));
-#endif
+	using_persistent_malloc = enable_pma(argv);
 #ifdef HAVE_MPFR
 	mp_set_memory_functions(mpfr_mem_alloc, mpfr_mem_realloc, mpfr_mem_free);
 #endif
@@ -260,17 +248,6 @@ main(int argc, char **argv)
 
 	if ((cp = getenv("GAWK_LOCALE_DIR")) != NULL)
 		locale_dir = cp;
-
-#if defined(F_GETFL) && defined(O_APPEND)
-	// 1/2018: This is needed on modern BSD systems so that the
-	// inplace tests pass. I think it's a bug in those kernels
-	// but let's just work around it anyway.
-	int flags = fcntl(fileno(stderr), F_GETFL, NULL);
-	if (flags >= 0 && (flags & O_APPEND) == 0) {
-		flags |= O_APPEND;
-		(void) fcntl(fileno(stderr), F_SETFL, flags);
-	}
-#endif
 
 #if defined(LOCALEDEBUG)
 	initial_locale = locale;
@@ -317,6 +294,9 @@ main(int argc, char **argv)
 
 	parse_args(argc, argv);
 
+	if (getenv("GAWK_GNU_MATCHERS") != NULL)
+		use_gnu_matchers = true;
+
 #if defined(LOCALEDEBUG)
 	if (locale != initial_locale)
 		set_locale_stuff();
@@ -328,6 +308,10 @@ main(int argc, char **argv)
 	 * this value once makes a speed difference.
 	 */
 	gawk_mb_cur_max = MB_CUR_MAX;
+#ifdef __MINGW32__
+	if (mingw_using_utf8(UTF8_SET))
+		gawk_mb_cur_max = 4;
+#endif
 
 	/* init the cache for checking bytes if they're characters */
 	init_btowc_cache();
@@ -335,9 +319,6 @@ main(int argc, char **argv)
 	/* set up the single byte case table */
 	if (gawk_mb_cur_max == 1)
 		load_casetable();
-
-	if (do_nostalgia)
-		nostalgia();
 
 	/* check for POSIXLY_CORRECT environment variable */
 	if (! do_posix && getenv("POSIXLY_CORRECT") != NULL) {
@@ -372,6 +353,9 @@ main(int argc, char **argv)
 			gawk_mb_cur_max = 1;	/* hands off my data! */
 #if defined(LC_ALL)
 			setlocale(LC_ALL, "C");
+#endif
+#ifdef __MINGW32__
+			mingw_using_utf8(UTF8_RESET);
 #endif
 		}
 	}
@@ -464,8 +448,8 @@ main(int argc, char **argv)
 	/* load extension libs */
 	for (s = srcfiles->next; s != srcfiles; s = s->next) {
 		if (s->stype == SRC_EXTLIB)
-			load_ext(s->fullpath);
-		else if (s->stype != SRC_INC)
+			load_ext(s->src, s->fullpath);
+		else if (s->stype != SRC_INC && s->stype != SRC_NSINC)
 			have_srcfile = true;
 	}
 
@@ -552,6 +536,7 @@ main(int argc, char **argv)
 		set_current_namespace(awk_namespace);
 		dump_prog(code_block);
 		dump_funcs();
+		close_prof_file();
 	}
 
 	if (do_dump_vars)
@@ -581,13 +566,11 @@ add_preassign(enum assign_type type, char *val)
 	++numassigns;
 
 	if (preassigns == NULL) {
-		emalloc(preassigns, struct pre_assign *,
-			INIT_SRC * sizeof(struct pre_assign), "add_preassign");
+		emalloc(preassigns, struct pre_assign *, INIT_SRC * sizeof(struct pre_assign));
 		alloc_assigns = INIT_SRC;
 	} else if (numassigns >= alloc_assigns) {
 		alloc_assigns *= 2;
-		erealloc(preassigns, struct pre_assign *,
-			alloc_assigns * sizeof(struct pre_assign), "add_preassigns");
+		erealloc(preassigns, struct pre_assign *, alloc_assigns * sizeof(struct pre_assign));
 	}
 	preassigns[numassigns].type = type;
 	preassigns[numassigns].val = estrdup(val, strlen(val));
@@ -651,9 +634,6 @@ usage(int exitval, FILE *fp)
 	fputs(_("\t-S\t\t\t--sandbox\n"), fp);
 	fputs(_("\t-t\t\t\t--lint-old\n"), fp);
 	fputs(_("\t-V\t\t\t--version\n"), fp);
-#ifdef NOSTALGIA
-	fputs(_("\t-W nostalgia\t\t--nostalgia\n"), fp);
-#endif
 #ifdef GAWKDEBUG
 	fputs(_("\t-Y\t\t\t--parsedebug\n"), fp);
 #endif
@@ -887,7 +867,8 @@ init_vars()
 	NODE *n;
 
 	for (vp = varinit; vp->name != NULL; vp++) {
-		if ((vp->flags & NO_INSTALL) != 0)
+		if (((vp->flags & NO_INSTALL) != 0) ||
+		    (do_traditional && ((vp->flags & NON_STANDARD) != 0)))
 			continue;
 		n = *(vp->spec) = install_symbol(estrdup(vp->name, strlen(vp->name)), Node_var);
 		if (vp->strval != NULL)
@@ -1054,8 +1035,8 @@ load_procinfo()
 	update_PROCINFO_str("mpfr_version", name);
 	sprintf(name, "GNU MP %s", gmp_version);
 	update_PROCINFO_str("gmp_version", name);
-	update_PROCINFO_num("prec_max", MPFR_PREC_MAX);
-	update_PROCINFO_num("prec_min", MPFR_PREC_MIN);
+	update_PROCINFO_num("prec_max", (AWKNUM) MPFR_PREC_MAX);
+	update_PROCINFO_num("prec_min", (AWKNUM) MPFR_PREC_MIN);
 #endif
 
 #ifdef DYNAMIC
@@ -1130,7 +1111,7 @@ is_std_var(const char *var)
 
 	for (vp = varinit; vp->name != NULL; vp++) {
 		if (strcmp(vp->name, var) == 0) {
-			if ((do_traditional || do_posix) && (vp->flags & NON_STANDARD) != 0)
+			if (do_traditional && (vp->flags & NON_STANDARD) != 0)
 				return false;
 
 			return true;
@@ -1257,7 +1238,7 @@ arg_assign(char *arg, bool initing)
 		// typed regex
 		size_t len = strlen(cp) - 3;
 
-		ezalloc(cp2, char *, len + 1, "arg_assign");
+		ezalloc(cp2, char *, len + 1);
 		memcpy(cp2, cp + 2, len);
 
 		it = make_typed_regex(cp2, len);
@@ -1346,20 +1327,6 @@ catchsig(int sig)
 	/* NOTREACHED */
 }
 
-/* nostalgia --- print the famous error message and die */
-
-static void
-nostalgia()
-{
-	/*
-	 * N.B.: This string is not gettextized, on purpose.
-	 * So there.
-	 */
-	fprintf(stderr, "awk: bailing out near line 1\n");
-	fflush(stderr);
-	abort();
-}
-
 #ifdef USE_PERSISTENT_MALLOC
 /* get_pma_version --- get a usable version string out of PMA */
 
@@ -1441,7 +1408,7 @@ init_fds()
 #endif
 			newfd = devopen("/dev/null", opposite_mode[fd]);
 			/* turn off some compiler warnings "set but not used" */
-			newfd += 0;
+			newfd = newfd + 0;
 #ifdef MAKE_A_HEROIC_EFFORT
 			if (do_lint && newfd < 0)
 				lintwarn(_("could not pre-open /dev/null for fd %d"), fd);
@@ -1471,7 +1438,7 @@ init_groupset()
 		return;
 
 	/* fill in groups */
-	emalloc(groupset, GETGROUPS_T *, ngroups * sizeof(GETGROUPS_T), "init_groupset");
+	emalloc(groupset, GETGROUPS_T *, ngroups * sizeof(GETGROUPS_T));
 
 	ngroups = getgroups(ngroups, groupset);
 	/* same thing here, give up but keep going */
@@ -1489,7 +1456,7 @@ char *
 estrdup(const char *str, size_t len)
 {
 	char *s;
-	emalloc(s, char *, len + 1, "estrdup");
+	emalloc(s, char *, len + 1);
 	memcpy(s, str, len);
 	s[len] = '\0';
 	return s;
@@ -1534,7 +1501,7 @@ save_argv(int argc, char **argv)
 {
 	int i;
 
-	emalloc(d_argv, char **, (argc + 1) * sizeof(char *), "save_argv");
+	emalloc(d_argv, char **, (argc + 1) * sizeof(char *));
 	for (i = 0; i < argc; i++)
 		d_argv[i] = estrdup(argv[i], strlen(argv[i]));
 	d_argv[argc] = NULL;
@@ -1581,7 +1548,8 @@ parse_args(int argc, char **argv)
 	/*
 	 * The + on the front tells GNU getopt not to rearrange argv.
 	 */
-	const char *optlist = "+F:f:v:W;bcCd::D::e:E:ghi:kIl:L::nNo::Op::MPrSstVYZ:";
+	// FIXME: 'G' is temporary (and undocumented!)
+	const char *optlist = "+F:f:v:W;bcCd::D::e:E:ghi:kIl:L::nNo::Op::MPrSstVYZ:G";
 	int old_optind;
 	int c;
 	char *scan;
@@ -1665,6 +1633,10 @@ parse_args(int argc, char **argv)
 
 		case 'g':
 			do_flags |= DO_INTL;
+			break;
+
+		case 'G':	// FIXME: command line option is temporary
+			use_gnu_matchers = true;
 			break;
 
 		case 'h':
@@ -1892,6 +1864,11 @@ set_locale_stuff(void)
 	/* These must be done after calling setlocale */
 	(void) bindtextdomain(PACKAGE, locale_dir);
 	(void) textdomain(PACKAGE);
+
+#ifdef __MINGW32__
+	if (mingw_using_utf8(UTF8_SET))
+		gawk_mb_cur_max = 4;
+#endif
 }
 
 /* platform_name --- return the platform name */
@@ -1922,12 +1899,12 @@ set_current_namespace(const char *new_namespace)
 	current_namespace = new_namespace;
 }
 
+#ifdef USE_PERSISTENT_MALLOC
 /* check_pma_security --- make some minimal security checks */
 
 static void
 check_pma_security(const char *pma_file)
 {
-#ifdef USE_PERSISTENT_MALLOC
 	struct stat sbuf;
 	int euid = geteuid();
 
@@ -1947,5 +1924,34 @@ check_pma_security(const char *pma_file)
 		fprintf(stderr, _("%s: warning: %s is not owned by euid %d.\n"),
 				myname, pma_file, euid);
 	}
+}
 #endif /* USE_PERSISTENT_MALLOC */
+
+/* enable_pma --- do the PMA flow, handle ASLR on Linux */
+
+static bool
+enable_pma(char **argv)
+{
+	persist_file = getenv("GAWK_PERSIST_FILE");	/* backing file for PMA */
+
+#ifndef USE_PERSISTENT_MALLOC
+	if (persist_file != NULL)
+		warning(_("persistent memory is not supported"));
+
+	return false;
+#else
+	os_disable_aslr(persist_file, argv);
+
+	check_pma_security(persist_file);
+	int pma_result = pma_init(1, persist_file);
+	if (pma_result != 0) {
+		// don't use 'fatal' routine, memory can't be allocated
+		fprintf(stderr, _("%s: fatal: persistent memory allocator failed to initialize: return value %d, pma.c line: %d.\n"),
+				myname, pma_result, pma_errno);
+		exit(EXIT_FATAL);
+	}
+
+
+	return (persist_file != NULL);
+#endif
 }

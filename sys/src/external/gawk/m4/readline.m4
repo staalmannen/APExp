@@ -1,5 +1,6 @@
 dnl Check for readline and dependencies
-dnl Copyright (C) 2004, 2005, 2013, 2014, 2021, Free Software Foundation, Inc.
+dnl Copyright (C) 2004, 2005, 2013, 2014, 2021, 2024,
+dnl Free Software Foundation, Inc.
 dnl
 dnl This file is free software, distributed under the terms of the GNU
 dnl General Public License.  As a special exception to the GNU General
@@ -66,6 +67,8 @@ dnl action if false:
 dnl action if cross compiling:
 		[AC_LINK_IFELSE(
 			[AC_LANG_PROGRAM([[#include <stdio.h>
+#include <fcntl.h>
+#include <unistd.h>
 #include <readline/readline.h>
 #include <readline/history.h>]],		dnl includes
 			dnl function body

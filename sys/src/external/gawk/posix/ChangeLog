@@ -1,3 +1,73 @@
+2026-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.4.0: Release tar ball made.
+
+2026-02-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (os_disable_aslr): Add code additional checks for
+	the relevant action constants for FreeBSD code to prevent
+	build failures on DragonFlyBSD. Thanks to Nelson H.F. Beebe.
+
+2026-02-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c: Update copyright year.
+
+2026-02-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (os_disable_aslr): Add code for FreeBSD 16. Also include
+	the right headers with appropriate #ifdef checks.
+
+2025-09-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (os_disable_aslr): Use setenv() instead of putenv().
+
+2025-08-31         David Bohman          <debohman@gmail.com>
+
+	* gawkmisc.c (os_disable_aslr): For macOS, include the
+	appropriate header and use a variable of the correct size
+	for the size parameter.
+
+2025-08-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (os_disable_aslr): Use a `char []' array for the
+	environment variable in call to putenv() instead of a string
+	constant. Avoids a warning from g++.
+
+2025-04-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (os_disable_aslr): Don't bother using readlink()
+	to get the path to the exe, just exec /proc/self/exe directly.
+	Saves time and trouble.
+
+2025-04-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (os_disable_aslr): Need to check also for
+	posix_spawnp at compile time. Thanks to Peter Dyballa
+	<Peter_Dyballa@gmx.de> for the report.
+
+2025-04-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.2: Release tar made.
+
+2025-02-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (os_disable_aslr): Revise the check for
+	ADDR_NO_RANDOMIZE, as it's not a macro. :-(
+	
+2025-02-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (os_disable_aslr): On Linux, check for
+	ADDR_NO_RANDOMIZE also. Thanks to Nelson Beebe for pointing
+	this out.
+
+2025-02-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.c (os_disable_aslr): New function for *nix.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.1: Release tar made.
+
 2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* 5.3.0: Release tar ball made.

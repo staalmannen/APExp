@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2013, 2016, 2017, 2019, 2020, 2022,
+ * Copyright (C) 1986, 1988, 1989, 1991-2013, 2016, 2017, 2019, 2020, 2022, 2025,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -30,7 +30,7 @@ extern FILE *output_fp;
 extern void indent(int indent_level);
 extern NODE **is_integer(NODE *symbol, NODE *subs);
 
-static size_t INT_CHAIN_MAX = 2;
+static size_t INT_CHAIN_MAX = 10;
 
 static NODE **int_array_init(NODE *symbol, NODE *subs);
 static NODE **int_lookup(NODE *symbol, NODE *subs);
@@ -458,7 +458,7 @@ int_copy(NODE *symbol, NODE *newsymb)
 	cursize = symbol->array_size;
 
 	/* allocate new table */
-	ezalloc(new, BUCKET **, cursize * sizeof(BUCKET *), "int_copy");
+	ezalloc(new, BUCKET **, cursize * sizeof(BUCKET *));
 
 	old = symbol->buckets;
 
@@ -547,10 +547,10 @@ int_list(NODE *symbol, NODE *t)
 		assert(list != NULL);
 		if (num_elems == 1 || num_elems == xn->table_size)
 			return list;
-		erealloc(list, NODE **, list_size * sizeof(NODE *), "int_list");
+		erealloc(list, NODE **, list_size * sizeof(NODE *));
 		k = elem_size * xn->table_size;
 	} else
-		emalloc(list, NODE **, list_size * sizeof(NODE *), "int_list");
+		emalloc(list, NODE **, list_size * sizeof(NODE *));
 
 	/* populate it */
 
@@ -841,7 +841,7 @@ grow_int_table(NODE *symbol)
 	}
 
 	/* allocate new table */
-	ezalloc(new, BUCKET **, newsize * sizeof(BUCKET *), "grow_int_table");
+	ezalloc(new, BUCKET **, newsize * sizeof(BUCKET *));
 
 	old = symbol->buckets;
 	symbol->buckets = new;

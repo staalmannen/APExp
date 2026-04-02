@@ -1,0 +1,7 @@
+gawk: linttypeof.awk:3: warning: `typeof' is a gawk extension
+foo: 42
+foo: 3
+gawk: linttypeof.awk:11: warning: reference to uninitialized argument `optional'
+bar: 42
+gawk: linttypeof.awk:11: warning: length: received non-string argument
+bar: 3

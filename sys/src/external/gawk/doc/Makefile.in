@@ -18,7 +18,7 @@
 # doc/Makefile.am --- automake input file for gawk
 #
 # Copyright (C) 2000, 2001, 2002, 2004, 2005, 2007, 2010, 2011, 2016, 2017,
-# 2021, 2022, 2023,
+# 2021, 2022, 2023, 2026
 # the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
@@ -179,14 +179,17 @@ am__v_texidevnull_ = $(am__v_texidevnull_@AM_DEFAULT_V@)
 am__v_texidevnull_0 = > /dev/null
 am__v_texidevnull_1 = 
 INFO_DEPS = $(srcdir)/gawk.info $(srcdir)/gawkinet.info \
-	$(srcdir)/gawkworkflow.info $(srcdir)/pm-gawk.info
+	$(srcdir)/gawkworkflow.info $(srcdir)/pm-gawk.info \
+	$(srcdir)/notes.info
 TEXINFO_TEX = $(top_srcdir)/build-aux/texinfo.tex
 am__TEXINFO_TEX_DIR = $(top_srcdir)/build-aux
-DVIS = gawk.dvi gawkinet.dvi gawkworkflow.dvi pm-gawk.dvi
-PDFS = gawk.pdf gawkinet.pdf gawkworkflow.pdf pm-gawk.pdf
-PSS = gawk.ps gawkinet.ps gawkworkflow.ps pm-gawk.ps
-HTMLS = gawk.html gawkinet.html gawkworkflow.html pm-gawk.html
-TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi pm-gawk.texi
+DVIS = gawk.dvi gawkinet.dvi gawkworkflow.dvi pm-gawk.dvi notes.dvi
+PDFS = gawk.pdf gawkinet.pdf gawkworkflow.pdf pm-gawk.pdf notes.pdf
+PSS = gawk.ps gawkinet.ps gawkworkflow.ps pm-gawk.ps notes.ps
+HTMLS = gawk.html gawkinet.html gawkworkflow.html pm-gawk.html \
+	notes.html
+TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi pm-gawk.texi \
+	notes.texi
 TEXI2DVI = texi2dvi
 TEXI2PDF = $(TEXI2DVI) --pdf --batch
 MAKEINFOHTML = $(MAKEINFO) --html
@@ -365,31 +368,35 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-info_TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi pm-gawk.texi
+info_TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi pm-gawk.texi notes.texi
 man_MANS = gawk.1 gawkbug.1 pm-gawk.1
 png_images = gawk_api-figure1.png gawk_api-figure2.png gawk_api-figure3.png \
 	gawk_array-elements.png gawk_general-program.png gawk_process-flow.png
 
 html_images = $(png_images) gawk_statist.jpg
 fig_images = $(png_images:%.png=%.fig)
-txt_images = $(png_images:%.png=%.txt) gawk_statist.txt
 eps_images = $(txt_images:%.txt=%.eps) gawk_statist.eps
+jpg_images = $(txt_images:%.txt=%.jpg) gawk_statist.jpg
 pdf_images = $(txt_images:%.txt=%.pdf) gawk_statist.pdf
+svg_images = $(txt_images:%.txt=%.svg) gawk_statist.svg
+txt_images = $(png_images:%.png=%.txt) gawk_statist.txt
 EXTRA_DIST = ChangeLog ChangeLog.0 ChangeLog.1 \
 	README.card ad.block setter.outline \
 	awkcard.in awkforai.txt texinfo.tex cardfonts \
 	$(fig_images) $(txt_images) $(eps_images) $(pdf_images) \
-	$(html_images) \
+	$(html_images) $(jpg_images) $(svg_images) \
 	it \
 	macros colors no.colors $(man_MANS) \
 	lflashlight-small.xpic lflashlight.eps lflashlight.pdf \
+	lflashlight.jpg lflashlight.svg \
 	rflashlight-small.xpic rflashlight.eps rflashlight.pdf \
+	rflashlight.jpg rflashlight.svg \
 	wordlist wordlist2 wordlist3 wordlist4 wordlist5 wordlist6 \
 	bc_notes
 
 
 # Get rid of generated files when cleaning
-CLEANFILES = *.ps *.html *.dvi *~ awkcard.nc awkcard.tr gawk.pdf gawkinet.pdf gawkworkflow.pdf awkcard.pdf gawk.1.pdf gawkbug.1.pdf pm-gawk.1.pdf pm-gawk.pdf
+CLEANFILES = *.ps *.html *.dvi *~ awkcard.nc awkcard.tr gawk.pdf gawkinet.pdf gawkworkflow.pdf awkcard.pdf gawk.1.pdf gawkbug.1.pdf pm-gawk.1.pdf pm-gawk.pdf notes.pdf
 TROFF = groff -t -Tps -U
 SEDME = sed -e "s/^level0 restore/level0 restore flashme 100 72 moveto (Copyright `date '+%m-%d-%y %T'`, FSF, Inc. (all)) show/" \
 		-e "s/^\/level0 save def/\/level0 save def 30 -48 translate/"
@@ -499,6 +506,10 @@ $(srcdir)/pm-gawk.info: pm-gawk.texi
 pm-gawk.dvi: pm-gawk.texi 
 pm-gawk.pdf: pm-gawk.texi 
 pm-gawk.html: pm-gawk.texi 
+$(srcdir)/notes.info: notes.texi 
+notes.dvi: notes.texi 
+notes.pdf: notes.texi 
+notes.html: notes.texi 
 .dvi.ps:
 	$(AM_V_DVIPS)TEXINPUTS="$(am__TEXINFO_TEX_DIR)$(PATH_SEPARATOR)$$TEXINPUTS" \
 	$(DVIPS) $(AM_V_texinfo) -o $@ $<
@@ -581,17 +592,19 @@ dist-info: $(INFO_DEPS)
 
 mostlyclean-aminfo:
 	-rm -rf gawk.t2d gawk.t2p gawkinet.t2d gawkinet.t2p gawkworkflow.t2d \
-	  gawkworkflow.t2p pm-gawk.t2d pm-gawk.t2p
+	  gawkworkflow.t2p pm-gawk.t2d pm-gawk.t2p notes.t2d notes.t2p
 
 clean-aminfo:
 	-test -z "gawk.dvi gawk.pdf gawk.ps gawk.html gawkinet.dvi gawkinet.pdf \
 	  gawkinet.ps gawkinet.html gawkworkflow.dvi gawkworkflow.pdf \
 	  gawkworkflow.ps gawkworkflow.html pm-gawk.dvi pm-gawk.pdf \
-	  pm-gawk.ps pm-gawk.html" \
+	  pm-gawk.ps pm-gawk.html notes.dvi notes.pdf notes.ps \
+	  notes.html" \
 	|| rm -rf gawk.dvi gawk.pdf gawk.ps gawk.html gawkinet.dvi gawkinet.pdf \
 	  gawkinet.ps gawkinet.html gawkworkflow.dvi gawkworkflow.pdf \
 	  gawkworkflow.ps gawkworkflow.html pm-gawk.dvi pm-gawk.pdf \
-	  pm-gawk.ps pm-gawk.html
+	  pm-gawk.ps pm-gawk.html notes.dvi notes.pdf notes.ps \
+	  notes.html
 
 maintainer-clean-aminfo:
 	@list='$(INFO_DEPS)'; for i in $$list; do \
@@ -945,6 +958,9 @@ gawkinet.ps: gawkinet.dvi
 gawkworkflow.ps: gawkworkflow.dvi
 	TEXINPUTS=$(srcdir): dvips -o gawkworkflow.ps gawkworkflow.dvi
 
+notes.ps: notes.dvi
+	TEXINPUTS=$(srcdir): dvips -o notes.ps notes.dvi
+
 pm-gawk.ps: pm-gawk.dvi
 	TEXINPUTS=$(srcdir): dvips -o pm-gawk.ps pm-gawk.dvi
 
@@ -978,12 +994,17 @@ awkcard.nc: $(CARDFILES)
 awkcard.pdf: awkcard.ps
 	ps2pdf awkcard.ps awkcard.pdf
 
-spell: spellmanual spellworkflow spellmanpage spellinet
+spell: spellmanual spellnotes spellworkflow spellmanpage spellinet
 
 spellmanual:
 	@echo ==== gawk.texi ====;
 	export LC_ALL=C ; spell "$(srcdir)"/gawk.texi | \
 	sort -u | comm -23 - "$(srcdir)"/wordlist
+
+spellnotes:
+	@echo ==== notes.texi ====;
+	export LC_ALL=C ; spell "$(srcdir)"/notes.texi | \
+	sort -u | comm -23 - "$(srcdir)"/wordlist7
 
 spellworkflow:
 	@echo ==== gawkworkflow.texi ====

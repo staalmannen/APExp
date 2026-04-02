@@ -4,7 +4,7 @@
 
 /*
  * Copyright (C) 1986, 1988, 1989, 1991-2013, 2016, 2017, 2018, 2019,
- * 2021, 2022,
+ * 2021, 2022, 2025,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -43,7 +43,7 @@
  * 11/2002: Modern machines are bigger, cut this down from 10.
  */
 
-static size_t STR_CHAIN_MAX = 2;
+static size_t STR_CHAIN_MAX = 10;
 
 extern FILE *output_fp;
 extern void indent(int indent_level);
@@ -339,7 +339,7 @@ str_copy(NODE *symbol, NODE *newsymb)
 	cursize = symbol->array_size;
 
 	/* allocate new table */
-	ezalloc(new, BUCKET **, cursize * sizeof(BUCKET *), "str_copy");
+	ezalloc(new, BUCKET **, cursize * sizeof(BUCKET *));
 
 	old = symbol->buckets;
 
@@ -412,7 +412,7 @@ str_list(NODE *symbol, NODE *t)
 		num_elems = 1;
 	list_size =  elem_size * num_elems;
 
-	emalloc(list, NODE **, list_size * sizeof(NODE *), "str_list");
+	emalloc(list, NODE **, list_size * sizeof(NODE *));
 
 	/* populate it */
 
@@ -679,7 +679,7 @@ grow_table(NODE *symbol)
 	}
 
 	/* allocate new table */
-	ezalloc(new, BUCKET **, newsize * sizeof(BUCKET *), "grow_table");
+	ezalloc(new, BUCKET **, newsize * sizeof(BUCKET *));
 
 	old = symbol->buckets;
 	symbol->buckets = new;

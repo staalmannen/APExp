@@ -1,3 +1,30 @@
+2026-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.4.0: Release tar ball made.
+
+2026-02-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.rpath, texinfo.tex: Updated from GNULIB.
+
+2025-08-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* compile, config.guess, config.sub, depcomp,
+	install-sh, texinfo.tex: Updated from GNULIB.
+
+2025-02-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ar-lib, compile, config.rpath, depcomp, install-sh,
+	texinfo.tex: Updated from GNULIB.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.1: Release tar made.
+
+2024-09-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ar-lib, compile, config.guess, config.rpath, config.sub,
+	depcomp, install-sh, texinfo.tex: Updated from GNULIB.
+
 2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* 5.3.0: Release tar ball made.

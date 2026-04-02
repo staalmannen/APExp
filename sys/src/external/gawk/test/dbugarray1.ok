@@ -1,0 +1,8 @@
+Starting program:
+Program exited normally with exit value: 0
+a = array, 2 elements
+a["1"] = 1
+a["2"] = 2
+b = array, 2 elements
+b["1"]["2"]["3"] = 123
+b["2"]["2"]["3"] = 223

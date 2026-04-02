@@ -4,7 +4,7 @@
 
 /*
  * Copyright (C) 1986, 1988, 1989, 1991-1993, 1996, 1997, 2007, 2010, 2011,
- * 2023 the Free Software Foundation, Inc.
+ * 2023, 2026 the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -27,6 +27,7 @@
 /* This file is included by custom.h for VMS-POSIX, or first
    by config.h (vms-conf.h) then again by awk.h for normal VMS.  */
 
+/* This file is being deprecated.   See config_vms.h for details. */
 #if defined(VMS_POSIX) || defined(IN_CONFIG_H)
 
 #define DEFAULT_FILETYPE ".awk"
@@ -39,10 +40,7 @@
 #define optopt		gnu_optopt
 #define regcomp		gnu_regcomp
 #define regexec		gnu_regexec
-#define regfree		gnu_regfree
 #define regerror	gnu_regerror
-#define setenv		gawk_setenv
-#define unsetenv	gawk_unsetenv
 #ifndef VMS_POSIX
 #define strftime	gnu_strftime	/* always use missing/strftime.c */
 #define strcasecmp	gnu_strcasecmp
@@ -84,13 +82,8 @@ extern int   gettimeofday(struct timeval *,void *);
 #define open		vms_open
 #define popen		vms_popen
 #define pclose		vms_pclose
-#ifndef HAVE_SNPRINTF
-#define snprintf gawk_snprintf	/* avoid %CC-I-INTRINSICDECL diagnostic */
-#define vsnprintf gawk_vsnprintf
-#endif
+
 /* supply missing or suppressed (due to defines in config.h) declarations */
-extern int snprintf(char *,size_t,const char *,...);
-extern int vsnprintf(char *restrict,size_t,const char *,va_list);
 extern int setenv(const char *,const char *,int);
 extern int unsetenv(const char *);
 #define strerror	vms_strerror
@@ -116,7 +109,6 @@ extern void vms_arg_fixup(int *,char ***);
 /* some things not in STDC_HEADERS */
 extern size_t gnu_strftime(char *,size_t,const char *,const struct tm *);
 extern int unlink(const char *);
-extern int getopt(int,char **,char *);
 extern int isatty(int);
 #ifndef fileno
 extern int fileno(FILE *);

@@ -1,0 +1,4085 @@
+# This file is distributed under the same license as the gawk package.
+# Turkish translations for GNU awk messages
+# Copyright (C) 2022 Free Software Foundation, Inc.
+#
+# Nilgün Belma Bugüner <nilgunbelma@gmail.com>, 2001, ..., 2022.
+msgid ""
+msgstr ""
+"Project-Id-Version: gawk 5.1.65\n"
+"Report-Msgid-Bugs-To: bug-gawk@gnu.org\n"
+"POT-Creation-Date: 2026-02-22 16:46+0200\n"
+"PO-Revision-Date: 2022-08-23 01:50+0300\n"
+"Last-Translator: Nilgün Belma Bugüner <nilgunbelma@gmail.com>\n"
+"Language-Team: Turkish <gnome-turk@gnome.org>\n"
+"Language: tr\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Bugs: Report translation errors to the Language-Team address.\n"
+"X-Generator: Poedit 2.4.2\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: array.c:249
+#, c-format
+msgid "from %s"
+msgstr "%s'den"
+
+#: array.c:366
+msgid "attempt to use a scalar value as array"
+msgstr "sayıl değer dizi olarak kullanılmaya çalışılıyor"
+
+#: array.c:368
+#, c-format
+msgid "attempt to use scalar parameter `%s' as an array"
+msgstr "sayısal paramaetre `%s' bir dizi olarak kullanılmaya çalışılıyor"
+
+#: array.c:371
+#, c-format
+msgid "attempt to use scalar `%s' as an array"
+msgstr "sayıl `%s' dizi olarak kullanılmaya çalışılıyor"
+
+#: array.c:418 array.c:609 builtin.c:83 builtin.c:1136 builtin.c:1163
+#: eval.c:1175 eval.c:1180 eval.c:1588 printf.c:775 printf.c:823 printf.c:836
+#, c-format
+msgid "attempt to use array `%s' in a scalar context"
+msgstr "`%s' dizisi bir sayısal bağlamda kullanılmaya çalışılıyor"
+
+#: array.c:616
+#, c-format
+msgid "delete: index `%.*s' not in array `%s'"
+msgstr "delete: `%.*s' indisi `%s' dizisinde değil"
+
+#: array.c:630
+#, c-format
+msgid "attempt to use scalar `%s[\"%.*s\"]' as an array"
+msgstr "sayıl `%s[\"%.*s\"]' dizi olarak kullanılmaya çalışılıyor"
+
+#: array.c:856 array.c:906
+#, c-format
+msgid "%s: first argument is not an array"
+msgstr "%s: ilk değiştirge bir dizi değil"
+
+#: array.c:898
+#, c-format
+msgid "%s: second argument is not an array"
+msgstr "%s: alınan ikinci değiştirge dizi değil"
+
+#: array.c:901 field.c:1150 field.c:1255
+#, c-format
+msgid "%s: cannot use %s as second argument"
+msgstr "%s: %s ikinci değiştirge olarak kullanılamaz"
+
+#: array.c:909
+#, c-format
+msgid "%s: first argument cannot be SYMTAB without a second argument"
+msgstr "%s: ilk değiştirge, ikinci değiştirge olmaksızın SYMTAB olamaz"
+
+#: array.c:911
+#, c-format
+msgid "%s: first argument cannot be FUNCTAB without a second argument"
+msgstr "%s: ilk değiştirge, ikinci değiştirge olmaksızın FUNCTAB olamaz"
+
+#: array.c:918
+msgid ""
+"asort/asorti: using the same array as source and destination without a third "
+"argument is silly."
+msgstr ""
+"asort/asorti: aynı diziyi kaynak ve hedef olarak üçüncü değiştirge olmadan "
+"kullanmak akılcı değil."
+
+#: array.c:923
+#, c-format
+msgid "%s: cannot use a subarray of first argument for second argument"
+msgstr "%s: ikinci değiştirge için ilk değiştirgenin altdizisi kullanılamaz"
+
+#: array.c:928
+#, c-format
+msgid "%s: cannot use a subarray of second argument for first argument"
+msgstr "%s: ilk değiştirge için ikinci değiştirgenin altdizisi kullanılamaz"
+
+#: array.c:1458
+#, c-format
+msgid "`%s' is invalid as a function name"
+msgstr "`%s' işlev ismi olarak geçersiz"
+
+#: array.c:1462
+#, c-format
+msgid "sort comparison function `%s' is not defined"
+msgstr "sıralayıcı karşılaştırma işlevi `%s' tanımlanmamış"
+
+#: awkgram.y:281
+#, c-format
+msgid "%s blocks must have an action part"
+msgstr "%s blokları bir eylem bölümü içermeli"
+
+#: awkgram.y:284
+msgid "each rule must have a pattern or an action part"
+msgstr "her kural bir eylem bölümü veya bir kalıp içermeli"
+
+#: awkgram.y:448 awkgram.y:460
+msgid "old awk does not support multiple `BEGIN' or `END' rules"
+msgstr "eski awk çok sayıda `BEGIN' veya `END' kuralını desteklemiyor"
+
+#: awkgram.y:513
+#, c-format
+msgid "`%s' is a built-in function, it cannot be redefined"
+msgstr "`%s' bir yerleşik işlevdir, yeniden atanamaz"
+
+#: awkgram.y:577
+msgid "regexp constant `//' looks like a C++ comment, but is not"
+msgstr "düzenli ifade sabiti `//' bir C++ açıklaması gibi görünüyor ama değil"
+
+#: awkgram.y:581
+#, c-format
+msgid "regexp constant `/%s/' looks like a C comment, but is not"
+msgstr "düzenli ifade sabiti `/%s/' bir C açıklaması gibi görünüyor ama değil"
+
+#: awkgram.y:708
+#, c-format
+msgid "duplicate case values in switch body: %s"
+msgstr "switch içinde yinelenmiş case değerleri var: %s"
+
+#: awkgram.y:729
+msgid "duplicate `default' detected in switch body"
+msgstr "switch içinde `default' tekrarı saptandı"
+
+#: awkgram.y:1065 awkgram.y:4471
+msgid "`break' is not allowed outside a loop or switch"
+msgstr "döngü veya switch dışında `break' kullanımı yasak"
+
+#: awkgram.y:1075 awkgram.y:4463
+msgid "`continue' is not allowed outside a loop"
+msgstr "döngü dışında `continue' kullanımı yasak"
+
+#: awkgram.y:1086
+#, c-format
+msgid "`next' used in %s action"
+msgstr "`next' %s eyleminde kullanılmış"
+
+#: awkgram.y:1097
+#, c-format
+msgid "`nextfile' used in %s action"
+msgstr "`nextfile' %s eyleminde kullanılmış"
+
+#: awkgram.y:1125
+msgid "`return' used outside function context"
+msgstr "`return' işlev bağlamının dışında kullanılmış"
+
+#: awkgram.y:1198
+msgid "plain `print' in BEGIN or END rule should probably be `print \"\"'"
+msgstr "BEGIN veya END kuralındaki `print' aslında `print \"\"' olmalıydı"
+
+#: awkgram.y:1268
+msgid "`delete' is not allowed with SYMTAB"
+msgstr "`delete' ile SYMTAB birlikte kullanılamaz"
+
+#: awkgram.y:1270
+msgid "`delete' is not allowed with FUNCTAB"
+msgstr "`delete' ile FUNCTAB birlikte kullanılamaz"
+
+#: awkgram.y:1414
+msgid "multistage two-way pipelines don't work"
+msgstr "çok katlı iki yönlü borular çalışmaz"
+
+#: awkgram.y:1416
+msgid "concatenation as I/O `>' redirection target is ambiguous"
+msgstr "G/Ç `>' yeniden yönlendirme hedefi olarak birleştirme belirsiz"
+
+#: awkgram.y:1628
+msgid "regular expression on right of assignment"
+msgstr "düzenli ifade atamanın sağında"
+
+#: awkgram.y:1643 awkgram.y:1656
+msgid "regular expression on left of `~' or `!~' operator"
+msgstr "düzenli ifade `~' ya da `!~' işlecinin solunda"
+
+#: awkgram.y:1673 awkgram.y:1823
+msgid "old awk does not support the keyword `in' except after `for'"
+msgstr "eski awk `for'dan sonra gelmeyen `in' anahtar sözcüğünü desteklemiyor"
+
+#: awkgram.y:1683
+msgid "regular expression on right of comparison"
+msgstr "düzenli ifade karşılaştırmanın sağında"
+
+#: awkgram.y:1802
+#, c-format
+msgid "non-redirected `getline' invalid inside `%s' rule"
+msgstr "`%s' kuralının içinde yönlendirme yapmayan `getline' geçersiz"
+
+#: awkgram.y:1805
+msgid "non-redirected `getline' undefined inside END action"
+msgstr "END eyleminin içinde yönlendirme yapmayan `getline' tanımsız"
+
+#: awkgram.y:1825
+msgid "old awk does not support multidimensional arrays"
+msgstr "eski awk çok boyutlu dizileri desteklemiyor"
+
+#: awkgram.y:1928
+msgid "call of `length' without parentheses is not portable"
+msgstr "parantezsiz `length' çağrısı taşınabilir değil"
+
+#: awkgram.y:2002
+msgid "indirect function calls are a gawk extension"
+msgstr "örtük işlev çağrıları gawk eklentisidir"
+
+#: awkgram.y:2015
+#, c-format
+msgid "cannot use special variable `%s' for indirect function call"
+msgstr "örtük işlev çağrısı için `%s' özel değişkeni kullanılamıyor"
+
+#: awkgram.y:2048
+#, c-format
+msgid "attempt to use non-function `%s' in function call"
+msgstr "işlev çağrısında işlev olmayan `%s' kullanılmaya çalışılıyor"
+
+#: awkgram.y:2113
+msgid "invalid subscript expression"
+msgstr "indis ifadesi geçersiz"
+
+#: awkgram.y:2490 awkgram.y:2510 gawkapi.c:276 gawkapi.c:293 msg.c:133
+msgid "warning: "
+msgstr "uyarı: "
+
+#: awkgram.y:2508 gawkapi.c:248 gawkapi.c:291 msg.c:165
+msgid "fatal: "
+msgstr "ölümcül: "
+
+#: awkgram.y:2561
+msgid "unexpected newline or end of string"
+msgstr "beklenmeyen satırsonu ya da dizge sonu"
+
+#: awkgram.y:2582
+msgid ""
+"source files / command-line arguments must contain complete functions or "
+"rules"
+msgstr ""
+"kaynak dosyaları / komut satırı değiştirgeleri işlev ve kuralların tamamını "
+"içermelidir"
+
+#: awkgram.y:2866 awkgram.y:2945 awkgram.y:3182 debug.c:546 debug.c:562
+#: debug.c:2890 debug.c:5263
+#, c-format
+msgid "cannot open source file `%s' for reading: %s"
+msgstr "`%s' kaynak dosyası okumak için açılamıyor: %s"
+
+#: awkgram.y:2867 awkgram.y:3009
+#, c-format
+msgid "cannot open shared library `%s' for reading: %s"
+msgstr "`%s' paylaşımlı kütüphanesi okumak için açılamıyor: %s"
+
+#: awkgram.y:2869 awkgram.y:2946 awkgram.y:3010 builtin.c:131 debug.c:5414
+msgid "reason unknown"
+msgstr "sebebi bilinmiyor"
+
+#: awkgram.y:2878 awkgram.y:2902
+#, c-format
+msgid "cannot include `%s' and use it as a program file"
+msgstr "`%s' içerilemiyor, uygulama dosyası olarak kullanılıyor"
+
+#: awkgram.y:2891
+#, c-format
+msgid "already included source file `%s'"
+msgstr "kaynak dosyası `%s' içinde zaten var"
+
+#: awkgram.y:2892
+#, c-format
+msgid "already loaded shared library `%s'"
+msgstr "paylaşımlı kütüphane `%s' zaten yüklü"
+
+#: awkgram.y:2929
+msgid "@include is a gawk extension"
+msgstr "@include gawk eklentisidir"
+
+#: awkgram.y:2935
+msgid "empty filename after @include"
+msgstr "boş dosyalı @include"
+
+#: awkgram.y:2990
+msgid "@load is a gawk extension"
+msgstr "@load gawk eklentisidir"
+
+#: awkgram.y:2996
+msgid "empty filename after @load"
+msgstr "boş dosyalı @load"
+
+#: awkgram.y:3134
+msgid "empty program text on command line"
+msgstr "komut satırında boş uygulama metni"
+
+#: awkgram.y:3250 debug.c:471 debug.c:629
+#, c-format
+msgid "cannot read source file `%s': %s"
+msgstr "`%s' kaynak dosyası okunamıyor: %s"
+
+#: awkgram.y:3261
+#, c-format
+msgid "source file `%s' is empty"
+msgstr "kaynak dosyası `%s' boş"
+
+#: awkgram.y:3321
+#, c-format
+msgid "error: invalid character '\\%03o' in source code"
+msgstr "hata: kaynak kod içindeki '\\%03o' karakteri geçersiz"
+
+#: awkgram.y:3548
+msgid "source file does not end in newline"
+msgstr "kaynak dosyasının sonunda satır sonu eksik"
+
+#: awkgram.y:3659
+msgid "unterminated regexp ends with `\\' at end of file"
+msgstr "sonlandırılmamış düzenli ifade dosya sonunda `\\' ile bitiyor"
+
+#: awkgram.y:3688
+msgid "unterminated regexp"
+msgstr "sonlandırılmamış düzenli ifade"
+
+#: awkgram.y:3692
+msgid "unterminated regexp at end of file"
+msgstr "dosya sonunda sonlandırılmamış düzenli ifade"
+
+#: awkgram.y:3781
+msgid "use of `\\ #...' line continuation is not portable"
+msgstr "`\\ #...' satır uzatma kullanımı taşınabilir değil"
+
+#: awkgram.y:3803
+msgid "backslash not last character on line"
+msgstr "tersbölü satırdaki son karakter değil"
+
+#: awkgram.y:3851 awkgram.y:3853 field.c:1157 field.c:1262
+msgid "multidimensional arrays are a gawk extension"
+msgstr "çok boyutlu diziler gawk eklentisidir"
+
+#: awkgram.y:3878 awkgram.y:3889
+#, c-format
+msgid "POSIX does not allow operator `%s'"
+msgstr "`%s' işlecine POSIX izin vermez"
+
+#: awkgram.y:3880 awkgram.y:3891 awkgram.y:3926 awkgram.y:3934
+#, c-format
+msgid "operator `%s' is not supported in old awk"
+msgstr "`%s' işlecini eski awk desteklemiyor"
+
+#: awkgram.y:4031 awkgram.y:4053 command.y:1188
+msgid "unterminated string"
+msgstr "sonlandırılmamış dizge"
+
+#: awkgram.y:4041 main.c:1253
+msgid "POSIX does not allow physical newlines in string values"
+msgstr "Dizge değerlerde fiziki satır sonlarına POSIX izin vermez"
+
+#: awkgram.y:4043 node.c:482
+msgid "backslash string continuation is not portable"
+msgstr "dizge devamı için ters eğik çizgi kullanımı taşınabilir değil"
+
+#: awkgram.y:4295
+#, c-format
+msgid "invalid char '%c' in expression"
+msgstr "ifade içinde '%c' karakteri geçersiz"
+
+#: awkgram.y:4391
+#, c-format
+msgid "`%s' is a gawk extension"
+msgstr "`%s' gawk eklentisidir"
+
+#: awkgram.y:4396
+#, c-format
+msgid "POSIX does not allow `%s'"
+msgstr "`%s' POSIX uyumlu değil"
+
+#: awkgram.y:4404
+#, c-format
+msgid "`%s' is not supported in old awk"
+msgstr "`%s' eski awk tarafından desteklemiyor"
+
+#: awkgram.y:4508
+msgid "`goto' considered harmful!"
+msgstr "`goto' zararlı sayılır!"
+
+#: awkgram.y:4577
+#, c-format
+msgid "%d is invalid as number of arguments for %s"
+msgstr "%d değiştirge sayısı olarak %s için geçersiz"
+
+#: awkgram.y:4612
+#, c-format
+msgid "%s: string literal as last argument of substitute has no effect"
+msgstr "%s: ikamenin son değiştirgesi olarak dizgesel sabit etkisiz"
+
+#: awkgram.y:4617
+#, c-format
+msgid "%s third parameter is not a changeable object"
+msgstr "üçüncü %s değiştirgesi değiştirilebilir bir nesne değil"
+
+#: awkgram.y:4720
+#, fuzzy
+#| msgid "index: regexp constant as second argument is not allowed"
+msgid "match: regexp constant as first argument is probably not what you want"
+msgstr "index: ikinci değiştirge olarak düzenli ifade sabiti kullanılamaz"
+
+#: awkgram.y:4729 awkgram.y:4732
+msgid "match: third argument is a gawk extension"
+msgstr "match: üçüncü değiştirge gawk eklentisidir"
+
+#: awkgram.y:4786 awkgram.y:4789
+msgid "close: second argument is a gawk extension"
+msgstr "close: ikinci değiştirge gawk eklentisidir"
+
+#: awkgram.y:4801
+msgid "use of dcgettext(_\"...\") is incorrect: remove leading underscore"
+msgstr "dcgettext(_\"...\") kullanımı yanlış: baştaki alt çizgiyi kaldırın"
+
+#: awkgram.y:4816
+msgid "use of dcngettext(_\"...\") is incorrect: remove leading underscore"
+msgstr "dcngettext(_\"...\") kullanımı yanlış: baştaki alt çizgiyi kaldırın"
+
+#: awkgram.y:4835
+msgid "index: regexp constant as second argument is not allowed"
+msgstr "index: ikinci değiştirge olarak düzenli ifade sabiti kullanılamaz"
+
+#: awkgram.y:4888
+#, c-format
+msgid "function `%s': parameter `%s' shadows global variable"
+msgstr "`%s' işlevi: değiştirge, `%s'global değişkeni gölgeliyor"
+
+#: awkgram.y:4937 debug.c:4243 debug.c:4286 debug.c:5412 profile.c:116
+#, c-format
+msgid "could not open `%s' for writing: %s"
+msgstr "`%s' yazmak için açılamadı: %s"
+
+#: awkgram.y:4938
+msgid "sending variable list to standard error"
+msgstr "değişken listesi standart hataya gönderiliyor"
+
+#: awkgram.y:4946
+#, c-format
+msgid "%s: close failed: %s"
+msgstr "%s: kapatma başarısız: %s"
+
+#: awkgram.y:4971
+msgid "shadow_funcs() called twice!"
+msgstr "shadow_funcs() iki kere çağrıldı!"
+
+#: awkgram.y:4979
+msgid "there were shadowed variables"
+msgstr "gölgeli değişkenler vardı"
+
+#: awkgram.y:5071
+#, c-format
+msgid "function name `%s' previously defined"
+msgstr "işlev ismi `%s' önceden atanmış"
+
+#: awkgram.y:5122
+#, c-format
+msgid "function `%s': cannot use function name as parameter name"
+msgstr "işlev `%s': işlev ismi değiştirge ismi olarak kullanılamaz"
+
+#: awkgram.y:5125
+#, fuzzy, c-format
+#| msgid ""
+#| "function `%s': cannot use special variable `%s' as a function parameter"
+msgid ""
+"function `%s': parameter `%s': POSIX disallows using a special variable as a "
+"function parameter"
+msgstr "işlev `%s': özel değişken `%s' işlev değiştirgesi olarak kullanılamaz"
+
+#: awkgram.y:5129
+#, c-format
+msgid "function `%s': parameter `%s' cannot contain a namespace"
+msgstr "`%s' işlevi: değiştirge `%s' bir isim alanı içermiyor"
+
+#: awkgram.y:5136
+#, c-format
+msgid "function `%s': parameter #%d, `%s', duplicates parameter #%d"
+msgstr "`%s' işlevi: %d. değiştirge, `%s', %d. değiştirgenin tekrarı"
+
+#: awkgram.y:5225
+#, c-format
+msgid "function `%s' called but never defined"
+msgstr "`%s' işlevi çağrıldı ama hiç atanmamış"
+
+#: awkgram.y:5229
+#, c-format
+msgid "function `%s' defined but never called directly"
+msgstr "`%s' işlevi tanımlı ama hiç doğrudan çağrılmadı"
+
+#: awkgram.y:5261
+#, c-format
+msgid "regexp constant for parameter #%d yields boolean value"
+msgstr "%d numaralı değiştirge bir düzenli ifade sabiti"
+
+#: awkgram.y:5276
+#, c-format
+msgid ""
+"function `%s' called with space between name and `(',\n"
+"or used as a variable or an array"
+msgstr ""
+"`%s' işlevi `(' ile isim arasında boşlukla çağrılmış,\n"
+"ya da bir değişken veya bir dizi olarak kullanılmış"
+
+#: awkgram.y:5500 awkgram.y:5553 mpfr.c:1598 mpfr.c:1619
+msgid "division by zero attempted"
+msgstr "sıfırla bölme hatası"
+
+#: awkgram.y:5509 awkgram.y:5562 mpfr.c:1635
+#, c-format
+msgid "division by zero attempted in `%%'"
+msgstr "`%%'de sıfırla bölme hatası"
+
+#: awkgram.y:5882
+msgid ""
+"cannot assign a value to the result of a field post-increment expression"
+msgstr "sonradan arttırımlı bir alan ifadesinin sonucuna değer atanamaz"
+
+#: awkgram.y:5885
+#, c-format
+msgid "invalid target of assignment (opcode %s)"
+msgstr "atama hedefi geçersiz (opcode %s)"
+
+#: awkgram.y:6265
+msgid "statement has no effect"
+msgstr "deyim etkisiz"
+
+#: awkgram.y:6780
+#, c-format
+msgid "identifier %s: qualified names not allowed in traditional / POSIX mode"
+msgstr ""
+"%s tanımlayıcısı: nitelikli isimlere geleneksel / POSIX kipinde izin verilmez"
+
+#: awkgram.y:6785
+#, c-format
+msgid "identifier %s: namespace separator is two colons, not one"
+msgstr ""
+"%s tanımlayıcısı: isim uzayı ayracı bir değil iki tane iki nokta üst üstedir"
+
+#: awkgram.y:6791
+#, c-format
+msgid "qualified identifier `%s' is badly formed"
+msgstr "niteliki tanıtıcı `%s' kötü biçimlendirilmiş"
+
+#: awkgram.y:6798
+#, c-format
+msgid ""
+"identifier `%s': namespace separator can only appear once in a qualified name"
+msgstr ""
+"%s tanımlayıcısı: isim uzayı ayracı bir nitelikli isimde yalnızca bir kere "
+"belirtilebilir"
+
+#: awkgram.y:6847 awkgram.y:6898
+#, c-format
+msgid "using reserved identifier `%s' as a namespace is not allowed"
+msgstr "isim uzayı olarak `%s' anahtar sözcüğünün kullanımına izin verilmedi"
+
+#: awkgram.y:6854 awkgram.y:6864
+#, c-format
+msgid ""
+"using reserved identifier `%s' as second component of a qualified name is "
+"not allowed"
+msgstr ""
+"nitelikli ismin 2. bileşeni olarak `%s' anahtar sözcüğünün kullanımına izin "
+"verilmedi"
+
+#: awkgram.y:6882
+msgid "@namespace is a gawk extension"
+msgstr "@namespace gawk eklentisidir"
+
+#: awkgram.y:6889
+#, c-format
+msgid "namespace name `%s' must meet identifier naming rules"
+msgstr "isim uzayı adı `%s' tanımlayıcı adlandırma kurallarını karşılamalı"
+
+#: builtin.c:93 builtin.c:100
+#, c-format
+msgid "%s: called with %d arguments"
+msgstr "%s: %d değiştirge ile çağrıldı"
+
+#: builtin.c:125
+#, c-format
+msgid "%s to \"%s\" failed: %s"
+msgstr "%s den \"%s\" ye başarısız: %s"
+
+#: builtin.c:129
+msgid "standard output"
+msgstr "standart çıktı"
+
+#: builtin.c:130
+msgid "standard error"
+msgstr "standart hata"
+
+#: builtin.c:206 builtin.c:544 builtin.c:646 builtin.c:667 builtin.c:1421
+#: builtin.c:1439 builtin.c:1558 builtin.c:2622 mpfr.c:830
+#, c-format
+msgid "%s: received non-numeric argument"
+msgstr "%s: sayısal olmayan değiştirge alındı"
+
+#: builtin.c:212
+#, c-format
+msgid "exp: argument %g is out of range"
+msgstr "exp: %g kapsamdışı"
+
+#: builtin.c:276 builtin.c:615 builtin.c:1021 builtin.c:1083 builtin.c:1330
+#: builtin.c:1363
+#, c-format
+msgid "%s: received non-string argument"
+msgstr "%s: alınan değiştirge dizge değil"
+
+#: builtin.c:293
+#, c-format
+msgid "fflush: cannot flush: pipe `%.*s' opened for reading, not writing"
+msgstr ""
+"fflush: kanala yazılamadı: boru `%.*s' okumak için açıldı, yazmak için değil"
+
+#: builtin.c:296
+#, c-format
+msgid "fflush: cannot flush: file `%.*s' opened for reading, not writing"
+msgstr ""
+"fflush: kanala yazılamadı: dosya `%.*s' okumak için açıldı, yazmak için değil"
+
+#: builtin.c:307
+#, c-format
+msgid "fflush: cannot flush file `%.*s': %s"
+msgstr "fflush: `%.*s' dosyası kanala yazılamıyor: %s"
+
+#: builtin.c:312
+#, c-format
+msgid "fflush: cannot flush: two-way pipe `%.*s' has closed write end"
+msgstr ""
+"fflush: kanala yazılamadı: iki yönlü boru `%.*s' yazma bitiminde kapandı"
+
+#: builtin.c:318
+#, c-format
+msgid "fflush: `%.*s' is not an open file, pipe or co-process"
+msgstr "fflush: `%.*s' bir açık dosya, boru ya da bir yan süreç değil"
+
+#: builtin.c:427 builtin.c:705 builtin.c:915 builtin.c:1600 builtin.c:2899
+#: builtin.c:2986 builtin.c:3053
+#, c-format
+msgid "%s: received non-string first argument"
+msgstr "%s: alınan ilk değiştirge dizge değil"
+
+#: builtin.c:429 builtin.c:2877 builtin.c:2892 builtin.c:2982 builtin.c:3044
+#, c-format
+msgid "%s: received non-string second argument"
+msgstr "%s: alınan ikinci değiştirge dizge değil"
+
+#: builtin.c:649 builtin.c:671
+#, c-format
+msgid "%s: received negative argument %g"
+msgstr "%s: negatif değiştirge %g alındı"
+
+#: builtin.c:692 builtin.c:2975
+#, c-format
+msgid "%s: received non-numeric third argument"
+msgstr "%s: alınan üçüncü değiştirge sayısal değil"
+
+#: builtin.c:699 builtin.c:889 builtin.c:1400 builtin.c:2440 builtin.c:2486
+#: builtin.c:3106
+#, c-format
+msgid "%s: received non-numeric second argument"
+msgstr "%s: alınan ikinci değiştirge sayısal değil"
+
+#: builtin.c:710
+#, c-format
+msgid "substr: length %g is not >= 1"
+msgstr "substr: uzunluk %g >= 1 değil"
+
+#: builtin.c:712
+#, c-format
+msgid "substr: length %g is not >= 0"
+msgstr "substr: uzunluk %g => 0 değil"
+
+#: builtin.c:726
+#, c-format
+msgid "substr: non-integer length %g will be truncated"
+msgstr "substr: tamsayı olmayan uzunluk %g den ondalık kısım çıkarılacak"
+
+#: builtin.c:731
+#, c-format
+msgid "substr: length %g too big for string indexing, truncating to %g"
+msgstr ""
+"substr: dizge indislemesi için uzunluk olarak %g çok fazla, %g den sonrası "
+"gözardı ediliyor"
+
+#: builtin.c:743
+#, c-format
+msgid "substr: start index %g is invalid, using 1"
+msgstr "substr: başlangıç indeksi olarak %g geçersiz, 1 kullanılıyor"
+
+#: builtin.c:748
+#, c-format
+msgid "substr: non-integer start index %g will be truncated"
+msgstr ""
+"substr: tamsayı olmayan başlangıç indeksi %g den ondalık kısım çıkarılacak"
+
+#: builtin.c:771
+msgid "substr: source string is zero length"
+msgstr "substr: kaynak dizge sıfır uzunlukta"
+
+#: builtin.c:785
+#, c-format
+msgid "substr: start index %g is past end of string"
+msgstr "substr: başlangıç indisi %g dizgenin sonundan sonra"
+
+#: builtin.c:793
+#, c-format
+msgid ""
+"substr: length %g at start index %g exceeds length of first argument (%lu)"
+msgstr ""
+"substr: uzunluk %g, %g başlangıç indisinde ilk değiştirgesinin uzunluğunu "
+"(%lu) aşıyor"
+
+#: builtin.c:868
+msgid "strftime: format value in PROCINFO[\"strftime\"] has numeric type"
+msgstr "strftime: PROCINFO[\"strftime\"] içindeki biçem değeri sayısal türde"
+
+#: builtin.c:899
+msgid "strftime: second argument less than 0 or too big for time_t"
+msgstr "strftime: ikinci değiştirge 0'dan küçük ya da time_t için çok büyük"
+
+#: builtin.c:906
+msgid "strftime: second argument out of range for time_t"
+msgstr "strftime: ikinci değiştirge time_t için aralık dışında"
+
+#: builtin.c:922
+msgid "strftime: received empty format string"
+msgstr "strftime: boş biçem dizgesi alındı"
+
+#: builtin.c:1040
+msgid "mktime: at least one of the values is out of the default range"
+msgstr "mktime: en azından değerlerden biri öntanımlı aralığın dışında"
+
+#: builtin.c:1078
+msgid "'system' function not allowed in sandbox mode"
+msgstr "'system' işlevine kum kutusu kipinde izin yok"
+
+#: builtin.c:1145 builtin.c:1220
+msgid "print: attempt to write to closed write end of two-way pipe"
+msgstr "print: iki yönlü borunun kapalı yazma ucuna yazılmaya çalışılıyor"
+
+#: builtin.c:1243
+#, c-format
+msgid "reference to uninitialized field `$%d'"
+msgstr "ilklendirilmemiş `$%d' alanına başvuru"
+
+#: builtin.c:1398 builtin.c:2438 builtin.c:2484 builtin.c:3104
+#, c-format
+msgid "%s: received non-numeric first argument"
+msgstr "%s: alınan ilk değiştirge sayısal değil"
+
+#: builtin.c:1591
+msgid "match: third argument is not an array"
+msgstr "match: üçüncü değiştirge bir dizi değil"
+
+#: builtin.c:1593
+#, c-format
+msgid "%s: cannot use %s as third argument"
+msgstr "%s: %s üçüncü değiştirge olarak kullanılamaz"
+
+#: builtin.c:1851
+#, c-format
+msgid "gensub: third argument `%.*s' treated as 1"
+msgstr "gensub: `%.*s' olan üçüncü değiştirge 1 kabul edildi"
+
+#: builtin.c:2220
+#, c-format
+msgid "%s: can be called indirectly only with two arguments"
+msgstr "%s: örtük olarak yalnızca 2 değiştirge ile çağrılabilir"
+
+#: builtin.c:2243
+msgid "indirect call to gensub requires three or four arguments"
+msgstr "gensub örtük çağrısı üç veya dört değiştirge gerektirir"
+
+#: builtin.c:2305
+msgid "indirect call to match requires two or three arguments"
+msgstr "match örtük çağrısı iki veya üç değiştirge gerektirir"
+
+#: builtin.c:2366
+#, c-format
+msgid "indirect call to %s requires two to four arguments"
+msgstr "%s örtük çağrısı iki ila dört değiştirge gerektirir"
+
+#: builtin.c:2446
+#, c-format
+msgid "lshift(%f, %f): negative values are not allowed"
+msgstr "lshift(%f, %f): negatif değerler kullanılamaz"
+
+#: builtin.c:2449
+#, c-format
+msgid "lshift(%f, %f): fractional values will be truncated"
+msgstr "lshift(%f, %f): ondalık kısımlar kırpılacak"
+
+#: builtin.c:2460
+#, fuzzy, c-format
+#| msgid "lshift(%f, %f): too large shift value will give strange results"
+msgid "lshift(%f, %f): too large shift value returns zero"
+msgstr "lshift(%f, %f): çok büyük kaydırma değeri tuhaf sonuçlar verecek"
+
+#: builtin.c:2492
+#, c-format
+msgid "rshift(%f, %f): negative values are not allowed"
+msgstr "rshift(%lf, %lf): negatif değerlere izin yok"
+
+#: builtin.c:2495
+#, c-format
+msgid "rshift(%f, %f): fractional values will be truncated"
+msgstr "rshift(%f, %f): ondalık kısımlar kırpılacak"
+
+#: builtin.c:2506
+#, fuzzy, c-format
+#| msgid "rshift(%f, %f): too large shift value will give strange results"
+msgid "rshift(%f, %f): too large shift value returns zero"
+msgstr "rshift(%f, %f): çok büyük kaydırma değeri tuhaf sonuçlar verecek"
+
+#: builtin.c:2527 builtin.c:2558 builtin.c:2588
+#, c-format
+msgid "%s: called with less than two arguments"
+msgstr "%s: ikiden az değiştirge ile çağrıldı"
+
+#: builtin.c:2532 builtin.c:2563 builtin.c:2594
+#, c-format
+msgid "%s: argument %d is non-numeric"
+msgstr "%s: %d. değiştirge sayısal değil"
+
+#: builtin.c:2536 builtin.c:2567 builtin.c:2598
+#, c-format
+msgid "%s: argument %d negative value %g is not allowed"
+msgstr "%s: %d. değiştirgede %g negatif değerine izin verilmiyor"
+
+#: builtin.c:2627
+#, c-format
+msgid "compl(%f): negative value is not allowed"
+msgstr "compl(%f): negatif değere izin yok"
+
+#: builtin.c:2630
+#, c-format
+msgid "compl(%f): fractional value will be truncated"
+msgstr "compl(%f): ondalık kısım kırpılacak"
+
+#: builtin.c:2761
+msgid "hexadecimal floating point constants require an exponent"
+msgstr ""
+
+#: builtin.c:2833
+#, c-format
+msgid "dcgettext: `%s' is not a valid locale category"
+msgstr "dcgettext: `%s' geçerli bir yerel kategori değil"
+
+#: builtin.c:2868 builtin.c:2886
+#, c-format
+msgid "%s: received non-string third argument"
+msgstr "%s: alınan üçüncü değiştirge dizge değil"
+
+#: builtin.c:2941 builtin.c:2962
+#, c-format
+msgid "%s: received non-string fifth argument"
+msgstr "%s: alınan beşinci değiştirge dizge değil"
+
+#: builtin.c:2951 builtin.c:2968
+#, c-format
+msgid "%s: received non-string fourth argument"
+msgstr "%s: alınan dördüncü değiştirge dizge değil"
+
+#: builtin.c:3096 mpfr.c:1346
+msgid "intdiv: third argument is not an array"
+msgstr "intdiv: üçüncü değiştirge bir dizi değil"
+
+#: builtin.c:3115 mpfr.c:1395
+msgid "intdiv: division by zero attempted"
+msgstr "intdiv: sıfırla bölme hatası"
+
+#: builtin.c:3156
+msgid "typeof: second argument is not an array"
+msgstr "typeof: ikinci değiştirge bir dizi değil"
+
+#: builtin.c:3260
+#, c-format
+msgid ""
+"typeof detected invalid flags combination `%s'; please file a bug report"
+msgstr ""
+"typeof `%s' geçersiz seçenek birleşimini saptadı; lütfen hata bildirimi yapın"
+
+#: builtin.c:3299
+#, c-format
+msgid "typeof: unknown argument type `%s'"
+msgstr "typeof: değiştirge türü `%s' bilinmiyor"
+
+#: cint_array.c:1268 cint_array.c:1296
+#, c-format
+msgid "cannot add a new file (%.*s) to ARGV in sandbox mode"
+msgstr "Kum kutusu kipinde ARGV'ye yeni dosya (%.*s) eklenemez"
+
+#: command.y:228
+#, c-format
+msgid "Type (g)awk statement(s). End with the command `end'\n"
+msgstr "(g)awk deyimlerini yazın. `end' komutuyla bitirin\n"
+
+#: command.y:292
+#, c-format
+msgid "invalid frame number: %d"
+msgstr "çerçeve numarası geçersiz: %d"
+
+#: command.y:298
+#, c-format
+msgid "info: invalid option - `%s'"
+msgstr "info: geçersiz seçenek - `%s'"
+
+#: command.y:324
+#, c-format
+msgid "source: `%s': already sourced"
+msgstr "source: `%s': zaten yürütülüyor"
+
+#: command.y:329
+#, c-format
+msgid "save: `%s': command not permitted"
+msgstr "save: `%s': komuta izin yok"
+
+#: command.y:342
+msgid "cannot use command `commands' for breakpoint/watchpoint commands"
+msgstr "kesme/izleme noktası komutları için `commands' komutu kullanılamıyor"
+
+#: command.y:344
+msgid "no breakpoint/watchpoint has been set yet"
+msgstr "henüz atanmış bir kesme/izleme noktası yok"
+
+#: command.y:346
+msgid "invalid breakpoint/watchpoint number"
+msgstr "kesme/izleme noktası numarası geçersiz"
+
+#: command.y:351
+#, c-format
+msgid "Type commands for when %s %d is hit, one per line.\n"
+msgstr ""
+"Her satıra bir tane olmak üzere, %s %d isabetine ulaşıldığında kullanılacak "
+"komutları yazın.\n"
+
+#: command.y:353
+#, c-format
+msgid "End with the command `end'\n"
+msgstr "`end' komutuyla sonlandı\n"
+
+#: command.y:360
+msgid "`end' valid only in command `commands' or `eval'"
+msgstr "`end' yalnızca `commands' veya `eval' komutunda geçerlidir"
+
+#: command.y:370
+msgid "`silent' valid only in command `commands'"
+msgstr "`silent' yalnızca `commands' komutunda geçerlidir"
+
+#: command.y:376
+#, c-format
+msgid "trace: invalid option - `%s'"
+msgstr "trace: geçersiz seçenek - `%s'"
+
+#: command.y:390
+msgid "condition: invalid breakpoint/watchpoint number"
+msgstr "condition: kesme/izleme noktası numarası geçersiz"
+
+#: command.y:452
+msgid "argument not a string"
+msgstr "değiştirge bir dizge değil"
+
+#: command.y:462 command.y:467
+#, c-format
+msgid "option: invalid parameter - `%s'"
+msgstr "option: geçersiz değiştirge - `%s'"
+
+#: command.y:477
+#, c-format
+msgid "no such function - `%s'"
+msgstr "böyle bir işlev yok - `%s'"
+
+#: command.y:534
+#, c-format
+msgid "enable: invalid option - `%s'"
+msgstr "enable: geçersiz seçenek - `%s'"
+
+#: command.y:600
+#, c-format
+msgid "invalid range specification: %d - %d"
+msgstr "aralık belirtimi geçersiz: %d - %d"
+
+#: command.y:662
+msgid "non-numeric value for field number"
+msgstr "alan numarası için değer bir sayı değil"
+
+#: command.y:683 command.y:690
+msgid "non-numeric value found, numeric expected"
+msgstr "sayısal değer beklenirken sayı olmayan değer bulundu"
+
+#: command.y:715 command.y:721
+msgid "non-zero integer value"
+msgstr "sıfırdan farklı tamsayı değer"
+
+#: command.y:820
+msgid ""
+"backtrace [N] - print trace of all or N innermost (outermost if N < 0) frames"
+msgstr ""
+"backtrace [N] - tümünün veya en içteki (N < 0 ise en dıştaki) N çerçevenin "
+"izini bas"
+
+#: command.y:822
+msgid ""
+"break [[filename:]N|function] - set breakpoint at the specified location"
+msgstr "break [[dosya:]N|işlev] - belirtilen konuma kesme noktası atar"
+
+#: command.y:824
+msgid "clear [[filename:]N|function] - delete breakpoints previously set"
+msgstr "clear [[dosya:]N|işlev] - önceden belirlenmiş kesme noktasını siler"
+
+#: command.y:826
+msgid ""
+"commands [num] - starts a list of commands to be executed at a "
+"breakpoint(watchpoint) hit"
+msgstr ""
+"commands [sayı] - starts a list of commands to be executed at a "
+"breakpoint(watchpoint) hit"
+
+#: command.y:828
+msgid "condition num [expr] - set or clear breakpoint or watchpoint condition"
+msgstr ""
+"condition num [ifade] - kesme/izleme noktası koşulunu tanımlar veya temizler"
+
+#: command.y:830
+msgid "continue [COUNT] - continue program being debugged"
+msgstr "continue [SAYI] - hata ayıklanan yazılıma devam eder"
+
+#: command.y:832
+msgid "delete [breakpoints] [range] - delete specified breakpoints"
+msgstr "delete [kesmenoktaları] [aralık] - belirtilen kesme noktalarını siler"
+
+#: command.y:834
+msgid "disable [breakpoints] [range] - disable specified breakpoints"
+msgstr ""
+"disable [kesmenoktaları] [aralık] - belirtilen kesme noktalarını iptal eder"
+
+#: command.y:836
+msgid "display [var] - print value of variable each time the program stops"
+msgstr "display [dğş] - uygulamanın her duruşunda değişkenin değeri basılır"
+
+#: command.y:838
+msgid "down [N] - move N frames down the stack"
+msgstr "down [N] - N kareyi yığıtta aşağı taşır"
+
+#: command.y:840
+msgid "dump [filename] - dump instructions to file or stdout"
+msgstr "dump [dosya] - talimatları dosyaya veya standart çıktıya döker"
+
+#: command.y:842
+msgid "enable [once|del] [breakpoints] [range] - enable specified breakpoints"
+msgstr ""
+"enable [once|del] [kesmenoktaları] [aralık] - belirtilen kesme noktaları "
+"etkin olur"
+
+#: command.y:844
+msgid "end - end a list of commands or awk statements"
+msgstr "end - komut ve awk deyimleri listesini sonlandırır"
+
+#: command.y:846
+msgid "eval stmt|[p1, p2, ...] - evaluate awk statement(s)"
+msgstr "eval stmt|[p1, p2, ...] - awk deyim(ler)ini yorumlar"
+
+#: command.y:848
+msgid "exit - (same as quit) exit debugger"
+msgstr "exit - (quit gibi) hata ayıklayıcıdan çıkar"
+
+#: command.y:850
+msgid "finish - execute until selected stack frame returns"
+msgstr "finish - seçili yığıt çerçevesi dönene kadar yürütme sürer"
+
+#: command.y:852
+msgid "frame [N] - select and print stack frame number N"
+msgstr "frame [N] - N'inci yığıt çerçevesini seçer ve basar"
+
+#: command.y:854
+msgid "help [command] - print list of commands or explanation of command"
+msgstr "help [komut] - komutun açıklamasını ya da komutların listesini basar"
+
+#: command.y:856
+msgid "ignore N COUNT - set ignore-count of breakpoint number N to COUNT"
+msgstr ""
+"ignore N SAYI - N kesme noktasının yoksayma sayısını SAYI olarak ayarlar"
+
+#: command.y:858
+msgid ""
+"info topic - source|sources|variables|functions|break|frame|args|locals|"
+"display|watch"
+msgstr ""
+"info başlığı - source|sources|variables|functions|break|frame|args|locals|"
+"display|watch"
+
+#: command.y:860
+msgid "list [-|+|[filename:]lineno|function|range] - list specified line(s)"
+msgstr ""
+"list [-|+|[dosya:]satırno|işlev|aralık] - belirtilen satır(lar)ı listeler"
+
+#: command.y:862
+msgid "next [COUNT] - step program, proceeding through subroutine calls"
+msgstr "next [SAYI] - adım uygulaması, alt yordam çağrıları yoluyla ilerler"
+
+#: command.y:864
+msgid ""
+"nexti [COUNT] - step one instruction, but proceed through subroutine calls"
+msgstr ""
+"nexti [SAYI] - tek adım talimatı, ancak alt yordam çağrıları yoluyla devam "
+"eder"
+
+#: command.y:866
+msgid "option [name[=value]] - set or display debugger option(s)"
+msgstr ""
+"option [isim[=değer]] - hata ayıklama seçeneğini tanımlar veya görüntüler"
+
+#: command.y:868
+msgid "print var [var] - print value of a variable or array"
+msgstr "print var [değ] - belirtilen değişken veya dizinin değerini basar"
+
+#: command.y:870
+msgid "printf format, [arg], ... - formatted output"
+msgstr "printf biçem, [değ], ... - biçemli çıktı"
+
+#: command.y:872
+msgid "quit - exit debugger"
+msgstr "quit - hata ayıklayıcıdan çıkar"
+
+#: command.y:874
+msgid "return [value] - make selected stack frame return to its caller"
+msgstr "return [değer] - seçilen yığıt çerçevesinin çağrıcıya dönmesini sağlar"
+
+#: command.y:876
+msgid "run - start or restart executing program"
+msgstr ""
+"run - uygulamanın çalışmasını başlatır veya çalışıyorsa yeniden başlatır"
+
+#: command.y:879
+msgid "save filename - save commands from the session to file"
+msgstr "save dosya - oturumdaki komutları dosyaya kaydeder"
+
+#: command.y:882
+msgid "set var = value - assign value to a scalar variable"
+msgstr "set değişken = değer - değeri bir sayıl değişkene atar"
+
+#: command.y:884
+msgid "silent - suspends usual message when stopped at a breakpoint/watchpoint"
+msgstr "silent - bir kesme/izleme noktasında durduğunda ileti askıya alınır"
+
+#: command.y:886
+msgid "source file - execute commands from file"
+msgstr "source dosya - dosyadaki komutları çalıştırır"
+
+#: command.y:888
+msgid "step [COUNT] - step program until it reaches a different source line"
+msgstr ""
+"step [SAYI] - farklı bir kaynak satırına ulaşana kadar uygulamayı adımlar"
+
+#: command.y:890
+msgid "stepi [COUNT] - step one instruction exactly"
+msgstr "stepi [SAYI] - tam olarak bir talimatlık adımlar"
+
+#: command.y:892
+msgid "tbreak [[filename:]N|function] - set a temporary breakpoint"
+msgstr "tbreak [[dosya:]N|işlev] - geçici bir kesme noktası tanımlar"
+
+#: command.y:894
+msgid "trace on|off - print instruction before executing"
+msgstr "trace on|off - çalıştırmadan önce talimatı basar"
+
+#: command.y:896
+msgid "undisplay [N] - remove variable(s) from automatic display list"
+msgstr "undisplay [N] - değişkenleri otomatik görüntüleme listesinden kaldırır"
+
+#: command.y:898
+msgid ""
+"until [[filename:]N|function] - execute until program reaches a different "
+"line or line N within current frame"
+msgstr ""
+"until [[dosya:]N|işlev] - farklı bir satıra veya geçerli çerçeve içindeki N. "
+"satıra ulaşana kadar uygulamayı yürütür"
+
+#: command.y:900
+msgid "unwatch [N] - remove variable(s) from watch list"
+msgstr "unwatch [N] - değişkenleri izleme listesinden kaldırır"
+
+#: command.y:902
+msgid "up [N] - move N frames up the stack"
+msgstr "up [N] - N çerçeveyi yığıtta yukarı taşır"
+
+#: command.y:904
+msgid "watch var - set a watchpoint for a variable"
+msgstr "watch değ - değişken için izleme noktası tanımlar"
+
+#: command.y:906
+msgid ""
+"where [N] - (same as backtrace) print trace of all or N innermost (outermost "
+"if N < 0) frames"
+msgstr ""
+"where [N] - (backtrace gibi) tamamını veya en içteki (N < 0 ise en dıştaki) "
+"N çerçeveyi basar"
+
+#: command.y:1017 debug.c:424 gawkapi.c:262 msg.c:142
+#, c-format
+msgid "error: "
+msgstr "hata: "
+
+#: command.y:1061
+#, c-format
+msgid "cannot read command: %s\n"
+msgstr "komut okunamıyor: %s\n"
+
+#: command.y:1075
+#, c-format
+msgid "cannot read command: %s"
+msgstr "komut okunamıyor: %s"
+
+#: command.y:1126
+msgid "invalid character in command"
+msgstr "Komuttaki karakter geçersiz"
+
+#: command.y:1162
+#, c-format
+msgid "unknown command - `%.*s', try help"
+msgstr "bilinmeyen komut - `%.*s', help yazın"
+
+#: command.y:1294
+msgid "invalid character"
+msgstr "karakter geçersiz"
+
+#: command.y:1498
+#, c-format
+msgid "undefined command: %s\n"
+msgstr "tanımsız komut: %s\n"
+
+#: debug.c:257
+msgid "set or show the number of lines to keep in history file"
+msgstr "geçmiş dosyasında tutulan satır sayısını tanımlar veya görüntüler"
+
+#: debug.c:259
+msgid "set or show the list command window size"
+msgstr "liste komutu pencere boyutunu tanımlar veya görüntüler"
+
+#: debug.c:261
+msgid "set or show gawk output file"
+msgstr "gawk çıktı dosyasını tanımlar veya görüntüler"
+
+#: debug.c:263
+msgid "set or show debugger prompt"
+msgstr "hata ayıklama istemini tanımlar veya görüntüler"
+
+#: debug.c:265
+msgid "(un)set or show saving of command history (value=on|off)"
+msgstr ""
+"komut geçmişinin kaydedilmesi etkin/etkisiz olur veya görüntülenir (değer=on|"
+"off)"
+
+#: debug.c:267
+msgid "(un)set or show saving of options (value=on|off)"
+msgstr ""
+"seçeneklerin kaydedilmesi etkin/etkisiz olur veya görüntülenir (değer=on|off)"
+
+#: debug.c:269
+msgid "(un)set or show instruction tracing (value=on|off)"
+msgstr "talimat izleme etkin/etkisiz olur veya görüntülenir (değer=on|off)"
+
+#: debug.c:358
+#, fuzzy, c-format
+#| msgid "program not running"
+msgid "%s:%d:%s: program not running"
+msgstr "uygulama çalışıyor"
+
+#: debug.c:476
+#, c-format
+msgid "source file `%s' is empty.\n"
+msgstr "kaynak dosyası `%s' boş.\n"
+
+#: debug.c:503
+msgid "no current source file"
+msgstr "geçerli kaynak dosyası yok"
+
+#: debug.c:528
+#, c-format
+msgid "cannot find source file named `%s': %s"
+msgstr "kaynak dosyası `%s' bulunamıyor: %s"
+
+#: debug.c:552
+#, c-format
+msgid "warning: source file `%s' modified since program compilation.\n"
+msgstr ""
+"uyarı: uygulamanın derlenmesinden beri `%s' kaynak dosyası değişikliğe "
+"uğradı.\n"
+
+#: debug.c:574
+#, c-format
+msgid "line number %d out of range; `%s' has %d lines"
+msgstr "satır numarası %d aralık dışında: `%s' içinde %d satır var"
+
+#: debug.c:634
+#, c-format
+msgid "unexpected eof while reading file `%s', line %d"
+msgstr "`%s' dosyası okunurken %d. satırda beklenmeyen satır sonu"
+
+#: debug.c:643
+#, c-format
+msgid "source file `%s' modified since start of program execution"
+msgstr ""
+"`%s' kaynak dosyası uygulama yürütmesinin başlangıcından bu yana değiştirildi"
+
+#: debug.c:755
+#, c-format
+msgid "Current source file: %s\n"
+msgstr "Geçerli kaynak dosyası: %s\n"
+
+#: debug.c:756
+#, c-format
+msgid "Number of lines: %d\n"
+msgstr "Satır sayısı: %d\n"
+
+#: debug.c:763
+#, c-format
+msgid "Source file (lines): %s (%d)\n"
+msgstr "Kaynak dosyası (satır sayısı): %s (%d)\n"
+
+#: debug.c:777
+msgid ""
+"Number  Disp  Enabled  Location\n"
+"\n"
+msgstr ""
+"Numara  Gör    Etkin    Konum\n"
+"\n"
+
+#: debug.c:788
+#, c-format
+msgid "\tnumber of hits = %ld\n"
+msgstr "\tisabet sayısı = %ld\n"
+
+#: debug.c:790
+#, c-format
+msgid "\tignore next %ld hit(s)\n"
+msgstr "\tsonraki %ld isabeti yoksay\n"
+
+#: debug.c:792 debug.c:932
+#, c-format
+msgid "\tstop condition: %s\n"
+msgstr "\tdurma koşulu: %s\n"
+
+#: debug.c:794 debug.c:934
+msgid "\tcommands:\n"
+msgstr "\tkomutlar:\n"
+
+#: debug.c:816
+#, c-format
+msgid "Current frame: "
+msgstr "Geçerli çerçeve: "
+
+#: debug.c:819
+#, c-format
+msgid "Called by frame: "
+msgstr "Çerçevenin çağırdığı: "
+
+#: debug.c:823
+#, c-format
+msgid "Caller of frame: "
+msgstr "Çerçeveyi çağıran: "
+
+#: debug.c:841
+#, c-format
+msgid "None in main().\n"
+msgstr "main() içinde yok.\n"
+
+#: debug.c:871
+msgid "No arguments.\n"
+msgstr "Hiç değiştirge yok.\n"
+
+#: debug.c:872
+msgid "No locals.\n"
+msgstr "Yerli öğe yok.\n"
+
+#: debug.c:880
+msgid ""
+"All defined variables:\n"
+"\n"
+msgstr ""
+"Tanımlı tüm değişkenler:\n"
+"\n"
+
+#: debug.c:890
+msgid ""
+"All defined functions:\n"
+"\n"
+msgstr ""
+"Tanımlı tüm işlevler:\n"
+"\n"
+
+#: debug.c:909
+msgid ""
+"Auto-display variables:\n"
+"\n"
+msgstr ""
+"Auto-display değişkenleri:\n"
+"\n"
+
+#: debug.c:912
+msgid ""
+"Watch variables:\n"
+"\n"
+msgstr ""
+"İzlenen değişkenler:\n"
+"\n"
+
+#: debug.c:1055
+#, c-format
+msgid "no symbol `%s' in current context\n"
+msgstr "geçerli bağlamda `%s' diye bir simge yok\n"
+
+#: debug.c:1067 debug.c:1496
+#, c-format
+msgid "`%s' is not an array\n"
+msgstr "`%s' bir dizi değil\n"
+
+#: debug.c:1081
+#, c-format
+msgid "$%ld = uninitialized field\n"
+msgstr "$%ld = ilklendirilmemiş alan\n"
+
+#: debug.c:1126
+#, c-format
+msgid "array `%s' is empty\n"
+msgstr "`%s' dizisi boş\n"
+
+#: debug.c:1185 debug.c:1237
+#, c-format
+msgid "subscript \"%.*s\" is not in array `%s'\n"
+msgstr "\"%.*s\" indisi `%s' dizisi içinde değil\n"
+
+#: debug.c:1241
+#, c-format
+msgid "`%s[\"%.*s\"]' is not an array\n"
+msgstr "`%s[\"%.*s\"]' bir dizi değil\n"
+
+#: debug.c:1303 debug.c:5172
+#, c-format
+msgid "`%s' is not a scalar variable"
+msgstr "`%s' sayıl bir değişken değil"
+
+#: debug.c:1326 debug.c:5202
+#, c-format
+msgid "attempt to use array `%s[\"%.*s\"]' in a scalar context"
+msgstr "`%s[\"%.*s\"]' dizisi sayıl bağlamda kullanılmaya çalışılıyor"
+
+#: debug.c:1349 debug.c:5213
+#, c-format
+msgid "attempt to use scalar `%s[\"%.*s\"]' as array"
+msgstr "sayıl %s[\"%.*s\"]' dizi olarak kullanılmaya çalışılıyor"
+
+#: debug.c:1492
+#, c-format
+msgid "`%s' is a function"
+msgstr "`%s' bir işlevdir"
+
+#: debug.c:1534
+#, c-format
+msgid "watchpoint %d is unconditional\n"
+msgstr "%d izleme noktası koşulsuz\n"
+
+#: debug.c:1568
+#, c-format
+msgid "no display item numbered %ld"
+msgstr "%ld numaralı görüntüleme öğesi yok"
+
+#: debug.c:1571
+#, c-format
+msgid "no watch item numbered %ld"
+msgstr "%ld numaralı izleme öğesi yok"
+
+#: debug.c:1597
+#, c-format
+msgid "%d: subscript \"%.*s\" is not in array `%s'\n"
+msgstr "%d: \"%.*s\" indisi `%s' dizisi içinde değil\n"
+
+#: debug.c:1841
+msgid "attempt to use scalar value as array"
+msgstr "sayıl değer dizi olarak kullanılmaya çalışılıyor"
+
+#: debug.c:1932
+#, c-format
+msgid "Watchpoint %d deleted because parameter is out of scope.\n"
+msgstr "Değiştirge kapsamdışı olduğundan %d izleme noktası silindi.\n"
+
+#: debug.c:1943
+#, c-format
+msgid "Display %d deleted because parameter is out of scope.\n"
+msgstr "display %d silindi, çünkü değiştirge kapsamdışı.\n"
+
+#: debug.c:1976
+#, c-format
+msgid " in file `%s', line %d\n"
+msgstr " `%s' dosyasının %d. satırında\n"
+
+#: debug.c:1997
+#, c-format
+msgid " at `%s':%d"
+msgstr " `%s':%d. satırda"
+
+#: debug.c:2013 debug.c:2076
+#, c-format
+msgid "#%ld\tin "
+msgstr "bu dosyanın %ld. satırı: "
+
+#: debug.c:2050
+#, c-format
+msgid "More stack frames follow ...\n"
+msgstr "Daha fazla yığın çerçevesi takip eder ...\n"
+
+#: debug.c:2093
+msgid "invalid frame number"
+msgstr "çerçeve numarası geçersiz"
+
+#: debug.c:2276
+#, c-format
+msgid "Note: breakpoint %d (enabled, ignore next %ld hits), also set at %s:%d"
+msgstr ""
+"Bilgi: kesme noktası %d (etkinleştirildi, sonraki %ld isabet yok sayılıyor), "
+"ayrıca %s:%d etkinleştirildi"
+
+#: debug.c:2283
+#, c-format
+msgid "Note: breakpoint %d (enabled), also set at %s:%d"
+msgstr ""
+"Bilgi: kesme noktası %d (etkinleştirildi), ayrıca %s:%d etkinleştirildi"
+
+#: debug.c:2290
+#, c-format
+msgid "Note: breakpoint %d (disabled, ignore next %ld hits), also set at %s:%d"
+msgstr ""
+"Bilgi: kesme noktası %d (iptal edildi, sonraki %ld isabet yok sayılıyor), "
+"ayrıca %s:%d etkinleştirildi"
+
+#: debug.c:2297
+#, c-format
+msgid "Note: breakpoint %d (disabled), also set at %s:%d"
+msgstr "Bilgi: kesme noktası %d (iptal edildi), ayrıca %s:%d etkinleştirildi"
+
+#: debug.c:2314
+#, c-format
+msgid "Breakpoint %d set at file `%s', line %d\n"
+msgstr "%d. kesme noktası `%s' dosyasının %d. satırına atandı\n"
+
+#: debug.c:2416
+#, c-format
+msgid "cannot set breakpoint in file `%s'\n"
+msgstr "`%s' dosyasında kesme noktası oluşturulamıyor\n"
+
+#: debug.c:2445
+#, c-format
+msgid "line number %d in file `%s' is out of range"
+msgstr "satır numarası %d, `%s' dosyası için aralık dışında"
+
+#: debug.c:2449
+#, c-format
+msgid "internal error: cannot find rule\n"
+msgstr "iç hata: kural bulunamadı\n"
+
+#: debug.c:2451
+#, c-format
+msgid "cannot set breakpoint at `%s':%d\n"
+msgstr "`%s':%d. satırda kesme noktası oluşturulamıyor\n"
+
+#: debug.c:2463
+#, c-format
+msgid "cannot set breakpoint in function `%s'\n"
+msgstr "`%s' işlevinde kesme noktası oluşturulamıyor\n"
+
+#: debug.c:2481
+#, c-format
+msgid "breakpoint %d set at file `%s', line %d is unconditional\n"
+msgstr ""
+"%d. kesme noktasının `%s' dosyasının %d. satırında atanması koşulsuzdur.\n"
+
+#: debug.c:2569 debug.c:3427
+#, c-format
+msgid "line number %d in file `%s' out of range"
+msgstr "satır numarası %d, `%s' dosyası için aralık dışı"
+
+#: debug.c:2585 debug.c:2607
+#, c-format
+msgid "Deleted breakpoint %d"
+msgstr "Kesme noktası %d silindi"
+
+#: debug.c:2591
+#, c-format
+msgid "No breakpoint(s) at entry to function `%s'\n"
+msgstr "`%s' işlevine girdide kesme noktası yok\n"
+
+#: debug.c:2618
+#, c-format
+msgid "No breakpoint at file `%s', line #%d\n"
+msgstr "`%s' dosyasının %d. satırında kesme noktası yok\n"
+
+#: debug.c:2673 debug.c:2714 debug.c:2734 debug.c:2777
+msgid "invalid breakpoint number"
+msgstr "kesme noktası numarası geçersiz"
+
+#: debug.c:2689
+msgid "Delete all breakpoints? (y or n) "
+msgstr "Tüm kesme noktaları silinsin mi? (y, e veya n, h)"
+
+#: debug.c:2690 debug.c:3001 debug.c:3054
+msgid "y"
+msgstr "e"
+
+#: debug.c:2739
+#, c-format
+msgid "Will ignore next %ld crossing(s) of breakpoint %d.\n"
+msgstr "%2$d kesme noktasının sonraki %1$ld geçişi yok sayılacak.\n"
+
+#: debug.c:2743
+#, c-format
+msgid "Will stop next time breakpoint %d is reached.\n"
+msgstr "%d kesme noktasına tekrar ulaşıldığında duracak.\n"
+
+#: debug.c:2861
+#, c-format
+msgid "Can only debug programs provided with the `-f' option.\n"
+msgstr "Yalnızca, `-f' seçenekli uygulamalar hata ayıklayabilir.\n"
+
+#: debug.c:2881
+#, c-format
+msgid "Restarting ...\n"
+msgstr "Yeniden başlatılıyor...\n"
+
+#: debug.c:2986
+#, c-format
+msgid "Failed to restart debugger"
+msgstr "Hata ayıklayıcı yeniden başlatılamadı"
+
+#: debug.c:3000
+msgid "Program already running. Restart from beginning (y/n)? "
+msgstr "Uygulama zaten çalışıyor. Baştan başlatılsın mı (y/n)? "
+
+#: debug.c:3004
+#, c-format
+msgid "Program not restarted\n"
+msgstr "Uygulama yeniden başlamadı\n"
+
+#: debug.c:3014
+#, c-format
+msgid "error: cannot restart, operation not allowed\n"
+msgstr ""
+"hata: yeniden başlatılamıyor, işleme izin verilmedi\n"
+"\n"
+
+#: debug.c:3020
+#, c-format
+msgid "error (%s): cannot restart, ignoring rest of the commands\n"
+msgstr "hata (%s): yeniden başlatılamıyor, komutların kalanı yok sayılıyor\n"
+
+#: debug.c:3028
+#, c-format
+msgid "Starting program:\n"
+msgstr "Uygulama başlatılıyor:\n"
+
+#: debug.c:3038
+#, c-format
+msgid "Program exited abnormally with exit value: %d\n"
+msgstr "Anormal şekilde uygulamadan çıkıldı. Çıkış değeri: %d\n"
+
+#: debug.c:3039
+#, c-format
+msgid "Program exited normally with exit value: %d\n"
+msgstr "Normal şekilde uygulamadan çıkıldı. Çıkış değeri: %d\n"
+
+#: debug.c:3053
+msgid "The program is running. Exit anyway (y/n)? "
+msgstr "Uygulama çalışıyor. Yine de çıkılsın mı (y/n)? "
+
+#: debug.c:3088
+#, c-format
+msgid "Not stopped at any breakpoint; argument ignored.\n"
+msgstr "Herhangi bir kesme noktasında durmadı; değiştirge yok sayıldı.\n"
+
+#: debug.c:3093
+#, c-format
+msgid "invalid breakpoint number %d"
+msgstr "kesme noktası numarası %d geçersiz"
+
+#: debug.c:3098
+#, c-format
+msgid "Will ignore next %ld crossings of breakpoint %d.\n"
+msgstr "%2$d kesme noktasının sonraki %1$ld geçişi yok sayılacak.\n"
+
+#: debug.c:3285
+#, c-format
+msgid "'finish' not meaningful in the outermost frame main()\n"
+msgstr "'finish' dış çerçeve main() içinde anlamlı değil\n"
+
+#: debug.c:3290
+#, c-format
+msgid "Run until return from "
+msgstr "Şundan dönene kadar çalışır: "
+
+#: debug.c:3333
+#, c-format
+msgid "'return' not meaningful in the outermost frame main()\n"
+msgstr ""
+"'return' dış çerçeve main() içinde anlamlı değil\n"
+"\n"
+
+#: debug.c:3446
+#, c-format
+msgid "cannot find specified location in function `%s'\n"
+msgstr "belirtilen konum, `%s' işlevinde bulunamadı\n"
+
+#: debug.c:3454
+#, c-format
+msgid "invalid source line %d in file `%s'"
+msgstr "`%2$s' dosyasındaki %1$d. kaynak satırı geçersiz"
+
+#: debug.c:3469
+#, c-format
+msgid "cannot find specified location %d in file `%s'\n"
+msgstr "belirtilen konum %d, `%s' dosyasında bulunamadı\n"
+
+#: debug.c:3501
+#, c-format
+msgid "element not in array\n"
+msgstr "öğe dizide yok\n"
+
+#: debug.c:3501
+#, c-format
+msgid "untyped variable\n"
+msgstr "yazılmamış değişken\n"
+
+#: debug.c:3543
+#, c-format
+msgid "Stopping in %s ...\n"
+msgstr "%s de durduruluyor ...\n"
+
+#: debug.c:3620
+#, c-format
+msgid "'finish' not meaningful with non-local jump '%s'\n"
+msgstr "'finish' yerel olmayan '%s' atlaması ile anlamlı değil\n"
+
+#: debug.c:3627
+#, c-format
+msgid "'until' not meaningful with non-local jump '%s'\n"
+msgstr ""
+"'until' yerel olmayan '%s' atlaması ile anlamlı değil\n"
+"\n"
+
+#. TRANSLATORS: don't translate the 'q' inside the brackets.
+#: debug.c:4388
+msgid "\t------[Enter] to continue or [q] + [Enter] to quit------"
+msgstr "--Devam etmek için [Enter] - Çıkmak için [q] + [Enter]--"
+
+#: debug.c:5209
+#, c-format
+msgid "[\"%.*s\"] not in array `%s'"
+msgstr "[\"%.*s\"] öğesi `%s' dizisinde değil"
+
+#: debug.c:5415
+#, c-format
+msgid "sending output to stdout\n"
+msgstr "çıktı standart çıktıya gönderiliyor\n"
+
+#: debug.c:5455
+msgid "invalid number"
+msgstr "sayı geçersiz"
+
+#: debug.c:5589
+#, c-format
+msgid "`%s' not allowed in current context; statement ignored"
+msgstr "`%s' geçerli bağlamda izin verilmiyor; deyim yok sayıldı"
+
+#: debug.c:5597
+msgid "`return' not allowed in current context; statement ignored"
+msgstr "`return' geçerli bağlamda izin verilmiyor; deyim yok sayıldı"
+
+#: debug.c:5645
+#, fuzzy, c-format
+#| msgid "fatal error: internal error"
+msgid "fatal error during eval, need to restart.\n"
+msgstr "ölümcül iç hata"
+
+#: debug.c:5835
+#, c-format
+msgid "no symbol `%s' in current context"
+msgstr "geçerli bağlamda `%s' diye bir simge yok"
+
+#: eval.c:405
+#, c-format
+msgid "unknown nodetype %d"
+msgstr "%d. düğüm türü bilinmiyor"
+
+#: eval.c:416 eval.c:432
+#, c-format
+msgid "unknown opcode %d"
+msgstr "opcode %d bilinmiyor"
+
+#: eval.c:429
+#, c-format
+msgid "opcode %s not an operator or keyword"
+msgstr "opcode %s bir işleç veya anahtar sözcük değil"
+
+#: eval.c:488
+msgid "buffer overflow in genflags2str"
+msgstr "genflags2str içinde tampon taştı"
+
+#: eval.c:700
+#, c-format
+msgid ""
+"\n"
+"\t# Function Call Stack:\n"
+"\n"
+msgstr ""
+"\n"
+"\t# İşlev Çağrısı Yığıtı:\n"
+"\n"
+
+#: eval.c:726
+msgid "`IGNORECASE' is a gawk extension"
+msgstr "`IGNORECASE' gawk eklentisidir"
+
+#: eval.c:747
+msgid "`BINMODE' is a gawk extension"
+msgstr "`BINMODE' gawk eklentisidir"
+
+#: eval.c:804
+#, c-format
+msgid "BINMODE value `%s' is invalid, treated as 3"
+msgstr "BINMODE değeri `%s' geçersiz, 3 olarak ele alındı"
+
+#: eval.c:927
+#, c-format
+msgid "bad `%sFMT' specification `%s'"
+msgstr "`%sFMT' özelliği `%s' hatalı"
+
+#: eval.c:997
+msgid "turning off `--lint' due to assignment to `LINT'"
+msgstr "`LINT' atamasından dolayı `--lint' kapatılıyor"
+
+#: eval.c:1209
+#, c-format
+msgid "reference to uninitialized argument `%s'"
+msgstr "başlangıç değeri olmayan `%s' değiştirgesine başvuru"
+
+#: eval.c:1210
+#, c-format
+msgid "reference to uninitialized variable `%s'"
+msgstr "öndeğer ataması yapılmamış `%s' değişkenine başvuru"
+
+#: eval.c:1228
+msgid "attempt to field reference from non-numeric value"
+msgstr "sayısal olmayan değerden alan başvurusu"
+
+#: eval.c:1230
+msgid "attempt to field reference from null string"
+msgstr "null dizgeden alana başvurulmaya çalışılyor"
+
+#: eval.c:1238
+#, c-format
+msgid "attempt to access field %ld"
+msgstr "%ld. alana erişilmeye çalışılıyor"
+
+#: eval.c:1247
+#, c-format
+msgid "reference to uninitialized field `$%ld'"
+msgstr "ilklendirilmemiş `$%ld' alanına başvuru"
+
+#: eval.c:1311
+#, c-format
+msgid "function `%s' called with more arguments than declared"
+msgstr "`%s' işlevi bildirilenden daha fazla değiştirgela çağrıldı"
+
+#: eval.c:1527
+#, c-format
+msgid "unwind_stack: unexpected type `%s'"
+msgstr "unwind_stack: beklenmeyen `%s' türü"
+
+#: eval.c:1708
+msgid "division by zero attempted in `/='"
+msgstr "`/='de sıfırla bölme hatası"
+
+#: eval.c:1715
+#, c-format
+msgid "division by zero attempted in `%%='"
+msgstr "`%%='de sıfırla bölme hatası"
+
+#: ext.c:53
+#, c-format
+msgid "extension `%s': trying to load %s, was previously loaded from %s"
+msgstr ""
+
+#: ext.c:99
+msgid "extensions are not allowed in sandbox mode"
+msgstr "kum kutusu kipinde eklentilere izin verilmez"
+
+#: ext.c:105
+msgid "-l / @load are gawk extensions"
+msgstr "-l / @load gawk eklentileridir"
+
+#: ext.c:108
+msgid "load_ext: received NULL lib_name"
+msgstr "load_ext: NULL lib_name alındı"
+
+#: ext.c:111
+#, c-format
+msgid "load_ext: cannot open library `%s': %s"
+msgstr "load_ext: kütüphane `%s' açılamıyor: %s"
+
+#: ext.c:117
+#, c-format
+msgid "load_ext: library `%s': does not define `plugin_is_GPL_compatible': %s"
+msgstr "load_ext: kütüphane `%s': `plugin_is_GPL_compatible' tanımlanmamış: %s"
+
+#: ext.c:123
+#, c-format
+msgid "load_ext: library `%s': cannot call function `%s': %s"
+msgstr "load_ext: kütüphane `%s': `%s' işlevi çağrılamıyor: %s"
+
+#: ext.c:127
+#, c-format
+msgid "load_ext: library `%s' initialization routine `%s' failed"
+msgstr "load_ext: `%s' kütüphanesini ilklendirme yordamı `%s' başarısız oldu"
+
+#: ext.c:143
+msgid "make_builtin: missing function name"
+msgstr "make_builtin: işlev ismi eksik"
+
+#: ext.c:151 ext.c:162
+#, c-format
+msgid "make_builtin: cannot use gawk built-in `%s' as function name"
+msgstr "make_builtin: gawk yerleşiği olan `%s' işlev ismi olamaz"
+
+#: ext.c:160
+#, c-format
+msgid "make_builtin: cannot use gawk built-in `%s' as namespace name"
+msgstr "make_builtin: gawk yerleşiği olan `%s' isim uzayı ismi olamaz"
+
+#: ext.c:177
+#, c-format
+msgid "make_builtin: cannot redefine function `%s'"
+msgstr "make_builtin: `%s' işlevi yeniden tanımlanamaz"
+
+#: ext.c:181
+#, c-format
+msgid "make_builtin: function `%s' already defined"
+msgstr "make_builtin: `%s' işlevi zaten tanımlı"
+
+#: ext.c:190
+#, c-format
+msgid "make_builtin: function name `%s' previously defined"
+msgstr "make_builtin: işlev ismi `%s' evvelce tanımlanmış"
+
+#: ext.c:194
+#, c-format
+msgid "make_builtin: negative argument count for function `%s'"
+msgstr "make_builtin: `%s' işlevi için değiştirge sayısı negatif"
+
+#: ext.c:275
+#, c-format
+msgid "function `%s': argument #%d: attempt to use scalar as an array"
+msgstr ""
+"`%s' işlevi: %d. değiştirge: tek değerli değişken bir dizi olarak "
+"kullanılmaya çalışılıyor"
+
+#: ext.c:279
+#, c-format
+msgid "function `%s': argument #%d: attempt to use array as a scalar"
+msgstr ""
+"`%s' işlevi: %d. değiştirge: dizi tek değerli bir değişken olarak "
+"kullanılmaya çalışılıyor"
+
+#: ext.c:299
+msgid "dynamic loading of libraries is not supported"
+msgstr "Kütüphanelerin dinamik yüklenmesi desteklenmiyor"
+
+#: extension/filefuncs.c:446
+#, c-format
+msgid "stat: unable to read symbolic link `%s'"
+msgstr "stat: sembolik bağ `%s' okunamıyor"
+
+#: extension/filefuncs.c:479
+msgid "stat: first argument is not a string"
+msgstr "stat: ilk değiştirge bir dizge değil"
+
+#: extension/filefuncs.c:484
+msgid "stat: second argument is not an array"
+msgstr "stat: ikinci değiştirge bir dizi değil"
+
+#: extension/filefuncs.c:528
+msgid "stat: bad parameters"
+msgstr "stat: değiştirgeler kötü"
+
+#: extension/filefuncs.c:594
+#, c-format
+msgid "fts init: could not create variable %s"
+msgstr "fts başlatma: %s değişkeni oluşturulamadı"
+
+#: extension/filefuncs.c:615
+msgid "fts is not supported on this system"
+msgstr "fts bu sistemde desteklenmiyor"
+
+#: extension/filefuncs.c:634
+msgid "fill_stat_element: could not create array, out of memory"
+msgstr "fill_stat_element: dizi oluşturulamadı, bellek yetersiz"
+
+#: extension/filefuncs.c:643
+msgid "fill_stat_element: could not set element"
+msgstr "fill_stat_element: öğe atanamadı"
+
+#: extension/filefuncs.c:658
+msgid "fill_path_element: could not set element"
+msgstr "fill_path_element: öğe atanamadı"
+
+#: extension/filefuncs.c:674
+msgid "fill_error_element: could not set element"
+msgstr "fill_error_element: öğe atanamadı"
+
+#: extension/filefuncs.c:726 extension/filefuncs.c:773
+msgid "fts-process: could not create array"
+msgstr "fts işlemi: dizi oluşturulamadı"
+
+#: extension/filefuncs.c:736 extension/filefuncs.c:783
+#: extension/filefuncs.c:801
+msgid "fts-process: could not set element"
+msgstr "fts işlemi: öğe atanamadı"
+
+#: extension/filefuncs.c:850
+msgid "fts: called with incorrect number of arguments, expecting 3"
+msgstr "fts: yanlış sayıda değiştirge ile çağrıldı, 3 olacaktı"
+
+#: extension/filefuncs.c:853
+msgid "fts: first argument is not an array"
+msgstr "fts: ilk değiştirge bir dizi değil"
+
+#: extension/filefuncs.c:859
+msgid "fts: second argument is not a number"
+msgstr "fts: ikinci değiştirge bir sayı değil"
+
+#: extension/filefuncs.c:865
+msgid "fts: third argument is not an array"
+msgstr "fts: üçüncü değiştirge bir dizi değil"
+
+#: extension/filefuncs.c:872
+msgid "fts: could not flatten array\n"
+msgstr "fts: dizi düzleştirilemedi\n"
+
+#: extension/filefuncs.c:890
+msgid "fts: ignoring sneaky FTS_NOSTAT flag. nyah, nyah, nyah."
+msgstr "fts: sinsi FTS_NOSTAT seçeneği yok sayılıyor. nayır, nolamaz."
+
+#: extension/fnmatch.c:125
+msgid "fnmatch: could not get first argument"
+msgstr "fnmatch: ilk değiştirge alınamadı"
+
+#: extension/fnmatch.c:130
+msgid "fnmatch: could not get second argument"
+msgstr "fnmatch: ikinci değiştirge alınamadı"
+
+#: extension/fnmatch.c:135
+msgid "fnmatch: could not get third argument"
+msgstr "fnmatch: üçüncü değiştirge alınamadı"
+
+#: extension/fnmatch.c:148
+msgid "fnmatch is not implemented on this system\n"
+msgstr "fnmatch bu sistemde gerçeklenmiyor\n"
+
+#: extension/fnmatch.c:180
+msgid "fnmatch init: could not add FNM_NOMATCH variable"
+msgstr "fnmatch init: FNM_NOMATCH değişkeni eklenemedi"
+
+#: extension/fnmatch.c:190
+#, c-format
+msgid "fnmatch init: could not set array element %s"
+msgstr "fnmatch init: dizi öğesi %s atanamadı"
+
+#: extension/fnmatch.c:200
+msgid "fnmatch init: could not install FNM array"
+msgstr "fnmatch init: FNM dizisi kurulamadı"
+
+#: extension/fork.c:92
+msgid "fork: PROCINFO is not an array!"
+msgstr "fork: PROCINFO bir dizi değil!"
+
+#: extension/inplace.c:131
+msgid "inplace::begin: in-place editing already active"
+msgstr "inplace::begin: yerinde düzenleme zaten etkin"
+
+#: extension/inplace.c:134
+#, c-format
+msgid "inplace::begin: expects 2 arguments but called with %d"
+msgstr "inplace::begin: 2 değiştirge gerekirken %d değiştirge ile çağrıldı"
+
+#: extension/inplace.c:137
+msgid "inplace::begin: cannot retrieve 1st argument as a string filename"
+msgstr "inplace::begin: birinci değiştirge dosya adını bir dizge olarak alamaz"
+
+#: extension/inplace.c:145
+#, c-format
+msgid "inplace::begin: disabling in-place editing for invalid FILENAME `%s'"
+msgstr ""
+"inplace::begin: geçersiz DOSYA `%s' için yerinde düzenleme iptal ediliyor."
+
+#: extension/inplace.c:152
+#, c-format
+msgid "inplace::begin: Cannot stat `%s' (%s)"
+msgstr "inplace::begin: `%s' durumlanamıyor (%s)"
+
+#: extension/inplace.c:159
+#, c-format
+msgid "inplace::begin: `%s' is not a regular file"
+msgstr "inplace::begin: `%s' normal dosya değil"
+
+#: extension/inplace.c:170
+#, c-format
+msgid "inplace::begin: mkstemp(`%s') failed (%s)"
+msgstr "inplace::begin: mkstemp(`%s') başarısız (%s)"
+
+#: extension/inplace.c:182
+#, c-format
+msgid "inplace::begin: chmod failed (%s)"
+msgstr "inplace::begin: chmod başarısız (%s)"
+
+#: extension/inplace.c:189
+#, c-format
+msgid "inplace::begin: dup(stdout) failed (%s)"
+msgstr "inplace::begin: dup(stdout) başarısız (%s)"
+
+#: extension/inplace.c:192
+#, c-format
+msgid "inplace::begin: dup2(%d, stdout) failed (%s)"
+msgstr "inplace::begin: dup2(%d, stdout) başarısız (%s)"
+
+#: extension/inplace.c:195
+#, c-format
+msgid "inplace::begin: close(%d) failed (%s)"
+msgstr "inplace::begin: close(%d) başarısız (%s)"
+
+#: extension/inplace.c:211
+#, c-format
+msgid "inplace::end: expects 2 arguments but called with %d"
+msgstr "inplace::end: 2 değiştirge gerekirken %d değiştirge ile çağrıldı"
+
+#: extension/inplace.c:214
+msgid "inplace::end: cannot retrieve 1st argument as a string filename"
+msgstr "inplace::end: birinci değiştirge dosya adını bir dizge olarak alamaz"
+
+#: extension/inplace.c:221
+msgid "inplace::end: in-place editing not active"
+msgstr "inplace::end: yerinde düzenleme etkin değil"
+
+#: extension/inplace.c:227
+#, c-format
+msgid "inplace::end: dup2(%d, stdout) failed (%s)"
+msgstr "inplace::end: dup2(%d, stdout) başarısız (%s)"
+
+#: extension/inplace.c:230
+#, c-format
+msgid "inplace::end: close(%d) failed (%s)"
+msgstr "inplace::end: close(%d) başarısız (%s)"
+
+#: extension/inplace.c:234
+#, c-format
+msgid "inplace::end: fsetpos(stdout) failed (%s)"
+msgstr "inplace::end: fsetpos(stdout) başarısız (%s)"
+
+#: extension/inplace.c:247
+#, c-format
+msgid "inplace::end: link(`%s', `%s') failed (%s)"
+msgstr "inplace::end: link(`%s', `%s') başarısız (%s)"
+
+#: extension/inplace.c:257
+#, c-format
+msgid "inplace::end: rename(`%s', `%s') failed (%s)"
+msgstr "inplace::end: rename(`%s', `%s') başarısız (%s)"
+
+#: extension/ordchr.c:107
+msgid "ord: first argument is not a string"
+msgstr "ord: ilk değiştirge bir dizge değil"
+
+#: extension/ordchr.c:136
+msgid "chr: first argument is not a number"
+msgstr "chr: ilk değiştirge bir sayı değil"
+
+#: extension/readdir.c:295
+#, fuzzy, c-format
+#| msgid "dir_take_control_of: opendir/fdopendir failed: %s"
+msgid "dir_take_control_of: %s: opendir/fdopendir failed: %s"
+msgstr "dir_take_control_of: opendir/fdopendir başarısız: %s"
+
+#: extension/readfile.c:133
+msgid "readfile: called with wrong kind of argument"
+msgstr "readfile: değiştirgenin yanlış çeşidi ile çağrıldı"
+
+#: extension/revoutput.c:127
+msgid "revoutput: could not initialize REVOUT variable"
+msgstr "revoutput: REVOUT değişkeni ilklendirilemedi"
+
+#: extension/rwarray.c:145 extension/rwarray.c:548
+#, c-format
+msgid "%s: first argument is not a string"
+msgstr "%s: ilk değiştirge bir dizge değil"
+
+#: extension/rwarray.c:189
+msgid "writea: second argument is not an array"
+msgstr "writea: ikinci değiştirge bir dizi değil"
+
+#: extension/rwarray.c:206
+msgid "writeall: unable to find SYMTAB array"
+msgstr "writeall: SYMTAB dizisi bulunamıyor"
+
+#: extension/rwarray.c:226
+msgid "write_array: could not flatten array"
+msgstr "write_array: dizi düzleştirilemedi"
+
+#: extension/rwarray.c:242
+msgid "write_array: could not release flattened array"
+msgstr "write_array: düzleştirillmiş dizi serbest bırakılamıyor"
+
+#: extension/rwarray.c:307
+#, c-format
+msgid "array value has unknown type %d"
+msgstr "dizi değeri bilinmeyen %d türünde"
+
+#: extension/rwarray.c:398
+msgid ""
+"rwarray extension: received GMP/MPFR value but compiled without GMP/MPFR "
+"support."
+msgstr ""
+"rwarray eklentisi: GMP/MPFR değeri alındı ama GMP/MPFR desteği olmaksızın "
+"derlendi."
+
+#: extension/rwarray.c:437
+#, c-format
+msgid "cannot free number with unknown type %d"
+msgstr "bilnmeyen %d türündeki sayı serbest bırakılamaz"
+
+#: extension/rwarray.c:442
+#, c-format
+msgid "cannot free value with unhandled type %d"
+msgstr "elde edilemeyen %d türündeki değer serbest bırakılamaz"
+
+#: extension/rwarray.c:481
+#, fuzzy, c-format
+#| msgid "readall: unable to set %s"
+msgid "readall: unable to set %s::%s"
+msgstr "readall: %s tanımlanamadı"
+
+#: extension/rwarray.c:483
+#, c-format
+msgid "readall: unable to set %s"
+msgstr "readall: %s tanımlanamadı"
+
+#: extension/rwarray.c:525
+msgid "reada: clear_array failed"
+msgstr "reada: clear_array başarısız"
+
+#: extension/rwarray.c:611
+msgid "reada: second argument is not an array"
+msgstr "reada: ikinci değiştirge bir dizi değil"
+
+#: extension/rwarray.c:648
+msgid "read_array: set_array_element failed"
+msgstr "read_array: set_array_element başarısız"
+
+#: extension/rwarray.c:756
+#, c-format
+msgid "treating recovered value with unknown type code %d as a string"
+msgstr "%d bilinmeyen tür koduyla kurtarılan değer bir dizge olarak işleniyor"
+
+#: extension/rwarray.c:827
+msgid ""
+"rwarray extension: GMP/MPFR value in file but compiled without GMP/MPFR "
+"support."
+msgstr ""
+"rwarray eklentisi: dosyada GMP/MPFR değeri var ama GMP/MPFR desteği "
+"olmaksızın derlendi."
+
+#: extension/time.c:170
+msgid "gettimeofday: not supported on this platform"
+msgstr "gettimeofday: bu sistemde desteklenmiyor"
+
+#: extension/time.c:191
+msgid "sleep: missing required numeric argument"
+msgstr "sleep: gereken sayısal değiştirge eksik"
+
+#: extension/time.c:197
+msgid "sleep: argument is negative"
+msgstr "sleep: negatif değiştirge"
+
+#: extension/time.c:231
+msgid "sleep: not supported on this platform"
+msgstr "sleep: bu sistemde desteklenmiyor"
+
+#: extension/time.c:253
+#, fuzzy
+#| msgid "%s: called with %d arguments"
+msgid "strptime: called with no arguments"
+msgstr "%s: %d değiştirge ile çağrıldı"
+
+#: extension/time.c:261
+#, fuzzy, c-format
+#| msgid "stat: first argument is not a string"
+msgid "do_strptime: argument 1 is not a string\n"
+msgstr "stat: ilk değiştirge bir dizge değil"
+
+#: extension/time.c:266
+#, fuzzy, c-format
+#| msgid "stat: first argument is not a string"
+msgid "do_strptime: argument 2 is not a string\n"
+msgstr "stat: ilk değiştirge bir dizge değil"
+
+#: field.c:321
+msgid "input record too large"
+msgstr "girdi kaydı çok büyük"
+
+#: field.c:443
+msgid "NF set to negative value"
+msgstr "NF negatif değere ayarlı"
+
+#: field.c:448
+msgid "decrementing NF is not portable to many awk versions"
+msgstr "NF'yi azaltmak, birçok awk sürümüne taşınabilir değildir"
+
+#: field.c:1005
+msgid "accessing fields from an END rule may not be portable"
+msgstr "END kuralından alanlara erişim taşınabilir olmayabilir"
+
+#: field.c:1132 field.c:1141
+msgid "split: fourth argument is a gawk extension"
+msgstr "split: dördüncü değiştirge gawk eklentisidir"
+
+#: field.c:1136
+msgid "split: fourth argument is not an array"
+msgstr "split: dördüncü değiştirge bir dizi değil"
+
+#: field.c:1138 field.c:1248
+#, c-format
+msgid "%s: cannot use %s as fourth argument"
+msgstr "%s: %s dördüncü değiştirge olarak kullanılamaz"
+
+#: field.c:1148
+msgid "split: second argument is not an array"
+msgstr "split: ikinci değiştirge bir dizi değil"
+
+#: field.c:1162
+msgid "split: cannot use the same array for second and fourth args"
+msgstr "split: 2. ve 4. değiştirge için aynı dizi kullanılamaz"
+
+#: field.c:1167
+msgid "split: cannot use a subarray of second arg for fourth arg"
+msgstr "split: 4. değiştirge için 2. değiştirgenin alt dizisi kullanılamaz"
+
+#: field.c:1170
+msgid "split: cannot use a subarray of fourth arg for second arg"
+msgstr "split: 2. değiştirge için 4. değiştirgenin alt dizisi kullanılamaz"
+
+#: field.c:1207
+msgid "split: null string for third arg is a non-standard extension"
+msgstr "split: üçüncü değiştirge için null dizge gawk eklentisidir"
+
+#: field.c:1246
+msgid "patsplit: fourth argument is not an array"
+msgstr "patsplit: dördüncü değiştirge bir dizi değil"
+
+#: field.c:1253
+msgid "patsplit: second argument is not an array"
+msgstr "patsplit: ikinci değiştirge bir dizi değil"
+
+#: field.c:1284
+msgid "patsplit: third argument must be non-null"
+msgstr "patsplit: üçüncü değiştirge null olmamalı"
+
+#: field.c:1288
+msgid "patsplit: cannot use the same array for second and fourth args"
+msgstr "patsplit: 2. ve 4. değiştirge için aynı dizi kullanılamaz"
+
+#: field.c:1293
+msgid "patsplit: cannot use a subarray of second arg for fourth arg"
+msgstr "patsplit: 4. değiştirge için 2. değiştirgenin alt dizisi kullanılamaz"
+
+#: field.c:1296
+msgid "patsplit: cannot use a subarray of fourth arg for second arg"
+msgstr "patsplit: 2. değiştirge için 4. değiştirgenin alt dizisi kullanılamaz"
+
+#: field.c:1333
+msgid "assignment to FS/FIELDWIDTHS/FPAT has no effect when using --csv"
+msgstr ""
+
+#: field.c:1363
+msgid "`FIELDWIDTHS' is a gawk extension"
+msgstr "`FIELDWIDTHS' gawk ekentisidir"
+
+#: field.c:1432
+msgid "`*' must be the last designator in FIELDWIDTHS"
+msgstr "`*' FIELDWIDTHS içindeki son tanımlayıcı olmalıdır"
+
+#: field.c:1453
+#, c-format
+msgid "invalid FIELDWIDTHS value, for field %d, near `%s'"
+msgstr "alan %d için `%s' yanında FIELDWIDTHS değeri geçersiz"
+
+#: field.c:1527
+msgid "null string for `FS' is a gawk extension"
+msgstr "`FS' için null dizge gawk eklentisidir"
+
+#: field.c:1531
+msgid "old awk does not support regexps as value of `FS'"
+msgstr "eski awk düzenli ifadeleri `FS' değeriyle desteklemiyor"
+
+#: field.c:1657
+#, fuzzy
+#| msgid "`FPAT' is a gawk extension"
+msgid "FPAT is a gawk extension"
+msgstr "`FPAT' gawk eklentisidir"
+
+#: gawkapi.c:158
+msgid "awk_value_to_node: received null retval"
+msgstr "awk_value_to_node: null dönüş değeri alındı"
+
+#: gawkapi.c:178 gawkapi.c:191
+msgid "awk_value_to_node: not in MPFR mode"
+msgstr "awk_value_to_node: MPFR kipinde değil"
+
+#: gawkapi.c:185 gawkapi.c:197
+msgid "awk_value_to_node: MPFR not supported"
+msgstr "awk_value_to_node: MPFR desteklenmiyor"
+
+#: gawkapi.c:201
+#, c-format
+msgid "awk_value_to_node: invalid number type `%d'"
+msgstr "awk_value_to_node: sayı türü `%d' geçersiz"
+
+#: gawkapi.c:388
+msgid "add_ext_func: received NULL name_space parameter"
+msgstr "add_ext_func: name_space için NULL alındı"
+
+#: gawkapi.c:526
+#, c-format
+msgid ""
+"node_to_awk_value: detected invalid numeric flags combination `%s'; please "
+"file a bug report"
+msgstr ""
+"node_to_awk_value: geçersiz sayısal seçenek birleşimi `%s' saptandı; lütfen "
+"hata bildirimi yapın"
+
+#: gawkapi.c:564
+msgid "node_to_awk_value: received null node"
+msgstr "node_to_awk_value: null düğüm alındı"
+
+#: gawkapi.c:567
+msgid "node_to_awk_value: received null val"
+msgstr "node_to_awk_value: null değer alındı"
+
+#: gawkapi.c:633 gawkapi.c:668 gawkapi.c:696 gawkapi.c:731
+#, c-format
+msgid ""
+"node_to_awk_value detected invalid flags combination `%s'; please file a bug "
+"report"
+msgstr ""
+"node_to_awk_value: geçersiz seçenek birleşimi `%s' saptandı; lütfen hata "
+"bildirimi yapın"
+
+#: gawkapi.c:1127
+msgid "remove_element: received null array"
+msgstr "remove_element: null dizi alındı"
+
+#: gawkapi.c:1130
+msgid "remove_element: received null subscript"
+msgstr "remove_element: null indis alındı"
+
+#: gawkapi.c:1272
+#, c-format
+msgid "api_flatten_array_typed: could not convert index %d to %s"
+msgstr "api_flatten_array_typed: %d. indis %s olarak dönüştürülemedi"
+
+#: gawkapi.c:1277
+#, c-format
+msgid "api_flatten_array_typed: could not convert value %d to %s"
+msgstr "api_flatten_array_typed: %d değeri %s olarak dönüştürülemedi"
+
+#: gawkapi.c:1373 gawkapi.c:1390
+msgid "api_get_mpfr: MPFR not supported"
+msgstr "api_get_mpfr: MPFR desteklenmiyor"
+
+#: gawkapi.c:1421
+msgid "cannot find end of BEGINFILE rule"
+msgstr "BEGINFILE kuralının sonu bulunamadı"
+
+#: gawkapi.c:1475
+#, c-format
+msgid "cannot open unrecognized file type `%s' for `%s'"
+msgstr "bilinmeyen `%s' dosya türü `%s' için açılamıyor"
+
+#: io.c:416
+#, c-format
+msgid "command line argument `%s' is a directory: skipped"
+msgstr "komut satırı değiştirgesi `%s' bir dizin: atlandı"
+
+#: io.c:419 io.c:531
+#, c-format
+msgid "cannot open file `%s' for reading: %s"
+msgstr "`%s' okumak için açılamıyor: %s"
+
+#: io.c:658
+#, c-format
+msgid "close of fd %d (`%s') failed: %s"
+msgstr "dosya tanıtıcı %d (`%s') kapatılamadı: %s"
+
+#: io.c:730
+#, c-format
+msgid "`%.*s' used for input file and for output file"
+msgstr "`%.*s' girdi dosyası ve çıktı dosyası için kullanılmış"
+
+#: io.c:732
+#, c-format
+msgid "`%.*s' used for input file and input pipe"
+msgstr "`%.*s' girdi dosyası ve girdi borusu için kullanılmış"
+
+#: io.c:734
+#, c-format
+msgid "`%.*s' used for input file and two-way pipe"
+msgstr "`%.*s' girdi dosyası ve iki yönlü boru için kullanılmış"
+
+#: io.c:736
+#, c-format
+msgid "`%.*s' used for input file and output pipe"
+msgstr "`%.*s' girdi dosyası ve çıktı borusu için kullanılmış"
+
+#: io.c:738
+#, c-format
+msgid "unnecessary mixing of `>' and `>>' for file `%.*s'"
+msgstr "`%.*s' dosyası için `>' ve `>>' karışımı gereksiz"
+
+#: io.c:740
+#, c-format
+msgid "`%.*s' used for input pipe and output file"
+msgstr "`%.*s' girdi borusu ve çıktı dosyası için kullanılmış"
+
+#: io.c:742
+#, c-format
+msgid "`%.*s' used for output file and output pipe"
+msgstr "`%.*s' çıktı dosyası ve çıktı borusu için kullanılmış"
+
+#: io.c:744
+#, c-format
+msgid "`%.*s' used for output file and two-way pipe"
+msgstr "`%.*s' çıktı dosyası ve iki yönlü boru için kullanılmış"
+
+#: io.c:746
+#, c-format
+msgid "`%.*s' used for input pipe and output pipe"
+msgstr "`%.*s' girdi borusu ve çıktı borusu için kullanılmış"
+
+#: io.c:748
+#, c-format
+msgid "`%.*s' used for input pipe and two-way pipe"
+msgstr "`%.*s' girdi borusu ve iki yönlü boru için kullanılmış"
+
+#: io.c:750
+#, c-format
+msgid "`%.*s' used for output pipe and two-way pipe"
+msgstr "`%.*s' çıktı borusu ve iki yönlü boru için kullanılmış"
+
+#: io.c:800
+msgid "redirection not allowed in sandbox mode"
+msgstr "kum kutusu kipinde yönlendirmeye izin verilmez"
+
+#: io.c:834
+#, c-format
+msgid "expression in `%s' redirection is a number"
+msgstr "`%s' yönlendirmesi içindeki ifade bir sayı"
+
+#: io.c:838
+#, c-format
+msgid "expression for `%s' redirection has null string value"
+msgstr "`%s' yönlendirmesi içindeki ifade null dizge değeri içeriyor"
+
+#: io.c:843
+#, c-format
+msgid ""
+"filename `%.*s' for `%s' redirection may be result of logical expression"
+msgstr ""
+"`%.*s' dosya ismi (`%s' yönlendirmesi için) mantıksal ifadenin sonucu "
+"olabilir"
+
+#: io.c:940 io.c:967
+#, c-format
+msgid "get_file cannot create pipe `%s' with fd %d"
+msgstr "get_file `%s' borusunu dosya tanıtıcı %d ile oluşturamıyor"
+
+#: io.c:954
+#, c-format
+msgid "cannot open pipe `%s' for output: %s"
+msgstr "`%s' borusu çıktı için açılamıyor: %s"
+
+#: io.c:972
+#, c-format
+msgid "cannot open pipe `%s' for input: %s"
+msgstr "`%s' borusu girdi için açılamıyor: %s"
+
+#: io.c:1001
+#, c-format
+msgid ""
+"get_file socket creation not supported on this platform for `%s' with fd %d"
+msgstr ""
+"`%s' için dosya tanıtıcı %d ile get_file üzerinden soket oluşturma bu "
+"sistemde desteklenmiyor"
+
+#: io.c:1012
+#, c-format
+msgid "cannot open two way pipe `%s' for input/output: %s"
+msgstr "iki yönlü `%s' borusu G/Ç için açılamıyor: %s"
+
+#: io.c:1099
+#, c-format
+msgid "cannot redirect from `%s': %s"
+msgstr "`%s'den yönlendirilemiyor: %s"
+
+#: io.c:1102
+#, c-format
+msgid "cannot redirect to `%s': %s"
+msgstr "`%s'e yönlendirilemiyor: %s"
+
+#: io.c:1204
+msgid ""
+"reached system limit for open files: starting to multiplex file descriptors"
+msgstr ""
+"açık dosyalar için sistem sınırı aşıldı: çoğul dosya tanımlayıcılara "
+"başlarken"
+
+#: io.c:1220
+#, c-format
+msgid "close of `%s' failed: %s"
+msgstr "`%s' kapatılamadı: %s"
+
+#: io.c:1228
+msgid "too many pipes or input files open"
+msgstr "çok fazla boru ya da dosya açık"
+
+#: io.c:1254
+msgid "close: second argument must be `to' or `from'"
+msgstr "close: ikinci değiştirge `to' ya da `from' olmalı"
+
+#: io.c:1272
+#, c-format
+msgid "close: `%.*s' is not an open file, pipe or co-process"
+msgstr "close: `%.*s' bir açık dosya, boru ya da alt-süreç değil"
+
+#: io.c:1277
+msgid "close of redirection that was never opened"
+msgstr "hiç açılmamış bir yönlendirmenin kapatılması"
+
+#: io.c:1379
+#, c-format
+msgid "close: redirection `%s' not opened with `|&', second argument ignored"
+msgstr ""
+"close: `%s' yönlendirmesi bir `|&' ile açılmamış, ikinci değiştirge "
+"yoksayıldı"
+
+#: io.c:1396
+#, c-format
+msgid "failure status (%d) on pipe close of `%s': %s"
+msgstr "başarısızlık durumu (%d): `%s' borusunun kapatılması: %s"
+
+#: io.c:1399
+#, c-format
+msgid "failure status (%d) on two-way pipe close of `%s': %s"
+msgstr "başarısızlık durumu (%d): iki yönlü `%s' borusunun kapatılması: %s"
+
+#: io.c:1402
+#, c-format
+msgid "failure status (%d) on file close of `%s': %s"
+msgstr "başarısızlık durumu (%d): `%s' dosyasının kapatılması: %s"
+
+#: io.c:1420
+#, c-format
+msgid "no explicit close of socket `%s' provided"
+msgstr "`%s' soketinin açıkça kapatılması istenmedi"
+
+#: io.c:1423
+#, c-format
+msgid "no explicit close of co-process `%s' provided"
+msgstr "`%s' alt-işleminin açıkça kapatılması istenmedi"
+
+#: io.c:1426
+#, c-format
+msgid "no explicit close of pipe `%s' provided"
+msgstr "`%s' borusunun açıkça kapatılması istenmedi"
+
+#: io.c:1429
+#, c-format
+msgid "no explicit close of file `%s' provided"
+msgstr "`%s' dosyasının açıkça kapatılması istenmedi"
+
+#: io.c:1464
+#, c-format
+msgid "fflush: cannot flush standard output: %s"
+msgstr "fflush: standard çıktı boşaltılamadı: %s"
+
+#: io.c:1465
+#, c-format
+msgid "fflush: cannot flush standard error: %s"
+msgstr "fflush: standard hata boşaltılamadı: %s"
+
+#: io.c:1470 io.c:1559 main.c:684 main.c:729
+#, c-format
+msgid "error writing standard output: %s"
+msgstr "standart çıktıya yazarken hata: %s"
+
+#: io.c:1471 io.c:1570 main.c:686
+#, c-format
+msgid "error writing standard error: %s"
+msgstr "standart hataya yazarken hata: %s"
+
+#: io.c:1510
+#, c-format
+msgid "pipe flush of `%s' failed: %s"
+msgstr "`%s' borusunun boşaltımı başarısız: %s"
+
+#: io.c:1513
+#, c-format
+msgid "co-process flush of pipe to `%s' failed: %s"
+msgstr "`%s'e borulanan alt-süreç ile aktarım başarısız: %s"
+
+#: io.c:1516
+#, c-format
+msgid "file flush of `%s' failed: %s"
+msgstr "`%s için dosya ile boşaltım başarısız: %s"
+
+#: io.c:1659
+#, c-format
+msgid "local port %s invalid in `/inet': %s"
+msgstr "yerel port `%s' `/inet' için geçersiz: %s"
+
+#: io.c:1662
+#, c-format
+msgid "local port %s invalid in `/inet'"
+msgstr "yerel port `%s' `/inet' için geçersiz"
+
+#: io.c:1685
+#, c-format
+msgid "remote host and port information (%s, %s) invalid: %s"
+msgstr "uzak konak ve port bilgisi (%s, %s) geçersiz: %s"
+
+#: io.c:1688
+#, c-format
+msgid "remote host and port information (%s, %s) invalid"
+msgstr "uzak konak ve port bilgisi (%s, %s) geçersiz"
+
+#: io.c:1930
+msgid "TCP/IP communications are not supported"
+msgstr "TCP/IP haberleşmesi desteklenmiyor"
+
+#: io.c:2058 io.c:2101
+#, c-format
+msgid "could not open `%s', mode `%s'"
+msgstr "`%s', `%s' kipinde açılamadı"
+
+#: io.c:2066 io.c:2118
+#, c-format
+msgid "close of master pty failed: %s"
+msgstr "ana pty kapatılamadı: %s"
+
+#: io.c:2068 io.c:2120 io.c:2461 io.c:2716
+#, c-format
+msgid "close of stdout in child failed: %s"
+msgstr "ast süreçte stdÇ kapatılamadı: %s"
+
+#: io.c:2071 io.c:2123
+#, c-format
+msgid "moving slave pty to stdout in child failed (dup: %s)"
+msgstr "ast süreçte yardımcı pty standart çıktıya taşınamadı (dup: %s)"
+
+#: io.c:2073 io.c:2125 io.c:2466
+#, c-format
+msgid "close of stdin in child failed: %s"
+msgstr "ast süreçte stdG kapatılamadı: %s"
+
+#: io.c:2076 io.c:2128
+#, c-format
+msgid "moving slave pty to stdin in child failed (dup: %s)"
+msgstr "ast süreçte yardımcı pty standart girdiye taşınamadı (dup: %s)"
+
+#: io.c:2078 io.c:2130 io.c:2152
+#, c-format
+msgid "close of slave pty failed: %s"
+msgstr "yardımcı pty kapatılamadı: %s"
+
+#: io.c:2314
+msgid "could not create child process or open pty"
+msgstr "süreç çatallanamıyor ya da pty açılamıyor"
+
+#: io.c:2400 io.c:2464 io.c:2691 io.c:2719
+#, c-format
+msgid "moving pipe to stdout in child failed (dup: %s)"
+msgstr "alt süreçteki boru standart çıktıya taşınamadı (dup: %s)"
+
+#: io.c:2407 io.c:2469
+#, c-format
+msgid "moving pipe to stdin in child failed (dup: %s)"
+msgstr "ast süreçteki boru standart girdiye taşınamadı (dup: %s)"
+
+#: io.c:2429 io.c:2709
+msgid "restoring stdout in parent process failed"
+msgstr "üst süreçte stdÇ eski durumuna getirilemedi"
+
+#: io.c:2437
+msgid "restoring stdin in parent process failed"
+msgstr "üst süreçte stdG eski durumuna getirilemedi"
+
+#: io.c:2472 io.c:2721 io.c:2736
+#, c-format
+msgid "close of pipe failed: %s"
+msgstr "boru kapatılamadı: %s"
+
+#: io.c:2531
+msgid "`|&' not supported"
+msgstr "`|&' desteklenmiyor"
+
+#: io.c:2676
+#, c-format
+msgid "cannot open pipe `%s': %s"
+msgstr "`%s' borusu açılamıyor: %s"
+
+#: io.c:2730
+#, c-format
+msgid "cannot create child process for `%s' (fork: %s)"
+msgstr "`%s' için ast süreç oluşturulamıyor (fork: %s)"
+
+#: io.c:2869
+msgid "getline: attempt to read from closed read end of two-way pipe"
+msgstr "getline: iki yönlü borunun kapalı okuma ucu okunmaya çalışılıyor"
+
+#: io.c:3192
+msgid "register_input_parser: received NULL pointer"
+msgstr "register_input_parser: NULL gösterici alındı"
+
+#: io.c:3220
+#, c-format
+msgid "input parser `%s' conflicts with previously installed input parser `%s'"
+msgstr ""
+"girdi çözümleyici `%s' evvelce kurulmuş girdi çözümleyici `%s' ile çelişiyor"
+
+#: io.c:3227
+#, c-format
+msgid "input parser `%s' failed to open `%s'"
+msgstr "`%2$s' açılırken girdi çözümleyici `%1$s' başarısız oldu"
+
+#: io.c:3247
+msgid "register_output_wrapper: received NULL pointer"
+msgstr "register_output_wrapper: NULL gösterici alındı"
+
+#: io.c:3275
+#, c-format
+msgid ""
+"output wrapper `%s' conflicts with previously installed output wrapper `%s'"
+msgstr ""
+"çıktı sarmalayıcı `%s' evvelce kurulmuş çıktı sarmalayıcı `%s' ile çelişiyor"
+
+#: io.c:3282
+#, c-format
+msgid "output wrapper `%s' failed to open `%s'"
+msgstr "çıktı sarmalayıcı `%s' `%s' açılırken başarısız oldu"
+
+#: io.c:3303
+msgid "register_output_processor: received NULL pointer"
+msgstr "register_output_processor: NULL gösterici alındı"
+
+#: io.c:3332
+#, c-format
+msgid ""
+"two-way processor `%s' conflicts with previously installed two-way processor "
+"`%s'"
+msgstr ""
+"iki yollu işlemci `%s' evvelce kurulmuş iki yollu işlemci `%s' ile çelişiyor"
+
+#: io.c:3341
+#, c-format
+msgid "two way processor `%s' failed to open `%s'"
+msgstr "iki yollu işlemci `%s', `%s' açılırken başarısız oldu"
+
+#: io.c:3499
+#, c-format
+msgid "data file `%s' is empty"
+msgstr "veri dosyası `%s' boş"
+
+#: io.c:3541 io.c:3549
+msgid "could not allocate more input memory"
+msgstr "daha fazla girdi belleği ayrılamadı"
+
+#: io.c:4227
+msgid "assignment to RS has no effect when using --csv"
+msgstr ""
+
+#: io.c:4247
+#, fuzzy
+#| msgid "multicharacter value of `RS' is a gawk extension"
+msgid "multicharacter value of RS is a gawk extension"
+msgstr "`RS' çoklu karakter değeri gawk eklentisidir"
+
+#: io.c:4361
+msgid "support for the UDP protocol is obsolete and will eventually be removed"
+msgstr ""
+
+#: io.c:4412
+msgid "IPv6 communication is not supported"
+msgstr "IPv6 iletişimi desteklenmiyor"
+
+#: io.c:4729
+msgid "gawk_popen_write: failed to move pipe fd to standard input"
+msgstr ""
+
+#: main.c:328
+msgid "environment variable `POSIXLY_CORRECT' set: turning on `--posix'"
+msgstr "ortam değişkeni `POSIXLY_CORRECT' var: `--posix' kullanılıyor"
+
+#: main.c:335
+msgid "`--posix' overrides `--traditional'"
+msgstr "`--posix' seçeneği `--traditional' seçeneğini etkisiz kılar"
+
+#: main.c:346
+msgid "`--posix'/`--traditional' overrides `--non-decimal-data'"
+msgstr ""
+"`--posix'/`--traditional' seçenekleri `--non-decimal-data' seçeneğini "
+"etkisiz kılar"
+
+#: main.c:351
+msgid "`--posix' overrides `--characters-as-bytes'"
+msgstr "`--posix' seçeneği `--characters-as-bytes' seçeneğini geçersiz kılar"
+
+#: main.c:364
+msgid "`--posix' and `--csv' conflict"
+msgstr ""
+
+#: main.c:368
+#, c-format
+msgid "running %s setuid root may be a security problem"
+msgstr "%s setuid root çalıştırıldığında güvenlik sorunları olabilir"
+
+#: main.c:370
+msgid "The -r/--re-interval options no longer have any effect"
+msgstr "-r/--re-interval seçeneklerinin artık etkisi yok"
+
+#: main.c:428
+#, c-format
+msgid "cannot set binary mode on stdin: %s"
+msgstr "standart girdi ikil kipe ayarlanamaz: %s"
+
+#: main.c:431
+#, c-format
+msgid "cannot set binary mode on stdout: %s"
+msgstr "standart çıktı ikil kipe ayarlanamaz: %s"
+
+#: main.c:433
+#, c-format
+msgid "cannot set binary mode on stderr: %s"
+msgstr "standart hata ikil kipe ayarlanamaz: %s"
+
+#: main.c:498
+msgid "no program text at all!"
+msgstr "uygulama metni hiç yok!"
+
+#: main.c:595
+#, c-format
+msgid "Usage: %s [POSIX or GNU style options] -f progfile [--] file ...\n"
+msgstr ""
+"Kullanımı: %s [POSIX veya GNU tarzı seçenekler] -f betik [--] dosya ...\n"
+
+#: main.c:597
+#, c-format
+msgid "Usage: %s [POSIX or GNU style options] [--] %cprogram%c file ...\n"
+msgstr "Kullanımı: %s [POSIX veya GNU tarzı seçenekler] %ckodlar%c dosya ...\n"
+
+#: main.c:602
+msgid "POSIX options:\t\tGNU long options: (standard)\n"
+msgstr "POSIX seçenekleri:\tGNU uzun seçenekleri: (standart)\n"
+
+#: main.c:603
+msgid "\t-f progfile\t\t--file=progfile\n"
+msgstr "\t-f progDosyası\t\t--file=progDosyası\n"
+
+#: main.c:604
+msgid "\t-F fs\t\t\t--field-separator=fs\n"
+msgstr "\t-F ayraç\t\t--field-separator=ayraç\n"
+
+#: main.c:605
+msgid "\t-v var=val\t\t--assign=var=val\n"
+msgstr "\t-v var=değer\t\t--assign=var=değer\n"
+
+#: main.c:606
+msgid "Short options:\t\tGNU long options: (extensions)\n"
+msgstr "POSIX seçenekleri:\tGNU uzun seçenekleri: (eklentiler)\n"
+
+#: main.c:607
+msgid "\t-b\t\t\t--characters-as-bytes\n"
+msgstr "\t-b\t\t\t--characters-as-bytes\n"
+
+#: main.c:608
+msgid "\t-c\t\t\t--traditional\n"
+msgstr "\t-c\t\t\t--traditional\n"
+
+#: main.c:609
+msgid "\t-C\t\t\t--copyright\n"
+msgstr "\t-C\t\t\t--copyright\n"
+
+#: main.c:610
+msgid "\t-d[file]\t\t--dump-variables[=file]\n"
+msgstr "\t-d[dosya]\t\t--dump-variables[=dosya]\n"
+
+#: main.c:611
+msgid "\t-D[file]\t\t--debug[=file]\n"
+msgstr "\t-D[dosya]\t\t--debug[=dosya]\n"
+
+#: main.c:612
+msgid "\t-e 'program-text'\t--source='program-text'\n"
+msgstr "\t-e 'yazılım-metni'\t--source='yazılım-metni'\n"
+
+#: main.c:613
+msgid "\t-E file\t\t\t--exec=file\n"
+msgstr "\t-E dosya\t\t--exec=dosya\n"
+
+#: main.c:614
+msgid "\t-g\t\t\t--gen-pot\n"
+msgstr "\t-g\t\t\t--gen-pot\n"
+
+#: main.c:615
+msgid "\t-h\t\t\t--help\n"
+msgstr "\t-h\t\t\t--help\n"
+
+#: main.c:616
+msgid "\t-i includefile\t\t--include=includefile\n"
+msgstr "\t-i dosya\t\t--include=dosya\n"
+
+#: main.c:617
+msgid "\t-I\t\t\t--trace\n"
+msgstr "\t-I\t\t\t--trace\n"
+
+#: main.c:618
+#, fuzzy
+#| msgid "\t-I\t\t\t--trace\n"
+msgid "\t-k\t\t\t--csv\n"
+msgstr "\t-I\t\t\t--trace\n"
+
+#: main.c:619
+msgid "\t-l library\t\t--load=library\n"
+msgstr "\t-l kütüphane\t\t--load=kütüphane\n"
+
+#. TRANSLATORS: the "fatal", "invalid" and "no-ext" here are literal
+#. values, they should not be translated. Thanks.
+#.
+#: main.c:624
+msgid "\t-L[fatal|invalid|no-ext]\t--lint[=fatal|invalid|no-ext]\n"
+msgstr "\t-L[fatal|invalid|no-ext]  --lint[=fatal|invalid|no-ext]\n"
+
+#: main.c:625
+msgid "\t-M\t\t\t--bignum\n"
+msgstr "\t-M\t\t\t--bignum\n"
+
+#: main.c:626
+msgid "\t-N\t\t\t--use-lc-numeric\n"
+msgstr "\t-N\t\t\t--use-lc-numeric\n"
+
+#: main.c:627
+msgid "\t-n\t\t\t--non-decimal-data\n"
+msgstr "\t-n\t\t\t--non-decimal-data\n"
+
+#: main.c:628
+msgid "\t-o[file]\t\t--pretty-print[=file]\n"
+msgstr "\t-o[dosya]\t\t--pretty-print[=dosya]\n"
+
+#: main.c:629
+msgid "\t-O\t\t\t--optimize\n"
+msgstr "\t-O\t\t\t--optimize\n"
+
+#: main.c:630
+msgid "\t-p[file]\t\t--profile[=file]\n"
+msgstr "\t-p[dosya]\t\t--profile[=dosya]\n"
+
+#: main.c:631
+msgid "\t-P\t\t\t--posix\n"
+msgstr "\t-P\t\t\t--posix\n"
+
+#: main.c:632
+msgid "\t-r\t\t\t--re-interval\n"
+msgstr "\t-r\t\t\t--re-interval\n"
+
+#: main.c:633
+msgid "\t-s\t\t\t--no-optimize\n"
+msgstr "\t-s\t\t\t--no-optimize\n"
+
+#: main.c:634
+msgid "\t-S\t\t\t--sandbox\n"
+msgstr "\t-S\t\t\t--sandbox\n"
+
+#: main.c:635
+msgid "\t-t\t\t\t--lint-old\n"
+msgstr "\t-t\t\t\t--lint-old\n"
+
+#: main.c:636
+msgid "\t-V\t\t\t--version\n"
+msgstr "\t-V\t\t\t--version\n"
+
+#: main.c:638
+msgid "\t-Y\t\t\t--parsedebug\n"
+msgstr "\t-Y\t\t\t--parsedebug\n"
+
+#: main.c:641
+msgid "\t-Z locale-name\t\t--locale=locale-name\n"
+msgstr "\t-Z yerel\t\t--locale=yerel\n"
+
+#. TRANSLATORS: --help output (end)
+#. no-wrap
+#: main.c:647
+msgid ""
+"\n"
+"To report bugs, use the `gawkbug' program.\n"
+"For full instructions, see the node `Bugs' in `gawk.info'\n"
+"which is section `Reporting Problems and Bugs' in the\n"
+"printed version.  This same information may be found at\n"
+"https://www.gnu.org/software/gawk/manual/html_node/Bugs.html.\n"
+"PLEASE do NOT try to report bugs by posting in comp.lang.awk,\n"
+"or by using a web forum such as Stack Overflow.\n"
+"\n"
+msgstr ""
+"\n"
+"Hataları bildirmek için, `gawkbug' uygulamasını kullanın.\n"
+"Talimatların tamamı, `gawk.info' içinde\n"
+"`Reporting Problems and Bugs' başlıklı `Bugs' bölümündedir\n"
+"Bu bilgi şu adreste de bulunabilir:\n"
+"https://www.gnu.org/software/gawk/manual/gawk.html#Bugs.\n"
+"Hataları LÜTFEN comp.lang.awk haber grubundan veya\n"
+"Stack Overflow gibi forumlar üzerinden bildirmeyin.\n"
+"\n"
+
+#: main.c:663
+#, c-format
+msgid ""
+"Source code for gawk may be obtained from\n"
+"%s/gawk-%s.tar.gz\n"
+"\n"
+msgstr ""
+
+#: main.c:667
+msgid ""
+"gawk is a pattern scanning and processing language.\n"
+"By default it reads standard input and writes standard output.\n"
+"\n"
+msgstr ""
+"gawk dizge kalıplarını tarama ve işleme dilidir.\n"
+"Öntanımlı olarak standart girdiyi okur ve standart çıktıya yazar.\n"
+"\n"
+
+#: main.c:671
+#, c-format
+msgid ""
+"Examples:\n"
+"\t%s '{ sum += $1 }; END { print sum }' file\n"
+"\t%s -F: '{ print $1 }' /etc/passwd\n"
+msgstr ""
+"Örnekler:\n"
+"\t%s '{ sum += $1 }; END { print sum }' dosya\n"
+"\t%s -F: '{ print $1 }' /etc/passwd\n"
+
+#: main.c:701
+#, c-format
+msgid ""
+"Copyright (C) 1989, 1991-%d Free Software Foundation.\n"
+"\n"
+"This program is free software; you can redistribute it and/or modify\n"
+"it under the terms of the GNU General Public License as published by\n"
+"the Free Software Foundation; either version 3 of the License, or\n"
+"(at your option) any later version.\n"
+"\n"
+msgstr ""
+"Telif hakkı (C) 1989, 1991-%d Free Software Foundation.\n"
+"\n"
+"Bu uygulama serbest yazılımdır. Bu yazılımı Free Software Foundation\n"
+"tarafından yayınlanmış olan GNU Genel Kamu Lisansının 3. ya da sonraki\n"
+"herhangi bir sürümünün koşulları altında kopyalayabilir, dağıtabilir ve/"
+"veya\n"
+"üzerinde değişiklik yapabilirsiniz.\n"
+"\n"
+
+#: main.c:709
+msgid ""
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"\n"
+msgstr ""
+"Bu uygulama kullanışlı olabileceği umularak dağıtılmaktadır. Ancak,\n"
+"hiçbir GARANTİSİ YOKTUR; hatta SATILABİLİRLİĞİ veya HERHANGİ BİR\n"
+"AMACA UYGUNLUĞU için bile garanti verilmez. Daha ayrıntılı bilgi\n"
+"edinmek için GNU Genel Kamu Lisansına bakınız.\n"
+"\n"
+
+#: main.c:715
+msgid ""
+"You should have received a copy of the GNU General Public License\n"
+"along with this program. If not, see http://www.gnu.org/licenses/.\n"
+msgstr ""
+"GNU Genel Kamu Lisansının bir kopyasını bu uygulama ile birlikte almış\n"
+"olacaksınız; yoksa http://www.gnu.org/licenses/ adresine bakın.\n"
+
+#: main.c:754
+msgid "-Ft does not set FS to tab in POSIX awk"
+msgstr "-Ft, POSIX awk'da FS'yi sekmeye ayarlamaz"
+
+#: main.c:1183
+#, c-format
+msgid ""
+"%s: `%s' argument to `-v' not in `var=value' form\n"
+"\n"
+msgstr ""
+"%s: `-v' ile verilen `%s' değiştirgesi `değişken=değer' biçiminde değil\n"
+"\n"
+
+#: main.c:1209
+#, c-format
+msgid "`%s' is not a legal variable name"
+msgstr "`%s' kurala uygun bir değişken ismi değil"
+
+#: main.c:1212
+#, c-format
+msgid "`%s' is not a variable name, looking for file `%s=%s'"
+msgstr "`%2$s=%3$s' için dosyaya bakınca, `%1$s' bir değişken ismi değil"
+
+#: main.c:1226
+#, c-format
+msgid "cannot use gawk builtin `%s' as variable name"
+msgstr "gawk yerleşiği olan `%s' değişken ismi olamaz"
+
+#: main.c:1231
+#, c-format
+msgid "cannot use function `%s' as variable name"
+msgstr "`%s' işlev ismi bir değişken olarak kullanılamaz"
+
+#: main.c:1310
+msgid "floating point exception"
+msgstr "Gerçel sayı istisnası"
+
+#: main.c:1320
+msgid "fatal error: internal error"
+msgstr "ölümcül iç hata"
+
+#: main.c:1407
+#, c-format
+msgid "no pre-opened fd %d"
+msgstr "ön açılışlı bir %d dosya tanımlayıcısı yok"
+
+#: main.c:1414
+#, c-format
+msgid "could not pre-open /dev/null for fd %d"
+msgstr "%d dosya tanımlayıcısı için /dev/null ön açılışı yapılamadı"
+
+#: main.c:1629
+msgid "empty argument to `-e/--source' ignored"
+msgstr "`-e/--source' seçeneği için boş değiştirge yoksayıldı"
+
+#: main.c:1702 main.c:1707
+msgid "`--profile' overrides `--pretty-print'"
+msgstr "`--posix' seçeneği `--pretty-print' seçeneğini geçersiz kılar"
+
+#: main.c:1719
+msgid "-M ignored: MPFR/GMP support not compiled in"
+msgstr "-M yoksayıldı: MPFR/GMP desteği derlenmemiş"
+
+#: main.c:1745
+#, c-format
+msgid "Use `GAWK_PERSIST_FILE=%s gawk ...' instead of --persist."
+msgstr "--persist yerine `GAWK_PERSIST_FILE=%s gawk ...' kullanın."
+
+#: main.c:1747
+msgid "Persistent memory is not supported."
+msgstr "Kalıcı bellek desteklenmiyor."
+
+#: main.c:1756
+#, c-format
+msgid "%s: option `-W %s' unrecognized, ignored\n"
+msgstr "%s: `-W %s' seçeneği tanımlı değil, yok sayıldı\n"
+
+#: main.c:1809
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s: seçenek bir değiştirgela kullanılır -- %c\n"
+
+#: main.c:1917
+#, c-format
+msgid "%s: fatal: cannot stat %s: %s\n"
+msgstr ""
+
+#: main.c:1921
+#, c-format
+msgid ""
+"%s: fatal: using persistent memory is not allowed when running as root.\n"
+msgstr ""
+
+#: main.c:1924
+#, c-format
+msgid "%s: warning: %s is not owned by euid %d.\n"
+msgstr ""
+
+#: main.c:1939
+msgid "persistent memory is not supported"
+msgstr "kalıcı bellek desteklenmiyor"
+
+#: main.c:1949
+#, c-format
+msgid ""
+"%s: fatal: persistent memory allocator failed to initialize: return value "
+"%d, pma.c line: %d.\n"
+msgstr ""
+"%s: ölümcül: kalıcı bellek ayırıcı ilklendirmede başarısız: dönen değer %d, "
+"pma.c satırı: %d.\n"
+
+#: mpfr.c:670
+#, c-format
+msgid "PREC value `%.*s' is invalid"
+msgstr "PREC değeri `%.*s' geçersiz"
+
+#: mpfr.c:729
+#, c-format
+msgid "ROUNDMODE value `%.*s' is invalid"
+msgstr "ROUNDMODE değeri `%.*s' geçersiz"
+
+#: mpfr.c:795
+msgid "atan2: received non-numeric first argument"
+msgstr "atan2: ilk değiştirge sayısal olmayan türde alındı"
+
+#: mpfr.c:797
+msgid "atan2: received non-numeric second argument"
+msgstr "atan2: ikinci değiştirge sayısal olmayan türde alındı"
+
+#: mpfr.c:836
+#, c-format
+msgid "%s: received negative argument %.*s"
+msgstr "%s: negatif değiştirge %.*s alındı"
+
+#: mpfr.c:903
+msgid "int: received non-numeric argument"
+msgstr "int: sayısal olmayan değiştirge alındı"
+
+#: mpfr.c:935
+msgid "compl: received non-numeric argument"
+msgstr "compl: sayısal olmayan değiştirge alındı"
+
+#: mpfr.c:947
+msgid "compl(%Rg): negative value is not allowed"
+msgstr "compl(%Rg): negatif değere izin yok"
+
+#: mpfr.c:952
+msgid "comp(%Rg): fractional value will be truncated"
+msgstr "comp(%Rg): ondalık kısım kırpılacak"
+
+#: mpfr.c:963
+#, c-format
+msgid "compl(%Zd): negative values are not allowed"
+msgstr "compl(%Zd): negatif değerlere izin yok"
+
+#: mpfr.c:981
+#, c-format
+msgid "%s: received non-numeric argument #%d"
+msgstr "%s: alınan %d. değiştirge sayısal değil"
+
+#: mpfr.c:991
+msgid "%s: argument #%d has invalid value %Rg, using 0"
+msgstr "%s: %d. değiştirge geçersiz %Rg değerini içeriyor, 0 kullanılıyor"
+
+#: mpfr.c:1002
+msgid "%s: argument #%d negative value %Rg is not allowed"
+msgstr "%s: %d. değiştirgede %Rg negatif değerine izin verilmiyor"
+
+#: mpfr.c:1009
+msgid "%s: argument #%d fractional value %Rg will be truncated"
+msgstr "%s: %d. değiştirge %Rg için ondalık kısım kırpılacak"
+
+#: mpfr.c:1023
+#, c-format
+msgid "%s: argument #%d negative value %Zd is not allowed"
+msgstr "%s: %d. değiştirgede %Zd negatif değerine izin verilmiyor"
+
+#: mpfr.c:1117
+msgid "and: called with less than two arguments"
+msgstr "and: ikiden az değiştirge ile çağrıldı"
+
+#: mpfr.c:1149
+msgid "or: called with less than two arguments"
+msgstr "or: iki değiştirgeden azı ile çağrıldı"
+
+#: mpfr.c:1180
+msgid "xor: called with less than two arguments"
+msgstr "xor: iki değiştirgeden azı ile çağrıldı"
+
+#: mpfr.c:1310
+msgid "srand: received non-numeric argument"
+msgstr "srand: sayısal olmayan değiştirge alındı"
+
+#: mpfr.c:1354
+msgid "intdiv: received non-numeric first argument"
+msgstr "intdiv: ilk değiştirge sayısal olmayan türde alındı"
+
+#: mpfr.c:1356
+msgid "intdiv: received non-numeric second argument"
+msgstr "intdiv: ikinci değiştirge sayısal değil"
+
+#: msg.c:76
+#, c-format
+msgid "cmd. line:"
+msgstr "komut satırı:"
+
+#: node.c:477
+#, fuzzy
+#| msgid "backslash not last character on line"
+msgid "backslash at end of string"
+msgstr "tersbölü satırdaki son karakter değil"
+
+#: node.c:511
+msgid "could not make typed regex"
+msgstr "yazılan düzenli ifade derlenemedi"
+
+#: node.c:599
+#, c-format
+msgid "old awk does not support the `\\%c' escape sequence"
+msgstr "eski awk `\\%c' önceleme dizilimini desteklemiyor"
+
+#: node.c:660
+msgid "POSIX does not allow `\\x' escapes"
+msgstr "POSIX `\\x' öncelemelerine izin vermez"
+
+#: node.c:668
+msgid "no hex digits in `\\x' escape sequence"
+msgstr "`\\x' önceleme dizgesinde onaltılık rakamlar yok"
+
+#: node.c:690
+#, c-format
+msgid ""
+"hex escape \\x%.*s of %d characters probably not interpreted the way you "
+"expect"
+msgstr ""
+"%1$d karakterlik \\x%2$.*3$s onaltılık öncellemi muhtemelen umduğunuz gibi "
+"yorumlanmayacak"
+
+#: node.c:703
+#, fuzzy
+#| msgid "POSIX does not allow `\\x' escapes"
+msgid "POSIX does not allow `\\u' escapes"
+msgstr "POSIX `\\x' öncelemelerine izin vermez"
+
+#: node.c:711
+#, fuzzy
+#| msgid "no hex digits in `\\x' escape sequence"
+msgid "no hex digits in `\\u' escape sequence"
+msgstr "`\\x' önceleme dizgesinde onaltılık rakamlar yok"
+
+#: node.c:739
+#, fuzzy
+#| msgid "no hex digits in `\\x' escape sequence"
+msgid "invalid `\\u' escape sequence"
+msgstr "`\\x' önceleme dizgesinde onaltılık rakamlar yok"
+
+#: node.c:761
+#, c-format
+msgid "escape sequence `\\%c' treated as plain `%c'"
+msgstr "`\\%c' önceleme dizgesi `%c' olarak kullanıldı"
+
+#: node.c:903
+msgid ""
+"Invalid multibyte data detected. There may be a mismatch between your data "
+"and your locale"
+msgstr ""
+"Geçersiz çok baytlı veri saptandı. Verileriniz ile yereliniz arasında bir "
+"uyumsuzluk olabilir"
+
+#: printf.c:225 printf.c:230
+msgid "fatal: must use `count$' on all formats or none"
+msgstr "ölümcül: tüm biçemlerde ya `count$' kullanmalısınız ya da hiçbir şey"
+
+#: printf.c:303
+#, c-format
+msgid "field width is ignored for `%%' specifier"
+msgstr "alan genişliği `%%' belirteci için yok sayıldı"
+
+#: printf.c:305
+#, c-format
+msgid "precision is ignored for `%%' specifier"
+msgstr "hassasiyet `%%' belirteci için yok sayıldı"
+
+#: printf.c:307
+#, c-format
+msgid "field width and precision are ignored for `%%' specifier"
+msgstr "alan genişliği ve hassasiyeti `%%' belirteci için yok sayıldı"
+
+#: printf.c:358
+msgid "fatal: `$' is not permitted in awk formats"
+msgstr "ölümcül: `$' awk biçemlerde kullanılmaz"
+
+#: printf.c:367 printf.c:379
+msgid "fatal: argument index with `$' must be > 0"
+msgstr "ölümcül: `$' ile birlikte verilen değiştirge indisi > 0 olmalıdır"
+
+#: printf.c:371 printf.c:383
+#, c-format
+msgid ""
+"fatal: argument index %ld greater than total number of supplied arguments"
+msgstr ""
+"ölümcül: değiştirge indisi %ld sağlanan toplam değiştirge sayısından büyük"
+
+#: printf.c:393
+#, fuzzy
+#| msgid "fatal: must use `count$' on all formats or none"
+msgid "must use `count$' on all formats or none"
+msgstr "ölümcül: tüm biçemlerde ya `count$' kullanmalısınız ya da hiçbir şey"
+
+#: printf.c:403
+msgid "fatal: no `$' supplied for positional field width or precision"
+msgstr ""
+"ölümcül: konumsal alan genişliği ya da duyarlığı için `$' kullanılmamış"
+
+#: printf.c:487
+#, c-format
+msgid "`%c' is meaningless in awk formats; ignored"
+msgstr "`%c' awk biçemlerde anlamsız; yoksayıldı"
+
+#: printf.c:491
+#, c-format
+msgid "fatal: `%c' is not permitted in POSIX awk formats"
+msgstr "ölümcül: `%c' POSIX awk biçemlerde kullanılmaz"
+
+#: printf.c:528
+#, c-format
+msgid "[s]printf: value %g is not a valid wide character"
+msgstr "[s]printf: %g değeri geçerli bir geniş karakter değil"
+
+#: printf.c:685
+#, c-format
+msgid "%%%c format is POSIX standard but not portable to other awks"
+msgstr "%%%c biçemi POSIX standardıdır ama diğer awk'lara taşınabilir değildir"
+
+#: printf.c:722
+#, c-format
+msgid "ignoring unknown format specifier character `%c': no argument converted"
+msgstr ""
+"bilinmeyen biçem belirteç karakteri `%c' yok sayılıyor: dönüştürülen "
+"değiştirge yok"
+
+#: printf.c:727
+msgid "fatal: not enough arguments to satisfy format string"
+msgstr "ölümcül: biçem dizgesini oluşturacak yeterli değiştirge yok"
+
+#: printf.c:729
+msgid "^ ran out for this one"
+msgstr "bir bunun için ^ tükendi"
+
+#: printf.c:736
+msgid "[s]printf: format specifier does not have control letter"
+msgstr "[s]printf: biçem belirteci denetim karakteri içermiyor"
+
+#: printf.c:739
+msgid "too many arguments supplied for format string"
+msgstr "biçem dizgesi için çok fazla değiştirge sağlanmış"
+
+#: printf.c:781
+#, c-format
+msgid "%s: received non-string format string argument"
+msgstr "%s: alınan biçem dizgesi değiştirgesi dizge değil"
+
+#: printf.c:796
+msgid "sprintf: no arguments"
+msgstr "sprintf: değiştirge yok"
+
+#: printf.c:819 printf.c:830
+msgid "printf: no arguments"
+msgstr "printf: değiştirge yok"
+
+#: printf.c:845
+msgid "printf: attempt to write to closed write end of two-way pipe"
+msgstr "printf: iki yönlü borunun kapalı yazma ucuna yazılmaya çalışılıyor"
+
+#: printf.c:1169
+#, c-format
+msgid "[s]printf: value %g is out of range for `%%%c' format"
+msgstr "[s]printf: %g değeri `%%%c' biçimi için kapsamdışı"
+
+#: printf.c:1180
+#, c-format
+msgid "[s]printf: value %s is out of range for `%%%c' format"
+msgstr "[s]printf: %s değeri `%%%c' biçimi için kapsamdışı"
+
+#: posix/gawkmisc.c:200
+#, c-format
+msgid "%s %s `%s': could not get fd flags: (fcntl F_GETFD: %s)"
+msgstr "%s %s `%s': dosya tanıtıcı seçenekleri alınamadı: (fcntl F_GETFD: %s)"
+
+#: posix/gawkmisc.c:212
+#, c-format
+msgid "%s %s `%s': could not set close-on-exec: (fcntl F_SETFD: %s)"
+msgstr "%s %s `%s': close-on-exec atanamadı: (fcntl: %s)"
+
+#: posix/gawkmisc.c:337
+#, c-format
+msgid "warning: personality: %s\n"
+msgstr ""
+
+#: posix/gawkmisc.c:375
+#, c-format
+msgid "waitpid: got exit status %#o\n"
+msgstr ""
+
+#: posix/gawkmisc.c:379
+#, c-format
+msgid "fatal: posix_spawnp: %s\n"
+msgstr ""
+
+#: posix/gawkmisc.c:404
+#, fuzzy, c-format
+#| msgid "warning: "
+msgid "warning: sysctl: %s\n"
+msgstr "uyarı: "
+
+#: posix/gawkmisc.c:413
+#, fuzzy, c-format
+#| msgid "warning: "
+msgid "warning: procctl: %s\n"
+msgstr "uyarı: "
+
+#: profile.c:79
+msgid "Program indentation level too deep. Consider refactoring your code"
+msgstr ""
+"Uygulama girinti düzeyi çok derin. Kodunuzu yeniden düzenlemeyi düşünün"
+
+#: profile.c:118
+msgid "sending profile to standard error"
+msgstr "profil standart hataya gönderiliyor"
+
+#: profile.c:288
+#, c-format
+msgid ""
+"\t# %s rule(s)\n"
+"\n"
+msgstr ""
+"\t# %s kural(lar)ı\n"
+"\n"
+
+#: profile.c:300
+#, c-format
+msgid ""
+"\t# Rule(s)\n"
+"\n"
+msgstr ""
+"\t# Kurallar\n"
+"\n"
+
+#: profile.c:392
+#, c-format
+msgid "internal error: %s with null vname"
+msgstr "iç hata: null vname'li %s"
+
+#: profile.c:697
+msgid "internal error: builtin with null fname"
+msgstr "iç hata: null fname'li yerleşik"
+
+#: profile.c:1358
+#, c-format
+msgid ""
+"%s# Loaded extensions (-l and/or @load)\n"
+"\n"
+msgstr ""
+"%s# Yüklü eklentiler (-l ve/veya @load)\n"
+"\n"
+
+#: profile.c:1389
+#, fuzzy, c-format
+#| msgid ""
+#| "\n"
+#| "# Included files (-i and/or @include)\n"
+#| "\n"
+msgid ""
+"\n"
+"# Included files (-i and/or @include and/or @nsinclude)\n"
+"\n"
+msgstr ""
+"\n"
+"# İçerilen dosyalar (-i ve/veya @include)\n"
+"\n"
+
+#: profile.c:1460
+#, c-format
+msgid "\t# gawk profile, created %s\n"
+msgstr "\t# gawk profili, oluşturuldu: %s\n"
+
+#: profile.c:2028
+#, c-format
+msgid ""
+"\n"
+"\t# Functions, listed alphabetically\n"
+msgstr ""
+"\n"
+"\t# İşlevler, alfabetik sırayla\n"
+
+#: profile.c:2090
+#, c-format
+msgid "redir2str: unknown redirection type %d"
+msgstr "redir2str: bilinmeyen yönlendirme türü %d"
+
+#: re.c:75 re.c:189
+msgid ""
+"behavior of matching a regexp containing NUL characters is not defined by "
+"POSIX"
+msgstr ""
+"NUL karakterler içeren bir düzenli ifadenin eşleşme davranışı POSIX'te "
+"tanımsızdır"
+
+#: re.c:145
+msgid "invalid NUL byte in dynamic regexp"
+msgstr "dinamik düzenli ifade içinde geçersiz NUL bayt"
+
+#: re.c:229
+#, c-format
+msgid "regexp escape sequence `\\%c' treated as plain `%c'"
+msgstr "düzenli ifade `\\%c' önceleme dizgesi `%c' olarak ele alındı"
+
+#: re.c:264
+#, c-format
+msgid "regexp escape sequence `\\%c' is not a known regexp operator"
+msgstr "düzenli ifade öncelemi `\\%c' bilinen bir düzenli ifade işleci değil"
+
+#: re.c:828
+#, c-format
+msgid "regexp component `%.*s' should probably be `[%.*s]'"
+msgstr "düzenli ifade bileşeni `%.*s' muhtemelen `[%.*s]' olmalı"
+
+#: support/dfa.c:911 support/minrx.c:2550
+msgid "unbalanced ["
+msgstr "dengesiz ["
+
+#: support/dfa.c:1032
+msgid "invalid character class"
+msgstr "karakter sınıfı geçersiz"
+
+#: support/dfa.c:1160
+msgid "character class syntax is [[:space:]], not [:space:]"
+msgstr "karakter sınıfı sözdizimi için [[:space:]] geçerlidir, [:space:] değil"
+
+#: support/dfa.c:1236
+msgid "unfinished \\ escape"
+msgstr "bitmemiş \\ öncelemi"
+
+#: support/dfa.c:1346
+msgid "? at start of expression"
+msgstr "ifade başlangıcında ?"
+
+#: support/dfa.c:1358
+msgid "* at start of expression"
+msgstr "ifade başlandıcında *"
+
+#: support/dfa.c:1372
+msgid "+ at start of expression"
+msgstr "ifade başlangıcında +"
+
+#: support/dfa.c:1427
+msgid "{...} at start of expression"
+msgstr "ifade başlangıcında {...}"
+
+#: support/dfa.c:1430
+msgid "invalid content of \\{\\}"
+msgstr "\\{\\} içeriği geçersiz"
+
+#: support/dfa.c:1432
+msgid "regular expression too big"
+msgstr "düzenli ifade çok büyük"
+
+#: support/dfa.c:1582
+msgid "stray \\ before unprintable character"
+msgstr "yazılamayan karakter öncesi serseri \\"
+
+#: support/dfa.c:1584
+msgid "stray \\ before white space"
+msgstr "boşluk karakterinden önce serseri \\"
+
+#: support/dfa.c:1595
+#, fuzzy, c-format
+#| msgid "stray \\ before %lc"
+msgid "stray \\ before %s"
+msgstr "%lc öncesi serseri \\"
+
+#: support/dfa.c:1596 support/dfa.c:1599
+msgid "stray \\"
+msgstr "serseri \\"
+
+#: support/dfa.c:1950 support/minrx.c:2554
+msgid "unbalanced ("
+msgstr "dengesiz ("
+
+#: support/dfa.c:2069
+msgid "no syntax specified"
+msgstr "sözdizimi belirtilmemiş"
+
+#: support/dfa.c:2080
+msgid "unbalanced )"
+msgstr "dengesiz )"
+
+#: support/getopt.c:605 support/getopt.c:634
+#, c-format
+msgid "%s: option '%s' is ambiguous; possibilities:"
+msgstr "%s: `%s' seçeneğinde belirsizlik; olasılıklar:"
+
+#: support/getopt.c:680 support/getopt.c:684
+#, c-format
+msgid "%s: option '--%s' doesn't allow an argument\n"
+msgstr "%s: `--%s' seçeneği değiştirgesiz kullanılmaz\n"
+
+#: support/getopt.c:693 support/getopt.c:698
+#, c-format
+msgid "%s: option '%c%s' doesn't allow an argument\n"
+msgstr "%s: seçenek `%c%s' değiştirgesiz kullanılır\n"
+
+#: support/getopt.c:741 support/getopt.c:760
+#, c-format
+msgid "%s: option '--%s' requires an argument\n"
+msgstr "%s: `--%s' seçeneği bir değiştirge gerektirir\n"
+
+#: support/getopt.c:798 support/getopt.c:801
+#, c-format
+msgid "%s: unrecognized option '--%s'\n"
+msgstr "%s: '--%s' seçeneği bilinmiyor\n"
+
+#: support/getopt.c:809 support/getopt.c:812
+#, c-format
+msgid "%s: unrecognized option '%c%s'\n"
+msgstr "%s: '%c%s' seçeneği bilinmiyor\n"
+
+#: support/getopt.c:861 support/getopt.c:864
+#, c-format
+msgid "%s: invalid option -- '%c'\n"
+msgstr "%s: geçersiz seçenek -- '%c'\n"
+
+#: support/getopt.c:917 support/getopt.c:934 support/getopt.c:1144
+#: support/getopt.c:1162
+#, c-format
+msgid "%s: option requires an argument -- '%c'\n"
+msgstr "%s: seçenek bir değiştirge gerektirir -- '%c'\n"
+
+#: support/getopt.c:990 support/getopt.c:1006
+#, c-format
+msgid "%s: option '-W %s' is ambiguous\n"
+msgstr "%s: `-W %s' seçeneğinde belirsizlik\n"
+
+#: support/getopt.c:1030 support/getopt.c:1048
+#, c-format
+msgid "%s: option '-W %s' doesn't allow an argument\n"
+msgstr "%s: `-W %s' seçeneği değiştirgesiz kullanılır\n"
+
+#: support/getopt.c:1069 support/getopt.c:1087
+#, c-format
+msgid "%s: option '-W %s' requires an argument\n"
+msgstr "%s: '-W %s' seçeneği bir değiştirge gerektirir\n"
+
+#: support/minrx.c:2545
+#, fuzzy
+#| msgid "Success"
+msgid "success"
+msgstr "Başarılı"
+
+#: support/minrx.c:2546
+msgid "bad pattern"
+msgstr ""
+
+#: support/minrx.c:2547
+#, fuzzy
+#| msgid "invalid content of \\{\\}"
+msgid "invalid contents of {}"
+msgstr "\\{\\} içeriği geçersiz"
+
+#: support/minrx.c:2548
+msgid "? * + or {interval} not preceded by valid subpattern"
+msgstr ""
+
+#: support/minrx.c:2549
+#, fuzzy
+#| msgid "unbalanced ["
+msgid "unbalanced {"
+msgstr "dengesiz ["
+
+#: support/minrx.c:2551
+#, fuzzy
+#| msgid "Invalid collation character"
+msgid "invalid collating element"
+msgstr "Karşılaştırma karakteri geçersiz"
+
+#: support/minrx.c:2552
+#, fuzzy
+#| msgid "Invalid character class name"
+msgid "invalid character class name"
+msgstr "Karakter sınıf ismi geçersiz"
+
+#: support/minrx.c:2553
+#, fuzzy
+#| msgid "Trailing backslash"
+msgid "invalid trailing backslash"
+msgstr "İzleyen tersbölü"
+
+#: support/minrx.c:2555
+#, fuzzy
+#| msgid "Invalid range end"
+msgid "invalid range endpoint"
+msgstr "Kapsam sonu geçersiz"
+
+#: support/minrx.c:2556
+msgid "memory allocation failed"
+msgstr ""
+
+#: support/minrx.c:2557
+msgid "invalid \\digit"
+msgstr ""
+
+#: support/minrx.c:2558
+msgid "match not found"
+msgstr ""
+
+#: support/minrx.c:2559
+#, fuzzy
+#| msgid "unknown opcode %d"
+msgid "unknown error code"
+msgstr "opcode %d bilinmiyor"
+
+#: support/regcomp.c:122
+msgid "Success"
+msgstr "Başarılı"
+
+#: support/regcomp.c:125
+msgid "No match"
+msgstr "Eşleşmez"
+
+#: support/regcomp.c:128
+msgid "Invalid regular expression"
+msgstr "Düzenli ifade geçersiz"
+
+#: support/regcomp.c:131
+msgid "Invalid collation character"
+msgstr "Karşılaştırma karakteri geçersiz"
+
+#: support/regcomp.c:134
+msgid "Invalid character class name"
+msgstr "Karakter sınıf ismi geçersiz"
+
+#: support/regcomp.c:137
+msgid "Trailing backslash"
+msgstr "İzleyen tersbölü"
+
+#: support/regcomp.c:140
+msgid "Invalid back reference"
+msgstr "Geriye başvuru geçersiz"
+
+#: support/regcomp.c:143
+msgid "Unmatched [, [^, [:, [., or [="
+msgstr "[, [^, [:, [. veya [= eşleşmiyor"
+
+#: support/regcomp.c:146
+msgid "Unmatched ( or \\("
+msgstr "( ya da \\( eşleşmiyor"
+
+#: support/regcomp.c:149
+msgid "Unmatched \\{"
+msgstr "\\{ eşleşmiyor"
+
+#: support/regcomp.c:152
+msgid "Invalid content of \\{\\}"
+msgstr "\\{\\} içeriği geçersiz"
+
+#: support/regcomp.c:155
+msgid "Invalid range end"
+msgstr "Kapsam sonu geçersiz"
+
+#: support/regcomp.c:158
+msgid "Memory exhausted"
+msgstr "Bellek tükendi"
+
+#: support/regcomp.c:161
+msgid "Invalid preceding regular expression"
+msgstr "düzenli ifade önceliği geçersiz"
+
+#: support/regcomp.c:164
+msgid "Premature end of regular expression"
+msgstr "Düzenli ifade sonu eksik kalmış"
+
+#: support/regcomp.c:167
+msgid "Regular expression too big"
+msgstr "Düzenli ifade çok büyük"
+
+#: support/regcomp.c:170
+msgid "Unmatched ) or \\)"
+msgstr ") ya da  \\) eşleşmiyor"
+
+#: support/regcomp.c:650
+msgid "No previous regular expression"
+msgstr "Daha önce düzenli ifade yok"
+
+#: symbol.c:127
+#, c-format
+msgid "%s was created by version `%s', but the current version is `%s'"
+msgstr ""
+
+#: symbol.c:149
+msgid ""
+"current setting of -M/--bignum does not match saved setting in PMA backing "
+"file"
+msgstr ""
+
+#: symbol.c:793
+#, c-format
+msgid "function `%s': cannot use function `%s' as a parameter name"
+msgstr "işlev `%s': işlev ismi `%s' değiştirge ismi olarak kullanılamaz"
+
+# (translator)
+# pop: point of presence; point of access to the internet.
+#: symbol.c:923
+msgid "cannot pop main context"
+msgstr "ana bağlam erişim noktası olamıyor"
+
+#~ msgid "`delete(array)' is a non-portable tawk extension"
+#~ msgstr "`delete array' taşınabilir olmayan gawk eklentisidir"
+
+#, c-format
+#~ msgid "%s: %d: tawk regex modifier `/.../%c' doesn't work in gawk"
+#~ msgstr "%s: %d: tawk regex değiştirici `/.../%c' gawk'ta çalışmaz"
+
+#, c-format
+#~ msgid "tawk regex modifier `/.../%c' doesn't work in gawk"
+#~ msgstr "tawk regex değiştirici `/.../%c' gawk'ta çalışmaz"
+
+#~ msgid "length: received array argument"
+#~ msgstr "length: dizi değiştirge alındı"
+
+#~ msgid "`length(array)' is a gawk extension"
+#~ msgstr "`length(array)' gawk eklentisidir"
+
+#~ msgid "fatal: `$' not permitted after period in format"
+#~ msgstr "ölümcül: `$' biçem içinde noktadan sonra kullanılmaz"
+
+#, c-format
+#~ msgid "[s]printf: value %g is too big for %%c format"
+#~ msgstr "[s]printf: %g değeri `%%c' biçimi için çok büyük"
+
+#, c-format
+#~ msgid "typeof: invalid argument type `%s'"
+#~ msgstr "typeof: değiştirge türü `%s' geçersiz"
+
+#, c-format
+#~ msgid "%s"
+#~ msgstr "%s"
+
+#~ msgid ""
+#~ "The time extension is obsolete. Use the timex extension from gawkextlib "
+#~ "instead."
+#~ msgstr ""
+#~ "time eklentisi kullanımdışı. Yerine gawkextlib altındaki timex "
+#~ "eklentisini kulanın."
+
+#~ msgid "\t-W nostalgia\t\t--nostalgia\n"
+#~ msgstr "\t-W nostalgia\t\t--nostalgia\n"
+
+#~ msgid "fatal error: internal error: segfault"
+#~ msgstr ""
+#~ "ölümcül iç hata: parçalama arızası (tr_TR yerine C yereli kullanımı çözüm "
+#~ "olabilir)"
+
+#~ msgid "fatal error: internal error: stack overflow"
+#~ msgstr "ölümcül iç hata: yığıt taşması"

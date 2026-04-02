@@ -42,7 +42,7 @@ PLEASE do NOT try to report bugs by posting in comp.lang.awk,
 or by using a web forum such as Stack Overflow.
 
 Source code for gawk may be obtained from
-https://ftp.gnu.org/gnu/gawk/gawk-5.3.0.tar.gz
+https://ftp.gnu.org/gnu/gawk/gawk-5.4.0.tar.gz
 
 gawk is a pattern scanning and processing language.
 By default it reads standard input and writes standard output.

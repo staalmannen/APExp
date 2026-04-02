@@ -1,5 +1,9 @@
 # dupword.awk --- find duplicate words in text
 #
+# This file and how to use it are described in the manual.
+# Therefore, we respectfully advise you to Read The Fine Manual
+# for more information.
+#
 # Arnold Robbins, arnold@skeeve.com, Public Domain
 # December 1991
 # Revised October 2000

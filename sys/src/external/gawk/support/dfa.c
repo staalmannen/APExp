@@ -1,5 +1,5 @@
 /* dfa.c - deterministic extended regexp routines for GNU
-   Copyright (C) 1988, 1998, 2000, 2002, 2004-2005, 2007-2023 Free Software
+   Copyright (C) 1988, 1998, 2000, 2002, 2004-2005, 2007-2026 Free Software
    Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -13,9 +13,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,
-   51 Franklin Street - Fifth Floor, Boston, MA  02110-1301, USA */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written June, 1988 by Mike Haertel
    Modified July, 1988 by Arthur David Olson to assist BMG speedups  */
@@ -33,7 +31,6 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#undef RE_DUP_MAX
 #include <limits.h>
 #include <string.h>
 #include <wchar.h>
@@ -44,20 +41,21 @@
 #include "xalloc.h"
 #include "localeinfo.h"
 
-#if GAWK
-/* Use ISO C 99 API.  */
+/* MinGW has this defined in a file included from config.h above.  */
+#ifndef __MINGW32__
+# if HAVE_UCHAR_H
+/* Use ISO C 11 API.  */
+#  include <uchar.h>
+# else
+#  define mbrtoc32  mbrtowc
+#  define c32rtomb  wcrtomb
+# endif
 # include <wctype.h>
-# define char32_t wchar_t
-# define mbrtoc32 mbrtowc
-# define c32rtomb wcrtomb
 # define c32tob wctob
 # define c32isprint iswprint
 # define c32isspace iswspace
-# define mbszero(p) memset ((p), 0, sizeof (mbstate_t))
-#else
-/* Use ISO C 11 + gnulib API.  */
-# include <uchar.h>
-#endif
+#endif	/* !__MINGW32__ */
+#define mbszero(p) memset ((p), 0, sizeof (mbstate_t))
 
 /* Pacify gcc -Wanalyzer-null-dereference in areas where GCC
    understandably cannot deduce that the input comes from a
@@ -67,7 +65,7 @@
 #define assume_nonnull(x) assume ((x) != NULL)
 
 static bool
-str_eq (char const *a, char const *b)
+streq (char const *a, char const *b)
 {
   return strcmp (a, b) == 0;
 }
@@ -81,7 +79,7 @@ c_isdigit (char c)
 #ifndef FALLTHROUGH
 # if 201710L < __STDC_VERSION__
 #  define FALLTHROUGH [[__fallthrough__]]
-# elif ((__GNUC__ >= 7) \
+# elif ((__GNUC__ >= 7 && !defined __clang__) \
         || (defined __apple_build_version__ \
             ? __apple_build_version__ >= 12000000 \
             : __clang_major__ >= 10))
@@ -947,7 +945,7 @@ static const struct dfa_ctype *_GL_ATTRIBUTE_PURE
 find_pred (const char *str)
 {
   for (int i = 0; prednames[i].name; i++)
-    if (str_eq (str, prednames[i].name))
+    if (streq (str, prednames[i].name))
       return &prednames[i];
   return NULL;
 }
@@ -1016,9 +1014,9 @@ parse_bracket_exp (struct dfa *dfa)
                 }
               str[len] = '\0';
 
-              /* Fetch bracket.  */
-              c = bracket_fetch_wc (dfa);
-              wc = dfa->lex.wctok;
+              /* Discard ']', reporting an error if no more input.  */
+              bracket_fetch_wc (dfa);
+
               if (c1 == ':')
                 /* Build character class.  POSIX allows character
                    classes to match multicharacter collating elements,
@@ -1026,8 +1024,8 @@ parse_bracket_exp (struct dfa *dfa)
                    worry about that possibility.  */
                 {
                   char const *class
-                    = (dfa->syntax.case_fold && (str_eq (str, "upper")
-                                                 || str_eq (str, "lower"))
+                    = (dfa->syntax.case_fold && (streq (str, "upper")
+                                                 || streq (str, "lower"))
                        ? "alpha" : str);
                   const struct dfa_ctype *pred = find_pred (class);
                   if (!pred)
@@ -1107,7 +1105,7 @@ parse_bracket_exp (struct dfa *dfa)
               if (wc != wc2 || wc == WEOF)
                 {
                   if (dfa->localeinfo.simple
-                      || (c_isdigit (c) & c_isdigit (c2)))
+                      || (c_isdigit (c) && c_isdigit (c2)))
                     {
                       for (int ci = c; ci <= c2; ci++)
                         if (dfa->syntax.case_fold && isalpha (ci))
@@ -2004,18 +2002,20 @@ closure (struct dfa *dfa)
           addtok (dfa, PLUS);
         if (dfa->lex.minrep == 0)
           addtok (dfa, QMARK);
-        int i;
-        for (i = 1; i < dfa->lex.minrep; i++)
-          {
-            copytoks (dfa, tindex, ntokens);
-            addtok (dfa, CAT);
-          }
-        for (; i < dfa->lex.maxrep; i++)
-          {
-            copytoks (dfa, tindex, ntokens);
-            addtok (dfa, QMARK);
-            addtok (dfa, CAT);
-          }
+        {
+          int i;
+          for (i = 1; i < dfa->lex.minrep; i++)
+            {
+              copytoks (dfa, tindex, ntokens);
+              addtok (dfa, CAT);
+            }
+          for (; i < dfa->lex.maxrep; i++)
+            {
+              copytoks (dfa, tindex, ntokens);
+              addtok (dfa, QMARK);
+              addtok (dfa, CAT);
+            }
+        }
         dfa->parse.tok = lex (dfa);
       }
     else if (dfa->parse.tok == REPMN)
@@ -2263,15 +2263,15 @@ state_index (struct dfa *d, position_set const *s, int context)
 {
   size_t hash = 0;
   int constraint = 0;
-  state_num i;
 
-  for (i = 0; i < s->nelem; ++i)
+  for (state_num i = 0; i < s->nelem; ++i)
     {
       idx_t ind = s->elems[i].index;
       hash ^= ind + s->elems[i].constraint;
     }
 
   /* Try to find a state that exactly matches the proposed one.  */
+  state_num i;
   for (i = 0; i < d->sindex; ++i)
     {
       if (hash != d->states[i].hash || s->nelem != d->states[i].elems.nelem
@@ -2703,6 +2703,7 @@ dfaanalyze (struct dfa *d, bool searchflag)
 
   addtok (d, CAT);
   idx_t tindex = d->tindex;
+  // assume (0 < tindex);
 
 #ifdef DEBUG
   fprintf (stderr, "dfaanalyze:\n");
@@ -3355,8 +3356,7 @@ transit_state (struct dfa *d, state_num s, unsigned char const **pp,
     {
       if (MAX_TRCOUNT <= d->mb_trcount)
         {
-          state_num s3;
-          for (s3 = -1; s3 < d->tralloc; s3++)
+          for (state_num s3 = -1; s3 < d->tralloc; s3++)
             {
               free (d->mb_trans[s3]);
               d->mb_trans[s3] = NULL;
@@ -3683,8 +3683,7 @@ free_mbdata (struct dfa *d)
 
   if (d->mb_trans)
     {
-      state_num s;
-      for (s = -1; s < d->tralloc; s++)
+      for (state_num s = -1; s < d->tralloc; s++)
         free (d->mb_trans[s]);
       free (d->mb_trans - 2);
     }
@@ -4060,7 +4059,7 @@ comsubs (char *left, char const *right)
   for (char *lcp = left; *lcp != '\0'; lcp++)
     {
       idx_t len = 0;
-      char *rcp = strchr (right, *lcp);
+      char const *rcp = strchr (right, *lcp);
       while (rcp != NULL)
         {
           idx_t i;
@@ -4202,15 +4201,14 @@ dfamust (struct dfa const *d)
 
         case OR:
           {
-            char **new;
             must *rmp = mp;
             assume_nonnull (rmp);
             must *lmp = mp = mp->prev;
             assume_nonnull (lmp);
-            idx_t j, ln, rn, n;
+            idx_t ln, rn, n;
 
             /* Guaranteed to be.  Unlikely, but ...  */
-            if (str_eq (lmp->is, rmp->is))
+            if (streq (lmp->is, rmp->is))
               {
                 lmp->begline &= rmp->begline;
                 lmp->endline &= rmp->endline;
@@ -4222,23 +4220,28 @@ dfamust (struct dfa const *d)
                 lmp->endline = false;
               }
             /* Left side--easy */
-            idx_t i = 0;
-            while (lmp->left[i] != '\0' && lmp->left[i] == rmp->left[i])
-              ++i;
-            lmp->left[i] = '\0';
+            {
+              idx_t i = 0;
+              while (lmp->left[i] != '\0' && lmp->left[i] == rmp->left[i])
+                ++i;
+              lmp->left[i] = '\0';
+            }
             /* Right side */
             ln = strlen (lmp->right);
             rn = strlen (rmp->right);
             n = ln;
             if (n > rn)
               n = rn;
-            for (i = 0; i < n; ++i)
-              if (lmp->right[ln - i - 1] != rmp->right[rn - i - 1])
-                break;
-            for (j = 0; j < i; ++j)
-              lmp->right[j] = lmp->right[(ln - i) + j];
-            lmp->right[j] = '\0';
-            new = inboth (lmp->in, rmp->in);
+            {
+              idx_t i, j;
+              for (i = 0; i < n; ++i)
+                if (lmp->right[ln - i - 1] != rmp->right[rn - i - 1])
+                  break;
+              for (j = 0; j < i; ++j)
+                lmp->right[j] = lmp->right[(ln - i) + j];
+              lmp->right[j] = '\0';
+            }
+            char **new = inboth (lmp->in, rmp->in);
             freelist (lmp->in);
             free (lmp->in);
             lmp->in = new;
@@ -4257,7 +4260,7 @@ dfamust (struct dfa const *d)
           for (idx_t i = 0; mp->in[i] != NULL; i++)
             if (strlen (mp->in[i]) > strlen (result))
               result = mp->in[i];
-          if (str_eq (result, mp->is))
+          if (streq (result, mp->is))
             {
               if ((!need_begline || mp->begline) && (!need_endline
                                                      || mp->endline))

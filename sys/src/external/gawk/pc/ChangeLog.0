@@ -255,7 +255,7 @@ Mon May 21 05:46:46 2007  Scott Deifik         <scottd.mail@sbcglobal.net>
 
 Wed May 16 22:12:55 2007  Scott Deifik         <scottd.mail@sbcglobal.net>
 
-	* Makfile.tst: Changes for DJGPP, bring in sync with main
+	* Makefile.tst: Changes for DJGPP, bring in sync with main
 	test/Makefile.
 
 Wed May  9 21:01:18 2007  Scott Deifik         <scottd.mail@sbcglobal.net>

@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2014, 2016, 2018-2023,
+ * Copyright (C) 1986, 1988, 1989, 1991-2014, 2016, 2018-2023, 2025,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -210,17 +210,17 @@ make_aname(const NODE *symbol)
 		slen = strlen(symbol->vname);	/* subscript in parent array */
 		if (alen + slen + 4 > max_alen) {		/* sizeof("[\"\"]") = 4 */
 			max_alen = alen + slen + 4 + SLEN;
-			erealloc(aname, char *, (max_alen + 1) * sizeof(char *), "make_aname");
+			erealloc(aname, char *, (max_alen + 1) * sizeof(char *));
 		}
 		alen += sprintf(aname + alen, "[\"%s\"]", symbol->vname);
 	} else {
 		alen = strlen(symbol->vname);
 		if (aname == NULL) {
 			max_alen = alen + SLEN;
-			emalloc(aname, char *, (max_alen + 1) * sizeof(char *), "make_aname");
+			emalloc(aname, char *, (max_alen + 1) * sizeof(char *));
 		} else if (alen > max_alen) {
 			max_alen = alen + SLEN;
-			erealloc(aname, char *, (max_alen + 1) * sizeof(char *), "make_aname");
+			erealloc(aname, char *, (max_alen + 1) * sizeof(char *));
 		}
 		memcpy(aname, symbol->vname, alen + 1);
 	}
@@ -282,10 +282,10 @@ array_vname(const NODE *symbol)
 
 	/* (Re)allocate memory: */
 	if (message == NULL) {
-		emalloc(message, char *, len, "array_vname");
+		emalloc(message, char *, len);
 		msglen = len;
 	} else if (len > msglen) {
-		erealloc(message, char *, len, "array_vname");
+		erealloc(message, char *, len);
 		msglen = len;
 	} /* else
 		current buffer can hold new name */
@@ -333,8 +333,15 @@ force_array(NODE *symbol, bool canfatal)
 			symbol = symbol->orig_array;
 	}
 
+	NODE *elem_new_parent = NULL;
+	char *elem_new_vname = NULL;
+
 	switch (symbol->type) {
 	case Node_elem_new:
+		elem_new_parent = symbol->elemnew_parent;
+		symbol->elemnew_parent = NULL;
+		elem_new_vname = symbol->elemnew_vname;
+		symbol->elemnew_vname = NULL;
 		efree(symbol->stptr);
 		symbol->stptr = NULL;
 		symbol->stlen = 0;
@@ -345,6 +352,10 @@ force_array(NODE *symbol, bool canfatal)
 		symbol->parent_array = NULL;	/* main array has no parent */
 		/* fall through */
 	case Node_var_array:
+		if (elem_new_parent != NULL)
+			symbol->parent_array = elem_new_parent;
+		if (elem_new_vname != NULL)
+			symbol->vname = elem_new_vname;
 		break;
 
 	case Node_array_ref:
@@ -412,7 +423,7 @@ concat_exp(int nargs, bool do_subsep)
 	}
 	len += (nargs - 1) * subseplen;
 
-	emalloc(str, char *, len + 1, "concat_exp");
+	emalloc(str, char *, len + 1);
 
 	r = args_array[nargs];
 	memcpy(str, r->stptr, r->stlen);
@@ -432,6 +443,30 @@ concat_exp(int nargs, bool do_subsep)
 	}
 
 	return make_str_node(str, len, ALREADY_MALLOCED);
+}
+
+
+/*
+ * adjust_param_node: change a parameter node when adjusting the call stack
+ *  (code factored out from the adjust_fcall_stack function)
+ */
+
+static void
+adjust_param_node(NODE *r)
+{
+	if (r->orig_array != NULL)
+		if (r->orig_array->valref > 0)
+			DEREF(r->orig_array);
+	if (r->prev_array != NULL && r->prev_array != r->orig_array)
+		if (r->prev_array->valref > 0)
+			DEREF(r->prev_array);
+	if (r->orig_array->type == Node_var_array) {
+		r->orig_array = r->prev_array = NULL;
+		null_array(r);
+	} else	{ /* Node_elem_new */
+		r->type = Node_var_new;
+	}
+	r->parent_array = NULL;
 }
 
 
@@ -475,13 +510,15 @@ adjust_fcall_stack(NODE *symbol, int nsubs)
 	for (; pcount > 0; pcount--) {
 		r = *sp++;
 		if (r->type != Node_array_ref
-				|| r->orig_array->type != Node_var_array)
+			|| (r->orig_array->type != Node_var_array
+				&& r->orig_array->type != Node_elem_new))
 			continue;
 		n = r->orig_array;
+#define PARENT_ARRAY(n) ((n->type == Node_elem_new) ? n->elemnew_parent : n->parent_array)
 
 		/* Case 1 */
 		if (n == symbol
-			&& symbol->parent_array != NULL
+			&& PARENT_ARRAY(symbol) != NULL
 			&& nsubs > 0
 		) {
 			/*
@@ -496,13 +533,12 @@ adjust_fcall_stack(NODE *symbol, int nsubs)
 			 *   BEGIN { a[0][0] = 1; f(a[0], a[0]); ...}
 			 */
 
-			null_array(r);
-			r->parent_array = NULL;
+			adjust_param_node(r);
 			continue;
 		}
 
 		/* Case 2 */
-		for (n = n->parent_array; n != NULL; n = n->parent_array) {
+		for (n = PARENT_ARRAY(n); n != NULL; n = PARENT_ARRAY(n)) {
 			assert(n->type == Node_var_array);
 			if (n == symbol) {
 				/*
@@ -514,8 +550,7 @@ adjust_fcall_stack(NODE *symbol, int nsubs)
 				 *    BEGIN { a[0][0][0][0] = 1; f(a[0], a[0][0][0]); .. }
 				 *
 				 */
-				null_array(r);
-				r->parent_array = NULL;
+				adjust_param_node(r);
 				break;
 			}
 		}
@@ -569,7 +604,7 @@ do_delete(NODE *symbol, int nsubs)
 
 	for (i = nsubs; i > 0; i--) {
 		subs = PEEK(i - 1);
-		if (subs->type != Node_val) {
+		if (subs->type != Node_val && subs->type != Node_elem_new) {
 			free_subs(i);
 			fatal(_("attempt to use array `%s' in a scalar context"), array_vname(subs));
 		}
@@ -608,8 +643,21 @@ do_delete(NODE *symbol, int nsubs)
 		/* cleared a sub-array, free Node_var_array */
 		efree(val->vname);
 		freenode(val);
-	} else
+	} else if (val->type == Node_elem_new) {
+		adjust_fcall_stack(val, nsubs);  /* fix function call stack; See above. */
+		elem_new_reset(val);
+		if ((val->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
+			efree(val->stptr);
+
+		mpfr_unset(val);
+#ifdef MEMDEBUG
+		memset(val, 0, sizeof(NODE));
+		val->type = 0xbaad;
+#endif
+		freenode(val);
+	} else {
 		unref(val);
+	}
 
 	(void) assoc_remove(symbol, subs);
 	DEREF(subs);
@@ -1455,7 +1503,7 @@ assoc_list(NODE *symbol, const char *sort_str, sort_context_t sort_ctxt)
 
 			/* give back extra memory */
 
-			erealloc(list, NODE **, num_elems * sizeof(NODE *), "assoc_list");
+			erealloc(list, NODE **, num_elems * sizeof(NODE *));
 		}
 	}
 
@@ -1477,7 +1525,7 @@ new_array_element(void)
 	NODE *n = make_number(0.0);
 	char *sp;
 
-	emalloc(sp, char *, 2, "new_array_element");
+	emalloc(sp, char *, 2);
 	sp[0] = sp[1] = '\0';
 
 	n->stptr = sp;

@@ -3,9 +3,9 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2023 the Free Software Foundation, Inc.
+ * Copyright (C) 1986, 1988, 1989, 1991-2026 the Free Software Foundation, Inc.
  *
- * This file is part of GAWK, the GNU implementation of the POP_SCALAR
+ * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
  *
  * GAWK is free software; you can redistribute it and/or modify
@@ -30,21 +30,9 @@
  * any system headers.  Otherwise, extreme death, destruction
  * and loss of life results.
  */
-#if defined(_TANDEM_SOURCE)
-/*
- * config.h forces this even on non-tandem systems but it
- * causes problems elsewhere if used in the check below.
- * so workaround it. bleah.
- */
-#define tandem_for_real	1
-#endif
 
 #ifdef HAVE_CONFIG_H
 #include <config.h>
-#endif
-
-#if defined(tandem_for_real) && ! defined(_SCO_DS)
-#define _XOPEN_SOURCE_EXTENDED 1
 #endif
 
 #include <stdio.h>
@@ -73,6 +61,9 @@
 #include <stdarg.h>
 #include <signal.h>
 #include <time.h>
+#if defined(HAVE_GETTIMEOFDAY)
+#include <sys/time.h>	// get the declaration
+#endif
 #include <errno.h>
 #if ! defined(errno)
 extern int errno;
@@ -86,6 +77,29 @@ extern int errno;
 /* We can handle multibyte strings.  */
 #include <wchar.h>
 #include <wctype.h>
+
+#if defined(__MINGW32__)
+
+/* Gawk functions: */
+extern size_t c32slen(const char32_t *);
+extern int c32scoll(const char32_t *, const char32_t *);
+
+#elif defined(HAVE_UCHAR_H) && defined(HAVE_MBRTOC32) && defined(HAVE_C32RTOMB)
+
+#include <uchar.h>
+#define c32slen(s) wcslen((wchar_t *) s)
+#define c32scoll(l, r)	wcscoll((wchar_t *) l, (wchar_t *) r)
+
+#else	/* POSIX without <uchar.h> */
+
+#define char32_t wchar_t
+#define mbrtoc32 mbrtowc
+#define c32rtomb wcrtomb
+#define c32slen(s) wcslen(s)
+#define c32scoll(l, r)	wcscoll(l, r)
+
+#endif	/* POSIX without <uchar.h> */
+
 #ifdef __CYGWIN__ /* Define helper function for large Unicode values */
 extern size_t wcitomb (char *s, int wc, mbstate_t *ps);
 #endif
@@ -108,6 +122,12 @@ extern size_t wcitomb (char *s, int wc, mbstate_t *ps);
 
 /* This section is the messiest one in the file, not a lot that can be done */
 
+/* AIX's <sys/cred.h> uses some names defined here in function prototypes.
+   Therefore, it must be included first or the build fails.  */
+#ifdef _AIX
+# include <sys/cred.h>
+#endif
+
 #ifndef VMS
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
@@ -128,8 +148,6 @@ typedef int off_t;
 #  endif
 # endif
 #endif	/* VMS */
-
-#include "protos.h"
 
 #ifdef HAVE_STRING_H
 #include <string.h>
@@ -162,6 +180,10 @@ typedef int off_t;
 #define fwrite	fwrite_unlocked
 #endif /* HAVE_FWRITE_UNLOCKED */
 
+#ifndef HAVE_TIMEGM
+extern time_t timegm(struct tm *tm);
+#endif
+
 #if defined(__MINGW32__)
 #include "nonposix.h"
 #endif /* defined(__MINGW32__) */
@@ -186,33 +208,38 @@ typedef int off_t;
 
 #include "regex.h"
 #include "dfa.h"
+#include "minrx.h"
 typedef struct Regexp {
 	struct re_pattern_buffer pat;
 	struct re_registers regs;
 	struct dfa *dfareg;
+	minrx_regex_t mre_pat;
+	minrx_regmatch_t *mre_regs;
 	bool has_meta;		/* re has meta chars so (probably) isn't simple string */
 	bool maybe_long;	/* re has meta chars that can match long text */
 } Regexp;
-#define	RESTART(rp,s)	(rp)->regs.start[0]
-#define	REEND(rp,s)	(rp)->regs.end[0]
-#define	SUBPATSTART(rp,s,n)	(rp)->regs.start[n]
-#define	SUBPATEND(rp,s,n)	(rp)->regs.end[n]
-#define	NUMSUBPATS(rp,s)	(rp)->regs.num_regs
+
+extern int re_restart(Regexp *rp, const char *s);
+extern int re_reend(Regexp *rp, const char *s);
+extern int re_subpatstart(Regexp *rp, const char *s, int n);
+extern int re_subpatend(Regexp *rp, const char *s, int n);
+extern int re_numsubpats(Regexp *rp, const char *s);
+
+#define	RESTART(rp,s)	re_restart(rp, s)
+#define	REEND(rp,s)	re_reend(rp, s)
+#define	SUBPATSTART(rp,s,n)	re_subpatstart(rp,s,n)
+#define	SUBPATEND(rp,s,n)	re_subpatend(rp,s,n)
+#define	NUMSUBPATS(rp,s)	re_numsubpats(rp,s)
 
 /* regexp matching flags: */
 #define RE_NO_FLAGS	0	/* empty flags */
 #define RE_NEED_START	1	/* need to know start/end of match */
 #define RE_NO_BOL	2	/* not allowed to match ^ in regexp */
+#define RE_NEED_SUB	4	/* need submatch start/end info */
 
 #include "gawkapi.h"
 
 #include "floatmagic.h"
-
-/* Stuff for losing systems. */
-#if !defined(HAVE_STRTOD)
-extern double gawk_strtod();
-#define strtod gawk_strtod
-#endif
 
 #if __GNUC__ < 2 || (__GNUC__ == 2 && __GNUC_MINOR__ < 7)
 # define __attribute__(arg)
@@ -235,6 +262,12 @@ extern double gawk_strtod();
 /* ------------------ Constants, Structures, Typedefs  ------------------ */
 
 #define AWKNUM	double
+
+/* On z/OS, the xlc compiler doesn't yield consistent enum sizes
+   unless specifically requested.  */
+#ifdef __MVS__
+#pragma enum(int)
+#endif
 
 enum defrule { BEGIN = 1, Rule, END, BEGINFILE, ENDFILE,
 	MAXRULE /* sentinel, not legal */ };
@@ -387,7 +420,11 @@ typedef struct exp_node {
 			char *sp;
 			size_t slen;
 			int idx;
-			wchar_t *wsp;
+			union {	// this union is for convenience of space
+				// reuse; the elements aren't otherwise related
+				char32_t *wsp;
+				char *vn;
+			} z;
 			size_t wslen;
 			struct exp_node *typre;
 			enum commenttype comtype;
@@ -511,8 +548,13 @@ typedef struct exp_node {
 #define stlen	sub.val.slen
 #define stfmt	sub.val.idx
 #define strndmode sub.val.rndmode
-#define wstptr	sub.val.wsp
+#define wstptr	sub.val.z.wsp
 #define wstlen	sub.val.wslen
+
+/* Node_elem_new */
+#define elemnew_vname	sub.val.z.vn
+#define elemnew_parent	sub.val.typre
+
 #ifdef HAVE_MPFR
 #define mpg_numbr	sub.val.nm.mpnum
 #define mpg_i		sub.val.nm.mpi
@@ -963,6 +1005,7 @@ typedef struct iobuf {
 				   to regrow/refill */
 	bool valid;
 	int errcode;
+	bool can_timeout;	/* true if I/O can timeout */
 
 	enum iobuf_flags {
 		IOP_IS_TTY	= 1,
@@ -1025,6 +1068,7 @@ typedef struct srcfile {
 		SRC_STDIN,
 		SRC_FILE,
 		SRC_INC,
+		SRC_NSINC,
 		SRC_EXTLIB
 	} stype;
 	char *src;	/* name on command line or include statement */
@@ -1144,6 +1188,8 @@ extern NODE **fields_arr;
 extern int sourceline;
 extern char *source;
 extern int errcount;
+extern const char *version_string;
+extern const char *persist_file;
 extern int (*interpret)(INSTRUCTION *);	/* interpreter routine */
 extern NODE *(*make_number)(double);	/* double instead of AWKNUM on purpose */
 extern NODE *(*str2number)(NODE *);
@@ -1162,6 +1208,7 @@ extern struct block_header nextfree[BLOCK_MAX];
 extern bool field0_valid;
 
 extern bool do_itrace;	/* separate so can poke from a debugger */
+extern bool use_gnu_matchers;	/* Use gnu matchers, not minrx */
 
 extern SRCFILE *srcfiles; /* source files */
 
@@ -1390,9 +1437,15 @@ extern void r_freeblock(void *, int id);
 #define	cant_happen(format, ...)	r_fatal("internal error: file %s, line %d: " format, \
 				__FILE__, __LINE__, __VA_ARGS__)
 
-#define	emalloc(var,ty,x,str)	(void) (var = (ty) emalloc_real((size_t)(x), str, #var, __FILE__, __LINE__))
-#define	ezalloc(var,ty,x,str)	(void) (var = (ty) ezalloc_real((size_t)(x), str, #var, __FILE__, __LINE__))
-#define	erealloc(var,ty,x,str)	(void) (var = (ty) erealloc_real((void *) var, (size_t)(x), str, #var, __FILE__, __LINE__))
+#ifdef USE_REAL_MALLOC
+#define	emalloc(var,ty,x)	(void) (var = (ty) malloc((size_t)(x)))
+#define	ezalloc(var,ty,x)	(void) (var = (ty) calloc((size_t)(x), 1))
+#define	erealloc(var,ty,x)	(void) (var = (ty) realloc((void *) var, (size_t)(x)))
+#else
+#define	emalloc(var,ty,x)	(void) (var = (ty) emalloc_real((size_t)(x), __func__, #var, __FILE__, __LINE__))
+#define	ezalloc(var,ty,x)	(void) (var = (ty) ezalloc_real((size_t)(x), __func__, #var, __FILE__, __LINE__))
+#define	erealloc(var,ty,x)	(void) (var = (ty) erealloc_real((void *) var, (size_t)(x), __func__, #var, __FILE__, __LINE__))
+#endif
 
 #define efree(p)	free(p)
 
@@ -1477,6 +1530,8 @@ extern NODE *make_regnode(NODETYPE type, NODE *exp);
 extern bool validate_qualified_name(char *token);
 /* builtin.c */
 extern void efflush(FILE *fp, const char *from, struct redirect *rp);
+extern void efwrite(const void *ptr, size_t size, size_t count, FILE *fp, const char *from,
+		struct redirect *rp, bool flush);
 extern double double_to_int(double d);
 extern NODE *do_exp(int nargs);
 extern NODE *do_fflush(int nargs);
@@ -1508,7 +1563,7 @@ extern NODE *do_sub(int nargs, unsigned int flags);
 extern NODE *call_sub(const char *name, int nargs);
 extern NODE *call_match(int nargs);
 extern NODE *call_split_func(const char *name, int nargs);
-extern NODE *format_tree(const char *, size_t, NODE **, long);
+extern NODE *format_args(const char *, size_t, NODE **, long);
 extern NODE *do_lshift(int nargs);
 extern NODE *do_rshift(int nargs);
 extern NODE *do_and(int nargs);
@@ -1522,6 +1577,7 @@ extern NODE *do_dcngettext(int nargs);
 extern NODE *do_bindtextdomain(int nargs);
 extern NODE *do_intdiv(int nargs);
 extern NODE *do_typeof(int nargs);
+extern NODE *do_dump_node(int nargs);
 extern int strncasecmpmbs(const unsigned char *,
 			  const unsigned char *, size_t);
 extern int sanitize_exit_status(int status);
@@ -1565,10 +1621,12 @@ extern STACK_ITEM *grow_stack(void);
 extern void dump_fcall_stack(FILE *fp);
 extern int register_exec_hook(Func_pre_exec preh, Func_post_exec posth);
 extern NODE **r_get_field(NODE *n, Func_ptr *assign, bool reference);
+extern void elem_new_reset(NODE *n);
 extern NODE *elem_new_to_scalar(NODE *n);
 /* ext.c */
 extern NODE *do_ext(int nargs);
-void load_ext(const char *lib_name);	/* temporary */
+void load_ext(const char *name, const char *lib_name);
+extern void init_extension_list(void);
 extern void close_extensions(void);
 extern bool is_valid_identifier(const char *name);
 #ifdef DYNAMIC
@@ -1578,6 +1636,7 @@ extern NODE *get_actual_argument(NODE *, int, bool);
 #define get_scalar_argument(n, i)  get_actual_argument((n), (i), false)
 #define get_array_argument(n, i)   get_actual_argument((n), (i), true)
 #endif
+extern struct extension *extension_list;
 /* field.c */
 extern void init_fields(void);
 extern void init_csv_fields(void);
@@ -1634,6 +1693,7 @@ extern int os_is_setuid(void);
 extern int os_setbinmode(int fd, int mode);
 extern void os_restore_mode(int fd);
 extern void os_maybe_set_errno(void);
+extern void os_disable_aslr(const char *persist_file, char **argv);
 extern size_t optimal_bufsize(int fd, struct stat *sbuf);
 extern int ispath(const char *file);
 extern int isdirpunct(int c);
@@ -1668,10 +1728,11 @@ extern bool inrec(IOBUF *iop, int *errcode);
 extern int nextfile(IOBUF **curfile, bool skipping);
 extern bool is_non_fatal_std(FILE *fp);
 extern bool is_non_fatal_redirect(const char *str, size_t len);
-extern void ignore_sigpipe(void);
-extern void set_sigpipe_to_default(void);
 extern bool non_fatal_flush_std_file(FILE *fp);
 extern size_t gawk_fwrite(const void *buf, size_t size, size_t count, FILE *fp, void *opaque);
+#ifndef PIPES_SIMULATED
+extern int wait_any(int interesting);
+#endif
 
 /* main.c */
 extern int arg_assign(char *arg, bool initing);
@@ -1736,6 +1797,7 @@ extern void (*lintfunc)(const char *mesg, ...);
 /* profile.c */
 extern void init_profiling_signals(void);
 extern void set_prof_file(const char *filename);
+extern void close_prof_file(void);
 extern void dump_prog(INSTRUCTION *code);
 extern char *pp_number(NODE *n);
 extern char *pp_string(const char *in_str, size_t len, int delim);
@@ -1755,10 +1817,10 @@ extern enum escape_results parse_escape(const char **string_ptr, const char **es
 extern NODE *str2wstr(NODE *n, size_t **ptr);
 extern NODE *wstr2str(NODE *n);
 #define force_wstring(n)	str2wstr(n, NULL)
-extern const wchar_t *wstrstr(const wchar_t *haystack, size_t hs_len,
-		const wchar_t *needle, size_t needle_len);
-extern const wchar_t *wcasestrstr(const wchar_t *haystack, size_t hs_len,
-		const wchar_t *needle, size_t needle_len);
+extern const char32_t *wstrstr(const char32_t *haystack, size_t hs_len,
+		const char32_t *needle, size_t needle_len);
+extern const char32_t *wcasestrstr(const char32_t *haystack, size_t hs_len,
+		const char32_t *needle, size_t needle_len);
 extern void r_free_wstr(NODE *n);
 #define free_wstr(n)	do { if ((n)->flags & WSTRCUR) r_free_wstr(n); } while(0)
 extern wint_t btowc_cache[];
@@ -1769,7 +1831,7 @@ extern bool out_of_range(NODE *n);
 extern char *format_nan_inf(NODE *n, char format);
 extern bool is_ieee_magic_val(const char *val);
 /* re.c */
-extern Regexp *make_regexp(const char *s, size_t len, bool ignorecase, bool dfa, bool canfatal);
+extern Regexp *make_regexp(char *s, size_t len, bool ignorecase, bool dfa, bool canfatal);
 extern int research(Regexp *rp, char *str, int start, size_t len, int flags);
 extern void refree(Regexp *rp);
 extern void reg_error(const char *s);
@@ -1876,7 +1938,7 @@ POP_ARRAY(bool check_for_untyped)
 /* POP_PARAM --- get the top parameter, array or scalar */
 
 static inline NODE *
-POP_PARAM(void)
+POP_PARAM()
 {
 	NODE *t = POP();
 
@@ -1884,8 +1946,9 @@ POP_PARAM(void)
 }
 
 /* POP_SCALAR --- pop the scalar at the top of the stack */
+
 static inline NODE *
-POP_SCALAR(void)
+POP_SCALAR()
 {
 	NODE *t = POP();
 
@@ -1893,6 +1956,18 @@ POP_SCALAR(void)
 		fatal(_("attempt to use array `%s' in a scalar context"), array_vname(t));
 	else if (t->type == Node_elem_new)
 		t = elem_new_to_scalar(t);
+	else if (t->type == Node_var_new) {
+		NODE *n = t;
+
+		t->type = Node_var;
+		// this should be a call to dupnode(), but there are
+		// ordering problems since we're in awk.h. Just
+		// do it manually, since it's the null string
+		t->var_value = Nnull_string;
+		t->var_value->valref++;
+		t = t->var_value;
+		DEREF(n);
+	}
 
 	return t;
 }
@@ -1900,7 +1975,7 @@ POP_SCALAR(void)
 /* TOP_SCALAR --- get the scalar at the top of the stack */
 
 static inline NODE *
-TOP_SCALAR(void)
+TOP_SCALAR()
 {
 	NODE *t = TOP();
 
@@ -1964,8 +2039,8 @@ static inline NODE *
 force_string_fmt(NODE *s, const char *fmtstr, int fmtidx)
 {
 	if (s->type == Node_elem_new) {
+		elem_new_reset(s);
 		s->type = Node_val;
-		s->flags &= ~NUMBER;
 
 		return s;
 	}
@@ -2005,6 +2080,12 @@ unref(NODE *r)
 static inline NODE *
 force_number(NODE *n)
 {
+	if (n->type == Node_elem_new) {
+		elem_new_reset(n);
+		n->type = Node_val;
+
+		return n;
+	}
 	return (n->flags & NUMCUR) != 0 ? n : str2number(n);
 }
 
@@ -2026,7 +2107,13 @@ force_number(NODE *n)
 static inline NODE *
 fixtype(NODE *n)
 {
-	assert(n->type == Node_val);
+	int flags = STRING|STRCUR|NUMBER|NUMCUR;
+	if (n->type == Node_var && (n->flags & flags) == flags)
+		n = n->var_value;	// converted from Node_elem_new
+
+	if (n->type != Node_val)
+		cant_happen("%s: expected Node_val: got %s",
+				__func__, nodetype2str(n->type));
 	if ((n->flags & (NUMCUR|USER_INPUT)) == USER_INPUT)
 		return force_number(n);
 	if ((n->flags & INTIND) != 0)
@@ -2065,8 +2152,8 @@ emalloc_real(size_t count, const char *where, const char *var, const char *file,
 
 	ret = (void *) malloc(count);
 	if (ret == NULL)
-		fatal(_("%s:%d:%s: %s: cannot allocate %ld bytes of memory: %s"),
-			file, line, where, var, (long) count, strerror(errno));
+		fatal(_("%s:%d:%s: %s: cannot allocate %zu bytes of memory: %s"),
+			file, line, where, var, count, strerror(errno));
 
 	return ret;
 }
@@ -2083,8 +2170,8 @@ ezalloc_real(size_t count, const char *where, const char *var, const char *file,
 
 	ret = (void *) calloc(1, count);
 	if (ret == NULL)
-		fatal(_("%s:%d:%s: %s: cannot allocate %ld bytes of memory: %s"),
-			file, line, where, var, (long) count, strerror(errno));
+		fatal(_("%s:%d:%s: %s: cannot allocate %zu bytes of memory: %s"),
+			file, line, where, var, count, strerror(errno));
 
 	return ret;
 }
@@ -2101,8 +2188,8 @@ erealloc_real(void *ptr, size_t count, const char *where, const char *var, const
 
 	ret = (void *) realloc(ptr, count);
 	if (ret == NULL)
-		fatal(_("%s:%d:%s: %s: cannot reallocate %ld bytes of memory: %s"),
-			file, line, where, var, (long) count, strerror(errno));
+		fatal(_("%s:%d:%s: %s: cannot reallocate %zu bytes of memory: %s"),
+			file, line, where, var, count, strerror(errno));
 
 	return ret;
 }

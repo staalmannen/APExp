@@ -1,6 +1,10 @@
 #! /bin/sh
 # igawk --- like gawk but do @include processing
 #
+# This file and how to use it are described in the manual.
+# Therefore, we respectfully advise you to Read The Fine Manual
+# for more information.
+#
 # Arnold Robbins, arnold@skeeve.com, Public Domain
 # July 1993
 # December 2010, minor edits
@@ -129,7 +133,7 @@ BEGIN {
         }
         close(input[stackptr])
     }
-}'  # close quote ends `expand_prog' variable
+}'  # closing single quote ends `expand_prog' variable
 
 processed_program=$(gawk -- "$expand_prog" /dev/stdin << EOF
 $program

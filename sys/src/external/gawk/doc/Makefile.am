@@ -2,7 +2,7 @@
 # doc/Makefile.am --- automake input file for gawk
 #
 # Copyright (C) 2000, 2001, 2002, 2004, 2005, 2007, 2010, 2011, 2016, 2017,
-# 2021, 2022, 2023,
+# 2021, 2022, 2023, 2026
 # the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
@@ -25,7 +25,7 @@
 
 ## process this file with automake to produce Makefile.in
 
-info_TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi pm-gawk.texi
+info_TEXINFOS = gawk.texi gawkinet.texi gawkworkflow.texi pm-gawk.texi notes.texi
 
 man_MANS = gawk.1 gawkbug.1 pm-gawk.1
 
@@ -34,24 +34,28 @@ png_images = gawk_api-figure1.png gawk_api-figure2.png gawk_api-figure3.png \
 html_images = $(png_images) gawk_statist.jpg
 
 fig_images = $(png_images:%.png=%.fig)
-txt_images = $(png_images:%.png=%.txt) gawk_statist.txt
 eps_images = $(txt_images:%.txt=%.eps) gawk_statist.eps
+jpg_images = $(txt_images:%.txt=%.jpg) gawk_statist.jpg
 pdf_images = $(txt_images:%.txt=%.pdf) gawk_statist.pdf
+svg_images = $(txt_images:%.txt=%.svg) gawk_statist.svg
+txt_images = $(png_images:%.png=%.txt) gawk_statist.txt
 
 EXTRA_DIST = ChangeLog ChangeLog.0 ChangeLog.1 \
 	README.card ad.block setter.outline \
 	awkcard.in awkforai.txt texinfo.tex cardfonts \
 	$(fig_images) $(txt_images) $(eps_images) $(pdf_images) \
-	$(html_images) \
+	$(html_images) $(jpg_images) $(svg_images) \
 	it \
 	macros colors no.colors $(man_MANS) \
 	lflashlight-small.xpic lflashlight.eps lflashlight.pdf \
+	lflashlight.jpg lflashlight.svg \
 	rflashlight-small.xpic rflashlight.eps rflashlight.pdf \
+	rflashlight.jpg rflashlight.svg \
 	wordlist wordlist2 wordlist3 wordlist4 wordlist5 wordlist6 \
 	bc_notes
 
 # Get rid of generated files when cleaning
-CLEANFILES = *.ps *.html *.dvi *~ awkcard.nc awkcard.tr gawk.pdf gawkinet.pdf gawkworkflow.pdf awkcard.pdf gawk.1.pdf gawkbug.1.pdf pm-gawk.1.pdf pm-gawk.pdf
+CLEANFILES = *.ps *.html *.dvi *~ awkcard.nc awkcard.tr gawk.pdf gawkinet.pdf gawkworkflow.pdf awkcard.pdf gawk.1.pdf gawkbug.1.pdf pm-gawk.1.pdf pm-gawk.pdf notes.pdf
 
 MAKEINFO = @MAKEINFO@ -c CHECK_NORMAL_MENU_STRUCTURE=1 --no-split --force
 
@@ -87,6 +91,9 @@ gawkinet.ps: gawkinet.dvi
 gawkworkflow.ps: gawkworkflow.dvi
 	TEXINPUTS=$(srcdir): dvips -o gawkworkflow.ps gawkworkflow.dvi
 
+notes.ps: notes.dvi
+	TEXINPUTS=$(srcdir): dvips -o notes.ps notes.dvi
+
 pm-gawk.ps: pm-gawk.dvi
 	TEXINPUTS=$(srcdir): dvips -o pm-gawk.ps pm-gawk.dvi
 
@@ -120,12 +127,17 @@ awkcard.nc: $(CARDFILES)
 awkcard.pdf: awkcard.ps
 	ps2pdf awkcard.ps awkcard.pdf
 
-spell: spellmanual spellworkflow spellmanpage spellinet
+spell: spellmanual spellnotes spellworkflow spellmanpage spellinet
 
 spellmanual:
 	@echo ==== gawk.texi ====;
 	export LC_ALL=C ; spell "$(srcdir)"/gawk.texi | \
 	sort -u | comm -23 - "$(srcdir)"/wordlist
+
+spellnotes:
+	@echo ==== notes.texi ====;
+	export LC_ALL=C ; spell "$(srcdir)"/notes.texi | \
+	sort -u | comm -23 - "$(srcdir)"/wordlist7
 
 spellworkflow:
 	@echo ==== gawkworkflow.texi ====

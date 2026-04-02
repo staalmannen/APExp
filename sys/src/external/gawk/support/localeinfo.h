@@ -1,6 +1,6 @@
 /* locale information
 
-   Copyright 2016-2023 Free Software Foundation, Inc.
+   Copyright 2016-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -13,21 +13,27 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street - Fifth Floor, Boston, MA
-   02110-1301, USA.  */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written by Paul Eggert.  */
 
 #include <limits.h>
 #include <wchar.h>
-#if GAWK
-/* Use ISO C 99 API.  */
-# define char32_t wchar_t
-#else
+#ifdef HAVE_UCHAR_H
 /* Use ISO C 11 + gnulib API.  */
 # include <uchar.h>
+#else
+# ifndef __MINGW32__
+#  define char32_t wchar_t
+# endif
+# define c32tolower towlower
+# define c32toupper towupper
 #endif
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 struct localeinfo
 {
@@ -64,3 +70,8 @@ extern void init_localeinfo (struct localeinfo *);
 enum { CASE_FOLDED_BUFSIZE = 32 };
 
 extern int case_folded_counterparts (wint_t, char32_t[CASE_FOLDED_BUFSIZE]);
+
+
+#ifdef __cplusplus
+}
+#endif

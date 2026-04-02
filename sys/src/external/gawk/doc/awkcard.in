@@ -2,7 +2,7 @@
 .\"
 .\" Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
 .\" 2005, 2007, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018,
-.\" 2019, 2020, 2021, 2022, 2023
+.\" 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026
 .\" Free Software Foundation, Inc.
 .\" 
 .\" Permission is granted to make and distribute verbatim copies of
@@ -100,7 +100,7 @@ Variables	5\*(CX
 \*(CD
 .SL
 .nf
-\*(FRCopyright \(co 1996\(en2005, 2007, 2009\(en2023
+\*(FRCopyright \(co 1996\(en2005, 2007, 2009\(en2024
 Free Software Foundation, Inc.
 .nf
 .BT
@@ -205,8 +205,11 @@ T}
 .ES
 .fi
 \*(CDIf you find a bug in this reference card, please use
-\*(FCgawkbug\*(FR to report it.\*(CX
-.EB "\s+2\f(HBBUG REPORTS\*(FR\s0"
+\*(FCgawkbug\*(FR to report it.
+.sp .4
+General questions about \*(FCawk\fP and \*(FCgawk\fP may be
+sent to \*(FChelp-gawk@gnu.org\fP.\*(CX
+.EB "\s+2\f(HBBUG REPORTS AND QUESTIONS\*(FR\s0"
 
 .BT
 
@@ -220,13 +223,6 @@ remains unique.
 Use ``\*(FC\-W \*(FIoption\*(FR''
 for full POSIX compliance.
 .sp .5
-.ig
-.\" This option is left undocumented, on purpose.
-\*(FC\-\^\-nostalgia\*(FR%T{
-provide a moment of nostalgia for
-long time \*(AK users.
-T}
-..
 .de TI \" table item
 .ti -4n
 \\$1
@@ -446,6 +442,8 @@ and optional function definitions.
 .sp .5
 	\*(CB\*(FC@include "\*(FIfilename\*(FC"
 .br
+	\*(CB\*(FC@nsinclude "\*(FIfilename\*(FC"
+.br
 	\*(FC@load "\*(FIfilename\*(FC"
 .br
 	\*(FC@namespace "\*(FInamespace\*(FC"\*(CD
@@ -454,20 +452,22 @@ and optional function definitions.
 .br
 	\*(FCfunction \*(FIname\*(FC(\*(FIparameter list\*(FC) { \*(FIstatements\*(FC }\*(FR
 .sp .5
-\*(AK first reads the program source from the
+\*(AK reads the program source from the
 \*(FIprog-file\*(FR(s), if specified,
 \*(CBfrom arguments to \*(FC\-\^\-source\*(FR,\*(CD
-or from the first non-option argument on the command line.
-The program text is read as if all the \*(FIprog-file\*(FR(s)
+or from the first non-option argument.
+The program text is the concatenation of all the \*(FIprog-file\*(FR(s)
 \*(CBand command line
-source texts\*(CD had been concatenated.
+source texts\*(CD.
 .sp
 \*(CB\*(GK includes files named on \*(FC@include\*(FR lines.
 Nested includes are allowed.
+\*(FC@nsinclude\*(FR includes files but does not reset their
+namespace to \*(FCawk\*(FR.
 \*(GK loads extensions named on \*(FC@load\*(FR lines;
 see \fHDynamic Extensions\*(FR.\*(CD
 .sp .5
-AWK programs execute in the following order.
+AWK programs execute as follows:
 First, all variable assignments specified via the \*(FC\-v\fP
 option are performed.
 Next, \*(AK executes the code in the
@@ -478,7 +478,7 @@ If there are no files named on the command line,
 .sp .5
 A command line argument of the form
 \*(FIvar\*(FC=\*(FIval\*(FR,
-is treated as a variable assignment. The variable
+acts as a variable assignment. The variable
 \*(FIvar\fP is assigned the value \*(FIval\*(FR.
 (This happens after any \*(FCBEGIN\fP rule(s) have been run.)
 .sp .5
@@ -498,11 +498,11 @@ the \*(FIaction\*(FR associated with \*(FCENDFILE\fP after processing the file.\
 .sp .5
 For each record in the input, \*(AK tests to see if it matches any
 \*(FIpattern\fP in the AWK program.
-For each pattern that the record matches,
+For each match,
 it executes the associated \*(FIaction\fP.
-The patterns are tested in the order they occur in the program.
+Patterns are tested in the order they occur in the program.
 .sp .5
-Finally, after all the input is exhausted,
+Finally, after readnig all the input,
 \*(AK executes the code in the \*(FCEND\fP rule(s), if any.
 .sp .5
 If a program only has a \*(FCBEGIN\fP rule, no input files are processed.
@@ -1282,7 +1282,8 @@ Usable only with the \*(FC|&\*(FR two-way I/O operator.
 .ti -.2i
 \*(FC/inet6/udp/\*(FIlport\*(FC/\*(FIrhost\*(FC/\*(FIrport\*(FR
 .br
-Similar, but use UDP/IP instead of TCP/IP.\*(CL
+Similar, but use UDP/IP instead of TCP/IP.
+\*(CRObsolete.\*(CL
 .in -.2i
 .EB "\s+2\f(HBSPECIAL FILENAMES\*(FR\s0"
 .sp .5
@@ -1986,7 +1987,7 @@ The default for \*(FIcat\*(FR is \*(FC"LC_MESSAGES"\*(FR.\*(CB
 .ES
 .nf
 \*(CDHost: \*(FCftp.gnu.org\*(FR
-File: \*(FC/gnu/gawk/gawk-5.3.0.tar.gz\fP
+File: \*(FC/gnu/gawk/gawk-5.4.0.tar.gz\fP
 .in +.2i
 .fi
 GNU \*(AK (\*(GK). There may be a later version.
@@ -2014,7 +2015,7 @@ maintains it.\*(CX
 .ES
 .fi
 \*(CDCopyright \(co 1996\(en2005,
-2007, 2009\(en2023 Free Software Foundation, Inc.
+2007, 2009\(en2026 Free Software Foundation, Inc.
 .sp .5   
 Permission is granted to make and distribute verbatim copies of this
 reference card provided the copyright notice and this permission notice

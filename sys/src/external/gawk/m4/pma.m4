@@ -1,6 +1,6 @@
 dnl Decide whether or not to use the persistent memory allocator
 dnl
-dnl Copyright (C) 2022, 2023 Free Software Foundation, Inc.
+dnl Copyright (C) 2022, 2023, 2025, 2026 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -10,6 +10,7 @@ AC_DEFUN([GAWK_USE_PERSISTENT_MALLOC],
 AC_REQUIRE([AX_CHECK_COMPILE_FLAG])
 AC_CHECK_SIZEOF([void *])
 use_persistent_malloc=no
+use_paxctl=no
 if test "$SKIP_PERSIST_MALLOC" = no && test $ac_cv_sizeof_void_p -eq 8
 then
 	AC_CHECK_FUNC([mmap])
@@ -19,25 +20,20 @@ then
 		use_persistent_malloc=yes
 		case $host_os in
 		linux-*)
-			AX_CHECK_COMPILE_FLAG([-no-pie],
-				[LDFLAGS="${LDFLAGS} -no-pie"
-				export LDFLAGS])
+			AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
+				#include <sys/personality.h>
+				int x = ADDR_NO_RANDOMIZE;
+				]], [[]])],[have_addr_no_randomize=yes],[have_addr_no_randomize=no])
 			;;
- 		*darwin*)
-			# 27 November 2022: PMA only works on Intel.
-			case $host in
-			x86_64-*)
-				LDFLAGS="${LDFLAGS} -Xlinker -no_pie"
-				export LDFLAGS
-				;;
-			*)
-				# disable on all other macOS systems
-				use_persistent_malloc=no
-				;;
-			esac
+		*netbsd1[[01]].*)
+			use_paxctl=yes
 			;;
-		*cygwin* | *CYGWIN* | *solaris2.11* | freebsd13.* | openbsd7.* )
-			true	# nothing do, exes on these systems are not PIE
+ 		*freebsd1[[2-6]]* | *midnightbsd[[34]].* | \
+ 		*darwin* | *cygwin* | *CYGWIN* | *solaris2.11*)
+			true
+			;;
+		openbsd7.*)
+			LDFLAGS="${LDFLAGS} -no-pie"
 			;;
 		# Other OS's go here...
 		*)
@@ -57,9 +53,15 @@ then
 fi
 
 AM_CONDITIONAL([USE_PERSISTENT_MALLOC], [test "$use_persistent_malloc" = "yes"])
+AM_CONDITIONAL([HAVE_ADDR_NO_RANDOMIZE], [test "$have_addr_no_randomize" = "yes"])
+AM_CONDITIONAL([USE_PAXCTL], [test "$use_paxctl" = "yes"])
 
 if test "$use_persistent_malloc" = "yes"
 then
 	AC_DEFINE(USE_PERSISTENT_MALLOC, 1, [Define to 1 if we can use the pma allocator])
+fi
+if test "$have_addr_no_randomize" = "yes"
+then
+	AC_DEFINE(HAVE_ADDR_NO_RANDOMIZE, 1, [Define to 1 if we have ADDR_NO_RANDOMIZE value])
 fi
 ])

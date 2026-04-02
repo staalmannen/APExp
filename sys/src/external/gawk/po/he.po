@@ -1,0 +1,3992 @@
+# Hebrew messages for GNU Awk
+# Copyright (C) 2001, 2002, 2023 Free Software Foundation, Inc.
+# Eli Zaretskii <eliz@gnu.org>, 2001, 2002.
+# Arnold Robbins <arnold@skeeve.com>, 2023, 2024.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: gawk 5.2.60\n"
+"Report-Msgid-Bugs-To: bug-gawk@gnu.org\n"
+"POT-Creation-Date: 2026-02-22 16:46+0200\n"
+"PO-Revision-Date: 2026-01-08 05:21+0000\n"
+"Last-Translator: Yaron Shahrabani <sh.yaron@gmail.com>\n"
+"Language-Team: Hebrew <https://translate.codeberg.org/projects/gawk/main/he/"
+">\n"
+"Language: he\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=4; plural=(n == 1) ? 0 : ((n == 2) ? 1 : ((n > 10 && "
+"n % 10 == 0) ? 2 : 3));\n"
+"X-Generator: Weblate 5.15.1\n"
+
+#: array.c:249
+#, c-format
+msgid "from %s"
+msgstr "מ־%s"
+
+#: array.c:366
+msgid "attempt to use a scalar value as array"
+msgstr "ניסיון שימוש בסקלאר כמערך"
+
+#: array.c:368
+#, c-format
+msgid "attempt to use scalar parameter `%s' as an array"
+msgstr "נסיון שימוש במשתנה סקלרי `%s' כמערך"
+
+#: array.c:371
+#, c-format
+msgid "attempt to use scalar `%s' as an array"
+msgstr "ניסיון שימוש בסקלאר `%s' כמערך"
+
+#: array.c:418 array.c:609 builtin.c:83 builtin.c:1136 builtin.c:1163
+#: eval.c:1175 eval.c:1180 eval.c:1588 printf.c:775 printf.c:823 printf.c:836
+#, c-format
+msgid "attempt to use array `%s' in a scalar context"
+msgstr "נסיון שימוש במערך `%s' בהקשר של סקלאר"
+
+#: array.c:616
+#, c-format
+msgid "delete: index `%.*s' not in array `%s'"
+msgstr "delete: המפתח `‎%.*s' לא נמצא במערך `%s'"
+
+#: array.c:630
+#, c-format
+msgid "attempt to use scalar `%s[\"%.*s\"]' as an array"
+msgstr "ניסיון שימוש בסקלאר `‎%s[\"%.*s\"]' כמערך"
+
+#: array.c:856 array.c:906
+#, c-format
+msgid "%s: first argument is not an array"
+msgstr "%s: הארגומנט הראשון אינו מערך"
+
+#: array.c:898
+#, c-format
+msgid "%s: second argument is not an array"
+msgstr "%s: ארגומנט שני אינו מערך"
+
+#: array.c:901 field.c:1150 field.c:1255
+#, c-format
+msgid "%s: cannot use %s as second argument"
+msgstr "%s: אסור להשתמש ב־`%s' כארגומנט שני"
+
+#: array.c:909
+#, c-format
+msgid "%s: first argument cannot be SYMTAB without a second argument"
+msgstr "%s: ארגומנט ראשון לא יכול להיות SYMTAB ללא ארגומנט שני"
+
+#: array.c:911
+#, c-format
+msgid "%s: first argument cannot be FUNCTAB without a second argument"
+msgstr "%s: ארגומנט ראשון לא יכול להיות FUNCTAB ללא ארגומנט שני"
+
+#: array.c:918
+msgid ""
+"asort/asorti: using the same array as source and destination without a third "
+"argument is silly."
+msgstr "asort/asorti: שימוש באותו מערך כמקור ויעד ללא ארגומנט שלישי הוא טיפשי."
+
+#: array.c:923
+#, c-format
+msgid "%s: cannot use a subarray of first argument for second argument"
+msgstr "%s: לא יכול להשתמש במערך משנה של ארגומנט ראשון עבור ארגומנט שני"
+
+#: array.c:928
+#, c-format
+msgid "%s: cannot use a subarray of second argument for first argument"
+msgstr "%s: לא יכול להשתמש במערך משנה של ארגומנט שני עבור ארגומנט ראשון"
+
+#: array.c:1458
+#, c-format
+msgid "`%s' is invalid as a function name"
+msgstr "`%s' אינו חוקי כשם פונקציה"
+
+#: array.c:1462
+#, c-format
+msgid "sort comparison function `%s' is not defined"
+msgstr "פונקציית המיון `%s' אינה מוגדרת"
+
+#: awkgram.y:281
+#, c-format
+msgid "%s blocks must have an action part"
+msgstr "בלוק %s חייב לכלול הגדרת פעולה"
+
+#: awkgram.y:284
+msgid "each rule must have a pattern or an action part"
+msgstr "לכל חוק צריך שיהיה או תבנית או פעולה"
+
+#: awkgram.y:448 awkgram.y:460
+msgid "old awk does not support multiple `BEGIN' or `END' rules"
+msgstr "awk ישן אינו תומך בכמה חוקי BEGIN או END"
+
+#: awkgram.y:513
+#, c-format
+msgid "`%s' is a built-in function, it cannot be redefined"
+msgstr "`%s' הינה פונקציה מובנית, אין לשנות את הגדרתה"
+
+#: awkgram.y:577
+msgid "regexp constant `//' looks like a C++ comment, but is not"
+msgstr "הביטוי הרגולרי '//` נראה כמו הערה בשפת C++‎, אך אינו הערה"
+
+#: awkgram.y:581
+#, c-format
+msgid "regexp constant `/%s/' looks like a C comment, but is not"
+msgstr "ביטוי רגולרי '/%s/` נראה כמו הערה בשפת C, אך אינו הערה"
+
+#: awkgram.y:708
+#, c-format
+msgid "duplicate case values in switch body: %s"
+msgstr "כפול ערכי רישיות בגוף המתג: %s"
+
+#: awkgram.y:729
+msgid "duplicate `default' detected in switch body"
+msgstr "זוהה `default' כפול בגוף המיתוג"
+
+#: awkgram.y:1065 awkgram.y:4471
+msgid "`break' is not allowed outside a loop or switch"
+msgstr "אין להשתמש ב־`break' מחוץ ללולאה"
+
+#: awkgram.y:1075 awkgram.y:4463
+msgid "`continue' is not allowed outside a loop"
+msgstr "אין להשתמש ב־`continue' מחוץ ללולאה"
+
+#: awkgram.y:1086
+#, c-format
+msgid "`next' used in %s action"
+msgstr "שימוש ב־`next' בהגדרת פעולה של %s"
+
+#: awkgram.y:1097
+#, c-format
+msgid "`nextfile' used in %s action"
+msgstr "שימוש ב־`nextfile' בהגדרת פעולה של %s"
+
+#: awkgram.y:1125
+msgid "`return' used outside function context"
+msgstr "שימוש ב-`return` שלא בקונטקסט של פונקציה"
+
+#: awkgram.y:1198
+msgid "plain `print' in BEGIN or END rule should probably be `print \"\"'"
+msgstr "`print' פשוט בכללי BEGIN או END צריך מן הסתם להיות `‎print \"\"‎'"
+
+#: awkgram.y:1268
+msgid "`delete' is not allowed with SYMTAB"
+msgstr "`delete' אסור עם SYMTAB"
+
+#: awkgram.y:1270
+msgid "`delete' is not allowed with FUNCTAB"
+msgstr "`delete' אסור עם FUNCTAB"
+
+#: awkgram.y:1414
+msgid "multistage two-way pipelines don't work"
+msgstr "אפיקים דו־כיווניים מרובי שלבים אינם עובדים"
+
+#: awkgram.y:1416
+msgid "concatenation as I/O `>' redirection target is ambiguous"
+msgstr "השרשור כיעד ניתוב מחדש של I/O `>' אינו חד משמעי"
+
+#: awkgram.y:1628
+msgid "regular expression on right of assignment"
+msgstr "ביטוי רגולרי בצד ימין של הוראת השמת ערך"
+
+#: awkgram.y:1643 awkgram.y:1656
+msgid "regular expression on left of `~' or `!~' operator"
+msgstr "ביטוי רגולרי משמאל לאופרטור '~` או '~!`"
+
+#: awkgram.y:1673 awkgram.y:1823
+msgid "old awk does not support the keyword `in' except after `for'"
+msgstr "awk ישן לא תומך בביטוי `in' למעט אחרי `for'"
+
+#: awkgram.y:1683
+msgid "regular expression on right of comparison"
+msgstr "ביטוי רגולרי בצד ימין של השוואה"
+
+#: awkgram.y:1802
+#, c-format
+msgid "non-redirected `getline' invalid inside `%s' rule"
+msgstr "`getline' לא מנותב לא חוקי בתוך כלל `%s'"
+
+#: awkgram.y:1805
+msgid "non-redirected `getline' undefined inside END action"
+msgstr "`getline' ללא הפנייה אינו מוגדר בתוך פעולת END"
+
+#: awkgram.y:1825
+msgid "old awk does not support multidimensional arrays"
+msgstr "awk ישן אינו תומך במערכים של כמה מימדים"
+
+#: awkgram.y:1928
+msgid "call of `length' without parentheses is not portable"
+msgstr "קריאה ל־`length' בלי סוגריים אינה ניידת"
+
+#: awkgram.y:2002
+msgid "indirect function calls are a gawk extension"
+msgstr "קריאות עקיפות לפונקציות הינן הרחבה ל־gawk"
+
+#: awkgram.y:2015
+#, c-format
+msgid "cannot use special variable `%s' for indirect function call"
+msgstr "אסור להשתמש במשתנה מיוחד `%s' בשביל קריאה עקיפה לפונקציה"
+
+#: awkgram.y:2048
+#, c-format
+msgid "attempt to use non-function `%s' in function call"
+msgstr "נסיון שימוש בדבר שהוא לא בפונקציה `%s' בקרואת פןנקציה"
+
+#: awkgram.y:2113
+msgid "invalid subscript expression"
+msgstr "ביטוי בעל תחביר שגוי במציין מערך"
+
+#: awkgram.y:2490 awkgram.y:2510 gawkapi.c:276 gawkapi.c:293 msg.c:133
+msgid "warning: "
+msgstr "אזהרה: "
+
+#: awkgram.y:2508 gawkapi.c:248 gawkapi.c:291 msg.c:165
+msgid "fatal: "
+msgstr "מכריע: "
+
+#: awkgram.y:2561
+msgid "unexpected newline or end of string"
+msgstr "סוף שורה במקום בלתי-צפוי"
+
+#: awkgram.y:2582
+msgid ""
+"source files / command-line arguments must contain complete functions or "
+"rules"
+msgstr ""
+"קובצי מקור / ארגומנטים של שורת הפקודה חייבים להכיל פונקציות מלאות או כללים"
+
+#: awkgram.y:2866 awkgram.y:2945 awkgram.y:3182 debug.c:546 debug.c:562
+#: debug.c:2890 debug.c:5263
+#, c-format
+msgid "cannot open source file `%s' for reading: %s"
+msgstr "לא ניתן לפתוח את קובץ המקור `%s' לקריאה: %s"
+
+#: awkgram.y:2867 awkgram.y:3009
+#, c-format
+msgid "cannot open shared library `%s' for reading: %s"
+msgstr "לא ניתן לפתוח את התיקייה המשותפת `%s' לקריאה: %s"
+
+#: awkgram.y:2869 awkgram.y:2946 awkgram.y:3010 builtin.c:131 debug.c:5414
+msgid "reason unknown"
+msgstr "מסיבה בלתי-ידועה"
+
+#: awkgram.y:2878 awkgram.y:2902
+#, c-format
+msgid "cannot include `%s' and use it as a program file"
+msgstr "לא יכול לכלול `%s' ולהשתמש בו כקובץ תוכנית"
+
+#: awkgram.y:2891
+#, c-format
+msgid "already included source file `%s'"
+msgstr "קובץ מקור `%s' כבר נכלל"
+
+#: awkgram.y:2892
+#, c-format
+msgid "already loaded shared library `%s'"
+msgstr "קובץ ספריה משותפת `%s' כבר נכלל"
+
+#: awkgram.y:2929
+msgid "@include is a gawk extension"
+msgstr "‎@include היא הרחבה נקודתית ל־gawk"
+
+#: awkgram.y:2935
+msgid "empty filename after @include"
+msgstr "שם קובץ ריק אחרי @include"
+
+#: awkgram.y:2990
+msgid "@load is a gawk extension"
+msgstr "@load הינו הרחבה ספציפית ל-gawk"
+
+#: awkgram.y:2996
+msgid "empty filename after @load"
+msgstr "שם קובץ ריק אחרי @load"
+
+#: awkgram.y:3134
+msgid "empty program text on command line"
+msgstr "תכנית ריקה התקבלה משורת הפקודה"
+
+#: awkgram.y:3250 debug.c:471 debug.c:629
+#, c-format
+msgid "cannot read source file `%s': %s"
+msgstr "לא ניתן לקרוא את קובץ המקור `%s'‏: %s"
+
+#: awkgram.y:3261
+#, c-format
+msgid "source file `%s' is empty"
+msgstr "קובץ המקור `%s' ריק"
+
+#: awkgram.y:3321
+#, c-format
+msgid "error: invalid character '\\%03o' in source code"
+msgstr "שגיאה: התו `‎\\%03o' בקוד המקור שגוי"
+
+#: awkgram.y:3548
+msgid "source file does not end in newline"
+msgstr "קובץ המקור אינו מסתיים בשורה חדשה"
+
+#: awkgram.y:3659
+msgid "unterminated regexp ends with `\\' at end of file"
+msgstr "ביטוי רגולרי בלתי-גמור מסתיים ב-`\\' בסף הקובץ"
+
+#: awkgram.y:3688
+msgid "unterminated regexp"
+msgstr "ביטוי רגולרי בלתי-גמור"
+
+#: awkgram.y:3692
+msgid "unterminated regexp at end of file"
+msgstr "ביטוי רגולרי בלתי-גמור בסוף הקובץ"
+
+#: awkgram.y:3781
+msgid "use of `\\ #...' line continuation is not portable"
+msgstr "שימוש ב-`\\ #...' כסימן להמשך שורה אינו פורטבילי"
+
+#: awkgram.y:3803
+msgid "backslash not last character on line"
+msgstr "לוכסן הפוך שאינו תו אחרון בשורה"
+
+#: awkgram.y:3851 awkgram.y:3853 field.c:1157 field.c:1262
+msgid "multidimensional arrays are a gawk extension"
+msgstr "מערכים רב-ממדיים הם הרחבה של gawk"
+
+#: awkgram.y:3878 awkgram.y:3889
+#, c-format
+msgid "POSIX does not allow operator `%s'"
+msgstr "POSIX אינו מרשה אופרטור `%s'"
+
+#: awkgram.y:3880 awkgram.y:3891 awkgram.y:3926 awkgram.y:3934
+#, c-format
+msgid "operator `%s' is not supported in old awk"
+msgstr "אופרטור `%s' אינו נתמך ב-awk ישן"
+
+#: awkgram.y:4031 awkgram.y:4053 command.y:1188
+msgid "unterminated string"
+msgstr "מחרוזת בלתי-גמורה"
+
+#: awkgram.y:4041 main.c:1253
+msgid "POSIX does not allow physical newlines in string values"
+msgstr "POSIX אינו מאפשר שורות חדשות פיזיות בערכי מחרוזת"
+
+#: awkgram.y:4043 node.c:482
+msgid "backslash string continuation is not portable"
+msgstr "המשך מחרוזת נטוי אחורי אינו פורטיבילי"
+
+#: awkgram.y:4295
+#, c-format
+msgid "invalid char '%c' in expression"
+msgstr "תו שגוי '%c' בביטוי"
+
+#: awkgram.y:4391
+#, c-format
+msgid "`%s' is a gawk extension"
+msgstr "`%s' היא הרחבה ל־gawk"
+
+#: awkgram.y:4396
+#, c-format
+msgid "POSIX does not allow `%s'"
+msgstr "POSIX אינו מרשה `%s'"
+
+#: awkgram.y:4404
+#, c-format
+msgid "`%s' is not supported in old awk"
+msgstr "`%s' אינו נתמך ב-awk ישן"
+
+#: awkgram.y:4508
+msgid "`goto' considered harmful!"
+msgstr "`goto' נחשב הרסני!"
+
+#: awkgram.y:4577
+#, c-format
+msgid "%d is invalid as number of arguments for %s"
+msgstr "%d הוא מספר שגוי של ארגומנטים עבור %s"
+
+#: awkgram.y:4612
+#, c-format
+msgid "%s: string literal as last argument of substitute has no effect"
+msgstr "%s: למחרוזת מילולית כארגומנט אחרון של תחליף אין השפעה"
+
+#: awkgram.y:4617
+#, c-format
+msgid "%s third parameter is not a changeable object"
+msgstr "ארגומנט %s שלישי של `sub' אינו פריט שניתן לשנות"
+
+#: awkgram.y:4720
+#, fuzzy
+#| msgid "index: regexp constant as second argument is not allowed"
+msgid "match: regexp constant as first argument is probably not what you want"
+msgstr "index: קבוע ביטוי רגולרי כארגומנט שני אינו מותר"
+
+#: awkgram.y:4729 awkgram.y:4732
+msgid "match: third argument is a gawk extension"
+msgstr "ארגומנט שלישי של `match' הינו הרחבה ספציפית ל-gawk"
+
+#: awkgram.y:4786 awkgram.y:4789
+msgid "close: second argument is a gawk extension"
+msgstr "ארגומנט שני של `close' הינו הרחבה ספציפית ל-gawk"
+
+#: awkgram.y:4801
+msgid "use of dcgettext(_\"...\") is incorrect: remove leading underscore"
+msgstr "שימוש שגוי ב-dcgettext(\"...\"): יש לסלק מקף-תחתון שבקדמת ארגומנט"
+
+#: awkgram.y:4816
+msgid "use of dcngettext(_\"...\") is incorrect: remove leading underscore"
+msgstr "שימוש שגוי ב-dcngettext(\"...\"): יש לסלק מקף-תחתון שבקדמת ארגומנט"
+
+#: awkgram.y:4835
+msgid "index: regexp constant as second argument is not allowed"
+msgstr "index: קבוע ביטוי רגולרי כארגומנט שני אינו מותר"
+
+#: awkgram.y:4888
+#, c-format
+msgid "function `%s': parameter `%s' shadows global variable"
+msgstr "הפונקציה `%s': הפרמטר `%s' גובר על משתנה כללי"
+
+#: awkgram.y:4937 debug.c:4243 debug.c:4286 debug.c:5412 profile.c:116
+#, c-format
+msgid "could not open `%s' for writing: %s"
+msgstr "בעת פתיחת `%s' לצורך כתיבה תקלה (%s)"
+
+#: awkgram.y:4938
+msgid "sending variable list to standard error"
+msgstr "רשימת משתנים נשלח לערוץ שגיאות תקני"
+
+#: awkgram.y:4946
+#, c-format
+msgid "%s: close failed: %s"
+msgstr "%s: תקלה בעת סגירת: %s"
+
+#: awkgram.y:4971
+msgid "shadow_funcs() called twice!"
+msgstr "shadow_funcs()‎ נקראה פעמיים!"
+
+#: awkgram.y:4979
+msgid "there were shadowed variables"
+msgstr "היו משתנים מאפילים"
+
+#: awkgram.y:5071
+#, c-format
+msgid "function name `%s' previously defined"
+msgstr "כבר מוגדרת פונקציה בשם `%s'"
+
+#: awkgram.y:5122
+#, c-format
+msgid "function `%s': cannot use function name as parameter name"
+msgstr "בפונקציה `%s': שם פונקציה אינו יכול לשמש כשם פרמטר"
+
+#: awkgram.y:5125
+#, fuzzy, c-format
+#| msgid ""
+#| "function `%s': cannot use special variable `%s' as a function parameter"
+msgid ""
+"function `%s': parameter `%s': POSIX disallows using a special variable as a "
+"function parameter"
+msgstr "בפונקציה `%s': `%s' שם משתנה מיוחד אינו יכול לשמש כשם פרמטר"
+
+#: awkgram.y:5129
+#, c-format
+msgid "function `%s': parameter `%s' cannot contain a namespace"
+msgstr "הפונקציה `%s': הפרמטר `%s' לא יכול להכיל מרחב שם"
+
+#: awkgram.y:5136
+#, c-format
+msgid "function `%s': parameter #%d, `%s', duplicates parameter #%d"
+msgstr "הפונקציה `%s': פרמטר מס׳ %d,‏ `%s', משכפל את פרמטר מס׳ %d"
+
+#: awkgram.y:5225
+#, c-format
+msgid "function `%s' called but never defined"
+msgstr "קריאה לפונקציה `%s' שאינה מוגדרת"
+
+#: awkgram.y:5229
+#, c-format
+msgid "function `%s' defined but never called directly"
+msgstr "פונקציה `%s' הוגדרה, אך לא נקראת"
+
+#: awkgram.y:5261
+#, c-format
+msgid "regexp constant for parameter #%d yields boolean value"
+msgstr "ביטוי רגולרי קבוע למשתנה מס׳ %d מניב ערך בוליאני"
+
+#: awkgram.y:5276
+#, c-format
+msgid ""
+"function `%s' called with space between name and `(',\n"
+"or used as a variable or an array"
+msgstr ""
+"קריאה לפןנקציה `%s' עם רווחים בין שמה לבין `(',\n"
+"או משמש כמשתנה או מערך"
+
+#: awkgram.y:5500 awkgram.y:5553 mpfr.c:1598 mpfr.c:1619
+msgid "division by zero attempted"
+msgstr "נסיון חלוקה באפס"
+
+#: awkgram.y:5509 awkgram.y:5562 mpfr.c:1635
+#, c-format
+msgid "division by zero attempted in `%%'"
+msgstr "נסיון חלוקה באפס ב-`%%'"
+
+#: awkgram.y:5882
+msgid ""
+"cannot assign a value to the result of a field post-increment expression"
+msgstr "לא ניתן להקצות ערך לתוצאה של ביטוי שלאחר הגדלה של שדה"
+
+#: awkgram.y:5885
+#, c-format
+msgid "invalid target of assignment (opcode %s)"
+msgstr "יעד לא חוקי של הקצאה (אופקוד %s)"
+
+#: awkgram.y:6265
+msgid "statement has no effect"
+msgstr "להכרזה אין השפעה"
+
+#: awkgram.y:6780
+#, c-format
+msgid "identifier %s: qualified names not allowed in traditional / POSIX mode"
+msgstr "מזהה %s: שמות מוסמכים אינם מותרים במצב מסורתי / POSIX"
+
+#: awkgram.y:6785
+#, c-format
+msgid "identifier %s: namespace separator is two colons, not one"
+msgstr "מזהה %s: מפריד מרחב השמות הוא שני נקודתיים, לא אחד"
+
+#: awkgram.y:6791
+#, c-format
+msgid "qualified identifier `%s' is badly formed"
+msgstr "מזהה מוסמך `%s' נוצר בצורה שגויה"
+
+#: awkgram.y:6798
+#, c-format
+msgid ""
+"identifier `%s': namespace separator can only appear once in a qualified name"
+msgstr "מזהה `%s': מפריד מרחב שמות יכול להופיע רק פעם אחת בשם מוסמך"
+
+#: awkgram.y:6847 awkgram.y:6898
+#, c-format
+msgid "using reserved identifier `%s' as a namespace is not allowed"
+msgstr "שימוש במזהה שמור `%s' כמרחב שמות אינו מותר"
+
+#: awkgram.y:6854 awkgram.y:6864
+#, c-format
+msgid ""
+"using reserved identifier `%s' as second component of a qualified name is "
+"not allowed"
+msgstr "שימוש במזהה שמור `%s' כרכיב שני של שם מוסמך הוא לא מורשה"
+
+#: awkgram.y:6882
+msgid "@namespace is a gawk extension"
+msgstr "@namespace הינו הרחבה ספציפית ל-gawk"
+
+#: awkgram.y:6889
+#, c-format
+msgid "namespace name `%s' must meet identifier naming rules"
+msgstr "שם מרחב השמות `%s' חייב לעמוד בכללי מתן שמות של מזהים"
+
+#: builtin.c:93 builtin.c:100
+#, c-format
+msgid "%s: called with %d arguments"
+msgstr "%s: נקרא עם %d ארגומנטים"
+
+#: builtin.c:125
+#, c-format
+msgid "%s to \"%s\" failed: %s"
+msgstr "%s ל-\"%s\" נתקל: %s"
+
+#: builtin.c:129
+msgid "standard output"
+msgstr "יחידת פלט סטנדרטית"
+
+#: builtin.c:130
+msgid "standard error"
+msgstr "יחידת פלט סטנדרטית"
+
+#: builtin.c:206 builtin.c:544 builtin.c:646 builtin.c:667 builtin.c:1421
+#: builtin.c:1439 builtin.c:1558 builtin.c:2622 mpfr.c:830
+#, c-format
+msgid "%s: received non-numeric argument"
+msgstr "%s: ארגומנט אינו מספר"
+
+#: builtin.c:212
+#, c-format
+msgid "exp: argument %g is out of range"
+msgstr "exp: הארגומנט %g מחוץ לטווח"
+
+#: builtin.c:276 builtin.c:615 builtin.c:1021 builtin.c:1083 builtin.c:1330
+#: builtin.c:1363
+#, c-format
+msgid "%s: received non-string argument"
+msgstr "%s: ארגומנט אינו מחרוזת"
+
+#: builtin.c:293
+#, c-format
+msgid "fflush: cannot flush: pipe `%.*s' opened for reading, not writing"
+msgstr "fflush: לא ניתן לרוקן: אפיק `%.*s' פתוח לקריאה, לא לכתיבה"
+
+#: builtin.c:296
+#, c-format
+msgid "fflush: cannot flush: file `%.*s' opened for reading, not writing"
+msgstr "fflush: לא ניתן לרוקן החוצץ: `%.*s' פתוח לקריאה, לא לכתיבה"
+
+#: builtin.c:307
+#, c-format
+msgid "fflush: cannot flush file `%.*s': %s"
+msgstr "fflush: לא ניתן לרוקן קובץ `%.*s': %s"
+
+#: builtin.c:312
+#, c-format
+msgid "fflush: cannot flush: two-way pipe `%.*s' has closed write end"
+msgstr "fflush: לא ניתן לרוקן החוצץ: תהליך מקביל `%.*s' סגר צד הכתיבה"
+
+#: builtin.c:318
+#, c-format
+msgid "fflush: `%.*s' is not an open file, pipe or co-process"
+msgstr "fflush: `%.*s' אינו קובץ פתוח, אפיק פתוח או תהליך מקביל"
+
+#: builtin.c:427 builtin.c:705 builtin.c:915 builtin.c:1600 builtin.c:2899
+#: builtin.c:2986 builtin.c:3053
+#, c-format
+msgid "%s: received non-string first argument"
+msgstr "%s: התקבל ארגומנט ראשון שאינו מחרוזת"
+
+#: builtin.c:429 builtin.c:2877 builtin.c:2892 builtin.c:2982 builtin.c:3044
+#, c-format
+msgid "%s: received non-string second argument"
+msgstr "%s: ארגומנט שני אינו מחרוזת"
+
+#: builtin.c:649 builtin.c:671
+#, c-format
+msgid "%s: received negative argument %g"
+msgstr "%s: נקרא עם ארגומנט שלילי %g"
+
+#: builtin.c:692 builtin.c:2975
+#, c-format
+msgid "%s: received non-numeric third argument"
+msgstr "%s: ארגומנט שלישי אינו מספר"
+
+#: builtin.c:699 builtin.c:889 builtin.c:1400 builtin.c:2440 builtin.c:2486
+#: builtin.c:3106
+#, c-format
+msgid "%s: received non-numeric second argument"
+msgstr "%s: ארגומנט שני אינו מספר"
+
+#: builtin.c:710
+#, c-format
+msgid "substr: length %g is not >= 1"
+msgstr "substr: אורך %g איננו מספר גדול מאפס"
+
+#: builtin.c:712
+#, c-format
+msgid "substr: length %g is not >= 0"
+msgstr "substr: אורך %g איננו מספר גדול מאפס"
+
+#: builtin.c:726
+#, c-format
+msgid "substr: non-integer length %g will be truncated"
+msgstr "substr: אורך %g, שאינו מספר שלם, יקוצץ"
+
+#: builtin.c:731
+#, c-format
+msgid "substr: length %g too big for string indexing, truncating to %g"
+msgstr "substr: אורך %g יותר מדי גדול, קוצץ ל-%g"
+
+#: builtin.c:743
+#, c-format
+msgid "substr: start index %g is invalid, using 1"
+msgstr "substr: מציין התחלה %g הינו שגוי, הוחלף ב-1"
+
+#: builtin.c:748
+#, c-format
+msgid "substr: non-integer start index %g will be truncated"
+msgstr "substr: ערכו של מציין התחלה %g ,שאינו מספר שלם, יקוצץ"
+
+#: builtin.c:771
+msgid "substr: source string is zero length"
+msgstr "substr: מחרוזת המקור הינה באורך אפס"
+
+#: builtin.c:785
+#, c-format
+msgid "substr: start index %g is past end of string"
+msgstr "substr: מציין התחלה %g הינו מעבר לסוף המחרוזת"
+
+#: builtin.c:793
+#, c-format
+msgid ""
+"substr: length %g at start index %g exceeds length of first argument (%lu)"
+msgstr "substr: אורך %g שמחיל במציין %g וותר גדול מאורך ארגומנט הראשון (%lu)"
+
+#: builtin.c:868
+msgid "strftime: format value in PROCINFO[\"strftime\"] has numeric type"
+msgstr "strftime: הערך בתבנית PROCINFO[\"strftime\"] הוא מסוג מספרי"
+
+#: builtin.c:899
+msgid "strftime: second argument less than 0 or too big for time_t"
+msgstr "strftime: ארגומנט שני קטן מ-0 או גדול מדי עבור time_t"
+
+#: builtin.c:906
+msgid "strftime: second argument out of range for time_t"
+msgstr "strftime: ארגומנט שני מחוץ לטווח עבור time_t"
+
+#: builtin.c:922
+msgid "strftime: received empty format string"
+msgstr "strftime: מחרוזת פורמט ריקה"
+
+#: builtin.c:1040
+msgid "mktime: at least one of the values is out of the default range"
+msgstr "mktime: לפחות אחד מהערכים אינו בתווך הנכון"
+
+#: builtin.c:1078
+msgid "'system' function not allowed in sandbox mode"
+msgstr "פונקציית `system' אסורה במצב ארגז חול"
+
+#: builtin.c:1145 builtin.c:1220
+msgid "print: attempt to write to closed write end of two-way pipe"
+msgstr "print: ניסיון לכתוב לקצה כתיבה סגור של אפיק דו־כיווני"
+
+#: builtin.c:1243
+#, c-format
+msgid "reference to uninitialized field `$%d'"
+msgstr "הפניה לשדה בלתי-מאתוחל `$%d'"
+
+#: builtin.c:1398 builtin.c:2438 builtin.c:2484 builtin.c:3104
+#, c-format
+msgid "%s: received non-numeric first argument"
+msgstr "%s: ארגומנט ראשון אינו מספר"
+
+#: builtin.c:1591
+msgid "match: third argument is not an array"
+msgstr "match: ארגומנט שלישי אינו מערך"
+
+#: builtin.c:1593
+#, c-format
+msgid "%s: cannot use %s as third argument"
+msgstr "%s: לא יכול להשתמש ב-%s כארגומנט שלישי"
+
+#: builtin.c:1851
+#, c-format
+msgid "gensub: third argument `%.*s' treated as 1"
+msgstr "gensub: ארגומנט שלישי `%.*s' הוחלף ב-1"
+
+#: builtin.c:2220
+#, c-format
+msgid "%s: can be called indirectly only with two arguments"
+msgstr "%s: ניתן לקרוא בעקיפין רק עם שני ארגומנטים"
+
+#: builtin.c:2243
+msgid "indirect call to gensub requires three or four arguments"
+msgstr "קריאה עקיפה ל־gensub דורשת שלושה או ארבעה ארגומנטים"
+
+#: builtin.c:2305
+msgid "indirect call to match requires two or three arguments"
+msgstr "קריאה עקיפה ל־match דורשת שניים או שלושה ארגומנטים"
+
+#: builtin.c:2366
+#, c-format
+msgid "indirect call to %s requires two to four arguments"
+msgstr "קריאה עקיפה ל־%s דורשת שניים עד ארבעה ארגומנטים"
+
+#: builtin.c:2446
+#, c-format
+msgid "lshift(%f, %f): negative values are not allowed"
+msgstr "lshift(%f, %f): ערכים שליליים אינם מותרים"
+
+#: builtin.c:2449
+#, c-format
+msgid "lshift(%f, %f): fractional values will be truncated"
+msgstr "lshift(%f, %f): ערכים שבורים יקוצצו"
+
+#: builtin.c:2460
+#, fuzzy, c-format
+#| msgid "lshift(%f, %f): too large shift value will give strange results"
+msgid "lshift(%f, %f): too large shift value returns zero"
+msgstr "lshift(%f, %f): שיעור הזזה גדול מדי יניב תוצאות בלתי-צפויות"
+
+#: builtin.c:2492
+#, c-format
+msgid "rshift(%f, %f): negative values are not allowed"
+msgstr "rshift(%f, %f): ערכים שליליים אינם מותרים"
+
+#: builtin.c:2495
+#, c-format
+msgid "rshift(%f, %f): fractional values will be truncated"
+msgstr "rshift(%f, %f): ערכים שבורים יקוצצו"
+
+#: builtin.c:2506
+#, fuzzy, c-format
+#| msgid "rshift(%f, %f): too large shift value will give strange results"
+msgid "rshift(%f, %f): too large shift value returns zero"
+msgstr "rshift(%f, %f): שיעור הזזה גדול מדי יניב תוצאות בלתי-צפויות"
+
+#: builtin.c:2527 builtin.c:2558 builtin.c:2588
+#, c-format
+msgid "%s: called with less than two arguments"
+msgstr "%s: נקרא עם פחות משני ארגומנטים"
+
+#: builtin.c:2532 builtin.c:2563 builtin.c:2594
+#, c-format
+msgid "%s: argument %d is non-numeric"
+msgstr "%s: ארגומנט %d אינו מספר"
+
+#: builtin.c:2536 builtin.c:2567 builtin.c:2598
+#, c-format
+msgid "%s: argument %d negative value %g is not allowed"
+msgstr "%s: ארגומנט %d ערך שלילי %g אינו מותר"
+
+#: builtin.c:2627
+#, c-format
+msgid "compl(%f): negative value is not allowed"
+msgstr "compl(%f): אסור ערך שלילי"
+
+#: builtin.c:2630
+#, c-format
+msgid "compl(%f): fractional value will be truncated"
+msgstr "compl(%f): ערך שבור יקוצץ"
+
+#: builtin.c:2761
+msgid "hexadecimal floating point constants require an exponent"
+msgstr ""
+
+#: builtin.c:2833
+#, c-format
+msgid "dcgettext: `%s' is not a valid locale category"
+msgstr "dcgettext:‏ `%s' אינה קטגוריית הגדרות מקומיות תקינה"
+
+#: builtin.c:2868 builtin.c:2886
+#, c-format
+msgid "%s: received non-string third argument"
+msgstr "%s: ארגומנט שלישי אינו מחרוזת"
+
+#: builtin.c:2941 builtin.c:2962
+#, c-format
+msgid "%s: received non-string fifth argument"
+msgstr "%s: ארגומנט חמישי אינו מחרוזת"
+
+#: builtin.c:2951 builtin.c:2968
+#, c-format
+msgid "%s: received non-string fourth argument"
+msgstr "%s: ארגומנט רביעי אינו מחרוזת"
+
+#: builtin.c:3096 mpfr.c:1346
+msgid "intdiv: third argument is not an array"
+msgstr "intdiv: ארגומנט שלישי אינו מערך"
+
+#: builtin.c:3115 mpfr.c:1395
+msgid "intdiv: division by zero attempted"
+msgstr "intdiv: נסיון חלוקה באפס"
+
+#: builtin.c:3156
+msgid "typeof: second argument is not an array"
+msgstr "typeof: הארגומנט השני אינו מערך"
+
+#: builtin.c:3260
+#, c-format
+msgid ""
+"typeof detected invalid flags combination `%s'; please file a bug report"
+msgstr "סוג של שילוב דגלים לא חוקי שזוהה `%s'; נא להגיש דוח באג"
+
+#: builtin.c:3299
+#, c-format
+msgid "typeof: unknown argument type `%s'"
+msgstr "typeof: סוג ארגומנט לא ידוע `%s'"
+
+#: cint_array.c:1268 cint_array.c:1296
+#, c-format
+msgid "cannot add a new file (%.*s) to ARGV in sandbox mode"
+msgstr "לא ניתן להוסיף קובץ חדש (%.*s) ל‏־ARGV במצב ארגז חול"
+
+#: command.y:228
+#, c-format
+msgid "Type (g)awk statement(s). End with the command `end'\n"
+msgstr "נא להקליד ‎(g)awk statement(s). לסיים בפקודה `end'\n"
+
+#: command.y:292
+#, c-format
+msgid "invalid frame number: %d"
+msgstr "מספר מסגרת שגוי: %d"
+
+#: command.y:298
+#, c-format
+msgid "info: invalid option - `%s'"
+msgstr "info: אפשרות שגויה - `%s'"
+
+#: command.y:324
+#, c-format
+msgid "source: `%s': already sourced"
+msgstr "source: `%s'‎ כבר נקרא"
+
+#: command.y:329
+#, c-format
+msgid "save: `%s': command not permitted"
+msgstr "save: `%s'‎: פקודה לא מורשה"
+
+#: command.y:342
+msgid "cannot use command `commands' for breakpoint/watchpoint commands"
+msgstr "לא ניתן להשתמש בפקודה `commands' עבור פקודות נקודת עצירה/נקודת מעקב"
+
+#: command.y:344
+msgid "no breakpoint/watchpoint has been set yet"
+msgstr "עדיין לא הוגדרה נקודת עצירה/נקודת שמירה"
+
+#: command.y:346
+msgid "invalid breakpoint/watchpoint number"
+msgstr "מספר נקודת עצירה/נקודת שמירה לא חוקי"
+
+#: command.y:351
+#, c-format
+msgid "Type commands for when %s %d is hit, one per line.\n"
+msgstr "נא למלא פקודות למקרה שמתרחש %s %d, אחת בשורה.\n"
+
+#: command.y:353
+#, c-format
+msgid "End with the command `end'\n"
+msgstr "לסיים עם הפקודה `end'\n"
+
+#: command.y:360
+msgid "`end' valid only in command `commands' or `eval'"
+msgstr "`end' תקף רק בפקודות `commands' או `eval'"
+
+#: command.y:370
+msgid "`silent' valid only in command `commands'"
+msgstr "`silent' מותר רק בפקודה `commands'"
+
+#: command.y:376
+#, c-format
+msgid "trace: invalid option - `%s'"
+msgstr "trace: אפשרות לא חוקית - `%s'"
+
+#: command.y:390
+#, fuzzy
+#| msgid "invalid breakpoint/watchpoint number"
+msgid "condition: invalid breakpoint/watchpoint number"
+msgstr "מספר נקודת עצירה/נקודת שמירה לא חוקי"
+
+#: command.y:452
+msgid "argument not a string"
+msgstr "הארגומנט אינו מערך"
+
+#: command.y:462 command.y:467
+#, c-format
+msgid "option: invalid parameter - `%s'"
+msgstr "option: פרמטר לא חוקי - `%s'"
+
+#: command.y:477
+#, c-format
+msgid "no such function - `%s'"
+msgstr "אין פונקציה כזאת - `%s'"
+
+#: command.y:534
+#, c-format
+msgid "enable: invalid option - `%s'"
+msgstr "enable: אפשרות שגויה - `%s'"
+
+#: command.y:600
+#, c-format
+msgid "invalid range specification: %d - %d"
+msgstr "הגדרה שגויה של תחום תוים: %d - %d"
+
+#: command.y:662
+msgid "non-numeric value for field number"
+msgstr "ערך לא מספרי עבור מספר שדה"
+
+#: command.y:683 command.y:690
+msgid "non-numeric value found, numeric expected"
+msgstr "נמצא ערך לא מספרי, צפוי מספרי"
+
+#: command.y:715 command.y:721
+msgid "non-zero integer value"
+msgstr "ערך מספר שלם שאינו אפס"
+
+#: command.y:820
+msgid ""
+"backtrace [N] - print trace of all or N innermost (outermost if N < 0) frames"
+msgstr ""
+"backtrace [N] - הדפס עקבות של כל המסגרות או N הפנימיות ביותר (החיצוניות אם N "
+"< 0)"
+
+#: command.y:822
+msgid ""
+"break [[filename:]N|function] - set breakpoint at the specified location"
+msgstr "break [[filename:]N|פונקציה] - הגדר נקודת עצירה במיקום שצוין"
+
+#: command.y:824
+msgid "clear [[filename:]N|function] - delete breakpoints previously set"
+msgstr "clear [[filename:]N|פונקציה] - מחק נקודות שבירה שהוגדרו בעבר"
+
+#: command.y:826
+msgid ""
+"commands [num] - starts a list of commands to be executed at a "
+"breakpoint(watchpoint) hit"
+msgstr ""
+"commands [num] - מתחיל רשימה של פקודות לביצוע בפגע נקודת עצירה (נקודת שמירה)"
+
+#: command.y:828
+msgid "condition num [expr] - set or clear breakpoint or watchpoint condition"
+msgstr "condition num [expr] - הגדר או נקה נקודת עצירה או מצב נקודת שמירה"
+
+#: command.y:830
+msgid "continue [COUNT] - continue program being debugged"
+msgstr "continue [כמות] - המשך איתור באגים בתוכנית"
+
+#: command.y:832
+msgid "delete [breakpoints] [range] - delete specified breakpoints"
+msgstr "delete [נקודות עצירה] [טווח] - מחיקת נקודות העצירה שצוינו"
+
+#: command.y:834
+msgid "disable [breakpoints] [range] - disable specified breakpoints"
+msgstr "disable [נקודות עצירה] [טווח] - השבתת נקודות העצירה שצוינו"
+
+# ------------------------------------------
+#: command.y:836
+msgid "display [var] - print value of variable each time the program stops"
+msgstr "display [משתנה] - הדפסת ערך של משתנה בכל פעם שהתוכנית נעצרת"
+
+#: command.y:838
+msgid "down [N] - move N frames down the stack"
+msgstr "down [ש] - ירידה של ש מסגרות במורד הערימה"
+
+#: command.y:840
+msgid "dump [filename] - dump instructions to file or stdout"
+msgstr "dump [שם קובץ] - הטלת ההנחיות לקובץ או ל־stdout"
+
+#: command.y:842
+msgid "enable [once|del] [breakpoints] [range] - enable specified breakpoints"
+msgstr "enable [once|del] [נקודות עצירה] [טווח] - הפעלת נקודות עצירה מסוימות"
+
+#: command.y:844
+msgid "end - end a list of commands or awk statements"
+msgstr "end - סוף רשימת פקודות או הצהרות של awk"
+
+#: command.y:846
+msgid "eval stmt|[p1, p2, ...] - evaluate awk statement(s)"
+msgstr "eval stmt|[p1, p2, ...] - חישוב ביטויי awk"
+
+#: command.y:848
+msgid "exit - (same as quit) exit debugger"
+msgstr "exit - (כמו quit) יציאה ממנפה השגיאות"
+
+#: command.y:850
+msgid "finish - execute until selected stack frame returns"
+msgstr "finish - להריץ עד שמסגרת המחסנית הנבחרת חוזרת"
+
+#: command.y:852
+msgid "frame [N] - select and print stack frame number N"
+msgstr "frame [ש] - בחירה והדפסה של מסגרת מס׳ ש"
+
+#: command.y:854
+msgid "help [command] - print list of commands or explanation of command"
+msgstr "help [פקודה] - הדפסת רשימת פקודות או הסבר של פקודה"
+
+#: command.y:856
+msgid "ignore N COUNT - set ignore-count of breakpoint number N to COUNT"
+msgstr "ignore N COUNT - הגדרת כמות התעלמות של נקודת העצירה N לכדי COUNT"
+
+#: command.y:858
+msgid ""
+"info topic - source|sources|variables|functions|break|frame|args|locals|"
+"display|watch"
+msgstr ""
+"info topic - source|sources|variables|functions|break|frame|args|locals|"
+"display|watch"
+
+#: command.y:860
+msgid "list [-|+|[filename:]lineno|function|range] - list specified line(s)"
+msgstr "list [-|+|[filename:]lineno|function|range] - הצגת השורות שצוינו"
+
+#: command.y:862
+msgid "next [COUNT] - step program, proceeding through subroutine calls"
+msgstr "next [כמות] - צעידה בתוכנית, תוך התקדמות מבעד לקריאת לתת־שגרות"
+
+#: command.y:864
+msgid ""
+"nexti [COUNT] - step one instruction, but proceed through subroutine calls"
+msgstr "nexti [כמות] - התקדמות בהנחיה אחת, אבל להמשיך מבעד לקריאות לתת־השגרות"
+
+#: command.y:866
+msgid "option [name[=value]] - set or display debugger option(s)"
+msgstr "option [name[=value]] - הגדרת או הצגת אפשרויות מנפה שגיאות"
+
+#: command.y:868
+msgid "print var [var] - print value of a variable or array"
+msgstr "print var [משתנה] - הצגת ערך של משתנה או מערך"
+
+#: command.y:870
+msgid "printf format, [arg], ... - formatted output"
+msgstr "printf format, [arg], ...‎ - פלט מעוצב"
+
+#: command.y:872
+msgid "quit - exit debugger"
+msgstr "quit - יציאה ממנפה השגיאות"
+
+#: command.y:874
+msgid "return [value] - make selected stack frame return to its caller"
+msgstr "return [ערך] - לגרום למסגרת הערימה הנבחרת לחזור למי שקרא לה"
+
+#: command.y:876
+msgid "run - start or restart executing program"
+msgstr "run - התחלת או חידוש הרצת תוכנית"
+
+#: command.y:879
+msgid "save filename - save commands from the session to file"
+msgstr "save filename - שמירת פקודות מההפעלה לקובץ"
+
+#: command.y:882
+msgid "set var = value - assign value to a scalar variable"
+msgstr "set var = value - החלת ערך למשתנה סקלארי"
+
+#: command.y:884
+msgid "silent - suspends usual message when stopped at a breakpoint/watchpoint"
+msgstr "silent - עיכוב ההודעות הרגילות בזמן עצירה על נקודת עצירה/מעקב"
+
+#: command.y:886
+msgid "source file - execute commands from file"
+msgstr "קובץ מקור -- הרצת פקודות מקובץ"
+
+#: command.y:888
+msgid "step [COUNT] - step program until it reaches a different source line"
+msgstr "step [COUNT] - לעבור צעד צעד בתוכנית עד להגעה לשורת מקור אחרת"
+
+#: command.y:890
+msgid "stepi [COUNT] - step one instruction exactly"
+msgstr "stepi [כמות] - להתקדם הנחיה אחת בלבד"
+
+#: command.y:892
+msgid "tbreak [[filename:]N|function] - set a temporary breakpoint"
+msgstr "tbreak [[filename:]N|function] - הגדרת נקודת עצירה זמנית"
+
+#: command.y:894
+msgid "trace on|off - print instruction before executing"
+msgstr "trace on|off - להדפיס את ההנחיה לפני הרצתה"
+
+#: command.y:896
+msgid "undisplay [N] - remove variable(s) from automatic display list"
+msgstr "undisplay [N] - הסרת משתנים מרשימת תצוגה אוטומטית"
+
+#: command.y:898
+msgid ""
+"until [[filename:]N|function] - execute until program reaches a different "
+"line or line N within current frame"
+msgstr ""
+"until [[filename:]N|function] - להריץ עד שהתוכנית מגיעה לשורת אחרת או לשורה "
+"N במסגרת הנוכחית"
+
+#: command.y:900
+msgid "unwatch [N] - remove variable(s) from watch list"
+msgstr "unwatch [N] - הסרת משתנים מרשימת המעקב"
+
+#: command.y:902
+msgid "up [N] - move N frames up the stack"
+msgstr "up [N] - העלאת N מסגרות במעלה הרשימה"
+
+#: command.y:904
+msgid "watch var - set a watchpoint for a variable"
+msgstr "watch var - הגדרת נקודת מעקב למשתנה"
+
+#: command.y:906
+msgid ""
+"where [N] - (same as backtrace) print trace of all or N innermost (outermost "
+"if N < 0) frames"
+msgstr ""
+"where [N] - (זהה ל־backtrace/מעקב קריאות) הדפסת עקבות של כל המסגרות או N "
+"הפנימיות ביותר (החיצוניות אם N < 0)"
+
+#: command.y:1017 debug.c:424 gawkapi.c:262 msg.c:142
+#, c-format
+msgid "error: "
+msgstr "שגיאה: "
+
+#: command.y:1061
+#, c-format
+msgid "cannot read command: %s\n"
+msgstr "לא ניתן לקרוא פקודה: %s\n"
+
+#: command.y:1075
+#, c-format
+msgid "cannot read command: %s"
+msgstr "לא ניתן לקרוא פקודה: %s"
+
+#: command.y:1126
+msgid "invalid character in command"
+msgstr "תו לא חוקי בפקודה"
+
+#: command.y:1162
+#, c-format
+msgid "unknown command - `%.*s', try help"
+msgstr "פקודה לא ידועה - `%.*s', נסה help"
+
+#: command.y:1294
+msgid "invalid character"
+msgstr "תו שגוי"
+
+#: command.y:1498
+#, c-format
+msgid "undefined command: %s\n"
+msgstr "פקודה לא מוגדרת: %s\n"
+
+#: debug.c:257
+msgid "set or show the number of lines to keep in history file"
+msgstr "הגדר או הצג את מספר השורות שיש לשמור בקובץ ההיסטוריה"
+
+#: debug.c:259
+msgid "set or show the list command window size"
+msgstr "הגדר או הצג את גודל חלון פקודת הרשימה"
+
+#: debug.c:261
+msgid "set or show gawk output file"
+msgstr "הגדר או הצג קובץ פלט gawk"
+
+#: debug.c:263
+msgid "set or show debugger prompt"
+msgstr "הגדרה או הצגת הודעת ניפוי באגים"
+
+#: debug.c:265
+msgid "(un)set or show saving of command history (value=on|off)"
+msgstr "(ביטול) הגדרה או הצגת שמירת היסטוריית הפקודות (ערך=on|off)"
+
+#: debug.c:267
+msgid "(un)set or show saving of options (value=on|off)"
+msgstr "(ביטול) הגדרת או הצגת שמירת אופציות (ערך=on|off)"
+
+#: debug.c:269
+msgid "(un)set or show instruction tracing (value=on|off)"
+msgstr "(ביטול) הגדרה או הצגת מעקב אחר הוראות (ערך=on|off)"
+
+#: debug.c:358
+#, fuzzy, c-format
+#| msgid "program not running"
+msgid "%s:%d:%s: program not running"
+msgstr "התוכנית לא פועלת"
+
+#: debug.c:476
+#, c-format
+msgid "source file `%s' is empty.\n"
+msgstr "קובץ מקור `%s' הינו ריק.\n"
+
+#: debug.c:503
+msgid "no current source file"
+msgstr "אין קובץ מקור נוכחי"
+
+#: debug.c:528
+#, c-format
+msgid "cannot find source file named `%s': %s"
+msgstr "לא יכול למצוא קובץ מקור בשם `%s': %s"
+
+#: debug.c:552
+#, c-format
+msgid "warning: source file `%s' modified since program compilation.\n"
+msgstr "אזהרה: קובץ המקור `%s' השתנה מאז הידור התוכנית.\n"
+
+#: debug.c:574
+#, c-format
+msgid "line number %d out of range; `%s' has %d lines"
+msgstr "שורה מספר %d מחוץ לטווח; ל- `%s' יש %d שורות"
+
+#: debug.c:634
+#, c-format
+msgid "unexpected eof while reading file `%s', line %d"
+msgstr "eof לא צפוי בזמן קריאת הקובץ `%s', שורה %d"
+
+#: debug.c:643
+#, c-format
+msgid "source file `%s' modified since start of program execution"
+msgstr "קובץ המקור `%s' נערך מאז תחילת הרצת התוכנית"
+
+#: debug.c:755
+#, c-format
+msgid "Current source file: %s\n"
+msgstr "קובץ המקור הנוכחי: %s\n"
+
+#: debug.c:756
+#, c-format
+msgid "Number of lines: %d\n"
+msgstr "מספר השורות: %d\n"
+
+#: debug.c:763
+#, c-format
+msgid "Source file (lines): %s (%d)\n"
+msgstr "קובץ מקור (שורות): %s (%d)\n"
+
+#: debug.c:777
+msgid ""
+"Number  Disp  Enabled  Location\n"
+"\n"
+msgstr ""
+"מספר  תצוגה  פעיל?  מקום\n"
+"\n"
+
+#: debug.c:788
+#, c-format
+msgid "\tnumber of hits = %ld\n"
+msgstr "\tמספר הלכידות = %ld\n"
+
+#: debug.c:790
+#, c-format
+msgid "\tignore next %ld hit(s)\n"
+msgstr "\tהתעלמות מ־%ld הפגיעות הבאות\n"
+
+#: debug.c:792 debug.c:932
+#, c-format
+msgid "\tstop condition: %s\n"
+msgstr "\tתנאי עצירה: %s\n"
+
+#: debug.c:794 debug.c:934
+msgid "\tcommands:\n"
+msgstr "\tפקודות:\n"
+
+#: debug.c:816
+#, c-format
+msgid "Current frame: "
+msgstr "מסגרת נוכחית: "
+
+#: debug.c:819
+#, c-format
+msgid "Called by frame: "
+msgstr "נקרא על ידי מסגרת: "
+
+#: debug.c:823
+#, c-format
+msgid "Caller of frame: "
+msgstr "קורא למסגרת: "
+
+#: debug.c:841
+#, c-format
+msgid "None in main().\n"
+msgstr "אין ב־main()‎.\n"
+
+#: debug.c:871
+msgid "No arguments.\n"
+msgstr "אין ארגומנטים.\n"
+
+#: debug.c:872
+msgid "No locals.\n"
+msgstr "אין משתנים מקומיים.\n"
+
+#: debug.c:880
+msgid ""
+"All defined variables:\n"
+"\n"
+msgstr ""
+"כל המשתנים המוגדרים:\n"
+"\n"
+
+#: debug.c:890
+msgid ""
+"All defined functions:\n"
+"\n"
+msgstr ""
+"כל הפונקציות המוגדרות:\n"
+"\n"
+
+#: debug.c:909
+msgid ""
+"Auto-display variables:\n"
+"\n"
+msgstr ""
+"הצגת משתנים אוטומטית:\n"
+"\n"
+
+#: debug.c:912
+msgid ""
+"Watch variables:\n"
+"\n"
+msgstr ""
+"מעקב אחר משתנים:\n"
+"\n"
+
+#: debug.c:1055
+#, c-format
+msgid "no symbol `%s' in current context\n"
+msgstr "אין סמל `%s' בהקשר הנוכחי\n"
+
+#: debug.c:1067 debug.c:1496
+#, c-format
+msgid "`%s' is not an array\n"
+msgstr "`%s' אינו מערך\n"
+
+#: debug.c:1081
+#, c-format
+msgid "$%ld = uninitialized field\n"
+msgstr "‎$%ld = שדה לא מאותחל\n"
+
+#: debug.c:1126
+#, c-format
+msgid "array `%s' is empty\n"
+msgstr "המערך `%s' ריק\n"
+
+#: debug.c:1185 debug.c:1237
+#, c-format
+msgid "subscript \"%.*s\" is not in array `%s'\n"
+msgstr "המפתח „‎%.*s” אינו במערך `%s'\n"
+
+#: debug.c:1241
+#, c-format
+msgid "`%s[\"%.*s\"]' is not an array\n"
+msgstr "`%s[\"%.*s\"]' אינו מערך\n"
+
+#: debug.c:1303 debug.c:5172
+#, c-format
+msgid "`%s' is not a scalar variable"
+msgstr "`%s' אינו משתנה סקלרי"
+
+#: debug.c:1326 debug.c:5202
+#, c-format
+msgid "attempt to use array `%s[\"%.*s\"]' in a scalar context"
+msgstr "נסיון שימוש במערך `%s[\"%.*s\"]' בהקשר הדורש סקלאר"
+
+#: debug.c:1349 debug.c:5213
+#, c-format
+msgid "attempt to use scalar `%s[\"%.*s\"]' as array"
+msgstr "ניסיון להשתמש בסקלאר `%s[\"%.*s\"]' כמערך"
+
+#: debug.c:1492
+#, c-format
+msgid "`%s' is a function"
+msgstr "`%s' היא פונקציה"
+
+#: debug.c:1534
+#, c-format
+msgid "watchpoint %d is unconditional\n"
+msgstr "נקודת המעקב %d נטולת תנאים\n"
+
+#: debug.c:1568
+#, c-format
+msgid "no display item numbered %ld"
+msgstr "אין פריט תצוגה עם המספר %ld"
+
+#: debug.c:1571
+#, c-format
+msgid "no watch item numbered %ld"
+msgstr "אין פריט מעקב עם המספר %ld"
+
+#: debug.c:1597
+#, c-format
+msgid "%d: subscript \"%.*s\" is not in array `%s'\n"
+msgstr "%d: המפתח „%.*s” אינו במערך `%s'\n"
+
+#: debug.c:1841
+msgid "attempt to use scalar value as array"
+msgstr "ניסיון להשתמש בערך סקלארי כמערך"
+
+#: debug.c:1932
+#, c-format
+msgid "Watchpoint %d deleted because parameter is out of scope.\n"
+msgstr "נקודת המעקב %d נמחקה כי המשתנה אינו בטווח.\n"
+
+#: debug.c:1943
+#, c-format
+msgid "Display %d deleted because parameter is out of scope.\n"
+msgstr "התצוגה %d נמחקה כיוון שהמשתנה מחוץ לטווח.\n"
+
+#: debug.c:1976
+#, c-format
+msgid " in file `%s', line %d\n"
+msgstr " בקובץ `%s', שורה %d\n"
+
+#: debug.c:1997
+#, c-format
+msgid " at `%s':%d"
+msgstr " ב־`%s':%d"
+
+#: debug.c:2013 debug.c:2076
+#, c-format
+msgid "#%ld\tin "
+msgstr "מס׳ %ld\tב־ "
+
+#: debug.c:2050
+#, c-format
+msgid "More stack frames follow ...\n"
+msgstr "עוד מסגרות ערימה בהמשך…\n"
+
+#: debug.c:2093
+msgid "invalid frame number"
+msgstr "מספר המסגרת שגוי"
+
+#: debug.c:2276
+#, c-format
+msgid "Note: breakpoint %d (enabled, ignore next %ld hits), also set at %s:%d"
+msgstr ""
+"לתשומת ליבך: נקודת עצירה %d (פעילה, להתעלם מ־%ld הפגיעות הבאות), מוגדרת גם "
+"ב־%s:%d"
+
+#: debug.c:2283
+#, c-format
+msgid "Note: breakpoint %d (enabled), also set at %s:%d"
+msgstr ""
+
+#: debug.c:2290
+#, c-format
+msgid "Note: breakpoint %d (disabled, ignore next %ld hits), also set at %s:%d"
+msgstr ""
+
+#: debug.c:2297
+#, c-format
+msgid "Note: breakpoint %d (disabled), also set at %s:%d"
+msgstr ""
+
+#: debug.c:2314
+#, c-format
+msgid "Breakpoint %d set at file `%s', line %d\n"
+msgstr "נקודת העצירה %d הוגדרה בקובץ `%s', שורה %d\n"
+
+#: debug.c:2416
+#, c-format
+msgid "cannot set breakpoint in file `%s'\n"
+msgstr "לא ניתן להגדיר נקודת עצירה בקובץ `%s'\n"
+
+#: debug.c:2445
+#, c-format
+msgid "line number %d in file `%s' is out of range"
+msgstr "שורה מספר %d בקובץ `%s' היא מחוץ לתחום"
+
+#: debug.c:2449
+#, c-format
+msgid "internal error: cannot find rule\n"
+msgstr "שגיאה פנימית: לא ניתן למצוא את הכלל\n"
+
+#: debug.c:2451
+#, c-format
+msgid "cannot set breakpoint at `%s':%d\n"
+msgstr "לא ניתן להגדיר נקודת עצירה ב־`%s':%d\n"
+
+#: debug.c:2463
+#, c-format
+msgid "cannot set breakpoint in function `%s'\n"
+msgstr "לא ניתן להגדיר נקודת עצירה ב־`%s'\n"
+
+#: debug.c:2481
+#, c-format
+msgid "breakpoint %d set at file `%s', line %d is unconditional\n"
+msgstr ""
+
+#: debug.c:2569 debug.c:3427
+#, c-format
+msgid "line number %d in file `%s' out of range"
+msgstr "שורה מס׳ %d בקובץ `%s' היא מחוץ לטווח"
+
+#: debug.c:2585 debug.c:2607
+#, c-format
+msgid "Deleted breakpoint %d"
+msgstr "מחיקת נקודת עצירה %d"
+
+#: debug.c:2591
+#, c-format
+msgid "No breakpoint(s) at entry to function `%s'\n"
+msgstr ""
+
+#: debug.c:2618
+#, c-format
+msgid "No breakpoint at file `%s', line #%d\n"
+msgstr "אין נקודת עצירה בקובץ `%s', שורה מס׳ %d\n"
+
+#: debug.c:2673 debug.c:2714 debug.c:2734 debug.c:2777
+msgid "invalid breakpoint number"
+msgstr "מספר נקודת העצירה שגוי"
+
+#: debug.c:2689
+msgid "Delete all breakpoints? (y or n) "
+msgstr "למחוק את כל נקודות העצירה? (y או n) "
+
+#: debug.c:2690 debug.c:3001 debug.c:3054
+msgid "y"
+msgstr "כ"
+
+#: debug.c:2739
+#, c-format
+msgid "Will ignore next %ld crossing(s) of breakpoint %d.\n"
+msgstr ""
+
+#: debug.c:2743
+#, c-format
+msgid "Will stop next time breakpoint %d is reached.\n"
+msgstr ""
+
+#: debug.c:2861
+#, c-format
+msgid "Can only debug programs provided with the `-f' option.\n"
+msgstr ""
+
+#: debug.c:2881
+#, c-format
+msgid "Restarting ...\n"
+msgstr "מופעל מחדש…\n"
+
+#: debug.c:2986
+#, c-format
+msgid "Failed to restart debugger"
+msgstr "הפעלת מנפה השגיאות מחדש נכשלה"
+
+#: debug.c:3000
+msgid "Program already running. Restart from beginning (y/n)? "
+msgstr "התוכנית כבר פעילה. להתחיל מההתחלה (y/n)? "
+
+#: debug.c:3004
+#, c-format
+msgid "Program not restarted\n"
+msgstr "התוכנית לא הופעלה מחדש\n"
+
+#: debug.c:3014
+#, c-format
+msgid "error: cannot restart, operation not allowed\n"
+msgstr "שגיאה: לא ניתן להפעיל מההתחלה, הפעולה לא מורשית\n"
+
+#: debug.c:3020
+#, c-format
+msgid "error (%s): cannot restart, ignoring rest of the commands\n"
+msgstr "שגיאה (%s): לא ניתן להפעיל מחדש, שאר הפקודות יזכו להתעלמות\n"
+
+#: debug.c:3028
+#, c-format
+msgid "Starting program:\n"
+msgstr "התוכנית מופעלת:\n"
+
+#: debug.c:3038
+#, c-format
+msgid "Program exited abnormally with exit value: %d\n"
+msgstr "התוכנית נקטעה באופן חריג עם ערך היציאה: %d\n"
+
+#: debug.c:3039
+#, c-format
+msgid "Program exited normally with exit value: %d\n"
+msgstr "התוכנית יצאה כרגיל עם ערך היציאה: %d\n"
+
+#: debug.c:3053
+msgid "The program is running. Exit anyway (y/n)? "
+msgstr "התוכנית פעילה. לצאת בכל זאת (y/n)? "
+
+#: debug.c:3088
+#, c-format
+msgid "Not stopped at any breakpoint; argument ignored.\n"
+msgstr "לא נעצר באף נקודת עצירה, הארגומנט נפסח.\n"
+
+#: debug.c:3093
+#, c-format
+msgid "invalid breakpoint number %d"
+msgstr "מספר נקודת העצירה %d שגוי"
+
+#: debug.c:3098
+#, c-format
+msgid "Will ignore next %ld crossings of breakpoint %d.\n"
+msgstr ""
+
+#: debug.c:3285
+#, c-format
+msgid "'finish' not meaningful in the outermost frame main()\n"
+msgstr ""
+
+#: debug.c:3290
+#, c-format
+msgid "Run until return from "
+msgstr "לרוץ עד חזרה מ־ "
+
+#: debug.c:3333
+#, c-format
+msgid "'return' not meaningful in the outermost frame main()\n"
+msgstr ""
+
+#: debug.c:3446
+#, c-format
+msgid "cannot find specified location in function `%s'\n"
+msgstr ""
+
+#: debug.c:3454
+#, c-format
+msgid "invalid source line %d in file `%s'"
+msgstr "שורת המקור %d שגויה בקובץ `%s'"
+
+#: debug.c:3469
+#, c-format
+msgid "cannot find specified location %d in file `%s'\n"
+msgstr "לא ניתן למצוא את המקום שצוין %d בקובץ `%s'\n"
+
+#: debug.c:3501
+#, c-format
+msgid "element not in array\n"
+msgstr "הרכיב לא במערך\n"
+
+#: debug.c:3501
+#, c-format
+msgid "untyped variable\n"
+msgstr "משתנה ללא סוג\n"
+
+#: debug.c:3543
+#, c-format
+msgid "Stopping in %s ...\n"
+msgstr ""
+
+#: debug.c:3620
+#, c-format
+msgid "'finish' not meaningful with non-local jump '%s'\n"
+msgstr ""
+
+#: debug.c:3627
+#, c-format
+msgid "'until' not meaningful with non-local jump '%s'\n"
+msgstr ""
+
+#. TRANSLATORS: don't translate the 'q' inside the brackets.
+#: debug.c:4388
+msgid "\t------[Enter] to continue or [q] + [Enter] to quit------"
+msgstr "\t------[Enter] כדי להמשיך או [q] ואז [Enter] כדי לצאת------"
+
+#: debug.c:5209
+#, c-format
+msgid "[\"%.*s\"] not in array `%s'"
+msgstr "[\"%.*s\"] לא במערך `%s'"
+
+#: debug.c:5415
+#, c-format
+msgid "sending output to stdout\n"
+msgstr "פלט נשלח ל־stdout\n"
+
+#: debug.c:5455
+msgid "invalid number"
+msgstr "מספר שגוי"
+
+#: debug.c:5589
+#, c-format
+msgid "`%s' not allowed in current context; statement ignored"
+msgstr ""
+
+#: debug.c:5597
+msgid "`return' not allowed in current context; statement ignored"
+msgstr ""
+
+#: debug.c:5645
+#, c-format
+msgid "fatal error during eval, need to restart.\n"
+msgstr "שגיאה מהותית במהלך eval (הערכה), יש להפעיל מחדש\n"
+
+#: debug.c:5835
+#, c-format
+msgid "no symbol `%s' in current context"
+msgstr "אין סימול `%s' בהקשר הנוכחי"
+
+#: eval.c:405
+#, c-format
+msgid "unknown nodetype %d"
+msgstr "nodetype %d לא מוכר"
+
+#: eval.c:416 eval.c:432
+#, c-format
+msgid "unknown opcode %d"
+msgstr "opcode %d לא מוכר"
+
+#: eval.c:429
+#, c-format
+msgid "opcode %s not an operator or keyword"
+msgstr "opcode %s לא מוכר"
+
+#: eval.c:488
+msgid "buffer overflow in genflags2str"
+msgstr "גלישת חוצץ ב-genflags2str"
+
+#: eval.c:700
+#, c-format
+msgid ""
+"\n"
+"\t# Function Call Stack:\n"
+"\n"
+msgstr ""
+"\n"
+"\t# מחסנית הקריאות לפונקציות:\n"
+"\n"
+
+#: eval.c:726
+msgid "`IGNORECASE' is a gawk extension"
+msgstr "`IGNORECASE' הינו הרחבה ספציפית ל-gawk"
+
+#: eval.c:747
+msgid "`BINMODE' is a gawk extension"
+msgstr "`BINMODE' הינו הרחבה ספציפית ל-gawk"
+
+#: eval.c:804
+#, c-format
+msgid "BINMODE value `%s' is invalid, treated as 3"
+msgstr "ערך `%s' ל-BINMODE אינו נכון, משתמשים ב-3"
+
+#: eval.c:927
+#, c-format
+msgid "bad `%sFMT' specification `%s'"
+msgstr "מפרט `%sFMT' פגום `%s'"
+
+#: eval.c:997
+msgid "turning off `--lint' due to assignment to `LINT'"
+msgstr "מבטל `--lint' עקב השמת ערך ל-'LINT'"
+
+#: eval.c:1209
+#, c-format
+msgid "reference to uninitialized argument `%s'"
+msgstr "הפניה לארגומנט בלתי מאותחל `%s'"
+
+#: eval.c:1210
+#, c-format
+msgid "reference to uninitialized variable `%s'"
+msgstr "הפניה למשתנה בלתי-מאותחל `%s'"
+
+#: eval.c:1228
+msgid "attempt to field reference from non-numeric value"
+msgstr "נסיון הפניה לשדה באמצעות ערך שאינו מספר"
+
+#: eval.c:1230
+msgid "attempt to field reference from null string"
+msgstr "נסיון הפניה לשדה באמצעות מחרוזת ריקה"
+
+#: eval.c:1238
+#, c-format
+msgid "attempt to access field %ld"
+msgstr "ניסיון גישה לשדה %ld"
+
+#: eval.c:1247
+#, c-format
+msgid "reference to uninitialized field `$%ld'"
+msgstr "הפניה לשדה בלתי מאותחל `$%ld'"
+
+#: eval.c:1311
+#, c-format
+msgid "function `%s' called with more arguments than declared"
+msgstr "הפונקציה `%s' נקראה עם יותר ארגומנטים משהוכרזו"
+
+#: eval.c:1527
+#, c-format
+msgid "unwind_stack: unexpected type `%s'"
+msgstr "unwind_stack: סוג `%s' בלתי צפוי"
+
+#: eval.c:1708
+msgid "division by zero attempted in `/='"
+msgstr "ניסיון חלוקה באפס ב־`/='"
+
+#: eval.c:1715
+#, c-format
+msgid "division by zero attempted in `%%='"
+msgstr "ניסיון חלוקה באפס ב-`%%='"
+
+#: ext.c:53
+#, c-format
+msgid "extension `%s': trying to load %s, was previously loaded from %s"
+msgstr ""
+
+#: ext.c:99
+msgid "extensions are not allowed in sandbox mode"
+msgstr "הרחבות אסורות במצב ארגז חול"
+
+#: ext.c:105
+msgid "-l / @load are gawk extensions"
+msgstr "‎-l / @load הן הרחבות של gawk"
+
+#: ext.c:108
+msgid "load_ext: received NULL lib_name"
+msgstr "load_ext: קיבל NULL בתור lib_name"
+
+#: ext.c:111
+#, c-format
+msgid "load_ext: cannot open library `%s': %s"
+msgstr "load_ext: לא ניתן לפתוח את הספריה `%s': %s"
+
+#: ext.c:117
+#, c-format
+msgid "load_ext: library `%s': does not define `plugin_is_GPL_compatible': %s"
+msgstr ""
+
+#: ext.c:123
+#, c-format
+msgid "load_ext: library `%s': cannot call function `%s': %s"
+msgstr "load_ext: הספרייה `%s': לא יכולה לקרוא לפונקציה `%s':‏ %s"
+
+#: ext.c:127
+#, c-format
+msgid "load_ext: library `%s' initialization routine `%s' failed"
+msgstr "load_ext: שגרת האתחול `%s' של הספרייה `%s' נכשלה"
+
+#: ext.c:143
+msgid "make_builtin: missing function name"
+msgstr "make_builtin: שם הפונקציה חסר"
+
+#: ext.c:151 ext.c:162
+#, c-format
+msgid "make_builtin: cannot use gawk built-in `%s' as function name"
+msgstr "make_builtin: לא ניתן להשתמש בשם `%s' המובנה ב־gawk כשם פונקציה"
+
+#: ext.c:160
+#, c-format
+msgid "make_builtin: cannot use gawk built-in `%s' as namespace name"
+msgstr "make_builtin: לא ניתן להשתמש בשם `%s' המובנה ב־gawk כשם מרחב"
+
+#: ext.c:177
+#, c-format
+msgid "make_builtin: cannot redefine function `%s'"
+msgstr "make_builtin: לא ניתן להגדיר את הפונקציה `%s' מחדש"
+
+#: ext.c:181
+#, c-format
+msgid "make_builtin: function `%s' already defined"
+msgstr "make_builtin: הפונקציה `%s' כבר מוגדרת"
+
+#: ext.c:190
+#, c-format
+msgid "make_builtin: function name `%s' previously defined"
+msgstr "make_builtin: שם הפונקציה `%s' כבר הוגדר בעבר"
+
+#: ext.c:194
+#, c-format
+msgid "make_builtin: negative argument count for function `%s'"
+msgstr "make_builitn: `%s': מספר ארגומנטים שלילי"
+
+#: ext.c:275
+#, c-format
+msgid "function `%s': argument #%d: attempt to use scalar as an array"
+msgstr "פונקציה `%s': ארגומנט מס׳ %d: ניסיון להשתמש בסקלאר כמערך"
+
+#: ext.c:279
+#, c-format
+msgid "function `%s': argument #%d: attempt to use array as a scalar"
+msgstr "פונקציה `%s': ארגומנט מס׳ %d: ניסיון להשתמש במערך כסקאלר"
+
+#: ext.c:299
+msgid "dynamic loading of libraries is not supported"
+msgstr "אין תמיכה בטעינת ספריות דינמית"
+
+#: extension/filefuncs.c:446
+#, c-format
+msgid "stat: unable to read symbolic link `%s'"
+msgstr "stat: לא ניתן לקרוא את הקישור הסמלי `%s'"
+
+#: extension/filefuncs.c:479
+msgid "stat: first argument is not a string"
+msgstr "stat: הארגומנט הראשון אינו מחרוזת"
+
+#: extension/filefuncs.c:484
+msgid "stat: second argument is not an array"
+msgstr "stat: הארגומנט השני אינו מערך"
+
+#: extension/filefuncs.c:528
+msgid "stat: bad parameters"
+msgstr "stat: פרמטרים שגויים"
+
+#: extension/filefuncs.c:594
+#, c-format
+msgid "fts init: could not create variable %s"
+msgstr "fts init: לא ניתן ליצור את המשתנה %s"
+
+#: extension/filefuncs.c:615
+msgid "fts is not supported on this system"
+msgstr "אין תמיכה ב־fts במערכת הזאת"
+
+#: extension/filefuncs.c:634
+msgid "fill_stat_element: could not create array, out of memory"
+msgstr "fill_stat_element: לא ניתן ליצור מערך, נגמר הזיכרון"
+
+#: extension/filefuncs.c:643
+msgid "fill_stat_element: could not set element"
+msgstr "fill_stat_element: לא ניתן להגדיר רכיב"
+
+#: extension/filefuncs.c:658
+msgid "fill_path_element: could not set element"
+msgstr "fill_path_element: לא ניתן להגדיר רכיב"
+
+#: extension/filefuncs.c:674
+msgid "fill_error_element: could not set element"
+msgstr "fill_error_element: לא ניתן להגדיר רכיב"
+
+#: extension/filefuncs.c:726 extension/filefuncs.c:773
+msgid "fts-process: could not create array"
+msgstr "fts-process: לא ניתן ליצור מערך"
+
+#: extension/filefuncs.c:736 extension/filefuncs.c:783
+#: extension/filefuncs.c:801
+msgid "fts-process: could not set element"
+msgstr "fts-process: לא ניתן להגדיר רכיב"
+
+#: extension/filefuncs.c:850
+msgid "fts: called with incorrect number of arguments, expecting 3"
+msgstr "fts: נקרא עם כמות שגויה של ארגומנטים, אמורים להיות 3"
+
+#: extension/filefuncs.c:853
+msgid "fts: first argument is not an array"
+msgstr "fts: ארגומנט ראשון אינו מערך"
+
+#: extension/filefuncs.c:859
+msgid "fts: second argument is not a number"
+msgstr "fst: הארגומנט השני אינו מספר"
+
+#: extension/filefuncs.c:865
+msgid "fts: third argument is not an array"
+msgstr "fts: הארגומנט השלישי אינו מערך"
+
+#: extension/filefuncs.c:872
+msgid "fts: could not flatten array\n"
+msgstr "fts: לא ניתן לשטח את המערך\n"
+
+#: extension/filefuncs.c:890
+msgid "fts: ignoring sneaky FTS_NOSTAT flag. nyah, nyah, nyah."
+msgstr ""
+
+#: extension/fnmatch.c:125
+msgid "fnmatch: could not get first argument"
+msgstr "fnmatch: לא ניתן לקבל את הארגומנט הראשון"
+
+#: extension/fnmatch.c:130
+msgid "fnmatch: could not get second argument"
+msgstr "fnmatch: לא ניתן לקבל את הארגומנט השני"
+
+#: extension/fnmatch.c:135
+msgid "fnmatch: could not get third argument"
+msgstr "fnmatch: לא ניתן לקבל את הארגומנט השלישי"
+
+#: extension/fnmatch.c:148
+msgid "fnmatch is not implemented on this system\n"
+msgstr "fnmatch לא ממומש במערכת הזאת\n"
+
+#: extension/fnmatch.c:180
+msgid "fnmatch init: could not add FNM_NOMATCH variable"
+msgstr "fnmatch init: לא ניתן להוסיף את המשתנה FNM_NOMATCH"
+
+#: extension/fnmatch.c:190
+#, c-format
+msgid "fnmatch init: could not set array element %s"
+msgstr "fnmatch init: לא ניתן להגדיר רכיב במערך %s"
+
+#: extension/fnmatch.c:200
+msgid "fnmatch init: could not install FNM array"
+msgstr "fnmatch init: לא ניתן להתקין מערך FNM"
+
+#: extension/fork.c:92
+msgid "fork: PROCINFO is not an array!"
+msgstr "fork:‏ PROCINFO אינו מערך!"
+
+#: extension/inplace.c:131
+msgid "inplace::begin: in-place editing already active"
+msgstr ""
+
+#: extension/inplace.c:134
+#, c-format
+msgid "inplace::begin: expects 2 arguments but called with %d"
+msgstr "inplace::begin: מצפה ל־2 ארגומנטים אבל נקרא עם %d"
+
+#: extension/inplace.c:137
+msgid "inplace::begin: cannot retrieve 1st argument as a string filename"
+msgstr "inplace::begin: לא ניתן לקבל ארגומנט ראשון כשם קובץ מחרוזת"
+
+#: extension/inplace.c:145
+#, c-format
+msgid "inplace::begin: disabling in-place editing for invalid FILENAME `%s'"
+msgstr ""
+
+#: extension/inplace.c:152
+#, c-format
+msgid "inplace::begin: Cannot stat `%s' (%s)"
+msgstr ""
+
+#: extension/inplace.c:159
+#, c-format
+msgid "inplace::begin: `%s' is not a regular file"
+msgstr "inplace::begin:‏ `%s' אינו קובץ רגיל"
+
+#: extension/inplace.c:170
+#, c-format
+msgid "inplace::begin: mkstemp(`%s') failed (%s)"
+msgstr "inplace::begin:‏ mkstemp(`%s') נכשל (%s)"
+
+#: extension/inplace.c:182
+#, c-format
+msgid "inplace::begin: chmod failed (%s)"
+msgstr "inplace::begin:‏ chmod נכשל (%s)"
+
+#: extension/inplace.c:189
+#, c-format
+msgid "inplace::begin: dup(stdout) failed (%s)"
+msgstr "inplace::begin‏: dup(stdout) נכשלה (%s)"
+
+#: extension/inplace.c:192
+#, c-format
+msgid "inplace::begin: dup2(%d, stdout) failed (%s)"
+msgstr "inplace::begin‏: dup2(%d, stdout) נכשלה (%s)"
+
+#: extension/inplace.c:195
+#, c-format
+msgid "inplace::begin: close(%d) failed (%s)"
+msgstr "‎inplace::begin:‏ close(%d) נכשלה (%s)"
+
+#: extension/inplace.c:211
+#, c-format
+msgid "inplace::end: expects 2 arguments but called with %d"
+msgstr "inplace::end: מצפה ל־2 ארגומנטים אבל נקרא עם %d"
+
+#: extension/inplace.c:214
+msgid "inplace::end: cannot retrieve 1st argument as a string filename"
+msgstr "inplace::end: לא ניתן לקבל ארגומנט ראשון כשם קובץ מחרוזת"
+
+#: extension/inplace.c:221
+msgid "inplace::end: in-place editing not active"
+msgstr ""
+
+#: extension/inplace.c:227
+#, c-format
+msgid "inplace::end: dup2(%d, stdout) failed (%s)"
+msgstr "inplace::end:‏ dup2(%d, stdout) נכשלה (%s)"
+
+#: extension/inplace.c:230
+#, c-format
+msgid "inplace::end: close(%d) failed (%s)"
+msgstr "‏inplace::end:‏ close(%d) נכשלה (%s)"
+
+#: extension/inplace.c:234
+#, c-format
+msgid "inplace::end: fsetpos(stdout) failed (%s)"
+msgstr "inplace::end‏: fsetpos(stdout) נכשלה (%s)"
+
+#: extension/inplace.c:247
+#, c-format
+msgid "inplace::end: link(`%s', `%s') failed (%s)"
+msgstr "‏inplace::end:‏ link(`%s', `%s') נכשלה (%s)"
+
+#: extension/inplace.c:257
+#, c-format
+msgid "inplace::end: rename(`%s', `%s') failed (%s)"
+msgstr ""
+
+#: extension/ordchr.c:107
+msgid "ord: first argument is not a string"
+msgstr "ord: הארגומנט הראשון אינו מחרוזת"
+
+#: extension/ordchr.c:136
+msgid "chr: first argument is not a number"
+msgstr "chr: הארגומנט הראשון אינו מספר"
+
+#: extension/readdir.c:295
+#, c-format
+msgid "dir_take_control_of: %s: opendir/fdopendir failed: %s"
+msgstr ""
+
+#: extension/readfile.c:133
+msgid "readfile: called with wrong kind of argument"
+msgstr "readfile: נקרא עם סוג ארגומנט שגוי"
+
+#: extension/revoutput.c:127
+msgid "revoutput: could not initialize REVOUT variable"
+msgstr ""
+
+#: extension/rwarray.c:145 extension/rwarray.c:548
+#, c-format
+msgid "%s: first argument is not a string"
+msgstr "%s: הארגומנט הראשון אינו מחרוזת"
+
+#: extension/rwarray.c:189
+msgid "writea: second argument is not an array"
+msgstr "writea: הארגומנט השני אינו מערך"
+
+#: extension/rwarray.c:206
+msgid "writeall: unable to find SYMTAB array"
+msgstr ""
+
+#: extension/rwarray.c:226
+msgid "write_array: could not flatten array"
+msgstr ""
+
+#: extension/rwarray.c:242
+msgid "write_array: could not release flattened array"
+msgstr "write_array: לא ניתן לשחרר מערך שהושטח"
+
+#: extension/rwarray.c:307
+#, c-format
+msgid "array value has unknown type %d"
+msgstr "סוג ערך המערך לא ידוע %d"
+
+#: extension/rwarray.c:398
+msgid ""
+"rwarray extension: received GMP/MPFR value but compiled without GMP/MPFR "
+"support."
+msgstr ""
+"הרחבת rwarray: התקבל ערך GMP/MPFR אבל ההידור בוצע ללא תמיכה ב־GMP/MPFR ."
+
+#: extension/rwarray.c:437
+#, c-format
+msgid "cannot free number with unknown type %d"
+msgstr "לא ניתן לשחרר מספר מסוג לא ידוע %d"
+
+#: extension/rwarray.c:442
+#, c-format
+msgid "cannot free value with unhandled type %d"
+msgstr "לא ניתן לשחרר ערך מסוג לא מטופל %d"
+
+#: extension/rwarray.c:481
+#, c-format
+msgid "readall: unable to set %s::%s"
+msgstr "readall: לא ניתן להגדיר %s::%s"
+
+#: extension/rwarray.c:483
+#, c-format
+msgid "readall: unable to set %s"
+msgstr "readall: לא ניתן להגדיר %s"
+
+#: extension/rwarray.c:525
+msgid "reada: clear_array failed"
+msgstr "reada:‏ clear_array נכשל"
+
+#: extension/rwarray.c:611
+msgid "reada: second argument is not an array"
+msgstr "reada: הארגומנט השני אינו מערך"
+
+#: extension/rwarray.c:648
+msgid "read_array: set_array_element failed"
+msgstr "read_array:‏ set_array_element נכשל"
+
+#: extension/rwarray.c:756
+#, c-format
+msgid "treating recovered value with unknown type code %d as a string"
+msgstr ""
+
+#: extension/rwarray.c:827
+msgid ""
+"rwarray extension: GMP/MPFR value in file but compiled without GMP/MPFR "
+"support."
+msgstr ""
+
+#: extension/time.c:170
+msgid "gettimeofday: not supported on this platform"
+msgstr "gettimeofday: לא נתמך בפלטפורמה הזאת"
+
+#: extension/time.c:191
+msgid "sleep: missing required numeric argument"
+msgstr "sleep: חסר ארגומנט מספרי הכרחי"
+
+#: extension/time.c:197
+msgid "sleep: argument is negative"
+msgstr "sleep: הארגומנט שלילי"
+
+#: extension/time.c:231
+msgid "sleep: not supported on this platform"
+msgstr "sleep: לא נתמך בפלטפורמה הזאת"
+
+#: extension/time.c:253
+msgid "strptime: called with no arguments"
+msgstr "strptime: נקרא ללא ארגומנטים"
+
+#: extension/time.c:261
+#, c-format
+msgid "do_strptime: argument 1 is not a string\n"
+msgstr "do_strptime: ארגומנט 1 אינו מחרוזת\n"
+
+#: extension/time.c:266
+#, c-format
+msgid "do_strptime: argument 2 is not a string\n"
+msgstr "do_strptime: ארגומנט 2 אינו מחרוזת\n"
+
+#: field.c:321
+msgid "input record too large"
+msgstr "רשומת הקלט גדולה מדי"
+
+#: field.c:443
+msgid "NF set to negative value"
+msgstr "NF הוגדר לערך שלילי"
+
+#: field.c:448
+msgid "decrementing NF is not portable to many awk versions"
+msgstr "הקטנת NF אינה נתמכת במגוון רחב של גרסאות awk"
+
+#: field.c:1005
+msgid "accessing fields from an END rule may not be portable"
+msgstr "גישה לשדות מכלל END לא תמיד עובד במימושים אחרים של awk"
+
+#: field.c:1132 field.c:1141
+msgid "split: fourth argument is a gawk extension"
+msgstr "split: הארגומנט הרביעי הוא הרחבה של gawk"
+
+#: field.c:1136
+msgid "split: fourth argument is not an array"
+msgstr "split: הארגומנט הרביעי אינו מערך"
+
+#: field.c:1138 field.c:1248
+#, c-format
+msgid "%s: cannot use %s as fourth argument"
+msgstr "%s: לא ניתן להשתמש ב־%s כארגומנט רביעי"
+
+#: field.c:1148
+msgid "split: second argument is not an array"
+msgstr "split: הארגומנט השני אינו מערך"
+
+#: field.c:1162
+msgid "split: cannot use the same array for second and fourth args"
+msgstr "split: לא ניתן להשתמש באותו המערך לארגומנטים השני והרביעי"
+
+#: field.c:1167
+msgid "split: cannot use a subarray of second arg for fourth arg"
+msgstr "split: אסור להשתמש בתת־מערך של הארגומנט השני בתור הארגומנט הרביעי"
+
+#: field.c:1170
+msgid "split: cannot use a subarray of fourth arg for second arg"
+msgstr "split: אסור להשתמש בתת־מערך של הארגומנט הרביעי כארגומנט שני"
+
+#: field.c:1207
+msgid "split: null string for third arg is a non-standard extension"
+msgstr "מחרוזת מאופסת כארגמונט שלישי ל־`split' היא הרחבה נקודתית ל־gawk"
+
+#: field.c:1246
+msgid "patsplit: fourth argument is not an array"
+msgstr "patsplit: הארגומנט הרביעי אינו מערך"
+
+#: field.c:1253
+msgid "patsplit: second argument is not an array"
+msgstr "patsplit: הארגומנט השני אינו מערך"
+
+#: field.c:1284
+msgid "patsplit: third argument must be non-null"
+msgstr "patsplit: הארגומנט השלישי לא יכול להישאר ריק"
+
+#: field.c:1288
+msgid "patsplit: cannot use the same array for second and fourth args"
+msgstr "אסור להשתמש באותו מערך כארגומנטים שני ורביעי ל־`patsplit'"
+
+#: field.c:1293
+msgid "patsplit: cannot use a subarray of second arg for fourth arg"
+msgstr "אסור להשתמש באותו תת־מערך כארגומנטים שני ורביעי ל־`patsplit'"
+
+#: field.c:1296
+msgid "patsplit: cannot use a subarray of fourth arg for second arg"
+msgstr "אסור להשתמש באותו מערך כארגומנטים שני ורביעי ל־`patsplit'"
+
+#: field.c:1333
+msgid "assignment to FS/FIELDWIDTHS/FPAT has no effect when using --csv"
+msgstr ""
+
+#: field.c:1363
+msgid "`FIELDWIDTHS' is a gawk extension"
+msgstr "`FIELDWIDTHS' היא הרחבה של gawk"
+
+#: field.c:1432
+msgid "`*' must be the last designator in FIELDWIDTHS"
+msgstr "`*' חייב להיות המפריד האחרון ב־FIELDWIDTHS (רוחבי עמודות)"
+
+#: field.c:1453
+#, c-format
+msgid "invalid FIELDWIDTHS value, for field %d, near `%s'"
+msgstr "ערך שגוי ל־FIELDWIDTHS, לשדה %d, קרוב ל־`%s'"
+
+#: field.c:1527
+msgid "null string for `FS' is a gawk extension"
+msgstr "מחרוזת מאופסת כ־`FS' היא הרחבה ל־gawk"
+
+#: field.c:1531
+msgid "old awk does not support regexps as value of `FS'"
+msgstr "awk ישן לא תומך בביטויים רגולריים כערך של `FS'"
+
+#: field.c:1657
+#, fuzzy
+#| msgid "`FPAT' is a gawk extension"
+msgid "FPAT is a gawk extension"
+msgstr "`FPAT' היא הרחבה של gawk"
+
+#: gawkapi.c:158
+msgid "awk_value_to_node: received null retval"
+msgstr "awk_value_to_node: התקבל ערך החזרה ריק (null)"
+
+#: gawkapi.c:178 gawkapi.c:191
+msgid "awk_value_to_node: not in MPFR mode"
+msgstr "awk_value_to_node: לא במצב MPFR"
+
+#: gawkapi.c:185 gawkapi.c:197
+msgid "awk_value_to_node: MPFR not supported"
+msgstr "awk_value_to_node: אין תמיכה ב־MPFR"
+
+#: gawkapi.c:201
+#, c-format
+msgid "awk_value_to_node: invalid number type `%d'"
+msgstr "awk_value_to_node: סוג המספר `%d' שגוי"
+
+#: gawkapi.c:388
+msgid "add_ext_func: received NULL name_space parameter"
+msgstr "add_ext_func: התקבל משתנה name_space (מרחב שם) ריק (NULL)"
+
+#: gawkapi.c:526
+#, c-format
+msgid ""
+"node_to_awk_value: detected invalid numeric flags combination `%s'; please "
+"file a bug report"
+msgstr "node_to_awk_value: התגלה שילוב דגלונים שגוי `%s', נא לדווח על כך כתקלה"
+
+#: gawkapi.c:564
+msgid "node_to_awk_value: received null node"
+msgstr "node_to_awk_value: התקבל מפרק ריק (null)"
+
+#: gawkapi.c:567
+msgid "node_to_awk_value: received null val"
+msgstr "node_to_awk_value: התקבל ערך ריק (null)"
+
+#: gawkapi.c:633 gawkapi.c:668 gawkapi.c:696 gawkapi.c:731
+#, c-format
+msgid ""
+"node_to_awk_value detected invalid flags combination `%s'; please file a bug "
+"report"
+msgstr ""
+
+#: gawkapi.c:1127
+msgid "remove_element: received null array"
+msgstr "remove_element: התקבל מערך ריק"
+
+#: gawkapi.c:1130
+msgid "remove_element: received null subscript"
+msgstr ""
+
+#: gawkapi.c:1272
+#, c-format
+msgid "api_flatten_array_typed: could not convert index %d to %s"
+msgstr ""
+
+#: gawkapi.c:1277
+#, c-format
+msgid "api_flatten_array_typed: could not convert value %d to %s"
+msgstr ""
+
+#: gawkapi.c:1373 gawkapi.c:1390
+msgid "api_get_mpfr: MPFR not supported"
+msgstr "api_get_mpfr: אין תמיכה ב־MPFR"
+
+#: gawkapi.c:1421
+msgid "cannot find end of BEGINFILE rule"
+msgstr "לא ניתן למצוא את סוף כלל BEGINFILE"
+
+#: gawkapi.c:1475
+#, c-format
+msgid "cannot open unrecognized file type `%s' for `%s'"
+msgstr "לא ניתן לפתוח את סוג הקובץ הבלתי מוכר `%s' עבור `%s'"
+
+#: io.c:416
+#, c-format
+msgid "command line argument `%s' is a directory: skipped"
+msgstr "ארגומנט שורת הפקודה `%s' הוא תיקייה: נפסח"
+
+#: io.c:419 io.c:531
+#, c-format
+msgid "cannot open file `%s' for reading: %s"
+msgstr "לא ניתן לפתוח את הקובץ `%s' לקריאה: %s"
+
+#: io.c:658
+#, c-format
+msgid "close of fd %d (`%s') failed: %s"
+msgstr "הסגירה של fd %d (`%s') נכשלה: %s"
+
+#: io.c:730
+#, c-format
+msgid "`%.*s' used for input file and for output file"
+msgstr ""
+
+#: io.c:732
+#, c-format
+msgid "`%.*s' used for input file and input pipe"
+msgstr ""
+
+#: io.c:734
+#, c-format
+msgid "`%.*s' used for input file and two-way pipe"
+msgstr ""
+
+#: io.c:736
+#, c-format
+msgid "`%.*s' used for input file and output pipe"
+msgstr ""
+
+#: io.c:738
+#, c-format
+msgid "unnecessary mixing of `>' and `>>' for file `%.*s'"
+msgstr "שימוש מיותר הן ב־'>` והן ב־'>>` עבור קובץ `%.*s'"
+
+#: io.c:740
+#, c-format
+msgid "`%.*s' used for input pipe and output file"
+msgstr ""
+
+#: io.c:742
+#, c-format
+msgid "`%.*s' used for output file and output pipe"
+msgstr ""
+
+#: io.c:744
+#, c-format
+msgid "`%.*s' used for output file and two-way pipe"
+msgstr ""
+
+#: io.c:746
+#, c-format
+msgid "`%.*s' used for input pipe and output pipe"
+msgstr ""
+
+#: io.c:748
+#, c-format
+msgid "`%.*s' used for input pipe and two-way pipe"
+msgstr ""
+
+#: io.c:750
+#, c-format
+msgid "`%.*s' used for output pipe and two-way pipe"
+msgstr ""
+
+#: io.c:800
+msgid "redirection not allowed in sandbox mode"
+msgstr "הפניה אסורה במצב ארגז חול"
+
+#: io.c:834
+#, c-format
+msgid "expression in `%s' redirection is a number"
+msgstr "הביטוי בהפניה `%s' הוא מספר"
+
+#: io.c:838
+#, c-format
+msgid "expression for `%s' redirection has null string value"
+msgstr "לביטוי להפניה `%s' יש ערך מחרוזת ריק/null"
+
+#: io.c:843
+#, c-format
+msgid ""
+"filename `%.*s' for `%s' redirection may be result of logical expression"
+msgstr "שם הקובץ `‎%.*s' להפנייה `%s' עשוי להיות תוצאה של ביטוי לוגי"
+
+#: io.c:940 io.c:967
+#, c-format
+msgid "get_file cannot create pipe `%s' with fd %d"
+msgstr ""
+
+#: io.c:954
+#, c-format
+msgid "cannot open pipe `%s' for output: %s"
+msgstr "לא ניתן לפתוח את האפיק `%s' לפלט: %s"
+
+#: io.c:972
+#, c-format
+msgid "cannot open pipe `%s' for input: %s"
+msgstr "לא ניתן לפתוח את האפיק `%s' לקלט: %s"
+
+#: io.c:1001
+#, c-format
+msgid ""
+"get_file socket creation not supported on this platform for `%s' with fd %d"
+msgstr ""
+
+#: io.c:1012
+#, c-format
+msgid "cannot open two way pipe `%s' for input/output: %s"
+msgstr "לא ניתן לפתוח אפיק דו־כיווני `%s' לקלט/פלט: %s"
+
+#: io.c:1099
+#, c-format
+msgid "cannot redirect from `%s': %s"
+msgstr "לא ניתן להפנות מ־`%s':‏ %s"
+
+#: io.c:1102
+#, c-format
+msgid "cannot redirect to `%s': %s"
+msgstr "לא ניתן להפנות אל `%s':‏ %s"
+
+#: io.c:1204
+msgid ""
+"reached system limit for open files: starting to multiplex file descriptors"
+msgstr ""
+"הגעת למגבלת כמות הקבצים הפתוחים של המערכת: עכשיו אתחיל לרבב מצייני קבצים"
+
+#: io.c:1220
+#, c-format
+msgid "close of `%s' failed: %s"
+msgstr "הסגירה של `%s' נכשלה: %s"
+
+#: io.c:1228
+msgid "too many pipes or input files open"
+msgstr "יותר מדי אפיקים (pipes) או קובצי קלט פתוחים"
+
+#: io.c:1254
+msgid "close: second argument must be `to' or `from'"
+msgstr "הארגומנט השני של `close' חייב להיות `to' או `from'"
+
+#: io.c:1272
+#, c-format
+msgid "close: `%.*s' is not an open file, pipe or co-process"
+msgstr "close: `%.*s' אינו קובץ פתוח, אפיק פתוח או תהליך משנה"
+
+#: io.c:1277
+msgid "close of redirection that was never opened"
+msgstr "סגירת הפנייה שלא נפתחה מעולם"
+
+#: io.c:1379
+#, c-format
+msgid "close: redirection `%s' not opened with `|&', second argument ignored"
+msgstr "close: הפנייה `%s' לא נפתחה ע\"י `|&', הארגומנט השני הוזנח"
+
+#: io.c:1396
+#, c-format
+msgid "failure status (%d) on pipe close of `%s': %s"
+msgstr "מצב כשל (%d) עם סגירת האפיק של `%s':‏ %s"
+
+#: io.c:1399
+#, c-format
+msgid "failure status (%d) on two-way pipe close of `%s': %s"
+msgstr "מצב כשל (%d) של סגירת אפיק דו־כיווני `%s':‏ %s"
+
+#: io.c:1402
+#, c-format
+msgid "failure status (%d) on file close of `%s': %s"
+msgstr "מצב תקלה (%d) של סגירת הקובץ של `%s':‏ %s"
+
+#: io.c:1420
+#, c-format
+msgid "no explicit close of socket `%s' provided"
+msgstr "שקע `%s' (socket) לא נסגר במפורש"
+
+#: io.c:1423
+#, c-format
+msgid "no explicit close of co-process `%s' provided"
+msgstr "תהליך מקביל `%s' (co-process) לא נסגר במפורש"
+
+#: io.c:1426
+#, c-format
+msgid "no explicit close of pipe `%s' provided"
+msgstr "אפיק `%s' (pipe) לא נסגר במפורש"
+
+#: io.c:1429
+#, c-format
+msgid "no explicit close of file `%s' provided"
+msgstr "קובץ `%s' לא נסגר במפורש"
+
+#: io.c:1464
+#, c-format
+msgid "fflush: cannot flush standard output: %s"
+msgstr ""
+
+#: io.c:1465
+#, c-format
+msgid "fflush: cannot flush standard error: %s"
+msgstr ""
+
+#: io.c:1470 io.c:1559 main.c:684 main.c:729
+#, c-format
+msgid "error writing standard output: %s"
+msgstr "שגיאה (%s) בכתיבה לערוץ פלט תקני (stdout)"
+
+#: io.c:1471 io.c:1570 main.c:686
+#, c-format
+msgid "error writing standard error: %s"
+msgstr "תקלה (%s) בכתיבה לערוץ שגיאות תקני"
+
+#: io.c:1510
+#, c-format
+msgid "pipe flush of `%s' failed: %s"
+msgstr "ריקון חוצץ האפיק `%s' נכשל: %s"
+
+#: io.c:1513
+#, c-format
+msgid "co-process flush of pipe to `%s' failed: %s"
+msgstr "ריקון חוצץ אפיק תהליך משנה אל `%s' נכשל: %s"
+
+#: io.c:1516
+#, c-format
+msgid "file flush of `%s' failed: %s"
+msgstr "ריקון קובץ של `%s' נכשל: %s"
+
+#: io.c:1659
+#, c-format
+msgid "local port %s invalid in `/inet': %s"
+msgstr "הפתחה המקומית %s שגויה תחת `‎/inet':‏ %s"
+
+#: io.c:1662
+#, c-format
+msgid "local port %s invalid in `/inet'"
+msgstr "הפתחה המקומית %s שגויה ב־`‎/inet'"
+
+#: io.c:1685
+#, c-format
+msgid "remote host and port information (%s, %s) invalid: %s"
+msgstr "פרטי המארח והפתחה המרוחקים (%s, %s) שגויים: %s"
+
+#: io.c:1688
+#, c-format
+msgid "remote host and port information (%s, %s) invalid"
+msgstr "מדע לשם ויציאה למחשב מרוחק לא ולידי (%s, %s)"
+
+#: io.c:1930
+msgid "TCP/IP communications are not supported"
+msgstr "אין תמיכה בתקשורת TCP/IP"
+
+#: io.c:2058 io.c:2101
+#, c-format
+msgid "could not open `%s', mode `%s'"
+msgstr "לא ניתן לפתוח את `%s', מצב `%s'"
+
+#: io.c:2066 io.c:2118
+#, c-format
+msgid "close of master pty failed: %s"
+msgstr "תקלה (%s) בסגירת master pty"
+
+#: io.c:2068 io.c:2120 io.c:2461 io.c:2716
+#, fuzzy, c-format
+msgid "close of stdout in child failed: %s"
+msgstr "תקלה (%s) בסגירת stdout בתכנית-בת"
+
+#: io.c:2071 io.c:2123
+#, c-format
+msgid "moving slave pty to stdout in child failed (dup: %s)"
+msgstr "העברת slave pty ל־stdout בצאצא נכשל (שכפול: %s)"
+
+#: io.c:2073 io.c:2125 io.c:2466
+#, fuzzy, c-format
+msgid "close of stdin in child failed: %s"
+msgstr "תקלה (%s) בסגירת stdin בתכנית-בת"
+
+#: io.c:2076 io.c:2128
+#, c-format
+msgid "moving slave pty to stdin in child failed (dup: %s)"
+msgstr "העברת pty כפוף ל־stdin בצאצא נכשלה (שכפול: %s)"
+
+#: io.c:2078 io.c:2130 io.c:2152
+#, fuzzy, c-format
+msgid "close of slave pty failed: %s"
+msgstr "תקלה (%s) בסגירת slave pty"
+
+#: io.c:2314
+msgid "could not create child process or open pty"
+msgstr "לא ניתן ליצור תהליך צאצאי או לפתוח pty"
+
+#: io.c:2400 io.c:2464 io.c:2691 io.c:2719
+#, c-format
+msgid "moving pipe to stdout in child failed (dup: %s)"
+msgstr "העברת אפיק ל־stdout בצאצא נכשלה (שכפול: %s)"
+
+#: io.c:2407 io.c:2469
+#, c-format
+msgid "moving pipe to stdin in child failed (dup: %s)"
+msgstr "העברת האפיק ל־stdin בצאצא נכשלה (שכפול: %s)"
+
+#: io.c:2429 io.c:2709
+msgid "restoring stdout in parent process failed"
+msgstr "שחזור stdout בתהליך הורה נכשל"
+
+#: io.c:2437
+msgid "restoring stdin in parent process failed"
+msgstr "שחזור stdin בתוכנית ההורה נכשלה"
+
+#: io.c:2472 io.c:2721 io.c:2736
+#, fuzzy, c-format
+msgid "close of pipe failed: %s"
+msgstr "תקלה (%s) בסגירת אפיק"
+
+#: io.c:2531
+msgid "`|&' not supported"
+msgstr "אין תמיכה ב-`|&'"
+
+#: io.c:2676
+#, c-format
+msgid "cannot open pipe `%s': %s"
+msgstr "לא ניתן לפתוח את האפיק `%s': %s"
+
+#: io.c:2730
+#, c-format
+msgid "cannot create child process for `%s' (fork: %s)"
+msgstr "לא ניתן ליצור תהליך צאצאי עבור `%s' (פיצול: %s)"
+
+#: io.c:2869
+msgid "getline: attempt to read from closed read end of two-way pipe"
+msgstr ""
+
+#: io.c:3192
+msgid "register_input_parser: received NULL pointer"
+msgstr ""
+
+#: io.c:3220
+#, c-format
+msgid "input parser `%s' conflicts with previously installed input parser `%s'"
+msgstr ""
+
+#: io.c:3227
+#, c-format
+msgid "input parser `%s' failed to open `%s'"
+msgstr ""
+
+#: io.c:3247
+msgid "register_output_wrapper: received NULL pointer"
+msgstr ""
+
+#: io.c:3275
+#, c-format
+msgid ""
+"output wrapper `%s' conflicts with previously installed output wrapper `%s'"
+msgstr ""
+
+#: io.c:3282
+#, c-format
+msgid "output wrapper `%s' failed to open `%s'"
+msgstr ""
+
+#: io.c:3303
+msgid "register_output_processor: received NULL pointer"
+msgstr ""
+
+#: io.c:3332
+#, c-format
+msgid ""
+"two-way processor `%s' conflicts with previously installed two-way processor "
+"`%s'"
+msgstr ""
+
+#: io.c:3341
+#, c-format
+msgid "two way processor `%s' failed to open `%s'"
+msgstr ""
+
+#: io.c:3499
+#, c-format
+msgid "data file `%s' is empty"
+msgstr "קובץ נתונים `%s' הינו ריק"
+
+#: io.c:3541 io.c:3549
+msgid "could not allocate more input memory"
+msgstr "לא יכל להקצות יותר זכרון לקלט"
+
+#: io.c:4227
+msgid "assignment to RS has no effect when using --csv"
+msgstr ""
+
+#: io.c:4247
+#, fuzzy
+#| msgid "multicharacter value of `RS' is a gawk extension"
+msgid "multicharacter value of RS is a gawk extension"
+msgstr "תמיכה במספר תוים בערך של `RS' הינה הרחבה ספציפית ל-gawk"
+
+#: io.c:4361
+msgid "support for the UDP protocol is obsolete and will eventually be removed"
+msgstr ""
+
+#: io.c:4412
+msgid "IPv6 communication is not supported"
+msgstr "אין תמיכה בתקשורת IPv6"
+
+#: io.c:4729
+msgid "gawk_popen_write: failed to move pipe fd to standard input"
+msgstr ""
+
+#: main.c:328
+msgid "environment variable `POSIXLY_CORRECT' set: turning on `--posix'"
+msgstr "משתנה סביבה `POSIXLY_CORRECT' מוגדר: מפעיל `--posix'"
+
+#: main.c:335
+msgid "`--posix' overrides `--traditional'"
+msgstr "`--posix' גובר על `--traditional'"
+
+#: main.c:346
+msgid "`--posix'/`--traditional' overrides `--non-decimal-data'"
+msgstr "--posix/--traditional' גובר על `--non-decimal-data'"
+
+#: main.c:351
+msgid "`--posix' overrides `--characters-as-bytes'"
+msgstr "`‎--posix' גובר על `‎--characters-as-bytes'"
+
+#: main.c:364
+msgid "`--posix' and `--csv' conflict"
+msgstr ""
+
+#: main.c:368
+#, c-format
+msgid "running %s setuid root may be a security problem"
+msgstr "הרצת %s כ-setuid root עלולה לפגוע באבטחת מידע"
+
+#: main.c:370
+msgid "The -r/--re-interval options no longer have any effect"
+msgstr ""
+
+#: main.c:428
+#, c-format
+msgid "cannot set binary mode on stdin: %s"
+msgstr "לא ניתן להגדיר מצב בינרי על הקלט התקני (stdin): %s"
+
+#: main.c:431
+#, fuzzy, c-format
+msgid "cannot set binary mode on stdout: %s"
+msgstr "תקלה (%s) בקביעת אופן פעולת stdout"
+
+#: main.c:433
+#, fuzzy, c-format
+msgid "cannot set binary mode on stderr: %s"
+msgstr "תקלה (%s) בקביעת אופן פעולת stderr"
+
+#: main.c:498
+msgid "no program text at all!"
+msgstr "טקסט של תכנית לא היה בנמצא כלל!"
+
+#: main.c:595
+#, c-format
+msgid "Usage: %s [POSIX or GNU style options] -f progfile [--] file ...\n"
+msgstr ""
+"אופן שימוש: %s [מאפיינים בגנון GNU או POSIX] -f שם-תכנית [--] שם-קןבץ ...\n"
+
+#: main.c:597
+#, c-format
+msgid "Usage: %s [POSIX or GNU style options] [--] %cprogram%c file ...\n"
+msgstr ""
+"אופן שימוש: %s [מאפיינים בגנון GNU או POSIX] %cתכנית%c [--] שם-קןבץ ...\n"
+
+#: main.c:602
+msgid "POSIX options:\t\tGNU long options: (standard)\n"
+msgstr "אפשרויות POSIX:\t\tאפשרויות גנו ארוכות: (רגילות)\n"
+
+#: main.c:603
+msgid "\t-f progfile\t\t--file=progfile\n"
+msgstr "\t-f קובץ-תכנית\t\t--file=רובץ-תכנית\n"
+
+#: main.c:604
+msgid "\t-F fs\t\t\t--field-separator=fs\n"
+msgstr "\t-F מפריד-שדות\t\t--field-separator=מפריד-שדות\n"
+
+#: main.c:605
+msgid "\t-v var=val\t\t--assign=var=val\n"
+msgstr "\t-v ערך=משתנה\t\t--assign=ערך=משתנה\n"
+
+#: main.c:606
+msgid "Short options:\t\tGNU long options: (extensions)\n"
+msgstr "אפשרויות קצרות:\t\\אפשרויות גנו ארוכחות: (הרחבות)\n"
+
+#: main.c:607
+msgid "\t-b\t\t\t--characters-as-bytes\n"
+msgstr "\t‎-b\t\t\t--characters-as-bytes\n"
+
+#: main.c:608
+msgid "\t-c\t\t\t--traditional\n"
+msgstr "\t‎-c\t\t\t--traditional\n"
+
+#: main.c:609
+msgid "\t-C\t\t\t--copyright\n"
+msgstr "\t‎-C\t\t\t--copyright\n"
+
+#: main.c:610
+#, fuzzy
+msgid "\t-d[file]\t\t--dump-variables[=file]\n"
+msgstr "\t-d[=שם-קובץ]\t--dump-variables[=שם-קובץ]\n"
+
+#: main.c:611
+#, fuzzy
+msgid "\t-D[file]\t\t--debug[=file]\n"
+msgstr "\t-p [שם-קובץ]\t--profile[=שם-קובץ]\n"
+
+#: main.c:612
+msgid "\t-e 'program-text'\t--source='program-text'\n"
+msgstr "\t-e 'טקסט-תוכנית'\t--source='טקסט-תוכנית'\n"
+
+#: main.c:613
+msgid "\t-E file\t\t\t--exec=file\n"
+msgstr "\t-E שם-קובץ\t\t--exec=שם-קובץ\n"
+
+#: main.c:614
+msgid "\t-g\t\t\t--gen-pot\n"
+msgstr "\t‎-g\t\t\t--gen-pot\n"
+
+#: main.c:615
+msgid "\t-h\t\t\t--help\n"
+msgstr "\t‎-h\t\t\t--help\n"
+
+#: main.c:616
+msgid "\t-i includefile\t\t--include=includefile\n"
+msgstr ""
+
+#: main.c:617
+#, fuzzy
+msgid "\t-I\t\t\t--trace\n"
+msgstr "\t-h\t\t\t--help\n"
+
+#: main.c:618
+#, fuzzy
+msgid "\t-k\t\t\t--csv\n"
+msgstr "\t-h\t\t\t--help\n"
+
+#: main.c:619
+msgid "\t-l library\t\t--load=library\n"
+msgstr ""
+
+#. TRANSLATORS: the "fatal", "invalid" and "no-ext" here are literal
+#. values, they should not be translated. Thanks.
+#.
+#: main.c:624
+#, fuzzy
+msgid "\t-L[fatal|invalid|no-ext]\t--lint[=fatal|invalid|no-ext]\n"
+msgstr "\t-L [fatal]\t\t--lint[=fatal]\n"
+
+#: main.c:625
+#, fuzzy
+msgid "\t-M\t\t\t--bignum\n"
+msgstr "\t-g\t\t\t--gen-pot\n"
+
+#: main.c:626
+msgid "\t-N\t\t\t--use-lc-numeric\n"
+msgstr "\t‎-N\t\t\t--use-lc-numeric\n"
+
+#: main.c:627
+msgid "\t-n\t\t\t--non-decimal-data\n"
+msgstr "\t‎-n\t\t\t--non-decimal-data\n"
+
+#: main.c:628
+#, fuzzy
+msgid "\t-o[file]\t\t--pretty-print[=file]\n"
+msgstr "\t-p [שם-קובץ]\t--profile[=שם-קובץ]\n"
+
+#: main.c:629
+msgid "\t-O\t\t\t--optimize\n"
+msgstr "\t‎-O\t\t\t--optimize\n"
+
+#: main.c:630
+#, fuzzy
+msgid "\t-p[file]\t\t--profile[=file]\n"
+msgstr "\t-p [שם-קובץ]\t--profile[=שם-קובץ]\n"
+
+#: main.c:631
+msgid "\t-P\t\t\t--posix\n"
+msgstr "\t‎-P\t\t\t--posix\n"
+
+#: main.c:632
+msgid "\t-r\t\t\t--re-interval\n"
+msgstr "\t‎-r\t\t\t--re-interval\n"
+
+#: main.c:633
+#, fuzzy
+msgid "\t-s\t\t\t--no-optimize\n"
+msgstr "\t-O\t\t\t--optimize\n"
+
+#: main.c:634
+msgid "\t-S\t\t\t--sandbox\n"
+msgstr "\t‎-S\t\t\t--sandbox\n"
+
+#: main.c:635
+msgid "\t-t\t\t\t--lint-old\n"
+msgstr "\t‎-t\t\t\t--lint-old\n"
+
+#: main.c:636
+msgid "\t-V\t\t\t--version\n"
+msgstr "\t‎-V\t\t\t--version\n"
+
+#: main.c:638
+#, fuzzy
+msgid "\t-Y\t\t\t--parsedebug\n"
+msgstr "\t-Y\t\t--parsedebug\n"
+
+#: main.c:641
+msgid "\t-Z locale-name\t\t--locale=locale-name\n"
+msgstr ""
+
+#. TRANSLATORS: --help output (end)
+#. no-wrap
+#: main.c:647
+msgid ""
+"\n"
+"To report bugs, use the `gawkbug' program.\n"
+"For full instructions, see the node `Bugs' in `gawk.info'\n"
+"which is section `Reporting Problems and Bugs' in the\n"
+"printed version.  This same information may be found at\n"
+"https://www.gnu.org/software/gawk/manual/html_node/Bugs.html.\n"
+"PLEASE do NOT try to report bugs by posting in comp.lang.awk,\n"
+"or by using a web forum such as Stack Overflow.\n"
+"\n"
+msgstr ""
+"\n"
+"כדי לדווח על תקלות, נא להשתמש בתוכנית `gawkbug'.\n"
+"להנחיות מלאות מוטב לפנות לסעיף `Bugs' ב־`gawk.info'\n"
+"שהוא תת־סעיף מתוך `Reporting Problems and Bugs' בגרסה\n"
+"המודפסת.  את אותו המידע אפשר למצוא גם באתר\n"
+"https://www.gnu.org/software/gawk/manual/html_node/Bugs.html.\n"
+"נא לא לדווח על תקלות ב־comp.lang.awk,\n"
+"או בפורומים מקוונים כדוגמת Stack Overflow.\n"
+"\n"
+
+#: main.c:663
+#, c-format
+msgid ""
+"Source code for gawk may be obtained from\n"
+"%s/gawk-%s.tar.gz\n"
+"\n"
+msgstr ""
+"את קוד המקור של gawk אפשר להשיג דרך\n"
+"%s/gawk-%s.tar.gz\n"
+"\n"
+
+#: main.c:667
+msgid ""
+"gawk is a pattern scanning and processing language.\n"
+"By default it reads standard input and writes standard output.\n"
+"\n"
+msgstr ""
+"gawk היא שפה לסריקה ועיבוד של תבניות.\n"
+"כברירת מחדל היא קוראת מהקלט התקני (stdin) וכותבת לפלט התקני (stdout).\n"
+"\n"
+
+#: main.c:671
+#, c-format
+msgid ""
+"Examples:\n"
+"\t%s '{ sum += $1 }; END { print sum }' file\n"
+"\t%s -F: '{ print $1 }' /etc/passwd\n"
+msgstr ""
+"דוגמאות:\n"
+"\t%s '{ sum += $1 }; END { print sum }' file\n"
+"\t%s -F: '{ print $1 }' /etc/passwd\n"
+
+#: main.c:701
+#, c-format
+msgid ""
+"Copyright (C) 1989, 1991-%d Free Software Foundation.\n"
+"\n"
+"This program is free software; you can redistribute it and/or modify\n"
+"it under the terms of the GNU General Public License as published by\n"
+"the Free Software Foundation; either version 3 of the License, or\n"
+"(at your option) any later version.\n"
+"\n"
+msgstr ""
+"כל הזכויות שמורות (C) 1989,‏ 1991-%d לקרן התוכנה החופשית.\n"
+"\n"
+"זו תוכנה חופשית, אפשר להפיץ אותה מחדש ו/או לשנות אותו\n"
+"בכפוף לרישיון הציבורי הכללי של גנו כפי שמפורסם על ידי קרן התוכנה\n"
+"החופשית בגרסה 3 של הרישיון או (לשיקולך) כל גרסה עדכנית\n"
+"יותר שלו.\n"
+"\n"
+
+#: main.c:709
+msgid ""
+"This program is distributed in the hope that it will be useful,\n"
+"but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+"MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+"GNU General Public License for more details.\n"
+"\n"
+msgstr ""
+"התוכנית הזאת מופצת בתקווה שתביא תועלת אך\n"
+"אינה נושאת עמה אחריות, אפילו לא מרומזת לשימוש\n"
+"מסחרי או התאמה לתכלית מסוימת. ברישיון הציבורי\n"
+"הכללי של גנו אפשר ללמוד על כך עוד.\n"
+"\n"
+
+#: main.c:715
+msgid ""
+"You should have received a copy of the GNU General Public License\n"
+"along with this program. If not, see http://www.gnu.org/licenses/.\n"
+msgstr ""
+"תכנית זו אמורה להיות מלווה בעותק של GNU General Public License;\n"
+"אם לא קיבלתם אותו, אנא ראו see http://www.gnu.org/licenses/.\n"
+
+#: main.c:754
+msgid "-Ft does not set FS to tab in POSIX awk"
+msgstr "‎-Ft אינו גורם ל־FS להיות TAB בגרסת POSIX של awk"
+
+#: main.c:1183
+#, c-format
+msgid ""
+"%s: `%s' argument to `-v' not in `var=value' form\n"
+"\n"
+msgstr ""
+"%s: הארגומנט `%s' לאפשרות `‎-v' אינו בצורת `var=value'\n"
+"\n"
+
+#: main.c:1209
+#, c-format
+msgid "`%s' is not a legal variable name"
+msgstr "`%s' אינו שם משתנה חוקי"
+
+#: main.c:1212
+#, c-format
+msgid "`%s' is not a variable name, looking for file `%s=%s'"
+msgstr "`%s' הוא לא שם משתנה, מתבצע חיפוש אחר הקובץ `%s=%s'"
+
+#: main.c:1226
+#, c-format
+msgid "cannot use gawk builtin `%s' as variable name"
+msgstr "לא ניתן להשתמש בשם `%s' שמובנה ב־gawk כשם משתנה"
+
+#: main.c:1231
+#, c-format
+msgid "cannot use function `%s' as variable name"
+msgstr "לא ניתן להשתמש בפונקציה `%s' כשם משתנה"
+
+#: main.c:1310
+msgid "floating point exception"
+msgstr "חריגה בחישובי נקודה צפה"
+
+#: main.c:1320
+msgid "fatal error: internal error"
+msgstr "תקלה חמורה: שגיאה פנימית"
+
+#: main.c:1407
+#, c-format
+msgid "no pre-opened fd %d"
+msgstr "ערוץ קלט/פלט %d לא פתוח מראש"
+
+# FIXME: /dev/null might not be known to all.
+#: main.c:1414
+#, c-format
+msgid "could not pre-open /dev/null for fd %d"
+msgstr "לא ניתן לפתוח ערוץ קלט/פלט ‎/dev/null ל-מאפיין הקובץ %d"
+
+#: main.c:1629
+msgid "empty argument to `-e/--source' ignored"
+msgstr "ארגומנט ריק ל־`‎-e/--source' הושמט"
+
+#: main.c:1702 main.c:1707
+msgid "`--profile' overrides `--pretty-print'"
+msgstr "`‎--profile' גובר על `‎--pretty-print'"
+
+#: main.c:1719
+msgid "-M ignored: MPFR/GMP support not compiled in"
+msgstr "‎-M הושמט: לא הודרה תמיכה ב־MPFR/GMP"
+
+#: main.c:1745
+#, c-format
+msgid "Use `GAWK_PERSIST_FILE=%s gawk ...' instead of --persist."
+msgstr "יש להשתמש ב־`GAWK_PERSIST_FILE=%s gawk ...‎' במקום ‎--persist."
+
+#: main.c:1747
+msgid "Persistent memory is not supported."
+msgstr "אין תמיכה בזיכרון קבוע."
+
+#: main.c:1756
+#, c-format
+msgid "%s: option `-W %s' unrecognized, ignored\n"
+msgstr "%s: האפשרות `‎-W %s' אינה מוכרת, נפסחת\n"
+
+#: main.c:1809
+#, c-format
+msgid "%s: option requires an argument -- %c\n"
+msgstr "%s מאפיין מחייב ארגומנט -- %c\n"
+
+#: main.c:1917
+#, c-format
+msgid "%s: fatal: cannot stat %s: %s\n"
+msgstr ""
+
+#: main.c:1921
+#, c-format
+msgid ""
+"%s: fatal: using persistent memory is not allowed when running as root.\n"
+msgstr ""
+
+#: main.c:1924
+#, c-format
+msgid "%s: warning: %s is not owned by euid %d.\n"
+msgstr ""
+
+#: main.c:1939
+msgid "persistent memory is not supported"
+msgstr "אין תמיכה בזיכרון קבוע"
+
+#: main.c:1949
+#, c-format
+msgid ""
+"%s: fatal: persistent memory allocator failed to initialize: return value "
+"%d, pma.c line: %d.\n"
+msgstr ""
+
+#: mpfr.c:670
+#, c-format
+msgid "PREC value `%.*s' is invalid"
+msgstr "ערך ה־ PREC‏ `%.*s' שגוי"
+
+#: mpfr.c:729
+#, c-format
+msgid "ROUNDMODE value `%.*s' is invalid"
+msgstr "ערך ה־ROUNDMODE ‏`%.*s' שגוי"
+
+#: mpfr.c:795
+msgid "atan2: received non-numeric first argument"
+msgstr "atan2: ארגומנט ראשון אינו מספר"
+
+#: mpfr.c:797
+msgid "atan2: received non-numeric second argument"
+msgstr "atan2: ארגומנט שני אינו מספר"
+
+#: mpfr.c:836
+#, c-format
+msgid "%s: received negative argument %.*s"
+msgstr "%s: קיבל ארגומנט שלילי %.*s"
+
+#: mpfr.c:903
+msgid "int: received non-numeric argument"
+msgstr "int: ארגומנט אינו מספר"
+
+#: mpfr.c:935
+msgid "compl: received non-numeric argument"
+msgstr "compl: ארגומנט אינו מספר"
+
+#: mpfr.c:947
+msgid "compl(%Rg): negative value is not allowed"
+msgstr "compl(%Rg): אסור ערך שלילי"
+
+#: mpfr.c:952
+msgid "comp(%Rg): fractional value will be truncated"
+msgstr "comp(%Rg): ערך עם שבר עשרוני יקוצץ"
+
+#: mpfr.c:963
+#, c-format
+msgid "compl(%Zd): negative values are not allowed"
+msgstr "compl(%Zd): אסור ערכים שליליים"
+
+#: mpfr.c:981
+#, c-format
+msgid "%s: received non-numeric argument #%d"
+msgstr "%s: התקבל ארגומט שאינו מספרי מס׳ %d"
+
+#: mpfr.c:991
+msgid "%s: argument #%d has invalid value %Rg, using 0"
+msgstr "%s: לארגומנט מס׳ %d יש את הערך השגוי %Rg, מוחלף ב־0"
+
+#: mpfr.c:1002
+msgid "%s: argument #%d negative value %Rg is not allowed"
+msgstr "%s: בארגומנט מס׳ %d יש את הערך השלילי %Rg שזה אסור"
+
+#: mpfr.c:1009
+#, fuzzy
+msgid "%s: argument #%d fractional value %Rg will be truncated"
+msgstr "and(%lf, %lf): ערכים שבורים יקוצצו"
+
+#: mpfr.c:1023
+#, c-format
+msgid "%s: argument #%d negative value %Zd is not allowed"
+msgstr ""
+
+#: mpfr.c:1117
+msgid "and: called with less than two arguments"
+msgstr "and: נקרא עם פחות משני ארגומנטים"
+
+#: mpfr.c:1149
+msgid "or: called with less than two arguments"
+msgstr "or: נקרא עם פחות משני ארגומנטים"
+
+#: mpfr.c:1180
+msgid "xor: called with less than two arguments"
+msgstr "xor: נקרא עם פחות משני ארגומנטים"
+
+#: mpfr.c:1310
+msgid "srand: received non-numeric argument"
+msgstr "srand: ארגומנט אינו מספר"
+
+#: mpfr.c:1354
+msgid "intdiv: received non-numeric first argument"
+msgstr "intdiv: קיבל ארגומנט ראשון שאינו מספרי"
+
+#: mpfr.c:1356
+msgid "intdiv: received non-numeric second argument"
+msgstr "intdiv: קיבל ארגומנט שני שאינו מספרי"
+
+# The next 4 strings are untranslated because msg.c prints the actual
+# message after "warning:", "error:", etc., which will look terribly
+# wrong if both these headings and the message text after them is in
+# Hebrew, due to changed directionality.
+#: msg.c:76
+#, c-format
+msgid "cmd. line:"
+msgstr "cmd. line:"
+
+#: node.c:477
+#, fuzzy
+#| msgid "backslash not last character on line"
+msgid "backslash at end of string"
+msgstr "לוכסן הפוך שאינו תו אחרון בשורה"
+
+#: node.c:511
+msgid "could not make typed regex"
+msgstr ""
+
+#: node.c:599
+#, c-format
+msgid "old awk does not support the `\\%c' escape sequence"
+msgstr "awk ישן אינו תומך בסדרות בקרה `\\%c'"
+
+#: node.c:660
+msgid "POSIX does not allow `\\x' escapes"
+msgstr "תקן POSIX אינו מרשה סדרות בקרה מסוג `\\x'"
+
+#: node.c:668
+msgid "no hex digits in `\\x' escape sequence"
+msgstr "אין ספרות הקסדצימליות בסדרת בקרה `\\x'"
+
+#: node.c:690
+#, c-format
+msgid ""
+"hex escape \\x%.*s of %d characters probably not interpreted the way you "
+"expect"
+msgstr "יכול להיות שסדרת בקרה `\\x%.*s' של %d תבים לא יהיה מובן כמו שאתם מצפים"
+
+#: node.c:703
+#, fuzzy
+#| msgid "POSIX does not allow `\\x' escapes"
+msgid "POSIX does not allow `\\u' escapes"
+msgstr "תקן POSIX אינו מרשה סדרות בקרה מסוג `\\x'"
+
+#: node.c:711
+#, fuzzy
+#| msgid "no hex digits in `\\x' escape sequence"
+msgid "no hex digits in `\\u' escape sequence"
+msgstr "אין ספרות הקסדצימליות בסדרת בקרה `\\x'"
+
+#: node.c:739
+#, fuzzy
+#| msgid "no hex digits in `\\x' escape sequence"
+msgid "invalid `\\u' escape sequence"
+msgstr "אין ספרות הקסדצימליות בסדרת בקרה `\\x'"
+
+#: node.c:761
+#, c-format
+msgid "escape sequence `\\%c' treated as plain `%c'"
+msgstr "תו המילוט `‎\\%c' זוכה ליחס של `%c' פשוט"
+
+#: node.c:903
+msgid ""
+"Invalid multibyte data detected. There may be a mismatch between your data "
+"and your locale"
+msgstr ""
+"זוהו נתונים מרובי בתים שגויים. כנראה שיש אי התאמה בין הנתונים שלך וההגדרות "
+"המקומיות שלך"
+
+#: printf.c:225 printf.c:230
+msgid "fatal: must use `count$' on all formats or none"
+msgstr "fatal: שימוש ב-`count$' מותר או בכל הפורמטים או באף אחד"
+
+#: printf.c:303
+#, c-format
+msgid "field width is ignored for `%%' specifier"
+msgstr "מתעלמים מרוחב השדה עבור מפרט `%%'"
+
+#: printf.c:305
+#, c-format
+msgid "precision is ignored for `%%' specifier"
+msgstr "מתעלמים מהדיוק עבור מפרט `%%'"
+
+#: printf.c:307
+#, c-format
+msgid "field width and precision are ignored for `%%' specifier"
+msgstr "מתעלמים מרוחב השדה והדיוק עבור מפרט `%%'"
+
+#: printf.c:358
+msgid "fatal: `$' is not permitted in awk formats"
+msgstr "fatal: `$' אסור לשימוש בפורמטים של awk"
+
+#: printf.c:367 printf.c:379
+msgid "fatal: argument index with `$' must be > 0"
+msgstr "מכריע: מונה הארגומנטים ליד `$' חייב להיות גדול מ־0"
+
+#: printf.c:371 printf.c:383
+#, c-format
+msgid ""
+"fatal: argument index %ld greater than total number of supplied arguments"
+msgstr "fatal: מונה הארגומנט %ld גדול ממספרם הכולל של הארגומנטים"
+
+#: printf.c:393
+#, fuzzy
+#| msgid "fatal: must use `count$' on all formats or none"
+msgid "must use `count$' on all formats or none"
+msgstr "fatal: שימוש ב-`count$' מותר או בכל הפורמטים או באף אחד"
+
+#: printf.c:403
+msgid "fatal: no `$' supplied for positional field width or precision"
+msgstr "fatal: לא נמצא `$' עבור מונה הארגומנט במציין רוחב שדה או דיוקו"
+
+#: printf.c:487
+#, c-format
+msgid "`%c' is meaningless in awk formats; ignored"
+msgstr "`%c' הינו חסר משמעות בפורמט של awk; הוזנח"
+
+#: printf.c:491
+#, c-format
+msgid "fatal: `%c' is not permitted in POSIX awk formats"
+msgstr "fatal: `%c' אינו יכול להופיע בפורמט של awk על-פי POSIX"
+
+#: printf.c:528
+#, c-format
+msgid "[s]printf: value %g is not a valid wide character"
+msgstr "[s]printf: הערך %g אינו תו רחב חוקי"
+
+#: printf.c:685
+#, c-format
+msgid "%%%c format is POSIX standard but not portable to other awks"
+msgstr "פורמט %%%c הוא תקן POSIX אך אינו נייד ל-awks אחרים"
+
+#: printf.c:722
+#, c-format
+msgid "ignoring unknown format specifier character `%c': no argument converted"
+msgstr "התעלמות מהתו '%c' של מפרט פורמט לא ידוע: לא הומר ארגומנט"
+
+#: printf.c:727
+msgid "fatal: not enough arguments to satisfy format string"
+msgstr "fatal: אין מספיק ארגומנטים עבור הפורמט"
+
+#: printf.c:729
+msgid "^ ran out for this one"
+msgstr "^ כאן נגמרו לי הארגומנטים"
+
+#: printf.c:736
+msgid "[s]printf: format specifier does not have control letter"
+msgstr "[s]printf: הפורמט אינו מכיל אות בקרת ההמרה"
+
+#: printf.c:739
+msgid "too many arguments supplied for format string"
+msgstr "יותר מדי ארגומנטים עבור הפורמט"
+
+#: printf.c:781
+#, c-format
+msgid "%s: received non-string format string argument"
+msgstr "%s: ארגומנט ראשון אינו מחרוזת"
+
+#: printf.c:796
+msgid "sprintf: no arguments"
+msgstr "sprintf: אין ארגומנטים"
+
+#: printf.c:819 printf.c:830
+msgid "printf: no arguments"
+msgstr "printf: אין אף ארגומנט"
+
+#: printf.c:845
+msgid "printf: attempt to write to closed write end of two-way pipe"
+msgstr "printf: ניסיון לכתוב לקצה כתיבה סגור של אפיק דו־כיווני"
+
+#: printf.c:1169
+#, c-format
+msgid "[s]printf: value %g is out of range for `%%%c' format"
+msgstr "[s]printf: הערך %g נמצא מחוץ לתחום עבור פורמט `%%%c'"
+
+#: printf.c:1180
+#, c-format
+msgid "[s]printf: value %s is out of range for `%%%c' format"
+msgstr "[s]printf: הערך %s נמצא מחוץ לטווח עבור פורמט `%%%c'"
+
+#: posix/gawkmisc.c:200
+#, c-format
+msgid "%s %s `%s': could not get fd flags: (fcntl F_GETFD: %s)"
+msgstr "%s %s `%s': תקלה בהוצאת אופציה של מאפיין קובץ: (fcntl F_GETFD: %s)"
+
+#: posix/gawkmisc.c:212
+#, c-format
+msgid "%s %s `%s': could not set close-on-exec: (fcntl F_SETFD: %s)"
+msgstr ""
+"%s %s `%s': תקלה בפעולה להשים אופציה של close-on-exec על מאפיין קובץ: (fcntl "
+"F_GETFD: %s)"
+
+#: posix/gawkmisc.c:337
+#, c-format
+msgid "warning: personality: %s\n"
+msgstr ""
+
+#: posix/gawkmisc.c:375
+#, c-format
+msgid "waitpid: got exit status %#o\n"
+msgstr ""
+
+#: posix/gawkmisc.c:379
+#, c-format
+msgid "fatal: posix_spawnp: %s\n"
+msgstr ""
+
+#: posix/gawkmisc.c:404
+#, fuzzy, c-format
+#| msgid "warning: "
+msgid "warning: sysctl: %s\n"
+msgstr "אזהרה: "
+
+#: posix/gawkmisc.c:413
+#, fuzzy, c-format
+#| msgid "warning: "
+msgid "warning: procctl: %s\n"
+msgstr "אזהרה: "
+
+#: profile.c:79
+msgid "Program indentation level too deep. Consider refactoring your code"
+msgstr ""
+"רמת הקינון של התוכנית עמוקה מדי. כדאי לשקול לבצע שינויים מבניים בקוד שלך"
+
+#: profile.c:118
+msgid "sending profile to standard error"
+msgstr "פרופיל ביצוע נשלח לערוץ שגיאות תקני"
+
+#: profile.c:288
+#, c-format
+msgid ""
+"\t# %s rule(s)\n"
+"\n"
+msgstr ""
+"\t# כללי %s\n"
+"\n"
+
+#: profile.c:300
+#, c-format
+msgid ""
+"\t# Rule(s)\n"
+"\n"
+msgstr ""
+"\t# כלל(ים)\n"
+"\n"
+
+#: profile.c:392
+#, c-format
+msgid "internal error: %s with null vname"
+msgstr "שגיאת תכנה פנימית: %s שה-vname שלו מאופס"
+
+#: profile.c:697
+msgid "internal error: builtin with null fname"
+msgstr "שגיאה פנימית: מובנה עם fname ריק (null)"
+
+#: profile.c:1358
+#, c-format
+msgid ""
+"%s# Loaded extensions (-l and/or @load)\n"
+"\n"
+msgstr ""
+
+#: profile.c:1389
+#, c-format
+msgid ""
+"\n"
+"# Included files (-i and/or @include and/or @nsinclude)\n"
+"\n"
+msgstr ""
+
+#: profile.c:1460
+#, c-format
+msgid "\t# gawk profile, created %s\n"
+msgstr "\t# פרופיל של gawk מתאריך %s\n"
+
+#: profile.c:2028
+#, c-format
+msgid ""
+"\n"
+"\t# Functions, listed alphabetically\n"
+msgstr ""
+"\n"
+"\t# פונקציות, בסדר אלף-בית\n"
+
+#: profile.c:2090
+#, c-format
+msgid "redir2str: unknown redirection type %d"
+msgstr "redir2str: סוג ההפניה %d לא ידוע"
+
+#: re.c:75 re.c:189
+msgid ""
+"behavior of matching a regexp containing NUL characters is not defined by "
+"POSIX"
+msgstr ""
+
+#: re.c:145
+msgid "invalid NUL byte in dynamic regexp"
+msgstr "בית מאופס (NULL) בביטוי רגולרי דינמי"
+
+#: re.c:229
+#, c-format
+msgid "regexp escape sequence `\\%c' treated as plain `%c'"
+msgstr "רצף המילוט `‎\\%c' של הביטוי הרגולרי פוענח כ־`%c' פשוט"
+
+#: re.c:264
+#, c-format
+msgid "regexp escape sequence `\\%c' is not a known regexp operator"
+msgstr ""
+"רצף מילוט הביטויים הרגולריים `‎\\%c' איננו פעולה מוכרת של ביטויים רגולריים"
+
+#: re.c:828
+#, c-format
+msgid "regexp component `%.*s' should probably be `[%.*s]'"
+msgstr "רכיב הביטוי הרגולרי `‎%.*s' כנראה אמור להיות `‎[%.*s]'"
+
+#: support/dfa.c:911 support/minrx.c:2550
+msgid "unbalanced ["
+msgstr "] לא מאוזן"
+
+#: support/dfa.c:1032
+msgid "invalid character class"
+msgstr "מחלקת תווים שגויה"
+
+#: support/dfa.c:1160
+msgid "character class syntax is [[:space:]], not [:space:]"
+msgstr "תחביר מחלקת תווים הוא [[:space:]], לא [:space:]"
+
+#: support/dfa.c:1236
+msgid "unfinished \\ escape"
+msgstr "מילוט \\ חלקי"
+
+#: support/dfa.c:1346
+msgid "? at start of expression"
+msgstr "? בתחילת ביטוי"
+
+#: support/dfa.c:1358
+msgid "* at start of expression"
+msgstr "* בתחילת ביטוי"
+
+#: support/dfa.c:1372
+msgid "+ at start of expression"
+msgstr "+ בתחילת ביטוי"
+
+#: support/dfa.c:1427
+msgid "{...} at start of expression"
+msgstr "{...} בתחילת הביטוי"
+
+#: support/dfa.c:1430
+msgid "invalid content of \\{\\}"
+msgstr "תוכן \\{\\} שגוי"
+
+#: support/dfa.c:1432
+msgid "regular expression too big"
+msgstr "הביטוי הרגולרי גדול מדי"
+
+#: support/dfa.c:1582
+msgid "stray \\ before unprintable character"
+msgstr "\\ תועה לפני תו שאינו להצגה"
+
+#: support/dfa.c:1584
+msgid "stray \\ before white space"
+msgstr "\\ תועה לפני רווח"
+
+#: support/dfa.c:1595
+#, fuzzy, c-format
+#| msgid "stray \\ before %lc"
+msgid "stray \\ before %s"
+msgstr "\\ תועה לפני %lc"
+
+#: support/dfa.c:1596 support/dfa.c:1599
+msgid "stray \\"
+msgstr "\\ תועה"
+
+#: support/dfa.c:1950 support/minrx.c:2554
+msgid "unbalanced ("
+msgstr ") לא מאוזן"
+
+#: support/dfa.c:2069
+msgid "no syntax specified"
+msgstr "לא צוין תחביר"
+
+#: support/dfa.c:2080
+msgid "unbalanced )"
+msgstr "( לא מאוזן"
+
+#: support/getopt.c:605 support/getopt.c:634
+#, c-format
+msgid "%s: option '%s' is ambiguous; possibilities:"
+msgstr "%s: האפשרות '%s' אינה חד־משמעית, אפשרויות:"
+
+#: support/getopt.c:680 support/getopt.c:684
+#, c-format
+msgid "%s: option '--%s' doesn't allow an argument\n"
+msgstr "%s: האפשרות '‎--%s' לא מרשה להשתמש בארגומנט\n"
+
+#: support/getopt.c:693 support/getopt.c:698
+#, c-format
+msgid "%s: option '%c%s' doesn't allow an argument\n"
+msgstr "%s: מאפיין '%c%s' אינו מקבל ארגומנט\n"
+
+#: support/getopt.c:741 support/getopt.c:760
+#, c-format
+msgid "%s: option '--%s' requires an argument\n"
+msgstr "%s: מאפיין '--%s' מחייב ארגומנט\n"
+
+#: support/getopt.c:798 support/getopt.c:801
+#, c-format
+msgid "%s: unrecognized option '--%s'\n"
+msgstr "%s: מאפיין בלתי-מזוהה '--%s'\n"
+
+#: support/getopt.c:809 support/getopt.c:812
+#, c-format
+msgid "%s: unrecognized option '%c%s'\n"
+msgstr "%s: מאפיין בלתי-מזוהה '%c%s'\n"
+
+#: support/getopt.c:861 support/getopt.c:864
+#, c-format
+msgid "%s: invalid option -- '%c'\n"
+msgstr "%s: מאפיין שגוי -- '%c'\n"
+
+#: support/getopt.c:917 support/getopt.c:934 support/getopt.c:1144
+#: support/getopt.c:1162
+#, c-format
+msgid "%s: option requires an argument -- '%c'\n"
+msgstr "%s: מאפיין מחייב ארגומנט -- '%c'\n"
+
+#: support/getopt.c:990 support/getopt.c:1006
+#, c-format
+msgid "%s: option '-W %s' is ambiguous\n"
+msgstr "%s: מאפיין '-W %s' אינו חד-משמעי\n"
+
+#: support/getopt.c:1030 support/getopt.c:1048
+#, c-format
+msgid "%s: option '-W %s' doesn't allow an argument\n"
+msgstr "%s: האפשרות '‎-W %s' לא מרשה ארגומנט\n"
+
+#: support/getopt.c:1069 support/getopt.c:1087
+#, c-format
+msgid "%s: option '-W %s' requires an argument\n"
+msgstr "%s: מאפיין '-W %s' מחייב ארגומנט\n"
+
+#: support/minrx.c:2545
+#, fuzzy
+#| msgid "Success"
+msgid "success"
+msgstr "הצלחה"
+
+#: support/minrx.c:2546
+msgid "bad pattern"
+msgstr ""
+
+#: support/minrx.c:2547
+#, fuzzy
+#| msgid "invalid content of \\{\\}"
+msgid "invalid contents of {}"
+msgstr "תוכן \\{\\} שגוי"
+
+#: support/minrx.c:2548
+msgid "? * + or {interval} not preceded by valid subpattern"
+msgstr ""
+
+#: support/minrx.c:2549
+#, fuzzy
+#| msgid "unbalanced ["
+msgid "unbalanced {"
+msgstr "] לא מאוזן"
+
+#: support/minrx.c:2551
+#, fuzzy
+#| msgid "Invalid collation character"
+msgid "invalid collating element"
+msgstr "תו סידור בלתי-מוגדר"
+
+#: support/minrx.c:2552
+#, fuzzy
+#| msgid "Invalid character class name"
+msgid "invalid character class name"
+msgstr "שם בלתי-מוגדר של קבוצת תוים"
+
+#: support/minrx.c:2553
+#, fuzzy
+#| msgid "Trailing backslash"
+msgid "invalid trailing backslash"
+msgstr "ביטוי רגולרי מסתיים בלוכסן אחורי `\\'"
+
+#: support/minrx.c:2555
+#, fuzzy
+#| msgid "Invalid range end"
+msgid "invalid range endpoint"
+msgstr "הגדרה שגויה של תחום תוים"
+
+#: support/minrx.c:2556
+msgid "memory allocation failed"
+msgstr ""
+
+#: support/minrx.c:2557
+msgid "invalid \\digit"
+msgstr ""
+
+#: support/minrx.c:2558
+msgid "match not found"
+msgstr ""
+
+#: support/minrx.c:2559
+#, fuzzy
+#| msgid "unknown opcode %d"
+msgid "unknown error code"
+msgstr "opcode %d לא מוכר"
+
+#: support/regcomp.c:122
+msgid "Success"
+msgstr "הצלחה"
+
+#: support/regcomp.c:125
+msgid "No match"
+msgstr "לא נמצאה מחרוזת מתאימה"
+
+#: support/regcomp.c:128
+msgid "Invalid regular expression"
+msgstr "ביטוי רגולרי שגוי"
+
+#: support/regcomp.c:131
+msgid "Invalid collation character"
+msgstr "תו סידור בלתי-מוגדר"
+
+#: support/regcomp.c:134
+msgid "Invalid character class name"
+msgstr "שם בלתי-מוגדר של קבוצת תוים"
+
+#: support/regcomp.c:137
+msgid "Trailing backslash"
+msgstr "ביטוי רגולרי מסתיים בלוכסן אחורי `\\'"
+
+#: support/regcomp.c:140
+msgid "Invalid back reference"
+msgstr "הפנייה שגויה לתת-ביטוי קודם"
+
+#: support/regcomp.c:143
+msgid "Unmatched [, [^, [:, [., or [="
+msgstr "[, [^, [:, [., או [= שאין להם בני זוג"
+
+#: support/regcomp.c:146
+msgid "Unmatched ( or \\("
+msgstr "( או \\( שאין לו בן-זוג"
+
+#: support/regcomp.c:149
+msgid "Unmatched \\{"
+msgstr "\\{ שאין לו בן-זוג"
+
+#: support/regcomp.c:152
+msgid "Invalid content of \\{\\}"
+msgstr "מבנה שגוי בתוך \\{\\}"
+
+#: support/regcomp.c:155
+msgid "Invalid range end"
+msgstr "הגדרה שגויה של תחום תוים"
+
+#: support/regcomp.c:158
+msgid "Memory exhausted"
+msgstr "נגמר הזכרון"
+
+#: support/regcomp.c:161
+msgid "Invalid preceding regular expression"
+msgstr "ביטוי רגולרי קודם שגוי או אינו קיים"
+
+#: support/regcomp.c:164
+msgid "Premature end of regular expression"
+msgstr "ביטוי רגולרי מסתיים מוקדם מדי"
+
+#: support/regcomp.c:167
+msgid "Regular expression too big"
+msgstr "ביטוי רגולרי גדול או מורכב מדי"
+
+#: support/regcomp.c:170
+msgid "Unmatched ) or \\)"
+msgstr ") או \\) שאין לו בן-זוג"
+
+#: support/regcomp.c:650
+msgid "No previous regular expression"
+msgstr "אין ביטוי רגולרי קודם"
+
+#: symbol.c:127
+#, c-format
+msgid "%s was created by version `%s', but the current version is `%s'"
+msgstr ""
+
+#: symbol.c:149
+msgid ""
+"current setting of -M/--bignum does not match saved setting in PMA backing "
+"file"
+msgstr "ההגדרה הנוכחית של ‎-M/--bignum לא תואמת להגדרה שנשמרה בקובץ גיבוי ה־PMA"
+
+#: symbol.c:793
+#, c-format
+msgid "function `%s': cannot use function `%s' as a parameter name"
+msgstr "הפונקציה `%s': לא ניתן להשתמש בפונקציה `%s' כשם פרמטר"
+
+#: symbol.c:923
+msgid "cannot pop main context"
+msgstr "לא ניתן לשלוף (pop) את התוכן הראשי"
+
+#~ msgid "`delete(array)' is a non-portable tawk extension"
+#~ msgstr "`delete(array)' הינו הרחבה של tawk לא פורטבלי"
+
+#, c-format
+#~ msgid "%s: %d: tawk regex modifier `/.../%c' doesn't work in gawk"
+#~ msgstr "%s: %d: משנה ביטוי רגולרי `/.../%c' של tawk לא עובד ב-gawk"
+
+#, c-format
+#~ msgid "tawk regex modifier `/.../%c' doesn't work in gawk"
+#~ msgstr "משנה ביטוי רגולרי `/.../%c' של tawk לא עובד ב-gawk"
+
+#~ msgid "length: received array argument"
+#~ msgstr "length: ארגומנט אינו מחרוזת"
+
+#~ msgid "`length(array)' is a gawk extension"
+#~ msgstr "`length(array)' הינו הרחבה ספציפית ל-gawk"
+
+#~ msgid "fatal: `$' not permitted after period in format"
+#~ msgstr "fatal: `$' אינו יכול להופיע אחרי הנקודה בפורמט"
+
+#, c-format
+#~ msgid "[s]printf: value %g is too big for %%c format"
+#~ msgstr "[s]printf: הערך %g גדול מדי עבור פורמט %%c"
+
+#~ msgid "\t-W nostalgia\t\t--nostalgia\n"
+#~ msgstr "\t‎-W nostalgia\t\t--nostalgia\n"
+
+#~ msgid "fatal error: internal error: segfault"
+#~ msgstr "תקלה חמורה: שגיאה פנימית: segfault"
+
+#~ msgid "fatal error: internal error: stack overflow"
+#~ msgstr "תקלה חמורה: שגיאה פנימית: stack overflow"

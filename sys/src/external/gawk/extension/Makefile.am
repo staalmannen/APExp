@@ -1,7 +1,7 @@
 #
 # extension/Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 1995-2006, 2012-2015, 2017, 2020, 2021, 2022, 2023
+# Copyright (C) 1995-2006, 2012-2015, 2017, 2020, 2021, 2022, 2023, 2026
 # the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
@@ -143,6 +143,11 @@ dist_man_MANS = \
 
 # gettext requires this
 SUBDIRS = po
+
+# 2/2026: Per request from coordinator@translationproject.org,
+# don't distribute the po/gawk-extensions.pot file.
+dist-hook:
+	rm -fr $(top_distdir)/extension/po/gawk-extensions.pot
 
 # For debugging
 DEBUG = -gdwarf-4 -g3

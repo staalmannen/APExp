@@ -59,6 +59,7 @@ $code = f$extract(0, 1, arch_type)
 $if (code .eqs. "I") then base = "I64VMS"
 $if (code .eqs. "V") then base = "VAXVMS"
 $if (code .eqs. "A") then base = "AXPVMS"
+$if (code .eqs. "x") then base = "X86VMS"
 $!
 $!
 $product = "gawk"

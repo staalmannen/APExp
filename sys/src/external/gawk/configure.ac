@@ -1,7 +1,7 @@
 dnl
 dnl configure.ac --- autoconf input file for gawk
 dnl
-dnl Copyright (C) 1995-2023 the Free Software Foundation, Inc.
+dnl Copyright (C) 1995-2026 the Free Software Foundation, Inc.
 dnl
 dnl This file is part of GAWK, the GNU implementation of the
 dnl AWK Programming Language.
@@ -23,7 +23,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([GNU Awk],[5.3.0],[bug-gawk@gnu.org],[gawk])
+AC_INIT([GNU Awk],[5.4.0],[bug-gawk@gnu.org],[gawk])
 
 # This is a hack. Different versions of install on different systems
 # are just too different. Chuck it and use install-sh.
@@ -59,8 +59,8 @@ AC_ARG_ENABLE([builtin-intdiv0],
 	then
 		AC_DEFINE(SUPPLY_INTDIV, 1, [enable built-in intdiv0 function])
 		sed '/^@set PATCHLEVEL/a\
-@set INTDIV' < "$srcdir"/doc/gawktexi.in > foo
-		cp foo "$srcdir"/doc/gawktexi.in
+@set INTDIV' < "$srcdir"/doc/gawk.texi > foo
+		cp foo "$srcdir"/doc/gawk.texi
 		rm foo
 	fi
 )
@@ -93,6 +93,15 @@ AC_ARG_ENABLE([versioned-extension-dir],
 
 		# note leading slash on the value
 		export EXTENSIONDIR=/ext-$MAJOR.$MINOR
+	fi
+)
+
+OPT_O3=no
+AC_ARG_ENABLE([O3],
+	[AS_HELP_STRING([--enable-O3],[build gawk with -O3 instead of -O2])],
+	if test "$enableval" = yes
+	then
+		OPT_O3=yes
 	fi
 )
 
@@ -138,10 +147,14 @@ then
 	then
 		CFLAGS="$CFLAGS -Wall -fno-builtin"
 	fi
+
+	if grep -i '^mallocdebug$' $srcdir/.developing > /dev/null
+	then
+		CFLAGS="$CFLAGS -DUSE_REAL_MALLOC"
+	fi
 	AC_MSG_RESULT([yes])
 else
 	AC_MSG_RESULT([no])
-	CFLAGS="$CFLAGS -DNDEBUG"	# turn off assertions
 fi
 
 AC_SUBST(CFLAGS)
@@ -180,10 +193,13 @@ AM_LANGINFO_CODESET
 gt_LC_MESSAGES
 
 dnl checks for header files
-AC_CHECK_HEADERS(arpa/inet.h fcntl.h locale.h libintl.h mcheck.h \
-	netdb.h netinet/in.h stddef.h string.h \
-	sys/ioctl.h sys/param.h sys/select.h sys/socket.h sys/time.h unistd.h \
-	termios.h stropts.h wchar.h wctype.h)
+AC_CHECK_HEADERS(arpa/inet.h fcntl.h locale.h libintl.h mcheck.h
+	netdb.h netinet/in.h stddef.h string.h
+	spawn.h
+	sys/procctl.h sys/sysctl.h
+	sys/ioctl.h sys/param.h sys/personality.h sys/select.h sys/socket.h sys/time.h
+	uchar.h
+	unistd.h termios.h stropts.h wchar.h wctype.h)
 
 gl_C_BOOL
 AC_HEADER_SYS_WAIT
@@ -208,7 +224,7 @@ AC_TYPE_LONG_LONG_INT
 AC_TYPE_UNSIGNED_LONG_LONG_INT
 AC_TYPE_INTMAX_T
 AC_TYPE_UINTMAX_T
-AC_CHECK_TYPE(ssize_t, int)
+AC_CHECK_TYPE(ssize_t, int)dnl This is the obsolete version of the macro
 AC_CHECK_SIZEOF(unsigned int)
 AC_CHECK_SIZEOF(unsigned long)
 dnl see if time_t is defined in <sys/types.h>
@@ -289,13 +305,6 @@ TYPE_SOCKLEN_T
 dnl Check for C11 _Noreturn
 GAWK_AC_NORETURN
 
-dnl checks for functions
-AC_FUNC_MKTIME
-case "$ac_cv_func_working_mktime" in
-yes)	AC_DEFINE(HAVE_MKTIME, 1, [we have the mktime function])
-	;;
-esac
-
 AC_CHECK_FUNC(getaddrinfo, [AC_DEFINE(HAVE_GETADDRINFO, 1, [have getaddrinfo])],
 	      [AC_CHECK_LIB(socket, getaddrinfo,
 			    [AC_DEFINE(HAVE_GETADDRINFO, 1,
@@ -306,15 +315,17 @@ AC_SEARCH_LIBS(isinf, m)
 AC_SEARCH_LIBS(ismod, m)
 AC_SEARCH_LIBS(isnan, m)
 
-# Need the check for mkstemp and tmpfile for missing_d/snprintf.c.
-AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror \
-	getgrent getgroups grantpt isascii isblank iswctype iswlower iswupper \
-	lstat \
-	mbrlen memcmp memcpy memmove memset \
-	mkstemp mtrace posix_openpt setenv setlocale setsid sigprocmask \
-	snprintf strcasecmp strchr strcoll strerror strftime strncasecmp \
-	strsignal strtod strtoul system timegm tmpfile towlower towupper \
-	tzset usleep waitpid wcrtomb wcscoll wctype)
+AC_CHECK_FUNCS(__etoa_l atexit btowc fmod fwrite_unlocked gai_strerror
+	getgrent getgroups grantpt isascii isblank
+	gettimeofday clock_gettime lstat
+	getdtablesize
+	_NSGetExecutablePath posix_spawnp
+	mbrtoc32 c32rtomb
+	mtrace personality posix_openpt setenv setlocale setsid sigprocmask
+	procctl sysctl
+	strcasecmp strcoll strftime strncasecmp
+	strsignal timegm
+	waitpid wctype)
 dnl this check is for both mbrtowc and the mbstate_t type, which is good
 AC_FUNC_MBRTOWC
 
@@ -436,14 +447,8 @@ dnl check for readline support
 GAWK_CHECK_READLINE
 
 dnl check for mpfr support
-case `uname -m` in
-*'Power Macintosh'*)
-	: ;;
-*)
-	case $SKIP_MPFR in
-	no)	GNUPG_CHECK_MPFR
-		;;
-	esac
+case $SKIP_MPFR in
+no)	GNUPG_CHECK_MPFR
 	;;
 esac
 
@@ -494,21 +499,41 @@ fi
 AC_OUTPUT
 if test "$GCC" = yes &&
    test -f $srcdir/.developing &&
-   grep -i debug $srcdir/.developing > /dev/null
+   grep -i '^debug$' $srcdir/.developing > /dev/null
 then
-	for i in awkgram command
-	do
-		rm -f $i.c
-		ed - $i.y << \EOF
+	if grep -i '^yaccdebug$' $srcdir/.developing > /dev/null
+	then
+		for i in awkgram command
+		do
+			rm -f $i.c
+			ed - $i.y << \EOF
 /^%}/a
 %no-lines
 .
 w
 EOF
-	done
-	for i in . support
+		done
+	fi
+	for i in . support extension
 	do
-		sed -e '/-O2/s///' -e '/^CFLAGS = /s//&${DEBUG} /' $i/Makefile > foo
-		mv foo $i/Makefile
+		# Use test -f in case --disable-extensions was used,
+		# in which case there won't be a Makefile in the extension
+		# directory.  This fixes a bug report.
+		if test -f $i/Makefile
+		then
+			sed -e '/-O2/s///' -e '/^CFLAGS = /s//&${DEBUG} /' $i/Makefile > foo
+			mv foo $i/Makefile
+		fi
+	done
+elif test "$GCC" = yes && test "$OPT_O3" = yes
+then
+	for i in . support extension
+	do
+		# Same thing here.
+		if test -f $i/Makefile
+		then
+			sed -e '/-O2/s//-O3/g'  $i/Makefile > foo
+			mv foo $i/Makefile
+		fi
 	done
 fi

@@ -6,10 +6,12 @@
  * 8/2001
  * Revised 6/2004
  * Revised 5/2012
+ * Revised 6/2025
+ * Revised 12/2025
  */
 
 /*
- * Copyright (C) 2001, 2004, 2011, 2012, 2013, 2018, 2020, 2021,
+ * Copyright (C) 2001, 2004, 2011, 2012, 2013, 2018, 2020, 2021, 2025,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -39,6 +41,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
+#include <wchar.h>
+#include <langinfo.h>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -49,9 +53,19 @@
 #define _(msgid)  gettext(msgid)
 #define N_(msgid) msgid
 
+#ifndef __MINGW32__
+#if defined(HAVE_UCHAR_H) && defined(HAVE_MBRTOC32) && defined(HAVE_C32RTOMB)
+#include <uchar.h>
+#else
+#define char32_t wchar_t
+#define mbrtoc32 mbrtowc
+#define c32rtomb wcrtomb
+#endif
+#endif /* __MINGW32__ */
+
 static const gawk_api_t *api;	/* for convenience macros to work */
 static awk_ext_id_t ext_id;
-static const char *ext_version = "ordchr extension: version 1.0";
+static const char *ext_version = "ordchr extension: version 2.0";
 static awk_bool_t (*init_func)(void) = NULL;
 
 int plugin_is_GPL_compatible;
@@ -62,12 +76,33 @@ static awk_value_t *
 do_ord(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 {
 	awk_value_t str;
-	double ret = -1;
+	double ret = 0xFFFD;	// unicode bad char
+	mbstate_t mbs;
+	const char *src;
 
 	assert(result != NULL);
 
+	memset(& mbs, 0, sizeof(mbs));
+
 	if (get_argument(0, AWK_STRING, & str)) {
-		ret = (unsigned char) str.str_value.str[0];
+		if (MB_CUR_MAX == 1) {
+			ret = str.str_value.str[0] & 0xff;
+		} else {
+			char32_t wc;
+			size_t res;
+
+			src = str.str_value.str;
+			res = mbrtoc32(& wc, src, MB_CUR_MAX, & mbs);
+			if (res == 0 || res == (size_t) -1 || res == (size_t) -2) {
+				// mimic gawk's behavior
+				char *codeset = nl_langinfo(CODESET);
+				if (strcmp(codeset, "UTF-8") == 0)
+					ret = 0xFFFD;	// unicode bad char
+				else
+					ret = wc;
+			} else
+				ret = wc;
+		}
 	} else if (do_lint)
 		lintwarn(ext_id, _("ord: first argument is not a string"));
 
@@ -83,23 +118,34 @@ do_chr(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 	awk_value_t num;
 	unsigned int ret = 0;
 	double val = 0.0;
-	char str[2];
-
-	str[0] = str[1] = '\0';
+	char32_t wc = 0;
+	char buf[20] = { '\0', '\0' };
 
 	assert(result != NULL);
 
 	if (get_argument(0, AWK_NUMBER, & num)) {
 		val = num.num_value;
 		ret = val;	/* convert to int */
-		ret &= 0xff;
-		str[0] = ret;
-		str[1] = '\0';
+		if (MB_CUR_MAX == 1) {
+			buf[0] = ret & 0xff;
+			goto done;
+		} else {
+			wc = ret;
+		}
 	} else if (do_lint)
 		lintwarn(ext_id, _("chr: first argument is not a number"));
 
+	mbstate_t mbs;
+	size_t res;
+
+	memset(& mbs, 0, sizeof(mbs));
+	res = c32rtomb(buf, wc,  & mbs);
+	if (res == 0 || res == (size_t)-1 || res == (size_t) -2)
+		buf[0] = buf[1] = '\0';
+
+done:
 	/* Set the return value */
-	return make_const_string(str, 1, result);
+	return make_const_string(buf, strlen(buf), result);
 }
 
 static awk_ext_func_t func_table[] = {

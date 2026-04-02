@@ -29,7 +29,7 @@ EXTRA_DIST = ChangeLog ChangeLog.0 ChangeLog.1 \
 # So we fix the locale to some sensible value.
 
 if TEST_CROSS_COMPILE
-AWKPROG = LC_ALL=C LANG=C awk$(EXEEXT)
+AWKPROG = LC_ALL=C LANG=C $(AWK)
 else
 AWKPROG = LC_ALL=C LANG=C "$(abs_top_builddir)/gawk$(EXEEXT)"
 endif

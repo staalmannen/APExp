@@ -17,7 +17,7 @@
 #
 # extension/Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 1995-2006, 2012-2015, 2017, 2020, 2021, 2022, 2023
+# Copyright (C) 1995-2006, 2012-2015, 2017, 2020, 2021, 2022, 2023, 2026
 # the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
@@ -1057,6 +1057,9 @@ distdir-am: $(DISTFILES)
 	      || exit 1; \
 	  fi; \
 	done
+	$(MAKE) $(AM_MAKEFLAGS) \
+	  top_distdir="$(top_distdir)" distdir="$(distdir)" \
+	  dist-hook
 	-test -n "$(am__skip_mode_fix)" \
 	|| find "$(distdir)" -type d ! -perm -755 \
 		-exec chmod u+rwx,go+rx {} \; -o \
@@ -1344,10 +1347,10 @@ uninstall-man: uninstall-man3
 	am--depfiles am--refresh check check-am clean clean-cscope \
 	clean-generic clean-libtool clean-noinstLTLIBRARIES \
 	clean-pkgextensionLTLIBRARIES cscope cscopelist-am ctags \
-	ctags-am dist dist-all dist-bzip2 dist-gzip dist-lzip \
-	dist-shar dist-tarZ dist-xz dist-zip dist-zstd distcheck \
-	distclean distclean-compile distclean-generic distclean-hdr \
-	distclean-libtool distclean-local distclean-tags \
+	ctags-am dist dist-all dist-bzip2 dist-gzip dist-hook \
+	dist-lzip dist-shar dist-tarZ dist-xz dist-zip dist-zstd \
+	distcheck distclean distclean-compile distclean-generic \
+	distclean-hdr distclean-libtool distclean-local distclean-tags \
 	distcleancheck distdir distuninstallcheck dvi dvi-am html \
 	html-am info info-am install install-am install-data \
 	install-data-am install-data-hook install-dvi install-dvi-am \
@@ -1377,6 +1380,11 @@ uninstall-so:
 	$(RM) $(DESTDIR)$(pkgextensiondir)/*.lib
 
 uninstall-recursive: uninstall-so
+
+# 2/2026: Per request from coordinator@translationproject.org,
+# don't distribute the po/gawk-extensions.pot file.
+dist-hook:
+	rm -fr $(top_distdir)/extension/po/gawk-extensions.pot
 
 distclean-local:
 	rm -fr .deps

@@ -27,6 +27,7 @@ MPFR
 MSEC
 NF
 NR
+Nov
 OFMT
 OFS
 ORS
@@ -44,8 +45,10 @@ SIGUSR
 SUBSEP
 SYMTAB
 TEXTDOMAIN
+Texinfo
 Trueman
 UTC
+Weinberger
 Yigit
 abc
 asort
@@ -95,6 +98,7 @@ gmo
 gsub
 html
 https
+ie
 inet
 int
 intdiv
@@ -114,6 +118,7 @@ myhome
 nextfile
 nlines
 nmap
+nsinclude
 num
 op
 org

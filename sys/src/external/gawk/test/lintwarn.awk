@@ -9,7 +9,7 @@ BEGIN {
 	print
 	nextfile
 	delete a
-	delete(a)
+	# delete(a)	# tawk extension, no longer allowed as of 10/2025
 	y = /a/
 	y == /a/
 	/b/ ~ x
@@ -26,7 +26,7 @@ BEGIN {
 	a
 	f(/pqr/)
 	//
-	/* */
+	# /* */		# not good with minrx
 }
 END {
 	getline

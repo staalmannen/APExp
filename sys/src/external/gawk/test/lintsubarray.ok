@@ -1,0 +1,3 @@
+gawk: lintsubarray.awk:2: warning: multidimensional arrays are a gawk extension
+gawk: lintsubarray.awk:3: warning: multidimensional arrays are a gawk extension
+gawk: lintsubarray.awk:3: warning: reference to uninitialized element `a["2"]["3"]'

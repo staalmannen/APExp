@@ -1,0 +1,40 @@
+Wed Feb 18 11:39:29 AM IST 2026
+===============================
+
+		* I * M * P * O * R * T * A * N * T *
+
+This release includes a new regular expression matcher, MinRX, written
+by Mike Haertel, the original author of GNU grep. It's available from
+https://github.com/mikehaertel/minrx.
+
+This matcher is fully POSIX compliant, which the current GNU matchers
+are not. In particular it follows POSIX rules for finding the longest
+leftmost submatches.  It is also more strict as to regular expression
+syntax, but primarily in a few corner cases that normal, correct,
+regular expression usage should not encounter.
+
+Because regular expression matching is such a fundamental part of
+awk/gawk, the original GNU matchers are still included in gawk.  In order
+to use them, give a value to the GAWK_GNU_MATCHERS environment variable
+before invoking gawk.
+
+If you find a difference in behavior between the new and original
+matchers, please report it. In particular if it adversely affects your
+current application(s).  Note that if the difference is due to being fully
+POSIX compliant, then you should consider revising your application.
+Please use the gawkbug script to report any issues, as would be done
+for any other bug. See node Bugs in the manual for more details; it's
+online at https://www.gnu.org/software/gawk/manual/html_node/Bugs.html.
+
+PLEASE NOTE! The original GNU matchers will eventually be removed from
+gawk.  So, please take the time to notice and report any issues in the
+MinRX matcher, so that they can be ironed out sooner rather than later.
+
+Thanks!
+
+Known Issues
+============
+When ignoring case, in locales where more than one lower-case
+character maps to the same upper-case character, MinRX does
+not currently do the right thing.  This is being worked on
+and should be fixed in the first patch.

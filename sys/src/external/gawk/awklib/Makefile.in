@@ -336,7 +336,7 @@ EXTRA_DIST = ChangeLog ChangeLog.0 ChangeLog.1 \
 @TEST_CROSS_COMPILE_FALSE@AWKPROG = LC_ALL=C LANG=C "$(abs_top_builddir)/gawk$(EXEEXT)"
 # With some locales, the script extract.awk fails.
 # So we fix the locale to some sensible value.
-@TEST_CROSS_COMPILE_TRUE@AWKPROG = LC_ALL=C LANG=C awk$(EXEEXT)
+@TEST_CROSS_COMPILE_TRUE@AWKPROG = LC_ALL=C LANG=C $(AWK)
 
 # Get config.h from the build directory and custom.h from the source directory.
 AM_CPPFLAGS = -I$(top_builddir) -I$(top_srcdir) -I$(top_srcdir)/support

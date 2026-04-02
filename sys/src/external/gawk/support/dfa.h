@@ -1,5 +1,5 @@
 /* dfa.h - declarations for GNU deterministic regexp compiler
-   Copyright (C) 1988, 1998, 2007, 2009-2023 Free Software Foundation, Inc.
+   Copyright (C) 1988, 1998, 2007, 2009-2026 Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -12,9 +12,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc.,
-   51 Franklin Street - Fifth Floor, Boston, MA  02110-1301, USA */
+   along with this program.  If not, see <https://www.gnu.org/licenses/>.  */
 
 /* Written June, 1988 by Mike Haertel */
 
@@ -33,7 +31,6 @@
 #include <regex.h>
 #include <stddef.h>
 #include <stdlib.h>
-#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -55,12 +52,12 @@ struct dfamust
 struct dfa;
 
 /* Needed when Gnulib is not used.  */
-//#ifndef _GL_ATTRIBUTE_MALLOC
+#ifndef _GL_ATTRIBUTE_MALLOC
 # define _GL_ATTRIBUTE_MALLOC
 # define _GL_ATTRIBUTE_DEALLOC(f, i)
 # define _GL_ATTRIBUTE_DEALLOC_FREE
 # define _GL_ATTRIBUTE_RETURNS_NONNULL
-//#endif
+#endif
 
 /* Entry points. */
 
@@ -68,7 +65,9 @@ struct dfa;
    It should be initialized via dfasyntax or dfacopysyntax before other use.
    The returned pointer should be passed directly to free() after
    calling dfafree() on it. */
-extern struct dfa *dfaalloc (void);
+extern struct dfa *dfaalloc (void)
+  _GL_ATTRIBUTE_MALLOC _GL_ATTRIBUTE_DEALLOC_FREE
+  _GL_ATTRIBUTE_RETURNS_NONNULL;
 
 /* DFA options that can be ORed together, for dfasyntax's 4th arg.  */
 enum
@@ -122,7 +121,8 @@ extern void dfamustfree (struct dfamust *);
 
 /* Allocate and return a struct dfamust from a struct dfa that was
    initialized by dfaparse and not yet given to dfacomp.  */
-extern struct dfamust *dfamust (struct dfa const *);
+extern struct dfamust *dfamust (struct dfa const *)
+  _GL_ATTRIBUTE_DEALLOC (dfamustfree, 1);
 
 /* Compile the given string of the given length into the given struct dfa.
    The last argument says whether to build a searching or an exact matcher.

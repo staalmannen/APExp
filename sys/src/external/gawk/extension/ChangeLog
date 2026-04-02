@@ -1,3 +1,140 @@
+2026-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.4.0: Release tar ball made.
+
+2026-02-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makfile.am (dist-hoook): Remove po/gawk-extensions.pot
+	from the tarball. Makes life easier for the translation project.
+	* fnmatch.c: Update copyright year.
+	* readdir.c: Update copyright year. Add #pragmas to avoid
+	warnings from -Warray-bounds.
+
+2026-01-20         J.			<thirdedition@gmx.net>
+
+	* configure.ac: Remove \ continuation in lists inside m4
+	constructs. Needed for MSYS2.
+
+2026-01-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* configure.ac: Look for uchar.h and c32 functions. Fixes compile
+	warnings in ordchr.c.
+	* ordchr.c (do_chr): Init wc to zero to avoid a different warning.
+	* gawkfts.c (fts_build): Use nostat in a no-op to avoid a
+	compiler warning.
+
+2026-01-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ordchr.c (do_ord): Remove check for "CP65001" since MinGW
+	nl_langinfo() now returns "UTF-8" for it.
+
+2025-12-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* fnmatch.c, ordchr.c: Style edit, add comment on #endif for MinGW.
+
+2025-12-28         Eli Zaretskii  <eliz@gnu.org>
+
+	* fnmatch.c [__MINGW32__]: disable HAVE_WCHAR_H and related stuff.
+	* ordchr.c {__MINGW32__]: Remove redirections which now come
+	through config.h.  Don't #include nl_langinfo.c, which is
+	compiled separately as a separate source file.
+
+2025-12-22         Eli Zaretskii  <eliz@gnu.org>
+
+	* ordchr.c: No need to include <windows.h>.
+
+2025-12-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ordchr.c: Switch to char32_t type and routines.
+	Remove accidentally duplicated code.
+
+2025-12-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ordchr.c (nl_langinfo): Per discussion with Eli, remove
+	the copied code and #include it from the ../pc directory.
+
+2025-12-12         Eli Zaretskii  <eliz@gnu.org>
+
+	* ordchr.c (do_ord): Check also for Windows UTF-8 code page.
+	(nl_langinfo): Replacement version for Windows.
+
+2025-10-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* configure.ac: Don't disable assertions anymore. They provide
+	value, and on modern systems don't affect performance.
+
+2025-07-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ordchr.c (do_ord): Revise to work like gawk does, returning 0xFFFD
+	for bad multibyte conversions.
+
+2025-06-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* ordchr.c (do_ord, do_chr): Revise to do multibyte / wide character
+	conversions.  It's a Unicode world these days.
+	Bumped the version to 2.0.
+	* ordchr.3am: Updated.
+
+2025-04-03         Eli Zaretskii  <eliz@gnu.org>
+
+	* time.c (init_time): New function.  On MS-Windows, attempts to
+	dynamically load GetSystemTimePreciseAsFileTime, which provides
+	more accurate time, as opposed to GetSystemTimeAsFileTime whose
+	precision is the basic 64Hz Windows clock.
+	(do_gettimeofday) [HAVE_GETSYSTEMTIMEASFILETIME]: Use
+	GetSystemTimePreciseAsFileTime if available.
+
+2025-04-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.2: Release tar made.
+
+2025-03-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* inplace.c (do_inplace_begin): Additional hoop jumping to
+	silence clang warnings. Sheesh.
+
+2024-11-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* time.3am: Fix spelling of "strptime()". Thanks to
+	James Ghofulpo <james@ghofulpo.com> for the report.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.1: Release tar made.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* configure.ac: Bump version, update copyright year.
+	* inplace.3am, time.c: update copyright year.
+
+2024-06-08         John E. Malmberg      <wb8tyw@qsl.net>
+
+	* time.c: Remove unneeded define for OpenVMS
+
+2024-02-12         Tim Rice              <trice@posteo.net>
+
+	* inplace.3am: Add a note that symbolic and hard links are
+	replaced with a new file.
+
+2024-01-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* configure.ac: MPFR on 32 bit Power PC is back
+	to working. Remove the check that disables it.
+
+2024-01-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* time.c (do_gettimeofday): Small bug fix. Thanks to
+	Andrew Schorr for pointing it out.
+
+2024-01-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Use newer interfaces for getting the time if they're available.
+	Thanks to Andreas Schwab <schwab@suse.de> and Andrew Schorr.
+
+	* time.c (do_gettimeofday): Use clock_gettime() or gettimeofday() or
+	time(), in that order.
+	* configure.ac: Add check for clock_gettime().
+
 2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* 5.3.0: Release tar ball made.
@@ -381,7 +518,7 @@
 
 2020-06-10         Arnold D. Robbins     <arnold@skeeve.com>
 
-	Miscellanious fixes from Michael Builov <mbuilov@gmail.com>.
+	Miscellaneous fixes from Michael Builov <mbuilov@gmail.com>.
 
 	* gawkfts.c (fts_open): Fix memory leak: fts_sort() allocates
 	sp->fts_array, but it's not freed if next fts_alloc() fails.

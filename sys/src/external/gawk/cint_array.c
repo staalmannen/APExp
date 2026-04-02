@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2013, 2016, 2017, 2019-2022,
+ * Copyright (C) 1986, 1988, 1989, 1991-2013, 2016, 2017, 2019-2022, 2025,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -246,7 +246,7 @@ cint_lookup(NODE *symbol, NODE *subs)
 		assert(symbol->table_size == 0);
 
 		/* nodes[0] .. nodes[NHAT- 1] not used */
-		ezalloc(symbol->nodes, NODE **, INT32_BIT * sizeof(NODE *), "cint_lookup");
+		ezalloc(symbol->nodes, NODE **, INT32_BIT * sizeof(NODE *));
 	}
 
 	symbol->table_size++;	/* one more element in array */
@@ -404,7 +404,7 @@ cint_copy(NODE *symbol, NODE *newsymb)
 	assert(symbol->nodes != NULL);
 
 	/* allocate new table */
-	ezalloc(new, NODE **, INT32_BIT * sizeof(NODE *), "cint_copy");
+	ezalloc(new, NODE **, INT32_BIT * sizeof(NODE *));
 
 	old = symbol->nodes;
 	for (i = NHAT; i < INT32_BIT; i++) {
@@ -464,10 +464,10 @@ cint_list(NODE *symbol, NODE *t)
 		t->flags = (unsigned int) assoc_kind;
 		if (num_elems == 1 || num_elems == xn->table_size)
 			return list;
-		erealloc(list, NODE **, list_size * sizeof(NODE *), "cint_list");
+		erealloc(list, NODE **, list_size * sizeof(NODE *));
 		k = elem_size * xn->table_size;
 	} else
-		emalloc(list, NODE **, list_size * sizeof(NODE *), "cint_list");
+		emalloc(list, NODE **, list_size * sizeof(NODE *));
 
 	if ((assoc_kind & AINUM) == 0) {
 		/* not sorting by "index num" */
@@ -770,7 +770,7 @@ tree_lookup(NODE *symbol, NODE *tree, long k, int m, long base)
 			actual_size /= 2;
 			tree->flags |= HALFHAT;
 		}
-		ezalloc(table, NODE **, actual_size * sizeof(NODE *), "tree_lookup");
+		ezalloc(table, NODE **, actual_size * sizeof(NODE *));
 		tree->nodes = table;
 	} else
 		size = tree->array_size;
@@ -943,7 +943,7 @@ tree_copy(NODE *newsymb, NODE *tree, NODE *newtree)
 	if ((tree->flags & HALFHAT) != 0)
 		hsize /= 2;
 
-	ezalloc(new, NODE **, hsize * sizeof(NODE *), "tree_copy");
+	ezalloc(new, NODE **, hsize * sizeof(NODE *));
 	newtree->nodes = new;
 	newtree->array_base = tree->array_base;
 	newtree->array_size = tree->array_size;
@@ -1061,7 +1061,7 @@ leaf_lookup(NODE *symbol, NODE *array, long k, long size, long base)
 		array->table_size = 0;	/* sanity */
 		array->array_size = size;
 		array->array_base = base;
-		ezalloc(array->nodes, NODE **, size * sizeof(NODE *), "leaf_lookup");
+		ezalloc(array->nodes, NODE **, size * sizeof(NODE *));
 		symbol->array_capacity += size;
 	}
 
@@ -1140,7 +1140,7 @@ leaf_copy(NODE *newsymb, NODE *array, NODE *newarray)
 	long size, i;
 
 	size = array->array_size;
-	ezalloc(new, NODE **, size * sizeof(NODE *), "leaf_copy");
+	ezalloc(new, NODE **, size * sizeof(NODE *));
 	newarray->nodes = new;
 	newarray->array_size = size;
 	newarray->array_base = array->array_base;

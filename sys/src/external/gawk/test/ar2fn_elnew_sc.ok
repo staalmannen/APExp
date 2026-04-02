@@ -1,0 +1,2 @@
+gawk: ar2fn_elnew_sc.awk:4: fatal: attempt to use array `y (from a["10"])' in a scalar context
+EXIT CODE: 2

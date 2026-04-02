@@ -6,4 +6,3 @@ BEGIN {
 	a = ((c = tolower("FOO")) in JUNK)
 	x = (y == 0 && z == 2 && q == 45)
 }
-

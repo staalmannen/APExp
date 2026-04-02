@@ -1,3 +1,469 @@
+2026-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.4.0: Release tar ball made.
+
+2026-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Adjusted.
+
+2026-02-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am: Change text of dynamic extension messages to
+	say "dynamic extensions" instead of "shared libraries".
+
+2026-02-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Adjusted.
+	* Makefile.am: Sort and prettify the big lists of tests.
+
+2026-02-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* iolint.awk, iolint.ok: Reverted to previous version. Changes
+	broke things on non-Ubuntu Linux systems.
+
+2026-02-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Adjusted.
+
+2026-02-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New tests, elemnew5 and elemnew6.
+	* elemnew5.awk, elemnew5.ok, elemnew6.awk, elemnew6.ok: New files.
+
+2026-02-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (RM): Add a definition, needed at NetBSD 10, at least.
+	* iolint.awk: Ensure PATH is set to find newly created version
+	of "cat". Also make it executable.
+	* iolint.ok: Updated to match the code changes in iolint.awk.
+
+2026-01-26         Scott Deifik		<scottd.mail@sbcglobal.net>
+
+	* Makefile.am (readdir): Always remove _dirlist and _longlist.
+	This avoids giving the wrong impression as to the number of tests
+	that fail should the readdir test fail.
+
+2026-01-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Adjusted.
+
+2026-01-18         Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile.am (mbprintf5): Silence the echoing of the recipe.
+
+2026-01-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (mbprintf5): Remove case/esac for Cygwin, as the
+	test should now pass there.
+
+2026-01-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (charset-tests-all, mbprintf5): Remove MS-DOS
+	case, as we no longer support MS-DOS / DJGPP.
+
+2026-01-11  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile.am (NEED_TESTOUTCMP): Add hexfloat.
+	(mbprintf5): Remove skipping for MinGW.
+	(EXPECTED_FAIL_MINGW): Fix typo.
+
+2026-01-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXPECTED_FAIL_ZOS): Remove randtest, add hexfloat.
+
+2026-01-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Adjusted.
+
+2026-01-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (strftime): Remove setting GAWKLOCALE to C, it defaults
+	to that anyway. Thanks to Eli Zaretskii.
+	(nlstringtest): No space before semicolon when setting GAWKLOCALE;
+	needed for pc/GenMakefileTst.awk to work correctly.
+
+2026-01-04  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile.am (EXPECTED_FAIL_MINGW): Remove tests that pass.
+
+2025-12-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, hexfloat.
+	* hexfloat.awk, hexfloat.ok: New files.
+
+2025-12-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* shortest-match.awk: Fix the program text to use strongly
+	typed regexps. Ooops.
+	* shortest-match.ok: Adjusted.
+	Thanks to Antonio Colombo for pointing out the problem.
+
+2025-12-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Adjusted.
+
+2025-12-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXPECTED_FAIL_ZOS): Remove duplicate cmdlinefsbacknl2
+	from the list.  Thanks to Nethox <nethox+awk@gmail.com>.
+
+2025-12-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXPECTED_FAIL_ZOS): Add randtest to the list.
+
+2025-12-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Adjusted.
+
+2025-12-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXPECTED_FAIL_ZOS): Add some more tests to the list.
+
+2025-12-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* mpfrrem.awk, mpfrrem.ok: Add test cases for the MPFR mod
+	operation with non-integer arguments.
+	Thanks to Nethox <nethox+awk@gmail.com> for the patch.
+
+2025-12-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, equiv.
+	* equiv.awk, equiv.in, equiv.ok: New files.
+
+2025-11-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (LOCALE_CHARSET_TESTS): Move commas, mbstr1 and
+	mbstr2 tests to here.
+
+2025-10-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, hex3.
+	* hex3.awk, hex3.ok: New files.
+
+2025-10-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, match5.
+	* match5.awk, match5.in, match5.ok: New files.
+
+2025-10-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* lintwarn.awk, lintwarn.ok: Adjust after code changes.
+
+2025-10-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, linttypeof.
+	* linttypeof.awk, linttypeof.ok: New files.
+
+2025-10-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (fmtspcl): Restore this test.
+	* fmtspcl.awk: Code updated to handle Inf values correctly.
+	* fmtspcl.ok: Updated.
+
+	Unrelated:
+
+	* asortsymtab-mpfr.ok: Updated.
+
+2025-10-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, lintsubarray.
+	* lintsubarray.awk, lintsubarray.ok: New files.
+
+	* Makefile.am (EXTRADIST): New test, matchbadarg2.
+	* matchbadarg2.awk, matchbadarg2.in, matchbadarg2.ok: New files.
+
+2025-10-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, matchbadarg1.
+	* matchbadarg1.awk, matchbadarg1.in, matchbadarg1.ok: New files.
+
+2025-10-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* printfbad4.ok: Update after code change.
+
+2025-07-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (NEED_POSIX): Add rscompat here.
+	(NEED_TRADITIONAL): Remove it from here.
+
+2025-07-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* elemnew4.awk: Remove calls to stopme(). Oops. Thanks to
+	Hermann Peifer <peifer@gmx.eu> for the report.
+
+2025-07-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, elemnew4.
+	* elemnew4.awk, elemnew4.ok: New files.
+
+2025-05-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* inplace1.ok, inplace2.ok, inplace2bcomp.ok, inplace3.ok,
+	inplace3bcomp.ok: Updated after changes in the awk files.
+
+2025-04-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, shortest-match.
+	* shortest-match.awk, shortest-match.ok: New files.
+
+2025-04-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Adjusted.
+	* 5.3.2: Release tar made.
+
+2025-03-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, splitwht2.
+	* splitwht2.awk, splitwht2.ok: New files.
+
+2025-03-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Adjusted for test tarball.
+
+2025-03-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, indirectbuiltin6.
+	* indirectbuiltin6.awk, indirectbuiltin6.ok: New files.
+
+2025-03-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* colonwarn.awk, colonwarn.ok: Updated after code changes.
+
+2025-02-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am: Clean up before release.
+	* badargs.ok: Adjusted.
+
+2025-02-14  Paul Eggert  <eggert@cs.ucla.edu>
+
+	* Makefile.am (inplace1, inplace2, inplace2bcomp, inplace3,
+	inplace3bcomp): Work around BSD glitch in the test case,
+	not in Gawk itself.
+
+2025-02-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, indirectbuiltin5.
+	* indirectbuiltin5.awk, indirectbuiltin5.ok: New files.
+
+2025-02-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, memleak3.
+	* memleak3.awk, memleak3.ok: New files.
+
+2025-02-03         Cristian Ioneci       <mekanofox@astropostale.com>
+
+	* Makefile.am (EXTRADIST): New tests: ar2fn_elnew_sc, ar2fn_elnew_sc2,
+	ar2fn_fmod, ar2fn_unxptyp_aref, ar2fn_unxptyp_val
+
+	* ar2fn_elnew_sc.awk, ar2fn_elnew_sc.ok, ar2fn_elnew_sc2.awk,
+	ar2fn_elnew_sc2.ok, ar2fn_fmod.awk, ar2fn_fmod.ok, ar2fn_unxptyp_aref.awk,
+	ar2fn_unxptyp_aref.ok, ar2fn_unxptyp_val.awk, ar2fn_unxptyp_val.ok: New
+	files.
+
+2025-01-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, memleak2.
+	* memleak2.awk, memleak2.ok: New files.
+
+2025-01-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, indirectbuiltin4.
+	* indirectbuiltin4.awk, indirectbuiltin4.ok: New files.
+
+2025-01-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, indirectbuiltin3.
+	* indirectbuiltin3.awk, indirectbuiltin3.ok: New files.
+
+2025-01-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, typeof9.
+	* typeof9.awk, typeof9.ok: New files.
+
+2024-10-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (diffout): Use ${PAGER:-more} instead of
+	${PAGER-more}.
+
+2024-10-21         John Devin            <john.m.devin@gmail.com>
+
+	* Makefile.am (diffout): Use $PAGER or `more' if it's not
+	defined instead of hard coding `more', for output of `make check'.
+	Using `less' would be better, but it's not always available (e.g.,
+	Windows).
+
+2024-10-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* lintplus2.ok, mpfrmemok1.ok, nsprof1.ok, nsprof2.ok, nsprof3.ok,
+	profile0.ok, profile2.ok, profile3.ok, profile4.ok, profile5.ok,
+	profile6.ok, profile7.ok, profile8.ok, profile9.ok, profile11.ok,
+	profile13.ok, profile14.ok, profile15.ok, profile16.ok,
+	profile17.ok: Updated after code change.
+
+2024-09-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRADIST): New test, delmessy.
+	* delmessy.awk, delmessy.ok: New files.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.1: Release tar made.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Adjusted.
+	* Makefile.am: Sort the big bunches of tests.
+	(makepmafile): Reference $(srcdir).
+
+2024-09-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, matchuninitialized.
+	* matchuninitialized.awk, matchuninitialized.ok: New files.
+	Thanks to prospero <prospero@cyber-wizard.com> for the test.
+
+2024-09-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* backbigs1.in, backbigs1.ok: Use a valid non-space
+	character instead of an invalid one.
+
+2024-08-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (makepmafile): Don't ues $< in the rule, that's a
+	GNU Make extension. Thanks to Nelson H.F. Beebe for the heads-up.
+
+2024-08-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* badargs.ok: Updated.
+
+2024-08-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, nsprof3.
+	* nsprof3.awk, nsprof3.ok: New files.
+
+2024-08-11  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile.am (NEED_TESTOUTCMP): Add printf-corners.
+
+2024-08-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (colonwarn): Fix to use AWKPATH.
+	* colonwarn.ok, badargs.ok: Updated.
+
+2024-08-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (colonwarn): Save stderr to get the warnings.
+	Thanks to Michal Jaegermann <michal.jnn@gmail.com>.
+
+2024-08-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* printf-corners.awk, printf-corners.ok, printf-corners-mpfr: Add
+	six additional test cases. Thanks to Maciej W. Rozycki
+	<macro@redhat.com>.
+
+2024-07-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* trailbs.ok: Updated (again) after minrx code change.
+
+2024-07-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* trailbs.ok: Updated after minrx code change.
+
+2024-07-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* printf-corners.awk, printf-corners.ok, printf-corners-mpfr: Add
+	an additional test case.
+
+2024-07-05         Maciej W. Rozycki     <macro@redhat.com>
+
+	* printf-corners.awk, printf-corners.ok, printf-corners-mpfr: Remove
+	cases with "inf" input.  Add further cases.
+
+2024-07-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, printf-corners.
+	* printf-corners.awk, printf-corners.ok, printf-corners-mpfr.ok: New
+	files.
+
+2024-06-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* hsprint.awk: Add headers to output, fix printing of
+	format string.
+	* hsprint.ok: Updated.
+
+2024-06-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): Add asortsymtab-mpfr.ok.
+	* asortsymtab-mpfr.ok: New file.
+	* testext-mpfr.ok: Updated.
+
+2024-06-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Gentests: Change `egrep -q' to `egrep -s' for greater portability.
+	* Makefile.am: Change uses of `grep -E' to `egrep -s' for
+	more portability.
+	Thanks to Nelson Beebe for the reports.
+
+2024-05-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* paramres.ok: Updated after code change.
+
+2024-04-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New tests: strsubscript.
+	* strsubscript.awk, strsubscript.ok: New files.
+
+2024-04-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* backbigs1.ok: Adjust.
+
+2024-02-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	MinRX changes.
+
+	* Makefile.am (EXTRA_DIST): regexuparrow is a new test.
+	* regexuparrow.awk, regexuparrow.in, regexuparrow.ok: New files.
+	* lintwarn.awk: Comment out a now invalid test.
+	* lintwarn.ok: Adjust.
+	* regex3minus.ok: Adjust.
+	* regexpbad.ok: Adjust.
+	* reindops.awk, reindops.ok: Adjust.
+	* trailbs.ok: Adjust.
+
+2024-02-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Gentests: Add GAWK_TEST_ARGS to .sh tests.
+
+2024-01-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New tests: match4.
+	* match4.awk, match4.ok: New files.
+
+2023-12-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New tests: dbugarray3, dbugarray4.
+	* dbugarray3.awk, dbugarray3.in, dbugarray3.ok,
+	dbugarray4.awk, dbugarray4.in, dbugarray4.ok: New files.
+
+2023-12-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test: dbugarray2.
+	* dbugarray2.awk, dbugarray2.in, dbugarray2.ok: New files.
+
+2023-12-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test: dbugarray1.
+	* dbugarray1.awk, dbugarray1.in, dbugarray1.ok: New files.
+
+2023-11-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New tests: typeof7 and typeof8.
+	* typeof7.awk, typeof7.ok, typeof8.awk, typeof8.ok: New files.
+
+2023-11-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): New test, re_test.
+	* re_test.awk, re_test.in, re_test.ok: New files.
+
 2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* 5.3.0: Release tar ball made.
@@ -484,13 +950,13 @@
 
 2021-10-13         Arnold D. Robbins     <arnold@skeeve.com>
 
-	* Gentest: Add check for ZOS_FAIL targets that have to
+	* Gentests: Add check for ZOS_FAIL targets that have to
 	be edited manually.
 	* Makefile.am: Update relevant targets.
 
 	Unrelated:
 
-	* Makefile.am: Uupdate copryight year, reformat some of the lists.
+	* Makefile.am: Update copryight year, reformat some of the lists.
 
 2021-09-27         Andrew J. Schorr      <aschorr@telemetry-investments.com>
 
@@ -764,7 +1230,7 @@
 
 2020-06-10         Arnold D. Robbins     <arnold@skeeve.com>
 
-	Miscellanious fixes from Michael Builov <mbuilov@gmail.com>.
+	Miscellaneous fixes from Michael Builov <mbuilov@gmail.com>.
 
 	* Gentests: Use correct locale for JP.
 

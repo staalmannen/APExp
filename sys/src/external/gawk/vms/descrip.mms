@@ -14,7 +14,7 @@
 #
 # awkgram.c :
 #	If you don't have bison but do have VMS POSIX or DEC/Shell,
-#	change the PARSER and PASERINIT macros to use yacc.  If you don't
+#	change the PARSER and PARSERINIT macros to use yacc.  If you don't
 #	have either yacc or bison, you'll have to make sure that the
 #	distributed version of "awkgram.c" has its modification date later
 #	than the date of "awkgram.y", so that MMS won't try to build that
@@ -52,32 +52,6 @@ MAKEFILE = $(VMSDIR)Descrip.MMS
 # Do not specify _POSIX_EXIT here, other tricks are used for this.
 CDEFS	= "GAWK","HAVE_CONFIG_H"
 
-.ifdef GNUC
-# assumes VAX
-# GCC has not been tested for decades.
-# GCC/VAX since OpenVMS 5.5 can use the AACRTL060 redistributable
-# kit instead of vaxcrtl.olb for much better results.
-# This will likely need a lot of changes if GCC is re-implemented
-# for OpenVMS.
-CC	= gcc
-CFLAGS	= /Incl=([],$(VMSDIR))/Obj=[]/Def=($(CDEFS)) $(CCFLAGS)
-LIBS	= gnu_cc:[000000]gcclib.olb/Library,sys$library:vaxcrtl.olb/Library
-.ifdef DO_GNUC_SETUP
-# in case GCC command verb needs to be manually defined
-.first
-	set command gnu_cc:[000000]gcc
-.endif	!DO_GNUC_SETUP
-.else	!!GNUC
-.ifdef VAXC
-# always VAX; versions of VAX C older than V3.2 won't work
-# VAXC SUPPORT will likely be removed in a future release
-# VAXC should not be used past OpenVMS/VAX 5.4
-# Before VAX 5.4 consider using GCC/VAX
-# Obviously this has also not been tested for decades
-CC	= cc
-CFLAGS	= /Incl=[]/Obj=[]/Opt=noInline/Def=($(CDEFS)) $(CCFLAGS)
-LIBS	= sys$share:vaxcrtl.exe/Shareable
-.else	!!VAXC
 # neither GNUC nor VAXC, assume DECC (same for either VAX or Alpha)
 .ifdef __VAX__
 CFLOAT  =
@@ -90,8 +64,6 @@ CINC1   = sys$disk:[],sys$disk:[.VMS],$(SUPPORT)
 CFLAGS	= /Incl=($(CINC1))/Obj=[]/Def=($(CDEFS))$(CNAME) $(CCFLAGS)
 CEFLAGS = /Incl=($(CINC1),[.missing_d],[.extension])$(CNAME) $(CCFLAGS)
 LIBS	=	# DECC$SHR instead of VAXCRTL, no special link option needed
-.endif	!VAXC
-.endif	!GNUC
 
 
 PARSER	= bison
@@ -114,19 +86,29 @@ NOOP = continue
 # object files
 GAWKOBJ = eval.obj,profile.obj
 AWKOBJ1 = array.obj,awkgram.obj,builtin.obj,cint_array.obj,\
-	command.obj,debug.obj,dfa.obj,dynarrray_resize.obj,ext.obj,field.obj,\
+	command.obj,debug.obj,dfa.obj,ext.obj,field.obj,\
 	floatcomp.obj,gawkapi.obj,gawkmisc.obj,getopt.obj,getopt1.obj
 
 AWKOBJ2 = int_array.obj,io.obj,localeinfo.obj,main.obj,mpfr.obj,msg.obj,\
-	node.obj,random.obj,re.obj,regex.obj,replace.obj,\
-	str_array.obj,symbol.obj,version.obj
+	node.obj,random.obj,re.obj,minrx.obj,regex.obj,replace.obj,\
+	str_array.obj,symbol.obj,version.obj,printf.obj
 
+AWKOBJ3 = dynarray_at_failure.obj,dynarrray_emplace_enlarge.obj,\
+      dynarrray_finalize.obj,dynarrray_resize.obj
+
+.ifdef __VAX__
+# Currently failing to compile on vax/vms with this error:
+# %RMS-W-RTB, 257 byte record too large for user's buffer
 AWKOBJS = $(AWKOBJ1),$(AWKOBJ2)
+.else
+AWKOBJS = $(AWKOBJ1),$(AWKOBJ2),$(AWKOBJ3)
+.endif
+
 
 # VMSOBJS
 #	VMS specific stuff
 VMSCODE = vms_misc.obj,vms_popen.obj,vms_fwrite.obj,vms_args.obj,\
-	vms_gawk.obj,vms_cli.obj,vms_crtl_init.obj
+	vms_gawk.obj,vms_cli.obj,vms_crtl_init.obj,vms_printf.obj
 VMSCMD	= gawk_cmd.obj			# built from .cld file
 VMSOBJS = $(VMSCODE),$(VMSCMD)
 
@@ -138,10 +120,10 @@ all : gawk gawk_debug
 
 # dummy target to allow building "gawk" in addition to explicit "gawk.exe"
 gawk : gawk.exe
-      @	$(ECHO) "$< is upto date"
+      @	$(ECHO) "$< is up to date"
 
 gawk_debug : gawk_debug.exe
-      @	$(ECHO) "$< is upto date"
+      @	$(ECHO) "$< is up to date"
 
 # rules to build gawk
 gawk.exe : $(GAWKOBJ) $(AWKOBJS) $(VMSOBJS) gawk.opt
@@ -156,6 +138,7 @@ gawk.opt : $(MAKEFILE) config.h         # create linker options file
       @ write opt "$(GAWKOBJ)"
       @ write opt "$(AWKOBJ1)"
       @ write opt "$(AWKOBJ2)"
+      @ write opt "$(AWKOBJ3)"
       @ write opt "$(VMSOBJS)"
       @ write opt "psect_attr=environ,noshr	!extern [noshare] char **"
       @ write opt "stack=48	!preallocate more pages (default is 20)"
@@ -182,54 +165,72 @@ command.obj	: command.c cmd.h
 debug.obj	: debug.c cmd.h
 dfa.obj		: $(SUPPORT)dfa.c $(SUPPORT)dfa.h
 
+
+# MMS 4.0 gets MMS$SOURCE wrong for the $(MALLOC) and $(SUPPORT) paths.
+dynarray_at_failure.obj : $(MALLOC)dynarray_at_failure.c $(MALLOC)dynarray.h
+    $define/user malloc $(MALLOC)
+    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
+      $(MALLOC)dynarray_at_failure.c
+
+dynarrray_emplace_enlarge.obj : $(MALLOC)dynarray_emplace_enlarge.c \
+       $(MALLOC)dynarray.h
+    $define/user malloc $(MALLOC)
+    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
+      $(MALLOC)dynarray_emplace_enlarge.c
+
+dynarrray_finalize.obj : $(MALLOC)dynarray_finalize.c $(MALLOC)dynarray.h
+    $define/user malloc $(MALLOC)
+    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
+      $(MALLOC)dynarray_finalize.c
+
 dynarrray_resize.obj : $(MALLOC)dynarray_resize.c $(MALLOC)dynarray.h
     $define/user malloc $(MALLOC)
-    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) $(MMS$SOURCE)
+    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
+      $(MALLOC)dynarray_resize.c
 
 ext.obj		: ext.c
 eval.obj	: eval.c
 field.obj	: field.c
 floatcomp.obj	: floatcomp.c
-gawkaoi.obj	: gawkapi.c
+gawkapi.obj	: gawkapi.c
 gawkmisc.obj	: gawkmisc.c $(VMSDIR)gawkmisc.vms
 getopt.obj	: $(SUPPORT)getopt.c
 getopt1.obj	: $(SUPPORT)getopt1.c
 int_array.obj	: int_array.c
 io.obj		: io.c
 localeinfo.obj  : $(SUPPORT)localeinfo.c
-main.obj	: main.c
+main.obj    : main.c
+minrx.obj   : $(SUPPORT)minrx.c
 msg.obj		: msg.c
 mpfr.obj	: mpfr.c
 node.obj	: node.c
+printf.obj      : printf.c
 profile.obj	: profile.c
 random.obj	: $(SUPPORT)random.c $(SUPPORT)random.h
 re.obj		: re.c
 
+# MMS 4.0 gets MMS$SOURCE wrong for the $(MALLOC) and $(SUPPORT) paths.
 regex.obj	: $(SUPPORT)regex.c $(SUPPORT)regcomp.c \
 		  $(SUPPORT)regex_internal.c $(SUPPORT)regexec.c \
 		  $(SUPPORT)regex.h $(SUPPORT)regex_internal.h \
                   $(MALLOC)dynarray.h
     $define/user malloc $(MALLOC)
-    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) $(MMS$SOURCE)
+    $(CC)$(CEFLAGS)/define=(HAVE_CONFIG_H)/object=$(MMS$TARGET) \
+      $(SUPPORT)regex.c
 
+regexec.obj : $(SUPPORT)regexec.c
 str_array.obj	: str_array.c
 symbol.obj	: symbol.c
 version.obj	: version.c
 vms_misc.obj	: $(VMSDIR)vms_misc.c
 vms_popen.obj	: $(VMSDIR)vms_popen.c
+vms_printf.obj  : $(VMSDIR)vms_printf.c
 vms_fwrite.obj	: $(VMSDIR)vms_fwrite.c
 vms_args.obj	: $(VMSDIR)vms_args.c
 vms_gawk.obj	: $(VMSDIR)vms_gawk.c
 vms_cli.obj	: $(VMSDIR)vms_cli.c
 vms_crtl_init.obj : $(VMSDIR)vms_crtl_init.c
-replace.obj	: replace.c $(MISSNGD)system.c $(MISSNGD)memcmp.c \
-		  $(MISSNGD)memcpy.c $(MISSNGD)memset.c $(MISSNGD)memmove.c \
-		  $(MISSNGD)strncasecmp.c $(MISSNGD)strerror.c \
-		  $(MISSNGD)strftime.c $(MISSNGD)strchr.c $(MISSNGD)strtod.c \
-		  $(MISSNGD)strtoul.c $(MISSNGD)tzset.c $(MISSNGD)mktime.c \
-		  $(MISSNGD)snprintf.c $(MISSNGD)getaddrinfo.c \
-		  $(MISSNGD)usleep.c \
-		  $(MISSNGD)setenv.c $(MISSNGD)strcoll.c $(MISSNGD)wcmisc.c
+replace.obj	: replace.c
 
 # bison or yacc have not been ported to current VMS versions
 # When that changes, this can be restored.
@@ -256,8 +257,10 @@ replace.obj	: replace.c $(MISSNGD)system.c $(MISSNGD)memcmp.c \
 #     @- if f$search("command_tab.c").nes."" then \
 #            rename/new_vers command_tab.c $@
 
+# changing to be manually maintained.
 config_vms.h : $(VMSDIR)generate_config_vms_h_gawk.com
-     $ @$(VMSDIR)generate_config_vms_h_gawk.com
+      $ copy sys$disk:[.vms]config_vms.h sys$disk:[]config_vms.h
+#     $ @$(VMSDIR)generate_config_vms_h_gawk.com
 
 config.h	: configh.in config_vms.h $(VMSDIR)config_h.com
      $ @$(VMSDIR)config_h.com
@@ -282,37 +285,39 @@ ext_gawkdirfd_h = [.extension]gawkdirfd.h config.h nonposix.h
 
 extensions : filefuncs.exe fnmatch.exe inplace.exe ordchr.exe readdir.exe \
 	revoutput.exe revtwoway.exe rwarray.exe testext.exe time.exe
+        @ write sys$output "$< are up to date"
 
-filefuncs.exe : filefuncs.obj stack.obj gawkfts.obj $(plug_opt)
+filefuncs.exe : filefuncs.obj stack.obj gawkfts.obj \
+           vms_printf.obj $(plug_opt)
 	link/share=$(MMS$TARGET) $(MMS$SOURCE), stack.obj, gawkfts.obj, \
-		$(plug_opt)/opt
+		vms_printf.obj, $(plug_opt)/opt
 
-fnmatch.exe : fnmatch.obj $(plug_opt)
-	link/share=$(MMS$TARGET) $(MMS$SOURCE), $(plug_opt)/opt
+fnmatch.exe : fnmatch.obj vms_printf.obj $(plug_opt)
+	link/share=$(MMS$TARGET) $(MMS$SOURCE), vms_printf.obj,  $(plug_opt)/opt
 
-inplace.exe : inplace.obj $(plug_opt)
-	link/share=$(MMS$TARGET) $(MMS$SOURCE), $(plug_opt)/opt
+inplace.exe : inplace.obj vms_printf.obj $(plug_opt)
+	link/share=$(MMS$TARGET) $(MMS$SOURCE), vms_printf.obj, $(plug_opt)/opt
 
-ordchr.exe : ordchr.obj $(plug_opt)
-	link/share=$(MMS$TARGET) $(MMS$SOURCE), $(plug_opt)/opt
+ordchr.exe : ordchr.obj vms_printf.obj $(plug_opt)
+	link/share=$(MMS$TARGET) $(MMS$SOURCE), vms_printf.obj, $(plug_opt)/opt
 
-readdir.exe : readdir.obj $(plug_opt)
-	link/share=$(MMS$TARGET) $(MMS$SOURCE), $(plug_opt)/opt
+readdir.exe : readdir.obj vms_printf.obj $(plug_opt)
+	link/share=$(MMS$TARGET) $(MMS$SOURCE), vms_printf.obj, $(plug_opt)/opt
 
-revoutput.exe : revoutput.obj $(plug_opt)
-	link/share=$(MMS$TARGET) $(MMS$SOURCE), $(plug_opt)/opt
+revoutput.exe : revoutput.obj vms_printf.obj $(plug_opt)
+	link/share=$(MMS$TARGET) $(MMS$SOURCE), vms_printf.obj, $(plug_opt)/opt
 
-revtwoway.exe : revtwoway.obj $(plug_opt)
-	link/share=$(MMS$TARGET) $(MMS$SOURCE), $(plug_opt)/opt
+revtwoway.exe : revtwoway.obj vms_printf.obj $(plug_opt)
+	link/share=$(MMS$TARGET) $(MMS$SOURCE), vms_printf.obj, $(plug_opt)/opt
 
-rwarray.exe : rwarray.obj $(plug_opt)
-	link/share=$(MMS$TARGET) $(MMS$SOURCE), $(plug_opt)/opt
+rwarray.exe : rwarray.obj vms_printf.obj $(plug_opt)
+	link/share=$(MMS$TARGET) $(MMS$SOURCE), vms_printf.obj, $(plug_opt)/opt
 
-testext.exe : testext.obj $(plug_opt)
-	link/share=$(MMS$TARGET) $(MMS$SOURCE), $(plug_opt)/opt
+testext.exe : testext.obj vms_printf.obj $(plug_opt)
+	link/share=$(MMS$TARGET) $(MMS$SOURCE), vms_printf.obj, $(plug_opt)/opt
 
-time.exe : time.obj $(plug_opt)
-	link/share=$(MMS$TARGET) $(MMS$SOURCE), $(plug_opt)/opt
+time.exe : time.obj vms_printf.obj $(plug_opt)
+	link/share=$(MMS$TARGET) $(MMS$SOURCE), vms_printf.obj, $(plug_opt)/opt
 
 stack.obj : [.extension]stack.c config.h gawkapi.h \
 	[.extension]gawkfts.h, [.extension]stack.h

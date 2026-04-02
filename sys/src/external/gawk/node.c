@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2001, 2003-2015, 2017-2019, 2021, 2022, 2023,
+ * Copyright (C) 1986, 1988, 1989, 1991-2001, 2003-2015, 2017-2019, 2021-2026,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -61,10 +61,8 @@ r_force_number(NODE *n)
 	char *ptr;
 
 	if (n->type == Node_elem_new) {
+		elem_new_reset(n);
 		n->type = Node_val;
-		n->flags &= ~STRING;
-		n->stptr[0] = '0';	// STRCUR is still set
-		n->stlen = 1;
 
 		return n;
 	}
@@ -234,7 +232,7 @@ r_format_val(const char *format, int index, NODE *s)
 		const char *result = format_nan_inf(s, 'g');
 		return make_string(result, strlen(result));
 	} else if ((val = double_to_int(s->numbr)) != s->numbr
-			|| val <= LONG_MIN || val >= LONG_MAX
+			|| val <= (double)LONG_MIN || val >= (double)LONG_MAX
 	) {
 		/* not an integral value, or out of integer range */
 		/*
@@ -249,16 +247,16 @@ r_format_val(const char *format, int index, NODE *s)
 		NODE *dummy[2], *r;
 		unsigned int oflags;
 
-		/* create dummy node for a sole use of format_tree */
+		/* create dummy node for a sole use of format_args */
 		dummy[1] = s;
 		oflags = s->flags;
 
 		if (val == s->numbr) {
 			/* integral value, but outside range of %ld, use %.0f */
-			r = format_tree("%.0f", 4, dummy, 2);
+			r = format_args("%.0f", 4, dummy, 2);
 			s->stfmt = STFMT_UNUSED;
 		} else {
-			r = format_tree(format, fmt_list[index]->stlen, dummy, 2);
+			r = format_args(format, fmt_list[index]->stlen, dummy, 2);
 			assert(r != NULL);
 			s->stfmt = index;
 		}
@@ -297,7 +295,7 @@ r_format_val(const char *format, int index, NODE *s)
 	}
 	if ((s->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
 		efree(s->stptr);
-	emalloc(s->stptr, char *, s->stlen + 1, "format_val");
+	emalloc(s->stptr, char *, s->stlen + 1);
 	memcpy(s->stptr, sp, s->stlen + 1);
 no_malloc:
 	s->flags |= STRCUR;
@@ -346,14 +344,14 @@ r_dupnode(NODE *n)
 	r->wstlen = 0;
 
 	if ((n->flags & STRCUR) != 0) {
-		emalloc(r->stptr, char *, n->stlen + 1, "r_dupnode");
+		emalloc(r->stptr, char *, n->stlen + 1);
 		memcpy(r->stptr, n->stptr, n->stlen);
 		r->stptr[n->stlen] = '\0';
 		r->stlen = n->stlen;
 		if ((n->flags & WSTRCUR) != 0) {
 			r->wstlen = n->wstlen;
-			emalloc(r->wstptr, wchar_t *, sizeof(wchar_t) * (n->wstlen + 1), "r_dupnode");
-			memcpy(r->wstptr, n->wstptr, n->wstlen * sizeof(wchar_t));
+			emalloc(r->wstptr, char32_t *, sizeof(char32_t) * (n->wstlen + 1));
+			memcpy(r->wstptr, n->wstptr, n->wstlen * sizeof(char32_t));
 			r->wstptr[n->wstlen] = L'\0';
 			r->flags |= WSTRCUR;
 		}
@@ -405,6 +403,7 @@ make_str_node(const char *s, size_t len, int flags)
 {
 	NODE *r;
 	getnode(r);
+	memset(r, '\0', sizeof(NODE));
 	r->type = Node_val;
 	r->numbr = 0;
 	r->flags = (MALLOC|STRING|STRCUR);
@@ -419,7 +418,7 @@ make_str_node(const char *s, size_t len, int flags)
 	if ((flags & ALREADY_MALLOCED) != 0)
 		r->stptr = (char *) s;
 	else {
-		emalloc(r->stptr, char *, len + 1, "make_str_node");
+		emalloc(r->stptr, char *, len + 1);
 		memcpy(r->stptr, s, len);
 	}
 	r->stptr[len] = '\0';
@@ -491,7 +490,7 @@ make_str_node(const char *s, size_t len, int flags)
 				*ptm++ = c;
 		}
 		len = ptm - r->stptr;
-		erealloc(r->stptr, char *, len + 1, "make_str_node");
+		erealloc(r->stptr, char *, len + 1);
 		r->stptr[len] = '\0';
 	}
 	r->stlen = len;
@@ -541,7 +540,21 @@ r_unref(NODE *tmp)
 	if ((tmp->flags & (MALLOC|STRCUR)) == (MALLOC|STRCUR))
 		efree(tmp->stptr);
 
+	if ((tmp->flags & REGEX) != 0) {
+		refree(tmp->typed_re->re_reg[0]);
+		if (tmp->typed_re->re_reg[1] != NULL)
+			refree(tmp->typed_re->re_reg[1]);
+		unref(tmp->typed_re->re_exp);
+		freenode(tmp->typed_re);
+	}
+
 	mpfr_unset(tmp);
+
+	if (tmp->type == Node_elem_new && tmp->elemnew_vname != NULL)
+		efree(tmp->elemnew_vname);
+	else if ((tmp->type == Node_var || tmp->type == Node_var_new)
+			&& tmp->vname != NULL)
+		efree(tmp->vname);
 
 	free_wstr(tmp);
 	freenode(tmp);
@@ -558,7 +571,7 @@ r_unref(NODE *tmp)
  *
  * Return values:
  *	ESCAPE_OK,		// nbytes == 1 to MB_CUR_MAX: the length of the translated escape sequence
- *	ESCAPE_CONV_ERR,	// wcrtomb conversion error
+ *	ESCAPE_CONV_ERR,	// c32rtomb conversion error
  *	ESCAPE_TERM_BACKSLASH,	// terminal backslash (to be preserved in cmdline strings)
  *	ESCAPE_LINE_CONTINUATION	// line continuation  (backslash-newline pair)
  *
@@ -571,7 +584,7 @@ parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 	static char buf[MB_LEN_MAX];
 	enum escape_results retval = ESCAPE_OK;
 	int c = *(*string_ptr)++;
-	int i;
+	long i;
 	int count;
 	int j;
 	const char *start;
@@ -680,9 +693,7 @@ parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 	case 'u':
 	{
 		size_t n;
-#ifndef __MINGW32__
 		mbstate_t mbs;
-#endif
 
 		if (do_lint) {
 			static bool warned = false;
@@ -718,15 +729,12 @@ parse_escape(const char **string_ptr, const char **result, size_t *nbytes)
 				break;
 			}
 		}
-#ifdef __MINGW32__
-		n = w32_wc_to_lc (i, buf);
-#elif defined (__CYGWIN__)
 		memset(& mbs, 0, sizeof(mbs));
+#if defined (__CYGWIN__)
 		n = wcitomb(buf, i, & mbs);
 #else
-		memset(& mbs, 0, sizeof(mbs));
-		n = wcrtomb(buf, i, & mbs);
-#endif	/* !__MINGW32__ */
+		n = c32rtomb(buf, i, & mbs);
+#endif	/* !__CYGWIN__ */
 		if (n == (size_t) -1) {
 			warning(_("invalid `\\u' escape sequence"));
 			retval = ESCAPE_CONV_ERR;
@@ -813,10 +821,24 @@ str2wstr(NODE *n, size_t **ptr)
 	size_t i, count, src_count;
 	char *sp;
 	mbstate_t mbs;
-	wchar_t wc, *wsp;
+	char32_t wc, *wsp;
 	static bool warned = false;
 
 	assert((n->flags & (STRING|STRCUR)) != 0);
+
+	/*
+	 * For use by do_match, create and fill in an array.
+	 * For each byte `i' in n->stptr (the original string),
+	 * a[i] is equal to `j', where `j' is the corresponding char32_t
+	 * in the converted wide string.
+	 *
+	 * This is needed even for Nnull_string or Null_field.
+	 *
+	 * Create the array.
+	 */
+	if (ptr != NULL) {
+		ezalloc(*ptr, size_t *, sizeof(size_t) * (n->stlen + 1));
+	}
 
 	/*
 	 * Don't convert global null string or global null field
@@ -838,9 +860,9 @@ str2wstr(NODE *n, size_t **ptr)
 	/*
 	 * After consideration and consultation, this
 	 * code trades space for time. We allocate
-	 * an array of wchar_t that is n->stlen long.
+	 * an array of char32_t that is n->stlen long.
 	 * This is needed in the worst case anyway, where
-	 * each input byte maps to one wchar_t.  The
+	 * each input byte maps to one char32_t.  The
 	 * advantage is that we only have to convert the string
 	 * once, instead of twice, once to find out how many
 	 * wide characters, and then again to actually fill in
@@ -848,20 +870,8 @@ str2wstr(NODE *n, size_t **ptr)
 	 * realloc the wide string down in size.
 	 */
 
-	emalloc(n->wstptr, wchar_t *, sizeof(wchar_t) * (n->stlen + 1), "str2wstr");
+	emalloc(n->wstptr, char32_t *, sizeof(char32_t) * (n->stlen + 1));
 	wsp = n->wstptr;
-
-	/*
-	 * For use by do_match, create and fill in an array.
-	 * For each byte `i' in n->stptr (the original string),
-	 * a[i] is equal to `j', where `j' is the corresponding wchar_t
-	 * in the converted wide string.
-	 *
-	 * Create the array.
-	 */
-	if (ptr != NULL) {
-		ezalloc(*ptr, size_t *, sizeof(size_t) * (n->stlen + 1), "str2wstr");
-	}
 
 	sp = n->stptr;
 	src_count = n->stlen;
@@ -877,7 +887,7 @@ str2wstr(NODE *n, size_t **ptr)
 			count = 1;
 			wc = btowc_cache(*sp);
 		} else
-			count = mbrtowc(& wc, sp, src_count, & mbs);
+			count = mbrtoc32(& wc, sp, src_count, & mbs);
 		switch (count) {
 		case (size_t) -2:
 		case (size_t) -1:
@@ -942,7 +952,7 @@ str2wstr(NODE *n, size_t **ptr)
 	n->flags |= WSTRCUR;
 #define ARBITRARY_AMOUNT_TO_GIVE_BACK 100
 	if (n->stlen - n->wstlen > ARBITRARY_AMOUNT_TO_GIVE_BACK)
-		erealloc(n->wstptr, wchar_t *, sizeof(wchar_t) * (n->wstlen + 1), "str2wstr");
+		erealloc(n->wstptr, char32_t *, sizeof(char32_t) * (n->wstlen + 1));
 
 	return n;
 }
@@ -954,7 +964,7 @@ wstr2str(NODE *n)
 {
 	size_t result;
 	size_t length;
-	wchar_t *wp;
+	char32_t *wp;
 	mbstate_t mbs;
 	char *newval, *cp;
 
@@ -969,11 +979,11 @@ wstr2str(NODE *n)
 	memset(& mbs, 0, sizeof(mbs));
 
 	length = n->wstlen;
-	emalloc(newval, char *, (length * gawk_mb_cur_max) + 1, "wstr2str");
+	emalloc(newval, char *, (length * gawk_mb_cur_max) + 1);
 
 	wp = n->wstptr;
 	for (cp = newval; length > 0; length--) {
-		result = wcrtomb(cp, *wp, & mbs);
+		result = c32rtomb(cp, *wp, & mbs);
 		if (result == (size_t) -1)	/* what to do? break seems best */
 			break;
 		cp += result;
@@ -1006,7 +1016,7 @@ r_free_wstr(NODE *n)
 }
 
 static void __attribute__ ((unused))
-dump_wstr(FILE *fp, const wchar_t *str, size_t len)
+dump_wstr(FILE *fp, const char32_t *str, size_t len)
 {
 	if (str == NULL || len == 0)
 		return;
@@ -1017,9 +1027,9 @@ dump_wstr(FILE *fp, const wchar_t *str, size_t len)
 
 /* wstrstr --- walk haystack, looking for needle, wide char version */
 
-const wchar_t *
-wstrstr(const wchar_t *haystack, size_t hs_len,
-	const wchar_t *needle, size_t needle_len)
+const char32_t *
+wstrstr(const char32_t *haystack, size_t hs_len,
+	const char32_t *needle, size_t needle_len)
 {
 	size_t i;
 
@@ -1031,7 +1041,7 @@ wstrstr(const wchar_t *haystack, size_t hs_len,
 		    && i+needle_len-1 < hs_len
 		    && haystack[i+needle_len-1] == needle[needle_len-1]) {
 			/* first & last chars match, check string */
-			if (memcmp(haystack+i, needle, sizeof(wchar_t) * needle_len) == 0) {
+			if (memcmp(haystack+i, needle, sizeof(char32_t) * needle_len) == 0) {
 				return haystack + i;
 			}
 		}
@@ -1042,9 +1052,9 @@ wstrstr(const wchar_t *haystack, size_t hs_len,
 
 /* wcasestrstr --- walk haystack, nocase look for needle, wide char version */
 
-const wchar_t *
-wcasestrstr(const wchar_t *haystack, size_t hs_len,
-	const wchar_t *needle, size_t needle_len)
+const char32_t *
+wcasestrstr(const char32_t *haystack, size_t hs_len,
+	const char32_t *needle, size_t needle_len)
 {
 	size_t i, j;
 
@@ -1056,11 +1066,11 @@ wcasestrstr(const wchar_t *haystack, size_t hs_len,
 		    && i+needle_len-1 < hs_len
 		    && towlower(haystack[i+needle_len-1]) == towlower(needle[needle_len-1])) {
 			/* first & last chars match, check string */
-			const wchar_t *start;
+			const char32_t *start;
 
 			start = haystack+i;
 			for (j = 0; j < needle_len; j++, start++) {
-				wchar_t h, n;
+				char32_t h, n;
 
 				h = towlower(*start);
 				n = towlower(needle[j]);
@@ -1150,7 +1160,7 @@ void *
 r_getblock(int id)
 {
 	void *res;
-	emalloc(res, void *, nextfree[id].size, "getblock");
+	emalloc(res, void *, nextfree[id].size);
 	nextfree[id].active++;
 	if (nextfree[id].highwater < nextfree[id].active)
 		nextfree[id].highwater = nextfree[id].active;
@@ -1180,7 +1190,7 @@ more_blocks(int id)
 	size = nextfree[id].size;
 
 	assert(size >= sizeof(struct block_item));
-	emalloc(freep, struct block_item *, BLOCKCHUNK * size, "more_blocks");
+	emalloc(freep, struct block_item *, BLOCKCHUNK * size);
 	p = (char *) freep;
 	endp = p + BLOCKCHUNK * size;
 

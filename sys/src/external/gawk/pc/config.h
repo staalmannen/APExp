@@ -15,8 +15,8 @@
 /* Define to 1 if the `getpgrp' function requires zero arguments. */
 #define GETPGRP_VOID 1
 
-/* Define to 1 if you have the `alarm' function. */
-#define HAVE_ALARM 1
+/* Define to 1 if we have ADDR_NO_RANDOMIZE value */
+#undef HAVE_ADDR_NO_RANDOMIZE
 
 /* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
@@ -27,6 +27,9 @@
 /* Define to 1 if you have the `btowc' function. */
 #define HAVE_BTOWC 1
 
+/* Define to 1 if you have the `c32rtomb' function. */
+#undef HAVE_C32RTOMB
+
 /* Define to 1 if you have the Mac OS X function
    CFLocaleCopyPreferredLanguages in the CoreFoundation framework. */
 #undef HAVE_CFLOCALECOPYPREFERREDLANGUAGES
@@ -34,6 +37,9 @@
 /* Define to 1 if you have the Mac OS X function CFPreferencesCopyAppValue in
    the CoreFoundation framework. */
 #undef HAVE_CFPREFERENCESCOPYAPPVALUE
+
+/* Define to 1 if you have the `clock_gettime' function. */
+#undef HAVE_CLOCK_GETTIME
 
 /* Define to 1 if bool, true and false work as per C2023. */
 #undef HAVE_C_BOOL
@@ -64,6 +70,9 @@
 /* have getaddrinfo */
 #define HAVE_GETADDRINFO 1
 
+/* Define to 1 if you have the `getdtablesize' function. */
+#undef HAVE_GETDTABLESIZE
+
 /* Define to 1 if you have the `getgrent' function. */
 #undef HAVE_GETGRENT
 
@@ -72,6 +81,9 @@
 
 /* Define if the GNU gettext() function is already present or preinstalled. */
 #undef HAVE_GETTEXT
+
+/* Define to 1 if you have the `gettimeofday' function. */
+#undef HAVE_GETTIMEOFDAY
 
 /* Define to 1 if you have the `grantpt' function. */
 #undef HAVE_GRANTPT
@@ -94,15 +106,6 @@
 /* Define to 1 if you have the `isblank' function. */
 #undef HAVE_ISBLANK
 
-/* Define to 1 if you have the `iswctype' function. */
-#define HAVE_ISWCTYPE 1
-
-/* Define to 1 if you have the `iswlower' function. */
-#define HAVE_ISWLOWER 1
-
-/* Define to 1 if you have the `iswupper' function. */
-#define HAVE_ISWUPPER 1
-
 /* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
 #define HAVE_LANGINFO_CODESET 1
 
@@ -124,8 +127,8 @@
 /* Define to 1 if you have the `lstat' function. */
 #undef HAVE_LSTAT
 
-/* Define to 1 if you have the `mbrlen' function. */
-#define HAVE_MBRLEN 1
+/* Define to 1 if you have the `mbrtoc32' function. */
+#undef HAVE_MBRTOC32
 
 /* Define to 1 if mbrtowc and mbstate_t are properly declared. */
 #define HAVE_MBRTOWC 1
@@ -133,29 +136,11 @@
 /* Define to 1 if you have the <mcheck.h> header file. */
 #undef HAVE_MCHECK_H
 
-/* Define to 1 if you have the `memcmp' function. */
-#define HAVE_MEMCMP 1
-
-/* Define to 1 if you have the `memcpy' function. */
-#define HAVE_MEMCPY 1
-
-/* Define to 1 if you have the `memmove' function. */
-#define HAVE_MEMMOVE 1
-
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Define to 1 if you have the `memset' function. */
-#define HAVE_MEMSET 1
-
 /* Define to 1 if you have the <minix/config.h> header file. */
 #undef HAVE_MINIX_CONFIG_H
-
-/* Define to 1 if you have the `mkstemp' function. */
-#undef HAVE_MKSTEMP
-
-/* we have the mktime function */
-#define HAVE_MKTIME 1
 
 /* Define to 1 if you have fully functional mpfr and gmp libraries. */
 /* #undef HAVE_MPFR */
@@ -169,8 +154,17 @@
 /* Define to 1 if you have the <netinet/in.h> header file. */
 #undef HAVE_NETINET_IN_H
 
+/* Define to 1 if you have the `personality' function. */
+#undef HAVE_PERSONALITY
+
 /* Define to 1 if you have the `posix_openpt' function. */
 #undef HAVE_POSIX_OPENPT
+
+/* Define to 1 if you have the `posix_spawnp' function. */
+#undef HAVE_POSIX_SPAWNP
+
+/* Define to 1 if you have the `procctl' function. */
+#undef HAVE_PROCCTL
 
 /* Define to 1 if you have the `setenv' function. */
 #define HAVE_SETENV 1
@@ -184,14 +178,14 @@
 /* Define to 1 if you have the `sigprocmask' function. */
 #undef HAVE_SIGPROCMASK
 
-/* Define to 1 if you have the `snprintf' function. */
-#define HAVE_SNPRINTF 1
-
 /* newer systems define this type here */
 #define HAVE_SOCKADDR_STORAGE 1
 
 /* we have sockets on this system */
 #define HAVE_SOCKETS 1
+
+/* Define to 1 if you have the <spawn.h> header file. */
+#undef HAVE_SPAWN_H
 
 /* Define to 1 if you have the <stdbool.h> header file. */
 #define HAVE_STDBOOL_H 1
@@ -213,14 +207,8 @@
 /* Define to 1 if you have the `strcasecmp' function. */
 #undef HAVE_STRCASECMP
 
-/* Define to 1 if you have the `strchr' function. */
-#define HAVE_STRCHR 1
-
 /* Define to 1 if you have the `strcoll' function. */
 #undef HAVE_STRCOLL
-
-/* Define to 1 if you have the `strerror' function. */
-#define HAVE_STRERROR 1
 
 /* Define to 1 if you have the `strftime' function. */
 /* MinGW uses the replacement from missing_d, to support the %e specifier.  */
@@ -244,12 +232,6 @@
 /* Define to 1 if you have the `strsignal' function. */
 #define HAVE_STRSIGNAL 1
 
-/* Define to 1 if you have the `strtod' function. */
-#define HAVE_STRTOD 1
-
-/* Define to 1 if you have the `strtoul' function. */
-#define HAVE_STRTOUL 1
-
 /* Define to 1 if `gr_passwd' is a member of `struct group'. */
 #undef HAVE_STRUCT_GROUP_GR_PASSWD
 
@@ -257,19 +239,25 @@
 #undef HAVE_STRUCT_PASSWD_PW_PASSWD
 
 /* Define to 1 if `st_blksize' is a member of `struct stat'. */
-#define HAVE_STRUCT_STAT_ST_BLKSIZE 1
+#undef HAVE_STRUCT_STAT_ST_BLKSIZE
 
 /* Define to 1 if `tm_zone' is a member of `struct tm'. */
 #undef HAVE_STRUCT_TM_TM_ZONE
 
-/* Define to 1 if you have the `system' function. */
-#define HAVE_SYSTEM 1
+/* Define to 1 if you have the `sysctl' function. */
+#undef HAVE_SYSCTL
 
 /* Define to 1 if you have the <sys/ioctl.h> header file. */
 #undef HAVE_SYS_IOCTL_H
 
 /* Define to 1 if you have the <sys/param.h> header file. */
 #define HAVE_SYS_PARAM_H 1
+
+/* Define to 1 if you have the <sys/personality.h> header file. */
+#undef HAVE_SYS_PERSONALITY_H
+
+/* Define to 1 if you have the <sys/procctl.h> header file. */
+#undef HAVE_SYS_PROCCTL_H
 
 /* Define to 1 if you have the <sys/select.h> header file. */
 #undef HAVE_SYS_SELECT_H
@@ -279,6 +267,9 @@
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
+
+/* Define to 1 if you have the <sys/sysctl.h> header file. */
+#undef HAVE_SYS_SYSCTL_H
 
 /* Define to 1 if you have the <sys/time.h> header file. */
 #define HAVE_SYS_TIME_H 1
@@ -295,25 +286,16 @@
 /* Define to 1 if you have the `timegm' function. */
 #undef HAVE_TIMEGM
 
-/* Define to 1 if you have the `tmpfile' function. */
-#undef HAVE_TMPFILE
-
 /* Define to 1 if your `struct tm' has `tm_zone'. Deprecated, use
    `HAVE_STRUCT_TM_TM_ZONE' instead. */
 #undef HAVE_TM_ZONE
-
-/* Define to 1 if you have the `towlower' function. */
-#define HAVE_TOWLOWER 1
-
-/* Define to 1 if you have the `towupper' function. */
-#define HAVE_TOWUPPER 1
 
 /* Define to 1 if you don't have `tm_zone' but do have the external array
    `tzname'. */
 #define HAVE_TZNAME 1
 
-/* Define to 1 if you have the `tzset' function. */
-#define HAVE_TZSET 1
+/* Define to 1 if you have the <uchar.h> header file. */
+#undef HAVE_UCHAR_H
 
 /* Define to 1 if the system has the type `uintmax_t'. */
 #define HAVE_UINTMAX_T 1
@@ -324,20 +306,11 @@
 /* Define to 1 if the system has the type `unsigned long long int'. */
 #undef HAVE_UNSIGNED_LONG_LONG_INT
 
-/* Define to 1 if you have the `usleep' function. */
-#define HAVE_USLEEP 1
-
 /* Define to 1 if you have the `waitpid' function. */
 #undef HAVE_WAITPID
 
 /* Define to 1 if you have the <wchar.h> header file. */
 #define HAVE_WCHAR_H 1
-
-/* Define to 1 if you have the `wcrtomb' function. */
-#define HAVE_WCRTOMB 1
-
-/* Define to 1 if you have the `wcscoll' function. */
-#define HAVE_WCSCOLL 1
 
 /* Define to 1 if you have the `wctype' function. */
 #define HAVE_WCTYPE 1
@@ -350,6 +323,9 @@
 
 /* systems should define this type here */
 #define HAVE_WINT_T 1
+
+/* Define to 1 if you have the `_NSGetExecutablePath' function. */
+#undef HAVE__NSGETEXECUTABLEPATH
 
 /* Define to 1 if you have the `__etoa_l' function. */
 #undef HAVE___ETOA_L
@@ -367,7 +343,7 @@
 #define PACKAGE_NAME "GNU Awk"
 
 /* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU Awk 5.3.0"
+#define PACKAGE_STRING "GNU Awk 5.4.0"
 
 /* Define to the one symbol short name of this package. */
 #define PACKAGE_TARNAME "gawk"
@@ -376,7 +352,7 @@
 #define PACKAGE_URL "http://www.gnu.org/software/gawk/"
 
 /* Define to the version of this package. */
-#define PACKAGE_VERSION "5.3.0"
+#define PACKAGE_VERSION "5.4.0"
 
 /* Define to 1 if *printf supports %a format */
 #define PRINTF_HAS_A_FORMAT 1
@@ -504,7 +480,7 @@
 
 
 /* Version number of package */
-#define VERSION "5.3.0"
+#define VERSION "5.4.0"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 #undef _FILE_OFFSET_BITS

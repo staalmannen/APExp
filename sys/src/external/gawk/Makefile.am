@@ -1,7 +1,7 @@
 #
 # Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 2000-2023 the Free Software Foundation, Inc.
+# Copyright (C) 2000-2026 the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
 # AWK Programming Language.
@@ -102,8 +102,8 @@ base_sources = \
 	msg.c \
 	node.c \
 	nonposix.h \
+	printf.c \
 	profile.c \
-	protos.h \
 	re.c \
 	replace.c \
 	str_array.c \
@@ -172,6 +172,12 @@ uninstall-recursive: uninstall-links
 
 # force there to be a gawk executable before running tests
 check-local: gawk$(EXEEXT)
+
+# on NetBSD 10, mark the exe as not using Address Space Layout Randomization
+if USE_PAXCTL
+all-local: gawk
+	paxctl +a gawk
+endif
 
 # A little extra clean up when making distributions.
 dist-hook:

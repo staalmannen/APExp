@@ -67,7 +67,7 @@ Special installation notes:
    problems with other PCSI installs and uninstalls to that directory.
 
    This bug can be manually repaired such as has been done on
-   on encompasserve.org as documented in PORTING_TO_VMS notes conference.
+   on decusserve.org as documented in PORTING_TO_VMS notes conference.
 
    At this time, we do not have a scripted repair to this bug, and it
    may not be possible to fully script a repair because this bug can
@@ -92,7 +92,7 @@ Special installation notes:
 An analyze/disk/repair step on the installation disk should be done after
 installation to collect files left over from incomplete deletions into the
 SYSLOST directory.  This step should be done on a "quiet" system per HP
-recomendations.
+recommendations.
 
 Bugs can be logged at the tracker with https://sourceforge.net/projects/gnv/.
 There is no guarantee that bugs will be fixed for a hobbyist build.
@@ -144,6 +144,10 @@ This kit is designed to be used with the GNV Bash 4.2.45 or later kit.
 
 Fixes and enhancements:
 
+ Gawk 5.0.1
+ 
+ This is the last version of GAwk that supports building on OpenVMS/VAX.
+
  Gawk 4.1.3 ECO 1
 
 * The previous GAWK kits were placing the binaries in /bin instead of
@@ -178,8 +182,9 @@ GNV$ prefix has been registered with HP for this purpose.
 OpenVMS specific building and kitting instructions are after the standard
 bash readme file below.
 
-The source kits contains files for building Gawk using MMK.
+The source kits contains files for building Gawk using MMK or MMS
 MMK 4.0 was used for this build on Alpha and Itanium Itanium.
+MMS 4.0 was used for this build on X86_64.
 
 Currently, the focus of the OpenVMS GNV porting team is to address bugs in
 the OpenVMS port of GNV components that pose immediate barriers to running

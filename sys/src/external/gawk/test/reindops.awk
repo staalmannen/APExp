@@ -1,6 +1,6 @@
 { 
 	if ($1 !~ /^+[2-9]/)
-		print "gawk is broken"
+		print "gawk now follows posix"
 	else
-		print "gawk is ok"
+		print "gawk is using gnu regex"
 }

@@ -1,2 +1,2 @@
-gawk: paramres.awk:3: error: function `foo': cannot use special variable `FS' as a function parameter
+gawk: paramres.awk:3: error: function `foo': parameter `FS': POSIX disallows using a special variable as a function parameter
 EXIT CODE: 1

@@ -13,10 +13,10 @@ $! This generates a []config.h file and also a config_vms.h file,
 $! which is used to supplement that file.
 $!
 $!
-$! Copyright (C) 2014, 2016, 2019, 2023 the Free Software Foundation, Inc.
+$! Copyright (C) 2014, 2016, 2019, 2023, 2024 the Free Software Foundation, Inc.
 $!
 $! This file is part of GAWK, the GNU implementation of the
-$! AWK Progamming Language.
+$! AWK Programming Language.
 $!
 $! GAWK is free software; you can redistribute it and/or modify
 $! it under the terms of the GNU General Public License as published by
@@ -51,7 +51,8 @@ $ args_lower = f$edit(args, "LOWERCASE")
 $!
 $ args_len = f$length(args)
 $!
-$ if (f$getsyi("HW_MODEL") .lt. 1024)
+$ hw_model = f$getsyi("HW_MODEL")
+$ if hw_model .gt 0 .and. hw_model .lt. 1024
 $ then
 $   arch_name = "VAX"
 $ else
@@ -162,7 +163,7 @@ $!
 $! This stuff seems needed for VMS 7.3 and earlier, but not VMS 8.2+
 $! Need some more data as to which versions these issues are fixed in.
 $ write cvh "#if __VMS_VER <= 80200000"
-$! mkstemp goes into an infinte loop in gawk in VAX/VMS 7.3
+$! mkstemp goes into an infinite loop in gawk in VAX/VMS 7.3
 $ write cvh "#ifdef HAVE_MKSTEMP"
 $ write cvh "#undef HAVE_MKSTEMP"
 $ write cvh "#endif"
@@ -320,6 +321,10 @@ $ write cvh "}"
 $ write cvh ""
 $ write cvh "#define TIME_T_UNSIGNED 1"
 $ write cvh "#include ""custom.h"""
+$ write cvh "/* TEMP Fixup for V9.2-2 termios header not compatible */"
+$ write cvh "#ifdef HAVE_TERMIOS_H"
+$ write cvh "#undef HAVE_TERMIOS_H"
+$ write cvh "#endif"
 $ write cvh ""
 $
 $!

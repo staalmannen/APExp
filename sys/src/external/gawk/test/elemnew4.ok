@@ -1,0 +1,28 @@
+
+Array dump: 
+
+Start: arrayarg[first] (untyped) == arrayarg[second] (untyped)? 1
+Start: arrayarg[first] (untyped) == arrayarg[third] (untyped)? 1
+Start: arrayarg[second] (untyped) == arrayarg[third] (untyped)? 1
+
+Array dump: 
+  array[first] = '' (type = untyped)
+  array[third] = '' (type = untyped)
+  array[second] = '' (type = untyped)
+
+assign: arr[first] = '' (type = string)
+reference: arr[second] = '' (type = unassigned)
+
+Array dump: 
+  array[first] = '' (type = string)
+  array[third] = '' (type = untyped)
+  array[second] = '' (type = unassigned)
+
+Try 2: arrayarg[first] (string) == arrayarg[second] (unassigned)? 1
+Try 2: arrayarg[first] (string) == arrayarg[third] (untyped)? 1
+Try 2: arrayarg[second] (unassigned) == arrayarg[third] (untyped)? 1
+
+Array dump: 
+  array[first] = '' (type = string)
+  array[third] = '' (type = untyped)
+  array[second] = '' (type = unassigned)

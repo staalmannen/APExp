@@ -1,3 +1,36 @@
+Sat Oct 11 20:10:07 IDT 2025
+============================
+
+PMA works "out of the box" on both ARM and Intel macs (64-bit
+systems only).  This has been the case since version 5.3.2.
+
+See the code for os_disable_aslr() in posix/gawkmisc.c.
+
+Sat 20 Jan 2024 21:28:35 IST
+============================
+
+With respect to Power PC macintosh systems and having MPFR, things
+are now in a better place.  If you have such a system, you need:
+
+1. GCC 4.2.  You can bootstrap GCC 4.2.4 if you first apply
+https://www.skeeve.com/gcc-4.2.4-compile-fix.diff. You will need
+a reasonable makeinfo to build the Info files after applying
+this fix. I'm told that you can get a version of Xcode with
+this compiler also.
+
+2. GMP 6.3.0. This is current as of this writing.
+
+3. MPFR 4.2.1. This is current as of this writing.
+
+Using GCC 4.2.4, I built both libraries with configure, make
+and make install, and then built gawk.
+
+An enormous THANK YOU to Sevan Janiyan <venture37@geeklan.co.uk>
+for his help, guidance, and personal testing.
+
+It's satisfying to have things working again on this system which
+is over 20 years old! :-)
+
 Sun 18 Dec 2022 21:04:40 IST
 ============================
 

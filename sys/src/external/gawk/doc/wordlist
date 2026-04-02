@@ -45,12 +45,14 @@ BEGINFILE
 BEL
 BINMODE
 BLKSIZE
+BMP
 BOOL
 BREs
 BSIZE
 BTL
 BUFFERPIPE
 BWK
+Backreferences
 Banzai
 BeOS
 Benzinger
@@ -78,6 +80,7 @@ CFLAGS
 CGI
 CHEM
 CIFS
+CJK
 COMFOLLOW
 COMMONEXT
 CONFIG
@@ -88,7 +91,6 @@ CSV
 CSVMODE
 CTYPE
 CbbA
-Cc
 Chana
 ChangeLog
 Chassell
@@ -131,8 +133,8 @@ Davide's
 Deifik
 Demaille
 Dinline
+Dracones
 Drepper
-DrillBits
 Duman
 Dupword
 EAGAIN
@@ -195,6 +197,7 @@ GETGRENT
 GMP
 GMT
 GNITS
+GNULIB
 GNV
 GPL
 GR
@@ -222,6 +225,7 @@ Haque
 Haris
 Hartholz
 Hasegawa
+Hc
 Hermann
 Hoare's
 Hoijui's
@@ -281,6 +285,7 @@ Krauze
 Kwityn
 Kwok
 LARGEFILE
+LASKY
 LC
 LEQ
 LF
@@ -288,7 +293,9 @@ LGPL
 LINENO
 LXIX
 Langston
+Lasky
 LeBlanc
+Lenox
 LibGCC
 Libmawk
 Libtool
@@ -297,6 +304,7 @@ Lvalue
 MALLOC
 MAXLINES
 MC
+MINGW
 MIPS
 MKS
 MMC
@@ -322,6 +330,7 @@ MiXeD
 Michal
 Microsystems
 MinGW
+MinRX
 Minshall
 MirBSD
 Mircea
@@ -346,6 +355,7 @@ NVMW
 NaN
 NaNs
 Nachum
+Naman
 Neacsu
 Neacsu's
 NetBSD
@@ -369,6 +379,7 @@ OI
 OM
 ORG
 ORS
+OSF
 OU
 OV
 Obi
@@ -405,7 +416,6 @@ POS
 PQgetvalue
 PREC
 PROCINFO
-PVERSION
 PW
 PWD
 Panos
@@ -490,7 +500,9 @@ Strnum
 Strtonum
 Subarrays
 Sublicensing
+Submatch
 SunOS
+Svnt
 SylvestersSequence
 TABs
 TEXTDOMAIN
@@ -514,6 +526,7 @@ Ulrich
 Uniq
 Uwe
 VER
+VSI
 VT
 Versioning
 Vinschen
@@ -524,6 +537,7 @@ Walamazoo
 Wallin
 Watchpoint
 Wc
+Weinberger
 Weinberger's
 Weisstein
 Wfile
@@ -540,8 +554,10 @@ XP
 XXX
 XXXX
 XYZ
+XYZZY
 XaXbXcX
 Xref
+YAN
 YYYY
 Yawitz
 Za
@@ -558,7 +574,15 @@ aIt
 aSAgbfocFVtguG
 aa
 aaa
+aaaXxxzzz
+aaaXyxxyxzzz
+aaaXyxzzz
+aaaXzzz
 aaaabcd
+aaaxxxxxxxxxxxxxxxxzzz
+aaaxxxyzzz
+aaaxxxzzz
+aaaxyxxyxxyxzzz
 aab
 aabbb
 aabbbccccddd
@@ -566,6 +590,7 @@ aac
 aaccdd
 ab
 abCDEf
+abab
 abc
 abcca
 abcd
@@ -579,6 +604,7 @@ abq
 abr
 abs
 abx
+abxxxcd
 abz
 ac
 aca
@@ -608,7 +634,6 @@ altweeknum
 amc
 amelia
 ampm
-andreas
 andrew
 andrewsumner
 andspan
@@ -623,13 +648,13 @@ aqb
 aqc
 ar
 arg
+argA
 argc
 args
 argv
 arnold
 arr
 arraydump
-arraymax
 arrayorder
 arsenio
 asc
@@ -645,6 +670,7 @@ atan
 atexit
 atime
 atl
+au
 austingroupbugs
 autoconf
 automake
@@ -658,6 +684,7 @@ awk
 awka
 awkcard
 awkcc
+awkdoc
 awkforai
 awkgo
 awkgram
@@ -673,6 +700,7 @@ babbly
 babery
 bable
 backreference
+backreferences
 backtrace
 bak
 barney
@@ -698,7 +726,6 @@ bignum
 bigskip
 bindtextdomain
 binmode
-bisonfix
 blabber
 blabbers
 blabby
@@ -722,7 +749,6 @@ brent
 brini
 broderick
 bt
-buening
 buf
 bufsize
 buildable
@@ -761,6 +787,7 @@ changeit
 charcount
 chardev
 charlist
+chcp
 chdir
 chem
 chet
@@ -780,11 +807,14 @@ cld
 cline
 cmd
 cmp
-cns
-cnswww
 cntrl
 co
 codeNF
+codeberg
+codepage
+codepages
+codepoints
+codeproject
 codequotebacktick
 codequoteundirected
 codesets
@@ -807,6 +837,7 @@ conan
 concat
 config
 configh
+conradludgate
 const
 coprocess
 coprocess's
@@ -829,7 +860,6 @@ ctime
 cul
 curdir
 curfile
-cwru
 cygwin
 cyrillic
 dCaaCbaaa
@@ -841,6 +871,7 @@ datafiles
 datespec
 dave
 david
+dawk
 dayname
 db
 dcgettext
@@ -863,6 +894,7 @@ dest
 detailmenu
 dev
 devbsize
+dfa
 dfn
 dgawk
 dict
@@ -957,6 +989,7 @@ fcount
 fd
 fdata
 fe
+fergs
 ferror
 fffffffffff
 fffffffffffd
@@ -1035,7 +1068,6 @@ gawklibpath
 gawkmisc
 gawkpath
 gawkrc
-gawktexi
 gawkworkflow
 gcc
 gdb
@@ -1045,7 +1077,6 @@ ge
 gecos
 gen
 gensub
-gerard
 getaddrinfo
 getegid
 geteuid
@@ -1067,6 +1098,7 @@ gettimeofday
 getuid
 gid
 gierd
+gis
 github
 globalstate
 gmail
@@ -1094,7 +1126,6 @@ grp
 gst
 gsub
 gt
-guerrero
 gunzip
 gvim
 gz
@@ -1162,14 +1193,12 @@ indx
 inelegancies
 inet
 inf
-inforef
 informaltable
 infusarum
 ing
 ington
 init
 inited
-inlinefmt
 inlineraw
 inmargin
 ino
@@ -1208,7 +1237,6 @@ johansen
 johnny
 joyent
 json
-juan
 julie
 karl
 katie
@@ -1218,7 +1246,6 @@ kmem
 kpilot
 ksh
 kylheku
-labadie
 lan
 lanceolis
 lang
@@ -1255,12 +1282,14 @@ lintwarn
 listinfo
 listsize
 literallayout
+localA
 localhost
 locutus
 longa
 longb
 longoptions
 longopts
+longpat
 loopcheck
 lordchr
 lp
@@ -1275,7 +1304,6 @@ lvalues
 lwall
 lwcm
 macOS
-macosx
 madronabluff
 mailx
 makeinfo
@@ -1299,8 +1327,10 @@ metaflac
 metasyntactic
 mey
 mikebrennan
+mikehaertel
 min
 mingw
+minrx
 miriam
 misc
 mit
@@ -1340,9 +1370,11 @@ mydata
 myfile
 myfiles
 myfunc
+mylib
 mylongopts
 myprint
 myprog
+myproj
 myshortopts
 mystrtonum
 mysub
@@ -1373,7 +1405,6 @@ newdata
 newdir
 newgawk
 newsxfer
-nexgo
 nextfile
 nexti
 nf
@@ -1421,6 +1452,7 @@ nonwhitespace
 noyesno
 nr
 ns
+nsinclude
 nul
 num
 numfields
@@ -1430,7 +1462,6 @@ nvalue
 nvmw
 nwords
 ny
-nyah
 nyu
 obaCLDUX
 obufp
@@ -1491,8 +1522,8 @@ pc
 pdf
 pdksh
 pdq
+pegasusheavy
 peifer
-pengyu
 perl
 perscr
 perscrutabor
@@ -1539,7 +1570,6 @@ progfile
 ps
 pseudorandom
 psl
-psx
 pt
 ptr
 pty
@@ -1571,6 +1601,8 @@ rand
 randint
 rankin
 rapidjson
+rawk
+raygard
 rdev
 rdquo
 reada
@@ -1580,6 +1612,7 @@ readfile
 readline
 realdata
 realloc
+realpath
 realprogram
 rec
 recomputation
@@ -1602,6 +1635,7 @@ rfc
 rflashlight
 rguid
 righthand
+rltop
 rm
 rms
 ro
@@ -1649,6 +1683,7 @@ sfx
 shellquote
 shortdayname
 shortmonth
+shortpat
 shorttitlepage
 showargs
 shu
@@ -1661,7 +1696,6 @@ slrn
 smallbook
 smallexample
 smtp
-snmp
 snobol
 solaris
 someopt
@@ -1708,22 +1742,27 @@ strptime
 strtod
 strtonum
 struct
+stuart
 su
 subarray
 subarrays
 subentry
 sublicense
 sublicenses
+submatch
+submatches
+subpattern
+subresult
 substr
 subsubsection
 sudo
 summarycontents
+sydneywater
 sylogin
 sym
 syncodeindex
 synindex
 sys
-syshlp
 systime
 t'noD
 t'nod
@@ -1738,7 +1777,6 @@ tbytes
 tchars
 tcount
 tcp
-tcpip
 tcsh
 tdata
 teardown
@@ -1764,9 +1802,10 @@ thispage
 thrudvang
 tid
 timeval
-timex
+tiswww
 titlepage
 tlines
+tlongpat
 tm
 tmp
 tmy
@@ -1778,7 +1817,9 @@ tpkelly
 tr
 tracy
 transfile
+triallax
 trunc
+tshortpat
 ttotal
 ttyD
 ttyV
@@ -1847,6 +1888,7 @@ vr
 vrule
 vskip
 waitpid
+wak
 walkarray
 washington
 wass
@@ -1854,8 +1896,10 @@ watchpoint
 wb
 wc
 wcscoll
+weblog
 webmail
 weeknum
+wenley
 wget
 wh
 whhhhhy
@@ -1868,6 +1912,7 @@ wikipedia
 wlv
 wnewmail
 wordfreq
+wouldn
 wr
 writea
 writeall
@@ -1877,6 +1922,7 @@ xA
 xAxBxCx
 xDEADBEEF
 xDeadBeef
+xFFFD
 xFOO
 xX
 xaa
@@ -1884,6 +1930,7 @@ xaaaa
 xab
 xbd
 xdeadBEEF
+xdeadbeefp
 xdigit
 xfcc
 xfcd
@@ -1906,6 +1953,13 @@ xvpzf
 xxAA
 xxBxx
 xxx
+xxxxxxxxxxxxx
+xxxxxxxxxxxxxxxx
+xxxy
+xyx
+xyxx
+xyxxyxx
+xyxxyxxyx
 xyz
 xyzzy
 xz
@@ -1919,6 +1973,7 @@ yourprog
 yxaay
 yyy
 zA
+zawk
 zbcom
 zerofile
 zodiacusque

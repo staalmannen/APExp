@@ -3,7 +3,8 @@
  */
 
 /*
- * Copyright (C) 2012-2019, 2021, 2022, 2023, the Free Software Foundation, Inc.
+ * copyright (c) 2012-2019, 2021-2024, 2026
+ * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -304,7 +305,7 @@ typedef struct awk_two_way_processor {
 } awk_two_way_processor_t;
 
 #define gawk_api_major_version 4
-#define gawk_api_minor_version 0
+#define gawk_api_minor_version 1
 
 /* Current version of the API. */
 enum {
@@ -496,6 +497,12 @@ typedef struct gawk_api {
 	 * These can change on the fly as things happen within gawk.
 	 * Currently only do_lint is prone to change, but we reserve
 	 * the right to allow the others to do so also.
+	 *
+	 * N.B. If we ever again need to add an additional do_flags value,
+	 * it would be wise to convert this from an array to a bitmask. If
+	 * we add a new do_flags value and bump DO_FLAGS_SIZE, then it requires
+	 * us to increment the ABI version. If we use a bitmask instead, then
+	 * we will be free to add new flags without breaking ABI compatibility.
 	 */
 #define DO_FLAGS_SIZE	7
 	awk_const int do_flags[DO_FLAGS_SIZE];

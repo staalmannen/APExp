@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 2012, 2013, 2014, 2018, 2022, 2023,
+ * Copyright (C) 2012, 2013, 2014, 2018, 2022, 2023, 2024, 2026
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -40,8 +40,9 @@
 #include <sys/stat.h>
 
 #ifdef __VMS
+#ifndef HAVE_NANOSLEEP
 #define HAVE_NANOSLEEP
-#define HAVE_GETTIMEOFDAY
+#endif
 #ifdef gettimeofday
 #undef gettimeofday
 #endif
@@ -82,7 +83,8 @@ vms_fake_nanosleep(struct timespec *rqdly, struct timespec *rmdly)
 static const gawk_api_t *api;	/* for convenience macros to work */
 static awk_ext_id_t ext_id;
 static const char *ext_version = "time extension: version 1.2";
-static awk_bool_t (*init_func)(void) = NULL;
+static awk_bool_t init_time(void);
+static awk_bool_t (*init_func)(void) = init_time;
 
 int plugin_is_GPL_compatible;
 
@@ -96,7 +98,24 @@ int plugin_is_GPL_compatible;
 #if defined(HAVE_GETSYSTEMTIMEASFILETIME)
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+typedef VOID (WINAPI * GetSystemTimePreciseAsFileTime_proc) (LPFILETIME);
+static GetSystemTimePreciseAsFileTime_proc
+	get_system_time_precise_as_filetime = NULL;
 #endif
+
+static awk_bool_t init_time(void)
+{
+#if defined(HAVE_GETSYSTEMTIMEASFILETIME)
+	/* GetSystemTimePreciseAsFileTime function retrieves the
+           current system date and time with the precision of better
+           than 1 us, but it is only available since Windows 8.  */
+	HMODULE h_kernel32 = LoadLibrary ("Kernel32.dll");
+	if (h_kernel32)
+	  get_system_time_precise_as_filetime =
+	    (GetSystemTimePreciseAsFileTime_proc) GetProcAddress (h_kernel32, "GetSystemTimePreciseAsFileTime");
+#endif
+	return awk_true;
+}
 
 /*
  * Returns time since 1/1/1970 UTC as a floating point value; should
@@ -110,7 +129,13 @@ do_gettimeofday(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 
 	assert(result != NULL);
 
-#if defined(HAVE_GETTIMEOFDAY)
+#if defined(HAVE_CLOCK_GETTIME)
+	{
+		struct timespec tv;
+		clock_gettime(CLOCK_REALTIME, & tv);
+		curtime = tv.tv_sec+(tv.tv_nsec/1000000000.0);
+	}
+#elif defined(HAVE_GETTIMEOFDAY)
 	{
 		struct timeval tv;
 		gettimeofday(&tv,NULL);
@@ -125,7 +150,10 @@ do_gettimeofday(int nargs, awk_value_t *result, struct awk_ext_func *unused)
 		} ft;
 
 		/* # of 100-nanosecond intervals since January 1, 1601 (UTC) */
-		GetSystemTimeAsFileTime(&ft.ft_val);
+		if (get_system_time_precise_as_filetime)
+			get_system_time_precise_as_filetime (&ft.ft_val);
+		else
+			GetSystemTimeAsFileTime(&ft.ft_val);
 #ifdef __GNUC__
 #define Const64(x) x##LL
 #else

@@ -3,7 +3,8 @@
  */
 
 /*
- * Copyright (C) 2012, 2013, 2015, 2017, 2018, 2019, 2021, 2022,
+ * Copyright (C) 2012, 2013, 2015, 2017, 2018, 2019, 2021, 2022, 2024, 2025,
+ * 2026,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -265,7 +266,7 @@ mpg_zero(NODE *n)
 /* force_mpnum --- force a value to be a GMP integer or MPFR float */
 
 static int
-force_mpnum(NODE *n, int do_nondec, int use_locale)
+force_mpnum(NODE *n, bool do_nondec, bool use_locale)
 {
 	char *cp, *cpend, *ptr, *cp1;
 	char save;
@@ -307,6 +308,9 @@ force_mpnum(NODE *n, int do_nondec, int use_locale)
 	if (do_nondec)
 		base = get_numbase(cp1, cpend - cp1, use_locale);
 
+	if (base == 16 && (strchr(cp, 'p') != NULL || strchr(cp, 'P') != NULL))
+		goto isfloat;
+
 	if (base != 10 || ! mpg_maybe_float(cp1, use_locale)) {
 		mpg_zero(n);
 		errno = 0;
@@ -316,6 +320,7 @@ force_mpnum(NODE *n, int do_nondec, int use_locale)
 		goto done;
 	}
 
+isfloat:
 	if (is_mpg_integer(n)) {
 		mpz_clear(n->mpg_i);
 		n->flags &= ~MPZN;
@@ -350,16 +355,20 @@ mpg_force_number(NODE *n)
 	char *cp, *cpend;
 
 	if (n->type == Node_elem_new) {
+		elem_new_reset(n);
 		n->type = Node_val;
-		n->flags &= ~STRING;
-		n->stptr[0] = '0';	// STRCUR is still set
-		n->stlen = 1;
 
 		return n;
 	}
 
 	if ((n->flags & NUMCUR) != 0)
 		return n;
+
+	/*
+	 * We should always set NUMCUR. If USER_INPUT is set and it's a
+	 * numeric string, we clear STRING and enable NUMBER, but if it's not
+	 * numeric, we disable USER_INPUT.
+	 */
 	n->flags |= NUMCUR;
 
 	/* Trim leading white space, bailing out if there's nothing else */
@@ -397,7 +406,7 @@ mpg_force_number(NODE *n)
 	/* else POSIX, so
 		fall through */
 
-	if (force_mpnum(n, (do_non_decimal_data && ! do_traditional), true)) {
+	if (force_mpnum(n, (do_non_decimal_data || do_posix), true)) {
 		if ((n->flags & USER_INPUT) != 0) {
 			/* leave USER_INPUT set to indicate a strnum */
 			n->flags &= ~STRING;
@@ -425,16 +434,16 @@ mpg_format_val(const char *format, int index, NODE *s)
 		return make_string(result, strlen(result));
 	}
 
-	/* create dummy node for a sole use of format_tree */
+	/* create dummy node for a sole use of format_args */
 	dummy[1] = s;
 	oflags = s->flags;
 
 	if (is_mpg_integer(s) || mpfr_integer_p(s->mpg_numbr)) {
 		/* integral value, use %d */
-		r = format_tree("%d", 2, dummy, 2);
+		r = format_args("%d", 2, dummy, 2);
 		s->stfmt = STFMT_UNUSED;
 	} else {
-		r = format_tree(format, fmt_list[index]->stlen, dummy, 2);
+		r = format_args(format, fmt_list[index]->stlen, dummy, 2);
 		assert(r != NULL);
 		s->stfmt = index;
 	}
@@ -983,7 +992,7 @@ get_intval(NODE *t1, int argnum, const char *op)
                                 	op, argnum, left)
 				);
 
-			emalloc(pz, mpz_ptr, sizeof (mpz_t), "get_intval");
+			emalloc(pz, mpz_ptr, sizeof (mpz_t));
 			mpz_init(pz);
 			return pz;	/* should be freed */
 		}
@@ -1002,7 +1011,7 @@ get_intval(NODE *t1, int argnum, const char *op)
 				);
 		}
 
-		emalloc(pz, mpz_ptr, sizeof (mpz_t), "get_intval");
+		emalloc(pz, mpz_ptr, sizeof (mpz_t));
 		mpz_init(pz);
 		mpfr_get_z(pz, left, MPFR_RNDZ);	/* float to integer conversion */
 		return pz;	/* should be freed */
@@ -1317,9 +1326,9 @@ do_mpfr_srand(int nargs)
 /*
  * We define the semantics as:
  * 	numerator = int(numerator)
- *	denominator = int(denonmator)
- *	quotient = int(numerator / denomator)
- *	remainder = int(numerator % denomator)
+ *	denominator = int(denominator)
+ *	quotient = int(numerator / denominator)
+ *	remainder = int(numerator % denominator)
  */
 
 NODE *
@@ -1594,7 +1603,10 @@ mpg_div(NODE *t1, NODE *t2)
 	return r;
 }
 
-/* mpg_mod --- modulus operation with arbitrary-precision numbers */
+/*
+ * mpg_mod --- modulus operation with arbitrary-precision numbers.
+ *	See test/mpfrrem.awk.
+ */
 
 static NODE *
 mpg_mod(NODE *t1, NODE *t2)
@@ -1603,29 +1615,18 @@ mpg_mod(NODE *t1, NODE *t2)
 	int tval;
 
 	if (is_mpg_integer(t1) && is_mpg_integer(t2)) {
-		/*
-		 * 8/2014: Originally, this was just
-		 *
-		 * r = mpg_integer();
-		 * mpz_mod(r->mpg_i, t1->mpg_i, t2->mpg_i);
-		 *
-		 * But that gave very strange results with negative numerator:
-		 *
-		 *	$ ./gawk -M 'BEGIN { print -15 % 7 }'
-		 *	6
-		 *
-		 * So instead we use mpz_tdiv_qr() to get the correct result
-		 * and just throw away the quotient. We could not find any
-		 * reason why mpz_mod() wasn't working correctly.
-		 */
-		NODE *dummy_quotient;
-
 		if (mpz_sgn(t2->mpg_i) == 0)
 			fatal(_("division by zero attempted"));
 		r = mpg_integer();
-		dummy_quotient = mpg_integer();
-		mpz_tdiv_qr(dummy_quotient->mpg_i, r->mpg_i, t1->mpg_i, t2->mpg_i);
-		unref(dummy_quotient);
+		/*
+		 * Before 2014-08, this called mpz_mod(), which is inconsistent
+		 * with mpfr_fmod() when the numerator is negative. It gave:
+		 *   $ gawk -M 'BEGIN { print 15 % 7, 15 % -7, -15 % 7, -15 % -7 }'
+		 *   1 1 6 6
+		 *   $ gawk -M 'BEGIN { print 15.0 % 7, 15.0 % -7, -15.0 % 7, -15.0 % -7 }'
+		 *   1 1 -1 -1
+		 */
+		mpz_tdiv_r(r->mpg_i, t1->mpg_i, t2->mpg_i);
 	} else {
 		mpfr_ptr p1, p2;
 		p1 = MP_FLOAT(t1);

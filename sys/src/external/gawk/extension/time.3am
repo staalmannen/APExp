@@ -1,4 +1,4 @@
-.TH TIME 3am "Jan 16 2023" "Free Software Foundation" "GNU Awk Extension Modules"
+.TH TIME 3am "Nov 13 2024" "Free Software Foundation" "GNU Awk Extension Modules"
 .SH NAME
 time \- time functions for gawk
 .SH SYNOPSIS
@@ -18,7 +18,7 @@ extension adds three functions named
 .B gettimeofday()
 .BR sleep() ,
 and
-.BR stptrime() , 
+.BR strptime() , 
 as follows.
 .TP
 .B gettimeofday()
@@ -106,7 +106,7 @@ and
 Arnold Robbins,
 .BR arnold@skeeve.com .
 .SH COPYING PERMISSIONS
-Copyright \(co 2012, 2013, 2018, 2022, 2023,
+Copyright \(co 2012, 2013, 2018, 2022, 2023, 2024,
 Free Software Foundation, Inc.
 .br
 Copyright \(co 2019,

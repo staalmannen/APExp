@@ -1,3 +1,41 @@
+2026-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.4.0: Release tar ball made.
+
+2025-12-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* strftime.c: Restored. It's needed on MinGW.
+
+2025-11-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* system.c: Removed.
+
+2025-11-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Remove a bunch of replacement files that are no longer needed.
+
+	* README: Updated.
+	* memcmp.c, memcpy.c, memmove.c, memset.c, mktime-internal.h,
+	mktime.c, setenv.c, snprintf.c, strchr.c, strerror.c, strftime.c,
+	strtod.c, strtoul.c, system.c, tzset.c, usleep.c: Removed.
+
+2025-11-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* wcmisc.c: Removed. Not needed anymore.
+
+2025-04-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.2: Release tar made.
+
+2025-03-23         Khem Raj              <raj.khem@gmail.com>
+
+	* fnmatch.c, getopt.h, getopt.c: Add parameter signatures
+	for getenv() and getopt(). Needed for Musl libc.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.1: Release tar made.
+
 2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* 5.3.0: Release tar ball made.
@@ -65,7 +103,7 @@
 
 2020-06-10         Arnold D. Robbins     <arnold@skeeve.com>
 
-	Miscellanious fixes from Michael Builov <mbuilov@gmail.com>.
+	Miscellaneous fixes from Michael Builov <mbuilov@gmail.com>.
 
 	* fnmatch.c (internal_fnmatch): Misc small fixes.
 

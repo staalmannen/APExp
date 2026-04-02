@@ -345,6 +345,10 @@ static void flr(ao_t *p) {  // remove ao from free list
 #define MAP_NORESERVE 0
 #endif /* MAP_NORESERVE */
 
+#ifndef MAP_ANONYMOUS
+#define MAP_ANONYMOUS MAP_ANON
+#endif /* MAP_ANONYMOUS */
+
 #define MMAP(N) mmap(NULL, (N), PROT_NONE, MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE, -1, 0)
 #define MUNMAP(A, N) do { if (0 != munmap((A), (N))) { ERR("munmap()" ERN); SERN; } } while (0)
 static void * addrgap(off_t n) {  // find big gap in address space to map n bytes

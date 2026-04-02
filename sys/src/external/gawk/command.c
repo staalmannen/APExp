@@ -2490,7 +2490,7 @@ append_statement(CMDARG *stmt_list, char *stmt)
 			len += strlen(a->a_string) + 1;	/* 1 for ',' */
 		len += EVALSIZE;
 
-		emalloc(s, char *, (len + 1) * sizeof(char), "append_statement");
+		emalloc(s, char *, (len + 1) * sizeof(char));
 		arg = mk_cmdarg(D_string);
 		arg->a_string = s;
 		arg->a_count = len;	/* kludge */
@@ -2517,7 +2517,7 @@ append_statement(CMDARG *stmt_list, char *stmt)
 	ssize = stmt_list->a_count;
 	if (len > ssize - slen) {
 		ssize = slen + len + EVALSIZE;
-		erealloc(s, char *, (ssize + 1) * sizeof(char), "append_statement");
+		erealloc(s, char *, (ssize + 1) * sizeof(char));
 		stmt_list->a_string = s;
 		stmt_list->a_count = ssize;
 	}
@@ -2529,7 +2529,7 @@ append_statement(CMDARG *stmt_list, char *stmt)
 	}
 
 	if (stmt == end_EVAL)
-		erealloc(stmt_list->a_string, char *, slen + 1, "append_statement");
+		erealloc(stmt_list->a_string, char *, slen + 1);
 	return stmt_list;
 
 #undef EVALSIZE
@@ -2682,7 +2682,7 @@ static CMDARG *
 mk_cmdarg(enum argtype type)
 {
 	CMDARG *arg;
-	ezalloc(arg, CMDARG *, sizeof(CMDARG), "mk_cmdarg");
+	ezalloc(arg, CMDARG *, sizeof(CMDARG));
 	arg->type = type;
 	return arg;
 }
@@ -2901,7 +2901,7 @@ again:
 		bool esc_seen = false;
 
 		toklen = lexend - lexptr;
-		emalloc(str, char *, toklen + 1, "yylex");
+		emalloc(str, char *, toklen + 1);
 		p = str;
 
 		while ((c = *++lexptr) != '"') {
@@ -2952,7 +2952,7 @@ err:
 			errno = 0;
 			l = strtol(tokstart, &end, 0);
 			if (errno != 0) {
-				yyerror(_("%s"), strerror(errno));
+				yyerror("%s", strerror(errno));
 				errno = 0;
 				return '\n';
 			}
@@ -3101,7 +3101,7 @@ concat_args(CMDARG *arg, int count)
 		return dupnode(n);
 	}
 
-	emalloc(tmp, NODE **, count * sizeof(NODE *), "concat_args");
+	emalloc(tmp, NODE **, count * sizeof(NODE *));
 	subseplen = SUBSEP_node->var_value->stlen;
 	subsep = SUBSEP_node->var_value->stptr;
 	len = -subseplen;
@@ -3113,7 +3113,7 @@ concat_args(CMDARG *arg, int count)
 		arg = arg->next;
 	}
 
-	emalloc(str, char *, len + 1, "concat_args");
+	emalloc(str, char *, len + 1);
 	n = tmp[0];
 	memcpy(str, n->stptr, n->stlen);
 	p = str + n->stlen;
@@ -3350,7 +3350,7 @@ srcfile_generator(const char *text, int state)
 		s = srcfiles->next;
 	}
 	while (s != srcfiles) {
-		if (s->stype != SRC_FILE && s->stype != SRC_INC) {
+		if (s->stype != SRC_FILE && s->stype != SRC_INC && s->stype != SRC_NSINC) {
 			s = s->next;
 			continue;
 		}

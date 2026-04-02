@@ -1,9 +1,10 @@
-# Mesajele în limba română pentru pachetul gawk
-# Copyright © 2003, 2022, 2023 Free Software Foundation, Inc.
+# Translation of gawk.po to Romanian.
+# Mesajele în limba română pentru pachetul gawk.
+# Copyright © 2003, 2022, 2023, 2024, 2025, 2026 Free Software Foundation, Inc.
 # This file is distributed under the same license as the gawk package.
 #
 # Eugen Hoanca <eugenh@urban-grafx.ro>, 2003.
-# Remus-Gabriel Chelu <remusgabriel.chelu@disroot.org>, 2022 - 2023.
+# Remus-Gabriel Chelu <remusgabriel.chelu@disroot.org>, 2022 - 2026.
 #
 # Cronologia traducerii fișierului „gawk”:
 # Traducerea inițială, făcută de EH, pentru versiunea gawk 3.1.0.31.
@@ -19,14 +20,18 @@
 # Actualizare a traducerii pentru versiunea 5.2.0a, făcută de R-GC, noi-2022.
 # Actualizare a traducerii pentru versiunea 5.2.1b, făcută de R-GC, apr-2023.
 # Actualizare a traducerii pentru versiunea 5.2.63, făcută de R-GC, oct-2023.
+# Actualizare a traducerii pentru versiunea 5.3.0c, făcută de R-GC, aug-2024.
+# Actualizare a traducerii pentru versiunea 5.3.1b, făcută de R-GC, mar-2025.
+# Actualizare a traducerii pentru versiunea 5.3.65, făcută de R-GC, ian-2026.
+# Actualizare a traducerii pentru versiunea 5.3.66, făcută de R-GC, feb-2026.
 # Actualizare a traducerii pentru versiunea Y, făcută de X, Y(luna-anul).
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: gawk 5.2.63\n"
+"Project-Id-Version: gawk 5.3.66\n"
 "Report-Msgid-Bugs-To: bug-gawk@gnu.org\n"
-"POT-Creation-Date: 2023-11-02 15:33+0200\n"
-"PO-Revision-Date: 2023-10-24 20:56+0200\n"
+"POT-Creation-Date: 2026-02-22 16:46+0200\n"
+"PO-Revision-Date: 2026-02-11 18:44+0100\n"
 "Last-Translator: Remus-Gabriel Chelu <remusgabriel.chelu@disroot.org>\n"
 "Language-Team: Romanian <translation-team-ro@lists.sourceforge.net>\n"
 "Language: ro\n"
@@ -36,65 +41,64 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : (n==0 || (n%100 > 0 && n%100 < "
 "20)) ? 1 : 2);\n"
 "X-Bugs: Report translation errors to the Language-Team address.\n"
-"X-Generator: Poedit 3.2.2\n"
+"X-Generator: Poedit 3.8\n"
 
 #: array.c:249
 #, c-format
 msgid "from %s"
 msgstr "de la %s"
 
-#: array.c:355
+#: array.c:366
 msgid "attempt to use a scalar value as array"
 msgstr "s-a încercat să se utilizeze o valoare scalară ca matrice"
 
-#: array.c:357
+#: array.c:368
 #, c-format
 msgid "attempt to use scalar parameter `%s' as an array"
 msgstr "s-a încercat să se utilizeze parametrul scalar „%s” ca matrice"
 
-#: array.c:360
+#: array.c:371
 #, c-format
 msgid "attempt to use scalar `%s' as an array"
 msgstr "s-a încercat să se utilizeze scalarul „%s” ca matrice"
 
-#: array.c:407 array.c:574 builtin.c:88 builtin.c:1746 builtin.c:1794
-#: builtin.c:1807 builtin.c:2323 builtin.c:2350 eval.c:1156 eval.c:1161
-#: eval.c:1558
+#: array.c:418 array.c:609 builtin.c:83 builtin.c:1136 builtin.c:1163
+#: eval.c:1175 eval.c:1180 eval.c:1588 printf.c:775 printf.c:823 printf.c:836
 #, c-format
 msgid "attempt to use array `%s' in a scalar context"
 msgstr "s-a încercat să se utilizeze matricea „%s” într-un context scalar"
 
-#: array.c:581
+#: array.c:616
 #, c-format
 msgid "delete: index `%.*s' not in array `%s'"
 msgstr "delete: indexul „%.*s” nu este în matricea „%s”"
 
-#: array.c:595
+#: array.c:630
 #, c-format
 msgid "attempt to use scalar `%s[\"%.*s\"]' as an array"
 msgstr "s-a încercat să se utilizeze scalarul „%s[\"%.*s\"]” ca o matrice"
 
-#: array.c:808 array.c:858
+#: array.c:856 array.c:906
 #, c-format
 msgid "%s: first argument is not an array"
 msgstr "%s: primul argument nu este o matrice"
 
-#: array.c:850
+#: array.c:898
 #, c-format
 msgid "%s: second argument is not an array"
 msgstr "%s: al doilea argument nu este o matrice"
 
-#: array.c:853 field.c:1148 field.c:1245
+#: array.c:901 field.c:1150 field.c:1255
 #, c-format
 msgid "%s: cannot use %s as second argument"
 msgstr "%s: nu se poate utiliza %s ca al doilea argument"
 
-#: array.c:861
+#: array.c:909
 #, c-format
 msgid "%s: first argument cannot be SYMTAB without a second argument"
 msgstr "%s: primul argument nu poate fi SYMTAB fără un al doilea argument"
 
-#: array.c:863
+#: array.c:911
 #, c-format
 msgid "%s: first argument cannot be FUNCTAB without a second argument"
 msgstr "%s: primul argument nu poate fi FUNCTAB fără un al doilea argument"
@@ -108,7 +112,7 @@ msgstr "%s: primul argument nu poate fi FUNCTAB fără un al doilea argument"
 # absurd”; subiectul era subînțeles, sau așa credeam...
 # ===
 # l-am făcut „direct”, pentru evitarea ambiguității
-#: array.c:870
+#: array.c:918
 msgid ""
 "asort/asorti: using the same array as source and destination without a third "
 "argument is silly."
@@ -130,7 +134,7 @@ msgstr ""
 # „subarray” = „submatrice”
 # ===
 # Ok, corecție aplicată
-#: array.c:875
+#: array.c:923
 #, c-format
 msgid "%s: cannot use a subarray of first argument for second argument"
 msgstr ""
@@ -152,14 +156,14 @@ msgstr ""
 # „subarray” = „submatrice”
 # ===
 # Ok, corecție aplicată
-#: array.c:880
+#: array.c:928
 #, c-format
 msgid "%s: cannot use a subarray of second argument for first argument"
 msgstr ""
 "%s: nu se poate folosi o submatrice din al doilea argument pentru primul "
 "argument"
 
-#: array.c:1410
+#: array.c:1458
 #, c-format
 msgid "`%s' is invalid as a function name"
 msgstr "„%s” nu este valid ca nume de funcție"
@@ -172,162 +176,158 @@ msgstr "„%s” nu este valid ca nume de funcție"
 # Ok, corecție aplicată; traducerea inițială a
 # mesajului, era:
 # „funcția de comparare a sortării „%s” nu este definită”
-#: array.c:1414
+#: array.c:1462
 #, c-format
 msgid "sort comparison function `%s' is not defined"
 msgstr "funcția „%s” de comparat a sortării nu este definită"
 
-#: awkgram.y:278
+#: awkgram.y:281
 #, c-format
 msgid "%s blocks must have an action part"
 msgstr "%s blocuri trebuie să aibă o parte de acțiune"
 
-#: awkgram.y:281
+#: awkgram.y:284
 msgid "each rule must have a pattern or an action part"
 msgstr "fiecare regulă trebuie să aibă un model sau o parte de acțiune"
 
-#: awkgram.y:435 awkgram.y:447
+#: awkgram.y:448 awkgram.y:460
 msgid "old awk does not support multiple `BEGIN' or `END' rules"
 msgstr "vechiul awk nu acceptă mai multe reguli „BEGIN” sau „END”"
 
-#: awkgram.y:500
+#: awkgram.y:513
 #, c-format
 msgid "`%s' is a built-in function, it cannot be redefined"
 msgstr "„%s” este funcție internă, nu poate fi redefinită"
 
-#: awkgram.y:564
+#: awkgram.y:577
 msgid "regexp constant `//' looks like a C++ comment, but is not"
 msgstr ""
 "constanta „//” a expresiei regulate arată ca un comentariu C++, dar nu este"
 
-#: awkgram.y:568
+#: awkgram.y:581
 #, c-format
 msgid "regexp constant `/%s/' looks like a C comment, but is not"
 msgstr ""
 "constanta „/%s/” a expresiei regulate arată ca un comentariu C, dar nu este"
 
-#: awkgram.y:695
+#: awkgram.y:708
 #, c-format
 msgid "duplicate case values in switch body: %s"
 msgstr "valori „case” duplicate în corpul „switch-ului”: %s"
 
-#: awkgram.y:716
+#: awkgram.y:729
 msgid "duplicate `default' detected in switch body"
 msgstr "„default” duplicat detectat în corpul „switch-ului”"
 
-#: awkgram.y:1052 awkgram.y:4484
+#: awkgram.y:1065 awkgram.y:4471
 msgid "`break' is not allowed outside a loop or switch"
 msgstr "„break” nu este permis în afara unei bucle sau a unui „switch”"
 
-#: awkgram.y:1062 awkgram.y:4476
+#: awkgram.y:1075 awkgram.y:4463
 msgid "`continue' is not allowed outside a loop"
 msgstr "„continue” nu este permis în afara unei bucle"
 
-#: awkgram.y:1073
+#: awkgram.y:1086
 #, c-format
 msgid "`next' used in %s action"
 msgstr "„next” utilizat în acțiunea %s"
 
-#: awkgram.y:1084
+#: awkgram.y:1097
 #, c-format
 msgid "`nextfile' used in %s action"
 msgstr "„nextfile” utilizat în acțiunea %s"
 
-#: awkgram.y:1112
+#: awkgram.y:1125
 msgid "`return' used outside function context"
 msgstr "„return” utilizat în afara contextului funcției"
 
-#: awkgram.y:1185
+#: awkgram.y:1198
 msgid "plain `print' in BEGIN or END rule should probably be `print \"\"'"
 msgstr ""
 "«print» simplu din regulile BEGIN sau END ar trebui probabil să fie «print "
 "\"\"»"
 
-#: awkgram.y:1255 awkgram.y:1304
+#: awkgram.y:1268
 msgid "`delete' is not allowed with SYMTAB"
 msgstr "„delete” nu este permis cu SYMTAB"
 
-#: awkgram.y:1257 awkgram.y:1306
+#: awkgram.y:1270
 msgid "`delete' is not allowed with FUNCTAB"
 msgstr "„delete” nu este permis cu FUNCTAB"
 
-#: awkgram.y:1291 awkgram.y:1295
-msgid "`delete(array)' is a non-portable tawk extension"
-msgstr "„delete(array)” este o extensie tawk neportabilă"
-
-#: awkgram.y:1431
+#: awkgram.y:1414
 msgid "multistage two-way pipelines don't work"
 msgstr "conductele bidirecționale multi-etapă nu funcționează"
 
-#: awkgram.y:1433
+#: awkgram.y:1416
 msgid "concatenation as I/O `>' redirection target is ambiguous"
 msgstr "concatenarea ca țintă de redirecționare In/Ieș „>” este ambiguă"
 
-#: awkgram.y:1645
+#: awkgram.y:1628
 msgid "regular expression on right of assignment"
 msgstr "expresie regulată în dreapta atribuirii"
 
-#: awkgram.y:1660 awkgram.y:1673
+#: awkgram.y:1643 awkgram.y:1656
 msgid "regular expression on left of `~' or `!~' operator"
 msgstr "expresie regulată în stânga operatorului „~” sau „!~'”"
 
-#: awkgram.y:1690 awkgram.y:1840
+#: awkgram.y:1673 awkgram.y:1823
 msgid "old awk does not support the keyword `in' except after `for'"
 msgstr "vechiul awk nu acceptă cuvântul cheie „in” decât după „for”"
 
-#: awkgram.y:1700
+#: awkgram.y:1683
 msgid "regular expression on right of comparison"
 msgstr "expresie regulată în dreapta comparației"
 
-#: awkgram.y:1819
+#: awkgram.y:1802
 #, c-format
 msgid "non-redirected `getline' invalid inside `%s' rule"
 msgstr "„getline” neredirecționat este nevalid în cadrul regulii „%s”"
 
-#: awkgram.y:1822
+#: awkgram.y:1805
 msgid "non-redirected `getline' undefined inside END action"
 msgstr "„getline” neredirecționat este nedefinit în cadrul acțiunii END"
 
-#: awkgram.y:1842
+#: awkgram.y:1825
 msgid "old awk does not support multidimensional arrays"
 msgstr "vechiul awk nu acceptă matrice multidimensionale"
 
-#: awkgram.y:1945
+#: awkgram.y:1928
 msgid "call of `length' without parentheses is not portable"
 msgstr "apelarea lui „length” fără paranteze nu este portabilă"
 
-#: awkgram.y:2019
+#: awkgram.y:2002
 msgid "indirect function calls are a gawk extension"
 msgstr "apelurile indirecte de funcții sunt o extensie gawk"
 
-#: awkgram.y:2032
+#: awkgram.y:2015
 #, c-format
 msgid "cannot use special variable `%s' for indirect function call"
 msgstr ""
 "nu se poate folosi variabila specială „%s” pentru apelul indirect al funcției"
 
-#: awkgram.y:2065
+#: awkgram.y:2048
 #, c-format
 msgid "attempt to use non-function `%s' in function call"
 msgstr "s-a încercat să se utilizeze non-funcția „%s” în apelul de funcție"
 
-#: awkgram.y:2130
+#: awkgram.y:2113
 msgid "invalid subscript expression"
 msgstr "expresie indice nevalidă"
 
-#: awkgram.y:2505 awkgram.y:2525 gawkapi.c:274 gawkapi.c:291 msg.c:133
+#: awkgram.y:2490 awkgram.y:2510 gawkapi.c:276 gawkapi.c:293 msg.c:133
 msgid "warning: "
 msgstr "avertisment: "
 
-#: awkgram.y:2523 gawkapi.c:246 gawkapi.c:289 msg.c:165
+#: awkgram.y:2508 gawkapi.c:248 gawkapi.c:291 msg.c:165
 msgid "fatal: "
 msgstr "fatal: "
 
-#: awkgram.y:2576
+#: awkgram.y:2561
 msgid "unexpected newline or end of string"
 msgstr "linie nouă neașteptată sau sfârșit de șir"
 
-#: awkgram.y:2597
+#: awkgram.y:2582
 msgid ""
 "source files / command-line arguments must contain complete functions or "
 "rules"
@@ -335,197 +335,190 @@ msgstr ""
 "fișierele sursă / argumentele liniei de comandă trebuie să conțină funcții "
 "sau reguli complete"
 
-#: awkgram.y:2881 awkgram.y:2959 awkgram.y:3197 debug.c:545 debug.c:561
-#: debug.c:2844 debug.c:5213
+#: awkgram.y:2866 awkgram.y:2945 awkgram.y:3182 debug.c:546 debug.c:562
+#: debug.c:2890 debug.c:5263
 #, c-format
 msgid "cannot open source file `%s' for reading: %s"
 msgstr "nu se poate deschide fișierul sursă „%s” pentru citire: %s"
 
-#: awkgram.y:2882 awkgram.y:3019
+#: awkgram.y:2867 awkgram.y:3009
 #, c-format
 msgid "cannot open shared library `%s' for reading: %s"
 msgstr "nu se poate deschide biblioteca partajată „%s” pentru citire: %s"
 
-#: awkgram.y:2884 awkgram.y:2960 awkgram.y:3020 builtin.c:136 debug.c:5364
+#: awkgram.y:2869 awkgram.y:2946 awkgram.y:3010 builtin.c:131 debug.c:5414
 msgid "reason unknown"
 msgstr "motiv necunoscut"
 
-#: awkgram.y:2893 awkgram.y:2917
+#: awkgram.y:2878 awkgram.y:2902
 #, c-format
 msgid "cannot include `%s' and use it as a program file"
 msgstr "nu se poate include „%s” și să fie utilizat ca fișier de program"
 
-#: awkgram.y:2906
+#: awkgram.y:2891
 #, c-format
 msgid "already included source file `%s'"
 msgstr "fișierul sursă „%s” este deja inclus"
 
-#: awkgram.y:2907
+#: awkgram.y:2892
 #, c-format
 msgid "already loaded shared library `%s'"
 msgstr "biblioteca partajată „%s” este deja încărcată"
 
-#: awkgram.y:2944
+#: awkgram.y:2929
 msgid "@include is a gawk extension"
 msgstr "@include este o extensie gawk"
 
-#: awkgram.y:2950
+#: awkgram.y:2935
 msgid "empty filename after @include"
 msgstr "nume de fișier gol după @include"
 
-#: awkgram.y:2999
+#: awkgram.y:2990
 msgid "@load is a gawk extension"
 msgstr "@load este o extensie gawk"
 
-#: awkgram.y:3006
+#: awkgram.y:2996
 msgid "empty filename after @load"
 msgstr "nume de fișier gol după @load"
 
-#: awkgram.y:3149
+#: awkgram.y:3134
 msgid "empty program text on command line"
 msgstr "text de program gol în linia de comandă"
 
-#: awkgram.y:3265 debug.c:470 debug.c:628
+#: awkgram.y:3250 debug.c:471 debug.c:629
 #, c-format
 msgid "cannot read source file `%s': %s"
 msgstr "nu se poate citi fișierul sursă „%s”: %s"
 
-#: awkgram.y:3276
+#: awkgram.y:3261
 #, c-format
 msgid "source file `%s' is empty"
 msgstr "fișierul sursă „%s” este gol"
 
-#: awkgram.y:3336
+#: awkgram.y:3321
 #, c-format
 msgid "error: invalid character '\\%03o' in source code"
 msgstr "eroare: caracter nevalid „\\%03o” în codul sursă"
 
-#: awkgram.y:3563
+#: awkgram.y:3548
 msgid "source file does not end in newline"
 msgstr "fișierul sursă nu se termină în linie nouă"
 
-#: awkgram.y:3673
+#: awkgram.y:3659
 msgid "unterminated regexp ends with `\\' at end of file"
 msgstr ""
 "expresia regulată neterminată se termină cu „\\” la sfârșitul fișierului"
 
-#: awkgram.y:3700
-#, c-format
-msgid "%s: %d: tawk regex modifier `/.../%c' doesn't work in gawk"
-msgstr ""
-"%s: %d: modificatorul expresiei regulate tawk „/.../%c” nu funcționează în "
-"gawk"
-
-#: awkgram.y:3704
-#, c-format
-msgid "tawk regex modifier `/.../%c' doesn't work in gawk"
-msgstr ""
-"modificatorul expresiei regulate tawk „/.../%c” nu funcționează în gawk"
-
-#: awkgram.y:3717
+#: awkgram.y:3688
 msgid "unterminated regexp"
 msgstr "expresie regulată neterminată"
 
-#: awkgram.y:3721
+#: awkgram.y:3692
 msgid "unterminated regexp at end of file"
 msgstr "expresie regulată neterminată la sfârșitul fișierului"
 
-#: awkgram.y:3810
+#: awkgram.y:3781
 msgid "use of `\\ #...' line continuation is not portable"
 msgstr "utilizarea continuării liniei „\\ #...” nu este portabilă"
 
-#: awkgram.y:3832
+#: awkgram.y:3803
 msgid "backslash not last character on line"
 msgstr "bara oblică inversă nu este ultimul caracter de pe linie"
 
-#: awkgram.y:3880 awkgram.y:3882
+#: awkgram.y:3851 awkgram.y:3853 field.c:1157 field.c:1262
 msgid "multidimensional arrays are a gawk extension"
 msgstr "matricele multidimensionale sunt o extensie gawk"
 
-#: awkgram.y:3907 awkgram.y:3918
+#: awkgram.y:3878 awkgram.y:3889
 #, c-format
 msgid "POSIX does not allow operator `%s'"
 msgstr "POSIX nu permite operatorul „%s”"
 
-#: awkgram.y:3909 awkgram.y:3920 awkgram.y:3955 awkgram.y:3963
+#: awkgram.y:3880 awkgram.y:3891 awkgram.y:3926 awkgram.y:3934
 #, c-format
 msgid "operator `%s' is not supported in old awk"
 msgstr "operatorul „%s” nu este acceptat în vechiul awk"
 
-#: awkgram.y:4060 awkgram.y:4082 command.y:1188
+#: awkgram.y:4031 awkgram.y:4053 command.y:1188
 msgid "unterminated string"
 msgstr "șir de caractere neterminat"
 
-#: awkgram.y:4070 main.c:1272
+#: awkgram.y:4041 main.c:1253
 msgid "POSIX does not allow physical newlines in string values"
 msgstr "POSIX nu permite liniile noi fizice în valorile șirului"
 
-#: awkgram.y:4072 node.c:483
+#: awkgram.y:4043 node.c:482
 msgid "backslash string continuation is not portable"
 msgstr "continuarea șirului cu bară oblică inversă nu este portabilă"
 
-#: awkgram.y:4313
+#: awkgram.y:4295
 #, c-format
 msgid "invalid char '%c' in expression"
 msgstr "caracter nevalid „%c” în expresie"
 
-#: awkgram.y:4408
+#: awkgram.y:4391
 #, c-format
 msgid "`%s' is a gawk extension"
 msgstr "„%s” este o extensie gawk"
 
-#: awkgram.y:4413
+#: awkgram.y:4396
 #, c-format
 msgid "POSIX does not allow `%s'"
 msgstr "POSIX nu permite „%s”"
 
-#: awkgram.y:4421
+#: awkgram.y:4404
 #, c-format
 msgid "`%s' is not supported in old awk"
 msgstr "„%s” nu este acceptat în vechiul awk"
 
-#: awkgram.y:4521
+#: awkgram.y:4508
 msgid "`goto' considered harmful!"
 msgstr "„goto” este considerat periculos!"
 
-#: awkgram.y:4590
+#: awkgram.y:4577
 #, c-format
 msgid "%d is invalid as number of arguments for %s"
 msgstr "%d este nevalid ca număr de argumente pentru %s"
 
-#: awkgram.y:4625
+#: awkgram.y:4612
 #, c-format
 msgid "%s: string literal as last argument of substitute has no effect"
 msgstr ""
 "%s: șirul de caractere literal ca ultim argument de substituție nu are nici "
 "un efect"
 
-#: awkgram.y:4630
+#: awkgram.y:4617
 #, c-format
 msgid "%s third parameter is not a changeable object"
 msgstr "al treilea parametru %s nu este un obiect modificabil"
 
-#: awkgram.y:4734 awkgram.y:4737
+#: awkgram.y:4720
+msgid "match: regexp constant as first argument is probably not what you want"
+msgstr ""
+"match: constanta expresiei regulate ca prim argument probabil nu este ceea "
+"ce doriți"
+
+#: awkgram.y:4729 awkgram.y:4732
 msgid "match: third argument is a gawk extension"
 msgstr "match: al treilea argument este o extensie gawk"
 
-#: awkgram.y:4791 awkgram.y:4794
+#: awkgram.y:4786 awkgram.y:4789
 msgid "close: second argument is a gawk extension"
 msgstr "close: al doilea argument este o extensie gawk"
 
-#: awkgram.y:4806
+#: awkgram.y:4801
 msgid "use of dcgettext(_\"...\") is incorrect: remove leading underscore"
 msgstr ""
 "utilizarea lui dcgettext(_\"...\") este incorectă: eliminați liniuța de "
 "subliniere „_”"
 
-#: awkgram.y:4821
+#: awkgram.y:4816
 msgid "use of dcngettext(_\"...\") is incorrect: remove leading underscore"
 msgstr ""
 "utilizarea lui dcngettext(_\"...\") este incorectă: eliminați liniuța de "
 "subliniere „_”"
 
-#: awkgram.y:4840
+#: awkgram.y:4835
 msgid "index: regexp constant as second argument is not allowed"
 msgstr ""
 "index: constanta expresiei regulate ca al doilea argument nu este permisă"
@@ -551,77 +544,79 @@ msgstr ""
 # italiene, făcută de unul dintre autorii lui
 # «gawk»:
 # „nasconde variabile globale”
-#: awkgram.y:4893
+#: awkgram.y:4888
 #, c-format
 msgid "function `%s': parameter `%s' shadows global variable"
 msgstr "funcția „%s”: parametrul „%s” ascunde variabila globală"
 
-#: awkgram.y:4942 debug.c:4197 debug.c:4240 debug.c:5362 profile.c:110
+#: awkgram.y:4937 debug.c:4243 debug.c:4286 debug.c:5412 profile.c:116
 #, c-format
 msgid "could not open `%s' for writing: %s"
 msgstr "nu s-a putut deschide „%s” pentru scriere: %s"
 
-#: awkgram.y:4943
+#: awkgram.y:4938
 msgid "sending variable list to standard error"
 msgstr "se trimite lista de variabile la ieșirea de eroare standard"
 
-#: awkgram.y:4951
+#: awkgram.y:4946
 #, c-format
 msgid "%s: close failed: %s"
 msgstr "%s: închidere eșuată %s"
 
-#: awkgram.y:4976
+#: awkgram.y:4971
 msgid "shadow_funcs() called twice!"
 msgstr "shadow_funcs() a fost apelată de două ori!"
 
-#: awkgram.y:4984
+#: awkgram.y:4979
 msgid "there were shadowed variables"
 msgstr "au existat variabile ascunse"
 
-#: awkgram.y:5061
+#: awkgram.y:5071
 #, c-format
 msgid "function name `%s' previously defined"
 msgstr "numele funcției „%s” a fost definit mai înainte"
 
-#: awkgram.y:5112
+#: awkgram.y:5122
 #, c-format
 msgid "function `%s': cannot use function name as parameter name"
 msgstr "funcția „%s”: nu se poate folosi numele funcției ca nume de parametru"
 
-#: awkgram.y:5115
+#: awkgram.y:5125
 #, c-format
-msgid "function `%s': cannot use special variable `%s' as a function parameter"
+msgid ""
+"function `%s': parameter `%s': POSIX disallows using a special variable as a "
+"function parameter"
 msgstr ""
-"funcția „%s”: nu se poate folosi variabila specială „%s” ca parametru al "
-"funcției"
+"funcția „%s”: parametrul „%s”: POSIX nu permite utilizarea unei variabile "
+"speciale ca parametru al unei funcții"
 
-#: awkgram.y:5119
+#: awkgram.y:5129
 #, c-format
 msgid "function `%s': parameter `%s' cannot contain a namespace"
 msgstr "funcția „%s”: parametrul „%s” nu poate conține un spațiu de nume"
 
-#: awkgram.y:5126
+#: awkgram.y:5136
 #, c-format
 msgid "function `%s': parameter #%d, `%s', duplicates parameter #%d"
 msgstr "funcția „%s”: parametrul #%d, „%s”, este o dublură a parametrului #%d"
 
-#: awkgram.y:5215
+#: awkgram.y:5225
 #, c-format
 msgid "function `%s' called but never defined"
 msgstr "funcția „%s” este apelată, dar nu a fost niciodată definită"
 
-#: awkgram.y:5219
+#: awkgram.y:5229
 #, c-format
 msgid "function `%s' defined but never called directly"
 msgstr "funcția „%s” este definită, dar nu a fost niciodată apelată direct"
 
-#: awkgram.y:5251
+#: awkgram.y:5261
 #, c-format
 msgid "regexp constant for parameter #%d yields boolean value"
 msgstr ""
 "constanta expresiei regulate pentru parametrul #%d produce o valoare booleană"
 
-#: awkgram.y:5266
+#: awkgram.y:5276
 #, c-format
 msgid ""
 "function `%s' called with space between name and `(',\n"
@@ -630,11 +625,11 @@ msgstr ""
 "funcția `%s' apelată cu spațiu între nume și `(',\n"
 "sau utilizată ca variabilă sau matrice"
 
-#: awkgram.y:5490 awkgram.y:5543 mpfr.c:1589 mpfr.c:1624
+#: awkgram.y:5500 awkgram.y:5553 mpfr.c:1598 mpfr.c:1619
 msgid "division by zero attempted"
 msgstr "s-a încercat împărțirea la zero"
 
-#: awkgram.y:5499 awkgram.y:5552 mpfr.c:1634
+#: awkgram.y:5509 awkgram.y:5562 mpfr.c:1635
 #, c-format
 msgid "division by zero attempted in `%%'"
 msgstr "s-a încercat împărțirea la zero în „%%”"
@@ -645,42 +640,42 @@ msgstr "s-a încercat împărțirea la zero în „%%”"
 # ===
 # Ok, corecție aplicată
 # inițial, era: post-intrementală
-#: awkgram.y:5872
+#: awkgram.y:5882
 msgid ""
 "cannot assign a value to the result of a field post-increment expression"
 msgstr ""
 "nu se poate atribui o valoare rezultatului unui câmp de expresie post-"
 "incrementală"
 
-#: awkgram.y:5875
+#: awkgram.y:5885
 #, c-format
 msgid "invalid target of assignment (opcode %s)"
 msgstr "țintă nevalidă a atribuirii (opcode %s)"
 
-#: awkgram.y:6255
+#: awkgram.y:6265
 msgid "statement has no effect"
 msgstr "declarația nu are nici un efect"
 
-#: awkgram.y:6770
+#: awkgram.y:6780
 #, c-format
 msgid "identifier %s: qualified names not allowed in traditional / POSIX mode"
 msgstr ""
 "identificator %s: numele calificate nu sunt permise în modul tradițional / "
 "POSIX"
 
-#: awkgram.y:6775
+#: awkgram.y:6785
 #, c-format
 msgid "identifier %s: namespace separator is two colons, not one"
 msgstr ""
 "identificatorul %s: separatorul de spațiu de nume este de două puncte duble "
 "„::”, nu de unul „:”"
 
-#: awkgram.y:6781
+#: awkgram.y:6791
 #, c-format
 msgid "qualified identifier `%s' is badly formed"
 msgstr "identificatorul calificat „%s” este prost format"
 
-#: awkgram.y:6788
+#: awkgram.y:6798
 #, c-format
 msgid ""
 "identifier `%s': namespace separator can only appear once in a qualified name"
@@ -688,13 +683,13 @@ msgstr ""
 "identificator „%s”: separatorul de spațiu de nume poate apărea o singură "
 "dată într-un nume calificat"
 
-#: awkgram.y:6837 awkgram.y:6888
+#: awkgram.y:6847 awkgram.y:6898
 #, c-format
 msgid "using reserved identifier `%s' as a namespace is not allowed"
 msgstr ""
 "utilizarea identificatorului rezervat „%s” ca spațiu de nume nu este permisă"
 
-#: awkgram.y:6844 awkgram.y:6854
+#: awkgram.y:6854 awkgram.y:6864
 #, c-format
 msgid ""
 "using reserved identifier `%s' as second component of a qualified name is "
@@ -703,7 +698,7 @@ msgstr ""
 "utilizarea identificatorului rezervat „%s” ca a doua componentă a unui nume "
 "calificat nu este permisă"
 
-#: awkgram.y:6872
+#: awkgram.y:6882
 msgid "@namespace is a gawk extension"
 msgstr "@namespace este o extensie gawk"
 
@@ -714,290 +709,148 @@ msgstr "@namespace este o extensie gawk"
 # Ok, propunere aplicată
 # inițial, era:
 # „... regulile de denumire ale identificatorului”
-#: awkgram.y:6879
+#: awkgram.y:6889
 #, c-format
 msgid "namespace name `%s' must meet identifier naming rules"
 msgstr ""
 "numele spațiului de nume „%s” trebuie să îndeplinească regulile de denumire "
 "pentru identificare"
 
-#: builtin.c:98 builtin.c:105
+#: builtin.c:93 builtin.c:100
 #, c-format
 msgid "%s: called with %d arguments"
 msgstr "%s: apelat cu %d argumente"
 
-#: builtin.c:130
+#: builtin.c:125
 #, c-format
 msgid "%s to \"%s\" failed: %s"
 msgstr "%s pentru \"%s\" a eșuat: %s"
 
-#: builtin.c:134
+#: builtin.c:129
 msgid "standard output"
 msgstr "ieșirea standard"
 
-#: builtin.c:135
+#: builtin.c:130
 msgid "standard error"
 msgstr "ieșirea de eroare standard"
 
-#: builtin.c:211 builtin.c:549 builtin.c:649 builtin.c:1859 builtin.c:2608
-#: builtin.c:2626 builtin.c:2745 builtin.c:3775 mpfr.c:821
+#: builtin.c:206 builtin.c:544 builtin.c:646 builtin.c:667 builtin.c:1421
+#: builtin.c:1439 builtin.c:1558 builtin.c:2622 mpfr.c:830
 #, c-format
 msgid "%s: received non-numeric argument"
 msgstr "%s: s-a primit un argument nenumeric"
 
-#: builtin.c:217
+#: builtin.c:212
 #, c-format
 msgid "exp: argument %g is out of range"
 msgstr "exp: argumentul %g este în afara domeniului"
 
-#: builtin.c:281 builtin.c:618 builtin.c:2201 builtin.c:2263 builtin.c:2517
-#: builtin.c:2550
+#: builtin.c:276 builtin.c:615 builtin.c:1021 builtin.c:1083 builtin.c:1330
+#: builtin.c:1363
 #, c-format
 msgid "%s: received non-string argument"
 msgstr "%s: s-a primit un argument ce nu este un șir"
 
-#: builtin.c:298
+#: builtin.c:293
 #, c-format
 msgid "fflush: cannot flush: pipe `%.*s' opened for reading, not writing"
 msgstr ""
 "fflush: nu se poate goli: conducta „%.*s” este deschisă pentru citire, nu "
 "pentru scriere"
 
-#: builtin.c:301
+#: builtin.c:296
 #, c-format
 msgid "fflush: cannot flush: file `%.*s' opened for reading, not writing"
 msgstr ""
 "fflush: nu se poate goli: fișierul „%.*s” este deschis pentru citire, nu "
 "pentru scriere"
 
-#: builtin.c:312
+#: builtin.c:307
 #, c-format
 msgid "fflush: cannot flush file `%.*s': %s"
 msgstr "fflush: nu se poate goli fișierul „%.*s”: %s"
 
-#: builtin.c:317
+#: builtin.c:312
 #, c-format
 msgid "fflush: cannot flush: two-way pipe `%.*s' has closed write end"
 msgstr ""
 "fflush: nu se poate goli: conducta bidirecțională „%.*s” are capătul de "
 "scriere închis"
 
-#: builtin.c:323
+#: builtin.c:318
 #, c-format
 msgid "fflush: `%.*s' is not an open file, pipe or co-process"
 msgstr "fflush: „%.*s” nu este un fișier deschis, o conductă sau un co-proces"
 
-#: builtin.c:432 builtin.c:1897 builtin.c:2107 builtin.c:2787 builtin.c:4037
-#: builtin.c:4124 builtin.c:4191
+#: builtin.c:427 builtin.c:705 builtin.c:915 builtin.c:1600 builtin.c:2899
+#: builtin.c:2986 builtin.c:3053
 #, c-format
 msgid "%s: received non-string first argument"
 msgstr "%s: primul argument primit, nu este un șir"
 
-#: builtin.c:434 builtin.c:4015 builtin.c:4030 builtin.c:4120 builtin.c:4182
+#: builtin.c:429 builtin.c:2877 builtin.c:2892 builtin.c:2982 builtin.c:3044
 #, c-format
 msgid "%s: received non-string second argument"
 msgstr "%s: al doilea argument primit, nu este un șir"
 
-# R-GC, scrie:
-# după revizarea fișierului, DȘ, zice:
-# → typo: "length"
-# ===
-# ok, corecție aplicată(mai apărea, în alt loc, aceeași greșeală)
-#: builtin.c:592
-msgid "length: received array argument"
-msgstr "length: s-a primit ca argument o matrice"
-
-#: builtin.c:595
-msgid "`length(array)' is a gawk extension"
-msgstr "„length(array)” este o extensie gawk"
-
-#: builtin.c:652 builtin.c:1863
+#: builtin.c:649 builtin.c:671
 #, c-format
 msgid "%s: received negative argument %g"
 msgstr "%s: s-a primit un argument negativ %g"
 
-#: builtin.c:857 builtin.c:862 builtin.c:1016
-msgid "fatal: must use `count$' on all formats or none"
-msgstr ""
-"fatal: trebuie să se folosească „count$” în toate formatele sau în niciunul"
-
-#: builtin.c:935
-#, c-format
-msgid "field width is ignored for `%%' specifier"
-msgstr "lățimea câmpului este ignorată pentru specificatorul „%%”"
-
-#: builtin.c:937
-#, c-format
-msgid "precision is ignored for `%%' specifier"
-msgstr "precizia este ignorată pentru specificatorul „%%”"
-
-#: builtin.c:939
-#, c-format
-msgid "field width and precision are ignored for `%%' specifier"
-msgstr "lățimea câmpului și precizia sunt ignorate pentru specificatorul „%%”"
-
-#: builtin.c:990
-msgid "fatal: `$' is not permitted in awk formats"
-msgstr "fatal: „$” nu este permis în formatele awk"
-
-#: builtin.c:999
-msgid "fatal: argument index with `$' must be > 0"
-msgstr "fatal: indexul argumentului cu „$” trebuie să fie > 0"
-
-#: builtin.c:1003
-#, c-format
-msgid ""
-"fatal: argument index %ld greater than total number of supplied arguments"
-msgstr ""
-"fatal: indexul argumentelor %ld este mai mare decât numărul total de "
-"argumente furnizate"
-
-#: builtin.c:1007
-msgid "fatal: `$' not permitted after period in format"
-msgstr "fatal: „$” nu este permis după un punct în format"
-
-#: builtin.c:1026
-msgid "fatal: no `$' supplied for positional field width or precision"
-msgstr ""
-"fatal: nu este furnizat „$” pentru lungimea sau precizia câmpului pozițional"
-
-#: builtin.c:1104
-#, c-format
-msgid "`%c' is meaningless in awk formats; ignored"
-msgstr "„%c” este lipsit de sens în formatele awk; se ignoră"
-
-#: builtin.c:1108
-#, c-format
-msgid "fatal: `%c' is not permitted in POSIX awk formats"
-msgstr "fatal: „%c” nu este permis în formatele POSIX ale awk"
-
-#: builtin.c:1139
-#, c-format
-msgid "[s]printf: value %g is too big for %%c format"
-msgstr "[s]printf: valoarea %g este prea mare pentru formatul %%c"
-
-#: builtin.c:1152
-#, c-format
-msgid "[s]printf: value %g is not a valid wide character"
-msgstr "[s]printf: valoarea %g nu este un caracter larg valid"
-
-#: builtin.c:1544
-#, c-format
-msgid "[s]printf: value %g is out of range for `%%%c' format"
-msgstr ""
-"[s]printf: valoarea %g este în afara intervalului pentru formatul „%%%c”"
-
-#: builtin.c:1552
-#, c-format
-msgid "[s]printf: value %s is out of range for `%%%c' format"
-msgstr ""
-"[s]printf: valoarea %s este în afara intervalului pentru formatul „%%%c”"
-
-#: builtin.c:1577
-#, c-format
-msgid "%%%c format is POSIX standard but not portable to other awks"
-msgstr "formatul %%%c este standard POSIX, dar nu este portabil la alte awks"
-
-#: builtin.c:1688
-#, c-format
-msgid "ignoring unknown format specifier character `%c': no argument converted"
-msgstr ""
-"se ignoră caracterul specificator de format „%c” necunoscut: niciun argument "
-"nu a fost convertit"
-
-#: builtin.c:1693
-msgid "fatal: not enough arguments to satisfy format string"
-msgstr "fatal: nu sunt suficiente argumente pentru a satisface șirul de format"
-
-#: builtin.c:1695
-msgid "^ ran out for this one"
-msgstr "^ insuficient pentru aceasta"
-
-#: builtin.c:1702
-msgid "[s]printf: format specifier does not have control letter"
-msgstr "[s]printf: specificatorul de format nu are literă de control"
-
-#: builtin.c:1705
-msgid "too many arguments supplied for format string"
-msgstr "prea multe argumente furnizate pentru șirul de format"
-
-# R-GC, scrie:
-# traducerea acestui mesaj, este o adaptare între
-# traducerea anterioară și traducerea italiană
-# actuală a acestui mesaj, ce este făcută de
-# dezvoltatorul italian al «gawk».
-#: builtin.c:1752
-#, c-format
-msgid "%s: received non-string format string argument"
-msgstr "%s: argumentul de format primit, nu este un șir"
-
-#: builtin.c:1767
-msgid "sprintf: no arguments"
-msgstr "sprintf: fără argumente"
-
-#: builtin.c:1790 builtin.c:1801
-msgid "printf: no arguments"
-msgstr "printf: fără argumente"
-
-#: builtin.c:1816
-msgid "printf: attempt to write to closed write end of two-way pipe"
-msgstr ""
-"printf: s-a încercat să se scrie la capătul de scriere închis al conductei "
-"bidirecționale"
-
-#: builtin.c:1884 builtin.c:4113
+#: builtin.c:692 builtin.c:2975
 #, c-format
 msgid "%s: received non-numeric third argument"
 msgstr "%s: al treilea argument primit nu este numeric"
 
-#: builtin.c:1891 builtin.c:2081 builtin.c:2587 builtin.c:3603 builtin.c:3644
-#: builtin.c:4244
+#: builtin.c:699 builtin.c:889 builtin.c:1400 builtin.c:2440 builtin.c:2486
+#: builtin.c:3106
 #, c-format
 msgid "%s: received non-numeric second argument"
 msgstr "%s: al doilea argument primit, nu este numeric"
 
-#: builtin.c:1902
+#: builtin.c:710
 #, c-format
 msgid "substr: length %g is not >= 1"
 msgstr "substr: lungimea %g nu este >= 1"
 
-#: builtin.c:1904
+#: builtin.c:712
 #, c-format
 msgid "substr: length %g is not >= 0"
 msgstr "substr: lungimea %g nu este >= 0"
 
-#: builtin.c:1918
+#: builtin.c:726
 #, c-format
 msgid "substr: non-integer length %g will be truncated"
 msgstr "substr: lungimea neîntreagă %g va fi trunchiată"
 
-#: builtin.c:1923
+#: builtin.c:731
 #, c-format
 msgid "substr: length %g too big for string indexing, truncating to %g"
 msgstr ""
 "substr: lungimea %g este prea mare pentru indexarea șirurilor, se trunchiază "
 "la %g"
 
-#: builtin.c:1935
+#: builtin.c:743
 #, c-format
 msgid "substr: start index %g is invalid, using 1"
 msgstr "substr: indexul de start %g este nevalid, se folosește 1"
 
-#: builtin.c:1940
+#: builtin.c:748
 #, c-format
 msgid "substr: non-integer start index %g will be truncated"
 msgstr "substr: indexul de start neîntreg %g va fi trunchiat"
 
-#: builtin.c:1963
+#: builtin.c:771
 msgid "substr: source string is zero length"
 msgstr "substr: șirul de caractere sursă are lungimea zero"
 
-#: builtin.c:1977
+#: builtin.c:785
 #, c-format
 msgid "substr: start index %g is past end of string"
 msgstr "substr: indexul de start %g este după sfârșitul de șirului"
 
-#: builtin.c:1985
+#: builtin.c:793
 #, c-format
 msgid ""
 "substr: length %g at start index %g exceeds length of first argument (%lu)"
@@ -1005,25 +858,25 @@ msgstr ""
 "substr: lungimea %g la începutul indexului %g depășește lungimea primului "
 "argument (%lu)"
 
-#: builtin.c:2060
+#: builtin.c:868
 msgid "strftime: format value in PROCINFO[\"strftime\"] has numeric type"
 msgstr ""
 "strftime: valoarea formatului din PROCINFO[\"strftime\"] are tip numeric"
 
-#: builtin.c:2091
+#: builtin.c:899
 msgid "strftime: second argument less than 0 or too big for time_t"
 msgstr ""
 "strftime: al doilea argument este mai mic de 0 sau prea mare pentru time_t"
 
-#: builtin.c:2098
+#: builtin.c:906
 msgid "strftime: second argument out of range for time_t"
 msgstr "strftime: al doilea argument în afara intervalului pentru time_t"
 
-#: builtin.c:2114
+#: builtin.c:922
 msgid "strftime: received empty format string"
 msgstr "strftime: s-a primit un șir de format gol"
 
-#: builtin.c:2220
+#: builtin.c:1040
 msgid "mktime: at least one of the values is out of the default range"
 msgstr ""
 "mktime: cel puțin una dintre valori este în afara intervalului implicit"
@@ -1036,144 +889,146 @@ msgstr ""
 # de traducere (ca un zombie)”, se întîmplă
 # accidente ca acesta....
 # Corectare aplicată
-#: builtin.c:2258
+#: builtin.c:1078
 msgid "'system' function not allowed in sandbox mode"
 msgstr "funcția „system” nu este permisă în modul sandbox"
 
-#: builtin.c:2332 builtin.c:2407
+#: builtin.c:1145 builtin.c:1220
 msgid "print: attempt to write to closed write end of two-way pipe"
 msgstr ""
 "print: s-a încercat să se scrie la capătul de scriere închis al conductei "
 "bidirecționale"
 
-#: builtin.c:2430
+#: builtin.c:1243
 #, c-format
 msgid "reference to uninitialized field `$%d'"
 msgstr "referință la câmpul neinițializat „$%d”"
 
-#: builtin.c:2585 builtin.c:3601 builtin.c:3642 builtin.c:4242
+#: builtin.c:1398 builtin.c:2438 builtin.c:2484 builtin.c:3104
 #, c-format
 msgid "%s: received non-numeric first argument"
 msgstr "%s: primul argument primit nu este numeric"
 
-#: builtin.c:2778
+#: builtin.c:1591
 msgid "match: third argument is not an array"
 msgstr "match: al treilea argument nu este o matrice"
 
-#: builtin.c:2780
+#: builtin.c:1593
 #, c-format
 msgid "%s: cannot use %s as third argument"
 msgstr "%s: nu se poate folosi %s ca al treilea argument"
 
-#: builtin.c:3029
+#: builtin.c:1851
 #, c-format
 msgid "gensub: third argument `%.*s' treated as 1"
 msgstr "gensub: al treilea argument „%.*s” tratat ca fiind 1"
 
-#: builtin.c:3403
+#: builtin.c:2220
 #, c-format
 msgid "%s: can be called indirectly only with two arguments"
 msgstr "%s: poate fi apelat indirect doar cu două argumente"
 
-#: builtin.c:3426
+#: builtin.c:2243
 msgid "indirect call to gensub requires three or four arguments"
 msgstr "apelul indirect la «gensub» necesită trei sau patru argumente"
 
-#: builtin.c:3488
+#: builtin.c:2305
 msgid "indirect call to match requires two or three arguments"
 msgstr "apelul indirect la «match» necesită două sau argumente"
 
-#: builtin.c:3532
+#: builtin.c:2366
 #, c-format
 msgid "indirect call to %s requires two to four arguments"
 msgstr "apelul indirect la %s necesită de la două până la patru argumente"
 
-#: builtin.c:3609
+#: builtin.c:2446
 #, c-format
 msgid "lshift(%f, %f): negative values are not allowed"
 msgstr "lshift(%f, %f): valorile negative nu sunt permise"
 
-#: builtin.c:3613
+#: builtin.c:2449
 #, c-format
 msgid "lshift(%f, %f): fractional values will be truncated"
 msgstr "lshift(%f, %f): valorile fracționale vor fi trunchiate"
 
-#: builtin.c:3615
+#: builtin.c:2460
 #, c-format
-msgid "lshift(%f, %f): too large shift value will give strange results"
-msgstr ""
-"lshift(%f, %f): o valoare prea mare de schimbare va da rezultate ciudate"
+msgid "lshift(%f, %f): too large shift value returns zero"
+msgstr "lshift(%f, %f): o valoare prea mare de deplasare va returna zero"
 
-#: builtin.c:3650
+#: builtin.c:2492
 #, c-format
 msgid "rshift(%f, %f): negative values are not allowed"
 msgstr "rshift(%f, %f): valorile negative nu sunt permise"
 
-#: builtin.c:3654
+#: builtin.c:2495
 #, c-format
 msgid "rshift(%f, %f): fractional values will be truncated"
 msgstr "rshift(%f, %f): valorile fracționale vor fi trunchiate"
 
-#: builtin.c:3656
+#: builtin.c:2506
 #, c-format
-msgid "rshift(%f, %f): too large shift value will give strange results"
-msgstr ""
-"rshift(%f, %f): o valoare prea mare de schimbare va da rezultate ciudate"
+msgid "rshift(%f, %f): too large shift value returns zero"
+msgstr "rshift(%f, %f): o valoare prea mare de deplasare va returna zero"
 
-#: builtin.c:3680 builtin.c:3711 builtin.c:3741
+#: builtin.c:2527 builtin.c:2558 builtin.c:2588
 #, c-format
 msgid "%s: called with less than two arguments"
 msgstr "%s: apelat cu mai puțin de două argumente"
 
-#: builtin.c:3685 builtin.c:3716 builtin.c:3747
+#: builtin.c:2532 builtin.c:2563 builtin.c:2594
 #, c-format
 msgid "%s: argument %d is non-numeric"
 msgstr "%s: argumentul %d nu este numeric"
 
-#: builtin.c:3689 builtin.c:3720 builtin.c:3751
+#: builtin.c:2536 builtin.c:2567 builtin.c:2598
 #, c-format
 msgid "%s: argument %d negative value %g is not allowed"
 msgstr "%s: argument %d, valoarea negativă %g nu este permisă"
 
-#: builtin.c:3780
+#: builtin.c:2627
 #, c-format
 msgid "compl(%f): negative value is not allowed"
 msgstr "compl(%f): valoarea negativă nu este permisă"
 
-#: builtin.c:3783
+#: builtin.c:2630
 #, c-format
 msgid "compl(%f): fractional value will be truncated"
 msgstr "compl(%f): valoarea fracțională va fi trunchiată"
 
-#: builtin.c:3971
+#: builtin.c:2761
+msgid "hexadecimal floating point constants require an exponent"
+msgstr "constantele hexazecimale cu virgulă mobilă necesită un exponent"
+
+#: builtin.c:2833
 #, c-format
 msgid "dcgettext: `%s' is not a valid locale category"
 msgstr "dcgettext: „%s” nu este o categorie locală validă"
 
-#: builtin.c:4006 builtin.c:4024
+#: builtin.c:2868 builtin.c:2886
 #, c-format
 msgid "%s: received non-string third argument"
 msgstr "%s: al treilea argument primit, nu este un șir"
 
-#: builtin.c:4079 builtin.c:4100
+#: builtin.c:2941 builtin.c:2962
 #, c-format
 msgid "%s: received non-string fifth argument"
 msgstr "%s: al cincilea argument primit, nu este un șir"
 
-#: builtin.c:4089 builtin.c:4106
+#: builtin.c:2951 builtin.c:2968
 #, c-format
 msgid "%s: received non-string fourth argument"
 msgstr "%s: al patrulea argument primit, nu este un șir"
 
-#: builtin.c:4234 mpfr.c:1337
+#: builtin.c:3096 mpfr.c:1346
 msgid "intdiv: third argument is not an array"
 msgstr "intdiv: al treilea argument nu este o matrice"
 
-#: builtin.c:4253 mpfr.c:1386
+#: builtin.c:3115 mpfr.c:1395
 msgid "intdiv: division by zero attempted"
 msgstr "intdiv: s-a încercat împărțirea la zero"
 
-#: builtin.c:4294
+#: builtin.c:3156
 msgid "typeof: second argument is not an array"
 msgstr "typeof: al doilea argument nu este o matrice"
 
@@ -1184,7 +1039,7 @@ msgstr "typeof: al doilea argument nu este o matrice"
 # ===
 # Corecții aplicate...; explicația prezenței acestor
 # erori, la fel ca mai sus, „intrarea în modul zombie”
-#: builtin.c:4384
+#: builtin.c:3260
 #, c-format
 msgid ""
 "typeof detected invalid flags combination `%s'; please file a bug report"
@@ -1192,7 +1047,7 @@ msgstr ""
 "typeof a detectat o combinație nevalidă de fanioane „%s”; trimiteți un "
 "raport de eroare semnalând acest lucru"
 
-#: builtin.c:4422
+#: builtin.c:3299
 #, c-format
 msgid "typeof: unknown argument type `%s'"
 msgstr "typeof: tip de argument necunoscut „%s”"
@@ -1528,7 +1383,7 @@ msgstr ""
 "where [N] - (la fel ca backtrace) afișează urma tuturor cadrelor sau cele "
 "mai interioare N cadre (cele mai exterioare dacă N < 0)"
 
-#: command.y:1017 debug.c:423 gawkapi.c:260 msg.c:142
+#: command.y:1017 debug.c:424 gawkapi.c:262 msg.c:142
 #, c-format
 msgid "error: "
 msgstr "eroare: "
@@ -1551,11 +1406,6 @@ msgstr "caracter nevalid în comandă"
 #, c-format
 msgid "unknown command - `%.*s', try help"
 msgstr "comandă necunoscută - «%.*s», încercați „--help”"
-
-#: command.y:1232
-#, c-format
-msgid "%s"
-msgstr "%s"
 
 #: command.y:1294
 msgid "invalid character"
@@ -1597,63 +1447,64 @@ msgid "(un)set or show instruction tracing (value=on|off)"
 msgstr "(dez)activează sau afișează urmărirea instrucțiunilor (valoare=on|off)"
 
 #: debug.c:358
-msgid "program not running"
-msgstr "programul nu rulează"
+#, c-format
+msgid "%s:%d:%s: program not running"
+msgstr "%s:%d:%s: programul nu rulează"
 
-#: debug.c:475
+#: debug.c:476
 #, c-format
 msgid "source file `%s' is empty.\n"
 msgstr "fișierul sursă „%s” este gol.\n"
 
-#: debug.c:502
+#: debug.c:503
 msgid "no current source file"
 msgstr "nici un fișier sursă curent"
 
-#: debug.c:527
+#: debug.c:528
 #, c-format
 msgid "cannot find source file named `%s': %s"
 msgstr "nu se poate găsi fișierul sursă numit „%s”: %s"
 
-#: debug.c:551
+#: debug.c:552
 #, c-format
 msgid "warning: source file `%s' modified since program compilation.\n"
 msgstr ""
 "avertisment: fișierul sursă „%s” a fost modificat de la compilarea "
 "programului.\n"
 
-#: debug.c:573
+#: debug.c:574
 #, c-format
 msgid "line number %d out of range; `%s' has %d lines"
 msgstr "numărul de linie %d în afara intervalului; „%s” are %d linii"
 
-#: debug.c:633
+#: debug.c:634
 #, c-format
 msgid "unexpected eof while reading file `%s', line %d"
 msgstr ""
 "sfârșit de fișier neașteptat în timpul citirii fișierului „%s”, linia %d"
 
-#: debug.c:642
+#: debug.c:643
 #, c-format
 msgid "source file `%s' modified since start of program execution"
 msgstr ""
 "fișierul sursă „%s” a fost modificat de la începutul execuției programului"
 
-#: debug.c:754
+#: debug.c:755
 #, c-format
 msgid "Current source file: %s\n"
 msgstr "Fișier sursă curent: %s\n"
 
-#: debug.c:755
+#: debug.c:756
 #, c-format
 msgid "Number of lines: %d\n"
 msgstr "Număr de linii: %d\n"
 
-#: debug.c:762
+#: debug.c:763
 #, c-format
 msgid "Source file (lines): %s (%d)\n"
 msgstr "Fișier sursă (linii): %s (%d)\n"
 
-#: debug.c:776
+#: debug.c:777
 msgid ""
 "Number  Disp  Enabled  Location\n"
 "\n"
@@ -1661,54 +1512,54 @@ msgstr ""
 "Număr   Disp  Activat  Locație\n"
 "\n"
 
-#: debug.c:787
+#: debug.c:788
 #, c-format
 msgid "\tnumber of hits = %ld\n"
 msgstr "\tnumăr de potriviri = %ld\n"
 
-#: debug.c:789
+#: debug.c:790
 #, c-format
 msgid "\tignore next %ld hit(s)\n"
 msgstr "\tignoră următoare(a/le) %ld potrivir(e/i)\n"
 
-#: debug.c:791 debug.c:931
+#: debug.c:792 debug.c:932
 #, c-format
 msgid "\tstop condition: %s\n"
 msgstr "\tcondiție de oprire: %s\n"
 
-#: debug.c:793 debug.c:933
+#: debug.c:794 debug.c:934
 msgid "\tcommands:\n"
 msgstr "\tcomenzi:\n"
 
-#: debug.c:815
+#: debug.c:816
 #, c-format
 msgid "Current frame: "
 msgstr "Cadru curent: "
 
-#: debug.c:818
+#: debug.c:819
 #, c-format
 msgid "Called by frame: "
 msgstr "Apelat de către cadru: "
 
-#: debug.c:822
+#: debug.c:823
 #, c-format
 msgid "Caller of frame: "
 msgstr "Apelant al cadrului: "
 
-#: debug.c:840
+#: debug.c:841
 #, c-format
 msgid "None in main().\n"
 msgstr "Niciunul în main().\n"
 
-#: debug.c:870
+#: debug.c:871
 msgid "No arguments.\n"
 msgstr "Fără argumente.\n"
 
-#: debug.c:871
+#: debug.c:872
 msgid "No locals.\n"
 msgstr "Fără variabile locale.\n"
 
-#: debug.c:879
+#: debug.c:880
 msgid ""
 "All defined variables:\n"
 "\n"
@@ -1716,7 +1567,7 @@ msgstr ""
 "Toate variabilele definite:\n"
 "\n"
 
-#: debug.c:889
+#: debug.c:890
 msgid ""
 "All defined functions:\n"
 "\n"
@@ -1724,7 +1575,7 @@ msgstr ""
 "Toate funcțiile definite:\n"
 "\n"
 
-#: debug.c:908
+#: debug.c:909
 msgid ""
 "Auto-display variables:\n"
 "\n"
@@ -1732,7 +1583,7 @@ msgstr ""
 "Afișare automată a variabilelor:\n"
 "\n"
 
-#: debug.c:911
+#: debug.c:912
 msgid ""
 "Watch variables:\n"
 "\n"
@@ -1740,100 +1591,100 @@ msgstr ""
 "Variabile de urmărire:\n"
 "\n"
 
-#: debug.c:1054
+#: debug.c:1055
 #, c-format
 msgid "no symbol `%s' in current context\n"
 msgstr "nici un simbol „%s” în contextul curent\n"
 
-#: debug.c:1066 debug.c:1455
+#: debug.c:1067 debug.c:1496
 #, c-format
 msgid "`%s' is not an array\n"
 msgstr "„%s” nu este o matrice\n"
 
-#: debug.c:1080
+#: debug.c:1081
 #, c-format
 msgid "$%ld = uninitialized field\n"
 msgstr "$%ld = câmp neinițializat\n"
 
-#: debug.c:1101
+#: debug.c:1126
 #, c-format
 msgid "array `%s' is empty\n"
 msgstr "matricea „%s” este goală\n"
 
-#: debug.c:1144 debug.c:1196
+#: debug.c:1185 debug.c:1237
 #, c-format
 msgid "subscript \"%.*s\" is not in array `%s'\n"
 msgstr "indicele „%.*s” nu se află în matricea „%s”\n"
 
-#: debug.c:1200
+#: debug.c:1241
 #, c-format
 msgid "`%s[\"%.*s\"]' is not an array\n"
 msgstr "„%s[\"%.*s\"]” nu este o matrice\n"
 
-#: debug.c:1262 debug.c:5122
+#: debug.c:1303 debug.c:5172
 #, c-format
 msgid "`%s' is not a scalar variable"
 msgstr "„%s” nu este o variabilă scalară"
 
-#: debug.c:1285 debug.c:5152
+#: debug.c:1326 debug.c:5202
 #, c-format
 msgid "attempt to use array `%s[\"%.*s\"]' in a scalar context"
 msgstr "încercare de a utiliza matricea „%s[\"%.*s\"]” într-un context scalar"
 
-#: debug.c:1308 debug.c:5163
+#: debug.c:1349 debug.c:5213
 #, c-format
 msgid "attempt to use scalar `%s[\"%.*s\"]' as array"
 msgstr "încercare de a utiliza scalarul „%s[\"%.*s\"]” ca matrice"
 
-#: debug.c:1451
+#: debug.c:1492
 #, c-format
 msgid "`%s' is a function"
 msgstr "„%s” este o funcție"
 
-#: debug.c:1493
+#: debug.c:1534
 #, c-format
 msgid "watchpoint %d is unconditional\n"
 msgstr "punctul de urmărire %d este necondițional\n"
 
-#: debug.c:1527
+#: debug.c:1568
 #, c-format
 msgid "no display item numbered %ld"
 msgstr "niciun element de afișare numerotat %ld"
 
-#: debug.c:1530
+#: debug.c:1571
 #, c-format
 msgid "no watch item numbered %ld"
 msgstr "niciun element de urmărire numerotat %ld"
 
-#: debug.c:1556
+#: debug.c:1597
 #, c-format
 msgid "%d: subscript \"%.*s\" is not in array `%s'\n"
 msgstr "%d: indicele „%.*s” nu se află în matricea „%s”\n"
 
-#: debug.c:1796
+#: debug.c:1841
 msgid "attempt to use scalar value as array"
 msgstr "încercare de a utiliza valoarea scalară ca matrice"
 
-#: debug.c:1887
+#: debug.c:1932
 #, c-format
 msgid "Watchpoint %d deleted because parameter is out of scope.\n"
 msgstr ""
 "Punctul de urmărire %d a fost șters deoarece parametrul este în afara "
 "domeniului de aplicare.\n"
 
-#: debug.c:1898
+#: debug.c:1943
 #, c-format
 msgid "Display %d deleted because parameter is out of scope.\n"
 msgstr ""
 "Afișarea %d a fost ștearsă deoarece parametrul este în afara domeniului de "
 "aplicare.\n"
 
-#: debug.c:1931
+#: debug.c:1976
 #, c-format
 msgid " in file `%s', line %d\n"
 msgstr " în fișierul „%s”, linia %d\n"
 
-#: debug.c:1952
+#: debug.c:1997
 #, c-format
 msgid " at `%s':%d"
 msgstr " la „%s”:%d"
@@ -1841,104 +1692,104 @@ msgstr " la „%s”:%d"
 # R-GC, scrie:
 # aici, „in”, la fel de bine, poate să fie «din»,
 # în loc de «în»; trebuie văzut în „producție”
-#: debug.c:1968 debug.c:2031
+#: debug.c:2013 debug.c:2076
 #, c-format
 msgid "#%ld\tin "
 msgstr "#%ld\tîn "
 
-#: debug.c:2005
+#: debug.c:2050
 #, c-format
 msgid "More stack frames follow ...\n"
 msgstr "Urmează mai multe cadre de stivă...\n"
 
-#: debug.c:2048
+#: debug.c:2093
 msgid "invalid frame number"
 msgstr "număr de cadru nevalid"
 
-#: debug.c:2231
+#: debug.c:2276
 #, c-format
 msgid "Note: breakpoint %d (enabled, ignore next %ld hits), also set at %s:%d"
 msgstr ""
 "Notă: punctul de întrerupere %d (activat, ignoră următoarele %ld potriviri), "
 "de asemenea, stabilit la %s:%d"
 
-#: debug.c:2238
+#: debug.c:2283
 #, c-format
 msgid "Note: breakpoint %d (enabled), also set at %s:%d"
 msgstr ""
 "Notă: punctul de întrerupere %d (activat), de asemenea, stabilit la %s:%d"
 
-#: debug.c:2245
+#: debug.c:2290
 #, c-format
 msgid "Note: breakpoint %d (disabled, ignore next %ld hits), also set at %s:%d"
 msgstr ""
 "Notă: punctul de întrerupere %d (dezactivat, ignoră următoarele %ld "
 "potriviri), de asemenea, stabilit la %s:%d"
 
-#: debug.c:2252
+#: debug.c:2297
 #, c-format
 msgid "Note: breakpoint %d (disabled), also set at %s:%d"
 msgstr ""
 "Notă: punctul de întrerupere %d (dezactivat), de asemenea, stabilit la %s:%d"
 
-#: debug.c:2269
+#: debug.c:2314
 #, c-format
 msgid "Breakpoint %d set at file `%s', line %d\n"
 msgstr "Punctul de întrerupere %d stabilit în fișierul „%s”, linia %d\n"
 
-#: debug.c:2371
+#: debug.c:2416
 #, c-format
 msgid "cannot set breakpoint in file `%s'\n"
 msgstr "nu se poate stabili punctul de întrerupere în fișierul „%s”\n"
 
-#: debug.c:2400
+#: debug.c:2445
 #, c-format
 msgid "line number %d in file `%s' is out of range"
 msgstr "numărul de linie %d din fișierul „%s” este în afara intervalului"
 
-#: debug.c:2404
+#: debug.c:2449
 #, c-format
 msgid "internal error: cannot find rule\n"
 msgstr "eroare internă: nu se poate găsi regula\n"
 
-#: debug.c:2406
+#: debug.c:2451
 #, c-format
 msgid "cannot set breakpoint at `%s':%d\n"
 msgstr "nu se poate stabili punctul de întrerupere în „%s”:%d\n"
 
-#: debug.c:2418
+#: debug.c:2463
 #, c-format
 msgid "cannot set breakpoint in function `%s'\n"
 msgstr "nu se poate stabili punctul de întrerupere în funcția „%s”\n"
 
-#: debug.c:2436
+#: debug.c:2481
 #, c-format
 msgid "breakpoint %d set at file `%s', line %d is unconditional\n"
 msgstr ""
 "punctul de întrerupere %d stabilit în fișierul „%s”, linia %d este "
 "necondițional\n"
 
-#: debug.c:2524 debug.c:3381
+#: debug.c:2569 debug.c:3427
 #, c-format
 msgid "line number %d in file `%s' out of range"
 msgstr "numărul de linie %d din fișierul „%s” este în afara intervalului"
 
-#: debug.c:2540 debug.c:2562
+#: debug.c:2585 debug.c:2607
 #, c-format
 msgid "Deleted breakpoint %d"
 msgstr "Punctul de întrerupere %d a fost șters"
 
-#: debug.c:2546
+#: debug.c:2591
 #, c-format
 msgid "No breakpoint(s) at entry to function `%s'\n"
 msgstr "Nu există punct(e) de întrerupere la intrarea în funcția „%s”\n"
 
-#: debug.c:2573
+#: debug.c:2618
 #, c-format
 msgid "No breakpoint at file `%s', line #%d\n"
 msgstr "Fără punct de întrerupere în fișierul „%s”, linia nr. %d\n"
 
-#: debug.c:2628 debug.c:2669 debug.c:2689 debug.c:2732
+#: debug.c:2673 debug.c:2714 debug.c:2734 debug.c:2777
 msgid "invalid breakpoint number"
 msgstr "număr de punct de întrerupere nevalid"
 
@@ -1949,187 +1800,187 @@ msgstr "număr de punct de întrerupere nevalid"
 # după revizarea fișierului, DȘ, zice:
 # → este perfect legit pentru că ai tradus și următorul „y” cu „d”. Deci
 # este foarte bine.
-#: debug.c:2644
+#: debug.c:2689
 msgid "Delete all breakpoints? (y or n) "
 msgstr "Ștergeți toate punctele de întrerupere? (d sau n) "
 
-#: debug.c:2645 debug.c:2955 debug.c:3008
+#: debug.c:2690 debug.c:3001 debug.c:3054
 msgid "y"
 msgstr "d"
 
-#: debug.c:2694
+#: debug.c:2739
 #, c-format
 msgid "Will ignore next %ld crossing(s) of breakpoint %d.\n"
 msgstr ""
 "Se va ignora următoare(a/le) %ld întâlnir(e/i) ale punctului de întrerupere "
 "%d.\n"
 
-#: debug.c:2698
+#: debug.c:2743
 #, c-format
 msgid "Will stop next time breakpoint %d is reached.\n"
 msgstr ""
 "Se va opri data viitoare când punctul de întrerupere %d este întâlnit.\n"
 
-#: debug.c:2815
+#: debug.c:2861
 #, c-format
 msgid "Can only debug programs provided with the `-f' option.\n"
 msgstr "Se pot depana numai programele furnizate cu opțiunea „-f”.\n"
 
-#: debug.c:2835
+#: debug.c:2881
 #, c-format
 msgid "Restarting ...\n"
 msgstr "Repornire ...\n"
 
-#: debug.c:2940
+#: debug.c:2986
 #, c-format
 msgid "Failed to restart debugger"
 msgstr "Repornirea depanatorului a eșuat"
 
-#: debug.c:2954
+#: debug.c:3000
 msgid "Program already running. Restart from beginning (y/n)? "
 msgstr "Programul rulează deja. Reporniți de la început (d/n)? "
 
-#: debug.c:2958
+#: debug.c:3004
 #, c-format
 msgid "Program not restarted\n"
 msgstr "Programul nu a fost repornit\n"
 
-#: debug.c:2968
+#: debug.c:3014
 #, c-format
 msgid "error: cannot restart, operation not allowed\n"
 msgstr "eroare: nu se poate reporni, operația nu este permisă\n"
 
-#: debug.c:2974
+#: debug.c:3020
 #, c-format
 msgid "error (%s): cannot restart, ignoring rest of the commands\n"
 msgstr "eroare (%s): nu se poate reporni, se ignoră restul comenzilor\n"
 
-#: debug.c:2982
+#: debug.c:3028
 #, c-format
 msgid "Starting program:\n"
 msgstr "Pornirea programului:\n"
 
-#: debug.c:2992
+#: debug.c:3038
 #, c-format
 msgid "Program exited abnormally with exit value: %d\n"
 msgstr "Programul a ieșit anormal cu valoarea de ieșire: %d\n"
 
-#: debug.c:2993
+#: debug.c:3039
 #, c-format
 msgid "Program exited normally with exit value: %d\n"
 msgstr "Programul a ieșit normal cu valoarea de ieșire: %d\n"
 
-#: debug.c:3007
+#: debug.c:3053
 msgid "The program is running. Exit anyway (y/n)? "
 msgstr "Programul rulează. Ieșiți oricum (d/n)? "
 
-#: debug.c:3042
+#: debug.c:3088
 #, c-format
 msgid "Not stopped at any breakpoint; argument ignored.\n"
 msgstr ""
 "Nu este oprit la niciun punct de întrerupere; argumentul este ignorat.\n"
 
-#: debug.c:3047
+#: debug.c:3093
 #, c-format
 msgid "invalid breakpoint number %d"
 msgstr "număr de punct de întrerupere nevalid %d"
 
-#: debug.c:3052
+#: debug.c:3098
 #, c-format
 msgid "Will ignore next %ld crossings of breakpoint %d.\n"
 msgstr ""
 "Se vor ignora următoarele %ld întâlniri ale punctului de întrerupere %d.\n"
 
-#: debug.c:3239
+#: debug.c:3285
 #, c-format
 msgid "'finish' not meaningful in the outermost frame main()\n"
 msgstr "„finish” nu are sens în cadrul celui mai extern main()\n"
 
-#: debug.c:3244
+#: debug.c:3290
 #, c-format
 msgid "Run until return from "
 msgstr "Rulează până la returnarea de "
 
-#: debug.c:3287
+#: debug.c:3333
 #, c-format
 msgid "'return' not meaningful in the outermost frame main()\n"
 msgstr "„return” nu are sens în cadrul celui mai extern main()\n"
 
-#: debug.c:3400
+#: debug.c:3446
 #, c-format
 msgid "cannot find specified location in function `%s'\n"
 msgstr "nu se poate găsi locația specificată în funcția „%s”\n"
 
-#: debug.c:3408
+#: debug.c:3454
 #, c-format
 msgid "invalid source line %d in file `%s'"
 msgstr "linia sursă nevalidă %d în fișierul „%s”"
 
-#: debug.c:3423
+#: debug.c:3469
 #, c-format
 msgid "cannot find specified location %d in file `%s'\n"
 msgstr "nu se poate găsi locația specificată %d, în fișierul „%s”\n"
 
-#: debug.c:3455
+#: debug.c:3501
 #, c-format
 msgid "element not in array\n"
 msgstr "element care nu se află în matrice\n"
 
-#: debug.c:3455
+#: debug.c:3501
 #, c-format
 msgid "untyped variable\n"
 msgstr "variabilă netipizată\n"
 
-#: debug.c:3497
+#: debug.c:3543
 #, c-format
 msgid "Stopping in %s ...\n"
 msgstr "Oprire în %s...\n"
 
-#: debug.c:3574
+#: debug.c:3620
 #, c-format
 msgid "'finish' not meaningful with non-local jump '%s'\n"
 msgstr "„finish” nu are sens cu saltul ne-local „%s”\n"
 
-#: debug.c:3581
+#: debug.c:3627
 #, c-format
 msgid "'until' not meaningful with non-local jump '%s'\n"
 msgstr "„until” nu are sens cu saltul ne-local „%s”\n"
 
 #. TRANSLATORS: don't translate the 'q' inside the brackets.
-#: debug.c:4342
+#: debug.c:4388
 msgid "\t------[Enter] to continue or [q] + [Enter] to quit------"
 msgstr ""
 "\t------[Enter] pentru a continua sau [q] + [Enter] pentru a ieși------"
 
-#: debug.c:5159
+#: debug.c:5209
 #, c-format
 msgid "[\"%.*s\"] not in array `%s'"
 msgstr "[\"%.*s\"] nu este în matricea „%s”"
 
-#: debug.c:5365
+#: debug.c:5415
 #, c-format
 msgid "sending output to stdout\n"
 msgstr "ieșirea este trimisă la ieșirea standard\n"
 
-#: debug.c:5405
+#: debug.c:5455
 msgid "invalid number"
 msgstr "număr nevalid"
 
-#: debug.c:5539
+#: debug.c:5589
 #, c-format
 msgid "`%s' not allowed in current context; statement ignored"
 msgstr "„%s” nu este permis în contextul curent; declarație ignorată"
 
-#: debug.c:5547
+#: debug.c:5597
 msgid "`return' not allowed in current context; statement ignored"
 msgstr "„return” nu este permis în contextul curent; declarație ignorată"
 
-#: debug.c:5595
+#: debug.c:5645
 #, c-format
 msgid "fatal error during eval, need to restart.\n"
 msgstr "eroare fatală în timpul evaluării, trebuie să reporniți.\n"
 
-#: debug.c:5785
+#: debug.c:5835
 #, c-format
 msgid "no symbol `%s' in current context"
 msgstr "nici un simbol „%s” în contextul curent"
@@ -2153,7 +2004,7 @@ msgstr "codul de operație %s nu este un operator sau un cuvânt cheie"
 msgid "buffer overflow in genflags2str"
 msgstr "depășire(overflow) de buffer în genflags2str"
 
-#: eval.c:690
+#: eval.c:700
 #, c-format
 msgid ""
 "\n"
@@ -2164,160 +2015,167 @@ msgstr ""
 "\t# Stiva de Apelare a Funcției:\n"
 "\n"
 
-#: eval.c:716
+#: eval.c:726
 msgid "`IGNORECASE' is a gawk extension"
 msgstr "„IGNORECASE” este o extensie gawk"
 
-#: eval.c:737
+#: eval.c:747
 msgid "`BINMODE' is a gawk extension"
 msgstr "„BINMODE” este o extensie gawk"
 
-#: eval.c:794
+#: eval.c:804
 #, c-format
 msgid "BINMODE value `%s' is invalid, treated as 3"
 msgstr "Valoarea BINMODE „%s” este nevalidă, tratată ca fiind 3"
 
-#: eval.c:917
+#: eval.c:927
 #, c-format
 msgid "bad `%sFMT' specification `%s'"
 msgstr "specificație „%sFMT” greșită „%s”"
 
-#: eval.c:987
+#: eval.c:997
 msgid "turning off `--lint' due to assignment to `LINT'"
 msgstr "se dezactivează  „--lint” din cauza atribuirii lui „LINT”"
 
-#: eval.c:1190
+#: eval.c:1209
 #, c-format
 msgid "reference to uninitialized argument `%s'"
 msgstr "referință la argumentul neinițializat „%s”"
 
-#: eval.c:1191
+#: eval.c:1210
 #, c-format
 msgid "reference to uninitialized variable `%s'"
 msgstr "referință la variabila neinițializată „%s”"
 
-#: eval.c:1209
+#: eval.c:1228
 msgid "attempt to field reference from non-numeric value"
 msgstr "încercare de referință la câmp dintr-o valoare nenumerică"
 
-#: eval.c:1211
+#: eval.c:1230
 msgid "attempt to field reference from null string"
 msgstr "încercare de referință la câmp dintr-un șir null"
 
-#: eval.c:1219
+#: eval.c:1238
 #, c-format
 msgid "attempt to access field %ld"
 msgstr "încercare de accesare a câmpului %ld"
 
-#: eval.c:1228
+#: eval.c:1247
 #, c-format
 msgid "reference to uninitialized field `$%ld'"
 msgstr "referință la câmpul neinițializat „$%ld”"
 
-#: eval.c:1292
+#: eval.c:1311
 #, c-format
 msgid "function `%s' called with more arguments than declared"
 msgstr ""
 "funcția „%s” a fost apelată cu mai multe argumente decât cele declarate"
 
-#: eval.c:1500
+#: eval.c:1527
 #, c-format
 msgid "unwind_stack: unexpected type `%s'"
 msgstr "unwind_stack: tip neașteptat „%s”"
 
-#: eval.c:1675
+#: eval.c:1708
 msgid "division by zero attempted in `/='"
 msgstr "s-a încercat împărțirea la zero în „/=”"
 
-#: eval.c:1682
+#: eval.c:1715
 #, c-format
 msgid "division by zero attempted in `%%='"
 msgstr "s-a încercat împărțirea la zero în „%%=”"
 
-#: ext.c:51
+#: ext.c:53
+#, c-format
+msgid "extension `%s': trying to load %s, was previously loaded from %s"
+msgstr ""
+"extensie „%s”: se încearcă încărcarea %s, care a fost încărcat anterior din "
+"%s"
+
+#: ext.c:99
 msgid "extensions are not allowed in sandbox mode"
 msgstr "extensiile nu sunt permise în modul sandbox"
 
-#: ext.c:54
+#: ext.c:105
 msgid "-l / @load are gawk extensions"
 msgstr "-l / @load sunt extensii gawk"
 
-#: ext.c:57
+#: ext.c:108
 msgid "load_ext: received NULL lib_name"
 msgstr "load_ext: s-a primit NULL lib_name"
 
-#: ext.c:60
+#: ext.c:111
 #, c-format
 msgid "load_ext: cannot open library `%s': %s"
 msgstr "load_ext: nu se poate deschide biblioteca „%s”: %s"
 
-#: ext.c:66
+#: ext.c:117
 #, c-format
 msgid "load_ext: library `%s': does not define `plugin_is_GPL_compatible': %s"
 msgstr "load_ext: biblioteca „%s”: nu definește „plugin_is_GPL_compatible”: %s"
 
-#: ext.c:72
+#: ext.c:123
 #, c-format
 msgid "load_ext: library `%s': cannot call function `%s': %s"
 msgstr "load_ext: biblioteca „%s”: nu se poate apela funcția „%s”: %s"
 
-#: ext.c:76
+#: ext.c:127
 #, c-format
 msgid "load_ext: library `%s' initialization routine `%s' failed"
 msgstr "load_ext: biblioteca „%s”: rutina de inițializare „%s” a eșuat"
 
-#: ext.c:92
+#: ext.c:143
 msgid "make_builtin: missing function name"
 msgstr "make_builtin: lipsește numele funcției"
 
-#: ext.c:100 ext.c:111
+#: ext.c:151 ext.c:162
 #, c-format
 msgid "make_builtin: cannot use gawk built-in `%s' as function name"
 msgstr ""
 "make_builtin: nu poate folosi comanda internă gawk „%s”, ca nume de funcție"
 
-#: ext.c:109
+#: ext.c:160
 #, c-format
 msgid "make_builtin: cannot use gawk built-in `%s' as namespace name"
 msgstr ""
 "make_builtin: nu poate folosi comanda internă gawk „%s”, ca nume de spațiu "
 "de nume"
 
-#: ext.c:126
+#: ext.c:177
 #, c-format
 msgid "make_builtin: cannot redefine function `%s'"
 msgstr "make_builtin: nu se poate redefini funcția „%s”"
 
-#: ext.c:130
+#: ext.c:181
 #, c-format
 msgid "make_builtin: function `%s' already defined"
 msgstr "make_builtin: funcția „%s” este deja definită"
 
-#: ext.c:135
+#: ext.c:190
 #, c-format
 msgid "make_builtin: function name `%s' previously defined"
 msgstr "make_builtin: numele funcției „%s” este deja definit"
 
-#: ext.c:139
+#: ext.c:194
 #, c-format
 msgid "make_builtin: negative argument count for function `%s'"
 msgstr ""
 "make_builtin: cantitatea numărului de argumente este negativă pentru funcția "
 "„%s”"
 
-#: ext.c:215
+#: ext.c:275
 #, c-format
 msgid "function `%s': argument #%d: attempt to use scalar as an array"
 msgstr ""
 "funcția „%s”: argument nr. %d: încercare de a utiliza un scalar ca o matrice"
 
-#: ext.c:219
+#: ext.c:279
 #, c-format
 msgid "function `%s': argument #%d: attempt to use array as a scalar"
 msgstr ""
 "funcția „%s”: argument nr. %d: încercare de a utiliza o matrice ca un scalar"
 
-#: ext.c:233
+#: ext.c:299
 msgid "dynamic loading of libraries is not supported"
 msgstr "încărcarea dinamică a bibliotecilor nu este acceptată"
 
@@ -2397,32 +2255,32 @@ msgid "fts: ignoring sneaky FTS_NOSTAT flag. nyah, nyah, nyah."
 msgstr ""
 "fts: se ignoră fanionul viclean FTS_NOSTAT. sâc, sâc, sâc coadă de pisic. :)"
 
-#: extension/fnmatch.c:120
+#: extension/fnmatch.c:125
 msgid "fnmatch: could not get first argument"
 msgstr "fnmatch: nu s-a putut obține primul argument"
 
-#: extension/fnmatch.c:125
+#: extension/fnmatch.c:130
 msgid "fnmatch: could not get second argument"
 msgstr "fnmatch: nu s-a putut obține al doilea argument"
 
-#: extension/fnmatch.c:130
+#: extension/fnmatch.c:135
 msgid "fnmatch: could not get third argument"
 msgstr "fnmatch: nu s-a putut obține al treilea argument"
 
-#: extension/fnmatch.c:143
+#: extension/fnmatch.c:148
 msgid "fnmatch is not implemented on this system\n"
 msgstr "fnmatch nu este implementat pe acest sistem\n"
 
-#: extension/fnmatch.c:175
+#: extension/fnmatch.c:180
 msgid "fnmatch init: could not add FNM_NOMATCH variable"
 msgstr "fnmatch init: nu s-a putut adăuga variabila FNM_NOMATCH"
 
-#: extension/fnmatch.c:185
+#: extension/fnmatch.c:190
 #, c-format
 msgid "fnmatch init: could not set array element %s"
 msgstr "fnmatch init: nu s-a putut stabili elementul matricei %s"
 
-#: extension/fnmatch.c:195
+#: extension/fnmatch.c:200
 msgid "fnmatch init: could not install FNM array"
 msgstr "fnmatch init: nu s-a putut instala matricea FNM"
 
@@ -2537,15 +2395,15 @@ msgstr "inplace::end: link(„%s”, „%s”) a eșuat (%s)"
 msgid "inplace::end: rename(`%s', `%s') failed (%s)"
 msgstr "inplace::end: rename(„%s”, „%s”) a eșuat (%s)"
 
-#: extension/ordchr.c:72
+#: extension/ordchr.c:107
 msgid "ord: first argument is not a string"
 msgstr "ord: primul argument nu este un șir"
 
-#: extension/ordchr.c:99
+#: extension/ordchr.c:136
 msgid "chr: first argument is not a number"
 msgstr "chr: primul argument nu este un număr"
 
-#: extension/readdir.c:291
+#: extension/readdir.c:295
 #, c-format
 msgid "dir_take_control_of: %s: opendir/fdopendir failed: %s"
 msgstr "dir_take_control_of: %s: opendir/fdopendir a eșuat: %s"
@@ -2637,175 +2495,175 @@ msgstr ""
 "extensia rwarray: a găsit valoarea GMP/MPFR în fișier, dar a fost compilată "
 "fără suport GMP/MPFR."
 
-#: extension/time.c:142
+#: extension/time.c:170
 msgid "gettimeofday: not supported on this platform"
 msgstr "gettimeofday: nu este acceptată pe această platformă"
 
-#: extension/time.c:163
+#: extension/time.c:191
 msgid "sleep: missing required numeric argument"
 msgstr "sleep: lipsește argumentul numeric necesar"
 
-#: extension/time.c:169
+#: extension/time.c:197
 msgid "sleep: argument is negative"
 msgstr "sleep: argumentul este negativ"
 
-#: extension/time.c:203
+#: extension/time.c:231
 msgid "sleep: not supported on this platform"
 msgstr "sleep: nu este acceptată pe această platformă"
 
-#: extension/time.c:225
+#: extension/time.c:253
 msgid "strptime: called with no arguments"
 msgstr "strptime: apelat fără argumente"
 
-#: extension/time.c:233
+#: extension/time.c:261
 #, c-format
 msgid "do_strptime: argument 1 is not a string\n"
 msgstr "do_strptime: argumentul 1 nu este un șir\n"
 
-#: extension/time.c:238
+#: extension/time.c:266
 #, c-format
 msgid "do_strptime: argument 2 is not a string\n"
 msgstr "do_strptime: argumentul 2 nu este un șir\n"
 
-#: field.c:320
+#: field.c:321
 msgid "input record too large"
 msgstr "înregistrarea de intrare este prea mare"
 
-#: field.c:441
+#: field.c:443
 msgid "NF set to negative value"
 msgstr "NF stabilit la o valoare negativă"
 
-#: field.c:446
+#: field.c:448
 msgid "decrementing NF is not portable to many awk versions"
 msgstr "decrementarea NF nu este portabilă în multe versiuni awk"
 
-#: field.c:1003
+#: field.c:1005
 msgid "accessing fields from an END rule may not be portable"
 msgstr "accesarea câmpurilor dintr-o regulă END poate să nu fie portabilă"
 
-#: field.c:1130 field.c:1139
+#: field.c:1132 field.c:1141
 msgid "split: fourth argument is a gawk extension"
 msgstr "split: al patrulea argument este o extensie gawk"
 
-#: field.c:1134
+#: field.c:1136
 msgid "split: fourth argument is not an array"
 msgstr "split: al patrulea argument nu este o matrice"
 
-#: field.c:1136 field.c:1238
+#: field.c:1138 field.c:1248
 #, c-format
 msgid "%s: cannot use %s as fourth argument"
 msgstr "%s: nu se poate utiliza %s ca al patrulea argument"
 
-#: field.c:1146
+#: field.c:1148
 msgid "split: second argument is not an array"
 msgstr "split: al doilea argument nu este o matrice"
 
-#: field.c:1152
+#: field.c:1162
 msgid "split: cannot use the same array for second and fourth args"
 msgstr ""
 "split: nu se poate folosi aceeași matrice pentru al doilea și al patrulea "
 "argument"
 
-#: field.c:1157
+#: field.c:1167
 msgid "split: cannot use a subarray of second arg for fourth arg"
 msgstr ""
 "split: nu se poate folosi o submatrice din al doilea argument pentru al "
 "patrulea argument"
 
-#: field.c:1160
+#: field.c:1170
 msgid "split: cannot use a subarray of fourth arg for second arg"
 msgstr ""
 "split: nu se poate folosi o submatrice din al patrulea argument pentru al "
 "doilea argument"
 
-#: field.c:1197
+#: field.c:1207
 msgid "split: null string for third arg is a non-standard extension"
 msgstr ""
 "split: șirul nul pentru al treilea argument este o extensie non-standard"
 
-#: field.c:1236
+#: field.c:1246
 msgid "patsplit: fourth argument is not an array"
 msgstr "patsplit: al patrulea argument nu este o matrice"
 
-#: field.c:1243
+#: field.c:1253
 msgid "patsplit: second argument is not an array"
 msgstr "patsplit: al doilea argument nu este o matrice"
 
-#: field.c:1254
+#: field.c:1284
 msgid "patsplit: third argument must be non-null"
 msgstr "patsplit: al treilea argument trebuie să nu fie null"
 
-#: field.c:1258
+#: field.c:1288
 msgid "patsplit: cannot use the same array for second and fourth args"
 msgstr ""
 "patsplit: nu se poate folosi aceeași matrice pentru al doilea și al patrulea "
 "argument"
 
-#: field.c:1263
+#: field.c:1293
 msgid "patsplit: cannot use a subarray of second arg for fourth arg"
 msgstr ""
 "patsplit: nu se poate folosi o submatrice din al doilea argument pentru al "
 "patrulea argument"
 
-#: field.c:1266
+#: field.c:1296
 msgid "patsplit: cannot use a subarray of fourth arg for second arg"
 msgstr ""
 "patsplit: nu se poate folosi o submatrice din al patrulea argument pentru al "
 "doilea argument"
 
-#: field.c:1304
+#: field.c:1333
 msgid "assignment to FS/FIELDWIDTHS/FPAT has no effect when using --csv"
 msgstr ""
 "asignarea la FS/FIELDWIDTHS/FPAT nu are niciun efect atunci când se "
 "utilizează „--csv”"
 
-#: field.c:1334
+#: field.c:1363
 msgid "`FIELDWIDTHS' is a gawk extension"
 msgstr "„FIELDWIDTHS” este o extensie gawk"
 
-#: field.c:1403
+#: field.c:1432
 msgid "`*' must be the last designator in FIELDWIDTHS"
 msgstr "„*” trebuie să fie ultimul desemnator din FIELDWIDTHS"
 
-#: field.c:1424
+#: field.c:1453
 #, c-format
 msgid "invalid FIELDWIDTHS value, for field %d, near `%s'"
 msgstr "valoare FIELDWIDTHS nevalidă, pentru câmpul %d, lângă „%s”"
 
-#: field.c:1498
+#: field.c:1527
 msgid "null string for `FS' is a gawk extension"
 msgstr "șirul null pentru „FS” este o extensie gawk"
 
-#: field.c:1502
+#: field.c:1531
 msgid "old awk does not support regexps as value of `FS'"
 msgstr "vechiul awk nu acceptă expresii regulate ca valoare pentru „FS”"
 
-#: field.c:1628
-msgid "`FPAT' is a gawk extension"
+#: field.c:1657
+msgid "FPAT is a gawk extension"
 msgstr "„FPAT” este o extensie gawk"
 
-#: gawkapi.c:156
+#: gawkapi.c:158
 msgid "awk_value_to_node: received null retval"
 msgstr "awk_value_to_node: s-a primit valoarea de returnare null”"
 
-#: gawkapi.c:176 gawkapi.c:189
+#: gawkapi.c:178 gawkapi.c:191
 msgid "awk_value_to_node: not in MPFR mode"
 msgstr "awk_value_to_node: nu se află în modul MPFR"
 
-#: gawkapi.c:183 gawkapi.c:195
+#: gawkapi.c:185 gawkapi.c:197
 msgid "awk_value_to_node: MPFR not supported"
 msgstr "awk_value_to_node: MPFR nu este acceptat"
 
-#: gawkapi.c:199
+#: gawkapi.c:201
 #, c-format
 msgid "awk_value_to_node: invalid number type `%d'"
 msgstr "awk_value_to_node: tip de număr nevalid „%d”"
 
-#: gawkapi.c:386
+#: gawkapi.c:388
 msgid "add_ext_func: received NULL name_space parameter"
 msgstr "add_ext_func: s-a primit parametrul name_space NULL"
 
-#: gawkapi.c:524
+#: gawkapi.c:526
 #, c-format
 msgid ""
 "node_to_awk_value: detected invalid numeric flags combination `%s'; please "
@@ -2814,15 +2672,15 @@ msgstr ""
 "node_to_awk_value: s-a detectat o combinație nevalidă de indicatori numerici "
 "„%s”; trimiteți un raport de eroare despre acest lucru"
 
-#: gawkapi.c:562
+#: gawkapi.c:564
 msgid "node_to_awk_value: received null node"
 msgstr "node_to_awk_value: s-a primit un nod null"
 
-#: gawkapi.c:565
+#: gawkapi.c:567
 msgid "node_to_awk_value: received null val"
 msgstr "node_to_awk_value: s-a primit o valoare null"
 
-#: gawkapi.c:633 gawkapi.c:670 gawkapi.c:700 gawkapi.c:737
+#: gawkapi.c:633 gawkapi.c:668 gawkapi.c:696 gawkapi.c:731
 #, c-format
 msgid ""
 "node_to_awk_value detected invalid flags combination `%s'; please file a bug "
@@ -2831,130 +2689,130 @@ msgstr ""
 "node_to_awk_value: s-a detectat o combinație nevalidă de indicatori „%s”; "
 "trimiteți un raport de eroare despre acest lucru"
 
-#: gawkapi.c:1129
+#: gawkapi.c:1127
 msgid "remove_element: received null array"
 msgstr "remove_element: s-a primit o matrice null"
 
-#: gawkapi.c:1132
+#: gawkapi.c:1130
 msgid "remove_element: received null subscript"
 msgstr "remove_element: s-a primit un indice null"
 
-#: gawkapi.c:1275
+#: gawkapi.c:1272
 #, c-format
 msgid "api_flatten_array_typed: could not convert index %d to %s"
 msgstr "api_flatten_array_typed: nu s-a putut converti indexul %d în %s"
 
-#: gawkapi.c:1280
+#: gawkapi.c:1277
 #, c-format
 msgid "api_flatten_array_typed: could not convert value %d to %s"
 msgstr "api_flatten_array_typed: nu s-a putut converti valoarea %d în %s"
 
-#: gawkapi.c:1376 gawkapi.c:1393
+#: gawkapi.c:1373 gawkapi.c:1390
 msgid "api_get_mpfr: MPFR not supported"
 msgstr "api_get_mpfr: MPFR nu este acceptat"
 
-#: gawkapi.c:1424
+#: gawkapi.c:1421
 msgid "cannot find end of BEGINFILE rule"
 msgstr "nu se poate găsi sfârșitul regulii BEGINFILE"
 
-#: gawkapi.c:1478
+#: gawkapi.c:1475
 #, c-format
 msgid "cannot open unrecognized file type `%s' for `%s'"
 msgstr "nu se poate deschide tipul de fișier nerecunoscut „%s” pentru „%s”"
 
-#: io.c:417
+#: io.c:416
 #, c-format
 msgid "command line argument `%s' is a directory: skipped"
 msgstr "argumentul liniei de comandă „%s” este un director: se ignoră"
 
-#: io.c:420 io.c:534
+#: io.c:419 io.c:531
 #, c-format
 msgid "cannot open file `%s' for reading: %s"
 msgstr "nu s-a putut deschide fișierul „%s” pentru citire: %s"
 
-#: io.c:661
+#: io.c:658
 #, c-format
 msgid "close of fd %d (`%s') failed: %s"
 msgstr "închiderea descriptorului de fișier %d („%s”) a eșuat: %s"
 
-#: io.c:733
+#: io.c:730
 #, c-format
 msgid "`%.*s' used for input file and for output file"
 msgstr ""
 "„%.*s” este utilizat pentru fișierul de intrare și pentru fișierul de ieșire"
 
-#: io.c:735
+#: io.c:732
 #, c-format
 msgid "`%.*s' used for input file and input pipe"
 msgstr ""
 "„%.*s” este utilizat pentru fișierul de intrare și pentru conducta de intrare"
 
-#: io.c:737
+#: io.c:734
 #, c-format
 msgid "`%.*s' used for input file and two-way pipe"
 msgstr ""
 "„%.*s” este utilizat pentru fișierul de intrare și pentru conducta "
 "bidirecțională"
 
-#: io.c:739
+#: io.c:736
 #, c-format
 msgid "`%.*s' used for input file and output pipe"
 msgstr ""
 "„%.*s” este utilizat pentru fișierul de intrare și pentru conducta de ieșire"
 
-#: io.c:741
+#: io.c:738
 #, c-format
 msgid "unnecessary mixing of `>' and `>>' for file `%.*s'"
 msgstr "amestecare nenecesară a „>” și „>>” pentru fișierul „%.*s”"
 
-#: io.c:743
+#: io.c:740
 #, c-format
 msgid "`%.*s' used for input pipe and output file"
 msgstr "„%.*s” este utilizat pentru conducta de intrare și fișierul de ieșire"
 
-#: io.c:745
+#: io.c:742
 #, c-format
 msgid "`%.*s' used for output file and output pipe"
 msgstr "„%.*s” este utilizat pentru fișierul de ieșire și conducta de ieșire"
 
-#: io.c:747
+#: io.c:744
 #, c-format
 msgid "`%.*s' used for output file and two-way pipe"
 msgstr ""
 "„%.*s” este utilizat pentru fișierul de ieșire și conducta bidirecțională"
 
-#: io.c:749
+#: io.c:746
 #, c-format
 msgid "`%.*s' used for input pipe and output pipe"
 msgstr "„%.*s” este utilizat pentru conducta de intrare și conducta de ieșire"
 
-#: io.c:751
+#: io.c:748
 #, c-format
 msgid "`%.*s' used for input pipe and two-way pipe"
 msgstr ""
 "„%.*s” este utilizat pentru conducta de intrare și conducta bidirecțională"
 
-#: io.c:753
+#: io.c:750
 #, c-format
 msgid "`%.*s' used for output pipe and two-way pipe"
 msgstr ""
 "„%.*s” este utilizat pentru conducta de ieșire și conducta bidirecțională"
 
-#: io.c:802
+#: io.c:800
 msgid "redirection not allowed in sandbox mode"
 msgstr "redirecționarea nu este permisă în modul sandbox"
 
-#: io.c:836
+#: io.c:834
 #, c-format
 msgid "expression in `%s' redirection is a number"
 msgstr "expresia din redirecționarea „%s” este un număr"
 
-#: io.c:840
+#: io.c:838
 #, c-format
 msgid "expression for `%s' redirection has null string value"
 msgstr "expresia pentru redirecționarea „%s” are o valoare de șir null"
 
-#: io.c:845
+#: io.c:843
 #, c-format
 msgid ""
 "filename `%.*s' for `%s' redirection may be result of logical expression"
@@ -2962,22 +2820,22 @@ msgstr ""
 "numele de fișier „%.*s” pentru redirecționarea „%s” poate fi rezultatul unei "
 "expresii logice"
 
-#: io.c:942 io.c:971
+#: io.c:940 io.c:967
 #, c-format
 msgid "get_file cannot create pipe `%s' with fd %d"
 msgstr "get_file nu poate crea conducta „%s” cu descriptorul de fișier %d"
 
-#: io.c:957
+#: io.c:954
 #, c-format
 msgid "cannot open pipe `%s' for output: %s"
 msgstr "nu se poate deschide conducta „%s” pentru ieșire: %s"
 
-#: io.c:976
+#: io.c:972
 #, c-format
 msgid "cannot open pipe `%s' for input: %s"
 msgstr "nu se poate deschide conducta „%s” pentru intrare: %s"
 
-#: io.c:1000
+#: io.c:1001
 #, c-format
 msgid ""
 "get_file socket creation not supported on this platform for `%s' with fd %d"
@@ -2985,262 +2843,262 @@ msgstr ""
 "crearea soclului get_file nu este acceptată pe această platformă pentru „%s” "
 "cu descriptorul de fișier %d"
 
-#: io.c:1011
+#: io.c:1012
 #, c-format
 msgid "cannot open two way pipe `%s' for input/output: %s"
 msgstr ""
 "nu se poate deschide conducta bidirecțională „%s” pentru intrare/ieșire: %s"
 
-#: io.c:1098
+#: io.c:1099
 #, c-format
 msgid "cannot redirect from `%s': %s"
 msgstr "nu se poate redirecționa de la „%s”: %s"
 
-#: io.c:1101
+#: io.c:1102
 #, c-format
 msgid "cannot redirect to `%s': %s"
 msgstr "nu se poate redirecționa la „%s”: %s"
 
-#: io.c:1203
+#: io.c:1204
 msgid ""
 "reached system limit for open files: starting to multiplex file descriptors"
 msgstr ""
 "s-a atins limita sistemului pentru fișiere deschise: se începe multiplexarea "
 "descriptorilor de fișiere"
 
-#: io.c:1219
+#: io.c:1220
 #, c-format
 msgid "close of `%s' failed: %s"
 msgstr "închiderea lui „%s” a eșuat: %s"
 
-#: io.c:1227
+#: io.c:1228
 msgid "too many pipes or input files open"
 msgstr "prea multe conducte sau fișiere de intrare deschise"
 
-#: io.c:1253
+#: io.c:1254
 msgid "close: second argument must be `to' or `from'"
 msgstr "close: al doilea argument trebuie să fie „to” sau „from”"
 
-#: io.c:1271
+#: io.c:1272
 #, c-format
 msgid "close: `%.*s' is not an open file, pipe or co-process"
 msgstr "close: „%.*s” nu este un fișier deschis, o conductă sau un co-proces"
 
-#: io.c:1276
+#: io.c:1277
 msgid "close of redirection that was never opened"
 msgstr "închiderea unei redirecționări care nu a fost niciodată deschisă"
 
-#: io.c:1378
+#: io.c:1379
 #, c-format
 msgid "close: redirection `%s' not opened with `|&', second argument ignored"
 msgstr ""
 "close: redirecționarea „%s” nu a fost deschisă cu „|&”, al doilea argument "
 "se ignoră"
 
-#: io.c:1395
+#: io.c:1396
 #, c-format
 msgid "failure status (%d) on pipe close of `%s': %s"
 msgstr "starea de eșec (%d) la închiderea conductei din „%s”: %s"
 
-#: io.c:1398
+#: io.c:1399
 #, c-format
 msgid "failure status (%d) on two-way pipe close of `%s': %s"
 msgstr ""
 "starea de eșec (%d) la închiderea conductei bidirecționale din „%s”: %s"
 
-#: io.c:1401
+#: io.c:1402
 #, c-format
 msgid "failure status (%d) on file close of `%s': %s"
 msgstr "stare de eșec (%d) în fișierul închis din „%s”: %s"
 
-#: io.c:1421
+#: io.c:1420
 #, c-format
 msgid "no explicit close of socket `%s' provided"
 msgstr "nu este furnizată nicio închidere explicită a soclului „%s”"
 
-#: io.c:1424
+#: io.c:1423
 #, c-format
 msgid "no explicit close of co-process `%s' provided"
 msgstr "nu este furnizată nicio închidere explicită a coprocesului „%s”"
 
-#: io.c:1427
+#: io.c:1426
 #, c-format
 msgid "no explicit close of pipe `%s' provided"
 msgstr "nu este furnizată nicio închidere explicită a conductei „%s”"
 
-#: io.c:1430
+#: io.c:1429
 #, c-format
 msgid "no explicit close of file `%s' provided"
 msgstr "nu este furnizată nicio închidere explicită a fișierului „%s”"
 
-#: io.c:1465
+#: io.c:1464
 #, c-format
 msgid "fflush: cannot flush standard output: %s"
 msgstr "fflush: nu se poate goli ieșirea standard: %s"
 
-#: io.c:1466
+#: io.c:1465
 #, c-format
 msgid "fflush: cannot flush standard error: %s"
 msgstr "fflush: nu se poate goli ieșirea de eroare standard: %s"
 
-#: io.c:1471 io.c:1560 main.c:704 main.c:749
+#: io.c:1470 io.c:1559 main.c:684 main.c:729
 #, c-format
 msgid "error writing standard output: %s"
 msgstr "eroare de scriere la ieșirea standard: %s"
 
-#: io.c:1472 io.c:1571 main.c:706
+#: io.c:1471 io.c:1570 main.c:686
 #, c-format
 msgid "error writing standard error: %s"
 msgstr "eroare de scriere la ieșirea de eroare standard: %s"
 
-#: io.c:1511
+#: io.c:1510
 #, c-format
 msgid "pipe flush of `%s' failed: %s"
 msgstr "golirea conductei din „%s” a eșuat: %s"
 
-#: io.c:1514
+#: io.c:1513
 #, c-format
 msgid "co-process flush of pipe to `%s' failed: %s"
 msgstr "golirea co-procesului conductei din „%s” a eșuat: %s"
 
-#: io.c:1517
+#: io.c:1516
 #, c-format
 msgid "file flush of `%s' failed: %s"
 msgstr "golirea fișierului din „%s” eșuat: %s"
 
-#: io.c:1660
+#: io.c:1659
 #, c-format
 msgid "local port %s invalid in `/inet': %s"
 msgstr "port local %s nevalid în „/inet”: %s"
 
-#: io.c:1663
+#: io.c:1662
 #, c-format
 msgid "local port %s invalid in `/inet'"
 msgstr "port local %s nevalid în „/inet”"
 
-#: io.c:1686
+#: io.c:1685
 #, c-format
 msgid "remote host and port information (%s, %s) invalid: %s"
 msgstr "informații despre gazdă și portul de la distanță (%s, %s) nevalide: %s"
 
-#: io.c:1689
+#: io.c:1688
 #, c-format
 msgid "remote host and port information (%s, %s) invalid"
 msgstr "informații despre gazdă și portul de la distanță (%s, %s) nevalide"
 
-#: io.c:1931
+#: io.c:1930
 msgid "TCP/IP communications are not supported"
 msgstr "comunicațiile TCP/IP nu sunt acceptate"
 
-#: io.c:2059 io.c:2102
+#: io.c:2058 io.c:2101
 #, c-format
 msgid "could not open `%s', mode `%s'"
 msgstr "nu s-a putut deschide „%s”, modul „%s”"
 
-#: io.c:2067 io.c:2119
+#: io.c:2066 io.c:2118
 #, c-format
 msgid "close of master pty failed: %s"
 msgstr "închiderea pseudo-terminalului principal a eșuat: %s"
 
-#: io.c:2069 io.c:2121 io.c:2462 io.c:2700
+#: io.c:2068 io.c:2120 io.c:2461 io.c:2716
 #, c-format
 msgid "close of stdout in child failed: %s"
 msgstr "închiderea ieșirii standard din procesul-copil a eșuat: %s"
 
-#: io.c:2072 io.c:2124
+#: io.c:2071 io.c:2123
 #, c-format
 msgid "moving slave pty to stdout in child failed (dup: %s)"
 msgstr ""
 "mutarea pseudo-terminalului secundar la ieșirea standard din procesul-copil "
 "a eșuat (dup: %s)"
 
-#: io.c:2074 io.c:2126 io.c:2467
+#: io.c:2073 io.c:2125 io.c:2466
 #, c-format
 msgid "close of stdin in child failed: %s"
 msgstr "închiderea intrării standard din procesul-copil a eșuat: %s"
 
-#: io.c:2077 io.c:2129
+#: io.c:2076 io.c:2128
 #, c-format
 msgid "moving slave pty to stdin in child failed (dup: %s)"
 msgstr ""
 "mutarea pseudo-terminalului secundar la intrarea standard din procesul-copil "
 "a eșuat (dup: %s)"
 
-#: io.c:2079 io.c:2131 io.c:2153
+#: io.c:2078 io.c:2130 io.c:2152
 #, c-format
 msgid "close of slave pty failed: %s"
 msgstr "închiderea pseudo-terminalului secundar a eșuat: %s"
 
-#: io.c:2315
+#: io.c:2314
 msgid "could not create child process or open pty"
 msgstr "nu s-a putut crea un proces-copil sau deschide pseudo-terminal"
 
-#: io.c:2401 io.c:2465 io.c:2675 io.c:2703
+#: io.c:2400 io.c:2464 io.c:2691 io.c:2719
 #, c-format
 msgid "moving pipe to stdout in child failed (dup: %s)"
 msgstr ""
 "mutarea conductei la ieșirea standard din procesul-copil a eșuat (dup: %s)"
 
-#: io.c:2408 io.c:2470
+#: io.c:2407 io.c:2469
 #, c-format
 msgid "moving pipe to stdin in child failed (dup: %s)"
 msgstr ""
 "mutarea conductei la intrarea standard din procesul-copil a eșuat (dup: %s)"
 
-#: io.c:2430 io.c:2693
+#: io.c:2429 io.c:2709
 msgid "restoring stdout in parent process failed"
 msgstr "restaurarea ieșirii standard din procesul-părinte a eșuat"
 
-#: io.c:2438
+#: io.c:2437
 msgid "restoring stdin in parent process failed"
 msgstr "restaurarea intrării standard din procesul-părinte a eșuat"
 
-#: io.c:2473 io.c:2705 io.c:2720
+#: io.c:2472 io.c:2721 io.c:2736
 #, c-format
 msgid "close of pipe failed: %s"
 msgstr "închiderea conductei a eșuat: %s"
 
-#: io.c:2532
+#: io.c:2531
 msgid "`|&' not supported"
 msgstr "„|&” nu este acceptat"
 
-#: io.c:2660
+#: io.c:2676
 #, c-format
 msgid "cannot open pipe `%s': %s"
 msgstr "nu s-a putut deschide conducta „%s” (%s)"
 
-#: io.c:2714
+#: io.c:2730
 #, c-format
 msgid "cannot create child process for `%s' (fork: %s)"
 msgstr "nu s-a putut crea procesul-copil pentru „%s” (fork: %s)"
 
-#: io.c:2853
+#: io.c:2869
 msgid "getline: attempt to read from closed read end of two-way pipe"
 msgstr ""
 "getline: încercare de citire din capătul de citire închis al conductei "
 "bidirecționale"
 
-#: io.c:3177
+#: io.c:3192
 msgid "register_input_parser: received NULL pointer"
 msgstr "register_input_parser: s-a primit indicator NULL"
 
-#: io.c:3205
+#: io.c:3220
 #, c-format
 msgid "input parser `%s' conflicts with previously installed input parser `%s'"
 msgstr ""
 "analizatorul de intrare „%s” intră în conflict cu analizatorul de intrare "
 "instalat anterior „%s”"
 
-#: io.c:3212
+#: io.c:3227
 #, c-format
 msgid "input parser `%s' failed to open `%s'"
 msgstr "analizatorul de intrare „%s” nu a putut deschide „%s”"
 
-#: io.c:3232
+#: io.c:3247
 msgid "register_output_wrapper: received NULL pointer"
 msgstr "register_output_wrapper: s-a primit indicator NULL"
 
-#: io.c:3260
+#: io.c:3275
 #, c-format
 msgid ""
 "output wrapper `%s' conflicts with previously installed output wrapper `%s'"
@@ -3248,16 +3106,16 @@ msgstr ""
 "interpretul de comenzi de ieșire „%s” intră în conflict cu interpretul de "
 "comenzi de ieșire instalat anterior „%s”"
 
-#: io.c:3267
+#: io.c:3282
 #, c-format
 msgid "output wrapper `%s' failed to open `%s'"
 msgstr "interpretul de comenzi de ieșire „%s” nu a putut deschide „%s”"
 
-#: io.c:3288
+#: io.c:3303
 msgid "register_output_processor: received NULL pointer"
 msgstr "register_output_processor: s-a primit indicator NULL"
 
-#: io.c:3317
+#: io.c:3332
 #, c-format
 msgid ""
 "two-way processor `%s' conflicts with previously installed two-way processor "
@@ -3266,72 +3124,71 @@ msgstr ""
 "procesorul bidirecțional „%s” intră în conflict cu procesorul bidirecțional "
 "„%s” instalat anterior"
 
-#: io.c:3326
+#: io.c:3341
 #, c-format
 msgid "two way processor `%s' failed to open `%s'"
 msgstr "procesorul bidirecțional „%s” nu a putut deschide „%s”"
 
-#: io.c:3457
+#: io.c:3499
 #, c-format
 msgid "data file `%s' is empty"
 msgstr "fișierul de date „%s” este gol"
 
-#: io.c:3499 io.c:3507
+#: io.c:3541 io.c:3549
 msgid "could not allocate more input memory"
 msgstr "nu s-a putut aloca mai multă memorie de intrare"
 
-#: io.c:4175
+#: io.c:4227
 msgid "assignment to RS has no effect when using --csv"
 msgstr "asignarea la RS nu are niciun efect atunci când se utilizează „--csv”"
 
-#: io.c:4195
-msgid "multicharacter value of `RS' is a gawk extension"
+#: io.c:4247
+msgid "multicharacter value of RS is a gawk extension"
 msgstr "valoarea multicaracter a „RS” este o extensie gawk"
 
-#: io.c:4354
+#: io.c:4361
+msgid "support for the UDP protocol is obsolete and will eventually be removed"
+msgstr ""
+"suportul pentru protocolul UDP este învechit și va fi în cele din urmă "
+"eliminat"
+
+#: io.c:4412
 msgid "IPv6 communication is not supported"
 msgstr "comunicația IPv6 nu este acceptată"
 
-#: main.c:231
-#, c-format
-msgid ""
-"%s: fatal: persistent memory allocator failed to initialize: return value "
-"%d, pma.c line: %d.\n"
+#: io.c:4729
+msgid "gawk_popen_write: failed to move pipe fd to standard input"
 msgstr ""
-"%s: fatal: alocatorul de memorie persistentă nu a reușit să se inițializeze: "
-"returnează valoarea %d, linia pma.c: %d.\n"
+"gawk_popen_write: nu s-a reușit să se mute descriptorul de fișier al "
+"conductei la intrarea standard"
 
-#: main.c:239
-msgid "persistent memory is not supported"
-msgstr "memoria persistentă nu este acceptată"
-
-#: main.c:347
+#: main.c:328
 msgid "environment variable `POSIXLY_CORRECT' set: turning on `--posix'"
 msgstr ""
 "variabila de mediu „POSIXLY_CORRECT” este definită: se activează „--posix”"
 
-#: main.c:354
+#: main.c:335
 msgid "`--posix' overrides `--traditional'"
 msgstr "„--posix” suprascrie „--traditional”"
 
-#: main.c:365
+#: main.c:346
 msgid "`--posix'/`--traditional' overrides `--non-decimal-data'"
 msgstr "„--posix”/„--traditional” suprascrie „--non-decimal-data”"
 
-#: main.c:370
+#: main.c:351
 msgid "`--posix' overrides `--characters-as-bytes'"
 msgstr "„--posix” suprascrie „--characters-as-bytes”"
 
-#: main.c:380
+#: main.c:364
 msgid "`--posix' and `--csv' conflict"
 msgstr "„--posix” și „--csv” sunt în conflict"
 
-#: main.c:384
+#: main.c:368
 #, c-format
 msgid "running %s setuid root may be a security problem"
 msgstr "rularea lui %s ca setuid-root poate fi o problemă de securitate"
 
-#: main.c:386
+#: main.c:370
 msgid "The -r/--re-interval options no longer have any effect"
 msgstr "Opțiunile „-r”/„--re-interval” nu mai au niciun efect"
 
@@ -3348,180 +3205,176 @@ msgstr "Opțiunile „-r”/„--re-interval” nu mai au niciun efect"
 # Opinii/Idei?
 # care este mai bună, pentru a transmite
 # mesajul autorului?
-#: main.c:444
+#: main.c:428
 #, c-format
 msgid "cannot set binary mode on stdin: %s"
 msgstr "nu se poate stabili modul binar pentru intrarea standard: %s"
 
-#: main.c:447
+#: main.c:431
 #, c-format
 msgid "cannot set binary mode on stdout: %s"
 msgstr "nu se poate stabili modul binar pentru ieșirea standard: %s"
 
-#: main.c:449
+#: main.c:433
 #, c-format
 msgid "cannot set binary mode on stderr: %s"
 msgstr "nu se poate stabili modul binar pentru ieșirea de eroare standard: %s"
 
-#: main.c:514
+#: main.c:498
 msgid "no program text at all!"
 msgstr "nu există nici un text de program!"
 
-#: main.c:612
+#: main.c:595
 #, c-format
 msgid "Usage: %s [POSIX or GNU style options] -f progfile [--] file ...\n"
 msgstr ""
 "Utilizare: %s [opțiuni stil POSIX sau GNU] -f fișier_program [--] "
 "fișier ...\n"
 
-#: main.c:614
+#: main.c:597
 #, c-format
 msgid "Usage: %s [POSIX or GNU style options] [--] %cprogram%c file ...\n"
 msgstr ""
 "Utilizare: %s [opțiuni stil POSIX sau GNU] [--] %cprogram%c fișier ...\n"
 
-#: main.c:619
+#: main.c:602
 msgid "POSIX options:\t\tGNU long options: (standard)\n"
 msgstr "Opțiuni POSIX:\t\tOpțiuni lungi GNU: (standard)\n"
 
-#: main.c:620
+#: main.c:603
 msgid "\t-f progfile\t\t--file=progfile\n"
 msgstr "\t-f fișier_program       --file=fișier_program\n"
 
-#: main.c:621
+#: main.c:604
 msgid "\t-F fs\t\t\t--field-separator=fs\n"
 msgstr "\t-F sep_câmp             --field-separator=sep_câmp\n"
 
-#: main.c:622
+#: main.c:605
 msgid "\t-v var=val\t\t--assign=var=val\n"
 msgstr "\t-v var=valoare          --assign=var=valoare\n"
 
-#: main.c:623
+#: main.c:606
 msgid "Short options:\t\tGNU long options: (extensions)\n"
 msgstr "Opțiuni scurte:\t\tOpțiuni lungi GNU: (extensii)\n"
 
-#: main.c:624
+#: main.c:607
 msgid "\t-b\t\t\t--characters-as-bytes\n"
 msgstr "\t-b\t\t\t--characters-as-bytes\n"
 
-#: main.c:625
+#: main.c:608
 msgid "\t-c\t\t\t--traditional\n"
 msgstr "\t-c\t\t\t--traditional\n"
 
-#: main.c:626
+#: main.c:609
 msgid "\t-C\t\t\t--copyright\n"
 msgstr "\t-C\t\t\t--copyright\n"
 
-#: main.c:627
+#: main.c:610
 msgid "\t-d[file]\t\t--dump-variables[=file]\n"
 msgstr "\t-d[fișier]\t\t--dump-variables[=fișier]\n"
 
-#: main.c:628
+#: main.c:611
 msgid "\t-D[file]\t\t--debug[=file]\n"
 msgstr "\t-D[fișier]              --debug[=fișier]\n"
 
-#: main.c:629
+#: main.c:612
 msgid "\t-e 'program-text'\t--source='program-text'\n"
 msgstr "\t-e „text-program”\t--source=„text-program”\n"
 
-#: main.c:630
+#: main.c:613
 msgid "\t-E file\t\t\t--exec=file\n"
 msgstr "\t-E fișier\t\t--exec=fișier\n"
 
-#: main.c:631
+#: main.c:614
 msgid "\t-g\t\t\t--gen-pot\n"
 msgstr "\t-g\t\t\t--gen-pot\n"
 
-#: main.c:632
+#: main.c:615
 msgid "\t-h\t\t\t--help\n"
 msgstr "\t-h\t\t\t--help\n"
 
-#: main.c:633
+#: main.c:616
 msgid "\t-i includefile\t\t--include=includefile\n"
 msgstr "\t-i fișier_de_inclus     --include=fișier_de_inclus\n"
 
-#: main.c:634
+#: main.c:617
 msgid "\t-I\t\t\t--trace\n"
 msgstr "\t-I\t\t\t--trace\n"
 
-#: main.c:635
+#: main.c:618
 msgid "\t-k\t\t\t--csv\n"
 msgstr "\t-k\t\t\t--csv\n"
 
-#: main.c:636
+#: main.c:619
 msgid "\t-l library\t\t--load=library\n"
 msgstr "\t-l biblioteca           --load=biblioteca\n"
 
 #. TRANSLATORS: the "fatal", "invalid" and "no-ext" here are literal
 #. values, they should not be translated. Thanks.
 #.
-#: main.c:641
+#: main.c:624
 msgid "\t-L[fatal|invalid|no-ext]\t--lint[=fatal|invalid|no-ext]\n"
 msgstr "\t-L[fatal|invalid|no-ext]\t--lint[=fatal|invalid|no-ext]\n"
 
-#: main.c:642
+#: main.c:625
 msgid "\t-M\t\t\t--bignum\n"
 msgstr "\t-M\t\t\t--bignum\n"
 
-#: main.c:643
+#: main.c:626
 msgid "\t-N\t\t\t--use-lc-numeric\n"
 msgstr "\t-N\t\t\t--use-lc-numeric\n"
 
-#: main.c:644
+#: main.c:627
 msgid "\t-n\t\t\t--non-decimal-data\n"
 msgstr "\t-n\t\t\t--non-decimal-data\n"
 
-#: main.c:645
+#: main.c:628
 msgid "\t-o[file]\t\t--pretty-print[=file]\n"
 msgstr "\t-o[fișier]\t\t--pretty-print[=fișier]\n"
 
-#: main.c:646
+#: main.c:629
 msgid "\t-O\t\t\t--optimize\n"
 msgstr "\t-O\t\t\t--optimize\n"
 
-#: main.c:647
+#: main.c:630
 msgid "\t-p[file]\t\t--profile[=file]\n"
 msgstr "\t-p[fișier]\t\t--profile[=fișier]\n"
 
-#: main.c:648
+#: main.c:631
 msgid "\t-P\t\t\t--posix\n"
 msgstr "\t-P\t\t\t--posix\n"
 
-#: main.c:649
+#: main.c:632
 msgid "\t-r\t\t\t--re-interval\n"
 msgstr "\t-r\t\t\t--re-interval\n"
 
-#: main.c:650
+#: main.c:633
 msgid "\t-s\t\t\t--no-optimize\n"
 msgstr "\t-s\t\t\t--no-optimize\n"
 
-#: main.c:651
+#: main.c:634
 msgid "\t-S\t\t\t--sandbox\n"
 msgstr "\t-S\t\t\t--sandbox\n"
 
-#: main.c:652
+#: main.c:635
 msgid "\t-t\t\t\t--lint-old\n"
 msgstr "\t-t\t\t\t--lint-old\n"
 
-#: main.c:653
+#: main.c:636
 msgid "\t-V\t\t\t--version\n"
 msgstr "\t-V\t\t\t--version\n"
 
-#: main.c:655
-msgid "\t-W nostalgia\t\t--nostalgia\n"
-msgstr "\t-W nostalgia\t\t--nostalgia\n"
-
-#: main.c:658
+#: main.c:638
 msgid "\t-Y\t\t\t--parsedebug\n"
 msgstr "\t-Y\t\t\t--parsedebug\n"
 
-#: main.c:661
+#: main.c:641
 msgid "\t-Z locale-name\t\t--locale=locale-name\n"
 msgstr "\t-Z nume_localizare\t\t--locale=nume_localizare\n"
 
 #. TRANSLATORS: --help output (end)
 #. no-wrap
-#: main.c:667
+#: main.c:647
 msgid ""
 "\n"
 "To report bugs, use the `gawkbug' program.\n"
@@ -3543,7 +3396,7 @@ msgstr ""
 "sau folosind un forum web, cum ar fi Stack Overflow\n"
 "\n"
 
-#: main.c:683
+#: main.c:663
 #, c-format
 msgid ""
 "Source code for gawk may be obtained from\n"
@@ -3564,7 +3417,7 @@ msgstr ""
 # începe să utilizeze un sistem operativ GNU/*,
 # iar în acest caz foarte improbabil, se vor
 # năpustii să lucreze direct cu «gawk».
-#: main.c:687
+#: main.c:667
 msgid ""
 "gawk is a pattern scanning and processing language.\n"
 "By default it reads standard input and writes standard output.\n"
@@ -3575,7 +3428,7 @@ msgstr ""
 "standard.\n"
 "\n"
 
-#: main.c:691
+#: main.c:671
 #, c-format
 msgid ""
 "Examples:\n"
@@ -3586,7 +3439,7 @@ msgstr ""
 "\t%s '{ sum += $1 }; END { print sum }' fișier\n"
 "\t%s -F: '{ print $1 }' /etc/passwd\n"
 
-#: main.c:721
+#: main.c:701
 #, c-format
 msgid ""
 "Copyright (C) 1989, 1991-%d Free Software Foundation.\n"
@@ -3605,7 +3458,7 @@ msgstr ""
 "(la latitudinea dumneavoastră) orice versiune ulterioară.\n"
 "\n"
 
-#: main.c:729
+#: main.c:709
 msgid ""
 "This program is distributed in the hope that it will be useful,\n"
 "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
@@ -3620,7 +3473,7 @@ msgstr ""
 "\n"
 "\n"
 
-#: main.c:735
+#: main.c:715
 msgid ""
 "You should have received a copy of the GNU General Public License\n"
 "along with this program. If not, see http://www.gnu.org/licenses/.\n"
@@ -3629,11 +3482,11 @@ msgstr ""
 "împreună cu acest program. Dacă nu, consultați pagina\n"
 "http://www.gnu.org/licenses/.\n"
 
-#: main.c:774
+#: main.c:754
 msgid "-Ft does not set FS to tab in POSIX awk"
 msgstr "-Ft nu stabilește FS la tabulator în awk POSIX"
 
-#: main.c:1202
+#: main.c:1183
 #, c-format
 msgid ""
 "%s: `%s' argument to `-v' not in `var=value' form\n"
@@ -3642,82 +3495,82 @@ msgstr ""
 "%s: argumentul „%s” pentru „-v” nu este în formatul „var=valoare”\n"
 "\n"
 
-#: main.c:1228
+#: main.c:1209
 #, c-format
 msgid "`%s' is not a legal variable name"
 msgstr "„%s” nu este un nume legal de variabilă"
 
-#: main.c:1231
+#: main.c:1212
 #, c-format
 msgid "`%s' is not a variable name, looking for file `%s=%s'"
 msgstr "„%s” nu este un nume de variabilă, se caută fișierul „%s=%s”"
 
-#: main.c:1245
+#: main.c:1226
 #, c-format
 msgid "cannot use gawk builtin `%s' as variable name"
 msgstr "nu se poate folosi comanda internă a gawk „%s”, ca nume de variabilă"
 
-#: main.c:1250
+#: main.c:1231
 #, c-format
 msgid "cannot use function `%s' as variable name"
 msgstr "nu se poate folosi funcția „%s” ca nume de variabilă"
 
-#: main.c:1329
+#: main.c:1310
 msgid "floating point exception"
 msgstr "excepție în virgulă mobilă"
 
-#: main.c:1339
+#: main.c:1320
 msgid "fatal error: internal error"
 msgstr "eroare fatală: eroare internă"
 
-#: main.c:1440
+#: main.c:1407
 #, c-format
 msgid "no pre-opened fd %d"
 msgstr "niciun descriptor de fișier predeschis %d"
 
-#: main.c:1447
+#: main.c:1414
 #, c-format
 msgid "could not pre-open /dev/null for fd %d"
 msgstr "nu s-a putut predeschide /dev/null pentru descriptorul de fișier %d"
 
-#: main.c:1661
+#: main.c:1629
 msgid "empty argument to `-e/--source' ignored"
 msgstr "argumentul gol pentru „-e/--source” a fost ignorat"
 
-#: main.c:1730 main.c:1735
+#: main.c:1702 main.c:1707
 msgid "`--profile' overrides `--pretty-print'"
 msgstr "„--profile” suprascrie „--pretty-print”"
 
-#: main.c:1747
+#: main.c:1719
 msgid "-M ignored: MPFR/GMP support not compiled in"
 msgstr "-M ignorat: suportul pentru MPFR/GMP nu a fost compilat"
 
-#: main.c:1773
+#: main.c:1745
 #, c-format
 msgid "Use `GAWK_PERSIST_FILE=%s gawk ...' instead of --persist."
 msgstr ""
 "Utilizați `GAWK_PERSIST_FILE=%s gawk ...' în loc de opțiunea „--persist”."
 
-#: main.c:1775
+#: main.c:1747
 msgid "Persistent memory is not supported."
 msgstr "Memoria persistentă nu este acceptată."
 
-#: main.c:1784
+#: main.c:1756
 #, c-format
 msgid "%s: option `-W %s' unrecognized, ignored\n"
 msgstr "%s: opțiunea „-W %s” nu este recunoscută, se ignoră\n"
 
-#: main.c:1837
+#: main.c:1809
 #, c-format
 msgid "%s: option requires an argument -- %c\n"
 msgstr "%s: opțiunea necesită un argument -- %c\n"
 
-#: main.c:1940
+#: main.c:1917
 #, c-format
 msgid "%s: fatal: cannot stat %s: %s\n"
 msgstr "%s: fatal: nu se poate stabili starea lui %s: %s\n"
 
-#: main.c:1944
+#: main.c:1921
 #, c-format
 msgid ""
 "%s: fatal: using persistent memory is not allowed when running as root.\n"
@@ -3725,98 +3578,111 @@ msgstr ""
 "%s: fatal: utilizarea memoriei persistente nu este permisă atunci când se "
 "execută ca root.\n"
 
-#: main.c:1947
+#: main.c:1924
 #, c-format
 msgid "%s: warning: %s is not owned by euid %d.\n"
 msgstr "%s: avertisment: %s nu este deținut de euid %d.\n"
 
-#: mpfr.c:661
+#: main.c:1939
+msgid "persistent memory is not supported"
+msgstr "memoria persistentă nu este acceptată"
+
+#: main.c:1949
+#, c-format
+msgid ""
+"%s: fatal: persistent memory allocator failed to initialize: return value "
+"%d, pma.c line: %d.\n"
+msgstr ""
+"%s: fatal: alocatorul de memorie persistentă nu a reușit să se inițializeze: "
+"returnează valoarea %d, linia pma.c: %d.\n"
+
+#: mpfr.c:670
 #, c-format
 msgid "PREC value `%.*s' is invalid"
 msgstr "valoarea PREC „%.*s” nu este validă"
 
-#: mpfr.c:720
+#: mpfr.c:729
 #, c-format
 msgid "ROUNDMODE value `%.*s' is invalid"
 msgstr "valoarea ROUNDMODE „%.*s” nu este validă"
 
-#: mpfr.c:786
+#: mpfr.c:795
 msgid "atan2: received non-numeric first argument"
 msgstr "atan2: s-a primit un prim argument nenumeric"
 
-#: mpfr.c:788
+#: mpfr.c:797
 msgid "atan2: received non-numeric second argument"
 msgstr "atan2: s-a primit un al doilea argument nenumeric"
 
-#: mpfr.c:827
+#: mpfr.c:836
 #, c-format
 msgid "%s: received negative argument %.*s"
 msgstr "%s: s-a primit argument negativ %.*s"
 
-#: mpfr.c:894
+#: mpfr.c:903
 msgid "int: received non-numeric argument"
 msgstr "int: s-a primit argument nenumeric"
 
-#: mpfr.c:926
+#: mpfr.c:935
 msgid "compl: received non-numeric argument"
 msgstr "compl: s-a primit argument nenumeric"
 
-#: mpfr.c:938
+#: mpfr.c:947
 msgid "compl(%Rg): negative value is not allowed"
 msgstr "compl(%lf): valoarea negativă nu este permisă"
 
-#: mpfr.c:943
+#: mpfr.c:952
 msgid "comp(%Rg): fractional value will be truncated"
 msgstr "comp(%Rg): valorile fracționale vor fi trunchiate"
 
-#: mpfr.c:954
+#: mpfr.c:963
 #, c-format
 msgid "compl(%Zd): negative values are not allowed"
 msgstr "compl(%Zd): valorile negative nu sunt permise"
 
-#: mpfr.c:972
+#: mpfr.c:981
 #, c-format
 msgid "%s: received non-numeric argument #%d"
 msgstr "%s: s-a primit un argument nenumeric #%d"
 
-#: mpfr.c:982
+#: mpfr.c:991
 msgid "%s: argument #%d has invalid value %Rg, using 0"
 msgstr "%s: argumentul #%d are valoarea %Rg nevalidă, folosind 0"
 
-#: mpfr.c:993
+#: mpfr.c:1002
 msgid "%s: argument #%d negative value %Rg is not allowed"
 msgstr "%s: argumentul #%d valoarea negativă %Rg nu este permisă"
 
-#: mpfr.c:1000
+#: mpfr.c:1009
 msgid "%s: argument #%d fractional value %Rg will be truncated"
 msgstr "%s: argumentul #%d valoarea fracțională %Rg va fi trunchiată"
 
-#: mpfr.c:1014
+#: mpfr.c:1023
 #, c-format
 msgid "%s: argument #%d negative value %Zd is not allowed"
 msgstr "%s: argumentul #%d valoarea negativă %Zd nu este permisă"
 
-#: mpfr.c:1108
+#: mpfr.c:1117
 msgid "and: called with less than two arguments"
 msgstr "and: apelat cu mai puțin de două argumente"
 
-#: mpfr.c:1140
+#: mpfr.c:1149
 msgid "or: called with less than two arguments"
 msgstr "or: apelat cu mai puțin de două argumente"
 
-#: mpfr.c:1171
+#: mpfr.c:1180
 msgid "xor: called with less than two arguments"
 msgstr "xor: apelat cu mai puțin de două argumente"
 
-#: mpfr.c:1301
+#: mpfr.c:1310
 msgid "srand: received non-numeric argument"
 msgstr "srand: s-a primit un argument nenumeric"
 
-#: mpfr.c:1345
+#: mpfr.c:1354
 msgid "intdiv: received non-numeric first argument"
 msgstr "intdiv: s-a primit un prim argument nenumeric"
 
-#: mpfr.c:1347
+#: mpfr.c:1356
 msgid "intdiv: received non-numeric second argument"
 msgstr "intdiv: s-a primit un al doilea argument nenumeric"
 
@@ -3825,28 +3691,28 @@ msgstr "intdiv: s-a primit un al doilea argument nenumeric"
 msgid "cmd. line:"
 msgstr "linie cmd:"
 
-#: node.c:478
+#: node.c:477
 msgid "backslash at end of string"
 msgstr "bară oblică inversă la sfârșitul șirului"
 
-#: node.c:512
+#: node.c:511
 msgid "could not make typed regex"
 msgstr "nu s-a putut face expresia regulată tastată"
 
-#: node.c:586
+#: node.c:599
 #, c-format
 msgid "old awk does not support the `\\%c' escape sequence"
 msgstr "vechiul awk nu acceptă secvența de eludare „\\%c”"
 
-#: node.c:647
+#: node.c:660
 msgid "POSIX does not allow `\\x' escapes"
 msgstr "POSIX nu permite eludări „\\x”"
 
-#: node.c:655
+#: node.c:668
 msgid "no hex digits in `\\x' escape sequence"
 msgstr "fără cifre hexazecimale în secvența de eludare „\\x”"
 
-#: node.c:677
+#: node.c:690
 #, c-format
 msgid ""
 "hex escape \\x%.*s of %d characters probably not interpreted the way you "
@@ -3855,24 +3721,24 @@ msgstr ""
 "eludarea hexazecimală \\x%.*s din %d caractere probabil nu a fost "
 "interpretată așa cum vă așteptați"
 
-#: node.c:692
+#: node.c:703
 msgid "POSIX does not allow `\\u' escapes"
 msgstr "POSIX nu permite eludări „\\u”"
 
-#: node.c:700
+#: node.c:711
 msgid "no hex digits in `\\u' escape sequence"
 msgstr "fără cifre hexazecimale în secvența de eludare „\\u”"
 
-#: node.c:731
+#: node.c:739
 msgid "invalid `\\u' escape sequence"
 msgstr "secvență de eludare „\\u” nevalidă"
 
-#: node.c:753
+#: node.c:761
 #, c-format
 msgid "escape sequence `\\%c' treated as plain `%c'"
 msgstr "secvența de eludare „\\%c” tratată ca „%c” simplu"
 
-#: node.c:893
+#: node.c:903
 msgid ""
 "Invalid multibyte data detected. There may be a mismatch between your data "
 "and your locale"
@@ -3880,29 +3746,178 @@ msgstr ""
 "S-au detectat date multiocteți nevalide. Este posibil să existe o "
 "nepotrivire între datele și localizarea dumneavoastră"
 
-#: posix/gawkmisc.c:179
+#: printf.c:225 printf.c:230
+msgid "fatal: must use `count$' on all formats or none"
+msgstr ""
+"fatal: trebuie să se folosească „count$” în toate formatele sau în niciunul"
+
+#: printf.c:303
+#, c-format
+msgid "field width is ignored for `%%' specifier"
+msgstr "lățimea câmpului este ignorată pentru specificatorul „%%”"
+
+#: printf.c:305
+#, c-format
+msgid "precision is ignored for `%%' specifier"
+msgstr "precizia este ignorată pentru specificatorul „%%”"
+
+#: printf.c:307
+#, c-format
+msgid "field width and precision are ignored for `%%' specifier"
+msgstr "lățimea câmpului și precizia sunt ignorate pentru specificatorul „%%”"
+
+#: printf.c:358
+msgid "fatal: `$' is not permitted in awk formats"
+msgstr "fatal: „$” nu este permis în formatele awk"
+
+#: printf.c:367 printf.c:379
+msgid "fatal: argument index with `$' must be > 0"
+msgstr "fatal: indexul argumentului cu „$” trebuie să fie > 0"
+
+#: printf.c:371 printf.c:383
+#, c-format
+msgid ""
+"fatal: argument index %ld greater than total number of supplied arguments"
+msgstr ""
+"fatal: indexul argumentelor %ld este mai mare decât numărul total de "
+"argumente furnizate"
+
+#: printf.c:393
+msgid "must use `count$' on all formats or none"
+msgstr "trebuie să se folosească „count$” în toate formatele sau în niciunul"
+
+#: printf.c:403
+msgid "fatal: no `$' supplied for positional field width or precision"
+msgstr ""
+"fatal: nu este furnizat „$” pentru lungimea sau precizia câmpului pozițional"
+
+#: printf.c:487
+#, c-format
+msgid "`%c' is meaningless in awk formats; ignored"
+msgstr "„%c” este lipsit de sens în formatele awk; se ignoră"
+
+#: printf.c:491
+#, c-format
+msgid "fatal: `%c' is not permitted in POSIX awk formats"
+msgstr "fatal: „%c” nu este permis în formatele POSIX ale awk"
+
+#: printf.c:528
+#, c-format
+msgid "[s]printf: value %g is not a valid wide character"
+msgstr "[s]printf: valoarea %g nu este un caracter larg valid"
+
+#: printf.c:685
+#, c-format
+msgid "%%%c format is POSIX standard but not portable to other awks"
+msgstr "formatul %%%c este standard POSIX, dar nu este portabil la alte awks"
+
+#: printf.c:722
+#, c-format
+msgid "ignoring unknown format specifier character `%c': no argument converted"
+msgstr ""
+"se ignoră caracterul specificator de format „%c” necunoscut: niciun argument "
+"nu a fost convertit"
+
+#: printf.c:727
+msgid "fatal: not enough arguments to satisfy format string"
+msgstr "fatal: nu sunt suficiente argumente pentru a satisface șirul de format"
+
+#: printf.c:729
+msgid "^ ran out for this one"
+msgstr "^ insuficient pentru aceasta"
+
+#: printf.c:736
+msgid "[s]printf: format specifier does not have control letter"
+msgstr "[s]printf: specificatorul de format nu are literă de control"
+
+#: printf.c:739
+msgid "too many arguments supplied for format string"
+msgstr "prea multe argumente furnizate pentru șirul de format"
+
+# R-GC, scrie:
+# traducerea acestui mesaj, este o adaptare între
+# traducerea anterioară și traducerea italiană
+# actuală a acestui mesaj, ce este făcută de
+# dezvoltatorul italian al «gawk».
+#: printf.c:781
+#, c-format
+msgid "%s: received non-string format string argument"
+msgstr "%s: argumentul de format primit, nu este un șir"
+
+#: printf.c:796
+msgid "sprintf: no arguments"
+msgstr "sprintf: fără argumente"
+
+#: printf.c:819 printf.c:830
+msgid "printf: no arguments"
+msgstr "printf: fără argumente"
+
+#: printf.c:845
+msgid "printf: attempt to write to closed write end of two-way pipe"
+msgstr ""
+"printf: s-a încercat să se scrie la capătul de scriere închis al conductei "
+"bidirecționale"
+
+#: printf.c:1169
+#, c-format
+msgid "[s]printf: value %g is out of range for `%%%c' format"
+msgstr ""
+"[s]printf: valoarea %g este în afara intervalului pentru formatul „%%%c”"
+
+#: printf.c:1180
+#, c-format
+msgid "[s]printf: value %s is out of range for `%%%c' format"
+msgstr ""
+"[s]printf: valoarea %s este în afara intervalului pentru formatul „%%%c”"
+
+#: posix/gawkmisc.c:200
 #, c-format
 msgid "%s %s `%s': could not get fd flags: (fcntl F_GETFD: %s)"
 msgstr ""
 "%s %s „%s”: nu s-a putut obține indicatoarele de descriptor de fișier: "
 "(fcntl F_GETFD: %s)"
 
-#: posix/gawkmisc.c:191
+#: posix/gawkmisc.c:212
 #, c-format
 msgid "%s %s `%s': could not set close-on-exec: (fcntl F_SETFD: %s)"
 msgstr "%s %s „%s”: nu s-a putut stabili close-on-exec: (fcntl F_SETFD: %s)"
 
-#: profile.c:73
+#: posix/gawkmisc.c:337
+#, c-format
+msgid "warning: personality: %s\n"
+msgstr "avertisment: apelul de sistem „personality” a returnat: %s\n"
+
+#: posix/gawkmisc.c:375
+#, c-format
+msgid "waitpid: got exit status %#o\n"
+msgstr "waitpid: a obținut starea de ieșire %#o\n"
+
+#: posix/gawkmisc.c:379
+#, c-format
+msgid "fatal: posix_spawnp: %s\n"
+msgstr "fatal: posix_spawnp: %s\n"
+
+#: posix/gawkmisc.c:404
+#, c-format
+msgid "warning: sysctl: %s\n"
+msgstr "avertisment: sysctl %s\n"
+
+#: posix/gawkmisc.c:413
+#, c-format
+msgid "warning: procctl: %s\n"
+msgstr "avertisment: procctl: %s\n"
+
+#: profile.c:79
 msgid "Program indentation level too deep. Consider refactoring your code"
 msgstr ""
 "Nivelul de indentare a programului este prea profund. Luați în considerare "
 "refactorizarea codului dumneavoastră"
 
-#: profile.c:112
+#: profile.c:118
 msgid "sending profile to standard error"
 msgstr "se trimite profilul la ieșirea de eroare standard"
 
-#: profile.c:270
+#: profile.c:288
 #, c-format
 msgid ""
 "\t# %s rule(s)\n"
@@ -3911,7 +3926,7 @@ msgstr ""
 "\t# %s regulă(i)\n"
 "\n"
 
-#: profile.c:278
+#: profile.c:300
 #, c-format
 msgid ""
 "\t# Rule(s)\n"
@@ -3920,16 +3935,16 @@ msgstr ""
 "\t# Regulă(i)\n"
 "\n"
 
-#: profile.c:366
+#: profile.c:392
 #, c-format
 msgid "internal error: %s with null vname"
 msgstr "eroare internă: %s cu vname null"
 
-#: profile.c:671
+#: profile.c:697
 msgid "internal error: builtin with null fname"
 msgstr "eroare internă: comandă internă cu fname null"
 
-#: profile.c:1329
+#: profile.c:1358
 #, c-format
 msgid ""
 "%s# Loaded extensions (-l and/or @load)\n"
@@ -3938,23 +3953,23 @@ msgstr ""
 "%s# Extensii încărcate (-l și/sau @load)\n"
 "\n"
 
-#: profile.c:1360
+#: profile.c:1389
 #, c-format
 msgid ""
 "\n"
-"# Included files (-i and/or @include)\n"
+"# Included files (-i and/or @include and/or @nsinclude)\n"
 "\n"
 msgstr ""
 "\n"
-"# Fișiere incluse (-i și/sau @include)\n"
+"# Fișiere incluse (-i și/sau @include și/sau @nsinclude)\n"
 "\n"
 
-#: profile.c:1424
+#: profile.c:1460
 #, c-format
 msgid "\t# gawk profile, created %s\n"
 msgstr "\t# profil gawk, creat %s\n"
 
-#: profile.c:1992
+#: profile.c:2028
 #, c-format
 msgid ""
 "\n"
@@ -3963,12 +3978,12 @@ msgstr ""
 "\n"
 "\t# Funcții, listate alfabetic\n"
 
-#: profile.c:2053
+#: profile.c:2090
 #, c-format
 msgid "redir2str: unknown redirection type %d"
 msgstr "redir2str: tip de redirecționare necunoscut %d"
 
-#: re.c:61 re.c:175
+#: re.c:75 re.c:189
 msgid ""
 "behavior of matching a regexp containing NUL characters is not defined by "
 "POSIX"
@@ -3976,94 +3991,94 @@ msgstr ""
 "comportamentul de potrivire a unei expresii regulate care conține caractere "
 "NULL nu este definit de POSIX"
 
-#: re.c:131
+#: re.c:145
 msgid "invalid NUL byte in dynamic regexp"
 msgstr "octet NULL nevalid în expresia regulată dinamică"
 
-#: re.c:215
+#: re.c:229
 #, c-format
 msgid "regexp escape sequence `\\%c' treated as plain `%c'"
 msgstr "secvența de evadare a expresiei regulate „\\%c” tratată ca „%c” simplă"
 
-#: re.c:249
+#: re.c:264
 #, c-format
 msgid "regexp escape sequence `\\%c' is not a known regexp operator"
 msgstr ""
 "secvența de eludare a expresiei regulate „\\%c” nu este un operator de "
 "expresii regulate cunoscut"
 
-#: re.c:720
+#: re.c:828
 #, c-format
 msgid "regexp component `%.*s' should probably be `[%.*s]'"
 msgstr ""
 "componenta expresiei regulate „%.*s” ar trebui probabil să fie „[%.*s]”"
 
-#: support/dfa.c:912
+#: support/dfa.c:911 support/minrx.c:2550
 msgid "unbalanced ["
 msgstr "[ fără pereche"
 
-#: support/dfa.c:1033
+#: support/dfa.c:1032
 msgid "invalid character class"
 msgstr "clasă de caractere nevalidă"
 
-#: support/dfa.c:1161
+#: support/dfa.c:1160
 msgid "character class syntax is [[:space:]], not [:space:]"
 msgstr "sintaxa clasei de caractere este [[:space:]], nu [:space:]"
 
-#: support/dfa.c:1237
+#: support/dfa.c:1236
 msgid "unfinished \\ escape"
 msgstr "eludare \\ neterminată"
 
-#: support/dfa.c:1347
+#: support/dfa.c:1346
 msgid "? at start of expression"
 msgstr "? la începutul expresiei"
 
-#: support/dfa.c:1359
+#: support/dfa.c:1358
 msgid "* at start of expression"
 msgstr "* la începutul expresiei"
 
-#: support/dfa.c:1373
+#: support/dfa.c:1372
 msgid "+ at start of expression"
 msgstr "+ la începutul expresiei"
 
-#: support/dfa.c:1428
+#: support/dfa.c:1427
 msgid "{...} at start of expression"
 msgstr "{...} la începutul expresiei"
 
-#: support/dfa.c:1431
+#: support/dfa.c:1430
 msgid "invalid content of \\{\\}"
 msgstr "conținut nevalid al \\{\\}"
 
-#: support/dfa.c:1433
+#: support/dfa.c:1432
 msgid "regular expression too big"
 msgstr "expresie regulată prea mare"
 
-#: support/dfa.c:1583
+#: support/dfa.c:1582
 msgid "stray \\ before unprintable character"
 msgstr "caracter în plus „\\”, înainte de caracter neimprimabil"
 
-#: support/dfa.c:1585
+#: support/dfa.c:1584
 msgid "stray \\ before white space"
 msgstr "caracter în plus „\\”, înainte de un spațiu în alb"
 
-#: support/dfa.c:1596
+#: support/dfa.c:1595
 #, c-format
 msgid "stray \\ before %s"
 msgstr "caracter în plus „\\”, înainte de „%s”"
 
-#: support/dfa.c:1597 support/dfa.c:1600
+#: support/dfa.c:1596 support/dfa.c:1599
 msgid "stray \\"
 msgstr "caracter în plus „\\”"
 
-#: support/dfa.c:1951
+#: support/dfa.c:1950 support/minrx.c:2554
 msgid "unbalanced ("
 msgstr "( fără pereche"
 
-#: support/dfa.c:2068
+#: support/dfa.c:2069
 msgid "no syntax specified"
 msgstr "nicio sintaxă specificată"
 
-#: support/dfa.c:2079
+#: support/dfa.c:2080
 msgid "unbalanced )"
 msgstr ") fără pereche"
 
@@ -4122,6 +4137,58 @@ msgstr "%s: opțiunea „-W %s” nu permite un argument\n"
 #, c-format
 msgid "%s: option '-W %s' requires an argument\n"
 msgstr "%s: opțiunea „-W %s” necesită un argument\n"
+
+#: support/minrx.c:2545
+msgid "success"
+msgstr "succes"
+
+#: support/minrx.c:2546
+msgid "bad pattern"
+msgstr "model greșit"
+
+#: support/minrx.c:2547
+msgid "invalid contents of {}"
+msgstr "conținut nevalid al {}"
+
+#: support/minrx.c:2548
+msgid "? * + or {interval} not preceded by valid subpattern"
+msgstr "? * + sau {interval} nu este precedat de un submodel valid"
+
+#: support/minrx.c:2549
+msgid "unbalanced {"
+msgstr "{ fără pereche"
+
+#: support/minrx.c:2551
+msgid "invalid collating element"
+msgstr "caracter de colaționare (comparare) nevalid"
+
+#: support/minrx.c:2552
+msgid "invalid character class name"
+msgstr "nume de clasă de caractere nevalid"
+
+#: support/minrx.c:2553
+msgid "invalid trailing backslash"
+msgstr "bară oblică inversă la sfârșit nevalidă"
+
+#: support/minrx.c:2555
+msgid "invalid range endpoint"
+msgstr "punct final de interval nevalid"
+
+#: support/minrx.c:2556
+msgid "memory allocation failed"
+msgstr "alocarea memoriei a eșuat"
+
+#: support/minrx.c:2557
+msgid "invalid \\digit"
+msgstr "cifră nevalidă"
+
+#: support/minrx.c:2558
+msgid "match not found"
+msgstr "potrivire negăsită"
+
+#: support/minrx.c:2559
+msgid "unknown error code"
+msgstr "cod de eroare necunoscut"
 
 #: support/regcomp.c:122
 msgid "Success"
@@ -4195,7 +4262,12 @@ msgstr ") or \\) fără pereche"
 msgid "No previous regular expression"
 msgstr "Nu există expresii regulate anterioare"
 
-#: symbol.c:137
+#: symbol.c:127
+#, c-format
+msgid "%s was created by version `%s', but the current version is `%s'"
+msgstr "%s a fost creat de versiunea „%s”, dar versiunea actuală este „%s”"
+
+#: symbol.c:149
 msgid ""
 "current setting of -M/--bignum does not match saved setting in PMA backing "
 "file"
@@ -4203,14 +4275,57 @@ msgstr ""
 "valoarea actuală a opțiunii „-M/--bignum” nu se potrivește cu valoarea "
 "salvată în fișierul de rezervă PMA"
 
-#: symbol.c:780
+#: symbol.c:793
 #, c-format
 msgid "function `%s': cannot use function `%s' as a parameter name"
 msgstr "funcția „%s”: nu se poate folosi funcția „%s” ca nume de parametru"
 
-#: symbol.c:910
+#: symbol.c:923
 msgid "cannot pop main context"
 msgstr "nu se poate afișa contextul principal"
+
+#~ msgid "`delete(array)' is a non-portable tawk extension"
+#~ msgstr "„delete(array)” este o extensie tawk neportabilă"
+
+#, c-format
+#~ msgid "%s: %d: tawk regex modifier `/.../%c' doesn't work in gawk"
+#~ msgstr ""
+#~ "%s: %d: modificatorul expresiei regulate tawk „/.../%c” nu funcționează "
+#~ "în gawk"
+
+#, c-format
+#~ msgid "tawk regex modifier `/.../%c' doesn't work in gawk"
+#~ msgstr ""
+#~ "modificatorul expresiei regulate tawk „/.../%c” nu funcționează în gawk"
+
+# R-GC, scrie:
+# după revizarea fișierului, DȘ, zice:
+# → typo: "length"
+# ===
+# ok, corecție aplicată(mai apărea, în alt loc, aceeași greșeală)
+#~ msgid "length: received array argument"
+#~ msgstr "length: s-a primit ca argument o matrice"
+
+#~ msgid "`length(array)' is a gawk extension"
+#~ msgstr "„length(array)” este o extensie gawk"
+
+#, c-format
+#~ msgid "warning: /proc/self/exe: readlink: %s\n"
+#~ msgstr "avertisment: /proc/self/exe: readlink: %s\n"
+
+#~ msgid "fatal: `$' not permitted after period in format"
+#~ msgstr "fatal: „$” nu este permis după un punct în format"
+
+#, c-format
+#~ msgid "[s]printf: value %g is too big for %%c format"
+#~ msgstr "[s]printf: valoarea %g este prea mare pentru formatul %%c"
+
+#, c-format
+#~ msgid "%s"
+#~ msgstr "%s"
+
+#~ msgid "\t-W nostalgia\t\t--nostalgia\n"
+#~ msgstr "\t-W nostalgia\t\t--nostalgia\n"
 
 #~ msgid "fatal error: internal error: segfault"
 #~ msgstr "eroare fatală: eroare internă: eroare de segmentare"

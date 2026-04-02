@@ -1,7 +1,7 @@
 #
 # Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 2000-2016, 2018, 2019, 2021, 2022, 2023
+# Copyright (C) 2000-2016, 2018, 2019, 2021, 2022, 2023, 2024, 2026
 # the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
@@ -35,6 +35,8 @@ EXTRA_DIST = \
         ChangeLog.0 \
 	Makefile.am \
 	Makefile.in \
+	charset.c \
+	charset.h \
 	pma.h \
 	pma.c \
 	regcomp.c \
@@ -62,6 +64,8 @@ libsupport_a_SOURCES = \
 	libc-config.h \
 	localeinfo.c \
 	localeinfo.h \
+	minrx.c \
+	minrx.h \
 	random.c \
 	random.h \
 	regex.c \
@@ -77,8 +81,6 @@ libsupport_a_SOURCES = \
 
 if USE_PERSISTENT_MALLOC
 libsupport_a_SOURCES += pma.c pma.h
-CFLAGS += -DNDEBUG
-AM_CFLAGS += -DNDEBUG
 endif
 
 # For some make's, e.g. OpenBSD, that don't define this
@@ -90,4 +92,4 @@ DEBUG = -gdwarf-4 -g3
 DEFS = -DGAWK -DHAVE_CONFIG_H -I"$(srcdir)/.."
 
 distclean-local:
-	rm -fr .deps
+	rm -fr .deps malloc/.deps

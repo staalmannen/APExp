@@ -1,7 +1,7 @@
 dnl
 dnl arch.m4 --- autoconf input file for gawk
 dnl
-dnl Copyright (C) 1995, 1996, 1998, 1999, 2000, 2003, 2004, 2015
+dnl Copyright (C) 1995, 1996, 1998, 1999, 2000, 2003, 2004, 2015, 2026
 dnl the Free Software Foundation, Inc.
 dnl
 dnl This file is part of GAWK, the GNU implementation of the
@@ -85,7 +85,7 @@ and reconfigure. ("xlc" is the recommended compiler on z/OS.)])
     ;;
   xlc*)
     dnl This enables C99, and on z/OS 1.11, the setenv() prototype.
-    CFLAGS="$CFLAGS -qlanglvl=stdc99:libext"
+    CFLAGS="$CFLAGS -qlanglvl=extc1x"
     dnl Use a compiler wrapper script to address some annoyances.
     cat >zos-cc <<EOF
 #!/bin/sh

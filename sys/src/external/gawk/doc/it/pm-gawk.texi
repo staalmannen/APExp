@@ -5,9 +5,11 @@
 
 @c TODO:  Checklist for release:
 @c    revise all   U P D A T E   items as appropriate
+@c    check all URLs by clicking in PDF version
 @c    check all to-do notes
 @c    remove most comments
-@c    spell check (last 2am 15 Aug 2022)
+@c    spell check
+@c    post final version to pma web site
 
 @c verbatim limits:  47 rows x 75 cols, smallformat 58 x 90
 
@@ -45,13 +47,12 @@ pm-@gwk{}
 @copying
 @noindent
 @c UPDATE copyright info below
-Copyright @copyright{} 2022 Terence Kelly @*
+Copyright @copyright{} 2022, 2025 Terence Kelly @*
 @ifnottex
-@noindent
 @email{tpkelly@@eecs.umich.edu} @*
 @email{tpkelly@@cs.princeton.edu} @*
 @email{tpkelly@@acm.org} @*
-@url{http://web.eecs.umich.edu/~tpkelly/pma/} @*
+@url{https://web.eecs.umich.edu/~tpkelly/pma/} @*
 @url{https://dl.acm.org/profile/81100523747}
 @end ifnottex
 
@@ -69,16 +70,19 @@ Una copia della licenza è disponibile nel sito @*
 @titlepage
 @title @value{TYTL}
 @c UPDATE date below
-@subtitle 16 agosto 2022
-@subtitle @gwk{} versione 5.2
-@subtitle @pmg{} versione 2022.08Aug.03.1659520468 (Avon 7)
+@subtitle 9 febbraio 2025
+@subtitle @gwk{} versione 5.3.2
+@subtitle @pmg{} versione 2022.10Oct.30.1667172241 (Avon 8)
 @author Terence Kelly
 @author @email{tpkelly@@eecs.umich.edu}
 @author @email{tpkelly@@cs.princeton.edu}
 @author @email{tpkelly@@acm.org}
-@author @url{http://web.eecs.umich.edu/~tpkelly/pma/}
+@author @url{https://web.eecs.umich.edu/~tpkelly/pma/}
 @author @url{https://dl.acm.org/profile/81100523747}
+@author @url{https://queue.acm.org/DrillBits}
 @vskip 0pt plus 1filll
+
+Traduzione italiana di Antonio Giovanni Colombo
 @insertcopying
 @end titlepage
 
@@ -91,7 +95,7 @@ Una copia della licenza è disponibile nel sito @*
 @ifnotxml
 @ifnotdocbook
 @top  Introduzione generale
-@gwk{} 5.2 introduce la funzionalità @emph{Memoria Persistente} he può
+@gwk{} 5.2 ha introdotto la funzionalità @emph{Memoria Persistente} che può
 ``ricordare'' le variabili e le funzioni definite in uno script che
 possono quindi essere utilizzate in successive esecuzioni di script @gwk{};
 ciò consente di passare variabili fra script non correlati fra loro
@@ -104,6 +108,9 @@ approfondita della Memoria Persistente in @gwk{}.
 @end ifnotdocbook
 @end ifnotxml
 @end ifnottex
+
+@c UPDATE:  ensure that TOC below matches order of sections and  
+@c          homebrew TOC in Introduction
 
 @menu
 * Introduzione::
@@ -124,7 +131,7 @@ approfondita della Memoria Persistente in @gwk{}.
 @sp 1
 
 @c UPDATE below after official release
-GNU AWK (@gwk{}) 5.2, rilasciato nel mese di settembre 2022, introduce
+GNU AWK (@gwk{}) 5.2, rilasciato nel mese di settembre 2022, ha introdotto
 la nuova funzionalità della @emph{memoria persistente} che facilita
 la preparazione di script AWK e in certi casi ne migliora le prestazioni.
 La nuova funzionalità, chiamata ``@pmg{}'',
@@ -134,8 +141,8 @@ e consente di passare variabili fra script non correlati fra loro
 senza serializzare/analizzare file di testo---in maniera praticamente
 trasparente. @pmg{} @emph{non} richiede presenza di memoria non-volatile
 sul computer in cui viene eseguito, e neppure altre infrastrutture
-insolite; funzione sui normali computer e sui normali sistemi operativi
-che la maggior parte delle persone sta utilizzando da decenni.
+insolite; funziona sui normali computer e sui normali sistemi operativi
+che sono in uso generale da decenni.
 
 @c @sp 1
 
@@ -151,7 +158,7 @@ esempi di programmi, e uno sguardo ``sotto il coperchio'' a
 @pmg{}.  Chi abbia familiarità con @gwk{} e con gli ambienti software
 di tipo Unix, può proseguire direttamente leggendo: @*
 
-@itemize @c @w{}
+@itemize
 @item @ref{Per iniziare} basta scrivere solo qualche carattere in più.
 @item @ref{Esempi} mostra come @pmg{} tratta tipici script AWK.
 @item @ref{Prestazioni} riguarda efficienza, regolazione S.O. e altro.
@@ -170,7 +177,10 @@ di tipo Unix, può proseguire direttamente leggendo: @*
 Si può trovare la versione più recente di questo manuale, e anche
 la ``versione del regista'', nel sito web dedicato all'allocatore
 di memoria persistente usato in @pmg{}: @*
-@center @url{http://web.eecs.umich.edu/~tpkelly/pma/}
+@center @url{https://web.eecs.umich.edu/~tpkelly/pma/}
+
+@c not citing this because it might not be as fresh as pma site
+@c https://www.gnu.org/software/gawk/manual/pm-gawk/
 
 @c @sp 1
 
@@ -178,7 +188,7 @@ La traduzione italiana più recente di questo manuale si può trovare
 in: @*
 @center @url{https://sites.google.com/view/gawkdoc-it/home-page}
 
-@c @sp 1
+@sp 1
 
 @noindent
 Due pubblicazioni descrivono [in inglese] l'allocatore di memoria
@@ -190,7 +200,7 @@ sorgente ufficiale di @gwk{}:
 @item @url{http://nvmw.ucsd.edu/nvmw2022-program/nvmw2022-data/@*nvmw2022-paper35-final_version_your_extended_abstract.pdf}
 @end itemize
 
-@c @sp 1
+@sp 1
 
 @noindent
 Sentitevi liberi di inviarmi domande, suggerimenti, e resoconti di esperienze a: @*
@@ -200,8 +210,7 @@ Sentitevi liberi di inviarmi domande, suggerimenti, e resoconti di esperienze a:
 @w{ } @w{ } @w{ } @w{ } @w{ } @w{ } @w{ } @w{ }  @email{tpkelly@@cs.princeton.edu} @*
 @w{ } @w{ } @w{ } @w{ } @w{ } @w{ } @w{ } @w{ }  @email{tpkelly@@acm.org}
 
-@c @page
-@sp 3
+@page
 @c ==================================================================
 @node    Per iniziare
 @chapter Per iniziare
@@ -212,11 +221,11 @@ Sentitevi liberi di inviarmi domande, suggerimenti, e resoconti di esperienze a:
 Ecco @pmg{} in azione, partendo dal prompt (@samp{$})
 della shell @command{bash}:
 @verbatim
-        $ truncate -s 4096000 heap.pma
-        $ export GAWK_PERSIST_FILE=heap.pma
-        $ gawk 'BEGIN{un_valore = 47}'
-        $ gawk 'BEGIN{un_valore += 7; print un_valore}'
-        54
+    $ truncate -s 4096000 heap.pma
+    $ export GAWK_PERSIST_FILE=heap.pma
+    $ gawk 'BEGIN{un_valore = 47}'
+    $ gawk 'BEGIN{un_valore += 7; print un_valore}'
+    54                       # '7' => non pm-gawk, errore => mal compilato
 @end verbatim
 @noindent
 Per prima cosa, il comando @command{truncate} crea un @dfn{file sparso}
@@ -232,28 +241,30 @@ variabile @code{un_valore}, la quale sarà poi salvata nel file sparso, e
 in questo modo ``sopravviverà'' al programma interpretato che l'ha
 inizializzata.
 Infine, il quarto comando invoca @pmg{} utilizzando uno script AWK
-di una riga @emph{differente} dal precedente, il quale incrementa e
+di una riga, @emph{differente} dal precedente, il quale incrementa e
 visualizza script @code{un_valore}.
 La riga di output mostra che in effetti @pmg{} ha ``ricordato''
 @code{un_valore} utilizzandolo in script differenti e non correlati
-fra loro.  (Se nel file eseguibile @gwk{} trovato nel vostro
-cammino di ricerca @env{$PATH} non è disponibile la funzionalità
-di memoria persistente, l'output dell'esempio visto sopra sarebbe
-@samp{7} invece che @samp{54}. @xref{Installazione}).  Per non usare
-la persistenza finché non lo si desideri ancora, si può impedire a
-@gwk{} di trovare il nome del file sparso, dando il comando
-@command{unset GAWK_PERSIST_FILE}.  Per ``dimenticare'' del tutto
-le variabili dello script, basta cancella il file sparso che le
-contiene.
+fra loro. Per non usare la persistenza finché non lo si desideri ancora,
+si può impedire a @gwk{} di trovare il nome del file sparso, dando
+il comando @command{unset GAWK_PERSIST_FILE}.  Per ``dimenticare''
+completamente le variabili dello script, basta cancellare il file
+sparso che le contiene.
 
-@sp 2
+@xref{Installazione} per due problemi comuni e per come risolverli.
+Se eseguite l'esempio qui sopra e @pmg{} non funziona alla @emph{seconda}
+chiamata, probabilmente il vostro @pmg{} era stato compilato in maniera
+non corretta.  Se viene stampato @samp{7} invece che @samp{54}, il
+programma eseguibile @gwk{} trovato nelle librerie del vostro
+@env{$PATH} sono state compilate senza la funzionalità della
+memoria persistente.
 
 Attivare e disattivare la memoria persistente usando i comandi
 @command{export} e @command{unset} per gestire la variabile d'ambiente
 richiede attenzione: dimenticando di usare @command{unset} quando
-non si vuole più usare la memoria persistente si possono generare errori
-e confusione.  Fortunatamente @command{bash} consente di
-passare a un programma le variabili d'ambiente più selettivamente,
+non si vuole più usare la memoria persistente si può andare incontro
+a sorprese.  Fortunatamente @command{bash} consente di
+passare a un programma le variabili d'ambiente più esplicitamente,
 comando per comando:
 @verbatim
         $ rm heap.pma                    # ripartire da zero
@@ -276,8 +287,8 @@ di @gwk{} vede la variabile d'ambiente speciale, e quindi usa la variabile
 dello script contenuta nel file sparso.
 
 Mentre la situazione è già migliorata rispetto all'uso di variabili
-d'ambiente ``generali'', il passaggio di variabili d'ambiente col
-metodo visto sopra è prolisso e rozzo.  Definire un @dfn{alias} di shell
+d'ambiente ``generali'', il passaggio di variabili d'ambiente
+è un metodo prolisso e scomodo.  Definire un @dfn{alias} di shell
 permette di immettere meno caratteri e di semplificare la
 visualizzazione:
 @verbatim
@@ -354,10 +365,10 @@ in input:
         26 142
 @end verbatim
 
-Rendendo AWK più interattivo, @pmg{} invita ad effettuare delle
-``conversazioni'' a piacere con i dati disponibili.  Se ci interessa
-vedere quali parole in @cite{Finn} sono assenti da @cite{Sawyer},
-le risposte (fra cui ``flapdoodle,'' ``yellocution,'' e
+@pmg{} sembra avere un ciclo leggi-valorizza-stampa, che invita
+a effettuare delle ``conversazioni'' interattive con i dati disponibili.
+Se ci interessa controllare quali parole in @cite{Finn} sono assenti da
+@cite{Sawyer}, le risposte (fra cui ``flapdoodle,'' ``yellocution,'' e
 ``sockdolager'') sono facili da trovare:
 @verbatim
         $ gawk 'BEGIN{for(w in hf) if (!(w in ts)) print w}'
@@ -388,8 +399,7 @@ Si usi @pmg{} per separare le due fasi e per consentire al modello
 statistico di aggiungere incrementalmente nuovi libri a quelli già
 presenti.
 
-@c @page
-@sp 3
+@page
 @c  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
 Il nostro secondo esempio prende in esame un altro tema, che è un
@@ -472,41 +482,25 @@ sono presenti con maggiore frequenza in una lista).
 @c    refer to gawk docs for portability constraints on heaps
 @c can use only one heap at a time
 
-@c @page
-@sp 3
+@page
 @c  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 
-Il nostro terzo e ultimo insieme di esempi mostra come @pmg{}
-consente di mantenere in un file sparso sia i dati che le
-@emph{funzioni} definite dall'utente, le quali, quindi, possono
-essere, in seguito, liberamente utilizzate in script AWK indipendenti
-fra loro.
+I nostri ultimi esempi mostrano come @pmg{} consente di mantenere in un file
+sparso sia i dati che le @emph{funzioni} definite dall'utente, le quali
+quindi, possono essere, in seguito, liberamente utilizzate in script AWK
+indipendenti fra loro.
 
-@c ADR doesn't like return in count() below
-@c TK:  it was put there for a reason:
-@c $ truncate -s 10M funzioni.pma
-@c $ export GAWK_PERSIST_FILE=funzioni.pma
-@c $ gawk 'function count(A,t) {for(i in A)t++; return t}'
-@c $ gawk 'BEGIN { a["x"] = 4; a["y"] = 5; a["z"] = 6 }'
-@c $ gawk 'BEGIN { print count(a) }'
-@c 3
-@c $ gawk 'BEGIN { delete a }'
-@c $ gawk 'BEGIN { print count(a) }'
-@c [!!blank line, not zero!!]
-@c $
-
-La sequenza di comandi che segue invoca @pmg{} per creare e poi
-utilizzare una funzione definita dall'utente.  Le successive
-invocazioni utilizzano parecchi script AWK, tra loro differenti,
-che comunicano attraverso il file sparso.  Ogni invocazione può
-aggiungere funzioni definite dall'utente e aggiungere o togliere
-dati al file sparso, a beneficio delle successive invocazioni
-di @pmg{}.
+La sequenza di comandi di shell mostrata qui sotto invoca @pmg{} per creare
+prima e per utilizzare poi una funzione definita dall'utente.  Le successive
+invocazioni utilizzano parecchi script AWK, tra loro differenti, che
+comunicano attraverso il file sparso.  Ogni invocazione può aggiungere
+funzioni definite dall'utente e aggiungere o togliere dati al file sparso,
+che verrà utilizzato dalle successive invocazioni di @pmg{}.
 @smallformat
 @verbatim
         $ truncate -s 10M funzioni.pma
         $ export GAWK_PERSIST_FILE=funzioni.pma
-        $ gawk 'function conta(A,t) {for(i in A)t++; return ""==t?0:t}'
+        $ gawk 'function conta(A,t) {for(i in A)t++; return t+0}'
         $ gawk 'BEGIN { a["x"] = 4; a["y"] = 5; a["z"] = 6 }'
         $ gawk 'BEGIN { print conta(a) }'
         3
@@ -537,9 +531,6 @@ e quindi viene stampato un contatore a zero.
 Infine, gli ultimi due comandi @pmg{} riempiono il vettore con
 47 elementi, e visualizzano il contatore aggiornato.
 
-@c I could be persuaded to leave the polinomial example as an
-@c exercise, offering to send my answer to readers upon request.
-
 Il seguente script di shell invoca più volte @pmg{} per creare
 un insieme di funzioni definite dall'utente che effettuano delle
 operazioni di base su polinomi di secondo grado: calcolo del
@@ -559,7 +550,7 @@ scomposta come @math{(x - 3)(x + 4)}.
         gawk 'BEGIN{ a = 1; b = 1; c = -12 }' # nuovi coefficienti
         gawk 'BEGIN { print p(2) }'           # valuta/stampa ancora
         gawk 'function d(s) { return s * sqrt(b^2 - 4*a*c)}'
-        gawk 'BEGIN{ print "discriminante (deve>  essere >=0): " d(1)}'
+        gawk 'BEGIN{ print "discriminante (deve essere >=0): " d(1)}'
         gawk 'function r(s) { return (-b + d(s))/(2*a)}'
         gawk 'BEGIN{ print "root: " r( 1) "   " p(r( 1)) }'
         gawk 'BEGIN{ print "root: " r(-1) "   " p(r(-1)) }'
@@ -571,10 +562,8 @@ scomposta come @math{(x - 3)(x + 4)}.
         rm -f polinomi.pma
 @end verbatim
 @end smallformat
-@noindent
 
-@c @page
-@sp 3
+@page
 @c ==================================================================
 @node    Prestazioni
 @chapter Prestazioni
@@ -622,6 +611,8 @@ tabelle hash.
 @c Note that the total number of English words in existence is fixed,
 @c so as the size of a corpus increases without bound, the ratio of
 @c vocabulary size to corpus size tends toward zero.
+
+@c TODO:  maybe @samp instead of @verb below; be very careful
 
 Il vantaggio di prestazioni di @pmg{} nasce quando script
 differenti creano e utilizzano vettori associativi.
@@ -678,8 +669,7 @@ gli script AWK comodi e produttivi.
 @c
 @c @url{http://nvmw.ucsd.edu/nvmw2022-program/nvmw2022-data/nvmw2022-paper35-final_version_your_extended_abstract.pdf}.
 
-@c @page
-@sp 3
+@page
 @c  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 @node    Memoria virtuale e file enormi
 @section Memoria virtuale e file enormi
@@ -779,15 +769,15 @@ utilizzando il comando @command{tee} è spiegata in
 @end verbatim
 @noindent
 La regolazione dei parametri può essere di aiuto sia per @gwk{} non-persistente
-che per @pmg{}.  [Avviso: La regolazione del Sistema Operativo è un'arte
+che per @pmg{}.@*
+[@strong{Avvertenza}: La regolazione del Sistema Operativo è un'arte
 occulta, potreste essere di parere diverso].
 
 @c sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches'
 @c
 @c sudo doesn't convey root privileges to the redirection '>' when calling from cmd line
 
-@c @page
-@sp 3
+@page
 @c  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 @node    File sparsi
 @section File sparsi
@@ -827,8 +817,8 @@ spazio occupa su disco:
 @noindent
 Mentre @command{ls} ci restituisce la dimensione logica del file
 che ci attendevamo (un Terabyte, o 2 elevato alla quarantesima potenza),
-il comando @command{du} ci informa che il file non occupa assolutamente
-nessuna memoria.  Il filesystem aggiungerà delle risorse di memoria
+il comando @command{du} ci informa che il file occupa @emph{zero} byte
+di memoria.  Il filesystem aggiungerà delle risorse di memoria
 fisica a fronte di questo file man mano che dei dati vengono scritti
 su di esso; se si va a leggere parti del file che non sono state ancora
 scritte, il risultato sono dei record a zeri binari.
@@ -848,10 +838,25 @@ specificato.  Se si copiano dei file sparsi usando il comando
 GNU @command{cp}, esso crea per default delle copie dei file
 che sono a loro volta dei file sparsi.
 
-Se un filesystem è cifrato, può impedire la creazione di file sparsi:
-se il valore in chiaro della posizione all'interno del file è tutto
-a zeri binari il corrispondente valore cifrato sarà probabilmente
-del tutto differente!  Effettuare la cifratura a livello della
+Per massimizzare il risparmio di memoria potremmo voler ``riorganizzare'' i
+file sparsi, togliendo da questi loro la memoria liberata, che conteneva dati
+cancellati, di cui @pmg{} non ha più bisogno.  Un programma di utilità a sé
+stante, @command{pma_sam}, è disponibile per fare ciò nel sito web @code{pma}.
+@c Running @command{du} before & after @command{pma_sam} will quantify
+@c the savings.
+
+@c NOTE:  In principle, it would be possible for pm-gawk to
+@c        automatically check whether re-sparsification would be
+@c        beneficial, and then just do it.  However to do this job
+@c        well would require knowledge about the file system and
+@c        would be quite tricky.  It's best to regard issues
+@c        surrounding sparse files, including re-sparsification, as
+@c        sysadmin matters separate from gawk.
+
+La cifratura di un filesystem può impedire la creazione di file sparsi:
+se il valore in chiaro della posizione all'interno di un file è tutto
+a zeri binari il corrispondente valore cifrato dev'essere diverso da
+una sequenza di zeri!  Effettuare la cifratura a livello della
 memoria [ossia codificando il dato prima di scriverlo], invece che
 lasciarla fare al filesystem, può offrire un livello accettabile di
 sicurezza, pur consentendo al filesystem l'implementazione di
@@ -869,16 +874,12 @@ completamente l'intero file.  Il comando di utilità
         $ ls -l megabyte
         -rw-rw-r--. 1 me me 1048576 Aug  5 23:18 megabyte
         $ du -h megabyte
-        1.0M    megabyte
+        1.0M    megabyte  # Abbiamo un megabyte, sia logico che fisico.
 @end verbatim
-@noindent
-In questo modo si ottiene il Megabyte richiesto, sia
-logicamente che fisicamente.
 
 @c UPDATE:  search for username in "ls" examples
 
-@c @page
-@sp 3
+@page
 @c  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 @node    Persistenza rispetto a durata
 @section Persistenza rispetto a durata
@@ -909,9 +910,8 @@ concetto, logicamente distinto è trattato nel @ref{Integrità dei dati}.)
 
 I dati @dfn{persistenti} sopravvivono ai programmi che ne fanno uso,
 ma non durano necessariamente per sempre.  Per esempio, come spiegato
-nella pagina di manuale del comando @command{mq_overview}, le code di
-messaggi sono persistenti, perché esistono finché il sistema non viene
-spento.
+in @samp{man mq_overview}, le code di messaggi sono persistenti,
+perché esistono finché il sistema non viene spento.
 I dati @dfn{durevoli} risiedono su un mezzo fisico che mantiene il
 suo contenuto anche se non è connesso a una presa di corrente.
 Per esempio, gli hard-disk e i dischi a stato solido contengono
@@ -959,7 +959,6 @@ trovare quando le prestazioni ``vanno sotto terra'', perché l'uso di
 memoria di @pmg{} eccede la capacità della memoria DRAM del computer
 e la paginazione ha inizio.
 
-@c TODO:
 @c virtual *machines* / cloud machines can make performance hard to measure repeatably
 @c    here we assume good old fashioned OS install directly on "bare metal"
 
@@ -978,8 +977,7 @@ memoria.  Una spiegazione [in inglese] riguardo ai comandi
 @c
 @url{https://www.kernel.org/doc/html/latest/admin-guide/sysctl/vm.html}.
 
-@c @page
-@sp 3
+@page
 @c  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 @node    Esperimenti
 @section Esperimenti
@@ -988,10 +986,9 @@ Lo script di C-shell (@command{csh}) che segue illustra i concetti e
 implementa i suggerimenti presentati in questo capitolo.
 È servito per produrre i risultati trattati nel @ref{Risultati},
 è stato eseguito in una ventina di minuti, su un laptop non troppo recente.
-Si può tagliare/incollare lo script stesso e metterlo in un file,
-o scaricarlo da @url{http://web.eecs.umich.edu/~tpkelly/pma/}.
-
-@c TODO: post script to Web site when finalized
+Per riprodurre i miei esperimenti, copiate/incollate le righe e
+mettetele in un file; assicuratevi che non ci siano righe omesse o
+inserite più di una volta.
 
 Lo script misura le prestazioni di quattro differenti modi di
 effettuare delle indagini sulla frequenza delle parole contenute
@@ -1117,6 +1114,9 @@ set t = '@@@@@@@' ; set c = "abcdefghijklmnopqrstuvwxyz$t$t$t$t$t$t"            
 tick ; ./$rg "$c" $isz 47 > $inp ; tock ; echo 'gen time:   ' `tyme`                #  68
 echo "input file:  $inp"                                                            #  69
 echo 'input wc:   ' `wc < $inp` ; echo 'input uniq: ' `sort -u $inp | wc`           #  70
+@end verbatim
+@page  @c = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
+@verbatim
 snd ############################################################################    #  71
 tick ; $tmr $PMG '{n[$1]++}END{print "output: " n["foo"]}' $inp                     #  72
 tock ; echo 'T ingenuo O(N):          ' `tyme` ; echo ''                            #  73
@@ -1157,8 +1157,7 @@ echo '' ; echo 'fine:       ' `date` `date +%s` ; echo ''                       
 @end verbatim
 @end smallformat
 
-@c @page
-@sp 3
+@page
 @c  = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = = =
 @node    Risultati
 @section Risultati
@@ -1181,7 +1180,8 @@ quella di testare qualitativamente delle ipotesi come quelle
 derivanti da un'analisi asintotica, e di fornire un'idea approssimata
 di quando i vari approcci possibili siano preferibili in pratica.
 
-@page
+@sp 1
+
 @verbatim
                            tempo es.     massimo uso         memoria
         AWK script             (sec)     memoria (K)  intermedia (K)
@@ -1272,28 +1272,28 @@ facile trovare la copia più recente se il file sparso è danneggiato,
 anche se l'informazione sull'ultima data di modifica sia stata
 inavvertitamente modificata.
 
-@c TODO:  sync individual files above instead of globally (?)
+@c NOTE:  we could sync individual files above instead of globally (???)
 @c        First carefully check what sync does in both cases
 @c        using strace, verify that "sync [file]" is correct.
 @c        Also check whether non-GNU/Linux offers fine-grained
 @c        sync command.  Cygwin?  Solaris?
 
-L'opzione @command{--reflink} del comando @command{cp} riduce sia
+L'opzione @option{--reflink} del comando @command{cp} riduce sia
 l'utilizzo di memoria su disco che il tempo richiesto per effettuare
 la copia.  Allo stesso modo un cui i file sparsi offrono della
 memoria su disco del tipo  ``paga solo per ciò che utilizzi'',
 la copia di tipo reflink offre della memoria del tipo
 ``paga solo per ciò che @emph{modifichi}''.@footnote{La chiamata-a-sistema
 che implementa la copiatura di tipo reflink è descritta nella
-pagina di manuale del comando @command{ioctl_ficlone}.}
+in @samp{ man ioctl_ficlone}.}
 Una copia reflink condivide memoria col file originale.
 Il filesystem garantisce che ulteriori modifiche a uno dei
 due file non riguarderà l'altro.  La copia con reflink non
 è disponibile per tutti i filesystem; al momento è supportata
-dai filesystem di tipo XFS, BtrFS, e OCFS2.@footnote{L'opzion
+dai filesystem di tipo XFS, BtrFS, e OCFS2.@footnote{L'opzione
 @command{--reflink} crea copie di un file sparso mantenendolo
 tale.  Se la copiatura con reflink non è disponibile, si dovrebbe
-usare invece l'opzione @command{--sparse=always}.}
+usare invece l'opzione @option{--sparse=always}.}
 Fortunatamente è possibile installare, per esempio, un filesystem
 XFS @emph{all'interno di un file ordinario} in qualche altro
 filesystem, come @code{ext4}.@footnote{Vedere
@@ -1342,8 +1342,7 @@ alle mancanze di corrente, vedere [in inglese]
 @c and
 @url{https://queue.acm.org/detail.cfm?id=3400902}.
 
-@c @page
-@sp 3
+@page
 @c ==================================================================
 @node    Ringraziamenti
 @chapter Ringraziamenti
@@ -1371,6 +1370,9 @@ Volos ha fornito e testato i suggerimenti sulla regolazione dei
 parametri del Sistema Operativo nella @ref{Memoria virtuale e file enormi}.
 Stan Park ha fornito degli approfondimenti riguardo a
 memoria virtuale, filesystem  e programmi di utilità.
+Antonio Giovanni Colombo ha tradotto questo manuale in italiano;
+vedere il file @file{doc/it/pm-gawk.texi} nella distribuzione di
+@gwk{}.
 
 @c ==================================================================
 @c ==================================================================
@@ -1379,39 +1381,153 @@ memoria virtuale, filesystem  e programmi di utilità.
 @node    Installazione
 @appendix Installazione
 
-@c UPDATE below or remove this section if it's obsolete
+@c UPDATE this section with every edition of the user manual
 
-@gwk{} 5.2 con la Memoria Persistente dovrebbe essere disponibile a
-settembre 2022; lo si troverà in @url{http://ftp.gnu.org/gnu/gawk/}.
-Se la versione 5.2 non è ancora rilasciata, la diramazione sorgente
-@dfn{master} sotto git è disponibile in
-@c
-@url{http://git.savannah.gnu.org/cgit/gawk.git/snapshot/gawk-master.tar.gz}.
-@c
-Scompattate il file di distribuzione, eseguite i comandi
-@command{./bootstrap.sh}, @command{./configure}, @command{make}, e
-@command{make check}, e poi sarete in grado di testare qualcuno degli
-esempi presentati sopra.  Col passare del tempo le versioni
-5.2 e successive di @gwk{}, che includono @pmg{} saranno incluse
-nei pacchetti di gestione del software delle maggiori distribuzioni
-GNU/Linux.  Quindi, in futuro, @pmg{} sarà disponibile
-nel comando @gwk{} di default per tali sistemi.
+Gli utenti possono ottenere la funzionalità @pmg{}
+tramite il sistema di gestione dei pacchetti software o effettuando
+un'installazione manuale.  Entrambi gli approcci hanno dei pro e
+dei contro.
 
-@c ADR comments on above, "run ./bootstrap.sh, ./configure ..."
-@c TK replies: I haven't been doing this.  Neither the README nor the
-@c    INSTALL in the gawk tarball mention bootstrap.sh.  If it's
-@c    important, shouldn't they?  The top of bootstrap.sh says its
-@c    purpose is "to avoid out-of-date issues in Git sandboxes."
-@c    When a neurodivergent source code control system requires us to
-@c    write shell scripts to work around the problems that it creates
-@c    gratuitously, the universe is trying to tell us something about
-@c    it.
+@strong{Pacchetti} @w{ } Delegare il compito di installare al sistema
+di gestione dei pacchetti software, disponibile nelle più importanti
+distribuzioni Linux, compreso Ubuntu e Fedora, è più semplice---in
+teoria.  I pacchetti software resi disponibili in alcune distribuzioni
+Linux, tuttavia, sono ``indietro'' anche di anni rispetto agli ultimi
+rilasci software di un particolare comando.  Per questo motivo,
+funzionalità relativamente nuove potrebbero essere disponibili solo
+in rilasci ``successivi'', ma non nei pacchetti ``regolari''
+presenti nella distribuzione Linux.
+@c For example, as of February 2025 the
+@c package-installed @gwk{} on Ubuntu Linux is pre-5.2 and therefore
+@c lacks the persistence feature introduced in @gwk{} 5.2, which was
+@c released way back in September 2022!
+Se la prima riga restituita dal comando @code{gawk --version}
+indica la versione 5.2 o successive e contiene ``@code{PMA},''
+la versione disponibile di @pmg{} supporta la memoria persistente;
+in caso contrario, vedere see ``Installazione Manuale'' più sotto.
 
-@c official gawk:
-@c http://ftp.gnu.org/gnu/gawk/                                               [where to look for 5.2 after release]
-@c https://www.skeeve.com/gawk/gawk-5.1.62.tar.gz                             [doesn't support persistent functions]
-@c http://git.savannah.gnu.org/cgit/gawk.git/snapshot/gawk-master.tar.gz      [if 5.2 isn't released yet]
-@c http://git.savannah.gnu.org/cgit/gawk.git                                  [ongoing development]
+@c TODO:  Robbins patch with bugzilla below; it says PIE is wrong
+@c        (postponing this in Feb '25 because situation is in flux;
+@c        it's best to release updated manual when dust settles)
+
+Un altro problema con il software installato tramite un gestore di
+pacchetti è che il software può essere stato compilato/preparato
+in maniera non corretta.  Per esempio, a febbraio 2025, il @gwk{}
+5.3.0 installato dal gestore pacchetti in Fedora 41 è stato creato,
+in maniera errata, come un programma indipendente dalla posizione
+di esecuzione (PIE --- Position Independent Executable), nonostante
+il metodo di compilazione inserito nella distribuzione ufficiale
+di @gwk{} disabiliti in modo deliberato e in maniera esplicita
+la costruzione di un programma di tipo PIE.  Il risultato, come
+evidenziato in @ref{Per iniziare}, è che @pmg{} va in errore la
+seconda volta che viene invocato.  I dettagli del problema con
+il pacchetto distribuito da Fedora mentre ci sono dei
+``lavori in corso'', a inizio febbraio 2025, sono disponibili in@*
+@w{ } @w{ } @w{ } @w{ } @w{ } @w{ } @url{https://bugzilla.redhat.com/show_bug.cgi?id=2341653} @*
+Per mezzo del programma di utilità @command{file} si può controllare
+se @gwk{} è stato compilato in maniera errata.  In ambiente Fedora 41,
+per esempio:
+@verbatim
+                $ which gawk
+                /usr/bin/gawk
+                $ file /usr/bin/gawk
+                /usr/bin/gawk: ELF 64-bit LSB pie ...
+@end verbatim
+@noindent
+La parolina ``@code{pie}'' è probabilmente da incolpare
+se il vostro @pmg{} va in errore alla @emph{seconda} invocazione.
+Per default, i programmi PIE vengono eseguiti in modalità ASLR
+(address-space layout randomization---rendere casuali alcuni
+indirizzi usati nei programmi), qualcosa che @gwk{} dalla versione 5.2
+fino alla corrente versione 5.3.1 non supporta.
+
+(Nota: L'allocatore di memoria persistente che rende possibile
+la memoria persistente @gwk{}---la libreria di funzioni
+@code{pma}---è perfettamente compatibile con le funzionalità PIE e
+ASLR.  L'incompatibilità fra @gwk{} e ASLR sorge dalle strutture
+interne dei dati dell'interprete, che richiedono che i puntatori
+alle funzioni siano consistenti fra un'invocazione e l'altra del
+programma.  ASLR introduce delle inconsistenze non desiderate
+in questi puntatori.)
+
+Nell'attesa di una correzione elegante e definitiva per il problema
+PIE di Fedora 41, si può evitare il problema nella maniera qui
+indicata: Eseguire l'interprete @pmg{} tramite @samp{setarch -R},
+disabilitando in questo modo ASLR anche se il programma è PIE.
+Ecco il primo esempio da @ref{Per iniziare}, dapprima senza, e
+poi con la correzione proposta:
+@verbatim
+    $ truncate -s 4096000 heap.pma
+    $ export GAWK_PERSIST_FILE=heap.pma
+    $ gawk 'BEGIN{myvar = 47}'
+    $ gawk 'BEGIN{myvar += 7; print myvar}'
+    Segmentation fault (core dumped)    # ...grazie al PIE
+
+    $ rm -f heap.pma                    # scarta file usato prima
+    $ truncate -s 4096000 heap.pma      # inizia di nuovo
+    $ setarch -R gawk 'BEGIN{myvar = 47}'
+    $ setarch -R gawk 'BEGIN{myvar += 7; print myvar}'
+    54                                  # come dev'essere
+@end verbatim
+@noindent
+Si consiglia di definire un alias di shell per ottenere, quando
+si invoca il familiare ed ergonomico @gwk{}, il verboso e prolisso
+@samp{setarch -R gawk}.
+
+Alternativamente, potrebbe essere possibile disabilitare la
+funzionalità ASLR per l'intero sistema operativo, usando
+il comando @code{sysctl} per modificare variabili come
+@code{kernel.randomize_va_space}.  Non ho esplorato questa
+possibilità, che andrebbe comunque usata con cautela.
+Occorre essere consapevoli di tutte le implicazioni, prima di
+richiedere un così brusco cambiamento a livello dell'intero
+sistema.
+
+È ragionevole aspettarsi che, in circostanze normali, una
+versione preparata correttamente di @pmg{} sarà prima o poi
+disponibile nel @gwk{} installato da un gestore di pacchetti
+nelle principali distribuzioni GNU/Linux.  Nel frattempo,
+un'installazione manuale è una modalità abbastanza semplice
+per avere a disposizione un @pmg{} che supporti la memoria
+permanente.
+
+A partire dalla versione 5.3.2 di @gwk{}, il fatto che l'eseguibile sia
+stato compilato nel formato PIE o meno non è più (o non dovrebbe più
+essere) un problema.  È lo stesso @gwk{} che provvede a disabilitare
+la funzionalità ASLR al momento dell'esecuzione, nel caso si stia usando
+la memoria persistente.
+
+@quotation NOTA
+Sembra che ci siano alcuni sistemi nei quali a un processo normale non
+è consentito di disabilitare la funzionalità ASLR.  In tali sistemi, il
+@emph{secondo} tentativo di eseguire @gwk{} usando la memoria persistente
+fallirà.  Se questo è il caso, si può tentare di compilare @gwk{} come
+eseguibile non-PIE, oppure utilizzare un altro computer.
+@end quotation
+
+@strong{Installazione Manuale} @w{ } La compilazione manuale,
+a partire dal codice sorgente, permette di ottenere l'ultima versione
+stabile disponibile di @gwk{}, seguendo la ``ricetta'' fornita
+dal manutentore, senza modifiche introdotte da intermediari.  
+Un'installazione eseguita in questo modo sarà esente da problemi
+come quello del PIE sopra descritto.
+L'ultima versione stabile può essere scaricata qui:@*
+@w{ } @w{ } @w{ } @w{ } @w{ } @w{ } @url{https://ftp.gnu.org/gnu/gawk/}@*
+@w{ } @w{ } @w{ } @w{ } @w{ } @w{ } @url{https://ftp.gnu.org/gnu/gawk/gawk-5.3.2.tar.xz}
+
+Chi desideri la versione ``più fresca'' disponibile, e voglia
+avventurarsi nel fai-da-te, può scaricare la versione ``master''
+mantenuta sotto @command{git} da@*
+@url{http://git.savannah.gnu.org/cgit/gawk.git/snapshot/gawk-master.tar.gz}@*
+Dopo aver espanso il file scaricato, eseguite @command{./bootstrap.sh},
+@command{./configure}, @command{make} e @command{make check}, e quindi
+potete provare ad eseguire alcuni degli esempi presentati sopra.
+
+A febbraio 2025, @pmg{} è supportato da buona parte, ma non da tutte le
+principali piattaforme di tipo Unix.  Il processo di compilazione di
+@gwk{} decide se includere o meno la funzionalità della memoria
+persistente; vedere la documentazione @gwk{} e il file
+@file{./m4/pma.m4} nella distribuzione @gwk{}.
 
 @c ==================================================================
 @node    Debugging
@@ -1436,18 +1552,22 @@ il fatto che le variabili predefinite di AWK, come per esempio
 invoca il programma.  Vedere la trattazione dell'inizializzazione
 per lo script minimo/massimo/media nel @ref{Esempi}.
 
-Se si sospetta che un bug sia connesso con la persistenza in @pmg{},
-si può impostare una variabile d'ambiente che farà sì che il codice
-@code{pma}, che si occupa della persistenza, invii dei messagi
-diagnostici più numerosi; per i dettagli, si veda la documentazione
-principale di @gwk{}.
+Se @pmg{} va in errore alla @emph{seconda} invocazione che usa un
+particolare file di appoggio della memoria persistente, vedere
+la discussione della funzionalità in @ref{Installazione}.
+
+Se si sospetta qualche altro tipo di problema connesso con la
+memoria persistente in @pmg{}, si può impostare una variabile
+d'ambiente per far sì che il codice @code{pma}, che gestisce la
+persistenza, invii dei messaggi diagnostici più numerosi;
+per i dettagli, si veda la documentazione principale di @gwk{}.
 @c or the @code{pma} documentation at
-@c @url{http://web.eecs.umich.edu/~tpkelly/pma/}.
+@c @url{https://web.eecs.umich.edu/~tpkelly/pma/}.
 
 Programmatori: Si può ricompilare @gwk{} abilitando delle asserzioni,
 il che causerà degli estesi controlli di integrità all'interno
-del codice @code{pma}.  Assicuratevi che il sorgente @file{pma.c}
-sia compilato @emph{senza} il flag @code{-DNDEBUG}, quando si
+del codice @code{pma}.  Assicuratevi che il file sorgente @file{pma.c}
+sia compilato @emph{senza} il flag @option{-DNDEBUG}, quando si
 compila @gwk{} usando il comando @command{make}.
 Il programma eseguibile che ne risulta dovrebbe essere testato
 con input piccoli, perché i controlli di integrità possono
@@ -1460,8 +1580,6 @@ versione di @gwk{} si sta usando, e cercate di fornire uno
 script piccolo e semplice che permetta di riprodurre
 il bug in maniera affidabile.
 
-@c @page
-@sp 3
 @c ==================================================================
 @node     Storia
 @appendix Storia
@@ -1474,9 +1592,9 @@ ripercorrete le fasi dell'evoluzione che ha condotto a
 @code{pma} e @pmg{}.
 
 Ho preparato parecchi script AWK durante le ricerche per la mia
-tesi di laurea sul Web caching, la maggior parte dei quali analizzava
-file di log provenienti da server Web e da cache Web.  Avere a
-disposizione @gwk{} con la Memoria Persistente avrebbe reso questi
+tesi di laurea sul Web caching, 25 anni fa, la maggior parte dei quali
+analizzava file di log provenienti da server Web e da cache Web.  Avere
+a disposizione @gwk{} con la Memoria Persistente avrebbe reso questi
 script più piccoli, più veloci, e più facili da scrivere, ma allora
 non ero neppure in grado di immaginare che @pmg{} sarebbe stato possibile.
 Quindi ho scritto un mucchio di codice inefficiente e tedioso che
@@ -1517,7 +1635,7 @@ permanente di un file mappato in memoria rifletta sempre la più
 recente chiamata a @code{msync()}, perfino in presenza di eventi
 come una mancanza di corrente e di crash sia a livello di programma
 che di Sistema Operativo.  Il prototipo originale del FAMS nel
-kernel Linux è descritto in un saggio di Park @dfn{et al.} negli
+kernel Linux è descritto in un saggio di Park et al.@: negli
 atti del convegno EuroSys 2013.  I miei colleghi e io abbiamo in
 seguito implementato FAMS in parecchie maniere differenti,
 fra cui i filesystem (FAST 2015) e le librerie a livello
@@ -1531,16 +1649,17 @@ resistenza ai crash nel venerabile e onnipresente comando GNU
 
 Negli ultimi anni la mia attenzione è tornata sui vantaggi
 della Memoria Persistente nella programmazione, che è
-diventata un argomento ``caldo'' grazie alla disponibilità
-commerciale di memoria non-volatile indirizzabile a byte
-(che, per confondere le idee, è oggi etichettata come
+diventata un argomento ``caldo'' ai tempi del COVID
+grazie alla fugace disponibilità commerciale di memoria
+non-volatile indirizzabile a byte (Intel Optane che, per
+confondere le idee, era descritta dal marketing come
 ``Memoria Persistente'').  L'astrazione software della
 Memoria Persistente e il corrispondente stile di programmazione
 sono perfettamente compatibili con dei computer
 @emph{convenzionali}---macchine non dotate di memoria non-volatile
 e neppure di altro software e hardware particolari.
-Ho scritto alcuni saggi per spiegare questo punto, per esempio
-[in inglese]
+Parecchi saggi sono stati scritti per spiegare questo punto,
+per esempio [in inglese]
 @url{https://queue.acm.org/detail.cfm?id=3358957}.
 
 A inizio 2022 ho scritto un nuovo allocatore di memoria persistente,
@@ -1549,7 +1668,7 @@ su hardware convenzionale.  L'interfaccia @code{pma} è compatibile
 con la chiamata a sistema @code{malloc()} e, a differenza
 dell'allocatore presente in Ken, @code{pma} non è collegato a un
 particolare meccanismo di resistenza ai crash.  Usare @code{pma}
-è facile e, almeno per alcuni, piacevole.
+è semplice e piacevole.
 
 Ken è stato integrato in prototipi derivanti sia dall'interprete
 di Javascript V8 che da un interprete Scheme, e quindi è parso
@@ -1584,7 +1703,7 @@ prestazioni è disponibile in
 @c    open source offers more impact than research
 @c    work with colleagues who Think Different from one another
 
-@sp 2
+@c @sp 2
 
 Mi piacciono parecchie cose di @pmg{}.  Non è invadente; man mano
 che acquisite familiarità ed esperienza, scivola sullo sfondo
@@ -1593,7 +1712,7 @@ implementazione e, cosa ancora più importante, semplifica i vostri
 script; molto del suo valore si apprezza non tanto nel codice che
 mette in grado di scrivere, quanto nel codice che consente di
 eliminare. È tutto ciò (e anche più) di cui avevo bisogno nella mia
-tesi di laurea vent'anni fa.  Guardando ai fatti, sembra ispirare
+tesi di laurea 25 anni fa.  Guardando ai fatti, sembra ispirare
 la creatività di coloro che l'hanno adottato per primi.  Sono curioso
 di vedere quali nuove finalità di utilizzo si possono trovare
 per esso.

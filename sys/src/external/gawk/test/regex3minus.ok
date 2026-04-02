@@ -1,1 +1,2 @@
-4
+gawk: regex3minus.awk:2: error: invalid range endpoint: /[qrs---tuv]/
+EXIT CODE: 1

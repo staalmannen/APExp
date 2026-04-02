@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2023,
+ * Copyright (C) 1986, 1988, 1989, 1991-2026,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -18,20 +18,13 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
  */
 
-/* For OSF/1 to get struct sockaddr_storage */
-#if defined(__osf__) && !defined(_OSF_SOURCE)
-#define _OSF_SOURCE
-#endif
-
 #include "awk.h"
-
-#include <sys/time.h>
 
 #ifdef HAVE_SYS_PARAM_H
 #undef RE_DUP_MAX	/* avoid spurious conflict w/regex.h */
@@ -43,6 +36,10 @@
 
 #ifndef O_ACCMODE
 #define O_ACCMODE	(O_RDONLY|O_WRONLY|O_RDWR)
+#endif
+
+#ifndef HAVE_GETDTABLESIZE
+#define getdtablesize()	(1024)	/* should be big enough */
 #endif
 
 #if ! defined(S_ISREG) && defined(S_IFREG)
@@ -215,7 +212,7 @@ typedef enum recvalues {
         NOTERM,         /* no terminator found, give me more input data */
         TERMATEND,      /* found terminator at end of buffer */
         TERMNEAREND     /* found terminator close to end of buffer, for when
-			   the RE might be match more data further in
+			   the RE might match more data further in
 			   the file. */
 } RECVALUE;
 
@@ -248,10 +245,9 @@ struct recmatch {
 static int iop_close(IOBUF *iop);
 static void close_one(void);
 static int close_redir(struct redirect *rp, bool exitwarn, two_way_close_type how);
-#ifndef PIPES_SIMULATED
-static int wait_any(int interesting);
-#endif
 static IOBUF *gawk_popen(const char *cmd, struct redirect *rp);
+static FILE *gawk_popen_write(const char *cmd);
+static int gawk_popen_write_close(FILE *fp);
 static IOBUF *iop_alloc(int fd, const char *name, int errno_val);
 static IOBUF *iop_finish(IOBUF *iop);
 static int gawk_pclose(struct redirect *rp);
@@ -263,6 +259,7 @@ static bool find_output_wrapper(awk_output_buf_t *outbuf);
 static void init_output_wrapper(awk_output_buf_t *outbuf);
 static bool find_two_way_processor(const char *name, struct redirect *rp);
 static bool avoid_flush(const char *name);
+static int wait_any_block_signals(int interesting);
 
 static RECVALUE rs1scan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state);
 static RECVALUE rsnullscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state);
@@ -496,8 +493,7 @@ nextfile(IOBUF **curfile, bool skipping)
 				fd = devopen(fname, binmode("r"));
 			}
 			errcode = errno;
-			if (! do_traditional)
-				update_ERRNO_int(errno);
+			update_ERRNO_int(errno);
 			iop = iop_alloc(fd, fname, errcode);
 			*curfile = iop_finish(iop);
 			if (iop->public.fd == INVALID_HANDLE)
@@ -505,7 +501,7 @@ nextfile(IOBUF **curfile, bool skipping)
 			else if (iop->valid)
 				iop->errcode = 0;
 
-			if (! do_traditional && iop->errcode != 0)
+			if (iop->errcode != 0)
 				update_ERRNO_int(iop->errcode);
 
 			return ++i;	/* run beginfile block */
@@ -517,8 +513,7 @@ nextfile(IOBUF **curfile, bool skipping)
 		/* no args. -- use stdin */
 		/* FNR is init'ed to 0 */
 		errno = 0;
-		if (! do_traditional)
-			update_ERRNO_int(errno);
+		update_ERRNO_int(errno);
 
 		unref(FILENAME_node->var_value);
 		FILENAME_node->var_value = make_string("-", 1);
@@ -799,6 +794,7 @@ redirect_string(const char *str, size_t explen, bool not_string,
 	static struct redirect *save_rp = NULL;	/* hold onto rp that should
 	                                         * be freed for reuse
 	                                         */
+	int save_errno;
 
 	if (do_sandbox)
 		fatal(_("redirection not allowed in sandbox mode"));
@@ -873,9 +869,9 @@ redirect_string(const char *str, size_t explen, bool not_string,
 			if (rp->pid != -1)
 #ifdef __MINGW32__
 				/* MinGW cannot wait for any process.  */
-				wait_any(rp->pid);
+				wait_any_block_signals(rp->pid);
 #else
-				wait_any(0);
+				wait_any_block_signals(0);
 #endif
 		}
 #endif /* PIPES_SIMULATED */
@@ -903,8 +899,8 @@ redirect_string(const char *str, size_t explen, bool not_string,
 			rp = save_rp;
 			efree(rp->value);
 		} else
-			emalloc(rp, struct redirect *, sizeof(struct redirect), "redirect");
-		emalloc(newstr, char *, explen + 1, "redirect");
+			emalloc(rp, struct redirect *, sizeof(struct redirect));
+		emalloc(newstr, char *, explen + 1);
 		memcpy(newstr, str, explen);
 		newstr[explen] = '\0';
 		str = newstr;
@@ -948,17 +944,15 @@ redirect_string(const char *str, size_t explen, bool not_string,
 			(void) flush_io();
 
 			os_restore_mode(fileno(stdin));
-			set_sigpipe_to_default();
 			/*
 			 * Don't check failure_fatal; see input pipe below.
 			 * Note that the failure happens upon failure to fork,
 			 * using a non-existant program will still succeed the
 			 * popen().
 			 */
-			if ((rp->output.fp = popen(str, binmode("w"))) == NULL)
+			if ((rp->output.fp = gawk_popen_write(str)) == NULL)
 				fatal(_("cannot open pipe `%s' for output: %s"),
 						str, strerror(errno));
-			ignore_sigpipe();
 
 			/* set close-on-exec */
 			os_close_on_exec(fileno(rp->output.fp), str, "pipe", "to");
@@ -981,16 +975,21 @@ redirect_string(const char *str, size_t explen, bool not_string,
 		case redirect_input:
 			direction = "from";
 			fd = (extfd >= 0) ? extfd : devopen(str, binmode("r"));
-			if (fd == INVALID_HANDLE && errno == EISDIR) {
-				*errflg = EISDIR;
-				/* do not free rp, saving it for reuse (save_rp = rp) */
-				return NULL;
-			}
+			save_errno = errno;
+			/* don't fail before letting registered
+			   parsers a chance to take control */
 			rp->iop = iop_alloc(fd, str, errno);
 			find_input_parser(rp->iop);
 			iop_finish(rp->iop);
 			if (! rp->iop->valid) {
-				if (! do_traditional && rp->iop->errcode != 0)
+				if (fd == INVALID_HANDLE && save_errno == EISDIR) {
+					*errflg = EISDIR;
+					iop_close(rp->iop);
+					rp->iop = NULL;
+					/* do not free rp, saving it for reuse (save_rp = rp) */
+					return NULL;
+				}
+				if (rp->iop->errcode != 0)
 					update_ERRNO_int(rp->iop->errcode);
 				iop_close(rp->iop);
 				rp->iop = NULL;
@@ -1130,7 +1129,7 @@ redirect_string(const char *str, size_t explen, bool not_string,
 struct redirect *
 redirect(NODE *redir_exp, int redirtype, int *errflg, bool failure_fatal)
 {
-	bool not_string = ((fixtype(redir_exp)->flags & STRING) == 0);
+	bool not_string = ((fixtype(redir_exp)->flags & (STRING|USER_INPUT)) == 0);
 
 	redir_exp = force_string(redir_exp);
 	return redirect_string(redir_exp->stptr, redir_exp->stlen, not_string,
@@ -1340,7 +1339,7 @@ close_rp(struct redirect *rp, two_way_close_type how)
 		}
 	} else if ((rp->flag & (RED_PIPE|RED_WRITE)) == (RED_PIPE|RED_WRITE)) {
 		/* write to pipe */
-		status = sanitize_exit_status(pclose(rp->output.fp));
+		status = sanitize_exit_status(gawk_popen_write_close(rp->output.fp));
 		if ((BINMODE & BINMODE_INPUT) != 0)
 			os_setbinmode(fileno(stdin), O_BINARY);
 
@@ -1404,10 +1403,8 @@ close_redir(struct redirect *rp, bool exitwarn, two_way_close_type how)
 					 status, rp->value, s);
 		}
 
-		if (! do_traditional) {
-			/* set ERRNO too so that program can get at it */
-			update_ERRNO_int(save_errno);
-		}
+		/* set ERRNO too so that program can get at it */
+		update_ERRNO_int(save_errno);
 	}
 
 checkwarn:
@@ -2197,7 +2194,7 @@ two_way_open(const char *str, struct redirect *rp, int extfd)
 		find_input_parser(rp->iop);
 		iop_finish(rp->iop);
 		if (! rp->iop->valid) {
-			if (! do_traditional && rp->iop->errcode != 0)
+			if (rp->iop->errcode != 0)
 				update_ERRNO_int(rp->iop->errcode);
 			iop_close(rp->iop);
 			rp->iop = NULL;
@@ -2321,7 +2318,7 @@ two_way_open(const char *str, struct redirect *rp, int extfd)
 		find_input_parser(rp->iop);
 		iop_finish(rp->iop);
 		if (! rp->iop->valid) {
-			if (! do_traditional && rp->iop->errcode != 0)
+			if (rp->iop->errcode != 0)
 				update_ERRNO_int(rp->iop->errcode);
 			iop_close(rp->iop);
 			rp->iop = NULL;
@@ -2490,7 +2487,7 @@ use_pipes:
 	find_input_parser(rp->iop);
 	iop_finish(rp->iop);
 	if (! rp->iop->valid) {
-		if (! do_traditional && rp->iop->errcode != 0)
+		if (rp->iop->errcode != 0)
 			update_ERRNO_int(rp->iop->errcode);
 		iop_close(rp->iop);
 		rp->iop = NULL;
@@ -2520,7 +2517,7 @@ use_pipes:
 
 #if !defined(__MINGW32__)
 	os_close_on_exec(ctop[0], str, "pipe", "from");
-	os_close_on_exec(ptoc[1], str, "pipe", "from");
+	os_close_on_exec(ptoc[1], str, "pipe", "to");
 
 	(void) close(ptoc[0]);
 	(void) close(ctop[1]);
@@ -2541,11 +2538,11 @@ use_pipes:
 #ifndef PIPES_SIMULATED		/* real pipes */
 
 /*
- * wait_any --- if the argument pid is 0, wait for all child processes that
- * have exited.  We loop to make sure to reap all children that have exited to
- * minimize the risk of running out of process slots.  Since we don't process
- * SIGCHLD, we do not immediately reap exited children.  So when we get here,
- * we want to reap any that have piled up.
+ * wait_any_block_signals --- if the argument pid is 0, wait for all child
+ * processes that have exited.  We loop to make sure to reap all children
+ * that have exited to minimize the risk of running out of process slots.
+ * Since we don't process SIGCHLD, we do not immediately reap exited
+ * children.  So when we get here, we want to reap any that have piled up.
  *
  * Note: on platforms that do not support waitpid with WNOHANG, when called with
  * a zero argument, this function will hang until all children have exited.
@@ -2555,18 +2552,20 @@ use_pipes:
  * I don't see why that should interfere with any signal handlers.  But I am
  * reluctant to remove this protection.  So I changed to use sigprocmask to
  * block signals instead to avoid interfering with installed signal handlers.
+ *
+ * ADR, 2025-07-29: I think this is so that a signal can interrupt a
+ * subprocess without killing gawk itself.  The code for handling process
+ * waiting and status updating is factored out to wait_any() so that
+ * do_system() in builtin.c can do its own signal management.
  */
 
 static int
-wait_any(int interesting)	/* pid of interest, if any */
+wait_any_block_signals(int interesting)	/* pid of interest, if any */
 {
-	int pid;
 	int status = 0;
-	struct redirect *redp;
 #ifdef HAVE_SIGPROCMASK
 	sigset_t set, oldset;
 
-	/* I have no idea why we are blocking signals during this function... */
 	sigemptyset(& set);
 	sigaddset(& set, SIGINT);
 	sigaddset(& set, SIGHUP);
@@ -2576,7 +2575,35 @@ wait_any(int interesting)	/* pid of interest, if any */
 	void (*hstat)(int), (*istat)(int), (*qstat)(int);
 
 	istat = signal(SIGINT, SIG_IGN);
+#ifndef __MINGW32__
+	hstat = signal(SIGHUP, SIG_IGN);
+	qstat = signal(SIGQUIT, SIG_IGN);
 #endif
+#endif
+
+	status = wait_any(interesting);
+
+#ifdef HAVE_SIGPROCMASK
+	sigprocmask(SIG_SETMASK, & oldset, NULL);
+#else
+	signal(SIGINT, istat);
+#ifndef __MINGW32__
+	signal(SIGHUP, hstat);
+	signal(SIGQUIT, qstat);
+#endif
+#endif
+	return status;
+}
+
+/* wait_any --- wait for a child to die */
+
+int
+wait_any(int interesting)	/* pid of interest, if any */
+{
+	int pid;
+	int status = 0;
+	struct redirect *redp;
+
 #ifdef __MINGW32__
 	if (interesting < 0) {
 		status = -1;
@@ -2593,10 +2620,6 @@ wait_any(int interesting)	/* pid of interest, if any */
 			}
 	}
 #else /* ! __MINGW32__ */
-#ifndef HAVE_SIGPROCMASK
-	hstat = signal(SIGHUP, SIG_IGN);
-	qstat = signal(SIGQUIT, SIG_IGN);
-#endif
 	for (;;) {
 # if defined(HAVE_WAITPID) && defined(WNOHANG)
 		/*
@@ -2625,16 +2648,7 @@ wait_any(int interesting)	/* pid of interest, if any */
 		if (pid == -1 && errno == ECHILD)
 			break;
 	}
-#ifndef HAVE_SIGPROCMASK
-	signal(SIGHUP, hstat);
-	signal(SIGQUIT, qstat);
-#endif
 #endif /* ! __MINGW32__ */
-#ifndef HAVE_SIGPROCMASK
-	signal(SIGINT, istat);
-#else
-	sigprocmask(SIG_SETMASK, & oldset, NULL);
-#endif
 	return status;
 }
 
@@ -2655,7 +2669,7 @@ gawk_popen(const char *cmd, struct redirect *rp)
 	 * but this could cause gawk to hang when it is started in a pipeline
 	 * and thus has a child process feeding it input (shell dependent).
 	 *
-	 * (void) wait_any(0);	// wait for outstanding processes
+	 * (void) wait_any_block_signals(0);	// wait for outstanding processes
 	 */
 
 	if (pipe(p) < 0)
@@ -2729,7 +2743,7 @@ gawk_popen(const char *cmd, struct redirect *rp)
 	find_input_parser(rp->iop);
 	iop_finish(rp->iop);
 	if (! rp->iop->valid) {
-		if (! do_traditional && rp->iop->errcode != 0)
+		if (rp->iop->errcode != 0)
 			update_ERRNO_int(rp->iop->errcode);
 		iop_close(rp->iop);
 		rp->iop = NULL;
@@ -2750,7 +2764,7 @@ gawk_pclose(struct redirect *rp)
 	/* process previously found, return stored status */
 	if (rp->pid == -1)
 		return rp->status;
-	rp->status = sanitize_exit_status(wait_any(rp->pid));
+	rp->status = sanitize_exit_status(wait_any_block_signals(rp->pid));
 	rp->pid = -1;
 	return rp->status;
 }
@@ -2770,13 +2784,13 @@ gawk_popen(const char *cmd, struct redirect *rp)
 	FILE *current;
 
 	os_restore_mode(fileno(stdin));
-	set_sigpipe_to_default();
 
+	set_sigpipe_to_default();
 	current = popen(cmd, binmode("r"));
+	ignore_sigpipe();
 
 	if ((BINMODE & BINMODE_INPUT) != 0)
 		os_setbinmode(fileno(stdin), O_BINARY);
-	ignore_sigpipe();
 
 	if (current == NULL)
 		return NULL;
@@ -2785,7 +2799,7 @@ gawk_popen(const char *cmd, struct redirect *rp)
 	find_input_parser(rp->iop);
 	iop_finish(rp->iop);
 	if (! rp->iop->valid) {
-		if (! do_traditional && rp->iop->errcode != 0)
+		if (rp->iop->errcode != 0)
 			update_ERRNO_int(rp->iop->errcode);
 		(void) pclose(current);
 		rp->iop->public.fd = INVALID_HANDLE;
@@ -2837,13 +2851,13 @@ do_getline_redir(int into_variable, enum redirval redirtype)
 
 	assert(redirtype != redirect_none);
 	redir_exp = TOP();
+	redir_exp = elem_new_to_scalar(redir_exp);
 	rp = redirect(redir_exp, redirtype, & redir_error, false);
 	DEREF(redir_exp);
 	decr_sp();
 	if (rp == NULL) {
 		if (redir_error) { /* failed redirect */
-			if (! do_traditional)
-				update_ERRNO_int(redir_error);
+			update_ERRNO_int(redir_error);
 		}
 		return make_number((AWKNUM) -1.0);
 	} else if ((rp->flag & RED_TWOWAY) != 0 && rp->iop == NULL) {
@@ -2861,7 +2875,7 @@ do_getline_redir(int into_variable, enum redirval redirtype)
 	errcode = 0;
 	retval = get_a_record(& s, & cnt, iop, & errcode, (lhs ? NULL : & field_width));
 	if (errcode != 0) {
-		if (! do_traditional && (errcode != -1))
+		if (errcode != -1)
 			update_ERRNO_int(errcode);
 		return make_number((AWKNUM) retval);
 	}
@@ -2913,7 +2927,7 @@ do_getline(int into_variable, IOBUF *iop)
 	errcode = 0;
 	retval = get_a_record(& s, & cnt, iop, & errcode, (into_variable ? NULL : & field_width));
 	if (errcode != 0) {
-		if (! do_traditional && (errcode != -1))
+		if (errcode != -1)
 			update_ERRNO_int(errcode);
 		if (into_variable)
 			(void) POP_ADDRESS();
@@ -2977,7 +2991,7 @@ init_awkpath(path_info *pi)
 			max_path++;
 
 	// +3 --> 2 for null entries at front and end of path, 1 for NULL end of list
-	ezalloc(pi->awkpath, const char **, (max_path + 3) * sizeof(char *), "init_awkpath");
+	ezalloc(pi->awkpath, const char **, (max_path + 3) * sizeof(char *));
 
 	start = path;
 	i = 0;
@@ -3007,7 +3021,7 @@ init_awkpath(path_info *pi)
 
 			len = end - start;
 			if (len > 0) {
-				emalloc(p, char *, len + 2, "init_awkpath");
+				emalloc(p, char *, len + 2);
 				memcpy(p, start, len);
 
 				/* add directory punctuation if necessary */
@@ -3039,7 +3053,7 @@ do_find_source(const char *src, struct stat *stb, int *errcode, path_info *pi)
 
 	/* some kind of path name, no search */
 	if (ispath(src)) {
-		emalloc(path, char *, strlen(src) + 1, "do_find_source");
+		emalloc(path, char *, strlen(src) + 1);
 		strcpy(path, src);
 		if (stat(path, stb) == 0)
 			return path;
@@ -3051,7 +3065,7 @@ do_find_source(const char *src, struct stat *stb, int *errcode, path_info *pi)
 	if (pi->awkpath == NULL)
 		init_awkpath(pi);
 
-	emalloc(path, char *, pi->max_pathlen + strlen(src) + 1, "do_find_source");
+	emalloc(path, char *, pi->max_pathlen + strlen(src) + 1);
 	for (i = 0; pi->awkpath[i] != NULL; i++) {
 		if (strcmp(pi->awkpath[i], "./") == 0 || strcmp(pi->awkpath[i], ".") == 0)
 			*path = '\0';
@@ -3097,7 +3111,7 @@ find_source(const char *src, struct stat *stb, int *errcode, int is_extlib)
 
 		/* append EXTLIB_SUFFIX and try again */
 		save_errno = errno;
-		emalloc(file_ext, char *, src_len + suffix_len + 1, "find_source");
+		emalloc(file_ext, char *, src_len + suffix_len + 1);
 		sprintf(file_ext, "%s%s", src, EXTLIB_SUFFIX);
 		path = do_find_source(file_ext, stb, errcode, pi);
 		efree(file_ext);
@@ -3116,7 +3130,7 @@ find_source(const char *src, struct stat *stb, int *errcode, int is_extlib)
 #endif
 
 #ifdef DEFAULT_FILETYPE
-	if (! do_traditional && path == NULL) {
+	if (path == NULL) {
 		char *file_awk;
 		int save_errno = errno;
 #ifdef VMS
@@ -3124,8 +3138,7 @@ find_source(const char *src, struct stat *stb, int *errcode, int is_extlib)
 #endif
 
 		/* append ".awk" and try again */
-		emalloc(file_awk, char *, strlen(src) +
-			sizeof(DEFAULT_FILETYPE) + 1, "find_source");
+		emalloc(file_awk, char *, strlen(src) + sizeof(DEFAULT_FILETYPE) + 1);
 		sprintf(file_awk, "%s%s", src, DEFAULT_FILETYPE);
 		path = do_find_source(file_awk, stb, errcode, pi);
 		efree(file_awk);
@@ -3151,7 +3164,7 @@ srcopen(SRCFILE *s)
 
 	if (s->stype == SRC_STDIN)
 		fd = fileno(stdin);
-	else if (s->stype == SRC_FILE || s->stype == SRC_INC)
+	else if (s->stype == SRC_FILE || s->stype == SRC_INC || s->stype == SRC_NSINC)
 		fd = devopen(s->fullpath, "r");
 
 	/* set binary mode so that debugger byte offset calculations will be right */
@@ -3336,6 +3349,30 @@ find_two_way_processor(const char *name, struct redirect *rp)
 	return false;
 }
 
+/* file_can_timeout --- return true if file i/o might could timeout */
+
+static inline bool
+file_can_timeout(int fd, mode_t st_mode)
+{
+	switch (st_mode & S_IFMT) {
+	case S_IFIFO:
+#ifdef S_IFSOCK
+	case S_IFSOCK:
+#endif
+		return true;
+	case S_IFCHR:
+		return isatty(fd);
+	case S_IFBLK:
+	case S_IFDIR:
+#ifdef S_IFLNK
+	case S_IFLNK:
+#endif
+	case S_IFREG:
+	default:
+	       return false;
+	}
+}
+
 /*
  * IOBUF management is somewhat complicated.  In particular,
  * it is possible and OK for an IOBUF to be allocated with
@@ -3384,13 +3421,14 @@ iop_alloc(int fd, const char *name, int errno_val)
 {
 	IOBUF *iop;
 
-	ezalloc(iop, IOBUF *, sizeof(IOBUF), "iop_alloc");
+	ezalloc(iop, IOBUF *, sizeof(IOBUF));
 
 	iop->public.fd = fd;
 	iop->public.name = name;
-	iop->public.read_func = ( ssize_t(*)() ) read;
+	iop->public.read_func = ( ssize_t(*)(int, void *, size_t) ) read;
 	iop->valid = false;
 	iop->errcode = errno_val;
+	iop->can_timeout = false;
 
 	if (fd != INVALID_HANDLE)
 		fstat(fd, & iop->public.sbuf);
@@ -3407,6 +3445,8 @@ iop_alloc(int fd, const char *name, int errno_val)
 		if (statf(name, & iop->public.sbuf) < 0)
 			memset(& iop->public.sbuf, 0, sizeof(struct stat));
 	}
+	if (iop->public.sbuf.st_mode != 0)
+		iop->can_timeout = file_can_timeout(fd, iop->public.sbuf.st_mode);
 
 	return iop;
 }
@@ -3459,7 +3499,7 @@ iop_finish(IOBUF *iop)
 		lintwarn(_("data file `%s' is empty"), iop->public.name);
 	iop->errcode = errno = 0;
 	iop->count = iop->scanoff = 0;
-	emalloc(iop->buf, char *, iop->size += 1, "iop_finish");
+	emalloc(iop->buf, char *, iop->size += 1);
 	iop->off = iop->buf;
 	iop->dataend = NULL;
 	iop->end = iop->buf + iop->size;
@@ -3509,7 +3549,7 @@ grow_iop_buffer(IOBUF *iop)
 		fatal(_("could not allocate more input memory"));
 
 	iop->size = newsize;
-	erealloc(iop->buf, char *, iop->size, "grow_iop_buffer");
+	erealloc(iop->buf, char *, iop->size);
 	iop->off = iop->buf + off;
 	iop->dataend = iop->off + valid;
 	iop->end = iop->buf + iop->size;
@@ -3713,11 +3753,19 @@ again:
 	 *              found a simple string match at end, return REC_OK
 	 *      else
 	 *              grow buffer, add more data, try again
+	 *              if possibly a variable length match (in which case more
+	 *                  match could be in next input buffer)
+	 *                      grow buffer, add more data, try again
+	 *              else # simpler re
+	 *                      return REC_OK
+	 *              fi
 	 *      fi
 	 */
 	if (iop->off + reend >= iop->dataend) {
 		if (reisstring(RS->stptr, RS->stlen, RSre, iop->off))
 			return REC_OK;
+		else if (! RSre->maybe_long)
+ 			return REC_OK;
 		else
 			return TERMATEND;
 	}
@@ -3854,7 +3902,7 @@ csvscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state)
 
 	/* look for a newline outside quotes */
 	do {
-		while (*bp != rs) { 
+		while (*bp != rs && bp < iop->dataend) { 
 			if (*bp == '\"')
 				in_quote = ! in_quote;
 			bp++;
@@ -3863,6 +3911,7 @@ csvscan(IOBUF *iop, struct recmatch *recm, SCANSTATE *state)
 			// convert CR-LF to LF by shifting the record
 			memmove(bp - 1, bp, iop->dataend - bp);
 			iop->dataend--;
+			*(iop->dataend) = rs;	/* set sentinel */
 			bp--;
 		}
 	} while (in_quote && bp < iop->dataend && bp++);
@@ -3940,7 +3989,7 @@ get_a_record(char **out,        /* pointer to pointer to data */
 	if (at_eof(iop) && no_data_left(iop))
 		return EOF;
 
-	if (read_can_timeout)
+	if (iop->can_timeout && read_can_timeout)
 		read_timeout = get_read_timeout(iop);
 
 	if (iop->public.get_record != NULL) {
@@ -4074,7 +4123,8 @@ get_a_record(char **out,        /* pointer to pointer to data */
 	 * but Bitter Experience teaches us not to make ``that'll never
 	 * happen'' kinds of assumptions.
 	 */
-	rtval = RT_node->var_value;
+	if (! do_traditional)
+		rtval = RT_node->var_value;
 
 	if (recm.rt_len == 0) {
 		set_RT_to_null();
@@ -4098,12 +4148,12 @@ get_a_record(char **out,        /* pointer to pointer to data */
 			lastmatchrec = matchrec;
 			set_RT(recm.rt_start, recm.rt_len);
 		} else if (matchrec == rs1scan) {
-			if (rtval->stlen != 1 || rtval->stptr[0] != recm.rt_start[0])
+			if (! do_traditional && (rtval->stlen != 1 || rtval->stptr[0] != recm.rt_start[0]))
 				set_RT(recm.rt_start, recm.rt_len);
 			/* else
 				leave it alone */
 		} else if (matchrec == rsnullscan) {
-			if (rtval->stlen >= recm.rt_len) {
+			if (! do_traditional && (rtval->stlen >= recm.rt_len)) {
 				rtval->stlen = recm.rt_len;
 				free_wstr(rtval);
 			} else
@@ -4183,7 +4233,7 @@ set_RS()
 		RS_is_null = true;
 		if (first_time || ! do_csv)
 			matchrec = rsnullscan;
-	} else if ((RS->stlen > 1 || (RS->flags & REGEX) != 0) && ! do_traditional) {
+	} else if ((RS->stlen > 1 || (RS->flags & REGEX) != 0) && ! do_posix) {
 		static bool warned = false;
 
 		RS_re[0] = make_regexp(RS->stptr, RS->stlen, false, true, true);
@@ -4194,7 +4244,7 @@ set_RS()
 			matchrec = rsrescan;
 
 		if (do_lint_extensions && ! warned) {
-			lintwarn(_("multicharacter value of `RS' is a gawk extension"));
+			lintwarn(_("multicharacter value of RS is a gawk extension"));
 			warned = true;
 		}
 	} else {
@@ -4303,9 +4353,15 @@ inetfile(const char *str, size_t len, struct inet_socket_info *isi)
 		return false;
 	if (memcmp(cp, "tcp/", 4) == 0)
 		isi->protocol = SOCK_STREAM;
-	else if (memcmp(cp, "udp/", 4) == 0)
+	else if (memcmp(cp, "udp/", 4) == 0) {
+		static bool warned = false;
+
+		if (! warned) {
+			warned = true;
+			warning(_("support for the UDP protocol is obsolete and will eventually be removed"));
+		}
 		isi->protocol = SOCK_DGRAM;
-	else
+	} else
 		return false;
 	cp += 4;
 
@@ -4388,7 +4444,7 @@ in_PROCINFO(const char *pidx1, const char *pidx2, NODE **full_idx)
 		str_len = strlen(pidx1) + subsep->stlen	+ strlen(pidx2);
 
 	if (sub == NULL) {
-		emalloc(str, char *, str_len + 1, "in_PROCINFO");
+		emalloc(str, char *, str_len + 1);
 		sub = make_str_node(str, str_len, ALREADY_MALLOCED);
 		if (full_idx)
 			*full_idx = sub;
@@ -4396,7 +4452,7 @@ in_PROCINFO(const char *pidx1, const char *pidx2, NODE **full_idx)
 		/* *full_idx != NULL */
 
 		assert(sub->valref == 1);
-		erealloc(sub->stptr, char *, str_len + 1, "in_PROCINFO");
+		erealloc(sub->stptr, char *, str_len + 1);
 		sub->stlen = str_len;
 	}
 
@@ -4420,7 +4476,7 @@ in_PROCINFO(const char *pidx1, const char *pidx2, NODE **full_idx)
 static long
 get_read_timeout(IOBUF *iop)
 {
-	long tmout = 0;
+	long tmout = read_default_timeout;	/* initialized from env. variable in init_io() */
 
 	if (PROCINFO_node != NULL) {
 		const char *name = iop->public.name;
@@ -4444,11 +4500,10 @@ get_read_timeout(IOBUF *iop)
 			(void) force_number(val);
 			tmout = get_number_si(val);
 		}
-	} else
-		tmout = read_default_timeout;	/* initialized from env. variable in init_io() */
+	}
 
 	/* overwrite read routine only if an extension has not done so */
-	if ((iop->public.read_func == ( ssize_t(*)() ) read) && tmout > 0)
+	if ((iop->public.read_func == ( ssize_t(*)(int, void *, size_t) ) read) && tmout > 0)
 		iop->public.read_func = read_with_timeout;
 
 	return tmout;
@@ -4588,4 +4643,167 @@ avoid_flush(const char *name)
 
 	return in_PROCINFO(bufferpipe, NULL, NULL) != NULL
 		|| in_PROCINFO(name, bufferpipe, NULL) != NULL;
+}
+
+/*
+ * See the thread starting at
+ * https://lists.gnu.org/archive/html/bug-gawk/2023-12/msg00011.html.
+ *
+ * We do our version of popen for write pipes in order
+ * to be able to reset SIGPIPE. Bleah.
+ */
+
+/* N.B. On 2025-07-29, we had a bug report related to a docker container
+ * that was configured with default 'ulimit -n' of 1073741816 files,
+ * so keeping an array of all fds was unworkable without overriding
+ * the default ulimit. We can solve this problem by using a hash table
+ * instead of an array of getdtablesize() fds. */
+/* #define PIPE_HASH_SIZE	127 */
+
+typedef struct write_pipe {
+	FILE *fp;
+	pid_t pid;
+#ifdef PIPE_HASH_SIZE
+	struct write_pipe *next;
+#endif /* PIPE_HASH_SIZE */
+} write_pipe;
+
+static write_pipe *open_pipes = NULL;
+
+
+#ifdef PIPE_HASH_SIZE
+
+/* save_pipe: save a pipe to the hash table */
+
+static void
+save_pipe(int fd, FILE *fp, pid_t pid)
+{
+	write_pipe *bucket = &open_pipes[fd % PIPE_HASH_SIZE];
+	write_pipe *wp;
+
+	if (bucket->fp == NULL)
+		wp = bucket;
+	else {
+		emalloc(wp, write_pipe *, sizeof(write_pipe));
+		wp->next = bucket->next;
+		bucket->next = wp;
+	}
+	wp->fp = fp;
+	wp->pid = pid;
+}
+
+#endif /* PIPE_HASH_SIZE */
+
+
+/* gawk_popen_write --- open a pipe for writing, set up a FILE * return value. */
+
+static FILE *
+gawk_popen_write(const char *cmd)
+{
+#if defined(VMS) || defined(__MINGW32__)
+	return popen(cmd, binmode("w"));
+#else
+	pid_t childpid;
+	int pipefds[2];
+
+	if (pipe(pipefds) < 0)
+		return NULL;
+
+	if (open_pipes == NULL) {
+#ifdef PIPE_HASH_SIZE
+		int count = PIPE_HASH_SIZE;
+#else
+		int count = getdtablesize();
+#endif
+
+		emalloc(open_pipes, write_pipe *, sizeof(write_pipe) * count);
+		memset(open_pipes, 0, sizeof(write_pipe) * count);
+	}
+
+	childpid = fork();
+	if (childpid == 0) {
+		// in the child
+		(void) close(pipefds[1]);	// close write end in the child
+		(void) close(0);
+		if (dup(pipefds[0]) != 0)
+			fatal(_("gawk_popen_write: failed to move pipe fd to standard input"));
+		(void) close(pipefds[0]);
+		set_sigpipe_to_default();
+		execl("/bin/sh", "sh", "-c", cmd, NULL);
+		_exit(errno == ENOENT ? 127 : 126);
+	} else if (childpid < 0) {
+		(void) close(pipefds[0]);
+		(void) close(pipefds[1]);
+		return NULL;
+	}
+
+	(void) close(pipefds[0]);	// don't need the read end in the parent
+	FILE *fp = fdopen(pipefds[1], binmode("w"));
+	if (fp == NULL) {
+		(void) close(pipefds[1]);
+		return NULL;
+	}
+
+#ifdef PIPE_HASH_SIZE
+	save_pipe(pipefds[1], fp, childpid);
+#else
+	int index = pipefds[1];	// use the write file desciptor.
+	open_pipes[index].pid = childpid;
+	open_pipes[index].fp = fp;
+#endif /* PIPE_HASH_SIZE */
+
+	return fp;
+#endif
+}
+
+/* gawk_popen_write_close --- close a FILE * that we created */
+
+static int
+gawk_popen_write_close(FILE *fp)
+{
+#if defined(VMS) || defined(__MINGW32__)
+	return pclose(fp);
+#else
+	write_pipe *wp;
+#ifdef PIPE_HASH_SIZE
+	write_pipe *parent;
+#endif
+
+	if (open_pipes == NULL || fp == NULL) {
+		errno = EINVAL;
+		return -1;
+	}
+
+#ifdef PIPE_HASH_SIZE
+	parent = NULL;
+	for (wp = &open_pipes[fileno(fp) % PIPE_HASH_SIZE]; wp != NULL;
+	     wp = wp->next) {
+#else
+	wp = &open_pipes[fileno(fp)];
+#endif
+	if (wp->fp == fp) {
+		int status;
+
+		(void) fflush(fp);
+		(void) fclose(fp);
+		status = wait_any_block_signals(wp->pid);
+
+		wp->fp = NULL;
+		wp->pid = 0;
+#ifdef PIPE_HASH_SIZE
+		if (parent != NULL) {
+			parent->next = wp->next;
+			efree(wp);
+		}
+#endif
+		return status;
+	}
+#ifdef PIPE_HASH_SIZE
+	parent = wp;
+	}
+#endif
+
+	errno = EBADF;
+	return -1;
+#endif
 }

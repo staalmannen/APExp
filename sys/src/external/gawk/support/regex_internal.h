@@ -1,5 +1,5 @@
 /* Extended regular expression matching and search library.
-   Copyright (C) 2002-2023 Free Software Foundation, Inc.
+   Copyright (C) 2002-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Isamu Hasegawa <isamu@yamato.ibm.com>.
 
@@ -29,6 +29,7 @@
 #include <locale.h>
 #include <wchar.h>
 #include <wctype.h>
+// #include <stdckdint.h>
 #include <stdint.h>
 
 #ifndef _LIBC
@@ -97,22 +98,14 @@
 #endif
 
 /* This is for other GNU distributions with internationalized messages.  */
-#if (HAVE_LIBINTL_H && ENABLE_NLS) || defined _LIBC
+#ifdef _LIBC
 # include <libintl.h>
-# ifdef _LIBC
-#  undef gettext
-#  define gettext(msgid) \
-  __dcgettext (_libc_intl_domainname, msgid, LC_MESSAGES)
-# endif
-#else
 # undef gettext
-# define gettext(msgid) (msgid)
-#endif
-
-#ifndef gettext_noop
-/* This define is so xgettext can find the internationalizable
-   strings.  */
+# define gettext(msgid) \
+  __dcgettext (_libc_intl_domainname, msgid, LC_MESSAGES)
 # define gettext_noop(String) String
+#else
+# include "gettext.h"
 #endif
 
 /* Number of ASCII characters.  */
@@ -140,9 +133,19 @@
 # define __towlower towlower
 # define __towupper towupper
 # define __btowc btowc
+# define __regfree regfree
+#if defined HAVE_UCHAR_H
+#include <uchar.h>
+# define __mbrtowc(pwc, s, n, mbs) mbrtoc32((char32_t *) pwc, s, n, mbs)
+# define __wcrtomb(s, wc, mbs) c32rtomb(s, (char32_t) wc, mbs)
+#elif defined __MINGW32__
+# define __mbrtowc mbrtoc32
+# define __wcrtomb c32rtomb
+#else
+# define char32_t wchar_t
 # define __mbrtowc mbrtowc
 # define __wcrtomb wcrtomb
-# define __regfree regfree
+#endif /* not HAVE_UCHAR_H */
 #endif /* not _LIBC */
 
 /* Types related to integers.  Unless protected by #ifdef _LIBC, the
@@ -288,7 +291,7 @@ typedef enum
 typedef struct
 {
   /* Multibyte characters.  */
-  wchar_t *mbchars;
+  char32_t *mbchars;
 
 #ifdef _LIBC
   /* Collating symbols.  */
@@ -305,8 +308,8 @@ typedef struct
   uint32_t *range_starts;
   uint32_t *range_ends;
 #else
-  wchar_t *range_starts;
-  wchar_t *range_ends;
+  char32_t *range_starts;
+  char32_t *range_ends;
 #endif
 
   /* Character classes. */
@@ -437,12 +440,6 @@ typedef struct re_dfa_t re_dfa_t;
 #define re_string_byte_at(pstr,idx) ((pstr)->mbs[idx])
 #define re_string_skip_bytes(pstr,idx) ((pstr)->cur_idx += (idx))
 #define re_string_set_index(pstr,idx) ((pstr)->cur_idx = (idx))
-
-#ifdef _LIBC
-# define MALLOC_0_IS_NONNULL 1
-#elif !defined MALLOC_0_IS_NONNULL
-# define MALLOC_0_IS_NONNULL 0
-#endif
 
 #ifndef MAX
 # define MAX(a,b) ((a) < (b) ? (b) : (a))
@@ -695,7 +692,7 @@ typedef struct
   {
     unsigned char ch;
     unsigned char *name;
-    wchar_t wch;
+    char32_t wch;
   } opr;
 } bracket_elem_t;
 

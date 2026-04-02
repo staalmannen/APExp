@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2023 the Free Software Foundation, Inc.
+ * Copyright (C) 1986, 1988, 1989, 1991-2026 the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -63,6 +63,7 @@ static char *tokexpand(void);
 static NODE *set_profile_text(NODE *n, const char *str, size_t len);
 static int check_qualified_special(char *token);
 static char *qualify_name(const char *name, size_t len);
+static void push_ns_onto_namespace_chain(INSTRUCTION *comment);
 static INSTRUCTION *trailing_comment;
 static INSTRUCTION *outer_comment;
 static INSTRUCTION *interblock_comment;
@@ -181,6 +182,8 @@ static INSTRUCTION *ip_beginfile;
 INSTRUCTION *main_beginfile;
 static bool called_from_eval = false;
 
+static bool include_use_current_namespace = false;
+
 static inline INSTRUCTION *list_create(INSTRUCTION *x);
 static inline INSTRUCTION *list_append(INSTRUCTION *l, INSTRUCTION *x);
 static inline INSTRUCTION *list_prepend(INSTRUCTION *l, INSTRUCTION *x);
@@ -205,7 +208,7 @@ extern double fmod(double x, double y);
 %token LEX_AND LEX_OR INCREMENT DECREMENT
 %token LEX_BUILTIN LEX_LENGTH
 %token LEX_EOF
-%token LEX_INCLUDE LEX_EVAL LEX_LOAD LEX_NAMESPACE
+%token LEX_INCLUDE LEX_EVAL LEX_LOAD LEX_NAMESPACE LEX_NSINCLUDE
 %token NEWLINE
 
 /* Lowest to highest */
@@ -298,6 +301,16 @@ rule
 		yyerrok;
 	  }
 	| '@' LEX_INCLUDE source statement_term
+	  {
+		want_source = false;
+		at_seen--;
+		if ($3 != NULL && $4 != NULL) {
+			SRCFILE *s = (SRCFILE *) $3;
+			s->comment = $4;
+		}
+		yyerrok;
+	  }
+	| '@' LEX_NSINCLUDE source statement_term
 	  {
 		want_source = false;
 		at_seen--;
@@ -562,7 +575,7 @@ regexp
 			if (len == 0)
 				lintwarn_ln($3->source_line,
 					_("regexp constant `//' looks like a C++ comment, but is not"));
-			else if (re[0] == '*' && re[len-1] == '*')
+			else if (use_gnu_matchers && re[0] == '*' && re[len-1] == '*')
 				/* possible C comment */
 				lintwarn_ln($3->source_line,
 					_("regexp constant `/%s/' looks like a C comment, but is not"), re);
@@ -696,10 +709,10 @@ statement
 					}
 
 					if (case_values == NULL)
-						emalloc(case_values, const char **, sizeof(char *) * maxcount, "statement");
+						emalloc(case_values, const char **, sizeof(char *) * maxcount);
 					else if (case_count >= maxcount) {
 						maxcount += 128;
-						erealloc(case_values, const char **, sizeof(char*) * maxcount, "statement");
+						erealloc(case_values, const char **, sizeof(char*) * maxcount);
 					}
 					case_values[case_count++] = caseval;
 				} else {
@@ -1276,36 +1289,6 @@ regular_print:
 			$$ = list_append(list_append($4, $2), $1);
 		}
 	  }
-	| LEX_DELETE '(' NAME ')'
-		  /*
-		   * this is for tawk compatibility. maybe the warnings
-		   * should always be done.
-		   */
-	  {
-		static bool warned = false;
-		char *arr = $3->lextok;
-
-		if (do_lint && ! warned) {
-			warned = true;
-			lintwarn_ln($1->source_line,
-				_("`delete(array)' is a non-portable tawk extension"));
-		}
-		if (do_traditional) {
-			error_ln($1->source_line,
-				_("`delete(array)' is a non-portable tawk extension"));
-		}
-		$3->memory = variable($3->source_line, arr, Node_var_new);
-		$3->opcode = Op_push_array;
-		$1->expr_count = 0;
-		$$ = list_append(list_create($3), $1);
-
-		if (! do_posix && ! do_traditional) {
-			if ($3->memory == symbol_table)
-				fatal(_("`delete' is not allowed with SYMTAB"));
-			else if ($3->memory == func_table)
-				fatal(_("`delete' is not allowed with FUNCTAB"));
-		}
-	  }
 	| exp
 	  {
 		$$ = optimize_assignment($1);
@@ -1772,7 +1755,7 @@ common_exp
 			n1 = force_string(n1);
 			n2 = force_string(n2);
 			nlen = n1->stlen + n2->stlen;
-			erealloc(n1->stptr, char *, nlen + 1, "constant fold");
+			erealloc(n1->stptr, char *, nlen + 1);
 			memcpy(n1->stptr + n1->stlen, n2->stptr, n2->stlen);
 			n1->stlen = nlen;
 			n1->stptr[nlen] = '\0';
@@ -2286,6 +2269,7 @@ static const struct token tokentab[] = {
 {"BEGINFILE",	Op_rule,	 LEX_BEGINFILE,	GAWKX,		0,	0},
 {"END",		Op_rule,	 LEX_END,	0,		0,	0},
 {"ENDFILE",	Op_rule,	 LEX_ENDFILE,	GAWKX,		0,	0},
+{"_dump_node",	Op_builtin,      LEX_BUILTIN,	GAWKX|A(0)|DEBUG_USE,	do_dump_node,	0},
 #ifdef ARRAYDEBUG
 {"adump",	Op_builtin,    LEX_BUILTIN,	GAWKX|A(1)|A(2)|DEBUG_USE,	do_adump,	0},
 #endif
@@ -2335,6 +2319,7 @@ static const struct token tokentab[] = {
 {"namespace",  	Op_symbol,	 LEX_NAMESPACE,	GAWKX,		0,	0},
 {"next",	Op_K_next,	 LEX_NEXT,	0,		0,	0},
 {"nextfile",	Op_K_nextfile, LEX_NEXTFILE,	0,		0,	0},
+{"nsinclude",	Op_symbol,	 LEX_NSINCLUDE,	GAWKX,	0,	0},
 {"or",		Op_builtin,    LEX_BUILTIN,	GAWKX,		do_or,	MPF(or)},
 {"patsplit",	Op_builtin,    LEX_BUILTIN,	GAWKX|A(2)|A(3)|A(4), do_patsplit,	0},
 {"print",	Op_K_print,	 LEX_PRINT,	0,		0,	0},
@@ -2469,7 +2454,7 @@ print_included_from()
 	saveline = sourceline;
 	sourceline = 0;
 
-	for (s = sourcefile; s != NULL && s->stype == SRC_INC; ) {
+	for (s = sourcefile; s != NULL && (s->stype == SRC_INC || s->stype == SRC_NSINC); ) {
 		s = s->next;
 		if (s == NULL || s->fd <= INVALID_HANDLE)
 			continue;
@@ -2481,10 +2466,10 @@ print_included_from()
 		msg("%s %s:%d%c",
 			s->prev == sourcefile ? "In file included from"
 					  : "                 from",
-			(s->stype == SRC_INC ||
+			(s->stype == SRC_INC || s->stype == SRC_NSINC ||
 				 s->stype == SRC_FILE) ? s->src : "cmd. line",
 			line,
-			s->stype == SRC_INC ? ',' : ':'
+			s->stype != SRC_FILE ? ',' : ':'
 		);
 	}
 	sourceline = saveline;
@@ -2605,7 +2590,7 @@ yyerror(const char *m, ...)
 	count = strlen(mesg) + 1;
 	if (lexptr != NULL)
 		count += (lexeme - thisline) + 2;
-	ezalloc(buf, char *, count+1, "yyerror");
+	ezalloc(buf, char *, count+1);
 
 	bp = buf;
 
@@ -2816,9 +2801,9 @@ parse_program(INSTRUCTION **pcode, bool from_eval)
 		errcount++;
 
 	if (args_array == NULL)
-		emalloc(args_array, NODE **, (max_args + 2) * sizeof(NODE *), "parse_program");
+		emalloc(args_array, NODE **, (max_args + 2) * sizeof(NODE *));
 	else
-		erealloc(args_array, NODE **, (max_args + 2) * sizeof(NODE *), "parse_program");
+		erealloc(args_array, NODE **, (max_args + 2) * sizeof(NODE *));
 
 	return (ret || errcount);
 }
@@ -2839,7 +2824,7 @@ do_add_srcfile(enum srctype stype, char *src, char *path, SRCFILE *thisfile)
 {
 	SRCFILE *s;
 
-	ezalloc(s, SRCFILE *, sizeof(SRCFILE), "do_add_srcfile");
+	ezalloc(s, SRCFILE *, sizeof(SRCFILE));
 	s->src = estrdup(src, strlen(src));
 	s->fullpath = path;
 	s->stype = stype;
@@ -2886,7 +2871,7 @@ add_srcfile(enum srctype stype, char *src, SRCFILE *thisfile, bool *already_incl
 
 	/* N.B. We do not eliminate duplicate SRC_FILE (-f) programs. */
 	for (s = srcfiles->next; s != srcfiles; s = s->next) {
-		if ((s->stype == SRC_FILE || s->stype == SRC_INC || s->stype == SRC_EXTLIB) && files_are_same(path, s)) {
+		if ((s->stype == SRC_FILE || s->stype == SRC_INC || s->stype == SRC_NSINC || s->stype == SRC_EXTLIB) && files_are_same(path, s)) {
 			if (stype == SRC_INC || stype == SRC_EXTLIB) {
 				/* eliminate duplicates */
 				if ((stype == SRC_INC) && (s->stype == SRC_FILE))
@@ -2951,7 +2936,8 @@ include_source(INSTRUCTION *file, void **srcfile_p)
 		return true;
 	}
 
-	s = add_srcfile(SRC_INC, src, sourcefile, &already_included, &errcode);
+	s = add_srcfile(include_use_current_namespace ? SRC_NSINC : SRC_INC,
+		src, sourcefile, &already_included, &errcode);
 	if (s == NULL) {
 		if (already_included)
 			return true;
@@ -2978,7 +2964,12 @@ include_source(INSTRUCTION *file, void **srcfile_p)
 	lasttok = 0;
 	lexeof = false;
 	eof_warned = false;
-	current_namespace = awk_namespace;
+	if (! include_use_current_namespace)
+		current_namespace = awk_namespace;
+	else
+		current_namespace = estrdup(current_namespace, strlen(current_namespace));
+
+	include_use_current_namespace = false;	// reset it
 	*srcfile_p = (void *) s;
 	return true;
 }
@@ -3000,7 +2991,6 @@ load_library(INSTRUCTION *file, void **srcfile_p)
 		return false;
 	}
 
-
 	if (strlen(src) == 0) {
 		if (do_lint)
 			lintwarn_ln(file->source_line, _("empty filename after @load"));
@@ -3021,7 +3011,7 @@ load_library(INSTRUCTION *file, void **srcfile_p)
 			return false;
 		}
 
-		load_ext(s->fullpath);
+		load_ext(s->src, s->fullpath);
 	}
 
 	*srcfile_p = (void *) s;
@@ -3105,11 +3095,6 @@ get_src_buf()
 	int savelen;
 	struct stat sbuf;
 
-	/*
-	 * No argument prototype on readfunc on purpose,
-	 * avoids problems with some ancient systems where
-	 * the types of arguments to read() aren't up to date.
-	 */
 	static ssize_t (*readfunc)(int, void *, size_t) = NULL;
 
 	if (readfunc == NULL) {
@@ -3166,7 +3151,7 @@ get_src_buf()
 					break;
 				}
 			savelen = lexptr - scan;
-			emalloc(buf, char *, savelen + 1, "get_src_buf");
+			emalloc(buf, char *, savelen + 1);
 			memcpy(buf, scan, savelen);
 			thisline = buf;
 			lexptr = buf + savelen;
@@ -3214,7 +3199,7 @@ get_src_buf()
 #undef A_DECENT_BUFFER_SIZE
 		sourcefile->bufsize = l;
 		newfile = true;
-		emalloc(sourcefile->buf, char *, sourcefile->bufsize, "get_src_buf");
+		emalloc(sourcefile->buf, char *, sourcefile->bufsize);
 		memset(sourcefile->buf, '\0', sourcefile->bufsize);	// keep valgrind happy
 		lexptr = lexptr_begin = lexeme = sourcefile->buf;
 		savelen = 0;
@@ -3244,7 +3229,7 @@ get_src_buf()
 
 			if (savelen > sourcefile->bufsize / 2) { /* long line or token  */
 				sourcefile->bufsize *= 2;
-				erealloc(sourcefile->buf, char *, sourcefile->bufsize, "get_src_buf");
+				erealloc(sourcefile->buf, char *, sourcefile->bufsize);
 				scan = sourcefile->buf + (scan - lexptr_begin);
 				lexptr_begin = sourcefile->buf;
 			}
@@ -3296,11 +3281,11 @@ tokexpand()
 	if (tokstart != NULL) {
 		tokoffset = tok - tokstart;
 		toksize *= 2;
-		erealloc(tokstart, char *, toksize, "tokexpand");
+		erealloc(tokstart, char *, toksize);
 		tok = tokstart + tokoffset;
 	} else {
 		toksize = 60;
-		emalloc(tokstart, char *, toksize, "tokexpand");
+		emalloc(tokstart, char *, toksize);
 		tok = tokstart;
 	}
 	tokend = tokstart + toksize;
@@ -3583,6 +3568,7 @@ yylex(void)
 {
 	int c;
 	bool seen_e = false;		/* These are for numbers */
+	bool seen_p = false;
 	bool seen_point = false;
 	bool esc_seen;		/* for literal strings */
 	int mid;
@@ -3690,21 +3676,6 @@ collect_regexp:
 end_regexp:
 				yylval = GET_INSTRUCTION(Op_token);
 				yylval->lextok = estrdup(tokstart, tok - tokstart);
-				if (do_lint) {
-					int peek = nextc(true);
-
-					pushback();
-					if (peek == 'i' || peek == 's') {
-						if (source)
-							lintwarn(
-						_("%s: %d: tawk regex modifier `/.../%c' doesn't work in gawk"),
-								source, sourceline, peek);
-						else
-							lintwarn(
-						_("tawk regex modifier `/.../%c' doesn't work in gawk"),
-								peek);
-					}
-				}
 				if (collecting_typed_regexp) {
 					collecting_typed_regexp = false;
 					lasttok = TYPED_REGEXP;
@@ -4136,7 +4107,7 @@ retry:
 	case '8':
 	case '9':
 		/* It's a number */
-		for (;;) {
+		for (;; c = nextc(true)) {
 			bool gotnumber = false;
 
 			tokadd(c);
@@ -4159,11 +4130,22 @@ retry:
 				break;
 			case '.':
 				/* period ends exponent part of floating point number */
-				if (seen_point || seen_e) {
+				if (seen_point || seen_e || seen_p) {
 					gotnumber = true;
 					break;
 				}
 				seen_point = true;
+				break;
+			case 'p':
+			case 'P':
+				if (inhex) {
+					if (seen_p)
+						gotnumber = true;
+					else {
+						seen_p = true;
+						goto collect_exponent;
+					}
+				}
 				break;
 			case 'e':
 			case 'E':
@@ -4174,6 +4156,7 @@ retry:
 					break;
 				}
 				seen_e = true;
+			collect_exponent:
 				if ((c = nextc(true)) == '-' || c == '+') {
 					int c2 = nextc(true);
 
@@ -4183,11 +4166,11 @@ retry:
 					} else {
 						pushback();	/* non-digit after + or - */
 						pushback();	/* + or - */
-						pushback();	/* e or E */
+						pushback();	/* e or E or p or P */
 					}
 				} else if (! isdigit(c)) {
-					pushback();	/* character after e or E */
-					pushback();	/* e or E */
+					pushback();	/* character after e or E or p or P */
+					pushback();	/* e or E or p or P */
 				} else {
 					pushback();	/* digit */
 				}
@@ -4222,7 +4205,6 @@ retry:
 			}
 			if (gotnumber)
 				break;
-			c = nextc(true);
 		}
 		pushback();
 
@@ -4366,6 +4348,7 @@ retry:
 		int class = tokentab[mid].class;
 
 		switch (class) {
+		case LEX_NSINCLUDE:
 		case LEX_EVAL:
 		case LEX_INCLUDE:
 		case LEX_LOAD:
@@ -4429,17 +4412,21 @@ retry:
 			continue_allowed++;
 
 		switch (class) {
+		case LEX_NSINCLUDE:
+			include_use_current_namespace = true;
+			goto make_at_token;	// can't fall through
 		case LEX_NAMESPACE:
 			want_namespace = true;
 			// fall through
 		case LEX_INCLUDE:
 		case LEX_LOAD:
+	make_at_token:
 			want_source = true;
 			break;
 		case LEX_EVAL:
 			if (in_main_context())
 				goto out;
-			emalloc(tokkey, char *, tok - tokstart + 1, "yylex");
+			emalloc(tokkey, char *, tok - tokstart + 1);
 			tokkey[0] = '@';
 			memcpy(tokkey + 1, tokstart, tok - tokstart);
 			yylval = GET_INSTRUCTION(Op_token);
@@ -4724,6 +4711,14 @@ snode(INSTRUCTION *subn, INSTRUCTION *r)
 #endif /* SUPPLY_INTDIV */
 	} else if (r->builtin == do_match) {
 		static bool warned = false;
+		static bool param_warned = false;
+
+		ip = subn->nexti->lasti;
+		if (! param_warned
+		    && (ip->opcode == Op_match_rec || ip->opcode == Op_push_re)) {
+			param_warned = true;
+			warning_ln(subn->source_line, _("match: regexp constant as first argument is probably not what you want"));
+		}
 
 		arg = subn->nexti->lasti->nexti;	/* 2nd arg list */
 		(void) mk_rexp(arg);
@@ -5021,6 +5016,9 @@ mk_function(INSTRUCTION *fi, INSTRUCTION *def)
 	}
 
 	if (do_pretty_print) {
+		if (namespace_chain == NULL)
+			push_ns_onto_namespace_chain(NULL);
+
 		fi[3].nexti = namespace_chain;
 		namespace_chain = NULL;
 		(void) list_prepend(def, instruction(Op_exec_count));
@@ -5042,6 +5040,18 @@ mk_function(INSTRUCTION *fi, INSTRUCTION *def)
 	/* remove params from symbol table */
 	remove_params(thisfunc);
 	return fi;
+}
+
+/* push_ns_onto_namespace_chain --- update the namespace chain */
+
+static void
+push_ns_onto_namespace_chain(INSTRUCTION *comment)
+{
+	INSTRUCTION *new_ns = instruction(Op_K_namespace);
+	new_ns->comment = comment;
+	new_ns->ns_name = estrdup(current_namespace, strlen(current_namespace));
+	new_ns->nexti = namespace_chain;
+	namespace_chain = new_ns;
 }
 
 /*
@@ -5099,7 +5109,7 @@ check_params(char *fname, int pcount, INSTRUCTION *list)
 
 	assert(pcount > 0);
 
-	emalloc(pnames, char **, pcount * sizeof(char *), "check_params");
+	emalloc(pnames, char **, pcount * sizeof(char *));
 
 	for (i = 0, p = list->nexti; p != NULL; i++, p = np) {
 		np = p->nexti;
@@ -5112,7 +5122,7 @@ check_params(char *fname, int pcount, INSTRUCTION *list)
 				_("function `%s': cannot use function name as parameter name"), fname);
 		} else if (is_std_var(name)) {
 			error_ln(p->source_line,
-				_("function `%s': cannot use special variable `%s' as a function parameter"),
+				_("function `%s': parameter `%s': POSIX disallows using a special variable as a function parameter"),
 					fname, name);
 		} else if (strchr(name, ':') != NULL)
 			error_ln(p->source_line,
@@ -5168,8 +5178,8 @@ func_use(const char *name, enum defref how)
 
 	/* not in the table, fall through to allocate a new one */
 
-	ezalloc(fp, struct fdesc *, sizeof(struct fdesc), "func_use");
-	emalloc(fp->name, char *, len + 1, "func_use");
+	ezalloc(fp, struct fdesc *, sizeof(struct fdesc));
+	emalloc(fp->name, char *, len + 1);
 	strcpy(fp->name, name);
 	fp->next = ftable[ind];
 	ftable[ind] = fp;
@@ -6645,7 +6655,7 @@ set_profile_text(NODE *n, const char *str, size_t len)
 	if (do_pretty_print) {
 		// two extra bytes: one for NUL termination, and another in
 		// case we need to add a leading minus sign in add_sign_to_num
-		emalloc(n->stptr, char *, len + 2, "set_profile_text");
+		emalloc(n->stptr, char *, len + 2);
 		memcpy(n->stptr, str, len);
 		n->stptr[len] = '\0';
 		n->stlen = len;
@@ -6689,7 +6699,7 @@ merge_comments(INSTRUCTION *c1, INSTRUCTION *c2)
 	}
 
 	char *buffer;
-	emalloc(buffer, char *, total + 1, "merge_comments");
+	emalloc(buffer, char *, total + 1);
 
 	strcpy(buffer, c1->memory->stptr);
 	if (c1->comment != NULL) {
@@ -6897,11 +6907,7 @@ set_namespace(INSTRUCTION *ns, INSTRUCTION *comment)
 	efree(ns->lextok);
 
 	// save info and push on front of list of namespaces seen
-	INSTRUCTION *new_ns = instruction(Op_K_namespace);
-	new_ns->comment = comment;
-	new_ns->ns_name = estrdup(current_namespace, strlen(current_namespace));
-	new_ns->nexti = namespace_chain;
-	namespace_chain = new_ns;
+	push_ns_onto_namespace_chain(comment);
 
 	ns->lextok = NULL;
 	bcfree(ns);
@@ -6951,7 +6957,7 @@ qualify_name(const char *name, size_t len)
 		size_t length = strlen(current_namespace) + 2 + len + 1;
 		char *buf;
 
-		emalloc(buf, char *, length, "qualify_name");
+		emalloc(buf, char *, length);
 		sprintf(buf, "%s::%s", current_namespace, name);
 
 		return buf;

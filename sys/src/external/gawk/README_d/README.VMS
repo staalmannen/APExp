@@ -20,33 +20,16 @@ The vmsbuild.com script is no longer being tested.
 DEC C  -- use either vmsbuild.com or descrip.mms as is.
        DEC C is also known as Compaq C and HP C.
 
+Currently as of 2026, only builds for 64 bit OpenVMS hardware are being built
+from the files in this distribution.
+
 With the end of HPE Hobbyist OpenVMS licenses as of 2022, only
 builds with VMS Software Inc. (VSI) Community Licenses are being tested.
 
 Builds have been using:
+    VSI C x86-64 V7.6-001 (GEM 50YAN) on OpenVMS x86_64 V9.2-3
     HP C V7.3-020 on OpenVMS IA64 V8.4-2L3
     HP C V7.3-010 on OpenVMS Alpha V8.4-2L1
-
-A build system for OpenVMS x86_64 has not yet been setup by a gawk
-tester / maintainer.
-
-These were the last known ways to build on VAX:
-
-VAX C  -- use `@vmsbuild VAXC' or `MMS/MACRO=("VAXC")'.  On a system
-        with both VAX C and DEC C installed where DEC C is the default,
-        use `MMS/MACRO=("VAXC","CC=CC/VAXC")' for the MMS variant; for
-        the vmsbuild.com variant, any need for `/VAXC' will be detected
-        automatically.
-        * IMPORTANT NOTE * VAX C should not be used on VAX/VMS 5.5-2 and
-        later.  Use DEC C instead.
-
-GNU C  -- use `@vmsbuild GNUC' or `MMS/MACRO=("GNUC")'.  On a system
-        where the GCC command is not already defined, use either
-        `@vmsbuild GNUC DO_GNUC_SETUP' or
-        `MMS/MACRO=("GNUC","DO_GNUC_SETUP")'.
-
-GAWK was originally ported for VMS V4.6 and up.  It has not been tested
-with a release that old for some time.
 
 Compiling dynamic extensions on VMS:
 
@@ -67,8 +50,7 @@ and the symbol name handling is to be exact case with CRC shortening for
 symbols longer than 32 bits.
 
 Currently dynamic extensions have only been tested to work on VMS 8.3 and later
-on both Alpha and Itanium.  Dynamic extensions are not currently working on
-VAX/VMS 7.3.
+on x86_64, Alpha and Itanium.
 
 Compile time are macros needed to be defined before the first VMS supplied
 header file is included.  Usually this will be done with a config.h file.
@@ -89,16 +71,6 @@ Alpha and Itanium:
 
 /name=(as_is,short)
 /float=ieee/ieee_mode=denorm_results
-
-VAX:
-
-/name=(as_is,short)
-
-The linker option files are [.vms]gawk_plugin.opt for Alpha and Itanium.
-
-As the VAX dynamic plug-in feature is not yet working, the files potentially
-needed for a future VAX plugin are in [.vms.vax] directory of the source.
-
 
 Testing GAWK on VMS:
 
@@ -179,7 +151,7 @@ search path of "SYS$DISK:[],AWK_LIBRARY:" when looking for awk program
 files specified by the '-f' option.  The format of AWKPATH is a comma-
 separated list of directory specifications.  When defining it, the
 value should be quoted so that it retains a single translation, not a
-multi-translation RMS searchlist.
+multi-translation RMS search list.
 
      The exit status from Gawk is encoded in the the VMS $status exit
 value so that the severity bits are set as expected and the original
@@ -199,16 +171,12 @@ the FATAL severity status set.  All other Gawk exit values will have
 the Success severity status set.
 
 This change was needed to provide all Gawk exit values to VMS programs and
-for compatibilty with programs written in C and the GNV environment.
+for compatibility with programs written in C and the GNV environment.
 
 Older versions of Gawk incorrectly mostly passed through the Gawk
 status values instead of encoding them.  DCL scripts that were checking
 the severity values will probably not need changing.  DCL scripts that
 were checking the exact exit status will need an update.
-
-VAX/VMS floating point uses unbiased rounding.  This is generaly incompatible
-with the expected behavior.  The ofmta test in the test directory will
-fail on VAX.
 
 Gawk needs the SYS$TIMEZONE_RULE or TZ logical name to be defined or it
 will output times in GMT.
@@ -222,7 +190,7 @@ TO DO Items (not in order of priority)
 1. With the system() function, the status for DCL commands are not being
    returned.
 2. Need gawk to accept logical names GNV$AWKPATH, GNV$AWKLIB, and
-   GNV$AWK_LIBARARY in addtion to the unprefixed names.  This will allow
+   GNV$AWK_LIBRARY in addition to the unprefixed names.  This will allow
    system wide default values to be set by an installation kit.
 
 3. Need to fix the gawk.cld file to not require a parameter for the options

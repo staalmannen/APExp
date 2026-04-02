@@ -1,3 +1,353 @@
+2026-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.4.0: Release tar ball made.
+
+2026-02-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2026-02-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.h: Regenerated.
+	* Makefile.tst.prologue, gawkmisc.pc, popen.c: Update copyright year.
+	* Makefile.tst: Regenerated.
+	* nl_langinfo.c: Add copyright notice.
+
+2026-02-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2026-01-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2026-01-22         Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile (check): Don't set $(AWK), it is set in a more useful
+	way by test/Makefile.
+
+2026-01-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2026-01-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2026-01-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2026-01-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2026-01-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2026-01-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* GenMakefileTst.awk (substitutions): Change to use split() so can
+	be used with any POSIX awk.
+	* Makefile.tst: Regenerated.
+	* config.h: Regenerated.
+
+2026-01-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2026-01-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* nl_langinfo.c: Typo fixes.
+
+2026-01-01         Eli Zaretskii  <eliz@gnu.org>
+
+	* nl_langinfo.c (nl_langinfo): Return "UTF-8" as the codeset on
+	Windows when the console uses codepage 65001.
+	(mingw_using_utf8): Adapt to the above change.
+
+	* mbc32.c: Remove the testing code.
+	(mbrtoc32): Fix UTF-8 decoding bug.
+	* mbc32.h: Remove inadvertently duplicated code.
+
+2025-12-30         Eli Zaretskii  <eliz@gnu.org>
+
+	* mbc32.c (mbrtoc32, mbrlenc32): Fix (re)initialization of
+	internal mbstate_t.
+
+2025-12-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-12-29         Eli Zaretskii  <eliz@gnu.org>
+
+	* mbc32.c (c32rtomb): Fix a typo.
+
+2025-12-28         Eli Zaretskii  <eliz@gnu.org>
+
+	* GenMakefileTst.awk: Replace GAWKLOCALE with LC_ALL.
+	* Makefile: Compile minrx.c with -O3.  Fix dependencies due to new
+	files.
+	* Makefile.ext: Don't use -static-libgcc, as the binaries are now
+	distributed with libgcc DLL.  Compile nl_langinfo.c, mbc32.c and
+	stdio-consolesafe.c into each extension DLL.
+	* config.h: Undefine HAVE_STRUCT_STAT_ST_BLKSIZE, it gets in the
+	way when compiling filefuncs extension (MinGW doesn't have this
+	member in its 'struct stat').
+	* mbc32.h:
+	* mbc32.c: New files, with functions to convert between multibyte
+	strings and char32_t Unicode codepoints.
+	* gawkmisc.pc: Update w32_setlocale, add caching of the locale for
+	faster access.  Add c32is* functions to replace isw* wctype.h
+	functions when the argument is a 32-bit full Unicode codepoint.
+	Also add char32_t replacements for towlower, towupper, btowc,
+	wctob, and wcscoll.  Together with mbc32.c, his constitutes the
+	bulk of support for full Unicode range and for using UTF-8 in
+	strings.
+	* nl_langinfo.c: Add #includes to be able to compile this file
+	separately.  Add mingw_using_utf8 utility function.  Add
+	mingw_mb_cur_max to which MB_CUR_MAX is redirected.
+	* popen.c: Remove unused variables and avoid compiler warnings.
+
+2025-12-22         Eli Zaretskii  <eliz@gnu.org>
+
+	* nl_langinfo.c: Include <locale.h> and <windows.h>.
+
+	* Makefile (gawkmisc$O): Add pc/nl_langinfo.c to dependencies.
+
+	* Makefile.ext (ordchr.$(SOEXT)): Add ../pc/nl_langinfo.c to
+	dependencies.
+
+2025-12-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.pc (c32slen): New function.
+	(c32scoll): New function. Dummy version, to be updated by Eli.
+
+2025-12-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-12-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-12-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Per discussion with Eli Zaretskii.
+
+	* gawkmisc.pc (nl_langinfo): Move to a separate file which
+	is #include'd. This helps with the ordchr extension.
+	* nl_langinfo.c: New file.
+
+2025-12-12         Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile: Remove protos.h and add minrx.c.
+
+2025-12-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-12-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-11-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-10-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-10-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-10-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-10-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-10-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-07-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-07-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-04-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-04-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.h: Regenerated.
+	* 5.3.2: Release tar made.
+
+2025-03-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-03-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.h: Regenerated.
+
+2025-03-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-03-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-02-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst.prologue: Update copyright years.
+	* Makefile.tst: Regenerated.
+
+2025-02-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-02-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-01-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-01-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-01-07         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2025-01-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2024-10-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2024-09-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst, config.h: Regenerated.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.1: Release tar made.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* gawkmisc.pc, testoutcmp.awk: Update copyright year.
+	* Makefile.tst, config.h: Regenerated.
+
+2024-09-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2024-08-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2024-08-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* config.h: Regenerated.
+
+2024-08-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* GenMakefileTst.awk: Adjust code so that multiple lines can
+	have $(CMP) and get changed to $(TESTOUTCMP).
+
+2024-08-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated after adding new test.
+
+2024-08-11  Eli Zaretskii  <eliz@gnu.org>
+
+	* Makefile.tst (NEED_TESTOUTCMP, printf-corners): Use
+	testoutcmp.awk.
+
+	* testoutcmp.awk: Add fixes for NAN and INF; fix exponents.
+
+	* Makefile (AWKOBJS4): Add new file printf$O.
+
+2024-08-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+	* config.h: Regenerated.
+
+2024-08-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2024-07-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2024-06-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2024-06-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2024-04-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2024-02-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2024-02-23         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* make-config.sh: New file.
+	* config.h: Updated.
+
+2024-01-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-12-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-12-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-12-12  Eli Zaretskii  <eliz@gnu.org>
+
+	* gawkmisc.pc (optimal_bufsize): Return DEFBLKSIZE for directories
+	"opened" by the readdir extension.
+
+2023-12-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-11-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
+2023-11-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.tst: Regenerated.
+
 2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* 5.3.0: Release tar ball made.

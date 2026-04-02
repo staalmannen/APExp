@@ -3,7 +3,7 @@ Sun 03 Jul 2022 02:51:58 PM IDT
 
 As mentioned in the NEWS file and documented in a little more detail
 in the manual, the MPFR feature is "on parole". This means that the
-gawk maintainer (Arnold ROobins) is no longer fixing bugs in the code
+gawk maintainer (Arnold Robbins) is no longer fixing bugs in the code
 or dealing with it.  However, a member of the gawk development team has
 volunteered to maintain this code.
 
@@ -43,6 +43,10 @@ Wed Nov 15 21:57:29 IST 2017
 As of gawk 4.2, MPFR is no longer supported on Mac OS X on PPC.
 Gawk switched to C99, and the last PPC version doesn't play well
 with C99.
+
+Sat 20 Jan 2024 21:28:35 IST
+============================
+MPFR support on macOS on PPC is restored. See README_d/README.macosx.
 
 ------------------------ Windows MinGW ----------------------------
 

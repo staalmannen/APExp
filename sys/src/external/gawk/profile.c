@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1999-2023 the Free Software Foundation, Inc.
+ * Copyright (C) 1999-2023, 2025, 2026 the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -53,8 +53,12 @@ static char *adjust_namespace(char *name, bool *malloced);
 #define DONT_FREE 1
 #define CAN_FREE  2
 
+#ifdef SIGHUP
 static void dump_and_exit(int signum) ATTRIBUTE_NORETURN;
+#endif
+#if defined(SIGHUP) || defined(SIGUSR1)
 static void just_dump(int signum);
+#endif
 
 /* pretty printing related functions and variables */
 
@@ -66,6 +70,8 @@ static long indent_level = 0;
 
 static const char tabs[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
 static const size_t tabs_len = sizeof(tabs) - 1;
+
+static bool at_start = true;
 
 #define check_indent_level() \
 	if (indent_level + 1 > tabs_len) \
@@ -112,6 +118,17 @@ set_prof_file(const char *file)
 		warning(_("sending profile to standard error"));
 		prof_fp = stderr;
 	}
+}
+
+/* close_prof_file --- close the output file for profiling or pretty-printing */
+
+void
+close_prof_file(void)
+{
+	if (prof_fp != NULL
+	    && fileno(prof_fp) != fileno(stdout)
+	    && fileno(prof_fp) != fileno(stderr))
+		(void) fclose(prof_fp);
 }
 
 /* init_profiling_signals --- set up signal handling for gawk --profile */
@@ -171,6 +188,7 @@ pp_push(int type, char *s, int flag, INSTRUCTION *comment)
 {
 	NODE *n;
 	getnode(n);
+	memset(n, '\0', sizeof(NODE));
 	n->pp_str = s;
 	n->pp_len = strlen(s);
 	n->flags = flag;
@@ -269,7 +287,11 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 					if (! rule_count[rule]++)
 						fprintf(prof_fp, _("\t# %s rule(s)\n\n"), ruletab[rule]);
 					indent(0);
-				}
+				} else if (! at_start)
+					putc('\n', prof_fp);
+				else
+					at_start = false;
+
 				fprintf(prof_fp, "%s {", ruletab[rule]);
 				end_line(pc);
 				skip_comment = true;
@@ -277,6 +299,10 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 				if (do_profile && ! rule_count[rule]++)
 					fprintf(prof_fp, _("\t# Rule(s)\n\n"));
 				ip1 = pc->nexti;
+				if (! at_start)
+					putc('\n', prof_fp);
+				else
+					at_start = false;
 				indent(ip1->exec_count);
 				if (ip1 != (pc + 1)->firsti) {		/* non-empty pattern */
 					pprint(ip1->nexti, (pc + 1)->firsti, NO_PPRINT_FLAGS);
@@ -308,7 +334,7 @@ pprint(INSTRUCTION *startp, INSTRUCTION *endp, int flags)
 			indent_out();
 			if (do_profile)
 				indent(0);
-			fprintf(prof_fp, "}\n\n");
+			fprintf(prof_fp, "}\n");
 			pc = (pc + 1)->lasti;
 			break;
 
@@ -432,7 +458,7 @@ cleanup:
 						+ indent_level + 1				// indent
 						+ pc->comment->memory->stlen + 3;		// tab comment
 
-				emalloc(str, char *, len, "pprint");
+				emalloc(str, char *, len);
 				sprintf(str, "%s%s%s%.*s %s", t1->pp_str, op2str(pc->opcode),
 						pc->comment->memory->stptr,
 						(int) (indent_level + 1), tabs, t2->pp_str);
@@ -1153,7 +1179,7 @@ cleanup:
 			len = f->pp_len + t->pp_len + cond->pp_len + 12;
 			if (qm_comment == NULL && colon_comment == NULL) {
 				// easy case
-				emalloc(str, char *, len, "pprint");
+				emalloc(str, char *, len);
 				sprintf(str, "%s ? %s : %s", cond->pp_str, t->pp_str, f->pp_str);
 			} else if (qm_comment != NULL && colon_comment != NULL) {
 				check_indent_level();
@@ -1161,7 +1187,7 @@ cleanup:
 					colon_comment->memory->stlen +
 					2 * (indent_level + 1) + 3 +		// indentation
 					t->pp_len + 6;
-				emalloc(str, char *, len, "pprint");
+				emalloc(str, char *, len);
 				sprintf(str,
 					"%s ? %s"	// cond ? comment
 					"%.*s   %s"	// indent true-part
@@ -1180,7 +1206,7 @@ cleanup:
 				len += qm_comment->memory->stlen +	// comment
 					1 * (indent_level + 1) + 3 +	// indentation
 					t->pp_len + 3;
-				emalloc(str, char *, len, "pprint");
+				emalloc(str, char *, len);
 				sprintf(str,
 					"%s ? %s"	// cond ? comment
 					"%.*s   %s"	// indent true-part
@@ -1196,7 +1222,7 @@ cleanup:
 				len += colon_comment->memory->stlen +		// comment
 					1 * (indent_level + 1) + 3 +		// indentation
 					t->pp_len + 3;
-				emalloc(str, char *, len, "pprint");
+				emalloc(str, char *, len);
 				sprintf(str,
 					"%s ? %s"	// cond ? true-part
 					" : %s"		// : comment
@@ -1285,7 +1311,7 @@ pp_string_fp(Func_print print_func, FILE *fp, const char *in_str,
 	efree(s);
 }
 
-
+#if defined(SIGHUP) || defined(SIGUSR1)
 /* just_dump --- dump the profile and function stack and keep going */
 
 static void
@@ -1299,7 +1325,9 @@ just_dump(int signum)
 	fflush(prof_fp);
 	signal(signum, just_dump);	/* for OLD Unix systems ... */
 }
+#endif	/* SIGUSR1 */
 
+#ifdef SIGHUP
 /* dump_and_exit --- dump the profile, the function stack, and exit */
 
 static void
@@ -1308,6 +1336,7 @@ dump_and_exit(int signum)
 	just_dump(signum);
 	final_exit(EXIT_FAILURE);
 }
+#endif	/* SIGHUP */
 
 /* print_lib_list --- print a list of all libraries loaded */
 
@@ -1338,7 +1367,7 @@ print_lib_list(FILE *prof_fp)
 		}
 	}
 	if (found)	/* we found some */
-		fprintf(prof_fp, "\n");
+		at_start = false;
 }
 
 /* print_include_list --- print a list of all files included */
@@ -1354,10 +1383,10 @@ print_include_list(FILE *prof_fp)
 		return;
 
 	for (s = srcfiles->next; s != srcfiles; s = s->next) {
-		if (s->stype == SRC_INC) {
+		if (s->stype == SRC_INC || s->stype == SRC_NSINC) {
 			if (! printed_header) {
 				printed_header = true;
-				fprintf(prof_fp, _("\n# Included files (-i and/or @include)\n\n"));
+				fprintf(prof_fp, _("\n# Included files (-i and/or @include and/or @nsinclude)\n\n"));
 			}
 			found = true;
 			fprintf(prof_fp, "# @include \"%s\"", s->src);
@@ -1369,7 +1398,7 @@ print_include_list(FILE *prof_fp)
 		}
 	}
 	if (found)	/* we found some */
-		fprintf(prof_fp, "\n");
+		at_start = false;
 }
 
 /* print_comment --- print comment text with proper indentation */
@@ -1380,6 +1409,13 @@ print_comment(INSTRUCTION* pc, long in)
 	char *text;
 	size_t count;
 	bool after_newline = false;
+
+	if (pc->memory->comment_type == BLOCK_COMMENT) {
+		if (! at_start && indent_level == 0)
+			putc('\n', prof_fp);
+		else
+			at_start = false;
+	}
 
 	count = pc->memory->stlen;
 	text = pc->memory->stptr;
@@ -1617,7 +1653,7 @@ pp_parenthesize(NODE *sp)
 	if (p[0] == '(')	// already parenthesized
 		return;
 
-	emalloc(p, char *, len + 3, "pp_parenthesize");
+	emalloc(p, char *, len + 3);
 	*p = '(';
 	memcpy(p + 1, sp->pp_str, len);
 	p[len + 1] = ')';
@@ -1690,7 +1726,7 @@ pp_string_or_typed_regex(const char *in_str, size_t len, int delim, bool typed_r
 /* make space for something l big in the buffer */
 #define chksize(l)  if ((l) > ofre) { \
 		long olen = obufout - obuf; \
-		erealloc(obuf, char *, osiz * 2, "pp_string"); \
+		erealloc(obuf, char *, osiz * 2); \
 		obufout = obuf + olen; \
 		ofre += osiz; \
 		osiz *= 2; \
@@ -1698,7 +1734,7 @@ pp_string_or_typed_regex(const char *in_str, size_t len, int delim, bool typed_r
 
 	/* initial size; 3 for delim + terminating null, 1 for @ */
 	osiz = len + 3 + 1 + (typed_regex == true);
-	emalloc(obuf, char *, osiz, "pp_string");
+	emalloc(obuf, char *, osiz);
 	obufout = obuf;
 	ofre = osiz - 1;
 
@@ -1751,7 +1787,7 @@ pp_number(NODE *n)
 	char *str;
 
 	assert((n->flags & NUMCONSTSTR) != 0);
-	emalloc(str, char *, n->stlen + 1, "pp_number");
+	emalloc(str, char *, n->stlen + 1);
 	strcpy(str, n->stptr);
 	return str;
 }
@@ -1783,10 +1819,10 @@ pp_list(int nargs, const char *paren, const char *delim)
 
 	if (pp_args == NULL) {
 		npp_args = nargs;
-		emalloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *), "pp_list");
+		emalloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *));
 	} else if (nargs > npp_args) {
 		npp_args = nargs;
-		erealloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *), "pp_list");
+		erealloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *));
 	}
 
 	delimlen = strlen(delim);
@@ -1809,7 +1845,7 @@ pp_list(int nargs, const char *paren, const char *delim)
 	}
 	comment = NULL;
 
-	emalloc(str, char *, len + 1, "pp_list");
+	emalloc(str, char *, len + 1);
 	s = str;
 	if (paren != NULL)
 		*s++ = paren[0];
@@ -1866,10 +1902,10 @@ pp_concat(int nargs)
 
 	if (pp_args == NULL) {
 		npp_args = nargs;
-		emalloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *), "pp_concat");
+		emalloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *));
 	} else if (nargs > npp_args) {
 		npp_args = nargs;
-		erealloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *), "pp_concat");
+		erealloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *));
 	}
 
 	/*
@@ -1883,7 +1919,7 @@ pp_concat(int nargs)
 		len += r->pp_len + delimlen + 2;
 	}
 
-	emalloc(str, char *, len + 1, "pp_concat");
+	emalloc(str, char *, len + 1);
 	s = str;
 
 	/* now copy in */
@@ -1957,7 +1993,7 @@ pp_group3(const char *s1, const char *s2, const char *s3)
 	len2 = strlen(s2);
 	len3 = strlen(s3);
 	l = len1 + len2 + len3 + 1;
-	emalloc(str, char *, l, "pp_group3");
+	emalloc(str, char *, l);
 	s = str;
 	if (len1 > 0) {
 		memcpy(s, s1, len1);
@@ -2031,6 +2067,7 @@ pp_func(INSTRUCTION *pc, void *data ATTRIBUTE_UNUSED)
 	if (do_profile)
 		indent(0);
 	fprintf(prof_fp, "}\n");
+	at_start = false;
 	return 0;
 }
 
@@ -2071,8 +2108,8 @@ pp_namespace(const char *name, INSTRUCTION *comment)
 	// info saved in Op_namespace instructions.
 	current_namespace = name;
 
-	// force newline, could be after a comment
-	fprintf(prof_fp, "\n");
+	if (! at_start)
+		fprintf(prof_fp, "\n");
 
 	if (do_profile)
 		indent(SPACEOVER);
@@ -2082,9 +2119,11 @@ pp_namespace(const char *name, INSTRUCTION *comment)
 	if (comment != NULL) {
 		putc('\t', prof_fp);
 		print_comment(comment, 0);
-		putc('\n', prof_fp);
+		// no newline here, print_comment puts one out
 	} else
-		fprintf(prof_fp, "\n\n");
+		fprintf(prof_fp, "\n");
+
+	at_start = false;
 }
 
 /* pp_namespace_list --- print the list, back to front, using recursion */
@@ -2114,7 +2153,7 @@ adjust_namespace(char *name, bool *malloced)
 		char *buf;
 		size_t len = 5 + strlen(name) + 1;
 
-		emalloc(buf, char *, len, "adjust_namespace");
+		emalloc(buf, char *, len);
 		sprintf(buf, "awk::%s", name);
 		*malloced = true;
 

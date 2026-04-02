@@ -366,7 +366,7 @@ $		return
 $!
 $mpfr:
 $		test_class = "mpfr"
-$		skip_reason = "Not yet implmented on VMS"
+$		skip_reason = "Not yet implemented on VMS"
 $		! mpfr has not yet been ported to VMS.
 $		gosub junit_report_skip
 $		return
@@ -753,10 +753,21 @@ $	return
 $
 $colonwarn:	echo "''test'"
 $	test_class = "gawk_ext"
+$   if f$search("sys$disk:[]_''test'*.tmp;*") .nes. ""
+$   then
+$       rm _'test'*.tmp;*
+$   endif
+$   if f$search("sys$disk:[]_''test'*.err;*") .nes. ""
+$   then
+$       rm _'test'*.err;*
+$   endif
+$   define/user sys$error _'test'.err
 $	gawk -f 'test'.awk 1 < 'test'.in > _'test'.tmp
+$   define/user sys$error _'test'_2.err
 $	gawk -f 'test'.awk 2 < 'test'.in > _'test'_2.tmp
+$   define/user sys$error _'test'_3.err
 $	gawk -f 'test'.awk 3 < 'test'.in > _'test'_3.tmp
-$	if f$search("sys$disk:[]_''test'_%.tmp;2") .nes. ""
+$	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
 $	then
 $	    delete sys$disk:[]_'test'_%.tmp;2
 $	endif
@@ -764,11 +775,16 @@ $	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
 $	then
 $	    delete sys$disk:[]_'test'.tmp;2
 $	endif
-$	append _'test'_2.tmp,_'test'_3.tmp _'test'.tmp
-$	cmp 'test'.ok sys$disk:[]_'test'.tmp;1
+$	append -
+       sys$disk:[]_'test'.tmp,sys$disk:[]_'test'.err,-
+	   sys$disk:[]_'test'_2.tmp,sys$disk:[]_'test'_2.err,-
+	   sys$disk:[]_'test'_3.tmp -
+	   _'test'_3.err
+$	cmp 'test'.ok sys$disk:[]_'test'_3.err;1
 $	if $status
 $	then
 $	    rm _'test'*.tmp;*
+$	    rm _'test'*.err;*
 $	    gosub junit_report_pass
 $	else
 $	    gosub junit_report_fail_diff
@@ -1424,7 +1440,7 @@ $	! this test could fail on slow machines or on a second boundary,
 $	! so if it does, double check the actual results
 $	! This test needs SYS$TIMEZONE_NAME and SYS$TIMEZONE_RULE
 $	! to be properly defined.
-$	! This test now needs GNV Corutils to work
+$	! This test now needs GNV Coreutils to work
 $	date_bin = "gnv$gnu:[bin]gnv$date.exe"
 $	if f$search(date_bin) .eqs. ""
 $	then
@@ -3058,7 +3074,7 @@ $rsstart3:
 $	echo "rsstart3"
 $	test_class = "gawk_ext"
 $!      rsstart3 with pipe fails,
-$!	presumeably due to PIPE's use of print file format
+$!	presumably due to PIPE's use of print file format
 $!	if .not.pipeok
 $!	then	echo "Without the PIPE command, ''test' can't be run."
 $!		On warning then  return
@@ -3124,7 +3140,7 @@ $	if test.eqs."rtlenmb" then  GAWKLOCALE = "en_US.UTF-8"
 $	pipe -
 	gawk -- "BEGIN {printf ""0\n\n\n1\n\n\n\n\n2\n\n""; exit}" | -
 	gawk -- "BEGIN {RS=""""}; {print length(RT)}" >_'test'.tmp
-$	if test.eqs."rtlenmb" then  delet_/Symbol/Local GAWKLOCALE
+$	if test.eqs."rtlenmb" then  delete/Symbol/Local GAWKLOCALE
 $	if test.eqs."rtlenmb" then  f = "rtlen.ok"
 $	if f$search("sys$disk:[]_''test'.tmp;2") .nes. ""
 $	then
@@ -3770,6 +3786,10 @@ $profile2:  echo "''test'"
 $	test_class = "gawk_ext"
 $	gawk --profile -v "sortcmd=SORT sys$input: sys$output:" -
 			-f xref.awk dtdgport.awk > _NL:
+$!  Test passes, but verification failing.
+$   skip_reason = "Verification bug in VMS 9.2-2 edit/sum access violation
+$   gosub junit_report_skip
+$   return
 $	! sed <awkprof.out 1,2d >_profile2.tmp
 $	sumslp awkprof.out /update=sys$input: /output=_'test'.tmp
 -1,2

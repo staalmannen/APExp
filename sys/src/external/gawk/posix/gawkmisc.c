@@ -1,6 +1,7 @@
 /* gawkmisc.c --- miscellaneous gawk routines that are OS specific.
 
-   Copyright (C) 1986, 1988, 1989, 1991 - 1998, 2001 - 2004, 2011, 2021, 2022, 2023,
+   Copyright (C) 1986, 1988, 1989, 1991 - 1998, 2001 - 2004, 2011,
+   2021, 2022, 2023, 2025, 2026
    the Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -24,6 +25,26 @@
 #include <sys/cygwin.h>
 #endif
 #include <io.h>		/* for declaration of setmode(). */
+#endif
+
+#ifdef HAVE_SYS_PERSONALITY_H	// for linux
+#include <sys/personality.h>
+#endif
+
+#ifdef HAVE_SPAWN_H
+#include <spawn.h>	// for macos
+#endif
+
+#ifdef HAVE__NSGETEXECUTABLEPATH
+#include <mach-o/dyld.h>
+#endif
+
+#ifdef HAVE_SYS_PROCCTL_H
+#include <sys/procctl.h>
+#endif
+
+#ifdef HAVE_SYS_SYSCTL_H
+#include <sys/sysctl.h>
 #endif
 
 const char quote = '\'';
@@ -219,10 +240,8 @@ os_isreadable(const awk_input_buf_t *iobuf, bool *isdir)
 	switch (iobuf->sbuf.st_mode & S_IFMT) {
 	case S_IFREG:
 	case S_IFCHR:	/* ttys, /dev/null, .. */
-#ifndef PLAN9
 #ifdef S_IFSOCK
 	case S_IFSOCK:
-#endif
 #endif
 #ifdef S_IFIFO
 	case S_IFIFO:
@@ -297,6 +316,111 @@ init_sockets(void)
 void
 os_maybe_set_errno(void)
 {
+}
+
+/* os_disable_aslr --- disable Address Space Layout Randomization */
+
+void
+os_disable_aslr(const char *persist_file, char **argv)
+{
+#if defined(HAVE_PERSONALITY) && defined(HAVE_ADDR_NO_RANDOMIZE)
+	// This code is Linux specific, both the reliance on /proc/self/exe
+	// and the personality system call.
+	if (persist_file != NULL) {
+		const char *cp = getenv("GAWK_PMA_REINCARNATION");
+
+		if (cp == NULL) {
+			static const char exe[] = "/proc/self/exe";
+
+			(void) setenv("GAWK_PMA_REINCARNATION", "true", true);
+			if (personality(PER_LINUX | ADDR_NO_RANDOMIZE) < 0) {
+				fprintf(stderr, _("warning: personality: %s\n"),
+							strerror(errno));
+				fflush(stderr);
+				// do the exec anyway...
+			}
+			execv(exe, argv);
+		} else
+			(void) unsetenv("GAWK_PMA_REINCARNATION");
+	}
+#endif
+
+#if defined(HAVE__NSGETEXECUTABLEPATH) && defined(HAVE_POSIX_SPAWNP)
+	// This code is for macos
+	if (persist_file != NULL) {
+		const char *cp = getenv("GAWK_PMA_REINCARNATION");
+
+		if (cp == NULL) {
+			char fullpath[BUFSIZ];
+			int n;
+			posix_spawnattr_t p_attr;
+			int status;
+			pid_t pid;
+			extern char **environ;
+			uint32_t size = BUFSIZ;
+
+			memset(fullpath, 0, BUFSIZ);
+			n = _NSGetExecutablePath(fullpath, &size);
+
+			putenv("GAWK_PMA_REINCARNATION=true");
+
+			posix_spawnattr_init(&p_attr);
+			posix_spawnattr_setflags(&p_attr, 0x100);
+			status = posix_spawnp(&pid, fullpath, NULL, &p_attr, argv, environ);
+			if (status == 0) {
+				if (waitpid(pid, &status,  WUNTRACED) != -1) {
+					if (WIFEXITED(status))
+						exit(WEXITSTATUS(status));	// use original exit code
+				} else {
+					fprintf(stderr, _("waitpid: got exit status %#o\n"), status);
+					exit(EXIT_FATAL);
+				}
+			} else {
+				fprintf(stderr, _("fatal: posix_spawnp: %s\n"), strerror(errno));
+				exit(EXIT_FATAL);
+			}
+		} else
+			(void) unsetenv("GAWK_PMA_REINCARNATION");
+	}
+#endif
+
+#if HAVE_SYS_PROCCTL_H && HAVE_SYS_SYSCTL_H && HAVE_PROCCTL && HAVE_SYSCTL && \
+	defined(PROC_ASLR_FORCE_DISABLE) && defined(PROC_ASLR_CTL)
+	// This code is for FreeBSD.
+	if (persist_file != NULL) {
+		const char *cp = getenv("GAWK_PMA_REINCARNATION");
+
+		if (cp == NULL) {
+			// Retrieve the full path of this file
+			int request[4];
+			request[0] = CTL_KERN;
+			request[1] = KERN_PROC;
+			request[2] = KERN_PROC_PATHNAME;
+			request[3] = -1; // Special PID -1 for the current process
+
+			char exe[PATH_MAX];
+			size_t len = sizeof(exe);
+			if (sysctl(request, 4, exe, &len, NULL, 0) == -1) {
+				fprintf(stderr, _("warning: sysctl: %s\n"),
+							strerror(errno));
+				fflush(stderr);
+				return;
+			}
+			
+			int action = PROC_ASLR_FORCE_DISABLE;
+			// pid of 0 means getpid()
+			if (procctl(P_PID, 0, PROC_ASLR_CTL, & action) < 0) {
+				fprintf(stderr, _("warning: procctl: %s\n"),
+							strerror(errno));
+				fflush(stderr);
+				// do the exec anyway...
+			}
+			(void) setenv("GAWK_PMA_REINCARNATION", "true", true);
+			execv(exe, argv);
+		} else
+			(void) unsetenv("GAWK_PMA_REINCARNATION");
+	}
+#endif
 }
 
 // For MSYS, restore behavior of working in text mode.

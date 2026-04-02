@@ -55,6 +55,7 @@ in_recipe && /^\t/ {
 # End of collected recipe, print it out
 in_recipe && /(^[^\t])|(^$)/ {
 	in_recipe = 0
+	fix_recipe_for_cmp(name)
 	print_recipe()
 
 	print
@@ -69,11 +70,25 @@ process		{ print }
 function substitutions(test, string)
 {
 	# locales
-	gsub(/en_US.UTF-8/, "ENU_USA.1252", string)
-	gsub(/fr_FR.UTF-8/, "FRA_FRA.1252", string)
-	gsub(/ja_JP.UTF-8/, "JPN_JPN.932", string)
-	gsub(/el_GR.iso88597/, "ell_GRC.1253", string)
-	gsub(/ru_RU.UTF-8/, "RUS_RUS.1251", string)
+	if (string ~ /GAWKLOCALE=[a-zA-Z_]+\.([^ ;]+)/) {
+	    n = split(string, codeset, /[.;]/)
+	    if (codeset[2] == "UTF-8")
+		codepage = "65001"
+	    else if (codeset[2] ~ /iso88597/)
+		codepage = "1253"
+	    else
+		codepage = ""
+	}
+	else
+	    codepage = ""
+
+	gsub(/en_US.UTF-8/, "ENU_USA", string)
+	gsub(/fr_FR.UTF-8/, "FRA_FRA", string)
+	gsub(/ja_JP.UTF-8/, "JPN_JPN", string)
+	gsub(/el_GR.iso88597/, "ELL_GRC", string)
+	gsub(/ru_RU.UTF-8/, "RUS_RUS", string)
+	if (codepage != "")
+	    gsub(/export GAWKLOCALE ?;/, "& $(CHCP) " codepage ";", string)
 
 	# command for `ls'
 	gsub(/@-ls/, "@-$(LS)", string)
@@ -82,18 +97,39 @@ function substitutions(test, string)
 	gsub(/-F\//, "-F$(SLASH)", string)
 	gsub(/=@\//, "=@$(SLASH)", string)
 
-	if (string ~ /\$\(CMP\)/ && test in testoutcmp) {
-		gsub(/\$\(CMP\)/, "$(TESTOUTCMP)", string)
-		delete testoutcmp[test]
-	}
+	# We need to do some additional chores
+	sub(/ machine-msg-end/, "& cleanup-codepage", string)
 
 	return string
+}
+
+# fix_recipe_for_cmp --- fix $(CMP) in all lines of a recipe
+
+function fix_recipe_for_cmp(test,	i, string)
+{
+	if (! (test in testoutcmp))
+		return
+
+	for (i in recipe_lines) {
+		string = recipe_lines[i]
+		if (string ~ /\$\(CMP\)/ && test in testoutcmp) {
+			gsub(/\$\(CMP\)/, "$(TESTOUTCMP)", string)
+			recipe_lines[i] = string
+		}
+	}
+	delete testoutcmp[test]
 }
 
 # print_recipe --- print out the recipe
 
 function print_recipe(		i, start)
 {
+	# Add our special recipe
+	if (name == "env-check") {
+		print "cleanup-codepage:"
+		print "\t@-$(CHCP) $(ORIGCP)"
+		print
+	}
 	print recipe_lines[1]	# target:
 	if (line == 1)
 		return
@@ -101,6 +137,8 @@ function print_recipe(		i, start)
 	# First line if it's @echo $@
 	if (recipe_lines[2] ~ /\t@echo [$]@/) {
 		start = 3
+		# Append restoration of the original console codepage
+		sub(/@echo [$]@/, "@echo $@; $(CHCP) $(ORIGCP)", recipe_lines[2])
 		print recipe_lines[2]
 	} else
 		start = 2
@@ -127,6 +165,11 @@ function print_recipe(		i, start)
 	# Print all the lines but the last
 	for (i = start; i <= line; i++)
 		print recipe_lines[i]
+
+	if (name == "printlang") {
+		# Print the original codepage
+		print "\t@-$(CHCP1)"
+	}
 }
 
 # start_new_recipe --- start collecting data from scratch

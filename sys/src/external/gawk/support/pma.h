@@ -22,6 +22,10 @@
 #ifndef PMA_H_INCLUDED
 #define PMA_H_INCLUDED
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 // version strings of interface and implementation should match
 #define PMA_H_VERSION "2022.10Oct.30.1667172241 (Avon 8-g1)"
 extern const char pma_version[];
@@ -83,5 +87,9 @@ extern void pma_check_and_dump(void);
    debugging (v == 0xdeadDEADbeefBEEF) and for preparing backing file
    to be re-sparsified with fallocate (v == 0x0). */
 extern void pma_set_avail_mem(const unsigned long v);
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif // PMA_H_INCLUDED

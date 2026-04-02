@@ -50,6 +50,8 @@ isarray(a_scalar) = 0
 
 test_array_create returned 1
 good: we have an array
+hello element value inside function is world
+hello element global scope is world
 Initial value of LINT is 0
 print_do_lint: lint = 0
 print_do_lint() returned 1

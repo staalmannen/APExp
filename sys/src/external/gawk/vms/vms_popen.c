@@ -86,7 +86,7 @@ static int pipes_lim = 0;
 #define psize(n) ((n) * sizeof(PIPE))
 #define expand_pipes(k) do {  PIPE *new_p; \
 	int new_p_lim = ((k) / _NFILE + 1) * _NFILE; \
-	emalloc(new_p, PIPE *, psize(new_p_lim), "expand_pipes"); \
+	emalloc(new_p, PIPE *, psize(new_p_lim)); \
 	if (pipes_lim > 0) \
 		memcpy(new_p, pipes, psize(pipes_lim)),  free(pipes); \
 	memset(new_p + psize(pipes_lim), 0, psize(new_p_lim - pipes_lim)); \
@@ -287,11 +287,11 @@ save_translation( const struct dsc$descriptor_s *logname )
 	    use three entries for each translation.
 	 */
 	itmlst_size = (3 * (max_trans_indx + 1) + 1) * sizeof(Itm);
-	emalloc(itmlst, Itm *, itmlst_size, "save_translation");
+	emalloc(itmlst, Itm *, itmlst_size);
 	for (i = 0; i <= max_trans_indx; i++) {
 	    struct def { U_Long indx, attr; U_Short len;
 			 char str[LNM$C_NAMLENGTH], eos; } *wrk;
-	    emalloc(wrk, struct def *, sizeof (struct def), "save_translation");
+	    emalloc(wrk, struct def *, sizeof (struct def));
 	    wrk->indx = (U_Long)i;  /* this one's an input value for $trnlnm */
 	    SetItmS(itmlst[3*i+0], LNM$_INDEX, &wrk->indx);
 	    SetItmS(itmlst[3*i+1], LNM$_ATTRIBUTES, &wrk->attr),  wrk->attr = 0;

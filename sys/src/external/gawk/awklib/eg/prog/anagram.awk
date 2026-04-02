@@ -1,7 +1,12 @@
 # anagram.awk --- An implementation of the anagram-finding algorithm
 #                 from Jon Bentley's "Programming Pearls," 2nd edition.
-#                 Addison Wesley, 2000, ISBN 0-201-65788-0.
+#                 Addison Wesley, 2000, ISBN-10: 0-201-65788-0,
+#                 ISBN-13: 978-0-201-65788-3.
 #                 Column 2, Problem C, section 2.8, pp 18-20.
+#
+# This file and how to use it are described in the manual.
+# Therefore, we respectfully advise you to Read The Fine Manual
+# for more information.
 #
 # This program requires gawk 4.0 or newer.
 # Required gawk-specific features:

@@ -1,6 +1,6 @@
 /* vms_misc.c -- sustitute code for missing/different run-time library routines.
 
-   Copyright (C) 1991-1993, 1996-1997, 2001, 2003, 2009, 2010, 2011, 2014, 2022, 2023,
+   Copyright (C) 1991-1993, 1996-1997, 2001, 2003, 2009, 2010, 2011, 2014, 2022, 2023, 2025,
    the Free Software Foundation, Inc.
 
    This program is free software; you can redistribute it and/or modify
@@ -59,7 +59,7 @@ vms_strdup( const char *str )
     char *result;
     int len = strlen(str);
 
-    emalloc(result, char *, len+1, "strdup");
+    emalloc(result, char *, len+1);
     return strcpy(result, str);
 }
 

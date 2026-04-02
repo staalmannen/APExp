@@ -1,5 +1,5 @@
 /* Extended regular expression matching and search library.
-   Copyright (C) 2002-2023 Free Software Foundation, Inc.
+   Copyright (C) 2002-2026 Free Software Foundation, Inc.
    This file is part of the GNU C Library.
    Contributed by Isamu Hasegawa <isamu@yamato.ibm.com>.
 
@@ -216,7 +216,7 @@ build_wcs_buffer (re_string_t *pstr)
   end_idx = (pstr->bufs_len > pstr->len) ? pstr->len : pstr->bufs_len;
   for (byte_idx = pstr->valid_len; byte_idx < end_idx;)
     {
-      wchar_t wc;
+      char32_t wc;
       const char *p;
 
       remain_len = end_idx - byte_idx;
@@ -242,7 +242,7 @@ build_wcs_buffer (re_string_t *pstr)
 	{
 	  /* We treat these cases as a singlebyte character.  */
 	  mbclen = 1;
-	  wc = (wchar_t) pstr->raw_mbs[pstr->raw_mbs_idx + byte_idx];
+	  wc = (char32_t) pstr->raw_mbs[pstr->raw_mbs_idx + byte_idx];
 	  if (__glibc_unlikely (pstr->trans != NULL))
 	    wc = pstr->trans[wc];
 	  pstr->cur_state = prev_st;
@@ -290,14 +290,14 @@ build_wcs_upper_buffer (re_string_t *pstr)
     {
       while (byte_idx < end_idx)
 	{
-	  wchar_t wc;
+	  char32_t wc;
 	  unsigned char ch = pstr->raw_mbs[pstr->raw_mbs_idx + byte_idx];
 
 	  if (isascii (ch) && mbsinit (&pstr->cur_state))
 	    {
-	      /* The next step uses the assumption that wchar_t is encoded
+	      /* The next step uses the assumption that char32_t is encoded
 		 ASCII-safe: all ASCII values can be converted like this.  */
-	      wchar_t wcu = __towupper (ch);
+	      char32_t wcu = __towupper (ch);
 	      if (isascii (wcu))
 		{
 		  pstr->mbs[byte_idx] = wcu;
@@ -314,7 +314,7 @@ build_wcs_upper_buffer (re_string_t *pstr)
 			       + byte_idx), remain_len, &pstr->cur_state);
 	  if (__glibc_likely (0 < mbclen && mbclen < (size_t) -2))
 	    {
-	      wchar_t wcu = __towupper (wc);
+	      char32_t wcu = __towupper (wc);
 	      if (wcu != wc)
 		{
 		  size_t mbcdlen;
@@ -343,7 +343,7 @@ build_wcs_upper_buffer (re_string_t *pstr)
 		 at the end of the string, or '\0'.  Just use the byte.  */
 	      pstr->mbs[byte_idx] = ch;
 	      /* And also cast it to wide char.  */
-	      pstr->wcs[byte_idx++] = (wchar_t) ch;
+	      pstr->wcs[byte_idx++] = (char32_t) ch;
 	      if (__glibc_unlikely (mbclen == (size_t) -1))
 		pstr->cur_state = prev_st;
 	    }
@@ -361,7 +361,7 @@ build_wcs_upper_buffer (re_string_t *pstr)
   else
     for (src_idx = pstr->valid_raw_len; byte_idx < end_idx;)
       {
-	wchar_t wc;
+	char32_t wc;
 	const char *p;
       offsets_needed:
 	remain_len = end_idx - byte_idx;
@@ -382,7 +382,7 @@ build_wcs_upper_buffer (re_string_t *pstr)
 	mbclen = __mbrtowc (&wc, p, remain_len, &pstr->cur_state);
 	if (__glibc_likely (0 < mbclen && mbclen < (size_t) -2))
 	  {
-	    wchar_t wcu = __towupper (wc);
+	    char32_t wcu = __towupper (wc);
 	    if (wcu != wc)
 	      {
 		size_t mbcdlen;
@@ -466,7 +466,7 @@ build_wcs_upper_buffer (re_string_t *pstr)
 	    ++src_idx;
 
 	    /* And also cast it to wide char.  */
-	    pstr->wcs[byte_idx++] = (wchar_t) ch;
+	    pstr->wcs[byte_idx++] = (char32_t) ch;
 	    if (__glibc_unlikely (mbclen == (size_t) -1))
 	      pstr->cur_state = prev_st;
 	  }
@@ -497,7 +497,7 @@ re_string_skip_chars (re_string_t *pstr, Idx new_raw_idx, wint_t *last_wc)
   for (rawbuf_idx = pstr->raw_mbs_idx + pstr->valid_raw_len;
        rawbuf_idx < new_raw_idx;)
     {
-      wchar_t wc2;
+      char32_t wc2;
       Idx remain_len = pstr->raw_len - rawbuf_idx;
       prev_st = pstr->cur_state;
       mbclen = __mbrtowc (&wc2, (const char *) pstr->raw_mbs + rawbuf_idx,
@@ -702,13 +702,13 @@ re_string_reconstruct (re_string_t *pstr, Idx idx, int eflags)
 		    end = pstr->raw_mbs;
 		  p = raw + offset - 1;
 #ifdef _LIBC
-		  /* We know the wchar_t encoding is UCS4, so for the simple
+		  /* We know the char32_t encoding is UCS4, so for the simple
 		     case, ASCII characters, skip the conversion step.  */
 		  if (isascii (*p) && __glibc_likely (pstr->trans == NULL))
 		    {
 		      memset (&pstr->cur_state, '\0', sizeof (mbstate_t));
 		      /* pstr->valid_len = 0; */
-		      wc = (wchar_t) *p;
+		      wc = (char32_t) *p;
 		    }
 		  else
 #endif
@@ -716,7 +716,7 @@ re_string_reconstruct (re_string_t *pstr, Idx idx, int eflags)
 		      if ((*p & 0xc0) != 0x80)
 			{
 			  mbstate_t cur_state;
-			  wchar_t wc2;
+			  char32_t wc2;
 			  Idx mlen = raw + pstr->len - p;
 			  unsigned char buf[6];
 			  size_t mbclen;
@@ -936,9 +936,15 @@ re_node_set_alloc (re_node_set *set, Idx size)
 {
   set->alloc = size;
   set->nelem = 0;
+#if GAWK
+  // PMA returns NULL for malloc() of zero bytes.
+  // In general, fudge it, in case of non-GLIBC malloc()
+  // that also doesn't like a size of zero. Sheesh.
+  if (size == 0)
+    size = 1;
+#endif
   set->elems = re_malloc (Idx, size);
-  if (__glibc_unlikely (set->elems == NULL)
-      && (MALLOC_0_IS_NONNULL || size != 0))
+  if (__glibc_unlikely (set->elems == NULL))
     return REG_ESPACE;
   return REG_NOERROR;
 }
@@ -1596,7 +1602,7 @@ create_ci_newstate (const re_dfa_t *dfa, const re_node_set *nodes,
   reg_errcode_t err;
   re_dfastate_t *newstate;
 
-  newstate = (re_dfastate_t *) calloc (sizeof (re_dfastate_t), 1);
+  newstate = (re_dfastate_t *) calloc (1, sizeof (re_dfastate_t));
   if (__glibc_unlikely (newstate == NULL))
     return NULL;
   err = re_node_set_init_copy (&newstate->nodes, nodes);
@@ -1644,7 +1650,7 @@ create_cd_newstate (const re_dfa_t *dfa, const re_node_set *nodes,
   reg_errcode_t err;
   re_dfastate_t *newstate;
 
-  newstate = (re_dfastate_t *) calloc (sizeof (re_dfastate_t), 1);
+  newstate = (re_dfastate_t *) calloc (1, sizeof (re_dfastate_t));
   if (__glibc_unlikely (newstate == NULL))
     return NULL;
   err = re_node_set_init_copy (&newstate->nodes, nodes);

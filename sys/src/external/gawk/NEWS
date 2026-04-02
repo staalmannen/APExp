@@ -1,8 +1,171 @@
-   Copyright (C) 2019, 2020, 2021, 2022, 2023 Free Software Foundation, Inc.
+   Copyright (C) 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026
+   Free Software Foundation, Inc.
    
    Copying and distribution of this file, with or without modification,
    are permitted in any medium without royalty provided the copyright
    notice and this notice are preserved.
+
+Changes from 5.3.x to 5.4.0
+---------------------------
+
+1. This release now uses Mike Haertel's MinRX regular expression matcher
+   as the default regexp engine. The old regex and dfa engines are still
+   available. More detail is available in the manual, and in the file
+   README_d/README.matchers. At the very least, read that file!
+
+2. The manual, in the Bugs section, now makes it explicit that
+   (a) Ad hominem attacks on the lists will not be tolerated, and
+   (b) Discussion of proprietary software is strongly discouraged.
+   Repeated offenses are grounds for being banned from the lists.
+
+3. There is now a new directive, @nsinclude, which works like @include
+   but does not reset the namespace for the included file to "awk". See
+   the manual for details.
+
+4. When using lshift() or rshift() and attempting to shift by as many
+   or more bits than in a uintmax_t, gawk returns zero, instead of
+   whatever the C compiler and hardware might have done.
+
+5. Gawk's use of persistent memory has changed somewhat:
+   A. Gawk now stores additional meta-information in the backing file.
+      This means that if you have a backing file with important data
+      in it, you should dump the data to a text file using the old version,
+      create a new backing file, and then read your data back in with
+      the new version, to a *brand new* backing file.
+   B. Gawk generates a warning if the version of gawk saved in the backing
+      file doesn't match that of the current running gawk.
+   C. It's now possible to use persistent memory and dynamic extensions
+      without problems. Gawk notices if an extension is being loaded from
+      a different path than what was first used and produces a fatal error
+      in this case.
+
+6. The ordchr extension now supports multibyte / wide characters.
+
+7. Per the 2024 POSIX standard, `length(array)' is no longer an extension,
+   but a regular feature.  Thus --posix no longer rejects it and --lint
+   no longer warns about it.
+
+8. The --traditional option has been rationalized to bring gawk into
+   sync with BWK awk. It no longer affects the return code from system(),
+   and it no longer prevents using a regexp for RS. Internally, the
+   code was cleaned up some as well.
+
+9. Assertions in the C code are now enabled.  To disable them, manually
+   edit the various Makefiles after running configure and before
+   running make. You will need to add -DNDEBUG to the CFLAGS variable.
+
+10. PMA should now work on OpenBSD 7, FreeBSD 12 - 16, NetBSD 10 and 11,
+    and MidnightBSD 3 and 4.
+
+11. Hexadecimal floating-point values may now be used in program source code,
+    with strtonum(), and with the -n/--non-decimal-data option.  See the
+    manual for details.
+
+12. A large number of small "replacement" files for standard functions
+    have been removed. These functions are now so standard that we
+    simply expect them to always be available. This simplifies the
+    distribution and the code maintenance.
+
+13. Support for UDP in gawk's networking support is now obsolete.
+    It never worked very well. It will be removed in version 6.0.
+    Gawk issues a warning when attempting to use it.
+
+14. Reading regular disk input files should be somewhat faster now,
+    since gawk no longer checks for timeouts on such files.  On one
+    very large file, gawk '{ print }' saw approximately a 9% speedup.
+
+15. The MinGW port of gawk for MS-Windows now supports UTF-8 encoded
+    non-ASCII text when the console window where gawk runs uses the
+    Windows codepage 65001 for output, even if the system-wide locale
+    specifies another codepage.
+
+    Similarly, the Cygwin port now also fully supports UTF-8.
+
+16. There is a new option to configure: --enable-O3.  This causes gcc to
+    use -O3 instead of -O2 when compiling gawk.  This is not the default
+    because experience in some projects has shown (sadly) that -O3 can cause
+    bugs.
+
+17. There is a new translation: Arabic. The .gmo files for the ca, da, fi,
+    ja, ka, ms, and vi translations are no longer built or included in
+    the distribution, as those translations have gone too long without
+    being updated.  The .po files remain in the distribution, should
+    any volunteers wish to come forward to update them.
+
+18. OpenVMS support has been updated. This release builds on
+    Alpha, Itanium and x86_64.
+
+19. As usual, a number of small bugs have been fixed; see the ChangeLog
+    for the details.
+
+Changes from 5.3.2 to 5.3.x
+---------------------------
+
+1. The Hebrew translation has been revived.
+
+2. All non-standard variables are now not installed for --traditional
+   and --posix.
+
+3. It's been discovered that persistent memory and dynamic extensions don't mix.
+   For now, trying this combination produces a fatal error. It may one day
+   get fixed. Or, it may not.
+
+4. A bug in the API has been fixed whereby using a numeric index to set an
+   array element will work. As a result, the API minor version was increased to 1.
+
+Changes from 5.3.1 to 5.3.2
+---------------------------
+
+1. The pretty printer now produces fewer spurious newlines; at the
+   outermost level it now adds newlines between block comments and
+   the block or function that follows them. The extra final newline
+   is no longer produced.
+
+2. OpenVMS 9.2-2 x86_64 is now supported.
+
+3. On Linux and macos systems, the -no-pie linker flag is no longer required.
+   PMA now works on macos systems with Apple silicon, and not just
+   Intel systems.
+
+4. Still more subtle issues related to uninitialized array elements have
+   been fixed.
+
+5. Associative arrays should now not grow quite as fast as they used to.
+
+6. The code and documentation are now consistent with each other with
+   respect to path searching and adding .awk to the filename. Both
+   are always done, even with --posix and --traditional.
+
+7. As usual, there have been several minor code cleanups and bug fixes.
+   See the ChangeLog for details.
+
+Changes from 5.3.0 to 5.3.1
+---------------------------
+
+1. More subtle issues related to uninitialized array elements have
+   been fixed.
+
+2. A number of bugs in the debugger related to handling of arrays
+   have been fixed.
+
+3. Some subtle bugs in the API have been fixed.
+
+4. Use of MPFR is now possible again on 32-bit Power PC Mac systems.
+
+5. Race conditions around broken pipes for system() and read and write
+   pipes should now be closed off.
+
+6. Support for OSF/1 has been removed.
+
+7. The never-documented --nostalgia option has been removed. It was
+   causing bug reports.
+
+8. The implementation of printf/sprintf has been thoroughly reworked
+   in order to make the code more maintainable and to fix a goodly
+   number of corner cases.
+
+9. As usual, there have been several minor code cleanups and bug fixes.
+   See the ChangeLog for details.
 
 Changes from 5.2.x to 5.3.0
 ---------------------------
@@ -44,7 +207,7 @@ Changes from 5.2.2 to 5.2.x
    features, see the manual or its man page. As a result, the
    readdir_test.c extension has been removed.
 
-2. We have a new translation: Ukranian.
+2. We have a new translation: Ukrainian.
 
 3. Several subtle issues related to null regexp matches around
    multibyte characters have been fixed.

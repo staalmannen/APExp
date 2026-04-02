@@ -1,5 +1,9 @@
 # labels.awk --- print mailing labels
 #
+# This file and how to use it are described in the manual.
+# Therefore, we respectfully advise you to Read The Fine Manual
+# for more information.
+#
 # Arnold Robbins, arnold@skeeve.com, Public Domain
 # June 1992
 # December 2010, minor edits

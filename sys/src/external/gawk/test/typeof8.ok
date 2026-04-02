@@ -1,0 +1,5 @@
+untyped
+test 0
+unassigned
+gawk: typeof8.awk:6: fatal: attempt to use scalar `a["1"]' as an array
+EXIT CODE: 2

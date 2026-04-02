@@ -178,7 +178,7 @@ function generate_shell(x,	s)
 	print x ":"
 	printf "\t@echo $@\n"
 
-	printf "\t@-$(LOCALES) AWK=\"$(AWKPROG)\" \"$(srcdir)\"/$@.sh %s > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@\n", s
+	printf "\t@-$(LOCALES) AWK=\"$(AWKPROG) $(GAWK_TEST_ARGS)\" \"$(srcdir)\"/$@.sh %s > _$@ 2>&1 || echo EXIT CODE: $$? >>_$@\n", s
 	printf "\t@-$(CMP) \"$(srcdir)\"/$@.ok _$@ && rm -f _$@\n\n"
 	
 }
@@ -268,7 +268,7 @@ function generate(x,	s, i, locale_string)
 	printf "AWKPATH=\"$(srcdir)\" $(AWK) -f $@.awk %s >_$@ 2>&1 || echo EXIT CODE: $$? >>_$@\n", s
 
 	if ((x "-mpfr.ok") in extra_dist) {
-		printf "\t@-if echo \"$$GAWK_TEST_ARGS\" | egrep -q -e '-M|--bignum' > /dev/null ; \\\n"
+		printf "\t@-if echo \"$$GAWK_TEST_ARGS\" | egrep -s -e '-M|--bignum' > /dev/null ; \\\n"
 		printf "\tthen $(CMP) \"$(srcdir)\"/$@-mpfr.ok _$@ && rm -f _$@ ; \\\n"
 		printf "\telse $(CMP) \"$(srcdir)\"/$@.ok _$@ && rm -f _$@ ; fi\n\n"
 	} else {

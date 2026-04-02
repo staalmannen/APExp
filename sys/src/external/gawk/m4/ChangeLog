@@ -1,3 +1,87 @@
+2026-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.4.0: Release tar ball made.
+
+2026-02-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* arch.m4: Change value of -qlanglvl for z/OS. Thanks to
+	Daniel Richard G. <skunk@iskunk.org> for the fix.
+
+2026-02-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pma.m4: Enable FreeBSD 12-15 and MidnightBSD 3 and 4.
+
+2026-02-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pma.m4: Enable NetBSD 11 too.
+
+2026-02-04         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pma.m4: Add FreeBSD support for PMA. For now, just FreeBSD 16.
+
+2026-02-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pma.m4: Add correct NetBSD support for PMA.
+
+2026-01-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pma.m4: FreeBSD and NetBSD don't support PMA. Remove them.
+
+2026-01-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pma.m4: Add FreeBSD 14 to list of non-PIE systems.
+
+2026-01-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pma.m4. Use [[xx]] to get [xx]; simplifies the script.
+
+2025-10-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pma.m4: OpenBSD requires -no-pie. Add NetBSD 10 and 11 to the
+	list of systems that don't have PIE executables. Thanks to
+	Nelson H.F. Beebe for all the testing.
+
+2025-08-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* libtool.m4: Add support for slimcc C compiler.
+
+2025-04-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.2: Release tar made.
+
+2025-03-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pma.m4: Use AC_COMPILE_IF_ELSE instead of AC_TRY_COMPILE.
+	Thanks to autoreconf.
+
+2025-02-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pma.m4: Add compilation check for ADDR_NO_RANDOMIZE. It's an
+	enum, not a define.  It's not available on really old Linux
+	systems, like CentOS 5.
+
+2025-02-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pma.m4: On macos, no longer need to do anything special,
+	but we do have to have a case for it so that PMA is enabled.
+
+2025-01-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pma.m4: On Linux, no longer need to do anything special,
+	but we do have to have a case for it so that PMA is enabled.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.1: Release tar made.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* readline.m4: Update copyright year.
+
+2024-05-26         Ross Burton           <ross.burton@arm.com>
+
+	* readline.m4: Add more needed includes for cross-compiling case.
+
 2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* 5.3.0: Release tar ball made.

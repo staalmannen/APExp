@@ -13,8 +13,8 @@ $!
 $! Put things back on error.
 $ on warning then goto all_exit
 $!
-$ arch_type = f$getsyi("ARCH_NAME")
-$ arch_code = f$extract(0, 1, arch_type)
+$ arch_name = f$getsyi("ARCH_NAME")
+$ arch_code = f$extract(0, 1, arch_name)
 $!
 $ can_build = 1
 $ producer = f$trnlnm("GNV_PCSI_PRODUCER")
@@ -43,18 +43,26 @@ $   write sys$output "Not able to build a kit."
 $   goto all_exit
 $ endif
 $!
+$! Prefer MMK over MMS
+$ if f$type(mmk) .eqs. "STRING"
+$ then
+$   mms :== 'mmk'
+$ else
+$!  mms needs a little help
+$   __'arch_name'__ == "TRUE"
+$ endif
 $!
 $! Build the gawk image(s)
 $!-------------------------
 $ if f$search("gawk.exe") .eqs. ""
 $ then
-$   mmk/descrip=[.vms]descrip.mms gawk
+$   mms/descrip=[.vms]descrip.mms gawk
 $ endif
 $ if arch_code .nes. "V"
 $ then
 $   if f$search("filefuncs.exe") .eqs. ""
 $   then
-$       mmk/descrip=[.vms]descrip.mms extensions
+$       mms/descrip=[.vms]descrip.mms extensions
 $   endif
 $ endif
 $!
@@ -92,12 +100,6 @@ $!
 $! Regenerate the PCSI Text file.
 $!---------------------------------
 $ @[.vms]build_gawk_pcsi_text.com
-$!
-$ base = ""
-$ arch_name = f$edit(f$getsyi("arch_name"),"UPCASE")
-$ if arch_name .eqs. "ALPHA" then base = "AXPVMS"
-$ if arch_name .eqs. "IA64" then base = "I64VMS"
-$ if arch_name .eqs. "VAX" then base = "VAXVMS"
 $!
 $!
 $! Parse the kit name into components.

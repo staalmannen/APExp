@@ -1,0 +1,6 @@
+run
+print a
+print @a
+print b
+print @b
+quit

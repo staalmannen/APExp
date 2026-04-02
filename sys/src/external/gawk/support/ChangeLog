@@ -1,3 +1,399 @@
+2026-02-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.4.0: Release tar ball made.
+
+2026-02-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* charset.h, charset.c: Updated from upstream. Fixes a bug
+	in charset_merge().
+
+2026-02-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am: Update copyright year.
+
+2026-02-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regex.h: Undo previous change. PCC now handles things correctly.
+
+2026-02-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regex.h: For PCC, undef __USE_GNU at the end of the file.
+	Prevents problems for io.c.
+
+2026-01-28         John E. Malmberg      <wb8tyw@qsl.net>
+
+	* ChangeLog: Spelling fixes.
+
+2026-01-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.c: Sync with upstream.
+
+2026-01-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.c: Small fix from upstream.
+
+2026-01-14         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* charset.c: Updated. Change %zd to %zu.
+
+2026-01-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.c: Latest code from Mike. Now handles all allocation errors.
+	(chr): Initialize lhmaxstk to silence clang warnings.
+	* dfa.c (parse_bracket_exp): Use && instead of & to silence clang.
+
+2026-01-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* charset.h, charset.c: Updated from upstream.
+
+2026-01-07  Eli Zaretskii  <eliz@gnu.org>
+
+	* regex_internal.h (__mbrtowc, __wcrtomb): Fix POSIX builds
+	without uchar.h.  Reported by Hermann Peifer <peifer@gmx.eu>.
+
+2026-01-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* cdefs.h, dfa.c, dfa.h, dynarray.h, flexmember.h, idx.h, intprops.h,
+	libc-config.h, localeinfo.c, localeinfo.h, malloc/dynarray-skeleton.c,
+	malloc/dynarray.h, malloc/dynarray_at_failure.c,
+	malloc/dynarray_emplace_enlarge.c, malloc/dynarray_finalize.c,
+	malloc/dynarray_resize.c, malloc/dynarray_resize_clear.c,
+	regcomp.c, regex.c, regex.h, regex_internal.c, regex_internal.h,
+	regexec.c, verify.h: Sync with GNULIB.
+
+2026-01-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regex_internal.h: Fix char32_t support for systems with uchar.h
+	and those without it. Fixes compile warnings.
+
+2026-01-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.c: Updated with latest changes from Mike Haertel.
+
+2026-01-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.c: Conditionalize inclusion of nonposix.h for MinGW to
+	also depend on ifdef GAWK. This is to make it easier (we hope)
+	to get the changes back into Mike's repo.
+
+2026-01-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.c: Fix from Mike for invalid bytes, reverts change of
+	2025-12-31. Also reset code checking codeset to match Mike's.
+
+2026-01-01         Eli Zaretskii  <eliz@gnu.org>
+
+	* minrx.c (minrx_regncomp): Remove Windows-specific codeset test.
+
+	* minrx.c [__MINGW32__]: Include nonposix.h to override setlocale
+	with MinGW-specific version.
+
+2025-12-31         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.c (chr): If an invalid byte is seen, return an error.
+	This helps avoid core dumps when matching in a multibyte locale
+	if the pattern contained an invalid byte; now the pattern
+	will not compile. Thanks to Eli Zaretskii for the push to
+	track this down.
+
+2025-12-30         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.c: Style edit: POSIX in all caps.
+
+2025-12-29         Eli Zaretskii  <eliz@gnu.org>
+
+	* minrx.c (minrx_regncomp): Support Windows-style UTF-8 codeset.
+	This fixes several tests in the test suite.
+
+2025-12-28         Eli Zaretskii  <eliz@gnu.org>
+
+	* dfa.c [__MINGW32__]: Don't use the HAVE_UCHAR stuff and don't
+	redirect char32_t functions to wc* equivalents, as that is all
+	defined correctly in custom.h.
+	* localeinfo.c [__MINGW32__]: Likewise.
+	* localeinfo.h [__MINGW32__]: Likewise.
+	* minrx.c [__MINGW32__]: Likewise.
+	* regex_internal.h [__MINGW32__]: Likewise.
+
+2025-12-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* charset.c: Add Unicode version info.
+
+2025-12-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c, localinfo.h, localeinfo.c, regex_internal.h: Fixes for
+	systems without uchar.h.
+
+2025-12-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Switch to using the char32_t and associated routines.
+
+	* dfa.c, localeinfo.c, localeinfo.h: Switch to uchar.h and add
+	appropriate defines.
+	* minrx.c: Add appropriate checks and defines to use char32_t.
+	* regcomp.c, regex_internal.c: Switch to char32_t from wchar_t.
+	* rexeg_internal.h: Ditto, also appropriate includes and defines.
+
+2025-12-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* charset.c: Updated with fixes to avoid undefined behavior.
+	Thanks to correctmost <cmlists@sent.com> for the bug report.
+
+2025-12-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Removed.
+
+2025-12-12         Eli Zaretskii  <eliz@gnu.org>
+
+	* minrx.c: Small fixes for MinGW.
+
+2025-12-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* charset.c: Updated.
+
+2025-12-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* charset.c: Updated. Make the big tables const. Add ifdefs
+	for compilation inside MinRX.
+	* charset.h: Updated. Add ifdefs for compilation inside MinRX.
+	* minrx.c: New version from Mike. (Hurray!)
+	* Makefile.am (EXTRA_DIST): Add charset.c and charset.h.
+
+2025-12-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Updated.
+
+2025-12-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp, charset.h, charset.c: Updated to latest.
+	* Makefile.am: charset.c is no longer compiled separately.
+	* minrx.c: Include charset.c, bug fix for equivalence class parsing.
+
+2025-12-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp, charset.c: Updated.
+
+2025-11-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp, charset.h, charset.c: Updated.
+
+2025-11-16         Sevan Janiyan         <venture37@geeklan.co.uk>
+
+	* pma.c: Add define for MAP_ANONYMOUS for old macOS systems.
+
+2025-11-09         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Updated.
+
+2025-10-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am: Don't disable assertions anymore. They provide
+	value, and on modern systems don't affect performance.
+
+2025-10-15         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Updated.
+
+2025-09-25         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* pma.h: Add `extern "C"' stuff so that it can be used
+	with C++.
+
+2025-08-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regcomp.c, regex.h, regex_internal.c, regexec.c,
+	verify.h: Sync with GNULIB.
+
+2025-07-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.h, minrx.cpp: Updated.
+
+2025-07-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* charset.c: Updated.
+
+2025-06-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Updated.
+
+2025-05-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regex_internal.c (re_node_set_alloc): Don't bother checking
+	for PMA, just always fudge a size of zero into a size of one.
+	There are undoubtedly other malloc()s out there that don't
+	like a size of zero.
+
+2025-05-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* regex_internal.c (re_node_set_alloc): PMA returns NULL if
+	malloc(0) called, whereas GLIBC malloc() returns non-NULL. IMHO
+	this is a bug in regex, that it expects non-NULL.  Added some
+	gawk-specific code to work around it.  Report from "Stan Marsh" (sic)
+	<gazelle@xmission.com>.
+
+2025-04-08         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Reenable use of charset routines.
+
+2025-04-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.h, minrx.cpp: Updated.
+
+2025-04-02         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.2: Release tar made.
+
+2025-03-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Updated.
+
+2025-03-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Updated.
+
+2025-03-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am: Don't set CFLAGS directly. Thanks to
+	"Jannick" <thirdedition@gmx.net> for the report.
+
+2025-03-12         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.h, minrx.cpp: Updated.
+
+2025-02-19         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* dfa.c, dfa.h, dynarray.h, flexmember.h, intprops.h,
+	libc-config.h, localeinfo.c, localeinfo.h,
+	malloc/dynarray-skeleton.c, malloc/dynarray.h,
+	malloc/dynarray_at_failure.c, malloc/dynarray_emplace_enlarge.c,
+	malloc/dynarray_finalize.c, malloc/dynarray_resize.c,
+	malloc/dynarray_resize_clear.c, regcomp.c, regex.c, regex.h,
+	regex_internal.c, regex_internal.h, regexec.c, verify.h:
+	Sync from GNULIB.
+
+2025-02-18         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* charset.c, charset.h, minrx.h, minrx.cpp: Updated.
+
+2025-02-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Update again. Minor speedups.
+
+2025-02-11         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Update again. More speedups.
+
+2025-02-10         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Updated with firstcset version that supports
+	charset.
+	* charset.h, charset.c: Updated.
+
+2025-02-06         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Update again. More speedups.
+
+2025-02-03         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Update again. More speedups.
+
+2025-01-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Update again. More speedups.
+
+2025-01-27         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Update again. More speedups.
+
+2025-01-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (EXTRA_DIST): Remove roaring.c and roaring.h:
+	* roaring.c, roaring.h: Removed.
+
+2025-01-22         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (CXXFLAGS): Get the value from Autoconf.
+	Compiles minrx.cpp with -O3, which it really needs.
+
+2025-01-21         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Update again.
+
+2025-01-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Update to current, fastest version.
+
+2025-01-13         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* roaring.h, roaring.c: New files.
+	* Makefile.am (libsupport_a_SOURCES): Add roaring.h and roaring.c.
+
+2024-12-24         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.h, minrx.cpp: Updated.
+	* charset.h, charset.c: New files.
+	* Makefile.am (libsupport_a_SOURCES): Add charset.h and charset.c.
+
+2024-11-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Updated.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* 5.3.1: Release tar made.
+
+2024-09-17         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am: Update copyright year.
+
+2024-09-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.h, minrx.cpp: Update from Mike.
+
+2024-08-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Update from Mike.
+
+2024-08-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* cdefs.h, verify.h: Sync from GNULIB.
+
+2024-08-05         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.cpp: Small changes in consultation with Mike.
+
+2024-07-28         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.h, minrx.cpp: Updated.
+
+2024-07-20         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* minrx.h, minrx.cpp: New files.
+
+2024-07-16         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (CXXFLAGS): Added for new version of minrx.
+
+2024-04-26         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* cdefs.h, dfa.h, dynarray.h, flexmember.h, idx.h,
+	intprops.h, libc-config.h, localeinfo.h, dynarray-skeleton.c,
+	dynarray.h, dynarray_at_failure.c, dynarray_finalize.c,
+	dynarray_resize_clear.c, regcomp.c, regex.c, regex.h,
+	regex_internal.c, verify.h: Updates from GNULIB. Mostly
+	changes in the copyright year.
+
+2024-02-29         Arnold D. Robbins     <arnold@skeeve.com>
+
+	Changes for MinRX.
+
+	* Makefile.am (libsupport_a_SOURCES): Add minrx.h and minrx.cpp.
+
+2024-02-01         Arnold D. Robbins     <arnold@skeeve.com>
+
+	* Makefile.am (distclean-local): Remove malloc/.deps
+	directory also.
+
 2023-11-02         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* 5.3.0: Release tar ball made.
@@ -22,7 +418,7 @@
 2023-04-14         Arnold D. Robbins     <arnold@skeeve.com>
 
 	* Makefile.am: Update copyright year.
-	* dfa.h, flexmember.h, regex_internal.h: Upate from GNULIB.
+	* dfa.h, flexmember.h, regex_internal.h: Update from GNULIB.
 
 2023-03-26         Arnold D. Robbins     <arnold@skeeve.com>
 
@@ -36,7 +432,7 @@
 	malloc/dynarray_at_failure.c, malloc/dynarray_emplace_enlarge.c,
 	malloc/dynarray_finalize.c, malloc/dynarray_resize.c,
 	malloc/dynarray_resize_clear.c, regcomp.c, regex.c, regex.h,
-	regex_internal.c, regex_interna.h, regexec.c, verify.h: Sync from
+	regex_internal.c, regex_internal.h, regexec.c, verify.h: Sync from
 	GNULIB. This mostly just updates the copyright year.
 
 2022-12-23         Arnold D. Robbins     <arnold@skeeve.com>

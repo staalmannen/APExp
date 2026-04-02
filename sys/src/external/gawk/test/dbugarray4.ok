@@ -1,0 +1,23 @@
+Starting program:
+Program exited normally with exit value: 0
+Watchpoint 1: a["1"]
+error: attempt to use scalar value as array
+Restarting ...
+Starting program:
+Stopping in BEGIN ...
+Watchpoint 1: a["1"]
+  Old value: element not in array
+  New value: array, 0 elements
+main() at `dbugarray4.awk':2
+2       	a[1][1] = 1
+Watchpoint 1: a["1"]
+  Old value: array, 0 elements
+  New value: array, 1 elements
+main() at `dbugarray4.awk':2
+2       	a[1][1] = 1
+Watchpoint 1: a["1"]
+  Old value: array, 1 elements
+  New value: array, 2 elements
+main() at `dbugarray4.awk':3
+3       	a[1][2] = 2
+Program exited normally with exit value: 0

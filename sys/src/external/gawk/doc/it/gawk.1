@@ -1,45 +1,59 @@
 .\"Traduzione di Giuseppe Guerrini <giusguerrini@racine.ra.it>
-.\"Novembre 1996 - da vers. 3.0.2
+.\"Novembre 1996 - da versione 3.0.2
 .\"
 .\"Aggiornamento e revisione:
 .\"	Antonio Giovanni Colombo <azc100@gmail.com>
 .\"	Marco Curreli <marcocurreli@tiscali.it>
+.\"	Giuseppe Sacco <giuseppe@sguazz.it>
 .\"Febbraio 2014 - da versione 4.0.1e
-.\"Aggiornam. a gawk-4.1.2 di Antonio Giovanni Colombo - Aprile 2015
-.\"Aggiornam. a gawk-4.1.3 di Marco Curreli - revis. A.G. Colombo - Giugno 2016
-.\"Aggiornam. a gawk-4.2.0 di A.G. Colombo - revis. M. Curreli - Dicembre  2017
-.\"Aggiornam. a gawk-4.2.1 di A.G. Colombo - revis. M. Curreli - Febbraio  2018
-.\"Aggiornam. a gawk-4.2.2 di A.G. Colombo - revis. M. Curreli - Dicembre  2018
-.\"Aggiornam. a gawk-5.0.0 di A.G. Colombo - Luglio   2019
-.\"Aggiornam. a gawk-5.1.0 di A.G. Colombo - revis. M. Curreli - Aprile    2020
-.\"Aggiornam. a gawk-5.1.0 di A.G. Colombo - Giugno   2020
-.\"Aggiornam. a gawk-5.1.0 di A.G. Colombo - Luglio   2020
-.\"Aggiornam. a gawk-5.1.1 di A.G. Colombo - Maggio   2021
-.\"Aggiornam. a gawk-5.1.1 di A.G. Colombo - Luglio   2021
-.\"Aggiornam. a gawk-5.1.1 di A.G. Colombo - Marzo    2022
-.\"Aggiornam. a gawk-5.1.1 di A.G. Colombo - Maggio   2022
-.\"Aggiornam. a gawk-5.1.1 di A.G. Colombo - Giugno   2022
-.\"Aggiornam. a gawk-5.2.0 di A.G. Colombo - Luglio   2022
-.\"Aggiornam. a gawk-5.3.0 di A.G. Colombo - Marzo    2023
-.\"Aggiornam. a gawk-5.3.0 di A.G. Colombo - Giugno   2023
-.\"Aggiornam. a gawk-5.3.0 di A.G. Colombo - Ottobre  2023
+.\"Aggiornamento a gawk-4.1.2 di Antonio Giovanni Colombo - Aprile 2015
+.\"Aggiornamento a gawk-4.1.3 di Marco Curreli - revisione A.G. Colombo - Giugno 2016
+.\"Aggiornamento a gawk-4.2.0 di A.G. Colombo - revisione M. Curreli - Dicembre  2017
+.\"Aggiornamento a gawk-4.2.1 di A.G. Colombo - revisione M. Curreli - Febbraio  2018
+.\"Aggiornamento a gawk-4.2.2 di A.G. Colombo - revisione M. Curreli - Dicembre  2018
+.\"Aggiornamento a gawk-5.0.0 di A.G. Colombo - Luglio   2019
+.\"Aggiornamento a gawk-5.1.0 di A.G. Colombo - revisione M. Curreli - Aprile    2020
+.\"Aggiornamento a gawk-5.1.0 di A.G. Colombo - Giugno   2020
+.\"Aggiornamento a gawk-5.1.0 di A.G. Colombo - Luglio   2020
+.\"Aggiornamento a gawk-5.1.1 di A.G. Colombo - Maggio   2021
+.\"Aggiornamento a gawk-5.1.1 di A.G. Colombo - Luglio   2021
+.\"Aggiornamento a gawk-5.1.1 di A.G. Colombo - Marzo    2022
+.\"Aggiornamento a gawk-5.1.1 di A.G. Colombo - Maggio   2022
+.\"Aggiornamento a gawk-5.1.1 di A.G. Colombo - Giugno   2022
+.\"Aggiornamento a gawk-5.2.0 di A.G. Colombo - Luglio   2022
+.\"Aggiornamento a gawk-5.3.0 di A.G. Colombo - Marzo    2023
+.\"Aggiornamento a gawk-5.3.0 di A.G. Colombo - Giugno   2023
+.\"Aggiornamento a gawk-5.3.0 di A.G. Colombo - Ottobre  2023
+.\"Aggiornamento a gawk-5.3.0 di A.G. Colombo - Novembre 2023
+.\"Aggiornamento a gawk-5.3.0 di A.G. Colombo - Aprile   2024
+.\"Aggiornamento a gawk-5.3.0 di Giuseppe Sacco e A.G. Colombo - Giugno   2024
+.\"Aggiornamento a gawk-5.3.0 di A.G. Colombo - Luglio   2024
+.\"Aggiornamento a gawk-5.3.1 di A.G. Colombo - Agosto   2024
+.\"Aggiornamento a gawk-5.3.1 di A.G. Colombo - Febbraio 2025
+.\"Aggiornamento a gawk-5.3.2 di A.G. Colombo - Febbraio 2025
+.\"Aggiornamento a gawk-5.3.2 di A.G. Colombo - Marzo    2025
+.\"Aggiornamento a gawk-5.3.2 di A.G. Colombo - Giugno   2025
+.\"Aggiornamento a gawk-5.3.2 di A.G. Colombo - Ottobre  2025
+.\"Aggiornamento a gawk-5.3.2 di A.G. Colombo - Novembre 2025
+.\"Aggiornamento a gawk-5.4.0 di A.G. Colombo - Febbraio 2026
 
 .ds PX \s-1POSIX\s+1
 .ds UX \s-1UNIX\s+1
 .ds GN \s-1GNU\s+1
 .ds AK \s-1AWK\s+1
-.ds EP \fIGAWK: Programmare efficacemente in AWK\fP
-.if !\n(.g \{\
-.	if !\w|\*(lq| \{\
-.		ds lq ``
-.		if \w'\(lq' .ds lq "\(lq
+.ds EP \fIGAWK: Effective AWK Programming\fP
+.if !\w@\*(lq@ \{\
+.\" The implementation doesn't seem to support the strings `lq` or `rq`.
+.	ie \n(.g \{\
+.		ds lq \(lq\"
+.		ds rq \(rq\"
 .	\}
-.	if !\w|\*(rq| \{\
+.	el \{\
+.		ds lq ``
 .		ds rq ''
-.		if \w'\(rq' .ds rq "\(rq
 .	\}
 .\}
-.TH GAWK 1 "22 Ottobre 2023" "Free Software Foundation" "Comandi di utilità"
+.TH GAWK 1 "10 febbraio 2026" "Free Software Foundation" "Comandi di utilità"
 .SH NOME
 gawk \- linguaggio per il riconoscimento e il trattamento di espressioni
 regolari
@@ -59,10 +73,37 @@ regolari
 ]
 .I testo del programma
 file .\|.\|.
+.SH DA LEGGERE PRIMA DI TUTTO
+Questa man page è fornita per 
+.IR convenienza .
+Si prega di notare che l'Unica-Sorgente-Del-Vero per
+.I gawk
+è il manuale, scritto in Texinfo, disponibile online in
+parecchi formati, sul sito
+.IR https://www.gnu.org/software/gawk/manual .
+La versione PDF in italiano del manuale stesso è disponibile sul sito:
+.IR https://sites.google.com/view/gawkdoc-it .
+Il manuale può anche essere stato installato (nella versione Info)
+sul sistema in uso, e quindi può essere reso disponibile al comando
+.IR info (1).
+.PP
+In caso di contraddizioni fra il manuale Texinfo e questa
+man page, il manuale Texinfo è da ritenere autoritativo.
+.PP
+Notare che la documentazione in formato Info, quella in formato
+di pagine web HTML, e la versione PDF del manuale hanno tutte
+lo stesso contenuto, poiché sono tutte generate dallo stesso
+file sorgente scritto in Texinfo.
+.PP
+Inoltre, il manutentore di
+.I gawk
+si riserva il diritto di eliminare questa pagina in formato "man"
+dalla distribuzione e/o quello di ridurne drasticamente il contenuto,
+per semplificare l'attività di manutenzione della stessa.
 .SH DESCRIZIONE
 .I Gawk
 è l'implementazione nell'ambito del Progetto \*(GN del linguaggio di
-programmazione \*(AK .  Si attiene alla definizione del linguaggio descritta
+programmazione \*(AK.  Si attiene alla definizione del linguaggio descritta
 nello standard \*(PX 1003.1.
 Questa versione è basata a sua volta sulla descrizione contenuta in
 .IR "The AWK Programming Language" ,
@@ -71,7 +112,7 @@ di Aho, Kernighan e Weinberger.
 fornisce le funzionalità aggiuntive presenti nella versione corrente
 di
 .I awk
- di Brian Kernighan e numerose estensioni specifiche di \*(GN.
+di Brian Kernighan e numerose estensioni specifiche di \*(GN.
 .PP
 La riga di comando contiene opzioni per
 .I gawk
@@ -85,11 +126,11 @@ nelle variabili \*(AK predefinite
 e
 .BR ARGV .
 .SH PREMESSA
-Questa pagina di manuale è intenzionalmente il più possibile concisa.
+Questa pagina di manuale è intenzionalmente concisa.
 La documentazione completa è disponibile in \*(EP, ed è là che si
-dovrebbe andare a cercare la descrizione completa di ogni singola
+deve cercare la descrizione completa di ogni singola
 funzionalità.
-Quando possibile, sono forniti dei link alla versione online del
+Dove possibile, sono forniti dei link alla versione online del
 manuale.
 .SH FORMATO DELLE OPZIONI
 .PP
@@ -114,7 +155,7 @@ rimanga univoca.
 .PP
 In aggiunta, ogni opzione lunga ha una corrispondente opzione corta, in modo
 che la funzionalità dell'opzione possa essere usata all'interno di script
-.B #!
+.B #!\&
 eseguibili.
 .SH OPZIONI
 .PP
@@ -125,21 +166,22 @@ estensioni
 .IR gawk ,
 elencate nell'ordine alfabetico delle opzioni corte.
 .TP
-.BI \-f " file-di-programma,\fR,\fP " \-\^\-file " file-di-programma"
+.BI \-f " file-di-programma\fR,\fP " \-\^\-file " file-di-programma"
 Legge il sorgente del programma \*(AK dal file
 .IR file-di-programma ,
 invece che dal primo argomento della riga di comando.
 Si possono specificare più opzioni
-.B \-f
+.B \-f.
 I file letti come specificato da
 .B \-f
 sono trattati come se iniziassero con la direttiva implicita \fB@namespace "awk"\fR.
 .TP
-.BI \-F " fs\fR, \fP" \-\^\-separatore-di-campo " fs"
+.BI \-F " fs\fR, \fP" \-\^\-field-separator " fs"
 Usa
 .I fs
 come separatore di campo in input (il valore della variabile predefinita
 .BR FS ).
+.TP
 \fB\-v\fI var\fB\^=\^\fIval\fR, \fB\-\^\-assign \fIvar\fB\^=\^\fIval\fR
 Assegna il valore
 .I val
@@ -149,11 +191,12 @@ prima che inizi l'esecuzione del programma.
 Questi valori delle variabili sono messi a disposizione della regola
 .B BEGIN
 di un programma \*(AK.
+.TP
 .BR \-b ", " \-\^\-characters\-as\-bytes
 Tratta tutti i dati in input come caratteri costituiti da un solo byte.
 L'opzione
 .B "\-\^\-posix"
-ignora questo comportamento.
+prevale su questa.
 .TP
 .BR \-c ", " \-\^\-traditional
 Viene eseguito in modalità
@@ -173,7 +216,7 @@ informazione sul copyright \*(GN ed esce senza segnalare errori.
 Stampa un lista ordinata di variabili globali, specificandone il tipo e il valore
 finale in
 .IR file .
-If file di default è
+Il file di default è
 .B awkvars.out
 nella directory corrente.
 .TP
@@ -186,16 +229,16 @@ L'argomento opzionale
 specifica un file contenente un elenco di comandi
 per il debugger da eseguire in maniera non interattiva.
 .sp .5
-In questo modo di esecuzione,
+In questo modalità d'esecuzione,
 .I gawk
 carica il codice sorgente
-AWK e quindi chiede di immettere comandi di debug.
+AWK e attende comandi di debug.
 .I Gawk
 può solo fare il debug di programmi sorgenti AWK specificati tramite le opzioni
 .B \-f
 e
-.B \-\^\-include .
-Il debugger è documentato in \*(EP; vedere
+.B \-\^\-include.
+Il debugger è documentato in \*(EP; vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/Debugger.html#Debugger .
 .TP
 .BI \-e " testo-del-programma\fR, \fP" \-\^\-source " testo-del-programma"
@@ -211,23 +254,25 @@ Simile a
 .BR \-f ,
 comunque, quest'opzione è l'ultima a essere elaborata.
 Dovrebbe essere usata con script
-.B #! ,
+.B #!\&
 specialmente per applicazioni CGI [Common Gateway Interface], per evitare
-di passare opzioni o codice (!) sulla riga di comando
+di passare opzioni o codice (!\&) sulla riga di comando
 da un URL.
 Quest'opzione disabilita gli assegnamenti di variabile da riga di comando.
+.TP
 .BR \-g ", " \-\^\-gen\-pot
 Esamina e analizza il programma \*(AK, e genera un file in formato \*(GN
 .B \&.pot
 (Portable Object Template)
 sullo standard output con elementi relativi a tutte le stringhe localizzabili
-nel programma.  Il programma in sé non viene eseguito.
+nel programma.
+Il programma in sé non viene eseguito.
 .TP
 .BR \-h ", " \-\^\-help
 Scrive sullo standard output un breve riassunto delle
 opzioni disponibili.
 In linea con le convenzioni di codifica
-.IR "GNU Coding Standards" ,
+.IR "GNU" ,
 queste opzioni provocano un'uscita immediata e senza segnalazione di errore.
 .TP
 \fB\-i \fIinclude-file\fR, \fB\-\^\-include \fIinclude-file\fR
@@ -248,16 +293,16 @@ sono trattati come se iniziassero con la direttiva implicita \fB@namespace "awk"
 Stampa i nomi del codice-byte generato internamente, nell'ordine
 in cui sono incontrati durante l'esecuzione del programma.
 Questa trace è stampata sullo standard error.
-Ogni ``codice operativo'' è preceduto da un segno
+Ogni \*(lqcodice operativo\*(rq  è preceduto da un segno
 .B +
 nell'output.
 .TP
 \fB\-k\fR, \fB\-\^\-csv\fR
 Abilita gestione speciale file CSV
-[Comma Separated Values - Valori Separati da Virgola].
-Vedere il manuale per i dettagli.
-.BR FIXME :
-Eventualmente, fornire un link (URL) qui.
+[Comma Separated Values].
+Vedere più avanti la sottosezione
+.BR "Valori Separati da Virgola"
+per ulteriori dettagli.
 .TP
 .BI \-l " lib\fR, " \-\^\-load " lib"
 Carica un'estensione
@@ -273,22 +318,21 @@ La procedura di inizializzazione della libreria si suppone avere come nome
 .BR dl_load() .
 .TP
 \fB\-L \fR[\fIvalore\fR], \fB\-\^\-lint\fR[\fB=\fIvalore\fR]
-Emette messaggi d'avvertimento relativi a costrutti dubbi o non portabili
+Emette degli avvisi relativi a costrutti dubbi o non portabili
 su altre implementazioni di \*(AK.
-Con l'argomento opzionale
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Options.html#Options
 per la lista di valori possibili per
 .IR valore .
 .TP
 .BR \-M ", " \-\^\-bignum
-Forza il calcolo con precisione arbitraria sui numeri.  Quest'opzione
-non ha effetto se
+Forza il calcolo con precisione arbitraria sui numeri.
+Quest'opzione non ha effetto se
 .I gawk
 non è compilato per utilizzare le librerie GNU MPFR e GMP.
 (In tal caso,
 .I gawk
-invia un messaggio di avvertimento.)
+invia un avviso.)
 .sp
 .B NOTA:
 Questa funzionalità è in
@@ -296,8 +340,9 @@ Questa funzionalità è in
 Il manutentore principale di
 .I gawk
 non ne curerà più la manutenzione, ma una delle persone del
-team di sviluppo l'ha presa in carico.  Se questa situazione
-dovesse cambiare, la funzionalità verrà rimossa da
+team di sviluppo l'ha presa in carico.
+Se questa situazione dovesse cambiare, la funzionalità verrà
+rimossa da
 .IR gawk .
 .ig
 Impostare la variabile di ambiente
@@ -326,7 +371,7 @@ di vecchia data.
 Stampa una versione formattata graziosamente del programma su
 .IR file .
 Il file di default è
-.B awkprof.out
+.B awkprof.out,
 nella directory corrente.
 Quest'opzione attiva anche l'opzione
 .BR \-\^\-no\-optimize .
@@ -335,32 +380,33 @@ Quest'opzione attiva anche l'opzione
 Abilita le ottimizzazioni predefinite di
 .IR gawk
 nella rappresentazione interna del programma.
-Quest'opzione è attiva in modo predefinito.
+Quest'opzione è attiva per default.
 .TP
 \fB\-p\fR[\fIprof-file\fR], \fB\-\^\-profile\fR[\fB=\fIprof-file\fR]
 Inizia una sessione di "profiling", e invia i dati tracciati al file
 .IR prof-file .
-Quello predefinito è
-.B awkprof.out .
+Il file di default è
+.B awkprof.out,
+nella directory corrente.
 Il profilo contiene il numero di esecuzioni di ogni istruzione sul margine
 sinistro e il conteggio delle chiamate di funzione per ogni funzione definita
 dall'utente.
 .I Gawk
-viene eseguito più lentamente in questo modo.
+è più lento in questa modalità.
 Quest'opzione attiva anche l'opzione
 .BR \-\^\-no\-optimize .
 .TP
 .BR \-P ", " \-\^\-posix
-Quest'opzione attiva la modalità di
-.IR compatibilità ,
-e disabilita un certo numero di estensioni comuni.
+Attiva la modalità di
+.IR compatibilità
+e disabilita parecchie estensioni comuni.
 .TP
 .BR \-r ", " \-\^\-re\-interval
 Abilita l'uso di
 .I "espressioni di intervallo"
-nelle espressioni regolari.
+nella ricerca di corrispondenze con espressioni regolari.
 Le espressioni di intervallo
-sono rese disponibili per default, ma quest'opzione
+sono abilitate per default, ma quest'opzione
 viene lasciata per compatibilità all'indietro.
 .TP
 .BR \-s ", " \-\^\-no\-optimize
@@ -381,21 +427,23 @@ e il caricamento delle estensioni dinamiche.
 L'esecuzione di comandi (tramite pipeline) è anch'essa disabilitata.
 .TP
 .BR \-t ", " \-\^\-lint\-old
-Emette messaggi d'avvertimento relativi a costrutti non portabili
+Emette avvisi relativi a costrutti non portabili
 sulla versione originale di
 .I awk
 per \*(UX.
 .TP
 .BR \-V ", " \-\^\-version
-Scrive sullo standard output la versione di questa particolare copia di
-.IR gawk .
+Scrive le informazioni sulla versione per questa specifica copia di
+.IR gawk
+sullo standard output.
 È utile principalmente per segnalare bug.
 In linea con le convenzioni di codifica
 .IR "GNU Coding Standards" ,
 queste opzioni provocano un'uscita immediata e senza segnalazione di errore.
 .TP
 .B \-\^\-
-Segnala la fine delle opzioni. È utile perché permette di passare al programma
+Segnala la fine delle opzioni.
+È utile perché permette di passare al programma
 \*(AK ulteriori argomenti [nomi di file] che iniziano con \*(lq\-\*(rq.
 .PP
 In modalità compatibile, qualsiasi altra opzione è contrassegnata come non
@@ -417,6 +465,8 @@ e definizioni di funzione opzionali.
 .RS
 .PP
 \fB@include "\fInome_del_file\fB"
+.br
+\fB@nsinclude "\fInome_del_file\^\fB"
 .br
 \fB@load "\fInome_del_file\fB"
 .br
@@ -451,9 +501,18 @@ Ciò equivale a usare l'opzione
 .BR \-\^\-include .
 .PP
 Le righe che iniziano con
+.B @nsinclude
+sono pure usate per includere file, ma con due differenze.
+La prima è che il namespace del file incluso
+.I non
+è supposto essere quello di default, ossia
+.BR awk ;
+inoltre, tali file possono essere inclusi più di una volta.
+.PP
+Le righe che iniziano con
 .B @load
-possono essere usate per caricare funzioni di estensione nel programma.  Questo è
-equivalente all'uso dell'opzione
+possono essere usate per caricare funzioni di estensione nel programma.
+Ciò equivale a usare l'opzione
 .BR \-\^\-load .
 .PP
 La variabile d'ambiente
@@ -464,7 +523,7 @@ indicati con le opzioni
 e
 .BR \-\^\-include .
 Se questa variabile non esiste, il percorso predefinito è
-\fB"/usr/local/share/awk"\fR
+\fB".:/usr/local/share/awk"\fR
 (la directory in questione può variare a seconda di come
 .I gawk
 è stato compilato e installato).
@@ -506,7 +565,7 @@ Se non ci  sono file indicati nella riga di comando,
 legge dallo standard input.
 .PP
 Se un nome di file nella riga di comando ha la forma
-.IB var = val,
+.IB var = val
 è trattato come un assegnamento di variabile.  Alla variabile
 .I var
 sarà assegnato il valore
@@ -526,7 +585,8 @@ se esiste una regola
 .BR BEGINFILE ,
 .I gawk
 esegue il codice associato
-prima di elaborare il contenuto del file.  Similarmente,
+prima di elaborare il contenuto del file.
+Analogamente,
 .I gawk
 esegue
 il codice associato a regole
@@ -542,36 +602,37 @@ Per ogni criterio di ricerca a cui un record corrisponde,
 .I gawk
 esegue
 .RI l' azione
-associata.  I criteri di ricerca sono verificati nell'ordine in cui appaiono nel programma.
+associata.
+I criteri di ricerca sono verificati nell'ordine in cui appaiono nel programma.
 .PP
 Infine, dopo che sono esauriti i dati in input,
 .I gawk
 esegue il codice nelle regola/e
 .B END
-(se esistente/i),
+(se esistente/i).
 .SS Directory nella riga di comando
 .PP
 Secondo POSIX, i file indicati sulla riga di comando di
 .I awk
 devono essere file di testo.
-Se non lo sono il comportamento è ``undefined''.  La maggior parte delle
-versioni di
+Se non lo sono il comportamento è \*(lqindefinito\*(rq.
+La maggior parte delle versioni di
 .I awk
 considerano una directory sulla riga di comando come un errore fatale.
 .PP
 Per
 .IR gawk ,
-una directory sulla riga di comando produce solo un messaggio di avvertimento,
-senza conseguenze.  Se sono date le opzioni
+una directory sulla riga di comando produce solo un avviso,
+senza conseguenze.  Se sono state date le opzioni
 .B \-\^\-posix
 o
 .B \-\^\-traditional
 .I gawk
-ritorna a trattare le directory sulla riga di comando come errore fatale.
+tratta le directory sulla riga di comando come errore fatale.
 .SH VARIABILI, RECORD E CAMPI
 Le variabili di \*(AK sono dinamiche; iniziano a esistere
 la prima volta che vengono usate.  I loro valori sono numeri in virgola
-mobile, o stringhe, o entrambe le cose, a seconda di come sono usati la prima volta.
+mobile o stringhe o entrambe le cose, a seconda di come sono usati.
 Inoltre,
 .I gawk
 consente di avere variabili di tipo "espressione regolare".
@@ -583,10 +644,10 @@ All'inizio dell'esecuzione del programma vengono impostate parecchie
 variabili predefinite; saranno descritte di volta in volta quando sarà
 necessario, ed elencate più avanti.
 .SS Record
-Normalmente i record sono separati dal carattere newline.  Si può controllare il
-modo in cui i record sono separati assegnando valori alla variabile predefinita
+Normalmente i record sono separati da caratteri "a capo".  Si può controllare il
+modo in cui i record vengono separati assegnando valori alla variabile predefinita
 .BR RS .
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Records.html
 per i dettagli.
 .SS Campi
@@ -597,12 +658,12 @@ in
 usando il valore della variabile
 .B FS
 come separatore di campo.
-Inoltre, le variabile
+Inoltre, le variabili
 .B FIELDWIDTHS
 e
 .B PATH
 possono essere usate per controllare la divisione in campi dell'input.
-Vedere i dettagli, a partire da
+Vedere [in inglese] i dettagli, a partire da
 .IR https://www.gnu.org/software/gawk/manual/html_node/Fields.html .
 .PP
 Ogni campo nel record in input può essere individuato dalla sua posizione:
@@ -646,32 +707,36 @@ Analogamente, assegnare un valore a
 .B $0
 provoca una nuova divisione del record, creando nuovi
 valori per i suoi campi.
-.SS Comma Separated Values [Valori Separati da Virgola]
-Quando è chiamato specificando l'opzione
-.B \-\^\-csv,
+.SS Valori Separati da Virgola
+Quando è chiamato specificando come opzione
+.B \-k
+oppure
+.B \-\^\-csv
+[Comma Separated Values],
 .I gawk
 non usa le regole spiegate sopra per determinare cosa costituisce
 un record e per dividerlo in campi.
-Invece, i record sono delimitati dai caratteri "ritorno a capo",
-che non siano all'interno di un campo CSV [per esempio, un
-campo che contenga un indirizzo completo è normalmente su più
-righe, che però formano un unico campo]. I campi sono separati
-fra loro da una virgola.
+In questo caso, un record è delimitato solo da caratteri
+"a capo" che NON siano all'interno di un campo CSV
+[per esempio, un campo che contiene un indirizzo completo è
+normalmente su più righe, che però formano un unico campo].
+I campi del record sono separati fra loro da una virgola.
 I caratteri "doppio apice" possono essere usati per indicare
-campi che contengono virgole, ritorni a capo, o doppi apici
-[che vanno raddoppiati].
-Vedere il manuale per i dettagli.
-.B FIXME
-Eventualmente, fornire un link (URL) qui.
+campi che contengono virgole, "a capo", o doppi apici
+[questi ultimi vanno in tal caso raddoppiati].
+Vedere [in inglese]
+.I https://www.gnu.org/software/gawk/manual/html_node/Comma-Separated-Fields.html
+per ulteriori dettagli.
 .SS Variabili predefinite
 Le variabili predefinite di
 .IR gawk "
-sono listate qui sotto.
-La lista è volutamente concisa. Per dettagli, vedere
+sono elencate sotto.
+La lista è volutamente concisa.
+Per i dettagli, vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/Built_002din-Variables .
 .TP "\w'\fBFIELDWIDTHS\fR'u+1n"
 .B ARGC
-Il numero di argomenti da riga di comando
+Il numero di argomenti sulla riga di comando.
 .TP
 .B ARGIND
 L'indice in
@@ -685,9 +750,9 @@ Vettore degli argomenti della riga di comando.  Il vettore è indicizzato da
 \- 1.
 .TP
 .B BINMODE
-Su sistemi non-POSIX, specifica l'uso della modalità \*(lqbinaria\*(rq per tutto
+Su i sistemi non-POSIX, specifica l'uso della modalità "binaria" per tutto
 l'I/O da e verso i file.
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/PC-Using.html
 per i dettagli.
 .TP
@@ -749,7 +814,7 @@ come separatore di campo.
 .TP
 .B FS
 Il separatore di campo, quello predefinito è uno spazio.
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Field-Separators.html
 per i dettagli.
 .TP
@@ -766,7 +831,7 @@ applicandola al vettore
 .B IGNORECASE
 Controlla la sensibilità alla distinzione tra maiuscole e minuscole
 in tutte le espressioni regolari e nelle operazioni sulle stringhe.
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Case_002dsensitivity.html
 per i dettagli.
 .TP
@@ -789,28 +854,28 @@ Il separatore di campi in uscita, normalmente è uno spazio.
 .TP
 .B ORS
 Il separatore di record in uscita, normalmente
-la sequenza di fine linea ("\fInewline\fR").
+la sequenza di fine linea "a-capo".
 .TP
 .B PREC
-La precisione di lavoro di numeri a virgola mobile con precisione arbitraria,
+La precisione di lavoro di numeri in virgola mobile con precisione arbitraria,
 53 [bit] è il valore predefinito.
 .TP
 .B PROCINFO
 Gli elementi di questo vettore forniscono accesso alle informazioni
 sul programma  \*(AK in esecuzione.
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Auto_002dset
 per i dettagli.
 .TP
 .B ROUNDMODE
-La modalità di arrotondamento da usare per operazioni sui numeri con precisione
+La modalità d'arrotondamento da usare per operazioni sui numeri con precisione
 arbitraria, quella predefinita è \fB"N"\fR (IEEE-754 roundTiesToEven mode).
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Setting-the-rounding-mode
 per i dettagli.
 .TP
 .B RS
-Il separatore di record in input, per default "newline".
+Il separatore di record in input, per default "a capo".
 .TP
 .B RT
 Il terminatore di record.
@@ -836,8 +901,8 @@ La stringa usata per separare indici multipli negli elementi di un vettore,
 quella predefinita è \fB"\e034"\fR.
 .TP
 .B SYMTAB
-Un vettore i cui indici sono i nomi di tutti i vettori e le variabili
-globali attualmente definite presenti nel programma.
+Un vettore i cui indici sono i nomi di tutte le variabili globali e di tutti i
+vettori attualmente definiti nel programma.
 Non è possibile usare l'istruzione
 .B delete
 per il vettore
@@ -852,7 +917,7 @@ localizzate delle stringhe del programma.
 I vettori hanno per indice un'espressione tra parentesi quadre
 .RB ( [ " e " ] ).
 Se l'espressione è formata da una lista di espressioni
-.RI ( expr ", " expr " .\|.\|.)"
+.RI ( espress. ", " espress. " .\|.\|.)"
 l'indice del vettore è una stringa ottenuta concatenando
 i valori (stringa) di ogni espressione, separati dal valore della
 variabile
@@ -876,7 +941,7 @@ vettori sono associativi, cioè indicizzati da valori di tipo stringa.
 L'operatore speciale
 .B in
 può essere usato per controllare se un vettore contiene un certo valore
-come indice.
+come indice:
 .PP
 .RS
 .ft B
@@ -908,9 +973,9 @@ può anche essere usata per cancellare l'intero contenuto di un vettore,
 basta specificare il nome del vettore stesso senza indici.
 .PP
 .I gawk
-supporta veri vettori multidimensionali.  Non richiede che
-tali vettori siano ``rettangolare'' come in C or C++.
-Vedere
+supporta veri vettori multidimensionali.
+Non è necessario che tali vettori siano "rettangolari" come in C o C++.
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Arrays
 per i dettagli.
 .SS Spazi-dei-nomi
@@ -927,7 +992,7 @@ consiste di due identificativi semplici, congiunti da una coppia di due punti
 Il primo dei due identificativi designa lo spazio-dei-nomi (namespace)
 mentre il secondo è il nome della variabile al suo interno.
 Tutti i nomi semplici (non qualificati) sono considerati come appartenenti
-allo spazio-dei-nomi ``corrente''; lo spazio-dei-nomi predefinito ha nome
+allo spazio-dei-nomi \*(lqcorrente\*(rq; lo spazio-dei-nomi predefinito ha nome
 .BR awk .
 Comunque, gli identificativi i cui nomi sono composti solo da lettere
 maiuscole, vengono sempre considerati come facenti parte dello spazio-dei-nomi
@@ -937,20 +1002,21 @@ anche se lo spazio-dei-nomi corrente è diverso da quello predefinito.
 Si può cambiare lo spazio-dei-nomi corrente tramite la direttiva
 \fB@namespace "\fInome\^\fB"\fR.
 .PP
-I nomi delle funzioni interne predefinite non possono essere usati come
-nomi di uno spazio-dei-nomi.  I nomi di ulteriori funzioni, fornite da
+I nomi delle funzioni interne predefinite standard non possono essere usati
+come nomi di uno spazio-dei-nomi.  I nomi di ulteriori funzioni, fornite da
 .I gawk
 possono essere usati come nomi di uno spazio-dei-nomi o come semplici
 identificativi in altri spazi-dei-nomi.
-Per ulteriori dettagli, vedere
+Per ulteriori dettagli, vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/Namespaces.html#Namespaces .
 .SS Notazione e conversione delle variabili
 Le variabili e i campi
-possono essere numeri (in virgola mobile), stringhe, o entrambe le cose.
+possono essere numeri (in virgola mobile), stringhe o entrambe le cose.
 Possono anche essere espressioni regolari.
 Come sia interpretato il valore di una variabile dipende dal contesto.
-In un'espressione numerica, sarà trattato come un numero; usato come
-stringa, sarà trattato come tale.
+In un'espressione numerica,
+sarà trattato come un numero;
+se usato come stringa, sarà trattato come tale.
 .PP
 Per far trattare una variabile come numero, le si sommi zero; per ottenere
 che venga trattata come come stringa, le si concateni la stringa nulla.
@@ -1018,7 +1084,7 @@ Le costanti stringa in \*(AK sono sequenze di caratteri racchiusi tra
 doppi apici (come \fB"valore"\fR).  All'interno delle stringhe, sono riconosciute alcune
 .IR "sequenze di protezione" ,
 come in C.
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Escape-Sequences
 per i dettagli.
 .SS Costanti di tipo Regexp
@@ -1035,7 +1101,7 @@ corrisponde a tutti i caratteri non stampabili [bianchi]).
 .I Gawk
 consente anche di usare costanti formate da espressioni regolari
 .IR "fortemente tipizzate" .
-I nome di tali costanti sono preceduti da un simbolo
+I nome di tali costanti vanno preceduti da un simbolo
 .B @
 (così:
 .BR @/valore/ ).
@@ -1079,7 +1145,7 @@ o
 .B else
 continuano automaticamente alla riga successiva.
 Negli altri casi, un'istruzione può continua sulla riga successiva
-se termina con \*(lq\e\*(rq, nel qual caso il "newline" è ignorato.
+se termina con \*(lq\e\*(rq, nel qual caso il carattere "a capo" è ignorato.
 Comunque, un \*(lq\e\*(rq che venga dopo un carattere
 .B #
 non è speciale.
@@ -1101,9 +1167,9 @@ I criteri di ricerca di \*(AK possono assumere le forme seguenti:
 .I "espressione di relazione"
 .IB criterio " && " criterio
 .IB criterio " || " criterio
-.IB criterio " ? " criterio " : " criterio
+.IB criterio " ?\& " criterio " : " criterio
 .BI ( criterio )
-.BI ! " criterio"
+.BI !\& " criterio"
 .IB criterio1 ", " criterio2
 .fi
 .RE
@@ -1132,7 +1198,7 @@ I criteri
 .B BEGIN
 e
 .B END
-devono necessariamente essere seguiti dall'indicazione di un'azione
+devono necessariamente essere seguiti dall'indicazione di un'azione.
 .PP
 .B BEGINFILE
 e
@@ -1147,19 +1213,20 @@ il valore di
 è una stringa vuota se il file è stato aperto con successo.
 Altrimenti, in caso di problemi col file il codice dovrebbe usare
 .B nextfile
-per saltarlo.  Se non lo fa,
+per saltarlo.
+Se non lo fa,
 .I gawk
 emette il solito errore fatale per i file che non possono essere aperti.
 .PP
 Per i criteri del tipo
-.BI / "espressione regolare" /
-l'azione associata è eseguita per ogni record in input che corrisponde
-all'espressione regolare.
+.BI / "espressione regolare" / ,
+l'azione associata è eseguita per ogni record in input
+che corrisponde all'espressione regolare.
 Le espressioni regolari hanno la stessa forma di quelle di
-.IR egrep (1),
-Vedere
+.IR egrep (1).
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Regexp.html
-per i dettagli sulle espressioni regolari
+per i dettagli sulle espressioni regolari.
 .PP
 In
 .RI un' "espressione relazionale"
@@ -1169,7 +1236,7 @@ certi campi sono individuati da determinate espressioni regolari.
 .PP
 Gli operatori
 .BR && ,
-.BR || ,
+.BR ||
 e
 .B !
 sono rispettivamente l'AND logico, l'OR logico e il NOT logico.  Come i loro
@@ -1183,7 +1250,8 @@ L'operatore
 .B ?\^:
 è simile allo stesso operatore in C: se il primo criterio è vero,
 allora il criterio utilizzato per il test è il secondo, altrimenti
-è il terzo. Dei criteri secondo e terzo, ne è valutato sempre solo uno.
+è il terzo.
+Dei criteri secondo e terzo, ne è valutato sempre solo uno.
 .PP
 Un'espressione nella forma
 .IB criterio1 ", " criterio2
@@ -1193,7 +1261,8 @@ Essa individua tutti i record a partire da quello che ha corrispondenza con
 .IR criterio1 ,
 fino a quello che corrisponde a
 .IR criterio2 ,
-compreso.  Non può essere combinata con alcun'altra espressione.
+compreso.
+Non può essere combinata con alcun altro tipo di espressione.
 .SS Azioni
 Le istruzioni di azione sono racchiuse tra parentesi graffe,
 .B {
@@ -1204,7 +1273,7 @@ assegnamento, condizionali e iterative presenti nella maggior parte
 dei linguaggi.  Gli operatori, le strutture di controllo e le istruzioni
 di input/output ricalcano quelli corrispondenti nel linguaggio C.
 .SS Operatori
-Gli operatori di \*(AK, in ordine decrescente di precedenza, sono
+Gli operatori di \*(AK, in ordine decrescente di precedenza, sono:
 .TP "\w'\fB*= /= %= ^=\fR'u+1n"
 .BR ( \&.\|.\|. )
 Raggruppamento
@@ -1233,7 +1302,7 @@ Concatenazione di stringhe.
 .B "|   |&"
 I/O proveniente dall'output di comandi [pipe] per
 .BR getline ,
-.BR print ,
+.BR print
 e
 .BR printf .
 .TP
@@ -1241,7 +1310,7 @@ e
 I normali operatori di relazione.
 .TP
 .B "~ !~"
-Corrispondenza tra espressioni regolari, e nessuna corrispondenza.
+Corrispondenza o non-corrispondenza tra espressioni regolari.
 .TP
 .B in
 Controllo di appartenenza a un vettore.
@@ -1287,7 +1356,7 @@ le seguenti:
 \fBdelete \fIvettore\^\fB[\^\fIindice\^\fB]\fR
 \fBdelete \fIvettore\^\fR
 \fBexit\fR [ \fIespressione\fR ]
-\fB{ \fIistruzione \fB}
+\fB{ \fIistruzioni \fB}
 \fBswitch (\fIespressione\fB) {
 \fBcase \fIvalore\fB|\fIespressione_regolare\fB : \fIistruzione
 \&.\^.\^.
@@ -1295,7 +1364,7 @@ le seguenti:
 \fB}\fR
 .fi
 .RE
-.SS "Istruzioni di I/O"
+.SS Istruzioni di I/O
 Le istruzioni di input/output sono le seguenti:
 .TP "\w'\fBprintf \fIformato, lista-espressioni\fR'u+1n"
 \fBclose(\fIfile \fR[\fB, \fIcome\fR]\fB)\fR
@@ -1370,7 +1439,7 @@ Scrive qualsiasi buffer associato con il file di output o la pipe
 .IR file .
 Se
 .I file
-non è specificato o è la stringa nulla,
+non è specificato o ha per valore la stringa nulla,
 vengono scritti tutti i file in output e le pipe.
 .TP
 .B next
@@ -1427,15 +1496,16 @@ La riga prodotta termina col valore della variabile
 Stampa usando il formato specificato.
 .TP
 .BI printf " formato, lista-espressioni" " >" file
-Stampa usando il formato specificato su
-.IR file .
+Stampa su
+.IR file
+usando il formato specificato.
 .TP
 .BI system( riga-di-comando )
 Esegue il comando
 .IR riga-di-comando ,
 e ne restituisce il valore d'uscita.
-(può non essere disponibile sui sistemi non-\*(PX).
-Vedere
+(Può non essere disponibile sui sistemi non-\*(PX).
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/I_002fO-Functions.html#I_002fO-Functions
 per tutti i dettagli sul valore restituito dal comando eseguito.
 .PP
@@ -1457,7 +1527,7 @@ Invia dati a un coprocesso o a un socket.
 .BR "Nomi di file speciali" ,
 più avanti).
 .PP
-Il comando
+La funzione
 .B getline
 restituisce 1 se tutto va bene, zero in caso di fine file, e \-1 in caso di errore.
 Se il valore di
@@ -1474,8 +1544,8 @@ A fronte di un errore
 .PP
 .BR NOTA :
 L'insuccesso nell'apertura di un socket bidirezionale genera un errore
-non fatale che viene restituito alla funzione chiamante.  Se si sta usando
-una pipe, un coprocesso, o un socket per alimentare la
+non fatale che viene restituito alla funzione chiamante.
+Se si sta usando una pipe, un coprocesso, o un socket per alimentare la
 .BR getline ,
 o da
 .B print
@@ -1493,7 +1563,8 @@ Le versioni di \*(AK dell'istruzione
 .B printf
 e della funzione
 .B sprintf()
-soono simili a quelle del linguaggio C. Per i dettagli, vedere
+sono simili a quelle del linguaggio C.
+Per i dettagli, vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/Printf.html .
 .SS Nomi di file speciali
 Effettuando delle ridirezioni di
@@ -1549,7 +1620,7 @@ sulla porta remota
 .IR rport .
 Si usi la porta numero
 .B 0
-Per permettere al sistema di scegliere una porta.
+per permettere al sistema di scegliere una porta.
 Si usi
 .B /inet4
 per richiedere una connessione IPv4,
@@ -1560,7 +1631,7 @@ Specificando semplicemente
 .B /inet
 usa quello predefinito del sistema (molto probabilmente IPv4).
 Si può usare solo con l'operatore bidirezionale di I/O
-.B |& .
+.B |&.
 .TP
 .PD 0
 .BI /inet/udp/ lport / rhost / rport
@@ -1571,6 +1642,7 @@ Si può usare solo con l'operatore bidirezionale di I/O
 .PD
 .BI /inet6/udp/ lport / rhost / rport
 Come sopra, ma usando porte UDP/IP invece che TCP/IP.
+.B "Il supporto del protocollo UDP è obsoleto e sarà rimosso in futuro."
 .SS Funzioni numeriche
 \*(AK ha le seguenti funzioni aritmetiche predefinite:
 .TP "\w'\fBsrand(\fR[\fIespressione\^\fR]\fB)\fR'u+1n"
@@ -1596,7 +1668,8 @@ I numeri
 .I numero
 e
 .I denominatore
-vengono troncati a numeri interi. Restituisce il quoziente di
+vengono troncati a numeri interi.
+Restituisce il quoziente di
 .I numero
 diviso per
 .I denominatore
@@ -1637,7 +1710,8 @@ Il valore restituito è il valore precedente
 del seme.
 .SS Funzioni di stringa
 .I Gawk
-offre le seguenti funzioni di stringa seguenti predefinite; ulteriori dettagli in
+offre le seguenti funzioni di stringa seguenti predefinite;
+per ulteriori dettagli vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/String-Functions .
 .TP "\w'\fBsprintf(\fIformato\^\fB\^, \fIlista-espressioni\^\fB)\fR'u+1n"
 \fBasort(\fIs \fR[\fB, \fId\fR [\fB, \fIcome\fR] ]\fB)\fR
@@ -1654,8 +1728,8 @@ valori, e sostituisce gli indici dei
 valori ordinati di
 .I s
 con la sequenza dei numeri interi
-a partire da 1.  Se viene specificato
-il vettore destinazione (facoltativo)
+a partire da 1.
+Se viene specificato il vettore destinazione (facoltativo)
 .IR d ,
 dapprima
 il vettore
@@ -1672,7 +1746,7 @@ La stringa facoltativa
 controlla la direzione e il modo del confronto.
 Valori ammissibili per
 .I come
-sono descritti in
+sono descritti [in inglese] in
 .IR https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html#String-Functions .
 .IR s " e " d
 possono specificare lo stesso vettore; la cosa ha senso nel
@@ -1766,7 +1840,7 @@ Si usi
 .B \e&
 per indicare il carattere
 .BR &
-inteso letteralmente (va scritto come \fB"\e\e&"\fP; vedere
+inteso letteralmente (va scritto come \fB"\e\e&"\fP; vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Gory-Details.html#Gory-Details
 per una trattazione più completa delle regole sull'uso della "e commerciale" (ampersand)
 e delle barre inverse nel testo di rimpiazzo di
@@ -1813,7 +1887,7 @@ Si noti che l'ordine degli argomenti è lo stesso in uso per l'operatore
 .IB stringa " ~"
 .IR espressione-regolare .
 .ft R
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/String-Functions.html#String-Functions
 per una descrizione di come il vettore
 .I a
@@ -1852,7 +1926,7 @@ e
 .I seps
 sono svuotati all'inizio dell'operazione.
 La suddivisione si comporta come la suddivisione in campi con
-.BR FPAT .
+.BR FPAT ,
 descritta sopra.
 .TP
 \fBsplit(\fIs\fB, \fIa \fR[\fB, \fIr\fR [\fB, \fIseps\fR] ]\fB)\fR
@@ -1955,43 +2029,43 @@ e
 lavorano in termini di caratteri, non di byte.
 .SS Funzioni di tempo
 .I Gawk
-mette a disposizione le seguenti funzioni per ottenere data e ora
-e per formattarle come desiderato. I dettagli si trovano in
+offre le seguenti funzioni per ottenere l'orario
+e per formattarlo.
+I dettagli si trovano [in inglese] in
 .IR https://www.gnu.org/software/gawk/manual/html_node/Time-Functions .
 .TP "\w'\fBsystime()\fR'u+1n"
-\fBmktime(\fIdatespec\fR [\fB, \fIutc-flag\fR]\fB)\fR
-Traduce
-.I datespec
-In una marcatura temporale nello stesso formato restituito dalla funzione [del linguaggio C]
+\fBmktime(\fIspecifica-data\fR [\fB, \fIutc-flag\fR]\fB)\fR
+Converte
+.I specifica-data
+in un orario nello stesso formato della funzione [del linguaggio C]
 .BR systime() ,
 e restituisce il risultato.
-Se il flag
+Se
 .I utc-flag
 è presente e diverso da zero e dalla stringa nulla,
-il tempo è supposto essere quello del fuso orario UTC
-[ora di Greenwich];
-altrimenti, si suppone che il tempo sia quello del
-fuso orario locale.
+l'orario restituito è nel fuso UTC [ora di Greenwich];
+altrimenti l'orario è nel fuso locale.
 Se
-.I datespec
+.I specifica-data
 non contiene sufficienti elementi o se il tempo risultante
 è fuori intervallo,
 .B mktime()
 restituisce \-1.
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Time-Functions.html#Time-Functions
 per i dettagli di
-.IR datespec .
+.IR specifica-data .
 .TP
-\fBstrftime(\fR[\fIformat \fR[\fB, \fItimestamp\fR[\fB, \fIutc-flag\fR]]]\fB)\fR
+\fBstrftime(\fR[\fIformato \fR[\fB, \fItimestamp\fR[\fB, \fIutc-flag\fR]]]\fB)\fR
 Formatta
 .I timestamp
 secondo quanto specificato in
-.IR format .
+.IR formato .
 Se
 .I utc-flag
-è presente e diversa da zero o dalla stringa nulla, il risultato
-è in UTC [ora di Greenwich], altrimenti il risultato è nell'ora locale.
+è presente e diverso da zero e dalla stringa nulla,
+l'orario restituito è nel fuso UTC [ora di Greenwich];
+altrimenti l'orario è nel fuso locale.
 Il
 .I timestamp
 dovrebbe essere nella forma utilizzata da
@@ -2000,7 +2074,7 @@ Se
 .I timestamp
 è omesso, sono utilizzate la data e l'ora correnti.
 Se
-.I format
+.I formato
 è omesso, è assunto un formato equivalente a quello dell'output del comando
 .IR date (1).
 Il formato predefinito è disponibile in
@@ -2015,7 +2089,7 @@ Restituisce l'ora corrente come numero di secondi a partire da:
 (1970-01-01 00:00:00 UTC sui sistemi \*(PX).
 .SS Funzioni di manipolazione dei bit
 .I Gawk
-prevede le seguenti funzioni di manipolazione dei bit.
+offre le seguenti funzioni di manipolazione dei bit.
 Sono realizzate dapprima convertendo valori in virgola mobile con precisione
 doppia in interi nel formato
 .BR uintmax_t ,
@@ -2065,7 +2139,6 @@ che vengono loro passati.
 Restituisce "Vero" se
 .I x
 è un vettore, altrimenti restituisce "Falso".
-[0 e la stringa nulla significano "Falso". Qualsiasi altro valore sta per "Vero".]
 .TP
 \fBtypeof(\fIx\fB)\fR
 Restituisce una stringa che indica il tipo di
@@ -2078,11 +2151,11 @@ La stringa sarà una di queste:
 \fB"strnum"\fP,
 \fB"unassigned"\fP
 o
-\fB"undefined"\fP.
+\fB"untyped"\fP.
 .SS Funzioni di internazionalizzazione
 Le seguenti funzioni possono essere usate all'interno di un programma AWK
 per tradurre stringhe in fase di esecuzione del programma.
-Per informazioni dettagliate, vedere
+Per informazioni dettagliate, vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/I18N-Functions.html#I18N-Functions .
 .TP
 \fBbindtextdomain(\fIdirectory \fR[\fB, \fIdominio\fR]\fB)\fR
@@ -2091,11 +2164,11 @@ Specifica la directory in cui
 cerca i file
 .BR \&.gmo ,
 nel caso non siano
-o non si possano mettere nelle directory ``standard''.
+o non si possano mettere nelle directory \*(lqstandard\*(rq.
 Restituisce la directory a cui
 .I dominio
-è ``collegato''.
-.sp .5
+è \*(lqcollegato\*(rq.
+.sp 0.5
 Il valore predefinito per
 .I dominio
 è il valore della variabile
@@ -2124,7 +2197,7 @@ Il valore predefinito per
 è \fB"LC_MESSAGES"\fR.
 .sp .5
 .TP
-\fBdcngettext(\fIstringa1\fB, \fIstringa2\fB, \fInumero \fR[\fB, \fIdominio \fR[\fB, \fIcategory\fR]]\fB)\fR
+\fBdcngettext(\fIstringa1\fB, \fIstringa2\fB, \fInumero \fR[\fB, \fIdominio \fR[\fB, \fIcategoria\fR]]\fB)\fR
 Restituisce la forma plurale in uso per
 .I numero
 nella traduzione di
@@ -2146,19 +2219,19 @@ Il valore predefinito per
 .SS Funzioni con valori booleani
 È possibile creare valori speciali di tipo booleano;
 vedere il manuale per sapere come funzionano e
-perché sono stati resi disponibili.
+perché esistono.
 .TP
 .BI mkbool( espressione\^ )
 A seconda del valore booleano di
 .I espressione
-restituisce un valore di true [vero] o false [falso].
-True ha come valore numerico uno.
-False ha come valore numerico zero.
+restituisce un valore di vero o falso.
+Vero ha come valore numerico uno.
+Falso ha come valore numerico zero.
 .SH FUNZIONI DEFINITE DALL'UTENTE
 Le funzioni in \*(AK sono definite in questo modo:
 .PP
 .RS
-\fBfunction \fInome\fB(\fIlista-parametri\fB) { \fIistruzioni \fB}\fR
+\fBfunction \fInome\fB(\fIlista-di-parametri\fB) { \fIistruzioni \fB}\fR
 .RE
 .PP
 Le funzioni vengono eseguite se chiamate dall'interno di espressioni,
@@ -2168,7 +2241,7 @@ ai parametri formali dichiarati nella funzione.
 I vettori sono passati per riferimento, le altre variabili per valore.
 .PP
 Le variabili locali sono dichiarate come parametri in più nella
-lista dei parametri.
+lista dei parametri formali.
 Per convenzione, si usa separare le variabili locali dai veri parametri
 con qualche spazio in più nella lista. Per esempio:
 .PP
@@ -2185,7 +2258,7 @@ function  f(p, q,     a, b)	# a e b sono variabili locali
 .ft R
 .RE
 .PP
-La parentesi sinistra che indica una chiamata deve seguire immediatamente
+La parentesi di sinistra che indica una chiamata deve seguire immediatamente
 il nome della funzione chiamata, senza spazi in mezzo.
 Questa restrizione non si applica alle funzioni predefinite elencate sopra.
 .PP
@@ -2194,14 +2267,15 @@ I parametri utilizzati come variabili locali sono inizializzati
 alla stringa nulla e al numero zero al momento dell'invocazione.
 .PP
 Si usi
-.BI return " expr"
+.BI return " espressione"
 per restituire un valore da una funzione.  Il valore di ritorno è indefinito se
 non si fornisce alcun valore, o se la funzione ritorna automaticamente dopo aver
 eseguito l'ultima istruzione della funzione stessa, nella modalità detta \*(lqfalling off\*(rq.
 .PP
-Le funzioni possono essere chiamate indirettamente.  Per far ciò basta assegnare
-il nome della funzione da chiamare, in formato stringa, a una variabile.  Poi
-si usi la variabile come se fosse un nome di funzione, premettendole il segno
+Le funzioni possono essere chiamate indirettamente.
+Per far ciò basta assegnare
+il nome della funzione da chiamare, in formato stringa, a una variabile.
+Poi si usi la variabile come se fosse un nome di funzione, premettendole il segno
 .B @
 come si può vedere qui sotto:
 .RS
@@ -2231,12 +2305,12 @@ La chiamata di una funzione indefinita in fase di esecuzione
 è un errore fatale.
 .SH CARICARE DINAMICAMENTE NUOVE FUNZIONI
 Si possono aggiungere dinamicamente nuove funzioni scritte in C o C++
-all'interpretatore
+all'interprete
 .I gawk
 in esecuzione tramite l'istruzione
 .BR @load .
 Una descrizione dettagliata non è possibile in questa pagina di manuale;
-vedere
+vedere [in inglese]
 .IR https://www.gnu.org/software/gawk/manual/html_node/Dynamic-Extensions.html#Dynamic-Extensions .
 .SH SEGNALI
 Il profilo
@@ -2255,10 +2329,12 @@ chiede a
 di scrivere il profilo e lo stack delle chiamate a funzione e di terminare l'esecuzione del programma.
 .SH INTERNAZIONALIZZAZIONE
 Le costanti di tipo stringa sono sequenze di caratteri racchiuse fra doppi
-apici.  In un ambiente dove non si parla inglese, è possibile segnare delle
-stringhe in un programma \*(AK per richiederne la traduzione nel linguaggio
-utilizzato in loco.  Tali stringhe sono precedute nel programma \*(AK da
-un carattere di sottolineatura (\*(lq_\*(rq).  Per esempio,,
+apici.
+In un ambiente dove non si parla inglese, è possibile segnare delle
+stringhe in un programma \*(AK per richiederne
+la traduzione nel linguaggio utilizzato localmente.
+Tali stringhe sono precedute nel programma \*(AK da
+un carattere di sottolineatura (\*(lq_\*(rq).  Per esempio,
 .sp
 .RS
 .ft B
@@ -2277,10 +2353,10 @@ gawk 'BEGIN { print _"hello, world" }'
 .sp
 .ft R
 potrebbe invece stampare
-.B "bonjour, monde"
-se eseguito in Francia.
+.B "salve, mondo"
+se eseguito in Italia.
 .PP
-Vedere
+Vedere [in inglese]
 .I https://www.gnu.org/software/gawk/manual/html_node/Internationalization.html#Internationalization
 per i passi necessari per produrre ed eseguire un programma \*(AK
 localizzabile.
@@ -2288,7 +2364,7 @@ localizzabile.
 .I Gawk
 ha fin troppe estensioni rispetto alla versione \*(PX di
 .IR awk .
-Esse sono descritte in
+Esse sono descritte [in inglese] in
 .IR https://www.gnu.org/software/gawk/manual/html_node/POSIX_002fGNU.html .
 Tutte le estensioni possono essere disabilitate
 invocando
@@ -2309,9 +2385,11 @@ esamina alla ricerca di file coi nomi indicati tramite le opzioni
 .B \-i
 e
 .BR \-\^\-include ,
-e tramite la direttiva
-.BR @include .
-Se la ricerca iniziale non ha successo, una seconda ricerca è
+e tramite le direttive
+.B @include
+e
+.B @nsinclude.
+Se la ricerca iniziale non va a buon fine, una seconda ricerca è
 effettuata accodando
 .B \&.awk
 al nome del file indicato.
@@ -2323,11 +2401,11 @@ può essere usata per fornire una lista di directory che
 esamina alla ricerca di file coi nomi indicati tramite le opzioni
 .B \-l
 e
-.B \-\^\-load
+.B \-\^\-load .
 .
 .PP
 La variabile d'ambiente
-.B GAWK_PERSIST_FILE ,
+.B GAWK_PERSIST_FILE,
 se presente, specifica il nome del file contenente
 i dati necessari alla funzionalità
 "memoria persistente" ["persistent memory"]
@@ -2335,8 +2413,7 @@ i dati necessari alla funzionalità
 .B gawk
 utilizzando i dati salvati alla fine di
 una precedente esecuzione di
-.B gawk ).
-.IR "Questa è una funzionalità sperimentale" .
+.B gawk).
 Vedere \*(EP per i dettagli.
 .PP
 La variabile d'ambiente
@@ -2350,7 +2427,8 @@ Per le connessioni a un host remoto via socket,
 controlla il numero di tentativi di lettura, e
 .B GAWK_MSEC_SLEEP
 l'intervallo fra un tentativo di lettura e quello successivo.
-L'intervallo è in millisecondi.  Su sistemi che non supportano
+L'intervallo è in millisecondi.
+Sui sistemi che non supportano
 .IR usleep (3),
 il valore è arrotondato a un numero intero di secondi.
 .PP
@@ -2365,12 +2443,12 @@ Se
 .B \-\^\-lint
 è stato specificato,
 .I gawk
-emette un messaggio di avvertimento riguardo a questo.
+emette un avviso riguardo a questo.
 .ig
 .PP
 Impostare a 1 la variabile d'ambiente
 .B GAWK_NO_MPFR_WARN
-per non ricevere il messaggio di avvertimento
+per non ricevere l'avviso
 che l'uso di MPFR e GMP è deprecato.
 ..
 .SH STATO DI USCITA
@@ -2396,17 +2474,17 @@ Questo valore è normalmente uno.
 .PP
 Se
 .I gawk
-termina a causa di un errore fatale, il valore restituito è 2.  Su sistemi
+termina a causa di un errore fatale, il valore restituito è 2.  Sui sistemi
 non-POSIX, questo valore può essere visualizzato come
 .BR EXIT_FAILURE .
 .SH INFORMAZIONE SULLA VERSIONE
 Questa pagina man documenta
 .IR gawk ,
-versione 5.3.
+versione 5.4.
 .SH AUTORI
-La versione originale di \*(UX
+La versione originale di
 .I awk
-è stata progettata e implementata da Alfred Aho,
+\*(UX è stata progettata e implementata da Alfred Aho,
 Peter Weinberger, e Brian Kernighan dei Bell Laboratories.
 Ozan Yigit è il manutentore corrente.
 Brian Kernighan contribuisce ogni tanto allo sviluppo.
@@ -2435,26 +2513,29 @@ nella distribuzione
 .I gawk
 per informazioni aggiornate riguardo ai manutentori
 e per sapere per quali sistemi operativi gawk è disponibile.
-.PP
-Traduzione in italiano a cura di
-ILDP - Italian Linux Documentation Project
-.B http://www.pluto.it/ildp
-.SH SEGNALAZIONE DI ERRORI
-Se trovate un bug in
+.SH SEGNALAZIONE DI ERRORI E RICHIESTE DI AIUTO
+Se si trova un bug in
 .IR gawk ,
-siete pregati di usare il programma
-.BR \%bug-gawk@gnu.org .
+usare il programma
 .IR gawkbug (1)
 per segnalarlo.
 .PP
-Istruzioni dettagliate per segnalare un bug sono disponibili in
+Istruzioni dettagliate per segnalare un bug sono disponibili [in inglese]
 IR https://www.gnu.org/software/gawk/manual/html_node/Bugs.html .
-.I Per piacere,
-leggete attentamente e seguite le istruzioni là disponibili.
+.I Per favore,
+leggere attentamente e seguire le istruzioni là disponibili.
 Ciò faciliterà la segnalazione di errori e la loro risoluzione per
 tutte le persone coinvolte.
 Veramente!
 .PP
+D'altro canto, se si hanno domande su come riuscire a raggiungere
+un particolare risultato utilizzando
+.I awk
+o
+.IR gawk ,
+si può spedire un messaggio di posta elettronica a
+.B help-gawk@gnu.org
+contenente una richiesta di aiuto.
 .SH ERRORI
 L'opzione
 .B \-F
@@ -2468,20 +2549,24 @@ ha troppe funzionalità.
 .IR egrep (1),
 .IR sed (1),
 .IR gawkbug (1),
-.IR printf (3),
+.IR printf (3)
 e
-.IR strftime (3),
+.IR strftime (3).
 .PP
-.IR "The AWK Programming Language" ,
+.IR "The AWK Programming Language - Second Edition" ,
 Alfred V.\& Aho, Brian W.\& Kernighan, Peter J.\& Weinberger,
-Addison-Wesley, 1988.  ISBN 0-201-07981-X.
+Addison-Wesley, 2023.
+ISBN 9-780138-269722.
 .PP
 \*(EP,
-Edizione 5.2, disponibile con il codice sorgente
+Edizione 5.3, distribuito con il codice sorgente
 .IR gawk .
-La versione originale corrente di questo documento è
+La versione originale aggiornata del libro è
 disponibile online a:
 .IR https://www.gnu.org/software/gawk/manual .
+La traduzione italiana aggiornata del libro è
+disponibile online a:
+.IR https://sites.google.com/view/gawkdoc-it .
 .PP
 La documentazione di
 .B gettext
@@ -2532,7 +2617,7 @@ Lo ringraziamo.
 Copyright \(co 1989, 1991, 1992, 1993, 1994, 1995, 1996,
 1997, 1998, 1999, 2001, 2002, 2003, 2004, 2005, 2007, 2009,
 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019,
-2020, 2021, 2022, 2023
+2020, 2021, 2022, 2023, 2024, 2025, 2026
 Free Software Foundation, Inc.
 .PP
 Permission is granted to make and distribute verbatim copies of
@@ -2570,7 +2655,7 @@ the original English text does that.
 Copyright \(co 1989, 1991, 1992, 1993, 1994, 1995, 1996,
 1997, 1998, 1999, 2001, 2002, 2003, 2004, 2005, 2007, 2009,
 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019,
-2020, 2021, 2022
+2020, 2021, 2022, 2023, 2024
 Free Software Foundation, Inc.
 .PP
 È permesso stampare e distribuire copie letterali di questa pagina

@@ -872,7 +872,7 @@ and watch the output. Within a second, it connects via TCP (@file{/inet/tcp})
 to a remote server and asks the service
 @samp{daytime} on the machine what time it is:
 
-@cindex @code{getline} command
+@cindex @code{getline} function
 @example
 @c file eg/network/daytimeclient.awk
 BEGIN @{

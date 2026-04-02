@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2010, 2013, 2014, 2016, the Free Software Foundation, Inc.
+ * Copyright (C) 2010, 2013, 2014, 2016, 2026,
+ * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -248,7 +249,6 @@ os_popen(const char *command, const char *mode )
     ** output.
     */
     if (*curmode == 'r') {
-        FILE *fp;
         if ((cur = dup(fileno(stdout))) == -1)
 	    return NULL;
 	*curmode = 'w';
@@ -304,7 +304,7 @@ os_pclose( FILE * current)
 	rval = -1;
 	if ((fd = dup(fileno(stdin))) != -1) {
 	  char *mode = pipes[cur].pmode; *mode = 'r';
-	  if (current = freopen(pipes[cur].name, mode, stdin)) {
+	  if ((current = freopen(pipes[cur].name, mode, stdin))) {
 	    rval = os_system(pipes[cur].command);
 	    fclose(current);
 	    if (dup2(fd, fileno(stdin)) == -1) rval = -1;

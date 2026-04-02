@@ -1,4 +1,4 @@
-This is gawkinet.info, produced by makeinfo version 7.0.1 from
+This is gawkinet.info, produced by makeinfo version 7.2.90 from
 gawkinet.texi.
 
 This is Edition 1.6 of ‘TCP/IP Internetworking with ‘gawk’’, for the
@@ -12,19 +12,19 @@ This is Edition 1.6 of ‘TCP/IP Internetworking with ‘gawk’’, for the
    Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
 any later version published by the Free Software Foundation; with the
-Invariant Sections being “GNU General Public License”, the Front-Cover
+Invariant Sections being "GNU General Public License", the Front-Cover
 texts being (a) (see below), and with the Back-Cover Texts being (b)
 (see below).  A copy of the license is included in the section entitled
-“GNU Free Documentation License”.
+"GNU Free Documentation License".
 
-  a. “A GNU Manual”
+  a. "A GNU Manual"
 
-  b. “You have the freedom to copy and modify this GNU manual.  Buying
+  b. "You have the freedom to copy and modify this GNU manual.  Buying
      copies from the FSF supports it in developing GNU and promoting
-     software freedom.”
+     software freedom."
 INFO-DIR-SECTION Network applications
 START-INFO-DIR-ENTRY
-* awkinet: (gawkinet).          TCP/IP Internetworking With ‘gawk’.
+* awkinet: (gawkinet).          TCP/IP Internetworking With 'gawk'.
 END-INFO-DIR-ENTRY
 
 
@@ -47,16 +47,16 @@ This file documents the networking features in GNU Awk (‘gawk’) version
    Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
 any later version published by the Free Software Foundation; with the
-Invariant Sections being “GNU General Public License”, the Front-Cover
+Invariant Sections being "GNU General Public License", the Front-Cover
 texts being (a) (see below), and with the Back-Cover Texts being (b)
 (see below).  A copy of the license is included in the section entitled
-“GNU Free Documentation License”.
+"GNU Free Documentation License".
 
-  a. “A GNU Manual”
+  a. "A GNU Manual"
 
-  b. “You have the freedom to copy and modify this GNU manual.  Buying
+  b. "You have the freedom to copy and modify this GNU manual.  Buying
      copies from the FSF supports it in developing GNU and promoting
-     software freedom.”
+     software freedom."
 
 * Menu:
 
@@ -124,7 +124,7 @@ the production versions of ‘gawk’ available from his home page.  In
 August of 2000 (for ‘gawk’ 3.0.6), this patch also made it to the main
 GNU ‘ftp’ distribution site.
 
-   For release with ‘gawk’, I edited Jürgen’s prose for English grammar
+   For release with ‘gawk’, I edited Jürgen's prose for English grammar
 and style, as he is not a native English speaker.  I also rearranged the
 material somewhat for what I felt was a better order of presentation,
 and (re)wrote some of the introductory material.
@@ -190,7 +190,7 @@ When you make a phone call, the following steps occur:
 
    The same steps occur in a duplex reliable computer networking
 connection.  There is considerably more overhead in setting up the
-communications, but once it’s done, data moves in both directions,
+communications, but once it's done, data moves in both directions,
 reliably, in sequence.
 
 
@@ -216,12 +216,12 @@ following.
      does not occur very often.)
 
   6. In a computer network, one or more “packets” may also arrive
-     multiple times.  (This doesn’t happen with the postal system!)
+     multiple times.  (This doesn't happen with the postal system!)
 
    The important characteristics of datagram communications, like those
 of the postal system are thus:
 
-   • Delivery is “best effort;” the data may never get there.
+   • Delivery is "best effort;" the data may never get there.
 
    • Each message is self-contained, including the source and
      destination addresses.
@@ -245,7 +245,7 @@ File: gawkinet.info,  Node: The TCP/IP Protocols,  Next: Making Connections,  Pr
 
 The Internet Protocol Suite (usually referred to as just TCP/IP)(1)
 consists of a number of different protocols at different levels or
-“layers.” For our purposes, three protocols provide the fundamental
+"layers."  For our purposes, three protocols provide the fundamental
 communications mechanisms.  All other defined protocols are referred to
 as user-level protocols (e.g., HTTP, used later in this Info file).
 
@@ -269,8 +269,8 @@ File: gawkinet.info,  Node: Basic Protocols,  Next: Ports,  Prev: The TCP/IP Pro
 IP
      The Internet Protocol.  This protocol is almost never used directly
      by applications.  It provides the basic packet delivery and routing
-     infrastructure of the Internet.  Much like the phone company’s
-     switching centers or the Post Office’s trucks, it is not of much
+     infrastructure of the Internet.  Much like the phone company's
+     switching centers or the Post Office's trucks, it is not of much
      day-to-day interest to the regular user (or programmer).  It
      happens to be a best effort datagram protocol.  In the early
      twenty-first century, there are two versions of this protocol in
@@ -281,11 +281,11 @@ IP
           addresses, on which most of the current Internet is based.
 
      IPv6
-          The “next generation” of the Internet Protocol, with 128-bit
+          The "next generation" of the Internet Protocol, with 128-bit
           addresses.  This protocol is in wide use in certain parts of
           the world, but has not yet replaced IPv4.(1)
 
-     Versions of the other protocols that sit “atop” IP exist for both
+     Versions of the other protocols that sit "atop" IP exist for both
      IPv4 and IPv6.  However, as the IPv6 versions are fundamentally the
      same as the original IPv4 versions, we will not distinguish further
      between them.
@@ -309,7 +309,7 @@ Protocol).
 
    ---------- Footnotes ----------
 
-   (1) There isn’t an IPv5.
+   (1) There isn't an IPv5.
 
 
 File: gawkinet.info,  Node: Ports,  Prev: Basic Protocols,  Up: The TCP/IP Protocols
@@ -323,9 +323,9 @@ than one person at the location; thus you have to further quantify the
 recipient by putting a person or company name on the envelope.
 
    In the phone system, one phone number may represent an entire
-company, in which case you need a person’s extension number in order to
+company, in which case you need a person's extension number in order to
 reach that individual directly.  Or, when you call a home, you have to
-say, “May I please speak to ...” before talking to the person directly.
+say, "May I please speak to ..."  before talking to the person directly.
 
    IP networking provides the concept of addressing.  An IP address
 represents a particular computer, but no more.  In order to reach the
@@ -336,7 +336,7 @@ represent the services, much like an extension number used with a phone
 number.
 
    Port numbers are 16-bit integers.  Unix and Unix-like systems reserve
-ports below 1024 for “well known” services, such as SMTP, FTP, and HTTP.
+ports below 1024 for "well known" services, such as SMTP, FTP, and HTTP.
 Numbers 1024 and above may be used by any application, although there is
 no promise made that a particular port number is always available.
 
@@ -347,7 +347,7 @@ File: gawkinet.info,  Node: Making Connections,  Prev: The TCP/IP Protocols,  Up
 ====================================================
 
 Two terms come up repeatedly when discussing networking: “client” and
-“server”.  For now, we’ll discuss these terms at the “connection level”,
+“server”.  For now, we'll discuss these terms at the “connection level”,
 when first establishing connections between two processes on different
 systems over a network.  (Once the connection is established, the higher
 level, or “application level” protocols, such as HTTP or FTP, determine
@@ -379,13 +379,13 @@ in order to enjoy the benefits of a simple communication paradigm in
 “synchronous”.(2)  I.e., each end waits on the other to finish
 transmitting, before replying.  This is much like two people in a phone
 conversation.  While both could talk simultaneously, doing so usually
-doesn’t work too well.
+doesn't work too well.
 
    In the case of TCP, the synchronicity is enforced by the protocol
 when sending data.  Data writes “block” until the data have been
 received on the other end.  For both TCP and UDP, data reads block until
 there is incoming data waiting to be read.  This is summarized in the
-following table, where an “x” indicates that the given action blocks.
+following table, where an "x" indicates that the given action blocks.
 
 TCP        x       x
 UDP        x
@@ -394,9 +394,9 @@ UDP        x
 
    (1) In the days before voice mail systems!
 
-   (2) For the technically savvy, data reads block—if there’s no
+   (2) For the technically savvy, data reads block--if there's no
 incoming data, the program is made to wait until there is, instead of
-receiving a “there’s no data” error return.
+receiving a "there's no data" error return.
 
 
 File: gawkinet.info,  Node: Using Networking,  Next: Some Applications and Techniques,  Prev: Introduction,  Up: Top
@@ -406,10 +406,10 @@ File: gawkinet.info,  Node: Using Networking,  Next: Some Applications and Techn
 
 The ‘awk’ programming language was originally developed as a
 pattern-matching language for writing short programs to perform data
-manipulation tasks.  ‘awk’’s strength is the manipulation of textual
+manipulation tasks.  ‘awk’'s strength is the manipulation of textual
 data that is stored in files.  It was never meant to be used for
 networking purposes.  To exploit its features in a networking context,
-it’s necessary to use an access mode for network connections that
+it's necessary to use an access mode for network connections that
 resembles the access of files as closely as possible.
 
    ‘awk’ is also meant to be a prototyping language.  It is used to
@@ -448,18 +448,18 @@ protocol is much less important for most users.
 
 File: gawkinet.info,  Node: Gawk Special Files,  Next: TCP Connecting,  Prev: Using Networking,  Up: Using Networking
 
-2.1 ‘gawk’’s Networking Mechanisms
+2.1 ‘gawk’'s Networking Mechanisms
 ==================================
 
 The ‘|&’ operator for use in communicating with a “coprocess” is
 described in *note Two-way Communications With Another Process:
 (gawk)Two-way I/O. It shows how to do two-way I/O to a separate process,
 sending it data with ‘print’ or ‘printf’ and reading data with
-‘getline’.  If you haven’t read it already, you should detour there to
+‘getline’.  If you haven't read it already, you should detour there to
 do so.
 
    ‘gawk’ transparently extends the two-way I/O mechanism to simple
-networking through the use of special file names.  When a “coprocess”
+networking through the use of special file names.  When a "coprocess"
 that matches the special files we are about to describe is started,
 ‘gawk’ creates the appropriate network connection, and then two-way I/O
 proceeds as usual.
@@ -495,14 +495,14 @@ File: gawkinet.info,  Node: Special File Fields,  Next: Comparing Protocols,  Pr
 
 This node explains the meaning of all of the fields, as well as the
 range of values and the defaults.  All of the fields are mandatory.  To
-let the system pick a value, or if the field doesn’t apply to the
+let the system pick a value, or if the field doesn't apply to the
 protocol, specify it as ‘0’ (zero):
 
 NET-TYPE
      This is one of ‘inet4’ for IPv4, ‘inet6’ for IPv6, or ‘inet’ to use
      the system default (which is likely to be IPv4).  For the rest of
      this document, we will use the generic ‘/inet’ in our descriptions
-     of how ‘gawk’’s networking works.
+     of how ‘gawk’'s networking works.
 
 PROTOCOL
      Determines which member of the TCP/IP family of protocols is
@@ -513,7 +513,7 @@ PROTOCOL
 LOCALPORT
      Determines which port on the local machine is used to communicate
      across the network.  Application-level clients usually use ‘0’ to
-     indicate they do not care which local port is used—instead they
+     indicate they do not care which local port is used--instead they
      specify a remote port to connect to.
 
      It is vital for application-level servers to use a number different
@@ -569,7 +569,6 @@ table-inet-components. gives you the combinations of values and their
 meaning.  If this table is too complicated, focus on the three lines
 printed in *bold*.  All the examples in *note Networking With ‘gawk’:
 Using Networking, use only the patterns printed in bold letters.
-
 
 PROTOCOL    LOCAL       HOST NAME   REMOTE      RESULTING CONNECTION-LEVEL
             PORT                    PORT        BEHAVIOR
@@ -672,10 +671,10 @@ started first:
      }
 
    In the case of UDP, the initial ‘print’ command is the one that
-actually sends data so that there is a connection.  UDP and “connection”
+actually sends data so that there is a connection.  UDP and "connection"
 sounds strange to anyone who has learned that UDP is a connectionless
-protocol.  Here, “connection” means that the ‘connect()’ system call has
-completed its work and completed the “association” between a certain
+protocol.  Here, "connection" means that the ‘connect()’ system call has
+completed its work and completed the "association" between a certain
 socket and an IP address.  Thus there are subtle differences between
 ‘connect()’ for TCP and UDP; see the man page for details.(1)
 
@@ -699,7 +698,7 @@ File: gawkinet.info,  Node: TCP Connecting,  Next: Troubleshooting,  Prev: Gawk 
 2.2 Establishing a TCP Connection
 =================================
 
-Let’s observe a network connection at work.  Type in the following
+Let's observe a network connection at work.  Type in the following
 program and watch the output.  Within a second, it connects via TCP
 (‘/inet/tcp’) to a remote server and asks the service ‘daytime’ on the
 machine what time it is:
@@ -832,7 +831,7 @@ support TCP as well as UDP.
 
    (1) Microsoft preferred to ignore the TCP/IP family of protocols
 until 1995.  Then came the rise of the Netscape browser as a landmark
-“killer application.” Microsoft added TCP/IP support and their own
+"killer application."  Microsoft added TCP/IP support and their own
 browser to Microsoft Windows 95 at the last minute.  They even
 back-ported their TCP/IP implementation to Microsoft Windows for
 Workgroups 3.11, but it was a rather rudimentary and half-hearted
@@ -972,7 +971,7 @@ machine can only be used by one server program at a time.  Now terminate
 the server program and change the name ‘8888’ to ‘echo’.  After
 restarting it, the server program does not run any more, and you know
 why: there is already an ‘echo’ service running on your machine.  But
-even if this isn’t true, you would not get your own ‘echo’ server
+even if this isn't true, you would not get your own ‘echo’ server
 running on a Unix machine, because the ports with numbers smaller than
 1024 (‘echo’ is at port 7) are reserved for ‘root’.  On machines running
 some flavor of Microsoft Windows, there is no restriction that reserves
@@ -982,7 +981,7 @@ restriction of the Unix world seems to have never been adopted ‘Does
 windows(10/server-2016) have privileged ports?’
 (https://social.technet.microsoft.com/Forums/windowsserver/en-US/334f0770-eda9-475a-a27f-46b80ab7e872/does-windows10server2016-have-privileged-ports-?forum=ws2016).
 In Microsoft Windows it is the level of the firewall that handles port
-access restrictions, not the level of the operating system’s kernel.
+access restrictions, not the level of the operating system's kernel.
 
    Turning this short server program into something really useful is
 simple.  Imagine a server that first reads a file name from the client
@@ -1119,7 +1118,7 @@ calls ‘www.yahoo.com’):
    Again, lines are separated by a redefined ‘RS’ and ‘ORS’.  The ‘GET’
 request that we send to the server is the only kind of HTTP request that
 existed when the web was created in the early 1990s.  HTTP calls this
-‘GET’ request a “method,” which tells the service to transmit a web page
+‘GET’ request a "method," which tells the service to transmit a web page
 (here the home page of the Yahoo!  search engine).  Version 1.0 added
 the request methods ‘HEAD’ and ‘POST’.  The current version of HTTP is
 1.1,(1)(2) and knows the additional request methods ‘OPTIONS’, ‘PUT’,
@@ -1154,11 +1153,11 @@ obsolete by RFC 2616, an update without any substantial changes.
 
    (2) Version 2.0 of HTTP (https://en.wikipedia.org/wiki/HTTP/2) was
 defined in RFC7540 (https://tools.ietf.org/html/rfc7540) and was derived
-from Google’s SPDY (https://en.wikipedia.org/wiki/SPDY) protocol.  It is
+from Google's SPDY (https://en.wikipedia.org/wiki/SPDY) protocol.  It is
 said to be widely supported.  As of 2020 the most popular web sites
 still identify themselves as supporting HTTP/1.1.  Version 3.0 of HTTP
 (https://en.wikipedia.org/wiki/HTTP/3) is still a draft and was derived
-from Google’s QUIC (https://en.wikipedia.org/wiki/QUIC) protocol.
+from Google's QUIC (https://en.wikipedia.org/wiki/QUIC) protocol.
 
 
 File: gawkinet.info,  Node: Primitive Service,  Next: Interacting Service,  Prev: Web page,  Up: Using Networking
@@ -1215,7 +1214,7 @@ The steps are as follows:
 point to <http://localhost:8080> (the browser needs to know on which
 port our server is listening for requests).  If this does not work, the
 browser probably tries to connect to a proxy server that does not know
-your machine.  If so, change the browser’s configuration so that the
+your machine.  If so, change the browser's configuration so that the
 browser does not try to use a proxy to connect to your machine.
 
 
@@ -1239,7 +1238,7 @@ will become the core of event-driven execution controlled by a graphical
 user interface (GUI). Each HTTP event that the user triggers by some
 action within the browser is received in this central procedure.
 Parameters and menu choices are extracted from this request, and an
-appropriate measure is taken according to the user’s choice:
+appropriate measure is taken according to the user's choice:
 
      BEGIN {
        if (MyHost == "") {
@@ -1384,10 +1383,10 @@ inevitable.  Header parameters should then be stored in a global array
 as well as the body.
 
    On each subsequent run through the main loop, one request from a
-browser is received, evaluated, and answered according to the user’s
+browser is received, evaluated, and answered according to the user's
 choice.  This can be done by letting the value of the HTTP method guide
 the main loop into execution of the procedure ‘HandleGET()’, which
-evaluates the user’s choice.  In this case, we have only one
+evaluates the user's choice.  In this case, we have only one
 hierarchical level of menus, but in the general case, menus are nested.
 The menu choices at each level are separated by ‘/’, just as in file
 names.  Notice how simple it is to construct menus of arbitrary depth:
@@ -1426,14 +1425,14 @@ File: gawkinet.info,  Node: CGI Lib,  Prev: Interacting Service,  Up: Interactin
 --------------------------
 
      HTTP is like being married: you have to be able to handle whatever
-     you’re given, while being very careful what you send back.
-                          — _Phil Smith III,
+     you're given, while being very careful what you send back.
+                          -- _Phil Smith III,
          <http://www.netfunny.com/rhf/jokes/99/Mar/http.html>_
 
    In *note A Web Service with Interaction: Interacting Service, we saw
-the function ‘CGI_setup()’ as part of the web server “core logic”
+the function ‘CGI_setup()’ as part of the web server "core logic"
 framework.  The code presented there handles almost everything necessary
-for CGI requests.  One thing it doesn’t do is handle encoded characters
+for CGI requests.  One thing it doesn't do is handle encoded characters
 in the requests.  For example, an ‘&’ is encoded as a percent sign
 followed by the hexadecimal value: ‘%26’.  These encoded values should
 be decoded.  Following is a simple library to perform these tasks.  This
@@ -1534,7 +1533,7 @@ is the code:
    This isolates details in a single function, ‘CGI_setup()’.  Decoding
 of encoded characters is pushed off to a helper function,
 ‘_CGI_decode()’.  The use of the leading underscore (‘_’) in the
-function name is intended to indicate that it is an “internal” function,
+function name is intended to indicate that it is an "internal" function,
 although there is nothing to enforce this:
 
      function _CGI_decode(str,   hexdigs, i, pre, code1, code2,
@@ -1568,7 +1567,7 @@ although there is nothing to enforce this:
    This works by splitting the string apart around an encoded character.
 The two digits are converted to lowercase characters and looked up in a
 string of hex digits.  Note that ‘0’ is not in the string on purpose;
-‘index()’ returns zero when it’s not found, automatically giving the
+‘index()’ returns zero when it's not found, automatically giving the
 correct value!  Once the hexadecimal value is converted from characters
 in a string into a numerical value, ‘sprintf()’ converts the value back
 into a real character.  The following is a simple test harness for the
@@ -1699,7 +1698,7 @@ Initially the user does not say anything; then ELIZA resets its money
 counter and asks the user to tell what comes to mind open-heartedly.
 The subsequent answers are converted to uppercase characters and stored
 for later comparison.  ELIZA presents the bill when being confronted
-with a sentence that contains the phrase “shut up.” Otherwise, it looks
+with a sentence that contains the phrase "shut up."  Otherwise, it looks
 for keywords in the sentence, conjugates the rest of the sentence,
 remembers the keyword for later use, and finally selects an answer from
 the set of possible answers:
@@ -1786,7 +1785,7 @@ ELIZA just picks an index randomly:
      }
 
    Some interesting remarks and details (including the original source
-code of ELIZA) are found on Mark Humphrys’s home page ‘How my program
+code of ELIZA) are found on Mark Humphrys's home page ‘How my program
 passed the Turing Test’ (https://computing.dcu.ie/~humphrys/eliza.html).
 Wikipedia provides much background information about ELIZA
 (https://en.wikipedia.org/wiki/ELIZA), including the original design of
@@ -1816,10 +1815,10 @@ application works or not sometimes depends on the following:
    • The state of the party at the other end
 
    The most difficult problems for a beginner arise from the hidden
-states of the underlying network.  After closing a TCP connection, it’s
+states of the underlying network.  After closing a TCP connection, it's
 often necessary to wait a short while before reopening the connection.
 Even more difficult is the establishment of a connection that previously
-ended with a “broken pipe.” Those connections have to “time out” for a
+ended with a "broken pipe."  Those connections have to "time out" for a
 minute or so before they can reopen.  Check this with the command
 ‘netstat -a’, which provides a list of still-active connections.
 
@@ -1835,7 +1834,7 @@ Loebner Prize is the first formal instantiation of a Turing Test.  Hugh
 Loebner agreed with The Cambridge Center for Behavioral Studies to
 underwrite a contest designed to implement the Turing Test.  Dr. Loebner
 pledged a Grand Prize of $100,000 for the first computer whose responses
-were indistinguishable from a human’s.  Each year an annual prize of
+were indistinguishable from a human's.  Each year an annual prize of
 $2000 and a bronze medal is awarded to the _most_ human computer.  The
 winner of the annual contest is the best entry relative to other entries
 that year, irrespective of how good it is in an absolute sense.  Here is
@@ -1900,7 +1899,7 @@ is up to you to accomplish this?
 
           The GAWK manual can be consumed in a single lab session and
           the language can be mastered by the next morning by the
-          average student.  GAWK’s automatic initialization, implicit
+          average student.  GAWK's automatic initialization, implicit
           coercion, I/O support and lack of pointers forgive many of the
           mistakes that young programmers are likely to make.  Those who
           have seen C but not mastered it are happy to see that GAWK
@@ -1910,14 +1909,14 @@ is up to you to accomplish this?
           There are further simple answers.  Probably the best is the
           fact that increasingly, undergraduate AI programming is
           involving the Web.  Oren Etzioni (University of Washington,
-          Seattle) has for a while been arguing that the “softbot” is
-          replacing the mechanical engineers’ robot as the most
+          Seattle) has for a while been arguing that the "softbot" is
+          replacing the mechanical engineers' robot as the most
           glamorous AI testbed.  If the artifact whose behavior needs to
           be controlled in an intelligent way is the software agent,
           then a language that is well-suited to controlling the
           software environment is the appropriate language.  That would
           imply a scripting language.  If the robot is KAREL, then the
-          right language is “turn left; turn right.” If the robot is
+          right language is "turn left; turn right."  If the robot is
           Netscape, then the right language is something that can
           generate ‘netscape -remote
           'openURL(http://cs.wustl.edu/~loui)'’ with elan.
@@ -1934,8 +1933,8 @@ is up to you to accomplish this?
           strings.  A language that provides the best support for string
           processing in the end provides the best support for logic, for
           the exploration of various logics, and for most forms of
-          symbolic processing that AI might choose to call “reasoning”
-          instead of “logic.” The implication is that PROLOG, which
+          symbolic processing that AI might choose to call "reasoning"
+          instead of "logic."  The implication is that PROLOG, which
           saves the AI programmer from having to write a unifier, saves
           perhaps two dozen lines of GAWK code at the expense of
           strongly biasing the logic and representational expressiveness
@@ -1956,7 +1955,7 @@ is up to you to accomplish this?
      real translation program.
 
    • Another dialogue-oriented application (on the verge of ridicule) is
-     the email “support service.” Troubled customers write an email to
+     the email "support service."  Troubled customers write an email to
      an automatic ‘gawk’ service that reads the email.  It looks for
      keywords in the mail and assembles a reply email accordingly.  By
      carefully investigating the email header, and repeating these
@@ -1998,7 +1997,7 @@ languages that allow us to quickly solve problems with short programs.
 But Tcl has Tk on top of it, and ‘gawk’ had nothing comparable up to
 now.  While Tcl needs a large and ever-changing library (Tk, which was
 originally bound to the X Window System), ‘gawk’ needs just the
-networking interface and some kind of browser on the client’s side.
+networking interface and some kind of browser on the client's side.
 Besides better portability, the most important advantage of this
 approach (embracing well-established standards such HTTP and HTML) is
 that _we do not need to change the language_.  We let others do the work
@@ -2030,7 +2029,7 @@ we can turn it into something useful.
 
    The PANIC program tells everyone who connects that the local site is
 not working.  When a web server breaks down, it makes a difference if
-customers get a strange “network unreachable” message, or a short
+customers get a strange "network unreachable" message, or a short
 message telling them that the server has a problem.  In such an
 emergency, the hard disk and everything on it (including the regular web
 service) may be unavailable.  Rebooting the web server off a USB drive
@@ -2114,7 +2113,7 @@ the page content, but does receive the header:
    This program can be changed as needed, but be careful with the last
 lines.  Make sure transmission of binary data is not corrupted by
 additional line breaks.  Even as it is now, the byte sequence
-‘"\r\n\r\n"’ would disappear if it were contained in binary data.  Don’t
+‘"\r\n\r\n"’ would disappear if it were contained in binary data.  Don't
 get caught in a trap when trying a quick fix on this one.
 
 
@@ -2252,7 +2251,7 @@ variables ‘Proxy’ and ‘ProxyPort’ as GETURL, because these variables are
 handed over to GETURL for each URL that gets checked.  The one and only
 parameter is the name of a file that contains one line for each URL. In
 the first column, we find the URL, and the second and third columns hold
-the length of the URL’s body when checked for the two last times.  Now,
+the length of the URL's body when checked for the two last times.  Now,
 we follow this plan:
 
   1. Read the URLs from the file and remember their most recent lengths
@@ -2304,7 +2303,7 @@ be passed on.  If so, we prepare strings that will become part of the
 command line later.  In ‘GetHeader’, we store these strings together
 with the longest part of the command line.  Later, in the loop over the
 URLs, ‘GetHeader’ is appended with the URL and a redirection operator to
-form the command that reads the URL’s header over the Internet.  GETURL
+form the command that reads the URL's header over the Internet.  GETURL
 always sends the headers to ‘/dev/stderr’.  That is the reason why we
 need the redirection operator to have the header piped in.
 
@@ -2341,7 +2340,7 @@ expression.  However, it is straightforward to add them, if doing so is
 necessary for other tasks.
 
    This program reads an HTML file and prints all the HTTP links that it
-finds.  It relies on ‘gawk’’s ability to use regular expressions as the
+finds.  It relies on ‘gawk’'s ability to use regular expressions as the
 record separator.  With ‘RS’ set to a regular expression that matches
 links, the second action is executed each time a non-empty link is
 found.  We can find the matching link itself in ‘RT’.
@@ -2371,7 +2370,7 @@ Microsoft and Netscape in the web server market.
 firewall.  After attaching a browser to port 80, we usually catch a
 glimpse of the bright side of the server (its home page).  With a tool
 like GETURL at hand, we are able to discover some of the more concealed
-or even “indecent” services (i.e., lacking conformity to standards of
+or even "indecent" services (i.e., lacking conformity to standards of
 quality).  It can be exciting to see the fancy CGI scripts that lie
 there, revealing the inner workings of the server, ready to be called:
 
@@ -2396,8 +2395,8 @@ there, revealing the inner workings of the server, ready to be called:
           gawk -f geturl.awk http://any.host.on.the.net/cgi-bin/printenv
 
    • Sometimes it is even possible to retrieve system files like the web
-     server’s log file—possibly containing customer data—or even the
-     file ‘/etc/passwd’.  (We don’t recommend this!)
+     server's log file--possibly containing customer data--or even the
+     file ‘/etc/passwd’.  (We don't recommend this!)
 
    *Caution:* Although this may sound funny or simply irrelevant, we are
 talking about severe security holes.  Try to explore your own system
@@ -2434,8 +2433,7 @@ File: gawkinet.info,  Node: STATIST,  Next: MAZE,  Prev: WEBGRAB,  Up: Some Appl
 -0.3 `------------'------------'------------'------------'
     -10           5            0            5           10" ]
 
-
-In the HTTP server examples we’ve shown thus far, we never present an
+In the HTTP server examples we've shown thus far, we never present an
 image to the browser and its user.  Presenting images is one task.
 Generating images that reflect some user input and presenting these
 dynamically generated images is another.  In this node, we use GNUPlot
@@ -2596,7 +2594,7 @@ tries to build up a connection for the image request while the request
 for the HTML text is not yet completed.  The browser tries to connect to
 the ‘gawk’ server on port 8080 while port 8080 is still in use for
 transmission of the HTML text.  The connection for the image cannot be
-built up, so the image appears as “broken” in the browser window.  We
+built up, so the image appears as "broken" in the browser window.  We
 solved this problem by telling the browser to open a separate window for
 the image, but only after a delay of 1000 milliseconds.  By this time,
 the server should be ready for serving the next request.
@@ -2670,7 +2668,7 @@ File: gawkinet.info,  Node: MAZE,  Next: MOBAGWHO,  Prev: STATIST,  Up: Some App
 ===================================================
 
      In the long run, every program becomes rococo, and then rubble.
-                            — _Alan Perlis_
+                           -- _Alan Perlis_
 
    By now, we know how to present arbitrary ‘Content-type’s to a
 browser.  In this node, our server presents a 3D world to our browser.
@@ -2681,7 +2679,7 @@ plugin enable exploration of this technology.  We could do one of those
 boring ‘Hello world’ examples here, that are usually presented when
 introducing novices to VRML. If you have never written any VRML code,
 have a look at the VRML FAQ. Presenting a static VRML scene is a bit
-trivial; in order to expose ‘gawk’’s capabilities, we will present a
+trivial; in order to expose ‘gawk’'s capabilities, we will present a
 dynamically generated VRML scene.  The function ‘SetUpServer()’ is very
 simple because it only sets the default HTML page and initializes the
 random number generator.  As usual, the surrounding server lets you
@@ -2805,7 +2803,7 @@ File: gawkinet.info,  Node: MOBAGWHO,  Next: STOXPRED,  Prev: MAZE,  Up: Some Ap
      make it so simple that there are obviously no deficiencies, and the
      other way is to make it so complicated that there are no obvious
      deficiencies.
-                           — _C.A.R. Hoare_
+                           -- _C.A.R. Hoare_
 
    A “mobile agent” is a program that can be dispatched from a computer
 and transported to a remote server for execution.  This is called
@@ -2832,7 +2830,7 @@ process is implemented depends upon the kind of server process:
      ‘POST’ method to transfer some data to a file on the web server.
      When a CGI script is called remotely with the ‘POST’ method instead
      of the usual ‘GET’ method, data is transmitted from the client
-     process to the standard input of the server’s CGI script.  So, to
+     process to the standard input of the server's CGI script.  So, to
      implement a mobile agent, we must not only write the agent program
      to start on the client side, but also the CGI script to receive the
      agent on the server side.
@@ -2864,7 +2862,7 @@ placed into a location like ‘/httpd/cgi-bin/PostAgent.sh’.
 
    By making its process id (‘$$’) part of the unique file name, the
 script avoids conflicts between concurrent instances of the script.
-First, all lines from standard input (the mobile agent’s source code)
+First, all lines from standard input (the mobile agent's source code)
 are copied into this unique file.  Then, the agent is started as a
 concurrent process and a short message reporting this fact is sent to
 the submitting client.  Finally, the script file of the mobile agent is
@@ -2881,14 +2879,14 @@ Self-Reference
      Each migrating instance of an agent is started in a way that
      enables it to read its own source code from standard input and use
      the code for subsequent migrations.  This is necessary because it
-     needs to treat the agent’s code as data to transmit.  ‘gawk’ is not
+     needs to treat the agent's code as data to transmit.  ‘gawk’ is not
      the ideal language for such a job.  Lisp and Tcl are more suitable
      because they do not make a distinction between program code and
      data.
 
 Independence
      After migration, the agent is not linked to its former home in any
-     way.  By reporting ‘Agent started’, it waves “Goodbye” to its
+     way.  By reporting ‘Agent started’, it waves "Goodbye" to its
      origin.  The originator may choose to terminate or not.
 
    The originating agent itself is started just like any other
@@ -2966,7 +2964,7 @@ mobile agent:
    The ‘migrate()’ function prepares the aforementioned strings
 containing the program code and transmits them to a server.  A
 consequence of this modular approach is that the ‘migrate()’ function
-takes some parameters that aren’t needed in this application, but that
+takes some parameters that aren't needed in this application, but that
 will be in future ones.  Its mandatory parameter ‘Destination’ holds the
 name (or IP address) of the server that the agent wants as a host for
 its code.  The optional parameter ‘MobCode’ may contain some ‘gawk’ code
@@ -2989,7 +2987,7 @@ variables.  The following conventions apply:
      takes part in migration has to be an element of this array.
      ‘migrate()’ also takes care of this.
 
-   Now it’s clear what happens to the ‘Label’ parameter of the function
+   Now it's clear what happens to the ‘Label’ parameter of the function
 ‘migrate()’.  It is copied into ‘MOBVAR["Label"]’ and travels alongside
 the other data.  Since traveling takes place via HTTP, records must be
 separated with ‘"\r\n"’ in ‘RS’ and ‘ORS’ as usual.  The code assembly
@@ -3020,7 +3018,7 @@ it starts ‘MyJob()’:
          MyJob()              # so we do our job
      }
 
-   All that’s left to extend the framework into a complete application
+   All that's left to extend the framework into a complete application
 is to write two application-specific functions: ‘MyInit()’ and
 ‘MyJob()’.  Keep in mind that the former is executed once on the
 originating host, while the latter is executed after each migration:
@@ -3062,11 +3060,11 @@ function runs on the remote host:
 
    After migrating, the first thing to do in ‘MyJob()’ is to delete the
 name of the current host from the list of hosts to visit.  Now, it is
-time to start the real work by appending the host’s name to the result
+time to start the real work by appending the host's name to the result
 string, and reading line by line who is logged in on this host.  A very
 annoying circumstance is the fact that the elements of ‘MOBVAR’ cannot
 hold the newline character (‘"\n"’).  If they did, migration of this
-string would not work because the string wouldn’t obey the syntax rule
+string would not work because the string wouldn't obey the syntax rule
 for a string in ‘gawk’.  ‘SUBSEP’ is used as a temporary replacement.
 
    If the list of hosts to visit holds at least one more entry, the
@@ -3094,13 +3092,13 @@ File: gawkinet.info,  Node: STOXPRED,  Next: PROTBASE,  Prev: MOBAGWHO,  Up: Som
      ape-descendent life forms are so amazingly primitive that they
      still think digital watches are a pretty neat idea.
 
-     This planet has — or rather had — a problem, which was this: most
+     This planet has -- or rather had -- a problem, which was this: most
      of the people living on it were unhappy for pretty much of the
      time.  Many solutions were suggested for this problem, but most of
      these were largely concerned with the movements of small green
-     pieces of paper, which is odd because it wasn’t the small green
+     pieces of paper, which is odd because it wasn't the small green
      pieces of paper that were unhappy.
-      — _Douglas Adams, ‘The Hitch Hiker’s Guide to the Galaxy’_
+      -- _Douglas Adams, ‘The Hitch Hiker's Guide to the Galaxy’_
 
    Valuable services on the Internet are usually _not_ implemented as
 mobile agents.  There are much simpler ways of implementing services.
@@ -3159,7 +3157,7 @@ anybody.
              ...
 
    The script as a whole is rather long.  In order to ease the pain of
-studying other people’s source code, we have broken the script up into
+studying other people's source code, we have broken the script up into
 meaningful parts which are invoked one after the other.  The basic
 structure of the script is as follows:
 
@@ -3231,11 +3229,11 @@ ending date are chosen to be exactly the same, but one year apart in the
 past.  All the action is initiated within the ‘printf’ command which
 transmits the request for data to the Yahoo server.
 
-   In the inner loop, the server’s data is first read and then scanned
+   In the inner loop, the server's data is first read and then scanned
 line by line.  Only lines which have six columns and the name of a month
 in the first column contain relevant data.  This data is stored in the
 two-dimensional array ‘quote’; one dimension being time, the other being
-the ticker symbol.  During retrieval of the first stock’s data, the
+the ticker symbol.  During retrieval of the first stock's data, the
 calendar names of the time instances are stored in the array ‘day’
 because we need them later.
 
@@ -3406,15 +3404,15 @@ File: gawkinet.info,  Node: PROTBASE,  Prev: STOXPRED,  Up: Some Applications an
 
      Inside every large problem is a small problem struggling to get
      out.(1)
-                  — _With apologies to C.A.R. Hoare_
+                  -- _With apologies to C.A.R. Hoare_
 
-   Yahoo’s database of stock market data is just one among the many
+   Yahoo's database of stock market data is just one among the many
 large databases on the Internet.  Another one is located at NCBI
 (National Center for Biotechnology Information).  Established in 1988 as
 a national resource for molecular biology information, NCBI creates
 public databases, conducts research in computational biology, develops
 software tools for analyzing genome data, and disseminates biomedical
-information.  In this section, we look at one of NCBI’s public services,
+information.  In this section, we look at one of NCBI's public services,
 which is called BLAST (Basic Local Alignment Search Tool).
 
    You probably know that the information necessary for reproducing
@@ -3458,7 +3456,7 @@ services:
      The query sequence is compared against the specified database using
      the BLAST algorithm and the results are returned in an email
      message.  For more information on formulating email BLAST searches,
-     you can send a message consisting of the word “HELP” to the same
+     you can send a message consisting of the word "HELP" to the same
      address, <blast@ncbi.nlm.nih.gov>.
 
    Our starting point is the demonstration client mentioned in the first
@@ -3512,7 +3510,7 @@ contains the mandatory ‘BEGIN’ directive, followed by the query sequence
 in FASTA/Pearson format.  Each line of information must be less than 80
 characters in length.
 
-   The “month” database contains all new or revised sequences released
+   The "month" database contains all new or revised sequences released
 in the last 30 days and is useful for searching against new sequences.
 There are five different blast programs, ‘blastn’ being the one that
 compares a nucleotide query sequence against a nucleotide sequence
@@ -3531,7 +3529,7 @@ description is arbitrary.
 following 10 lines of code into a file named ‘protbase.awk’ and use this
 client instead.  Invoke it with ‘gawk -f protbase.awk protbase.request’.
 Then wait a minute and watch the result coming in.  In order to
-replicate the demonstration client’s behavior as closely as possible,
+replicate the demonstration client's behavior as closely as possible,
 this client does not use a proxy server.  We could also have extended
 the client program in *note Retrieving Web Pages: GETURL, to implement
 the client request from ‘protbase.awk’ as a special case.
@@ -3560,7 +3558,7 @@ prints the complete result coming from the server.
 you can ignore.  Then there are some comments about the query having
 been filtered to avoid spuriously high scores.  After this, there is a
 reference to the paper that describes the software being used for
-searching the data base.  After a repetition of the original query’s
+searching the data base.  After a repetition of the original query's
 description we find the list of significant alignments:
 
      Sequences producing significant alignments:                        (bits)  Value
@@ -3600,7 +3598,7 @@ for the databases from which the sequences were derived.
    For example, an identifier might be ‘gb|AC021182.14|AC021182’, where
 the ‘gb’ tag indicates that the identifier refers to a GenBank sequence,
 ‘AC021182.14’ is its GenBank ACCESSION, and ‘AC021182’ is the GenBank
-LOCUS. The identifier contains no spaces, so that a space indicates the
+LOCUS.  The identifier contains no spaces, so that a space indicates the
 end of the identifier.
 
    Let us continue in the result listing.  Each of the seven alignments
@@ -3631,7 +3629,7 @@ and you might appreciate the following hints.
      Michael S. Waterman, which is worth reading if you are seriously
      interested.  You can find a good book review on the Internet.
 
-  2. While Waterman’s book explains the algorithms employed internally
+  2. While Waterman's book explains the algorithms employed internally
      in the database search engines, most practitioners prefer to
      approach the subject differently.  The applied side of
      Computational Biology is called Bioinformatics, and emphasizes the
@@ -3648,8 +3646,8 @@ and you might appreciate the following hints.
 
    ---------- Footnotes ----------
 
-   (1) What C.A.R. Hoare actually said was “Inside every large program
-is a small program struggling to get out.”
+   (1) What C.A.R. Hoare actually said was "Inside every large program
+is a small program struggling to get out."
 
 
 File: gawkinet.info,  Node: Links,  Next: GNU Free Documentation License,  Prev: Some Applications and Techniques,  Up: Top
@@ -3669,7 +3667,7 @@ file.  They are presented in the order in which they appear.
 ‘Web Client Programming with Perl’
      <http://www.oreilly.com/catalog/webclient>
 
-Richard Stevens’s home page and book
+Richard Stevens's home page and book
      <http://www.kohala.com/start>
 
 Volume III of ‘Internetworking with TCP/IP’, by Comer and Stevens
@@ -3681,7 +3679,7 @@ XBM Graphics File Format
 GNUPlot
      <http://www.gnuplot.info>
 
-Mark Humphrys’ Eliza page
+Mark Humphrys' Eliza page
      <https://computing.dcu.ie/~humphrys/eliza.html>
 
 Eliza on Wikipedia
@@ -3784,7 +3782,7 @@ GNU Free Documentation License
      author and publisher a way to get credit for their work, while not
      being considered responsible for modifications made by others.
 
-     This License is a kind of “copyleft”, which means that derivative
+     This License is a kind of "copyleft", which means that derivative
      works of the document must themselves be free in the same sense.
      It complements the GNU General Public License, which is a copyleft
      license designed for free software.
@@ -3805,18 +3803,18 @@ GNU Free Documentation License
      be distributed under the terms of this License.  Such a notice
      grants a world-wide, royalty-free license, unlimited in duration,
      to use that work under the conditions stated herein.  The
-     “Document”, below, refers to any such manual or work.  Any member
-     of the public is a licensee, and is addressed as “you”.  You accept
+     "Document", below, refers to any such manual or work.  Any member
+     of the public is a licensee, and is addressed as "you".  You accept
      the license if you copy, modify or distribute the work in a way
      requiring permission under copyright law.
 
-     A “Modified Version” of the Document means any work containing the
+     A "Modified Version" of the Document means any work containing the
      Document or a portion of it, either copied verbatim, or with
      modifications and/or translated into another language.
 
-     A “Secondary Section” is a named appendix or a front-matter section
+     A "Secondary Section" is a named appendix or a front-matter section
      of the Document that deals exclusively with the relationship of the
-     publishers or authors of the Document to the Document’s overall
+     publishers or authors of the Document to the Document's overall
      subject (or to related matters) and contains nothing that could
      fall directly within that overall subject.  (Thus, if the Document
      is in part a textbook of mathematics, a Secondary Section may not
@@ -3825,7 +3823,7 @@ GNU Free Documentation License
      of legal, commercial, philosophical, ethical or political position
      regarding them.
 
-     The “Invariant Sections” are certain Secondary Sections whose
+     The "Invariant Sections" are certain Secondary Sections whose
      titles are designated, as being those of Invariant Sections, in the
      notice that says that the Document is released under this License.
      If a section does not fit the above definition of Secondary then it
@@ -3833,13 +3831,13 @@ GNU Free Documentation License
      contain zero Invariant Sections.  If the Document does not identify
      any Invariant Sections then there are none.
 
-     The “Cover Texts” are certain short passages of text that are
+     The "Cover Texts" are certain short passages of text that are
      listed, as Front-Cover Texts or Back-Cover Texts, in the notice
      that says that the Document is released under this License.  A
      Front-Cover Text may be at most 5 words, and a Back-Cover Text may
      be at most 25 words.
 
-     A “Transparent” copy of the Document means a machine-readable copy,
+     A "Transparent" copy of the Document means a machine-readable copy,
      represented in a format whose specification is available to the
      general public, that is suitable for revising the document
      straightforwardly with generic text editors or (for images composed
@@ -3851,7 +3849,7 @@ GNU Free Documentation License
      been arranged to thwart or discourage subsequent modification by
      readers is not Transparent.  An image format is not Transparent if
      used for any substantial amount of text.  A copy that is not
-     “Transparent” is called “Opaque”.
+     "Transparent" is called "Opaque".
 
      Examples of suitable formats for Transparent copies include plain
      ASCII without markup, Texinfo input format, LaTeX input format,
@@ -3864,23 +3862,23 @@ GNU Free Documentation License
      the machine-generated HTML, PostScript or PDF produced by some word
      processors for output purposes only.
 
-     The “Title Page” means, for a printed book, the title page itself,
+     The "Title Page" means, for a printed book, the title page itself,
      plus such following pages as are needed to hold, legibly, the
      material this License requires to appear in the title page.  For
-     works in formats which do not have any title page as such, “Title
-     Page” means the text near the most prominent appearance of the
-     work’s title, preceding the beginning of the body of the text.
+     works in formats which do not have any title page as such, "Title
+     Page" means the text near the most prominent appearance of the
+     work's title, preceding the beginning of the body of the text.
 
-     The “publisher” means any person or entity that distributes copies
+     The "publisher" means any person or entity that distributes copies
      of the Document to the public.
 
-     A section “Entitled XYZ” means a named subunit of the Document
+     A section "Entitled XYZ" means a named subunit of the Document
      whose title either is precisely XYZ or contains XYZ in parentheses
      following text that translates XYZ in another language.  (Here XYZ
      stands for a specific section name mentioned below, such as
-     “Acknowledgements”, “Dedications”, “Endorsements”, or “History”.)
-     To “Preserve the Title” of such a section when you modify the
-     Document means that it remains a section “Entitled XYZ” according
+     "Acknowledgements", "Dedications", "Endorsements", or "History".)
+     To "Preserve the Title" of such a section when you modify the
+     Document means that it remains a section "Entitled XYZ" according
      to this definition.
 
      The Document may include Warranty Disclaimers next to the notice
@@ -3910,7 +3908,7 @@ GNU Free Documentation License
 
      If you publish printed copies (or copies in media that commonly
      have printed covers) of the Document, numbering more than 100, and
-     the Document’s license notice requires Cover Texts, you must
+     the Document's license notice requires Cover Texts, you must
      enclose the copies in covers that carry, clearly and legibly, all
      these Cover Texts: Front-Cover Texts on the front cover, and
      Back-Cover Texts on the back cover.  Both covers must also clearly
@@ -3982,15 +3980,15 @@ GNU Free Documentation License
           the Addendum below.
 
        G. Preserve in that license notice the full lists of Invariant
-          Sections and required Cover Texts given in the Document’s
+          Sections and required Cover Texts given in the Document's
           license notice.
 
        H. Include an unaltered copy of this License.
 
-       I. Preserve the section Entitled “History”, Preserve its Title,
+       I. Preserve the section Entitled "History", Preserve its Title,
           and add to it an item stating at least the title, year, new
           authors, and publisher of the Modified Version as given on the
-          Title Page.  If there is no section Entitled “History” in the
+          Title Page.  If there is no section Entitled "History" in the
           Document, create one stating the title, year, authors, and
           publisher of the Document as given on its Title Page, then add
           an item describing the Modified Version as stated in the
@@ -4000,12 +3998,12 @@ GNU Free Documentation License
           for public access to a Transparent copy of the Document, and
           likewise the network locations given in the Document for
           previous versions it was based on.  These may be placed in the
-          “History” section.  You may omit a network location for a work
+          "History" section.  You may omit a network location for a work
           that was published at least four years before the Document
           itself, or if the original publisher of the version it refers
           to gives permission.
 
-       K. For any section Entitled “Acknowledgements” or “Dedications”,
+       K. For any section Entitled "Acknowledgements" or "Dedications",
           Preserve the Title of the section, and preserve in the section
           all the substance and tone of each of the contributor
           acknowledgements and/or dedications given therein.
@@ -4014,11 +4012,11 @@ GNU Free Documentation License
           in their text and in their titles.  Section numbers or the
           equivalent are not considered part of the section titles.
 
-       M. Delete any section Entitled “Endorsements”.  Such a section
+       M. Delete any section Entitled "Endorsements".  Such a section
           may not be included in the Modified Version.
 
        N. Do not retitle any existing section to be Entitled
-          “Endorsements” or to conflict in title with any Invariant
+          "Endorsements" or to conflict in title with any Invariant
           Section.
 
        O. Preserve any Warranty Disclaimers.
@@ -4027,15 +4025,15 @@ GNU Free Documentation License
      appendices that qualify as Secondary Sections and contain no
      material copied from the Document, you may at your option designate
      some or all of these sections as invariant.  To do this, add their
-     titles to the list of Invariant Sections in the Modified Version’s
+     titles to the list of Invariant Sections in the Modified Version's
      license notice.  These titles must be distinct from any other
      section titles.
 
-     You may add a section Entitled “Endorsements”, provided it contains
+     You may add a section Entitled "Endorsements", provided it contains
      nothing but endorsements of your Modified Version by various
-     parties—for example, statements of peer review or that the text has
-     been approved by an organization as the authoritative definition of
-     a standard.
+     parties--for example, statements of peer review or that the text
+     has been approved by an organization as the authoritative
+     definition of a standard.
 
      You may add a passage of up to five words as a Front-Cover Text,
      and a passage of up to 25 words as a Back-Cover Text, to the end of
@@ -4073,10 +4071,10 @@ GNU Free Documentation License
      combined work.
 
      In the combination, you must combine any sections Entitled
-     “History” in the various original documents, forming one section
-     Entitled “History”; likewise combine any sections Entitled
-     “Acknowledgements”, and any sections Entitled “Dedications”.  You
-     must delete all sections Entitled “Endorsements.”
+     "History" in the various original documents, forming one section
+     Entitled "History"; likewise combine any sections Entitled
+     "Acknowledgements", and any sections Entitled "Dedications".  You
+     must delete all sections Entitled "Endorsements."
 
   6. COLLECTIONS OF DOCUMENTS
 
@@ -4097,16 +4095,16 @@ GNU Free Documentation License
 
      A compilation of the Document or its derivatives with other
      separate and independent documents or works, in or on a volume of a
-     storage or distribution medium, is called an “aggregate” if the
+     storage or distribution medium, is called an "aggregate" if the
      copyright resulting from the compilation is not used to limit the
-     legal rights of the compilation’s users beyond what the individual
+     legal rights of the compilation's users beyond what the individual
      works permit.  When the Document is included in an aggregate, this
      License does not apply to the other works in the aggregate which
      are not themselves derivative works of the Document.
 
      If the Cover Text requirement of section 3 is applicable to these
      copies of the Document, then if the Document is less than one half
-     of the entire aggregate, the Document’s Cover Texts may be placed
+     of the entire aggregate, the Document's Cover Texts may be placed
      on covers that bracket the Document within the aggregate, or the
      electronic equivalent of covers if the Document is in electronic
      form.  Otherwise they must appear on printed covers that bracket
@@ -4128,8 +4126,8 @@ GNU Free Documentation License
      this License or a notice or disclaimer, the original version will
      prevail.
 
-     If a section in the Document is Entitled “Acknowledgements”,
-     “Dedications”, or “History”, the requirement (section 4) to
+     If a section in the Document is Entitled "Acknowledgements",
+     "Dedications", or "History", the requirement (section 4) to
      Preserve its Title (section 1) will typically require changing the
      actual title.
 
@@ -4170,7 +4168,7 @@ GNU Free Documentation License
 
      Each version of the License is given a distinguishing version
      number.  If the Document specifies that a particular numbered
-     version of this License “or any later version” applies to it, you
+     version of this License "or any later version" applies to it, you
      have the option of following the terms and conditions either of
      that specified version or of any later version that has been
      published (not as a draft) by the Free Software Foundation.  If the
@@ -4178,29 +4176,29 @@ GNU Free Documentation License
      choose any version ever published (not as a draft) by the Free
      Software Foundation.  If the Document specifies that a proxy can
      decide which future versions of this License can be used, that
-     proxy’s public statement of acceptance of a version permanently
+     proxy's public statement of acceptance of a version permanently
      authorizes you to choose that version for the Document.
 
   11. RELICENSING
 
-     “Massive Multiauthor Collaboration Site” (or “MMC Site”) means any
+     "Massive Multiauthor Collaboration Site" (or "MMC Site") means any
      World Wide Web server that publishes copyrightable works and also
      provides prominent facilities for anybody to edit those works.  A
      public wiki that anybody can edit is an example of such a server.
-     A “Massive Multiauthor Collaboration” (or “MMC”) contained in the
+     A "Massive Multiauthor Collaboration" (or "MMC") contained in the
      site means any set of copyrightable works thus published on the MMC
      site.
 
-     “CC-BY-SA” means the Creative Commons Attribution-Share Alike 3.0
+     "CC-BY-SA" means the Creative Commons Attribution-Share Alike 3.0
      license published by Creative Commons Corporation, a not-for-profit
      corporation with a principal place of business in San Francisco,
      California, as well as future copyleft versions of that license
      published by that same organization.
 
-     “Incorporate” means to publish or republish a Document, in whole or
+     "Incorporate" means to publish or republish a Document, in whole or
      in part, as part of another Document.
 
-     An MMC is “eligible for relicensing” if it is licensed under this
+     An MMC is "eligible for relicensing" if it is licensed under this
      License, and if all works that were first published under this
      License somewhere other than this MMC, and subsequently
      incorporated in whole or in part into the MMC, (1) had no cover
@@ -4227,7 +4225,7 @@ notices just after the title page:
        Free Documentation License''.
 
    If you have Invariant Sections, Front-Cover Texts and Back-Cover
-Texts, replace the “with...Texts.” line with this:
+Texts, replace the "with...Texts."  line with this:
 
          with the Invariant Sections being LIST THEIR TITLES, with
          the Front-Cover Texts being LIST, and with the Back-Cover Texts
@@ -4265,12 +4263,13 @@ Index
 * BLAST, Basic Local Alignment Search Tool: PROTBASE.         (line   6)
 * blocking:                              Making Connections.  (line  35)
 * Boutell, Thomas:                       STATIST.             (line   6)
+* CGI (Common Gateway Interface):        MOBAGWHO.            (line  42)
 * CGI (Common Gateway Interface), dynamic web pages and: Web page.
                                                               (line  45)
 * CGI (Common Gateway Interface), library: CGI Lib.           (line  11)
-* CGI (Common Gateway Interface):        MOBAGWHO.            (line  42)
 * clients:                               Making Connections.  (line  21)
 * Clinton, Bill:                         Challenges.          (line  58)
+  Common Gateway Interface, See CGI.
 * Computational Biology:                 PROTBASE.            (line 229)
 * contest:                               Challenges.          (line   6)
 * cron utility:                          STOXPRED.            (line  23)
@@ -4291,14 +4290,14 @@ Index
                                                               (line   6)
 * FTP (File Transfer Protocol):          Basic Protocols.     (line  45)
 * gawk, networking:                      Using Networking.    (line   6)
-* gawk, networking, filenames:           Gawk Special Files.  (line  29)
 * gawk, networking, connections:         Special File Fields. (line  56)
 * gawk, networking, connections <1>:     TCP Connecting.      (line   6)
-* gawk, networking, service, establishing: Setting Up.        (line   6)
 * gawk, networking, email:               Email.               (line   6)
-* gawk, web and:                         Interacting Service. (line   6)
+* gawk, networking, filenames:           Gawk Special Files.  (line  29)
+* gawk, networking, service, establishing: Setting Up.        (line   6)
 * gawk, networking, troubleshooting:     Caveats.             (line   6)
-* getline command:                       TCP Connecting.      (line  11)
+  gawk, web and, See web service.
+* getline function:                      TCP Connecting.      (line  11)
 * GETURL program:                        GETURL.              (line   6)
 * GIF image format:                      Web page.            (line  45)
 * GIF image format <1>:                  STATIST.             (line   6)
@@ -4321,10 +4320,13 @@ Index
 * HTTP server, core logic <1>:           Interacting Service. (line  23)
 * Humphrys, Mark:                        Simple Server.       (line 178)
 * Hypertext Markup Language (HTML):      Web page.            (line  29)
+  Hypertext Transfer Protocol, See HTTP.
 * image format:                          STATIST.             (line   6)
-* images, retrieving over networks:      Web page.            (line  45)
 * images, in web pages:                  Interacting Service. (line 190)
-* JavaScript:                            STATIST.             (line  58)
+* images, retrieving over networks:      Web page.            (line  45)
+  input/output, two-way,:                See also gawk, networking.
+  Internet, See networks.
+* JavaScript:                            STATIST.             (line  80)
 * Linux:                                 Troubleshooting.     (line  53)
 * Linux <1>:                             Interacting.         (line  33)
 * Linux <2>:                             REMCONF.             (line   6)
@@ -4333,26 +4335,27 @@ Index
 * Loebner, Hugh:                         Challenges.          (line   6)
 * Loui, Ronald:                          Challenges.          (line  75)
 * MAZE:                                  MAZE.                (line   6)
+* Microsoft Windows:                     WEBGRAB.             (line  43)
 * Microsoft Windows, networking:         Troubleshooting.     (line  53)
 * Microsoft Windows, networking, ports:  Setting Up.          (line  39)
-* Microsoft Windows:                     WEBGRAB.             (line  43)
 * MiniSQL:                               REMCONF.             (line 109)
 * MOBAGWHO program:                      MOBAGWHO.            (line   6)
 * NCBI, National Center for Biotechnology Information: PROTBASE.
                                                               (line   6)
 * network type field:                    Special File Fields. (line  11)
+  networks:                              See also web pages.
 * networks, gawk and:                    Using Networking.    (line   6)
-* networks, gawk and, filenames:         Gawk Special Files.  (line  29)
-* networks, ports, specifying:           Special File Fields. (line  24)
 * networks, gawk and, connections:       Special File Fields. (line  56)
 * networks, gawk and, connections <1>:   TCP Connecting.      (line   6)
-* networks, gawk and, service, establishing: Setting Up.      (line   6)
-* networks, ports, reserved:             Setting Up.          (line  39)
 * networks, gawk and, email:             Email.               (line   6)
+* networks, gawk and, filenames:         Gawk Special Files.  (line  29)
+* networks, gawk and, service, establishing: Setting Up.      (line   6)
 * networks, gawk and, troubleshooting:   Caveats.             (line   6)
-* Numerical Recipes:                     STATIST.             (line  14)
-* ORS variable, POP and:                 Email.               (line  38)
+* networks, ports, reserved:             Setting Up.          (line  39)
+* networks, ports, specifying:           Special File Fields. (line  24)
+* Numerical Recipes:                     STATIST.             (line  36)
 * ORS variable, HTTP and:                Web page.            (line  29)
+* ORS variable, POP and:                 Email.               (line  38)
 * PANIC program:                         PANIC.               (line   6)
 * Perl:                                  Using Networking.    (line  14)
 * Perl, gawk networking and:             Using Networking.    (line  24)
@@ -4363,15 +4366,15 @@ Index
 * POP (Post Office Protocol):            Email.               (line   6)
 * POP (Post Office Protocol) <1>:        Email.               (line  38)
 * Post Office Protocol (POP):            Email.               (line   6)
-* PostScript:                            STATIST.             (line 140)
+* PostScript:                            STATIST.             (line 162)
 * PROLOG:                                Challenges.          (line  75)
 * PROTBASE:                              PROTBASE.            (line   6)
 * protocol field:                        Special File Fields. (line  17)
 * PS image format:                       STATIST.             (line   6)
 * Python:                                Using Networking.    (line  14)
 * Python, gawk networking and:           Using Networking.    (line  24)
-* record separators, POP and:            Email.               (line  38)
 * record separators, HTTP and:           Web page.            (line  29)
+* record separators, POP and:            Email.               (line  38)
 * REMCONF program:                       REMCONF.             (line   6)
 * remoteport field:                      Gawk Special Files.  (line  34)
 * RFC 1939:                              Email.               (line   6)
@@ -4383,11 +4386,11 @@ Index
 * RFC 821:                               Email.               (line   6)
 * robot:                                 Challenges.          (line  84)
 * robot <1>:                             WEBGRAB.             (line   6)
-* RS variable, POP and:                  Email.               (line  38)
 * RS variable, HTTP and:                 Web page.            (line  29)
+* RS variable, POP and:                  Email.               (line  38)
 * servers:                               Making Connections.  (line  14)
-* servers, as hosts:                     Special File Fields. (line  35)
 * servers <1>:                           Setting Up.          (line  22)
+* servers, as hosts:                     Special File Fields. (line  35)
 * servers, HTTP:                         Interacting Service. (line   6)
 * servers, web:                          Simple Server.       (line   6)
 * Simple Mail Transfer Protocol (SMTP):  Basic Protocols.     (line  45)
@@ -4406,18 +4409,21 @@ Index
 * TCP (Transmission Control Protocol), connection, establishing: TCP Connecting.
                                                               (line   6)
 * TCP (Transmission Control Protocol), UDP and: Interacting.  (line  56)
-* TCP/IP, sockets and:                   Gawk Special Files.  (line  19)
 * TCP/IP, network type, selecting:       Special File Fields. (line  11)
 * TCP/IP, protocols, selecting:          Special File Fields. (line  17)
-* troubleshooting, networks, connections: Troubleshooting.    (line   6)
+* TCP/IP, sockets and:                   Gawk Special Files.  (line  19)
+  Transmission Control Protocol, See TCP.
 * troubleshooting, gawk, networks:       Caveats.             (line   6)
+* troubleshooting, networks, connections: Troubleshooting.    (line   6)
 * troubleshooting, networks, timeouts:   Caveats.             (line  18)
 * UDP (User Datagram Protocol):          File /inet/udp.      (line   6)
 * UDP (User Datagram Protocol), TCP and: Interacting.         (line  56)
 * Unix, network ports and:               Setting Up.          (line  39)
 * URLCHK program:                        URLCHK.              (line   6)
+  User Datagram Protocol, See UDP.
 * vertical bar (|), |& operator (I/O):   TCP Connecting.      (line  29)
 * VRML:                                  MAZE.                (line   6)
+  web browsers,, See web service.
 * web pages:                             Web page.            (line   6)
 * web pages, images in:                  Interacting Service. (line 190)
 * web pages, retrieving:                 GETURL.              (line   6)
@@ -4430,66 +4436,65 @@ Index
 * Yahoo!:                                REMCONF.             (line   6)
 * Yahoo! <1>:                            STOXPRED.            (line   6)
 
-
 
 Tag Table:
-Node: Top1144
-Node: Preface4843
-Node: Introduction6264
-Node: Stream Communications7294
-Node: Datagram Communications8478
-Node: The TCP/IP Protocols10126
-Ref: The TCP/IP Protocols-Footnote-110813
-Node: Basic Protocols10970
-Ref: Basic Protocols-Footnote-113035
-Node: Ports13066
-Node: Making Connections14486
-Ref: Making Connections-Footnote-117092
-Ref: Making Connections-Footnote-217139
-Node: Using Networking17329
-Node: Gawk Special Files19692
-Node: Special File Fields21553
-Ref: table-inet-components25546
-Node: Comparing Protocols26862
-Node: File /inet/tcp27396
-Node: File /inet/udp28386
-Ref: File /inet/udp-Footnote-130126
-Node: TCP Connecting30384
-Node: Troubleshooting33917
-Ref: Troubleshooting-Footnote-136709
-Node: Interacting37689
-Node: Setting Up42123
-Node: Email46762
-Ref: Email-Footnote-149208
-Node: Web page50028
-Ref: Web page-Footnote-152904
-Ref: Web page-Footnote-253102
-Node: Primitive Service53600
-Node: Interacting Service56356
-Ref: Interacting Service-Footnote-165613
-Node: CGI Lib65645
-Node: Simple Server72727
-Ref: Simple Server-Footnote-180586
-Node: Caveats80691
-Node: Challenges81853
-Ref: Challenges-Footnote-190656
-Node: Some Applications and Techniques90761
-Node: PANIC93256
-Node: GETURL94994
-Node: REMCONF97649
-Node: URLCHK103183
-Node: WEBGRAB107055
-Node: STATIST111597
-Ref: STATIST-Footnote-1124909
-Node: MAZE125364
-Node: MOBAGWHO131629
-Ref: MOBAGWHO-Footnote-1145798
-Node: STOXPRED145866
-Node: PROTBASE160259
-Ref: PROTBASE-Footnote-1173589
-Node: Links173708
-Node: GNU Free Documentation License176631
-Node: Index201954
+Node: Top1125
+Node: Preface4808
+Node: Introduction6227
+Node: Stream Communications7257
+Node: Datagram Communications8439
+Node: The TCP/IP Protocols10081
+Ref: The TCP/IP Protocols-Footnote-110765
+Node: Basic Protocols10922
+Ref: Basic Protocols-Footnote-112975
+Node: Ports13004
+Node: Making Connections14415
+Ref: Making Connections-Footnote-117013
+Ref: Making Connections-Footnote-217060
+Node: Using Networking17241
+Node: Gawk Special Files19600
+Node: Special File Fields21453
+Ref: table-inet-components25441
+Node: Comparing Protocols26756
+Node: File /inet/tcp27290
+Node: File /inet/udp28280
+Ref: File /inet/udp-Footnote-130008
+Node: TCP Connecting30266
+Node: Troubleshooting33797
+Ref: Troubleshooting-Footnote-136589
+Node: Interacting37566
+Node: Setting Up42000
+Node: Email46635
+Ref: Email-Footnote-149081
+Node: Web page49901
+Ref: Web page-Footnote-152773
+Ref: Web page-Footnote-252971
+Node: Primitive Service53465
+Node: Interacting Service56219
+Ref: Interacting Service-Footnote-165470
+Node: CGI Lib65502
+Node: Simple Server72569
+Ref: Simple Server-Footnote-180423
+Node: Caveats80528
+Node: Challenges81681
+Ref: Challenges-Footnote-190461
+Node: Some Applications and Techniques90566
+Node: PANIC93059
+Node: GETURL94793
+Node: REMCONF97446
+Node: URLCHK102980
+Node: WEBGRAB106848
+Node: STATIST111378
+Ref: STATIST-Footnote-1124683
+Node: MAZE125138
+Node: MOBAGWHO131399
+Ref: MOBAGWHO-Footnote-1145547
+Node: STOXPRED145615
+Node: PROTBASE159995
+Ref: PROTBASE-Footnote-1173307
+Node: Links173422
+Node: GNU Free Documentation License176341
+Node: Index201464
 
 End Tag Table
 

@@ -3,7 +3,7 @@
  */
 
 /*
- * Copyright (C) 1986, 1988, 1989, 1991-2011, 2016, 2021,
+ * Copyright (C) 1986, 1988, 1989, 1991-2011, 2016, 2021, 2025,
  * the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
@@ -95,8 +95,36 @@ adjust_uint(uintmax_t n)
 	 * values, strip leading nonzero bits of integers that are so large
 	 * that they cannot be represented exactly as AWKNUMs, so that their
 	 * low order bits are represented exactly, without rounding errors.
-	 * This is more desirable in practice, since it means the user sees
-	 * integers that are the same width as the AWKNUM fractions.
+	 *
+	 * When computing with integers that AWKNUM cannot represent exactly,
+	 * GAWK uses AWKNUM to approximate wraparound integer arithmetic
+	 * using the widest integer that AWKNUM can represent this time.
+	 * GAWK prefers to lose excess high-order information instead of
+	 * the more-usual rounding that would lose low-order information.
+	 *
+	 * Typically uintmax_t is 64-bit and AWKNUM is IEEE 754 binary64,
+	 * so AWKNUM_FRACTION_BITS is DBL_MANT_DIG (i.e., 53) and
+	 * some 64-bit uintmax_t values have nonzero bits that are too widely
+	 * spread apart to fit into AWKNUM's 53-bit significand.
+	 * For example, let N = 8 + 2**62 (0x4000000000000008), one such value.
+	 * Then ((AWKNUM) N) equals 2**62 (0x4000000000000000) due to rounding,
+	 * whereas ((AWKNUM) adjust_uint (N)) exactly equals (adjust_uint (N))
+	 * which is 8 (in other words, N modulo 2**56),
+	 * because N's low-order 3 bits are zero and 56 = 53 + 3.
+	 * In this example, adjust_uint implements 56-bit wraparound
+	 * integer arithmetic (not counting the sign bit).
+	 * Other examples implement wider or narrow wraparound arithmetic,
+	 * depending on how many low-order bits are zero.
+	 *
+	 * Using adjust_uint better matches expectations
+	 * with GAWK expressions like compl(1).
+	 * With adjust_uint, compl(1) evaluates to 0x3ffffffffffffe
+	 * which makes sense if the word size is 54 bits this time;
+	 * without it, compl(1) would evaluate to 0x40000000000000
+	 * which is nonsense no matter what the word size would be.
+	 * (Perhaps it would be even better if compl(1) evaluated to -2,
+	 * i.e., two's complement in an infinitely wide word,
+	 * but that is a matter for another day.)
 	 */
 	int wordbits = CHAR_BIT * sizeof n;
 	if (AWKNUM_FRACTION_BITS < wordbits) {

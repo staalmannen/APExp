@@ -15,8 +15,12 @@ BEGIN {
 	if (nnan_str == "nan")
 		nnan_str = "+" nnan_str
 	inf = -log(0)
-	inf_str = "+" sprintf("%Pf", inf)
+	inf_str = sprintf("%Pf", inf)
+	if (inf_str == "inf")
+		inf_str = "+" inf
 	ninf_str = sprintf("%Pf", -inf)
+	if (ninf_str == "inf")
+		ninf_str = "-" inf
 
 	n = 0
 	formats[n++] = "%a"

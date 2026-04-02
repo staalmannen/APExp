@@ -17,7 +17,7 @@
 #
 # Makefile.am --- automake input file for gawk
 #
-# Copyright (C) 2000-2016, 2018, 2019, 2021, 2022, 2023
+# Copyright (C) 2000-2016, 2018, 2019, 2021, 2022, 2023, 2024, 2026
 # the Free Software Foundation, Inc.
 #
 # This file is part of GAWK, the GNU implementation of the
@@ -113,8 +113,6 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 @USE_PERSISTENT_MALLOC_TRUE@am__append_1 = pma.c pma.h
-@USE_PERSISTENT_MALLOC_TRUE@am__append_2 = -DNDEBUG
-@USE_PERSISTENT_MALLOC_TRUE@am__append_3 = -DNDEBUG
 subdir = support
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/arch.m4 \
@@ -149,16 +147,18 @@ libsupport_a_LIBADD =
 am__libsupport_a_SOURCES_DIST = attribute.h cdefs.h dfa.c dfa.h \
 	dynarray.h flexmember.h getopt.c getopt.h getopt1.c \
 	getopt_int.h idx.h intprops.h intprops-internal.h \
-	libc-config.h localeinfo.c localeinfo.h random.c random.h \
-	regex.c regex.h verify.h xalloc.h malloc/dynarray.h \
-	malloc/dynarray_at_failure.c malloc/dynarray_emplace_enlarge.c \
-	malloc/dynarray_finalize.c malloc/dynarray_resize.c \
-	malloc/dynarray_resize_clear.c pma.c pma.h
+	libc-config.h localeinfo.c localeinfo.h minrx.c minrx.h \
+	random.c random.h regex.c regex.h verify.h xalloc.h \
+	malloc/dynarray.h malloc/dynarray_at_failure.c \
+	malloc/dynarray_emplace_enlarge.c malloc/dynarray_finalize.c \
+	malloc/dynarray_resize.c malloc/dynarray_resize_clear.c pma.c \
+	pma.h
 am__dirstamp = $(am__leading_dot)dirstamp
 @USE_PERSISTENT_MALLOC_TRUE@am__objects_1 = pma.$(OBJEXT)
 am_libsupport_a_OBJECTS = dfa.$(OBJEXT) getopt.$(OBJEXT) \
-	getopt1.$(OBJEXT) localeinfo.$(OBJEXT) random.$(OBJEXT) \
-	regex.$(OBJEXT) malloc/dynarray_at_failure.$(OBJEXT) \
+	getopt1.$(OBJEXT) localeinfo.$(OBJEXT) minrx.$(OBJEXT) \
+	random.$(OBJEXT) regex.$(OBJEXT) \
+	malloc/dynarray_at_failure.$(OBJEXT) \
 	malloc/dynarray_emplace_enlarge.$(OBJEXT) \
 	malloc/dynarray_finalize.$(OBJEXT) \
 	malloc/dynarray_resize.$(OBJEXT) \
@@ -181,8 +181,8 @@ depcomp = $(SHELL) $(top_srcdir)/build-aux/depcomp
 am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/dfa.Po ./$(DEPDIR)/getopt.Po \
 	./$(DEPDIR)/getopt1.Po ./$(DEPDIR)/localeinfo.Po \
-	./$(DEPDIR)/pma.Po ./$(DEPDIR)/random.Po ./$(DEPDIR)/regex.Po \
-	malloc/$(DEPDIR)/dynarray_at_failure.Po \
+	./$(DEPDIR)/minrx.Po ./$(DEPDIR)/pma.Po ./$(DEPDIR)/random.Po \
+	./$(DEPDIR)/regex.Po malloc/$(DEPDIR)/dynarray_at_failure.Po \
 	malloc/$(DEPDIR)/dynarray_emplace_enlarge.Po \
 	malloc/$(DEPDIR)/dynarray_finalize.Po \
 	malloc/$(DEPDIR)/dynarray_resize.Po \
@@ -237,7 +237,7 @@ AUTOMAKE = @AUTOMAKE@
 AWK = @AWK@
 CC = @CC@
 CCDEPMODE = @CCDEPMODE@
-CFLAGS = @CFLAGS@ $(am__append_2)
+CFLAGS = @CFLAGS@
 CPP = @CPP@
 CPPFLAGS = @CPPFLAGS@
 CSCOPE = @CSCOPE@
@@ -358,7 +358,7 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-AM_CFLAGS = @CFLAGS@ $(am__append_3)
+AM_CFLAGS = @CFLAGS@
 AM_LDFLAGS = @LDFLAGS@
 
 # Stuff to include in the dist that doesn't need it's own
@@ -367,6 +367,8 @@ EXTRA_DIST = \
         ChangeLog.0 \
 	Makefile.am \
 	Makefile.in \
+	charset.c \
+	charset.h \
 	pma.h \
 	pma.c \
 	regcomp.c \
@@ -381,11 +383,11 @@ noinst_LIBRARIES = libsupport.a
 libsupport_a_SOURCES = attribute.h cdefs.h dfa.c dfa.h dynarray.h \
 	flexmember.h getopt.c getopt.h getopt1.c getopt_int.h idx.h \
 	intprops.h intprops-internal.h libc-config.h localeinfo.c \
-	localeinfo.h random.c random.h regex.c regex.h verify.h \
-	xalloc.h malloc/dynarray.h malloc/dynarray_at_failure.c \
-	malloc/dynarray_emplace_enlarge.c malloc/dynarray_finalize.c \
-	malloc/dynarray_resize.c malloc/dynarray_resize_clear.c \
-	$(am__append_1)
+	localeinfo.h minrx.c minrx.h random.c random.h regex.c regex.h \
+	verify.h xalloc.h malloc/dynarray.h \
+	malloc/dynarray_at_failure.c malloc/dynarray_emplace_enlarge.c \
+	malloc/dynarray_finalize.c malloc/dynarray_resize.c \
+	malloc/dynarray_resize_clear.c $(am__append_1)
 
 # For some make's, e.g. OpenBSD, that don't define this
 RM = rm -f
@@ -461,6 +463,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getopt.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getopt1.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/localeinfo.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/minrx.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pma.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/random.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/regex.Po@am__quote@ # am--include-marker
@@ -621,6 +624,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/getopt.Po
 	-rm -f ./$(DEPDIR)/getopt1.Po
 	-rm -f ./$(DEPDIR)/localeinfo.Po
+	-rm -f ./$(DEPDIR)/minrx.Po
 	-rm -f ./$(DEPDIR)/pma.Po
 	-rm -f ./$(DEPDIR)/random.Po
 	-rm -f ./$(DEPDIR)/regex.Po
@@ -678,6 +682,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/getopt.Po
 	-rm -f ./$(DEPDIR)/getopt1.Po
 	-rm -f ./$(DEPDIR)/localeinfo.Po
+	-rm -f ./$(DEPDIR)/minrx.Po
 	-rm -f ./$(DEPDIR)/pma.Po
 	-rm -f ./$(DEPDIR)/random.Po
 	-rm -f ./$(DEPDIR)/regex.Po
@@ -722,7 +727,7 @@ uninstall-am:
 
 
 distclean-local:
-	rm -fr .deps
+	rm -fr .deps malloc/.deps
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

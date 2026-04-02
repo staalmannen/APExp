@@ -1,4 +1,4 @@
-This is the README for GNU awk 5 under Windows32.
+This is the README for GNU awk 5 on MS-Windows.
 
     Gawk has been compiled and tested on MS-Windows using
 the MinGW ports of the GNU development tools.
@@ -7,8 +7,8 @@ the MinGW ports of the GNU development tools.
 to compile and run gawk under Windows.  For Cygwin, building and
 installation is the same as under Unix:
 
-	tar -xvpzf gawk-5.2.x.tar.gz
-	cd gawk-5.2.x
+	tar -xvpzf gawk-5.3.x.tar.gz
+	cd gawk-5.3.x
 	./configure && make
 
 The `configure' step takes a long time, but works otherwise.
@@ -32,6 +32,10 @@ The makefile contains a number of targets for building the MS-Windows
 version.  A list of targets will be printed if the make command is
 given without a target.  As an example, to build gawk using the MinGW
 tools, enter "make mingw32".
+
+If you are building with MinGW using anything other than pc/Makefile,
+be sure to pass the -D__USE_MINGW_ANSI_STDIO command-line option to
+GCC.
 
 After you build in the top-level directory, chdir to the extension
 subdirectory and say "make" there to build the extensions.  If you
@@ -61,9 +65,9 @@ their end-of-line markers converted, as described in Makefile.tst.
 One change you will have to make for testing the MinGW port using the
 MSYS Bash is to set SLASH to //.
 
-Testing Gawk built with MPFR support should report 30 tests failed, and
+Testing Gawk built with MPFR support should report 24 tests failed, and
 if your ls.exe doesn't produce inode numbers consistent with the readdir
-extension, you should see 31 failures.  If you see more failures, you
+extension, you should see 25 failures.  If you see more failures, you
 should investigate the reasons.
 
 It is routine to install by hand, but note that the install target also

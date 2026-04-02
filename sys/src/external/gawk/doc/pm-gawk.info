@@ -1,17 +1,17 @@
-This is pm-gawk.info, produced by makeinfo version 7.0.1 from
+This is pm-gawk.info, produced by makeinfo version 7.1 from
 pm-gawk.texi.
 
-Copyright © 2022 Terence Kelly
+Copyright © 2022, 2025 Terence Kelly
 <tpkelly@eecs.umich.edu>
 <tpkelly@cs.princeton.edu>
 <tpkelly@acm.org>
-<http://web.eecs.umich.edu/~tpkelly/pma/>
+<https://web.eecs.umich.edu/~tpkelly/pma/>
 <https://dl.acm.org/profile/81100523747>
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
 any later version published by the Free Software Foundation; with the
-Invariant Sections being “Introduction” and “History”, no Front-Cover
+Invariant Sections being "Introduction" and "History", no Front-Cover
 Texts, and no Back-Cover Texts.  A copy of the license is available at
 <https://www.gnu.org/licenses/fdl-1.3.html>
 INFO-DIR-SECTION Text creation and manipulation
@@ -25,24 +25,24 @@ File: pm-gawk.info,  Node: Top,  Next: Introduction,  Up: (dir)
 General Introduction
 ********************
 
-‘gawk’ 5.2 introduces a _persistent memory_ feature that can “remember”
+‘gawk’ 5.2 introduced a _persistent memory_ feature that can "remember"
 script-defined variables and functions across executions; pass variables
 between unrelated scripts without serializing/parsing text files; and
 handle data sets larger than available memory plus swap.  This
 supplementary manual provides an in-depth look at persistent-memory
 ‘gawk’.
 
-Copyright © 2022 Terence Kelly
+Copyright © 2022, 2025 Terence Kelly
 <tpkelly@eecs.umich.edu>
 <tpkelly@cs.princeton.edu>
 <tpkelly@acm.org>
-<http://web.eecs.umich.edu/~tpkelly/pma/>
+<https://web.eecs.umich.edu/~tpkelly/pma/>
 <https://dl.acm.org/profile/81100523747>
 
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.3 or
 any later version published by the Free Software Foundation; with the
-Invariant Sections being “Introduction” and “History”, no Front-Cover
+Invariant Sections being "Introduction" and "History", no Front-Cover
 Texts, and no Back-Cover Texts.  A copy of the license is available at
 <https://www.gnu.org/licenses/fdl-1.3.html>
 
@@ -65,21 +65,21 @@ File: pm-gawk.info,  Node: Introduction,  Next: Quick Start,  Prev: Top,  Up: To
 **************
 
 
-GNU AWK (‘gawk’) 5.2, expected in September 2022, introduces a new
+GNU AWK (‘gawk’) 5.2, released in September 2022, introduced a new
 _persistent memory_ feature that makes AWK scripting easier and
-sometimes improves performance.  The new feature, called “pm-‘gawk’,”
-can “remember” script-defined variables and functions across executions
+sometimes improves performance.  The new feature, called "pm-‘gawk’,"
+can "remember" script-defined variables and functions across executions
 and can pass variables and functions between unrelated scripts without
-serializing/parsing text files—all with near-zero fuss.  pm-‘gawk’ does
+serializing/parsing text files--all with near-zero fuss.  pm-‘gawk’ does
 _not_ require non-volatile memory hardware nor any other exotic
 infrastructure; it runs on the ordinary conventional computers and
-operating systems that most of us have been using for decades.
+operating systems that we've all been using for decades.
 
 
 The main ‘gawk’ documentation(1) covers the basics of the new
 persistence feature.  This supplementary manual provides additional
 detail, tutorial examples, and a peek under the hood of pm-‘gawk’.  If
-you’re familiar with ‘gawk’ and Unix-like environments, dive straight
+you're familiar with ‘gawk’ and Unix-like environments, dive straight
 in:
 
    • *note Quick Start:: hits the ground running with a few keystrokes.
@@ -91,13 +91,13 @@ in:
    • *note Acknowledgments:: thanks those who made pm-‘gawk’ happen.
    • *note Installation:: shows where obtain pm-‘gawk’.
    • *note Debugging:: explains how to handle suspected bugs.
-   • *note History:: traces pm-‘gawk’’s persistence technology.
+   • *note History:: traces pm-‘gawk’'s persistence technology.
 
 
-You can find the latest version of this manual, and also the “director’s
-cut,” at the web site for the persistent memory allocator used in
+You can find the latest version of this manual, and also the "director's
+cut," at the web site for the persistent memory allocator used in
 pm-‘gawk’:
-               <http://web.eecs.umich.edu/~tpkelly/pma/>
+              <https://web.eecs.umich.edu/~tpkelly/pma/>
 
 
 Two publications describe the persistent memory allocator and early
@@ -125,12 +125,12 @@ File: pm-gawk.info,  Node: Quick Start,  Next: Examples,  Prev: Introduction,  U
 2 Quick Start
 *************
 
-Here’s pm-‘gawk’ in action at the ‘bash’ shell prompt (‘$’):
-        $ truncate -s 4096000 heap.pma
-        $ export GAWK_PERSIST_FILE=heap.pma
-        $ gawk 'BEGIN{myvar = 47}'
-        $ gawk 'BEGIN{myvar += 7; print myvar}'
-        54
+Here's pm-‘gawk’ in action at the ‘bash’ shell prompt (‘$’):
+    $ truncate -s 4096000 heap.pma
+    $ export GAWK_PERSIST_FILE=heap.pma
+    $ gawk 'BEGIN{myvar = 47}'
+    $ gawk 'BEGIN{myvar += 7; print myvar}'
+    54                            # '7' => not pm-gawk, crash => bad build
 First, ‘truncate’ creates an empty (all-zero-bytes) “heap file” where
 pm-‘gawk’ will store script variables; its size is a multiple of the
 system page size (4 KiB). Next, ‘export’ sets an environment variable
@@ -140,20 +140,22 @@ one-line AWK script that initializes variable ‘myvar’, which will reside
 in the heap file and thereby outlive the interpreter process that
 initialized it.  Finally, the fourth command invokes pm-‘gawk’ on a
 _different_ one-line script that increments and prints ‘myvar’.  The
-output shows that pm-‘gawk’ has indeed “remembered” ‘myvar’ across
-executions of unrelated scripts.  (If the ‘gawk’ executable in your
-search ‘$PATH’ lacks the persistence feature, the output in the above
-example will be ‘7’ instead of ‘54’.  *Note Installation::.)  To disable
-persistence until you want it again, prevent ‘gawk’ from finding the
-heap file via ‘unset GAWK_PERSIST_FILE’.  To permanently “forget” script
-variables, delete the heap file.
+output shows that pm-‘gawk’ has indeed "remembered" ‘myvar’ across
+executions of unrelated scripts.  To disable persistence until you want
+it again, prevent ‘gawk’ from finding the heap file via ‘unset
+GAWK_PERSIST_FILE’.  To permanently "forget" script variables, delete
+the heap file.
 
+   *Note Installation:: for two common problems and their fixes: If you
+run the example above and pm-‘gawk’ crashes on the _second_ invocation,
+it is likely that your pm-‘gawk’ was incorrectly built.  If the printed
+output is ‘7’ instead of ‘54’, the ‘gawk’ executable in your search
+‘$PATH’ lacks the persistence feature.
 
-
-   Toggling persistence by ‘export’-ing and ‘unset’-ing “ambient” envars
+   Toggling persistence by ‘export’-ing and ‘unset’-ing "ambient" envars
 requires care: Forgetting to ‘unset’ when you no longer want persistence
-can cause confusing bugs.  Fortunately, ‘bash’ allows you to pass envars
-more deliberately, on a per-command basis:
+can cause surprises.  Fortunately, ‘bash’ allows you to pass envars more
+deliberately, on a per-command basis:
         $ rm heap.pma                    # start fresh
         $ unset GAWK_PERSIST_FILE        # eliminate ambient envar
         $ truncate -s 4096000 heap.pma   # create new heap file
@@ -171,8 +173,8 @@ does see the special envar and therefore uses the script variable from
 the heap file.
 
    While sometimes less error prone than ambient envars, per-command
-envar passing as shown above is verbose and shouty.  A shell alias saves
-keystrokes and reduces visual clutter:
+envar passing is verbose and shouty.  A shell alias saves keystrokes and
+reduces visual clutter:
         $ alias pm='GAWK_PERSIST_FILE=heap.pma'
         $ pm gawk 'BEGIN{print ++myvar}'
         55
@@ -186,7 +188,7 @@ File: pm-gawk.info,  Node: Examples,  Next: Performance,  Prev: Quick Start,  Up
 **********
 
 Our first example uses pm-‘gawk’ to streamline analysis of a prose
-corpus, Mark Twain’s ‘Tom Sawyer’ and ‘Huckleberry Finn’ from
+corpus, Mark Twain's ‘Tom Sawyer’ and ‘Huckleberry Finn’ from
 <https://gutenberg.org/files/74/74-0.txt> and
 <https://gutenberg.org/files/76/76-0.txt>.  We first convert
 non-alphabetic characters to newlines (so each line has at most one
@@ -194,10 +196,10 @@ word) and convert to lowercase:
         $ tr -c a-zA-Z '\n' < 74-0.txt | tr A-Z a-z > sawyer.txt
         $ tr -c a-zA-Z '\n' < 76-0.txt | tr A-Z a-z > finn.txt
 
-   It’s easy to count word frequencies with AWK’s associative arrays.
+   It's easy to count word frequencies with AWK's associative arrays.
 pm-‘gawk’ makes these arrays persistent, so we need not re-ingest the
-entire corpus every time we ask a new question (“read once, analyze
-happily ever after”):
+entire corpus every time we ask a new question ("read once, analyze
+happily ever after"):
         $ truncate -s 100M twain.pma
         $ export GAWK_PERSIST_FILE=twain.pma
         $ gawk '{ts[$1]++}' sawyer.txt                    # ingest
@@ -207,46 +209,46 @@ happily ever after”):
         2 27
 The ‘truncate’ command above creates a heap file large enough to store
 all of the data it must eventually contain, with plenty of room to
-spare.  (As we’ll see in *note Sparse Heap Files::, this isn’t
+spare.  (As we'll see in *note Sparse Heap Files::, this isn't
 wasteful.)  The ‘export’ command ensures that subsequent ‘gawk’
 invocations activate pm-‘gawk’.  The first pm-‘gawk’ command stores ‘Tom
-Sawyer’’s word frequencies in associative array ‘ts[]’.  Because this
+Sawyer’'s word frequencies in associative array ‘ts[]’.  Because this
 array is persistent, subsequent pm-‘gawk’ commands can access it without
 having to parse the input file again.
 
-   Expanding our analysis to encompass a second book is easy.  Let’s
+   Expanding our analysis to encompass a second book is easy.  Let's
 populate a new associative array ‘hf[]’ with the word frequencies in
 ‘Huckleberry Finn’:
         $ gawk '{hf[$1]++}' finn.txt
-Now we can freely intermix accesses to both books’ data conveniently and
+Now we can freely intermix accesses to both books' data conveniently and
 efficiently, without the overhead and coding fuss of repeated input
 parsing:
         $ gawk 'BEGIN{print ts["river"], hf["river"]}'
         26 142
 
-   By making AWK more interactive, pm-‘gawk’ invites casual
-conversations with data.  If we’re curious what words in ‘Finn’ are
-absent from ‘Sawyer’, answers (including “flapdoodle,” “yellocution,”
-and “sockdolager”) are easy to find:
+   pm-‘gawk’ feels like it has a read-eval-print loop, which invites
+casual interactive conversations with data.  If we're curious what words
+from ‘Finn’ are not in ‘Sawyer’, answers (including "flapdoodle,"
+"yellocution," and "sockdolager") are a few keystrokes away:
         $ gawk 'BEGIN{for(w in hf) if (!(w in ts)) print w}'
 
-   Rumors of Twain’s death may be exaggerated.  If he publishes new
+   Rumors of Twain's death may be exaggerated.  If he publishes new
 books in the future, it will be easy to incorporate them into our
 analysis incrementally.  The performance benefits of incremental
 processing for common AWK chores such as log file analysis are discussed
 in <https://queue.acm.org/detail.cfm?id=3534855> and the companion paper
 cited therein, and below in *note Performance::.
 
-   Exercise: The “Markov” AWK script on page 79 of Kernighan & Pike’s
+   Exercise: The "Markov" AWK script on page 79 of Kernighan & Pike's
 ‘The Practice of Programming’ generates random text reminiscent of a
 given corpus using a simple statistical modeling technique.  This script
-consists of a “learning” or “training” phase followed by an
+consists of a "learning" or "training" phase followed by an
 output-generation phase.  Use pm-‘gawk’ to de-couple the two phases and
 to allow the statistical model to incrementally ingest additions to the
 input corpus.
 
-   Our second example considers another domain that plays to AWK’s
-strengths, data analysis.  For simplicity we’ll create two small input
+   Our second example considers another domain that plays to AWK's
+strengths, data analysis.  For simplicity we'll create two small input
 files of numeric data.
         $ printf '1\n2\n3\n4\n5\n' > A.dat
         $ printf '5\n6\n7\n8\n9\n' > B.dat
@@ -272,8 +274,8 @@ pm-‘gawk’ requires changing the above script to ensure that ‘min’ and
 and _not_ every time the script runs.  Furthermore, whereas
 script-defined variables such as ‘min’ retain their values across
 pm-‘gawk’ executions, built-in AWK variables such as ‘NR’ are reset to
-zero every time pm-‘gawk’ runs, so we can’t use them in the same way.
-Here’s a modified script for pm-‘gawk’:
+zero every time pm-‘gawk’ runs, so we can't use them in the same way.
+Here's a modified script for pm-‘gawk’:
         $ cat summary_persistent.awk
             ! init   { min = max = $1; init = 1 }
             min > $1 { min = $1 }
@@ -300,9 +302,9 @@ the number in the middle of a sorted list; if the length of the list is
 even, average the two numbers at the middle.  The modes are the values
 that occur most frequently.)
 
-   Our third and final set of examples shows that pm-‘gawk’ allows us to
-bundle both script-defined data and also user-defined _functions_ in a
-persistent heap that may be passed freely between unrelated AWK scripts.
+   Our final examples show that pm-‘gawk’ allows us to bundle both
+script-defined data and also user-defined _functions_ in a persistent
+heap that we can pass freely between unrelated AWK scripts.
 
    The following shell transcript repeatedly invokes pm-‘gawk’ to create
 and then employ a user-defined function.  These separate invocations
@@ -311,7 +313,7 @@ file.  Each invocation can add user-defined functions and add or remove
 data from the heap that subsequent invocations will access.
         $ truncate -s 10M funcs.pma
         $ export GAWK_PERSIST_FILE=funcs.pma
-        $ gawk 'function count(A,t) {for(i in A)t++; return ""==t?0:t}'
+        $ gawk 'function count(A,t) {for(i in A)t++; return t+0}'
         $ gawk 'BEGIN { a["x"] = 4; a["y"] = 5; a["z"] = 6 }'
         $ gawk 'BEGIN { print count(a) }'
         3
@@ -339,7 +341,7 @@ count them.
 collection of user-defined functions that perform basic operations on
 quadratic polynomials: evaluation at a given point, computing the
 discriminant, and using the quadratic formula to find the roots.  It
-then factorizes x^2 + x - 12 into (x - 3)(x + 4).
+then factors x^2 + x - 12 into (x - 3)(x + 4).
         #!/bin/sh
         rm -f                    poly.pma
         truncate -s 10M          poly.pma
@@ -371,8 +373,9 @@ This chapter explains several performance advantages that result from
 the implementation of persistent memory in pm-‘gawk’, shows how tuning
 the underlying operating system sometimes improves performance, and
 presents experimental performance measurements.  To make the discussion
-concrete, we use examples from a GNU/Linux system—GNU utilities atop the
-Linux OS—but the principles apply to other modern operating systems.
+concrete, we use examples from a GNU/Linux system--GNU utilities atop
+the Linux OS--but the principles apply to other modern operating
+systems.
 
 * Menu:
 
@@ -392,11 +395,11 @@ File: pm-gawk.info,  Node: Constant-Time Array Access,  Next: Virtual Memory and
 pm-‘gawk’ preserves the efficiency of data access when data structures
 are created by one process and later re-used by a different process.
 
-   Consider the associative arrays used to analyze Mark Twain’s books in
+   Consider the associative arrays used to analyze Mark Twain's books in
 *note Examples::.  We created arrays ‘ts[]’ and ‘hf[]’ by reading files
 ‘sawyer.txt’ and ‘finn.txt’.  If N denotes the total volume of data in
 these files, building the associative arrays typically requires time
-proportional to N, or “O(N) expected time” in the lingo of asymptotic
+proportional to N, or "O(N) expected time" in the lingo of asymptotic
 analysis.  If W is the number of unique words in the input files, the
 size of the associative arrays will be proportional to W, or O(W).
 Accessing individual array elements requires only _constant_ or O(1)
@@ -410,11 +413,11 @@ earlier in BEGIN{print ts["river"], hf["river"]}, still requires only
 O(1) time, which is asymptotically far superior to the alternatives.
 Naïvely reconstructing arrays by re-ingesting all raw inputs in every
 ‘gawk’ process that accesses the arrays would of course require O(N)
-time—a profligate cost if the text corpus is large.  Dumping arrays to
+time--a profligate cost if the text corpus is large.  Dumping arrays to
 files and re-loading them as needed would reduce the preparation time
 for access to O(W). That can be a substantial improvement in practice; N
 is roughly 19 times larger than W in our Twain corpus.  Nonetheless O(W)
-remains far slower than pm-‘gawk’’s O(1).  As we’ll see in *note
+remains far slower than pm-‘gawk’'s O(1).  As we'll see in *note
 Results::, the difference is not merely theoretical.
 
    The persistent memory implementation beneath pm-‘gawk’ enables it to
@@ -427,8 +430,8 @@ lookup on the corresponding hash table, which in turn accesses memory on
 the persistent heap.  Modern operating systems implement memory-mapped
 files in such a way that these memory accesses trigger the bare minimum
 of data movement required: Only those parts of the heap file containing
-needed data are “paged in” to the memory of the pm-‘gawk’ process.  In
-the worst case, the heap file is not in the file system’s in-memory
+needed data are "paged in" to the memory of the pm-‘gawk’ process.  In
+the worst case, the heap file is not in the file system's in-memory
 cache, so the required pages must be faulted into memory from storage.
 Our asymptotic analysis of efficiency applies regardless of whether the
 heap file is cached or not.  The entire heap file is _not_ accessed
@@ -448,7 +451,7 @@ File: pm-gawk.info,  Node: Virtual Memory and Big Data,  Next: Sparse Heap Files
 
 Small data sets seldom spoil the delights of AWK by causing performance
 troubles, with or without persistence.  As the size of the ‘gawk’
-interpreter’s internal data structures approaches the capacity of
+interpreter's internal data structures approaches the capacity of
 physical memory, however, acceptable performance requires understanding
 modern operating systems and sometimes tuning them.  Fortunately
 pm-‘gawk’ offers new degrees of control for performance-conscious users
@@ -458,18 +461,18 @@ perplexity.
 
    Modern operating systems feature “virtual memory” that strives to
 appear both larger than installed DRAM (which is small) and faster than
-installed storage devices (which are slow).  As a program’s memory
+installed storage devices (which are slow).  As a program's memory
 footprint approaches the capacity of DRAM, the virtual memory system
-transparently “pages” (moves) the program’s data between DRAM and a
+transparently “pages” (moves) the program's data between DRAM and a
 “swap area” on a storage device.  Paging can degrade performance mildly
-or severely, depending on the program’s memory access patterns.  Random
+or severely, depending on the program's memory access patterns.  Random
 accesses to large data structures can trigger excessive paging and
-dramatic slowdown.  Unfortunately, the hash tables beneath AWK’s
+dramatic slowdown.  Unfortunately, the hash tables beneath AWK's
 signature associative arrays inherently require random memory accesses,
 so large associative arrays can be problematic.
 
    Persistence changes the rules in our favor: The OS pages data to
-pm-‘gawk’’s _heap file_ instead of the swap area.  This won’t help
+pm-‘gawk’'s _heap file_ instead of the swap area.  This won't help
 performance much if the heap file resides in a conventional
 storage-backed file system.  On Unix-like systems, however, we may place
 the heap file in a DRAM-backed file system such as ‘/dev/shm/’, which
@@ -478,18 +481,18 @@ the heap file in such a file system is a reasonable expedient, with two
 caveats: First, keep in mind that DRAM-backed file systems perish when
 the machine reboots or crashes, so you must copy the heap file to a
 conventional storage-backed file system when your computation is done.
-Second, pm-‘gawk’’s memory footprint can’t exceed available DRAM if you
+Second, pm-‘gawk’'s memory footprint can't exceed available DRAM if you
 place the heap file in a DRAM-backed file system.
 
    Tuning OS paging parameters may improve performance if you decide to
 run pm-‘gawk’ with a heap file in a conventional storage-backed file
 system.  Some OSes have unhelpful default habits regarding modified
-(“dirty”) memory backed by files.  For example, the OS may write dirty
+("dirty") memory backed by files.  For example, the OS may write dirty
 memory pages to the heap file periodically and/or when the OS believes
-that “too much” memory is dirty.  Such “eager” writeback can degrade
+that "too much" memory is dirty.  Such "eager" writeback can degrade
 performance noticeably and brings no benefit to pm-‘gawk’.  Fortunately
 some OSes allow paging defaults to be over-ridden so that writeback is
-“lazy” rather than eager.  For Linux see the discussion of the ‘dirty_*’
+"lazy" rather than eager.  For Linux see the discussion of the ‘dirty_*’
 parameters at
 <https://www.kernel.org/doc/html/latest/admin-guide/sysctl/vm.html>.
 Changing these parameters can prevent wasteful eager paging:(1)
@@ -498,8 +501,8 @@ Changing these parameters can prevent wasteful eager paging:(1)
         $ echo 300000 | sudo tee /proc/sys/vm/dirty_expire_centisecs
         $ echo 50000  | sudo tee /proc/sys/vm/dirty_writeback_centisecs
 Tuning paging parameters can help non-persistent ‘gawk’ as well as
-pm-‘gawk’.  [Disclaimer: OS tuning is an occult art, and your mileage
-may vary.]
+pm-‘gawk’.
+[*Disclaimer*: OS tuning is an occult art, and your mileage may vary.]
 
    ---------- Footnotes ----------
 
@@ -512,22 +515,22 @@ File: pm-gawk.info,  Node: Sparse Heap Files,  Next: Persistence versus Durabili
 4.3 Sparse Heap Files
 =====================
 
-To be frugal with storage resources, pm-‘gawk’’s heap file should be
+To be frugal with storage resources, pm-‘gawk’'s heap file should be
 created as a “sparse file”: a file whose logical size is larger than its
 storage resource footprint.  Modern file systems support sparse files,
 which are easy to create using the ‘truncate’ tool shown in our
 examples.
 
-   Let’s first create a conventional _non_-sparse file using ‘echo’:
+   Let's first create a conventional _non_-sparse file using ‘echo’:
         $ echo hi > dense
         $ ls -l dense
         -rw-rw-r--. 1 me me 3 Aug  5 23:08 dense
         $ du -h dense
         4.0K    dense
 The ‘ls’ utility reports that file ‘dense’ is three bytes long (two for
-the letters in “hi” plus one for the newline).  The ‘du’ utility reports
-that this file consumes 4 KiB of storage—one block of disk, as small as
-a non-sparse file’s storage footprint can be.  Now let’s use ‘truncate’
+the letters in "hi" plus one for the newline).  The ‘du’ utility reports
+that this file consumes 4 KiB of storage--one block of disk, as small as
+a non-sparse file's storage footprint can be.  Now let's use ‘truncate’
 to create a logically enormous sparse file and check its physical size:
         $ truncate -s 1T sparse
         $ ls -l sparse
@@ -535,39 +538,42 @@ to create a logically enormous sparse file and check its physical size:
         $ du -h sparse
         0       sparse
 Whereas ‘ls’ reports the logical file size that we expect (one TiB or 2
-raised to the power 40 bytes), ‘du’ reveals that the file occupies no
-storage whatsoever.  The file system will allocate physical storage
-resources beneath this file as data is written to it; reading unwritten
-regions of the file yields zeros.
+raised to the power 40 bytes), ‘du’ reveals that the file consumes
+_zero_ storage.  The file system will allocate physical storage beneath
+this file as data are written to it; reading unwritten regions yields
+zeros.
 
-   The “pay as you go” storage cost of sparse files offers both
+   The "pay as you go" storage cost of sparse files offers both
 convenience and control for pm-‘gawk’ users.  If your file system
 supports sparse files, go ahead and create lavishly capacious heap files
 for pm-‘gawk’.  Their logical size costs nothing and persistent memory
-allocation within pm-‘gawk’ won’t fail until physical storage resources
+allocation within pm-‘gawk’ won't fail until physical storage resources
 beneath the file system are exhausted.  But if instead you want to
 _prevent_ a heap file from consuming too much storage, simply set its
-initial size to whatever bound you wish to enforce; it won’t eat more
+initial size to whatever bound you wish to enforce; it won't eat more
 disk than that.  Copying sparse files with GNU ‘cp’ creates sparse
 copies by default.
 
-   File-system encryption can preclude sparse files: If the cleartext of
-a byte offset range within a file is all zero bytes, the corresponding
-ciphertext probably shouldn’t be all zeros!  Encrypting at the storage
-layer instead of the file system layer may offer acceptable security
-while still permitting file systems to implement sparse files.
+   To maximize storage frugality we sometimes want to "re-sparsify" heap
+files cluttered with de-allocated memory that pm-‘gawk’ no longer needs.
+A stand-alone utility, ‘pma_sam’, is provided for this purpose at the
+‘pma’ web site.
 
-   Sometimes you might prefer a dense heap file backed by pre-allocated
-storage resources, for example to increase the likelihood that
-pm-‘gawk’’s internal memory allocation will succeed until the persistent
-heap occupies the entire heap file.  The ‘fallocate’ utility will do the
-trick:
+   File-system encryption can preclude sparse files: If the plaintext of
+a byte offset range within a file is all zero bytes, the corresponding
+ciphertext mustn't be all zeros!  Encrypting at the storage layer
+instead of the file system may offer acceptable security while still
+permitting sparse files.
+
+   Sometimes you want a dense heap file backed by pre-allocated storage,
+e.g., to ensure that pm-‘gawk’'s internal memory allocation will succeed
+until the persistent heap fills the entire file.  The ‘fallocate’
+utility does the trick:
         $ fallocate -l 1M mibi
         $ ls -l mibi
         -rw-rw-r--. 1 me me 1048576 Aug  5 23:18 mibi
         $ du -h mibi
-        1.0M    mibi
-We get the MiB we asked for, both logically and physically.
+        1.0M    mibi       # We get our MiB, both logically & physically.
 
 
 File: pm-gawk.info,  Node: Persistence versus Durability,  Next: Experiments,  Prev: Sparse Heap Files,  Up: Performance
@@ -576,12 +582,12 @@ File: pm-gawk.info,  Node: Persistence versus Durability,  Next: Experiments,  P
 =================================
 
 Arguably the most important general guideline for good performance in
-computer systems is, “pay only for what you need.”(1) To apply this
+computer systems is, "pay only for what you need."(1)  To apply this
 maxim to pm-‘gawk’ we must distinguish two concepts that are frequently
 conflated: persistence and durability.(2)  (A third logically distinct
 concept is the subject of *note Data Integrity::.)
 
-   “Persistent” data outlive the processes that access them, but don’t
+   “Persistent” data outlive the processes that access them, but don't
 necessarily last forever.  For example, as explained in ‘man
 mq_overview’, message queues are persistent because they exist until the
 system shuts down.  “Durable” data reside on a physical medium that
@@ -599,7 +605,7 @@ systems such as ‘/dev/shm/’ are persistent but not durable.
 performance-conscious pm-‘gawk’ users pay the added premium for
 durability only when persistence alone is not sufficient.  Two ways to
 avoid unwanted durability overheads were discussed in *note Virtual
-Memory and Big Data::: Place pm-‘gawk’’s heap file in a DRAM-backed file
+Memory and Big Data::: Place pm-‘gawk’'s heap file in a DRAM-backed file
 system, or disable eager writeback to the heap file.  Expedients such as
 these enable you to remove durability overheads from the critical path
 of multi-stage data analyses even when you want heap files to eventually
@@ -614,14 +620,14 @@ AWK or C program to generate a stream of random text, or just cobble
 together a quick and dirty generator on the command line:
         $ openssl rand --base64 1000000 | tr -c a-zA-Z '\n' > random.dat
 Varying the size of random inputs can, for example, find where
-performance “falls off the cliff” as pm-‘gawk’’s memory footprint
+performance "falls off the cliff" as pm-‘gawk’'s memory footprint
 exceeds the capacity of DRAM and paging begins.
 
    Experiments require careful methodology, especially when the heap
-file is in a storage-backed file system.  Overlooking the file system’s
+file is in a storage-backed file system.  Overlooking the file system's
 DRAM cache can easily misguide interpretation of results and foil
 repeatability.  Fortunately Linux allows us to invalidate the file
-system cache and thus mimic a “cold start” condition resembling the
+system cache and thus mimic a "cold start" condition resembling the
 immediate aftermath of a machine reboot.  Accesses to ordinary files on
 durable storage will then be served from the storage devices, not from
 cache.  Read about ‘sync’ and ‘/proc/sys/vm/drop_caches’ at
@@ -634,11 +640,11 @@ Certain well-known textbook algorithms continue to grind away
 fruitlessly long after having computed all of their output.
 See <https://queue.acm.org/detail.cfm?id=3424304>.
 
-   (2) In recent years the term “persistent memory” has sometimes been
-used to denote novel byte-addressable non-volatile memory hardware—an
+   (2) In recent years the term "persistent memory" has sometimes been
+used to denote novel byte-addressable non-volatile memory hardware--an
 unfortunate practice that contradicts sensible long-standing convention
 and causes needless confusion.  NVM provides durability.  Persistent
-memory is a software abstraction that doesn’t require NVM. See
+memory is a software abstraction that doesn't require NVM. See
 <https://queue.acm.org/detail.cfm?id=3358957>.
 
 
@@ -650,38 +656,38 @@ File: pm-gawk.info,  Node: Experiments,  Next: Results,  Prev: Persistence versu
 The C-shell (‘csh’) script listed below illustrates concepts and
 implements tips presented in this chapter.  It produced the results
 discussed in *note Results:: in roughly 20 minutes on an aging laptop.
-You can cut and paste the code listing below into a file, or download it
-from <http://web.eecs.umich.edu/~tpkelly/pma/>.
+To reproduce my experiments, cut/paste the listing below into a file;
+take care that no lines are duplicated or omitted.
 
    The script measures the performance of four different ways to support
 word frequency queries over a text corpus: The naïve approach of reading
 the corpus into an associative array for every query; manually dumping a
 text representation of the word-frequency table and manually loading it
-prior to a query; using ‘gawk’’s ‘rwarray’ extension to dump and load an
+prior to a query; using ‘gawk’'s ‘rwarray’ extension to dump and load an
 associative array; and using pm-‘gawk’ to maintain a persistent
 associative array.
 
-   Comments at the top explain prerequisites.  Lines 8–10 set input
+   Comments at the top explain prerequisites.  Lines 8-10 set input
 parameters: the directory where tests are run and where files including
 the heap file are held, the off-the-shelf timer used to measure run
 times and other performance characteristics such as peak memory usage,
 and the size of the input.  The default input size results in pm-‘gawk’
 memory footprints under 3 GiB, which is large enough for interesting
-results and small enough to fit in DRAM and avoid paging on today’s
-computers.  Lines 13–14 define a homebrew timer.
+results and small enough to fit in DRAM and avoid paging on today's
+computers.  Lines 13-14 define a homebrew timer.
 
    Two sections of the script are relevant if the default run directory
 is changed from ‘/dev/shm/’ to a directory in a conventional
-storage-backed file system: Lines 15–17 define the mechanism for
-clearing file data cached in DRAM; lines 23–30 set Linux kernel
+storage-backed file system: Lines 15-17 define the mechanism for
+clearing file data cached in DRAM; lines 23-30 set Linux kernel
 parameters to discourage eager paging.
 
-   Lines 37–70 spit out, compile, and run a little C program to generate
+   Lines 37-70 spit out, compile, and run a little C program to generate
 a random text corpus.  This program is fast, flexible, and
 deterministic, generating the same random output given the same
 parameters.
 
-   Lines 71–100 run the four different AWK approaches on the same random
+   Lines 71-100 run the four different AWK approaches on the same random
 input, reporting separately the time to build and to query the
 associative array containing word frequencies.
 
@@ -807,7 +813,7 @@ results.  Keep in mind that performance measurements are often sensitive
 to seemingly irrelevant factors.  For example, the program that runs
 first may have the advantage of a cooler CPU; later contestants may
 start with a hot CPU and consequent clock throttling by a modern
-processor’s thermal regulation apparatus.  Very generally, performance
+processor's thermal regulation apparatus.  Very generally, performance
 measurement is a notoriously tricky business.  For scripting, whose main
 motive is convenience rather than speed, the proper role for performance
 measurements is to qualitatively test hypotheses such as those that
@@ -836,28 +842,28 @@ The ‘freqtbl’ and ‘rwarray’ approaches build an associative array of
 word frequencies, serialize it to an intermediate file, and then read
 the entire intermediate file prior to serving queries; the former does
 this manually and the latter uses a ‘gawk’ extension.  Both can serve
-queries in roughly ten seconds, not four minutes.  As we’d expect from
+queries in roughly ten seconds, not four minutes.  As we'd expect from
 the asymptotic analysis, performing work proportional to the number of
 words is preferable to work proportional to the size of the raw input
-corpus: O(W) time is faster than O(N). And as we’d expect, pm-‘gawk’’s
+corpus: O(W) time is faster than O(N). And as we'd expect, pm-‘gawk’'s
 constant-time queries are faster still, by roughly two orders of
 magnitude.  For the computations considered here, pm-‘gawk’ makes the
 difference between blink-of-an-eye interactive queries and response
-times long enough for the user’s mind to wander.
+times long enough for the user's mind to wander.
 
    Whereas ‘freqtbl’ and ‘rwarray’ reconstruct an associative array
 prior to accessing an individual element, pm-‘gawk’ stores a ready-made
-associative array in persistent memory.  That’s why its intermediate
+associative array in persistent memory.  That's why its intermediate
 file (the heap file) is much larger than the other two intermediate
-files, why the heap file is nearly as large as pm-‘gawk’’s peak memory
+files, why the heap file is nearly as large as pm-‘gawk’'s peak memory
 footprint while building the persistent array, and why its memory
 footprint is very small while serving a query that accesses a single
 array element.  The upside of the large heap file is O(1) access instead
-of O(W)—a classic time-space tradeoff.  If storage is a scarce resource,
-all three intermediate files can be compressed, ‘freqtbl’ by a factor of
-roughly 2.7, ‘rwarray’ by roughly 5.6x, and pm-‘gawk’ by roughly 11x
-using ‘xz’.  Compression is CPU-intensive and slow, another time-space
-tradeoff.
+of O(W)--a classic time-space tradeoff.  If storage is a scarce
+resource, all three intermediate files can be compressed, ‘freqtbl’ by a
+factor of roughly 2.7x, ‘rwarray’ by roughly 5.6x, and pm-‘gawk’ by
+roughly 11x using ‘xz’.  Compression is CPU-intensive and slow, another
+time-space tradeoff.
 
 
 File: pm-gawk.info,  Node: Data Integrity,  Next: Acknowledgments,  Prev: Performance,  Up: Top
@@ -870,7 +876,7 @@ command-line typos can harm your data, but precautions can mitigate
 these risks.  In scripting scenarios it usually suffices to create safe
 backups of important files at appropriate times.  As simple as this
 sounds, care is needed to achieve genuine protection and to reduce the
-costs of backups.  Here’s a prudent yet frugal way to back up a heap
+costs of backups.  Here's a prudent yet frugal way to back up a heap
 file between uses:
         $ backup_base=heap_bk_`date +%s`
         $ cp --reflink=always heap.pma $backup_base.pma
@@ -887,30 +893,30 @@ Timestamps in backup filenames make it easy to find the most recent copy
 if the heap file is damaged, even if last-mod metadata are inadvertently
 altered.
 
-   The ‘cp’ command’s ‘--reflink’ option reduces both the storage
+   The ‘cp’ command's ‘--reflink’ option reduces both the storage
 footprint of the copy and the time required to make it.  Just as sparse
-files provide “pay as you go” storage footprints, reflink copying offers
-“pay as you _change_” storage costs.(1)  A reflink copy shares storage
+files provide "pay as you go" storage footprints, reflink copying offers
+"pay as you _change_" storage costs.(1)  A reflink copy shares storage
 with the original file.  The file system ensures that subsequent changes
-to either file don’t affect the other.  Reflink copying is not available
+to either file don't affect the other.  Reflink copying is not available
 on all file systems; XFS, BtrFS, and OCFS2 currently support it.(2)
 Fortunately you can install, say, an XFS file system _inside an ordinary
 file_ on some other file system, such as ‘ext4’.(3)
 
    After creating a backup copy of the heap file we use ‘sync’ to force
 it down to durable media.  Otherwise the copy may reside only in
-volatile DRAM memory—the file system’s cache—where an OS crash or power
-failure could corrupt it.(4)  After ‘sync’-ing the backup we create and
-‘sync’ a “success indicator” file with extension ‘.done’ to address a
-nasty corner case: Power may fail _while_ a backup is being copied from
-the primary heap file, leaving either file, or both, corrupt on
-storage—a particularly worrisome possibility for jobs that run
+volatile DRAM memory--the file system's cache--where an OS crash or
+power failure could corrupt it.(4)  After ‘sync’-ing the backup we
+create and ‘sync’ a "success indicator" file with extension ‘.done’ to
+address a nasty corner case: Power may fail _while_ a backup is being
+copied from the primary heap file, leaving either file, or both, corrupt
+on storage--a particularly worrisome possibility for jobs that run
 unattended.  Upon reboot, each ‘.done’ file attests that the
 corresponding backup succeeded, making it easy to identify the most
 recent successful backup.
 
-   Finally, if you’re serious about tolerating failures you must “train
-as you would fight” by testing your hardware/software stack against
+   Finally, if you're serious about tolerating failures you must "train
+as you would fight" by testing your hardware/software stack against
 realistic failures.  For realistic power-failure testing, see
 <https://queue.acm.org/detail.cfm?id=3400902>.
 
@@ -929,7 +935,7 @@ If reflink copying is not available, ‘--sparse=always’ should be used.
 ‘sync’ returns only after all file system data are flushed down to
 durable storage.  If your ‘sync’ is unreliable, write a little C program
 that calls ‘fsync()’ to flush a file.  To be safe, also call ‘fsync()’
-on every enclosing directory on the file’s ‘realpath()’ up to the root.
+on every enclosing directory on the file's ‘realpath()’ up to the root.
 
 
 File: pm-gawk.info,  Node: Acknowledgments,  Next: Installation,  Prev: Data Integrity,  Up: Top
@@ -948,10 +954,12 @@ Cygwin.  Nelson H. F. Beebe provided access to Solaris machines for
 testing.  Robbins, Volos, Li, Tan, Jon Bentley, and Hans Boehm reviewed
 drafts of this user manual and provided useful feedback.  Bentley
 suggested the min/max/mean example in *note Examples::, and also the
-exercise of making Kernighan & Pike’s “Markov” script persistent.  Volos
+exercise of making Kernighan & Pike's "Markov" script persistent.  Volos
 provided and tested the advice on tuning OS parameters in *note Virtual
 Memory and Big Data::.  Stan Park provided insights about virtual
-memory, file systems, and utilities.
+memory, file systems, and utilities.  Antonio Giovanni Colombo
+translated this manual into Italian; see file ‘doc/it/pm-gawk.texi’ in
+the ‘gawk’ distribution tarball.
 
 
 File: pm-gawk.info,  Node: Installation,  Next: Debugging,  Prev: Acknowledgments,  Up: Top
@@ -959,16 +967,109 @@ File: pm-gawk.info,  Node: Installation,  Next: Debugging,  Prev: Acknowledgment
 Appendix A Installation
 ***********************
 
-‘gawk’ 5.2 featuring persistent memory is expected to be released in
-September 2022; look for it at <http://ftp.gnu.org/gnu/gawk/>.  If 5.2
-is not released yet, the master git branch is available at
-<http://git.savannah.gnu.org/cgit/gawk.git/snapshot/gawk-master.tar.gz>.
+Users may obtain pm-‘gawk’ via software package management systems or
+via manual installation.  Each approach has pros and cons.
+
+   *Packages*   Delegating the chore of installation to software package
+management systems, such as those associated with major Linux
+distributions including Ubuntu and Fedora, is easier--in theory.
+Software packages on some Linux distributions, however, lag years behind
+the latest software releases.  Therefore relatively new features might
+be available only in "upstream" releases but not "downstream" packages.
+For example, as of February 2025 the package-installed ‘gawk’ on Ubuntu
+Linux is pre-5.2 and therefore lacks the persistence feature introduced
+in ‘gawk’ 5.2, which was released way back in September 2022!  If the
+first output line of ‘gawk --version’ shows 5.2 or later and "‘PMA’,"
+you've got a pm-‘gawk’ that supports persistence; otherwise see "Manual
+Install" below.
+
+   Another problem with software installed by package managers is that
+the software may have been compiled/built incorrectly.  For example, as
+of February 2025 the package-installed ‘gawk’ 5.3.0 on Fedora 41 was
+incorrectly created as a position-independent executable (PIE), despite
+the official ‘gawk’ distribution's build system very deliberately and
+explicitly disabling PIE. The result, noted in *note Quick Start::, is
+that pm-‘gawk’ crashes the second time it is invoked.  The details of
+the Fedora package bug, and remedies that are works in progress as of
+early February 2025, are available at
+            <https://bugzilla.redhat.com/show_bug.cgi?id=2341653>
+The ‘file’ utility reveals whether ‘gawk’ was incorrectly built.  On
+Fedora 41, for example:
+                $ which gawk
+                /usr/bin/gawk
+                $ file /usr/bin/gawk
+                /usr/bin/gawk: ELF 64-bit LSB pie ...
+That little word "‘pie’" is likely to blame if your pm-‘gawk’ crashes on
+the _second_ invocation.  By default, PIEs run with address-space layout
+randomization (ASLR), which ‘gawk’ 5.2 thru the current 5.3.1 do not
+tolerate.
+
+   (Note: The persistent memory allocator that enables persistent-memory
+‘gawk’--the ‘pma’ library--is perfectly compatible with PIE and ASLR.
+The incompatibility of ‘gawk’ and ASLR arises from the interpreter's
+internal data structures, which require that function pointers be
+consistent across invocations.  ASLR introduces gratuitous
+inconsistencies into these pointers.)
+
+   While we're waiting for an elegant and permanent fix for the Fedora
+41 PIE bug, we can use a klugey workaround: Run the pm-‘gawk’
+interpreter via ‘setarch -R’, which disables ASLR despite the PIE.
+Here's the first example from *note Quick Start::, first without the
+fix, then with the fix:
+    $ truncate -s 4096000 heap.pma
+    $ export GAWK_PERSIST_FILE=heap.pma
+    $ gawk 'BEGIN{myvar = 47}'
+    $ gawk 'BEGIN{myvar += 7; print myvar}'
+    Segmentation fault (core dumped)        # thanks to PIE
+
+    $ rm -f heap.pma                        # discard heap from first try
+    $ truncate -s 4096000 heap.pma          # start fresh
+    $ setarch -R gawk 'BEGIN{myvar = 47}'
+    $ setarch -R gawk 'BEGIN{myvar += 7; print myvar}'
+    54                                                   # success
+You can define a shell alias to expand the familiar and ergonomic ‘gawk’
+into the cumbersome and verbose ‘setarch -R gawk’.
+
+   Alternatively, it might be possible to disable ASLR system-wide by
+using ‘sysctl’ to twiddle variables such as ‘kernel.randomize_va_space’.
+I have not investigated such measures, which should be used with
+caution.  Fully understand the implications of such a blunt system-wide
+change before making it.
+
+   It's reasonable to expect that, in the normal course of events,
+correctly built pm-‘gawk’ will eventually find its way into the default
+package-installed ‘gawk’ on major GNU/Linux distros.  Meanwhile, manual
+installation is a fairly easy way to get a working pm-‘gawk’.
+
+   As of version 5.3.2 of ‘gawk’, PIE vs. non-PIE builds are (or should
+be) a non-issue.  ‘gawk’ itself arranges to disable ASLR at runtime when
+using persistent memory.
+
+     NOTE: Apparently there are some systems where regular processes are
+     not allowed to disable ASLR. On such a system, the _second_ attempt
+     to run ‘gawk’ with a persistent backing store will fail.  In such a
+     case, you can try building ‘gawk’ yourself as a non-PIE executable,
+     or use a different system.
+
+   *Manual Install*   Manually compiling ‘gawk’ from source code in the
+latest upstream release gives you the most recent stable version of
+‘gawk’, built in accordance with with the maintainer's recipe, with no
+meddling by intermediaries.  Therefore a manual install won't suffer
+from bugs such as the PIE bug discussed above.  Download the latest
+release here:
+            <https://ftp.gnu.org/gnu/gawk/>
+            <https://ftp.gnu.org/gnu/gawk/gawk-5.3.2.tar.xz>
+
+   Finally, for the ultimate in bleeding-edge upstream freshness,
+adventurous do-it-yourselfers can grab the ‘git’ master branch from
+<http://git.savannah.gnu.org/cgit/gawk.git/snapshot/gawk-master.tar.gz>
 Unpack the tarball, run ‘./bootstrap.sh’, ‘./configure’, ‘make’, and
-‘make check’, then try some of the examples presented earlier.  In the
-normal course of events, 5.2 and later ‘gawk’ releases featuring
-pm-‘gawk’ will appear in the software package management systems of
-major GNU/Linux distros.  Eventually pm-‘gawk’ will be available in the
-default ‘gawk’ on such systems.
+‘make check’, then try some of the examples presented earlier.
+
+   As of February 2025, pm-‘gawk’ is supported on most, but not all,
+major Unix-like platforms.  The ‘gawk’ build system decides whether to
+include support for persistence; see the ‘gawk’ documentation and the
+file ‘m4/pma.m4’ in the ‘gawk’ distribution.
 
 
 File: pm-gawk.info,  Node: Debugging,  Next: History,  Prev: Installation,  Up: Top
@@ -980,19 +1081,21 @@ For bugs unrelated to persistence, see the ‘gawk’ documentation, e.g.,
 ‘GAWK: Effective AWK Programming’, available at
 <https://www.gnu.org/software/gawk/manual/>.
 
-   If pm-‘gawk’ doesn’t behave as you expect, first consider whether
-you’re using the heap file that you intend; using the wrong heap file is
+   If pm-‘gawk’ doesn't behave as you expect, first consider whether
+you're using the heap file that you intend; using the wrong heap file is
 a common mistake.  Other fertile sources of bugs for newcomers are the
 fact that a ‘BEGIN’ block is executed every time pm-‘gawk’ runs, which
-isn’t always what you really want, and the fact that built-in AWK
+isn't always what you really want, and the fact that built-in AWK
 variables such as ‘NR’ are always reset to zero every time the
 interpreter runs.  See the discussion of initialization surrounding the
 min/max/mean script in *note Examples::.
 
-   If you suspect a persistence-related bug in pm-‘gawk’, you can set an
-environment variable that will cause its persistent heap module, ‘pma’,
-to emit more verbose error messages; for details see the main ‘gawk’
-documentation.
+   If pm-‘gawk’ crashes on the _second_ invocation that uses a
+particular heap file, see the discussion of PIE in *note Installation::.
+If you suspect some other kind of persistence-related bug in pm-‘gawk’,
+you can set an environment variable that will cause its persistent heap
+module, ‘pma’, to emit more verbose error messages; for details see the
+main ‘gawk’ documentation.
 
    Programmers: You can re-compile ‘gawk’ with assertions enabled, which
 will trigger extensive integrity checks within ‘pma’.  Ensure that
@@ -1001,7 +1104,7 @@ will trigger extensive integrity checks within ‘pma’.  Ensure that
 integrity checks can be very slow.  If assertions fail, that likely
 indicates bugs somewhere in pm-‘gawk’.  Report such bugs to me (Terence
 Kelly) and also following the procedures in the main ‘gawk’
-documentation.  Specify what version of ‘gawk’ you’re using, and try to
+documentation.  Specify what version of ‘gawk’ you're using, and try to
 provide a small and simple script that reliably reproduces the bug.
 
 
@@ -1016,8 +1119,8 @@ allocator, ‘pma’, whose design is described in
 trace the evolutionary paths that led to ‘pma’ and pm-‘gawk’.
 
    I wrote many AWK scripts during my dissertation research on Web
-caching twenty years ago, most of which processed log files from Web
-servers and Web caches.  Persistent ‘gawk’ would have made these scripts
+caching 25 years ago, most of which processed log files from Web servers
+and Web caches.  Persistent ‘gawk’ would have made these scripts
 smaller, faster, and easier to write, but at the time I was unable even
 to imagine that pm-‘gawk’ is possible.  So I wrote a lot of bothersome,
 inefficient code that manually dumped and re-loaded AWK script variables
@@ -1026,29 +1129,29 @@ began to connect the dots that make persistent scripting possible, and a
 further decade would pass before pm-‘gawk’ came together.
 
    Circa 2011 while working at HP Labs I developed a fault-tolerant
-distributed computing platform called “Ken,” which contained a
+distributed computing platform called "Ken," which contained a
 persistent memory allocator that resembles a simplified ‘pma’: It
 presented a ‘malloc()’-like C interface and it allocated memory from a
 file-backed memory mapping.  Experience with Ken convinced me that the
 software abstraction of persistent memory offers important attractions
 compared with the alternatives for managing persistent data (e.g.,
-relational databases and key-value stores).  Unfortunately, Ken’s
-allocator is so deeply intertwined with the rest of Ken that it’s
-essentially inseparable; to enjoy the benefits of Ken’s persistent
-memory, one must “buy in” to a larger and more complicated value
-proposition.  Whatever its other virtues might be, Ken isn’t ideal for
+relational databases and key-value stores).  Unfortunately, Ken's
+allocator is so deeply intertwined with the rest of Ken that it's
+essentially inseparable; to enjoy the benefits of Ken's persistent
+memory, one must "buy in" to a larger and more complicated value
+proposition.  Whatever its other virtues might be, Ken isn't ideal for
 showcasing the benefits of persistent memory in isolation.
 
    Another entangled aspect of Ken was a crash-tolerance mechanism that,
 in retrospect, can be viewed as a user-space implementation of
 failure-atomic ‘msync()’.  The first post-Ken disentanglement effort
 isolated the crash-tolerance mechanism and implemented it in the Linux
-kernel, calling the result “failure-atomic ‘msync()’” (FAMS). FAMS
+kernel, calling the result "failure-atomic ‘msync()’" (FAMS). FAMS
 strengthens the semantics of ordinary standard ‘msync()’ by guaranteeing
 that the durable state of a memory-mapped file always reflects the most
 recent successful ‘msync()’ call, even in the presence of failures such
 as power outages and OS or application crashes.  The original Linux
-kernel FAMS prototype is described in a paper by Park et al.  in EuroSys
+kernel FAMS prototype is described in a paper by Park et al. in EuroSys
 2013.  My colleagues and I subsequently implemented FAMS in several
 different ways including in file systems (FAST 2015) and user-space
 libraries.  My most recent FAMS implementation, which leverages the
@@ -1058,20 +1161,20 @@ ubiquitous GNU ‘dbm’ (‘gdbm’) database
 (<https://queue.acm.org/detail.cfm?id=3487353>).
 
    In recent years my attention has returned to the advantages of
-persistent memory programming, lately a hot topic thanks to the
-commercial availability of byte-addressable non-volatile memory hardware
-(which, confusingly, is nowadays marketed as “persistent memory”).  The
-software abstraction of persistent memory and the corresponding
-programming style, however, are perfectly compatible with _conventional_
-computers—machines with neither non-volatile memory nor any other
-special hardware or software.  I wrote a few papers making this point,
-for example <https://queue.acm.org/detail.cfm?id=3358957>.
+persistent memory programming, which was a hot topic circa COVID thanks
+to the fleeting commercial availability of byte-addressable non-volatile
+memory hardware (Intel Optane, confusingly marketed as "persistent
+memory").  The software abstraction of persistent memory and the
+corresponding programming style, however, are perfectly compatible with
+_conventional_ computers--machines with neither non-volatile memory nor
+any other special hardware or software.  Several papers make this point,
+e.g., <https://queue.acm.org/detail.cfm?id=3358957>
 
    In early 2022 I wrote a new stand-alone persistent memory allocator,
 ‘pma’, to make persistent memory programming easy on conventional
 hardware.  The ‘pma’ interface is compatible with ‘malloc()’ and, unlike
-Ken’s allocator, ‘pma’ is not coupled to a particular crash-tolerance
-mechanism.  Using ‘pma’ is easy and, at least to some, enjoyable.
+Ken's allocator, ‘pma’ is not coupled to a particular crash-tolerance
+mechanism.  Using ‘pma’ is easy and fun.
 
    Ken had been integrated into prototype forks of both the V8
 JavaScript interpreter and a Scheme interpreter, so it was natural to
@@ -1093,45 +1196,43 @@ respects, however, the two implementations are similar.  A description
 of the prototype, including performance measurements, is available at
 <http://nvmw.ucsd.edu/nvmw2022-program/nvmw2022-data/nvmw2022-paper35-final_version_your_extended_abstract.pdf>.
 
-
-
-   I enjoy several aspects of pm-‘gawk’.  It’s unobtrusive; as you gain
+   I enjoy several aspects of pm-‘gawk’.  It's unobtrusive; as you gain
 familiarity and experience, it fades into the background of your
-scripting.  It’s simple in both concept and implementation, and more
+scripting.  It's simple in both concept and implementation, and more
 importantly it simplifies your scripts; much of its value is measured
 not in the code it enables you to write but rather in the code it lets
-you discard.  It’s all that I needed for my dissertation research twenty
+you discard.  It's all that I needed for my dissertation research 25
 years ago, and more.  Anecdotally, it appears to inspire creativity in
-early adopters, who have devised uses that pm-‘gawk’’s designers never
-anticipated.  I’m curious to see what new purposes you find for it.
+early adopters, who have devised uses that pm-‘gawk’'s designers never
+anticipated.  I'm curious to see what new purposes you find for it.
 
 
 
 Tag Table:
-Node: Top815
-Node: Introduction2036
-Ref: Introduction-Footnote-14464
-Node: Quick Start4568
-Node: Examples7485
-Node: Performance16627
-Node: Constant-Time Array Access17337
-Node: Virtual Memory and Big Data20704
-Ref: Virtual Memory and Big Data-Footnote-124341
-Node: Sparse Heap Files24481
-Node: Persistence versus Durability27580
-Ref: Persistence versus Durability-Footnote-131060
-Ref: Persistence versus Durability-Footnote-231306
-Node: Experiments31707
-Node: Results43458
-Node: Data Integrity47097
-Ref: Data Integrity-Footnote-149964
-Ref: Data Integrity-Footnote-250061
-Ref: Data Integrity-Footnote-350213
-Ref: Data Integrity-Footnote-450307
-Node: Acknowledgments50688
-Node: Installation51888
-Node: Debugging52718
-Node: History54467
+Node: Top812
+Node: Introduction2028
+Ref: Introduction-Footnote-14431
+Node: Quick Start4535
+Node: Examples7630
+Node: Performance16719
+Node: Constant-Time Array Access17427
+Node: Virtual Memory and Big Data20777
+Ref: Virtual Memory and Big Data-Footnote-124381
+Node: Sparse Heap Files24521
+Node: Persistence versus Durability27710
+Ref: Persistence versus Durability-Footnote-131171
+Ref: Persistence versus Durability-Footnote-231417
+Node: Experiments31811
+Node: Results43546
+Node: Data Integrity47171
+Ref: Data Integrity-Footnote-150009
+Ref: Data Integrity-Footnote-250106
+Ref: Data Integrity-Footnote-350258
+Ref: Data Integrity-Footnote-450352
+Node: Acknowledgments50731
+Node: Installation52063
+Node: Debugging57872
+Node: History59767
 
 End Tag Table
 

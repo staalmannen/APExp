@@ -1,4 +1,4 @@
-.TH INPLACE 3am "Jun 26 2018" "Free Software Foundation" "GNU Awk Extension Modules"
+.TH INPLACE 3am "Feb 29 2024" "Free Software Foundation" "GNU Awk Extension Modules"
 .SH NAME
 inplace \- emulate sed/perl/ruby in-place editing
 .SH SYNOPSIS
@@ -23,6 +23,15 @@ is.
 By default, each named file on the command line is
 replaced with a new file of the same name whose contents
 are the results of running the AWK program.
+Since a new file is created, if the file is a link (whether hard
+or symbolic), the link will be broken.
+This behavior is consistent with GNU
+.I sed
+which also breaks links when the
+.B \-i
+or
+.B \-\^\-in\-place
+flag is used.
 If the user supplies an AWK variable named
 .B inplace::suffix
 in a
@@ -76,7 +85,7 @@ gawk -i inplace -f \f(CIscriptfile\fP files ...
 Andrew Schorr,
 .BR schorr@telemetry-investments.com .
 .SH COPYING PERMISSIONS
-Copyright \(co 2012, 2013, 2015, 2018, 2019,
+Copyright \(co 2012, 2013, 2015, 2018, 2019, 2024,
 Free Software Foundation, Inc.
 .PP
 Permission is granted to make and distribute verbatim copies of

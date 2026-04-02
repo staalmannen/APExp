@@ -1,5 +1,5 @@
-Mon 16 Oct 2023 16:48:39 IDT
-============================
+Sat Jan 24 09:27:16 PM IST 2026
+===============================
 
 There were too many files tracking different thoughts and ideas for
 things to do, or consider doing.  This file merges them into one. As
@@ -11,6 +11,28 @@ careful work with Git.
 
 TODO
 ====
+
+Roadmap for 6.0
+---------------
+
+	Nuke regex and dfa and the additional files needed for them.
+
+	Get rid of lint-old.  Old awk has been obsolete for close to 40
+	years now.
+
+	Get rid of the --persist option.
+
+	Get rid of the -r/--re-interval option(s).
+
+	Get rid of AWKNUM. Just use double.
+
+	Clean up obsolete bits in the extension API. This will
+	require incrementing the major number.
+
+	Eli Zaretskii suggests making codeset info available in the
+	extension API.  Along similar lines, perhaps the API should
+	support access to the wide character version of a string.
+	Also mb_cur_max.
 
 Minor Cleanups and Code Improvements
 ------------------------------------
@@ -25,9 +47,6 @@ Minor Cleanups and Code Improvements
 	- Double check uses of xxx:: targets in the test suite Makefile,
 	maybe only one colon is needed.
 
-	- The commas, mbstr1 and mbstr2 tests should probably be moved
-	into the locale tests.
-
 	API:
 		??? #if !defined(GAWK) && !defined(GAWK_OMIT_CONVENIENCE_MACROS)
 
@@ -35,24 +54,17 @@ Minor Cleanups and Code Improvements
 
 	Look at function order within files.
 
-	Consider removing use of and/or need for the protos.h file.
-
 	Fully synchronize whitespace tests (for \s, \S in Unicode
 	environment) with those of GNU grep.
-
-	Lint option which would allow extensions and only complain
-	about genuine errors.
-
-	Go through the FIXMEs in the manual and fix as many as possible.
-
-	In the test suite, don't run locale tests if the locale aren't
-	available.
 
 	In the test suite, use grep -E if no egrep or egrep produces
 	a warning.
 
 Minor New Features
 ------------------
+
+	Store the filename and line number where a variable is
+	first used.
 
 	Enable command line source text in the debugger.
 
@@ -63,11 +75,6 @@ Minor New Features
 	Consider relaxing the strictness of --posix.
 
 	Enhance --lint=invalid to apply in more places.
-
-	? Add an optional base to strtonum, allowing 2-36.
-
-	? Optional third argument for index indicating where to start the
-	search.
 
 	Suggested by Jannick:
 	* It is possible to make gawk look for a file with extension name
@@ -89,21 +96,11 @@ Major New Features
 
 		Indirect through array elements, not just scalar variables
 
-	Add ability to do decimal arithmetic.
-
 	Rework management of array index storage. (Partially DONE.)
 
 	Consider using an atom table for all string array indices.
 
 	DBM storage of awk arrays. Try to allow multiple dbm packages.
-
-	?? A RECLEN variable for fixed-length record input. PROCINFO["RS"]
-	would be "RS" or "RECLEN" depending upon what's in use.
-	*** Could this be done as an extension?
-
-	?? Use a new or improved dfa and/or regex library.
-
-	Rewrite in C++.
 
 Things To Think About That May Never Happen
 -------------------------------------------
@@ -118,26 +115,26 @@ Things To Think About That May Never Happen
 	Try running with diehard. See http://www.diehard-software.org,
 	https://github.com/emeryberger/DieHard
 
-	Include a sample rpm spec file in a new packaging subdirectory.
-	(Really needed?)
-
-	Patch lexer for @include and @load to make quotes optional.
-	(Really needed?)
-
 	Add a lint check if the return value of a function is used but
 	the function did not supply a value.
 
-	Consider making gawk output +nan for NaN values so that it
-	will accept its own output as input.
-		NOTE: Investigated this.  GLIBC formats NaN as '-nan'
-		and -NaN as 'nan'.  Dealing with this is not simple.
+Things That We Decided We Will Never Do
+=======================================
+
+	Add ability to do decimal arithmetic.
 
 	Review the bash source script for working with shared libraries in
 	order to nuke the use of libtool. [ Partially started in the
 	dead-branches/nolibtool branch. ]
 
-Things That We Decided We Will Never Do
-=======================================
+	Include a sample rpm spec file in a new packaging subdirectory.
+
+	Patch lexer for @include and @load to make quotes optional.
+
+	Add an optional base to strtonum, allowing 2-36.
+
+	Optional third argument for index indicating where to start the
+	search.
 
 	See if something like  b = a "" can be optimized to not do
 	a concatenation, but instead just set STRCUR on a.
@@ -150,7 +147,7 @@ Things That We Decided We Will Never Do
 	Add macros for working with flags instead of using & and |
 	directly.
 
-	FIX regular field splitting to use FPAT algorithm.
+	Fix regular field splitting to use FPAT algorithm.
 		Note: Looked at this. Not sure it's with the trouble:
 		If it ain't broke...
 
@@ -177,3 +174,16 @@ Things That We Decided We Will Never Do
 	Change from dlopen to using the libltdl library (i.e. lt_dlopen).
 	This may support more platforms.  If we move off of libtool
 	then this is the wrong direction.
+
+	A RECLEN variable for fixed-length record input. PROCINFO["RS"]
+	would be "RS" or "RECLEN" depending upon what's in use.
+	There is a reclen extension in gawkextlib. That's good enough.
+
+	Rewrite in C++.
+
+	Consider making gawk output +nan for NaN values so that it
+	will accept its own output as input.
+		NOTE: Investigated this.  GLIBC formats NaN as '-nan'
+		and -NaN as 'nan'.  Dealing with this is not simple.
+	Gawk already produces +nan and -nan for NaN values, it's just
+	that the sign may not always be what one expects.

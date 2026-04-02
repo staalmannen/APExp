@@ -1,7 +1,7 @@
 dnl
 dnl configure.ac --- autoconf input file for gawk
 dnl
-dnl Copyright (C) 2012-2021, 2023 the Free Software Foundation, Inc.
+dnl Copyright (C) 2012-2021, 2023-2026 the Free Software Foundation, Inc.
 dnl
 dnl This file is part of GAWK, the GNU implementation of the
 dnl AWK Programming Language.
@@ -23,7 +23,7 @@ dnl
 
 dnl Process this file with autoconf to produce a configure script.
 
-AC_INIT([GNU Awk Bundled Extensions],[5.3.0],[bug-gawk@gnu.org],[gawk-extensions])
+AC_INIT([GNU Awk Bundled Extensions],[5.4.0],[bug-gawk@gnu.org],[gawk-extensions])
 
 AC_PREREQ([2.71])
 
@@ -98,31 +98,26 @@ then
 	AC_MSG_RESULT([yes])
 else
 	AC_MSG_RESULT([no])
-	CFLAGS="$CFLAGS -DNDEBUG"	# turn off assertions
 fi
 
-AC_CHECK_HEADERS(fnmatch.h limits.h sys/mkdev.h sys/param.h sys/select.h \
-		sys/statvfs.h sys/sysmacros.h sys/time.h)
+AC_CHECK_HEADERS(fnmatch.h limits.h sys/mkdev.h sys/param.h sys/select.h
+		sys/statvfs.h sys/sysmacros.h sys/time.h uchar.h)
 
 AC_HEADER_DIRENT
 AC_CHECK_HEADERS_ONCE([sys/time.h])
 
 
 dnl check for mpfr support
-case `uname -m` in
-*'Power Macintosh'*)
-	: ;;
-*)
-	case $SKIP_MPFR in
-	no)	GNUPG_CHECK_MPFR
-		;;
-	esac
+case $SKIP_MPFR in
+no)	GNUPG_CHECK_MPFR
 	;;
 esac
 
 AC_SEARCH_LIBS(fmod, m)
-AC_CHECK_FUNCS(fdopendir fmod fnmatch getdtablesize \
-		gettimeofday nanosleep select statvfs \
+AC_CHECK_FUNCS(fdopendir fmod fnmatch getdtablesize
+		clock_gettime gettimeofday
+		nanosleep select statvfs
+		mbrtoc32 c32rtomb
 		GetSystemTimeAsFileTime strptime)
 
 GAWK_FUNC_DIRFD

@@ -713,6 +713,7 @@ fts_build(FTS *sp, int type)
 		nlinks = -1;
 		nostat = 0;
 	}
+	nostat = !! nostat;	// silence compiler warning
 
 #ifdef notdef
 	(void)printf("nlinks == %d (cur: %d)\n", nlinks, cur->fts_nlink);

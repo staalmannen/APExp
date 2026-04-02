@@ -14,6 +14,12 @@
    language is requested. */
 #undef ENABLE_NLS
 
+/* Define to 1 if we have ADDR_NO_RANDOMIZE value */
+#undef HAVE_ADDR_NO_RANDOMIZE
+
+/* Define to 1 if you have the `c32rtomb' function. */
+#undef HAVE_C32RTOMB
+
 /* Define to 1 if you have the Mac OS X function
    CFLocaleCopyPreferredLanguages in the CoreFoundation framework. */
 #undef HAVE_CFLOCALECOPYPREFERREDLANGUAGES
@@ -21,6 +27,9 @@
 /* Define to 1 if you have the Mac OS X function CFPreferencesCopyAppValue in
    the CoreFoundation framework. */
 #undef HAVE_CFPREFERENCESCOPYAPPVALUE
+
+/* Define to 1 if you have the `clock_gettime' function. */
+#undef HAVE_CLOCK_GETTIME
 
 /* Define if the GNU dcgettext() function is already present or preinstalled.
    */
@@ -78,6 +87,9 @@
 
 /* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
+
+/* Define to 1 if you have the `mbrtoc32' function. */
+#undef HAVE_MBRTOC32
 
 /* Define to 1 if you have the <minix/config.h> header file. */
 #undef HAVE_MINIX_CONFIG_H
@@ -149,6 +161,9 @@
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
+
+/* Define to 1 if you have the <uchar.h> header file. */
+#undef HAVE_UCHAR_H
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H

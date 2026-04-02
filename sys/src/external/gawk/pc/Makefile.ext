@@ -27,6 +27,9 @@ SOEXT = dll
 MPFR = -DHAVE_MPFR
 MPFR_LIBS = -lmpfr -lgmp
 
+CFLAGS = -I.. -DHAVE_CONFIG_H -D__USE_MINGW_ANSI_STDIO
+LIBS = ../pc/mbc32.c ../pc/nl_langinfo.c ../missing_d/stdio-consolesafe.c
+
 SIMPLE_EXTENSIONS = inplace.$(SOEXT) ordchr.$(SOEXT) readfile.$(SOEXT)\
  revoutput.$(SOEXT) revtwoway.$(SOEXT) testext.$(SOEXT)
 ALL_EXTENSIONS = filefuncs.$(SOEXT) fnmatch.$(SOEXT) inplace.$(SOEXT)\
@@ -37,30 +40,30 @@ ALL_EXTENSIONS = filefuncs.$(SOEXT) fnmatch.$(SOEXT) inplace.$(SOEXT)\
 extensions: $(ALL_EXTENSIONS)
 
 fnmatch.$(SOEXT): fnmatch.c
-	gcc -I.. -I../missing_d -DHAVE_FNMATCH_H -shared -gdwarf-2 -g3 -static-libgcc -o $@ fnmatch.c
+	gcc $(CFLAGS) -I../missing_d -DHAVE_FNMATCH_H -shared -gdwarf-2 -g3 -o $@ fnmatch.c $(LIBS)
 
 intdiv.$(SOEXT): intdiv.c
-	gcc -I.. $(MPFR) -shared -gdwarf-2 -g3 -static-libgcc -o $@ intdiv.c $(MPFR_LIBS)
+	gcc  $(CFLAGS) $(MPFR) -shared -gdwarf-2 -g3 -o $@ intdiv.c $(LIBS) $(MPFR_LIBS)
 
 readdir.$(SOEXT): readdir.c gawkdirfd.h
-	gcc -I.. -DHAVE_DIRENT_H -shared -gdwarf-2 -g3 -static-libgcc -o $@ readdir.c
+	gcc  $(CFLAGS) -DHAVE_DIRENT_H -shared -gdwarf-2 -g3 -o $@ readdir.c $(LIBS)
 
 rwarray.$(SOEXT): rwarray.c
-	gcc -I.. -shared -gdwarf-2 -g3 -static-libgcc -o $@ rwarray.c -lws2_32
+	gcc  $(CFLAGS) -shared -gdwarf-2 -g3 -o $@ rwarray.c $(LIBS) -lws2_32
 
 filefuncs.$(SOEXT): filefuncs.c stack.c stack.h gawkfts.h
-	gcc -I.. -shared -gdwarf-2 -g3 -static-libgcc -o $@ filefuncs.c stack.c
+	gcc  $(CFLAGS) -shared -gdwarf-2 -g3 -o $@ filefuncs.c stack.c $(LIBS)
 
 time.$(SOEXT): time.c
-	gcc -DHAVE_GETSYSTEMTIMEASFILETIME -I.. -shared -gdwarf-2 -g3 -static-libgcc -o $@ time.c
+	gcc $(CFLAGS) -DHAVE_GETSYSTEMTIMEASFILETIME  -shared -gdwarf-2 -g3 -o $@ time.c $(LIBS)
 
 $(SIMPLE_EXTENSIONS):
-	gcc -I.. -shared -gdwarf-2 -g3 -static-libgcc -o $@ $(@:.$(SOEXT)=.c)
+	gcc  $(CFLAGS) -shared -gdwarf-2 -g3 -o $@ $(@:.$(SOEXT)=.c) $(LIBS)
 
-$(ALL_EXTENSIONS): ../gawkapi.h ../gettext.h
+$(ALL_EXTENSIONS): ../gawkapi.h ../gettext.h ../pc/mbc32.c ../missing_d/stdio-consolesafe.c
 
 inplace.$(SOEXT): inplace.c
-ordchr.$(SOEXT): ordchr.c
+ordchr.$(SOEXT): ordchr.c ../pc/nl_langinfo.c
 readfile.$(SOEXT): readfile.c
 revoutput.$(SOEXT): revoutput.c
 rwarray.$(SOEXT): rwarray.c

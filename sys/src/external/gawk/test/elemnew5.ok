@@ -1,0 +1,2 @@
+gawk: elemnew5.awk:1: fatal: expression for `<' redirection has null string value
+EXIT CODE: 2

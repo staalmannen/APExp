@@ -1,0 +1,711 @@
+This is notes.info, produced by makeinfo version 7.2.90 from notes.texi.
+
+This manual is for maintainers of GNU ‘awk’.
+
+   Copyright © 2024 Arnold Robbins.
+
+   This is Edition 0.5 of ‘GNU Awk Maintainer Notes’.
+
+     Permission is granted to copy, distribute and/or modify this
+     document under the terms of the GNU Free Documentation License,
+     Version 1.3 or any later version published by the Free Software
+     Foundation.
+
+
+File: notes.info,  Node: Top,  Next: GNU Awk Maintainership Background and Context,  Up: (dir)
+
+GNU Awk Maintainer Notes
+************************
+
+This manual is for maintainers of GNU ‘awk’.
+
+* Menu:
+
+* GNU Awk Maintainership Background and Context:: GNU Awk Background and
+                                                  Context.
+* General Maintainership Background::             General Maintainership
+                                                  Background.
+* General Maintainership::                        General Maintainership.
+* Index::
+
+
+File: notes.info,  Node: GNU Awk Maintainership Background and Context,  Next: General Maintainership Background,  Prev: Top,  Up: Top
+
+1 GNU ‘Awk’ Background and Context
+**********************************
+
+The purpose of this document is to provide background on GNU ‘awk’,
+(‘gawk’), it's code and it's development.  The idea is to have something
+new maintainers can read in order to help them come up to speed.
+
+1.1 Goals
+=========
+
+Here are my personal goals for bringing new maintainers on board.  Over
+the next few years, I want to:
+
+   • Do a thorough review of the manual, and get it published again.
+
+   • Bring you two up to speed to the point that each of you would be
+     able to:
+
+        -- Fix bugs as reported on the bug list
+
+        -- Make releases
+
+        -- Make improvements in the code base
+
+   • This will allow me to become "Maintainer Emeritus".  In that
+     position I hope that I would still be contributing, but no longer
+     bearing the main responsibility.
+
+   This won't happen overnight.  The code base is large and there's a
+lot to come up to speed on, and I don't expect miracles, we all have
+lives and day jobs.  "Slow but steady" will be the watch word.
+
+1.2 Some History
+================
+
+The manual states:
+
+     Paul Rubin wrote ‘gawk’ in 1986.  Jay Fenlason completed it, with
+     advice from Richard Stallman.  John Woods contributed parts of the
+     code as well.  In 1988 and 1989, David Trueman, with help from me,
+     thoroughly reworked ‘gawk’ for compatibility with the newer ‘awk’.
+     Circa 1994, I became the primary maintainer.  Current development
+     focuses on bug fixes, performance improvements, standards
+     compliance, and, occasionally, new features.
+
+   In October of 1987, I picked up a copy of the Aho, Kernighan and
+Weinberger book on ‘awk’.  Up until then, the documentation on ‘awk’ was
+so skimpy that I'd stayed away from it; the book made things much
+clearer, and also more exciting!  I wanted to give (new) ‘awk’ a try.
+
+   New ‘awk’ wasn't easily available at the time, so I went to see what
+the GNU project had, and lo and behold, there was indeed a GNU ‘awk’.
+This very first version was a (buggy!)  clone of the original Unix
+‘awk’.  Having an interest in compiler and interpreter technology, I
+volunteered to work on ‘gawk’ and help bring it into compatibility with
+the new version.  (I was single and owned my own Unix system...)
+
+   David Trueman had already volunteered to do that, so I joined his
+effort.  We set up UUCP links and exchanged diffs via email; he was the
+primary maintainer.
+
+   At some point, I asked if there was a manual; a 90 page Texinfo draft
+existed (written by Diane Barlow Close) and I started adding to and
+improving it.
+
+   David and I met a time or two in person at USENIX conferences; I may
+even still have some notes on our feature plans, most of which
+eventually made their way into ‘gawk’.
+
+   Circa 1994 (I don't remember if it was '93 or '94) David had to pull
+out of the project, and I became the sole maintainer.  We had a port to
+MS-DOS and also to VMS around then, and ‘mawk’ had also been written and
+released.  There were also various ports to different kinds of
+then-common Unix systems.
+
+   In the mid-90s ‘gawk’ got some heavy-duty use (Rick Adams as UUNET
+started to use it for his accounting because of the "no arbitrary
+limits" principle), but people were still using the Unix version mostly.
+
+   As Linux systems started to grow in popularity, ‘gawk’ became _the_
+installed version of ‘awk’, and it really began to stabilize and get
+many bugs worked out.  When it was just "also" available, it wasn't as
+heavily stressed as when it was _the_ ‘awk’.  So, this was good.
+
+   The manual has a section listing in detail the order in which
+features were added to ‘gawk’ over time.  That list is very long, so
+there's no need to repeat it here.
+
+   The major versions of ‘gawk’ through 3.x all built a parse tree
+representing the program, and then recursively evaluated that tree in
+order to execute the program.
+
+   At version 4.0, that changed, when an outside developer (John Haque)
+changed ‘gawk’ to generate and interpret "byte codes" representing the
+program.  As part of that work, John also added an ‘awk’-level debugger,
+which is really useful.  This structure remains in place today.
+
+   John Haque left the project in December of 2012 over a disagreement
+with me as to how the project should be run.  He wanted to see things
+being done in a certain way, which I did not have the cycles to do, but
+he himself did not want to help make those changes.  (I had offered to
+promote him to co-maintainer, but he declined).  Effectively, "here is
+what you should do, but I'm not going to help."  Since that didn't suit
+me, he left in a bit of huff, but that's life.
+
+   Today, I feel like I have stretched the ‘awk’ language as much as it
+should be (more really).  I think future facilities should be added via
+the extension mechanism and not via language changes.
+
+   There remains plenty of interesting work to do in terms of the code
+structure, data structures, and performance, which I no longer have the
+motivation to really tackle; I'm hoping new blood will be able to do
+some of these things.  :-)
+
+   For what it's worth, as many versions as I could find are in the
+‘git’ repository and tagged appropriately, so it's possible to go back
+and see the earlier versions.
+
+1.3 First Steps
+===============
+
+Here are some first steps for every new co-maintainer candidate:
+
+  1. Start the process to sign paperwork to assign copyright in your
+     changes to ‘gawk’ and its documentation to the Free Software
+     Foundation.  Please send an email to <copyright-clerk@fsf.org>
+     asking for paperwork to assign copyright in all current and future
+     changes to ‘gawk’ and its documentation to the FSF. You will have
+     to do this before any patches can be integrated into the code base.
+
+  2. Check out the ‘gawk’ documentation online at the GNU project.  In
+     particular, look at the ‘gawk’ workflow document for how things
+     will start out for your contributions.
+
+  3. Also, if you haven't read the ‘gawk’ manual, please do.  You will
+     probably know a lot of what's there, but maybe not everything.
+     There's a lot there.  The section on contributing code is most
+     relevant in terms of how patches need to be done, but you'll need
+     to learn the language itself as well.
+
+
+File: notes.info,  Node: General Maintainership Background,  Next: General Maintainership,  Prev: GNU Awk Maintainership Background and Context,  Up: Top
+
+2 General Maintainership Background
+***********************************
+
+This chapter describes the processes and tools you shold be familiar
+with, with general pointers to specific documents to read.  All of them
+can be found easily on the Internet, so specific URLs are not included.
+
+2.1 Workflow and Tooling Outline
+================================
+
+This section provides some background introductory material and
+pointers.
+
+2.1.1 GNU Coding Standards
+--------------------------
+
+This document describes how to write code for the GNU Project.  If you
+haven't read it, you should.  The most important point it makes is the
+"no arbitrary limits" principle: GNU programs should not fall over due
+to fixed-size buffers, for example.
+
+   The document also describes code formatting standards for GNU
+programs.  Note though, that with one exception, ‘gawk’ does not follow
+the coding style, instead using standard "K & R" code layout, with tabs,
+not spaces.  The one exception is that function names in function
+definitions are placed at the beginning of the line.
+
+   These days the document lives in GNULIB:
+
+     git clone https://git.savannah.gnu.org/git/gnulib.git
+     cd gnulib/doc
+     texi2pdf standards.texi
+
+   The ‘gawk’ manual has a detailed section on C coding style; please
+read that after reading the coding standards.
+
+2.1.2 maintain.texi
+-------------------
+
+This document describes high level general stuff to know if you're going
+to be a GNU maintainer.  These days it also lives in GNULIB:
+
+     cd gnulib/doc
+     texi2pdf maintain.texi
+
+It's necessary, if not exciting, reading.
+
+2.1.3 Savannah
+--------------
+
+The GNU project has its own software hosting, mainly for Git and CVS,
+called Savannah (https://savannah.gnu.org).  This is where the ‘gawk’
+Git repository is maintained.  It's worth poking around there.
+Eventually you'll want to create a user account so that you'll be able
+to commit directly to the repository, but this is not urgent at this
+point.
+
+2.1.4 Mailing list or bug tracker
+---------------------------------
+
+‘gawk’ has two mailing lists: <bug-gawk@gnu.org> for bug reports, and
+<help-gawk@gnu.org> for people looking for help.  I sometimes skim the
+latter via the web archive but do not receive it.  I leave it to other
+folks to answer questions there, or not, as it happens.
+
+   I don't really wish to change off of mailing list usage.  On the
+other hand, if one of you wants to set up and manage a bug tracker, then
+let's discuss.
+
+2.1.5 Release management
+------------------------
+
+‘gawk’ use X.Y.Z versioning.  The X is the major version, currently 5.
+It changes rarely.  The Y is the minor version, changing whenever there
+are enough new features to make it worth doing a major release.  The Z
+is the patch level.  Those patch releases happen 2-3 times a year.
+
+   Releases used to be more frequent, but I have purposely slowed down,
+trying to avoid adding new features or making major changes.
+
+   You can look at the ‘NEWS*’ files to get a sense of the kinds of
+things that change between releases.  You can skim the ‘ChangeLog*’
+files to see descriptions of the kinds of changes that happen.  Most are
+small, incremental changes.
+
+2.2 Technical Skills
+====================
+
+Here are some the technical skills you'll need as a maintainer.  These
+all also apply pretty much across the board, not just to ‘gawk’.
+
+2.2.1 Git skills
+----------------
+
+‘gawk’, and just about all the other GNU projects, use Git for source
+code management.  Using the ‘git’ command line is *strongly*
+recommended.  I have seen things messed up too often when relying on
+graphical Git tools.
+
+   The ‘gawk’ workflow document provides an extremely basic introduction
+to using Git.  That's a starting point, but you should also invest time
+in going beyond what's presented there.
+
+2.2.2 C (and maybe also C++)
+----------------------------
+
+I doubt this is an issue, but you should definitely have C skills.
+‘gawk’ is a very large C program.
+
+   The code expects at least a C 99 capable compiler.  I try to avoid
+being bleeding edge in the use of C features in order to allow for
+maximum portability.  In particular, the OpenVMS C compiler isn't any
+further advanced than that, so as long as we want to continue to support
+OpenVMS we can't use the latest features.  Personally, this doesn't
+bother me; I don't feel a need to use the latest features.
+
+   It's an interesting question as to whether knowing C++ is necessary.
+Moving ‘gawk’ to a simple subset of C++ in order to get away from its
+use of unions might not be a bad idea.  On the other hand, it's a big
+chunk of work and I think that most of the rest of the ‘gawk’ developers
+would _not_ be happy working in C++.  On the third hand, the parts of
+‘gawk’ they deal with are generally both small and localized, and they
+could probably manage.
+
+2.2.3 Make
+----------
+
+You should be comfortable with ‘make’ and ‘Makefile’s.  I try to keep
+the ‘Makefile’s portable to more than just GNU Make.  ‘make’ is the
+foundation for the "Autotools."
+
+2.2.4 Autoconf, Automake, libtool, GNU ‘m4’
+-------------------------------------------
+
+The "Autotools."  You should read the manuals for each of these, at
+least.  I like to use the latest _released_ version of these tools, not
+whatever may be in Git on a particular day.
+
+   These tools are what create the ‘configure’ script.  ‘autoconf’ uses
+‘m4’ macros to create ‘configure’; you should have a basic understanding
+of ‘m4’ also, although ‘autoconf’ hides most of it from you.
+
+   The files of interest are ‘configure.ac’, ‘extension/configure.ac’,
+and files in the ‘m4’ directory.
+
+2.2.5 Texinfo
+-------------
+
+The various manuals are all written in Texinfo, the GNU Project's markup
+language.  Texinfo can be used to produce Info files, HTML and (with
+TeX) PDF. I don't care for Info myself, but it's the GNU standard
+format, so the files are created during build for inclusion in releases.
+
+   Texinfo has grown a lot over the years.  I don't use every last
+feature in it.  You may want to skim ‘doc/gawk.texi’ to get a feel for
+it and then read some of the "basics" on Texinfo in the Texinfo
+documentation.
+
+   Texinfo is important since, if you add a user-visible feature, you
+will have to document it in the manual as well.
+
+2.2.6 ‘troff’ ‘-man’ -- semi-optional
+-------------------------------------
+
+The man pages are written in ‘troff’.  A basic knowledge of how to write
+man pages is helpful.  For the 5.3.0 release, I cut the ‘gawk.1’ man
+page down in size by a lot, but it's still very large.
+
+   The four-color reference card, ‘awkcard.pdf’, is written in ‘troff’
+and ‘tbl’.  That's a much harder thing to deal with.  I suspect that
+once I "retire" it can be dropped from the distribution, or marked as
+unmaintained.
+
+2.2.7 GDB, ‘valgrind’, and ‘gprof’
+----------------------------------
+
+Debugging and profiling skills.  I've been using ‘gdb’ for decades, to
+the point where I can't really use any other debugger.  Both Vim and
+Emacs have excellent integration for ‘gdb’.
+
+   ‘valgrind’ is invaluable for dealing with memory leak issues.
+
+   ‘gprof’ is occasionally necessary if you think there's a performance
+bottleneck somewhere.
+
+2.2.8 The GCC Compile Farm
+--------------------------
+
+Google this, and get yourself an account on it.  It's a resource that I
+only recently started to leverage, but they have a number of machines
+that it's unlikely that you will have.  So if you want to test ‘gawk’
+(or something else) on a particular architecture that they have, this is
+one way to go.
+
+
+File: notes.info,  Node: General Maintainership,  Next: Index,  Prev: General Maintainership Background,  Up: Top
+
+3 General Maintainership
+************************
+
+3.1 Compiler / Interpreter Skills
+=================================
+
+You should be generally familiar with the terminology and components of
+compilers and interpreters.  Things like: parsing, scanning, and symbol
+tables.  In particular, ‘gawk’ uses a hand-written scanner and a ‘Bison’
+parser (LALR, based on YACC). The ‘Flex and Bison’ book by John Levine
+is probably a good resource if you have no background in this.
+
+   As ‘gawk’ parses a program, it builds up a linked list of so-called
+"byte codes," representing the program to be run.  This is "compiling"
+and "code generation" of a sort, but the instructions generated are
+simply structs representing operations defined by ‘gawk’ itself, not
+code for a real machine or for any standard virtual machine such as the
+Java JVM or the .Net CLR.
+
+   Once the progam is built, ‘gawk’ then interprets the byte codes, by
+way of a loop around a gigantic switch statement on each type of
+instruction.
+
+   The bytes codes are the basis also for the debugger and the pretty
+printer.  The pretty printer interprets the byte codes to reconstitute
+‘awk’ source code.  The pretty printer also handles line count
+profiling.
+
+   The debugger remains something of a black box to me; I'm not sure I
+can explain how it works off the top of my head.  (This is sad.)
+
+   Future notes will talk about some of these things in more detail.
+
+3.2 Learn The Language
+======================
+
+To maintain ‘gawk’, you have to know ‘awk’, as well as what ‘gawk’
+provides in addition to standard ‘awk’.  There are three major resources
+for learning the language and for knowing how it's supposed to work.
+
+  1. ‘The AWK Programming Language’ by Aho, Kernighan and Weinberger.
+     The first edition of this book is the classic reference for ‘awk’,
+     despite it being 35 years old.  The second edition came out in
+     2023, and it has been completely rewritten to reflect the changes
+     in BWK ‘awk’.  It is compact, but very worthwhile.
+
+  2. The manual, ‘GAWK: Effective AWK Programming’, by yours truly.  The
+     manual has grown over the years, as ‘gawk’ has grown.  I've done my
+     best to make it both tutorial and reference for both standard ‘awk’
+     and for ‘gawk’'s capabilities.  If you want to print it out, here
+     are the steps:
+
+          cd /path/to/gawk/repo
+          ./bootstrap.sh && ./configure && make
+          cd doc
+          make pdf
+
+     The ‘gawk.pdf’ file will be the manual.  You'll need all the right
+     TeX and Texinfo bits installed for this.  Alternatively, you can
+     find it online in various formats at
+     <https://www.gnu.org/software/gawk/manual/>.
+
+     Eventually y'all will be maintaining this manual, so you should
+     become familiar with it in any case.
+
+     You should read the other Texinfo files too, at your leisure:
+     ‘gawkinet.pdf’ for networking with ‘gawk’, and ‘gawkworkflow.pdf’.
+     The workflow document is most relevant for getting started working
+     with the team.
+
+  3. The POSIX standard for ‘awk’.  This can be found online at:
+     <https://pubs.opengroup.org/onlinepubs/9699919799/utilities/awk.html>.
+
+     It is the official standard for ‘awk’.  It's written in more formal
+     prose than the AK&W book or the ‘gawk’ manual.  It's handy to have
+     a copy of this to refer to, to know what POSIX specifies and what
+     it doesn't.  In particular, ‘gawk’ ‘--posix’ is supposed to be
+     (mostly) POSIX compliant, meaning that all ‘gawk’ extensions are
+     disabled.
+
+     There are a few (minor) areas where ‘gawk’ ‘--posix’ doesn't follow
+     the standard, since doing so makes it too painful to use.  See the
+     ‘POSIX.STD’ file in the distribution (or Git).
+
+3.3 Test Suite Structure
+========================
+
+The test suite is fairly formalized.  For each test FOO, there is at
+least a ‘FOO.awk’ and a ‘FOO.ok’ file.  Optionally, there may be a
+‘FOO.in’ file, which is input data for ‘FOO.awk’ to process.  ‘FOO.ok’
+is the combined standard output and standard error from running ‘gawk’
+on ‘FOO.awk’ (with ‘FOO.in’, if relevant).
+
+   Adding new tests generally does not require actually writing the test
+stanzas.  Instead the ‘Makefile’ process takes care of this, using an
+‘awk’ script that reads ‘Makefile.am’ and generates the test stanzas for
+any tests that have not been written manually.
+
+   To add a new test, first be sure that ‘configure’ and ‘make’ have
+already been run.  You should also have the "Autotools" installed, using
+the same versions as I do.  In that case, the steps to add a test
+involve editing ‘Makefile.am’:
+
+  1. In the list of files for ‘EXTRA_DIST’, add ‘FOO.awk’ and ‘FOO.ok’.
+     Add ‘FOO.in’ also if relevant.  Keep this list sorted
+     alphabetically.
+
+  2. Add the new test name in the relevant list:
+
+     ‘ARRAYDEBUG_TESTS’     Array debugging tests.
+     ‘BASIC_TESTS’          Tests for standard ‘awk’ functionality.
+     ‘EXTRA_TESTS’          Tests we don't usually run.  (I should rethink
+                            these, maybe.)
+     ‘GAWK_EXT_TESTS’       Tests of ‘gawk’-specific extensions.
+     ‘INET_TESTS’           Networking facility tests.
+     ‘LOCALE_CHARSET_TESTS’ Tests whose results depend on different locales.
+     ‘MACHINE_TESTS’        Tests that may vary based on machine
+                            architecture.
+     ‘SHLIB_TESTS’          Tests of the extension facility.
+     ‘UNIX_TESTS’           Tests that require *nix.
+
+  3. In addition, there are a number of ‘NEED_XXX’ groups listing tests
+     that need additional ‘gawk’ options, such as ‘--lint’ or ‘--debug’.
+     The ‘Makefile’ doesn't use them directly.  Instead, the
+     ‘test/Gentests’ script, which generates the test stanzas, reads
+     ‘Makefile.am’ and processes these lists in order to generate the
+     test stanzas.  I recommend reviewing the ‘test/Gentests’ script as
+     well.
+
+  4. After saving ‘Makefile.am’, just run ‘make’, and everything will be
+     regenerated.  This should be done in the top level directory.  This
+     will also update ‘pc/Makefile.tst’, which is used for running the
+     tests on MinGW.
+
+3.4 Documentation
+=================
+
+The ‘doc’ directory contains all of ‘gawk’'s documentation.  This
+includes manuals in Texinfo as well as man pages, and a four-color
+reference card, written in ‘tbl’ and ‘troff’.
+
+   The various files are:
+
+‘ChangeLog*’
+     ChangeLog files tracking changes.
+
+‘Makefile.am’
+‘Makefile.in’
+     ‘Makefile’ stuff via the Autotools.
+
+‘README.card’
+‘ad.block’
+‘awkcard.in’
+‘cardfonts’
+‘colors’
+‘macros’
+‘no.colors’
+‘setter.outline’
+     The files for making the reference card.
+
+‘api-figure*.fig’
+‘api-figure*.*’
+‘array-elements.fig’
+‘array-elements.*’
+‘general-program.fig’
+‘general-program.*’
+‘lflashlight-small.xpic’
+‘lflashlight.*’
+‘process-flow.fig’
+‘process-flow.*’
+‘rflashlight-small.xpic’
+‘rflashlight.*’
+‘statist.*’
+     Image files used in the manual, both the original from the drawing
+     programs (‘.fig’ and ‘.xpic’) and the generated files.
+
+‘awkforai.txt’
+     A draft of an article for ACM SIGPLAN Notices on why ‘awk’ is good
+     for AI.
+
+‘bc_notes’
+‘implementation-notes.txt’
+     Some implementation notes.  (I should review these.)
+
+‘gawk.1’
+‘gawkbug.1’
+‘igawk.1’
+‘pm-gawk.1’
+     Manual pages.  ‘igawk.1’ is no longer installed.
+
+‘gawkinet.texi’
+‘gawk.texi’
+‘gawkworkflow.texi’
+‘pm-gawk.texi’
+‘texinfo.tex’
+     The Texinfo manuals.
+
+‘it/*’
+     The Italian translation of the manual and of the man pages(1).
+
+‘wordlist*’
+     Lists of valid words that my spell(1) doesn't think are valid.
+     Used for spell checking the various documentation files.
+
+3.5 Portability: POSIX and Non-POSIX
+====================================
+
+There are places in ‘gawk’ where it needs to find out OS-specific
+information or do an OS-specific task.  These are abstracted into the
+following routines:
+
+     os_arg_fixup(int *argcp, char ***argvp)
+     os_devopen(const char *name, int flag)
+     os_close_on_exec(int fd, const char *name, const char *what, const char *dir)
+     os_isdir(int fd)
+     os_isreadable(const awk_input_buf_t *iobuf, bool *isdir)
+     os_is_setuid()
+     os_setbinmode(int fd, int mode)
+     os_restore_mode(int fd)
+     os_isatty(int fd)
+     os_maybe_set_errno(void)
+
+   There are three different implementations of these routines, one for
+OpenVMS, one for Windows with MinGW, and one for everything else
+(POSIX).
+
+   In the top level directory, the ‘gawkmisc.c’ file includes a
+subsidiary file for each environment, depending upon the system where
+‘gawk’ is being compiled.
+
+   On POSIX systems, this is ‘posix/gawkmisc.c’.  On OpenVMS, this is
+‘vms/gawkmisc.vms’, and on Windows with MinGW, this is ‘pc/gawkmisc.pc’.
+Each of these files are C code that define the above routines.  On some
+of the systems, these routines return default or error values, as
+appropriate.
+
+   In this way, the mainline ‘gawk’ code avoids lots of ‘#ifdef’
+statements, yet the ‘os_’ prefix provides an indication that the
+operation being performed is OS-specific.
+
+   If you look at the files, you will see that they are very similar to
+each other.
+
+3.6 GNULIB
+==========
+
+In the support directory are files that ‘gawk’ uses as essentially
+"library" or support routines.  For example, the ‘regex’ and ‘dfa’
+matchers.  (Why ‘gawk’ has two regular expression matchers is another
+story.)  Almost all these files come from GNULIB.
+
+   Unlike most other projects that take files from GNULIB, all I do is
+take the source files.  I don't use the GNULIB infrastructure
+(‘gnulibtoolize’, or whatever it's called) to bring in all their ‘m4’
+files.  The reason is that they tend to pull in the transitive closure
+of everything any particular item depends upon.  Thus the supporting
+infrastructure ends up overwhelming the actual code in the project.
+That's both silly and wasteful of CPU time, person time, and disk space.
+
+   The script ‘helpers/update-support.sh’ can be used to update the
+support directory's files, although it assumes that the local ‘git’
+clone of the GNULIB repository lives in a certain directory.
+
+   I am the only one who runs it, although we can look into making it
+more general going forward.
+
+   ---------- Footnotes ----------
+
+   (1) The Italian translation is maintained by Antonio Colombo
+<azc100@gmail.com>.  He has commit access to the repository.
+
+
+File: notes.info,  Node: Index,  Prev: General Maintainership,  Up: Top
+
+Index
+*****
+
+ [index ]
+* Menu:
+
+* Adams, Rick:                           GNU Awk Maintainership Background and Context.
+                                                              (line  78)
+* Aho, Alfred:                           GNU Awk Maintainership Background and Context.
+                                                              (line  48)
+* Aho, Alfred <1>:                       General Maintainership.
+                                                              (line  43)
+* Barlow Close, Diane:                   GNU Awk Maintainership Background and Context.
+                                                              (line  64)
+* Colombo, Antonio:                      General Maintainership.
+                                                              (line 200)
+* Fenlason, Jay:                         GNU Awk Maintainership Background and Context.
+                                                              (line  40)
+* Haque, John:                           GNU Awk Maintainership Background and Context.
+                                                              (line  95)
+* Haque, John <1>:                       GNU Awk Maintainership Background and Context.
+                                                              (line 100)
+* Kernighan, Brian:                      GNU Awk Maintainership Background and Context.
+                                                              (line  48)
+* Kernighan, Brian <1>:                  General Maintainership.
+                                                              (line  43)
+* Levine, John:                          General Maintainership.
+                                                              (line   9)
+* Robbins, Arnold:                       GNU Awk Maintainership Background and Context.
+                                                              (line  68)
+* Rubin, Paul:                           GNU Awk Maintainership Background and Context.
+                                                              (line  40)
+* Stallman, Richard:                     GNU Awk Maintainership Background and Context.
+                                                              (line  40)
+* Trueman, David:                        GNU Awk Maintainership Background and Context.
+                                                              (line  40)
+* Trueman, David <1>:                    GNU Awk Maintainership Background and Context.
+                                                              (line  60)
+* Trueman, David <2>:                    GNU Awk Maintainership Background and Context.
+                                                              (line  68)
+* Trueman, David <3>:                    GNU Awk Maintainership Background and Context.
+                                                              (line  72)
+* Weinberger, Peter:                     GNU Awk Maintainership Background and Context.
+                                                              (line  48)
+* Weinberger, Peter <1>:                 General Maintainership.
+                                                              (line  43)
+* Woods, John:                           GNU Awk Maintainership Background and Context.
+                                                              (line  40)
+
+
+Tag Table:
+Node: Top443
+Node: GNU Awk Maintainership Background and Context1003
+Node: General Maintainership Background7563
+Node: General Maintainership15422
+Ref: General Maintainership-Footnote-126312
+Node: Index26438
+
+End Tag Table
+
+
+Local Variables:
+coding: utf-8
+End:

@@ -7,7 +7,7 @@
  */
 
 /*
- * Copyright (C) 2012, 2013, 2018 the Free Software Foundation, Inc.
+ * Copyright (C) 2012, 2013, 2018, 2026 the Free Software Foundation, Inc.
  *
  * This file is part of GAWK, the GNU implementation of the
  * AWK Programming Language.
@@ -73,6 +73,11 @@
 #ifdef __VMS
 #include "fnmatch.c"	/* ditto */
 #else
+#ifdef __MINGW32__
+/* Prevent ../missing_d/fnmatch.c from using wchar_t stuff.  */
+#undef HAVE_WCHAR_H
+#undef HAVE_CONFIG_H
+#endif /* __MINGW32__ */
 #include "../missing_d/fnmatch.c"	/* ditto */
 #endif
 #define HAVE_FNMATCH
