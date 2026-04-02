@@ -28,12 +28,13 @@ iob.h	ece45655	548
 lex.c	1b0d5df9	34746
 machdefs.h	4950e5b	659
 main.c	468e0c	21769
-makefile.u	e0dd1cab	3710
-makefile.vc	eb8aae7c	2685
+makefile.u	43100ab	3723
+makefile.vc	fbe4d1d7	2698
 malloc.c	3505600	4020
 mem.c	ad64d7c	5437
 memset.c	12a1e1aa	2121
 misc.c	8d99c9	22945
+mkfile.plan9	f7113921	3543
 names.c	fa887031	21553
 names.h	110806d6	569
 niceprintf.c	141fb644	10950
