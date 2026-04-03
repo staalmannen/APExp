@@ -3,12 +3,12 @@
 #include <errno.h>
 #include "internal.h"
 
-size_t mbrtowc(wchar_t * wc, const char * src, size_t n, mbstate_t * st)
+size_t mbrtowc(wchar_t *restrict wc, const char *restrict src, size_t n, mbstate_t *restrict st)
 {
 	static unsigned internal_state;
 	unsigned c;
 	const unsigned char *s = (const void *)src;
-	const unsigned N = n;
+	const size_t N = n;
 	wchar_t dummy;
 
 	if (!st) st = (void *)&internal_state;

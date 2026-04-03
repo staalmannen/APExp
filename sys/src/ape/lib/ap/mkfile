@@ -42,8 +42,6 @@ DIRS=\
 	thread\
 	time\
 	unistd\
-	wchar\
-
 
 default:V:	all
 

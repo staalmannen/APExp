@@ -63,6 +63,35 @@ OFILES=\
 	strtod.$O\
 	strtold.$O\
 	strtof.$O\
+	swab.$O\
+	wcpcpy.$O\
+	wcpncpy.$O\
+	wcscasecmp.$O\
+	wcscasecmp_l.$O\
+	wcscat.$O\
+	wcschr.$O\
+	wcscmp.$O\
+	wcscpy.$O\
+	wcscspn.$O\
+	wcsdup.$O\
+	wcslen.$O\
+	wcsncasecmp.$O\
+	wcsncasecmp_l.$O\
+	wcsncat.$O\
+	wcsncmp.$O\
+	wcsncpy.$O\
+	wcsnlen.$O\
+	wcspbrk.$O\
+	wcsrchr.$O\
+	wcsspn.$O\
+	wcsstr.$O\
+	wcstok.$O\
+	wcswcs.$O\
+	wmemchr.$O\
+	wmemcmp.$O\
+	wmemcpy.$O\
+	wmemmove.$O\
+	wmemset.$O\
 # hacks\
 	strtoumax.$O\
 

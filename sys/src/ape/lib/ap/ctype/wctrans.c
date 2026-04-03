@@ -8,19 +8,19 @@ wctrans_t wctrans(const char *class)
 	return 0;
 }
 
-Rune towctrans(Rune wc, wctrans_t trans)
+wint_t towctrans(wint_t wc, wctrans_t trans)
 {
 	if (trans == (wctrans_t)1) return towupper(wc);
 	if (trans == (wctrans_t)2) return towlower(wc);
 	return wc;
 }
 
-wctrans_t __wctrans_l(const char *s, int l)
+wctrans_t __wctrans_l(const char *s, locale_t l)
 {
 	return wctrans(s);
 }
 
-Rune __towctrans_l(Rune c, wctrans_t t, int l)
+wint_t __towctrans_l(wint_t c, wctrans_t t, locale_t l)
 {
 	return towctrans(c, t);
 }

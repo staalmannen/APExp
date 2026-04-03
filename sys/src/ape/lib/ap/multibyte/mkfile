@@ -26,6 +26,9 @@ OFILES=\
 	utfrrune.$O\
 	utfrune.$O\
 	utfutf.$O\
+# libwtf, minus musl\
+	fwide.$O\
+	wctype.$O\
 # sbase libutf\
 	fgetrune.$O\
 	fputrune.$O\
@@ -40,13 +43,33 @@ OFILES=\
 	runecmp.$O\
 	utftorunestr.$O\
 	charntorune.$O\
+# musl\
+	btowc.$O\
+	c16rtomb.$O\
+	c32rtomb.$O\
+	mblen.$O\
+	mbrlen.$O\
+	mbrtoc16.$O\
+	mbrtoc32.$O\
+	mbrtowc.$O\
+	mbsinit.$O\
+	mbsnrtowcs.$O\
+	mbsrtowcs.$O\
+	mbstowcs.$O\
+	mbtowc.$O\
+	wcrtomb.$O\
+	wcsnrtombs.$O\
+	wcsrtombs.$O\
+	wcstombs.$O\
+	wctob.$O\
+	wctomb.$O\
 
 HFILES=\
 	$APEXPROOT/sys/include/ape/utf.h\
 
 UPDATE=\
 	mkfile\
-	${OFILES:%.$O=%.c}\
+	${OFILES:%.$O=%.c\}\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

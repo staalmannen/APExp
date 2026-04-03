@@ -19,16 +19,19 @@ OFILES=\
 	mbwc.$O\
 	system.$O\
 #	musl\
+	ecvt.$O\
+	fcvt.$O\
+	gcvt.$O\
 	imaxdiv.$O\
 	imaxabs.$O\
+	labs.$O\
 	lldiv.$O\
 	llabs.$O\
 	qsort_r.$O\
 	qsort_nr.$O\
 # public domain \
 	alloca.$O\
-#	hacks\
-	posix_memalign.$O\
+
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib

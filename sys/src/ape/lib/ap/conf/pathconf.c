@@ -45,9 +45,5 @@ pathconf(const char *, int name)
 	return -1;
 }
 
-long
-fpathconf(int, int name)
-{
-	return pathconf(0, name);
-}
+
 

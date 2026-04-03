@@ -8,6 +8,29 @@ OFILES=\
 	isalnum.$O\
 	toupper.$O\
 #	musl\
+	__ctype_b_loc.$O\
+	__ctype_get_mb_cur_max.$O\
+	__ctype_tolower_loc.$O\
+	__ctype_toupper_loc.$O\
+	iswalnum.$O\
+	iswalpha.$O\
+	iswblank.$O\
+	iswcntrl.$O\
+	iswctype.$O\
+	iswdigit.$O\
+	iswgraph.$O\
+	iswlower.$O\
+	iswprint.$O\
+	iswpunct.$O\
+	iswspace.$O\
+	iswupper.$O\
+	iswxdigit.$O\
+	isxdigit.$O\
+	toascii.$O\
+	wcwidth.$O\
+	wctrans.$O\
+	wcswidth.$O\
+
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

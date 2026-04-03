@@ -6,6 +6,7 @@ LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 	getpagesize.$O\
 	pathconf.$O\
+	fpathconf.$O\
 	sysconf.$O\
 #	hacks\
 	getdtablesize.$O\

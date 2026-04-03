@@ -1,7 +1,9 @@
-#include <stdint.h>
-#include <stdlib.h>
+#define bittab __fsmu8
 
-extern const uint32_t bittab[];
+#include <stdint.h>
+#include <features.h>
+
+extern hidden const uint32_t bittab[];
 
 /* Upper 6 state bits are a negative integer offset to bound-check next byte */
 /*    equivalent to: ( (b-0x80) | (b+offset) ) & ~0x3f      */
@@ -17,3 +19,6 @@ extern const uint32_t bittab[];
 /* Arbitrary encoding for representing code units instead of characters. */
 #define CODEUNIT(c) (0xdfff & (signed char)(c))
 #define IS_CODEUNIT(c) ((unsigned)(c)-0xdf80 < 0x80)
+
+/* Get inline definition of MB_CUR_MAX. */
+#include "locale_impl.h"
