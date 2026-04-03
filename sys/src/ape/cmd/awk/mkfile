@@ -69,7 +69,6 @@ CFLAGS=-c -B -I. -I$GAWKSRC -I$GAWKSRC/support -DGAWK \
 
 
 install:V:
-	cp $BIN/gawk $BIN/awk
 	mkdir -p $APEXPROOT/sys/lib/ape/awk
 	cp $GAWKSRC/awklib/eg/lib/*.awk $APEXPROOT/sys/lib/ape/awk/
 	cp $GAWKSRC/awklib/eg/prog/igawk.sh $APEXPROOT/rc/bin/ape/igawk

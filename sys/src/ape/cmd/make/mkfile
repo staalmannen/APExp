@@ -2,7 +2,7 @@ APE=../..
 <$APE/config
 APEXPROOT=../../../../..
 
-TARG=gmake
+TARG=make
 
 OFILES=	\
 # src \
@@ -72,4 +72,3 @@ nuke:V:
 
 install:V:
 	cp $GMAKESRC/doc/make.1 $APEXPROOT/sys/man/1/make
-	cp $BIN/gmake $BIN/make

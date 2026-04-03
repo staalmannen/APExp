@@ -1,6 +1,6 @@
 </$objtype/mkfile
 APEXPROOT=../../../../..
-TARG=gsed
+TARG=sed
 OFILES=	compile.$O\
 		execute.$O\
 		fmt.$O\

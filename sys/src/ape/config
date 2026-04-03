@@ -10,7 +10,7 @@ FAMILY=plan9
 AR=ar				# manipulating libraries
 RANLIB=echo			# for updating libraries
 
-INSTALL=$APELIB/install		# install script
+INSTALL=$APEBIN/xinstall		# install script
 INSOWNER=()			# default installation parameter
 INSGROUP=bin			# default installation parameter
 INSMODE=775			# default installation parameter

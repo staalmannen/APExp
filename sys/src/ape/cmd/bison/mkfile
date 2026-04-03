@@ -1,0 +1,204 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+
+TARG=bison
+
+OFILES=\
+	bison-AnnotationList.$O \
+	bison-InadequacyList.$O \
+	bison-Sbitset.$O \
+	bison-assoc.$O \
+	bison-closure.$O \
+	bison-complain.$O \
+	bison-conflicts.$O \
+	bison-counterexample.$O \
+	bison-derivation.$O \
+	bison-derives.$O \
+	bison-files.$O \
+	bison-fixits.$O \
+	bison-getargs.$O \
+	bison-glyphs.$O \
+	bison-gram.$O \
+	bison-graphviz.$O \
+	bison-ielr.$O \
+	bison-lalr.$O \
+	bison-location.$O \
+	bison-lr0.$O \
+	bison-lssi.$O \
+	bison-main.$O \
+	bison-muscle-tab.$O \
+	bison-named-ref.$O \
+	bison-nullable.$O \
+	bison-output.$O \
+	bison-parse-gram.$O \
+	bison-parse-simulation.$O \
+	bison-print-graph.$O \
+	bison-print-xml.$O \
+	bison-print.$O \
+	bison-reader.$O \
+	bison-reduce.$O \
+	bison-relation.$O \
+	bison-scan-code-c.$O \
+	bison-scan-gram-c.$O \
+	bison-scan-skel-c.$O \
+	bison-state.$O \
+	bison-state-item.$O \
+	bison-strversion.$O \
+	bison-symlist.$O \
+	bison-symtab.$O \
+	bison-tables.$O \
+	bison-uniqstr.$O
+
+LIB_OBJS=\
+	libbison_a-openat-proc.$O \
+	libbison_a-hard-locale.$O \
+	libbison_a-openat-die.$O \
+	libbison_a-save-cwd.$O \
+	libbison_a-setlocale_null.$O \
+	libbison_a-stat-time.$O \
+	libbison_a-u8-mbtoucr.$O \
+	libbison_a-u8-uctomb.$O \
+	libbison_a-u8-uctomb-aux.$O \
+	libbison_a-width.$O \
+	libbison_a-allocator.$O \
+	libbison_a-areadlink.$O \
+	libbison_a-argmatch.$O \
+	libbison_a-gl_array_list.$O \
+	libbison_a-basename-lgpl.$O \
+	libbison_a-binary-io.$O \
+	libbison_a-bitrotate.$O \
+	libbison_a-bitset.$O \
+	libbison_a-array.$O \
+	libbison_a-stats.$O \
+	libbison_a-table.$O \
+	libbison_a-list.$O \
+	libbison_a-vector.$O \
+	libbison_a-bitsetv.$O \
+	libbison_a-c-ctype.$O \
+	libbison_a-c-strcasecmp.$O \
+	libbison_a-c-strncasecmp.$O \
+	libbison_a-canonicalize.$O \
+	libbison_a-careadlinkat.$O \
+	libbison_a-cloexec.$O \
+	libbison_a-close-stream.$O \
+	libbison_a-closeout.$O \
+	libbison_a-concat-filename.$O \
+	libbison_a-dirname.$O \
+	libbison_a-basename.$O \
+	libbison_a-dirname-lgpl.$O \
+	libbison_a-stripslash.$O \
+	libbison_a-execute.$O \
+	libbison_a-exitfail.$O \
+	libbison_a-fatal-signal.$O \
+	libbison_a-fd-safer-flag.$O \
+	libbison_a-dup-safer-flag.$O \
+	libbison_a-file-set.$O \
+	libbison_a-findprog-in.$O \
+	libbison_a-fopen-safer.$O \
+	libbison_a-fstrcmp.$O \
+	libbison_a-gethrxtime.$O \
+	libbison_a-xtime.$O \
+	libbison_a-getprogname.$O \
+	libbison_a-gettime.$O \
+	libbison_a-hash.$O \
+	libbison_a-gl_hash_map.$O \
+	libbison_a-hash-pjw.$O \
+	libbison_a-hash-triple-simple.$O \
+	libbison_a-ialloc.$O \
+	libbison_a-integer_length.$O \
+	libbison_a-integer_length_l.$O \
+	libbison_a-gl_linked_list.$O \
+	libbison_a-gl_list.$O \
+	libbison_a-localcharset.$O \
+	libbison_a-lock.$O \
+	libbison_a-gl_map.$O \
+	libbison_a-math.$O \
+	libbison_a-mbchar.$O \
+	libbison_a-mbfile.$O \
+	libbison_a-mbswidth.$O \
+	libbison_a-gl_oset.$O \
+	libbison_a-pipe2.$O \
+	libbison_a-pipe2-safer.$O \
+	libbison_a-printf-frexp.$O \
+	libbison_a-printf-frexpl.$O \
+	libbison_a-progname.$O \
+	libbison_a-quotearg.$O \
+	libbison_a-gl_rbtree_oset.$O \
+	libbison_a-gl_rbtreehash_list.$O \
+	libbison_a-scratch_buffer_dupfree.$O \
+	libbison_a-scratch_buffer_grow.$O \
+	libbison_a-scratch_buffer_grow_preserve.$O \
+	libbison_a-scratch_buffer_set_array_size.$O \
+	libbison_a-sig-handler.$O \
+	libbison_a-spawn-pipe.$O \
+	libbison_a-threadlib.$O \
+	libbison_a-timespec.$O \
+	libbison_a-timevar.$O \
+	libbison_a-tls.$O \
+	libbison_a-unicodeio.$O \
+	libbison_a-unistd.$O \
+	libbison_a-dup-safer.$O \
+	libbison_a-fd-safer.$O \
+	libbison_a-pipe-safer.$O \
+	libbison_a-wait-process.$O \
+	libbison_a-wctype-h.$O \
+	libbison_a-xmalloc.$O \
+	libbison_a-xalloc-die.$O \
+	libbison_a-xconcat-filename.$O \
+	libbison_a-xhash.$O \
+	libbison_a-gl_xlist.$O \
+	libbison_a-gl_xmap.$O \
+	libbison_a-xmemdup0.$O \
+	libbison_a-xreadlink.$O \
+	libbison_a-xsize.$O \
+	libbison_a-xstrndup.$O \
+	libbison_a-get-errno.$O \
+	libbison_a-path-join.$O \
+	liby_a-main.$O \
+	liby_a-yyerror.$O
+
+LIB=libbison.a$O
+BIN=$APEXPROOT/$objtype/bin/ape
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+BISONSRC=../../../external/bison
+
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
+CFLAGS=-c -I. -I$BISONSRC -B -DHAVE_CONFIG_H\
+		-DLOCALEDIR="/sys/lib/ape/locale"
+
+bison-%.$O: $BISONSRC/src/%.c
+	$CC $CFLAGS -c $source -o $target
+
+libbison_a-%.$O: $BISONSRC/lib/%.c
+	$CC $CFLAGS -c $source -o $target
+
+libbison_a-%.$O: $BISONSRC/lib/bitset/%.c
+	$CC $CFLAGS -c $source -o $target
+
+libbison_a-%.$O: $BISONSRC/lib/malloc/%.c
+	$CC $CFLAGS -c $source -o $target
+
+libbison_a-%.$O: $BISONSRC/lib/unistr/%.c
+	$CC $CFLAGS -c $source -o $target
+
+libbison_a-%.$O: $BISONSRC/lib/glthread/%.c
+	$CC $CFLAGS -c $source -o $target
+
+libbison_a-%.$O: $BISONSRC/lib/uniqidth/%.c
+	$CC $CFLAGS -c $source -o $target
+
+liby_a-%.$O: $BISONSRC/lib/%.c
+	$CC $CFLAGS -c $source -o $target
+
+
+libbison.a$O: $LIB_OBJS
+			ar vu libbison.a$O $LIB_OBJS
+
+install:V:
+		cp $BISONSRC/bison.1 $APEXPROOT/sys/man/1/bison
+		cp $BISONSRC/yacc.1 $APEXPROOT/sys/man/1/yacc

@@ -1,0 +1,152 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+
+TARG=grep
+
+OFILES=\
+	dfasearch.$(OBJEXT) grep.$(OBJEXT) \
+	kwsearch.$(OBJEXT) kwset.$(OBJEXT) searchutils.$(OBJEXT) \
+	pcresearch.$(OBJEXT)
+
+LIB_OBJS=\
+	libgreputils_a-argmatch.$(OBJEXT) \
+	libgreputils_a-openat-proc.$(OBJEXT) \
+	libgreputils_a-basename-lgpl.$(OBJEXT) \
+	libgreputils_a-binary-io.$(OBJEXT) \
+	libgreputils_a-bitrotate.$(OBJEXT) \
+	libgreputils_a-btoc32.$(OBJEXT) libgreputils_a-btowc.$(OBJEXT) \
+	libgreputils_a-c-ctype.$(OBJEXT) \
+	libgreputils_a-c-stack.$(OBJEXT) \
+	libgreputils_a-c-strcasecmp.$(OBJEXT) \
+	libgreputils_a-c32_apply_type_test.$(OBJEXT) \
+	libgreputils_a-c32_get_type_test.$(OBJEXT) \
+	libgreputils_a-c32isalnum.$(OBJEXT) \
+	libgreputils_a-c32isalpha.$(OBJEXT) \
+	libgreputils_a-c32isblank.$(OBJEXT) \
+	libgreputils_a-c32iscntrl.$(OBJEXT) \
+	libgreputils_a-c32isdigit.$(OBJEXT) \
+	libgreputils_a-c32isgraph.$(OBJEXT) \
+	libgreputils_a-c32islower.$(OBJEXT) \
+	libgreputils_a-c32isprint.$(OBJEXT) \
+	libgreputils_a-c32ispunct.$(OBJEXT) \
+	libgreputils_a-c32isspace.$(OBJEXT) \
+	libgreputils_a-c32isupper.$(OBJEXT) \
+	libgreputils_a-c32isxdigit.$(OBJEXT) libgreputils_a-c32rtomb.$(OBJEXT) \
+	libgreputils_a-c32tob.$(OBJEXT) \
+	libgreputils_a-c32tolower.$(OBJEXT) \
+	libgreputils_a-c32toupper.$(OBJEXT) libgreputils_a-chdir-long.$(OBJEXT) \
+	libgreputils_a-cloexec.$(OBJEXT) \
+	libgreputils_a-close-stream.$(OBJEXT) \
+	libgreputils_a-closeout.$(OBJEXT) \
+	libgreputils_a-cycle-check.$(OBJEXT) \
+	libgreputils_a-dfa.$(OBJEXT) \
+	libgreputils_a-localeinfo.$(OBJEXT) \
+	libgreputils_a-dirname-lgpl.$(OBJEXT) \
+	libgreputils_a-stripslash.$(OBJEXT) \
+	libgreputils_a-dup2.$(OBJEXT) libgreputils_a-error.$(OBJEXT) \
+	libgreputils_a-exclude.$(OBJEXT) \
+	libgreputils_a-exitfail.$(OBJEXT) \
+	libgreputils_a-fcntl.$(OBJEXT) libgreputils_a-creat-safer.$(OBJEXT) \
+	libgreputils_a-open-safer.$(OBJEXT) \
+	libgreputils_a-fd-hook.$(OBJEXT) libgreputils_a-fdopendir.$(OBJEXT) \
+	libgreputils_a-filenamecat-lgpl.$(OBJEXT) libgreputils_a-fpending.$(OBJEXT) \
+	libgreputils_a-free.$(OBJEXT) libgreputils_a-fstatat.$(OBJEXT) \
+	libgreputils_a-fts.$(OBJEXT) libgreputils_a-getcwd-lgpl.$(OBJEXT) \
+	libgreputils_a-getopt.$(OBJEXT) libgreputils_a-getopt1.$(OBJEXT) \
+	malloc/libgreputils_a-dynarray_at_failure.$(OBJEXT) \
+	malloc/libgreputils_a-dynarray_emplace_enlarge.$(OBJEXT) \
+	malloc/libgreputils_a-dynarray_finalize.$(OBJEXT) \
+	malloc/libgreputils_a-dynarray_resize.$(OBJEXT) \
+	malloc/libgreputils_a-dynarray_resize_clear.$(OBJEXT) \
+	libgreputils_a-hard-locale.$(OBJEXT) \
+	libgreputils_a-hash.$(OBJEXT) libgreputils_a-i-ring.$(OBJEXT) \
+	libgreputils_a-ialloc.$(OBJEXT) \
+	libgreputils_a-iswctype.$(OBJEXT) \
+	libgreputils_a-localcharset.$(OBJEXT) libgreputils_a-localeconv.$(OBJEXT) \
+	glthread/libgreputils_a-lock.$(OBJEXT) libgreputils_a-lseek.$(OBJEXT) \
+	libgreputils_a-lstat.$(OBJEXT) libgreputils_a-malloca.$(OBJEXT) \
+	libgreputils_a-mbrlen.$(OBJEXT) libgreputils_a-mbrtoc32.$(OBJEXT) libgreputils_a-mbrtowc.$(OBJEXT) \
+	libgreputils_a-mbscasecmp.$(OBJEXT) \
+	libgreputils_a-mbsrtoc32s.$(OBJEXT) libgreputils_a-mbsrtowcs.$(OBJEXT) \
+	libgreputils_a-mbszero.$(OBJEXT) \
+	libgreputils_a-mcel.$(OBJEXT) \
+	libgreputils_a-memchr2.$(OBJEXT) \
+	libgreputils_a-memrchr.$(OBJEXT) \
+	libgreputils_a-nl_langinfo.$(OBJEXT) libgreputils_a-obstack.$(OBJEXT) \
+	glthread/libgreputils_a-once.$(OBJEXT) \
+	libgreputils_a-openat.$(OBJEXT) libgreputils_a-openat-die.$(OBJEXT) \
+	libgreputils_a-openat-safer.$(OBJEXT) \
+	libgreputils_a-opendirat.$(OBJEXT) \
+	libgreputils_a-quotearg.$(OBJEXT) \
+	libgreputils_a-rawmemchr.$(OBJEXT) \
+	libgreputils_a-reallocarray.$(OBJEXT) \
+	libgreputils_a-regex.$(OBJEXT) libgreputils_a-safe-read.$(OBJEXT) \
+	libgreputils_a-same-inode.$(OBJEXT) \
+	libgreputils_a-save-cwd.$(OBJEXT) \
+	libgreputils_a-setlocale_null.$(OBJEXT) libgreputils_a-setlocale-lock.$(OBJEXT) \
+	libgreputils_a-setlocale_null-unlocked.$(OBJEXT) \
+	libgreputils_a-sigsegv.$(OBJEXT) libgreputils_a-stackvma.$(OBJEXT)\
+	libgreputils_a-stat-time.$(OBJEXT) \
+	libgreputils_a-stdlib.$(OBJEXT) \
+	libgreputils_a-stpcpy.$(OBJEXT) libgreputils_a-str_endswith.$(OBJEXT) \
+	libgreputils_a-strerror.$(OBJEXT) libgreputils_a-strerror-override.$(OBJEXT) \
+	libgreputils_a-strnlen1.$(OBJEXT) \
+	libgreputils_a-strtoll.$(OBJEXT) \
+	glthread/libgreputils_a-threadlib.$(OBJEXT) libgreputils_a-tolower.$(OBJEXT) \
+	libgreputils_a-toupper.$(OBJEXT) libgreputils_a-ctype_alnum.$(OBJEXT) libgreputils_a-ctype_alpha.$(OBJEXT) \
+	libgreputils_a-ctype_blank.$(OBJEXT) libgreputils_a-ctype_cntrl.$(OBJEXT) libgreputils_a-ctype_digit.$(OBJEXT) \
+	libgreputils_a-ctype_graph.$(OBJEXT) libgreputils_a-ctype_lower.$(OBJEXT) libgreputils_a-ctype_print.$(OBJEXT) \
+	libgreputils_a-ctype_punct.$(OBJEXT) libgreputils_a-ctype_space.$(OBJEXT) libgreputils_a-ctype_upper.$(OBJEXT) \
+	libgreputils_a-ctype_xdigit.$(OBJEXT) libgreputils_a-unistd.$(OBJEXT) \
+	libgreputils_a-dup-safer.$(OBJEXT) \
+	libgreputils_a-fd-safer.$(OBJEXT) \
+	libgreputils_a-pipe-safer.$(OBJEXT) libgreputils_a-u32-chr.$(OBJEXT) \
+	libgreputils_a-u32-cpy.$(OBJEXT) libgreputils_a-u32-pcpy.$(OBJEXT) libgreputils_a-u32-strcat.$(OBJEXT) \
+	libgreputils_a-u32-strlen.$(OBJEXT) libgreputils_a-version-etc.$(OBJEXT) \
+	libgreputils_a-version-etc-fsf.$(OBJEXT) \
+	libgreputils_a-wctob.$(OBJEXT) libgreputils_a-wctype.$(OBJEXT) \
+	libgreputils_a-wctype-h.$(OBJEXT) libgreputils_a-wmempcpy.$(OBJEXT) \
+	libgreputils_a-xmalloc.$(OBJEXT) \
+	libgreputils_a-xalloc-die.$(OBJEXT) \
+	libgreputils_a-xbinary-io.$(OBJEXT) \
+	libgreputils_a-xstrtoimax.$(OBJEXT) \
+	libgreputils_a-xstrtol.$(OBJEXT) \
+	libgreputils_a-xstrtoul.$(OBJEXT) \
+	libgreputils_a-colorize.$(OBJEXT)
+
+LIB=libgrep.a$O
+BIN=$APEXPROOT/$objtype/bin/ape
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+GREPSRC=../../../external/ggrep
+
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
+CFLAGS=-c -I. -I$GREPSRC -I$GREPSRC/src -I$GREPSRC/lib\
+		-B -DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale"
+
+%.$O: $GREPSRC/src/%.c
+	$CC $CFLAGS $GREPSRC/src/$stem.c
+
+libgreputils_a-%.$O: $GREPSRC/lib/%.c
+	$CC $CFLAGS -c $source -o $target
+
+libgreputils_a-%.$O: $GREPSRC/lib/unicase/%.c
+	$CC $CFLAGS -c $source -o $target
+
+
+libgreputils_a-%.$O: $GREPSRC/lib/unictype/%.c
+	$CC $CFLAGS -c $source -o $target
+
+libgreputils_a-%.$O: $GREPSRC/lib/unistr/%.c
+	$CC $CFLAGS -c $source -o $target
+
+
+libgrep.a$O: $LIB_OBJS
+			ar vu libgrep.a$O $LIB_OBJS
+
+install:V:
+		cp $GREPSRC/grep.1 $APEXPROOT/sys/man/1/grep
