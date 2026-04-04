@@ -5,11 +5,11 @@
 
 #define NETPATHLEN 40
 
-extern	int	accept(int, char*);
+extern	int	net_accept(int, char*);
 extern	int	announce(char*, char*);
 extern	int	dial(char*, char*, char*, int*);
 extern	int	hangup(int);
-extern	int	listen(char*, char*);
+extern	int	net_listen(char*, char*);
 extern	char*	netmkaddr(char*, char*, char*);
 extern	int	reject(int, char*, char *);
 

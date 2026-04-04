@@ -21,6 +21,7 @@
 #include <stdlib.h> /* provides: mbtowc wctomb mbstowcs wcstombs */
 #include <string.h>
 #include <time.h>
+#include <langinfo.h>
 
 /*
  * #############################################
