@@ -6,6 +6,7 @@ APE=$APEXPROOT/sys/src/ape
 # source code re-organized like the musl src directory
 
 DIRS=\
+	aio\
 	complex\
 	conf\
 	ctype\

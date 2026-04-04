@@ -3,9 +3,22 @@ APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
+# split isalnum to each function by itself
+
 OFILES=\
 	ctype.$O\
 	isalnum.$O\
+	isalpha.$O\
+	isblank.$O\
+	iscntrl.$O\
+	isdigit.$O\
+	isgraph.$O\
+	islower.$O\
+	isprint.$O\
+	ispunct.$O\
+	isspace.$O\
+	isupper.$O\
+	isxdigit.$O\
 	toupper.$O\
 #	musl\
 	__ctype_b_loc.$O\

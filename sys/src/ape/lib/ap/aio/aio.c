@@ -1,432 +1,227 @@
 #include <aio.h>
-#include <pthread.h>
-#include <semaphore.h>
-#include <limits.h>
-#include <errno.h>
 #include <unistd.h>
+#include <errno.h>
 #include <stdlib.h>
-#include <sys/auxv.h>
-#include "syscall.h"
-#include "atomic.h"
-#include "pthread_impl.h"
-#include "aio_impl.h"
+#include <string.h>
 
-#define malloc __libc_malloc
-#define calloc __libc_calloc
-#define realloc __libc_realloc
-#define free __libc_free
+/* ---------------------------------------------------------
+   Global worker thread
+   --------------------------------------------------------- */
 
-/* The following is a threads-based implementation of AIO with minimal
- * dependence on implementation details. Most synchronization is
- * performed with pthread primitives, but atomics and futex operations
- * are used for notification in a couple places where the pthread
- * primitives would be inefficient or impractical.
- *
- * For each fd with outstanding aio operations, an aio_queue structure
- * is maintained. These are reference-counted and destroyed by the last
- * aio worker thread to exit. Accessing any member of the aio_queue
- * structure requires a lock on the aio_queue. Adding and removing aio
- * queues themselves requires a write lock on the global map object,
- * a 4-level table mapping file descriptor numbers to aio queues. A
- * read lock on the map is used to obtain locks on existing queues by
- * excluding destruction of the queue by a different thread while it is
- * being locked.
- *
- * Each aio queue has a list of active threads/operations. Presently there
- * is a one to one relationship between threads and operations. The only
- * members of the aio_thread structure which are accessed by other threads
- * are the linked list pointers, op (which is immutable), running (which
- * is updated atomically), and err (which is synchronized via running),
- * so no locking is necessary. Most of the other other members are used
- * for sharing data between the main flow of execution and cancellation
- * cleanup handler.
- *
- * Taking any aio locks requires having all signals blocked. This is
- * necessary because aio_cancel is needed by close, and close is required
- * to be async-signal safe. All aio worker threads run with all signals
- * blocked permanently.
- */
+typedef struct aio_task {
+    struct aiocb *cb;
+    struct aio_task *next;
+} aio_task;
 
-struct aio_thread {
-	pthread_t td;
-	struct aiocb *cb;
-	struct aio_thread *next, *prev;
-	struct aio_queue *q;
-	volatile int running;
-	int err, op;
-	ssize_t ret;
-};
+static pthread_mutex_t aio_q_lock = PTHREAD_MUTEX_INITIALIZER;
+static pthread_cond_t  aio_q_cond = PTHREAD_COND_INITIALIZER;
+static aio_task *aio_q_head = NULL;
+static aio_task *aio_q_tail = NULL;
 
-struct aio_queue {
-	int fd, seekable, append, ref, init;
-	pthread_mutex_t lock;
-	pthread_cond_t cond;
-	struct aio_thread *head;
-};
+static pthread_once_t aio_once = PTHREAD_ONCE_INIT;
+static pthread_t aio_worker_thread;
 
-struct aio_args {
-	struct aiocb *cb;
-	struct aio_queue *q;
-	int op;
-	sem_t sem;
-};
+/* ---------------------------------------------------------
+   Queue handling
+   --------------------------------------------------------- */
 
-static pthread_rwlock_t maplock = PTHREAD_RWLOCK_INITIALIZER;
-static struct aio_queue *****map;
-static volatile int aio_fd_cnt;
-volatile int __aio_fut;
-
-static size_t io_thread_stack_size;
-
-#define MAX(a,b) ((a)>(b) ? (a) : (b))
-
-static struct aio_queue *__aio_get_queue(int fd, int need)
+static void enqueue(struct aiocb *cb)
 {
-	sigset_t allmask, origmask;
-	int masked = 0;
-	if (fd < 0) {
-		errno = EBADF;
-		return 0;
-	}
-	int a=fd>>24;
-	unsigned char b=fd>>16, c=fd>>8, d=fd;
-	struct aio_queue *q = 0;
-	pthread_rwlock_rdlock(&maplock);
-	if ((!map || !map[a] || !map[a][b] || !map[a][b][c] || !(q=map[a][b][c][d])) && need) {
-		pthread_rwlock_unlock(&maplock);
-		if (fcntl(fd, F_GETFD) < 0) return 0;
-		sigfillset(&allmask);
-		masked = 1;
-		pthread_sigmask(SIG_BLOCK, &allmask, &origmask);
-		pthread_rwlock_wrlock(&maplock);
-		if (!io_thread_stack_size) {
-			unsigned long val = __getauxval(AT_MINSIGSTKSZ);
-			io_thread_stack_size = MAX(MINSIGSTKSZ+2048, val+512);
-		}
-		if (!map) map = calloc(sizeof *map, (-1U/2+1)>>24);
-		if (!map) goto out;
-		if (!map[a]) map[a] = calloc(sizeof **map, 256);
-		if (!map[a]) goto out;
-		if (!map[a][b]) map[a][b] = calloc(sizeof ***map, 256);
-		if (!map[a][b]) goto out;
-		if (!map[a][b][c]) map[a][b][c] = calloc(sizeof ****map, 256);
-		if (!map[a][b][c]) goto out;
-		if (!(q = map[a][b][c][d])) {
-			map[a][b][c][d] = q = calloc(sizeof *****map, 1);
-			if (q) {
-				q->fd = fd;
-				pthread_mutex_init(&q->lock, 0);
-				pthread_cond_init(&q->cond, 0);
-				a_inc(&aio_fd_cnt);
-			}
-		}
-	}
-	if (q) pthread_mutex_lock(&q->lock);
-out:
-	pthread_rwlock_unlock(&maplock);
-	if (masked) pthread_sigmask(SIG_SETMASK, &origmask, 0);
-	return q;
+    aio_task *t = malloc(sizeof(aio_task));
+    t->cb = cb;
+    t->next = NULL;
+
+    pthread_mutex_lock(&aio_q_lock);
+    if (aio_q_tail)
+        aio_q_tail->next = t;
+    else
+        aio_q_head = t;
+
+    aio_q_tail = t;
+    pthread_cond_signal(&aio_q_cond);
+    pthread_mutex_unlock(&aio_q_lock);
 }
 
-static void __aio_unref_queue(struct aio_queue *q)
+static struct aiocb *dequeue(void)
 {
-	if (q->ref > 1) {
-		q->ref--;
-		pthread_mutex_unlock(&q->lock);
-		return;
-	}
+    pthread_mutex_lock(&aio_q_lock);
+    while (!aio_q_head)
+        pthread_cond_wait(&aio_q_cond, &aio_q_lock);
 
-	/* This is potentially the last reference, but a new reference
-	 * may arrive since we cannot free the queue object without first
-	 * taking the maplock, which requires releasing the queue lock. */
-	pthread_mutex_unlock(&q->lock);
-	pthread_rwlock_wrlock(&maplock);
-	pthread_mutex_lock(&q->lock);
-	if (q->ref == 1) {
-		int fd=q->fd;
-		int a=fd>>24;
-		unsigned char b=fd>>16, c=fd>>8, d=fd;
-		map[a][b][c][d] = 0;
-		a_dec(&aio_fd_cnt);
-		pthread_rwlock_unlock(&maplock);
-		pthread_mutex_unlock(&q->lock);
-		free(q);
-	} else {
-		q->ref--;
-		pthread_rwlock_unlock(&maplock);
-		pthread_mutex_unlock(&q->lock);
-	}
+    aio_task *t = aio_q_head;
+    aio_q_head = t->next;
+    if (!aio_q_head) aio_q_tail = NULL;
+
+    pthread_mutex_unlock(&aio_q_lock);
+
+    struct aiocb *cb = t->cb;
+    free(t);
+    return cb;
 }
 
-static void cleanup(void *ctx)
+/* ---------------------------------------------------------
+   Worker thread
+   --------------------------------------------------------- */
+
+static void *aio_worker(void *arg)
 {
-	struct aio_thread *at = ctx;
-	struct aio_queue *q = at->q;
-	struct aiocb *cb = at->cb;
-	struct sigevent sev = cb->aio_sigevent;
+    (void)arg;
+    for (;;) {
+        struct aiocb *cb = dequeue();
 
-	/* There are four potential types of waiters we could need to wake:
-	 *   1. Callers of aio_cancel/close.
-	 *   2. Callers of aio_suspend with a single aiocb.
-	 *   3. Callers of aio_suspend with a list.
-	 *   4. AIO worker threads waiting for sequenced operations.
-	 * Types 1-3 are notified via atomics/futexes, mainly for AS-safety
-	 * considerations. Type 4 is notified later via a cond var. */
+        pthread_mutex_lock(&cb->__lock);
+        cb->__status = EINPROGRESS;
+        pthread_mutex_unlock(&cb->__lock);
 
-	cb->__ret = at->ret;
-	if (a_swap(&at->running, 0) < 0)
-		__wake(&at->running, -1, 1);
-	if (a_swap(&cb->__err, at->err) != EINPROGRESS)
-		__wake(&cb->__err, -1, 1);
-	if (a_swap(&__aio_fut, 0))
-		__wake(&__aio_fut, -1, 1);
+        ssize_t ret;
+        if (cb->__op == LIO_READ)
+            ret = pread(cb->aio_fildes, (void *)cb->aio_buf, cb->aio_nbytes, cb->aio_offset);
+        else if (cb->__op == LIO_WRITE)
+            ret = pwrite(cb->aio_fildes, (void *)cb->aio_buf, cb->aio_nbytes, cb->aio_offset);
+        else
+            ret = -1;
 
-	pthread_mutex_lock(&q->lock);
+        pthread_mutex_lock(&cb->__lock);
+        cb->__ret = ret;
+        cb->__status = (ret < 0 ? errno : 0);
+        cb->__queued = 0;
+        pthread_cond_broadcast(&cb->__cond);
+        pthread_mutex_unlock(&cb->__lock);
+    }
 
-	if (at->next) at->next->prev = at->prev;
-	if (at->prev) at->prev->next = at->next;
-	else q->head = at->next;
-
-	/* Signal aio worker threads waiting for sequenced operations. */
-	pthread_cond_broadcast(&q->cond);
-
-	__aio_unref_queue(q);
-
-	if (sev.sigev_notify == SIGEV_SIGNAL) {
-		siginfo_t si = {
-			.si_signo = sev.sigev_signo,
-			.si_value = sev.sigev_value,
-			.si_code = SI_ASYNCIO,
-			.si_pid = getpid(),
-			.si_uid = getuid()
-		};
-		__syscall(SYS_rt_sigqueueinfo, si.si_pid, si.si_signo, &si);
-	}
-	if (sev.sigev_notify == SIGEV_THREAD) {
-		a_store(&__pthread_self()->cancel, 0);
-		sev.sigev_notify_function(sev.sigev_value);
-	}
+    return NULL;
 }
 
-static void *io_thread_func(void *ctx)
+/* start worker once */
+static void start_worker(void)
 {
-	struct aio_thread at, *p;
-
-	struct aio_args *args = ctx;
-	struct aiocb *cb = args->cb;
-	int fd = cb->aio_fildes;
-	int op = args->op;
-	void *buf = (void *)cb->aio_buf;
-	size_t len = cb->aio_nbytes;
-	off_t off = cb->aio_offset;
-
-	struct aio_queue *q = args->q;
-	ssize_t ret;
-
-	pthread_mutex_lock(&q->lock);
-	sem_post(&args->sem);
-
-	at.op = op;
-	at.running = 1;
-	at.ret = -1;
-	at.err = ECANCELED;
-	at.q = q;
-	at.td = __pthread_self();
-	at.cb = cb;
-	at.prev = 0;
-	if ((at.next = q->head)) at.next->prev = &at;
-	q->head = &at;
-
-	if (!q->init) {
-		int seekable = lseek(fd, 0, SEEK_CUR) >= 0;
-		q->seekable = seekable;
-		q->append = !seekable || (fcntl(fd, F_GETFL) & O_APPEND);
-		q->init = 1;
-	}
-
-	pthread_cleanup_push(cleanup, &at);
-
-	/* Wait for sequenced operations. */
-	if (op!=LIO_READ && (op!=LIO_WRITE || q->append)) {
-		for (;;) {
-			for (p=at.next; p && p->op!=LIO_WRITE; p=p->next);
-			if (!p) break;
-			pthread_cond_wait(&q->cond, &q->lock);
-		}
-	}
-
-	pthread_mutex_unlock(&q->lock);
-
-	switch (op) {
-	case LIO_WRITE:
-		ret = q->append ? write(fd, buf, len) : pwrite(fd, buf, len, off);
-		break;
-	case LIO_READ:
-		ret = !q->seekable ? read(fd, buf, len) : pread(fd, buf, len, off);
-		break;
-	case O_SYNC:
-		ret = fsync(fd);
-		break;
-	case O_DSYNC:
-		ret = fdatasync(fd);
-		break;
-	}
-	at.ret = ret;
-	at.err = ret<0 ? errno : 0;
-	
-	pthread_cleanup_pop(1);
-
-	return 0;
+    pthread_create(&aio_worker_thread, NULL, aio_worker, NULL);
 }
 
-static int submit(struct aiocb *cb, int op)
+/* ---------------------------------------------------------
+   Helpers
+   --------------------------------------------------------- */
+
+static void init_cb(struct aiocb *cb)
 {
-	int ret = 0;
-	pthread_attr_t a;
-	sigset_t allmask, origmask;
-	pthread_t td;
-	struct aio_queue *q = __aio_get_queue(cb->aio_fildes, 1);
-	struct aio_args args = { .cb = cb, .op = op, .q = q };
-	sem_init(&args.sem, 0, 0);
+    static pthread_mutex_t init_lock = PTHREAD_MUTEX_INITIALIZER;
+    pthread_mutex_lock(&init_lock);
 
-	if (!q) {
-		if (errno != EBADF) errno = EAGAIN;
-		cb->__ret = -1;
-		cb->__err = errno;
-		return -1;
-	}
-	q->ref++;
-	pthread_mutex_unlock(&q->lock);
+    static int initialized = 0;
+    if (!initialized) {
+        pthread_once(&aio_once, start_worker);
+        initialized = 1;
+    }
 
-	if (cb->aio_sigevent.sigev_notify == SIGEV_THREAD) {
-		if (cb->aio_sigevent.sigev_notify_attributes)
-			a = *cb->aio_sigevent.sigev_notify_attributes;
-		else
-			pthread_attr_init(&a);
-	} else {
-		pthread_attr_init(&a);
-		pthread_attr_setstacksize(&a, io_thread_stack_size);
-		pthread_attr_setguardsize(&a, 0);
-	}
-	pthread_attr_setdetachstate(&a, PTHREAD_CREATE_DETACHED);
-	sigfillset(&allmask);
-	pthread_sigmask(SIG_BLOCK, &allmask, &origmask);
-	cb->__err = EINPROGRESS;
-	if (pthread_create(&td, &a, io_thread_func, &args)) {
-		pthread_mutex_lock(&q->lock);
-		__aio_unref_queue(q);
-		cb->__err = errno = EAGAIN;
-		cb->__ret = ret = -1;
-	}
-	pthread_sigmask(SIG_SETMASK, &origmask, 0);
+    pthread_mutex_unlock(&init_lock);
 
-	if (!ret) {
-		while (sem_wait(&args.sem));
-	}
+    cb->__status = EINPROGRESS;
+    cb->__ret = -1;
+    cb->__queued = 1;
 
-	return ret;
+    pthread_mutex_init(&cb->__lock, NULL);
+    pthread_cond_init(&cb->__cond, NULL);
 }
+
+/* ---------------------------------------------------------
+   Public API
+   --------------------------------------------------------- */
 
 int aio_read(struct aiocb *cb)
 {
-	return submit(cb, LIO_READ);
+    init_cb(cb);
+    cb->__op = LIO_READ;
+    enqueue(cb);
+    return 0;
 }
 
 int aio_write(struct aiocb *cb)
 {
-	return submit(cb, LIO_WRITE);
+    init_cb(cb);
+    cb->__op = LIO_WRITE;
+    enqueue(cb);
+    return 0;
 }
 
 int aio_fsync(int op, struct aiocb *cb)
 {
-	if (op != O_SYNC && op != O_DSYNC) {
-		errno = EINVAL;
-		return -1;
-	}
-	return submit(cb, op);
-}
-
-ssize_t aio_return(struct aiocb *cb)
-{
-	return cb->__ret;
+    (void)op;
+    /* emulate fsync: just enqueue a special nop */
+    init_cb(cb);
+    cb->__op = LIO_NOP;
+    enqueue(cb);
+    return 0;
 }
 
 int aio_error(const struct aiocb *cb)
 {
-	a_barrier();
-	return cb->__err & 0x7fffffff;
+    return cb->__queued ? EINPROGRESS : cb->__status;
 }
 
-int aio_cancel(int fd, struct aiocb *cb)
+ssize_t aio_return(struct aiocb *cb)
 {
-	sigset_t allmask, origmask;
-	int ret = AIO_ALLDONE;
-	struct aio_thread *p;
-	struct aio_queue *q;
+    if (cb->__queued)
+        return -1;
 
-	/* Unspecified behavior case. Report an error. */
-	if (cb && fd != cb->aio_fildes) {
-		errno = EINVAL;
-		return -1;
-	}
-
-	sigfillset(&allmask);
-	pthread_sigmask(SIG_BLOCK, &allmask, &origmask);
-
-	errno = ENOENT;
-	if (!(q = __aio_get_queue(fd, 0))) {
-		if (errno == EBADF) ret = -1;
-		goto done;
-	}
-
-	for (p = q->head; p; p = p->next) {
-		if (cb && cb != p->cb) continue;
-		/* Transition target from running to running-with-waiters */
-		if (a_cas(&p->running, 1, -1)) {
-			pthread_cancel(p->td);
-			__wait(&p->running, 0, -1, 1);
-			if (p->err == ECANCELED) ret = AIO_CANCELED;
-		}
-	}
-
-	pthread_mutex_unlock(&q->lock);
-done:
-	pthread_sigmask(SIG_SETMASK, &origmask, 0);
-	return ret;
+    return cb->__ret;
 }
 
-int __aio_close(int fd)
+int aio_suspend(const struct aiocb *const list[], int n,
+                const struct timespec *ts)
 {
-	a_barrier();
-	if (aio_fd_cnt) aio_cancel(fd, 0);
-	return fd;
+    int i;
+    int done = 0;
+
+    pthread_mutex_t mx = PTHREAD_MUTEX_INITIALIZER;
+    pthread_cond_t  cv = PTHREAD_COND_INITIALIZER;
+
+    pthread_mutex_lock(&mx);
+
+    while (!done) {
+        done = 0;
+
+        for (i = 0; i < n; i++) {
+            const struct aiocb *cb = list[i];
+            if (!cb) continue;
+
+            if (!cb->__queued) {
+                done = 1;
+                break;
+            }
+        }
+
+        if (!done) {
+            if (ts)
+                pthread_cond_timedwait(&cv, &mx, ts);
+            else
+                pthread_cond_wait(&cv, &mx);
+        }
+    }
+
+    pthread_mutex_unlock(&mx);
+    return 0;
 }
 
-void __aio_atfork(int who)
+int lio_listio(int mode, struct aiocb *const list[],
+               int nent, struct sigevent *sev)
 {
-	if (who<0) {
-		pthread_rwlock_rdlock(&maplock);
-		return;
-	} else if (!who) {
-		pthread_rwlock_unlock(&maplock);
-		return;
-	}
-	aio_fd_cnt = 0;
-	if (pthread_rwlock_tryrdlock(&maplock)) {
-		/* Obtaining lock may fail if _Fork was called nor via
-		 * fork. In this case, no further aio is possible from
-		 * child and we can just null out map so __aio_close
-		 * does not attempt to do anything. */
-		map = 0;
-		return;
-	}
-	if (map) for (int a=0; a<(-1U/2+1)>>24; a++)
-		if (map[a]) for (int b=0; b<256; b++)
-			if (map[a][b]) for (int c=0; c<256; c++)
-				if (map[a][b][c]) for (int d=0; d<256; d++)
-					map[a][b][c][d] = 0;
-	/* Re-initialize the rwlock rather than unlocking since there
-	 * may have been more than one reference on it in the parent.
-	 * We are not a lock holder anyway; the thread in the parent was. */
-	pthread_rwlock_init(&maplock, 0);
+    int i;
+
+    for (i = 0; i < nent; i++) {
+        struct aiocb *cb = list[i];
+        if (!cb) continue;
+
+        if (cb->__op == LIO_READ) aio_read(cb);
+        else if (cb->__op == LIO_WRITE) aio_write(cb);
+        else cb->__status = 0;
+    }
+
+    if (mode == LIO_WAIT) {
+        const struct aiocb *clist[nent];
+        for (i = 0; i < nent; i++) clist[i] = list[i];
+        return aio_suspend(clist, nent, NULL);
+    }
+
+    /* LIO_NOWAIT ignores sev in this portable implementation */
+    return 0;
 }

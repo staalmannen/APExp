@@ -3,9 +3,13 @@ APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
+# split malloc into malloc, free and realloc
+
 OFILES=\
 	calloc.$O\
 	malloc.$O\
+	free.$O\
+	realloc.$O\
 	setmalloctag.$O\
 	setrealloctag.$O\
 # claude ported from musl\

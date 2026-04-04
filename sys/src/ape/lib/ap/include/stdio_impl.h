@@ -62,8 +62,6 @@ struct _IO_FILE {
 	struct __locale_struct *locale;
 };
 
-typedef struct _IO_FILE _MUSL_FILE;
-
 extern hidden struct _IO_FILE *volatile __stdin_used;
 extern hidden struct _IO_FILE *volatile __stdout_used;
 extern hidden struct _IO_FILE *volatile __stderr_used;
@@ -131,5 +129,23 @@ hidden void __getopt_msg(const char *, const char *, const char *, size_t);
 /* Caller-allocated FILE * operations */
 hidden struct _IO_FILE *__fopen_rb_ca(const char *, struct _IO_FILE *, unsigned char *, size_t);
 hidden int __fclose_ca(struct _IO_FILE *);
+
+/* missing helpers */
+static inline int __shgetc(struct _IO_FILE *f) { return __uflow(f); }
+
+#define f_reading(f)  (!((f)->flags & F_NORD))
+#define f_writing(f)  (!((f)->flags & F_NOWR))
+
+/* Whether musl needs FILE orientation (wide/narrow); can stub */
+#define ORIENT(f,m) ((void)0)
+
+/* required for scanf internals */
+#ifndef feof_unlocked
+#define feof_unlocked(f)  ((f)->flags & F_EOF)
+#endif
+
+#ifndef ferror_unlocked
+#define ferror_unlocked(f) ((f)->flags & F_ERR)
+#endif
 
 #endif

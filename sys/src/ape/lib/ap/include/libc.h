@@ -1,3 +1,7 @@
+#ifndef _LIBC_H
+#define _LIBC_H
+
+/* Plan9 / APExp libc.h */
 #define _LOCK_EXTENSION
 #define _QLOCK_EXTENSION
 
@@ -206,3 +210,163 @@ struct Tm
 
 Tm* _gmtime(time_t);
 #define gmtime _gmtime
+
+/* ============================================================
+   Musl compatibility shims
+   ============================================================ */
+
+/*
+ * These functions are required by musl libc internal files such as:
+ *   pthread_impl.h
+ *   futex.h
+ *   cancellation.c
+ *   thread list helpers
+ *
+ * They do NOT implement musl’s real behavior. These are lightweight
+ * compatibility stubs that allow musl components to compile when
+ * linked against your Plan 9–derived pthread and libc system.
+ */
+
+#include <pthread.h>
+
+/* ------------------------------
+   Thread self
+   ------------------------------ */
+
+static inline pthread_t __pthread_self(void)
+{
+    return pthread_self();
+}
+
+/* ------------------------------
+   TLS (no real TLS used)
+   ------------------------------ */
+
+static inline int __init_tp(void *p)      { return 0; }
+static inline void *__copy_tls(unsigned char *p) { return NULL; }
+static inline void __reset_tls(void)      { }
+
+/* ------------------------------
+   Cancellation stubs
+   ------------------------------ */
+
+struct __ptcb { void *unused; };
+
+static inline void __testcancel(void) { }
+static inline void __do_cleanup_push(struct __ptcb *cb) { }
+static inline void __do_cleanup_pop(struct __ptcb *cb) { }
+static inline void __pthread_tsd_run_dtors(void) { }
+
+/* ------------------------------
+   Key deletion shim
+   ------------------------------ */
+
+static inline void __pthread_key_delete_synccall(void (*f)(void *), void *p) { }
+static inline int __pthread_key_delete_impl(pthread_key_t k)
+{
+    return pthread_key_delete(k);
+}
+
+/* ------------------------------
+   Thread list / global locks
+   ------------------------------ */
+
+static volatile int __thread_list_lock = 0;
+static volatile int __abort_lock[1] = {0};
+
+static inline void __tl_lock(void)  { }
+static inline void __tl_unlock(void){ }
+static inline void __tl_sync(pthread_t t) { }
+
+/* ------------------------------
+   Synchronization: wait/wake
+   (portable futex emulation)
+   ------------------------------ */
+
+typedef struct {
+    pthread_mutex_t m;
+    pthread_cond_t  c;
+} __shim_waiter_t;
+
+static __shim_waiter_t __shim_waiter = {
+    PTHREAD_MUTEX_INITIALIZER,
+    PTHREAD_COND_INITIALIZER
+};
+
+/* Wait while *addr == val */
+static inline void __wait(volatile int *addr,
+                          volatile int *cond,
+                          int val,
+                          int priv)
+{
+    (void)cond; (void)priv;
+
+    pthread_mutex_lock(&__shim_waiter.m);
+    while (*addr == val)
+        pthread_cond_wait(&__shim_waiter.c, &__shim_waiter.m);
+    pthread_mutex_unlock(&__shim_waiter.m);
+}
+
+/* Wake cnt waiters */
+static inline void __wake(volatile void *addr,
+                          int cnt,
+                          int priv)
+{
+    (void)addr; (void)priv;
+
+    pthread_mutex_lock(&__shim_waiter.m);
+    if (cnt <= 1)
+        pthread_cond_signal(&__shim_waiter.c);
+    else
+        pthread_cond_broadcast(&__shim_waiter.c);
+    pthread_mutex_unlock(&__shim_waiter.m);
+}
+
+/* Timed wait (timeout ignored in this shim) */
+static inline int __timedwait(volatile int *addr,
+                              int val,
+                              clockid_t clk,
+                              const struct timespec *ts,
+                              int priv)
+{
+    (void)clk; (void)ts; (void)priv;
+    __wait(addr, NULL, val, priv);
+    return 0;
+}
+
+static inline int __timedwait_cp(volatile int *addr,
+                                 int val,
+                                 clockid_t clk,
+                                 const struct timespec *ts,
+                                 int priv)
+{
+    return __timedwait(addr, val, clk, ts, priv);
+}
+
+/* ------------------------------
+   Misc musl symbols
+   ------------------------------ */
+
+static inline void __membarrier_init(void) { }
+static inline void __dl_thread_cleanup(void) { }
+
+static inline void __unmapself(void *a, size_t s)
+{
+    /* unsupported — no-op */
+}
+
+static inline int __libc_sigaction(int s,
+                                   const struct sigaction *a,
+                                   struct sigaction *o)
+{
+    return sigaction(s, a, o);
+}
+
+/* Provide default (dummy) values */
+static unsigned __default_stacksize = 1 << 20;
+static unsigned __default_guardsize = 4096;
+
+#define DEFAULT_STACK_SIZE  (__default_stacksize)
+#define DEFAULT_GUARD_SIZE  (__default_guardsize)
+
+#endif /* _LIBC_H */
