@@ -92,6 +92,7 @@ extern int	pthread_mutex_destroy(pthread_mutex_t*);
 
 extern int	pthread_cond_init(pthread_cond_t*, pthread_condattr_t*);
 extern int	pthread_cond_wait(pthread_cond_t*, pthread_mutex_t*);
+#define pthread_cond_timedwait(x,y,z) pthread_cond_wait(x,y)
 extern int	pthread_cond_signal(pthread_cond_t*);
 extern int	pthread_cond_broadcast(pthread_cond_t*);
 extern int	pthread_cond_destroy(pthread_cond_t*);
