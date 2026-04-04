@@ -97,6 +97,25 @@ extern int sigprocmask(int, sigset_t *, sigset_t *);
 extern int sigpending(sigset_t *);
 extern int sigsuspend(const sigset_t *);
 
+#include <pthread.h>
+struct sigevent {
+	int             sigev_notify;  /* Notification type */
+	int             sigev_signo;   /* Signal number */
+	union sigval    sigev_value;   /* Data passed with notification */
+
+	typeof(void (union sigval))  *sigev_notify_function;
+                                          /* Notification function
+                                             (SIGEV_THREAD) */
+	pthread_attr_t *sigev_notify_attributes;
+                                          /* Notification attributes */
+};
+
+union sigval {                     /* Data passed with notification */
+	int             sival_int;     /* Integer value */
+	void           *sival_ptr;     /* Pointer value */
+};
+
+
 #ifdef __cplusplus
 }
 #endif
