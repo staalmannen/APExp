@@ -369,4 +369,6 @@ static unsigned __default_guardsize = 4096;
 #define DEFAULT_STACK_SIZE  (__default_stacksize)
 #define DEFAULT_GUARD_SIZE  (__default_guardsize)
 
+#include "musl.h"
+
 #endif /* _LIBC_H */
