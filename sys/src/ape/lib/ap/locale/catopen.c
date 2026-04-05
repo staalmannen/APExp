@@ -8,6 +8,7 @@
 #include <locale.h>
 #include <sys/mman.h>
 #include "../include/musl.h"
+#include <limits.h>
 
 #define V(p) be32toh(*(uint32_t *)(p))
 

@@ -10,7 +10,7 @@
 #include <sys/types.h>
 
 /* Include musl-compatible stdio internal definitions */
-#include "/sys/src/ape/lib/ap/include/stdio_impl.h"
+#include "stdio_impl.h"
 
 /* FILE is now the musl struct _IO_FILE */
 typedef struct _IO_FILE FILE;
@@ -75,7 +75,7 @@ extern int fclose(FILE *);
 extern int fflush(FILE *);
 extern FILE *fopen(const char *, const char *);
 extern FILE *freopen(const char *, const char *, FILE *);
-extern void setbuf(FILE *, char *);
+extern int setbuf(FILE *, char *);
 extern int setvbuf(FILE *, char *, int, size_t);
 extern int fprintf(FILE *, const char *, ...);
 extern int fscanf(FILE *, const char *, ...);
@@ -112,6 +112,8 @@ extern long ftell(FILE *);
 extern off_t ftello(FILE *);
 extern void rewind(FILE *);
 extern void clearerr(FILE *);
+
+
 extern int feof(FILE *);
 extern int ferror(FILE *);
 extern void perror(const char *);

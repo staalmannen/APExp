@@ -1,10 +1,10 @@
 #include <sys/mman.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include "../plan9/syscall.h"
+#include "../include/syscall.h"
 
-#define __mmap mmap
-#define __fstat fstat
+//#define __mmap mmap
+//#define __fstat fstat
 
 const char unsigned *__map_file(const char *pathname, size_t *size)
 {

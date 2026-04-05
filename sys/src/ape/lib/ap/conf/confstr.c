@@ -20,7 +20,7 @@ confstr(int name, char *buf, size_t len)
 
 	switch(name){
 	case _CS_PATH:
-		val = "/bin:/usr/bin";
+		val = "/bin:.";
 		break;
 	default:
 		/* not defined: return 0 with no error per POSIX */

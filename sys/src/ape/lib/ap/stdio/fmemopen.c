@@ -1,4 +1,4 @@
-#include "../include/stdio_impl.h"
+#include "stdio_impl.h"
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
@@ -13,12 +13,12 @@ struct cookie {
 };
 
 struct mem_FILE {
-	_MUSL_FILE f;
+	FILE f;
 	struct cookie c;
 	unsigned char buf[UNGET+BUFSIZ], buf2[];
 };
 
-static off_t mseek(_MUSL_FILE *f, off_t off, int whence)
+static off_t mseek(FILE *f, off_t off, int whence)
 {
 	ssize_t base;
 	struct cookie *c = f->cookie;
@@ -37,7 +37,7 @@ static off_t mseek(_MUSL_FILE *f, off_t off, int whence)
 	return c->pos = base+off;
 }
 
-static size_t mread(_MUSL_FILE *f, unsigned char *buf, size_t len)
+static size_t mread(FILE *f, unsigned char *buf, size_t len)
 {
 	struct cookie *c = f->cookie;
 	size_t rem = c->len - c->pos;
@@ -57,7 +57,7 @@ static size_t mread(_MUSL_FILE *f, unsigned char *buf, size_t len)
 	return len;
 }
 
-static size_t mwrite(_MUSL_FILE *f, const unsigned char *buf, size_t len)
+static size_t mwrite(FILE *f, const unsigned char *buf, size_t len)
 {
 	struct cookie *c = f->cookie;
 	size_t rem;
@@ -79,7 +79,7 @@ static size_t mwrite(_MUSL_FILE *f, const unsigned char *buf, size_t len)
 	return len;
 }
 
-static int mclose(_MUSL_FILE *m)
+static int mclose(FILE *m)
 {
 	return 0;
 }
@@ -87,7 +87,7 @@ static int mclose(_MUSL_FILE *m)
 FILE *fmemopen(void *restrict buf, size_t size, const char *restrict mode)
 {
 	struct mem_FILE *f;
-	_MUSL_FILE *mf;
+	FILE *mf;
 	int plus = !!strchr(mode, '+');
 	
 	if (!strchr("rwa", *mode)) {
@@ -126,8 +126,6 @@ FILE *fmemopen(void *restrict buf, size_t size, const char *restrict mode)
 	f->f.write = mwrite;
 	f->f.seek = mseek;
 	f->f.close = mclose;
-
-	if (!libc.threaded) f->f.lock = -1;
 
 	mf = __ofl_add(&f->f);
 	return (FILE *)mf;

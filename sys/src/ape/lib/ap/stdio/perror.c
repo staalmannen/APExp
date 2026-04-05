@@ -3,6 +3,7 @@
  */
 #include "iolib.h"
 #include <errno.h>
+#include <string.h>
 
 void perror(const char *s){
 	if(s!=NULL && *s != '\0') fputs(s, stderr), fputs(": ", stderr);

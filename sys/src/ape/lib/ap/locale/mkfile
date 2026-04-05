@@ -18,7 +18,7 @@ OFILES=\
 	iconv.$O\
 	iconv_close.$O\
 	langinfo.$O\
-	locale_map.$O\
+#	locale_map.$O\
 	localeconv.$O\
 	newlocale.$O\
 	pleval.$O\
