@@ -1,5 +1,7 @@
 #include <wchar.h>
 
+#undef wcsrchr
+
 wchar_t *wcsrchr(const wchar_t *s, wchar_t c)
 {
 	const wchar_t *p;

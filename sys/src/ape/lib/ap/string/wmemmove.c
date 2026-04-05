@@ -1,6 +1,8 @@
 #include <wchar.h>
 #include <stdint.h>
 
+#undef wmemmove
+
 wchar_t *wmemmove(wchar_t *d, const wchar_t *s, size_t n)
 {
 	wchar_t *d0 = d;

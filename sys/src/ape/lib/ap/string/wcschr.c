@@ -1,5 +1,7 @@
 #include <wchar.h>
 
+#undef wcschr
+
 wchar_t *wcschr(const wchar_t *s, wchar_t c)
 {
 	if (!c) return (wchar_t *)s + wcslen(s);

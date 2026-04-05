@@ -1,5 +1,7 @@
 #include <wchar.h>
 
+#undef wcspbrk
+
 wchar_t *wcspbrk(const wchar_t *s, const wchar_t *b)
 {
 	s += wcscspn(s, b);

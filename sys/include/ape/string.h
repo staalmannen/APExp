@@ -45,6 +45,7 @@ extern char *strchrnul(const char*, int);
 #define __strchrnul strchrnul
 extern int strerror_r(int, char *, size_t);
 
+
 void *memmem(const void *, size_t, const void *, size_t);
 void *memrchr(const void *, int, size_t);
 char *stpcpy(char *, const char *);
@@ -57,6 +58,11 @@ void *mempcpy(void *, const void *, size_t);
 size_t strlcat(char *, const char *, size_t);
 #define estrlcat strlcat
 #define xstrlcat strlcat
+
+#include <wchar.h>
+extern size_t wcsnlen(const wchar_t *, size_t);
+extern int wcscasecmp(const wchar_t *, const wchar_t *);
+extern int wcsncasecmp(const wchar_t *, const wchar_t *, size_t);
 
 
 #ifdef __cplusplus

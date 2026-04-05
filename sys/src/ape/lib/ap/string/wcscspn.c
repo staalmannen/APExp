@@ -1,5 +1,7 @@
 #include <wchar.h>
 
+#undef wcscspn
+
 size_t wcscspn(const wchar_t *s, const wchar_t *c)
 {
 	const wchar_t *a;

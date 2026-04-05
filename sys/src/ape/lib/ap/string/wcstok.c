@@ -1,5 +1,7 @@
 #include <wchar.h>
 
+#undef wcstok
+
 wchar_t *wcstok(wchar_t *restrict s, const wchar_t *restrict sep, wchar_t **restrict p)
 {
 	if (!s && !(s = *p)) return NULL;
