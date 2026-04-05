@@ -57,6 +57,18 @@ OFILES=\
 	vsprintf.$O\
 	vsnprintf.$O\
 # musl \
+	__fdopen.$O\
+	__overflow.$O\
+	__toread.$O\
+	__uflow.$O\
+	__stdio_read.$O\
+	__stdio_write.$O\
+	__stdio_seek.$O\
+	__stdio_close.$O\
+	__stdio_exit.$O\
+	ofl.$O\
+	ofl_add.$O\
+	open_memstream.$O\
 	asprintf.$O\
 	vasprintf.$O\
 	fmemopen.$O\
