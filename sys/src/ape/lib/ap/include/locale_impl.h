@@ -47,7 +47,8 @@ char *__gettextdomain(void);
 
 #define LC_GLOBAL_LOCALE UTF8_LOCALE
 
+//always UTF-8
 #undef MB_CUR_MAX
-#define MB_CUR_MAX (CURRENT_UTF8 ? 4 : 1)
+#define MB_CUR_MAX (4)
 
 #endif

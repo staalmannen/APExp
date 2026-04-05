@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "internal.h"
 
+#undef wctob
+
 int wctob(wint_t c)
 {
 	if (c < 128U) return c;

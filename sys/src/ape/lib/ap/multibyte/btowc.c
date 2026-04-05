@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include "internal.h"
 
+#undef btowc
+
 wint_t btowc(int c)
 {
 	int b = (unsigned char)c;

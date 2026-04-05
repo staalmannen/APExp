@@ -64,6 +64,8 @@ OFILES=\
 	wctob.$O\
 	wctomb.$O\
 
+# TODO : hunt down some duplicate text symbols. not obvious via grep
+
 HFILES=\
 	$APEXPROOT/sys/include/ape/utf.h\
 
