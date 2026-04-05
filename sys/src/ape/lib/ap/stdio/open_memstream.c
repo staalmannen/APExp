@@ -15,12 +15,12 @@ struct cookie {
 };
 
 struct ms_FILE {
-	_MUSL_FILE f;
+	FILE f;
 	struct cookie c;
 	unsigned char buf[BUFSIZ];
 };
 
-static off_t ms_seek(_MUSL_FILE *f, off_t off, int whence)
+static off_t ms_seek(FILE *f, off_t off, int whence)
 {
 	ssize_t base;
 	struct cookie *c = f->cookie;
@@ -39,7 +39,7 @@ static off_t ms_seek(_MUSL_FILE *f, off_t off, int whence)
 	return c->pos = base+off;
 }
 
-static size_t ms_write(_MUSL_FILE *f, const unsigned char *buf, size_t len)
+static size_t ms_write(FILE *f, const unsigned char *buf, size_t len)
 {
 	struct cookie *c = f->cookie;
 	size_t len2 = f->wpos - f->wbase;
@@ -63,7 +63,7 @@ static size_t ms_write(_MUSL_FILE *f, const unsigned char *buf, size_t len)
 	return len;
 }
 
-static int ms_close(_MUSL_FILE *f)
+static int ms_close(FILE *f)
 {
 	return 0;
 }
@@ -71,7 +71,7 @@ static int ms_close(_MUSL_FILE *f)
 FILE *open_memstream(char **bufp, size_t *sizep)
 {
 	struct ms_FILE *f;
-	_MUSL_FILE *mf;
+	FILE *mf;
 	char *buf;
 
 	if (!(f=malloc(sizeof *f))) return 0;
@@ -98,8 +98,6 @@ FILE *open_memstream(char **bufp, size_t *sizep)
 	f->f.seek = ms_seek;
 	f->f.close = ms_close;
 	f->f.mode = -1;
-
-	if (!libc.threaded) f->f.lock = -1;
 
 	mf = __ofl_add(&f->f);
 	return (FILE *)mf;
