@@ -6,7 +6,6 @@
 #include <limits.h>
 #include "glue.h"
 
-__attribute__((__visibility__("hidden")))
 extern const uint16_t size_classes[];
 
 #define MMAP_THRESHOLD 131052
@@ -57,7 +56,6 @@ struct malloc_context {
 	uintptr_t brk;
 };
 
-__attribute__((__visibility__("hidden")))
 extern struct malloc_context ctx;
 
 #ifdef PAGESIZE
@@ -66,10 +64,8 @@ extern struct malloc_context ctx;
 #define PGSZ ctx.pagesize
 #endif
 
-__attribute__((__visibility__("hidden")))
 struct meta *alloc_meta(void);
 
-__attribute__((__visibility__("hidden")))
 int is_allzero(void *);
 
 static inline void queue(struct meta **phead, struct meta *m)

@@ -12,10 +12,10 @@
 #include "lock.h"
 #include "fork_impl.h"
 
-#define malloc __libc_malloc
+/* #define malloc __libc_malloc
 #define calloc __libc_calloc
 #define realloc undef
-#define free undef
+#define free undef */
 
 struct binding {
 	struct binding *next;
@@ -39,6 +39,9 @@ static char *gettextdir(const char *domainname, size_t *dirlen)
 	}
 	return 0;
 }
+
+// we have a name conflict with atomic.h
+#define lock gettext_lock
 
 static volatile int lock[1];
 volatile int *const __gettext_lockptr = lock;

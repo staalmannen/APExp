@@ -287,6 +287,13 @@ static inline int a_clz_64(uint64_t x)
 	return a_clz_32(x) + 32;
 }
 
+static inline void a_store(volatile int *p, int v)
+{
+	a_barrier();
+	*p = v;
+	a_barrier();
+}
+
 
 
 #endif /* ATOMIC_H */

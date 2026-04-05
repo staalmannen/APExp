@@ -7,10 +7,15 @@
 #include "lock.h"
 #include "fork_impl.h"
 
-#define malloc __libc_malloc
+/* #define malloc __libc_malloc
 #define calloc undef
 #define realloc undef
-#define free undef
+#define free undef */
+
+#define __mmap mmap
+#define __munmap munmap
+#define __fstat fstat
+extern const char unsigned *__map_file(const char *, size_t *);
 
 const char *__lctrans_impl(const char *msg, const struct __locale_map *lm)
 {
@@ -63,7 +68,7 @@ const struct __locale_map *__get_locale(int cat, const char *val)
 	for (p=loc_head; p; p=p->next)
 		if (!strcmp(val, p->name)) return p;
 
-	if (!libc.secure) path = getenv("MUSL_LOCPATH");
+	getenv("MUSL_LOCPATH");
 	/* FIXME: add a default path? */
 
 	if (path) for (; *path; path=z+!!*z) {
@@ -111,3 +116,5 @@ const struct __locale_map *__get_locale(int cat, const char *val)
 
 	return new;
 }
+
+
