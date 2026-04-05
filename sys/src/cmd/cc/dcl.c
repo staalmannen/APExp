@@ -114,9 +114,16 @@ compoundlit(Type *t, Node *initnode)
 	}
 
 	if(init != Z) {
-		seq          = new(OCOMMA, init, var);
-		seq->type    = t;
-//		seq->addable = 1;	/* compound literal is an lvalue (C99 §6.5.2.5p4) */
+		seq       = new(OCOMMA, init, var);
+		seq->type = t;
+		/*
+		 * Mark the OCOMMA as an lvalue for scalar/pointer compound literals
+		 * so that &(type){...} is addressable (C99 §6.5.2.5p4).
+		 * Not set for struct/union/complex types — those go through sugen()
+		 * and must not be treated as register-loadable by cgen().
+		 */
+		if(!iscmplx(t->etype) && !typesu[t->etype])
+			seq->addable = 1;
 		return seq;
 	}
 	return var;

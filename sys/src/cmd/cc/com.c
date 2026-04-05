@@ -620,7 +620,17 @@ tcomo(Node *n, int f)
 		if(o | tcom(r))
 			goto bad;
 		n->type = r->type;
-//		n->addable = r->addable;	/* compound literal lvalue: propagate addressability */
+		/*
+		 * Propagate lvalue-ness from the right child to the OCOMMA node
+		 * so that &(type){...} compound literals are addressable (C99 §6.5.2.5p4).
+		 * Guard: only for scalar/pointer types.  Complex and struct/union OCOMMA
+		 * nodes (built by cmplx.c) must NOT be marked addable — they are handled
+		 * by sugen(), not cgen(), and marking them addable causes "unknown type in
+		 * regalloc" errors when cgen tries to load them into a register.
+		 */
+		if(r->addable && n->type != T
+		&& !iscmplx(n->type->etype) && !typesu[n->type->etype])
+			n->addable = 1;
 		break;
 
 	case OINIT:		/* compound literal initialiser */
