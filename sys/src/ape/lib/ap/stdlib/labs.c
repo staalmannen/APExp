@@ -1,6 +1,10 @@
 #include <stdlib.h>
 
-long labs(long a)
+long
+labs(long a)
 {
-	return a>0 ? a : -a;
+	if(a < 0)
+		return -a;
+	return a;
 }
+

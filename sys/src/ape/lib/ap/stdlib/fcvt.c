@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
+extern char *ecvt(double, int, int *, int *);
+
 char *fcvt(double x, int n, int *dp, int *sign)
 {
 	char tmp[1500];
