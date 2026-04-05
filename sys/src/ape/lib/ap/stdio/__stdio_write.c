@@ -1,39 +1,50 @@
 #include "stdio_impl.h"
-#include <sys/uio.h>
+#include <unistd.h>
+#include <errno.h>
+#include <string.h>
 
 size_t __stdio_write(FILE *f, const unsigned char *buf, size_t len)
 {
-	struct iovec iovs[2] = {
-		{ .iov_base = f->wbase, .iov_len = f->wpos-f->wbase },
-		{ .iov_base = (void *)buf, .iov_len = len }
-	};
-	struct iovec *iov = iovs;
-	size_t rem = iov[0].iov_len + iov[1].iov_len;
-	int iovcnt = 2;
 	ssize_t cnt;
+	size_t written = 0;
 
-	if (!iov->iov_len) {
-		iov++;
-		iovcnt--;
-	}
-	for (;;) {
-		cnt = syscall(SYS_writev, f->fd, iov, iovcnt);
-		if (cnt == rem) {
-			f->wend = f->buf + f->buf_size;
-			f->wpos = f->wbase = f->buf;
-			return len;
-		}
+	/* First, flush any pending data in write buffer */
+	if (f->wpos > f->wbase) {
+		size_t to_write = f->wpos - f->wbase;
+		cnt = write(f->fd, f->wbase, to_write);
 		if (cnt < 0) {
-			f->wpos = f->wbase = f->wend = 0;
 			f->flags |= F_ERR;
-			return iovcnt == 2 ? 0 : len-iov[0].iov_len;
+			f->wpos = f->wbase = f->wend = f->buf;
+			return 0;
 		}
-		rem -= cnt;
-		if (cnt > iov[0].iov_len) {
-			cnt -= iov[0].iov_len;
-			iov++; iovcnt--;
-		}
-		iov[0].iov_base = (char *)iov[0].iov_base + cnt;
-		iov[0].iov_len -= cnt;
+		/* If partial write, we have a problem - just clear buffer */
+		f->wpos = f->wbase = f->buf;
+		f->wend = f->buf + f->buf_size;
 	}
+
+	/* Now write the new data */
+	if (len > 0) {
+		cnt = write(f->fd, buf, len);
+		if (cnt < 0) {
+			f->flags |= F_ERR;
+			f->wpos = f->wbase = f->wend = f->buf;
+			return 0;
+		}
+		written = (size_t)cnt;
+
+		/* If partial write, move remainder to buffer */
+		if (written < len) {
+			size_t remaining = len - written;
+			memcpy(f->wpos, buf + written, remaining);
+			f->wpos += remaining;
+		}
+	}
+
+	/* Reset buffer pointers on success */
+	if (f->wpos == f->wbase) {
+		f->wend = f->buf + f->buf_size;
+	}
+
+	return len;
 }
+

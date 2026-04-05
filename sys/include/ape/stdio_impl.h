@@ -50,7 +50,7 @@ struct _IO_FILE {
 	int pipe_pid;
 	long lockcount;
 	int mode;
-	volatile int lock;
+	volatile intptr_t lock;
 	int lbf;
 	void *cookie;
 	off_t off;

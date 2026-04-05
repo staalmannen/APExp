@@ -1,4 +1,3 @@
-#include <stdint.h>
 #include "stdio_impl.h"
 #include <stdlib.h>
 #include <fcntl.h>
@@ -6,6 +5,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <stdint.h>
 
 FILE *__fdopen(int fd, const char *mode)
 {
@@ -37,7 +37,6 @@ FILE *__fdopen(int fd, const char *mode)
 
 	/* Line buffering - simplified for Plan 9 (no TIOCGWINSZ) */
 	f->lbf = EOF;
-	/* Could add isatty() check here if needed for terminals */
 
 	/* Initialize operation pointers */
 	f->read = __stdio_read;
@@ -46,7 +45,6 @@ FILE *__fdopen(int fd, const char *mode)
 	f->close = __stdio_close;
 
 	/* Initialize pthread mutex for the lock field */
-	/* The lock field is interpreted as a pthread_mutex_t* when >= 0 */
 	lock = malloc(sizeof(pthread_mutex_t));
 	if (!lock) {
 		free(f);
@@ -61,8 +59,8 @@ FILE *__fdopen(int fd, const char *mode)
 		return NULL;
 	}
 
-	/* Store pointer as int (assumes pointer fits in int) */
-	f->lock = (int)(intptr_t)lock;
+	/* Store pointer as intptr_t */
+	f->lock = (intptr_t)lock;
 
 	/* Add to open file list */
 	return __ofl_add(f);
