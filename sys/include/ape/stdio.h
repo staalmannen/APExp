@@ -8,38 +8,26 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <sys/types.h>
-/*
- * According to X3J11, there is only one i/o buffer
- * and it must not be occupied by both input and output data.
- *	If rp<wp, we must have state==RD and
- *	if wp<rp, we must have state==WR, so that getc and putc work correctly.
- *	On open, rp, wp and buf are set to 0, so first getc or putc will call _IO_getc
- *	or _IO_putc, which will allocate the buffer.
- *	If setvbuf(., ., _IONBF, .) is called, bufl is set to 0 and
- *	buf, rp and wp are pointed at unbuf.
- *	If setvbuf(., ., _IOLBF, .) is called, _IO_putc leaves wp and rp pointed at the
- *	end of the buffer so that it can be called on each putc to check whether it's got
- *	a newline.  This nonsense is in order to avoid impacting performance of the other
- *	buffering modes more than necessary -- putting the test in putc adds many
- *	instructions that are wasted in non-_IOLBF mode:
- *	#define putc(c, f)	(_IO_ctmp=(c),\
- *				(f)->wp>=(f)->rp || (f)->flags&LINEBUF && _IO_ctmp=='\n'\
- *					?_IO_putc(_IO_ctmp, f)\
- *					:*(f)->wp++=_IO_ctmp)
- *				
- */
-typedef struct{
-	int fd;		/* UNIX file pointer */
-	char flags;	/* bits for must free buffer on close, line-buffered */
-	char state;	/* last operation was read, write, position, error, eof */
-	char *buf;	/* pointer to i/o buffer */
-	char *rp;	/* read pointer (or write end-of-buffer) */
-	char *wp;	/* write pointer (or read end-of-buffer) */
-	char *lp;	/* actual write pointer used when line-buffering */
-	size_t bufl;	/* actual length of buffer */
-	char unbuf[1];	/* tiny buffer for unbuffered io (used for ungetc?) */
-}FILE;
 
+/* Include musl-compatible stdio internal definitions */
+#include "/sys/src/ape/lib/ap/include/stdio_impl.h"
+
+/* FILE is now the musl struct _IO_FILE */
+typedef struct _IO_FILE FILE;
+
+/* Legacy APE FILE struct - kept for reference only, will be removed */
+/* typedef struct{
+ *	int fd;
+ *	char flags;
+ *	char state;
+ *	char *buf;
+ *	char *rp;
+ *	char *wp;
+ *	char *lp;
+ *	size_t bufl;
+ *	char unbuf[1];
+ *}APE_FILE;
+ */
 
 typedef long long fpos_t;
 #ifndef NULL
@@ -49,6 +37,7 @@ typedef long long fpos_t;
 #define NULL ((void*)0)
 #endif
 #endif
+
 /*
  * Third arg of setvbuf
  */
@@ -66,9 +55,12 @@ typedef long long fpos_t;
 #define	SEEK_END	2
 #define	SEEK_SET	0
 #define	TMP_MAX		64		/* very hard to set correctly */
-#define	stderr	(&_IO_stream[2])
-#define	stdin	(&_IO_stream[0])
-#define	stdout	(&_IO_stream[1])
+
+/* stdin, stdout, stderr are now extern pointers to static FILE objects in stdio.c */
+extern FILE *stdin;
+extern FILE *stdout;
+extern FILE *stderr;
+
 #define	_IO_CHMASK	0377		/* mask for 8 bit characters */
 
 #ifdef __cplusplus
@@ -102,14 +94,10 @@ extern char *fgets(char *, int, FILE *);
 extern int fputc(int, FILE *);
 extern int fputs(const char *, FILE *);
 extern int getc(FILE *);
-#define	getc(f)	((f)->rp>=(f)->wp?_IO_getc(f):*(f)->rp++&_IO_CHMASK)
-extern int _IO_getc(FILE *f);
 extern int getchar(void);
 #define	getchar()	getc(stdin)
 extern char *gets(char *);
 extern int putc(int, FILE *);
-#define	putc(c, f) ((f)->wp>=(f)->rp?_IO_putc(c, f):(int)(*(unsigned char*)(f)->wp++=(c)&_IO_CHMASK))
-extern int _IO_putc(int, FILE *);
 extern int putchar(int);
 #define	putchar(c)	putc(c, stdout)
 extern int puts(const char *);
@@ -127,7 +115,6 @@ extern void clearerr(FILE *);
 extern int feof(FILE *);
 extern int ferror(FILE *);
 extern void perror(const char *);
-extern FILE _IO_stream[FOPEN_MAX];
 
 extern int fileno(FILE *);
 extern FILE* fdopen(int, const char*);
@@ -139,9 +126,7 @@ extern char *ctermid_r(char *);
 extern FILE *popen(char *, char *);
 extern int	pclose(FILE *);
 
-
 /* from musl libc */
-
 extern int asprintf(char**, const char *, ...);
 extern int vasprintf(char **, const char *, va_list);
 
@@ -153,7 +138,6 @@ extern ssize_t getline (char **, size_t *, FILE *);
 
 extern int dprintf(int, const char *, ...);
 extern int vdprintf(int, const char *, va_list);
-
 
 #ifdef __cplusplus
 }

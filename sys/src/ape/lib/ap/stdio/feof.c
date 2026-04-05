@@ -1,7 +1,6 @@
-/*
- * pANS stdio -- feof
- */
-#include "iolib.h"
+#include "stdio_impl.h"
+
 int feof(FILE *f){
-	return f->state==END;
+	return f->flags & F_EOF;
 }
+

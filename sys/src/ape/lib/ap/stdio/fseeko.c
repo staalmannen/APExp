@@ -1,24 +1,39 @@
-/*
- * pANS stdio -- fseeko
- */
-#include "iolib.h"
+#include "stdio_impl.h"
+#include <errno.h>
+
 int fseeko(FILE *f, off_t offs, int type){
-	switch(f->state){
-	case ERR:
-	case CLOSED:
+	off_t ret;
+
+	FLOCK(f);
+
+	if (f->fd < 0) {
+		FUNLOCK(f);
 		return -1;
-	case WR:
-		fflush(f);
-		break;
-	case RD:
-		if(type==1 && f->buf!=f->unbuf)
-			offs-=f->wp-f->rp;
-		break;
 	}
-	if(f->flags&STRING || lseek(f->fd, offs, type)==-1)
+
+	/* Flush write buffer if needed */
+	if (f->wpos > f->wbase) {
+		if (f->write(f, (unsigned char *)f->wbase, f->wpos - f->wbase)
+			!= (size_t)(f->wpos - f->wbase)) {
+			f->flags |= F_ERR;
+			FUNLOCK(f);
+			return -1;
+		}
+	}
+
+	/* Seek to position */
+	ret = lseek(f->fd, offs, type);
+	if (ret < 0) {
+		f->flags |= F_ERR;
+		FUNLOCK(f);
 		return -1;
-	if(f->state==RD) f->rp=f->wp=f->buf;
-	if(f->state!=OPEN)
-		f->state=RDWR;
+	}
+
+	/* Clear read buffer on successful seek */
+	f->rpos = f->rend = 0;
+	f->flags &= ~(F_EOF | F_ERR);
+
+	FUNLOCK(f);
 	return 0;
 }
+

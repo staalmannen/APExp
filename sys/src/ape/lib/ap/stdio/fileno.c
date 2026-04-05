@@ -1,10 +1,6 @@
-/*
- * Posix stdio -- fileno
- */
-#include "iolib.h"
+#include "stdio_impl.h"
+
 int fileno(FILE *f){
-	if(f==NULL)
-		return -1;
-	else
-		return f->fd;
+	return f->fd;
 }
+

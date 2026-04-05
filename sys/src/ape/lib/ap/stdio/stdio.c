@@ -1,10 +1,53 @@
-/*
- * pANS stdio -- data
- */
-#include "iolib.h"
-FILE _IO_stream[]={
-/*	fd	flags	state	buf	rp	wp	lp	bufl	unbuf */
-	0,	0,	OPEN,	0,	0,	0,	0,	0,	0,
-	1,	0,	OPEN,	0,	0,	0,	0,	0,	0,
-	2,	0,	OPEN,	0,	0,	0,	0,	0,	0,
+#include "stdio_impl.h"
+#include <pthread.h>
+#include <sys/ioctl.h>
+#include <unistd.h>
+
+static struct _IO_FILE stdin_file = {
+	.fd = 0,
+	.flags = 0,
+	.rpos = NULL, .rend = NULL,
+	.wpos = NULL, .wend = NULL, .wbase = NULL,
+	.buf = NULL, .buf_size = BUFSIZ,
+	.read = __stdio_read,
+	.write = __stdio_write,
+	.seek = __stdio_seek,
+	.close = __stdio_close,
+	.lock = PTHREAD_MUTEX_INITIALIZER,
+	.lbf = EOF,
 };
+
+static struct _IO_FILE stdout_file = {
+	.fd = 1,
+	.flags = 0,
+	.rpos = NULL, .rend = NULL,
+	.wpos = NULL, .wend = NULL, .wbase = NULL,
+	.buf = NULL, .buf_size = BUFSIZ,
+	.read = __stdio_read,
+	.write = __stdio_write,
+	.seek = __stdio_seek,
+	.close = __stdio_close,
+	.lock = PTHREAD_MUTEX_INITIALIZER,
+	.lbf = '\n',
+};
+
+static struct _IO_FILE stderr_file = {
+	.fd = 2,
+	.flags = F_NOWR,
+	.rpos = NULL, .rend = NULL,
+	.wpos = NULL, .wend = NULL, .wbase = NULL,
+	.buf = NULL, .buf_size = BUFSIZ,
+	.read = __stdio_read,
+	.write = __stdio_write,
+	.seek = __stdio_seek,
+	.close = __stdio_close,
+	.lock = PTHREAD_MUTEX_INITIALIZER,
+	.lbf = EOF,
+};
+
+
+
+
+FILE *const stdin = &stdin_file;
+FILE *const stdout = &stdout_file;
+FILE *const stderr = &stderr_file;

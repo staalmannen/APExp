@@ -1,17 +1,14 @@
-/*
- * pANS stdio -- sprintf
- */
-#include "iolib.h"
+#include "stdio_impl.h"
+
 int sprintf(char *buf, const char *fmt, ...){
 	int n;
 	va_list args;
-	FILE *f=_IO_sopenw();
-	if(f==NULL)
-		return 0;
-	setvbuf(f, buf, _IOFBF, 100000);
+
 	va_start(args, fmt);
-	n=vfprintf(f, fmt, args);
+	n=vsnprintf(buf, 2147483647, fmt, args);
 	va_end(args);
-	_IO_sclose(f);
+
 	return n;
 }
+
+

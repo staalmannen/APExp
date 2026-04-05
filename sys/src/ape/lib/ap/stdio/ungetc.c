@@ -1,33 +1,27 @@
-/*
- * pANS stdio -- ungetc
- */
-#include "iolib.h"
+#include "stdio_impl.h"
+
 int ungetc(int c, FILE *f){
 	if(c==EOF) return EOF;
-	switch(f->state){
-	default:	/* WR */
-		f->state=ERR;
+
+	FLOCK(f);
+
+	/* Ensure we're in read mode */
+	if (__toread(f)) {
+		FUNLOCK(f);
 		return EOF;
-	case CLOSED:
-	case ERR:
-		return EOF;
-	case OPEN:
-		_IO_setvbuf(f);
-	case RDWR:
-	case END:
-		f->wp=f->buf;
-		if(f->bufl==0)
-			f->wp += 1;
-		else
-			f->wp += f->bufl;
-		f->rp = f->wp;
-		f->state=RD;
-	case RD:
-		if(f->rp==f->buf) return EOF;
-		if(f->flags&STRING)
-			f->rp--;
-		else
-			*--f->rp=c;
-		return (char)c;
 	}
+
+	/* ungetc requires a read buffer; ensure one exists */
+	if (!f->buf || f->rpos <= f->buf) {
+		FUNLOCK(f);
+		return EOF;
+	}
+
+	/* Decrement read pointer and store character */
+	*--f->rpos = (unsigned char)c;
+	f->flags &= ~F_EOF; /* Clear EOF flag on ungetc */
+
+	FUNLOCK(f);
+	return (unsigned char)c;
 }
+

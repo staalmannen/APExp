@@ -1,14 +1,8 @@
-/*
- * pANS stdio -- clearerr
- */
-#include "iolib.h"
+#include "stdio_impl.h"
+
 void clearerr(FILE *f){
-	switch(f->state){
-	case ERR:
-		f->state=f->buf?RDWR:OPEN;
-		break;
-	case END:
-		f->state=RDWR;
-		break;
-	}
+	FLOCK(f);
+	f->flags &= ~(F_EOF | F_ERR);
+	FUNLOCK(f);
 }
+

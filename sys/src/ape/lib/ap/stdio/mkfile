@@ -3,9 +3,6 @@ APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
-	_IO_newfile.$O\
-	_IO_getc.$O\
-	_IO_putc.$O\
 	_dtoa.$O\
 	_fconv.$O\
 	clearerr.$O\
@@ -45,13 +42,10 @@ OFILES=\
 	remove.$O\
 	rewind.$O\
 	scanf.$O\
-	sclose.$O\
 	setbuf.$O\
 	setlinebuf.$O\
 	setvbuf.$O\
 	snprintf.$O\
-	sopenr.$O\
-	sopenw.$O\
 	sprintf.$O\
 	sscanf.$O\
 	stdio.$O\
@@ -67,7 +61,9 @@ OFILES=\
 	vasprintf.$O\
 	fmemopen.$O\
 	getdelim.$O\
-# hacks \
+# hacks and de novo vibe code\
+	__fmodeflags.$O\
+	__fwritex.$O\
 	dprintf.$O\
 
 

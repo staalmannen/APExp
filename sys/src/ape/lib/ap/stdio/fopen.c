@@ -1,12 +1,15 @@
-/*
- * pANS stdio -- fopen
- */
-#include "iolib.h"
+#include "stdio_impl.h"
+#include <fcntl.h>
+#include <errno.h>
 
 FILE *fopen(const char *name, const char *mode){
-	FILE *f;
+	int fd;
+	int flags = __fmodeflags(mode);
 
-	if((f = _IO_newfile()) == NULL)
+	fd = open(name, flags, 0666);
+	if (fd < 0)
 		return NULL;
-	return freopen(name, mode, f);
+	return __fdopen(fd, mode);
 }
+
+

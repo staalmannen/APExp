@@ -1,7 +1,6 @@
-/*
- * pANS stdio -- ferror
- */
-#include "iolib.h"
+#include "stdio_impl.h"
+
 int ferror(FILE *f){
-	return f->state==ERR;
+	return f->flags & F_ERR;
 }
+

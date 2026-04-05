@@ -1,46 +1,48 @@
-/*
- * pANS stdio -- fread
- */
-#include "iolib.h"
+#include "stdio_impl.h"
 #include <string.h>
 
-#define BIGN (BUFSIZ/2)
+size_t fread(void *restrict p, size_t recl, size_t nrec, FILE *restrict f){
+	unsigned char *s = (unsigned char *)p;
+	size_t total = recl * nrec;
+	size_t bytes = 0;
 
-size_t fread(void *p, size_t recl, size_t nrec, FILE *f){
-	char *s;
-	int n, d, c;
+	FLOCK(f);
 
-	s=(char *)p;
-	n=recl*nrec;
-	while(n>0 && f->state!=CLOSED){
-		d=f->wp-f->rp;
-		if(d>0){
-			if(d>n)
-				d=n;
-			memcpy(s, f->rp, d);
-			f->rp+=d;
-		}else{
-			if(f->buf==f->unbuf || (n >= BIGN && f->state==RD && !(f->flags&STRING))){
-				d=read(f->fd, s, n);
-				if(d<=0){
-					if(f->state!=CLOSED)
-						f->state=(d==0)?END:ERR;
-					goto ret;
-				}
-			}else{
- 				c=_IO_getc(f);
-				if(c==EOF)
-					goto ret;
-				*s=c;
-				d=1;
+	while (bytes < total) {
+		size_t avail = f->rend - f->rpos;
+		if (avail > 0) {
+			/* Data in read buffer */
+			size_t n = (total - bytes < avail) ? (total - bytes) : avail;
+			memcpy(s + bytes, f->rpos, n);
+			f->rpos += n;
+			bytes += n;
+		} else {
+			/* Need to refill buffer */
+			if (__toread(f)) {
+				/* Cannot transition to read mode */
+				break;
 			}
+
+			/* Read into buffer */
+			size_t n = f->read(f, f->buf, f->buf_size);
+			if (n == 0) {
+				/* EOF */
+				f->flags |= F_EOF;
+				break;
+			}
+			if (n == (size_t)-1) {
+				/* Error */
+				f->flags |= F_ERR;
+				break;
+			}
+
+			f->rpos = f->buf;
+			f->rend = f->buf + n;
 		}
-		s+=d;
-		n-=d;
 	}
-    ret:
-	if(recl)
-		return (s-(char*)p)/recl;
-	else
-		return s-(char*)p;
+
+	FUNLOCK(f);
+
+	return bytes / recl;
 }
+
