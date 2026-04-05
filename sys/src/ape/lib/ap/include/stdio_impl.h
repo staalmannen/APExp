@@ -69,11 +69,25 @@ extern hidden struct _IO_FILE *volatile __stderr_used;
 /* APExp: __lockfile/__unlockfile -- APE has no thread support so these
  * are no-op stubs. The lock field is retained in the struct (layout must
  * match) but will never be contended.
- * Note: __lockfile returns 1 (not 0) so that FUNLOCK actually calls
- * __unlockfile -- matching musl's convention where a nonzero return
- * means "I took the lock and you must release it". */
-static inline int  __lockfile(struct _IO_FILE *f)   { (void)f; return 1; }
-static inline void __unlockfile(struct _IO_FILE *f) { (void)f; }
+ *
+ * UPDATED: Now uses real pthread mutexes for proper thread safety.
+ * Each FILE has its own lock (f->lock is a pthread_mutex_t).
+ * __lockfile returns 1 on success to signal FUNLOCK to call __unlockfile.
+ */
+
+#include <pthread.h>
+
+static inline int __lockfile(struct _IO_FILE *f) {
+	if (f->lock < 0) return 0;
+	if (pthread_mutex_lock((pthread_mutex_t *)&f->lock) != 0)
+		return 0;
+	return 1;
+}
+
+static inline void __unlockfile(struct _IO_FILE *f) {
+	if (f->lock < 0) return;
+	pthread_mutex_unlock((pthread_mutex_t *)&f->lock);
+}
 
 hidden size_t __stdio_read(struct _IO_FILE *, unsigned char *, size_t);
 hidden size_t __stdio_write(struct _IO_FILE *, const unsigned char *, size_t);
