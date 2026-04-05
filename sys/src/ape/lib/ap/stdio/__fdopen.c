@@ -1,61 +1,76 @@
+#include <stdint.h>
 #include "stdio_impl.h"
 #include <stdlib.h>
-#include <sys/ioctl.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
-#include "libc.h"
+#include <unistd.h>
+#include <pthread.h>
 
 FILE *__fdopen(int fd, const char *mode)
 {
 	FILE *f;
-	struct winsize wsz;
+	pthread_mutex_t *lock;
 
 	/* Check for valid initial mode character */
 	if (!strchr("rwa", *mode)) {
 		errno = EINVAL;
-		return 0;
+		return NULL;
 	}
 
-	/* Allocate FILE+buffer or fail */
-	if (!(f=malloc(sizeof *f + UNGET + BUFSIZ))) return 0;
+	/* Allocate FILE+buffer */
+	f = malloc(sizeof(struct _IO_FILE) + UNGET + BUFSIZ);
+	if (!f) return NULL;
 
-	/* Zero-fill only the struct, not the buffer */
-	memset(f, 0, sizeof *f);
+	/* Zero-fill the struct */
+	memset(f, 0, sizeof(struct _IO_FILE));
 
 	/* Impose mode restrictions */
-	if (!strchr(mode, '+')) f->flags = (*mode == 'r') ? F_NOWR : F_NORD;
-
-	/* Apply close-on-exec flag */
-	if (strchr(mode, 'e')) __syscall(SYS_fcntl, fd, F_SETFD, FD_CLOEXEC);
-
-	/* Set append mode on fd if opened for append */
-	if (*mode == 'a') {
-		int flags = __syscall(SYS_fcntl, fd, F_GETFL);
-		if (!(flags & O_APPEND))
-			__syscall(SYS_fcntl, fd, F_SETFL, flags | O_APPEND);
-		f->flags |= F_APP;
+	if (!strchr(mode, '+')) {
+		f->flags = (*mode == 'r') ? F_NOWR : F_NORD;
 	}
 
+	/* Initialize fd and buffer */
 	f->fd = fd;
-	f->buf = (unsigned char *)f + sizeof *f + UNGET;
+	f->buf = (unsigned char *)f + sizeof(struct _IO_FILE) + UNGET;
 	f->buf_size = BUFSIZ;
 
-	/* Activate line buffered mode for terminals */
+	/* Line buffering - simplified for Plan 9 (no TIOCGWINSZ) */
 	f->lbf = EOF;
-	if (!(f->flags & F_NOWR) && !__syscall(SYS_ioctl, fd, TIOCGWINSZ, &wsz))
-		f->lbf = '\n';
+	/* Could add isatty() check here if needed for terminals */
 
-	/* Initialize op ptrs. No problem if some are unneeded. */
+	/* Initialize operation pointers */
 	f->read = __stdio_read;
 	f->write = __stdio_write;
 	f->seek = __stdio_seek;
 	f->close = __stdio_close;
 
-	if (!libc.threaded) f->lock = -1;
+	/* Initialize pthread mutex for the lock field */
+	/* The lock field is interpreted as a pthread_mutex_t* when >= 0 */
+	lock = malloc(sizeof(pthread_mutex_t));
+	if (!lock) {
+		free(f);
+		errno = ENOMEM;
+		return NULL;
+	}
 
-	/* Add new FILE to open file list */
+	if (pthread_mutex_init(lock, NULL) != 0) {
+		free(lock);
+		free(f);
+		errno = ENOMEM;
+		return NULL;
+	}
+
+	/* Store pointer as int (assumes pointer fits in int) */
+	f->lock = (int)(intptr_t)lock;
+
+	/* Add to open file list */
 	return __ofl_add(f);
 }
 
-weak_alias(__fdopen, fdopen);
+/* Compatibility alias */
+FILE *fdopen(int fd, const char *mode)
+{
+	return __fdopen(fd, mode);
+}
+
