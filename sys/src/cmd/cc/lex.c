@@ -1371,8 +1371,40 @@ loop:
 	case 'f':	return '\f';
 	case 'a':	return '\a';
 	case 'v':	return '\v';
+	case 'u':
+	case 'U':
+		/*
+		 * C99 §6.4.3 universal character names: \uXXXX and \UXXXXXXXX.
+		 * Read exactly 4 (u) or 8 (U) mandatory hex digits.
+		 * The resulting code point is returned as a Rune; the caller's
+		 * runetochar() encodes it as UTF-8 (Plan9 is natively UTF-8).
+		 */
+		{
+			int ndigs = (c == 'u') ? 4 : 8;
+			long cp = 0;
+			for(i = 0; i < ndigs; i++) {
+				c = GETC();
+				if(c >= '0' && c <= '9')
+					cp = cp*16 + c-'0';
+				else if(c >= 'a' && c <= 'f')
+					cp = cp*16 + c-'a'+10;
+				else if(c >= 'A' && c <= 'F')
+					cp = cp*16 + c-'A'+10;
+				else {
+					yyerror("invalid universal character name");
+					unget(c);
+					return Runeerror;
+				}
+			}
+			/* C99: \u0000-\u009F (except \u0024, \u0040, \u0060) are
+			 * reserved; reject surrogates and code points > U+10FFFF. */
+			if(cp > 0x10FFFF || (cp >= 0xD800 && cp <= 0xDFFF)) {
+				yyerror("universal character name out of range");
+				return Runeerror;
+			}
+			return cp;
+		}
 	}
-	return c;
 }
 
 struct
