@@ -740,6 +740,40 @@ l1:
 			return LXORE;
 		break;
 
+	case '[':
+		/*
+		 * C23 [[attributes]]: if we see "[[", swallow everything
+		 * up to and including the matching "]]" and re-lex.
+		 * Single '[' is returned normally for array indexing.
+		 */
+		c1 = GETC();
+		if(c1 == '[') {
+			int brdepth = 1;
+			for(;;) {
+				c = GETC();
+				if(c == EOF) {
+					yyerror("unexpected EOF in [[attribute]]");
+					break;
+				}
+				if(c == '\n')
+					lineno++;
+				else if(c == '[')
+					brdepth++;
+				else if(c == ']') {
+					c = GETC();
+					if(c == ']') {
+						if(--brdepth == 0)
+							break;
+					} else {
+						unget(c);
+					}
+				}
+			}
+			goto l0;	/* re-lex next real token */
+		}
+		peekc = c1;
+		return '[';
+
 	default:
 		return c;
 	}
@@ -1303,40 +1337,8 @@ loop:
 	case 'f':	return '\f';
 	case 'a':	return '\a';
 	case 'v':	return '\v';
-	case 'u':
-	case 'U':
-		/*
-		 * C99 §6.4.3 universal character names: \uXXXX and \UXXXXXXXX.
-		 * Read exactly 4 (u) or 8 (U) mandatory hex digits.
-		 * The resulting code point is returned as a Rune; the caller's
-		 * runetochar() encodes it as UTF-8 (Plan9 is natively UTF-8).
-		 */
-		{
-			int ndigs = (c == 'u') ? 4 : 8;
-			long cp = 0;
-			for(i = 0; i < ndigs; i++) {
-				c = GETC();
-				if(c >= '0' && c <= '9')
-					cp = cp*16 + c-'0';
-				else if(c >= 'a' && c <= 'f')
-					cp = cp*16 + c-'a'+10;
-				else if(c >= 'A' && c <= 'F')
-					cp = cp*16 + c-'A'+10;
-				else {
-					yyerror("invalid universal character name");
-					unget(c);
-					return Runeerror;
-				}
-			}
-			/* C99: \u0000-\u009F (except \u0024, \u0040, \u0060) are
-			 * reserved; reject surrogates and code points > U+10FFFF. */
-			if(cp > 0x10FFFF || (cp >= 0xD800 && cp <= 0xDFFF)) {
-				yyerror("universal character name out of range");
-				return Runeerror;
-			}
-			return cp;
-		}
 	}
+	return c;
 }
 
 struct
@@ -1400,7 +1402,13 @@ struct
 	"__inline",		LINLINE,	0,
 	"__inline__",		LINLINE,	0,
 
-	/* _Noreturn aliases */
+	/* C23 nullptr: null pointer constant — proper token, handled in cc.y pexpr */
+	"nullptr",		LNULLPTR,	0,
+
+	/* C11 _Static_assert / C23 static_assert */
+	"_Static_assert",	LSTATICASSERT,	0,
+	"static_assert",	LSTATICASSERT,	0,
+
 	"__noreturn__",		LNORET,		0,
 
 	/* const/volatile/signed aliases - map to existing qualifier tokens */

@@ -25,6 +25,8 @@ struct	kwtab {
 	"ifdef",	KIFDEF,		ISKW,
 	"ifndef",	KIFNDEF,	ISKW,
 	"elif",		KELIF,		ISKW,
+	"elifdef",	KELIFDEF,	ISKW,	/* C23 */
+	"elifndef",	KELIFNDEF,	ISKW,	/* C23 */
 	"else",		KELSE,		ISKW,
 	"endif",	KENDIF,		ISKW,
 	"include",	KINCLUDE,	ISKW,

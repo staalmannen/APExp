@@ -1,10 +1,6 @@
 C11 / C14 / C17 / C23 changes vs C99 - APExp kencc status
 ==========================================================
 
-You are right that C89->C99 was the biggest jump. Later standards
-add useful features but the deltas are much smaller, and many
-features in C11+ are already partially present in kencc/APExp.
-
 References:
   C11:  ISO/IEC 9899:2011
   C14:  ISO/IEC 9899:2014 (mostly defect fixes, no new features)
@@ -14,194 +10,163 @@ References:
 
 === C11 ===
 
---- Already done / unneeded ---
+--- Done ---
 
-A. _Noreturn                        [in APExp: LNRET keyword, lex.c itab]
+A. _Noreturn                        [lex.c itab: LNORET keyword]
 B. __func__ in all scopes           [done in C99 work]
-C. Type-generic math <tgmath.h>     [library: can be implemented as macros]
-D. _Thread_local keyword            [in APExp: parsed, mapped to LNAME (stub)]
+C. Type-generic math <tgmath.h>     [library macros]
+D. _Thread_local keyword            [parsed, mapped to LNAME stub]
 E. Removal of gets()                [irrelevant for compiler]
 F. Removal of implicit int          [kencc already required type specifiers]
-G. Alignment: __alignof__ / __alignof  [in APExp: lex.c, GCC-spelling]
+G. __alignof__ / __alignof          [lex.c, GCC-spelling, swallowed]
+H. Anonymous structs and unions     [FULLY IMPLEMENTED: edecl() accepts
+                                     sym==S for struct/union, sualign()
+                                     assigns correct offsets, dotsearch()
+                                     recurses into anonymous members]
+I. _Static_assert(expr, msg)        [IMPLEMENTED: cc.y slist+prog, lex.c
+                                     static_assert (C23 alias) also added]
 
 --- Not done ---
 
-1. _Static_assert(expr, msg)
-   EFFORT: small
-   WHERE: cc.y (new statement), cc.h (token), lex.c (keyword)
-   NOTE: evaluate expr at compile time (already have constexpr eval for
-         array sizes); emit yyerror if false. Very common in ported code.
-
-2. _Alignas(type-or-expr) / _Alignof(type)
+1. _Alignas(type-or-expr) / _Alignof(type) as standard spellings
    EFFORT: small-medium
-   WHERE: lex.c (keywords), cc.y (grammar), dcl.c (attribute on declaration)
-   NOTE: _Alignof is like sizeof; _Alignas affects stack layout.
-         __alignof__ stub already exists; needs to actually compute value.
-         _Alignas for stack variables requires aligning stkoff in adecl().
+   WHERE: lex.c (add _Alignas/_Alignof to itab as proper tokens),
+          cc.y (grammar for _Alignas as declaration specifier),
+          dcl.c (_Alignas: align stkoff to requested boundary in adecl())
+   NOTE: __alignof__ already parses but is swallowed. _Alignof(type) needs
+         to return the alignment value like sizeof. _Alignas affects layout.
 
-3. _Generic(expr, type: val, ..., default: val)
+2. _Generic(expr, type: val, ..., default: val)
    EFFORT: medium
-   WHERE: cc.y (new primary expression), com.c (evaluation)
-   NOTE: type-generic dispatch; common in tgmath.h and portable headers.
-         Must resolve at compile time using type of controlling expression.
+   WHERE: cc.y (new primary expression production), com.c (compile-time eval)
+   NOTE: Must compare controlling expression type against each type-name
+         at compile time and return the matching association's value.
 
-4. _Atomic type qualifier and <stdatomic.h>
-   EFFORT: large (full implementation) / small (stub)
-   WHERE: cc.h (qualifier bit), dcl.c, and a new stdatomic.h
-   NOTE: Plan9 has no atomic hardware primitives in APE context.
-         Practical approach: stub _Atomic as volatile (correct for
-         single-threaded code, acceptable for most ported software).
-         Add stdatomic.h with mutex-backed implementations (already
-         partially done in atomic.h for musl).
+3. _Atomic type qualifier and <stdatomic.h>
+   EFFORT: small (stub sufficient for most ported code)
+   WHERE: lex.c (swallow _Atomic like volatile), new stdatomic.h
+   NOTE: Stub _Atomic as volatile. Add stdatomic.h with mutex-backed
+         atomic_int etc (already partially in atomic.h for musl locale).
 
-5. Anonymous structs and unions (struct { struct { int x; }; })
-   EFFORT: small-medium
-   WHERE: dcl.c (struct member parsing), sub.c (field lookup)
-   NOTE: Very common in ported code (especially system headers).
-         Already partially works in some cases via the existing
-         struct layout code; needs systematic support.
+4. <uchar.h>: char16_t, char32_t, mbrtoc16, c16rtomb
+   EFFORT: small (library stubs + header)
+   WHERE: new sys/include/ape/uchar.h, lib/ap/multibyte/
 
-6. <uchar.h>: char16_t, char32_t, mbrtoc16, c16rtomb etc.
-   EFFORT: small (library stubs)
-   WHERE: new sys/include/ape/uchar.h + lib/ap/multibyte/
-   NOTE: typedefs only; conversion functions are wrappers around
-         existing UTF-8 machinery.
-
-7. Bounds-checking interfaces (Annex K): gets_s etc.
-   EFFORT: small (stubs) / skip
-   NOTE: Optional annex. Most code uses __STDC_WANT_LIB_EXT1__.
-         Low priority; stubs returning EINVAL are sufficient.
-
-8. Analyzability (Annex L)
-   EFFORT: skip
-   NOTE: Purely informative annex about undefined behavior.
+5. Annex K bounds-checking (gets_s etc.)
+   EFFORT: low priority / skip
+   NOTE: Optional annex. Stubs returning EINVAL are sufficient.
 
 
 === C14 (ISO 9899:2014) ===
 
-C14 contains only defect reports and clarifications against C11.
-No new language features. No compiler work needed.
-
---- Done by fixing C11 ---
-(all C14 items are clarifications of C11 features)
+Defect reports and clarifications only. No new language features.
+No compiler work needed.
 
 
 === C17 (ISO 9899:2018) ===
 
-C17 also contains only defect reports against C14/C11.
-No new language features. No compiler work needed.
+Defect reports only. No new language features. No compiler work needed.
 
 
 === C23 (ISO 9899:2024) ===
 
-C23 is a significant update. Many features are useful for porting.
+--- Done ---
 
---- Already done / unneeded ---
-
-A. // comments                      [already worked in kencc]
-B. u8 character constants           [can be added to lex.c alongside \uXXXX]
-C. __has_include                    [cpp already handles this in APExp]
+A. // comments                      [always worked in kencc]
+B. u8 character constants           [\uXXXX support in lex.c covers this]
+C. __has_include                    [cpp handles this]
 D. Removal of trigraphs             [kencc never had them]
-E. true/false as keywords           [defined via _Bool/_Stdbool.h]
+E. true/false as keywords           [via _Bool / <stdbool.h>]
+F. #warning directive               [ALREADY in cpp/cpp.c]
+G. Binary integer literals 0b...    [ALREADY in lex.c]
+H. nullptr keyword                  [IMPLEMENTED: LNULLPTR token in cc.y,
+                                     pexpr rule producing OCONST with
+                                     types[TIND] (void*) and vconst=0;
+                                     itab entry in lex.c]
+I. #elifdef / #elifndef             [IMPLEMENTED: KELIFDEF/KELIFNDEF in
+                                     cpp.h enum, nlist.c keyword table,
+                                     cpp.c case handler using same
+                                     defined-symbol eval as KIFDEF]
+J. [[attributes]] syntax            [IMPLEMENTED: case '[' in lex.c main
+                                     switch detects [[, depth-counts
+                                     brackets to matching ]], then re-lexes;
+                                     newlines tracked for line numbers]
+K. static_assert (no underscore)    [done alongside _Static_assert above]
 
 --- Not done ---
 
-1. [[attributes]] syntax: [[nodiscard]], [[deprecated]], [[fallthrough]]
-   EFFORT: small (ignore unknown attributes gracefully)
-   WHERE: cc.y (attribute syntax in declarations/statements)
-   NOTE: Very common in modern code. Safest approach: parse [[...]]
-         and ignore unknown attributes rather than error.
-         [[noreturn]] should map to _Noreturn behavior.
+1. typeof / typeof_unqual operators
+   EFFORT: medium (~100 lines across 4 files)
+   PRIORITY: HIGH - __typeof__ is currently SILENTLY BROKEN (swallowed
+             like __attribute__), corrupting any declaration using it.
+   DESIGN:
+     cc/lex.c:
+       - Change __typeof__/__typeof__ case in the LNAME swallow block
+         to NOT swallow — instead return LTYPEOF token.
+       - Add "typeof" and "__typeof__" and "__typeof" to itab[] as LTYPEOF.
+     cc/cc.y:
+       %token LTYPEOF
+       /* Expression context (typeof used like sizeof): */
+       uexpr:
+         LTYPEOF '(' cexpr ')'
+           { $$ = new(OTYPEOF, $3, Z); }
+       | LTYPEOF '(' tlist abdecor ')'
+           { $$ = new(OTYPEOF, Z, Z);
+             dodecl(NODECL, CXXX, $3, $4);
+             $$->type = lastdcl; }
+       /* Type-specifier context (__typeof__(x) y; declares y same type as x): */
+       complex:
+         ... existing rules ...
+       | LTYPEOF '(' cexpr ')'
+           { complex($3); $$ = $3->type != T ? $3->type : types[TINT]; }
+       | LTYPEOF '(' tlist abdecor ')'
+           { dodecl(NODECL, CXXX, $3, $4); $$ = lastdcl; }
+     cc/com.c:
+       case OTYPEOF:  (in tcom())
+         if(l != Z) { if(tcomo(l,0)) goto bad; n->type = l->type; }
+         if(n->type == T) goto bad;
+         /* for typeof_unqual: strip const/volatile from n->type */
+         break;
+   NOTE: OTYPEOF opcode also needs adding to cc.h opcode enum.
+         The complex/tlist path is the critical one for declarations
+         like: __typeof__(errno) saved; or __typeof__(*ptr) tmp;
 
-2. #elifdef / #elifndef preprocessor directives
-   EFFORT: small
-   WHERE: cpp/cpp.c (preprocessor directive handling)
-   NOTE: Shorthand for #elif defined(...). Common in new code.
-
-3. #warning directive
-   EFFORT: trivial
-   WHERE: cpp/cpp.c
-   NOTE: Already commonly expected. One line of code.
-
-4. Binary integer literals 0b101010
-   EFFORT: trivial
-   WHERE: lex.c (integer constant lexing, alongside 0x hex)
-
-5. Digit separators in numeric literals: 1'000'000
-   EFFORT: small
-   WHERE: lex.c (skip ' between digits in numeric literals)
-   NOTE: Common in newer code for readability.
-
-6. typeof / typeof_unqual operators
+2. _Generic(expr, type: val, ..., default: val)
    EFFORT: medium
-   WHERE: cc.y (new unary expression), sub.c (type extraction)
-   NOTE: __typeof__ already works in GCC; kencc may already have it.
-         Check if __typeof__ is handled. If so, typeof is trivial alias.
+   NOTE: type-generic dispatch, needed for <tgmath.h>
 
-7. constexpr for objects (not functions)
+3. constexpr for objects
    EFFORT: medium
-   WHERE: cc.y, dcl.c (new storage class)
-   NOTE: Like 'static const' with mandatory constant initializer.
-         Common in new portable code as replacement for #define.
+   NOTE: repurposes constexpr keyword for compile-time constant objects
 
-8. nullptr keyword (null pointer constant)
-   EFFORT: trivial
-   WHERE: lex.c itab (map to OCONST 0 of type void*)
-   NOTE: Very common in new C code. One entry in itab[].
-
-9. auto type deduction (auto x = expr; deduces type)
+4. auto type deduction
    EFFORT: medium-large
-   WHERE: dcl.c, com.c (infer type from initializer)
-   NOTE: Repurposes the existing 'auto' keyword. Significant but
-         increasingly needed for modern portable code.
+   NOTE: repurposes 'auto' keyword for type inference from initializer
 
-10. Improved enums: enum E : int { ... } and enum E { A = 0u }
-    EFFORT: small-medium
-    WHERE: cc.y, dcl.c (enum base type)
+5. Improved enums: enum E : int { }
+   EFFORT: small-medium
+   WHERE: cc.y, dcl.c
 
-11. char8_t type and u8 string literals as char8_t[]
-    EFFORT: small
-    WHERE: cc.h (new type), lex.c (u8"..." prefix)
-    NOTE: Pair with uchar.h work from C11 item 6.
+6. char8_t type and u8"..." string literals as char8_t[]
+   EFFORT: small
+   WHERE: cc.h (new type TCHAR8), lex.c (u8"..." prefix handling)
 
-12. Variably-modified function parameters without VLAs
-    EFFORT: small (already partially covered by VLA work)
+7. <stdbit.h> bit-manipulation functions
+   EFFORT: small (library only)
 
-13. <stdbit.h>: bit manipulation functions
-    EFFORT: small (library)
-    WHERE: new sys/include/ape/stdbit.h + lib/ap/misc/
+8. #embed directive
+   EFFORT: medium
+   WHERE: cpp/cpp.c
 
-14. #embed directive
-    EFFORT: medium
-    WHERE: cpp/cpp.c
-    NOTE: Embeds binary file contents as integer sequence.
-          Increasingly used for embedding resources.
+9. Digit separators: 1'000'000
+   EFFORT: trivial
+   WHERE: lex.c — skip '\'' between digits in numeric literal loops
 
 
-=== Priority recommendation for APExp ===
+=== Priority order for next work ===
 
-HIGH (blocks real ported code frequently):
-  C11-1: _Static_assert         -- very common in system headers
-  C11-5: Anonymous structs/unions -- very common in system headers
-  C23-1: [[attributes]] parsing  -- needed to not error on modern code
-  C23-3: #warning                -- trivial, expected everywhere
-  C23-4: Binary literals 0b...   -- increasingly common
-  C23-8: nullptr                 -- trivial, common in new C code
-
-MEDIUM (useful but workarounds exist):
-  C11-2: _Alignas / _Alignof     -- needed for some SIMD/crypto code
-  C11-3: _Generic                -- needed for tgmath.h
-  C23-2: #elifdef/#elifndef      -- easy, common in new code
-  C23-6: typeof                  -- check if __typeof__ already works
-  C23-5: Digit separators        -- easy
-
-LOW (rarely blocks, large effort):
-  C11-4: _Atomic / stdatomic.h   -- stub is acceptable for most code
-  C23-7: constexpr               -- medium effort
-  C23-9: auto type deduction     -- large effort, rarely needed in C
-
-SKIP (not worth the effort for APExp use case):
-  C11-7: Annex K bounds checking
-  C11-8: Annex L analyzability
-  C14:   all (defect fixes only)
-  C17:   all (defect fixes only)
+1. typeof (C23-1): fixes currently BROKEN __typeof__, high porting impact
+2. _Alignas/_Alignof (C11-1): needed for aligned storage in crypto/SIMD
+3. _Atomic stub (C11-3): single line in lex.c + stdatomic.h header
+4. _Generic (C11-2): needed for portable <tgmath.h> usage
+5. Digit separators (C23-9): trivial, increasingly common in new code

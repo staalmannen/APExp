@@ -195,6 +195,37 @@ control(Tokenrow *trp)
 			skipping = ifdepth;
 		break;
 
+	case KELIFDEF:
+	case KELIFNDEF:
+		/* C23 #elifdef/#elifndef: like #elif defined(X)/#elif !defined(X) */
+		if (ifdepth==0) {
+			error(ERROR, "#elifdef/#elifndef with no #if");
+			return;
+		}
+		if (ifsatisfied[ifdepth]==2)
+			error(ERROR, "#elifdef/#elifndef after #else");
+		{
+			Nlist *dp;
+			int defined;
+			trp->tp++;
+			if (trp->lp - trp->bp != 4 || trp->tp->type!=NAME) {
+				error(ERROR, "Syntax error in #elifdef/#elifndef");
+				break;
+			}
+			dp = lookup(trp->tp, 0);
+			defined = dp && (dp->flag&(ISDEFINED|ISMAC));
+			if ((np->val==KELIFDEF) == defined) {
+				if (ifsatisfied[ifdepth])
+					skipping = ifdepth;
+				else {
+					skipping = 0;
+					ifsatisfied[ifdepth] = 1;
+				}
+			} else
+				skipping = ifdepth;
+		}
+		break;
+
 	case KELSE:
 		if (ifdepth==0 || cursource->ifdepth==0) {
 			error(ERROR, "#else with no #if");
