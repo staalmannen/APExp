@@ -66,6 +66,7 @@ OFILES=\
 	__stdio_seek.$O\
 	__stdio_close.$O\
 	__stdio_exit.$O\
+	__stdout_write.$O\
 	ofl.$O\
 	ofl_add.$O\
 	open_memstream.$O\
