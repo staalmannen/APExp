@@ -272,6 +272,7 @@ enum
 	OSET,
 	OSIGN,
 	OSIZE,
+	OTYPEOF,	/* typeof(expr) / typeof(type) — C23/GCC extension */
 	OSTRING,
 	OLSTRING,
 	OSTRUCT,

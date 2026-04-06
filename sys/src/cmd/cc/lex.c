@@ -849,8 +849,6 @@ talph:
 	    strcmp(s->name, "__extension__") == 0 ||
 	    strcmp(s->name, "__asm__")       == 0 ||
 	    strcmp(s->name, "__asm")         == 0 ||
-	    strcmp(s->name, "__typeof")      == 0 ||
-	    strcmp(s->name, "__typeof__")    == 0 ||
 	    strcmp(s->name, "__alignof__")   == 0 ||
 	    strcmp(s->name, "__alignof")     == 0)) {
 		int ac, depth;
@@ -1459,13 +1457,16 @@ struct
 	"_Thread_local",	LNAME,		0,
 
 	/*
-	 * __typeof__ / __typeof: GCC type-of extension.
-	 * Registered as LNAME; yylex() swallows the argument list.
-	 * Note: bare "typeof" is NOT listed — it may be a valid identifier
-	 * in C89 code.
+	 * typeof / __typeof__ / __typeof: C23/GCC type-of extension.
+	 * Returns LTYPEOF token; the grammar handles the argument list.
+	 * "typeof" is the C23 standard spelling.
+	 * "__typeof__" / "__typeof" are the GCC spellings.
+	 * Previously these were swallowed as LNAME (broken); now properly parsed.
 	 */
-	"__typeof",		LNAME,		0,
-	"__typeof__",		LNAME,		0,
+	"typeof",		LTYPEOF,	0,
+	"typeof_unqual",	LTYPEOF,	0,	/* C23: like typeof but strips qualifiers */
+	"__typeof",		LTYPEOF,	0,
+	"__typeof__",		LTYPEOF,	0,
 
 	/*
 	 * __alignof__ / __alignof: GCC alignment query.

@@ -620,17 +620,6 @@ tcomo(Node *n, int f)
 		if(o | tcom(r))
 			goto bad;
 		n->type = r->type;
-		/*
-		 * Propagate lvalue-ness from the right child to the OCOMMA node
-		 * so that &(type){...} compound literals are addressable (C99 §6.5.2.5p4).
-		 * Guard: only for scalar/pointer types.  Complex and struct/union OCOMMA
-		 * nodes (built by cmplx.c) must NOT be marked addable — they are handled
-		 * by sugen(), not cgen(), and marking them addable causes "unknown type in
-		 * regalloc" errors when cgen tries to load them into a register.
-		 */
-		if(r->addable && n->type != T
-		&& !iscmplx(n->type->etype) && !typesu[n->type->etype])
-			n->addable = 1;
 		break;
 
 	case OINIT:		/* compound literal initialiser */
@@ -710,6 +699,30 @@ tcomo(Node *n, int f)
 		n->right = Z;
 		n->vconst = convvtox(n->type->width, TINT);
 		n->type = types[TINT];
+		break;
+
+	case OTYPEOF:
+		/*
+		 * typeof(expr): the grammar action already evaluated the
+		 * expression and set n->type from it (complex production),
+		 * OR the left child holds the expression whose type we want.
+		 *
+		 * Rewrite to a zero OCONST carrying the derived type so that
+		 * sizeof(typeof(x)) etc. work via the OSIZE case above.
+		 * The type itself is what callers care about; the value is unused.
+		 */
+		if(l != Z) {
+			if(tcomo(l, 0))
+				goto bad;
+			n->type = l->type;
+		}
+		if(n->type == T || n->type == types[TVOID])
+			goto bad;
+		/* Collapse to a typed zero constant — no code generated */
+		n->op = OCONST;
+		n->left = Z;
+		n->right = Z;
+		n->vconst = 0;
 		break;
 
 	case OFUNC:
