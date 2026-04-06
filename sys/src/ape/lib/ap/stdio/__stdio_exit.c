@@ -1,7 +1,7 @@
 #include "stdio_impl.h"
 #include <stdio.h>
 
-/* APExp: Replace musl weak_alias with proper extern declarations */
+/* APExp: Replace musl weak_alias with proper extern declarations and function aliases */
 FILE *volatile __stdin_used = NULL;
 FILE *volatile __stdout_used = NULL;
 FILE *volatile __stderr_used = NULL;
@@ -10,8 +10,12 @@ static void close_file(FILE *f)
 {
 	if (!f) return;
 	FFINALLOCK(f);
-	if (f->wpos != f->wbase) f->write(f, (unsigned char *)f->wpos - (unsigned char *)f->wbase, 0);
-	if (f->rpos != f->rend) f->seek(f, f->rpos - f->rend, SEEK_CUR);
+	if (f->wpos > f->wbase) {
+		f->write(f, (unsigned char *)f->wbase, f->wpos - f->wbase);
+	}
+	if (f->rpos != f->rend) {
+		f->seek(f, f->rpos - f->rend, SEEK_CUR);
+	}
 }
 
 void __stdio_exit(void)
