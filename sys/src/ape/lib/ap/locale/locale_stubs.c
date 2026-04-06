@@ -130,6 +130,13 @@ __lctrans_impl(const char *msg, const struct __locale_map *lm)
 	return msg;
 }
 
+const char *__lctrans_cur(const char *msg)
+{
+	return __lctrans_impl(msg, (const struct __locale_map *) "UTF-8");
+}
+
+
+
 
 
 
