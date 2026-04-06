@@ -5,34 +5,28 @@ LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 	locale.$O\
 # musl \
-	__lctrans.$O\
 	__mo_lookup.$O\
 	c_locale.$O\
 	catclose.$O\
 	catgets.$O\
 	catopen.$O\
 	bind_textdomain_codeset.$O\
-#	dcngettext.$O\
-	duplocale.$O\
-	freelocale.$O\
+	dcngettext.$O\
 	iconv.$O\
 	iconv_close.$O\
 	langinfo.$O\
-#	locale_map.$O\
 	localeconv.$O\
-	newlocale.$O\
 	pleval.$O\
-	setlocale.$O\
 	strcoll.$O\
 	strtod_l.$O\
 	strfmon.$O\
 	strxfrm.$O\
 	textdomain.$O\
-	uselocale.$O\
 	wcscoll.$O\
 	wcsxfrm.$O\
 # stub\
 	locale_charset.$O\
+	locale_stubs.$O\
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib
