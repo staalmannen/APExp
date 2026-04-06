@@ -1,0 +1,207 @@
+C11 / C14 / C17 / C23 changes vs C99 - APExp kencc status
+==========================================================
+
+You are right that C89->C99 was the biggest jump. Later standards
+add useful features but the deltas are much smaller, and many
+features in C11+ are already partially present in kencc/APExp.
+
+References:
+  C11:  ISO/IEC 9899:2011
+  C14:  ISO/IEC 9899:2014 (mostly defect fixes, no new features)
+  C17:  ISO/IEC 9899:2018 (same - defect fixes only)
+  C23:  ISO/IEC 9899:2024
+
+
+=== C11 ===
+
+--- Already done / unneeded ---
+
+A. _Noreturn                        [in APExp: LNRET keyword, lex.c itab]
+B. __func__ in all scopes           [done in C99 work]
+C. Type-generic math <tgmath.h>     [library: can be implemented as macros]
+D. _Thread_local keyword            [in APExp: parsed, mapped to LNAME (stub)]
+E. Removal of gets()                [irrelevant for compiler]
+F. Removal of implicit int          [kencc already required type specifiers]
+G. Alignment: __alignof__ / __alignof  [in APExp: lex.c, GCC-spelling]
+
+--- Not done ---
+
+1. _Static_assert(expr, msg)
+   EFFORT: small
+   WHERE: cc.y (new statement), cc.h (token), lex.c (keyword)
+   NOTE: evaluate expr at compile time (already have constexpr eval for
+         array sizes); emit yyerror if false. Very common in ported code.
+
+2. _Alignas(type-or-expr) / _Alignof(type)
+   EFFORT: small-medium
+   WHERE: lex.c (keywords), cc.y (grammar), dcl.c (attribute on declaration)
+   NOTE: _Alignof is like sizeof; _Alignas affects stack layout.
+         __alignof__ stub already exists; needs to actually compute value.
+         _Alignas for stack variables requires aligning stkoff in adecl().
+
+3. _Generic(expr, type: val, ..., default: val)
+   EFFORT: medium
+   WHERE: cc.y (new primary expression), com.c (evaluation)
+   NOTE: type-generic dispatch; common in tgmath.h and portable headers.
+         Must resolve at compile time using type of controlling expression.
+
+4. _Atomic type qualifier and <stdatomic.h>
+   EFFORT: large (full implementation) / small (stub)
+   WHERE: cc.h (qualifier bit), dcl.c, and a new stdatomic.h
+   NOTE: Plan9 has no atomic hardware primitives in APE context.
+         Practical approach: stub _Atomic as volatile (correct for
+         single-threaded code, acceptable for most ported software).
+         Add stdatomic.h with mutex-backed implementations (already
+         partially done in atomic.h for musl).
+
+5. Anonymous structs and unions (struct { struct { int x; }; })
+   EFFORT: small-medium
+   WHERE: dcl.c (struct member parsing), sub.c (field lookup)
+   NOTE: Very common in ported code (especially system headers).
+         Already partially works in some cases via the existing
+         struct layout code; needs systematic support.
+
+6. <uchar.h>: char16_t, char32_t, mbrtoc16, c16rtomb etc.
+   EFFORT: small (library stubs)
+   WHERE: new sys/include/ape/uchar.h + lib/ap/multibyte/
+   NOTE: typedefs only; conversion functions are wrappers around
+         existing UTF-8 machinery.
+
+7. Bounds-checking interfaces (Annex K): gets_s etc.
+   EFFORT: small (stubs) / skip
+   NOTE: Optional annex. Most code uses __STDC_WANT_LIB_EXT1__.
+         Low priority; stubs returning EINVAL are sufficient.
+
+8. Analyzability (Annex L)
+   EFFORT: skip
+   NOTE: Purely informative annex about undefined behavior.
+
+
+=== C14 (ISO 9899:2014) ===
+
+C14 contains only defect reports and clarifications against C11.
+No new language features. No compiler work needed.
+
+--- Done by fixing C11 ---
+(all C14 items are clarifications of C11 features)
+
+
+=== C17 (ISO 9899:2018) ===
+
+C17 also contains only defect reports against C14/C11.
+No new language features. No compiler work needed.
+
+
+=== C23 (ISO 9899:2024) ===
+
+C23 is a significant update. Many features are useful for porting.
+
+--- Already done / unneeded ---
+
+A. // comments                      [already worked in kencc]
+B. u8 character constants           [can be added to lex.c alongside \uXXXX]
+C. __has_include                    [cpp already handles this in APExp]
+D. Removal of trigraphs             [kencc never had them]
+E. true/false as keywords           [defined via _Bool/_Stdbool.h]
+
+--- Not done ---
+
+1. [[attributes]] syntax: [[nodiscard]], [[deprecated]], [[fallthrough]]
+   EFFORT: small (ignore unknown attributes gracefully)
+   WHERE: cc.y (attribute syntax in declarations/statements)
+   NOTE: Very common in modern code. Safest approach: parse [[...]]
+         and ignore unknown attributes rather than error.
+         [[noreturn]] should map to _Noreturn behavior.
+
+2. #elifdef / #elifndef preprocessor directives
+   EFFORT: small
+   WHERE: cpp/cpp.c (preprocessor directive handling)
+   NOTE: Shorthand for #elif defined(...). Common in new code.
+
+3. #warning directive
+   EFFORT: trivial
+   WHERE: cpp/cpp.c
+   NOTE: Already commonly expected. One line of code.
+
+4. Binary integer literals 0b101010
+   EFFORT: trivial
+   WHERE: lex.c (integer constant lexing, alongside 0x hex)
+
+5. Digit separators in numeric literals: 1'000'000
+   EFFORT: small
+   WHERE: lex.c (skip ' between digits in numeric literals)
+   NOTE: Common in newer code for readability.
+
+6. typeof / typeof_unqual operators
+   EFFORT: medium
+   WHERE: cc.y (new unary expression), sub.c (type extraction)
+   NOTE: __typeof__ already works in GCC; kencc may already have it.
+         Check if __typeof__ is handled. If so, typeof is trivial alias.
+
+7. constexpr for objects (not functions)
+   EFFORT: medium
+   WHERE: cc.y, dcl.c (new storage class)
+   NOTE: Like 'static const' with mandatory constant initializer.
+         Common in new portable code as replacement for #define.
+
+8. nullptr keyword (null pointer constant)
+   EFFORT: trivial
+   WHERE: lex.c itab (map to OCONST 0 of type void*)
+   NOTE: Very common in new C code. One entry in itab[].
+
+9. auto type deduction (auto x = expr; deduces type)
+   EFFORT: medium-large
+   WHERE: dcl.c, com.c (infer type from initializer)
+   NOTE: Repurposes the existing 'auto' keyword. Significant but
+         increasingly needed for modern portable code.
+
+10. Improved enums: enum E : int { ... } and enum E { A = 0u }
+    EFFORT: small-medium
+    WHERE: cc.y, dcl.c (enum base type)
+
+11. char8_t type and u8 string literals as char8_t[]
+    EFFORT: small
+    WHERE: cc.h (new type), lex.c (u8"..." prefix)
+    NOTE: Pair with uchar.h work from C11 item 6.
+
+12. Variably-modified function parameters without VLAs
+    EFFORT: small (already partially covered by VLA work)
+
+13. <stdbit.h>: bit manipulation functions
+    EFFORT: small (library)
+    WHERE: new sys/include/ape/stdbit.h + lib/ap/misc/
+
+14. #embed directive
+    EFFORT: medium
+    WHERE: cpp/cpp.c
+    NOTE: Embeds binary file contents as integer sequence.
+          Increasingly used for embedding resources.
+
+
+=== Priority recommendation for APExp ===
+
+HIGH (blocks real ported code frequently):
+  C11-1: _Static_assert         -- very common in system headers
+  C11-5: Anonymous structs/unions -- very common in system headers
+  C23-1: [[attributes]] parsing  -- needed to not error on modern code
+  C23-3: #warning                -- trivial, expected everywhere
+  C23-4: Binary literals 0b...   -- increasingly common
+  C23-8: nullptr                 -- trivial, common in new C code
+
+MEDIUM (useful but workarounds exist):
+  C11-2: _Alignas / _Alignof     -- needed for some SIMD/crypto code
+  C11-3: _Generic                -- needed for tgmath.h
+  C23-2: #elifdef/#elifndef      -- easy, common in new code
+  C23-6: typeof                  -- check if __typeof__ already works
+  C23-5: Digit separators        -- easy
+
+LOW (rarely blocks, large effort):
+  C11-4: _Atomic / stdatomic.h   -- stub is acceptable for most code
+  C23-7: constexpr               -- medium effort
+  C23-9: auto type deduction     -- large effort, rarely needed in C
+
+SKIP (not worth the effort for APExp use case):
+  C11-7: Annex K bounds checking
+  C11-8: Annex L analyzability
+  C14:   all (defect fixes only)
+  C17:   all (defect fixes only)
