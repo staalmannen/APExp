@@ -9,6 +9,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <sys/types.h>
+#include <pthread.h>
 /* APExp: sys/uio.h not available; writev call sites in __stdio_write.c
  * must be replaced with a plain write() loop - see notes */
 
@@ -20,10 +21,6 @@
 #endif
 
 #define UNGET 8
-
-#define FFINALLOCK(f) ((f)->lock>=0 ? __lockfile((f)) : 0)
-#define FLOCK(f) int __need_unlock = ((f)->lock>=0 ? __lockfile((f)) : 0)
-#define FUNLOCK(f) do { if (__need_unlock) __unlockfile((f)); } while (0)
 
 #define F_PERM 1
 #define F_NORD 4
@@ -66,28 +63,31 @@ extern hidden struct _IO_FILE *volatile __stdin_used;
 extern hidden struct _IO_FILE *volatile __stdout_used;
 extern hidden struct _IO_FILE *volatile __stderr_used;
 
-/* APExp: __lockfile/__unlockfile -- APE has no thread support so these
- * are no-op stubs. The lock field is retained in the struct (layout must
- * match) but will never be contended.
- *
- * UPDATED: Now uses real pthread mutexes for proper thread safety.
- * Each FILE has its own lock (f->lock is a pthread_mutex_t).
+/* APExp: __lockfile/__unlockfile -- Real pthread mutex support
+ * Each FILE has its own lock (f->lock stores a pthread_mutex_t*).
  * __lockfile returns 1 on success to signal FUNLOCK to call __unlockfile.
  */
 
-#include <pthread.h>
-
 static inline int __lockfile(struct _IO_FILE *f) {
+	pthread_mutex_t *lock;
 	if (f->lock < 0) return 0;
-	if (pthread_mutex_lock((pthread_mutex_t *)&f->lock) != 0)
+	lock = (pthread_mutex_t *)(intptr_t)f->lock;
+	if (!lock) return 0;
+	if (pthread_mutex_lock(lock) != 0)
 		return 0;
 	return 1;
 }
 
 static inline void __unlockfile(struct _IO_FILE *f) {
+	pthread_mutex_t *lock;
 	if (f->lock < 0) return;
-	pthread_mutex_unlock((pthread_mutex_t *)&f->lock);
+	lock = (pthread_mutex_t *)(intptr_t)f->lock;
+	if (lock) pthread_mutex_unlock(lock);
 }
+
+#define FLOCK(f) int __need_unlock = __lockfile(f)
+#define FUNLOCK(f) do { if (__need_unlock) __unlockfile(f); } while(0)
+#define FFINALLOCK(f) ((f)->lock>=0 ? __lockfile((f)) : 0)
 
 hidden size_t __stdio_read(struct _IO_FILE *, unsigned char *, size_t);
 hidden size_t __stdio_write(struct _IO_FILE *, const unsigned char *, size_t);
@@ -101,9 +101,6 @@ hidden int __towrite(struct _IO_FILE *);
 hidden void __stdio_exit(void);
 hidden void __stdio_exit_needed(void);
 
-#if defined(__PIC__) && (100*__GNUC__+__GNUC_MINOR__ >= 303)
-__attribute__((visibility("protected")))
-#endif
 int __overflow(struct _IO_FILE *, int), __uflow(struct _IO_FILE *);
 
 hidden int __fseeko(struct _IO_FILE *, off_t, int);
@@ -119,11 +116,6 @@ hidden int __fmodeflags(const char *);
 hidden struct _IO_FILE *__ofl_add(struct _IO_FILE *f);
 hidden struct _IO_FILE **__ofl_lock(void);
 hidden void __ofl_unlock(void);
-
-/* APExp: pthread/locked-file tracking omitted -- no thread support in APE.
- * __register_locked_file, __unlist_locked_file, __do_orphaned_stdio_locks
- * and struct __pthread are all removed. Any .c file referencing these
- * will need those call sites stubbed or guarded with #ifndef APE_NO_THREADS. */
 
 #define MAYBE_WAITERS 0x40000000
 
