@@ -67,9 +67,13 @@ OFILES=\
 	__stdio_close.$O\
 	__stdio_exit.$O\
 	__stdout_write.$O\
+	__towrite.$O\
 	ofl.$O\
 	ofl_add.$O\
 	open_memstream.$O\
+	stderr.$O\
+	stdin.$O\
+	stdout.$O\
 	asprintf.$O\
 	vasprintf.$O\
 	fmemopen.$O\

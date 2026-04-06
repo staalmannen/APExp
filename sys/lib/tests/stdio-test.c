@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
 
 void debug_print(const char *msg) {
-	write(2, msg, __builtin_strlen(msg));
+	write(2, msg, strlen(msg));
 	write(2, "\n", 1);
 }
 
