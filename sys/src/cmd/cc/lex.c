@@ -882,6 +882,36 @@ talph:
 		goto l0;	/* fetch next real token */
 	}
 	/*
+	 * GCC __builtin_* functions: swallow the entire call and
+	 * substitute a zero constant.  This handles the common cases:
+	 *   __builtin_expect(x, v)         -> 0  (branch prediction hint)
+	 *   __builtin_types_compatible_p() -> 0  (type query)
+	 *   __builtin_offsetof(T,m)        -> 0  (use offsetof macro instead)
+	 *   __builtin_unreachable()        -> 0  (hint, no effect)
+	 * For __builtin_va_* the <stdarg.h> macros handle them before we see them.
+	 */
+	if(s->lexical == LNAME && strncmp(s->name, "__builtin_", 10) == 0) {
+		int ac, depth;
+		do { ac = GETC(); } while(ac == ' ' || ac == '\t');
+		if(ac == '(') {
+			depth = 1;
+			while(depth > 0) {
+				ac = GETC();
+				if(ac == EOF) break;
+				if(ac == '(') depth++;
+				else if(ac == ')') depth--;
+				else if(ac == '\n') lineno++;
+			}
+		} else {
+			unget(ac);
+		}
+		/* return integer constant 0 in place of the builtin call */
+		yylval.vval = 0;
+		strcpy(symb, "0");
+		return LCONST;
+	}
+
+	/*
 	 * GNU/C11 storage class and visibility qualifiers that Plan 9 ignores.
 	 * Drop silently and re-lex the next token.
 	 * Reset lasttok so a dropped qualifier cannot spuriously trigger
@@ -890,6 +920,8 @@ talph:
 	if(s->lexical == LNAME && (
 	    strcmp(s->name, "__thread")      == 0 ||
 	    strcmp(s->name, "_Thread_local") == 0 ||
+	    strcmp(s->name, "_Atomic")       == 0 ||
+	    strcmp(s->name, "__atomic")      == 0 ||
 	    strcmp(s->name, "__hidden")      == 0 ||
 	    strcmp(s->name, "__visible")     == 0 ||
 	    strcmp(s->name, "hidden")        == 0 ||
@@ -953,6 +985,7 @@ tnum:
 	if(c != '0') {
 		c1 |= Numdec;
 		for(;;) {
+			if(c == '\'') { c = GETC(); continue; }	/* C23 digit separator */
 			if(!isdigit(c))
 				goto dc;
 
@@ -971,6 +1004,7 @@ tnum:
 				goto toolong;
 			*cp++ = c;
 			c = GETC();
+			if(c == '\'') continue;			/* C23 digit separator */
 			if(isdigit(c)){
 				vv = vv*16 + c-'0';
 				continue;
@@ -997,6 +1031,7 @@ tnum:
 				goto toolong;
 			*cp++ = c;
 			c = GETC();
+			if(c == '\'') continue;			/* C23 digit separator */
 			if(c == '0' || c == '1'){
 				vv = vv*2 + c-'0';
 				continue;
@@ -1008,6 +1043,7 @@ tnum:
 	if(c < '0' || c > '7')
 		goto dc;
 	for(;;) {
+		if(c == '\'') { c = GETC(); continue; }	/* C23 digit separator */
 		if(c < '0' || c > '7')
 			goto ncu;
 

@@ -66,9 +66,24 @@
 %token	LWHILE LVOID LENUM LSIGNED LCONSTNT LVOLATILE LSET LSIGNOF
 %token	LRESTRICT LINLINE LNORET LDOTDOTDOT LCOMPLEX LIMAGINARY LCOMPLEXF LCOMPLEXD
 %token	LTYPEOF
+%token	LNULLPTR LSTATICASSERT
 %%
 prog:
 |	prog xdecl
+|	prog LSTATICASSERT '(' expr ',' LSTRING ')' ';'
+	{
+		/* C11 _Static_assert at file scope */
+		complex($4);
+		if($4->op == OCONST && !$4->vconst)
+			diag($4, "_Static_assert failed: %s", $6.s);
+	}
+|	prog LSTATICASSERT '(' expr ')' ';'
+	{
+		/* C23 _Static_assert without message at file scope */
+		complex($4);
+		if($4->op == OCONST && !$4->vconst)
+			diag($4, "_Static_assert failed");
+	}
 
 /*
  * external declarator
@@ -384,6 +399,22 @@ slist:
 |	slist stmnt
 	{
 		$$ = new(OLIST, $1, $2);
+	}
+|	slist LSTATICASSERT '(' expr ',' LSTRING ')' ';'
+	{
+		/* C11 _Static_assert at function scope */
+		complex($4);
+		if($4->op == OCONST && !$4->vconst)
+			diag($4, "_Static_assert failed: %s", $6.s);
+		$$ = $1;
+	}
+|	slist LSTATICASSERT '(' expr ')' ';'
+	{
+		/* C23 _Static_assert without message */
+		complex($4);
+		if($4->op == OCONST && !$4->vconst)
+			diag($4, "_Static_assert failed");
+		$$ = $1;
 	}
 
 labels:
@@ -741,6 +772,14 @@ pexpr:
 	'(' cexpr ')'
 	{
 		$$ = $2;
+	}
+|	LNULLPTR
+	{
+		/* C23 nullptr: null pointer constant of type void* */
+		$$ = new(OCONST, Z, Z);
+		$$->type = types[TIND];
+		$$->vconst = 0;
+		$$->cstring = "nullptr";
 	}
 |	LSIZEOF '(' tlist abdecor ')'
 	{
