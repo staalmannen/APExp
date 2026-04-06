@@ -1,22 +1,29 @@
 #include <stdio.h>
+#include <unistd.h>
+
+void debug_print(const char *msg) {
+	write(2, msg, __builtin_strlen(msg));
+	write(2, "\n", 1);
+}
 
 int main(int argc, char *argv[], char *envp[]) {
-	FILE *f;
-	char buf[100];
+	debug_print("TEST: main() started");
 
-	f = fopen("/tmp/test.txt", "w");
+	debug_print("TEST: about to call fopen");
+	FILE *f = fopen("/tmp/test.txt", "w");
+
 	if (!f) {
-		perror("fopen");
+		debug_print("TEST: fopen failed");
 		return 1;
 	}
+
+	debug_print("TEST: fopen succeeded");
 	fprintf(f, "Hello from musl stdio!\n");
+
+	debug_print("TEST: about to fclose");
 	fclose(f);
 
-	f = fopen("/tmp/test.txt", "r");
-	fgets(buf, sizeof(buf), f);
-	printf("Read: %s", buf);
-	fclose(f);
-
+	debug_print("TEST: main() exiting");
 	return 0;
 }
 
