@@ -15,9 +15,11 @@ size_t __wcsxfrm_l(wchar_t *restrict dest, const wchar_t *restrict src, size_t n
 	return l;
 }
 
+#undef wcsxfrm
+
 size_t wcsxfrm(wchar_t *restrict dest, const wchar_t *restrict src, size_t n)
 {
-	return __wcsxfrm_l(dest, src, n, CURRENT_LOCALE);
+	return __wcsxfrm_l(dest, src, n, (locale_t) "UTF-8");
 }
 
 weak_alias(__wcsxfrm_l, wcsxfrm_l);

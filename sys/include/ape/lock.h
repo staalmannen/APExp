@@ -18,6 +18,7 @@ extern	void	unlock(Lock*);
 extern	int	canlock(Lock*);
 extern	int	tas(int*);
 
+
 #ifdef __cplusplus
 }
 #endif

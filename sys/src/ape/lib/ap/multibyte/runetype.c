@@ -1030,6 +1030,9 @@ Rune	__totitle1[] =
 	0x01f3, 499,	/* ǳ ǲ */
 };
 
+// name conflict with stdlib.h
+#define bsearch rune_bsearch
+
 static
 Rune*
 bsearch(Rune c, Rune *t, int n, int ne)

@@ -11,7 +11,6 @@ OFILES=\
 	catgets.$O\
 	catopen.$O\
 	bind_textdomain_codeset.$O\
-	dcngettext.$O\
 	iconv.$O\
 	iconv_close.$O\
 	langinfo.$O\
@@ -25,6 +24,7 @@ OFILES=\
 	wcscoll.$O\
 	wcsxfrm.$O\
 # stub\
+	dcngettext.$O\
 	locale_charset.$O\
 	locale_stubs.$O\
 

@@ -40,7 +40,7 @@ nl_catd catopen(const char *name, int oflag)
 	char buf[PATH_MAX];
 	size_t i;
 	const char *path, *lang, *p, *z;
-	if (libc.secure || !(path = getenv("NLSPATH"))) {
+	if (!(path = getenv("NLSPATH"))) {
 		errno = ENOENT;
 		return (nl_catd)-1;
 	}

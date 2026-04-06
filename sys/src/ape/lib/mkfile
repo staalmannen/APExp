@@ -18,7 +18,7 @@ _OPTIONAL_LIBS=\
 	edit\
 	fortran\
 	gettextpo\
-	intl\
+#	intl\
 	lua\
 	lzma\
 	pascal\
