@@ -1,18 +1,19 @@
+/* sys/src/ape/lib/ap/stdio/ofl.c */
 #include "stdio_impl.h"
-#include "lock.h"
-#include "fork_impl.h"
+#include <pthread.h>
 
 static FILE *ofl_head;
-static volatile int ofl_lock[1];
-volatile int *const __stdio_ofl_lockptr = ofl_lock;
+static pthread_mutex_t ofl_lock = PTHREAD_MUTEX_INITIALIZER;
+volatile int *const __stdio_ofl_lockptr = (volatile int *)&ofl_lock;
 
 FILE **__ofl_lock()
 {
-	LOCK(ofl_lock);
+	pthread_mutex_lock(&ofl_lock);
 	return &ofl_head;
 }
 
 void __ofl_unlock()
 {
-	UNLOCK(ofl_lock);
+	pthread_mutex_unlock(&ofl_lock);
 }
+
