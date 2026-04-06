@@ -826,7 +826,7 @@ ed_command(EditLine *el, wint_t c __attribute__((__unused__)))
 	wchar_t tmpbuf[EL_BUFSIZ];
 	int tmplen;
 
-	tmplen = c_gets(el, tmpbuf, (unsigned short *) L"\n: ");
+	tmplen = c_gets(el, tmpbuf, L"\n: ");
 	terminal__putc(el, '\n');
 
 	if (tmplen < 0 || (tmpbuf[tmplen] = 0, parse_line(el, tmpbuf)) == -1)

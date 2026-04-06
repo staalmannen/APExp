@@ -35,7 +35,7 @@ AM_INIT_AUTOMAKE
 LT_INIT
 
 # libtool -version-info
-AC_SUBST(LT_VERSION, [0:74:0])
+AC_SUBST(LT_VERSION, [0:76:0])
 
 m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
 
@@ -114,7 +114,7 @@ AC_CHECK_TYPES([u_int32_t])
 # Checks for library functions.
 AC_FUNC_CLOSEDIR_VOID
 AC_FUNC_FORK
-AC_PROG_GCC_TRADITIONAL
+AC_PROG_CC
 ## _AIX is offended by rpl_malloc and rpl_realloc
 #AC_FUNC_MALLOC
 #AC_FUNC_REALLOC

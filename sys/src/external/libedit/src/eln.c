@@ -183,23 +183,23 @@ el_set(EditLine *el, int op, ...)
 		 */
 		switch (op) {
 		case EL_BIND:
-			wargv[0] = (unsigned short *) L"bind";
+			wargv[0] = L"bind";
 			ret = map_bind(el, i, wargv);
 			break;
 		case EL_TELLTC:
-			wargv[0] = (unsigned short *) L"telltc";
+			wargv[0] = L"telltc";
 			ret = terminal_telltc(el, i, wargv);
 			break;
 		case EL_SETTC:
-			wargv[0] = (unsigned short *) L"settc";
+			wargv[0] = L"settc";
 			ret = terminal_settc(el, i, wargv);
 			break;
 		case EL_ECHOTC:
-			wargv[0] = (unsigned short *) L"echotc";
+			wargv[0] = L"echotc";
 			ret = terminal_echotc(el, i, wargv);
 			break;
 		case EL_SETTY:
-			wargv[0] = (unsigned short *) L"setty";
+			wargv[0] = L"setty";
 			ret = tty_stty(el, i, wargv);
 			break;
 		default:

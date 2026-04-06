@@ -1,7 +1,7 @@
 /*	$NetBSD: tokenizer.c,v 1.29 2023/05/30 11:53:40 christos Exp $	*/
 
 /*-
- * Copyright (c) 1992, 1993 NARROW
+ * Copyright (c) 1992, 1993
  *	The Regents of the University of California.  All rights reserved.
  *
  * This code is derived from software contributed to Berkeley by
@@ -127,7 +127,7 @@ FUN(tok,init)(const Char *ifs)
 
 	if (tok == NULL)
 		return NULL;
-	tok->ifs = tok_strdup(ifs ? ifs : (Char *) IFS);
+	tok->ifs = tok_strdup(ifs ? ifs : IFS);
 	if (tok->ifs == NULL) {
 		tok_free(tok);
 		return NULL;
@@ -216,7 +216,7 @@ FUN(tok,line)(TYPE(Tokenizer) *tok, const TYPE(LineInfo) *line,
 	ptr = line->buffer;
 	for (ptr = line->buffer; ;ptr++) {
 		if (ptr >= line->lastchar)
-			ptr = (Char *) STR("");
+			ptr = STR("");
 		if (ptr == line->cursor) {
 			cc = (int)tok->argc;
 			co = (int)(tok->wptr - tok->wstart);
@@ -464,6 +464,6 @@ FUN(tok,str)(TYPE(Tokenizer) *tok, const Char *line, int *argc,
 
 	memset(&li, 0, sizeof(li));
 	li.buffer = line;
-	li.cursor = li.lastchar = (Char *) Strchr(line, '\0');
+	li.cursor = li.lastchar = Strchr(line, '\0');
 	return FUN(tok,line)(tok, &li, argc, argv, NULL, NULL);
 }

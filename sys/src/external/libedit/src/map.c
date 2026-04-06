@@ -1,4 +1,4 @@
-/*	$NetBSD: map.c,v 1.55 2022/10/30 19:11:31 christos Exp $	*/
+/*	$NetBSD: map.c,v 1.56 2025/01/03 00:40:08 rillig Exp $	*/
 
 /*-
  * Copyright (c) 1992, 1993
@@ -37,7 +37,7 @@
 #if 0
 static char sccsid[] = "@(#)map.c	8.1 (Berkeley) 6/4/93";
 #else
-__RCSID("$NetBSD: map.c,v 1.55 2022/10/30 19:11:31 christos Exp $");
+__RCSID("$NetBSD: map.c,v 1.56 2025/01/03 00:40:08 rillig Exp $");
 #endif
 #endif /* not lint && not SCCSID */
 
@@ -1118,10 +1118,10 @@ map_get_editor(EditLine *el, const wchar_t **editor)
 		return -1;
 	switch (el->el_map.type) {
 	case MAP_EMACS:
-		*editor = (unsigned short *) L"emacs";
+		*editor = L"emacs";
 		return 0;
 	case MAP_VI:
-		*editor = (unsigned short *) L"vi";
+		*editor = L"vi";
 		return 0;
 	}
 	return -1;
@@ -1244,9 +1244,9 @@ map_print_all_keys(EditLine *el)
 	map_print_some_keys(el, el->el_map.alt, prev, i - 1);
 
 	(void) fprintf(el->el_outfile, "Multi-character bindings\n");
-	keymacro_print(el, (unsigned short *) L"");
+	keymacro_print(el, L"");
 	(void) fprintf(el->el_outfile, "Arrow key bindings\n");
-	terminal_print_arrow(el, (unsigned short *) L"");
+	terminal_print_arrow(el, L"");
 }
 
 
@@ -1390,7 +1390,6 @@ map_bind(EditLine *el, int argc, const wchar_t **argv)
 	/* coverity[dead_error_begin] */
 	default:
 		EL_ABORT((el->el_errfile, "Bad XK_ type %d\n", ntype));
-		break;
 	}
 	return 0;
 }

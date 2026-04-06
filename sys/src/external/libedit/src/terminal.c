@@ -985,37 +985,37 @@ terminal_init_arrow(EditLine *el)
 {
 	funckey_t *arrow = el->el_terminal.t_fkey;
 
-	arrow[A_K_DN].name = (unsigned short *) L"down";
+	arrow[A_K_DN].name = L"down";
 	arrow[A_K_DN].key = T_kd;
 	arrow[A_K_DN].fun.cmd = ED_NEXT_HISTORY;
 	arrow[A_K_DN].type = XK_CMD;
 
-	arrow[A_K_UP].name = (unsigned short *) L"up";
+	arrow[A_K_UP].name = L"up";
 	arrow[A_K_UP].key = T_ku;
 	arrow[A_K_UP].fun.cmd = ED_PREV_HISTORY;
 	arrow[A_K_UP].type = XK_CMD;
 
-	arrow[A_K_LT].name = (unsigned short *) L"left";
+	arrow[A_K_LT].name = L"left";
 	arrow[A_K_LT].key = T_kl;
 	arrow[A_K_LT].fun.cmd = ED_PREV_CHAR;
 	arrow[A_K_LT].type = XK_CMD;
 
-	arrow[A_K_RT].name = (unsigned short *) L"right";
+	arrow[A_K_RT].name = L"right";
 	arrow[A_K_RT].key = T_kr;
 	arrow[A_K_RT].fun.cmd = ED_NEXT_CHAR;
 	arrow[A_K_RT].type = XK_CMD;
 
-	arrow[A_K_HO].name = (unsigned short *) L"home";
+	arrow[A_K_HO].name = L"home";
 	arrow[A_K_HO].key = T_kh;
 	arrow[A_K_HO].fun.cmd = ED_MOVE_TO_BEG;
 	arrow[A_K_HO].type = XK_CMD;
 
-	arrow[A_K_EN].name = (unsigned short *) L"end";
+	arrow[A_K_EN].name = L"end";
 	arrow[A_K_EN].key = T_at7;
 	arrow[A_K_EN].fun.cmd = ED_MOVE_TO_END;
 	arrow[A_K_EN].type = XK_CMD;
 
-	arrow[A_K_DE].name = (unsigned short *) L"delete";
+	arrow[A_K_DE].name = L"delete";
 	arrow[A_K_DE].key = T_kD;
 	arrow[A_K_DE].fun.cmd = ED_DELETE_NEXT_CHAR;
 	arrow[A_K_DE].type = XK_CMD;
@@ -1029,9 +1029,9 @@ static void
 terminal_reset_arrow(EditLine *el)
 {
 	funckey_t *arrow = el->el_terminal.t_fkey;
-	static const wchar_t strA[] = (unsigned short *) L"\033[A";
-	static const wchar_t strB[] = (unsigned short *) L"\033[B";
-	static const wchar_t strC[] = (unsigned short *) L"\033[C";
+	static const wchar_t strA[] = L"\033[A";
+	static const wchar_t strB[] = L"\033[B";
+	static const wchar_t strC[] = L"\033[C";
 	static const wchar_t strD[] = L"\033[D";
 	static const wchar_t strH[] = L"\033[H";
 	static const wchar_t strF[] = L"\033[F";

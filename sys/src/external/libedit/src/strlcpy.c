@@ -1,4 +1,4 @@
-/*	$NetBSD: strlcpy.c,v 1.3 2007/06/04 18:19:27 christos Exp $	*/
+/*	$NetBSD: strlcpy.c,v 1.4 2024/11/01 21:11:37 riastradh Exp $	*/
 /*	$OpenBSD: strlcpy.c,v 1.7 2003/04/12 21:56:39 millert Exp $	*/
 
 /*
@@ -20,7 +20,7 @@
 #include "config.h"
 
 #if defined(LIBC_SCCS) && !defined(lint)
-__RCSID("$NetBSD: strlcpy.c,v 1.3 2007/06/04 18:19:27 christos Exp $");
+__RCSID("$NetBSD: strlcpy.c,v 1.4 2024/11/01 21:11:37 riastradh Exp $");
 #endif /* LIBC_SCCS and not lint */
 
 #include <sys/types.h>
@@ -40,7 +40,7 @@ __weak_alias(strlcpy, _strlcpy)
  * Returns strlen(src); if retval >= siz, truncation occurred.
  */
 size_t
-strlcpy(char *dst, const char *src, size_t siz)
+strlcpy(char *__restrict dst, const char *__restrict src, size_t siz)
 {
 	char *d = dst;
 	const char *s = src;

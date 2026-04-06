@@ -1,4 +1,4 @@
-/*	$NetBSD: el.c,v 1.101 2022/10/30 19:11:31 christos Exp $	*/
+/*	$NetBSD: el.c,v 1.102 2025/01/03 00:40:08 rillig Exp $	*/
 
 /*-
  * Copyright (c) 1992, 1993
@@ -37,7 +37,7 @@
 #if 0
 static char sccsid[] = "@(#)el.c	8.2 (Berkeley) 1/3/94";
 #else
-__RCSID("$NetBSD: el.c,v 1.101 2022/10/30 19:11:31 christos Exp $");
+__RCSID("$NetBSD: el.c,v 1.102 2025/01/03 00:40:08 rillig Exp $");
 #endif
 #endif /* not lint && not SCCSID */
 
@@ -274,34 +274,33 @@ el_wset(EditLine *el, int op, ...)
 
 		switch (op) {
 		case EL_BIND:
-			argv[0] = (unsigned short *) L"bind";
+			argv[0] = L"bind";
 			rv = map_bind(el, i, argv);
 			break;
 
 		case EL_TELLTC:
-			argv[0] = (unsigned short *) L"telltc";
+			argv[0] = L"telltc";
 			rv = terminal_telltc(el, i, argv);
 			break;
 
 		case EL_SETTC:
-			argv[0] = (unsigned short *) L"settc";
+			argv[0] = L"settc";
 			rv = terminal_settc(el, i, argv);
 			break;
 
 		case EL_ECHOTC:
-			argv[0] = (unsigned short *) L"echotc";
+			argv[0] = L"echotc";
 			rv = terminal_echotc(el, i, argv);
 			break;
 
 		case EL_SETTY:
-			argv[0] = (unsigned short *) L"setty";
+			argv[0] = L"setty";
 			rv = tty_stty(el, i, argv);
 			break;
 
 		default:
 			rv = -1;
 			EL_ABORT((el->el_errfile, "Bad op %d\n", op));
-			break;
 		}
 		break;
 	}

@@ -950,7 +950,6 @@ tty__get_flag(struct termios *t, int kind) {
 		return &t->c_lflag;
 	default:
 		abort();
-		return NULL;
 		/*NOTREACHED*/
 	}
 }
@@ -1251,7 +1250,7 @@ tty_stty(EditLine *el, int argc __attribute__((__unused__)),
 			break;
 		}
 		d = s;
-		p = (unsigned short *) wcschr(s, (unsigned short *) L'=');
+		p = wcschr(s, L'=');
 		for (m = ttymodes; m->m_name; m++)
 			if ((p ? strncmp(m->m_name, ct_encode_string(d,
 			    &el->el_scratch), (size_t)(p - d)) :

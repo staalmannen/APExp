@@ -1,6 +1,14 @@
    * See also NetBSD changelog:
 	http://cvsweb.netbsd.org/bsdweb.cgi/src/lib/libedit
 
+2025-10-16 Jess Thrysoee
+
+   * all: sync with upstream source
+
+2025-01-04 Jess Thrysoee
+
+   * all: sync with upstream source
+
 2024-08-08 Jess Thrysoee
 
    * all: sync with upstream source

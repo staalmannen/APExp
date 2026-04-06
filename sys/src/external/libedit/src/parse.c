@@ -64,13 +64,13 @@ static const struct {
 	const wchar_t *name;
 	int (*func)(EditLine *, int, const wchar_t **);
 } cmds[] = {
-	{ (unsigned short *) L"bind",		map_bind	},
-	{ (unsigned short *) L"echotc",		terminal_echotc	},
-	{ (unsigned short *) L"edit",		el_editmode	},
-	{ (unsigned short *) L"history",		hist_command	},
-	{ (unsigned short *) L"telltc",		terminal_telltc	},
-	{ (unsigned short *) L"settc",		terminal_settc	},
-	{ (unsigned short *) L"setty",		tty_stty	},
+	{ L"bind",		map_bind	},
+	{ L"echotc",		terminal_echotc	},
+	{ L"edit",		el_editmode	},
+	{ L"history",		hist_command	},
+	{ L"telltc",		terminal_telltc	},
+	{ L"settc",		terminal_settc	},
+	{ L"setty",		tty_stty	},
 	{ NULL,			NULL		}
 };
 
@@ -104,7 +104,7 @@ el_wparse(EditLine *el, int argc, const wchar_t *argv[])
 
 	if (argc < 1)
 		return -1;
-	ptr = (unsigned short *) wcschr(argv[0], (unsigned short *) L':');
+	ptr = wcschr(argv[0], L':');
 	if (ptr != NULL) {
 		wchar_t *tprog;
 		size_t l;
@@ -179,14 +179,14 @@ parse__escape(const wchar_t **ptr)
 		case 'U':		/* Unicode \U+xxxx or \U+xxxxx format */
 		{
 			int i;
-			const wchar_t hex[] = (unsigned short) L"0123456789ABCDEF";
+			const wchar_t hex[] = L"0123456789ABCDEF";
 			const wchar_t *h;
 			++p;
 			if (*p++ != '+')
 				return -1;
 			c = 0;
 			for (i = 0; i < 5; ++i) {
-				h = (unsigned short *) wcschr(hex, *p++);
+				h = wcschr(hex, *p++);
 				if (!h && i < 4)
 					return -1;
 				else if (h)

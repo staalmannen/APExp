@@ -821,7 +821,7 @@ vi_match(EditLine *el, wint_t c __attribute__((__unused__)))
 	o_ch = el->el_line.cursor[i];
 	if (o_ch == 0)
 		return CC_ERROR;
-	delta = (size_t)(wcschr(match_chars, o_ch) - (size_t) match_chars);
+	delta = (size_t)(wcschr(match_chars, o_ch) - match_chars);
 	c_ch = match_chars[delta ^ 1];
 	count = 1;
 	delta = 1 - (delta & 1) * 2;
