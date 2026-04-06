@@ -66,9 +66,5 @@ FILE *__fdopen(int fd, const char *mode)
 	return __ofl_add(f);
 }
 
-/* Compatibility alias */
-FILE *fdopen(int fd, const char *mode)
-{
-	return __fdopen(fd, mode);
-}
+
 
