@@ -153,6 +153,7 @@ estartfn(ulong key, int fd, int n, int (*fn)(int, Event*, uchar*, int))
 	buf[0] = MAXSLAVE;
 	write(epipe[1], buf, 1);
 	_exits(0);
+	return 0;
 }
 
 ulong
@@ -180,6 +181,7 @@ etimer(ulong key, int n)
 	t[0] = MAXSLAVE;
 	write(epipe[1], t, 1);
 	_exits(0);
+	return 0;
 }
 
 static void

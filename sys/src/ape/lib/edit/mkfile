@@ -49,7 +49,7 @@ EDITSRC=../../../external/libedit/src
 #fails on include_next
 CC=$APEXPROOT/$objtype/bin/pcc
 
-CFLAGS=-c -I. -I$APEXPROOT/sys/include/ape -I$EDITSRC -DHAVE_CONFIG_H -D_POSIX_SOURCE
+CFLAGS=-c -I$EDITSRC/.. -I$EDITSRC -DHAVE_CONFIG_H -D_POSIX_SOURCE -D__STDC_ISO_10646__=1
 
 %.$O: $EDITSRC/%.c
 	$CC $CFLAGS $EDITSRC/$stem.c

@@ -41,6 +41,7 @@ extern int putenv(char *);
 extern int system(const char *);
 extern void *bsearch(const void *, const void *, size_t, size_t, int (*)(const void *, const void *));
 extern void qsort(void *, size_t, size_t, int (*)(const void *, const void *));
+#undef abs
 extern int abs(int);
 extern div_t div(int, int);
 extern long int labs(long int);

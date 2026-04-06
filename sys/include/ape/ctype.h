@@ -41,11 +41,13 @@ extern unsigned char _ctype[];
 #define	isalpha(c)	(_ctype[(unsigned char)(c)]&(_ISupper|_ISlower))
 #define	isblank(c)	(_ctype[(unsigned char)(c)]&_ISblank)
 #define	iscntrl(c)	(_ctype[(unsigned char)(c)]&_IScntrl)
+#undef isdigit
 #define	isdigit(c)	(_ctype[(unsigned char)(c)]&_ISdigit)
 #define	isgraph(c)	(_ctype[(unsigned char)(c)]&(_ISpunct|_ISupper|_ISlower|_ISdigit))
 #define	islower(c)	(_ctype[(unsigned char)(c)]&_ISlower)
 #define	isprint(c)	(_ctype[(unsigned char)(c)]&(_ISpunct|_ISupper|_ISlower|_ISdigit|_ISblank))
 #define	ispunct(c)	(_ctype[(unsigned char)(c)]&_ISpunct)
+#undef isspace
 #define	isspace(c)	(_ctype[(unsigned char)(c)]&_ISspace)
 #define	isupper(c)	(_ctype[(unsigned char)(c)]&_ISupper)
 #define	isxdigit(c)	(_ctype[(unsigned char)(c)]&_ISxdigit)

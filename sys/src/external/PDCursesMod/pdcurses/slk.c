@@ -106,9 +106,7 @@ static int label_length = 0;
 static int labels = 0;
 static int label_fmt = 0;
 static int label_line = 0;
-//we ignore the hidden keyword
-#define hidden Hidden
-static bool hidden = FALSE;
+static bool Hidden = FALSE;
 
 #define MAX_LABEL_LENGTH 32
 
@@ -183,7 +181,7 @@ static void _drawone(int num)
 {
     int i, col, slen;
 
-    if (hidden)
+    if (Hidden)
         return;
 
     slen = slk[num].len;
@@ -220,7 +218,7 @@ static void _redraw(void)
 {
     int i;
 
-    if( !hidden)
+    if( !Hidden)
     {
         for (i = 0; i < labels; ++i)
             _drawone(i);
@@ -349,7 +347,7 @@ int slk_clear(void)
     if (!SP)
         return ERR;
 
-    hidden = TRUE;
+    Hidden = TRUE;
     werase(SP->slk_winptr);
     return wrefresh(SP->slk_winptr);
 }
@@ -362,7 +360,7 @@ int slk_restore(void)
     if (!SP)
         return ERR;
 
-    hidden = FALSE;
+    Hidden = FALSE;
     _redraw();
     return wrefresh(SP->slk_winptr);
 }
@@ -568,7 +566,7 @@ void PDC_slk_free(void)
         labels = 0;
         label_fmt = 0;
         label_line = 0;
-        hidden = FALSE;
+        Hidden = FALSE;
     }
 }
 
@@ -582,7 +580,7 @@ int PDC_mouse_in_slk(int y, int x)
        of the screen, or the SLKs are hidden,  we are not interested in it. */
 
     assert( SP);
-    if (!slk || hidden || !SP->slk_winptr
+    if (!slk || Hidden || !SP->slk_winptr
                         || (y != SP->slk_winptr->_begy + label_line))
         return 0;
 

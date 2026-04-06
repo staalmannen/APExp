@@ -4,7 +4,7 @@
 # Copyright (C) 1994-2024 Free Software Foundation, Inc.
 
 # This Makefile.in is free software; the Free Software Foundation
-# gives unlimited permission to copy and/or distribute it, 
+# gives unlimited permission to copy and/or distribute it,
 # with or without modifications, as long as this notice is preserved.
 
 # This program is distributed in the hope that it will be useful,
@@ -91,14 +91,17 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = x86_64-unknown-plan9
 host_triplet = x86_64-unknown-plan9
-am__append_1 = strlcpy.c
-am__append_2 = strlcat.c
+#am__append_1 = strlcpy.c
+#am__append_2 = strlcat.c
 #am__append_3 = getline.c
 am__append_4 = vis.c
 am__append_5 = unvis.c
 subdir = src
-ACLOCAL_M4 =
-am__aclocal_m4_deps =
+ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
+am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
+	$(top_srcdir)/m4/ltoptions.m4 $(top_srcdir)/m4/ltsugar.m4 \
+	$(top_srcdir)/m4/ltversion.m4 $(top_srcdir)/m4/lt~obsolete.m4 \
+	$(top_srcdir)/acinclude.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(nobase_include_HEADERS) \
@@ -145,8 +148,8 @@ am__libedit_la_SOURCES_DIST = chared.c common.c el.c eln.c emacs.c \
 	refresh.h search.h sig.h sys.h terminal.h tty.h vis.h \
 	filecomplete.h editline/readline.h literal.h strlcpy.c \
 	strlcat.c getline.c vis.c unvis.c
-am__objects_1 = strlcpy.lo
-am__objects_2 = strlcat.lo
+#am__objects_1 = strlcpy.lo
+#am__objects_2 = strlcat.lo
 #am__objects_3 = getline.lo
 am__objects_4 = vis.lo
 am__objects_5 = unvis.lo
@@ -183,7 +186,21 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I. -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade =
+am__depfiles_remade = ./$(DEPDIR)/chared.Plo ./$(DEPDIR)/chartype.Plo \
+	./$(DEPDIR)/common.Plo ./$(DEPDIR)/el.Plo ./$(DEPDIR)/eln.Plo \
+	./$(DEPDIR)/emacs.Plo ./$(DEPDIR)/filecomplete.Plo \
+	./$(DEPDIR)/getline.Plo ./$(DEPDIR)/hist.Plo \
+	./$(DEPDIR)/history.Plo ./$(DEPDIR)/historyn.Plo \
+	./$(DEPDIR)/keymacro.Plo ./$(DEPDIR)/literal.Plo \
+	./$(DEPDIR)/map.Plo ./$(DEPDIR)/parse.Plo \
+	./$(DEPDIR)/prompt.Plo ./$(DEPDIR)/read.Plo \
+	./$(DEPDIR)/readline.Plo ./$(DEPDIR)/reallocarr.Plo \
+	./$(DEPDIR)/refresh.Plo ./$(DEPDIR)/search.Plo \
+	./$(DEPDIR)/sig.Plo ./$(DEPDIR)/strlcat.Plo \
+	./$(DEPDIR)/strlcpy.Plo ./$(DEPDIR)/terminal.Plo \
+	./$(DEPDIR)/tokenizer.Plo ./$(DEPDIR)/tokenizern.Plo \
+	./$(DEPDIR)/tty.Plo ./$(DEPDIR)/unvis.Plo ./$(DEPDIR)/vi.Plo \
+	./$(DEPDIR)/vis.Plo ./$(DEPDIR)/wcsdup.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -260,19 +277,19 @@ EXEEXT =
 FGREP = /bin/grep -F
 FILECMD = file
 GREP = /bin/grep
-INSTALL = .././install-sh -c
+INSTALL = /bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 LD = pcc
 LDFLAGS = 
-LIBOBJS =  ${LIBOBJDIR}lstat$U.o
+LIBOBJS = 
 LIBS = -lcurses 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
-LN_S = cp -pR
-LTLIBOBJS =  ${LIBOBJDIR}lstat$U.lo
+LN_S = ln -s
+LTLIBOBJS = 
 LT_SYS_LIBRARY_PATH = 
 LT_VERSION = 0:74:0
 MAKEINFO = ${SHELL} '/usr/glenda/APExp/sys/src/external/libedit/missing' makeinfo
@@ -294,7 +311,7 @@ PACKAGE_TARNAME = libedit-20240808
 PACKAGE_URL = 
 PACKAGE_VERSION = 3.1
 PATH_SEPARATOR = :
-RANLIB = :
+RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/sh
@@ -449,6 +466,39 @@ mostlyclean-compile:
 
 distclean-compile:
 	-rm -f *.tab.c
+
+include ./$(DEPDIR)/chared.Plo # am--include-marker
+include ./$(DEPDIR)/chartype.Plo # am--include-marker
+include ./$(DEPDIR)/common.Plo # am--include-marker
+include ./$(DEPDIR)/el.Plo # am--include-marker
+include ./$(DEPDIR)/eln.Plo # am--include-marker
+include ./$(DEPDIR)/emacs.Plo # am--include-marker
+include ./$(DEPDIR)/filecomplete.Plo # am--include-marker
+include ./$(DEPDIR)/getline.Plo # am--include-marker
+include ./$(DEPDIR)/hist.Plo # am--include-marker
+include ./$(DEPDIR)/history.Plo # am--include-marker
+include ./$(DEPDIR)/historyn.Plo # am--include-marker
+include ./$(DEPDIR)/keymacro.Plo # am--include-marker
+include ./$(DEPDIR)/literal.Plo # am--include-marker
+include ./$(DEPDIR)/map.Plo # am--include-marker
+include ./$(DEPDIR)/parse.Plo # am--include-marker
+include ./$(DEPDIR)/prompt.Plo # am--include-marker
+include ./$(DEPDIR)/read.Plo # am--include-marker
+include ./$(DEPDIR)/readline.Plo # am--include-marker
+include ./$(DEPDIR)/reallocarr.Plo # am--include-marker
+include ./$(DEPDIR)/refresh.Plo # am--include-marker
+include ./$(DEPDIR)/search.Plo # am--include-marker
+include ./$(DEPDIR)/sig.Plo # am--include-marker
+include ./$(DEPDIR)/strlcat.Plo # am--include-marker
+include ./$(DEPDIR)/strlcpy.Plo # am--include-marker
+include ./$(DEPDIR)/terminal.Plo # am--include-marker
+include ./$(DEPDIR)/tokenizer.Plo # am--include-marker
+include ./$(DEPDIR)/tokenizern.Plo # am--include-marker
+include ./$(DEPDIR)/tty.Plo # am--include-marker
+include ./$(DEPDIR)/unvis.Plo # am--include-marker
+include ./$(DEPDIR)/vi.Plo # am--include-marker
+include ./$(DEPDIR)/vis.Plo # am--include-marker
+include ./$(DEPDIR)/wcsdup.Plo # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)

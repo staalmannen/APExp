@@ -127,7 +127,7 @@ configure:3533: $? = 0
 configure:3580: result: yes
 configure:3600: checking for cc option to enable C11 features
 configure:3615: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:184[stdin:243] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:184[stdin:253] syntax error, last name: __func__$9
 configure:3615: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -418,7 +418,7 @@ configure: failed program was:
 | }
 | 
 configure:3615: cc -std=gnu11 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:184[stdin:243] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:184[stdin:253] syntax error, last name: __func__$9
 configure:3615: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -711,8 +711,7 @@ configure: failed program was:
 configure:3629: result: unsupported
 configure:3649: checking for cc option to enable C99 features
 configure:3664: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:217[stdin:276] array size must be a positive constant
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:272] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 configure:3664: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -943,8 +942,7 @@ configure: failed program was:
 | }
 | 
 configure:3664: cc -std=gnu99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:217[stdin:276] array size must be a positive constant
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:272] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 configure:3664: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1175,8 +1173,7 @@ configure: failed program was:
 | }
 | 
 configure:3664: cc -std=c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:217[stdin:276] array size must be a positive constant
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:272] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 configure:3664: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1407,8 +1404,7 @@ configure: failed program was:
 | }
 | 
 configure:3664: cc -c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:217[stdin:276] array size must be a positive constant
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:272] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 configure:3664: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1639,8 +1635,7 @@ configure: failed program was:
 | }
 | 
 configure:3664: cc -qlanglvl=extc1x -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:217[stdin:276] array size must be a positive constant
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:272] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 configure:3664: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1871,8 +1866,7 @@ configure: failed program was:
 | }
 | 
 configure:3664: cc -qlanglvl=extc99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:217[stdin:276] array size must be a positive constant
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:272] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 configure:3664: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2103,8 +2097,7 @@ configure: failed program was:
 | }
 | 
 configure:3664: cc -AC99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:217[stdin:276] array size must be a positive constant
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:272] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 configure:3664: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2335,8 +2328,7 @@ configure: failed program was:
 | }
 | 
 configure:3664: cc -D_STDC_C99= -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:217[stdin:276] array size must be a positive constant
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:272] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 configure:3664: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2619,8 +2611,7 @@ configure:3819: $? = 0
 configure:3819: result: yes
 configure:3819: checking for minix/config.h
 configure:3819: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: p
+<eof> End of file
 configure:3819: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2673,8 +2664,7 @@ configure: failed program was:
 configure:3819: result: no
 configure:3819: checking for vfork.h
 configure:3819: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: p
+<eof> End of file
 configure:3819: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2734,7 +2724,7 @@ configure:3904: cc -c -g  conftest.c >&5
 configure:3904: $? = 0
 configure:3933: result: no
 configure:4010: checking for a BSD-compatible install
-configure:4084: result: ./install-sh -c
+configure:4084: result: /bin/install -c
 configure:4095: checking whether sleep supports fractional seconds
 configure:4111: result: yes
 configure:4114: checking filesystem timestamp resolution
@@ -2792,7 +2782,7 @@ configure:5781: output
  D some_variable
 configure:5789: result: BSD nm
 configure:5792: checking whether ln -s works
-configure:5799: result: no, using cp -pR
+configure:5796: result: yes
 configure:5804: checking the maximum length of command line arguments
 configure:5937: result: 512
 configure:5985: checking how to convert x86_64-unknown-plan9 file names to x86_64-unknown-plan9 format
@@ -2829,7 +2819,8 @@ configure:6977: checking for strip
 configure:6998: found /bin/strip
 configure:7010: result: strip
 configure:7088: checking for ranlib
-configure:7124: result: no
+configure:7109: found /bin/ranlib
+configure:7121: result: ranlib
 configure:7223: checking command to parse /bin/nm output from cc object
 configure:7377: cc -c -g  conftest.c >&5
 configure:7380: $? = 0
@@ -2851,78 +2842,8 @@ configure:8050: : '-?'
 configure:8059: result: no
 configure:8794: checking for dlfcn.h
 configure:8794: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: char
-configure:8794: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "libedit"
-| #define PACKAGE_TARNAME "libedit-20240808"
-| #define PACKAGE_VERSION "3.1"
-| #define PACKAGE_STRING "libedit 3.1"
-| #define PACKAGE_BUGREPORT ""
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PACKAGE "libedit-20240808"
-| #define VERSION "3.1"
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| 
-| #include <dlfcn.h>
-configure:8794: result: no
+configure:8794: $? = 0
+configure:8794: result: yes
 configure:9059: checking for objdir
 configure:9076: result: .libs
 configure:9737: checking for cc option to produce PIC
@@ -2994,7 +2915,7 @@ configure:13955: result: none needed
 configure:13981: checking whether cc understands -c and -o together
 configure:14020: result: yes
 configure:14037: checking whether ln -s works
-configure:14044: result: no, using cp -pR
+configure:14041: result: yes
 configure:14052: checking for gawk
 configure:14085: result: awk
 configure:14103: checking for nroff
@@ -3043,6 +2964,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | /* end confdefs.h.  */
 | 
@@ -3095,7 +3017,7 @@ configure:14730: $? = 0
 configure:14730: result: yes
 configure:14736: checking for malloc.h
 configure:14736: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: c
+<eof> End of file
 configure:14736: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3135,6 +3057,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -3192,7 +3115,7 @@ configure:14772: $? = 0
 configure:14772: result: yes
 configure:14778: checking for ncurses.h
 configure:14778: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: c
+<eof> End of file
 configure:14778: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3232,6 +3155,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -3277,174 +3201,12 @@ configure: failed program was:
 configure:14778: result: no
 configure:14784: checking for sys/cdefs.h
 configure:14784: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: c
-configure:14784: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "libedit"
-| #define PACKAGE_TARNAME "libedit-20240808"
-| #define PACKAGE_VERSION "3.1"
-| #define PACKAGE_STRING "libedit 3.1"
-| #define PACKAGE_BUGREPORT ""
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PACKAGE "libedit-20240808"
-| #define VERSION "3.1"
-| #define LT_OBJDIR ".libs/"
-| #define HAVE_LIBCURSES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_CURSES_H 1
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| #include <sys/cdefs.h>
-configure:14784: result: no
+configure:14784: $? = 0
+configure:14784: result: yes
 configure:14790: checking for termcap.h
 configure:14790: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: c
-configure:14790: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "libedit"
-| #define PACKAGE_TARNAME "libedit-20240808"
-| #define PACKAGE_VERSION "3.1"
-| #define PACKAGE_STRING "libedit 3.1"
-| #define PACKAGE_BUGREPORT ""
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PACKAGE "libedit-20240808"
-| #define VERSION "3.1"
-| #define LT_OBJDIR ".libs/"
-| #define HAVE_LIBCURSES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_CURSES_H 1
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| #include <termcap.h>
-configure:14790: result: no
+configure:14790: $? = 0
+configure:14790: result: yes
 configure:14798: checking for ncurses.h
 configure:14798: result: no
 configure:14803: checking for curses.h
@@ -3459,7 +3221,7 @@ configure:14835: $? = 0
 configure:14835: result: yes
 configure:14852: checking for struct dirent.d_namlen
 configure:14852: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:61[stdin:259] not a member of struct/union: d_namlen
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:64[stdin:422] not a member of struct/union: d_namlen
 configure:14852: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3499,6 +3261,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -3511,6 +3274,8 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | /* end confdefs.h.  */
 | #if HAVE_DIRENT_H
@@ -3528,7 +3293,7 @@ configure: failed program was:
 |   return 0;
 | }
 configure:14852: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:61[stdin:259] not a member of struct/union: d_namlen
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:64[stdin:422] not a member of struct/union: d_namlen
 configure:14852: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3568,6 +3333,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -3580,6 +3346,8 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | /* end confdefs.h.  */
 | #if HAVE_DIRENT_H
@@ -3605,7 +3373,7 @@ configure:14952: checking for pid_t
 configure:14952: cc -c -g  conftest.c >&5
 configure:14952: $? = 0
 configure:14952: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:84[stdin:1116] syntax error, last name: pid_t
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:87[stdin:4247] syntax error, last name: pid_t
 configure:14952: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3645,6 +3413,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -3657,6 +3426,8 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | /* end confdefs.h.  */
 | #include <stddef.h>
@@ -3701,7 +3472,7 @@ configure:14990: checking for size_t
 configure:14990: cc -c -g  conftest.c >&5
 configure:14990: $? = 0
 configure:14990: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:83[stdin:1115] syntax error, last name: size_t
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:86[stdin:4246] syntax error, last name: size_t
 configure:14990: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3741,6 +3512,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -3753,6 +3525,8 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | /* end confdefs.h.  */
 | #include <stddef.h>
@@ -3794,7 +3568,7 @@ configure: failed program was:
 configure:14990: result: yes
 configure:15001: checking for u_int32_t
 configure:15001: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libedit/conftest.c:83[stdin:1115] name not declared: u_int32_t
+/usr/glenda/APExp/sys/src/external/libedit/conftest.c:86[stdin:4246] name not declared: u_int32_t
 configure:15001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3834,6 +3608,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -3846,6 +3621,8 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | /* end confdefs.h.  */
 | #include <stddef.h>
@@ -3935,6 +3712,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -3947,6 +3725,8 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | /* end confdefs.h.  */
@@ -3989,7 +3769,11 @@ configure:15093: ./conftest
 configure:15093: $? = 0
 configure:15107: result: yes
 configure:15289: checking whether lstat correctly handles trailing slash
-configure:15343: result: no
+configure:15322: cc -o conftest -g   conftest.c -lcurses  >&5
+configure:15322: $? = 0
+configure:15322: ./conftest
+configure:15322: $? = 0
+configure:15343: result: yes
 configure:15360: checking whether stat accepts an empty string
 configure:15382: cc -o conftest -g   conftest.c -lcurses  >&5
 configure:15382: $? = 0
@@ -4042,6 +3826,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -4054,10 +3839,13 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | #define vfork fork
 | #define HAVE_WORKING_FORK 1
+| #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 | #define HAVE_ENDPWENT 1
 | /* end confdefs.h.  */
 | /* Define isascii to an innocuous variant, in case <limits.h> declares isascii.
@@ -4142,6 +3930,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -4154,10 +3943,13 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | #define vfork fork
 | #define HAVE_WORKING_FORK 1
+| #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 | #define HAVE_ENDPWENT 1
 | #define HAVE_MEMCHR 1
 | #define HAVE_MEMSET 1
@@ -4196,7 +3988,9 @@ configure: failed program was:
 configure:15434: result: no
 configure:15440: checking for regcomp
 configure:15440: cc -o conftest -g   conftest.c -lcurses  >&5
-main: undefined: regcomp in main
+add_icase_literals: undefined: toupperrune in add_icase_literals
+add_icase_literals: undefined: tolowerrune in add_icase_literals
+regfree: __fsmu8: not defined
 configure:15440: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4236,6 +4030,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -4248,10 +4043,13 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | #define vfork fork
 | #define HAVE_WORKING_FORK 1
+| #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 | #define HAVE_ENDPWENT 1
 | #define HAVE_MEMCHR 1
 | #define HAVE_MEMSET 1
@@ -4362,6 +4160,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -4374,10 +4173,13 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | #define vfork fork
 | #define HAVE_WORKING_FORK 1
+| #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 | #define HAVE_ENDPWENT 1
 | #define HAVE_MEMCHR 1
 | #define HAVE_MEMSET 1
@@ -4424,310 +4226,16 @@ configure: failed program was:
 configure:15494: result: no
 configure:15500: checking for wcsdup
 configure:15500: cc -o conftest -g   conftest.c -lcurses  >&5
-main: undefined: wcsdup in main
-configure:15500: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "libedit"
-| #define PACKAGE_TARNAME "libedit-20240808"
-| #define PACKAGE_VERSION "3.1"
-| #define PACKAGE_STRING "libedit 3.1"
-| #define PACKAGE_BUGREPORT ""
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PACKAGE "libedit-20240808"
-| #define VERSION "3.1"
-| #define LT_OBJDIR ".libs/"
-| #define HAVE_LIBCURSES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_CURSES_H 1
-| #define HAVE_TERM_H 1
-| #define HAVE_FORK 1
-| #define vfork fork
-| #define HAVE_WORKING_FORK 1
-| #define HAVE_ENDPWENT 1
-| #define HAVE_MEMCHR 1
-| #define HAVE_MEMSET 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRCHR 1
-| #define HAVE_STRCSPN 1
-| #define HAVE_STRDUP 1
-| #define HAVE_STRERROR 1
-| #define HAVE_STRRCHR 1
-| #define HAVE_STRSTR 1
-| #define HAVE_STRTOL 1
-| /* end confdefs.h.  */
-| /* Define wcsdup to an innocuous variant, in case <limits.h> declares wcsdup.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define wcsdup innocuous_wcsdup
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char wcsdup (void); below.  */
-| 
-| #include <limits.h>
-| #undef wcsdup
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char wcsdup (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_wcsdup || defined __stub___wcsdup
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return wcsdup ();
-|   ;
-|   return 0;
-| }
-configure:15500: result: no
+configure:15500: $? = 0
+configure:15500: result: yes
 configure:15506: checking for strlcpy
 configure:15506: cc -o conftest -g   conftest.c -lcurses  >&5
-main: undefined: strlcpy in main
-configure:15506: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "libedit"
-| #define PACKAGE_TARNAME "libedit-20240808"
-| #define PACKAGE_VERSION "3.1"
-| #define PACKAGE_STRING "libedit 3.1"
-| #define PACKAGE_BUGREPORT ""
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PACKAGE "libedit-20240808"
-| #define VERSION "3.1"
-| #define LT_OBJDIR ".libs/"
-| #define HAVE_LIBCURSES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_CURSES_H 1
-| #define HAVE_TERM_H 1
-| #define HAVE_FORK 1
-| #define vfork fork
-| #define HAVE_WORKING_FORK 1
-| #define HAVE_ENDPWENT 1
-| #define HAVE_MEMCHR 1
-| #define HAVE_MEMSET 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRCHR 1
-| #define HAVE_STRCSPN 1
-| #define HAVE_STRDUP 1
-| #define HAVE_STRERROR 1
-| #define HAVE_STRRCHR 1
-| #define HAVE_STRSTR 1
-| #define HAVE_STRTOL 1
-| /* end confdefs.h.  */
-| /* Define strlcpy to an innocuous variant, in case <limits.h> declares strlcpy.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define strlcpy innocuous_strlcpy
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char strlcpy (void); below.  */
-| 
-| #include <limits.h>
-| #undef strlcpy
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char strlcpy (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_strlcpy || defined __stub___strlcpy
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return strlcpy ();
-|   ;
-|   return 0;
-| }
-configure:15506: result: no
+configure:15506: $? = 0
+configure:15506: result: yes
 configure:15512: checking for strlcat
 configure:15512: cc -o conftest -g   conftest.c -lcurses  >&5
-main: undefined: strlcat in main
-configure:15512: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "libedit"
-| #define PACKAGE_TARNAME "libedit-20240808"
-| #define PACKAGE_VERSION "3.1"
-| #define PACKAGE_STRING "libedit 3.1"
-| #define PACKAGE_BUGREPORT ""
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PACKAGE "libedit-20240808"
-| #define VERSION "3.1"
-| #define LT_OBJDIR ".libs/"
-| #define HAVE_LIBCURSES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_CURSES_H 1
-| #define HAVE_TERM_H 1
-| #define HAVE_FORK 1
-| #define vfork fork
-| #define HAVE_WORKING_FORK 1
-| #define HAVE_ENDPWENT 1
-| #define HAVE_MEMCHR 1
-| #define HAVE_MEMSET 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRCHR 1
-| #define HAVE_STRCSPN 1
-| #define HAVE_STRDUP 1
-| #define HAVE_STRERROR 1
-| #define HAVE_STRRCHR 1
-| #define HAVE_STRSTR 1
-| #define HAVE_STRTOL 1
-| /* end confdefs.h.  */
-| /* Define strlcat to an innocuous variant, in case <limits.h> declares strlcat.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define strlcat innocuous_strlcat
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char strlcat (void); below.  */
-| 
-| #include <limits.h>
-| #undef strlcat
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char strlcat (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_strlcat || defined __stub___strlcat
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return strlcat ();
-|   ;
-|   return 0;
-| }
-configure:15512: result: no
+configure:15512: $? = 0
+configure:15512: result: yes
 configure:15518: checking for vis
 configure:15518: cc -o conftest -g   conftest.c -lcurses  >&5
 main: undefined: vis in main
@@ -4770,6 +4278,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -4782,10 +4291,13 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | #define vfork fork
 | #define HAVE_WORKING_FORK 1
+| #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 | #define HAVE_ENDPWENT 1
 | #define HAVE_MEMCHR 1
 | #define HAVE_MEMSET 1
@@ -4797,6 +4309,9 @@ configure: failed program was:
 | #define HAVE_STRRCHR 1
 | #define HAVE_STRSTR 1
 | #define HAVE_STRTOL 1
+| #define HAVE_WCSDUP 1
+| #define HAVE_STRLCPY 1
+| #define HAVE_STRLCAT 1
 | /* end confdefs.h.  */
 | /* Define vis to an innocuous variant, in case <limits.h> declares vis.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -4872,6 +4387,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -4884,10 +4400,13 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | #define vfork fork
 | #define HAVE_WORKING_FORK 1
+| #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 | #define HAVE_ENDPWENT 1
 | #define HAVE_MEMCHR 1
 | #define HAVE_MEMSET 1
@@ -4899,6 +4418,9 @@ configure: failed program was:
 | #define HAVE_STRRCHR 1
 | #define HAVE_STRSTR 1
 | #define HAVE_STRTOL 1
+| #define HAVE_WCSDUP 1
+| #define HAVE_STRLCPY 1
+| #define HAVE_STRLCAT 1
 | /* end confdefs.h.  */
 | /* Define strvis to an innocuous variant, in case <limits.h> declares strvis.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -4974,6 +4496,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -4986,10 +4509,13 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | #define vfork fork
 | #define HAVE_WORKING_FORK 1
+| #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 | #define HAVE_ENDPWENT 1
 | #define HAVE_MEMCHR 1
 | #define HAVE_MEMSET 1
@@ -5001,6 +4527,9 @@ configure: failed program was:
 | #define HAVE_STRRCHR 1
 | #define HAVE_STRSTR 1
 | #define HAVE_STRTOL 1
+| #define HAVE_WCSDUP 1
+| #define HAVE_STRLCPY 1
+| #define HAVE_STRLCAT 1
 | /* end confdefs.h.  */
 | /* Define strunvis to an innocuous variant, in case <limits.h> declares strunvis.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -5076,6 +4605,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -5088,10 +4618,13 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | #define vfork fork
 | #define HAVE_WORKING_FORK 1
+| #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 | #define HAVE_ENDPWENT 1
 | #define HAVE_MEMCHR 1
 | #define HAVE_MEMSET 1
@@ -5103,6 +4636,9 @@ configure: failed program was:
 | #define HAVE_STRRCHR 1
 | #define HAVE_STRSTR 1
 | #define HAVE_STRTOL 1
+| #define HAVE_WCSDUP 1
+| #define HAVE_STRLCPY 1
+| #define HAVE_STRLCAT 1
 | /* end confdefs.h.  */
 | /* Define __secure_getenv to an innocuous variant, in case <limits.h> declares __secure_getenv.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -5178,6 +4714,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -5190,10 +4727,13 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | #define vfork fork
 | #define HAVE_WORKING_FORK 1
+| #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 | #define HAVE_ENDPWENT 1
 | #define HAVE_MEMCHR 1
 | #define HAVE_MEMSET 1
@@ -5205,6 +4745,9 @@ configure: failed program was:
 | #define HAVE_STRRCHR 1
 | #define HAVE_STRSTR 1
 | #define HAVE_STRTOL 1
+| #define HAVE_WCSDUP 1
+| #define HAVE_STRLCPY 1
+| #define HAVE_STRLCAT 1
 | /* end confdefs.h.  */
 | /* Define secure_getenv to an innocuous variant, in case <limits.h> declares secure_getenv.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -5280,6 +4823,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -5292,10 +4836,13 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | #define vfork fork
 | #define HAVE_WORKING_FORK 1
+| #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 | #define HAVE_ENDPWENT 1
 | #define HAVE_MEMCHR 1
 | #define HAVE_MEMSET 1
@@ -5307,6 +4854,9 @@ configure: failed program was:
 | #define HAVE_STRRCHR 1
 | #define HAVE_STRSTR 1
 | #define HAVE_STRTOL 1
+| #define HAVE_WCSDUP 1
+| #define HAVE_STRLCPY 1
+| #define HAVE_STRLCAT 1
 | /* end confdefs.h.  */
 | /* Define reallocarr to an innocuous variant, in case <limits.h> declares reallocarr.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -5341,9 +4891,9 @@ configure: failed program was:
 | }
 configure:15548: result: no
 configure:15557: checking for strlcpy
-configure:15557: result: no
+configure:15557: result: yes
 configure:15576: checking for strlcat
-configure:15576: result: no
+configure:15576: result: yes
 configure:15595: checking for getline
 configure:15595: cc -o conftest -g   conftest.c -lcurses  >&5
 configure:15595: $? = 0
@@ -5392,6 +4942,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -5404,10 +4955,13 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | #define vfork fork
 | #define HAVE_WORKING_FORK 1
+| #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 | #define HAVE_ENDPWENT 1
 | #define HAVE_MEMCHR 1
 | #define HAVE_MEMSET 1
@@ -5419,6 +4973,9 @@ configure: failed program was:
 | #define HAVE_STRRCHR 1
 | #define HAVE_STRSTR 1
 | #define HAVE_STRTOL 1
+| #define HAVE_WCSDUP 1
+| #define HAVE_STRLCPY 1
+| #define HAVE_STRLCAT 1
 | /* end confdefs.h.  */
 | /* Define unvis to an innocuous variant, in case <limits.h> declares unvis.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -5495,6 +5052,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -5507,10 +5065,13 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | #define vfork fork
 | #define HAVE_WORKING_FORK 1
+| #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 | #define HAVE_ENDPWENT 1
 | #define HAVE_MEMCHR 1
 | #define HAVE_MEMSET 1
@@ -5522,6 +5083,9 @@ configure: failed program was:
 | #define HAVE_STRRCHR 1
 | #define HAVE_STRSTR 1
 | #define HAVE_STRTOL 1
+| #define HAVE_WCSDUP 1
+| #define HAVE_STRLCPY 1
+| #define HAVE_STRLCAT 1
 | /* end confdefs.h.  */
 | #include <stdlib.h>
 |                 #include <sys/types.h>
@@ -5578,6 +5142,7 @@ configure: failed program was:
 | #define __EXTENSIONS__ 1
 | #define PACKAGE "libedit-20240808"
 | #define VERSION "3.1"
+| #define HAVE_DLFCN_H 1
 | #define LT_OBJDIR ".libs/"
 | #define HAVE_LIBCURSES 1
 | #define HAVE_DIRENT_H 1
@@ -5590,10 +5155,13 @@ configure: failed program was:
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_CURSES_H 1
+| #define HAVE_SYS_CDEFS_H 1
+| #define HAVE_TERMCAP_H 1
 | #define HAVE_TERM_H 1
 | #define HAVE_FORK 1
 | #define vfork fork
 | #define HAVE_WORKING_FORK 1
+| #define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 | #define HAVE_ENDPWENT 1
 | #define HAVE_MEMCHR 1
 | #define HAVE_MEMSET 1
@@ -5605,6 +5173,9 @@ configure: failed program was:
 | #define HAVE_STRRCHR 1
 | #define HAVE_STRSTR 1
 | #define HAVE_STRTOL 1
+| #define HAVE_WCSDUP 1
+| #define HAVE_STRLCPY 1
+| #define HAVE_STRLCAT 1
 | /* end confdefs.h.  */
 | #include <stdlib.h>
 |                 #include <sys/types.h>
@@ -5637,29 +5208,18 @@ generated by GNU Autoconf 2.72.  Invocation command line was
 
 on krypton
 
-config.status:1146: creating Makefile
-config.status:1146: creating libedit.pc
-config.status:1146: creating src/Makefile
-config.status:1146: creating doc/Makefile
-config.status:1146: creating examples/Makefile
-config.status:1146: creating config.h
-config.status:1375: executing depfiles commands
-config.status:1450: cd src       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
-make: stat: 	./.deps/common.Plo: Invalid argument
-assertion failed: file ../../../external/gmake/job.c:2520
-config.status:1457: $? = 1
-config.status:1450: cd examples       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
-make: stat: 	./.deps/wtc1.Po: Invalid argument
-assertion failed: file ../../../external/gmake/job.c:2520
-config.status:1457: $? = 1
-config.status:1461: error: in '/usr/glenda/APExp/sys/src/external/libedit':
-config.status:1463: error: Something went wrong bootstrapping makefile fragments
-    for automatic dependency tracking.  If GNU make was not used, consider
-    re-running the configure script with MAKE="gmake" (or whatever is
-    necessary).  You can also try re-running configure with the
-    '--disable-dependency-tracking' option to at least be able to build
-    the package (albeit without support for automatic dependency tracking).
-See 'config.log' for more details
+config.status:1153: creating Makefile
+config.status:1153: creating libedit.pc
+config.status:1153: creating src/Makefile
+config.status:1153: creating doc/Makefile
+config.status:1153: creating examples/Makefile
+config.status:1153: creating config.h
+config.status:1382: executing depfiles commands
+config.status:1457: cd src       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1464: $? = 0
+config.status:1457: cd examples       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1464: $? = 0
+config.status:1382: executing libtool commands
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -5694,7 +5254,7 @@ ac_cv_func_fork_works=yes
 ac_cv_func_getline=yes
 ac_cv_func_isascii=no
 ac_cv_func_issetugid=no
-ac_cv_func_lstat_dereferences_slashed_symlink=no
+ac_cv_func_lstat_dereferences_slashed_symlink=yes
 ac_cv_func_memchr=yes
 ac_cv_func_memset=yes
 ac_cv_func_re_comp=no
@@ -5707,8 +5267,8 @@ ac_cv_func_strchr=yes
 ac_cv_func_strcspn=yes
 ac_cv_func_strdup=yes
 ac_cv_func_strerror=yes
-ac_cv_func_strlcat=no
-ac_cv_func_strlcpy=no
+ac_cv_func_strlcat=yes
+ac_cv_func_strlcpy=yes
 ac_cv_func_strrchr=yes
 ac_cv_func_strstr=yes
 ac_cv_func_strtol=yes
@@ -5718,10 +5278,10 @@ ac_cv_func_unvis=no
 ac_cv_func_vfork=no
 ac_cv_func_vfork_works=no
 ac_cv_func_vis=no
-ac_cv_func_wcsdup=no
+ac_cv_func_wcsdup=yes
 ac_cv_header_curses_h=yes
 ac_cv_header_dirent_dirent_h=yes
-ac_cv_header_dlfcn_h=no
+ac_cv_header_dlfcn_h=yes
 ac_cv_header_fcntl_h=yes
 ac_cv_header_inttypes_h=yes
 ac_cv_header_limits_h=yes
@@ -5733,14 +5293,14 @@ ac_cv_header_stdio_h=yes
 ac_cv_header_stdlib_h=yes
 ac_cv_header_string_h=yes
 ac_cv_header_strings_h=yes
-ac_cv_header_sys_cdefs_h=no
+ac_cv_header_sys_cdefs_h=yes
 ac_cv_header_sys_ioctl_h=yes
 ac_cv_header_sys_param_h=yes
 ac_cv_header_sys_stat_h=yes
 ac_cv_header_sys_types_h=yes
 ac_cv_header_sys_wait_h=yes
 ac_cv_header_term_h=yes
-ac_cv_header_termcap_h=no
+ac_cv_header_termcap_h=yes
 ac_cv_header_termios_h=yes
 ac_cv_header_unistd_h=yes
 ac_cv_header_vfork_h=no
@@ -5755,10 +5315,12 @@ ac_cv_path_EGREP_TRADITIONAL='/bin/grep -E'
 ac_cv_path_FGREP='/bin/grep -F'
 ac_cv_path_GREP=/bin/grep
 ac_cv_path_SED=/bin/sed
+ac_cv_path_install='/bin/install -c'
 ac_cv_prog_AWK=awk
 ac_cv_prog_CC=cc
 ac_cv_prog_ac_ct_AR=ar
 ac_cv_prog_ac_ct_FILECMD=file
+ac_cv_prog_ac_ct_RANLIB=ranlib
 ac_cv_prog_ac_ct_STRIP=strip
 ac_cv_prog_cc_c11=no
 ac_cv_prog_cc_c89=
@@ -5847,10 +5409,10 @@ FILECMD='file'
 GREP='/bin/grep'
 HAVE_GETLINE_FALSE='#'
 HAVE_GETLINE_TRUE=''
-HAVE_STRLCAT_FALSE=''
-HAVE_STRLCAT_TRUE='#'
-HAVE_STRLCPY_FALSE=''
-HAVE_STRLCPY_TRUE='#'
+HAVE_STRLCAT_FALSE='#'
+HAVE_STRLCAT_TRUE=''
+HAVE_STRLCPY_FALSE='#'
+HAVE_STRLCPY_TRUE=''
 HAVE_UNVIS_FALSE=''
 HAVE_UNVIS_TRUE='#'
 HAVE_VIS_FALSE=''
@@ -5861,12 +5423,12 @@ INSTALL_SCRIPT='${INSTALL}'
 INSTALL_STRIP_PROGRAM='$(install_sh) -c -s'
 LD='pcc'
 LDFLAGS=''
-LIBOBJS=' ${LIBOBJDIR}lstat$U.o'
+LIBOBJS=''
 LIBS='-lcurses '
 LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 LIPO=''
-LN_S='cp -pR'
-LTLIBOBJS=' ${LIBOBJDIR}lstat$U.lo'
+LN_S='ln -s'
+LTLIBOBJS=''
 LT_SYS_LIBRARY_PATH=''
 LT_VERSION='0:74:0'
 MAKEINFO='${SHELL} '\''/usr/glenda/APExp/sys/src/external/libedit/missing'\'' makeinfo'
@@ -5888,7 +5450,7 @@ PACKAGE_TARNAME='libedit-20240808'
 PACKAGE_URL=''
 PACKAGE_VERSION='3.1'
 PATH_SEPARATOR=':'
-RANLIB=':'
+RANLIB='ranlib'
 SED='/bin/sed'
 SET_MAKE=''
 SHELL='/bin/sh'
@@ -5988,6 +5550,7 @@ target_alias=''
 #define __EXTENSIONS__ 1
 #define PACKAGE "libedit-20240808"
 #define VERSION "3.1"
+#define HAVE_DLFCN_H 1
 #define LT_OBJDIR ".libs/"
 #define HAVE_LIBCURSES 1
 #define HAVE_DIRENT_H 1
@@ -6000,10 +5563,13 @@ target_alias=''
 #define HAVE_SYS_PARAM_H 1
 #define HAVE_UNISTD_H 1
 #define HAVE_CURSES_H 1
+#define HAVE_SYS_CDEFS_H 1
+#define HAVE_TERMCAP_H 1
 #define HAVE_TERM_H 1
 #define HAVE_FORK 1
 #define vfork fork
 #define HAVE_WORKING_FORK 1
+#define LSTAT_FOLLOWS_SLASHED_SYMLINK 1
 #define HAVE_ENDPWENT 1
 #define HAVE_MEMCHR 1
 #define HAVE_MEMSET 1
@@ -6015,5 +5581,8 @@ target_alias=''
 #define HAVE_STRRCHR 1
 #define HAVE_STRSTR 1
 #define HAVE_STRTOL 1
+#define HAVE_WCSDUP 1
+#define HAVE_STRLCPY 1
+#define HAVE_STRLCAT 1
 
-configure: exit 1
+configure: exit 0

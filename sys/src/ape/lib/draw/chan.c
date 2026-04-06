@@ -29,12 +29,14 @@ chantostr(char *buf, ulong cc)
 	return buf;
 }
 
+#ifndef __CTYPE
 /* avoid pulling in ctype when using with drawterm etc. */
 static int
 isspace(char c)
 {
 	return c==' ' || c== '\t' || c=='\r' || c=='\n';
 }
+#endif /* __CTYPE */
 
 ulong
 strtochan(char *s)
