@@ -59,9 +59,9 @@ struct _IO_FILE {
 	struct __locale_struct *locale;
 };
 
-extern hidden struct _IO_FILE *volatile __stdin_used;
-extern hidden struct _IO_FILE *volatile __stdout_used;
-extern hidden struct _IO_FILE *volatile __stderr_used;
+extern struct _IO_FILE *volatile __stdin_used;
+extern struct _IO_FILE *volatile __stdout_used;
+extern struct _IO_FILE *volatile __stderr_used;
 
 /* APExp: __lockfile/__unlockfile -- Real pthread mutex support
  * Each FILE has its own lock (f->lock stores a pthread_mutex_t*).

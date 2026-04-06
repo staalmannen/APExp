@@ -1,10 +1,8 @@
 #include "stdio_impl.h"
 #include <stdio.h>
 
-/* APExp: Replace musl weak_alias with proper extern declarations and function aliases */
-FILE *volatile __stdin_used = NULL;
-FILE *volatile __stdout_used = NULL;
-FILE *volatile __stderr_used = NULL;
+/* APExp: stdin/stdout/stderr are defined in stdin.c, stdout.c, stderr.c
+ * These are just extern declarations, not definitions */
 
 static void close_file(FILE *f)
 {
@@ -36,11 +34,6 @@ void __stdio_exit(void)
 	}
 
 	__ofl_unlock();
-
-	/* Don't close standard streams - they may be in use */
-	/* close_file(__stdin_used); */
-	/* close_file(__stdout_used); */
-	/* close_file(__stderr_used); */
 }
 
 /* Alias for compatibility */
