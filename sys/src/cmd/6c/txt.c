@@ -119,7 +119,7 @@ gclean(void)
 			continue;
 		if(s->type->width == 0)
 			continue;
-		if(s->class != CGLOBL && s->class != CSTATIC)
+		if(s->class != CGLOBL && s->class != CSTATIC && s->class != CLOCAL)
 			continue;
 		if(s->type == types[TENUM])
 			continue;
@@ -503,7 +503,7 @@ naddr(Node *n, Adr *a)
 		a->type = D_STATIC;
 		a->sym = n->sym;
 		a->offset = n->xoffset;
-		if(n->class == CSTATIC)
+		if(n->class == CSTATIC || n->class == CLOCAL)
 			break;
 		if(n->class == CEXTERN || n->class == CGLOBL) {
 			a->type = D_EXTERN;
@@ -1469,7 +1469,7 @@ gpseudo(int a, Sym *s, Node *n)
 	p->from.type = D_EXTERN;
 	p->from.sym = s;
 	p->from.scale = (profileflg ? 0 : NOPROF);
-	if(s->class == CSTATIC)
+	if(s->class == CSTATIC || s->class == CLOCAL)
 		p->from.type = D_STATIC;
 	naddr(n, &p->to);
 	if(a == ADATA || a == AGLOBL)
@@ -1506,8 +1506,8 @@ exreg(Type *t)
 
 schar	ewidth[NTYPE] =
 {
-	-1,		/*[TXXX]*/	
-	SZ_CHAR,	/*[TCHAR]*/	
+	-1,		/*[TXXX]*/
+	SZ_CHAR,	/*[TCHAR]*/
 	SZ_CHAR,	/*[TUCHAR]*/
 	SZ_SHORT,	/*[TSHORT]*/
 	SZ_SHORT,	/*[TUSHORT]*/
@@ -1531,10 +1531,10 @@ long	ncast[NTYPE] =
 {
 	0,				/*[TXXX]*/
 	BCHAR|BUCHAR,			/*[TCHAR]*/
-	BCHAR|BUCHAR,			/*[TUCHAR]*/	
+	BCHAR|BUCHAR,			/*[TUCHAR]*/
 	BSHORT|BUSHORT,			/*[TSHORT]*/
 	BSHORT|BUSHORT,			/*[TUSHORT]*/
-	BINT|BUINT|BLONG|BULONG,	/*[TINT]*/		
+	BINT|BUINT|BLONG|BULONG,	/*[TINT]*/
 	BINT|BUINT|BLONG|BULONG,	/*[TUINT]*/
 	BINT|BUINT|BLONG|BULONG,	/*[TLONG]*/
 	BINT|BUINT|BLONG|BULONG,	/*[TULONG]*/

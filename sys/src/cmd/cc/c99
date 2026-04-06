@@ -4,13 +4,14 @@ http://home.datacomm.ch/t_wolf/tw/c/c9x_changes.html
 (Numbers are from the web page list.)
 
 Not done (yet?):
-11. _Complex, _Imaginary, _Bool
 34. goto restrictions for variable-length arrows
+17b. Named initializers for static/const aggregates at file scope
+     (works for auto aggregates, see item 24)
 18. Notation for universal characters \uXXXX
-25. Division and mod truncate toward zero.
-26. _Bool, float _Complex, double _Complex, long double _Complex
+
 
 Done:
+11. _Complex, _Imaginary, _Bool [in APExp, works, claude.ai help]
 7. __VA_ARGS__
 9, 19. Hexdecimal floating point constants. [in APExp, works, claude.ai help]
 11, 30, 31, 32. restrict, inline
@@ -18,6 +19,8 @@ Done:
 14. Variable arrays in parameter lists. [in APExp, testing, claude.ai help]
 15. for loop declarations
 23. __func__ identifier
+25. Division and mod truncate toward zero. [in APExp, testing, claude.ai help]
+26. _Bool, float _Complex, double _Complex, long double _Complex [in APExp, testing, claude.ai help]
 28. structs ending in incomplete type.
 33. Variable-length arrays [in APExp, testing, claude.ai help]
 

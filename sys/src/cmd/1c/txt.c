@@ -213,7 +213,7 @@ gclean(void)
 			continue;
 		if(s->type->width == 0)
 			continue;
-		if(s->class != CGLOBL && s->class != CSTATIC)
+		if(s->class != CGLOBL && s->class != CSTATIC && s->class != CLOCAL)
 			continue;
 		if(s->type == types[TENUM])
 			continue;
@@ -322,7 +322,7 @@ naddr(Node *n, Adr *a, int x)
 		a->sym = n->sym;
 		a->offset = n->xoffset;
 		a->type = D_STATIC;
-		if(n->class == CSTATIC)
+		if(n->class == CSTATIC || n->class == CLOCAL)
 			break;
 		if(n->class == CEXTERN || n->class == CGLOBL) {
 			a->type = D_EXTERN;
@@ -809,7 +809,7 @@ gpseudo(int a, Sym *s, int g, long v)
 	p->to.offset = v;
 	p->from.sym = s;
 	p->from.type = D_EXTERN;
-	if(s->class == CSTATIC)
+	if(s->class == CSTATIC || s->class == CLOCAL)
 		p->from.type = D_STATIC;
 }
 
@@ -824,7 +824,7 @@ gpseudotree(int a, Sym *s, Node *n)
 	naddr(n, &p->to, D_NONE);
 	p->from.sym = s;
 	p->from.type = D_EXTERN;
-	if(s->class == CSTATIC)
+	if(s->class == CSTATIC || s->class == CLOCAL)
 		p->from.type = D_STATIC;
 }
 

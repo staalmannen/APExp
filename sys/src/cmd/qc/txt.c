@@ -123,7 +123,7 @@ gclean(void)
 			continue;
 		if(s->type->width == 0)
 			continue;
-		if(s->class != CGLOBL && s->class != CSTATIC)
+		if(s->class != CGLOBL && s->class != CSTATIC && s->class != CLOCAL)
 			continue;
 		if(s->type == types[TENUM])
 			continue;
@@ -514,7 +514,7 @@ naddr(Node *n, Adr *a)
 		a->name = D_STATIC;
 		a->sym = n->sym;
 		a->offset = n->xoffset;
-		if(n->class == CSTATIC)
+		if(n->class == CSTATIC || n->class == CLOCAL)
 			break;
 		if(n->class == CEXTERN || n->class == CGLOBL) {
 			a->name = D_EXTERN;
@@ -1667,7 +1667,7 @@ gpseudo(int a, Sym *s, Node *n)
 	if(a == ATEXT)
 		p->reg = (profileflg ? 0 : NOPROF);
 	p->from.name = D_EXTERN;
-	if(s->class == CSTATIC)
+	if(s->class == CSTATIC || s->class == CLOCAL)
 		p->from.name = D_STATIC;
 	naddr(n, &p->to);
 	if(a == ADATA || a == AGLOBL)
