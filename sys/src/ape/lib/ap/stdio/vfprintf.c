@@ -1,12 +1,25 @@
 /*
  * pANS stdio -- vfprintf
+ * APExp: Fixed to use __overflow() directly instead of putc() macro to avoid circular dependency
  */
-#include "iolib.h"
+#include "stdio_impl.h"
 #include <stdarg.h>
 #include <stdint.h>
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
+
+/* Output a single character - helper function */
+static inline int _putc_impl(int c, FILE *f)
+{
+	unsigned char ch = (unsigned char)c;
+	if (ch != f->lbf && f->wpos != f->wend) {
+		*f->wpos++ = ch;
+		return ch;
+	}
+	return __overflow(f, c);
+}
+
 /*
  * Leading flags
  */
@@ -157,7 +170,7 @@ vfprintf(FILE *f, const char *s, va_list args)
 	nprint = 0;
 	while(*s){
 		if(*s != '%'){
-			putc(*s++, f);
+			_putc_impl(*s++, f);
 			nprint++;
 			continue;
 		}
@@ -203,7 +216,7 @@ vfprintf(FILE *f, const char *s, va_list args)
 		}
 		if(ocvt[*s]) nprint += (*ocvt[*s++])(f, &args, flags, width, precision);
 		else if(*s){
-			putc(*s++, f);
+			_putc_impl(*s++, f);
 			nprint++;
 		}
 	}
@@ -218,9 +231,9 @@ ocvt_c(FILE *f, va_list *args, int flags, int width, int)
 {
 	int i;
 
-	if(!(flags&LEFT)) for(i=1; i<width; i++) putc(' ', f);
-	putc((unsigned char)va_arg(*args, int), f);
-	if(flags&LEFT) for(i=1; i<width; i++) putc(' ', f);
+	if(!(flags&LEFT)) for(i=1; i<width; i++) _putc_impl(' ', f);
+	_putc_impl((unsigned char)va_arg(*args, int), f);
+	if(flags&LEFT) for(i=1; i<width; i++) _putc_impl(' ', f);
 	return width<1 ? 1 : width;
 }
 
@@ -239,24 +252,24 @@ ocvt_s(FILE *f, va_list *args, int flags, int width, int precision)
 		else
 			for(i=0; s[i]; i++);
 		for(; i<width; i++){
-			putc(' ', f);
+			_putc_impl(' ', f);
 			n++;
 		}
 	}
 	if(precision >= 0){
 		for(i=0; i!=precision && *s; i++){
-			putc(*s++, f);
+			_putc_impl(*s++, f);
 			n++;
 		}
 	} else{
 		for(i=0;*s;i++){
-			putc(*s++, f);
+			_putc_impl(*s++, f);
 			n++;
 		}
 	}
 	if(flags&LEFT){
 		for(; i<width; i++){
-			putc(' ', f);
+			_putc_impl(' ', f);
 			n++;
 		}
 	}
@@ -344,37 +357,37 @@ ocvt_fixed(FILE *f, va_list *args, int flags, int width, int precision,
 			fputs(sign, f);
 			fputs(prefix, f);
 			while(npad){
-				putc('0', f);
+				_putc_impl('0', f);
 				--npad;
 			}
 		} else{
 			while(npad){
-				putc(' ', f);
+				_putc_impl(' ', f);
 				--npad;
 			}
 			fputs(sign, f);
 			fputs(prefix, f);
 		}
 		while(nlzero){
-			putc('0', f);
+			_putc_impl('0', f);
 			--nlzero;
 		}
-		while(dp!=digits) putc(*--dp, f);
+		while(dp!=digits) _putc_impl(*--dp, f);
 	}
 	else{
 		fputs(sign, f);
 		fputs(prefix, f);
 		while(nlzero){
-			putc('0', f);
+			_putc_impl('0', f);
 			--nlzero;
 		}
-		while(dp != digits) putc(*--dp, f);
+		while(dp != digits) _putc_impl(*--dp, f);
 		while(npad){
-			putc(' ', f);
+			_putc_impl(' ', f);
 			--npad;
 		}
 	}
-	return nout;	
+	return nout;
 }
 
 static int
@@ -534,37 +547,39 @@ ocvt_flt(FILE *f, va_list *args, int flags, int width, int precision, char afmt)
 	}
 	if(!(flags&ZPAD) && !(flags&LEFT))
 		while(nout < width){
-			putc(' ', f);
+			_putc_impl(' ', f);
 			nout++;
 		}
-	if(sign) putc('-', f);
-	else if(flags&SIGN) putc('+', f);
-	else if(flags&SPACE) putc(' ', f);
+	if(sign) _putc_impl('-', f);
+	else if(flags&SIGN) _putc_impl('+', f);
+	else if(flags&SPACE) _putc_impl(' ', f);
 	if((flags&ZPAD) && !(flags&LEFT))
 		while(nout < width){
-			putc('0', f);
+			_putc_impl('0', f);
 			nout++;
 		}
 	if(fmt == 'f'){
-		for(i=0; i<exponent; i++) putc(i<ndig?digits[i]:'0', f);
-		if(i == 0) putc('0', f);
-		if(precision>0 || flags&ALT) putc('.', f);
+		for(i=0; i<exponent; i++) _putc_impl(i<ndig?digits[i]:'0', f);
+		if(i == 0) _putc_impl('0', f);
+		if(precision>0 || flags&ALT) _putc_impl('.', f);
 		for(i=0; i!=precision; i++)
-			putc(0<=i+exponent && i+exponent<ndig?digits[i+exponent]:'0', f);
+			_putc_impl(0<=i+exponent && i+exponent<ndig?digits[i+exponent]:'0', f);
 	}
 	else{
-		putc(digits[0], f);
-		if(precision>0 || flags&ALT) putc('.', f);
-		for(i=0; i!=precision; i++) putc(i<ndig-1?digits[i+1]:'0', f);
+		_putc_impl(digits[0], f);
+		if(precision>0 || flags&ALT) _putc_impl('.', f);
+		for(i=0; i!=precision; i++) _putc_impl(i<ndig-1?digits[i+1]:'0', f);
 	}
 	if(fmt != 'f'){
-		putc(echr, f);
-		putc(exponent<=0?'-':'+', f);
-		while(eptr>ebuf) putc(*--eptr, f);
+		_putc_impl(echr, f);
+		_putc_impl(exponent<=0?'-':'+', f);
+		while(eptr>ebuf) _putc_impl(*--eptr, f);
 	}
 	while(nout < width){
-		putc(' ', f);
+		_putc_impl(' ', f);
 		nout++;
 	}
 	return nout;
 }
+
+

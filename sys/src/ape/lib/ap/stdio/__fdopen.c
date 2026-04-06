@@ -12,6 +12,7 @@ FILE *__fdopen(int fd, const char *mode)
 	FILE *f;
 	pthread_mutex_t *lock;
 	unsigned char *buf_start;
+	size_t alloc_size;
 
 	/* Check for valid initial mode character */
 	if (!strchr("rwa", *mode)) {
@@ -19,28 +20,31 @@ FILE *__fdopen(int fd, const char *mode)
 		return NULL;
 	}
 
+	/* Calculate allocation size: struct + UNGET + buffer */
+	alloc_size = sizeof(struct _IO_FILE) + UNGET + BUFSIZ;
+
 	/* Allocate FILE+buffer as one block */
-	f = malloc(sizeof(struct _IO_FILE) + UNGET + BUFSIZ);
+	f = malloc(alloc_size);
 	if (!f) return NULL;
 
 	/* Zero-fill the entire block */
-	memset(f, 0, sizeof(struct _IO_FILE) + UNGET + BUFSIZ);
+	memset(f, 0, alloc_size);
 
-	/* Calculate buffer start address */
+	/* Calculate buffer start address (UNGET bytes after struct) */
 	buf_start = (unsigned char *)f + sizeof(struct _IO_FILE) + UNGET;
 
-	/* Initialize all FILE fields */
+	/* Initialize FILE fields */
 	f->flags = F_PERM;
 	f->fd = fd;
 	f->buf = buf_start;
 	f->buf_size = BUFSIZ;
 
-	/* Initialize read/write pointers */
-	f->rpos = f->buf;
-	f->rend = f->buf;
-	f->wbase = f->buf;
-	f->wpos = f->buf;
-	f->wend = f->buf + BUFSIZ;
+	/* Initialize read/write pointers correctly */
+	f->rpos = buf_start;
+	f->rend = buf_start;
+	f->wbase = buf_start;
+	f->wpos = buf_start;
+	f->wend = buf_start + BUFSIZ;  /* END of buffer */
 
 	/* Impose mode restrictions */
 	if (!strchr(mode, '+')) {
