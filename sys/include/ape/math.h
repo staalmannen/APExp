@@ -371,4 +371,139 @@ float       y0f(float);
 float       y1f(float);
 float       ynf(int, float);
 
+/* ------------------------------------------------------------------ */
+/* C99 additions: these functions are in libap.a (from musl) but were  */
+/* missing from earlier versions of this header.                        */
+/* ------------------------------------------------------------------ */
+
+extern double	acosh(double);
+extern float	acoshf(float);
+extern long double	acoshl(long double);
+
+extern double	asinh(double);
+extern float	asinhf(float);
+extern long double	asinhl(long double);
+
+extern double	atanh(double);
+extern float	atanhf(float);
+extern long double	atanhl(long double);
+
+extern float	atanf(float);
+extern long double	atanl(long double);
+
+extern float	atan2f(float, float);
+extern long double	atan2l(long double, long double);
+
+extern float	ceilf(float);
+extern long double	ceill(long double);
+
+extern double	cbrt(double);
+extern float	cbrtf(float);
+extern long double	cbrtl(long double);
+
+extern double	copysign(double, double);
+extern float	copysignf(float, float);
+extern long double	copysignl(long double, long double);
+
+extern double	exp2(double);
+extern float	exp2f(float);
+extern long double	exp2l(long double);
+
+extern double	expm1(double);
+extern float	expm1f(float);
+extern long double	expm1l(long double);
+
+extern double	fdim(double, double);
+extern float	fdimf(float, float);
+extern long double	fdiml(long double, long double);
+
+extern double	fma(double, double, double);
+extern float	fmaf(float, float, float);
+extern long double	fmal(long double, long double, long double);
+
+extern double	fmax(double, double);
+extern float	fmaxf(float, float);
+extern long double	fmaxl(long double, long double);
+
+extern int	ilogb(double);
+extern int	ilogbf(float);
+extern int	ilogbl(long double);
+
+extern double	lgamma(double);
+extern float	lgammaf(float);
+extern long double	lgammal(long double);
+
+extern long long	llrint(double);
+extern long long	llrintf(float);
+extern long long	llrintl(long double);
+
+extern long long	llround(double);
+extern long long	llroundf(float);
+extern long long	llroundl(long double);
+
+extern double	log1p(double);
+extern float	log1pf(float);
+extern long double	log1pl(long double);
+
+extern double	log2(double);
+extern float	log2f(float);
+extern long double	log2l(long double);
+
+extern double	logb(double);
+extern float	logbf(float);
+extern long double	logbl(long double);
+
+extern long	lrint(double);
+extern long	lrintf(float);
+extern long	lrintl(long double);
+
+extern long	lround(double);
+extern long	lroundf(float);
+extern long	lroundl(long double);
+
+extern double	nearbyint(double);
+extern float	nearbyintf(float);
+extern long double	nearbyintl(long double);
+
+extern double	nextafter(double, double);
+extern float	nextafterf(float, float);
+extern long double	nextafterl(long double, long double);
+
+extern double	nexttoward(double, long double);
+extern float	nexttowardf(float, long double);
+extern long double	nexttowardl(long double, long double);
+
+extern double	remainder(double, double);
+extern float	remainderf(float, float);
+extern long double	remainderl(long double, long double);
+
+extern double	remquo(double, double, int *);
+extern float	remquof(float, float, int *);
+extern long double	remquol(long double, long double, int *);
+
+extern double	rint(double);
+extern float	rintf(float);
+extern long double	rintl(long double);
+
+extern double	round(double);
+extern float	roundf(float);
+extern long double	roundl(long double);
+
+extern double	scalbln(double, long);
+extern float	scalblnf(float, long);
+extern long double	scalblnl(long double, long);
+
+extern double	scalbn(double, int);
+extern float	scalbnf(float, int);
+extern long double	scalbnl(long double, int);
+
+extern double	tgamma(double);
+extern float	tgammaf(float);
+extern long double	tgammal(long double);
+
+extern double	trunc(double);
+extern float	truncf(float);
+extern long double	truncl(long double);
+
+
 #endif /* __MATH */
