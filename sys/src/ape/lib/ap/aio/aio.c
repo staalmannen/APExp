@@ -16,8 +16,8 @@
  *  - Worker thread is created detached so it doesn't need joining.
  *  - lio_listio LIO_WAIT: uses aio_suspend correctly.
  *  - pthread_cond_timedwait on Plan9 ignores the timeout (it's a macro
- *    alias for pthread_cond_wait); aio_suspend falls back to polling
- *    with a short sleep when a timeout is requested.
+ *  - pthread_cond_timedwait is now properly implemented; aio_suspend
+ *    uses it directly instead of the old nanosleep polling fallback.
  */
 
 #include <aio.h>
@@ -274,80 +274,76 @@ aio_cancel(int fd, struct aiocb *cb)
  * aio_suspend: wait until at least one request in list[] completes,
  * or until timeout expires.
  *
- * Plan9 note: pthread_cond_timedwait is a macro alias for
- * pthread_cond_wait (timeout ignored).  When a timeout is requested
- * we poll with a short sleep instead to avoid hanging forever.
+ * POSIX specifies ts as a RELATIVE timeout (unlike pthread_cond_timedwait
+ * which takes absolute time).  We convert to absolute before calling
+ * pthread_cond_timedwait.
+ *
+ * Since we now have a real pthread_cond_timedwait implementation, we no
+ * longer need the polling fallback.  The timed and untimed paths unify
+ * naturally: NULL ts → wait indefinitely, non-NULL ts → wait with deadline.
  */
 int
 aio_suspend(const struct aiocb *const list[], int n,
             const struct timespec *ts)
 {
-	int i;
+	int i, r;
+	struct timespec deadline;
 
 	if(n <= 0) return 0;
 
-	if(!ts) {
-		/* No timeout: wait on the first non-null pending cb's cond.
-		 * Loop until at least one completes. */
-		for(;;) {
-			for(i = 0; i < n; i++) {
-				const struct aiocb *cb = list[i];
-				if(!cb) continue;
-				pthread_mutex_lock((pthread_mutex_t *)&cb->__lock);
-				if(!cb->__queued) {
-					pthread_mutex_unlock(
-					    (pthread_mutex_t *)&cb->__lock);
-					return 0;
-				}
-				/* wait for this one to complete */
-				pthread_cond_wait(
+	/*
+	 * POSIX: ts is a relative timeout.  Convert to absolute deadline
+	 * by adding to the current CLOCK_REALTIME time.
+	 */
+	if(ts) {
+		clock_gettime(CLOCK_REALTIME, &deadline);
+		deadline.tv_sec  += ts->tv_sec;
+		deadline.tv_nsec += ts->tv_nsec;
+		if(deadline.tv_nsec >= 1000000000L) {
+			deadline.tv_sec++;
+			deadline.tv_nsec -= 1000000000L;
+		}
+	}
+
+	/*
+	 * Wait on each cb in turn.  For a list of N operations we want
+	 * to return as soon as ANY one completes.  We iterate the list
+	 * repeatedly; on each pass we block on the first still-pending cb
+	 * we find.  When that cb completes we re-scan from the beginning.
+	 * The outer loop exits the moment any cb is no longer queued.
+	 */
+	for(;;) {
+		for(i = 0; i < n; i++) {
+			const struct aiocb *cb = list[i];
+			if(!cb) continue;
+
+			pthread_mutex_lock((pthread_mutex_t *)&cb->__lock);
+			if(!cb->__queued) {
+				pthread_mutex_unlock((pthread_mutex_t *)&cb->__lock);
+				return 0;
+			}
+			/* Block until this cb signals completion (or timeout). */
+			if(ts)
+				r = pthread_cond_timedwait(
+				    (pthread_cond_t *)&cb->__cond,
+				    (pthread_mutex_t *)&cb->__lock,
+				    &deadline);
+			else
+				r = pthread_cond_wait(
 				    (pthread_cond_t *)&cb->__cond,
 				    (pthread_mutex_t *)&cb->__lock);
-				pthread_mutex_unlock(
-				    (pthread_mutex_t *)&cb->__lock);
-				/* re-check: it may now be done */
-				pthread_mutex_lock((pthread_mutex_t *)&cb->__lock);
-				if(!cb->__queued) {
-					pthread_mutex_unlock(
-					    (pthread_mutex_t *)&cb->__lock);
-					return 0;
-				}
-				pthread_mutex_unlock(
-				    (pthread_mutex_t *)&cb->__lock);
-			}
-		}
-	} else {
-		/*
-		 * Timeout requested.  Since pthread_cond_timedwait on Plan9
-		 * ignores the timeout, we poll with 10ms sleeps.
-		 * Convert ts (relative timeout) to total milliseconds.
-		 */
-		long ms = ts->tv_sec * 1000 + ts->tv_nsec / 1000000;
-		if(ms <= 0) ms = 1;
+			pthread_mutex_unlock((pthread_mutex_t *)&cb->__lock);
 
-		while(ms > 0) {
-			for(i = 0; i < n; i++) {
-				const struct aiocb *cb = list[i];
-				if(!cb) continue;
-				pthread_mutex_lock((pthread_mutex_t *)&cb->__lock);
-				if(!cb->__queued) {
-					pthread_mutex_unlock(
-					    (pthread_mutex_t *)&cb->__lock);
-					return 0;
-				}
-				pthread_mutex_unlock(
-				    (pthread_mutex_t *)&cb->__lock);
+			if(r == ETIMEDOUT) {
+				errno = EAGAIN;
+				return -1;
 			}
-			/* sleep 10ms */
-			struct timespec sl;
-			sl.tv_sec  = 0;
-			sl.tv_nsec = 10 * 1000 * 1000;
-			nanosleep(&sl, NULL);
-			ms -= 10;
+			/*
+			 * We were woken (possibly spuriously).  Re-scan from
+			 * the top to check if any cb is actually done.
+			 */
+			break;
 		}
-		/* timed out */
-		errno = EAGAIN;
-		return -1;
 	}
 }
 

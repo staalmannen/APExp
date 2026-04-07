@@ -10,6 +10,7 @@ OFILES=\
 	cond_init.$O\
 	cond_signal.$O\
 	cond_wait.$O\
+	cond_timedwait.$O\
 	pthread_create.$O\
 	pthread_equal.$O\
 	pthread_exit.$O\
