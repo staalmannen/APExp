@@ -119,6 +119,8 @@ control(Tokenrow *trp)
 			return;
 
 		case KELIF:
+		case KELIFDEF:
+		case KELIFNDEF:
 		case KELSE:
 			if (ifdepth<=skipping)
 				break;

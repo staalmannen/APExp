@@ -3,6 +3,10 @@ http://home.datacomm.ch/t_wolf/tw/c/c9x_changes.html
 
 (Numbers are from the web page list.)
 
+Current status:
+Apart from goto restrictions for VLA is C99 support pretty much done.
+
+
 Not done (yet?):
 34. goto restrictions for variable-length arrows
 

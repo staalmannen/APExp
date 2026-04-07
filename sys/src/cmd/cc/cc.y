@@ -231,6 +231,20 @@ edecl:
 		lasttype = $2;
 	}
 	zedlist ';'
+|	edecl LSTATICASSERT '(' expr ',' LSTRING ')' ';'
+	{
+		/* C11 _Static_assert inside struct/union body */
+		complex($4);
+		if($4->op == OCONST && !$4->vconst)
+			diag($4, "_Static_assert failed: %s", $6.s);
+	}
+|	edecl LSTATICASSERT '(' expr ')' ';'
+	{
+		/* C23 _Static_assert without message inside struct/union body */
+		complex($4);
+		if($4->op == OCONST && !$4->vconst)
+			diag($4, "_Static_assert failed");
+	}
 
 zedlist:					/* extension */
 	{
