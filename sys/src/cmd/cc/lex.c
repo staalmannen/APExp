@@ -1470,6 +1470,9 @@ struct
 	"__inline",		LINLINE,	0,
 	"__inline__",		LINLINE,	0,
 
+	/* C11 _Generic type-generic selection expression */
+	"_Generic",		LGENERIC,	0,
+
 	/* C23 nullptr: null pointer constant — proper token, handled in cc.y pexpr */
 	"nullptr",		LNULLPTR,	0,
 

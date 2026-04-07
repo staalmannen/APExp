@@ -1,5 +1,6 @@
 %{
 #include "cc.h"
+static Node *generic_select(Node*, Node*);
 %}
 %union	{
 	Node*	node;
@@ -38,6 +39,7 @@
 %type	<node>	adlist edecor tag qual qlist
 %type	<node>	abdecor abdecor1 abdecor2 abdecor3
 %type	<node>	zexpr lexpr init ilist forexpr
+%type	<node>	generic_assoc_list generic_assoc
 
 %left	';'
 %left	','
@@ -68,6 +70,7 @@
 %token	LTYPEOF
 %token	LNULLPTR LSTATICASSERT
 %token	LALIGNOF
+%token	LGENERIC
 %%
 prog:
 |	prog xdecl
@@ -820,6 +823,22 @@ pexpr:
 		dodecl(NODECL, CXXX, $3, $4);
 		$$->type = lastdcl;
 	}
+|	LGENERIC '(' expr ',' generic_assoc_list ')'
+	{
+		/*
+		 * C11 _Generic: resolve at compile time.
+		 * complex() the controlling expr to get its type,
+		 * apply lvalue conversion, then walk the association
+		 * list to find the matching branch.
+		 */
+		complex($3);
+		$$ = generic_select($3, $5);
+		if($$ == Z) {
+			diag($3, "_Generic: no matching association for type %T",
+			     $3->type);
+			$$ = $3;
+		}
+	}
 |	pexpr '(' zelist ')'
 	{
 		$$ = new(OFUNC, $1, Z);
@@ -1384,4 +1403,131 @@ tag:
 ltag:
 	LNAME
 |	LTYPE
+/*
+ * C11 §6.5.1.1 _Generic selection expression.
+ *
+ * _Generic(ctrl, type1: val1, ..., default: valn)
+ *
+ * The controlling expression is evaluated for its type only (like sizeof).
+ * The matching association's value is the result; others are discarded.
+ * We build the association list as OLIST of OCAST nodes:
+ *   OCAST->type  = association type (T = null for default:)
+ *   OCAST->left  = value expression
+ *
+ * The grammar action calls generic_select() to walk the list and
+ * return the selected value node.  Non-selected nodes never reach tcom().
+ */
+generic_assoc_list:
+	generic_assoc
+|	generic_assoc_list ',' generic_assoc
+	{
+		$$ = new(OLIST, $1, $3);
+	}
+
+generic_assoc:
+	tlist abdecor ':' expr
+	{
+		/*
+		 * type-name : expression association.
+		 * Pack as OCAST: type in ->type, value in ->left.
+		 */
+		Node *assoc;
+		dodecl(NODECL, CXXX, $1, $2);
+		assoc = new(OCAST, $4, Z);
+		assoc->type = lastdcl;
+		$$ = assoc;
+	}
+|	LDEFAULT ':' expr
+	{
+		/*
+		 * default : expression association.
+		 * type T (null) signals "default".
+		 */
+		Node *assoc;
+		assoc = new(OCAST, $3, Z);
+		assoc->type = T;
+		$$ = assoc;
+	}
+
+
+
 %%
+
+/*
+ * generic_select: walk the _Generic association list and return the
+ * value expression whose type matches the controlling expression's type.
+ *
+ * Association list is an OLIST tree of OCAST nodes:
+ *   assoc->type  = type-name (T = default)
+ *   assoc->left  = value expression
+ *
+ * Type matching follows C11 §6.5.1.1p2:
+ *   - Qualified and unqualified versions of a type are compatible
+ *     (garb qualifiers are stripped before comparison).
+ *   - Array types decay to pointer types (lvalue conversion).
+ *   - Function types decay to pointer-to-function.
+ *   - At most one non-default association may match (we pick first).
+ */
+static Type*
+generic_ctrl_type(Type *t)
+{
+	if(t == T)
+		return T;
+	/* array decay */
+	if(t->etype == TARRAY)
+		return typ(TIND, t->link);
+	/* function decay */
+	if(t->etype == TFUNC)
+		return typ(TIND, t);
+	/* strip qualifiers for matching */
+	if(t->garb & (GCONSTNT|GVOLATILE)) {
+		Type *u = copytyp(t);
+		u->garb &= ~(GCONSTNT|GVOLATILE);
+		return u;
+	}
+	return t;
+}
+
+static Node*
+generic_select(Node *ctrl, Node *list)
+{
+	Node *assoc, *deflt, *p;
+	Type *ct;
+
+	if(ctrl == Z || ctrl->type == T)
+		return Z;
+
+	ct = generic_ctrl_type(ctrl->type);
+	deflt = Z;
+
+	/* Walk OLIST tree (left-folded by the grammar) */
+	p = list;
+	for(;;) {
+		if(p == Z)
+			break;
+		if(p->op == OLIST) {
+			assoc = p->right;
+			p = p->left;
+		} else {
+			assoc = p;
+			p = Z;
+		}
+		if(assoc == Z || assoc->op != OCAST)
+			continue;
+		if(assoc->type == T) {
+			/* default association */
+			deflt = assoc->left;
+			continue;
+		}
+		if(sametype(ct, assoc->type))
+			return assoc->left;
+		/* Also match with qualifiers stripped from assoc type */
+		if(assoc->type->garb & (GCONSTNT|GVOLATILE)) {
+			Type *u = copytyp(assoc->type);
+			u->garb &= ~(GCONSTNT|GVOLATILE);
+			if(sametype(ct, u))
+				return assoc->left;
+		}
+	}
+	return deflt;
+}

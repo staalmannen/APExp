@@ -743,7 +743,7 @@ tcomo(Node *n, int f)
 		 *
 		 * Formula: align(1, T, Ael1) rounds 1 up to the next multiple
 		 * of the type's natural alignment, giving the alignment directly.
-		 * Examples: char→1, short→2, int→4, double→8, struct→max_member.
+		 * Examples: char->1, short->2, int->4, double->8, struct->max_member.
 		 */
 		if(l != Z) {
 			/* _Alignof(expr) form: evaluate child for its type only */

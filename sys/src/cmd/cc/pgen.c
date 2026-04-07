@@ -77,10 +77,31 @@ codgen(Node *n, Node *nn)
 	warnreach = 1;
 	gen(n);
 	if(canreach && thisfn->link->etype != TVOID){
-		if(debug['B'])
-			warn(Z, "no return at end of function: %s", n1->sym->name);
-		else
-			diag(Z, "no return at end of function: %s", n1->sym->name);
+		/*
+		 * C99 §5.1.2.2.3: reaching the closing } of main() is
+		 * equivalent to return 0.  Synthesise that silently.
+		 * For all other non-void functions, warn (not error) —
+		 * ported code frequently omits return on unreachable paths.
+		 * Use -B to suppress even the warning.
+		 */
+		if(strcmp(n1->sym->name, "main") == 0 &&
+		   thisfn->link->etype == TINT) {
+			/* emit: return 0 */
+			Node ret, zero;
+			ret = znode;
+			ret.op = ORETURN;
+			ret.type = thisfn->link;
+			zero = znode;
+			zero.op = OCONST;
+			zero.type = thisfn->link;
+			zero.vconst = 0;
+			ret.left = &zero;
+			gen(&ret);
+		} else {
+			if(!debug['B'])
+				warn(Z, "no return at end of function: %s",
+				     n1->sym->name);
+		}
 	}
 	noretval(3);
 	gbranch(ORETURN);
