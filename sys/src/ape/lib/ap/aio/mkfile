@@ -7,7 +7,7 @@ LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 # todo: fix this so that it builds and actually works
 
 OFILES=\
-#	aio.$O\
+	aio.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

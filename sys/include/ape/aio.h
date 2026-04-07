@@ -13,6 +13,7 @@
 #define LIO_READ        0
 #define LIO_WRITE       1
 #define LIO_NOP         2
+#define LIO_FSYNC       3		/* internal: used by aio_fsync() */
 
 #define LIO_WAIT        0
 #define LIO_NOWAIT      1
@@ -39,6 +40,7 @@ int aio_write(struct aiocb *);
 int aio_fsync(int op, struct aiocb *);
 int aio_error(const struct aiocb *);
 ssize_t aio_return(struct aiocb *);
+int aio_cancel(int, struct aiocb *);
 int aio_suspend(const struct aiocb *const [], int, const struct timespec *);
 int lio_listio(int mode, struct aiocb *const [], int, struct sigevent *);
 
