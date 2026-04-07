@@ -848,9 +848,7 @@ talph:
 	    strcmp(s->name, "__declspec")    == 0 ||
 	    strcmp(s->name, "__extension__") == 0 ||
 	    strcmp(s->name, "__asm__")       == 0 ||
-	    strcmp(s->name, "__asm")         == 0 ||
-	    strcmp(s->name, "__alignof__")   == 0 ||
-	    strcmp(s->name, "__alignof")     == 0)) {
+	    strcmp(s->name, "__asm")         == 0)) {
 		int ac, depth;
 		/* skip whitespace to see if '(' follows */
 		do { ac = GETC(); } while(ac == ' ' || ac == '\t');
@@ -1129,6 +1127,7 @@ casedothex:
 			goto toolong;
 		*cp++ = c;
 		c = GETC();
+		if(c == '\'') { c = GETC(); continue; }	/* C23 digit separator */
 		if(!isdigit(c) && !(c >= 'a' && c <= 'f') && !(c >= 'A' && c <= 'F'))
 			break;
 	}
@@ -1150,6 +1149,7 @@ casep:
 	if(!isdigit(c))
 		yyerror("malformed hex float constant exponent");
 	while(isdigit(c)) {
+		if(c == '\'') { c = GETC(); continue; }	/* C23 digit separator */
 		if(cp >= &symb[NSYMB-1])
 			goto toolong;
 		*cp++ = c;
@@ -1163,6 +1163,7 @@ casedot:
 			goto toolong;
 		*cp++ = c;
 		c = GETC();
+		if(c == '\'') { c = GETC(); continue; }	/* C23 digit separator */
 		if(!isdigit(c))
 			break;
 	}
@@ -1181,6 +1182,7 @@ casee:
 	if(!isdigit(c))
 		yyerror("malformed fp constant exponent");
 	while(isdigit(c)) {
+		if(c == '\'') { c = GETC(); continue; }	/* C23 digit separator */
 		if(cp >= &symb[NSYMB-1])
 			goto toolong;
 		*cp++ = c;
@@ -1537,11 +1539,15 @@ struct
 	"__typeof__",		LTYPEOF,	0,
 
 	/*
-	 * __alignof__ / __alignof: GCC alignment query.
-	 * Registered as LNAME; yylex() swallows the argument list.
+	 * _Alignof / __alignof__ / __alignof: C11/GCC alignment query.
+	 * Returns LALIGNOF token; grammar produces compile-time constant.
+	 * Previously swallowed (broken); now properly parsed.
+	 * "alignof" is the C23 standard spelling (no underscore).
 	 */
-	"__alignof__",		LNAME,		0,
-	"__alignof",		LNAME,		0,
+	"_Alignof",		LALIGNOF,	0,
+	"alignof",		LALIGNOF,	0,
+	"__alignof__",		LALIGNOF,	0,
+	"__alignof",		LALIGNOF,	0,
 
 	/*
 	 * GNU visibility / linkage hints.

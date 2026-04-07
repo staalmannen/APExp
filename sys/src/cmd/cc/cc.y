@@ -67,6 +67,7 @@
 %token	LRESTRICT LINLINE LNORET LDOTDOTDOT LCOMPLEX LIMAGINARY LCOMPLEXF LCOMPLEXD
 %token	LTYPEOF
 %token	LNULLPTR LSTATICASSERT
+%token	LALIGNOF
 %%
 prog:
 |	prog xdecl
@@ -775,6 +776,11 @@ uexpr:
 	{
 		$$ = new(OSIGN, $2, Z);
 	}
+|	LALIGNOF uexpr
+	{
+		/* _Alignof(expr): alignment of the expression's type */
+		$$ = new(OALIGNOF, $2, Z);
+	}
 |	LTYPEOF '(' cexpr ')'
 	{
 		/* typeof(expr): produce a node carrying the expression's type.
@@ -804,6 +810,13 @@ pexpr:
 |	LSIGNOF '(' tlist abdecor ')'
 	{
 		$$ = new(OSIGN, Z, Z);
+		dodecl(NODECL, CXXX, $3, $4);
+		$$->type = lastdcl;
+	}
+|	LALIGNOF '(' tlist abdecor ')'
+	{
+		/* _Alignof(type-name): alignment requirement of type */
+		$$ = new(OALIGNOF, Z, Z);
 		dodecl(NODECL, CXXX, $3, $4);
 		$$->type = lastdcl;
 	}

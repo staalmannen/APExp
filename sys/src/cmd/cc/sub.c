@@ -1039,6 +1039,7 @@ loop:
 	case OSIGN:
 	case OSIZE:
 	case OTYPEOF:
+	case OALIGNOF:
 	case OCONST:
 	case OSTRING:
 	case OLSTRING:
@@ -1576,6 +1577,7 @@ Init	onamesinit[] =
 	OSIGN,		0,	"SIGN",
 	OSIZE,		0,	"SIZE",
 	OTYPEOF,	0,	"TYPEOF",
+	OALIGNOF,	0,	"ALIGNOF",
 	OSTRING,	0,	"STRING",
 	OLSTRING,	0,	"LSTRING",
 	OSTRUCT,	0,	"STRUCT",

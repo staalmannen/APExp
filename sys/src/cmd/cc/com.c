@@ -736,6 +736,35 @@ tcomo(Node *n, int f)
 		n->vconst = 0;
 		break;
 
+	case OALIGNOF:
+		/*
+		 * _Alignof(type) / _Alignof(expr): returns the alignment
+		 * requirement of the type as a compile-time integer constant.
+		 *
+		 * Formula: align(1, T, Ael1) rounds 1 up to the next multiple
+		 * of the type's natural alignment, giving the alignment directly.
+		 * Examples: char→1, short→2, int→4, double→8, struct→max_member.
+		 */
+		if(l != Z) {
+			/* _Alignof(expr) form: evaluate child for its type only */
+			if(l->op != OSTRING && l->op != OLSTRING)
+				if(tcomo(l, 0))
+					goto bad;
+			n->type = l->type;
+		}
+		if(n->type == T)
+			goto bad;
+		if(n->type->width < 0) {
+			diag(n, "_Alignof undefined type");
+			goto bad;
+		}
+		n->op = OCONST;
+		n->left = Z;
+		n->right = Z;
+		n->vconst = align(1, n->type, Ael1);
+		n->type = types[TULONG];
+		break;
+
 	case OFUNC:
 		o = tcomo(l, 0);
 		if(o)

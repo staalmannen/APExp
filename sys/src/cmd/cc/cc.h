@@ -273,6 +273,7 @@ enum
 	OSIGN,
 	OSIZE,
 	OTYPEOF,	/* typeof(expr) / typeof(type) — C23/GCC extension */
+	OALIGNOF,	/* _Alignof(type) / __alignof__(type) — C11/GCC */
 	OSTRING,
 	OLSTRING,
 	OSTRUCT,
