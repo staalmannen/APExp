@@ -44,7 +44,9 @@ The install target:
 
 386, 68020, amd64, arm, arm64, mips, power, power64, sparc, sparc64, spim
 
-Architecture-specific code lives under `sys/src/ape/lib/ap/arch/[archname]/`.
+The current architecture defined by the variable $objtype, for example $objtype=amd64 for x86_64.
+
+Architecture-specific code for libap.a lives under `sys/src/ape/lib/ap/arch/$objtype/`.
 
 ### Compiler Configuration
 
@@ -81,12 +83,13 @@ sys/src/
 │       ├── bash/     # Bash port
 │       ├── f2c/, p2c/, objc/  # Transpilers (Fortran, Pascal, ObjC → C)
 │       └── [bzip2, xz, unrar, unace, unarj, clzip]  # Archivers
-sys/include/ape/      # All APE/POSIX headers
+sys/include/ape/      # All architecture-independent APE/POSIX headers
 sys/lib/
 ├── ape/locale/       # Locale data
 ├── pascal/           # Pascal runtime
 └── tests/            # Test programs (currently just stdio-test.c)
 sys/man/1/, sys/man/3/  # Manual pages
+$objtype/include/ape  # All architecture-dependent APE/POSIX headers
 ```
 
 ### libap (Core Library)
@@ -105,6 +108,7 @@ Multiple upstream libraries are **merged into libap**: lib9, libbsd, libutf, lib
 ### Headers
 
 `sys/include/ape/` contains APE/POSIX headers sourced from: musl libc, NetBSD (libnbcompat), OpenBSD (queue.h via sbase), GNU, and custom Plan9 shims.
+`$objtype/include/ape/` contains APE/POSIX headers that are architecture-dependent
 
 ## Compiler Enhancements
 
@@ -127,7 +131,7 @@ Safe to disable: non-C language libraries, transpilers (f2c, p2c, objc), archive
 
 ## Testing
 
-Minimal test infrastructure at `sys/lib/tests/stdio-test.c`. Testing is primarily ad-hoc: compile a program under APExp and verify it builds/runs correctly.
+Minimal test infrastructure at `sys/lib/tests/stdio-test.c`. Testing is primarily ad-hoc: compile a program under APExp and verify it builds/runs correctly. In the future, more tests will be put in this directory.
 
 ## Current Development Focus (as of 2026-04)
 
@@ -403,13 +407,6 @@ functions in the library with no header declaration. Without a declaration,
 kencc gives functions implicit `int` return type — silently truncating
 pointer and float return values.
 
-**Highest priority (causes almost every port to fail):**
-- `sys/include/ape/sys/stat.h`: `stat`, `fstat`, `lstat`, `chmod`, `fchmod`, `fchown`, `umask`
-- `sys/include/ape/unistd.h`: `readv`, `writev`, `mkdir`, `readlink`, and 10 `*at` functions
-- `sys/include/ape/stdlib.h`: `aligned_alloc`, `memalign`, `reallocarray`, `qsort_r`
-- `sys/include/ape/time.h`: `gettimeofday`
-- `sys/include/ape/pthread.h`: rwlock functions (in `pthread_ext.c` but undeclared)
+The math.h gap (30 functions) and the other missing declarations has been fixed.
 
-**See `missing_declarations_report.txt` in project notes for complete list.**
 
-The math.h gap (30 functions) has been fixed. The others are in progress.

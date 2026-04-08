@@ -1288,6 +1288,20 @@ complex:
 	{
 		$$ = types[TCFLOAT];
 	}
+|	LTYPEOF '(' cexpr ')'
+	{
+		/* typeof(expr) as type specifier: __typeof__(x) y;
+		 * Evaluate the expression for its type, discard the value. */
+		complex($3);
+		$$ = $3->type != T ? $3->type : types[TINT];
+	}
+|	LTYPEOF '(' tlist abdecor ')'
+	{
+		/* typeof(type) as type specifier: __typeof__(int (*)(void)) fp;
+		 * dodecl resolves tlist+abdecor into lastdcl. */
+		dodecl(NODECL, CXXX, $3, $4);
+		$$ = lastdcl;
+	}
 
 gctnlist:
 	gctname
@@ -1309,20 +1323,6 @@ gctname:
 	tname
 |	gname
 |	cname
-|	LTYPEOF '(' cexpr ')'
-	{
-		/* typeof(expr) as type specifier: __typeof__(x) y;
-		 * Evaluate the expression for its type, discard the value. */
-		complex($3);
-		$$ = $3->type != T ? $3->type : types[TINT];
-	}
-|	LTYPEOF '(' tlist abdecor ')'
-	{
-		/* typeof(type) as type specifier: __typeof__(int (*)(void)) fp;
-		 * dodecl resolves tlist+abdecor into lastdcl. */
-		dodecl(NODECL, CXXX, $3, $4);
-		$$ = lastdcl;
-	}
 
 gcnlist:
 	gcname
