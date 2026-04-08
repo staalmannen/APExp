@@ -99,7 +99,7 @@ host_triplet = x86_64-unknown-plan9
 #   __udivdi3, __umoddi3).
 #am__append_1 = -D__USE_MINGW_ANSI_STDIO=0
 # A bison-2.1 generated plural.c includes <libintl.h> if ENABLE_NLS.
-am__append_2 = libintl.h
+#am__append_2 = libintl.h
 #am__append_3 = libintl.res.lo
 subdir = .
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -261,8 +261,8 @@ am__objects_1 = bindtextdom.lo dcgettext.lo dgettext.lo gettext.lo \
 	dcngettext.lo dngettext.lo ngettext.lo plural.lo plural-exp.lo \
 	langprefs.lo log.lo printf.lo setlocale.lo version.lo osdep.lo \
 	intl-compat.lo compat.lo
-#am_libgnuintl_la_OBJECTS =  \
-#	$(am__objects_1)
+am_libgnuintl_la_OBJECTS =  \
+	$(am__objects_1)
 libgnuintl_la_OBJECTS = $(am_libgnuintl_la_OBJECTS)
 AM_V_lt = $(am__v_lt_$(V))
 am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
@@ -271,19 +271,19 @@ am__v_lt_1 =
 libgnuintl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libgnuintl_la_LDFLAGS) $(LDFLAGS) -o $@
-#am_libgnuintl_la_rpath =
+am_libgnuintl_la_rpath =
 am__libintl_la_SOURCES_DIST = bindtextdom.c dcgettext.c dgettext.c \
 	gettext.c finddomain.c hash-string.c loadmsgcat.c \
 	localealias.c textdomain.c l10nflist.c explodename.c \
 	dcigettext.c dcngettext.c dngettext.c ngettext.c plural.y \
 	plural-exp.c langprefs.c log.c printf.c setlocale.c version.c \
 	osdep.c intl-compat.c compat.c
-am_libintl_la_OBJECTS = $(am__objects_1)
+#am_libintl_la_OBJECTS = $(am__objects_1)
 libintl_la_OBJECTS = $(am_libintl_la_OBJECTS)
 libintl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CCLD) $(AM_CFLAGS) $(CFLAGS) \
 	$(libintl_la_LDFLAGS) $(LDFLAGS) -o $@
-am_libintl_la_rpath =
+#am_libintl_la_rpath =
 AM_V_P = $(am__v_P_$(V))
 am__v_P_ = $(am__v_P_$(AM_DEFAULT_VERBOSITY))
 am__v_P_0 = false
@@ -484,16 +484,16 @@ APPLE_UNIVERSAL_BUILD = 0
 AR = ar
 ARFLAGS = cr
 AS = as
-ASSERT_H = assert.h
+ASSERT_H = 
 AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing' autoconf
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing' autoheader
 AUTOMAKE = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing' automake-1.18
 AWK = awk
-BITSIZEOF_PTRDIFF_T = 64
-BITSIZEOF_SIG_ATOMIC_T = 32
-BITSIZEOF_SIZE_T = 32
-BITSIZEOF_WCHAR_T = 16
-BITSIZEOF_WINT_T = 32
+BITSIZEOF_PTRDIFF_T = 0
+BITSIZEOF_SIG_ATOMIC_T = 0
+BITSIZEOF_SIZE_T = 0
+BITSIZEOF_WCHAR_T = 0
+BITSIZEOF_WINT_T = 0
 CAN_PRINT_STACK_TRACE = 0
 CATOBJEXT = .gmo
 CC = cc
@@ -1190,8 +1190,8 @@ GL_GNULIB_ZPRINTF = 0
 GL_GNULIB__EXIT = 0
 GMSGFMT = :
 GMSGFMT_015 = :
-GNULIBHEADERS_OVERRIDE_CHAR16_T = 1
-GNULIBHEADERS_OVERRIDE_CHAR32_T = 1
+GNULIBHEADERS_OVERRIDE_CHAR16_T = 0
+GNULIBHEADERS_OVERRIDE_CHAR32_T = 0
 GNULIBHEADERS_OVERRIDE_CHAR8_T = 1
 GNULIBHEADERS_OVERRIDE_WINT_T = 0
 GREP = /bin/grep
@@ -1234,13 +1234,13 @@ HAVE_DECL_ATANL = 1
 HAVE_DECL_CEILF = 1
 HAVE_DECL_CEILL = 1
 HAVE_DECL_COSL = 1
-HAVE_DECL_ECVT = 0
+HAVE_DECL_ECVT = 1
 HAVE_DECL_ENVIRON = 1
 HAVE_DECL_EXECVPE = 0
 HAVE_DECL_EXPL = 1
 HAVE_DECL_FCHDIR = 1
 HAVE_DECL_FCLOSEALL = 0
-HAVE_DECL_FCVT = 0
+HAVE_DECL_FCVT = 1
 HAVE_DECL_FDATASYNC = 1
 HAVE_DECL_FLOORF = 1
 HAVE_DECL_FLOORL = 1
@@ -1248,7 +1248,7 @@ HAVE_DECL_FPURGE = 1
 HAVE_DECL_FREXPL = 1
 HAVE_DECL_FSEEKO = 1
 HAVE_DECL_FTELLO = 1
-HAVE_DECL_GCVT = 0
+HAVE_DECL_GCVT = 1
 HAVE_DECL_GETDELIM = 1
 HAVE_DECL_GETDOMAINNAME = 1
 HAVE_DECL_GETLINE = 1
@@ -1295,7 +1295,7 @@ HAVE_DECL_TRUNCL = 1
 HAVE_DECL_TTYNAME_R = 1
 HAVE_DECL_UNSETENV = 1
 HAVE_DECL_VSNPRINTF = 1
-HAVE_DECL_WCSDUP = 0
+HAVE_DECL_WCSDUP = 1
 HAVE_DECL_WCWIDTH = 1
 HAVE_DPRINTF = 1
 HAVE_DUP3 = 1
@@ -1386,7 +1386,7 @@ HAVE_MAX_ALIGN_T = 0
 HAVE_MBRLEN = 1
 HAVE_MBRTOC16 = 1
 HAVE_MBRTOC32 = 0
-HAVE_MBRTOWC = 1
+HAVE_MBRTOWC = 0
 HAVE_MBSINIT = 1
 HAVE_MBSLEN = 0
 HAVE_MBSNRTOWCS = 1
@@ -1569,7 +1569,7 @@ HAVE_TSEARCH = 1
 HAVE_TWALK = 1
 HAVE_TYPE_VISIT = 1
 HAVE_TZALLOC = 0
-HAVE_UCHAR_H = 0
+HAVE_UCHAR_H = 1
 HAVE_UNISTD_H = 1
 HAVE_UNISTRING_WOE32DLL_H = 0
 HAVE_UNLINKAT = 1
@@ -1618,7 +1618,7 @@ HAVE_WMEMCPY = 1
 HAVE_WMEMMOVE = 1
 HAVE_WMEMPCPY = 1
 HAVE_WMEMSET = 1
-HAVE_WORKING_C32RTOMB = 0
+HAVE_WORKING_C32RTOMB = 1
 HAVE_WORKING_CXX_STDCKDINT_H = 0
 HAVE_WORKING_C_STDCKDINT_H = 0
 HAVE_WORKING_MBRTOC32 = 0
@@ -1639,7 +1639,7 @@ INTL_MACOSX_LIBS =
 LD = pcc
 LDFLAGS = 
 LIBICONV = 
-LIBINTL = ${top_builddir}/intl/libintl.la  
+LIBINTL = 
 LIBMULTITHREAD = 
 LIBOBJS = 
 LIBPMULTITHREAD = 
@@ -1668,7 +1668,7 @@ LOCALE_FR = none
 LOCALE_JA = ja_JP
 LOCALE_ZH_CN = none
 LTLIBICONV = 
-LTLIBINTL = ${top_builddir}/intl/libintl.la  
+LTLIBINTL = 
 LTLIBMULTITHREAD = 
 LTLIBOBJS = 
 LTLIBTHREAD = 
@@ -1680,8 +1680,8 @@ MKDIR_P = mkdir -p
 MSGFMT = :
 MSGMERGE = /bin/msgmerge
 MSGMERGE_FOR_MSGFMT_OPTION = --no-location --quiet
-NEXT_ASSERT_H = <assert.h>
-NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = <assert.h>
+NEXT_ASSERT_H = 
+NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_ERRNO_H = <errno.h>
 NEXT_AS_FIRST_DIRECTIVE_FCNTL_H = <fcntl.h>
 NEXT_AS_FIRST_DIRECTIVE_FLOAT_H = <float.h>
@@ -1874,7 +1874,7 @@ REPLACE_LDEXP = 0
 REPLACE_LDEXPL = 0
 REPLACE_LINK = 0
 REPLACE_LINKAT = 0
-REPLACE_LOCALECONV = 1
+REPLACE_LOCALECONV = 0
 REPLACE_LOCALTIME = 0
 REPLACE_LOCALTIME_R = 0
 REPLACE_LOCALTIME_RZ = 0
@@ -1900,10 +1900,10 @@ REPLACE_MBRLEN = 0
 REPLACE_MBRTOC16 = 0
 REPLACE_MBRTOC32 = 0
 REPLACE_MBRTOWC = 1
-REPLACE_MBSINIT = 0
+REPLACE_MBSINIT = 1
 REPLACE_MBSNRTOWCS = 0
 REPLACE_MBSRTOWCS = 0
-REPLACE_MBSTATE_T = 0
+REPLACE_MBSTATE_T = 1
 REPLACE_MBSTOWCS = 0
 REPLACE_MBTOWC = 0
 REPLACE_MB_CUR_MAX = 0
@@ -2052,7 +2052,7 @@ REPLACE_STRTOLL = 0
 REPLACE_STRTOUL = 0
 REPLACE_STRTOULL = 0
 REPLACE_STRTOUMAX = 0
-REPLACE_STRUCT_LCONV = 1
+REPLACE_STRUCT_LCONV = 0
 REPLACE_STRVERSCMP = 0
 REPLACE_SYMLINK = 0
 REPLACE_SYMLINKAT = 0
@@ -2130,7 +2130,7 @@ UNISTD_H_DEFINES_STRUCT_TIMESPEC = 0
 UNISTD_H_HAVE_SYS_RANDOM_H = 0
 UNISTD_H_HAVE_WINSOCK2_H = 0
 UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS = 0
-USE_INCLUDED_LIBINTL = yes
+USE_INCLUDED_LIBINTL = no
 USE_NLS = yes
 VERSION = 0.22.5
 WARN_CFLAGS = 
@@ -2169,12 +2169,12 @@ datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-gl_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/frexp.Plo $(DEPDIR)/frexpl.Plo $(DEPDIR)/isnanf.Plo $(DEPDIR)/isnanl.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/vasnprintf.Plo
-gl_LIBOBJS =  asnprintf.o frexp.o frexpl.o isnanf.o isnanl.o printf-args.o printf-parse.o vasnprintf.o
-gl_LTLIBOBJS =  asnprintf.lo frexp.lo frexpl.lo isnanf.lo isnanl.lo printf-args.lo printf-parse.lo vasnprintf.lo
-gl_libgnu_LIBOBJDEPS =  $(DEPDIR)/libgnu_la-asnprintf.Plo $(DEPDIR)/libgnu_la-frexp.Plo $(DEPDIR)/libgnu_la-frexpl.Plo $(DEPDIR)/libgnu_la-isnanf.Plo $(DEPDIR)/libgnu_la-isnanl.Plo $(DEPDIR)/libgnu_la-printf-args.Plo $(DEPDIR)/libgnu_la-printf-parse.Plo $(DEPDIR)/libgnu_la-vasnprintf.Plo
-gl_libgnu_LIBOBJS =  libgnu_a-asnprintf.o libgnu_a-frexp.o libgnu_a-frexpl.o libgnu_a-isnanf.o libgnu_a-isnanl.o libgnu_a-printf-args.o libgnu_a-printf-parse.o libgnu_a-vasnprintf.o
-gl_libgnu_LTLIBOBJS =  libgnu_la-asnprintf.lo libgnu_la-frexp.lo libgnu_la-frexpl.lo libgnu_la-isnanf.lo libgnu_la-isnanl.lo libgnu_la-printf-args.lo libgnu_la-printf-parse.lo libgnu_la-vasnprintf.lo
+gl_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/frexp.Plo $(DEPDIR)/frexpl.Plo $(DEPDIR)/isnanf.Plo $(DEPDIR)/isnanl.Plo $(DEPDIR)/lc-charset-dispatch.Plo $(DEPDIR)/mbtowc-lock.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/vasnprintf.Plo
+gl_LIBOBJS =  asnprintf.o frexp.o frexpl.o isnanf.o isnanl.o lc-charset-dispatch.o mbtowc-lock.o printf-args.o printf-parse.o vasnprintf.o
+gl_LTLIBOBJS =  asnprintf.lo frexp.lo frexpl.lo isnanf.lo isnanl.lo lc-charset-dispatch.lo mbtowc-lock.lo printf-args.lo printf-parse.lo vasnprintf.lo
+gl_libgnu_LIBOBJDEPS =  $(DEPDIR)/libgnu_la-asnprintf.Plo $(DEPDIR)/libgnu_la-frexp.Plo $(DEPDIR)/libgnu_la-frexpl.Plo $(DEPDIR)/libgnu_la-isnanf.Plo $(DEPDIR)/libgnu_la-isnanl.Plo $(DEPDIR)/libgnu_la-lc-charset-dispatch.Plo $(DEPDIR)/libgnu_la-mbtowc-lock.Plo $(DEPDIR)/libgnu_la-printf-args.Plo $(DEPDIR)/libgnu_la-printf-parse.Plo $(DEPDIR)/libgnu_la-vasnprintf.Plo
+gl_libgnu_LIBOBJS =  libgnu_a-asnprintf.o libgnu_a-frexp.o libgnu_a-frexpl.o libgnu_a-isnanf.o libgnu_a-isnanl.o libgnu_a-lc-charset-dispatch.o libgnu_a-mbtowc-lock.o libgnu_a-printf-args.o libgnu_a-printf-parse.o libgnu_a-vasnprintf.o
+gl_libgnu_LTLIBOBJS =  libgnu_la-asnprintf.lo libgnu_la-frexp.lo libgnu_la-frexpl.lo libgnu_la-isnanf.lo libgnu_la-isnanl.lo libgnu_la-lc-charset-dispatch.lo libgnu_la-mbtowc-lock.lo libgnu_la-printf-args.lo libgnu_la-printf-parse.lo libgnu_la-vasnprintf.lo
 gltests_LIBOBJDEPS = 
 gltests_LIBOBJS = 
 gltests_LTLIBOBJS = 
@@ -2393,12 +2393,12 @@ LIBINTLSOURCES = \
 # We must not install the libintl.h/libintl.la files if we are on a
 # system which has the GNU gettext() function in its C library or in a
 # separate library.
-nodist_include_HEADERS = libintl.h
-#noinst_LTLIBRARIES = libgnuintl.la
+#nodist_include_HEADERS = libintl.h
+noinst_LTLIBRARIES = libgnuintl.la
 # Note: libintl.la actually gets installed in $(libdir). See below.
-noinst_LTLIBRARIES = libintl.la
-libintl_la_SOURCES = $(LIBINTLSOURCES)
-#libgnuintl_la_SOURCES = $(LIBINTLSOURCES)
+#noinst_LTLIBRARIES = libintl.la
+#libintl_la_SOURCES = $(LIBINTLSOURCES)
+libgnuintl_la_SOURCES = $(LIBINTLSOURCES)
 
 # Dependencies.
 PLURAL_DEPS = $(am__append_2)
@@ -2909,7 +2909,7 @@ check-am: all-am
 check: $(BUILT_SOURCES)
 	$(MAKE) $(AM_MAKEFLAGS) check-recursive
 all-am: Makefile $(LTLIBRARIES) $(HEADERS) config.h
-#installdirs-local:
+installdirs-local:
 installdirs: installdirs-recursive
 installdirs-am: installdirs-local
 	for dir in "$(DESTDIR)$(includedir)"; do \
@@ -2953,8 +2953,8 @@ maintainer-clean-generic:
 	-$(am__rm_f) $(BUILT_SOURCES)
 	-$(am__rm_f) $(MAINTAINERCLEANFILES)
 	-$(am__rm_f) plural.c
-#install-exec-local:
-#uninstall-local:
+install-exec-local:
+uninstall-local:
 clean: clean-recursive
 
 clean-am: clean-generic clean-libtool clean-local \
@@ -3289,26 +3289,26 @@ compat.lo:           ../config.h libgnuintl.h
 
 # Installation of libintl.la.
 
-install-exec-local: install-exec-libintl
-install-exec-libintl: libintl.la
-	$(mkdir_p) $(DESTDIR)$(libdir)
-	$(LIBTOOL) --mode=install \
-	  $(INSTALL) libintl.la $(DESTDIR)$(libdir)/libintl.la; \
-	if test "@RELOCATABLE@" = yes; then \
-	  dependencies=`sed -n -e 's,^dependency_libs=\(.*\),\1,p' < $(DESTDIR)$(libdir)/libintl.la | sed -e "s,^',," -e "s,'\$$,,"`; \
-	  if test -n "$$dependencies"; then \
-	    rm -f $(DESTDIR)$(libdir)/libintl.la; \
-	  fi; \
-	fi
+#install-exec-local: install-exec-libintl
+#install-exec-libintl: libintl.la
+#	$(mkdir_p) $(DESTDIR)$(libdir)
+#	$(LIBTOOL) --mode=install \
+#	  $(INSTALL) libintl.la $(DESTDIR)$(libdir)/libintl.la; \
+#	if test "@RELOCATABLE@" = yes; then \
+#	  dependencies=`sed -n -e 's,^dependency_libs=\(.*\),\1,p' < $(DESTDIR)$(libdir)/libintl.la | sed -e "s,^',," -e "s,'\$$,,"`; \
+#	  if test -n "$$dependencies"; then \
+#	    rm -f $(DESTDIR)$(libdir)/libintl.la; \
+#	  fi; \
+#	fi
 
-installdirs-local: installdirs-libintl
-installdirs-libintl:
-	$(mkdir_p) $(DESTDIR)$(libdir)
+#installdirs-local: installdirs-libintl
+#installdirs-libintl:
+#	$(mkdir_p) $(DESTDIR)$(libdir)
 
-uninstall-local: uninstall-libintl
-uninstall-libintl:
-	$(LIBTOOL) --mode=uninstall \
-	  rm -f $(DESTDIR)$(libdir)/libintl.la
+#uninstall-local: uninstall-libintl
+#uninstall-libintl:
+#	$(LIBTOOL) --mode=uninstall \
+#	  rm -f $(DESTDIR)$(libdir)/libintl.la
 
 # Installation of preloadable_libintl.so.
 

@@ -29,29 +29,29 @@
 /* #undef AC_APPLE_UNIVERSAL_BUILD */
 
 /* Define to the number of bits in type 'ptrdiff_t'. */
-#define BITSIZEOF_PTRDIFF_T 64
+#define BITSIZEOF_PTRDIFF_T 0
 
 /* Define to the number of bits in type 'sig_atomic_t'. */
-#define BITSIZEOF_SIG_ATOMIC_T 32
+#define BITSIZEOF_SIG_ATOMIC_T 0
 
 /* Define to the number of bits in type 'size_t'. */
-#define BITSIZEOF_SIZE_T 32
+#define BITSIZEOF_SIZE_T 0
 
 /* Define to the number of bits in type 'wchar_t'. */
-#define BITSIZEOF_WCHAR_T 16
+#define BITSIZEOF_WCHAR_T 0
 
 /* Define to the number of bits in type 'wint_t'. */
-#define BITSIZEOF_WINT_T 32
+#define BITSIZEOF_WINT_T 0
 
 /* Define to 1 if using 'alloca.c'. */
 /* #undef C_ALLOCA */
 
 /* Define as the bit index in the word where to find bit 0 of the exponent of
    'double'. */
-#define DBL_EXPBIT0_BIT 20
+/* #undef DBL_EXPBIT0_BIT */
 
 /* Define as the word index where to find the exponent of 'double'. */
-#define DBL_EXPBIT0_WORD 1
+/* #undef DBL_EXPBIT0_WORD */
 
 /* Define to a C preprocessor expression that evaluates to 1 or 0, depending
    whether the gnulib module fscanf shall be considered present. */
@@ -224,11 +224,11 @@
 /* #undef HAVE_C_BOOL */
 
 /* Define to 1 if the static_assert keyword works. */
-/* #undef HAVE_C_STATIC_ASSERT */
+#define HAVE_C_STATIC_ASSERT 1
 
 /* Define to 1 if you have the declaration of 'ecvt', and to 0 if you don't.
    */
-#define HAVE_DECL_ECVT 0
+#define HAVE_DECL_ECVT 1
 
 /* Define to 1 if you have the declaration of 'execvpe', and to 0 if you
    don't. */
@@ -240,11 +240,11 @@
 
 /* Define to 1 if you have the declaration of 'fcvt', and to 0 if you don't.
    */
-#define HAVE_DECL_FCVT 0
+#define HAVE_DECL_FCVT 1
 
 /* Define to 1 if you have the declaration of 'gcvt', and to 0 if you don't.
    */
-#define HAVE_DECL_GCVT 0
+#define HAVE_DECL_GCVT 1
 
 /* Define to 1 if you have the declaration of 'getw', and to 0 if you don't.
    */
@@ -256,7 +256,7 @@
 
 /* Define to 1 if you have the declaration of 'mbrtowc', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_MBRTOWC */
+#define HAVE_DECL_MBRTOWC 1
 
 /* Define to 1 if you have the declaration of 'mbsinit', and to 0 if you
    don't. */
@@ -280,7 +280,7 @@
 
 /* Define to 1 if you have the declaration of 'wcsdup', and to 0 if you don't.
    */
-#define HAVE_DECL_WCSDUP 0
+#define HAVE_DECL_WCSDUP 1
 
 /* Define to 1 if you have the declaration of 'wcwidth', and to 0 if you
    don't. */
@@ -325,7 +325,7 @@
 #define HAVE_LONG_LONG_INT 1
 
 /* Define to 1 if you have the 'mbrtowc' function. */
-#define HAVE_MBRTOWC 1
+/* #undef HAVE_MBRTOWC */
 
 /* Define to 1 if you have the 'mbsinit' function. */
 #define HAVE_MBSINIT 1
@@ -395,7 +395,7 @@
 #define HAVE_STRNLEN 1
 
 /* Define to 1 if 'decimal_point' is a member of 'struct lconv'. */
-#define HAVE_STRUCT_LCONV_DECIMAL_POINT 1
+/* #undef HAVE_STRUCT_LCONV_DECIMAL_POINT */
 
 /* Define to 1 if 'int_p_cs_precedes' is a member of 'struct lconv'. */
 /* #undef HAVE_STRUCT_LCONV_INT_P_CS_PRECEDES */
@@ -425,7 +425,7 @@
 /* #undef HAVE_TOWLOWER */
 
 /* Define to 1 if you have the <uchar.h> header file. */
-/* #undef HAVE_UCHAR_H */
+#define HAVE_UCHAR_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
@@ -453,10 +453,10 @@
 #define HAVE_WCRTOMB 1
 
 /* Define to 1 if you have the 'wcslen' function. */
-/* #undef HAVE_WCSLEN */
+#define HAVE_WCSLEN 1
 
 /* Define to 1 if you have the 'wcsnlen' function. */
-/* #undef HAVE_WCSNLEN */
+#define HAVE_WCSNLEN 1
 
 /* Define to 1 if you have the <wctype.h> header file. */
 #define HAVE_WCTYPE_H 1
@@ -475,7 +475,7 @@
 #define HAVE_WINT_T 1
 
 /* Define if the c32rtomb function basically works. */
-/* #undef HAVE_WORKING_C32RTOMB */
+#define HAVE_WORKING_C32RTOMB 1
 
 /* Define if the mbrtoc32 function basically works. */
 /* #undef HAVE_WORKING_MBRTOC32 */
@@ -631,7 +631,7 @@
 
 /* Define if the mbrtowc function may signal encoding errors in the C locale.
    */
-#define MBRTOWC_IN_C_LOCALE_MAYBE_EILSEQ 1
+/* #undef MBRTOWC_IN_C_LOCALE_MAYBE_EILSEQ */
 
 /* Define if the mbrtowc function has the NULL pwc argument bug. */
 /* #undef MBRTOWC_NULL_ARG1_BUG */

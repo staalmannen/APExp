@@ -195,13 +195,13 @@ am__append_15 = getopt.c getopt1.c
 #am__append_21 = iswdigit.c
 #am__append_22 = iswpunct.c
 #am__append_23 = iswxdigit.c
-am__append_24 = localeconv.c
+#am__append_24 = localeconv.c
 #am__append_25 = localename-unsafe.c
 am__append_26 = localename-unsafe.c
 am__append_27 = lstat.c
 am__append_28 = mbrtoc32.c
 am__append_29 = mbrtowc.c
-#am__append_30 = mbsinit.c
+am__append_30 = mbsinit.c
 #am__append_31 = memchr.c
 #am__append_32 = memmove.c
 #am__append_33 = mempcpy.c
@@ -214,7 +214,7 @@ am__append_37 = open.c
 am__append_40 = rawmemchr.c
 am__append_41 = readlink.c
 #am__append_42 = realloc.c
-am__append_43 = reallocarray.c
+#am__append_43 = reallocarray.c
 #am__append_44 = progreloc.c
 am__append_45 = setlocale.c
 #am__append_46 = setlocale-fixes.c
@@ -572,15 +572,15 @@ am__dirstamp = $(am__leading_dot)dirstamp
 #	libgrt_a-iswpunct.$(OBJEXT)
 #am__objects_23 =  \
 #	libgrt_a-iswxdigit.$(OBJEXT)
-am__objects_24 =  \
-	libgrt_a-localeconv.$(OBJEXT)
+#am__objects_24 =  \
+#	libgrt_a-localeconv.$(OBJEXT)
 #am__objects_25 = libgrt_a-localename-unsafe.$(OBJEXT)
 am__objects_26 = libgrt_a-localename-unsafe.$(OBJEXT)
 am__objects_27 = libgrt_a-lstat.$(OBJEXT)
 am__objects_28 =  \
 	libgrt_a-mbrtoc32.$(OBJEXT)
 am__objects_29 = libgrt_a-mbrtowc.$(OBJEXT)
-#am__objects_30 = libgrt_a-mbsinit.$(OBJEXT)
+am__objects_30 = libgrt_a-mbsinit.$(OBJEXT)
 #am__objects_31 = libgrt_a-memchr.$(OBJEXT)
 #am__objects_32 = libgrt_a-memmove.$(OBJEXT)
 #am__objects_33 = libgrt_a-mempcpy.$(OBJEXT)
@@ -597,7 +597,7 @@ am__objects_41 =  \
 	libgrt_a-readlink.$(OBJEXT)
 #am__objects_42 =  \
 #	libgrt_a-realloc.$(OBJEXT)
-am__objects_43 = libgrt_a-reallocarray.$(OBJEXT)
+#am__objects_43 = libgrt_a-reallocarray.$(OBJEXT)
 #am__objects_44 =  \
 #	libgrt_a-progreloc.$(OBJEXT)
 am__objects_45 =  \
@@ -1047,17 +1047,17 @@ AR = ar
 ARFLAGS = cr
 AS = as
 ASM_SYMBOL_PREFIX = ""
-ASSERT_H = assert.h
+ASSERT_H = 
 AUGMENT_SHLIBPATH = 
 AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing' autoconf
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing' autoheader
 AUTOMAKE = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing' automake-1.18
 AWK = awk
-BITSIZEOF_PTRDIFF_T = 64
-BITSIZEOF_SIG_ATOMIC_T = 32
-BITSIZEOF_SIZE_T = 32
-BITSIZEOF_WCHAR_T = 16
-BITSIZEOF_WINT_T = 32
+BITSIZEOF_PTRDIFF_T = 0
+BITSIZEOF_SIG_ATOMIC_T = 0
+BITSIZEOF_SIZE_T = 0
+BITSIZEOF_WCHAR_T = 0
+BITSIZEOF_WINT_T = 0
 BUILDCSHARP = no
 BUILDD = no
 BUILDJAVA = no
@@ -1798,8 +1798,8 @@ GL_GNULIB_ZPRINTF = 0
 GL_GNULIB__EXIT = 0
 GMSGFMT = :
 GMSGFMT_015 = :
-GNULIBHEADERS_OVERRIDE_CHAR16_T = 1
-GNULIBHEADERS_OVERRIDE_CHAR32_T = 1
+GNULIBHEADERS_OVERRIDE_CHAR16_T = 0
+GNULIBHEADERS_OVERRIDE_CHAR32_T = 0
 GNULIBHEADERS_OVERRIDE_CHAR8_T = 1
 GNULIBHEADERS_OVERRIDE_WINT_T = 0
 GNULIB_LOCALEDIR = ${datarootdir}/locale
@@ -1846,13 +1846,13 @@ HAVE_DECL_ATANL = 1
 HAVE_DECL_CEILF = 1
 HAVE_DECL_CEILL = 1
 HAVE_DECL_COSL = 1
-HAVE_DECL_ECVT = 0
+HAVE_DECL_ECVT = 1
 HAVE_DECL_ENVIRON = 0
 HAVE_DECL_EXECVPE = 0
 HAVE_DECL_EXPL = 1
 HAVE_DECL_FCHDIR = 1
 HAVE_DECL_FCLOSEALL = 0
-HAVE_DECL_FCVT = 0
+HAVE_DECL_FCVT = 1
 HAVE_DECL_FDATASYNC = 1
 HAVE_DECL_FLOORF = 1
 HAVE_DECL_FLOORL = 1
@@ -1860,7 +1860,7 @@ HAVE_DECL_FPURGE = 1
 HAVE_DECL_FREXPL = 1
 HAVE_DECL_FSEEKO = 1
 HAVE_DECL_FTELLO = 1
-HAVE_DECL_GCVT = 0
+HAVE_DECL_GCVT = 1
 HAVE_DECL_GETDELIM = 1
 HAVE_DECL_GETDOMAINNAME = 1
 HAVE_DECL_GETLINE = 1
@@ -1907,7 +1907,7 @@ HAVE_DECL_TRUNCL = 1
 HAVE_DECL_TTYNAME_R = 1
 HAVE_DECL_UNSETENV = 1
 HAVE_DECL_VSNPRINTF = 1
-HAVE_DECL_WCSDUP = 0
+HAVE_DECL_WCSDUP = 1
 HAVE_DECL_WCWIDTH = 1
 HAVE_DOTNET_CSC = 
 HAVE_DOTNET_IN_PATH = 
@@ -2014,7 +2014,7 @@ HAVE_MAX_ALIGN_T = 0
 HAVE_MBRLEN = 1
 HAVE_MBRTOC16 = 1
 HAVE_MBRTOC32 = 0
-HAVE_MBRTOWC = 1
+HAVE_MBRTOWC = 0
 HAVE_MBSINIT = 1
 HAVE_MBSLEN = 0
 HAVE_MBSNRTOWCS = 1
@@ -2121,7 +2121,7 @@ HAVE_RANDOM_R = 1
 HAVE_RAWMEMCHR = 0
 HAVE_READLINK = 1
 HAVE_READLINKAT = 1
-HAVE_REALLOCARRAY = 0
+HAVE_REALLOCARRAY = 1
 HAVE_REALPATH = 1
 HAVE_REMAINDER = 1
 HAVE_REMAINDERF = 1
@@ -2211,7 +2211,7 @@ HAVE_TOTALORDERMAGF = 1
 HAVE_TOTALORDERMAGL = 1
 HAVE_TYPE_VOLATILE_SIG_ATOMIC_T = 1
 HAVE_TZALLOC = 0
-HAVE_UCHAR_H = 0
+HAVE_UCHAR_H = 1
 HAVE_UNISTD_H = 1
 HAVE_UNISTRING_WOE32DLL_H = 0
 HAVE_UNLINKAT = 1
@@ -2262,18 +2262,18 @@ HAVE_WMEMCPY = 1
 HAVE_WMEMMOVE = 1
 HAVE_WMEMPCPY = 1
 HAVE_WMEMSET = 1
-HAVE_WORKING_C32RTOMB = 0
+HAVE_WORKING_C32RTOMB = 1
 HAVE_WORKING_CXX_STDCKDINT_H = 0
 HAVE_WORKING_C_STDCKDINT_H = 0
 HAVE_WORKING_MBRTOC32 = 0
 HAVE_XLOCALE_H = 0
 HAVE__EXIT = 1
 ICONV_CONST = 
-ICONV_H = iconv.h
+ICONV_H = 
 INCLUDE_NEXT = include_next
 INCLUDE_NEXT_AS_FIRST_DIRECTIVE = include_next
 INSTALL = /bin/install -c
-INSTALLED_LIBINTL = -lintl   
+INSTALLED_LIBINTL = 
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_PROGRAM_ENV = 
@@ -2291,7 +2291,7 @@ LIBDL =
 LIBGRT_LIBDEPS =  
 LIBGRT_LTLIBDEPS =  
 LIBICONV = 
-LIBINTL = ${top_builddir}/intl/libintl.la  
+LIBINTL = 
 LIBMULTITHREAD = 
 LIBOBJS = 
 LIBPMULTITHREAD = 
@@ -2322,7 +2322,7 @@ LOCALE_FR = none
 LOCALE_JA = ja_JP
 LOCALE_ZH_CN = none
 LTLIBICONV = 
-LTLIBINTL = ${top_builddir}/intl/libintl.la  
+LTLIBINTL = 
 LTLIBMULTITHREAD = 
 LTLIBOBJS = 
 LTLIBTHREAD = 
@@ -2338,8 +2338,8 @@ MODULA2_CHOICE = yes
 MSGFMT = :
 MSGMERGE = /bin/msgmerge
 MSGMERGE_FOR_MSGFMT_OPTION = --no-location --quiet
-NEXT_ASSERT_H = <assert.h>
-NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = <assert.h>
+NEXT_ASSERT_H = 
+NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_ERRNO_H = <errno.h>
 NEXT_AS_FIRST_DIRECTIVE_ERROR_H = <error.h>
 NEXT_AS_FIRST_DIRECTIVE_FCNTL_H = <fcntl.h>
@@ -2562,7 +2562,7 @@ REPLACE_LDEXP = 0
 REPLACE_LDEXPL = 0
 REPLACE_LINK = 0
 REPLACE_LINKAT = 0
-REPLACE_LOCALECONV = 1
+REPLACE_LOCALECONV = 0
 REPLACE_LOCALTIME = 0
 REPLACE_LOCALTIME_R = 0
 REPLACE_LOCALTIME_RZ = 0
@@ -2589,10 +2589,10 @@ REPLACE_MBRLEN = 0
 REPLACE_MBRTOC16 = 0
 REPLACE_MBRTOC32 = 0
 REPLACE_MBRTOWC = 1
-REPLACE_MBSINIT = 0
+REPLACE_MBSINIT = 1
 REPLACE_MBSNRTOWCS = 0
 REPLACE_MBSRTOWCS = 0
-REPLACE_MBSTATE_T = 0
+REPLACE_MBSTATE_T = 1
 REPLACE_MBSTOWCS = 0
 REPLACE_MBTOWC = 0
 REPLACE_MB_CUR_MAX = 0
@@ -2749,7 +2749,7 @@ REPLACE_STRTOLL = 1
 REPLACE_STRTOUL = 1
 REPLACE_STRTOULL = 1
 REPLACE_STRTOUMAX = 0
-REPLACE_STRUCT_LCONV = 1
+REPLACE_STRUCT_LCONV = 0
 REPLACE_STRVERSCMP = 0
 REPLACE_SYMLINK = 0
 REPLACE_SYMLINKAT = 0
@@ -2829,7 +2829,7 @@ UNISTD_H_DEFINES_STRUCT_TIMESPEC = 0
 UNISTD_H_HAVE_SYS_RANDOM_H = 0
 UNISTD_H_HAVE_WINSOCK2_H = 0
 UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS = 0
-USE_INCLUDED_LIBINTL = yes
+USE_INCLUDED_LIBINTL = no
 USE_NLS = yes
 VALUE_OF_LC_ALL = 
 VALUE_OF_LC_COLLATE = 
@@ -2880,12 +2880,12 @@ datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/gettext
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-gl_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Po $(DEPDIR)/frexp.Po $(DEPDIR)/frexpl.Po $(DEPDIR)/isnanf.Po $(DEPDIR)/isnanl.Po $(DEPDIR)/printf-args.Po $(DEPDIR)/printf-parse.Po $(DEPDIR)/vasnprintf.Po
-gl_LIBOBJS =  asnprintf.o frexp.o frexpl.o isnanf.o isnanl.o printf-args.o printf-parse.o vasnprintf.o
-gl_LTLIBOBJS =  asnprintf.lo frexp.lo frexpl.lo isnanf.lo isnanl.lo printf-args.lo printf-parse.lo vasnprintf.lo
-gl_libgrt_LIBOBJDEPS =  $(DEPDIR)/libgrt_a-asnprintf.Po $(DEPDIR)/libgrt_a-frexp.Po $(DEPDIR)/libgrt_a-frexpl.Po $(DEPDIR)/libgrt_a-isnanf.Po $(DEPDIR)/libgrt_a-isnanl.Po $(DEPDIR)/libgrt_a-printf-args.Po $(DEPDIR)/libgrt_a-printf-parse.Po $(DEPDIR)/libgrt_a-vasnprintf.Po
-gl_libgrt_LIBOBJS =  libgrt_a-asnprintf.o libgrt_a-frexp.o libgrt_a-frexpl.o libgrt_a-isnanf.o libgrt_a-isnanl.o libgrt_a-printf-args.o libgrt_a-printf-parse.o libgrt_a-vasnprintf.o
-gl_libgrt_LTLIBOBJS =  libgrt_la-asnprintf.lo libgrt_la-frexp.lo libgrt_la-frexpl.lo libgrt_la-isnanf.lo libgrt_la-isnanl.lo libgrt_la-printf-args.lo libgrt_la-printf-parse.lo libgrt_la-vasnprintf.lo
+gl_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Po $(DEPDIR)/frexp.Po $(DEPDIR)/frexpl.Po $(DEPDIR)/isnanf.Po $(DEPDIR)/isnanl.Po $(DEPDIR)/lc-charset-dispatch.Po $(DEPDIR)/mbtowc-lock.Po $(DEPDIR)/printf-args.Po $(DEPDIR)/printf-parse.Po $(DEPDIR)/vasnprintf.Po
+gl_LIBOBJS =  asnprintf.o frexp.o frexpl.o isnanf.o isnanl.o lc-charset-dispatch.o mbtowc-lock.o printf-args.o printf-parse.o vasnprintf.o
+gl_LTLIBOBJS =  asnprintf.lo frexp.lo frexpl.lo isnanf.lo isnanl.lo lc-charset-dispatch.lo mbtowc-lock.lo printf-args.lo printf-parse.lo vasnprintf.lo
+gl_libgrt_LIBOBJDEPS =  $(DEPDIR)/libgrt_a-asnprintf.Po $(DEPDIR)/libgrt_a-frexp.Po $(DEPDIR)/libgrt_a-frexpl.Po $(DEPDIR)/libgrt_a-isnanf.Po $(DEPDIR)/libgrt_a-isnanl.Po $(DEPDIR)/libgrt_a-lc-charset-dispatch.Po $(DEPDIR)/libgrt_a-mbtowc-lock.Po $(DEPDIR)/libgrt_a-printf-args.Po $(DEPDIR)/libgrt_a-printf-parse.Po $(DEPDIR)/libgrt_a-vasnprintf.Po
+gl_libgrt_LIBOBJS =  libgrt_a-asnprintf.o libgrt_a-frexp.o libgrt_a-frexpl.o libgrt_a-isnanf.o libgrt_a-isnanl.o libgrt_a-lc-charset-dispatch.o libgrt_a-mbtowc-lock.o libgrt_a-printf-args.o libgrt_a-printf-parse.o libgrt_a-vasnprintf.o
+gl_libgrt_LTLIBOBJS =  libgrt_la-asnprintf.lo libgrt_la-frexp.lo libgrt_la-frexpl.lo libgrt_la-isnanf.lo libgrt_la-isnanl.lo libgrt_la-lc-charset-dispatch.lo libgrt_la-mbtowc-lock.lo libgrt_la-printf-args.lo libgrt_la-printf-parse.lo libgrt_la-vasnprintf.lo
 gltests_LIBOBJDEPS = 
 gltests_LIBOBJS = 
 gltests_LTLIBOBJS = 
@@ -6944,22 +6944,22 @@ alloca.h: $(top_builddir)/config.status
 
 # We need the following in order to create <assert.h> when the system
 # doesn't have one that works with the given compiler.
-assert.h: assert.in.h verify.h $(top_builddir)/config.status
-	$(gl_V_at){ $(SED_HEADER_STDOUT) \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
-	      -e 's|@''PRAGMA_COLUMNS''@||g' \
-	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
-	      < $(srcdir)/assert.in.h && \
-	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
-	      -e 's|_gl_verify|_gl_static_assert|g' \
-	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
-	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL\1|g' \
-	      < $(srcdir)/verify.h; \
-	} > $@-t
-	$(AM_V_at)mv $@-t $@
-#assert.h: $(top_builddir)/config.status
-#	rm -f $@
+#assert.h: assert.in.h verify.h $(top_builddir)/config.status
+#	$(gl_V_at){ $(SED_HEADER_STDOUT) \
+#	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+#	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
+#	      -e 's|@''PRAGMA_COLUMNS''@||g' \
+#	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
+#	      < $(srcdir)/assert.in.h && \
+#	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
+#	      -e 's|_gl_verify|_gl_static_assert|g' \
+#	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
+#	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL\1|g' \
+#	      < $(srcdir)/verify.h; \
+#	} > $@-t
+#	$(AM_V_at)mv $@-t $@
+assert.h: $(top_builddir)/config.status
+	rm -f $@
 
 # We need the following in order to create <errno.h> when the system
 # doesn't have one that is POSIX compliant.
@@ -7071,25 +7071,25 @@ malloc/scratch_buffer.gl.h: malloc/scratch_buffer.h
 
 # We need the following in order to create <iconv.h> when the system
 # doesn't have one that works with the given compiler.
-iconv.h: iconv.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(WARN_ON_USE_H)
-	$(gl_V_at)$(SED_HEADER_STDOUT) \
-	      -e 's|@''GUARD_PREFIX''@|GL|g' \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
-	      -e 's|@''PRAGMA_COLUMNS''@||g' \
-	      -e 's|@''NEXT_ICONV_H''@|$(NEXT_ICONV_H)|g' \
-	      -e 's/@''GNULIB_ICONV''@/$(GL_GNULIB_ICONV)/g' \
-	      -e 's|@''ICONV_CONST''@|$(ICONV_CONST)|g' \
-	      -e 's|@''REPLACE_ICONV''@|$(REPLACE_ICONV)|g' \
-	      -e 's|@''REPLACE_ICONV_OPEN''@|$(REPLACE_ICONV_OPEN)|g' \
-	      -e 's|@''REPLACE_ICONV_UTF''@|$(REPLACE_ICONV_UTF)|g' \
-	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
-	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
-	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
-	      $(srcdir)/iconv.in.h > $@-t
-	$(AM_V_at)mv $@-t $@
-#iconv.h: $(top_builddir)/config.status
-#	rm -f $@
+#iconv.h: iconv.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(WARN_ON_USE_H)
+#	$(gl_V_at)$(SED_HEADER_STDOUT) \
+#	      -e 's|@''GUARD_PREFIX''@|GL|g' \
+#	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+#	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
+#	      -e 's|@''PRAGMA_COLUMNS''@||g' \
+#	      -e 's|@''NEXT_ICONV_H''@|$(NEXT_ICONV_H)|g' \
+#	      -e 's/@''GNULIB_ICONV''@/$(GL_GNULIB_ICONV)/g' \
+#	      -e 's|@''ICONV_CONST''@|$(ICONV_CONST)|g' \
+#	      -e 's|@''REPLACE_ICONV''@|$(REPLACE_ICONV)|g' \
+#	      -e 's|@''REPLACE_ICONV_OPEN''@|$(REPLACE_ICONV_OPEN)|g' \
+#	      -e 's|@''REPLACE_ICONV_UTF''@|$(REPLACE_ICONV_UTF)|g' \
+#	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
+#	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
+#	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
+#	      $(srcdir)/iconv.in.h > $@-t
+#	$(AM_V_at)mv $@-t $@
+iconv.h: $(top_builddir)/config.status
+	rm -f $@
 
 $(srcdir)/iconv_open-aix.h: $(srcdir)/iconv_open-aix.gperf
 	$(V_GPERF)$(GPERF) -m 10 $(srcdir)/iconv_open-aix.gperf > $(srcdir)/iconv_open-aix.h-t1 \
@@ -9074,7 +9074,7 @@ mostlyclean-local: mostlyclean-generic
 	:
 distclean-local: distclean-gnulib-libobjs
 distclean-gnulib-libobjs:
-	-rm -f  $(DEPDIR)/libgrt_a-asnprintf.Po $(DEPDIR)/libgrt_a-frexp.Po $(DEPDIR)/libgrt_a-frexpl.Po $(DEPDIR)/libgrt_a-isnanf.Po $(DEPDIR)/libgrt_a-isnanl.Po $(DEPDIR)/libgrt_a-printf-args.Po $(DEPDIR)/libgrt_a-printf-parse.Po $(DEPDIR)/libgrt_a-vasnprintf.Po
+	-rm -f  $(DEPDIR)/libgrt_a-asnprintf.Po $(DEPDIR)/libgrt_a-frexp.Po $(DEPDIR)/libgrt_a-frexpl.Po $(DEPDIR)/libgrt_a-isnanf.Po $(DEPDIR)/libgrt_a-isnanl.Po $(DEPDIR)/libgrt_a-lc-charset-dispatch.Po $(DEPDIR)/libgrt_a-mbtowc-lock.Po $(DEPDIR)/libgrt_a-printf-args.Po $(DEPDIR)/libgrt_a-printf-parse.Po $(DEPDIR)/libgrt_a-vasnprintf.Po
 maintainer-clean-local: distclean-gnulib-libobjs
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

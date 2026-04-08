@@ -189,12 +189,12 @@ am__append_30 = libglib_rpl.la
 am__append_31 = libxml_rpl.la
 am__append_32 = libxml_rpl.la
 am__append_33 = libxml_rpl.la
-am__append_34 = localeconv.c
+#am__append_34 = localeconv.c
 #am__append_35 = log10.c
 am__append_36 = lstat.c
 am__append_37 = mbrtoc32.c
 am__append_38 = mbrtowc.c
-#am__append_39 = mbsinit.c
+am__append_39 = mbsinit.c
 #am__append_40 = memchr.c
 #am__append_41 = msvc-inval.c
 #am__append_42 = msvc-nothrow.c
@@ -204,7 +204,7 @@ am__append_44 = open.c
 #am__append_46 = raise.c
 #am__append_47 = read.c
 #am__append_48 = realloc.c
-am__append_49 = reallocarray.c
+#am__append_49 = reallocarray.c
 am__append_50 = setlocale-lock.c
 #am__append_51 = sigaction.c
 am__append_52 = signbitf.c signbitd.c signbitl.c
@@ -592,14 +592,14 @@ am__objects_8 = libtextstyle_la-fseterr.lo
 #	libtextstyle_la-iswpunct.lo
 #am__objects_20 =  \
 #	libtextstyle_la-iswxdigit.lo
-am__objects_21 =  \
-	libtextstyle_la-localeconv.lo
+#am__objects_21 =  \
+#	libtextstyle_la-localeconv.lo
 #am__objects_22 = libtextstyle_la-log10.lo
 am__objects_23 = libtextstyle_la-lstat.lo
 am__objects_24 =  \
 	libtextstyle_la-mbrtoc32.lo
 am__objects_25 = libtextstyle_la-mbrtowc.lo
-#am__objects_26 = libtextstyle_la-mbsinit.lo
+am__objects_26 = libtextstyle_la-mbsinit.lo
 #am__objects_27 = libtextstyle_la-memchr.lo
 #am__objects_28 =  \
 #	libtextstyle_la-msvc-inval.lo
@@ -611,7 +611,7 @@ am__objects_31 = libtextstyle_la-open.lo
 #am__objects_34 = libtextstyle_la-read.lo
 #am__objects_35 =  \
 #	libtextstyle_la-realloc.lo
-am__objects_36 = libtextstyle_la-reallocarray.lo
+#am__objects_36 = libtextstyle_la-reallocarray.lo
 am__objects_37 = libtextstyle_la-setlocale-lock.lo
 #am__objects_38 =  \
 #	libtextstyle_la-sigaction.lo
@@ -1180,17 +1180,17 @@ APPLE_UNIVERSAL_BUILD = 0
 AR = ar
 ARFLAGS = cr
 AS = as
-ASSERT_H = assert.h
+ASSERT_H = 
 AUGMENT_SHLIBPATH = 
 AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/build-aux/missing' autoconf
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/build-aux/missing' autoheader
 AUTOMAKE = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/libtextstyle/build-aux/missing' automake-1.18
 AWK = awk
-BITSIZEOF_PTRDIFF_T = 64
-BITSIZEOF_SIG_ATOMIC_T = 32
-BITSIZEOF_SIZE_T = 32
-BITSIZEOF_WCHAR_T = 16
-BITSIZEOF_WINT_T = 32
+BITSIZEOF_PTRDIFF_T = 0
+BITSIZEOF_SIG_ATOMIC_T = 0
+BITSIZEOF_SIZE_T = 0
+BITSIZEOF_WCHAR_T = 0
+BITSIZEOF_WINT_T = 0
 CAN_PRINT_STACK_TRACE = 0
 CC = cc
 CCDEPMODE = depmode=none
@@ -1925,8 +1925,8 @@ GL_LTS_GNULIB_WMEMSET = 0
 GL_LTS_GNULIB_WRITE = 1
 GL_LTS_GNULIB_ZPRINTF = 0
 GL_LTS_GNULIB__EXIT = 0
-GNULIBHEADERS_OVERRIDE_CHAR16_T = 1
-GNULIBHEADERS_OVERRIDE_CHAR32_T = 1
+GNULIBHEADERS_OVERRIDE_CHAR16_T = 0
+GNULIBHEADERS_OVERRIDE_CHAR32_T = 0
 GNULIBHEADERS_OVERRIDE_CHAR8_T = 1
 GNULIBHEADERS_OVERRIDE_WINT_T = 0
 GNULIB_LOCALEDIR = ${datarootdir}/locale
@@ -1972,13 +1972,13 @@ HAVE_DECL_ATANL = 1
 HAVE_DECL_CEILF = 1
 HAVE_DECL_CEILL = 1
 HAVE_DECL_COSL = 1
-HAVE_DECL_ECVT = 0
+HAVE_DECL_ECVT = 1
 HAVE_DECL_ENVIRON = 1
 HAVE_DECL_EXECVPE = 0
 HAVE_DECL_EXPL = 1
 HAVE_DECL_FCHDIR = 1
 HAVE_DECL_FCLOSEALL = 0
-HAVE_DECL_FCVT = 0
+HAVE_DECL_FCVT = 1
 HAVE_DECL_FDATASYNC = 1
 HAVE_DECL_FLOORF = 1
 HAVE_DECL_FLOORL = 1
@@ -1986,7 +1986,7 @@ HAVE_DECL_FPURGE = 1
 HAVE_DECL_FREXPL = 1
 HAVE_DECL_FSEEKO = 1
 HAVE_DECL_FTELLO = 1
-HAVE_DECL_GCVT = 0
+HAVE_DECL_GCVT = 1
 HAVE_DECL_GETDELIM = 1
 HAVE_DECL_GETDOMAINNAME = 1
 HAVE_DECL_GETLINE = 1
@@ -2033,7 +2033,7 @@ HAVE_DECL_TRUNCL = 1
 HAVE_DECL_TTYNAME_R = 1
 HAVE_DECL_UNSETENV = 1
 HAVE_DECL_VSNPRINTF = 1
-HAVE_DECL_WCSDUP = 0
+HAVE_DECL_WCSDUP = 1
 HAVE_DECL_WCWIDTH = 1
 HAVE_DPRINTF = 1
 HAVE_DUP3 = 1
@@ -2136,7 +2136,7 @@ HAVE_MAX_ALIGN_T = 0
 HAVE_MBRLEN = 1
 HAVE_MBRTOC16 = 1
 HAVE_MBRTOC32 = 0
-HAVE_MBRTOWC = 1
+HAVE_MBRTOWC = 0
 HAVE_MBSINIT = 1
 HAVE_MBSLEN = 0
 HAVE_MBSNRTOWCS = 1
@@ -2241,7 +2241,7 @@ HAVE_RANDOM_R = 1
 HAVE_RAWMEMCHR = 1
 HAVE_READLINK = 1
 HAVE_READLINKAT = 1
-HAVE_REALLOCARRAY = 0
+HAVE_REALLOCARRAY = 1
 HAVE_REALPATH = 1
 HAVE_REMAINDER = 1
 HAVE_REMAINDERF = 1
@@ -2337,7 +2337,7 @@ HAVE_TOTALORDERMAGF = 1
 HAVE_TOTALORDERMAGL = 1
 HAVE_TYPE_VOLATILE_SIG_ATOMIC_T = 1
 HAVE_TZALLOC = 0
-HAVE_UCHAR_H = 0
+HAVE_UCHAR_H = 1
 HAVE_UNISTD_H = 1
 HAVE_UNISTRING_WOE32DLL_H = 0
 HAVE_UNLINKAT = 1
@@ -2388,7 +2388,7 @@ HAVE_WMEMCPY = 1
 HAVE_WMEMMOVE = 1
 HAVE_WMEMPCPY = 1
 HAVE_WMEMSET = 1
-HAVE_WORKING_C32RTOMB = 0
+HAVE_WORKING_C32RTOMB = 1
 HAVE_WORKING_CXX_STDCKDINT_H = 0
 HAVE_WORKING_C_STDCKDINT_H = 0
 HAVE_WORKING_MBRTOC32 = 0
@@ -2471,8 +2471,8 @@ MANIFEST_TOOL = :
 MBRTOWC_LIB = 
 MKDIR_P = mkdir -p
 NAMESPACING = yes
-NEXT_ASSERT_H = <assert.h>
-NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = <assert.h>
+NEXT_ASSERT_H = 
+NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_ERRNO_H = <errno.h>
 NEXT_AS_FIRST_DIRECTIVE_ERROR_H = <error.h>
 NEXT_AS_FIRST_DIRECTIVE_FCNTL_H = <fcntl.h>
@@ -2688,7 +2688,7 @@ REPLACE_LDEXP = 0
 REPLACE_LDEXPL = 0
 REPLACE_LINK = 0
 REPLACE_LINKAT = 0
-REPLACE_LOCALECONV = 1
+REPLACE_LOCALECONV = 0
 REPLACE_LOCALTIME = 0
 REPLACE_LOCALTIME_R = 0
 REPLACE_LOCALTIME_RZ = 0
@@ -2715,10 +2715,10 @@ REPLACE_MBRLEN = 0
 REPLACE_MBRTOC16 = 0
 REPLACE_MBRTOC32 = 0
 REPLACE_MBRTOWC = 1
-REPLACE_MBSINIT = 0
+REPLACE_MBSINIT = 1
 REPLACE_MBSNRTOWCS = 0
 REPLACE_MBSRTOWCS = 0
-REPLACE_MBSTATE_T = 0
+REPLACE_MBSTATE_T = 1
 REPLACE_MBSTOWCS = 0
 REPLACE_MBTOWC = 0
 REPLACE_MB_CUR_MAX = 0
@@ -2876,7 +2876,7 @@ REPLACE_STRTOLL = 0
 REPLACE_STRTOUL = 0
 REPLACE_STRTOULL = 0
 REPLACE_STRTOUMAX = 0
-REPLACE_STRUCT_LCONV = 1
+REPLACE_STRUCT_LCONV = 0
 REPLACE_STRUCT_TIMEVAL = 0
 REPLACE_STRVERSCMP = 0
 REPLACE_SYMLINK = 0
@@ -3003,12 +3003,12 @@ libdir = ${exec_prefix}/lib
 libexecdir = ${exec_prefix}/libexec
 localedir = ${datarootdir}/locale
 localstatedir = ${prefix}/var
-lts_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/asprintf.Plo $(DEPDIR)/frexp.Plo $(DEPDIR)/frexpl.Plo $(DEPDIR)/isnand.Plo $(DEPDIR)/isnanf.Plo $(DEPDIR)/isnanl.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/snprintf.Plo $(DEPDIR)/vasnprintf.Plo $(DEPDIR)/vasprintf.Plo $(DEPDIR)/vsnprintf.Plo
-lts_LIBOBJS =  asnprintf.o asprintf.o frexp.o frexpl.o isnand.o isnanf.o isnanl.o printf-args.o printf-parse.o snprintf.o vasnprintf.o vasprintf.o vsnprintf.o
-lts_LTLIBOBJS =  asnprintf.lo asprintf.lo frexp.lo frexpl.lo isnand.lo isnanf.lo isnanl.lo printf-args.lo printf-parse.lo snprintf.lo vasnprintf.lo vasprintf.lo vsnprintf.lo
-lts_libtextstyle_LIBOBJDEPS =  $(DEPDIR)/libtextstyle_la-asnprintf.Plo $(DEPDIR)/libtextstyle_la-asprintf.Plo $(DEPDIR)/libtextstyle_la-frexp.Plo $(DEPDIR)/libtextstyle_la-frexpl.Plo $(DEPDIR)/libtextstyle_la-isnand.Plo $(DEPDIR)/libtextstyle_la-isnanf.Plo $(DEPDIR)/libtextstyle_la-isnanl.Plo $(DEPDIR)/libtextstyle_la-printf-args.Plo $(DEPDIR)/libtextstyle_la-printf-parse.Plo $(DEPDIR)/libtextstyle_la-snprintf.Plo $(DEPDIR)/libtextstyle_la-vasnprintf.Plo $(DEPDIR)/libtextstyle_la-vasprintf.Plo $(DEPDIR)/libtextstyle_la-vsnprintf.Plo
-lts_libtextstyle_LIBOBJS =  libtextstyle_a-asnprintf.o libtextstyle_a-asprintf.o libtextstyle_a-frexp.o libtextstyle_a-frexpl.o libtextstyle_a-isnand.o libtextstyle_a-isnanf.o libtextstyle_a-isnanl.o libtextstyle_a-printf-args.o libtextstyle_a-printf-parse.o libtextstyle_a-snprintf.o libtextstyle_a-vasnprintf.o libtextstyle_a-vasprintf.o libtextstyle_a-vsnprintf.o
-lts_libtextstyle_LTLIBOBJS =  libtextstyle_la-asnprintf.lo libtextstyle_la-asprintf.lo libtextstyle_la-frexp.lo libtextstyle_la-frexpl.lo libtextstyle_la-isnand.lo libtextstyle_la-isnanf.lo libtextstyle_la-isnanl.lo libtextstyle_la-printf-args.lo libtextstyle_la-printf-parse.lo libtextstyle_la-snprintf.lo libtextstyle_la-vasnprintf.lo libtextstyle_la-vasprintf.lo libtextstyle_la-vsnprintf.lo
+lts_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/asprintf.Plo $(DEPDIR)/frexp.Plo $(DEPDIR)/frexpl.Plo $(DEPDIR)/isnand.Plo $(DEPDIR)/isnanf.Plo $(DEPDIR)/isnanl.Plo $(DEPDIR)/lc-charset-dispatch.Plo $(DEPDIR)/mbtowc-lock.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/snprintf.Plo $(DEPDIR)/vasnprintf.Plo $(DEPDIR)/vasprintf.Plo $(DEPDIR)/vsnprintf.Plo
+lts_LIBOBJS =  asnprintf.o asprintf.o frexp.o frexpl.o isnand.o isnanf.o isnanl.o lc-charset-dispatch.o mbtowc-lock.o printf-args.o printf-parse.o snprintf.o vasnprintf.o vasprintf.o vsnprintf.o
+lts_LTLIBOBJS =  asnprintf.lo asprintf.lo frexp.lo frexpl.lo isnand.lo isnanf.lo isnanl.lo lc-charset-dispatch.lo mbtowc-lock.lo printf-args.lo printf-parse.lo snprintf.lo vasnprintf.lo vasprintf.lo vsnprintf.lo
+lts_libtextstyle_LIBOBJDEPS =  $(DEPDIR)/libtextstyle_la-asnprintf.Plo $(DEPDIR)/libtextstyle_la-asprintf.Plo $(DEPDIR)/libtextstyle_la-frexp.Plo $(DEPDIR)/libtextstyle_la-frexpl.Plo $(DEPDIR)/libtextstyle_la-isnand.Plo $(DEPDIR)/libtextstyle_la-isnanf.Plo $(DEPDIR)/libtextstyle_la-isnanl.Plo $(DEPDIR)/libtextstyle_la-lc-charset-dispatch.Plo $(DEPDIR)/libtextstyle_la-mbtowc-lock.Plo $(DEPDIR)/libtextstyle_la-printf-args.Plo $(DEPDIR)/libtextstyle_la-printf-parse.Plo $(DEPDIR)/libtextstyle_la-snprintf.Plo $(DEPDIR)/libtextstyle_la-vasnprintf.Plo $(DEPDIR)/libtextstyle_la-vasprintf.Plo $(DEPDIR)/libtextstyle_la-vsnprintf.Plo
+lts_libtextstyle_LIBOBJS =  libtextstyle_a-asnprintf.o libtextstyle_a-asprintf.o libtextstyle_a-frexp.o libtextstyle_a-frexpl.o libtextstyle_a-isnand.o libtextstyle_a-isnanf.o libtextstyle_a-isnanl.o libtextstyle_a-lc-charset-dispatch.o libtextstyle_a-mbtowc-lock.o libtextstyle_a-printf-args.o libtextstyle_a-printf-parse.o libtextstyle_a-snprintf.o libtextstyle_a-vasnprintf.o libtextstyle_a-vasprintf.o libtextstyle_a-vsnprintf.o
+lts_libtextstyle_LTLIBOBJS =  libtextstyle_la-asnprintf.lo libtextstyle_la-asprintf.lo libtextstyle_la-frexp.lo libtextstyle_la-frexpl.lo libtextstyle_la-isnand.lo libtextstyle_la-isnanf.lo libtextstyle_la-isnanl.lo libtextstyle_la-lc-charset-dispatch.lo libtextstyle_la-mbtowc-lock.lo libtextstyle_la-printf-args.lo libtextstyle_la-printf-parse.lo libtextstyle_la-snprintf.lo libtextstyle_la-vasnprintf.lo libtextstyle_la-vasprintf.lo libtextstyle_la-vsnprintf.lo
 ltstests_LIBOBJDEPS = 
 ltstests_LIBOBJS = 
 ltstests_LTLIBOBJS = 
@@ -7865,22 +7865,22 @@ alloca.h: $(top_builddir)/config.status
 
 # We need the following in order to create <assert.h> when the system
 # doesn't have one that works with the given compiler.
-assert.h: assert.in.h verify.h $(top_builddir)/config.status
-	$(gl_V_at){ $(SED_HEADER_STDOUT) \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
-	      -e 's|@''PRAGMA_COLUMNS''@||g' \
-	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
-	      < $(srcdir)/assert.in.h && \
-	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
-	      -e 's|_gl_verify|_gl_static_assert|g' \
-	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
-	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL_LTS\1|g' \
-	      < $(srcdir)/verify.h; \
-	} > $@-t
-	$(AM_V_at)mv $@-t $@
-#assert.h: $(top_builddir)/config.status
-#	rm -f $@
+#assert.h: assert.in.h verify.h $(top_builddir)/config.status
+#	$(gl_V_at){ $(SED_HEADER_STDOUT) \
+#	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+#	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
+#	      -e 's|@''PRAGMA_COLUMNS''@||g' \
+#	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
+#	      < $(srcdir)/assert.in.h && \
+#	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
+#	      -e 's|_gl_verify|_gl_static_assert|g' \
+#	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
+#	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL_LTS\1|g' \
+#	      < $(srcdir)/verify.h; \
+#	} > $@-t
+#	$(AM_V_at)mv $@-t $@
+assert.h: $(top_builddir)/config.status
+	rm -f $@
 
 # We need the following in order to create <errno.h> when the system
 # doesn't have one that is POSIX compliant.
@@ -10547,7 +10547,7 @@ mostlyclean-local: mostlyclean-generic
 	:
 distclean-local: distclean-gnulib-libobjs
 distclean-gnulib-libobjs:
-	-rm -f  $(DEPDIR)/libtextstyle_la-asnprintf.Plo $(DEPDIR)/libtextstyle_la-asprintf.Plo $(DEPDIR)/libtextstyle_la-frexp.Plo $(DEPDIR)/libtextstyle_la-frexpl.Plo $(DEPDIR)/libtextstyle_la-isnand.Plo $(DEPDIR)/libtextstyle_la-isnanf.Plo $(DEPDIR)/libtextstyle_la-isnanl.Plo $(DEPDIR)/libtextstyle_la-printf-args.Plo $(DEPDIR)/libtextstyle_la-printf-parse.Plo $(DEPDIR)/libtextstyle_la-snprintf.Plo $(DEPDIR)/libtextstyle_la-vasnprintf.Plo $(DEPDIR)/libtextstyle_la-vasprintf.Plo $(DEPDIR)/libtextstyle_la-vsnprintf.Plo
+	-rm -f  $(DEPDIR)/libtextstyle_la-asnprintf.Plo $(DEPDIR)/libtextstyle_la-asprintf.Plo $(DEPDIR)/libtextstyle_la-frexp.Plo $(DEPDIR)/libtextstyle_la-frexpl.Plo $(DEPDIR)/libtextstyle_la-isnand.Plo $(DEPDIR)/libtextstyle_la-isnanf.Plo $(DEPDIR)/libtextstyle_la-isnanl.Plo $(DEPDIR)/libtextstyle_la-lc-charset-dispatch.Plo $(DEPDIR)/libtextstyle_la-mbtowc-lock.Plo $(DEPDIR)/libtextstyle_la-printf-args.Plo $(DEPDIR)/libtextstyle_la-printf-parse.Plo $(DEPDIR)/libtextstyle_la-snprintf.Plo $(DEPDIR)/libtextstyle_la-vasnprintf.Plo $(DEPDIR)/libtextstyle_la-vasprintf.Plo $(DEPDIR)/libtextstyle_la-vsnprintf.Plo
 maintainer-clean-local: distclean-gnulib-libobjs
 clean-local: clean-generic
 	@for dir in '' $(CLEANDIRS); do \

@@ -4,7 +4,67 @@ APE=$APEXPROOT/sys/src/ape
 
 LIB=$APEXPROOT/$objtype/lib/ape/libgettextpo.a
 
-OFILES= \
+GNULIB=\
+# gnulib-lib/malloc \
+	scratch_buffer_grow.$O\
+	scratch_buffer_grow_preserve.$O\
+	scratch_buffer_set_array_size.$O\
+# gnulib-lib/unistr \
+	u8-check.$O\
+	u8-mblen.$O\
+	u8-mbtouc.$O\
+	u8-mbtouc-aux.$O\
+	u8-mbtouc-unsafe.$O\
+	u8-mbtouc-unsafe-aux.$O\
+	u16-mbtouc-aux.$O\
+	u8-uctomb.$O\
+	u8-uctomb-aux.$O\
+	u8-mbtouc.$O\
+	u8-mbtoucr.$O\
+	u8-prev.$O\
+# gnulib-lib/unictype \
+	ctype_alnum.$O\
+	ctype_cntrl.$O\
+	ctype_space.$O\
+# gnulib-lib/uniwidth \
+	width.$O\
+# gnulib-lib/unilbrk \
+	u8-width-linebreaks.$O\
+	u8-possible-linebreaks.$O\
+	ulc-common.$O\
+	ulc-width-linebreaks.$O\
+	lbrktables.$O\
+# gnulib-lib/uniconv\
+	u8-conv-from-enc.$O\
+# gnulib-lib\
+	canonicalize.$O\
+	csharpcomp.$O\
+	file-set.$O\
+	gettime.$O\
+	hash.$O\
+	hash-triple-simple.$O\
+	hash-pjw.$O\
+	javacomp.$O\
+	localename.$O\
+	localename-unsafe.$O\
+	mempcpy.$O\
+	read-file.$O\
+	safe-read.$O\
+	spawn.$O\
+	spawni.$O\
+	spawnp.$O\
+	spawn-pipe.$O\
+	spawnattr_destroy.$O\
+	spawnattr_init.$O\
+	spawnattr_setflags.$O\
+	spawnattr_setpgroup.$O\
+	spawnattr_setsigmask.$O\
+	supersede.$O\
+	utimens.$O\
+	memset_explicit.$O\
+	xstriconveh.$O\
+
+SRCDIR=\
 # src \
 	dir-list.$O\
 	file-list.$O\
@@ -86,6 +146,9 @@ OFILES= \
 	xg-mixed-string.$O\
 	xg-pos.$O\
 	x-po.$O\
+
+
+OFILES= \
 # libgettextpo \
 	c-strstr.$O\
 	concat-filename.$O\
@@ -116,65 +179,11 @@ OFILES= \
 	xstriconv.$O\
 # woe32dll \
 	gettextpo-exports.$O\
-# gnulib-lib/malloc \
-	scratch_buffer_grow.$O\
-	scratch_buffer_grow_preserve.$O\
-	scratch_buffer_set_array_size.$O\
-# gnulib-lib/unistr \
-	u8-check.$O\
-	u8-mblen.$O\
-	u8-mbtouc.$O\
-	u8-mbtouc-aux.$O\
-	u8-mbtouc-unsafe.$O\
-	u8-mbtouc-unsafe-aux.$O\
-	u16-mbtouc-aux.$O\
-	u8-uctomb.$O\
-	u8-uctomb-aux.$O\
-	u8-mbtouc.$O\
-	u8-mbtoucr.$O\
-	u8-prev.$O\
-# gnulib-lib/unictype \
-	ctype_alnum.$O\
-	ctype_cntrl.$O\
-	ctype_space.$O\
-# gnulib-lib/uniwidth \
-	width.$O\
-# gnulib-lib/unilbrk \
-	u8-width-linebreaks.$O\
-	u8-possible-linebreaks.$O\
-	ulc-common.$O\
-	ulc-width-linebreaks.$O\
-	lbrktables.$O\
-# gnulib-lib/uniconv\
-	u8-conv-from-enc.$O\
-# gnulib-lib\
-	canonicalize.$O\
-	csharpcomp.$O\
-	file-set.$O\
-	gettime.$O\
-	hash.$O\
-	hash-triple-simple.$O\
-	hash-pjw.$O\
-	javacomp.$O\
-	localename.$O\
-	localename-unsafe.$O\
-	mempcpy.$O\
-	read-file.$O\
-	safe-read.$O\
-	spawn.$O\
-	spawni.$O\
-	spawnp.$O\
-	spawn-pipe.$O\
-	spawnattr_destroy.$O\
-	spawnattr_init.$O\
-	spawnattr_setflags.$O\
-	spawnattr_setpgroup.$O\
-	spawnattr_setsigmask.$O\
-	supersede.$O\
-	utimens.$O\
-	memset_explicit.$O\
-	xstriconveh.$O\
+	$SRCDIR\
+	$GNULIB\
 
+
+#feels weird to package gnulib in the library. Let's see if it is needed.
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

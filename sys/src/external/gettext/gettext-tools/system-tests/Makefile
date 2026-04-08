@@ -85,18 +85,18 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = x86_64-unknown-plan9
 host_triplet = x86_64-unknown-plan9
-#check_PROGRAMS = testlocale$(EXEEXT) \
-#	intl-1-prg$(EXEEXT) \
-#	intl-3-prg$(EXEEXT) \
-#	intl-4-prg$(EXEEXT) \
-#	intl-5-prg$(EXEEXT) \
-#	intl-setlocale-1-prg$(EXEEXT) \
-#	intl-setlocale-2-prg$(EXEEXT) \
-#	intl-thread-1-prg$(EXEEXT) \
-#	intl-thread-2-prg$(EXEEXT) \
-#	intl-thread-3-prg$(EXEEXT) \
-#	cake$(EXEEXT) fc3$(EXEEXT) \
-#	fc4$(EXEEXT) fc5$(EXEEXT)
+check_PROGRAMS = testlocale$(EXEEXT) \
+	intl-1-prg$(EXEEXT) \
+	intl-3-prg$(EXEEXT) \
+	intl-4-prg$(EXEEXT) \
+	intl-5-prg$(EXEEXT) \
+	intl-setlocale-1-prg$(EXEEXT) \
+	intl-setlocale-2-prg$(EXEEXT) \
+	intl-thread-1-prg$(EXEEXT) \
+	intl-thread-2-prg$(EXEEXT) \
+	intl-thread-3-prg$(EXEEXT) \
+	cake$(EXEEXT) fc3$(EXEEXT) \
+	fc4$(EXEEXT) fc5$(EXEEXT)
 subdir = system-tests
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/tests/gnulib-m4/gnulib-comp.m4 \
@@ -515,7 +515,7 @@ CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 am__cake_SOURCES_DIST = plural-1-prg.c
-#am_cake_OBJECTS = plural-1-prg.$(OBJEXT)
+am_cake_OBJECTS = plural-1-prg.$(OBJEXT)
 cake_OBJECTS = $(am_cake_OBJECTS)
 cake_LDADD = $(LDADD)
 AM_V_lt = $(am__v_lt_$(V))
@@ -523,49 +523,49 @@ am__v_lt_ = $(am__v_lt_$(AM_DEFAULT_VERBOSITY))
 am__v_lt_0 = --silent
 am__v_lt_1 = 
 am__fc3_SOURCES_DIST = format-c-3-prg.c
-#am_fc3_OBJECTS = format-c-3-prg.$(OBJEXT)
+am_fc3_OBJECTS = format-c-3-prg.$(OBJEXT)
 fc3_OBJECTS = $(am_fc3_OBJECTS)
 fc3_LDADD = $(LDADD)
 am__fc4_SOURCES_DIST = format-c-4-prg.c
-#am_fc4_OBJECTS = format-c-4-prg.$(OBJEXT)
+am_fc4_OBJECTS = format-c-4-prg.$(OBJEXT)
 fc4_OBJECTS = $(am_fc4_OBJECTS)
 fc4_LDADD = $(LDADD)
 am__fc5_SOURCES_DIST = format-c-5-prg.c
-#am_fc5_OBJECTS = format-c-5-prg.$(OBJEXT)
+am_fc5_OBJECTS = format-c-5-prg.$(OBJEXT)
 fc5_OBJECTS = $(am_fc5_OBJECTS)
 fc5_LDADD = $(LDADD)
 am__intl_1_prg_SOURCES_DIST = intl-1-prg.c
-#am_intl_1_prg_OBJECTS =  \
-#	intl-1-prg.$(OBJEXT)
+am_intl_1_prg_OBJECTS =  \
+	intl-1-prg.$(OBJEXT)
 intl_1_prg_OBJECTS = $(am_intl_1_prg_OBJECTS)
 intl_1_prg_LDADD = $(LDADD)
 am__intl_3_prg_SOURCES_DIST = intl-3-prg.c
-#am_intl_3_prg_OBJECTS =  \
-#	intl-3-prg.$(OBJEXT)
+am_intl_3_prg_OBJECTS =  \
+	intl-3-prg.$(OBJEXT)
 intl_3_prg_OBJECTS = $(am_intl_3_prg_OBJECTS)
 intl_3_prg_LDADD = $(LDADD)
 am__intl_4_prg_SOURCES_DIST = intl-4-prg.c
-#am_intl_4_prg_OBJECTS =  \
-#	intl-4-prg.$(OBJEXT)
+am_intl_4_prg_OBJECTS =  \
+	intl-4-prg.$(OBJEXT)
 intl_4_prg_OBJECTS = $(am_intl_4_prg_OBJECTS)
 intl_4_prg_LDADD = $(LDADD)
 am__intl_5_prg_SOURCES_DIST = intl-5-prg.c
-#am_intl_5_prg_OBJECTS =  \
-#	intl-5-prg.$(OBJEXT)
+am_intl_5_prg_OBJECTS =  \
+	intl-5-prg.$(OBJEXT)
 intl_5_prg_OBJECTS = $(am_intl_5_prg_OBJECTS)
 intl_5_prg_LDADD = $(LDADD)
 am__intl_setlocale_1_prg_SOURCES_DIST = intl-setlocale-1-prg.c
-#am_intl_setlocale_1_prg_OBJECTS =  \
-#	intl-setlocale-1-prg.$(OBJEXT)
+am_intl_setlocale_1_prg_OBJECTS =  \
+	intl-setlocale-1-prg.$(OBJEXT)
 intl_setlocale_1_prg_OBJECTS = $(am_intl_setlocale_1_prg_OBJECTS)
 intl_setlocale_1_prg_LDADD = $(LDADD)
 am__intl_setlocale_2_prg_SOURCES_DIST = intl-setlocale-2-prg.c
-#am_intl_setlocale_2_prg_OBJECTS =  \
-#	intl-setlocale-2-prg.$(OBJEXT)
+am_intl_setlocale_2_prg_OBJECTS =  \
+	intl-setlocale-2-prg.$(OBJEXT)
 intl_setlocale_2_prg_OBJECTS = $(am_intl_setlocale_2_prg_OBJECTS)
 intl_setlocale_2_prg_LDADD = $(LDADD)
 am__intl_thread_1_prg_SOURCES_DIST = intl-thread-1-prg.c
-#am_intl_thread_1_prg_OBJECTS = intl_thread_1_prg-intl-thread-1-prg.$(OBJEXT)
+am_intl_thread_1_prg_OBJECTS = intl_thread_1_prg-intl-thread-1-prg.$(OBJEXT)
 intl_thread_1_prg_OBJECTS = $(am_intl_thread_1_prg_OBJECTS)
 intl_thread_1_prg_DEPENDENCIES =
 intl_thread_1_prg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
@@ -573,7 +573,7 @@ intl_thread_1_prg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(intl_thread_1_prg_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__intl_thread_2_prg_SOURCES_DIST = intl-thread-2-prg.c
-#am_intl_thread_2_prg_OBJECTS = intl_thread_2_prg-intl-thread-2-prg.$(OBJEXT)
+am_intl_thread_2_prg_OBJECTS = intl_thread_2_prg-intl-thread-2-prg.$(OBJEXT)
 intl_thread_2_prg_OBJECTS = $(am_intl_thread_2_prg_OBJECTS)
 intl_thread_2_prg_DEPENDENCIES =
 intl_thread_2_prg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
@@ -581,7 +581,7 @@ intl_thread_2_prg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(intl_thread_2_prg_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__intl_thread_3_prg_SOURCES_DIST = intl-thread-3-prg.c
-#am_intl_thread_3_prg_OBJECTS = intl_thread_3_prg-intl-thread-3-prg.$(OBJEXT)
+am_intl_thread_3_prg_OBJECTS = intl_thread_3_prg-intl-thread-3-prg.$(OBJEXT)
 intl_thread_3_prg_OBJECTS = $(am_intl_thread_3_prg_OBJECTS)
 intl_thread_3_prg_DEPENDENCIES =
 intl_thread_3_prg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
@@ -589,8 +589,8 @@ intl_thread_3_prg_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(intl_thread_3_prg_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
 am__testlocale_SOURCES_DIST = testlocale.c
-#am_testlocale_OBJECTS =  \
-#	testlocale.$(OBJEXT)
+am_testlocale_OBJECTS =  \
+	testlocale.$(OBJEXT)
 testlocale_OBJECTS = $(am_testlocale_OBJECTS)
 testlocale_LDADD = $(LDADD)
 AM_V_P = $(am__v_P_$(V))
@@ -907,7 +907,7 @@ ARCHIVE_VERSION = 1.0
 ARFLAGS = cr
 AS = as
 ASM_SYMBOL_PREFIX = ""
-ASSERT_H = assert.h
+ASSERT_H = 
 AUGMENT_SHLIBPATH = 
 AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing' autoconf
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing' autoheader
@@ -916,11 +916,11 @@ AWK = awk
 BISON_LOCALEDIR = ${datarootdir}/locale
 BISON_LOCALEDIR_c = "/usr/local/share/locale"
 BISON_LOCALEDIR_c_make = \"$(BISON_LOCALEDIR)\"
-BITSIZEOF_PTRDIFF_T = 64
-BITSIZEOF_SIG_ATOMIC_T = 32
-BITSIZEOF_SIZE_T = 32
-BITSIZEOF_WCHAR_T = 16
-BITSIZEOF_WINT_T = 32
+BITSIZEOF_PTRDIFF_T = 0
+BITSIZEOF_SIG_ATOMIC_T = 0
+BITSIZEOF_SIZE_T = 0
+BITSIZEOF_WCHAR_T = 0
+BITSIZEOF_WINT_T = 0
 BUILDCSHARP = no
 BUILDD = no
 BUILDJAVA = no
@@ -2789,8 +2789,8 @@ GL_GTTGL_GNULIB_WCTOMB = 0
 GL_GTTGL_GNULIB__EXIT = 0
 GMSGFMT = :
 GMSGFMT_015 = :
-GNULIBHEADERS_OVERRIDE_CHAR16_T = 1
-GNULIBHEADERS_OVERRIDE_CHAR32_T = 1
+GNULIBHEADERS_OVERRIDE_CHAR16_T = 0
+GNULIBHEADERS_OVERRIDE_CHAR32_T = 0
 GNULIBHEADERS_OVERRIDE_CHAR8_T = 1
 GNULIBHEADERS_OVERRIDE_WINT_T = 0
 GNULIB_LOCALEDIR = ${datarootdir}/locale
@@ -2817,8 +2817,8 @@ HAVE_ATANL = 1
 HAVE_ATOLL = 1
 HAVE_BLKCNT_T = 1
 HAVE_BLKSIZE_T = 1
-HAVE_BTOWC = 0
-HAVE_C32RTOMB = 0
+HAVE_BTOWC = 1
+HAVE_C32RTOMB = 1
 HAVE_C99_STDINT_H = 0
 HAVE_CANONICALIZE_FILE_NAME = 0
 HAVE_CBRT = 1
@@ -2848,13 +2848,13 @@ HAVE_DECL_CEILF = 1
 HAVE_DECL_CEILL = 1
 HAVE_DECL_COSL = 1
 HAVE_DECL_DIRFD = 1
-HAVE_DECL_ECVT = 0
+HAVE_DECL_ECVT = 1
 HAVE_DECL_ENVIRON = 0
 HAVE_DECL_EXECVPE = 0
 HAVE_DECL_EXPL = 1
 HAVE_DECL_FCHDIR = 1
 HAVE_DECL_FCLOSEALL = 0
-HAVE_DECL_FCVT = 0
+HAVE_DECL_FCVT = 1
 HAVE_DECL_FDATASYNC = 1
 HAVE_DECL_FDOPENDIR = 0
 HAVE_DECL_FLOORF = 1
@@ -2865,7 +2865,7 @@ HAVE_DECL_FREXPL = 1
 HAVE_DECL_FSEEKO = 1
 HAVE_DECL_FTELLO = 1
 HAVE_DECL_GAI_STRERROR = 1
-HAVE_DECL_GCVT = 0
+HAVE_DECL_GCVT = 1
 HAVE_DECL_GETADDRINFO = 1
 HAVE_DECL_GETDELIM = 1
 HAVE_DECL_GETDOMAINNAME = 1
@@ -2920,7 +2920,7 @@ HAVE_DECL_TRUNCL = 1
 HAVE_DECL_TTYNAME_R = 1
 HAVE_DECL_UNSETENV = 1
 HAVE_DECL_VSNPRINTF = 1
-HAVE_DECL_WCSDUP = 0
+HAVE_DECL_WCSDUP = 1
 HAVE_DECL_WCWIDTH = 1
 HAVE_DIRENT_H = 1
 HAVE_DOTNET = 
@@ -2962,7 +2962,7 @@ HAVE_FMAF = 1
 HAVE_FMAL = 1
 HAVE_FMODF = 1
 HAVE_FMODL = 1
-HAVE_FNMATCH = 1
+HAVE_FNMATCH = 0
 HAVE_FNMATCH_H = 1
 HAVE_FREELOCALE = 0
 HAVE_FREXPF = 1
@@ -3060,15 +3060,15 @@ HAVE_LOGP1F = 1
 HAVE_LOGP1L = 1
 HAVE_LSTAT = 1
 HAVE_MAX_ALIGN_T = 0
-HAVE_MBRLEN = 1
+HAVE_MBRLEN = 0
 HAVE_MBRTOC16 = 1
 HAVE_MBRTOC32 = 0
-HAVE_MBRTOWC = 1
+HAVE_MBRTOWC = 0
 HAVE_MBSINIT = 1
 HAVE_MBSLEN = 0
 HAVE_MBSNRTOWCS = 1
-HAVE_MBSRTOWCS = 1
-HAVE_MBTOWC = 1
+HAVE_MBSRTOWCS = 0
+HAVE_MBTOWC = 0
 HAVE_MCS = 
 HAVE_MCS_IN_PATH = 
 HAVE_MEMPCPY = 1
@@ -3106,10 +3106,10 @@ HAVE_POSIX_MEMALIGN = 1
 HAVE_POSIX_OPENPT = 1
 HAVE_POSIX_SIGNALBLOCKING = 1
 HAVE_POSIX_SPAWN = 1
-HAVE_POSIX_SPAWNATTR_T = 0
+HAVE_POSIX_SPAWNATTR_T = 1
 HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR = 0
 HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDFCHDIR = 1
-HAVE_POSIX_SPAWN_FILE_ACTIONS_T = 0
+HAVE_POSIX_SPAWN_FILE_ACTIONS_T = 1
 HAVE_POWF = 1
 HAVE_PREAD = 1
 HAVE_PSELECT = 1
@@ -3183,7 +3183,7 @@ HAVE_RAWMEMCHR = 0
 HAVE_READDIR = 1
 HAVE_READLINK = 1
 HAVE_READLINKAT = 1
-HAVE_REALLOCARRAY = 0
+HAVE_REALLOCARRAY = 1
 HAVE_REALPATH = 1
 HAVE_REMAINDER = 1
 HAVE_REMAINDERF = 1
@@ -3226,7 +3226,7 @@ HAVE_SINF = 1
 HAVE_SINHF = 1
 HAVE_SINL = 1
 HAVE_SLEEP = 1
-HAVE_SPAWN_H = 0
+HAVE_SPAWN_H = 1
 HAVE_SQRTF = 1
 HAVE_SQRTL = 1
 HAVE_STDCKDINT_H = 0
@@ -3291,7 +3291,7 @@ HAVE_TOTALORDERMAGL = 1
 HAVE_TOUPPER_L = 1
 HAVE_TYPE_VOLATILE_SIG_ATOMIC_T = 1
 HAVE_TZALLOC = 0
-HAVE_UCHAR_H = 0
+HAVE_UCHAR_H = 1
 HAVE_UNISTD_H = 1
 HAVE_UNISTRING_WOE32DLL_H = 0
 HAVE_UNLINKAT = 1
@@ -3331,7 +3331,7 @@ HAVE_WCSSTR = 1
 HAVE_WCSTOK = 1
 HAVE_WCSWIDTH = 1
 HAVE_WCSXFRM = 1
-HAVE_WCTOB = 0
+HAVE_WCTOB = 1
 HAVE_WCTRANS_T = 1
 HAVE_WCTYPE_H = 1
 HAVE_WCTYPE_T = 1
@@ -3344,7 +3344,7 @@ HAVE_WMEMCPY = 1
 HAVE_WMEMMOVE = 1
 HAVE_WMEMPCPY = 0
 HAVE_WMEMSET = 1
-HAVE_WORKING_C32RTOMB = 0
+HAVE_WORKING_C32RTOMB = 1
 HAVE_WORKING_CXX_STDCKDINT_H = 0
 HAVE_WORKING_C_STDCKDINT_H = 0
 HAVE_WORKING_MBRTOC32 = 0
@@ -3354,7 +3354,7 @@ HAVE__EXIT = 1
 HOSTENT_LIB = 
 HTONL_LIB = 
 ICONV_CONST = 
-ICONV_H = iconv.h
+ICONV_H = 
 INCCURL = 
 INCJSON_C = 
 INCLUDE_NEXT = include_next
@@ -3363,7 +3363,7 @@ INCXML =
 INET_NTOP_LIB = 
 INET_PTON_LIB = 
 INSTALL = /bin/install -c
-INSTALLED_LIBGETTEXTPO_DEPS = -lintl   
+INSTALLED_LIBGETTEXTPO_DEPS = 
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_PROGRAM_ENV = 
@@ -3390,7 +3390,7 @@ LIBDL =
 LIBGNU_LIBDEPS = 
 LIBGNU_LTLIBDEPS = 
 LIBICONV = 
-LIBINTL = ${top_builddir}/../gettext-runtime/intl/libintl.la  
+LIBINTL = 
 LIBJSON_C = 
 LIBMULTITHREAD = 
 LIBOBJS = 
@@ -3450,7 +3450,7 @@ LOCALE_TR_UTF8 = none
 LOCALE_ZH_CN = none
 LOG10_LIBM = 
 LTLIBICONV = 
-LTLIBINTL = ${top_builddir}/../gettext-runtime/intl/libintl.la  
+LTLIBINTL = 
 LTLIBMULTITHREAD = 
 LTLIBOBJS = 
 LTLIBTEXTSTYLE = 
@@ -3474,9 +3474,9 @@ MSGMERGE_LIBM =
 NANOSLEEP_LIB = 
 NETINET_IN_H = 
 NEXT_ARPA_INET_H = <arpa/inet.h>
-NEXT_ASSERT_H = <assert.h>
+NEXT_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_ARPA_INET_H = <arpa/inet.h>
-NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = <assert.h>
+NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_CTYPE_H = <ctype.h>
 NEXT_AS_FIRST_DIRECTIVE_DIRENT_H = <dirent.h>
 NEXT_AS_FIRST_DIRECTIVE_ENDIAN_H = <endian.h>
@@ -3620,8 +3620,8 @@ REPLACE_ALIGNED_ALLOC = 0
 REPLACE_ASINF = 0
 REPLACE_ATAN2F = 0
 REPLACE_ATANF = 0
-REPLACE_BTOWC = 0
-REPLACE_C32RTOMB = 0
+REPLACE_BTOWC = 1
+REPLACE_C32RTOMB = 1
 REPLACE_CALLOC_FOR_CALLOC_GNU = 0
 REPLACE_CALLOC_FOR_CALLOC_POSIX = 0
 REPLACE_CANONICALIZE_FILE_NAME = 0
@@ -3682,14 +3682,14 @@ REPLACE_FMAL = 0
 REPLACE_FMOD = 0
 REPLACE_FMODF = 0
 REPLACE_FMODL = 0
-REPLACE_FNMATCH = 1
+REPLACE_FNMATCH = 0
 REPLACE_FOPEN = 1
 REPLACE_FOPEN_FOR_FOPEN_GNU = 1
 REPLACE_FPRINTF = 0
 REPLACE_FPURGE = 0
 REPLACE_FREE = 1
 REPLACE_FREELOCALE = 0
-REPLACE_FREOPEN = 0
+REPLACE_FREOPEN = 1
 REPLACE_FREXP = 1
 REPLACE_FREXPF = 0
 REPLACE_FREXPL = 1
@@ -3697,19 +3697,19 @@ REPLACE_FSEEK = 1
 REPLACE_FSEEKO = 1
 REPLACE_FSTAT = 0
 REPLACE_FSTATAT = 1
-REPLACE_FTELL = 0
-REPLACE_FTELLO = 0
+REPLACE_FTELL = 1
+REPLACE_FTELLO = 1
 REPLACE_FTRUNCATE = 0
 REPLACE_FUTIMENS = 0
 REPLACE_GAI_STRERROR = 0
 REPLACE_GETADDRINFO = 1
 REPLACE_GETCWD = 1
-REPLACE_GETDELIM = 0
+REPLACE_GETDELIM = 1
 REPLACE_GETDOMAINNAME = 0
 REPLACE_GETDTABLESIZE = 0
 REPLACE_GETENTROPY = 0
 REPLACE_GETGROUPS = 0
-REPLACE_GETLINE = 0
+REPLACE_GETLINE = 1
 REPLACE_GETLOADAVG = 0
 REPLACE_GETLOCALENAME_L = 0
 REPLACE_GETLOGIN = 0
@@ -3757,7 +3757,7 @@ REPLACE_LDEXP = 0
 REPLACE_LDEXPL = 0
 REPLACE_LINK = 0
 REPLACE_LINKAT = 0
-REPLACE_LOCALECONV = 1
+REPLACE_LOCALECONV = 0
 REPLACE_LOCALTIME = 0
 REPLACE_LOCALTIME_R = 0
 REPLACE_LOCALTIME_RZ = 0
@@ -3784,10 +3784,10 @@ REPLACE_MBRLEN = 1
 REPLACE_MBRTOC16 = 0
 REPLACE_MBRTOC32 = 0
 REPLACE_MBRTOWC = 1
-REPLACE_MBSINIT = 0
+REPLACE_MBSINIT = 1
 REPLACE_MBSNRTOWCS = 0
 REPLACE_MBSRTOWCS = 1
-REPLACE_MBSTATE_T = 0
+REPLACE_MBSTATE_T = 1
 REPLACE_MBSTOWCS = 0
 REPLACE_MBTOWC = 0
 REPLACE_MB_CUR_MAX = 0
@@ -3957,7 +3957,7 @@ REPLACE_STRTOLL = 0
 REPLACE_STRTOUL = 1
 REPLACE_STRTOULL = 0
 REPLACE_STRTOUMAX = 0
-REPLACE_STRUCT_LCONV = 1
+REPLACE_STRUCT_LCONV = 0
 REPLACE_STRUCT_TIMEVAL = 0
 REPLACE_STRVERSCMP = 0
 REPLACE_SYMLINK = 1
@@ -3994,7 +3994,7 @@ REPLACE_VFPRINTF = 0
 REPLACE_VPRINTF = 0
 REPLACE_VSNPRINTF = 1
 REPLACE_VSPRINTF = 0
-REPLACE_WCRTOMB = 0
+REPLACE_WCRTOMB = 1
 REPLACE_WCSCMP = 0
 REPLACE_WCSFTIME = 0
 REPLACE_WCSNCAT = 0
@@ -4055,7 +4055,7 @@ UNISTD_H_HAVE_SYS_RANDOM_H = 0
 UNISTD_H_HAVE_WINSOCK2_H = 0
 UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS = 0
 USE_ACL = 0
-USE_INCLUDED_LIBINTL = yes
+USE_INCLUDED_LIBINTL = no
 USE_NLS = yes
 USE_SELINUX_SELINUX_H = 0
 VERSION = 0.22.5
@@ -4116,12 +4116,12 @@ dvidir_c_make = \"$(dvidir)\"
 exec_prefix = ${prefix}
 exec_prefix_c = "/usr/local"
 exec_prefix_c_make = \"$(exec_prefix)\"
-gl_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/fnmatch.Plo $(DEPDIR)/fopen.Plo $(DEPDIR)/frexp.Plo $(DEPDIR)/frexpl.Plo $(DEPDIR)/isnand.Plo $(DEPDIR)/isnanf.Plo $(DEPDIR)/isnanl.Plo $(DEPDIR)/mbsrtoc32s-state.Plo $(DEPDIR)/mbsrtowcs-state.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/snprintf.Plo $(DEPDIR)/strerror_r.Plo $(DEPDIR)/strstr.Plo $(DEPDIR)/vasnprintf.Plo $(DEPDIR)/vsnprintf.Plo
-gl_LIBOBJS =  asnprintf.o fnmatch.o fopen.o frexp.o frexpl.o isnand.o isnanf.o isnanl.o mbsrtoc32s-state.o mbsrtowcs-state.o printf-args.o printf-parse.o snprintf.o strerror_r.o strstr.o vasnprintf.o vsnprintf.o
-gl_LTLIBOBJS =  asnprintf.lo fnmatch.lo fopen.lo frexp.lo frexpl.lo isnand.lo isnanf.lo isnanl.lo mbsrtoc32s-state.lo mbsrtowcs-state.lo printf-args.lo printf-parse.lo snprintf.lo strerror_r.lo strstr.lo vasnprintf.lo vsnprintf.lo
-gl_libgettextlib_LIBOBJDEPS =  $(DEPDIR)/libgettextlib_la-asnprintf.Plo $(DEPDIR)/libgettextlib_la-fnmatch.Plo $(DEPDIR)/libgettextlib_la-fopen.Plo $(DEPDIR)/libgettextlib_la-frexp.Plo $(DEPDIR)/libgettextlib_la-frexpl.Plo $(DEPDIR)/libgettextlib_la-isnand.Plo $(DEPDIR)/libgettextlib_la-isnanf.Plo $(DEPDIR)/libgettextlib_la-isnanl.Plo $(DEPDIR)/libgettextlib_la-mbsrtoc32s-state.Plo $(DEPDIR)/libgettextlib_la-mbsrtowcs-state.Plo $(DEPDIR)/libgettextlib_la-printf-args.Plo $(DEPDIR)/libgettextlib_la-printf-parse.Plo $(DEPDIR)/libgettextlib_la-snprintf.Plo $(DEPDIR)/libgettextlib_la-strerror_r.Plo $(DEPDIR)/libgettextlib_la-strstr.Plo $(DEPDIR)/libgettextlib_la-vasnprintf.Plo $(DEPDIR)/libgettextlib_la-vsnprintf.Plo
-gl_libgettextlib_LIBOBJS =  libgettextlib_a-asnprintf.o libgettextlib_a-fnmatch.o libgettextlib_a-fopen.o libgettextlib_a-frexp.o libgettextlib_a-frexpl.o libgettextlib_a-isnand.o libgettextlib_a-isnanf.o libgettextlib_a-isnanl.o libgettextlib_a-mbsrtoc32s-state.o libgettextlib_a-mbsrtowcs-state.o libgettextlib_a-printf-args.o libgettextlib_a-printf-parse.o libgettextlib_a-snprintf.o libgettextlib_a-strerror_r.o libgettextlib_a-strstr.o libgettextlib_a-vasnprintf.o libgettextlib_a-vsnprintf.o
-gl_libgettextlib_LTLIBOBJS =  libgettextlib_la-asnprintf.lo libgettextlib_la-fnmatch.lo libgettextlib_la-fopen.lo libgettextlib_la-frexp.lo libgettextlib_la-frexpl.lo libgettextlib_la-isnand.lo libgettextlib_la-isnanf.lo libgettextlib_la-isnanl.lo libgettextlib_la-mbsrtoc32s-state.lo libgettextlib_la-mbsrtowcs-state.lo libgettextlib_la-printf-args.lo libgettextlib_la-printf-parse.lo libgettextlib_la-snprintf.lo libgettextlib_la-strerror_r.lo libgettextlib_la-strstr.lo libgettextlib_la-vasnprintf.lo libgettextlib_la-vsnprintf.lo
+gl_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/fnmatch.Plo $(DEPDIR)/fopen.Plo $(DEPDIR)/frexp.Plo $(DEPDIR)/frexpl.Plo $(DEPDIR)/isnand.Plo $(DEPDIR)/isnanf.Plo $(DEPDIR)/isnanl.Plo $(DEPDIR)/lc-charset-dispatch.Plo $(DEPDIR)/mbsrtoc32s-state.Plo $(DEPDIR)/mbsrtowcs-state.Plo $(DEPDIR)/mbtowc-lock.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/snprintf.Plo $(DEPDIR)/strerror_r.Plo $(DEPDIR)/strstr.Plo $(DEPDIR)/vasnprintf.Plo $(DEPDIR)/vsnprintf.Plo
+gl_LIBOBJS =  asnprintf.o fnmatch.o fopen.o frexp.o frexpl.o isnand.o isnanf.o isnanl.o lc-charset-dispatch.o mbsrtoc32s-state.o mbsrtowcs-state.o mbtowc-lock.o printf-args.o printf-parse.o snprintf.o strerror_r.o strstr.o vasnprintf.o vsnprintf.o
+gl_LTLIBOBJS =  asnprintf.lo fnmatch.lo fopen.lo frexp.lo frexpl.lo isnand.lo isnanf.lo isnanl.lo lc-charset-dispatch.lo mbsrtoc32s-state.lo mbsrtowcs-state.lo mbtowc-lock.lo printf-args.lo printf-parse.lo snprintf.lo strerror_r.lo strstr.lo vasnprintf.lo vsnprintf.lo
+gl_libgettextlib_LIBOBJDEPS =  $(DEPDIR)/libgettextlib_la-asnprintf.Plo $(DEPDIR)/libgettextlib_la-fnmatch.Plo $(DEPDIR)/libgettextlib_la-fopen.Plo $(DEPDIR)/libgettextlib_la-frexp.Plo $(DEPDIR)/libgettextlib_la-frexpl.Plo $(DEPDIR)/libgettextlib_la-isnand.Plo $(DEPDIR)/libgettextlib_la-isnanf.Plo $(DEPDIR)/libgettextlib_la-isnanl.Plo $(DEPDIR)/libgettextlib_la-lc-charset-dispatch.Plo $(DEPDIR)/libgettextlib_la-mbsrtoc32s-state.Plo $(DEPDIR)/libgettextlib_la-mbsrtowcs-state.Plo $(DEPDIR)/libgettextlib_la-mbtowc-lock.Plo $(DEPDIR)/libgettextlib_la-printf-args.Plo $(DEPDIR)/libgettextlib_la-printf-parse.Plo $(DEPDIR)/libgettextlib_la-snprintf.Plo $(DEPDIR)/libgettextlib_la-strerror_r.Plo $(DEPDIR)/libgettextlib_la-strstr.Plo $(DEPDIR)/libgettextlib_la-vasnprintf.Plo $(DEPDIR)/libgettextlib_la-vsnprintf.Plo
+gl_libgettextlib_LIBOBJS =  libgettextlib_a-asnprintf.o libgettextlib_a-fnmatch.o libgettextlib_a-fopen.o libgettextlib_a-frexp.o libgettextlib_a-frexpl.o libgettextlib_a-isnand.o libgettextlib_a-isnanf.o libgettextlib_a-isnanl.o libgettextlib_a-lc-charset-dispatch.o libgettextlib_a-mbsrtoc32s-state.o libgettextlib_a-mbsrtowcs-state.o libgettextlib_a-mbtowc-lock.o libgettextlib_a-printf-args.o libgettextlib_a-printf-parse.o libgettextlib_a-snprintf.o libgettextlib_a-strerror_r.o libgettextlib_a-strstr.o libgettextlib_a-vasnprintf.o libgettextlib_a-vsnprintf.o
+gl_libgettextlib_LTLIBOBJS =  libgettextlib_la-asnprintf.lo libgettextlib_la-fnmatch.lo libgettextlib_la-fopen.lo libgettextlib_la-frexp.lo libgettextlib_la-frexpl.lo libgettextlib_la-isnand.lo libgettextlib_la-isnanf.lo libgettextlib_la-isnanl.lo libgettextlib_la-lc-charset-dispatch.lo libgettextlib_la-mbsrtoc32s-state.lo libgettextlib_la-mbsrtowcs-state.lo libgettextlib_la-mbtowc-lock.lo libgettextlib_la-printf-args.lo libgettextlib_la-printf-parse.lo libgettextlib_la-snprintf.lo libgettextlib_la-strerror_r.lo libgettextlib_la-strstr.lo libgettextlib_la-vasnprintf.lo libgettextlib_la-vsnprintf.lo
 gltests_LIBOBJDEPS = 
 gltests_LIBOBJS = 
 gltests_LTLIBOBJS = 
@@ -4142,12 +4142,12 @@ grgltests_WITNESS = IN_GETTEXT_TOOLS_GNULIB_TESTS
 grgltests_libgnu_LIBOBJDEPS = 
 grgltests_libgnu_LIBOBJS = 
 grgltests_libgnu_LTLIBOBJS = 
-gtpo_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/fopen.Plo $(DEPDIR)/frexp.Plo $(DEPDIR)/frexpl.Plo $(DEPDIR)/isnanf.Plo $(DEPDIR)/isnanl.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/strerror_r.Plo $(DEPDIR)/strstr.Plo $(DEPDIR)/vasnprintf.Plo
-gtpo_LIBOBJS =  asnprintf.o fopen.o frexp.o frexpl.o isnanf.o isnanl.o printf-args.o printf-parse.o strerror_r.o strstr.o vasnprintf.o
-gtpo_LTLIBOBJS =  asnprintf.lo fopen.lo frexp.lo frexpl.lo isnanf.lo isnanl.lo printf-args.lo printf-parse.lo strerror_r.lo strstr.lo vasnprintf.lo
-gtpo_libgnu_LIBOBJDEPS =  $(DEPDIR)/libgnu_la-asnprintf.Plo $(DEPDIR)/libgnu_la-fopen.Plo $(DEPDIR)/libgnu_la-frexp.Plo $(DEPDIR)/libgnu_la-frexpl.Plo $(DEPDIR)/libgnu_la-isnanf.Plo $(DEPDIR)/libgnu_la-isnanl.Plo $(DEPDIR)/libgnu_la-printf-args.Plo $(DEPDIR)/libgnu_la-printf-parse.Plo $(DEPDIR)/libgnu_la-strerror_r.Plo $(DEPDIR)/libgnu_la-strstr.Plo $(DEPDIR)/libgnu_la-vasnprintf.Plo
-gtpo_libgnu_LIBOBJS =  libgnu_a-asnprintf.o libgnu_a-fopen.o libgnu_a-frexp.o libgnu_a-frexpl.o libgnu_a-isnanf.o libgnu_a-isnanl.o libgnu_a-printf-args.o libgnu_a-printf-parse.o libgnu_a-strerror_r.o libgnu_a-strstr.o libgnu_a-vasnprintf.o
-gtpo_libgnu_LTLIBOBJS =  libgnu_la-asnprintf.lo libgnu_la-fopen.lo libgnu_la-frexp.lo libgnu_la-frexpl.lo libgnu_la-isnanf.lo libgnu_la-isnanl.lo libgnu_la-printf-args.lo libgnu_la-printf-parse.lo libgnu_la-strerror_r.lo libgnu_la-strstr.lo libgnu_la-vasnprintf.lo
+gtpo_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/fopen.Plo $(DEPDIR)/frexp.Plo $(DEPDIR)/frexpl.Plo $(DEPDIR)/isnanf.Plo $(DEPDIR)/isnanl.Plo $(DEPDIR)/lc-charset-dispatch.Plo $(DEPDIR)/mbtowc-lock.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/strerror_r.Plo $(DEPDIR)/strstr.Plo $(DEPDIR)/vasnprintf.Plo
+gtpo_LIBOBJS =  asnprintf.o fopen.o frexp.o frexpl.o isnanf.o isnanl.o lc-charset-dispatch.o mbtowc-lock.o printf-args.o printf-parse.o strerror_r.o strstr.o vasnprintf.o
+gtpo_LTLIBOBJS =  asnprintf.lo fopen.lo frexp.lo frexpl.lo isnanf.lo isnanl.lo lc-charset-dispatch.lo mbtowc-lock.lo printf-args.lo printf-parse.lo strerror_r.lo strstr.lo vasnprintf.lo
+gtpo_libgnu_LIBOBJDEPS =  $(DEPDIR)/libgnu_la-asnprintf.Plo $(DEPDIR)/libgnu_la-fopen.Plo $(DEPDIR)/libgnu_la-frexp.Plo $(DEPDIR)/libgnu_la-frexpl.Plo $(DEPDIR)/libgnu_la-isnanf.Plo $(DEPDIR)/libgnu_la-isnanl.Plo $(DEPDIR)/libgnu_la-lc-charset-dispatch.Plo $(DEPDIR)/libgnu_la-mbtowc-lock.Plo $(DEPDIR)/libgnu_la-printf-args.Plo $(DEPDIR)/libgnu_la-printf-parse.Plo $(DEPDIR)/libgnu_la-strerror_r.Plo $(DEPDIR)/libgnu_la-strstr.Plo $(DEPDIR)/libgnu_la-vasnprintf.Plo
+gtpo_libgnu_LIBOBJS =  libgnu_a-asnprintf.o libgnu_a-fopen.o libgnu_a-frexp.o libgnu_a-frexpl.o libgnu_a-isnanf.o libgnu_a-isnanl.o libgnu_a-lc-charset-dispatch.o libgnu_a-mbtowc-lock.o libgnu_a-printf-args.o libgnu_a-printf-parse.o libgnu_a-strerror_r.o libgnu_a-strstr.o libgnu_a-vasnprintf.o
+gtpo_libgnu_LTLIBOBJS =  libgnu_la-asnprintf.lo libgnu_la-fopen.lo libgnu_la-frexp.lo libgnu_la-frexpl.lo libgnu_la-isnanf.lo libgnu_la-isnanl.lo libgnu_la-lc-charset-dispatch.lo libgnu_la-mbtowc-lock.lo libgnu_la-printf-args.lo libgnu_la-printf-parse.lo libgnu_la-strerror_r.lo libgnu_la-strstr.lo libgnu_la-vasnprintf.lo
 gtpotests_LIBOBJDEPS = 
 gtpotests_LIBOBJS = 
 gtpotests_LTLIBOBJS = 
@@ -4282,37 +4282,37 @@ LOG_COMPILER = $(SHELL) $(srcdir)/run-test
 # Note that Automake's $(DEFAULT_INCLUDES) already contains
 # -I. -I$(srcdir) -I$(top_builddir).
 AM_CPPFLAGS = 
-#TESTS = intl-1 intl-2 intl-3 intl-4 intl-5 \
-#	intl-setlocale-1 intl-setlocale-2 \
-#	intl-thread-1 intl-thread-2 intl-thread-3 \
-#	format-c-3 format-c-4 format-c-5 plural-1
+TESTS = intl-1 intl-2 intl-3 intl-4 intl-5 \
+	intl-setlocale-1 intl-setlocale-2 \
+	intl-thread-1 intl-thread-2 intl-thread-3 \
+	format-c-3 format-c-4 format-c-5 plural-1
 
-#testlocale_SOURCES = testlocale.c
-#intl_1_prg_SOURCES = intl-1-prg.c
-#intl_3_prg_SOURCES = intl-3-prg.c
-#intl_4_prg_SOURCES = intl-4-prg.c
-#intl_5_prg_SOURCES = intl-5-prg.c
-#intl_setlocale_1_prg_SOURCES = intl-setlocale-1-prg.c
-#intl_setlocale_2_prg_SOURCES = intl-setlocale-2-prg.c
-#intl_thread_1_prg_SOURCES = intl-thread-1-prg.c
-#intl_thread_1_prg_CFLAGS = $(intl_thread_1_prg_CFLAGS_0)
-#intl_thread_1_prg_CFLAGS_1 = -DUSE_POSIX_THREADS
-#intl_thread_1_prg_LDADD = $(LDADD) $(intl_thread_1_prg_LDADD_0)
-#intl_thread_1_prg_LDADD_1 = -lpthread
-#intl_thread_2_prg_SOURCES = intl-thread-2-prg.c
-#intl_thread_2_prg_CFLAGS = $(intl_thread_2_prg_CFLAGS_0)
-#intl_thread_2_prg_CFLAGS_1 = -DUSE_POSIX_THREADS
-#intl_thread_2_prg_LDADD = $(LDADD) $(intl_thread_2_prg_LDADD_0)
-#intl_thread_2_prg_LDADD_1 = -lpthread
-#intl_thread_3_prg_SOURCES = intl-thread-3-prg.c
-#intl_thread_3_prg_CFLAGS = $(intl_thread_3_prg_CFLAGS_0)
-#intl_thread_3_prg_CFLAGS_1 = -DUSE_POSIX_THREADS
-#intl_thread_3_prg_LDADD = $(LDADD) $(intl_thread_3_prg_LDADD_0)
-#intl_thread_3_prg_LDADD_1 = -lpthread
-#cake_SOURCES = plural-1-prg.c
-#fc3_SOURCES = format-c-3-prg.c
-#fc4_SOURCES = format-c-4-prg.c
-#fc5_SOURCES = format-c-5-prg.c
+testlocale_SOURCES = testlocale.c
+intl_1_prg_SOURCES = intl-1-prg.c
+intl_3_prg_SOURCES = intl-3-prg.c
+intl_4_prg_SOURCES = intl-4-prg.c
+intl_5_prg_SOURCES = intl-5-prg.c
+intl_setlocale_1_prg_SOURCES = intl-setlocale-1-prg.c
+intl_setlocale_2_prg_SOURCES = intl-setlocale-2-prg.c
+intl_thread_1_prg_SOURCES = intl-thread-1-prg.c
+intl_thread_1_prg_CFLAGS = $(intl_thread_1_prg_CFLAGS_0)
+intl_thread_1_prg_CFLAGS_1 = -DUSE_POSIX_THREADS
+intl_thread_1_prg_LDADD = $(LDADD) $(intl_thread_1_prg_LDADD_0)
+intl_thread_1_prg_LDADD_1 = -lpthread
+intl_thread_2_prg_SOURCES = intl-thread-2-prg.c
+intl_thread_2_prg_CFLAGS = $(intl_thread_2_prg_CFLAGS_0)
+intl_thread_2_prg_CFLAGS_1 = -DUSE_POSIX_THREADS
+intl_thread_2_prg_LDADD = $(LDADD) $(intl_thread_2_prg_LDADD_0)
+intl_thread_2_prg_LDADD_1 = -lpthread
+intl_thread_3_prg_SOURCES = intl-thread-3-prg.c
+intl_thread_3_prg_CFLAGS = $(intl_thread_3_prg_CFLAGS_0)
+intl_thread_3_prg_CFLAGS_1 = -DUSE_POSIX_THREADS
+intl_thread_3_prg_LDADD = $(LDADD) $(intl_thread_3_prg_LDADD_0)
+intl_thread_3_prg_LDADD_1 = -lpthread
+cake_SOURCES = plural-1-prg.c
+fc3_SOURCES = format-c-3-prg.c
+fc4_SOURCES = format-c-4-prg.c
+fc5_SOURCES = format-c-5-prg.c
 all: all-am
 
 .SUFFIXES:
@@ -5023,7 +5023,7 @@ uninstall-am:
 
 .PRECIOUS: Makefile
 
-#.PHONY: $(TESTS)
+.PHONY: $(TESTS)
 
 # Clean up after Solaris cc.
 clean-local:

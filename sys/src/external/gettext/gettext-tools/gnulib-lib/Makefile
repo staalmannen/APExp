@@ -417,15 +417,15 @@ am__append_23 = free.c
 am__append_24 = fseterr.c
 #am__append_25 = fstat.c
 am__append_26 = fstatat.c
-#am__append_27 = ftell.c
-#am__append_28 = ftello.c
+am__append_27 = ftell.c
+am__append_28 = ftello.c
 am__append_29 = getaddrinfo.c
 #am__append_30 = gai_strerror.c
 am__append_31 = getcwd.c
 am__append_32 = getcwd-lgpl.c
-#am__append_33 = getdelim.c
+am__append_33 = getdelim.c
 #am__append_34 = getdtablesize.c
-#am__append_35 = getline.c
+am__append_35 = getline.c
 #am__append_36 = getlocalename_l-unsafe.c
 am__append_37 = getlocalename_l-unsafe.c
 am__append_38 = getopt.c getopt1.c
@@ -455,7 +455,7 @@ am__append_53 = iswctype.c
 am__append_57 = libxml_rpl.la
 am__append_58 = libxml_rpl.la
 am__append_59 = libxml_rpl.la
-am__append_60 = localeconv.c
+#am__append_60 = localeconv.c
 #am__append_61 = localename-unsafe.c
 am__append_62 = localename-unsafe.c
 #am__append_63 = localtime.c
@@ -464,9 +464,9 @@ am__append_65 = lseek.c
 am__append_66 = lstat.c
 am__append_67 = mbrtoc32.c
 am__append_68 = mbrtowc.c
-#am__append_69 = mbsinit.c
+am__append_69 = mbsinit.c
 am__append_70 = mbsrtowcs.c
-#am__append_71 = mbtowc.c
+am__append_71 = mbtowc.c
 #am__append_72 = memchr.c
 #am__append_73 = memcmp.c
 #am__append_74 = memmove.c
@@ -504,7 +504,7 @@ am__append_104 = rawmemchr.c
 #am__append_106 = readdir.c
 am__append_107 = readlink.c
 #am__append_108 = realloc.c
-am__append_109 = reallocarray.c
+#am__append_109 = reallocarray.c
 #am__append_110 = progreloc.c
 #am__append_111 = rewinddir.c
 am__append_112 = rmdir.c
@@ -1231,19 +1231,19 @@ am__objects_23 =  \
 #am__objects_24 = libgettextlib_la-fstat.lo
 am__objects_25 =  \
 	libgettextlib_la-fstatat.lo
-#am__objects_26 = libgettextlib_la-ftell.lo
-#am__objects_27 = libgettextlib_la-ftello.lo
+am__objects_26 = libgettextlib_la-ftell.lo
+am__objects_27 = libgettextlib_la-ftello.lo
 am__objects_28 =  \
 	libgettextlib_la-getaddrinfo.lo
 #am__objects_29 = libgettextlib_la-gai_strerror.lo
 am__objects_30 = libgettextlib_la-getcwd.lo
 am__objects_31 =  \
 	libgettextlib_la-getcwd-lgpl.lo
-#am__objects_32 =  \
-#	libgettextlib_la-getdelim.lo
+am__objects_32 =  \
+	libgettextlib_la-getdelim.lo
 #am__objects_33 = libgettextlib_la-getdtablesize.lo
-#am__objects_34 =  \
-#	libgettextlib_la-getline.lo
+am__objects_34 =  \
+	libgettextlib_la-getline.lo
 #am__objects_35 = libgettextlib_la-getlocalename_l-unsafe.lo
 am__objects_36 = libgettextlib_la-getlocalename_l-unsafe.lo
 am__objects_37 = libgettextlib_la-getopt.lo \
@@ -1277,8 +1277,8 @@ am__objects_49 =  \
 #	libgettextlib_la-iswpunct.lo
 #am__objects_52 =  \
 #	libgettextlib_la-iswxdigit.lo
-am__objects_53 =  \
-	libgettextlib_la-localeconv.lo
+#am__objects_53 =  \
+#	libgettextlib_la-localeconv.lo
 #am__objects_54 = libgettextlib_la-localename-unsafe.lo
 am__objects_55 = libgettextlib_la-localename-unsafe.lo
 #am__objects_56 =  \
@@ -1290,11 +1290,11 @@ am__objects_60 =  \
 	libgettextlib_la-mbrtoc32.lo
 am__objects_61 =  \
 	libgettextlib_la-mbrtowc.lo
-#am__objects_62 =  \
-#	libgettextlib_la-mbsinit.lo
+am__objects_62 =  \
+	libgettextlib_la-mbsinit.lo
 am__objects_63 =  \
 	libgettextlib_la-mbsrtowcs.lo
-#am__objects_64 = libgettextlib_la-mbtowc.lo
+am__objects_64 = libgettextlib_la-mbtowc.lo
 #am__objects_65 = libgettextlib_la-memchr.lo
 #am__objects_66 = libgettextlib_la-memcmp.lo
 #am__objects_67 =  \
@@ -1343,7 +1343,7 @@ am__objects_100 =  \
 	libgettextlib_la-readlink.lo
 #am__objects_101 =  \
 #	libgettextlib_la-realloc.lo
-am__objects_102 = libgettextlib_la-reallocarray.lo
+#am__objects_102 = libgettextlib_la-reallocarray.lo
 #am__objects_103 =  \
 #	libgettextlib_la-progreloc.lo
 #am__objects_104 =  \
@@ -2339,7 +2339,7 @@ ARCHIVE_VERSION = 1.0
 ARFLAGS = cr
 AS = as
 ASM_SYMBOL_PREFIX = ""
-ASSERT_H = assert.h
+ASSERT_H = 
 AUGMENT_SHLIBPATH = 
 AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing' autoconf
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing' autoheader
@@ -2348,11 +2348,11 @@ AWK = awk
 BISON_LOCALEDIR = ${datarootdir}/locale
 BISON_LOCALEDIR_c = "/usr/local/share/locale"
 BISON_LOCALEDIR_c_make = \"$(BISON_LOCALEDIR)\"
-BITSIZEOF_PTRDIFF_T = 64
-BITSIZEOF_SIG_ATOMIC_T = 32
-BITSIZEOF_SIZE_T = 32
-BITSIZEOF_WCHAR_T = 16
-BITSIZEOF_WINT_T = 32
+BITSIZEOF_PTRDIFF_T = 0
+BITSIZEOF_SIG_ATOMIC_T = 0
+BITSIZEOF_SIZE_T = 0
+BITSIZEOF_WCHAR_T = 0
+BITSIZEOF_WINT_T = 0
 BUILDCSHARP = no
 BUILDD = no
 BUILDJAVA = no
@@ -4219,8 +4219,8 @@ GL_GTTGL_GNULIB_WCTOMB = 0
 GL_GTTGL_GNULIB__EXIT = 0
 GMSGFMT = :
 GMSGFMT_015 = :
-GNULIBHEADERS_OVERRIDE_CHAR16_T = 1
-GNULIBHEADERS_OVERRIDE_CHAR32_T = 1
+GNULIBHEADERS_OVERRIDE_CHAR16_T = 0
+GNULIBHEADERS_OVERRIDE_CHAR32_T = 0
 GNULIBHEADERS_OVERRIDE_CHAR8_T = 1
 GNULIBHEADERS_OVERRIDE_WINT_T = 0
 GNULIB_LOCALEDIR = ${datarootdir}/locale
@@ -4247,8 +4247,8 @@ HAVE_ATANL = 1
 HAVE_ATOLL = 1
 HAVE_BLKCNT_T = 1
 HAVE_BLKSIZE_T = 1
-HAVE_BTOWC = 0
-HAVE_C32RTOMB = 0
+HAVE_BTOWC = 1
+HAVE_C32RTOMB = 1
 HAVE_C99_STDINT_H = 0
 HAVE_CANONICALIZE_FILE_NAME = 0
 HAVE_CBRT = 1
@@ -4278,13 +4278,13 @@ HAVE_DECL_CEILF = 1
 HAVE_DECL_CEILL = 1
 HAVE_DECL_COSL = 1
 HAVE_DECL_DIRFD = 1
-HAVE_DECL_ECVT = 0
+HAVE_DECL_ECVT = 1
 HAVE_DECL_ENVIRON = 0
 HAVE_DECL_EXECVPE = 0
 HAVE_DECL_EXPL = 1
 HAVE_DECL_FCHDIR = 1
 HAVE_DECL_FCLOSEALL = 0
-HAVE_DECL_FCVT = 0
+HAVE_DECL_FCVT = 1
 HAVE_DECL_FDATASYNC = 1
 HAVE_DECL_FDOPENDIR = 0
 HAVE_DECL_FLOORF = 1
@@ -4295,7 +4295,7 @@ HAVE_DECL_FREXPL = 1
 HAVE_DECL_FSEEKO = 1
 HAVE_DECL_FTELLO = 1
 HAVE_DECL_GAI_STRERROR = 1
-HAVE_DECL_GCVT = 0
+HAVE_DECL_GCVT = 1
 HAVE_DECL_GETADDRINFO = 1
 HAVE_DECL_GETDELIM = 1
 HAVE_DECL_GETDOMAINNAME = 1
@@ -4350,7 +4350,7 @@ HAVE_DECL_TRUNCL = 1
 HAVE_DECL_TTYNAME_R = 1
 HAVE_DECL_UNSETENV = 1
 HAVE_DECL_VSNPRINTF = 1
-HAVE_DECL_WCSDUP = 0
+HAVE_DECL_WCSDUP = 1
 HAVE_DECL_WCWIDTH = 1
 HAVE_DIRENT_H = 1
 HAVE_DOTNET = 
@@ -4392,7 +4392,7 @@ HAVE_FMAF = 1
 HAVE_FMAL = 1
 HAVE_FMODF = 1
 HAVE_FMODL = 1
-HAVE_FNMATCH = 1
+HAVE_FNMATCH = 0
 HAVE_FNMATCH_H = 1
 HAVE_FREELOCALE = 0
 HAVE_FREXPF = 1
@@ -4490,15 +4490,15 @@ HAVE_LOGP1F = 1
 HAVE_LOGP1L = 1
 HAVE_LSTAT = 1
 HAVE_MAX_ALIGN_T = 0
-HAVE_MBRLEN = 1
+HAVE_MBRLEN = 0
 HAVE_MBRTOC16 = 1
 HAVE_MBRTOC32 = 0
-HAVE_MBRTOWC = 1
+HAVE_MBRTOWC = 0
 HAVE_MBSINIT = 1
 HAVE_MBSLEN = 0
 HAVE_MBSNRTOWCS = 1
-HAVE_MBSRTOWCS = 1
-HAVE_MBTOWC = 1
+HAVE_MBSRTOWCS = 0
+HAVE_MBTOWC = 0
 HAVE_MCS = 
 HAVE_MCS_IN_PATH = 
 HAVE_MEMPCPY = 1
@@ -4536,10 +4536,10 @@ HAVE_POSIX_MEMALIGN = 1
 HAVE_POSIX_OPENPT = 1
 HAVE_POSIX_SIGNALBLOCKING = 1
 HAVE_POSIX_SPAWN = 1
-HAVE_POSIX_SPAWNATTR_T = 0
+HAVE_POSIX_SPAWNATTR_T = 1
 HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR = 0
 HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDFCHDIR = 1
-HAVE_POSIX_SPAWN_FILE_ACTIONS_T = 0
+HAVE_POSIX_SPAWN_FILE_ACTIONS_T = 1
 HAVE_POWF = 1
 HAVE_PREAD = 1
 HAVE_PSELECT = 1
@@ -4613,7 +4613,7 @@ HAVE_RAWMEMCHR = 0
 HAVE_READDIR = 1
 HAVE_READLINK = 1
 HAVE_READLINKAT = 1
-HAVE_REALLOCARRAY = 0
+HAVE_REALLOCARRAY = 1
 HAVE_REALPATH = 1
 HAVE_REMAINDER = 1
 HAVE_REMAINDERF = 1
@@ -4656,7 +4656,7 @@ HAVE_SINF = 1
 HAVE_SINHF = 1
 HAVE_SINL = 1
 HAVE_SLEEP = 1
-HAVE_SPAWN_H = 0
+HAVE_SPAWN_H = 1
 HAVE_SQRTF = 1
 HAVE_SQRTL = 1
 HAVE_STDCKDINT_H = 0
@@ -4721,7 +4721,7 @@ HAVE_TOTALORDERMAGL = 1
 HAVE_TOUPPER_L = 1
 HAVE_TYPE_VOLATILE_SIG_ATOMIC_T = 1
 HAVE_TZALLOC = 0
-HAVE_UCHAR_H = 0
+HAVE_UCHAR_H = 1
 HAVE_UNISTD_H = 1
 HAVE_UNISTRING_WOE32DLL_H = 0
 HAVE_UNLINKAT = 1
@@ -4761,7 +4761,7 @@ HAVE_WCSSTR = 1
 HAVE_WCSTOK = 1
 HAVE_WCSWIDTH = 1
 HAVE_WCSXFRM = 1
-HAVE_WCTOB = 0
+HAVE_WCTOB = 1
 HAVE_WCTRANS_T = 1
 HAVE_WCTYPE_H = 1
 HAVE_WCTYPE_T = 1
@@ -4774,7 +4774,7 @@ HAVE_WMEMCPY = 1
 HAVE_WMEMMOVE = 1
 HAVE_WMEMPCPY = 0
 HAVE_WMEMSET = 1
-HAVE_WORKING_C32RTOMB = 0
+HAVE_WORKING_C32RTOMB = 1
 HAVE_WORKING_CXX_STDCKDINT_H = 0
 HAVE_WORKING_C_STDCKDINT_H = 0
 HAVE_WORKING_MBRTOC32 = 0
@@ -4784,7 +4784,7 @@ HAVE__EXIT = 1
 HOSTENT_LIB = 
 HTONL_LIB = 
 ICONV_CONST = 
-ICONV_H = iconv.h
+ICONV_H = 
 INCCURL = 
 INCJSON_C = 
 INCLUDE_NEXT = include_next
@@ -4793,7 +4793,7 @@ INCXML =
 INET_NTOP_LIB = 
 INET_PTON_LIB = 
 INSTALL = /bin/install -c
-INSTALLED_LIBGETTEXTPO_DEPS = -lintl   
+INSTALLED_LIBGETTEXTPO_DEPS = 
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_PROGRAM_ENV = 
@@ -4820,7 +4820,7 @@ LIBDL =
 LIBGNU_LIBDEPS = 
 LIBGNU_LTLIBDEPS = 
 LIBICONV = 
-LIBINTL = ${top_builddir}/../gettext-runtime/intl/libintl.la  
+LIBINTL = 
 LIBJSON_C = 
 LIBMULTITHREAD = 
 LIBOBJS = 
@@ -4880,7 +4880,7 @@ LOCALE_TR_UTF8 = none
 LOCALE_ZH_CN = none
 LOG10_LIBM = 
 LTLIBICONV = 
-LTLIBINTL = ${top_builddir}/../gettext-runtime/intl/libintl.la  
+LTLIBINTL = 
 LTLIBMULTITHREAD = 
 LTLIBOBJS = 
 LTLIBTEXTSTYLE = 
@@ -4904,9 +4904,9 @@ MSGMERGE_LIBM =
 NANOSLEEP_LIB = 
 NETINET_IN_H = 
 NEXT_ARPA_INET_H = <arpa/inet.h>
-NEXT_ASSERT_H = <assert.h>
+NEXT_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_ARPA_INET_H = <arpa/inet.h>
-NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = <assert.h>
+NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_CTYPE_H = <ctype.h>
 NEXT_AS_FIRST_DIRECTIVE_DIRENT_H = <dirent.h>
 NEXT_AS_FIRST_DIRECTIVE_ENDIAN_H = <endian.h>
@@ -5052,8 +5052,8 @@ REPLACE_ALIGNED_ALLOC = 0
 REPLACE_ASINF = 0
 REPLACE_ATAN2F = 0
 REPLACE_ATANF = 0
-REPLACE_BTOWC = 0
-REPLACE_C32RTOMB = 0
+REPLACE_BTOWC = 1
+REPLACE_C32RTOMB = 1
 REPLACE_CALLOC_FOR_CALLOC_GNU = 0
 REPLACE_CALLOC_FOR_CALLOC_POSIX = 0
 REPLACE_CANONICALIZE_FILE_NAME = 0
@@ -5114,14 +5114,14 @@ REPLACE_FMAL = 0
 REPLACE_FMOD = 0
 REPLACE_FMODF = 0
 REPLACE_FMODL = 0
-REPLACE_FNMATCH = 1
+REPLACE_FNMATCH = 0
 REPLACE_FOPEN = 1
 REPLACE_FOPEN_FOR_FOPEN_GNU = 1
 REPLACE_FPRINTF = 0
 REPLACE_FPURGE = 0
 REPLACE_FREE = 1
 REPLACE_FREELOCALE = 0
-REPLACE_FREOPEN = 0
+REPLACE_FREOPEN = 1
 REPLACE_FREXP = 1
 REPLACE_FREXPF = 0
 REPLACE_FREXPL = 1
@@ -5129,19 +5129,19 @@ REPLACE_FSEEK = 1
 REPLACE_FSEEKO = 1
 REPLACE_FSTAT = 0
 REPLACE_FSTATAT = 1
-REPLACE_FTELL = 0
-REPLACE_FTELLO = 0
+REPLACE_FTELL = 1
+REPLACE_FTELLO = 1
 REPLACE_FTRUNCATE = 0
 REPLACE_FUTIMENS = 0
 REPLACE_GAI_STRERROR = 0
 REPLACE_GETADDRINFO = 1
 REPLACE_GETCWD = 1
-REPLACE_GETDELIM = 0
+REPLACE_GETDELIM = 1
 REPLACE_GETDOMAINNAME = 0
 REPLACE_GETDTABLESIZE = 0
 REPLACE_GETENTROPY = 0
 REPLACE_GETGROUPS = 0
-REPLACE_GETLINE = 0
+REPLACE_GETLINE = 1
 REPLACE_GETLOADAVG = 0
 REPLACE_GETLOCALENAME_L = 0
 REPLACE_GETLOGIN = 0
@@ -5189,7 +5189,7 @@ REPLACE_LDEXP = 0
 REPLACE_LDEXPL = 0
 REPLACE_LINK = 0
 REPLACE_LINKAT = 0
-REPLACE_LOCALECONV = 1
+REPLACE_LOCALECONV = 0
 REPLACE_LOCALTIME = 0
 REPLACE_LOCALTIME_R = 0
 REPLACE_LOCALTIME_RZ = 0
@@ -5216,10 +5216,10 @@ REPLACE_MBRLEN = 1
 REPLACE_MBRTOC16 = 0
 REPLACE_MBRTOC32 = 0
 REPLACE_MBRTOWC = 1
-REPLACE_MBSINIT = 0
+REPLACE_MBSINIT = 1
 REPLACE_MBSNRTOWCS = 0
 REPLACE_MBSRTOWCS = 1
-REPLACE_MBSTATE_T = 0
+REPLACE_MBSTATE_T = 1
 REPLACE_MBSTOWCS = 0
 REPLACE_MBTOWC = 0
 REPLACE_MB_CUR_MAX = 0
@@ -5389,7 +5389,7 @@ REPLACE_STRTOLL = 0
 REPLACE_STRTOUL = 1
 REPLACE_STRTOULL = 0
 REPLACE_STRTOUMAX = 0
-REPLACE_STRUCT_LCONV = 1
+REPLACE_STRUCT_LCONV = 0
 REPLACE_STRUCT_TIMEVAL = 0
 REPLACE_STRVERSCMP = 0
 REPLACE_SYMLINK = 1
@@ -5426,7 +5426,7 @@ REPLACE_VFPRINTF = 0
 REPLACE_VPRINTF = 0
 REPLACE_VSNPRINTF = 1
 REPLACE_VSPRINTF = 0
-REPLACE_WCRTOMB = 0
+REPLACE_WCRTOMB = 1
 REPLACE_WCSCMP = 0
 REPLACE_WCSFTIME = 0
 REPLACE_WCSNCAT = 0
@@ -5487,7 +5487,7 @@ UNISTD_H_HAVE_SYS_RANDOM_H = 0
 UNISTD_H_HAVE_WINSOCK2_H = 0
 UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS = 0
 USE_ACL = 0
-USE_INCLUDED_LIBINTL = yes
+USE_INCLUDED_LIBINTL = no
 USE_NLS = yes
 USE_SELINUX_SELINUX_H = 0
 VERSION = 0.22.5
@@ -5548,12 +5548,12 @@ dvidir_c_make = \"$(dvidir)\"
 exec_prefix = ${prefix}
 exec_prefix_c = "/usr/local"
 exec_prefix_c_make = \"$(exec_prefix)\"
-gl_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/fnmatch.Plo $(DEPDIR)/fopen.Plo $(DEPDIR)/frexp.Plo $(DEPDIR)/frexpl.Plo $(DEPDIR)/isnand.Plo $(DEPDIR)/isnanf.Plo $(DEPDIR)/isnanl.Plo $(DEPDIR)/mbsrtoc32s-state.Plo $(DEPDIR)/mbsrtowcs-state.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/snprintf.Plo $(DEPDIR)/strerror_r.Plo $(DEPDIR)/strstr.Plo $(DEPDIR)/vasnprintf.Plo $(DEPDIR)/vsnprintf.Plo
-gl_LIBOBJS =  asnprintf.o fnmatch.o fopen.o frexp.o frexpl.o isnand.o isnanf.o isnanl.o mbsrtoc32s-state.o mbsrtowcs-state.o printf-args.o printf-parse.o snprintf.o strerror_r.o strstr.o vasnprintf.o vsnprintf.o
-gl_LTLIBOBJS =  asnprintf.lo fnmatch.lo fopen.lo frexp.lo frexpl.lo isnand.lo isnanf.lo isnanl.lo mbsrtoc32s-state.lo mbsrtowcs-state.lo printf-args.lo printf-parse.lo snprintf.lo strerror_r.lo strstr.lo vasnprintf.lo vsnprintf.lo
-gl_libgettextlib_LIBOBJDEPS =  $(DEPDIR)/libgettextlib_la-asnprintf.Plo $(DEPDIR)/libgettextlib_la-fnmatch.Plo $(DEPDIR)/libgettextlib_la-fopen.Plo $(DEPDIR)/libgettextlib_la-frexp.Plo $(DEPDIR)/libgettextlib_la-frexpl.Plo $(DEPDIR)/libgettextlib_la-isnand.Plo $(DEPDIR)/libgettextlib_la-isnanf.Plo $(DEPDIR)/libgettextlib_la-isnanl.Plo $(DEPDIR)/libgettextlib_la-mbsrtoc32s-state.Plo $(DEPDIR)/libgettextlib_la-mbsrtowcs-state.Plo $(DEPDIR)/libgettextlib_la-printf-args.Plo $(DEPDIR)/libgettextlib_la-printf-parse.Plo $(DEPDIR)/libgettextlib_la-snprintf.Plo $(DEPDIR)/libgettextlib_la-strerror_r.Plo $(DEPDIR)/libgettextlib_la-strstr.Plo $(DEPDIR)/libgettextlib_la-vasnprintf.Plo $(DEPDIR)/libgettextlib_la-vsnprintf.Plo
-gl_libgettextlib_LIBOBJS =  libgettextlib_a-asnprintf.o libgettextlib_a-fnmatch.o libgettextlib_a-fopen.o libgettextlib_a-frexp.o libgettextlib_a-frexpl.o libgettextlib_a-isnand.o libgettextlib_a-isnanf.o libgettextlib_a-isnanl.o libgettextlib_a-mbsrtoc32s-state.o libgettextlib_a-mbsrtowcs-state.o libgettextlib_a-printf-args.o libgettextlib_a-printf-parse.o libgettextlib_a-snprintf.o libgettextlib_a-strerror_r.o libgettextlib_a-strstr.o libgettextlib_a-vasnprintf.o libgettextlib_a-vsnprintf.o
-gl_libgettextlib_LTLIBOBJS =  libgettextlib_la-asnprintf.lo libgettextlib_la-fnmatch.lo libgettextlib_la-fopen.lo libgettextlib_la-frexp.lo libgettextlib_la-frexpl.lo libgettextlib_la-isnand.lo libgettextlib_la-isnanf.lo libgettextlib_la-isnanl.lo libgettextlib_la-mbsrtoc32s-state.lo libgettextlib_la-mbsrtowcs-state.lo libgettextlib_la-printf-args.lo libgettextlib_la-printf-parse.lo libgettextlib_la-snprintf.lo libgettextlib_la-strerror_r.lo libgettextlib_la-strstr.lo libgettextlib_la-vasnprintf.lo libgettextlib_la-vsnprintf.lo
+gl_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/fnmatch.Plo $(DEPDIR)/fopen.Plo $(DEPDIR)/frexp.Plo $(DEPDIR)/frexpl.Plo $(DEPDIR)/isnand.Plo $(DEPDIR)/isnanf.Plo $(DEPDIR)/isnanl.Plo $(DEPDIR)/lc-charset-dispatch.Plo $(DEPDIR)/mbsrtoc32s-state.Plo $(DEPDIR)/mbsrtowcs-state.Plo $(DEPDIR)/mbtowc-lock.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/snprintf.Plo $(DEPDIR)/strerror_r.Plo $(DEPDIR)/strstr.Plo $(DEPDIR)/vasnprintf.Plo $(DEPDIR)/vsnprintf.Plo
+gl_LIBOBJS =  asnprintf.o fnmatch.o fopen.o frexp.o frexpl.o isnand.o isnanf.o isnanl.o lc-charset-dispatch.o mbsrtoc32s-state.o mbsrtowcs-state.o mbtowc-lock.o printf-args.o printf-parse.o snprintf.o strerror_r.o strstr.o vasnprintf.o vsnprintf.o
+gl_LTLIBOBJS =  asnprintf.lo fnmatch.lo fopen.lo frexp.lo frexpl.lo isnand.lo isnanf.lo isnanl.lo lc-charset-dispatch.lo mbsrtoc32s-state.lo mbsrtowcs-state.lo mbtowc-lock.lo printf-args.lo printf-parse.lo snprintf.lo strerror_r.lo strstr.lo vasnprintf.lo vsnprintf.lo
+gl_libgettextlib_LIBOBJDEPS =  $(DEPDIR)/libgettextlib_la-asnprintf.Plo $(DEPDIR)/libgettextlib_la-fnmatch.Plo $(DEPDIR)/libgettextlib_la-fopen.Plo $(DEPDIR)/libgettextlib_la-frexp.Plo $(DEPDIR)/libgettextlib_la-frexpl.Plo $(DEPDIR)/libgettextlib_la-isnand.Plo $(DEPDIR)/libgettextlib_la-isnanf.Plo $(DEPDIR)/libgettextlib_la-isnanl.Plo $(DEPDIR)/libgettextlib_la-lc-charset-dispatch.Plo $(DEPDIR)/libgettextlib_la-mbsrtoc32s-state.Plo $(DEPDIR)/libgettextlib_la-mbsrtowcs-state.Plo $(DEPDIR)/libgettextlib_la-mbtowc-lock.Plo $(DEPDIR)/libgettextlib_la-printf-args.Plo $(DEPDIR)/libgettextlib_la-printf-parse.Plo $(DEPDIR)/libgettextlib_la-snprintf.Plo $(DEPDIR)/libgettextlib_la-strerror_r.Plo $(DEPDIR)/libgettextlib_la-strstr.Plo $(DEPDIR)/libgettextlib_la-vasnprintf.Plo $(DEPDIR)/libgettextlib_la-vsnprintf.Plo
+gl_libgettextlib_LIBOBJS =  libgettextlib_a-asnprintf.o libgettextlib_a-fnmatch.o libgettextlib_a-fopen.o libgettextlib_a-frexp.o libgettextlib_a-frexpl.o libgettextlib_a-isnand.o libgettextlib_a-isnanf.o libgettextlib_a-isnanl.o libgettextlib_a-lc-charset-dispatch.o libgettextlib_a-mbsrtoc32s-state.o libgettextlib_a-mbsrtowcs-state.o libgettextlib_a-mbtowc-lock.o libgettextlib_a-printf-args.o libgettextlib_a-printf-parse.o libgettextlib_a-snprintf.o libgettextlib_a-strerror_r.o libgettextlib_a-strstr.o libgettextlib_a-vasnprintf.o libgettextlib_a-vsnprintf.o
+gl_libgettextlib_LTLIBOBJS =  libgettextlib_la-asnprintf.lo libgettextlib_la-fnmatch.lo libgettextlib_la-fopen.lo libgettextlib_la-frexp.lo libgettextlib_la-frexpl.lo libgettextlib_la-isnand.lo libgettextlib_la-isnanf.lo libgettextlib_la-isnanl.lo libgettextlib_la-lc-charset-dispatch.lo libgettextlib_la-mbsrtoc32s-state.lo libgettextlib_la-mbsrtowcs-state.lo libgettextlib_la-mbtowc-lock.lo libgettextlib_la-printf-args.lo libgettextlib_la-printf-parse.lo libgettextlib_la-snprintf.lo libgettextlib_la-strerror_r.lo libgettextlib_la-strstr.lo libgettextlib_la-vasnprintf.lo libgettextlib_la-vsnprintf.lo
 gltests_LIBOBJDEPS = 
 gltests_LIBOBJS = 
 gltests_LTLIBOBJS = 
@@ -5574,12 +5574,12 @@ grgltests_WITNESS = IN_GETTEXT_TOOLS_GNULIB_TESTS
 grgltests_libgnu_LIBOBJDEPS = 
 grgltests_libgnu_LIBOBJS = 
 grgltests_libgnu_LTLIBOBJS = 
-gtpo_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/fopen.Plo $(DEPDIR)/frexp.Plo $(DEPDIR)/frexpl.Plo $(DEPDIR)/isnanf.Plo $(DEPDIR)/isnanl.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/strerror_r.Plo $(DEPDIR)/strstr.Plo $(DEPDIR)/vasnprintf.Plo
-gtpo_LIBOBJS =  asnprintf.o fopen.o frexp.o frexpl.o isnanf.o isnanl.o printf-args.o printf-parse.o strerror_r.o strstr.o vasnprintf.o
-gtpo_LTLIBOBJS =  asnprintf.lo fopen.lo frexp.lo frexpl.lo isnanf.lo isnanl.lo printf-args.lo printf-parse.lo strerror_r.lo strstr.lo vasnprintf.lo
-gtpo_libgnu_LIBOBJDEPS =  $(DEPDIR)/libgnu_la-asnprintf.Plo $(DEPDIR)/libgnu_la-fopen.Plo $(DEPDIR)/libgnu_la-frexp.Plo $(DEPDIR)/libgnu_la-frexpl.Plo $(DEPDIR)/libgnu_la-isnanf.Plo $(DEPDIR)/libgnu_la-isnanl.Plo $(DEPDIR)/libgnu_la-printf-args.Plo $(DEPDIR)/libgnu_la-printf-parse.Plo $(DEPDIR)/libgnu_la-strerror_r.Plo $(DEPDIR)/libgnu_la-strstr.Plo $(DEPDIR)/libgnu_la-vasnprintf.Plo
-gtpo_libgnu_LIBOBJS =  libgnu_a-asnprintf.o libgnu_a-fopen.o libgnu_a-frexp.o libgnu_a-frexpl.o libgnu_a-isnanf.o libgnu_a-isnanl.o libgnu_a-printf-args.o libgnu_a-printf-parse.o libgnu_a-strerror_r.o libgnu_a-strstr.o libgnu_a-vasnprintf.o
-gtpo_libgnu_LTLIBOBJS =  libgnu_la-asnprintf.lo libgnu_la-fopen.lo libgnu_la-frexp.lo libgnu_la-frexpl.lo libgnu_la-isnanf.lo libgnu_la-isnanl.lo libgnu_la-printf-args.lo libgnu_la-printf-parse.lo libgnu_la-strerror_r.lo libgnu_la-strstr.lo libgnu_la-vasnprintf.lo
+gtpo_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/fopen.Plo $(DEPDIR)/frexp.Plo $(DEPDIR)/frexpl.Plo $(DEPDIR)/isnanf.Plo $(DEPDIR)/isnanl.Plo $(DEPDIR)/lc-charset-dispatch.Plo $(DEPDIR)/mbtowc-lock.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/strerror_r.Plo $(DEPDIR)/strstr.Plo $(DEPDIR)/vasnprintf.Plo
+gtpo_LIBOBJS =  asnprintf.o fopen.o frexp.o frexpl.o isnanf.o isnanl.o lc-charset-dispatch.o mbtowc-lock.o printf-args.o printf-parse.o strerror_r.o strstr.o vasnprintf.o
+gtpo_LTLIBOBJS =  asnprintf.lo fopen.lo frexp.lo frexpl.lo isnanf.lo isnanl.lo lc-charset-dispatch.lo mbtowc-lock.lo printf-args.lo printf-parse.lo strerror_r.lo strstr.lo vasnprintf.lo
+gtpo_libgnu_LIBOBJDEPS =  $(DEPDIR)/libgnu_la-asnprintf.Plo $(DEPDIR)/libgnu_la-fopen.Plo $(DEPDIR)/libgnu_la-frexp.Plo $(DEPDIR)/libgnu_la-frexpl.Plo $(DEPDIR)/libgnu_la-isnanf.Plo $(DEPDIR)/libgnu_la-isnanl.Plo $(DEPDIR)/libgnu_la-lc-charset-dispatch.Plo $(DEPDIR)/libgnu_la-mbtowc-lock.Plo $(DEPDIR)/libgnu_la-printf-args.Plo $(DEPDIR)/libgnu_la-printf-parse.Plo $(DEPDIR)/libgnu_la-strerror_r.Plo $(DEPDIR)/libgnu_la-strstr.Plo $(DEPDIR)/libgnu_la-vasnprintf.Plo
+gtpo_libgnu_LIBOBJS =  libgnu_a-asnprintf.o libgnu_a-fopen.o libgnu_a-frexp.o libgnu_a-frexpl.o libgnu_a-isnanf.o libgnu_a-isnanl.o libgnu_a-lc-charset-dispatch.o libgnu_a-mbtowc-lock.o libgnu_a-printf-args.o libgnu_a-printf-parse.o libgnu_a-strerror_r.o libgnu_a-strstr.o libgnu_a-vasnprintf.o
+gtpo_libgnu_LTLIBOBJS =  libgnu_la-asnprintf.lo libgnu_la-fopen.lo libgnu_la-frexp.lo libgnu_la-frexpl.lo libgnu_la-isnanf.lo libgnu_la-isnanl.lo libgnu_la-lc-charset-dispatch.lo libgnu_la-mbtowc-lock.lo libgnu_la-printf-args.lo libgnu_la-printf-parse.lo libgnu_la-strerror_r.lo libgnu_la-strstr.lo libgnu_la-vasnprintf.lo
 gtpotests_LIBOBJDEPS = 
 gtpotests_LIBOBJS = 
 gtpotests_LTLIBOBJS = 
@@ -6121,11 +6121,11 @@ EXTRA_libgettextlib_la_SOURCES = calloc.c calloc.c classpath.c \
 # Need $(LTLIBUNISTRING) because ulc_width_linebreaks, uc_width, etc. may be
 # taken from libunistring, when the configure option --with-libunistring-prefix
 # was given.
-# Need ${top_builddir}/../gettext-runtime/intl/libintl.la   because many source files use gettext().
+# Need  because many source files use gettext().
 # Need  because linebreak.c and striconv.c use iconv().
 # Need   because copy-file.c uses acl.h and qcopy_acl.
 # As of 2010-10-04, these are all added by gnulib-tool automatically.
-#libgettextlib_la_LDFLAGS += $(LTLIBUNISTRING) ${top_builddir}/../gettext-runtime/intl/libintl.la     
+#libgettextlib_la_LDFLAGS += $(LTLIBUNISTRING)    
 libgettextlib_la_LDFLAGS = $(AM_LDFLAGS) -no-undefined \
 	$(CLOCK_TIME_LIB) $(FABS_LIBM) $(FILE_HAS_ACL_LIB) \
 	$(GETADDRINFO_LIB) $(GETLOCALENAME_L_LIB) $(GETRANDOM_LIB) \
@@ -12451,22 +12451,22 @@ arpa/inet.h: arpa_inet.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(WARN_ON
 
 # We need the following in order to create <assert.h> when the system
 # doesn't have one that works with the given compiler.
-assert.h: assert.in.h verify.h $(top_builddir)/config.status
-	$(gl_V_at){ $(SED_HEADER_STDOUT) \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
-	      -e 's|@''PRAGMA_COLUMNS''@||g' \
-	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
-	      < $(srcdir)/assert.in.h && \
-	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
-	      -e 's|_gl_verify|_gl_static_assert|g' \
-	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
-	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL\1|g' \
-	      < $(srcdir)/verify.h; \
-	} > $@-t
-	$(AM_V_at)mv $@-t $@
-#assert.h: $(top_builddir)/config.status
-#	rm -f $@
+#assert.h: assert.in.h verify.h $(top_builddir)/config.status
+#	$(gl_V_at){ $(SED_HEADER_STDOUT) \
+#	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+#	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
+#	      -e 's|@''PRAGMA_COLUMNS''@||g' \
+#	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
+#	      < $(srcdir)/assert.in.h && \
+#	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
+#	      -e 's|_gl_verify|_gl_static_assert|g' \
+#	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
+#	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL\1|g' \
+#	      < $(srcdir)/verify.h; \
+#	} > $@-t
+#	$(AM_V_at)mv $@-t $@
+assert.h: $(top_builddir)/config.status
+	rm -f $@
 
 # We need the following in order to create <byteswap.h> when the system
 # doesn't have one.
@@ -12731,25 +12731,25 @@ malloc/scratch_buffer.gl.h: malloc/scratch_buffer.h
 
 # We need the following in order to create <iconv.h> when the system
 # doesn't have one that works with the given compiler.
-iconv.h: iconv.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(WARN_ON_USE_H)
-	$(gl_V_at)$(SED_HEADER_STDOUT) \
-	      -e 's|@''GUARD_PREFIX''@|GL|g' \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
-	      -e 's|@''PRAGMA_COLUMNS''@||g' \
-	      -e 's|@''NEXT_ICONV_H''@|$(NEXT_ICONV_H)|g' \
-	      -e 's/@''GNULIB_ICONV''@/$(GL_GNULIB_ICONV)/g' \
-	      -e 's|@''ICONV_CONST''@|$(ICONV_CONST)|g' \
-	      -e 's|@''REPLACE_ICONV''@|$(REPLACE_ICONV)|g' \
-	      -e 's|@''REPLACE_ICONV_OPEN''@|$(REPLACE_ICONV_OPEN)|g' \
-	      -e 's|@''REPLACE_ICONV_UTF''@|$(REPLACE_ICONV_UTF)|g' \
-	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
-	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
-	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
-	      $(srcdir)/iconv.in.h > $@-t
-	$(AM_V_at)mv $@-t $@
-#iconv.h: $(top_builddir)/config.status
-#	rm -f $@
+#iconv.h: iconv.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(WARN_ON_USE_H)
+#	$(gl_V_at)$(SED_HEADER_STDOUT) \
+#	      -e 's|@''GUARD_PREFIX''@|GL|g' \
+#	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+#	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
+#	      -e 's|@''PRAGMA_COLUMNS''@||g' \
+#	      -e 's|@''NEXT_ICONV_H''@|$(NEXT_ICONV_H)|g' \
+#	      -e 's/@''GNULIB_ICONV''@/$(GL_GNULIB_ICONV)/g' \
+#	      -e 's|@''ICONV_CONST''@|$(ICONV_CONST)|g' \
+#	      -e 's|@''REPLACE_ICONV''@|$(REPLACE_ICONV)|g' \
+#	      -e 's|@''REPLACE_ICONV_OPEN''@|$(REPLACE_ICONV_OPEN)|g' \
+#	      -e 's|@''REPLACE_ICONV_UTF''@|$(REPLACE_ICONV_UTF)|g' \
+#	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
+#	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
+#	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
+#	      $(srcdir)/iconv.in.h > $@-t
+#	$(AM_V_at)mv $@-t $@
+iconv.h: $(top_builddir)/config.status
+	rm -f $@
 
 $(srcdir)/iconv_open-aix.h: $(srcdir)/iconv_open-aix.gperf
 	$(V_GPERF)$(GPERF) -m 10 $(srcdir)/iconv_open-aix.gperf > $(srcdir)/iconv_open-aix.h-t1 \
@@ -15387,7 +15387,7 @@ mostlyclean-local: mostlyclean-generic
 	:
 distclean-local: distclean-gnulib-libobjs
 distclean-gnulib-libobjs:
-	-rm -f  $(DEPDIR)/libgettextlib_la-asnprintf.Plo $(DEPDIR)/libgettextlib_la-fnmatch.Plo $(DEPDIR)/libgettextlib_la-fopen.Plo $(DEPDIR)/libgettextlib_la-frexp.Plo $(DEPDIR)/libgettextlib_la-frexpl.Plo $(DEPDIR)/libgettextlib_la-isnand.Plo $(DEPDIR)/libgettextlib_la-isnanf.Plo $(DEPDIR)/libgettextlib_la-isnanl.Plo $(DEPDIR)/libgettextlib_la-mbsrtoc32s-state.Plo $(DEPDIR)/libgettextlib_la-mbsrtowcs-state.Plo $(DEPDIR)/libgettextlib_la-printf-args.Plo $(DEPDIR)/libgettextlib_la-printf-parse.Plo $(DEPDIR)/libgettextlib_la-snprintf.Plo $(DEPDIR)/libgettextlib_la-strerror_r.Plo $(DEPDIR)/libgettextlib_la-strstr.Plo $(DEPDIR)/libgettextlib_la-vasnprintf.Plo $(DEPDIR)/libgettextlib_la-vsnprintf.Plo
+	-rm -f  $(DEPDIR)/libgettextlib_la-asnprintf.Plo $(DEPDIR)/libgettextlib_la-fnmatch.Plo $(DEPDIR)/libgettextlib_la-fopen.Plo $(DEPDIR)/libgettextlib_la-frexp.Plo $(DEPDIR)/libgettextlib_la-frexpl.Plo $(DEPDIR)/libgettextlib_la-isnand.Plo $(DEPDIR)/libgettextlib_la-isnanf.Plo $(DEPDIR)/libgettextlib_la-isnanl.Plo $(DEPDIR)/libgettextlib_la-lc-charset-dispatch.Plo $(DEPDIR)/libgettextlib_la-mbsrtoc32s-state.Plo $(DEPDIR)/libgettextlib_la-mbsrtowcs-state.Plo $(DEPDIR)/libgettextlib_la-mbtowc-lock.Plo $(DEPDIR)/libgettextlib_la-printf-args.Plo $(DEPDIR)/libgettextlib_la-printf-parse.Plo $(DEPDIR)/libgettextlib_la-snprintf.Plo $(DEPDIR)/libgettextlib_la-strerror_r.Plo $(DEPDIR)/libgettextlib_la-strstr.Plo $(DEPDIR)/libgettextlib_la-vasnprintf.Plo $(DEPDIR)/libgettextlib_la-vsnprintf.Plo
 maintainer-clean-local: distclean-gnulib-libobjs
 # This rule is executed only on Woe32 systems.
 # Use $(RC) with libtool, $(WINDRES) when not using libtool.

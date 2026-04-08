@@ -139,10 +139,10 @@ am__append_4 = fseterr.c
 #am__append_6 = iswdigit.c
 #am__append_7 = iswpunct.c
 #am__append_8 = iswxdigit.c
-am__append_9 = localeconv.c
+#am__append_9 = localeconv.c
 am__append_10 = mbrtoc32.c
 am__append_11 = mbrtowc.c
-#am__append_12 = mbsinit.c
+am__append_12 = mbsinit.c
 #am__append_13 = memchr.c
 am__append_14 = setlocale-lock.c
 #am__append_15 = stdio-read.c
@@ -288,10 +288,10 @@ am__objects_4 = libgnu_la-fseterr.lo
 #am__objects_6 = libgnu_la-iswdigit.lo
 #am__objects_7 = libgnu_la-iswpunct.lo
 #am__objects_8 = libgnu_la-iswxdigit.lo
-am__objects_9 = libgnu_la-localeconv.lo
+#am__objects_9 = libgnu_la-localeconv.lo
 am__objects_10 = libgnu_la-mbrtoc32.lo
 am__objects_11 = libgnu_la-mbrtowc.lo
-#am__objects_12 = libgnu_la-mbsinit.lo
+am__objects_12 = libgnu_la-mbsinit.lo
 #am__objects_13 = libgnu_la-memchr.lo
 am__objects_14 =  \
 	libgnu_la-setlocale-lock.lo
@@ -555,16 +555,16 @@ APPLE_UNIVERSAL_BUILD = 0
 AR = ar
 ARFLAGS = cr
 AS = as
-ASSERT_H = assert.h
+ASSERT_H = 
 AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing' autoconf
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing' autoheader
 AUTOMAKE = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missing' automake-1.18
 AWK = awk
-BITSIZEOF_PTRDIFF_T = 64
-BITSIZEOF_SIG_ATOMIC_T = 32
-BITSIZEOF_SIZE_T = 32
-BITSIZEOF_WCHAR_T = 16
-BITSIZEOF_WINT_T = 32
+BITSIZEOF_PTRDIFF_T = 0
+BITSIZEOF_SIG_ATOMIC_T = 0
+BITSIZEOF_SIZE_T = 0
+BITSIZEOF_WCHAR_T = 0
+BITSIZEOF_WINT_T = 0
 CAN_PRINT_STACK_TRACE = 0
 CC = cc
 CCDEPMODE = depmode=none
@@ -1107,8 +1107,8 @@ GL_GNULIB_WMEMSET = 0
 GL_GNULIB_WRITE = 0
 GL_GNULIB_ZPRINTF = 0
 GL_GNULIB__EXIT = 0
-GNULIBHEADERS_OVERRIDE_CHAR16_T = 1
-GNULIBHEADERS_OVERRIDE_CHAR32_T = 1
+GNULIBHEADERS_OVERRIDE_CHAR16_T = 0
+GNULIBHEADERS_OVERRIDE_CHAR32_T = 0
 GNULIBHEADERS_OVERRIDE_CHAR8_T = 1
 GNULIBHEADERS_OVERRIDE_WINT_T = 0
 GREP = /bin/grep
@@ -1128,17 +1128,17 @@ HAVE_CRTDEFS_H = 0
 HAVE_CXX_STDCKDINT_H = 0
 HAVE_C_STDCKDINT_H = 0
 HAVE_C_UNREACHABLE = 0
-HAVE_DECL_ECVT = 0
+HAVE_DECL_ECVT = 1
 HAVE_DECL_ENVIRON = 1
 HAVE_DECL_EXECVPE = 0
 HAVE_DECL_FCHDIR = 1
 HAVE_DECL_FCLOSEALL = 0
-HAVE_DECL_FCVT = 0
+HAVE_DECL_FCVT = 1
 HAVE_DECL_FDATASYNC = 1
 HAVE_DECL_FPURGE = 1
 HAVE_DECL_FSEEKO = 1
 HAVE_DECL_FTELLO = 1
-HAVE_DECL_GCVT = 0
+HAVE_DECL_GCVT = 1
 HAVE_DECL_GETDELIM = 1
 HAVE_DECL_GETDOMAINNAME = 1
 HAVE_DECL_GETLINE = 1
@@ -1174,7 +1174,7 @@ HAVE_DECL_TRUNCATE = 1
 HAVE_DECL_TTYNAME_R = 1
 HAVE_DECL_UNSETENV = 1
 HAVE_DECL_VSNPRINTF = 1
-HAVE_DECL_WCSDUP = 0
+HAVE_DECL_WCSDUP = 1
 HAVE_DECL_WCWIDTH = 1
 HAVE_DPRINTF = 1
 HAVE_DUP3 = 1
@@ -1222,7 +1222,7 @@ HAVE_MAX_ALIGN_T = 0
 HAVE_MBRLEN = 1
 HAVE_MBRTOC16 = 1
 HAVE_MBRTOC32 = 0
-HAVE_MBRTOWC = 1
+HAVE_MBRTOWC = 0
 HAVE_MBSINIT = 1
 HAVE_MBSLEN = 0
 HAVE_MBSNRTOWCS = 1
@@ -1297,7 +1297,7 @@ HAVE_SYS_LOADAVG_H = 0
 HAVE_SYS_PARAM_H = 0
 HAVE_SYS_PROCESS_H = 0
 HAVE_SYS_TYPES_H = 1
-HAVE_UCHAR_H = 0
+HAVE_UCHAR_H = 1
 HAVE_UNISTD_H = 1
 HAVE_UNISTRING_WOE32DLL_H = 0
 HAVE_UNLINKAT = 1
@@ -1346,7 +1346,7 @@ HAVE_WMEMCPY = 1
 HAVE_WMEMMOVE = 1
 HAVE_WMEMPCPY = 1
 HAVE_WMEMSET = 1
-HAVE_WORKING_C32RTOMB = 0
+HAVE_WORKING_C32RTOMB = 1
 HAVE_WORKING_CXX_STDCKDINT_H = 0
 HAVE_WORKING_C_STDCKDINT_H = 0
 HAVE_WORKING_MBRTOC32 = 0
@@ -1394,8 +1394,8 @@ MAKEINFO = ${SHELL} '/usr/glenda/APExp/sys/src/external/gettext/build-aux/missin
 MANIFEST_TOOL = :
 MBRTOWC_LIB = 
 MKDIR_P = mkdir -p
-NEXT_ASSERT_H = <assert.h>
-NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = <assert.h>
+NEXT_ASSERT_H = 
+NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_ERRNO_H = <errno.h>
 NEXT_AS_FIRST_DIRECTIVE_FCNTL_H = <fcntl.h>
 NEXT_AS_FIRST_DIRECTIVE_FLOAT_H = <float.h>
@@ -1528,7 +1528,7 @@ REPLACE_ITOLD = 0
 REPLACE_LCHOWN = 0
 REPLACE_LINK = 0
 REPLACE_LINKAT = 0
-REPLACE_LOCALECONV = 1
+REPLACE_LOCALECONV = 0
 REPLACE_LSEEK = 0
 REPLACE_MALLOC_FOR_MALLOC_GNU = 0
 REPLACE_MALLOC_FOR_MALLOC_POSIX = 0
@@ -1536,10 +1536,10 @@ REPLACE_MBRLEN = 0
 REPLACE_MBRTOC16 = 0
 REPLACE_MBRTOC32 = 0
 REPLACE_MBRTOWC = 1
-REPLACE_MBSINIT = 0
+REPLACE_MBSINIT = 1
 REPLACE_MBSNRTOWCS = 0
 REPLACE_MBSRTOWCS = 0
-REPLACE_MBSTATE_T = 0
+REPLACE_MBSTATE_T = 1
 REPLACE_MBSTOWCS = 0
 REPLACE_MBTOWC = 0
 REPLACE_MB_CUR_MAX = 0
@@ -1614,7 +1614,7 @@ REPLACE_STRTOLL = 0
 REPLACE_STRTOUL = 0
 REPLACE_STRTOULL = 0
 REPLACE_STRTOUMAX = 0
-REPLACE_STRUCT_LCONV = 1
+REPLACE_STRUCT_LCONV = 0
 REPLACE_STRVERSCMP = 0
 REPLACE_SYMLINK = 0
 REPLACE_SYMLINKAT = 0
@@ -1704,12 +1704,12 @@ datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-gl_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/vasnprintf.Plo
-gl_LIBOBJS =  asnprintf.o printf-args.o printf-parse.o vasnprintf.o
-gl_LTLIBOBJS =  asnprintf.lo printf-args.lo printf-parse.lo vasnprintf.lo
-gl_libgnu_LIBOBJDEPS =  $(DEPDIR)/libgnu_la-asnprintf.Plo $(DEPDIR)/libgnu_la-printf-args.Plo $(DEPDIR)/libgnu_la-printf-parse.Plo $(DEPDIR)/libgnu_la-vasnprintf.Plo
-gl_libgnu_LIBOBJS =  libgnu_a-asnprintf.o libgnu_a-printf-args.o libgnu_a-printf-parse.o libgnu_a-vasnprintf.o
-gl_libgnu_LTLIBOBJS =  libgnu_la-asnprintf.lo libgnu_la-printf-args.lo libgnu_la-printf-parse.lo libgnu_la-vasnprintf.lo
+gl_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Plo $(DEPDIR)/lc-charset-dispatch.Plo $(DEPDIR)/mbtowc-lock.Plo $(DEPDIR)/printf-args.Plo $(DEPDIR)/printf-parse.Plo $(DEPDIR)/vasnprintf.Plo
+gl_LIBOBJS =  asnprintf.o lc-charset-dispatch.o mbtowc-lock.o printf-args.o printf-parse.o vasnprintf.o
+gl_LTLIBOBJS =  asnprintf.lo lc-charset-dispatch.lo mbtowc-lock.lo printf-args.lo printf-parse.lo vasnprintf.lo
+gl_libgnu_LIBOBJDEPS =  $(DEPDIR)/libgnu_la-asnprintf.Plo $(DEPDIR)/libgnu_la-lc-charset-dispatch.Plo $(DEPDIR)/libgnu_la-mbtowc-lock.Plo $(DEPDIR)/libgnu_la-printf-args.Plo $(DEPDIR)/libgnu_la-printf-parse.Plo $(DEPDIR)/libgnu_la-vasnprintf.Plo
+gl_libgnu_LIBOBJS =  libgnu_a-asnprintf.o libgnu_a-lc-charset-dispatch.o libgnu_a-mbtowc-lock.o libgnu_a-printf-args.o libgnu_a-printf-parse.o libgnu_a-vasnprintf.o
+gl_libgnu_LTLIBOBJS =  libgnu_la-asnprintf.lo libgnu_la-lc-charset-dispatch.lo libgnu_la-mbtowc-lock.lo libgnu_la-printf-args.lo libgnu_la-printf-parse.lo libgnu_la-vasnprintf.lo
 gltests_LIBOBJDEPS = 
 gltests_LIBOBJS = 
 gltests_LTLIBOBJS = 
@@ -3025,22 +3025,22 @@ alloca.h: $(top_builddir)/config.status
 
 # We need the following in order to create <assert.h> when the system
 # doesn't have one that works with the given compiler.
-assert.h: assert.in.h verify.h $(top_builddir)/config.status
-	$(gl_V_at){ $(SED_HEADER_STDOUT) \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
-	      -e 's|@''PRAGMA_COLUMNS''@||g' \
-	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
-	      < $(srcdir)/assert.in.h && \
-	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
-	      -e 's|_gl_verify|_gl_static_assert|g' \
-	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
-	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL\1|g' \
-	      < $(srcdir)/verify.h; \
-	} > $@-t
-	$(AM_V_at)mv $@-t $@
-#assert.h: $(top_builddir)/config.status
-#	rm -f $@
+#assert.h: assert.in.h verify.h $(top_builddir)/config.status
+#	$(gl_V_at){ $(SED_HEADER_STDOUT) \
+#	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+#	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
+#	      -e 's|@''PRAGMA_COLUMNS''@||g' \
+#	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
+#	      < $(srcdir)/assert.in.h && \
+#	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
+#	      -e 's|_gl_verify|_gl_static_assert|g' \
+#	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
+#	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL\1|g' \
+#	      < $(srcdir)/verify.h; \
+#	} > $@-t
+#	$(AM_V_at)mv $@-t $@
+assert.h: $(top_builddir)/config.status
+	rm -f $@
 
 # We need the following in order to create <errno.h> when the system
 # doesn't have one that is POSIX compliant.
@@ -4347,7 +4347,7 @@ mostlyclean-local: mostlyclean-generic
 	:
 distclean-local: distclean-gnulib-libobjs
 distclean-gnulib-libobjs:
-	-rm -f  $(DEPDIR)/libgnu_la-asnprintf.Plo $(DEPDIR)/libgnu_la-printf-args.Plo $(DEPDIR)/libgnu_la-printf-parse.Plo $(DEPDIR)/libgnu_la-vasnprintf.Plo
+	-rm -f  $(DEPDIR)/libgnu_la-asnprintf.Plo $(DEPDIR)/libgnu_la-lc-charset-dispatch.Plo $(DEPDIR)/libgnu_la-mbtowc-lock.Plo $(DEPDIR)/libgnu_la-printf-args.Plo $(DEPDIR)/libgnu_la-printf-parse.Plo $(DEPDIR)/libgnu_la-vasnprintf.Plo
 maintainer-clean-local: distclean-gnulib-libobjs
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

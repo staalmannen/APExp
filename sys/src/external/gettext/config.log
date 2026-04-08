@@ -90,7 +90,6 @@ configure:2934: tardir=conftest.dir && eval pax -L -x ustar -w "$tardir" >confte
 ./configure: pax: not found
 configure:2937: $? = 127
 configure:2934: tardir=conftest.dir && eval find "$tardir" -print | cpio -o -H ustar -L >conftest.tar
-./configure: find: not found
 ./configure: cpio: not found
 configure:2937: $? = 127
 configure:2934: tardir=conftest.dir && eval false >conftest.tar

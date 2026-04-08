@@ -100,13 +100,13 @@ configure:2878: checking whether NLS is requested
 configure:2889: result: yes
 configure:2929: checking for msgfmt
 configure:2946: trying /bin/msgfmt...
-msgfmt 264525: suicide: bad address in notify
+msgfmt 80455: suicide: bad address in notify
 configure:2966: result: no
 configure:2972: checking for gmsgfmt
 configure:3009: result: :
 configure:3054: checking for xgettext
 configure:3071: trying /bin/xgettext...
-xgettext 264540: suicide: bad address in notify
+xgettext 80470: suicide: bad address in notify
 configure:3091: result: no
 configure:3133: checking for msgmerge
 configure:3150: trying /bin/msgmerge...
