@@ -123,6 +123,23 @@ extern int pthread_attr_getstacksize(const pthread_attr_t *, size_t *);
 
 extern int pthread_detach(pthread_t);
 
+/* rwlock (in pthread_ext.c, types already in pthread.h): */
+extern int pthread_rwlock_init(pthread_rwlock_t *, const pthread_rwlockattr_t *);
+extern int pthread_rwlock_destroy(pthread_rwlock_t *);
+extern int pthread_rwlock_rdlock(pthread_rwlock_t *);
+extern int pthread_rwlock_wrlock(pthread_rwlock_t *);
+extern int pthread_rwlock_tryrdlock(pthread_rwlock_t *);
+extern int pthread_rwlock_trywrlock(pthread_rwlock_t *);
+extern int pthread_rwlock_unlock(pthread_rwlock_t *);
+extern int pthread_rwlockattr_init(pthread_rwlockattr_t *);
+extern int pthread_rwlockattr_destroy(pthread_rwlockattr_t *);
+/* barrier (in pthread_ext.c, types already in pthread.h): */
+extern int pthread_barrier_init(pthread_barrier_t *, const pthread_barrierattr_t *, unsigned);
+extern int pthread_barrier_destroy(pthread_barrier_t *);
+extern int pthread_barrier_wait(pthread_barrier_t *);
+extern int pthread_barrierattr_init(pthread_barrierattr_t *);
+extern int pthread_barrierattr_destroy(pthread_barrierattr_t *);
+
 
 #ifdef __cplusplus
 }

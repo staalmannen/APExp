@@ -163,8 +163,24 @@ extern int gethostname(char *, size_t);
 extern int truncate(const char *, off_t);
 extern int getdtablesize(void);
 
+ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
+ssize_t writev(int fd, const struct iovec *iov, int iovcnt); /* unistd/writev.c */
+
+/* AT functions (require dirfd support): */
+int openat(int dirfd, const char *path, int flags, ...); /* unistd/at_functions.c */
+int fstatat(int dirfd, const char *path, struct stat *buf, int flags);
+int unlinkat(int dirfd, const char *path, int flags);
+int mkdirat(int dirfd, const char *path, mode_t mode);
+int renameat(int olddirfd, const char *old, int newdirfd, const char *new);
+int readlinkat(int dirfd, const char *path, char *buf, size_t n);
+int symlinkat(const char *target, int dirfd, const char *linkpath);
+int faccessat(int dirfd, const char *path, int mode, int flags);
+int fchownat(int dirfd, const char *path, uid_t uid, gid_t gid, int flags);
+int fchmodat(int dirfd, const char *path, mode_t mode, int flags);
+int linkat(int old_dfd, const char *old, int new_dfd, const char *new, int flags);
+
 /* stubs and hacks */
-# include <sys/stat.h> /* readlink */
+# include <sys/stat.h> /* readlink, mkdir, mkfifo */
 extern int symlink(const char *, const char *);
 extern int usleep(unsigned int);
 extern size_t confstr(int, char *, size_t);

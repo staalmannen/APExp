@@ -50,6 +50,7 @@ void *memmem(const void *, size_t, const void *, size_t);
 void *memrchr(const void *, int, size_t);
 char *stpcpy(char *, const char *);
 char *stpncpy(char *, const char *, size_t);
+size_t strlcpy(char *dst, const char *src, size_t n);
 char *strsignal(int);
 char *strsep(char **, const char *);
 char *strcasestr(const char *, const char *);
@@ -58,6 +59,9 @@ void *mempcpy(void *, const void *, size_t);
 size_t strlcat(char *, const char *, size_t);
 #define estrlcat strlcat
 #define xstrlcat strlcat
+
+char *index(const char *s, int c);
+void swab(const void *src, void *dst, ssize_t n);
 
 #include <wchar.h>
 extern size_t wcsnlen(const wchar_t *, size_t);

@@ -12,12 +12,11 @@ OFILES=\
 	realloc.$O\
 	setmalloctag.$O\
 	setrealloctag.$O\
-# claude ported from musl\
+# claude ported from musl / APE malloc internals\
 	posix_memalign.$O\
-# musl - rewrite to fit APExp?\
-#	reallocarray.$O\
-#	memalign.$O\
-#	aligned_alloc.$O\
+	reallocarray.$O\
+	memalign.$O\
+	aligned_alloc.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

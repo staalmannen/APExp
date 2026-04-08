@@ -6,8 +6,6 @@ extern "C" {
 #endif
 
 #include <features.h>
-
-#define __NEED_size_t
 #include <alltypes.h>
 
 typedef enum { FIND, ENTER } ACTION;

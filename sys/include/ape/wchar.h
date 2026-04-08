@@ -195,4 +195,16 @@ size_t wcsrtombs(char *, const wchar_t **, size_t, mbstate_t *);
 int wcwidth(wchar_t);
 int wcswidth(const wchar_t *, size_t);
 
+/* from musl */
+
+wchar_t *wcsdup(const wchar_t *s);
+size_t mbsnrtowcs(wchar_t *wcs, const char **src,
+	size_t n, size_t wn, mbstate_t *st);
+size_t wcsnrtombs(char *dst, const wchar_t **wcs,
+	size_t wn, size_t n, mbstate_t *st);
+wchar_t *wcpcpy(wchar_t *d, const wchar_t *s);
+wchar_t *wcpncpy(wchar_t *d, const wchar_t *s, size_t n);
+
+
+
 #endif /* _WCHAR_H */

@@ -53,11 +53,9 @@ extern struct lconv *localeconv(void);
 #define LC_MESSAGES 1729
 
 /* from musl */
-#include <nl_types.h>
-extern int catclose(nl_catd);
+#include <nl_types.h> /* catgets catclose catopen */
 extern int cmp(void,void);
-extern char *catgets(nl_catd, int, int, const char *);
-extern nl_catd catopen(const char *, int);
+extern void freelocale(locale_t);
 static ssize_t vstrfmon_l(char *, size_t, locale_t, const char *, va_list);
 extern ssize_t strfmon_l(char *, size_t, locale_t, const char *, ...);
 extern ssize_t strfmon(char *, size_t, const char *, ...);

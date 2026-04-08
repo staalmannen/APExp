@@ -3,6 +3,9 @@
 
 #pragma lib "/$M/lib/ape/libap.a"
 
+#include <libnet.h>
+#include <netinet/in.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -186,6 +189,7 @@ enum {
 extern int accept(int, void *, int *);
 extern int bind(int, void *, int);
 extern int connect(int, void *, int);
+extern int endhostent(void);
 extern int getpeername(int, void *, int *);
 extern int getsockname(int, void *, int *);
 extern int getsockopt(int, int, int, void *, int *);
@@ -200,6 +204,7 @@ extern int sendmsg(int, struct msghdr *, int);
 extern int shutdown(int, int);
 extern int socket(int, int, int);
 extern int socketpair(int, int, int, int *);
+
 
 #ifdef __cplusplus
 }

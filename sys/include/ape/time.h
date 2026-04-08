@@ -86,4 +86,7 @@ extern long timezone;
 extern long altzone;
 extern int daylight;
 
+#include <sys/times.h> /* times */
+#include <sys/time.h> /* gettimeofday */
+
 #endif /* __TIME_H */

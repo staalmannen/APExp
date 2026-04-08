@@ -65,16 +65,33 @@ extern int unsetenv(const char *);
 extern char *realpath(const char *, char *);
 
 extern long long llabs(long long);
-#ifndef lldiv_t
-typedef struct { long long quot, rem; } lldiv_t;
-#endif
 extern lldiv_t lldiv(long long, long long);
 
 extern int at_quick_exit(void (*)(void));
 extern _Noreturn void quick_exit(int);
 
-extern int posix_memalign(void **, size_t, size_t);
+/* musl and other ports */
 
+extern int posix_memalign(void **, size_t, size_t);
+extern void *aligned_alloc(size_t align, size_t len);
+extern void *memalign(size_t align, size_t len);
+extern void *reallocarray(void *ptr, size_t m, size_t n);
+
+extern void qsort_r(void *base, size_t nel, size_t width,
+    int (*cmp)(const void *, const void *, void *), void *arg);
+
+extern long a64l(const char *s);
+extern char *l64a(long x);
+
+extern unsigned long truerand(void);
+
+extern char *ecvt(double, int, int *, int *);
+extern char *fcvt(double, int, int *, int *);
+extern char *gcvt(double, int n, char *buf);
+
+extern int getrusage(int who, struct rusage *usage);          /* misc/getrusage.c */
+extern int ioctl(int fd, unsigned long request, ...);         /* misc/ioctl.c */
+extern int uname(struct utsname *buf);                        /* misc/uname.c */
 
 #ifdef __cplusplus
 }

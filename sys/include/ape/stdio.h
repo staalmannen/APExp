@@ -15,20 +15,6 @@
 /* FILE is now the musl struct _IO_FILE */
 typedef struct _IO_FILE FILE;
 
-/* Legacy APE FILE struct - kept for reference only, will be removed */
-/* typedef struct{
- *	int fd;
- *	char flags;
- *	char state;
- *	char *buf;
- *	char *rp;
- *	char *wp;
- *	char *lp;
- *	size_t bufl;
- *	char unbuf[1];
- *}APE_FILE;
- */
-
 typedef long long fpos_t;
 #ifndef NULL
 #ifdef __cplusplus
@@ -140,6 +126,9 @@ extern ssize_t getline (char **, size_t *, FILE *);
 
 extern int dprintf(int, const char *, ...);
 extern int vdprintf(int, const char *, va_list);
+
+extern double pow10(int n);                                   /* stdio/pow10.c why not in math?*/
+extern void setlinebuf(FILE *f);
 
 #ifdef __cplusplus
 }
