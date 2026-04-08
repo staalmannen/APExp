@@ -209,23 +209,23 @@ static int history_set_nth(void *, TYPE(HistEvent) *, int);
 				}
 
 /* error messages */
-static const Char *const he_errlist[] = {
-	STR("OK"),
-	STR("unknown error"),
-	STR("malloc() failed"),
-	STR("first event not found"),
-	STR("last event not found"),
-	STR("empty list"),
-	STR("no next event"),
-	STR("no previous event"),
-	STR("current event is invalid"),
-	STR("event not found"),
-	STR("can't read history from file"),
-	STR("can't write history"),
-	STR("required parameter(s) not supplied"),
-	STR("history size negative"),
-	STR("function not allowed with other history-functions-set the default"),
-	STR("bad parameters")
+static const wchar_t * he_errlist[] = {
+	(const wchar_t *) "OK",
+	(const wchar_t *) "unknown error",
+	(const wchar_t *) "malloc() failed",
+	(const wchar_t *) "first event not found",
+	(const wchar_t *) "last event not found",
+	(const wchar_t *) "empty list",
+	(const wchar_t *) "no next event",
+	(const wchar_t *) "no previous event",
+	(const wchar_t *) "current event is invalid",
+	(const wchar_t *) "event not found",
+	(const wchar_t *) "can't read history from file",
+	(const wchar_t *) "can't write history",
+	(const wchar_t *) "required parameter(s) not supplied",
+	(const wchar_t *) "history size negative",
+	(const wchar_t *) "function not allowed with other history-functions-set the default",
+	(const wchar_t *) "bad parameters"
 };
 /* error codes */
 #define	_HE_OK                   0

@@ -469,7 +469,7 @@ cv_search(EditLine *el, int dir)
 	el->el_search.patdir = dir;
 
 	tmplen = c_gets(el, &tmpbuf[LEN],
-		dir == ED_SEARCH_PREV_HISTORY ? L"\n/" : L"\n?" );
+		dir == ED_SEARCH_PREV_HISTORY ? (const wchar_t *) "\n/" : (const wchar_t *) "\n?" );
 	if (tmplen == -1)
 		return CC_REFRESH;
 

@@ -63,7 +63,7 @@ typedef enum {
 #define	WINCR		20
 #define	AINCR		10
 
-#define	IFS		STR("\t \n")
+#define	IFS		(const wchar_t *) ("\t \n")
 
 #define	tok_malloc(a)		malloc(a)
 #define	tok_free(a)		free(a)
@@ -216,7 +216,7 @@ FUN(tok,line)(TYPE(Tokenizer) *tok, const TYPE(LineInfo) *line,
 	ptr = line->buffer;
 	for (ptr = line->buffer; ;ptr++) {
 		if (ptr >= line->lastchar)
-			ptr = STR("");
+			ptr = (const wchar_t *) "";
 		if (ptr == line->cursor) {
 			cc = (int)tok->argc;
 			co = (int)(tok->wptr - tok->wstart);

@@ -1118,10 +1118,10 @@ map_get_editor(EditLine *el, const wchar_t **editor)
 		return -1;
 	switch (el->el_map.type) {
 	case MAP_EMACS:
-		*editor = L"emacs";
+		*editor = (const wchar_t *) "emacs";
 		return 0;
 	case MAP_VI:
-		*editor = L"vi";
+		*editor = (const wchar_t *) "vi";
 		return 0;
 	}
 	return -1;
@@ -1244,9 +1244,9 @@ map_print_all_keys(EditLine *el)
 	map_print_some_keys(el, el->el_map.alt, prev, i - 1);
 
 	(void) fprintf(el->el_outfile, "Multi-character bindings\n");
-	keymacro_print(el, L"");
+	keymacro_print(el, (const wchar_t *) "");
 	(void) fprintf(el->el_outfile, "Arrow key bindings\n");
-	terminal_print_arrow(el, L"");
+	terminal_print_arrow(el, (const wchar_t *) "");
 }
 
 

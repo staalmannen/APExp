@@ -985,37 +985,37 @@ terminal_init_arrow(EditLine *el)
 {
 	funckey_t *arrow = el->el_terminal.t_fkey;
 
-	arrow[A_K_DN].name = L"down";
+	arrow[A_K_DN].name = (const wchar_t *) "down";
 	arrow[A_K_DN].key = T_kd;
 	arrow[A_K_DN].fun.cmd = ED_NEXT_HISTORY;
 	arrow[A_K_DN].type = XK_CMD;
 
-	arrow[A_K_UP].name = L"up";
+	arrow[A_K_UP].name = (const wchar_t *) "up";
 	arrow[A_K_UP].key = T_ku;
 	arrow[A_K_UP].fun.cmd = ED_PREV_HISTORY;
 	arrow[A_K_UP].type = XK_CMD;
 
-	arrow[A_K_LT].name = L"left";
+	arrow[A_K_LT].name = (const wchar_t *) "left";
 	arrow[A_K_LT].key = T_kl;
 	arrow[A_K_LT].fun.cmd = ED_PREV_CHAR;
 	arrow[A_K_LT].type = XK_CMD;
 
-	arrow[A_K_RT].name = L"right";
+	arrow[A_K_RT].name = (const wchar_t *) "right";
 	arrow[A_K_RT].key = T_kr;
 	arrow[A_K_RT].fun.cmd = ED_NEXT_CHAR;
 	arrow[A_K_RT].type = XK_CMD;
 
-	arrow[A_K_HO].name = L"home";
+	arrow[A_K_HO].name = (const wchar_t *) "home";
 	arrow[A_K_HO].key = T_kh;
 	arrow[A_K_HO].fun.cmd = ED_MOVE_TO_BEG;
 	arrow[A_K_HO].type = XK_CMD;
 
-	arrow[A_K_EN].name = L"end";
+	arrow[A_K_EN].name = (const wchar_t *) "end";
 	arrow[A_K_EN].key = T_at7;
 	arrow[A_K_EN].fun.cmd = ED_MOVE_TO_END;
 	arrow[A_K_EN].type = XK_CMD;
 
-	arrow[A_K_DE].name = L"delete";
+	arrow[A_K_DE].name = (const wchar_t *) "delete";
 	arrow[A_K_DE].key = T_kD;
 	arrow[A_K_DE].fun.cmd = ED_DELETE_NEXT_CHAR;
 	arrow[A_K_DE].type = XK_CMD;
@@ -1029,18 +1029,18 @@ static void
 terminal_reset_arrow(EditLine *el)
 {
 	funckey_t *arrow = el->el_terminal.t_fkey;
-	static const wchar_t strA[] = L"\033[A";
-	static const wchar_t strB[] = L"\033[B";
-	static const wchar_t strC[] = L"\033[C";
-	static const wchar_t strD[] = L"\033[D";
-	static const wchar_t strH[] = L"\033[H";
-	static const wchar_t strF[] = L"\033[F";
-	static const wchar_t stOA[] = L"\033OA";
-	static const wchar_t stOB[] = L"\033OB";
-	static const wchar_t stOC[] = L"\033OC";
-	static const wchar_t stOD[] = L"\033OD";
-	static const wchar_t stOH[] = L"\033OH";
-	static const wchar_t stOF[] = L"\033OF";
+	static const wchar_t strA[] = (const wchar_t *) "\033[A";
+	static const wchar_t strB[] = (const wchar_t *) "\033[B";
+	static const wchar_t strC[] = (const wchar_t *) "\033[C";
+	static const wchar_t strD[] = (const wchar_t *) "\033[D";
+	static const wchar_t strH[] = (const wchar_t *) "\033[H";
+	static const wchar_t strF[] = (const wchar_t *) "\033[F";
+	static const wchar_t stOA[] = (const wchar_t *) "\033OA";
+	static const wchar_t stOB[] = (const wchar_t *) "\033OB";
+	static const wchar_t stOC[] = (const wchar_t *) "\033OC";
+	static const wchar_t stOD[] = (const wchar_t *) "\033OD";
+	static const wchar_t stOH[] = (const wchar_t *) "\033OH";
+	static const wchar_t stOF[] = (const wchar_t *) "\033OF";
 
 	keymacro_add(el, strA, &arrow[A_K_UP].fun, arrow[A_K_UP].type);
 	keymacro_add(el, strB, &arrow[A_K_DN].fun, arrow[A_K_DN].type);

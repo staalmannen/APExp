@@ -54,8 +54,6 @@ OFILES=\
 	pdcsetsc.$O\
 	pdcutil.$O\
 # common\
-	blink.$O\
-	mouse.$O\
 	pdccolor.$O\
 	psf.$O
 
@@ -85,8 +83,8 @@ CFLAGS= -c -I$CURSRC -I$CURSRC/plan9 -I$CURSRC/common -D_POSIX_SOURCE \
 %.$O: $CURSRC/plan9/%.c
 	$CC $CFLAGS $CURSRC/plan9/$stem.c
 
-pdccolor.$O: $CURSRC/common/pdccolor.c
-	$CC $CFLAGS $CURSRC/common/pdccolor.c
+%.$O: $CURSRC/common/%.c
+	$CC $CFLAGS $CURSRC/common/$stem.c
 
 install:V:
 #	cp $CURSRC/curses.h $APEXPROOT/sys/include/ape/curses.h

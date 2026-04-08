@@ -25,9 +25,9 @@ OFILES=	chared.$O\
 		reallocarr.$O\
 		wcsdup.$O\
 		tokenizer.$O\
-		tokenizern.$O\
+#		tokenizern.$O\
 		history.$O\
-		historyn.$O\
+#		historyn.$O\
 		filecomplete.$O\
 		readline.$O\
 		literal.$O\
@@ -49,7 +49,9 @@ EDITSRC=../../../external/libedit/src
 #fails on include_next
 CC=$APEXPROOT/$objtype/bin/pcc
 
-CFLAGS=-c -I$EDITSRC/.. -I$EDITSRC -DHAVE_CONFIG_H -D_POSIX_SOURCE -D__STDC_ISO_10646__=1
+CFLAGS=-c -I$EDITSRC/.. -I$EDITSRC -DHAVE_CONFIG_H -D_POSIX_SOURCE\
+	-D__STDC_ISO_10646__=1 -DHAVE_SIZE_MAX -DNBBY=8\
+	-DHAVE_CURSES_H -D_REENTRANT
 
 %.$O: $EDITSRC/%.c
 	$CC $CFLAGS $EDITSRC/$stem.c

@@ -64,13 +64,13 @@ static const struct {
 	const wchar_t *name;
 	int (*func)(EditLine *, int, const wchar_t **);
 } cmds[] = {
-	{ L"bind",		map_bind	},
-	{ L"echotc",		terminal_echotc	},
-	{ L"edit",		el_editmode	},
-	{ L"history",		hist_command	},
-	{ L"telltc",		terminal_telltc	},
-	{ L"settc",		terminal_settc	},
-	{ L"setty",		tty_stty	},
+	{ (const wchar_t *) "bind",		map_bind	},
+	{ (const wchar_t *) "echotc",		terminal_echotc	},
+	{ (const wchar_t *) "edit",		el_editmode	},
+	{ (const wchar_t *) "history",		hist_command	},
+	{ (const wchar_t *) "telltc",		terminal_telltc	},
+	{ (const wchar_t *) "settc",		terminal_settc	},
+	{ (const wchar_t *) "setty",		tty_stty	},
 	{ NULL,			NULL		}
 };
 

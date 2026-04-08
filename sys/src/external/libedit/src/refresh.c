@@ -1129,7 +1129,7 @@ re_fastputc(EditLine *el, wint_t c)
 			el->el_cursor.v++;
 			lastline = el->el_display[++el->el_refresh.r_oldcv];
 		}
-		re__copy_and_pad((wchar_t *)lastline, L"",
+		re__copy_and_pad((wchar_t *)lastline, (const wchar_t *) "",
 		    (size_t)el->el_terminal.t_size.h);
 
 		if (EL_HAS_AUTO_MARGINS) {

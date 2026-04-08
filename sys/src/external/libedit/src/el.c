@@ -274,27 +274,27 @@ el_wset(EditLine *el, int op, ...)
 
 		switch (op) {
 		case EL_BIND:
-			argv[0] = L"bind";
+			argv[0] = (const wchar_t *) "bind";
 			rv = map_bind(el, i, argv);
 			break;
 
 		case EL_TELLTC:
-			argv[0] = L"telltc";
+			argv[0] = (const wchar_t *) "telltc";
 			rv = terminal_telltc(el, i, argv);
 			break;
 
 		case EL_SETTC:
-			argv[0] = L"settc";
+			argv[0] = (const wchar_t *) "settc";
 			rv = terminal_settc(el, i, argv);
 			break;
 
 		case EL_ECHOTC:
-			argv[0] = L"echotc";
+			argv[0] = (const wchar_t *) "echotc";
 			rv = terminal_echotc(el, i, argv);
 			break;
 
 		case EL_SETTY:
-			argv[0] = L"setty";
+			argv[0] = (const wchar_t *) "setty";
 			rv = tty_stty(el, i, argv);
 			break;
 

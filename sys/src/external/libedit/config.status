@@ -545,8 +545,8 @@ AMDEP_TRUE="" MAKE="make"
 sed_quote_subst='s/\(["`$\\]\)/\\\1/g'
 double_quote_subst='s/\(["`\\]\)/\\\1/g'
 delay_variable_subst='s/\\\\\\\\\\\$/\\\\\\$/g'
-macro_version='2.4.7'
-macro_revision='2.4.7'
+macro_version='2.5.4'
+macro_revision='2.5.4'
 enable_shared='no'
 enable_static='yes'
 pic_mode='default'
@@ -728,7 +728,7 @@ if test -n "${ZSH_VERSION+set}"; then
 fi
 
 
-    PACKAGE='libedit-20240808'
+    PACKAGE='libedit-20251016'
     VERSION='3.1'
     RM='rm -f'
     ofile='libtool'
@@ -832,7 +832,7 @@ S["ENABLE_EXAMPLES_FALSE"]="#"
 S["ENABLE_EXAMPLES_TRUE"]=""
 S["MANTYPE"]=""
 S["NROFF"]="/bin/false"
-S["LT_VERSION"]="0:74:0"
+S["LT_VERSION"]="0:76:0"
 S["LT_SYS_LIBRARY_PATH"]=""
 S["OTOOL64"]=""
 S["OTOOL"]=""
@@ -882,8 +882,8 @@ S["AMDEP_FALSE"]="#"
 S["AMDEP_TRUE"]=""
 S["am__include"]="include"
 S["DEPDIR"]=".deps"
-S["am__untar"]="$${TAR-tar} xf -"
-S["am__tar"]="$${TAR-tar} chof - \"$$tardir\""
+S["am__untar"]="false"
+S["am__tar"]="false"
 S["AMTAR"]="$${TAR-tar}"
 S["am__leading_dot"]="."
 S["SET_MAKE"]=""
@@ -895,11 +895,11 @@ S["STRIP"]="strip"
 S["install_sh"]="${SHELL} /usr/glenda/APExp/sys/src/external/libedit/install-sh"
 S["MAKEINFO"]="${SHELL} '/usr/glenda/APExp/sys/src/external/libedit/missing' makeinfo"
 S["AUTOHEADER"]="${SHELL} '/usr/glenda/APExp/sys/src/external/libedit/missing' autoheader"
-S["AUTOMAKE"]="${SHELL} '/usr/glenda/APExp/sys/src/external/libedit/missing' automake-1.17"
+S["AUTOMAKE"]="${SHELL} '/usr/glenda/APExp/sys/src/external/libedit/missing' automake-1.18"
 S["AUTOCONF"]="${SHELL} '/usr/glenda/APExp/sys/src/external/libedit/missing' autoconf"
-S["ACLOCAL"]="${SHELL} '/usr/glenda/APExp/sys/src/external/libedit/missing' aclocal-1.17"
+S["ACLOCAL"]="${SHELL} '/usr/glenda/APExp/sys/src/external/libedit/missing' aclocal-1.18"
 S["VERSION"]="3.1"
-S["PACKAGE"]="libedit-20240808"
+S["PACKAGE"]="libedit-20251016"
 S["CYGPATH_W"]="echo"
 S["am__isrc"]=""
 S["INSTALL_DATA"]="${INSTALL} -m 644"
@@ -947,7 +947,7 @@ S["PACKAGE_URL"]=""
 S["PACKAGE_BUGREPORT"]=""
 S["PACKAGE_STRING"]="libedit 3.1"
 S["PACKAGE_VERSION"]="3.1"
-S["PACKAGE_TARNAME"]="libedit-20240808"
+S["PACKAGE_TARNAME"]="libedit-20251016"
 S["PACKAGE_NAME"]="libedit"
 S["PATH_SEPARATOR"]=":"
 S["SHELL"]="/bin/sh"
@@ -994,7 +994,7 @@ if test -n "$CONFIG_HEADERS"; then
 cat >"$ac_tmp/defines.awk" <<\_ACAWK ||
 BEGIN {
 D["PACKAGE_NAME"]=" \"libedit\""
-D["PACKAGE_TARNAME"]=" \"libedit-20240808\""
+D["PACKAGE_TARNAME"]=" \"libedit-20251016\""
 D["PACKAGE_VERSION"]=" \"3.1\""
 D["PACKAGE_STRING"]=" \"libedit 3.1\""
 D["PACKAGE_BUGREPORT"]=" \"\""
@@ -1027,7 +1027,7 @@ D["__STDC_WANT_LIB_EXT2__"]=" 1"
 D["__STDC_WANT_MATH_SPEC_FUNCS__"]=" 1"
 D["_TANDEM_SOURCE"]=" 1"
 D["__EXTENSIONS__"]=" 1"
-D["PACKAGE"]=" \"libedit-20240808\""
+D["PACKAGE"]=" \"libedit-20251016\""
 D["VERSION"]=" \"3.1\""
 D["HAVE_DLFCN_H"]=" 1"
 D["LT_OBJDIR"]=" \".libs/\""
@@ -1497,19 +1497,18 @@ See 'config.log' for more details" "$LINENO" 5; }
     cat <<_LT_EOF >> "$cfgfile"
 #! $SHELL
 # Generated automatically by $as_me ($PACKAGE) $VERSION
-# Libtool was configured on host `(hostname || uname -n) 2>/dev/null | sed 1q`:
 # NOTE: Changes made to this file will be lost: look at ltmain.sh.
 
 # Provide generalized library-building support services.
 # Written by Gordon Matzigkeit, 1996
 
-# Copyright (C) 2014 Free Software Foundation, Inc.
+# Copyright (C) 2024 Free Software Foundation, Inc.
 # This is free software; see the source for copying conditions.  There is NO
 # warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 # GNU Libtool is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of of the License, or
+# the Free Software Foundation; either version 2 of the License, or
 # (at your option) any later version.
 #
 # As a special exception to the GNU General Public License, if you
@@ -1890,7 +1889,7 @@ hardcode_direct=$hardcode_direct
 
 # Set to "yes" if using DIR/libNAME\$shared_ext during linking hardcodes
 # DIR into the resulting binary and the resulting library dependency is
-# "absolute",i.e impossible to change by setting \$shlibpath_var if the
+# "absolute",i.e. impossible to change by setting \$shlibpath_var if the
 # library is relocated.
 hardcode_direct_absolute=$hardcode_direct_absolute
 
