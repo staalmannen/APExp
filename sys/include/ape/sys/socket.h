@@ -5,6 +5,7 @@
 
 #include <libnet.h>
 #include <netinet/in.h>
+#include <netdb.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -189,7 +190,6 @@ enum {
 extern int accept(int, void *, int *);
 extern int bind(int, void *, int);
 extern int connect(int, void *, int);
-extern int endhostent(void);
 extern int getpeername(int, void *, int *);
 extern int getsockname(int, void *, int *);
 extern int getsockopt(int, int, int, void *, int *);

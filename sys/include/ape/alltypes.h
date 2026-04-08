@@ -31,8 +31,6 @@ typedef unsigned useconds_t;
 
 typedef va_list __isoc_va_list;
 
-struct iovec { void *iov_base; size_t iov_len; };
-
 struct winsize { unsigned short ws_row, ws_col, ws_xpixel, ws_ypixel; };
 
 typedef struct { union { int __i[12]; volatile int __vi[12]; void *__p[12*sizeof(int)/sizeof(void*)]; } __u; } cnd_t;

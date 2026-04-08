@@ -90,8 +90,9 @@ extern char *fcvt(double, int, int *, int *);
 extern char *gcvt(double, int n, char *buf);
 
 extern int getrusage(int who, struct rusage *usage);          /* misc/getrusage.c */
-extern int ioctl(int fd, unsigned long request, ...);         /* misc/ioctl.c */
 extern int uname(struct utsname *buf);                        /* misc/uname.c */
+
+#include <sys/ioctl.h> /* ioctl */
 
 #ifdef __cplusplus
 }

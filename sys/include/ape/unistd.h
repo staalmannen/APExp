@@ -163,9 +163,6 @@ extern int gethostname(char *, size_t);
 extern int truncate(const char *, off_t);
 extern int getdtablesize(void);
 
-ssize_t readv(int fd, const struct iovec *iov, int iovcnt);
-ssize_t writev(int fd, const struct iovec *iov, int iovcnt); /* unistd/writev.c */
-
 /* AT functions (require dirfd support): */
 int openat(int dirfd, const char *path, int flags, ...); /* unistd/at_functions.c */
 int fstatat(int dirfd, const char *path, struct stat *buf, int flags);
@@ -181,6 +178,7 @@ int linkat(int old_dfd, const char *old, int new_dfd, const char *new, int flags
 
 /* stubs and hacks */
 # include <sys/stat.h> /* readlink, mkdir, mkfifo */
+# include <sys/uio.h> /* readv writev */
 extern int symlink(const char *, const char *);
 extern int usleep(unsigned int);
 extern size_t confstr(int, char *, size_t);

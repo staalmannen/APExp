@@ -1407,6 +1407,7 @@ loop:
 			return cp;
 		}
 	}
+return c;
 }
 
 struct

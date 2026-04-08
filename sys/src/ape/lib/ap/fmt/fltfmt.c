@@ -52,41 +52,6 @@ static double pows10[] =
 	1e150, 1e151, 1e152, 1e153, 1e154, 1e155, 1e156, 1e157, 1e158, 1e159, 
 };
 
-static double
-pow10(int n)
-{
-	double d;
-	int neg;
-
-	neg = 0;
-	if(n < 0){
-		if(n < DBL_MIN_10_EXP){
-			return 0.;
-		}
-		neg = 1;
-		n = -n;
-	}else if(n > DBL_MAX_10_EXP){
-		return HUGE_VAL;
-	}
-	if(n < (int)(sizeof(pows10)/sizeof(pows10[0])))
-		d = pows10[n];
-	else{
-		d = pows10[sizeof(pows10)/sizeof(pows10[0]) - 1];
-		for(;;){
-			n -= sizeof(pows10)/sizeof(pows10[0]) - 1;
-			if(n < (int)(sizeof(pows10)/sizeof(pows10[0]))){
-				d *= pows10[n];
-				break;
-			}
-			d *= pows10[sizeof(pows10)/sizeof(pows10[0]) - 1];
-		}
-	}
-	if(neg){
-		return 1./d;
-	}
-	return d;
-}
-
 static int
 xadd(char *a, int n, int v)
 {
