@@ -68,11 +68,18 @@ FILE *__fdopen(int fd, const char *mode)
 		return NULL;
 	}
 
-	if (pthread_mutex_init(lock, NULL) != 0) {
-		free(lock);
-		free(f);
-		errno = ENOMEM;
-		return NULL;
+	{
+		pthread_mutexattr_t attr;
+		pthread_mutexattr_init(&attr);
+		pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+		if (pthread_mutex_init(lock, &attr) != 0) {
+			pthread_mutexattr_destroy(&attr);
+			free(lock);
+			free(f);
+			errno = ENOMEM;
+			return NULL;
+		}
+		pthread_mutexattr_destroy(&attr);
 	}
 
 	/* Store pointer as intptr_t */

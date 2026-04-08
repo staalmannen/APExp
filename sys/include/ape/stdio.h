@@ -130,6 +130,10 @@ extern int vdprintf(int, const char *, va_list);
 extern double pow10(int n);                                   /* stdio/pow10.c why not in math?*/
 extern void setlinebuf(FILE *f);
 
+extern void flockfile(FILE *);
+extern void funlockfile(FILE *);
+extern int ftrylockfile(FILE *);
+
 #ifdef __cplusplus
 }
 #endif

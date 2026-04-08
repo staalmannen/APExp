@@ -82,6 +82,7 @@ OFILES=\
 	__fmodeflags.$O\
 	__fwritex.$O\
 	dprintf.$O\
+	flockfile.$O\
 
 
 
