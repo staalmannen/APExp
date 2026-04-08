@@ -116,20 +116,21 @@ color
 
 
 ### Portability
-                             X/Open  ncurses  NetBSD
-    has_colors                  Y       Y       Y
-    start_color                 Y       Y       Y
-    init_pair                   Y       Y       Y
-    pair_content                Y       Y       Y
-    can_change_color            Y       Y       Y
-    init_color                  Y       Y       Y
-    color_content               Y       Y       Y
-    alloc_pair                  -       Y       -
-    assume_default_colors       -       Y       Y
-    find_pair                   -       Y       -
-    free_pair                   -       Y       -
-    use_default_colors          -       Y       Y
-    PDC_set_line_color          -       -       -
+   Function              | X/Open | ncurses | NetBSD
+   :---------------------|:------:|:-------:|:------:
+   has_colors            |    Y   |    Y    |   Y
+   start_color           |    Y   |    Y    |   Y
+   init_pair             |    Y   |    Y    |   Y
+   pair_content          |    Y   |    Y    |   Y
+   can_change_color      |    Y   |    Y    |   Y
+   init_color            |    Y   |    Y    |   Y
+   color_content         |    Y   |    Y    |   Y
+   alloc_pair            |    -   |    Y    |   -
+   assume_default_colors |    -   |    Y    |   Y
+   find_pair             |    -   |    Y    |   -
+   free_pair             |    -   |    Y    |   -
+   use_default_colors    |    -   |    Y    |   Y
+   PDC_set_line_color    |    -   |    -    |   -
 
 **man-end****************************************************************/
 
@@ -224,8 +225,6 @@ static void _check_hash_tbl( void)
       }
 }
 
-static int _default_foreground_idx = COLOR_WHITE, _default_background_idx = COLOR_BLACK;
-
 int start_color(void)
 {
     PDC_LOG(("start_color() - called\n"));
@@ -241,11 +240,11 @@ int start_color(void)
     if (!SP->default_colors && SP->orig_attr && getenv("PDC_ORIGINAL_COLORS"))
         SP->default_colors = TRUE;
 
-    _init_pair_core( 0, _default_foreground_idx,
-                        _default_background_idx);
+    _init_pair_core( 0, SP->default_foreground_idx,
+                        SP->default_background_idx);
     if( !SP->_preserve)
         curscr->_clear = TRUE;
-#if !defined( CHTYPE_32) && !defined(OS2) && !defined(DOS)
+#if !defined( CHTYPE_32) && !defined( CHTYPE_16) && !defined(OS2) && !defined(DOS)
     if( COLORS >= 1024 && (long)INT_MAX > 1024L * 1024L)
         COLOR_PAIRS = 1024 * 1024;
     else if( COLORS >= 16)
@@ -263,8 +262,8 @@ int start_color(void)
 
 void PDC_set_default_colors( const int fg_idx, const int bg_idx)
 {
-   _default_foreground_idx = fg_idx;
-   _default_background_idx = bg_idx;
+   SP->default_foreground_idx = fg_idx;
+   SP->default_background_idx = bg_idx;
 }
 
 static void _normalize(int *fg, int *bg)
@@ -272,10 +271,10 @@ static void _normalize(int *fg, int *bg)
     const bool using_defaults = (SP->orig_attr && (SP->default_colors || !SP->color_started));
 
     if (*fg == -1 || *fg == UNSET_COLOR_PAIR)
-        *fg = using_defaults ? SP->orig_fore : _default_foreground_idx;
+        *fg = using_defaults ? SP->orig_fore : SP->default_foreground_idx;
 
     if (*bg == -1 || *fg == UNSET_COLOR_PAIR)
-        *bg = using_defaults ? SP->orig_back : _default_background_idx;
+        *bg = using_defaults ? SP->orig_back : SP->default_background_idx;
 }
 
 /* When a color pair is reset,  all cells of that color should be
@@ -316,7 +315,7 @@ PDC_set_line_color() is called (and changes the way in which text
 with those attributes is drawn),  the corresponding text should be
 redrawn.    */
 
-void PDC_set_cells_to_refresh_for_attr_change( const attr_t attr)
+static void _set_cells_to_refresh_for_attr_change( const chtype attr)
 {
     int x, y;
 
@@ -534,8 +533,8 @@ int PDC_set_line_color(short color)
     if( SP->line_color != color)
     {
         SP->line_color = color;
-        PDC_set_cells_to_refresh_for_attr_change(
-               WA_TOP | WA_UNDERLINE | WA_LEFT | WA_RIGHT | WA_STRIKEOUT);
+        _set_cells_to_refresh_for_attr_change(
+               A_TOP | A_UNDERLINE | A_LEFT | A_RIGHT | A_STRIKEOUT);
     }
     return OK;
 }
@@ -554,7 +553,7 @@ static void _init_color_table( SCREEN *sp)
     p[0].prev = p[0].next = 0;
     p[1].prev = p[1].next = 1;
     sp->default_colors = FALSE;
-    PDC_set_default_colors( _default_foreground_idx, _default_background_idx);
+    PDC_set_default_colors( COLOR_WHITE, COLOR_BLACK);
 }
 
 int PDC_init_atrtab(void)
@@ -562,8 +561,8 @@ int PDC_init_atrtab(void)
     assert( SP);
     _init_color_table( SP);
     _init_pair_core( 0,
-            (SP->orig_attr ? SP->orig_fore : _default_foreground_idx),
-            (SP->orig_attr ? SP->orig_back : _default_background_idx));
+            (SP->orig_attr ? SP->orig_fore : SP->default_foreground_idx),
+            (SP->orig_attr ? SP->orig_back : SP->default_background_idx));
     return( 0);
 }
 
@@ -697,8 +696,8 @@ void reset_color_pairs( void)
     SP->pair_hash_tbl_size = SP->pair_hash_tbl_used = 0;
     _init_color_table( SP);
     _init_pair_core( 0,
-            (SP->orig_attr ? SP->orig_fore : _default_foreground_idx),
-            (SP->orig_attr ? SP->orig_back : _default_background_idx));
+            (SP->orig_attr ? SP->orig_fore : SP->default_foreground_idx),
+            (SP->orig_attr ? SP->orig_back : SP->default_background_idx));
     curscr->_clear = TRUE;
 }
 

@@ -125,38 +125,39 @@ inopts
    always return FALSE.
 
 ### Portability
-                             X/Open  ncurses  NetBSD
-    cbreak                      Y       Y       Y
-    nocbreak                    Y       Y       Y
-    echo                        Y       Y       Y
-    noecho                      Y       Y       Y
-    is_cbreak                   -       Y       -
-    is_echo                     -       Y       -
-    is_nl                       -       Y       -
-    is_raw                      -       Y       -
-    PDC_getcbreak               -       -       -
-    PDC_getecho                 -       -       -
-    halfdelay                   Y       Y       Y
-    intrflush                   Y       Y       Y
-    keypad                      Y       Y       Y
-    meta                        Y       Y       Y
-    nl                          Y       Y       Y
-    nonl                        Y       Y       Y
-    nodelay                     Y       Y       Y
-    notimeout                   Y       Y       Y
-    raw                         Y       Y       Y
-    noraw                       Y       Y       Y
-    noqiflush                   Y       Y       Y
-    qiflush                     Y       Y       Y
-    timeout                     Y       Y       Y
-    wtimeout                    Y       Y       Y
-    wgetdelay                   -       Y       -
-    typeahead                   Y       Y       Y
-    crmode                      Y       Y       Y
-    nocrmode                    Y       Y       Y
-    is_keypad                   -       Y       Y
-    is_nodelay                  -       Y       -
-    is_notimeout                -       Y       -
+   Function              | X/Open | ncurses | NetBSD
+   :---------------------|:------:|:-------:|:------:
+   cbreak                |    Y   |    Y    |   Y
+   nocbreak              |    Y   |    Y    |   Y
+   echo                  |    Y   |    Y    |   Y
+   noecho                |    Y   |    Y    |   Y
+   is_cbreak             |    -   |    Y    |   -
+   is_echo               |    -   |    Y    |   -
+   is_nl                 |    -   |    Y    |   -
+   is_raw                |    -   |    Y    |   -
+   PDC_getcbreak         |    -   |    -    |   -
+   PDC_getecho           |    -   |    -    |   -
+   halfdelay             |    Y   |    Y    |   Y
+   intrflush             |    Y   |    Y    |   Y
+   keypad                |    Y   |    Y    |   Y
+   meta                  |    Y   |    Y    |   Y
+   nl                    |    Y   |    Y    |   Y
+   nonl                  |    Y   |    Y    |   Y
+   nodelay               |    Y   |    Y    |   Y
+   notimeout             |    Y   |    Y    |   Y
+   raw                   |    Y   |    Y    |   Y
+   noraw                 |    Y   |    Y    |   Y
+   noqiflush             |    Y   |    Y    |   Y
+   qiflush               |    Y   |    Y    |   Y
+   timeout               |    Y   |    Y    |   Y
+   wtimeout              |    Y   |    Y    |   Y
+   wgetdelay             |    -   |    Y    |   -
+   typeahead             |    Y   |    Y    |   Y
+   crmode                |    Y   |    Y    |   Y
+   nocrmode              |    Y   |    Y    |   Y
+   is_keypad             |    -   |    Y    |   Y
+   is_nodelay            |    -   |    Y    |   -
+   is_notimeout          |    -   |    Y    |   -
 
 **man-end****************************************************************/
 
@@ -169,6 +170,8 @@ int cbreak(void)
         return ERR;
 
     SP->cbreak = TRUE;
+    SP->delaytenths = 0;
+    SP->raw_inp = FALSE;
 
     return OK;
 }
@@ -183,6 +186,7 @@ int nocbreak(void)
 
     SP->cbreak = FALSE;
     SP->delaytenths = 0;
+    SP->raw_inp = TRUE;
 
     return OK;
 }
@@ -253,6 +257,7 @@ int halfdelay(int tenths)
         return ERR;
 
     SP->delaytenths = tenths;
+    SP->raw_inp = FALSE;
 
     return OK;
 }
@@ -334,7 +339,8 @@ int nodelay(WINDOW *win, bool flag)
     if (!win)
         return ERR;
 
-    win->_nodelay = flag;
+    win->_delayms = (flag ? 0 : BLOCKING_INPUT);
+    SP->delaytenths = 0;
 
     return OK;
 }
@@ -368,7 +374,9 @@ int raw(void)
         return ERR;
 
     PDC_set_keyboard_binary(TRUE);
+    SP->delaytenths = 0;
     SP->raw_inp = TRUE;
+    SP->cbreak = TRUE;
 
     return OK;
 }
@@ -382,7 +390,9 @@ int noraw(void)
         return ERR;
 
     PDC_set_keyboard_binary(FALSE);
+    SP->delaytenths = 0;
     SP->raw_inp = FALSE;
+    SP->cbreak = FALSE;
 
     return OK;
 }
@@ -421,30 +431,9 @@ void wtimeout(WINDOW *win, int delay)
         return;
 
     if (delay < 0)
-    {
-        /* This causes a blocking read on the window, so turn on delay
-           mode */
-
-        win->_nodelay = FALSE;
-        win->_delayms = 0;
-    }
-    else if (!delay)
-    {
-        /* This causes a non-blocking read on the window, so turn off
-           delay mode */
-
-        win->_nodelay = TRUE;
-        win->_delayms = 0;
-    }
+        win->_delayms = BLOCKING_INPUT;
     else
-    {
-        /* This causes the read on the window to delay for the number of
-           milliseconds. Also forces the window into non-blocking read
-           mode */
-
-        /*win->_nodelay = TRUE;*/
         win->_delayms = delay;
-    }
 }
 
 void timeout(int delay)
@@ -487,7 +476,7 @@ bool is_nodelay(const WINDOW *win)
     if (!win)
         return FALSE;
 
-    return win->_nodelay;
+    return !win->_delayms;
 }
 
 bool is_notimeout(const WINDOW *win)

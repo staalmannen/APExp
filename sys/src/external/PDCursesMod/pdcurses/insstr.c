@@ -46,33 +46,36 @@ insstr
    All functions return OK on success and ERR on error.
 
 ### Portability
-                             X/Open  ncurses  NetBSD
-    insstr                      Y       Y       Y
-    winsstr                     Y       Y       Y
-    mvinsstr                    Y       Y       Y
-    mvwinsstr                   Y       Y       Y
-    insnstr                     Y       Y       Y
-    winsnstr                    Y       Y       Y
-    mvinsnstr                   Y       Y       Y
-    mvwinsnstr                  Y       Y       Y
-    ins_wstr                    Y       Y       Y
-    wins_wstr                   Y       Y       Y
-    mvins_wstr                  Y       Y       Y
-    mvwins_wstr                 Y       Y       Y
-    ins_nwstr                   Y       Y       Y
-    wins_nwstr                  Y       Y       Y
-    mvins_nwstr                 Y       Y       Y
-    mvwins_nwstr                Y       Y       Y
+   Function              | X/Open | ncurses | NetBSD
+   :---------------------|:------:|:-------:|:------:
+   insstr                |    Y   |    Y    |   Y
+   winsstr               |    Y   |    Y    |   Y
+   mvinsstr              |    Y   |    Y    |   Y
+   mvwinsstr             |    Y   |    Y    |   Y
+   insnstr               |    Y   |    Y    |   Y
+   winsnstr              |    Y   |    Y    |   Y
+   mvinsnstr             |    Y   |    Y    |   Y
+   mvwinsnstr            |    Y   |    Y    |   Y
+   ins_wstr              |    Y   |    Y    |   Y
+   wins_wstr             |    Y   |    Y    |   Y
+   mvins_wstr            |    Y   |    Y    |   Y
+   mvwins_wstr           |    Y   |    Y    |   Y
+   ins_nwstr             |    Y   |    Y    |   Y
+   wins_nwstr            |    Y   |    Y    |   Y
+   mvins_nwstr           |    Y   |    Y    |   Y
+   mvwins_nwstr          |    Y   |    Y    |   Y
 
 **man-end****************************************************************/
 
 #include <string.h>
 
+#define MAX_WSTR 80
+
 int winsnstr(WINDOW *win, const char *str, int n)
 {
 #ifdef PDC_WIDE
-    wchar_t wstr[513], *p;
-    int i;
+    wchar_t wstr[MAX_WSTR], *p = wstr;
+    int i = 0;
 #endif
     int len;
 
@@ -89,13 +92,7 @@ int winsnstr(WINDOW *win, const char *str, int n)
         n = len;
 
 #ifdef PDC_WIDE
-    if (n > 512)
-        n = 512;
-
-    p = wstr;
-    i = 0;
-
-    while( i < n && str[i])
+    while( p < wstr + MAX_WSTR && str[i])
     {
         int retval = PDC_mbtowc(p, str + i, n - i);
 
@@ -104,6 +101,9 @@ int winsnstr(WINDOW *win, const char *str, int n)
         p++;
         i += retval;
     }
+    if( p == wstr + MAX_WSTR)        /* not enough room in wstr;  break */
+        if( ERR == winsnstr( win, str + i, n - i))    /* str into parts */
+            return ERR;
 
     while (p > wstr)
         if (winsch(win, *--p) == ERR)

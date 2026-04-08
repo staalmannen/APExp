@@ -15,6 +15,10 @@
     #include <unistd.h>
 #endif
 
+#ifdef __WATCOMC__
+   #include <io.h>
+#endif
+
 #ifdef WACS_S1
 # define HAVE_WIDE
 #endif
@@ -52,11 +56,13 @@ character cell.  On odd passes,  we're computing the RGB for the bottom
 halves,  and each time one is computed,  we spit out another character.
 (And,  if the colors have changed,  we allocate another color pair.
 So this can chew through as many color pairs as there are character
-cells on the current screen.)    */
+cells on the current screen,  or LINES * COLS.  In practice,  'pair_num'
+is reset at twice that value.  This avoids flickering that could be
+caused by setting a color pair for the 'new' image that was in use by
+the 'old' image that we're replacing.)  */
 
 double aspect = 1.1;       /* The 'bottom block' (half-height cell character) */
                /* is _almost_ square,  but is about 10% wider than it is tall */
-
 
 /* PNM files give each pixel as an RGB triplet of bytes.  A width by height
 image consumes exactly width * height * 3 bytes. */
@@ -193,7 +199,7 @@ used to make the results marginally less ugly. */
 
 static int find_in_palette( const int32_t rgb, const int dither)
 {
-#ifndef CHTYPE_32
+#if !defined( CHTYPE_32) && INT_MAX > 65536
    if( COLORS > 0x100000)
       return( rgb + 256);
    else
@@ -222,7 +228,7 @@ int main( const int argc, const char *argv[])
    char *pixels, buff[100];
    const char *filename = temp_image_name;
    const char *filename_to_show = temp_image_name;
-   int c = 0, i, bytes_per_pixel = 3;
+   int c = 0, i, bytes_per_pixel = 3, pair_num = 16;
    double scale = 0., xpix = 0., ypix = 0.;
    bool show_help = TRUE;
    SCREEN *screen_pointer;
@@ -305,7 +311,7 @@ int main( const int argc, const char *argv[])
       int *xloc = (int *)calloc( 2 * COLS, sizeof( int));
       int *idxs = xloc + COLS;
       int prev_idx = -1, prev_low_idx = -1;
-      int j, pair_num = 16;
+      int j;
       MEVENT mouse_event;
       double xpix1, ypix1;
 
@@ -362,6 +368,8 @@ int main( const int argc, const char *argv[])
 #endif
                   attrset( COLOR_PAIR( pair_num));
                   pair_num++;
+                  if( pair_num == 2 * LINES * COLS + 16)   /* see comments */
+                     pair_num = 16;        /* above about avoiding flicker */
                   prev_low_idx = low_idx;
                   prev_idx = idxs[i];
                   }

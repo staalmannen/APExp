@@ -84,17 +84,18 @@ initscr
    returns OK, and resize_term(), which returns either OK or ERR.
 
 ### Portability
-                             X/Open  ncurses  NetBSD
-    initscr                     Y       Y       Y
-    endwin                      Y       Y       Y
-    isendwin                    Y       Y       Y
-    newterm                     Y       Y       Y
-    set_term                    Y       Y       Y
-    delscreen                   Y       Y       Y
-    resize_term                 -       Y       Y
-    set_tabsize                 -       Y       Y
-    curses_version              -       Y       -
-    is_termresized              -       -       -
+   Function              | X/Open | ncurses | NetBSD
+   :---------------------|:------:|:-------:|:------:
+   initscr               |    Y   |    Y    |   Y
+   endwin                |    Y   |    Y    |   Y
+   isendwin              |    Y   |    Y    |   Y
+   newterm               |    Y   |    Y    |   Y
+   set_term              |    Y   |    Y    |   Y
+   delscreen             |    Y   |    Y    |   Y
+   resize_term           |    -   |    Y    |   Y
+   set_tabsize           |    -   |    Y    |   Y
+   curses_version        |    -   |    Y    |   -
+   is_termresized        |    -   |    -    |   -
 
 **man-end****************************************************************/
 
@@ -223,6 +224,7 @@ SCREEN *newterm(const char *type, FILE *outfd, FILE *infd)
     SP->dirty = FALSE;
     SP->sel_start = -1;
     SP->sel_end = -1;
+    SP->off_screen_windows = OFF_SCREEN_WINDOWS_TO_RIGHT_AND_BOTTOM;
 
     SP->orig_cursor = PDC_get_cursor_mode();
 
@@ -366,7 +368,7 @@ SCREEN *set_term(SCREEN *new_scr)
 
 void delscreen(SCREEN *sp)
 {
-    int i = 0;
+    int i;
 
     PDC_LOG(("delscreen() - called\n"));
 

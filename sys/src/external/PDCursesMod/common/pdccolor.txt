@@ -1,0 +1,81 @@
+   The VT,  WinGUI,  X11,  and SDLn models all have the ability to
+support 'full' RGB,  16 million colors.  DOSVGA,  WinCon, and Plan9
+don't currently support full color,  but may eventually be revised
+using the same scheme.
+
+   ncurses currently supports full color with the xterm-direct model,
+in which you get 2^24 colors and can't change them.  The problem with
+the ncurses solution is that it breaks existing palette-based code.
+I've found a few people complaining about this. It's true that one
+should not blindly assume you'll have a color palette and can change
+it,  nor should you assume a particular color palette. There's no
+promise of that sort in Curses.  The can_change_color() function
+exists for good reason.  (The Linux console is a good example of a
+place where you can't change colors.)
+
+   However,  many people (me included) have written code that
+assumes that init_color() will actually change the color. I think
+a lot of people do.  If somebody complains that it doesn't work in
+the Linux console,  we say : "Don't do that."
+
+   Fortunately,  PDCursesMod has been revised so that it uses the
+the existing Curses model  _and_ can access a changeable palette
+of 16-million colors,  have 2^20 = 1048576 color pairs, and not
+require much code or memory.  (Actually,  usually somewhat less.)
+
+   As the 'PDC_default_color' function in 'pdccolor.c' shows,  the
+first 256 palette entries are the traditional ones : 8 primary
+colors,  8 "intensified" primary colors,  a 6x6x6=216 color cube,
+and 24 shades of gray.  (Re-defining the first 256 colors would have
+broken backward de facto compatibility.)  This is now followed by
+2^24 colors,  so COLORS = 2^24 + 2^8.  By default,  palette indices
+past 256 have color components
+
+r =  (index - 256) & 0xff
+g = ((index - 256) >> 8) & 0xff
+b = ((index - 256) >> 16) & 0xff
+
+   All of these colors can be easily computed algorithmically.
+Unless a palette entry is deliberately set,  we need allocate no
+memory at all,  even though we have a palette of 2^24 + 2^8 colors.
+The 'picsview' demo illustrates how this can be done;  color
+0xdeadbe, (blue 0xde, green 0xad, blue 0xbe)  for example,  is at
+palette index 0xdeadbe + 256 = 0xdeaebe.
+
+   Resetting of palette entries is relatively rare,  especially
+because most PDCurses*/ncurses programs don't expect more than 256
+colors anyway.  'testcurs' resets colors beyond this,  but that's
+explicitly to test the above code.  As palette entries are set,
+the array of entries ('rgbs' in pdccolor.c) is reallocated to be
+the smallest power of two capable of handling all entries.
+
+   The vast majority of programs which either never use color
+indices past 256,  or which decide to use them at the default
+values, will never cause rgbs[] to be allocated.  If you decide
+to use a palette of,  say,  1024 colors,  then fine;  rgbs[] will
+be extended to consume 1024 RGB values (which are four-byte ints,
+so 4K of memory).
+
+   At present,  the only use made of this (a rather contrived one,
+solely to test out the capability) is in 'testcurs',  in its 'colors
+beyond 256' section.
+
+   If you look in pdcurses/color.c,  you will see that the color
+pairs are similarly dynamically reallocated when new pairs are
+set.  One can have 2^20 = 1048576 color pairs,  consuming about 25
+MBytes assuming 32-bit ints.  (Four integers are allocated for
+each color pair,  plus slightly more than one integer for a hash
+table.)  But few applications use more than a few color pairs;  the
+unusual programs with a dozen colors will consume a few hundred
+bytes.  'testcurs' uses a few hundred pairs in the same 'colors
+beyond 256' section.  'picsview' and 'mbrot' (which are PDCursesMod
+additions) use still more color pairs.
+
+   'picsview' allocates a color pair for each character cell.  With
+the program at full screen with a tiny font,  I've been able to get
+it to allocate over 100K color pairs... indeed, that sort of
+"picture drawing" is the only case I can think of where one might
+use really large numbers of colors.  Note that since 'picsview' and
+'mbrot' use default colors (no calls are made to init_color()),  the
+RGB array is not reallocated,  even though the full 16 million color
+space is being exploited.

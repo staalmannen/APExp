@@ -6,7 +6,9 @@
 #include <stdlib.h>
 #include <locale.h>
 #include <assert.h>
-#include <locale.h>
+
+#if NCURSES_VERSION_PATCH >= 20170311 || __PDCURSES__
+            /* we have alloc_pair(), free_pair(), init_extended_color() */
 
 #ifdef WACS_S1
 # define HAVE_WIDE
@@ -228,7 +230,7 @@ int main( const int argc, const char **argv)
 #else
     mousemask( BUTTON1_CLICKED | BUTTON4_PRESSED | BUTTON5_PRESSED, NULL);
 #endif
-#ifndef CHTYPE_32
+#if !defined( CHTYPE_32) && INT_MAX > 65536
     if( COLORS > 0x1000000 && COLOR_PAIRS >= 4096 && !_n_colors)
        _n_colors = COLORS;    /* use PDCursesMod's rgb palette */
     else
@@ -355,3 +357,10 @@ int main( const int argc, const char **argv)
         fclose( input_fp);
     return( 0);
 }
+#else
+int main( void)
+{
+   printf( "This build lacks the new_pair functions\n");
+   return( 0);
+}
+#endif

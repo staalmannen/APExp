@@ -63,14 +63,15 @@ pad
    All functions except is_pad() return OK on success and ERR on error.
 
 ### Portability
-                             X/Open  ncurses  NetBSD
-    newpad                      Y       Y       Y
-    subpad                      Y       Y       Y
-    prefresh                    Y       Y       Y
-    pnoutrefresh                Y       Y       Y
-    pechochar                   Y       Y       Y
-    pecho_wchar                 Y       Y       Y
-    is_pad                      -       Y       Y
+   Function              | X/Open | ncurses | NetBSD
+   :---------------------|:------:|:-------:|:------:
+   newpad                |    Y   |    Y    |   Y
+   subpad                |    Y   |    Y    |   Y
+   prefresh              |    Y   |    Y    |   Y
+   pnoutrefresh          |    Y   |    Y    |   Y
+   pechochar             |    Y   |    Y    |   Y
+   pecho_wchar           |    Y   |    Y    |   Y
+   is_pad                |    -   |    Y    |   Y
 
 **man-end****************************************************************/
 
@@ -147,7 +148,7 @@ WINDOW *subpad(WINDOW *orig, int nlines, int ncols, int begy, int begx)
     win->_attrs = orig->_attrs;
     win->_leaveit = orig->_leaveit;
     win->_scroll = orig->_scroll;
-    win->_nodelay = orig->_nodelay;
+    win->_delayms = orig->_delayms;
     win->_use_keypad = orig->_use_keypad;
     win->_parent = orig;
 

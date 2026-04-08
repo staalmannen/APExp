@@ -77,19 +77,20 @@ getch
    character or function key token.
 
 ### Portability
-                             X/Open  ncurses  NetBSD
-    getch                       Y       Y       Y
-    wgetch                      Y       Y       Y
-    mvgetch                     Y       Y       Y
-    mvwgetch                    Y       Y       Y
-    ungetch                     Y       Y       Y
-    flushinp                    Y       Y       Y
-    get_wch                     Y       Y       Y
-    wget_wch                    Y       Y       Y
-    mvget_wch                   Y       Y       Y
-    mvwget_wch                  Y       Y       Y
-    unget_wch                   Y       Y       Y
-    PDC_get_key_modifiers       -       -       -
+   Function              | X/Open | ncurses | NetBSD
+   :---------------------|:------:|:-------:|:------:
+   getch                 |    Y   |    Y    |   Y
+   wgetch                |    Y   |    Y    |   Y
+   mvgetch               |    Y   |    Y    |   Y
+   mvwgetch              |    Y   |    Y    |   Y
+   ungetch               |    Y   |    Y    |   Y
+   flushinp              |    Y   |    Y    |   Y
+   get_wch               |    Y   |    Y    |   Y
+   wget_wch              |    Y   |    Y    |   Y
+   mvget_wch             |    Y   |    Y    |   Y
+   mvwget_wch            |    Y   |    Y    |   Y
+   unget_wch             |    Y   |    Y    |   Y
+   PDC_get_key_modifiers |    -   |    -    |   -
 
 **man-end****************************************************************/
 
@@ -406,20 +407,73 @@ static int _mouse_key(void)
     return key;
 }
 
-/* ftime() is consided obsolete.  But it's all we have for
+#ifdef _WIN32
+#undef MOUSE_MOVED
+#include <windows.h>
+
+/* GetSystemTimeAsFileTime( ) returns the time in units of 0.1 microsecond.
+We want milliseconds,  i.e.,  one ten-thousandth of that.  Also,  it returns
+the time as a 64-bit integer,  spread across two unsigned 32-bit ints.
+
+   If 64-bit long integers are supported,  we simply shift A,  add B,
+cast to a long,  and divide by 10000.  If they are not (the usual case),
+less obvious arithmetic is needed.  See commit message for details.  */
+
+long PDC_millisecs( void)
+{
+   FILETIME ft;
+   long rval;
+#if LONG_MAX < 9223372036854775807L
+   DWORD tval;
+
+   GetSystemTimeAsFileTime( &ft);
+   tval = ft.dwHighDateTime % 10000u;
+   rval = 429496L * tval + (456L * tval + (long)(ft.dwLowDateTime >> 4)) / 625L;
+#else
+   uint64_t tval;
+
+   GetSystemTimeAsFileTime( &ft);
+   tval = ((uint64_t)ft.dwHighDateTime << 32) | (uint64_t)ft.dwLowDateTime;
+   rval = (long)( tval / 10000u);
+#endif
+   return( rval);
+}
+#else       /* Non-Microsoft Windows cases */
+
+/* ftime() is considered obsolete.  But it's all we have for
 millisecond precision on older compilers/systems.  We'll
 use clock_gettime() or gettimeofday() when available. */
 
-#if defined( _POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 199309L)
-   #define CLOCK_GETTIME_AVAILABLE    1
-#endif
-#if defined( _DEFAULT_SOURCE) || defined( _BSD_SOURCE) || defined(HAVE_GETTIMEOFDAY)
-   #define GETTIMEOFDAY_AVAILABLE    1
+#include <time.h>
+#ifdef __has_include
+   #if __has_include(<sys/time.h>)
+       #include <sys/time.h>
+   #endif
 #endif
 
-#if defined( GETTIMEOFDAY_AVAILABLE)
-#include <sys/time.h>
+#if defined( _POSIX_C_SOURCE) && (_POSIX_C_SOURCE >= 199309L) \
+     && (!defined( __MINGW32__) || defined( CLOCK_REALTIME))
+   /* only newer MinGW environments have clock_gettime and
+      those have CLOCK_REALTIME as a macro */
+   #define HAVE_CLOCK_GETTIME
+#elif defined( _DEFAULT_SOURCE) || defined( _BSD_SOURCE) \
+     || defined( __FreeBSD__) || defined( __MINGW32__)
+   /* POSIX.1-2008 marks gettimeofday() as obsolete,
+      recommending the use of clock_gettime instead, so we
+      only use that alternative to POSIX_C conditionally */
+   #define HAVE_GETTIMEOFDAY
+#endif
 
+#if defined( HAVE_CLOCK_GETTIME)
+long PDC_millisecs( void)
+{
+    struct timespec t;
+
+    clock_gettime( CLOCK_MONOTONIC, &t);
+    return( t.tv_sec * 1000 + t.tv_nsec / 1000000);
+}
+
+#elif defined( HAVE_GETTIMEOFDAY)
 long PDC_millisecs( void)
 {
     struct timeval t;
@@ -427,16 +481,7 @@ long PDC_millisecs( void)
     gettimeofday( &t, NULL);
     return( t.tv_sec * 1000 + t.tv_usec / 1000);
 }
-#elif defined( CLOCK_GETTIME_AVAILABLE)
-#include <time.h>
 
-long PDC_millisecs( void)
-{
-    struct timespec t;
-
-    clock_gettime( CLOCK_REALTIME, &t);
-    return( t.tv_sec * 1000 + t.tv_nsec / 1000000);
-}
 #else    /* neither gettimeofday() or clock_gettime() available */
 #include <sys/timeb.h>
 
@@ -448,6 +493,7 @@ long PDC_millisecs( void)
     return( (long)t.time * 1000L + (long)t.millitm);
 }
 #endif
+#endif      /* #ifndef _WIN32 */
 
 /* On many systems,  checking for a key hit is quite slow.  If
 PDC_check_key( ) returns FALSE,  we can safely stop checking for
@@ -481,8 +527,6 @@ bool PDC_is_function_key( const int key)
    return( key >= KEY_MIN && key < KEY_MAX);
 }
 
-#define WAIT_FOREVER    -1
-
 static int _raw_wgetch_no_surrogate_pairs( WINDOW *win)
 {
     int key = ERR, remaining_millisecs;
@@ -498,8 +542,6 @@ static int _raw_wgetch_no_surrogate_pairs( WINDOW *win)
         remaining_millisecs = 100 * SP->delaytenths;
     else
         remaining_millisecs = win->_delayms;
-    if( !remaining_millisecs && !win->_nodelay)
-        remaining_millisecs = WAIT_FOREVER;
 
     /* refresh window when wgetch is called if there have been changes
        to it and it is not a pad */
@@ -516,7 +558,7 @@ static int _raw_wgetch_no_surrogate_pairs( WINDOW *win)
 
     /* if normal and data in buffer */
 
-    else if ((!SP->raw_inp && !SP->cbreak) && (SP->c_gindex < SP->c_pindex))
+    else if ( !SP->cbreak && (SP->c_gindex < SP->c_pindex))
         key = SP->c_buffer[SP->c_gindex++];
 
     if( key != ERR)
@@ -541,7 +583,7 @@ static int _raw_wgetch_no_surrogate_pairs( WINDOW *win)
             /* if not, handle timeout() and halfdelay() */
             int nap_time = 50;
 
-            if (remaining_millisecs != WAIT_FOREVER)
+            if (remaining_millisecs != BLOCKING_INPUT)
             {
                 if (!remaining_millisecs)
                     return ERR;
@@ -616,7 +658,7 @@ static int _raw_wgetch_no_surrogate_pairs( WINDOW *win)
 
         /* if no buffering */
 
-        if (SP->raw_inp || SP->cbreak)
+        if( SP->cbreak)
         {
             if( key == KEY_RESIZE)
                 resize_term( 0, 0);
@@ -645,20 +687,19 @@ static int _raw_wgetch_no_surrogate_pairs( WINDOW *win)
     }
 }
 
-#define IS_HIGH_SURROGATE( x)  ((x) >= 0xd800 && (x) < 0xdc00)
-#define IS_LOW_SURROGATE( x)   ((x) >= 0xdc00 && (x) < 0xe000)
-
 static int _raw_wgetch( WINDOW *win)
 {
    int rval = _raw_wgetch_no_surrogate_pairs( win);
 
-   if( IS_HIGH_SURROGATE( rval))
+#ifdef PDC_WIDE
+   if( PDC_IS_HIGH_SURROGATE( rval))
       {
       const int c = _raw_wgetch_no_surrogate_pairs( win);
 
-      if( IS_LOW_SURROGATE( c))
+      if( PDC_IS_LOW_SURROGATE( c))
          rval = ((rval - 0xd800) << 10) + 0x10000 + c - 0xdc00;
       }
+#endif
    return( rval);
 }
 
@@ -757,9 +798,11 @@ int wgetch(WINDOW *win)
         if( rval != ERR && (rval < 0 || rval > 127)
                   && !PDC_is_function_key( rval))
         {
-            wchar_t c = (wchar_t)rval;
+            wchar_t c[2];
 
-            n_buff = PDC_wcstombs( (char *)buffered, &c, 1);
+            c[0] = (wchar_t)rval;
+            c[1] = L'\0';
+            n_buff = PDC_wcstombs( (char *)buffered, c, sizeof( buffered));
             if( (int)n_buff <= 0)
             {
                 n_buff = 0;

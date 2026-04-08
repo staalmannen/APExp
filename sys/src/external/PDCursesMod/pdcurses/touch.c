@@ -50,14 +50,15 @@ touch
    is_wintouched() and is_linetouched().
 
 ### Portability
-                             X/Open  ncurses  NetBSD
-    touchwin                    Y       Y       Y
-    touchline                   Y       Y       Y
-    untouchwin                  Y       Y       Y
-    wtouchln                    Y       Y       Y
-    is_linetouched              Y       Y       Y
-    is_wintouched               Y       Y       Y
-    touchoverlap                -       -       Y
+   Function              | X/Open | ncurses | NetBSD
+   :---------------------|:------:|:-------:|:------:
+   touchwin              |    Y   |    Y    |   Y
+   touchline             |    Y   |    Y    |   Y
+   untouchwin            |    Y   |    Y    |   Y
+   wtouchln              |    Y   |    Y    |   Y
+   is_linetouched        |    Y   |    Y    |   Y
+   is_wintouched         |    Y   |    Y    |   Y
+   touchoverlap          |    -   |    -    |   Y
 
 **man-end****************************************************************/
 
@@ -65,6 +66,9 @@ void PDC_set_changed_cells_range( WINDOW *win, const int y, const int start, con
 {
     assert( win);
     assert( y >= 0 && y < win->_maxy);
+    assert( start >= 0 || start == _NO_CHANGE);
+    assert( start <= end);
+    assert( end < win->_maxx);
     win->_firstch[y] = start;
     win->_lastch[y] = end;
 }
@@ -81,6 +85,9 @@ void PDC_mark_cells_as_changed( WINDOW *win, const int y, const int start, const
 {
     assert( win);
     assert( y >= 0 && y < win->_maxy);
+    assert( start >= 0 || start == _NO_CHANGE);
+    assert( start <= end);
+    assert( end < win->_maxx);
     if( win->_firstch[y] == _NO_CHANGE)
     {
         win->_firstch[y] = start;

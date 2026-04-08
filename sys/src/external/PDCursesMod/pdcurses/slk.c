@@ -78,25 +78,26 @@ slk
    All functions return OK on success and ERR on error.
 
 ### Portability
-                             X/Open  ncurses  NetBSD
-    slk_init                    Y       Y       Y
-    slk_set                     Y       Y       Y
-    slk_refresh                 Y       Y       Y
-    slk_noutrefresh             Y       Y       Y
-    slk_label                   Y       Y       Y
-    slk_clear                   Y       Y       Y
-    slk_restore                 Y       Y       Y
-    slk_touch                   Y       Y       Y
-    slk_attron                  Y       Y       Y
-    slk_attrset                 Y       Y       Y
-    slk_attroff                 Y       Y       Y
-    slk_attr_on                 Y       Y       Y
-    slk_attr_set                Y       Y       Y
-    slk_attr_off                Y       Y       Y
-    slk_attr                    -       Y       -
-    slk_wset                    Y       Y       Y
-    slk_wlabel                  -       -       -
-    extended_slk_color          -       Y       -
+   Function              | X/Open | ncurses | NetBSD
+   :---------------------|:------:|:-------:|:------:
+   slk_init              |    Y   |    Y    |   Y
+   slk_set               |    Y   |    Y    |   Y
+   slk_refresh           |    Y   |    Y    |   Y
+   slk_noutrefresh       |    Y   |    Y    |   Y
+   slk_label             |    Y   |    Y    |   Y
+   slk_clear             |    Y   |    Y    |   Y
+   slk_restore           |    Y   |    Y    |   Y
+   slk_touch             |    Y   |    Y    |   Y
+   slk_attron            |    Y   |    Y    |   Y
+   slk_attrset           |    Y   |    Y    |   Y
+   slk_attroff           |    Y   |    Y    |   Y
+   slk_attr_on           |    Y   |    Y    |   Y
+   slk_attr_set          |    Y   |    Y    |   Y
+   slk_attr_off          |    Y   |    Y    |   Y
+   slk_attr              |    -   |    Y    |   -
+   slk_wset              |    Y   |    Y    |   Y
+   slk_wlabel            |    -   |    -    |   -
+   extended_slk_color    |    -   |    Y    |   -
 
 **man-end****************************************************************/
 
@@ -106,7 +107,7 @@ static int label_length = 0;
 static int labels = 0;
 static int label_fmt = 0;
 static int label_line = 0;
-static bool Hidden = FALSE;
+static bool hidden = FALSE;
 
 #define MAX_LABEL_LENGTH 32
 
@@ -181,7 +182,7 @@ static void _drawone(int num)
 {
     int i, col, slen;
 
-    if (Hidden)
+    if (hidden)
         return;
 
     slen = slk[num].len;
@@ -218,7 +219,7 @@ static void _redraw(void)
 {
     int i;
 
-    if( !Hidden)
+    if( !hidden)
     {
         for (i = 0; i < labels; ++i)
             _drawone(i);
@@ -347,7 +348,7 @@ int slk_clear(void)
     if (!SP)
         return ERR;
 
-    Hidden = TRUE;
+    hidden = TRUE;
     werase(SP->slk_winptr);
     return wrefresh(SP->slk_winptr);
 }
@@ -360,7 +361,7 @@ int slk_restore(void)
     if (!SP)
         return ERR;
 
-    Hidden = FALSE;
+    hidden = FALSE;
     _redraw();
     return wrefresh(SP->slk_winptr);
 }
@@ -566,7 +567,7 @@ void PDC_slk_free(void)
         labels = 0;
         label_fmt = 0;
         label_line = 0;
-        Hidden = FALSE;
+        hidden = FALSE;
     }
 }
 
@@ -580,7 +581,7 @@ int PDC_mouse_in_slk(int y, int x)
        of the screen, or the SLKs are hidden,  we are not interested in it. */
 
     assert( SP);
-    if (!slk || Hidden || !SP->slk_winptr
+    if (!slk || hidden || !SP->slk_winptr
                         || (y != SP->slk_winptr->_begy + label_line))
         return 0;
 

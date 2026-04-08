@@ -12,13 +12,11 @@ See 'pdccolor.txt' for a rationale of how this works. */
 #define PACKED_RGB uint32_t
 
 #ifndef PACK_RGB
-   #define PACK_RGB( red, green, blue) ((red) | ((green)<<8) | ((PACKED_RGB)(blue) << 16))
+   #define PACK_RGB( red, green, blue) ((PACKED_RGB)(red) | ((PACKED_RGB)(green)<<8) | ((PACKED_RGB)(blue) << 16))
 #endif
 
 #include <curspriv.h>
 #include "pdccolor.h"
-
-int PDC_blink_state = 0;
 
 static PACKED_RGB *rgbs;   /* the 'standard' 256-color palette,  plus any allocated */
 static int _palette_size;
@@ -186,11 +184,13 @@ void PDC_get_rgb_values( const chtype srcp,
     else
         *background_rgb = PDC_get_palette_entry( background_index);
 
+    if( srcp & A_STANDOUT)
+        intensify_backgnd = TRUE;
     if( srcp & A_BLINK)
     {
         if( !(SP->termattrs & A_BLINK))   /* convert 'blinking' to 'bold' */
             intensify_backgnd = TRUE;
-        else if( PDC_blink_state)
+        else if( SP->blink_state & 1)
             reverse_colors ^= 1;
     }
     if( default_foreground)

@@ -1,3 +1,4 @@
+
 /*
  * This is a test program for PDCurses. Originally by
  * John Burnell <johnb@kea.am.dsir.govt.nz>
@@ -8,6 +9,21 @@
 
 #ifndef _XOPEN_SOURCE_EXTENDED
 # define _XOPEN_SOURCE_EXTENDED 1
+#endif
+
+/* Uncomment the following #define to test the 'classic' (undocumented
+SysV) mouse functions in inputTest.  Otherwise,  the ncurses mouse
+interface will be used.       */
+
+// #define CLASSIC_MOUSE_INTERFACE
+
+#if defined( CLASSIC_MOUSE_INTERFACE)
+   #define BUTTON_MOVE_EVENTS (BUTTON1_MOVED | BUTTON2_MOVED | BUTTON3_MOVED \
+                          | BUTTON4_MOVED | BUTTON5_MOVED)
+   #define ALL_MOVE_EVENTS  (BUTTON_MOVE_EVENTS | REPORT_MOUSE_POSITION)
+#else
+   #define PDC_NCMOUSE
+   #define ALL_MOVE_EVENTS   REPORT_MOUSE_POSITION
 #endif
 
 #include <stdio.h>
@@ -108,8 +124,83 @@ COMMAND command[MAX_OPTIONS] =
 };
 
 int width, height;
-static bool report_mouse_movement = FALSE;
+static mmask_t test_mouse_mask = ALL_MOUSE_EVENTS;
 static SCREEN *screen_pointer;
+
+static mmask_t parse_mouse_mask( const char *str)
+{
+   test_mouse_mask = 0;
+   while( *str)
+      {
+      const mmask_t *event_ptr = NULL;
+      const mmask_t pressed[5] = { BUTTON1_PRESSED, BUTTON2_PRESSED,
+                  BUTTON3_PRESSED, BUTTON4_PRESSED, BUTTON5_PRESSED };
+      const mmask_t released[5] = { BUTTON1_RELEASED, BUTTON2_RELEASED,
+                  BUTTON3_RELEASED, BUTTON4_RELEASED, BUTTON5_RELEASED };
+      const mmask_t clicked[5] = { BUTTON1_CLICKED, BUTTON2_CLICKED,
+                  BUTTON3_CLICKED, BUTTON4_CLICKED, BUTTON5_CLICKED };
+      const mmask_t dblclk[5] = { BUTTON1_DOUBLE_CLICKED, BUTTON2_DOUBLE_CLICKED,
+                  BUTTON3_DOUBLE_CLICKED, BUTTON4_DOUBLE_CLICKED, BUTTON5_DOUBLE_CLICKED };
+      const mmask_t triclk[5] = { BUTTON1_TRIPLE_CLICKED, BUTTON2_TRIPLE_CLICKED,
+                  BUTTON3_TRIPLE_CLICKED, BUTTON4_TRIPLE_CLICKED, BUTTON5_TRIPLE_CLICKED };
+#ifdef BUTTON1_MOVED
+      const mmask_t moved[5] = { BUTTON1_MOVED, BUTTON2_MOVED,
+                  BUTTON3_MOVED, BUTTON4_MOVED, BUTTON5_MOVED };
+#endif
+
+      switch( *str)
+         {
+         case 'p':
+            event_ptr = pressed;
+            break;
+         case 'r':
+            event_ptr = released;
+            break;
+         case 'c':
+            event_ptr = clicked;
+            break;
+         case 'd':
+            event_ptr = dblclk;
+            break;
+         case 't':
+            event_ptr = triclk;
+            break;
+#ifdef BUTTON1_MOVED
+         case 'm':
+            event_ptr = moved;
+            break;
+#endif
+#ifdef MOUSE_WHEEL_SCROLL
+         case 'w':
+            test_mouse_mask |= MOUSE_WHEEL_SCROLL;
+            break;
+#endif
+#ifdef BUTTON_MODIFIER_SHIFT
+         case 's':
+            test_mouse_mask |= BUTTON_MODIFIER_SHIFT;
+            break;
+#endif
+#ifdef BUTTON_MODIFIER_CONTROL
+         case 'x':
+            test_mouse_mask |= BUTTON_MODIFIER_CONTROL;
+            break;
+#endif
+#ifdef BUTTON_MODIFIER_ALT
+         case 'a':
+            test_mouse_mask |= BUTTON_MODIFIER_ALT;
+            break;
+#endif
+         case 'M':
+            test_mouse_mask |= REPORT_MOUSE_POSITION;
+            break;
+         }
+      str++;
+      if( event_ptr)
+         while( *str >= '1' && *str <= '5')
+            test_mouse_mask |= event_ptr[*str++ - '1'];
+      }
+   return test_mouse_mask;
+}
 
 int main(int argc, char *argv[])
 {
@@ -117,9 +208,8 @@ int main(int argc, char *argv[])
     int key, old_option = -1, new_option = 0, i;
     bool quit = FALSE;
 
-#ifdef _WIN32
-    setlocale(LC_ALL, ".utf8");
-#endif
+    if( !setlocale( LC_CTYPE, "C.UTF-8"))
+        setlocale( LC_CTYPE, "en_US.utf8");
 
 #ifdef __PDCURSESMOD__
 #ifdef PDC_VER_MAJOR   /* so far only seen in 4.0+ */
@@ -129,13 +219,36 @@ int main(int argc, char *argv[])
 
     if (initTest(&win, argc, argv))
         return 1;
-
+#ifdef __PDCURSESMOD__
+    PDC_set_title( "testcurs -- PDCurses* demo/test program");
+#endif
     for( i = 1; i < argc; i++)
         if( argv[i][0] == '-')
             switch( argv[i][1])
             {
+#if defined( __PDCURSES__) || defined( NCURSES_DEBUG_LIB)
+                case 'd':
+                    {
+                        unsigned flags;
+
+                        if( 1 == sscanf( argv[i] + 2, "%x", &flags))
+                            curses_trace( flags);
+                    }
+                    break;
+#endif
+                case 'i': case 'I':
+                    mouseinterval( atoi( argv[i] + 2));
+                    break;
                 case 'l': case 'L':
-                    setlocale( LC_ALL, argv[i] + 2);
+                    setlocale( LC_CTYPE, argv[i] + 2);
+                    break;
+                case 's':
+                    {
+                        char tbuff[200];
+
+                        if( fgets( tbuff, sizeof( tbuff), stdin))
+                           printf( "Got a line\n%s", tbuff);
+                    }
                     break;
 #ifdef __PDCURSESMOD__
                 case 'b': case 'B':
@@ -162,7 +275,10 @@ int main(int argc, char *argv[])
 #endif
 #endif
                 case 'z':
-                    report_mouse_movement = TRUE;
+                    if( !argv[i][2])
+                       test_mouse_mask = ALL_MOUSE_EVENTS | REPORT_MOUSE_POSITION;
+                    else
+                       test_mouse_mask = parse_mouse_mask( argv[i] + 2);
                     break;
                 default:
                     break;
@@ -230,9 +346,6 @@ int main(int argc, char *argv[])
             break;
 #ifdef KEY_RESIZE
         case KEY_RESIZE:
-# ifdef PDCURSES
-            resize_term(0, 0);
-# endif
             old_option = -1;
             erase();
             display_menu(old_option, new_option);
@@ -385,6 +498,9 @@ void inputTest(WINDOW *win)
     static const char spinner[5] = "/-\\|";
     int spinner_count = 0;
     int line = 3;
+#ifndef CLASSIC_MOUSE_INTERFACE
+    int mouse_buttons_held = 0;
+#endif
 
     wclear(win);
 
@@ -425,9 +541,14 @@ void inputTest(WINDOW *win)
 
     wtimeout(win, 200);
 
-#ifdef PDCURSES
-    mouse_set( ALL_MOUSE_EVENTS |
-            (report_mouse_movement ? REPORT_MOUSE_POSITION : 0));
+#ifdef CLASSIC_MOUSE_INTERFACE
+    mouse_set( test_mouse_mask);
+#else
+    mousemask( test_mouse_mask, NULL);
+#endif
+#ifdef NCURSES_VERSION
+    if( test_mouse_mask & REPORT_MOUSE_POSITION)
+      printf( "\x1b\x5b?1003h\n");        /* command string to enable mouse movement */
 #endif
     curs_set(0);        /* turn cursor off */
 
@@ -472,18 +593,15 @@ void inputTest(WINDOW *win)
             waddch( win, c);
         else
             wprintw(win, "%s", unctrl(c));
-#ifdef PDCURSES
+#ifdef CLASSIC_MOUSE_INTERFACE
         if (c == KEY_MOUSE)
         {
             int button = 0;
             request_mouse_pos();
 
-            if (BUTTON_CHANGED(1))
-                button = 1;
-            else if (BUTTON_CHANGED(2))
-                button = 2;
-            else if (BUTTON_CHANGED(3))
-                button = 3;
+            for( i = 0; i < PDC_MAX_MOUSE_BUTTONS; i++)
+                if (BUTTON_CHANGED(i))
+                    button = i;
 
             wmove(win, line, 5);
             wclrtoeol(win);
@@ -546,6 +664,59 @@ void inputTest(WINDOW *win)
             if (PDC_get_key_modifiers() & PDC_KEY_MODIFIER_NUMLOCK)
                 waddstr(win, " NUMLOCK");
         }
+#else             /* ncurses mouse handling */
+        if (c == KEY_MOUSE)
+        {
+            MEVENT mevent;
+
+            wmove(win, line, 5);
+            wclrtoeol(win);
+            if( OK == getmouse( &mevent))
+            {
+                const mmask_t events[] = { BUTTON1_PRESSED, BUTTON1_RELEASED,
+                        BUTTON1_CLICKED, BUTTON1_DOUBLE_CLICKED, BUTTON1_TRIPLE_CLICKED,
+                        BUTTON2_PRESSED, BUTTON2_RELEASED, BUTTON2_CLICKED,
+                         BUTTON2_DOUBLE_CLICKED, BUTTON2_TRIPLE_CLICKED,
+                        BUTTON3_PRESSED, BUTTON3_RELEASED, BUTTON3_CLICKED,
+                         BUTTON3_DOUBLE_CLICKED, BUTTON3_TRIPLE_CLICKED,
+                        BUTTON4_PRESSED, BUTTON4_RELEASED, BUTTON4_CLICKED,
+                         BUTTON4_DOUBLE_CLICKED, BUTTON4_TRIPLE_CLICKED,
+                        BUTTON5_PRESSED, BUTTON5_RELEASED, BUTTON5_CLICKED,
+                         BUTTON5_DOUBLE_CLICKED, BUTTON5_TRIPLE_CLICKED,
+#ifdef BUTTON_CTRL
+                  BUTTON_CTRL,
+#else
+                  BUTTON_CONTROL,
+#endif
+                        BUTTON_SHIFT, BUTTON_ALT };
+
+                for( i = 0; (size_t)i < sizeof( events) / sizeof( events[0]); i++)
+                    if( mevent.bstate & events[i])
+                    {
+                        const char *text[8] = { "pressed", "released", "clicked",
+                               "dblclick", "triple-click", "Ctrl", "Shift", "Alt" };
+
+                        if( i < 25)
+                           wprintw( win, "button %d %s", i / 5 + 1, text[i % 5]);
+                        else
+                           wprintw( win, "  %s", text[i - 20]);
+                        if( i % 5 == 0)    /* button pressed */
+                           mouse_buttons_held |= (1 << (i / 5));
+                        if( i % 5 == 1)    /* button released */
+                           mouse_buttons_held &= ~(1 << (i / 5));
+                    }
+                if( mevent.bstate & ALL_MOVE_EVENTS)
+                {
+                    wprintw( win, "moved <%d>", mouse_buttons_held);
+                    for( i = 0; i < 3; i++)
+                        if( (mouse_buttons_held >> i) & 1)
+                            wprintw( win, "  Button %d", i + 1);
+                }
+                wprintw(win, "  Posn: Y: %d X: %d", mevent.y, mevent.x);
+            }
+            else
+                wprintw( win, "  ? getmouse failed ?");
+        }
 #endif
         wrefresh(win);
         line++;
@@ -557,9 +728,15 @@ void inputTest(WINDOW *win)
     wtimeout(win, -1);  /* turn off timeout() */
     curs_set(1);        /* turn cursor back on */
 
-#ifdef PDCURSES
+#ifdef CLASSIC_MOUSE_INTERFACE
     mouse_set(0L);
     PDC_return_key_modifiers(FALSE);
+#else
+    mousemask( (mmask_t)0, NULL);
+#endif
+#ifdef NCURSES_VERSION
+    if( test_mouse_mask & REPORT_MOUSE_POSITION)
+      printf( "\x1b\x5b?1003l\n");        /* disables mouse movement reports */
 #endif
     wclear(win);
     if( c == 1)
@@ -614,7 +791,7 @@ void inputTest(WINDOW *win)
     mvwaddstr(win, 6, 2, "Enter a number then a string separated by space");
     mvwin(win, 2, 1);
     wrefresh(win);
-    mvwscanw(win, 7, 6, "%d %s", &num, buffer);
+    mvwscanw(win, 7, 6, "%d %79s", &num, buffer);
     mvwprintw(win, 8, 6, "String: %s Number: %d", buffer, num);
     Continue(win);
 
@@ -744,11 +921,11 @@ void outputTest(WINDOW *win)
     mvwaddstr(win, 10, 1, "Enter a string: ");
     wrefresh(win);
     echo();
-    wscanw(win, "%s", Buffer);
+    wscanw(win, "%79s", Buffer);
 
     printw("This is a formatted string in stdscr: %d %s\n", 42, "is it");
     mvaddstr(10, 1, "Enter a string: ");
-    scanw("%s", Buffer);
+    scanw("%79s", Buffer);
 
     wclear(win);
     curs_set(2);
@@ -928,6 +1105,7 @@ void clipboardTest(WINDOW *win)
         clear();
         mvaddstr(1, 1, "Clipboard contents...");
         mvprintw(2, 1, "%s\n", ptr);
+        PDC_freeclipboard( ptr);
     }
 
     Continue2();
@@ -1299,7 +1477,7 @@ void acsTest(WINDOW *win)
     /* Spanish, Russian, Greek, Georgian, fullwidth, combining */
 
         tmarg += n_rows * 2;
-        mvaddwstr(tmarg, COLS / 8 - 5, (const wchar_t *) L"Espa\xf1ol");
+        mvaddwstr(tmarg, COLS / 8 - 5, L"Espa\xf1ol");
         mvaddwstr(tmarg, 3 * (COLS / 8) - 5, russian);
         mvaddwstr(tmarg, 5 * (COLS / 8) - 5, greek);
         mvaddwstr(tmarg, 7 * (COLS / 8) - 5, georgian);
@@ -1381,14 +1559,14 @@ void attrTest(WINDOW *win)
     mvaddstr(tmarg + 15, col1, "A_STRIKEOUT");
 #endif
 
-    attr_set( WA_TOP, 0, NULL);
+    (void)attr_set( WA_TOP, 0, NULL);
     mvaddstr(tmarg + 15, col2, "A_TOP");
 
-    attr_set( WA_DIM, 0, NULL);
+    (void)attr_set( WA_DIM, 0, NULL);
     mvaddstr(tmarg + 17, col2, "A_DIM");
 
 #ifdef WA_ITALIC
-    attr_set( WA_ITALIC | WA_UNDERLINE, 0, NULL);
+    (void)attr_set( WA_ITALIC | WA_UNDERLINE, 0, NULL);
     mvaddstr(tmarg + 3, col2, "Underlined Italic");
 #endif
 
@@ -1398,10 +1576,10 @@ void attrTest(WINDOW *win)
     attrset( A_BLINK | A_UNDERLINE);
     mvaddstr(tmarg + 7, col2, "Underlined Blink");
 
-    attr_set( WA_LEFT, 0, NULL);
+    (void)attr_set( WA_LEFT, 0, NULL);
     mvaddstr(tmarg + 9, col2, "A_LEFT");
 
-    attr_set( WA_RIGHT, 0, NULL);
+    (void)attr_set( WA_RIGHT, 0, NULL);
     mvaddstr(tmarg + 11, col2, "A_RIGHT");
 
     attrset(A_BLINK|A_REVERSE);
@@ -1449,10 +1627,10 @@ void remap(int tmarg, const short *colors)
 
     for (i = 0; i < 8; i++)
     {
-        init_color(colors[i], i * 125, 0, i * 125);
+        init_color(colors[i], (short)( i * 125), 0, (short)( i * 125));
 
         if (COLORS >= 16)
-            init_color(colors[i] + 8, 0, i * 125, 0);
+            init_color((short)( colors[i] + 8), 0, (short)( i * 125), 0);
     }
 
     mvaddstr(tmarg + 19, 3, "Press any key to continue");
@@ -1464,11 +1642,13 @@ void remap(int tmarg, const short *colors)
                       orgcolors[i].blue);
 }
 
-void extended(int tmarg)
+static void show_color_cube( int tmarg)
 {
     short i, x, y, z, lmarg = (short)(COLS - 77) / 2;
 
     erase();
+    if( lmarg < 0)
+      lmarg = 0;
 
     curs_set(0);
 
@@ -1478,10 +1658,18 @@ void extended(int tmarg)
 
     mvaddstr(tmarg + 2, lmarg, "6x6x6 Color Cube (16-231):");
 
-    mvaddstr(tmarg + 4,  lmarg, "Blk      Red");
-    mvaddstr(tmarg + 4,  lmarg + 65, "Grn      Yel");
-    mvaddstr(tmarg + 11, lmarg, "Blue    Mgta");
-    mvaddstr(tmarg + 11, lmarg + 65, "Cyan   White");
+    mvaddstr(tmarg + 4,  lmarg, "Black    Red");
+    mvaddstr(tmarg + 11, lmarg, "Blue Magenta");
+    if( COLS >= 77)
+    {
+        mvaddstr(tmarg + 4,  lmarg + 65, "Green Yellow");
+        mvaddstr(tmarg + 11, lmarg + 65, "Cyan   White");
+    }
+    else
+    {
+        mvaddstr(tmarg + 11, COLS - 12, "Green Yellow");
+        mvaddstr(tmarg + 18, COLS - 12, "Cyan   White");
+    }
 
     for (i = 16; i < 256; i++)
         init_pair(i, COLOR_BLACK, i);
@@ -1491,8 +1679,14 @@ void extended(int tmarg)
             for (y = 0; y < 6; y++)
             {
                 chtype ch = ' ' | COLOR_PAIR(i++);
+                int line = tmarg + 5 + y, col = z * 13 + x * 2 + lmarg;
 
-                mvaddch(tmarg + 5 + y, z * 13 + x * 2 + lmarg, ch);
+                if( z == 5 && COLS < 77)
+                {
+                    line += 7;
+                    col += COLS - 77;
+                }
+                mvaddch( line, col, ch);
                 addch(ch);
             }
 
@@ -1592,31 +1786,33 @@ void gradient(int tmarg)
 
             if (!i || i == 3)
             {
-                init_color(cnum,    (i ? 0 : 1000), oval, oval);
-                init_color(cnum + 1,(i ? 1000 : 0), reverse, 0);
+                init_color(cnum,  (short)( i ? 0 : 1000), oval, oval);
+                cnum++;
+                init_color( cnum, (short)( i ? 1000 : 0), reverse, 0);
             }
             else if (i == 1 || i == 4)
             {
-                init_color(cnum,     (i == 4 ? 1000 : 0), 0, reverse);
-                init_color(cnum + 1, (i == 4 ? 0 : 1000), reverse, 0);
+                init_color( cnum, (short)( i == 4 ? 1000 : 0), 0, reverse);
+                cnum++;
+                init_color( cnum, (short)( i == 4 ? 0 : 1000), reverse, 0);
             }
             else if( i == 2 || i == 5)
             {
-                init_color(cnum,     reverse, (i == 2 ? 1000 : 0), reverse);
+                init_color(cnum, reverse, (short)( i == 2 ? 1000 : 0), reverse);
+                cnum++;
                 if( i == 2)
-                   init_color(cnum + 1, reverse, 0, oval);
+                   init_color(cnum, reverse, 0, oval);
                 else
-                   init_color(cnum + 1, oval, oval, oval);
+                   init_color(cnum, oval, oval, oval);
             }
-            init_pair(pnum, cnum, cnum + 1);
+            init_pair(pnum, (short)( cnum - 1), cnum);
+            cnum++;
             attrset(COLOR_PAIR(pnum));
             if (i == 2)
                 attron(A_UNDERLINE);
             else
                 attroff(A_UNDERLINE);
             addch(output_text[i][j]);
-
-            cnum += 2;
             pnum++;
         }
     }
@@ -1625,6 +1821,8 @@ void gradient(int tmarg)
     curs_set(1);
 
     attrset(A_NORMAL);
+    if( cnum >= COLORS || pnum >= COLOR_PAIRS)
+       mvprintw(tmarg + 18, 3, "RAN OUT OF COLORS at %d colors", (int)cnum);
     mvaddstr(tmarg + 19, 3, "Press any key to continue");
     curTest();
 }
@@ -1643,19 +1841,19 @@ void colorTest(WINDOW *win)
         "COLOR_CYAN", "COLOR_MAGENTA", "COLOR_YELLOW", "COLOR_WHITE"
     };
 
-    chtype fill = ACS_BLOCK;
-    bool widecol = (COLORS >= 16);
+    const bool widecol = (COLORS >= 16);
+    const chtype fill = widecol ? ' ' : '@';
+    const int tmarg = (LINES - 19) / 2;
+    const int col1 = (COLS - 60) / 2;
+    const int col2 = col1 + 20;
+    const int col3 = col2 + 20;
 
-    int i, j, tmarg, col1, col2, col3;
+    int i, j;
 
     INTENTIONALLY_UNUSED_PARAMETER( win);
     if (!has_colors())
         return;
 
-    tmarg = (LINES - 19) / 2;
-    col1 = (COLS - 60) / 2;
-    col2 = col1 + 20;
-    col3 = col2 + 20;
 
     attrset(A_BOLD);
     mvaddstr(tmarg, (COLS - 22) / 2, "Color Attribute Macros");
@@ -1674,9 +1872,13 @@ void colorTest(WINDOW *win)
 
     for (i = 0; i < 8; i++)
     {
-        init_pair((short)i + 4, colors[i], COLOR_BLACK);
         if (widecol)
-            init_pair((short)i + 12, colors[i] + 8, COLOR_BLACK);
+        {
+            init_pair((short)( i + 4), COLOR_BLACK, colors[i]);
+            init_pair((short)(i + 12), COLOR_BLACK, colors[i] + 8);
+        }
+        else
+            init_pair((short)( i + 4), colors[i], COLOR_BLACK);
 
         mvaddstr(tmarg + i + 5, col1, colornames[i]);
 
@@ -1697,8 +1899,8 @@ void colorTest(WINDOW *win)
     if (can_change_color())
         remap(tmarg, colors);
 
-    if (COLORS >= 256)
-        extended(tmarg);
+    if( COLORS >= 256 && COLOR_PAIRS >= 256)
+        show_color_cube( tmarg);
 
 #if defined( __PDCURSESMOD__)
     if (can_change_color() && (long)COLORS == ((1L << 24) + 256L)
@@ -1706,7 +1908,7 @@ void colorTest(WINDOW *win)
         supergradient( tmarg);
 #endif
 
-    if (can_change_color() && COLORS >= 768)
+    if (can_change_color() && COLORS >= 768 && COLOR_PAIRS > 256)
         gradient(tmarg);
 }
 #endif
@@ -1731,11 +1933,11 @@ void wideTest(WINDOW *win)
     addwstr(tmp);
     addstr("\n\n\n Hex:\n\n ");
 
-    for (i = 0; i < wcslen(tmp); i++)
+    for (i = 0; tmp[i]; i++)
     {
         printw("%04x ", tmp[i]);
         addnwstr(tmp + i, 1);
-        addstr("  ");
+        addstr( getcurx( stdscr) > COLS - 8 ? "\n " : "  ");
     }
 
     noecho();

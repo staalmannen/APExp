@@ -119,21 +119,22 @@ mouse
    current platform.
 
 ### Portability
-                             X/Open  ncurses  NetBSD
-    mouse_set                   -       -       -
-    mouse_on                    -       -       -
-    mouse_off                   -       -       -
-    request_mouse_pos           -       -       -
-    wmouse_position             -       -       -
-    getmouse                    -       *       -
-    mouseinterval               -       Y       -
-    wenclose                    -       Y       -
-    wmouse_trafo                -       Y       -
-    mouse_trafo                 -       Y       -
-    mousemask                   -       Y       -
-    nc_getmouse                 -       *       -
-    ungetmouse                  -       Y       -
-    has_mouse                   -       Y       -
+   Function              | X/Open | ncurses | NetBSD
+   :---------------------|:------:|:-------:|:------:
+   mouse_set             |    -   |    -    |   -
+   mouse_on              |    -   |    -    |   -
+   mouse_off             |    -   |    -    |   -
+   request_mouse_pos     |    -   |    -    |   -
+   wmouse_position       |    -   |    -    |   -
+   getmouse              |    -   |    *    |   -
+   mouseinterval         |    -   |    Y    |   -
+   wenclose              |    -   |    Y    |   -
+   wmouse_trafo          |    -   |    Y    |   -
+   mouse_trafo           |    -   |    Y    |   -
+   mousemask             |    -   |    Y    |   -
+   nc_getmouse           |    -   |    *    |   -
+   ungetmouse            |    -   |    Y    |   -
+   has_mouse             |    -   |    Y    |   -
 
     * See above, under Description
 
@@ -293,6 +294,10 @@ bool mouse_trafo(int *y, int *x, bool to_screen)
     return wmouse_trafo(stdscr, y, x, to_screen);
 }
 
+#define BUTTON_MOVE_EVENTS (BUTTON1_MOVED | BUTTON2_MOVED | BUTTON3_MOVED \
+                          | BUTTON4_MOVED | BUTTON5_MOVED)
+#define ALL_MOVE_EVENTS  (BUTTON_MOVE_EVENTS | REPORT_MOUSE_POSITION)
+
 mmask_t mousemask(mmask_t mask, mmask_t *oldmask)
 {
     PDC_LOG(("mousemask() - called\n"));
@@ -308,12 +313,23 @@ mmask_t mousemask(mmask_t mask, mmask_t *oldmask)
        when using 32-bit mmask_ts,  so filter them here */
 
 #if !defined( PDC_LONG_MMASK)
-    mask &= ~(BUTTON1_MOVED | BUTTON2_MOVED | BUTTON3_MOVED);
+    mask &= ~BUTTON_MOVE_EVENTS;
 #endif
 
     mouse_set(mask);
 
     return SP->_trap_mbe;
+}
+
+/* For full compatibility with the ncurses mouse interface,  we need
+to account for the fact that ncurses maps wheel-up to a button4 press
+and wheel-down to a button5 press.  It lacks PDCursesMod's separate
+wheel scroll event flag.        */
+
+mmask_t nc_mousemask(mmask_t mask, mmask_t *oldmask)
+{
+    SP->ncurses_mouse = TRUE;
+    return( mousemask( mask, oldmask));
 }
 
 int nc_getmouse(MEVENT *event)
@@ -358,17 +374,12 @@ int nc_getmouse(MEVENT *event)
         }
     }
 
-    if (MOUSE_WHEEL_UP)
+    if (MOUSE_WHEEL_UP || (Mouse_status.changes & 0x200))
         bstate |= BUTTON4_PRESSED;
-    else if (MOUSE_WHEEL_DOWN)
+    else if (MOUSE_WHEEL_DOWN || (Mouse_status.changes & 0x400))
         bstate |= BUTTON5_PRESSED;
-                     /* 'Moves' (i.e.,  button is pressed) and 'position reports' */
-                     /* (mouse moved with no button down) are all reported as     */
-                     /* 'position reports' in NCurses,  which lacks 'move' events. */
-    if( MOUSE_MOVED && (SP->_trap_mbe & REPORT_MOUSE_POSITION))
-        bstate |= REPORT_MOUSE_POSITION;
 
-    for( i = 0; i < 3; i++)
+    for( i = 0; i < 5; i++)
     {
        if( Mouse_status.button[i] & PDC_BUTTON_SHIFT)
            bstate |= BUTTON_MODIFIER_SHIFT;
@@ -381,6 +392,12 @@ int nc_getmouse(MEVENT *event)
     /* extra filter pass -- mainly for button modifiers */
 
     event->bstate = bstate & SP->_trap_mbe;
+
+                     /* 'Moves' (i.e.,  button is pressed) and 'position reports' */
+                     /* (mouse moved with no button down) are all reported as     */
+                     /* 'position reports' in NCurses,  which lacks 'move' events. */
+    if( MOUSE_MOVED && (SP->_trap_mbe & ALL_MOVE_EVENTS))
+       event->bstate |= REPORT_MOUSE_POSITION;
 
     return OK;
 }
