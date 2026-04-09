@@ -1,20 +1,29 @@
 dnl
 dnl autoconf source file for configure script for the objc-bootstrap compiler
-dnl $Id: configure.in,v 1.9 2023/03/04 08:16:31 stes Exp $
+dnl $Id: configure.in,v 1.18 2025/06/18 08:37:10 stes Exp $
 dnl
 dnl note: we're in the process of converting the old configure script
 dnl (configure.orig) to an autoconf script (long term project)
 dnl before 3.3.30 objc-bootstrap would use the configure script from objc
 dnl this is now in its own util/configure.in script
 
-AC_INIT()
+AC_INIT
 
 dnl variable $OBJCDIR/lib or $OBJCDIR/lib64
 dnl this supports the Linux platforms (Red Hat/SuSE) that insist on lib64
 AC_ARG_VAR(LIB64NAME,name relative to OBJCDIR)
 
-dnl the following sets 'srcdir' check that it finds unique block98.html file
+dnl the following sets 'srcdir' check that it finds unique BOOTSTRAP file
 AC_CONFIG_SRCDIR(BOOTSTRAP)
+
+dnl by default define IMP
+dnl typedef id (*IMP) ()           
+dnl Method pointer traditional K&R C style as in C (and ANSI C)
+
+AC_ARG_WITH(impcplus,
+  [  --with-impcplus         define IMP C++ style id (*imp)(id,...)],
+  [ac_cv_impcplus=$withval]
+)
 
 dnl normally we check for _objcInit() (to see if it's not in the syslibs)
 dnl if it is, we should be using some other prefixed name (oc_objcInit)
@@ -50,10 +59,10 @@ AC_ARG_WITH(informix,
 )
 
 AC_CONFIG_AUX_DIR(util)
-AC_CANONICAL_SYSTEM
+AC_CANONICAL_TARGET
 
 TARGET=$target;AC_SUBST(TARGET)
-OBJC1VERSION=3.3.38;AC_SUBST(OBJC1VERSION)
+OBJC1VERSION=3.4.8;AC_SUBST(OBJC1VERSION)
 NAME=objc-${OBJC1VERSION};AC_SUBST(NAME)
 WARNING="DO NOT EDIT -- configure ${NAME} ${TARGET}";AC_SUBST(WARNING)
 
@@ -193,7 +202,7 @@ dnl gcc -E -O2 (without -x c flag)
 dnl however in the gcc case we can use the -x c flag instead of rename file
 dnl
 
-case $ac_cv_prog_gcc in
+case $ac_cv_c_compiler_gnu in
   yes) 
 AC_MSG_CHECKING(whether $CPP supports -x c to turn off Objective-C mode)
 cat <<EOF >foo.m 
@@ -222,7 +231,7 @@ OBJC1FILTER='';AC_SUBST(OBJC1FILTER)
 CPPIMPORTFLAG="";
 CCDOLLARFLAG="";
 
-case $ac_cv_prog_gcc in
+case $ac_cv_c_compiler_gnu in
  yes) 
   CPPIMPORTFLAG="-x objective-c -Wno-import";
   CCDOLLARFLAG="-fdollars-in-identifiers";
@@ -261,6 +270,7 @@ case $target in
  *nextstep*|*rhapsody*) OC_CPARGS="-traditional-cpp";;
  *) OC_CPARGS='';;
 esac
+OC_CCARGS=''
 
 dnl
 dnl since POC 3.3.4 we select gcc in C mode rather than their Objective-C mode
@@ -269,7 +279,7 @@ dnl but only if GCC actually supports -x c
 dnl note that old GCC compilers did not have an issue with this
 dnl and I think better to avoid -x c, after all GCC 5 behavior seems buggy
 dnl
-case $ac_cv_prog_gcc in
+case $ac_cv_c_compiler_gnu in
   yes) 
     case $CPPHASCLANG in
       1) OC_CPARGS='-x c';;
@@ -279,10 +289,29 @@ case $ac_cv_prog_gcc in
   *) ;;
 esac
 
+dnl
+dnl Since gcc 15 the compiler defaults to C23
+dnl select -std=gnu17 if the compiler accepts that flag
+dnl
+
+m4_include([ax_cc_gnu17.m4])
+
+AX_CC_GNU17
+
+case $ac_cv_gnu17 in
+    yes) OC_CPARGS="-std=gnu17 $OC_CPARGS";OC_CCARGS="-std=gnu17 $OC_CCARGS";;
+    no) ;;
+esac
+
 OC_CPARGS="-D__PORTABLE_OBJC__ $OC_CPARGS"
+
+case $ac_cv_impcplus in 
+  yes) OC_CPARGS="$OC_CPARGS -DOBJCRT_IMPCPLUS=1";;
+  no) ;;
+esac
+
 AC_SUBST(OC_CPARGS)
 
-OC_CCARGS=''
 AC_SUBST(OC_CCARGS)
 
 dnl
@@ -355,7 +384,7 @@ case $target in
 # since -gnu extensions are enabled by default, we'd better remove this switch
 	*apple-darwin*) OC_OCARGS="-gnu -darwin";;
 	*solaris*)
-case $ac_cv_prog_gcc in
+case $ac_cv_c_compiler_gnu in
 	yes) OC_OCARGS="-gnu";;
 	no) OC_OCARGS="-gnu -sunstudio";;
 esac;;
@@ -377,6 +406,12 @@ case $ac_cv_shortlinetags in
      esac
      ;;
 esac
+
+case $ac_cv_impcplus in
+  yes) OC_OCARGS="$OC_OCARGS -impcplus";;
+  no) ;;
+esac
+
 AC_SUBST(OC_OCARGS)
 OC_LDARGS='';
 AC_SUBST(OC_LDARGS)
@@ -413,7 +448,7 @@ USELFLAG=1;AC_SUBST(USELFLAG)
 
 dnl flags for compiling the compiler
 MFLAGS=OPT_MFLAGS;AC_SUBST(MFLAGS)
-case $ac_cv_prog_gcc in
+case $ac_cv_c_compiler_gnu in
   yes) OPT_MFLAGS='-DNDEBUG -O2';;
   *) OPT_MFLAGS='-DNDEBUG';;
 esac
@@ -482,7 +517,7 @@ case $target in
 	*netbsd*)  DLARGS="-Bshareable";
 		   ;;
 	*sysv*uw*|*sco*)
-            case $ac_cv_prog_gcc in
+            case $ac_cv_c_compiler_gnu in
                yes)
                    DLARGS="-shared";
 	           DLXLDARGS="-Xlinker --export-dynamic -ldl";
@@ -504,7 +539,7 @@ case $target in
 	*sunos*|*solaris*) DLARGS="-G";DLXLDARGS="-ldl";
 		   ;;
 	*hpux*)
-            case $ac_cv_prog_gcc in
+            case $ac_cv_c_compiler_gnu in
 	       yes)
 	           DLARGS="-shared";
 	           DLXLDARGS="-Wl,-E -ldld";
@@ -518,7 +553,7 @@ case $target in
             esac
 	    ;;
 	*osf*)
-            case $ac_cv_prog_gcc in
+            case $ac_cv_c_compiler_gnu in
 	       yes)
 	           DLARGS="-shared";
 		   ;;
@@ -531,7 +566,7 @@ case $target in
             esac
             ;;
         *irix*)
-            case $ac_cv_prog_gcc in
+            case $ac_cv_c_compiler_gnu in
 	       yes)
 	           DLARGS="-shared";
 		   ;;
@@ -588,7 +623,8 @@ esac
 
 AC_SUBST(LINKFORMAT)
 
-AC_HEADER_STDC
+dnl comment out STDC for autoconf 2.71
+dnl AC_HEADER_STDC
 AC_CHECK_HEADERS(string.h stdarg.h)
 
 AC_PROG_CC_C_O
@@ -721,7 +757,8 @@ AC_SUBST(SQLEXT)
 
 list='Makefile objc'
 
-AC_OUTPUT($list)
+AC_CONFIG_FILES([$list])
+AC_OUTPUT
 
 # created from objc.in
 chmod a+x objc

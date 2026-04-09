@@ -66,12 +66,12 @@ typedef char*STR;
 typedef char BOOL;
 typedef FILE*IOD;
 typedef id SHR;
-# 62 "./../../include/objcrt/objcrt.h"
+# 67 "./../../include/objcrt/objcrt.h"
 typedef id(*IMP)();
 
 
 typedef void(*ARGIMP)(id,SEL,void*);
-# 85 "./../../include/objcrt/objcrt.h"
+# 90 "./../../include/objcrt/objcrt.h"
 extern BOOL msgFlag;
 extern FILE*msgIOD;
 extern FILE*dbgIOD;
@@ -79,13 +79,13 @@ extern BOOL allocFlag;
 extern BOOL dbgFlag;
 extern BOOL noCacheFlag;
 extern BOOL noNilRcvr;
-# 98 "./../../include/objcrt/objcrt.h"
+# 103 "./../../include/objcrt/objcrt.h"
 SEL selUid(STR);
 STR selName(SEL);
 void dbg(char*fmt,...);
 void loadobjc(void*modPtr);
 void unloadobjc(void*modPtr);
-# 106 "./../../include/objcrt/objcrt.h"
+# 111 "./../../include/objcrt/objcrt.h"
 IMP fwdimp(id,SEL,IMP);
 IMP fwdimpSuper(id,SEL,IMP);
 void fwdmsg(id,SEL,void*,ARGIMP);
@@ -268,6 +268,7 @@ extern char*o_bind;
 extern char*o_browsedir;
 extern int o_refbind;
 extern int o_inlinecache;
+extern int o_impcplus;
 extern int o_cplus;
 extern int o_gencode;
 extern int o_st80;
@@ -438,15 +439,15 @@ return(id)self;
 static id i_TranslationUnit_inlinecacheprologue(struct TranslationUnit_PRIVATE *self,SEL _cmd)
 {
 
-if(o_cplus){
-gs("struct objcrt_inlineCache {id cls;id (*imp)(...);};\n");
+if(o_impcplus){
+gs("struct objcrt_inlineCache {id cls;id (*imp)(id,...);};\n");
 }else{
 gs("struct objcrt_inlineCache {id cls;id (*imp)();};\n");
 }
 # 124 "trlunit.m"
-if(o_cplus){
+if(o_impcplus){
 gextc();
-gf("id %s _nilHandler(...);\n",o_bind);
+gf("id %s _nilHandler(id,...);\n",o_bind);
 }else{
 gf("id %s _nilHandler(id,char*);\n",o_bind);
 }
@@ -559,11 +560,11 @@ gs("typedef struct _PRIVATE *id;\n");
 (objcT13=(objcT14=ClassDef,(*_imp(objcT14,selTransTbl[3]))(objcT14,selTransTbl[3])),(*_imp(objcT13,selTransTbl[8]))(objcT13,selTransTbl[8]));
 
 if( !o_fwd){
-if(o_cplus){
+if(o_impcplus){
 gextc();
-gf("id %s (* _imp(id,char*))(...);\n",o_bind);
+gf("id %s (* _imp(id,char*))(id,...);\n",o_bind);
 gextc();
-gf("id %s (* _impSuper(id,char*))(...);\n",o_bind);
+gf("id %s (* _impSuper(id,char*))(id,...);\n",o_bind);
 }else{
 gf("extern id %s (* _imp(id,char*))();\n",o_bind);
 gf("extern id %s (* _impSuper(id,char*))();\n",o_bind);
@@ -583,15 +584,15 @@ gs("static char **selTransTbl;\n");
 }
 
 if(o_fwd){
-if(o_cplus){
-gs("static id (**fwdTransTbl)(...);\n");
+if(o_impcplus){
+gs("static id (**fwdTransTbl)(id,...);\n");
 }else{
 gs("static id (**fwdTransTbl)();\n");
 }
 }
 
-if(o_cplus){
-gs("struct _SLT {char *_cmd;id (*_imp)(...);};\n");
+if(o_impcplus){
+gs("struct _SLT {char *_cmd;id (*_imp)(id,...);};\n");
 }else{
 gs("struct _SLT {char *_cmd;id (*_imp)();};\n");
 }
@@ -815,8 +816,8 @@ int i,n;
 
 n=(self->fwdcltn)?(objcT56=self->fwdcltn,(*(unsigned(*)(id,SEL))_imp(objcT56,selTransTbl[12]))(objcT56,selTransTbl[12])):0;
 
-if(o_cplus){
-gs("static id (*(_fwdTransTbl[]))(...) ={\n");
+if(o_impcplus){
+gs("static id (*(_fwdTransTbl[]))(id,...) ={\n");
 }else{
 gs("static id (*(_fwdTransTbl[]))() ={\n");
 }
@@ -827,16 +828,16 @@ id objcT57,objcT58;
 # 435 "trlunit.m"
 char*s=(objcT57=(objcT58=self->fwdcltn,(*(id(*)(id,SEL,unsigned))_imp(objcT58,selTransTbl[17]))(objcT58,selTransTbl[17],i)),(*(char*(*)(id,SEL))_imp(objcT57,selTransTbl[23]))(objcT57,selTransTbl[23]));
 
-if(o_cplus){
-gf("(id(*)(...))%s,\n",s);
+if(o_impcplus){
+gf("(id(*)(id,...))%s,\n",s);
 }else{
 gf("(id(*)())%s,\n",s);
 }
 }
 
 
-if(o_cplus){
-gs("(id(*)(...))0\n};\n");
+if(o_impcplus){
+gs("(id(*)(id,...))0\n};\n");
 }else{
 gs("(id(*)())0\n};\n");
 }
@@ -1731,7 +1732,7 @@ static char *_selTransTbl[] ={
 };
 struct modDescriptor trlunit_modDesc = {
   "trlunit",
-  "objc3.3.19",
+  "objc3.4.8",
   0L,
   0,
   0,

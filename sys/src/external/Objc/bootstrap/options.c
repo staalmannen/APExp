@@ -79,6 +79,7 @@ extern char*o_bind;
 extern char*o_browsedir;
 extern int o_refbind;
 extern int o_inlinecache;
+extern int o_impcplus;
 extern int o_cplus;
 extern int o_gencode;
 extern int o_st80;
@@ -147,6 +148,7 @@ char*o_bind;
 char*o_browsedir;
 int o_refbind;
 int o_inlinecache;
+int o_impcplus;
 int o_cplus;
 int o_gencode;
 int o_st80;
@@ -230,6 +232,7 @@ o_warnings=1;
 o_vms=0;
 o_hpux=0;
 o_refcnt=0;
+o_impcplus=0;
 o_cplus=0;
 o_debuginfo=0;
 o_ppi=0;
@@ -256,7 +259,7 @@ static char *_selTransTbl[] ={
 };
 struct modDescriptor options_modDesc = {
   "options",
-  "objc3.3.19",
+  "objc3.4.8",
   0L,
   0,
   0,

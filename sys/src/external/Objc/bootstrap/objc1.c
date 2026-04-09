@@ -57,12 +57,12 @@ typedef char*STR;
 typedef char BOOL;
 typedef FILE*IOD;
 typedef id SHR;
-# 62 "./../../include/objcrt/objcrt.h"
+# 67 "./../../include/objcrt/objcrt.h"
 typedef id(*IMP)();
 
 
 typedef void(*ARGIMP)(id,SEL,void*);
-# 85 "./../../include/objcrt/objcrt.h"
+# 90 "./../../include/objcrt/objcrt.h"
 extern BOOL msgFlag;
 extern FILE*msgIOD;
 extern FILE*dbgIOD;
@@ -70,13 +70,13 @@ extern BOOL allocFlag;
 extern BOOL dbgFlag;
 extern BOOL noCacheFlag;
 extern BOOL noNilRcvr;
-# 98 "./../../include/objcrt/objcrt.h"
+# 103 "./../../include/objcrt/objcrt.h"
 SEL selUid(STR);
 STR selName(SEL);
 void dbg(char*fmt,...);
 void loadobjc(void*modPtr);
 void unloadobjc(void*modPtr);
-# 106 "./../../include/objcrt/objcrt.h"
+# 111 "./../../include/objcrt/objcrt.h"
 IMP fwdimp(id,SEL,IMP);
 IMP fwdimpSuper(id,SEL,IMP);
 void fwdmsg(id,SEL,void*,ARGIMP);
@@ -188,6 +188,7 @@ extern char*o_bind;
 extern char*o_browsedir;
 extern int o_refbind;
 extern int o_inlinecache;
+extern int o_impcplus;
 extern int o_cplus;
 extern int o_gencode;
 extern int o_st80;
@@ -357,20 +358,20 @@ void definebuiltinvar(char*s);
 # 38 "objc1.m"
 void printversion(void)
 {
-printf("%s\n","3.3.38");
+printf("%s\n","3.4.8");
 exit(0);
 }
 
 void printcopyright(void)
 {
-printf("Portable Object Compiler %s (c) 1997-2023.\n","3.3.38");
+printf("Portable Object Compiler %s (c) 1997-2025.\n","3.4.8");
 printf("Distributed under the terms of the GNU LGPL.\n");
 }
 
 void unknownoption(char*arg)
 {
 STR msg="%s: unknown option %s\n";
-STR name=(o_cplus)?"objcpls1":"objc1";
+STR name="objc1";
 fprintf(stderr,msg,name,arg);
 exit(1);
 }
@@ -381,7 +382,7 @@ id objcT0,objcT1;
 
 # 60 "objc1.m"
 STR msg="%s: illegal argument %s for %s\n";
-STR name=(o_cplus)?"objcpls1":"objc1";
+STR name="objc1";
 fprintf(stderr,msg,name,(objcT0=arg,(*(STR(*)(id,SEL))_imp(objcT0,selTransTbl[0]))(objcT0,selTransTbl[0])),(objcT1=option,(*(STR(*)(id,SEL))_imp(objcT1,selTransTbl[0]))(objcT1,selTransTbl[0])));
 exit(1);
 }
@@ -673,6 +674,8 @@ o_selfassign=0;
 o_nilrcvr=0;
 }else if( !strcmp(t,"-objc")){
 o_gencode=0;
+}else if( !strcmp(t,"-impcplus")){
+o_impcplus++;
 }else if( !strcmp(t,"-cplus")){
 o_cplus++;
 }else if( !strcmp(t,"-inlinecache")){
@@ -753,7 +756,7 @@ unknownoption(t);
 }
 }
 
-# 404 "objc1.m"
+# 406 "objc1.m"
 void openinfile(void)
 {
 if(o_infile){
@@ -771,18 +774,18 @@ inlineno=1;
 if(o_srcfilename){
 id objcT37;
 
-# 419 "objc1.m"
+# 421 "objc1.m"
 infilename=(objcT37=String,(*(id(*)(id,SEL,STR))_imp(objcT37,selTransTbl[1]))(objcT37,selTransTbl[1],o_srcfilename));
 }else{
 if(o_infile){
 id objcT38;
 
-# 422 "objc1.m"
+# 424 "objc1.m"
 infilename=(objcT38=String,(*(id(*)(id,SEL,STR))_imp(objcT38,selTransTbl[1]))(objcT38,selTransTbl[1],o_infile));
 }else{
 id objcT39;
 
-# 424 "objc1.m"
+# 426 "objc1.m"
 infilename=(objcT39=String,(*(id(*)(id,SEL,STR))_imp(objcT39,selTransTbl[1]))(objcT39,selTransTbl[1],"-=stdin=-"));
 }
 }
@@ -790,12 +793,12 @@ infilename=(objcT39=String,(*(id(*)(id,SEL,STR))_imp(objcT39,selTransTbl[1]))(ob
 if( !o_nolinetags){
 id objcT40;
 
-# 429 "objc1.m"
+# 431 "objc1.m"
 gl(inlineno,(objcT40=infilename,(*(STR(*)(id,SEL))_imp(objcT40,selTransTbl[0]))(objcT40,selTransTbl[0])));
 }
 
 (void)0;
-(objcT41=trlunit,(*(id(*)(id,SEL,char*))_imp(objcT41,selTransTbl[7]))(objcT41,selTransTbl[7],"objc3.3.38"));
+(objcT41=trlunit,(*(id(*)(id,SEL,char*))_imp(objcT41,selTransTbl[7]))(objcT41,selTransTbl[7],"objc3.4.8"));
 (objcT42=trlunit,(*(id(*)(id,SEL,char*))_imp(objcT42,selTransTbl[8]))(objcT42,selTransTbl[8],(objcT43=infilename,(*(STR(*)(id,SEL))_imp(objcT43,selTransTbl[0]))(objcT43,selTransTbl[0]))));
 
 if(o_vms){
@@ -882,11 +885,15 @@ definebuiltinfun("__builtin___memcpy_chk");
 
 definebuiltinfun("__builtin_bswap32");
 definebuiltinfun("__builtin_bswap64");
-# 523 "objc1.m"
+# 525 "objc1.m"
 definebuiltinfun("__builtin___stpcpy_chk");
-# 527 "objc1.m"
+# 529 "objc1.m"
 definebuiltinvar("__builtin_va_alist");
 if( !(o_sunstudio&&o_m64))definebuiltinfun("__builtin_va_arg_incr");
+
+
+definebuiltinvar("nullptr");
+definebuiltinfun("__builtin_c23_va_start");
 }
 }
 
@@ -919,7 +926,7 @@ if(o_outfile)fclose(gfile);
 # 24 "./../oclib/trlunit.h"
 extern id  TranslationUnit;
 
-# 558 "objc1.m"
+# 564 "objc1.m"
 int objcmain(int argc,char*argv[])
 {
 id objcT44,objcT45,objcT46,objcT47;
@@ -950,7 +957,7 @@ return 0;
 }
 extern int oc_objcInit(int debug,int traceInit);
 
-# 558 "objc1.m"
+# 564 "objc1.m"
 int main(int argc,char*argv[]){
 oc_objcInit(0,0);
 return objcmain(argc,argv);
@@ -973,7 +980,7 @@ static char *_selTransTbl[] ={
 };
 struct modDescriptor objc1_modDesc = {
   "objc1",
-  "objc3.3.19",
+  "objc3.4.8",
   0L,
   0,
   0,

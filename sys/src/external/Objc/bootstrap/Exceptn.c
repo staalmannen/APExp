@@ -48,7 +48,7 @@ typedef char*STR;
 typedef char BOOL;
 typedef FILE*IOD;
 typedef id SHR;
-# 64 "./objcrt.h"
+# 69 "./objcrt.h"
 typedef id(*IMP)();
 
 
@@ -56,11 +56,11 @@ typedef void(*ARGIMP)(id,SEL,void*);
 # 1 "../../util//stdarg.h"
 #include <stdarg.h>
 
-# 117 "./objcrt.h"
+# 122 "./objcrt.h"
 struct objcrt_private
 {
 id isa;
-# 123 "./objcrt.h"
+# 128 "./objcrt.h"
 unsigned short attr;
 unsigned short objID;
 
@@ -69,7 +69,7 @@ unsigned short objID;
 struct objcrt_shared
 {
 id isa;
-# 134 "./objcrt.h"
+# 139 "./objcrt.h"
 id clsSuper;
 char*clsName;
 char*clsTypes;
@@ -84,13 +84,13 @@ id*clsGlbl;
 };
 
 typedef struct objcrt_shared*Cls_t;
-# 179 "./objcrt.h"
+# 184 "./objcrt.h"
 struct objcrt_slt
 {
 SEL _cmd;
 IMP _imp;
 };
-# 189 "./objcrt.h"
+# 194 "./objcrt.h"
 struct objcrt_useDescriptor
 {
 int processed;
@@ -98,14 +98,14 @@ struct objcrt_useDescriptor*next;
 struct objcrt_useDescriptor***uses;
 struct objcrt_modDescriptor*(*bind)();
 };
-# 201 "./objcrt.h"
+# 206 "./objcrt.h"
 typedef struct hashedSelector
 {
 struct hashedSelector*next;
 STR key;
 }
 HASH,*PHASH;
-# 213 "./objcrt.h"
+# 218 "./objcrt.h"
 typedef struct objcrt_modDescriptor MOD,*PMOD;
 typedef struct objcrt_methodDescriptor METH,*PMETH;
 
@@ -136,7 +136,7 @@ id*cls;
 SEL*sel;
 IMP imp;
 };
-# 256 "./objcrt.h"
+# 261 "./objcrt.h"
 extern BOOL msgFlag;
 extern FILE*msgIOD;
 extern FILE*dbgIOD;
@@ -144,16 +144,16 @@ extern BOOL allocFlag;
 extern BOOL dbgFlag;
 extern BOOL noCacheFlag;
 extern BOOL noNilRcvr;
-# 269 "./objcrt.h"
+# 274 "./objcrt.h"
 SEL selUid(STR);
 STR selName(SEL);
 void dbg(char*fmt,...);
 void loadobjc(void*modPtr);
 void unloadobjc(void*modPtr);
-# 286 "./objcrt.h"
+# 291 "./objcrt.h"
 IMP _imp(id,SEL);
 IMP _impSuper(id,SEL);
-# 291 "./objcrt.h"
+# 296 "./objcrt.h"
 IMP fwdimp(id,SEL,IMP);
 IMP fwdimpSuper(id,SEL,IMP);
 void fwdmsg(id,SEL,void*,ARGIMP);
@@ -163,7 +163,7 @@ id selptrfwd(id,SEL,id,id,id,id);
 id idincref(id obj);
 id idassign(id*lhs,id rhs);
 id iddecref(id obj);
-# 320 "./objcrt.h"
+# 325 "./objcrt.h"
 extern id(*oc_alloc)(id,unsigned int);
 extern id(*oc_dealloc)(id);
 extern id(*oc_copy)(id,unsigned int);
@@ -234,7 +234,7 @@ struct Exception_SHARED {
   id clsCats;
   id *clsGlbl;
 
-# 45 "./Exceptn.h"
+# 46 "./Exceptn.h"
 id handler;};
 
 # 37 "./Exceptn.h"
@@ -245,14 +245,14 @@ extern struct Exception_SHARED _Exception;
 extern struct _SHARED __Exception;
 
 
-# 41 "Exceptn.m"
+# 46 "Exceptn.m"
 static id c_Exception_install_(struct Exception_PRIVATE *self,SEL _cmd,id aHandler)
 {
 if(((struct Exception_SHARED *)self)->handler)
 {
 id objcT0;
 ((struct Exception_SHARED *)self)->
-# 45 "Exceptn.m"
+# 50 "Exceptn.m"
 handler=(objcT0=aHandler,(*_imp(objcT0,selTransTbl[0]))(objcT0,selTransTbl[0],((struct Exception_SHARED *)self)->handler));
 }
 else
@@ -262,21 +262,21 @@ handler=aHandler;
 return(id)self;
 }
 
-# 60 "Exceptn.m"
+# 65 "Exceptn.m"
 static id i_Exception_defaultAction(struct Exception_PRIVATE *self,SEL _cmd)
 {
 id objcT1;
 
-# 62 "Exceptn.m"
+# 67 "Exceptn.m"
 return(objcT1=(id)self,(*_imp(objcT1,selTransTbl[1]))(objcT1,selTransTbl[1]));
 }
 
-# 71 "Exceptn.m"
+# 76 "Exceptn.m"
 static id c_Exception_signal(struct Exception_PRIVATE *self,SEL _cmd)
 {
 id objcT2,objcT3;
 
-# 73 "Exceptn.m"
+# 78 "Exceptn.m"
 return(objcT2=(objcT3=(id)self,(*_imp(objcT3,selTransTbl[2]))(objcT3,selTransTbl[2])),(*_imp(objcT2,selTransTbl[3]))(objcT2,selTransTbl[3]));
 }
 
@@ -284,7 +284,7 @@ static id c_Exception_signal_(struct Exception_PRIVATE *self,SEL _cmd,STR messag
 {
 id objcT4,objcT5;
 
-# 78 "Exceptn.m"
+# 83 "Exceptn.m"
 return(objcT4=(objcT5=(id)self,(*_imp(objcT5,selTransTbl[2]))(objcT5,selTransTbl[2])),(*(id(*)(id,SEL,STR))_imp(objcT4,selTransTbl[4]))(objcT4,selTransTbl[4],message));
 }
 
@@ -292,20 +292,20 @@ static id i_Exception_free(struct Exception_PRIVATE *self,SEL _cmd)
 {
 id objcT6,objcT7;
 
-# 83 "Exceptn.m"
+# 88 "Exceptn.m"
 if(self->messageText)self->
 messageText=(objcT6=self->messageText,(*_imp(objcT6,selTransTbl[5]))(objcT6,selTransTbl[5]));
 return(objcT7=_Exception.clsSuper,(*_impSuper(objcT7,selTransTbl[5]))((id)self,selTransTbl[5]));
 }
 
-# 95 "Exceptn.m"
+# 100 "Exceptn.m"
 static id i_Exception_signal(struct Exception_PRIVATE *self,SEL _cmd)
 {
 if(((struct Exception_SHARED *)self->isa)->handler)
 {
 id objcT8,objcT9;
 self->
-# 99 "Exceptn.m"
+# 104 "Exceptn.m"
 resumeHandler=((struct Exception_SHARED *)self->isa)->handler;((struct Exception_SHARED *)self->isa)->
 handler=(objcT8=((struct Exception_SHARED *)self->isa)->handler,(*_imp(objcT8,selTransTbl[6]))(objcT8,selTransTbl[6]));
 return(objcT9=self->resumeHandler,(*_imp(objcT9,selTransTbl[7]))(objcT9,selTransTbl[7],(id)self));
@@ -314,7 +314,7 @@ else
 {
 id objcT10;
 
-# 105 "Exceptn.m"
+# 110 "Exceptn.m"
 return(objcT10=(id)self,(*_imp(objcT10,selTransTbl[8]))(objcT10,selTransTbl[8],self->messageText));
 }
 }
@@ -323,8 +323,8 @@ static id i_Exception_signal_(struct Exception_PRIVATE *self,SEL _cmd,STR messag
 {
 id objcT11,objcT12;
 
-# 111 "Exceptn.m"
-return(objcT11=(objcT12=(id)self,(*_imp(objcT12,selTransTbl[9]))(objcT12,selTransTbl[9],message)),(*_imp(objcT11,selTransTbl[3]))(objcT11,selTransTbl[3]));
+# 116 "Exceptn.m"
+return(objcT11=(objcT12=(id)self,(*(id(*)(id,SEL,STR))_imp(objcT12,selTransTbl[9]))(objcT12,selTransTbl[9],message)),(*_imp(objcT11,selTransTbl[3]))(objcT11,selTransTbl[3]));
 }
 
 static id i_Exception_messageText(struct Exception_PRIVATE *self,SEL _cmd)
@@ -336,7 +336,7 @@ static STR i_Exception_str(struct Exception_PRIVATE *self,SEL _cmd)
 {
 id objcT13;
 
-# 121 "Exceptn.m"
+# 126 "Exceptn.m"
 return(objcT13=self->messageText,(*(STR(*)(id,SEL))_imp(objcT13,selTransTbl[10]))(objcT13,selTransTbl[10]));
 }
 
@@ -350,20 +350,20 @@ static id i_Exception_str_(struct Exception_PRIVATE *self,SEL _cmd,STR message)
 {
 id objcT14,objcT15,objcT16;
 
-# 132 "Exceptn.m"
+# 137 "Exceptn.m"
 static id MsgClass;
 id aMessage;
 if( !MsgClass)
 MsgClass=(objcT14=(id)self,(*(id(*)(id,SEL,STR))_imp(objcT14,selTransTbl[11]))(objcT14,selTransTbl[11],"String"));
-return(objcT15=(id)self,(*_imp(objcT15,selTransTbl[9]))(objcT15,selTransTbl[9],(objcT16=MsgClass,(*(id(*)(id,SEL,STR))_imp(objcT16,selTransTbl[12]))(objcT16,selTransTbl[12],message))));
+return(objcT15=(id)self,(*_imp(objcT15,selTransTbl[12]))(objcT15,selTransTbl[12],(objcT16=MsgClass,(*(id(*)(id,SEL,STR))_imp(objcT16,selTransTbl[9]))(objcT16,selTransTbl[9],message))));
 }
 
-# 145 "Exceptn.m"
+# 150 "Exceptn.m"
 static id i_Exception_resignalAs_(struct Exception_PRIVATE *self,SEL _cmd,id replacementException)
 {
 id objcT17;
 
-# 147 "Exceptn.m"
+# 152 "Exceptn.m"
 return(objcT17=(id)self,(*_imp(objcT17,selTransTbl[13]))(objcT17,selTransTbl[13]));
 }
 
@@ -438,16 +438,16 @@ static char *_selTransTbl[] ={
 "pop",
 "value:",
 "halt:",
-"messageText:",
+"str:",
 "str",
 "findClass:",
-"str:",
+"messageText:",
 "notImplemented",
 0
 };
 struct modDescriptor Exceptn_modDesc = {
   "Exceptn",
-  "objc3.3.19",
+  "objc3.4.8",
   0L,
   0,
   0,

@@ -60,12 +60,12 @@ typedef char*STR;
 typedef char BOOL;
 typedef FILE*IOD;
 typedef id SHR;
-# 62 "./../../include/objcrt/objcrt.h"
+# 67 "./../../include/objcrt/objcrt.h"
 typedef id(*IMP)();
 
 
 typedef void(*ARGIMP)(id,SEL,void*);
-# 85 "./../../include/objcrt/objcrt.h"
+# 90 "./../../include/objcrt/objcrt.h"
 extern BOOL msgFlag;
 extern FILE*msgIOD;
 extern FILE*dbgIOD;
@@ -73,13 +73,13 @@ extern BOOL allocFlag;
 extern BOOL dbgFlag;
 extern BOOL noCacheFlag;
 extern BOOL noNilRcvr;
-# 98 "./../../include/objcrt/objcrt.h"
+# 103 "./../../include/objcrt/objcrt.h"
 SEL selUid(STR);
 STR selName(SEL);
 void dbg(char*fmt,...);
 void loadobjc(void*modPtr);
 void unloadobjc(void*modPtr);
-# 106 "./../../include/objcrt/objcrt.h"
+# 111 "./../../include/objcrt/objcrt.h"
 IMP fwdimp(id,SEL,IMP);
 IMP fwdimpSuper(id,SEL,IMP);
 void fwdmsg(id,SEL,void*,ARGIMP);
@@ -236,6 +236,7 @@ extern char*o_bind;
 extern char*o_browsedir;
 extern int o_refbind;
 extern int o_inlinecache;
+extern int o_impcplus;
 extern int o_cplus;
 extern int o_gencode;
 extern int o_st80;
@@ -1128,11 +1129,11 @@ return(id)self;
 
 static id i_ClassDef_genslt_(struct ClassDef_PRIVATE *self,SEL _cmd,id methdef)
 {
-if(o_cplus){
+if(o_impcplus){
 id objcT126,objcT127;
 
 # 559 "classdef.m"
-gf("\n{\"%s\",(id (*)(...))%s},",(objcT126=methdef,(*(char*(*)(id,SEL))_imp(objcT126,selTransTbl[37]))(objcT126,selTransTbl[37])),(objcT127=methdef,(*(char*(*)(id,SEL))_imp(objcT127,selTransTbl[38]))(objcT127,selTransTbl[38])));
+gf("\n{\"%s\",(id (*)(id,...))%s},",(objcT126=methdef,(*(char*(*)(id,SEL))_imp(objcT126,selTransTbl[37]))(objcT126,selTransTbl[37])),(objcT127=methdef,(*(char*(*)(id,SEL))_imp(objcT127,selTransTbl[38]))(objcT127,selTransTbl[38])));
 }else{
 id objcT128,objcT129;
 
@@ -1144,8 +1145,8 @@ return(id)self;
 
 static id i_ClassDef_gennilslt(struct ClassDef_PRIVATE *self,SEL _cmd)
 {
-if(o_cplus){
-gs("\n{(char*)0,(id (*)(...))0}");
+if(o_impcplus){
+gs("\n{(char*)0,(id (*)(id,...))0}");
 }else{
 gs("\n{(char*)0,(id (*)())0}");
 }
@@ -2286,7 +2287,7 @@ static char *_selTransTbl[] ={
 };
 struct modDescriptor classdef_modDesc = {
   "classdef",
-  "objc3.3.19",
+  "objc3.4.8",
   0L,
   0,
   0,

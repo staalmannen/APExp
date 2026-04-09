@@ -60,12 +60,12 @@ typedef char*STR;
 typedef char BOOL;
 typedef FILE*IOD;
 typedef id SHR;
-# 62 "./../../include/objcrt/objcrt.h"
+# 67 "./../../include/objcrt/objcrt.h"
 typedef id(*IMP)();
 
 
 typedef void(*ARGIMP)(id,SEL,void*);
-# 85 "./../../include/objcrt/objcrt.h"
+# 90 "./../../include/objcrt/objcrt.h"
 extern BOOL msgFlag;
 extern FILE*msgIOD;
 extern FILE*dbgIOD;
@@ -73,13 +73,13 @@ extern BOOL allocFlag;
 extern BOOL dbgFlag;
 extern BOOL noCacheFlag;
 extern BOOL noNilRcvr;
-# 98 "./../../include/objcrt/objcrt.h"
+# 103 "./../../include/objcrt/objcrt.h"
 SEL selUid(STR);
 STR selName(SEL);
 void dbg(char*fmt,...);
 void loadobjc(void*modPtr);
 void unloadobjc(void*modPtr);
-# 106 "./../../include/objcrt/objcrt.h"
+# 111 "./../../include/objcrt/objcrt.h"
 IMP fwdimp(id,SEL,IMP);
 IMP fwdimpSuper(id,SEL,IMP);
 void fwdmsg(id,SEL,void*,ARGIMP);
@@ -255,6 +255,7 @@ extern char*o_bind;
 extern char*o_browsedir;
 extern int o_refbind;
 extern int o_inlinecache;
+extern int o_impcplus;
 extern int o_cplus;
 extern int o_gencode;
 extern int o_st80;
@@ -1620,7 +1621,7 @@ static char *_selTransTbl[] ={
 };
 struct modDescriptor blockxpr_modDesc = {
   "blockxpr",
-  "objc3.3.19",
+  "objc3.4.8",
   0L,
   0,
   0,

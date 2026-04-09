@@ -45,12 +45,12 @@ typedef char*STR;
 typedef char BOOL;
 typedef FILE*IOD;
 typedef id SHR;
-# 62 "./../../include/objcrt/objcrt.h"
+# 67 "./../../include/objcrt/objcrt.h"
 typedef id(*IMP)();
 
 
 typedef void(*ARGIMP)(id,SEL,void*);
-# 85 "./../../include/objcrt/objcrt.h"
+# 90 "./../../include/objcrt/objcrt.h"
 extern BOOL msgFlag;
 extern FILE*msgIOD;
 extern FILE*dbgIOD;
@@ -58,13 +58,13 @@ extern BOOL allocFlag;
 extern BOOL dbgFlag;
 extern BOOL noCacheFlag;
 extern BOOL noNilRcvr;
-# 98 "./../../include/objcrt/objcrt.h"
+# 103 "./../../include/objcrt/objcrt.h"
 SEL selUid(STR);
 STR selName(SEL);
 void dbg(char*fmt,...);
 void loadobjc(void*modPtr);
 void unloadobjc(void*modPtr);
-# 106 "./../../include/objcrt/objcrt.h"
+# 111 "./../../include/objcrt/objcrt.h"
 IMP fwdimp(id,SEL,IMP);
 IMP fwdimpSuper(id,SEL,IMP);
 void fwdmsg(id,SEL,void*,ARGIMP);
@@ -120,7 +120,7 @@ struct Exception_SHARED {
   id clsCats;
   id *clsGlbl;
 
-# 41 "./../../include/objcrt/Exceptn.h"
+# 42 "./../../include/objcrt/Exceptn.h"
 id handler;};
 
 # 28 "./unknownt.h"
@@ -195,7 +195,7 @@ static char *_selTransTbl[] ={
 };
 struct modDescriptor unknownt_modDesc = {
   "unknownt",
-  "objc3.3.19",
+  "objc3.4.8",
   0L,
   0,
   0,

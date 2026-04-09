@@ -48,7 +48,7 @@ typedef char*STR;
 typedef char BOOL;
 typedef FILE*IOD;
 typedef id SHR;
-# 64 "./objcrt.h"
+# 69 "./objcrt.h"
 typedef id(*IMP)();
 
 
@@ -56,11 +56,11 @@ typedef void(*ARGIMP)(id,SEL,void*);
 # 1 "../../util//stdarg.h"
 #include <stdarg.h>
 
-# 117 "./objcrt.h"
+# 122 "./objcrt.h"
 struct objcrt_private
 {
 id isa;
-# 123 "./objcrt.h"
+# 128 "./objcrt.h"
 unsigned short attr;
 unsigned short objID;
 
@@ -69,7 +69,7 @@ unsigned short objID;
 struct objcrt_shared
 {
 id isa;
-# 134 "./objcrt.h"
+# 139 "./objcrt.h"
 id clsSuper;
 char*clsName;
 char*clsTypes;
@@ -84,13 +84,13 @@ id*clsGlbl;
 };
 
 typedef struct objcrt_shared*Cls_t;
-# 179 "./objcrt.h"
+# 184 "./objcrt.h"
 struct objcrt_slt
 {
 SEL _cmd;
 IMP _imp;
 };
-# 189 "./objcrt.h"
+# 194 "./objcrt.h"
 struct objcrt_useDescriptor
 {
 int processed;
@@ -98,14 +98,14 @@ struct objcrt_useDescriptor*next;
 struct objcrt_useDescriptor***uses;
 struct objcrt_modDescriptor*(*bind)();
 };
-# 201 "./objcrt.h"
+# 206 "./objcrt.h"
 typedef struct hashedSelector
 {
 struct hashedSelector*next;
 STR key;
 }
 HASH,*PHASH;
-# 213 "./objcrt.h"
+# 218 "./objcrt.h"
 typedef struct objcrt_modDescriptor MOD,*PMOD;
 typedef struct objcrt_methodDescriptor METH,*PMETH;
 
@@ -136,7 +136,7 @@ id*cls;
 SEL*sel;
 IMP imp;
 };
-# 256 "./objcrt.h"
+# 261 "./objcrt.h"
 extern BOOL msgFlag;
 extern FILE*msgIOD;
 extern FILE*dbgIOD;
@@ -144,16 +144,16 @@ extern BOOL allocFlag;
 extern BOOL dbgFlag;
 extern BOOL noCacheFlag;
 extern BOOL noNilRcvr;
-# 269 "./objcrt.h"
+# 274 "./objcrt.h"
 SEL selUid(STR);
 STR selName(SEL);
 void dbg(char*fmt,...);
 void loadobjc(void*modPtr);
 void unloadobjc(void*modPtr);
-# 286 "./objcrt.h"
+# 291 "./objcrt.h"
 IMP _imp(id,SEL);
 IMP _impSuper(id,SEL);
-# 291 "./objcrt.h"
+# 296 "./objcrt.h"
 IMP fwdimp(id,SEL,IMP);
 IMP fwdimpSuper(id,SEL,IMP);
 void fwdmsg(id,SEL,void*,ARGIMP);
@@ -163,7 +163,7 @@ id selptrfwd(id,SEL,id,id,id,id);
 id idincref(id obj);
 id idassign(id*lhs,id rhs);
 id iddecref(id obj);
-# 320 "./objcrt.h"
+# 325 "./objcrt.h"
 extern id(*oc_alloc)(id,unsigned int);
 extern id(*oc_dealloc)(id);
 extern id(*oc_copy)(id,unsigned int);
@@ -229,7 +229,7 @@ struct Exception_SHARED {
   id clsCats;
   id *clsGlbl;
 
-# 45 "./Exceptn.h"
+# 46 "./Exceptn.h"
 id handler;};
 
 # 28 "./OutOfMem.h"
@@ -290,7 +290,7 @@ static char *_selTransTbl[] ={
 };
 struct modDescriptor OutOfMem_modDesc = {
   "OutOfMem",
-  "objc3.3.19",
+  "objc3.4.8",
   0L,
   0,
   0,

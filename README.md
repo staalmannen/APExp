@@ -130,7 +130,7 @@ C transpilers is a fun little proof-of-concept and also opens up for more langua
 
 - The pascal-to-C transpiler p2c (2.01) is included in APExp
 - The fortran-to-C transpiler f2c (20250303) is included in APExp
-- The ObjC-to-C transpiler (3.3.38, bootstrap) is included in APExp
+- The ObjC-to-C transpiler (3.4.8, bootstrap, TODO: build 3.4.13 with the bootstrapped compiler) is included in APExp
 
 
 ***(un)archivers***
