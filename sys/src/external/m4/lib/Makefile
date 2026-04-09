@@ -220,8 +220,8 @@ am__append_23 = fseeko.c
 am__append_24 = fseterr.c
 #am__append_25 = fstat.c
 am__append_26 = fstatat.c
-#am__append_27 = ftell.c
-#am__append_28 = ftello.c
+am__append_27 = ftell.c
+am__append_28 = ftello.c
 am__append_29 = getcwd.c
 am__append_30 = getcwd-lgpl.c
 #am__append_31 = getdtablesize.c
@@ -239,15 +239,15 @@ am__append_42 = iswctype.c
 #am__append_43 = iswdigit.c
 #am__append_44 = iswpunct.c
 #am__append_45 = iswxdigit.c
-am__append_46 = localeconv.c
+#am__append_46 = localeconv.c
 #am__append_47 = localename-unsafe.c
 am__append_48 = localename-unsafe.c
 am__append_49 = lseek.c
 am__append_50 = lstat.c
 am__append_51 = mbrtoc32.c
 am__append_52 = mbrtowc.c
-#am__append_53 = mbsinit.c
-#am__append_54 = mbtowc.c
+am__append_53 = mbsinit.c
+am__append_54 = mbtowc.c
 #am__append_55 = memchr.c
 #am__append_56 = mempcpy.c
 am__append_57 = memrchr.c
@@ -283,7 +283,7 @@ am__append_86 = rawmemchr.c
 #am__append_87 = readdir.c
 am__append_88 = readlink.c
 #am__append_89 = realloc.c
-am__append_90 = reallocarray.c
+#am__append_90 = reallocarray.c
 am__append_91 = regex.c
 am__append_92 = rename.c
 #am__append_93 = rewinddir.c
@@ -328,7 +328,7 @@ am__append_131 = unistr/u8-mbtoucr.c
 am__append_132 = unistr/u8-uctomb.c unistr/u8-uctomb-aux.c
 am__append_133 = uniwidth/width.c
 #am__append_134 = waitpid.c
-#am__append_135 = wcrtomb.c
+am__append_135 = wcrtomb.c
 am__append_136 = wctype.c
 #am__append_137 = wcwidth.c
 #am__append_138 = windows-mutex.c
@@ -660,8 +660,8 @@ am__objects_23 = libm4_a-fseeko.$(OBJEXT)
 am__objects_24 = libm4_a-fseterr.$(OBJEXT)
 #am__objects_25 = libm4_a-fstat.$(OBJEXT)
 am__objects_26 = libm4_a-fstatat.$(OBJEXT)
-#am__objects_27 = libm4_a-ftell.$(OBJEXT)
-#am__objects_28 = libm4_a-ftello.$(OBJEXT)
+am__objects_27 = libm4_a-ftell.$(OBJEXT)
+am__objects_28 = libm4_a-ftello.$(OBJEXT)
 am__objects_29 = libm4_a-getcwd.$(OBJEXT)
 am__objects_30 =  \
 	libm4_a-getcwd-lgpl.$(OBJEXT)
@@ -692,8 +692,8 @@ am__objects_42 =  \
 #	libm4_a-iswpunct.$(OBJEXT)
 #am__objects_45 =  \
 #	libm4_a-iswxdigit.$(OBJEXT)
-am__objects_46 =  \
-	libm4_a-localeconv.$(OBJEXT)
+#am__objects_46 =  \
+#	libm4_a-localeconv.$(OBJEXT)
 #am__objects_47 = libm4_a-localename-unsafe.$(OBJEXT)
 am__objects_48 = libm4_a-localename-unsafe.$(OBJEXT)
 am__objects_49 = libm4_a-lseek.$(OBJEXT)
@@ -701,8 +701,8 @@ am__objects_50 = libm4_a-lstat.$(OBJEXT)
 am__objects_51 =  \
 	libm4_a-mbrtoc32.$(OBJEXT)
 am__objects_52 = libm4_a-mbrtowc.$(OBJEXT)
-#am__objects_53 = libm4_a-mbsinit.$(OBJEXT)
-#am__objects_54 = libm4_a-mbtowc.$(OBJEXT)
+am__objects_53 = libm4_a-mbsinit.$(OBJEXT)
+am__objects_54 = libm4_a-mbtowc.$(OBJEXT)
 #am__objects_55 = libm4_a-memchr.$(OBJEXT)
 #am__objects_56 = libm4_a-mempcpy.$(OBJEXT)
 am__objects_57 = libm4_a-memrchr.$(OBJEXT)
@@ -745,8 +745,8 @@ am__objects_88 =  \
 	libm4_a-readlink.$(OBJEXT)
 #am__objects_89 =  \
 #	libm4_a-realloc.$(OBJEXT)
-am__objects_90 =  \
-	libm4_a-reallocarray.$(OBJEXT)
+#am__objects_90 =  \
+#	libm4_a-reallocarray.$(OBJEXT)
 am__objects_91 = libm4_a-regex.$(OBJEXT)
 am__objects_92 = libm4_a-rename.$(OBJEXT)
 #am__objects_93 =  \
@@ -808,7 +808,7 @@ am__objects_132 = unistr/libm4_a-u8-uctomb.$(OBJEXT) \
 	unistr/libm4_a-u8-uctomb-aux.$(OBJEXT)
 am__objects_133 = uniwidth/libm4_a-width.$(OBJEXT)
 #am__objects_134 = libm4_a-waitpid.$(OBJEXT)
-#am__objects_135 = libm4_a-wcrtomb.$(OBJEXT)
+am__objects_135 = libm4_a-wcrtomb.$(OBJEXT)
 am__objects_136 = libm4_a-wctype.$(OBJEXT)
 #am__objects_137 = libm4_a-wcwidth.$(OBJEXT)
 #am__objects_138 = libm4_a-windows-mutex.$(OBJEXT)
@@ -1276,16 +1276,16 @@ APPLE_UNIVERSAL_BUILD = 0
 AR = ar
 ARFLAGS = cr
 ASM_SYMBOL_PREFIX = ""
-ASSERT_H = assert.h
+ASSERT_H = 
 AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/m4/build-aux/missing' autoconf
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/m4/build-aux/missing' autoheader
 AUTOMAKE = ${SHELL} '/usr/glenda/APExp/sys/src/external/m4/build-aux/missing' automake-1.18
 AWK = awk
-BITSIZEOF_PTRDIFF_T = 64
-BITSIZEOF_SIG_ATOMIC_T = 32
-BITSIZEOF_SIZE_T = 32
-BITSIZEOF_WCHAR_T = 16
-BITSIZEOF_WINT_T = 32
+BITSIZEOF_PTRDIFF_T = 0
+BITSIZEOF_SIG_ATOMIC_T = 0
+BITSIZEOF_SIZE_T = 0
+BITSIZEOF_WCHAR_T = 0
+BITSIZEOF_WINT_T = 0
 CAN_PRINT_STACK_TRACE = 0
 CC = cc
 CCDEPMODE = depmode=none
@@ -2079,8 +2079,8 @@ GL_M4_GNULIB_ZPRINTF = 0
 GL_M4_GNULIB__EXIT = 0
 GMSGFMT = :
 GMSGFMT_015 = :
-GNULIBHEADERS_OVERRIDE_CHAR16_T = 1
-GNULIBHEADERS_OVERRIDE_CHAR32_T = 1
+GNULIBHEADERS_OVERRIDE_CHAR16_T = 0
+GNULIBHEADERS_OVERRIDE_CHAR32_T = 0
 GNULIBHEADERS_OVERRIDE_CHAR8_T = 1
 GNULIBHEADERS_OVERRIDE_WINT_T = 0
 GNULIB_LOCALEDIR = ${datarootdir}/locale
@@ -2103,8 +2103,8 @@ HAVE_ATANL = 1
 HAVE_ATOLL = 1
 HAVE_BLKCNT_T = 1
 HAVE_BLKSIZE_T = 1
-HAVE_BTOWC = 0
-HAVE_C32RTOMB = 0
+HAVE_BTOWC = 1
+HAVE_C32RTOMB = 1
 HAVE_C99_STDINT_H = 0
 HAVE_CANONICALIZE_FILE_NAME = 0
 HAVE_CBRT = 1
@@ -2130,13 +2130,13 @@ HAVE_DECL_CEILF = 1
 HAVE_DECL_CEILL = 1
 HAVE_DECL_COSL = 1
 HAVE_DECL_DIRFD = 1
-HAVE_DECL_ECVT = 0
+HAVE_DECL_ECVT = 1
 HAVE_DECL_ENVIRON = 0
 HAVE_DECL_EXECVPE = 0
 HAVE_DECL_EXPL = 1
 HAVE_DECL_FCHDIR = 1
 HAVE_DECL_FCLOSEALL = 0
-HAVE_DECL_FCVT = 0
+HAVE_DECL_FCVT = 1
 HAVE_DECL_FDATASYNC = 1
 HAVE_DECL_FDOPENDIR = 0
 HAVE_DECL_FLOORF = 1
@@ -2145,7 +2145,7 @@ HAVE_DECL_FPURGE = 0
 HAVE_DECL_FREXPL = 1
 HAVE_DECL_FSEEKO = 1
 HAVE_DECL_FTELLO = 1
-HAVE_DECL_GCVT = 0
+HAVE_DECL_GCVT = 1
 HAVE_DECL_GETDELIM = 1
 HAVE_DECL_GETDOMAINNAME = 1
 HAVE_DECL_GETLINE = 1
@@ -2198,7 +2198,7 @@ HAVE_DECL_TRUNCL = 1
 HAVE_DECL_TTYNAME_R = 1
 HAVE_DECL_UNSETENV = 1
 HAVE_DECL_VSNPRINTF = 1
-HAVE_DECL_WCSDUP = 0
+HAVE_DECL_WCSDUP = 1
 HAVE_DECL_WCWIDTH = 1
 HAVE_DIRENT_H = 1
 HAVE_DPRINTF = 1
@@ -2322,12 +2322,12 @@ HAVE_MAX_ALIGN_T = 0
 HAVE_MBRLEN = 1
 HAVE_MBRTOC16 = 1
 HAVE_MBRTOC32 = 0
-HAVE_MBRTOWC = 1
+HAVE_MBRTOWC = 0
 HAVE_MBSINIT = 1
 HAVE_MBSLEN = 0
 HAVE_MBSNRTOWCS = 1
 HAVE_MBSRTOWCS = 1
-HAVE_MBTOWC = 1
+HAVE_MBTOWC = 0
 HAVE_MEMPCPY = 1
 HAVE_MEMSET_EXPLICIT = 0
 HAVE_MKDIRAT = 1
@@ -2360,10 +2360,10 @@ HAVE_POSIX_MEMALIGN = 1
 HAVE_POSIX_OPENPT = 1
 HAVE_POSIX_SIGNALBLOCKING = 1
 HAVE_POSIX_SPAWN = 1
-HAVE_POSIX_SPAWNATTR_T = 0
+HAVE_POSIX_SPAWNATTR_T = 1
 HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR = 0
 HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDFCHDIR = 1
-HAVE_POSIX_SPAWN_FILE_ACTIONS_T = 0
+HAVE_POSIX_SPAWN_FILE_ACTIONS_T = 1
 HAVE_POWF = 1
 HAVE_PREAD = 1
 HAVE_PSELECT = 1
@@ -2437,7 +2437,7 @@ HAVE_RAWMEMCHR = 0
 HAVE_READDIR = 1
 HAVE_READLINK = 1
 HAVE_READLINKAT = 1
-HAVE_REALLOCARRAY = 0
+HAVE_REALLOCARRAY = 1
 HAVE_REALPATH = 1
 HAVE_REMAINDER = 1
 HAVE_REMAINDERF = 1
@@ -2480,7 +2480,7 @@ HAVE_SINF = 1
 HAVE_SINHF = 1
 HAVE_SINL = 1
 HAVE_SLEEP = 1
-HAVE_SPAWN_H = 0
+HAVE_SPAWN_H = 1
 HAVE_SQRTF = 1
 HAVE_SQRTL = 1
 HAVE_STDCKDINT_H = 0
@@ -2541,7 +2541,7 @@ HAVE_TOTALORDERMAGL = 1
 HAVE_TOUPPER_L = 1
 HAVE_TYPE_VOLATILE_SIG_ATOMIC_T = 1
 HAVE_TZALLOC = 0
-HAVE_UCHAR_H = 0
+HAVE_UCHAR_H = 1
 HAVE_UNISTD_H = 1
 HAVE_UNISTRING_WOE32DLL_H = 0
 HAVE_UNLINKAT = 1
@@ -2579,7 +2579,7 @@ HAVE_WCSSTR = 1
 HAVE_WCSTOK = 1
 HAVE_WCSWIDTH = 1
 HAVE_WCSXFRM = 1
-HAVE_WCTOB = 0
+HAVE_WCTOB = 1
 HAVE_WCTRANS_T = 1
 HAVE_WCTYPE_H = 1
 HAVE_WCTYPE_T = 1
@@ -2592,7 +2592,7 @@ HAVE_WMEMCPY = 1
 HAVE_WMEMMOVE = 1
 HAVE_WMEMPCPY = 1
 HAVE_WMEMSET = 1
-HAVE_WORKING_C32RTOMB = 0
+HAVE_WORKING_C32RTOMB = 1
 HAVE_WORKING_CXX_STDCKDINT_H = 0
 HAVE_WORKING_C_STDCKDINT_H = 0
 HAVE_WORKING_MBRTOC32 = 0
@@ -2602,7 +2602,7 @@ HAVE__EXIT = 1
 HOST_CPU = i386
 HOST_CPU_C_ABI = i386
 ICONV_CONST = 
-ICONV_H = iconv.h
+ICONV_H = 
 INCLUDE_NEXT = include_next
 INCLUDE_NEXT_AS_FIRST_DIRECTIVE = include_next
 INET_PTON_LIB = 
@@ -2673,12 +2673,12 @@ LTLIBMULTITHREAD =
 LTLIBOBJS = 
 LTLIBSIGSEGV = 
 LTLIBTHREAD = 
-M4_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Po $(DEPDIR)/asprintf.Po $(DEPDIR)/fopen.Po $(DEPDIR)/frexp.Po $(DEPDIR)/frexpl.Po $(DEPDIR)/isnanf.Po $(DEPDIR)/isnanl.Po $(DEPDIR)/printf-args.Po $(DEPDIR)/printf-parse.Po $(DEPDIR)/snprintf.Po $(DEPDIR)/strstr.Po $(DEPDIR)/vasnprintf.Po $(DEPDIR)/vasprintf.Po
-M4_LIBOBJS =  asnprintf.o asprintf.o fopen.o frexp.o frexpl.o isnanf.o isnanl.o printf-args.o printf-parse.o snprintf.o strstr.o vasnprintf.o vasprintf.o
-M4_LTLIBOBJS =  asnprintf.lo asprintf.lo fopen.lo frexp.lo frexpl.lo isnanf.lo isnanl.lo printf-args.lo printf-parse.lo snprintf.lo strstr.lo vasnprintf.lo vasprintf.lo
-M4_libm4_LIBOBJDEPS =  $(DEPDIR)/libm4_a-asnprintf.Po $(DEPDIR)/libm4_a-asprintf.Po $(DEPDIR)/libm4_a-fopen.Po $(DEPDIR)/libm4_a-frexp.Po $(DEPDIR)/libm4_a-frexpl.Po $(DEPDIR)/libm4_a-isnanf.Po $(DEPDIR)/libm4_a-isnanl.Po $(DEPDIR)/libm4_a-printf-args.Po $(DEPDIR)/libm4_a-printf-parse.Po $(DEPDIR)/libm4_a-snprintf.Po $(DEPDIR)/libm4_a-strstr.Po $(DEPDIR)/libm4_a-vasnprintf.Po $(DEPDIR)/libm4_a-vasprintf.Po
-M4_libm4_LIBOBJS =  libm4_a-asnprintf.o libm4_a-asprintf.o libm4_a-fopen.o libm4_a-frexp.o libm4_a-frexpl.o libm4_a-isnanf.o libm4_a-isnanl.o libm4_a-printf-args.o libm4_a-printf-parse.o libm4_a-snprintf.o libm4_a-strstr.o libm4_a-vasnprintf.o libm4_a-vasprintf.o
-M4_libm4_LTLIBOBJS =  libm4_la-asnprintf.lo libm4_la-asprintf.lo libm4_la-fopen.lo libm4_la-frexp.lo libm4_la-frexpl.lo libm4_la-isnanf.lo libm4_la-isnanl.lo libm4_la-printf-args.lo libm4_la-printf-parse.lo libm4_la-snprintf.lo libm4_la-strstr.lo libm4_la-vasnprintf.lo libm4_la-vasprintf.lo
+M4_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Po $(DEPDIR)/asprintf.Po $(DEPDIR)/fopen.Po $(DEPDIR)/frexp.Po $(DEPDIR)/frexpl.Po $(DEPDIR)/isnanf.Po $(DEPDIR)/isnanl.Po $(DEPDIR)/lc-charset-dispatch.Po $(DEPDIR)/mbtowc-lock.Po $(DEPDIR)/printf-args.Po $(DEPDIR)/printf-parse.Po $(DEPDIR)/snprintf.Po $(DEPDIR)/strstr.Po $(DEPDIR)/vasnprintf.Po $(DEPDIR)/vasprintf.Po
+M4_LIBOBJS =  asnprintf.o asprintf.o fopen.o frexp.o frexpl.o isnanf.o isnanl.o lc-charset-dispatch.o mbtowc-lock.o printf-args.o printf-parse.o snprintf.o strstr.o vasnprintf.o vasprintf.o
+M4_LTLIBOBJS =  asnprintf.lo asprintf.lo fopen.lo frexp.lo frexpl.lo isnanf.lo isnanl.lo lc-charset-dispatch.lo mbtowc-lock.lo printf-args.lo printf-parse.lo snprintf.lo strstr.lo vasnprintf.lo vasprintf.lo
+M4_libm4_LIBOBJDEPS =  $(DEPDIR)/libm4_a-asnprintf.Po $(DEPDIR)/libm4_a-asprintf.Po $(DEPDIR)/libm4_a-fopen.Po $(DEPDIR)/libm4_a-frexp.Po $(DEPDIR)/libm4_a-frexpl.Po $(DEPDIR)/libm4_a-isnanf.Po $(DEPDIR)/libm4_a-isnanl.Po $(DEPDIR)/libm4_a-lc-charset-dispatch.Po $(DEPDIR)/libm4_a-mbtowc-lock.Po $(DEPDIR)/libm4_a-printf-args.Po $(DEPDIR)/libm4_a-printf-parse.Po $(DEPDIR)/libm4_a-snprintf.Po $(DEPDIR)/libm4_a-strstr.Po $(DEPDIR)/libm4_a-vasnprintf.Po $(DEPDIR)/libm4_a-vasprintf.Po
+M4_libm4_LIBOBJS =  libm4_a-asnprintf.o libm4_a-asprintf.o libm4_a-fopen.o libm4_a-frexp.o libm4_a-frexpl.o libm4_a-isnanf.o libm4_a-isnanl.o libm4_a-lc-charset-dispatch.o libm4_a-mbtowc-lock.o libm4_a-printf-args.o libm4_a-printf-parse.o libm4_a-snprintf.o libm4_a-strstr.o libm4_a-vasnprintf.o libm4_a-vasprintf.o
+M4_libm4_LTLIBOBJS =  libm4_la-asnprintf.lo libm4_la-asprintf.lo libm4_la-fopen.lo libm4_la-frexp.lo libm4_la-frexpl.lo libm4_la-isnanf.lo libm4_la-isnanl.lo libm4_la-lc-charset-dispatch.lo libm4_la-mbtowc-lock.lo libm4_la-printf-args.lo libm4_la-printf-parse.lo libm4_la-snprintf.lo libm4_la-strstr.lo libm4_la-vasnprintf.lo libm4_la-vasprintf.lo
 M4tests_LIBOBJDEPS =  $(DEPDIR)/frexp.Po $(DEPDIR)/frexpl.Po $(DEPDIR)/strerror_r.Po
 M4tests_LIBOBJS =  frexp.o frexpl.o strerror_r.o
 M4tests_LTLIBOBJS =  frexp.lo frexpl.lo strerror_r.lo
@@ -2695,9 +2695,9 @@ MSGMERGE = /bin/msgmerge
 NANOSLEEP_LIB = 
 NETINET_IN_H = 
 NEXT_ARPA_INET_H = <arpa/inet.h>
-NEXT_ASSERT_H = <assert.h>
+NEXT_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_ARPA_INET_H = <arpa/inet.h>
-NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = <assert.h>
+NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_CTYPE_H = <ctype.h>
 NEXT_AS_FIRST_DIRECTIVE_DIRENT_H = <dirent.h>
 NEXT_AS_FIRST_DIRECTIVE_ERRNO_H = <errno.h>
@@ -2805,8 +2805,8 @@ REPLACE_ALIGNED_ALLOC = 0
 REPLACE_ASINF = 0
 REPLACE_ATAN2F = 0
 REPLACE_ATANF = 0
-REPLACE_BTOWC = 0
-REPLACE_C32RTOMB = 0
+REPLACE_BTOWC = 1
+REPLACE_C32RTOMB = 1
 REPLACE_CALLOC_FOR_CALLOC_GNU = 0
 REPLACE_CALLOC_FOR_CALLOC_POSIX = 0
 REPLACE_CANONICALIZE_FILE_NAME = 0
@@ -2873,7 +2873,7 @@ REPLACE_FPRINTF = 0
 REPLACE_FPURGE = 0
 REPLACE_FREE = 1
 REPLACE_FREELOCALE = 0
-REPLACE_FREOPEN = 0
+REPLACE_FREOPEN = 1
 REPLACE_FREXP = 1
 REPLACE_FREXPF = 0
 REPLACE_FREXPL = 1
@@ -2881,8 +2881,8 @@ REPLACE_FSEEK = 1
 REPLACE_FSEEKO = 1
 REPLACE_FSTAT = 0
 REPLACE_FSTATAT = 1
-REPLACE_FTELL = 0
-REPLACE_FTELLO = 0
+REPLACE_FTELL = 1
+REPLACE_FTELLO = 1
 REPLACE_FTRUNCATE = 0
 REPLACE_FUTIMENS = 0
 REPLACE_GETCWD = 1
@@ -2939,7 +2939,7 @@ REPLACE_LDEXP = 0
 REPLACE_LDEXPL = 0
 REPLACE_LINK = 0
 REPLACE_LINKAT = 0
-REPLACE_LOCALECONV = 1
+REPLACE_LOCALECONV = 0
 REPLACE_LOCALTIME = 0
 REPLACE_LOCALTIME_R = 0
 REPLACE_LOCALTIME_RZ = 0
@@ -2966,10 +2966,10 @@ REPLACE_MBRLEN = 0
 REPLACE_MBRTOC16 = 0
 REPLACE_MBRTOC32 = 0
 REPLACE_MBRTOWC = 1
-REPLACE_MBSINIT = 0
+REPLACE_MBSINIT = 1
 REPLACE_MBSNRTOWCS = 0
 REPLACE_MBSRTOWCS = 0
-REPLACE_MBSTATE_T = 0
+REPLACE_MBSTATE_T = 1
 REPLACE_MBSTOWCS = 0
 REPLACE_MBTOWC = 0
 REPLACE_MB_CUR_MAX = 0
@@ -3139,7 +3139,7 @@ REPLACE_STRTOLL = 0
 REPLACE_STRTOUL = 0
 REPLACE_STRTOULL = 0
 REPLACE_STRTOUMAX = 0
-REPLACE_STRUCT_LCONV = 1
+REPLACE_STRUCT_LCONV = 0
 REPLACE_STRUCT_TIMEVAL = 0
 REPLACE_STRVERSCMP = 0
 REPLACE_SYMLINK = 1
@@ -3175,7 +3175,7 @@ REPLACE_VFPRINTF = 0
 REPLACE_VPRINTF = 0
 REPLACE_VSNPRINTF = 0
 REPLACE_VSPRINTF = 0
-REPLACE_WCRTOMB = 0
+REPLACE_WCRTOMB = 1
 REPLACE_WCSCMP = 0
 REPLACE_WCSFTIME = 0
 REPLACE_WCSNCAT = 0
@@ -9310,22 +9310,22 @@ alloca.h: $(top_builddir)/config.status
 
 # We need the following in order to create <assert.h> when the system
 # doesn't have one that works with the given compiler.
-assert.h: assert.in.h verify.h $(top_builddir)/config.status
-	$(gl_V_at){ $(SED_HEADER_STDOUT) \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
-	      -e 's|@''PRAGMA_COLUMNS''@||g' \
-	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
-	      < $(srcdir)/assert.in.h && \
-	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
-	      -e 's|_gl_verify|_gl_static_assert|g' \
-	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
-	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL_M4\1|g' \
-	      < $(srcdir)/verify.h; \
-	} > $@-t
-	$(AM_V_at)mv $@-t $@
-#assert.h: $(top_builddir)/config.status
-#	rm -f $@
+#assert.h: assert.in.h verify.h $(top_builddir)/config.status
+#	$(gl_V_at){ $(SED_HEADER_STDOUT) \
+#	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+#	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
+#	      -e 's|@''PRAGMA_COLUMNS''@||g' \
+#	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
+#	      < $(srcdir)/assert.in.h && \
+#	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
+#	      -e 's|_gl_verify|_gl_static_assert|g' \
+#	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
+#	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL_M4\1|g' \
+#	      < $(srcdir)/verify.h; \
+#	} > $@-t
+#	$(AM_V_at)mv $@-t $@
+assert.h: $(top_builddir)/config.status
+	rm -f $@
 
 # Listed in the same order as the GNU makefile conventions, and
 # provided by autoconf 2.59c+ or 2.70.
@@ -9539,25 +9539,25 @@ clean-GNUmakefile:
 
 # We need the following in order to create <iconv.h> when the system
 # doesn't have one that works with the given compiler.
-iconv.h: iconv.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(WARN_ON_USE_H)
-	$(gl_V_at)$(SED_HEADER_STDOUT) \
-	      -e 's|@''GUARD_PREFIX''@|GL_M4|g' \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
-	      -e 's|@''PRAGMA_COLUMNS''@||g' \
-	      -e 's|@''NEXT_ICONV_H''@|$(NEXT_ICONV_H)|g' \
-	      -e 's/@''GNULIB_ICONV''@/$(GL_M4_GNULIB_ICONV)/g' \
-	      -e 's|@''ICONV_CONST''@|$(ICONV_CONST)|g' \
-	      -e 's|@''REPLACE_ICONV''@|$(REPLACE_ICONV)|g' \
-	      -e 's|@''REPLACE_ICONV_OPEN''@|$(REPLACE_ICONV_OPEN)|g' \
-	      -e 's|@''REPLACE_ICONV_UTF''@|$(REPLACE_ICONV_UTF)|g' \
-	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
-	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
-	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
-	      $(srcdir)/iconv.in.h > $@-t
-	$(AM_V_at)mv $@-t $@
-#iconv.h: $(top_builddir)/config.status
-#	rm -f $@
+#iconv.h: iconv.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H) $(WARN_ON_USE_H)
+#	$(gl_V_at)$(SED_HEADER_STDOUT) \
+#	      -e 's|@''GUARD_PREFIX''@|GL_M4|g' \
+#	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+#	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
+#	      -e 's|@''PRAGMA_COLUMNS''@||g' \
+#	      -e 's|@''NEXT_ICONV_H''@|$(NEXT_ICONV_H)|g' \
+#	      -e 's/@''GNULIB_ICONV''@/$(GL_M4_GNULIB_ICONV)/g' \
+#	      -e 's|@''ICONV_CONST''@|$(ICONV_CONST)|g' \
+#	      -e 's|@''REPLACE_ICONV''@|$(REPLACE_ICONV)|g' \
+#	      -e 's|@''REPLACE_ICONV_OPEN''@|$(REPLACE_ICONV_OPEN)|g' \
+#	      -e 's|@''REPLACE_ICONV_UTF''@|$(REPLACE_ICONV_UTF)|g' \
+#	      -e '/definitions of _GL_FUNCDECL_RPL/r $(CXXDEFS_H)' \
+#	      -e '/definition of _GL_ARG_NONNULL/r $(ARG_NONNULL_H)' \
+#	      -e '/definition of _GL_WARN_ON_USE/r $(WARN_ON_USE_H)' \
+#	      $(srcdir)/iconv.in.h > $@-t
+#	$(AM_V_at)mv $@-t $@
+iconv.h: $(top_builddir)/config.status
+	rm -f $@
 
 $(srcdir)/iconv_open-aix.h: $(srcdir)/iconv_open-aix.gperf
 	$(V_GPERF)$(GPERF) -m 10 $(srcdir)/iconv_open-aix.gperf > $(srcdir)/iconv_open-aix.h-t1 \
@@ -11640,7 +11640,7 @@ mostlyclean-local: mostlyclean-generic
 	:
 distclean-local: distclean-gnulib-libobjs
 distclean-gnulib-libobjs:
-	-rm -f  $(DEPDIR)/libm4_a-asnprintf.Po $(DEPDIR)/libm4_a-asprintf.Po $(DEPDIR)/libm4_a-fopen.Po $(DEPDIR)/libm4_a-frexp.Po $(DEPDIR)/libm4_a-frexpl.Po $(DEPDIR)/libm4_a-isnanf.Po $(DEPDIR)/libm4_a-isnanl.Po $(DEPDIR)/libm4_a-printf-args.Po $(DEPDIR)/libm4_a-printf-parse.Po $(DEPDIR)/libm4_a-snprintf.Po $(DEPDIR)/libm4_a-strstr.Po $(DEPDIR)/libm4_a-vasnprintf.Po $(DEPDIR)/libm4_a-vasprintf.Po
+	-rm -f  $(DEPDIR)/libm4_a-asnprintf.Po $(DEPDIR)/libm4_a-asprintf.Po $(DEPDIR)/libm4_a-fopen.Po $(DEPDIR)/libm4_a-frexp.Po $(DEPDIR)/libm4_a-frexpl.Po $(DEPDIR)/libm4_a-isnanf.Po $(DEPDIR)/libm4_a-isnanl.Po $(DEPDIR)/libm4_a-lc-charset-dispatch.Po $(DEPDIR)/libm4_a-mbtowc-lock.Po $(DEPDIR)/libm4_a-printf-args.Po $(DEPDIR)/libm4_a-printf-parse.Po $(DEPDIR)/libm4_a-snprintf.Po $(DEPDIR)/libm4_a-strstr.Po $(DEPDIR)/libm4_a-vasnprintf.Po $(DEPDIR)/libm4_a-vasprintf.Po
 maintainer-clean-local: distclean-gnulib-libobjs
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

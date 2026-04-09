@@ -5,32 +5,32 @@ APE=$APEXPROOT/sys/src/ape
 LIB=$APEXPROOT/$objtype/lib/ape/libcroco.a
 
 OFILES=\
-	additional-sel.$O\
-	attr-sel.$O\
-	cascade.$O\
-	declaration.$O\
-	doc-handler.$O\
-	enc-handler.$O\
-	fonts.$O\
-	input.$O\
-	num.$O\
-	om-parser.$O\
-	parser.$O\
-	parsing-location.$O\
-	prop-list.$O\
-	pseudo.$O\
-	rgb.$O\
-	sel-eng.$O\
-	selector.$O\
-	simple-sel.$O\
-	statement.$O\
-	string.$O\
-	style.$O\
-	stylesheet.$O\
-	term.$O\
-	tknzr.$O\
-	token.$O\
-	utils.$O\
+	cr-additional-sel.$O\
+	cr-attr-sel.$O\
+	cr-cascade.$O\
+	cr-declaration.$O\
+	cr-doc-handler.$O\
+	cr-enc-handler.$O\
+	cr-fonts.$O\
+	cr-input.$O\
+	cr-num.$O\
+	cr-om-parser.$O\
+	cr-parser.$O\
+	cr-parsing-location.$O\
+	cr-prop-list.$O\
+	cr-pseudo.$O\
+	cr-rgb.$O\
+	cr-sel-eng.$O\
+	cr-selector.$O\
+	cr-simple-sel.$O\
+	cr-statement.$O\
+	cr-string.$O\
+	cr-style.$O\
+	cr-stylesheet.$O\
+	cr-term.$O\
+	cr-tknzr.$O\
+	cr-token.$O\
+	cr-utils.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
@@ -43,8 +43,9 @@ CC=$APEXPROOT/$objtype/bin/pcc
 
 DEFS=
 
-CFLAGS=-c -B -I. -I$CROCSRC -I$CROCSRC/..
-		-D_POSIX_SOURCE -D_BSD_SOURCE -DHAVE_CONFIG_H $DEFS
+CFLAGS=-c -B -I. -I$CROCOSRC -I$CROCOSRC/..\
+	-I$GETTEXTSRC/libtextstyle -I$GETTEXTSRC/libtextstyle/lib/glib\
+	-D_POSIX_SOURCE -D_BSD_SOURCE -DHAVE_CONFIG_H $DEFS
 
 %.$O: $CROCOSRC/%.c
 	$CC $CFLAGS $CROCOSRC/$stem.c

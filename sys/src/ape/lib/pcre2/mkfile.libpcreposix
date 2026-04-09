@@ -17,11 +17,9 @@ CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=8
 
 install:V:
 	cp libpcre2posix.a $APEXPROOT/$objtype/lib/ape/libpcre2posix.a
-	cp pcre2posix.h $APEXPROOT/sys/include/ape/
 
 nuke:V:
 	mk clean
 	rm -f $LIB
 	rm -f $APEXPROOT/$objtype/lib/ape/libpcreposix.a
-	rm -f $APEXPROOT/sys/include/ape/pcre2posix.h
 

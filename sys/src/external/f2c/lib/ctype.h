@@ -42,6 +42,4 @@ char My_ctype[264] = {
 	0, 0, 0, 0, 0, 0, 0, 0};
 #endif /*}*/
 
-#define isdigit(x) (My_ctype[(x)+8] & 1)
-#define isspace(x) (My_ctype[(x)+8] & 2)
 #endif

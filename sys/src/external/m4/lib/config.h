@@ -135,19 +135,19 @@
 #define AVOID_ANY_THREADS 1
 
 /* Define to the number of bits in type 'ptrdiff_t'. */
-#define BITSIZEOF_PTRDIFF_T 64
+#define BITSIZEOF_PTRDIFF_T 0
 
 /* Define to the number of bits in type 'sig_atomic_t'. */
-#define BITSIZEOF_SIG_ATOMIC_T 32
+#define BITSIZEOF_SIG_ATOMIC_T 0
 
 /* Define to the number of bits in type 'size_t'. */
-#define BITSIZEOF_SIZE_T 32
+#define BITSIZEOF_SIZE_T 0
 
 /* Define to the number of bits in type 'wchar_t'. */
-#define BITSIZEOF_WCHAR_T 16
+#define BITSIZEOF_WCHAR_T 0
 
 /* Define to the number of bits in type 'wint_t'. */
-#define BITSIZEOF_WINT_T 32
+#define BITSIZEOF_WINT_T 0
 
 /* Define if the c32rtomb function has an incorrect return value. */
 /* #undef C32RTOMB_RETVAL_BUG */
@@ -161,16 +161,16 @@
 
 /* Define as the bit index in the word where to find bit 0 of the exponent of
    'double'. */
-#define DBL_EXPBIT0_BIT 20
+/* #undef DBL_EXPBIT0_BIT */
 
 /* Define as the word index where to find the exponent of 'double'. */
-#define DBL_EXPBIT0_WORD 1
+/* #undef DBL_EXPBIT0_WORD */
 
 /* Define as the bit index in the word where to find the sign of 'double'. */
-#define DBL_SIGNBIT_BIT 31
+/* #undef DBL_SIGNBIT_BIT */
 
 /* Define as the word index where to find the sign of 'double'. */
-#define DBL_SIGNBIT_WORD 1
+/* #undef DBL_SIGNBIT_WORD */
 
 /* the name of the file descriptor member of DIR */
 /* #undef DIR_FD_MEMBER_NAME */
@@ -207,16 +207,16 @@
 
 /* Define as the bit index in the word where to find bit 0 of the exponent of
    'float'. */
-#define FLT_EXPBIT0_BIT 23
+/* #undef FLT_EXPBIT0_BIT */
 
 /* Define as the word index where to find the exponent of 'float'. */
-#define FLT_EXPBIT0_WORD 0
+/* #undef FLT_EXPBIT0_WORD */
 
 /* Define as the bit index in the word where to find the sign of 'float'. */
-#define FLT_SIGNBIT_BIT 31
+/* #undef FLT_SIGNBIT_BIT */
 
 /* Define as the word index where to find the sign of 'float'. */
-#define FLT_SIGNBIT_WORD 0
+/* #undef FLT_SIGNBIT_WORD */
 
 /* Define to 1 if fopen() fails to recognize a trailing slash. */
 /* #undef FOPEN_TRAILING_SLASH_BUG */
@@ -231,7 +231,7 @@
   
 
 /* Define to 1 if the system's ftello function has the Solaris bug. */
-/* #undef FTELLO_BROKEN_AFTER_SWITCHING_FROM_READ_TO_WRITE */
+#define FTELLO_BROKEN_AFTER_SWITCHING_FROM_READ_TO_WRITE 1
 
 /* Define to 1 if the system's ftello function has the macOS bug. */
 /* #undef FTELLO_BROKEN_AFTER_UNGETC */
@@ -253,7 +253,7 @@
 /* #undef FUNC_REALPATH_WORKS */
 
 /* Define to 1 if ungetc is broken when used on arbitrary bytes. */
-/* #undef FUNC_UNGETC_BROKEN */
+#define FUNC_UNGETC_BROKEN 1
 
 /* Define this to 'void' or 'struct timezone' to match the system's
    declaration of the second argument to gettimeofday. */
@@ -1100,7 +1100,7 @@
 /* #undef HAVE_BP_SYM_H */
 
 /* Define to 1 if you have the 'btowc' function. */
-/* #undef HAVE_BTOWC */
+#define HAVE_BTOWC 1
 
 /* Define to 1 if nanosleep mishandles large arguments. */
 #define HAVE_BUG_BIG_NANOSLEEP 1
@@ -1139,27 +1139,27 @@
 
 /* Define if the copysignf function is declared in <math.h> and available in
    libc. */
-/* #undef HAVE_COPYSIGNF_IN_LIBC */
+#define HAVE_COPYSIGNF_IN_LIBC 1
 
 /* Define if the copysignl function is declared in <math.h> and available in
    libc. */
-/* #undef HAVE_COPYSIGNL_IN_LIBC */
+#define HAVE_COPYSIGNL_IN_LIBC 1
 
 /* Define if the copysign function is declared in <math.h> and available in
    libc. */
-/* #undef HAVE_COPYSIGN_IN_LIBC */
+#define HAVE_COPYSIGN_IN_LIBC 1
 
 /* Define to 1 if you have the <crtdefs.h> header file. */
 /* #undef HAVE_CRTDEFS_H */
 
 /* Define to 1 if the alignas and alignof keywords work. */
-/* #undef HAVE_C_ALIGNASOF */
+#define HAVE_C_ALIGNASOF 1
 
 /* Define to 1 if bool, true and false work as per C2023. */
 /* #undef HAVE_C_BOOL */
 
 /* Define to 1 if the static_assert keyword works. */
-/* #undef HAVE_C_STATIC_ASSERT */
+#define HAVE_C_STATIC_ASSERT 1
 
 /* Define to 1 if C supports variable-length arrays. */
 /* #undef HAVE_C_VARARRAYS */
@@ -1178,15 +1178,15 @@
 
 /* Define to 1 if you have the declaration of 'copysign', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_COPYSIGN */
+#define HAVE_DECL_COPYSIGN 1
 
 /* Define to 1 if you have the declaration of 'copysignf', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_COPYSIGNF */
+#define HAVE_DECL_COPYSIGNF 1
 
 /* Define to 1 if you have the declaration of 'copysignl', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_COPYSIGNL */
+#define HAVE_DECL_COPYSIGNL 1
 
 /* Define to 1 if you have the declaration of 'dirfd', and to 0 if you don't.
    */
@@ -1194,7 +1194,7 @@
 
 /* Define to 1 if you have the declaration of 'ecvt', and to 0 if you don't.
    */
-#define HAVE_DECL_ECVT 0
+#define HAVE_DECL_ECVT 1
 
 /* Define to 1 if you have the declaration of 'execvpe', and to 0 if you
    don't. */
@@ -1210,7 +1210,7 @@
 
 /* Define to 1 if you have the declaration of 'fcvt', and to 0 if you don't.
    */
-#define HAVE_DECL_FCVT 0
+#define HAVE_DECL_FCVT 1
 
 /* Define to 1 if you have the declaration of 'fdopendir', and to 0 if you
    don't. */
@@ -1218,11 +1218,11 @@
 
 /* Define to 1 if you have the declaration of 'feof_unlocked', and to 0 if you
    don't. */
-#define HAVE_DECL_FEOF_UNLOCKED 0
+#define HAVE_DECL_FEOF_UNLOCKED 1
 
 /* Define to 1 if you have the declaration of 'ferror_unlocked', and to 0 if
    you don't. */
-#define HAVE_DECL_FERROR_UNLOCKED 0
+#define HAVE_DECL_FERROR_UNLOCKED 1
 
 /* Define to 1 if you have the declaration of 'fflush_unlocked', and to 0 if
    you don't. */
@@ -1266,7 +1266,7 @@
 
 /* Define to 1 if you have the declaration of 'gcvt', and to 0 if you don't.
    */
-#define HAVE_DECL_GCVT 0
+#define HAVE_DECL_GCVT 1
 
 /* Define to 1 if you have the declaration of 'getchar_unlocked', and to 0 if
    you don't. */
@@ -1278,7 +1278,7 @@
 
 /* Define to 1 if you have the declaration of 'getc_unlocked', and to 0 if you
    don't. */
-#define HAVE_DECL_GETC_UNLOCKED 0
+#define HAVE_DECL_GETC_UNLOCKED 1
 
 /* Define to 1 if you have the declaration of 'getdtablesize', and to 0 if you
    don't. */
@@ -1310,7 +1310,7 @@
 
 /* Define to 1 if you have the declaration of 'mbrtowc', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_MBRTOWC */
+#define HAVE_DECL_MBRTOWC 1
 
 /* Define to 1 if you have the declaration of 'mbsinit', and to 0 if you
    don't. */
@@ -1326,7 +1326,7 @@
 
 /* Define to 1 if you have the declaration of 'posix_spawn', and to 0 if you
    don't. */
-#define HAVE_DECL_POSIX_SPAWN 0
+#define HAVE_DECL_POSIX_SPAWN 1
 
 /* Define to 1 if you have the declaration of 'program_invocation_name', and
    to 0 if you don't. */
@@ -1342,7 +1342,7 @@
 
 /* Define to 1 if you have the declaration of 'putc_unlocked', and to 0 if you
    don't. */
-#define HAVE_DECL_PUTC_UNLOCKED 0
+#define HAVE_DECL_PUTC_UNLOCKED 1
 
 /* Define to 1 if you have the declaration of 'putw', and to 0 if you don't.
    */
@@ -1410,7 +1410,7 @@
 
 /* Define to 1 if you have the declaration of 'wcsdup', and to 0 if you don't.
    */
-#define HAVE_DECL_WCSDUP 0
+#define HAVE_DECL_WCSDUP 1
 
 /* Define to 1 if you have the declaration of 'wcwidth', and to 0 if you
    don't. */
@@ -1508,7 +1508,7 @@
 #define HAVE_FSTATAT 1
 
 /* Define to 1 if the system has the ftello function. */
-/* #undef HAVE_FTELLO */
+#define HAVE_FTELLO 1
 
 /* Define to 1 if you have the `ftruncate' function. */
 #define HAVE_FTRUNCATE 1
@@ -1624,7 +1624,7 @@
 /* #undef HAVE_ISWCNTRL */
 
 /* Define to 1 if you have the 'iswctype' function. */
-#define HAVE_ISWCTYPE 1
+/* #undef HAVE_ISWCTYPE */
 
 /* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
 /* #undef HAVE_LANGINFO_CODESET */
@@ -1645,7 +1645,7 @@
 /* #undef HAVE_LIBCX_SPAWN2_H */
 
 /* Define to 1 if you have the <libintl.h> header file. */
-/* #undef HAVE_LIBINTL_H */
+#define HAVE_LIBINTL_H 1
 
 /* Define if you have the libsigsegv library. */
 /* #undef HAVE_LIBSIGSEGV */
@@ -1682,7 +1682,7 @@
 #define HAVE_MATH_H 1
 
 /* Define to 1 if you have the 'mbrtowc' function. */
-#define HAVE_MBRTOWC 1
+/* #undef HAVE_MBRTOWC */
 
 /* Define to 1 if you have the 'mbsinit' function. */
 #define HAVE_MBSINIT 1
@@ -1694,7 +1694,7 @@
 #define HAVE_MBSTATE_T 1
 
 /* Define to 1 if you have the `mbtowc' function. */
-#define HAVE_MBTOWC 1
+/* #undef HAVE_MBTOWC */
 
 /* Define to 1 if you have the `mempcpy' function. */
 #define HAVE_MEMPCPY 1
@@ -1788,7 +1788,7 @@
 #define HAVE_POSIX_SPAWN 1
 
 /* Define to 1 if the system has the type 'posix_spawnattr_t'. */
-/* #undef HAVE_POSIX_SPAWNATTR_T */
+#define HAVE_POSIX_SPAWNATTR_T 1
 
 /* Define to 1 if you have the 'posix_spawn_file_actions_addchdir' function.
    */
@@ -1799,7 +1799,7 @@
 /* #undef HAVE_POSIX_SPAWN_FILE_ACTIONS_ADDCHDIR_NP */
 
 /* Define to 1 if the system has the type 'posix_spawn_file_actions_t'. */
-/* #undef HAVE_POSIX_SPAWN_FILE_ACTIONS_T */
+#define HAVE_POSIX_SPAWN_FILE_ACTIONS_T 1
 
 /* Define to 1 if you have the 'pselect' function. */
 /* #undef HAVE_PSELECT */
@@ -1854,7 +1854,7 @@
 #define HAVE_READLINK 1
 
 /* Define to 1 if you have the `reallocarray' function. */
-/* #undef HAVE_REALLOCARRAY */
+#define HAVE_REALLOCARRAY 1
 
 /* Define to 1 if realloc (..., 0) returns nonnull. */
 #define HAVE_REALLOC_0_NONNULL 1
@@ -1962,7 +1962,7 @@
 /* #undef HAVE_SOLARIS114_LOCALES */
 
 /* Define to 1 if you have the <spawn.h> header file. */
-/* #undef HAVE_SPAWN_H */
+#define HAVE_SPAWN_H 1
 
 /* Define to 1 if you have the <stdbool.h> header file. */
 #define HAVE_STDBOOL_H 1
@@ -2011,7 +2011,7 @@
 #define HAVE_STRSIGNAL 1
 
 /* Define to 1 if 'decimal_point' is a member of 'struct lconv'. */
-#define HAVE_STRUCT_LCONV_DECIMAL_POINT 1
+/* #undef HAVE_STRUCT_LCONV_DECIMAL_POINT */
 
 /* Define to 1 if 'int_p_cs_precedes' is a member of 'struct lconv'. */
 /* #undef HAVE_STRUCT_LCONV_INT_P_CS_PRECEDES */
@@ -2113,7 +2113,7 @@
 #define HAVE_TSEARCH 1
 
 /* Define to 1 if you have the <uchar.h> header file. */
-/* #undef HAVE_UCHAR_H */
+#define HAVE_UCHAR_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
@@ -2159,10 +2159,10 @@
 #define HAVE_WCRTOMB 1
 
 /* Define to 1 if you have the 'wcslen' function. */
-/* #undef HAVE_WCSLEN */
+#define HAVE_WCSLEN 1
 
 /* Define to 1 if you have the 'wctob' function. */
-/* #undef HAVE_WCTOB */
+#define HAVE_WCTOB 1
 
 /* Define to 1 if you have the <wctype.h> header file. */
 #define HAVE_WCTYPE_H 1
@@ -2184,7 +2184,7 @@
 #define HAVE_WINT_T 1
 
 /* Define if the c32rtomb function basically works. */
-/* #undef HAVE_WORKING_C32RTOMB */
+#define HAVE_WORKING_C32RTOMB 1
 
 /* Define to 1 if fstatat (..., 0) works. For example, it does not work in AIX
    7.1. */
@@ -2231,7 +2231,7 @@
 
 /* Define to 1 if the compiler supports __builtin_expect,
    and to 2 if <builtins.h> does.  */
-/* #undef HAVE___BUILTIN_EXPECT */
+#define HAVE___BUILTIN_EXPECT 1
 #ifndef HAVE___BUILTIN_EXPECT
 # define __builtin_expect(e, c) (e)
 #elif HAVE___BUILTIN_EXPECT == 2
@@ -2381,17 +2381,17 @@
 
 /* Define as the bit index in the word where to find bit 0 of the exponent of
    'long double'. */
-#define LDBL_EXPBIT0_BIT 20
+/* #undef LDBL_EXPBIT0_BIT */
 
 /* Define as the word index where to find the exponent of 'long double'. */
-#define LDBL_EXPBIT0_WORD 1
+/* #undef LDBL_EXPBIT0_WORD */
 
 /* Define as the bit index in the word where to find the sign of 'long
    double'. */
-#define LDBL_SIGNBIT_BIT 31
+/* #undef LDBL_SIGNBIT_BIT */
 
 /* Define as the word index where to find the sign of 'long double'. */
-#define LDBL_SIGNBIT_WORD 1
+/* #undef LDBL_SIGNBIT_WORD */
 
 /* Define if localename.c overrides newlocale(), duplocale(), freelocale(). */
 /* #undef LOCALENAME_ENHANCE_LOCALE_FUNCS */
@@ -2424,7 +2424,7 @@
 
 /* Define if the mbrtowc function may signal encoding errors in the C locale.
    */
-#define MBRTOWC_IN_C_LOCALE_MAYBE_EILSEQ 1
+/* #undef MBRTOWC_IN_C_LOCALE_MAYBE_EILSEQ */
 
 /* Define if the mbrtowc function has the NULL pwc argument bug. */
 /* #undef MBRTOWC_NULL_ARG1_BUG */
@@ -2480,7 +2480,7 @@
 
 /* Define if the vasnprintf implementation needs special code for the 'lc'
    directive. */
-/* #undef NEED_PRINTF_DIRECTIVE_LC */
+#define NEED_PRINTF_DIRECTIVE_LC 1
 
 /* Define if the vasnprintf implementation needs special code for the 'ls'
    directive. */
@@ -2488,7 +2488,7 @@
 
 /* Define if the vasnprintf implementation needs special code for 'double'
    arguments. */
-/* #undef NEED_PRINTF_DOUBLE */
+#define NEED_PRINTF_DOUBLE 1
 
 /* Define if the vasnprintf implementation needs special code for surviving
    out-of-memory conditions. */
@@ -2496,7 +2496,7 @@
 
 /* Define if the vasnprintf implementation needs special code for the # flag
    with a zero precision and a zero value in the 'x' and 'X' directives. */
-/* #undef NEED_PRINTF_FLAG_ALT_PRECISION_ZERO */
+#define NEED_PRINTF_FLAG_ALT_PRECISION_ZERO 1
 
 /* Define if the vasnprintf implementation needs special code for the ' flag.
    */
@@ -2508,7 +2508,7 @@
 
 /* Define if the vasnprintf implementation needs special code for the '-'
    flag. */
-/* #undef NEED_PRINTF_FLAG_LEFTADJUST */
+#define NEED_PRINTF_FLAG_LEFTADJUST 1
 
 /* Define if the vasnprintf implementation needs special code for the 0 flag.
    */
@@ -2520,15 +2520,15 @@
 
 /* Define if the vasnprintf implementation needs special code for infinite
    'long double' arguments. */
-#define NEED_PRINTF_INFINITE_LONG_DOUBLE 1
+/* #undef NEED_PRINTF_INFINITE_LONG_DOUBLE */
 
 /* Define if the vasnprintf implementation needs special code for 'long
    double' arguments. */
-/* #undef NEED_PRINTF_LONG_DOUBLE */
+#define NEED_PRINTF_LONG_DOUBLE 1
 
 /* Define if the vasnprintf implementation needs special code for supporting
    large precisions without arbitrary bounds. */
-/* #undef NEED_PRINTF_UNBOUNDED_PRECISION */
+#define NEED_PRINTF_UNBOUNDED_PRECISION 1
 
 /* Define to 1 if realloc should abort upon undefined behaviour. */
 /* #undef NEED_SANITIZED_REALLOC */
@@ -2871,7 +2871,7 @@
 /* #undef WCRTOMB_C_LOCALE_BUG */
 
 /* Define if the wcrtomb function has an incorrect return value. */
-/* #undef WCRTOMB_RETVAL_BUG */
+#define WCRTOMB_RETVAL_BUG 1
 
 /* Define if WSAStartup is needed. */
 /* #undef WINDOWS_SOCKETS */

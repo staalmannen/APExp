@@ -85,6 +85,7 @@ static const char *utf8_decode (const char *s, l_uint32 *val, int strict) {
 ** start in the range [i,j], or nil + current position if 's' is not
 ** well formed in that interval
 */
+#define utflen lua_utflen
 static int utflen (lua_State *L) {
   lua_Integer n = 0;  /* counter for the number of characters */
   size_t len;  /* string length in bytes */
