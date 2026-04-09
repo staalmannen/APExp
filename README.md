@@ -60,41 +60,55 @@ sources. To get more C99 compatibility, vibe-coded (claude.ai) patches have been
 Install paths have been modified so that libraries and binaries are installed in the local directory structure of APExp. A bind script (apexp-sh) in the root of APExp can be used to overlay APExp over the native APE.
 
 
-***Libraries and headers***
-
-- libap, lib9, libbsd, libutf, libfmt, libv, libmp and libnet are merged
-- 3rd party libc functions primarily from musl libc, but also some from NetBSD (fts-standalone, libnbcompat)
-- sys/src/ape/lib/ap has been reorganized like the musl src directory
-- imported several fenv, math, regex, search and other functions from musl libc
+***Headers***
 - err.h provided by libnbcompat (NetBSD) [11]
 - regex.h provided by musl libc
 - iconv.h provided by musl libc
+- libintl.h provided by musl libc
 - OpenBSD sys/queue.h copied from suckless sbase
 - getopt.h gnu getopt_long from musl libc
 - strings.h shim pointing to bsd.h
 - stdio.h : added fmemopen, getdelim/getline from musl libc
-- fchown/fchmod stubs introduced
 - wchar.h/wctype.h provided by the thin "libwtf" [12]
+- readline.h provided by libedit
+- curses.h, term.h, panel.h provided by PDCursesMod
 
-
-- curses.h, term.h, panel.h provided by PDCursesMod (built with wchar)
-- gettext libintl from GNU (version 0.22.5 )
+***Libraries***
+**new libap**
+- libap, lib9, libbsd, libpthreads, libutf, libfmt, libv, libmp and libnet are merged
+- 3rd party libc functions primarily from musl libc, but also some from NetBSD (fts-standalone, libnbcompat)
+- sys/src/ape/lib/ap has been reorganized like the musl src directory
+- imported fenv, math, complex, regex, search and other functions from musl libc
+- migrated from APE stdio to musl stdio (with some major porting, using pthreads)
+- fchown/fchmod stubs introduced
+**3rd party**
+- libcurses : PDCursesMod (check out 2026-04-08; built with utf8/wchar)
+- libedit (version 3.1 2025-10-16)
+- libpcre2 (version 10.47)
+- libxml2 (from gettext version 1.0.0)
+- libgettextpo / libtextstyles (from gettext version 1.0.0)
+- liblzma (from xz version 5.8.3)
+- libz (version 1.2.2)
+- libbz2 (version 1.0.8)
 
 
 ***Utilities***
 
-
+- The shell is still the original APE pdksh
+- --- TODO: replace with GNU bash (version 5.3)
 - APE make has been replaced by a port of GNU make (version 4.4.1)
-- APE sed has been replaced by a port of GNU sed (version 4.2.1)
-- APE grep has been replaced by pcre2grep (version 10.432024-02-16 )
-- system awk has been replaced by GNU awk (version 5.3.0) as ape/awk
-- GNU m4 (version 1.4.19) has been added
-- GNU gettext utilities (version 0.22.5) have been added
+- APE sed has been replaced by a port of GNU sed (version 4.9)
+- APE grep has been replaced by pcre2grep (version 10.47 ). 
+- - - - TODO: replace with GNU grep (version 3.12)
+- system awk has been replaced by GNU awk (version 5.4.0) since native awk is sometimes needed, it is installed as gawk
+- GNU m4 (version 1.4.21) has been added
+- GNU gettext utilities and libraries (version 1.0.0) have been added
 - A "musl" iconv utility has been added from alpine linux.
-- system yacc has been replaced by byacc (version 20240109) as ape/yacc
+- system yacc has been replaced by byacc (version 20240109) as ape/yacc. 
+- - - - TODO: replace with Bison (version ) and keep native yacc as "yacc"
 - system lex has been replaced by flex (version 2.6.4) as ape/lex
 - vibe-coded (claude.ai) GAS-compatible "as" front end to native $Oa assemblers.
-- the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" et al. have been built from suckless sbase [14]
+- the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" *et al.* have been built from suckless sbase [14]
 - steve's mkmk (/n/sources/contrib) imported to APExp
 - copied "head", "which", and "printenv" rc scripts from steve (/n/sources/contrib)
 
@@ -110,8 +124,8 @@ Install paths have been modified so that libraries and binaries are installed in
 
 C transpilers is a fun little proof-of-concept and also opens up for more languages. Many will only have very little practical use, however.
 
-- The pascal-to-C transpiler p2c (1.21alpha) is included in APExp
-- The fortran-to-C transpiler f2c (20240504) is included in APExp
+- The pascal-to-C transpiler p2c (2.01) is included in APExp
+- The fortran-to-C transpiler f2c (20250303) is included in APExp
 - The ObjC-to-C transpiler (3.3.38, bootstrap) is included in APExp
 
 
@@ -126,7 +140,7 @@ sources could be a barrier. Because of this, APExp package several (un)archivers
 - unrar (2.71 ; can handle old rar archives. More recent versions written in c++)
 - unace (2.7)
 - clzip (1.14)
-- xz (5.6.3)
+- xz (5.8.3)
 
 
 ***BLOAT!!!1!!!***

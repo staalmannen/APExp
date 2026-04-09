@@ -17,14 +17,15 @@ _OPTIONAL_LIBS=\
 	curses\
 	edit\
 	fortran\
-	gettextpo\
 	lua\
 	lzma\
 	pascal\
 	pcre2\
+	z\
+# gettext\
+	gettextpo\
 	textstyle\
 	xml2\
-	z\
 
 DIRS=\
 	$_CORE_LIBS\
