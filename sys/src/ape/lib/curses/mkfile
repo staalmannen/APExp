@@ -54,8 +54,8 @@ OFILES=\
 	pdcsetsc.$O\
 	pdcutil.$O\
 # common\
-	pdccolor.$O\
-	psf.$O
+	common-pdccolor.$O\
+	common-psf.$O
 
 HFILES=\
 	$APEXPROOT/sys/include/ape/curses.h\
@@ -83,11 +83,11 @@ CFLAGS= -c -I$CURSRC -I$CURSRC/plan9 -I$CURSRC/common -D_POSIX_SOURCE \
 %.$O: $CURSRC/plan9/%.c
 	$CC $CFLAGS $CURSRC/plan9/$stem.c
 
-%.$O: $CURSRC/common/%.c
-	$CC $CFLAGS $CURSRC/common/$stem.c
+common-%.$O: $CURSRC/common/%.c
+	$CC $CFLAGS -c $prereq -o $target
 
 install:V:
-	cp $CURSRC/doc/MANUAL.md $APEXPROOT/sys/man/1/pdcurses
+	cp $CURSRC/docs/MANUAL.md $APEXPROOT/sys/man/1/pdcurses
 
 demos:V:
 	@{

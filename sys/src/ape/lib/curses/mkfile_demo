@@ -7,7 +7,7 @@ TARG=\
 	firework\
     init_col\
     mbrot\
-	newtest\
+#	newtest\
 	ozdemo\
 	picsview\
 	ptest\
@@ -17,7 +17,7 @@ TARG=\
 #	testcurs\
 	tuidemo\
     version\
-    widetest\
+#    widetest\
 	worm\
 	xmas
 

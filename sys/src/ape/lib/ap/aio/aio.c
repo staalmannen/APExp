@@ -141,8 +141,6 @@ aio_worker(void *arg)
 		pthread_cond_broadcast(&cb->__cond);
 		pthread_mutex_unlock(&cb->__lock);
 	}
-	/* NOTREACHED */
-	return NULL;
 }
 
 static pthread_once_t aio_once = PTHREAD_ONCE_INIT;
