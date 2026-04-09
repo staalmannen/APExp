@@ -1,4 +1,10 @@
 
+objc (3.4.3) UNRELEASED; urgency=low
+
+  * v 3.4.3
+
+ -- David Stes <stes@telenet.be>  Mon, 05 May 2025 18:43:40 +0200
+
 objc (3.3.41) UNRELEASED; urgency=low
 
   * v 3.3.41

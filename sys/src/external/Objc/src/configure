@@ -674,13 +674,20 @@ YTABH
 LEXYYC
 YACC
 LEX
+UT_BOOTLIBS
 OBJC_BOOTLIBS
+UT_IFLAGS
 CAKIT_IFLAGS
 OBJC_IFLAGS
 OCLIB_IFLAGS
 OBJPAK_IFLAGS
 OBJCRT_IFLAGS
 EXTRA_MFLAGS
+REFCNTDBG_MFLAGS
+REFCNTOPT_MFLAGS
+CAKITLIBNAME
+OBJPAKLIBNAME
+OBJCRTLIBNAME
 DBG_MFLAGS
 OPT_MFLAGS
 MFLAGS
@@ -801,11 +808,13 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_impcplus
 with_prefixed_names
 with_postlink
 with_longlinetags
 with_shortlinetags
 with_informix
+with_gnu17
 with_tentdef
 with_attrcommon
 '
@@ -1439,11 +1448,13 @@ if test -n "$ac_init_help"; then
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-impcplus         define IMP C++ style id (*imp)(id,...)
   --with-prefixed-names   use oc_objcInit as initialization function
   --with-postlink         use postlink runtime initialization
   --with-longlinetags     generate long #line linetags
   --with-shortlinetags    generate short # linetags
   --with-informix         set SQLCC to Informix esql
+  --with-gnu17            use -std=gnu17 for C compiler and C preprocessor
   --with-tentdef          use C tentative definitions
   --with-attrcommon       use __attribute__ for C tentative definitions
 
@@ -2568,6 +2579,16 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
+# Check whether --with-impcplus was given.
+if test ${with_impcplus+y}
+then :
+  withval=$with_impcplus; ac_cv_impcplus=$withval
+
+fi
+
+
+
+
 # Check whether --with-prefixed-names was given.
 if test ${with_prefixed_names+y}
 then :
@@ -2738,7 +2759,7 @@ test -n "$target_alias" &&
   program_prefix=${target_alias}-
 
 TARGET=$target;
-OBJC1VERSION=3.3.44;
+OBJC1VERSION=3.4.13;
 NAME=objc-${OBJC1VERSION};
 WARNING="DO NOT EDIT -- configure ${NAME} ${TARGET}";
 
@@ -4281,6 +4302,7 @@ case $target in
  *nextstep*|*rhapsody*) OC_CPARGS="-traditional-cpp";;
  *) OC_CPARGS='';;
 esac
+OC_CCARGS=''
 
 case $ac_cv_c_compiler_gnu in
   yes)
@@ -4292,10 +4314,104 @@ case $ac_cv_c_compiler_gnu in
   *) ;;
 esac
 
+
+# ===========================================================================
+#       https://www.gnu.org/software/autoconf-archive
+# ===========================================================================
+#
+# SYNOPSIS
+#
+#   AX_CC_GNU17
+#
+# DESCRIPTION
+#
+#   Determine whether the C compiler supports -std=gnu17
+#
+#   The $ac_cv_gnu17 variable will be either yes or no
+#
+# LICENSE
+#
+#   Copyright (c) 2025 David Stes
+#
+#   This program is free software: you can redistribute it and/or modify it
+#   under the terms of the GNU General Public License as published by the
+#   Free Software Foundation, either version 3 of the License, or (at your
+#   option) any later version.
+#
+#   This program is distributed in the hope that it will be useful, but
+#   WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General
+#   Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License along
+#   with this program. If not, see <https://www.gnu.org/licenses/>.
+
+#serial 1
+
+
+# Check whether --with-gnu17 was given.
+if test ${with_gnu17+y}
+then :
+  withval=$with_gnu17; ac_cv_gnu17=$withval
+
+fi
+
+
+
+
+
+
+
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking whether compiler supports -std=gnu17" >&5
+printf %s "checking whether compiler supports -std=gnu17... " >&6; }
+if test ${ac_cv_gnu17+y}
+then :
+  printf %s "(cached) " >&6
+else case e in #(
+  e)
+t1="ac$$.c"
+o1="ac$$.o"
+ac_clean_files="$t1 $o1"
+cat >$t1 <<EOF
+#ifdef __cplusplus
+typedef int (*IMP) (...);        /* pointer in C++/C23 */
+#else
+typedef int (*IMP) ();           /* pointer in K&R C/C17 */
+#endif
+EOF
+# since gcc 15 gcc defaults to C++ style definitions with ... (ellipsis)
+echo "$CC -std=gnu17 -c $t1" >&5
+if $CC -std=gnu17 -c $t1 2>&5 1>&5
+  then
+    echo " (yes)" >&5
+    ac_cv_gnu17=yes;
+  else
+    echo " (no)" >&5
+    ac_cv_gnu17=no;
+fi
+rm -rf $ac_clean_files
+ ;;
+esac
+fi
+
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_gnu17" >&5
+printf "%s\n" "$ac_cv_gnu17" >&6; }
+
+
+case $ac_cv_gnu17 in
+    yes) OC_CPARGS="-std=gnu17 $OC_CPARGS";OC_CCARGS="-std=gnu17 $OC_CCARGS";;
+    no) ;;
+esac
+
 OC_CPARGS="-D__PORTABLE_OBJC__ $OC_CPARGS"
 
+case $ac_cv_impcplus in
+  yes) OC_CPARGS="$OC_CPARGS -DOBJCRT_IMPCPLUS=1";;
+  no) ;;
+esac
 
-OC_CCARGS=''
+
 
 
 
@@ -4404,6 +4520,12 @@ case $ac_cv_shortlinetags in
      esac
      ;;
 esac
+
+case $ac_cv_impcplus in
+  yes) OC_OCARGS="$OC_OCARGS -impcplus";;
+  no) ;;
+esac
+
 
 OC_LDARGS='';
 
@@ -4947,6 +5069,17 @@ esac
 
 DBG_MFLAGS=${DBG_MFLAGS:-'-DDEBUG -g'};
 
+# for building the runtime with -refcnt support
+# to use the names objcrtr, objpakr, cakitr instead of objcrt,objpak,cakit
+OBJCRTLIBNAME=${OBJCRTLIBNAME:-objcrt};
+OBJPAKLIBNAME=${OBJPAKLIBNAME:-objpak};
+CAKITLIBNAME=${CAKITLIBNAME:-cakit};
+
+REFCNTOPT_MFLAGS=${REFCNTOPT_MFLAGS:-'-refcnt -DNDEBUG'}
+
+REFCNTDBG_MFLAGS=${REFCNTDBG_MFLAGS:-'-refcnt -DDEBUG -g'}
+
+
 # allow configure EXTRA_MFLAGS=  to specify some extra .m flag
 
 
@@ -4966,6 +5099,7 @@ NOI="-noI";
 NOLIBS="-noLibs";
 OBJCRT_INC="${ISRCDIR}${UP}${UP}include${PATHSEP}objcrt";
 OBJPAK_INC="${ISRCDIR}${UP}${UP}include${PATHSEP}objpak"
+CAKIT_INC="${ISRCDIR}${UP}${UP}include${PATHSEP}cakit"
 
 # -I. is included for #include "config.h" and "yacc.h"
 # it is possible that $ISRCDIR is also -I./ so duplicate -I./ -I. in that case
@@ -4975,10 +5109,16 @@ OBJPAK_IFLAGS="$NOI $OBJCRT_INC $ISRCDIR -I."
 OCLIB_IFLAGS="$NOI $OBJCRT_INC $OBJPAK_INC $ISRCDIR -I."
 OBJC_IFLAGS="$NOI $OBJCRT_INC $OBJPAK_INC ${ISRCDIR}${UP}oclib $ISRCDIR -I."
 CAKIT_IFLAGS="$NOI $OBJCRT_INC $ISRCDIR -I."
+UT_IFLAGS="$NOI $OBJCRT_INC $OBJPAK_INC $CAKIT_INC $ISRCDIR -I."
 
 OBJC_BOOTLIBS="${NOLIBS} ${UP}oclib${PATHSEP}oclib.${LIBSUFFIX}"
 OBJC_BOOTLIBS="$OBJC_BOOTLIBS ${UP}objpak${PATHSEP}objpak.${LIBSUFFIX}"
 OBJC_BOOTLIBS="$OBJC_BOOTLIBS ${UP}objcrt${PATHSEP}objcrt.${LIBSUFFIX}"
+UT_BOOTLIBS="${NOLIBS} ${UP}cakit${PATHSEP}cakit.${LIBSUFFIX}"
+UT_BOOTLIBS="$UT_BOOTLIBS ${UP}objpak${PATHSEP}objpak.${LIBSUFFIX}"
+UT_BOOTLIBS="$UT_BOOTLIBS ${UP}objcrt${PATHSEP}objcrt.${LIBSUFFIX}"
+
+
 
 
 
@@ -5877,7 +6017,7 @@ esac
 
 
 
-list='config.h Makefile src/objcrt/config.h src/objcrt/Makefile src/objpak/config.h src/objpak/Makefile src/oclib/config.h src/oclib/Makefile src/objc/config.h src/objc/Makefile src/objc/objc src/objc/objc.m src/cakit/config.h src/cakit/Makefile examples/Makefile words/Makefile'
+list='config.h Makefile src/objcrt/config.h src/objcrt/Makefile src/objpak/config.h src/objpak/Makefile src/oclib/config.h src/oclib/Makefile src/objc/config.h src/objc/Makefile src/objc/objc src/objc/objc.m src/unittest/config.h src/unittest/Makefile src/cakit/config.h src/cakit/Makefile examples/Makefile words/Makefile'
 
 #list="$list pkg/objc.p5m pkg/objclibs.p5m"
 

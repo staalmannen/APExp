@@ -1,6 +1,6 @@
 
 /* 
- * Copyright (c) 1998-2024 David Stes
+ * Copyright (c) 1998-2026 David Stes
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Library General Public License as published 
@@ -43,14 +43,14 @@ void printversion(void)
 
 void printcopyright(void)
 {
-  printf("Portable Object Compiler %s (c) 1997-2024.\n",OBJCVERSION);
+  printf("Portable Object Compiler %s (c) 1997-2025.\n",OBJCVERSION);
   printf("Distributed under the terms of the GNU LGPL.\n");
 }
 
 void unknownoption(char* arg)
 {
   STR msg = "%s: unknown option %s\n";
-  STR name = (o_cplus) ? "objcpls1" : "objc1";
+  STR name = "objc1";
   fprintf(stderr, msg, name, arg);
   exit(1);
 }
@@ -58,7 +58,7 @@ void unknownoption(char* arg)
 void badarg(id option,id arg)
 {
   STR msg = "%s: illegal argument %s for %s\n";
-  STR name = (o_cplus) ? "objcpls1" : "objc1";
+  STR name = "objc1";
   fprintf(stderr, msg, name, [arg str], [option str]);
   exit(1);
 }
@@ -316,8 +316,17 @@ void setoptions(id aCltn)
       o_nilrcvr = 0;
     } else if (!strcmp(t,"-objc")) {
       o_gencode = 0;
+    } else if (!strcmp(t,"-impcplus")) {
+      o_impcplus++;
+    } else if (!strcmp(t,"-wcharcplus")) {
+      o_wcharcplus++;
+    } else if (!strcmp(t,"-boolcplus")) {
+      o_boolcplus++;
     } else if (!strcmp(t,"-cplus")) {
       o_cplus++;
+      o_wcharcplus++;
+      o_boolcplus++;
+      o_impcplus++;
     } else if (!strcmp(t,"-inlinecache")) {
       o_inlinecache++;
     } else if (!strcmp(t,"-refBind")) {
@@ -526,6 +535,10 @@ void setfirstlinetag(void)
     /* Solaris 11.3 defines va_arg_incr as function when -m64 */
     definebuiltinvar("__builtin_va_alist");
     if (!(o_sunstudio && o_m64)) definebuiltinfun("__builtin_va_arg_incr");
+
+    /* gcc15 in so called c23 or gnu23 mode */
+    definebuiltinvar("nullptr");
+    definebuiltinfun("__builtin_c23_va_start");
   }
 }
 

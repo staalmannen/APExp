@@ -1,6 +1,6 @@
-Portable Object Compiler (c) 1997-2024  All Rights Reserved.
+Portable Object Compiler (c) 1997-2025  All Rights Reserved.
 
-For help, send email to me: stes@telenet.be
+For help, send email to David Stes: stes@telenet.be
 or preferably to the objc-discuss@lists.sourceforge.net mailing list.
 
 0. Make sure to install lex and yacc and set LEX and YACC variables :
@@ -85,6 +85,22 @@ I'd recommend to install the bootstrap compiler in a different directory,
 
 It is important to use the --prefix option if you want to install the compiler in a directory like $HOME/bin.  The default (if no --prefix is specified) is to install into /usr/local/bin,/usr/local/include,/usr/local/man etc.  
 
+Configure has some options (see --help for a list).
+
+The runtime library and compiler support K&R (Kernighan&Ritchie) style IMP
+
+typedef id (*IMP) ();           /* Method pointer traditional K&R C style */
+
+and C++ style IMP function pointers
+
+typedef id (*IMP) (id,...);     /* Method pointer C++ style */
+
+The configure script option:
+
+	./configure --with-impcplus
+
+enables the C++ style by setting -DOBJCRT_IMPCPLUS=1 and the -impcplus switch.
+
 The configure script has to find a C compiler for all this to work.
 
 The configure script will try to find itself a C compiler.
@@ -119,17 +135,20 @@ or on Digital Unix, CC='cc -std' or on Solaris /opt/developerstudio12.6/bin/cc
 	cd objc-2.3.1
 
 	./configure --help
-	./configure --prefix=$HOME
+	./configure --prefix=$HOME MFLAGS=DBG_MFLAGS
 
         or
 
-	./configure --prefix=$HOME \
+	./configure --prefix=$HOME --with-impcplus\
            OBJC=/opt/objc-bootstrap/bin/objc \
            XOBJC=/opt/objc-bootstrap/bin/objc \
            YACC='yacc -d' LEX='flex --nounistd' \
-           AR=echo FINAL_AR='ar cr'
+           AR=echo FINAL_AR='ar cr' \
+	   MFLAGS=DBG_MFLAGS
 
-        the previous configure line sets OBJC and XOBJC to 
+        the previous configure line installs into $HOME/bin,$HOME/include
+	enables the -DOBJCRT_IMPCPLUS=1 switch for C++ IMP definition,
+	(and enables code generation for -impcplus), sets OBJC and XOBJC to 
         a bootstrap compiler that was installed in /opt/objc-bootstrap,
 	which is only necessary,
 	if you don't have a previous version of objc in the PATH (see step 2)
@@ -138,13 +157,27 @@ or on Digital Unix, CC='cc -std' or on Solaris /opt/developerstudio12.6/bin/cc
         where by default we use multiple ar invocations instead of a single
         ar invocation.
 
+	MFLAGS=DBG_MFLAGS enables lots of assert() statements
+
 	make
 
-  Optionally run a few basic tests before 'make install':
+  Enable debug and assertions with
+
+	./configure MFLAGS=DBG_MFLAGS
+
+  Enable optimizer flags with (this adds -DNDEBUG to disable asserts)
+
+	./configure MFLAGS=OPT_MFLAGS
+
+  Optionally run the "Unit Test" tests before 'make install':
 
 	make check
 
-  Then 
+  Note that "make check" will only fail if not compiled with -DNDEBUG.  See,
+
+	man assert
+
+  To install the compiler and runtime libraries, use :
 
 	make install
 
@@ -154,7 +187,7 @@ or on Digital Unix, CC='cc -std' or on Solaris /opt/developerstudio12.6/bin/cc
 
   different from /opt/objc-bootstrap/bin or $HOME/objc-bootstrap/bin.
 
-  Some examples can be used to check:
+  Some examples (in addition to "Unit Test" from make check) :
 
 	make words
 
@@ -197,6 +230,36 @@ This will compile/build the compiler in the "mybuild" directory.
 
 This can be useful to do multiple builds in different directories,
 using different flags.
+
+For example, a version of the runtime can be built in separate directories
+
+	- with debug info
+	- with postlink runtime initialisation
+	- with profile information
+	- with reference counts 
+	- with object tables (double indirection)
+	- with Boehm-Demers-Weiser garbage collection
+	- with inline cache 
+	- with the -fast option to disable the use of frame pointer
+	etc.
+
+By building in separate directories (out of the source tree) different configurations can used :
+
+	gnutar xvfz objc-3.4.11.tar.gz
+
+	mkdir bdwgcbuild
+	cd bdwgcbuild
+
+	../objc-3.4.11/configure --prefix=$HOME EXTRA_MFLAGS="-DOBJCRT_BOEHM"
+	make runtime
+
+	cd ..
+	mkdir inlinebuild
+	cd inlinebuild
+	../objc-3.4.11/configure --prefix=$HOME EXTRA_MFLAGS="-inlineCache"
+	make runtime
+
+The objc driver script assumes however that the name of the runtime libraries is changed appropriately; for example from objcrt.a to objcrtgc.a for BDWGC.
 
 Good luck!
 

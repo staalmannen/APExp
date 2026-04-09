@@ -2,7 +2,7 @@
 .de q
 ``\\$1''\\$2
 ..
-.TH objc 1 "Feb 2, 2023"
+.TH objc 1 "Jul 6, 2025"
 .SH NAME
 objc \- Portable Object Compiler
 .SH SYNOPSIS
@@ -116,12 +116,6 @@ is also emitting by default linetags that refer to the original source file, it 
 
 Print overview of compiler switches.
 
-.IP "\fB\-i\fP"
-
-Generate a TDF capsule (.j file) for use with the
-.B tcc
-compiler and do not link.  Equivalent to \-Fj.
-
 .IP "\fB\-Idir\fP"
 
 Add
@@ -130,7 +124,7 @@ to the search path for include files.
 
 .IP "\fB\-inlinecache\fP"
 
-Generate inline cache code for calls to _imp() messenger.  The inline cache messenger associates to each message expression its own cache, and will in
+Generate inline cache code for calls to messenger.  The inline cache messenger associates to each message expression its own cache, and will in
 many cases bypass the default objcrt messenger.
 
 It is safe to use this option to produce binary libraries of objects; the
@@ -140,17 +134,6 @@ either with or without the -inlinecache option.
 .IP "\fB\-import\fP"
 
 Pass flags to the C preprocessor to do the traditional Objective-C constructs # import and // on which we usually don't depend.  Note that it's also possible to set the environment variable CPP to a preprocessor that's newline-terminated-comments capable, or to use the cvtimport(1) utility so that the flag is not needed. 
-
-.IP "\fB\-jfoo\fP" 
-
-Find and add a TDF library
-.B foo.tl.
-
-.IP "\fB\-Jdir\fP" 
-
-Add
-.B dir
-to the search path for TDF libraries.
 
 .IP "\fB\-lfoo\fP" 
 
@@ -289,12 +272,6 @@ Use the combination of the flags \-postlink and \-retain to produce a file
 .B _postlnk.c
 that contains a list of all the Objective C modules that are linked into your program.
 
-.IP "\fB\-prod\fP"
-
-Combine target independent independent TDF capsules into a TDF archive (a .ta file).  This option is passed on to the
-.B tcc (1)
-compiler, the archive name can be set with \-o.  The resulting platform independent .ta file can be specified on the command line as an ordinary .a file.
-
 .IP "\fB\-pthreads\fP"
 
 Link against the library
@@ -417,12 +394,6 @@ after running the Objective C compiler.  This option can somewhat reduce the siz
 will extract selector strings out of the translated Objective C sources, assemble the strings in a file called "strings", and will cause the runtime to use a single, shared table of strings).  This could also speed up runtime
 initialization as selectors don't have to be uniqued anylonger at startup.
 
-.IP "\fB\-Yenv\fP"
-
-Use the specified environment.  This is for the TenDRA
-.B tcc
-compiler.  Valid values are \-Yansi, \-Yposix, \-Yunix95 etc.
-
 .SH ENVIRONMENT
 
 The most useful environment variable for setting options for
@@ -469,12 +440,6 @@ $OBJCDIR/bin and $OBJCDIR/man can be added to $PATH and $MANPATH respectively.
 
 .br
 
-.IP "OBJCPATHSEP"
-
-This environment variable, if set, is a string that will be used as path separator instead of the default separator.  Applies to both objc and objc1.
-
-.br
-
 .IP "TMPDIR"
 
 If set, temporary files will be placed in this directory.  The \-T option overrides the value set by TMPDIR.
@@ -509,7 +474,7 @@ function should be logged.  If this variable is set, output for OBJCRTDBG and OB
 
 .SH BUGS
 
-Send bug reports to stes@telenet.be.
+Send bug reports to stes@telenet.be or preferably to objc-discuss@lists.sourceforge.net.   See http://objc.sourceforge.net for more info.
 
 .SH "SEE ALSO"
 cc(1),

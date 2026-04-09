@@ -1,9 +1,9 @@
 #!/bin/sh
 #
 # script to precompile compiler to C (bootstrap package)
-# $Id: bootSrc,v 1.47 2023/10/07 11:54:36 stes Exp $
+# $Id: bootSrc,v 1.51 2025/06/18 08:37:00 stes Exp $
 
-DST=/tmp/objc-bootstrap-3.3.41
+DST=/tmp/objc-bootstrap-3.4.8
 
 if test -f Makefile
 then
@@ -17,7 +17,8 @@ ac_cv_func_memcpy=no;export ac_cv_func_memcpy
 ac_cv_func_snprintf=no;export ac_cv_func_snprintf
 ./configure --with-postlink --with-prefixed-names
 
-OBJCOPT='-C -traditional -traditional-cpp -noFwd -noFiler -postlink -init oc_objcInit -nostdinc -I../../util/ -T../../util/'
+# for some reason linetags differ without -traditional
+OBJCOPT='-C -traditional -noFwd -noFiler -postlink -init oc_objcInit -nostdinc -I../../util/ -T../../util/'
 export OBJCOPT
 
 (cd src/objcrt;make)
@@ -38,6 +39,7 @@ cp License.txt $DST
 cp util/configure.in $DST
 cp util/ax_cc_tentdef.m4 $DST
 cp util/ax_cc_attrcommon.m4 $DST
+cp util/ax_cc_gnu17.m4 $DST
 cp util/Makefile.in $DST
 cp util/Makefile.vms $DST
 cp util/config.sub $DST/util/

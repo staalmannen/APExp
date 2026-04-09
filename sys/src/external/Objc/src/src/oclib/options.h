@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 1998-2023 David Stes.
+ * Copyright (c) 1998-2026 David Stes.
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Library General Public License as published 
@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: options.h,v 1.9 2023/01/27 20:19:10 stes Exp $
+ * $Id: options.h,v 1.12 2026/02/14 18:11:20 stes Exp $
  */
 
 void defoptions(void);
@@ -55,6 +55,9 @@ extern char *o_bind;
 extern char *o_browsedir;
 extern int o_refbind;
 extern int o_inlinecache;
+extern int o_boolcplus;
+extern int o_wcharcplus;
+extern int o_impcplus;
 extern int o_cplus;
 extern int o_gencode;
 extern int o_st80;

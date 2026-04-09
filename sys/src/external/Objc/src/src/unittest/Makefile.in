@@ -1,0 +1,103 @@
+
+#
+# Portable Object Compiler (c) 2025.  All Rights Reserved. 
+# $Id: Makefile.in,v 1.9 2025/12/31 18:15:24 stes Exp $
+#
+
+#
+# This Makefile should work with UNIX make (like SysV, BSD, GNU make)
+#
+
+SRCDIR=@srcdir@
+BUILDDIR=@builddir@
+CD=cd
+MKDIR=mkdir
+STRIP=strip
+CHMOD=chmod
+RM=@RM@
+CP=@CP@
+AR=@AR@
+INSTALL=@INSTALL@
+FINAL_AR=@FINAL_AR@
+RANLIB=@RANLIB@
+@SET_MAKE@
+CC=@CC@
+DBG_MFLAGS=@DBG_MFLAGS@
+OPT_MFLAGS=@OPT_MFLAGS@
+REFCNTDBG_MFLAGS=@REFCNTDBG_MFLAGS@
+REFCNTOPT_MFLAGS=@REFCNTOPT_MFLAGS@
+EXTRA_MFLAGS=@EXTRA_MFLAGS@
+OBJSUFFIX=@OBJSUFFIX@
+LIBSUFFIX=@LIBSUFFIX@
+BINDIR=@BINDIR@
+LIBDIR=@LIBDIR@
+IFLAGS=@UT_IFLAGS@
+BOOTLIBS=@UT_BOOTLIBS@
+DEPENDLIBS=../objcrt/objcrt.$(LIBSUFFIX) \
+           ../objpak/objpak.$(LIBSUFFIX) \
+           ../cakit/cakit.$(LIBSUFFIX)
+
+MFLAGS=$(@MFLAGS@)
+
+#
+# Link the objut test program to BOOTLIBS
+# the libraries that are not yet installed;  this is so that "make check"
+# can test those libraries before they are installed by "make install"
+# use XOBJC for the build (as is used to build objc1 itself)
+#
+
+OBJC=@XOBJC@
+
+VPATH=$(SRCDIR)
+
+.SUFFIXES: .m
+
+OBJUTPROGRAM=objut@BINDOTSUFFIX@
+
+OBJUTFILES=\
+	testste.$(OBJSUFFIX)\
+	testcase.$(OBJSUFFIX)\
+	classcnt.$(OBJSUFFIX)\
+	bagtest.$(OBJSUFFIX)\
+	factest.$(OBJSUFFIX)\
+	ordctest.$(OBJSUFFIX)\
+	seqtest.$(OBJSUFFIX)\
+	zashaus.$(OBJSUFFIX)\
+	quofield.$(OBJSUFFIX)\
+	galfield.$(OBJSUFFIX)\
+	bigrand.$(OBJSUFFIX)\
+	shanks.$(OBJSUFFIX)\
+	legendre.$(OBJSUFFIX)\
+	bezout.$(OBJSUFFIX)\
+	perfect.$(OBJSUFFIX)\
+	mvartest.$(OBJSUFFIX)\
+	fddtest.$(OBJSUFFIX)\
+	lgndtest.$(OBJSUFFIX)\
+	objut.$(OBJSUFFIX)
+
+.m.$(OBJSUFFIX):
+	$(OBJC) -c $< $(MFLAGS) $(EXTRA_MFLAGS) $(IFLAGS)
+
+check : $(OBJUTPROGRAM)
+	$(BUILDDIR)/$(OBJUTPROGRAM)
+
+#because PerfectNumberTest uses cakit and because "make test" is assumed
+#to be running before cakit is installed, use BOOTLIBS with -noLibs flag
+
+$(OBJUTPROGRAM) : $(OBJUTFILES) $(DEPENDLIBS)
+	$(OBJC) $(EXTRA_MFLAGS) $(OBJUTFILES) $(BOOTLIBS) -o $(OBJUTPROGRAM)
+
+cleantmp :
+	-$(RM) *.P
+	-$(RM) *.i
+
+clean : cleantmp
+	-$(RM) *.$(OBJSUFFIX)
+	-$(RM) *.$(LIBSUFFIX)
+	-$(RM) $(OBJUTPROGRAM)
+
+distclean : clean
+	-$(RM) core 
+	-$(RM) Makefile 
+	-$(RM) config.h 
+

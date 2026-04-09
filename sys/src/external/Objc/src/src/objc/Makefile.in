@@ -1,7 +1,7 @@
 
 #
-# Portable Object Compiler (c) 1997-2023.  All Rights Reserved. 
-# $Id: Makefile.in,v 1.16 2024/03/26 16:57:06 stes Exp $
+# Portable Object Compiler (c) 1997-2025.  All Rights Reserved. 
+# $Id: Makefile.in,v 1.17 2025/03/07 19:10:45 stes Exp $
 #
 
 #
@@ -55,7 +55,6 @@ VPATH=$(SRCDIR)
 OBJCSCRIPT=objc
 OBJCPROGRAM=objc.exe
 OBJC1PROGRAM=objc1@BINDOTSUFFIX@
-OBJUTPROGRAM=objut@BINDOTSUFFIX@
 POSTLINK=postlink@BINDOTSUFFIX@
 
 OBJCFILES=\
@@ -66,9 +65,6 @@ OBJC1FILES=\
 	lex.$(OBJSUFFIX)\
 	lexfiltr.$(OBJSUFFIX)\
 	objc1.$(OBJSUFFIX)
-
-OBJUTFILES=\
-	objut.$(OBJSUFFIX)
 
 PRELINKFILE=\
 	_prelink.$(OBJSUFFIX)
@@ -101,17 +97,11 @@ default : $(OBJC1PROGRAM) $(PRELINKFILE) $(PREDLLFILE) $(POSTLINK)
 
 runtime : $(PRELINKFILE) $(PREDLLFILE)
 
-check : $(OBJUTPROGRAM)
-	$(BUILDDIR)/$(OBJUTPROGRAM)
-
 $(OBJCPROGRAM) : $(OBJCFILES) $(DEPENDLIBS)
 	$(OBJC) $(EXTRA_MFLAGS) $(OBJCFILES) $(BOOTLIBS) -o $(OBJCPROGRAM)
 
 $(OBJC1PROGRAM) : $(OBJC1FILES) $(DEPENDLIBS)
 	$(OBJC) $(EXTRA_MFLAGS) $(OBJC1FILES) $(BOOTLIBS) -o $(OBJC1PROGRAM)
-
-$(OBJUTPROGRAM) : $(OBJUTFILES) $(DEPENDLIBS)
-	$(OBJC) $(EXTRA_MFLAGS) $(OBJUTFILES) $(BOOTLIBS) -o $(OBJUTPROGRAM)
 
 $(PRELINKFILE) : _prelink.c
 	$(CC) -c $(EXTRA_MFLAGS) $<
@@ -163,7 +153,6 @@ clean : cleantmp
 	-$(RM) objc.m yacc.h yacc.m lex.m
 	-$(RM) $(OBJCPROGRAM)
 	-$(RM) $(OBJC1PROGRAM)
-	-$(RM) $(OBJUTPROGRAM)
 	-$(RM) $(POSTLINK)
 
 distclean : clean

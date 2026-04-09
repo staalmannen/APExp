@@ -1,6 +1,9 @@
 
+/* old style utmp example - superseded by howmany-utmpx.m for utmpx */
+
 #include <stdio.h>
 #include <utmp.h>
+#include <stdlib.h>
 #include <objpak.h>
 
 #if !defined(UTMP_FILE) && defined(_PATH_UTMP)
@@ -21,7 +24,10 @@ users(void)
   struct utmp ut;
   int n,m = sizeof(struct utmp);
 
-  if ( (f = fopen(UTMP_FILE,"r")) == NULL) perror("fopen");
+  if ( (f = fopen(UTMP_FILE,"r")) == NULL) {
+     perror("fopen");
+     exit(1);
+  }
 
   c = [Set new];
   while (1 == fread(&ut,m,1,f)) {
@@ -32,8 +38,9 @@ users(void)
   return c;
 }
 
-main(int argc,char *argv[])
+int main(int argc,char *argv[])
 {
-  printf("%i\n",[users() size]);
+  printf("Opening for read: %s\n",UTMP_FILE);
+  printf("Number of good users: %i\n",[users() size]);
 }
 

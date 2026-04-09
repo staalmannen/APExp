@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 1998,2000 David Stes.
+ * Copyright (c) 1998,2000,2025 David Stes.
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Library General Public License as published 
@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: classdef.m,v 1.6 2000/09/08 15:51:26 stes Exp $
+ * $Id: classdef.m,v 1.9 2025/06/09 10:28:02 stes Exp $
  */
 
 #include "config.h"
@@ -555,8 +555,8 @@ id curclassdef;
 
 - genslt:methdef
 {
-  if (o_cplus) {
-    gf("\n{\"%s\",(id (*)(...))%s},", [methdef selname], [methdef impname]);
+  if (o_impcplus) {
+    gf("\n{\"%s\",(id (*)(id,...))%s},", [methdef selname], [methdef impname]);
   } else {
     gf("\n{\"%s\",(id (*)())%s},", [methdef selname], [methdef impname]);
   }
@@ -565,8 +565,8 @@ id curclassdef;
 
 - gennilslt
 {
-  if (o_cplus) {
-    gs("\n{(char*)0,(id (*)(...))0}");
+  if (o_impcplus) {
+    gs("\n{(char*)0,(id (*)(id,...))0}");
   } else {
     gs("\n{(char*)0,(id (*)())0}");
   }

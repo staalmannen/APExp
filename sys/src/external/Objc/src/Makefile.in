@@ -1,7 +1,7 @@
 
 #
 # Portable Object Compiler (c) 1996-2023. All Rights Reserved.
-# $Id: Makefile.in,v 1.30 2023/02/17 15:39:00 stes Exp $
+# $Id: Makefile.in,v 1.32 2025/12/31 18:16:31 stes Exp $
 #
 
 SRCDIR=@srcdir@
@@ -30,14 +30,8 @@ runtimer : objcrtr objpakr cakitr
 objcrt ::
 	$(CD) src; $(CD) objcrt; $(MAKE)
 
-objcrtr ::
-	$(CD) src;$(CD) objcrt; $(MAKE) OBJC="objc -q -refcnt" LIBRARY=objcrtr.a
-
 objpak ::
 	$(CD) src; $(CD) objpak; $(MAKE)
-
-objpakr ::
-	$(CD) src;$(CD) objpak; $(MAKE) OBJC="objc -q -refcnt" LIBRARY=objpakr.a
 
 oclib ::
 	$(CD) src; $(CD) oclib;  $(MAKE)
@@ -45,17 +39,14 @@ oclib ::
 objc : objcrt objpak oclib
 	$(CD) src; $(CD) objc;   $(MAKE)
 
-test : compiler
-	$(CD) src; $(CD) objc;   $(MAKE) check
+test ::
+	$(CD) src; $(CD) unittest;   $(MAKE) check
 
-check : compiler
-	$(CD) src; $(CD) objc;   $(MAKE) check
+check : default
+	$(CD) src; $(CD) unittest;   $(MAKE) check
 
 cakit ::
 	$(CD) src; $(CD) cakit;  $(MAKE)
-
-cakitr ::
-	$(CD) src;$(CD) cakit;$(MAKE) OBJC="objc -q -refcnt" LIBRARY=cakitr.a
 
 browse ::
 	objc -browse tmp browse.h
@@ -164,6 +155,7 @@ cleantmp :
 	-$(CD) src; $(CD) oclib;  $(MAKE) cleantmp
 	-$(CD) src; $(CD) objc;   $(MAKE) cleantmp
 	-$(CD) src; $(CD) cakit;  $(MAKE) cleantmp
+	-$(CD) src; $(CD) unittest;  $(MAKE) cleantmp
 	-$(CD) examples;          $(MAKE) cleantmp
 	-$(CD) words;             $(MAKE) cleantmp
 	-$(CD) DependencyGraph;   $(MAKE) cleantmp
@@ -176,6 +168,7 @@ cleanruntime :
 clean : cleanruntime
 	-$(CD) src; $(CD) oclib;  $(MAKE) clean
 	-$(CD) src; $(CD) objc;   $(MAKE) clean
+	-$(CD) src; $(CD) unittest;   $(MAKE) clean
 
 distclean :
 	-$(RM) Makefile tags
@@ -186,6 +179,7 @@ distclean :
 	-$(CD) src; $(CD) oclib;  $(MAKE) distclean
 	-$(CD) src; $(CD) objc;   $(MAKE) distclean
 	-$(CD) src; $(CD) cakit;  $(MAKE) distclean
+	-$(CD) src; $(CD) unittest;  $(MAKE) distclean
 	-$(CD) examples;          $(MAKE) distclean
 	-$(CD) words;             $(MAKE) distclean
 	-$(CD) DependencyGraph;   $(MAKE) distclean

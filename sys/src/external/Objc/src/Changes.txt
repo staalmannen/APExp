@@ -1,4 +1,102 @@
 
+3.4.13  * add Fedora 43 to Platforms.txt
+
+	* wchar_t, __wchar_t and bool support was added in/since version 2.2.12
+	  objc1 flag -cplus now enables -boolcplus -wcharcplus + extern "C"
+
+3.4.12	* add SUSE SLES 16.0 to Platforms.txt
+
+	* add OmniOS CE r151056 to Platforms.txt
+
+	* added REFCNTOPT_MFLAGS and REFCNTDBG_MFLAGS to Makefile.in
+	  'make runtime/installruntime' to build/install refcnt libraries
+
+	* fix TestSuite class and Unit Test for -refcnt
+
+3.4.11  * add openSUSE Tumbleweed i586/x86_64 with gcc 15.2.1 to Platforms.txt
+
+	* update RPM spec file, build bins --without-gnu17 --with-impcplus
+
+	* add option -bdwgc for the Boehm-Demers-Weiser garbage collector
+
+	* add comment on EXTRA_MFLAGS in Install.txt
+
+3.4.10  * add OpenBSD7.7 to Platforms.txt
+
+	* add LegendreTest in Unit Test (check whether -1 is square modulo p)
+
+3.4.9	* add factorial test in Unit Test
+
+	* pointer to sourceforge site in manpage
+
+3.4.8   * add multivariate polynomial test in Unit Test
+
+	* add option --with-impcplus to configure script
+
+	* add remark on --with-impcplus in Install and Readme files
+
+3.4.7	* modify configure script for UT_BOOTLIBS (Unit Test bootlibs)
+	  and UT_IFLAGS (Unit Test include files) NOT including oclib anylonger
+
+	* add __builtin_c23_va_start (stdarg.h openSUSE 16 gcc 15) for -gnu
+	  stdarg.h unfortunately has: va_list ap;char *format;
+	  __builtin_c23_va_start(ap,format)
+
+	* add nullptr (stddef.h openSUSE 16 gcc 15) as builtin constant -gnu
+	  stddef.h unfortunately has: typedef __typeof__(nullptr) nullptr_t;
+
+	* add comment on Tendra tcc in Readme
+
+3.4.6   * add fddtest (FactorDistinctDegreeTest) class (subclass of TestCase) 
+	  test for Polynomial distinct degree factorisation to src/unittest
+
+	* add GaloisField, Legendre, Shanks, Bezout to src/unittest
+
+	* make -impcplus option output (id,...) arguments instead of (...)
+	  and define OBJCRT_IMPCPLUS instead of using __STDC_VERSION__
+
+3.4.5   * change -cplus option / add option -impcplus to objc1 and objc 
+
+	* remove TDF options (for the tcc C compiler) from man page
+
+3.4.4   * add __STDC_VERSION__ test in objcrt.h for C++ style IMP def in C23
+
+3.4.3   * add PerfectNumberTest class (subclass of TestCase)
+
+	* modify src/unittest/Makefile to link cakit
+ 
+	* add gcc 15 for openSUSE Leap 16 to Platforms
+	  
+	  builds with gcc15 using -std=gnu17 and byacc (not with bison 3.8.2)
+	
+	* modify configure script to use -std=gnu17 cc/cpp (for gcc)
+
+3.4.2	* add TestCase, TestSuite and subclasses to src/unittest
+
+	* add note on configure MFLAGS=DBG_FLAGS in Install.txt
+
+3.4.1	* add a directory src/unittest for the Object Unit Test
+
+	* move src/objc/objut.m to src/unittest/objut.m
+
+3.3.49  * for gcc 14.2 reenable prototypes yylex() and yyerror() in yacc.ym
+
+	* add gcc 14.2 to Platforms.txt
+
+	* add test on perfect numbers in examples (examples/perfect.m)
+
+3.3.48  * add eachElementtest() in objut.m with an eachElement Sequence test
+
+3.3.47  * add bagtest() in src/objc/objut.m with a test for the Bag class
+
+	* increase count of classes in objut as Bag and BagSequence are loaded
+
+3.3.46	* add link to Brad Cox' TaskMaster paper and ISBN in Books.txt
+
+	* add orcltntest() to test OrderedCollection in src/objc/objut.m
+
+3.3.45  * add examples/howmany-utmpx.m extended user accounting utmpx
+
 3.3.44  * add comment on lex and flex in Install.txt
 
 	* fix incorrect example which was setting FLEX instead of LEX

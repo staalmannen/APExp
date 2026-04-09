@@ -25,7 +25,12 @@ For Objective-C :
 
 	https://doi.org/10.1145/38765.38846
 
-4.  Object Oriented Programming: An Evolutionary Approach. (2nd ed.)
+4.  Object Oriented Programming: An Evolutionary Approach. (1st ed.)
+	Brad J. Cox
+	Addison-Wesley Publishing Company, Reading,
+	Massachusetts, 1986  ISBN: 0-201-10393-1.
+
+    Object Oriented Programming: An Evolutionary Approach. (2nd ed.)
 	Brad J. Cox, Andrew J. Novobilski
 	Addison-Wesley Publishing Company, Reading,
 	Massachusetts, 1986,1991. ISBN: 0-201-54834-8.
@@ -34,3 +39,6 @@ For Objective-C :
 5.  Taskmaster ECOOP position paper
 	Brad Cox
         ECOOP'91, Workshop on Exception Handling And OOPLS, Geneva, Switzerland
+
+	https://web.archive.org/web/20030425141005/http://www.virtualschool.edu/cox/pub/TaskMaster/index.html
+

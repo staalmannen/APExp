@@ -1,7 +1,7 @@
 
 /*
  * Computer Algebra Kit (c) 1993,2000 by Comp.Alg.Objects.  All Rights Reserved.
- * $Id: cakit.h,v 1.19 2023/03/12 12:34:41 stes Exp $
+ * $Id: cakit.h,v 1.20 2025/06/09 10:27:30 stes Exp $
  */
 
 /*

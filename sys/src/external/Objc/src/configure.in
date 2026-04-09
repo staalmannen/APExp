@@ -1,6 +1,6 @@
 dnl
-dnl autoconf source file for objc-3.x.x configure script
-dnl $Id: configure.in,v 1.113 2024/03/26 16:46:16 stes Exp $
+dnl autoconf source file for objc-4.x.x configure script
+dnl $Id: configure.in,v 1.135 2026/01/11 05:55:36 stes Exp $
 dnl
 dnl note: we're in the process of converting the old configure script
 dnl (configure.orig) to an autoconf script (long term project)
@@ -13,6 +13,15 @@ AC_ARG_VAR(LIB64NAME,name relative to OBJCDIR)
 
 dnl the following sets 'srcdir' check that it finds unique block98.html file
 AC_CONFIG_SRCDIR(block98.html)
+
+dnl by default define IMP
+dnl typedef id (*IMP) ()           
+dnl Method pointer traditional K&R C style as in C (and ANSI C)
+
+AC_ARG_WITH(impcplus,
+  [  --with-impcplus         define IMP C++ style id (*imp)(id,...)],
+  [ac_cv_impcplus=$withval]
+)
 
 dnl normally we check for _objcInit() (to see if it's not in the syslibs)
 dnl if it is, we should be using some other prefixed name (oc_objcInit)
@@ -51,7 +60,7 @@ AC_CONFIG_AUX_DIR(util)
 AC_CANONICAL_TARGET
 
 TARGET=$target;AC_SUBST(TARGET)
-OBJC1VERSION=3.3.44;AC_SUBST(OBJC1VERSION)
+OBJC1VERSION=3.4.13;AC_SUBST(OBJC1VERSION)
 NAME=objc-${OBJC1VERSION};AC_SUBST(NAME)
 WARNING="DO NOT EDIT -- configure ${NAME} ${TARGET}";AC_SUBST(WARNING)
 
@@ -267,6 +276,7 @@ case $target in
  *nextstep*|*rhapsody*) OC_CPARGS="-traditional-cpp";;
  *) OC_CPARGS='';;
 esac
+OC_CCARGS=''
 
 dnl
 dnl since POC 3.3.4 we select gcc in C mode rather than their Objective-C mode
@@ -285,10 +295,28 @@ case $ac_cv_c_compiler_gnu in
   *) ;;
 esac
 
-OC_CPARGS="-D__PORTABLE_OBJC__ $OC_CPARGS"
-AC_SUBST(OC_CPARGS)
+dnl
+dnl Since gcc 15 the compiler defaults to C23
+dnl select -std=gnu17 if the compiler accepts that flag
+dnl
 
-OC_CCARGS=''
+m4_include([util/ax_cc_gnu17.m4])
+
+AX_CC_GNU17
+
+case $ac_cv_gnu17 in
+    yes) OC_CPARGS="-std=gnu17 $OC_CPARGS";OC_CCARGS="-std=gnu17 $OC_CCARGS";;
+    no) ;;
+esac
+
+OC_CPARGS="-D__PORTABLE_OBJC__ $OC_CPARGS"
+
+case $ac_cv_impcplus in 
+  yes) OC_CPARGS="$OC_CPARGS -DOBJCRT_IMPCPLUS=1";;
+  no) ;;
+esac
+
+AC_SUBST(OC_CPARGS)
 AC_SUBST(OC_CCARGS)
 
 dnl
@@ -383,6 +411,12 @@ case $ac_cv_shortlinetags in
      esac
      ;;
 esac
+
+case $ac_cv_impcplus in
+  yes) OC_OCARGS="$OC_OCARGS -impcplus";;
+  no) ;;
+esac
+
 AC_SUBST(OC_OCARGS)
 OC_LDARGS='';
 AC_SUBST(OC_LDARGS)
@@ -426,6 +460,17 @@ esac
 AC_SUBST(OPT_MFLAGS)
 DBG_MFLAGS=${DBG_MFLAGS:-'-DDEBUG -g'};AC_SUBST(DBG_MFLAGS)
 
+# for building the runtime with -refcnt support
+# to use the names objcrtr, objpakr, cakitr instead of objcrt,objpak,cakit
+OBJCRTLIBNAME=${OBJCRTLIBNAME:-objcrt}; AC_SUBST(OBJCRTLIBNAME)
+OBJPAKLIBNAME=${OBJPAKLIBNAME:-objpak}; AC_SUBST(OBJPAKLIBNAME)
+CAKITLIBNAME=${CAKITLIBNAME:-cakit}; AC_SUBST(CAKITLIBNAME)
+
+REFCNTOPT_MFLAGS=${REFCNTOPT_MFLAGS:-'-refcnt -DNDEBUG'}
+AC_SUBST(REFCNTOPT_MFLAGS)
+REFCNTDBG_MFLAGS=${REFCNTDBG_MFLAGS:-'-refcnt -DDEBUG -g'}
+AC_SUBST(REFCNTDBG_MFLAGS)
+
 # allow configure EXTRA_MFLAGS=  to specify some extra .m flag
 AC_SUBST(EXTRA_MFLAGS)
 
@@ -445,6 +490,7 @@ NOI="-noI";
 NOLIBS="-noLibs";
 OBJCRT_INC="${ISRCDIR}${UP}${UP}include${PATHSEP}objcrt";
 OBJPAK_INC="${ISRCDIR}${UP}${UP}include${PATHSEP}objpak"
+CAKIT_INC="${ISRCDIR}${UP}${UP}include${PATHSEP}cakit"
 
 # -I. is included for #include "config.h" and "yacc.h"
 # it is possible that $ISRCDIR is also -I./ so duplicate -I./ -I. in that case
@@ -454,17 +500,23 @@ OBJPAK_IFLAGS="$NOI $OBJCRT_INC $ISRCDIR -I."
 OCLIB_IFLAGS="$NOI $OBJCRT_INC $OBJPAK_INC $ISRCDIR -I."
 OBJC_IFLAGS="$NOI $OBJCRT_INC $OBJPAK_INC ${ISRCDIR}${UP}oclib $ISRCDIR -I."
 CAKIT_IFLAGS="$NOI $OBJCRT_INC $ISRCDIR -I."
+UT_IFLAGS="$NOI $OBJCRT_INC $OBJPAK_INC $CAKIT_INC $ISRCDIR -I."
 
 OBJC_BOOTLIBS="${NOLIBS} ${UP}oclib${PATHSEP}oclib.${LIBSUFFIX}"
 OBJC_BOOTLIBS="$OBJC_BOOTLIBS ${UP}objpak${PATHSEP}objpak.${LIBSUFFIX}"
 OBJC_BOOTLIBS="$OBJC_BOOTLIBS ${UP}objcrt${PATHSEP}objcrt.${LIBSUFFIX}"
+UT_BOOTLIBS="${NOLIBS} ${UP}cakit${PATHSEP}cakit.${LIBSUFFIX}"
+UT_BOOTLIBS="$UT_BOOTLIBS ${UP}objpak${PATHSEP}objpak.${LIBSUFFIX}"
+UT_BOOTLIBS="$UT_BOOTLIBS ${UP}objcrt${PATHSEP}objcrt.${LIBSUFFIX}"
 
 AC_SUBST(OBJCRT_IFLAGS)
 AC_SUBST(OBJPAK_IFLAGS)
 AC_SUBST(OCLIB_IFLAGS)
 AC_SUBST(OBJC_IFLAGS)
 AC_SUBST(CAKIT_IFLAGS)
+AC_SUBST(UT_IFLAGS)
 AC_SUBST(OBJC_BOOTLIBS)
+AC_SUBST(UT_BOOTLIBS)
 
 dnl Since the quality of the POC depends on lex/yacc, we require flex/byacc
 dnl Most lexes, yaccs and bison also work (but: byacc is required for -refcnt)
@@ -766,7 +818,7 @@ AC_SUBST(SQLINC)
 AC_SUBST(SQLLIBS)
 AC_SUBST(SQLEXT)
 
-list='config.h Makefile src/objcrt/config.h src/objcrt/Makefile src/objpak/config.h src/objpak/Makefile src/oclib/config.h src/oclib/Makefile src/objc/config.h src/objc/Makefile src/objc/objc src/objc/objc.m src/cakit/config.h src/cakit/Makefile examples/Makefile words/Makefile'
+list='config.h Makefile src/objcrt/config.h src/objcrt/Makefile src/objpak/config.h src/objpak/Makefile src/oclib/config.h src/oclib/Makefile src/objc/config.h src/objc/Makefile src/objc/objc src/objc/objc.m src/unittest/config.h src/unittest/Makefile src/cakit/config.h src/cakit/Makefile examples/Makefile words/Makefile'
 
 #list="$list pkg/objc.p5m pkg/objclibs.p5m" 
 

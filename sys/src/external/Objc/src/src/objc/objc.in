@@ -1,8 +1,8 @@
 #! /bin/sh
-# Portable Object Compiler (c) 1997,2020.  All Rights Reserved.
+# Portable Object Compiler (c) 1997,2025.  All Rights Reserved.
 # Driver Script (@NAME@)
 #
-# $Id: objc.in,v 1.21 2023/01/27 20:19:07 stes Exp $
+# $Id: objc.in,v 1.23 2025/11/21 15:15:03 stes Exp $
 #
 # @WARNING@
 
@@ -211,6 +211,10 @@ do
     -boehm)    objcrt=objcrtgc;
                      cpargs="$cpargs -I$gcprefix/include";
 		     finlibs="$finlibs $gcprefix/$libdirname/gc.a";
+		     ;;
+    -bdwgc)    objcrt=objcrtgc;
+                     cpargs="$cpargs -I$gcprefix/include/gc";
+		     finlibs="$finlibs -L$gcprefix/$libdirname -lgc";
 		     ;;
     -gc|-refcnt)	     cpargs="$cpargs -DOBJC_REFCNT=1";
                      ocargs="$ocargs $arg";

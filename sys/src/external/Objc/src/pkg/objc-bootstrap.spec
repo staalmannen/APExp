@@ -1,6 +1,6 @@
 Summary: Bootstrap for Portable Object Compiler
 Name: objc-bootstrap
-Version: 3.3.38
+Version: 3.4.11
 Release: 1%{?dist}
 Group: Applications/File
 License: GPLv2+
@@ -44,6 +44,9 @@ rm -rf $RPM_BUILD_ROOT
 %{_libdir}/_prelink.o
 
 %changelog
+* Sat May 10 2025 David Stes <stes@telenet.be> 3.4.3
+Update to 3.4.3
+
 * Sat Feb 11 2023 David Stes <stes@telenet.be> 3.3.32
 Use _prefix /opt/objc-bootstrap for bootstrap compiler
 

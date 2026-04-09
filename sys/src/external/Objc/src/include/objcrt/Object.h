@@ -1,7 +1,7 @@
 
 /*
- * Portable Object Compiler (c) 1997,2023.  All Rights Reserved.
- * $Id: Object.h,v 1.8 2023/02/19 17:15:52 stes Exp $
+ * Portable Object Compiler (c) 1997,2025.  All Rights Reserved.
+ * $Id: Object.h,v 1.9 2025/06/09 10:27:17 stes Exp $
  */
 
 /*

@@ -63,6 +63,7 @@ For Ubuntu
 	mv debian ../
 	cd ..
 	date -R >> debian/changelog
+	check debian/control debian/rules
 	debuild -us -uc -b
 
 For RedHat / OracleLinux / SUSE / openSUSE / rpm based systems 

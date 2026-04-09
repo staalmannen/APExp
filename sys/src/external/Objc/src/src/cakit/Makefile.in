@@ -2,7 +2,7 @@
 #
 # Computer Algebra Kit
 # Copyright (c) 1992,2024 Computer Algebra Objects.  All Rights Reserved. 
-# $Id: Makefile.in,v 1.7 2024/03/26 16:57:02 stes Exp $
+# $Id: Makefile.in,v 1.8 2025/12/31 18:16:04 stes Exp $
 #
 
 #
@@ -28,6 +28,8 @@ RANLIB=@RANLIB@
 @SET_MAKE@
 DBG_MFLAGS=@DBG_MFLAGS@
 OPT_MFLAGS=@OPT_MFLAGS@
+REFCNTDBG_MFLAGS=@REFCNTDBG_MFLAGS@
+REFCNTOPT_MFLAGS=@REFCNTOPT_MFLAGS@
 EXTRA_MFLAGS=@EXTRA_MFLAGS@
 OBJSUFFIX=@OBJSUFFIX@
 LIBSUFFIX=@LIBSUFFIX@
@@ -39,7 +41,7 @@ VPATH=$(SRCDIR)
 
 .SUFFIXES: .m 
 
-LIBRARY=cakit.a
+LIBRARY=@CAKITLIBNAME@.a
 SHLIB=libcakit@DOTSHLIBSUFFIX@
 
 .m.o:

@@ -1,6 +1,6 @@
 
 /*
- * Copyright (c) 1997,2021 David Stes.
+ * Copyright (c) 1997,2025 David Stes.
  *
  * This library is free software; you can redistribute it and/or modify it
  * under the terms of the GNU Library General Public License as published 
@@ -16,7 +16,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
  *
- * $Id: yacc.ym,v 1.21 2021/03/23 12:39:49 stes Exp $
+ * $Id: yacc.ym,v 1.22 2025/01/23 18:47:15 stes Exp $
  */
 
 %{
@@ -38,7 +38,7 @@
 #include "util.h"
 #include "stmt.h"
 
-#if 0
+#if 1
 /* breaks compile wcc386 */
 int yyerror(char*);
 int yylex() ;

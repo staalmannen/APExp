@@ -23,6 +23,12 @@ Bar.o : Bar.m
 Zot.o : Zot.m
 	objc -c Zot.m
 
+perfect.o : perfect.m
+	objc -c perfect.m
+
+perfect : perfect.o
+	objc -o perfect perfect.o
+
 poseAs : poseAs.o Zot.o Foo.o Bar.o
 	objc -o poseAs poseAs.o Zot.o Foo.o Bar.o
 
@@ -43,7 +49,7 @@ cleantmp :
 clean : cleantmp
 	-$(RM) *.o
 	-$(RM) $(PROGRAM) a.out
-	-$(RM) dlopen dynclass.so
+	-$(RM) perfect dlopen dynclass.so
 
 distclean : clean
 	-$(RM) Makefile 

@@ -1,10 +1,10 @@
-Portable Object Compiler (c) 1997-2023.  All Rights Reserved.
+Portable Object Compiler (c) 1997-2025.  All Rights Reserved.
 
 
 GETTING HELP
 ------------
 
-For help and reporting bugs : send email to me (stes@telenet.be)
+For help and reporting bugs : send email to David Stes (stes@telenet.be)
 or to the objc-discuss@lists.sourceforge.net mailing list.
 
 Subscribe to the mailing list at https://sourceforge.net/p/objc/mailman/
@@ -55,6 +55,16 @@ The "objc" distribution consists of the following parts :
 	There's absolutely no assembly language needed, nor is there
 	a dependency on stack layout, register allocation conventions etc.
 
+	The runtime defines a C type "id" for identifying objects,
+	laid out in classes, similar as in Smalltalk-80.
+
+	It works by binding at runtime (during execution of the program),
+	methods (messages) and objects that receive messages,
+	to function pointers (of C type IMP).
+
+	The runtime library supports K&R (Kernighan&Ritchie) style IMP
+	and C++ style IMP function pointers.
+
         The runtime and compiler support using the frame pointer,
 	as a general purpose register (as in the x64 ABI, for instance).
 
@@ -71,6 +81,8 @@ The "objc" distribution consists of the following parts :
 	port with 'objc'.  Compatible with ICpak101, the collection class
 	library described in Brad Cox book, and used by existing
 	Objective-C packages that were developed with Stepstone objc.
+
+	The classes from Brad Cox' book are similar to those from Smalltalk-80.
 
 	4. "cakit", the "Computer Algebra Kit" Objective C classes
 
@@ -90,8 +102,9 @@ NOT included is a C compiler : in order to be able to use "objc", you will
 need to elsewhere find a compatible C compiler.  This should be no problem
 since one of our goals - see below - is to make "objc" work with as many C
 compilers as possible.  On UNIX systems, the (free) "gcc" compiler is a
-possibility (not needed, but possible).  Another possibility, is to use
-the (free) "lcc" compiler or the "tcc" TDF compiler system.
+possibility (not needed, but possible).
+
+Another possibility, is to use the (free) "lcc" compiler or the "tcc" TDF compiler system, or Intel "icc".  The TDF tcc compiler was compatible in the past, but has not been tested for years.  See http://github.com/tendra for more info.
 
 
 NICE FEATURES
@@ -124,8 +137,11 @@ NICE FEATURES
 
 	8.Option for Garbage Collection (using Boehm gc package).
 
-          Option for automatic reference counted memory management 
-          (doesn't require Boehm).  
+	See the Boehm-Demers-Weiser GC at http://hboehm.info/gc for more info.
+	Tested with option -bdwgc using GC 8.3.0
+
+        Option for automatic reference counted memory management 
+        (doesn't require Boehm).  
 
 	9.Exception handling scheme (using Objective-C Blocks) that allows
 	to specify a default handler to be executed.
@@ -142,12 +158,4 @@ NICE FEATURES
 
 	14.Great system for experimentation with your own additions/extensions
 	to Objective C !
-
-
-WANT TO HELP?
--------------
-
-If you like "objc", feel free to send e-mail to, "stes@pandora.be".
-I'm especially interested in bug-fixes, of course.  And in ports
-to machines that I don't have access to (e.g. CP/M, Atari).
 

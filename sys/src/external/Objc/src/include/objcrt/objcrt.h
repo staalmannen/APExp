@@ -1,7 +1,7 @@
 
 /*
- * Portable Object Compiler (c) 1997,2020,2023.  All Rights Reserved.
- * $Id: objcrt.h,v 1.16 2023/02/19 17:00:50 stes Exp $
+ * Portable Object Compiler (c) 1997-2025.  All Rights Reserved.
+ * $Id: objcrt.h,v 1.18 2025/06/09 10:27:17 stes Exp $
  */
 
 /*
@@ -56,10 +56,15 @@ typedef char BOOL;		/* Boolean */
 typedef FILE *IOD;		/* I/O Device */
 typedef id SHR;			/* type of class, for us, it's id */
 
-#ifdef __cplusplus
-typedef id (*IMP) (...);	/* Method pointer */
+#if OBJCRT_IMPCPLUS
+/* this case was defined back in 1997 #ifdef __cplusplus as: id (*IMP)(...) */
+/* some compilers insist on an argument before the three dots */
+/* __cplusplus was replaced in objc-3.4.6 by -impcplus and OBJCRT_IMPCPLUS */
+typedef id (*IMP) (id,...);	/* Method pointer C++ style */
 #else
-typedef id (*IMP) ();		/* Method pointer */
+/* this is the default case; should be supported by ANSI-C compilers */
+/* although that ANSI-C see Appendix 8.6.3 also allows C++ style three dots */
+typedef id (*IMP) ();		/* Method pointer traditional K&R C style */
 #endif
 
 typedef void (*ARGIMP) (id, SEL, void *);	/* dispatcher */

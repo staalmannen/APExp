@@ -2,7 +2,7 @@ Source: objc
 Maintainer: David Stes <stes@telenet.be>
 Section: misc
 Priority: optional
-Standards-Version: 3.3.41
+Standards-Version: 3.4.3
 Build-Depends: debhelper (>=9)
 
 Package: objc

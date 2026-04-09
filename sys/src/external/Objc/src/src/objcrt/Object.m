@@ -1,7 +1,7 @@
 
 /*
- * Portable Object Compiler (c) 1997,2023.  All Rights Reserved.
- * $Id: Object.m,v 1.9 2023/02/19 17:15:56 stes Exp $
+ * Portable Object Compiler (c) 1997,2025.  All Rights Reserved.
+ * $Id: Object.m,v 1.10 2025/06/09 10:27:57 stes Exp $
  */
 
 /*
@@ -572,25 +572,25 @@ inherits (Cls_t aCls, STR name)
 
 - perform:(SEL)aSelector
 {
-  return (*fwdimp (self, aSelector, selptrfwd)) (self, aSelector);
+  return (*fwdimp (self, aSelector, (IMP) selptrfwd)) (self, aSelector);
 }
 
 - perform:(SEL)aSelector with:anObject
 {
   /* the usual all C cast */
-  return (*fwdimp (self, aSelector, selptrfwd)) (self, aSelector, anObject);
+  return (*fwdimp (self, aSelector, (IMP) selptrfwd)) (self, aSelector, anObject);
 }
 
 - perform:(SEL)aSelector with:anObject with:otherObject
 {
   /* the usual all C cast */
-  return (*fwdimp (self, aSelector, selptrfwd)) (self, aSelector, anObject, otherObject);
+  return (*fwdimp (self, aSelector, (IMP) selptrfwd)) (self, aSelector, anObject, otherObject);
 }
 
 - perform:(SEL)aSelector with:anObject with:otherObject with:thirdObj
 {
   /* the usual all C cast */
-  return (*fwdimp (self, aSelector, selptrfwd)) (self, aSelector, anObject, otherObject, thirdObj);
+  return (*fwdimp (self, aSelector, (IMP) selptrfwd)) (self, aSelector, anObject, otherObject, thirdObj);
 }
 /*****************************************************************************
  *
