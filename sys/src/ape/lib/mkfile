@@ -23,6 +23,7 @@ _OPTIONAL_LIBS=\
 	lzma\
 	pascal\
 	pcre2\
+	tcl\
 	z\
 # gettext\
 	gettextpo\

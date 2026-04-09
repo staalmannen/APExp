@@ -1,0 +1,29 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+TCLSRC=$APEXPROOT/sys/src/external/tcl
+
+BIN=$APEXPROOT/$objtype/bin
+TARG=tclsh
+
+OFILES=tclAppInit.$O
+LIB=$APEXPROOT/$objtype/lib/ape/libtcl.a
+HFILES=$TCLSRC/plan9/tclConfig.h
+CLEANFILES=$LIB
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CFLAGS=-FVp -c -I$TCLSRC/plan9 -I$TCLSRC/generic\
+	-I$TCLSRC/unix -I$TCLSRC/libtommath\
+	-DHAVE_TCL_CONFIG_H -DPLAN9
+
+$O.out: $OFILES $LIB
+	$LD $LDFLAGS -o $target $prereq
+
+$LIB:V:
+	mk $MKFLAGS -f $APEXPROOT/sys/src/ape/lib/tcl/mkfile
+
+tclAppInit.$O: $TCLSRC/unix/tclAppInit.c
+	$CC $CFLAGS $TCLSRC/unix/tclAppInit.c
+
