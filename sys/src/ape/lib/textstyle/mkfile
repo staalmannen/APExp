@@ -4,68 +4,129 @@ APE=$APEXPROOT/sys/src/ape
 
 LIB=$APEXPROOT/$objtype/lib/ape/libtextstyle.a
 
-OFILES= \
-# libtextstyle \
-	color.$O\
-	concat-filename.$O\
-	fatal-signal.$O\
-	fd-ostream.$O\
-#	fd-ostream.oo.$O\
-	file-ostream.$O\
-#	file-ostream.oo.$O\
-	full-write.$O\
-	html-ostream.$O\
-#	html-ostream.oo.$O\
-	html-styled-ostream.$O\
-#	html-styled-ostream.oo.$O\
-	iconv-ostream.$O\
-#	iconv-ostream.oo.$O\
-	memory-ostream.$O\
-#	memory-ostream.oo.$O\
-	misc.$O\
-	noop-styled-ostream.$O\
-#	noop-styled-ostream.oo.$O\
-	ostream.$O\
-#	ostream.oo.$O\
-	styled-ostream.$O\
-#	styled-ostream.oo.$O\
-	term-ostream.$O\
-#	term-ostream.oo.$O\
-	term-styled-ostream.$O\
-#	term-styled-ostream.oo.$O\
-	safe-read.$O\
-	safe-write.$O\
-	stpcpy.$O\
-	term-style-control.$O\
-	xconcat-filename.$O\
-	xgethostname.$O\
-# libtextstyle/libcroco \
-	cr-additional-sel.$O\
-	cr-attr-sel.$O\
-	cr-cascade.$O\
-	cr-declaration.$O\
-	cr-doc-handler.$O\
-	cr-enc-handler.$O\
-	cr-fonts.$O\
-	cr-input.$O\
-	cr-num.$O\
-	cr-om-parser.$O\
-	cr-parser.$O\
-	cr-parsing-location.$O\
-	cr-prop-list.$O\
-	cr-pseudo.$O\
-	cr-rgb.$O\
-	cr-sel-eng.$O\
-	cr-selector.$O\
-	cr-simple-sel.$O\
-	cr-statement.$O\
-	cr-string.$O\
-	cr-style.$O\
-	cr-stylesheet.$O\
-	cr-term.$O\
-	cr-tknzr.$O\
-	cr-token.$O\
-	cr-utils.$O\
+OFILES=\
+# libtextstyle\
+	libtextstyle_la-gl_array_list.$O\
+	libtextstyle_la-basename-lgpl.$O\
+	libtextstyle_la-binary-io.$O\
+	libtextstyle_la-c-ctype.$O\
+	libtextstyle_la-c-strcasecmp.$O\
+	libtextstyle_la-c-strncasecmp.$O\
+	libtextstyle_la-c32isalnum.$O\
+	libtextstyle_la-c32isalpha.$O\
+	libtextstyle_la-c32isblank.$O\
+	libtextstyle_la-c32iscntrl.$O\
+	libtextstyle_la-c32isdigit.$O\
+	libtextstyle_la-c32isgraph.$O\
+	libtextstyle_la-c32islower.$O\
+	libtextstyle_la-c32isprint.$O\
+	libtextstyle_la-c32ispunct.$O\
+	libtextstyle_la-c32isspace.$O\
+	libtextstyle_la-c32isupper.$O\
+	libtextstyle_la-c32isxdigit.$O\
+	libtextstyle_la-c32tolower.$O\
+	libtextstyle_la-c32width.$O\
+	libtextstyle_la-cloexec.$O\
+	libtextstyle_la-concat-filename.$O\
+	libtextstyle_la-dup2.$O\
+	libtextstyle_la-error.$O\
+	libtextstyle_la-exitfail.$O\
+	libtextstyle_la-fatal-signal.$O\
+	libtextstyle_la-fcntl.$O\
+	libtextstyle_la-fd-hook.$O\
+	libtextstyle_la-fd-ostream.$O\
+	libtextstyle_la-file-ostream.$O\
+	libtextstyle_la-float.$O\
+	libtextstyle_la-free.$O\
+	libtextstyle_la-fseterr.$O\
+	libtextstyle_la-full-write.$O\
+	libtextstyle_la-get_ppid_of.$O\
+	libtextstyle_la-get_progname_of.$O\
+	libtextstyle_la-hard-locale.$O\
+	libtextstyle_la-html-ostream.$O\
+	libtextstyle_la-html-styled-ostream.$O\
+	libtextstyle_la-ialloc.$O\
+	libtextstyle_la-iconv-ostream.$O\
+	libtextstyle_la-gl_list.$O\
+	libtextstyle_la-localcharset.$O\
+	libtextstyle_la-lock.$O\
+	libtextstyle_la-lstat.$O\
+	libtextstyle_la-malloca.$O\
+	libtextstyle_la-math.$O\
+	libtextstyle_la-mbchar.$O\
+	libtextstyle_la-mbiterf.$O\
+	libtextstyle_la-mbrtoc32.$O\
+	libtextstyle_la-mbrtowc.$O\
+	libtextstyle_la-mbsinit.$O\
+	libtextstyle_la-mbsnlen.$O\
+	libtextstyle_la-mbszero.$O\
+	libtextstyle_la-mem-hash-map.$O\
+	libtextstyle_la-memory-ostream.$O\
+	libtextstyle_la-next-prime.$O\
+	libtextstyle_la-noop-styled-ostream.$O\
+	libtextstyle_la-obstack.$O\
+	libtextstyle_la-once.$O\
+	libtextstyle_la-open.$O\
+	libtextstyle_la-ostream.$O\
+	libtextstyle_la-printf-frexp.$O\
+	libtextstyle_la-printf-frexpl.$O\
+	libtextstyle_la-safe-read.$O\
+	libtextstyle_la-safe-write.$O\
+	libtextstyle_la-same-inode.$O\
+	libtextstyle_la-setlocale_null.$O\
+	libtextstyle_la-setlocale-lock.$O\
+	libtextstyle_la-setlocale_null-unlocked.$O\
+	libtextstyle_la-sig-handler.$O\
+	libtextstyle_la-signbitf.$O\
+	libtextstyle_la-signbitd.$O\
+	libtextstyle_la-signbitl.$O\
+	libtextstyle_la-sockets.$O\
+	libtextstyle_la-stat-time.$O\
+	libtextstyle_la-stdlib.$O\
+	libtextstyle_la-stpcpy.$O\
+	libtextstyle_la-str_endswith.$O\
+	libtextstyle_la-str_startswith.$O\
+	libtextstyle_la-strerror.$O\
+	libtextstyle_la-strerror-override.$O\
+	libtextstyle_la-string.$O\
+	libtextstyle_la-styled-ostream.$O\
+	libtextstyle_la-sys_socket.$O\
+	libtextstyle_la-term-ostream.$O\
+	libtextstyle_la-term-style-control.$O\
+	libtextstyle_la-term-styled-ostream.$O\
+	libtextstyle_la-threadlib.$O\
+	libtextstyle_la-tolower.$O\
+	libtextstyle_la-ctype_alnum.$O\
+	libtextstyle_la-ctype_alpha.$O\
+	libtextstyle_la-ctype_blank.$O\
+	libtextstyle_la-ctype_cntrl.$O\
+	libtextstyle_la-ctype_digit.$O\
+	libtextstyle_la-ctype_graph.$O\
+	libtextstyle_la-ctype_lower.$O\
+	libtextstyle_la-ctype_print.$O\
+	libtextstyle_la-ctype_punct.$O\
+	libtextstyle_la-ctype_space.$O\
+	libtextstyle_la-ctype_upper.$O\
+	libtextstyle_la-ctype_xdigit.$O\
+	libtextstyle_la-unistd.$O\
+	libtextstyle_la-u8-mbtouc.$O\
+	libtextstyle_la-u8-mbtouc-aux.$O\
+	libtextstyle_la-width.$O\
+	libtextstyle_la-vaszprintf.$O\
+	libtextstyle_la-aszprintf.$O\
+	libtextstyle_la-vsnzprintf.$O\
+	libtextstyle_la-wctype-h.$O\
+	libtextstyle_la-xmalloc.$O\
+	libtextstyle_la-xalloc-die.$O\
+	libtextstyle_la-xconcat-filename.$O\
+	libtextstyle_la-xgethostname.$O\
+	libtextstyle_la-gl_xlist.$O\
+	libtextstyle_la-xsize.$O\
+	libtextstyle_la-xvasprintf.$O\
+	libtextstyle_la-xasprintf.$O\
+	libtextstyle_la-color.$O\
+	libtextstyle_la-misc.$O\
+	libtextstyle_la-version.$O\
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib
@@ -76,18 +137,28 @@ GETTEXTSRC=../../../external/gettext/libtextstyle
 #fails on include_next
 CC=$APEXPROOT/$objtype/bin/pcc
 
-CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/lib -I$GETTEXTSRC/lib/libcroco\
+CFLAGS=-c -B -I. -I$GETTEXTSRC -I$GETTEXTSRC/lib -I$GETTEXTSRC/lib/glthread\
 		-DHAVE_CONFIG_H -D_POSIX_SOURCE -D_BSD_EXTENSION -D_RESEARCH_SOURCE\
 		-DSET=set -Drpl_open=open -DO_BINARY=0
 
-%.$O: $GETTEXTSRC/lib/%.c
-	$CC $CFLAGS $GETTEXTSRC/lib/$stem.c
+libtextstyle_la-%.$O: $GETTEXTSRC/lib/%.c
+	$CC $CFLAGS -c $source -o $target
 
-%.$O: $GETTEXTSRC/lib/libcroco/%.c
-	$CC $CFLAGS $GETTEXTSRC/lib/libcroco/$stem.c
+libtextstyle_la-%.$O: $GETTEXTSRC/lib/glthread/%.c
+	$CC $CFLAGS -c $source -o $target
 
-%.$O: $GETTEXTSRC/gnulib-local//%.c
-	$CC $CFLAGS $GETTEXTSRC/gnulib-local/$stem.c
+libtextstyle_la-%.$O: $GETTEXTSRC/lib/unicase/%.c
+	$CC $CFLAGS -c $source -o $target
+
+libtextstyle_la-%.$O: $GETTEXTSRC/lib/unictype/%.c
+	$CC $CFLAGS -c $source -o $target
+
+libtextstyle_la-%.$O: $GETTEXTSRC/lib/unistr/%.c
+	$CC $CFLAGS -c $source -o $target
+
+libtextstyle_la-%.$O: $GETTEXTSRC/lib/uniwidth/%.c
+	$CC $CFLAGS -c $source -o $target
+
 
 
 

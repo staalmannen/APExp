@@ -1,0 +1,57 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libcroco.a
+
+OFILES=\
+	additional-sel.$O\
+	attr-sel.$O\
+	cascade.$O\
+	declaration.$O\
+	doc-handler.$O\
+	enc-handler.$O\
+	fonts.$O\
+	input.$O\
+	num.$O\
+	om-parser.$O\
+	parser.$O\
+	parsing-location.$O\
+	prop-list.$O\
+	pseudo.$O\
+	rgb.$O\
+	sel-eng.$O\
+	selector.$O\
+	simple-sel.$O\
+	statement.$O\
+	string.$O\
+	style.$O\
+	stylesheet.$O\
+	term.$O\
+	tknzr.$O\
+	token.$O\
+	utils.$O\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+GETTEXTSRC=../../../external/gettext
+CROCOSRC=../../../external/gettext/libtextstyle/lib/libcroco
+
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
+DEFS=
+
+CFLAGS=-c -B -I. -I$CROCSRC -I$CROCSRC/..
+		-D_POSIX_SOURCE -D_BSD_SOURCE -DHAVE_CONFIG_H $DEFS
+
+%.$O: $CROCOSRC/%.c
+	$CC $CFLAGS $CROCOSRC/$stem.c
+
+
+
+
+
+
+

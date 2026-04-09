@@ -51,7 +51,9 @@ the most capable web browser available on Plan9.
 **Modifications made to APE**
 
 
-***Starting material :*** Imported the latest 9front APE sources from git [7] (date: 2024-04-24; rebased 2026-01-29, which included the bitfield patch from @jamoson (bitfield support in kencc) [8]).
+***Starting material :*** 
+
+Imported the latest 9front APE sources from git [7] (date: 2024-04-24; rebased 2026-01-29, which included the bitfield patch from @jamoson (bitfield support in kencc) [8]).
 In addition, several patches from @lufia [9, 10] to build libressl and curl
 (introduces pthread, include_next cpp support, etc) has been applied to the
 sources. To get more C99 compatibility, vibe-coded (claude.ai) patches have been introduced (VLA, hex float support, complex support, compound literals, division by 0, dropping keywords, etc). C99 support is *pretty much complete* by now, and we have even started adding some C11/C23 features to the compiler. This served as a base to add ports of third party libraries and utilities to enhance compatibility.
@@ -74,6 +76,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - curses.h, term.h, panel.h provided by PDCursesMod
 
 ***Libraries***
+
 **new libap**
 - libap, lib9, libbsd, libpthreads, libutf, libfmt, libv, libmp and libnet are merged
 - 3rd party libc functions primarily from musl libc, but also some from NetBSD (fts-standalone, libnbcompat)
@@ -81,6 +84,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - imported fenv, math, complex, regex, search and other functions from musl libc
 - migrated from APE stdio to musl stdio (with some major porting, using pthreads)
 - fchown/fchmod stubs introduced
+
 **3rd party**
 - libcurses : PDCursesMod (check out 2026-04-08; built with utf8/wchar)
 - libedit (version 3.1 2025-10-16)
@@ -95,22 +99,22 @@ Install paths have been modified so that libraries and binaries are installed in
 ***Utilities***
 
 - The shell is still the original APE pdksh
-- --- TODO: replace with GNU bash (version 5.3)
+- -> TODO: replace with GNU bash (version 5.3)
 - APE make has been replaced by a port of GNU make (version 4.4.1)
 - APE sed has been replaced by a port of GNU sed (version 4.9)
 - APE grep has been replaced by pcre2grep (version 10.47 ). 
-- - - - TODO: replace with GNU grep (version 3.12)
+- -> TODO: replace with GNU grep (version 3.12)
 - system awk has been replaced by GNU awk (version 5.4.0) since native awk is sometimes needed, it is installed as gawk
 - GNU m4 (version 1.4.21) has been added
 - GNU gettext utilities and libraries (version 1.0.0) have been added
 - A "musl" iconv utility has been added from alpine linux.
 - system yacc has been replaced by byacc (version 20240109) as ape/yacc. 
-- - - - TODO: replace with Bison (version ) and keep native yacc as "yacc"
+- -> TODO: replace with Bison (version 3.8) and keep native yacc as "yacc" because it is sometimes needed
 - system lex has been replaced by flex (version 2.6.4) as ape/lex
 - vibe-coded (claude.ai) GAS-compatible "as" front end to native $Oa assemblers.
 - the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" *et al.* have been built from suckless sbase [14]
 - steve's mkmk (/n/sources/contrib) imported to APExp
-- copied "head", "which", and "printenv" rc scripts from steve (/n/sources/contrib)
+- copied "which", and "printenv" rc scripts from steve (/n/sources/contrib)
 
 
 ***Languages***

@@ -1,11 +1,13 @@
 </$objtype/mkfile
 
+#do we need libl? We don't build Plan9 lex/yacc
+
 _CORE_LIBS=\
 	ap\
 	auth\
 	bio\
 	draw\
-	l\
+#	l\
 	plumb\
 	sec\
 
@@ -25,6 +27,8 @@ _OPTIONAL_LIBS=\
 # gettext\
 	gettextpo\
 	textstyle\
+	croco\
+	glib\
 	xml2\
 
 DIRS=\

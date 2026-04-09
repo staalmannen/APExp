@@ -19,6 +19,8 @@
 #ifndef _TEXTSTYLE_VERSION_H
 #define _TEXTSTYLE_VERSION_H
 
+#pragma lib "/$M/lib/ape/libtextstyle.a"
+
 /* Get LIBTEXTSTYLE_DLL_VARIABLE.  */
 #include <textstyle/woe32dll.h>
 

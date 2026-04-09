@@ -87,11 +87,7 @@ CFLAGS= -c -I$CURSRC -I$CURSRC/plan9 -I$CURSRC/common -D_POSIX_SOURCE \
 	$CC $CFLAGS $CURSRC/common/$stem.c
 
 install:V:
-#	cp $CURSRC/curses.h $APEXPROOT/sys/include/ape/curses.h
-#	ape/patch $APEXPROOT/sys/include/ape/curses.h <header.patch
-#	cp $CURSRC/panel.h $APEXPROOT/sys/include/ape/panel.h
-#	cp $CURSRC/term.h $APEXPROOT/sys/include/ape/term.h
-
+	cp $CURSRC/doc/MANUAL.md $APEXPROOT/sys/man/1/pdcurses
 
 demos:V:
 	@{
@@ -106,4 +102,3 @@ clean:V:
 
 nuke:V:
 	rm -f $LIB
-#	rm -f $HFILES

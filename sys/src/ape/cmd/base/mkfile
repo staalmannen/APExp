@@ -8,35 +8,98 @@ LIB=\
 
 TARG= \
 		basename\
+		bc\
+		cal\
 		cat\
+		chgrp\
+		chmod\
+		chown\
+		chroot\
+		cksum\
 		cmp\
-		cut\
-		comm\
 #		cols\
+		comm\
+		cp\
+		cron\
+		cut\
+		date\
+		dc\
+		dd\
 		dirname\
+		du\
+		echo\
+		ed\
+		env\
 		expand\
 		expr\
 		false\
 #		find\
+		flock\
+		fold\
+		getconf\
+##		grep\
 		head\
+		hostname\
+		join\
 		kill\
+		link\
+		ln\
+		logger\
+		logname\
 		ls\
+		md5sum\
+		mkdir\
+		mkfifo\
+		mknod\
+		mktemp\
+		mv\
+		nice\
+		nl\
+		nohup\
 		od\
 #		paste\
+		pathchk\
 		printenv\
 		printf\
+		pwd\
+		readlink\
+		renice\
 		rev\
+		rm\
+		rmdir\
+##		sed\
 		seq\
+		setsid\
+		sha1sum\
+		sha244sum\
+		sha256sum\
+		sha384sum\
+		sha512-224sum\
+		sha512-256sum\
+		sha512sum\
+		sleep\
 		sort\
+		split\
 		sponge\
 		strings\
+		sync\
 		tail\
+##		tar\
+		tee\
 		test\
-		true\
+		tftp\
+		time\
+		touch\
 		tr\
+		true\
 		tsort\
+		tty\
 		uname\
 		unexpand\
+		uniq\
+		unlink\
+		uudecode\
+		uuencode\
 #		which\
 		whoami\
 		xargs\
@@ -116,6 +179,10 @@ libutil.a$O: $UTIL_OBJS
 
 %.$O: $SBASESRC/libutil/%.c
 	$CC $SBASE_CFLAGS $SBASESRC/libutil/$stem.c
+
+bc.c: $SBASESRC/bc.y
+	yacc $SBASESRC/bc.y -o bc.c
+
 
 install:V:
 	mk all
