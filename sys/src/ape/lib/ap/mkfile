@@ -2,9 +2,6 @@ APEXPROOT=../../../../../
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-# libap and libbsd have been merged
-# source code re-organized like the musl src directory
-
 DIRS=\
 	aio\
 	complex\

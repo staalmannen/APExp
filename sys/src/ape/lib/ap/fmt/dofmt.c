@@ -13,7 +13,7 @@
  */
 #include <stdarg.h>
 #include <string.h>
-#include "utf.h"
+#include <utf.h>
 #include "fmt.h"
 #include "fmtdef.h"
 

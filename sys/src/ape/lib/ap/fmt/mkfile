@@ -52,9 +52,10 @@ HFILES=\
 
 $NAN.$O: ../include/nan.h
 strtod.$O: ../include/nan.h
+dofmt.$O: /sys/include/ape/utf.h
 
 test: $LIB test.$O
 	$CC -o test test.$O $LIB
 
 
-CFLAGS=-c -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION -I../include
+CFLAGS=-c -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION -I$APEXPROOT/sys/include/ape -I../include
