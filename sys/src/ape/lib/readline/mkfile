@@ -1,0 +1,74 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+</$APE/config
+
+# libhistory is just a substet of libreadline. I don't bother building it.
+LIB=$APEXPROOT/$objtype/lib/ape/libreadline.a
+TERMCAP=$APEXPROOT/$objtype/lib/ape/libcurses.a
+BIN=$APEXPROOT/$objtype/bin/ape
+
+HISTOBJ=history.$O\
+	histexpand.$O\
+	histfile.$O\
+	histsearch.$O\
+	shell.$O\
+	mbutil.$O\
+
+TILDEOBJ=tilde.$O\
+
+COLORSOBJ=colors.$O\
+	parse-colors.$O\
+
+OFILES= readline.$O\
+	vi_mode.$O\
+	funmap.$O\
+	keymaps.$O\
+	parens.$O\
+	search.$O\
+	rltty.$O\
+	complete.$O\
+	bind.$O\
+	isearch.$O\
+	display.$O\
+	signals.$O\
+	util.$O\
+	kill.$O\
+	undo.$O\
+	macro.$O\
+	input.$O\
+	callback.$O\
+	terminal.$O\
+	text.$O\
+	nls.$O\
+	misc.$O\
+	$HISTOBJ\
+	$TILDEOBJ\
+	$COLORSOBJ\
+	xmalloc.$O\
+	xfree.$O\
+	compat.$O\
+	gettimeofday.$O\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+RLSRC=../../../external/readline
+
+#during building from scratch, the new pcc is not picked up and compilation
+#fails on include_next
+CC=$APEXPROOT/$objtype/bin/pcc
+
+CFLAGS=-c -DHAVE_CONFIG_H -D_POSIX_SOURCE -DHAVE_CURSES_H\
+	-I$RLSRC -DRL_LIBRARY_VERSION='"8.3"' -DBRACKETED_PASTE_DEFAULT=1\
+	-DTERMCAP_LIB="-lcurses" -DREADLINE_LIBRARY
+
+%.$O: $RLSRC/%.c
+	$CC $CFLAGS $RLSRC/$stem.c
+
+install:V: rl
+	cp rl $BIN/rl
+
+rl: $RLSRC/exapmles/rl.c $LIB $TERMCAP
+	$CC $prereq -o $target
+
+
+
