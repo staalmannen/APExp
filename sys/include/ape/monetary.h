@@ -6,11 +6,6 @@ extern "C" {
 #endif
 
 #include <features.h>
-
-#define __NEED_ssize_t
-#define __NEED_size_t
-#define __NEED_locale_t
-
 #include <alltypes.h>
 
 ssize_t strfmon(char *, size_t, const char *, ...);

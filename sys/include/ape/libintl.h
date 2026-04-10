@@ -8,11 +8,7 @@ extern "C" {
 #define __USE_GNU_GETTEXT 1
 #define __GNU_GETTEXT_SUPPORTED_REVISION(major) ((major) == 0 ? 1 : -1)
 
-#if __GNUC__ >= 3
-#define __fa(n) __attribute__ ((__format_arg__ (n)))
-#else
 #define __fa(n)
-#endif
 
 char *gettext(const char *) __fa(1);
 char *dgettext(const char *, const char *) __fa(2);
@@ -25,6 +21,14 @@ char *bindtextdomain (const char *, const char *);
 char *bind_textdomain_codeset(const char *, const char *);
 
 #undef __fa
+
+#include <stdio.h>
+#define gettext_printf(args...) printf(args)
+
+/* to supply LC_MESSAGES and other stuff GNU expects to be exported when
+   including libintl.h */
+#include <locale.h>
+
 
 #ifdef __cplusplus
 }
