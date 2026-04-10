@@ -8,15 +8,7 @@ OFILES=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=$CFLAGS -D_POSIX_SOURCE -D_BSD_EXTENSION -D_PLAN9_SOURCE\
+CFLAGS=$CFLAGS -c -D_POSIX_SOURCE -D_BSD_EXTENSION -D_PLAN9_SOURCE\
 	-I../include
-
-# weird error. Need to build twice to link the object in libap.a
-#
-# warning: /usr/glenda/APExp/sys/src/ape/lib/ap/aio/aio.c:98[stdin:4848] set and not used: arg 
-# warning: /usr/glenda/APExp/sys/src/ape/lib/ap/aio/aio.c:246[stdin:4987] set and not used: fd 
-# _apemain: undefined: main in _apemain
-# pcc: 6l: 6l 456: error
-
 
 
