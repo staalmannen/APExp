@@ -17,9 +17,9 @@ hidden FILE __stdout_FILE = {
 	/* Explicit initialization */
 	.rpos = NULL,
 	.rend = NULL,
-	.wpos = NULL,
-	.wend = NULL,
-	.wbase = NULL,
+	.wpos = buf+UNGET,
+	.wend = buf+sizeof(buf),
+	.wbase = buf+UNGET,
 	.prev = NULL,
 	.next = NULL,
 	.prev_locked = NULL,

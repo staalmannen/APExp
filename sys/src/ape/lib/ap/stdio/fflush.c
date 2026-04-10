@@ -7,10 +7,11 @@ int fflush(FILE *f){
 		FILE **flp = __ofl_lock();
 		for (FILE *g = *flp; g; g = g->next_locked) {
 			if (g->wpos > g->wbase) {
-				if (__fwritex((unsigned char *)g->wbase, g->wpos - g->wbase, g)
-					!= (size_t)(g->wpos - g->wbase)) {
-					error = EOF;
-				}
+				/* Call write(f,0,0) — the musl flush-signal convention.
+				 * The write function (e.g. __stdio_write, mwrite) flushes
+				 * wbase..wpos internally. Passing wbase+count would double-write. */
+				g->write(g, 0, 0);
+				if (g->flags & F_ERR) error = EOF;
 			}
 		}
 		__ofl_unlock();
@@ -20,9 +21,9 @@ int fflush(FILE *f){
 	FLOCK(f);
 
 	if (f->wpos > f->wbase) {
-		if (f->write(f, (unsigned char *)f->wbase, f->wpos - f->wbase)
-			!= (size_t)(f->wpos - f->wbase)) {
-			f->flags |= F_ERR;
+		/* Flush-signal: write function flushes pending wbase..wpos internally */
+		f->write(f, 0, 0);
+		if (f->flags & F_ERR) {
 			FUNLOCK(f);
 			return EOF;
 		}

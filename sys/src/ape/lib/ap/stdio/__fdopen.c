@@ -34,21 +34,31 @@ FILE *__fdopen(int fd, const char *mode)
 	buf_start = (unsigned char *)f + sizeof(struct _IO_FILE) + UNGET;
 
 	/* Initialize FILE fields */
-	f->flags = F_PERM;
+	f->flags = 0;  /* not permanent — fclose() will free this FILE */
 	f->fd = fd;
 	f->buf = buf_start;
 	f->buf_size = BUFSIZ;
 
-	/* Initialize read/write pointers correctly */
-	f->rpos = buf_start;
-	f->rend = buf_start;
-	f->wbase = buf_start;
-	f->wpos = buf_start;
-	f->wend = buf_start + BUFSIZ;  /* END of buffer */
-
 	/* Impose mode restrictions */
 	if (!strchr(mode, '+')) {
 		f->flags |= (*mode == 'r') ? F_NOWR : F_NORD;
+	}
+
+	/* Initialize read/write pointers.
+	 * Read-only files leave write pointers NULL so any write attempt
+	 * falls through to f->write() which fails on the read-only fd,
+	 * properly setting F_ERR.  Write/append files get a ready buffer. */
+	f->rpos = buf_start;
+	f->rend = buf_start;
+	if (f->flags & F_NOWR) {
+		/* Read-only: no write buffer */
+		f->wbase = NULL;
+		f->wpos  = NULL;
+		f->wend  = NULL;
+	} else {
+		f->wbase = buf_start;
+		f->wpos  = buf_start;
+		f->wend  = buf_start + BUFSIZ;
 	}
 
 	/* Line buffering */

@@ -14,7 +14,7 @@ int __stdio_close(FILE *f)
 	ret = close(f->fd);
 	f->fd = -1;
 
-	/* Destroy the pthread mutex if it exists */
+	/* Destroy and free the pthread mutex */
 	if (f->lock > 0) {
 		lock = (pthread_mutex_t *)(intptr_t)f->lock;
 		pthread_mutex_destroy(lock);
@@ -22,15 +22,11 @@ int __stdio_close(FILE *f)
 		f->lock = -1;
 	}
 
-	/* Free any allocated buffer */
-	if (f->flags & F_SVB) {
-		free(f->buf);
-		f->buf = NULL;
-	}
-
-	/* Free the FILE structure itself if it was malloc'd */
-	free(f);
-
+	/*
+	 * NOTE: do NOT free f->buf or free(f) here.
+	 * fclose() owns that cleanup:
+	 *   - it frees f->buf when F_SVB is set
+	 *   - it frees the FILE struct itself for non-F_PERM files
+	 */
 	return ret;
 }
-

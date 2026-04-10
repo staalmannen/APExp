@@ -4,9 +4,9 @@
 int setvbuf(FILE *f, char *buf, int mode, size_t size){
 	FLOCK(f);
 
-	/* Flush any pending writes */
+	/* Flush any pending writes (write(f,0,0) is the musl flush-signal) */
 	if (f->wpos > f->wbase) {
-		f->write(f, (unsigned char *)f->wbase, f->wpos - f->wbase);
+		f->write(f, 0, 0);
 	}
 
 	/* Clear buffers */
