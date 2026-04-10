@@ -89,8 +89,6 @@ Install paths have been modified so that libraries and binaries are installed in
 - libcurses : PDCursesMod (check out 2026-04-08; built with utf8/wchar)
 - libedit (version 3.1 2025-10-16)
 - libpcre2 (version 10.47)
-- libxml2 (from gettext version 1.0.0)
-- libgettextpo / libtextstyles (from gettext version 1.0.0)
 - liblzma (from xz version 5.8.3)
 - libz (version 1.3.2)
 - libbz2 (version 1.0.8)
@@ -104,15 +102,15 @@ Install paths have been modified so that libraries and binaries are installed in
 - APE sed has been replaced by a port of GNU sed (version 4.9)
 - APE grep has been replaced by pcre2grep (version 10.47 ). 
 - -> TODO: replace with GNU grep (version 3.12)
-- system awk has been replaced by GNU awk (version 5.4.0) since native awk is sometimes needed, it is installed as gawk
+- GNU awk (version 5.4.0). Since native awk is sometimes needed, GNU awk is installed as gawk
 - GNU m4 (version 1.4.21) has been added
-- GNU gettext utilities and libraries (version 1.0.0) have been added
-- A "musl" iconv utility has been added from alpine linux.
-- system yacc has been replaced by byacc (version 20240109) as ape/yacc. 
+- gettext utilities from Sabotage Linux "gettext-tiny" [14]
+- A "musl" iconv utility has been added from Alpine Linux.
+- system yacc has been replaced by byacc (version 20240109) as yacc. 
 - -> TODO: replace with Bison (version 3.8) and keep native yacc as "yacc" because it is sometimes needed
-- system lex has been replaced by flex (version 2.6.4) as ape/lex
+- system lex has been replaced by flex (version 2.6.4) as lex
 - vibe-coded (claude.ai) GAS-compatible "as" front end to native $Oa assemblers.
-- the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" *et al.* have been built from suckless sbase [14]
+- the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" *et al.* have been built from suckless sbase [15]
 - steve's mkmk (/n/sources/contrib) imported to APExp
 - copied "which", and "printenv" rc scripts from steve (/n/sources/contrib)
 
@@ -181,7 +179,9 @@ Yes, the default build is "bloated" because I enable everything that I believe w
 
 [13] https://github.com/cheusov/nbase
 
-[14] https://core.suckless.org/sbase/
+[14] https://github.com/sabotage-linux/gettext-tiny
+
+[15] https://core.suckless.org/sbase/
 
 
 

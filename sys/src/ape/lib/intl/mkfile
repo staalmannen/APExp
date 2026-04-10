@@ -1,0 +1,22 @@
+</$objtype/mkfile
+APEXPROOT=../../../../..
+LIB=$APEXPROOT/$objtype/lib/ape/libintl.a
+
+# tiny shim library to make configure scripts happy
+
+OFILES=	libintl-musl.$O
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+GETTEXTSRC=../../../external/gettext
+
+CC=pcc
+LD=pcc
+CFLAGS=-c 
+
+%.$O: $GETTEXTSRC/libintl/%.c
+	$CC $CFLAGS $GETTEXTSRC/libintl/$stem.c
+
+nuke:V:
+	mk clean
+	rm -f $LIB
