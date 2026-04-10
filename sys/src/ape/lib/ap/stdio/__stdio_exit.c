@@ -14,7 +14,7 @@ static void close_file(FILE *f)
 	/* Try to lock and flush */
 	if (FFINALLOCK(f)) {
 		if (f->wpos > f->wbase) {
-			f->write(f, (unsigned char *)f->wbase, f->wpos - f->wbase);
+			f->write(f, 0, 0);
 		}
 		__unlockfile(f);
 	}

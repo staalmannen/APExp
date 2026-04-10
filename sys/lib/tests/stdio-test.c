@@ -116,7 +116,9 @@ static void test_printf_formats(void) {
 	snprintf(buf, sizeof(buf), "%e", 12345.6789);
 	check("%%e scientific", buf[0] != '\0' && strchr(buf, 'e') != NULL);
 
-	snprintf(buf, sizeof(buf), "%g", 0.00012345);
+	/* %g uses scientific notation when exponent < -4 (i.e. <= -5).
+	 * 0.000012345 = 1.2345e-5 → exponent -5 < -4 → should produce 'e'. */
+	snprintf(buf, sizeof(buf), "%g", 0.000012345);
 	check("%%g small number", strchr(buf, 'e') != NULL);
 
 	snprintf(buf, sizeof(buf), "%g", 123456.0);

@@ -13,9 +13,8 @@ int fseek(FILE *f, long offs, int type){
 
 	/* Flush write buffer if needed */
 	if (f->wpos > f->wbase) {
-		if (f->write(f, (unsigned char *)f->wbase, f->wpos - f->wbase)
-			!= (size_t)(f->wpos - f->wbase)) {
-			f->flags |= F_ERR;
+		f->write(f, 0, 0);
+		if (f->flags & F_ERR) {
 			FUNLOCK(f);
 			return -1;
 		}

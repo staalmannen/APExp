@@ -108,7 +108,7 @@ int vfscanf(FILE *f, const char *s, va_list args)
 		}
 		if(!icvt[*fmtp]) goto NonSpecial;
 		if(!(*icvt[*fmtp])(f, &args, store, width, type))
-			return ncvt?ncvt:EOF;
+			return ncvt;	/* matching failure: return count so far (may be 0) */
 		if(*fmtp=='\0') break;
 		if(store) ncvt++;
 	}

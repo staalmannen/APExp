@@ -5,23 +5,22 @@ int ungetc(int c, FILE *f){
 
 	FLOCK(f);
 
-	/* Ensure we're in read mode */
-	if (__toread(f)) {
+	/* Need an active read buffer with room in the UNGET area.
+	 * Do NOT call __toread here — it resets rpos/rend and destroys
+	 * any buffered data that hasn't been read yet. */
+	if(!f->buf || !f->rpos || f->rpos <= (unsigned char *)f->buf - UNGET){
 		FUNLOCK(f);
 		return EOF;
 	}
 
-	/* ungetc requires a read buffer; ensure one exists */
-	if (!f->buf || f->rpos <= f->buf) {
-		FUNLOCK(f);
-		return EOF;
-	}
+	/* If there is a pending (unflushed) write buffer, flush it first */
+	if(f->wpos != f->wbase && f->wpos)
+		f->write(f, 0, 0);
+	f->wpos = f->wbase = f->wend = 0;
 
-	/* Decrement read pointer and store character */
 	*--f->rpos = (unsigned char)c;
-	f->flags &= ~F_EOF; /* Clear EOF flag on ungetc */
+	f->flags &= ~F_EOF;
 
 	FUNLOCK(f);
 	return (unsigned char)c;
 }
-
