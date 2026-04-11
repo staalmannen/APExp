@@ -42,11 +42,11 @@
 #define	HAVE_UINTPTR_T	1
 #define	HAVE_UNISTD_H	1
 #define	HAVE_WAITPID	1
-#define	NO_DLFCN_H	1
-#define	NO_FSTATFS	1
-#define	NO_REALPATH	1
-#define	NO_UNION_WAIT	1
-#define	NO_VALUES_H	1
+//#define	NO_DLFCN_H	1
+//#define	NO_FSTATFS	1
+//#define	NO_REALPATH	1
+//#define	NO_UNION_WAIT	1
+//#define	NO_VALUES_H	1
 
 #define	TCL_CFGVAL_ENCODING	"utf-8"
 #define	TCL_CFG_DEBUG	1
@@ -62,7 +62,6 @@
 
 /* math helper */
 #include <math.h>
-extern	double	hypot(double, double);
 #ifndef isnan
 #define	isnan	isNaN
 #endif
@@ -70,11 +69,6 @@ extern	double	hypot(double, double);
 /* errno helper */
 #include <errno.h>
 
-extern	int	mkstemp(char*);
-#define	ECONNRESET	(EINPROGRESS+1)
-#undef	EPROTOTYPE
-
-#define	socklen_t	int
 #define	P_tmpdir		"/tmp"
 
 #endif

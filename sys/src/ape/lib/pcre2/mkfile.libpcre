@@ -1,12 +1,15 @@
 </$objtype/mkfile
-LIB=libpcre2.a
-HFILES= config.h
+
+APEXPROOT=../../../../..
+LIB=$APEXPROOT/$objtype/lib/ape/libpcre2.a
+
 OFILES=\
 	#src\
 		pcre2_auto_possess.$O\
-		pcre2_chartables.$O\
 		pcre2_chkdint.$O\
 		pcre2_compile.$O\
+		pcre2_compile_cgroup.$O\
+		pcre2_compile_class.$O\
 		pcre2_config.$O\
 		pcre2_context.$O\
 		pcre2_convert.$O\
@@ -18,6 +21,7 @@ OFILES=\
 		pcre2_maketables.$O\
 		pcre2_match.$O\
 		pcre2_match_data.$O\
+		pcre2_match_next.$O\
 		pcre2_newline.$O\
 		pcre2_ord2utf.$O\
 		pcre2_pattern_info.$O\
@@ -31,24 +35,26 @@ OFILES=\
 		pcre2_ucd.$O\
 		pcre2_valid_utf.$O\
 		pcre2_xclass.$O\
+		pcre2_chartables.$O\
+
 
 
 </sys/src/cmd/mksyslib
 
 PCRESRC=../../../external/pcre2
-APEXPROOT=../../../../..
 
 CC=pcc
 LD=pcc
 # Normally are 8, 16 and 32 libraries made.
 # We are only using UTF-8 so width=8 should be enough
-CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=8
+CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=8 -DPCRE2_STATIC
 
 %.$O: $PCRESRC/src/%.c
 	$CC $CFLAGS $PCRESRC/src/$stem.c
 
-install:V:
-	cp libpcre2.a $APEXPROOT/$objtype/lib/ape/libpcre2.a
+pcre2_chartables.c: $PCRESRC/src/pcre2_chartables.c.dist
+	cp $PCRESRC/src/pcre2_chartables.c.dist pcre2_chartables.c
+
 
 nuke:V:
 	mk clean
