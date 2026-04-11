@@ -10,20 +10,19 @@ extern "C" {
 
 #define __fa(n)
 
-char *gettext(const char *) __fa(1);
-char *dgettext(const char *, const char *) __fa(2);
-char *dcgettext(const char *, const char *, int) __fa(2);
-char *ngettext(const char *, const char *, unsigned long) __fa(1) __fa(2);
-char *dngettext(const char *, const char *, const char *, unsigned long) __fa(2) __fa(3);
-char *dcngettext(const char *, const char *, const char *, unsigned long, int) __fa(2) __fa(3);
-char *textdomain(const char *);
-char *bindtextdomain (const char *, const char *);
-char *bind_textdomain_codeset(const char *, const char *);
+extern char *gettext(const char *) __fa(1);
+extern char *dgettext(const char *, const char *) __fa(2);
+extern char *dcgettext(const char *, const char *, int) __fa(2);
+extern char *ngettext(const char *, const char *, unsigned long) __fa(1) __fa(2);
+extern char *dngettext(const char *, const char *, const char *, unsigned long) __fa(2) __fa(3);
+extern char *dcngettext(const char *, const char *, const char *, unsigned long, int) __fa(2) __fa(3);
+extern char *textdomain(const char *);
+extern char *bindtextdomain (const char *, const char *);
+extern char *bind_textdomain_codeset(const char *, const char *);
 
 #undef __fa
 
 #include <stdio.h>
-#define gettext_printf(args...) printf(args)
 
 /* to supply LC_MESSAGES and other stuff GNU expects to be exported when
    including libintl.h */
