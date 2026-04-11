@@ -4,158 +4,74 @@ APE=$APEXPROOT/sys/src/ape
 
 LIB=$APEXPROOT/$objtype/lib/ape/libtcl.a
 
-UNIX_OBJS = tclUnixChan.o tclUnixEvent.o tclUnixFCmd.o \
-	tclUnixFile.o tclUnixPipe.o tclUnixSock.o \
-	tclUnixTime.o tclUnixInit.o tclUnixThrd.o \
-	tclUnixCompat.o
+UNIX_OBJS = tclUnixChan.$O tclUnixEvent.$O tclUnixFCmd.$O \
+	tclUnixFile.$O tclUnixPipe.$O tclUnixSock.$O \
+	tclUnixTime.$O tclUnixInit.$O tclUnixThrd.$O \
+	tclUnixCompat.$O
 
-TOMMATH_OBJS = bn_s_mp_reverse.o bn_s_mp_mul_digs_fast.o \
-	bn_s_mp_sqr_fast.o bn_mp_add.o bn_mp_and.o \
-	bn_mp_add_d.o bn_mp_clamp.o bn_mp_clear.o bn_mp_clear_multi.o \
-	bn_mp_cmp.o bn_mp_cmp_d.o bn_mp_cmp_mag.o \
-	bn_mp_cnt_lsb.o bn_mp_copy.o \
-	bn_mp_count_bits.o bn_mp_div.o bn_mp_div_d.o bn_mp_div_2.o \
-	bn_mp_div_2d.o bn_s_mp_div_3.o bn_mp_exch.o bn_mp_expt_n.o \
-	bn_mp_get_mag_u64.o \
-	bn_mp_grow.o bn_mp_init.o \
-	bn_mp_init_copy.o bn_mp_init_multi.o bn_mp_init_set.o \
-	bn_mp_init_size.o bn_s_mp_karatsuba_mul.o \
-	bn_mp_init_i64.o bn_mp_init_u64.o \
-	bn_s_mp_karatsuba_sqr.o bn_s_mp_balance_mul.o \
-	bn_mp_lshd.o bn_mp_mod.o bn_mp_mod_2d.o bn_mp_mul.o bn_mp_mul_2.o \
-	bn_mp_mul_2d.o bn_mp_mul_d.o bn_mp_neg.o bn_mp_or.o bn_mp_pack.o \
-	bn_mp_pack_count.o bn_mp_radix_size.o bn_mp_radix_smap.o  \
-	bn_mp_set_i64.o bn_mp_read_radix.o bn_mp_rshd.o \
-	bn_mp_set_u64.o bn_mp_shrink.o \
-	bn_mp_sqr.o bn_mp_sqrt.o bn_mp_sub.o bn_mp_sub_d.o \
-	bn_mp_signed_rsh.o \
-	bn_mp_to_ubin.o bn_mp_unpack.o \
-	bn_s_mp_toom_mul.o bn_s_mp_toom_sqr.o bn_mp_to_radix.o \
-	bn_mp_ubin_size.o bn_mp_xor.o bn_mp_zero.o bn_s_mp_add.o \
-	bn_s_mp_mul_digs.o bn_s_mp_sqr.o bn_s_mp_sub.o
+TOMMATH_OBJS = bn_s_mp_reverse.$O bn_s_mp_mul_digs_fast.$O \
+	bn_s_mp_sqr_fast.$O bn_mp_add.$O bn_mp_and.$O \
+	bn_mp_add_d.$O bn_mp_clamp.$O bn_mp_clear.$O bn_mp_clear_multi.$O \
+	bn_mp_cmp.$O bn_mp_cmp_d.$O bn_mp_cmp_mag.$O \
+	bn_mp_cnt_lsb.$O bn_mp_copy.$O \
+	bn_mp_count_bits.$O bn_mp_div.$O bn_mp_div_d.$O bn_mp_div_2.$O \
+	bn_mp_div_2d.$O bn_s_mp_div_3.$O bn_mp_exch.$O bn_mp_expt_n.$O \
+	bn_mp_get_mag_u64.$O \
+	bn_mp_grow.$O bn_mp_init.$O \
+	bn_mp_init_copy.$O bn_mp_init_multi.$O bn_mp_init_set.$O \
+	bn_mp_init_size.$O bn_s_mp_karatsuba_mul.$O \
+	bn_mp_init_i64.$O bn_mp_init_u64.$O \
+	bn_s_mp_karatsuba_sqr.$O bn_s_mp_balance_mul.$O \
+	bn_mp_lshd.$O bn_mp_mod.$O bn_mp_mod_2d.$O bn_mp_mul.$O bn_mp_mul_2.$O \
+	bn_mp_mul_2d.$O bn_mp_mul_d.$O bn_mp_neg.$O bn_mp_or.$O bn_mp_pack.$O \
+	bn_mp_pack_count.$O bn_mp_radix_size.$O bn_mp_radix_smap.$O  \
+	bn_mp_set_i64.$O bn_mp_read_radix.$O bn_mp_rshd.$O \
+	bn_mp_set_u64.$O bn_mp_shrink.$O \
+	bn_mp_sqr.$O bn_mp_sqrt.$O bn_mp_sub.$O bn_mp_sub_d.$O \
+	bn_mp_signed_rsh.$O \
+	bn_mp_to_ubin.$O bn_mp_unpack.$O \
+	bn_s_mp_toom_mul.$O bn_s_mp_toom_sqr.$O bn_mp_to_radix.$O \
+	bn_mp_ubin_size.$O bn_mp_xor.$O bn_mp_zero.$O bn_s_mp_add.$O \
+	bn_s_mp_mul_digs.$O bn_s_mp_sqr.$O bn_s_mp_sub.$O
 
-GENERIC_OBJS = regcomp.o regexec.o regfree.o regerror.o tclAlloc.o \
-	tclArithSeries.o tclAssembly.o tclAsync.o tclBasic.o tclBinary.o \
-	tclCkalloc.o tclClock.o tclClockFmt.o tclCmdAH.o tclCmdIL.o tclCmdMZ.o \
-	tclCompCmds.o tclCompCmdsGR.o tclCompCmdsSZ.o tclCompExpr.o \
-	tclCompile.o tclConfig.o tclDate.o tclDictObj.o tclDisassemble.o \
-	tclEncoding.o tclEnsemble.o \
-	tclEnv.o tclEvent.o tclExecute.o tclFCmd.o tclFileName.o tclGet.o \
-	tclHash.o tclHistory.o \
-	tclIcu.o tclIndexObj.o tclInterp.o tclIO.o tclIOCmd.o \
-	tclIORChan.o tclIORTrans.o tclIOGT.o tclIOSock.o tclIOUtil.o \
-	tclLink.o tclListObj.o \
-	tclLiteral.o tclLoad.o tclMain.o tclNamesp.o tclNotify.o \
-	tclObj.o tclOptimize.o tclPanic.o tclParse.o tclPathObj.o tclPipe.o \
-	tclPkg.o tclPkgConfig.o tclPosixStr.o \
-	tclPreserve.o tclProc.o tclProcess.o tclRegexp.o \
-	tclResolve.o tclResult.o tclScan.o tclStringObj.o tclStrIdxTree.o \
-	tclStrToD.o tclThread.o \
-	tclThreadAlloc.o tclThreadJoin.o tclThreadStorage.o tclStubInit.o \
-	tclTimer.o tclTrace.o tclUtf.o tclUtil.o tclVar.o tclZlib.o \
-	tclTomMathInterface.o tclZipfs.o
+GENERIC_OBJS = regcomp.$O regexec.$O regfree.$O regerror.$O tclAlloc.$O \
+	tclArithSeries.$O tclAssembly.$O tclAsync.$O tclBasic.$O tclBinary.$O \
+	tclCkalloc.$O tclClock.$O tclClockFmt.$O tclCmdAH.$O tclCmdIL.$O tclCmdMZ.$O \
+	tclCompCmds.$O tclCompCmdsGR.$O tclCompCmdsSZ.$O tclCompExpr.$O \
+	tclCompile.$O tclConfig.$O tclDate.$O tclDictObj.$O tclDisassemble.$O \
+	tclEncoding.$O tclEnsemble.$O \
+	tclEnv.$O tclEvent.$O tclExecute.$O tclFCmd.$O tclFileName.$O tclGet.$O \
+	tclHash.$O tclHistory.$O \
+	tclIcu.$O tclIndexObj.$O tclInterp.$O tclIO.$O tclIOCmd.$O \
+	tclIORChan.$O tclIORTrans.$O tclIOGT.$O tclIOSock.$O tclIOUtil.$O \
+	tclLink.$O tclListObj.$O \
+	tclLiteral.$O tclLoad.$O tclMain.$O tclNamesp.$O tclNotify.$O \
+	tclObj.$O tclOptimize.$O tclPanic.$O tclParse.$O tclPathObj.$O tclPipe.$O \
+	tclPkg.$O tclPkgConfig.$O tclPosixStr.$O \
+	tclPreserve.$O tclProc.$O tclProcess.$O tclRegexp.$O \
+	tclResolve.$O tclResult.$O tclScan.$O tclStringObj.$O tclStrIdxTree.$O \
+	tclStrToD.$O tclThread.$O \
+	tclThreadAlloc.$O tclThreadJoin.$O tclThreadStorage.$O tclStubInit.$O \
+	tclTimer.$O tclTrace.$O tclUtf.$O tclUtil.$O tclVar.$O tclZlib.$O \
+	tclTomMathInterface.$O tclZipfs.$O
 
-OO_OBJS = tclOO.o tclOOBasic.o tclOOCall.o tclOODefineCmds.o tclOOInfo.o \
-	tclOOMethod.o tclOOProp.o tclOOStubInit.o
+OO_OBJS = tclOO.$O tclOOBasic.$O tclOOCall.$O tclOODefineCmds.$O tclOOInfo.$O \
+	tclOOMethod.$O tclOOProp.$O tclOOStubInit.$O
 
-NOTIFY_OBJS = tclEpollNotfy.o tclKqueueNotfy.o tclSelectNotfy.o
+NOTIFY_OBJS = tclEpollNotfy.$O tclKqueueNotfy.$O tclSelectNotfy.$O
 
 
 OFILES=\
 # plan9 \
 	plan9compat.$O\
 # unix \
-	tclUnixChan.$O\
-	tclUnixCompat.$O\
-	tclUnixEvent.$O\
-	tclUnixFCmd.$O\
-	tclUnixFile.$O\
-	tclUnixInit.$O\
-	tclUnixNotfy.$O\
-	tclUnixPipe.$O\
-	tclUnixSock.$O\
-#	tclUnixTest.$O\
-	tclUnixThrd.$O\
-	tclUnixTime.$O\
+	$UNIX_OBJS\
+	$NOTIFY_OBJS\
 # generic \
-	regcomp.$O\
-	regerror.$O\
-	regexec.$O\
-	regfree.$O\
-	tclAlloc.$O\
-	tclAsync.$O\
-	tclBasic.$O\
-	tclBinary.$O\
-	tclCkalloc.$O\
-	tclClock.$O\
-	tclCmdAH.$O\
-	tclCmdIL.$O\
-	tclCmdMZ.$O\
-	tclCompCmds.$O\
-	tclCompExpr.$O\
-	tclCompile.$O\
-	tclConfig.$O\
-	tclDate.$O\
-	tclDictObj.$O\
-	tclEncoding.$O\
-	tclEnv.$O\
-	tclEvent.$O\
-	tclExecute.$O\
-	tclFCmd.$O\
-	tclFileName.$O\
-	tclGet.$O\
-	tclHash.$O\
-	tclHistory.$O\
-	tclIO.$O\
-	tclIOCmd.$O\
-	tclIOGT.$O\
-	tclIORChan.$O\
-	tclIOSock.$O\
-	tclIOUtil.$O\
-	tclIndexObj.$O\
-	tclInterp.$O\
-	tclLink.$O\
-	tclListObj.$O\
-	tclLiteral.$O\
-	tclLoad.$O\
-	tclLoadNone.$O\
-	tclMain.$O\
-	tclNamesp.$O\
-	tclNotify.$O\
-	tclObj.$O\
-	tclPanic.$O\
-	tclParse.$O\
-	tclPathObj.$O\
-	tclPipe.$O\
-	tclPkg.$O\
-	tclPkgConfig.$O\
-	tclPosixStr.$O\
-	tclPreserve.$O\
-	tclProc.$O\
-	tclRegexp.$O\
-	tclResolve.$O\
-	tclResult.$O\
-	tclScan.$O\
-	tclStrToD.$O\
-	tclStringObj.$O\
-	tclStubInit.$O\
-	tclStubLib.$O\
-	tclTest.$O\
-	tclTestObj.$O\
-	tclTestProcBodyObj.$O\
-	tclThread.$O\
-	tclThreadAlloc.$O\
-	tclThreadJoin.$O\
-	tclThreadStorage.$O\
-	tclThreadTest.$O\
-	tclTimer.$O\
-	tclTomMathInterface.$O\
-	tclTrace.$O\
-	tclUniData.$O\
-	tclUtf.$O\
-	tclUtil.$O\
-	tclVar.$O\
+	$GENERIC_OBJS\
+	$OO_OBJS\
 # libtommath \
+	$TOMMATH_OBJS
 
 
 TCLSRC=$APEXPROOT/sys/src/external/tcl

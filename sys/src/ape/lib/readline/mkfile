@@ -64,10 +64,10 @@ CFLAGS=-c -DHAVE_CONFIG_H -D_POSIX_SOURCE -DHAVE_CURSES_H\
 %.$O: $RLSRC/%.c
 	$CC $CFLAGS $RLSRC/$stem.c
 
-install:V: rl
-	cp rl $BIN/rl
+install:V: $O.rl
+	cp $O.rl $BIN/rl
 
-rl: $RLSRC/exapmles/rl.c $LIB $TERMCAP
+$O.rl: $RLSRC/exapmles/rl.c $LIB $TERMCAP
 	$CC $prereq -o $target
 
 
