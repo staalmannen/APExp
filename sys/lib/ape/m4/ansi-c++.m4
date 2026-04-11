@@ -1,5 +1,5 @@
-# ansi-c++.m4 serial 12
-dnl Copyright (C) 2002-2003, 2005, 2010-2021 Free Software Foundation, Inc.
+# ansi-c++.m4 serial 9
+dnl Copyright (C) 2002-2003, 2005, 2010-2017 Free Software Foundation, Inc.
 dnl This file is free software; the Free Software Foundation
 dnl gives unlimited permission to copy and/or distribute it,
 dnl with or without modifications, as long as this notice is preserved.
@@ -122,31 +122,7 @@ EOF
     dnl /usr/local/share/automake-1.11/am/depend2.am:   The usual way to define 'am__fastdepCXX' is to add 'AC_PROG_CXX'
     dnl /usr/local/share/automake-1.11/am/depend2.am:   to 'configure.ac' and run 'aclocal' and 'autoconf' again.
     _AM_DEPENDENCIES([CXX])
-    dnl Determine a good default for the CXXFLAGS variable.
-    AC_LANG_PUSH([C++])
-    _AC_LANG_COMPILER_GNU
-    if test $ac_compiler_gnu = yes; then
-      GXX=yes
-    else
-      GXX=
-    fi
-    _AC_PROG_CXX_G
-    AC_LANG_POP([C++])
   else
     AM_CONDITIONAL([am__fastdepCXX], [false])
   fi
-])
-
-# gl_ANSI_CXX
-# Sets CXX to the name of a sufficiently ANSI C++ compliant compiler, or to
-# "no" if none is found.
-# Defines the Automake condition ANSICXX to true if such a compiler was found,
-# or to false if not.
-AC_DEFUN([gl_ANSI_CXX],
-[
-  gl_PROG_ANSI_CXX([CXX], [ANSICXX])
-  dnl This line is needed in order to avoid trouble with Autoconf.  It makes
-  dnl sure that Autoconf does not insert expansions of AC_PROG_CXX at random
-  dnl places.  See <https://savannah.gnu.org/support/?110294>.
-  m4_provide([AC_PROG_CXX])
 ])
