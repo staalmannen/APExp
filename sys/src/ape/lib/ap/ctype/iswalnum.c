@@ -1,5 +1,6 @@
 #include <wctype.h>
 #include <langinfo.h>
+#undef iswalnum
 
 int iswalnum(wint_t wc)
 {

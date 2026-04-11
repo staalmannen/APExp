@@ -1,4 +1,5 @@
 #include <wctype.h>
+#undef iswlower
 
 int iswlower(wint_t wc)
 {

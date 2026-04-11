@@ -1,5 +1,8 @@
 #include <wctype.h>
 #include <string.h>
+#undef wctype
+#undef iswctype
+
 
 #define WCTYPE_ALNUM  1
 #define WCTYPE_ALPHA  2

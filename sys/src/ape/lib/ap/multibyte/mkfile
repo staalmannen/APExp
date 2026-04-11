@@ -28,7 +28,6 @@ OFILES=\
 	utfutf.$O\
 # libwtf, minus musl\
 	fwide.$O\
-	wctype.$O\
 # sbase libutf\
 	fgetrune.$O\
 	fputrune.$O\
@@ -73,4 +72,4 @@ UPDATE=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-c -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION -D_LIBAPEXP -I../include
+CFLAGS=-c -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION -I../include

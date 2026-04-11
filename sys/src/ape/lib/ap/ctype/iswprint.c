@@ -1,4 +1,5 @@
 #include <wctype.h>
+#undef iswprint
 
 /* Consider all legal codepoints as printable except for:
  * - C0 and C1 control characters

@@ -1054,6 +1054,8 @@ bsearch(Rune c, Rune *t, int n, int ne)
 	return 0;
 }
 
+#undef tolowerrune
+
 Rune
 tolowerrune(Rune c)
 {
@@ -1067,6 +1069,8 @@ tolowerrune(Rune c)
 		return c + p[1] - 500;
 	return c;
 }
+
+#undef toupperrune
 
 Rune
 toupperrune(Rune c)
@@ -1082,6 +1086,8 @@ toupperrune(Rune c)
 	return c;
 }
 
+#undef totitlerune
+
 Rune
 totitlerune(Rune c)
 {
@@ -1092,6 +1098,8 @@ totitlerune(Rune c)
 		return c + p[1] - 500;
 	return c;
 }
+
+#undef islowerrune
 
 int
 islowerrune(Rune c)
@@ -1121,6 +1129,8 @@ isupperrune(Rune c)
 	return 0;
 }
 
+#undef isalpharune
+
 int
 isalpharune(Rune c)
 {
@@ -1137,11 +1147,15 @@ isalpharune(Rune c)
 	return 0;
 }
 
+#undef istitlerune
+
 int
 istitlerune(Rune c)
 {
 	return isupperrune(c) && islowerrune(c);
 }
+
+#undef isspacerune
 
 int
 isspacerune(Rune c)

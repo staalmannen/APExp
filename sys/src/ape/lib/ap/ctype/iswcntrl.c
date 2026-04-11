@@ -1,4 +1,5 @@
 #include <wctype.h>
+#undef iswcntrl
 
 int iswcntrl(wint_t wc)
 {

@@ -1,5 +1,6 @@
 #include <wchar.h>
 #include <wctype.h>
+#undef iswspace
 
 /* Our definition of whitespace is the Unicode White_Space property,
  * minus non-breaking spaces (U+00A0, U+2007, and U+202F) and script-

@@ -1,4 +1,5 @@
 #include <wctype.h>
+#undef iswalpha
 
 static const unsigned char table[] = {
 #include "alpha.h"

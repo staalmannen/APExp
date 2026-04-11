@@ -1,4 +1,5 @@
 #include <wctype.h>
+#undef iswgraph
 
 int iswgraph(wint_t wc)
 {
