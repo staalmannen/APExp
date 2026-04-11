@@ -42,11 +42,11 @@
 #define	HAVE_UINTPTR_T	1
 #define	HAVE_UNISTD_H	1
 #define	HAVE_WAITPID	1
-//#define	NO_DLFCN_H	1
-//#define	NO_FSTATFS	1
-//#define	NO_REALPATH	1
-//#define	NO_UNION_WAIT	1
-//#define	NO_VALUES_H	1
+#define	NO_DLFCN_H	1
+#define	NO_FSTATFS	1
+#define	NO_REALPATH	1
+#define	NO_UNION_WAIT	1
+#define	NO_VALUES_H	1
 
 #define	TCL_CFGVAL_ENCODING	"utf-8"
 #define	TCL_CFG_DEBUG	1

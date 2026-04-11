@@ -8,53 +8,53 @@ LIB=\
 
 TARG= \
 		basename\
-		bc\
+#		bc\
 		cal\
 		cat\
-		chgrp\
-		chmod\
-		chown\
+#		chgrp\
+#		chmod\
+#		chown\
 		chroot\
 		cksum\
 		cmp\
 #		cols\
 		comm\
-		cp\
-		cron\
+#		cp\
+#		cron\
 		cut\
 		date\
 		dc\
 		dd\
 		dirname\
-		du\
+#		du\
 		echo\
-		ed\
+#		ed\
 		env\
 		expand\
 		expr\
 		false\
 #		find\
-		flock\
+#		flock\
 		fold\
-		getconf\
+#		getconf\
 ##		grep\
 		head\
-		hostname\
+#		hostname\
 		join\
 		kill\
 		link\
-		ln\
-		logger\
+#		ln\
+#		logger\
 		logname\
 		ls\
 		md5sum\
 		mkdir\
 		mkfifo\
-		mknod\
-		mktemp\
-		mv\
-		nice\
-		nl\
+#		mknod\
+#		mktemp\
+#		mv\
+#		nice\
+#		nl\
 		nohup\
 		od\
 #		paste\
@@ -63,33 +63,33 @@ TARG= \
 		printf\
 		pwd\
 		readlink\
-		renice\
+#		renice\
 		rev\
-		rm\
+#		rm\
 		rmdir\
 ##		sed\
 		seq\
 		setsid\
 		sha1sum\
-		sha244sum\
-		sha256sum\
-		sha384sum\
-		sha512-224sum\
-		sha512-256sum\
-		sha512sum\
+#		sha244sum\
+#		sha256sum\
+#		sha384sum\
+#		sha512-224sum\
+#		sha512-256sum\
+#		sha512sum\
 		sleep\
 		sort\
 		split\
 		sponge\
 		strings\
-		sync\
+#		sync\
 		tail\
 ##		tar\
 		tee\
-		test\
+#		test\
 		tftp\
 		time\
-		touch\
+#		touch\
 		tr\
 		true\
 		tsort\
@@ -108,7 +108,7 @@ TARG= \
 
 UTIL_OBJS=\
 		concat.$O\
-		_cp.$O\
+#		_cp.$O\
 		crypt.$O\
 		ealloc.$O\
 		enmasse.$O\

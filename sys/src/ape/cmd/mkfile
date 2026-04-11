@@ -18,6 +18,7 @@ _CORE_APPS=\
 	gettext\
 # core utilities \
 	base\
+	grep\
 	pcregrep\
 #	expr\
 

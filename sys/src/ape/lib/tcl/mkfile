@@ -4,7 +4,8 @@ APE=$APEXPROOT/sys/src/ape
 
 LIB=$APEXPROOT/$objtype/lib/ape/libtcl.a
 
-UNIX_OBJS = tclUnixChan.$O tclUnixEvent.$O tclUnixFCmd.$O \
+UNIX_OBJS = tclUnixChan.$O tclUnixEvent.$O\
+#	tclUnixFCmd.$O \
 	tclUnixFile.$O tclUnixPipe.$O tclUnixSock.$O \
 	tclUnixTime.$O tclUnixInit.$O tclUnixThrd.$O \
 	tclUnixCompat.$O
