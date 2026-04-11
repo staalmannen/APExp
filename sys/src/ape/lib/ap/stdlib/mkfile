@@ -16,7 +16,6 @@ OFILES=\
 	itoa.$O\
 	itol.$O\
 	ldiv.$O\
-	mbwc.$O\
 	system.$O\
 #	musl\
 	ecvt.$O\

@@ -3,7 +3,6 @@ APE=$APEXPROOT/sys/src/ape
 <$APE/config
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
-	locale.$O\
 # musl \
 	__mo_lookup.$O\
 	c_locale.$O\

@@ -64,8 +64,6 @@ OFILES=\
 	wctob.$O\
 	wctomb.$O\
 
-# TODO : hunt down some duplicate text symbols. not obvious via grep
-
 HFILES=\
 	$APEXPROOT/sys/include/ape/utf.h\
 
@@ -75,4 +73,4 @@ UPDATE=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-CFLAGS=-c -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION -I../include
+CFLAGS=-c -D_POSIX_SOURCE -D_PLAN9_SOURCE -D_BSD_EXTENSION -D_LIBAPEXP -I../include
