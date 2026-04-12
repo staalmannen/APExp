@@ -3,7 +3,9 @@
 /* 8 bit chars (signed), 16 bit shorts, 32 bit ints/longs */
 
 #define CHAR_BIT	8
+#ifndef MB_LEN_MAX
 #define MB_LEN_MAX	4
+#endif
 
 #define UCHAR_MAX	0xff
 #define USHRT_MAX	0xffff

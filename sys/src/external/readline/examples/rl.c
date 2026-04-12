@@ -32,11 +32,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 
-#ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
-#else 
-extern void exit();
-#endif
 
 #ifdef HAVE_LOCALE_H
 #  include <locale.h>

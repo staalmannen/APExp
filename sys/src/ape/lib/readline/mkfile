@@ -57,18 +57,19 @@ RLSRC=../../../external/readline
 #fails on include_next
 CC=$APEXPROOT/$objtype/bin/pcc
 
-CFLAGS=-c -DHAVE_CONFIG_H -D_POSIX_SOURCE -DHAVE_CURSES_H\
+CFLAGS=-c -DHAVE_CONFIG_H -D_POSIX_SOURCE -DHAVE_CURSES_H -DHAVE_STDLIB_H\
 	-I$RLSRC -DRL_LIBRARY_VERSION='"8.3"' -DBRACKETED_PASTE_DEFAULT=1\
-	-DTERMCAP_LIB="-lcurses" -DREADLINE_LIBRARY
+	-DTERMCAP_LIB="-lcurses"
 
 %.$O: $RLSRC/%.c
 	$CC $CFLAGS $RLSRC/$stem.c
 
 install:V: $O.rl
 	cp $O.rl $BIN/rl
+	chmod +x $BIN/rl
 
-$O.rl: $RLSRC/exapmles/rl.c $LIB $TERMCAP
-	$CC $prereq -o $target
+$O.rl: $RLSRC/examples/rl.c $LIB $TERMCAP
+	$CC $CFLAGS $prereq -o $target
 
 
 

@@ -109,7 +109,6 @@ default:V:
 install:V:
 	mk -f mkfile.libpcre $target
 	mk -f mkfile.libpcreposix $target
-	cp pcre2-config $APEXPROOT/rc/bin/ape
 	for (i in $MAN1)
 		@{ cd $PCRESRC/doc; cp $i.1 $APEXPROOT/sys/man/1/$i }
 	for (i in $MAN3) 
@@ -118,7 +117,6 @@ install:V:
 installall:V:
 	mk -f mkfile.libpcre install
 	mk -f mkfile.libpcreposix install
-	cp pcre2-config $APEXPROOT/rc/bin/ape
 	for (i in $MAN1)
 		@{ cd $PCRESRC/doc; cp $i.1 $APEXPROOT/sys/man/1/$i }
 	for (i in $MAN3) 

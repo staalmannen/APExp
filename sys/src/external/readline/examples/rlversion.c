@@ -27,7 +27,7 @@
 
 #include <stdio.h>
 #include <sys/types.h>
-#include "posixstat.h"
+//#include "posixstat.h"
 
 #ifdef HAVE_STDLIB_H
 #  include <stdlib.h>
