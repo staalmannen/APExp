@@ -172,28 +172,28 @@ CFLAGS=-c -I. -I$BISONSRC -B -DHAVE_CONFIG_H\
 		-DLOCALEDIR="/sys/lib/ape/locale"
 
 bison-%.$O: $BISONSRC/src/%.c
-	$CC $CFLAGS -c $source -o $target
+	$CC $CFLAGS -c $prereq -o $target
 
 libbison_a-%.$O: $BISONSRC/lib/%.c
-	$CC $CFLAGS -c $source -o $target
+	$CC $CFLAGS $prereq -o $target
 
 libbison_a-%.$O: $BISONSRC/lib/bitset/%.c
-	$CC $CFLAGS -c $source -o $target
+	$CC $CFLAGS $prereq -o $target
 
 libbison_a-%.$O: $BISONSRC/lib/malloc/%.c
-	$CC $CFLAGS -c $source -o $target
+	$CC $CFLAGS $prereq -o $target
 
 libbison_a-%.$O: $BISONSRC/lib/unistr/%.c
-	$CC $CFLAGS -c $source -o $target
+	$CC $CFLAGS $prereq -o $target
 
 libbison_a-%.$O: $BISONSRC/lib/glthread/%.c
-	$CC $CFLAGS -c $source -o $target
+	$CC $CFLAGS $prereq -o $target
 
 libbison_a-%.$O: $BISONSRC/lib/uniqidth/%.c
-	$CC $CFLAGS -c $source -o $target
+	$CC $CFLAGS $prereq -o $target
 
 liby_a-%.$O: $BISONSRC/lib/%.c
-	$CC $CFLAGS -c $source -o $target
+	$CC $CFLAGS $prereq -o $target
 
 
 libbison.a$O: $LIB_OBJS

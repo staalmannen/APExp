@@ -5,7 +5,7 @@ APE=$APEXPROOT/sys/src/ape
 LIB=$APEXPROOT/$objtype/lib/ape/libtcl.a
 
 UNIX_OBJS = tclUnixChan.$O tclUnixEvent.$O\
-#	tclUnixFCmd.$O \
+	tclUnixFCmd.$O \
 	tclUnixFile.$O tclUnixPipe.$O tclUnixSock.$O \
 	tclUnixTime.$O tclUnixInit.$O tclUnixThrd.$O \
 	tclUnixCompat.$O
@@ -82,11 +82,8 @@ HFILES=\
 
 <$APEXPROOT/sys/src/cmd/mklib
 
-CFLAGS=-FVp -c -I$TCLSRC/plan9 -I$TCLSRC/generic -I$TCLSRC/unix\
+CFLAGS=-FVp -c -I. -I$TCLSRC/generic -I$TCLSRC/unix\
 	-I$TCLSRC/libtommath -DHAVE_TCL_CONFIG_H -DPLAN9 -DMODULE_SCOPE=/**/
-
-%.$O: $TCLSRC/plan9/%.c
-	$CC $CFLAGS $TCLSRC/plan9/$stem.c
 
 %.$O: $TCLSRC/libtommath/%.c
 	$CC $CFLAGS $TCLSRC/libtommath/$stem.c

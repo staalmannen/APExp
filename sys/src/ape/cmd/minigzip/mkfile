@@ -18,7 +18,7 @@ CC=pcc
 LD=pcc
 CFLAGS= -c -D_POSIX_SOURCE
 
-%.$O: $ZSRC/%.c
-    $CC $CFLAGS $ZSRC/$stem.c
+%.$O: $ZSRC/test/%.c
+    $CC $CFLAGS $ZSRC/test/$stem.c
 
 
