@@ -13,7 +13,7 @@ CC=pcc
 CLD=$LD
 LD=pcc
 
-BIN=/$objtype/bin/
+BIN=/$objtype/bin/ape
 
 CFLAGS=-FV
 
