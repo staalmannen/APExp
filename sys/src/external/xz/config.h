@@ -1,5 +1,5 @@
-/* config.h.  Generated from config.h.in by configure.  */
-/* config.h.in.  Generated from configure.ac by autoheader. */
+/* config.h.  Generated from config.h.in by configure. */
+/* config.h.in.  Generated from configure.ac by autoheader. UNSAFE*/
 
 /* Define if building universal (internal helper macro) */
 /* #undef AC_APPLE_UNIVERSAL_BUILD */
@@ -365,7 +365,7 @@
 
 /* Define to 1 if the GNU C extensions __builtin_bswap16/32/64 are supported.
    */
-#define HAVE___BUILTIN_BSWAPXX 1
+// #undef HAVE___BUILTIN_BSWAPXX
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
@@ -472,7 +472,7 @@
 /* Define to 1 to use unsafe type punning, e.g. char *x = ...; *(int *)x =
    123; which violates strict aliasing rules and thus is undefined behavior
    and might result in broken code. */
-/* #undef TUKLIB_USE_UNSAFE_TYPE_PUNNING */
+#define TUKLIB_USE_UNSAFE_TYPE_PUNNING 1
 
 /* Enable extensions on AIX, Interix, z/OS.  */
 #ifndef _ALL_SOURCE
