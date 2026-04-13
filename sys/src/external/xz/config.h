@@ -1,5 +1,5 @@
 /* config.h.  Generated from config.h.in by configure.  */
-/* config.h.in.  Generated from configure.ac by autoheader.  */
+/* config.h.in.  Generated from configure.ac by autoheader. SCHED */
 
 /* Define if building universal (internal helper macro) */
 /* #undef AC_APPLE_UNIVERSAL_BUILD */
@@ -427,7 +427,7 @@
 
 /* Define to 1 if the number of available CPU cores can be detected with
    sched_getaffinity() */
-#define TUKLIB_CPUCORES_SCHED_GETAFFINITY 1
+// #undef TUKLIB_CPUCORES_SCHED_GETAFFINITY
 
 /* Define to 1 if the number of available CPU cores can be detected with
    sysconf(_SC_NPROCESSORS_ONLN) or sysconf(_SC_NPROC_ONLN). */

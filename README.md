@@ -72,7 +72,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - strings.h shim pointing to bsd.h
 - stdio.h : added fmemopen, getdelim/getline from musl libc
 - wchar.h/wctype.h provided by the thin "libwtf" [12]
-- readline.h provided by libedit
+- readline headers provided by GNU readline
 - curses.h, term.h, panel.h provided by PDCursesMod
 
 ***Libraries***
@@ -87,7 +87,7 @@ Install paths have been modified so that libraries and binaries are installed in
 
 **3rd party**
 - libcurses : PDCursesMod (check out 2026-04-08; built with utf8/wchar)
-- libedit (version 3.1 2025-10-16)
+- readline (version 8.3)
 - libpcre2 (version 10.47)
 - liblzma (from xz version 5.8.3)
 - libz (version 1.3.2)

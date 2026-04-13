@@ -17,7 +17,7 @@ _CORE_APP_DEPENDENCIES=\
 _OPTIONAL_LIBS=\
 	bz2\
 	curses\
-	edit\
+	readline\
 	fortran\
 	lua\
 	lzma\
@@ -25,12 +25,6 @@ _OPTIONAL_LIBS=\
 	pcre2\
 	tcl\
 	z\
-# gettext\
-	gettextpo\
-	textstyle\
-	croco\
-	glib\
-	xml2\
 
 DIRS=\
 	$_CORE_LIBS\
