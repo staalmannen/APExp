@@ -62,6 +62,7 @@ OFILES=\
 	wcstombs.$O\
 	wctob.$O\
 	wctomb.$O\
+	internal.$O\
 
 HFILES=\
 	$APEXPROOT/sys/include/ape/utf.h\
