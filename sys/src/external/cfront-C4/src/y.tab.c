@@ -144,7 +144,7 @@ union  __Q2_2ea4__C1 __O1__2ea ;
 };
 
 # 1 ""
-extern void *__nw__FUl (unsigned long );
+extern void *__nw__FUl (size_t );
 
 # 80 "/home/claude/cfront-3/src/cfront.h"
 extern struct ea *ea0 ;
@@ -736,15 +736,15 @@ struct type *__0__X6 ;
 struct node *__0__X1 ;
 
 # 708 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (unsigned long )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
+if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (size_t )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (unsigned long )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
+(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (size_t )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( (
+(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( (
 # 708 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( (__0__X6 = (struct type *)( (__0__X1 = (((struct node *)__0__X6 ))), ( ((__0__X1 ||
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
+(__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
 # 708 "/home/claude/cfront-3/src/cfront.h"
 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X6 -> defined__4type = 0 )) , (__0__X6 ->
 # 708 "/home/claude/cfront-3/src/cfront.h"
@@ -2519,7 +2519,7 @@ static char *get_classname__FPCc (const char *__1s )
 char *__1r ;
 
 # 284 "gram.y"
-__1r = (((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (strlen ( __1s ) + 1 ))) ));
+__1r = (((char *)__nw__FUl ( (size_t)((sizeof (char ))* (strlen ( __1s ) + 1 ))) ));
 sprintf ( __1r , (const char *)"%s", __1s ) ;
 { char *__1s2 ;
 
@@ -2668,7 +2668,7 @@ __1b = ( (__0__X46 = 0 ), ( (__2__X47 = 0 ), ( ((__0__X46 || (__0__X46 = (struct
 # 327 "gram.y"
 )(sizeof (struct basecl))) ))?( (__0__X46 = (struct basecl *)( (__0__X9 = (((struct node *)__0__X46 ))), ( ((__0__X9 || (__0__X9 = (struct node *)__nw__FUl (
 # 327 "gram.y"
-(unsigned long )(sizeof (struct node))) ))?( ( (__0__X9 -> base__4node = 0 ), (__0__X9 -> permanent__4node = 0 )) , (__0__X9 ->
+(size_t )(sizeof (struct node))) ))?( ( (__0__X9 -> base__4node = 0 ), (__0__X9 -> permanent__4node = 0 )) , (__0__X9 ->
 # 327 "gram.y"
 baseclass__4node = 0 )) :0 ), __0__X9 ) ) ), ( (__0__X46 -> baseclass__4node = 1 ), ( (__0__X46 -> bclass__6basecl = ((struct
 # 327 "gram.y"
@@ -6983,15 +6983,15 @@ struct type *__0__X6 ;
 struct node *__0__X1 ;
 
 # 693 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct vec *)__nw__3vecSFUl ( (unsigned long )(sizeof (struct vec))) )){ __0this = (struct vec *)( (__0__X7 =
+if (__0this || (__0this = (struct vec *)__nw__3vecSFUl ( (size_t )(sizeof (struct vec))) )){ __0this = (struct vec *)( (__0__X7 =
 # 693 "/home/claude/cfront-3/src/cfront.h"
-(((struct pvtyp *)__0this ))), ( ((__0__X7 || (__0__X7 = (struct pvtyp *)__nw__FUl ( (unsigned long )(sizeof (struct pvtyp))) ))?(__0__X7 = (struct pvtyp *)(
+(((struct pvtyp *)__0this ))), ( ((__0__X7 || (__0__X7 = (struct pvtyp *)__nw__FUl ( (size_t )(sizeof (struct pvtyp))) ))?(__0__X7 = (struct pvtyp *)(
 # 693 "/home/claude/cfront-3/src/cfront.h"
-(__0__X6 = (((struct type *)__0__X7 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( (
+(__0__X6 = (((struct type *)__0__X7 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( (
 # 693 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( (__0__X6 = (struct type *)( (__0__X1 = (((struct node *)__0__X6 ))), ( ((__0__X1 ||
 # 693 "/home/claude/cfront-3/src/cfront.h"
-(__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
+(__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
 # 693 "/home/claude/cfront-3/src/cfront.h"
 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X6 -> defined__4type = 0 )) , (__0__X6 ->
 # 693 "/home/claude/cfront-3/src/cfront.h"
@@ -8538,7 +8538,7 @@ in_arg_list = 0 ;
 # 1292 "gram.y"
 yyval . el__7YYSTYPE = ( (__0__X114 = 0 ), ( (__2__X115 = __ct__4exprFUcP4exprT2 ( (struct expr *)0 , (unsigned char )140 , (yystack .
 # 1292 "gram.y"
-l_mark__11YYSTACKDATA [0 ]). pe__7YYSTYPE , (struct expr *)0 ) ), ( ((__0__X114 || (__0__X114 = (struct elist *)__nw__FUl ( (unsigned long )(sizeof (struct elist)))
+l_mark__11YYSTACKDATA [0 ]). pe__7YYSTYPE , (struct expr *)0 ) ), ( ((__0__X114 || (__0__X114 = (struct elist *)__nw__FUl ( (size_t )(sizeof (struct elist)))
 # 1292 "gram.y"
 ))?( (__0__X114 -> head__5elist = (__0__X114 -> tail__5elist = __2__X115 )), 0 ) :0 ), __0__X114 ) ) ) ;
 
@@ -10858,7 +10858,7 @@ struct stmt *__2__X158 ;
 # 2208 "gram.y"
 yyval . sl__7YYSTYPE = ( (__0__X157 = 0 ), ( (__2__X158 = (yystack . l_mark__11YYSTACKDATA [0 ]). ps__7YYSTYPE ), ( ((__0__X157 || (__0__X157 = (struct
 # 2208 "gram.y"
-slist *)__nw__FUl ( (unsigned long )(sizeof (struct slist))) ))?( (__0__X157 -> head__5slist = (__0__X157 -> tail__5slist = __2__X158 )), 0 ) :0 ), __0__X157 )
+slist *)__nw__FUl ( (size_t )(sizeof (struct slist))) ))?( (__0__X157 -> head__5slist = (__0__X157 -> tail__5slist = __2__X158 )), 0 ) :0 ), __0__X157 )
 # 2208 "gram.y"
 ) ) ;
 stmt_seen = 1 ;
@@ -10939,7 +10939,7 @@ __3n = name_unlist__FP5nlist ( cd ) ;
 __3ss = stmt_unlist__FP5slist ( (yystack . l_mark__11YYSTACKDATA [-1]). sl__7YYSTYPE ) ;
 yyval . p__7YYSTYPE = (struct node *)( (__0__X159 = 0 ), ( (__2__X160 = (yystack . l_mark__11YYSTACKDATA [-3]). l__7YYSTYPE ), ( (__2__X161 = (yystack .
 # 2246 "gram.y"
-l_mark__11YYSTACKDATA [0 ]). l__7YYSTYPE ), ( ((__0__X159 || (__0__X159 = (struct block *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct block))) ))?(((void )( (__0__X159 =
+l_mark__11YYSTACKDATA [0 ]). l__7YYSTYPE ), ( ((__0__X159 || (__0__X159 = (struct block *)__nw__4stmtSFUl ( (size_t )(sizeof (struct block))) ))?(((void )( (__0__X159 =
 # 2246 "gram.y"
 (struct block *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X159 ), (unsigned char )116 , __2__X160 , __3ss ) ), ( (__0__X159 -> __O1__4stmt.d = __3n ),
 # 2246 "gram.y"
@@ -11013,7 +11013,7 @@ struct loc __2__X165 ;
 # 2256 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X163 = 0 ), ( (__2__X164 = (yystack . l_mark__11YYSTACKDATA [-1]). l__7YYSTYPE ), ( (__2__X165 = (yystack .
 # 2256 "gram.y"
-l_mark__11YYSTACKDATA [0 ]). l__7YYSTYPE ), ( ((__0__X163 || (__0__X163 = (struct block *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct block))) ))?(((void )( (__0__X163 =
+l_mark__11YYSTACKDATA [0 ]). l__7YYSTYPE ), ( ((__0__X163 || (__0__X163 = (struct block *)__nw__4stmtSFUl ( (size_t )(sizeof (struct block))) ))?(((void )( (__0__X163 =
 # 2256 "gram.y"
 (struct block *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X163 ), (unsigned char )116 , __2__X164 , ((struct stmt *)0 )) ), ( (__0__X163 -> __O1__4stmt.d =
 # 2256 "gram.y"
@@ -11074,7 +11074,7 @@ struct loc __2__X168 ;
 # 2260 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X166 = 0 ), ( (__2__X167 = (yystack . l_mark__11YYSTACKDATA [-2]). l__7YYSTYPE ), ( (__2__X168 = (yystack .
 # 2260 "gram.y"
-l_mark__11YYSTACKDATA [0 ]). l__7YYSTYPE ), ( ((__0__X166 || (__0__X166 = (struct block *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct block))) ))?(((void )( (__0__X166 =
+l_mark__11YYSTACKDATA [0 ]). l__7YYSTYPE ), ( ((__0__X166 || (__0__X166 = (struct block *)__nw__4stmtSFUl ( (size_t )(sizeof (struct block))) ))?(((void )( (__0__X166 =
 # 2260 "gram.y"
 (struct block *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X166 ), (unsigned char )116 , __2__X167 , ((struct stmt *)0 )) ), ( (__0__X166 -> __O1__4stmt.d =
 # 2260 "gram.y"
@@ -11135,7 +11135,7 @@ struct expr *__2__X171 ;
 # 2266 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X169 = 0 ), ( (__2__X170 = curloc ), ( (__2__X171 = (yystack . l_mark__11YYSTACKDATA [0 ]). pe__7YYSTYPE ),
 # 2266 "gram.y"
-( ((__0__X169 || (__0__X169 = (struct estmt *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct estmt))) ))?( (__0__X169 = (struct estmt *)__ct__4stmtFUc3locP4stmt ( ((struct
+( ((__0__X169 || (__0__X169 = (struct estmt *)__nw__4stmtSFUl ( (size_t )(sizeof (struct estmt))) ))?( (__0__X169 = (struct estmt *)__ct__4stmtFUc3locP4stmt ( ((struct
 # 2266 "gram.y"
 stmt *)__0__X169 ), ((unsigned char )72 ), __2__X170 , ((struct stmt *)0 )) ), (__0__X169 -> __O2__4stmt.e = __2__X171 )) :0 ), __0__X169 ) )
 # 2266 "gram.y"
@@ -11183,7 +11183,7 @@ struct name *__2__X174 ;
 # 2272 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X172 = 0 ), ( (__2__X173 = (yystack . l_mark__11YYSTACKDATA [-1]). l__7YYSTYPE ), ( (__2__X174 = (yystack .
 # 2272 "gram.y"
-l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X172 || (__0__X172 = (struct lstmt *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct lstmt))) ))?( (__0__X172 = (struct
+l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X172 || (__0__X172 = (struct lstmt *)__nw__4stmtSFUl ( (size_t )(sizeof (struct lstmt))) ))?( (__0__X172 = (struct
 # 2272 "gram.y"
 lstmt *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X172 ), ((unsigned char )19 ), __2__X173 , ((struct stmt *)0 )) ), (__0__X172 -> __O1__4stmt.d = __2__X174 )) :0 ),
 # 2272 "gram.y"
@@ -11249,7 +11249,7 @@ if (stmt_seen )
 # 2278 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X179 = 0 ), ( (__2__X180 = curloc ), ( (__2__X181 = (((struct expr *)(((struct
 # 2278 "gram.y"
-expr *)(yystack . l_mark__11YYSTACKDATA [-1]). s__7YYSTYPE ))))), ( ((__0__X179 || (__0__X179 = (struct estmt *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct estmt))) ))?( (__0__X179 =
+expr *)(yystack . l_mark__11YYSTACKDATA [-1]). s__7YYSTYPE ))))), ( ((__0__X179 || (__0__X179 = (struct estmt *)__nw__4stmtSFUl ( (size_t )(sizeof (struct estmt))) ))?( (__0__X179 =
 # 2278 "gram.y"
 (struct estmt *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X179 ), ((unsigned char )1 ), __2__X180 , ((struct stmt *)0 )) ), (__0__X179 -> __O2__4stmt.e = __2__X181 ))
 # 2278 "gram.y"
@@ -11306,7 +11306,7 @@ struct expr *__2__X184 ;
 # 2302 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X182 = 0 ), ( (__2__X183 = curloc ), ( (__2__X184 = dummy ), ( ((__0__X182 ||
 # 2302 "gram.y"
-(__0__X182 = (struct estmt *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct estmt))) ))?( (__0__X182 = (struct estmt *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X182 ), ((unsigned
+(__0__X182 = (struct estmt *)__nw__4stmtSFUl ( (size_t )(sizeof (struct estmt))) ))?( (__0__X182 = (struct estmt *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X182 ), ((unsigned
 # 2302 "gram.y"
 char )72 ), __2__X183 , ((struct stmt *)0 )) ), (__0__X182 -> __O2__4stmt.e = __2__X184 )) :0 ), __0__X182 ) ) ) )
 # 2302 "gram.y"
@@ -11332,7 +11332,7 @@ struct expr *__2__X187 ;
 # 2304 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X185 = 0 ), ( (__2__X186 = (yystack . l_mark__11YYSTACKDATA [-2]). l__7YYSTYPE ), ( (__2__X187 = (yystack .
 # 2304 "gram.y"
-l_mark__11YYSTACKDATA [-1]). pe__7YYSTYPE ), ( ((__0__X185 || (__0__X185 = (struct estmt *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct estmt))) ))?( (__0__X185 = (struct
+l_mark__11YYSTACKDATA [-1]). pe__7YYSTYPE ), ( ((__0__X185 || (__0__X185 = (struct estmt *)__nw__4stmtSFUl ( (size_t )(sizeof (struct estmt))) ))?( (__0__X185 = (struct
 # 2304 "gram.y"
 estmt *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X185 ), ((unsigned char )28 ), __2__X186 , ((struct stmt *)0 )) ), (__0__X185 -> __O2__4stmt.e = __2__X187 )) :0 ),
 # 2304 "gram.y"
@@ -11374,7 +11374,7 @@ struct loc __2__X190 ;
 # 2315 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X188 = 0 ), ( (__2__X189 = __3n -> where__4name ), ( (__2__X190 = noloc ), (
 # 2315 "gram.y"
-((__0__X188 || (__0__X188 = (struct block *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct block))) ))?(((void )( (__0__X188 = (struct block *)__ct__4stmtFUc3locP4stmt ( ((struct
+((__0__X188 || (__0__X188 = (struct block *)__nw__4stmtSFUl ( (size_t )(sizeof (struct block))) ))?(((void )( (__0__X188 = (struct block *)__ct__4stmtFUc3locP4stmt ( ((struct
 # 2315 "gram.y"
 stmt *)__0__X188 ), (unsigned char )116 , __2__X189 , ((struct stmt *)0 )) ), ( (__0__X188 -> __O1__4stmt.d = __3n ), (__0__X188 -> __O3__4stmt.where2 =
 # 2315 "gram.y"
@@ -11406,7 +11406,7 @@ struct loc __2__X193 ;
 # 2328 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X191 = 0 ), ( (__2__X192 = curloc ), ( (__2__X193 = noloc ), ( ((__0__X191 ||
 # 2328 "gram.y"
-(__0__X191 = (struct block *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct block))) ))?(((void )( (__0__X191 = (struct block *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X191 ),
+(__0__X191 = (struct block *)__nw__4stmtSFUl ( (size_t )(sizeof (struct block))) ))?(((void )( (__0__X191 = (struct block *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X191 ),
 # 2328 "gram.y"
 (unsigned char )116 , __2__X192 , ((struct stmt *)0 )) ), ( (__0__X191 -> __O1__4stmt.d = ((struct name *)0 )), (__0__X191 -> __O3__4stmt.where2 =
 # 2328 "gram.y"
@@ -11471,7 +11471,7 @@ yyval . p__7YYSTYPE = (struct node *)( (__0__X194 = 0 ), ( (__2__X195 = (yystack
 # 2345 "gram.y"
 l_mark__11YYSTACKDATA [-1]). pe__7YYSTYPE ), ( (__2__X197 = (yystack . l_mark__11YYSTACKDATA [0 ]). ps__7YYSTYPE ), ( (__2__X198 = 0 ), ( ((__0__X194 || (__0__X194 = (struct
 # 2345 "gram.y"
-ifstmt *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct ifstmt))) ))?( (__0__X194 = (struct ifstmt *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X194 ), (unsigned char )20 ,
+ifstmt *)__nw__4stmtSFUl ( (size_t )(sizeof (struct ifstmt))) ))?( (__0__X194 = (struct ifstmt *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X194 ), (unsigned char )20 ,
 # 2345 "gram.y"
 __2__X195 , __2__X197 ) ), ( (__0__X194 -> __O2__4stmt.e = __2__X196 ), (__0__X194 -> __O3__4stmt.else_stmt = __2__X198 )) ) :0 ), __0__X194 ) )
 # 2345 "gram.y"
@@ -11505,7 +11505,7 @@ yyval . p__7YYSTYPE = (struct node *)( (__0__X199 = 0 ), ( (__2__X200 = (yystack
 # 2347 "gram.y"
 l_mark__11YYSTACKDATA [-3]). pe__7YYSTYPE ), ( (__2__X202 = (yystack . l_mark__11YYSTACKDATA [-2]). ps__7YYSTYPE ), ( (__2__X203 = (yystack . l_mark__11YYSTACKDATA [0 ]). ps__7YYSTYPE ), ( ((__0__X199 ||
 # 2347 "gram.y"
-(__0__X199 = (struct ifstmt *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct ifstmt))) ))?( (__0__X199 = (struct ifstmt *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X199 ), (unsigned
+(__0__X199 = (struct ifstmt *)__nw__4stmtSFUl ( (size_t )(sizeof (struct ifstmt))) ))?( (__0__X199 = (struct ifstmt *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X199 ), (unsigned
 # 2347 "gram.y"
 char )20 , __2__X200 , __2__X202 ) ), ( (__0__X199 -> __O2__4stmt.e = __2__X201 ), (__0__X199 -> __O3__4stmt.else_stmt = __2__X203 )) ) :0 ),
 # 2347 "gram.y"
@@ -11580,7 +11580,7 @@ yyval . p__7YYSTYPE = (struct node *)( (__0__X208 = 0 ), ( (__2__X209 = (yystack
 # 2351 "gram.y"
 l_mark__11YYSTACKDATA [-5]). ps__7YYSTYPE ), ( (__2__X211 = (yystack . l_mark__11YYSTACKDATA [-4]). pe__7YYSTYPE ), ( (__2__X212 = (yystack . l_mark__11YYSTACKDATA [-2]). pe__7YYSTYPE ), ( (__2__X213 =
 # 2351 "gram.y"
-(yystack . l_mark__11YYSTACKDATA [0 ]). ps__7YYSTYPE ), ( ((__0__X208 || (__0__X208 = (struct forstmt *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct forstmt))) ))?( (__0__X208 =
+(yystack . l_mark__11YYSTACKDATA [0 ]). ps__7YYSTYPE ), ( ((__0__X208 || (__0__X208 = (struct forstmt *)__nw__4stmtSFUl ( (size_t )(sizeof (struct forstmt))) ))?( (__0__X208 =
 # 2351 "gram.y"
 (struct forstmt *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X208 ), (unsigned char )16 , __2__X209 , __2__X213 ) ), ( (__0__X208 -> __O3__4stmt.for_init = __2__X210 ),
 # 2351 "gram.y"
@@ -11659,7 +11659,7 @@ struct stmt *__2__X220 ;
 __3n = (yystack . l_mark__11YYSTACKDATA [-1]). pn__7YYSTYPE ;
 yyval . p__7YYSTYPE = (struct node *)( (__0__X218 = 0 ), ( (__2__X219 = __3n -> where__4name ), ( (__2__X220 = (yystack . l_mark__11YYSTACKDATA [0 ]).
 # 2359 "gram.y"
-ps__7YYSTYPE ), ( ((__0__X218 || (__0__X218 = (struct lstmt *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct lstmt))) ))?( (__0__X218 = (struct lstmt *)__ct__4stmtFUc3locP4stmt (
+ps__7YYSTYPE ), ( ((__0__X218 || (__0__X218 = (struct lstmt *)__nw__4stmtSFUl ( (size_t )(sizeof (struct lstmt))) ))?( (__0__X218 = (struct lstmt *)__ct__4stmtFUc3locP4stmt (
 # 2359 "gram.y"
 ((struct stmt *)__0__X218 ), ((unsigned char )115 ), __2__X219 , __2__X220 ) ), (__0__X218 -> __O1__4stmt.d = __3n )) :0 ), __0__X218 ) )
 # 2359 "gram.y"
@@ -11697,7 +11697,7 @@ struct stmt *__2__X223 ;
 __3n = (yystack . l_mark__11YYSTACKDATA [-1]). pn__7YYSTYPE ;
 yyval . p__7YYSTYPE = (struct node *)( (__0__X221 = 0 ), ( (__2__X222 = __3n -> where__4name ), ( (__2__X223 = (yystack . l_mark__11YYSTACKDATA [0 ]).
 # 2363 "gram.y"
-ps__7YYSTYPE ), ( ((__0__X221 || (__0__X221 = (struct lstmt *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct lstmt))) ))?( (__0__X221 = (struct lstmt *)__ct__4stmtFUc3locP4stmt (
+ps__7YYSTYPE ), ( ((__0__X221 || (__0__X221 = (struct lstmt *)__nw__4stmtSFUl ( (size_t )(sizeof (struct lstmt))) ))?( (__0__X221 = (struct lstmt *)__ct__4stmtFUc3locP4stmt (
 # 2363 "gram.y"
 ((struct stmt *)__0__X221 ), ((unsigned char )115 ), __2__X222 , __2__X223 ) ), (__0__X221 -> __O1__4stmt.d = __3n )) :0 ), __0__X221 ) )
 # 2363 "gram.y"
@@ -11784,7 +11784,7 @@ struct stmt *__2__X230 ;
 # 2377 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X228 = 0 ), ( (__2__X229 = (yystack . l_mark__11YYSTACKDATA [-1]). ps__7YYSTYPE ), ( (__2__X230 = stmt_unlist__FP5slist (
 # 2377 "gram.y"
-(yystack . l_mark__11YYSTACKDATA [0 ]). sl__7YYSTYPE ) ), ( ((__0__X228 || (__0__X228 = (struct handler *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct handler))) ))?(((void
+(yystack . l_mark__11YYSTACKDATA [0 ]). sl__7YYSTYPE ) ), ( ((__0__X228 || (__0__X228 = (struct handler *)__nw__4stmtSFUl ( (size_t )(sizeof (struct handler))) ))?(((void
 # 2377 "gram.y"
 )( (__0__X228 = (struct handler *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X228 ), (unsigned char )116 , __2__X229 ?__2__X229 -> where__4stmt :curloc , __2__X229 ) ), (
 # 2377 "gram.y"
@@ -11835,7 +11835,7 @@ struct stmt *__2__X234 ;
 # 2389 "gram.y"
 yyval . sl__7YYSTYPE = ( (__0__X233 = 0 ), ( (__2__X234 = (yystack . l_mark__11YYSTACKDATA [0 ]). ps__7YYSTYPE ), ( ((__0__X233 || (__0__X233 = (struct
 # 2389 "gram.y"
-slist *)__nw__FUl ( (unsigned long )(sizeof (struct slist))) ))?( (__0__X233 -> head__5slist = (__0__X233 -> tail__5slist = __2__X234 )), 0 ) :0 ), __0__X233 )
+slist *)__nw__FUl ( (size_t )(sizeof (struct slist))) ))?( (__0__X233 -> head__5slist = (__0__X233 -> tail__5slist = __2__X234 )), 0 ) :0 ), __0__X233 )
 # 2389 "gram.y"
 ) ) ;
 stmt_seen = 1 ;
@@ -11899,7 +11899,7 @@ Pexpr __4ee2 ;
 # 2424 "gram.y"
 __4ee2 = __3e -> __O3__4expr.e2 ;
 if (__4ee2 )error__FPCc ( (const char *)"EX inEL") ;
-( (__3e ?(((void )(__3e ?(((void )(((void )__dl__4exprSFPvUl ( (void *)__3e , (unsigned long )(sizeof (struct expr))) )))):(((void )0 ))))):(((void )0 ))))
+( (__3e ?(((void )(__3e ?(((void )(((void )__dl__4exprSFPvUl ( (void *)__3e , (size_t )(sizeof (struct expr))) )))):(((void )0 ))))):(((void )0 ))))
 # 2426 "gram.y"
 ;
 __3e = __4ee2 ;
@@ -11921,7 +11921,7 @@ struct expr *__2__X236 ;
 # 2434 "gram.y"
 yyval . el__7YYSTYPE = ( (__0__X235 = 0 ), ( (__2__X236 = __ct__4exprFUcP4exprT2 ( (struct expr *)0 , (unsigned char )140 , (yystack .
 # 2434 "gram.y"
-l_mark__11YYSTACKDATA [0 ]). pe__7YYSTYPE , (struct expr *)0 ) ), ( ((__0__X235 || (__0__X235 = (struct elist *)__nw__FUl ( (unsigned long )(sizeof (struct elist)))
+l_mark__11YYSTACKDATA [0 ]). pe__7YYSTYPE , (struct expr *)0 ) ), ( ((__0__X235 || (__0__X235 = (struct elist *)__nw__FUl ( (size_t )(sizeof (struct elist)))
 # 2434 "gram.y"
 ))?( (__0__X235 -> head__5elist = (__0__X235 -> tail__5elist = __2__X236 )), 0 ) :0 ), __0__X235 ) ) ) ;
 
@@ -12545,7 +12545,7 @@ struct texpr *__0__X247 ;
 
 # 2558 "gram.y"
 __3t = (yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE -> __O1__4expr.tp ;
-yyval . p__7YYSTYPE = (struct node *)( (__0__X247 = 0 ), ( ((__0__X247 || (__0__X247 = (struct texpr *)__nw__4exprSFUl ( (unsigned long )(sizeof
+yyval . p__7YYSTYPE = (struct node *)( (__0__X247 = 0 ), ( ((__0__X247 || (__0__X247 = (struct texpr *)__nw__4exprSFUl ( (size_t)(sizeof
 # 2559 "gram.y"
 (struct texpr))) ))?( (__0__X247 = (struct texpr *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X247 ), ((unsigned char )23 ), ((struct expr *)0 ), (struct expr *)0 )
 # 2559 "gram.y"
@@ -12578,7 +12578,7 @@ struct texpr *__0__X248 ;
 
 # 2565 "gram.y"
 __3t = (yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE -> __O1__4expr.tp ;
-yyval . p__7YYSTYPE = (struct node *)( (__0__X248 = 0 ), ( ((__0__X248 || (__0__X248 = (struct texpr *)__nw__4exprSFUl ( (unsigned long )(sizeof
+yyval . p__7YYSTYPE = (struct node *)( (__0__X248 = 0 ), ( ((__0__X248 || (__0__X248 = (struct texpr *)__nw__4exprSFUl ( (size_t)(sizeof
 # 2566 "gram.y"
 (struct texpr))) ))?( (__0__X248 = (struct texpr *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X248 ), ((unsigned char )184 ), ((struct expr *)0 ), (struct expr *)0 )
 # 2566 "gram.y"
@@ -12617,7 +12617,7 @@ struct expr *__2__X251 ;
 # 2573 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X249 = 0 ), ( (__2__X250 = (yystack . l_mark__11YYSTACKDATA [-1]). pn__7YYSTYPE -> __O1__4expr.tp ), ( (__2__X251 =
 # 2573 "gram.y"
-(yystack . l_mark__11YYSTACKDATA [0 ]). pe__7YYSTYPE ), ( ((__0__X249 || (__0__X249 = (struct texpr *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct texpr))) ))?( (__0__X249 =
+(yystack . l_mark__11YYSTACKDATA [0 ]). pe__7YYSTYPE ), ( ((__0__X249 || (__0__X249 = (struct texpr *)__nw__4exprSFUl ( (size_t )(sizeof (struct texpr))) ))?( (__0__X249 =
 # 2573 "gram.y"
 (struct texpr *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X249 ), ((unsigned char )113 ), __2__X251 , (struct expr *)0 ) ), (__0__X249 -> __O4__4expr.tp2 = __2__X250 ))
 # 2573 "gram.y"
@@ -12715,7 +12715,7 @@ struct expr *__2__X253 ;
 # 2591 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X252 = 0 ), ( (__2__X253 = (yystack . l_mark__11YYSTACKDATA [0 ]). pe__7YYSTYPE ), ( ((__0__X252 || (__0__X252 =
 # 2591 "gram.y"
-(struct texpr *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct texpr))) ))?( (__0__X252 = (struct texpr *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X252 ), ((unsigned char
+(struct texpr *)__nw__4exprSFUl ( (size_t )(sizeof (struct texpr))) ))?( (__0__X252 = (struct texpr *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X252 ), ((unsigned char
 # 2591 "gram.y"
 )30 ), __2__X253 , (struct expr *)0 ) ), (__0__X252 -> __O4__4expr.tp2 = ((struct type *)0 ))) :0 ), __0__X252 ) ) ) ;
 # 2591 "gram.y"
@@ -12738,7 +12738,7 @@ struct type *__2__X255 ;
 # 2596 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X254 = 0 ), ( (__2__X255 = (yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE -> __O1__4expr.tp ), ( ((__0__X254 ||
 # 2596 "gram.y"
-(__0__X254 = (struct texpr *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct texpr))) ))?( (__0__X254 = (struct texpr *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X254 ), ((unsigned
+(__0__X254 = (struct texpr *)__nw__4exprSFUl ( (size_t )(sizeof (struct texpr))) ))?( (__0__X254 = (struct texpr *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X254 ), ((unsigned
 # 2596 "gram.y"
 char )30 ), ((struct expr *)0 ), (struct expr *)0 ) ), (__0__X254 -> __O4__4expr.tp2 = __2__X255 )) :0 ), __0__X254 ) ) )
 # 2596 "gram.y"
@@ -12774,7 +12774,7 @@ struct expr *__2__X258 ;
 # 2602 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X256 = 0 ), ( (__2__X257 = (yystack . l_mark__11YYSTACKDATA [-2]). pe__7YYSTYPE ), ( (__2__X258 = (struct
 # 2602 "gram.y"
-expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X256 || (__0__X256 = (struct ref *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct ref))) ))?( (__0__X256 =
+expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X256 || (__0__X256 = (struct ref *)__nw__4exprSFUl ( (size_t )(sizeof (struct ref))) ))?( (__0__X256 =
 # 2602 "gram.y"
 (struct ref *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X256 ), ((unsigned char )44 ), __2__X257 , (struct expr *)0 ) ), (__0__X256 -> __O4__4expr.mem = __2__X258 ))
 # 2602 "gram.y"
@@ -12801,7 +12801,7 @@ struct expr *__2__X261 ;
 (yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE -> __O2__4name.n_qualifier = (yystack . l_mark__11YYSTACKDATA [-1]). pn__7YYSTYPE ;
 yyval . p__7YYSTYPE = (struct node *)( (__0__X259 = 0 ), ( (__2__X260 = (yystack . l_mark__11YYSTACKDATA [-3]). pe__7YYSTYPE ), ( (__2__X261 = (struct
 # 2606 "gram.y"
-expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X259 || (__0__X259 = (struct ref *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct ref))) ))?( (__0__X259 =
+expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X259 || (__0__X259 = (struct ref *)__nw__4exprSFUl ( (size_t )(sizeof (struct ref))) ))?( (__0__X259 =
 # 2606 "gram.y"
 (struct ref *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X259 ), ((unsigned char )44 ), __2__X260 , (struct expr *)0 ) ), (__0__X259 -> __O4__4expr.mem = __2__X261 ))
 # 2606 "gram.y"
@@ -12827,7 +12827,7 @@ struct expr *__2__X264 ;
 (yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE -> __O2__4name.n_qualifier = (yystack . l_mark__11YYSTACKDATA [-1]). pn__7YYSTYPE ;
 yyval . p__7YYSTYPE = (struct node *)( (__0__X262 = 0 ), ( (__2__X263 = (yystack . l_mark__11YYSTACKDATA [-3]). pe__7YYSTYPE ), ( (__2__X264 = (struct
 # 2611 "gram.y"
-expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X262 || (__0__X262 = (struct ref *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct ref))) ))?( (__0__X262 =
+expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X262 || (__0__X262 = (struct ref *)__nw__4exprSFUl ( (size_t )(sizeof (struct ref))) ))?( (__0__X262 =
 # 2611 "gram.y"
 (struct ref *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X262 ), ((unsigned char )44 ), __2__X263 , (struct expr *)0 ) ), (__0__X262 -> __O4__4expr.mem = __2__X264 ))
 # 2611 "gram.y"
@@ -12851,7 +12851,7 @@ struct expr *__2__X267 ;
 # 2614 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X265 = 0 ), ( (__2__X266 = (yystack . l_mark__11YYSTACKDATA [-2]). pe__7YYSTYPE ), ( (__2__X267 = (struct
 # 2614 "gram.y"
-expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X265 || (__0__X265 = (struct ref *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct ref))) ))?( (__0__X265 =
+expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X265 || (__0__X265 = (struct ref *)__nw__4exprSFUl ( (size_t )(sizeof (struct ref))) ))?( (__0__X265 =
 # 2614 "gram.y"
 (struct ref *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X265 ), ((unsigned char )44 ), __2__X266 , (struct expr *)0 ) ), (__0__X265 -> __O4__4expr.mem = __2__X267 ))
 # 2614 "gram.y"
@@ -12878,7 +12878,7 @@ struct expr *__2__X270 ;
 (yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE -> __O2__4name.n_qualifier = (yystack . l_mark__11YYSTACKDATA [-1]). pn__7YYSTYPE ;
 yyval . p__7YYSTYPE = (struct node *)( (__0__X268 = 0 ), ( (__2__X269 = (yystack . l_mark__11YYSTACKDATA [-3]). pe__7YYSTYPE ), ( (__2__X270 = (struct
 # 2619 "gram.y"
-expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X268 || (__0__X268 = (struct ref *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct ref))) ))?( (__0__X268 =
+expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X268 || (__0__X268 = (struct ref *)__nw__4exprSFUl ( (size_t )(sizeof (struct ref))) ))?( (__0__X268 =
 # 2619 "gram.y"
 (struct ref *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X268 ), ((unsigned char )44 ), __2__X269 , (struct expr *)0 ) ), (__0__X268 -> __O4__4expr.mem = __2__X270 ))
 # 2619 "gram.y"
@@ -12907,7 +12907,7 @@ struct expr *__2__X273 ;
 (yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE -> __O2__4name.n_qualifier = (yystack . l_mark__11YYSTACKDATA [-1]). pn__7YYSTYPE ;
 yyval . p__7YYSTYPE = (struct node *)( (__0__X271 = 0 ), ( (__2__X272 = (yystack . l_mark__11YYSTACKDATA [-3]). pe__7YYSTYPE ), ( (__2__X273 = (struct
 # 2628 "gram.y"
-expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X271 || (__0__X271 = (struct ref *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct ref))) ))?( (__0__X271 =
+expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X271 || (__0__X271 = (struct ref *)__nw__4exprSFUl ( (size_t )(sizeof (struct ref))) ))?( (__0__X271 =
 # 2628 "gram.y"
 (struct ref *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X271 ), ((unsigned char )44 ), __2__X272 , (struct expr *)0 ) ), (__0__X271 -> __O4__4expr.mem = __2__X273 ))
 # 2628 "gram.y"
@@ -12934,7 +12934,7 @@ struct expr *__2__X276 ;
 # 2633 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X274 = 0 ), ( (__2__X275 = (yystack . l_mark__11YYSTACKDATA [-2]). pe__7YYSTYPE ), ( (__2__X276 = (struct
 # 2633 "gram.y"
-expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X274 || (__0__X274 = (struct ref *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct ref))) ))?( (__0__X274 =
+expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X274 || (__0__X274 = (struct ref *)__nw__4exprSFUl ( (size_t )(sizeof (struct ref))) ))?( (__0__X274 =
 # 2633 "gram.y"
 (struct ref *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X274 ), ((unsigned char )45 ), __2__X275 , (struct expr *)0 ) ), (__0__X274 -> __O4__4expr.mem = __2__X276 ))
 # 2633 "gram.y"
@@ -12961,7 +12961,7 @@ struct expr *__2__X279 ;
 (yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE -> __O2__4name.n_qualifier = (yystack . l_mark__11YYSTACKDATA [-1]). pn__7YYSTYPE ;
 yyval . p__7YYSTYPE = (struct node *)( (__0__X277 = 0 ), ( (__2__X278 = (yystack . l_mark__11YYSTACKDATA [-3]). pe__7YYSTYPE ), ( (__2__X279 = (struct
 # 2637 "gram.y"
-expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X277 || (__0__X277 = (struct ref *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct ref))) ))?( (__0__X277 =
+expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X277 || (__0__X277 = (struct ref *)__nw__4exprSFUl ( (size_t )(sizeof (struct ref))) ))?( (__0__X277 =
 # 2637 "gram.y"
 (struct ref *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X277 ), ((unsigned char )45 ), __2__X278 , (struct expr *)0 ) ), (__0__X277 -> __O4__4expr.mem = __2__X279 ))
 # 2637 "gram.y"
@@ -12987,7 +12987,7 @@ struct expr *__2__X282 ;
 (yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE -> __O2__4name.n_qualifier = (yystack . l_mark__11YYSTACKDATA [-1]). pn__7YYSTYPE ;
 yyval . p__7YYSTYPE = (struct node *)( (__0__X280 = 0 ), ( (__2__X281 = (yystack . l_mark__11YYSTACKDATA [-3]). pe__7YYSTYPE ), ( (__2__X282 = (struct
 # 2642 "gram.y"
-expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X280 || (__0__X280 = (struct ref *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct ref))) ))?( (__0__X280 =
+expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X280 || (__0__X280 = (struct ref *)__nw__4exprSFUl ( (size_t )(sizeof (struct ref))) ))?( (__0__X280 =
 # 2642 "gram.y"
 (struct ref *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X280 ), ((unsigned char )45 ), __2__X281 , (struct expr *)0 ) ), (__0__X280 -> __O4__4expr.mem = __2__X282 ))
 # 2642 "gram.y"
@@ -13011,7 +13011,7 @@ struct expr *__2__X285 ;
 # 2645 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X283 = 0 ), ( (__2__X284 = (yystack . l_mark__11YYSTACKDATA [-2]). pe__7YYSTYPE ), ( (__2__X285 = (struct
 # 2645 "gram.y"
-expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X283 || (__0__X283 = (struct ref *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct ref))) ))?( (__0__X283 =
+expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X283 || (__0__X283 = (struct ref *)__nw__4exprSFUl ( (size_t )(sizeof (struct ref))) ))?( (__0__X283 =
 # 2645 "gram.y"
 (struct ref *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X283 ), ((unsigned char )45 ), __2__X284 , (struct expr *)0 ) ), (__0__X283 -> __O4__4expr.mem = __2__X285 ))
 # 2645 "gram.y"
@@ -13038,7 +13038,7 @@ struct expr *__2__X288 ;
 (yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE -> __O2__4name.n_qualifier = (yystack . l_mark__11YYSTACKDATA [-1]). pn__7YYSTYPE ;
 yyval . p__7YYSTYPE = (struct node *)( (__0__X286 = 0 ), ( (__2__X287 = (yystack . l_mark__11YYSTACKDATA [-3]). pe__7YYSTYPE ), ( (__2__X288 = (struct
 # 2650 "gram.y"
-expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X286 || (__0__X286 = (struct ref *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct ref))) ))?( (__0__X286 =
+expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X286 || (__0__X286 = (struct ref *)__nw__4exprSFUl ( (size_t )(sizeof (struct ref))) ))?( (__0__X286 =
 # 2650 "gram.y"
 (struct ref *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X286 ), ((unsigned char )45 ), __2__X287 , (struct expr *)0 ) ), (__0__X286 -> __O4__4expr.mem = __2__X288 ))
 # 2650 "gram.y"
@@ -13067,7 +13067,7 @@ struct expr *__2__X291 ;
 (yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE -> __O2__4name.n_qualifier = (yystack . l_mark__11YYSTACKDATA [-1]). pn__7YYSTYPE ;
 yyval . p__7YYSTYPE = (struct node *)( (__0__X289 = 0 ), ( (__2__X290 = (yystack . l_mark__11YYSTACKDATA [-3]). pe__7YYSTYPE ), ( (__2__X291 = (struct
 # 2659 "gram.y"
-expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X289 || (__0__X289 = (struct ref *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct ref))) ))?( (__0__X289 =
+expr *)(yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE ), ( ((__0__X289 || (__0__X289 = (struct ref *)__nw__4exprSFUl ( (size_t )(sizeof (struct ref))) ))?( (__0__X289 =
 # 2659 "gram.y"
 (struct ref *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X289 ), ((unsigned char )45 ), __2__X290 , (struct expr *)0 ) ), (__0__X289 -> __O4__4expr.mem = __2__X291 ))
 # 2659 "gram.y"
@@ -13303,7 +13303,7 @@ struct expr *__2__X295 ;
 # 2758 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X293 = 0 ), ( (__2__X294 = tok_to_type__FUc ( (yystack . l_mark__11YYSTACKDATA [-3]). t__7YYSTYPE ) ), (
 # 2758 "gram.y"
-(__2__X295 = (yystack . l_mark__11YYSTACKDATA [-1]). pe__7YYSTYPE ), ( ((__0__X293 || (__0__X293 = (struct texpr *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct texpr))) ))?(
+(__2__X295 = (yystack . l_mark__11YYSTACKDATA [-1]). pe__7YYSTYPE ), ( ((__0__X293 || (__0__X293 = (struct texpr *)__nw__4exprSFUl ( (size_t )(sizeof (struct texpr))) ))?(
 # 2758 "gram.y"
 (__0__X293 = (struct texpr *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X293 ), ((unsigned char )157 ), __2__X295 , (struct expr *)0 ) ), (__0__X293 -> __O4__4expr.tp2 =
 # 2758 "gram.y"
@@ -13332,7 +13332,7 @@ struct name *__0__X299 ;
 # 2764 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X296 = 0 ), ( (__2__X297 = (yystack . l_mark__11YYSTACKDATA [-3]). pn__7YYSTYPE -> __O1__4expr.tp ), ( (__2__X298 =
 # 2764 "gram.y"
-(yystack . l_mark__11YYSTACKDATA [-1]). pe__7YYSTYPE ), ( ((__0__X296 || (__0__X296 = (struct texpr *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct texpr))) ))?( (__0__X296 =
+(yystack . l_mark__11YYSTACKDATA [-1]). pe__7YYSTYPE ), ( ((__0__X296 || (__0__X296 = (struct texpr *)__nw__4exprSFUl ( (size_t )(sizeof (struct texpr))) ))?( (__0__X296 =
 # 2764 "gram.y"
 (struct texpr *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X296 ), ((unsigned char )157 ), __2__X298 , (struct expr *)0 ) ), (__0__X296 -> __O4__4expr.tp2 = __2__X297 ))
 # 2764 "gram.y"
@@ -13369,7 +13369,7 @@ struct texpr *__0__X300 ;
 
 # 2772 "gram.y"
 __3t = (yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE -> __O1__4expr.tp ;
-yyval . p__7YYSTYPE = (struct node *)( (__0__X300 = 0 ), ( ((__0__X300 || (__0__X300 = (struct texpr *)__nw__4exprSFUl ( (unsigned long )(sizeof
+yyval . p__7YYSTYPE = (struct node *)( (__0__X300 = 0 ), ( ((__0__X300 || (__0__X300 = (struct texpr *)__nw__4exprSFUl ( (size_t)(sizeof
 # 2773 "gram.y"
 (struct texpr))) ))?( (__0__X300 = (struct texpr *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X300 ), ((unsigned char )23 ), ((struct expr *)0 ), (struct expr *)0 )
 # 2773 "gram.y"
@@ -13403,7 +13403,7 @@ struct texpr *__0__X301 ;
 
 # 2780 "gram.y"
 __3t = (yystack . l_mark__11YYSTACKDATA [0 ]). pn__7YYSTYPE -> __O1__4expr.tp ;
-yyval . p__7YYSTYPE = (struct node *)( (__0__X301 = 0 ), ( ((__0__X301 || (__0__X301 = (struct texpr *)__nw__4exprSFUl ( (unsigned long )(sizeof
+yyval . p__7YYSTYPE = (struct node *)( (__0__X301 = 0 ), ( ((__0__X301 || (__0__X301 = (struct texpr *)__nw__4exprSFUl ( (size_t)(sizeof
 # 2781 "gram.y"
 (struct texpr))) ))?( (__0__X301 = (struct texpr *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X301 ), ((unsigned char )184 ), ((struct expr *)0 ), (struct expr *)0 )
 # 2781 "gram.y"
@@ -13443,7 +13443,7 @@ else
 # 2792 "gram.y"
 yyval . p__7YYSTYPE = (struct node *)( (__0__X302 = 0 ), ( (__2__X303 = __3e ), ( (__2__X304 = __3ee ), (
 # 2792 "gram.y"
-((__0__X302 || (__0__X302 = (struct call *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct call))) ))?(__0__X302 = (struct call *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X302 ), (unsigned
+((__0__X302 || (__0__X302 = (struct call *)__nw__4exprSFUl ( (size_t )(sizeof (struct call))) ))?(__0__X302 = (struct call *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X302 ), (unsigned
 # 2792 "gram.y"
 char )109 , __2__X303 , __2__X304 ) ):0 ), __0__X302 ) ) ) ) ;
 }

@@ -144,7 +144,7 @@ union  __Q2_2ea4__C1 __O1__2ea ;
 };
 
 # 1 ""
-extern void *__nw__FUl (unsigned long );
+extern void *__nw__FUl (size_t );
 
 # 80 "/home/claude/cfront-3/src/cfront.h"
 extern struct ea *ea0 ;
@@ -736,15 +736,15 @@ struct type *__0__X6 ;
 struct node *__0__X1 ;
 
 # 708 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (unsigned long )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
+if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (size_t )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (unsigned long )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
+(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (size_t )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( (
+(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( (
 # 708 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( (__0__X6 = (struct type *)( (__0__X1 = (((struct node *)__0__X6 ))), ( ((__0__X1 ||
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
+(__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
 # 708 "/home/claude/cfront-3/src/cfront.h"
 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X6 -> defined__4type = 0 )) , (__0__X6 ->
 # 708 "/home/claude/cfront-3/src/cfront.h"
@@ -1719,9 +1719,9 @@ struct table *__ct__5tableFsP5tableP4name (register struct table *__0this , shor
 struct node *__0__X17 ;
 
 # 39 "/home/claude/cfront-3/src/table.cpp"
-if (__0this || (__0this = (struct table *)__nw__5tableSFUl ( (unsigned long )(sizeof (struct table))) )){ __0this = (struct table *)( (__0__X17 =
+if (__0this || (__0this = (struct table *)__nw__5tableSFUl ( (size_t )(sizeof (struct table))) )){ __0this = (struct table *)( (__0__X17 =
 # 39 "/home/claude/cfront-3/src/table.cpp"
-(((struct node *)__0this ))), ( ((__0__X17 || (__0__X17 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X17 ->
+(((struct node *)__0this ))), ( ((__0__X17 || (__0__X17 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X17 ->
 # 39 "/home/claude/cfront-3/src/table.cpp"
 base__4node = 0 ), (__0__X17 -> permanent__4node = 0 )) , (__0__X17 -> baseclass__4node = 0 )) :0 ), __0__X17 ) ) ;
 ;
@@ -1730,9 +1730,9 @@ __0this -> t_name__5table = __1n ;
 __0this -> size__5table = (__1sz = ((__1sz <= 0 )?2 :(__1sz + 1 )));
 
 # 45 "/home/claude/cfront-3/src/table.cpp"
-__0this -> entries__5table = (((struct name **)__nw__FUl ( (unsigned long )((sizeof (struct name *))* __1sz )) ));
+__0this -> entries__5table = (((struct name **)__nw__FUl ( (size_t)((sizeof (struct name *))* __1sz )) ));
 __0this -> hashsize__5table = (__1sz = ((__1sz * 3 )/ 2 ));
-__0this -> hashtbl__5table = (((short *)__nw__FUl ( (unsigned long )((sizeof (short ))* __1sz )) ));
+__0this -> hashtbl__5table = (((short *)__nw__FUl ( (size_t)((sizeof (short ))* __1sz )) ));
 memset ( (void *)__0this -> hashtbl__5table , 0 , (sizeof (short ))* __1sz ) ;
 __0this -> next__5table = __1nx ;
 __0this -> free_slot__5table = 1 ;
@@ -1754,7 +1754,7 @@ int __0__free )
 # 56 "/home/claude/cfront-3/src/table.cpp"
 __dl__FPv ( (void *)__0this -> entries__5table ) ;
 __dl__FPv ( (void *)__0this -> hashtbl__5table ) ;
-if (__0this )if (__0__free & 1)__dl__5tableSFPvUl ( (void *)__0this , (unsigned long )(sizeof (struct table))) ;
+if (__0this )if (__0__free & 1)__dl__5tableSFPvUl ( (void *)__0this , (size_t )(sizeof (struct table))) ;
 } 
 # 58 "/home/claude/cfront-3/src/table.cpp"
 }
@@ -1995,7 +1995,7 @@ __2nw = __ct__4nameFPCc ( (struct name *)0 , (const char *)0 ) ;
 { char *__2ps ;
 
 # 208 "/home/claude/cfront-3/src/table.cpp"
-__2ps = (((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (strlen ( __1s ) + 1 ))) ));
+__2ps = (((char *)__nw__FUl ( (size_t)((sizeof (char ))* (strlen ( __1s ) + 1 ))) ));
 strcpy ( __2ps , __1s ) ;
 
 # 211 "/home/claude/cfront-3/src/table.cpp"
@@ -2049,7 +2049,7 @@ if (__1g <= __0this -> size__5table )return ;
 __0this -> size__5table = (__1mx = (__1g + 1 ));
 
 # 233 "/home/claude/cfront-3/src/table.cpp"
-__1np = (((struct name **)__nw__FUl ( (unsigned long )((sizeof (struct name *))* __1mx )) ));
+__1np = (((struct name **)__nw__FUl ( (size_t)((sizeof (struct name *))* __1mx )) ));
 for(__1j = 0 ;__1j < __0this -> free_slot__5table ;__1j ++ ) (__1np [__1j ])= (__0this -> entries__5table [__1j ]);
 __dl__FPv ( (void *)__0this -> entries__5table ) ;
 __0this -> entries__5table = __1np ;
@@ -2057,7 +2057,7 @@ __0this -> entries__5table = __1np ;
 # 238 "/home/claude/cfront-3/src/table.cpp"
 __dl__FPv ( (void *)__0this -> hashtbl__5table ) ;
 __0this -> hashsize__5table = (__1mx = ((__1g * 3 )/ 2 ));
-__1hash = (__0this -> hashtbl__5table = (((short *)__nw__FUl ( (unsigned long )((sizeof (short ))* __1mx )) )));
+__1hash = (__0this -> hashtbl__5table = (((short *)__nw__FUl ( (size_t)((sizeof (short ))* __1mx )) )));
 memset ( (void *)__1hash , 0 , __1mx * (sizeof (short ))) ;
 
 # 243 "/home/claude/cfront-3/src/table.cpp"
@@ -2173,9 +2173,9 @@ struct ktable *__ct__6ktableFiP6ktableP4name (register struct ktable *__0this , 
 struct node *__0__X26 ;
 
 # 316 "/home/claude/cfront-3/src/table.cpp"
-if (__0this || (__0this = (struct ktable *)__nw__6ktableSFUl ( (unsigned long )(sizeof (struct ktable))) )){ __0this = (struct ktable *)( (__0__X26 =
+if (__0this || (__0this = (struct ktable *)__nw__6ktableSFUl ( (size_t )(sizeof (struct ktable))) )){ __0this = (struct ktable *)( (__0__X26 =
 # 316 "/home/claude/cfront-3/src/table.cpp"
-(((struct node *)__0this ))), ( ((__0__X26 || (__0__X26 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X26 ->
+(((struct node *)__0this ))), ( ((__0__X26 || (__0__X26 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X26 ->
 # 316 "/home/claude/cfront-3/src/table.cpp"
 base__4node = 0 ), (__0__X26 -> permanent__4node = 0 )) , (__0__X26 -> baseclass__4node = 0 )) :0 ), __0__X26 ) ) ;
 ;
@@ -2247,7 +2247,7 @@ __0this -> __O1__6ktable.k_n = 0 ;
 else 
 # 332 "/home/claude/cfront-3/src/table.cpp"
 __dt__5tableFv ( __0this -> __O1__6ktable.k_t , 3) ;
-if (__0this )if (__0__free & 1)__dl__6ktableSFPvUl ( (void *)__0this , (unsigned long )(sizeof (struct ktable))) ;
+if (__0this )if (__0__free & 1)__dl__6ktableSFPvUl ( (void *)__0this , (size_t )(sizeof (struct ktable))) ;
 } 
 # 333 "/home/claude/cfront-3/src/table.cpp"
 }
@@ -2512,7 +2512,7 @@ static struct ea *__ct__2eaFUl (struct ea *__0this ,
 # 76 "/home/claude/cfront-3/src/cfront.h"
 size_t __2ii ){ 
 # 76 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ea *)__nw__FUl ( (unsigned long )(sizeof (struct ea)))
+if (__0this || (__0this = (struct ea *)__nw__FUl ( (size_t )(sizeof (struct ea)))
 # 76 "/home/claude/cfront-3/src/cfront.h"
 ))__0this -> __O1__2ea.i = __2ii ;
 

@@ -151,7 +151,7 @@ union  __Q2_2ea4__C1 __O1__2ea ;
 };
 
 # 1 ""
-extern void *__nw__FUl (unsigned long );
+extern void *__nw__FUl (size_t );
 
 # 80 "/home/claude/cfront-3/src/cfront.h"
 extern struct ea *ea0 ;
@@ -743,15 +743,15 @@ struct type *__0__X6 ;
 struct node *__0__X1 ;
 
 # 708 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (unsigned long )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
+if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (size_t )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (unsigned long )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
+(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (size_t )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( (
+(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( (
 # 708 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( (__0__X6 = (struct type *)( (__0__X1 = (((struct node *)__0__X6 ))), ( ((__0__X1 ||
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
+(__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
 # 708 "/home/claude/cfront-3/src/cfront.h"
 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X6 -> defined__4type = 0 )) , (__0__X6 ->
 # 708 "/home/claude/cfront-3/src/cfront.h"
@@ -1794,7 +1794,7 @@ while (__1p < __1lim )((*(__1p ++ )))= Block_Pname_def ;
 void transfer__11Block_PnameFPP4nameUl (struct Block_Pname *__0this , Pname *, size_t );
 
 # 29 "/home/claude/cfront-3/src/block.cpp"
-void copy__11Block_PnameFRC11Block_Pname (register struct Block_Pname *__0this , const struct Block_Pname *__1b ){ __0this -> p__11Block_Pname = (((struct name **)__nw__FUl ( (unsigned long )((sizeof
+void copy__11Block_PnameFRC11Block_Pname (register struct Block_Pname *__0this , const struct Block_Pname *__1b ){ __0this -> p__11Block_Pname = (((struct name **)__nw__FUl ( (size_t)((sizeof
 # 29 "/home/claude/cfront-3/src/block.cpp"
 (struct name *))* ((*__1b )). n__11Block_Pname )) ));
 
@@ -1829,13 +1829,13 @@ while (__1nn <= __1k )__1nn += ((__1nn >> 1 )+ 1 );
 { Pname *__1np ;
 
 # 29 "/home/claude/cfront-3/src/block.cpp"
-__1np = (((struct name **)__nw__FUl ( (unsigned long )((sizeof (struct name *))* __1nn )) ));
+__1np = (((struct name **)__nw__FUl ( (size_t)((sizeof (struct name *))* __1nn )) ));
 
 # 29 "/home/claude/cfront-3/src/block.cpp"
 if (! __1np ){ __1nn = (__1k + 1 );
 
 # 29 "/home/claude/cfront-3/src/block.cpp"
-__1np = (((struct name **)__nw__FUl ( (unsigned long )((sizeof (struct name *))* __1nn )) ));
+__1np = (((struct name **)__nw__FUl ( (size_t)((sizeof (struct name *))* __1nn )) ));
 
 # 29 "/home/claude/cfront-3/src/block.cpp"
 }
@@ -1968,7 +1968,7 @@ while (__1p < __1lim )((*(__1p ++ )))= Block_int_def ;
 void transfer__9Block_intFPiUl (struct Block_int *__0this , int *, size_t );
 
 # 30 "/home/claude/cfront-3/src/block.cpp"
-void copy__9Block_intFRC9Block_int (register struct Block_int *__0this , const struct Block_int *__1b ){ __0this -> p__9Block_int = (((int *)__nw__FUl ( (unsigned long )((sizeof
+void copy__9Block_intFRC9Block_int (register struct Block_int *__0this , const struct Block_int *__1b ){ __0this -> p__9Block_int = (((int *)__nw__FUl ( (size_t)((sizeof
 # 30 "/home/claude/cfront-3/src/block.cpp"
 (int ))* ((*__1b )). n__9Block_int )) ));
 
@@ -2003,13 +2003,13 @@ while (__1nn <= __1k )__1nn += ((__1nn >> 1 )+ 1 );
 { int *__1np ;
 
 # 30 "/home/claude/cfront-3/src/block.cpp"
-__1np = (((int *)__nw__FUl ( (unsigned long )((sizeof (int ))* __1nn )) ));
+__1np = (((int *)__nw__FUl ( (size_t)((sizeof (int ))* __1nn )) ));
 
 # 30 "/home/claude/cfront-3/src/block.cpp"
 if (! __1np ){ __1nn = (__1k + 1 );
 
 # 30 "/home/claude/cfront-3/src/block.cpp"
-__1np = (((int *)__nw__FUl ( (unsigned long )((sizeof (int ))* __1nn )) ));
+__1np = (((int *)__nw__FUl ( (size_t)((sizeof (int ))* __1nn )) ));
 
 # 30 "/home/claude/cfront-3/src/block.cpp"
 }
@@ -2340,7 +2340,7 @@ while (__1p < __1lim )((*(__1p ++ )))= Block_Pchar_def ;
 void transfer__11Block_PcharFPPcUl (struct Block_Pchar *__0this , Pchar *, size_t );
 
 # 32 "/home/claude/cfront-3/src/block.cpp"
-void copy__11Block_PcharFRC11Block_Pchar (register struct Block_Pchar *__0this , const struct Block_Pchar *__1b ){ __0this -> p__11Block_Pchar = (((char **)__nw__FUl ( (unsigned long )((sizeof
+void copy__11Block_PcharFRC11Block_Pchar (register struct Block_Pchar *__0this , const struct Block_Pchar *__1b ){ __0this -> p__11Block_Pchar = (((char **)__nw__FUl ( (size_t)((sizeof
 # 32 "/home/claude/cfront-3/src/block.cpp"
 (char *))* ((*__1b )). n__11Block_Pchar )) ));
 
@@ -2375,13 +2375,13 @@ while (__1nn <= __1k )__1nn += ((__1nn >> 1 )+ 1 );
 { Pchar *__1np ;
 
 # 32 "/home/claude/cfront-3/src/block.cpp"
-__1np = (((char **)__nw__FUl ( (unsigned long )((sizeof (char *))* __1nn )) ));
+__1np = (((char **)__nw__FUl ( (size_t)((sizeof (char *))* __1nn )) ));
 
 # 32 "/home/claude/cfront-3/src/block.cpp"
 if (! __1np ){ __1nn = (__1k + 1 );
 
 # 32 "/home/claude/cfront-3/src/block.cpp"
-__1np = (((char **)__nw__FUl ( (unsigned long )((sizeof (char *))* __1nn )) ));
+__1np = (((char **)__nw__FUl ( (size_t)((sizeof (char *))* __1nn )) ));
 
 # 32 "/home/claude/cfront-3/src/block.cpp"
 }
@@ -2549,13 +2549,13 @@ while (__1nn <= __1k )__1nn += ((__1nn >> 1 )+ 1 );
 { CPchar *__1np ;
 
 # 33 "/home/claude/cfront-3/src/block.cpp"
-__1np = (((const char **)__nw__FUl ( (unsigned long )((sizeof (const char *))* __1nn )) ));
+__1np = (((const char **)__nw__FUl ( (size_t)((sizeof (const char *))* __1nn )) ));
 
 # 33 "/home/claude/cfront-3/src/block.cpp"
 if (! __1np ){ __1nn = (__1k + 1 );
 
 # 33 "/home/claude/cfront-3/src/block.cpp"
-__1np = (((const char **)__nw__FUl ( (unsigned long )((sizeof (const char *))* __1nn )) ));
+__1np = (((const char **)__nw__FUl ( (size_t)((sizeof (const char *))* __1nn )) ));
 
 # 33 "/home/claude/cfront-3/src/block.cpp"
 }
@@ -2688,7 +2688,7 @@ while (__1p < __1lim )((*(__1p ++ )))= Block_short_def ;
 void transfer__11Block_shortFPsUl (struct Block_short *__0this , short *, size_t );
 
 # 34 "/home/claude/cfront-3/src/block.cpp"
-void copy__11Block_shortFRC11Block_short (register struct Block_short *__0this , const struct Block_short *__1b ){ __0this -> p__11Block_short = (((short *)__nw__FUl ( (unsigned long )((sizeof
+void copy__11Block_shortFRC11Block_short (register struct Block_short *__0this , const struct Block_short *__1b ){ __0this -> p__11Block_short = (((short *)__nw__FUl ( (size_t)((sizeof
 # 34 "/home/claude/cfront-3/src/block.cpp"
 (short ))* ((*__1b )). n__11Block_short )) ));
 
@@ -2723,13 +2723,13 @@ while (__1nn <= __1k )__1nn += ((__1nn >> 1 )+ 1 );
 { short *__1np ;
 
 # 34 "/home/claude/cfront-3/src/block.cpp"
-__1np = (((short *)__nw__FUl ( (unsigned long )((sizeof (short ))* __1nn )) ));
+__1np = (((short *)__nw__FUl ( (size_t)((sizeof (short ))* __1nn )) ));
 
 # 34 "/home/claude/cfront-3/src/block.cpp"
 if (! __1np ){ __1nn = (__1k + 1 );
 
 # 34 "/home/claude/cfront-3/src/block.cpp"
-__1np = (((short *)__nw__FUl ( (unsigned long )((sizeof (short ))* __1nn )) ));
+__1np = (((short *)__nw__FUl ( (size_t)((sizeof (short ))* __1nn )) ));
 
 # 34 "/home/claude/cfront-3/src/block.cpp"
 }
@@ -2847,7 +2847,7 @@ void __sti___clear_ (void )
 struct Block_Pname *__0__X21 ;
 
 # 31 "/home/claude/cfront-3/src/block.cpp"
-( (__0__X21 = (& Block_BlockPname_def )), ( ((__0__X21 || (__0__X21 = (struct Block_Pname *)__nw__FUl ( (unsigned long )(sizeof (struct Block_Pname))) ))?(
+( (__0__X21 = (& Block_BlockPname_def )), ( ((__0__X21 || (__0__X21 = (struct Block_Pname *)__nw__FUl ( (size_t )(sizeof (struct Block_Pname))) ))?(
 # 31 "/home/claude/cfront-3/src/block.cpp"
 (__0__X21 -> n__11Block_Pname = 0 ), (__0__X21 -> p__11Block_Pname = 0 )) :0 ), __0__X21 ) ) ;
 
@@ -2883,7 +2883,7 @@ if (__0this )if (__0__free & 1)__dl__FPv ( (void *)__0this ) ;
 }
 
 # 21 "/home/claude/cfront-3/src/block.cpp"
-static struct Block_Pname *__ct__11Block_PnameFv (struct Block_Pname *__0this ){ if (__0this || (__0this = (struct Block_Pname *)__nw__FUl ( (unsigned long )(sizeof (struct Block_Pname)))
+static struct Block_Pname *__ct__11Block_PnameFv (struct Block_Pname *__0this ){ if (__0this || (__0this = (struct Block_Pname *)__nw__FUl ( (size_t )(sizeof (struct Block_Pname)))
 # 21 "/home/claude/cfront-3/src/block.cpp"
 )){ __0this -> n__11Block_Pname = 0 ;
 

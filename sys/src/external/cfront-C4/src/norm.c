@@ -144,7 +144,7 @@ union  __Q2_2ea4__C1 __O1__2ea ;
 };
 
 # 1 ""
-extern void *__nw__FUl (unsigned long );
+extern void *__nw__FUl (size_t );
 
 # 80 "/home/claude/cfront-3/src/cfront.h"
 extern struct ea *ea0 ;
@@ -736,15 +736,15 @@ struct type *__0__X6 ;
 struct node *__0__X1 ;
 
 # 708 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (unsigned long )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
+if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (size_t )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (unsigned long )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
+(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (size_t )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( (
+(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( (
 # 708 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( (__0__X6 = (struct type *)( (__0__X1 = (((struct node *)__0__X6 ))), ( ((__0__X1 ||
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
+(__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
 # 708 "/home/claude/cfront-3/src/cfront.h"
 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X6 -> defined__4type = 0 )) , (__0__X6 ->
 # 708 "/home/claude/cfront-3/src/cfront.h"
@@ -2226,11 +2226,11 @@ struct type *__0__X26 ;
 struct node *__0__X1 ;
 
 # 37 "/home/claude/cfront-3/src/norm.cpp"
-generic_tpdef = ( (__0__X26 = 0 ), ( ((__0__X26 || (__0__X26 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?(
+generic_tpdef = ( (__0__X26 = 0 ), ( ((__0__X26 || (__0__X26 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?(
 # 37 "/home/claude/cfront-3/src/norm.cpp"
 ( ( ( ( ( ( ( (__0__X26 = (struct type *)( (__0__X1 = (((struct node *)__0__X26 ))), (
 # 37 "/home/claude/cfront-3/src/norm.cpp"
-((__0__X1 || (__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 ->
+((__0__X1 || (__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 ->
 # 37 "/home/claude/cfront-3/src/norm.cpp"
 permanent__4node = 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X26 -> defined__4type = 0 )) ,
 # 37 "/home/claude/cfront-3/src/norm.cpp"
@@ -2273,7 +2273,7 @@ char *make_name__FUc (TOK __1c )
 char *__1s ;
 
 # 58 "/home/claude/cfront-3/src/norm.cpp"
-__1s = (((char *)__nw__FUl ( (unsigned long )(8* (sizeof (char )))) ));
+__1s = (((char *)__nw__FUl ( (size_t)(8* (sizeof (char )))) ));
 
 # 60 "/home/claude/cfront-3/src/norm.cpp"
 if (10000 <= (++ stcount ))error__FiPCc ( (int )'i' , (const char *)"too many generatedNs") ;
@@ -3487,7 +3487,7 @@ Pname __5obj ;
 unsigned long __2__X123 ;
 
 # 478 "/home/claude/cfront-3/src/norm.cpp"
-__5ss = (((char *)__nw__FUl ( (unsigned long )(8* (sizeof (char )))) ));
+__5ss = (((char *)__nw__FUl ( (size_t)(8* (sizeof (char )))) ));
 __5obj = __ct__4nameFPCc ( (struct name *)0 , (const char *)__5ss ) ;
 strcpy ( __5ss , __3s ) ;
 if ((__3cl -> csu__8classdef == 36 )&& (__3cl -> class_base__8classdef != 2)){ 
@@ -4580,11 +4580,11 @@ struct type *__0__X171 ;
 struct node *__0__X1 ;
 
 # 931 "/home/claude/cfront-3/src/norm.cpp"
-__0this -> __O3__4expr.tpdef = ( (__0__X171 = 0 ), ( ((__0__X171 || (__0__X171 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type)))
+__0this -> __O3__4expr.tpdef = ( (__0__X171 = 0 ), ( ((__0__X171 || (__0__X171 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type)))
 # 931 "/home/claude/cfront-3/src/norm.cpp"
 ))?( ( ( ( ( ( ( ( (__0__X171 = (struct type *)( (__0__X1 = (((struct node *)__0__X171 ))),
 # 931 "/home/claude/cfront-3/src/norm.cpp"
-( ((__0__X1 || (__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ),
+( ((__0__X1 || (__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ),
 # 931 "/home/claude/cfront-3/src/norm.cpp"
 (__0__X1 -> permanent__4node = 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X171 -> defined__4type = 0 ))
 # 931 "/home/claude/cfront-3/src/norm.cpp"
@@ -4718,13 +4718,13 @@ struct type *__0__X2 ;
 struct node *__0__X1 ;
 
 # 372 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct enumdef *)__nw__FUl ( (unsigned long )(sizeof (struct enumdef))) )){ __0this = (struct enumdef *)( (__0__X2 =
+if (__0this || (__0this = (struct enumdef *)__nw__FUl ( (size_t )(sizeof (struct enumdef))) )){ __0this = (struct enumdef *)( (__0__X2 =
 # 372 "/home/claude/cfront-3/src/cfront.h"
-(((struct type *)__0this ))), ( ((__0__X2 || (__0__X2 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( ( (
+(((struct type *)__0this ))), ( ((__0__X2 || (__0__X2 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( ( (
 # 372 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( (__0__X2 = (struct type *)( (__0__X1 = (((struct node *)__0__X2 ))), ( ((__0__X1 || (__0__X1 =
 # 372 "/home/claude/cfront-3/src/cfront.h"
-(struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node = 0 ))
+(struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node = 0 ))
 # 372 "/home/claude/cfront-3/src/cfront.h"
 , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X2 -> defined__4type = 0 )) , (__0__X2 -> lex_level__4type =
 # 372 "/home/claude/cfront-3/src/cfront.h"
@@ -4918,15 +4918,15 @@ struct type *__0__X6 ;
 struct node *__0__X1 ;
 
 # 693 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct vec *)__nw__3vecSFUl ( (unsigned long )(sizeof (struct vec))) )){ __0this = (struct vec *)( (__0__X7 =
+if (__0this || (__0this = (struct vec *)__nw__3vecSFUl ( (size_t )(sizeof (struct vec))) )){ __0this = (struct vec *)( (__0__X7 =
 # 693 "/home/claude/cfront-3/src/cfront.h"
-(((struct pvtyp *)__0this ))), ( ((__0__X7 || (__0__X7 = (struct pvtyp *)__nw__FUl ( (unsigned long )(sizeof (struct pvtyp))) ))?(__0__X7 = (struct pvtyp *)(
+(((struct pvtyp *)__0this ))), ( ((__0__X7 || (__0__X7 = (struct pvtyp *)__nw__FUl ( (size_t )(sizeof (struct pvtyp))) ))?(__0__X7 = (struct pvtyp *)(
 # 693 "/home/claude/cfront-3/src/cfront.h"
-(__0__X6 = (((struct type *)__0__X7 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( (
+(__0__X6 = (((struct type *)__0__X7 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( (
 # 693 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( (__0__X6 = (struct type *)( (__0__X1 = (((struct node *)__0__X6 ))), ( ((__0__X1 ||
 # 693 "/home/claude/cfront-3/src/cfront.h"
-(__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
+(__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
 # 693 "/home/claude/cfront-3/src/cfront.h"
 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X6 -> defined__4type = 0 )) , (__0__X6 ->
 # 693 "/home/claude/cfront-3/src/cfront.h"
@@ -5792,7 +5792,7 @@ struct expr *__2__X208 ;
 # 1534 "/home/claude/cfront-3/src/norm.cpp"
 __1n -> __O3__4expr.n_initializer = (struct expr *)( (__0__X206 = 0 ), ( (__2__X207 = (__3cn ?__3cn -> __O1__4expr.tp :__3template_formal_type )), ( (__2__X208 = (((struct expr *)(((struct
 # 1534 "/home/claude/cfront-3/src/norm.cpp"
-expr *)__2f -> argtype__3fct ))))), ( ((__0__X206 || (__0__X206 = (struct texpr *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct texpr))) ))?( (__0__X206 = (struct
+expr *)__2f -> argtype__3fct ))))), ( ((__0__X206 || (__0__X206 = (struct texpr *)__nw__4exprSFUl ( (size_t )(sizeof (struct texpr))) ))?( (__0__X206 = (struct
 # 1534 "/home/claude/cfront-3/src/norm.cpp"
 texpr *)__ct__4exprFUcP4exprT2 ( ((struct expr *)__0__X206 ), ((unsigned char )157 ), __2__X208 , (struct expr *)0 ) ), (__0__X206 -> __O4__4expr.tp2 = __2__X207 )) :0 ),
 # 1534 "/home/claude/cfront-3/src/norm.cpp"
@@ -6065,17 +6065,17 @@ switch (__2b -> base__4node ){
 # 1658 "/home/claude/cfront-3/src/norm.cpp"
 case 21 :( (__0this ?(((void
 # 1658 "/home/claude/cfront-3/src/norm.cpp"
-)(__0this ?(((void )(((void )__dl__3ptrSFPvUl ( (void *)__0this , (unsigned long )(sizeof (struct ptr))) )))):(((void )0 ))))):(((void )0 )))) ;
+)(__0this ?(((void )(((void )__dl__3ptrSFPvUl ( (void *)__0this , (size_t )(sizeof (struct ptr))) )))):(((void )0 ))))):(((void )0 )))) ;
 
 # 1658 "/home/claude/cfront-3/src/norm.cpp"
 return Pint_type ;
-case 5 :( (__0this ?(((void )(__0this ?(((void )(((void )__dl__3ptrSFPvUl ( (void *)__0this , (unsigned long )(sizeof (struct ptr))) )))):(((void )0 ))))):(((void
+case 5 :( (__0this ?(((void )(__0this ?(((void )(((void )__dl__3ptrSFPvUl ( (void *)__0this , (size_t )(sizeof (struct ptr))) )))):(((void )0 ))))):(((void
 # 1659 "/home/claude/cfront-3/src/norm.cpp"
 )0 )))) ;
 
 # 1659 "/home/claude/cfront-3/src/norm.cpp"
 return Pchar_type ;
-case 38 :( (__0this ?(((void )(__0this ?(((void )(((void )__dl__3ptrSFPvUl ( (void *)__0this , (unsigned long )(sizeof (struct ptr))) )))):(((void )0 ))))):(((void
+case 38 :( (__0this ?(((void )(__0this ?(((void )(((void )__dl__3ptrSFPvUl ( (void *)__0this , (size_t )(sizeof (struct ptr))) )))):(((void )0 ))))):(((void
 # 1660 "/home/claude/cfront-3/src/norm.cpp"
 )0 )))) ;
 
@@ -6974,7 +6974,7 @@ static struct ea *__ct__2eaFUl (struct ea *__0this ,
 # 76 "/home/claude/cfront-3/src/cfront.h"
 size_t __2ii ){ 
 # 76 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ea *)__nw__FUl ( (unsigned long )(sizeof (struct ea)))
+if (__0this || (__0this = (struct ea *)__nw__FUl ( (size_t )(sizeof (struct ea)))
 # 76 "/home/claude/cfront-3/src/cfront.h"
 ))__0this -> __O1__2ea.i = __2ii ;
 

@@ -55,7 +55,7 @@ int pos__10HashWalker ;
 void reset__10HashWalkerFv (struct HashWalker *__0this );
 
 # 1 ""
-extern void *__nw__FUl (unsigned long );
+extern void *__nw__FUl (size_t );
 
 # 89 "/home/claude/cfront-3/src/hash.h"
 void error__4HashFPCc (struct Hash *__0this , const char *__1msg );
@@ -831,15 +831,15 @@ struct type *__0__X6 ;
 struct node *__0__X1 ;
 
 # 708 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (unsigned long )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
+if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (size_t )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (unsigned long )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
+(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (size_t )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( (
+(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( (
 # 708 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( (__0__X6 = (struct type *)( (__0__X1 = (((struct node *)__0__X6 ))), ( ((__0__X1 ||
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
+(__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
 # 708 "/home/claude/cfront-3/src/cfront.h"
 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X6 -> defined__4type = 0 )) , (__0__X6 ->
 # 708 "/home/claude/cfront-3/src/cfront.h"
@@ -3154,13 +3154,13 @@ struct type *__0__X5 ;
 struct node *__0__X1 ;
 
 # 667 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct gen *)__nw__FUl ( (unsigned long )(sizeof (struct gen))) )){ ( ( (__0this = (struct
+if (__0this || (__0this = (struct gen *)__nw__FUl ( (size_t )(sizeof (struct gen))) )){ ( ( (__0this = (struct
 # 667 "/home/claude/cfront-3/src/cfront.h"
-gen *)( (__0__X5 = (((struct type *)__0this ))), ( ((__0__X5 || (__0__X5 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?(
+gen *)( (__0__X5 = (((struct type *)__0this ))), ( ((__0__X5 || (__0__X5 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?(
 # 667 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( ( (__0__X5 = (struct type *)( (__0__X1 = (((struct node *)__0__X5 ))), (
 # 667 "/home/claude/cfront-3/src/cfront.h"
-((__0__X1 || (__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 ->
+((__0__X1 || (__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 ->
 # 667 "/home/claude/cfront-3/src/cfront.h"
 permanent__4node = 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X5 -> defined__4type = 0 )) ,
 # 667 "/home/claude/cfront-3/src/cfront.h"
@@ -3553,7 +3553,7 @@ if (__1f -> body__3fct )return ;
 
 # 724 "/home/claude/cfront-3/src/template.cpp"
 ;
-__1pbleh = (((struct bleh__handle_bound_friend__FP14basic_templateP4name__L42 *)__nw__FUl ( (unsigned long )((sizeof (struct bleh__handle_bound_friend__FP14basic_templateP4name__L42 ))* __1formal_cnt )) ));
+__1pbleh = (((struct bleh__handle_bound_friend__FP14basic_templateP4name__L42 *)__nw__FUl ( (size_t)((sizeof (struct bleh__handle_bound_friend__FP14basic_templateP4name__L42 ))* __1formal_cnt )) ));
 
 # 727 "/home/claude/cfront-3/src/template.cpp"
 for(__1formals = ( __1pb -> formals__14basic_template ) ;__1formals ;__1formals = __1formals -> l__9name_list ) { 
@@ -3656,7 +3656,7 @@ struct cons *__2__X44 ;
 __1cl = ( (((struct classdef *)(((struct classdef *)(((struct templ *)(((struct templ *)__1pb ))))-> basep__5templ -> b_name__8basetype -> __O1__4expr.tp ))))) ;
 __1cl -> templ_friends__8classdef = ( (__0__X43 = 0 ), ( (__2__X44 = __1cl -> templ_friends__8classdef ), ( ((__0__X43 || (__0__X43 = (struct cons *)__nw__FUl (
 # 776 "/home/claude/cfront-3/src/template.cpp"
-(unsigned long )(sizeof (struct cons))) ))?( (__0__X43 -> car__4cons = ((void *)__1fr )), (__0__X43 -> cdr__4cons = __2__X44 )) :0 ), __0__X43 )
+(size_t )(sizeof (struct cons))) ))?( (__0__X43 -> car__4cons = ((void *)__1fr )), (__0__X43 -> cdr__4cons = __2__X44 )) :0 ), __0__X43 )
 # 776 "/home/claude/cfront-3/src/template.cpp"
 ) ) ;
 __1fr -> extrapolated__14basic_template = 1 ;
@@ -8520,7 +8520,7 @@ strcat ( (char *)__1s , __1ins ) ;
 { char *__1result ;
 
 # 3111 "/home/claude/cfront-3/src/template.cpp"
-__1result = (((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (strlen ( (const char *)__1s ) + 1 )))
+__1result = (((char *)__nw__FUl ( (size_t)((sizeof (char ))* (strlen ( (const char *)__1s ) + 1 )))
 # 3111 "/home/claude/cfront-3/src/template.cpp"
 ));
 strcpy ( __1result , (const char *)__1s ) ;
@@ -9418,7 +9418,7 @@ __2new_tname = __2treal -> tname__10basic_inst ;
 # 3550 "/home/claude/cfront-3/src/template.cpp"
 __1last = (__1last -> cdr__4cons = ( (__0__X176 = 0 ), ( (__2__X177 = 0 ), ( ((__0__X176 || (__0__X176 = (struct cons *)__nw__FUl (
 # 3550 "/home/claude/cfront-3/src/template.cpp"
-(unsigned long )(sizeof (struct cons))) ))?( (__0__X176 -> car__4cons = ((void *)__2treal )), (__0__X176 -> cdr__4cons = __2__X177 )) :0 ), __0__X176 )
+(size_t )(sizeof (struct cons))) ))?( (__0__X176 -> car__4cons = ((void *)__2treal )), (__0__X176 -> cdr__4cons = __2__X177 )) :0 ), __0__X176 )
 # 3550 "/home/claude/cfront-3/src/template.cpp"
 ) ) );
 
@@ -9504,7 +9504,7 @@ else
 # 3619 "/home/claude/cfront-3/src/template.cpp"
 __0this -> corr__10basic_inst = ( (__0__X181 = 0 ), ( (__2__X182 = 1000), ( ((__0__X181 || (__0__X181 = (struct pointer_hash *)__nw__FUl (
 # 3619 "/home/claude/cfront-3/src/template.cpp"
-(unsigned long )(sizeof (struct pointer_hash))) ))?( (__0__X181 = (struct pointer_hash *)__ct__4HashFi ( ((struct Hash *)__0__X181 ), (int )__2__X182 ) ), (
+(size_t )(sizeof (struct pointer_hash))) ))?( (__0__X181 = (struct pointer_hash *)__ct__4HashFi ( ((struct Hash *)__0__X181 ), (int )__2__X182 ) ), (
 # 3619 "/home/claude/cfront-3/src/template.cpp"
 (__0__X181 -> key_hash_function__4Hash = (pointer_hash_fcn__FUl )), (__0__X181 -> key_key_equality_function__4Hash = (pointer_hasheq__FUlT1 ))) ) :0 ), __0__X181 ) ) ) ;
 
@@ -10163,7 +10163,7 @@ return __0this ;
 }
 
 # 3969 "/home/claude/cfront-3/src/template.cpp"
-struct templ_state *__ct__11templ_stateFv (register struct templ_state *__0this ){ if (__0this || (__0this = (struct templ_state *)__nw__FUl ( (unsigned long )(sizeof (struct templ_state))) )){
+struct templ_state *__ct__11templ_stateFv (register struct templ_state *__0this ){ if (__0this || (__0this = (struct templ_state *)__nw__FUl ( (size_t )(sizeof (struct templ_state))) )){
 # 3969 "/home/claude/cfront-3/src/template.cpp"
 
 # 3971 "/home/claude/cfront-3/src/template.cpp"
@@ -10210,9 +10210,9 @@ struct templ *__ct__5templFP9name_listP4name (register struct templ *__0this , P
 struct basic_template *__0__X196 ;
 
 # 3993 "/home/claude/cfront-3/src/template.cpp"
-if (__0this || (__0this = (struct templ *)__nw__FUl ( (unsigned long )(sizeof (struct templ))) )){ ( (__0this = (struct templ *)(
+if (__0this || (__0this = (struct templ *)__nw__FUl ( (size_t )(sizeof (struct templ))) )){ ( (__0this = (struct templ *)(
 # 3993 "/home/claude/cfront-3/src/template.cpp"
-(__0__X196 = (((struct basic_template *)__0this ))), ( ((__0__X196 || (__0__X196 = (struct basic_template *)__nw__FUl ( (unsigned long )(sizeof (struct basic_template))) ))?(__0__X196 -> __vptr__14basic_template =
+(__0__X196 = (((struct basic_template *)__0this ))), ( ((__0__X196 || (__0__X196 = (struct basic_template *)__nw__FUl ( (size_t )(sizeof (struct basic_template))) ))?(__0__X196 -> __vptr__14basic_template =
 # 3993 "/home/claude/cfront-3/src/template.cpp"
 (struct __mptr *) __ptbl_vec___[0]):0 ), __0__X196 ) ) ), (__0this -> __vptr__14basic_template = (struct __mptr *) __ptbl_vec___[1])) ;
 
@@ -10297,9 +10297,9 @@ struct basic_inst *__0__X197 ;
 struct state *__0__X23 ;
 
 # 4025 "/home/claude/cfront-3/src/template.cpp"
-if (__0this || (__0this = (struct templ_inst *)__nw__FUl ( (unsigned long )(sizeof (struct templ_inst))) )){ ( (__0this = (struct templ_inst *)(
+if (__0this || (__0this = (struct templ_inst *)__nw__FUl ( (size_t )(sizeof (struct templ_inst))) )){ ( (__0this = (struct templ_inst *)(
 # 4025 "/home/claude/cfront-3/src/template.cpp"
-(__0__X197 = (((struct basic_inst *)__0this ))), ( ((__0__X197 || (__0__X197 = (struct basic_inst *)__nw__FUl ( (unsigned long )(sizeof (struct basic_inst))) ))?( (__0__X197 ->
+(__0__X197 = (((struct basic_inst *)__0this ))), ( ((__0__X197 || (__0__X197 = (struct basic_inst *)__nw__FUl ( (size_t )(sizeof (struct basic_inst))) ))?( (__0__X197 ->
 # 4025 "/home/claude/cfront-3/src/template.cpp"
 __vptr__10basic_inst = (struct __mptr *) __ptbl_vec___[2]), ( (__0__X23 = (& __0__X197 -> context__10basic_inst )), ( ((__0__X23 || (__0__X23 = (struct state *)__nw__FUl ( (unsigned
 # 4025 "/home/claude/cfront-3/src/template.cpp"
@@ -10377,9 +10377,9 @@ struct basic_inst *__0__X199 ;
 struct state *__0__X23 ;
 
 # 4053 "/home/claude/cfront-3/src/template.cpp"
-if (__0this || (__0this = (struct templ_inst *)__nw__FUl ( (unsigned long )(sizeof (struct templ_inst))) )){ ( (__0this = (struct templ_inst *)(
+if (__0this || (__0this = (struct templ_inst *)__nw__FUl ( (size_t )(sizeof (struct templ_inst))) )){ ( (__0this = (struct templ_inst *)(
 # 4053 "/home/claude/cfront-3/src/template.cpp"
-(__0__X199 = (((struct basic_inst *)__0this ))), ( ((__0__X199 || (__0__X199 = (struct basic_inst *)__nw__FUl ( (unsigned long )(sizeof (struct basic_inst))) ))?( (__0__X199 ->
+(__0__X199 = (((struct basic_inst *)__0this ))), ( ((__0__X199 || (__0__X199 = (struct basic_inst *)__nw__FUl ( (size_t )(sizeof (struct basic_inst))) ))?( (__0__X199 ->
 # 4053 "/home/claude/cfront-3/src/template.cpp"
 __vptr__10basic_inst = (struct __mptr *) __ptbl_vec___[2]), ( (__0__X23 = (& __0__X199 -> context__10basic_inst )), ( ((__0__X23 || (__0__X23 = (struct state *)__nw__FUl ( (unsigned
 # 4053 "/home/claude/cfront-3/src/template.cpp"
@@ -10443,9 +10443,9 @@ struct basic_inst *__0__X200 ;
 struct state *__0__X23 ;
 
 # 4085 "/home/claude/cfront-3/src/template.cpp"
-if (__0this || (__0this = (struct funct_inst *)__nw__FUl ( (unsigned long )(sizeof (struct funct_inst))) )){ ( (__0this = (struct funct_inst *)(
+if (__0this || (__0this = (struct funct_inst *)__nw__FUl ( (size_t )(sizeof (struct funct_inst))) )){ ( (__0this = (struct funct_inst *)(
 # 4085 "/home/claude/cfront-3/src/template.cpp"
-(__0__X200 = (((struct basic_inst *)__0this ))), ( ((__0__X200 || (__0__X200 = (struct basic_inst *)__nw__FUl ( (unsigned long )(sizeof (struct basic_inst))) ))?( (__0__X200 ->
+(__0__X200 = (((struct basic_inst *)__0this ))), ( ((__0__X200 || (__0__X200 = (struct basic_inst *)__nw__FUl ( (size_t )(sizeof (struct basic_inst))) ))?( (__0__X200 ->
 # 4085 "/home/claude/cfront-3/src/template.cpp"
 __vptr__10basic_inst = (struct __mptr *) __ptbl_vec___[2]), ( (__0__X23 = (& __0__X200 -> context__10basic_inst )), ( ((__0__X23 || (__0__X23 = (struct state *)__nw__FUl ( (unsigned
 # 4085 "/home/claude/cfront-3/src/template.cpp"
@@ -10480,7 +10480,7 @@ struct classdef *__ct__8classdefFUc (struct classdef *__0this , TOK );
 # 4098 "/home/claude/cfront-3/src/template.cpp"
 struct templ_classdef *__ct__14templ_classdefFP10templ_inst (register struct templ_classdef *__0this , Ptempl_inst __1i )
 # 4100 "/home/claude/cfront-3/src/template.cpp"
-{ if (__0this || (__0this = (struct templ_classdef *)__nw__FUl ( (unsigned long )(sizeof (struct templ_classdef)))
+{ if (__0this || (__0this = (struct templ_classdef *)__nw__FUl ( (size_t )(sizeof (struct templ_classdef)))
 # 4100 "/home/claude/cfront-3/src/template.cpp"
 )){ __0this = (struct templ_classdef *)__ct__8classdefFUc ( ((struct classdef *)__0this ), (unsigned char )6 ) ;
 __0this -> inst__14templ_classdef = __1i ;
@@ -10496,7 +10496,7 @@ return __0this ;
 # 4107 "/home/claude/cfront-3/src/template.cpp"
 struct templ_classdef *__ct__14templ_classdefFP10templ_instUc (register struct templ_classdef *__0this , Ptempl_inst __1i , TOK __1csu )
 # 4109 "/home/claude/cfront-3/src/template.cpp"
-{ if (__0this || (__0this = (struct templ_classdef *)__nw__FUl ( (unsigned long )(sizeof
+{ if (__0this || (__0this = (struct templ_classdef *)__nw__FUl ( (size_t)(sizeof
 # 4109 "/home/claude/cfront-3/src/template.cpp"
 (struct templ_classdef))) )){ __0this = (struct templ_classdef *)__ct__8classdefFUc ( ((struct classdef *)__0this ), __1csu ) ;
 __0this -> inst__14templ_classdef = __1i ;
@@ -10513,7 +10513,7 @@ return __0this ;
 struct fct *__ct__3fctFP4typeP4nameUc (struct fct *__0this , Ptype , Pname , TOK );
 
 # 4116 "/home/claude/cfront-3/src/template.cpp"
-struct templ_fct *__ct__9templ_fctFP10funct_inst (register struct templ_fct *__0this , Pfunct_inst __1i ){ if (__0this || (__0this = (struct templ_fct *)__nw__9templ_fctSFUl ( (unsigned long )(sizeof (struct templ_fct)))
+struct templ_fct *__ct__9templ_fctFP10funct_inst (register struct templ_fct *__0this , Pfunct_inst __1i ){ if (__0this || (__0this = (struct templ_fct *)__nw__9templ_fctSFUl ( (size_t )(sizeof (struct templ_fct)))
 # 4116 "/home/claude/cfront-3/src/template.cpp"
 )){ __0this = (struct templ_fct *)__ct__3fctFP4typeP4nameUc ( ((struct fct *)__0this ), (struct type *)0 , (struct name *)0 , (unsigned char )0 ) ;
 # 4116 "/home/claude/cfront-3/src/template.cpp"
@@ -10536,9 +10536,9 @@ struct data_template *__ct__13data_templateFR5templP9name_listP4name (register s
 struct basic_template *__0__X201 ;
 
 # 4123 "/home/claude/cfront-3/src/template.cpp"
-if (__0this || (__0this = (struct data_template *)__nw__FUl ( (unsigned long )(sizeof (struct data_template))) )){ ( (__0this = (struct data_template *)(
+if (__0this || (__0this = (struct data_template *)__nw__FUl ( (size_t )(sizeof (struct data_template))) )){ ( (__0this = (struct data_template *)(
 # 4123 "/home/claude/cfront-3/src/template.cpp"
-(__0__X201 = (((struct basic_template *)__0this ))), ( ((__0__X201 || (__0__X201 = (struct basic_template *)__nw__FUl ( (unsigned long )(sizeof (struct basic_template))) ))?(__0__X201 -> __vptr__14basic_template =
+(__0__X201 = (((struct basic_template *)__0this ))), ( ((__0__X201 || (__0__X201 = (struct basic_template *)__nw__FUl ( (size_t )(sizeof (struct basic_template))) ))?(__0__X201 -> __vptr__14basic_template =
 # 4123 "/home/claude/cfront-3/src/template.cpp"
 (struct __mptr *) __ptbl_vec___[0]):0 ), __0__X201 ) ) ), (__0this -> __vptr__14basic_template = (struct __mptr *) __ptbl_vec___[5])) ;
 
@@ -10569,9 +10569,9 @@ struct function_template *__ct__17function_templateFR5templP9name_listP4name (re
 struct basic_template *__0__X202 ;
 
 # 4135 "/home/claude/cfront-3/src/template.cpp"
-if (__0this || (__0this = (struct function_template *)__nw__FUl ( (unsigned long )(sizeof (struct function_template))) )){ ( (__0this = (struct function_template *)(
+if (__0this || (__0this = (struct function_template *)__nw__FUl ( (size_t )(sizeof (struct function_template))) )){ ( (__0this = (struct function_template *)(
 # 4135 "/home/claude/cfront-3/src/template.cpp"
-(__0__X202 = (((struct basic_template *)__0this ))), ( ((__0__X202 || (__0__X202 = (struct basic_template *)__nw__FUl ( (unsigned long )(sizeof (struct basic_template))) ))?(__0__X202 -> __vptr__14basic_template =
+(__0__X202 = (((struct basic_template *)__0this ))), ( ((__0__X202 || (__0__X202 = (struct basic_template *)__nw__FUl ( (size_t )(sizeof (struct basic_template))) ))?(__0__X202 -> __vptr__14basic_template =
 # 4135 "/home/claude/cfront-3/src/template.cpp"
 (struct __mptr *) __ptbl_vec___[0]):0 ), __0__X202 ) ) ), (__0this -> __vptr__14basic_template = (struct __mptr *) __ptbl_vec___[6])) ;
 
@@ -10602,9 +10602,9 @@ struct function_template *__ct__17function_templateFP9name_listP4name (register 
 struct basic_template *__0__X203 ;
 
 # 4147 "/home/claude/cfront-3/src/template.cpp"
-if (__0this || (__0this = (struct function_template *)__nw__FUl ( (unsigned long )(sizeof (struct function_template))) )){ ( (__0this = (struct function_template *)(
+if (__0this || (__0this = (struct function_template *)__nw__FUl ( (size_t )(sizeof (struct function_template))) )){ ( (__0this = (struct function_template *)(
 # 4147 "/home/claude/cfront-3/src/template.cpp"
-(__0__X203 = (((struct basic_template *)__0this ))), ( ((__0__X203 || (__0__X203 = (struct basic_template *)__nw__FUl ( (unsigned long )(sizeof (struct basic_template))) ))?(__0__X203 -> __vptr__14basic_template =
+(__0__X203 = (((struct basic_template *)__0this ))), ( ((__0__X203 || (__0__X203 = (struct basic_template *)__nw__FUl ( (size_t )(sizeof (struct basic_template))) ))?(__0__X203 -> __vptr__14basic_template =
 # 4147 "/home/claude/cfront-3/src/template.cpp"
 (struct __mptr *) __ptbl_vec___[0]):0 ), __0__X203 ) ) ), (__0this -> __vptr__14basic_template = (struct __mptr *) __ptbl_vec___[6])) ;
 
@@ -10671,7 +10671,7 @@ del__4HashFi ( (struct Hash *)__0this -> corr__10basic_inst , (int )(((unsigned 
 }
 else __0this -> corr__10basic_inst = ( (__0__X205 = 0 ), ( (__2__X206 = 1000), ( ((__0__X205 || (__0__X205 = (struct pointer_hash *)__nw__FUl (
 # 4177 "/home/claude/cfront-3/src/template.cpp"
-(unsigned long )(sizeof (struct pointer_hash))) ))?( (__0__X205 = (struct pointer_hash *)__ct__4HashFi ( ((struct Hash *)__0__X205 ), (int )__2__X206 ) ), (
+(size_t )(sizeof (struct pointer_hash))) ))?( (__0__X205 = (struct pointer_hash *)__ct__4HashFi ( ((struct Hash *)__0__X205 ), (int )__2__X206 ) ), (
 # 4177 "/home/claude/cfront-3/src/template.cpp"
 (__0__X205 -> key_hash_function__4Hash = (pointer_hash_fcn__FUl )), (__0__X205 -> key_key_equality_function__4Hash = (pointer_hasheq__FUlT1 ))) ) :0 ), __0__X205 ) ) ) ;
 
@@ -11484,7 +11484,7 @@ struct ea __0__X__V1500q2z144hdwckg ;
 
 # 4484 "/home/claude/cfront-3/src/template.cpp"
 __1count = get_formals_count__14basic_templateFv ( (struct basic_template *)__1ft ) ;
-__1parray = (((struct Pslot *)__nw__FUl ( (unsigned long )((sizeof (struct Pslot ))* __1count )) ));
+__1parray = (((struct Pslot *)__nw__FUl ( (size_t)((sizeof (struct Pslot ))* __1count )) ));
 __1ni = 0 ;
 
 # 4488 "/home/claude/cfront-3/src/template.cpp"
@@ -12058,7 +12058,7 @@ static struct ea *__ct__2eaFUl (struct ea *__0this ,
 # 76 "/home/claude/cfront-3/src/cfront.h"
 size_t __2ii ){ 
 # 76 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ea *)__nw__FUl ( (unsigned long )(sizeof (struct ea)))
+if (__0this || (__0this = (struct ea *)__nw__FUl ( (size_t )(sizeof (struct ea)))
 # 76 "/home/claude/cfront-3/src/cfront.h"
 ))__0this -> __O1__2ea.i = __2ii ;
 

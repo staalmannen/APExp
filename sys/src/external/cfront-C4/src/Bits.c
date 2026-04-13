@@ -122,7 +122,7 @@ size_t n__16Block_Bits_chunk ;
 void move__16Block_Bits_chunkFPUlUl (struct Block_Bits_chunk *__0this , Bits_chunk *, size_t );
 
 # 1 ""
-extern void *__nw__FUl (unsigned long );
+extern void *__nw__FUl (size_t );
 
 # 27 "/home/claude/cfront-3/src/Bits.h"
 void copy__16Block_Bits_chunkFRC16Block_Bits_chunk (struct Block_Bits_chunk *__0this , const struct Block_Bits_chunk *);
@@ -246,13 +246,13 @@ while (__1nn <= __1k )__1nn += ((__1nn >> 1 )+ 1 );
 { Bits_chunk *__1np ;
 
 # 26 "/home/claude/cfront-3/src/Bits.cpp"
-__1np = (((unsigned long *)__nw__FUl ( (unsigned long )((sizeof (unsigned long ))* __1nn )) ));
+__1np = (((unsigned long *)__nw__FUl ( (size_t)((sizeof (unsigned long ))* __1nn )) ));
 
 # 26 "/home/claude/cfront-3/src/Bits.cpp"
 if (! __1np ){ __1nn = (__1k + 1 );
 
 # 26 "/home/claude/cfront-3/src/Bits.cpp"
-__1np = (((unsigned long *)__nw__FUl ( (unsigned long )((sizeof (unsigned long ))* __1nn )) ));
+__1np = (((unsigned long *)__nw__FUl ( (size_t)((sizeof (unsigned long ))* __1nn )) ));
 
 # 26 "/home/claude/cfront-3/src/Bits.cpp"
 }
@@ -375,9 +375,9 @@ struct Block_Bits_chunk *__0__X21 ;
 struct Block_Bits_chunk *__0__X22 ;
 
 # 29 "/home/claude/cfront-3/src/Bits.cpp"
-if (__0this || (__0this = (struct Bits *)__nw__FUl ( (unsigned long )(sizeof (struct Bits))) )){ ( (__0__X21 = (& __0this ->
+if (__0this || (__0this = (struct Bits *)__nw__FUl ( (size_t )(sizeof (struct Bits))) )){ ( (__0__X21 = (& __0this ->
 # 29 "/home/claude/cfront-3/src/Bits.cpp"
-b__4Bits )), ( ((__0__X21 || (__0__X21 = (struct Block_Bits_chunk *)__nw__FUl ( (unsigned long )(sizeof (struct Block_Bits_chunk))) ))?( (__0__X21 -> n__16Block_Bits_chunk = 0 ),
+b__4Bits )), ( ((__0__X21 || (__0__X21 = (struct Block_Bits_chunk *)__nw__FUl ( (size_t )(sizeof (struct Block_Bits_chunk))) ))?( (__0__X21 -> n__16Block_Bits_chunk = 0 ),
 # 29 "/home/claude/cfront-3/src/Bits.cpp"
 (__0__X21 -> p__16Block_Bits_chunk = 0 )) :0 ), __0__X21 ) ) ;
 if (__1ct < 32){ 
@@ -444,7 +444,7 @@ if (( (__0__X23 = (const struct Block_Bits_chunk *)(& __0this -> b__4Bits )), ( 
 # 46 "/home/claude/cfront-3/src/Bits.cpp"
 (
 # 46 "/home/claude/cfront-3/src/Bits.cpp"
-(__0__X24 = (& __0this -> b__4Bits )), ( move__16Block_Bits_chunkFPUlUl ( __0__X24 , (Bits_chunk *)(((unsigned long *)__nw__FUl ( (unsigned long )((sizeof (unsigned
+(__0__X24 = (& __0this -> b__4Bits )), ( move__16Block_Bits_chunkFPUlUl ( __0__X24 , (Bits_chunk *)(((unsigned long *)__nw__FUl ( (size_t)((sizeof (unsigned
 # 46 "/home/claude/cfront-3/src/Bits.cpp"
 long ))* __1newsize )) )), __1newsize ) , __0__X24 -> n__16Block_Bits_chunk ) ) ;
 __0this -> n__4Bits = (( (__0__X25 = (const struct Block_Bits_chunk *)(& __0this -> b__4Bits )), ( __0__X25 -> n__16Block_Bits_chunk ) ) ?__1x :(((unsigned
@@ -779,7 +779,7 @@ const struct Block_Bits_chunk *__2__X36 ;
 # 185 "/home/claude/cfront-3/src/Bits.cpp"
 ( (( ( ( (__0__X35 = (& __0_result -> b__4Bits )), ( (__2__X36 = (const struct Block_Bits_chunk *)(& ((*__1x )).
 # 185 "/home/claude/cfront-3/src/Bits.cpp"
-b__4Bits )), ( ((__0__X35 || (__0__X35 = (struct Block_Bits_chunk *)__nw__FUl ( (unsigned long )(sizeof (struct Block_Bits_chunk))) ))?(((void )copy__16Block_Bits_chunkFRC16Block_Bits_chunk ( __0__X35 , __2__X36 )
+b__4Bits )), ( ((__0__X35 || (__0__X35 = (struct Block_Bits_chunk *)__nw__FUl ( (size_t )(sizeof (struct Block_Bits_chunk))) ))?(((void )copy__16Block_Bits_chunkFRC16Block_Bits_chunk ( __0__X35 , __2__X36 )
 # 185 "/home/claude/cfront-3/src/Bits.cpp"
 )):(((void )0 ))), __0__X35 ) ) ) , (__0_result -> n__4Bits = ((*__1x )). n__4Bits )) , 0 ) ), __0_result )
 # 185 "/home/claude/cfront-3/src/Bits.cpp"

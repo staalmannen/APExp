@@ -144,7 +144,7 @@ union  __Q2_2ea4__C1 __O1__2ea ;
 };
 
 # 1 ""
-extern void *__nw__FUl (unsigned long );
+extern void *__nw__FUl (size_t );
 
 # 80 "/home/claude/cfront-3/src/cfront.h"
 extern struct ea *ea0 ;
@@ -736,15 +736,15 @@ struct type *__0__X6 ;
 struct node *__0__X1 ;
 
 # 708 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (unsigned long )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
+if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (size_t )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (unsigned long )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
+(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (size_t )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( (
+(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( (
 # 708 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( (__0__X6 = (struct type *)( (__0__X1 = (((struct node *)__0__X6 ))), ( ((__0__X1 ||
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
+(__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
 # 708 "/home/claude/cfront-3/src/cfront.h"
 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X6 -> defined__4type = 0 )) , (__0__X6 ->
 # 708 "/home/claude/cfront-3/src/cfront.h"
@@ -1851,7 +1851,7 @@ __2save_cur_tree = __0this -> cur_tree__6walker ;
 __0this -> depth__6walker ++ ;
 if (__0this -> control__6walker . alloc_stack_bytes__17tree_walk_control ){ 
 # 139 "/home/claude/cfront-3/src/tree_walk.cpp"
-__0this -> cur_tree__6walker = (((struct tree_walk_tree *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))*
+__0this -> cur_tree__6walker = (((struct tree_walk_tree *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))*
 # 139 "/home/claude/cfront-3/src/tree_walk.cpp"
 (__0this -> control__6walker . alloc_stack_bytes__17tree_walk_control + (sizeof (struct tree_walk_tree ))))) ))));
 __0this -> cur_tree__6walker -> parent__14tree_walk_tree = __2save_cur_tree ;
@@ -1883,9 +1883,9 @@ struct walker *__ct__6walkerFRC17tree_walk_control (register struct walker *__0t
 register struct tree_walk_control *__0__X18 ;
 
 # 149 "/home/claude/cfront-3/src/tree_walk.cpp"
-if (__0this || (__0this = (struct walker *)__nw__FUl ( (unsigned long )(sizeof (struct walker))) )){ ( (__0__X18 = (& __0this ->
+if (__0this || (__0this = (struct walker *)__nw__FUl ( (size_t )(sizeof (struct walker))) )){ ( (__0__X18 = (& __0this ->
 # 149 "/home/claude/cfront-3/src/tree_walk.cpp"
-control__6walker )), ( ((__0__X18 || (__0__X18 = (struct tree_walk_control *)__nw__FUl ( (unsigned long )(sizeof (struct tree_walk_control))) ))?( (__0__X18 -> version__17tree_walk_control = 1 ),
+control__6walker )), ( ((__0__X18 || (__0__X18 = (struct tree_walk_control *)__nw__FUl ( (size_t )(sizeof (struct tree_walk_control))) ))?( (__0__X18 -> version__17tree_walk_control = 1 ),
 # 149 "/home/claude/cfront-3/src/tree_walk.cpp"
 ( (__0__X18 -> callback_info__17tree_walk_control = 0 ), ( (__0__X18 -> fetcher__17tree_walk_control = null_tfp ), ( (__0__X18 -> call_i_error__17tree_walk_control = 0 ), ( (__0__X18 ->
 # 149 "/home/claude/cfront-3/src/tree_walk.cpp"
@@ -1903,7 +1903,7 @@ else {
 register struct pointer_hash *__0__X19 ;
 
 # 154 "/home/claude/cfront-3/src/tree_walk.cpp"
-__0this -> nodes_seen_hash__6walker = (struct Hash *)( (__0__X19 = 0 ), ( ((__0__X19 || (__0__X19 = (struct pointer_hash *)__nw__FUl ( (unsigned long )(sizeof
+__0this -> nodes_seen_hash__6walker = (struct Hash *)( (__0__X19 = 0 ), ( ((__0__X19 || (__0__X19 = (struct pointer_hash *)__nw__FUl ( (size_t)(sizeof
 # 154 "/home/claude/cfront-3/src/tree_walk.cpp"
 (struct pointer_hash))) ))?( (__0__X19 = (struct pointer_hash *)__ct__4HashFi ( ((struct Hash *)__0__X19 ), (int )((unsigned long )100 )) ), ( (__0__X19 ->
 # 154 "/home/claude/cfront-3/src/tree_walk.cpp"
@@ -2163,7 +2163,7 @@ else
 # 261 "/home/claude/cfront-3/src/tree_walk.cpp"
 { 
 # 262 "/home/claude/cfront-3/src/tree_walk.cpp"
-((*__1taddr ))= (((void *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* __1length )) ))));
+((*__1taddr ))= (((void *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* __1length )) ))));
 if (((*__1taddr ))== 0 ){ 
 # 264 "/home/claude/cfront-3/src/tree_walk.cpp"
 error__6walkerFPCcUl ( __0this , (const char *)"walker::fetch: failed to malloc %d bytes.", __1length ) ;
@@ -4029,7 +4029,7 @@ if (__3cn || eobj ){
 char *__4str_tmp ;
 
 # 1062 "/home/claude/cfront-3/src/tree_walk.cpp"
-__4str_tmp = (((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (strlen ( eobj ?(((struct enumdef *)(((struct enumdef *)eobj -> __O1__4expr.tp ))))-> string__7enumdef :(((struct
+__4str_tmp = (((char *)__nw__FUl ( (size_t)((sizeof (char ))* (strlen ( eobj ?(((struct enumdef *)(((struct enumdef *)eobj -> __O1__4expr.tp ))))-> string__7enumdef :(((struct
 # 1062 "/home/claude/cfront-3/src/tree_walk.cpp"
 classdef *)(((struct classdef *)__3cn -> __O1__4expr.tp ))))-> string__8classdef ) + 1 ))) ));
 strcpy ( __4str_tmp , eobj ?(((struct enumdef *)(((struct enumdef *)eobj -> __O1__4expr.tp ))))-> string__7enumdef :(((struct classdef *)(((struct classdef *)__3cn -> __O1__4expr.tp ))))-> string__8classdef ) ;

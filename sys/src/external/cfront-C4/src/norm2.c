@@ -144,7 +144,7 @@ union  __Q2_2ea4__C1 __O1__2ea ;
 };
 
 # 1 ""
-extern void *__nw__FUl (unsigned long );
+extern void *__nw__FUl (size_t );
 
 # 80 "/home/claude/cfront-3/src/cfront.h"
 extern struct ea *ea0 ;
@@ -736,15 +736,15 @@ struct type *__0__X6 ;
 struct node *__0__X1 ;
 
 # 708 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (unsigned long )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
+if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (size_t )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (unsigned long )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
+(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (size_t )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( (
+(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( (
 # 708 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( (__0__X6 = (struct type *)( (__0__X1 = (((struct node *)__0__X6 ))), ( ((__0__X1 ||
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
+(__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
 # 708 "/home/claude/cfront-3/src/cfront.h"
 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X6 -> defined__4type = 0 )) , (__0__X6 ->
 # 708 "/home/claude/cfront-3/src/cfront.h"
@@ -1733,13 +1733,13 @@ struct type *__0__X20 ;
 struct node *__0__X1 ;
 
 # 36 "/home/claude/cfront-3/src/norm2.cpp"
-if (__0this || (__0this = (struct fct *)__nw__3fctSFUl ( (unsigned long )(sizeof (struct fct))) )){ __0this = (struct fct *)( (__0__X20 =
+if (__0this || (__0this = (struct fct *)__nw__3fctSFUl ( (size_t )(sizeof (struct fct))) )){ __0this = (struct fct *)( (__0__X20 =
 # 36 "/home/claude/cfront-3/src/norm2.cpp"
-(((struct type *)__0this ))), ( ((__0__X20 || (__0__X20 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( ( (
+(((struct type *)__0this ))), ( ((__0__X20 || (__0__X20 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( ( (
 # 36 "/home/claude/cfront-3/src/norm2.cpp"
 ( ( ( ( ( (__0__X20 = (struct type *)( (__0__X1 = (((struct node *)__0__X20 ))), ( ((__0__X1 || (__0__X1 =
 # 36 "/home/claude/cfront-3/src/norm2.cpp"
-(struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node = 0 ))
+(struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node = 0 ))
 # 36 "/home/claude/cfront-3/src/norm2.cpp"
 , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X20 -> defined__4type = 0 )) , (__0__X20 -> lex_level__4type =
 # 36 "/home/claude/cfront-3/src/norm2.cpp"
@@ -1854,9 +1854,9 @@ struct expr *__ct__4exprFUcP4exprT2 (register struct expr *__0this , TOK __1ba ,
 struct node *__0__X22 ;
 
 # 81 "/home/claude/cfront-3/src/norm2.cpp"
-if (__0this || (__0this = (struct expr *)__nw__4exprSFUl ( (unsigned long )(sizeof (struct expr))) )){ __0this = (struct expr *)( (__0__X22 =
+if (__0this || (__0this = (struct expr *)__nw__4exprSFUl ( (size_t )(sizeof (struct expr))) )){ __0this = (struct expr *)( (__0__X22 =
 # 81 "/home/claude/cfront-3/src/norm2.cpp"
-(((struct node *)__0this ))), ( ((__0__X22 || (__0__X22 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X22 ->
+(((struct node *)__0this ))), ( ((__0__X22 || (__0__X22 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X22 ->
 # 81 "/home/claude/cfront-3/src/norm2.cpp"
 base__4node = 0 ), (__0__X22 -> permanent__4node = 0 )) , (__0__X22 -> baseclass__4node = 0 )) :0 ), __0__X22 ) ) ;
 ;
@@ -1883,9 +1883,9 @@ struct stmt *__ct__4stmtFUc3locP4stmt (register struct stmt *__0this , TOK __1ba
 struct node *__0__X23 ;
 
 # 93 "/home/claude/cfront-3/src/norm2.cpp"
-if (__0this || (__0this = (struct stmt *)__nw__4stmtSFUl ( (unsigned long )(sizeof (struct stmt))) )){ __0this = (struct stmt *)( (__0__X23 =
+if (__0this || (__0this = (struct stmt *)__nw__4stmtSFUl ( (size_t )(sizeof (struct stmt))) )){ __0this = (struct stmt *)( (__0__X23 =
 # 93 "/home/claude/cfront-3/src/norm2.cpp"
-(((struct node *)__0this ))), ( ((__0__X23 || (__0__X23 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X23 ->
+(((struct node *)__0this ))), ( ((__0__X23 || (__0__X23 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X23 ->
 # 93 "/home/claude/cfront-3/src/norm2.cpp"
 base__4node = 0 ), (__0__X23 -> permanent__4node = 0 )) , (__0__X23 -> baseclass__4node = 0 )) :0 ), __0__X23 ) ) ;
 ;
@@ -1918,13 +1918,13 @@ struct type *__0__X24 ;
 struct node *__0__X1 ;
 
 # 105 "/home/claude/cfront-3/src/norm2.cpp"
-if (__0this || (__0this = (struct classdef *)__nw__FUl ( (unsigned long )(sizeof (struct classdef))) )){ __0this = (struct classdef *)( (__0__X24 =
+if (__0this || (__0this = (struct classdef *)__nw__FUl ( (size_t )(sizeof (struct classdef))) )){ __0this = (struct classdef *)( (__0__X24 =
 # 105 "/home/claude/cfront-3/src/norm2.cpp"
-(((struct type *)__0this ))), ( ((__0__X24 || (__0__X24 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( ( (
+(((struct type *)__0this ))), ( ((__0__X24 || (__0__X24 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( ( (
 # 105 "/home/claude/cfront-3/src/norm2.cpp"
 ( ( ( ( ( (__0__X24 = (struct type *)( (__0__X1 = (((struct node *)__0__X24 ))), ( ((__0__X1 || (__0__X1 =
 # 105 "/home/claude/cfront-3/src/norm2.cpp"
-(struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node = 0 ))
+(struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node = 0 ))
 # 105 "/home/claude/cfront-3/src/norm2.cpp"
 , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X24 -> defined__4type = 0 )) , (__0__X24 -> lex_level__4type =
 # 105 "/home/claude/cfront-3/src/norm2.cpp"
@@ -1999,13 +1999,13 @@ struct type *__0__X27 ;
 struct node *__0__X1 ;
 
 # 139 "/home/claude/cfront-3/src/norm2.cpp"
-if (__0this || (__0this = (struct basetype *)__nw__FUl ( (unsigned long )(sizeof (struct basetype))) )){ __0this = (struct basetype *)( (__0__X27 =
+if (__0this || (__0this = (struct basetype *)__nw__FUl ( (size_t )(sizeof (struct basetype))) )){ __0this = (struct basetype *)( (__0__X27 =
 # 139 "/home/claude/cfront-3/src/norm2.cpp"
-(((struct type *)__0this ))), ( ((__0__X27 || (__0__X27 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( ( (
+(((struct type *)__0this ))), ( ((__0__X27 || (__0__X27 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( ( (
 # 139 "/home/claude/cfront-3/src/norm2.cpp"
 ( ( ( ( ( (__0__X27 = (struct type *)( (__0__X1 = (((struct node *)__0__X27 ))), ( ((__0__X1 || (__0__X1 =
 # 139 "/home/claude/cfront-3/src/norm2.cpp"
-(struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node = 0 ))
+(struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node = 0 ))
 # 139 "/home/claude/cfront-3/src/norm2.cpp"
 , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X27 -> defined__4type = 0 )) , (__0__X27 -> lex_level__4type =
 # 139 "/home/claude/cfront-3/src/norm2.cpp"
@@ -2166,9 +2166,9 @@ struct name_list *__ct__9name_listFP4nameP9name_list (register struct name_list 
 struct node *__0__X28 ;
 
 # 200 "/home/claude/cfront-3/src/norm2.cpp"
-if (__0this || (__0this = (struct name_list *)__nw__FUl ( (unsigned long )(sizeof (struct name_list))) )){ __0this = (struct name_list *)( (__0__X28 =
+if (__0this || (__0this = (struct name_list *)__nw__FUl ( (size_t )(sizeof (struct name_list))) )){ __0this = (struct name_list *)( (__0__X28 =
 # 200 "/home/claude/cfront-3/src/norm2.cpp"
-(((struct node *)__0this ))), ( ((__0__X28 || (__0__X28 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X28 ->
+(((struct node *)__0this ))), ( ((__0__X28 || (__0__X28 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X28 ->
 # 200 "/home/claude/cfront-3/src/norm2.cpp"
 base__4node = 0 ), (__0__X28 -> permanent__4node = 0 )) , (__0__X28 -> baseclass__4node = 0 )) :0 ), __0__X28 ) ) ;
 __0this -> base__4node = 201 ;
@@ -2182,7 +2182,7 @@ return __0this ;
 # 206 "/home/claude/cfront-3/src/norm2.cpp"
 struct nlist *__ct__5nlistFP4name (register struct nlist *__0this , Pname __1n )
 # 207 "/home/claude/cfront-3/src/norm2.cpp"
-{ if (__0this || (__0this = (struct nlist *)__nw__FUl ( (unsigned long )(sizeof (struct nlist)))
+{ if (__0this || (__0this = (struct nlist *)__nw__FUl ( (size_t )(sizeof (struct nlist)))
 # 207 "/home/claude/cfront-3/src/norm2.cpp"
 )){ 
 # 208 "/home/claude/cfront-3/src/norm2.cpp"
@@ -2307,7 +2307,7 @@ if (255 < (__1p - __1buf ))error__FiPCc ( (int )'i' , (const char *)"sig_name():
 { char *__1s ;
 
 # 262 "/home/claude/cfront-3/src/norm2.cpp"
-__1s = (((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* ((__1p - __1buf )+ 1 ))) ));
+__1s = (((char *)__nw__FUl ( (size_t)((sizeof (char ))* ((__1p - __1buf )+ 1 ))) ));
 strcpy ( __1s , (const char *)__1buf ) ;
 __1n -> __O2__4expr.string = (const char *)__1s ;
 __1n -> __O1__4expr.tp = 0 ;

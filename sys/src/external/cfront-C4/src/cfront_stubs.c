@@ -51,7 +51,7 @@ void __vec_delete(void *p, int n, int sz, void *dtor, int del, int d) {
     if (!p) return;
     if (dtor && n > 0) {
         /* dtor signature: void (*)(T*, int) - the int is a "free" flag */
-        char *q = (char *)p + (n-1) * sz;
+        char *q = n > 0 ? (char *)p + (n-1) * sz : (char *)p;
         typedef void (*DtorFn)(void *, int);
         DtorFn fn = (DtorFn)dtor;
         int i;

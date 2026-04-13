@@ -144,7 +144,7 @@ union  __Q2_2ea4__C1 __O1__2ea ;
 };
 
 # 1 ""
-extern void *__nw__FUl (unsigned long );
+extern void *__nw__FUl (size_t );
 
 # 80 "/home/claude/cfront-3/src/cfront.h"
 extern struct ea *ea0 ;
@@ -736,15 +736,15 @@ struct type *__0__X6 ;
 struct node *__0__X1 ;
 
 # 708 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (unsigned long )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
+if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (size_t )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (unsigned long )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
+(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (size_t )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( (
+(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( (
 # 708 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( (__0__X6 = (struct type *)( (__0__X1 = (((struct node *)__0__X6 ))), ( ((__0__X1 ||
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
+(__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
 # 708 "/home/claude/cfront-3/src/cfront.h"
 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X6 -> defined__4type = 0 )) , (__0__X6 ->
 # 708 "/home/claude/cfront-3/src/cfront.h"
@@ -1668,7 +1668,7 @@ if (__0this -> __O1__4expr.tp && (__0this -> __O1__4expr.tp -> permanent__4node 
 if (__1i && (__1i != (((struct expr *)1 ))))if (__1i && (__1i -> permanent__4node == 0 ))del__4exprFv ( __1i ) ;
 ( (__0this ?(((void )(__0this ?(((void )( ( ((((struct expr *)__0this ))?(((void )((((struct expr *)__0this ))?(((void )(((void )0 )))):(((void )0 ))))):(((void )0 )))) ,
 # 39 "/home/claude/cfront-3/src/del.cpp"
-(((void )__dl__4nameSFPvUl ( (void *)__0this , (unsigned long )(sizeof (struct name))) ))) )):(((void )0 ))))):(((void )0 )))) ;
+(((void )__dl__4nameSFPvUl ( (void *)__0this , (size_t )(sizeof (struct name))) ))) )):(((void )0 ))))):(((void )0 )))) ;
 
 # 39 "/home/claude/cfront-3/src/del.cpp"
 }
@@ -1739,7 +1739,7 @@ case 108 :
 # 57 "/home/claude/cfront-3/src/del.cpp"
 __3f = (((struct fct *)(((struct fct *)__0this ))));
 if (__3f -> returns__3fct && (__3f -> returns__3fct -> permanent__4node == 0 ))del__4typeFv ( __3f -> returns__3fct ) ;
-( (__3f ?(((void )(__3f ?(((void )(((void )__dl__3fctSFPvUl ( (void *)__3f , (unsigned long )(sizeof (struct fct))) )))):(((void )0 ))))):(((void )0 ))))
+( (__3f ?(((void )(__3f ?(((void )(((void )__dl__3fctSFPvUl ( (void *)__3f , (size_t )(sizeof (struct fct))) )))):(((void )0 ))))):(((void )0 ))))
 # 59 "/home/claude/cfront-3/src/del.cpp"
 ;
 break ;
@@ -1752,7 +1752,7 @@ case 110 :
 __3v = (((struct vec *)(((struct vec *)__0this ))));
 if (__3v -> dim__3vec && (__3v -> dim__3vec -> permanent__4node == 0 ))del__4exprFv ( __3v -> dim__3vec ) ;
 if (__3v -> typ__5pvtyp && (__3v -> typ__5pvtyp -> permanent__4node == 0 ))del__4typeFv ( __3v -> typ__5pvtyp ) ;
-( (__3v ?(((void )(__3v ?(((void )(((void )__dl__3vecSFPvUl ( (void *)__3v , (unsigned long )(sizeof (struct vec))) )))):(((void )0 ))))):(((void )0 ))))
+( (__3v ?(((void )(__3v ?(((void )(((void )__dl__3vecSFPvUl ( (void *)__3v , (size_t )(sizeof (struct vec))) )))):(((void )0 ))))):(((void )0 ))))
 # 66 "/home/claude/cfront-3/src/del.cpp"
 ;
 break ;
@@ -1766,7 +1766,7 @@ case 158 :
 # 71 "/home/claude/cfront-3/src/del.cpp"
 __3p = (((struct ptr *)(((struct ptr *)__0this ))));
 if (__3p -> typ__5pvtyp && (__3p -> typ__5pvtyp -> permanent__4node == 0 ))del__4typeFv ( __3p -> typ__5pvtyp ) ;
-( (__3p ?(((void )(__3p ?(((void )(((void )__dl__3ptrSFPvUl ( (void *)__3p , (unsigned long )(sizeof (struct ptr))) )))):(((void )0 ))))):(((void )0 ))))
+( (__3p ?(((void )(__3p ?(((void )(((void )__dl__3ptrSFPvUl ( (void *)__3p , (size_t )(sizeof (struct ptr))) )))):(((void )0 ))))):(((void )0 ))))
 # 73 "/home/claude/cfront-3/src/del.cpp"
 ;
 break ;
@@ -1879,7 +1879,7 @@ if (__4x -> permanent__4node )break ;
 __4x -> permanent__4node = 3 ;
 __3tp = __3tp -> __O3__4expr.e2 ;
 if (__4x -> __O2__4expr.e1 )if (__4x -> __O2__4expr.e1 && (__4x -> __O2__4expr.e1 -> permanent__4node == 0 ))del__4exprFv ( __4x -> __O2__4expr.e1 ) ;
-( (__4x ?(((void )(__4x ?(((void )(((void )__dl__4exprSFPvUl ( (void *)__4x , (unsigned long )(sizeof (struct expr))) )))):(((void )0 ))))):(((void )0 ))))
+( (__4x ?(((void )(__4x ?(((void )(((void )__dl__4exprSFPvUl ( (void *)__4x , (size_t )(sizeof (struct expr))) )))):(((void )0 ))))):(((void )0 ))))
 # 135 "/home/claude/cfront-3/src/del.cpp"
 ;
 }
@@ -1893,7 +1893,7 @@ if (__0this -> __O2__4expr.e1 && (__0this -> __O2__4expr.e1 -> permanent__4node 
 if (__0this -> __O3__4expr.e2 && (__0this -> __O3__4expr.e2 -> permanent__4node == 0 ))del__4exprFv ( __0this -> __O3__4expr.e2 ) ;
 dd :
 # 145 "/home/claude/cfront-3/src/del.cpp"
-( (__0this ?(((void )(__0this ?(((void )(((void )__dl__4exprSFPvUl ( (void *)__0this , (unsigned long )(sizeof (struct expr))) )))):(((void )0 ))))):(((void )0 ))))
+( (__0this ?(((void )(__0this ?(((void )(((void )__dl__4exprSFPvUl ( (void *)__0this , (size_t )(sizeof (struct expr))) )))):(((void )0 ))))):(((void )0 ))))
 # 145 "/home/claude/cfront-3/src/del.cpp"
 ;
 }
@@ -1964,7 +1964,7 @@ if (__0this -> s__4stmt && (__0this -> s__4stmt -> permanent__4node == 0 ))del__
 if (__0this -> s_list__4stmt && (__0this -> s_list__4stmt -> permanent__4node == 0 ))del__4stmtFv ( __0this -> s_list__4stmt ) ;
 dd :
 # 189 "/home/claude/cfront-3/src/del.cpp"
-( (__0this ?(((void )(__0this ?(((void )(((void )__dl__4stmtSFPvUl ( (void *)__0this , (unsigned long )(sizeof (struct stmt))) )))):(((void )0 ))))):(((void )0 ))))
+( (__0this ?(((void )(__0this ?(((void )(((void )__dl__4stmtSFPvUl ( (void *)__0this , (size_t )(sizeof (struct stmt))) )))):(((void )0 ))))):(((void )0 ))))
 # 189 "/home/claude/cfront-3/src/del.cpp"
 ;
 }
@@ -2222,14 +2222,14 @@ default :
 # 297 "/home/claude/cfront-3/src/del.cpp"
 ( (__2p ?(((void )(__2p ?(((void )( ( ((((struct expr *)__2p ))?(((void )((((struct expr *)__2p ))?(((void )(((void )0 )))):(((void )0 ))))):(((void )0 ))))
 # 297 "/home/claude/cfront-3/src/del.cpp"
-, (((void )__dl__4nameSFPvUl ( (void *)__2p , (unsigned long )(sizeof (struct name))) ))) )):(((void )0 ))))):(((void )0 )))) ;
+, (((void )__dl__4nameSFPvUl ( (void *)__2p , (size_t )(sizeof (struct name))) ))) )):(((void )0 ))))):(((void )0 )))) ;
 # 297 "/home/claude/cfront-3/src/del.cpp"
 
 # 298 "/home/claude/cfront-3/src/del.cpp"
 }
 else ( (__2p ?(((void )(__2p ?(((void )( ( ((((struct expr *)__2p ))?(((void )((((struct expr *)__2p ))?(((void )(((void )0 )))):(((void )0 ))))):(((void )0 ))))
 # 299 "/home/claude/cfront-3/src/del.cpp"
-, (((void )__dl__4nameSFPvUl ( (void *)__2p , (unsigned long )(sizeof (struct name))) ))) )):(((void )0 ))))):(((void )0 )))) ;
+, (((void )__dl__4nameSFPvUl ( (void *)__2p , (size_t )(sizeof (struct name))) ))) )):(((void )0 ))))):(((void )0 )))) ;
 # 299 "/home/claude/cfront-3/src/del.cpp"
 
 # 300 "/home/claude/cfront-3/src/del.cpp"

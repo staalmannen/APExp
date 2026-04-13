@@ -149,7 +149,7 @@ union  __Q2_2ea4__C1 __O1__2ea ;
 };
 
 # 1 ""
-extern void *__nw__FUl (unsigned long );
+extern void *__nw__FUl (size_t );
 
 # 80 "/home/claude/cfront-3/src/cfront.h"
 extern struct ea *ea0 ;
@@ -741,15 +741,15 @@ struct type *__0__X6 ;
 struct node *__0__X1 ;
 
 # 708 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (unsigned long )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
+if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (size_t )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (unsigned long )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
+(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (size_t )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( (
+(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( (
 # 708 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( (__0__X6 = (struct type *)( (__0__X1 = (((struct node *)__0__X6 ))), ( ((__0__X1 ||
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
+(__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
 # 708 "/home/claude/cfront-3/src/cfront.h"
 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X6 -> defined__4type = 0 )) , (__0__X6 ->
 # 708 "/home/claude/cfront-3/src/cfront.h"
@@ -2244,7 +2244,7 @@ struct toknode *__1p ;
 if ((__1p = free_toks__7toknode )== 0 ){ 
 # 137 "/home/claude/cfront-3/src/lalex.cpp"
 struct toknode *__2q ;
-free_toks__7toknode = (__2q = (((struct toknode *)(((char *)__nw__FUl ( (unsigned long )(768* (sizeof (char )))) )))));
+free_toks__7toknode = (__2q = (((struct toknode *)(((char *)__nw__FUl ( (size_t)(768* (sizeof (char )))) )))));
 __1p = free_toks__7toknode ;
 for(;__2q != (& (__1p [15]));( (__2q -> next__7toknode = (__2q + 1 )), (++ __2q )) ) ;
 __2q -> next__7toknode = 0 ;
@@ -2258,7 +2258,7 @@ struct toknode *__ct__7toknodeFUc7YYSTYPE3loc (register struct toknode *__0this 
 # 148 "/home/claude/cfront-3/src/lalex.cpp"
 { if (__0this || (__0this = (struct toknode *)__nw__7toknodeSFUl (
 # 148 "/home/claude/cfront-3/src/lalex.cpp"
-(unsigned long )(sizeof (struct toknode))) )){ 
+(size_t )(sizeof (struct toknode))) )){ 
 # 149 "/home/claude/cfront-3/src/lalex.cpp"
 __0this -> tok__7toknode = __1t ;
 __0this -> used__7toknode = 0 ;
@@ -2443,7 +2443,7 @@ __3t -> last__7toknode = __4x ;
 for(;__4xx ;__4xx = __4x ) { __4x = __4xx -> next__7toknode ;
 
 # 240 "/home/claude/cfront-3/src/lalex.cpp"
-( (__4xx ?(((void )(__4xx ?(((void )(((void )__dl__7toknodeSFPvUl ( (void *)__4xx , (unsigned long )(sizeof (struct toknode))) )))):(((void )0 ))))):(((void )0 ))))
+( (__4xx ?(((void )(__4xx ?(((void )(((void )__dl__7toknodeSFPvUl ( (void *)__4xx , (size_t )(sizeof (struct toknode))) )))):(((void )0 ))))):(((void )0 ))))
 # 240 "/home/claude/cfront-3/src/lalex.cpp"
 ;
 
@@ -2728,7 +2728,7 @@ else
 # 371 "/home/claude/cfront-3/src/lalex.cpp"
 latok = (rear = 0 );
 idname = __1T -> idname__7toknode ;
-( (__1T ?(((void )(__1T ?(((void )(((void )__dl__7toknodeSFPvUl ( (void *)__1T , (unsigned long )(sizeof (struct toknode))) )))):(((void )0 ))))):(((void )0 ))))
+( (__1T ?(((void )(__1T ?(((void )(((void )__dl__7toknodeSFPvUl ( (void *)__1T , (size_t )(sizeof (struct toknode))) )))):(((void )0 ))))):(((void )0 ))))
 # 373 "/home/claude/cfront-3/src/lalex.cpp"
 ;
 return __1tk ;
@@ -2772,7 +2772,7 @@ do {
 # 395 "/home/claude/cfront-3/src/lalex.cpp"
 ;
 __1tx = __1tx -> next__7toknode ;
-( (__1tt ?(((void )(__1tt ?(((void )(((void )__dl__7toknodeSFPvUl ( (void *)__1tt , (unsigned long )(sizeof (struct toknode))) )))):(((void )0 ))))):(((void )0 ))))
+( (__1tt ?(((void )(__1tt ?(((void )(((void )__dl__7toknodeSFPvUl ( (void *)__1tt , (size_t )(sizeof (struct toknode))) )))):(((void )0 ))))):(((void )0 ))))
 # 397 "/home/claude/cfront-3/src/lalex.cpp"
 ;
 __1tt = __1tx ;
@@ -2800,7 +2800,7 @@ else front = __1t -> next__7toknode ;
 if (latok == __1t )latok = (__1t -> last__7toknode ?__1t -> last__7toknode :front );
 if (__1t -> next__7toknode )__1t -> next__7toknode -> last__7toknode = __1t -> last__7toknode ;
 else rear = __1t -> last__7toknode ;
-( (__1t ?(((void )(__1t ?(((void )(((void )__dl__7toknodeSFPvUl ( (void *)__1t , (unsigned long )(sizeof (struct toknode))) )))):(((void )0 ))))):(((void )0 ))))
+( (__1t ?(((void )(__1t ?(((void )(((void )__dl__7toknodeSFPvUl ( (void *)__1t , (size_t )(sizeof (struct toknode))) )))):(((void )0 ))))):(((void )0 ))))
 # 411 "/home/claude/cfront-3/src/lalex.cpp"
 ;
 }
@@ -5226,7 +5226,7 @@ error__FiP3locPCcRC2eaN34 ( 0 , __1L , (const char *)"illegal bit field", (const
 # 1780 "/home/claude/cfront-3/src/lalex.cpp"
 struct ea *)ea0 , (const struct ea *)ea0 , (const struct ea *)ea0 ) ;
 del_tokens__FP7toknode ( front ) ;
-( (__0__X101 = front ), ( (__0__X101 ?(((void )(__0__X101 ?(((void )(((void )__dl__7toknodeSFPvUl ( (void *)__0__X101 , (unsigned long )(sizeof (struct toknode)))
+( (__0__X101 = front ), ( (__0__X101 ?(((void )(__0__X101 ?(((void )(((void )__dl__7toknodeSFPvUl ( (void *)__0__X101 , (size_t )(sizeof (struct toknode)))
 # 1782 "/home/claude/cfront-3/src/lalex.cpp"
 )))):(((void )0 ))))):(((void )0 )))) ) ;
 front = latok ;
@@ -5297,7 +5297,7 @@ static struct ea *__ct__2eaFUl (struct ea *__0this ,
 # 76 "/home/claude/cfront-3/src/cfront.h"
 size_t __2ii ){ 
 # 76 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ea *)__nw__FUl ( (unsigned long )(sizeof (struct ea)))
+if (__0this || (__0this = (struct ea *)__nw__FUl ( (size_t )(sizeof (struct ea)))
 # 76 "/home/claude/cfront-3/src/cfront.h"
 ))__0this -> __O1__2ea.i = __2ii ;
 

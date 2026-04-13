@@ -63,7 +63,7 @@ int pos__10HashWalker ;
 void reset__10HashWalkerFv (struct HashWalker *__0this );
 
 # 1 ""
-extern void *__nw__FUl (unsigned long );
+extern void *__nw__FUl (size_t );
 
 # 89 "/home/claude/cfront-3/src/hash.h"
 void error__4HashFPCc (struct Hash *__0this , const char *__1msg );
@@ -871,11 +871,11 @@ void error__4HashFPCc (struct Hash *__0this , const char *__1msg )
 # 52 "/home/claude/cfront-3/src/hash.cpp"
 struct Hash *__ct__4HashFi (register struct Hash *__0this , int __1sz )
 # 53 "/home/claude/cfront-3/src/hash.cpp"
-{ if (__0this || (__0this = (struct Hash *)__nw__FUl ( (unsigned long )(sizeof
+{ if (__0this || (__0this = (struct Hash *)__nw__FUl ( (size_t)(sizeof
 # 53 "/home/claude/cfront-3/src/hash.cpp"
 (struct Hash))) )){ 
 # 54 "/home/claude/cfront-3/src/hash.cpp"
-__0this -> tab__4Hash = (((struct HashTableEntry *)__nw__FUl ( (unsigned long )((sizeof (struct HashTableEntry ))* (__0this -> size__4Hash = __1sz )))
+__0this -> tab__4Hash = (((struct HashTableEntry *)__nw__FUl ( (size_t)((sizeof (struct HashTableEntry ))* (__0this -> size__4Hash = __1sz )))
 # 54 "/home/claude/cfront-3/src/hash.cpp"
 ));
 { { int __1i ;
@@ -918,11 +918,11 @@ void advance__10HashWalkerFv (struct HashWalker *__0this );
 # 59 "/home/claude/cfront-3/src/hash.cpp"
 struct Hash *__ct__4HashFR4Hash (register struct Hash *__0this , struct Hash *__1a )
 # 60 "/home/claude/cfront-3/src/hash.cpp"
-{ if (__0this || (__0this = (struct Hash *)__nw__FUl ( (unsigned long )(sizeof
+{ if (__0this || (__0this = (struct Hash *)__nw__FUl ( (size_t)(sizeof
 # 60 "/home/claude/cfront-3/src/hash.cpp"
 (struct Hash))) )){ 
 # 61 "/home/claude/cfront-3/src/hash.cpp"
-__0this -> tab__4Hash = (((struct HashTableEntry *)__nw__FUl ( (unsigned long )((sizeof (struct HashTableEntry ))* (__0this -> size__4Hash = ((*__1a )).
+__0this -> tab__4Hash = (((struct HashTableEntry *)__nw__FUl ( (size_t)((sizeof (struct HashTableEntry ))* (__0this -> size__4Hash = ((*__1a )).
 # 61 "/home/claude/cfront-3/src/hash.cpp"
 size__4Hash ))) ));
 
@@ -1271,7 +1271,7 @@ int __1oldsize ;
 # 251 "/home/claude/cfront-3/src/hash.cpp"
 __1oldtab = __0this -> tab__4Hash ;
 __1oldsize = __0this -> size__4Hash ;
-__0this -> tab__4Hash = (((struct HashTableEntry *)__nw__FUl ( (unsigned long )((sizeof (struct HashTableEntry ))* (__0this -> size__4Hash = __1newsize ))) ));
+__0this -> tab__4Hash = (((struct HashTableEntry *)__nw__FUl ( (size_t)((sizeof (struct HashTableEntry ))* (__0this -> size__4Hash = __1newsize ))) ));
 { int __1i ;
 
 # 254 "/home/claude/cfront-3/src/hash.cpp"

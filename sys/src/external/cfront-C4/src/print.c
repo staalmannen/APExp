@@ -144,7 +144,7 @@ union  __Q2_2ea4__C1 __O1__2ea ;
 };
 
 # 1 ""
-extern void *__nw__FUl (unsigned long );
+extern void *__nw__FUl (size_t );
 
 # 80 "/home/claude/cfront-3/src/cfront.h"
 extern struct ea *ea0 ;
@@ -736,15 +736,15 @@ struct type *__0__X6 ;
 struct node *__0__X1 ;
 
 # 708 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (unsigned long )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
+if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (size_t )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (unsigned long )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
+(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (size_t )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( (
+(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( (
 # 708 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( (__0__X6 = (struct type *)( (__0__X1 = (((struct node *)__0__X6 ))), ( ((__0__X1 ||
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
+(__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
 # 708 "/home/claude/cfront-3/src/cfront.h"
 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X6 -> defined__4type = 0 )) , (__0__X6 ->
 # 708 "/home/claude/cfront-3/src/cfront.h"
@@ -2349,7 +2349,7 @@ __dl__FPv ( (void *)__3t ) ;
 __3str = 0 ;
 if (__0this -> __O2__4expr.string ){ 
 # 376 "/home/claude/cfront-3/src/print.cpp"
-__3str = (((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* ((strlen ( __0this -> __O2__4expr.string )
+__3str = (((char *)__nw__FUl ( (size_t)((sizeof (char ))* ((strlen ( __0this -> __O2__4expr.string )
 # 376 "/home/claude/cfront-3/src/print.cpp"
 + strlen ( __0this -> __O3__4expr.string2 ) )+ 1 ))) ));
 strcpy ( __3str , __0this -> __O2__4expr.string ) ;
@@ -2370,7 +2370,7 @@ char *__4str ;
 __4nn = insert__5tableFP4nameUc ( ptbl , __ct__4nameFPCc ( (struct name *)0 , __3str ?(((const char *)__3str )):__0this -> __O3__4expr.string2 ) , (unsigned char )0 )
 # 386 "/home/claude/cfront-3/src/print.cpp"
 ;
-__4str = (((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (strlen ( (const char *)__3s ) + 1 )))
+__4str = (((char *)__nw__FUl ( (size_t)((sizeof (char ))* (strlen ( (const char *)__3s ) + 1 )))
 # 387 "/home/claude/cfront-3/src/print.cpp"
 ));
 strcpy ( __4str , (const char *)__3s ) ;
@@ -3959,7 +3959,7 @@ char *__2p ;
 
 # 1325 "/home/claude/cfront-3/src/print.cpp"
 __2p = st_name__FPCc ( (const char *)"__ptbl_vec__") ;
-ptbl_name = (((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (strlen ( (const char *)__2p ) + 1 )))
+ptbl_name = (((char *)__nw__FUl ( (size_t)((sizeof (char ))* (strlen ( (const char *)__2p ) + 1 )))
 # 1326 "/home/claude/cfront-3/src/print.cpp"
 ));
 strcpy ( ptbl_name , (const char *)__2p ) ;
@@ -4051,7 +4051,7 @@ __1i ++ ;
 if (__1p == 0 ){ 
 # 1372 "/home/claude/cfront-3/src/print.cpp"
 __1s = (((struct ptbl_rec *)__nw__FUl ( sizeof (struct ptbl_rec )) ));
-__1s -> pname__8ptbl_rec = (((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (strlen ( __1name ) + 1 ))) ));
+__1s -> pname__8ptbl_rec = (((char *)__nw__FUl ( (size_t)((sizeof (char ))* (strlen ( __1name ) + 1 ))) ));
 # 1373 "/home/claude/cfront-3/src/print.cpp"
 
 # 1374 "/home/claude/cfront-3/src/print.cpp"
@@ -4070,7 +4070,7 @@ __1r -> next__8ptbl_rec = __1s ;
 { char *__1pp ;
 
 # 1383 "/home/claude/cfront-3/src/print.cpp"
-__1pp = (((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (strlen ( (const char *)ptbl_name ) + 10 )))
+__1pp = (((char *)__nw__FUl ( (size_t)((sizeof (char ))* (strlen ( (const char *)ptbl_name ) + 10 )))
 # 1383 "/home/claude/cfront-3/src/print.cpp"
 ));
 sprintf ( __1pp , (const char *)"%s[%d]", ptbl_name , __1i ) ;
@@ -4091,12 +4091,12 @@ struct ptbl_rec *__1p ;
 __1p = (((struct ptbl_rec *)__nw__FUl ( sizeof (struct ptbl_rec )) ));
 
 # 1393 "/home/claude/cfront-3/src/print.cpp"
-__1p -> pname__8ptbl_rec = (((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (strlen ( __1ptbl ) + 1 ))) ));
+__1p -> pname__8ptbl_rec = (((char *)__nw__FUl ( (size_t)((sizeof (char ))* (strlen ( __1ptbl ) + 1 ))) ));
 # 1393 "/home/claude/cfront-3/src/print.cpp"
 
 # 1394 "/home/claude/cfront-3/src/print.cpp"
 strcpy ( __1p -> pname__8ptbl_rec , __1ptbl ) ;
-__1p -> vname__8ptbl_rec = (((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (strlen ( __1vtbl ) + 1 ))) ));
+__1p -> vname__8ptbl_rec = (((char *)__nw__FUl ( (size_t)((sizeof (char ))* (strlen ( __1vtbl ) + 1 ))) ));
 # 1395 "/home/claude/cfront-3/src/print.cpp"
 
 # 1397 "/home/claude/cfront-3/src/print.cpp"

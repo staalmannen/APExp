@@ -144,7 +144,7 @@ union  __Q2_2ea4__C1 __O1__2ea ;
 };
 
 # 1 ""
-extern void *__nw__FUl (unsigned long );
+extern void *__nw__FUl (size_t );
 
 # 80 "/home/claude/cfront-3/src/cfront.h"
 extern struct ea *ea0 ;
@@ -736,15 +736,15 @@ struct type *__0__X6 ;
 struct node *__0__X1 ;
 
 # 708 "/home/claude/cfront-3/src/cfront.h"
-if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (unsigned long )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
+if (__0this || (__0this = (struct ptr *)__nw__3ptrSFUl ( (size_t )(sizeof (struct ptr))) )){ __0this = (struct ptr *)( (__0__X8 =
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (unsigned long )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
+(((struct pvtyp *)__0this ))), ( ((__0__X8 || (__0__X8 = (struct pvtyp *)__nw__FUl ( (size_t )(sizeof (struct pvtyp))) ))?(__0__X8 = (struct pvtyp *)(
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (unsigned long )(sizeof (struct type))) ))?( (
+(__0__X6 = (((struct type *)__0__X8 ))), ( ((__0__X6 || (__0__X6 = (struct type *)__nw__FUl ( (size_t )(sizeof (struct type))) ))?( (
 # 708 "/home/claude/cfront-3/src/cfront.h"
 ( ( ( ( ( ( (__0__X6 = (struct type *)( (__0__X1 = (((struct node *)__0__X6 ))), ( ((__0__X1 ||
 # 708 "/home/claude/cfront-3/src/cfront.h"
-(__0__X1 = (struct node *)__nw__FUl ( (unsigned long )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
+(__0__X1 = (struct node *)__nw__FUl ( (size_t )(sizeof (struct node))) ))?( ( (__0__X1 -> base__4node = 0 ), (__0__X1 -> permanent__4node =
 # 708 "/home/claude/cfront-3/src/cfront.h"
 0 )) , (__0__X1 -> baseclass__4node = 0 )) :0 ), __0__X1 ) ) ), (__0__X6 -> defined__4type = 0 )) , (__0__X6 ->
 # 708 "/home/claude/cfront-3/src/cfront.h"
@@ -2442,7 +2442,7 @@ case 1:
 # 85 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . node = (((struct node *)(((struct node *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof ((*__1node )))) :(((char
 # 85 "/home/claude/cfront-3/src/tree_copy.cpp"
-*)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof ((*__1node ))))) )))))) ))));
+*)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof ((*__1node ))))) )))))) ))));
 ((*__1n . node ))= (*((*__1node )));
 goto Replace ;
 
@@ -2451,7 +2451,7 @@ case 2:
 # 90 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . vr = (((struct virt *)(((struct virt *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct virt )))
 # 90 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct virt )))) )))))) ))));
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct virt )))) )))))) ))));
 ((*__1n . vr ))= (*(((struct virt *)(((struct virt *)((*__1node )))))));
 goto Replace ;
 
@@ -2460,7 +2460,7 @@ case 3:
 # 95 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . list = (((struct name_list *)(((struct name_list *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct name_list )))
 # 95 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct name_list )))) )))))) ))));
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct name_list )))) )))))) ))));
 ((*__1n . list ))= (*(((struct name_list *)(((struct name_list *)((*__1node )))))));
 goto Replace ;
 
@@ -2469,7 +2469,7 @@ case 4:
 # 100 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . g = (((struct gen *)(((struct gen *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct gen )))
 # 100 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct gen )))) )))))) ))));
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct gen )))) )))))) ))));
 ((*__1n . g ))= (*(((struct gen *)(((struct gen *)((*__1node )))))));
 goto Replace ;
 
@@ -2478,7 +2478,7 @@ case 5:
 # 105 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . vc = (((struct vec *)(((struct vec *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct vec )))
 # 105 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct vec )))) )))))) ))));
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct vec )))) )))))) ))));
 ((*__1n . vc ))= (*(((struct vec *)(((struct vec *)((*__1node )))))));
 goto Replace ;
 
@@ -2487,7 +2487,7 @@ case 6:
 # 110 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . p = (((struct ptr *)(((struct ptr *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct ptr )))
 # 110 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct ptr )))) )))))) ))));
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct ptr )))) )))))) ))));
 ((*__1n . p ))= (*(((struct ptr *)(((struct ptr *)((*__1node )))))));
 goto Replace ;
 
@@ -2496,7 +2496,7 @@ case 7:
 # 115 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . f = (((struct fct *)(((struct fct *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct fct )))
 # 115 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct fct )))) )))))) ))));
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct fct )))) )))))) ))));
 ((*__1n . f ))= (*(((struct fct *)(((struct fct *)((*__1node )))))));
 if (__1n . f -> f_signature__3fct ){ 
 # 118 "/home/claude/cfront-3/src/tree_copy.cpp"
@@ -2508,7 +2508,7 @@ unsigned long __2__X30 ;
 # 118 "/home/claude/cfront-3/src/tree_copy.cpp"
 __3str_tmp = (((char *)( (__2__X30 = (strlen ( (((struct fct *)(((struct fct *)((*__1node ))))))-> f_signature__3fct ) + 1 )), ( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci ->
 # 118 "/home/claude/cfront-3/src/tree_copy.cpp"
-malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , __2__X30 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* __2__X30 )) ))))))
+malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , __2__X30 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* __2__X30 )) ))))))
 # 118 "/home/claude/cfront-3/src/tree_copy.cpp"
 ) ));
 
@@ -2528,12 +2528,12 @@ case 8:
 # 127 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . t = (((struct table *)(((struct table *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct table )))
 # 127 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct table )))) )))))) ))));
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct table )))) )))))) ))));
 ((*__1n . t ))= (*(((struct table *)(((struct table *)((*__1node )))))));
 add__10patch_treeSFP4node ( __1n . node ) ;
 __1n . t -> entries__5table = (((Pname *)( (__2__X31 = ((sizeof (Pname ))* __1n . t -> size__5table )), ( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))(
 # 130 "/home/claude/cfront-3/src/tree_copy.cpp"
-__1tci -> hook_info__14tree_copy_info , __2__X31 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* __2__X31 )) )))))) )
+__1tci -> hook_info__14tree_copy_info , __2__X31 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* __2__X31 )) )))))) )
 # 130 "/home/claude/cfront-3/src/tree_copy.cpp"
 ));
 memcpy ( (void *)(((char *)__1n . t -> entries__5table )), (const void *)(((char *)(((struct table *)(((struct table *)((*__1node ))))))-> entries__5table )), __1n .
@@ -2541,7 +2541,7 @@ memcpy ( (void *)(((char *)__1n . t -> entries__5table )), (const void *)(((char
 t -> size__5table * (sizeof (Pname ))) ;
 __1n . t -> hashtbl__5table = (((short *)( (__2__X32 = ((sizeof (short ))* __1n . t -> hashsize__5table )), ( (__1tci ->
 # 132 "/home/claude/cfront-3/src/tree_copy.cpp"
-malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , __2__X32 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* __2__X32 ))
+malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , __2__X32 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* __2__X32 ))
 # 132 "/home/claude/cfront-3/src/tree_copy.cpp"
 )))))) ) ));
 memcpy ( (void *)(((char *)__1n . t -> hashtbl__5table )), (const void *)(((char *)(((struct table *)(((struct table *)((*__1node ))))))-> hashtbl__5table )), __1n .
@@ -2554,7 +2554,7 @@ case 19:
 # 138 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . kt = (((struct ktable *)(((struct ktable *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct ktable )))
 # 138 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct ktable )))) )))))) ))));
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct ktable )))) )))))) ))));
 ((*__1n . kt ))= (*(((struct ktable *)(((struct ktable *)((*__1node )))))));
 add__10patch_treeSFP4node ( __1n . node ) ;
 goto Replace ;
@@ -2569,7 +2569,7 @@ return ;
 }
 __1n . bt = (((struct basetype *)(((struct basetype *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct basetype ))) :(((char
 # 149 "/home/claude/cfront-3/src/tree_copy.cpp"
-*)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct basetype )))) )))))) ))));
+*)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct basetype )))) )))))) ))));
 ((*__1n . bt ))= (*(((struct basetype *)(((struct basetype *)((*__1node )))))));
 __1n . bt -> defined__4type |= 0100 ;
 if ((discriminator__8basetypeFi ( __1n . bt , 0 ) == 2 )&& __1n . bt -> __O1__8basetype.b_linkage ){ 
@@ -2582,7 +2582,7 @@ unsigned long __2__X33 ;
 # 153 "/home/claude/cfront-3/src/tree_copy.cpp"
 __3str_tmp = ( (__2__X33 = (strlen ( __1n . bt -> __O1__8basetype.b_linkage ) + 1 )), ( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci ->
 # 153 "/home/claude/cfront-3/src/tree_copy.cpp"
-hook_info__14tree_copy_info , __2__X33 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* __2__X33 )) )))))) ) ;
+hook_info__14tree_copy_info , __2__X33 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* __2__X33 )) )))))) ) ;
 # 153 "/home/claude/cfront-3/src/tree_copy.cpp"
 
 # 154 "/home/claude/cfront-3/src/tree_copy.cpp"
@@ -2603,7 +2603,7 @@ return ;
 }
 __1n . x = (((struct expr *)(((struct expr *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct expr ))) :(((char
 # 166 "/home/claude/cfront-3/src/tree_copy.cpp"
-*)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct expr )))) )))))) ))));
+*)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct expr )))) )))))) ))));
 ((*__1n . x ))= (*(((struct expr *)(((struct expr *)((*__1node )))))));
 if ((discriminator__4exprFi ( __1n . x , 1 ) == 3 )&& __1n . x -> __O2__4expr.string ){ 
 # 169 "/home/claude/cfront-3/src/tree_copy.cpp"
@@ -2615,7 +2615,7 @@ unsigned long __2__X34 ;
 # 169 "/home/claude/cfront-3/src/tree_copy.cpp"
 __3str_tmp = ( (__2__X34 = (strlen ( __1n . x -> __O2__4expr.string ) + 1 )), ( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci ->
 # 169 "/home/claude/cfront-3/src/tree_copy.cpp"
-hook_info__14tree_copy_info , __2__X34 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* __2__X34 )) )))))) ) ;
+hook_info__14tree_copy_info , __2__X34 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* __2__X34 )) )))))) ) ;
 # 169 "/home/claude/cfront-3/src/tree_copy.cpp"
 
 # 170 "/home/claude/cfront-3/src/tree_copy.cpp"
@@ -2634,7 +2634,7 @@ unsigned long __2__X35 ;
 # 175 "/home/claude/cfront-3/src/tree_copy.cpp"
 __3str_tmp = ( (__2__X35 = (strlen ( __1n . x -> __O3__4expr.string2 ) + 1 )), ( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci ->
 # 175 "/home/claude/cfront-3/src/tree_copy.cpp"
-hook_info__14tree_copy_info , __2__X35 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* __2__X35 )) )))))) ) ;
+hook_info__14tree_copy_info , __2__X35 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* __2__X35 )) )))))) ) ;
 # 175 "/home/claude/cfront-3/src/tree_copy.cpp"
 
 # 176 "/home/claude/cfront-3/src/tree_copy.cpp"
@@ -2650,7 +2650,7 @@ case 12:
 # 183 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . s = (((struct stmt *)(((struct stmt *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct stmt )))
 # 183 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct stmt )))) )))))) ))));
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct stmt )))) )))))) ))));
 ((*__1n . s ))= (*(((struct stmt *)(((struct stmt *)((*__1node )))))));
 goto Replace ;
 
@@ -2664,7 +2664,7 @@ return ;
 }
 __1n . e = (((struct enumdef *)(((struct enumdef *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct enumdef ))) :(((char
 # 192 "/home/claude/cfront-3/src/tree_copy.cpp"
-*)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct enumdef )))) )))))) ))));
+*)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct enumdef )))) )))))) ))));
 ((*__1n . e ))= (*(((struct enumdef *)(((struct enumdef *)((*__1node )))))));
 __1n . e -> defined__4type |= 0100 ;
 if (__1n . e -> string__7enumdef ){ 
@@ -2677,7 +2677,7 @@ unsigned long __2__X36 ;
 # 196 "/home/claude/cfront-3/src/tree_copy.cpp"
 __3str_tmp = ( (__2__X36 = (__1n . e -> e_strlen__7enumdef + 1 )), ( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , __2__X36 )
 # 196 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* __2__X36 )) )))))) ) ;
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* __2__X36 )) )))))) ) ;
 strcpy ( __3str_tmp , (((struct enumdef *)(((struct enumdef *)((*__1node ))))))-> string__7enumdef ) ;
 
 # 199 "/home/claude/cfront-3/src/tree_copy.cpp"
@@ -2701,7 +2701,7 @@ return ;
 }
 __1n . c = (((struct classdef *)(((struct classdef *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct classdef ))) :(((char
 # 213 "/home/claude/cfront-3/src/tree_copy.cpp"
-*)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct classdef )))) )))))) ))));
+*)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct classdef )))) )))))) ))));
 ((*__1n . c ))= (*(((struct classdef *)(((struct classdef *)((*__1node )))))));
 __1n . c -> defined__4type |= 0100 ;
 if (__1n . c -> string__8classdef ){ 
@@ -2714,7 +2714,7 @@ unsigned long __2__X37 ;
 # 217 "/home/claude/cfront-3/src/tree_copy.cpp"
 __3str_tmp = ( (__2__X37 = (strlen ( __1n . c -> string__8classdef ) + 1 )), ( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci ->
 # 217 "/home/claude/cfront-3/src/tree_copy.cpp"
-hook_info__14tree_copy_info , __2__X37 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* __2__X37 )) )))))) ) ;
+hook_info__14tree_copy_info , __2__X37 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* __2__X37 )) )))))) ) ;
 # 217 "/home/claude/cfront-3/src/tree_copy.cpp"
 
 # 218 "/home/claude/cfront-3/src/tree_copy.cpp"
@@ -2732,7 +2732,7 @@ unsigned long __2__X38 ;
 # 224 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . c -> nested_sig__4type = ( (__2__X38 = (strlen ( (const char *)__1n . c -> nested_sig__4type ) + 1 )), (
 # 224 "/home/claude/cfront-3/src/tree_copy.cpp"
-(__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , __2__X38 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))*
+(__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , __2__X38 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))*
 # 224 "/home/claude/cfront-3/src/tree_copy.cpp"
 __2__X38 )) )))))) ) ;
 strcpy ( __1n . c -> nested_sig__4type , (const char *)(((struct classdef *)(((struct classdef *)((*__1node ))))))-> nested_sig__4type ) ;
@@ -2744,7 +2744,7 @@ case 15:
 # 230 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . bcl = (((struct basecl *)(((struct basecl *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct basecl )))
 # 230 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct basecl )))) )))))) ))));
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct basecl )))) )))))) ))));
 ((*__1n . bcl ))= (*(((struct basecl *)(((struct basecl *)((*__1node )))))));
 goto Replace ;
 
@@ -2753,7 +2753,7 @@ case 18:
 # 235 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . tp = (((struct type *)(((struct type *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct type )))
 # 235 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct type )))) )))))) ))));
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct type )))) )))))) ))));
 ((*__1n . tp ))= (*(((struct type *)(((struct type *)((*__1node )))))));
 if (__1n . tp -> nested_sig__4type )
 # 238 "/home/claude/cfront-3/src/tree_copy.cpp"
@@ -2764,7 +2764,7 @@ unsigned long __2__X39 ;
 # 239 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . tp -> nested_sig__4type = ( (__2__X39 = (strlen ( (const char *)__1n . tp -> nested_sig__4type ) + 1 )), (
 # 239 "/home/claude/cfront-3/src/tree_copy.cpp"
-(__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , __2__X39 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))*
+(__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , __2__X39 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))*
 # 239 "/home/claude/cfront-3/src/tree_copy.cpp"
 __2__X39 )) )))))) ) ;
 strcpy ( __1n . tp -> nested_sig__4type , (const char *)(((struct type *)(((struct type *)((*__1node ))))))-> nested_sig__4type ) ;
@@ -2776,7 +2776,7 @@ case 16:
 # 245 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . iline = (((struct iline *)(((struct iline *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct iline )))
 # 245 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct iline )))) )))))) ))));
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct iline )))) )))))) ))));
 ((*__1n . iline ))= (*(((struct iline *)(((struct iline *)((*__1node )))))));
 goto Replace ;
 
@@ -2785,7 +2785,7 @@ case 17:
 # 250 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . ia = (((struct ia *)(((struct ia *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct ia )))
 # 250 "/home/claude/cfront-3/src/tree_copy.cpp"
-:(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct ia )))) )))))) ))));
+:(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct ia )))) )))))) ))));
 ((*__1n . ia ))= (*(((struct ia *)(((struct ia *)((*__1node )))))));
 goto Replace ;
 
@@ -2813,7 +2813,7 @@ return ;
 }
 __1n . n = (((struct name *)(((struct name *)( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , (sizeof (struct name ))) :(((char
 # 268 "/home/claude/cfront-3/src/tree_copy.cpp"
-*)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* (sizeof (struct name )))) )))))) ))));
+*)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* (sizeof (struct name )))) )))))) ))));
 ((*__1n . n ))= (*(((struct name *)(((struct name *)((*__1node )))))));
 if (__1n . n -> n_ktable__4name )
 # 271 "/home/claude/cfront-3/src/tree_copy.cpp"
@@ -2861,7 +2861,7 @@ unsigned long __2__X40 ;
 # 284 "/home/claude/cfront-3/src/tree_copy.cpp"
 __7str_tmp = ( (__2__X40 = (strlen ( eobj ?(((struct enumdef *)(((struct enumdef *)eobj -> __O1__4expr.tp ))))-> string__7enumdef :(((struct classdef *)(((struct classdef *)__6cn -> __O1__4expr.tp ))))-> string__8classdef ) +
 # 284 "/home/claude/cfront-3/src/tree_copy.cpp"
-1 )), ( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , __2__X40 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof
+1 )), ( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , __2__X40 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof
 # 284 "/home/claude/cfront-3/src/tree_copy.cpp"
 (char ))* __2__X40 )) )))))) ) ;
 strcpy ( __7str_tmp , eobj ?(((struct enumdef *)(((struct enumdef *)eobj -> __O1__4expr.tp ))))-> string__7enumdef :(((struct classdef *)(((struct classdef *)__6cn -> __O1__4expr.tp ))))-> string__8classdef ) ;
@@ -2900,7 +2900,7 @@ unsigned long __2__X41 ;
 # 296 "/home/claude/cfront-3/src/tree_copy.cpp"
 __4str_tmp = ( (__2__X41 = (strlen ( __1n . n -> __O2__4expr.string ) + 1 )), ( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci ->
 # 296 "/home/claude/cfront-3/src/tree_copy.cpp"
-hook_info__14tree_copy_info , __2__X41 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* __2__X41 )) )))))) ) ;
+hook_info__14tree_copy_info , __2__X41 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* __2__X41 )) )))))) ) ;
 # 296 "/home/claude/cfront-3/src/tree_copy.cpp"
 
 # 297 "/home/claude/cfront-3/src/tree_copy.cpp"
@@ -2920,7 +2920,7 @@ unsigned long __2__X42 ;
 # 303 "/home/claude/cfront-3/src/tree_copy.cpp"
 __3str_tmp = ( (__2__X42 = (strlen ( __1n . n -> __O3__4expr.string2 ) + 1 )), ( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci ->
 # 303 "/home/claude/cfront-3/src/tree_copy.cpp"
-hook_info__14tree_copy_info , __2__X42 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* __2__X42 )) )))))) ) ;
+hook_info__14tree_copy_info , __2__X42 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* __2__X42 )) )))))) ) ;
 # 303 "/home/claude/cfront-3/src/tree_copy.cpp"
 
 # 304 "/home/claude/cfront-3/src/tree_copy.cpp"
@@ -2941,7 +2941,7 @@ unsigned long __2__X43 ;
 # 310 "/home/claude/cfront-3/src/tree_copy.cpp"
 __3str_tmp = ( (__2__X43 = (strlen ( __1n . n -> n_anon__4name ) + 1 )), ( (__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci ->
 # 310 "/home/claude/cfront-3/src/tree_copy.cpp"
-hook_info__14tree_copy_info , __2__X43 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))* __2__X43 )) )))))) ) ;
+hook_info__14tree_copy_info , __2__X43 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))* __2__X43 )) )))))) ) ;
 # 310 "/home/claude/cfront-3/src/tree_copy.cpp"
 
 # 311 "/home/claude/cfront-3/src/tree_copy.cpp"
@@ -2957,7 +2957,7 @@ unsigned long __2__X44 ;
 # 317 "/home/claude/cfront-3/src/tree_copy.cpp"
 __1n . n -> n_template_arg_string__4name = ( (__2__X44 = (strlen ( (const char *)__1n . n -> n_template_arg_string__4name ) + 1 )), (
 # 317 "/home/claude/cfront-3/src/tree_copy.cpp"
-(__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , __2__X44 ) :(((char *)(((char *)__nw__FUl ( (unsigned long )((sizeof (char ))*
+(__1tci -> malloc_hook__14tree_copy_info ?(*(__1tci -> malloc_hook__14tree_copy_info ))( __1tci -> hook_info__14tree_copy_info , __2__X44 ) :(((char *)(((char *)__nw__FUl ( (size_t)((sizeof (char ))*
 # 317 "/home/claude/cfront-3/src/tree_copy.cpp"
 __2__X44 )) )))))) ) ;
 strcpy ( __1n . n -> n_template_arg_string__4name , (const char *)(((struct name *)(((struct name *)((*__1node ))))))-> n_template_arg_string__4name ) ;
