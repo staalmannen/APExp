@@ -6,12 +6,12 @@ LIB=$APEXPROOT/$objtype/lib/ape/liblzma.a
 XZSRC=../../../external/xz/src/liblzma
 
 OFILES=\
-# ../common \
-	tuklib_cpucores.$O\
+# ../common\
 	tuklib_physmem.$O\
-# common \
+	tuklib_cpucores.$O\
+# common\
 	common.$O\
-	block_util.$O\
+	block_util.$O
 	easy_preset.$O\
 	filter_common.$O\
 	hardware_physmem.$O\
@@ -36,7 +36,7 @@ OFILES=\
 	stream_encoder.$O\
 	stream_flags_encoder.$O\
 	vli_encoder.$O\
-#	stream_encoder_mt.$O\
+	stream_encoder_mt.$O\
 	microlzma_encoder.$O\
 	alone_decoder.$O\
 	auto_decoder.$O\
@@ -48,55 +48,51 @@ OFILES=\
 	filter_buffer_decoder.$O\
 	filter_decoder.$O\
 	filter_flags_decoder.$O\
-	index_decoder.$O\
+	common/index_decoder.$O\
 	index_hash.$O\
 	stream_buffer_decoder.$O\
 	stream_decoder.$O\
 	stream_flags_decoder.$O\
 	vli_decoder.$O\
-#	stream_decoder_mt.$O\
+	stream_decoder_mt.$O\
 	microlzma_decoder.$O\
-	lzip_decoder.$O\
-# check \
+	common/lzip_decoder.$O\
+# check\
 	check.$O\
-	crc32_table.$O\
+	crc32_small.$O\
 	crc32_fast.$O\
-##	crc64_small.$O\ #if/else\
-	crc64_table.$O\
-##	crc64_fast.$O\ #if/else\
+	crc64_small.$O\
+	crc64_fast.$O\
 	sha256.$O\
-# lz \
+# lz\
 	lz_encoder.$O\
 	lz_encoder_mf.$O\
 	lz_decoder.$O\
-# lzma \
-##	fastpos_tablegen.$O\ # main()?\
+# lzma\
 	lzma_encoder_presets.$O\
 	lzma_encoder.$O\
 	lzma_encoder_optimum_fast.$O\
 	lzma_encoder_optimum_normal.$O\
+	fastpos_table.$O\
 	lzma_decoder.$O\
 	lzma2_encoder.$O\
 	lzma2_decoder.$O\
-# rangecoder \
-	price_tablegen.$O\
-	price_table.$O\
-# delta \
-	delta_common.$O\
-	delta_encoder.$O\
-	delta_decoder.$O\
-# simple \
-	simple_coder.$O\
-	simple_encoder.$O\
-	simple_decoder.$O\
-	x86.$O\
-	powerpc.$O\
-	ia64.$O\
-	arm.$O\
-	armthumb.$O\
-	arm64.$O\
-	sparc.$O\
-	riscv.$O
+# rangecoder\
+	rangecoder/range_common.h rangecoder/range_encoder.h \
+	rangecoder/price.h rangecoder/price_table.c \
+	rangecoder/range_decoder.h
+# delta\
+	delta/delta_common.c \
+	delta/delta_common.h delta/delta_private.h \
+	delta/delta_encoder.c delta/delta_encoder.h \
+	delta/delta_decoder.c delta/delta_decoder.h \
+# simple\
+	simple/simple_coder.c simple/simple_coder.h \
+	simple/simple_private.h simple/simple_encoder.c \
+	simple/simple_encoder.h simple/simple_decoder.c \
+	simple/simple_decoder.h simple/x86.c simple/powerpc.c \
+	simple/ia64.c simple/arm.c simple/armthumb.c simple/arm64.c \
+	simple/sparc.c simple/riscv.c
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib

@@ -28,6 +28,7 @@ DIRS=\
 	process\
 	regex\
 	search\
+	sched\
 	select\
 	signal\
 	stat\

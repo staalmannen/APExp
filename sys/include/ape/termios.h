@@ -141,4 +141,4 @@ extern int tcsetpgrp(int, pid_t);
 extern int tcdrain(int);
 extern int tcflush(int, int);
 extern int tcflow(int, int);
-extern int tcsendbreak(int);
+extern int tcsendbreak(int, int);

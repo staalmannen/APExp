@@ -171,32 +171,46 @@ tcgetpgrp(int fd)
 	return pgrp;
 }
 
-/* should do a better job here */
-
 int
-tcdrain(int)
+tcdrain(int fd)
 {
-	errno = ENOTTY;
-	return -1;
+	if(!isatty(fd)){
+		errno = ENOTTY;
+		return -1;
+	}
+	/* Plan9: output is synchronous; nothing to drain */
+	return 0;
 }
 
 int
-tcflush(int, int)
+tcflush(int fd, int)
 {
-	errno = ENOTTY;
-	return -1;
+	if(!isatty(fd)){
+		errno = ENOTTY;
+		return -1;
+	}
+	/* Plan9: no kernel queue to flush */
+	return 0;
 }
 
 int
-tcflow(int, int)
+tcflow(int fd, int)
 {
-	errno = ENOTTY;
-	return -1;
+	if(!isatty(fd)){
+		errno = ENOTTY;
+		return -1;
+	}
+	/* Plan9: no flow-control registers to poke */
+	return 0;
 }
 
 int
-tcsendbreak(int)
+tcsendbreak(int fd, int)
 {
-	errno = ENOTTY;
-	return -1;
+	if(!isatty(fd)){
+		errno = ENOTTY;
+		return -1;
+	}
+	/* Plan9: no break signal on serial lines */
+	return 0;
 }
