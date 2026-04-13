@@ -4120,7 +4120,7 @@ __1sick = (((void (*)(int ,...))(signal )));
 # 680 "/home/claude/cfront-3/src/main.cpp"
 ((*__1sick ))( 8 , core_dump__Fi ) ;
 ((*__1sick ))( 7 , core_dump__Fi ) ;
-((*__1sick ))( 11 , core_dump__Fi ) ;
+/* keep our SIGSEGV handler: ((*__1sick))(11, core_dump__Fi); */
 
 # 687 "/home/claude/cfront-3/src/main.cpp"
 error_init__Fv ( ) ;
