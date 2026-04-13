@@ -17,8 +17,12 @@ int
 ioctl(int fd, unsigned long request, void* arg)
 {
 	struct stat d;
+	struct winsize *ws;
+	char *p;
+	int n;
 
-	if(request == FIONREAD) {
+	switch(request) {
+	case FIONREAD:
 		if(fstat(fd, &d) < 0) {
 			errno = EBADF;
 			return -1;
@@ -26,7 +30,24 @@ ioctl(int fd, unsigned long request, void* arg)
 		/* this works if the file is buffered somehow */
 		*(long*)arg = d.st_size;
 		return 0;
-	} else {
+
+	case TIOCGWINSZ:
+		ws = (struct winsize*)arg;
+		memset(ws, 0, sizeof *ws);
+		/* Primary source: $COLUMNS and $LINES, set by 9term/vt on resize. */
+		ws->ws_col = 80;
+		ws->ws_row = 24;
+		if((p = getenv("COLUMNS")) != NULL && (n = atoi(p)) > 0)
+			ws->ws_col = (unsigned short)n;
+		if((p = getenv("LINES")) != NULL && (n = atoi(p)) > 0)
+			ws->ws_row = (unsigned short)n;
+		return 0;
+
+	case TIOCSWINSZ:
+		/* Plan9 has no kernel ioctl; accept and ignore. */
+		return 0;
+
+	default:
 		errno = EINVAL;
 		return -1;
 	}

@@ -31,7 +31,10 @@ typedef unsigned useconds_t;
 
 typedef va_list __isoc_va_list;
 
+#ifndef __struct_winsize_defined
+#define __struct_winsize_defined
 struct winsize { unsigned short ws_row, ws_col, ws_xpixel, ws_ypixel; };
+#endif
 
 typedef struct { union { int __i[12]; volatile int __vi[12]; void *__p[12*sizeof(int)/sizeof(void*)]; } __u; } cnd_t;
 
