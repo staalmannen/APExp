@@ -78,21 +78,23 @@ OFILES=\
 	lzma2_encoder.$O\
 	lzma2_decoder.$O\
 # rangecoder\
-	rangecoder/range_common.h rangecoder/range_encoder.h \
-	rangecoder/price.h rangecoder/price_table.c \
-	rangecoder/range_decoder.h
+	price_table.$O\
 # delta\
-	delta/delta_common.c \
-	delta/delta_common.h delta/delta_private.h \
-	delta/delta_encoder.c delta/delta_encoder.h \
-	delta/delta_decoder.c delta/delta_decoder.h \
+	delta_common.$O\
+	delta_encoder.$O\
+	delta_decoder.$O\
 # simple\
-	simple/simple_coder.c simple/simple_coder.h \
-	simple/simple_private.h simple/simple_encoder.c \
-	simple/simple_encoder.h simple/simple_decoder.c \
-	simple/simple_decoder.h simple/x86.c simple/powerpc.c \
-	simple/ia64.c simple/arm.c simple/armthumb.c simple/arm64.c \
-	simple/sparc.c simple/riscv.c
+	simple_coder.$O\
+	simple_encoder.$O\
+	simple_decoder.$O\
+	x86.$O\
+	powerpc.$O\
+	ia64.$O\
+	arm.$O\
+	armthumb.$O\
+	arm64.$O\
+	sparc.$O\
+	riscv.$O
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib
