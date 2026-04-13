@@ -11,7 +11,7 @@ OFILES=\
 	tuklib_cpucores.$O\
 # common\
 	common.$O\
-	block_util.$O
+	block_util.$O\
 	easy_preset.$O\
 	filter_common.$O\
 	hardware_physmem.$O\
@@ -48,7 +48,7 @@ OFILES=\
 	filter_buffer_decoder.$O\
 	filter_decoder.$O\
 	filter_flags_decoder.$O\
-	common/index_decoder.$O\
+	index_decoder.$O\
 	index_hash.$O\
 	stream_buffer_decoder.$O\
 	stream_decoder.$O\
@@ -56,7 +56,7 @@ OFILES=\
 	vli_decoder.$O\
 	stream_decoder_mt.$O\
 	microlzma_decoder.$O\
-	common/lzip_decoder.$O\
+	lzip_decoder.$O\
 # check\
 	check.$O\
 	crc32_small.$O\
@@ -94,8 +94,7 @@ OFILES=\
 	armthumb.$O\
 	arm64.$O\
 	sparc.$O\
-	riscv.$O
-
+	riscv.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

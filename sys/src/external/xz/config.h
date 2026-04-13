@@ -1,5 +1,5 @@
 /* config.h.  Generated from config.h.in by configure.  */
-/* config.h.in.  Generated from configure.ac by autoheader. SCHED */
+/* config.h.in.  Generated from configure.ac by autoheader. */
 
 /* Define if building universal (internal helper macro) */
 /* #undef AC_APPLE_UNIVERSAL_BUILD */
@@ -234,7 +234,7 @@
 #define HAVE_PROGRAM_INVOCATION_NAME 1
 
 /* Define to 1 if you have the 'pthread_condattr_setclock' function. */
-#define HAVE_PTHREAD_CONDATTR_SETCLOCK 1
+// #undef HAVE_PTHREAD_CONDATTR_SETCLOCK
 
 /* Have PTHREAD_PRIO_INHERIT. */
 #define HAVE_PTHREAD_PRIO_INHERIT 1
@@ -459,7 +459,7 @@
 
 /* Define to 1 if the amount of physical memory can be detected with
    sysconf(_SC_PAGESIZE) and sysconf(_SC_PHYS_PAGES). */
-#define TUKLIB_PHYSMEM_SYSCONF 1
+// #undef TUKLIB_PHYSMEM_SYSCONF
 
 /* Define to 1 if the amount of physical memory can be detected with sysctl().
    */
