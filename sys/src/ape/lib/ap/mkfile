@@ -36,6 +36,7 @@ DIRS=\
 	string\
 	syscall\
 	temp\
+	termcap\
 	termios\
 	thread\
 	time\

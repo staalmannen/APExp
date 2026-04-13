@@ -1,0 +1,99 @@
+# APExp termcap database
+# Minimal but functional entries for Plan9/9front environments.
+# Set $TERMCAP to the path of this file, or set $TERMCAP to an inline entry.
+#
+# Format: name|alias|description:\
+#         :cap=value:cap#number:flag:
+
+dumb|dumb terminal:\
+	:am:co#80:li#24:
+
+# ANSI/VT100-family terminals
+
+ansi|ansi/pc-term compatible with color:\
+	:am:bs:mi:ms:pt:xn:\
+	:co#80:li#24:\
+	:AL=\E[%dL:DC=\E[%dP:DL=\E[%dM:DO=\E[%dB:\
+	:IC=\E[%d@:LE=\E[%dD:RI=\E[%dC:UP=\E[%dA:\
+	:al=\E[L:bl=^G:cd=\E[J:ce=\E[K:cl=\E[H\E[2J:\
+	:cm=\E[%i%d;%dH:cr=^M:cs=\E[%i%d;%dr:\
+	:ct=\E[3g:dc=\E[P:dl=\E[M:do=\E[B:\
+	:ei=:ho=\E[H:ic=\E[@:im=:\
+	:k1=\E[11~:k2=\E[12~:k3=\E[13~:k4=\E[14~:\
+	:k5=\E[15~:k6=\E[17~:k7=\E[18~:k8=\E[19~:\
+	:k9=\E[20~:k10=\E[21~:k11=\E[23~:k12=\E[24~:\
+	:kD=\E[3~:kI=\E[2~:kN=\E[6~:kP=\E[5~:\
+	:kd=\E[B:kh=\E[H:kH=\E[F:kl=\E[D:kr=\E[C:ku=\E[A:\
+	:le=^H:mb=\E[5m:md=\E[1m:me=\E[m:mk=\E[8m:mr=\E[7m:\
+	:nd=\E[C:nw=\EE:rc=\E8:rs=\Ec:sc=\E7:\
+	:se=\E[m:sf=\n:so=\E[7m:sr=\EM:\
+	:st=\EH:ta=^I:ue=\E[m:up=\E[A:us=\E[4m:\
+	:ve=\E[?25h:vi=\E[?25l:vs=\E[?25h:
+
+vt100|vt100-am|dec vt100 (w/advanced video):\
+	:am:bs:ms:pt:xn:\
+	:co#80:li#24:\
+	:DO=\E[%dB:LE=\E[%dD:RI=\E[%dC:UP=\E[%dA:\
+	:bl=^G:cd=\E[J:ce=\E[K:cl=\E[H\E[2J:\
+	:cm=\E[%i%d;%dH:cr=^M:cs=\E[%i%d;%dr:\
+	:ct=\E[3g:do=\n:ei=\E[4l:ho=\E[H:im=\E[4h:\
+	:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:\
+	:k5=\E[15~:k6=\E[17~:k7=\E[18~:k8=\E[19~:\
+	:k9=\E[20~:k10=\E[21~:k11=\E[23~:k12=\E[24~:\
+	:kD=\E[3~:kI=\E[2~:kN=\E[6~:kP=\E[5~:\
+	:kd=\EOB:kh=\E[H:kH=\E[F:kl=\EOD:kr=\EOC:ku=\EOA:\
+	:le=^H:mb=\E[5m:md=\E[1m:me=\E[m:mr=\E[7m:\
+	:nd=\E[C:rc=\E8:sc=\E7:\
+	:se=\E[m:sf=\n:so=\E[7m:sr=\EM:\
+	:st=\EH:ta=^I:ue=\E[m:up=\E[A:us=\E[4m:\
+	:ve=\E[?25h:vi=\E[?25l:vs=\E[?25h:
+
+vt102|dec vt102:\
+	:am:bs:ms:pt:xn:\
+	:co#80:li#24:\
+	:DO=\E[%dB:LE=\E[%dD:RI=\E[%dC:UP=\E[%dA:\
+	:al=\E[L:bl=^G:cd=\E[J:ce=\E[K:cl=\E[H\E[2J:\
+	:cm=\E[%i%d;%dH:cr=^M:cs=\E[%i%d;%dr:\
+	:ct=\E[3g:dc=\E[P:dl=\E[M:do=\n:ei=\E[4l:ho=\E[H:im=\E[4h:\
+	:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:\
+	:k5=\E[15~:k6=\E[17~:k7=\E[18~:k8=\E[19~:\
+	:k9=\E[20~:k10=\E[21~:k11=\E[23~:k12=\E[24~:\
+	:kD=\E[3~:kI=\E[2~:kN=\E[6~:kP=\E[5~:\
+	:kd=\EOB:kh=\E[H:kH=\E[F:kl=\EOD:kr=\EOC:ku=\EOA:\
+	:le=^H:mb=\E[5m:md=\E[1m:me=\E[m:mr=\E[7m:\
+	:nd=\E[C:rc=\E8:sc=\E7:\
+	:se=\E[m:sf=\n:so=\E[7m:sr=\EM:\
+	:st=\EH:ta=^I:ue=\E[m:up=\E[A:us=\E[4m:\
+	:ve=\E[?25h:vi=\E[?25l:vs=\E[?25h:
+
+xterm|xterm-color|xterm terminal emulator:\
+	:am:bs:km:mi:ms:pt:xn:\
+	:co#80:li#24:\
+	:AL=\E[%dL:DC=\E[%dP:DL=\E[%dM:DO=\E[%dB:\
+	:IC=\E[%d@:LE=\E[%dD:RI=\E[%dC:UP=\E[%dA:\
+	:al=\E[L:bl=^G:cd=\E[J:ce=\E[K:cl=\E[H\E[2J:\
+	:cm=\E[%i%d;%dH:cr=^M:cs=\E[%i%d;%dr:\
+	:ct=\E[3g:dc=\E[P:dl=\E[M:do=\E[B:\
+	:ei=\E[4l:ho=\E[H:im=\E[4h:\
+	:is=\E[!p\E[?3;4l\E[4l\E>:\
+	:k1=\EOP:k2=\EOQ:k3=\EOR:k4=\EOS:\
+	:k5=\E[15~:k6=\E[17~:k7=\E[18~:k8=\E[19~:\
+	:k9=\E[20~:k10=\E[21~:k11=\E[23~:k12=\E[24~:\
+	:kD=\E[3~:kI=\E[2~:kN=\E[6~:kP=\E[5~:\
+	:kd=\EOB:kh=\EOH:kH=\EOF:kl=\EOD:kr=\EOC:ku=\EOA:\
+	:le=^H:mb=\E[5m:md=\E[1m:me=\E[m:mk=\E[8m:mr=\E[7m:\
+	:nd=\E[C:nw=\EE:rc=\E8:rs=\E[!p\E[?3;4l\E[4l\E>:sc=\E7:\
+	:se=\E[m:sf=\n:so=\E[7m:sr=\EM:\
+	:st=\EH:ta=^I:te=\E[?1049l:ti=\E[?1049h:\
+	:ue=\E[m:up=\E[A:us=\E[4m:\
+	:ve=\E[?25h:vi=\E[?25l:vs=\E[?12;25h:
+
+xterm-256color|xterm with 256 colors:\
+	:co#80:li#24:tc=xterm:
+
+# Plan9 9term (plumbing/editing terminal; no ANSI sequences in practice)
+# Programs should check for 9term and avoid terminal control sequences.
+9term|plan9 9term window:\
+	:am:bs:\
+	:co#80:li#24:\
+	:bl=^G:cr=^M:do=\n:le=^H:nd=\E[C:ta=^I:up=\E[A:
