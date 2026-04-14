@@ -16,6 +16,31 @@ static int nstack = 0;
 
 static void notecont(Ureg*, char*);
 
+/* Write a label + hex value to stderr, safe to call from signal context */
+static void
+dbg(const char *label, unsigned long long val)
+{
+	int n;
+	char buf[19];
+	int i;
+	unsigned long long v;
+
+	for(n = 0; label[n]; n++)
+		;
+	_WRITE(2, label, n);
+
+	/* 0xHHHHHHHHHHHHHHHH\n — 19 bytes */
+	v = val;
+	buf[0] = '0';
+	buf[1] = 'x';
+	buf[18] = '\n';
+	for(i = 17; i >= 2; i--){
+		buf[i] = "0123456789abcdef"[v & 0xf];
+		v >>= 4;
+	}
+	_WRITE(2, buf, 19);
+}
+
 void
 _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 {
@@ -39,6 +64,9 @@ notecont(Ureg *u, char *s)
 	Pcstack *p;
 	void(*f)(int, char*, Ureg*);
 
+	dbg("notecont: u=            ", (unsigned long long)u);
+	dbg("notecont: u->sp=        ", u->sp);
+	dbg("notecont: u->pc=        ", u->pc);
 	p = &pcstack[nstack-1];
 	f = p->hdlr;
 	u->pc = p->restorepc;
@@ -75,10 +103,21 @@ siglongjmp(sigjmp_buf j, int ret)
 
 	jb = (sigjmp_buf_amd64*)j;
 
+	dbg("siglongjmp nstack=      ", (unsigned long long)nstack);
+	dbg("  jb->jmpbuf[SP]=       ", jb->jmpbuf[JMPBUFSP]);
+	dbg("  jb->jmpbuf[PC]=       ", jb->jmpbuf[JMPBUFPC]);
+	if(nstack > 0){
+		dbg("  pcstack[n-1].u=       ", (unsigned long long)pcstack[nstack-1].u);
+		dbg("  pcstack[n-1].u->sp=   ", pcstack[nstack-1].u->sp);
+	}
+
 	if(jb->set)
 		_psigblocked = jb->blocked;
-	if(nstack == 0 || pcstack[nstack-1].u->sp > jb->jmpbuf[JMPBUFSP])
+	if(nstack == 0 || pcstack[nstack-1].u->sp > jb->jmpbuf[JMPBUFSP]){
+		dbg("  PATH: longjmp, SP=    ", jb->jmpbuf[JMPBUFSP]);
 		longjmp((void*)jb->jmpbuf, ret);
+	}
+	dbg("  PATH: NRSTR SP-target=", jb->jmpbuf[JMPBUFSP] + 8);
 	u = pcstack[nstack-1].u;
 	nstack--;
 	u->ax = ret;
