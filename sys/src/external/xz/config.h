@@ -4,6 +4,7 @@
 #define LZMA_API_IMPORT /**/
 #define LZMA_API_CALL /**/
 #define LZMA_API(type) type
+#define lzma_attr_visibility_hidden /**/
 
 
 /* Define if building universal (internal helper macro) */
