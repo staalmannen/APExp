@@ -163,6 +163,8 @@ extern int gethostname(char *, size_t);
 extern int truncate(const char *, off_t);
 extern int getdtablesize(void);
 
+extern unsigned ualarm(unsigned, unsigned);
+
 /* AT functions (require dirfd support): */
 int openat(int dirfd, const char *path, int flags, ...); /* unistd/at_functions.c */
 int fstatat(int dirfd, const char *path, struct stat *buf, int flags);

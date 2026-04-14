@@ -8,7 +8,9 @@ OFILES=\
 	chdir.$O\
 	chroot.$O\
 	close.$O\
+	ctermid.$O\
 	dup.$O\
+	dup2.$O\
 	fchdir.$O\
 	fsync.$O\
 	ftruncate.$O\
@@ -39,7 +41,9 @@ OFILES=\
 	unlink.$O\
 	writev.$O\
 	write.$O\
-#	hacks\
+# musl\
+	ualarm.$O\
+# hacks\
 	at_functions.$O\
 	truncate.$O\
 	symlink.$O\

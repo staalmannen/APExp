@@ -4,6 +4,7 @@
 
 #ifndef __TIMEVAL__
 #define __TIMEVAL__
+
 struct timeval {
 	long	tv_sec;
 	long	tv_usec;

@@ -4,7 +4,6 @@ APE=$APEXPROOT/sys/src/ape
 
 LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
-	ctermid.$O\
 	getopt.$O\
 	getprogname.$O\
 	getrusage.$O\
