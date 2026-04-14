@@ -19,15 +19,12 @@ _CORE_APPS=\
 # core utilities \
 	base\
 	grep\
-	pcregrep\
-#	expr\
 
 _OPTIONAL_APPS=\
 # archivers \
 	bzip2\
 	clzip\
 	minigzip\
-#	pax\
 	unace\
 	unarj\
 	unrar\
@@ -39,6 +36,7 @@ _OPTIONAL_APPS=\
 	p2c\
 	objc\
 # dev tools \
+	pcregrep\
 	diff\
 	patch\
 	mkmk\
