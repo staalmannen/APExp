@@ -44,6 +44,7 @@ OFILES=\
 	truncate.$O\
 	symlink.$O\
 	usleep.$O\
+	mknod.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

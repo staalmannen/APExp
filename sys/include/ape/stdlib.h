@@ -64,6 +64,8 @@ extern int setenv(const char *, const char *, int);
 extern int unsetenv(const char *);
 extern char *realpath(const char *, char *);
 
+extern char *mkdtemp(char *);
+
 extern long long llabs(long long);
 extern lldiv_t lldiv(long long, long long);
 

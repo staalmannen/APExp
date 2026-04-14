@@ -77,6 +77,7 @@ extern "C" {
 extern mode_t umask(mode_t);
 extern int mkdir(const char *, mode_t);
 extern int mkfifo(const char *, mode_t);
+extern int mknod(const char *, mode_t, dev_t);
 extern int stat(const char *, struct stat *);
 extern int fstat(int, struct stat *);
 extern int chmod(const char *, mode_t);

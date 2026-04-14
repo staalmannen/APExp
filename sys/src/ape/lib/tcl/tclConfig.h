@@ -1,12 +1,22 @@
 #ifndef _TCLCONFIG
 #define _TCLCONFIG
 
+#define PACKAGE_NAME tcl
+#define PACKAGE_VERSION 9.0.3
+
+#define STATIC_BUILD 1
+
+#define TCL_THREADS 0
+// #define POSIX_THREAD_SEMANTICS 1
+
 #define	HAVE_SOCK_OPTS	1
 #define	_POSIX_SOURCE	1
 #define	_BSD_EXTENSION	1
 #define	_SUSV2_SOURCE	1
 #define	_REENTRANT_SOURCE	1
 #define	STDC_HEADERS	1
+#define HAVE_FTS 1
+
 
 #define	CFG_INSTALL_BINDIR		"/bin"
 #define	CFG_INSTALL_DOCDIR	"/sys/man"

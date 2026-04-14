@@ -8,6 +8,7 @@ OFILES=\
 	mktemp.$O\
 	tmpfile.$O\
 #	musl\
+	mkdtemp.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
