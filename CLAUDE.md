@@ -352,6 +352,31 @@ Any pointer passed to `free()` MUST be exactly the value returned by `malloc()`.
 Aligned-allocation fallback for alignment > 16 returns adjusted pointers that
 are NOT free()-safe. Document this in any aligned allocator.
 
+### amd64 sigsetjmp / siglongjmp — two bugs fixed
+
+**Files:** `sys/src/ape/lib/ap/arch/amd64/setjmp.s`, `sys/src/ape/lib/ap/arch/amd64/notetramp.c`
+
+**Bug 1 (setjmp.s):** `MOVL $_psigblocked(SB), 4(RARG)` stored the ADDRESS of
+`_psigblocked` into the jmpbuf (the `$` prefix = immediate/address). Should be
+`MOVL _psigblocked(SB), BX; MOVL BX, 4(RARG)` to store the VALUE.
+
+**Bug 2 (notetramp.c):** `notecont()` decremented `nstack` BEFORE calling the
+user signal handler. When the handler called `siglongjmp()`, siglongjmp saw
+`nstack==0` and unconditionally took the `longjmp()` path — which crashes because
+it tries to restore SP to a value near USTKTOP (the top of user address space on
+pc64) that maps to an unmapped page.
+
+**Fix:** Move `nstack--` from BEFORE `(*f)(...)` to AFTER it in `notecont()`.
+When siglongjmp is called from inside the handler, `nstack==1` so it checks the
+SP condition: the Ureg SP (set by NSAVE to ~600 bytes below signal delivery SP,
+itself below sigsetjmp SP) is always less than `jb->jmpbuf[JMPBUFSP]`, so the
+NRSTR path is taken. NRSTR uses `_NOTED(3)` to have the kernel directly restore
+the process to the sigsetjmp return point — no `longjmp()`, no SP-write, no crash.
+
+**Invariant:** After this fix, `siglongjmp` called from within a signal handler
+on amd64 always takes the NRSTR path (never `longjmp()`). Outside signal context
+(`nstack==0`), the `longjmp()` path is taken as before.
+
 ### Build order for compiler changes
 ```
 cd sys/src/cmd/cc && mk nuke && mk install   # regenerates y.tab.h

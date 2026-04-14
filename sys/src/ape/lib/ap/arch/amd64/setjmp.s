@@ -19,7 +19,8 @@ TEXT	setjmp(SB), $0
 TEXT	sigsetjmp(SB), $0
 	MOVL	savemask+8(FP), BX
 	MOVL	BX, 0(RARG)
-	MOVL	$_psigblocked(SB), 4(RARG)
+	MOVL	_psigblocked(SB), BX	/* load VALUE, not address */
+	MOVL	BX, 4(RARG)
 	MOVQ	SP, 8(RARG)	/* store sp */
 	MOVQ	0(SP), BX	/* store return pc */
 	MOVQ	BX, 16(RARG)

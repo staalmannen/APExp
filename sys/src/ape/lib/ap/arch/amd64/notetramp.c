@@ -42,8 +42,17 @@ notecont(Ureg *u, char *s)
 	p = &pcstack[nstack-1];
 	f = p->hdlr;
 	u->pc = p->restorepc;
-	nstack--;
+	/*
+	 * Do NOT decrement nstack before calling f.  If the handler calls
+	 * siglongjmp, siglongjmp needs nstack > 0 so it can take the
+	 * _NOTED(3) (NRSTR) path rather than calling longjmp().  The longjmp
+	 * path on amd64 crashes because the kernel-delivered context has
+	 * SP near USTKTOP, outside the mapped stack.  siglongjmp decrements
+	 * nstack itself in the NRSTR path.  If the handler returns normally
+	 * (no longjmp), we decrement nstack here and fall through to NRSTR.
+	 */
 	(*f)(p->sig, s, u);
+	nstack--;
 	_NOTED(3);	/* NRSTR */
 }
 
