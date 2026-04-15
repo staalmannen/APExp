@@ -92,10 +92,11 @@ bool IsDigit(int32_t wc)
 }
 
 static int
-cmp(size_t x, size_t y)
+gnu_cmp(size_t x, size_t y)
 {
 	return (x > y) - (x < y);
 }
+#define cmp gnu_cmp
 
 #ifdef __GNUC__
 // FIXME: expand compiler support beyond clang and gcc

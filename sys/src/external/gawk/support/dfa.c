@@ -31,6 +31,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#undef RE_DUP_MAX
 #include <limits.h>
 #include <string.h>
 #include <wchar.h>

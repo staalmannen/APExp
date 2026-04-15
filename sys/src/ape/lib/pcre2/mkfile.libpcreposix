@@ -1,12 +1,13 @@
 </$objtype/mkfile
-LIB=libpcre2posix.a
+APEXPROOT=../../../../..
+LIB=$APEXPROOT/$objtype/lib/ape/libpcre2posix.a
+
 OFILES=pcre2posix.$O
-HFILES= config.h 
 
 </sys/src/cmd/mksyslib
 
 PCRESRC=../../../external/pcre2
-APEXPROOT=../../../../..
+
 
 CC=pcc
 LD=pcc
@@ -14,9 +15,6 @@ CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=8
 
 %.$O: $PCRESRC/src/%.c
 	$CC $CFLAGS $PCRESRC/src/$stem.c
-
-install:V:
-	cp libpcre2posix.a $APEXPROOT/$objtype/lib/ape/libpcre2posix.a
 
 nuke:V:
 	mk clean

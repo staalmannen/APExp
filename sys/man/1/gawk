@@ -3,17 +3,18 @@
 .ds GN \s-1GNU\s+1
 .ds AK \s-1AWK\s+1
 .ds EP \fIGAWK: Effective AWK Programming\fP
-.if !\n(.g \{\
-.	if !\w|\*(lq| \{\
-.		ds lq ``
-.		if \w'\(lq' .ds lq "\(lq
+.if !\w@\*(lq@ \{\
+.\" The implementation doesn't seem to support the strings `lq` or `rq`.
+.	ie \n(.g \{\
+.		ds lq \(lq\"
+.		ds rq \(rq\"
 .	\}
-.	if !\w|\*(rq| \{\
+.	el \{\
+.		ds lq ``
 .		ds rq ''
-.		if \w'\(rq' .ds rq "\(rq
 .	\}
 .\}
-.TH GAWK 1 "Nov 02 2023" "Free Software Foundation" "Utility Commands"
+.TH GAWK 1 "February 10 2026" "Free Software Foundation" "Utility Commands"
 .SH NAME
 gawk \- pattern scanning and processing language
 .SH SYNOPSIS
@@ -32,6 +33,30 @@ gawk \- pattern scanning and processing language
 ]
 .I program-text
 file .\|.\|.
+.SH README FIRST
+This manual page is provided as a
+.IR courtesy .
+Please note that the One Source Of Truth for
+.I gawk
+is the Texinfo manual, available online in several formats at
+.IR https://www.gnu.org/software/gawk/manual .
+It may also be installed in the Info subsystem on your system,
+and available therefore via the
+.IR info (1)
+command.
+.PP
+In the case of any contradiction between the Texinfo manual and
+this manual page, the Texinfo manual should be considered to be authoritative.
+.PP
+Note that the Info documentation, HTML web page(s), and PDF version of
+the manual all have the same content, since they are all generated
+from the same Texinfo source file.
+.PP
+Furthermore, the
+.I gawk
+maintainer reserves the right in the future to remove this manual page from
+the distribution or to severely truncate the content in order to
+ease his maintenance burden.
 .SH DESCRIPTION
 .I Gawk
 is the \*(GN Project's implementation of the \*(AK programming language.
@@ -85,7 +110,7 @@ remains unique.
 Additionally, every long option has a corresponding short
 option, so that the option's functionality may be used from
 within
-.B #!
+.B #!\&
 executable scripts.
 .SH OPTIONS
 .I Gawk
@@ -184,9 +209,9 @@ Similar to
 .BR \-f ,
 however, this option is the last one processed.
 This should be used with
-.B #!
+.B #!\&
 scripts, particularly for CGI applications, to avoid
-passing in options or source code (!) on the command line
+passing in options or source code (!\&) on the command line
 from a URL.
 This option disables command-line variable assignments.
 .TP
@@ -220,8 +245,9 @@ are treated as if they begin with an implicit \fB@namespace "awk"\fR statement.
 .TP
 .BR \-I ", " \-\^\-trace
 Print the internal byte code names as they are executed when running
-the program. The trace is printed to standard error. Each ``op code''
-is preceded by a
+the program.
+The trace is printed to standard error.
+Each \*(lqop code\*(rq is preceded by a
 .B +
 sign in the output.
 .TP
@@ -252,8 +278,8 @@ for the list of possible values for
 .IR value .
 .TP
 .BR \-M ", " \-\^\-bignum
-Force arbitrary precision arithmetic on numbers. This option has
-no effect if
+Force arbitrary precision arithmetic on numbers.
+This option has no effect if
 .I gawk
 is not compiled to use the GNU MPFR and GMP libraries.
 (In such a case,
@@ -266,9 +292,9 @@ This feature is
 The primary
 .I gawk
 maintainer is no longer supporting it, although there is
-a member of the development team who is. If this situation
-changes, the feature
-will be removed from
+a member of the development team who is.
+If this situation changes,
+the feature will be removed from
 .IR gawk .
 .ig
 Set
@@ -284,14 +310,6 @@ Recognize octal and hexadecimal values in input data.
 Force
 .I gawk
 to use the locale's decimal point character when parsing input data.
-.ig
-.\" This option is left undocumented, on purpose.
-.TP
-.BR "\-W nostalgia" ", " \-\^\-nostalgia
-Provide a moment of nostalgia for long time
-.I awk
-users.
-..
 .TP
 \fB\-o\fR[\fIfile\fR], \fB\-\^\-pretty-print\fR[\fB=\fIfile\fR]
 Output a pretty printed version of the program to
@@ -365,7 +383,8 @@ Per the
 these options cause an immediate, successful exit.
 .TP
 .B \-\^\-
-Signal the end of options. This is useful to allow further arguments to the
+Signal the end of options.
+This is useful to allow further arguments to the
 \*(AK program itself to start with a \*(lq\-\*(rq.
 .PP
 In compatibility mode,
@@ -386,6 +405,8 @@ and optional function definitions.
 .RS
 .PP
 \fB@include "\fIfilename\^\fB"
+.br
+\fB@nsinclude "\fIfilename\^\fB"
 .br
 \fB@load "\fIfilename\^\fB"
 .br
@@ -421,6 +442,15 @@ This is equivalent
 to using the
 .B \-\^\-include
 option.
+.PP
+Lines beginning with
+.B @nsinclude
+also include files, but with two differences.
+First, the namespace in the included file is
+.I not
+reset to the default of
+.BR awk ,
+and such files may be included multiple times.
 .PP
 Lines beginning with
 .B @load
@@ -501,7 +531,8 @@ if a
 rule exists,
 .I gawk
 executes the associated code
-before processing the contents of the file. Similarly,
+before processing the contents of the file.
+Similarly,
 .I gawk
 executes
 the code associated with
@@ -529,7 +560,7 @@ rule(s) (if any).
 According to POSIX, files named on the
 .I awk
 command line must be
-text files.  The behavior is ``undefined'' if they are not.  Most versions
+text files.  The behavior is \*(lqundefined\*(rq if they are not.  Most versions
 of
 .I awk
 treat a directory on the command line as a fatal error.
@@ -624,7 +655,7 @@ Similarly, assigning a value to
 causes the record to be resplit, creating new
 values for the fields.
 .SS Comma Separated Values
-When invoked with ether the
+When invoked with either the
 .B \-k
 or the
 .B \-\^\-csv
@@ -642,7 +673,8 @@ for more details.
 .SS Built-in Variables
 .IR Gawk\^ "'s"
 built-in variables are listed below.
-This list is purposely terse. For details, see
+This list is purposely terse.
+For details, see
 .IR https://www.gnu.org/software/gawk/manual/html_node/Built_002din-Variables .
 .TP "\w'\fBFIELDWIDTHS\fR'u+1n"
 .B ARGC
@@ -887,8 +919,8 @@ statement may also be used to delete the entire contents of an array,
 just by specifying the array name without a subscript.
 .PP
 .I gawk
-supports true multidimensional arrays. It does not require that
-such arrays be ``rectangular'' as in C or C++.
+supports true multidimensional arrays.
+It does not require that such arrays be \*(lqrectangular\*(rq as in C or C++.
 See
 .I https://www.gnu.org/software/gawk/manual/html_node/Arrays
 for details.
@@ -906,7 +938,7 @@ consists of a two simple identifiers joined by a double colon
 The left-hand identifier represents the namespace and the right-hand
 identifier is the variable within it.
 All simple (non-qualified) names are considered to be in the
-``current'' namespace; the default namespace is
+\*(lqcurrent\*(rq namespace; the default namespace is
 .BR awk .
 However, simple identifiers consisting solely of uppercase
 letters are forced into the
@@ -927,10 +959,11 @@ For more details, see
 .SS Variable Typing And Conversion
 Variables and fields
 may be (floating point) numbers, or strings, or both.
-They may also be regular expressions. How the
-value of a variable is interpreted depends upon its context.  If used in
-a numeric expression, it will be treated as a number; if used as a string
-it will be treated as a string.
+They may also be regular expressions.
+How the value of a variable is interpreted depends upon its context.
+If used in a numeric expression,
+it will be treated as a number;
+if used as a string it will be treated as a string.
 .PP
 To force a variable to be treated as a number, add zero to it; to force it
 to be treated as a string, concatenate it with the null string.
@@ -1012,13 +1045,14 @@ matches whitespace characters).
 .I Gawk
 provides
 .I "strongly typed"
-regular expression constants. These are written with a leading
+regular expression constants.
+These are written with a leading
 .B @
 symbol (like so:
 .BR @/value/ ).
 Such constants may be assigned to scalars (variables, array elements)
-and passed to user-defined functions. Variables that have been so
-assigned have regular expression type.
+and passed to user-defined functions.
+Variables that have been so assigned have regular expression type.
 .SH PATTERNS AND ACTIONS
 \*(AK is a line-oriented language.  The pattern comes first, and then the
 action.  Action statements are enclosed in
@@ -1078,9 +1112,9 @@ and to the pattern-action statements themselves.
 .I "relational expression"
 .IB pattern " && " pattern
 .IB pattern " || " pattern
-.IB pattern " ? " pattern " : " pattern
+.IB pattern " ?\& " pattern " : " pattern
 .BI ( pattern )
-.BI ! " pattern"
+.BI !\& " pattern"
 .IB pattern1 ", " pattern2
 .fi
 .RE
@@ -1125,14 +1159,16 @@ is the empty string if the file was opened successfully.
 Otherwise, there is some problem with the file and the code should
 use
 .B nextfile
-to skip it. If that is not done,
+to skip it.
+If that is not done,
 .I gawk
 produces its usual fatal error for files that cannot be opened.
 .PP
 For
 .BI / "regular expression" /
-patterns, the associated statement is executed for each input record that matches
-the regular expression.
+patterns,
+the associated statement is executed for each input record
+that matches the regular expression.
 Regular expressions are essentially the same as those in
 .IR egrep (1).
 See
@@ -1270,7 +1306,7 @@ as follows:
 \fB}\fR
 .fi
 .RE
-.SS "I/O Statements"
+.SS I/O Statements
 The input/output statements are as follows:
 .TP "\w'\fBprintf \fIfmt, expr-list\fR'u+1n"
 \fBclose(\fIfile \fR[\fB, \fIhow\fR]\fB)\fR
@@ -1434,7 +1470,7 @@ below.)
 .PP
 The
 .B getline
-command returns 1 on success, zero on end of file, and \-1 on an error.
+function returns 1 on success, zero on end of file, and \-1 on an error.
 If the
 .IR errno (3)
 value indicates that the I/O operation may be retried,
@@ -1448,7 +1484,8 @@ is set to a string describing the problem.
 .PP
 .BR NOTE :
 Failure in opening a two-way socket results in a non-fatal error being
-returned to the calling function. If using a pipe, coprocess, or socket to
+returned to the calling function.
+If using a pipe, coprocess, or socket to
 .BR getline ,
 or from
 .B print
@@ -1467,7 +1504,8 @@ The \*(AK versions of the
 statement and
 .B sprintf()
 function
-are similar to those of C. For details, see
+are similar to those of C.
+For details, see
 .IR https://www.gnu.org/software/gawk/manual/html_node/Printf.html .
 .SS Special File Names
 When doing I/O redirection from either
@@ -1546,6 +1584,7 @@ two-way I/O operator.
 .PD
 .BI /inet6/udp/ lport / rhost / rport
 Similar, but use UDP/IP instead of TCP/IP.
+.B "UDP support is obsolete and will be removed in the future."
 .SS Numeric Functions
 \*(AK has the following built-in arithmetic functions:
 .TP "\w'\fBsrand(\fR[\fIexpr\^\fR]\fB)\fR'u+1n"
@@ -1571,7 +1610,8 @@ Truncate
 .I num
 and
 .I denom
-to integers. Return the quotient of
+to integers.
+Return the quotient of
 .I num
 divided by
 .I denom
@@ -1629,8 +1669,8 @@ comparing values, and replace the indices of the
 sorted values
 .I s
 with sequential
-integers starting with 1. If the optional
-destination array
+integers starting with 1.
+If the optional destination array
 .I d
 is specified,
 first duplicate
@@ -1642,7 +1682,8 @@ and then sort
 leaving the indices of the
 source array
 .I s
-unchanged. The optional string
+unchanged.
+The optional string
 .I how
 controls the direction and the comparison mode.
 Valid values for
@@ -1932,7 +1973,8 @@ all work in terms of characters, not bytes.
 .SS Time Functions
 .I Gawk
 provides the following functions for obtaining time stamps and
-formatting them. Details are provided in
+formatting them.
+Details are provided in
 .IR https://www.gnu.org/software/gawk/manual/html_node/Time-Functions .
 .TP "\w'\fBsystime()\fR'u+1n"
 \fBmktime(\fIdatespec\fR [\fB, \fIutc-flag\fR]\fB)\fR
@@ -2050,7 +2092,7 @@ The string will be one of
 \fB"strnum"\fP,
 \fB"unassigned"\fP,
 or
-\fB"undefined"\fP.
+\fB"untyped"\fP.
 .SS Internationalization Functions
 The following functions may be used from within your AWK program for
 translating strings at run-time.
@@ -2063,11 +2105,11 @@ Specify the directory where
 looks for the
 .B \&.gmo
 files, in case they
-will not or cannot be placed in the ``standard'' locations.
+will not or cannot be placed in the \*(lqstandard\*(rq locations.
 It returns the directory where
 .I domain
-is ``bound.''
-.sp .5
+is \*(lqbound.\*(rq
+.sp 0.5
 The default
 .I domain
 is the value of
@@ -2168,7 +2210,8 @@ to return a value from a function.  The return value is undefined if no
 value is provided, or if the function returns by \*(lqfalling off\*(rq the
 end.
 .PP
-Functions may be called indirectly. To do this, assign
+Functions may be called indirectly.
+To do this, assign
 the name of the function to be called, as a string, to a variable.
 Then use the variable as if it were the name of a function, prefixed with an
 .B @
@@ -2225,8 +2268,9 @@ to dump the profile and function call stack and then exit.
 .SH INTERNATIONALIZATION
 String constants are sequences of characters enclosed in double
 quotes.  In non-English speaking environments, it is possible to mark
-strings in the \*(AK program as requiring translation to the local
-natural language. Such strings are marked in the \*(AK program with
+strings in the \*(AK program as
+requiring translation to the local natural language.
+Such strings are marked in the \*(AK program with
 a leading underscore (\*(lq_\*(rq).  For example,
 .sp
 .RS
@@ -2280,7 +2324,9 @@ and
 .B \-\^\-include
 options, and the
 .B @include
-directive.  If the initial search fails, the path is searched again after
+and
+.B @nsinclude
+directives.  If the initial search fails, the path is searched again after
 appending
 .B \&.awk
 to the filename.
@@ -2299,7 +2345,6 @@ The
 .B GAWK_PERSIST_FILE
 environment variable, if present, specifies a file to use as
 the backing store for persistent memory.
-.IR "This is an experimental feature" .
 See \*(EP for the details.
 .PP
 The
@@ -2313,7 +2358,8 @@ For connection to a remote host via socket,
 controls the number of retries, and
 .B GAWK_MSEC_SLEEP
 the interval between retries.
-The interval is in milliseconds. On systems that do not support
+The interval is in milliseconds.
+On systems that do not support
 .IR usleep (3),
 the value is rounded up to an integral number of seconds.
 .PP
@@ -2366,13 +2412,13 @@ status is 2.  On non-POSIX systems, this value may be mapped to
 .SH VERSION INFORMATION
 This man page documents
 .IR gawk ,
-version 5.3.
+version 5.4.
 .SH AUTHORS
 The original version of \*(UX
 .I awk
 was designed and implemented by Alfred Aho,
 Peter Weinberger, and Brian Kernighan of Bell Laboratories.
-Ozan Yigit is the the current maintainer.
+Ozan Yigit is the current maintainer.
 Brian Kernighan occasionally dabbles in its development.
 .PP
 Paul Rubin and Jay Fenlason,
@@ -2399,7 +2445,7 @@ file in the
 .I gawk
 distribution for up-to-date information about maintainers
 and which ports are currently supported.
-.SH BUG REPORTS
+.SH BUG REPORTS AND QUESTIONS
 If you find a bug in
 .IR gawk ,
 please use the
@@ -2412,6 +2458,15 @@ Full instructions for reporting a bug are provided in
 carefully read and follow the instructions given there.
 This will make bug reporting and resolution much easier for everyone involved.
 Really.
+.PP
+On the other hand, if you have a question as to how to accomplish
+a particular task using
+.I awk
+or
+.IR gawk ,
+send an email to
+.B help-gawk@gnu.org
+with your request for help.
 .SH BUGS
 The
 .B \-F
@@ -2430,11 +2485,13 @@ and
 .IR strftime (3).
 .PP
 .IR "The AWK Programming Language" ,
+second edition,
 Alfred V.\& Aho, Brian W.\& Kernighan, Peter J.\& Weinberger,
-Addison-Wesley, 1988.  ISBN 0-201-07981-X.
+Addison-Wesley, 2023.
+ISBN 9-780138-269722.
 .PP
 \*(EP,
-Edition 5.2, shipped with the
+Edition 5.3, shipped with the
 .I gawk
 source.
 The current version of this document is available online at
@@ -2489,7 +2546,7 @@ We thank him.
 Copyright \(co 1989, 1991, 1992, 1993, 1994, 1995, 1996,
 1997, 1998, 1999, 2001, 2002, 2003, 2004, 2005, 2007, 2009,
 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019,
-2020, 2021, 2022, 2023
+2020, 2021, 2022, 2023, 2024, 2025, 2026
 Free Software Foundation, Inc.
 .PP
 Permission is granted to make and distribute verbatim copies of

@@ -23,6 +23,7 @@ OFILES=	array.$O\
 		mpfr.$O\
 		msg.$O\
 		node.$O\
+		printf.$O\
 		profile.$O\
 		re.$O\
 		replace.$O\
@@ -36,15 +37,15 @@ OFILES=	array.$O\
 		getopt.$O\
 		getopt1.$O\
 		localeinfo.$O\
-		regex.$O\
+		minrx.$O\
 		random.$O\
+		regex.$O\
 #support/malloc \
 		dynarray_at_failure.$O\
 		dynarray_emplace_enlarge.$O\
 		dynarray_resize.$O\
 		dynarray_resize_clear.$O\
 		dynarray_finalize.$O\
-#		dynarray-skeleton.$O
 
 <$APEXPROOT/sys/src/cmd/mkone
 
@@ -56,7 +57,8 @@ CC=$APEXPROOT/$objtype/bin/pcc
 
 CFLAGS=-c -B -I. -I$GAWKSRC -I$GAWKSRC/support -DGAWK \
 		-DHAVE_CONFIG_H -DGETGROUPS_NOT_STANDARD\
-		-DLOCALEDIR="/sys/lib/ape/locale"
+		-DLOCALEDIR="/sys/lib/ape/locale" -DSHLIBEXT="a"\
+		-DDEFPATH="/bin:." -DDEFLIBPATH="/$M/lib/ape"
 
 %.$O: $GAWKSRC/%.c
 	$CC $CFLAGS $GAWKSRC/$stem.c

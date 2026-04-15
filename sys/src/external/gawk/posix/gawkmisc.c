@@ -240,9 +240,6 @@ os_isreadable(const awk_input_buf_t *iobuf, bool *isdir)
 	switch (iobuf->sbuf.st_mode & S_IFMT) {
 	case S_IFREG:
 	case S_IFCHR:	/* ttys, /dev/null, .. */
-#ifdef S_IFSOCK
-	case S_IFSOCK:
-#endif
 #ifdef S_IFIFO
 	case S_IFIFO:
 #endif

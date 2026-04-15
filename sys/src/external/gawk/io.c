@@ -3356,9 +3356,6 @@ file_can_timeout(int fd, mode_t st_mode)
 {
 	switch (st_mode & S_IFMT) {
 	case S_IFIFO:
-#ifdef S_IFSOCK
-	case S_IFSOCK:
-#endif
 		return true;
 	case S_IFCHR:
 		return isatty(fd);

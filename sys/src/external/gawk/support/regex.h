@@ -404,11 +404,7 @@ typedef enum
 # endif
 #endif
 
-#ifdef __USE_GNU
 # define __REPB_PREFIX(name) name
-#else
-# define __REPB_PREFIX(name) __##name
-#endif
 
 struct re_pattern_buffer
 {
