@@ -15,7 +15,7 @@
 
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
-#define ENABLE_NLS 1
+/* #undef ENABLE_NLS */
 
 /* Define to 1 if ARM64 CRC32 instruction is supported. See configure.ac for
    details. */
@@ -69,14 +69,14 @@
 /* #undef HAVE_COMMONCRYPTO_COMMONDIGEST_H */
 
 /* Define to 1 if you have the <cpuid.h> header file. */
-#define HAVE_CPUID_H 1
+/* #undef HAVE_CPUID_H */
 
 /* Define to 1 if the 32-bit x86 CRC assembly files are used. */
 /* #undef HAVE_CRC_X86_ASM */
 
 /* Define if the GNU dcgettext() function is already present or preinstalled.
    */
-#define HAVE_DCGETTEXT 1
+/* #undef HAVE_DCGETTEXT */
 
 /* Define to 1 if any of HAVE_DECODER_foo have been defined. */
 #define HAVE_DECODERS 1
@@ -161,7 +161,7 @@
 #define HAVE_FUNC_ATTRIBUTE_CONSTRUCTOR 1
 
 /* Define to 1 if you have the 'futimens' function. */
-#define HAVE_FUTIMENS 1
+/* #undef HAVE_FUTIMENS */
 
 /* Define to 1 if you have the 'futimes' function. */
 /* #undef HAVE_FUTIMES */
@@ -179,10 +179,10 @@
 #define HAVE_GETOPT_LONG 1
 
 /* Define to 1 if you have the 'getrlimit' function. */
-#define HAVE_GETRLIMIT 1
+/* #undef HAVE_GETRLIMIT */
 
 /* Define if the GNU gettext() function is already present or preinstalled. */
-#define HAVE_GETTEXT 1
+/* #undef HAVE_GETTEXT */
 
 /* Define to 1 if 'HWCAP_CRC32' is declared in <sys/auxv.h>. */
 /* #undef HAVE_HWCAP_CRC32 */
@@ -191,14 +191,14 @@
 /* #undef HAVE_ICONV */
 
 /* Define to 1 if you have the <immintrin.h> header file. */
-#define HAVE_IMMINTRIN_H 1
+/* #undef HAVE_IMMINTRIN_H */
 
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
 /* Define to 1 if Linux Landlock is supported. See configure.ac for details.
    */
-#define HAVE_LINUX_LANDLOCK 1
+/* #undef HAVE_LINUX_LANDLOCK */
 
 /* Define to 1 if 64-bit LoongArch CRC32 instructions are supported. */
 /* #undef HAVE_LOONGARCH_CRC32 */
@@ -234,16 +234,16 @@
 /* #undef HAVE_PLEDGE */
 
 /* Define to 1 if you have the 'posix_fadvise' function. */
-#define HAVE_POSIX_FADVISE 1
+/* #undef HAVE_POSIX_FADVISE */
 
 /* Define to 1 if 'program_invocation_name' is declared in <errno.h>. */
-#define HAVE_PROGRAM_INVOCATION_NAME 1
+/* #undef HAVE_PROGRAM_INVOCATION_NAME */
 
 /* Define to 1 if you have the 'pthread_condattr_setclock' function. */
-// #undef HAVE_PTHREAD_CONDATTR_SETCLOCK
+/* #undef HAVE_PTHREAD_CONDATTR_SETCLOCK */
 
 /* Have PTHREAD_PRIO_INHERIT. */
-#define HAVE_PTHREAD_PRIO_INHERIT 1
+/* #undef HAVE_PTHREAD_PRIO_INHERIT */
 
 /* Define to 1 if you have the 'SHA256Init' function. */
 /* #undef HAVE_SHA256INIT */
@@ -335,7 +335,7 @@
 
 /* Define to 1 if _mm_set_epi64x and _mm_clmulepi64_si128 are usable. See
    configure.ac for details. */
-#define HAVE_USABLE_CLMUL 1
+/* #undef HAVE_USABLE_CLMUL */
 
 /* Define to 1 if you have the 'utime' function. */
 /* #undef HAVE_UTIME */
@@ -348,7 +348,7 @@
 
 /* Define to 1 or 0, depending whether the compiler supports simple visibility
    declarations. */
-#define HAVE_VISIBILITY 1
+/* #undef HAVE_VISIBILITY */
 
 /* Define to 1 if you have the <wchar.h> header file. */
 #define HAVE_WCHAR_H 1
@@ -357,21 +357,21 @@
 #define HAVE_WCWIDTH 1
 
 /* Define to 1 if the system has the type '_Bool'. */
-#define HAVE__BOOL 1
+#define HAVE__Bool 1
 
 /* Define to 1 if you have the '_futime' function. */
 /* #undef HAVE__FUTIME */
 
 /* Define to 1 if _mm_movemask_epi8 is available. */
-#define HAVE__MM_MOVEMASK_EPI8 1
+/* #undef HAVE__MM_MOVEMASK_EPI8 */
 
 /* Define to 1 if the GNU C extension __builtin_assume_aligned is supported.
    */
-#define HAVE___BUILTIN_ASSUME_ALIGNED 1
+/* #undef HAVE___BUILTIN_ASSUME_ALIGNED */
 
 /* Define to 1 if the GNU C extensions __builtin_bswap16/32/64 are supported.
    */
-// #undef HAVE___BUILTIN_BSWAPXX
+/* #undef HAVE___BUILTIN_BSWAPXX */
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
@@ -433,7 +433,7 @@
 
 /* Define to 1 if the number of available CPU cores can be detected with
    sched_getaffinity() */
-// #undef TUKLIB_CPUCORES_SCHED_GETAFFINITY
+/* #undef TUKLIB_CPUCORES_SCHED_GETAFFINITY */
 
 /* Define to 1 if the number of available CPU cores can be detected with
    sysconf(_SC_NPROCESSORS_ONLN) or sysconf(_SC_NPROC_ONLN). */
@@ -465,7 +465,7 @@
 
 /* Define to 1 if the amount of physical memory can be detected with
    sysconf(_SC_PAGESIZE) and sysconf(_SC_PHYS_PAGES). */
-// #undef TUKLIB_PHYSMEM_SYSCONF
+/* #undef TUKLIB_PHYSMEM_SYSCONF */
 
 /* Define to 1 if the amount of physical memory can be detected with sysctl().
    */
