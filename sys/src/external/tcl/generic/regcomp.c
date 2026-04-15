@@ -189,7 +189,8 @@ static int before(celt, celt);
 static struct cvec *eclass(struct vars *, celt, int);
 static struct cvec *cclass(struct vars *, const chr *, const chr *, int);
 static struct cvec *allcases(struct vars *, pchr);
-static int cmp(const chr *, const chr *, size_t);
+static int tcl_cmp(const chr *, const chr *, size_t);
+#define cmp tcl_cmp
 static int casecmp(const chr *, const chr *, size_t);
 /* automatically gathered by fwd; do not hand-edit */
 /* =====^!^===== end forwards =====^!^===== */

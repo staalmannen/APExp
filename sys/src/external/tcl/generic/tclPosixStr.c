@@ -310,9 +310,6 @@ Tcl_ErrnoId(void)
 #ifdef ENOMEDIUM
     case ENOMEDIUM: return "ENOMEDIUM";
 #endif
-#ifdef ENOMSG
-    case ENOMSG: return "ENOMSG";
-#endif
 #ifdef ENONET
     case ENONET: return "ENONET";
 #endif
@@ -411,9 +408,6 @@ Tcl_ErrnoId(void)
 #endif
 #ifdef EPROTO
     case EPROTO: return "EPROTO";
-#endif
-#ifdef EPROTONOSUPPORT
-    case EPROTONOSUPPORT: return "EPROTONOSUPPORT";
 #endif
 #ifdef EPROTOTYPE
     case EPROTOTYPE: return "EPROTOTYPE";
@@ -785,7 +779,7 @@ Tcl_ErrnoMsg(
 #ifdef ENODEV
     case ENODEV: return "no such device";
 #endif
-#ifdef ENOENT
+#if defined(ENOENT) || defined(ENOMSG)
     case ENOENT: return "no such file or directory";
 #endif
 #ifdef ENOEXEC
@@ -802,9 +796,6 @@ Tcl_ErrnoMsg(
 #endif
 #ifdef ENOMEDIUM
     case ENOMEDIUM: return "no medium found";
-#endif
-#ifdef ENOMSG
-    case ENOMSG: return "no message of desired type";
 #endif
 #ifdef ENONET
     case ENONET: return "machine is not on the network";
@@ -905,10 +896,7 @@ Tcl_ErrnoMsg(
 #ifdef EPROTO
     case EPROTO: return "protocol error";
 #endif
-#ifdef EPROTONOSUPPORT
-    case EPROTONOSUPPORT: return "protocol not supported";
-#endif
-#ifdef EPROTOTYPE
+#if defined(EPROTOTYPE) || defined(EPROTONOSUPPORT)
     case EPROTOTYPE: return "protocol wrong type for socket";
 #endif
 #ifdef ERANGE

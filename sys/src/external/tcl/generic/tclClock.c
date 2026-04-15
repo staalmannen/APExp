@@ -4709,14 +4709,6 @@ ClockSafeCatchCmd(
  *----------------------------------------------------------------------
  */
 
-#ifdef _WIN32
-#define getenv(x) _wgetenv(L##x)
-#else
-#define WCHAR char
-#define wcslen strlen
-#define wcscmp strcmp
-#define wcscpy strcpy
-#endif
 #define TZ_INIT_MARKER	((WCHAR *) INT2PTR(-1))
 
 typedef struct {
