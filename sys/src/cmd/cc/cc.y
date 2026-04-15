@@ -336,12 +336,21 @@ init:
 qual:
 	'[' lexpr ']'
 	{
-		$$ = new(OARRAY, $2, Z);
+		$$ = new(OARRAY, Z, $2);
 	}
 |	'.' ltag
 	{
 		$$ = new(OELEM, Z, Z);
 		$$->sym = $2;
+	}
+|	qual '.' ltag
+	{
+		$$ = new(OELEM, $1, Z);
+		$$->sym = $3;
+	}
+|	qual '[' lexpr ']'
+	{
+		$$ = new(OARRAY, $1, $3);
 	}
 |	qual '='
 

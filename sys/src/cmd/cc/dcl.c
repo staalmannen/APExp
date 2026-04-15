@@ -682,13 +682,22 @@ init1(Sym *s, Type *t, long o, int exflag)
 			a = peekinit();
 			if(a == Z)
 				break;
-			if(a->op == OELEM && t->link->etype != TSTRUCT)
+			Node *ap = a;
+			Node *parent = Z;
+			while(ap->left != Z && (ap->op == OELEM || ap->op == OARRAY)){
+				parent = ap;
+				ap = ap->left;
+			}
+			if(ap->op == OELEM && t->link->etype != TSTRUCT)
 				break;
-			if(a->op == OARRAY) {
+			if(ap->op == OARRAY) {
 				if(e && exflag)
 					break;
-				a = nextinit();
-				r = a->left;
+				r = ap->right;
+				if(parent != Z)
+					parent->left = Z;
+				else
+					nextinit();
 				complex(r);
 				if(r->op != OCONST) {
 					diag(r, "initializer subscript must be constant");
@@ -736,12 +745,21 @@ init1(Sym *s, Type *t, long o, int exflag)
 
 	again:
 		for(t1 = t->link; t1 != T; t1 = t1->down) {
-			if(a->op == OARRAY && t1->etype != TARRAY)
+			Node *ap = a;
+			Node *parent = Z;
+			while(ap->left != Z && (ap->op == OELEM || ap->op == OARRAY)){
+				parent = ap;
+				ap = ap->left;
+			}
+			if(ap->op == OARRAY && t1->etype != TARRAY)
 				break;
-			if(a->op == OELEM) {
-				if(t1->sym != a->sym)
+			if(ap->op == OELEM) {
+				if(t1->sym != ap->sym)
 					continue;
-				nextinit();
+				if(parent != Z)
+					parent->left = Z;
+				else
+					nextinit();
 			}
 			if(t1->nbits && (bitoff != t1->offset || !bitagg)) {
 				if(a->op == OELEM && bitoff != -1)
