@@ -25,6 +25,10 @@ void __stdio_exit(void)
 	FILE *f;
 	FILE **head;
 
+	/* Flush the static streams first (not in OFL list) */
+	close_file(stdout);
+	close_file(stderr);
+
 	/* Safely lock and iterate open file list */
 	head = __ofl_lock();
 	if (!head) return;

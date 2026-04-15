@@ -3,13 +3,19 @@
 int fflush(FILE *f){
 	if(f==NULL){
 		int error = 0;
-		/* Flush all open files via __ofl interface */
+		/* Flush stdout and stderr (static files, not in OFL list) */
+		FILE *sfiles[] = { stdout, stderr, NULL };
+		for (int i = 0; sfiles[i]; i++) {
+			FILE *sf = sfiles[i];
+			if (sf->wpos > sf->wbase) {
+				sf->write(sf, 0, 0);
+				if (sf->flags & F_ERR) error = EOF;
+			}
+		}
+		/* Flush all dynamically opened files via OFL list */
 		FILE **flp = __ofl_lock();
-		for (FILE *g = *flp; g; g = g->next_locked) {
+		for (FILE *g = *flp; g; g = g->next) {
 			if (g->wpos > g->wbase) {
-				/* Call write(f,0,0) — the musl flush-signal convention.
-				 * The write function (e.g. __stdio_write, mwrite) flushes
-				 * wbase..wpos internally. Passing wbase+count would double-write. */
 				g->write(g, 0, 0);
 				if (g->flags & F_ERR) error = EOF;
 			}
