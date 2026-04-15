@@ -3,7 +3,7 @@
 #pragma lib "/$M/lib/ape/libap.a"
 
 typedef int jmp_buf[10];
-typedef int sigjmp_buf[10];
+typedef int sigjmp_buf[12];
 
 #ifdef __cplusplus
 extern "C" {

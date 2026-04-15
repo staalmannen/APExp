@@ -10,7 +10,8 @@ ok:
 	RET
 
 TEXT	setjmp(SB), $0
-	MOVQ	SP, 0(RARG)	/* store sp */
+	LEAQ	8(SP), BX	/* store sp as it would be after RET */
+	MOVQ	BX, 0(RARG)
 	MOVQ	0(SP), BX	/* store return pc */
 	MOVQ	BX, 8(RARG)
 	MOVL	$0, AX		/* return 0 */
@@ -18,11 +19,13 @@ TEXT	setjmp(SB), $0
 
 TEXT	sigsetjmp(SB), $0
 	MOVL	savemask+8(FP), BX
-	MOVL	BX, 0(RARG)
-	MOVL	_psigblocked(SB), BX	/* load VALUE, not address */
-	MOVL	BX, 4(RARG)
-	MOVQ	SP, 8(RARG)	/* store sp */
+	MOVQ	$0, 0(RARG)	/* clear first 8 bytes of sigjmp_buf (mask + bits) */
+	MOVL	BX, 0(RARG)	/* store 32-bit savemask */
+	MOVQ	_psigblocked(SB), BX
+	MOVQ	BX, 8(RARG)	/* store 64-bit blocked mask at offset 8 */
+	LEAQ	8(SP), BX	/* store sp as it would be after RET */
+	MOVQ	BX, 16(RARG)	/* offset 16 for jmpbuf[SP] */
 	MOVQ	0(SP), BX	/* store return pc */
-	MOVQ	BX, 16(RARG)
+	MOVQ	BX, 24(RARG)	/* offset 24 for jmpbuf[PC] */
 	MOVL	$0, AX	/* return 0 */
 	RET

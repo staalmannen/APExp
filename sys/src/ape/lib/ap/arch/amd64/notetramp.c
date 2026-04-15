@@ -90,8 +90,8 @@ notecont(Ureg *u, char *s)
 extern sigset_t	_psigblocked;
 
 typedef struct {
-	sigset_t set;
-	sigset_t blocked;
+	unsigned long long set;
+	unsigned long long blocked;
 	unsigned long long jmpbuf[2];
 } sigjmp_buf_amd64;
 
@@ -111,19 +111,24 @@ siglongjmp(sigjmp_buf j, int ret)
 		dbg("  pcstack[n-1].u->sp=   ", pcstack[nstack-1].u->sp);
 	}
 
-	if(jb->set)
+	if(jb->set & 0xFFFFFFFF){
 		_psigblocked = jb->blocked;
+	}
 	if(nstack == 0 || pcstack[nstack-1].u->sp > jb->jmpbuf[JMPBUFSP]){
-		dbg("  PATH: longjmp, SP=    ", jb->jmpbuf[JMPBUFSP]);
+		dbg("  PATH: longjmp, SP=    ", jb->jmpbuf[JMPBUFSP] - 8);
+		/* adjust SP for longjmp because it expects SP pointing to return PC */
+		/* but we stored SP after the return PC */
+		unsigned long long *sp = (void*)jb->jmpbuf[JMPBUFSP];
+		sp[-1] = jb->jmpbuf[JMPBUFPC];
 		longjmp((void*)jb->jmpbuf, ret);
 	}
-	dbg("  PATH: NRSTR SP-target=", jb->jmpbuf[JMPBUFSP] + 8);
+	dbg("  PATH: NRSTR SP-target=", jb->jmpbuf[JMPBUFSP]);
 	u = pcstack[nstack-1].u;
 	nstack--;
 	u->ax = ret;
 	if(ret == 0)
 		u->ax = 1;
 	u->pc = jb->jmpbuf[JMPBUFPC];
-	u->sp = jb->jmpbuf[JMPBUFSP] + 8;
+	u->sp = jb->jmpbuf[JMPBUFSP];
 	_NOTED(3);	/* NRSTR */
 }
