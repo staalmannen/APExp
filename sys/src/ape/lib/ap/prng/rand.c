@@ -44,7 +44,7 @@ srand(unsigned int seed)
 	}
 }
 
-static long
+long
 lrand(void)
 {
 	ulong x;

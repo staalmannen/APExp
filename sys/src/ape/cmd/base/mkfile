@@ -82,14 +82,14 @@ TARG= \
 		split\
 		sponge\
 		strings\
-		sync\
+#		sync\
 		tail\
 ##		tar\
 		tee\
 		test\
 		tftp\
 		time\
-		touch\
+#		touch\
 		tr\
 		true\
 		tsort\

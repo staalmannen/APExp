@@ -1,4 +1,4 @@
-/* config.h.  Generated from config.hin by configure.  */
+/* config.h.  Generated from config.hin by configure. VERSION */
 /* config.hin.  Generated from configure.ac by autoheader.  */ 
 
 /* CPU and C ABI indicator */
@@ -2029,18 +2029,6 @@
 
 /* Packager-specific version information */
 /* #undef PACKAGE_PACKAGER_VERSION */
-
-/* Define to the full name and version of this package. */
-#define PACKAGE_STRING "GNU grep 3.12"
-
-/* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME "grep"
-
-/* Define to the home page for this package. */
-#define PACKAGE_URL "https://www.gnu.org/software/grep/"
-
-/* Define to the version of this package. */
-#define PACKAGE_VERSION "3.12"
 
 /* Define to the type that is the result of default argument promotions of
    type mode_t. */

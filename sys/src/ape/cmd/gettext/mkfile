@@ -1,18 +1,18 @@
 </$objtype/mkfile
 APEXPROOT=../../../../..
 
+LIB=parserlib.a$O
+
 TARG=	\
 	msgfmt\
 	msgmerge\
 	xgettext\
 	autopoint
 
-PARSEROBJS=	\
-	poparser.$O\
-	poparser_sysdep.$O\
-	StringEscape.$O
+PARSEROBJS=	poparser.$O poparser_sysdep.$O StringEscape.$O
 
 BIN=$APEXPROOT/$objtype/bin/ape
+
 
 <$APEXPROOT/sys/src/cmd/mkmany
 
@@ -23,12 +23,23 @@ CC=pcc
 CFLAGS=-Fw -B
 
 
+parserlib.a$O: $PARSEROBJS
+	ar vu $LIB $PARSEROBJS
+
 %.$O: $GETTEXTSRC/src/%.c
 	$CC $CFLAGS $GETTEXTSRC/src/$stem.c
 
-$O.%: %.$O $PARSEROBJS
-	$CC -o $target $prereq
+$O.msgfmt: msgfmt.$O
+	$CC -o $O.msgfmt msgfmt.$O $LIB
 
+$O.msgmerge: msgmerge.$O
+	$CC -o $O.msgmerge msgmerge.$O $LIB
+
+$O.xgettext: xgettext.$O
+	$CC -o $O.xgettext xgettext.$O $LIB
+
+$O.autopoint: autopoint.$O
+	$CC -o $O.autopoint autopoint.$O $LIB
 
 
 
