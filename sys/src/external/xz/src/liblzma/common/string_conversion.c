@@ -264,8 +264,7 @@ static const option_map bcj_optmap[] = {
 		.name = "start",
 		.flags = OPTMAP_NO_STRFY_ZERO | OPTMAP_USE_BYTE_SUFFIX,
 		.offset = offsetof(lzma_options_bcj, start_offset),
-		.u.range.min = 0,
-		.u.range.max = UINT32_MAX,
+		.u = { .range = { .min = 0, .max = UINT32_MAX } },
 	}
 };
 
@@ -290,8 +289,7 @@ static const option_map delta_optmap[] = {
 	{
 		.name = "dist",
 		.offset = offsetof(lzma_options_delta, dist),
-		.u.range.min = LZMA_DELTA_DIST_MIN,
-		.u.range.max = LZMA_DELTA_DIST_MAX,
+		.u = { .range = { .min = LZMA_DELTA_DIST_MIN, .max = LZMA_DELTA_DIST_MAX } },
 	}
 };
 
@@ -386,47 +384,46 @@ static const option_map lzma12_optmap[] = {
 		.name = "dict",
 		.flags = OPTMAP_USE_BYTE_SUFFIX,
 		.offset = offsetof(lzma_options_lzma, dict_size),
-		.u.range.min = LZMA_DICT_SIZE_MIN,
-		// FIXME? The max is really max for encoding but decoding
-		// would allow 4 GiB - 1 B.
-		.u.range.max = (UINT32_C(1) << 30) + (UINT32_C(1) << 29),
+		.u = {
+			.range = {
+				.min = LZMA_DICT_SIZE_MIN,
+				// FIXME? The max is really max for encoding but decoding
+				// would allow 4 GiB - 1 B.
+				.max = (UINT32_C(1) << 30) + (UINT32_C(1) << 29),
+			}
+		},
 	}, {
 		.name = "lc",
 		.offset = offsetof(lzma_options_lzma, lc),
-		.u.range.min = LZMA_LCLP_MIN,
-		.u.range.max = LZMA_LCLP_MAX,
+		.u = { .range = { .min = LZMA_LCLP_MIN, .max = LZMA_LCLP_MAX } },
 	}, {
 		.name = "lp",
 		.offset = offsetof(lzma_options_lzma, lp),
-		.u.range.min = LZMA_LCLP_MIN,
-		.u.range.max = LZMA_LCLP_MAX,
+		.u = { .range = { .min = LZMA_LCLP_MIN, .max = LZMA_LCLP_MAX } },
 	}, {
 		.name = "pb",
 		.offset = offsetof(lzma_options_lzma, pb),
-		.u.range.min = LZMA_PB_MIN,
-		.u.range.max = LZMA_PB_MAX,
+		.u = { .range = { .min = LZMA_PB_MIN, .max = LZMA_PB_MAX } },
 	}, {
 		.name = "mode",
 		.type = OPTMAP_TYPE_LZMA_MODE,
 		.flags = OPTMAP_USE_NAME_VALUE_MAP,
 		.offset = offsetof(lzma_options_lzma, mode),
-		.u.map = lzma12_mode_map,
+		.u = { .map = lzma12_mode_map },
 	}, {
 		.name = "nice",
 		.offset = offsetof(lzma_options_lzma, nice_len),
-		.u.range.min = 2,
-		.u.range.max = 273,
+		.u = { .range = { .min = 2, .max = 273 } },
 	}, {
 		.name = "mf",
 		.type = OPTMAP_TYPE_LZMA_MATCH_FINDER,
 		.flags = OPTMAP_USE_NAME_VALUE_MAP,
 		.offset = offsetof(lzma_options_lzma, mf),
-		.u.map = lzma12_mf_map,
+		.u = { .map = lzma12_mf_map },
 	}, {
 		.name = "depth",
 		.offset = offsetof(lzma_options_lzma, depth),
-		.u.range.min = 0,
-		.u.range.max = UINT32_MAX,
+		.u = { .range = { .min = 0, .max = UINT32_MAX } },
 	}
 };
 
