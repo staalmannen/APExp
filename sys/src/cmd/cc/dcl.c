@@ -776,10 +776,10 @@ init1(Sym *s, Type *t, long o, int exflag)
 			a = peekinit();
 			if(a == Z)
 				break;
-			if(a->op == OELEM)
+			if(a->op == OELEM || a->op == OARRAY)
 				goto again;
 		}
-		if(a && a->op == OELEM)
+		if(a && (a->op == OELEM || a->op == OARRAY))
 			diag(a, "structure element not found %F", a);
 		if(bitoff != -1) {
 			if(bitagg)
