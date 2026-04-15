@@ -1,0 +1,16 @@
+# tcl pkg-config source file
+
+prefix=/usr/local
+exec_prefix=/usr/local
+libdir=/usr/local/lib
+includedir=${prefix}/include
+libfile=libtcl9.0.a
+
+Name: Tool Command Language
+Description: Tcl is a powerful, easy-to-learn dynamic programming language, suitable for a wide range of uses.
+URL: https://www.tcl-lang.org/
+Version: 9.0.3
+Requires.private:  zlib >= 1.2.3
+Libs: -L${libdir} -ltcl9.0 -ltclstub
+Libs.private: -ldl -lz  -lpthread 
+Cflags: -I${includedir} 
