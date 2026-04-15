@@ -481,6 +481,7 @@ isstruct(Node *a, Type *t)
 	case OCONST:
 	case OINIT:
 	case OELEM:
+	case OARRAY:
 		return 0;
 	}
 

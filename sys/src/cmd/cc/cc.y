@@ -336,7 +336,7 @@ init:
 qual:
 	'[' lexpr ']'
 	{
-		$$ = new(OARRAY, Z, $2);
+		$$ = new(OARRAY, $2, Z);
 	}
 |	'.' ltag
 	{
@@ -350,7 +350,7 @@ qual:
 	}
 |	qual '[' lexpr ']'
 	{
-		$$ = new(OARRAY, $1, $3);
+		$$ = new(OARRAY, $3, $1);
 	}
 |	qual '='
 
