@@ -15,9 +15,9 @@
 static uint64_t crc64_table[256];
 
 
-#ifdef HAVE_FUNC_ATTRIBUTE_CONSTRUCTOR
-__attribute__((__constructor__))
-#endif
+//#ifdef HAVE_FUNC_ATTRIBUTE_CONSTRUCTOR
+//__attribute__((__constructor__))
+//#endif
 static void
 crc64_init(void)
 {

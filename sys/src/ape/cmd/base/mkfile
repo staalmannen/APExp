@@ -50,8 +50,8 @@ TARG= \
 		md5sum\
 		mkdir\
 		mkfifo\
-#		mknod\
-#		mktemp\
+		mknod\
+		mktemp\
 #		mv\
 #		nice\
 #		nl\
@@ -82,14 +82,14 @@ TARG= \
 		split\
 		sponge\
 		strings\
-#		sync\
+		sync\
 		tail\
 ##		tar\
 		tee\
-#		test\
+		test\
 		tftp\
 		time\
-#		touch\
+		touch\
 		tr\
 		true\
 		tsort\
@@ -100,7 +100,7 @@ TARG= \
 		unlink\
 		uudecode\
 		uuencode\
-#		which\
+		which\
 		whoami\
 		xargs\
 		xinstall\
@@ -165,8 +165,8 @@ CPPFLAGS =\
 
 SBASE_CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil\
 	-I$SBASESRC/../gnulib -D_POSIX_SOURCE -D_BSD_EXTENSION \
-	-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE -DAT_EACCESS=NULL\
-	-DAT_FDCWD=NULL -DAT_SYMLINK_NOFOLLOW=1
+	-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE -DAT_EACCESS=0\
+	-DAT_FDCWD=0 -DAT_SYMLINK_NOFOLLOW=1
 
 libutil.a$O: $UTIL_OBJS
 			ar vu libutil.a$O $UTIL_OBJS

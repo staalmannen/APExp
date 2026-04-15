@@ -8,6 +8,7 @@
 //  Author:     Lasse Collin
 //
 ///////////////////////////////////////////////////////////////////////////////
+#define HAVE_SMALL
 
 #include "check.h"
 #include "crc_common.h"
@@ -18,9 +19,9 @@
 uint32_t lzma_crc32_table[1][256];
 
 
-#ifdef HAVE_FUNC_ATTRIBUTE_CONSTRUCTOR
-__attribute__((__constructor__))
-#endif
+//#ifdef HAVE_FUNC_ATTRIBUTE_CONSTRUCTOR
+//__attribute__((__constructor__))
+//#endif
 static void
 crc32_init(void)
 {
