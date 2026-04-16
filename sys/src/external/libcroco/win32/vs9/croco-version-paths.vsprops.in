@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="Windows-1252"?>
+<!--
+This file is part of The Croco Library
+This program is free software; you can redistribute it and/or
+modify it under the terms of version 2.1 of the GNU Lesser General Public
+License as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA
+
+Author: Fan, Chun-wei
+See COPYRIGHTS file for copyright information.
+-->
+<VisualStudioPropertySheet
+	ProjectType="Visual C++"
+	Version="8.00"
+	Name="crocoversionpathsprops"
+	>
+	<UserMacro
+		Name="CrocoMajorVersion"
+		Value="@LIBCROCO_MAJOR_VERSION@"
+	/>
+	<UserMacro
+		Name="CrocoMinorVersion"
+		Value="@LIBCROCO_MINOR_VERSION@"
+	/>
+	<UserMacro
+		Name="CrocoMicroVersion"
+		Value="@LIBCROCO_MICRO_VERSION@"
+	/>
+	<UserMacro
+		Name="ApiVersion"
+		Value="$(CrocoMajorVersion).$(CrocoMinorVersion)"
+	/>
+	<UserMacro
+		Name="VSVer"
+		Value="9"
+	/>
+	<UserMacro
+		Name="GlibEtcInstallRoot"
+		Value="$(SolutionDir)\..\..\..\vs$(VSVer)\$(PlatformName)"
+	/>
+	<UserMacro
+		Name="CopyDir"
+		Value="$(GlibEtcInstallRoot)"
+	/>
+	<UserMacro
+		Name="DefDir"
+		Value="$(SolutionDir)$(ConfigurationName)\$(PlatformName)\obj\$(ProjectName)"
+	/>
+	<UserMacro
+		Name="LibCrocoLibtoolCompatibleDllPrefix"
+		Value="lib"
+	/>
+	<UserMacro
+		Name="LibCrocoLibtoolCompatibleDllSuffix"
+		Value="-$(ApiVersion)-0"
+	/>
+	<UserMacro
+		Name="LibCrocoSeparateVSDllPrefix"
+		Value=""
+	/>
+	<UserMacro
+		Name="LibCrocoSeparateVSDllSuffix"
+		Value="-$(ApiVersion)-vs$(VSVer)"
+	/>
+	<!-- Change these two to LibCrocoLibtoolCompatibleDllPrefix and
+	LibCrocoLibtoolCompatibleDllSuffix if that is what you want -->
+	<UserMacro
+		Name="LibCrocoDllPrefix"
+		Value="$(LibCrocoSeparateVSDllPrefix)"
+	/>
+	<UserMacro
+		Name="LibCrocoDllSuffix"
+		Value="$(LibCrocoSeparateVSDllSuffix)"
+	/>
+	<UserMacro
+		Name="PythonPath"
+		Value="c:\python27"
+	/>
+</VisualStudioPropertySheet>

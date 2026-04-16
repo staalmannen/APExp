@@ -1,0 +1,26 @@
+@charset "utf8" ;
+
+@import url("http://pouet.com")screen, paper, aural ;
+
+@page coin :pseudo-page {
+  page-prop0 : page-val0;
+  page-prop1 : page-val1
+}
+
+
+@media paper, aural {
+  x {
+    foo : fooval;
+    bar : barval
+  }
+}
+
+@font-face {
+  font-prop1 : font1;
+  font-prop2 : font2
+}
+
+x>y[attr="val"].class#tatati z+toto {
+  prop1 : function(a);
+  prop2 : val2
+}

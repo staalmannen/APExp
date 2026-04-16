@@ -1,0 +1,219 @@
+
+
+@charset "utf8";
+
+/********************************************
+ * Parsing location information of the @charset rule
+ ********************************************/
+  /*@charset*/
+  /*line:1 column:1 byte offset:0 */
+  /*utf8*/
+  /*line:1 column:10 byte offset:9 */
+
+@import url("http://pouet.com") screen, paper, aural;
+
+/*****************************************************
+ *Parsing location inforamtion for the @import rule
+ ******************************************************/
+
+  /*@import*/
+  /*line:3 column:1 byte offset:19 */
+
+  /*http://pouet.com*/
+  /*line:3 column:9 byte offset:27 */
+
+  /*screen*/
+  /*line:3 column:33 byte offset:51 */
+
+  /*paper*/
+  /*line:3 column:41 byte offset:59 */
+
+  /*aural*/
+  /*line:3 column:48 byte offset:66 */
+
+@import url("http://pouet.com") screen2, paper2, aural2;
+
+/*****************************************************
+ *Parsing location inforamtion for the @import rule
+ ******************************************************/
+
+  /*@import*/
+  /*line:4 column:1 byte offset:74 */
+
+  /*http://pouet.com*/
+  /*line:4 column:9 byte offset:82 */
+
+  /*screen2*/
+  /*line:4 column:31 byte offset:104 */
+
+  /*paper2*/
+  /*line:4 column:40 byte offset:113 */
+
+  /*aural2*/
+  /*line:4 column:48 byte offset:121 */
+
+@page coin :pseudo-page
+
+  /*@page*/
+  /*line:6 column:1 byte offset:131 */
+  /*coin*/
+  /*line:6 column:7 byte offset:137 */
+  /*pseudo-page*/
+  /*line:6 column:13 byte offset:143 */
+
+{
+
+
+page-prop0 : page-val0;
+
+
+/************************************************
+ *Parsing location information of the property
+ ************************************************/
+  /*page-prop0*/
+  /*line:7 column:7 byte offset:163 */
+  /*page-val0*/
+  /*line:7 column:19 byte offset:175 */
+
+
+page-prop1 : page-val1;
+
+
+/************************************************
+ *Parsing location information of the property
+ ************************************************/
+  /*page-prop1*/
+  /*line:8 column:7 byte offset:193 */
+  /*page-val1*/
+  /*line:8 column:19 byte offset:205 */
+}
+@media paper, aural
+  /*@media*/
+  /*line:11 column:1 byte offset:220 */
+  /*paper*/
+  /*line:11 column:8 byte offset:227 */
+  /*aural*/
+  /*line:11 column:15 byte offset:234 */
+
+{
+x {
+/************************************************
+ *Parsing location information of the selector
+ ************************************************/
+/*x*/
+/*line:12 column:5 byte offset:246 */
+  /*x*/
+  /*line:12 column:5 byte offset:246 */
+
+
+foo : fooval;
+
+
+/************************************************
+ *Parsing location information of the property
+ ************************************************/
+  /*foo*/
+  /*line:13 column:7 byte offset:256 */
+  /*fooval*/
+  /*line:13 column:12 byte offset:261 */
+
+
+bar : barval;
+
+
+/************************************************
+ *Parsing location information of the property
+ ************************************************/
+  /*bar*/
+  /*line:14 column:7 byte offset:276 */
+  /*barval*/
+  /*line:14 column:12 byte offset:281 */
+ }
+
+}
+@font-face {
+/******************************************************
+ Parsing location information for the @font-face rule
+ ******************************************************/
+
+  /*@font-face*/
+  /*line:18 column:1 byte offset:299 */
+
+
+font-prop1 : font1;
+
+
+/************************************************
+ *Parsing location information of the property
+ ************************************************/
+  /*font-prop1*/
+  /*line:19 column:2 byte offset:313 */
+  /*font1*/
+  /*line:19 column:14 byte offset:325 */
+
+
+font-prop2 : font2;
+
+
+/************************************************
+ *Parsing location information of the property
+ ************************************************/
+  /*font-prop2*/
+  /*line:20 column:2 byte offset:334 */
+  /*font2*/
+  /*line:20 column:14 byte offset:346 */
+}
+x>y[attr="val"].class#tatati z+toto {
+/************************************************
+ *Parsing location information of the selector
+ ************************************************/
+/*x*/
+/*line:22 column:1 byte offset:356 */
+  /*x*/
+  /*line:22 column:1 byte offset:356 */
+/*y[attr="val"].class#tatati*/
+/*line:22 column:5 byte offset:360 */
+  /*y*/
+  /*line:22 column:5 byte offset:360 */
+
+  /*[attr="val"]*/
+  /*line:22 column:6 byte offset:361 */
+
+  /*.class*/
+  /*line:22 column:17 byte offset:372 */
+
+  /*#tatati*/
+  /*line:22 column:22 byte offset:377 */
+/*z*/
+/*line:22 column:30 byte offset:385 */
+  /*z*/
+  /*line:22 column:30 byte offset:385 */
+/*toto*/
+/*line:22 column:34 byte offset:389 */
+  /*toto*/
+  /*line:22 column:34 byte offset:389 */
+
+
+prop1 : function(a);
+
+
+/************************************************
+ *Parsing location information of the property
+ ************************************************/
+  /*prop1*/
+  /*line:23 column:2 byte offset:396 */
+  /*function(a)*/
+  /*line:23 column:9 byte offset:403 */
+
+
+prop2 : val2;
+
+
+/************************************************
+ *Parsing location information of the property
+ ************************************************/
+  /*prop2*/
+  /*line:24 column:2 byte offset:418 */
+  /*val2*/
+  /*line:24 column:9 byte offset:425 */
+ }

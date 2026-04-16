@@ -1,0 +1,24 @@
+#!/bin/sh
+
+###
+#
+###
+
+OUTPUT_FILE=valgrind.log
+VG=`which valgrind`
+VG_OPTIONS="-q --num-callers=100 --leak-check=yes --show-reachable=yes"
+
+#Some sanity checks
+if test "empty$VG" = "empty" ; then
+   echo "You should install valgrind and set it binary into your"
+   echo "\$PATH env variable"
+   echo "go to http://developer.kde.org/~sewardj/ to dowload valgring"   
+   exit
+fi
+
+
+if test "empty$1" != "empty" ; then
+    OUTPUT_FILE="$1".vg
+fi
+
+exec $VG $VG_OPTIONS $@ 2>"$OUTPUT_FILE"

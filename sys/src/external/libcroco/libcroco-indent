@@ -1,0 +1,102 @@
+#!/bin/sh
+#This is just a smallish indent script to indent mlview
+#to indent all the sources correctly (before commiting for ex),
+#type: 
+#./indent-mlview src/*.[ch]
+
+#Here go some explanations of the indent options:
+#
+#-bad: forces a blank line after every block of declaration
+#=============================================================
+#-bap: forces a blank line after every procedure body
+#=============================================================
+#-bbb: forces a blank line before every boxed comment.
+#=============================================================
+#-sob: forces indent to swallow every optional blank line.
+#=============================================================
+#-bl -bli2 formats braces like this:
+#if (x > 2)
+#  {
+#    x-- ;
+#  }
+#=============================================================
+#-nce formats the "else" not to cudle up to the
+#immediately preceding }:
+#if (x > 2)
+#  {
+#    x-- ;
+#  }
+#else
+#  {
+#    x++ ;
+#  }
+#==============================
+#-ce is the contrary of -nce
+#=============================================================
+#-ss: put a space before a semi colon that is at the same line as a
+#for.
+#=============================================================
+#-pcs: puts a space between the name of a procedure being called
+#and  the '('.
+#=============================================================
+#-bs: puts a space between the sizeof operator and its argument.
+#=============================================================
+#-saf: puts a space between a for an the following parenthesis.
+#=============================================================
+#-sai: puts a space between an if and its arguments
+#=============================================================
+#-saw: puts a space between a while and its arguments
+#=============================================================
+#-psl: causes the type of a procedure being defined to be placed
+#on the line before the name of the procedure.
+#=============================================================
+#-bls: formats braces in struct declarations like this:
+#struct foo
+#{
+#  int x;
+#};
+#-brs: formats braces in struct decls like this:
+#struct foo {
+#  int x;
+#};
+#=============================================================
+#-bc: forces a newline after each comma in a declaration.
+#=============================================================
+#-i2: puts indentation at 2 blank chars.
+#=============================================================
+#-lp: 
+#without -lp the code looks like this:
+#p1 = first_procedure (second_procedure (p2, p3),
+#          third_procedure (p4, p5));
+#with -lp the code looks like this:
+#p1 = first_procedure (second_procedure (p2, p3),
+#                      third_procedure (p4, p5));
+#=============================================================
+#-ppi2: indents preprocessor directives using 2 spaces.
+#=============================================================
+#=============================================================
+#-ts2:set tabs spaces to 2 blank chars.
+#=============================================================
+#-l60 == --line-length60
+#=============================================================
+#-bbo: break long lines before boolean operators when found.
+#=============================================================
+
+INDENT=`which indent`
+GREP=`which grep`
+if test x$INDENT = x ; then
+    echo "Argh !!! Could not find indent in your PATH. Exited."
+    exit -1
+    if test x$GREP = x ; then
+	echo "Argh!!! Could not find grep in you PATH. Exited."
+	exit -1 ;
+    fi
+    is_gnu=`$INDENT -version | $GREP gnu`
+    if test x$is_gnu = x ; then
+	echo "Found a indent that is not the GNU one. Exited."
+	exit -1 ;
+    fi
+fi
+
+exec $INDENT -bad -bap -nbbb -br -ce -ss -pcs -bs -saf -sai \
+-cdw -saw -psl -brs -bc -i8 -ppi0 -lp -ts0 -bbo -sob $@

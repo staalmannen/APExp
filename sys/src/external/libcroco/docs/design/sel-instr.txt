@@ -1,0 +1,64 @@
+Draft of the libcroco selector internal instruction set.
+*********************************************************
+
+READERS SHOULD READ THE CHAPTER 5 of THE CSS2 CSS2 SPEC INTITLED
+"Selectors" FIRST.
+
+I) Introduction
+''''''''''''''''''''
+This is the instructions set understood by the libcroco
+sel-eng.c module (Selection engine).
+
+The purpose of the selection engine is to basically to say whether if a given
+xml node is matched by a given css2 selector or not.
+
+II) Rationale
+''''''''''''''''''''
+For the sake of performance (mostly processing speed) each CSS2
+selector is compiled into a sequences of atomic selection instructions
+that are easily executable by the selection engine.
+
+III) Selection instruction set overview
+''''''''''''''''''''''''''''''''''''''''
+
+Each selection instruction returns a boolean value (TRUE or FALSE).
+The execution of a sequence of selection instruction stops at the
+first instruction that returns a FALSE value and the selection engine
+returns returns the value FALSE to say that the current xml node
+is matched by the CSS2 selection expression being evaluated.
+
+Note that during the evaluation of a CSS2 selection expression,
+all the contextual information are stored into an evalutation context.
+For example, the context will hold a pointer to the xml node the
+selection engine is trying to match.
+
+III.1) The instruction set.
+'''''''''''''''''''''''''''
+
+set-cur-node 'a_node'
+----------------------
+a_node: an xml node
+Sets the current xml node (in the context) to a_node.
+
+match-n-ancestor 'a_n' 'a_parent' 
+----------------------------------
+a_parent: a string.
+a_n: a number. The depth of the ancestor
+
+Returns true if the current xml node has an ancestor
+located at a depth 'n' (going upward from the current node)
+and named 'a_parent'. An ancestor located at depth '0' designates
+the current xml node. An ancesstor located at depth '1' designates
+the parent of the current xml node etc ...
+
+match-any
+---------
+Always returns true.
+
+match-first-child 'a_name'
+--------------------------
+Returns true if the current xml element's name equal 'a_name' and
+if the current xml element is the first child of its parent.
+
+TODO: continue reading the chapter 5 of the css2 spec and finish
+the design of this instruction set.

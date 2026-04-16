@@ -1,0 +1,2 @@
+foo { bar: attr(width, length, calc(70% - 5px)) }
+foo {bar: attr(x,y) }

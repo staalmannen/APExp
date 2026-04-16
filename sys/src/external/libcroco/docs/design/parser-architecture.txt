@@ -1,0 +1,146 @@
+Libcroco parser architecture
+-----------------------------
+
+Author: Dodji Seketeli <dodji@seketeli.org>
+
+$Id$
+
+I) Forethoughts.
+===================
+
+Libcroco's parser is a simple recursive descent parser.
+The major design focus has been simplicity, reliability and
+conformance.
+
+Simplicity
+-----------
+We want the code to be maintainable by anyone who knows the CSS spec
+and who knows how to code in C. Therefore, we avoid to overuse
+the C preprocessor magic and all the tricks that tend to turn C into
+a maintainance nightmare.
+
+We also try to adhere to the Gnome coding guidelines specified
+at http://developer.gnome.org/doc/guides/programming-guidelines.
+
+
+Reliability
+-----------
+Each single function of the libcroco library should never crash, 
+and this, whatever the arguments it takes.
+As a consequence we tend to be paranoid when it comes to check
+pointers values before dereferencing them for example...
+
+Conformance
+-----------
+We try to stick to the CSS spec. We know this is almost impossible to achieve
+given the ressources we have but we think it is a sane target to chase.
+
+II) Overall architecture
+=========================
+The parser is organized around several main classes:
+
+1/ CRInput
+2/ CRTknzr (Tokenizer or lexer)
+3/ CRParser
+4/ CROMParser
+
+II.1 The CRInput class
+-----------------------
+The CRInput class provides the abstraction of
+an utf8-encoded character stream. 
+
+Ideally, it should abstract local data sources 
+(local files and in-memory buffers)
+and remote data sources (sockets, url-identified ressources) but for the
+moment, it can only abstract local data sources.
+
+Adding a new type of data source should be transparent for the
+classes that already use CRInput. After all, this is what abstraction is about :)
+
+
+II.2 The CRTknzr class
+----------------------
+The main job of the tokenizer (or lexer) is to
+provide a get_next_token() method.
+This methods returns the next CSS token found in the input stream.
+(Note that the input stream here is an instance of CRInput).
+
+This provides an extremely useful facility to the parser.
+
+II.3 The CRParser class
+-------------------------
+The core of the parser.
+
+The main job of this class is to provide a cr_parser_parse_stylesheet() 
+method. During the parsing (the execution of the cr_parser_stylesheet())
+the parser sends events to notify the application when it encounters
+remarkable CSS constructions. This is the SAC (Simple API for CSS) API model.
+
+To achieve that task, almost each production of the CSS grammar 
+has a matching parsing function (or method) in this class.
+
+For example, the following production named "ruleset" (specified in the 
+CSS2 spec in appendix D.1):
+
+ruleset : selector [ ',' S* selector ]*
+        '{' S* declaration [ ';' S* declaration ]* '}' S*
+
+is "implemented" by the cr_parser_parse_ruleset() method. 
+
+The same thing applies for the "selector" production:
+
+selector : simple_selector [ combinator simple_selector ]*
+
+which is implemented by the cr_parser_parse_selector() method... and so on
+and so forth.
+
+II.3.1 Structure of a parsing method.
+-------------------------------------
+A parsing method (e.g cr_parser_parse_ruleset()) is there
+to:
+
+             * try to recognize a substring of the incoming character string
+	     as something that matches a given CSS grammar production.
+
+             e.g: the job of the cr_parser_parse_ruleset() is to try 
+	     to recognize if "what" comes next in the input stream 
+	     is a CSS2 "ruleset".
+
+             * build a basic abstract data structure to 
+	     store the information encountered
+	     during the parsing of the current character string.
+
+	     eg: cr_parser_parse_declaration() has the following prototype:
+
+             enum CRStatus
+	     cr_parser_parse_declaration (CRParser *a_this, GString **a_property,
+					  CRTerm **a_value) ;
+
+             In case of successful parsing, this method returns 
+	     (via its parameters) the property _and_ the 
+	     value of the CSS2 declaration.
+	     Note that a CSS2 declaration is specified as follows:
+
+	     declaration : property ':' S* expr prio?
+	                  | /* empty */
+
+	     * After completion, say if the parsing has succeeded or not.	
+	     
+	     eg: cr_parser_parse_declaration() returns CR_OK if the
+	     parsing has succeeded, and error code otherwise. Obviously,
+	     the out parameters "a_property" and "a_value" are valid if and only
+	     if the return value is CR_OK.
+
+	     * whenever the function is parsing a construct that must
+	     be notified to the user as part of the SAC API spec, notify
+	     the user by calling the right SAC callback.
+
+	     * if the parsing failed, leave the position in the stream unchanged.
+	     That is, the position in the character stream should be as if
+	     the parsing function hasn't been called at all.
+
+	     
+II.4 The selection Engine.
+--------------------------
+
+Hmmh, I should kick my ass to write this down ... 

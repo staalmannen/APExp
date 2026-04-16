@@ -1,0 +1,113 @@
+Author: Dodji Seketeli.
+-----------------------
+
+Introduction
+------------
+
+The coding standard we use are based on the GNU coding standards
+available at http://www.gnu.org/prep/standards_toc.html
+and on the Gnome Coding standards available at 
+http://developer.gnome.org/doc/guides/programming-guidelines/book1.html .
+
+Please, make sure you read these documents before you read this one.
+
+I) General coding style rules
+---------------------------
+
+Coding style refers to the way the code is formated.
+Here are the guidelines we use in this project:
+
+Indentation Style
+- - - - - - - - - -
+
+We use the 2-spaces tab indentation style (the GNU's one) .
+
+Make sure as much as possible that each code line does not
+exceed 80 characters length. Why ? because you don't know
+who will read your code. The smallest screens are 80 chars
+wide. So, please, make the code available to everybody.
+
+
+Functions naming
+- - - -  - - -  -
+
+We use the GNU name scheme to name our functions.
+
+GOOD:
+
+int
+my_function_name (char a_variable_name)
+{
+    printf ("The variable value is %c", a_variable_name) ;
+    return 0 ;
+}
+
+
+BAD:
+
+int
+myFunctionName (char blabla) 
+{
+    printf ("This is awfull\n") ;
+}
+
+or
+
+int my_FunctionName (char Blabla) {
+    printf ("This is bad\n") ;
+}
+
+The words of the function names are separared by an underscore ('_') and
+are written in lower case.
+The name functions arguments allways start with by a "a_" .
+
+Avoid for instance the Java function (method) name scheme by mixing
+upper and lower case in the function names.
+
+
+Be genereous with white spaces:
+
+GOOD:
+
+int foo (int a_parameter) 
+{
+    if (test == TRUE) {
+       printf ("Coucou\n") ;
+    }
+}
+
+BAD:
+
+int foo(int a_parameter)
+{
+    if(test==TRUE) {
+        printf("coucou\n")
+    }
+}
+
+
+To ensure that the each line of code is less than 80 characters, 
+if a function has many parameters, you can write it this way:
+
+
+Constants naming
+- - - - - -  - - -
+Constants (defines or constant variables) must be in upper case.
+The worlds of the constant name must be separated by an underscore ('_').
+For instance:
+
+GOOD:
+gint A_CONSTANT = 10 ;
+#define ANOTHER_CONSTANT 100 ;
+
+BAD:
+gin a_Constant = 10 ;
+#define another_Constant ;
+
+
+structure and enum naming
+---------------------
+
+
+II) Object Oriented C programming
+-----------------------------

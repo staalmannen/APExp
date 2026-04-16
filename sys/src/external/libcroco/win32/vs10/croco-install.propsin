@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+This file is part of The Croco Library
+This program is free software; you can redistribute it and/or
+modify it under the terms of version 2.1 of the GNU Lesser General Public
+License as published by the Free Software Foundation.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307
+USA
+
+Author: Fan, Chun-wei
+See COPYRIGHTS file for copyright information.
+-->
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets">
+    <Import Project="croco-build-defines.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros">
+    <BinDir>$(SolutionDir)$(Configuration)\$(Platform)\bin</BinDir>
+    <LibCrocoDoInstall>
+mkdir $(CopyDir)
+mkdir $(CopyDir)\bin
+copy $(BinDir)\$(LibCrocoDllPrefix)croco$(LibCrocoDllSuffix).dll $(CopyDir)\bin
+copy $(BinDir)\$(LibCrocoDllPrefix)croco$(LibCrocoDllSuffix).pdb $(CopyDir)\bin
+copy $(BinDir)\csslint.exe $(CopyDir)\bin
+copy $(BinDir)\csslint.pdb $(CopyDir)\bin
+
+mkdir $(CopyDir)\include\libcroco-$(ApiVersion)\libcroco
+#include "croco.vs10.headers"
+
+mkdir $(CopyDir)\lib\pkgconfig
+copy $(BinDir)\croco-$(ApiVersion).lib $(CopyDir)\lib
+copy ..\libcroco-$(ApiVersion).pc $(CopyDir)\lib\pkgconfig
+    </LibCrocoDoInstall>
+    <LibcrocoPCFiles>..\libcroco-$(ApiVersion).pc</LibcrocoPCFiles>
+    <LibcrocoGenPC>(if not exist $(CopyDir) mkdir $(CopyDir)) &amp; (if exist $(PythonPath)\python.exe $(PythonPath)\python.exe ..\crocopc.py --prefix=$(CopyDir) --version=$(CrocoMajorVersion).$(CrocoMinorVersion).$(CrocoMicroVersion))</LibcrocoGenPC>
+  </PropertyGroup>
+  <PropertyGroup>
+    <_PropertySheetDisplayName>crocoinstallprops</_PropertySheetDisplayName>
+  </PropertyGroup>
+  <ItemGroup>
+    <BuildMacro Include="BinDir">
+      <Value>$(BinDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="LibCrocoDoInstall">
+      <Value>$(LibCrocoDoInstall)</Value>
+    </BuildMacro>
+    <BuildMacro Include="LibcrocoPCFiles">
+      <Value>$(LibcrocoPCFiles)</Value>
+    </BuildMacro>
+    <BuildMacro Include="LibcrocoGenPC">
+      <Value>$(LibcrocoGenPC)</Value>
+    </BuildMacro>
+  </ItemGroup>
+</Project>

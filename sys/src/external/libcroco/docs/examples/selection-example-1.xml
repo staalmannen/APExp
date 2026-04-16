@@ -1,0 +1,14 @@
+<?xml version="1.0" ?>
+<report>
+  <entry type="notice">
+    <note id="foo"/>
+    <notea/>
+    <note id="bar"/>
+  </entry>
+  <entry>
+    <notea/>
+    <note/>
+    <note id="foo"/>
+    <note id="bar"/>
+  </entry>
+</report>

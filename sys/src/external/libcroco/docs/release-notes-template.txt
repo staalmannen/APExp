@@ -1,0 +1,41 @@
+Application
+===========
+
+Libcroco 0.4
+
+Description
+===========
+
+Libcroco is a CSS parsing and manipulation library
+written in C for the gnome project.
+
+It provides :
+
+-two CSS parsing apis: SAC and CSSOM.
+-A CSS2 selection and cascading engine based on libxml2.
+-An experimental XML/CSS rendering engine.
+
+Changes
+=======
+- Removed the pango dependancy from the 
+  selection engine and put it in the layout engine. (Dodji Seketeli)
+- Added a test example to demonstrate the use of the selection engine (Stefan Seefeld)
+
+Fixes
+=====
+- Fixed some gcc-2.96 parse errors (Dodji Seketeli)
+- Make sure the header files are C++ friendly (Dodji Seketeli)
+- Make sure the code examples compile with g++ (Dodji Seketeli)
+- Fixed a bug in the selection engine (Dodji Seketeli)
+
+Homepage
+========
+http://www.freespiders.org/projects/libcroco
+
+Download
+========
+http://ftp.gnome.org/pub/GNOME/sources/libcroco
+
+GNOME Software Map entry
+========================
+http://www.gnome.org/softwaremap/projects/libcroco
