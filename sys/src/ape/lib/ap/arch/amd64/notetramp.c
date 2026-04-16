@@ -120,7 +120,7 @@ siglongjmp(sigjmp_buf j, int ret)
 	if(nstack == 0 || pcstack[nstack-1].u->sp > jb->jmpbuf[JMPBUFSP]){
 		/* adjust SP for longjmp because it expects SP pointing to return PC */
 		unsigned long long *sp = (void*)jb->jmpbuf[JMPBUFSP];
-		sp[-1] = jb->jmpbuf[JMPBUFPC];
+		sp[0] = jb->jmpbuf[JMPBUFPC];
 		longjmp((void*)jb->jmpbuf, ret);
 	}
 
@@ -130,6 +130,6 @@ siglongjmp(sigjmp_buf j, int ret)
 	if(ret == 0)
 		u->ax = 1;
 	u->pc = jb->jmpbuf[JMPBUFPC];
-	u->sp = jb->jmpbuf[JMPBUFSP];
+	u->sp = jb->jmpbuf[JMPBUFSP] + 8;
 	_NOTED(3);	/* NRSTR */
 }

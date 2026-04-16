@@ -1,31 +1,32 @@
 TEXT	longjmp(SB), $0
-	MOVL	val+0(FP), AX	/* return value in 0(FP) */
+	MOVQ	buf+0(FP), RARG	/* Ensure RARG points to jmp_buf */
+	MOVL	val+8(FP), AX	/* val is the second argument */
 	CMPL	AX, $0
 	JNE	ok		/* ansi: "longjmp(0) => longjmp(1)" */
 	MOVL	$1, AX
 ok:
-	MOVQ	0(DI), SP	/* restore sp */
-	MOVQ	8(DI), BX	/* get return pc */
-	MOVQ	BX, 0(SP)	/* put return pc on stack for RET */
+	MOVQ	0(RARG), SP	/* restore sp exactly as it was at setjmp entry */
+	MOVQ	8(RARG), BX	/* get return pc */
+	MOVQ	BX, 0(SP)	/* put return pc back on stack */
 	RET
 
 TEXT	setjmp(SB), $0
-	LEAQ	8(SP), BX	/* store sp as it would be after RET */
-	MOVQ	BX, 0(DI)
+	MOVQ	buf+0(FP), RARG	/* Ensure RARG points to jmp_buf */
+	MOVQ	SP, 0(RARG)	/* store sp */
 	MOVQ	0(SP), BX	/* store return pc */
-	MOVQ	BX, 8(DI)
+	MOVQ	BX, 8(RARG)
 	MOVL	$0, AX		/* return 0 */
 	RET
 
 TEXT	sigsetjmp(SB), $0
-	MOVL	savemask+0(FP), BX /* savemask in 0(FP) */
-	MOVQ	$0, 0(DI)	/* clear first 8 bytes (mask + bits) */
-	MOVL	BX, 0(DI)	/* store 32-bit savemask */
+	MOVQ	buf+0(FP), RARG	/* RARG = sigjmp_buf */
+	MOVL	savemask+8(FP), BX /* savemask is the second argument */
+	MOVQ	$0, 0(RARG)	/* clear first 8 bytes (mask + bits) */
+	MOVL	BX, 0(RARG)	/* store 32-bit savemask */
 	MOVQ	_psigblocked(SB), BX
-	MOVQ	BX, 8(DI)	/* store 64-bit blocked mask at offset 8 */
-	LEAQ	8(SP), BX	/* store sp as it would be after RET */
-	MOVQ	BX, 16(DI)	/* offset 16 for jmpbuf[SP] */
+	MOVQ	BX, 8(RARG)	/* store 64-bit blocked mask at offset 8 */
+	MOVQ	SP, 16(RARG)	/* offset 16 for jmpbuf[SP] */
 	MOVQ	0(SP), BX	/* store return pc */
-	MOVQ	BX, 24(DI)	/* offset 24 for jmpbuf[PC] */
+	MOVQ	BX, 24(RARG)	/* offset 24 for jmpbuf[PC] */
 	MOVL	$0, AX	/* return 0 */
 	RET
