@@ -72,7 +72,13 @@ __newlocale(int mask, const char *name, locale_t base)
 	return UTF8_LOCALE;
 }
 
-weak_alias(__newlocale, newlocale);
+locale_t
+newlocale(int mask, const char *name, locale_t base)
+{
+	(void)mask; (void)name; (void)base;
+	return UTF8_LOCALE;
+}
+
 
 /* ------------------------------------------------------------------ */
 /* uselocale: ignore the request, always return UTF-8 locale           */
@@ -85,7 +91,12 @@ __uselocale(locale_t new)
 	return UTF8_LOCALE;
 }
 
-weak_alias(__uselocale, uselocale);
+locale_t
+uselocale(locale_t new)
+{
+	(void)new;
+	return UTF8_LOCALE;
+}
 
 /* ------------------------------------------------------------------ */
 /* duplocale: nothing to duplicate                                      */

@@ -280,4 +280,9 @@ double __lgamma_r(double x, int *signgamp)
 	return r;
 }
 
-weak_alias(__lgamma_r, lgamma_r);
+double lgamma_r(double x, int *signgamp)
+{
+	return __lgamma_r(x, *signgamp);
+}
+
+

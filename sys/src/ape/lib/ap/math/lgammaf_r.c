@@ -215,4 +215,9 @@ float __lgammaf_r(float x, int *signgamp)
 	return r;
 }
 
-weak_alias(__lgammaf_r, lgammaf_r);
+float lgammaf_r(float x, int *signgamp)
+{
+	return __lgammaf_r(x, *signgamp);
+}
+
+

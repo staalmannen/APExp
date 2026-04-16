@@ -15,4 +15,11 @@ size_t strxfrm(char *restrict dest, const char *restrict src, size_t n)
 	return __strxfrm_l(dest, src, n, (locale_t) "UTF-8");
 }
 
-weak_alias(__strxfrm_l, strxfrm_l);
+size_t strxfrm_l(char *restrict dest, const char *restrict src, size_t n, locale_t loc)
+{
+	size_t l = strlen(src);
+	if (n > l) strcpy(dest, src);
+	return l;
+}
+
+

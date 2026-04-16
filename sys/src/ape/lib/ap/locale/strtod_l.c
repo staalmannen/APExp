@@ -17,6 +17,20 @@ long double strtold_l(const char *s, char **p, locale_t l)
 	return strtold(s, p);
 }
 
-weak_alias(strtof_l, __strtof_l);
-weak_alias(strtod_l, __strtod_l);
-weak_alias(strtold_l, __strtold_l);
+float __strtof_l(const char *s, char **p, locale_t l)
+{
+	return strtof(s, p);
+}
+
+double __strtod_l(const char *s, char **p, locale_t l)
+{
+	return strtod(s, p);
+}
+
+long double __strtold_l(const char *s, char **p, locale_t l)
+{
+	return strtold(s, p);
+}
+
+
+

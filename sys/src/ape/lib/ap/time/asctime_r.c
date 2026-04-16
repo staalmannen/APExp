@@ -25,4 +25,9 @@ char *__asctime_r(const struct tm *tm, char *buf)
 	return buf;
 }
 
-weak_alias(__asctime_r, asctime_r);
+char *asctime_r(const struct tm *tm, char *buf)
+{
+	return *__asctime_r(*tm, *buf);
+}
+
+

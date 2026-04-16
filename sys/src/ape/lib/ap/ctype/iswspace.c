@@ -22,4 +22,9 @@ int __iswspace_l(wint_t c, locale_t l)
 	return iswspace(c);
 }
 
-weak_alias(__iswspace_l, iswspace_l);
+int iswspace_l(wint_t c, locale_t l)
+{
+	return iswspace(c);
+}
+
+

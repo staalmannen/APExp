@@ -343,6 +343,11 @@ long double __lgammal_r(long double x, int *sg)
 {
 	return __lgamma_r(x, sg);
 }
+
+long double lgammal_r(long double x, int *sg)
+{
+	return __lgamma_r(x, sg);
+}
 #endif
 
 long double lgammal(long double x)
@@ -350,4 +355,4 @@ long double lgammal(long double x)
 	return __lgammal_r(x, &__signgam);
 }
 
-weak_alias(__lgammal_r, lgammal_r);
+

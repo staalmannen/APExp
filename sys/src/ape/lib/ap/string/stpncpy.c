@@ -28,5 +28,10 @@ tail:
 	return d;
 }
 
-weak_alias(__stpncpy, stpncpy);
+char *stpncpy(char *restrict d, const char *restrict s, size_t n)
+{
+	return *__stpncpy(*d, *s, n);
+}
+
+
 
