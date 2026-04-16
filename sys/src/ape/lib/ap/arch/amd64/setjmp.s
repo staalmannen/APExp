@@ -30,13 +30,18 @@ TEXT	sigsetjmp(SB), $0
 
 /* 
  * _notejmp(Ureg *u, int ret, unsigned long long pc, unsigned long long sp)
- * DI = u, SI = ret, DX = pc, CX = sp
+ * RARG = u
+ * 8(FP) = ret
+ * 16(FP) = pc
+ * 24(FP) = sp
  */
 TEXT	_notejmp(SB), $0
-	MOVQ	DI, RARG	/* RARG = u */
-	MOVQ	SI, 0(RARG)	/* u->ax = ret */
-	MOVQ	DX, 168(RARG)	/* u->pc = pc (offset 168 in Ureg) */
-	MOVQ	CX, 200(RARG)	/* u->sp = sp (offset 200 in Ureg) */
-	MOVL	$3, AX		/* NRSTR */
+	MOVL	ret+8(FP), AX
+	MOVQ	AX, 0(RARG)	/* u->ax = ret */
+	MOVQ	pc+16(FP), BX
+	MOVQ	BX, 144(RARG)	/* u->pc = pc */
+	MOVQ	sp+24(FP), CX
+	MOVQ	CX, 168(RARG)	/* u->sp = sp */
+	MOVL	$3, AX		/* NRSTR (noted(3)) */
 	SYSCALL
 	RET
