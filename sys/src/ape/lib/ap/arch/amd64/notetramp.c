@@ -118,6 +118,9 @@ siglongjmp(sigjmp_buf j, int ret)
 	 * u->sp <= jb->jmpbuf[SP].
 	 */
 	if(nstack == 0 || pcstack[nstack-1].u->sp > jb->jmpbuf[JMPBUFSP]){
+		/* adjust SP for longjmp because it expects SP pointing to return PC */
+		unsigned long long *sp = (void*)jb->jmpbuf[JMPBUFSP];
+		sp[-1] = jb->jmpbuf[JMPBUFPC];
 		longjmp((void*)jb->jmpbuf, ret);
 	}
 
