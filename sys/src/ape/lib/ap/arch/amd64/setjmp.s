@@ -1,29 +1,42 @@
 TEXT	longjmp(SB), $0
-	MOVL	val+8(FP), AX	/* return value is the second argument */
+	MOVL	val+8(FP), AX
 	TESTL	AX, AX
-	JNZ	ok		/* ansi: "longjmp(0) => longjmp(1)" */
+	JNZ	ok
 	MOVL	$1, AX
 ok:
-	MOVQ	0(RARG), SP	/* restore sp from env[0] */
-	MOVQ	8(RARG), BX	/* get return pc from env[1] */
-	MOVQ	BX, 0(SP)	/* put return pc back on stack for RET */
+	MOVQ	0(RARG), SP
+	MOVQ	8(RARG), BX
+	MOVQ	BX, 0(SP)
 	RET
 
 TEXT	setjmp(SB), $0
-	MOVQ	SP, 0(RARG)	/* store sp in env[0] */
-	MOVQ	0(SP), BX	/* store return pc in env[1] */
+	MOVQ	SP, 0(RARG)
+	MOVQ	0(SP), BX
 	MOVQ	BX, 8(RARG)
-	MOVL	$0, AX		/* return 0 */
+	MOVL	$0, AX
 	RET
 
 TEXT	sigsetjmp(SB), $0
-	MOVL	savemask+8(FP), BX /* savemask is the second argument */
-	MOVQ	$0, 0(RARG)	/* clear first 8 bytes of sigjmp_buf */
-	MOVL	BX, 0(RARG)	/* store 32-bit savemask at offset 0 */
+	MOVL	savemask+8(FP), BX
+	MOVQ	$0, 0(RARG)
+	MOVL	BX, 0(RARG)
 	MOVQ	_psigblocked(SB), CX
-	MOVQ	CX, 8(RARG)	/* store 64-bit blocked mask at offset 8 */
-	MOVQ	SP, 16(RARG)	/* store sp at offset 16 (jmp_buf[0]) */
+	MOVQ	CX, 8(RARG)
+	MOVQ	SP, 16(RARG)
 	MOVQ	0(SP), DX
-	MOVQ	DX, 24(RARG)	/* store return pc at offset 24 (jmp_buf[1]) */
-	MOVL	$0, AX		/* return 0 */
+	MOVQ	DX, 24(RARG)
+	MOVL	$0, AX
+	RET
+
+/* 
+ * _notejmp(Ureg *u, int ret, unsigned long long pc, unsigned long long sp)
+ * DI = u, SI = ret, DX = pc, CX = sp
+ */
+TEXT	_notejmp(SB), $0
+	MOVQ	DI, RARG	/* RARG = u */
+	MOVQ	SI, 0(RARG)	/* u->ax = ret */
+	MOVQ	DX, 168(RARG)	/* u->pc = pc (offset 168 in Ureg) */
+	MOVQ	CX, 200(RARG)	/* u->sp = sp (offset 200 in Ureg) */
+	MOVL	$3, AX		/* NRSTR */
+	SYSCALL
 	RET

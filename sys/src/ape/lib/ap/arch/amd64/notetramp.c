@@ -81,8 +81,13 @@ siglongjmp(sigjmp_buf j, int ret)
 	/* kernel-restore path (NRSTR) */
 	u = pcstack[nstack-1].u;
 	nstack--;
-	u->ax = (ret == 0) ? 1 : ret;
-	u->pc = jb->jmpbuf[1];
-	u->sp = jb->jmpbuf[0] + 8; /* Restore SP to state after a RET */
-	_NOTED(3);
+	
+	/* 
+	 * Target SP from setjmp was the address of the return PC.
+	 * A real RET would result in SP + 8.
+	 */
+	unsigned long long target_sp = jb->jmpbuf[0] + 8;
+	
+	extern void _notejmp(Ureg*, int, unsigned long long, unsigned long long);
+	_notejmp(u, (ret == 0) ? 1 : ret, jb->jmpbuf[1], target_sp);
 }
