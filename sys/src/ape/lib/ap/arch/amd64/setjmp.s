@@ -36,12 +36,14 @@ TEXT	sigsetjmp(SB), $0
  * 24(FP) = sp
  */
 TEXT	_notejmp(SB), $0
+	MOVQ	RARG, BP	/* BP = u */
 	MOVL	ret+8(FP), AX
-	MOVQ	AX, 0(RARG)	/* u->ax = ret */
+	MOVQ	AX, 0(BP)	/* u->ax = ret */
 	MOVQ	pc+16(FP), BX
-	MOVQ	BX, 144(RARG)	/* u->pc = pc */
+	MOVQ	BX, 144(BP)	/* u->pc = pc */
 	MOVQ	sp+24(FP), CX
-	MOVQ	CX, 168(RARG)	/* u->sp = sp */
-	MOVL	$3, AX		/* NRSTR (noted(3)) */
+	MOVQ	CX, 168(BP)	/* u->sp = sp */
+	MOVQ	$3, DI		/* arg 1: NRSTR */
+	MOVQ	$33, AX		/* syscall: noted */
 	SYSCALL
 	RET

@@ -83,10 +83,11 @@ siglongjmp(sigjmp_buf j, int ret)
 	nstack--;
 	
 	/* 
-	 * Target SP from setjmp was the address of the return PC.
-	 * A real RET would result in SP + 8.
+	 * Use the exact SP saved by setjmp. 
+	 * Since u->pc is the return address, having u->sp point 
+	 * to that return address is consistent.
 	 */
-	unsigned long long target_sp = jb->jmpbuf[0] + 8;
+	unsigned long long target_sp = jb->jmpbuf[0];
 	
 	extern void _notejmp(Ureg*, int, unsigned long long, unsigned long long);
 	_notejmp(u, (ret == 0) ? 1 : ret, jb->jmpbuf[1], target_sp);
