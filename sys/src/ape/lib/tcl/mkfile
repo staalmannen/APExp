@@ -72,7 +72,11 @@ OFILES=\
 	$GENERIC_OBJS\
 	$OO_OBJS\
 # libtommath \
-	$TOMMATH_OBJS
+	$TOMMATH_OBJS\
+# minizip \
+	zip.$O\
+	ioapi.$O\
+
 
 
 TCLSRC=$APEXPROOT/sys/src/external/tcl
@@ -82,7 +86,7 @@ HFILES=\
 
 <$APEXPROOT/sys/src/cmd/mklib
 
-CFLAGS=-FVp -c -I. -I$TCLSRC/generic -I$TCLSRC/unix\
+CFLAGS=-FVp -c -I. -I$TCLSRC/generic -I$TCLSRC/unix -I$TCLSRC/minizip\
 	-I$TCLSRC/libtommath -DHAVE_TCL_CONFIG_H -DPLAN9 -DMODULE_SCOPE=/**/\
 	-DWCHAR=char -I$APEXPROOT/sys/src/external/zlib
 
@@ -91,6 +95,9 @@ CFLAGS=-FVp -c -I. -I$TCLSRC/generic -I$TCLSRC/unix\
 
 %.$O: $TCLSRC/generic/%.c
 	$CC $CFLAGS $TCLSRC/generic/$stem.c
+
+%.$O: $TCLSRC/minizip/%.c
+	$CC $CFLAGS $TCLSRC/minizip/$stem.c
 
 %.$O: $TCLSRC/unix/%.c
 	$CC $CFLAGS $TCLSRC/unix/$stem.c

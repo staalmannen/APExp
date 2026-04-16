@@ -77,7 +77,7 @@
     } while (0)
 
 #include "zlib.h"
-//#include "crypt.h"
+#include "crypt.h"
 #include "zutil.h"
 #include "crc32.h"
 
