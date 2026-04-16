@@ -103,26 +103,24 @@ siglongjmp(sigjmp_buf j, int ret)
 
 	jb = (sigjmp_buf_amd64*)j;
 
-	dbg("siglongjmp nstack=      ", (unsigned long long)nstack);
-	dbg("  jb->jmpbuf[SP]=       ", jb->jmpbuf[JMPBUFSP]);
-	dbg("  jb->jmpbuf[PC]=       ", jb->jmpbuf[JMPBUFPC]);
-	if(nstack > 0){
-		dbg("  pcstack[n-1].u=       ", (unsigned long long)pcstack[nstack-1].u);
-		dbg("  pcstack[n-1].u->sp=   ", pcstack[nstack-1].u->sp);
-	}
-
 	if(jb->set & 0xFFFFFFFF){
 		_psigblocked = jb->blocked;
 	}
+
+	/*
+	 * If we're not in a signal handler (nstack == 0),
+	 * or we're jumping to a frame that was active AFTER the last signal
+	 * happened (which shouldn't happen but if it did), use normal longjmp.
+	 *
+	 * A signal context u->sp is the stack pointer when the signal occurred.
+	 * The target frame's SP is jb->jmpbuf[SP].
+	 * Since stack grows down, the signal frame (happened later) must have
+	 * u->sp <= jb->jmpbuf[SP].
+	 */
 	if(nstack == 0 || pcstack[nstack-1].u->sp > jb->jmpbuf[JMPBUFSP]){
-		dbg("  PATH: longjmp, SP=    ", jb->jmpbuf[JMPBUFSP] - 8);
-		/* adjust SP for longjmp because it expects SP pointing to return PC */
-		/* but we stored SP after the return PC */
-		unsigned long long *sp = (void*)jb->jmpbuf[JMPBUFSP];
-		sp[-1] = jb->jmpbuf[JMPBUFPC];
 		longjmp((void*)jb->jmpbuf, ret);
 	}
-	dbg("  PATH: NRSTR SP-target=", jb->jmpbuf[JMPBUFSP]);
+
 	u = pcstack[nstack-1].u;
 	nstack--;
 	u->ax = ret;
