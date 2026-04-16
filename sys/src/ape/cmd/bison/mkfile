@@ -168,7 +168,8 @@ BISONSRC=../../../external/bison
 #fails on include_next
 CC=$APEXPROOT/$objtype/bin/pcc
 
-CFLAGS=-c -I. -I$BISONSRC -B -DHAVE_CONFIG_H\
+CFLAGS=-c -I. -I$BISONSRC -I$BISONSRC/lib -I$BISONSRC/src\
+		-B -DHAVE_CONFIG_H\
 		-DLOCALEDIR="/sys/lib/ape/locale"
 
 bison-%.$O: $BISONSRC/src/%.c
@@ -189,7 +190,7 @@ libbison_a-%.$O: $BISONSRC/lib/unistr/%.c
 libbison_a-%.$O: $BISONSRC/lib/glthread/%.c
 	$CC $CFLAGS $prereq -o $target
 
-libbison_a-%.$O: $BISONSRC/lib/uniqidth/%.c
+libbison_a-%.$O: $BISONSRC/lib/uniwidth/%.c
 	$CC $CFLAGS $prereq -o $target
 
 liby_a-%.$O: $BISONSRC/lib/%.c

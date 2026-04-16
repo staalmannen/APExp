@@ -1,0 +1,24 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/liblua.a
+BASICSRC=../../../external/BASIC/src
+
+TARG=bacon 
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+OFILES= bacon.bac.$O
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CC=pcc
+LD=pcc
+CFLAGS= -c -I. -I$BASICSRC
+
+%.$O: $BASICSRC/%.c
+    $CC $CFLAGS $BASICSRC/$stem.c
+
+
+

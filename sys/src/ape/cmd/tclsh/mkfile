@@ -8,9 +8,7 @@ BIN=$APEXPROOT/$objtype/bin
 TARG=tclsh
 
 OFILES=tclAppInit.$O
-LIB=$APEXPROOT/$objtype/lib/ape/libtcl.a
-HFILES=$TCLSRC/plan9/tclConfig.h
-CLEANFILES=$LIB
+LIB=$APEXPROOT/$objtype/lib/ape/libtcl.a $APEXPROOT/$objtype/lib/ape/libz.a
 
 <$APEXPROOT/sys/src/cmd/mkone
 
@@ -20,9 +18,6 @@ CFLAGS=-FVp -c -I$TCLSRC/plan9 -I$TCLSRC/generic\
 
 $O.out: $OFILES $LIB
 	$LD $LDFLAGS -o $target $prereq
-
-$LIB:V:
-	mk $MKFLAGS -f $APEXPROOT/sys/src/ape/lib/tcl/mkfile
 
 tclAppInit.$O: $TCLSRC/unix/tclAppInit.c
 	$CC $CFLAGS $TCLSRC/unix/tclAppInit.c
