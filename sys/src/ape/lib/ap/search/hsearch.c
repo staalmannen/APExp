@@ -115,7 +115,7 @@ static int __hcreate_r(size_t nel, struct hsearch_data *htab)
 	return r;
 }
 
-static int hcreate_r(size_t nel, struct hsearch_data *htab)
+int hcreate_r(size_t nel, struct hsearch_data *htab)
 {
 	int r;
 
@@ -175,6 +175,6 @@ static int __hsearch_r(ENTRY item, ACTION action, ENTRY **retval, struct hsearch
 
 int hsearch_r(ENTRY item, ACTION action, ENTRY **retval, struct hsearch_data *htab)
 {
-	return __hsearch_r(item, action, **retval, *htab);
+	return __hsearch_r(item, action, retval, htab);
 }
 

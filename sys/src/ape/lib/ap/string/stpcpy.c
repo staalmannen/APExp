@@ -28,7 +28,7 @@ char *__stpcpy(char *restrict d, const char *restrict s)
 
 char *stpcpy(char *restrict d, const char *restrict s)
 {
-	return *__stpcpy(*d, *s);
+	return __stpcpy(d, s);
 }
 
 

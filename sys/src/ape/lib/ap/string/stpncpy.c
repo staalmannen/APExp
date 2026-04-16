@@ -30,7 +30,7 @@ tail:
 
 char *stpncpy(char *restrict d, const char *restrict s, size_t n)
 {
-	return *__stpncpy(*d, *s, n);
+	return __stpncpy(d, s, n);
 }
 
 

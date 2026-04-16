@@ -282,7 +282,7 @@ double __lgamma_r(double x, int *signgamp)
 
 double lgamma_r(double x, int *signgamp)
 {
-	return __lgamma_r(x, *signgamp);
+	return __lgamma_r(x, signgamp);
 }
 
 

@@ -217,7 +217,7 @@ float __lgammaf_r(float x, int *signgamp)
 
 float lgammaf_r(float x, int *signgamp)
 {
-	return __lgammaf_r(x, *signgamp);
+	return __lgammaf_r(x, signgamp);
 }
 
 
