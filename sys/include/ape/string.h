@@ -42,7 +42,6 @@ extern char *strtok_r(char *, const char *, char **);
 
 /* from musl */
 extern char *strchrnul(const char*, int);
-#define __strchrnul strchrnul
 extern int strerror_r(int, char *, size_t);
 
 
