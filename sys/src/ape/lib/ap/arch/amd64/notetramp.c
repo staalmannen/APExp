@@ -17,11 +17,12 @@ static struct Pcstack {
 } pcstack[MAXSIGSTACK];
 static int nstack = 0;
 
+static void notecont(Ureg*, char*);
+
 void
 _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 {
 	Pcstack *p;
-	extern void _notecont_trampoline(void);
 
 	if(nstack >= MAXSIGSTACK)
 		_NOTED(1);
@@ -33,17 +34,12 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	p->msg = "signal";
 	nstack++;
 	
-	u->pc = (unsigned long long) _notecont_trampoline;
-	/* 
-	 * Critical: Pass u to notecont via RARG (R15).
-	 * The kernel will restore R15 from u->r15 when resuming.
-	 */
-	u->r15 = (unsigned long long)u;
-	_NOTED(2);	/* NSAVE */
+	u->pc = (unsigned long long) notecont;
+	_NOTED(2);	/* NSAVE: clear note and capture state */
 }
 
-void
-notecont(Ureg *u)
+static void
+notecont(Ureg *u, char *s)
 {
 	Pcstack *p;
 	void(*f)(int, char*, Ureg*);
@@ -115,26 +111,20 @@ typedef struct {
 void
 siglongjmp(sigjmp_buf j, int ret)
 {
-	struct Ureg *u;
 	sigjmp_buf_amd64 *jb = (sigjmp_buf_amd64*)j;
 
 	if(jb->set & 0xFFFFFFFF){
 		_psigblocked = jb->blocked;
 	}
 
-	if(nstack == 0 || pcstack[nstack-1].u->sp > jb->jmpbuf[0]){
-		unsigned long long *sp = (void*)jb->jmpbuf[0];
-		sp[0] = jb->jmpbuf[1];
-		longjmp((void*)jb->jmpbuf, ret);
+	/* 
+	 * If we are jumping out of a signal handler, pop the signal stack.
+	 * Since _notetramp already called NSAVE, the kernel note is cleared.
+	 * We can safely use longjmp to switch back to the target frame.
+	 */
+	while(nstack > 0 && pcstack[nstack-1].u->sp < jb->jmpbuf[0]){
+		nstack--;
 	}
 
-	u = pcstack[nstack-1].u;
-	nstack--;
-
-	u->ax = (ret == 0) ? 1 : ret;
-	u->pc = jb->jmpbuf[1];
-	u->sp = jb->jmpbuf[0] + 8;
-
-	_NOTED(3);	/* NRSTR */
-	_EXITS("siglongjmp failed");
+	longjmp((void*)jb->jmpbuf, ret);
 }
