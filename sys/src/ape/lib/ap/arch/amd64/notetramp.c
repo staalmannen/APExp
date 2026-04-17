@@ -16,31 +16,6 @@ static int nstack = 0;
 
 static void notecont(Ureg*, char*);
 
-/* Write a label + hex value to stderr, safe to call from signal context */
-static void
-dbg(const char *label, unsigned long long val)
-{
-	int n;
-	char buf[19];
-	int i;
-	unsigned long long v;
-
-	for(n = 0; label[n]; n++)
-		;
-	_WRITE(2, label, n);
-
-	/* 0xHHHHHHHHHHHHHHHH\n — 19 bytes */
-	v = val;
-	buf[0] = '0';
-	buf[1] = 'x';
-	buf[18] = '\n';
-	for(i = 17; i >= 2; i--){
-		buf[i] = "0123456789abcdef"[v & 0xf];
-		v >>= 4;
-	}
-	_WRITE(2, buf, 19);
-}
-
 void
 _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 {
@@ -90,25 +65,28 @@ siglongjmp(sigjmp_buf j, int ret)
 		_psigblocked = jb->blocked;
 	}
 
+	/* 
+	 * If not in signal handler, or jumping to a frame that was 
+	 * active after the signal, use normal longjmp.
+	 */
 	if(nstack == 0 || pcstack[nstack-1].u->sp > jb->jmpbuf[0]){
-		/* adjust SP for longjmp because it expects SP pointing to return PC */
+		/* 
+		 * We must ensure the return PC is on the stack for longjmp 
+		 * because it uses RET.
+		 */
 		unsigned long long *sp = (void*)jb->jmpbuf[0];
 		sp[0] = jb->jmpbuf[1];
 		longjmp((void*)jb->jmpbuf, ret);
 	}
 
+	/* kernel-restore path (NRSTR) */
 	u = pcstack[nstack-1].u;
 	nstack--;
 
-	dbg("siglongjmp: u=         ", (unsigned long long)u);
-	dbg("siglongjmp: target pc= ", jb->jmpbuf[1]);
-	dbg("siglongjmp: target sp= ", jb->jmpbuf[0]);
-
 	u->ax = (ret == 0) ? 1 : ret;
 	u->pc = jb->jmpbuf[1];
-	u->sp = jb->jmpbuf[0] + 8;
+	u->sp = jb->jmpbuf[0];
 	_NOTED(3);	/* NRSTR */
 	
-	/* If _NOTED returns, it failed */
 	_EXITS("siglongjmp failed");
 }
