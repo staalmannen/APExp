@@ -34,6 +34,8 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	nstack++;
 	
 	u->pc = (unsigned long long) _notecont_trampoline;
+	/* Preserve u in RARG (R15) for when kernel resumes after NSAVE */
+	u->r15 = (unsigned long long)u;
 	_NOTED(2);	/* NSAVE: clear note and capture state */
 }
 
@@ -119,7 +121,7 @@ siglongjmp(sigjmp_buf j, int ret)
 	/* 
 	 * If we are jumping out of a signal handler, pop the signal stack.
 	 * Since _notetramp already called NSAVE, the kernel note is cleared.
-	 * We can safely use longjmp to return to the sigsetjmp call-site.
+	 * We can safely use longjmp to restore control.
 	 */
 	while(nstack > 0 && pcstack[nstack-1].u->sp < jb->jmpbuf[0]){
 		nstack--;
