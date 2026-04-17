@@ -17,11 +17,12 @@ static struct Pcstack {
 } pcstack[MAXSIGSTACK];
 static int nstack = 0;
 
+static void notecont(Ureg*, char*);
+
 void
 _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 {
 	Pcstack *p;
-	extern void _notecont_trampoline(void);
 
 	if(nstack >= MAXSIGSTACK)
 		_NOTED(1);
@@ -33,13 +34,11 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	p->msg = "signal";
 	nstack++;
 	
-	u->pc = (unsigned long long) _notecont_trampoline;
-	/* Preserve u in RARG (R15) for when kernel resumes after NSAVE */
-	u->r15 = (unsigned long long)u;
-	_NOTED(2);	/* NSAVE: clear note and capture state */
+	u->pc = (unsigned long long) notecont;
+	_NOTED(2);	/* NSAVE */
 }
 
-void
+static void
 notecont(Ureg *u, char *s)
 {
 	Pcstack *p;
@@ -50,52 +49,26 @@ notecont(Ureg *u, char *s)
 	u->pc = p->restorepc;
 	(*f)(p->sig, p->msg, u);
 	nstack--;
-	
-	/* Return to kernel via NRSTR to restore original context */
-	_NOTED(3);
+	_NOTED(3);	/* NRSTR */
 }
-
-/*
- * _ape_notehandler is called by the assembly trampoline _notehandler.
- * u is in RARG, msg is at 8(FP).
- */
-static struct {
-	char	*msg;
-	int	num;
-} sigtab[] = {
-	{"hangup",				SIGHUP},
-	{"interrupt",				SIGINT},
-	{"quit",				SIGQUIT},
-	{"alarm",				SIGALRM},
-	{"sys: trap: illegal instruction",	SIGILL},
-	{"sys: trap: arithmetic overflow",	SIGFPE},
-	{"sys: fp:",				SIGFPE},
-	{"sys: trap: bus error",		SIGSEGV},
-	{"sys: trap: address error",		SIGSEGV},
-	{"sys: write on closed pipe",		SIGPIPE},
-	{"term",				SIGTERM},
-	{"usr1",				SIGUSR1},
-	{"usr2",				SIGUSR2},
-};
-
-extern void (*_sighdlr[])(int, char*, Ureg*);
 
 int
 _ape_notehandler(Ureg *u, char *msg)
 {
-	int i;
+	extern void (*_sighdlr[])(int, char*, Ureg*);
+	extern int _stringsig(char*);
+	int sig;
 	void (*f)(int, char*, Ureg*);
 
-	for(i = 0; i < sizeof(sigtab)/sizeof(sigtab[0]); i++){
-		if(strncmp(msg, sigtab[i].msg, strlen(sigtab[i].msg)) == 0){
-			f = _sighdlr[sigtab[i].num];
-			if(f != SIG_DFL && f != SIG_IGN && f != SIG_ERR){
-				pcstack[nstack].msg = msg; /* Save actual message */
-				_notetramp(sigtab[i].num, f, u);
-			}
-			_NOTED(0);
-			return 0;
+	sig = _stringsig(msg);
+	if(sig > 0){
+		f = _sighdlr[sig];
+		if(f != SIG_DFL && f != SIG_IGN && f != SIG_ERR){
+			pcstack[nstack].msg = msg;
+			_notetramp(sig, f, u);
 		}
+		_NOTED(0);
+		return 0;
 	}
 	_NOTED(1);
 	return 0;
@@ -103,10 +76,11 @@ _ape_notehandler(Ureg *u, char *msg)
 
 extern sigset_t	_psigblocked;
 
+/* Layout must match sigsetjmp in setjmp.s */
 typedef struct {
 	unsigned long long set;
 	unsigned long long blocked;
-	unsigned long long jmpbuf[2];
+	unsigned long long jmpbuf[8];
 } sigjmp_buf_amd64;
 
 void
@@ -118,11 +92,6 @@ siglongjmp(sigjmp_buf j, int ret)
 		_psigblocked = jb->blocked;
 	}
 
-	/* 
-	 * If we are jumping out of a signal handler, pop the signal stack.
-	 * Since _notetramp already called NSAVE, the kernel note is cleared.
-	 * We can safely use longjmp to restore control.
-	 */
 	while(nstack > 0 && pcstack[nstack-1].u->sp < jb->jmpbuf[0]){
 		nstack--;
 	}
