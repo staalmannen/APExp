@@ -51,7 +51,7 @@ notecont(void)
 
 	p = &pcstack[nstack-1];
 	f = p->hdlr;
-	u->pc = p->restorepc;
+	p->u->pc = p->restorepc;
 	(*f)(p->sig, p->msg, p->u);
 	nstack--;
 	_signoted(3);	/* NRSTR */
