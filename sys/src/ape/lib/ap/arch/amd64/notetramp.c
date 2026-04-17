@@ -34,7 +34,7 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	nstack++;
 	
 	u->pc = (unsigned long long) notecont;
-	_NOTED(2);	/* NSAVE: capture state and clear note */
+	_NOTED(2);	/* NSAVE */
 }
 
 static void
@@ -42,13 +42,14 @@ notecont(Ureg *u, char *s)
 {
 	Pcstack *p;
 	void(*f)(int, char*, Ureg*);
+	extern void _signoted(int);
 
 	p = &pcstack[nstack-1];
 	f = p->hdlr;
 	u->pc = p->restorepc;
 	(*f)(p->sig, p->msg, u);
 	nstack--;
-	_NOTED(3);	/* NRSTR */
+	_signoted(3);	/* NRSTR */
 }
 
 int
@@ -56,6 +57,7 @@ _ape_notehandler(Ureg *u, char *msg)
 {
 	extern void (*_sighdlr[])(int, char*, Ureg*);
 	extern int _stringsig(char*);
+	extern void _signoted(int);
 	int sig;
 	void (*f)(int, char*, Ureg*);
 
@@ -66,20 +68,17 @@ _ape_notehandler(Ureg *u, char *msg)
 			pcstack[nstack].msg = msg;
 			_notetramp(sig, f, u);
 		}
-		_NOTED(0);	/* NCONT */
-		return 0;
+		_signoted(0);	/* NCONT */
 	}
-	_NOTED(1);	/* NDFLT */
-	return 0;
+	return 0; /* Fall back to NDFLT in assembly */
 }
 
 extern sigset_t	_psigblocked;
 
-/* Layout must match sigsetjmp in setjmp.s */
 typedef struct {
 	unsigned long long set;
 	unsigned long long blocked;
-	unsigned long long jmpbuf[8]; /* SP, PC, BP, BX, R12, R13, R14, R15 */
+	unsigned long long jmpbuf[8];
 } sigjmp_buf_amd64;
 
 void
@@ -87,6 +86,7 @@ siglongjmp(sigjmp_buf j, int ret)
 {
 	sigjmp_buf_amd64 *jb = (sigjmp_buf_amd64*)j;
 	Ureg *u;
+	extern void _signoted(int);
 
 	if(jb->set & 0xFFFFFFFF){
 		_psigblocked = jb->blocked;
@@ -95,13 +95,9 @@ siglongjmp(sigjmp_buf j, int ret)
 	if(nstack > 0){
 		u = pcstack[nstack-1].u;
 		nstack--;
-		
-		/* Prepare Ureg for restoration */
 		u->ax = (ret == 0) ? 1 : ret;
 		u->pc = jb->jmpbuf[1];
 		u->sp = jb->jmpbuf[0] + 8;
-		
-		extern void _signoted(int);
 		_signoted(3); /* NRSTR */
 	}
 
