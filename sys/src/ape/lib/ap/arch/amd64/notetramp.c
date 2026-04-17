@@ -94,13 +94,15 @@ siglongjmp(sigjmp_buf j, int ret)
 
 	if(nstack > 0){
 		u = pcstack[nstack-1].u;
-		/* 
-		 * For APE, we always use NRSTR if jumping out of a signal handler
-		 * to ensure the kernel state is correctly cleared.
-		 */
 		nstack--;
-		extern void _signoted(Ureg*, int, unsigned long long, unsigned long long);
-		_signoted(u, (ret == 0) ? 1 : ret, jb->jmpbuf[1], jb->jmpbuf[0] + 8);
+		
+		/* Prepare Ureg for restoration */
+		u->ax = (ret == 0) ? 1 : ret;
+		u->pc = jb->jmpbuf[1];
+		u->sp = jb->jmpbuf[0] + 8;
+		
+		extern void _signoted(Ureg*, int);
+		_signoted(u, 3); /* NRSTR */
 	}
 
 	longjmp((void*)jb->jmpbuf, ret);

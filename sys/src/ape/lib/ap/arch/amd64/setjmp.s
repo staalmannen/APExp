@@ -50,7 +50,7 @@ TEXT	sigsetjmp(SB), 1, $0
 	MOVQ	_psigblocked(SB), AX
 	MOVQ	AX, 8(RARG)	/* store 64-bit blocked mask */
 	
-	/* Save registers into jmpbuf starting at offset 16 */
+	/* Fully implement jmp_buf save at offset 16 */
 	MOVQ	SP, 16(RARG)
 	MOVQ	0(SP), AX
 	MOVQ	AX, 24(RARG)	/* PC */
@@ -70,7 +70,7 @@ TEXT	sigsetjmp(SB), 1, $0
 TEXT	_notehandler(SB), 1, $0
 	MOVQ	8(SP), RARG	/* u */
 	MOVQ	16(SP), AX	/* msg */
-	MOVQ	SP, R11		/* Save current SP in scratch register */
+	MOVQ	SP, R11		/* Save current SP */
 	SUBQ	$16, SP		/* Align stack */
 	ANDQ	$~15, SP
 	MOVQ	AX, 8(SP)	/* msg at 8(FP) */
@@ -80,26 +80,23 @@ TEXT	_notehandler(SB), 1, $0
 
 /*
  * Stack-safe kernel restore.
- * _signoted(Ureg *u, int ret, unsigned long long pc, unsigned long long sp)
- * Performs noted(NRSTR) without risking fault at USTKTOP.
+ * _signoted(Ureg *u, int v)
+ * Performs noted(u, v) without risking fault at USTKTOP.
  */
 TEXT	_signoted(SB), 1, $0
-	MOVQ	RARG, R11	/* Use R11 as scratch pointer to Ureg */
-	MOVL	ret+8(FP), AX
-	MOVQ	AX, 0(R11)	/* u->ax = ret */
-	MOVQ	pc+16(FP), AX
-	MOVQ	AX, 144(R11)	/* u->pc = pc */
-	MOVQ	sp+24(FP), AX
-	MOVQ	AX, 168(R11)	/* u->sp = sp */
+	/* RARG already contains u (pointer) */
+	MOVL	v+8(FP), AX	/* AX = v (NRSTR = 3) */
 	
-	/* 
-	 * Move SP down significantly to avoid USTKTOP boundary.
-	 * Even if the restored SP is high, this temporary SP is safe.
-	 */
+	/* Move SP down significantly to avoid USTKTOP boundary */
+	MOVQ	SP, R11
 	SUBQ	$128, SP
-	MOVQ	$3, 8(SP)	/* noted(3) - NRSTR on new stack */
+	ANDQ	$~15, SP
+	
+	MOVQ	RARG, 8(SP)	/* Arg 0: Ureg* */
+	MOVQ	AX, 16(SP)	/* Arg 1: v */
+	
 	MOVQ	$33, R15	/* syscall 33 (noted) in RARG */
 	SYSCALL
-	/* Kernel should not return here on success */
-	ADDQ	$128, SP
+	
+	MOVQ	R11, SP
 	RET
