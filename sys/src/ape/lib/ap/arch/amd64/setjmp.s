@@ -70,8 +70,8 @@ TEXT	sigsetjmp(SB), 1, $0
 TEXT	_notehandler(SB), 1, $0
 	MOVQ	8(SP), RARG	/* u */
 	MOVQ	16(SP), AX	/* msg */
-	MOVQ	SP, R11		/* Save current SP */
-	SUBQ	$16, SP		/* Align stack */
+	MOVQ	SP, R11		/* Save current SP in scratch register */
+	SUBQ	$32, SP		/* Align stack and provide arg space */
 	ANDQ	$~15, SP
 	MOVQ	AX, 8(SP)	/* msg at 8(FP) */
 	CALL	_ape_notehandler(SB)
@@ -80,23 +80,17 @@ TEXT	_notehandler(SB), 1, $0
 
 /*
  * Stack-safe kernel restore.
- * _signoted(Ureg *u, int v)
- * Performs noted(u, v) without risking fault at USTKTOP.
+ * _signoted(int v)
+ * Performs noted(v) without risking fault at USTKTOP.
  */
 TEXT	_signoted(SB), 1, $0
-	/* RARG already contains u (pointer) */
-	MOVL	v+8(FP), AX	/* AX = v (NRSTR = 3) */
-	
-	/* Move SP down significantly to avoid USTKTOP boundary */
-	MOVQ	SP, R11
-	SUBQ	$128, SP
+	MOVQ	SP, R11		/* Save current SP */
+	SUBQ	$128, SP	/* Move away from USTKTOP boundary */
 	ANDQ	$~15, SP
 	
-	MOVQ	RARG, 8(SP)	/* Arg 0: Ureg* */
-	MOVQ	AX, 16(SP)	/* Arg 1: v */
-	
-	MOVQ	$33, R15	/* syscall 33 (noted) in RARG */
+	MOVQ	RARG, 8(SP)	/* Put v (NRSTR=3) on the stack */
+	MOVQ	$33, R15	/* Syscall 33 (noted) into R15 */
 	SYSCALL
 	
-	MOVQ	R11, SP
+	MOVQ	R11, SP		/* Restore SP if syscall fails */
 	RET

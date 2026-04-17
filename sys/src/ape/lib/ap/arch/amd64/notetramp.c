@@ -101,8 +101,8 @@ siglongjmp(sigjmp_buf j, int ret)
 		u->pc = jb->jmpbuf[1];
 		u->sp = jb->jmpbuf[0] + 8;
 		
-		extern void _signoted(Ureg*, int);
-		_signoted(u, 3); /* NRSTR */
+		extern void _signoted(int);
+		_signoted(3); /* NRSTR */
 	}
 
 	longjmp((void*)jb->jmpbuf, ret);
