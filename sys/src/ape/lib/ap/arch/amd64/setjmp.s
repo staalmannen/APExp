@@ -27,3 +27,24 @@ TEXT	sigsetjmp(SB), $0
 	MOVQ	DX, 24(RARG)
 	MOVL	$0, AX
 	RET
+
+/* 
+ * _notejmp(Ureg *u, int ret, unsigned long long pc, unsigned long long sp)
+ * RARG = u
+ * 8(FP) = ret
+ * 16(FP) = pc
+ * 24(FP) = sp
+ */
+TEXT	_notejmp(SB), $0
+	MOVQ	RARG, BP	/* BP = u */
+	MOVL	ret+8(FP), AX
+	MOVQ	AX, 0(BP)	/* u->ax = ret */
+	MOVQ	pc+16(FP), BX
+	MOVQ	BX, 144(BP)	/* u->pc = pc */
+	MOVQ	sp+24(FP), CX
+	MOVQ	CX, 168(BP)	/* u->sp = sp */
+	
+	MOVQ	$3, RARG	/* RARG = 3 (NRSTR) */
+	MOVL	$33, AX		/* AX = 33 (noted) */
+	SYSCALL
+	RET
