@@ -46,7 +46,10 @@ notecont(Ureg *u, char *s)
 	u->pc = p->restorepc;
 	(*f)(p->sig, s, u);
 	nstack--;
-	_NOTED(3);	/* NRSTR */
+	
+	/* Return to kernel via NRSTR to restore original context */
+	u->sp += 8; /* Adjust for the dummy PC pushed by signal delivery */
+	_NOTED(3);
 }
 
 /*
@@ -127,8 +130,8 @@ siglongjmp(sigjmp_buf j, int ret)
 
 	u->ax = (ret == 0) ? 1 : ret;
 	u->pc = jb->jmpbuf[1];
-	u->sp = jb->jmpbuf[0] + 8; /* Adjust SP to simulate a RET */
+	u->sp = jb->jmpbuf[0] + 8; /* Adjust SP to simulate a completed RET */
 
-	_NOTED(3);	/* NRSTR */
-	_EXITS("siglongjmp failed");
+	extern void _notejmp(Ureg*);
+	_notejmp(u);
 }
