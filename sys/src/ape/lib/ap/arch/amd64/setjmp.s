@@ -40,12 +40,10 @@ TEXT	_notehandler(SB), $0
 /*
  * _notejmp(Ureg *u)
  * Switch stack to point to Ureg and invoke noted(NRSTR).
- * NRSTR expects Ureg at SP+16 on amd64 (matching syscall wrapper logic).
  */
 TEXT	_notejmp(SB), $0
 	MOVQ	RARG, BP
-	LEAQ	-16(BP), SP	/* Set SP so that u is at 16(SP) */
-	MOVQ	$3, 8(SP)	/* noted(3) - NRSTR */
+	MOVQ	$3, 8(SP)	/* noted(3) - NRSTR, placed where syscall expects it */
 	MOVQ	$33, R15	/* syscall noted */
 	SYSCALL
 	RET
