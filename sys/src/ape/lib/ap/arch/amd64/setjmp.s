@@ -43,18 +43,18 @@ TEXT	sigsetjmp(SB), 1, $0
 	MOVQ	_psigblocked(SB), AX
 	MOVQ	AX, 8(RARG)	/* store 64-bit blocked mask */
 	
-	/* Inline setjmp logic at offset 16 to avoid SP corruption */
-	ADDQ	$16, RARG
-	MOVQ	SP, 0(RARG)
+	/* Save rest into jmpbuf at offset 16 without modifying RARG */
+	MOVQ	RARG, R11
+	ADDQ	$16, R11
+	MOVQ	SP, 0(R11)
 	MOVQ	0(SP), AX
-	MOVQ	AX, 8(RARG)
-	MOVQ	BP, 16(RARG)
-	MOVQ	BX, 24(RARG)
-	MOVQ	R12, 32(RARG)
-	MOVQ	R13, 40(RARG)
-	MOVQ	R14, 48(RARG)
-	MOVQ	R15, 56(RARG)
-	SUBQ	$16, RARG	/* Restore RARG pointer */
+	MOVQ	AX, 8(R11)	/* PC */
+	MOVQ	BP, 16(R11)
+	MOVQ	BX, 24(R11)
+	MOVQ	R12, 32(R11)
+	MOVQ	R13, 40(R11)
+	MOVQ	R14, 48(R11)
+	MOVQ	R15, 56(R11)
 	
 	MOVL	$0, AX
 	RET
@@ -73,25 +73,22 @@ TEXT	_notehandler(SB), 1, $0
 	
 	/* If handler returns, terminate (NDFLT) */
 	MOVQ	R11, SP		/* Restore SP to find u again */
-	MOVQ	8(SP), RARG
-	MOVQ	$1, 8(SP)	/* Arg 0: NDFLT */
-	MOVQ	$33, R15	/* Syscall noted */
-	SYSCALL
+	MOVQ	$1, RARG	/* Arg 0: NDFLT */
+	CALL	_signoted(SB)
 	RET
 
 /*
  * Stack-safe kernel restore.
  */
 TEXT	_signoted(SB), 1, $0
-	/* v is at 8(FP) */
-	MOVL	v+8(FP), AX
-	MOVQ	SP, R11
+	/* v is in RARG */
+	MOVQ	SP, R13		/* Use R13 (preserved by SYSCALL) to save SP */
 	SUBQ	$128, SP	/* Stay away from USTKTOP */
 	ANDQ	$~15, SP
 	
-	MOVQ	AX, 8(SP)	/* Arg 0: v */
-	MOVQ	$33, R15	/* Syscall noted */
+	MOVQ	RARG, 8(SP)	/* Arg 0: v on stack */
+	MOVQ	$33, R15	/* Syscall 33 (noted) in R15 */
 	SYSCALL
 	
-	MOVQ	R11, SP
+	MOVQ	R13, SP
 	RET

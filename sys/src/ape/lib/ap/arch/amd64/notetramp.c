@@ -34,6 +34,11 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	nstack++;
 	
 	u->pc = (unsigned long long) notecont;
+	/* 
+	 * Critical: Pass u to notecont via RARG (R15).
+	 * The kernel will restore R15 from u->r15 when resuming after NSAVE.
+	 */
+	u->r15 = (unsigned long long)u;
 	_NOTED(2);	/* NSAVE */
 }
 
@@ -74,6 +79,7 @@ _ape_notehandler(Ureg *u, char *msg)
 
 extern sigset_t	_psigblocked;
 
+/* Layout must match sigsetjmp in setjmp.s */
 typedef struct {
 	unsigned long long set;
 	unsigned long long blocked;
