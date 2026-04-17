@@ -29,7 +29,7 @@ ok:
 	MOVQ	40(RARG), R13
 	MOVQ	48(RARG), R14
 	
-	MOVQ	0(RARG), SP
+	MOVQ	0(RARG), SP	/* Restore SP to call site state */
 	MOVQ	8(RARG), DI	/* Target PC */
 	MOVQ	56(RARG), R15
 	
@@ -43,18 +43,16 @@ TEXT	sigsetjmp(SB), 1, $0
 	MOVQ	_psigblocked(SB), AX
 	MOVQ	AX, 8(RARG)	/* store 64-bit blocked mask */
 	
-	/* Save rest into jmpbuf at offset 16 without modifying RARG */
-	MOVQ	RARG, R11
-	ADDQ	$16, R11
-	MOVQ	SP, 0(R11)
+	/* Inline setjmp logic into the jmpbuf at offset 16 */
+	MOVQ	SP, 16(RARG)
 	MOVQ	0(SP), AX
-	MOVQ	AX, 8(R11)	/* PC */
-	MOVQ	BP, 16(R11)
-	MOVQ	BX, 24(R11)
-	MOVQ	R12, 32(R11)
-	MOVQ	R13, 40(R11)
-	MOVQ	R14, 48(R11)
-	MOVQ	R15, 56(R11)
+	MOVQ	AX, 24(RARG)	/* PC */
+	MOVQ	BP, 32(RARG)
+	MOVQ	BX, 40(RARG)
+	MOVQ	R12, 48(RARG)
+	MOVQ	R13, 56(RARG)
+	MOVQ	R14, 64(RARG)
+	MOVQ	R15, 72(RARG)
 	
 	MOVL	$0, AX
 	RET
@@ -65,29 +63,33 @@ TEXT	sigsetjmp(SB), 1, $0
 TEXT	_notehandler(SB), 1, $0
 	MOVQ	8(SP), RARG	/* u */
 	MOVQ	16(SP), AX	/* msg */
-	MOVQ	SP, R11		/* Use R11 as scratch to save SP */
-	SUBQ	$32, SP		/* Create frame and align */
+	MOVQ	SP, R11		/* Use R11 to save SP */
+	SUBQ	$64, SP		/* Move stack down and align */
 	ANDQ	$~15, SP
 	MOVQ	AX, 8(SP)	/* msg at 8(FP) */
 	CALL	_ape_notehandler(SB)
 	
 	/* If handler returns, terminate (NDFLT) */
 	MOVQ	R11, SP		/* Restore SP to find u again */
-	MOVQ	$1, RARG	/* Arg 0: NDFLT */
+	MOVQ	8(SP), RARG	/* Arg 0: u */
+	MOVQ	$1, 8(SP)	/* Arg 1: NDFLT */
 	CALL	_signoted(SB)
 	RET
 
 /*
  * Stack-safe kernel restore.
+ * _signoted(Ureg *u, int v)
  */
 TEXT	_signoted(SB), 1, $0
-	/* v is in RARG */
-	MOVQ	SP, R13		/* Use R13 (preserved by SYSCALL) to save SP */
-	SUBQ	$128, SP	/* Stay away from USTKTOP */
+	/* u is in RARG, v is at 8(FP) */
+	MOVL	v+8(FP), AX
+	MOVQ	SP, R13
+	SUBQ	$128, SP	/* Stay away from USTKTOP boundary */
 	ANDQ	$~15, SP
 	
-	MOVQ	RARG, 8(SP)	/* Arg 0: v on stack */
-	MOVQ	$33, R15	/* Syscall 33 (noted) in R15 */
+	MOVQ	RARG, 8(SP)	/* Arg 0: u */
+	MOVQ	AX, 16(SP)	/* Arg 1: v */
+	MOVQ	$33, R15	/* syscall noted */
 	SYSCALL
 	
 	MOVQ	R13, SP
