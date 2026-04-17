@@ -17,7 +17,7 @@ static struct Pcstack {
 } pcstack[MAXSIGSTACK];
 static int nstack = 0;
 
-static void notecont(Ureg*, char*);
+static void notecont(void);
 
 void
 _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
@@ -43,18 +43,21 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 }
 
 static void
-notecont(Ureg *u, char *s)
+notecont(void)
 {
 	Pcstack *p;
 	void(*f)(int, char*, Ureg*);
-	extern void _signoted(Ureg*, int);
+	extern void _signoted(int);
+
+	if(nstack <= 0)
+		_EXITS("notecont: nstack <= 0");
 
 	p = &pcstack[nstack-1];
 	f = p->hdlr;
-	u->pc = p->restorepc;
-	(*f)(p->sig, p->msg, u);
+	p->u->pc = p->restorepc;
+	(*f)(p->sig, p->msg, p->u);
 	nstack--;
-	_signoted(u, 3);	/* NRSTR */
+	_signoted(3);	/* NRSTR */
 }
 
 int
@@ -82,7 +85,7 @@ extern sigset_t	_psigblocked;
 typedef struct {
 	unsigned long long set;
 	unsigned long long blocked;
-	unsigned long long jmpbuf[8];
+	unsigned long long jmpbuf[8]; /* SP, PC, BP, BX, R12, R13, R14, R15 */
 } sigjmp_buf_amd64;
 
 void
@@ -90,7 +93,7 @@ siglongjmp(sigjmp_buf j, int ret)
 {
 	sigjmp_buf_amd64 *jb = (sigjmp_buf_amd64*)j;
 	Ureg *u;
-	extern void _signoted(Ureg*, int);
+	extern void _signoted(int);
 
 	if(jb->set & 0xFFFFFFFF){
 		_psigblocked = jb->blocked;
@@ -100,7 +103,10 @@ siglongjmp(sigjmp_buf j, int ret)
 		u = pcstack[nstack-1].u;
 		nstack--;
 		
-		/* Sync registers into Ureg for restoration */
+		/* 
+		 * Synchronize all registers into the Ureg before restoration.
+		 * jb->jmpbuf index 0 is SP, 1 is PC, etc.
+		 */
 		u->ax = (ret == 0) ? 1 : ret;
 		u->pc = jb->jmpbuf[1];
 		u->sp = jb->jmpbuf[0] + 8;
@@ -111,7 +117,7 @@ siglongjmp(sigjmp_buf j, int ret)
 		u->r14 = jb->jmpbuf[6];
 		u->r15 = jb->jmpbuf[7];
 		
-		_signoted(u, 3); /* NRSTR */
+		_signoted(3); /* NRSTR */
 	}
 
 	longjmp((void*)jb->jmpbuf, ret);
