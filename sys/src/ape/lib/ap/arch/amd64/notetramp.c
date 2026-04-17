@@ -35,7 +35,7 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	nstack++;
 	
 	u->pc = (unsigned long long) notecont;
-	_NOTED(2);	/* NSAVE */
+	_NOTED(2);	/* NSAVE: capture state and clear note */
 }
 
 static void
@@ -67,10 +67,10 @@ _ape_notehandler(Ureg *u, char *msg)
 			pcstack[nstack].msg = msg;
 			_notetramp(sig, f, u);
 		}
-		_NOTED(0);
+		_NOTED(0);	/* NCONT */
 		return 0;
 	}
-	_NOTED(1);
+	_NOTED(1);	/* NDFLT */
 	return 0;
 }
 
@@ -92,6 +92,7 @@ siglongjmp(sigjmp_buf j, int ret)
 		_psigblocked = jb->blocked;
 	}
 
+	/* Pop nested signal frames if we are jumping out of them */
 	while(nstack > 0 && pcstack[nstack-1].u->sp < jb->jmpbuf[0]){
 		nstack--;
 	}
