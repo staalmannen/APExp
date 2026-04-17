@@ -30,8 +30,10 @@ TEXT	sigsetjmp(SB), $0
 
 /*
  * Entry point for Plan 9 notes.
- * Kernel pushes: msg, u, dummy_pc (at 0(SP)).
- * 6c expects u in RARG, msg at 8(FP).
+ * Kernel delivers:
+ *   16(SP) = char *msg
+ *   8(SP)  = Ureg *u
+ *   0(SP)  = dummy PC
  */
 TEXT	_notehandler(SB), $0
 	MOVQ	8(SP), RARG	/* RARG = u */
@@ -47,7 +49,7 @@ TEXT	_notehandler(SB), $0
 /*
  * Trampoline for notecont.
  * Kernel restores SP and jumps here.
- * Arguments u and msg are on the stack.
+ * Arguments u and msg are on the stack as above.
  */
 TEXT	_notecont_trampoline(SB), $0
 	MOVQ	8(SP), RARG	/* RARG = u */
