@@ -17,7 +17,7 @@ static struct Pcstack {
 } pcstack[MAXSIGSTACK];
 static int nstack = 0;
 
-static void notecont(Ureg*, char*);
+static void notecont(void);
 
 void
 _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
@@ -38,18 +38,18 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 }
 
 static void
-notecont(Ureg *u, char *s)
+notecont(void)
 {
 	Pcstack *p;
 	void(*f)(int, char*, Ureg*);
-	extern void _signoted(int);
+	extern void _signoted(Ureg*, int);
 
 	p = &pcstack[nstack-1];
 	f = p->hdlr;
-	u->pc = p->restorepc;
-	(*f)(p->sig, p->msg, u);
+	p->u->pc = p->restorepc;
+	(*f)(p->sig, p->msg, p->u);
 	nstack--;
-	_signoted(3);	/* NRSTR */
+	_signoted(p->u, 3);	/* NRSTR */
 }
 
 int
@@ -57,7 +57,6 @@ _ape_notehandler(Ureg *u, char *msg)
 {
 	extern void (*_sighdlr[])(int, char*, Ureg*);
 	extern int _stringsig(char*);
-	extern void _signoted(int);
 	int sig;
 	void (*f)(int, char*, Ureg*);
 
@@ -68,9 +67,9 @@ _ape_notehandler(Ureg *u, char *msg)
 			pcstack[nstack].msg = msg;
 			_notetramp(sig, f, u);
 		}
-		_signoted(0);	/* NCONT */
+		/* return to trampoline to call _signoted(u, NCONT) if needed */
 	}
-	return 0; /* Fall back to NDFLT in assembly */
+	return 0;
 }
 
 extern sigset_t	_psigblocked;
@@ -86,7 +85,7 @@ siglongjmp(sigjmp_buf j, int ret)
 {
 	sigjmp_buf_amd64 *jb = (sigjmp_buf_amd64*)j;
 	Ureg *u;
-	extern void _signoted(int);
+	extern void _signoted(Ureg*, int);
 
 	if(jb->set & 0xFFFFFFFF){
 		_psigblocked = jb->blocked;
@@ -98,7 +97,7 @@ siglongjmp(sigjmp_buf j, int ret)
 		u->ax = (ret == 0) ? 1 : ret;
 		u->pc = jb->jmpbuf[1];
 		u->sp = jb->jmpbuf[0] + 8;
-		_signoted(3); /* NRSTR */
+		_signoted(u, 3); /* NRSTR */
 	}
 
 	longjmp((void*)jb->jmpbuf, ret);

@@ -39,6 +39,7 @@ TEXT	sigsetjmp(SB), 1, $0
 	MOVQ	AX, 0(RARG)
 	MOVQ	_psigblocked(SB), AX
 	MOVQ	AX, 8(RARG)
+	
 	/* Save rest into jmpbuf at offset 16 */
 	MOVQ	SP, 16(RARG)
 	MOVQ	0(SP), AX
@@ -52,25 +53,41 @@ TEXT	sigsetjmp(SB), 1, $0
 	MOVL	$0, AX
 	RET
 
+/*
+ * Entry point for Plan 9 notes.
+ * Kernel pushes: msg(16(SP)), u(8(SP)), dummy_pc(0(SP)).
+ */
 TEXT	_notehandler(SB), 1, $0
 	MOVQ	8(SP), RARG	/* u */
 	MOVQ	16(SP), AX	/* msg */
 	MOVQ	SP, R11
-	SUBQ	$32, SP		/* Create frame and align */
+	SUBQ	$1024, SP	/* Move stack away for safety */
 	ANDQ	$~15, SP
 	MOVQ	AX, 8(SP)	/* msg at 8(FP) */
 	CALL	_ape_notehandler(SB)
-	/* If _ape_notehandler returns, we must perform noted(NDFLT) */
-	MOVQ	$1, RARG	/* NDFLT */
+	
+	/* If handler returns, terminate with original message */
+	MOVQ	1024+8(SP), RARG /* Arg 0: u */
+	MOVQ	$1, 8(SP)	 /* Arg 1: NDFLT */
 	CALL	_signoted(SB)
 	RET
 
+/*
+ * Stack-safe kernel restore.
+ * _signoted(Ureg *u, int v)
+ * Performs noted(u, v) using the correct amd64 signature.
+ */
 TEXT	_signoted(SB), 1, $0
+	/* u is in RARG, v is at 8(FP) */
+	MOVQ	v+8(FP), AX
 	MOVQ	SP, R11
-	SUBQ	$128, SP	/* Stay away from USTKTOP */
+	SUBQ	$128, SP	/* Create safe zone */
 	ANDQ	$~15, SP
-	MOVQ	RARG, 8(SP)	/* Arg 0 */
-	MOVQ	$33, R15	/* Syscall noted */
+	
+	MOVQ	RARG, 8(SP)	/* Arg 0: u */
+	MOVQ	AX, 16(SP)	/* Arg 1: v */
+	MOVQ	$33, R15	/* syscall noted */
 	SYSCALL
+	
 	MOVQ	R11, SP
 	RET
