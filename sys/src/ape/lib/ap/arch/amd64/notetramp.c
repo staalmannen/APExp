@@ -17,7 +17,27 @@ static struct Pcstack {
 } pcstack[MAXSIGSTACK];
 static int nstack = 0;
 
-static void notecont(Ureg*, char*);
+/* Notecont doesn't take arguments; it uses the global signal stack */
+static void
+notecont(void)
+{
+	Pcstack *p;
+	Ureg *u;
+	void(*f)(int, char*, Ureg*);
+
+	if(nstack <= 0)
+		_EXITS("notecont: nstack <= 0");
+
+	p = &pcstack[nstack-1];
+	u = p->u;
+	f = p->hdlr;
+	u->pc = p->restorepc;
+	
+	(*f)(p->sig, p->msg, u);
+	
+	nstack--;
+	_NOTED(3);	/* NRSTR */
+}
 
 void
 _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
@@ -31,25 +51,11 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	p->sig = sig;
 	p->hdlr = hdlr;
 	p->u = u;
-	p->msg = "signal";
+	/* Message pointer is saved by _ape_notehandler */
 	nstack++;
 	
 	u->pc = (unsigned long long) notecont;
 	_NOTED(2);	/* NSAVE: capture state and clear note */
-}
-
-static void
-notecont(Ureg *u, char *s)
-{
-	Pcstack *p;
-	void(*f)(int, char*, Ureg*);
-
-	p = &pcstack[nstack-1];
-	f = p->hdlr;
-	u->pc = p->restorepc;
-	(*f)(p->sig, p->msg, u);
-	nstack--;
-	_NOTED(3);	/* NRSTR */
 }
 
 int
@@ -80,7 +86,7 @@ extern sigset_t	_psigblocked;
 typedef struct {
 	unsigned long long set;
 	unsigned long long blocked;
-	unsigned long long jmpbuf[10]; /* Enough for 80 bytes */
+	unsigned long long jmpbuf[8];
 } sigjmp_buf_amd64;
 
 void

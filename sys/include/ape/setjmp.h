@@ -3,12 +3,11 @@
 #pragma lib "/$M/lib/ape/libap.a"
 
 /* 
- * Buffers must be large enough to hold all callee-saved registers.
- * For amd64, we need 8 registers * 8 bytes = 64 bytes.
- * int[20] = 80 bytes, which is safe.
+ * Buffers must be large enough to hold all callee-saved registers (64-bit).
+ * BP, BX, R12, R13, R14, R15, SP, PC = 8 registers = 64 bytes.
  */
-typedef int jmp_buf[20];
-typedef int sigjmp_buf[30];
+typedef int jmp_buf[24];
+typedef int sigjmp_buf[32];
 
 #ifdef __cplusplus
 extern "C" {

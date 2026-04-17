@@ -49,23 +49,29 @@ TEXT	sigsetjmp(SB), $0
 	MOVQ	_psigblocked(SB), CX
 	MOVQ	CX, 8(RARG)	/* store blocked mask */
 	
-	/* Call setjmp for the rest, starting at offset 16 */
-	PUSHQ	RARG
-	ADDQ	$16, RARG
-	CALL	setjmp(SB)
-	POPQ	RARG
+	/* Save registers into jmpbuf starting at offset 16 */
+	MOVQ	SP, 16(RARG)
+	MOVQ	0(SP), AX
+	MOVQ	AX, 24(RARG)	/* PC */
+	MOVQ	BP, 32(RARG)
+	MOVQ	BX, 40(RARG)
+	MOVQ	R12, 48(RARG)
+	MOVQ	R13, 56(RARG)
+	MOVQ	R14, 64(RARG)
+	MOVQ	R15, 72(RARG)
+	
+	MOVL	$0, AX
 	RET
 
 /*
  * Entry point for Plan 9 notes.
- * Kernel pushes: msg(16(SP)), u(8(SP)), dummy_pc(0(SP)).
- * 6c expects u in RARG, msg at 8(FP).
+ * Kernel pushes: u(0(SP)), msg(8(SP)).
  */
 TEXT	_notehandler(SB), $0
-	MOVQ	8(SP), RARG	/* u */
-	MOVQ	16(SP), AX	/* msg */
-	SUBQ	$16, SP		/* Create frame and align */
-	MOVQ	AX, 8(SP)	/* msg at 8(FP) */
+	MOVQ	0(SP), RARG	/* u into RARG for 6c */
+	MOVQ	8(SP), AX	/* msg */
+	SUBQ	$16, SP
+	MOVQ	AX, 8(SP)	/* msg as second argument */
 	CALL	_ape_notehandler(SB)
-	ADDQ	$16, SP		/* Restore stack pointer */
+	ADDQ	$16, SP
 	RET
