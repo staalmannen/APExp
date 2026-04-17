@@ -27,3 +27,23 @@ TEXT	sigsetjmp(SB), $0
 	MOVQ	DX, 24(RARG)
 	MOVL	$0, AX
 	RET
+
+/*
+ * Entry point for Plan 9 notes.
+ * Kernel puts u at 0(SP) and msg at 8(SP).
+ * 6c expects u in RARG (R15).
+ */
+TEXT	_notehandler(SB), $0
+	MOVQ	0(SP), RARG
+	JMP	_ape_notehandler(SB)
+
+/*
+ * _notejmp(Ureg *u)
+ * Safely switch to the Ureg stack and restore via NRSTR.
+ */
+TEXT	_notejmp(SB), $0
+	MOVQ	RARG, SP
+	MOVQ	$3, RARG	/* NRSTR */
+	MOVL	$33, AX		/* sys noted */
+	SYSCALL
+	RET

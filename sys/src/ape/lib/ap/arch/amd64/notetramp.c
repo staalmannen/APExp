@@ -2,6 +2,8 @@
 #include "../../include/sys9.h"
 #include <signal.h>
 #include <setjmp.h>
+#include <string.h>
+#include <stdlib.h>
 
 /* A stack to hold pcs when signals nest */
 #define MAXSIGSTACK 20
@@ -47,6 +49,51 @@ notecont(Ureg *u, char *s)
 	_NOTED(3);	/* NRSTR */
 }
 
+/*
+ * _ape_notehandler is called by the assembly trampoline _notehandler.
+ * u is in RARG, msg is at 8(FP).
+ */
+static struct {
+	char	*msg;
+	int	num;
+} sigtab[] = {
+	{"hangup",				SIGHUP},
+	{"interrupt",				SIGINT},
+	{"quit",				SIGQUIT},
+	{"alarm",				SIGALRM},
+	{"sys: trap: illegal instruction",	SIGILL},
+	{"sys: trap: arithmetic overflow",	SIGFPE},
+	{"sys: fp:",				SIGFPE},
+	{"sys: trap: bus error",		SIGSEGV},
+	{"sys: trap: address error",		SIGSEGV},
+	{"sys: write on closed pipe",		SIGPIPE},
+	{"term",				SIGTERM},
+	{"usr1",				SIGUSR1},
+	{"usr2",				SIGUSR2},
+};
+
+extern void (*_sighdlr[])(int, char*, Ureg*);
+
+int
+_ape_notehandler(Ureg *u, char *msg)
+{
+	int i;
+	void (*f)(int, char*, Ureg*);
+
+	for(i = 0; i < sizeof(sigtab)/sizeof(sigtab[0]); i++){
+		if(strncmp(msg, sigtab[i].msg, strlen(sigtab[i].msg)) == 0){
+			f = _sighdlr[sigtab[i].num];
+			if(f != SIG_DFL && f != SIG_IGN && f != SIG_ERR){
+				_notetramp(sigtab[i].num, f, u);
+			}
+			_NOTED(0);
+			return 0;
+		}
+	}
+	_NOTED(1);
+	return 0;
+}
+
 extern sigset_t	_psigblocked;
 
 typedef struct {
@@ -65,22 +112,23 @@ siglongjmp(sigjmp_buf j, int ret)
 		_psigblocked = jb->blocked;
 	}
 
-	if(nstack == 0){
+	if(nstack == 0 || pcstack[nstack-1].u->sp > jb->jmpbuf[0]){
+		/* 
+		 * We must ensure the return PC is on the stack for longjmp 
+		 * because it uses RET.
+		 */
+		unsigned long long *sp = (void*)jb->jmpbuf[0];
+		sp[0] = jb->jmpbuf[1];
 		longjmp((void*)jb->jmpbuf, ret);
 	}
 
-	/* Always use NRSTR if in a signal handler to clear kernel state */
 	u = pcstack[nstack-1].u;
 	nstack--;
 
 	u->ax = (ret == 0) ? 1 : ret;
 	u->pc = jb->jmpbuf[1];
-	/* 
-	 * Restoring SP to the state it was at the entry of sigsetjmp.
-	 * Since sigsetjmp was a function call, SP points to the return address.
-	 * We add 8 to simulate a RET having occurred.
-	 */
-	u->sp = jb->jmpbuf[0] + 8;
-	_NOTED(3);	/* NRSTR */
-	_EXITS("siglongjmp failed");
+	u->sp = jb->jmpbuf[0] + 8; /* Adjust SP to simulate a RET */
+
+	extern void _notejmp(Ureg*);
+	_notejmp(u);
 }
