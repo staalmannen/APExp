@@ -46,11 +46,11 @@ ok:
 TEXT	sigsetjmp(SB), $0
 	MOVL	savemask+8(FP), AX
 	MOVQ	$0, 0(RARG)
-	MOVL	AX, 0(RARG)	/* store savemask */
+	MOVL	AX, 0(RARG)	/* store 32-bit savemask */
 	MOVQ	_psigblocked(SB), AX
-	MOVQ	AX, 8(RARG)	/* store blocked mask */
+	MOVQ	AX, 8(RARG)	/* store 64-bit blocked mask */
 	
-	/* Fully implement jmp_buf save at offset 16 to avoid RARG corruption */
+	/* Fully implement jmp_buf save at offset 16 */
 	MOVQ	SP, 16(RARG)
 	MOVQ	0(SP), AX
 	MOVQ	AX, 24(RARG)	/* PC */
@@ -66,15 +66,32 @@ TEXT	sigsetjmp(SB), $0
 
 /*
  * Entry point for Plan 9 notes.
- * Kernel delivers: msg(16(SP)), u(8(SP)), dummy_pc(0(SP)).
  */
 TEXT	_notehandler(SB), $0
-	MOVQ	8(SP), RARG	/* u into RARG for 6c */
+	MOVQ	8(SP), RARG	/* u */
 	MOVQ	16(SP), AX	/* msg */
 	MOVQ	SP, BX		/* Save current SP */
-	SUBQ	$24, SP		/* 8 bytes for alignment + 16 for args */
-	ANDQ	$~15, SP	/* Force 16-byte alignment */
-	MOVQ	AX, 8(SP)	/* msg at 8(FP) */
+	SUBQ	$24, SP		/* Align stack and provide arg space */
+	ANDQ	$~15, SP
+	MOVQ	AX, 8(SP)	/* msg as second argument */
 	CALL	_ape_notehandler(SB)
-	MOVQ	BX, SP		/* Restore SP */
+	MOVQ	BX, SP
+	RET
+
+/*
+ * Stack-safe kernel restore.
+ * _signoted(Ureg *u, int ret, unsigned long long pc, unsigned long long sp)
+ * Performs noted(NRSTR) without using the user stack.
+ */
+TEXT	_signoted(SB), $0
+	MOVQ	ret+8(FP), AX
+	MOVQ	AX, 0(RARG)	/* u->ax = ret */
+	MOVQ	pc+16(FP), AX
+	MOVQ	AX, 144(RARG)	/* u->pc = pc */
+	MOVQ	sp+24(FP), AX
+	MOVQ	AX, 168(RARG)	/* u->sp = sp */
+	
+	MOVQ	$3, RARG	/* noted arg: NRSTR */
+	MOVQ	$33, AX		/* syscall: noted */
+	SYSCALL
 	RET

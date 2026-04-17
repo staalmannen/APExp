@@ -100,11 +100,8 @@ siglongjmp(sigjmp_buf j, int ret)
 		 */
 		if(jb->jmpbuf[0] >= u->sp){
 			nstack--;
-			u->ax = (ret == 0) ? 1 : ret;
-			u->pc = jb->jmpbuf[1];
-			/* MUST add 8 to simulate the completed RET of sigsetjmp */
-			u->sp = jb->jmpbuf[0] + 8;
-			_NOTED(3);	/* NRSTR */
+			extern void _signoted(Ureg*, int, unsigned long long, unsigned long long);
+			_signoted(u, (ret == 0) ? 1 : ret, jb->jmpbuf[1], jb->jmpbuf[0] + 8);
 		}
 	}
 
