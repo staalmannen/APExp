@@ -17,12 +17,11 @@ static struct Pcstack {
 } pcstack[MAXSIGSTACK];
 static int nstack = 0;
 
-static void notecont(Ureg*, char*);
-
 void
 _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 {
 	Pcstack *p;
+	extern void _notecont_trampoline(void);
 
 	if(nstack >= MAXSIGSTACK)
 		_NOTED(1);
@@ -34,11 +33,11 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	p->msg = "signal";
 	nstack++;
 	
-	u->pc = (unsigned long long) notecont;
+	u->pc = (unsigned long long) _notecont_trampoline;
 	_NOTED(2);	/* NSAVE: clear note and capture state */
 }
 
-static void
+void
 notecont(Ureg *u, char *s)
 {
 	Pcstack *p;
@@ -120,7 +119,7 @@ siglongjmp(sigjmp_buf j, int ret)
 	/* 
 	 * If we are jumping out of a signal handler, pop the signal stack.
 	 * Since _notetramp already called NSAVE, the kernel note is cleared.
-	 * We can safely use longjmp to switch back to the target frame.
+	 * We can safely use longjmp to return to the sigsetjmp call-site.
 	 */
 	while(nstack > 0 && pcstack[nstack-1].u->sp < jb->jmpbuf[0]){
 		nstack--;
