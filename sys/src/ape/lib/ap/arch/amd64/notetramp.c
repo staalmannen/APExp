@@ -17,27 +17,7 @@ static struct Pcstack {
 } pcstack[MAXSIGSTACK];
 static int nstack = 0;
 
-/* Notecont doesn't take arguments; it uses the global signal stack */
-static void
-notecont(void)
-{
-	Pcstack *p;
-	Ureg *u;
-	void(*f)(int, char*, Ureg*);
-
-	if(nstack <= 0)
-		_EXITS("notecont: nstack <= 0");
-
-	p = &pcstack[nstack-1];
-	u = p->u;
-	f = p->hdlr;
-	u->pc = p->restorepc;
-	
-	(*f)(p->sig, p->msg, u);
-	
-	nstack--;
-	_NOTED(3);	/* NRSTR */
-}
+static void notecont(Ureg*, char*);
 
 void
 _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
@@ -51,11 +31,25 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	p->sig = sig;
 	p->hdlr = hdlr;
 	p->u = u;
-	/* Message pointer is saved by _ape_notehandler */
+	p->msg = "signal";
 	nstack++;
 	
 	u->pc = (unsigned long long) notecont;
 	_NOTED(2);	/* NSAVE: capture state and clear note */
+}
+
+static void
+notecont(Ureg *u, char *s)
+{
+	Pcstack *p;
+	void(*f)(int, char*, Ureg*);
+
+	p = &pcstack[nstack-1];
+	f = p->hdlr;
+	u->pc = p->restorepc;
+	(*f)(p->sig, p->msg, u);
+	nstack--;
+	_NOTED(3);	/* NRSTR */
 }
 
 int
@@ -93,14 +87,22 @@ void
 siglongjmp(sigjmp_buf j, int ret)
 {
 	sigjmp_buf_amd64 *jb = (sigjmp_buf_amd64*)j;
+	Ureg *u;
 
 	if(jb->set & 0xFFFFFFFF){
 		_psigblocked = jb->blocked;
 	}
 
-	/* Pop nested signal frames if we are jumping out of them */
-	while(nstack > 0 && pcstack[nstack-1].u->sp < jb->jmpbuf[0]){
-		nstack--;
+	if(nstack > 0){
+		u = pcstack[nstack-1].u;
+		/* If target SP is above signal SP, we can use NRSTR */
+		if(jb->jmpbuf[0] >= u->sp){
+			nstack--;
+			u->ax = (ret == 0) ? 1 : ret;
+			u->pc = jb->jmpbuf[1];
+			u->sp = jb->jmpbuf[0];
+			_NOTED(3);	/* NRSTR */
+		}
 	}
 
 	longjmp((void*)jb->jmpbuf, ret);

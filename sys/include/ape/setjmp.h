@@ -4,7 +4,8 @@
 
 /* 
  * Buffers must be large enough to hold all callee-saved registers (64-bit).
- * BP, BX, R12, R13, R14, R15, SP, PC = 8 registers = 64 bytes.
+ * SP, PC, BP, BX, R12, R13, R14 = 7 registers = 56 bytes.
+ * int[24] = 96 bytes, which is safe and allows for future expansion.
  */
 typedef int jmp_buf[24];
 typedef int sigjmp_buf[32];
