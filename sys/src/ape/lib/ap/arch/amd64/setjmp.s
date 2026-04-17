@@ -31,7 +31,7 @@ ok:
 	
 	MOVQ	0(RARG), SP	/* Restore SP to call site state */
 	MOVQ	8(RARG), DI	/* Target PC */
-	MOVQ	56(RARG), R15	/* Restore RARG (R15) */
+	MOVQ	56(RARG), R15
 	
 	MOVQ	DI, 0(SP)	/* Put target PC on stack for RET */
 	RET
@@ -43,7 +43,7 @@ TEXT	sigsetjmp(SB), 1, $0
 	MOVQ	_psigblocked(SB), AX
 	MOVQ	AX, 8(RARG)	/* store 64-bit blocked mask */
 	
-	/* Inline setjmp logic into the sigjmp_buf starting at offset 16 */
+	/* Inline setjmp logic into the jmpbuf at offset 16 */
 	MOVQ	SP, 16(RARG)
 	MOVQ	0(SP), AX
 	MOVQ	AX, 24(RARG)	/* PC */
@@ -59,34 +59,50 @@ TEXT	sigsetjmp(SB), 1, $0
 
 /*
  * Entry point for Plan 9 notes.
+ * Kernel pushes: msg(16(SP)), u(8(SP)), dummy_pc(0(SP)).
  */
 TEXT	_notehandler(SB), 1, $0
 	MOVQ	8(SP), RARG	/* u */
 	MOVQ	16(SP), AX	/* msg */
-	MOVQ	SP, R11		/* Use R11 to save SP */
+	
+	PUSHQ	R12		/* Save callee-saved register */
+	MOVQ	SP, R12		/* Save SP */
 	SUBQ	$32, SP		/* Create frame and align */
 	ANDQ	$~15, SP
-	MOVQ	AX, 8(SP)	/* msg at 8(FP) for _ape_notehandler */
+	
+	MOVQ	AX, 8(SP)	/* msg at 8(FP) for C */
 	CALL	_ape_notehandler(SB)
 	
 	/* If handler returns, terminate (NDFLT) */
-	MOVQ	R11, SP		/* Restore SP to find original arguments */
-	MOVQ	$1, RARG	/* Arg 0: NDFLT */
-	CALL	_signoted(SB)
+	MOVQ	R12, SP		/* Restore SP to find original u */
+	MOVQ	8(SP), RARG	/* Arg 0: u */
+	MOVQ	$1, AX		/* Arg 1: NDFLT */
+	PUSHQ	AX
+	PUSHQ	RARG
+	CALL	_signoted(SB)	/* _signoted handles the rest */
+	POPQ	RARG
+	POPQ	AX
+	POPQ	R12
 	RET
 
 /*
  * Stack-safe kernel restore.
+ * _signoted(Ureg *u, int v)
  */
 TEXT	_signoted(SB), 1, $0
-	/* v is in RARG */
-	MOVQ	SP, R11		/* Save SP */
+	MOVQ	v+8(FP), AX
+	/* u is in RARG */
+	
+	PUSHQ	R12		/* Save callee-saved (SYSCALL-preserved) */
+	MOVQ	SP, R12
 	SUBQ	$128, SP	/* Stay away from USTKTOP boundary */
 	ANDQ	$~15, SP
 	
-	MOVQ	RARG, 8(SP)	/* Arg 0: v */
+	MOVQ	RARG, 8(SP)	/* Arg 0: u */
+	MOVQ	AX, 16(SP)	/* Arg 1: v */
 	MOVQ	$33, R15	/* syscall noted */
 	SYSCALL
 	
-	MOVQ	R11, SP
+	MOVQ	R12, SP
+	POPQ	R12
 	RET
