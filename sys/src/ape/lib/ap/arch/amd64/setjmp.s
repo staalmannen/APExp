@@ -18,7 +18,7 @@ TEXT	setjmp(SB), 1, $0
 	RET
 
 TEXT	longjmp(SB), 1, $0
-	MOVL	8(FP), AX	/* return value val */
+	MOVL	val+8(FP), AX
 	TESTL	AX, AX
 	JNZ	ok
 	MOVL	$1, AX
@@ -35,7 +35,7 @@ ok:
 	RET
 
 TEXT	sigsetjmp(SB), 1, $0
-	MOVL	8(FP), AX	/* savemask */
+	MOVL	savemask+8(FP), AX
 	MOVQ	AX, 0(RARG)
 	MOVQ	_psigblocked(SB), AX
 	MOVQ	AX, 8(RARG)
@@ -55,18 +55,17 @@ TEXT	sigsetjmp(SB), 1, $0
 
 /*
  * Entry point for Plan 9 notes.
- * Kernel pushes: msg(16(SP)), u(8(SP)), dummy_pc(0(SP)).
  */
 TEXT	_notehandler(SB), 1, $0
 	MOVQ	8(SP), RARG	/* u */
 	MOVQ	16(SP), AX	/* msg */
 	MOVQ	SP, R11
-	SUBQ	$1024, SP	/* Move stack away for safety */
+	SUBQ	$1024, SP
 	ANDQ	$~15, SP
 	MOVQ	AX, 8(SP)	/* msg at 8(FP) for _ape_notehandler */
 	CALL	_ape_notehandler(SB)
 	
-	/* If handler returns, terminate with original message (NDFLT) */
+	/* If handler returns, terminate (NDFLT) */
 	MOVQ	1032(SP), RARG  /* Restore u from original 8(SP) */
 	MOVQ	$1, 8(SP)	/* Arg 1: NDFLT */
 	CALL	_signoted(SB)
@@ -74,14 +73,11 @@ TEXT	_notehandler(SB), 1, $0
 
 /*
  * Stack-safe kernel restore.
- * _signoted(Ureg *u, int v)
- * Performs noted(u, v) using the correct amd64 signature.
  */
 TEXT	_signoted(SB), 1, $0
-	/* u is in RARG, v is at 8(FP) */
-	MOVQ	8(FP), AX	/* AX = v */
+	MOVQ	v+8(FP), AX
 	MOVQ	SP, R11
-	SUBQ	$128, SP	/* Create safe zone */
+	SUBQ	$128, SP
 	ANDQ	$~15, SP
 	
 	MOVQ	RARG, 8(SP)	/* Arg 0: u */
