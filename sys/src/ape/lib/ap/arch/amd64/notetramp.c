@@ -10,6 +10,7 @@
 typedef struct Pcstack Pcstack;
 static struct Pcstack {
 	int sig;
+	char *msg;
 	void (*hdlr)(int, char*, Ureg*);
 	unsigned long long restorepc;
 	Ureg *u;
@@ -29,13 +30,20 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	p->sig = sig;
 	p->hdlr = hdlr;
 	p->u = u;
+	p->msg = "signal";
 	nstack++;
+	
 	u->pc = (unsigned long long) _notecont_trampoline;
+	/* 
+	 * Critical: Pass u to notecont via RARG (R15).
+	 * The kernel will restore R15 from u->r15 when resuming.
+	 */
+	u->r15 = (unsigned long long)u;
 	_NOTED(2);	/* NSAVE */
 }
 
 void
-notecont(Ureg *u, char *s)
+notecont(Ureg *u)
 {
 	Pcstack *p;
 	void(*f)(int, char*, Ureg*);
@@ -43,7 +51,7 @@ notecont(Ureg *u, char *s)
 	p = &pcstack[nstack-1];
 	f = p->hdlr;
 	u->pc = p->restorepc;
-	(*f)(p->sig, s, u);
+	(*f)(p->sig, p->msg, u);
 	nstack--;
 	
 	/* Return to kernel via NRSTR to restore original context */
@@ -85,6 +93,7 @@ _ape_notehandler(Ureg *u, char *msg)
 		if(strncmp(msg, sigtab[i].msg, strlen(sigtab[i].msg)) == 0){
 			f = _sighdlr[sigtab[i].num];
 			if(f != SIG_DFL && f != SIG_IGN && f != SIG_ERR){
+				pcstack[nstack].msg = msg; /* Save actual message */
 				_notetramp(sigtab[i].num, f, u);
 			}
 			_NOTED(0);
@@ -124,7 +133,7 @@ siglongjmp(sigjmp_buf j, int ret)
 
 	u->ax = (ret == 0) ? 1 : ret;
 	u->pc = jb->jmpbuf[1];
-	u->sp = jb->jmpbuf[0] + 8; /* Simulates a RET having occurred */
+	u->sp = jb->jmpbuf[0] + 8;
 
 	_NOTED(3);	/* NRSTR */
 	_EXITS("siglongjmp failed");
