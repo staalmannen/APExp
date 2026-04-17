@@ -11,6 +11,19 @@
  * 56: R15 (RARG)
  */
 
+TEXT	setjmp(SB), $0
+	MOVQ	SP, 0(RARG)
+	MOVQ	0(SP), AX	/* Return PC */
+	MOVQ	AX, 8(RARG)
+	MOVQ	BP, 16(RARG)
+	MOVQ	BX, 24(RARG)
+	MOVQ	R12, 32(RARG)
+	MOVQ	R13, 40(RARG)
+	MOVQ	R14, 48(RARG)
+	MOVQ	R15, 56(RARG)
+	MOVL	$0, AX
+	RET
+
 TEXT	longjmp(SB), $0
 	MOVL	val+8(FP), AX
 	TESTL	AX, AX
@@ -30,38 +43,17 @@ ok:
 	MOVQ	DI, 0(SP)	/* put return PC on stack for RET */
 	RET
 
-TEXT	setjmp(SB), $0
-	MOVQ	SP, 0(RARG)
-	MOVQ	BP, 16(RARG)
-	MOVQ	BX, 24(RARG)
-	MOVQ	R12, 32(RARG)
-	MOVQ	R13, 40(RARG)
-	MOVQ	R14, 48(RARG)
-	MOVQ	R15, 56(RARG)
-	MOVQ	0(SP), AX	/* Use AX as scratch for return PC */
-	MOVQ	AX, 8(RARG)
-	MOVL	$0, AX
-	RET
-
 TEXT	sigsetjmp(SB), $0
 	MOVL	savemask+8(FP), AX
-	MOVQ	$0, 0(RARG)
-	MOVL	AX, 0(RARG)	/* store savemask */
+	MOVQ	AX, 0(RARG)	/* store savemask */
 	MOVQ	_psigblocked(SB), CX
 	MOVQ	CX, 8(RARG)	/* store blocked mask */
 	
-	/* jmp_buf starts at offset 16 in sigjmp_buf */
-	MOVQ	SP, 16(RARG)
-	MOVQ	0(SP), CX	/* Use CX as scratch for return PC */
-	MOVQ	CX, 24(RARG)
-	MOVQ	BP, 32(RARG)
-	MOVQ	BX, 40(RARG)
-	MOVQ	R12, 48(RARG)
-	MOVQ	R13, 56(RARG)
-	MOVQ	R14, 64(RARG)
-	MOVQ	R15, 72(RARG)
-	
-	MOVL	$0, AX
+	/* Call setjmp for the rest, starting at offset 16 */
+	PUSHQ	RARG
+	ADDQ	$16, RARG
+	CALL	setjmp(SB)
+	POPQ	RARG
 	RET
 
 /*
@@ -72,7 +64,8 @@ TEXT	sigsetjmp(SB), $0
 TEXT	_notehandler(SB), $0
 	MOVQ	8(SP), RARG	/* u */
 	MOVQ	16(SP), AX	/* msg */
-	SUBQ	$16, SP		/* Align stack */
+	SUBQ	$16, SP		/* Create frame and align */
 	MOVQ	AX, 8(SP)	/* msg at 8(FP) */
 	CALL	_ape_notehandler(SB)
+	ADDQ	$16, SP		/* Restore stack pointer */
 	RET

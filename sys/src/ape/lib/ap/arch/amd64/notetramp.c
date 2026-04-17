@@ -80,7 +80,7 @@ extern sigset_t	_psigblocked;
 typedef struct {
 	unsigned long long set;
 	unsigned long long blocked;
-	unsigned long long jmpbuf[8];
+	unsigned long long jmpbuf[10]; /* Enough for 80 bytes */
 } sigjmp_buf_amd64;
 
 void
