@@ -11,7 +11,7 @@
  * 56: R15 (RARG)
  */
 
-TEXT	setjmp(SB), $0
+TEXT	setjmp(SB), 1, $0
 	MOVQ	SP, 0(RARG)
 	MOVQ	0(SP), AX	/* Return PC */
 	MOVQ	AX, 8(RARG)
@@ -24,7 +24,7 @@ TEXT	setjmp(SB), $0
 	MOVL	$0, AX
 	RET
 
-TEXT	longjmp(SB), $0
+TEXT	longjmp(SB), 1, $0
 	MOVL	val+8(FP), AX
 	TESTL	AX, AX
 	JNZ	ok
@@ -43,7 +43,7 @@ ok:
 	MOVQ	DI, 0(SP)	/* Put target PC on stack for RET */
 	RET
 
-TEXT	sigsetjmp(SB), $0
+TEXT	sigsetjmp(SB), 1, $0
 	MOVL	savemask+8(FP), AX
 	MOVQ	$0, 0(RARG)
 	MOVL	AX, 0(RARG)	/* store 32-bit savemask */
@@ -67,31 +67,32 @@ TEXT	sigsetjmp(SB), $0
 /*
  * Entry point for Plan 9 notes.
  */
-TEXT	_notehandler(SB), $0
+TEXT	_notehandler(SB), 1, $0
 	MOVQ	8(SP), RARG	/* u */
 	MOVQ	16(SP), AX	/* msg */
-	MOVQ	SP, BX		/* Save current SP */
-	SUBQ	$24, SP		/* Align stack and provide arg space */
+	MOVQ	SP, R11		/* Save current SP in scratch register */
+	SUBQ	$16, SP		/* Align stack */
 	ANDQ	$~15, SP
-	MOVQ	AX, 8(SP)	/* msg as second argument */
+	MOVQ	AX, 8(SP)	/* msg at 8(FP) */
 	CALL	_ape_notehandler(SB)
-	MOVQ	BX, SP
+	MOVQ	R11, SP
 	RET
 
 /*
  * Stack-safe kernel restore.
  * _signoted(Ureg *u, int ret, unsigned long long pc, unsigned long long sp)
- * Performs noted(NRSTR) without using the user stack.
+ * Performs noted(NRSTR) without using the user stack for locals.
  */
-TEXT	_signoted(SB), $0
-	MOVQ	ret+8(FP), AX
-	MOVQ	AX, 0(RARG)	/* u->ax = ret */
+TEXT	_signoted(SB), 1, $0
+	MOVQ	RARG, R11	/* Use R11 as scratch pointer to Ureg */
+	MOVL	ret+8(FP), AX
+	MOVQ	AX, 0(R11)	/* u->ax = ret */
 	MOVQ	pc+16(FP), AX
-	MOVQ	AX, 144(RARG)	/* u->pc = pc */
+	MOVQ	AX, 144(R11)	/* u->pc = pc */
 	MOVQ	sp+24(FP), AX
-	MOVQ	AX, 168(RARG)	/* u->sp = sp */
+	MOVQ	AX, 168(R11)	/* u->sp = sp */
 	
-	MOVQ	$3, RARG	/* noted arg: NRSTR */
-	MOVQ	$33, AX		/* syscall: noted */
+	MOVQ	$3, 8(SP)	/* noted(3) - NRSTR on stack */
+	MOVQ	$33, R15	/* syscall 33 (noted) in RARG */
 	SYSCALL
 	RET

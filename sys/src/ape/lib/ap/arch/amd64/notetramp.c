@@ -96,7 +96,7 @@ siglongjmp(sigjmp_buf j, int ret)
 		u = pcstack[nstack-1].u;
 		/* 
 		 * If target SP is above signal SP, we can use NRSTR.
-		 * jb->jmpbuf[0] is the SP saved by sigsetjmp (pointing to return PC).
+		 * jb->jmpbuf[0] is the SP saved by sigsetjmp.
 		 */
 		if(jb->jmpbuf[0] >= u->sp){
 			nstack--;
