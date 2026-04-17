@@ -31,19 +31,31 @@ TEXT	sigsetjmp(SB), $0
 /*
  * Entry point for Plan 9 notes.
  * Kernel pushes: msg, u, dummy_pc (at 0(SP)).
- * 6c expects u in RARG, msg at 8(FP) (which is 16(SP)).
+ * 6c expects u in RARG, msg at 8(FP).
  */
 TEXT	_notehandler(SB), $0
 	MOVQ	8(SP), RARG	/* RARG = u */
-	JMP	_ape_notehandler(SB)
+	MOVQ	16(SP), AX	/* AX = msg */
+	MOVQ	SP, BX		/* Save original SP */
+	SUBQ	$16, SP		/* Create frame and align */
+	ANDQ	$~15, SP
+	MOVQ	AX, 8(SP)	/* msg at 8(FP) */
+	CALL	_ape_notehandler(SB)
+	MOVQ	BX, SP		/* Restore SP */
+	RET
 
 /*
- * _notejmp(Ureg *u)
- * Switch stack to point to Ureg and invoke noted(NRSTR).
+ * Trampoline for notecont.
+ * Kernel restores SP and jumps here.
+ * Arguments u and msg are on the stack.
  */
-TEXT	_notejmp(SB), $0
-	MOVQ	RARG, BP
-	MOVQ	$3, 8(SP)	/* noted(3) - NRSTR, placed where syscall expects it */
-	MOVQ	$33, R15	/* syscall noted */
-	SYSCALL
+TEXT	_notecont_trampoline(SB), $0
+	MOVQ	8(SP), RARG	/* RARG = u */
+	MOVQ	16(SP), AX	/* AX = msg */
+	MOVQ	SP, BX
+	SUBQ	$16, SP
+	ANDQ	$~15, SP
+	MOVQ	AX, 8(SP)
+	CALL	notecont(SB)
+	MOVQ	BX, SP
 	RET

@@ -16,12 +16,11 @@ static struct Pcstack {
 } pcstack[MAXSIGSTACK];
 static int nstack = 0;
 
-static void notecont(Ureg*, char*);
-
 void
 _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 {
 	Pcstack *p;
+	extern void _notecont_trampoline(void);
 
 	if(nstack >= MAXSIGSTACK)
 		_NOTED(1);
@@ -31,11 +30,11 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	p->hdlr = hdlr;
 	p->u = u;
 	nstack++;
-	u->pc = (unsigned long long) notecont;
+	u->pc = (unsigned long long) _notecont_trampoline;
 	_NOTED(2);	/* NSAVE */
 }
 
-static void
+void
 notecont(Ureg *u, char *s)
 {
 	Pcstack *p;
@@ -48,7 +47,6 @@ notecont(Ureg *u, char *s)
 	nstack--;
 	
 	/* Return to kernel via NRSTR to restore original context */
-	u->sp += 8; /* Adjust for the dummy PC pushed by signal delivery */
 	_NOTED(3);
 }
 
@@ -116,10 +114,6 @@ siglongjmp(sigjmp_buf j, int ret)
 	}
 
 	if(nstack == 0 || pcstack[nstack-1].u->sp > jb->jmpbuf[0]){
-		/* 
-		 * We must ensure the return PC is on the stack for longjmp 
-		 * because it uses RET.
-		 */
 		unsigned long long *sp = (void*)jb->jmpbuf[0];
 		sp[0] = jb->jmpbuf[1];
 		longjmp((void*)jb->jmpbuf, ret);
@@ -130,8 +124,8 @@ siglongjmp(sigjmp_buf j, int ret)
 
 	u->ax = (ret == 0) ? 1 : ret;
 	u->pc = jb->jmpbuf[1];
-	u->sp = jb->jmpbuf[0] + 8; /* Adjust SP to simulate a completed RET */
+	u->sp = jb->jmpbuf[0] + 8;
 
-	extern void _notejmp(Ureg*);
-	_notejmp(u);
+	_NOTED(3);	/* NRSTR */
+	_EXITS("siglongjmp failed");
 }
