@@ -68,7 +68,7 @@ sigsetjmp(sigjmp_buf buf, int savemask)
 
 /* this is registered in _envsetup */
 int
-_notehandler(Ureg *u, char *msg)
+_ape_notehandler_fallback(Ureg *u, char *msg)
 {
 	int i;
 	void(*f)(int, char*, Ureg*);
