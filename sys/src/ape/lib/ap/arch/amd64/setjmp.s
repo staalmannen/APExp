@@ -36,11 +36,11 @@ ok:
 	MOVQ	40(RARG), R13
 	MOVQ	48(RARG), R14
 	
-	MOVQ	0(RARG), SP	/* Restore SP to the call site */
+	MOVQ	0(RARG), SP	/* Restore SP to call site state */
 	MOVQ	8(RARG), DI	/* Target PC */
 	MOVQ	56(RARG), R15	/* Restore RARG (R15) */
 	
-	MOVQ	DI, 0(SP)	/* Put return PC on stack for RET */
+	MOVQ	DI, 0(SP)	/* Put target PC on stack for RET */
 	RET
 
 TEXT	sigsetjmp(SB), $0
@@ -66,13 +66,15 @@ TEXT	sigsetjmp(SB), $0
 
 /*
  * Entry point for Plan 9 notes.
- * Kernel pushes: msg(16(SP)), u(8(SP)), dummy_pc(0(SP)).
+ * Kernel delivers: msg(16(SP)), u(8(SP)), dummy_pc(0(SP)).
  */
 TEXT	_notehandler(SB), $0
 	MOVQ	8(SP), RARG	/* u into RARG for 6c */
 	MOVQ	16(SP), AX	/* msg */
-	SUBQ	$16, SP		/* Create frame and align */
+	MOVQ	SP, BX		/* Save current SP */
+	SUBQ	$24, SP		/* 8 bytes for alignment + 16 for args */
+	ANDQ	$~15, SP	/* Force 16-byte alignment */
 	MOVQ	AX, 8(SP)	/* msg at 8(FP) */
 	CALL	_ape_notehandler(SB)
-	ADDQ	$16, SP
+	MOVQ	BX, SP		/* Restore SP */
 	RET

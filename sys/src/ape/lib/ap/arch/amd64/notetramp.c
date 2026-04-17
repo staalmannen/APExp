@@ -31,7 +31,6 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	p->sig = sig;
 	p->hdlr = hdlr;
 	p->u = u;
-	/* Message pointer is saved by _ape_notehandler */
 	nstack++;
 	
 	u->pc = (unsigned long long) notecont;
@@ -103,7 +102,7 @@ siglongjmp(sigjmp_buf j, int ret)
 			nstack--;
 			u->ax = (ret == 0) ? 1 : ret;
 			u->pc = jb->jmpbuf[1];
-			/* MUST add 8 to simulate the RET that sigsetjmp would have done */
+			/* MUST add 8 to simulate the completed RET of sigsetjmp */
 			u->sp = jb->jmpbuf[0] + 8;
 			_NOTED(3);	/* NRSTR */
 		}
