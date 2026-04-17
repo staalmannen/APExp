@@ -6,7 +6,7 @@
 
 TEXT	setjmp(SB), 1, $0
 	MOVQ	SP, 0(RARG)
-	MOVQ	0(SP), AX
+	MOVQ	0(SP), AX	/* Return PC */
 	MOVQ	AX, 8(RARG)
 	MOVQ	BP, 16(RARG)
 	MOVQ	BX, 24(RARG)
@@ -28,28 +28,34 @@ ok:
 	MOVQ	32(RARG), R12
 	MOVQ	40(RARG), R13
 	MOVQ	48(RARG), R14
+	
 	MOVQ	0(RARG), SP
-	MOVQ	8(RARG), DI
+	MOVQ	8(RARG), DI	/* Target PC */
 	MOVQ	56(RARG), R15
-	MOVQ	DI, 0(SP)
+	
+	MOVQ	DI, 0(SP)	/* Put target PC on stack for RET */
 	RET
 
 TEXT	sigsetjmp(SB), 1, $0
 	MOVL	savemask+8(FP), AX
-	MOVQ	AX, 0(RARG)
+	MOVQ	$0, 0(RARG)
+	MOVL	AX, 0(RARG)	/* store 32-bit savemask */
 	MOVQ	_psigblocked(SB), AX
-	MOVQ	AX, 8(RARG)
+	MOVQ	AX, 8(RARG)	/* store 64-bit blocked mask */
 	
-	/* Save rest into jmpbuf at offset 16 */
-	MOVQ	SP, 16(RARG)
+	/* Inline setjmp logic at offset 16 to avoid SP corruption */
+	ADDQ	$16, RARG
+	MOVQ	SP, 0(RARG)
 	MOVQ	0(SP), AX
-	MOVQ	AX, 24(RARG)	/* PC */
-	MOVQ	BP, 32(RARG)
-	MOVQ	BX, 40(RARG)
-	MOVQ	R12, 48(RARG)
-	MOVQ	R13, 56(RARG)
-	MOVQ	R14, 64(RARG)
-	MOVQ	R15, 72(RARG)
+	MOVQ	AX, 8(RARG)
+	MOVQ	BP, 16(RARG)
+	MOVQ	BX, 24(RARG)
+	MOVQ	R12, 32(RARG)
+	MOVQ	R13, 40(RARG)
+	MOVQ	R14, 48(RARG)
+	MOVQ	R15, 56(RARG)
+	SUBQ	$16, RARG	/* Restore RARG pointer */
+	
 	MOVL	$0, AX
 	RET
 
@@ -59,30 +65,32 @@ TEXT	sigsetjmp(SB), 1, $0
 TEXT	_notehandler(SB), 1, $0
 	MOVQ	8(SP), RARG	/* u */
 	MOVQ	16(SP), AX	/* msg */
-	MOVQ	SP, R11
-	SUBQ	$1024, SP
+	MOVQ	SP, R11		/* Use R11 as scratch to save SP */
+	SUBQ	$32, SP		/* Create frame and align */
 	ANDQ	$~15, SP
-	MOVQ	AX, 8(SP)	/* msg at 8(FP) for _ape_notehandler */
+	MOVQ	AX, 8(SP)	/* msg at 8(FP) */
 	CALL	_ape_notehandler(SB)
 	
 	/* If handler returns, terminate (NDFLT) */
-	MOVQ	1032(SP), RARG  /* Restore u from original 8(SP) */
-	MOVQ	$1, 8(SP)	/* Arg 1: NDFLT */
-	CALL	_signoted(SB)
+	MOVQ	R11, SP		/* Restore SP to find u again */
+	MOVQ	8(SP), RARG
+	MOVQ	$1, 8(SP)	/* Arg 0: NDFLT */
+	MOVQ	$33, R15	/* Syscall noted */
+	SYSCALL
 	RET
 
 /*
  * Stack-safe kernel restore.
  */
 TEXT	_signoted(SB), 1, $0
-	MOVQ	v+8(FP), AX
+	/* v is at 8(FP) */
+	MOVL	v+8(FP), AX
 	MOVQ	SP, R11
-	SUBQ	$128, SP
+	SUBQ	$128, SP	/* Stay away from USTKTOP */
 	ANDQ	$~15, SP
 	
-	MOVQ	RARG, 8(SP)	/* Arg 0: u */
-	MOVQ	AX, 16(SP)	/* Arg 1: v */
-	MOVQ	$33, R15	/* syscall noted */
+	MOVQ	AX, 8(SP)	/* Arg 0: v */
+	MOVQ	$33, R15	/* Syscall noted */
 	SYSCALL
 	
 	MOVQ	R11, SP

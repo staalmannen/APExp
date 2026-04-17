@@ -17,7 +17,7 @@ static struct Pcstack {
 } pcstack[MAXSIGSTACK];
 static int nstack = 0;
 
-static void notecont(void);
+static void notecont(Ureg*, char*);
 
 void
 _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
@@ -38,18 +38,18 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 }
 
 static void
-notecont(void)
+notecont(Ureg *u, char *s)
 {
 	Pcstack *p;
 	void(*f)(int, char*, Ureg*);
-	extern void _signoted(Ureg*, int);
+	extern void _signoted(int);
 
 	p = &pcstack[nstack-1];
 	f = p->hdlr;
-	p->u->pc = p->restorepc;
-	(*f)(p->sig, p->msg, p->u);
+	u->pc = p->restorepc;
+	(*f)(p->sig, p->msg, u);
 	nstack--;
-	_signoted(p->u, 3);	/* NRSTR */
+	_signoted(3);	/* NRSTR */
 }
 
 int
@@ -67,7 +67,7 @@ _ape_notehandler(Ureg *u, char *msg)
 			pcstack[nstack].msg = msg;
 			_notetramp(sig, f, u);
 		}
-		/* return to trampoline to call _signoted(u, NCONT) if needed */
+		/* return to trampoline to call noted(NCONT) if needed */
 	}
 	return 0;
 }
@@ -85,7 +85,7 @@ siglongjmp(sigjmp_buf j, int ret)
 {
 	sigjmp_buf_amd64 *jb = (sigjmp_buf_amd64*)j;
 	Ureg *u;
-	extern void _signoted(Ureg*, int);
+	extern void _signoted(int);
 
 	if(jb->set & 0xFFFFFFFF){
 		_psigblocked = jb->blocked;
@@ -97,7 +97,7 @@ siglongjmp(sigjmp_buf j, int ret)
 		u->ax = (ret == 0) ? 1 : ret;
 		u->pc = jb->jmpbuf[1];
 		u->sp = jb->jmpbuf[0] + 8;
-		_signoted(u, 3); /* NRSTR */
+		_signoted(3); /* NRSTR */
 	}
 
 	longjmp((void*)jb->jmpbuf, ret);
