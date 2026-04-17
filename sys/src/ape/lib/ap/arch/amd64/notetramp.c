@@ -129,6 +129,6 @@ siglongjmp(sigjmp_buf j, int ret)
 	u->pc = jb->jmpbuf[1];
 	u->sp = jb->jmpbuf[0] + 8; /* Adjust SP to simulate a RET */
 
-	extern void _notejmp(Ureg*);
-	_notejmp(u);
+	_NOTED(3);	/* NRSTR */
+	_EXITS("siglongjmp failed");
 }

@@ -30,20 +30,12 @@ TEXT	sigsetjmp(SB), $0
 
 /*
  * Entry point for Plan 9 notes.
- * Kernel puts u at 0(SP) and msg at 8(SP).
- * 6c expects u in RARG (R15).
+ * Kernel pushes: msg, u, dummy_pc (at 0(SP)).
+ * So: 0(SP)=dummy_pc, 8(SP)=u, 16(SP)=msg.
+ * 6c expects u in RARG, msg at 8(FP).
  */
 TEXT	_notehandler(SB), $0
-	MOVQ	0(SP), RARG
+	MOVQ	8(SP), RARG	/* RARG = u */
+	MOVQ	16(SP), AX	/* AX = msg */
+	MOVQ	AX, 8(SP)	/* Move msg to Arg 2 position (8(FP)) */
 	JMP	_ape_notehandler(SB)
-
-/*
- * _notejmp(Ureg *u)
- * Safely switch to the Ureg stack and restore via NRSTR.
- */
-TEXT	_notejmp(SB), $0
-	MOVQ	RARG, SP
-	MOVQ	$3, RARG	/* NRSTR */
-	MOVL	$33, AX		/* sys noted */
-	SYSCALL
-	RET
