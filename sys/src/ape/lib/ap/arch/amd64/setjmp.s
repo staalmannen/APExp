@@ -6,12 +6,12 @@ TEXT	longjmp(SB), $0
 ok:
 	MOVQ	0(RARG), SP
 	MOVQ	8(RARG), BX
-	MOVQ	BX, 0(SP)
+	MOVQ	BX, 0(SP)	/* Put return PC where RET expects it */
 	RET
 
 TEXT	setjmp(SB), $0
 	MOVQ	SP, 0(RARG)
-	MOVQ	0(SP), BX
+	MOVQ	0(SP), BX	/* Store the return PC */
 	MOVQ	BX, 8(RARG)
 	MOVL	$0, AX
 	RET
