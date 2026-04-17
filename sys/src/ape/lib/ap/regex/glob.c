@@ -11,6 +11,8 @@
 #include <unistd.h>
 #include <pwd.h>
 
+#define __strchrnul strchrnul
+
 struct match
 {
 	struct match *next;
