@@ -18,7 +18,7 @@ TEXT	setjmp(SB), 1, $0
 	RET
 
 TEXT	longjmp(SB), 1, $0
-	MOVL	val+8(FP), AX
+	MOVL	8(FP), AX	/* return value val */
 	TESTL	AX, AX
 	JNZ	ok
 	MOVL	$1, AX
@@ -35,7 +35,7 @@ ok:
 	RET
 
 TEXT	sigsetjmp(SB), 1, $0
-	MOVL	savemask+8(FP), AX
+	MOVL	8(FP), AX	/* savemask */
 	MOVQ	AX, 0(RARG)
 	MOVQ	_psigblocked(SB), AX
 	MOVQ	AX, 8(RARG)
@@ -43,7 +43,7 @@ TEXT	sigsetjmp(SB), 1, $0
 	/* Save rest into jmpbuf at offset 16 */
 	MOVQ	SP, 16(RARG)
 	MOVQ	0(SP), AX
-	MOVQ	AX, 24(RARG)
+	MOVQ	AX, 24(RARG)	/* PC */
 	MOVQ	BP, 32(RARG)
 	MOVQ	BX, 40(RARG)
 	MOVQ	R12, 48(RARG)
@@ -63,12 +63,12 @@ TEXT	_notehandler(SB), 1, $0
 	MOVQ	SP, R11
 	SUBQ	$1024, SP	/* Move stack away for safety */
 	ANDQ	$~15, SP
-	MOVQ	AX, 8(SP)	/* msg at 8(FP) */
+	MOVQ	AX, 8(SP)	/* msg at 8(FP) for _ape_notehandler */
 	CALL	_ape_notehandler(SB)
 	
-	/* If handler returns, terminate with original message */
-	MOVQ	1024+8(SP), RARG /* Arg 0: u */
-	MOVQ	$1, 8(SP)	 /* Arg 1: NDFLT */
+	/* If handler returns, terminate with original message (NDFLT) */
+	MOVQ	1032(SP), RARG  /* Restore u from original 8(SP) */
+	MOVQ	$1, 8(SP)	/* Arg 1: NDFLT */
 	CALL	_signoted(SB)
 	RET
 
@@ -79,7 +79,7 @@ TEXT	_notehandler(SB), 1, $0
  */
 TEXT	_signoted(SB), 1, $0
 	/* u is in RARG, v is at 8(FP) */
-	MOVQ	v+8(FP), AX
+	MOVQ	8(FP), AX	/* AX = v */
 	MOVQ	SP, R11
 	SUBQ	$128, SP	/* Create safe zone */
 	ANDQ	$~15, SP

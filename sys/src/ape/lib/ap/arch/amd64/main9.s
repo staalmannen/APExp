@@ -12,6 +12,6 @@ TEXT	_main(SB), 1, $0
 	MOVQ	$_apemain(SB), RARG
 	PUSHQ	RARG
 	PUSHQ	$0
-	JMPF	_callmain(SB)
+	JMP	_callmain(SB)
 
 GLOBL	_tos(SB), $8
