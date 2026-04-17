@@ -95,14 +95,12 @@ siglongjmp(sigjmp_buf j, int ret)
 	if(nstack > 0){
 		u = pcstack[nstack-1].u;
 		/* 
-		 * If target SP is above signal SP, we can use NRSTR.
-		 * jb->jmpbuf[0] is the SP saved by sigsetjmp.
+		 * For APE, we always use NRSTR if jumping out of a signal handler
+		 * to ensure the kernel state is correctly cleared.
 		 */
-		if(jb->jmpbuf[0] >= u->sp){
-			nstack--;
-			extern void _signoted(Ureg*, int, unsigned long long, unsigned long long);
-			_signoted(u, (ret == 0) ? 1 : ret, jb->jmpbuf[1], jb->jmpbuf[0] + 8);
-		}
+		nstack--;
+		extern void _signoted(Ureg*, int, unsigned long long, unsigned long long);
+		_signoted(u, (ret == 0) ? 1 : ret, jb->jmpbuf[1], jb->jmpbuf[0] + 8);
 	}
 
 	longjmp((void*)jb->jmpbuf, ret);

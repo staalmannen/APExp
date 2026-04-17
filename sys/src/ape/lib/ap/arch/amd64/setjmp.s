@@ -50,7 +50,7 @@ TEXT	sigsetjmp(SB), 1, $0
 	MOVQ	_psigblocked(SB), AX
 	MOVQ	AX, 8(RARG)	/* store 64-bit blocked mask */
 	
-	/* Fully implement jmp_buf save at offset 16 */
+	/* Save registers into jmpbuf starting at offset 16 */
 	MOVQ	SP, 16(RARG)
 	MOVQ	0(SP), AX
 	MOVQ	AX, 24(RARG)	/* PC */
@@ -81,7 +81,7 @@ TEXT	_notehandler(SB), 1, $0
 /*
  * Stack-safe kernel restore.
  * _signoted(Ureg *u, int ret, unsigned long long pc, unsigned long long sp)
- * Performs noted(NRSTR) without using the user stack for locals.
+ * Performs noted(NRSTR) without risking fault at USTKTOP.
  */
 TEXT	_signoted(SB), 1, $0
 	MOVQ	RARG, R11	/* Use R11 as scratch pointer to Ureg */
@@ -92,7 +92,14 @@ TEXT	_signoted(SB), 1, $0
 	MOVQ	sp+24(FP), AX
 	MOVQ	AX, 168(R11)	/* u->sp = sp */
 	
-	MOVQ	$3, 8(SP)	/* noted(3) - NRSTR on stack */
+	/* 
+	 * Move SP down significantly to avoid USTKTOP boundary.
+	 * Even if the restored SP is high, this temporary SP is safe.
+	 */
+	SUBQ	$128, SP
+	MOVQ	$3, 8(SP)	/* noted(3) - NRSTR on new stack */
 	MOVQ	$33, R15	/* syscall 33 (noted) in RARG */
 	SYSCALL
+	/* Kernel should not return here on success */
+	ADDQ	$128, SP
 	RET
