@@ -31,7 +31,7 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	p->sig = sig;
 	p->hdlr = hdlr;
 	p->u = u;
-	p->msg = "signal";
+	/* Message pointer is saved by _ape_notehandler */
 	nstack++;
 	
 	u->pc = (unsigned long long) notecont;
@@ -80,7 +80,7 @@ extern sigset_t	_psigblocked;
 typedef struct {
 	unsigned long long set;
 	unsigned long long blocked;
-	unsigned long long jmpbuf[8];
+	unsigned long long jmpbuf[8]; /* SP, PC, BP, BX, R12, R13, R14, R15 */
 } sigjmp_buf_amd64;
 
 void
@@ -95,12 +95,16 @@ siglongjmp(sigjmp_buf j, int ret)
 
 	if(nstack > 0){
 		u = pcstack[nstack-1].u;
-		/* If target SP is above signal SP, we can use NRSTR */
+		/* 
+		 * If target SP is above signal SP, we can use NRSTR.
+		 * jb->jmpbuf[0] is the SP saved by sigsetjmp (pointing to return PC).
+		 */
 		if(jb->jmpbuf[0] >= u->sp){
 			nstack--;
 			u->ax = (ret == 0) ? 1 : ret;
 			u->pc = jb->jmpbuf[1];
-			u->sp = jb->jmpbuf[0];
+			/* MUST add 8 to simulate the RET that sigsetjmp would have done */
+			u->sp = jb->jmpbuf[0] + 8;
 			_NOTED(3);	/* NRSTR */
 		}
 	}
