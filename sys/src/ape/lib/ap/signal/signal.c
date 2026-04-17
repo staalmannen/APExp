@@ -66,33 +66,9 @@ sigsetjmp(sigjmp_buf buf, int savemask)
 }
 */
 
-/* this is registered in _envsetup */
-int
-_ape_notehandler_fallback(Ureg *u, char *msg)
-{
-	int i;
-	void(*f)(int, char*, Ureg*);
-	extern void _doatexits(void);	/* in stdio/exit.c */
-
-	if(_finishing)
-		_finish(0, 0);
-	for(i = 0; i<NSIGTAB; i++){
-		if(strncmp(msg, sigtab[i].msg, strlen(sigtab[i].msg)) == 0){
-			f = _sighdlr[sigtab[i].num];
-			if(f == SIG_DFL || f == SIG_ERR)
-				break;
-			if(f != SIG_IGN) {
-				_notetramp(sigtab[i].num, f, u);
-				/* notetramp is machine-dependent; doesn't return to here */
-			}
-			_NOTED(0); /* NCONT */
-			return 0;
-		}
-	}
-	_doatexits();
-	_NOTED(1); /* NDFLT */
-	return 0;
-}
+/* _notehandler is now implemented in arch/amd64/notetramp.c with an 
+   assembly entry point in arch/amd64/setjmp.s to handle the 
+   Plan 9 kernel calling convention. */
 
 int
 _stringsig(char *nam)
