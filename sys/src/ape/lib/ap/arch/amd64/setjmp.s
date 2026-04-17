@@ -43,16 +43,19 @@ TEXT	sigsetjmp(SB), 1, $0
 	MOVQ	_psigblocked(SB), AX
 	MOVQ	AX, 8(RARG)	/* store 64-bit blocked mask */
 	
-	/* Inline setjmp logic into the sigjmp_buf starting at offset 16 */
-	MOVQ	SP, 16(RARG)	/* index 0 of jmpbuf part */
+	/* 
+	 * Inline setjmp logic into sigjmp_buf starting at offset 16.
+	 * Offsets 16-72 match jmp_buf layout 0-56.
+	 */
+	MOVQ	SP, 16(RARG)	/* jmp_buf[0] (SP) */
 	MOVQ	0(SP), AX
-	MOVQ	AX, 24(RARG)	/* index 1 (PC) */
-	MOVQ	BP, 32(RARG)	/* index 2 (BP) */
-	MOVQ	BX, 40(RARG)	/* index 3 (BX) */
-	MOVQ	R12, 48(RARG)	/* index 4 (R12) */
-	MOVQ	R13, 56(RARG)	/* index 5 (R13) */
-	MOVQ	R14, 64(RARG)	/* index 6 (R14) */
-	MOVQ	R15, 72(RARG)	/* index 7 (R15) */
+	MOVQ	AX, 24(RARG)	/* jmp_buf[1] (PC) */
+	MOVQ	BP, 32(RARG)	/* jmp_buf[2] (BP) */
+	MOVQ	BX, 40(RARG)	/* jmp_buf[3] (BX) */
+	MOVQ	R12, 48(RARG)	/* jmp_buf[4] (R12) */
+	MOVQ	R13, 56(RARG)	/* jmp_buf[5] (R13) */
+	MOVQ	R14, 64(RARG)	/* jmp_buf[6] (R14) */
+	MOVQ	R15, 72(RARG)	/* jmp_buf[7] (R15) */
 	
 	MOVL	$0, AX
 	RET
@@ -64,32 +67,31 @@ TEXT	_notehandler(SB), 1, $0
 	MOVQ	8(SP), RARG	/* u */
 	MOVQ	16(SP), AX	/* msg */
 	
-	PUSHQ	R12		/* Save callee-saved register */
-	MOVQ	SP, R12		/* Save SP */
-	SUBQ	$32, SP		/* Create frame and align */
-	ANDQ	$~15, SP
+	PUSHQ	R12		/* callee-saved scratch */
+	MOVQ	SP, R12
+	SUBQ	$32, SP		/* frame */
+	ANDQ	$~15, SP	/* align */
 	
-	MOVQ	AX, 8(SP)	/* msg at 8(FP) for C */
+	MOVQ	AX, 8(SP)	/* msg at 8(FP) */
 	CALL	_ape_notehandler(SB)
 	
-	MOVQ	R12, SP		/* Restore SP */
+	MOVQ	R12, SP
 	POPQ	R12
 	RET
 
 /*
- * Stack-safe kernel restore.
- * _signoted(int v)
+ * Stack-safe kernel restore bridge.
  */
 TEXT	_signoted(SB), 1, $0
 	MOVL	v+8(FP), AX
 	
-	PUSHQ	R12		/* Save callee-saved (SYSCALL-preserved) */
+	PUSHQ	R12
 	MOVQ	SP, R12
-	SUBQ	$128, SP	/* Stay away from USTKTOP boundary */
+	SUBQ	$128, SP	/* safe zone */
 	ANDQ	$~15, SP
 	
-	MOVQ	AX, 8(SP)	/* Arg 0: v on stack */
-	MOVQ	$33, R15	/* syscall noted */
+	MOVQ	AX, 8(SP)	/* code */
+	MOVQ	$33, R15	/* syscall 33 (noted) */
 	SYSCALL
 	
 	MOVQ	R12, SP
