@@ -44,7 +44,7 @@ notecont(void)
 {
 	Pcstack *p;
 	void(*f)(int, char*, Ureg*);
-	extern void _signoted(int);
+	extern void _signoted(Ureg*, int);
 
 	if(nstack <= 0)
 		_EXITS("notecont: nstack <= 0");
@@ -54,7 +54,7 @@ notecont(void)
 	f = p->hdlr;
 	(*f)(p->sig, p->msg, p->u);
 	nstack--;
-	_signoted(3);	/* NRSTR */
+	_signoted(p->u, 3);	/* NRSTR */
 }
 
 int
@@ -62,7 +62,7 @@ _ape_notehandler(Ureg *u, char *msg)
 {
 	extern void (*_sighdlr[])(int, char*, Ureg*);
 	extern int _stringsig(char*);
-	extern void _signoted(int);
+	extern void _signoted(Ureg*, int);
 	int sig;
 	void (*f)(int, char*, Ureg*);
 
@@ -73,7 +73,7 @@ _ape_notehandler(Ureg *u, char *msg)
 			pcstack[nstack].msg = msg;
 			_notetramp(sig, f, u);
 		}
-		_signoted(0); /* NCONT */
+		_signoted(u, 0); /* NCONT */
 	}
 	return 0;
 }
@@ -92,7 +92,7 @@ siglongjmp(sigjmp_buf j, int ret)
 {
 	sigjmp_buf_amd64 *jb = (sigjmp_buf_amd64*)j;
 	Ureg *u;
-	extern void _signoted(int);
+	extern void _signoted(Ureg*, int);
 
 	if(jb->set & 0xFFFFFFFF){
 		_psigblocked = jb->blocked;
@@ -102,9 +102,7 @@ siglongjmp(sigjmp_buf j, int ret)
 		u = pcstack[nstack-1].u;
 		nstack--;
 		
-		/* 
-		 * Synchronize General Purpose registers into Ureg for restoration.
-		 */
+		/* Synchronize registers into Ureg for restoration */
 		u->ax = (ret == 0) ? 1 : ret;
 		u->pc = jb->jmpbuf[1];
 		u->sp = jb->jmpbuf[0] + 8;
@@ -115,7 +113,7 @@ siglongjmp(sigjmp_buf j, int ret)
 		u->r14 = jb->jmpbuf[6];
 		u->r15 = jb->jmpbuf[7];
 		
-		_signoted(3); /* NRSTR */
+		_signoted(u, 3); /* NRSTR */
 	}
 
 	longjmp((void*)jb->jmpbuf, ret);
