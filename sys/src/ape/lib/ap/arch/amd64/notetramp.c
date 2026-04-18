@@ -17,7 +17,7 @@ static struct Pcstack {
 } pcstack[MAXSIGSTACK];
 static int nstack = 0;
 
-static void notecont(Ureg*, char*);
+static void notecont(void);
 
 void
 _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
@@ -40,17 +40,21 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 }
 
 static void
-notecont(Ureg *u, char *s)
+notecont(void)
 {
 	Pcstack *p;
 	void(*f)(int, char*, Ureg*);
+	extern void _signoted(Ureg*, int);
+
+	if(nstack <= 0)
+		_EXITS("notecont: nstack <= 0");
 
 	p = &pcstack[nstack-1];
+	p->u->pc = p->restorepc;
 	f = p->hdlr;
-	u->pc = p->restorepc;
-	(*f)(p->sig, s, u);
+	(*f)(p->sig, p->msg, p->u);
 	nstack--;
-	_NOTED(3);	/* NRSTR */
+	_signoted(p->u, 3);	/* NRSTR */
 }
 
 int
@@ -65,6 +69,7 @@ _ape_notehandler(Ureg *u, char *msg)
 	if(sig > 0){
 		f = _sighdlr[sig];
 		if(f != SIG_DFL && f != SIG_IGN && f != SIG_ERR){
+			pcstack[nstack].msg = msg;
 			_notetramp(sig, f, u);
 		}
 	}
@@ -73,11 +78,11 @@ _ape_notehandler(Ureg *u, char *msg)
 
 extern sigset_t	_psigblocked;
 
-/* Layout must match sigsetjmp in setjmp.s */
+/* Layout must match sigsetjmp in setjmp.s (offset 16) */
 typedef struct {
 	unsigned long long set;
 	unsigned long long blocked;
-	unsigned long long jmpbuf[2]; 
+	unsigned long long jmpbuf[8]; /* SP, PC, BP, BX, R12, R13, R14, R15 */
 } sigjmp_buf_amd64;
 
 void
@@ -85,6 +90,7 @@ siglongjmp(sigjmp_buf j, int ret)
 {
 	sigjmp_buf_amd64 *jb = (sigjmp_buf_amd64*)j;
 	Ureg *u;
+	extern void _signoted(Ureg*, int);
 
 	if(jb->set & 0xFFFFFFFF){
 		_psigblocked = jb->blocked;
@@ -93,10 +99,19 @@ siglongjmp(sigjmp_buf j, int ret)
 	if(nstack > 0){
 		u = pcstack[nstack-1].u;
 		nstack--;
+		
+		/* Synchronize registers into Ureg for restoration */
 		u->ax = (ret == 0) ? 1 : ret;
 		u->pc = jb->jmpbuf[1];
 		u->sp = jb->jmpbuf[0] + 8;
-		_NOTED(3); /* NRSTR */
+		u->bp = jb->jmpbuf[2];
+		u->bx = jb->jmpbuf[3];
+		u->r12 = jb->jmpbuf[4];
+		u->r13 = jb->jmpbuf[5];
+		u->r14 = jb->jmpbuf[6];
+		u->r15 = jb->jmpbuf[7];
+		
+		_signoted(u, 3); /* NRSTR */
 	}
 
 	longjmp((void*)jb->jmpbuf, ret);

@@ -1,14 +1,12 @@
 TEXT	_main(SB), 1, $0
 	MOVQ	AX, _tos(SB)
-	
-	/* Provide 8KB headroom at top of stack for signals */
-	SUBQ	$8192, SP
-	ANDQ	$~15, SP
-
 	MOVQ	$_apemain(SB), R15
-	PUSHQ	R15
+	/* 
+	 * Kernel puts argc at 0(SP), argv at 8(SP).
+	 * C code expects argc at 0(FP) (which is 8(SP) if JMP is used).
+	 * We push a dummy value so that 0(FP) points to the original 0(SP).
+	 */
 	PUSHQ	$0
-	CALL	_callmain(SB)
-	RET
+	JMP	_callmain(SB)
 
 GLOBL	_tos(SB), $8
