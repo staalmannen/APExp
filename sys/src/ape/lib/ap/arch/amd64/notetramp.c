@@ -44,7 +44,6 @@ notecont(void)
 {
 	Pcstack *p;
 	void(*f)(int, char*, Ureg*);
-	extern void _signoted(Ureg*, int);
 
 	if(nstack <= 0)
 		_EXITS("notecont: nstack <= 0");
@@ -54,7 +53,7 @@ notecont(void)
 	f = p->hdlr;
 	(*f)(p->sig, p->msg, p->u);
 	nstack--;
-	_signoted(p->u, 3);	/* NRSTR */
+	_NOTED(3);	/* NRSTR */
 }
 
 int
@@ -62,7 +61,6 @@ _ape_notehandler(Ureg *u, char *msg)
 {
 	extern void (*_sighdlr[])(int, char*, Ureg*);
 	extern int _stringsig(char*);
-	extern void _signoted(Ureg*, int);
 	int sig;
 	void (*f)(int, char*, Ureg*);
 
@@ -73,8 +71,9 @@ _ape_notehandler(Ureg *u, char *msg)
 			pcstack[nstack].msg = msg;
 			_notetramp(sig, f, u);
 		}
-		_signoted(u, 0); /* NCONT */
+		_NOTED(0); /* NCONT */
 	}
+	_NOTED(1); /* NDFLT */
 	return 0;
 }
 
@@ -91,18 +90,30 @@ void
 siglongjmp(sigjmp_buf j, int ret)
 {
 	sigjmp_buf_amd64 *jb = (sigjmp_buf_amd64*)j;
+	Ureg *u;
 
 	if(jb->set & 0xFFFFFFFF){
 		_psigblocked = jb->blocked;
 	}
 
-	/* 
-	 * If we are jumping out of a signal handler, pop the stack.
-	 * Since _notetramp already called NSAVE, the kernel note is cleared.
-	 * We can safely jump back to the call-site using verified longjmp.
-	 */
-	while(nstack > 0 && pcstack[nstack-1].u->sp < jb->jmpbuf[0]){
+	if(nstack > 0){
+		u = pcstack[nstack-1].u;
 		nstack--;
+		
+		/* 
+		 * Synchronize all registers into the Ureg before restoration.
+		 */
+		u->ax = (ret == 0) ? 1 : ret;
+		u->pc = jb->jmpbuf[1];
+		u->sp = jb->jmpbuf[0] + 8;
+		u->bp = jb->jmpbuf[2];
+		u->bx = jb->jmpbuf[3];
+		u->r12 = jb->jmpbuf[4];
+		u->r13 = jb->jmpbuf[5];
+		u->r14 = jb->jmpbuf[6];
+		u->r15 = jb->jmpbuf[7];
+		
+		_NOTED(3); /* NRSTR */
 	}
 
 	longjmp((void*)jb->jmpbuf, ret);
