@@ -34,7 +34,7 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	nstack++;
 	
 	u->pc = (unsigned long long) notecont;
-	/* Preserve u in RARG (R15) for resumption */
+	/* Preserve u in RARG (R15) for continuation */
 	u->r15 = (unsigned long long)u;
 	_NOTED(2);	/* NSAVE */
 }
@@ -44,17 +44,17 @@ notecont(void)
 {
 	Pcstack *p;
 	void(*f)(int, char*, Ureg*);
-	extern void _signoted(int);
 
 	if(nstack <= 0)
 		_EXITS("notecont: nstack <= 0");
 
 	p = &pcstack[nstack-1];
-	f = p->hdlr;
 	p->u->pc = p->restorepc;
+	f = p->hdlr;
 	(*f)(p->sig, p->msg, p->u);
 	nstack--;
-	_signoted(3);	/* NRSTR */
+	
+	_NOTED(3);	/* NRSTR */
 }
 
 int
@@ -62,7 +62,6 @@ _ape_notehandler(Ureg *u, char *msg)
 {
 	extern void (*_sighdlr[])(int, char*, Ureg*);
 	extern int _stringsig(char*);
-	extern void _signoted(int);
 	int sig;
 	void (*f)(int, char*, Ureg*);
 
@@ -73,9 +72,7 @@ _ape_notehandler(Ureg *u, char *msg)
 			pcstack[nstack].msg = msg;
 			_notetramp(sig, f, u);
 		}
-		_signoted(0); /* NCONT */
 	}
-	_signoted(1); /* NDFLT */
 	return 0;
 }
 
@@ -85,7 +82,7 @@ extern sigset_t	_psigblocked;
 typedef struct {
 	unsigned long long set;
 	unsigned long long blocked;
-	unsigned long long jmpbuf[8]; /* SP, PC, BP, BX, R12, R13, R14, R15 */
+	unsigned long long jmpbuf[5]; 
 } sigjmp_buf_amd64;
 
 void
@@ -97,14 +94,7 @@ siglongjmp(sigjmp_buf j, int ret)
 		_psigblocked = jb->blocked;
 	}
 
-	/* 
-	 * Pop nested signal frames. Since _notetramp already called NSAVE, 
-	 * the kernel note is cleared. We can safely jump back to the 
-	 * call-site using verified longjmp assembly.
-	 */
-	while(nstack > 0 && pcstack[nstack-1].u->sp < jb->jmpbuf[0]){
-		nstack--;
-	}
-
+	/* Reset signal stack and jump back to user space */
+	nstack = 0;
 	longjmp((void*)jb->jmpbuf, ret);
 }
