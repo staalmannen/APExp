@@ -102,7 +102,7 @@ siglongjmp(sigjmp_buf j, int ret)
 		u = pcstack[nstack-1].u;
 		nstack--;
 		
-		/* Synchronize registers into Ureg for restoration */
+		/* Synchronize General Purpose registers into Ureg for restoration */
 		u->ax = (ret == 0) ? 1 : ret;
 		u->pc = jb->jmpbuf[1];
 		u->sp = jb->jmpbuf[0] + 8;

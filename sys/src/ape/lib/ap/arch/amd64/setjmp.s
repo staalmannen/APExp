@@ -18,7 +18,7 @@ TEXT	setjmp(SB), 1, $0
 	RET
 
 TEXT	longjmp(SB), 1, $0
-	/* R15 = jmp_buf, 0(FP) = val */
+	/* R15 = jmp_buf, val is at 0(FP) (which is 8(SP) in $0 frame) */
 	MOVL	val+0(FP), AX
 	TESTL	AX, AX
 	JNZ	ok
@@ -38,7 +38,7 @@ ok:
 	RET
 
 TEXT	sigsetjmp(SB), 1, $0
-	/* R15 = sigjmp_buf, 0(FP) = savemask */
+	/* R15 = sigjmp_buf, savemask is at 0(FP) (which is 8(SP) in $0 frame) */
 	MOVL	savemask+0(FP), AX
 	MOVQ	$0, 0(R15)
 	MOVL	AX, 0(R15)	/* store 32-bit savemask */
@@ -46,15 +46,15 @@ TEXT	sigsetjmp(SB), 1, $0
 	MOVQ	AX, 8(R15)	/* store 64-bit blocked mask */
 	
 	/* Inline setjmp logic into the sigjmp_buf starting at offset 16 */
-	MOVQ	SP, 16(R15)	/* jmpbuf[0] */
+	MOVQ	SP, 16(R15)
 	MOVQ	0(SP), AX
-	MOVQ	AX, 24(R15)	/* jmpbuf[1] */
-	MOVQ	BP, 32(R15)	/* jmpbuf[2] */
-	MOVQ	BX, 40(R15)	/* jmpbuf[3] */
-	MOVQ	R12, 48(R15)	/* jmpbuf[4] */
-	MOVQ	R13, 56(R15)	/* jmpbuf[5] */
-	MOVQ	R14, 64(R15)	/* jmpbuf[6] */
-	MOVQ	R15, 72(R15)	/* jmpbuf[7] */
+	MOVQ	AX, 24(R15)
+	MOVQ	BP, 32(R15)
+	MOVQ	BX, 40(R15)
+	MOVQ	R12, 48(R15)
+	MOVQ	R13, 56(R15)
+	MOVQ	R14, 64(R15)
+	MOVQ	R15, 72(R15)
 	
 	MOVL	$0, AX
 	RET
@@ -75,10 +75,11 @@ TEXT	_notehandler(SB), 1, $32
  * _signoted(Ureg *u, int v)
  */
 TEXT	_signoted(SB), 1, $32
-	/* u is in R15, v is at 0(FP) (which is 40(SP)) */
+	/* u is in R15, v is at 0(FP) */
 	MOVL	v+0(FP), AX	/* v */
-	MOVQ	R15, 8(SP)	/* Arg 0: u for kernel */
+	MOVQ	R15, BP		/* BP is RARG for kernel syscalls */
+	MOVQ	BP, 8(SP)	/* Arg 0: u for kernel */
 	MOVQ	AX, 16(SP)	/* Arg 1: v for kernel */
-	MOVQ	$33, BP		/* BP is RARG for kernel syscalls */
+	MOVQ	$33, R15	/* syscall 33 (noted) in R15 for syscall dispatch */
 	SYSCALL
 	RET
