@@ -1,101 +1,73 @@
 /*
- * amd64 setjmp/longjmp
+ * amd64 setjmp/longjmp (Stack-Safe & Kernel-Aligned)
  * jmp_buf layout (8-byte slots):
- *  0: SP, 1: PC, 2: BP, 3: BX, 4: R12, 5: R13, 6: R14, 7: R15
+ *  0: SP, 1: PC, 2: BP, 3: BX
  */
 
-TEXT	setjmp(SB), 1, $0
-	MOVQ	SP, 0(RARG)
+TEXT	setjmp(SB), $0
+	MOVQ	SP, 0(R15)	/* R15 is RARG for 6c */
 	MOVQ	0(SP), AX	/* Return PC */
-	MOVQ	AX, 8(RARG)
-	MOVQ	BP, 16(RARG)
-	MOVQ	BX, 24(RARG)
-	MOVQ	R12, 32(RARG)
-	MOVQ	R13, 40(RARG)
-	MOVQ	R14, 48(RARG)
-	MOVQ	R15, 56(RARG)
+	MOVQ	AX, 8(R15)
+	MOVQ	BP, 16(R15)
+	MOVQ	BX, 24(R15)
 	MOVL	$0, AX
 	RET
 
-TEXT	longjmp(SB), 1, $0
-	MOVL	val+8(FP), AX
+TEXT	longjmp(SB), $0
+	/* R15 = jmp_buf, 8(SP) = val */
+	MOVL	val+8(SP), AX
 	TESTL	AX, AX
 	JNZ	ok
 	MOVL	$1, AX
 ok:
-	MOVQ	16(RARG), BP
-	MOVQ	24(RARG), BX
-	MOVQ	32(RARG), R12
-	MOVQ	40(RARG), R13
-	MOVQ	48(RARG), R14
-	
-	MOVQ	0(RARG), SP	/* Restore SP to call site state */
-	MOVQ	8(RARG), DI	/* Target PC */
-	MOVQ	56(RARG), R15
-	
-	MOVQ	DI, 0(SP)	/* Put target PC on stack for RET */
-	RET
+	MOVQ	16(R15), BP
+	MOVQ	24(R15), BX
+	MOVQ	0(R15), SP
+	ADDQ	$8, SP		/* Simulate pop of return address */
+	MOVQ	8(R15), DI	/* Target PC */
+	JMP	DI		/* Stack-safe: jump without writing */
 
-TEXT	sigsetjmp(SB), 1, $0
-	MOVL	savemask+8(FP), AX
-	MOVQ	$0, 0(RARG)
-	MOVL	AX, 0(RARG)	/* store savemask */
+TEXT	sigsetjmp(SB), $0
+	/* R15 = sigjmp_buf, 8(SP) = savemask */
+	MOVL	savemask+8(SP), AX
+	MOVQ	$0, 0(R15)
+	MOVL	AX, 0(R15)	/* set */
 	MOVQ	_psigblocked(SB), AX
-	MOVQ	AX, 8(RARG)	/* store blocked mask */
+	MOVQ	AX, 8(R15)	/* blocked */
 	
-	/* Inline setjmp logic into the sigjmp_buf starting at offset 16 */
-	MOVQ	SP, 16(RARG)
+	/* Inline setjmp at offset 16 */
+	MOVQ	SP, 16(R15)
 	MOVQ	0(SP), AX
-	MOVQ	AX, 24(RARG)
-	MOVQ	BP, 32(RARG)
-	MOVQ	BX, 40(RARG)
-	MOVQ	R12, 48(RARG)
-	MOVQ	R13, 56(RARG)
-	MOVQ	R14, 64(RARG)
-	MOVQ	R15, 72(RARG)
-	
+	MOVQ	AX, 24(R15)
+	MOVQ	BP, 32(R15)
+	MOVQ	BX, 40(R15)
 	MOVL	$0, AX
 	RET
 
 /*
  * Entry point for Plan 9 notes.
- * Kernel pushes: msg(16(SP)), u(8(SP)), dummy_pc(0(SP)).
+ * Kernel delivers u in BP (kernel's RARG), msg on stack.
  */
-TEXT	_notehandler(SB), $0
-	MOVQ	8(SP), RARG	/* u */
-	MOVQ	16(SP), AX	/* msg */
-	
-	/* Manually create frame to ensure alignment and argument safety */
-	PUSHQ	R12
-	MOVQ	SP, R12
-	SUBQ	$32, SP
-	ANDQ	$~15, SP
-	
-	MOVQ	AX, 8(SP)	/* msg at 8(FP) for C */
+TEXT	_notehandler(SB), 1, $0
+	MOVQ	BP, R15		/* u into R15 for 6c */
+	MOVQ	8(SP), AX	/* msg */
+	PUSHQ	AX
+	PUSHQ	R15
 	CALL	_ape_notehandler(SB)
-	
-	MOVQ	R12, SP
-	POPQ	R12
+	POPQ	R15
+	POPQ	AX
+	/* If we return, must terminate */
+	MOVQ	$1, AX		/* NDFLT */
+	PUSHQ	AX
+	CALL	_signoted(SB)
 	RET
 
 /*
  * Stack-safe kernel restore bridge.
- * _signoted(Ureg *u, int v)
  */
-TEXT	_signoted(SB), 1, $32
-	MOVQ	u+0(FP), RARG	/* u */
-	MOVL	v+8(FP), AX	/* v */
-	
-	PUSHQ	R12
-	MOVQ	SP, R12
-	SUBQ	$128, SP	/* safe zone */
-	ANDQ	$~15, SP
-	
-	MOVQ	RARG, 8(SP)	/* Arg 0: u */
-	MOVQ	AX, 16(SP)	/* Arg 1: v */
-	MOVQ	$33, R15	/* syscall noted */
+TEXT	_signoted(SB), $0
+	MOVL	v+8(SP), AX
+	MOVQ	AX, 8(SP)
+	MOVQ	$33, BP		/* syscall noted in BP (kernel RARG) */
 	SYSCALL
-	
-	MOVQ	R12, SP
-	POPQ	R12
 	RET
