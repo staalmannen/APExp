@@ -73,11 +73,11 @@ _ape_notehandler(Ureg *u, char *msg)
 
 extern sigset_t	_psigblocked;
 
-/* Layout must match sigsetjmp in setjmp.s (offset 16) */
+/* Layout must match sigsetjmp in setjmp.s */
 typedef struct {
 	unsigned long long set;
 	unsigned long long blocked;
-	unsigned long long jmpbuf[4]; /* SP, PC, BP, BX */
+	unsigned long long jmpbuf[2]; 
 } sigjmp_buf_amd64;
 
 void
@@ -96,8 +96,6 @@ siglongjmp(sigjmp_buf j, int ret)
 		u->ax = (ret == 0) ? 1 : ret;
 		u->pc = jb->jmpbuf[1];
 		u->sp = jb->jmpbuf[0] + 8;
-		u->bp = jb->jmpbuf[2];
-		u->bx = jb->jmpbuf[3];
 		_NOTED(3); /* NRSTR */
 	}
 
