@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_PREREQ(2.64)
+AC_PREREQ([2.72])
 AC_INIT([libcroco],[0.6.13],[http://bugzilla.gnome.org/enter_bug.cgi?product=libcroco],[libcroco])
 AC_CONFIG_SRCDIR([src/cr-input.c])
 AC_CANONICAL_HOST
@@ -43,8 +43,16 @@ AC_PROG_CC
 AC_PROG_INSTALL
 AC_PROG_CPP
 AC_PROG_MAKE_SET
-AC_STDC_HEADERS
-AC_ISC_POSIX
+m4_warn([obsolete],
+[The preprocessor macro 'STDC_HEADERS' is obsolete.
+  Except in unusual embedded environments, you can safely include all
+  C89 headers unconditionally.])dnl
+# Autoupdate added the next two lines to ensure that your configure
+# script's behavior did not change.  They are probably safe to remove.
+AC_CHECK_INCLUDES_DEFAULT
+AC_PROG_EGREP
+
+AC_SEARCH_LIBS([strerror],[cposix])
 
 LT_INIT([])
 
@@ -69,8 +77,7 @@ dnl messages issued by the user
 dnl ***************************************************************
 G_DISABLE_CHECKS=0
 AC_ARG_ENABLE(checks,
-		AC_HELP_STRING([--enable-checks=yes|no],
-	 	[enables runtime safety checks. Default=yes]),
+		AS_HELP_STRING([--enable-checks=yes|no],[enables runtime safety checks. Default=yes]),
 		WITH_CHECKS=$enableval,
 		WITH_CHECKS="yes")
 
@@ -146,7 +153,7 @@ CC_CHECK_CFLAGS_APPEND([ \
 
 ##########################################
 
-AC_OUTPUT([
+AC_CONFIG_FILES([
 Makefile
 libcroco.pc
 libcroco.spec
@@ -174,6 +181,7 @@ src/libcroco-config.h
 csslint/Makefile
 
 ])
+AC_OUTPUT
 
 dnl =======================================================================
 echo "
