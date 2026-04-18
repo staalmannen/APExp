@@ -27,7 +27,7 @@
 /* #undef BITSIZEOF_SIZE_T */
 
 /* Define to the number of bits in type 'wchar_t'. */
-#define BITSIZEOF_WCHAR_T 32
+#define BITSIZEOF_WCHAR_T 16
 
 /* Define to the number of bits in type 'wint_t'. */
 /* #undef BITSIZEOF_WINT_T */

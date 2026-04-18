@@ -27,7 +27,7 @@
 /* #undef BITSIZEOF_SIZE_T */
 
 /* Define to the number of bits in type 'wchar_t'. */
-#define BITSIZEOF_WCHAR_T 32
+#define BITSIZEOF_WCHAR_T 16
 
 /* Define to the number of bits in type 'wint_t'. */
 /* #undef BITSIZEOF_WINT_T */
@@ -447,7 +447,7 @@
 #define HAVE_ARPA_INET_H 1
 
 /* Define to 1 if you have the <arpa/nameser.h> header file. */
-#define HAVE_ARPA_NAMESER_H 1
+/* #undef HAVE_ARPA_NAMESER_H */
 
 /* Define to 1 if you have the <bp-sym.h> header file. */
 /* #undef HAVE_BP_SYM_H */
@@ -712,7 +712,7 @@
 #define HAVE_MALLOC_0_NONNULL 1
 
 /* Define to 1 if you have the <malloc.h> header file. */
-#define HAVE_MALLOC_H 1
+/* #undef HAVE_MALLOC_H */
 
 /* Define if malloc and calloc set errno on allocation failure. */
 #define HAVE_MALLOC_POSIX 1
@@ -796,7 +796,7 @@
 #define HAVE_REALLOC_POSIX 1
 
 /* Define to 1 if you have the <resolv.h> header file. */
-#define HAVE_RESOLV_H 1
+/* #undef HAVE_RESOLV_H */
 
 /* Define to 1 if 'long double' and 'double' have the same representation. */
 /* #undef HAVE_SAME_LONG_DOUBLE_AS_DOUBLE */
