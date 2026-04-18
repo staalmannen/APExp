@@ -51,6 +51,7 @@ notecont(void)
 	p = &pcstack[nstack-1];
 	p->u->pc = p->restorepc;
 	f = p->hdlr;
+	/* Resumed from NSAVE: BP (RARG) contains u, stack is preserved */
 	(*f)(p->sig, p->msg, p->u);
 	nstack--;
 	_NOTED(3);	/* NRSTR */
@@ -73,12 +74,13 @@ _ape_notehandler(Ureg *u, char *msg)
 		}
 		_NOTED(0); /* NCONT */
 	}
+	_NOTED(1); /* NDFLT */
 	return 0;
 }
 
 extern sigset_t	_psigblocked;
 
-/* Layout must match sigsetjmp in setjmp.s (8-byte slots) */
+/* Layout must match sigsetjmp in setjmp.s (offset 16) */
 typedef struct {
 	unsigned long long set;
 	unsigned long long blocked;
@@ -100,7 +102,7 @@ siglongjmp(sigjmp_buf j, int ret)
 		nstack--;
 		u->ax = (ret == 0) ? 1 : ret;
 		u->pc = jb->jmpbuf[1];
-		u->sp = jb->jmpbuf[0] + 8;
+		u->sp = jb->jmpbuf[0];
 		_NOTED(3); /* NRSTR */
 	}
 
