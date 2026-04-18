@@ -101,7 +101,8 @@ siglongjmp(sigjmp_buf j, int ret)
 		nstack--;
 		
 		/* 
-		 * Synchronize all registers into the Ureg before restoration.
+		 * Synchronize all General Purpose registers into the Ureg 
+		 * before restoration to ensure a consistent context.
 		 */
 		u->ax = (ret == 0) ? 1 : ret;
 		u->pc = jb->jmpbuf[1];

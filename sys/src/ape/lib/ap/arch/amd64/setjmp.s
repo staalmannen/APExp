@@ -1,10 +1,10 @@
 /*
- * amd64 setjmp/longjmp
+ * amd64 setjmp/longjmp (Stack-Safe Version)
  * jmp_buf layout (8-byte slots):
  *  0: SP, 1: PC, 2: BP, 3: BX, 4: R12, 5: R13, 6: R14, 7: R15
  */
 
-TEXT	setjmp(SB), 1, $0
+TEXT	setjmp(SB), $0
 	MOVQ	SP, 0(RARG)
 	MOVQ	0(SP), AX	/* Return PC */
 	MOVQ	AX, 8(RARG)
@@ -17,8 +17,9 @@ TEXT	setjmp(SB), 1, $0
 	MOVL	$0, AX
 	RET
 
-TEXT	longjmp(SB), 1, $0
-	MOVL	val+8(FP), AX
+TEXT	longjmp(SB), $0
+	/* RARG = jmp_buf, 0(FP) = val */
+	MOVL	val+0(FP), AX
 	TESTL	AX, AX
 	JNZ	ok
 	MOVL	$1, AX
@@ -28,22 +29,22 @@ ok:
 	MOVQ	32(RARG), R12
 	MOVQ	40(RARG), R13
 	MOVQ	48(RARG), R14
-	
-	MOVQ	0(RARG), SP	/* Restore SP to call site state */
-	MOVQ	8(RARG), DI	/* Target PC */
 	MOVQ	56(RARG), R15
 	
-	MOVQ	DI, 0(SP)	/* Put target PC on stack for RET */
-	RET
+	MOVQ	0(RARG), SP
+	ADDQ	$8, SP		/* Stack-safe: simulate POP of return address */
+	MOVQ	8(RARG), DI	/* Target PC */
+	JMP	DI		/* Jump without writing to stack */
 
-TEXT	sigsetjmp(SB), 1, $0
-	MOVL	savemask+8(FP), AX
+TEXT	sigsetjmp(SB), $0
+	/* RARG = sigjmp_buf, 0(FP) = savemask */
+	MOVL	savemask+0(FP), AX
 	MOVQ	$0, 0(RARG)
-	MOVL	AX, 0(RARG)	/* store 32-bit savemask */
+	MOVL	AX, 0(RARG)	/* store savemask */
 	MOVQ	_psigblocked(SB), AX
-	MOVQ	AX, 8(RARG)	/* store 64-bit blocked mask */
+	MOVQ	AX, 8(RARG)	/* store blocked mask */
 	
-	/* Inline setjmp logic into the sigjmp_buf starting at offset 16 */
+	/* Inline setjmp logic into sigjmp_buf starting at offset 16 */
 	MOVQ	SP, 16(RARG)	/* jmpbuf[0] */
 	MOVQ	0(SP), AX
 	MOVQ	AX, 24(RARG)	/* jmpbuf[1] */
