@@ -6,10 +6,10 @@
  * Buffers must be large enough to hold all callee-saved registers (64-bit).
  * We save 8 registers: SP, PC, BP, BX, R12, R13, R14, R15.
  * 8 * 8 = 64 bytes.
- * int[20] = 80 bytes, providing headroom.
+ * int[24] = 96 bytes, providing ample room.
  */
-typedef int jmp_buf[20];
-typedef int sigjmp_buf[30];
+typedef int jmp_buf[24];
+typedef int sigjmp_buf[32];
 
 #ifdef __cplusplus
 extern "C" {

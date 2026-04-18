@@ -2,6 +2,7 @@
 #include "../../include/sys9.h"
 #include <signal.h>
 #include <setjmp.h>
+#include <ureg.h>
 #include <string.h>
 #include <stdlib.h>
 
@@ -44,7 +45,7 @@ notecont(void)
 {
 	Pcstack *p;
 	void(*f)(int, char*, Ureg*);
-	extern void _signoted(Ureg*, int, unsigned long long, unsigned long long);
+	extern void _signoted(Ureg*, int);
 
 	if(nstack <= 0)
 		_EXITS("notecont: nstack <= 0");
@@ -54,7 +55,7 @@ notecont(void)
 	f = p->hdlr;
 	(*f)(p->sig, p->msg, p->u);
 	nstack--;
-	_signoted(p->u, 3, 0, 0);	/* NRSTR */
+	_signoted(p->u, 3);	/* NRSTR */
 }
 
 int
@@ -62,7 +63,7 @@ _ape_notehandler(Ureg *u, char *msg)
 {
 	extern void (*_sighdlr[])(int, char*, Ureg*);
 	extern int _stringsig(char*);
-	extern void _signoted(Ureg*, int, unsigned long long, unsigned long long);
+	extern void _signoted(Ureg*, int);
 	int sig;
 	void (*f)(int, char*, Ureg*);
 
@@ -73,9 +74,8 @@ _ape_notehandler(Ureg *u, char *msg)
 			pcstack[nstack].msg = msg;
 			_notetramp(sig, f, u);
 		}
-		_signoted(u, 0, 0, 0); /* NCONT */
+		_signoted(u, 0); /* NCONT */
 	}
-	_signoted(u, 1, 0, 0); /* NDFLT */
 	return 0;
 }
 
@@ -93,7 +93,7 @@ siglongjmp(sigjmp_buf j, int ret)
 {
 	sigjmp_buf_amd64 *jb = (sigjmp_buf_amd64*)j;
 	Ureg *u;
-	extern void _signoted(Ureg*, int, unsigned long long, unsigned long long);
+	extern void _signoted(Ureg*, int);
 
 	if(jb->set & 0xFFFFFFFF){
 		_psigblocked = jb->blocked;
@@ -103,8 +103,10 @@ siglongjmp(sigjmp_buf j, int ret)
 		u = pcstack[nstack-1].u;
 		nstack--;
 		
-		/* Synchronize registers into Ureg for kernel restoration */
+		/* Synchronize General Purpose registers into Ureg for restoration */
 		u->ax = (ret == 0) ? 1 : ret;
+		u->pc = jb->jmpbuf[1];
+		u->sp = jb->jmpbuf[0] + 8;
 		u->bp = jb->jmpbuf[2];
 		u->bx = jb->jmpbuf[3];
 		u->r12 = jb->jmpbuf[4];
@@ -112,7 +114,7 @@ siglongjmp(sigjmp_buf j, int ret)
 		u->r14 = jb->jmpbuf[6];
 		u->r15 = jb->jmpbuf[7];
 		
-		_signoted(u, 3, jb->jmpbuf[1], jb->jmpbuf[0] + 8); /* NRSTR */
+		_signoted(u, 3); /* NRSTR */
 	}
 
 	longjmp((void*)jb->jmpbuf, ret);
