@@ -62,6 +62,7 @@ _ape_notehandler(Ureg *u, char *msg)
 {
 	extern void (*_sighdlr[])(int, char*, Ureg*);
 	extern int _stringsig(char*);
+	extern void _signoted(Ureg*, int);
 	int sig;
 	void (*f)(int, char*, Ureg*);
 
@@ -72,13 +73,14 @@ _ape_notehandler(Ureg *u, char *msg)
 			pcstack[nstack].msg = msg;
 			_notetramp(sig, f, u);
 		}
+		_signoted(u, 0); /* NCONT */
 	}
 	return 0;
 }
 
 extern sigset_t	_psigblocked;
 
-/* Layout must match sigsetjmp in setjmp.s (offset 16) */
+/* Layout must match sigsetjmp in setjmp.s */
 typedef struct {
 	unsigned long long set;
 	unsigned long long blocked;
