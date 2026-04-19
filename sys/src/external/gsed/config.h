@@ -960,7 +960,7 @@
 #define HAVE_LC_MESSAGES 1
 
 /* Define to 1 if you have the <libintl.h> header file. */
-/* #undef HAVE_LIBINTL_H */
+#define HAVE_LIBINTL_H 1
 
 /* Define to 1 if the bcrypt library is guaranteed to be present. */
 /* #undef HAVE_LIB_BCRYPT */

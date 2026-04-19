@@ -1282,7 +1282,7 @@
 #define HAVE_GETOPT_LONG_ONLY 1
 
 /* Define to 1 if the system has the 'getpagesize' function. */
-/* #undef HAVE_GETPAGESIZE */
+#define HAVE_GETPAGESIZE 1
 
 /* Define to 1 if you have the `getppriv' function. */
 /* #undef HAVE_GETPPRIV */
@@ -1349,7 +1349,7 @@
 #define HAVE_LIBGEN_H 1
 
 /* Define to 1 if you have the <libintl.h> header file. */
-/* #undef HAVE_LIBINTL_H */
+#define HAVE_LIBINTL_H 1
 
 /* Define to 1 if the bcrypt library is guaranteed to be present. */
 /* #undef HAVE_LIB_BCRYPT */

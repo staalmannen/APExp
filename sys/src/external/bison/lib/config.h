@@ -918,7 +918,7 @@
 #define HAVE_GETOPT_LONG_ONLY 1
 
 /* Define to 1 if the system has the 'getpagesize' function. */
-/* #undef HAVE_GETPAGESIZE */
+#define HAVE_GETPAGESIZE 1
 
 /* Define to 1 if you have the `getprogname' function. */
 #define HAVE_GETPROGNAME 1
@@ -984,7 +984,8 @@
 #define HAVE_LDEXP_IN_LIBC 1
 
 /* Define if you have the libtextstyle library. */
-/* #undef HAVE_LIBTEXTSTYLE */
+// we have a shim header dealing with it.
+#define HAVE_LIBTEXTSTYLE 1
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
