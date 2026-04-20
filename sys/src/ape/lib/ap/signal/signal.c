@@ -76,7 +76,7 @@ sigsetjmp(sigjmp_buf buf, int savemask)
  * stub or a 3-arg declaration; left for a later pass.
  */
 int
-_notehandler(Ureg *u, char *msg)
+_notehandler(Ureg *u, Ureg *dummy, char *msg)
 {
 	int i;
 	void (*f)(int, char*, Ureg*);
