@@ -84,4 +84,8 @@ u->r15 = jb->jmpbuf[7];
 ```
 
 ### 3. Corrected Startup Sequence
-Updated `main9.s` to use a non-stack-modifying `JMP` to enter the C runtime, ensuring `argc` and `argv` are perfectly aligned with the compiler's frame pointer expectations.
+Updated `main9.s` to use `JMPF` (not `JMP`) to enter the C runtime, and moved `GLOBL _tos(SB), $8` before the `TEXT` directive to match the upstream layout.
+
+**Why `JMPF` matters:** The 6l linker treats `TEXT f(SB)` containing `JMP g(SB)` as a normal function and may insert a REGEXT (R15) save/restore prologue. For `_main`, this prologue emits `SUBQ $8, SP; MOVQ R15, 0(SP)` before our two `PUSHQ` instructions. This shifts the stack by 8 bytes, so `_callmain` reads R15's saved value as `argc` instead of the kernel's real `argc`. The corrupted `argc` and `argv` cascade into all downstream startup code — including the first `setjmp`/`sigsetjmp` call sites, which then save a wrong SP value that later causes the suicide trap (or GPV).
+
+`JMPF` signals to the linker that `_main` is a dispatch stub, suppressing the REGEXT prologue and preserving the correct stack layout for `_callmain`.

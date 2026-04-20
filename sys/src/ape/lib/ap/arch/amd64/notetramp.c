@@ -81,8 +81,17 @@ siglongjmp(sigjmp_buf j, int ret)
 
 	if(jb->set & 0xFFFFFFFF)
 		_psigblocked = jb->blocked;
+
+	/*
+	 * If we are jumping "out" of one or more signal handlers,
+	 * we must pop the corresponding pcstack entries.
+	 */
+	while(nstack > 0 && pcstack[nstack-1].u->sp < jb->jmpbuf[JMPBUFSP])
+		nstack--;
+
 	if(nstack == 0 || pcstack[nstack-1].u->sp > jb->jmpbuf[JMPBUFSP])
 		longjmp((void*)jb->jmpbuf, ret);
+
 	u = pcstack[nstack-1].u;
 	nstack--;
 	/*
