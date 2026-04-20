@@ -8,7 +8,7 @@ _CORE_APPS=\
 # parsing/editing source etc \
 	as\
 	lex\
-	yacc\
+	bison\
 	awk\
 	sed\
 # often invoked during make \
@@ -30,8 +30,10 @@ _OPTIONAL_APPS=\
 	unrar\
 	xz\
 	xzdec\
+	tar\
 # languages and transpilers \
 	lua\
+	tclsh\
 	f2c\
 	p2c\
 	objc\

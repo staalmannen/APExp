@@ -1,0 +1,13 @@
+#!/bin/rc
+
+rm amd64/bin/ape/*
+rm amd64/lib/ape/*
+
+cd sys/src/ape/
+
+cd lib && mk clean
+
+cd ../cmd && mk clean
+
+
+
