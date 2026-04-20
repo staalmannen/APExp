@@ -3,8 +3,10 @@
  *
  * Two fixes from upstream 9front:
  *
- * 1. Arg offset: APExp 6c does NOT push the first arg to the stack, so the
- *    second arg is at 0(FP)=8(SP), not 8(FP)=16(SP) as in upstream 9front.
+ * 1. Arg offset: APExp 6c puts the first arg in RARG (BP) but regaalloc1 still
+ *    reserves a 0(FP) slot for it.  So the second arg is at 8(FP)=[SP+16],
+ *    same as upstream 9front.  main9.s uses PUSHQ RARG + PUSHQ $0 to shift
+ *    the kernel's initial argc/arg0 from [SP+0]/[SP+8] to [SP+16]/[SP+24].
  *
  * 2. longjmp stack safety: upstream writes the return PC to 0(SP) then RETs,
  *    which faults if SP is at USTKTOP (0x7ffffffff000) as it often is at
@@ -17,7 +19,7 @@
  */
 
 TEXT	longjmp(SB), $0
-	MOVL	r+0(FP), AX		/* APExp: second arg at 0(FP), not 8(FP) */
+	MOVL	r+8(FP), AX		/* second arg at 8(FP): regaalloc1 reserves slot at 0(FP) for RARG */
 	CMPL	AX, $0
 	JNE	ok			/* ansi: "longjmp(0) => longjmp(1)" */
 	MOVL	$1, AX
@@ -35,7 +37,7 @@ TEXT	setjmp(SB), $0
 	RET
 
 TEXT	sigsetjmp(SB), $0
-	MOVL	savemask+0(FP), BX	/* APExp: second arg at 0(FP), not 8(FP) */
+	MOVL	savemask+8(FP), BX	/* second arg at 8(FP): regaalloc1 reserves 0(FP) for RARG */
 	MOVL	BX, 0(RARG)
 	MOVQ	_psigblocked(SB), BX	/* VALUE of _psigblocked, not address */
 	MOVQ	BX, 8(RARG)
