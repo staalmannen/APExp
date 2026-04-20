@@ -42,13 +42,8 @@ notecont(Ureg *u, char *s)
 	p = &pcstack[nstack-1];
 	f = p->hdlr;
 	u->pc = p->restorepc;
-	(*f)(p->sig, s, u);
-	/*
-	 * Decrement AFTER handler returns so that siglongjmp called from
-	 * inside the handler sees nstack>0 and takes the NRSTR path instead
-	 * of falling through to longjmp (which would crash near USTKTOP).
-	 */
 	nstack--;
+	(*f)(p->sig, s, u);
 	_NOTED(3);	/* NRSTR */
 }
 

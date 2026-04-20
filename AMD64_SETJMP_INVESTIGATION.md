@@ -17,16 +17,39 @@ Plan 9 amd64 processes often start with a stack pointer at the absolute limit of
 *   **Original Bug**: `longjmp` used the `RET` instruction, which requires pushing the target PC onto the stack. If the stack was already at the boundary, this write triggered a suicide trap.
 *   **Fix**: Re-implemented `longjmp` to use a direct `JMP` after restoring `SP`, ensuring it **never writes to the stack** during context restoration.
 
-### 2. Register/Calling Convention Mismatches
-There was a critical three-way mismatch in register usage:
-*   **APE Compiler (6c)**: Uses `R15` as the first argument register (`RARG`) for C functions.
-*   **Plan 9 Kernel**: Delivers signals with arguments on the stack but uses `BP` as the argument register for system calls.
-*   **APE Syscall Wrappers**: C functions that attempted to use the stack, causing faults at the boundary.
+### 2. Register/Calling Convention for Note Handlers
+APExp's 6c uses `BP` as `RARG` (first argument register). The Plan 9 kernel sets `ureg->bp = nureg`
+(the Ureg pointer) when delivering notes, matching this convention exactly — so note handlers
+compiled with 6c receive the correct Ureg pointer in RARG=BP. The second argument (note string)
+is placed at 0(FP)=[SP+8], but the kernel puts it at [SP+16] (one slot higher due to the first-arg
+shadow slot). This means the `char *msg` parameter in `_notehandler` gets the Ureg pointer rather
+than the string, causing signal table lookup to always fail; the process falls through to
+`_NOTED(1)` (default action). This is the same behaviour as upstream 9front APE and is harmless
+for most signals (the signal number in RARG is still correct).
 
-### 3. Incomplete Context Restoration in `NRSTR`
-The kernel's `noted(NRSTR)` path reloads **all** General Purpose Registers from the `Ureg` structure.
-*   **Original Bug**: APE only updated `AX`, `PC`, and `SP` in the `Ureg`. Registers like `BP`, `BX`, and `R12-R15` were restored with stale values from the signal handler context, causing immediate GPVs.
-*   **Fix**: `siglongjmp` now explicitly synchronizes all 8 general-purpose registers from the jump buffer into the `Ureg` before restoration.
+### 3. `nstack--` Ordering in `notecont` + Callee-Save Register Corruption
+The call flow through `_notetramp` → NSAVE → `notecont` → signal handler → `siglongjmp` involves
+two independent issues:
+
+**Bug A — nstack ordering (primary crash cause):**
+Upstream APE decrements `nstack` BEFORE calling `(*f)()`, so when the signal handler calls
+`siglongjmp`, `nstack==0` and siglongjmp takes the `longjmp()` path.  A previous "fix" moved
+`nstack--` AFTER `(*f)()` to force the NRSTR path (since the old longjmp wrote to the stack and
+crashed at USTKTOP).  But once `longjmp` was rewritten to use `ADDQ $8,SP + JMP` (no stack write),
+the longjmp() path became safe again.  With `nstack--` AFTER `(*f)()`, siglongjmp took the NRSTR
+path which has subtler interactions with the NSAVE/NRSTR note stack, causing a GPV at a slightly
+different address.
+*   **Fix**: Restored upstream ordering — `nstack--` BEFORE `(*f)()`. siglongjmp always sees
+    `nstack==0` for a single-level signal and takes the safe `longjmp()` path.
+
+**Bug B — incomplete jmpbuf / callee-save register corruption in NRSTR path:**
+`sigjmp_buf_amd64.jmpbuf` was declared `[2]` (SP and PC only), but `sigsetjmp` in `setjmp.s`
+saves 8 registers (SP, PC, BP, BX, R12–R15).  The NRSTR path (reached for nested signals) only
+restored AX, PC, and SP into the Ureg, leaving BP/BX/R12–R15 stale.  The kernel's
+`noted(NRSTR)` → `setregisters()` copies the Ureg verbatim, so stale callee-saved values
+(especially R15=REGEXT) were restored at the sigsetjmp site → GPV.
+*   **Fix**: Expanded `jmpbuf[2]` → `jmpbuf[8]` in the struct; added full register sync in the
+    NRSTR path (kept for the nested-signal case).
 
 ### 4. Linker Frame Requirements
 The Plan 9 linker (`6l`) requires strictly balanced stack operations.
