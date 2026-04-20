@@ -2,33 +2,32 @@ GLOBL	_tos(SB), $8
 
 TEXT	_main(SB), 1, $0
 	MOVQ	AX, _tos(SB)
-	MOVQ	SP, R12			/* R12 = old (kernel) SP */
+	MOVQ	SP, R12			/* R12 = kernel SP */
 	
-	/* Shift stack down by 2MB to provide absolute safety from USTKTOP */
-	SUBQ	$2097152, SP
-	ANDQ	$~15, SP		/* 16-byte alignment */
+	/* 1. diagnostic jump over NOPs to move binary offsets */
+	JMP	start
+	BYTE	$0x90; BYTE	$0x90; BYTE	$0x90; BYTE	$0x90
+	BYTE	$0x90; BYTE	$0x90; BYTE	$0x90; BYTE	$0x90
+	BYTE	$0x90; BYTE	$0x90; BYTE	$0x90; BYTE	$0x90
+	BYTE	$0x90; BYTE	$0x90; BYTE	$0x90; BYTE	$0x90
+
+start:
+	/* 2. simple 64KB stack shift */
+	SUBQ	$65536, SP
+	ANDQ	$~15, SP
 	
-	/* Relocate [argc, argv[0], ..., NULL] from kernel stack to new stack.
-	 * Total slots: argc (1) + argv pointers (argc + 1) = argc + 2 slots.
-	 * We place them starting at 16(SP) so that after PUSHQ $0 they align with 8(FP).
-	 */
+	/* 3. copy argc, argv block */
 	MOVQ	0(R12), AX		/* AX = argc */
 	MOVQ	AX, CX
-	ADDQ	$2, CX			/* CX = argc + 2 slots */
+	ADDQ	$2, CX
 	MOVQ	R12, SI
 	MOVQ	SP, DI
-	ADDQ	$8, DI			/* DI = SP + 8 (target for argc) */
+	ADDQ	$8, DI			/* target for argc */
 	CLD
-	REP; MOVSQ			/* Relocate the block */
+	REP; MOVSQ
 	
-	/* Set up _callmain(f, argc, arg0)
-	 * f is passed in RARG (BP) and also in the shadow slot at 0(FP).
-	 */
+	/* 4. dispatch to _callmain(f, argc, arg0) */
 	MOVQ	$_apemain(SB), RARG
-	MOVQ	RARG, 0(SP)		/* f shadow slot at 0(FP) before PUSH */
-	
-	/* Fake return address and jump to C runtime.
-	 * Using JMPF and TEXT flag 1 (NOPROF) suppresses linker prologues.
-	 */
+	MOVQ	RARG, 0(SP)		/* f shadow slot */
 	PUSHQ	$0
 	JMPF	_callmain(SB)
