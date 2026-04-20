@@ -99,7 +99,7 @@ extern void	_detachbuf(void);
 extern void	_finish(int, char *);
 extern char	*_ultoa(char *, unsigned long);
 extern int	_notehandler(void *, char *);
-extern void	_notetramp(int, void (*)(int, char*, Ureg*), Ureg*);
+extern void	_notetramp(int, void (*)(int, char*, Ureg*), Ureg*, char*);
 extern void	_syserrno(void);
 extern int	_getpw(int *, char **, char **);
 extern int _isatty(int);
