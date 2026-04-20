@@ -1,102 +1,76 @@
 /*
- * amd64 setjmp/longjmp
+ * amd64 setjmp/longjmp for APExp.
  *
  * jmp_buf layout (8-byte slots):
- *  [0]: SP   [1]: PC   [2]: BP   [3]: BX
- *  [4]: R12  [5]: R13  [6]: R14  [7]: R15
+ *  [0]: SP   [1]: PC
  *
  * sigjmp_buf layout:
- *  [0]: set (savemask flag, 4 bytes used)
+ *  [0]: set (savemask flag, low 4 bytes)
  *  [8]: blocked (_psigblocked value)
- * [16]: jmpbuf[0..7] as above (SP, PC, BP, BX, R12..R15)
+ * [16]: jmpbuf[0] = SP
+ * [24]: jmpbuf[1] = PC (return address of sigsetjmp)
  *
- * Plan 9 amd64 calling convention:
- *   RARG (= BP) carries the first argument (pointer).
- *   Subsequent args are on the stack at 0(FP), 8(FP), ...
- *   (FP = SP + frame_size + 8; for frame $0: FP = SP + 8)
- *
- * Syscall convention:
- *   RARG = syscall number; first user arg at 0(FP) = 8(SP).
+ * Plan 9 amd64 calling convention (APExp / 6c):
+ *   RARG (= BP register) carries the first argument.
+ *   Subsequent args are on the stack at 0(FP)=8(SP), 8(FP)=16(SP), ...
+ *   The first arg is NOT also pushed to the stack (unlike upstream 9front).
  *
  * _notehandler assembly:
- *   The kernel calls the notify handler with RARG=nureg,
- *   [sp+8]=nureg, [sp+16]=msg.  The assembly wrapper moves msg
- *   from [sp+16] to 0(FP) of _ape_notehandler (APExp C convention).
+ *   The kernel delivers notes with RARG=nureg, [sp+0]=0 (retPC), [sp+8]=nureg,
+ *   [sp+16]=msg.  The stub overwrites the retPC placeholder at [sp+0] with msg,
+ *   then CALLs _ape_notehandler.  After the CALL pushes a return address,
+ *   msg lands at [sp+8]=0(FP) in the callee — matching APExp's convention.
+ *   _ape_notehandler never returns (it always calls _NOTED before returning).
  */
 
 TEXT	setjmp(SB), $0
 	MOVQ	SP, 0(RARG)
-	MOVQ	0(SP), AX		/* return PC */
-	MOVQ	AX, 8(RARG)
-	MOVQ	BP, 16(RARG)
-	MOVQ	BX, 24(RARG)
-	MOVQ	R12, 32(RARG)
-	MOVQ	R13, 40(RARG)
-	MOVQ	R14, 48(RARG)
-	MOVQ	R15, 56(RARG)
+	MOVQ	0(SP), BX		/* return PC */
+	MOVQ	BX, 8(RARG)
 	MOVL	$0, AX
 	RET
 
 TEXT	longjmp(SB), $0
-	MOVL	val+0(FP), AX		/* second arg: val at 0(FP) */
-	TESTL	AX, AX
-	JNZ	ok
+	MOVL	val+0(FP), AX		/* second arg at 0(FP) in APExp convention */
+	CMPL	AX, $0
+	JNE	ok
 	MOVL	$1, AX
 ok:
-	MOVQ	16(RARG), BP
-	MOVQ	24(RARG), BX
-	MOVQ	32(RARG), R12
-	MOVQ	40(RARG), R13
-	MOVQ	48(RARG), R14
-	MOVQ	56(RARG), R15
 	MOVQ	0(RARG), SP
-	ADDQ	$8, SP			/* simulate pop of return address */
-	MOVQ	8(RARG), DI		/* target PC into scratch reg */
-	JMP	DI			/* no write to stack */
+	ADDQ	$8, SP			/* skip return-address slot; no stack write */
+	MOVQ	8(RARG), BX		/* target PC into scratch register */
+	JMP	BX			/* stack-safe: no write near USTKTOP */
 
 TEXT	sigsetjmp(SB), $0
-	MOVL	savemask+0(FP), AX	/* second arg: savemask at 0(FP) */
-	MOVQ	$0, 0(RARG)
-	MOVL	AX, 0(RARG)		/* set savemask flag (low 32 bits) */
-	MOVQ	_psigblocked(SB), AX	/* VALUE of _psigblocked, not address */
-	MOVQ	AX, 8(RARG)
-	/* inline setjmp at offset 16 */
+	MOVL	savemask+0(FP), BX	/* second arg at 0(FP) */
+	MOVL	$0, 0(RARG)
+	MOVL	BX, 0(RARG)		/* store savemask flag (low 32 bits) */
+	MOVQ	_psigblocked(SB), BX	/* VALUE of _psigblocked (not address) */
+	MOVQ	BX, 8(RARG)
 	MOVQ	SP, 16(RARG)
-	MOVQ	0(SP), AX		/* return PC */
-	MOVQ	AX, 24(RARG)
-	MOVQ	BP, 32(RARG)
-	MOVQ	BX, 40(RARG)
-	MOVQ	R12, 48(RARG)
-	MOVQ	R13, 56(RARG)
-	MOVQ	R14, 64(RARG)
-	MOVQ	R15, 72(RARG)
+	MOVQ	0(SP), BX		/* return PC */
+	MOVQ	BX, 24(RARG)
 	MOVL	$0, AX
 	RET
 
 /*
  * Entry point for Plan 9 notes (registered via _NOTIFY).
  *
- * The kernel delivers notes by jumping here with:
+ * Kernel delivery layout:
  *   RARG (BP) = nureg*
- *   [sp+0]   = 0  (return PC placeholder)
- *   [sp+8]   = nureg*  (first arg, also in RARG)
- *   [sp+16]  = msg*    (second arg)
+ *   [sp+0]  = 0        (return PC placeholder, never used)
+ *   [sp+8]  = nureg*   (first arg, also in RARG)
+ *   [sp+16] = msg*     (second arg in upstream convention, third in APExp)
  *
- * APExp's C calling convention: first arg in RARG only (not on stack);
- * second arg at 0(FP) = 8(SP_in_callee).
- * We must move msg from [sp+16] to 0(SP) before CALL so that after
- * CALL pushes the return PC, msg ends up at 8(SP) = 0(FP). ✓
+ * APExp second-arg convention: 0(FP) = [sp+8] after CALL.
+ * We overwrite the kernel's placeholder at [sp+0] with msg, then CALL.
+ * After CALL pushes the return address, msg sits at [sp+8]=0(FP). ✓
  *
- * _ape_notehandler never returns — it always calls _NOTED before returning.
+ * _ape_notehandler never returns — it always calls _NOTED.
  */
 TEXT	_notehandler(SB), $0
-	MOVQ	8(SP), RARG		/* nureg (redundant: kernel already set RARG) */
 	MOVQ	16(SP), AX		/* msg */
-	MOVQ	SP, R11			/* save SP for return */
-	SUBQ	$16, SP
-	ANDQ	$~15, SP		/* align stack to 16 bytes */
-	MOVQ	AX, 0(SP)		/* msg at 0(SP): after CALL → 0(FP) in callee */
+	MOVQ	AX, 0(SP)		/* overwrite retPC placeholder with msg */
 	CALL	_ape_notehandler(SB)	/* RARG=nureg, 0(FP)=msg */
 	/* _ape_notehandler always calls _NOTED; should not return here */
-	MOVQ	R11, SP
 	RET
