@@ -7,27 +7,18 @@ TEXT	_main(SB), 1, $0
 	SUBQ	$524288, SP
 	ANDQ	$~15, SP
 	MOVQ	AX, CX
-copy_loop:
-	TESTQ	CX, CX
-	JZ	copy_done
-	DECQ	CX
-	MOVQ	CX, R11
-	SHLQ	$3, R11
-	MOVQ	8(R12)(R11*1), BX
-	PUSHQ	BX
-	JMP	copy_loop
-copy_done:
-	MOVQ	$0, BX
-	PUSHQ	BX
-	MOVQ	SP, R13
-	MOVQ	0(R12), AX
+	ADDQ	$2, CX
+	MOVQ	R12, SI
+	MOVQ	SP, DI
+	CLD
+	REP; MOVSQ
 	MOVQ	$_apemain(SB), RARG
+	MOVQ	0(SP), AX
+	MOVQ	SP, R13
+	ADDQ	$8, R13
 	SUBQ	$32, SP
-	ANDQ	$~15, SP
 	MOVQ	RARG, 0(SP)
 	MOVQ	AX, 8(SP)
 	MOVQ	R13, 16(SP)
-	XORQ	BP, BP
-	CALL	_callmain(SB)
-	XORL	AX, AX
-	RET
+	PUSHQ	$0
+	JMPF	_callmain(SB)
