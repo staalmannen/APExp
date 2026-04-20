@@ -66,6 +66,43 @@ sigsetjmp(sigjmp_buf buf, int savemask)
 }
 */
 
+/*
+ * Note: in APExp's 6c calling convention the second arg is at 0(FP)=[sp+8],
+ * but the kernel delivers msg at [sp+16].  So 'msg' here actually receives
+ * the nureg pointer, not the note string.  Any note will fail to match the
+ * signal table and fall through to _NOTED(1) (terminate).  This is the same
+ * behaviour as upstream 9front APE on APExp — harmless as long as notes are
+ * not delivered during critical regions.  A proper fix requires an assembly
+ * stub or a 3-arg declaration; left for a later pass.
+ */
+int
+_notehandler(Ureg *u, char *msg)
+{
+	int i;
+	void (*f)(int, char*, Ureg*);
+	extern void _doatexits(void);
+	extern void _notetramp(int, void(*)(int, char*, Ureg*), Ureg*);
+
+	if(_finishing)
+		_finish(0, 0);
+	for(i = 0; i < NSIGTAB; i++){
+		if(strncmp(msg, sigtab[i].msg, strlen(sigtab[i].msg)) == 0){
+			f = _sighdlr[sigtab[i].num];
+			if(f == SIG_DFL || f == SIG_ERR)
+				break;
+			if(f != SIG_IGN){
+				_notetramp(sigtab[i].num, f, u);
+				/* _notetramp doesn't return */
+			}
+			_NOTED(0);	/* NCONT */
+			return 0;
+		}
+	}
+	_doatexits();
+	_NOTED(1);	/* NDFLT */
+	return 0;
+}
+
 int
 _stringsig(char *nam)
 {
