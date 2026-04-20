@@ -3,41 +3,34 @@ GLOBL	_tos(SB), $8
 TEXT	_main(SB), 1, $0
 	MOVQ	AX, _tos(SB)
 	MOVQ	SP, R12			/* R12 = old (kernel) SP */
-	MOVQ	0(R12), AX		/* AX = argc */
 	
-	/* Move stack down by 512KB to provide massive headroom */
-	SUBQ	$524288, SP
+	/* Shift stack down by 1MB to provide massive headroom */
+	SUBQ	$1048576, SP
 	ANDQ	$~15, SP		/* 16-byte alignment */
 	
-	/* Copy argc and all argv pointers (including NULL) to the new stack.
-	 * Total slots to copy: argc (1) + argv pointers (argc + 1).
+	/* Relocate [argc, argv[0], ..., NULL] from kernel stack to new stack.
+	 * We want argc at 8(FP) and argv[0] at 16(FP).
+	 * If we push a fake return address, 0(FP) is at 8(SP).
+	 * So argc should be at 16(SP), and argv[0] at 24(SP).
+	 * This means we copy the block starting at 8(SP) before the PUSH.
 	 */
+	MOVQ	0(R12), AX		/* AX = argc */
 	MOVQ	AX, CX
-	ADDQ	$2, CX			/* CX = number of 8-byte slots */
+	ADDQ	$2, CX			/* CX = argc + 2 slots (argc + argv + NULL) */
 	MOVQ	R12, SI
 	MOVQ	SP, DI
+	ADDQ	$8, DI			/* DI = SP + 8 (target for argc) */
 	CLD
 	REP; MOVSQ			/* Relocate the block */
 	
-	/* Now 0(SP) is argc, 8(SP) is argv[0] ...
-	 * _callmain(f, argc, arg0) expects:
-	 *   f in RARG (BP)
-	 *   argc at 8(FP)
-	 *   arg0 at 16(FP)
+	/* Set up _callmain(f, argc, arg0)
+	 * f is passed in RARG (BP) and also in the shadow slot at 0(FP).
 	 */
 	MOVQ	$_apemain(SB), RARG
-	MOVQ	0(SP), AX		/* AX = argc */
-	MOVQ	SP, R13
-	ADDQ	$8, R13			/* R13 = &argv[0] (arg0) */
-	
-	/* Set up _callmain frame (32 bytes) */
-	SUBQ	$32, SP
-	MOVQ	RARG, 0(SP)		/* Shadow slot for 1st arg */
-	MOVQ	AX, 8(SP)		/* argc at 8(FP) */
-	MOVQ	R13, 16(SP)		/* arg0 at 16(FP) */
+	MOVQ	RARG, 0(SP)		/* f shadow slot at 0(FP) before PUSH */
 	
 	/* Fake return address and jump to C runtime.
-	 * Using JMPF suppresses linker balance checks for PUSH/POP.
+	 * After PUSHQ, shadow slot is at 8(SP), argc is at 16(SP), arg0 is at 24(SP).
 	 */
 	PUSHQ	$0
 	JMPF	_callmain(SB)
