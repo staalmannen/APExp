@@ -118,7 +118,7 @@ done:
 	}
 	*pp = 0;
 	if(!nohandle)
-		_NOTIFY((int (*)(void*, char*))_notehandler);
+		_NOTIFY(_notehandler);
 }
 
 static void
