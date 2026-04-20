@@ -4,19 +4,17 @@ TEXT	_main(SB), 1, $0
 	MOVQ	AX, _tos(SB)
 	MOVQ	SP, R12			/* R12 = old (kernel) SP */
 	
-	/* Shift stack down by 1MB to provide massive headroom */
-	SUBQ	$1048576, SP
+	/* Shift stack down by 2MB to provide absolute safety from USTKTOP */
+	SUBQ	$2097152, SP
 	ANDQ	$~15, SP		/* 16-byte alignment */
 	
 	/* Relocate [argc, argv[0], ..., NULL] from kernel stack to new stack.
-	 * We want argc at 8(FP) and argv[0] at 16(FP).
-	 * If we push a fake return address, 0(FP) is at 8(SP).
-	 * So argc should be at 16(SP), and argv[0] at 24(SP).
-	 * This means we copy the block starting at 8(SP) before the PUSH.
+	 * Total slots: argc (1) + argv pointers (argc + 1) = argc + 2 slots.
+	 * We place them starting at 16(SP) so that after PUSHQ $0 they align with 8(FP).
 	 */
 	MOVQ	0(R12), AX		/* AX = argc */
 	MOVQ	AX, CX
-	ADDQ	$2, CX			/* CX = argc + 2 slots (argc + argv + NULL) */
+	ADDQ	$2, CX			/* CX = argc + 2 slots */
 	MOVQ	R12, SI
 	MOVQ	SP, DI
 	ADDQ	$8, DI			/* DI = SP + 8 (target for argc) */
@@ -30,7 +28,7 @@ TEXT	_main(SB), 1, $0
 	MOVQ	RARG, 0(SP)		/* f shadow slot at 0(FP) before PUSH */
 	
 	/* Fake return address and jump to C runtime.
-	 * After PUSHQ, shadow slot is at 8(SP), argc is at 16(SP), arg0 is at 24(SP).
+	 * Using JMPF and TEXT flag 1 (NOPROF) suppresses linker prologues.
 	 */
 	PUSHQ	$0
 	JMPF	_callmain(SB)

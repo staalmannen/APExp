@@ -3,7 +3,7 @@ GLOBL	_tos(SB), $8
 TEXT	_main(SB), 1, $0
 	MOVQ	AX, _tos(SB)
 	MOVQ	SP, R12
-	SUBQ	$1048576, SP
+	SUBQ	$2097152, SP
 	ANDQ	$~15, SP
 	MOVQ	0(R12), AX
 	MOVQ	AX, CX
