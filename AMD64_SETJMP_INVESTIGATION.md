@@ -45,13 +45,15 @@ JMP     DI            /* Jump directly; no stack write required */
 ```
 
 ### 2. Full Register-to-Ureg Sync
-Updated `siglongjmp` in `notetramp.c` to perform a complete state hand-off to the kernel:
+Updated `siglongjmp` in `notetramp.c` to perform a complete state hand-off to the kernel.
+Also expanded `sigjmp_buf_amd64.jmpbuf` from `[2]` to `[8]` entries to match the 8-register
+layout that `sigsetjmp` in `setjmp.s` actually saves (SP, PC, BP, BX, R12–R15):
 ```c
-u->ax = (ret == 0) ? 1 : ret;
-u->pc = jb->jmpbuf[1];
-u->sp = jb->jmpbuf[0] + 8;
-u->bp = jb->jmpbuf[2];
-u->bx = jb->jmpbuf[3];
+u->ax  = (ret == 0) ? 1 : ret;
+u->pc  = jb->jmpbuf[1];
+u->sp  = jb->jmpbuf[0] + 8;
+u->bp  = jb->jmpbuf[2];
+u->bx  = jb->jmpbuf[3];
 u->r12 = jb->jmpbuf[4];
 u->r13 = jb->jmpbuf[5];
 u->r14 = jb->jmpbuf[6];

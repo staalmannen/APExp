@@ -59,15 +59,21 @@ extern sigset_t	_psigblocked;
 
 /*
  * sigjmp_buf layout — must match sigsetjmp in setjmp.s:
- *   [0]  set     — savemask flag (low 32 bits; upper 32 undefined)
- *   [8]  blocked — _psigblocked VALUE (8 bytes; upstream stored address in 4 bytes)
+ *   [0]  set       — savemask flag (low 32 bits; upper 32 undefined)
+ *   [8]  blocked   — _psigblocked VALUE (8 bytes)
  *  [16]  jmpbuf[0] = SP
  *  [24]  jmpbuf[1] = PC
+ *  [32]  jmpbuf[2] = BP
+ *  [40]  jmpbuf[3] = BX
+ *  [48]  jmpbuf[4] = R12
+ *  [56]  jmpbuf[5] = R13
+ *  [64]  jmpbuf[6] = R14
+ *  [72]  jmpbuf[7] = R15  (REGEXT global-register cache)
  */
 typedef struct {
 	unsigned long long	set;
 	unsigned long long	blocked;
-	unsigned long long	jmpbuf[2];
+	unsigned long long	jmpbuf[8];
 } sigjmp_buf_amd64;
 
 void
@@ -84,10 +90,21 @@ siglongjmp(sigjmp_buf j, int ret)
 		longjmp((void*)jb->jmpbuf, ret);
 	u = pcstack[nstack-1].u;
 	nstack--;
-	u->ax = ret;
-	if(ret == 0)
-		u->ax = 1;
-	u->pc = jb->jmpbuf[JMPBUFPC];
-	u->sp = jb->jmpbuf[JMPBUFSP] + 8;
+	/*
+	 * Full register sync into Ureg before NRSTR.
+	 * The kernel's noted(NRSTR) reloads ALL general-purpose registers
+	 * from the Ureg.  We must restore every callee-saved register that
+	 * sigsetjmp captured; otherwise the setjmp-site code sees stale
+	 * values (especially R15=REGEXT) and faults immediately.
+	 */
+	u->ax  = (ret == 0) ? 1 : ret;
+	u->pc  = jb->jmpbuf[JMPBUFPC];
+	u->sp  = jb->jmpbuf[JMPBUFSP] + 8;
+	u->bp  = jb->jmpbuf[2];
+	u->bx  = jb->jmpbuf[3];
+	u->r12 = jb->jmpbuf[4];
+	u->r13 = jb->jmpbuf[5];
+	u->r14 = jb->jmpbuf[6];
+	u->r15 = jb->jmpbuf[7];
 	_NOTED(3);	/* NRSTR */
 }
