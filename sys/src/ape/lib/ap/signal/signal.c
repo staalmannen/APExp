@@ -81,7 +81,7 @@ _notehandler(Ureg *u, char *msg)
 	int i;
 	void (*f)(int, char*, Ureg*);
 	extern void _doatexits(void);
-	extern void _notetramp(int, void(*)(int, char*, Ureg*), Ureg*);
+	extern void _notetramp(int, void(*)(int, char*, Ureg*), Ureg*, char*);
 
 	if(_finishing)
 		_finish(0, 0);
@@ -91,7 +91,7 @@ _notehandler(Ureg *u, char *msg)
 			if(f == SIG_DFL || f == SIG_ERR)
 				break;
 			if(f != SIG_IGN){
-				_notetramp(sigtab[i].num, f, u);
+				_notetramp(sigtab[i].num, f, u, msg);
 				/* _notetramp doesn't return */
 			}
 			_NOTED(0);	/* NCONT */

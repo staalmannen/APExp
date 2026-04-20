@@ -12,13 +12,14 @@ static struct Pcstack {
 	unsigned long restorepc;
 	unsigned long restorenpc;
 	Ureg *u;
+	char msg[ERRMAX];
 } pcstack[MAXSIGSTACK];
 static int nstack = 0;
 
-static void notecont(Ureg*, char*);
+static void notecont(void);
 
 void
-_notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
+_notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u, char *msg)
 {
 	Pcstack *p;
 
@@ -30,6 +31,10 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 	p->sig = sig;
 	p->hdlr = hdlr;
 	p->u = u;
+	if(msg)
+		strncpy(p->msg, msg, ERRMAX-1);
+	else
+		p->msg[0] = '\0';
 	nstack++;
 	u->pc = (unsigned long) notecont;
 	u->npc = u->pc+4;
@@ -37,17 +42,19 @@ _notetramp(int sig, void (*hdlr)(int, char*, Ureg*), Ureg *u)
 }
 
 static void
-notecont(Ureg *u, char *s)
+notecont(void)
 {
 	Pcstack *p;
 	void(*f)(int, char*, Ureg*);
+	Ureg *u;
 
 	p = &pcstack[nstack-1];
 	f = p->hdlr;
+	u = p->u;
 	u->pc = p->restorepc;
 	u->npc = p->restorenpc;
 	nstack--;
-	(*f)(p->sig, s, u);
+	(*f)(p->sig, p->msg, u);
 	_NOTED(3);	/* NRSTR */
 }
 
