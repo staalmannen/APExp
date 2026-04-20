@@ -1,48 +1,82 @@
 /*
  * amd64 setjmp/longjmp for APExp.
  *
- * Two fixes from upstream 9front:
+ * jmp_buf layout (8-byte slots):
+ *  [0]: SP   [1]: PC   [2]: BP   [3]: BX
+ *  [4]: R12  [5]: R13  [6]: R14  [7]: R15
  *
- * 1. Arg offset: APExp 6c puts the first arg in RARG (BP) but regaalloc1 still
- *    reserves a 0(FP) slot for it.  So the second arg is at 8(FP)=[SP+16],
- *    same as upstream 9front.  main9.s uses PUSHQ RARG + PUSHQ $0 to shift
- *    the kernel's initial argc/arg0 from [SP+0]/[SP+8] to [SP+16]/[SP+24].
+ * sigjmp_buf layout:
+ *  [0]:  set (savemask flag, 4 bytes; upper 4 zero-padded)
+ *  [8]:  blocked (_psigblocked VALUE)
+ *  [16]: jmpbuf[0..7] as above
  *
- * 2. longjmp stack safety: upstream writes the return PC to 0(SP) then RETs,
- *    which faults if SP is at USTKTOP (0x7ffffffff000) as it often is at
- *    process start.  Fixed by using ADDQ $8,SP + JMP — no stack write.
+ * Plan 9 amd64 calling convention (APExp / 6c):
+ *   RARG (= BP register) carries the first argument.
+ *   regaalloc1() reserves a 0(FP) slot for the first arg even when it is
+ *   in RARG, so the SECOND arg is at 8(FP)=[SP+16], same as upstream.
  *
- * 3. sigsetjmp _psigblocked: upstream stores the ADDRESS ($symbol) rather
- *    than the VALUE.  Fixed by loading through the symbol.
+ * Why 8 registers: APExp's 6c uses REGEXT=D_R15, meaning R15 (and R14 down)
+ * can be allocated as persistent register caches for global variables within
+ * a function.  longjmp must restore these so the setjmp-site code sees the
+ * correct global-variable-in-register values.  Saving only SP+PC (upstream)
+ * is not sufficient; without restoring R15 et al., code at the setjmp target
+ * reads stale/garbage global-register values → GPV.
  *
- * Everything else is identical to upstream 9front amd64/setjmp.s.
+ * Suicide-trap fix: upstream writes the target PC to 0(SP) then RETs.
+ * This faults when SP is at USTKTOP.  Instead: ADDQ $8,SP + JMP (no write).
+ *
+ * sigsetjmp _psigblocked: upstream stores the ADDRESS ($symbol).  We load
+ * the value through the symbol instead.
  */
 
-TEXT	longjmp(SB), $0
-	MOVL	r+8(FP), AX		/* second arg at 8(FP): regaalloc1 reserves slot at 0(FP) for RARG */
-	CMPL	AX, $0
-	JNE	ok			/* ansi: "longjmp(0) => longjmp(1)" */
-	MOVL	$1, AX
-ok:
-	MOVQ	0(RARG), SP		/* restore sp */
-	ADDQ	$8, SP			/* skip return-address slot; no stack write */
-	MOVQ	8(RARG), BX		/* target PC into scratch register */
-	JMP	BX			/* stack-safe: no write near USTKTOP */
-
 TEXT	setjmp(SB), $0
-	MOVQ	SP, 0(RARG)		/* store sp */
-	MOVQ	0(SP), BX		/* store return pc */
-	MOVQ	BX, 8(RARG)
-	MOVL	$0, AX			/* return 0 */
+	MOVQ	SP, 0(RARG)
+	MOVQ	0(SP), AX		/* return PC */
+	MOVQ	AX, 8(RARG)
+	MOVQ	BP, 16(RARG)		/* BP=RARG=buf ptr; restored by longjmp */
+	MOVQ	BX, 24(RARG)
+	MOVQ	R12, 32(RARG)
+	MOVQ	R13, 40(RARG)
+	MOVQ	R14, 48(RARG)
+	MOVQ	R15, 56(RARG)		/* R15 = REGEXT (global register cache) */
+	MOVL	$0, AX
 	RET
 
+TEXT	longjmp(SB), $0
+	MOVL	val+8(FP), AX		/* second arg at 8(FP) */
+	TESTL	AX, AX
+	JNZ	ok
+	MOVL	$1, AX
+ok:
+	MOVQ	RARG, R11		/* R11 = jmpbuf ptr (scratch) */
+	MOVQ	16(R11), BP
+	MOVQ	24(R11), BX
+	MOVQ	32(R11), R12
+	MOVQ	40(R11), R13
+	MOVQ	48(R11), R14
+	MOVQ	56(R11), R15		/* restore R15 (REGEXT global cache) */
+	MOVQ	0(R11), SP		/* restore SP */
+	ADDQ	$8, SP			/* skip return-address slot; no stack write */
+	MOVQ	8(R11), R11		/* R11 = target PC */
+	JMP	R11			/* stack-safe: no write near USTKTOP */
+
 TEXT	sigsetjmp(SB), $0
-	MOVL	savemask+8(FP), BX	/* second arg at 8(FP): regaalloc1 reserves 0(FP) for RARG */
-	MOVL	BX, 0(RARG)
-	MOVQ	_psigblocked(SB), BX	/* VALUE of _psigblocked, not address */
-	MOVQ	BX, 8(RARG)
-	MOVQ	SP, 16(RARG)		/* store sp (offset +8 vs upstream: extra 8 for blocked) */
-	MOVQ	0(SP), BX		/* store return pc */
-	MOVQ	BX, 24(RARG)
-	MOVL	$0, AX			/* return 0 */
+	MOVL	savemask+8(FP), AX	/* second arg at 8(FP) */
+	MOVQ	$0, 0(RARG)
+	MOVL	AX, 0(RARG)		/* store savemask (low 32 bits) */
+	MOVQ	_psigblocked(SB), AX	/* VALUE of _psigblocked, not address */
+	MOVQ	AX, 8(RARG)
+	/* inline setjmp at offset 16 (jmpbuf[0..7]) */
+	MOVQ	RARG, R11
+	ADDQ	$16, R11		/* R11 = &jmpbuf[0] */
+	MOVQ	SP, 0(R11)
+	MOVQ	0(SP), AX		/* return PC */
+	MOVQ	AX, 8(R11)
+	MOVQ	BP, 16(R11)
+	MOVQ	BX, 24(R11)
+	MOVQ	R12, 32(R11)
+	MOVQ	R13, 40(R11)
+	MOVQ	R14, 48(R11)
+	MOVQ	R15, 56(R11)		/* R15 = REGEXT */
+	MOVL	$0, AX
 	RET
