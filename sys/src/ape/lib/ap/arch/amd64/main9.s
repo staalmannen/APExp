@@ -2,31 +2,57 @@ GLOBL	_tos(SB), $8
 
 TEXT	_main(SB), 1, $0
 	MOVQ	AX, _tos(SB)
-	MOVQ	SP, R11			/* R11 = kernel SP */
+	MOVQ	SP, R12			/* R12 = old (kernel) SP */
+	MOVQ	0(R12), AX		/* AX = argc */
 	
-	/* Move stack down by 128KB to provide headroom for signals */
-	SUBQ	$131072, SP
-	ANDQ	$~15, SP		/* Ensure 16-byte alignment */
+	/* Move stack down by 512KB to provide massive headroom */
+	SUBQ	$524288, SP
+	ANDQ	$~15, SP		/* 16-byte alignment */
 	
-	/* Relocate [argc, argv[0], ..., NULL] to the new stack.
-	 * We place them starting at 16(SP) so that after PUSHQ $0 they align with 8(FP).
+	/* Copy argc and all argv pointers to the new stack.
+	 * We need room for argc (8 bytes) + (argc+1) pointers (8 bytes each).
+	 * We'll just push them in reverse order to build the array on the stack.
 	 */
-	MOVQ	0(R11), AX		/* AX = argc */
-	MOVQ	AX, CX
-	ADDQ	$2, CX			/* CX = argc + 2 (argc + argv pointers + NULL) */
-	MOVQ	R11, SI
-	MOVQ	SP, DI
-	ADDQ	$8, DI			/* DI = SP + 8 (target for argc) */
-	CLD
-	REP; MOVSQ
+	MOVQ	AX, CX			/* CX = argc */
+	MOVQ	CX, R11
+	SHLQ	$3, R11			/* R11 = argc * 8 */
 	
-	/* Set up _callmain(f, argc, arg0)
-	 * f is in RARG (BP)
-	 * argc is at 8(FP) = 16(SP) after PUSHQ
-	 * arg0 is at 16(FP) = 24(SP) after PUSHQ
+	/* Push NULL terminator (argv[argc]) */
+	MOVQ	$0, BX
+	PUSHQ	BX
+	
+	/* Copy argv[argc-1] down to argv[0] */
+	TESTQ	CX, CX
+	JZ	copy_done
+copy_loop:
+	DECQ	CX
+	MOVQ	CX, R11
+	SHLQ	$3, R11
+	MOVQ	8(R12)(R11*1), BX	/* BX = argv[i] */
+	PUSHQ	BX
+	TESTQ	CX, CX
+	JNZ	copy_loop
+copy_done:
+	
+	/* Now SP points to new argv[0].
+	 * We need to set up _callmain(f, argc, arg0).
+	 * arg0 (3rd arg) should be the address of our new argv[0].
 	 */
-	MOVQ	$_apemain(SB), RARG
-	MOVQ	RARG, 0(SP)		/* Shadow slot for 1st arg (at 0(FP)) */
-	PUSHQ	$0			/* Fake return address at 0(SP) */
+	MOVQ	SP, R13			/* R13 = &argv[0] */
+	MOVQ	0(R12), AX		/* AX = argc */
+	MOVQ	$_apemain(SB), RARG	/* f in RARG (BP) */
 	
-	JMPF	_callmain(SB)
+	/* Align stack for call and set up args */
+	SUBQ	$32, SP			/* Room for arguments and shadow slot */
+	ANDQ	$~15, SP
+	
+	MOVQ	RARG, 0(SP)		/* f at 0(FP) */
+	MOVQ	AX, 8(SP)		/* argc at 8(FP) */
+	MOVQ	R13, 16(SP)		/* &argv[0] at 16(FP) */
+	
+	/* Terminate backtrace */
+	XORQ	BP, BP
+	
+	CALL	_callmain(SB)
+	XORL	AX, AX
+	RET
