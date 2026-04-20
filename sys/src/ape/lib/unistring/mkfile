@@ -1,0 +1,18 @@
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libunistring.a
+
+OFILES=\
+
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+UNISTRSOURCE=../../../external/libunistring
+
+CFLAGS=-c -I$UNISTRSOURCE -D_POSIX_SOURCE -DHAVE_CONFIG_H
+
+%.$O: $UNISTRSOURCE/lib/%.c
+	$CC $CFLAGS $UNISTRSOURCE/lib/$stem.c
+

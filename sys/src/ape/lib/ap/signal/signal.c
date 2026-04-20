@@ -66,9 +66,9 @@ sigsetjmp(sigjmp_buf buf, int savemask)
 }
 */
 
-/* _notehandler is now implemented in arch/amd64/notetramp.c with an 
-   assembly entry point in arch/amd64/setjmp.s to handle the 
-   Plan 9 kernel calling convention. */
+/* _notehandler is implemented as a plain C function in arch/amd64/notetramp.c.
+   The Plan 9 kernel's notify() calling convention already matches 6c's:
+   RARG (BP) = first arg (nureg*), msg* on stack at 8(FP). */
 
 int
 _stringsig(char *nam)
