@@ -138,7 +138,7 @@ concat2 (char const *str1, char const *str2)
 FILE *
 xfopen (const char *name, const char *mode)
 {
-  FILE *res = fopen_safer (name, mode);
+  FILE *res = (FILE *) fopen_safer (name, mode);
   if (!res)
     error (EXIT_FAILURE, get_errno (),
            _("%s: cannot open"), quotearg_colon (name));

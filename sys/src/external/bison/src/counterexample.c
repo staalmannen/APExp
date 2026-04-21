@@ -117,7 +117,7 @@ free_counterexample (counterexample *cex)
 static void
 counterexample_print (const counterexample *cex, FILE *out, const char *prefix)
 {
-  const bool flat = getenv ("YYFLAT");
+  const bool flat = (const char) getenv ("YYFLAT");
   const char *example1_label
     = cex->unifying ? _("Example") : _("First example");
   const char *example2_label

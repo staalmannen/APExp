@@ -899,7 +899,7 @@ create_start_rules (void)
       start_symbols = symbol_list_sym_new (start, start->location);
     }
 
-  const bool several = start_symbols->next;
+  const bool several = (const bool) start_symbols->next;
   if (several)
     create_multiple_start_rules (start_symbols);
   else

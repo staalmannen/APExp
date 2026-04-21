@@ -1,4 +1,4 @@
-/* lib/config.h.  Generated from config.in.h by configure.  */
+/* lib/config.h.  Generated from config.in.h by configure. GNULIB*/
 /* lib/config.in.h.  Generated from configure.ac by autoheader.  */
 
 /* Define if building universal (internal helper macro) */
@@ -123,7 +123,7 @@
 
 /* Define to a C preprocessor expression that evaluates to 1 or 0, depending
    whether the gnulib module fopen-safer shall be considered present. */
-#define GNULIB_FOPEN_SAFER 1
+#undef GNULIB_FOPEN_SAFER
 
 /* Define to a C preprocessor expression that evaluates to 1 or 0, depending
    whether the gnulib module fscanf shall be considered present. */
@@ -985,7 +985,7 @@
 
 /* Define if you have the libtextstyle library. */
 // we have a shim header dealing with it.
-#define HAVE_LIBTEXTSTYLE 1
+// #undef HAVE_LIBTEXTSTYLE
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1

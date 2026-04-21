@@ -51,6 +51,13 @@ extern int fcntl(int, int, ...);
 extern int open(const char *, int, ...);
 extern int creat(const char *, mode_t);
 
+/* hacks */
+#define O_SEARCH O_RDONLY
+#define O_BINARY O_RDONLY
+#define O_DIRECTORY O_RDONLY
+
+#define AT_FDCWD -100
+
 #ifdef __cplusplus
 }
 #endif

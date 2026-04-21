@@ -63,7 +63,10 @@ extern float strtof_l(const char *, char **, locale_t);
 extern double strtod_l(const char *, char **, locale_t);
 extern long double strtold_l(const char *, char **, locale_t);
 
-
+/* other hacks */
+#ifndef SETLOCALE_NULL_MAX
+#define SETLOCALE_NULL_MAX 256+1
+#endif
 
 
 #ifdef __cplusplus
