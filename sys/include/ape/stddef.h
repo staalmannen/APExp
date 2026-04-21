@@ -17,6 +17,7 @@ typedef long _ptrdiff_t;
 #define offsetof(ty,mem) ((size_t) &(((ty *)0)->mem))
 
 typedef _ptrdiff_t ptrdiff_t;
+typedef long max_align_t;
 #ifndef _SIZE_T
 #define _SIZE_T
 typedef unsigned long size_t;

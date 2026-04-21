@@ -244,7 +244,7 @@ canonicalize_filename_mode_stk (const char *name, canonicalize_mode_t can_mode,
             }
           rname = rname_buf->data;
         }
-      dest = rawmemchr (rname, '\0');
+      dest = (char *) rawmemchr (rname, '\0');
       start = name;
       prefix_len = FILE_SYSTEM_PREFIX_LEN (rname);
     }

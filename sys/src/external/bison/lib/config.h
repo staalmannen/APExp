@@ -1,5 +1,5 @@
 /* lib/config.h.  Generated from config.in.h by configure.  */
-/* lib/config.in.h.  Generated from configure.ac by autoheader.  */
+/* lib/config.in.h.  Generated from configure.ac by autoheader. */
 
 /* Define if building universal (internal helper macro) */
 /* #undef AC_APPLE_UNIVERSAL_BUILD */
@@ -123,7 +123,7 @@
 
 /* Define to a C preprocessor expression that evaluates to 1 or 0, depending
    whether the gnulib module fopen-safer shall be considered present. */
-#define GNULIB_FOPEN_SAFER 1
+#undef GNULIB_FOPEN_SAFER
 
 /* Define to a C preprocessor expression that evaluates to 1 or 0, depending
    whether the gnulib module fscanf shall be considered present. */
@@ -717,7 +717,7 @@
 
 /* Define to 1 if you have the declaration of `getchar_unlocked', and to 0 if
    you don't. */
-#define HAVE_DECL_GETCHAR_UNLOCKED 0
+#define HAVE_DECL_GETCHAR_UNLOCKED 1
 
 /* Define to 1 if you have the declaration of `getcwd', and to 0 if you don't.
    */
@@ -918,7 +918,7 @@
 #define HAVE_GETOPT_LONG_ONLY 1
 
 /* Define to 1 if the system has the 'getpagesize' function. */
-/* #undef HAVE_GETPAGESIZE */
+#define HAVE_GETPAGESIZE 1
 
 /* Define to 1 if you have the `getprogname' function. */
 #define HAVE_GETPROGNAME 1

@@ -59,6 +59,7 @@ extern int creat(const char *, mode_t);
 #define F_DUPFD_CLOEXEC FD_CLOEXEC
 
 #define AT_FDCWD -100
+#define AT_EACCESS -1
 
 #ifdef __cplusplus
 }
