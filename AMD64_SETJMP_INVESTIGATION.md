@@ -46,11 +46,16 @@ This produces exactly the observed crash:
 
 ### Fix
 
+Use R11 (caller-saved scratch register, NOT in setjmp's save list) instead of
+R12 to hold the kernel SP.  R12–R15 are callee-saved REGEXT registers; using
+any of them to hold a value near USTKTOP contaminates the jmpbuf when
+sigsetjmp is called later.
+
 Replace the explicit boundary-check loop with `CLD; REP; MOVSQ`.  No boundary
 check is needed: the last source read is at `kernel_SP + (argc+1)*8 =
 USTKTOP - ssize + argc*8 < USTKTOP - 8`, always within mapped memory.
-Using only AX/CX/SI/DI (all caller-saved) for the copy keeps all callee-saved
-REGEXT registers (R12–R15, BP, BX) clean.
+Using only AX/CX/SI/DI/R11 (all caller-saved) for the copy keeps all
+callee-saved REGEXT registers (R12–R15, BP, BX) clean.
 
 ## The Architectural Fix (Final Patch)
 1.  **Safe Startup (`main9.s`)**: Shifts stack 128KB below USTKTOP; copies

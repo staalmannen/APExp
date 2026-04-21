@@ -2,7 +2,15 @@ GLOBL	_tos(SB), $8
 
 TEXT	_main(SB), 1, $0
 	MOVQ	AX, _tos(SB)
-	MOVQ	SP, R12			/* R12 = kernel SP */
+
+	/*
+	 * Use R11 (caller-saved scratch, NOT saved by setjmp/sigsetjmp) to
+	 * hold the kernel SP.  R12-R15 are callee-saved REGEXT registers;
+	 * if sigsetjmp captures a value near USTKTOP in any of them and
+	 * longjmp restores it, a subsequent REGEXT write faults at USTKTOP.
+	 * R11 is never in the setjmp register list, so it is safe.
+	 */
+	MOVQ	SP, R11			/* R11 = kernel SP */
 
 	/* Shift stack down 128KB so signal frames are never near USTKTOP. */
 	SUBQ	$131072, SP
@@ -10,19 +18,12 @@ TEXT	_main(SB), 1, $0
 
 	/*
 	 * Copy [argc, argv[0], ..., NULL] from kernel stack to new stack.
-	 * The reads are from kernel SP (USTKTOP - ssize - 8) upward; the
-	 * last read is at most USTKTOP - ssize + argc*8 < USTKTOP - 8, so
-	 * no boundary check is required.  CX = argc + 2 is always small.
-	 *
-	 * IMPORTANT: do NOT use R13 here.  R13 is a callee-saved REGEXT
-	 * register; if sigsetjmp saves a garbage R13 value and longjmp
-	 * restores it, any subsequent REGEXT write would fault at that
-	 * address.  Use only AX/CX/SI/DI (all caller-saved) for the copy.
+	 * Uses only AX/CX/SI/DI/R11 — no callee-saved REGEXT registers.
 	 */
-	MOVQ	0(R12), AX		/* AX = argc */
+	MOVQ	0(R11), AX		/* AX = argc */
 	MOVQ	AX, CX
 	ADDQ	$2, CX			/* CX = argc + 2 (argc + argv ptrs + NULL) */
-	MOVQ	R12, SI
+	MOVQ	R11, SI
 	MOVQ	SP, DI
 	ADDQ	$8, DI			/* DI = new_SP + 8 (target for argc) */
 	CLD

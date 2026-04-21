@@ -360,15 +360,19 @@ are NOT free()-safe. Document this in any aligned allocator.
 `_psigblocked` into the jmpbuf. Fix: load the VALUE with an intermediate register.
 
 **Bug 2 (main9.s — suicide trap: fault write addr=0x7ffffffff000):**
-The copy loop used `MOVQ $0x7ffffffff000, R13` then MOVSQ loop.  R13 is a
-callee-saved REGEXT register in 6c.  If no function between `_main` and
-`sigsetjmp` reinitialises R13 as REGEXT, `sigsetjmp` saves `R13 = 0x7ffffffff000`
-into jmpbuf[5].  After `longjmp` restores it, any function using R13 as REGEXT
-for a global variable generates `MOVL val, 0(R13)` which faults at 0x7ffffffff000
-(the guard page).
-**Fix:** Use `CLD; REP; MOVSQ` — no boundary check is needed (argc is always
-small; the last read is always < USTKTOP), and only caller-saved registers
-(AX/CX/SI/DI) are used.
+Two sub-bugs, both in how `_main` stored a value near USTKTOP in a callee-saved
+REGEXT register that sigsetjmp later captured:
+
+- Sub-bug 2a: The copy loop used `MOVQ $0x7ffffffff000, R13` (boundary guard).
+  R13 is REGEXT — sigsetjmp saved 0x7ffffffff000 → jmpbuf[5]; longjmp restored
+  it; subsequent REGEXT write via R13 faulted at 0x7ffffffff000.
+- Sub-bug 2b: After replacing the loop with `REP; MOVSQ`, the code still used
+  `MOVQ SP, R12` to save kernel SP (= USTKTOP - ssize - 8 ≈ USTKTOP - 56).
+  R12 is also REGEXT — sigsetjmp saved kernel_SP → jmpbuf[4]; longjmp restored
+  it; REGEXT code with offset 56 from R12 wrote exactly to 0x7ffffffff000.
+
+**Fix:** Use R11 (caller-saved scratch, NOT in setjmp's save list) instead of
+R12 to hold the kernel SP.  Use `CLD; REP; MOVSQ` with only AX/CX/SI/DI/R11.
 
 **Bug 3 (notetramp.c / notetramp ordering):**
 `notecont()` decremented `nstack` BEFORE calling the user signal handler; when
@@ -378,7 +382,9 @@ With the old longjmp (PUSH+RET), this caused a fault when SP was near USTKTOP.
 (ADDQ $8,SP + JMP, no stack write), the longjmp() path is safe when nstack==0.
 
 **Invariant:** `longjmp` must NEVER write to the stack (uses ADDQ+JMP not PUSH+RET).
-`main9.s` must NEVER use R12–R15 as scratch registers — these are REGEXT-reserved.
+`main9.s` must NEVER use R11–R15 as scratch registers — R12–R15 are REGEXT-reserved,
+and R11 is the only safe scratch for values that must not survive to sigsetjmp.
+Actually: use ONLY AX/CX/DX/SI/DI/R8/R9/R10/R11 (caller-saved) in `_main` startup.
 
 ### Build order for compiler changes
 ```
