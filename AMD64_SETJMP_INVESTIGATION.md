@@ -5,29 +5,24 @@ This document summarizes the findings and fixes for the "mysterious crashes" (su
 ## Symptoms
 1.  **Suicide Traps**: `suicide: sys: trap: fault write addr=0x7ffffffff000`
     *   Occurred when instructions attempted to write to the absolute top of user memory (`USTKTOP`).
-    *   **Crucial Observation**: Shifting the stack pointer (`SP`) by 2MB in `_main` did **not** prevent the crash at `0x7ffffffff000`. This strongly suggests that the problematic write is either:
-        *   Restoring an `SP` value that was captured *before* the shift (unlikely in this environment).
-        *   Using a corrupted pointer that happens to point to the boundary.
-        *   Occurring in a context where the stack shift was not applied (e.g., a different thread or kernel-level delivery).
+    *   **Persistent Failure**: Shifting the stack by up to 2MB in `_main` did **not** resolve the crash. This indicates that the problematic write is likely targeting a pointer or structure (like the `Ureg`) that is derived from the kernel's initial stack placement, bypassing our relocation.
 2.  **General Protection Violations**: `trap: general protection violation pc=...`
-    *   Triggered when restored register state was inconsistent or when the stack was misaligned.
-    *   Resolved by ensuring 16-byte alignment and correct callee-saved register restoration (R12-R15).
+    *   Triggered by inconsistent register state or stack misalignment.
+    *   Resolved by 16-byte alignment and full callee-save (R12-R15) restoration.
 3.  **Constant PC Values**:
-    *   The crash `pc` has remained remarkably consistent (`0x20ca43`, `0x20ca44`, `0x20ca47`, `0x20ca59`) across different stack-shift builds. This suggests the faulting instruction is in a fixed location in `libc` (likely `setjmp.s` or `notetramp.c`) and that our changes to `_main` (which vary in instruction count) are shifting the binary layout in ways that haven't yet isolated the bug.
+    *   The crash `pc` has remained remarkably stable (most recently `0x20ca44`), suggesting the faulting instruction is likely in the signal resumption path (`siglongjmp` or `_NOTED` stub).
 
 ## Current Investigation State
 
-### 1. The Stack Shift Mystery
-We moved `SP` 2MB below the top, yet we still see writes to `0x7ffffffff000`. This address is the first invalid address above the stack. A write here usually means a `PUSH` or `CALL` occurred when `SP` was exactly `0x7ffffffff008`.
-*   **Hypothesis**: Something is restoring `SP` to the very top of the memory space, bypassing our `_main` shift.
+### 1. The NRSTR Vulnerability
+The `NRSTR` path in `siglongjmp` writes to the `Ureg` struct provided by the kernel. If the signal arrived when the process was at a very high stack address (common in early startup or deep recursion), the `Ureg` itself may be located at the very edge of the address space. Writing to high-offset members (like `r15` or `ss`) in this struct can trigger the suicide trap.
 
-### 2. Signal Handler Signature
-Verified `_notehandler(Ureg *u, char *msg)` as the correct 2-argument signature for APE on amd64. A 3-argument version caused GPVs.
+### 2. Startup Stack Relocation
+We have relocated the user stack and arguments in `_main`. While this protects normal function calls, it does not prevent the kernel from delivering new signals on the "current" stack, which might still be near the top if a previous `longjmp` restored an old `SP`.
 
-### 3. State Capture in `notetramp.c`
-We have implemented a 4-argument `_notetramp` that captures the signal message into a global `Pcstack`. This ensures the message survives the `NSAVE`/`NRSTR` cycle, addressing potential corruption during resumption.
-
-## Planned Diagnostic Steps
-1.  **NOP Injection**: We are injecting 16 NOPs into `setjmp.s` to force a shift in the binary layout of `libc`. If the crash `pc` shifts by 16 bytes, we have positively identified `setjmp`/`longjmp` as the faulting site.
-2.  **Simplified Startup**: Reverting to a simpler `main9.s` to eliminate any side effects from complex relocation loops while maintaining a safe 64KB headroom.
-3.  **Strict siglongjmp Review**: Ensuring that `siglongjmp` never restores an `SP` value that could lead to a boundary fault.
+## The "Nuclear Option" Fix (Current Patch)
+To definitively stop the suicide traps, we are transitioning to a **stack-neutral signal recovery** model:
+1.  **Bypass NRSTR**: `siglongjmp` no longer modifies the kernel's `Ureg` or calls `noted(NRSTR)`.
+2.  **Manual Unwind**: We manually adjust the global `nstack` state to "pop" all handlers being jumped over.
+3.  **Direct Context Restore**: We use `longjmp` (which we've already verified to be stack-safe) to restore the CPU state and resume execution. This avoids the need to touch the kernel's signal context at the memory boundary.
+4.  **Robust Relocation**: `main9.s` now uses a simplified 128KB shift with a safe manual copy loop for the environment block.

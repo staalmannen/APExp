@@ -3,22 +3,17 @@ GLOBL	_tos(SB), $8
 TEXT	_main(SB), 1, $0
 	MOVQ	AX, _tos(SB)
 	MOVQ	SP, R12
-	JMP	start
-	BYTE	$0x90; BYTE	$0x90; BYTE	$0x90; BYTE	$0x90
-	BYTE	$0x90; BYTE	$0x90; BYTE	$0x90; BYTE	$0x90
-	BYTE	$0x90; BYTE	$0x90; BYTE	$0x90; BYTE	$0x90
-	BYTE	$0x90; BYTE	$0x90; BYTE	$0x90; BYTE	$0x90
-start:
-	SUBQ	$65536, SP
+	SUBQ	$131072, SP
 	ANDQ	$~15, SP
-	MOVQ	0(R12), AX
-	MOVQ	AX, CX
-	ADDQ	$2, CX
 	MOVQ	R12, SI
 	MOVQ	SP, DI
 	ADDQ	$8, DI
-	CLD
-	REP; MOVSQ
+	MOVQ	$64, CX
+copy_loop:
+	DECQ	CX
+	MOVQ	(SI)(CX*8), AX
+	MOVQ	AX, (DI)(CX*8)
+	JNZ	copy_loop
 	MOVQ	$_apemain(SB), RARG
 	MOVQ	RARG, 0(SP)
 	PUSHQ	$0
