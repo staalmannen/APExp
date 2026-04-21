@@ -8,12 +8,16 @@ TEXT	_main(SB), 1, $0
 	MOVQ	R12, SI
 	MOVQ	SP, DI
 	ADDQ	$8, DI
-	MOVQ	$64, CX
+	MOVQ	0(R12), AX
+	MOVQ	AX, CX
+	ADDQ	$2, CX
 copy_loop:
-	DECQ	CX
-	MOVQ	(SI)(CX*8), AX
-	MOVQ	AX, (DI)(CX*8)
-	JNZ	copy_loop
+	MOVQ	SI, R11
+	CMPQ	R11, $0x7ffffffff000
+	JAE	copy_done
+	MOVSQ
+	LOOP	copy_loop
+copy_done:
 	MOVQ	$_apemain(SB), RARG
 	MOVQ	RARG, 0(SP)
 	PUSHQ	$0

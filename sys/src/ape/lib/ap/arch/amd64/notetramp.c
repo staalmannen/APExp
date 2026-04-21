@@ -82,6 +82,7 @@ typedef struct {
 void
 siglongjmp(sigjmp_buf j, int ret)
 {
+	struct Ureg *u;
 	sigjmp_buf_amd64 *jb;
 
 	jb = (sigjmp_buf_amd64*)j;
@@ -96,19 +97,26 @@ siglongjmp(sigjmp_buf j, int ret)
 	while(nstack > 0 && pcstack[nstack-1].u->sp < jb->jmpbuf[JMPBUFSP])
 		nstack--;
 
+	if(nstack == 0 || pcstack[nstack-1].u->sp > jb->jmpbuf[JMPBUFSP])
+		longjmp((void*)jb->jmpbuf, ret);
+
+	u = pcstack[nstack-1].u;
+	nstack--;
 	/*
-	 * NUCLEAR OPTION: Bypassing the NRSTR (noted(3)) path.
-	 * 
-	 * Previous implementations tried to write the target state back into
-	 * the kernel's Ureg structure.  However, if the signal arrived when
-	 * the stack was near the boundary (0x7ffffffff000), writing to high
-	 * offsets in the Ureg triggered a suicide trap.
-	 *
-	 * Since we have already called NSAVE (_NOTED(2)) in _notetramp, the 
-	 * kernel has cleared the note and is simply holding the process state.
-	 * We can safely use longjmp() to restore the CPU context and resume
-	 * execution in user space.  The kernel will notice the process is
-	 * active again and deliver subsequent signals normally.
+	 * Full register sync into Ureg before NRSTR.
+	 * The kernel's noted(NRSTR) reloads ALL general-purpose registers
+	 * from the Ureg.  We must restore every callee-saved register that
+	 * sigsetjmp captured; otherwise the setjmp-site code sees stale
+	 * values (especially R15=REGEXT) and faults immediately.
 	 */
-	longjmp((void*)jb->jmpbuf, ret);
+	u->ax  = (ret == 0) ? 1 : ret;
+	u->pc  = jb->jmpbuf[JMPBUFPC];
+	u->sp  = jb->jmpbuf[JMPBUFSP] + 8;
+	u->bp  = jb->jmpbuf[2];
+	u->bx  = jb->jmpbuf[3];
+	u->r12 = jb->jmpbuf[4];
+	u->r13 = jb->jmpbuf[5];
+	u->r14 = jb->jmpbuf[6];
+	u->r15 = jb->jmpbuf[7];
+	_NOTED(3);	/* NRSTR */
 }

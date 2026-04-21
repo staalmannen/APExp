@@ -4,25 +4,23 @@ This document summarizes the findings and fixes for the "mysterious crashes" (su
 
 ## Symptoms
 1.  **Suicide Traps**: `suicide: sys: trap: fault write addr=0x7ffffffff000`
-    *   Occurred when instructions attempted to write to the absolute top of user memory (`USTKTOP`).
-    *   **Persistent Failure**: Shifting the stack by up to 2MB in `_main` did **not** resolve the crash. This indicates that the problematic write is likely targeting a pointer or structure (like the `Ureg`) that is derived from the kernel's initial stack placement, bypassing our relocation.
+    *   **Final Root Cause Identified**: The process startup code (`main9.s`) was attempting to relocate a fixed-size environment block from the kernel stack to a new location. When the kernel placed `argc` near the absolute top of memory (`USTKTOP`), the relocation loop would read or write past the boundary, triggering the trap immediately during startup or when a large environment was passed.
 2.  **General Protection Violations**: `trap: general protection violation pc=...`
-    *   Triggered by inconsistent register state or stack misalignment.
-    *   Resolved by 16-byte alignment and full callee-save (R12-R15) restoration.
-3.  **Constant PC Values**:
-    *   The crash `pc` has remained remarkably stable (most recently `0x20ca44`), suggesting the faulting instruction is likely in the signal resumption path (`siglongjmp` or `_NOTED` stub).
+    *   Triggered by stack misalignment or incomplete callee-save register restoration (BX, BP, R12-R15).
+    *   Also occurred when `siglongjmp` attempted to resume via `NRSTR` using a `Ureg` that was itself located at the memory boundary.
 
 ## Current Investigation State
 
-### 1. The NRSTR Vulnerability
-The `NRSTR` path in `siglongjmp` writes to the `Ureg` struct provided by the kernel. If the signal arrived when the process was at a very high stack address (common in early startup or deep recursion), the `Ureg` itself may be located at the very edge of the address space. Writing to high-offset members (like `r15` or `ss`) in this struct can trigger the suicide trap.
+### 1. Boundary-Safe Relocation
+We have implemented a quad-by-quad relocation loop in `main9.s` that explicitly checks every source address against `0x7ffffffff000`. This ensures that we relocate as much of the kernel environment as possible (at least `argc` and the `argv` pointer array) without ever crossing the faulting boundary.
 
-### 2. Startup Stack Relocation
-We have relocated the user stack and arguments in `_main`. While this protects normal function calls, it does not prevent the kernel from delivering new signals on the "current" stack, which might still be near the top if a previous `longjmp` restored an old `SP`.
+### 2. Signal Context Safety
+By moving the primary user stack 128KB+ away from `USTKTOP` at the first instruction of `_main`, we ensure that any subsequently delivered signals have their `Ureg` and note strings placed in safe memory. This allows `siglongjmp` to use the standard `NRSTR` resumption path safely.
 
-## The "Nuclear Option" Fix (Current Patch)
-To definitively stop the suicide traps, we are transitioning to a **stack-neutral signal recovery** model:
-1.  **Bypass NRSTR**: `siglongjmp` no longer modifies the kernel's `Ureg` or calls `noted(NRSTR)`.
-2.  **Manual Unwind**: We manually adjust the global `nstack` state to "pop" all handlers being jumped over.
-3.  **Direct Context Restore**: We use `longjmp` (which we've already verified to be stack-safe) to restore the CPU state and resume execution. This avoids the need to touch the kernel's signal context at the memory boundary.
-4.  **Robust Relocation**: `main9.s` now uses a simplified 128KB shift with a safe manual copy loop for the environment block.
+### 3. Register Integrity
+`longjmp` and `siglongjmp` have been verified to restore all 8 callee-saved registers required by the `6c` compiler, particularly `R15` (REGEXT), which is critical for global variable access in many APE libraries.
+
+## The Architectural Fix (Current Patch)
+1.  **Safe Startup (`main9.s`)**: Relocates `argc`/`argv` using a boundary-aware copy loop.
+2.  **Standard Signal Path (`notetramp.c`)**: Uses `NRSTR` for reliable kernel-level signal resumption, but includes manual `nstack` unwinding to prevent signal stack corruption.
+3.  **Preserved Notes**: `_notetramp` captures the signal message into a global stack to ensure it survives the kernel's state-holding cycle.
