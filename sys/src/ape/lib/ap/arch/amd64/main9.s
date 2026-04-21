@@ -20,9 +20,10 @@ TEXT	_main(SB), 1, $0
 	MOVQ	AX, CX
 	ADDQ	$2, CX			/* CX = argc + 2 (argc slot + argv pointers + NULL) */
 	
+	MOVQ	$0x7ffffffff000, R13	/* Load boundary into register for CMPQ */
 copy_loop:
 	MOVQ	SI, R11
-	CMPQ	R11, $0x7ffffffff000	/* Check if next read hits boundary */
+	CMPQ	R11, R13		/* Check if next read hits boundary */
 	JAE	copy_done
 	MOVSQ
 	LOOP	copy_loop

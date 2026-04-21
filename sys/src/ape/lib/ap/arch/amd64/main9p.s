@@ -11,9 +11,10 @@ TEXT	_main(SB), 1, $0
 	MOVQ	0(R12), AX
 	MOVQ	AX, CX
 	ADDQ	$2, CX
+	MOVQ	$0x7ffffffff000, R13
 copy_loop:
 	MOVQ	SI, R11
-	CMPQ	R11, $0x7ffffffff000
+	CMPQ	R11, R13
 	JAE	copy_done
 	MOVSQ
 	LOOP	copy_loop
