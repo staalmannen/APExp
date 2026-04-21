@@ -1,4 +1,4 @@
-/* lib/config.h.  Generated from config.in.h by configure. GNULIB*/
+/* lib/config.h.  Generated from config.in.h by configure. */
 /* lib/config.in.h.  Generated from configure.ac by autoheader.  */
 
 /* Define if building universal (internal helper macro) */

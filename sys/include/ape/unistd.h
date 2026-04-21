@@ -184,6 +184,7 @@ int linkat(int old_dfd, const char *old, int new_dfd, const char *new, int flags
 extern int symlink(const char *, const char *);
 extern int usleep(unsigned int);
 extern size_t confstr(int, char *, size_t);
+extern char **environ;
 
 #ifdef __cplusplus
 }

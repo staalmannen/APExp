@@ -125,10 +125,10 @@ LIB_OBJS=\
 	libbison_a-quotearg.$O \
 	libbison_a-gl_rbtree_oset.$O \
 	libbison_a-gl_rbtreehash_list.$O \
-	libbison_a-scratch_buffer_dupfree.$O \
-	libbison_a-scratch_buffer_grow.$O \
-	libbison_a-scratch_buffer_grow_preserve.$O \
-	libbison_a-scratch_buffer_set_array_size.$O \
+#	libbison_a-scratch_buffer_dupfree.$O \
+#	libbison_a-scratch_buffer_grow.$O \
+#	libbison_a-scratch_buffer_grow_preserve.$O \
+#	libbison_a-scratch_buffer_set_array_size.$O \
 	libbison_a-sig-handler.$O \
 	libbison_a-spawn-pipe.$O \
 	libbison_a-threadlib.$O \

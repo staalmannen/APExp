@@ -54,7 +54,9 @@ extern int creat(const char *, mode_t);
 /* hacks */
 #define O_SEARCH O_RDONLY
 #define O_BINARY O_RDONLY
+#define O_TEXT O_RDWR
 #define O_DIRECTORY O_RDONLY
+#define F_DUPFD_CLOEXEC FD_CLOEXEC
 
 #define AT_FDCWD -100
 
