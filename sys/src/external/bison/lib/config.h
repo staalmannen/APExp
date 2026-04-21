@@ -1,4 +1,4 @@
-/* lib/config.h.  Generated from config.in.h by configure. */
+/* lib/config.h.  Generated from config.in.h by configure.  */
 /* lib/config.in.h.  Generated from configure.ac by autoheader.  */
 
 /* Define if building universal (internal helper macro) */
@@ -123,7 +123,7 @@
 
 /* Define to a C preprocessor expression that evaluates to 1 or 0, depending
    whether the gnulib module fopen-safer shall be considered present. */
-#undef GNULIB_FOPEN_SAFER
+#define GNULIB_FOPEN_SAFER 1
 
 /* Define to a C preprocessor expression that evaluates to 1 or 0, depending
    whether the gnulib module fscanf shall be considered present. */
@@ -725,7 +725,7 @@
 
 /* Define to 1 if you have the declaration of `getc_unlocked', and to 0 if you
    don't. */
-#define HAVE_DECL_GETC_UNLOCKED 1
+#define HAVE_DECL_GETC_UNLOCKED 0
 
 /* Define to 1 if you have the declaration of `getdelim', and to 0 if you
    don't. */
@@ -918,7 +918,7 @@
 #define HAVE_GETOPT_LONG_ONLY 1
 
 /* Define to 1 if the system has the 'getpagesize' function. */
-#define HAVE_GETPAGESIZE 1
+/* #undef HAVE_GETPAGESIZE */
 
 /* Define to 1 if you have the `getprogname' function. */
 #define HAVE_GETPROGNAME 1
@@ -984,8 +984,7 @@
 #define HAVE_LDEXP_IN_LIBC 1
 
 /* Define if you have the libtextstyle library. */
-// we have a shim header dealing with it.
-// #undef HAVE_LIBTEXTSTYLE
+/* #undef HAVE_LIBTEXTSTYLE */
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
