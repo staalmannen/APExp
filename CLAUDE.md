@@ -352,30 +352,33 @@ Any pointer passed to `free()` MUST be exactly the value returned by `malloc()`.
 Aligned-allocation fallback for alignment > 16 returns adjusted pointers that
 are NOT free()-safe. Document this in any aligned allocator.
 
-### amd64 sigsetjmp / siglongjmp — two bugs fixed
+### amd64 sigsetjmp / siglongjmp — bugs and fixes
 
-**Files:** `sys/src/ape/lib/ap/arch/amd64/setjmp.s`, `sys/src/ape/lib/ap/arch/amd64/notetramp.c`
+**Files:** `sys/src/ape/lib/ap/arch/amd64/setjmp.s`, `sys/src/ape/lib/ap/arch/amd64/notetramp.c`, `sys/src/ape/lib/ap/arch/amd64/main9.s`
 
 **Bug 1 (setjmp.s):** `MOVL $_psigblocked(SB), 4(RARG)` stored the ADDRESS of
-`_psigblocked` into the jmpbuf (the `$` prefix = immediate/address). Should be
-`MOVL _psigblocked(SB), BX; MOVL BX, 4(RARG)` to store the VALUE.
+`_psigblocked` into the jmpbuf. Fix: load the VALUE with an intermediate register.
 
-**Bug 2 (notetramp.c):** `notecont()` decremented `nstack` BEFORE calling the
-user signal handler. When the handler called `siglongjmp()`, siglongjmp saw
-`nstack==0` and unconditionally took the `longjmp()` path — which crashes because
-it tries to restore SP to a value near USTKTOP (the top of user address space on
-pc64) that maps to an unmapped page.
+**Bug 2 (main9.s — suicide trap: fault write addr=0x7ffffffff000):**
+The copy loop used `MOVQ $0x7ffffffff000, R13` then MOVSQ loop.  R13 is a
+callee-saved REGEXT register in 6c.  If no function between `_main` and
+`sigsetjmp` reinitialises R13 as REGEXT, `sigsetjmp` saves `R13 = 0x7ffffffff000`
+into jmpbuf[5].  After `longjmp` restores it, any function using R13 as REGEXT
+for a global variable generates `MOVL val, 0(R13)` which faults at 0x7ffffffff000
+(the guard page).
+**Fix:** Use `CLD; REP; MOVSQ` — no boundary check is needed (argc is always
+small; the last read is always < USTKTOP), and only caller-saved registers
+(AX/CX/SI/DI) are used.
 
-**Fix:** Move `nstack--` from BEFORE `(*f)(...)` to AFTER it in `notecont()`.
-When siglongjmp is called from inside the handler, `nstack==1` so it checks the
-SP condition: the Ureg SP (set by NSAVE to ~600 bytes below signal delivery SP,
-itself below sigsetjmp SP) is always less than `jb->jmpbuf[JMPBUFSP]`, so the
-NRSTR path is taken. NRSTR uses `_NOTED(3)` to have the kernel directly restore
-the process to the sigsetjmp return point — no `longjmp()`, no SP-write, no crash.
+**Bug 3 (notetramp.c / notetramp ordering):**
+`notecont()` decremented `nstack` BEFORE calling the user signal handler; when
+the handler called `siglongjmp()`, `nstack==0` so `longjmp()` path was taken.
+With the old longjmp (PUSH+RET), this caused a fault when SP was near USTKTOP.
+**Fix (current):** `nstack--` is now BEFORE `(*f)()`.  With our new longjmp
+(ADDQ $8,SP + JMP, no stack write), the longjmp() path is safe when nstack==0.
 
-**Invariant:** After this fix, `siglongjmp` called from within a signal handler
-on amd64 always takes the NRSTR path (never `longjmp()`). Outside signal context
-(`nstack==0`), the `longjmp()` path is taken as before.
+**Invariant:** `longjmp` must NEVER write to the stack (uses ADDQ+JMP not PUSH+RET).
+`main9.s` must NEVER use R12–R15 as scratch registers — these are REGEXT-reserved.
 
 ### Build order for compiler changes
 ```

@@ -9,18 +9,53 @@ This document summarizes the findings and fixes for the "mysterious crashes" (su
     *   Triggered by stack misalignment or incomplete callee-save register restoration (BX, BP, R12-R15).
     *   Also occurred when `siglongjmp` attempted to resume via `NRSTR` using a `Ureg` that was itself located at the memory boundary.
 
-## Current Investigation State
+## Root Cause: REGEXT Register Pollution in main9.s
 
-### 1. Boundary-Safe Relocation
-We have implemented a quad-by-quad relocation loop in `main9.s` that explicitly checks every source address against `0x7ffffffff000`. This ensures that we relocate as much of the kernel environment as possible (at least `argc` and the `argv` pointer array) without ever crossing the faulting boundary.
+### The R13 = 0x7ffffffff000 Bug (Final Diagnosis)
 
-### 2. Signal Context Safety
-By moving the primary user stack 128KB+ away from `USTKTOP` at the first instruction of `_main`, we ensure that any subsequently delivered signals have their `Ureg` and note strings placed in safe memory. This allows `siglongjmp` to use the standard `NRSTR` resumption path safely.
+The boundary-safe relocation loop used R13 as a scratch register to hold the
+guard-page address:
 
-### 3. Register Integrity
-`longjmp` and `siglongjmp` have been verified to restore all 8 callee-saved registers required by the `6c` compiler, particularly `R15` (REGEXT), which is critical for global variable access in many APE libraries.
+```asm
+MOVQ  $0x7ffffffff000, R13   /* ← poisons R13 */
+copy_loop:
+    MOVQ  SI, R11
+    CMPQ  R11, R13            /* boundary check */
+    JAE   copy_done
+    MOVSQ
+    LOOP  copy_loop
+```
 
-## The Architectural Fix (Current Patch)
-1.  **Safe Startup (`main9.s`)**: Relocates `argc`/`argv` using a boundary-aware copy loop.
-2.  **Standard Signal Path (`notetramp.c`)**: Uses `NRSTR` for reliable kernel-level signal resumption, but includes manual `nstack` unwinding to prevent signal stack corruption.
-3.  **Preserved Notes**: `_notetramp` captures the signal message into a global stack to ensure it survives the kernel's state-holding cycle.
+R13 is a **callee-saved REGEXT register** in Plan 9 6c (used to cache the
+address of a global variable within a function).  The call chain from _main to
+`sigsetjmp` may not reinitialise R13 (if no function in the chain uses R13 as
+REGEXT), so `sigsetjmp` saves `R13 = 0x7ffffffff000` into `jmpbuf[5]`.
+
+When `longjmp` restores the registers:
+```asm
+MOVQ  40(R11), R13    /* restores R13 = 0x7ffffffff000 */
+```
+
+Any subsequent function that uses R13 as REGEXT for a global generates:
+```asm
+MOVL  newval, 0(R13)  /* FAULT: write to 0x7ffffffff000 (guard page) */
+```
+
+This produces exactly the observed crash:
+`suicide: sys: trap: fault write addr=0x7ffffffff000 pc=<instr>`
+
+### Fix
+
+Replace the explicit boundary-check loop with `CLD; REP; MOVSQ`.  No boundary
+check is needed: the last source read is at `kernel_SP + (argc+1)*8 =
+USTKTOP - ssize + argc*8 < USTKTOP - 8`, always within mapped memory.
+Using only AX/CX/SI/DI (all caller-saved) for the copy keeps all callee-saved
+REGEXT registers (R12–R15, BP, BX) clean.
+
+## The Architectural Fix (Final Patch)
+1.  **Safe Startup (`main9.s`)**: Shifts stack 128KB below USTKTOP; copies
+    `argc`/`argv` with `REP; MOVSQ` using only caller-saved registers.
+2.  **Standard Signal Path (`notetramp.c`)**: Uses `longjmp()` path when
+    `nstack==0` (single-level signal); uses `NRSTR` only for nested signals.
+3.  **8-Register setjmp (`setjmp.s`)**: Saves/restores all callee-saved REGEXT
+    registers (R12–R15, BP, BX) so the setjmp site sees correct global-cache values.
