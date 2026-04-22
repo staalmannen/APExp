@@ -198,12 +198,12 @@ liby_a-%.$O: $BISONSRC/lib/%.c
 
 
 libbison.a$O: $LIB_OBJS
-			ar vu libbison.a$O $LIB_OBJS
+		ar vu libbison.a$O $LIB_OBJS
 
 install:V:
-		cp $BISONSRC/bison.1 $APEXPROOT/sys/man/1/bison
-		cp $BISONSRC/yacc.1 $APEXPROOT/sys/man/1/yacc
+		cp $BISONSRC/doc/bison.1 $APEXPROOT/sys/man/1/bison
+		cp $BISONSRC/doc/yacc.1 $APEXPROOT/sys/man/1/yacc
 
 clean:V:
-	rm -f libbison.a$O
+		rm -f libbison.a$O
 

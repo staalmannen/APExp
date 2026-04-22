@@ -87,11 +87,14 @@ Install paths have been modified so that libraries and binaries are installed in
 
 **3rd party**
 - libcurses : PDCursesMod (check out 2026-04-08; built with utf8/wchar)
-- readline (version 8.3)
+- GNU readline (version 8.3)
+- GNU libunistring (version 1.4.2)
 - libpcre2 (version 10.47)
+- libxml2 (version 2.15.2)
 - liblzma (from xz version 5.8.3)
 - libz (version 1.3.2)
 - libbz2 (version 1.0.8)
+- zstd (version 1.5.7)
 
 
 ***Utilities***
