@@ -83,6 +83,10 @@ OFILES=\
 	__fwritex.$O\
 	dprintf.$O\
 	flockfile.$O\
+# GNU extensions\
+	asnprintf.$O\
+	_fpending.$O\
+	error.$O\
 
 
 

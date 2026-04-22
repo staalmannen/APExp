@@ -78,6 +78,15 @@ int posix_spawn_file_actions_addopen(posix_spawn_file_actions_t *fa,
                                      int fd, const char *path,
                                      int flags, mode_t mode)
 	{ (void)fa; (void)fd; (void)path; (void)flags; (void)mode; return 0; }
+int posix_spawn_file_actions_addchdir(posix_spawn_file_actions_t *fa,
+                                      const char *path)
+	{ (void)fa; (void)path; return 0; }
+int posix_spawn_file_actions_addchdir_np(posix_spawn_file_actions_t *fa,
+                                         const char *path)
+	{ (void)fa; (void)path; return 0; }
+int posix_spawn_file_actions_addfchdir_np(posix_spawn_file_actions_t *fa,
+                                          int fd)
+	{ (void)fa; (void)fd; return 0; }
 
 /* spawnattr stubs */
 int posix_spawnattr_init(posix_spawnattr_t *a)      { (void)a; return 0; }

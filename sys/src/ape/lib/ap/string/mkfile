@@ -94,6 +94,10 @@ OFILES=\
 	wmemset.$O\
 # hacks\
 	strtoumax.$O\
+# GNU extensions\
+	ffsl.$O\
+	rawmemchr.$O\
+	obstack.$O\
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib

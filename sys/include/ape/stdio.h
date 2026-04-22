@@ -118,6 +118,11 @@ extern int	pclose(FILE *);
 extern int asprintf(char**, const char *, ...);
 extern int vasprintf(char **, const char *, va_list);
 
+/* GNU extensions */
+extern char *asnprintf(char *, size_t *, const char *, ...);
+extern char *vasnprintf(char *, size_t *, const char *, va_list);
+extern size_t _fpending(FILE *);
+
 extern FILE *fmemopen(void *, size_t, const char *);
 extern FILE *open_memstream(char **, size_t *);
 

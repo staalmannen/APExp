@@ -17,6 +17,8 @@ OFILES=\
 	reallocarray.$O\
 	memalign.$O\
 	aligned_alloc.$O\
+# GNU xalloc family\
+	xmalloc.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

@@ -44,6 +44,11 @@ extern char *strtok_r(char *, const char *, char **);
 extern char *strchrnul(const char*, int);
 extern int strerror_r(int, char *, size_t);
 
+/* GNU extensions */
+extern int ffsl(long);
+extern int ffsll(long long);
+extern void *rawmemchr(const void *, int);
+
 
 void *memmem(const void *, size_t, const void *, size_t);
 void *memrchr(const void *, int, size_t);
