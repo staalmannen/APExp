@@ -106,8 +106,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - GNU m4 (version 1.4.21) has been added
 - gettext utilities from Sabotage Linux "gettext-tiny" [14]
 - A "musl" iconv utility has been added from Alpine Linux.
-- system yacc has been replaced by byacc (version 20240109) as yacc. 
-- -> TODO: replace with Bison (version 3.8) and keep native yacc as "yacc" because it is sometimes needed
+- GNU bison (version 3.8) introduced. Native yacc as "yacc" because it is sometimes needed
 - system lex has been replaced by flex (version 2.6.4) as lex
 - vibe-coded (claude.ai) GAS-compatible "as" front end to native $Oa assemblers.
 - the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" *et al.* have been built from suckless sbase [15]
