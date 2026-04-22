@@ -119,6 +119,66 @@ extern struct in6_addr in6addr_loopback;
 	{{ 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, \
 	   0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x01 }}
 
+/* IPv6 address test macros (POSIX / RFC 3493) */
+#include <string.h>
+#define IN6_ARE_ADDR_EQUAL(a,b) \
+	(memcmp(&(a)->s6_addr[0], &(b)->s6_addr[0], 16) == 0)
+
+#define IN6_IS_ADDR_UNSPECIFIED(a) \
+	(((a)->s6_addr[0]  | (a)->s6_addr[1]  | (a)->s6_addr[2]  | \
+	  (a)->s6_addr[3]  | (a)->s6_addr[4]  | (a)->s6_addr[5]  | \
+	  (a)->s6_addr[6]  | (a)->s6_addr[7]  | (a)->s6_addr[8]  | \
+	  (a)->s6_addr[9]  | (a)->s6_addr[10] | (a)->s6_addr[11] | \
+	  (a)->s6_addr[12] | (a)->s6_addr[13] | (a)->s6_addr[14] | \
+	  (a)->s6_addr[15]) == 0)
+
+#define IN6_IS_ADDR_LOOPBACK(a) \
+	((a)->s6_addr[0]  == 0 && (a)->s6_addr[1]  == 0 && \
+	 (a)->s6_addr[2]  == 0 && (a)->s6_addr[3]  == 0 && \
+	 (a)->s6_addr[4]  == 0 && (a)->s6_addr[5]  == 0 && \
+	 (a)->s6_addr[6]  == 0 && (a)->s6_addr[7]  == 0 && \
+	 (a)->s6_addr[8]  == 0 && (a)->s6_addr[9]  == 0 && \
+	 (a)->s6_addr[10] == 0 && (a)->s6_addr[11] == 0 && \
+	 (a)->s6_addr[12] == 0 && (a)->s6_addr[13] == 0 && \
+	 (a)->s6_addr[14] == 0 && (a)->s6_addr[15] == 1)
+
+/* ::ffff:0:0/96 — IPv4-mapped */
+#define IN6_IS_ADDR_V4MAPPED(a) \
+	((a)->s6_addr[0]  == 0 && (a)->s6_addr[1]  == 0 && \
+	 (a)->s6_addr[2]  == 0 && (a)->s6_addr[3]  == 0 && \
+	 (a)->s6_addr[4]  == 0 && (a)->s6_addr[5]  == 0 && \
+	 (a)->s6_addr[6]  == 0 && (a)->s6_addr[7]  == 0 && \
+	 (a)->s6_addr[8]  == 0 && (a)->s6_addr[9]  == 0 && \
+	 (a)->s6_addr[10] == 0xff && (a)->s6_addr[11] == 0xff)
+
+/* ::0.0.0.0/96 — IPv4-compatible (deprecated) */
+#define IN6_IS_ADDR_V4COMPAT(a) \
+	((a)->s6_addr[0]  == 0 && (a)->s6_addr[1]  == 0 && \
+	 (a)->s6_addr[2]  == 0 && (a)->s6_addr[3]  == 0 && \
+	 (a)->s6_addr[4]  == 0 && (a)->s6_addr[5]  == 0 && \
+	 (a)->s6_addr[6]  == 0 && (a)->s6_addr[7]  == 0 && \
+	 (a)->s6_addr[8]  == 0 && (a)->s6_addr[9]  == 0 && \
+	 (a)->s6_addr[10] == 0 && (a)->s6_addr[11] == 0 && \
+	 !((a)->s6_addr[12] == 0 && (a)->s6_addr[13] == 0 && \
+	   (a)->s6_addr[14] == 0 && \
+	   ((a)->s6_addr[15] == 0 || (a)->s6_addr[15] == 1)))
+
+#define IN6_IS_ADDR_MULTICAST(a) ((a)->s6_addr[0] == 0xff)
+#define IN6_IS_ADDR_LINKLOCAL(a) \
+	((a)->s6_addr[0] == 0xfe && ((a)->s6_addr[1] & 0xc0) == 0x80)
+#define IN6_IS_ADDR_SITELOCAL(a) \
+	((a)->s6_addr[0] == 0xfe && ((a)->s6_addr[1] & 0xc0) == 0xc0)
+#define IN6_IS_ADDR_MC_NODELOCAL(a) \
+	(IN6_IS_ADDR_MULTICAST(a) && (((a)->s6_addr[1] & 0xf) == 0x1))
+#define IN6_IS_ADDR_MC_LINKLOCAL(a) \
+	(IN6_IS_ADDR_MULTICAST(a) && (((a)->s6_addr[1] & 0xf) == 0x2))
+#define IN6_IS_ADDR_MC_SITELOCAL(a) \
+	(IN6_IS_ADDR_MULTICAST(a) && (((a)->s6_addr[1] & 0xf) == 0x5))
+#define IN6_IS_ADDR_MC_ORGLOCAL(a) \
+	(IN6_IS_ADDR_MULTICAST(a) && (((a)->s6_addr[1] & 0xf) == 0x8))
+#define IN6_IS_ADDR_MC_GLOBAL(a) \
+	(IN6_IS_ADDR_MULTICAST(a) && (((a)->s6_addr[1] & 0xf) == 0xe))
+
 /*
  * Socket address, internet style.
  */

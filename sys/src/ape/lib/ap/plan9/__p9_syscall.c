@@ -479,7 +479,7 @@ __p9_syscall(long n, long a1, long a2, long a3, long a4, long a5, long a6)
 		return p9ret(_STAT((const char*)a1, (unsigned char*)a2, (int)a3));
 
 	case SYS_access: /* [DIRECT] */
-		return p9ret(__access((char*)a1, (int)a2));
+		return p9ret(access((const char*)a1, (int)a2));
 
 	case SYS_unlink: /* [DIRECT] */
 		return p9ret(_REMOVE((const char*)a1));

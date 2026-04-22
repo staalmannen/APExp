@@ -55,7 +55,17 @@ typedef uint64_t	uint_least64_t;
 typedef _intptr_t intptr_t;
 typedef _uintptr_t uintptr_t;
 
-#define UINT32_C(x) (unsigned long) x
+/* C99 integer constant macros. Plan9 is LLP64: int=long=32-bit, long long=64-bit. */
+#define INT8_C(c)    c
+#define INT16_C(c)   c
+#define INT32_C(c)   c##L
+#define INT64_C(c)   c##LL
+#define UINT8_C(c)   c##U
+#define UINT16_C(c)  c##U
+#define UINT32_C(c)  c##UL
+#define UINT64_C(c)  c##ULL
+#define INTMAX_C(c)  c##LL
+#define UINTMAX_C(c) c##ULL
 
 #define INT8_MIN	((int8_t)0x80)
 #define INT16_MIN	((int16_t)0x8000)
