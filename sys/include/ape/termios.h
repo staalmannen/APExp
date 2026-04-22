@@ -62,6 +62,8 @@
 #define HUPCL	0x040
 #define PARENB	0x080
 #define PARODD	0x100
+/* baud rate mask in c_cflag: bits 9-13 (above all control-mode bits) */
+#define CBAUD	0x3E00
 
 /* local modes */
 #define ECHO	0x001
@@ -134,10 +136,12 @@ extern int cfsetospeed(struct termios *, speed_t);
 extern speed_t cfgetispeed(const struct termios *);
 extern int cfsetispeed(struct termios *, speed_t);
 extern void cfmakeraw(struct termios *);
+extern int cfsetspeed(struct termios *, speed_t);
 extern int tcgetattr(int, struct termios *);
 extern int tcsetattr(int, int, const struct termios *);
 extern pid_t tcgetpgrp(int);
 extern int tcsetpgrp(int, pid_t);
+extern pid_t tcgetsid(int);
 extern int tcdrain(int);
 extern int tcflush(int, int);
 extern int tcflow(int, int);

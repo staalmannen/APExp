@@ -46,7 +46,7 @@ tcgetattr(int fd, struct termios *t)
 			/* If there is no emulation return sensible defaults */
 			t->c_iflag = ISTRIP|ICRNL|IXON|IXOFF;
 			t->c_oflag = OPOST|TAB3|ONLCR;
-			t->c_cflag = B9600;
+			t->c_cflag = CS8 | CREAD | CLOCAL | (B9600 << 9);
 			t->c_lflag = ISIG|ICANON|ECHO|ECHOE|ECHOK;
 			t->c_cc[VINTR] = CINTR;
 			t->c_cc[VQUIT] = CQUIT;
@@ -213,4 +213,15 @@ tcsendbreak(int fd, int)
 	}
 	/* Plan9: no break signal on serial lines */
 	return 0;
+}
+
+pid_t
+tcgetsid(int fd)
+{
+	if(!isatty(fd)){
+		errno = ENOTTY;
+		return -1;
+	}
+	/* Plan9 has no session concept; return process group as session id */
+	return getpid();
 }

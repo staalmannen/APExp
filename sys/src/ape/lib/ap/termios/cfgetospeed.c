@@ -13,26 +13,35 @@ cfmakeraw(struct termios *t)
 }
 
 speed_t
-cfgetospeed(const struct termios *)
+cfgetospeed(const struct termios *t)
 {
-	return B0;
+	return (t->c_cflag & CBAUD) >> 9;
 }
 
 int
-cfsetospeed(struct termios *, speed_t)
+cfsetospeed(struct termios *t, speed_t s)
 {
+	t->c_cflag = (t->c_cflag & ~CBAUD) | ((s & 0x1F) << 9);
 	return 0;
 }
 
 speed_t
-cfgetispeed(const struct termios *)
+cfgetispeed(const struct termios *t)
 {
-	return B0;
+	return (t->c_cflag & CBAUD) >> 9;
 }
 
 int
-cfsetispeed(struct termios *, speed_t)
+cfsetispeed(struct termios *t, speed_t s)
 {
+	t->c_cflag = (t->c_cflag & ~CBAUD) | ((s & 0x1F) << 9);
+	return 0;
+}
+
+int
+cfsetspeed(struct termios *t, speed_t s)
+{
+	t->c_cflag = (t->c_cflag & ~CBAUD) | ((s & 0x1F) << 9);
 	return 0;
 }
 
