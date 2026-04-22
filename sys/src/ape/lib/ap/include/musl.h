@@ -13,7 +13,10 @@
 #include <stdint.h>
 
 /* musl expects ssize_t */
+#ifndef _SSIZE_T
+#define _SSIZE_T
 typedef long ssize_t;
+#endif
 
 /* -------------------------------------------------------------
  * errno handling – APExp already provides global 'errno'
