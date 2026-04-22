@@ -1,0 +1,41 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+BIN=$APEXPROOT/$objtype/bin/ape/wish
+
+TKSRC=$APEXPROOT/sys/src/external/tk
+TCLSRC=$APEXPROOT/sys/src/external/tcl
+
+CFLAGS=\
+	-FVp -c\
+	-I$TKSRC/generic\
+	-I$TKSRC/xlib\
+	-I$TKSRC/plan9\
+	-I$TCLSRC/generic\
+	-I$APEXPROOT/sys/include/ape\
+	-I$APEXPROOT/$objtype/include/ape\
+	-DHAVE_TCL_CONFIG_H\
+	-DPLAN9\
+	-DMODULE_SCOPE=/***/\
+	-DWCHAR=char\
+	-DTK_PLATFORM=\"plan9\"\
+
+LIBS=\
+	$APEXPROOT/$objtype/lib/ape/libtk.a\
+	$APEXPROOT/$objtype/lib/ape/libtcl.a\
+	$APEXPROOT/$objtype/lib/ape/libdraw.a\
+	$APEXPROOT/$objtype/lib/ape/libap.a\
+
+OFILES=tkAppInit.$O
+
+all:V: $BIN
+
+$BIN: $OFILES $LIBS
+	$LD $LDFLAGS -o $BIN $OFILES $LIBS
+
+tkAppInit.$O: $TKSRC/unix/tkAppInit.c
+	$CC $CFLAGS $TKSRC/unix/tkAppInit.c
+
+clean:V:
+	rm -f *.[$OS] $BIN

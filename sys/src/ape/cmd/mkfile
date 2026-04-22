@@ -21,6 +21,8 @@ _CORE_APPS=\
 	grep\
 
 _OPTIONAL_APPS=\
+# GUI \
+	wish\
 # archivers \
 	bzip2\
 	clzip\

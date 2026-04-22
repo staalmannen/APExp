@@ -1,0 +1,58 @@
+# mkfile — Plan 9 backend for Tk
+#
+# This directory is built as part of libtk.a (alongside the generic/
+# and xlib/ sources).  It should NOT be built standalone; include it
+# via the top-level libtk mkfile.
+#
+# Compiler flags:
+#   -I../generic  -I../xlib  -I. (for our tkPlan9Port.h / tkPlan9Int.h)
+#   -I$APEXPROOT/sys/include/ape  (for Tcl/Tk headers)
+#
+# tkPlan9DrawImpl.c is special: it #includes Plan 9's <draw.h> and
+# must be compiled WITHOUT any Xlib.h in scope.  Its object is linked
+# separately but into the same library.
+
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+# Per-backend object files (compiled with Tk generic includes)
+PLAN9_OBJS=\
+	tkPlan9Init.$O\
+	tkPlan9Event.$O\
+	tkPlan9Draw.$O\
+	tkPlan9Font.$O\
+	tkPlan9Color.$O\
+	tkPlan9Wm.$O\
+
+# DrawImpl is compiled differently (no Xlib headers; uses draw.h)
+DRAWIMPL_OBJ=tkPlan9DrawImpl.$O
+
+TKSRC=$APEXPROOT/sys/src/external/tk
+TCLSRC=$APEXPROOT/sys/src/external/tcl
+
+CFLAGS=\
+	-I$TKSRC/generic\
+	-I$TKSRC/xlib\
+	-I$TKSRC/plan9\
+	-I$TCLSRC/generic\
+	-I$APEXPROOT/sys/include/ape\
+	-I$APEXPROOT/$objtype/include/ape\
+	-DUSE_TCL_STUBS\
+	-DUSE_TK_STUBS\
+
+# DrawImpl uses Plan 9 native includes, not APE headers
+DRAWIMPL_CFLAGS=\
+	-I/sys/include\
+	-I$TKSRC/plan9\
+
+all:V: $PLAN9_OBJS $DRAWIMPL_OBJ
+
+$DRAWIMPL_OBJ: tkPlan9DrawImpl.c
+	$CC $DRAWIMPL_CFLAGS -c tkPlan9DrawImpl.c
+
+%.$O: %.c
+	$CC $CFLAGS -c $stem.c
+
+clean:V:
+	rm -f *.$O

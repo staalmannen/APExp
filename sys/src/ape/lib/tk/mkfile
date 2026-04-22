@@ -1,0 +1,221 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libtk.a
+
+TKSRC=$APEXPROOT/sys/src/external/tk
+TCLSRC=$APEXPROOT/sys/src/external/tcl
+
+XLIB_OBJS=\
+	xcolors.$O\
+	xdraw.$O\
+	xgc.$O\
+	ximage.$O\
+	xutil.$O\
+
+PLAN9_OBJS=\
+	tkPlan9Init.$O\
+	tkPlan9Event.$O\
+	tkPlan9Draw.$O\
+	tkPlan9Font.$O\
+	tkPlan9Color.$O\
+	tkPlan9Wm.$O\
+	tkPlan9Stubs.$O\
+
+# DrawImpl uses Plan 9 native headers (draw.h, mouse.h, keyboard.h)
+# It does NOT use APE/Xlib headers.
+DRAWIMPL_OBJ=tkPlan9DrawImpl.$O
+
+GENERIC_OBJS=\
+	tk3d.$O\
+	tkArgv.$O\
+	tkAtom.$O\
+	tkBind.$O\
+	tkBitmap.$O\
+	tkBusy.$O\
+	tkButton.$O\
+	tkCanvArc.$O\
+	tkCanvBmap.$O\
+	tkCanvImg.$O\
+	tkCanvLine.$O\
+	tkCanvPoly.$O\
+	tkCanvPs.$O\
+	tkCanvText.$O\
+	tkCanvUtil.$O\
+	tkCanvWind.$O\
+	tkCanvas.$O\
+	tkClipboard.$O\
+	tkCmds.$O\
+	tkColor.$O\
+	tkConfig.$O\
+	tkConsole.$O\
+	tkCursor.$O\
+	tkEntry.$O\
+	tkError.$O\
+	tkEvent.$O\
+	tkFocus.$O\
+	tkFont.$O\
+	tkFrame.$O\
+	tkGC.$O\
+	tkGeometry.$O\
+	tkGet.$O\
+	tkGrab.$O\
+	tkGrid.$O\
+	tkIcu.$O\
+	tkImage.$O\
+	tkImgBmap.$O\
+	tkImgGIF.$O\
+	tkImgListFormat.$O\
+	tkImgPNG.$O\
+	tkImgPPM.$O\
+	tkImgPhInstance.$O\
+	tkImgPhoto.$O\
+	tkImgSVGnano.$O\
+	tkImgUtil.$O\
+	tkListbox.$O\
+	tkMain.$O\
+	tkMenu.$O\
+	tkMenuDraw.$O\
+	tkMenubutton.$O\
+	tkMessage.$O\
+	tkObj.$O\
+	tkOldConfig.$O\
+	tkOption.$O\
+	tkPack.$O\
+	tkPanedWindow.$O\
+	tkPkgConfig.$O\
+	tkPlace.$O\
+	tkRectOval.$O\
+	tkScale.$O\
+	tkScrollbar.$O\
+	tkSelect.$O\
+	tkStubInit.$O\
+	tkStyle.$O\
+	tkText.$O\
+	tkTextBTree.$O\
+	tkTextDisp.$O\
+	tkTextImage.$O\
+	tkTextIndex.$O\
+	tkTextMark.$O\
+	tkTextTag.$O\
+	tkTextWind.$O\
+	tkTrig.$O\
+	tkUndo.$O\
+	tkPointer.$O\
+	tkUtil.$O\
+	tkVisual.$O\
+	tkWindow.$O\
+
+TTK_OBJS=\
+	ttkBlink.$O\
+	ttkButton.$O\
+	ttkCache.$O\
+	ttkClamTheme.$O\
+	ttkClassicTheme.$O\
+	ttkDefaultTheme.$O\
+	ttkElements.$O\
+	ttkEntry.$O\
+	ttkFrame.$O\
+	ttkImage.$O\
+	ttkInit.$O\
+	ttkLabel.$O\
+	ttkLayout.$O\
+	ttkManager.$O\
+	ttkNotebook.$O\
+	ttkPanedwindow.$O\
+	ttkProgress.$O\
+	ttkScale.$O\
+	ttkScroll.$O\
+	ttkScrollbar.$O\
+	ttkSeparator.$O\
+	ttkSquare.$O\
+	ttkState.$O\
+	ttkStubInit.$O\
+	ttkTagSet.$O\
+	ttkTheme.$O\
+	ttkTrace.$O\
+	ttkTrack.$O\
+	ttkTreeview.$O\
+	ttkWidget.$O\
+
+UNIX_OBJS=\
+	tkUnix3d.$O\
+	tkUnixButton.$O\
+	tkUnixConfig.$O\
+	tkUnixCursor.$O\
+	tkUnixDraw.$O\
+	tkUnixFocus.$O\
+	tkUnixMenu.$O\
+	tkUnixMenubu.$O\
+	tkUnixScale.$O\
+	tkUnixScrlbr.$O\
+	tkUnixXId.$O\
+
+# Plan9 objects come first so our implementations win over xlib/ stubs
+# (e.g. our XCreateWindow beats xgc.c's stub that returns 0).
+# UNIX_OBJS come after TTK_OBJS; duplicate symbols (TkpScanWindowId,
+# TkpChangeFocus, TkpCmapStressed) are silently skipped — plan9/ wins.
+OFILES=\
+	$PLAN9_OBJS\
+	$DRAWIMPL_OBJ\
+	$GENERIC_OBJS\
+	$TTK_OBJS\
+	$UNIX_OBJS\
+	$XLIB_OBJS\
+
+# Flags for generic/ and plan9/ files (APE headers + Tk includes)
+CFLAGS=\
+	-FVp -c\
+	-I.\
+	-I$TKSRC/generic\
+	-I$TKSRC/generic/ttk\
+	-I$TKSRC/xlib\
+	-I$TKSRC/plan9\
+	-I$TCLSRC/generic\
+	-I$TCLSRC/plan9\
+	-I$APEXPROOT/sys/include/ape\
+	-I$APEXPROOT/$objtype/include/ape\
+	-DHAVE_TCL_CONFIG_H\
+	-DHAVE_TK_CONFIG_H\
+	-DPLAN9\
+	-DMODULE_SCOPE=/***/\
+	-DWCHAR=char\
+	-DTK_PLATFORM=\"plan9\"\
+	-DUSE_TCL_STUBS\
+
+# DrawImpl uses APE's Plan 9 extension headers (draw.h, mouse.h, u.h)
+# It must NOT include Xlib.h; add -DPLAN9_SOURCE to enable draw.h.
+DRAWIMPL_CFLAGS=\
+	-FVp -c\
+	-I$TKSRC/plan9\
+	-I$APEXPROOT/sys/include/ape\
+	-I$APEXPROOT/$objtype/include/ape\
+	-D_PLAN9_SOURCE\
+
+HFILES=\
+	tkConfig.h\
+
+<$APEXPROOT/sys/src/cmd/mklib
+
+$DRAWIMPL_OBJ: $TKSRC/plan9/tkPlan9DrawImpl.c
+	$CC $DRAWIMPL_CFLAGS $TKSRC/plan9/tkPlan9DrawImpl.c
+
+%.$O: $TKSRC/plan9/%.c
+	$CC $CFLAGS $TKSRC/plan9/$stem.c
+
+%.$O: $TKSRC/xlib/%.c
+	$CC $CFLAGS $TKSRC/xlib/$stem.c
+
+%.$O: $TKSRC/generic/%.c
+	$CC $CFLAGS $TKSRC/generic/$stem.c
+
+%.$O: $TKSRC/generic/ttk/%.c
+	$CC $CFLAGS $TKSRC/generic/ttk/$stem.c
+
+%.$O: $TKSRC/unix/%.c
+	$CC $CFLAGS $TKSRC/unix/$stem.c
+
+clean:V:
+	rm -f $LIB
+	rm -f *.$O
