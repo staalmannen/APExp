@@ -7,7 +7,7 @@
 #define HUGE_VAL 1.79769313486231e+308
 
 #define INFINITY HUGE_VAL
-#define HUGE_VALF HUGE_VAL
+#define HUGE_VALF ((float)HUGE_VAL)	/* float infinity on IEEE 754 */
 #define NAN NaN()
 
 #define double_t double

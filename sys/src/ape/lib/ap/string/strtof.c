@@ -94,9 +94,9 @@ strtof(const char *cp, char **endptr)
 	/* narrow to float, check for overflow */
 	{
 		float result = (float)num;
-		if(result == HUGE_VALF || result == -HUGE_VALF)
-			if(num != HUGE_VAL && num != -HUGE_VAL)
-				errno = ERANGE;
+		/* isinf promotes result to double, avoiding float constant overflow */
+		if(isinf(result) && num != HUGE_VAL && num != -HUGE_VAL)
+			errno = ERANGE;
 		return result;
 	}
 }
