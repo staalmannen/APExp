@@ -2,46 +2,18 @@
 APEXPROOT=../../../../..
 TARG=sed
 OFILES=	compile.$O\
+		debug.$O\
 		execute.$O\
-		fmt.$O\
 		mbcs.$O\
 		regexp.$O\
 		sed.$O\
-		utils.$O
+		utils.$O\
+		version.$O
 
 LIB_OBJS=\
-		alloca.$O\
-#		btowc.$O\
-		dirname.$O\
-		error.$O\
-		exitfail.$O\
-		getdelim.$O\
-		getline.$O\
-		getopt.$O\
-		getopt1.$O\
-		localcharset.$O\
-		lstat.$O\
-#		mbrlen.$O\
-#		mbrtowc.$O\
-#		mbsinit.$O\
-		mkstemp.$O\
-		obstack.$O\
-		quote.$O\
-		quotearg.$O\
-		regex.$O\
-		rename.$O\
-		strerror.$O\
-		stripslash.$O\
-		strndup.$O\
-		strnlen.$O\
-		tempname.$O\
-#		wcrtomb.$O\
-#		wctob.$O\
-		xmalloc.$O\
-		xstrndup.$O\
-		basename.$O\
-		strverscmp.$O\
-		xalloc-die.$O
+	libsed_a-canonicalize-lgpl.$O\		
+# malloc\
+
 
 LIB=libgnu.a$O
 BIN=$APEXPROOT/$objtype/bin/ape
@@ -60,8 +32,8 @@ CFLAGS=-c -I. -I$GSEDSRC -I$GSEDSRC/sed -I$GSEDSRC/lib -B -DHAVE_CONFIG_H\
 %.$O: $GSEDSRC/sed/%.c
 	$CC $CFLAGS $GSEDSRC/sed/$stem.c
 
-%.$O: $GSEDSRC/lib/%.c
-	$CC $CFLAGS $GSEDSRC/lib/$stem.c
+libsed_a-%.$O: $GSEDSRC/lib/%.c
+	$CC $CFLAGS $GSEDSRC/lib/$stem.c -o $target
 
 libgnu.a$O: $LIB_OBJS
 			ar vu libgnu.a$O $LIB_OBJS

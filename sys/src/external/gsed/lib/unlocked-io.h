@@ -96,12 +96,8 @@
 #  define fwrite_unlocked(w,x,y,z) fwrite (w,x,y,z)
 # endif
 
-# if HAVE_DECL_GETC_UNLOCKED || defined get_unlocked
 #  undef getc
 #  define getc(x) getc_unlocked (x)
-# else
-#  define getc_unlocked(x) getc (x)
-# endif
 
 # if HAVE_DECL_GETCHAR_UNLOCKED || defined getchar_unlocked
 #  undef getchar
