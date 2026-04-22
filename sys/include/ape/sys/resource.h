@@ -33,11 +33,42 @@ struct rusage {
 #define	ru_last		ru_nivcsw
 };
 
+/* resource limits */
+typedef unsigned long long rlim_t;
+#define RLIM_INFINITY	((rlim_t)-1)
+#define RLIM_SAVED_MAX	RLIM_INFINITY
+#define RLIM_SAVED_CUR	RLIM_INFINITY
+
+struct rlimit {
+	rlim_t	rlim_cur;	/* current (soft) limit */
+	rlim_t	rlim_max;	/* maximum value for rlim_cur */
+};
+
+#define RLIMIT_CPU	0	/* max cpu time (seconds) */
+#define RLIMIT_FSIZE	1	/* max file size */
+#define RLIMIT_DATA	2	/* max data segment size */
+#define RLIMIT_STACK	3	/* max stack size */
+#define RLIMIT_CORE	4	/* max core file size */
+#define RLIMIT_RSS	5	/* max resident set size */
+#define RLIMIT_NPROC	6	/* max number of processes */
+#define RLIMIT_NOFILE	7	/* max open file descriptors */
+#define RLIMIT_MEMLOCK	8	/* max locked memory */
+#define RLIMIT_AS	9	/* max address space */
+#define RLIMIT_LOCKS	10	/* max file locks */
+#define RLIMIT_SIGPENDING 11	/* max pending signals */
+#define RLIMIT_MSGQUEUE	12	/* max POSIX msg queue bytes */
+#define RLIMIT_NICE	13
+#define RLIMIT_RTPRIO	14
+#define RLIMIT_NLIMITS	15
+#define RLIM_NLIMITS	RLIMIT_NLIMITS
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 extern int getrusage(int, struct rusage *);
+extern int getrlimit(int, struct rlimit *);
+extern int setrlimit(int, const struct rlimit *);
 
 #ifdef __cplusplus
 }
