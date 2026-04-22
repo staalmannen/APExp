@@ -51,15 +51,21 @@ extern int fcntl(int, int, ...);
 extern int open(const char *, int, ...);
 extern int creat(const char *, mode_t);
 
-/* hacks */
-#define O_SEARCH O_RDONLY
-#define O_BINARY O_RDONLY
-#define O_TEXT O_RDWR
-#define O_DIRECTORY O_RDONLY
-#define F_DUPFD_CLOEXEC FD_CLOEXEC
+/* POSIX extensions / portability */
+#define O_SEARCH	O_RDONLY	/* open dir for search; no-op on Plan 9 */
+#define O_BINARY	0		/* no CRLF translation (Windows); no-op */
+#define O_TEXT		0		/* CRLF translation (Windows); no-op */
+#define O_DIRECTORY	0		/* fail if not dir (Linux); no-op on Plan 9 */
 
-#define AT_FDCWD -100
-#define AT_EACCESS -1
+/* F_DUPFD_CLOEXEC: dup fd to >= arg and set FD_CLOEXEC on result */
+#define F_DUPFD_CLOEXEC	8
+
+/* *at() family constants */
+#define AT_FDCWD		-100	/* use cwd for relative paths (POSIX) */
+#define AT_SYMLINK_NOFOLLOW	0x100
+#define AT_SYMLINK_FOLLOW	0x400
+#define AT_EACCESS		0x200	/* faccessat: use effective uid/gid */
+#define AT_REMOVEDIR		0x200	/* unlinkat: remove directory */
 
 #ifdef __cplusplus
 }

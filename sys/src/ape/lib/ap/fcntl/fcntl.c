@@ -27,6 +27,7 @@ fcntl(int fd, int cmd, ...)
 	if(fd<0 || fd>=OPEN_MAX || !(fi->flags&FD_ISOPEN))
 		err = EBADF;
 	else switch(cmd){
+		case F_DUPFD_CLOEXEC:
 		case F_DUPFD:
 			if(fi->flags&(FD_BUFFERED|FD_BUFFEREDX)){
 				err = EGREG;	/* dup of buffered fd not implemented */
@@ -49,6 +50,8 @@ fcntl(int fd, int cmd, ...)
 				}else{
 					fans = &_fdinfo[ans];
 					fans->flags = fi->flags&~FD_CLOEXEC;
+					if(cmd == F_DUPFD_CLOEXEC)
+						fans->flags |= FD_CLOEXEC;
 					fans->oflags = oflags;
 					fans->uid = fi->uid;
 					fans->gid = fi->gid;
