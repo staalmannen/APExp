@@ -2,7 +2,7 @@
 #define __STDDEF_ARCH_H
 
 typedef long long _ptrdiff_t;
-/* arm64 is LLP64: pointers are 64-bit, 'unsigned long' is 32-bit. */
+/* power64 is LLP64: pointers are 64-bit, 'unsigned long' is 32-bit. */
 #ifndef _SIZE_T
 #define _SIZE_T
 typedef unsigned long long size_t;

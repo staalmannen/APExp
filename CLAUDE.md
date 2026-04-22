@@ -365,9 +365,10 @@ guard page → `fault write addr=0x7ffffffff000`.
 - Same for `sys/include/ape/sys/types.h`, `unistd.h`, `bsd.h`
 - `vsnprintf.c`: also fixed to use `memcpy(buf, mem, min(n, nbuf-1))` instead of `strncpy(buf, mem, nbuf-1)` — the strncpy approach is wrong when nbuf = INT_MAX regardless of size_t width
 
-**Other arch-specific headers:** the 64-bit architectures arm64, power64 and
-others also need `_size_t = unsigned long long` — add to their `stddef_arch.h`
-when those architectures are tested.
+**Other 64-bit arch headers updated (2026-04):** arm64 `stddef_arch.h` updated
+with same pattern. power64 `stddef_arch.h` created (power64 had none).
+32-bit architectures (386, arm, mips, power, sparc, 68020, spim) are correct
+as-is: `unsigned long` = pointer-sized on ILP32.
 
 ### APE malloc / free() constraint
 `free(ptr)` computes `(Bucket*)((uintptr_t)ptr - datoff)` where `datoff=16`.
