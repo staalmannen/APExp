@@ -15,11 +15,11 @@
 
 #ifndef _SIZE_T
 #define _SIZE_T
-typedef _size_t size_t;
+typedef unsigned long size_t;
 #endif
 #ifndef _SSIZE_T
 #define _SSIZE_T
-typedef _ssize_t ssize_t;
+typedef long ssize_t;
 #endif
 #ifndef NULL
 #ifndef NULL

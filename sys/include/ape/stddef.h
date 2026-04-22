@@ -5,8 +5,6 @@
 
 #ifndef __STDDEF_ARCH_H
 typedef long _ptrdiff_t;
-typedef unsigned long _size_t;
-typedef long _ssize_t;
 #endif
 
 #ifndef NULL
@@ -22,7 +20,7 @@ typedef _ptrdiff_t ptrdiff_t;
 typedef long max_align_t;
 #ifndef _SIZE_T
 #define _SIZE_T
-typedef _size_t size_t;
+typedef unsigned long size_t;
 #endif
 #ifndef _WCHAR_T
 #define _WCHAR_T
