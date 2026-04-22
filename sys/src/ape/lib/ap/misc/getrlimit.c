@@ -1,6 +1,6 @@
 #include <sys/resource.h>
+#include <stddef.h>
 #include <errno.h>
-#include <limits.h>
 
 /*
  * getrlimit / setrlimit stubs for Plan9/APExp.
