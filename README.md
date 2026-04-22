@@ -120,7 +120,8 @@ Install paths have been modified so that libraries and binaries are installed in
 ***Languages***
 
 
-- Lua (5.5.0) is included by default in APExp
+- Lua (version 5.5.0)
+- Tcl (version 9.0.3)
 
 
 ***Transpilers***

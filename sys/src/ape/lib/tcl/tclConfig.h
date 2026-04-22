@@ -19,10 +19,10 @@
 
 
 #define	CFG_INSTALL_BINDIR		"/bin"
-#define	CFG_INSTALL_DOCDIR	"/sys/man"
-#define	CFG_INSTALL_INCDIR		"/sys/src/cmd/tcl/generic"
+#define	CFG_INSTALL_DOCDIR		"/sys/man"
+#define	CFG_INSTALL_INCDIR		"/sys/lib/tcl/generic"
 #define	CFG_INSTALL_LIBDIR		"/sys/lib/tcl"
-#define	CFG_INSTALL_SCRDIR		"/sys/src/cmd/tcl"
+#define	CFG_INSTALL_SCRDIR		"/sys/lib/tcl"
 
 #define	CFG_RUNTIME_BINDIR		CFG_INSTALL_BINDIR
 #define	CFG_RUNTIME_DOCDIR	CFG_INSTALL_DOCDIR
@@ -52,7 +52,7 @@
 #define	HAVE_UINTPTR_T	1
 #define	HAVE_UNISTD_H	1
 #define	HAVE_WAITPID	1
-#define	NO_DLFCN_H	1
+// #define	NO_DLFCN_H	1
 #define	NO_FSTATFS	1
 #define	NO_REALPATH	1
 #define	NO_UNION_WAIT	1

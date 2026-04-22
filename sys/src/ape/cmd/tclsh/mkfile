@@ -12,7 +12,8 @@ LIB=$APEXPROOT/$objtype/lib/ape/libtcl.a $APEXPROOT/$objtype/lib/ape/libz.a
 
 <$APEXPROOT/sys/src/cmd/mkone
 
-CFLAGS=-FVp -c -I$TCLSRC/plan9 -I$TCLSRC/generic\
+CFLAGS=-FVp -c -I$APEXPROOT/sys/src/ape/lib/tcl\
+	-I$TCLSRC/plan9 -I$TCLSRC/generic\
 	-I$TCLSRC/unix -I$TCLSRC/libtommath\
 	-DHAVE_TCL_CONFIG_H -DPLAN9
 
@@ -21,4 +22,5 @@ $O.out: $OFILES $LIB
 
 tclAppInit.$O: $TCLSRC/unix/tclAppInit.c
 	$CC $CFLAGS $TCLSRC/unix/tclAppInit.c
+
 

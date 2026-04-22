@@ -8,7 +8,7 @@ UNIX_OBJS = tclUnixChan.$O tclUnixEvent.$O\
 	tclUnixFCmd.$O \
 	tclUnixFile.$O tclUnixPipe.$O tclUnixSock.$O \
 	tclUnixTime.$O tclUnixInit.$O tclUnixThrd.$O \
-	tclUnixCompat.$O
+	tclUnixCompat.$O tclLoadDl.$O
 
 TOMMATH_OBJS = bn_s_mp_reverse.$O bn_s_mp_mul_digs_fast.$O \
 	bn_s_mp_sqr_fast.$O bn_mp_add.$O bn_mp_and.$O \
@@ -88,7 +88,7 @@ HFILES=\
 
 CFLAGS=-FVp -c -I. -I$TCLSRC/generic -I$TCLSRC/unix -I$TCLSRC/minizip\
 	-I$TCLSRC/libtommath -DHAVE_TCL_CONFIG_H -DPLAN9 -DMODULE_SCOPE=/**/\
-	-DWCHAR=char -I$APEXPROOT/sys/src/external/zlib
+	-DWCHAR=char -I$APEXPROOT/sys/src/external/zlib -DMP_FIXED_CUTOFFS
 
 %.$O: $TCLSRC/libtommath/%.c
 	$CC $CFLAGS $TCLSRC/libtommath/$stem.c
@@ -103,3 +103,6 @@ CFLAGS=-FVp -c -I. -I$TCLSRC/generic -I$TCLSRC/unix -I$TCLSRC/minizip\
 	$CC $CFLAGS $TCLSRC/unix/$stem.c
 
 
+clean:V:
+	rm -f $LIB
+	rm -f *.$O

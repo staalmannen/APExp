@@ -17,7 +17,7 @@ TARG= \
 		chroot\
 		cksum\
 		cmp\
-#		cols\
+		cols\
 		comm\
 #		cp\
 #		cron\
@@ -108,7 +108,7 @@ TARG= \
 
 UTIL_OBJS=\
 		concat.$O\
-#		_cp.$O\
+		_cp.$O\
 		crypt.$O\
 		ealloc.$O\
 		enmasse.$O\
@@ -165,8 +165,7 @@ CPPFLAGS =\
 
 SBASE_CFLAGS=-c $CPPFLAGS -I$SBASESRC -I$SBASESRC/libutil\
 	-I$SBASESRC/../gnulib -D_POSIX_SOURCE -D_BSD_EXTENSION \
-	-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE -DAT_EACCESS=0\
-	-DAT_FDCWD=0 -DAT_SYMLINK_NOFOLLOW=1
+	-D_LIMITS_EXTENSION -D_RESEARCH_SOURCE
 
 libutil.a$O: $UTIL_OBJS
 			ar vu libutil.a$O $UTIL_OBJS
