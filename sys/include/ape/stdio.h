@@ -122,6 +122,7 @@ extern int vasprintf(char **, const char *, va_list);
 extern char *asnprintf(char *, size_t *, const char *, ...);
 extern char *vasnprintf(char *, size_t *, const char *, va_list);
 extern size_t _fpending(FILE *);
+extern size_t __fpending(FILE *);
 
 extern FILE *fmemopen(void *, size_t, const char *);
 extern FILE *open_memstream(char **, size_t *);

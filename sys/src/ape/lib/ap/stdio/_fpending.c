@@ -8,3 +8,10 @@ _fpending(FILE *f)
 		return (size_t)(f->wpos - f->wbase);
 	return 0;
 }
+
+/* glibc-internal name used by gnulib's close_stream and fpending modules */
+size_t
+__fpending(FILE *f)
+{
+	return _fpending(f);
+}
