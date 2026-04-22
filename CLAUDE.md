@@ -346,6 +346,29 @@ if(deadline.tv_nsec >= 1000000000L) { deadline.tv_sec++; deadline.tv_nsec -= 100
 
 ## Known Invariants and Traps
 
+### size_t / ssize_t must be 64-bit on amd64
+
+Plan 9 6c has `long` = 32-bit even on amd64.  The original headers defined
+`size_t = unsigned long` and `ssize_t = long`, making them 32-bit.  This
+causes ABI mismatches: a 32-bit size_t value is stored in 4 bytes, but the
+callee reads 8 bytes (amd64 argument slots are always 8-byte aligned), getting
+garbage in the upper 32 bits.
+
+**Symptom:** `vsnprintf` called by `sprintf` received `nbuf = INT_MAX = 0x7fffffff`
+(correct), but `strncpy(buf, mem, nbuf - 1)` was passed `n = 0x7fff7ffffffe`
+(high 32 bits = stack garbage), causing 2-billion-byte zero-padding into the
+guard page → `fault write addr=0x7ffffffff000`.
+
+**Fix (2026-04):**
+- `amd64/include/ape/stddef_arch.h`: added `typedef unsigned long long _size_t; typedef long long _ssize_t;`
+- `sys/include/ape/stddef.h`: `typedef _size_t size_t` (fallback: `unsigned long` for 32-bit arches)
+- Same for `sys/include/ape/sys/types.h`, `unistd.h`, `bsd.h`
+- `vsnprintf.c`: also fixed to use `memcpy(buf, mem, min(n, nbuf-1))` instead of `strncpy(buf, mem, nbuf-1)` — the strncpy approach is wrong when nbuf = INT_MAX regardless of size_t width
+
+**Other arch-specific headers:** the 64-bit architectures arm64, power64 and
+others also need `_size_t = unsigned long long` — add to their `stddef_arch.h`
+when those architectures are tested.
+
 ### APE malloc / free() constraint
 `free(ptr)` computes `(Bucket*)((uintptr_t)ptr - datoff)` where `datoff=16`.
 Any pointer passed to `free()` MUST be exactly the value returned by `malloc()`.

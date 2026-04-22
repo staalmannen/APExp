@@ -14,8 +14,11 @@ int vsnprintf(char *buf, size_t nbuf, const char *fmt, va_list args){
 		n = vfprintf(f, fmt, args);
 		fclose(f);
 		if (n >= 0 && mem) {
-			strncpy(buf, mem, nbuf - 1);
-			buf[nbuf - 1] = '\0';
+			/* Use actual length, not nbuf-1: nbuf may be INT_MAX
+			 * (from sprintf) making strncpy/buf[] index overflow. */
+			size_t copy_len = ((size_t)n < nbuf - 1) ? (size_t)n : nbuf - 1;
+			memcpy(buf, mem, copy_len);
+			buf[copy_len] = '\0';
 			free(mem);
 		}
 		return n;

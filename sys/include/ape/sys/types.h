@@ -1,6 +1,8 @@
 #ifndef __TYPES_H
 #define __TYPES_H
 
+#include <stddef_arch.h>
+
 #pragma lib "/$M/lib/ape/libap.a"
 
 typedef	unsigned short	ino_t;
@@ -21,11 +23,11 @@ typedef long long blkcnt_t;    /* count of file system blocks */
 
 #ifndef _SIZE_T
 #define _SIZE_T
-typedef unsigned long size_t;
+typedef _size_t size_t;
 #endif
 #ifndef _SSIZE_T
 #define _SSIZE_T
-typedef long ssize_t;
+typedef _ssize_t ssize_t;
 #endif
 
 #ifndef _TIME_T
