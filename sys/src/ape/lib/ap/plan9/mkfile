@@ -41,6 +41,8 @@ OFILES=\
 	nap.$O\
 # musl/linux syscall compatibility hack\
 	__p9_syscall.$O\
+# mmap/munmap wrappers (Plan9 segattach emulation)\
+	mman.$O\
 # lib9\
 	argv0.$O\
 	p9bind.$O\

@@ -15,11 +15,11 @@ OFILES=\
 	time.$O\
 	times.$O\
 	tzset.$O\
-#	musl\
-#	__map_file.$O\
+# musl\
+	__map_file.$O\
 #	asctime.$O\
 #	asctime_r.$O\
-#	hacks\
+# hacks\
 	strptime.$O\
 	timegm.$O\
 

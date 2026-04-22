@@ -148,29 +148,36 @@ p9_mmap(void *addr, size_t len, int prot, int flags, int fd, off_t off)
 {
 	void *p;
 	(void)prot;  /* Plan9 has no per-page protection */
-	(void)off;
-
-	/* only anonymous mappings are supported */
-	if(!(flags & (MAP_ANONYMOUS|MAP_ANON)) && fd != -1)
-		return -ENOSYS;
 
 	/* MAP_FIXED at a specific address is not supportable in userland */
 	if((flags & MAP_FIXED) && addr != NULL)
 		return -EINVAL;
 
-	/* use segattach for large allocations to get page-aligned memory */
+	/* allocate backing memory */
 	if(len >= 65536){
 		p = _SEGATTACH(0, "memory", 0, len);
 		if(p == (void*)-1)
 			return -ENOMEM;
-		return (long)(uintptr_t)p;
+	} else {
+		p = malloc(len);
+		if(p == NULL)
+			return -ENOMEM;
 	}
-
-	/* malloc for small allocations */
-	p = malloc(len);
-	if(p == NULL)
-		return -ENOMEM;
 	memset(p, 0, len);
+
+	/* file-backed mapping: read file contents into the buffer.
+	 * Write-back (MAP_SHARED) is not supported; changes are private. */
+	if(!(flags & (MAP_ANONYMOUS|MAP_ANON)) && fd != -1){
+		ssize_t n;
+		if(off != 0)
+			lseek(fd, off, SEEK_SET);
+		n = read(fd, p, len);
+		if(n < 0){
+			if(len >= 65536) _SEGDETACH(p);
+			else free(p);
+			return -EIO;
+		}
+	}
 	return (long)(uintptr_t)p;
 }
 
