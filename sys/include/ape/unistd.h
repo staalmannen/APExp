@@ -178,6 +178,11 @@ int fchownat(int dirfd, const char *path, uid_t uid, gid_t gid, int flags);
 int fchmodat(int dirfd, const char *path, mode_t mode, int flags);
 int linkat(int old_dfd, const char *old, int new_dfd, const char *new, int flags);
 
+/* GNU extensions */
+extern int pipe2(int [2], int);
+extern int dup3(int, int, int);
+extern int execvpe(const char *, char *const [], char *const []);
+
 /* stubs and hacks */
 # include <sys/stat.h> /* readlink, mkdir, mkfifo */
 # include <sys/uio.h> /* readv writev */

@@ -11,6 +11,8 @@ OFILES=\
 	execvp.$O\
 	fork.$O\
 	wait.$O\
+# GNU extensions\
+	execvpe.$O\
 # hacks\
 	posix_spawn.$O\
 

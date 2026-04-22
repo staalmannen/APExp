@@ -43,6 +43,8 @@ OFILES=\
 	write.$O\
 # musl\
 	ualarm.$O\
+# GNU extensions\
+	pipe2.$O\
 # hacks\
 	at_functions.$O\
 	truncate.$O\

@@ -63,6 +63,8 @@ extern int clearenv(void);
 extern int setenv(const char *, const char *, int);
 extern int unsetenv(const char *);
 extern char *realpath(const char *, char *);
+extern char *get_current_dir_name(void);
+extern char *canonicalize_file_name(const char *);
 
 extern char *mkdtemp(char *);
 

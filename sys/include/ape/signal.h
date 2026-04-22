@@ -64,18 +64,43 @@ extern void psignal(int, const char *);
 #endif
 
 typedef long sigset_t;
+
+/* sigval: integer or pointer payload for real-time signals / sigevent */
+union sigval {
+	int	sigval_int;
+	void   *sigval_ptr;
+};
+
+/* siginfo_t: signal origin info passed to SA_SIGINFO handlers.
+ * Plan 9 does not supply most of these fields; they are zero-filled. */
+typedef struct {
+	int	si_signo;
+	int	si_errno;
+	int	si_code;
+	pid_t	si_pid;
+	uid_t	si_uid;
+	void   *si_addr;
+	int	si_status;
+	long	si_band;
+	union sigval si_value;
+} siginfo_t;
+
 struct sigaction {
-	void		(*sa_handler)();
+	union {
+		void		(*sa_handler)();
+		void		(*sa_sigaction)(int, siginfo_t *, void *);
+	};
 	sigset_t	sa_mask;
 	int		sa_flags;
 };
 /* values for sa_flags */
   #define SA_NOCLDSTOP  0x001
   #define SA_ONSTACK    0x002
-  #define SA_RESETHAND  0x004   /* was 3, should be a bit */
-  #define SA_RESTART    0x008   /* was 4 */
-  #define SA_RESTORER   0x010   /* was 5 */
-  #define SA_NODEFER    0x020   /* was 0 — this is the dangerous one */
+  #define SA_RESETHAND  0x004
+  #define SA_RESTART    0x008
+  #define SA_RESTORER   0x010
+  #define SA_NODEFER    0x020
+  #define SA_SIGINFO    0x040   /* use sa_sigaction; Plan 9 passes zero siginfo */
 
 /* first argument to sigprocmask */
 #define SIG_BLOCK	1
@@ -98,11 +123,6 @@ extern int sigpending(sigset_t *);
 extern int sigsuspend(const sigset_t *);
 
 #include <pthread.h>
-
-union sigval {                     /* Data passed with notification */
-	int             sigval_int;     /* Integer value */
-	void           *sigval_ptr;     /* Pointer value */
-};
 
 struct sigevent {
 	int             sigev_notify;  /* Notification type */

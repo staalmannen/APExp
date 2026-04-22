@@ -20,6 +20,8 @@ OFILES=\
 	realpath.$O\
 # fts-standalone\
 	fts.$O\
+# GNU extensions\
+	get_current_dir.$O\
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib
