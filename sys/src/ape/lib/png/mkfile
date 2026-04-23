@@ -1,0 +1,72 @@
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libpng.a
+
+#we are not including arch-specific objects
+
+OFILES= png.$O\
+	pngerror.$O\
+	pngget.$O\
+	pngmem.$O\
+	pngpread.$O\
+	pngread.$O\
+	pngrio.$O\
+	pngrtran.$O\
+#	pngrutil.$O\
+	pngset.$O\
+	pngtrans.$O\
+	pngwio.$O\
+	pngwrite.$O\
+	pngwtran.$O\
+	pngwutil.$O\
+# intel\
+#	intel_init.$O\
+#	filter_sse2_intrinsics.$O\
+# mips\
+#	mips_init.$O\
+#	filter_msa_intrinsics.$O\
+# arm\
+#	arm_init.$O\
+#	filter_neon_intrinsics.$O\
+#	palette_neon_intrinsics.$O\
+# loongarch\
+#	loongarch_lsx_init.$O\
+#	filter_lsx_intrinsics.$O\
+# powerpc\
+#	powerpc_init.$O\
+#	filter_vsx_intrinsics.$O\
+# riscv\
+#	riscv_init.$O\
+#	filter_rvv_intrinsics.$O
+
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+PNGSOURCE=../../../external/libpng
+
+CFLAGS=-c -I$PNGSOURCE -D_POSIX_SOURCE\
+	-DPNG_RELEASE_BUILD -DHAVE_CONFIG_H
+
+%.$O: $PNGSOURCE/%.c
+	$CC $CFLAGS $PNGSOURCE/$stem.c
+
+%.$O: $PNGSOURCE/intel/%.c
+	$CC $CFLAGS $PNGSOURCE/intel/$stem.c
+
+%.$O: $PNGSOURCE/mips/%.c
+	$CC $CFLAGS $PNGSOURCE/mips/$stem.c
+
+%.$O: $PNGSOURCE/arm/%.c
+	$CC $CFLAGS $PNGSOURCE/arm/$stem.c
+
+%.$O: $PNGSOURCE/loongarch/%.c
+	$CC $CFLAGS $PNGSOURCE/loongarch/$stem.c
+
+%.$O: $PNGSOURCE/powerpc/%.c
+	$CC $CFLAGS $PNGSOURCE/powerpc/$stem.c
+
+%.$O: $PNGSOURCE/riscv/%.c
+	$CC $CFLAGS $PNGSOURCE/riscv/$stem.c
+

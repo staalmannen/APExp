@@ -1,0 +1,17 @@
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libzstd.a
+
+OFILES= 
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+ZSOURCE=../../../external/zstd
+
+CFLAGS=-c -I$ZSTDSOURCE -D_POSIX_SOURCE
+
+%.$O: $ZSTDSOURCE/%.c
+	$CC $CFLAGS $ZSTDSOURCE/$stem.c
+
