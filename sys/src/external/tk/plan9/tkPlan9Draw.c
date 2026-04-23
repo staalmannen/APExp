@@ -333,7 +333,32 @@ XPutImage(Display *display, Drawable d, GC gc, XImage *image,
     return 0;
 }
 
+<<<<<<<<<< sys/src/external/tk/plan9/tkPlan9Draw.c
+int
+TkPutImage(unsigned long *colors, int ncolors,
+           Display *display, Drawable d, GC gc, XImage *image,
+           int src_x, int src_y, int dest_x, int dest_y,
+           unsigned int width, unsigned int height)
+{
+    (void)colors;
+	(void)ncolors;
+    return XPutImage(display, d, gc, image,
+                     src_x, src_y, dest_x, dest_y, width, height);
+}
+========== original
+int
+TkPutImage(unsigned long *colors, int ncolors,
+           Display *display, Drawable d, GC gc, XImage *image,
+           int src_x, int src_y, int dest_x, int dest_y,
+           unsigned int width, unsigned int height)
+{
+    (void)colors; (void)ncolors;
+    return XPutImage(display, d, gc, image,
+                     src_x, src_y, dest_x, dest_y, width, height);
+}
+========== /usr/glenda/APExp/.git/fs/object/581fdb1efa9e952dc81426297527cb58b3cd07ed/tree/sys/src/external/tk/plan9/tkPlan9Draw.c
 /* TkPutImage is a macro on Unix/Plan9 (tkInt.h) expanding to XPutImage */
+>>>>>>>>>>
 
 /* ------------------------------------------------------------------ */
 /* Pixmap (off-screen buffer) stubs                                   */

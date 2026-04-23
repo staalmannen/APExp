@@ -1,7 +1,5 @@
 </$objtype/mkfile
 
-#do we need libl? We don't build Plan9 lex/yacc
-
 _CORE_LIBS=\
 	ap\
 	auth\
@@ -17,15 +15,19 @@ _CORE_APP_DEPENDENCIES=\
 _OPTIONAL_LIBS=\
 	bz2\
 	curses\
-	readline\
 	fortran\
 	lua\
 	lzma\
 	pascal\
 	pcre2\
+#	png\
+	readline\
 	tcl\
-	tk\
+#	tk\
+#	unistring\
+#	xml2\
 	z\
+#	zstd\
 
 DIRS=\
 	$_CORE_LIBS\

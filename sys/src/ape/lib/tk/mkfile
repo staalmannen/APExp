@@ -181,7 +181,7 @@ CFLAGS=\
 	-DPLAN9\
 	-DMODULE_SCOPE=/***/\
 	-DWCHAR=char\
-	-DTK_PLATFORM=\"plan9\"\
+	-DTK_PLATFORM="plan9"\
 	-DUSE_TCL_STUBS\
 
 # DrawImpl uses APE's Plan 9 extension headers (draw.h, mouse.h, u.h)

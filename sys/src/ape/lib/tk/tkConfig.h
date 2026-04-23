@@ -32,7 +32,7 @@
 #undef HAVE_GL
 
 /* TK_LIBRARY: where tk.tcl lives */
-#define CFG_INSTALL_LIBDIR	"/lib/tk"
+#define CFG_INSTALL_LIBDIR	"/sys/lib/tk"
 #define CFG_RUNTIME_LIBDIR	CFG_INSTALL_LIBDIR
 
 /* Cursors — we use none */
