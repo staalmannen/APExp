@@ -427,7 +427,11 @@ TkSendCleanup(TkDisplay *dispPtr)
     (void)dispPtr;
 }
 
-/* TkSetPixmapColormap: not needed on Plan 9 */
+/* TkSetPixmapColormap: not needed on Plan 9.
+ * tkPlan9Port.h defines TkSetPixmapColormap(p,c) as a macro to no-op
+ * call sites, but we still need the linker symbol for the stubs table.
+ * Undef the macro before defining the function. */
+#undef TkSetPixmapColormap
 void
 TkSetPixmapColormap(Pixmap pixmap, Colormap colormap)
 {

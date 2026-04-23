@@ -353,16 +353,7 @@ XPutImage(Display *display, Drawable d, GC gc, XImage *image,
     return 0;
 }
 
-int
-TkPutImage(unsigned long *colors, int ncolors,
-           Display *display, Drawable d, GC gc, XImage *image,
-           int src_x, int src_y, int dest_x, int dest_y,
-           unsigned int width, unsigned int height)
-{
-    (void)colors; (void)ncolors;
-    return XPutImage(display, d, gc, image,
-                     src_x, src_y, dest_x, dest_y, width, height);
-}
+/* TkPutImage is a macro on Unix/Plan9 (tkInt.h) expanding to XPutImage */
 
 /* ------------------------------------------------------------------ */
 /* Pixmap (off-screen buffer) stubs                                   */
@@ -758,12 +749,7 @@ XPointInRegion(Region rgn, int x, int y)
     return 0;
 }
 
-int
-XOffsetRegion(Region rgn, int dx, int dy)
-{
-    (void)rgn; (void)dx; (void)dy;
-    return 0;
-}
+/* XOffsetRegion: real implementation in tkPlan9Stubs.c */
 
 int
 XUnionRegion(Region srca, Region srcb, Region dst)
