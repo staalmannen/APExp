@@ -327,29 +327,9 @@ XPutImage(Display *display, Drawable d, GC gc, XImage *image,
           int dest_x, int dest_y,
           unsigned int width, unsigned int height)
 {
-    int ox, oy, x, y;
-    unsigned char *rgba, *src, *dst;
-    (void)display; (void)gc;
-
-    if (!image || !image->data) return 0;
-    DrawableOffset(d, &ox, &oy);
-    rgba = (unsigned char *)ckalloc((int)width * (int)height * 4);
-    dst = rgba;
-    for (y = 0; y < (int)height; y++) {
-        src = (unsigned char *)image->data
-              + (src_y + y) * image->bytes_per_line
-              + src_x * 4;
-        for (x = 0; x < (int)width; x++) {
-            dst[0] = src[0];
-            dst[1] = src[1];
-            dst[2] = src[2];
-            dst[3] = 0xFF;
-            src += 4;
-            dst += 4;
-        }
-    }
-    tkp9_putpixels(dest_x + ox, dest_y + oy, (int)width, (int)height, rgba);
-    ckfree(rgba);
+    (void)display; (void)d; (void)gc; (void)image;
+    (void)src_x; (void)src_y; (void)dest_x; (void)dest_y;
+    (void)width; (void)height;
     return 0;
 }
 
