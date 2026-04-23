@@ -1199,8 +1199,10 @@ complex:
 	{
 		dotag($2, TENUM, 0);
 		$$ = $2->suetag;
-		if($$->link == T)
+		if($$->link == T) {
 			$$->link = types[TINT];
+			$$->garb |= GINCOMPLETE;
+		}
 		$$ = $$->link;
 	}
 |	LENUM ltag
@@ -1215,8 +1217,9 @@ complex:
 	enum '}'
 	{
 		$$ = $2->suetag;
-		if($$->link != T)
+		if($$->link != T && !($$->garb & GINCOMPLETE))
 			diag(Z, "redeclare tag: %s", $2->name);
+		$$->garb &= ~GINCOMPLETE;
 		if(en.tenum == T) {
 			diag(Z, "enum type ambiguous: %s", $2->name);
 			en.tenum = types[TINT];

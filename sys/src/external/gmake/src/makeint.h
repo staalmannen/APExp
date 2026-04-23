@@ -562,10 +562,10 @@ void out_of_memory (void) NORETURN;
 #define ONS(_t,_a,_f,_n,_s)   _t((_a), INTSTR_LENGTH + strlen (_s), \
                                  (_f), (_n), (_s))
 
-/* enum variable_origin; */
+enum variable_origin;
 struct variable;
 
-void reset_makeflags (int origin);
+void reset_makeflags (enum variable_origin origin);
 struct variable *define_makeflags (int makefile);
 int should_print_dir (void);
 void temp_stdin_unlink (void);
