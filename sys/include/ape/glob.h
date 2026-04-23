@@ -6,15 +6,21 @@ extern "C" {
 #endif
 
 #include <features.h>
-
 #include <alltypes.h>
+
+struct stat;
+struct dirent;
 
 typedef struct {
 	size_t gl_pathc;
 	char **gl_pathv;
 	size_t gl_offs;
-	int __dummy1;
-	void *__dummy2[5];
+	int gl_flags;
+	void (*gl_closedir)(void *);
+	struct dirent *(*gl_readdir)(void *);
+	void *(*gl_opendir)(const char *);
+	int (*gl_lstat)(const char *, struct stat *);
+	int (*gl_stat)(const char *, struct stat *);
 } glob_t;
 
 int  glob(const char *__restrict, int, int (*)(const char *, int), glob_t *__restrict);
@@ -29,7 +35,12 @@ void globfree(glob_t *);
 #define GLOB_NOESCAPE 0x40
 #define	GLOB_PERIOD   0x80
 
+#define GLOB_MAGCHAR     0x0100
+#define GLOB_ALTDIRFUNC  0x0200
+#define GLOB_BRACE       0x0400
+#define GLOB_NOMAGIC     0x0800
 #define GLOB_TILDE       0x1000
+#define GLOB_ONLYDIR     0x2000
 #define GLOB_TILDE_CHECK 0x4000
 
 #define GLOB_NOSPACE 1
