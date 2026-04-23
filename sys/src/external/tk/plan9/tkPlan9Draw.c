@@ -327,24 +327,26 @@ XPutImage(Display *display, Drawable d, GC gc, XImage *image,
           int dest_x, int dest_y,
           unsigned int width, unsigned int height)
 {
-    int ox, oy;
+    int ox, oy, x, y, idx;
+    unsigned long pix;
     unsigned char *rgba;
-    int x, y;
+    unsigned long (*get_pix)(XImage*, int, int);
     (void)display; (void)gc;
 
     if (!image || !image->data) return 0;
     DrawableOffset(d, &ox, &oy);
+    get_pix = image->f.get_pixel;
 
     /* Convert image data to RGBA32 for tkp9_putpixels */
     rgba = (unsigned char *)ckalloc((int)width * (int)height * 4);
     for (y = 0; y < (int)height; y++) {
         for (x = 0; x < (int)width; x++) {
-            unsigned long pix = XGetPixel(image, src_x + x, src_y + y);
-            int idx = (y * (int)width + x) * 4;
-            rgba[idx+0] = (pix >> 16) & 0xFF; /* R */
-            rgba[idx+1] = (pix >>  8) & 0xFF; /* G */
-            rgba[idx+2] =  pix        & 0xFF; /* B */
-            rgba[idx+3] = 0xFF;               /* A */
+            pix = (*get_pix)(image, src_x + x, src_y + y);
+            idx = (y * (int)width + x) * 4;
+            rgba[idx+0] = (unsigned char)((pix >> 16) & 0xFF);
+            rgba[idx+1] = (unsigned char)((pix >>  8) & 0xFF);
+            rgba[idx+2] = (unsigned char)( pix        & 0xFF);
+            rgba[idx+3] = 0xFF;
         }
     }
     tkp9_putpixels(dest_x + ox, dest_y + oy,
