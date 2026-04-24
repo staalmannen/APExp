@@ -16,8 +16,8 @@ OFILES=\
 	error.$O\
 	expr.$O\
 	flags.$O\
-#	jobs.$O\
-	nojobs.$O\
+	jobs.$O\
+#	nojobs.$O\
 	subst.$O\
 	hashcmd.$O\
 	hashlib.$O\
@@ -47,7 +47,7 @@ OFILES=\
 	pcomplete.$O\
 	pcomplib.$O\
 	syntax.$O\
-	xmalloc.$O\
+#	xmalloc.$O\
 # termcap - force linking... \
 #	termcap.$O\
 #	tparam.$O\
@@ -62,7 +62,7 @@ BASHLIBS=\
 	libglob.a$O\
 	libsh.a$O
 
-LIB= $BASHLIBS
+LIB= $BASHLIBS $APEXPROOT/$objtype/lib/ape/libreadline.a
 
 BIN=$APEXPROOT/$objtype/bin/ape
 

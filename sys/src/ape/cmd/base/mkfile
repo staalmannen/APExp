@@ -78,7 +78,7 @@ TARG= \
 #		sha512-256sum\
 #		sha512sum\
 		sleep\
-		sort\
+#		sort\
 		split\
 		sponge\
 		strings\

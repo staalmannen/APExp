@@ -7,14 +7,14 @@
 #include "poparser.h"
 #include "StringEscape.h"
 
-__attribute__((noreturn))
+//__attribute__((noreturn))
 static void syntax(void) {
 	fprintf(stdout,
 	"Usage: msgmerge [OPTION] def.po ref.pot\n");
 	exit(1);
 }
 
-__attribute__((noreturn))
+//__attribute__((noreturn))
 static void version(void) {
 	fprintf(stdout,
 		"msgmerge (GNU gettext-tools compatible) 99.9999.9999\n");

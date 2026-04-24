@@ -1,13 +1,9 @@
 </$objtype/mkfile
 APEXPROOT=../../../../..
 
-LIB=parserlib.a$O
-
 TARG=	\
 	msgfmt\
 	msgmerge\
-	xgettext\
-	autopoint
 
 PARSEROBJS=	poparser.$O poparser_sysdep.$O StringEscape.$O
 
@@ -20,26 +16,22 @@ GETTEXTSRC=../../../external/gettext
 
 
 CC=pcc
-CFLAGS=-Fw -B
+CFLAGS=-Fw -B -c
 
-
-parserlib.a$O: $PARSEROBJS
-	ar vu $LIB $PARSEROBJS
 
 %.$O: $GETTEXTSRC/src/%.c
 	$CC $CFLAGS $GETTEXTSRC/src/$stem.c
 
-$O.msgfmt: msgfmt.$O
-	$CC -o $O.msgfmt msgfmt.$O $LIB
+$O.msgfmt: msgfmt.$O $PARSEROBJS
+	$CC -o $O.msgfmt msgfmt.$O $PARSEROBJS
 
 $O.msgmerge: msgmerge.$O
-	$CC -o $O.msgmerge msgmerge.$O $LIB
+	$CC -o $O.msgmerge msgmerge.$O $PARSEROBJS
 
-$O.xgettext: xgettext.$O
-	$CC -o $O.xgettext xgettext.$O $LIB
-
-$O.autopoint: autopoint.$O
-	$CC -o $O.autopoint autopoint.$O $LIB
+install:V:
+	cat $GETTEXTSRC/src/autopoint.in | sed 's,@datadir@,"/sys/lib/ape",' > $APEXPROOT/rc/bin/ape/autopoint
+	cp $GETTEXTSRC/src/xgettext.sh $APEXPROOT/rc/bin/ape/xgettext
+	chmod +x $APEXPROOT/rc/bin/ape/*
 
 
 
