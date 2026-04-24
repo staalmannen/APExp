@@ -16,8 +16,8 @@ infodir="${datarootdir}/info"
 mandir="${datarootdir}/man"
 localedir="${datarootdir}/locale"
 runstatedir="${localstatedir}/run"
-top_builddir="/usr/glenda/APExp/sys/src/external/unace"
-top_srcdir="/usr/glenda/APExp/sys/src/external/unace"
+top_builddir="/home/jens/Devel/APExp/sys/src/external/unace"
+top_srcdir="/home/jens/Devel/APExp/sys/src/external/unace"
 builddir="."
 srcdir="."
 
@@ -35,10 +35,10 @@ PACKAGE_TARNAME="unace"
 PACKAGE_BUGREPORT=""
 PACKAGE_VERSION="2.7w"
 
-OS_BUILD="Plan9"
+OS_BUILD="Linux"
 OS_CROSS=""
-OS_TARGET="Plan9"
-TARGET_OS="Plan9"
+OS_TARGET="Linux"
+TARGET_OS="Linux"
 
 #=================================================
 
