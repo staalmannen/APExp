@@ -56,7 +56,7 @@ struct TreeItemRec {
     Tcl_Obj	*tagsObj;
     Tcl_Obj	*selObj;
     Tcl_Obj	*imageAnchorObj;
-    int	hidden;
+    int	itemHidden;
     int		height;	/* Height is in number of row heights */
 
     Ttk_TagSet  *cellTagSets;
@@ -83,7 +83,7 @@ static const Tk_OptionSpec ItemOptionSpecs[] = {
 	"1", TCL_INDEX_NONE, offsetof(TreeItem,height),
 	0,0,0 },
     {TK_OPTION_BOOLEAN, "-hidden", "hidden", "Hidden",
-	"0", TCL_INDEX_NONE, offsetof(TreeItem,hidden),
+	"0", TCL_INDEX_NONE, offsetof(TreeItem,itemHidden),
 	0,0,0 },
     {TK_OPTION_STRING, "-image", "image", "Image",
 	NULL, offsetof(TreeItem,imageObj), TCL_INDEX_NONE,
@@ -126,7 +126,7 @@ static TreeItem *NewItem(void)
     item->tagsObj = NULL;
     item->selObj = NULL;
     item->imageAnchorObj = NULL;
-    item->hidden = 0;
+    item->itemHidden = 0;
     item->height = 1;
     item->cellTagSets = NULL;
     item->nTagSets = 0;
@@ -1617,18 +1617,18 @@ error:
  *	Update position data for all visible items.
  */
 static void UpdatePositionItem(
-    Treeview *tv, TreeItem *item, int hidden,
+    Treeview *tv, TreeItem *item, int itemHidden,
     int *rowPos, int *itemPos, int *visiblePos)
 {
     TreeItem *child = item->children;
     item->itemPos = *itemPos;
     *itemPos += 1;
 
-    if (item->hidden) {
-	hidden = 1;
+    if (item->itemHidden) {
+	itemHidden = 1;
     }
 
-    if (hidden) {
+    if (itemHidden) {
 	item->rowPos = -1;
 	item->visiblePos = -1;
     } else {
@@ -1643,10 +1643,10 @@ static void UpdatePositionItem(
     }
 
     if (!(item->state & TTK_STATE_OPEN)) {
-	hidden = 1;
+	itemHidden = 1;
     }
     while (child) {
-	UpdatePositionItem(tv, child, hidden, rowPos, itemPos, visiblePos);
+	UpdatePositionItem(tv, child, itemHidden, rowPos, itemPos, visiblePos);
 	child = child->next;
     }
 }
