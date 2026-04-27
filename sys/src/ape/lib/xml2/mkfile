@@ -5,50 +5,51 @@ APE=$APEXPROOT/sys/src/ape
 LIB=$APEXPROOT/$objtype/lib/ape/libxml2.a
 
 OFILES=\
-	lbuf.$O\
-	lchvalid.$O\
-	ldict.$O\\
-	lentities.$O\
-	lencoding.$O\
-	lerror.$O\
-	lglobals.$O\
-	lhash.$O\
-	llist.$O\
-	lparser.$O\
-	lparserInternals.$O\
-	lSAX2.$O\
-	lthreads.$O\
-	ltree.$O\
-	luri.$O\
-	lvalid.$O\
-	lxmlIO.$O\
-	lxmlmemory.$O\
-	lxmlstring.$O\
-	lc14n.$O\
-	lcatalog.$O\
-	ldebugXML.$O\
-	lHTMLparser.$O\
-	lHTMLtree.$O\
-	lxmlmodule.$O\
-	lxmlsave.$O\
-	lpattern.$O\
-	lxmlreader.$O\
-	lxmlregexp.$O\
-	lrelaxng.$O\
-	lxmlschemas.$O\
-	lxmlschemastypes.$O\
-	lxmlwriter.$O\
+	buf.$O\
+	chvalid.$O\
+	dict.$O\
+	entities.$O\
+	encoding.$O\
+	error.$O\
+	globals.$O\
+	hash.$O\
+	list.$O\
+	parser.$O\
+	parserInternals.$O\
+	SAX2.$O\
+	threads.$O\
+	tree.$O\
+	uri.$O\
+	valid.$O\
+	xmlIO.$O\
+	xmlmemory.$O\
+	xmlstring.$O\
+	c14n.$O\
+	catalog.$O\
+	debugXML.$O\
+	HTMLparser.$O\
+	HTMLtree.$O\
+	xmlmodule.$O\
+	xmlsave.$O\
+	pattern.$O\
+	xmlreader.$O\
+	xmlregexp.$O\
+	relaxng.$O\
+	xmlschemas.$O\
+	xmlschemastypes.$O\
+	xmlwriter.$O\
 	xinclude.$O\
-	lxpath.$O\
-	lxlink.$O\
-	lxpointer.$O\
+	xpath.$O\
+	xlink.$O\
+	xpointer.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
 XML2SOURCE=../../../external/libxml2
 
-CFLAGS=-c -I$XML2SOURCE -D_POSIX_SOURCE -DHAVE_CONFIG_H
+CFLAGS=-c -I$XML2SOURCE -I$XML2SOURCE/include -D_POSIX_SOURCE -DHAVE_CONFIG_H
 
 %.$O: $XML2SOURCE/%.c
 	$CC $CFLAGS $XML2SOURCE/$stem.c
+
 

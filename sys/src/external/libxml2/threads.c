@@ -506,7 +506,6 @@ xmlCleanupParser(void) {
     !defined(LIBXML_STATIC) && \
     !defined(_WIN32)
 static void
-ATTRIBUTE_DESTRUCTOR
 xmlDestructor(void) {
     /*
      * Calling custom deallocation functions in a destructor can cause

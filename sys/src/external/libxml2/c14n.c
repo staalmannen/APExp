@@ -575,7 +575,7 @@ xmlC14NPrintNamespacesWalker(const void *ns, void *ctx) {
  * @returns 0 on success or -1 on fail.
  */
 static int
-xmlC14NProcessNamespacesAxis(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
+xmlC14NProcessNamespacesAxis(xmlC14NCtxPtr ctx, xmlNodePtr cur, int Visible)
 {
     xmlNodePtr n;
     xmlNsPtr ns, tmp;
@@ -604,7 +604,7 @@ xmlC14NProcessNamespacesAxis(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
 
 	    if((tmp == ns) && !xmlC14NIsXmlNs(ns) && xmlC14NIsVisible(ctx, ns, cur)) {
 		already_rendered = xmlC14NVisibleNsStackFind(ctx->ns_rendered, ns);
-		if(visible) {
+		if(Visible) {
 	            if (xmlC14NVisibleNsStackAdd(ctx->ns_rendered, ns, cur) < 0) {
                         xmlC14NErrMemory(ctx);
                         goto error;
@@ -629,7 +629,7 @@ xmlC14NProcessNamespacesAxis(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
      *     namespace node in the node-set (default namespace nodes always
      *     have non-empty values in XPath)
      */
-    if(visible && !has_empty_ns) {
+    if(Visible && !has_empty_ns) {
         xmlNs ns_default;
 
         memset(&ns_default, 0, sizeof(ns_default));
@@ -683,7 +683,7 @@ error:
  * @returns 0 on success or -1 on fail.
  */
 static int
-xmlExcC14NProcessNamespacesAxis(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
+xmlExcC14NProcessNamespacesAxis(xmlC14NCtxPtr ctx, xmlNodePtr cur, int Visible)
 {
     xmlNsPtr ns;
     xmlListPtr list;
@@ -736,7 +736,7 @@ xmlExcC14NProcessNamespacesAxis(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
 	    ns = xmlSearchNs(cur->doc, cur, prefix);
 	    if((ns != NULL) && !xmlC14NIsXmlNs(ns) && xmlC14NIsVisible(ctx, ns, cur)) {
 		already_rendered = xmlC14NVisibleNsStackFind(ctx->ns_rendered, ns);
-		if(visible) {
+		if(Visible) {
 		    if (xmlC14NVisibleNsStackAdd(ctx->ns_rendered, ns, cur) < 0) {
                         xmlC14NErrMemory(ctx);
                         goto error;
@@ -760,12 +760,12 @@ xmlExcC14NProcessNamespacesAxis(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
 	has_visibly_utilized_empty_ns = 1;
     }
     if((ns != NULL) && !xmlC14NIsXmlNs(ns)) {
-	if(visible && xmlC14NIsVisible(ctx, ns, cur)) {
+	if(Visible && xmlC14NIsVisible(ctx, ns, cur)) {
 	    if(!xmlExcC14NVisibleNsStackFind(ctx->ns_rendered, ns, ctx)) {
 		xmlListInsert(list, ns);
 	    }
 	}
-	if(visible) {
+	if(Visible) {
 	    if (xmlC14NVisibleNsStackAdd(ctx->ns_rendered, ns, cur) < 0) {
                 xmlC14NErrMemory(ctx);
                 goto error;
@@ -790,7 +790,7 @@ xmlExcC14NProcessNamespacesAxis(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
                 xmlC14NErrMemory(ctx);
                 goto error;
             }
-	    if(!already_rendered && visible) {
+	    if(!already_rendered && Visible) {
 		xmlListInsert(list, attr->ns);
 	    }
 	    if(xmlStrlen(attr->ns->prefix) == 0) {
@@ -804,7 +804,7 @@ xmlExcC14NProcessNamespacesAxis(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
     /*
      * Process xmlns=""
      */
-    if(visible && has_visibly_utilized_empty_ns &&
+    if(Visible && has_visibly_utilized_empty_ns &&
 	    !has_empty_ns && !has_empty_ns_in_inclusive_list) {
         xmlNs ns_default;
 
@@ -814,7 +814,7 @@ xmlExcC14NProcessNamespacesAxis(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
 	if(!already_rendered) {
 	    xmlC14NPrintNamespaces(&ns_default, ctx);
 	}
-    } else if(visible && !has_empty_ns && has_empty_ns_in_inclusive_list) {
+    } else if(Visible && !has_empty_ns && has_empty_ns_in_inclusive_list) {
         xmlNs ns_default;
 
         memset(&ns_default, 0, sizeof(ns_default));
@@ -1393,7 +1393,7 @@ xmlC14NCheckForRelativeNamespaces(xmlC14NCtxPtr ctx, xmlNodePtr cur)
  * @returns non-negative value on success or negative value on fail
  */
 static int
-xmlC14NProcessElementNode(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
+xmlC14NProcessElementNode(xmlC14NCtxPtr ctx, xmlNodePtr cur, int Visible)
 {
     int ret;
     xmlC14NVisibleNsStack state;
@@ -1418,7 +1418,7 @@ xmlC14NProcessElementNode(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
     memset(&state, 0, sizeof(state));
     xmlC14NVisibleNsStackSave(ctx->ns_rendered, &state);
 
-    if (visible) {
+    if (Visible) {
         if (ctx->parent_is_doc) {
 	    /* save this flag into the stack */
 	    parent_is_doc = ctx->parent_is_doc;
@@ -1436,22 +1436,22 @@ xmlC14NProcessElementNode(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
     }
 
     if (!xmlC14NIsExclusive(ctx)) {
-        ret = xmlC14NProcessNamespacesAxis(ctx, cur, visible);
+        ret = xmlC14NProcessNamespacesAxis(ctx, cur, Visible);
     } else {
-        ret = xmlExcC14NProcessNamespacesAxis(ctx, cur, visible);
+        ret = xmlExcC14NProcessNamespacesAxis(ctx, cur, Visible);
     }
     if (ret < 0)
         return (-1);
     /* todo: shouldn't this go to "visible only"? */
-    if(visible) {
+    if(Visible) {
 	xmlC14NVisibleNsStackShift(ctx->ns_rendered);
     }
 
-    ret = xmlC14NProcessAttrsAxis(ctx, cur, visible);
+    ret = xmlC14NProcessAttrsAxis(ctx, cur, Visible);
     if (ret < 0)
 	return (-1);
 
-    if (visible) {
+    if (Visible) {
         xmlOutputBufferWriteString(ctx->buf, ">");
     }
     if (cur->children != NULL) {
@@ -1459,7 +1459,7 @@ xmlC14NProcessElementNode(xmlC14NCtxPtr ctx, xmlNodePtr cur, int visible)
         if (ret < 0)
             return (-1);
     }
-    if (visible) {
+    if (Visible) {
         xmlOutputBufferWriteString(ctx->buf, "</");
         if ((cur->ns != NULL) && (xmlStrlen(cur->ns->prefix) > 0)) {
             xmlOutputBufferWriteString(ctx->buf,
@@ -1493,17 +1493,17 @@ static int
 xmlC14NProcessNode(xmlC14NCtxPtr ctx, xmlNodePtr cur)
 {
     int ret = 0;
-    int visible;
+    int Visible;
 
     if ((ctx == NULL) || (cur == NULL)) {
         xmlC14NErrParam(ctx);
         return (-1);
     }
 
-    visible = xmlC14NIsVisible(ctx, cur, cur->parent);
+    Visible = xmlC14NIsVisible(ctx, cur, cur->parent);
     switch (cur->type) {
         case XML_ELEMENT_NODE:
-            ret = xmlC14NProcessElementNode(ctx, cur, visible);
+            ret = xmlC14NProcessElementNode(ctx, cur, Visible);
             break;
         case XML_CDATA_SECTION_NODE:
         case XML_TEXT_NODE:
@@ -1516,7 +1516,7 @@ xmlC14NProcessNode(xmlC14NCtxPtr ctx, xmlNodePtr cur)
              */
             /* cdata sections are processed as text nodes */
             /* todo: verify that cdata sections are included in XPath nodes set */
-            if ((visible) && (cur->content != NULL)) {
+            if ((Visible) && (cur->content != NULL)) {
                 xmlChar *buffer;
 
                 buffer = xmlC11NNormalizeText(cur->content);
@@ -1543,7 +1543,7 @@ xmlC14NProcessNode(xmlC14NCtxPtr ctx, xmlNodePtr cur)
              * symbol of PI children of the root node with a greater document
              * order than the document element.
              */
-            if (visible) {
+            if (Visible) {
                 if (ctx->pos == XMLC14N_AFTER_DOCUMENT_ELEMENT) {
                     xmlOutputBufferWriteString(ctx->buf, "\x0A<?");
                 } else {
@@ -1592,7 +1592,7 @@ xmlC14NProcessNode(xmlC14NCtxPtr ctx, xmlNodePtr cur)
              * top-level document element and outside of the document type
              * declaration).
              */
-            if (visible && ctx->with_comments) {
+            if (Visible && ctx->with_comments) {
                 if (ctx->pos == XMLC14N_AFTER_DOCUMENT_ELEMENT) {
                     xmlOutputBufferWriteString(ctx->buf, "\x0A<!--");
                 } else {

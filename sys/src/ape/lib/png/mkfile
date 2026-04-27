@@ -14,7 +14,7 @@ OFILES= png.$O\
 	pngread.$O\
 	pngrio.$O\
 	pngrtran.$O\
-#	pngrutil.$O\
+	pngrutil.$O\
 	pngset.$O\
 	pngtrans.$O\
 	pngwio.$O\
