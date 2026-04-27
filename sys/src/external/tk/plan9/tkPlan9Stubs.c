@@ -210,16 +210,16 @@ TkpDrawAngledCharsInContext(
     GC gc,
     Tk_Font tkfont,
     const char *source,
-    int numSourceBytes,
-    int rangeStart,
-    int numBytes,
+    Tcl_Size numBytes,
+    Tcl_Size rangeStart,
+    Tcl_Size rangeLength,
     double x, double y,
     double angle)
 {
     /* Fallback: draw horizontally, ignoring angle */
     Tk_DrawCharsInContext(display, d, gc, tkfont,
-                          source, numSourceBytes,
-                          rangeStart, numBytes,
+                          source, numBytes,
+                          rangeStart, rangeLength,
                           (int)x, (int)y);
     (void)angle;
 }
@@ -240,17 +240,6 @@ TkpGetBindingXEvent(Tcl_Interp *interp)
 /* ------------------------------------------------------------------ */
 
 /* TkpGetFontAttrsForChar is in tkPlan9Font.c */
-
-/* ------------------------------------------------------------------ */
-/* Platform test init (no-op)                                         */
-/* ------------------------------------------------------------------ */
-
-int
-TkplatformtestInit(Tcl_Interp *interp)
-{
-    (void)interp;
-    return TCL_OK;
-}
 
 /* ------------------------------------------------------------------ */
 /* ICU (no-op — Plan 9 doesn't have libicu)                          */
