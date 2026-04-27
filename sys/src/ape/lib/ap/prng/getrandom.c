@@ -1,6 +1,3 @@
-#define _POSIX_SOURCE
-#define _BSD_EXTENSION
-#define _PLAN9_SOURCE
 #include <u.h>
 #include <sys/types.h>
 #include <sys/random.h>
