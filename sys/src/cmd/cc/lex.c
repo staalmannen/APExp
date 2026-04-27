@@ -925,7 +925,8 @@ talph:
 	 * not an attribute.
 	 */
 #define indeclname(t) \
-	((t)=='.' || (t)==LMG || (t)=='*' || \
+	((t)=='.' || (t)==LMG || (t)=='*' || (t)==',' || (t)=='(' || \
+	 (t)=='[' || (t)=='=' || (t)=='&' || (t)=='|' || (t)=='^' || \
 	 (t)==LCHAR || (t)==LINT || (t)==LFLOAT || (t)==LDOUBLE || \
 	 (t)==LLONG || (t)==LSHORT || (t)==LUNSIGNED || (t)==LSIGNED || \
 	 (t)==LVOID || (t)==LNAME)
