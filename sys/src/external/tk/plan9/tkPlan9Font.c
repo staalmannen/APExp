@@ -18,6 +18,7 @@
  */
 
 #include "tkPlan9Int.h"
+#include "tkFont.h"
 
 /* ------------------------------------------------------------------ */
 /* Plan 9 font handle embedded in TkFont                              */
