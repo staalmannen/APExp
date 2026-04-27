@@ -11,6 +11,7 @@
  */
 
 #include "tkPlan9Int.h"
+#include "tkColor.h"
 
 /* ------------------------------------------------------------------ */
 /* Internal: parse X11 colour names via xcolors.c (xlib/)            */
