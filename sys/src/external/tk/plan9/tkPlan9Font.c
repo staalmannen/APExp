@@ -178,7 +178,7 @@ int
 Tk_MeasureChars(
     Tk_Font tkfont,
     const char *source,
-    int numBytes,
+    Tcl_Size numBytes,
     int maxPixels,
     int flags,
     int *lengthPtr)
@@ -189,20 +189,20 @@ Tk_MeasureChars(
 
     fnt = p9f ? p9f->p9font : NULL;
 
-    if (numBytes < 0) numBytes = (int)strlen(source);
+    if (numBytes < 0) numBytes = (Tcl_Size)strlen(source);
 
     if (maxPixels < 0) {
         /* Measure all bytes */
-        w = tkp9_measuretext(fnt, source, numBytes);
+        w = tkp9_measuretext(fnt, source, (int)numBytes);
         if (lengthPtr) *lengthPtr = w;
-        return numBytes;
+        return (int)numBytes;
     }
 
     /* Find how many bytes fit within maxPixels */
     nbytes = 0;
     w      = 0;
     i      = 0;
-    while (i < numBytes) {
+    while (i < (int)numBytes) {
         /* Walk UTF-8 characters */
         unsigned char c = (unsigned char)source[i];
         int charlen = 1;
@@ -210,7 +210,7 @@ Tk_MeasureChars(
         else if ((c & 0xE0) == 0xC0) charlen = 2;
         else if ((c & 0xF0) == 0xE0) charlen = 3;
         else if ((c & 0xF8) == 0xF0) charlen = 4;
-        if (i + charlen > numBytes) break;
+        if (i + charlen > (int)numBytes) break;
 
         int cw = tkp9_measuretext(fnt, source + i, charlen);
         if (w + cw > maxPixels) {
@@ -233,15 +233,15 @@ int
 Tk_MeasureCharsInContext(
     Tk_Font tkfont,
     const char *source,
-    int numSourceBytes,
-    int rangeStart,
-    int numBytes,
+    Tcl_Size numSourceBytes,
+    Tcl_Size rangeStart,
+    Tcl_Size rangeLength,
     int maxPixels,
     int flags,
     int *lengthPtr)
 {
     (void)numSourceBytes;
-    return Tk_MeasureChars(tkfont, source + rangeStart, numBytes,
+    return Tk_MeasureChars(tkfont, source + rangeStart, rangeLength,
                            maxPixels, flags, lengthPtr);
 }
 
@@ -256,7 +256,7 @@ Tk_DrawChars(
     GC gc,
     Tk_Font tkfont,
     const char *source,
-    int numBytes,
+    Tcl_Size numBytes,
     int x, int y)
 {
     P9Font *p9f = (P9Font *)tkfont;
@@ -274,7 +274,7 @@ Tk_DrawChars(
 
     /* y in Tk is the baseline; Plan 9 string() also uses baseline */
     tkp9_drawtext(x + ox, y + oy - (p9f ? p9f->ascent : 0),
-                  source, numBytes, fnt, rgba);
+                  source, (int)numBytes, fnt, rgba);
 }
 
 /* ------------------------------------------------------------------ */
@@ -288,14 +288,14 @@ Tk_DrawCharsInContext(
     GC gc,
     Tk_Font tkfont,
     const char *source,
-    int numSourceBytes,
-    int rangeStart,
-    int numBytes,
+    Tcl_Size numSourceBytes,
+    Tcl_Size rangeStart,
+    Tcl_Size rangeLength,
     int x, int y)
 {
     (void)numSourceBytes;
     Tk_DrawChars(display, d, gc, tkfont,
-                 source + rangeStart, numBytes, x, y);
+                 source + rangeStart, rangeLength, x, y);
 }
 
 /* ------------------------------------------------------------------ */
@@ -303,17 +303,16 @@ Tk_DrawCharsInContext(
 /* ------------------------------------------------------------------ */
 
 void
-TkpGetSubFonts(Tcl_Interp *interp, Tk_Window tkwin)
+TkpGetSubFonts(Tcl_Interp *interp, Tk_Font tkfont)
 {
-    (void)interp; (void)tkwin;
+    (void)interp; (void)tkfont;
 }
 
-int
+void
 TkpGetFontAttrsForChar(Tk_Window tkwin, Tk_Font tkfont,
                        int c, TkFontAttributes *faPtr)
 {
     P9Font *p9f = (P9Font *)tkfont;
     (void)tkwin; (void)c;
     if (p9f) *faPtr = p9f->header.fa;
-    return 0;
 }
