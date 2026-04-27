@@ -25,15 +25,15 @@
 
 /*
  * Use APE's Plan 9 extension headers.
- * u.h defines ulong, uchar, etc.
+ * u.h defines ulong, uchar, nil, etc.
  * draw.h defines Image, Font, Display (Plan 9 types) etc.
- * libc.h provides atoi, atoll, open, read, close, etc.
- * These are the APE versions from sys/include/ape/.
+ * _PLAN9_SOURCE is passed via -D in DRAWIMPL_CFLAGS.
  */
-#define _PLAN9_SOURCE
 #include <u.h>
-#include <libc.h>
 #include <draw.h>
+#include <stdlib.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include "tkP9Draw.h"
 
@@ -66,12 +66,12 @@ tkp9_open(const char *label)
         return -1;
 
     /* Open mouse device directly (avoids libthread dependency) */
-    gMouseFd = open("/dev/mouse", ORDWR);
+    gMouseFd = open("/dev/mouse", O_RDWR);
     if(gMouseFd < 0)
-        gMouseFd = open("/dev/mouse", OREAD);
+        gMouseFd = open("/dev/mouse", O_RDONLY);
 
     /* Open console for keyboard input */
-    gConsFd = open("/dev/cons", OREAD);
+    gConsFd = open("/dev/cons", O_RDONLY);
 
     return 0;
 }
