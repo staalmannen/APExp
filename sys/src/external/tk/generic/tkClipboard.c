@@ -557,7 +557,7 @@ Tk_ClipboardObjCmd(
 	static const char *const getOptionStrings[] = {
 	    "-displayof", "-type", NULL
 	};
-	enum getOptions { APPEND_DISPLAYOF, APPEND_TYPE };
+	enum getOptions { GET_DISPLAYOF, GET_TYPE };
 	int subIndex;
 
 	for (i = 2; i < objc; i++) {
@@ -577,10 +577,10 @@ Tk_ClipboardObjCmd(
 		return TCL_ERROR;
 	    }
 	    switch ((enum getOptions) subIndex) {
-	    case APPEND_DISPLAYOF:
+	    case GET_DISPLAYOF:
 		path = Tcl_GetString(objv[i]);
 		break;
-	    case APPEND_TYPE:
+	    case GET_TYPE:
 		targetName = Tcl_GetString(objv[i]);
 		break;
 	    }
