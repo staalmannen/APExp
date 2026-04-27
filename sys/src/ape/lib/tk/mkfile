@@ -184,6 +184,7 @@ CFLAGS=\
 	-DWCHAR=char\
 	-DTK_PLATFORM="plan9"\
 	-DUSE_TCL_STUBS\
+	-DSTATIC_BUILD\
 
 # DrawImpl uses APE's Plan 9 extension headers (draw.h, mouse.h, u.h)
 # It must NOT include Xlib.h; add -DPLAN9_SOURCE to enable draw.h.
