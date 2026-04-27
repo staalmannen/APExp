@@ -172,7 +172,6 @@ CFLAGS=\
 	-I$TKSRC/generic/ttk\
 	-I$TKSRC/xlib\
 	-I$TKSRC/bitmaps\
-	-I$TKSRC/unix\
 	-I$TKSRC/plan9\
 	-I$TCLSRC/generic\
 	-I$TCLSRC/plan9\

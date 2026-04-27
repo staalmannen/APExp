@@ -1,7 +1,9 @@
 /*
  * plan9/tkUnixDefault.h --
  *
- *	Shim: redirects generic code's #include "tkUnixDefault.h" to the
- *	Plan 9 default colours header.
+ *	Shim: shadows unix/tkUnixDefault.h so that plan9/ can appear on the
+ *	include path without exposing unix/ (which drags in tkUnixPort.h and
+ *	<X11/Xproto.h>).  We include the Unix defaults directly via relative
+ *	path — that file has no #includes of its own, only #define macros.
  */
-#include "tkPlan9Default.h"
+#include "../unix/tkUnixDefault.h"
