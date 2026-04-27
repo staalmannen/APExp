@@ -245,11 +245,10 @@ TkpGetBindingXEvent(Tcl_Interp *interp)
 /* ICU (no-op — Plan 9 doesn't have libicu)                          */
 /* ------------------------------------------------------------------ */
 
-int
+void
 Icu_Init(Tcl_Interp *interp)
 {
     (void)interp;
-    return TCL_OK;
 }
 
 /* ------------------------------------------------------------------ */
