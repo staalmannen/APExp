@@ -5,6 +5,7 @@ LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 
 OFILES=\
 	arc4random.$O\
+	getrandom.$O\
 	rand.$O\
 	truerand.$O\
 #	musl\
