@@ -914,7 +914,21 @@ talph:
 	 * Drop silently and re-lex the next token.
 	 * Reset lasttok so a dropped qualifier cannot spuriously trigger
 	 * _Complex combining on the next token.
+	 *
+	 * "__hidden"/"__visible" and the double-underscore variants are C-reserved
+	 * identifiers — always swallow them.  Plain "hidden"/"visible" are common
+	 * English words used as struct member names and variable declarators, so
+	 * only swallow them in declaration-specifier position: skip the swallow
+	 * when the previous token was a type-specifier keyword (char, int, ...),
+	 * a typedef/variable name (LNAME), a member-access operator (. or ->),
+	 * or a pointer star — all positions where the next identifier is a name,
+	 * not an attribute.
 	 */
+#define indeclname(t) \
+	((t)=='.' || (t)==LMG || (t)=='*' || \
+	 (t)==LCHAR || (t)==LINT || (t)==LFLOAT || (t)==LDOUBLE || \
+	 (t)==LLONG || (t)==LSHORT || (t)==LUNSIGNED || (t)==LSIGNED || \
+	 (t)==LVOID || (t)==LNAME)
 	if(s->lexical == LNAME && (
 	    strcmp(s->name, "__thread")      == 0 ||
 	    strcmp(s->name, "_Thread_local") == 0 ||
@@ -922,12 +936,14 @@ talph:
 	    strcmp(s->name, "__atomic")      == 0 ||
 	    strcmp(s->name, "__hidden")      == 0 ||
 	    strcmp(s->name, "__visible")     == 0 ||
-	    strcmp(s->name, "hidden")        == 0 ||
-	    strcmp(s->name, "visible")       == 0 ||
 	    strcmp(s->name, "__used")        == 0 ||
 	    strcmp(s->name, "__leaf__")      == 0 ||
 	    strcmp(s->name, "__pure__")      == 0 ||
-	    strcmp(s->name, "__nonnull__")   == 0)) {
+	    strcmp(s->name, "__nonnull__")   == 0 ||
+	    (!indeclname(lasttok) && (
+	        strcmp(s->name, "hidden")    == 0 ||
+	        strcmp(s->name, "visible")   == 0)))) {
+#undef indeclname
 		lasttok = 0;
 		/*
 		 * talph set peekc to the first char after the identifier.
