@@ -201,7 +201,7 @@ TkSelClearSelection(Tcl_Interp *interp, XEvent *eventPtr)
 
 int
 TkpTestsendCmd(void *clientData, Tcl_Interp *interp,
-               int objc, Tcl_Obj *const objv[])
+               Tcl_Size objc, Tcl_Obj *const objv[])
 {
     (void)clientData; (void)objc; (void)objv;
     Tcl_SetObjResult(interp,
