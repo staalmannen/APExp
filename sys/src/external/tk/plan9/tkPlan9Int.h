@@ -26,6 +26,7 @@
 #endif
 
 #include "tkP9Draw.h"
+#include "tkIntPlatDecls.h"
 
 /* ------------------------------------------------------------------ */
 /* Maximum number of Tk "windows" (all map onto Plan 9's single window) */
