@@ -333,6 +333,7 @@ XPutImage(Display *display, Drawable d, GC gc, XImage *image,
     return 0;
 }
 
+#undef TkPutImage
 int
 TkPutImage(unsigned long *colors, int ncolors,
            Display *display, Drawable d, GC gc, XImage *image,
