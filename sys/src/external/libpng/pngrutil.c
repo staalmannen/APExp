@@ -20,7 +20,7 @@
 /* The minimum 'zlib' stream is assumed to be just the 2 byte header, 5 bytes
  * minimum 'deflate' stream, and the 4 byte checksum.
  */
-#define LZ77Min  (2U+5U+4U)
+#define LZ77Min 11U /* (2U+5U+4U) */
 
 #ifdef PNG_READ_INTERLACING_SUPPORTED
 /* Arrays to facilitate interlacing - use pass (0 - 6) as index. */
@@ -2983,6 +2983,23 @@ png_handle_unknown(png_structrp png_ptr, png_inforp info_ptr,
  * png_handle_cHNK function for the chunk in question.  When chunk support is
  * compiled out the entry will be NULL.
  */
+#define NoCheck 0x801U      /* Do not check the maximum length */
+#define Limit   0x802U      /* Limit to png_chunk_max bytes */
+#define LKMin   (3U + LZ77Min) /* Minimum length of keyword+LZ77 */
+
+#define hIHDR PNG_HAVE_IHDR
+#define hPLTE PNG_HAVE_PLTE
+#define hIDAT PNG_HAVE_IDAT
+   /* For the two chunks, tRNS and bKGD which can occur in PNGs without a PLTE
+    * but must occur after the PLTE use this and put the check in the handler
+    * routine for colour mapped images were PLTE is required.  Also put a check
+    * in PLTE for other image types to drop the PLTE if tRNS or bKGD have been
+    * seen.
+    */
+#define hCOL  (PNG_HAVE_PLTE|PNG_HAVE_IDAT)
+   /* Used for the decoding chunks which must be before PLTE. */
+#define aIDAT PNG_AFTER_IDAT
+
 static const struct
 {
    png_handle_result_code (*handler)(
@@ -3012,30 +3029,6 @@ static const struct
 }
 read_chunks[PNG_INDEX_unknown] =
 {
-   /* Definitions as above but done indirectly by #define so that
-    * PNG_KNOWN_CHUNKS can be used safely to build the table in order.
-    *
-    * Each CDcHNK definition lists the values for the parameters **after**
-    * the first, 'handler', function.  'handler' is NULL when the chunk has no
-    * compiled in support.
-    */
-#  define NoCheck 0x801U      /* Do not check the maximum length */
-#  define Limit   0x802U      /* Limit to png_chunk_max bytes */
-#  define LKMin   3U+LZ77Min  /* Minimum length of keyword+LZ77 */
-
-#define hIHDR PNG_HAVE_IHDR
-#define hPLTE PNG_HAVE_PLTE
-#define hIDAT PNG_HAVE_IDAT
-   /* For the two chunks, tRNS and bKGD which can occur in PNGs without a PLTE
-    * but must occur after the PLTE use this and put the check in the handler
-    * routine for colour mapped images were PLTE is required.  Also put a check
-    * in PLTE for other image types to drop the PLTE if tRNS or bKGD have been
-    * seen.
-    */
-#define hCOL  (PNG_HAVE_PLTE|PNG_HAVE_IDAT)
-   /* Used for the decoding chunks which must be before PLTE. */
-#define aIDAT PNG_AFTER_IDAT
-
    /* Chunks from W3C PNG v3: */
    /*       cHNK  max_len,   min, before, after, multiple */
 #  define CDIHDR      13U,   13U,  hIHDR,     0,        0
