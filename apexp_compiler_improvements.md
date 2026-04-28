@@ -329,6 +329,36 @@ good hygiene — particularly for the CLOCAL/CSTATIC fix and any future
 
 ---
 
+## Part VII — Preprocessor: Deep Macro Rescanning
+
+Standard C (C89/C99) requires that after a macro is expanded, the resulting
+tokens are rescanned for more macros. This process must repeat until no more
+macros are found. The current APExp preprocessor (inherited from kencc) hits
+limits on deep expansion chains, particularly those involving token pasting.
+
+### The Problem
+
+In complex libraries like `libpng`, macro chains can be several layers deep.
+An expansion such as:
+`PNG_KNOWN_CHUNKS` → `PNG_CHUNK(iCCP, 14)` → `CDiCCP` → `LKMin` → `LZ77Min`
+
+The preprocessor may stop rescanning before the final step, passing the
+literal text `LZ77Min` to the compiler instead of its numeric expansion. This
+usually happens because the preprocessor treats the result of a token-paste
+(`##`) as "final" too early or reaches a hard-coded recursion depth limit.
+
+### Proposed Fixes
+
+Relevant code: `sys/src/cmd/cc/lex.c` and `sys/src/cmd/cc/mac.c`.
+
+1.  **Increase Rescan Depth**: Identify and increase constants that limit
+    macro recursion or rescan passes in the integrated preprocessor.
+2.  **Explicit Rescanning of ## Results**: Ensure that tokens produced by the
+    `##` operator are explicitly flagged for a full rescan pass to comply
+    with C89/C99 requirements.
+
+---
+
 ## Summary: current C standard support level
 
 | Standard | Coverage | Confidence |
