@@ -19,7 +19,8 @@ CFLAGS=\
 	-DPLAN9\
 	-DMODULE_SCOPE=/***/\
 	-DWCHAR=char\
-	-DTK_PLATFORM=\"plan9\"\
+	-DTK_PLATFORM="plan9"\
+
 
 LIBS=\
 	$APEXPROOT/$objtype/lib/ape/libtk.a\
@@ -30,6 +31,8 @@ LIBS=\
 	$APEXPROOT/$objtype/lib/ape/libap.a\
 
 OFILES=tkAppInit.$O
+
+<$APEXPROOT/sys/src/cmd/mkone
 
 all:V: $BIN
 

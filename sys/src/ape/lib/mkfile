@@ -24,8 +24,7 @@ _OPTIONAL_LIBS=\
 	readline\
 	tcl\
 	tk\
-#	unistring\
-#	xml2\
+	xml2\
 	z\
 #	zstd\
 
