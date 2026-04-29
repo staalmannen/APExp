@@ -72,16 +72,19 @@ good:
 	}
 
 	size = sizeof(Bucket)+(1<<pow);
-	size += 7;
-	size &= ~7;
+	size += 15;
+	size &= ~15;	/* round to 16-byte boundary for POSIX max_align_t */
 
 	if(pow < CUTOFF) {
+		uintptr_t gap;
 		n = (CUTOFF-pow)+2;
-		bp = sbrk(size*n);
+		bp = sbrk(size*n + 15);	/* +15 so we can align the base */
 		if(bp == (void*)-1){
 			unlock(&arena);
 			return nil;
 		}
+		gap = (-(uintptr_t)bp) & 15;
+		bp = (Bucket*)((uintptr_t)bp + gap);
 
 		next = (uintptr_t)bp+size;
 		nbp = (Bucket*)next;
@@ -95,11 +98,14 @@ good:
 		nbp->size = pow;
 	}
 	else {
-		bp = sbrk(size);
+		uintptr_t gap;
+		bp = sbrk(size + 15);	/* +15 so we can align the base */
 		if(bp == (void*)-1){
 			unlock(&arena);
 			return nil;
 		}
+		gap = (-(uintptr_t)bp) & 15;
+		bp = (Bucket*)((uintptr_t)bp + gap);
 	}
 	unlock(&arena);
 		
