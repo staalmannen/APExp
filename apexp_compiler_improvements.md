@@ -366,6 +366,41 @@ Expansion sequences such as `PNG_KNOWN_CHUNKS` → `PNG_CHUNK(iCCP, 14)` →
 
 ---
 
+## Part VII — Preprocessor: Deep Macro Rescanning and Token Pasting
+
+Standard C (C89/C99) requires that after a macro is expanded, the resulting
+tokens are rescanned for more macros. This process must repeat until no more
+macros are found. The APExp preprocessors (both standalone `cpp` and the
+integrated one in `cc`) previously hit limits on deep expansion chains and
+sometimes failed to rescan tokens produced by pasting (`##`).
+
+### The Problem
+
+In complex libraries like `libpng`, macro chains can be several layers deep.
+Expansion sequences such as `PNG_KNOWN_CHUNKS` → `PNG_CHUNK(iCCP, 14)` →
+`CDiCCP` → `LKMin` → `LZ77Min` often failed because:
+1.  The rescan logic was distributed and sometimes skipped tokens produced
+    by the `##` operator or during substitution.
+2.  Hideset limits (recursion prevention) were too small for deep chains.
+
+### Implementation Fixes (in `sys/src/cmd/cpp/`)
+
+1.  **Consolidated Rescanning**: Modified `macro.c` (`expand`) to perform a
+    single, definitive rescanning pass via `expandrow` on the entire result
+    of a macro expansion AFTER all substitutions and token joinings (`##`)
+    are complete. This aligns the implementation with Standard C.
+2.  **Hideset Expansion**: Increased `HSSIZ` in `hideset.c` from 32 to 64.
+    This allows deeper nested macro expansion chains before hit the safety
+    limit that prevents infinite recursion.
+
+### Future Work
+
+- **Integrated Preprocessor**: The integrated preprocessor in `sys/src/cmd/cc/`
+  likely requires a similar refactoring to ensure consistent behaviour when
+  the compiler is invoked without an external preprocessor.
+
+---
+
 ## Summary: current C standard support level
 
 | Standard | Coverage | Confidence |
