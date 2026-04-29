@@ -368,3 +368,98 @@ TkpGetMS(void)
     clock_gettime(CLOCK_MONOTONIC, &ts);
     return (unsigned long)(ts.tv_sec * 1000UL + ts.tv_nsec / 1000000UL);
 }
+
+/* ------------------------------------------------------------------ */
+/* Focus claim / key redirect (embed stubs — no embedding on Plan 9)  */
+/* ------------------------------------------------------------------ */
+
+void
+TkpClaimFocus(TkWindow *topLevelPtr, int force)
+{
+    (void)topLevelPtr; (void)force;
+}
+
+void
+TkpRedirectKeyEvent(TkWindow *winPtr, XEvent *eventPtr)
+{
+    (void)winPtr; (void)eventPtr;
+}
+
+/* ------------------------------------------------------------------ */
+/* User inactivity timer (no idle detection on Plan 9)                */
+/* ------------------------------------------------------------------ */
+
+long
+Tk_GetUserInactiveTime(Display *dpy)
+{
+    (void)dpy;
+    return -1;
+}
+
+void
+Tk_ResetUserInactiveTime(Display *dpy)
+{
+    (void)dpy;
+}
+
+/* ------------------------------------------------------------------ */
+/* Pointer coords (return last known mouse position)                  */
+/* ------------------------------------------------------------------ */
+
+void
+Tk_GetPointerCoords(Tk_Window tkwin, int *xPtr, int *yPtr)
+{
+    (void)tkwin;
+    *xPtr = 0;
+    *yPtr = 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Virtual root geometry (Plan 9 has no virtual root; = screen size)  */
+/* ------------------------------------------------------------------ */
+
+void
+Tk_GetVRootGeometry(Tk_Window tkwin, int *xPtr, int *yPtr,
+                    int *widthPtr, int *heightPtr)
+{
+    *xPtr      = 0;
+    *yPtr      = 0;
+    *widthPtr  = WidthOfScreen(Tk_Screen(tkwin));
+    *heightPtr = HeightOfScreen(Tk_Screen(tkwin));
+}
+
+/* ------------------------------------------------------------------ */
+/* Coords → window hit-test                                           */
+/* ------------------------------------------------------------------ */
+
+Tk_Window
+Tk_CoordsToWindow(int rootX, int rootY, Tk_Window tkwin)
+{
+    (void)rootX; (void)rootY; (void)tkwin;
+    return NULL;
+}
+
+/* ------------------------------------------------------------------ */
+/* Move toplevel (delegate to XMoveWindow)                            */
+/* ------------------------------------------------------------------ */
+
+void
+Tk_MoveToplevelWindow(Tk_Window tkwin, int x, int y)
+{
+    TkWindow *winPtr = (TkWindow *)tkwin;
+    XMoveWindow(winPtr->display, winPtr->window, x, y);
+}
+
+/* ------------------------------------------------------------------ */
+/* Wm command (stub — returns "not implemented" for all sub-commands) */
+/* ------------------------------------------------------------------ */
+
+int
+Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
+            int objc, Tcl_Obj *const objv[])
+{
+    (void)clientData; (void)objc; (void)objv;
+    Tcl_SetObjResult(interp,
+        Tcl_NewStringObj("wm not fully implemented on Plan 9", -1));
+    return TCL_ERROR;
+}

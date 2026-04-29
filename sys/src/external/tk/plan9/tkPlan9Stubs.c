@@ -563,3 +563,37 @@ TkDrawAngledChars(Display *display, Drawable drawable, GC gc,
     }
 }
 
+/* ------------------------------------------------------------------ */
+/* Interp names (send is not supported on Plan 9)                     */
+/* ------------------------------------------------------------------ */
+
+int
+TkGetInterpNames(Tcl_Interp *interp, Tk_Window tkwin)
+{
+    (void)interp; (void)tkwin;
+    return TCL_OK;
+}
+
+/* ------------------------------------------------------------------ */
+/* XLoadFont stub (no X11 font server)                                */
+/* ------------------------------------------------------------------ */
+
+Font
+XLoadFont(Display *display, const char *name)
+{
+    (void)display; (void)name;
+    return None;
+}
+
+/* ------------------------------------------------------------------ */
+/* TkpGetPixel — pack XColor r/g/b into 0x00RRGGBB pixel value        */
+/* ------------------------------------------------------------------ */
+
+unsigned long
+TkpGetPixel(XColor *colorPtr)
+{
+    return ((unsigned long)(colorPtr->red   >> 8) << 16)
+         | ((unsigned long)(colorPtr->green >> 8) <<  8)
+         |  (unsigned long)(colorPtr->blue  >> 8);
+}
+
