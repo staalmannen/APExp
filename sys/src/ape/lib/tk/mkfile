@@ -150,7 +150,6 @@ UNIX_OBJS=\
 	tkUnixMenubu.$O\
 	tkUnixScale.$O\
 	tkUnixScrlbr.$O\
-	tkUnixXId.$O\
 
 # Plan9 objects come first so our implementations win over xlib/ stubs
 # (e.g. our XCreateWindow beats xgc.c's stub that returns 0).

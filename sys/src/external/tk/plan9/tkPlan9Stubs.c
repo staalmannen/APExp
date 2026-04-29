@@ -484,3 +484,20 @@ TkpGetKeySym(TkDisplay *dispPtr, XEvent *eventPtr)
     return NoSymbol;
 }
 
+/* ------------------------------------------------------------------ */
+/* Pixmap wrappers (normally from unix/tkUnixXId.c)                  */
+/* ------------------------------------------------------------------ */
+
+Pixmap
+Tk_GetPixmap(Display *display, Drawable d, int width, int height, int depth)
+{
+    return XCreatePixmap(display, d, (unsigned)width, (unsigned)height,
+        (unsigned)depth);
+}
+
+void
+Tk_FreePixmap(Display *display, Pixmap pixmap)
+{
+    XFreePixmap(display, pixmap);
+}
+

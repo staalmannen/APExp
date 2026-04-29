@@ -199,6 +199,7 @@ icuCleanup(
     Tcl_MutexUnlock(&icu_mutex);
 }
 
+#ifndef PLAN9
 void
 Icu_Init(
     Tcl_Interp *interp)
@@ -317,6 +318,8 @@ Icu_Init(
     icu_fns.nopen += 5;
     }
 }
+
+#endif /* !PLAN9 */
 
 /*
  * Local Variables:

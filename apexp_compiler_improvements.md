@@ -333,64 +333,51 @@ good hygiene — particularly for the CLOCAL/CSTATIC fix and any future
 
 Standard C (C89/C99) requires that after a macro is expanded, the resulting
 tokens are rescanned for more macros. This process must repeat until no more
-macros are found. The APExp preprocessor (inherited from kencc) previously
-hit limits on deep expansion chains and lacked proper token pasting (`##`).
+macros are found. Both the integrated preprocessor in `cc` and the standalone
+`cpp` (used by `pcc`) historically hit limits on deep expansion chains,
+particularly those involving token joining (`##`) or deep nested definitions
+common in libraries like `libpng`.
 
 ### The Problem
 
-In complex libraries like `libpng`, macro chains can be several layers deep.
-Expansion sequences such as `PNG_KNOWN_CHUNKS` → `PNG_CHUNK(iCCP, 14)` →
-`CDiCCP` → `LKMin` → `LZ77Min` often failed because:
-1.  `##` was not correctly handled, preventing the formation of `CDiCCP`.
-2.  The rescan logic in `yylex` could prematurely stop or skip tokens.
+In complex chains such as `PNG_KNOWN_CHUNKS` → `PNG_CHUNK(iCCP, 14)` →
+`CDiCCP` → `LKMin` → `LZ77Min`, the preprocessor often failed at the final
+steps. This was due to two structural weaknesses:
+1.  **Single-Pass Iteration**: The token loop typically advanced past newly
+    expanded tokens, skipping rescanning of the expansion result in the
+    same pass.
+2.  **Pointer Invalidation**: Macro expansion often triggers buffer
+    reallocations. The original use of pointers (`Token *tp`) for iteration
+    made the logic unstable during deep expansions.
 
-### Implementation Fixes
+### Implementation Fixes (Standalone `cpp`)
 
-1.  **Token Pasting (`##`)**: Modified `sys/src/cmd/cc/macbody` (`macexpand`)
-    to recognize the `####` sequence (stored by `dodefine` for source `##`)
-    and join the surrounding tokens by skipping the operator in the output
-    buffer.
-2.  **Deep Rescanning**: Improved the rescanning logic in `sys/src/cmd/cc/lex.c`
-    (`yylex`) to ensure that all characters in the expansion buffer,
-    including those merged from `peekc`, are properly evaluated by restarting
-    the lexer loop at `l0` with the new IO context.
+The following improvements were applied to `sys/src/cmd/cpp/` to stabilize
+the preprocessor for complex software:
 
-### Known Limitations
+1.  **Exhaustive Rescanning**: Modified `expandrow` in `macro.c` to use
+    **index-based iteration** and, crucially, **reset the index to 0**
+    after every expansion. This ensures that every token on a line is
+    continuously re-evaluated until no more macros remain, satisfying the
+    Standard's "repeat until no more macros are found" requirement.
+2.  **Indexed Loop Safety**: Converted token iteration from pointers to
+    integer indices. This prevents "use-after-realloc" bugs, ensuring that
+    the loop remains valid even if the token row buffer is resized during
+    an expansion.
+3.  **Hideset Expansion**: Increased `HSSIZ` (recursion prevention buffer)
+    in `hideset.c` from 32 to **128**. This provides the necessary headroom
+    for the extremely deep macro hierarchies found in modern portable C.
 
-- **Argument Buffer**: `macexpand` uses a hard-coded 2000-character buffer
-  (`char buf[2000]`) for macro arguments. Extremely large macro expansions
-  may still hit this limit.
-- **Rescan Depth**: While `pushdepth` in `newio` is set to 1000, which is
-  generous, extremely recursive macros will still be caught by this safety
-  limit.
+### Remaining Challenges
 
----
-
-## Part VII — Preprocessor: Deep Macro Rescanning and Token Pasting
-
-Standard C (C89/C99) requires that after a macro is expanded, the resulting
-tokens are rescanned for more macros. This process must repeat until no more
-macros are found. The APExp preprocessor (standalone `cpp`) previously
-hit limits on deep expansion chains and failed to rescan tokens produced
-by token joining (`##`).
-
-### The Problem
-
-In complex libraries like `libpng`, macro chains can be several layers deep.
-Expansion sequences such as `PNG_KNOWN_CHUNKS` → `PNG_CHUNK(iCCP, 14)` →
-`CDiCCP` → `LKMin` → `LZ77Min` failed because:
-1.  `CDiCCP` (formed by `##`) was not rescanned immediately.
-2.  The recursion prevention limit (hideset size) was too small.
-
-### Implementation Fixes (in `sys/src/cmd/cpp/`)
-
-1.  **Ensured Rescanning**: Modified `macro.c` (`expand`) to reset the token
-    pointer to the beginning of the inserted expansion (`trp->tp -= rowlen(&ntr)`).
-    This ensures that the outer `expandrow` loop naturally rescans the entire
-    result, including joined tokens, as required by Standard C.
-2.  **Hideset Expansion**: Increased `HSSIZ` in `hideset.c` from 32 to 64.
-    This allows deeper nested macro expansion chains before hitting the
-    safety limit that prevents infinite recursion.
+-   **Integrated Preprocessor**: While `cpp` is now more robust, the
+    integrated preprocessor in `sys/src/cmd/cc/lex.c` and `macbody` still
+    requires a similar refactoring to ensure consistent behavior when
+    compiling without an external preprocessor.
+-   **Concatenation Edge Cases**: Certain combinations of token-pasting and
+    deep rescanning may still hit subtle issues with the `quicklook`
+    optimization bitmask, which is retained for performance but may
+    occasionally need to be bypassed for newly formed tokens.
 
 ---
 
