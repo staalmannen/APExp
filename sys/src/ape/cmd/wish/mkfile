@@ -22,7 +22,7 @@ CFLAGS=\
 	-DTK_PLATFORM="plan9"\
 
 
-LIBS=\
+LIB=\
 	$APEXPROOT/$objtype/lib/ape/libtk.a\
 	$APEXPROOT/$objtype/lib/ape/libtcl.a\
 	$APEXPROOT/$objtype/lib/ape/libdraw.a\
@@ -37,7 +37,7 @@ OFILES=tkAppInit.$O
 all:V: $BIN
 
 $BIN: $OFILES $LIBS
-	$LD $LDFLAGS -o $BIN $OFILES $LIBS
+	$LD $LDFLAGS -o $BIN $OFILES $LIB
 
 tkAppInit.$O: $TKSRC/unix/tkAppInit.c
 	$CC $CFLAGS $TKSRC/unix/tkAppInit.c
