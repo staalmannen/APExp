@@ -140,43 +140,44 @@ syntax:
 void
 expandrow(Tokenrow *trp, char *flag)
 {
-	Token *tp;
 	Nlist *np;
+	int i;
 
 	if (flag)
 		setsource(flag, -1, "");
-	for (tp = trp->tp; tp<trp->lp; ) {
+	for (i = 0; i < rowlen(trp); ) {
+		Token *tp = &trp->bp[i];
 		if (tp->type!=NAME
 		 || quicklook(tp->t[0], tp->len>1?tp->t[1]:0)==0
 		 || (np = lookup(tp, 0))==NULL
 		 || (np->flag&(ISDEFINED|ISMAC))==0
 		 || tp->hideset && checkhideset(tp->hideset, np)) {
-			tp++;
+			i++;
 			continue;
 		}
 		trp->tp = tp;
 		if (np->val==KDEFINED) {
 			tp->type = DEFINED;
-			if ((tp+1)<trp->lp && (tp+1)->type==NAME)
-				(tp+1)->type = NAME1;
-			else if ((tp+3)<trp->lp && (tp+1)->type==LP
-			 && (tp+2)->type==NAME && (tp+3)->type==RP)
-				(tp+2)->type = NAME1;
+			if ((i+1)<rowlen(trp) && trp->bp[i+1].type==NAME)
+				trp->bp[i+1].type = NAME1;
+			else if ((i+3)<rowlen(trp) && trp->bp[i+1].type==LP
+			 && trp->bp[i+2].type==NAME && trp->bp[i+3].type==RP)
+				trp->bp[i+2].type = NAME1;
 			else
 				error(ERROR, "Incorrect syntax for `defined'");
-			tp++;
+			i++;
 			continue;
 		}
 		if (np->flag&ISMAC)
 			builtin(trp, np->val);
 		else
 			expand(trp, np);
-		tp = trp->tp;
 		/*
 		 * Rescan the result of the expansion.
 		 * expand() has reset trp->tp to the start of the expansion.
-		 * We continue without tp++ to check the first new token.
+		 * We don't increment i so that we check the first new token.
 		 */
+		i = trp->tp - trp->bp;
 	}
 	if (flag)
 		unsetsource();
