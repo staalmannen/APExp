@@ -189,11 +189,6 @@ TkSelPropProc(XEvent *eventPtr)
     (void)eventPtr;
 }
 
-void
-TkSelClearSelection(Tcl_Interp *interp, XEvent *eventPtr)
-{
-    (void)interp; (void)eventPtr;
-}
 
 /* ------------------------------------------------------------------ */
 /* Send command (no-op — Plan 9 has no X11 send)                     */

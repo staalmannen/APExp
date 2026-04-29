@@ -871,21 +871,6 @@ XUngrabKeyboard(Display *d, Time t)
     return 0;
 }
 
-int
-XGrabPointer(Display *d, Window w, Bool owner, unsigned event_mask,
-             int ptr_mode, int kbd_mode, Window confine, Cursor cursor, Time t)
-{
-    (void)d; (void)w; (void)owner; (void)event_mask;
-    (void)ptr_mode; (void)kbd_mode; (void)confine; (void)cursor; (void)t;
-    return GrabSuccess;
-}
-
-int
-XUngrabPointer(Display *d, Time t)
-{
-    (void)d; (void)t;
-    return 0;
-}
 
 /* ------------------------------------------------------------------ */
 /* Properties (stubs — Plan 9 has no X properties)                   */

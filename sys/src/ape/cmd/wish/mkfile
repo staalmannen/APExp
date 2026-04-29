@@ -25,6 +25,8 @@ LIBS=\
 	$APEXPROOT/$objtype/lib/ape/libtk.a\
 	$APEXPROOT/$objtype/lib/ape/libtcl.a\
 	$APEXPROOT/$objtype/lib/ape/libdraw.a\
+	$APEXPROOT/$objtype/lib/ape/libpng.a\
+	$APEXPROOT/$objtype/lib/ape/libz.a\
 	$APEXPROOT/$objtype/lib/ape/libap.a\
 
 OFILES=tkAppInit.$O

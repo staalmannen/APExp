@@ -224,16 +224,6 @@ TkpDrawAngledCharsInContext(
     (void)angle;
 }
 
-/* ------------------------------------------------------------------ */
-/* Binding event lookup                                                */
-/* ------------------------------------------------------------------ */
-
-XEvent *
-TkpGetBindingXEvent(Tcl_Interp *interp)
-{
-    (void)interp;
-    return NULL;
-}
 
 /* ------------------------------------------------------------------ */
 /* Font attributes for a character                                    */
@@ -426,12 +416,6 @@ TkSetPixmapColormap(Pixmap pixmap, Colormap colormap)
     (void)pixmap; (void)colormap;
 }
 
-/* TkPointerDeadWindow: notify pointer of dead window */
-void
-TkPointerDeadWindow(TkWindow *winPtr)
-{
-    (void)winPtr;
-}
 
 /* TkpSetCapture: pointer capture (no-op on Plan 9) */
 void
@@ -513,8 +497,3 @@ TkpGetKeySym(TkDisplay *dispPtr, XEvent *eventPtr)
     return NoSymbol;
 }
 
-void
-TkpInitKeymapInfo(TkDisplay *dispPtr)
-{
-    (void)dispPtr;
-}

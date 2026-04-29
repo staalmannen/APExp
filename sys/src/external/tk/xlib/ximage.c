@@ -32,6 +32,7 @@
  *----------------------------------------------------------------------
  */
 
+#ifndef PLAN9
 Pixmap
 XCreateBitmapFromData(
     Display *display,
@@ -62,6 +63,7 @@ XCreateBitmapFromData(
     XFreeGC(display, gc);
     return pix;
 }
+#endif /* !PLAN9 */
 
 /*
  * Local Variables:

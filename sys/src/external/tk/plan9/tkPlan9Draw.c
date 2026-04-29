@@ -414,13 +414,6 @@ XFreeCursor(Display *d, Cursor c)
     return 0;
 }
 
-int
-XDefineCursor(Display *d, Window w, Cursor c)
-{
-    (void)d; (void)w; (void)c;
-    return 0;
-}
-
 /* ------------------------------------------------------------------ */
 /* Input methods (stubs — Plan 9 uses /dev/kbd directly)              */
 /* ------------------------------------------------------------------ */
@@ -546,12 +539,6 @@ XVisualIDFromVisual(Visual *visual)
     return visual ? visual->visualid : 0;
 }
 
-int
-XSetDashes(Display *d, GC gc, int offset, const char *dash_list, int n)
-{
-    (void)d; (void)gc; (void)offset; (void)dash_list; (void)n;
-    return 0;
-}
 
 XVaNestedList
 XVaCreateNestedList(int dummy, ...)
@@ -748,14 +735,6 @@ XUnionRegion(Region srca, Region srcb, Region dst)
     return 0;
 }
 
-int
-XSetClipRectangles(Display *d, GC gc, int clip_x_origin, int clip_y_origin,
-                   XRectangle *rectangles, int n, int ordering)
-{
-    (void)d; (void)gc; (void)clip_x_origin; (void)clip_y_origin;
-    (void)rectangles; (void)n; (void)ordering;
-    return 0;
-}
 
 /* Selection (clipboard) stubs */
 int

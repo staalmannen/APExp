@@ -23,7 +23,7 @@ _OPTIONAL_LIBS=\
 	png\
 	readline\
 	tcl\
-#	tk\
+	tk\
 #	unistring\
 #	xml2\
 	z\

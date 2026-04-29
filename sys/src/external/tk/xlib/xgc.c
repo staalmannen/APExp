@@ -507,6 +507,7 @@ XDrawImageString(
 }
 #endif
 
+#ifndef PLAN9
 int
 XDrawPoint(
     Display *display,
@@ -807,6 +808,7 @@ XSetIMValues(
 ) {
     return NULL;
 }
+#endif /* !PLAN9 */
 
 /*
  * Local Variables:
