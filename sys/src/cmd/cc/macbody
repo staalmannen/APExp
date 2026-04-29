@@ -513,6 +513,14 @@ macexpand(Sym *s, char *b, int blen)
 		if(c == 0)
 			goto bad;
 		if(c == '#') {
+			/*
+			 * #### in macro definition means ## in source.
+			 * We skip it to join tokens.
+			 */
+			if(*cp == '#') {
+				cp++;
+				continue;
+			}
 			*b++ = c;
 			continue;
 		}

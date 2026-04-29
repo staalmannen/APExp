@@ -329,33 +329,40 @@ good hygiene — particularly for the CLOCAL/CSTATIC fix and any future
 
 ---
 
-## Part VII — Preprocessor: Deep Macro Rescanning
+## Part VII — Preprocessor: Deep Macro Rescanning and Token Pasting
 
 Standard C (C89/C99) requires that after a macro is expanded, the resulting
 tokens are rescanned for more macros. This process must repeat until no more
-macros are found. The current APExp preprocessor (inherited from kencc) hits
-limits on deep expansion chains, particularly those involving token pasting.
+macros are found. The APExp preprocessor (inherited from kencc) previously
+hit limits on deep expansion chains and lacked proper token pasting (`##`).
 
 ### The Problem
 
 In complex libraries like `libpng`, macro chains can be several layers deep.
-An expansion such as:
-`PNG_KNOWN_CHUNKS` → `PNG_CHUNK(iCCP, 14)` → `CDiCCP` → `LKMin` → `LZ77Min`
+Expansion sequences such as `PNG_KNOWN_CHUNKS` → `PNG_CHUNK(iCCP, 14)` →
+`CDiCCP` → `LKMin` → `LZ77Min` often failed because:
+1.  `##` was not correctly handled, preventing the formation of `CDiCCP`.
+2.  The rescan logic in `yylex` could prematurely stop or skip tokens.
 
-The preprocessor may stop rescanning before the final step, passing the
-literal text `LZ77Min` to the compiler instead of its numeric expansion. This
-usually happens because the preprocessor treats the result of a token-paste
-(`##`) as "final" too early or reaches a hard-coded recursion depth limit.
+### Implementation Fixes
 
-### Proposed Fixes
+1.  **Token Pasting (`##`)**: Modified `sys/src/cmd/cc/macbody` (`macexpand`)
+    to recognize the `####` sequence (stored by `dodefine` for source `##`)
+    and join the surrounding tokens by skipping the operator in the output
+    buffer.
+2.  **Deep Rescanning**: Improved the rescanning logic in `sys/src/cmd/cc/lex.c`
+    (`yylex`) to ensure that all characters in the expansion buffer,
+    including those merged from `peekc`, are properly evaluated by restarting
+    the lexer loop at `l0` with the new IO context.
 
-Relevant code: `sys/src/cmd/cc/lex.c` and `sys/src/cmd/cc/mac.c`.
+### Known Limitations
 
-1.  **Increase Rescan Depth**: Identify and increase constants that limit
-    macro recursion or rescan passes in the integrated preprocessor.
-2.  **Explicit Rescanning of ## Results**: Ensure that tokens produced by the
-    `##` operator are explicitly flagged for a full rescan pass to comply
-    with C89/C99 requirements.
+- **Argument Buffer**: `macexpand` uses a hard-coded 2000-character buffer
+  (`char buf[2000]`) for macro arguments. Extremely large macro expansions
+  may still hit this limit.
+- **Rescan Depth**: While `pushdepth` in `newio` is set to 1000, which is
+  generous, extremely recursive macros will still be caught by this safety
+  limit.
 
 ---
 

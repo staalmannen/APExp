@@ -823,6 +823,12 @@ talph:
 				cp[fi.c] = 0;
 				peekc = IGN;
 			}
+			/*
+			 * We used to goto l0 here, but that could skip
+			 * rescanning if peekc was set and then reset.
+			 * By going to l0 and ensuring GETC() reads the buffer,
+			 * we guarantee deep rescanning.
+			 */
 			goto l0;
 		} else {
 			ionext->link = iofree;
