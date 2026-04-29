@@ -172,6 +172,11 @@ expandrow(Tokenrow *trp, char *flag)
 		else
 			expand(trp, np);
 		tp = trp->tp;
+		/*
+		 * Rescan the result of the expansion.
+		 * expand() has reset trp->tp to the start of the expansion.
+		 * We continue without tp++ to check the first new token.
+		 */
 	}
 	if (flag)
 		unsetsource();
@@ -235,8 +240,6 @@ expand(Tokenrow *trp, Nlist *np)
 				tp->hideset = unionhideset(tp->hideset, hs);
 		}
 	}
-	ntr.tp = ntr.bp;
-	expandrow(&ntr, (char*)np->name);
 	ntr.tp = ntr.bp;
 	insertrow(trp, ntokc, &ntr);
 	trp->tp -= rowlen(&ntr);
@@ -364,7 +367,7 @@ void
 substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 {
 	Tokenrow ttr, rp, rn;
-	Token *tp, *ap, *an, *pp, *pn;
+	Token *tp, *ap, *an;
 	int ntok, argno, hs;
 
 	for (rtr->tp=rtr->bp; rtr->tp<rtr->lp; ) {
@@ -381,10 +384,11 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 			rtr->tp = tp;
 			insertrow(rtr, ntok, stringify(atr[argno]));
 		} else if (ispaste(rtr, &ap, &an, &ntok)) { /* first token, just do the next one */
+			Token *pp, *pn;
 			pp = ap;
 			memset(&rp, 0, sizeof(rp));
 			pn = an;
-			memset(&rn, 0, sizeof(rp));
+			memset(&rn, 0, sizeof(rn));
 			if (ap && (argno = lookuparg(np, ap)) >= 0){
 				pp = nil;
 				rp = *atr[argno];
@@ -402,6 +406,11 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 			insertrow(rtr, ntok, &ttr);
 			insertrow(rtr, 0, &rn);
 			free(ttr.bp);
+			/*
+			 * Rescan the joined token.
+			 * insertrow() advanced the pointer, so we move it back.
+			 */
+			rtr->tp--;
 		} else if (rtr->tp->type==NAME) {
 			if((argno = lookuparg(np, rtr->tp)) >= 0) {
 				if (rtr->tp < rtr->bp) {
@@ -409,12 +418,23 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 					continue;
 				}
 				copytokenrow(&ttr, atr[argno]);
+				expandrow(&ttr, "<macro>");
 				insertrow(rtr, 1, &ttr);
 				free(ttr.bp);
 			} else {
 				maketokenrow(1, &ttr);
 				ttr.lp = ttr.tp + 1;
 				*ttr.tp = *rtr->tp;
+
+				hs = newhideset(rtr->tp->hideset, np);
+				if(hideset == 0)
+					ttr.tp->hideset = hs;
+				else
+					ttr.tp->hideset = unionhideset(hideset, hs);
+				expandrow(&ttr, (char*)np->name);
+				for(tp = ttr.bp; tp != ttr.lp; tp++)
+					if(tp->type == COMMA)
+						tp->type = XCOMMA;
 				insertrow(rtr, 1, &ttr);
 				dofree(ttr.bp);
 			}
