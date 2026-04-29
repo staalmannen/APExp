@@ -398,19 +398,36 @@ XkbKeycodeToKeysym(Display *display, unsigned int keycode, int group, int level)
     return (KeySym)keycode;
 }
 
+typedef struct { const char *name; KeySym value; } KsEntry;
+static const KsEntry ksTable[] = {
+#include "../generic/ks_names.h"
+    {NULL, 0}
+};
+
 KeySym
 XStringToKeysym(const char *string)
 {
-    /* Simple pass-through — xutil.c provides full XStringToKeySym() */
-    return (KeySym)0;
-    (void)string;
+    const KsEntry *p;
+    if (!string || !string[0])
+        return NoSymbol;
+    for (p = ksTable; p->name; p++) {
+        if (strcmp(p->name, string) == 0)
+            return p->value;
+    }
+    return NoSymbol;
 }
 
 char *
 XKeysymToString(KeySym keysym)
 {
-    /* Return simple ASCII for printable keysyms */
     static char buf[2];
+    const KsEntry *p;
+    /* Check named keysyms table first */
+    for (p = ksTable; p->name; p++) {
+        if (p->value == keysym)
+            return (char *)p->name;
+    }
+    /* Fall back to single printable ASCII */
     if (keysym >= 0x20 && keysym < 0x7f) {
         buf[0] = (char)keysym;
         buf[1] = '\0';

@@ -459,15 +459,92 @@ Tk_MoveToplevelWindow(Tk_Window tkwin, int x, int y)
 }
 
 /* ------------------------------------------------------------------ */
-/* Wm command (stub — returns "not implemented" for all sub-commands) */
+/* Wm command — Plan 9 has no WM protocol, so most sub-commands are   */
+/* no-ops.  Queries return sensible defaults.                          */
 /* ------------------------------------------------------------------ */
 
 int
 Tk_WmObjCmd(void *clientData, Tcl_Interp *interp,
             int objc, Tcl_Obj *const objv[])
 {
-    (void)clientData; (void)objc; (void)objv;
-    Tcl_SetObjResult(interp,
-        Tcl_NewStringObj("wm not fully implemented on Plan 9", -1));
-    return TCL_ERROR;
+    static const char *const opts[] = {
+        "aspect", "attributes", "client", "colormapwindows",
+        "command", "deiconify", "focusmodel", "forget",
+        "frame", "geometry", "grid", "group",
+        "iconbadge", "iconbitmap", "iconify",
+        "iconmask", "iconname", "iconphoto",
+        "iconposition", "iconwindow", "manage", "maxsize",
+        "minsize", "overrideredirect", "positionfrom",
+        "protocol", "resizable", "sizefrom", "stackorder",
+        "state", "title", "transient", "withdraw", NULL
+    };
+    enum {
+        OPT_ASPECT, OPT_ATTRIBUTES, OPT_CLIENT, OPT_CMAPWINS,
+        OPT_COMMAND, OPT_DEICONIFY, OPT_FOCUSMODEL, OPT_FORGET,
+        OPT_FRAME, OPT_GEOMETRY, OPT_GRID, OPT_GROUP,
+        OPT_ICONBADGE, OPT_ICONBITMAP, OPT_ICONIFY,
+        OPT_ICONMASK, OPT_ICONNAME, OPT_ICONPHOTO,
+        OPT_ICONPOS, OPT_ICONWIN, OPT_MANAGE, OPT_MAXSIZE,
+        OPT_MINSIZE, OPT_OVERREDIR, OPT_POSFROM,
+        OPT_PROTOCOL, OPT_RESIZABLE, OPT_SIZEFROM, OPT_STACKORDER,
+        OPT_STATE, OPT_TITLE, OPT_TRANSIENT, OPT_WITHDRAW
+    };
+    int index;
+    (void)clientData;
+
+    if (objc < 2) {
+        Tcl_WrongNumArgs(interp, 1, objv, "option window ?arg ...?");
+        return TCL_ERROR;
+    }
+    if (Tcl_GetIndexFromObjStruct(interp, objv[1], opts,
+            sizeof(char *), "option", 0, &index) != TCL_OK)
+        return TCL_ERROR;
+
+    switch (index) {
+    case OPT_GEOMETRY:
+        /* query (wm geometry .): return a placeholder */
+        if (objc == 3)
+            Tcl_SetObjResult(interp, Tcl_NewStringObj("1x1+0+0", -1));
+        return TCL_OK;
+
+    case OPT_STATE:
+        /* always report the window as normal */
+        if (objc == 3)
+            Tcl_SetObjResult(interp, Tcl_NewStringObj("normal", -1));
+        return TCL_OK;
+
+    case OPT_STACKORDER:
+        /* return empty list */
+        Tcl_SetObjResult(interp, Tcl_NewListObj(0, NULL));
+        return TCL_OK;
+
+    case OPT_ICONNAME:
+    case OPT_TITLE:
+        /* query returns empty string; set is silently accepted */
+        if (objc == 3)
+            Tcl_SetObjResult(interp, Tcl_NewStringObj("", -1));
+        return TCL_OK;
+
+    case OPT_RESIZABLE:
+        /* query returns "1 1" */
+        if (objc == 3)
+            Tcl_SetObjResult(interp, Tcl_NewStringObj("1 1", -1));
+        return TCL_OK;
+
+    case OPT_MINSIZE:
+    case OPT_MAXSIZE:
+        /* query returns "0 0" */
+        if (objc == 3)
+            Tcl_SetObjResult(interp, Tcl_NewStringObj("0 0", -1));
+        return TCL_OK;
+
+    case OPT_FRAME:
+        /* return "0x0" — Plan 9 has no separate frame window */
+        Tcl_SetObjResult(interp, Tcl_NewStringObj("0x0", -1));
+        return TCL_OK;
+
+    default:
+        /* all other sub-commands silently succeed */
+        return TCL_OK;
+    }
 }
