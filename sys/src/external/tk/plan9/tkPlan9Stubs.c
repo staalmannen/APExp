@@ -568,6 +568,16 @@ TkDrawAngledChars(Display *display, Drawable drawable, GC gc,
 /* ------------------------------------------------------------------ */
 
 int
+TkpTestembedCmd(void *dummy, Tcl_Interp *interp,
+                Tcl_Size objc, Tcl_Obj *const objv[])
+{
+    (void)dummy; (void)objc; (void)objv;
+    Tcl_SetObjResult(interp,
+        Tcl_NewStringObj("testembed not supported on Plan 9", -1));
+    return TCL_ERROR;
+}
+
+int
 TkGetInterpNames(Tcl_Interp *interp, Tk_Window tkwin)
 {
     (void)interp; (void)tkwin;
