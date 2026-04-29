@@ -146,10 +146,11 @@ expandrow(Tokenrow *trp, char *flag)
 
 	if (flag)
 		setsource(flag, -1, "");
+	
+	/* Exhaustive Rescan: loop until no more macros are found in the row */
 	for (i = 0; i < rowlen(trp); ) {
 		Token *tp = &trp->bp[i];
 		if (tp->type!=NAME
-		 || quicklook(tp->t[0], tp->len>1?tp->t[1]:0)==0
 		 || (np = lookup(tp, 0))==NULL
 		 || (np->flag&(ISDEFINED|ISMAC))==0
 		 || tp->hideset && checkhideset(tp->hideset, np)) {
@@ -173,11 +174,9 @@ expandrow(Tokenrow *trp, char *flag)
 			builtin(trp, np->val);
 		else
 			expand(trp, np);
-		/*
-		 * Rescan the result of the expansion.
-		 * expand() has reset trp->tp to the start of the expansion.
-		 */
-		i = trp->tp - trp->bp;
+		
+		/* After an expansion, restart scanning from the beginning of the row */
+		i = 0;
 	}
 	if (flag)
 		unsetsource();
@@ -230,8 +229,9 @@ expand(Tokenrow *trp, Nlist *np)
 		}
 	}
 
+	/* distribute hidesets to all tokens in the expansion */
 	hs = newhideset(trp->tp->hideset, np);
-	for (tp=ntr.bp; tp<ntr.lp; tp++) {	/* distribute hidesets */
+	for (tp=ntr.bp; tp<ntr.lp; tp++) {
 		if (tp->type==NAME) {
 			if (tp->hideset==0)
 				tp->hideset = hs;
@@ -239,8 +239,7 @@ expand(Tokenrow *trp, Nlist *np)
 				tp->hideset = unionhideset(tp->hideset, hs);
 		}
 	}
-	ntr.tp = ntr.bp;
-	expandrow(&ntr, (char*)np->name);
+
 	ntr.tp = ntr.bp;
 	insertrow(trp, ntokc, &ntr);
 	trp->tp -= rowlen(&ntr);
@@ -368,7 +367,7 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 {
 	Tokenrow ttr, rp, rn;
 	Token *tp, *ap, *an;
-	int ntok, argno, i, hs;
+	int ntok, argno, i;
 
 	for (i = 0; i < rowlen(rtr); ) {
 		rtr->tp = &rtr->bp[i];
@@ -406,21 +405,19 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 			insertrow(rtr, ntok, &ttr);
 			insertrow(rtr, 0, &rn);
 			free(ttr.bp);
-			/* rescan joined token */
+			/* move pointer back to rescan the joined result */
 			i = rtr->tp - rtr->bp - 1;
-		} else if (rtr->tp->type==NAME) {
-			if((argno = lookuparg(np, rtr->tp)) >= 0) {
-				copytokenrow(&ttr, atr[argno]);
-				expandrow(&ttr, "<macro>");
-				for(tp = ttr.bp; tp != ttr.lp; tp++)
-					if(tp->type == COMMA)
-						tp->type = XCOMMA;
-				insertrow(rtr, 1, &ttr);
-				free(ttr.bp);
-				i = rtr->tp - rtr->bp;
-			} else {
-				i++;
-			}
+		} else if (rtr->tp->type==NAME && (argno = lookuparg(np, rtr->tp)) >= 0) {
+			copytokenrow(&ttr, atr[argno]);
+			/* Standard C: Expand argument BEFORE substitution */
+			expandrow(&ttr, "<macro>");
+			/* Protect commas in expanded arguments */
+			for(tp = ttr.bp; tp != ttr.lp; tp++)
+				if(tp->type == COMMA)
+					tp->type = XCOMMA;
+			insertrow(rtr, 1, &ttr);
+			free(ttr.bp);
+			i = rtr->tp - rtr->bp;
 		} else {
 			i++;
 		}
