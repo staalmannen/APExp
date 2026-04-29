@@ -236,6 +236,8 @@ expand(Tokenrow *trp, Nlist *np)
 		}
 	}
 	ntr.tp = ntr.bp;
+	expandrow(&ntr, (char*)np->name);
+	ntr.tp = ntr.bp;
 	insertrow(trp, ntokc, &ntr);
 	trp->tp -= rowlen(&ntr);
 	free(ntr.bp);
@@ -407,23 +409,12 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 					continue;
 				}
 				copytokenrow(&ttr, atr[argno]);
-				expandrow(&ttr, "<macro>");
 				insertrow(rtr, 1, &ttr);
 				free(ttr.bp);
 			} else {
 				maketokenrow(1, &ttr);
 				ttr.lp = ttr.tp + 1;
 				*ttr.tp = *rtr->tp;
-
-				hs = newhideset(rtr->tp->hideset, np);
-				if(hideset == 0)
-					ttr.tp->hideset = hs;
-				else
-					ttr.tp->hideset = unionhideset(hideset, hs);
-				expandrow(&ttr, (char*)np->name);
-				for(tp = ttr.bp; tp != ttr.lp; tp++)
-					if(tp->type == COMMA)
-						tp->type = XCOMMA;
 				insertrow(rtr, 1, &ttr);
 				dofree(ttr.bp);
 			}
