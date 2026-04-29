@@ -175,7 +175,6 @@ expandrow(Tokenrow *trp, char *flag)
 		/*
 		 * Rescan the result of the expansion.
 		 * expand() has reset trp->tp to the start of the expansion.
-		 * We don't increment i so that we check the first new token.
 		 */
 		i = trp->tp - trp->bp;
 	}
@@ -230,9 +229,8 @@ expand(Tokenrow *trp, Nlist *np)
 		}
 	}
 
-	/* distribute hidesets */
 	hs = newhideset(trp->tp->hideset, np);
-	for (tp=ntr.bp; tp<ntr.lp; tp++) {
+	for (tp=ntr.bp; tp<ntr.lp; tp++) {	/* distribute hidesets */
 		if (tp->type==NAME) {
 			if (tp->hideset==0)
 				tp->hideset = hs;
@@ -240,11 +238,6 @@ expand(Tokenrow *trp, Nlist *np)
 				tp->hideset = unionhideset(tp->hideset, hs);
 		}
 	}
-
-	/* rescan the result */
-	ntr.tp = ntr.bp;
-	expandrow(&ntr, (char*)np->name);
-
 	ntr.tp = ntr.bp;
 	insertrow(trp, ntokc, &ntr);
 	trp->tp -= rowlen(&ntr);
@@ -371,7 +364,7 @@ void
 substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 {
 	Tokenrow ttr, rp, rn;
-	Token *ap, *an;
+	Token *tp, *ap, *an;
 	int ntok, argno, i;
 
 	for (i = 0; i < rowlen(rtr); ) {
@@ -410,9 +403,16 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 			insertrow(rtr, ntok, &ttr);
 			insertrow(rtr, 0, &rn);
 			free(ttr.bp);
+			/* move pointer back to rescan the joined result */
 			i = rtr->tp - rtr->bp - 1;
 		} else if (rtr->tp->type==NAME && (argno = lookuparg(np, rtr->tp)) >= 0) {
 			copytokenrow(&ttr, atr[argno]);
+			/* Standard C: Expand argument BEFORE substitution */
+			expandrow(&ttr, "<macro>");
+			/* Protect commas in expanded arguments */
+			for(tp = ttr.bp; tp != ttr.lp; tp++)
+				if(tp->type == COMMA)
+					tp->type = XCOMMA;
 			insertrow(rtr, 1, &ttr);
 			free(ttr.bp);
 			i = rtr->tp - rtr->bp;
