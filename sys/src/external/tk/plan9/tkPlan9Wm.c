@@ -414,6 +414,14 @@ Tk_GetPointerCoords(Tk_Window tkwin, int *xPtr, int *yPtr)
     *yPtr = 0;
 }
 
+void
+TkGetPointerCoords(Tk_Window tkwin, int *xPtr, int *yPtr)
+{
+    (void)tkwin;
+    *xPtr = 0;
+    *yPtr = 0;
+}
+
 /* ------------------------------------------------------------------ */
 /* Virtual root geometry (Plan 9 has no virtual root; = screen size)  */
 /* ------------------------------------------------------------------ */
