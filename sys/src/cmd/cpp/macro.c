@@ -199,13 +199,11 @@ expand(Tokenrow *trp, Nlist *np)
 	copytokenrow(&ntr, np->vp);		/* copy macro value */
 	if (np->ap==NULL) {			/* parameterless */
 		ntokc = 1;
-		/* substargs for handling # and ## */
 		atr[0] = nil;
 		substargs(np, &ntr, atr, trp->tp->hideset);
 	} else {
 		ntokc = gatherargs(trp, atr, (np->flag&ISVARMAC) ? rowlen(np->ap) : 0, &narg);
 		if (narg<0) {			/* not actually a call (no '(') */
-			/* gatherargs has already pushed trp->tr to the next token */
 			return;
 		}
 		nparam = rowlen(np->ap);
@@ -232,8 +230,9 @@ expand(Tokenrow *trp, Nlist *np)
 		}
 	}
 
+	/* distribute hidesets */
 	hs = newhideset(trp->tp->hideset, np);
-	for (tp=ntr.bp; tp<ntr.lp; tp++) {	/* distribute hidesets */
+	for (tp=ntr.bp; tp<ntr.lp; tp++) {
 		if (tp->type==NAME) {
 			if (tp->hideset==0)
 				tp->hideset = hs;
@@ -241,6 +240,11 @@ expand(Tokenrow *trp, Nlist *np)
 				tp->hideset = unionhideset(tp->hideset, hs);
 		}
 	}
+
+	/* rescan the result */
+	ntr.tp = ntr.bp;
+	expandrow(&ntr, (char*)np->name);
+
 	ntr.tp = ntr.bp;
 	insertrow(trp, ntokc, &ntr);
 	trp->tp -= rowlen(&ntr);
@@ -362,29 +366,28 @@ ispaste(Tokenrow *rtr, Token **ap, Token **an, int *ntok)
 
 /*
  * substitute the argument list into the replacement string
- *  This would be simple except for ## and #
  */
 void
 substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 {
 	Tokenrow ttr, rp, rn;
-	Token *tp, *ap, *an;
-	int ntok, argno, hs;
+	Token *ap, *an;
+	int ntok, argno, i;
 
-	for (rtr->tp=rtr->bp; rtr->tp<rtr->lp; ) {
+	for (i = 0; i < rowlen(rtr); ) {
+		rtr->tp = &rtr->bp[i];
 		if(rtr->tp->hideset && checkhideset(hideset, np)) {
-			rtr->tp++;
+			i++;
 		} else if (rtr->tp->type==SHARP) {	/* string operator */
-			tp = rtr->tp;
-			rtr->tp += 1;
-			if ((argno = lookuparg(np, rtr->tp))<0) {
+			if ((argno = lookuparg(np, rtr->tp+1))<0) {
 				error(ERROR, "# not followed by macro parameter");
+				i++;
 				continue;
 			}
-			ntok = 1 + (rtr->tp - tp);
-			rtr->tp = tp;
+			ntok = 2;
 			insertrow(rtr, ntok, stringify(atr[argno]));
-		} else if (ispaste(rtr, &ap, &an, &ntok)) { /* first token, just do the next one */
+			i = rtr->tp - rtr->bp;
+		} else if (ispaste(rtr, &ap, &an, &ntok)) {
 			Token *pp, *pn;
 			pp = ap;
 			memset(&rp, 0, sizeof(rp));
@@ -407,40 +410,14 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 			insertrow(rtr, ntok, &ttr);
 			insertrow(rtr, 0, &rn);
 			free(ttr.bp);
-			/*
-			 * Rescan the joined token.
-			 * insertrow() advanced the pointer, so we move it back.
-			 */
-			rtr->tp--;
-		} else if (rtr->tp->type==NAME) {
-			if((argno = lookuparg(np, rtr->tp)) >= 0) {
-				if (rtr->tp < rtr->bp) {
-					error(ERROR, "access out of bounds");
-					continue;
-				}
-				copytokenrow(&ttr, atr[argno]);
-				expandrow(&ttr, "<macro>");
-				insertrow(rtr, 1, &ttr);
-				free(ttr.bp);
-			} else {
-				maketokenrow(1, &ttr);
-				ttr.lp = ttr.tp + 1;
-				*ttr.tp = *rtr->tp;
-
-				hs = newhideset(rtr->tp->hideset, np);
-				if(hideset == 0)
-					ttr.tp->hideset = hs;
-				else
-					ttr.tp->hideset = unionhideset(hideset, hs);
-				expandrow(&ttr, (char*)np->name);
-				for(tp = ttr.bp; tp != ttr.lp; tp++)
-					if(tp->type == COMMA)
-						tp->type = XCOMMA;
-				insertrow(rtr, 1, &ttr);
-				dofree(ttr.bp);
-			}
+			i = rtr->tp - rtr->bp - 1;
+		} else if (rtr->tp->type==NAME && (argno = lookuparg(np, rtr->tp)) >= 0) {
+			copytokenrow(&ttr, atr[argno]);
+			insertrow(rtr, 1, &ttr);
+			free(ttr.bp);
+			i = rtr->tp - rtr->bp;
 		} else {
-			rtr->tp++;
+			i++;
 		}
 	}
 }
