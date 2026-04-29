@@ -3,6 +3,6 @@
 
 #include <features.h>
 
-hidden unsigned long __pleval(const char *, unsigned long);
+unsigned long __pleval(const char *, unsigned long);
 
 #endif

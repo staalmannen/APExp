@@ -121,7 +121,7 @@ Install paths have been modified so that libraries and binaries are installed in
 
 
 - Lua (version 5.5.0)
-- Tcl (version 9.0.3)
+- Tcl (tclsh) & Tk (wish) (version 9.0.3)
 
 
 ***Transpilers***
