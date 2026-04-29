@@ -157,19 +157,6 @@ TkpBuildRegionFromAlphaData(Region region,
 }
 
 /* ------------------------------------------------------------------ */
-/* Frame / 3D drawing                                                  */
-/* ------------------------------------------------------------------ */
-
-void
-TkpDrawFrameEx(Tk_Window tkwin, Drawable drawable,
-               Tk_3DBorder border, int highlightWidth,
-               int borderWidth, int relief)
-{
-    (void)tkwin; (void)drawable; (void)border;
-    (void)highlightWidth; (void)borderWidth; (void)relief;
-}
-
-/* ------------------------------------------------------------------ */
 /* Busy windows (transparency)                                         */
 /* ------------------------------------------------------------------ */
 

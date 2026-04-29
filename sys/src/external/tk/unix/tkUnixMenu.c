@@ -1857,6 +1857,7 @@ TkpComputeStandardMenuGeometry(
  *----------------------------------------------------------------------
  */
 
+#ifndef PLAN9
 void
 TkpMenuNotifyToplevelCreate(
     TCL_UNUSED(Tcl_Interp *),	/* The interp the menu lives in. */
@@ -1915,6 +1916,7 @@ TkpMenuThreadInit(void)
      * Nothing to do.
      */
 }
+#endif /* !PLAN9 */
 
 /*
  * Local Variables:

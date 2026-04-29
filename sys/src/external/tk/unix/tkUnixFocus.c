@@ -34,6 +34,7 @@
  *----------------------------------------------------------------------
  */
 
+#ifndef PLAN9
 int
 TkpChangeFocus(
     TkWindow *winPtr,		/* Window that is to receive the X focus. */
@@ -139,6 +140,7 @@ TkpChangeFocus(
     XFlush(dispPtr->display);
     return serial;
 }
+#endif /* !PLAN9 */
 
 /*
  * Local Variables:
