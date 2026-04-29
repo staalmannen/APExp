@@ -83,8 +83,9 @@ dodefine(Tokenrow *trp)
 	if (args) {
 		Tokenrow *tap;
 		tap = normtokenrow(args);
-		dofree(args->bp);
-		args = tap;
+		dofree(tap->bp);
+		tap->bp = args->bp; tap->lp = args->lp; tap->max = args->max;
+		dofree(tap);
 	}
 	np->ap = args;
 	np->vp = def;
@@ -229,9 +230,8 @@ expand(Tokenrow *trp, Nlist *np)
 		}
 	}
 
-	/* distribute hidesets */
 	hs = newhideset(trp->tp->hideset, np);
-	for (tp=ntr.bp; tp<ntr.lp; tp++) {
+	for (tp=ntr.bp; tp<ntr.lp; tp++) {	/* distribute hidesets */
 		if (tp->type==NAME) {
 			if (tp->hideset==0)
 				tp->hideset = hs;
@@ -239,11 +239,8 @@ expand(Tokenrow *trp, Nlist *np)
 				tp->hideset = unionhideset(tp->hideset, hs);
 		}
 	}
-
-	/* rescan the result completely */
 	ntr.tp = ntr.bp;
 	expandrow(&ntr, (char*)np->name);
-
 	ntr.tp = ntr.bp;
 	insertrow(trp, ntokc, &ntr);
 	trp->tp -= rowlen(&ntr);
@@ -422,22 +419,7 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 				free(ttr.bp);
 				i = rtr->tp - rtr->bp;
 			} else {
-				/* identifier not an argument - try expanding it in-place */
-				maketokenrow(1, &ttr);
-				ttr.lp = ttr.tp + 1;
-				*ttr.tp = *rtr->tp;
-				hs = newhideset(rtr->tp->hideset, np);
-				if(hideset == 0)
-					ttr.tp->hideset = hs;
-				else
-					ttr.tp->hideset = unionhideset(hideset, hs);
-				expandrow(&ttr, (char*)np->name);
-				for(tp = ttr.bp; tp != ttr.lp; tp++)
-					if(tp->type == COMMA)
-						tp->type = XCOMMA;
-				insertrow(rtr, 1, &ttr);
-				dofree(ttr.bp);
-				i = rtr->tp - rtr->bp;
+				i++;
 			}
 		} else {
 			i++;
