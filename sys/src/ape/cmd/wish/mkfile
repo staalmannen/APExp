@@ -2,7 +2,8 @@ APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-BIN=$APEXPROOT/$objtype/bin/ape/wish
+BIN=$APEXPROOT/$objtype/bin/ape
+TARG=wish
 
 TKSRC=$APEXPROOT/sys/src/external/tk
 TCLSRC=$APEXPROOT/sys/src/external/tcl
@@ -34,13 +35,9 @@ OFILES=tkAppInit.$O
 
 <$APEXPROOT/sys/src/cmd/mkone
 
-all:V: $BIN
-
-$BIN: $OFILES $LIBS
-	$LD $LDFLAGS -o $BIN $OFILES $LIB
 
 tkAppInit.$O: $TKSRC/unix/tkAppInit.c
 	$CC $CFLAGS $TKSRC/unix/tkAppInit.c
 
 clean:V:
-	rm -f *.[$OS] $BIN
+	rm -f *.[$OS] $BIN/$TARG
