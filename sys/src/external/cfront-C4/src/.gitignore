@@ -1,0 +1,5 @@
+ns_strip
+cfront
+szal/szal
+*.o
+*..c

@@ -3185,10 +3185,39 @@ puttok__FUc ( __0this -> base__4node ) ;
 if (__0this -> __O3__4expr.e2 )Eprint__FP4expr ( __0this -> __O3__4expr.e2 ) ;
 break ;
 
+case 99 : /* THROW expression -- setjmp/longjmp EH */
+{
+    struct expr *__3e1 = __0this -> __O2__4expr.e1 ;
+    if (!__3e1 || __3e1 == (struct expr *)dummy) {
+        /* bare throw -- rethrow */
+        fputs("(__cfront_rethrow(),0)", out_file);
+    } else {
+        const char *__2tname = "void";
+        struct type *__2tp = __3e1 -> __O1__4expr.tp ;
+        while (__2tp) {
+            if (__2tp -> base__4node == 97) { /* BASETYPE */
+                struct name *__3bn = ((struct basetype *)__2tp) -> b_name__8basetype ;
+                if (__3bn && __3bn -> __O2__4expr.string) __2tname = __3bn -> __O2__4expr.string ;
+                break ;
+            } else if (__2tp -> base__4node == 6) { /* CLASS */
+                const char *__3cn = ((struct classdef *)__2tp) -> string__8classdef ;
+                if (__3cn) __2tname = __3cn ;
+                break ;
+            } else if (__2tp -> base__4node == 125 || __2tp -> base__4node == 115) { /* PTR/RPTR */
+                __2tp = ((struct pvtyp *)__2tp) -> typ__5pvtyp ;
+            } else { break ; }
+        }
+        fprintf(out_file, "(__cfront_throw(sizeof(%s),(const char *)\"%s\",(void *)(&(", __2tname, __2tname);
+        print__4exprFv(__3e1);
+        fputs("))),0)", out_file);
+    }
+    break ;
+}
+
 # 902 "/home/claude/cfront-3/src/print.cpp"
 default :
 # 903 "/home/claude/cfront-3/src/print.cpp"
-{ 
+{
 # 903 "/home/claude/cfront-3/src/print.cpp"
 struct ea __0__V29 ;
 
@@ -3819,6 +3848,118 @@ if (__0this -> __O2__4stmt.s2 )
 print__4stmtFv ( __0this -> __O2__4stmt.s2 ) ;
 }
 break ;
+
+case 100 : /* TRY handler -- setjmp/longjmp EH transformation */
+{
+    static int __s_eh_ctr = 0 ;
+    int __2eid ;
+    struct stmt *__2tbody ;
+    struct stmt *__2clist ;
+    struct stmt *__2cs ;
+    int __2ncatch ;
+    int __2i ;
+
+    __2eid = ++__s_eh_ctr ;
+    __2tbody = __0this -> s__4stmt ;
+    __2clist = __2tbody ? __2tbody -> s_list__4stmt : (struct stmt *)0 ;
+
+    /* Disconnect catch chain from try body to avoid spurious printing */
+    if (__2tbody) __2tbody -> s_list__4stmt = (struct stmt *)0 ;
+
+    /* Count catch clauses */
+    __2ncatch = 0 ;
+    { struct stmt *__2t = __2clist ;
+      while (__2t) { __2ncatch++ ; __2t = __2t -> s_list__4stmt ; }
+    }
+
+    /* Emit EH frame block with inline runtime declarations */
+    fprintf(out_file,
+        "{ /* EH try/catch */\n"
+        "struct __cfront_eh_frame{long __env[64];struct __cfront_eh_frame*prev;"
+        "void*exception;const char*exception_type;unsigned char exc_buf[256];};\n"
+        "extern struct __cfront_eh_frame*__cfront_eh_top;\n"
+        "extern void __cfront_throw(unsigned long,const char*,void*);\n"
+        "extern void __cfront_rethrow(void);\n"
+        "extern int __cfront_eh_match(struct __cfront_eh_frame*,const char*);\n"
+        "extern int __cfront_setjmp(struct __cfront_eh_frame*);\n"
+        "struct __cfront_eh_frame __ehf%d;\n"
+        "__ehf%d.prev=__cfront_eh_top;\n"
+        "__cfront_eh_top=&__ehf%d;\n"
+        "if(__cfront_setjmp(&__ehf%d)==0){\n",
+        __2eid, __2eid, __2eid, __2eid);
+
+    /* Print try body */
+    if (__2tbody) print__4stmtFv(__2tbody) ;
+
+    /* Normal exit: pop frame */
+    fprintf(out_file,
+        "__cfront_eh_top=__ehf%d.prev;\n"
+        "}else{\n"
+        "__cfront_eh_top=__ehf%d.prev;\n",
+        __2eid, __2eid);
+
+    /* Print catch clauses */
+    __2cs = __2clist ;
+    while (__2cs) {
+        struct name *__2cv = __2cs -> __O1__4stmt.d ;
+        struct stmt *__2cbody = __2cs -> s__4stmt ;
+        struct stmt *__2cnext = __2cs -> s_list__4stmt ;
+
+        if (!__2cv) {
+            /* catch(...) -- catch all */
+            fputs("{\n", out_file) ;
+            if (__2cbody) print__4stmtFv(__2cbody) ;
+            fputs("}\n", out_file) ;
+        } else {
+            /* catch(Type var) or catch(Type& var) -- type-matched catch */
+            const char *__2tname = "void";
+            struct type *__2tp = __2cv -> __O1__4expr.tp ;
+            while (__2tp) {
+                if (__2tp -> base__4node == 97) { /* BASETYPE */
+                    struct name *__3bn = ((struct basetype *)__2tp) -> b_name__8basetype ;
+                    if (__3bn && __3bn -> __O2__4expr.string) __2tname = __3bn -> __O2__4expr.string ;
+                    break ;
+                } else if (__2tp -> base__4node == 6) { /* CLASS */
+                    const char *__3cn = ((struct classdef *)__2tp) -> string__8classdef ;
+                    if (__3cn) __2tname = __3cn ;
+                    break ;
+                } else if (__2tp -> base__4node == 125 || __2tp -> base__4node == 115) { /* PTR/RPTR */
+                    __2tp = ((struct pvtyp *)__2tp) -> typ__5pvtyp ;
+                } else { break ; }
+            }
+            fprintf(out_file, "if(__cfront_eh_match(&__ehf%d,(const char*)\"%s\")){\n",
+                    __2eid, __2tname);
+            /* Emit catch variable: pointer into EH frame exception */
+            if (__2cv -> __O2__4expr.string) {
+                fprintf(out_file, "%s*%s=(%s*)__ehf%d.exception;\n",
+                        __2tname, __2cv -> __O2__4expr.string,
+                        __2tname, __2eid);
+            }
+            /* Print catch body (case 116 emits its own {}) */
+            if (__2cbody) print__4stmtFv(__2cbody) ;
+            /* Open else for next catch or emit rethrow for last */
+            if (__2cnext)
+                fputs("}else{\n", out_file) ;
+            else
+                fputs("}else{__cfront_rethrow();}\n", out_file) ;
+        }
+        __2cs = __2cnext ;
+    }
+
+    if (!__2clist)
+        fputs("__cfront_rethrow();\n", out_file) ;
+
+    /* Close N-1 accumulated else blocks + outer else + frame block */
+    for (__2i = 0 ; __2i < __2ncatch - 1 ; __2i++) fputs("}\n", out_file) ;
+    fputs("}\n}\n", out_file) ;
+
+    /* Restore catch chain */
+    if (__2tbody) __2tbody -> s_list__4stmt = __2clist ;
+
+    /* Print next statement in sequence */
+    if (__0this -> s_list__4stmt) print__4stmtFv(__0this -> s_list__4stmt) ;
+    break ;
+}
 
 # 1241 "/home/claude/cfront-3/src/print.cpp"
 case 116 :

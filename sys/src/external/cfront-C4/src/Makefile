@@ -169,7 +169,11 @@ y.tab.o: y.tab.cpp $(COMDEP)
 _stdio.o: _stdio.c
 	$(CCOMP)  $(MSIZE) -c _stdio.c
 
+ns_strip: ns_strip.c
+	$(CCOMP) $(MSIZE) -o ns_strip ns_strip.c
+	cp ns_strip ..
+
 clean:
 	-rm -f szal.result szal/szal$(EXEEXT)
 	#-rm -f y.tab.cpp yystype.h
-	-rm -f *.o *..c cfront$(EXEEXT) #../cfront
+	-rm -f *.o *..c cfront$(EXEEXT) ns_strip #../cfront
