@@ -9,7 +9,7 @@
  * Hideset 0 is empty.
  */
 
-#define	HSSIZ	64
+#define	HSSIZ	128
 typedef	Nlist	**Hideset;
 Hideset	*hidesets;
 int	nhidesets = 0;
