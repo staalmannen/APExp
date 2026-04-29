@@ -518,6 +518,7 @@ macexpand(Sym *s, char *b, int blen)
 			 * We skip it to join tokens.
 			 */
 			if(*cp == '#') {
+				print("DEBUG: skipping ##\n");
 				cp++;
 				continue;
 			}

@@ -809,7 +809,9 @@ talph:
 		print("%L: %s\n", lineno, symb);
 	peekc = c;
 	s = lookup();
+	print("DEBUG: lookup %s macro=%p\n", symb, s->macro);
 	if(s->macro) {
+		print("DEBUG: expanding %s\n", s->name);
 		newio();
 		cp = ionext->b;
 		if(macexpand(s, cp, sizeof(ionext->b)-1)){
