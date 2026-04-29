@@ -9,6 +9,7 @@
  */
 
 #include "tkPlan9Int.h"
+#include <time.h>
 
 /* ------------------------------------------------------------------ */
 /* TkpGetWrapperWindow / TkpMakeMenuWindow                            */
@@ -214,4 +215,156 @@ TkpClipboardAppend(TkDisplay *dispPtr, Atom target, Atom format,
 {
     (void)dispPtr; (void)target; (void)format; (void)buffer; (void)length;
     return TCL_OK;
+}
+
+/* ------------------------------------------------------------------ */
+/* Window manager internal functions (TkWm*)                          */
+/* Plan 9 has no separate WM; these are no-ops or minimal stubs.      */
+/* ------------------------------------------------------------------ */
+
+void
+TkWmNewWindow(TkWindow *winPtr)
+{
+    (void)winPtr;
+}
+
+void
+TkWmMapWindow(TkWindow *winPtr)
+{
+    (void)winPtr;
+}
+
+void
+TkWmUnmapWindow(TkWindow *winPtr)
+{
+    (void)winPtr;
+}
+
+void
+TkWmDeadWindow(TkWindow *winPtr)
+{
+    (void)winPtr;
+}
+
+void
+TkWmSetClass(TkWindow *winPtr)
+{
+    (void)winPtr;
+}
+
+void
+TkWmRestackToplevel(TkWindow *winPtr, int aboveBelow, TkWindow *otherPtr)
+{
+    (void)winPtr; (void)aboveBelow; (void)otherPtr;
+}
+
+TkWindow *
+TkWmFocusToplevel(TkWindow *winPtr)
+{
+    TkWindow *w = winPtr;
+    while (w && !(w->flags & TK_TOP_LEVEL))
+        w = w->parentPtr;
+    return w;
+}
+
+void
+TkWmAddToColormapWindows(TkWindow *winPtr)
+{
+    (void)winPtr;
+}
+
+void
+TkWmRemoveFromColormapWindows(TkWindow *winPtr)
+{
+    (void)winPtr;
+}
+
+TkWindow **
+TkWmStackorderToplevel(TkWindow *parentPtr)
+{
+    (void)parentPtr;
+    return NULL;
+}
+
+void
+TkWmProtocolEventProc(TkWindow *winPtr, XEvent *eventPtr)
+{
+    (void)winPtr; (void)eventPtr;
+}
+
+/* ------------------------------------------------------------------ */
+/* Grid geometry hint (wm-level resize grid)                         */
+/* ------------------------------------------------------------------ */
+
+void
+Tk_SetGrid(Tk_Window tkwin, int reqWidth, int reqHeight,
+           int gridWidth, int gridHeight)
+{
+    (void)tkwin; (void)reqWidth; (void)reqHeight;
+    (void)gridWidth; (void)gridHeight;
+}
+
+void
+Tk_UnsetGrid(Tk_Window tkwin)
+{
+    (void)tkwin;
+}
+
+/* ------------------------------------------------------------------ */
+/* Root coordinates                                                   */
+/* ------------------------------------------------------------------ */
+
+void
+Tk_GetRootCoords(Tk_Window tkwin, int *xPtr, int *yPtr)
+{
+    TkWindow *winPtr = (TkWindow *)tkwin;
+    int x = 0, y = 0;
+    while (winPtr) {
+        x += winPtr->changes.x + winPtr->changes.border_width;
+        y += winPtr->changes.y + winPtr->changes.border_width;
+        winPtr = winPtr->parentPtr;
+    }
+    *xPtr = x;
+    *yPtr = y;
+}
+
+/* ------------------------------------------------------------------ */
+/* Create actual X window (Plan 9: allocate an XID)                  */
+/* ------------------------------------------------------------------ */
+
+Window
+Tk_MakeWindow(Tk_Window tkwin, Window parent)
+{
+    TkWindow *winPtr = (TkWindow *)tkwin;
+    XSetWindowAttributes atts;
+    unsigned long mask = 0;
+
+    if (winPtr->atts.background_pixmap != None) {
+        atts.background_pixmap = winPtr->atts.background_pixmap;
+        mask |= CWBackPixmap;
+    } else {
+        atts.background_pixel = winPtr->atts.background_pixel;
+        mask |= CWBackPixel;
+    }
+    atts.border_pixel = winPtr->atts.border_pixel;
+    atts.colormap     = winPtr->atts.colormap;
+    mask |= CWBorderPixel | CWColormap;
+
+    return XCreateWindow(winPtr->display, parent,
+        winPtr->changes.x, winPtr->changes.y,
+        (unsigned)winPtr->changes.width, (unsigned)winPtr->changes.height,
+        (unsigned)winPtr->changes.border_width,
+        winPtr->depth, InputOutput, winPtr->visual, mask, &atts);
+}
+
+/* ------------------------------------------------------------------ */
+/* Millisecond timer (platform)                                       */
+/* ------------------------------------------------------------------ */
+
+unsigned long
+TkpGetMS(void)
+{
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (unsigned long)(ts.tv_sec * 1000UL + ts.tv_nsec / 1000000UL);
 }

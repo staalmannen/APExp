@@ -501,3 +501,65 @@ Tk_FreePixmap(Display *display, Pixmap pixmap)
     XFreePixmap(display, pixmap);
 }
 
+/* ------------------------------------------------------------------ */
+/* Embed / container (no embedding support on Plan 9)                 */
+/* ------------------------------------------------------------------ */
+
+int
+Tk_UseWindow(Tcl_Interp *interp, Tk_Window tkwin, const char *string)
+{
+    (void)tkwin; (void)string;
+    Tcl_SetObjResult(interp,
+        Tcl_NewStringObj("-use not supported on Plan 9", -1));
+    return TCL_ERROR;
+}
+
+void
+Tk_MakeContainer(Tk_Window tkwin)
+{
+    (void)tkwin;
+}
+
+Tk_Window
+Tk_GetOtherWindow(Tk_Window tkwin)
+{
+    (void)tkwin;
+    return NULL;
+}
+
+/* ------------------------------------------------------------------ */
+/* App name (no send/register on Plan 9)                              */
+/* ------------------------------------------------------------------ */
+
+const char *
+Tk_SetAppName(Tk_Window tkwin, const char *name)
+{
+    (void)tkwin;
+    return name;
+}
+
+/* ------------------------------------------------------------------ */
+/* Clipboard cleanup (no X11 clipboard server)                        */
+/* ------------------------------------------------------------------ */
+
+void
+TkClipCleanup(TkDisplay *dispPtr)
+{
+    (void)dispPtr;
+}
+
+/* ------------------------------------------------------------------ */
+/* Angled text drawing                                                */
+/* ------------------------------------------------------------------ */
+
+void
+TkDrawAngledChars(Display *display, Drawable drawable, GC gc,
+                  Tk_Font tkfont, const char *source, Tcl_Size numBytes,
+                  double x, double y, double angle)
+{
+    if (angle == 0.0) {
+        Tk_DrawChars(display, drawable, gc, tkfont, source, (int)numBytes,
+            (int)x, (int)y);
+    }
+}
+
