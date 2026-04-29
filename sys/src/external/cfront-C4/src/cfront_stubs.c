@@ -30,6 +30,58 @@ static void early_init(void) {
 
 void _main(void) { /* no C++ global constructors needed */ }
 
+/* ------------------------------------------------------------------ */
+/* EH runtime: setjmp/longjmp exception handling for cfront            */
+/* ------------------------------------------------------------------ */
+
+#include <setjmp.h>
+#include <string.h>
+
+/* NOTE: layout must match the struct emitted in generated C by print.c case 100.
+ * __env[64]: jmp_buf storage (512 B on 64-bit, always >= any real jmp_buf).
+ * exc_buf[256]: separate storage for the thrown value (not overlapping jmp_buf).
+ */
+struct __cfront_eh_frame {
+    long __env[64];                  /* jmp_buf -- must be first */
+    struct __cfront_eh_frame *prev;
+    void *exception;                 /* points into exc_buf after throw */
+    const char *exception_type;
+    unsigned char exc_buf[256];      /* copy of thrown value */
+};
+
+struct __cfront_eh_frame *__cfront_eh_top = 0;
+
+int __cfront_setjmp(struct __cfront_eh_frame *f) {
+    return setjmp(*(jmp_buf *)f->__env);
+}
+
+void __cfront_throw(unsigned long sz, const char *tname, void *val) {
+    struct __cfront_eh_frame *f = __cfront_eh_top;
+    if (!f) {
+        fprintf(stderr, "cfront: unhandled exception: %s\n", tname ? tname : "?");
+        abort();
+    }
+    if (sz > sizeof(f->exc_buf)) sz = sizeof(f->exc_buf);
+    if (val && sz) memcpy(f->exc_buf, val, sz);
+    f->exception = f->exc_buf;
+    f->exception_type = tname;
+    longjmp(*(jmp_buf *)f->__env, 1);  /* jmp_buf not corrupted -- exc_buf is separate */
+}
+
+void __cfront_rethrow(void) {
+    struct __cfront_eh_frame *f = __cfront_eh_top;
+    if (!f) {
+        fprintf(stderr, "cfront: rethrow with no active exception\n");
+        abort();
+    }
+    longjmp(*(jmp_buf *)f->__env, 1);
+}
+
+int __cfront_eh_match(struct __cfront_eh_frame *f, const char *tname) {
+    if (!f || !f->exception_type || !tname) return 0;
+    return strcmp(f->exception_type, tname) == 0;
+}
+
 /* __vec_new: allocate array and call constructor for each element */
 void *__vec_new(void *p, int n, int sz, void *ctor) {
     if (!p) p = calloc((size_t)n, (size_t)sz);

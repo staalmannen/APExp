@@ -2498,7 +2498,7 @@ ee		:  ee ASSIGN ee
 			}
 		|  term
 		|  THROW term
-			{ $$ = dummy; }
+			{ $$ = new expr(THROW,$<pe>2,0); }
 		;
 
 e		:  e ASSIGN e
@@ -2547,7 +2547,7 @@ e		:  e ASSIGN e
 			init_seen = 0;
 			}
 		|  THROW term
-			{ $$ = dummy; }
+			{ $$ = new expr(THROW,$<pe>2,0); }
 		|  %prec NO_EXPR
 			{	$$ = dummy; }
 		;

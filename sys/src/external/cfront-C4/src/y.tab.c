@@ -11786,7 +11786,7 @@ yyval . p__7YYSTYPE = (struct node *)( (__0__X228 = 0 ), ( (__2__X229 = (yystack
 # 2377 "gram.y"
 (yystack . l_mark__11YYSTACKDATA [0 ]). sl__7YYSTYPE ) ), ( ((__0__X228 || (__0__X228 = (struct handler *)__nw__4stmtSFUl ( (size_t )(sizeof (struct handler))) ))?(((void
 # 2377 "gram.y"
-)( (__0__X228 = (struct handler *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X228 ), (unsigned char )116 , __2__X229 ?__2__X229 -> where__4stmt :curloc , __2__X229 ) ), (
+)( (__0__X228 = (struct handler *)__ct__4stmtFUc3locP4stmt ( ((struct stmt *)__0__X228 ), (unsigned char )100 , __2__X229 ?__2__X229 -> where__4stmt :curloc , __2__X229 ) ), (
 # 2377 "gram.y"
 (__0__X228 -> __O1__4stmt.d = 0 ), ( (__0__X228 -> s__4stmt -> s_list__4stmt = __2__X230 ), (__0__X228 -> __O3__4stmt.where2 = curloc )) ) ) )):(((void
 # 2377 "gram.y"
@@ -12236,7 +12236,7 @@ pe__7YYSTYPE ) ;
 break ;
 case 295 :
 # 2501 "gram.y"
-{ yyval . p__7YYSTYPE = (struct node *)dummy ;
+{ yyval . p__7YYSTYPE = (struct node *)__ct__4exprFUcP4exprT2 ( (struct expr *)0 , (unsigned char )99 , (yystack . l_mark__11YYSTACKDATA [0 ]). pe__7YYSTYPE , (struct expr *)0 ) ;
 
 # 2501 "gram.y"
 }
@@ -12509,7 +12509,7 @@ init_seen = 0 ;
 break ;
 case 320 :
 # 2550 "gram.y"
-{ yyval . p__7YYSTYPE = (struct node *)dummy ;
+{ yyval . p__7YYSTYPE = (struct node *)__ct__4exprFUcP4exprT2 ( (struct expr *)0 , (unsigned char )99 , (yystack . l_mark__11YYSTACKDATA [0 ]). pe__7YYSTYPE , (struct expr *)0 ) ;
 
 # 2550 "gram.y"
 }

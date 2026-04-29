@@ -1073,8 +1073,8 @@ struct block : public stmt {	// BLOCK	{ d s }
 #endif
 };
 
-struct handler : public stmt {	// not implemented -- currently set to BLOCK
-	handler( Pstmt tt, Pstmt hh ) : stmt (BLOCK,tt?tt->where:curloc,tt)
+struct handler : public stmt {	// base=TRY: setjmp/longjmp exception handling
+	handler( Pstmt tt, Pstmt hh ) : stmt (TRY,tt?tt->where:curloc,tt)
 		{ d=0; s->s_list=hh; where2=curloc; }
 };
 

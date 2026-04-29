@@ -6638,6 +6638,28 @@ continue_del_list = __3ocl ;
 }
 break ;
 
+case 100 : /* TRY handler -- simplify try body + catch bodies */
+{
+    struct stmt *__2tbody = __0this -> s__4stmt ;
+    struct stmt *__2clist = __2tbody ? __2tbody -> s_list__4stmt : (struct stmt *)0 ;
+    /* Disconnect catch chain so try body simpl doesn't recurse into it */
+    if (__2tbody) __2tbody -> s_list__4stmt = (struct stmt *)0 ;
+    if (__2tbody) simpl__4stmtFv(__2tbody) ;
+    if (__2tbody) __2tbody -> s_list__4stmt = __2clist ;
+    /* Simplify each catch clause body */
+    { struct stmt *__2cs = __2clist ;
+      while (__2cs) {
+          if (__2cs -> s__4stmt) simpl__4stmtFv(__2cs -> s__4stmt) ;
+          __2cs = __2cs -> s_list__4stmt ;
+      }
+    }
+    break ;
+}
+
+case 98 : /* CATCH stmt -- simplify catch body */
+    if (__0this -> s__4stmt) simpl__4stmtFv(__0this -> s__4stmt) ;
+    break ;
+
 # 2196 "/home/claude/cfront-3/src/simpl2.cpp"
 case 116 :
 # 2197 "/home/claude/cfront-3/src/simpl2.cpp"
