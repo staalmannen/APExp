@@ -142,6 +142,85 @@ syntax:
 	return;
 }
 
+int
+dohasinclude(Tokenrow *trp)
+{
+	char fname[256], iname[256], *p;
+	Includelist *ip;
+	int angled, len, fd, i;
+	Token *tp = trp->tp;
+
+	/* find '(' */
+	tp++;
+	while(tp < trp->lp && tp->type == WS) tp++;
+	if(tp >= trp->lp || tp->type != LP) return 0;
+	tp++;
+	while(tp < trp->lp && tp->type == WS) tp++;
+	if(tp >= trp->lp) return 0;
+
+	if (tp->type==STRING) {
+		len = tp->len-2;
+		if (len > sizeof(fname) - 1)
+			len = sizeof(fname) - 1;
+		strncpy(fname, (char*)tp->t+1, len);
+		angled = 0;
+	} else if (tp->type==LT) {
+		len = 0;
+		tp++;
+		while (tp->type!=GT) {
+			if (tp>=trp->lp || len+tp->len+2 >= sizeof(fname))
+				return 0;
+			strncpy(fname+len, (char*)tp->t, tp->len);
+			len += tp->len;
+			tp++;
+		}
+		angled = 1;
+	} else
+		return 0;
+
+	/* find ')' */
+	tp++;
+	while(tp < trp->lp && tp->type == WS) tp++;
+	if(tp >= trp->lp || tp->type != RP) return 0;
+
+	/* Update caller's tp to point at ')' so it can be replaced */
+	trp->tp = tp;
+
+	fname[len] = '\0';
+	if (fname[0]=='/') {
+		fd = open(fname, 0);
+	} else {
+		fd = -1;
+		if (!angled) {
+			strcpy(iname, cursource->filename);
+			p = strrchr(iname, '/');
+			if (p != NULL) {
+				*p = '\0';
+				strcat(iname, "/");
+				strcat(iname, fname);
+				fd = open(iname, 0);
+			}
+		}
+		for (i=NINCLUDE-1; fd<0 && i>=0; i--) {
+			ip = &includelist[i];
+			if (ip->file==NULL || ip->deleted || (angled && ip->always==0))
+				continue;
+			if (strlen(fname)+strlen(ip->file)+2 > sizeof(iname))
+				continue;
+			strcpy(iname, ip->file);
+			strcat(iname, "/");
+			strcat(iname, fname);
+			if((fd = open(iname, 0)) >= 0)
+				break;
+		}
+	}
+	if(fd >= 0) {
+		close(fd);
+		return 1;
+	}
+	return 0;
+}
+
 /*
  * Generate a line directive for cursource
  */

@@ -1522,6 +1522,15 @@ struct
 	"_Bool",		LCHAR,		TUCHAR,
 
 	/*
+	 * C23 bool, true, and false.
+	 * bool is mapped to LCHAR (unsigned char width) like _Bool.
+	 * true and false are mapped to LCONST 1 and 0.
+	 */
+	"bool",			LCHAR,		TUCHAR,
+	"true",			LCONST,		1,
+	"false",		LCONST,		0,
+
+	/*
 	 * __attribute__((...)) and __declspec(...):
 	 * These are registered as LNAME so lookup() returns them as
 	 * ordinary identifiers.  The yylex() function detects them by

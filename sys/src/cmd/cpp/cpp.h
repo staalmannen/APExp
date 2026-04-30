@@ -21,7 +21,7 @@ enum toktype { END, UNCLASS, NAME, NUMBER, STRING, CCON, NL, WS, DSHARP,
 		DSHARP1, NAME1, DEFINED, UMINUS, MAXTOK};
 
 enum kwtype { KIF, KIFDEF, KIFNDEF, KELIF, KELIFDEF, KELIFNDEF, KELSE, KENDIF, KINCLUDE, KINCLUDE_NEXT,
-		KDEFINE, KUNDEF, KLINE, KERROR, KWARNING, KPRAGMA, KDEFINED, KLINENO, KFILE, KDATE, KTIME, KSTDC, KEVAL };
+		KDEFINE, KUNDEF, KLINE, KERROR, KWARNING, KPRAGMA, KDEFINED, KLINENO, KFILE, KDATE, KTIME, KSTDC, KEVAL, KHAS_INCLUDE };
 
 #define	ISDEFINED	01	/* has #defined value */
 #define	ISKW		02	/* is PP keyword */
@@ -112,6 +112,7 @@ void	control(Tokenrow *);
 void	dodefine(Tokenrow *);
 void	doadefine(Tokenrow *, int);
 void	doinclude(Tokenrow *, int);
+int	dohasinclude(Tokenrow *);
 void	doif(Tokenrow *, enum kwtype);
 void	expand(Tokenrow *, Nlist *);
 void	builtin(Tokenrow *, int);

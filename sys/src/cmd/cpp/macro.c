@@ -168,6 +168,37 @@ expandrow(Tokenrow *trp, char *flag)
 			i++;
 			continue;
 		}
+		if (np->val==KHAS_INCLUDE) {
+			Token *start = tp;
+			int found;
+			static unsigned char one[] = "1";
+			static unsigned char zero[] = "0";
+			Token t;
+			Tokenrow tr;
+
+			trp->tp = tp;
+			found = dohasinclude(trp);
+			/* dohasinclude advanced trp->tp to ')' */
+			tp = trp->tp;
+			ntok = (tp - start) + 1;
+
+			t.type = NUMBER;
+			t.t = found ? one : zero;
+			t.len = 1;
+			t.wslen = start->wslen;
+			t.flag = start->flag;
+			t.hideset = start->hideset;
+
+			tr.bp = tr.tp = &t;
+			tr.lp = &t + 1;
+			tr.max = 1;
+
+			trp->tp = start;
+			insertrow(trp, ntok, &tr);
+			/* ntok was replaced by 1 token, restart from 0 */
+			i = 0;
+			continue;
+		}
 		if (np->flag&ISMAC)
 			builtin(trp, np->val);
 		else
@@ -437,7 +468,6 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset, int nparam)
 					ntok = tp - lp;
 					if (!va_empty) {
 						copytokenrow(&ctr, &vtr);
-						expandrow(&ctr, "<macro>");
 						insertrow(rtr, ntok, &ctr);
 						free(ctr.bp);
 					} else {

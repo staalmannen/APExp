@@ -106,6 +106,8 @@ file(s) it touches and any traps worth remembering.
 | `alignof` (C23 spelling) | `lex.c` | Alias for `_Alignof` |
 | `typeof_unqual` (C23) | `lex.c` LTYPEOF_UNQUAL; `cc.y`; `com.c` | Now properly strips const/volatile qualifiers |
 
+| `bool`, `true`, `false` | `lex.c` `itab[]` | C23 keywords; `bool` mapped to `TUCHAR`, `true`/`false` to `1`/`0` |
+| `__has_include` | `cpp/eval.c`; `cpp/include.c` | C23 builtin; checks file existence in include path |
 | `main()` implicit `return 0` | `cc/pgen.c` | C99 §5.1.2.2.3 — synthesises `gen(&ret)` with zero |
 | Non-void fall-off | `cc/pgen.c` | Was a hard error; downgraded to warning |
 | Designated initialisers | `cc/dcl.c` | Was already present |
@@ -169,9 +171,10 @@ This is correct per the standard.
 | `_Alignof` query | Done |
 | `_Generic` | Done |
 | `typeof`/`__typeof__` | Done |
-| `static_assert`, `alignof` | Done (C23 aliases) |
-| `typeof_unqual` | Alias only — qualifier stripping not implemented |
-| `_Alignas` in declarations | Not implemented (layout effect) |
+| `static_assert`, `alignof` | Done (C23 aliases) | Now also supports single-argument `static_assert` |
+| `typeof_unqual` | `lex.c` LTYPEOF_UNQUAL; `cc.y`; `com.c` | Now properly strips const/volatile qualifiers |
+| `__VA_OPT__` | `macro.c` `substargs` | Fully compliant C23/C++20 implementation |
+| `_Alignas` in declarations | Not implemented (layout effect) | Not implemented |
 | `_Atomic` full stdatomic.h | Dropped as qualifier; no CAS operations |
 | `constexpr` objects (C23) | Not implemented |
 | `auto` type deduction (C23) | Not implemented |
