@@ -141,7 +141,7 @@ void
 expandrow(Tokenrow *trp, char *flag)
 {
 	Nlist *np;
-	int i;
+	int i, ntok;
 
 	if (flag)
 		setsource(flag, -1, "");
@@ -397,7 +397,7 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset, int nparam)
 {
 	Tokenrow ttr, rp, rn;
 	Token *tp, *ap, *an, *pp, *pn;
-	int ntok, argno;
+	int ntok, argno, i, hs;
 
 	for (rtr->tp=rtr->bp; rtr->tp<rtr->lp; ) {
 		if(rtr->tp->hideset && checkhideset(hideset, np)) {
