@@ -29,6 +29,24 @@ TEXT	_main(SB), 1, $0
 	CLD
 	REP; MOVSQ
 
+	/*
+	 * Set the POSIX default FP environment before any C code runs.
+	 * 9front kernel initialises MXCSR=0x1900: invalid-operation,
+	 * divide-by-zero, and overflow exceptions are UNMASKED (trapping).
+	 * POSIX programs expect all exceptions masked (0x1f80).  Without
+	 * this reset, ordinary math calls (log, floor, …) in Tcl/Tk crash
+	 * immediately with "sys: fp: invalid operation".
+	 * Also set the x87 control word to 0x037f (all exceptions masked,
+	 * double precision, round-to-nearest) for the same reason.
+	 */
+	SUBQ	$8, SP
+	MOVL	$0x1f80, AX
+	MOVL	AX, 0(SP)
+	LDMXCSR	0(SP)
+	MOVL	$0x037f, 0(SP)
+	FLDCW	0(SP)
+	ADDQ	$8, SP
+
 	/* Set up _callmain(f, argc, arg0): f in RARG, argc at 8(FP), arg0 at 16(FP). */
 	MOVQ	$_apemain(SB), RARG
 	MOVQ	RARG, 0(SP)		/* shadow slot for first arg */

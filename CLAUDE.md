@@ -410,6 +410,24 @@ With the old longjmp (PUSH+RET), this caused a fault when SP was near USTKTOP.
 and R11 is the only safe scratch for values that must not survive to sigsetjmp.
 Actually: use ONLY AX/CX/DX/SI/DI/R8/R9/R10/R11 (caller-saved) in `_main` startup.
 
+### FP environment: Plan 9 vs POSIX
+
+**File:** `sys/src/ape/lib/ap/arch/amd64/main9.s`
+
+Plan 9's kernel initialises MXCSR to `0x1900`: invalid-operation, divide-by-zero,
+and overflow exceptions are **unmasked** (will trap as process notes).  POSIX
+programs expect all FP exceptions masked (`0x1f80` — the Linux/glibc default).
+Without correction, any early FP call in Tcl/Tk (e.g. `log(2.)` in
+`TclInitDoubleConversion`) crashes immediately with
+`"sys: fp: invalid operation fppc=... status=0x21"`.
+
+**Fix (2026-04):** In `_main` (before jumping to `_callmain`), explicitly set:
+- MXCSR = `0x1f80` via `LDMXCSR` (all SSE FP exceptions masked)
+- x87 CW = `0x037f` via `FLDCW`  (all x87 FP exceptions masked, double precision)
+
+**Invariant:** Any new APE startup path that bypasses `main9.s` MUST set the
+POSIX FP environment before executing any floating-point code.
+
 ### Build order for compiler changes
 ```
 cd sys/src/cmd/cc && mk nuke && mk install   # regenerates y.tab.h
