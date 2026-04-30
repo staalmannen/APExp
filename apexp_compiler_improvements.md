@@ -428,7 +428,45 @@ once per compilation unit, improving build times and simplifying header manageme
 
 ---
 
-## Summary: current C standard support level
+## Part X — Roadmap for Remaining C11/C23 Features
+
+The current implementation provides robust support for core C23 features. The
+remaining tasks focus on language-level primitives that require deeper
+integration with the compiler's code-generation backend.
+
+### Priority Roadmap
+
+| Feature | Standard | Difficulty | Impact | Notes |
+|:---|:---|:---|:---|:---|
+| **`_Alignas`** | C11 | Medium | High | Requires `sualign` struct-layout and local frame offset updates. |
+| **`auto`** | C23 | High | High | Deep change: type deduction in the declaration parser. |
+| **`constexpr`** | C23 | High | Medium | File-scope maps to `static const`; function-scope is complex. |
+| **`_Atomic` / CAS** | C11 | High | High | Requires mapping to libap atomics or backend intrinsics. |
+
+### Technical Analysis
+
+1.  **`_Alignas` (Priority 1)**: This is the highest-value missing feature. Many
+    portable libraries require strict memory alignment for SIMD or cache
+    efficiency. Implementation involves passing alignment metadata from the
+    parser to the backend's layout pass (`sualign`) and ensuring the stack
+    frame allocator respects these requirements.
+
+2.  **`auto` Type Deduction (Priority 2)**: This allows `auto x = expr;` at
+    local scope. It is widely used in modern C codebases. It is high-difficulty
+    because it changes the declaration parser: the compiler must hold the
+    initialiser expression's type and perform deduction before the variable
+    declaration is finalized.
+
+3.  **`constexpr` Objects (Priority 3)**: While C23 makes this more formal,
+    the compiler already handles constant expression folding well. The primary
+    challenge is managing the `static`-like linkage for file-scope `constexpr`.
+    This is generally lower impact than `_Alignas` or `auto`.
+
+4.  **`_Atomic` Operations (Priority 4)**: A full `stdatomic.h` implementation
+    requires backend support for CAS (Compare-and-Swap) instructions. Without
+    it, atomic operations must be stubbed or implemented via memory barriers
+    (which are also incomplete). This is high-effort but necessary for
+    multithreaded code.
 
 | Standard | Coverage | Confidence |
 |----------|----------|------------|
