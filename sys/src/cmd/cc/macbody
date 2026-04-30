@@ -515,9 +515,13 @@ macexpand(Sym *s, char *b, int blen)
 		if(c == '#') {
 			/*
 			 * #### in macro definition means ## in source.
-			 * We skip it to join tokens.
+			 * Strip trailing whitespace from b before joining,
+			 * so that "CD ## a" with arg a="iCCP" produces
+			 * "CDiCCP" rather than "CD iCCP".
 			 */
 			if(*cp == '#') {
+				while(b > ob && b[-1] == ' ')
+					b--;
 				cp++;
 				continue;
 			}
