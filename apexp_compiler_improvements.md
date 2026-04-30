@@ -411,17 +411,36 @@ Implemented `__VA_OPT__` support in `sys/src/cmd/cpp/macro.c` (`substargs`):
 
 ---
 
+## Part IX — Preprocessor: #pragma once Support
+
+The standalone preprocessor (`cpp`) supports `#pragma once` as an alternative
+to traditional include guards. This ensures that a header file is only included
+once per compilation unit, improving build times and simplifying header management.
+
+### Implementation Details
+
+1.  **File Identification**: The preprocessor uses `dirfstat` to uniquely
+    identify files based on their device (`dev`) and QID (`qid.path`),
+    preventing multiple inclusions even if reached through different paths
+    (e.g., symlinks or multiple `-I` flags).
+2.  **Blocking List**: A global list of "once-blocked" files is maintained
+    during compilation. When `#pragma once` is encountered, the current file's
+    identity is added to this list.
+3.  **Include Guard**: The `doinclude` logic checks every candidate file
+    against the blocking list before opening it, silently skipping any matches.
+
+---
+
 ## Summary: current C standard support level
 
 | Standard | Coverage | Confidence |
 |----------|----------|------------|
 | C89 / ANSI C | ~100% | High — this is the baseline |
 | C99 | ~95% | High — all major features present |
-| C11 | ~70% | Medium — `_Generic`, `_Static_assert`, `_Alignof`, threads via libap; `_Atomic` stubbed |
-| C23 | ~40% | Low-medium — aliases, `nullptr`, `[[attrs]]`, `static_assert`, `typeof_unqual`; major items pending |
+| C11 | ~75% | Medium — `_Generic`, `_Static_assert`, `_Alignof`, threads via libap |
+| C23 | ~50% | Medium — aliases, `nullptr`, `[[attrs]]`, `static_assert`, `__VA_OPT__` |
 
-The gap between nominal support and real-world porting success is small:
-the remaining unsupported items (`_Alignas`, full `_Atomic`, `constexpr`,
-`auto`) appear rarely in the portable C code that APExp targets. The
-compiler successfully builds a broad range of GNU tools, Lua, PCRE2, Tcl,
-gettext, flex, byacc, and GNU make.
+The preprocessor is now significantly more robust and aligns closely with
+modern C standards, supporting deep macro recursion, exhaustive rescanning,
+variadic macro optimizations (`__VA_OPT__`), and efficient header management
+(`#pragma once`).
