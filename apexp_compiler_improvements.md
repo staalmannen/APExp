@@ -104,7 +104,8 @@ file(s) it touches and any traps worth remembering.
 | `#elifdef`/`#elifndef` | `cpp/cpp.h`; `cpp/nlist.c`; `cpp/cpp.c` | Also fixed skipping-block dispatch |
 | `static_assert` (C23 spelling) | `lex.c` | Alias for `_Static_assert` |
 | `alignof` (C23 spelling) | `lex.c` | Alias for `_Alignof` |
-| `typeof_unqual` (C23) | `lex.c` | Alias for `typeof`; qualifier stripping not yet done |
+| `typeof_unqual` (C23) | `lex.c` LTYPEOF_UNQUAL; `cc.y`; `com.c` | Now properly strips const/volatile qualifiers |
+
 | `main()` implicit `return 0` | `cc/pgen.c` | C99 §5.1.2.2.3 — synthesises `gen(&ret)` with zero |
 | Non-void fall-off | `cc/pgen.c` | Was a hard error; downgraded to warning |
 | Designated initialisers | `cc/dcl.c` | Was already present |
@@ -242,14 +243,7 @@ function returning a 64-bit integer.
 
 These are listed roughly in order of difficulty and anticipated impact.
 
-### 1. `typeof_unqual` qualifier stripping
-
-Currently `typeof_unqual(T)` is an alias for `typeof(T)` — qualifiers are
-not stripped. Correct implementation requires: after resolving the type
-from `typeof`, clear the `GCONSTNT`/`GVOLATILE` bits from the type node.
-Low effort; high correctness benefit for C23 code.
-
-### 2. `_Alignas` in declarations
+### 1. `_Alignas` in declarations
 
 `_Alignof` (the query) works. `_Alignas(N)` as a declaration specifier
 (affecting struct layout and variable placement) does not. Implementation:

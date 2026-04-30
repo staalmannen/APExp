@@ -67,7 +67,7 @@ static Node *generic_select(Node*, Node*);
 %token	LSTATIC LSTRUCT LSWITCH LTYPEDEF LTYPESTR LUNION LUNSIGNED
 %token	LWHILE LVOID LENUM LSIGNED LCONSTNT LVOLATILE LSET LSIGNOF
 %token	LRESTRICT LINLINE LNORET LDOTDOTDOT LCOMPLEX LIMAGINARY LCOMPLEXF LCOMPLEXD
-%token	LTYPEOF
+%token	LTYPEOF LTYPEOF_UNQUAL
 %token	LNULLPTR LSTATICASSERT
 %token	LALIGNOF
 %token	LGENERIC
@@ -799,6 +799,11 @@ uexpr:
 		 * tcom() will resolve it; used with sizeof(typeof(x)) etc. */
 		$$ = new(OTYPEOF, $3, Z);
 	}
+|	LTYPEOF_UNQUAL '(' cexpr ')'
+	{
+		/* typeof_unqual(expr): produce a node for later type resolution. */
+		$$ = new(OTYPEOF_UNQUAL, $3, Z);
+	}
 
 pexpr:
 	'(' cexpr ')'
@@ -1307,12 +1312,32 @@ complex:
 		complex($3);
 		$$ = $3->type != T ? $3->type : types[TINT];
 	}
+|	LTYPEOF_UNQUAL '(' cexpr ')'
+	{
+		/* typeof_unqual(expr): strip const/volatile from top-level type. */
+		complex($3);
+		$$ = $3->type != T ? $3->type : types[TINT];
+		if($$->garb & (GCONSTNT|GVOLATILE)) {
+			$$ = copytyp($$);
+			$$->garb &= ~(GCONSTNT|GVOLATILE);
+		}
+	}
 |	LTYPEOF '(' tlist abdecor ')'
 	{
 		/* typeof(type) as type specifier: __typeof__(int (*)(void)) fp;
 		 * dodecl resolves tlist+abdecor into lastdcl. */
 		dodecl(NODECL, CXXX, $3, $4);
 		$$ = lastdcl;
+	}
+|	LTYPEOF_UNQUAL '(' tlist abdecor ')'
+	{
+		/* typeof_unqual(type): strip const/volatile. */
+		dodecl(NODECL, CXXX, $3, $4);
+		$$ = lastdcl;
+		if($$->garb & (GCONSTNT|GVOLATILE)) {
+			$$ = copytyp($$);
+			$$->garb &= ~(GCONSTNT|GVOLATILE);
+		}
 	}
 
 gctnlist:

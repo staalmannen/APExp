@@ -1562,7 +1562,7 @@ struct
 	 * Previously these were swallowed as LNAME (broken); now properly parsed.
 	 */
 	"typeof",		LTYPEOF,	0,
-	"typeof_unqual",	LTYPEOF,	0,	/* C23: like typeof but strips qualifiers */
+	"typeof_unqual",	LTYPEOF_UNQUAL,	0,	/* C23: like typeof but strips qualifiers */
 	"__typeof",		LTYPEOF,	0,
 	"__typeof__",		LTYPEOF,	0,
 

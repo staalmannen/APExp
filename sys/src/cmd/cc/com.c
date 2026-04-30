@@ -713,6 +713,7 @@ tcomo(Node *n, int f)
 		break;
 
 	case OTYPEOF:
+	case OTYPEOF_UNQUAL:
 		/*
 		 * typeof(expr): the grammar action already evaluated the
 		 * expression and set n->type from it (complex production),
@@ -729,6 +730,15 @@ tcomo(Node *n, int f)
 		}
 		if(n->type == T || n->type == types[TVOID])
 			goto bad;
+
+		if(n->op == OTYPEOF_UNQUAL) {
+			/* Strip top-level const/volatile qualifiers */
+			if(n->type->garb & (GCONSTNT|GVOLATILE)) {
+				n->type = copytyp(n->type);
+				n->type->garb &= ~(GCONSTNT|GVOLATILE);
+			}
+		}
+
 		/* Collapse to a typed zero constant — no code generated */
 		n->op = OCONST;
 		n->left = Z;
