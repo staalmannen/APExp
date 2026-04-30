@@ -406,7 +406,7 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset, int nparam)
 		} else if (rtr->tp->type==NAME) {
 			if (strcmp((char*)rtr->tp->t, "__VA_OPT__") == 0 && (np->flag & ISVARMAC)) {
 				int depth, va_empty;
-				Tokenrow vtr, etr;
+				Tokenrow vtr, etr, ctr;
 				Token *lp = rtr->tp;
 
 				/* find (tokens) */
@@ -436,12 +436,13 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset, int nparam)
 					
 					ntok = tp - lp;
 					if (!va_empty) {
-						expandrow(&vtr, "<macro>");
-						insertrow(rtr, ntok, &vtr);
+						copytokenrow(&ctr, &vtr);
+						expandrow(&ctr, "<macro>");
+						insertrow(rtr, ntok, &ctr);
+						free(ctr.bp);
 					} else {
 						maketokenrow(0, &etr);
 						insertrow(rtr, ntok, &etr);
-						free(etr.bp);
 					}
 					continue;
 				}
