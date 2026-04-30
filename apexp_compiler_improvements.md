@@ -391,6 +391,26 @@ identifiers were being incorrectly dropped.
 
 ---
 
+## Part VIII — Preprocessor: __VA_OPT__ Support (C23)
+
+Standard C23 (and C++20) introduces `__VA_OPT__(tokens)`, which expands to
+`tokens` if the variadic argument list (`__VA_ARGS__`) is non-empty, and to
+nothing otherwise. This is essential for handling trailing commas in macros.
+
+### Implementation Fixes (Standalone `cpp`)
+
+Implemented `__VA_OPT__` support in `sys/src/cmd/cpp/macro.c` (`substargs`):
+1.  **Keyword Detection**: The preprocessor now recognizes `__VA_OPT__` within
+    variadic macros.
+2.  **Parentheses Grouping**: Corrected logic to identify the tokens within
+    the `__VA_OPT__(...)` construct, supporting nested parentheses.
+3.  **Emptiness Check**: Added a check to determine if `__VA_ARGS__` contains
+    any non-whitespace tokens.
+4.  **Conditional Expansion**: If `__VA_ARGS__` is non-empty, the contents of
+    `__VA_OPT__` are rescanned and inserted; otherwise, they are discarded.
+
+---
+
 ## Summary: current C standard support level
 
 | Standard | Coverage | Confidence |

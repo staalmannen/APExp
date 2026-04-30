@@ -198,13 +198,11 @@ expand(Tokenrow *trp, Nlist *np)
 	copytokenrow(&ntr, np->vp);		/* copy macro value */
 	if (np->ap==NULL) {			/* parameterless */
 		ntokc = 1;
-		/* substargs for handling # and ## */
 		atr[0] = nil;
-		substargs(np, &ntr, atr, trp->tp->hideset);
+		substargs(np, &ntr, atr, trp->tp->hideset, 0);
 	} else {
 		ntokc = gatherargs(trp, atr, (np->flag&ISVARMAC) ? rowlen(np->ap) : 0, &narg);
 		if (narg<0) {			/* not actually a call (no '(') */
-			/* gatherargs has already pushed trp->tr to the next token */
 			return;
 		}
 		nparam = rowlen(np->ap);
@@ -224,7 +222,7 @@ expand(Tokenrow *trp, Nlist *np)
 			trp->tp += ntokc;
 			return;
 		}
-		substargs(np, &ntr, atr, trp->tp->hideset);	/* put args into replacement */
+		substargs(np, &ntr, atr, trp->tp->hideset, nparam);	/* put args into replacement */
 		for (i=0; i<narg; i++) {
 			dofree(atr[i]->bp);
 			dofree(atr[i]);
@@ -364,7 +362,7 @@ ispaste(Tokenrow *rtr, Token **ap, Token **an, int *ntok)
  *  This would be simple except for ## and #
  */
 void
-substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
+substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset, int nparam)
 {
 	Tokenrow ttr, rp, rn;
 	Token *tp, *ap, *an, *pp, *pn;
@@ -387,7 +385,7 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 			pp = ap;
 			memset(&rp, 0, sizeof(rp));
 			pn = an;
-			memset(&rn, 0, sizeof(rp));
+			memset(&rn, 0, sizeof(rn));
 			if (ap && (argno = lookuparg(np, ap)) >= 0){
 				pp = nil;
 				rp = *atr[argno];
@@ -406,6 +404,48 @@ substargs(Nlist *np, Tokenrow *rtr, Tokenrow **atr, int hideset)
 			insertrow(rtr, 0, &rn);
 			free(ttr.bp);
 		} else if (rtr->tp->type==NAME) {
+			if (strcmp((char*)rtr->tp->t, "__VA_OPT__") == 0 && (np->flag & ISVARMAC)) {
+				int depth, va_empty;
+				Tokenrow vtr, etr;
+				Token *lp = rtr->tp;
+
+				/* find (tokens) */
+				tp = lp + 1;
+				while (tp < rtr->lp && tp->type == WS) tp++;
+				if (tp < rtr->lp && tp->type == LP) {
+					vtr.bp = vtr.tp = tp + 1;
+					depth = 1;
+					for (tp++; tp < rtr->lp && depth > 0; tp++) {
+						if (tp->type == LP) depth++;
+						else if (tp->type == RP) depth--;
+					}
+					vtr.lp = tp - 1;
+					
+					/* is __VA_ARGS__ empty? */
+					va_empty = 1;
+					if (nparam > 0) {
+						Tokenrow *var = atr[nparam-1];
+						Token *vtp;
+						for (vtp = var->bp; vtp < var->lp; vtp++) {
+							if (vtp->type != WS && vtp->type != NL) {
+								va_empty = 0;
+								break;
+							}
+						}
+					}
+					
+					ntok = tp - lp;
+					if (!va_empty) {
+						expandrow(&vtr, "<macro>");
+						insertrow(rtr, ntok, &vtr);
+					} else {
+						maketokenrow(0, &etr);
+						insertrow(rtr, ntok, &etr);
+						free(etr.bp);
+					}
+					continue;
+				}
+			}
 			if((argno = lookuparg(np, rtr->tp)) >= 0) {
 				if (rtr->tp < rtr->bp) {
 					error(ERROR, "access out of bounds");
