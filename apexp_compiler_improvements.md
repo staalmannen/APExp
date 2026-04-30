@@ -335,14 +335,14 @@ Standard C (C89/C99) requires that after a macro is expanded, the resulting
 tokens are rescanned for more macros. This process must repeat until no more
 macros are found. Both the integrated preprocessor in `cc` and the standalone
 `cpp` (used by `pcc`) historically hit limits on deep expansion chains,
-particularly those involving token joining (`##`) or deep nested definitions
-common in libraries like `libpng`.
+particularly those involving token joining (`##`) or deep nested definitions.
 
 ### The Problem
 
 In complex chains such as `PNG_KNOWN_CHUNKS` → `PNG_CHUNK(iCCP, 14)` →
 `CDiCCP` → `LKMin` → `LZ77Min`, the preprocessor often failed at the final
-steps. This was due to two structural weaknesses:
+steps. This was due to two structural weaknesses in the original `kencc`
+preprocessors:
 1.  **Single-Pass Iteration**: The token loop typically advanced past newly
     expanded tokens, skipping rescanning of the expansion result in the
     same pass.
@@ -353,10 +353,10 @@ steps. This was due to two structural weaknesses:
 ### Implementation Fixes (Standalone `cpp`)
 
 The following improvements were applied to `sys/src/cmd/cpp/` to stabilize
-the preprocessor for complex software:
+the preprocessor for complex software like `libpng` and `f2c`:
 
 1.  **Exhaustive Rescanning**: Modified `expandrow` in `macro.c` to use
-    **index-based iteration** and, crucially, **reset the index to 0**
+    **index-based iteration** and, crucially, **reset the iteration index to 0**
     after every expansion. This ensures that every token on a line is
     continuously re-evaluated until no more macros remain, satisfying the
     Standard's "repeat until no more macros are found" requirement.
@@ -368,16 +368,26 @@ the preprocessor for complex software:
     in `hideset.c` from 32 to **128**. This provides the necessary headroom
     for the extremely deep macro hierarchies found in modern portable C.
 
+### Identifier Handling Improvements (`cc/lex.c`)
+
+To support software that uses GNU attributes or linkage hints as variable names,
+the `indeclname` macro in the compiler's lexer was expanded. This ensures that
+keywords like `hidden` and `visible` are only swallowed when they appear in
+declaration-specifier positions, but are returned as `LNAME` tokens when they
+appear after type keywords (`int`, `char`), struct/union specifiers, or
+pointer operators. This fixes regressions where common English words used as
+identifiers were being incorrectly dropped.
+
 ### Remaining Challenges
 
--   **Integrated Preprocessor**: While `cpp` is now more robust, the
-    integrated preprocessor in `sys/src/cmd/cc/lex.c` and `macbody` still
-    requires a similar refactoring to ensure consistent behavior when
-    compiling without an external preprocessor.
--   **Concatenation Edge Cases**: Certain combinations of token-pasting and
-    deep rescanning may still hit subtle issues with the `quicklook`
-    optimization bitmask, which is retained for performance but may
-    occasionally need to be bypassed for newly formed tokens.
+-   **Concatenation Rescanning**: While exhaustive rescanning is implemented,
+    certain cases involving `##` producing a macro name (like `CDiCCP`) may
+    still fail to expand in the final step. This suggests a subtle interaction
+    where the resulting token might be inheriting a hideset from the operator
+    itself or hitting an edge case in the `quicklook` bitmask optimization.
+-   **Integrated Preprocessor**: The integrated preprocessor in `sys/src/cmd/cc/`
+    requires a similar index-based refactoring to match the robustness of
+    the updated standalone `cpp`.
 
 ---
 

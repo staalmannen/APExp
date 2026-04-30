@@ -931,11 +931,12 @@ talph:
 	 * not an attribute.
 	 */
 #define indeclname(t) \
-	((t)=='.' || (t)==LMG || (t)=='*' || (t)==',' || (t)=='(' || \
+	((t)=='.' || (t)==LMG || (t)=='*' || (t)==',' || (t)=='(' || (t)==')' || \
 	 (t)=='[' || (t)=='=' || (t)=='&' || (t)=='|' || (t)=='^' || \
 	 (t)==LCHAR || (t)==LINT || (t)==LFLOAT || (t)==LDOUBLE || \
 	 (t)==LLONG || (t)==LSHORT || (t)==LUNSIGNED || (t)==LSIGNED || \
-	 (t)==LVOID || (t)==LNAME)
+	 (t)==LVOID || (t)==LTYPE || (t)==LTYPESTR || (t)==LSTRUCT || \
+	 (t)==LUNION || (t)==LENUM || (t)==LNAME)
 	if(s->lexical == LNAME && (
 	    strcmp(s->name, "__thread")      == 0 ||
 	    strcmp(s->name, "_Thread_local") == 0 ||
