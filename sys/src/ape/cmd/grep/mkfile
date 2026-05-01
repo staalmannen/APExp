@@ -62,7 +62,7 @@ LIB_OBJS=\
 	libgreputils_a-fpending.$O \
 	libgreputils_a-free.$O \
 	libgreputils_a-fstatat.$O \
-	libgreputils_a-fts.$O \
+#	libgreputils_a-fts.$O \
 	libgreputils_a-getcwd-lgpl.$O \
 	libgreputils_a-getopt.$O \
 	libgreputils_a-getopt1.$O \
@@ -85,8 +85,8 @@ LIB_OBJS=\
 	libgreputils_a-mbrlen.$O \
 	libgreputils_a-mbrtoc32.$O \
 	libgreputils_a-mbrtowc.$O \
-	libgreputils_a-mbscasecmp.$O \
-	libgreputils_a-mbsrtoc32s.$O \
+#	libgreputils_a-mbscasecmp.$O \
+#	libgreputils_a-mbsrtoc32s.$O \
 	libgreputils_a-mbsrtowcs.$O \
 	libgreputils_a-mbszero.$O \
 	libgreputils_a-mcel.$O \
@@ -100,7 +100,7 @@ LIB_OBJS=\
 	libgreputils_a-openat-safer.$O \
 	libgreputils_a-opendirat.$O \
 	libgreputils_a-quotearg.$O \
-	libgreputils_a-rawmemchr.$O \
+#	libgreputils_a-rawmemchr.$O \
 	libgreputils_a-reallocarray.$O \
 	libgreputils_a-regex.$O \
 	libgreputils_a-safe-read.$O \
@@ -109,7 +109,7 @@ LIB_OBJS=\
 	libgreputils_a-setlocale_null.$O \
 	libgreputils_a-setlocale-lock.$O \
 	libgreputils_a-setlocale_null-unlocked.$O \
-	libgreputils_a-sigsegv.$O \
+#	libgreputils_a-sigsegv.$O \
 	libgreputils_a-stackvma.$O\
 	libgreputils_a-stat-time.$O \
 	libgreputils_a-stdlib.$O \

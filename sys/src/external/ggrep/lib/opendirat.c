@@ -45,7 +45,7 @@ opendirat (int dir_fd, char const *dir, int extra_flags, int *pnew_fd)
 
   if (new_fd < 0)
     return NULL;
-  DIR *dirp = fdopendir (new_fd);
+  DIR *dirp = (DIR *) fdopendir (new_fd);
   if (dirp)
     *pnew_fd = new_fd;
   else

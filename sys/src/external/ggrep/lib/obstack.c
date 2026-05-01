@@ -214,7 +214,7 @@ _obstack_newchunk (struct obstack *h, _OBSTACK_SIZE_T length)
 
 /* Suppress -Wmissing-prototypes warning.  We don't want to declare this in
    obstack.h because it is just for debugging.  */
-int _obstack_allocated_p (struct obstack *h, void *obj) __attribute_pure__;
+int _obstack_allocated_p (struct obstack *h, void *obj);
 
 int
 _obstack_allocated_p (struct obstack *h, void *obj)
@@ -308,7 +308,7 @@ int obstack_exit_failure = EXIT_FAILURE;
 #  include <libio/iolibio.h>
 # endif
 
-static __attribute_noreturn__ void
+static void
 print_and_abort (void)
 {
   /* Don't change any of these strings.  Yes, it would be possible to add
@@ -330,6 +330,6 @@ print_and_abort (void)
    abort gracefully or use longjump - but shouldn't return.  This
    variable by default points to the internal function
    'print_and_abort'.  */
-__attribute_noreturn__ void (*obstack_alloc_failed_handler) (void)
+void (*obstack_alloc_failed_handler) (void)
   = print_and_abort;
 #endif /* !_OBSTACK_NO_ERROR_HANDLER */

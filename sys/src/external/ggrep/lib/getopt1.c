@@ -24,6 +24,8 @@
 #include <getopt.h>
 #include "getopt_int.h"
 
+#define __getopt_argv_const /**/
+
 int
 getopt_long (int argc, char *__getopt_argv_const *argv, const char *options,
 	     const struct option *long_options, int *opt_index)

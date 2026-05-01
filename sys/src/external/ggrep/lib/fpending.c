@@ -55,7 +55,8 @@ __fpending (FILE *fp)
 #elif defined __MINT__               /* Atari FreeMiNT */
   return fp->__bufp - fp->__buffer;
 #elif defined EPLAN9                 /* Plan9 */
-  return fp->wp - fp->buf;
+// FILE struct has changed in APExp
+  return fp->wend - fp->wbase;
 #else
 # error "Please port gnulib fpending.c to your platform!"
   return 1;
