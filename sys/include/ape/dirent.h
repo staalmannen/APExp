@@ -21,9 +21,13 @@ struct	dirent {
 /* d_type is not available on Plan9; define DT_ constants as stubs */
 #define d_type d_stat.st_mode
 #define DT_UNKNOWN 0
+#define DT_FIFO    1
+#define DT_CHR     2
 #define DT_DIR     4
+#define DT_BLK     6
 #define DT_REG     8
 #define DT_LNK     10
+#define DT_SOCK    12
 
 typedef struct _dirdesc {
 	int	dd_fd;		/* file descriptor */
