@@ -506,7 +506,7 @@ rpl_fcntl_DUPFD_CLOEXEC (int fd, int target)
      information on whether the system call really works, but
      avoid caching failure if the corresponding F_DUPFD fails
      for any reason.  0 = unknown, 1 = yes, -1 = no.  */
-  static int have_dupfd_cloexec = GNULIB_defined_F_DUPFD_CLOEXEC ? -1 : 0;
+  static int have_dupfd_cloexec = -1;
   if (0 <= have_dupfd_cloexec)
     {
       result = fcntl (fd, F_DUPFD_CLOEXEC, target);

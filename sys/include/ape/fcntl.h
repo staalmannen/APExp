@@ -19,6 +19,7 @@
 #define	O_RSYNC		0x2000
 #define O_SYNC		0x4000
 #define O_CLOEXEC	02000000
+#define O_NOFOLLOW 0
 
 #define	F_DUPFD		0	/* Duplicate fildes */
 #define	F_GETFD		1	/* Get fildes flags */

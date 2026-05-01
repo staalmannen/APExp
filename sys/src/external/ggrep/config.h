@@ -1,5 +1,5 @@
 /* config.h.  Generated from config.hin by configure.  */
-/* config.hin.  Generated from configure.ac by autoheader.  */
+/* config.hin.  obstack Generated from configure.ac by autoheader.  */ 
 
 /* CPU and C ABI indicator */
 #ifndef __i386__
@@ -1404,7 +1404,7 @@
 #define HAVE_NL_LANGINFO 1
 
 /* Define to 1 if you have the <obstack.h> header file. */
-/* #undef HAVE_OBSTACK_H */
+#define HAVE_OBSTACK_H 1
 
 /* Define to 1 if you have the 'openat' function. */
 #define HAVE_OPENAT 1
@@ -3406,15 +3406,7 @@
      It is here so that we can cope with an older version of unitypes.h
      that does not contain this definition and that is pre-installed among
      the public header files.  */
-  # if defined __restrict \
-       || 2 < __GNUC__ + (95 <= __GNUC_MINOR__) \
-       || __clang_major__ >= 3
-  #  define _UC_RESTRICT __restrict
-  # elif 199901L <= __STDC_VERSION__ || defined restrict
-  #  define _UC_RESTRICT restrict
-  # else
   #  define _UC_RESTRICT
-  # endif
   
 
 /* Define as a macro for copying va_list variables. */

@@ -14,27 +14,30 @@ LIB_OBJS=\
 	libgreputils_a-basename-lgpl.$O \
 	libgreputils_a-binary-io.$O \
 	libgreputils_a-bitrotate.$O \
-	libgreputils_a-btoc32.$O libgreputils_a-btowc.$O \
+	libgreputils_a-btoc32.$O \
+#	libgreputils_a-btowc.$O \
 	libgreputils_a-c-ctype.$O \
-	libgreputils_a-c-stack.$O \
+#	libgreputils_a-c-stack.$O \
 	libgreputils_a-c-strcasecmp.$O \
-	libgreputils_a-c32_apply_type_test.$O \
-	libgreputils_a-c32_get_type_test.$O \
-	libgreputils_a-c32isalnum.$O \
-	libgreputils_a-c32isalpha.$O \
-	libgreputils_a-c32isblank.$O \
-	libgreputils_a-c32iscntrl.$O \
-	libgreputils_a-c32isdigit.$O \
-	libgreputils_a-c32isgraph.$O \
-	libgreputils_a-c32islower.$O \
-	libgreputils_a-c32isprint.$O \
-	libgreputils_a-c32ispunct.$O \
-	libgreputils_a-c32isspace.$O \
-	libgreputils_a-c32isupper.$O \
-	libgreputils_a-c32isxdigit.$O libgreputils_a-c32rtomb.$O \
-	libgreputils_a-c32tob.$O \
-	libgreputils_a-c32tolower.$O \
-	libgreputils_a-c32toupper.$O libgreputils_a-chdir-long.$O \
+#	libgreputils_a-c32_apply_type_test.$O \
+#	libgreputils_a-c32_get_type_test.$O \
+#	libgreputils_a-c32isalnum.$O \
+#	libgreputils_a-c32isalpha.$O \
+#	libgreputils_a-c32isblank.$O \
+#	libgreputils_a-c32iscntrl.$O \
+#	libgreputils_a-c32isdigit.$O \
+#	libgreputils_a-c32isgraph.$O \
+#	libgreputils_a-c32islower.$O \
+#	libgreputils_a-c32isprint.$O \
+#	libgreputils_a-c32ispunct.$O \
+#	libgreputils_a-c32isspace.$O \
+#	libgreputils_a-c32isupper.$O \
+#	libgreputils_a-c32isxdigit.$O \
+#	libgreputils_a-c32rtomb.$O \
+#	libgreputils_a-c32tob.$O \
+#	libgreputils_a-c32tolower.$O \
+#	libgreputils_a-c32toupper.$O \
+	libgreputils_a-chdir-long.$O \
 	libgreputils_a-cloexec.$O \
 	libgreputils_a-close-stream.$O \
 	libgreputils_a-closeout.$O \
@@ -43,76 +46,113 @@ LIB_OBJS=\
 	libgreputils_a-localeinfo.$O \
 	libgreputils_a-dirname-lgpl.$O \
 	libgreputils_a-stripslash.$O \
-	libgreputils_a-dup2.$O libgreputils_a-error.$O \
+	libgreputils_a-dup2.$O \
+	libgreputils_a-error.$O \
 	libgreputils_a-exclude.$O \
 	libgreputils_a-exitfail.$O \
-	libgreputils_a-fcntl.$O libgreputils_a-creat-safer.$O \
+	libgreputils_a-fcntl.$O \
+	libgreputils_a-creat-safer.$O \
 	libgreputils_a-open-safer.$O \
-	libgreputils_a-fd-hook.$O libgreputils_a-fdopendir.$O \
-	libgreputils_a-filenamecat-lgpl.$O libgreputils_a-fpending.$O \
-	libgreputils_a-free.$O libgreputils_a-fstatat.$O \
-	libgreputils_a-fts.$O libgreputils_a-getcwd-lgpl.$O \
-	libgreputils_a-getopt.$O libgreputils_a-getopt1.$O \
-	malloc/libgreputils_a-dynarray_at_failure.$O \
-	malloc/libgreputils_a-dynarray_emplace_enlarge.$O \
-	malloc/libgreputils_a-dynarray_finalize.$O \
-	malloc/libgreputils_a-dynarray_resize.$O \
-	malloc/libgreputils_a-dynarray_resize_clear.$O \
+	libgreputils_a-fd-hook.$O \
+	libgreputils_a-fdopendir.$O \
+	libgreputils_a-filenamecat-lgpl.$O \
+	libgreputils_a-fpending.$O \
+	libgreputils_a-free.$O \
+	libgreputils_a-fstatat.$O \
+	libgreputils_a-fts.$O \
+	libgreputils_a-getcwd-lgpl.$O \
+	libgreputils_a-getopt.$O \
+	libgreputils_a-getopt1.$O \
+	libgreputils_a-dynarray_at_failure.$O \
+	libgreputils_a-dynarray_emplace_enlarge.$O \
+	libgreputils_a-dynarray_finalize.$O \
+	libgreputils_a-dynarray_resize.$O \
+	libgreputils_a-dynarray_resize_clear.$O \
 	libgreputils_a-hard-locale.$O \
-	libgreputils_a-hash.$O libgreputils_a-i-ring.$O \
+	libgreputils_a-hash.$O \
+	libgreputils_a-i-ring.$O \
 	libgreputils_a-ialloc.$O \
 	libgreputils_a-iswctype.$O \
-	libgreputils_a-localcharset.$O libgreputils_a-localeconv.$O \
-	glthread/libgreputils_a-lock.$O libgreputils_a-lseek.$O \
-	libgreputils_a-lstat.$O libgreputils_a-malloca.$O \
-	libgreputils_a-mbrlen.$O libgreputils_a-mbrtoc32.$O libgreputils_a-mbrtowc.$O \
+	libgreputils_a-localcharset.$O \
+	libgreputils_a-localeconv.$O \
+	libgreputils_a-lock.$O \
+	libgreputils_a-lseek.$O \
+	libgreputils_a-lstat.$O \
+	libgreputils_a-malloca.$O \
+	libgreputils_a-mbrlen.$O \
+	libgreputils_a-mbrtoc32.$O \
+	libgreputils_a-mbrtowc.$O \
 	libgreputils_a-mbscasecmp.$O \
-	libgreputils_a-mbsrtoc32s.$O libgreputils_a-mbsrtowcs.$O \
+	libgreputils_a-mbsrtoc32s.$O \
+	libgreputils_a-mbsrtowcs.$O \
 	libgreputils_a-mbszero.$O \
 	libgreputils_a-mcel.$O \
 	libgreputils_a-memchr2.$O \
 	libgreputils_a-memrchr.$O \
-	libgreputils_a-nl_langinfo.$O libgreputils_a-obstack.$O \
-	glthread/libgreputils_a-once.$O \
-	libgreputils_a-openat.$O libgreputils_a-openat-die.$O \
+	libgreputils_a-nl_langinfo.$O \
+	libgreputils_a-obstack.$O \
+	libgreputils_a-once.$O \
+	libgreputils_a-openat.$O \
+	libgreputils_a-openat-die.$O \
 	libgreputils_a-openat-safer.$O \
 	libgreputils_a-opendirat.$O \
 	libgreputils_a-quotearg.$O \
 	libgreputils_a-rawmemchr.$O \
 	libgreputils_a-reallocarray.$O \
-	libgreputils_a-regex.$O libgreputils_a-safe-read.$O \
+	libgreputils_a-regex.$O \
+	libgreputils_a-safe-read.$O \
 	libgreputils_a-same-inode.$O \
 	libgreputils_a-save-cwd.$O \
-	libgreputils_a-setlocale_null.$O libgreputils_a-setlocale-lock.$O \
+	libgreputils_a-setlocale_null.$O \
+	libgreputils_a-setlocale-lock.$O \
 	libgreputils_a-setlocale_null-unlocked.$O \
-	libgreputils_a-sigsegv.$O libgreputils_a-stackvma.$O\
+	libgreputils_a-sigsegv.$O \
+	libgreputils_a-stackvma.$O\
 	libgreputils_a-stat-time.$O \
 	libgreputils_a-stdlib.$O \
-	libgreputils_a-stpcpy.$O libgreputils_a-str_endswith.$O \
-	libgreputils_a-strerror.$O libgreputils_a-strerror-override.$O \
+	libgreputils_a-stpcpy.$O \
+	libgreputils_a-str_endswith.$O \
+	libgreputils_a-strerror.$O \
+	libgreputils_a-strerror-override.$O \
 	libgreputils_a-strnlen1.$O \
 	libgreputils_a-strtoll.$O \
-	glthread/libgreputils_a-threadlib.$O libgreputils_a-tolower.$O \
-	libgreputils_a-toupper.$O libgreputils_a-ctype_alnum.$O libgreputils_a-ctype_alpha.$O \
-	libgreputils_a-ctype_blank.$O libgreputils_a-ctype_cntrl.$O libgreputils_a-ctype_digit.$O \
-	libgreputils_a-ctype_graph.$O libgreputils_a-ctype_lower.$O libgreputils_a-ctype_print.$O \
-	libgreputils_a-ctype_punct.$O libgreputils_a-ctype_space.$O libgreputils_a-ctype_upper.$O \
-	libgreputils_a-ctype_xdigit.$O libgreputils_a-unistd.$O \
+	libgreputils_a-threadlib.$O \
+	libgreputils_a-tolower.$O \
+	libgreputils_a-toupper.$O \
+	libgreputils_a-ctype_alnum.$O \
+	libgreputils_a-ctype_alpha.$O \
+	libgreputils_a-ctype_blank.$O \
+	libgreputils_a-ctype_cntrl.$O \
+	libgreputils_a-ctype_digit.$O \
+	libgreputils_a-ctype_graph.$O \
+	libgreputils_a-ctype_lower.$O \
+	libgreputils_a-ctype_print.$O \
+	libgreputils_a-ctype_punct.$O \
+	libgreputils_a-ctype_space.$O \
+	libgreputils_a-ctype_upper.$O \
+	libgreputils_a-ctype_xdigit.$O \
+	libgreputils_a-unistd.$O \
 	libgreputils_a-dup-safer.$O \
 	libgreputils_a-fd-safer.$O \
-	libgreputils_a-pipe-safer.$O libgreputils_a-u32-chr.$O \
-	libgreputils_a-u32-cpy.$O libgreputils_a-u32-pcpy.$O libgreputils_a-u32-strcat.$O \
-	libgreputils_a-u32-strlen.$O libgreputils_a-version-etc.$O \
+	libgreputils_a-pipe-safer.$O \
+	libgreputils_a-u32-chr.$O \
+	libgreputils_a-u32-cpy.$O \
+	libgreputils_a-u32-pcpy.$O \
+	libgreputils_a-u32-strcat.$O \
+	libgreputils_a-u32-strlen.$O \
+	libgreputils_a-version-etc.$O \
 	libgreputils_a-version-etc-fsf.$O \
-	libgreputils_a-wctob.$O libgreputils_a-wctype.$O \
-	libgreputils_a-wctype-h.$O libgreputils_a-wmempcpy.$O \
+	libgreputils_a-wctob.$O \
+	libgreputils_a-wctype.$O \
+	libgreputils_a-wctype-h.$O \
+	libgreputils_a-wmempcpy.$O \
 	libgreputils_a-xmalloc.$O \
 	libgreputils_a-xalloc-die.$O \
 	libgreputils_a-xbinary-io.$O \
 	libgreputils_a-xstrtoimax.$O \
 	libgreputils_a-xstrtol.$O \
 	libgreputils_a-xstrtoul.$O \
-	libgreputils_a-colorize.$O
+	libgreputils_a-colorize-posix.$O
 
 LIB=libgrep.a$O
 BIN=$APEXPROOT/$objtype/bin/ape
@@ -132,17 +172,23 @@ CFLAGS=-c -I. -I$GREPSRC -I$GREPSRC/src -I$GREPSRC/lib\
 	$CC $CFLAGS $GREPSRC/src/$stem.c
 
 libgreputils_a-%.$O: $GREPSRC/lib/%.c
-	$CC $CFLAGS -c $source -o $target
+	$CC $CFLAGS -c $prereq -o $target
 
 libgreputils_a-%.$O: $GREPSRC/lib/unicase/%.c
-	$CC $CFLAGS -c $source -o $target
+	$CC $CFLAGS -c $prereq -o $target
 
 
 libgreputils_a-%.$O: $GREPSRC/lib/unictype/%.c
-	$CC $CFLAGS -c $source -o $target
+	$CC $CFLAGS -c $prereq -o $target
 
 libgreputils_a-%.$O: $GREPSRC/lib/unistr/%.c
-	$CC $CFLAGS -c $source -o $target
+	$CC $CFLAGS -c $prereq -o $target
+
+libgreputils_a-%.$O: $GREPSRC/lib/malloc/%.c
+	$CC $CFLAGS -c $prereq -o $target
+
+libgreputils_a-%.$O: $GREPSRC/lib/glthread/%.c
+	$CC $CFLAGS -c $prereq -o $target
 
 
 libgrep.a$O: $LIB_OBJS
