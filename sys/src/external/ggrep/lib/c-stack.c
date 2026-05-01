@@ -49,7 +49,9 @@
 # include <stdio.h>
 #endif
 
-#include <sigsegv.h>
+#if HAVE_STACK_OVERFLOW_RECOVERY
+# include <sigsegv.h>
+#endif
 
 #include "exitfail.h"
 #include "idx.h"
