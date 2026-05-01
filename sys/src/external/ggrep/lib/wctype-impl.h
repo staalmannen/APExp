@@ -92,5 +92,5 @@ wctype (const char* name)
     default:
       break;
     }
-  return NULL;
+  return (wctype_t) NULL;
 }

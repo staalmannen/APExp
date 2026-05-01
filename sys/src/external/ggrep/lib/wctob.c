@@ -23,6 +23,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#undef wctob
 int
 wctob (wint_t wc)
 {

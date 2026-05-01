@@ -20,7 +20,7 @@ LIB_OBJS=\
 	libgreputils_a-btoc32.$O \
 #	libgreputils_a-btowc.$O \
 	libgreputils_a-c-ctype.$O \
-#	libgreputils_a-c-stack.$O \
+	libgreputils_a-c-stack.$O \
 	libgreputils_a-c-strcasecmp.$O \
 #	libgreputils_a-c32_apply_type_test.$O \
 #	libgreputils_a-c32_get_type_test.$O \
@@ -61,8 +61,8 @@ LIB_OBJS=\
 	libgreputils_a-filenamecat-lgpl.$O \
 	libgreputils_a-fpending.$O \
 	libgreputils_a-free.$O \
-	libgreputils_a-fstatat.$O \
-#	libgreputils_a-fts.$O \
+#	libgreputils_a-fstatat.$O \
+	libgreputils_a-fts.$O \
 	libgreputils_a-getcwd-lgpl.$O \
 	libgreputils_a-getopt.$O \
 	libgreputils_a-getopt1.$O \
@@ -135,9 +135,11 @@ LIB_OBJS=\
 	libgreputils_a-xstrtoimax.$O \
 	libgreputils_a-xstrtol.$O \
 	libgreputils_a-xstrtoul.$O \
-	libgreputils_a-colorize-posix.$O
+	libgreputils_a-colorize-posix.$O \
+	libgreputils_a-version-etc-fsf.$O
 
 LIB=libgrep.a$O
+CLEANFILES=$LIB
 BIN=$APEXPROOT/$objtype/bin/ape
 
 <$APEXPROOT/sys/src/cmd/mkone
