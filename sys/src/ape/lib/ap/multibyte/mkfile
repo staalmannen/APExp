@@ -46,10 +46,11 @@ OFILES=\
 	btowc.$O\
 	c16rtomb.$O\
 	c32rtomb.$O\
+	mbrtoc32.$O\
+	c32-shims.$O\
 	mblen.$O\
 	mbrlen.$O\
 	mbrtoc16.$O\
-	mbrtoc32.$O\
 	mbrtowc.$O\
 	mbsinit.$O\
 	mbsnrtowcs.$O\
@@ -63,6 +64,10 @@ OFILES=\
 	wctob.$O\
 	wctomb.$O\
 	internal.$O\
+	unicase.$O\
+	u32-strlen.$O\
+	ctype_misc.$O\
+	unistr.$O\
 
 HFILES=\
 	$APEXPROOT/sys/include/ape/utf.h\

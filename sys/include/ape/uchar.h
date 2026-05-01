@@ -2,7 +2,7 @@
 #define _UCHAR_H
 
 #include <unitypes.h>
-#include <stddef.h>
+#include <wchar.h>
 
 typedef uint32_t char32_t;
 

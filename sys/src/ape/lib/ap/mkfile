@@ -41,7 +41,6 @@ DIRS=\
 	termios\
 	thread\
 	time\
-	unistring\
 	unistd\
 
 default:V:	all
