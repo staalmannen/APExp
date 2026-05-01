@@ -1,6 +1,6 @@
 /* Error handler for noninteractive utilities
    Copyright (C) 1990-2025 Free Software Foundation, Inc.
-   This file is part of the GNU C Library.
+   This file is part of the GNU C Library. edit
 
    The GNU C Library is free software; you can redistribute it and/or
    modify it under the terms of the GNU Lesser General Public

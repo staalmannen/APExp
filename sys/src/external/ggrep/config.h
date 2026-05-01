@@ -1,5 +1,5 @@
 /* config.h.  Generated from config.hin by configure.  */
-/* config.hin.  obstack Generated from configure.ac by autoheader.  */ 
+/* config.hin. Generated from configure.ac by autoheader.  */ 
 
 /* CPU and C ABI indicator */
 #ifndef __i386__

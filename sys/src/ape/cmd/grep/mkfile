@@ -4,8 +4,11 @@ APEXPROOT=../../../../..
 TARG=grep
 
 OFILES=\
-	dfasearch.$O grep.$O \
-	kwsearch.$O kwset.$O searchutils.$O \
+	dfasearch.$O\
+	grep.$O \
+	kwsearch.$O\
+	kwset.$O\
+	searchutils.$O\
 	pcresearch.$O
 
 LIB_OBJS=\
