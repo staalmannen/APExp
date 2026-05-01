@@ -49,6 +49,7 @@ OFILES=\
 	mbrtoc32.$O\
 	c32-shims.$O\
 	c32-ctype.$O\
+	mbzero.$O\
 	mblen.$O\
 	mbrlen.$O\
 	mbrtoc16.$O\

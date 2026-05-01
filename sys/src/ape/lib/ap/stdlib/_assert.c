@@ -14,5 +14,13 @@ _assert(char *f, unsigned line)
 	*--s = ':';
 	write(2, s, &buf[20] - s);
 	abort();
-	
+
 }
+
+void
+assert(int e)
+{
+	if(!e)
+		_assert("unknown", 0);
+}
+
