@@ -1381,7 +1381,7 @@
 #define HAVE_MINMAX_IN_SYS_PARAM_H 1
 
 /* Define to 1 if you have the 'mprotect' function. */
-/* #undef HAVE_MPROTECT */
+#define HAVE_MPROTECT 0
 
 /* Define to 1 on MSVC platforms that have the "invalid parameter handler"
    concept. */
@@ -1465,7 +1465,7 @@
 #define HAVE_READDIR 1
 
 /* Define to 1 if you have the `reallocarray' function. */
-/* #undef HAVE_REALLOCARRAY */
+#define HAVE_REALLOCARRAY 0
 
 /* Define to 1 if realloc (..., 0) returns nonnull. */
 #define HAVE_REALLOC_0_NONNULL 1
@@ -1507,7 +1507,7 @@
 #define HAVE_SHUTDOWN 1
 
 /* Define to 1 if you have the 'sigaltstack' function. */
-/* #undef HAVE_SIGALTSTACK */
+#define HAVE_SIGALTSTACK 0
 
 /* Define to 1 if 'sig_atomic_t' is a signed integer type. */
 #define HAVE_SIGNED_SIG_ATOMIC_T 1

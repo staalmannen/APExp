@@ -110,7 +110,7 @@ LIB_OBJS=\
 	libgreputils_a-setlocale-lock.$O \
 	libgreputils_a-setlocale_null-unlocked.$O \
 #	libgreputils_a-sigsegv.$O \
-	libgreputils_a-stackvma.$O\
+#	libgreputils_a-stackvma.$O\
 	libgreputils_a-stat-time.$O \
 	libgreputils_a-stdlib.$O \
 	libgreputils_a-stpcpy.$O \
