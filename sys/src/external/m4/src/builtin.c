@@ -1080,7 +1080,7 @@ m4_esyscmd (struct obstack *obs, int argc, token_data **argv)
           obstack_1grow (obs, ch);
           continue;
         }
-      len = fread (obstack_next_free (obs), 1, avail, pin);
+      len = fread ((void *) obstack_next_free (obs), 1, avail, pin);
       if (len <= 0)
         break;
       obstack_blank_fast (obs, len);

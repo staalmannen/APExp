@@ -3,9 +3,7 @@ APEXPROOT=../../../../..
 TARG=m4
 LIB=libgnu.a$O\
 	$APEXPROOT/$objtype/lib/ape/libintl.a\
-	$APEXPROOT/$objtype/lib/ape/libgettextpo.a\
-	$APEXPROOT/$objtype/lib/ape/libtextstyle.a\
-	$APEXPROOT/$objtype/lib/ape/libxml.a
+	$APEXPROOT/$objtype/lib/ape/libxml2.a
 
 OFILES=\
 	#src\
@@ -25,7 +23,7 @@ LIB_OBJS= \
 		asyncsafe-spin.$O\
 		basename-lgpl.$O\
 		c-ctype.$O\
-		c-stack.$O\
+#		c-stack.$O\
 		c-strcasecmp.$O\
 		clean-temp.$O\
 		clean-temp-simple.$O\
@@ -43,7 +41,7 @@ LIB_OBJS= \
 		findprog-in.$O\
 		fopen-safer.$O\
 		fpending.$O\
-		freadahead.$O\
+#		freadahead.$O\
 		getrandom.$O\
 		gl_avltree_oset.$O\
 		gl_linked_list.$O\
@@ -84,7 +82,7 @@ LIB_OBJS= \
 		tempname.$O\
 		tmpdir.$O\
 		trim.$O\
-		verror.$O\
+#		verror.$O\
 		version-etc.$O\
 		version-etc-fsf.$O\
 		wait-process.$O\
@@ -93,7 +91,7 @@ LIB_OBJS= \
 		xmalloc.$O\
 		xmalloca.$O\
 		xprintf.$O\
-		xstrndup.$O\
+#		xstrndup.$O\
 # lib/malloc \
 		dynarray_at_failure.$O\
 		dynarray_emplace_enlarge.$O\

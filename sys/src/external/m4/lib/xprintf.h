@@ -33,11 +33,6 @@ extern "C" {
 /* Like zprintf, but call error if it fails without setting stdout's
    error indicator, i.e. upon ENOMEM, EOVERFLOW, or EILSEQ errors.  */
 extern off64_t xprintf (char const *restrict format, ...)
-#if GNULIB_VPRINTF_POSIX
-     _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_STANDARD, 1, 2))
-#else
-     _GL_ATTRIBUTE_FORMAT ((_GL_ATTRIBUTE_SPEC_PRINTF_SYSTEM, 1, 2))
-#endif
      ;
 
 /* Like vzprintf, but call error if it fails without setting stdout's

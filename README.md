@@ -103,8 +103,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - -> TODO: replace with GNU bash (version 5.3)
 - APE make has been replaced by a port of GNU make (version 4.4.1)
 - APE sed has been replaced by a port of GNU sed (version 4.9)
-- APE grep has been replaced by pcre2grep (version 10.47 ). 
-- -> TODO: replace with GNU grep (version 3.12)
+- APE grep has been replaced with GNU grep (version 3.12)
 - GNU awk (version 5.4.0). Since native awk is sometimes needed, GNU awk is installed as gawk
 - GNU m4 (version 1.4.21) has been added
 - gettext utilities from Sabotage Linux "gettext-tiny" [14]

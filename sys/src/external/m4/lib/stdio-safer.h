@@ -30,8 +30,7 @@ extern "C" {
 
 
 #if GNULIB_FOPEN_SAFER
-FILE *fopen_safer (char const *, char const *)
-  _GL_ARG_NONNULL ((1, 2)) _GL_ATTRIBUTE_DEALLOC (fclose, 1);
+FILE *fopen_safer (char const *, char const *);
 #endif
 
 #if GNULIB_FREOPEN_SAFER

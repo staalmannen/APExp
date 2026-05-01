@@ -688,7 +688,7 @@ input_init (void)
      chunk.  */
   obstack_init (&token_stack);
   obstack_alloc (&token_stack, 1);
-  token_bottom = obstack_base (&token_stack);
+  token_bottom = (void *) obstack_base (&token_stack);
 
   isp = NULL;
   wsp = NULL;
