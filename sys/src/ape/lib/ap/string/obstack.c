@@ -17,34 +17,34 @@ call_alloc_failed(void)
 	}
 }
 
-static struct _obstack_chunk *
-call_chunkfun(struct obstack *h, long size)
+static void *
+call_chunkfun(struct obstack *h, _OBSTACK_SIZE_T size)
 {
 	if(h->use_extra_arg)
-		return (*h->chunkfun)(h->extra_arg, size);
-	return (*(struct _obstack_chunk *(*)(long))(void *)h->chunkfun)(size);
+		return (*h->chunkfun.extra)(h->extra_arg, size);
+	return (*h->chunkfun.plain)(size);
 }
 
 static void
-call_freefun(struct obstack *h, struct _obstack_chunk *chunk)
+call_freefun(struct obstack *h, void *chunk)
 {
 	if(h->use_extra_arg)
-		(*h->freefun)(h->extra_arg, chunk);
+		(*h->freefun.extra)(h->extra_arg, chunk);
 	else
-		(*(void (*)(void *))(void *)h->freefun)(chunk);
+		(*h->freefun.plain)(chunk);
 }
 
 int
-_obstack_begin(struct obstack *h, int size, int alignment,
-               void *(*chunkfun)(long), void (*freefun)(void *))
+_obstack_begin(struct obstack *h, _OBSTACK_SIZE_T size, _OBSTACK_SIZE_T alignment,
+               void *(*chunkfun)(size_t), void (*freefun)(void *))
 {
 	struct _obstack_chunk *chunk;
 
 	if(size == 0) size = 4096;
 	if(alignment == 0) alignment = sizeof(void *);
 
-	h->chunkfun = (struct _obstack_chunk *(*)(void *, long))(void *)chunkfun;
-	h->freefun = (void (*)(void *, struct _obstack_chunk *))(void *)freefun;
+	h->chunkfun.plain = chunkfun;
+	h->freefun.plain = freefun;
 	h->chunk_size = size;
 	h->alignment_mask = alignment - 1;
 	h->use_extra_arg = 0;
@@ -61,14 +61,14 @@ _obstack_begin(struct obstack *h, int size, int alignment,
 	h->chunk = chunk;
 	chunk->prev = NULL;
 	chunk->limit = (char *)chunk + size;
-	h->next_free = h->object_base = chunk->contents;
+	h->next_free = h->object_base = (char *)__PTR_ALIGN(chunk, chunk->contents, h->alignment_mask);
 	h->chunk_limit = chunk->limit;
 	return 1;
 }
 
 int
-_obstack_begin_1(struct obstack *h, int size, int alignment,
-                 void *(*chunkfun)(void *, long),
+_obstack_begin_1(struct obstack *h, _OBSTACK_SIZE_T size, _OBSTACK_SIZE_T alignment,
+                 void *(*chunkfun)(void *, size_t),
                  void (*freefun)(void *, void *), void *arg)
 {
 	struct _obstack_chunk *chunk;
@@ -76,8 +76,8 @@ _obstack_begin_1(struct obstack *h, int size, int alignment,
 	if(size == 0) size = 4096;
 	if(alignment == 0) alignment = sizeof(void *);
 
-	h->chunkfun = (struct _obstack_chunk *(*)(void *, long))chunkfun;
-	h->freefun = (void (*)(void *, struct _obstack_chunk *))freefun;
+	h->chunkfun.extra = chunkfun;
+	h->freefun.extra = freefun;
 	h->chunk_size = size;
 	h->alignment_mask = alignment - 1;
 	h->use_extra_arg = 1;
@@ -85,7 +85,7 @@ _obstack_begin_1(struct obstack *h, int size, int alignment,
 	h->alloc_failed = 0;
 	h->extra_arg = arg;
 
-	chunk = (*chunkfun)(arg, size);
+	chunk = (struct _obstack_chunk *)(*chunkfun)(arg, size);
 	if(chunk == NULL){
 		h->alloc_failed = 1;
 		call_alloc_failed();
@@ -94,27 +94,28 @@ _obstack_begin_1(struct obstack *h, int size, int alignment,
 	h->chunk = chunk;
 	chunk->prev = NULL;
 	chunk->limit = (char *)chunk + size;
-	h->next_free = h->object_base = chunk->contents;
+	h->next_free = h->object_base = (char *)__PTR_ALIGN(chunk, chunk->contents, h->alignment_mask);
 	h->chunk_limit = chunk->limit;
 	return 1;
 }
 
 void
-_obstack_newchunk(struct obstack *h, int length)
+_obstack_newchunk(struct obstack *h, _OBSTACK_SIZE_T length)
 {
 	struct _obstack_chunk *old_chunk = h->chunk;
 	struct _obstack_chunk *new_chunk;
-	long obj_size = h->next_free - h->object_base;
-	long new_size;
+	_OBSTACK_SIZE_T obj_size = h->next_free - h->object_base;
+	_OBSTACK_SIZE_T new_size;
+	char *object_base;
 
 	/* New chunk must hold the current partial object + length */
 	new_size = obj_size + length + (obj_size >> 3) + 100;
 	if(new_size < h->chunk_size)
 		new_size = h->chunk_size;
-	/* Round up to include chunk header */
-	new_size += (long)(h->object_base - (char *)old_chunk);
+	/* Round up to include chunk header and alignment */
+	new_size += (_OBSTACK_SIZE_T)(h->object_base - (char *)old_chunk) + h->alignment_mask;
 
-	new_chunk = call_chunkfun(h, new_size);
+	new_chunk = (struct _obstack_chunk *)call_chunkfun(h, new_size);
 	if(new_chunk == NULL){
 		h->alloc_failed = 1;
 		call_alloc_failed();
@@ -123,9 +124,10 @@ _obstack_newchunk(struct obstack *h, int length)
 	new_chunk->prev = old_chunk;
 	new_chunk->limit = (char *)new_chunk + new_size;
 
-	memcpy(new_chunk->contents, h->object_base, (size_t)obj_size);
+	object_base = (char *)__PTR_ALIGN(new_chunk, new_chunk->contents, h->alignment_mask);
+	memcpy(object_base, h->object_base, (size_t)obj_size);
 
-	h->object_base = new_chunk->contents;
+	h->object_base = object_base;
 	h->next_free = h->object_base + obj_size;
 	h->chunk_limit = new_chunk->limit;
 	h->chunk = new_chunk;
@@ -154,13 +156,13 @@ _obstack_free(struct obstack *h, void *obj)
 	h->object_base = h->next_free = h->chunk_limit = NULL;
 }
 
-int
+_OBSTACK_SIZE_T
 _obstack_memory_used(struct obstack *h)
 {
 	struct _obstack_chunk *lp;
-	int total = 0;
+	_OBSTACK_SIZE_T total = 0;
 	for(lp = h->chunk; lp != NULL; lp = lp->prev)
-		total += (int)(lp->limit - (char *)lp);
+		total += (_OBSTACK_SIZE_T)(lp->limit - (char *)lp);
 	return total;
 }
 
