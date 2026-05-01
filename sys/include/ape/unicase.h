@@ -2,9 +2,8 @@
 #define _UNICASE_H
 
 #include <unitypes.h>
-#include <utf.h>
 
-Rune uc_tolower(Rune r);
-Rune uc_toupper(Rune r);
+ucs4_t uc_tolower(ucs4_t r);
+ucs4_t uc_toupper(ucs4_t r);
 
 #endif
