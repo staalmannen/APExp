@@ -122,17 +122,6 @@ LIB_OBJS=\
 	libgreputils_a-threadlib.$O \
 	libgreputils_a-tolower.$O \
 	libgreputils_a-toupper.$O \
-	libgreputils_a-ctype_alpha.$O \
-	libgreputils_a-ctype_blank.$O \
-	libgreputils_a-ctype_cntrl.$O \
-	libgreputils_a-ctype_digit.$O \
-	libgreputils_a-ctype_graph.$O \
-	libgreputils_a-ctype_lower.$O \
-	libgreputils_a-ctype_print.$O \
-	libgreputils_a-ctype_punct.$O \
-	libgreputils_a-ctype_space.$O \
-	libgreputils_a-ctype_upper.$O \
-	libgreputils_a-ctype_xdigit.$O \
 	libgreputils_a-unistd.$O \
 	libgreputils_a-dup-safer.$O \
 	libgreputils_a-fd-safer.$O \
@@ -173,9 +162,6 @@ CFLAGS=-c -I. -I$GREPSRC -I$GREPSRC/src -I$GREPSRC/lib\
 	$CC $CFLAGS $GREPSRC/src/$stem.c
 
 libgreputils_a-%.$O: $GREPSRC/lib/%.c
-	$CC $CFLAGS -c $prereq -o $target
-
-libgreputils_a-%.$O: $GREPSRC/lib/unictype/%.c
 	$CC $CFLAGS -c $prereq -o $target
 
 libgreputils_a-%.$O: $GREPSRC/lib/unistr/%.c
