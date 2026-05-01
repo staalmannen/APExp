@@ -27,10 +27,11 @@ extern void _assert(char *, unsigned);
 #  else
 /* 
  * Fallback for compilers without native _Static_assert.
- * Support both 1 and 2 argument forms using variadic macros.
  */
-#   define _STATIC_ASSERT_3(e, m, ...) extern char (*_static_assert_check(void))[1-2*!(e)]
-#   define static_assert(...) _STATIC_ASSERT_3(__VA_ARGS__, "static assertion failed", 0)
+#   define _GLUE(a, b) a##b
+#   define _STATIC_NAME(n) _GLUE(_static_assert_type_, n)
+#   define _STATIC_ASSERT_3(e, m, n, ...) typedef char _STATIC_NAME(n)[(e) ? 1 : -1]
+#   define static_assert(...) _STATIC_ASSERT_3(__VA_ARGS__, "static assertion failed", __LINE__)
 #   define _Static_assert(...) static_assert(__VA_ARGS__)
 #  endif
 # endif
