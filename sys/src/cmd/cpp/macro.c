@@ -147,24 +147,14 @@ expandrow(Tokenrow *trp, char *flag)
 		setsource(flag, -1, "");
 	for (i = 0; i < rowlen(trp); ) {
 		Token *tp = &trp->bp[i];
-		if (tp->type!=NAME) { i++; continue; }
-		if (quicklook(tp->t[0], tp->len>1?tp->t[1]:0)==0) {
-			fprintf(stderr, "SKIP quicklook fail: %.*s\n", tp->len, tp->t);
-			i++; continue;
+		if (tp->type!=NAME
+		 || quicklook(tp->t[0], tp->len>1?tp->t[1]:0)==0
+		 || (np = lookup(tp, 0))==NULL
+		 || (np->flag&(ISDEFINED|ISMAC))==0
+		 || tp->hideset && checkhideset(tp->hideset, np)) {
+			i++;
+			continue;
 		}
-		if ((np = lookup(tp, 0))==NULL) {
-			fprintf(stderr, "SKIP lookup fail: %.*s\n", tp->len, tp->t);
-			i++; continue;
-		}
-		if ((np->flag&(ISDEFINED|ISMAC))==0) {
-			fprintf(stderr, "SKIP notdef: %.*s\n", tp->len, tp->t);
-			i++; continue;
-		}
-		if (tp->hideset && checkhideset(tp->hideset, np)) {
-			fprintf(stderr, "SKIP hideset: %.*s\n", tp->len, tp->t);
-			i++; continue;
-		}
-		fprintf(stderr, "EXPAND: %.*s\n", tp->len, tp->t);
 		trp->tp = tp;
 		if (np->val==KDEFINED) {
 			tp->type = DEFINED;
@@ -455,7 +445,6 @@ glue(Tokenrow *ntr, Token *tp, Token *tn)
 	maketokenrow(3, ntr);
 	gettokens(ntr, 1);
 	unsetsource();
-	dofree(tt);
 	if (np + nn == 0) {
 		ntr->lp = ntr->bp;
 	} else {
@@ -466,7 +455,8 @@ glue(Tokenrow *ntr, Token *tp, Token *tn)
 		}
 		ntr->lp = ntr->bp+1;
 	}
-	makespace(ntr);
+	makespace(ntr);	/* makespace copies tp->t before we free tt */
+	dofree(tt);
 }
 
 /*
