@@ -6,8 +6,9 @@ LIB=$APEXPROOT/$objtype/lib/ape/libap.a
 OFILES=\
 	unicase.$O\
 	u32-strlen.$O\
-	ctype_alnum.$O\
 	ctype_misc.$O\
+	ctype_alnum.$O\
+	unistr.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

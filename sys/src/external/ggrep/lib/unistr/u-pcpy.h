@@ -18,5 +18,6 @@
 UNIT *
 FUNC (UNIT *dest, const UNIT *src, size_t n)
 {
-  return U_CPY (dest, src, n) + n;
+  UNIT *ptr = U_CPY (dest, src, n);
+  return ptr + n;
 }
