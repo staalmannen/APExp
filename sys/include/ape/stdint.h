@@ -131,17 +131,74 @@ typedef _uintptr_t uintptr_t;
 #define UINT_LEAST32_MAX	UINT32_MAX
 #define UINT_LEAST64_MAX	UINT64_MAX
 
+#ifndef INTPTR_WIDTH
+#define INTPTR_WIDTH 32
+#define UINTPTR_WIDTH 32
+#endif
+
+#if INTPTR_WIDTH == 64
+#define INTPTR_MIN	INT64_MIN
+#define INTPTR_MAX	INT64_MAX
+#define UINTPTR_MAX	UINT64_MAX
 #define PTRDIFF_MAX	INT64_MAX
+#define PTRDIFF_MIN	INT64_MIN
+#define PTRDIFF_WIDTH	64
+#else
+#define INTPTR_MIN	INT32_MIN
+#define INTPTR_MAX	INT32_MAX
+#define UINTPTR_MAX	UINT32_MAX
+#define PTRDIFF_MAX	INT32_MAX
+#define PTRDIFF_MIN	INT32_MIN
+#define PTRDIFF_WIDTH	32
+#endif
+
+#define INT8_WIDTH         8
+#define UINT8_WIDTH        8
+#define INT16_WIDTH        16
+#define UINT16_WIDTH       16
+#define INT32_WIDTH        32
+#define UINT32_WIDTH       32
+#define INT64_WIDTH        64
+#define UINT64_WIDTH       64
+
+#define INT_LEAST8_WIDTH   8
+#define UINT_LEAST8_WIDTH  8
+#define INT_LEAST16_WIDTH  16
+#define UINT_LEAST16_WIDTH 16
+#define INT_LEAST32_WIDTH  32
+#define UINT_LEAST32_WIDTH 32
+#define INT_LEAST64_WIDTH  64
+#define UINT_LEAST64_WIDTH 64
+
+#define INT_FAST8_WIDTH    8
+#define UINT_FAST8_WIDTH   8
+#define INT_FAST16_WIDTH   16
+#define UINT_FAST16_WIDTH  16
+#define INT_FAST32_WIDTH   32
+#define UINT_FAST32_WIDTH  32
+#define INT_FAST64_WIDTH   64
+#define UINT_FAST64_WIDTH  64
+
+#define INTMAX_WIDTH       64
+#define UINTMAX_WIDTH      64
 
 /* 
  * Right now, all of our size_t types are 32 bit, even on
  * 64 bit architectures.
  */
 #ifndef SIZE_MIN
-#define SIZE_MIN	UINT32_MIN
+#define SIZE_MIN	0
 #endif
-#ifndef SIZE_MAX
+#if INTPTR_WIDTH == 64
+#define SIZE_MAX	UINT64_MAX
+#define SIZE_WIDTH	64
+#else
 #define SIZE_MAX	UINT32_MAX
+#define SIZE_WIDTH	32
 #endif
+
+#define WCHAR_WIDTH	16
+#define WINT_WIDTH	32
+#define SIG_ATOMIC_WIDTH	32
 
 #endif

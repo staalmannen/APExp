@@ -15,6 +15,18 @@
 
 #define UINTPTR_MAX ULLONG_MAX
 
+#define CHAR_WIDTH	8
+#define SCHAR_WIDTH	8
+#define UCHAR_WIDTH	8
+#define SHRT_WIDTH	16
+#define USHRT_WIDTH	16
+#define INT_WIDTH	32
+#define UINT_WIDTH	32
+#define LONG_WIDTH	32
+#define ULONG_WIDTH	32
+#define LLONG_WIDTH	64
+#define ULLONG_WIDTH	64
+
 #define CHAR_MAX	SCHAR_MAX
 #define SCHAR_MAX	0x7f
 #define SHRT_MAX	0x7fff
