@@ -7,8 +7,8 @@ OFILES=\
 	unicase.$O\
 	u32-strlen.$O\
 	ctype_misc.$O\
-	ctype_alnum.$O\
 	unistr.$O\
+	c32-shims.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 

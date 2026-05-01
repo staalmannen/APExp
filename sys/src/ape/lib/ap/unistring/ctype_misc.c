@@ -1,6 +1,7 @@
 #include <unictype.h>
 #include <utf.h>
 
+int uc_is_alnum(Rune r) { return isalnumrune(r); }
 int uc_is_alpha(Rune r) { return isalpharune(r); }
 int uc_is_digit(Rune r) { return isdigitrune(r); }
 int uc_is_lower(Rune r) { return islowerrune(r); }

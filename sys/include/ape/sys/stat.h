@@ -61,6 +61,9 @@ struct	stat {
 /*hack*/
 #define S_ISVTX S_IWOTH
 
+#define S_TYPEISSHM(st) 0
+#define S_TYPEISTMO(st) 0
+
 #define S_IFMT S__MASK
 #define S_IFDIR 0040000
 #define S_IFCHR 0020000
