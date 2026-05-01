@@ -19,6 +19,7 @@ int c32isspace(char32_t r);
 int c32isupper(char32_t r);
 int c32isxdigit(char32_t r);
 
+int c32tob(char32_t c);
 ucs4_t c32tolower(ucs4_t r);
 ucs4_t c32toupper(ucs4_t r);
 size_t c32rtomb(char *s, ucs4_t wc, mbstate_t *ps);
