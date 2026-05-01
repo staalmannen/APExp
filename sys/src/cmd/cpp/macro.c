@@ -516,7 +516,6 @@ glue(Tokenrow *ntr, Token *tp, Token *tn)
 	maketokenrow(3, ntr);
 	gettokens(ntr, 1);
 	unsetsource();
-	dofree(tt);
 	if (np + nn == 0) {
 		ntr->lp = ntr->bp;
 	} else {
@@ -527,7 +526,8 @@ glue(Tokenrow *ntr, Token *tp, Token *tn)
 		}
 		ntr->lp = ntr->bp+1;
 	}
-	makespace(ntr);
+	makespace(ntr);	/* makespace copies tp->t before we free tt */
+	dofree(tt);
 }
 
 /*
