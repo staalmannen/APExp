@@ -6,6 +6,6 @@ typedef unsigned long long _uintptr_t;
 #define INTPTR_WIDTH 64
 #define UINTPTR_WIDTH 64
 
-#include "/sys/include/ape/stdint.h"
+#include <stdint.h>
 
 #endif

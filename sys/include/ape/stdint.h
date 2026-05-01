@@ -4,12 +4,20 @@
 #include <stdint_arch.h>
 
 /*
- * Default for 32 bit architectures, overriden by
- * /$objtype/include/ape/stdint.h if needed.
+ * Default for architectures that don't define width/types in stdint_arch.h
  */
 #ifndef _STDINT_ARCH_H_
+# ifndef INTPTR_WIDTH
+#  define INTPTR_WIDTH 32
+#  define UINTPTR_WIDTH 32
+# endif
+# if INTPTR_WIDTH == 64
+typedef long long _intptr_t;
+typedef unsigned long long _uintptr_t;
+# else
 typedef int _intptr_t;
 typedef unsigned int _uintptr_t;
+# endif
 #endif
 
 typedef char s8;
@@ -36,7 +44,7 @@ typedef int8_t	int_fast8_t;
 typedef int16_t	int_fast16_t;
 typedef int32_t	int_fast32_t;
 typedef int64_t	int_fast64_t;
-;
+
 typedef int8_t	int_least8_t;
 typedef int16_t	int_least16_t;
 typedef int32_t	int_least32_t;

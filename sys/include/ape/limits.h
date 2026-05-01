@@ -13,8 +13,6 @@
 #define ULONG_MAX	0xffffffffUL
 #define ULLONG_MAX	0xffffffffffffffffULL
 
-#define UINTPTR_MAX ULLONG_MAX
-
 #define CHAR_WIDTH	8
 #define SCHAR_WIDTH	8
 #define UCHAR_WIDTH	8
