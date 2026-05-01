@@ -147,14 +147,24 @@ expandrow(Tokenrow *trp, char *flag)
 		setsource(flag, -1, "");
 	for (i = 0; i < rowlen(trp); ) {
 		Token *tp = &trp->bp[i];
-		if (tp->type!=NAME
-		 || quicklook(tp->t[0], tp->len>1?tp->t[1]:0)==0
-		 || (np = lookup(tp, 0))==NULL
-		 || (np->flag&(ISDEFINED|ISMAC))==0
-		 || tp->hideset && checkhideset(tp->hideset, np)) {
-			i++;
-			continue;
+		if (tp->type!=NAME) { i++; continue; }
+		if (quicklook(tp->t[0], tp->len>1?tp->t[1]:0)==0) {
+			fprintf(stderr, "SKIP ql: %.*s\n", tp->len, tp->t);
+			i++; continue;
 		}
+		if ((np = lookup(tp, 0))==NULL) {
+			fprintf(stderr, "SKIP np: %.*s\n", tp->len, tp->t);
+			i++; continue;
+		}
+		if ((np->flag&(ISDEFINED|ISMAC))==0) {
+			fprintf(stderr, "SKIP def: %.*s\n", tp->len, tp->t);
+			i++; continue;
+		}
+		if (tp->hideset && checkhideset(tp->hideset, np)) {
+			fprintf(stderr, "SKIP hs: %.*s hs=%d\n", tp->len, tp->t, tp->hideset);
+			i++; continue;
+		}
+		fprintf(stderr, "EXPAND: %.*s hs=%d flag=%s\n", tp->len, tp->t, tp->hideset, flag?flag:"(main)");
 		trp->tp = tp;
 		if (np->val==KDEFINED) {
 			tp->type = DEFINED;
@@ -195,6 +205,7 @@ expand(Tokenrow *trp, Nlist *np)
 	Tokenrow ntr;
 	Token *tp;
 
+	fprintf(stderr, "expand(): macro=%.*s hs=%d\n", np->len, np->name, trp->tp->hideset);
 	copytokenrow(&ntr, np->vp);		/* copy macro value */
 	if (np->ap==NULL) {			/* parameterless */
 		ntokc = 1;
@@ -234,6 +245,7 @@ expand(Tokenrow *trp, Nlist *np)
 	hs = newhideset(trp->tp->hideset, np);
 	for (tp=ntr.bp; tp<ntr.lp; tp++) {	/* distribute hidesets */
 		if (tp->type==NAME) {
+			fprintf(stderr, "  hideset: %.*s gets hs=%d (was %d)\n", tp->len, tp->t, hs, tp->hideset);
 			if (tp->hideset==0)
 				tp->hideset = hs;
 			else
@@ -455,6 +467,8 @@ glue(Tokenrow *ntr, Token *tp, Token *tn)
 		}
 		ntr->lp = ntr->bp+1;
 	}
+	fprintf(stderr, "GLUE: '%.*s' ## '%.*s' -> '%.*s'\n",
+		np, tt, nn, tt+np, np+nn, tt);
 	makespace(ntr);	/* makespace copies tp->t before we free tt */
 	dofree(tt);
 }
