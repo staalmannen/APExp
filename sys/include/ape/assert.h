@@ -25,8 +25,13 @@ extern void _assert(char *, unsigned);
 #  if defined(__STDC_VERSION__) && __STDC_VERSION__ >= 201112L
 #   define static_assert _Static_assert
 #  else
-#   define static_assert(e, m) extern char (*_static_assert_check(void))[1-2*!(e)]
-#   define _Static_assert(e, m) static_assert(e, m)
+/* 
+ * Fallback for compilers without native _Static_assert.
+ * Support both 1 and 2 argument forms using variadic macros.
+ */
+#   define _STATIC_ASSERT_3(e, m, ...) extern char (*_static_assert_check(void))[1-2*!(e)]
+#   define static_assert(...) _STATIC_ASSERT_3(__VA_ARGS__, "static assertion failed", 0)
+#   define _Static_assert(...) static_assert(__VA_ARGS__)
 #  endif
 # endif
 #endif
