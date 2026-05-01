@@ -1,0 +1,14 @@
+APEXPROOT=../../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+LIB=$APEXPROOT/$objtype/lib/ape/libap.a
+
+OFILES=\
+	unicase.$O\
+	u32-strlen.$O\
+	ctype_alnum.$O\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=$CFLAGS -c -D_POSIX_SOURCE\
+	-D_BSD_EXTENSION -D_PLAN9_SOURCE -I../include
