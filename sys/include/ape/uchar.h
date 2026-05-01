@@ -4,6 +4,7 @@
 #include <unitypes.h>
 #include <wchar.h>
 
+typedef uint16_t char16_t;
 typedef uint32_t char32_t;
 
 int c32isalnum(char32_t r);

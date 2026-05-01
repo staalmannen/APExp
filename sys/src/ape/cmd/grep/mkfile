@@ -18,28 +18,13 @@ LIB_OBJS=\
 	libgreputils_a-binary-io.$O \
 	libgreputils_a-bitrotate.$O \
 	libgreputils_a-btoc32.$O \
-#	libgreputils_a-btowc.$O \
+	libgreputils_a-btowc.$O \
 	libgreputils_a-c-ctype.$O \
 	libgreputils_a-c-stack.$O \
 	libgreputils_a-c-strcasecmp.$O \
 #	libgreputils_a-c32_apply_type_test.$O \
 #	libgreputils_a-c32_get_type_test.$O \
-#	libgreputils_a-c32isalnum.$O \
-#	libgreputils_a-c32isalpha.$O \
-#	libgreputils_a-c32isblank.$O \
-#	libgreputils_a-c32iscntrl.$O \
-#	libgreputils_a-c32isdigit.$O \
-#	libgreputils_a-c32isgraph.$O \
-#	libgreputils_a-c32islower.$O \
-#	libgreputils_a-c32isprint.$O \
-#	libgreputils_a-c32ispunct.$O \
-#	libgreputils_a-c32isspace.$O \
-#	libgreputils_a-c32isupper.$O \
-#	libgreputils_a-c32isxdigit.$O \
-#	libgreputils_a-c32rtomb.$O \
 #	libgreputils_a-c32tob.$O \
-#	libgreputils_a-c32tolower.$O \
-#	libgreputils_a-c32toupper.$O \
 	libgreputils_a-chdir-long.$O \
 	libgreputils_a-cloexec.$O \
 	libgreputils_a-close-stream.$O \
@@ -85,7 +70,7 @@ LIB_OBJS=\
 	libgreputils_a-mbrlen.$O \
 	libgreputils_a-mbrtoc32.$O \
 	libgreputils_a-mbrtowc.$O \
-#	libgreputils_a-mbscasecmp.$O \
+	libgreputils_a-mbscasecmp.$O \
 #	libgreputils_a-mbsrtoc32s.$O \
 	libgreputils_a-mbsrtowcs.$O \
 	libgreputils_a-mbszero.$O \
@@ -170,4 +155,4 @@ libgrep.a$O: $LIB_OBJS
 			ar vu libgrep.a$O $LIB_OBJS
 
 install:V:
-		cp $GREPSRC/grep.1 $APEXPROOT/sys/man/1/grep
+		cp $GREPSRC/doc/grep.in.1 $APEXPROOT/sys/man/1/grep

@@ -24,6 +24,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#undef btowc
 wint_t
 btowc (int c)
 {

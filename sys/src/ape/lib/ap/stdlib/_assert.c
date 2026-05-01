@@ -17,6 +17,8 @@ _assert(char *f, unsigned line)
 
 }
 
+#undef assert
+
 void
 assert(int e)
 {

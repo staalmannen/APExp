@@ -42,7 +42,7 @@ OFILES=\
 	runecmp.$O\
 	utftorunestr.$O\
 	charntorune.$O\
-# musl\
+# musl and shims\
 	btowc.$O\
 	c16rtomb.$O\
 	c32rtomb.$O\
@@ -50,6 +50,7 @@ OFILES=\
 	c32-shims.$O\
 	c32-ctype.$O\
 	mbzero.$O\
+	mbszero.$O\
 	mblen.$O\
 	mbrlen.$O\
 	mbrtoc16.$O\

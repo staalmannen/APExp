@@ -1,19 +1,19 @@
 GLOBL	_tos(SB), $8
 
-TEXT	_main(SB), 1, $0
+TEXT	_mainp(SB), 1, $0
 	MOVQ	AX, _tos(SB)
-	MOVQ	SP, R11
-	SUBQ	$131072, SP
-	ANDQ	$~15, SP
-	MOVQ	0(R11), AX
-	MOVQ	AX, CX
-	ADDQ	$2, CX
-	MOVQ	R11, SI
-	MOVQ	SP, DI
-	ADDQ	$8, DI
-	CLD
-	REP; MOVSQ
-	MOVQ	$_apemain(SB), RARG
-	MOVQ	RARG, 0(SP)
+	MOVQ	$_profmain(SB), RARG
+	PUSHQ	RARG
 	PUSHQ	$0
 	JMPF	_callmain(SB)
+
+TEXT	_savearg(SB), 1, $0
+	MOVQ	RARG, AX
+	RET
+
+TEXT	_saveret(SB), 1, $0
+	RET				/* we want RARG in RARG */
+
+TEXT	_callpc(SB), 1, $0
+	MOVQ	8(RARG), AX
+	RET
