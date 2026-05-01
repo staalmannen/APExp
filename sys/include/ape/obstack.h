@@ -87,42 +87,34 @@ extern int obstack_vprintf(struct obstack *, const char *, va_list);
      + ((h)->alignment_mask + 1))
 
 #define obstack_grow(h, where, length) \
-  do { \
-    int __len = (length); \
-    if((h)->next_free + __len > (h)->chunk_limit) \
-      _obstack_newchunk((h), __len); \
-    memcpy((h)->next_free, (where), (size_t)__len); \
-    (h)->next_free += __len; \
-  } while(0)
+  ((h)->temp.tempint = (length), \
+   ((h)->next_free + (h)->temp.tempint > (h)->chunk_limit \
+    ? _obstack_newchunk((h), (h)->temp.tempint) : (void)0), \
+   memcpy((h)->next_free, (where), (size_t)(h)->temp.tempint), \
+   (void)((h)->next_free += (h)->temp.tempint))
 
 #define obstack_grow0(h, where, length) \
-  do { \
-    int __len = (length); \
-    if((h)->next_free + __len + 1 > (h)->chunk_limit) \
-      _obstack_newchunk((h), __len + 1); \
-    memcpy((h)->next_free, (where), (size_t)__len); \
-    (h)->next_free += __len; \
-    *((h)->next_free)++ = '\0'; \
-  } while(0)
+  ((h)->temp.tempint = (length), \
+   ((h)->next_free + (h)->temp.tempint + 1 > (h)->chunk_limit \
+    ? _obstack_newchunk((h), (h)->temp.tempint + 1) : (void)0), \
+   memcpy((h)->next_free, (where), (size_t)(h)->temp.tempint), \
+   (h)->next_free += (h)->temp.tempint, \
+   (void)(*((h)->next_free)++ = '\0'))
 
 #define obstack_1grow(h, datum) \
-  do { \
-    if((h)->next_free + 1 > (h)->chunk_limit) \
-      _obstack_newchunk((h), 1); \
-    *((h)->next_free)++ = (datum); \
-  } while(0)
+  (((h)->next_free + 1 > (h)->chunk_limit \
+    ? _obstack_newchunk((h), 1) : (void)0), \
+   (void)(*((h)->next_free)++ = (datum)))
 
 #define obstack_blank(h, length) \
-  do { \
-    int __len = (length); \
-    if(__len > 0 && (h)->next_free + __len > (h)->chunk_limit) \
-      _obstack_newchunk((h), __len); \
-    (h)->next_free += __len; \
-  } while(0)
+  ((h)->temp.tempint = (length), \
+   ((h)->temp.tempint > 0 && (h)->next_free + (h)->temp.tempint > (h)->chunk_limit \
+    ? _obstack_newchunk((h), (h)->temp.tempint) : (void)0), \
+   (void)((h)->next_free += (h)->temp.tempint))
 
 #define obstack_ptr_grow(h, ptr) \
-  obstack_blank((h), sizeof(void *)); \
-  ((void **)((h)->next_free))[-1] = (ptr)
+  (obstack_blank((h), sizeof(void *)), \
+   (void)(((void **)((h)->next_free))[-1] = (ptr)))
 
 /* Finishing an object */
 #define obstack_finish(h) \
