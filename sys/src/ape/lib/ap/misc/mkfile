@@ -23,6 +23,7 @@ OFILES=\
 # GNU extensions\
 	get_current_dir.$O\
 	getrlimit.$O\
+	scratch_buffer.$O\
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib

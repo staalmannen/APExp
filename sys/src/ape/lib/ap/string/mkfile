@@ -18,6 +18,7 @@ OFILES=\
 	strchr.$O\
 	strcmp.$O\
 	strcoll.$O\
+	streq.$O\
 	strcpy.$O\
 	strcspn.$O\
 	strdup.$O\

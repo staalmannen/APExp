@@ -143,6 +143,11 @@ extern int obstack_vprintf(struct obstack *, const char *, va_list);
   (obstack_blank((h), sizeof(void *)), \
    (void)(((void **)((h)->next_free))[-1] = (ptr)))
 
+/* Obstack accessors */
+#define obstack_base(h) ((void *) (h)->object_base)
+#define obstack_next_free(h) ((void *) (h)->next_free)
+#define obstack_blank_fast(h, n) ((h)->next_free += (n))
+
 /* Finishing an object */
 #define obstack_finish(h) \
   ((h)->next_free == (h)->object_base \
