@@ -1306,7 +1306,7 @@ compile_program (struct vector *vector)
                       bad_prog (_(Y_CMD_LEN));
 
                     /* Set the i-th source character.  */
-                    trans_pairs[2 * i] = (char *) XCALLOC (src_lens[i] + 1, sizeof (char));
+                    trans_pairs[2 * i] = XCALLOC (src_lens[i] + 1, sizeof (char));
                     memcpy (trans_pairs[2 * i], src_buf, src_lens[i]);
                     trans_pairs[2 * i][src_lens[i]] = '\0';
                     src_buf += src_lens[i]; /* Forward to next character.  */
@@ -1320,7 +1320,7 @@ compile_program (struct vector *vector)
                       mbclen = 1;
 
                     /* Set the i-th destination character.  */
-                    trans_pairs[2 * i + 1] = (char *) XCALLOC (mbclen + 1, sizeof (char));
+                    trans_pairs[2 * i + 1] = XCALLOC (mbclen + 1, sizeof (char));
                     memcpy (trans_pairs[2 * i + 1], dest_buf + idx, mbclen);
                     trans_pairs[2 * i + 1][mbclen] = '\0';
                     idx += mbclen; /* Forward to next character.  */
