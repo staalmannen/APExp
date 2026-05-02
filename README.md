@@ -63,6 +63,7 @@ Install paths have been modified so that libraries and binaries are installed in
 
 
 ***Headers***
+- time_t has changed to 64-bit (long long) for 2038
 - err.h provided by libnbcompat (NetBSD) [11]
 - regex.h provided by musl libc
 - iconv.h provided by musl libc

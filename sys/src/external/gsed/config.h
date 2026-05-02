@@ -1,5 +1,5 @@
-/* config.h.  Generated from config_h.in by configure.  */
-/* config_h.in.  Generated from configure.ac by autoheader.  */
+/* config.h.  Generated from config_h.in by configure. */
+/* config_h.in.  Generated from configure.ac by autoheader. */
 
 /* Define if building universal (internal helper macro) */
 /* #undef AC_APPLE_UNIVERSAL_BUILD */
@@ -1189,7 +1189,7 @@
 /* #undef HAVE_STDALIGN_H */
 
 /* Define to 1 if you have the <stdbool.h> header file. */
-/* #undef HAVE_STDBOOL_H */
+#define HAVE_STDBOOL_H 1
 
 /* Define to 1 if you have the <stdckdint.h> header file. */
 /* #undef HAVE_STDCKDINT_H */

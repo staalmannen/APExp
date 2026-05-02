@@ -357,10 +357,19 @@ surrounded by #ifndef/#endif lines so that the value can be overridden by -D. */
 #define SUPPORT_PCRE2_8 /**/
 
 /* Define to any value to enable support for Unicode and UTF encoding. This
+<<<<<<<<<< sys/src/external/pcre2/src/config.h
+
+========== original
+   will work even in an EBCDIC environment, but it is incompatible with the
+   EBCDIC macro. That is, PCRE2 can support *either* EBCDIC code *or*
+   ASCII/Unicode, but not both at once. */
+/* #undef SUPPORT_UNICODE */
+========== /usr/glenda/APExp/.git/fs/object/35a2a7a4fd69ea5d05279c96b5e6828e1a58930f/tree/sys/src/external/pcre2/src/config.h
    will work even in an EBCDIC environment, but it is incompatible with the
    EBCDIC macro. That is, PCRE2 can support *either* EBCDIC code *or*
    ASCII/Unicode, but not both at once. */
 #define SUPPORT_UNICODE /**/
+>>>>>>>>>>
 
 /* Define to any value for valgrind support to find invalid memory reads. */
 /* #undef SUPPORT_VALGRIND */

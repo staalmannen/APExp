@@ -26,8 +26,7 @@ enum exit_codes {
 };
 
 
-_Noreturn void panic (const char *str, ...)
-  _GL_ATTRIBUTE_FORMAT_PRINTF_STANDARD (1, 2);
+_Noreturn void panic (const char *str, ...);
 
 FILE *ck_fopen (const char *name, const char *mode, int fail);
 FILE *ck_fdopen (int fd, const char *name, const char *mode, int fail);
@@ -39,7 +38,7 @@ const char *follow_symlink (const char *path);
 size_t ck_getdelim (char **text, size_t *buflen, char buffer_delimiter,
                     FILE *stream);
 FILE * ck_mkstemp (char **p_filename, const char *tmpdir, const char *base,
-                   const char *mode) _GL_ARG_NONNULL ((1, 2, 3, 4));
+                   const char *mode);
 void ck_rename (const char *from, const char *to);
 
 void *ck_malloc (size_t size);

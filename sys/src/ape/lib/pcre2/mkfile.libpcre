@@ -46,8 +46,7 @@ PCRESRC=../../../external/pcre2
 CC=pcc
 LD=pcc
 # Normally are 8, 16 and 32 libraries made.
-# We are only using UTF-8 so width=8 should be enough
-CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=8 -DPCRE2_STATIC
+CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=32 -DPCRE2_STATIC
 
 %.$O: $PCRESRC/src/%.c
 	$CC $CFLAGS $PCRESRC/src/$stem.c
