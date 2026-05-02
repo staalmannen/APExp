@@ -16,6 +16,14 @@ extern "C" {
 #define _OBSTACK_SIZE_T size_t
 #endif
 
+#ifndef _OBSTACK_CHUNK_SIZE_T
+#define _OBSTACK_CHUNK_SIZE_T size_t
+#endif
+
+#ifndef _OBSTACK_INDEX_T
+#define _OBSTACK_INDEX_T size_t
+#endif
+
 #ifndef _CHUNK_SIZE_T
 #define _CHUNK_SIZE_T size_t
 #endif
