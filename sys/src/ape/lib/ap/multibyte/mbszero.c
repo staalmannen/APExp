@@ -1,5 +1,6 @@
+#include <wchar.h>
 #include <string.h>
 
-void mbszero(void *s, size_t n) {
-    memset(s, 0, n);
+void mbszero(mbstate_t *ps) {
+    memset(ps, 0, sizeof(mbstate_t));
 }
