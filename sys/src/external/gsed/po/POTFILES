@@ -12,4 +12,4 @@
      ../sed/execute.c \
      ../sed/regexp.c \
      ../sed/sed.c \
-     ../sed/utils.c \
+     ../sed/utils.c
