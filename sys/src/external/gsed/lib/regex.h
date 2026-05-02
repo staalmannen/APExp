@@ -514,7 +514,7 @@ struct re_registers
 /* POSIX specification for registers.  Aside from the different names than
    're_registers', POSIX uses an array of structures, instead of a
    structure of arrays.  */
-typedef struct
+typedef struct regmatch_s
 {
   regoff_t rm_so;  /* Byte offset from string's start to substring's start.  */
   regoff_t rm_eo;  /* Byte offset from string's start to substring's end.  */
