@@ -50,13 +50,6 @@ configure:3278: result: yes
 configure:3437: checking for a race-free mkdir -p
 configure:3481: result: ./build-aux/install-sh -c -d
 configure:3488: checking for gawk
-configure:3523: result: no
-configure:3488: checking for mawk
-configure:3523: result: no
-configure:3488: checking for nawk
-configure:3523: result: no
-configure:3488: checking for awk
-configure:3509: found /bin/awk
 configure:3520: result: awk
 configure:3531: checking whether make sets $(MAKE)
 configure:3554: result: yes
@@ -123,6 +116,7 @@ configure:4526: result: o
 configure:4530: checking whether the compiler supports GNU C
 configure:4550: cc -c   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gmake/conftest.c:16[stdin:17] syntax error, last name: me
+cc: cpp: 6c 66376: error
 configure:4550: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -153,7 +147,12 @@ configure:4592: $? = 0
 configure:4636: result: yes
 configure:4656: checking for cc option to enable C11 features
 configure:4671: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:171[stdin:240] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:171[stdin:251] syntax error, last name: __func__$9
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cpp: conftest.c:167 #error directive: "Compiler does not advertise C11 conformance"
+cc: 6c: cpp 66409: errors
 configure:4671: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -429,7 +428,19 @@ configure: failed program was:
 | }
 | 
 configure:4671: cc -std=gnu11 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:171[stdin:240] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:171[stdin:251] syntax error, last name: __func__$9
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -n ignored
+cc: flag -u ignored
+cc: flag -1 ignored
+cc: flag -1 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cpp: conftest.c:167 #error directive: "Compiler does not advertise C11 conformance"
+cc: 6c: cpp 66423: errors
 configure:4671: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -707,7 +718,11 @@ configure: failed program was:
 configure:4684: result: unsupported
 configure:4702: checking for cc option to enable C99 features
 configure:4717: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 66443: errors
 configure:4717: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -923,7 +938,18 @@ configure: failed program was:
 | }
 | 
 configure:4717: cc -std=gnu99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -n ignored
+cc: flag -u ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 66457: errors
 configure:4717: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1139,7 +1165,16 @@ configure: failed program was:
 | }
 | 
 configure:4717: cc -std=c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 66471: errors
 configure:4717: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1355,7 +1390,13 @@ configure: failed program was:
 | }
 | 
 configure:4717: cc -c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 66485: errors
 configure:4717: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1571,7 +1612,13 @@ configure: failed program was:
 | }
 | 
 configure:4717: cc -qlanglvl=extc1x -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -q ignored
+cc: can't find library for -l
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 66499: errors
 configure:4717: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1787,7 +1834,13 @@ configure: failed program was:
 | }
 | 
 configure:4717: cc -qlanglvl=extc99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -q ignored
+cc: can't find library for -l
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 66513: errors
 configure:4717: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2003,7 +2056,14 @@ configure: failed program was:
 | }
 | 
 configure:4717: cc -AC99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -C ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 66527: errors
 configure:4717: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2219,7 +2279,11 @@ configure: failed program was:
 | }
 | 
 configure:4717: cc -D_STDC_C99= -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 66541: errors
 configure:4717: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2495,8 +2559,8 @@ configure:5072: $? = 0
 configure:5072: result: yes
 configure:5072: checking for minix/config.h
 configure:5072: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: i
+cpp: conftest.c:49 Could not find include file <minix/config.h>
+cc: 6c: cpp 66756: error
 configure:5072: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2559,7 +2623,9 @@ configure:5072: $? = 0
 configure:5072: result: yes
 configure:5072: checking for vfork.h
 configure:5072: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: extern
+<eof> syntax error, last name: mbstate_t
+cpp: conftest.c:51 Could not find include file <vfork.h>
+cc: 6c: cpp 66803: error
 configure:5072: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2711,6 +2777,7 @@ configure:6376: g++ -qversion >&5
 configure:6387: $? = 127
 configure:6391: checking whether the compiler supports GNU C++
 configure:6411: g++ -c   conftest.cpp >&5
+./configure: g++: not found
 configure:6411: $? = 127
 configure: failed program was:
 | /* confdefs.h */
@@ -2767,6 +2834,7 @@ configure: failed program was:
 configure:6421: result: no
 configure:6432: checking whether g++ accepts -g
 configure:6453: g++ -c -g  conftest.cpp >&5
+./configure: g++: not found
 configure:6453: $? = 127
 configure: failed program was:
 | /* confdefs.h */
@@ -2818,6 +2886,7 @@ configure: failed program was:
 |   return 0;
 | }
 configure:6469: g++ -c   conftest.cpp >&5
+./configure: g++: not found
 configure:6469: $? = 127
 configure: failed program was:
 | /* confdefs.h */
@@ -2869,6 +2938,7 @@ configure: failed program was:
 |   return 0;
 | }
 configure:6486: g++ -c -g  conftest.cpp >&5
+./configure: g++: not found
 configure:6486: $? = 127
 configure: failed program was:
 | /* confdefs.h */
@@ -2922,6 +2992,7 @@ configure: failed program was:
 configure:6497: result: no
 configure:6517: checking for g++ option to enable C++11 features
 configure:6532: g++  -c   conftest.cpp >&5
+./configure: g++: not found
 configure:6532: $? = 127
 configure: failed program was:
 | /* confdefs.h */
@@ -3166,6 +3237,8 @@ configure:6840: checking how to run the C preprocessor
 configure:6866: cc -E  conftest.c
 configure:6866: $? = 0
 configure:6881: cc -E  conftest.c
+cpp: conftest.c:42 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 67139: error
 configure:6881: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3214,6 +3287,8 @@ configure:6908: result: cc -E
 configure:6922: cc -E  conftest.c
 configure:6922: $? = 0
 configure:6937: cc -E  conftest.c
+cpp: conftest.c:42 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 67161: error
 configure:6937: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3278,7 +3353,8 @@ configure:7609: checking for size_t
 configure:7609: cc -c -g  conftest.c >&5
 configure:7609: $? = 0
 configure:7609: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:73[stdin:1551] syntax error, last name: size_t
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:73[stdin:4746] syntax error, last name: size_t
+cc: cpp: 6c 67229: error
 configure:7609: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3368,6 +3444,7 @@ configure:7701: result: yes
 configure:7773: checking for eaccess
 configure:7773: cc -o conftest -g   conftest.c  >&5
 main: undefined: eaccess in main
+cc: 6l: 6l 67272: error
 configure:7773: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3448,6 +3525,7 @@ configure:7773: result: no
 configure:7800: checking for cc options needed to detect all undeclared functions
 configure:7822: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gmake/conftest.c:49[stdin:50] name not declared: strchr
+cc: cpp: 6c 67292: error
 configure:7822: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3509,6 +3587,7 @@ configure:7921: checking host CPU and C ABI
 configure:7951: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gmake/conftest.c:48[stdin:49] not a function
 /usr/glenda/APExp/sys/src/external/gmake/conftest.c:48[stdin:49] syntax error, last name: fail
+cc: cpp: 6c 67324: error
 configure:7951: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3573,6 +3652,7 @@ configure:8551: result: no
 configure:8625: checking for getloadavg
 configure:8625: cc -o conftest -g   conftest.c  >&5
 main: undefined: getloadavg in main
+cc: 6l: 6l 67376: error
 configure:8625: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3660,6 +3740,8 @@ configure:8625: result: no
 configure:8638: checking for elf_begin in -lelf
 configure:8661: cc -o conftest -g   conftest.c -lelf   >&5
 main: undefined: elf_begin in main
+cc: can't find library for -l
+cc: 6l: 6l 67397: error
 configure:8661: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3728,6 +3810,8 @@ configure:8671: result: no
 configure:8678: checking for kvm_open in -lkvm
 configure:8701: cc -o conftest -g   conftest.c -lkvm   >&5
 main: undefined: kvm_open in main
+cc: can't find library for -l
+cc: 6l: 6l 67418: error
 configure:8701: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3796,6 +3880,8 @@ configure:8711: result: no
 configure:8719: checking for getloadavg in -lutil
 configure:8742: cc -o conftest -g   conftest.c -lutil   >&5
 main: undefined: getloadavg in main
+cc: can't find library for -l
+cc: 6l: 6l 67439: error
 configure:8742: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3864,6 +3950,8 @@ configure:8752: result: no
 configure:8768: checking for getloadavg in -lgetloadavg
 configure:8791: cc -o conftest -g   conftest.c -lgetloadavg  -L/usr/local/lib  >&5
 main: undefined: getloadavg in main
+cc: can't find library for -l
+cc: 6l: 6l 67460: error
 configure:8791: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3932,6 +4020,8 @@ configure:8801: result: no
 configure:8817: checking for kstat_open in -lkstat
 configure:8840: cc -o conftest -g   conftest.c -lkstat   >&5
 main: undefined: kstat_open in main
+cc: can't find library for -l
+cc: 6l: 6l 67481: error
 configure:8840: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4000,6 +4090,8 @@ configure:8850: result: no
 configure:8864: checking for perfstat_cpu_total in -lperfstat
 configure:8887: cc -o conftest -g   conftest.c -lperfstat   >&5
 main: undefined: perfstat_cpu_total in main
+cc: can't find library for -l
+cc: 6l: 6l 67502: error
 configure:8887: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4067,8 +4159,9 @@ configure: failed program was:
 configure:8897: result: no
 configure:8911: checking for sys/dg_sys_info.h
 configure:8911: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: ex
+<eof> syntax error, last name: wch
+cpp: conftest.c:79 Could not find include file <sys/dg_sys_info.h>
+cc: 6c: cpp 67522: error
 configure:8911: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4153,8 +4246,9 @@ configure: failed program was:
 configure:8911: result: no
 configure:8978: checking for sys/loadavg.h
 configure:8978: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: ex
+<eof> syntax error, last name: wch
+cpp: conftest.c:79 Could not find include file <sys/loadavg.h>
+cc: 6c: cpp 67541: error
 configure:8978: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4237,9 +4331,10 @@ configure: failed program was:
 | #endif
 | #include <sys/loadavg.h>
 configure:8978: result: no
-configure:8990: checking whether getloadavg is declared
+configure:8990: checking whether  is declared
 configure:8990: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:66[stdin:316] name not declared: getloadavg
+cpp: conftest.c:62 Syntax error in #ifdef/#ifndef
+cc: 6c: cpp 67564: errors
 configure:8990: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4303,11 +4398,11 @@ configure: failed program was:
 | int
 | main (void)
 | {
-| #ifndef getloadavg
+| #ifndef 
 | #ifdef __cplusplus
-|   (void) getloadavg;
+|   (void) ;
 | #else
-|   (void) getloadavg;
+|   (void) ;
 | #endif
 | #endif
 | 
@@ -4318,6 +4413,7 @@ configure:8990: result: no
 configure:9031: checking for pstat_getdynamic
 configure:9031: cc -o conftest -g   conftest.c  >&5
 main: undefined: pstat_getdynamic in main
+cc: 6l: 6l 67584: error
 configure:9031: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4404,8 +4500,9 @@ configure: failed program was:
 configure:9031: result: no
 configure:9053: checking for inq_stats/cpustats.h
 configure:9053: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: ex
+<eof> syntax error, last name: wch
+cpp: conftest.c:79 Could not find include file <inq_stats/cpustats.h>
+cc: 6c: cpp 67604: error
 configure:9053: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4490,8 +4587,9 @@ configure: failed program was:
 configure:9053: result: no
 configure:9068: checking for sys/cpustats.h
 configure:9068: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: ex
+<eof> syntax error, last name: wch
+cpp: conftest.c:79 Could not find include file <sys/cpustats.h>
+cc: 6c: cpp 67623: error
 configure:9068: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4576,8 +4674,9 @@ configure: failed program was:
 configure:9068: result: no
 configure:9078: checking for mach/mach.h
 configure:9078: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: ex
+<eof> syntax error, last name: wch
+cpp: conftest.c:79 Could not find include file <mach/mach.h>
+cc: 6c: cpp 67642: error
 configure:9078: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4662,8 +4761,9 @@ configure: failed program was:
 configure:9078: result: no
 configure:9089: checking for nlist.h
 configure:9089: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: ex
+<eof> syntax error, last name: wch
+cpp: conftest.c:79 Could not find include file <nlist.h>
+cc: 6c: cpp 67661: error
 configure:9089: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4748,6 +4848,8 @@ configure: failed program was:
 configure:9089: result: no
 configure:9157: checking if system libc has working GNU glob
 configure:9192: cc -c -g  conftest.c >&5
+cpp: conftest.c:53 Could not find include file <gnu-versions.h>
+cc: 6c: cpp 67683: error
 configure:9192: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4824,6 +4926,7 @@ configure:9260: checking whether system uses MSDOS-style paths
 configure:9282: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gmake/conftest.c:54[stdin:55] not a function
 /usr/glenda/APExp/sys/src/external/gmake/conftest.c:54[stdin:55] syntax error, last name: MSDOS
+cc: cpp: 6c 67701: error
 configure:9282: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4892,8 +4995,8 @@ configure: failed program was:
 configure:9290: result: no
 configure:9301: checking for bool, true, false
 configure:9316: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:56[stdin:57] not a function
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:56[stdin:57] syntax error, last name: b
+cpp: conftest.c:54 #error directive: "true == false"
+cc: 6c: cpp 67722: errors
 configure:9316: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4961,6 +5064,8 @@ configure:9559: result: cc -E
 configure:9573: cc -E  conftest.c
 configure:9573: $? = 0
 configure:9588: cc -E  conftest.c
+cpp: conftest.c:52 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 67756: error
 configure:9588: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5023,6 +5128,7 @@ configure:9708: checking whether byte ordering is bigendian
 configure:9724: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gmake/conftest.c:53[stdin:54] not a function
 /usr/glenda/APExp/sys/src/external/gmake/conftest.c:53[stdin:54] syntax error, last name: a
+cc: cpp: 6c 67780: error
 configure:9724: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5082,7 +5188,8 @@ configure: failed program was:
 | 	     typedef int dummy;
 | 
 configure:9770: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:59[stdin:142] syntax error, last name: endian
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:59[stdin:212] syntax error, last name: endian
+cc: cpp: 6c 67795: error
 configure:9770: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5150,7 +5257,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:9816: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:58[stdin:183] syntax error, last name: endian
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:58[stdin:197] syntax error, last name: endian
+cc: cpp: 6c 67810: error
 configure:9816: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5227,14 +5335,12 @@ configure:10020: checking whether NLS is requested
 configure:10030: result: yes
 configure:10070: checking for msgfmt
 configure: trying /bin/msgfmt...
-msgfmt 123370: suicide: bad address in notify
-configure:10106: result: no
+configure:10103: result: /bin/msgfmt
 configure:10112: checking for gmsgfmt
-configure:10148: result: :
+configure:10148: result: /bin/msgfmt
 configure:10198: checking for xgettext
 configure: trying /bin/xgettext...
-xgettext 123388: suicide: bad address in notify
-configure:10234: result: no
+configure:10231: result: /bin/xgettext
 configure:10276: checking for msgmerge
 configure: trying /bin/msgmerge...
 configure:10308: result: /bin/msgmerge
@@ -5246,6 +5352,8 @@ configure:10466: checking for shared library run path origin
 configure:10480: result: done
 configure:11056: checking for CFPreferencesCopyAppValue
 configure:11075: cc -o conftest -g   conftest.c  -Wl,-framework -Wl,CoreFoundation >&5
+cpp: conftest.c:52 Could not find include file <CoreFoundation/CFPreferences.h>
+cc: 6c: cpp 68014: error
 configure:11075: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5310,6 +5418,8 @@ configure: failed program was:
 configure:11085: result: no
 configure:11092: checking for CFLocaleCopyCurrent
 configure:11111: cc -o conftest -g   conftest.c  -Wl,-framework -Wl,CoreFoundation >&5
+cpp: conftest.c:52 Could not find include file <CoreFoundation/CFLocale.h>
+cc: 6c: cpp 68034: error
 configure:11111: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5374,6 +5484,9 @@ configure: failed program was:
 configure:11121: result: no
 configure:11170: checking for GNU gettext in libc
 configure:11195: cc -o conftest -g   conftest.c  >&5
+rwakeupall: _nl_msg_cat_cntr: not defined
+rwakeupall: _nl_domain_bindings: not defined
+cc: 6l: 6l 68055: error
 configure:11195: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5452,414 +5565,18 @@ configure:11303: checking for working iconv
 configure:11434: cc -o conftest -g   conftest.c  >&5
 configure:11434: $? = 0
 configure:11434: ./conftest
-conftest 123529: suicide: sys: trap: fault write addr=0x20bc39 pc=0x20110e
-configure:11434: $? = 1
-configure: program exited with status 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Make"
-| #define PACKAGE_TARNAME "make"
-| #define PACKAGE_VERSION "4.4.1"
-| #define PACKAGE_STRING "GNU Make 4.4.1"
-| #define PACKAGE_BUGREPORT "bug-make@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/make/"
-| #define PACKAGE "make"
-| #define VERSION "4.4.1"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_STDBOOL_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define MAKE_CXX "g++"
-| #define HAVE_ALLOCA_H 1
-| #define HAVE_ALLOCA 1
-| #define eaccess access
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #define GNULIB_TEST_GETLOADAVG 1
-| /* end confdefs.h.  */
-| 
-| #include <iconv.h>
-| #include <string.h>
-| 
-| #ifndef ICONV_CONST
-| # define ICONV_CONST 
-| #endif
-| 
-| int
-| main (void)
-| {
-| int result = 0;
-|   /* Test against AIX 5.1 bug: Failures are not distinguishable from successful
-|      returns.  */
-|   {
-|     iconv_t cd_utf8_to_88591 = iconv_open ("ISO8859-1", "UTF-8");
-|     if (cd_utf8_to_88591 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\342\202\254"; /* EURO SIGN */
-|         char buf[10];
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = strlen (input);
-|         char *outptr = buf;
-|         size_t outbytesleft = sizeof (buf);
-|         size_t res = iconv (cd_utf8_to_88591,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if (res == 0)
-|           result |= 1;
-|         iconv_close (cd_utf8_to_88591);
-|       }
-|   }
-|   /* Test against Solaris 10 bug: Failures are not distinguishable from
-|      successful returns.  */
-|   {
-|     iconv_t cd_ascii_to_88591 = iconv_open ("ISO8859-1", "646");
-|     if (cd_ascii_to_88591 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\263";
-|         char buf[10];
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = strlen (input);
-|         char *outptr = buf;
-|         size_t outbytesleft = sizeof (buf);
-|         size_t res = iconv (cd_ascii_to_88591,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if (res == 0)
-|           result |= 2;
-|         iconv_close (cd_ascii_to_88591);
-|       }
-|   }
-|   /* Test against AIX 6.1..7.1 bug: Buffer overrun.  */
-|   {
-|     iconv_t cd_88591_to_utf8 = iconv_open ("UTF-8", "ISO-8859-1");
-|     if (cd_88591_to_utf8 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\304";
-|         static char buf[2] = { (char)0xDE, (char)0xAD };
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = 1;
-|         char *outptr = buf;
-|         size_t outbytesleft = 1;
-|         size_t res = iconv (cd_88591_to_utf8,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if (res != (size_t)(-1) || outptr - buf > 1 || buf[1] != (char)0xAD)
-|           result |= 4;
-|         iconv_close (cd_88591_to_utf8);
-|       }
-|   }
-| #if 0 /* This bug could be worked around by the caller.  */
-|   /* Test against HP-UX 11.11 bug: Positive return value instead of 0.  */
-|   {
-|     iconv_t cd_88591_to_utf8 = iconv_open ("utf8", "iso88591");
-|     if (cd_88591_to_utf8 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\304rger mit b\366sen B\374bchen ohne Augenma\337";
-|         char buf[50];
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = strlen (input);
-|         char *outptr = buf;
-|         size_t outbytesleft = sizeof (buf);
-|         size_t res = iconv (cd_88591_to_utf8,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if ((int)res > 0)
-|           result |= 8;
-|         iconv_close (cd_88591_to_utf8);
-|       }
-|   }
-| #endif
-|   /* Test against HP-UX 11.11 bug: No converter from EUC-JP to UTF-8 is
-|      provided.  */
-|   if (/* Try standardized names.  */
-|       iconv_open ("UTF-8", "EUC-JP") == (iconv_t)(-1)
-|       /* Try IRIX, OSF/1 names.  */
-|       && iconv_open ("UTF-8", "eucJP") == (iconv_t)(-1)
-|       /* Try AIX names.  */
-|       && iconv_open ("UTF-8", "IBM-eucJP") == (iconv_t)(-1)
-|       /* Try HP-UX names.  */
-|       && iconv_open ("utf8", "eucJP") == (iconv_t)(-1))
-|     result |= 16;
-|   return result;
-| 
-|   ;
-|   return 0;
-| }
-configure:11434: cc -o conftest -g   conftest.c  >&5
 configure:11434: $? = 0
-configure:11434: ./conftest
-conftest 123546: suicide: sys: trap: fault write addr=0x20bc39 pc=0x20110e
-configure:11434: $? = 1
-configure: program exited with status 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Make"
-| #define PACKAGE_TARNAME "make"
-| #define PACKAGE_VERSION "4.4.1"
-| #define PACKAGE_STRING "GNU Make 4.4.1"
-| #define PACKAGE_BUGREPORT "bug-make@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/make/"
-| #define PACKAGE "make"
-| #define VERSION "4.4.1"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_STDBOOL_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define MAKE_CXX "g++"
-| #define HAVE_ALLOCA_H 1
-| #define HAVE_ALLOCA 1
-| #define eaccess access
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #define GNULIB_TEST_GETLOADAVG 1
-| /* end confdefs.h.  */
-| 
-| #include <iconv.h>
-| #include <string.h>
-| 
-| #ifndef ICONV_CONST
-| # define ICONV_CONST const
-| #endif
-| 
-| int
-| main (void)
-| {
-| int result = 0;
-|   /* Test against AIX 5.1 bug: Failures are not distinguishable from successful
-|      returns.  */
-|   {
-|     iconv_t cd_utf8_to_88591 = iconv_open ("ISO8859-1", "UTF-8");
-|     if (cd_utf8_to_88591 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\342\202\254"; /* EURO SIGN */
-|         char buf[10];
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = strlen (input);
-|         char *outptr = buf;
-|         size_t outbytesleft = sizeof (buf);
-|         size_t res = iconv (cd_utf8_to_88591,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if (res == 0)
-|           result |= 1;
-|         iconv_close (cd_utf8_to_88591);
-|       }
-|   }
-|   /* Test against Solaris 10 bug: Failures are not distinguishable from
-|      successful returns.  */
-|   {
-|     iconv_t cd_ascii_to_88591 = iconv_open ("ISO8859-1", "646");
-|     if (cd_ascii_to_88591 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\263";
-|         char buf[10];
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = strlen (input);
-|         char *outptr = buf;
-|         size_t outbytesleft = sizeof (buf);
-|         size_t res = iconv (cd_ascii_to_88591,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if (res == 0)
-|           result |= 2;
-|         iconv_close (cd_ascii_to_88591);
-|       }
-|   }
-|   /* Test against AIX 6.1..7.1 bug: Buffer overrun.  */
-|   {
-|     iconv_t cd_88591_to_utf8 = iconv_open ("UTF-8", "ISO-8859-1");
-|     if (cd_88591_to_utf8 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\304";
-|         static char buf[2] = { (char)0xDE, (char)0xAD };
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = 1;
-|         char *outptr = buf;
-|         size_t outbytesleft = 1;
-|         size_t res = iconv (cd_88591_to_utf8,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if (res != (size_t)(-1) || outptr - buf > 1 || buf[1] != (char)0xAD)
-|           result |= 4;
-|         iconv_close (cd_88591_to_utf8);
-|       }
-|   }
-| #if 0 /* This bug could be worked around by the caller.  */
-|   /* Test against HP-UX 11.11 bug: Positive return value instead of 0.  */
-|   {
-|     iconv_t cd_88591_to_utf8 = iconv_open ("utf8", "iso88591");
-|     if (cd_88591_to_utf8 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\304rger mit b\366sen B\374bchen ohne Augenma\337";
-|         char buf[50];
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = strlen (input);
-|         char *outptr = buf;
-|         size_t outbytesleft = sizeof (buf);
-|         size_t res = iconv (cd_88591_to_utf8,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if ((int)res > 0)
-|           result |= 8;
-|         iconv_close (cd_88591_to_utf8);
-|       }
-|   }
-| #endif
-|   /* Test against HP-UX 11.11 bug: No converter from EUC-JP to UTF-8 is
-|      provided.  */
-|   if (/* Try standardized names.  */
-|       iconv_open ("UTF-8", "EUC-JP") == (iconv_t)(-1)
-|       /* Try IRIX, OSF/1 names.  */
-|       && iconv_open ("UTF-8", "eucJP") == (iconv_t)(-1)
-|       /* Try AIX names.  */
-|       && iconv_open ("UTF-8", "IBM-eucJP") == (iconv_t)(-1)
-|       /* Try HP-UX names.  */
-|       && iconv_open ("utf8", "eucJP") == (iconv_t)(-1))
-|     result |= 16;
-|   return result;
-| 
-|   ;
-|   return 0;
-| }
-configure:11447: result: no
+configure:11447: result: yes
 configure:11937: checking for GNU gettext in libintl
 configure:11970: cc -o conftest -g    conftest.c  -lintl >&5
-configure:11970: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Make"
-| #define PACKAGE_TARNAME "make"
-| #define PACKAGE_VERSION "4.4.1"
-| #define PACKAGE_STRING "GNU Make 4.4.1"
-| #define PACKAGE_BUGREPORT "bug-make@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/make/"
-| #define PACKAGE "make"
-| #define VERSION "4.4.1"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_STDBOOL_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define MAKE_CXX "g++"
-| #define HAVE_ALLOCA_H 1
-| #define HAVE_ALLOCA 1
-| #define eaccess access
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #define GNULIB_TEST_GETLOADAVG 1
-| /* end confdefs.h.  */
-| 
-| #include <libintl.h>
-| 
-| extern int _nl_msg_cat_cntr;
-| extern
-| #ifdef __cplusplus
-| "C"
-| #endif
-| const char *_nl_expand_alias (const char *);
-| 
-| int
-| main (void)
-| {
-| 
-| bindtextdomain ("", "");
-| return * gettext ("") + _nl_msg_cat_cntr + *_nl_expand_alias ("")
-| 
-|   ;
-|   return 0;
-| }
-configure:12017: result: no
+configure:11970: $? = 0
+configure:12017: result: yes
 configure:12052: checking whether to use NLS
-configure:12054: result: no
+configure:12054: result: yes
+configure:12057: checking where the gettext function comes from
+configure:12068: result: external libintl
+configure:12076: checking how to link with libintl
+configure:12078: result: -lintl
 configure:12127: checking for library containing strerror
 configure:12157: cc -o conftest -g   conftest.c  >&5
 configure:12157: $? = 0
@@ -5898,7 +5615,9 @@ configure:12488: $? = 0
 configure:12488: result: yes
 configure:12494: checking for memory.h
 configure:12494: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: int
+<eof> syntax error, last name: char
+cpp: conftest.c:91 Could not find include file <memory.h>
+cc: 6c: cpp 68274: error
 configure:12494: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5951,6 +5670,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -5997,7 +5720,9 @@ configure:12506: $? = 0
 configure:12506: result: yes
 configure:12512: checking for sys/timeb.h
 configure:12512: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: int
+<eof> syntax error, last name: cha
+cpp: conftest.c:93 Could not find include file <sys/timeb.h>
+cc: 6c: cpp 68313: error
 configure:12512: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6050,6 +5775,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -6100,203 +5829,16 @@ configure:12524: $? = 0
 configure:12524: result: yes
 configure:12530: checking for sys/file.h
 configure:12530: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: i
-configure:12530: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Make"
-| #define PACKAGE_TARNAME "make"
-| #define PACKAGE_VERSION "4.4.1"
-| #define PACKAGE_STRING "GNU Make 4.4.1"
-| #define PACKAGE_BUGREPORT "bug-make@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/make/"
-| #define PACKAGE "make"
-| #define VERSION "4.4.1"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_STDBOOL_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define MAKE_CXX "g++"
-| #define HAVE_ALLOCA_H 1
-| #define HAVE_ALLOCA 1
-| #define eaccess access
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #define GNULIB_TEST_GETLOADAVG 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_RESOURCE_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_SYS_SELECT_H 1
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| #include <sys/file.h>
-configure:12530: result: no
+configure:12530: $? = 0
+configure:12530: result: yes
 configure:12536: checking for fcntl.h
 configure:12536: cc -c -g  conftest.c >&5
 configure:12536: $? = 0
 configure:12536: result: yes
 configure:12542: checking for spawn.h
 configure:12542: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: fpathconf
-configure:12542: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Make"
-| #define PACKAGE_TARNAME "make"
-| #define PACKAGE_VERSION "4.4.1"
-| #define PACKAGE_STRING "GNU Make 4.4.1"
-| #define PACKAGE_BUGREPORT "bug-make@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/make/"
-| #define PACKAGE "make"
-| #define VERSION "4.4.1"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_STDBOOL_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define MAKE_CXX "g++"
-| #define HAVE_ALLOCA_H 1
-| #define HAVE_ALLOCA 1
-| #define eaccess access
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #define GNULIB_TEST_GETLOADAVG 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_RESOURCE_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_FCNTL_H 1
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| #include <spawn.h>
-configure:12542: result: no
+configure:12542: $? = 0
+configure:12542: result: yes
 configure:12551: checking for an ANSI C-conforming const
 configure:12618: cc -c -g  conftest.c >&5
 configure:12618: $? = 0
@@ -6307,7 +5849,8 @@ configure:12667: checking for pid_t
 configure:12667: cc -c -g  conftest.c >&5
 configure:12667: $? = 0
 configure:12667: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:96[stdin:1574] syntax error, last name: pid_t
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:102[stdin:4775] syntax error, last name: pid_t
+cc: cpp: 6c 68433: error
 configure:12667: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6360,6 +5903,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -6371,7 +5918,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | /* end confdefs.h.  */
 | #include <stddef.h>
 | #ifdef HAVE_STDIO_H
@@ -6415,7 +5964,8 @@ configure:12703: checking for off_t
 configure:12703: cc -c -g  conftest.c >&5
 configure:12703: $? = 0
 configure:12703: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:95[stdin:1573] syntax error, last name: off_t
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:101[stdin:4774] syntax error, last name: off_t
+cc: cpp: 6c 68461: error
 configure:12703: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6468,6 +6018,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -6479,7 +6033,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | /* end confdefs.h.  */
 | #include <stddef.h>
 | #ifdef HAVE_STDIO_H
@@ -6524,7 +6080,8 @@ configure:12723: checking for ssize_t
 configure:12723: cc -c -g  conftest.c >&5
 configure:12723: $? = 0
 configure:12723: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:95[stdin:1573] syntax error, last name: ssize_t
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:101[stdin:4774] syntax error, last name: ssize_t
+cc: cpp: 6c 68494: error
 configure:12723: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6577,6 +6134,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -6588,7 +6149,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | /* end confdefs.h.  */
 | #include <stddef.h>
 | #ifdef HAVE_STDIO_H
@@ -6641,7 +6204,8 @@ configure:12857: checking for intmax_t
 configure:12857: cc -c -g  conftest.c >&5
 configure:12857: $? = 0
 configure:12857: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:97[stdin:1575] syntax error, last name: intmax_t
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:103[stdin:4776] syntax error, last name: intmax_t
+cc: cpp: 6c 68557: error
 configure:12857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6694,6 +6258,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -6705,7 +6273,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | /* end confdefs.h.  */
@@ -6750,7 +6320,8 @@ configure:12875: checking for uintmax_t
 configure:12875: cc -c -g  conftest.c >&5
 configure:12875: $? = 0
 configure:12875: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:98[stdin:1576] syntax error, last name: uintmax_t
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:104[stdin:4777] syntax error, last name: uintmax_t
+cc: cpp: 6c 68586: error
 configure:12875: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6803,6 +6374,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -6814,7 +6389,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -6860,7 +6437,8 @@ configure:12894: checking for sig_atomic_t
 configure:12894: cc -c -g  conftest.c >&5
 configure:12894: $? = 0
 configure:12894: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:73[stdin:236] syntax error, last name: sig_atomic_t
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:79[stdin:1493] syntax error, last name: sig_atomic_t
+cc: cpp: 6c 68615: error
 configure:12894: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6913,6 +6491,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -6924,7 +6506,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -6973,228 +6557,12 @@ configure:13134: $? = 0
 configure:13134: result: yes
 configure:13140: checking for stpcpy
 configure:13140: cc -o conftest -g   conftest.c  >&5
-main: undefined: stpcpy in main
-configure:13140: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Make"
-| #define PACKAGE_TARNAME "make"
-| #define PACKAGE_VERSION "4.4.1"
-| #define PACKAGE_STRING "GNU Make 4.4.1"
-| #define PACKAGE_BUGREPORT "bug-make@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/make/"
-| #define PACKAGE "make"
-| #define VERSION "4.4.1"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_STDBOOL_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define MAKE_CXX "g++"
-| #define HAVE_ALLOCA_H 1
-| #define HAVE_ALLOCA 1
-| #define eaccess access
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #define GNULIB_TEST_GETLOADAVG 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_RESOURCE_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_UINTMAX_T 1
-| #define HAVE_SIG_ATOMIC_T 1
-| #define ST_MTIM_NSEC st_mtim.tv_nsec
-| #define FILE_TIMESTAMP_HI_RES 1
-| #define HAVE_CLOCK_GETTIME 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_STRTOLL 1
-| #define HAVE_STRDUP 1
-| #define HAVE_STRNDUP 1
-| /* end confdefs.h.  */
-| /* Define stpcpy to an innocuous variant, in case <limits.h> declares stpcpy.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define stpcpy innocuous_stpcpy
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char stpcpy (); below.  */
-| 
-| #include <limits.h>
-| #undef stpcpy
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char stpcpy ();
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_stpcpy || defined __stub___stpcpy
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return stpcpy ();
-|   ;
-|   return 0;
-| }
-configure:13140: result: no
+configure:13140: $? = 0
+configure:13140: result: yes
 configure:13146: checking for memrchr
 configure:13146: cc -o conftest -g   conftest.c  >&5
-main: undefined: memrchr in main
-configure:13146: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Make"
-| #define PACKAGE_TARNAME "make"
-| #define PACKAGE_VERSION "4.4.1"
-| #define PACKAGE_STRING "GNU Make 4.4.1"
-| #define PACKAGE_BUGREPORT "bug-make@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/make/"
-| #define PACKAGE "make"
-| #define VERSION "4.4.1"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_STDBOOL_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define MAKE_CXX "g++"
-| #define HAVE_ALLOCA_H 1
-| #define HAVE_ALLOCA 1
-| #define eaccess access
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #define GNULIB_TEST_GETLOADAVG 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_RESOURCE_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_UINTMAX_T 1
-| #define HAVE_SIG_ATOMIC_T 1
-| #define ST_MTIM_NSEC st_mtim.tv_nsec
-| #define FILE_TIMESTAMP_HI_RES 1
-| #define HAVE_CLOCK_GETTIME 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_STRTOLL 1
-| #define HAVE_STRDUP 1
-| #define HAVE_STRNDUP 1
-| /* end confdefs.h.  */
-| /* Define memrchr to an innocuous variant, in case <limits.h> declares memrchr.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define memrchr innocuous_memrchr
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char memrchr (); below.  */
-| 
-| #include <limits.h>
-| #undef memrchr
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char memrchr ();
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_memrchr || defined __stub___memrchr
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return memrchr ();
-|   ;
-|   return 0;
-| }
-configure:13146: result: no
+configure:13146: $? = 0
+configure:13146: result: yes
 configure:13152: checking for mempcpy
 configure:13152: cc -o conftest -g   conftest.c  >&5
 configure:13152: $? = 0
@@ -7234,6 +6602,7 @@ configure:13200: result: yes
 configure:13206: checking for sigsetmask
 configure:13206: cc -o conftest -g   conftest.c  >&5
 main: undefined: sigsetmask in main
+cc: 6l: 6l 68925: error
 configure:13206: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7286,6 +6655,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -7297,7 +6670,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -7310,6 +6685,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -7363,6 +6740,7 @@ configure:13218: result: yes
 configure:13224: checking for seteuid
 configure:13224: cc -o conftest -g   conftest.c  >&5
 main: undefined: seteuid in main
+cc: 6l: 6l 68978: error
 configure:13224: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7415,6 +6793,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -7426,7 +6808,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -7439,6 +6823,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -7486,6 +6872,7 @@ configure:13224: result: no
 configure:13230: checking for setegid
 configure:13230: cc -o conftest -g   conftest.c  >&5
 main: undefined: setegid in main
+cc: 6l: 6l 68999: error
 configure:13230: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7538,6 +6925,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -7549,7 +6940,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -7562,6 +6955,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -7613,6 +7008,7 @@ configure:13236: result: yes
 configure:13242: checking for setreuid
 configure:13242: cc -o conftest -g   conftest.c  >&5
 main: undefined: setreuid in main
+cc: 6l: 6l 69036: error
 configure:13242: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7665,6 +7061,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -7676,7 +7076,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -7689,6 +7091,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -7737,6 +7141,7 @@ configure:13242: result: no
 configure:13248: checking for setregid
 configure:13248: cc -o conftest -g   conftest.c  >&5
 main: undefined: setregid in main
+cc: 6l: 6l 69057: error
 configure:13248: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7789,6 +7194,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -7800,7 +7209,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -7813,6 +7224,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -7864,254 +7277,12 @@ configure:13254: $? = 0
 configure:13254: result: yes
 configure:13260: checking for getrlimit
 configure:13260: cc -o conftest -g   conftest.c  >&5
-main: undefined: getrlimit in main
-configure:13260: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Make"
-| #define PACKAGE_TARNAME "make"
-| #define PACKAGE_VERSION "4.4.1"
-| #define PACKAGE_STRING "GNU Make 4.4.1"
-| #define PACKAGE_BUGREPORT "bug-make@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/make/"
-| #define PACKAGE "make"
-| #define VERSION "4.4.1"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_STDBOOL_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define MAKE_CXX "g++"
-| #define HAVE_ALLOCA_H 1
-| #define HAVE_ALLOCA 1
-| #define eaccess access
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #define GNULIB_TEST_GETLOADAVG 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_RESOURCE_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_UINTMAX_T 1
-| #define HAVE_SIG_ATOMIC_T 1
-| #define ST_MTIM_NSEC st_mtim.tv_nsec
-| #define FILE_TIMESTAMP_HI_RES 1
-| #define HAVE_CLOCK_GETTIME 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_STRTOLL 1
-| #define HAVE_STRDUP 1
-| #define HAVE_STRNDUP 1
-| #define HAVE_MEMPCPY 1
-| #define HAVE_UMASK 1
-| #define HAVE_MKSTEMP 1
-| #define HAVE_MKTEMP 1
-| #define HAVE_FDOPEN 1
-| #define HAVE_DUP 1
-| #define HAVE_DUP2 1
-| #define HAVE_GETCWD 1
-| #define HAVE_REALPATH 1
-| #define HAVE_SIGACTION 1
-| #define HAVE_GETGROUPS 1
-| #define HAVE_SETLINEBUF 1
-| #define HAVE_MKFIFO 1
-| /* end confdefs.h.  */
-| /* Define getrlimit to an innocuous variant, in case <limits.h> declares getrlimit.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define getrlimit innocuous_getrlimit
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char getrlimit (); below.  */
-| 
-| #include <limits.h>
-| #undef getrlimit
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char getrlimit ();
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_getrlimit || defined __stub___getrlimit
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return getrlimit ();
-|   ;
-|   return 0;
-| }
-configure:13260: result: no
+configure:13260: $? = 0
+configure:13260: result: yes
 configure:13266: checking for setrlimit
 configure:13266: cc -o conftest -g   conftest.c  >&5
-main: undefined: setrlimit in main
-configure:13266: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Make"
-| #define PACKAGE_TARNAME "make"
-| #define PACKAGE_VERSION "4.4.1"
-| #define PACKAGE_STRING "GNU Make 4.4.1"
-| #define PACKAGE_BUGREPORT "bug-make@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/make/"
-| #define PACKAGE "make"
-| #define VERSION "4.4.1"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_STDBOOL_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define MAKE_CXX "g++"
-| #define HAVE_ALLOCA_H 1
-| #define HAVE_ALLOCA 1
-| #define eaccess access
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #ifndef __i386__
-| #define __i386__ 1
-| #endif
-| #define GNULIB_TEST_GETLOADAVG 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_RESOURCE_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_UINTMAX_T 1
-| #define HAVE_SIG_ATOMIC_T 1
-| #define ST_MTIM_NSEC st_mtim.tv_nsec
-| #define FILE_TIMESTAMP_HI_RES 1
-| #define HAVE_CLOCK_GETTIME 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_STRTOLL 1
-| #define HAVE_STRDUP 1
-| #define HAVE_STRNDUP 1
-| #define HAVE_MEMPCPY 1
-| #define HAVE_UMASK 1
-| #define HAVE_MKSTEMP 1
-| #define HAVE_MKTEMP 1
-| #define HAVE_FDOPEN 1
-| #define HAVE_DUP 1
-| #define HAVE_DUP2 1
-| #define HAVE_GETCWD 1
-| #define HAVE_REALPATH 1
-| #define HAVE_SIGACTION 1
-| #define HAVE_GETGROUPS 1
-| #define HAVE_SETLINEBUF 1
-| #define HAVE_MKFIFO 1
-| /* end confdefs.h.  */
-| /* Define setrlimit to an innocuous variant, in case <limits.h> declares setrlimit.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define setrlimit innocuous_setrlimit
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char setrlimit (); below.  */
-| 
-| #include <limits.h>
-| #undef setrlimit
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char setrlimit ();
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_setrlimit || defined __stub___setrlimit
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return setrlimit ();
-|   ;
-|   return 0;
-| }
-configure:13266: result: no
+configure:13266: $? = 0
+configure:13266: result: yes
 configure:13272: checking for setvbuf
 configure:13272: cc -o conftest -g   conftest.c  >&5
 configure:13272: $? = 0
@@ -8151,6 +7322,7 @@ configure:13320: result: yes
 configure:13326: checking for pselect
 configure:13326: cc -o conftest -g   conftest.c  >&5
 main: undefined: pselect in main
+cc: 6l: 6l 69270: error
 configure:13326: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8203,6 +7375,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -8214,7 +7390,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -8227,6 +7405,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -8240,6 +7420,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -8290,9 +7472,10 @@ configure:13338: checking for posix_spawnattr_setsigmask
 configure:13338: cc -o conftest -g   conftest.c  >&5
 configure:13338: $? = 0
 configure:13338: result: yes
-configure:13349: checking whether bsd_signal is declared
+configure:13349: checking whether  is declared
 configure:13349: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:110[stdin:273] name not declared: bsd_signal
+cpp: conftest.c:116 Syntax error in #ifdef/#ifndef
+cc: 6c: cpp 69326: errors
 configure:13349: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8345,6 +7528,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -8356,7 +7543,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -8369,6 +7558,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -8382,6 +7573,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -8400,11 +7593,11 @@ configure: failed program was:
 | int
 | main (void)
 | {
-| #ifndef bsd_signal
+| #ifndef 
 | #ifdef __cplusplus
-|   (void) bsd_signal;
+|   (void) ;
 | #else
-|   (void) bsd_signal;
+|   (void) ;
 | #endif
 | #endif
 | 
@@ -8419,6 +7612,7 @@ configure:13366: result: yes
 configure:13366: checking for vfork
 configure:13366: cc -o conftest -g   conftest.c  >&5
 main: undefined: vfork in main
+cc: 6l: 6l 69362: error
 configure:13366: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8471,6 +7665,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -8482,7 +7680,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -8495,6 +7695,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -8508,6 +7710,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -8571,6 +7775,7 @@ configure:13599: result: yes
 configure:13605: checking for strcmpi
 configure:13605: cc -o conftest -g   conftest.c  >&5
 main: undefined: strcmpi in main
+cc: 6l: 6l 69436: error
 configure:13605: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8623,6 +7828,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -8634,7 +7843,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -8647,6 +7858,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -8660,6 +7873,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -8713,6 +7928,7 @@ configure:13605: result: no
 configure:13611: checking for strncmpi
 configure:13611: cc -o conftest -g   conftest.c  >&5
 main: undefined: strncmpi in main
+cc: 6l: 6l 69457: error
 configure:13611: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8765,6 +7981,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -8776,7 +7996,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -8789,6 +8011,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -8802,6 +8026,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -8855,6 +8081,7 @@ configure:13611: result: no
 configure:13617: checking for stricmp
 configure:13617: cc -o conftest -g   conftest.c  >&5
 main: undefined: stricmp in main
+cc: 6l: 6l 69478: error
 configure:13617: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8907,6 +8134,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -8918,7 +8149,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -8931,6 +8164,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -8944,6 +8179,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -8997,6 +8234,7 @@ configure:13617: result: no
 configure:13623: checking for strnicmp
 configure:13623: cc -o conftest -g   conftest.c  >&5
 main: undefined: strnicmp in main
+cc: 6l: 6l 69499: error
 configure:13623: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9049,6 +8287,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -9060,7 +8302,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -9073,6 +8317,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -9086,6 +8332,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -9154,9 +8402,10 @@ configure:13818: checking for pkg-config
 configure:13856: result: no
 configure:13895: checking for GNU Guile
 configure:13907: result: no
-configure:14076: checking whether sys_siglist is declared
+configure:14076: checking whether  is declared
 configure:14076: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:150[stdin:1968] name not declared: sys_siglist
+cpp: conftest.c:156 Syntax error in #ifdef/#ifndef
+cc: 6c: cpp 69578: errors
 configure:14076: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9209,6 +8458,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -9220,7 +8473,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -9233,6 +8488,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -9246,6 +8503,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -9304,11 +8563,11 @@ configure: failed program was:
 | int
 | main (void)
 | {
-| #ifndef sys_siglist
+| #ifndef 
 | #ifdef __cplusplus
-|   (void) sys_siglist;
+|   (void) ;
 | #else
-|   (void) sys_siglist;
+|   (void) ;
 | #endif
 | #endif
 | 
@@ -9316,9 +8575,10 @@ configure: failed program was:
 |   return 0;
 | }
 configure:14076: result: no
-configure:14091: checking whether _sys_siglist is declared
+configure:14091: checking whether  is declared
 configure:14091: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:151[stdin:1969] name not declared: _sys_siglist
+cpp: conftest.c:157 Syntax error in #ifdef/#ifndef
+cc: 6c: cpp 69602: errors
 configure:14091: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9371,6 +8631,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -9382,7 +8646,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -9395,6 +8661,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -9408,6 +8676,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -9467,11 +8737,11 @@ configure: failed program was:
 | int
 | main (void)
 | {
-| #ifndef _sys_siglist
+| #ifndef 
 | #ifdef __cplusplus
-|   (void) _sys_siglist;
+|   (void) ;
 | #else
-|   (void) _sys_siglist;
+|   (void) ;
 | #endif
 | #endif
 | 
@@ -9479,9 +8749,10 @@ configure: failed program was:
 |   return 0;
 | }
 configure:14091: result: no
-configure:14106: checking whether __sys_siglist is declared
+configure:14106: checking whether  is declared
 configure:14106: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:152[stdin:1970] name not declared: __sys_siglist
+cpp: conftest.c:158 Syntax error in #ifdef/#ifndef
+cc: 6c: cpp 69626: errors
 configure:14106: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9534,6 +8805,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -9545,7 +8820,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -9558,6 +8835,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -9571,6 +8850,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -9631,11 +8912,11 @@ configure: failed program was:
 | int
 | main (void)
 | {
-| #ifndef __sys_siglist
+| #ifndef 
 | #ifdef __cplusplus
-|   (void) __sys_siglist;
+|   (void) ;
 | #else
-|   (void) __sys_siglist;
+|   (void) ;
 | #endif
 | #endif
 | 
@@ -9657,7 +8938,8 @@ configure:14139: $? = 0
 configure:14139: result: yes
 configure:14146: checking for union wait
 configure:14179: cc -o conftest -g   conftest.c  >&5
-/usr/glenda/APExp/sys/src/external/gmake/conftest.c:127[stdin:230] syntax error, last name: chunks
+/usr/glenda/APExp/sys/src/external/gmake/conftest.c:137[stdin:308] syntax error, last name: chunks
+cc: cpp: 6c 69691: error
 configure:14179: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9710,6 +8992,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -9721,7 +9007,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -9734,6 +9022,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -9747,6 +9037,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -9802,9 +9094,11 @@ configure:14662: checking for SA_RESTART
 configure:14680: cc -c -g  conftest.c >&5
 configure:14680: $? = 0
 configure:14688: result: yes
-configure:14727: checking whether dlopen is declared
+configure:14727: checking whether  is declared
 configure:14727: cc -c -g   conftest.c >&5
-/sys/include/ape/dlfcn.h:20[stdin:137] name not declared: NULL
+/sys/include/ape/dlfcn.h:20[stdin:147] name not declared: NULL
+cpp: conftest.c:131 Syntax error in #ifdef/#ifndef
+cc: 6c: cpp 69731: errors
 configure:14727: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9857,6 +9151,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -9868,7 +9166,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -9881,6 +9181,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -9894,6 +9196,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -9927,11 +9231,11 @@ configure: failed program was:
 | int
 | main (void)
 | {
-| #ifndef dlopen
+| #ifndef 
 | #ifdef __cplusplus
-|   (void) dlopen;
+|   (void) ;
 | #else
-|   (void) dlopen;
+|   (void) ;
 | #endif
 | #endif
 | 
@@ -9939,9 +9243,11 @@ configure: failed program was:
 |   return 0;
 | }
 configure:14727: result: no
-configure:14736: checking whether dlsym is declared
+configure:14736: checking whether  is declared
 configure:14736: cc -c -g   conftest.c >&5
-/sys/include/ape/dlfcn.h:20[stdin:138] name not declared: NULL
+/sys/include/ape/dlfcn.h:20[stdin:148] name not declared: NULL
+cpp: conftest.c:132 Syntax error in #ifdef/#ifndef
+cc: 6c: cpp 69755: errors
 configure:14736: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9994,6 +9300,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -10005,7 +9315,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -10018,6 +9330,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -10031,6 +9345,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -10065,11 +9381,11 @@ configure: failed program was:
 | int
 | main (void)
 | {
-| #ifndef dlsym
+| #ifndef 
 | #ifdef __cplusplus
-|   (void) dlsym;
+|   (void) ;
 | #else
-|   (void) dlsym;
+|   (void) ;
 | #endif
 | #endif
 | 
@@ -10077,9 +9393,11 @@ configure: failed program was:
 |   return 0;
 | }
 configure:14736: result: no
-configure:14745: checking whether dlerror is declared
+configure:14745: checking whether  is declared
 configure:14745: cc -c -g   conftest.c >&5
-/sys/include/ape/dlfcn.h:20[stdin:139] name not declared: NULL
+/sys/include/ape/dlfcn.h:20[stdin:149] name not declared: NULL
+cpp: conftest.c:133 Syntax error in #ifdef/#ifndef
+cc: 6c: cpp 69779: errors
 configure:14745: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -10132,6 +9450,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -10143,7 +9465,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -10156,6 +9480,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -10169,6 +9495,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -10204,11 +9532,11 @@ configure: failed program was:
 | int
 | main (void)
 | {
-| #ifndef dlerror
+| #ifndef 
 | #ifdef __cplusplus
-|   (void) dlerror;
+|   (void) ;
 | #else
-|   (void) dlerror;
+|   (void) ;
 | #endif
 | #endif
 | 
@@ -10218,8 +9546,8 @@ configure: failed program was:
 configure:14745: result: no
 configure:14931: checking for posix_spawn that fails synchronously
 configure:14954: cc -o conftest -g   conftest.c  >&5
-cpp: conftest.c:122 Could not find include file <spawn.h>
-cc: 6c: cpp 125276: error
+configure:14954: $? = 0
+configure:14954: ./conftest
 configure:14954: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -10273,6 +9601,10 @@ configure: failed program was:
 | #define __i386__ 1
 | #endif
 | #define GNULIB_TEST_GETLOADAVG 1
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_DIRENT_H 1
 | #define HAVE_STDLIB_H 1
 | #define HAVE_STRING_H 1
@@ -10284,7 +9616,9 @@ configure: failed program was:
 | #define HAVE_SYS_RESOURCE_H 1
 | #define HAVE_SYS_TIME_H 1
 | #define HAVE_SYS_SELECT_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_FCNTL_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_UNSIGNED_LONG_LONG_INT 1
 | #define HAVE_LONG_LONG_INT 1
 | #define HAVE_INTMAX_T 1
@@ -10297,6 +9631,8 @@ configure: failed program was:
 | #define HAVE_STRTOLL 1
 | #define HAVE_STRDUP 1
 | #define HAVE_STRNDUP 1
+| #define HAVE_STPCPY 1
+| #define HAVE_MEMRCHR 1
 | #define HAVE_MEMPCPY 1
 | #define HAVE_UMASK 1
 | #define HAVE_MKSTEMP 1
@@ -10310,6 +9646,8 @@ configure: failed program was:
 | #define HAVE_GETGROUPS 1
 | #define HAVE_SETLINEBUF 1
 | #define HAVE_MKFIFO 1
+| #define HAVE_GETRLIMIT 1
+| #define HAVE_SETRLIMIT 1
 | #define HAVE_SETVBUF 1
 | #define HAVE_PIPE 1
 | #define HAVE_STRERROR 1
@@ -10375,19 +9713,21 @@ generated by GNU Autoconf 2.71.  Invocation command line was
 
 on krypton
 
-config.status:1076: creating build.cfg
-config.status:1076: creating tests/config-flags.pm
-config.status:1076: creating Makefile
-config.status:1076: creating lib/Makefile
-config.status:1076: creating doc/Makefile
-config.status:1076: creating po/Makefile.in
-config.status:1076: creating src/config.h
-config.status:1341: executing depfiles commands
-config.status:1416: cd .       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
-config.status:1423: $? = 0
-config.status:1416: cd lib       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
-config.status:1423: $? = 0
-config.status:1341: executing po-directories commands
+config.status:958: creating build.cfg
+config.status:958: creating tests/config-flags.pm
+config.status:958: creating Makefile
+config.status:958: creating lib/Makefile
+config.status:958: creating doc/Makefile
+config.status:958: creating po/Makefile.in
+config.status:958: creating src/config.h
+config.status:1223: executing depfiles commands
+config.status:1298: cd .       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+make: Nothing to be done for 'am--depfiles'.
+config.status:1305: $? = 0
+config.status:1298: cd lib       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+make: Nothing to be done for 'am--depfiles'.
+config.status:1305: $? = 0
+config.status:1223: executing po-directories commands
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -10446,12 +9786,12 @@ ac_cv_func_fork_works=yes
 ac_cv_func_getcwd=yes
 ac_cv_func_getgroups=yes
 ac_cv_func_getloadavg=no
-ac_cv_func_getrlimit=no
+ac_cv_func_getrlimit=yes
 ac_cv_func_gettimeofday=yes
 ac_cv_func_isatty=yes
 ac_cv_func_lstat=yes
 ac_cv_func_mempcpy=yes
-ac_cv_func_memrchr=no
+ac_cv_func_memrchr=yes
 ac_cv_func_mkfifo=yes
 ac_cv_func_mkstemp=yes
 ac_cv_func_mktemp=yes
@@ -10467,11 +9807,11 @@ ac_cv_func_seteuid=no
 ac_cv_func_setlinebuf=yes
 ac_cv_func_setregid=no
 ac_cv_func_setreuid=no
-ac_cv_func_setrlimit=no
+ac_cv_func_setrlimit=yes
 ac_cv_func_setvbuf=yes
 ac_cv_func_sigaction=yes
 ac_cv_func_sigsetmask=no
-ac_cv_func_stpcpy=no
+ac_cv_func_stpcpy=yes
 ac_cv_func_strcasecmp=yes
 ac_cv_func_strcmpi=no
 ac_cv_func_strcoll_works=yes
@@ -10508,7 +9848,7 @@ ac_cv_header_mach_mach_h=no
 ac_cv_header_memory_h=no
 ac_cv_header_minix_config_h=no
 ac_cv_header_nlist_h=no
-ac_cv_header_spawn_h=no
+ac_cv_header_spawn_h=yes
 ac_cv_header_stat_broken=no
 ac_cv_header_stdbool_h=yes
 ac_cv_header_stdint_h=yes
@@ -10518,7 +9858,7 @@ ac_cv_header_string_h=yes
 ac_cv_header_strings_h=yes
 ac_cv_header_sys_cpustats_h=no
 ac_cv_header_sys_dg_sys_info_h=no
-ac_cv_header_sys_file_h=no
+ac_cv_header_sys_file_h=yes
 ac_cv_header_sys_loadavg_h=no
 ac_cv_header_sys_param_h=yes
 ac_cv_header_sys_resource_h=yes
@@ -10541,12 +9881,12 @@ ac_cv_lib_util_getloadavg=no
 ac_cv_member_struct_dirent_d_type=yes
 ac_cv_objext=o
 ac_cv_path_EGREP='/bin/grep -E'
-ac_cv_path_GMSGFMT=:
+ac_cv_path_GMSGFMT=/bin/msgfmt
 ac_cv_path_GREP=/bin/grep
-ac_cv_path_MSGFMT=:
+ac_cv_path_MSGFMT=/bin/msgfmt
 ac_cv_path_MSGMERGE=/bin/msgmerge
 ac_cv_path_SED=/bin/sed
-ac_cv_path_XGETTEXT=:
+ac_cv_path_XGETTEXT=/bin/xgettext
 ac_cv_path_install='/bin/install -c'
 ac_cv_prog_AR=ar
 ac_cv_prog_AWK=awk
@@ -10563,7 +9903,7 @@ ac_cv_prog_cc_stdc=
 ac_cv_prog_cxx_11=no
 ac_cv_prog_cxx_g=no
 ac_cv_prog_cxx_stdcxx=
-ac_cv_prog_make_make_set=yes
+ac_cv_prog_make__set=yes
 ac_cv_safe_to_define___extensions__=yes
 ac_cv_search_clock_gettime='none required'
 ac_cv_search_getpwnam='none required'
@@ -10583,22 +9923,13 @@ ac_cv_type_uid_t=yes
 ac_cv_type_uintmax_t=yes
 ac_cv_type_unsigned_long_long_int=yes
 ac_cv_working_alloca_h=yes
-acl_cv_hardcode_direct=no
-acl_cv_hardcode_libdir_flag_spec=
-acl_cv_hardcode_libdir_separator=
-acl_cv_hardcode_minus_L=no
-acl_cv_libext=a
-acl_cv_libname_spec='lib$name'
-acl_cv_library_names_spec=
 acl_cv_path_LD=pcc
 acl_cv_prog_gnu_ld=no
 acl_cv_rpath=done
-acl_cv_shlibext=so
-acl_cv_wl=
 am_cv_CC_dependencies_compiler_type=none
 am_cv_CXX_dependencies_compiler_type=none
 am_cv_func_iconv=yes
-am_cv_func_iconv_works=no
+am_cv_func_iconv_works=yes
 am_cv_lib_iconv=no
 am_cv_make_support_nested_variables=yes
 am_cv_prog_cc_c_o=yes
@@ -10612,7 +9943,7 @@ gl_cv_rpl_alloca=no
 gt_cv_func_CFLocaleCopyCurrent=no
 gt_cv_func_CFPreferencesCopyAppValue=no
 gt_cv_func_gnugettext1_libc=no
-gt_cv_func_gnugettext1_libintl=no
+gt_cv_func_gnugettext1_libintl=yes
 make_cv_file_timestamp_hi_res=yes
 make_cv_job_server=yes
 make_cv_load=no
@@ -10675,8 +10006,8 @@ GL_COND_OBJ_GETLOADAVG_TRUE=''
 GL_GENERATE_ALLOCA_H_FALSE=''
 GL_GENERATE_ALLOCA_H_TRUE='#'
 GL_GNULIB_GETLOADAVG='1'
-GMSGFMT=':'
-GMSGFMT_015=':'
+GMSGFMT='/bin/msgfmt'
+GMSGFMT_015='/bin/msgfmt'
 GREP='/bin/grep'
 GUILE_CFLAGS=''
 GUILE_LIBS=''
@@ -10690,7 +10021,7 @@ INSTALL_DATA='${INSTALL} -m 644'
 INSTALL_PROGRAM='${INSTALL}'
 INSTALL_SCRIPT='${INSTALL}'
 INSTALL_STRIP_PROGRAM='$(install_sh) -c -s'
-INTLLIBS=''
+INTLLIBS='-lintl'
 INTL_MACOSX_LIBS=''
 KNOWN_PREFIX_FALSE='#'
 KNOWN_PREFIX_TRUE=''
@@ -10698,17 +10029,17 @@ LDFLAGS=''
 LIBGNU_LIBDEPS=''
 LIBGNU_LTLIBDEPS=''
 LIBICONV=''
-LIBINTL=''
+LIBINTL='-lintl'
 LIBOBJS=''
 LIBS=''
 LTLIBICONV=''
-LTLIBINTL=''
+LTLIBINTL='-lintl'
 LTLIBOBJS=''
 MAKEINFO='${SHELL} '\''/usr/glenda/APExp/sys/src/external/gmake/build-aux/missing'\'' makeinfo'
 MAKE_HOST='x86_64-unknown-plan9'
 MKDIR_P='./build-aux/install-sh -c -d'
-MSGFMT=':'
-MSGFMT_015=':'
+MSGFMT='/bin/msgfmt'
+MSGFMT_015='/bin/msgfmt'
 MSGMERGE='/bin/msgmerge'
 OBJEXT='o'
 PACKAGE='make'
@@ -10723,7 +10054,7 @@ PERL='perl'
 PKG_CONFIG=''
 PKG_CONFIG_LIBDIR=''
 PKG_CONFIG_PATH=''
-POSUB=''
+POSUB='po'
 RANLIB='ranlib'
 REMOTE='stub'
 SED='/bin/sed'
@@ -10732,15 +10063,15 @@ SHELL='/bin/sh'
 STRIP=''
 USE_CUSTOMS_FALSE=''
 USE_CUSTOMS_TRUE='#'
-USE_NLS='no'
+USE_NLS='yes'
 USE_SYSTEM_GLOB='no'
 USE_SYSTEM_GLOB_FALSE=''
 USE_SYSTEM_GLOB_TRUE='#'
 VERSION='4.4.1'
 WINDOWSENV_FALSE=''
 WINDOWSENV_TRUE='#'
-XGETTEXT=':'
-XGETTEXT_015=':'
+XGETTEXT='/bin/xgettext'
+XGETTEXT_015='/bin/xgettext'
 XGETTEXT_EXTRA_OPTIONS=''
 ac_ct_CC=''
 ac_ct_CXX=''
@@ -10861,6 +10192,10 @@ MAINT_MAKEFILE='/dev/null'
 #define __i386__ 1
 #endif
 #define GNULIB_TEST_GETLOADAVG 1
+#define HAVE_ICONV 1
+#define ENABLE_NLS 1
+#define HAVE_GETTEXT 1
+#define HAVE_DCGETTEXT 1
 #define HAVE_DIRENT_H 1
 #define HAVE_STDLIB_H 1
 #define HAVE_STRING_H 1
@@ -10872,7 +10207,9 @@ MAINT_MAKEFILE='/dev/null'
 #define HAVE_SYS_RESOURCE_H 1
 #define HAVE_SYS_TIME_H 1
 #define HAVE_SYS_SELECT_H 1
+#define HAVE_SYS_FILE_H 1
 #define HAVE_FCNTL_H 1
+#define HAVE_SPAWN_H 1
 #define HAVE_UNSIGNED_LONG_LONG_INT 1
 #define HAVE_LONG_LONG_INT 1
 #define HAVE_INTMAX_T 1
@@ -10885,6 +10222,8 @@ MAINT_MAKEFILE='/dev/null'
 #define HAVE_STRTOLL 1
 #define HAVE_STRDUP 1
 #define HAVE_STRNDUP 1
+#define HAVE_STPCPY 1
+#define HAVE_MEMRCHR 1
 #define HAVE_MEMPCPY 1
 #define HAVE_UMASK 1
 #define HAVE_MKSTEMP 1
@@ -10898,6 +10237,8 @@ MAINT_MAKEFILE='/dev/null'
 #define HAVE_GETGROUPS 1
 #define HAVE_SETLINEBUF 1
 #define HAVE_MKFIFO 1
+#define HAVE_GETRLIMIT 1
+#define HAVE_SETRLIMIT 1
 #define HAVE_SETVBUF 1
 #define HAVE_PIPE 1
 #define HAVE_STRERROR 1

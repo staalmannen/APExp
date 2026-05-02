@@ -51,13 +51,6 @@ configure:3165: result: yes
 configure:3324: checking for a race-free mkdir -p
 configure:3368: result: ./build-aux/install-sh -c -d
 configure:3375: checking for gawk
-configure:3410: result: no
-configure:3375: checking for mawk
-configure:3410: result: no
-configure:3375: checking for nawk
-configure:3410: result: no
-configure:3375: checking for awk
-configure:3396: found /bin/awk
 configure:3407: result: awk
 configure:3418: checking whether make sets $(MAKE)
 configure:3441: result: yes
@@ -128,6 +121,7 @@ configure:4666: result: o
 configure:4670: checking whether the compiler supports GNU C
 configure:4690: cc -c   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:16[stdin:17] syntax error, last name: me
+cc: cpp: 6c 36702: error
 configure:4690: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -158,7 +152,12 @@ configure:4732: $? = 0
 configure:4776: result: yes
 configure:4796: checking for cc option to enable C11 features
 configure:4811: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:171[stdin:240] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:171[stdin:251] syntax error, last name: __func__$9
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cpp: conftest.c:167 #error directive: "Compiler does not advertise C11 conformance"
+cc: 6c: cpp 36735: errors
 configure:4811: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -434,7 +433,19 @@ configure: failed program was:
 | }
 | 
 configure:4811: cc -std=gnu11 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:171[stdin:240] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:171[stdin:251] syntax error, last name: __func__$9
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -n ignored
+cc: flag -u ignored
+cc: flag -1 ignored
+cc: flag -1 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cpp: conftest.c:167 #error directive: "Compiler does not advertise C11 conformance"
+cc: 6c: cpp 36749: errors
 configure:4811: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -712,7 +723,11 @@ configure: failed program was:
 configure:4824: result: unsupported
 configure:4842: checking for cc option to enable C99 features
 configure:4857: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 36769: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -928,7 +943,18 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -std=gnu99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -n ignored
+cc: flag -u ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 36783: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1144,7 +1170,16 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -std=c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 36797: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1360,7 +1395,13 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 36811: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1576,7 +1617,13 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -qlanglvl=extc1x -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -q ignored
+cc: can't find library for -l
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 36825: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1792,7 +1839,13 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -qlanglvl=extc99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -q ignored
+cc: can't find library for -l
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 36839: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2008,7 +2061,14 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -AC99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -C ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 36853: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2224,7 +2284,11 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -D_STDC_C99= -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 36867: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2494,7 +2558,9 @@ configure:5134: $? = 0
 configure:5134: result: yes
 configure:5134: checking for minix/config.h
 configure:5134: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: c
+<eof> syntax error, last name: int
+cpp: conftest.c:49 Could not find include file <minix/config.h>
+cc: 6c: cpp 37065: error
 configure:5134: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2568,12 +2634,10 @@ configure:5365: result: /bin/grep
 configure:5370: checking for egrep
 configure:5438: result: /bin/grep -E
 configure:5447: checking for bison
-configure:5482: result: no
-configure:5447: checking for byacc
-configure:5468: found /bin/byacc
-configure:5479: result: byacc
+configure:5468: found /bin/bison
+configure:5479: result: bison -y
 configure:5491: checking whether ln -s works
-configure:5495: result: yes
+configure:5498: result: no, using cp -pR
 configure:5940: checking for C compiler version
 configure:5949: cc --version >&5
 cc: flag -- ignored
@@ -2620,6 +2684,8 @@ configure:6428: checking how to run the C preprocessor
 configure:6454: cc -E  conftest.c
 configure:6454: $? = 0
 configure:6469: cc -E  conftest.c
+cpp: conftest.c:40 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 37251: error
 configure:6469: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2666,6 +2732,8 @@ configure:6496: result: cc -E
 configure:6510: cc -E  conftest.c
 configure:6510: $? = 0
 configure:6525: cc -E  conftest.c
+cpp: conftest.c:40 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 37273: error
 configure:6525: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2713,6 +2781,7 @@ configure:6615: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:50[stdin:48] name not declared: m
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:50[stdin:48] name not declared: m
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:53[stdin:51] syntax error, last name: static
+cc: cpp: 6c 37294: error
 configure:6615: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2797,6 +2866,8 @@ configure:6711: result: cc -E
 configure:6725: cc -E  conftest.c
 configure:6725: $? = 0
 configure:6740: cc -E  conftest.c
+cpp: conftest.c:41 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 37323: error
 configure:6740: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2878,14 +2949,12 @@ configure:7601: checking whether NLS is requested
 configure:7611: result: yes
 configure:7651: checking for msgfmt
 configure: trying /bin/msgfmt...
-msgfmt 66585: suicide: bad address in notify
-configure:7687: result: no
+configure:7684: result: /bin/msgfmt
 configure:7693: checking for gmsgfmt
-configure:7729: result: :
+configure:7729: result: /bin/msgfmt
 configure:7774: checking for xgettext
 configure: trying /bin/xgettext...
-xgettext 66600: suicide: bad address in notify
-configure:7810: result: no
+configure:7807: result: /bin/xgettext
 configure:7852: checking for msgmerge
 configure: trying /bin/msgmerge...
 configure:7884: result: /bin/msgmerge
@@ -2899,6 +2968,7 @@ configure:8147: checking 32-bit host C ABI
 configure:8214: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:44[stdin:45] not a function
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:44[stdin:45] syntax error, last name: fail
+cc: cpp: 6c 37601: error
 configure:8214: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2954,6 +3024,8 @@ configure:8492: checking for the common suffixes of directories in the library s
 configure:8561: result: lib,lib,lib
 configure:9079: checking for CFPreferencesCopyAppValue
 configure:9098: cc -o conftest -g   conftest.c  -Wl,-framework -Wl,CoreFoundation >&5
+cpp: conftest.c:41 Could not find include file <CoreFoundation/CFPreferences.h>
+cc: 6c: cpp 37647: error
 configure:9098: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3007,6 +3079,8 @@ configure: failed program was:
 configure:9108: result: no
 configure:9115: checking for CFLocaleCopyPreferredLanguages
 configure:9134: cc -o conftest -g   conftest.c  -Wl,-framework -Wl,CoreFoundation >&5
+cpp: conftest.c:41 Could not find include file <CoreFoundation/CFLocale.h>
+cc: 6c: cpp 37667: error
 configure:9134: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3060,485 +3134,16 @@ configure: failed program was:
 configure:9144: result: no
 configure:9194: checking for GNU gettext in libc
 configure:9224: cc -o conftest -g   conftest.c  >&5
-configure:9224: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| /* end confdefs.h.  */
-| 
-| #include <libintl.h>
-| #ifndef __GNU_GETTEXT_SUPPORTED_REVISION
-| extern int _nl_msg_cat_cntr;
-| extern int *_nl_domain_bindings;
-| #define __GNU_GETTEXT_SYMBOL_EXPRESSION (_nl_msg_cat_cntr + *_nl_domain_bindings)
-| #else
-| #define __GNU_GETTEXT_SYMBOL_EXPRESSION 0
-| #endif
-| 
-| 
-| int
-| main (void)
-| {
-| 
-| bindtextdomain ("", "");
-| return * gettext ("") + __GNU_GETTEXT_SYMBOL_EXPRESSION
-| 
-|   ;
-|   return 0;
-| }
-configure:9234: result: no
-configure:9268: checking for iconv
-configure:9293: cc -o conftest -g   conftest.c  >&5
-configure:9293: $? = 0
-configure:9329: result: yes
-configure:9332: checking for working iconv
-configure:9475: cc -o conftest -g   conftest.c  >&5
-configure:9475: $? = 0
-configure:9475: ./conftest
-conftest 66786: suicide: sys: trap: fault write addr=0x20bca0 pc=0x201175
-configure:9475: $? = 1
-configure: program exited with status 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| /* end confdefs.h.  */
-| 
-| #include <iconv.h>
-| #include <string.h>
-| 
-| #ifndef ICONV_CONST
-| # define ICONV_CONST 
-| #endif
-| 
-| int
-| main (void)
-| {
-| int result = 0;
-|   /* Test against AIX 5.1 bug: Failures are not distinguishable from successful
-|      returns.  */
-|   {
-|     iconv_t cd_utf8_to_88591 = iconv_open ("ISO8859-1", "UTF-8");
-|     if (cd_utf8_to_88591 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\342\202\254"; /* EURO SIGN */
-|         char buf[10];
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = strlen (input);
-|         char *outptr = buf;
-|         size_t outbytesleft = sizeof (buf);
-|         size_t res = iconv (cd_utf8_to_88591,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if (res == 0)
-|           result |= 1;
-|         iconv_close (cd_utf8_to_88591);
-|       }
-|   }
-|   /* Test against Solaris 10 bug: Failures are not distinguishable from
-|      successful returns.  */
-|   {
-|     iconv_t cd_ascii_to_88591 = iconv_open ("ISO8859-1", "646");
-|     if (cd_ascii_to_88591 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\263";
-|         char buf[10];
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = strlen (input);
-|         char *outptr = buf;
-|         size_t outbytesleft = sizeof (buf);
-|         size_t res = iconv (cd_ascii_to_88591,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if (res == 0)
-|           result |= 2;
-|         iconv_close (cd_ascii_to_88591);
-|       }
-|   }
-|   /* Test against AIX 6.1..7.1 bug: Buffer overrun.  */
-|   {
-|     iconv_t cd_88591_to_utf8 = iconv_open ("UTF-8", "ISO-8859-1");
-|     if (cd_88591_to_utf8 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\304";
-|         static char buf[2] = { (char)0xDE, (char)0xAD };
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = 1;
-|         char *outptr = buf;
-|         size_t outbytesleft = 1;
-|         size_t res = iconv (cd_88591_to_utf8,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if (res != (size_t)(-1) || outptr - buf > 1 || buf[1] != (char)0xAD)
-|           result |= 4;
-|         iconv_close (cd_88591_to_utf8);
-|       }
-|   }
-| #if 0 /* This bug could be worked around by the caller.  */
-|   /* Test against HP-UX 11.11 bug: Positive return value instead of 0.  */
-|   {
-|     iconv_t cd_88591_to_utf8 = iconv_open ("utf8", "iso88591");
-|     if (cd_88591_to_utf8 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\304rger mit b\366sen B\374bchen ohne Augenma\337";
-|         char buf[50];
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = strlen (input);
-|         char *outptr = buf;
-|         size_t outbytesleft = sizeof (buf);
-|         size_t res = iconv (cd_88591_to_utf8,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if ((int)res > 0)
-|           result |= 8;
-|         iconv_close (cd_88591_to_utf8);
-|       }
-|   }
-| #endif
-|   /* Test against HP-UX 11.11 bug: No converter from EUC-JP to UTF-8 is
-|      provided.  */
-|   {
-|     /* Try standardized names.  */
-|     iconv_t cd1 = iconv_open ("UTF-8", "EUC-JP");
-|     /* Try IRIX, OSF/1 names.  */
-|     iconv_t cd2 = iconv_open ("UTF-8", "eucJP");
-|     /* Try AIX names.  */
-|     iconv_t cd3 = iconv_open ("UTF-8", "IBM-eucJP");
-|     /* Try HP-UX names.  */
-|     iconv_t cd4 = iconv_open ("utf8", "eucJP");
-|     if (cd1 == (iconv_t)(-1) && cd2 == (iconv_t)(-1)
-|         && cd3 == (iconv_t)(-1) && cd4 == (iconv_t)(-1))
-|       result |= 16;
-|     if (cd1 != (iconv_t)(-1))
-|       iconv_close (cd1);
-|     if (cd2 != (iconv_t)(-1))
-|       iconv_close (cd2);
-|     if (cd3 != (iconv_t)(-1))
-|       iconv_close (cd3);
-|     if (cd4 != (iconv_t)(-1))
-|       iconv_close (cd4);
-|   }
-|   return result;
-| 
-|   ;
-|   return 0;
-| }
-configure:9475: cc -o conftest -g   conftest.c  >&5
-configure:9475: $? = 0
-configure:9475: ./conftest
-conftest 66803: suicide: sys: trap: fault write addr=0x20bca0 pc=0x201175
-configure:9475: $? = 1
-configure: program exited with status 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| /* end confdefs.h.  */
-| 
-| #include <iconv.h>
-| #include <string.h>
-| 
-| #ifndef ICONV_CONST
-| # define ICONV_CONST const
-| #endif
-| 
-| int
-| main (void)
-| {
-| int result = 0;
-|   /* Test against AIX 5.1 bug: Failures are not distinguishable from successful
-|      returns.  */
-|   {
-|     iconv_t cd_utf8_to_88591 = iconv_open ("ISO8859-1", "UTF-8");
-|     if (cd_utf8_to_88591 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\342\202\254"; /* EURO SIGN */
-|         char buf[10];
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = strlen (input);
-|         char *outptr = buf;
-|         size_t outbytesleft = sizeof (buf);
-|         size_t res = iconv (cd_utf8_to_88591,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if (res == 0)
-|           result |= 1;
-|         iconv_close (cd_utf8_to_88591);
-|       }
-|   }
-|   /* Test against Solaris 10 bug: Failures are not distinguishable from
-|      successful returns.  */
-|   {
-|     iconv_t cd_ascii_to_88591 = iconv_open ("ISO8859-1", "646");
-|     if (cd_ascii_to_88591 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\263";
-|         char buf[10];
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = strlen (input);
-|         char *outptr = buf;
-|         size_t outbytesleft = sizeof (buf);
-|         size_t res = iconv (cd_ascii_to_88591,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if (res == 0)
-|           result |= 2;
-|         iconv_close (cd_ascii_to_88591);
-|       }
-|   }
-|   /* Test against AIX 6.1..7.1 bug: Buffer overrun.  */
-|   {
-|     iconv_t cd_88591_to_utf8 = iconv_open ("UTF-8", "ISO-8859-1");
-|     if (cd_88591_to_utf8 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\304";
-|         static char buf[2] = { (char)0xDE, (char)0xAD };
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = 1;
-|         char *outptr = buf;
-|         size_t outbytesleft = 1;
-|         size_t res = iconv (cd_88591_to_utf8,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if (res != (size_t)(-1) || outptr - buf > 1 || buf[1] != (char)0xAD)
-|           result |= 4;
-|         iconv_close (cd_88591_to_utf8);
-|       }
-|   }
-| #if 0 /* This bug could be worked around by the caller.  */
-|   /* Test against HP-UX 11.11 bug: Positive return value instead of 0.  */
-|   {
-|     iconv_t cd_88591_to_utf8 = iconv_open ("utf8", "iso88591");
-|     if (cd_88591_to_utf8 != (iconv_t)(-1))
-|       {
-|         static ICONV_CONST char input[] = "\304rger mit b\366sen B\374bchen ohne Augenma\337";
-|         char buf[50];
-|         ICONV_CONST char *inptr = input;
-|         size_t inbytesleft = strlen (input);
-|         char *outptr = buf;
-|         size_t outbytesleft = sizeof (buf);
-|         size_t res = iconv (cd_88591_to_utf8,
-|                             &inptr, &inbytesleft,
-|                             &outptr, &outbytesleft);
-|         if ((int)res > 0)
-|           result |= 8;
-|         iconv_close (cd_88591_to_utf8);
-|       }
-|   }
-| #endif
-|   /* Test against HP-UX 11.11 bug: No converter from EUC-JP to UTF-8 is
-|      provided.  */
-|   {
-|     /* Try standardized names.  */
-|     iconv_t cd1 = iconv_open ("UTF-8", "EUC-JP");
-|     /* Try IRIX, OSF/1 names.  */
-|     iconv_t cd2 = iconv_open ("UTF-8", "eucJP");
-|     /* Try AIX names.  */
-|     iconv_t cd3 = iconv_open ("UTF-8", "IBM-eucJP");
-|     /* Try HP-UX names.  */
-|     iconv_t cd4 = iconv_open ("utf8", "eucJP");
-|     if (cd1 == (iconv_t)(-1) && cd2 == (iconv_t)(-1)
-|         && cd3 == (iconv_t)(-1) && cd4 == (iconv_t)(-1))
-|       result |= 16;
-|     if (cd1 != (iconv_t)(-1))
-|       iconv_close (cd1);
-|     if (cd2 != (iconv_t)(-1))
-|       iconv_close (cd2);
-|     if (cd3 != (iconv_t)(-1))
-|       iconv_close (cd3);
-|     if (cd4 != (iconv_t)(-1))
-|       iconv_close (cd4);
-|   }
-|   return result;
-| 
-|   ;
-|   return 0;
-| }
-configure:9488: result: no
-configure:10000: checking for GNU gettext in libintl
-configure:10038: cc -o conftest -g    conftest.c  -lintl >&5
-configure:10038: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| /* end confdefs.h.  */
-| 
-| #include <libintl.h>
-| #ifndef __GNU_GETTEXT_SUPPORTED_REVISION
-| extern int _nl_msg_cat_cntr;
-| extern
-| #ifdef __cplusplus
-| "C"
-| #endif
-| const char *_nl_expand_alias (const char *);
-| #define __GNU_GETTEXT_SYMBOL_EXPRESSION (_nl_msg_cat_cntr + *_nl_expand_alias (""))
-| #else
-| #define __GNU_GETTEXT_SYMBOL_EXPRESSION 0
-| #endif
-| 
-| 
-| int
-| main (void)
-| {
-| 
-| bindtextdomain ("", "");
-| return * gettext ("") + __GNU_GETTEXT_SYMBOL_EXPRESSION
-| 
-|   ;
-|   return 0;
-| }
-configure:10090: result: no
+configure:9224: $? = 0
+configure:9234: result: yes
 configure:10125: checking whether to use NLS
-configure:10127: result: no
+configure:10127: result: yes
+configure:10130: checking where the gettext function comes from
+configure:10141: result: libc
 configure:10200: checking for nl_langinfo and CODESET
 configure:10217: cc -o conftest -g   conftest.c  >&5
-/sys/include/ape/langinfo.h:16[stdin:122] syntax error, last name: size_t
+/sys/include/ape/langinfo.h:16[stdin:125] syntax error, last name: size_t
+cc: cpp: 6c 37712: error
 configure:10217: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3580,6 +3185,9 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | /* end confdefs.h.  */
 | #include <langinfo.h>
 | int
@@ -3608,86 +3216,13 @@ configure:10283: $? = 0
 configure:10283: result: yes
 configure:10289: checking for libintl.h
 configure:10289: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: fchdir
-configure:10289: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| #define HAVE_LC_MESSAGES 1
-| #define HAVE_ARPA_INET_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LOCALE_H 1
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| #include <libintl.h>
-configure:10289: result: no
+configure:10289: $? = 0
+configure:10289: result: yes
 configure:10295: checking for mcheck.h
 configure:10295: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: fchdir
+<eof> syntax error, last name: wchar_t
+cpp: conftest.c:77 Could not find include file <mcheck.h>
+cc: 6c: cpp 37805: error
 configure:10295: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3729,10 +3264,14 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | /* end confdefs.h.  */
 | #include <stddef.h>
 | #ifdef HAVE_STDIO_H
@@ -3780,92 +3319,13 @@ configure:10319: checking for string.h
 configure:10319: result: yes
 configure:10325: checking for spawn.h
 configure:10325: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: fch
-configure:10325: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| #define HAVE_LC_MESSAGES 1
-| #define HAVE_ARPA_INET_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_NETINET_IN_H 1
-| #define HAVE_STDDEF_H 1
-| #define HAVE_STRING_H 1
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| #include <spawn.h>
-configure:10325: result: no
+configure:10325: $? = 0
+configure:10325: result: yes
 configure:10331: checking for sys/procctl.h
 configure:10331: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: fch
+<eof> syntax error, last name: wcha
+cpp: conftest.c:82 Could not find include file <sys/procctl.h>
+cc: 6c: cpp 37886: error
 configure:10331: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3907,14 +3367,19 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | /* end confdefs.h.  */
 | #include <stddef.h>
 | #ifdef HAVE_STDIO_H
@@ -3948,8 +3413,9 @@ configure: failed program was:
 configure:10331: result: no
 configure:10337: checking for sys/sysctl.h
 configure:10337: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: fch
+<eof> syntax error, last name: wcha
+cpp: conftest.c:82 Could not find include file <sys/sysctl.h>
+cc: 6c: cpp 37905: error
 configure:10337: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3991,14 +3457,19 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | /* end confdefs.h.  */
 | #include <stddef.h>
 | #ifdef HAVE_STDIO_H
@@ -4040,8 +3511,9 @@ configure:10349: $? = 0
 configure:10349: result: yes
 configure:10355: checking for sys/personality.h
 configure:10355: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: f
+<eof> syntax error, last name: wc
+cpp: conftest.c:84 Could not find include file <sys/personality.h>
+cc: 6c: cpp 37952: error
 configure:10355: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4083,14 +3555,19 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | /* end confdefs.h.  */
@@ -4136,93 +3613,8 @@ configure:10373: checking for sys/time.h
 configure:10373: result: yes
 configure:10379: checking for uchar.h
 configure:10379: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: in
-configure:10379: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| #define HAVE_LC_MESSAGES 1
-| #define HAVE_ARPA_INET_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_NETINET_IN_H 1
-| #define HAVE_STDDEF_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_TIME_H 1
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| #include <uchar.h>
-configure:10379: result: no
+configure:10379: $? = 0
+configure:10379: result: yes
 configure:10385: checking for unistd.h
 configure:10385: result: yes
 configure:10391: checking for termios.h
@@ -4231,7 +3623,9 @@ configure:10391: $? = 0
 configure:10391: result: yes
 configure:10397: checking for stropts.h
 configure:10397: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: extern
+<eof> syntax error, last name: co
+cpp: conftest.c:90 Could not find include file <stropts.h>
+cc: 6c: cpp 38039: error
 configure:10397: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4273,19 +3667,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | /* end confdefs.h.  */
@@ -4327,8 +3727,8 @@ configure:10409: $? = 0
 configure:10409: result: yes
 configure:10419: checking for bool, true, false
 configure:10434: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:62[stdin:63] not a function
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:62[stdin:63] syntax error, last name: b
+cpp: conftest.c:66 #error directive: "true == false"
+cc: 6c: cpp 38078: errors
 configure:10434: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4370,19 +3770,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -4401,8 +3807,9 @@ configure:10481: $? = 0
 configure:10489: result: yes
 configure:10503: checking for memory.h
 configure:10503: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: exte
+<eof> syntax error, last name: char
+cpp: conftest.c:93 Could not find include file <memory.h>
+cc: 6c: cpp 38111: error
 configure:10503: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4444,19 +3851,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -4497,7 +3910,8 @@ configure:10530: checking for pid_t
 configure:10530: cc -c -g  conftest.c >&5
 configure:10530: $? = 0
 configure:10530: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:91[stdin:1569] syntax error, last name: pid_t
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:97[stdin:4770] syntax error, last name: pid_t
+cc: cpp: 6c 38137: error
 configure:10530: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4539,19 +3953,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -4600,7 +4020,8 @@ configure:10566: checking for size_t
 configure:10566: cc -c -g  conftest.c >&5
 configure:10566: $? = 0
 configure:10566: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:90[stdin:1568] syntax error, last name: size_t
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:96[stdin:4769] syntax error, last name: size_t
+cc: cpp: 6c 38165: error
 configure:10566: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4642,19 +4063,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -4722,7 +4149,8 @@ configure:10822: checking for intmax_t
 configure:10822: cc -c -g  conftest.c >&5
 configure:10822: $? = 0
 configure:10822: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:94[stdin:1572] syntax error, last name: intmax_t
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:100[stdin:4773] syntax error, last name: intmax_t
+cc: cpp: 6c 38263: error
 configure:10822: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4764,19 +4192,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -4828,7 +4262,8 @@ configure:10840: checking for uintmax_t
 configure:10840: cc -c -g  conftest.c >&5
 configure:10840: $? = 0
 configure:10840: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:95[stdin:1573] syntax error, last name: uintmax_t
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:101[stdin:4774] syntax error, last name: uintmax_t
+cc: cpp: 6c 38292: error
 configure:10840: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4870,19 +4305,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -4935,7 +4376,8 @@ configure:10856: checking for ssize_t
 configure:10856: cc -c -g  conftest.c >&5
 configure:10856: $? = 0
 configure:10856: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:96[stdin:1574] syntax error, last name: ssize_t
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:102[stdin:4775] syntax error, last name: ssize_t
+cc: cpp: 6c 38321: error
 configure:10856: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4977,19 +4419,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -5063,7 +4511,8 @@ configure:11021: checking for socklen_t
 configure:11021: cc -c -g  conftest.c >&5
 configure:11021: $? = 0
 configure:11021: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:77[stdin:327] syntax error, last name: socklen_t
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:83[stdin:4595] syntax error, last name: socklen_t
+cc: cpp: 6c 38429: error
 configure:11021: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5105,19 +4554,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -5159,6 +4614,7 @@ configure:11194: result: none required
 configure:11203: checking for library containing isinf
 configure:11233: cc -o conftest -g   conftest.c  >&5
 main: undefined: isinf in main
+cc: 6l: 6l 38483: error
 configure:11233: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5200,19 +4656,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -5246,6 +4708,7 @@ configure: failed program was:
 | }
 configure:11233: cc -o conftest -g   conftest.c -lm   >&5
 main: undefined: isinf in main
+cc: 6l: 6l 38499: error
 configure:11233: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5287,19 +4750,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -5335,6 +4804,7 @@ configure:11253: result: no
 configure:11262: checking for library containing ismod
 configure:11292: cc -o conftest -g   conftest.c  >&5
 main: undefined: ismod in main
+cc: 6l: 6l 38521: error
 configure:11292: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5376,19 +4846,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -5422,6 +4898,7 @@ configure: failed program was:
 | }
 configure:11292: cc -o conftest -g   conftest.c -lm   >&5
 main: undefined: ismod in main
+cc: 6l: 6l 38537: error
 configure:11292: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5463,19 +4940,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -5511,6 +4994,7 @@ configure:11312: result: no
 configure:11321: checking for library containing isnan
 configure:11351: cc -o conftest -g   conftest.c  >&5
 main: undefined: isnan in main
+cc: 6l: 6l 38559: error
 configure:11351: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5552,19 +5036,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -5598,6 +5088,7 @@ configure: failed program was:
 | }
 configure:11351: cc -o conftest -g   conftest.c -lm   >&5
 main: undefined: isnan in main
+cc: 6l: 6l 38575: error
 configure:11351: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5639,19 +5130,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -5687,6 +5184,7 @@ configure:11371: result: no
 configure:11381: checking for __etoa_l
 configure:11381: cc -o conftest -g   conftest.c  >&5
 main: undefined: __etoa_l in main
+cc: 6l: 6l 38597: error
 configure:11381: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5728,19 +5226,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -5798,113 +5302,8 @@ configure:11387: $? = 0
 configure:11387: result: yes
 configure:11393: checking for btowc
 configure:11393: cc -o conftest -g   conftest.c  >&5
-main: undefined: btowc in main
-configure:11393: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| #define HAVE_LC_MESSAGES 1
-| #define HAVE_ARPA_INET_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_NETINET_IN_H 1
-| #define HAVE_STDDEF_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define GETGROUPS_T gid_t
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_UINTMAX_T 1
-| #define SIZEOF_UNSIGNED_INT 4
-| #define SIZEOF_UNSIGNED_LONG 4
-| #define TIME_T_IN_SYS_TYPES_H 1
-| #define HAVE_WCTYPE_T 1
-| #define HAVE_WINT_T 1
-| #define HAVE_SOCKADDR_STORAGE 1
-| #define HAVE_GETADDRINFO 1
-| #define HAVE_ATEXIT 1
-| /* end confdefs.h.  */
-| /* Define btowc to an innocuous variant, in case <limits.h> declares btowc.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define btowc innocuous_btowc
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char btowc (); below.  */
-| 
-| #include <limits.h>
-| #undef btowc
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char btowc ();
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_btowc || defined __stub___btowc
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return btowc ();
-|   ;
-|   return 0;
-| }
-configure:11393: result: no
+configure:11393: $? = 0
+configure:11393: result: yes
 configure:11399: checking for fmod
 configure:11399: cc -o conftest -g   conftest.c  >&5
 configure:11399: $? = 0
@@ -5912,6 +5311,7 @@ configure:11399: result: yes
 configure:11405: checking for fwrite_unlocked
 configure:11405: cc -o conftest -g   conftest.c  >&5
 main: undefined: fwrite_unlocked in main
+cc: 6l: 6l 38666: error
 configure:11405: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5953,19 +5353,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -5985,6 +5391,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | /* end confdefs.h.  */
 | /* Define fwrite_unlocked to an innocuous variant, in case <limits.h> declares fwrite_unlocked.
@@ -6034,6 +5441,7 @@ configure:11423: result: yes
 configure:11429: checking for grantpt
 configure:11429: cc -o conftest -g   conftest.c  >&5
 main: undefined: grantpt in main
+cc: 6l: 6l 38735: error
 configure:11429: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6075,19 +5483,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -6107,6 +5521,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -6147,6 +5562,7 @@ configure:11429: result: no
 configure:11435: checking for isascii
 configure:11435: cc -o conftest -g   conftest.c  >&5
 main: undefined: isascii in main
+cc: 6l: 6l 38756: error
 configure:11435: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6188,19 +5604,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -6220,6 +5642,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -6280,6 +5703,7 @@ configure:11465: result: yes
 configure:11471: checking for _NSGetExecutablePath
 configure:11471: cc -o conftest -g   conftest.c  >&5
 main: undefined: _NSGetExecutablePath in main
+cc: 6l: 6l 38857: error
 configure:11471: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6321,19 +5745,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -6353,6 +5783,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -6401,245 +5832,16 @@ configure:11477: $? = 0
 configure:11477: result: yes
 configure:11483: checking for mbrtoc32
 configure:11483: cc -o conftest -g   conftest.c  >&5
-main: undefined: mbrtoc32 in main
-configure:11483: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| #define HAVE_LC_MESSAGES 1
-| #define HAVE_ARPA_INET_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_NETINET_IN_H 1
-| #define HAVE_STDDEF_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define GETGROUPS_T gid_t
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_UINTMAX_T 1
-| #define SIZEOF_UNSIGNED_INT 4
-| #define SIZEOF_UNSIGNED_LONG 4
-| #define TIME_T_IN_SYS_TYPES_H 1
-| #define HAVE_WCTYPE_T 1
-| #define HAVE_WINT_T 1
-| #define HAVE_SOCKADDR_STORAGE 1
-| #define HAVE_GETADDRINFO 1
-| #define HAVE_ATEXIT 1
-| #define HAVE_FMOD 1
-| #define HAVE_GAI_STRERROR 1
-| #define HAVE_GETGRENT 1
-| #define HAVE_GETGROUPS 1
-| #define HAVE_ISBLANK 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_CLOCK_GETTIME 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETDTABLESIZE 1
-| #define HAVE_POSIX_SPAWNP 1
-| /* end confdefs.h.  */
-| /* Define mbrtoc32 to an innocuous variant, in case <limits.h> declares mbrtoc32.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define mbrtoc32 innocuous_mbrtoc32
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char mbrtoc32 (); below.  */
-| 
-| #include <limits.h>
-| #undef mbrtoc32
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char mbrtoc32 ();
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_mbrtoc32 || defined __stub___mbrtoc32
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return mbrtoc32 ();
-|   ;
-|   return 0;
-| }
-configure:11483: result: no
+configure:11483: $? = 0
+configure:11483: result: yes
 configure:11489: checking for c32rtomb
 configure:11489: cc -o conftest -g   conftest.c  >&5
-main: undefined: c32rtomb in main
-configure:11489: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| #define HAVE_LC_MESSAGES 1
-| #define HAVE_ARPA_INET_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_NETINET_IN_H 1
-| #define HAVE_STDDEF_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define GETGROUPS_T gid_t
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_UINTMAX_T 1
-| #define SIZEOF_UNSIGNED_INT 4
-| #define SIZEOF_UNSIGNED_LONG 4
-| #define TIME_T_IN_SYS_TYPES_H 1
-| #define HAVE_WCTYPE_T 1
-| #define HAVE_WINT_T 1
-| #define HAVE_SOCKADDR_STORAGE 1
-| #define HAVE_GETADDRINFO 1
-| #define HAVE_ATEXIT 1
-| #define HAVE_FMOD 1
-| #define HAVE_GAI_STRERROR 1
-| #define HAVE_GETGRENT 1
-| #define HAVE_GETGROUPS 1
-| #define HAVE_ISBLANK 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_CLOCK_GETTIME 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETDTABLESIZE 1
-| #define HAVE_POSIX_SPAWNP 1
-| /* end confdefs.h.  */
-| /* Define c32rtomb to an innocuous variant, in case <limits.h> declares c32rtomb.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define c32rtomb innocuous_c32rtomb
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char c32rtomb (); below.  */
-| 
-| #include <limits.h>
-| #undef c32rtomb
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char c32rtomb ();
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_c32rtomb || defined __stub___c32rtomb
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return c32rtomb ();
-|   ;
-|   return 0;
-| }
-configure:11489: result: no
+configure:11489: $? = 0
+configure:11489: result: yes
 configure:11495: checking for mtrace
 configure:11495: cc -o conftest -g   conftest.c  >&5
 main: undefined: mtrace in main
+cc: 6l: 6l 38926: error
 configure:11495: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6681,19 +5883,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -6713,6 +5921,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -6723,6 +5932,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | /* end confdefs.h.  */
 | /* Define mtrace to an innocuous variant, in case <limits.h> declares mtrace.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -6759,6 +5970,7 @@ configure:11495: result: no
 configure:11501: checking for personality
 configure:11501: cc -o conftest -g   conftest.c  >&5
 main: undefined: personality in main
+cc: 6l: 6l 38947: error
 configure:11501: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6800,19 +6012,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -6832,6 +6050,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -6842,6 +6061,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | /* end confdefs.h.  */
 | /* Define personality to an innocuous variant, in case <limits.h> declares personality.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -6878,6 +6099,7 @@ configure:11501: result: no
 configure:11507: checking for posix_openpt
 configure:11507: cc -o conftest -g   conftest.c  >&5
 main: undefined: posix_openpt in main
+cc: 6l: 6l 38968: error
 configure:11507: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6919,19 +6141,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -6951,6 +6179,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -6961,6 +6190,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | /* end confdefs.h.  */
 | /* Define posix_openpt to an innocuous variant, in case <limits.h> declares posix_openpt.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -7013,6 +6244,7 @@ configure:11531: result: yes
 configure:11537: checking for procctl
 configure:11537: cc -o conftest -g   conftest.c  >&5
 main: undefined: procctl in main
+cc: 6l: 6l 39053: error
 configure:11537: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7054,19 +6286,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -7086,6 +6324,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -7096,6 +6335,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -7136,6 +6377,7 @@ configure:11537: result: no
 configure:11543: checking for sysctl
 configure:11543: cc -o conftest -g   conftest.c  >&5
 main: undefined: sysctl in main
+cc: 6l: 6l 39074: error
 configure:11543: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7177,19 +6419,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -7209,6 +6457,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -7219,6 +6468,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -7304,270 +6555,12 @@ configure:11688: $? = 0
 configure:11703: result: 8
 configure:11715: checking for mmap
 configure:11715: cc -o conftest -g   conftest.c  >&5
-main: undefined: mmap in main
-configure:11715: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| #define HAVE_LC_MESSAGES 1
-| #define HAVE_ARPA_INET_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_NETINET_IN_H 1
-| #define HAVE_STDDEF_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define GETGROUPS_T gid_t
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_UINTMAX_T 1
-| #define SIZEOF_UNSIGNED_INT 4
-| #define SIZEOF_UNSIGNED_LONG 4
-| #define TIME_T_IN_SYS_TYPES_H 1
-| #define HAVE_WCTYPE_T 1
-| #define HAVE_WINT_T 1
-| #define HAVE_SOCKADDR_STORAGE 1
-| #define HAVE_GETADDRINFO 1
-| #define HAVE_ATEXIT 1
-| #define HAVE_FMOD 1
-| #define HAVE_GAI_STRERROR 1
-| #define HAVE_GETGRENT 1
-| #define HAVE_GETGROUPS 1
-| #define HAVE_ISBLANK 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_CLOCK_GETTIME 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETDTABLESIZE 1
-| #define HAVE_POSIX_SPAWNP 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_SETSID 1
-| #define HAVE_SIGPROCMASK 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_STRFTIME 1
-| #define HAVE_STRNCASECMP 1
-| #define HAVE_STRSIGNAL 1
-| #define HAVE_TIMEGM 1
-| #define HAVE_WAITPID 1
-| #define HAVE_WCTYPE 1
-| #define HAVE_MBRTOWC 1
-| #define SIZEOF_VOID_P 8
-| /* end confdefs.h.  */
-| /* Define mmap to an innocuous variant, in case <limits.h> declares mmap.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define mmap innocuous_mmap
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char mmap (); below.  */
-| 
-| #include <limits.h>
-| #undef mmap
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char mmap ();
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_mmap || defined __stub___mmap
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return mmap ();
-|   ;
-|   return 0;
-| }
-configure:11715: result: no
+configure:11715: $? = 0
+configure:11715: result: yes
 configure:11721: checking for munmap
 configure:11721: cc -o conftest -g   conftest.c  >&5
-main: undefined: munmap in main
-configure:11721: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| #define HAVE_LC_MESSAGES 1
-| #define HAVE_ARPA_INET_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_NETINET_IN_H 1
-| #define HAVE_STDDEF_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define GETGROUPS_T gid_t
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_UINTMAX_T 1
-| #define SIZEOF_UNSIGNED_INT 4
-| #define SIZEOF_UNSIGNED_LONG 4
-| #define TIME_T_IN_SYS_TYPES_H 1
-| #define HAVE_WCTYPE_T 1
-| #define HAVE_WINT_T 1
-| #define HAVE_SOCKADDR_STORAGE 1
-| #define HAVE_GETADDRINFO 1
-| #define HAVE_ATEXIT 1
-| #define HAVE_FMOD 1
-| #define HAVE_GAI_STRERROR 1
-| #define HAVE_GETGRENT 1
-| #define HAVE_GETGROUPS 1
-| #define HAVE_ISBLANK 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_CLOCK_GETTIME 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETDTABLESIZE 1
-| #define HAVE_POSIX_SPAWNP 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_SETSID 1
-| #define HAVE_SIGPROCMASK 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_STRFTIME 1
-| #define HAVE_STRNCASECMP 1
-| #define HAVE_STRSIGNAL 1
-| #define HAVE_TIMEGM 1
-| #define HAVE_WAITPID 1
-| #define HAVE_WCTYPE 1
-| #define HAVE_MBRTOWC 1
-| #define SIZEOF_VOID_P 8
-| /* end confdefs.h.  */
-| /* Define munmap to an innocuous variant, in case <limits.h> declares munmap.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define munmap innocuous_munmap
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char munmap (); below.  */
-| 
-| #include <limits.h>
-| #undef munmap
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char munmap ();
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_munmap || defined __stub___munmap
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return munmap ();
-|   ;
-|   return 0;
-| }
-configure:11721: result: no
+configure:11721: $? = 0
+configure:11721: result: yes
 configure:11834: checking for dlfcn.h
 configure:11834: cc -c -g  conftest.c >&5
 configure:11834: $? = 0
@@ -7575,6 +6568,7 @@ configure:11834: result: yes
 configure:11841: checking for library containing dlopen
 configure:11871: cc -o conftest -g   conftest.c  >&5
 main: undefined: dlopen in main
+cc: 6l: 6l 39315: error
 configure:11871: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7616,19 +6610,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -7648,6 +6648,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -7658,6 +6659,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -7687,6 +6690,8 @@ configure: failed program was:
 | }
 configure:11871: cc -o conftest -g   conftest.c -ldl   >&5
 main: undefined: dlopen in main
+cc: can't find library for -l
+cc: 6l: 6l 39331: error
 configure:11871: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7728,19 +6733,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -7760,6 +6771,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -7770,6 +6782,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -7799,6 +6813,8 @@ configure: failed program was:
 | }
 configure:11871: cc -o conftest -g   conftest.c -lzrldsrl   >&5
 main: undefined: dlopen in main
+cc: can't find library for -l
+cc: 6l: 6l 39347: error
 configure:11871: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7840,19 +6856,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -7872,6 +6894,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -7882,6 +6905,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -7912,7 +6937,8 @@ configure: failed program was:
 configure:11891: result: no
 configure:11938: checking whether getpgrp requires zero arguments
 configure:11956: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:128[stdin:1606] too many function arguments: getpgrp
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:137[stdin:4810] too many function arguments: getpgrp
+cc: cpp: 6c 39367: error
 configure:11956: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7954,19 +6980,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -7986,6 +7018,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -7996,6 +7029,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -8093,19 +7128,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -8125,6 +7166,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -8135,6 +7177,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -8215,19 +7259,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -8247,6 +7297,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -8257,6 +7308,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -8303,526 +7356,20 @@ configure:12202: checking where to find the socket library calls
 configure:12208: result: the standard library
 configure:12239: checking whether readline via "-lreadline" is present and sane
 configure:12306: cc -o conftest -g   conftest.c  -lreadline >&5
-cc: can't find library for -l
-cpp: /sys/include/ape/editline/readline.h:85 /sys/include/ape/readline/readline.h:2 conftest.c:102 Could not find include file <sys/ttydefaults.h>
-cc: 6c: cpp 68640: error
-<eof> syntax error, last name: WINDOW
-configure:12306: $? = 1
-configure: program exited with status 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| #define HAVE_LC_MESSAGES 1
-| #define HAVE_ARPA_INET_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_NETINET_IN_H 1
-| #define HAVE_STDDEF_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define GETGROUPS_T gid_t
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_UINTMAX_T 1
-| #define SIZEOF_UNSIGNED_INT 4
-| #define SIZEOF_UNSIGNED_LONG 4
-| #define TIME_T_IN_SYS_TYPES_H 1
-| #define HAVE_WCTYPE_T 1
-| #define HAVE_WINT_T 1
-| #define HAVE_SOCKADDR_STORAGE 1
-| #define HAVE_GETADDRINFO 1
-| #define HAVE_ATEXIT 1
-| #define HAVE_FMOD 1
-| #define HAVE_GAI_STRERROR 1
-| #define HAVE_GETGRENT 1
-| #define HAVE_GETGROUPS 1
-| #define HAVE_ISBLANK 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_CLOCK_GETTIME 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETDTABLESIZE 1
-| #define HAVE_POSIX_SPAWNP 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_SETSID 1
-| #define HAVE_SIGPROCMASK 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_STRFTIME 1
-| #define HAVE_STRNCASECMP 1
-| #define HAVE_STRSIGNAL 1
-| #define HAVE_TIMEGM 1
-| #define HAVE_WAITPID 1
-| #define HAVE_WCTYPE 1
-| #define HAVE_MBRTOWC 1
-| #define SIZEOF_VOID_P 8
-| #define GETPGRP_VOID 1
-| #define HAVE_SOCKETS 1
-| /* end confdefs.h.  */
-| #include <stdio.h>
-| #include <fcntl.h>
-| #include <unistd.h>
-| #include <readline/readline.h>
-| #include <readline/history.h>
-| 
-| int main(int argc, char **argv)
-| {
-| 	int fd;
-| 	char *line;
-| 
-| 	close(0);
-| 	close(1);
-| 	fd = open("/dev/null", 2);	/* should get fd 0 */
-| 	dup(fd);
-| 	line = readline("giveittome> ");
-| 
-| 	/* some printfs don't handle NULL for %s */
-| 	printf("got <%s>\n", line ? line : "(NULL)");
-| 	return 0;
-| }
-configure:12317: result: no
-configure:12239: checking whether readline via "-lreadline -ltermcap" is present and sane
-configure:12306: cc -o conftest -g   conftest.c  -lreadline -ltermcap >&5
-cc: can't find library for -l
-cc: can't find library for -l
-cpp: /sys/include/ape/editline/readline.h:85 /sys/include/ape/readline/readline.h:2 conftest.c:102 Could not find include file <sys/ttydefaults.h>
-cc: 6c: cpp 68659: error
-<eof> syntax error, last name: WINDOW
-configure:12306: $? = 1
-configure: program exited with status 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| #define HAVE_LC_MESSAGES 1
-| #define HAVE_ARPA_INET_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_NETINET_IN_H 1
-| #define HAVE_STDDEF_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define GETGROUPS_T gid_t
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_UINTMAX_T 1
-| #define SIZEOF_UNSIGNED_INT 4
-| #define SIZEOF_UNSIGNED_LONG 4
-| #define TIME_T_IN_SYS_TYPES_H 1
-| #define HAVE_WCTYPE_T 1
-| #define HAVE_WINT_T 1
-| #define HAVE_SOCKADDR_STORAGE 1
-| #define HAVE_GETADDRINFO 1
-| #define HAVE_ATEXIT 1
-| #define HAVE_FMOD 1
-| #define HAVE_GAI_STRERROR 1
-| #define HAVE_GETGRENT 1
-| #define HAVE_GETGROUPS 1
-| #define HAVE_ISBLANK 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_CLOCK_GETTIME 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETDTABLESIZE 1
-| #define HAVE_POSIX_SPAWNP 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_SETSID 1
-| #define HAVE_SIGPROCMASK 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_STRFTIME 1
-| #define HAVE_STRNCASECMP 1
-| #define HAVE_STRSIGNAL 1
-| #define HAVE_TIMEGM 1
-| #define HAVE_WAITPID 1
-| #define HAVE_WCTYPE 1
-| #define HAVE_MBRTOWC 1
-| #define SIZEOF_VOID_P 8
-| #define GETPGRP_VOID 1
-| #define HAVE_SOCKETS 1
-| /* end confdefs.h.  */
-| #include <stdio.h>
-| #include <fcntl.h>
-| #include <unistd.h>
-| #include <readline/readline.h>
-| #include <readline/history.h>
-| 
-| int main(int argc, char **argv)
-| {
-| 	int fd;
-| 	char *line;
-| 
-| 	close(0);
-| 	close(1);
-| 	fd = open("/dev/null", 2);	/* should get fd 0 */
-| 	dup(fd);
-| 	line = readline("giveittome> ");
-| 
-| 	/* some printfs don't handle NULL for %s */
-| 	printf("got <%s>\n", line ? line : "(NULL)");
-| 	return 0;
-| }
-configure:12317: result: no
-configure:12239: checking whether readline via "-lreadline -lcurses" is present and sane
-configure:12306: cc -o conftest -g   conftest.c  -lreadline -lcurses >&5
-cc: can't find library for -l
-cpp: /sys/include/ape/editline/readline.h:85 /sys/include/ape/readline/readline.h:2 conftest.c:102 Could not find include file <sys/ttydefaults.h>
-cc: 6c: cpp 68675: error
-<eof> syntax error, last name: WINDOW
-configure:12306: $? = 1
-configure: program exited with status 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| #define HAVE_LC_MESSAGES 1
-| #define HAVE_ARPA_INET_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_NETINET_IN_H 1
-| #define HAVE_STDDEF_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define GETGROUPS_T gid_t
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_UINTMAX_T 1
-| #define SIZEOF_UNSIGNED_INT 4
-| #define SIZEOF_UNSIGNED_LONG 4
-| #define TIME_T_IN_SYS_TYPES_H 1
-| #define HAVE_WCTYPE_T 1
-| #define HAVE_WINT_T 1
-| #define HAVE_SOCKADDR_STORAGE 1
-| #define HAVE_GETADDRINFO 1
-| #define HAVE_ATEXIT 1
-| #define HAVE_FMOD 1
-| #define HAVE_GAI_STRERROR 1
-| #define HAVE_GETGRENT 1
-| #define HAVE_GETGROUPS 1
-| #define HAVE_ISBLANK 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_CLOCK_GETTIME 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETDTABLESIZE 1
-| #define HAVE_POSIX_SPAWNP 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_SETSID 1
-| #define HAVE_SIGPROCMASK 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_STRFTIME 1
-| #define HAVE_STRNCASECMP 1
-| #define HAVE_STRSIGNAL 1
-| #define HAVE_TIMEGM 1
-| #define HAVE_WAITPID 1
-| #define HAVE_WCTYPE 1
-| #define HAVE_MBRTOWC 1
-| #define SIZEOF_VOID_P 8
-| #define GETPGRP_VOID 1
-| #define HAVE_SOCKETS 1
-| /* end confdefs.h.  */
-| #include <stdio.h>
-| #include <fcntl.h>
-| #include <unistd.h>
-| #include <readline/readline.h>
-| #include <readline/history.h>
-| 
-| int main(int argc, char **argv)
-| {
-| 	int fd;
-| 	char *line;
-| 
-| 	close(0);
-| 	close(1);
-| 	fd = open("/dev/null", 2);	/* should get fd 0 */
-| 	dup(fd);
-| 	line = readline("giveittome> ");
-| 
-| 	/* some printfs don't handle NULL for %s */
-| 	printf("got <%s>\n", line ? line : "(NULL)");
-| 	return 0;
-| }
-configure:12317: result: no
-configure:12239: checking whether readline via "-lreadline -lncurses" is present and sane
-configure:12306: cc -o conftest -g   conftest.c  -lreadline -lncurses >&5
-cc: can't find library for -l
-cc: can't find library for -l
-cpp: /sys/include/ape/editline/readline.h:85 /sys/include/ape/readline/readline.h:2 conftest.c:102 Could not find include file <sys/ttydefaults.h>
-cc: 6c: cpp 68691: error
-<eof> syntax error, last name: WINDOW
-configure:12306: $? = 1
-configure: program exited with status 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "GNU Awk"
-| #define PACKAGE_TARNAME "gawk"
-| #define PACKAGE_VERSION "5.4.0"
-| #define PACKAGE_STRING "GNU Awk 5.4.0"
-| #define PACKAGE_BUGREPORT "bug-gawk@gnu.org"
-| #define PACKAGE_URL "https://www.gnu.org/software/gawk/"
-| #define PACKAGE "gawk"
-| #define VERSION "5.4.0"
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define __STDC_NO_VLA__ 1
-| #define HAVE_LC_MESSAGES 1
-| #define HAVE_ARPA_INET_H 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_NETDB_H 1
-| #define HAVE_NETINET_IN_H 1
-| #define HAVE_STDDEF_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_PARAM_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_SOCKET_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_SYS_WAIT_H 1
-| #define GETGROUPS_T gid_t
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_LONG_LONG_INT 1
-| #define HAVE_UNSIGNED_LONG_LONG_INT 1
-| #define HAVE_INTMAX_T 1
-| #define HAVE_UINTMAX_T 1
-| #define SIZEOF_UNSIGNED_INT 4
-| #define SIZEOF_UNSIGNED_LONG 4
-| #define TIME_T_IN_SYS_TYPES_H 1
-| #define HAVE_WCTYPE_T 1
-| #define HAVE_WINT_T 1
-| #define HAVE_SOCKADDR_STORAGE 1
-| #define HAVE_GETADDRINFO 1
-| #define HAVE_ATEXIT 1
-| #define HAVE_FMOD 1
-| #define HAVE_GAI_STRERROR 1
-| #define HAVE_GETGRENT 1
-| #define HAVE_GETGROUPS 1
-| #define HAVE_ISBLANK 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_CLOCK_GETTIME 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETDTABLESIZE 1
-| #define HAVE_POSIX_SPAWNP 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_SETSID 1
-| #define HAVE_SIGPROCMASK 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_STRFTIME 1
-| #define HAVE_STRNCASECMP 1
-| #define HAVE_STRSIGNAL 1
-| #define HAVE_TIMEGM 1
-| #define HAVE_WAITPID 1
-| #define HAVE_WCTYPE 1
-| #define HAVE_MBRTOWC 1
-| #define SIZEOF_VOID_P 8
-| #define GETPGRP_VOID 1
-| #define HAVE_SOCKETS 1
-| /* end confdefs.h.  */
-| #include <stdio.h>
-| #include <fcntl.h>
-| #include <unistd.h>
-| #include <readline/readline.h>
-| #include <readline/history.h>
-| 
-| int main(int argc, char **argv)
-| {
-| 	int fd;
-| 	char *line;
-| 
-| 	close(0);
-| 	close(1);
-| 	fd = open("/dev/null", 2);	/* should get fd 0 */
-| 	dup(fd);
-| 	line = readline("giveittome> ");
-| 
-| 	/* some printfs don't handle NULL for %s */
-| 	printf("got <%s>\n", line ? line : "(NULL)");
-| 	return 0;
-| }
-configure:12317: result: no
+configure:12306: $? = 0
+configure:12306: ./conftest
+configure:12306: $? = 0
+configure:12317: result: yes
+configure:12372: checking for history_list in -lreadline
+configure:12395: cc -o conftest -g   conftest.c -lreadline -lreadline  >&5
+configure:12395: $? = 0
+configure:12405: result: yes
 configure:12448: checking whether mpfr via "-lmpfr -lgmp" is present and usable
 configure:12475: cc -o conftest -g   conftest.c  -lmpfr -lgmp >&5
-<eof> not a function
-<eof> syntax error, last name: e
+cc: can't find library for -l
+cc: can't find library for -l
+cpp: conftest.c:113 Could not find include file <mpfr.h>
+cc: 6c: cpp 39502: error
 configure:12475: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8864,19 +7411,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -8896,6 +7449,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -8906,6 +7460,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -8922,6 +7478,8 @@ configure: failed program was:
 | #define SIZEOF_VOID_P 8
 | #define GETPGRP_VOID 1
 | #define HAVE_SOCKETS 1
+| #define HAVE_LIBREADLINE 1
+| #define HAVE_HISTORY_LIST 1
 | /* end confdefs.h.  */
 | 
 | 
@@ -8963,7 +7521,8 @@ configure:12562: $? = 0
 configure:12570: result: time.h
 configure:12578: checking for cc options needed to detect all undeclared functions
 configure:12600: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:106[stdin:107] name not declared: strchr
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:117[stdin:118] name not declared: strchr
+cc: cpp: 6c 39576: error
 configure:12600: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9005,19 +7564,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -9037,6 +7602,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -9047,6 +7613,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -9063,6 +7631,8 @@ configure: failed program was:
 | #define SIZEOF_VOID_P 8
 | #define GETPGRP_VOID 1
 | #define HAVE_SOCKETS 1
+| #define HAVE_LIBREADLINE 1
+| #define HAVE_HISTORY_LIST 1
 | #define HAVE_STRUCT_STAT_ST_BLKSIZE 1
 | #define HAVE_STRUCT_PASSWD_PW_PASSWD 1
 | #define HAVE_STRUCT_GROUP_GR_PASSWD 1
@@ -9092,7 +7662,8 @@ configure:12827: $? = 0
 configure:12835: result: yes
 configure:12843: checking for C/C++ restrict keyword
 configure:12873: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:106[stdin:107] syntax error, last name: __restrict__
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:117[stdin:118] syntax error, last name: __restrict__
+cc: cpp: 6c 39643: error
 configure:12873: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9134,19 +7705,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -9166,6 +7743,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -9176,6 +7754,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -9192,6 +7772,8 @@ configure: failed program was:
 | #define SIZEOF_VOID_P 8
 | #define GETPGRP_VOID 1
 | #define HAVE_SOCKETS 1
+| #define HAVE_LIBREADLINE 1
+| #define HAVE_HISTORY_LIST 1
 | #define HAVE_STRUCT_STAT_ST_BLKSIZE 1
 | #define HAVE_STRUCT_PASSWD_PW_PASSWD 1
 | #define HAVE_STRUCT_GROUP_GR_PASSWD 1
@@ -9215,7 +7797,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:12873: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:106[stdin:107] syntax error, last name: __restrict
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:117[stdin:118] syntax error, last name: __restrict
+cc: cpp: 6c 39658: error
 configure:12873: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9257,19 +7840,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -9289,6 +7878,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -9299,6 +7889,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -9315,6 +7907,8 @@ configure: failed program was:
 | #define SIZEOF_VOID_P 8
 | #define GETPGRP_VOID 1
 | #define HAVE_SOCKETS 1
+| #define HAVE_LIBREADLINE 1
+| #define HAVE_HISTORY_LIST 1
 | #define HAVE_STRUCT_STAT_ST_BLKSIZE 1
 | #define HAVE_STRUCT_PASSWD_PW_PASSWD 1
 | #define HAVE_STRUCT_GROUP_GR_PASSWD 1
@@ -9338,7 +7932,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:12873: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:105[stdin:106] syntax error, last name: ip
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:116[stdin:117] syntax error, last name: ip
+cc: cpp: 6c 39673: error
 configure:12873: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9380,19 +7975,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -9412,6 +8013,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -9422,6 +8024,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -9438,6 +8042,8 @@ configure: failed program was:
 | #define SIZEOF_VOID_P 8
 | #define GETPGRP_VOID 1
 | #define HAVE_SOCKETS 1
+| #define HAVE_LIBREADLINE 1
+| #define HAVE_HISTORY_LIST 1
 | #define HAVE_STRUCT_STAT_ST_BLKSIZE 1
 | #define HAVE_STRUCT_PASSWD_PW_PASSWD 1
 | #define HAVE_STRUCT_GROUP_GR_PASSWD 1
@@ -9461,7 +8067,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:12873: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:106[stdin:107] syntax error, last name: restrict
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:117[stdin:118] syntax error, last name: restrict
+cc: cpp: 6c 39688: error
 configure:12873: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9503,19 +8110,25 @@ configure: failed program was:
 | #define _TANDEM_SOURCE 1
 | #define __EXTENSIONS__ 1
 | #define __STDC_NO_VLA__ 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
 | #define HAVE_LC_MESSAGES 1
 | #define HAVE_ARPA_INET_H 1
 | #define HAVE_FCNTL_H 1
 | #define HAVE_LOCALE_H 1
+| #define HAVE_LIBINTL_H 1
 | #define HAVE_NETDB_H 1
 | #define HAVE_NETINET_IN_H 1
 | #define HAVE_STDDEF_H 1
 | #define HAVE_STRING_H 1
+| #define HAVE_SPAWN_H 1
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_PARAM_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_SOCKET_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_UCHAR_H 1
 | #define HAVE_UNISTD_H 1
 | #define HAVE_TERMIOS_H 1
 | #define HAVE_WCHAR_H 1
@@ -9535,6 +8148,7 @@ configure: failed program was:
 | #define HAVE_SOCKADDR_STORAGE 1
 | #define HAVE_GETADDRINFO 1
 | #define HAVE_ATEXIT 1
+| #define HAVE_BTOWC 1
 | #define HAVE_FMOD 1
 | #define HAVE_GAI_STRERROR 1
 | #define HAVE_GETGRENT 1
@@ -9545,6 +8159,8 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_GETDTABLESIZE 1
 | #define HAVE_POSIX_SPAWNP 1
+| #define HAVE_MBRTOC32 1
+| #define HAVE_C32RTOMB 1
 | #define HAVE_SETENV 1
 | #define HAVE_SETLOCALE 1
 | #define HAVE_SETSID 1
@@ -9561,6 +8177,8 @@ configure: failed program was:
 | #define SIZEOF_VOID_P 8
 | #define GETPGRP_VOID 1
 | #define HAVE_SOCKETS 1
+| #define HAVE_LIBREADLINE 1
+| #define HAVE_HISTORY_LIST 1
 | #define HAVE_STRUCT_STAT_ST_BLKSIZE 1
 | #define HAVE_STRUCT_PASSWD_PW_PASSWD 1
 | #define HAVE_STRUCT_GROUP_GR_PASSWD 1
@@ -9609,23 +8227,26 @@ generated by GNU Autoconf 2.71.  Invocation command line was
 
 on krypton
 
-config.status:1000: creating Makefile
-config.status:1000: creating support/Makefile
-config.status:1000: creating awklib/Makefile
-config.status:1000: creating doc/Makefile
-config.status:1000: creating extras/Makefile
-config.status:1000: creating po/Makefile.in
-config.status:1000: creating test/Makefile
-config.status:1000: creating gawkbug
-config.status:1000: creating config.h
-config.status:1229: executing depfiles commands
-config.status:1304: cd .       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
-config.status:1311: $? = 0
-config.status:1304: cd support       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
-config.status:1311: $? = 0
-config.status:1304: cd awklib       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
-config.status:1311: $? = 0
-config.status:1229: executing po-directories commands
+config.status:897: creating Makefile
+config.status:897: creating support/Makefile
+config.status:897: creating awklib/Makefile
+config.status:897: creating doc/Makefile
+config.status:897: creating extras/Makefile
+config.status:897: creating po/Makefile.in
+config.status:897: creating test/Makefile
+config.status:897: creating gawkbug
+config.status:897: creating config.h
+config.status:1126: executing depfiles commands
+config.status:1201: cd .       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+make: Nothing to be done for 'am--depfiles'.
+config.status:1208: $? = 0
+config.status:1201: cd support       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+make: Nothing to be done for 'am--depfiles'.
+config.status:1208: $? = 0
+config.status:1201: cd awklib       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+make: Nothing to be done for 'am--depfiles'.
+config.status:1208: $? = 0
+config.status:1126: executing po-directories commands
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -9665,8 +8286,8 @@ ac_cv_env_target_alias_value=
 ac_cv_func__NSGetExecutablePath=no
 ac_cv_func___etoa_l=no
 ac_cv_func_atexit=yes
-ac_cv_func_btowc=no
-ac_cv_func_c32rtomb=no
+ac_cv_func_btowc=yes
+ac_cv_func_c32rtomb=yes
 ac_cv_func_clock_gettime=yes
 ac_cv_func_connect=yes
 ac_cv_func_fmod=yes
@@ -9683,11 +8304,11 @@ ac_cv_func_grantpt=no
 ac_cv_func_isascii=no
 ac_cv_func_isblank=yes
 ac_cv_func_lstat=yes
-ac_cv_func_mbrtoc32=no
+ac_cv_func_mbrtoc32=yes
 ac_cv_func_mbrtowc=yes
-ac_cv_func_mmap=no
+ac_cv_func_mmap=yes
 ac_cv_func_mtrace=no
-ac_cv_func_munmap=no
+ac_cv_func_munmap=yes
 ac_cv_func_personality=no
 ac_cv_func_posix_openpt=no
 ac_cv_func_posix_spawnp=yes
@@ -9709,14 +8330,14 @@ ac_cv_header_arpa_inet_h=yes
 ac_cv_header_dlfcn_h=yes
 ac_cv_header_fcntl_h=yes
 ac_cv_header_inttypes_h=yes
-ac_cv_header_libintl_h=no
+ac_cv_header_libintl_h=yes
 ac_cv_header_locale_h=yes
 ac_cv_header_mcheck_h=no
 ac_cv_header_memory_h=no
 ac_cv_header_minix_config_h=no
 ac_cv_header_netdb_h=yes
 ac_cv_header_netinet_in_h=yes
-ac_cv_header_spawn_h=no
+ac_cv_header_spawn_h=yes
 ac_cv_header_stdbool_h=yes
 ac_cv_header_stddef_h=yes
 ac_cv_header_stdint_h=yes
@@ -9737,27 +8358,28 @@ ac_cv_header_sys_time_h=yes
 ac_cv_header_sys_types_h=yes
 ac_cv_header_sys_wait_h=yes
 ac_cv_header_termios_h=yes
-ac_cv_header_uchar_h=no
+ac_cv_header_uchar_h=yes
 ac_cv_header_unistd_h=yes
 ac_cv_header_wchar_h=yes
 ac_cv_header_wctype_h=yes
 ac_cv_host=x86_64-unknown-plan9
+ac_cv_lib_readline_history_list=yes
 ac_cv_member_struct_group_gr_passwd=yes
 ac_cv_member_struct_passwd_pw_passwd=yes
 ac_cv_member_struct_stat_st_blksize=yes
 ac_cv_member_struct_tm_tm_zone=yes
 ac_cv_objext=o
 ac_cv_path_EGREP='/bin/grep -E'
-ac_cv_path_GMSGFMT=:
+ac_cv_path_GMSGFMT=/bin/msgfmt
 ac_cv_path_GREP=/bin/grep
-ac_cv_path_MSGFMT=:
+ac_cv_path_MSGFMT=/bin/msgfmt
 ac_cv_path_MSGMERGE=/bin/msgmerge
 ac_cv_path_SED=/bin/sed
-ac_cv_path_XGETTEXT=:
+ac_cv_path_XGETTEXT=/bin/xgettext
 ac_cv_prog_AWK=awk
 ac_cv_prog_CC=cc
 ac_cv_prog_CPP='cc -E'
-ac_cv_prog_YACC=byacc
+ac_cv_prog_YACC='bison -y'
 ac_cv_prog_ac_ct_AR=ar
 ac_cv_prog_ac_ct_RANLIB=ranlib
 ac_cv_prog_cc_c11=no
@@ -9765,7 +8387,7 @@ ac_cv_prog_cc_c89=
 ac_cv_prog_cc_c99=no
 ac_cv_prog_cc_g=yes
 ac_cv_prog_cc_stdc=
-ac_cv_prog_make_make_set=yes
+ac_cv_prog_make__set=yes
 ac_cv_safe_to_define___extensions__=yes
 ac_cv_search_dlopen=no
 ac_cv_search_fmod='none required'
@@ -9791,24 +8413,12 @@ ac_cv_type_uid_t=yes
 ac_cv_type_uintmax_t=yes
 ac_cv_type_unsigned_long_long_int=yes
 ac_cv_zos_uss=no
-acl_cv_hardcode_direct=no
-acl_cv_hardcode_libdir_flag_spec=
-acl_cv_hardcode_libdir_separator=
-acl_cv_hardcode_minus_L=no
 acl_cv_libdirstems=lib,lib,lib
-acl_cv_libext=a
-acl_cv_libname_spec='lib$name'
-acl_cv_library_names_spec=
 acl_cv_prog_gnu_ld=no
 acl_cv_rpath=done
-acl_cv_shlibext=so
-acl_cv_wl=
 am_cv_CC_dependencies_compiler_type=none
 am_cv_ar_interface=ar
-am_cv_func_iconv=yes
-am_cv_func_iconv_works=no
 am_cv_langinfo_codeset=no
-am_cv_lib_iconv=no
 am_cv_make_support_nested_variables=yes
 am_cv_prog_cc_c_o=yes
 ax_cv_check_cflags__=yes
@@ -9817,8 +8427,7 @@ gl_cv_elf=no
 gl_cv_host_cpu_c_abi_32bit=yes
 gt_cv_func_CFLocaleCopyPreferredLanguages=no
 gt_cv_func_CFPreferencesCopyAppValue=no
-gt_cv_func_gnugettext1_libc=no
-gt_cv_func_gnugettext1_libintl=no
+gt_cv_func_gnugettext1_libc=yes
 gt_cv_val_LC_MESSAGES=yes
 
 ## ----------------- ##
@@ -9857,10 +8466,10 @@ ENABLE_EXTENSIONS_FALSE=''
 ENABLE_EXTENSIONS_TRUE='#'
 ETAGS='etags'
 EXEEXT=''
-GAWKLIBEXT='so'
+GAWKLIBEXT=''
 GETTEXT_MACRO_VERSION='0.20'
-GMSGFMT=':'
-GMSGFMT_015=':'
+GMSGFMT='/bin/msgfmt'
+GMSGFMT_015='/bin/msgfmt'
 GREP='/bin/grep'
 HAVE_ADDR_NO_RANDOMIZE_FALSE=''
 HAVE_ADDR_NO_RANDOMIZE_TRUE='#'
@@ -9871,19 +8480,19 @@ INSTALL_STRIP_PROGRAM='$(install_sh) -c -s'
 INTLLIBS=''
 INTL_MACOSX_LIBS=''
 LDFLAGS=''
-LIBICONV=''
+LIBICONV='-liconv'
 LIBINTL=''
 LIBMPFR=''
 LIBOBJS=''
-LIBREADLINE=''
+LIBREADLINE='-lreadline'
 LIBS=''
-LN_S='ln -s'
-LTLIBICONV=''
+LN_S='cp -pR'
+LTLIBICONV='-liconv'
 LTLIBINTL=''
 LTLIBOBJS=''
 MAKEINFO='${SHELL} '\''/usr/glenda/APExp/sys/src/external/gawk/build-aux/missing'\'' makeinfo'
 MKDIR_P='./build-aux/install-sh -c -d'
-MSGFMT=':'
+MSGFMT='/bin/msgfmt'
 MSGMERGE='/bin/msgmerge'
 MSGMERGE_FOR_MSGFMT_OPTION='--no-location --quiet'
 OBJEXT='o'
@@ -9895,7 +8504,7 @@ PACKAGE_TARNAME='gawk'
 PACKAGE_URL='https://www.gnu.org/software/gawk/'
 PACKAGE_VERSION='5.4.0'
 PATH_SEPARATOR=':'
-POSUB=''
+POSUB='po'
 RANLIB='ranlib'
 SED='/bin/sed'
 SET_MAKE=''
@@ -9904,21 +8513,21 @@ SOCKET_LIBS=''
 STRIP=''
 TEST_CROSS_COMPILE_FALSE=''
 TEST_CROSS_COMPILE_TRUE='#'
-USE_NLS='no'
+USE_NLS='yes'
 USE_PAXCTL_FALSE=''
 USE_PAXCTL_TRUE='#'
 USE_PERSISTENT_MALLOC_FALSE=''
 USE_PERSISTENT_MALLOC_TRUE='#'
 VERSION='5.4.0'
-XGETTEXT=':'
-XGETTEXT_015=':'
+XGETTEXT='/bin/xgettext'
+XGETTEXT_015='/bin/xgettext'
 XGETTEXT_EXTRA_OPTIONS=''
-YACC='byacc'
+YACC='bison -y'
 YFLAGS=''
 ZOS_FAIL=''
 ac_ct_AR='ar'
 ac_ct_CC=''
-acl_shlibext='so'
+acl_shlibext=''
 am__EXEEXT_FALSE=''
 am__EXEEXT_TRUE='#'
 am__fastdepCC_FALSE=''
@@ -10012,19 +8621,25 @@ target_alias=''
 #define _TANDEM_SOURCE 1
 #define __EXTENSIONS__ 1
 #define __STDC_NO_VLA__ 1
+#define ENABLE_NLS 1
+#define HAVE_GETTEXT 1
+#define HAVE_DCGETTEXT 1
 #define HAVE_LC_MESSAGES 1
 #define HAVE_ARPA_INET_H 1
 #define HAVE_FCNTL_H 1
 #define HAVE_LOCALE_H 1
+#define HAVE_LIBINTL_H 1
 #define HAVE_NETDB_H 1
 #define HAVE_NETINET_IN_H 1
 #define HAVE_STDDEF_H 1
 #define HAVE_STRING_H 1
+#define HAVE_SPAWN_H 1
 #define HAVE_SYS_IOCTL_H 1
 #define HAVE_SYS_PARAM_H 1
 #define HAVE_SYS_SELECT_H 1
 #define HAVE_SYS_SOCKET_H 1
 #define HAVE_SYS_TIME_H 1
+#define HAVE_UCHAR_H 1
 #define HAVE_UNISTD_H 1
 #define HAVE_TERMIOS_H 1
 #define HAVE_WCHAR_H 1
@@ -10044,6 +8659,7 @@ target_alias=''
 #define HAVE_SOCKADDR_STORAGE 1
 #define HAVE_GETADDRINFO 1
 #define HAVE_ATEXIT 1
+#define HAVE_BTOWC 1
 #define HAVE_FMOD 1
 #define HAVE_GAI_STRERROR 1
 #define HAVE_GETGRENT 1
@@ -10054,6 +8670,8 @@ target_alias=''
 #define HAVE_LSTAT 1
 #define HAVE_GETDTABLESIZE 1
 #define HAVE_POSIX_SPAWNP 1
+#define HAVE_MBRTOC32 1
+#define HAVE_C32RTOMB 1
 #define HAVE_SETENV 1
 #define HAVE_SETLOCALE 1
 #define HAVE_SETSID 1
@@ -10070,6 +8688,8 @@ target_alias=''
 #define SIZEOF_VOID_P 8
 #define GETPGRP_VOID 1
 #define HAVE_SOCKETS 1
+#define HAVE_LIBREADLINE 1
+#define HAVE_HISTORY_LIST 1
 #define HAVE_STRUCT_STAT_ST_BLKSIZE 1
 #define HAVE_STRUCT_PASSWD_PW_PASSWD 1
 #define HAVE_STRUCT_GROUP_GR_PASSWD 1

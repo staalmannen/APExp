@@ -190,3 +190,182 @@ VGFMAFLAG =
 --------------------
 
 
+--------------------
+./configure
+Sat May e 04:03:45 EDT 2026
+Checking for gcc...
+=== ztest118077.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+cc -c ztest118077.c
+... using cc
+
+Checking for compiler...
+=== ztest118077.c ===
+int foo() { return 0; }
+===
+cc -c ztest118077.c
+Checking for obsessive-compulsive compiler options...
+=== ztest118077.c ===
+int foo() { return 0; }
+===
+cc -c -O ztest118077.c
+
+Checking for shared library support...
+=== ztest118077.c ===
+extern int getchar();
+int hello() {return getchar();}
+===
+cc -c -O ztest118077.c
+cc -shared -O -o ztest118077.so ztest118077.o
+cc: flag -h ignored
+cc: flag -a ignored
+cc: flag -r ignored
+cc: flag -e ignored
+cc: flag -d ignored
+_apemain: undefined: main in _apemain
+cc: 6l: 6l 118124: error
+(exit code 1)
+No shared library support.
+Building static library libz.a version with cc.
+
+=== ztest118077.c ===
+#include <stdio.h>
+#include <stdlib.h>
+size_t dummy = 0;
+===
+cc -c -O ztest118077.c
+Checking for size_t... Yes.
+
+=== ztest118077.c ===
+#include <sys/types.h>
+off64_t dummy = 0;
+===
+cc -c -O -D_LARGEFILE64_SOURCE=1 ztest118077.c
+Checking for off64_t... Yes.
+Checking for fseeko... Yes.
+
+=== ztest118077.c ===
+#include <string.h>
+#include <errno.h>
+int main() { return strlen(strerror(errno)); }
+===
+cc -O -D_LARGEFILE64_SOURCE=1 -o ztest118077 ztest118077.c
+Checking for strerror... Yes.
+
+=== ztest118077.c ===
+#include <unistd.h>
+int main() { return 0; }
+===
+cc -c -O -D_LARGEFILE64_SOURCE=1 ztest118077.c
+Checking for unistd.h... Yes.
+
+=== ztest118077.c ===
+#include <stdarg.h>
+int main() { return 0; }
+===
+cc -c -O -D_LARGEFILE64_SOURCE=1 ztest118077.c
+Checking for stdarg.h... Yes.
+
+=== ztest118077.c ===
+#include <stdio.h>
+#include <stdarg.h>
+#include "zconf.h"
+int main()
+{
+#ifndef STDC
+  choke me
+#endif
+  return 0;
+}
+===
+cc -c -O -D_LARGEFILE64_SOURCE=1 ztest118077.c
+Checking whether to use vs[n]printf() or s[n]printf()... using vs[n]printf().
+
+=== ztest118077.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return 0;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+cc -O -D_LARGEFILE64_SOURCE=1 -o ztest118077 ztest118077.c
+Checking for vsnprintf() in stdio.h... Yes.
+
+=== ztest118077.c ===
+#include <stdio.h>
+#include <stdarg.h>
+int mytest(const char *fmt, ...)
+{
+  int n;
+  char buf[20];
+  va_list ap;
+  va_start(ap, fmt);
+  n = vsnprintf(buf, sizeof(buf), fmt, ap);
+  va_end(ap);
+  return n;
+}
+int main()
+{
+  return (mytest("Hello%d\n", 1));
+}
+===
+cc -c -O -D_LARGEFILE64_SOURCE=1 ztest118077.c
+Checking for return value of vsnprintf()... Yes.
+=== ztest118077.c ===
+#ifndef __s390x__
+    #error
+#endif
+===
+cc -c -O -D_LARGEFILE64_SOURCE=1 ztest118077.c
+cpp: ztest118077.c:2 #error directive: 
+cc: 6c: cpp 118201: errors
+(exit code 1)
+Checking for s390x build ... No.
+
+ALL = static all64
+AR = ar
+ARFLAGS = rc
+CC = cc
+CFLAGS = -O -D_LARGEFILE64_SOURCE=1
+CPP =
+EXE =
+LDCONFIG = ldconfig
+LDFLAGS =
+LDSHARED = cc
+LDSHAREDLIBC = -lc
+OBJC = $(OBJZ) $(OBJG)
+PIC_OBJC = $(PIC_OBJZ) $(PIC_OBJG)
+RANLIB = ranlib
+SFLAGS = -O -D_LARGEFILE64_SOURCE=1
+SHAREDLIB =
+SHAREDLIBM =
+SHAREDLIBV =
+STATICLIB = libz.a
+TEST = all teststatic test64
+VER =
+SRCDIR =
+exec_prefix = ${prefix}
+includedir = ${prefix}/include
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/share/man
+prefix = /usr/local
+sharedlibdir = ${libdir}
+uname = Plan9 4
+HAVE_S390X = 0
+HAVE_S390X_VX = 0
+VGFMAFLAG =
+--------------------
+
+

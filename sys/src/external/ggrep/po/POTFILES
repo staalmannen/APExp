@@ -14,4 +14,4 @@
      ../lib/xalloc-die.c \
      ../src/dfasearch.c \
      ../src/grep.c \
-     ../src/pcresearch.c
+     ../src/pcresearch.c \

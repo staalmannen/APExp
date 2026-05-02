@@ -420,7 +420,7 @@ ac_pwd='/usr/glenda/APExp/sys/src/external/m4'
 srcdir='.'
 INSTALL='/bin/install -c'
 MKDIR_P='mkdir -p'
-AWK='gawk'
+AWK='awk'
 test -n "$AWK" || {
   awk '' </dev/null ||
     as_fn_error $? "try installing gawk"
@@ -3099,7 +3099,7 @@ S["am__tar"]="false"
 S["AMTAR"]="$${TAR-tar}"
 S["am__leading_dot"]="."
 S["SET_MAKE"]=""
-S["AWK"]="gawk"
+S["AWK"]="awk"
 S["mkdir_p"]="$(MKDIR_P)"
 S["MKDIR_P"]="mkdir -p"
 S["INSTALL_STRIP_PROGRAM"]="$(install_sh) -c -s"

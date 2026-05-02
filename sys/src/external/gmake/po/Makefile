@@ -21,7 +21,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-
+VPATH = .
 
 prefix = /usr/local
 exec_prefix = ${prefix}
@@ -45,17 +45,17 @@ install_sh = $(SHELL) ${SHELL} /usr/glenda/APExp/sys/src/external/gmake/build-au
 MKDIR_P = .././build-aux/install-sh -c -d
 mkdir_p = $(MKDIR_P)
 
-GMSGFMT_ = :
-GMSGFMT_no = :
-GMSGFMT_yes = :
+GMSGFMT_ = /bin/msgfmt
+GMSGFMT_no = /bin/msgfmt
+GMSGFMT_yes = /bin/msgfmt
 GMSGFMT = $(GMSGFMT_$(USE_MSGCTXT))
-MSGFMT_ = :
-MSGFMT_no = :
-MSGFMT_yes = :
+MSGFMT_ = /bin/msgfmt
+MSGFMT_no = /bin/msgfmt
+MSGFMT_yes = /bin/msgfmt
 MSGFMT = $(MSGFMT_$(USE_MSGCTXT))
-XGETTEXT_ = :
-XGETTEXT_no = :
-XGETTEXT_yes = :
+XGETTEXT_ = /bin/xgettext
+XGETTEXT_no = /bin/xgettext
+XGETTEXT_yes = /bin/xgettext
 XGETTEXT = $(XGETTEXT_$(USE_MSGCTXT))
 MSGMERGE = msgmerge
 MSGMERGE_UPDATE = /bin/msgmerge --update
@@ -104,7 +104,7 @@ POTFILES = \
      ../src/vmsfunctions.c \
      ../src/vmsjobs.c \
      ../src/vpath.c \
-     ../src/w32/w32os.c
+     ../src/w32/w32os.c \
 
 CATALOGS =  be.gmo bg.gmo cs.gmo da.gmo de.gmo es.gmo fi.gmo fr.gmo ga.gmo gl.gmo he.gmo hr.gmo id.gmo it.gmo ja.gmo ko.gmo lt.gmo nl.gmo pl.gmo pt.gmo pt_BR.gmo ro.gmo ru.gmo sr.gmo sv.gmo tr.gmo uk.gmo vi.gmo zh_CN.gmo zh_TW.gmo
 
@@ -225,7 +225,7 @@ DIST_DEPENDS_ON_UPDATE_PO = yes
 	mv t-$@ $@
 
 
-all: all-no
+all: all-yes
 
 all-yes: stamp-po
 all-no:
@@ -358,7 +358,7 @@ $(POFILES): $(POFILESDEPS)
 
 install: install-exec install-data
 install-exec:
-install-data: install-data-no
+install-data: install-data-yes
 	if test "$(PACKAGE)" = "gettext-tools"; then \
 	  $(mkdir_p) $(DESTDIR)$(gettextsrcdir); \
 	  for file in $(DISTFILES.common) Makevars.template; do \
@@ -416,7 +416,7 @@ install-strip: install
 
 installdirs: installdirs-exec installdirs-data
 installdirs-exec:
-installdirs-data: installdirs-data-no
+installdirs-data: installdirs-data-yes
 	if test "$(PACKAGE)" = "gettext-tools"; then \
 	  $(mkdir_p) $(DESTDIR)$(gettextsrcdir); \
 	else \
@@ -460,7 +460,7 @@ installcheck:
 
 uninstall: uninstall-exec uninstall-data
 uninstall-exec:
-uninstall-data: uninstall-data-no
+uninstall-data: uninstall-data-yes
 	if test "$(PACKAGE)" = "gettext-tools"; then \
 	  for file in $(DISTFILES.common) Makevars.template; do \
 	    rm -f $(DESTDIR)$(gettextsrcdir)/$$file; \

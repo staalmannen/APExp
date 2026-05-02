@@ -19,7 +19,7 @@
 
 
 
-
+VPATH = .
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -975,7 +975,7 @@ LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIBZ = 
 LIB_POSTFIX = 
 LIPO = 
-LN_S = ln -s
+LN_S = cp -pR
 LTLIBOBJS = 
 LT_SYS_LIBRARY_PATH = 
 MAINT = #

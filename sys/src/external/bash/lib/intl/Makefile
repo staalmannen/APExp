@@ -23,7 +23,7 @@ SHELL = /bin/sh
 srcdir = .
 top_srcdir = ../..
 top_builddir = /usr/glenda/APExp/sys/src/external/bash
-
+VPATH = $(srcdir)$(srcdir)
 
 prefix = /usr/local
 exec_prefix = ${prefix}
@@ -150,7 +150,7 @@ libgnuintl.h: $(srcdir)/libgnuintl.in.h $(srcdir)/export.h
 	    -e 's,@''HAVE_ASPRINTF''@,1,g' \
 	    -e 's,@''HAVE_SNPRINTF''@,1,g' \
 	    -e 's,@''HAVE_WPRINTF''@,0,g' \
-	    -e 's,@''HAVE_NEWLOCALE''@,0,g' \
+	    -e 's,@''HAVE_NEWLOCALE''@,1,g' \
 	    -e 's,@''ENHANCE_LOCALE_FUNCS''@,0,g' \
 	  < $(srcdir)/libgnuintl.in.h \
 	| if test 'no' = yes; then \
@@ -169,7 +169,7 @@ libintl.h: $(srcdir)/libgnuintl.in.h
 	    -e 's,@''HAVE_ASPRINTF''@,1,g' \
 	    -e 's,@''HAVE_SNPRINTF''@,1,g' \
 	    -e 's,@''HAVE_WPRINTF''@,0,g' \
-	    -e 's,@''HAVE_NEWLOCALE''@,0,g' \
+	    -e 's,@''HAVE_NEWLOCALE''@,1,g' \
 	    -e 's,@''ENHANCE_LOCALE_FUNCS''@,0,g' \
 	  < $(srcdir)/libgnuintl.in.h > libintl.h
 

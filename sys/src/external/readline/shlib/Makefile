@@ -30,7 +30,7 @@ RL_LIBRARY_NAME = readline
 datarootdir = ${prefix}/share
 
 srcdir = .
-VPATH = ..
+VPATH = ....
 topdir = ..
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/readline
 
@@ -99,7 +99,7 @@ SHLIB_DLLVERSION = $(SHLIB_MAJOR)
 
 SHLIB_STATUS = unsupported
 
-TERMCAP_LIB = -lcurses
+TERMCAP_LIB = 
 
 # shared library versioning
 SHLIB_MAJOR=		8

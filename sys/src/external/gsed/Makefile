@@ -176,7 +176,7 @@
 
 
 
-
+VPATH = .
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -253,20 +253,20 @@ POST_UNINSTALL = :
 build_triplet = x86_64-unknown-plan9
 host_triplet = x86_64-unknown-plan9
 bin_PROGRAMS = sed/sed$(EXEEXT)
-am__append_1 = lib/btowc.c
+#am__append_1 = lib/btowc.c
 am__append_2 = lib/canonicalize-lgpl.c
 #am__append_3 = lib/close.c
-am__append_4 = lib/dup2.c
-am__append_5 = lib/error.c
+#am__append_4 = lib/dup2.c
+#am__append_5 = lib/error.c
 am__append_6 = lib/fcntl.c
-am__append_7 = lib/fpending.c
+#am__append_7 = lib/fpending.c
 am__append_8 = lib/free.c
 #am__append_9 = lib/fstat.c
 am__append_10 = lib/fwriting.c
 #am__append_11 = lib/getdelim.c
-#am__append_12 = lib/getdtablesize.c
-am__append_13 = lib/getrandom.c
-am__append_14 = lib/localeconv.c
+am__append_12 = lib/getdtablesize.c
+#am__append_13 = lib/getrandom.c
+#am__append_14 = lib/localeconv.c
 am__append_15 = lib/lstat.c
 am__append_16 = lib/mbrlen.c
 am__append_17 = lib/mbrtowc.c
@@ -274,16 +274,16 @@ am__append_17 = lib/mbrtowc.c
 #am__append_19 = lib/mbtowc.c
 #am__append_20 = lib/memchr.c
 #am__append_21 = lib/mempcpy.c
-am__append_22 = lib/memrchr.c
+#am__append_22 = lib/memrchr.c
 am__append_23 = lib/mkdir.c
 am__append_24 = lib/mkostemp.c
 #am__append_25 = lib/msvc-inval.c
 #am__append_26 = lib/msvc-nothrow.c
 am__append_27 = lib/nl_langinfo.c
 #am__append_28 = lib/nl_langinfo-lock.c
-am__append_29 = lib/obstack.c
+#am__append_29 = lib/obstack.c
 #am__append_30 = lib/open.c
-am__append_31 = lib/rawmemchr.c
+#am__append_31 = lib/rawmemchr.c
 am__append_32 = lib/readlink.c
 am__append_33 = lib/reallocarray.c
 am__append_34 = lib/regex.c
@@ -298,7 +298,7 @@ am__append_42 = lib/strerror.c
 am__append_43 = lib/strerror-override.c
 #am__append_44 = lib/strverscmp.c
 #am__append_45 = lib/wcrtomb.c
-am__append_46 = lib/wctob.c
+#am__append_46 = lib/wctob.c
 #am__append_47 = lib/wctomb.c
 #am__append_48 = lib/windows-mutex.c
 #am__append_49 = lib/windows-once.c
@@ -486,24 +486,24 @@ am__lib_libsed_a_SOURCES_DIST = lib/copy-acl.c lib/set-acl.c \
 	lib/wctob.c lib/wctomb.c lib/wctype-h.c lib/windows-mutex.c \
 	lib/windows-once.c lib/windows-recmutex.c lib/windows-rwlock.c \
 	lib/xmalloc.c lib/xalloc-die.c
-am__objects_1 = lib/libsed_a-btowc.$(OBJEXT)
+#am__objects_1 = lib/libsed_a-btowc.$(OBJEXT)
 am__objects_2 = lib/libsed_a-canonicalize-lgpl.$(OBJEXT)
 #am__objects_3 = lib/libsed_a-close.$(OBJEXT)
-am__objects_4 = lib/libsed_a-dup2.$(OBJEXT)
-am__objects_5 = lib/libsed_a-error.$(OBJEXT)
+#am__objects_4 = lib/libsed_a-dup2.$(OBJEXT)
+#am__objects_5 = lib/libsed_a-error.$(OBJEXT)
 am__objects_6 = lib/libsed_a-fcntl.$(OBJEXT)
-am__objects_7 =  \
-	lib/libsed_a-fpending.$(OBJEXT)
+#am__objects_7 =  \
+#	lib/libsed_a-fpending.$(OBJEXT)
 am__objects_8 = lib/libsed_a-free.$(OBJEXT)
 #am__objects_9 = lib/libsed_a-fstat.$(OBJEXT)
 am__objects_10 =  \
 	lib/libsed_a-fwriting.$(OBJEXT)
 #am__objects_11 =  \
 #	lib/libsed_a-getdelim.$(OBJEXT)
-#am__objects_12 = lib/libsed_a-getdtablesize.$(OBJEXT)
-am__objects_13 =  \
-	lib/libsed_a-getrandom.$(OBJEXT)
-am__objects_14 = lib/libsed_a-localeconv.$(OBJEXT)
+am__objects_12 = lib/libsed_a-getdtablesize.$(OBJEXT)
+#am__objects_13 =  \
+#	lib/libsed_a-getrandom.$(OBJEXT)
+#am__objects_14 = lib/libsed_a-localeconv.$(OBJEXT)
 am__objects_15 = lib/libsed_a-lstat.$(OBJEXT)
 am__objects_16 =  \
 	lib/libsed_a-mbrlen.$(OBJEXT)
@@ -517,8 +517,8 @@ am__objects_17 =  \
 #	lib/libsed_a-memchr.$(OBJEXT)
 #am__objects_21 =  \
 #	lib/libsed_a-mempcpy.$(OBJEXT)
-am__objects_22 =  \
-	lib/libsed_a-memrchr.$(OBJEXT)
+#am__objects_22 =  \
+#	lib/libsed_a-memrchr.$(OBJEXT)
 am__objects_23 = lib/libsed_a-mkdir.$(OBJEXT)
 am__objects_24 =  \
 	lib/libsed_a-mkostemp.$(OBJEXT)
@@ -526,11 +526,11 @@ am__objects_24 =  \
 #am__objects_26 = lib/libsed_a-msvc-nothrow.$(OBJEXT)
 am__objects_27 = lib/libsed_a-nl_langinfo.$(OBJEXT)
 #am__objects_28 = lib/libsed_a-nl_langinfo-lock.$(OBJEXT)
-am__objects_29 =  \
-	lib/libsed_a-obstack.$(OBJEXT)
+#am__objects_29 =  \
+#	lib/libsed_a-obstack.$(OBJEXT)
 #am__objects_30 = lib/libsed_a-open.$(OBJEXT)
-am__objects_31 =  \
-	lib/libsed_a-rawmemchr.$(OBJEXT)
+#am__objects_31 =  \
+#	lib/libsed_a-rawmemchr.$(OBJEXT)
 am__objects_32 =  \
 	lib/libsed_a-readlink.$(OBJEXT)
 am__objects_33 = lib/libsed_a-reallocarray.$(OBJEXT)
@@ -549,7 +549,7 @@ am__objects_43 = lib/libsed_a-strerror-override.$(OBJEXT)
 #am__objects_44 = lib/libsed_a-strverscmp.$(OBJEXT)
 #am__objects_45 =  \
 #	lib/libsed_a-wcrtomb.$(OBJEXT)
-am__objects_46 = lib/libsed_a-wctob.$(OBJEXT)
+#am__objects_46 = lib/libsed_a-wctob.$(OBJEXT)
 #am__objects_47 =  \
 #	lib/libsed_a-wctomb.$(OBJEXT)
 #am__objects_48 = lib/libsed_a-windows-mutex.$(OBJEXT)
@@ -1159,7 +1159,7 @@ AM_DEFAULT_VERBOSITY = 0
 APPLE_UNIVERSAL_BUILD = 0
 AR = ar
 ARFLAGS = cr
-ASSERT_H = $(top_build_prefix)lib/assert.h
+ASSERT_H = 
 AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/gsed/build-aux/missing' autoconf
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/gsed/build-aux/missing' autoheader
 AUTOMAKE = ${SHELL} '/usr/glenda/APExp/sys/src/external/gsed/build-aux/missing' automake-1.16
@@ -1576,8 +1576,8 @@ GL_GNULIB_WMEMPCPY = 0
 GL_GNULIB_WMEMSET = 0
 GL_GNULIB_WRITE = 0
 GL_GNULIB__EXIT = 0
-GMSGFMT = :
-GMSGFMT_015 = :
+GMSGFMT = /bin/msgfmt
+GMSGFMT_015 = /bin/msgfmt
 GNULIBHEADERS_OVERRIDE_WINT_T = 0
 GNULIB_GETTIMEOFDAY = 0
 GNULIB_TEST_WARN_CFLAGS = 
@@ -1588,16 +1588,16 @@ HAVE_ALLOCA_H = 1
 HAVE_ALPHASORT = 1
 HAVE_ARPA_INET_H = 1
 HAVE_ATOLL = 1
-HAVE_BTOWC = 0
+HAVE_BTOWC = 1
 HAVE_C99_STDINT_H = 0
-HAVE_CANONICALIZE_FILE_NAME = 0
+HAVE_CANONICALIZE_FILE_NAME = 1
 HAVE_CHOWN = 1
 HAVE_CLOSEDIR = 1
 HAVE_COPY_FILE_RANGE = 1
 HAVE_CRTDEFS_H = 0
-HAVE_DECL_DIRFD = 1
+HAVE_DECL_DIRFD = 0
 HAVE_DECL_ECVT = 0
-HAVE_DECL_ENVIRON = 0
+HAVE_DECL_ENVIRON = 1
 HAVE_DECL_EXECVPE = 0
 HAVE_DECL_FCHDIR = 1
 HAVE_DECL_FCLOSEALL = 0
@@ -1605,32 +1605,32 @@ HAVE_DECL_FCVT = 0
 HAVE_DECL_FDATASYNC = 1
 HAVE_DECL_FDOPENDIR = 1
 HAVE_DECL_FPURGE = 0
-HAVE_DECL_FSEEKO = 1
-HAVE_DECL_FTELLO = 1
+HAVE_DECL_FSEEKO = 0
+HAVE_DECL_FTELLO = 0
 HAVE_DECL_GCVT = 0
-HAVE_DECL_GETDELIM = 1
+HAVE_DECL_GETDELIM = 0
 HAVE_DECL_GETDOMAINNAME = 1
 HAVE_DECL_GETLINE = 1
 HAVE_DECL_GETLOADAVG = 1
 HAVE_DECL_GETLOGIN = 1
 HAVE_DECL_GETLOGIN_R = 1
-HAVE_DECL_GETPAGESIZE = 1
+HAVE_DECL_GETPAGESIZE = 0
 HAVE_DECL_GETUSERSHELL = 1
 HAVE_DECL_IMAXABS = 1
 HAVE_DECL_IMAXDIV = 1
 HAVE_DECL_INET_NTOP = 1
-HAVE_DECL_INET_PTON = 1
+HAVE_DECL_INET_PTON = 0
 HAVE_DECL_INITSTATE = 1
 HAVE_DECL_LOCALTIME_R = 1
 HAVE_DECL_MEMMEM = 1
-HAVE_DECL_MEMRCHR = 1
+HAVE_DECL_MEMRCHR = 0
 HAVE_DECL_OBSTACK_PRINTF = 1
-HAVE_DECL_SETENV = 1
+HAVE_DECL_SETENV = 0
 HAVE_DECL_SETHOSTNAME = 1
 HAVE_DECL_SETSTATE = 1
 HAVE_DECL_SNPRINTF = 1
-HAVE_DECL_STRDUP = 1
-HAVE_DECL_STRERROR_R = 1
+HAVE_DECL_STRDUP = 0
+HAVE_DECL_STRERROR_R = 0
 HAVE_DECL_STRNDUP = 1
 HAVE_DECL_STRNLEN = 1
 HAVE_DECL_STRSIGNAL = 1
@@ -1639,7 +1639,7 @@ HAVE_DECL_STRTOK_R = 1
 HAVE_DECL_STRTOUMAX = 1
 HAVE_DECL_TRUNCATE = 1
 HAVE_DECL_TTYNAME_R = 1
-HAVE_DECL_UNSETENV = 1
+HAVE_DECL_UNSETENV = 0
 HAVE_DECL_VSNPRINTF = 1
 HAVE_DECL_WCSDUP = 0
 HAVE_DECL_WCTOB = 0
@@ -1647,7 +1647,7 @@ HAVE_DECL_WCWIDTH = 1
 HAVE_DIRENT_H = 1
 HAVE_DPRINTF = 1
 HAVE_DUP3 = 1
-HAVE_DUPLOCALE = 0
+HAVE_DUPLOCALE = 1
 HAVE_EUIDACCESS = 1
 HAVE_EXECVPE = 1
 HAVE_EXPLICIT_BZERO = 0
@@ -1661,21 +1661,21 @@ HAVE_FDOPENDIR = 1
 HAVE_FEATURES_H = 1
 HAVE_FFSL = 1
 HAVE_FFSLL = 1
-HAVE_FREELOCALE = 0
+HAVE_FREELOCALE = 1
 HAVE_FSEEKO = 1
 HAVE_FSTATAT = 1
 HAVE_FSYNC = 1
 HAVE_FTELLO = 1
 HAVE_FTRUNCATE = 1
 HAVE_FUTIMENS = 1
-HAVE_GETDTABLESIZE = 1
+HAVE_GETDTABLESIZE = 0
 HAVE_GETENTROPY = 1
 HAVE_GETGROUPS = 1
 HAVE_GETHOSTNAME = 1
 HAVE_GETLOGIN = 1
 HAVE_GETPAGESIZE = 1
 HAVE_GETPASS = 1
-HAVE_GETRANDOM = 0
+HAVE_GETRANDOM = 1
 HAVE_GETSUBOPT = 1
 HAVE_GETTIMEOFDAY = 1
 HAVE_GETUMASK = 1
@@ -1686,7 +1686,7 @@ HAVE_INITSTATE = 1
 HAVE_INTTYPES_H = 1
 HAVE_ISBLANK = 1
 HAVE_ISWBLANK = 1
-HAVE_ISWCNTRL = 0
+HAVE_ISWCNTRL = 1
 HAVE_LANGINFO_ALTMON = 0
 HAVE_LANGINFO_CODESET = 0
 HAVE_LANGINFO_ERA = 0
@@ -1720,7 +1720,7 @@ HAVE_MKSTEMPS = 1
 HAVE_MSVC_INVALID_PARAMETER_HANDLER = 0
 HAVE_NANOSLEEP = 1
 HAVE_NETINET_IN_H = 
-HAVE_NEWLOCALE = 0
+HAVE_NEWLOCALE = 1
 HAVE_NL_LANGINFO = 1
 HAVE_OPENAT = 1
 HAVE_OPENDIR = 1
@@ -1801,18 +1801,18 @@ HAVE_RAISE = 1
 HAVE_RANDOM = 1
 HAVE_RANDOM_H = 1
 HAVE_RANDOM_R = 1
-HAVE_RAWMEMCHR = 0
+HAVE_RAWMEMCHR = 1
 HAVE_READDIR = 1
 HAVE_READLINK = 1
 HAVE_READLINKAT = 1
-HAVE_REALLOCARRAY = 0
+HAVE_REALLOCARRAY = 1
 HAVE_REALPATH = 1
 HAVE_RENAMEAT = 1
 HAVE_REWINDDIR = 1
 HAVE_RPMATCH = 1
 HAVE_SA_FAMILY_T = 1
 HAVE_SCANDIR = 1
-HAVE_SCHED_H = 0
+HAVE_SCHED_H = 1
 HAVE_SCHED_YIELD = 1
 HAVE_SECURE_GETENV = 1
 HAVE_SETENV = 1
@@ -1827,7 +1827,7 @@ HAVE_SIGNED_SIG_ATOMIC_T = 1
 HAVE_SIGNED_WCHAR_T = 0
 HAVE_SIGNED_WINT_T = 0
 HAVE_SIGSET_T = 1
-HAVE_SLEEP = 1
+HAVE_SLEEP = 0
 HAVE_STDINT_H = 1
 HAVE_STPCPY = 1
 HAVE_STPNCPY = 1
@@ -1844,7 +1844,7 @@ HAVE_STRTOLL = 1
 HAVE_STRTOUL = 1
 HAVE_STRTOULL = 1
 HAVE_STRUCT_RANDOM_DATA = 1
-HAVE_STRUCT_SCHED_PARAM = 0
+HAVE_STRUCT_SCHED_PARAM = 1
 HAVE_STRUCT_SIGACTION_SA_SIGACTION = 1
 HAVE_STRUCT_SOCKADDR_STORAGE = 1
 HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY = 1
@@ -1858,7 +1858,7 @@ HAVE_SYS_INTTYPES_H = 0
 HAVE_SYS_IOCTL_H = 1
 HAVE_SYS_LOADAVG_H = 0
 HAVE_SYS_PARAM_H = 0
-HAVE_SYS_RANDOM_H = 0
+HAVE_SYS_RANDOM_H = 1
 HAVE_SYS_SELECT_H = 1
 HAVE_SYS_SOCKET_H = 1
 HAVE_SYS_TIME_H = 1
@@ -1930,11 +1930,11 @@ INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 INT32_MAX_LT_INTMAX_MAX = 1
 INT64_MAX_EQ_LONG_MAX = 0
-INTLLIBS = 
+INTLLIBS = -lintl
 INTL_MACOSX_LIBS = 
 LDFLAGS = 
 LIBICONV = 
-LIBINTL = 
+LIBINTL = -lintl
 LIBMULTITHREAD = 
 LIBOBJS = 
 LIBPMULTITHREAD = 
@@ -1970,20 +1970,20 @@ LOCALE_JA = ja_JP
 LOCALE_TR_UTF8 = none
 LOCALE_ZH_CN = none
 LTLIBICONV = 
-LTLIBINTL = 
+LTLIBINTL = -lintl
 LTLIBMULTITHREAD = 
 LTLIBOBJS = 
 LTLIBTHREAD = 
 MAKEINFO = ${SHELL} '/usr/glenda/APExp/sys/src/external/gsed/build-aux/missing' makeinfo
 MKDIR_P = mkdir -p
-MSGFMT = :
-MSGFMT_015 = :
+MSGFMT = /bin/msgfmt
+MSGFMT_015 = /bin/msgfmt
 MSGMERGE = /bin/msgmerge
 NETINET_IN_H = 
 NEXT_ARPA_INET_H = <arpa/inet.h>
-NEXT_ASSERT_H = <assert.h>
+NEXT_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_ARPA_INET_H = <arpa/inet.h>
-NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = <assert.h>
+NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_CTYPE_H = <ctype.h>
 NEXT_AS_FIRST_DIRECTIVE_DIRENT_H = <dirent.h>
 NEXT_AS_FIRST_DIRECTIVE_ERRNO_H = <errno.h>
@@ -2056,7 +2056,7 @@ PACKAGE_URL = https://www.gnu.org/software/sed/
 PACKAGE_VERSION = 4.9
 PATH_SEPARATOR = :
 PERL = 
-POSUB = 
+POSUB = po
 PRAGMA_COLUMNS = 
 PRAGMA_SYSTEM_HEADER = 
 PRIPTR_PREFIX = "l"
@@ -2066,9 +2066,9 @@ RANLIB = ranlib
 REPLACE_ACCESS = 0
 REPLACE_ALIGNED_ALLOC = 0
 REPLACE_BTOWC = 0
-REPLACE_CALLOC_FOR_CALLOC_GNU = 0
-REPLACE_CALLOC_FOR_CALLOC_POSIX = 0
-REPLACE_CANONICALIZE_FILE_NAME = 0
+REPLACE_CALLOC_FOR_CALLOC_GNU = 1
+REPLACE_CALLOC_FOR_CALLOC_POSIX = 1
+REPLACE_CANONICALIZE_FILE_NAME = 1
 REPLACE_CHMOD = 0
 REPLACE_CHOWN = 0
 REPLACE_CLOSE = 0
@@ -2079,7 +2079,7 @@ REPLACE_CTIME = GNULIB_PORTCHECK
 REPLACE_DIRFD = 0
 REPLACE_DPRINTF = 0
 REPLACE_DUP = 0
-REPLACE_DUP2 = 1
+REPLACE_DUP2 = 0
 REPLACE_DUPLOCALE = 0
 REPLACE_EXECL = 0
 REPLACE_EXECLE = 0
@@ -2131,19 +2131,19 @@ REPLACE_INITSTATE = 0
 REPLACE_IOCTL = 0
 REPLACE_ISATTY = 0
 REPLACE_ISWBLANK = 0
-REPLACE_ISWCNTRL = 1
+REPLACE_ISWCNTRL = 0
 REPLACE_ISWDIGIT = 0
 REPLACE_ISWXDIGIT = 0
 REPLACE_LCHOWN = 0
 REPLACE_LINK = 0
 REPLACE_LINKAT = 0
-REPLACE_LOCALECONV = 1
+REPLACE_LOCALECONV = 0
 REPLACE_LOCALTIME = 0
 REPLACE_LOCALTIME_R = GNULIB_PORTCHECK
 REPLACE_LSEEK = 1
 REPLACE_LSTAT = 1
-REPLACE_MALLOC_FOR_MALLOC_GNU = 0
-REPLACE_MALLOC_FOR_MALLOC_POSIX = 0
+REPLACE_MALLOC_FOR_MALLOC_GNU = 1
+REPLACE_MALLOC_FOR_MALLOC_POSIX = 1
 REPLACE_MBRLEN = 1
 REPLACE_MBRTOWC = 1
 REPLACE_MBSINIT = 0
@@ -2237,9 +2237,9 @@ REPLACE_RANDOM_R = 0
 REPLACE_READ = 0
 REPLACE_READLINK = 1
 REPLACE_READLINKAT = 0
-REPLACE_REALLOCARRAY = 0
+REPLACE_REALLOCARRAY = 1
 REPLACE_REALLOC_FOR_REALLOC_GNU = 0
-REPLACE_REALLOC_FOR_REALLOC_POSIX = 0
+REPLACE_REALLOC_FOR_REALLOC_POSIX = 1
 REPLACE_REALPATH = 1
 REPLACE_REMOVE = 0
 REPLACE_RENAME = 1
@@ -2250,7 +2250,7 @@ REPLACE_SELECT = 0
 REPLACE_SETENV = 0
 REPLACE_SETLOCALE = 1
 REPLACE_SETSTATE = 0
-REPLACE_SLEEP = 1
+REPLACE_SLEEP = 0
 REPLACE_SNPRINTF = 0
 REPLACE_SPRINTF = 0
 REPLACE_STAT = 0
@@ -2278,13 +2278,13 @@ REPLACE_STRTOLL = 0
 REPLACE_STRTOUL = 0
 REPLACE_STRTOULL = 0
 REPLACE_STRTOUMAX = 0
-REPLACE_STRUCT_LCONV = 1
+REPLACE_STRUCT_LCONV = 0
 REPLACE_STRUCT_TIMEVAL = 0
 REPLACE_SYMLINK = 1
 REPLACE_SYMLINKAT = 0
 REPLACE_TIMEGM = GNULIB_PORTCHECK
 REPLACE_TMPFILE = 0
-REPLACE_TOWLOWER = 1
+REPLACE_TOWLOWER = 0
 REPLACE_TRUNCATE = 0
 REPLACE_TTYNAME_R = 0
 REPLACE_TZSET = GNULIB_PORTCHECK
@@ -2316,7 +2316,7 @@ SET_MAKE =
 SHELL = /bin/sh
 SIG_ATOMIC_T_SUFFIX = 
 SIZE_T_SUFFIX = ul
-STDALIGN_H = $(top_build_prefix)lib/stdalign.h
+STDALIGN_H = 
 STDARG_H = 
 STDCKDINT_H = $(top_build_prefix)lib/stdckdint.h
 STDDEF_H = $(top_build_prefix)lib/stddef.h
@@ -2331,11 +2331,11 @@ UINT32_MAX_LT_UINTMAX_MAX = 1
 UINT64_MAX_EQ_ULONG_MAX = 0
 UNDEFINE_STRTOK_R = 0
 UNISTD_H_DEFINES_STRUCT_TIMESPEC = 0
-UNISTD_H_HAVE_SYS_RANDOM_H = 0
+UNISTD_H_HAVE_SYS_RANDOM_H = 1
 UNISTD_H_HAVE_WINSOCK2_H = 0
 UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS = 0
 USE_ACL = 0
-USE_NLS = no
+USE_NLS = yes
 VERSION = 4.9
 WARN_CFLAGS = 
 WCHAR_T_SUFFIX = 
@@ -2347,8 +2347,8 @@ WINDOWS_STAT_TIMESPEC = 0
 WINT_T_SUFFIX = u
 XFAIL_TESTS = testsuite/utf8-1 testsuite/utf8-2 \
                                       testsuite/utf8-3 testsuite/utf8-4
-XGETTEXT = :
-XGETTEXT_015 = :
+XGETTEXT = /bin/xgettext
+XGETTEXT_015 = /bin/xgettext
 XGETTEXT_EXTRA_OPTIONS =  --flag=error:3:c-format --flag=error_at_line:5:c-format
 abs_aux_dir = /usr/glenda/APExp/sys/src/external/gsed/build-aux
 abs_builddir = /usr/glenda/APExp/sys/src/external/gsed
@@ -2375,9 +2375,9 @@ datarootdir = ${prefix}/share
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 dvidir = ${docdir}
 exec_prefix = ${prefix}
-gl_LIBOBJDEPS = 
-gl_LIBOBJS = 
-gl_LTLIBOBJS = 
+gl_LIBOBJDEPS =  lib/./$(DEPDIR)/calloc.Po lib/./$(DEPDIR)/malloc.Po lib/./$(DEPDIR)/realloc.Po
+gl_LIBOBJS =  lib/calloc.o lib/malloc.o lib/realloc.o
+gl_LTLIBOBJS =  lib/calloc.lo lib/malloc.lo lib/realloc.lo
 gltests_LIBOBJDEPS =  ./$(DEPDIR)/fopen.Po ./$(DEPDIR)/strerror_r.Po
 gltests_LIBOBJS =  fopen.o strerror_r.o
 gltests_LTLIBOBJS =  fopen.lo strerror_r.lo
@@ -6279,23 +6279,23 @@ lib/alloca.h: $(top_builddir)/config.status
 
 # We need the following in order to create <assert.h> when the system
 # doesn't have one that works with the given compiler.
-lib/assert.h: lib/assert.in.h lib/verify.h $(top_builddir)/config.status
-	$(AM_V_GEN)$(MKDIR_P) 'lib'
-	$(gl_V_at){ $(SED_HEADER_STDOUT) \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
-	      -e 's|@''PRAGMA_COLUMNS''@||g' \
-	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
-	      < $(top_srcdir)/lib/assert.in.h && \
-	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
-	      -e 's|_gl_verify|_gl_static_assert|g' \
-	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
-	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL\1|g' \
-	      < $(top_srcdir)/lib/verify.h; \
-	} > $@-t
-	$(AM_V_at)mv $@-t $@
-#lib/assert.h: $(top_builddir)/config.status
-#	rm -f $@
+#lib/assert.h: lib/assert.in.h lib/verify.h $(top_builddir)/config.status
+#	$(AM_V_GEN)$(MKDIR_P) 'lib'
+#	$(gl_V_at){ $(SED_HEADER_STDOUT) \
+#	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+#	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
+#	      -e 's|@''PRAGMA_COLUMNS''@||g' \
+#	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
+#	      < $(top_srcdir)/lib/assert.in.h && \
+#	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
+#	      -e 's|_gl_verify|_gl_static_assert|g' \
+#	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
+#	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL\1|g' \
+#	      < $(top_srcdir)/lib/verify.h; \
+#	} > $@-t
+#	$(AM_V_at)mv $@-t $@
+lib/assert.h: $(top_builddir)/config.status
+	rm -f $@
 
 # We need the following in order to create <ctype.h> when the system
 # doesn't have one that works with the given compiler.
@@ -6524,12 +6524,12 @@ lib/selinux/label.h: lib/se-label.in.h $(top_builddir)/config.status
 
 # We need the following in order to create <stdalign.h> when the system
 # doesn't have one that works.
-lib/stdalign.h: lib/stdalign.in.h $(top_builddir)/config.status
-	$(AM_V_GEN)$(MKDIR_P) 'lib'
-	$(gl_V_at)$(SED_HEADER_TO_AT_t) $(top_srcdir)/lib/stdalign.in.h
-	$(AM_V_at)mv $@-t $@
-#lib/stdalign.h: $(top_builddir)/config.status
-#	rm -f $@
+#lib/stdalign.h: lib/stdalign.in.h $(top_builddir)/config.status
+#	$(AM_V_GEN)$(MKDIR_P) 'lib'
+#	$(gl_V_at)$(SED_HEADER_TO_AT_t) $(top_srcdir)/lib/stdalign.in.h
+#	$(AM_V_at)mv $@-t $@
+lib/stdalign.h: $(top_builddir)/config.status
+	rm -f $@
 
 # We need the following in order to create <stdarg.h> when the system
 # doesn't have one that works with the given compiler.
@@ -7497,7 +7497,7 @@ mostlyclean-local: mostlyclean-generic
 	:
 distclean-local: distclean-gnulib-libobjs
 distclean-gnulib-libobjs:
-	-rm -f 
+	-rm -f  lib/./$(DEPDIR)/calloc.Po lib/./$(DEPDIR)/malloc.Po lib/./$(DEPDIR)/realloc.Po
 maintainer-clean-local: distclean-gnulib-libobjs
 
 $(sed_sed_OBJECTS): $(BUILT_SOURCES)

@@ -102,6 +102,7 @@ configure:3905: result: o
 configure:3909: checking whether the compiler supports GNU C
 configure:3929: cc -c   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/readline/conftest.c:14[stdin:15] syntax error, last name: me
+cc: cpp: 6c 114640: error
 configure:3929: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -130,7 +131,12 @@ configure:3973: $? = 0
 configure:4020: result: yes
 configure:4040: checking for cc option to enable C11 features
 configure:4055: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:184[stdin:253] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:184[stdin:264] syntax error, last name: __func__$9
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cpp: conftest.c:180 #error directive: "Compiler does not advertise C11 conformance"
+cc: 6c: cpp 114673: errors
 configure:4055: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -421,7 +427,19 @@ configure: failed program was:
 | }
 | 
 configure:4055: cc -std=gnu11 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:184[stdin:253] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:184[stdin:264] syntax error, last name: __func__$9
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -n ignored
+cc: flag -u ignored
+cc: flag -1 ignored
+cc: flag -1 ignored
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cpp: conftest.c:180 #error directive: "Compiler does not advertise C11 conformance"
+cc: 6c: cpp 114687: errors
 configure:4055: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -714,7 +732,11 @@ configure: failed program was:
 configure:4069: result: unsupported
 configure:4089: checking for cc option to enable C99 features
 configure:4104: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 114707: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -945,7 +967,18 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -std=gnu99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -n ignored
+cc: flag -u ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 114721: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1176,7 +1209,16 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -std=c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 114735: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1407,7 +1449,13 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 114749: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1638,7 +1686,13 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -qlanglvl=extc1x -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -q ignored
+cc: can't find library for -l
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 114763: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1869,7 +1923,13 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -qlanglvl=extc99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -q ignored
+cc: can't find library for -l
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 114777: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2100,7 +2160,14 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -AC99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -C ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 114791: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2331,7 +2398,11 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -D_STDC_C99= -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 114805: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2608,7 +2679,9 @@ configure:4197: $? = 0
 configure:4197: result: yes
 configure:4197: checking for minix/config.h
 configure:4197: cc -c -g  conftest.c >&5
-<eof> End of file
+<eof> syntax error, last name: mbs
+cpp: conftest.c:47 Could not find include file <minix/config.h>
+cc: 6c: cpp 114979: error
 configure:4197: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2695,7 +2768,8 @@ configure:4927: checking for size_t
 configure:4927: cc -c -g  conftest.c >&5
 configure:4927: $? = 0
 configure:4927: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:70[stdin:4491] syntax error, last name: size_t
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:70[stdin:4743] syntax error, last name: size_t
+cc: cpp: 6c 115138: error
 configure:4927: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2777,7 +2851,8 @@ configure:4938: checking for ssize_t
 configure:4938: cc -c -g  conftest.c >&5
 configure:4938: $? = 0
 configure:4938: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:70[stdin:4491] syntax error, last name: ssize_t
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:70[stdin:4743] syntax error, last name: ssize_t
+cc: cpp: 6c 115166: error
 configure:4938: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2859,7 +2934,8 @@ configure:4950: checking for mode_t
 configure:4950: cc -c -g  conftest.c >&5
 configure:4950: $? = 0
 configure:4950: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:70[stdin:4491] syntax error, last name: mode_t
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:70[stdin:4743] syntax error, last name: mode_t
+cc: cpp: 6c 115194: error
 configure:4950: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2968,6 +3044,7 @@ configure:5212: result: yes
 configure:5218: checking for pselect
 configure:5218: cc -o conftest -g   conftest.c  >&5
 main: undefined: pselect in main
+cc: 6l: 6l 115327: error
 configure:5218: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3056,6 +3133,7 @@ configure:5230: result: yes
 configure:5236: checking for setitimer
 configure:5236: cc -o conftest -g   conftest.c  >&5
 main: undefined: setitimer in main
+cc: 6l: 6l 115380: error
 configure:5236: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3137,88 +3215,8 @@ configure: failed program was:
 configure:5236: result: no
 configure:5243: checking for fnmatch
 configure:5243: cc -o conftest -g   conftest.c  >&5
-casefold: undefined: toupperrune in casefold
-casefold: undefined: tolowerrune in casefold
-fnmatch: __fsmu8: not defined
-configure:5243: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| /* end confdefs.h.  */
-| /* Define fnmatch to an innocuous variant, in case <limits.h> declares fnmatch.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define fnmatch innocuous_fnmatch
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char fnmatch (void); below.  */
-| 
-| #include <limits.h>
-| #undef fnmatch
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char fnmatch (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_fnmatch || defined __stub___fnmatch
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return fnmatch ();
-|   ;
-|   return 0;
-| }
-configure:5243: result: no
+configure:5243: $? = 0
+configure:5243: result: yes
 configure:5249: checking for memmove
 configure:5249: cc -o conftest -g   conftest.c  >&5
 configure:5249: $? = 0
@@ -3254,6 +3252,7 @@ configure:5291: result: yes
 configure:5297: checking for tcgetwinsize
 configure:5297: cc -o conftest -g   conftest.c  >&5
 main: undefined: tcgetwinsize in main
+cc: 6l: 6l 115545: error
 configure:5297: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3300,6 +3299,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -3344,6 +3344,7 @@ configure:5297: result: no
 configure:5303: checking for tcsetwinsize
 configure:5303: cc -o conftest -g   conftest.c  >&5
 main: undefined: tcsetwinsize in main
+cc: 6l: 6l 115566: error
 configure:5303: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3390,6 +3391,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -3438,6 +3440,7 @@ configure:5309: result: yes
 configure:5316: checking for isascii
 configure:5316: cc -o conftest -g   conftest.c  >&5
 main: undefined: isascii in main
+cc: 6l: 6l 115603: error
 configure:5316: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3484,6 +3487,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -3546,7 +3550,8 @@ configure:5349: checking for uid_t
 configure:5349: cc -c -g  conftest.c >&5
 configure:5349: $? = 0
 configure:5349: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:90[stdin:4511] syntax error, last name: uid_t
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:91[stdin:4764] syntax error, last name: uid_t
+cc: cpp: 6c 115694: error
 configure:5349: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3593,6 +3598,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -3648,7 +3654,8 @@ configure:5360: checking for gid_t
 configure:5360: cc -c -g  conftest.c >&5
 configure:5360: $? = 0
 configure:5360: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:90[stdin:4511] syntax error, last name: gid_t
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:91[stdin:4764] syntax error, last name: gid_t
+cc: cpp: 6c 115722: error
 configure:5360: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3695,6 +3702,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -3797,6 +3805,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -3877,6 +3886,10 @@ configure:5498: checking for stdlib.h
 configure:5498: result: yes
 configure:5504: checking for varargs.h
 configure:5504: cc -c -g  conftest.c >&5
+<eof> not a function
+<eof> syntax error, last name: wc
+cpp: conftest.c:92 Could not find include file <varargs.h>
+cc: 6c: cpp 115810: error
 configure:5504: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3923,6 +3936,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -3997,6 +4011,10 @@ configure:5546: $? = 0
 configure:5546: result: yes
 configure:5552: checking for memory.h
 configure:5552: cc -c -g  conftest.c >&5
+<eof> not a function
+<eof> syntax error, last name: si
+cpp: conftest.c:99 Could not find include file <memory.h>
+cc: 6c: cpp 115911: error
 configure:5552: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4043,6 +4061,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -4108,6 +4127,8 @@ configure:5564: $? = 0
 configure:5564: result: yes
 configure:5570: checking for termio.h
 configure:5570: cc -c -g  conftest.c >&5
+cpp: conftest.c:101 Could not find include file <termio.h>
+cc: 6c: cpp 115958: error
 configure:5570: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4154,6 +4175,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -4217,6 +4239,8 @@ configure:5577: $? = 0
 configure:5577: result: yes
 configure:5583: checking for sys/pte.h
 configure:5583: cc -c -g  conftest.c >&5
+cpp: conftest.c:102 Could not find include file <sys/pte.h>
+cc: 6c: cpp 115991: error
 configure:5583: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4263,6 +4287,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -4323,6 +4348,8 @@ configure: failed program was:
 configure:5583: result: no
 configure:5589: checking for sys/stream.h
 configure:5589: cc -c -g  conftest.c >&5
+cpp: conftest.c:102 Could not find include file <sys/stream.h>
+cc: 6c: cpp 116010: error
 configure:5589: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4369,6 +4396,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -4437,114 +4465,12 @@ configure:5601: $? = 0
 configure:5601: result: yes
 configure:5607: checking for sys/file.h
 configure:5607: cc -c -g  conftest.c >&5
-configure:5607: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| #include <sys/file.h>
-configure:5607: result: no
+configure:5607: $? = 0
+configure:5607: result: yes
 configure:5615: checking for sys/ptem.h
 configure:5615: cc -c -g  conftest.c >&5
+cpp: conftest.c:83 Could not find include file <sys/ptem.h>
+cc: 6c: cpp 116071: error
 configure:5615: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4591,6 +4517,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -4620,6 +4547,7 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | /* end confdefs.h.  */
 | 
 | #if HAVE_SYS_STREAM_H
@@ -4633,7 +4561,8 @@ configure:5635: checking for cc option to enable large file support
 configure:5670: cc -c -g  conftest.c >&5
 configure:5670: $? = 0
 configure:5676: cc -DFTYPE=ino_t -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:84[stdin:145] array size must be a positive constant
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:86[stdin:217] array size must be a positive constant
+cc: cpp: 6c 116096: error
 configure:5676: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4680,6 +4609,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -4709,6 +4639,7 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | /* end confdefs.h.  */
 | #include <sys/types.h>
 | #ifndef FTYPE
@@ -4730,7 +4661,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:5681: cc -DFTYPE=ino_t -D_FILE_OFFSET_BITS=64 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:84[stdin:145] array size must be a positive constant
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:86[stdin:217] array size must be a positive constant
+cc: cpp: 6c 116109: error
 configure:5681: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4777,6 +4709,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -4806,6 +4739,7 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | /* end confdefs.h.  */
 | #include <sys/types.h>
 | #ifndef FTYPE
@@ -4835,134 +4769,13 @@ configure:5949: checking if signal handlers must be reinstalled when invoked
 configure:6008: cc -o conftest -g   conftest.c  >&5
 configure:6008: $? = 0
 configure:6008: ./conftest
-conftest 18606: suicide: sys: trap: fault write addr=0x7ffffffff000 pc=0x20224d
-configure:6008: $? = 1
-configure: program exited with status 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| /* end confdefs.h.  */
-| 
-| #include <signal.h>
-| #ifdef HAVE_UNISTD_H
-| #include <unistd.h>
-| #endif
-| #include <stdlib.h>
-| 
-| typedef void sigfunc(int);
-| 
-| volatile int nsigint;
-| 
-| #ifdef HAVE_POSIX_SIGNALS
-| sigfunc *
-| set_signal_handler(int sig, sigfunc *handler)
-| {
-|   struct sigaction act, oact;
-|   act.sa_handler = handler;
-|   act.sa_flags = 0;
-|   sigemptyset (&act.sa_mask);
-|   sigemptyset (&oact.sa_mask);
-|   sigaction (sig, &act, &oact);
-|   return (oact.sa_handler);
-| }
-| #else
-| #define set_signal_handler(s, h) signal(s, h)
-| #endif
-| 
-| void
-| sigint(int s)
-| {
-|   nsigint++;
-| }
-| 
-| int
-| main()
-| {
-| 	nsigint = 0;
-| 	set_signal_handler(SIGINT, sigint);
-| 	kill((int)getpid(), SIGINT);
-| 	kill((int)getpid(), SIGINT);
-| 	exit(nsigint != 2);
-| }
-| 
-configure:6023: result: yes
+configure:6008: $? = 0
+configure:6023: result: no
 configure:6032: checking for presence of POSIX-style sigsetjmp/siglongjmp
 configure:6102: cc -o conftest -g   conftest.c  >&5
 configure:6102: $? = 0
 configure:6102: ./conftest
-conftest 18628: suicide: sys: trap: fault read addr=0x0 pc=0x20cd68
+conftest 116170: suicide: sys: trap: fault read addr=0x0 pc=0x20c88f
 configure:6102: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -5010,6 +4823,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -5039,8 +4853,8 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | /* end confdefs.h.  */
 | 
 | #ifdef HAVE_UNISTD_H
@@ -5148,6 +4962,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -5177,8 +4992,8 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | /* end confdefs.h.  */
 | 
@@ -5223,6 +5038,8 @@ configure:6243: checking how to run the C preprocessor
 configure:6269: cc -E  conftest.c
 configure:6269: $? = 0
 configure:6285: cc -E  conftest.c
+cpp: conftest.c:79 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 116229: error
 configure:6285: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5269,6 +5086,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -5298,8 +5116,8 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
@@ -5307,6 +5125,8 @@ configure:6314: result: cc -E
 configure:6328: cc -E  conftest.c
 configure:6328: $? = 0
 configure:6344: cc -E  conftest.c
+cpp: conftest.c:79 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 116251: error
 configure:6344: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5353,6 +5173,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -5382,8 +5203,8 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | /* end confdefs.h.  */
 | #include <ac_nonexistent.h>
@@ -5393,234 +5214,8 @@ configure:6511: checking whether getpw functions are declared in pwd.h
 configure:6540: result: yes
 configure:6548: checking whether termios.h defines TIOCGWINSZ
 configure:6561: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:108[stdin:4736] name not declared: TIOCGWINSZ
-configure:6561: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| #include <termios.h>
-| const int tiocgwinsz = TIOCGWINSZ;
-| 
-configure:6571: result: no
-configure:6575: checking whether sys/ioctl.h defines TIOCGWINSZ
-configure:6588: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:108[stdin:4548] name not declared: TIOCGWINSZ
-configure:6588: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| #include <sys/ioctl.h>
-| const int tiocgwinsz = TIOCGWINSZ;
-| 
-configure:6598: result: no
+configure:6561: $? = 0
+configure:6571: result: yes
 configure:6610: checking for inttypes.h
 configure:6610: result: yes
 configure:6618: checking for sig_atomic_t in signal.h
@@ -5629,7 +5224,8 @@ configure:6635: $? = 0
 configure:6646: result: yes
 configure:6700: checking for TIOCSTAT in sys/ioctl.h
 configure:6719: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:86[stdin:168] name not declared: TIOCSTAT
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:87[stdin:253] name not declared: TIOCSTAT
+cc: cpp: 6c 116317: error
 configure:6719: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5676,6 +5272,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -5705,8 +5302,8 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
@@ -5728,7 +5325,8 @@ configure:6757: $? = 0
 configure:6769: result: yes
 configure:6776: checking for speed_t in sys/types.h
 configure:6793: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:85[stdin:148] syntax error, last name: x
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:86[stdin:219] syntax error, last name: x
+cc: cpp: 6c 116350: error
 configure:6793: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5775,6 +5373,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -5804,8 +5403,8 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
@@ -5822,104 +5421,10 @@ configure: failed program was:
 configure:6804: result: no
 configure:6811: checking for struct winsize in sys/ioctl.h and termios.h
 configure:6839: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:90[stdin:172] structure not fully declared winsize
-configure:6839: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| #define HAVE_INTTYPES_H 1
-| #define FIONREAD_IN_SYS_IOCTL 1
-| /* end confdefs.h.  */
-| 
-| #include <sys/types.h>
-| #include <sys/ioctl.h>
-| 
-| int
-| main (void)
-| {
-| 
-| struct winsize x;
-| if (sizeof (x) > 0) return (0);
-| 
-|   ;
-|   return 0;
-| }
+configure:6839: $? = 0
 configure:6873: cc -c -g  conftest.c >&5
+cpp: conftest.c:84 Could not find include file <sys/termios.h>
+cc: 6c: cpp 116379: error
 configure:6873: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5966,6 +5471,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -5995,8 +5501,8 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
@@ -6016,14 +5522,15 @@ configure: failed program was:
 |   ;
 |   return 0;
 | }
-configure:6909: result: not found
+configure:6899: result: sys/ioctl.h
 configure:6915: checking for struct dirent.d_ino
 configure:6915: cc -c -g  conftest.c >&5
 configure:6915: $? = 0
 configure:6915: result: yes
 configure:6948: checking for struct dirent.d_fileno
 configure:6948: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:108[stdin:2932] not a member of struct/union: d_fileno
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:110[stdin:3144] not a member of struct/union: d_fileno
+cc: cpp: 6c 116412: error
 configure:6948: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6070,6 +5577,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -6099,12 +5607,13 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | /* end confdefs.h.  */
 | 
@@ -6139,7 +5648,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:6948: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:108[stdin:2932] not a member of struct/union: d_fileno
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:110[stdin:3144] not a member of struct/union: d_fileno
+cc: cpp: 6c 116426: error
 configure:6948: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6186,6 +5696,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -6215,12 +5726,13 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | /* end confdefs.h.  */
 | 
@@ -6261,6 +5773,9 @@ configure:7001: $? = 0
 configure:7013: result: yes
 configure:7021: checking for libaudit.h
 configure:7021: cc -c -g  conftest.c >&5
+<eof> syntax error, last name: mb
+cpp: conftest.c:113 Could not find include file <libaudit.h>
+cc: 6c: cpp 116461: error
 configure:7021: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6307,6 +5822,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -6336,12 +5852,13 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | #define HAVE_TIMEVAL 1
 | /* end confdefs.h.  */
@@ -6377,7 +5894,8 @@ configure: failed program was:
 configure:7021: result: no
 configure:7028: checking for cc options needed to detect all undeclared functions
 configure:7050: cc -c -g   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:87[stdin:88] name not declared: strchr
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:89[stdin:90] name not declared: strchr
+cc: cpp: 6c 116479: error
 configure:7050: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6424,6 +5942,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -6453,12 +5972,13 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | #define HAVE_TIMEVAL 1
 | /* end confdefs.h.  */
@@ -6473,8 +5993,10 @@ configure: failed program was:
 configure:7077: cc -c -g   conftest.c >&5
 configure:7077: $? = 0
 configure:7097: result: none needed
-configure:7111: checking whether AUDIT_USER_TTY is declared
+configure:7111: checking whether  is declared
 configure:7111: cc -c -g   conftest.c >&5
+cpp: conftest.c:85 Could not find include file <linux/audit.h>
+cc: 6c: cpp 116510: error
 configure:7111: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6521,6 +6043,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -6550,12 +6073,13 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | #define HAVE_TIMEVAL 1
 | /* end confdefs.h.  */
@@ -6564,11 +6088,11 @@ configure: failed program was:
 | int
 | main (void)
 | {
-| #ifndef AUDIT_USER_TTY
+| #ifndef 
 | #ifdef __cplusplus
-|   (void) AUDIT_USER_TTY;
+|   (void) ;
 | #else
-|   (void) AUDIT_USER_TTY;
+|   (void) ;
 | #endif
 | #endif
 | 
@@ -6578,347 +6102,14 @@ configure: failed program was:
 configure:7111: result: no
 configure:7138: checking for tgetent
 configure:7138: cc -o conftest -g   conftest.c  >&5
-main: undefined: tgetent in main
-configure:7138: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| #define HAVE_INTTYPES_H 1
-| #define FIONREAD_IN_SYS_IOCTL 1
-| #define HAVE_STRUCT_DIRENT_D_INO 1
-| #define HAVE_TIMEVAL 1
-| #define HAVE_DECL_AUDIT_USER_TTY 0
-| /* end confdefs.h.  */
-| /* Define tgetent to an innocuous variant, in case <limits.h> declares tgetent.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define tgetent innocuous_tgetent
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char tgetent (void); below.  */
-| 
-| #include <limits.h>
-| #undef tgetent
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char tgetent (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_tgetent || defined __stub___tgetent
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return tgetent ();
-|   ;
-|   return 0;
-| }
-configure:7138: result: no
-configure:7143: checking for tgetent in -ltermcap
-configure:7172: cc -o conftest -g   conftest.c -ltermcap   >&5
-main: undefined: tgetent in main
-configure:7172: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| #define HAVE_INTTYPES_H 1
-| #define FIONREAD_IN_SYS_IOCTL 1
-| #define HAVE_STRUCT_DIRENT_D_INO 1
-| #define HAVE_TIMEVAL 1
-| #define HAVE_DECL_AUDIT_USER_TTY 0
-| /* end confdefs.h.  */
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.
-|    The 'extern "C"' is for builds by C++ compilers;
-|    although this is not generally supported in C code supporting it here
-|    has little cost and some practical benefit (sr 110532).  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char tgetent (void);
-| int
-| main (void)
-| {
-| return tgetent ();
-|   ;
-|   return 0;
-| }
-configure:7184: result: no
-configure:7190: checking for tgetent in -ltinfo
-configure:7219: cc -o conftest -g   conftest.c -ltinfo   >&5
-main: undefined: tgetent in main
-configure:7219: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| #define HAVE_INTTYPES_H 1
-| #define FIONREAD_IN_SYS_IOCTL 1
-| #define HAVE_STRUCT_DIRENT_D_INO 1
-| #define HAVE_TIMEVAL 1
-| #define HAVE_DECL_AUDIT_USER_TTY 0
-| /* end confdefs.h.  */
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.
-|    The 'extern "C"' is for builds by C++ compilers;
-|    although this is not generally supported in C code supporting it here
-|    has little cost and some practical benefit (sr 110532).  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char tgetent (void);
-| int
-| main (void)
-| {
-| return tgetent ();
-|   ;
-|   return 0;
-| }
-configure:7231: result: no
-configure:7237: checking for tgetent in -lcurses
-configure:7266: cc -o conftest -g   conftest.c -lcurses   >&5
-configure:7266: $? = 0
-configure:7278: result: yes
+configure:7138: $? = 0
+configure:7138: result: yes
 configure:7401: checking which library has the termcap functions
-configure:7404: result: using libcurses
+configure:7404: result: using libc
 configure:7466: checking for nl_langinfo and CODESET
 configure:7483: cc -o conftest -g   conftest.c  >&5
-/sys/include/ape/langinfo.h:16[stdin:165] syntax error, last name: size_t
+/sys/include/ape/langinfo.h:16[stdin:167] syntax error, last name: size_t
+cc: cpp: 6c 116549: error
 configure:7483: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6965,6 +6156,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -6994,12 +6186,13 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | #define HAVE_TIMEVAL 1
 | #define HAVE_DECL_AUDIT_USER_TTY 0
@@ -7025,6 +6218,9 @@ configure:7520: $? = 0
 configure:7520: result: yes
 configure:7528: checking for mbstr.h
 configure:7528: cc -c -g  conftest.c >&5
+<eof> syntax error, last name: wchar_t
+cpp: conftest.c:117 Could not find include file <mbstr.h>
+cc: 6c: cpp 116604: error
 configure:7528: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7071,6 +6267,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -7100,12 +6297,13 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | #define HAVE_TIMEVAL 1
 | #define HAVE_DECL_AUDIT_USER_TTY 0
@@ -7145,130 +6343,12 @@ configure: failed program was:
 configure:7528: result: no
 configure:7536: checking for mbrlen
 configure:7536: cc -o conftest -g   conftest.c  >&5
-__towrite_needs_stdio_exit: __fsmu8: not defined
-configure:7536: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| #define HAVE_INTTYPES_H 1
-| #define FIONREAD_IN_SYS_IOCTL 1
-| #define HAVE_STRUCT_DIRENT_D_INO 1
-| #define HAVE_TIMEVAL 1
-| #define HAVE_DECL_AUDIT_USER_TTY 0
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_LANGINFO_H 1
-| /* end confdefs.h.  */
-| /* Define mbrlen to an innocuous variant, in case <limits.h> declares mbrlen.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define mbrlen innocuous_mbrlen
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char mbrlen (void); below.  */
-| 
-| #include <limits.h>
-| #undef mbrlen
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char mbrlen (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_mbrlen || defined __stub___mbrlen
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return mbrlen ();
-|   ;
-|   return 0;
-| }
-configure:7536: result: no
+configure:7536: $? = 0
+configure:7536: result: yes
 configure:7543: checking for mbscasecmp
 configure:7543: cc -o conftest -g   conftest.c  >&5
 main: undefined: mbscasecmp in main
+cc: 6l: 6l 116640: error
 configure:7543: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7315,6 +6395,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -7344,18 +6425,20 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | #define HAVE_TIMEVAL 1
 | #define HAVE_DECL_AUDIT_USER_TTY 0
 | #define HAVE_WCTYPE_H 1
 | #define HAVE_WCHAR_H 1
 | #define HAVE_LANGINFO_H 1
+| #define HAVE_MBRLEN 1
 | /* end confdefs.h.  */
 | /* Define mbscasecmp to an innocuous variant, in case <limits.h> declares mbscasecmp.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -7392,6 +6475,7 @@ configure:7543: result: no
 configure:7550: checking for mbscmp
 configure:7550: cc -o conftest -g   conftest.c  >&5
 main: undefined: mbscmp in main
+cc: 6l: 6l 116661: error
 configure:7550: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7438,6 +6522,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -7467,18 +6552,20 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | #define HAVE_TIMEVAL 1
 | #define HAVE_DECL_AUDIT_USER_TTY 0
 | #define HAVE_WCTYPE_H 1
 | #define HAVE_WCHAR_H 1
 | #define HAVE_LANGINFO_H 1
+| #define HAVE_MBRLEN 1
 | /* end confdefs.h.  */
 | /* Define mbscmp to an innocuous variant, in case <limits.h> declares mbscmp.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -7515,6 +6602,7 @@ configure:7550: result: no
 configure:7557: checking for mbsncmp
 configure:7557: cc -o conftest -g   conftest.c  >&5
 main: undefined: mbsncmp in main
+cc: 6l: 6l 116682: error
 configure:7557: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7561,6 +6649,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -7590,18 +6679,20 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | #define HAVE_TIMEVAL 1
 | #define HAVE_DECL_AUDIT_USER_TTY 0
 | #define HAVE_WCTYPE_H 1
 | #define HAVE_WCHAR_H 1
 | #define HAVE_LANGINFO_H 1
+| #define HAVE_MBRLEN 1
 | /* end confdefs.h.  */
 | /* Define mbsncmp to an innocuous variant, in case <limits.h> declares mbsncmp.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -7637,253 +6728,16 @@ configure: failed program was:
 configure:7557: result: no
 configure:7564: checking for mbsnrtowcs
 configure:7564: cc -o conftest -g   conftest.c  >&5
-__towrite_needs_stdio_exit: __fsmu8: not defined
-configure:7564: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| #define HAVE_INTTYPES_H 1
-| #define FIONREAD_IN_SYS_IOCTL 1
-| #define HAVE_STRUCT_DIRENT_D_INO 1
-| #define HAVE_TIMEVAL 1
-| #define HAVE_DECL_AUDIT_USER_TTY 0
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_LANGINFO_H 1
-| /* end confdefs.h.  */
-| /* Define mbsnrtowcs to an innocuous variant, in case <limits.h> declares mbsnrtowcs.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define mbsnrtowcs innocuous_mbsnrtowcs
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char mbsnrtowcs (void); below.  */
-| 
-| #include <limits.h>
-| #undef mbsnrtowcs
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char mbsnrtowcs (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_mbsnrtowcs || defined __stub___mbsnrtowcs
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return mbsnrtowcs ();
-|   ;
-|   return 0;
-| }
-configure:7564: result: no
+configure:7564: $? = 0
+configure:7564: result: yes
 configure:7571: checking for mbsrtowcs
 configure:7571: cc -o conftest -g   conftest.c  >&5
-__towrite_needs_stdio_exit: __fsmu8: not defined
-configure:7571: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| #define HAVE_INTTYPES_H 1
-| #define FIONREAD_IN_SYS_IOCTL 1
-| #define HAVE_STRUCT_DIRENT_D_INO 1
-| #define HAVE_TIMEVAL 1
-| #define HAVE_DECL_AUDIT_USER_TTY 0
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_LANGINFO_H 1
-| /* end confdefs.h.  */
-| /* Define mbsrtowcs to an innocuous variant, in case <limits.h> declares mbsrtowcs.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define mbsrtowcs innocuous_mbsrtowcs
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char mbsrtowcs (void); below.  */
-| 
-| #include <limits.h>
-| #undef mbsrtowcs
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char mbsrtowcs (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_mbsrtowcs || defined __stub___mbsrtowcs
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return mbsrtowcs ();
-|   ;
-|   return 0;
-| }
-configure:7571: result: no
+configure:7571: $? = 0
+configure:7571: result: yes
 configure:7579: checking for mbschr
 configure:7579: cc -o conftest -g   conftest.c  >&5
 main: undefined: mbschr in main
+cc: 6l: 6l 116735: error
 configure:7579: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7930,6 +6784,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -7959,18 +6814,22 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | #define HAVE_TIMEVAL 1
 | #define HAVE_DECL_AUDIT_USER_TTY 0
 | #define HAVE_WCTYPE_H 1
 | #define HAVE_WCHAR_H 1
 | #define HAVE_LANGINFO_H 1
+| #define HAVE_MBRLEN 1
+| #define HAVE_MBSNRTOWCS 1
+| #define HAVE_MBSRTOWCS 1
 | /* end confdefs.h.  */
 | /* Define mbschr to an innocuous variant, in case <limits.h> declares mbschr.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -8022,132 +6881,8 @@ configure:7616: $? = 0
 configure:7616: result: yes
 configure:7623: checking for wctype
 configure:7623: cc -o conftest -g   conftest.c  >&5
-isupperrune: undefined: tolowerrune in isupperrune
-islowerrune: undefined: toupperrune in islowerrune
-configure:7623: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| #define HAVE_INTTYPES_H 1
-| #define FIONREAD_IN_SYS_IOCTL 1
-| #define HAVE_STRUCT_DIRENT_D_INO 1
-| #define HAVE_TIMEVAL 1
-| #define HAVE_DECL_AUDIT_USER_TTY 0
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_LANGINFO_H 1
-| #define HAVE_WCRTOMB 1
-| #define HAVE_WCSCOLL 1
-| #define HAVE_WCSDUP 1
-| #define HAVE_WCWIDTH 1
-| /* end confdefs.h.  */
-| /* Define wctype to an innocuous variant, in case <limits.h> declares wctype.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define wctype innocuous_wctype
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char wctype (void); below.  */
-| 
-| #include <limits.h>
-| #undef wctype
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char wctype (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_wctype || defined __stub___wctype
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return wctype ();
-|   ;
-|   return 0;
-| }
-configure:7623: result: no
+configure:7623: $? = 0
+configure:7623: result: yes
 configure:7630: checking for wcsnrtombs
 configure:7630: cc -o conftest -g   conftest.c  >&5
 configure:7630: $? = 0
@@ -8158,375 +6893,20 @@ configure:7638: $? = 0
 configure:7638: result: yes
 configure:7655: checking whether mbrtowc and mbstate_t are properly declared
 configure:7676: cc -o conftest -g   conftest.c  >&5
-rwakeupall: __fsmu8: not defined
-configure:7676: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| #define HAVE_INTTYPES_H 1
-| #define FIONREAD_IN_SYS_IOCTL 1
-| #define HAVE_STRUCT_DIRENT_D_INO 1
-| #define HAVE_TIMEVAL 1
-| #define HAVE_DECL_AUDIT_USER_TTY 0
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_LANGINFO_H 1
-| #define HAVE_WCRTOMB 1
-| #define HAVE_WCSCOLL 1
-| #define HAVE_WCSDUP 1
-| #define HAVE_WCWIDTH 1
-| #define HAVE_WCSNRTOMBS 1
-| #define HAVE_WCSWIDTH 1
-| /* end confdefs.h.  */
-| #include <wchar.h>
-| int
-| main (void)
-| {
-| wchar_t wc;
-| 	      char const s[] = "";
-| 	      size_t n = 1;
-| 	      mbstate_t state;
-| 	      return ! (sizeof state && (mbrtowc) (&wc, s, n, &state));
-|   ;
-|   return 0;
-| }
-configure:7687: result: no
+configure:7676: $? = 0
+configure:7687: result: yes
 configure:7700: checking for iswlower
 configure:7700: cc -o conftest -g   conftest.c  >&5
-main: undefined: iswlower in main
-configure:7700: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| #define HAVE_INTTYPES_H 1
-| #define FIONREAD_IN_SYS_IOCTL 1
-| #define HAVE_STRUCT_DIRENT_D_INO 1
-| #define HAVE_TIMEVAL 1
-| #define HAVE_DECL_AUDIT_USER_TTY 0
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_LANGINFO_H 1
-| #define HAVE_WCRTOMB 1
-| #define HAVE_WCSCOLL 1
-| #define HAVE_WCSDUP 1
-| #define HAVE_WCWIDTH 1
-| #define HAVE_WCSNRTOMBS 1
-| #define HAVE_WCSWIDTH 1
-| /* end confdefs.h.  */
-| /* Define iswlower to an innocuous variant, in case <limits.h> declares iswlower.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define iswlower innocuous_iswlower
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char iswlower (void); below.  */
-| 
-| #include <limits.h>
-| #undef iswlower
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char iswlower (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_iswlower || defined __stub___iswlower
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return iswlower ();
-|   ;
-|   return 0;
-| }
-configure:7700: result: no
+configure:7700: $? = 0
+configure:7700: result: yes
 configure:7706: checking for iswupper
 configure:7706: cc -o conftest -g   conftest.c  >&5
-main: undefined: iswupper in main
-configure:7706: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| #define HAVE_INTTYPES_H 1
-| #define FIONREAD_IN_SYS_IOCTL 1
-| #define HAVE_STRUCT_DIRENT_D_INO 1
-| #define HAVE_TIMEVAL 1
-| #define HAVE_DECL_AUDIT_USER_TTY 0
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_LANGINFO_H 1
-| #define HAVE_WCRTOMB 1
-| #define HAVE_WCSCOLL 1
-| #define HAVE_WCSDUP 1
-| #define HAVE_WCWIDTH 1
-| #define HAVE_WCSNRTOMBS 1
-| #define HAVE_WCSWIDTH 1
-| /* end confdefs.h.  */
-| /* Define iswupper to an innocuous variant, in case <limits.h> declares iswupper.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define iswupper innocuous_iswupper
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char iswupper (void); below.  */
-| 
-| #include <limits.h>
-| #undef iswupper
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char iswupper (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_iswupper || defined __stub___iswupper
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return iswupper ();
-|   ;
-|   return 0;
-| }
-configure:7706: result: no
+configure:7706: $? = 0
+configure:7706: result: yes
 configure:7712: checking for towlower
 configure:7712: cc -o conftest -g   conftest.c  >&5
 main: undefined: towlower in main
+cc: 6l: 6l 116917: error
 configure:7712: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8573,6 +6953,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -8602,24 +6983,33 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | #define HAVE_TIMEVAL 1
 | #define HAVE_DECL_AUDIT_USER_TTY 0
 | #define HAVE_WCTYPE_H 1
 | #define HAVE_WCHAR_H 1
 | #define HAVE_LANGINFO_H 1
+| #define HAVE_MBRLEN 1
+| #define HAVE_MBSNRTOWCS 1
+| #define HAVE_MBSRTOWCS 1
 | #define HAVE_WCRTOMB 1
 | #define HAVE_WCSCOLL 1
 | #define HAVE_WCSDUP 1
 | #define HAVE_WCWIDTH 1
+| #define HAVE_WCTYPE 1
 | #define HAVE_WCSNRTOMBS 1
 | #define HAVE_WCSWIDTH 1
+| #define HAVE_MBRTOWC 1
+| #define HAVE_MBSTATE_T 1
+| #define HAVE_ISWLOWER 1
+| #define HAVE_ISWUPPER 1
 | /* end confdefs.h.  */
 | /* Define towlower to an innocuous variant, in case <limits.h> declares towlower.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -8656,6 +7046,7 @@ configure:7712: result: no
 configure:7718: checking for towupper
 configure:7718: cc -o conftest -g   conftest.c  >&5
 main: undefined: towupper in main
+cc: 6l: 6l 116938: error
 configure:7718: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8702,6 +7093,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -8731,24 +7123,33 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | #define HAVE_TIMEVAL 1
 | #define HAVE_DECL_AUDIT_USER_TTY 0
 | #define HAVE_WCTYPE_H 1
 | #define HAVE_WCHAR_H 1
 | #define HAVE_LANGINFO_H 1
+| #define HAVE_MBRLEN 1
+| #define HAVE_MBSNRTOWCS 1
+| #define HAVE_MBSRTOWCS 1
 | #define HAVE_WCRTOMB 1
 | #define HAVE_WCSCOLL 1
 | #define HAVE_WCSDUP 1
 | #define HAVE_WCWIDTH 1
+| #define HAVE_WCTYPE 1
 | #define HAVE_WCSNRTOMBS 1
 | #define HAVE_WCSWIDTH 1
+| #define HAVE_MBRTOWC 1
+| #define HAVE_MBSTATE_T 1
+| #define HAVE_ISWLOWER 1
+| #define HAVE_ISWUPPER 1
 | /* end confdefs.h.  */
 | /* Define towupper to an innocuous variant, in case <limits.h> declares towupper.
 |    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
@@ -8784,134 +7185,8 @@ configure: failed program was:
 configure:7718: result: no
 configure:7724: checking for iswctype
 configure:7724: cc -o conftest -g   conftest.c  >&5
-isupperrune: undefined: tolowerrune in isupperrune
-islowerrune: undefined: toupperrune in islowerrune
-configure:7724: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| #define HAVE_INTTYPES_H 1
-| #define FIONREAD_IN_SYS_IOCTL 1
-| #define HAVE_STRUCT_DIRENT_D_INO 1
-| #define HAVE_TIMEVAL 1
-| #define HAVE_DECL_AUDIT_USER_TTY 0
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_LANGINFO_H 1
-| #define HAVE_WCRTOMB 1
-| #define HAVE_WCSCOLL 1
-| #define HAVE_WCSDUP 1
-| #define HAVE_WCWIDTH 1
-| #define HAVE_WCSNRTOMBS 1
-| #define HAVE_WCSWIDTH 1
-| /* end confdefs.h.  */
-| /* Define iswctype to an innocuous variant, in case <limits.h> declares iswctype.
-|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
-| #define iswctype innocuous_iswctype
-| 
-| /* System header to define __stub macros and hopefully few prototypes,
-|    which can conflict with char iswctype (void); below.  */
-| 
-| #include <limits.h>
-| #undef iswctype
-| 
-| /* Override any GCC internal prototype to avoid an error.
-|    Use char because int might match the return type of a GCC
-|    builtin and then its argument prototype would still apply.  */
-| #ifdef __cplusplus
-| extern "C"
-| #endif
-| char iswctype (void);
-| /* The GNU C library defines this for functions which it implements
-|     to always fail with ENOSYS.  Some functions are actually named
-|     something starting with __ and the normal name is an alias.  */
-| #if defined __stub_iswctype || defined __stub___iswctype
-| choke me
-| #endif
-| 
-| int
-| main (void)
-| {
-| return iswctype ();
-|   ;
-|   return 0;
-| }
-configure:7724: result: no
+configure:7724: $? = 0
+configure:7724: result: yes
 configure:7734: checking for wchar_t in wchar.h
 configure:7755: cc -c -g  conftest.c >&5
 configure:7755: $? = 0
@@ -8975,6 +7250,7 @@ configure: failed program was:
 | #define HAVE_LSTAT 1
 | #define HAVE_READLINK 1
 | #define HAVE_SELECT 1
+| #define HAVE_FNMATCH 1
 | #define HAVE_MEMMOVE 1
 | #define HAVE_PUTENV 1
 | #define HAVE_SETENV 1
@@ -9004,24 +7280,34 @@ configure: failed program was:
 | #define HAVE_SYS_IOCTL_H 1
 | #define HAVE_SYS_SELECT_H 1
 | #define HAVE_SYS_TIME_H 1
+| #define HAVE_SYS_FILE_H 1
 | #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
 | #define HAVE_LSTAT 1
 | #define HAVE_GETPW_DECLS 1
 | #define HAVE_INTTYPES_H 1
 | #define FIONREAD_IN_SYS_IOCTL 1
+| #define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 | #define HAVE_STRUCT_DIRENT_D_INO 1
 | #define HAVE_TIMEVAL 1
 | #define HAVE_DECL_AUDIT_USER_TTY 0
 | #define HAVE_WCTYPE_H 1
 | #define HAVE_WCHAR_H 1
 | #define HAVE_LANGINFO_H 1
+| #define HAVE_MBRLEN 1
+| #define HAVE_MBSNRTOWCS 1
+| #define HAVE_MBSRTOWCS 1
 | #define HAVE_WCRTOMB 1
 | #define HAVE_WCSCOLL 1
 | #define HAVE_WCSDUP 1
 | #define HAVE_WCWIDTH 1
+| #define HAVE_WCTYPE 1
 | #define HAVE_WCSNRTOMBS 1
 | #define HAVE_WCSWIDTH 1
+| #define HAVE_MBRTOWC 1
+| #define HAVE_MBSTATE_T 1
+| #define HAVE_ISWLOWER 1
+| #define HAVE_ISWUPPER 1
+| #define HAVE_ISWCTYPE 1
 | #define HAVE_WCHAR_T 1
 | #define HAVE_WCTYPE_T 1
 | #define HAVE_WINT_T 1
@@ -9052,165 +7338,8 @@ configure:7928: checking size of wchar_t
 configure:7934: cc -o conftest -g   conftest.c  >&5
 configure:7934: $? = 0
 configure:7934: ./conftest
-configure:7934: $? = 1
-configure: program exited with status 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "readline"
-| #define PACKAGE_TARNAME "readline"
-| #define PACKAGE_VERSION "8.3"
-| #define PACKAGE_STRING "readline 8.3"
-| #define PACKAGE_BUGREPORT "bug-readline@gnu.org"
-| #define PACKAGE_URL ""
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_WCHAR_H 1
-| #define STDC_HEADERS 1
-| #define _ALL_SOURCE 1
-| #define _DARWIN_C_SOURCE 1
-| #define _GNU_SOURCE 1
-| #define _HPUX_ALT_XOPEN_SOCKET_API 1
-| #define _NETBSD_SOURCE 1
-| #define _OPENBSD_SOURCE 1
-| #define _POSIX_PTHREAD_SEMANTICS 1
-| #define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_BFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_DFP_EXT__ 1
-| #define __STDC_WANT_IEC_60559_EXT__ 1
-| #define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
-| #define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
-| #define __STDC_WANT_LIB_EXT2__ 1
-| #define __STDC_WANT_MATH_SPEC_FUNCS__ 1
-| #define _TANDEM_SOURCE 1
-| #define __EXTENSIONS__ 1
-| #define PROTOTYPES 1
-| #define __PROTOTYPES 1
-| #define HAVE_DIRENT_H 1
-| #define HAVE_FCNTL 1
-| #define HAVE_GETTIMEOFDAY 1
-| #define HAVE_KILL 1
-| #define HAVE_LSTAT 1
-| #define HAVE_READLINK 1
-| #define HAVE_SELECT 1
-| #define HAVE_MEMMOVE 1
-| #define HAVE_PUTENV 1
-| #define HAVE_SETENV 1
-| #define HAVE_SETLOCALE 1
-| #define HAVE_STRCASECMP 1
-| #define HAVE_STRPBRK 1
-| #define HAVE_SYSCONF 1
-| #define HAVE_TCGETATTR 1
-| #define HAVE_VSNPRINTF 1
-| #define HAVE_ISXDIGIT 1
-| #define HAVE_GETPWENT 1
-| #define HAVE_GETPWNAM 1
-| #define HAVE_GETPWUID 1
-| #define HAVE_STRCOLL 1
-| #define HAVE_FCNTL_H 1
-| #define HAVE_UNISTD_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STDARG_H 1
-| #define HAVE_STDBOOL_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_LIMITS_H 1
-| #define HAVE_LOCALE_H 1
-| #define HAVE_PWD_H 1
-| #define HAVE_TERMCAP_H 1
-| #define HAVE_TERMIOS_H 1
-| #define HAVE_SYS_IOCTL_H 1
-| #define HAVE_SYS_SELECT_H 1
-| #define HAVE_SYS_TIME_H 1
-| #define HAVE_POSIX_SIGNALS 1
-| #define MUST_REINSTALL_SIGHANDLERS 1
-| #define HAVE_LSTAT 1
-| #define HAVE_GETPW_DECLS 1
-| #define HAVE_INTTYPES_H 1
-| #define FIONREAD_IN_SYS_IOCTL 1
-| #define HAVE_STRUCT_DIRENT_D_INO 1
-| #define HAVE_TIMEVAL 1
-| #define HAVE_DECL_AUDIT_USER_TTY 0
-| #define HAVE_WCTYPE_H 1
-| #define HAVE_WCHAR_H 1
-| #define HAVE_LANGINFO_H 1
-| #define HAVE_WCRTOMB 1
-| #define HAVE_WCSCOLL 1
-| #define HAVE_WCSDUP 1
-| #define HAVE_WCWIDTH 1
-| #define HAVE_WCSNRTOMBS 1
-| #define HAVE_WCSWIDTH 1
-| #define HAVE_WCHAR_T 1
-| #define HAVE_WCTYPE_T 1
-| #define HAVE_WINT_T 1
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| static long int longval (void) { return (long int) (sizeof (wchar_t)); }
-| static unsigned long int ulongval (void) { return (long int) (sizeof (wchar_t)); }
-| #include <stdio.h>
-| #include <stdlib.h>
-| int
-| main (void)
-| {
-| 
-|   FILE *f = fopen ("conftest.val", "w");
-|   if (! f)
-|     return 1;
-|   if (((long int) (sizeof (wchar_t))) < 0)
-|     {
-|       long int i = longval ();
-|       if (i != ((long int) (sizeof (wchar_t))))
-| 	return 1;
-|       fprintf (f, "%ld", i);
-|     }
-|   else
-|     {
-|       unsigned long int i = ulongval ();
-|       if (i != ((long int) (sizeof (wchar_t))))
-| 	return 1;
-|       fprintf (f, "%lu", i);
-|     }
-|   /* Do not output a trailing newline, as this causes \r\n confusion
-|      on some platforms.  */
-|   return ferror (f) || fclose (f) != 0;
-| 
-|   ;
-|   return 0;
-| }
-configure:7951: result: 0
+configure:7934: $? = 0
+configure:7951: result: 2
 configure:7978: checking configuration for building shared libraries
 configure:8004: result: unsupported
 configure:8201: creating ./config.status
@@ -9230,14 +7359,14 @@ generated by GNU Autoconf 2.72.  Invocation command line was
 
 on krypton
 
-config.status:931: creating Makefile
-config.status:931: creating doc/Makefile
-config.status:931: creating examples/Makefile
-config.status:931: creating shlib/Makefile
-config.status:931: creating readline.pc
-config.status:931: creating history.pc
-config.status:931: creating config.h
-config.status:1120: executing stamp-h commands
+config.status:837: creating Makefile
+config.status:837: creating doc/Makefile
+config.status:837: creating examples/Makefile
+config.status:837: creating shlib/Makefile
+config.status:837: creating readline.pc
+config.status:837: creating history.pc
+config.status:837: creating config.h
+config.status:1026: executing stamp-h commands
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -9270,26 +7399,26 @@ ac_cv_env_target_alias_set=
 ac_cv_env_target_alias_value=
 ac_cv_func_chown_works=no
 ac_cv_func_fcntl=yes
-ac_cv_func_fnmatch=no
+ac_cv_func_fnmatch=yes
 ac_cv_func_getpwent=yes
 ac_cv_func_getpwnam=yes
 ac_cv_func_getpwuid=yes
 ac_cv_func_gettimeofday=yes
 ac_cv_func_isascii=no
-ac_cv_func_iswctype=no
-ac_cv_func_iswlower=no
-ac_cv_func_iswupper=no
+ac_cv_func_iswctype=yes
+ac_cv_func_iswlower=yes
+ac_cv_func_iswupper=yes
 ac_cv_func_isxdigit=yes
 ac_cv_func_kill=yes
 ac_cv_func_lstat=yes
-ac_cv_func_mbrlen=no
-ac_cv_func_mbrtowc=no
+ac_cv_func_mbrlen=yes
+ac_cv_func_mbrtowc=yes
 ac_cv_func_mbscasecmp=no
 ac_cv_func_mbschr=no
 ac_cv_func_mbscmp=no
 ac_cv_func_mbsncmp=no
-ac_cv_func_mbsnrtowcs=no
-ac_cv_func_mbsrtowcs=no
+ac_cv_func_mbsnrtowcs=yes
+ac_cv_func_mbsrtowcs=yes
 ac_cv_func_memmove=yes
 ac_cv_func_pselect=no
 ac_cv_func_putenv=yes
@@ -9305,7 +7434,7 @@ ac_cv_func_sysconf=yes
 ac_cv_func_tcgetattr=yes
 ac_cv_func_tcgetwinsize=no
 ac_cv_func_tcsetwinsize=no
-ac_cv_func_tgetent=no
+ac_cv_func_tgetent=yes
 ac_cv_func_towlower=no
 ac_cv_func_towupper=no
 ac_cv_func_vsnprintf=yes
@@ -9314,7 +7443,7 @@ ac_cv_func_wcscoll=yes
 ac_cv_func_wcsdup=yes
 ac_cv_func_wcsnrtombs=yes
 ac_cv_func_wcswidth=yes
-ac_cv_func_wctype=no
+ac_cv_func_wctype=yes
 ac_cv_func_wcwidth=yes
 ac_cv_have_decl_AUDIT_USER_TTY=no
 ac_cv_have_sig_atomic_t=yes
@@ -9337,7 +7466,7 @@ ac_cv_header_stdio_h=yes
 ac_cv_header_stdlib_h=yes
 ac_cv_header_string_h=yes
 ac_cv_header_strings_h=yes
-ac_cv_header_sys_file_h=no
+ac_cv_header_sys_file_h=yes
 ac_cv_header_sys_ioctl_h=yes
 ac_cv_header_sys_pte_h=no
 ac_cv_header_sys_ptem_h=no
@@ -9354,9 +7483,6 @@ ac_cv_header_varargs_h=no
 ac_cv_header_wchar_h=yes
 ac_cv_header_wctype_h=yes
 ac_cv_host=x86_64-unknown-plan9
-ac_cv_lib_curses_tgetent=yes
-ac_cv_lib_termcap_tgetent=no
-ac_cv_lib_tinfo_tgetent=no
 ac_cv_member_struct_dirent_d_fileno=no
 ac_cv_member_struct_dirent_d_ino=yes
 ac_cv_objext=o
@@ -9371,14 +7497,13 @@ ac_cv_prog_cc_c89=
 ac_cv_prog_cc_c99=no
 ac_cv_prog_cc_g=yes
 ac_cv_prog_cc_stdc=
-ac_cv_prog_make_make_set=yes
+ac_cv_prog_make__set=yes
 ac_cv_safe_to_define___extensions__=yes
 ac_cv_search_opendir='none required'
 ac_cv_should_define__xopen_source=no
-ac_cv_sizeof_wchar_t=0
+ac_cv_sizeof_wchar_t=2
 ac_cv_sys_largefile_opts='none needed'
-ac_cv_sys_tiocgwinsz_in_sys_ioctl_h=no
-ac_cv_sys_tiocgwinsz_in_termios_h=no
+ac_cv_sys_tiocgwinsz_in_termios_h=yes
 ac_cv_type_gid_t=yes
 ac_cv_type_mode_t=yes
 ac_cv_type_size_t=yes
@@ -9390,15 +7515,15 @@ bash_cv_func_lstat=yes
 bash_cv_func_sigsetjmp=missing
 bash_cv_func_strcoll_broken=no
 bash_cv_getpw_declared=yes
-bash_cv_must_reinstall_sighandlers=yes
+bash_cv_must_reinstall_sighandlers=no
 bash_cv_posix_signals=yes
 bash_cv_signal_vintage=posix
 bash_cv_speed_t_in_sys_types=no
 bash_cv_struct_timeval=yes
-bash_cv_struct_winsize_header=other
-bash_cv_struct_winsize_ioctl=no
+bash_cv_struct_winsize_header=ioctl_h
+bash_cv_struct_winsize_ioctl=yes
 bash_cv_struct_winsize_termios=no
-bash_cv_termcap_lib=libcurses
+bash_cv_termcap_lib=libc
 bash_cv_tiocstat_in_ioctl=no
 bash_cv_type_wchar_t=yes
 bash_cv_type_wctype_t=yes
@@ -9469,8 +7594,8 @@ SHOBJ_XLDFLAGS=''
 STATIC_INSTALL_TARGET='install-static'
 STATIC_TARGET='static'
 STYLE_CFLAGS=' '
-TERMCAP_LIB='-lcurses'
-TERMCAP_PKG_CONFIG_LIB='ncurses'
+TERMCAP_LIB=''
+TERMCAP_PKG_CONFIG_LIB='termcap'
 ac_ct_CC=''
 bindir='${exec_prefix}/bin'
 build='x86_64-unknown-plan9'
@@ -9556,6 +7681,7 @@ target_alias=''
 #define HAVE_LSTAT 1
 #define HAVE_READLINK 1
 #define HAVE_SELECT 1
+#define HAVE_FNMATCH 1
 #define HAVE_MEMMOVE 1
 #define HAVE_PUTENV 1
 #define HAVE_SETENV 1
@@ -9585,27 +7711,37 @@ target_alias=''
 #define HAVE_SYS_IOCTL_H 1
 #define HAVE_SYS_SELECT_H 1
 #define HAVE_SYS_TIME_H 1
+#define HAVE_SYS_FILE_H 1
 #define HAVE_POSIX_SIGNALS 1
-#define MUST_REINSTALL_SIGHANDLERS 1
 #define HAVE_LSTAT 1
 #define HAVE_GETPW_DECLS 1
 #define HAVE_INTTYPES_H 1
 #define FIONREAD_IN_SYS_IOCTL 1
+#define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 #define HAVE_STRUCT_DIRENT_D_INO 1
 #define HAVE_TIMEVAL 1
 #define HAVE_DECL_AUDIT_USER_TTY 0
 #define HAVE_WCTYPE_H 1
 #define HAVE_WCHAR_H 1
 #define HAVE_LANGINFO_H 1
+#define HAVE_MBRLEN 1
+#define HAVE_MBSNRTOWCS 1
+#define HAVE_MBSRTOWCS 1
 #define HAVE_WCRTOMB 1
 #define HAVE_WCSCOLL 1
 #define HAVE_WCSDUP 1
 #define HAVE_WCWIDTH 1
+#define HAVE_WCTYPE 1
 #define HAVE_WCSNRTOMBS 1
 #define HAVE_WCSWIDTH 1
+#define HAVE_MBRTOWC 1
+#define HAVE_MBSTATE_T 1
+#define HAVE_ISWLOWER 1
+#define HAVE_ISWUPPER 1
+#define HAVE_ISWCTYPE 1
 #define HAVE_WCHAR_T 1
 #define HAVE_WCTYPE_T 1
 #define HAVE_WINT_T 1
-#define SIZEOF_WCHAR_T 0
+#define SIZEOF_WCHAR_T 2
 
 configure: exit 0

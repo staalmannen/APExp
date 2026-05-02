@@ -16,7 +16,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-
+VPATH = .
 
 topdir = ..
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
@@ -35,9 +35,9 @@ INSTALL_DATA = ${INSTALL} -m 644
 MKINSTALLDIRS = $(top_srcdir)/support/mkinstalldirs
 mkinstalldirs = $(SHELL) $(MKINSTALLDIRS)
 
-GMSGFMT = :
-MSGFMT = :
-XGETTEXT = :
+GMSGFMT = /bin/msgfmt
+MSGFMT = /bin/msgfmt
+XGETTEXT = /bin/xgettext
 MSGMERGE = msgmerge
 MSGMERGE_UPDATE = /bin/msgmerge --update
 MSGINIT = msginit

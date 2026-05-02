@@ -57,7 +57,7 @@
 
 
 
-
+VPATH = .
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -325,8 +325,8 @@ GETTEXT_MACRO_VERSION = 0.19
 GL_CFLAG_ALLOW_WARNINGS = 
 GL_CFLAG_GNULIB_WARNINGS = 
 GL_GNULIB_GETLOADAVG = 1
-GMSGFMT = :
-GMSGFMT_015 = :
+GMSGFMT = /bin/msgfmt
+GMSGFMT_015 = /bin/msgfmt
 GREP = /bin/grep
 GUILE_CFLAGS = 
 GUILE_LIBS = 
@@ -339,23 +339,23 @@ INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-INTLLIBS = 
+INTLLIBS = -lintl
 INTL_MACOSX_LIBS = 
 LDFLAGS = 
 LIBGNU_LIBDEPS = 
 LIBGNU_LTLIBDEPS = 
 LIBICONV = 
-LIBINTL = 
+LIBINTL = -lintl
 LIBOBJS = 
 LIBS = 
 LTLIBICONV = 
-LTLIBINTL = 
+LTLIBINTL = -lintl
 LTLIBOBJS = 
 MAKEINFO = ${SHELL} '/usr/glenda/APExp/sys/src/external/gmake/build-aux/missing' makeinfo
 MAKE_HOST = x86_64-unknown-plan9
 MKDIR_P = .././build-aux/install-sh -c -d
-MSGFMT = :
-MSGFMT_015 = :
+MSGFMT = /bin/msgfmt
+MSGFMT_015 = /bin/msgfmt
 MSGMERGE = /bin/msgmerge
 OBJEXT = o
 PACKAGE = make
@@ -370,18 +370,18 @@ PERL = perl
 PKG_CONFIG = 
 PKG_CONFIG_LIBDIR = 
 PKG_CONFIG_PATH = 
-POSUB = 
+POSUB = po
 RANLIB = ranlib
 REMOTE = stub
 SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = 
-USE_NLS = no
+USE_NLS = yes
 USE_SYSTEM_GLOB = no
 VERSION = 4.4.1
-XGETTEXT = :
-XGETTEXT_015 = :
+XGETTEXT = /bin/xgettext
+XGETTEXT_015 = /bin/xgettext
 XGETTEXT_EXTRA_OPTIONS = 
 abs_builddir = /usr/glenda/APExp/sys/src/external/gmake/lib
 abs_srcdir = /usr/glenda/APExp/sys/src/external/gmake/lib

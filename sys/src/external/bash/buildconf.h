@@ -37,7 +37,7 @@
 #define HAVE_STRING_H 1
 #define HAVE_STDLIB_H 1
 
-#define HAVE_RENAME 1
+#define HAVE_RENAME
 
 /* defining this implies a C23 environment */
 /* #undef HAVE_C_BOOL */
@@ -45,8 +45,8 @@
 /* Don't assume this; it's from C99; let syntax.h define a replacement */
 /* #undef HAVE_ISBLANK */
 
-#define PROCESS_SUBSTITUTION 1
+/* #undef PROCESS_SUBSTITUTION */
 
-#define EXTENDED_GLOB 1
+/* #undef EXTENDED_GLOB */
 
 #endif /* BUILDCONF_H */

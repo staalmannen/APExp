@@ -51,13 +51,6 @@ configure:3055: result: yes
 configure:3214: checking for a race-free mkdir -p
 configure:3258: result: ./install-sh -c -d
 configure:3265: checking for gawk
-configure:3300: result: no
-configure:3265: checking for mawk
-configure:3300: result: no
-configure:3265: checking for nawk
-configure:3300: result: no
-configure:3265: checking for awk
-configure:3286: found /bin/awk
 configure:3297: result: awk
 configure:3308: checking whether make sets $(MAKE)
 configure:3331: result: yes
@@ -123,6 +116,7 @@ configure:4318: result: o
 configure:4322: checking whether the compiler supports GNU C
 configure:4342: cc -c   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/pcre2/conftest.c:16[stdin:17] syntax error, last name: me
+cc: cpp: 6c 109602: error
 configure:4342: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -153,7 +147,12 @@ configure:4384: $? = 0
 configure:4428: result: yes
 configure:4448: checking for cc option to enable C11 features
 configure:4463: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:171[stdin:240] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:171[stdin:251] syntax error, last name: __func__$9
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cpp: conftest.c:167 #error directive: "Compiler does not advertise C11 conformance"
+cc: 6c: cpp 109635: errors
 configure:4463: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -429,7 +428,19 @@ configure: failed program was:
 | }
 | 
 configure:4463: cc -std=gnu11 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:171[stdin:240] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:171[stdin:251] syntax error, last name: __func__$9
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -n ignored
+cc: flag -u ignored
+cc: flag -1 ignored
+cc: flag -1 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cpp: conftest.c:167 #error directive: "Compiler does not advertise C11 conformance"
+cc: 6c: cpp 109649: errors
 configure:4463: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -707,7 +718,11 @@ configure: failed program was:
 configure:4476: result: unsupported
 configure:4494: checking for cc option to enable C99 features
 configure:4509: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 109669: errors
 configure:4509: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -923,7 +938,18 @@ configure: failed program was:
 | }
 | 
 configure:4509: cc -std=gnu99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -n ignored
+cc: flag -u ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 109683: errors
 configure:4509: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1139,7 +1165,16 @@ configure: failed program was:
 | }
 | 
 configure:4509: cc -std=c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 109697: errors
 configure:4509: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1355,7 +1390,13 @@ configure: failed program was:
 | }
 | 
 configure:4509: cc -c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 109711: errors
 configure:4509: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1571,7 +1612,13 @@ configure: failed program was:
 | }
 | 
 configure:4509: cc -qlanglvl=extc1x -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -q ignored
+cc: can't find library for -l
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 109725: errors
 configure:4509: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1787,7 +1834,13 @@ configure: failed program was:
 | }
 | 
 configure:4509: cc -qlanglvl=extc99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -q ignored
+cc: can't find library for -l
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 109739: errors
 configure:4509: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2003,7 +2056,14 @@ configure: failed program was:
 | }
 | 
 configure:4509: cc -AC99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -C ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 109753: errors
 configure:4509: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2219,7 +2279,11 @@ configure: failed program was:
 | }
 | 
 configure:4509: cc -D_STDC_C99= -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:267] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:94 #error directive: "your preprocessor is broken"
+cpp: conftest.c:98 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 109767: errors
 configure:4509: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2494,6 +2558,8 @@ configure:4851: $? = 0
 configure:4851: result: yes
 configure:4851: checking for minix/config.h
 configure:4851: cc -c -g  conftest.c >&5
+cpp: conftest.c:49 Could not find include file <minix/config.h>
+cc: 6c: cpp 109977: error
 configure:4851: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2567,7 +2633,8 @@ configure:5216: checking for int64_t
 configure:5216: cc -c   conftest.c >&5
 configure:5216: $? = 0
 configure:5216: cc -c   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:70[stdin:4491] array size must be a positive constant
+/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:70[stdin:4743] array size must be a positive constant
+cc: cpp: 6c 110069: error
 configure:5216: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2677,9 +2744,9 @@ configure:6164: output
  D some_variable
 configure:6171: result: BSD nm
 configure:6174: checking whether ln -s works
-configure:6178: result: yes
+configure:6181: result: no, using cp -pR
 configure:6186: checking the maximum length of command line arguments
-configure:6318: result: 512
+configure:6318: result: 262144
 configure:6366: checking how to convert x86_64-unknown-plan9 file names to x86_64-unknown-plan9 format
 configure:6407: result: func_convert_file_noop
 configure:6414: checking how to convert x86_64-unknown-plan9 file names to toolchain format
@@ -2717,15 +2784,18 @@ configure:7580: checking command to parse /bin/nm output from cc object
 configure:7734: cc -c   conftest.c >&5
 configure:7737: $? = 0
 configure:7741: /bin/nm conftest.o | /bin/sed -n -e 's/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' | /bin/sed '/ __gnu_lto/d' > conftest.nm
-configure:7807: cc -o conftest    conftest.c conftstm.o >&5
-configure:7810: $? = 0
-configure:7848: result: ok
+cannot run /bin/sed -n -e 's/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' | /bin/sed '/ __gnu_lto/d'
+configure:7734: cc -c   conftest.c >&5
+configure:7737: $? = 0
+configure:7741: /bin/nm conftest.o | /bin/sed -n -e 's/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*_\([_A-Za-z][_A-Za-z0-9]*\)$/\1 _\2 \2/p' | /bin/sed '/ __gnu_lto/d' > conftest.nm
+cannot run /bin/sed -n -e 's/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*_\([_A-Za-z][_A-Za-z0-9]*\)$/\1 _\2 \2/p' | /bin/sed '/ __gnu_lto/d'
+configure:7845: result: failed
 configure:7895: checking for sysroot
 configure:7926: result: no
 configure:7933: checking for a working dd
-configure:7977: result: 
+configure:7977: result: /bin/dd
 configure:7981: checking how to truncate binary pipes
-configure:7997: result: /bin/sed -e 4q
+configure:7997: result: /bin/dd bs=4096 count=1
 configure:8334: checking for mt
 configure:8369: result: no
 configure:8389: checking if : is a manifest tool
@@ -2766,7 +2836,7 @@ configure:13782: result: no
 configure:13785: checking whether to build static libraries
 configure:13789: result: yes
 configure:13826: checking whether ln -s works
-configure:13830: result: yes
+configure:13833: result: no, using cp -pR
 configure:13846: checking for special C compiler options needed for large files
 configure:13877: cc -c   conftest.c >&5
 configure:13877: $? = 0
@@ -2777,8 +2847,11 @@ configure:13926: $? = 0
 configure:13960: result: no
 configure:14049: checking whether the -Werror option is usable
 configure:14070: cc -c  -Werror  conftest.c >&5
+cc: bad option after -W; ignored
 configure:14070: $? = 0
 configure:14084: cc -c  -Werror  conftest.c >&5
+cc: bad option after -W; ignored
+cpp: conftest.c:44 #warning directive: e
 configure:14084: $? = 0
 configure:14098: result: no
 configure:14181: checking linker version script flag
@@ -2797,45 +2870,45 @@ fnuxi = 0123 01234567
  0.00 library: /amd64/lib/ape/libap.a(malloc)
  0.00 library: /amd64/lib/ape/libap.a(exit)
  0.00 library: /amd64/lib/ape/libap.a(_exit)
- 0.00 library pass: /amd64/lib/ape/libap.a
- 0.00 library: /amd64/lib/ape/libap.a(unlock)
- 0.00 library: /amd64/lib/ape/libap.a(pthread_mutex_unlock)
- 0.00 library: /amd64/lib/ape/libap.a(pthread_mutex_lock)
- 0.00 library: /amd64/lib/ape/libap.a(_SLEEP)
- 0.00 library: /amd64/lib/ape/libap.a(_OPEN)
- 0.00 library: /amd64/lib/ape/libap.a(_NOTIFY)
- 0.00 library: /amd64/lib/ape/libap.a(_EXITS)
- 0.00 library: /amd64/lib/ape/libap.a(_CLOSE)
- 0.00 library: /amd64/lib/ape/libap.a(memcpy)
- 0.00 library: /amd64/lib/ape/libap.a(strtoul)
- 0.00 library: /amd64/lib/ape/libap.a(strncpy)
- 0.00 library: /amd64/lib/ape/libap.a(strlen)
- 0.00 library: /amd64/lib/ape/libap.a(strcpy)
- 0.00 library: /amd64/lib/ape/libap.a(strcmp)
- 0.00 library: /amd64/lib/ape/libap.a(strchr)
- 0.00 library: /amd64/lib/ape/libap.a(memset)
- 0.00 library: /amd64/lib/ape/libap.a(memmove)
- 0.00 library: /amd64/lib/ape/libap.a(memcmp)
- 0.00 library: /amd64/lib/ape/libap.a(memchr)
- 0.00 library: /amd64/lib/ape/libap.a(memccpy)
- 0.00 library: /amd64/lib/ape/libap.a(abort)
- 0.00 library: /amd64/lib/ape/libap.a(__uflow)
- 0.00 library: /amd64/lib/ape/libap.a(__toread)
- 0.00 library: /amd64/lib/ape/libap.a(_sighdlr)
- 0.00 library: /amd64/lib/ape/libap.a(kill)
- 0.00 library: /amd64/lib/ape/libap.a(qlock)
- 0.00 library: /amd64/lib/ape/libap.a(_dirreadall)
- 0.00 library: /amd64/lib/ape/libap.a(_convM2D)
- 0.00 library: /amd64/lib/ape/libap.a(sbrk)
- 0.00 library: /amd64/lib/ape/libap.a(_READ)
- 0.00 library: /amd64/lib/ape/libap.a(_fdinit)
- 0.00 library: /amd64/lib/ape/libap.a(open)
- 0.00 library: /amd64/lib/ape/libap.a(_syserrno)
- 0.00 library pass: /amd64/lib/ape/libap.a
- 0.00 library: /amd64/lib/ape/libap.a(tas)
- 0.00 library: /amd64/lib/ape/libap.a(_notetramp)
- 0.00 library: /amd64/lib/ape/libap.a(_SEEK)
- 0.00 library: /amd64/lib/ape/libap.a(write)
+ 0.01 library pass: /amd64/lib/ape/libap.a
+ 0.01 library: /amd64/lib/ape/libap.a(unlock)
+ 0.01 library: /amd64/lib/ape/libap.a(pthread_mutex_unlock)
+ 0.01 library: /amd64/lib/ape/libap.a(pthread_mutex_lock)
+ 0.01 library: /amd64/lib/ape/libap.a(_SLEEP)
+ 0.01 library: /amd64/lib/ape/libap.a(_OPEN)
+ 0.01 library: /amd64/lib/ape/libap.a(_NOTIFY)
+ 0.01 library: /amd64/lib/ape/libap.a(_EXITS)
+ 0.01 library: /amd64/lib/ape/libap.a(_CLOSE)
+ 0.01 library: /amd64/lib/ape/libap.a(memcpy)
+ 0.01 library: /amd64/lib/ape/libap.a(strtoul)
+ 0.01 library: /amd64/lib/ape/libap.a(strncpy)
+ 0.01 library: /amd64/lib/ape/libap.a(strlen)
+ 0.01 library: /amd64/lib/ape/libap.a(strcpy)
+ 0.01 library: /amd64/lib/ape/libap.a(strcmp)
+ 0.01 library: /amd64/lib/ape/libap.a(memset)
+ 0.01 library: /amd64/lib/ape/libap.a(memmove)
+ 0.01 library: /amd64/lib/ape/libap.a(memcmp)
+ 0.01 library: /amd64/lib/ape/libap.a(memchr)
+ 0.01 library: /amd64/lib/ape/libap.a(memccpy)
+ 0.01 library: /amd64/lib/ape/libap.a(abort)
+ 0.01 library: /amd64/lib/ape/libap.a(__stdio_exit)
+ 0.01 library: /amd64/lib/ape/libap.a(__uflow)
+ 0.01 library: /amd64/lib/ape/libap.a(__toread)
+ 0.01 library: /amd64/lib/ape/libap.a(_sighdlr)
+ 0.01 library: /amd64/lib/ape/libap.a(kill)
+ 0.01 library: /amd64/lib/ape/libap.a(qlock)
+ 0.01 library: /amd64/lib/ape/libap.a(_dirreadall)
+ 0.01 library: /amd64/lib/ape/libap.a(_convM2D)
+ 0.01 library: /amd64/lib/ape/libap.a(sbrk)
+ 0.01 library: /amd64/lib/ape/libap.a(_READ)
+ 0.01 library: /amd64/lib/ape/libap.a(_fdinit)
+ 0.01 library: /amd64/lib/ape/libap.a(open)
+ 0.01 library: /amd64/lib/ape/libap.a(_syserrno)
+ 0.01 library pass: /amd64/lib/ape/libap.a
+ 0.01 library: /amd64/lib/ape/libap.a(tas)
+ 0.01 library: /amd64/lib/ape/libap.a(_notetramp)
+ 0.01 library: /amd64/lib/ape/libap.a(_SEEK)
+ 0.01 library: /amd64/lib/ape/libap.a(write)
  0.01 library: /amd64/lib/ape/libap.a(setpgid)
  0.01 library: /amd64/lib/ape/libap.a(_isatty)
  0.01 library: /amd64/lib/ape/libap.a(getpid)
@@ -2854,9 +2927,15 @@ fnuxi = 0123 01234567
  0.01 library: /amd64/lib/ape/libap.a(_BRK_)
  0.01 library: /amd64/lib/ape/libap.a(strstr)
  0.01 library: /amd64/lib/ape/libap.a(strncmp)
+ 0.01 library: /amd64/lib/ape/libap.a(strchr)
  0.01 library: /amd64/lib/ape/libap.a(strcat)
  0.01 library: /amd64/lib/ape/libap.a(atoi)
- 0.01 library: /amd64/lib/ape/libap.a(__stdio_exit_needed)
+ 0.01 library: /amd64/lib/ape/libap.a(stdout)
+ 0.01 library: /amd64/lib/ape/libap.a(stderr)
+ 0.01 library: /amd64/lib/ape/libap.a(__ofl_unlock)
+ 0.01 library: /amd64/lib/ape/libap.a(__stdio_close)
+ 0.01 library: /amd64/lib/ape/libap.a(__stdio_seek)
+ 0.01 library: /amd64/lib/ape/libap.a(__stdio_write)
  0.01 library: /amd64/lib/ape/libap.a(sprintf)
  0.01 library: /amd64/lib/ape/libap.a(stat)
  0.01 library: /amd64/lib/ape/libap.a(fstat)
@@ -2867,51 +2946,44 @@ fnuxi = 0123 01234567
  0.01 library: /amd64/lib/ape/libap.a(_getpw)
  0.01 library: /amd64/lib/ape/libap.a(_closebuf)
  0.01 library: /amd64/lib/ape/libap.a(atexit)
- 0.01 library pass: /amd64/lib/ape/libap.a
- 0.01 library: /amd64/lib/ape/libap.a(longjmp)
- 0.01 library: /amd64/lib/ape/libap.a(read)
- 0.01 library: /amd64/lib/ape/libap.a(_WSTAT)
- 0.01 library: /amd64/lib/ape/libap.a(_STAT)
- 0.01 library: /amd64/lib/ape/libap.a(_SEGDETACH)
- 0.01 library: /amd64/lib/ape/libap.a(_SEGATTACH)
- 0.01 library: /amd64/lib/ape/libap.a(_RFORK)
- 0.01 library: /amd64/lib/ape/libap.a(_FWSTAT)
- 0.01 library: /amd64/lib/ape/libap.a(_FSTAT)
- 0.01 library: /amd64/lib/ape/libap.a(strtol)
- 0.01 library: /amd64/lib/ape/libap.a(__ofl_unlock)
- 0.01 library: /amd64/lib/ape/libap.a(vsnprintf)
- 0.01 library: /amd64/lib/ape/libap.a(vfprintf)
- 0.01 library: /amd64/lib/ape/libap.a(fputs)
- 0.01 library: /amd64/lib/ape/libap.a(ferror)
- 0.01 library: /amd64/lib/ape/libap.a(fclose)
- 0.01 library: /amd64/lib/ape/libap.a(_dtoa)
- 0.01 library: /amd64/lib/ape/libap.a(floor)
- 0.01 library pass: /amd64/lib/ape/libap.a
- 0.01 library: /amd64/lib/ape/libap.a(fmemopen)
- 0.01 library: /amd64/lib/ape/libap.a(open_memstream)
- 0.01 library: /amd64/lib/ape/libap.a(__ofl_add)
- 0.01 library: /amd64/lib/ape/libap.a(__overflow)
- 0.01 library: /amd64/lib/ape/libap.a(fflush)
- 0.01 library: /amd64/lib/ape/libap.a(_Balloc)
- 0.01 library: /amd64/lib/ape/libap.a(sigaction)
- 0.01 library: /amd64/lib/ape/libap.a(modf)
- 0.01 library pass: /amd64/lib/ape/libap.a
- 0.01 library: /amd64/lib/ape/libap.a(lseek)
- 0.01 library: /amd64/lib/ape/libap.a(pthread_key_delete)
- 0.01 library: /amd64/lib/ape/libap.a(pthread_cond_wait)
- 0.01 library: /amd64/lib/ape/libap.a(pthread_cond_signal)
- 0.01 library: /amd64/lib/ape/libap.a(pthread_cond_broadcast)
- 0.01 library: /amd64/lib/ape/libap.a(strsignal)
- 0.01 library: /amd64/lib/ape/libap.a(strnlen)
- 0.01 library: /amd64/lib/ape/libap.a(__fwritex)
- 0.01 library: /amd64/lib/ape/libap.a(stderr)
- 0.01 library: /amd64/lib/ape/libap.a(__towrite)
- 0.01 library: /amd64/lib/ape/libap.a(__stdio_close)
- 0.01 library: /amd64/lib/ape/libap.a(__stdio_seek)
- 0.01 library: /amd64/lib/ape/libap.a(__stdio_write)
- 0.02 library: /amd64/lib/ape/libap.a(fprintf)
  0.02 library pass: /amd64/lib/ape/libap.a
+ 0.02 library: /amd64/lib/ape/libap.a(longjmp)
+ 0.02 library: /amd64/lib/ape/libap.a(read)
+ 0.02 library: /amd64/lib/ape/libap.a(lseek)
  0.02 library: /amd64/lib/ape/libap.a(pthread_mutex_destroy)
+ 0.02 library: /amd64/lib/ape/libap.a(_WSTAT)
+ 0.02 library: /amd64/lib/ape/libap.a(_STAT)
+ 0.02 library: /amd64/lib/ape/libap.a(_SEGDETACH)
+ 0.02 library: /amd64/lib/ape/libap.a(_SEGATTACH)
+ 0.02 library: /amd64/lib/ape/libap.a(_RFORK)
+ 0.02 library: /amd64/lib/ape/libap.a(_FWSTAT)
+ 0.02 library: /amd64/lib/ape/libap.a(_FSTAT)
+ 0.02 library: /amd64/lib/ape/libap.a(strtol)
+ 0.02 library: /amd64/lib/ape/libap.a(vsnprintf)
+ 0.02 library: /amd64/lib/ape/libap.a(vfprintf)
+ 0.02 library: /amd64/lib/ape/libap.a(fputs)
+ 0.02 library: /amd64/lib/ape/libap.a(ferror)
+ 0.02 library: /amd64/lib/ape/libap.a(fclose)
+ 0.02 library: /amd64/lib/ape/libap.a(_dtoa)
+ 0.02 library: /amd64/lib/ape/libap.a(floor)
+ 0.02 library pass: /amd64/lib/ape/libap.a
+ 0.02 library: /amd64/lib/ape/libap.a(fmemopen)
+ 0.02 library: /amd64/lib/ape/libap.a(open_memstream)
+ 0.02 library: /amd64/lib/ape/libap.a(__ofl_add)
+ 0.02 library: /amd64/lib/ape/libap.a(__overflow)
+ 0.02 library: /amd64/lib/ape/libap.a(fflush)
+ 0.02 library: /amd64/lib/ape/libap.a(_Balloc)
+ 0.02 library: /amd64/lib/ape/libap.a(sigaction)
+ 0.02 library: /amd64/lib/ape/libap.a(modf)
+ 0.02 library pass: /amd64/lib/ape/libap.a
+ 0.02 library: /amd64/lib/ape/libap.a(pthread_key_delete)
+ 0.02 library: /amd64/lib/ape/libap.a(pthread_cond_wait)
+ 0.02 library: /amd64/lib/ape/libap.a(pthread_cond_signal)
+ 0.02 library: /amd64/lib/ape/libap.a(pthread_cond_broadcast)
+ 0.02 library: /amd64/lib/ape/libap.a(strsignal)
+ 0.02 library: /amd64/lib/ape/libap.a(strnlen)
+ 0.02 library: /amd64/lib/ape/libap.a(__towrite)
+ 0.02 library: /amd64/lib/ape/libap.a(fprintf)
  0.02 library pass: /amd64/lib/ape/libap.a
  0.02 autolib: /amd64/lib/ape/libap.a (from /amd64/lib/ape/libap.a(_apemain))
  0.02 ldobj: /amd64/lib/ape/libap.a
@@ -2925,12 +2997,12 @@ fnuxi = 0123 01234567
  0.02 span 2
  0.02 span
  0.02 span 3
-etext = 20cc97
+etext = 20cf0a
  0.02 asmb
- 0.02 datblk
- 0.02 headr
- 0.02 cpu time
-2220 symbols
+ 0.03 datblk
+ 0.03 headr
+ 0.03 cpu time
+2406 symbols
 24 sizeof adr
 96 sizeof prog
 configure:14216: $? = 0
@@ -3014,13 +3086,13 @@ fnuxi = 0123 01234567
  0.00 library: /amd64/lib/ape/libap.a(strlen)
  0.00 library: /amd64/lib/ape/libap.a(strcpy)
  0.00 library: /amd64/lib/ape/libap.a(strcmp)
- 0.00 library: /amd64/lib/ape/libap.a(strchr)
  0.00 library: /amd64/lib/ape/libap.a(memset)
  0.00 library: /amd64/lib/ape/libap.a(memmove)
  0.00 library: /amd64/lib/ape/libap.a(memcmp)
  0.00 library: /amd64/lib/ape/libap.a(memchr)
  0.00 library: /amd64/lib/ape/libap.a(memccpy)
  0.00 library: /amd64/lib/ape/libap.a(abort)
+ 0.00 library: /amd64/lib/ape/libap.a(__stdio_exit)
  0.00 library: /amd64/lib/ape/libap.a(__uflow)
  0.00 library: /amd64/lib/ape/libap.a(__toread)
  0.00 library: /amd64/lib/ape/libap.a(_sighdlr)
@@ -3041,49 +3113,56 @@ fnuxi = 0123 01234567
  0.00 library: /amd64/lib/ape/libap.a(setpgid)
  0.00 library: /amd64/lib/ape/libap.a(_isatty)
  0.00 library: /amd64/lib/ape/libap.a(getpid)
- 0.00 library: /amd64/lib/ape/libap.a(getpgrp)
- 0.00 library: /amd64/lib/ape/libap.a(close)
- 0.00 library: /amd64/lib/ape/libap.a(access)
- 0.00 library: /amd64/lib/ape/libap.a(pthread_self)
- 0.00 library: /amd64/lib/ape/libap.a(__SEEK)
- 0.00 library: /amd64/lib/ape/libap.a(_RENDEZVOUS)
- 0.00 library: /amd64/lib/ape/libap.a(_PWRITE)
- 0.00 library: /amd64/lib/ape/libap.a(_PREAD)
- 0.00 library: /amd64/lib/ape/libap.a(_NOTED)
- 0.00 library: /amd64/lib/ape/libap.a(_FD2PATH)
- 0.00 library: /amd64/lib/ape/libap.a(_ERRSTR)
- 0.00 library: /amd64/lib/ape/libap.a(_CREATE)
- 0.00 library: /amd64/lib/ape/libap.a(_BRK_)
- 0.00 library: /amd64/lib/ape/libap.a(strstr)
- 0.00 library: /amd64/lib/ape/libap.a(strncmp)
- 0.00 library: /amd64/lib/ape/libap.a(strcat)
- 0.00 library: /amd64/lib/ape/libap.a(atoi)
- 0.00 library: /amd64/lib/ape/libap.a(__stdio_exit_needed)
- 0.00 library: /amd64/lib/ape/libap.a(sprintf)
- 0.00 library: /amd64/lib/ape/libap.a(stat)
- 0.00 library: /amd64/lib/ape/libap.a(fstat)
- 0.00 library: /amd64/lib/ape/libap.a(_psigblocked)
- 0.00 library: /amd64/lib/ape/libap.a(_dirtostat)
- 0.00 library: /amd64/lib/ape/libap.a(_dirfstat)
- 0.00 library: /amd64/lib/ape/libap.a(_convD2M)
- 0.00 library: /amd64/lib/ape/libap.a(_getpw)
- 0.00 library: /amd64/lib/ape/libap.a(_closebuf)
- 0.00 library: /amd64/lib/ape/libap.a(atexit)
- 0.00 library pass: /amd64/lib/ape/libap.a
- 0.00 library: /amd64/lib/ape/libap.a(longjmp)
- 0.00 library: /amd64/lib/ape/libap.a(read)
- 0.00 library: /amd64/lib/ape/libap.a(_WSTAT)
- 0.00 library: /amd64/lib/ape/libap.a(_STAT)
- 0.00 library: /amd64/lib/ape/libap.a(_SEGDETACH)
- 0.00 library: /amd64/lib/ape/libap.a(_SEGATTACH)
- 0.00 library: /amd64/lib/ape/libap.a(_RFORK)
- 0.00 library: /amd64/lib/ape/libap.a(_FWSTAT)
- 0.00 library: /amd64/lib/ape/libap.a(_FSTAT)
- 0.00 library: /amd64/lib/ape/libap.a(strtol)
- 0.00 library: /amd64/lib/ape/libap.a(__ofl_unlock)
- 0.00 library: /amd64/lib/ape/libap.a(vsnprintf)
- 0.00 library: /amd64/lib/ape/libap.a(vfprintf)
- 0.00 library: /amd64/lib/ape/libap.a(fputs)
+ 0.01 library: /amd64/lib/ape/libap.a(getpgrp)
+ 0.01 library: /amd64/lib/ape/libap.a(close)
+ 0.01 library: /amd64/lib/ape/libap.a(access)
+ 0.01 library: /amd64/lib/ape/libap.a(pthread_self)
+ 0.01 library: /amd64/lib/ape/libap.a(__SEEK)
+ 0.01 library: /amd64/lib/ape/libap.a(_RENDEZVOUS)
+ 0.01 library: /amd64/lib/ape/libap.a(_PWRITE)
+ 0.01 library: /amd64/lib/ape/libap.a(_PREAD)
+ 0.01 library: /amd64/lib/ape/libap.a(_NOTED)
+ 0.01 library: /amd64/lib/ape/libap.a(_FD2PATH)
+ 0.01 library: /amd64/lib/ape/libap.a(_ERRSTR)
+ 0.01 library: /amd64/lib/ape/libap.a(_CREATE)
+ 0.01 library: /amd64/lib/ape/libap.a(_BRK_)
+ 0.01 library: /amd64/lib/ape/libap.a(strstr)
+ 0.01 library: /amd64/lib/ape/libap.a(strncmp)
+ 0.01 library: /amd64/lib/ape/libap.a(strchr)
+ 0.01 library: /amd64/lib/ape/libap.a(strcat)
+ 0.01 library: /amd64/lib/ape/libap.a(atoi)
+ 0.01 library: /amd64/lib/ape/libap.a(stdout)
+ 0.01 library: /amd64/lib/ape/libap.a(stderr)
+ 0.01 library: /amd64/lib/ape/libap.a(__ofl_unlock)
+ 0.01 library: /amd64/lib/ape/libap.a(__stdio_close)
+ 0.01 library: /amd64/lib/ape/libap.a(__stdio_seek)
+ 0.01 library: /amd64/lib/ape/libap.a(__stdio_write)
+ 0.01 library: /amd64/lib/ape/libap.a(sprintf)
+ 0.01 library: /amd64/lib/ape/libap.a(stat)
+ 0.01 library: /amd64/lib/ape/libap.a(fstat)
+ 0.01 library: /amd64/lib/ape/libap.a(_psigblocked)
+ 0.01 library: /amd64/lib/ape/libap.a(_dirtostat)
+ 0.01 library: /amd64/lib/ape/libap.a(_dirfstat)
+ 0.01 library: /amd64/lib/ape/libap.a(_convD2M)
+ 0.01 library: /amd64/lib/ape/libap.a(_getpw)
+ 0.01 library: /amd64/lib/ape/libap.a(_closebuf)
+ 0.01 library: /amd64/lib/ape/libap.a(atexit)
+ 0.01 library pass: /amd64/lib/ape/libap.a
+ 0.01 library: /amd64/lib/ape/libap.a(longjmp)
+ 0.01 library: /amd64/lib/ape/libap.a(read)
+ 0.01 library: /amd64/lib/ape/libap.a(lseek)
+ 0.01 library: /amd64/lib/ape/libap.a(pthread_mutex_destroy)
+ 0.01 library: /amd64/lib/ape/libap.a(_WSTAT)
+ 0.01 library: /amd64/lib/ape/libap.a(_STAT)
+ 0.01 library: /amd64/lib/ape/libap.a(_SEGDETACH)
+ 0.01 library: /amd64/lib/ape/libap.a(_SEGATTACH)
+ 0.01 library: /amd64/lib/ape/libap.a(_RFORK)
+ 0.01 library: /amd64/lib/ape/libap.a(_FWSTAT)
+ 0.01 library: /amd64/lib/ape/libap.a(_FSTAT)
+ 0.01 library: /amd64/lib/ape/libap.a(strtol)
+ 0.01 library: /amd64/lib/ape/libap.a(vsnprintf)
+ 0.01 library: /amd64/lib/ape/libap.a(vfprintf)
+ 0.01 library: /amd64/lib/ape/libap.a(fputs)
  0.01 library: /amd64/lib/ape/libap.a(ferror)
  0.01 library: /amd64/lib/ape/libap.a(fclose)
  0.01 library: /amd64/lib/ape/libap.a(_dtoa)
@@ -3098,41 +3177,33 @@ fnuxi = 0123 01234567
  0.01 library: /amd64/lib/ape/libap.a(sigaction)
  0.01 library: /amd64/lib/ape/libap.a(modf)
  0.01 library pass: /amd64/lib/ape/libap.a
- 0.01 library: /amd64/lib/ape/libap.a(lseek)
  0.01 library: /amd64/lib/ape/libap.a(pthread_key_delete)
  0.01 library: /amd64/lib/ape/libap.a(pthread_cond_wait)
  0.01 library: /amd64/lib/ape/libap.a(pthread_cond_signal)
  0.01 library: /amd64/lib/ape/libap.a(pthread_cond_broadcast)
  0.01 library: /amd64/lib/ape/libap.a(strsignal)
  0.01 library: /amd64/lib/ape/libap.a(strnlen)
- 0.01 library: /amd64/lib/ape/libap.a(__fwritex)
- 0.01 library: /amd64/lib/ape/libap.a(stderr)
  0.01 library: /amd64/lib/ape/libap.a(__towrite)
- 0.01 library: /amd64/lib/ape/libap.a(__stdio_close)
- 0.01 library: /amd64/lib/ape/libap.a(__stdio_seek)
- 0.01 library: /amd64/lib/ape/libap.a(__stdio_write)
  0.01 library: /amd64/lib/ape/libap.a(fprintf)
  0.01 library pass: /amd64/lib/ape/libap.a
- 0.01 library: /amd64/lib/ape/libap.a(pthread_mutex_destroy)
- 0.01 library pass: /amd64/lib/ape/libap.a
- 0.01 autolib: /amd64/lib/ape/libap.a (from /amd64/lib/ape/libap.a(_apemain))
- 0.01 ldobj: /amd64/lib/ape/libap.a
- 0.01 library pass: /amd64/lib/ape/libap.a
- 0.01 mkfwd
- 0.01 patch
- 0.01 follow
- 0.01 dodata
- 0.01 span
- 0.01 span 1
- 0.01 span 2
- 0.01 span
- 0.01 span 3
-etext = 20cc97
- 0.01 asmb
- 0.01 datblk
- 0.01 headr
- 0.01 cpu time
-2220 symbols
+ 0.02 autolib: /amd64/lib/ape/libap.a (from /amd64/lib/ape/libap.a(_apemain))
+ 0.02 ldobj: /amd64/lib/ape/libap.a
+ 0.02 library pass: /amd64/lib/ape/libap.a
+ 0.02 mkfwd
+ 0.02 patch
+ 0.02 follow
+ 0.02 dodata
+ 0.02 span
+ 0.02 span 1
+ 0.02 span 2
+ 0.02 span
+ 0.02 span 3
+etext = 20cf0a
+ 0.02 asmb
+ 0.02 datblk
+ 0.02 headr
+ 0.02 cpu time
+2406 symbols
 24 sizeof adr
 96 sizeof prog
 configure:14269: $? = 0
@@ -3250,6 +3321,7 @@ malloc calls unlock
 malloc calls sbrk
 malloc calls unlock
 malloc calls unlock
+exit calls __stdio_exit
 exit calls _doatexits
 exit calls _exit
 __lockfile calls pthread_mutex_lock
@@ -3289,14 +3361,7 @@ __shgetc calls __uflow
 __lockfile calls pthread_mutex_lock
 __unlockfile calls pthread_mutex_unlock
 __shgetc calls __uflow
-strlen calls strchr
-__lockfile calls pthread_mutex_lock
-__unlockfile calls pthread_mutex_unlock
-__shgetc calls __uflow
 strcpy calls memccpy
-__lockfile calls pthread_mutex_lock
-__unlockfile calls pthread_mutex_unlock
-__shgetc calls __uflow
 __lockfile calls pthread_mutex_lock
 __unlockfile calls pthread_mutex_unlock
 __shgetc calls __uflow
@@ -3318,6 +3383,17 @@ __unlockfile calls pthread_mutex_unlock
 __shgetc calls __uflow
 abort calls getpid
 abort calls kill
+__lockfile calls pthread_mutex_lock
+__unlockfile calls pthread_mutex_unlock
+__shgetc calls __uflow
+close_file calls __lockfile
+close_file calls __unlockfile
+__stdio_exit calls close_file
+__stdio_exit calls close_file
+__stdio_exit calls __ofl_lock
+__stdio_exit calls close_file
+__stdio_exit calls __ofl_unlock
+__stdio_exit_needed calls __stdio_exit
 __lockfile calls pthread_mutex_lock
 __unlockfile calls pthread_mutex_unlock
 __shgetc calls __uflow
@@ -3488,7 +3564,11 @@ _syserrno calls _ERRSTR
 _syserrno calls strncpy
 _syserrno calls strstr
 _syserrno calls _ERRSTR
+__lockfile calls pthread_mutex_lock
+__unlockfile calls pthread_mutex_unlock
+__shgetc calls __uflow
 _notetramp calls _NOTED
+_notetramp calls strncpy
 _notetramp calls _NOTED
 notecont calls _NOTED
 siglongjmp calls longjmp
@@ -3571,12 +3651,31 @@ atoi calls strtol
 __lockfile calls pthread_mutex_lock
 __unlockfile calls pthread_mutex_unlock
 __shgetc calls __uflow
-close_file calls __lockfile
-close_file calls __unlockfile
-__stdio_exit calls __ofl_lock
-__stdio_exit calls close_file
-__stdio_exit calls __ofl_unlock
-__stdio_exit_needed calls __stdio_exit
+__lockfile calls pthread_mutex_lock
+__unlockfile calls pthread_mutex_unlock
+__shgetc calls __uflow
+__lockfile calls pthread_mutex_lock
+__unlockfile calls pthread_mutex_unlock
+__shgetc calls __uflow
+__ofl_lock calls pthread_mutex_lock
+__ofl_unlock calls pthread_mutex_unlock
+__lockfile calls pthread_mutex_lock
+__unlockfile calls pthread_mutex_unlock
+__shgetc calls __uflow
+__stdio_close calls close
+__stdio_close calls pthread_mutex_destroy
+__stdio_close calls free
+__lockfile calls pthread_mutex_lock
+__unlockfile calls pthread_mutex_unlock
+__shgetc calls __uflow
+__stdio_seek calls write
+__stdio_seek calls lseek
+__lockfile calls pthread_mutex_lock
+__unlockfile calls pthread_mutex_unlock
+__shgetc calls __uflow
+__stdio_write calls write
+__stdio_write calls write
+__stdio_write calls memcpy
 __lockfile calls pthread_mutex_lock
 __unlockfile calls pthread_mutex_unlock
 __shgetc calls __uflow
@@ -3748,18 +3847,15 @@ pread calls _readbuf
 pread calls _PREAD
 pread calls _syserrno
 read calls pread
-__lockfile calls pthread_mutex_lock
-__unlockfile calls pthread_mutex_unlock
-__shgetc calls __uflow
-__ofl_lock calls pthread_mutex_lock
-__ofl_unlock calls pthread_mutex_unlock
+lseek calls _SEEK
+lseek calls _syserrno
 __lockfile calls pthread_mutex_lock
 __unlockfile calls pthread_mutex_unlock
 __shgetc calls __uflow
 vsnprintf calls open_memstream
 vsnprintf calls vfprintf
 vsnprintf calls fclose
-vsnprintf calls strncpy
+vsnprintf calls memcpy
 vsnprintf calls free
 vsnprintf calls fmemopen
 vsnprintf calls vfprintf
@@ -3839,8 +3935,10 @@ __lockfile calls pthread_mutex_lock
 __unlockfile calls pthread_mutex_unlock
 __shgetc calls __uflow
 fclose calls fflush
+fclose calls fflush
 fclose calls free
 fclose calls close
+fclose calls free
 __lockfile calls pthread_mutex_lock
 __unlockfile calls pthread_mutex_unlock
 __shgetc calls __uflow
@@ -3970,7 +4068,6 @@ __lockfile calls pthread_mutex_lock
 __unlockfile calls pthread_mutex_unlock
 __shgetc calls __uflow
 fflush calls __ofl_lock
-fflush calls __fwritex
 fflush calls __ofl_unlock
 fflush calls __lockfile
 fflush calls __unlockfile
@@ -4002,14 +4099,13 @@ __unlockfile calls pthread_mutex_unlock
 __shgetc calls __uflow
 sigaction calls memset
 sigaction calls signal
+sigaction calls signal
 sigaction calls memset
 psignal calls strsignal
 psignal calls fprintf
 psignal calls fprintf
 __bswap64 calls __bswap32
 __bswap64 calls __bswap32
-lseek calls _SEEK
-lseek calls _syserrno
 pthread_key_delete calls free
 pthread_cond_wait calls pthread_mutex_unlock
 pthread_cond_wait calls qlock
@@ -4031,32 +4127,7 @@ __shgetc calls __uflow
 __lockfile calls pthread_mutex_lock
 __unlockfile calls pthread_mutex_unlock
 __shgetc calls __uflow
-__lockfile calls pthread_mutex_lock
-__unlockfile calls pthread_mutex_unlock
-__shgetc calls __uflow
-__lockfile calls pthread_mutex_lock
-__unlockfile calls pthread_mutex_unlock
-__shgetc calls __uflow
 __towrite_needs_stdio_exit calls __stdio_exit_needed
-__lockfile calls pthread_mutex_lock
-__unlockfile calls pthread_mutex_unlock
-__shgetc calls __uflow
-__stdio_close calls close
-__stdio_close calls pthread_mutex_destroy
-__stdio_close calls free
-__stdio_close calls free
-__stdio_close calls free
-__lockfile calls pthread_mutex_lock
-__unlockfile calls pthread_mutex_unlock
-__shgetc calls __uflow
-__stdio_seek calls write
-__stdio_seek calls lseek
-__lockfile calls pthread_mutex_lock
-__unlockfile calls pthread_mutex_unlock
-__shgetc calls __uflow
-__stdio_write calls write
-__stdio_write calls write
-__stdio_write calls memcpy
 __lockfile calls pthread_mutex_lock
 __unlockfile calls pthread_mutex_unlock
 __shgetc calls __uflow
@@ -4120,6 +4191,7 @@ configure:14529: result: yes
 configure:14546: checking for __assume()
 configure:14565: cc -o conftest    conftest.c  >&5
 main: undefined: __assume in main
+cc: 6l: 6l 110677: error
 configure:14565: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4175,7 +4247,8 @@ configure: failed program was:
 configure:14573: result: no
 configure:14589: checking for __builtin_mul_overflow()
 configure:14616: cc -o conftest    conftest.c  >&5
-/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:55[stdin:164] syntax error, last name: a
+/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:55[stdin:196] syntax error, last name: a
+cc: cpp: 6c 110696: error
 configure:14616: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4240,6 +4313,7 @@ configure:14624: result: no
 configure:14640: checking for __builtin_unreachable()
 configure:14659: cc -o conftest    conftest.c  >&5
 /usr/glenda/APExp/sys/src/external/pcre2/conftest.c:47[stdin:48] syntax error, last name: 0
+cc: cpp: 6c 110716: error
 configure:14659: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4311,7 +4385,9 @@ configure:15314: $? = 0
 configure:15314: result: yes
 configure:15323: checking for windows.h
 configure:15323: cc -c   conftest.c >&5
-<eof> End of file
+<eof> syntax error, last name: wchar_
+cpp: conftest.c:76 Could not find include file <windows.h>
+cc: 6c: cpp 110791: error
 configure:15323: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4403,7 +4479,8 @@ configure:15536: checking for size_t
 configure:15536: cc -c   conftest.c >&5
 configure:15536: $? = 0
 configure:15536: cc -c   conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:80[stdin:4501] syntax error, last name: size_t
+/usr/glenda/APExp/sys/src/external/pcre2/conftest.c:80[stdin:4753] syntax error, last name: size_t
+cc: cpp: 6c 110844: error
 configure:15536: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4494,6 +4571,7 @@ configure:15536: result: yes
 configure:15549: checking for memfd_create
 configure:15549: cc -o conftest    conftest.c  >&5
 main: undefined: memfd_create in main
+cc: 6l: 6l 110866: error
 configure:15549: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4579,6 +4657,7 @@ configure:15549: result: no
 configure:15555: checking for mkostemp
 configure:15555: cc -o conftest    conftest.c  >&5
 main: undefined: mkostemp in main
+cc: 6l: 6l 110887: error
 configure:15555: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4664,6 +4743,7 @@ configure:15555: result: no
 configure:15561: checking for secure_getenv
 configure:15561: cc -o conftest    conftest.c  >&5
 main: undefined: secure_getenv in main
+cc: 6l: 6l 110908: error
 configure:15561: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4768,6 +4848,8 @@ configure:15704: $? = 0
 configure:15706: result: yes
 configure:17726: checking whether Intel CET is enabled
 configure:17747: cc -c   conftest.c >&5
+cpp: conftest.c:73 #error directive: CET is not enabled
+cc: 6c: cpp 111022: errors
 configure:17747: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4867,20 +4949,21 @@ generated by GNU Autoconf 2.71.  Invocation command line was
 
 on krypton
 
-config.status:1204: creating Makefile
-config.status:1204: creating libpcre2-8.pc
-config.status:1204: creating libpcre2-16.pc
-config.status:1204: creating libpcre2-32.pc
-config.status:1204: creating libpcre2-posix.pc
-config.status:1204: creating pcre2-config
-config.status:1204: creating src/pcre2.h
-config.status:1204: creating src/config.h
-config.status:1433: executing depfiles commands
-config.status:1508: cd .       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
-config.status:1515: $? = 0
-config.status:1433: executing libtool commands
-config.status:1433: executing script-chmod commands
-config.status:1433: executing delete-old-chartables commands
+config.status:1139: creating Makefile
+config.status:1139: creating libpcre2-8.pc
+config.status:1139: creating libpcre2-16.pc
+config.status:1139: creating libpcre2-32.pc
+config.status:1139: creating libpcre2-posix.pc
+config.status:1139: creating pcre2-config
+config.status:1139: creating src/pcre2.h
+config.status:1139: creating src/config.h
+config.status:1368: executing depfiles commands
+config.status:1443: cd .       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+make: Nothing to be done for 'am--depfiles'.
+config.status:1450: $? = 0
+config.status:1368: executing libtool commands
+config.status:1368: executing script-chmod commands
+config.status:1368: executing delete-old-chartables commands
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -4954,6 +5037,7 @@ ac_cv_path_FGREP='/bin/grep -F'
 ac_cv_path_GREP=/bin/grep
 ac_cv_path_SED=/bin/sed
 ac_cv_path_install='/bin/install -c'
+ac_cv_path_lt_DD=/bin/dd
 ac_cv_prog_AWK=awk
 ac_cv_prog_CC=cc
 ac_cv_prog_ac_ct_AR=ar
@@ -4965,7 +5049,7 @@ ac_cv_prog_cc_c89=
 ac_cv_prog_cc_c99=no
 ac_cv_prog_cc_g=yes
 ac_cv_prog_cc_stdc=
-ac_cv_prog_make_make_set=yes
+ac_cv_prog_make__set=yes
 ac_cv_safe_to_define___extensions__=yes
 ac_cv_should_define__xopen_source=no
 ac_cv_sys_file_offset_bits=no
@@ -4992,15 +5076,15 @@ lt_cv_prog_compiler_pic_works=yes
 lt_cv_prog_compiler_static_works=yes
 lt_cv_prog_gnu_ld=no
 lt_cv_sharedlib_from_linklib_cmd='print -r --'
-lt_cv_sys_global_symbol_pipe='/bin/sed -n -e '\''s/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p'\'' | /bin/sed '\''/ __gnu_lto/d'\'
+lt_cv_sys_global_symbol_pipe=
 lt_cv_sys_global_symbol_to_c_name_address='/bin/sed -n -e '\''s/^: \(.*\) .*$/  {"\1", (void *) 0},/p'\'' -e '\''s/^[BCDEGRST][BCDEGRST]* .* \(.*\)$/  {"\1", (void *) \&\1},/p'\'
 lt_cv_sys_global_symbol_to_c_name_address_lib_prefix='/bin/sed -n -e '\''s/^: \(.*\) .*$/  {"\1", (void *) 0},/p'\'' -e '\''s/^[BCDEGRST][BCDEGRST]* .* \(lib.*\)$/  {"\1", (void *) \&\1},/p'\'' -e '\''s/^[BCDEGRST][BCDEGRST]* .* \(.*\)$/  {"lib\1", (void *) \&\1},/p'\'
-lt_cv_sys_global_symbol_to_cdecl='/bin/sed -n -e '\''s/^T .* \(.*\)$/extern int \1();/p'\'' -e '\''s/^[BCDEGRST][BCDEGRST]* .* \(.*\)$/extern char \1;/p'\'
+lt_cv_sys_global_symbol_to_cdecl=
 lt_cv_sys_global_symbol_to_import=
-lt_cv_sys_max_cmd_len=512
+lt_cv_sys_max_cmd_len=262144
 lt_cv_to_host_file_cmd=func_convert_file_noop
 lt_cv_to_tool_file_cmd=func_convert_file_noop
-lt_cv_truncate_bin='/bin/sed -e 4q'
+lt_cv_truncate_bin='/bin/dd bs=4096 count=1'
 pcre2_cc_cv_attribute_uninitialized=yes
 pcre2_cc_cv_builtin_assume=no
 pcre2_cc_cv_builtin_mul_overflow=no
@@ -5080,7 +5164,7 @@ LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 LIBZ=''
 LIB_POSTFIX=''
 LIPO=''
-LN_S='ln -s'
+LN_S='cp -pR'
 LTLIBOBJS=''
 LT_SYS_LIBRARY_PATH=''
 MAINT='#'

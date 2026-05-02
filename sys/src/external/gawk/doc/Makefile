@@ -39,7 +39,7 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 #
 
-
+VPATH = .
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -261,10 +261,10 @@ ECHO_T =
 EGREP = /bin/grep -E
 ETAGS = etags
 EXEEXT = 
-GAWKLIBEXT = so
+GAWKLIBEXT = 
 GETTEXT_MACRO_VERSION = 0.20
-GMSGFMT = :
-GMSGFMT_015 = :
+GMSGFMT = /bin/msgfmt
+GMSGFMT_015 = /bin/msgfmt
 GREP = /bin/grep
 INSTALL = .././build-aux/install-sh -c
 INSTALL_DATA = ${INSTALL} -m 644
@@ -274,19 +274,19 @@ INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 INTLLIBS = 
 INTL_MACOSX_LIBS = 
 LDFLAGS = 
-LIBICONV = 
+LIBICONV = -liconv
 LIBINTL = 
 LIBMPFR = 
 LIBOBJS = 
-LIBREADLINE = 
+LIBREADLINE = -lreadline
 LIBS = 
-LN_S = ln -s
-LTLIBICONV = 
+LN_S = cp -pR
+LTLIBICONV = -liconv
 LTLIBINTL = 
 LTLIBOBJS = 
 MAKEINFO = ${SHELL} '/usr/glenda/APExp/sys/src/external/gawk/build-aux/missing' makeinfo -c CHECK_NORMAL_MENU_STRUCTURE=1 --no-split --force
 MKDIR_P = .././build-aux/install-sh -c -d
-MSGFMT = :
+MSGFMT = /bin/msgfmt
 MSGMERGE = /bin/msgmerge
 MSGMERGE_FOR_MSGFMT_OPTION = --no-location --quiet
 OBJEXT = o
@@ -298,19 +298,19 @@ PACKAGE_TARNAME = gawk
 PACKAGE_URL = https://www.gnu.org/software/gawk/
 PACKAGE_VERSION = 5.4.0
 PATH_SEPARATOR = :
-POSUB = 
+POSUB = po
 RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
 SHELL = /bin/sh
 SOCKET_LIBS = 
 STRIP = 
-USE_NLS = no
+USE_NLS = yes
 VERSION = 5.4.0
-XGETTEXT = :
-XGETTEXT_015 = :
+XGETTEXT = /bin/xgettext
+XGETTEXT_015 = /bin/xgettext
 XGETTEXT_EXTRA_OPTIONS = 
-YACC = byacc
+YACC = bison -y
 YFLAGS = 
 ZOS_FAIL = 
 abs_builddir = /usr/glenda/APExp/sys/src/external/gawk/doc
@@ -319,7 +319,7 @@ abs_top_builddir = /usr/glenda/APExp/sys/src/external/gawk
 abs_top_srcdir = /usr/glenda/APExp/sys/src/external/gawk
 ac_ct_AR = ar
 ac_ct_CC = 
-acl_shlibext = so
+acl_shlibext = 
 am__include = include
 am__leading_dot = .
 am__quote = 

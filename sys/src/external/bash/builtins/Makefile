@@ -36,7 +36,7 @@ EXEEXT =
 prefix = /usr/local
 
 srcdir = .
-
+VPATH = .
 topdir = ..
 
 datarootdir = ${prefix}/share
@@ -86,9 +86,9 @@ INTL_LIBSRC = ${topdir}/lib/intl
 INTL_BUILDDIR = ${LIBBUILD}/intl
 INTL_LIBDIR = ${INTL_BUILDDIR}
 INTL_LIBRARY = ${INTL_BUILDDIR}/libintl.a
-INTL_INC = -I${INTL_LIBSRC} -I${INTL_BUILDDIR}
-INTL_DEP = ${INTL_LIBDIR}/libintl.a
-LIBINTL_H = ${INTL_BUILDDIR}/libintl.h
+INTL_INC = 
+INTL_DEP = 
+LIBINTL_H = 
 
 HELPDIR = 
 MKDIRS = ${topdir}/support/mkdirs

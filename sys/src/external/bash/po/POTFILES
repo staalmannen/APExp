@@ -71,4 +71,4 @@
      ../variables.c \
      ../version.c \
      ../xmalloc.c \
-     ../lib/intl/plural.c
+     ../lib/intl/plural.c \

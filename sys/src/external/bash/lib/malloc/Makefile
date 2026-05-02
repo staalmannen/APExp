@@ -16,7 +16,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 srcdir = .
-
+VPATH = .
 topdir = ../..
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
 
@@ -51,8 +51,8 @@ BASHINCDIR = ${topdir}/include
 
 INTL_LIBSRC = ${topdir}/lib/intl
 INTL_BUILDDIR = ${LIBBUILD}/intl
-INTL_INC = -I${INTL_LIBSRC} -I${INTL_BUILDDIR}
-LIBINTL_H = ${INTL_BUILDDIR}/libintl.h
+INTL_INC = 
+LIBINTL_H = 
 
 INCLUDES = -I. -I../.. -I$(topdir) -I$(BASHINCDIR) -I$(topdir)/lib $(INTL_INC)
 

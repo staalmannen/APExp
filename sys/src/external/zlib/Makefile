@@ -16,13 +16,13 @@ CC=cc
 GCOV=
 LLVM_GCOV_FLAG=
 
-CFLAGS=-O
+CFLAGS=-O -D_LARGEFILE64_SOURCE=1
 #CFLAGS=-O -DMAX_WBITS=14 -DMAX_MEM_LEVEL=7
 #CFLAGS=-g -DZLIB_DEBUG
 #CFLAGS=-O3 -Wall -Wwrite-strings -Wpointer-arith -Wconversion \
 #           -Wstrict-prototypes -Wmissing-prototypes
 
-SFLAGS=-O
+SFLAGS=-O -D_LARGEFILE64_SOURCE=1
 LDFLAGS=
 TEST_LIBS=-L. libz.a
 LDSHARED=cc
@@ -72,7 +72,7 @@ OBJS = $(OBJC) $(OBJA)
 
 PIC_OBJS = $(PIC_OBJC) $(PIC_OBJA)
 
-all: static
+all: static all64
 
 static: example$(EXE) minigzip$(EXE)
 
@@ -82,7 +82,7 @@ all64: example64$(EXE) minigzip64$(EXE)
 
 check: test
 
-test: all teststatic
+test: all teststatic test64
 
 teststatic: static
 	@TMPST=tmpst_$$; \

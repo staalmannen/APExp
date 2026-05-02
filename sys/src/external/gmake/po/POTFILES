@@ -28,4 +28,4 @@
      ../src/vmsfunctions.c \
      ../src/vmsjobs.c \
      ../src/vpath.c \
-     ../src/w32/w32os.c
+     ../src/w32/w32os.c \

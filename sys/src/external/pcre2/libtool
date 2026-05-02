@@ -102,10 +102,10 @@ FGREP="/bin/grep -F"
 NM="/bin/nm"
 
 # Whether we need soft or hard links.
-LN_S="ln -s"
+LN_S="cp -pR"
 
 # What is the maximum length of a command?
-max_cmd_len=512
+max_cmd_len=262144
 
 # Object file suffix (normally "o").
 objext=o
@@ -117,10 +117,10 @@ exeext=
 lt_unset=unset
 
 # turn spaces into newlines.
-SP2NL="tr \\040 \\012"
+SP2NL="tr \040 \012"
 
 # turn newlines into spaces.
-NL2SP="tr \\015\\012 \\040\\040"
+NL2SP="tr \015\012 \040\040"
 
 # convert $build file names to $host format.
 to_host_file_cmd=func_convert_file_noop
@@ -135,7 +135,7 @@ FILECMD="file"
 deplibs_check_method="unknown"
 
 # Command to use when deplibs_check_method = "file_magic".
-file_magic_cmd="\$MAGIC_CMD"
+file_magic_cmd="$MAGIC_CMD"
 
 # How to find potential files when deplibs_check_method = "file_magic".
 file_magic_glob=""
@@ -163,7 +163,7 @@ STRIP="strip"
 
 # Commands used to install an old-style archive.
 RANLIB="ranlib"
-old_postinstall_cmds="chmod 644 \$oldlib~\$RANLIB \$tool_oldlib"
+old_postinstall_cmds="chmod 644 $oldlib~$RANLIB $tool_oldlib"
 old_postuninstall_cmds=""
 
 # Whether to use a lock for old archive extraction.
@@ -176,19 +176,19 @@ LTCC="cc"
 LTCFLAGS=""
 
 # Take the output of nm and produce a listing of raw symbols and C names.
-global_symbol_pipe="/bin/sed -n -e 's/^.*[	 ]\\([BCDEGRST][BCDEGRST]*\\)[	 ][	 ]*\\([_A-Za-z][_A-Za-z0-9]*\\)\$/\\1 \\2 \\2/p' | /bin/sed '/ __gnu_lto/d'"
+global_symbol_pipe=""
 
 # Transform the output of nm in a proper C declaration.
-global_symbol_to_cdecl="/bin/sed -n -e 's/^T .* \\(.*\\)\$/extern int \\1();/p' -e 's/^[BCDEGRST][BCDEGRST]* .* \\(.*\\)\$/extern char \\1;/p'"
+global_symbol_to_cdecl=""
 
 # Transform the output of nm into a list of symbols to manually relocate.
 global_symbol_to_import=""
 
 # Transform the output of nm in a C name address pair.
-global_symbol_to_c_name_address="/bin/sed -n -e 's/^: \\(.*\\) .*\$/  {\"\\1\", (void *) 0},/p' -e 's/^[BCDEGRST][BCDEGRST]* .* \\(.*\\)\$/  {\"\\1\", (void *) \\&\\1},/p'"
+global_symbol_to_c_name_address="/bin/sed -n -e 's/^: \(.*\) .*$/  {"\1", (void *) 0},/p' -e 's/^[BCDEGRST][BCDEGRST]* .* \(.*\)$/  {"\1", (void *) \&\1},/p'"
 
 # Transform the output of nm in a C name address pair when lib prefix is needed.
-global_symbol_to_c_name_address_lib_prefix="/bin/sed -n -e 's/^: \\(.*\\) .*\$/  {\"\\1\", (void *) 0},/p' -e 's/^[BCDEGRST][BCDEGRST]* .* \\(lib.*\\)\$/  {\"\\1\", (void *) \\&\\1},/p' -e 's/^[BCDEGRST][BCDEGRST]* .* \\(.*\\)\$/  {\"lib\\1\", (void *) \\&\\1},/p'"
+global_symbol_to_c_name_address_lib_prefix="/bin/sed -n -e 's/^: \(.*\) .*$/  {"\1", (void *) 0},/p' -e 's/^[BCDEGRST][BCDEGRST]* .* \(lib.*\)$/  {"\1", (void *) \&\1},/p' -e 's/^[BCDEGRST][BCDEGRST]* .* \(.*\)$/  {"lib\1", (void *) \&\1},/p'"
 
 # The name lister interface.
 nm_interface="BSD nm"
@@ -200,7 +200,7 @@ nm_file_list_spec=""
 lt_sysroot=
 
 # Command to truncate a binary pipe.
-lt_truncate_bin="/bin/sed -e 4q"
+lt_truncate_bin="/bin/dd bs=4096 count=1"
 
 # The name of the directory that contains temporary libtool files.
 objdir=.libs
@@ -261,7 +261,7 @@ shlibpath_var=
 shlibpath_overrides_runpath=unknown
 
 # Format of library name prefix.
-libname_spec="lib\$name"
+libname_spec="lib$name"
 
 # List of archive names.  First name is the real one, the rest are links.
 # The last name is the one that the linker finds with -lNAME
@@ -317,10 +317,10 @@ LD="pcc"
 
 # How to create reloadable object files.
 reload_flag=" -r"
-reload_cmds="\$LD\$reload_flag -o \$output\$reload_objs"
+reload_cmds="$LD$reload_flag -o $output$reload_objs"
 
 # Commands used to build an old-style archive.
-old_archive_cmds="\$AR \$AR_FLAGS \$oldlib\$oldobjs~\$RANLIB \$tool_oldlib"
+old_archive_cmds="$AR $AR_FLAGS $oldlib$oldobjs~$RANLIB $tool_oldlib"
 
 # A language specific compiler.
 CC="cc"
@@ -423,7 +423,7 @@ link_all_deplibs=unknown
 always_export_symbols=no
 
 # The commands to list exported symbols.
-export_symbols_cmds="\$NM \$libobjs \$convenience | \$global_symbol_pipe | \$SED 's/.* //' | sort | uniq > \$export_symbols"
+export_symbols_cmds="$NM $libobjs $convenience | $global_symbol_pipe | $SED 's/.* //' | sort | uniq > $export_symbols"
 
 # Symbols that should not be listed in the preloaded symbols.
 exclude_expsyms="_GLOBAL_OFFSET_TABLE_|_GLOBAL__F[ID]_.*"

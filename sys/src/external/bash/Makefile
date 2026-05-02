@@ -65,12 +65,12 @@ topdir = .
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
 top_builddir = /usr/glenda/APExp/sys/src/external/bash
 srcdir = .
-
+VPATH = .
 
 
 CC = cc
 CC_FOR_BUILD = $(CC)
-YACC = byacc
+YACC = bison -y
 SHELL = /bin/sh
 CP = cp
 RM = rm -f
@@ -216,7 +216,7 @@ LIBBUILD = ${BUILD_DIR}/${LIBSUBDIR}
 SUBDIR_INCLUDES = -I.  -I$(topdir) -I$(topdir)/$(LIBSUBDIR)
 
 BUILD_INCLUDED_LIBINTL = yes
-USE_INCLUDED_LIBINTL = yes
+USE_INCLUDED_LIBINTL = no
 
 # the bash library
 # the library is a mix of functions that the C library does not provide on
@@ -353,7 +353,7 @@ TERM_LIBSRC = $(LIBSRC)/termcap
 TERM_LIBDIR = $(dot)/$(LIBSUBDIR)/termcap
 TERM_ABSSRC = ${topdir}/$(TERM_LIBDIR)
 
-TERMCAP_LIB = -lcurses
+TERMCAP_LIB = 
 TERMCAP_LIBRARY = $(TERM_LIBDIR)/libtermcap.a
 TERMCAP_LDFLAGS = -L$(TERM_LIBDIR)
 TERMCAP_DEP = 
@@ -398,20 +398,20 @@ INTL_LIBDIR = $(dot)/$(LIBSUBDIR)/intl
 INTL_ABSSRC = ${topdir}/$(INTL_LIB)
 INTL_BUILDDIR = ${LIBBUILD}/intl
 
-INTL_LIB     = lib/intl/libintl.a  
+INTL_LIB     = 
 INTL_LIBRARY = $(INTL_LIBDIR)/libintl.a
-INTL_DEP = ${INTL_LIBDIR}/libintl.a
-INTL_INC = -I${INTL_LIBSRC} -I${INTL_BUILDDIR}
+INTL_DEP = 
+INTL_INC = 
 
-LIBINTL_H = ${INTL_BUILDDIR}/libintl.h
+LIBINTL_H = 
 
 # libiconv
 LIBICONV = 
 
 # tests
-LIBINTL = lib/intl/libintl.a  
-LTLIBINTL = lib/intl/libintl.la  
-INTLLIBS = lib/intl/libintl.a  
+LIBINTL = 
+LTLIBINTL = 
+INTLLIBS = 
 
 # Our malloc.
 MALLOC_TARGET = malloc

@@ -26,4 +26,4 @@
      ../src/input.c \
      ../src/m4.c \
      ../src/macro.c \
-     ../src/output.c
+     ../src/output.c \

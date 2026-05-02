@@ -151,7 +151,7 @@
 #  xstrtoimax \
 #  year2038
 
-
+VPATH = .
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -230,29 +230,29 @@ am__append_3 = chdir-long.c
 #am__append_5 = closedir.c
 #am__append_6 = dirfd.c
 #am__append_7 = dup.c
-am__append_8 = dup2.c
+#am__append_8 = dup2.c
 am__append_9 = error.c
 #am__append_10 = fchdir.c
 am__append_11 = fcntl.c
 am__append_12 = fdopendir.c
-am__append_13 = fpending.c
+#am__append_13 = fpending.c
 am__append_14 = free.c
 #am__append_15 = fstat.c
 am__append_16 = fstatat.c
 am__append_17 = fts.c
 am__append_18 = getcwd-lgpl.c
-#am__append_19 = getdtablesize.c
+am__append_19 = getdtablesize.c
 am__append_20 = getopt.c getopt1.c
 #am__append_21 = getpagesize.c
 #am__append_22 = getprogname.c
 #am__append_23 = isatty.c
 #am__append_24 = isblank.c
 #am__append_25 = iswblank.c
-am__append_26 = iswctype.c
-#am__append_27 = iswdigit.c
+#am__append_26 = iswctype.c
+am__append_27 = iswdigit.c
 #am__append_28 = iswpunct.c
-#am__append_29 = iswxdigit.c
-am__append_30 = localeconv.c
+am__append_29 = iswxdigit.c
+#am__append_30 = localeconv.c
 am__append_31 = lseek.c
 am__append_32 = lstat.c
 am__append_33 = mbrlen.c
@@ -263,22 +263,22 @@ am__append_37 = mbsrtowcs.c
 #am__append_38 = mbtowc.c
 #am__append_39 = memchr.c
 #am__append_40 = mempcpy.c
-am__append_41 = memrchr.c
+#am__append_41 = memrchr.c
 #am__append_42 = msvc-inval.c
 #am__append_43 = msvc-nothrow.c
 am__append_44 = nl_langinfo.c
 #am__append_45 = nl_langinfo-lock.c
-am__append_46 = obstack.c
+#am__append_46 = obstack.c
 #am__append_47 = open.c
 am__append_48 = openat.c
 #am__append_49 = opendir.c
 #am__append_50 = pipe.c
 #am__append_51 = pthread-once.c
 #am__append_52 = raise.c
-am__append_53 = rawmemchr.c
+#am__append_53 = rawmemchr.c
 #am__append_54 = read.c
 #am__append_55 = readdir.c
-#am__append_56 = realloc.c
+am__append_56 = realloc.c
 am__append_57 = reallocarray.c
 am__append_58 = regex.c
 am__append_59 = setlocale-lock.c
@@ -286,12 +286,12 @@ am__append_60 = sigsegv.c stackvma.c
 #am__append_61 = stat.c
 #am__append_62 = stdio-read.c
 #am__append_63 = stdio-write.c
-am__append_64 = stpcpy.c
+#am__append_64 = stpcpy.c
 #am__append_65 = strdup.c
 am__append_66 = strerror.c
 am__append_67 = strerror-override.c
-#am__append_68 = strnlen.c
-#am__append_69 = strtoimax.c
+am__append_68 = strnlen.c
+am__append_69 = strtoimax.c
 am__append_70 = strtoll.c
 am__append_71 = unicase/tolower.c
 am__append_72 = unicase/toupper.c
@@ -313,9 +313,9 @@ am__append_87 = unistr/u32-pcpy.c
 am__append_88 = unistr/u32-strcat.c
 am__append_89 = unistr/u32-strlen.c
 #am__append_90 = wcrtomb.c
-am__append_91 = wctob.c
+#am__append_91 = wctob.c
 #am__append_92 = wctomb.c
-am__append_93 = wctype.c
+#am__append_93 = wctype.c
 #am__append_94 = windows-mutex.c
 #am__append_95 = windows-once.c
 #am__append_96 = windows-recmutex.c
@@ -554,7 +554,7 @@ am__objects_3 = libgreputils_a-chdir-long.$(OBJEXT)
 #am__objects_6 =  \
 #	libgreputils_a-dirfd.$(OBJEXT)
 #am__objects_7 = libgreputils_a-dup.$(OBJEXT)
-am__objects_8 = libgreputils_a-dup2.$(OBJEXT)
+#am__objects_8 = libgreputils_a-dup2.$(OBJEXT)
 am__objects_9 =  \
 	libgreputils_a-error.$(OBJEXT)
 #am__objects_10 =  \
@@ -562,8 +562,8 @@ am__objects_9 =  \
 am__objects_11 =  \
 	libgreputils_a-fcntl.$(OBJEXT)
 am__objects_12 = libgreputils_a-fdopendir.$(OBJEXT)
-am__objects_13 =  \
-	libgreputils_a-fpending.$(OBJEXT)
+#am__objects_13 =  \
+#	libgreputils_a-fpending.$(OBJEXT)
 am__objects_14 = libgreputils_a-free.$(OBJEXT)
 #am__objects_15 =  \
 #	libgreputils_a-fstat.$(OBJEXT)
@@ -571,7 +571,7 @@ am__objects_16 =  \
 	libgreputils_a-fstatat.$(OBJEXT)
 am__objects_17 = libgreputils_a-fts.$(OBJEXT)
 am__objects_18 = libgreputils_a-getcwd-lgpl.$(OBJEXT)
-#am__objects_19 = libgreputils_a-getdtablesize.$(OBJEXT)
+am__objects_19 = libgreputils_a-getdtablesize.$(OBJEXT)
 am__objects_20 =  \
 	libgreputils_a-getopt.$(OBJEXT) \
 	libgreputils_a-getopt1.$(OBJEXT)
@@ -583,14 +583,14 @@ am__objects_20 =  \
 #	libgreputils_a-isblank.$(OBJEXT)
 #am__objects_25 =  \
 #	libgreputils_a-iswblank.$(OBJEXT)
-am__objects_26 =  \
-	libgreputils_a-iswctype.$(OBJEXT)
-#am__objects_27 =  \
-#	libgreputils_a-iswdigit.$(OBJEXT)
+#am__objects_26 =  \
+#	libgreputils_a-iswctype.$(OBJEXT)
+am__objects_27 =  \
+	libgreputils_a-iswdigit.$(OBJEXT)
 #am__objects_28 =  \
 #	libgreputils_a-iswpunct.$(OBJEXT)
-#am__objects_29 = libgreputils_a-iswxdigit.$(OBJEXT)
-am__objects_30 = libgreputils_a-localeconv.$(OBJEXT)
+am__objects_29 = libgreputils_a-iswxdigit.$(OBJEXT)
+#am__objects_30 = libgreputils_a-localeconv.$(OBJEXT)
 am__objects_31 =  \
 	libgreputils_a-lseek.$(OBJEXT)
 am__objects_32 =  \
@@ -610,14 +610,14 @@ am__objects_37 = libgreputils_a-mbsrtowcs.$(OBJEXT)
 #	libgreputils_a-memchr.$(OBJEXT)
 #am__objects_40 =  \
 #	libgreputils_a-mempcpy.$(OBJEXT)
-am__objects_41 =  \
-	libgreputils_a-memrchr.$(OBJEXT)
+#am__objects_41 =  \
+#	libgreputils_a-memrchr.$(OBJEXT)
 #am__objects_42 = libgreputils_a-msvc-inval.$(OBJEXT)
 #am__objects_43 = libgreputils_a-msvc-nothrow.$(OBJEXT)
 am__objects_44 = libgreputils_a-nl_langinfo.$(OBJEXT)
 #am__objects_45 = libgreputils_a-nl_langinfo-lock.$(OBJEXT)
-am__objects_46 =  \
-	libgreputils_a-obstack.$(OBJEXT)
+#am__objects_46 =  \
+#	libgreputils_a-obstack.$(OBJEXT)
 #am__objects_47 = libgreputils_a-open.$(OBJEXT)
 am__objects_48 =  \
 	libgreputils_a-openat.$(OBJEXT)
@@ -627,11 +627,11 @@ am__objects_48 =  \
 #am__objects_51 = libgreputils_a-pthread-once.$(OBJEXT)
 #am__objects_52 =  \
 #	libgreputils_a-raise.$(OBJEXT)
-am__objects_53 = libgreputils_a-rawmemchr.$(OBJEXT)
+#am__objects_53 = libgreputils_a-rawmemchr.$(OBJEXT)
 #am__objects_54 = libgreputils_a-read.$(OBJEXT)
 #am__objects_55 =  \
 #	libgreputils_a-readdir.$(OBJEXT)
-#am__objects_56 = libgreputils_a-realloc.$(OBJEXT)
+am__objects_56 = libgreputils_a-realloc.$(OBJEXT)
 am__objects_57 = libgreputils_a-reallocarray.$(OBJEXT)
 am__objects_58 =  \
 	libgreputils_a-regex.$(OBJEXT)
@@ -642,16 +642,16 @@ am__objects_60 =  \
 #am__objects_61 = libgreputils_a-stat.$(OBJEXT)
 #am__objects_62 = libgreputils_a-stdio-read.$(OBJEXT)
 #am__objects_63 = libgreputils_a-stdio-write.$(OBJEXT)
-am__objects_64 =  \
-	libgreputils_a-stpcpy.$(OBJEXT)
+#am__objects_64 =  \
+#	libgreputils_a-stpcpy.$(OBJEXT)
 #am__objects_65 =  \
 #	libgreputils_a-strdup.$(OBJEXT)
 am__objects_66 =  \
 	libgreputils_a-strerror.$(OBJEXT)
 am__objects_67 = libgreputils_a-strerror-override.$(OBJEXT)
-#am__objects_68 =  \
-#	libgreputils_a-strnlen.$(OBJEXT)
-#am__objects_69 = libgreputils_a-strtoimax.$(OBJEXT)
+am__objects_68 =  \
+	libgreputils_a-strnlen.$(OBJEXT)
+am__objects_69 = libgreputils_a-strtoimax.$(OBJEXT)
 am__objects_70 =  \
 	libgreputils_a-strtoll.$(OBJEXT)
 am__objects_71 = unicase/libgreputils_a-tolower.$(OBJEXT)
@@ -675,12 +675,12 @@ am__objects_88 = unistr/libgreputils_a-u32-strcat.$(OBJEXT)
 am__objects_89 = unistr/libgreputils_a-u32-strlen.$(OBJEXT)
 #am__objects_90 =  \
 #	libgreputils_a-wcrtomb.$(OBJEXT)
-am__objects_91 =  \
-	libgreputils_a-wctob.$(OBJEXT)
+#am__objects_91 =  \
+#	libgreputils_a-wctob.$(OBJEXT)
 #am__objects_92 =  \
 #	libgreputils_a-wctomb.$(OBJEXT)
-am__objects_93 =  \
-	libgreputils_a-wctype.$(OBJEXT)
+#am__objects_93 =  \
+#	libgreputils_a-wctype.$(OBJEXT)
 #am__objects_94 = libgreputils_a-windows-mutex.$(OBJEXT)
 #am__objects_95 = libgreputils_a-windows-once.$(OBJEXT)
 #am__objects_96 = libgreputils_a-windows-recmutex.$(OBJEXT)
@@ -1078,7 +1078,7 @@ AM_DEFAULT_VERBOSITY = 0
 APPLE_UNIVERSAL_BUILD = 0
 AR = ar
 ARFLAGS = cr
-ASSERT_H = assert.h
+ASSERT_H = 
 AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/ggrep/build-aux/missing' autoconf
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/ggrep/build-aux/missing' autoheader
 AUTOMAKE = ${SHELL} '/usr/glenda/APExp/sys/src/external/ggrep/build-aux/missing' automake-1.17
@@ -1845,15 +1845,15 @@ GL_GNULIB_WMEMSET = 0
 GL_GNULIB_WRITE = 0
 GL_GNULIB_ZPRINTF = 0
 GL_GNULIB__EXIT = 0
-GMSGFMT = :
-GMSGFMT_015 = :
-GNULIBHEADERS_OVERRIDE_CHAR16_T = 1
-GNULIBHEADERS_OVERRIDE_CHAR32_T = 1
+GMSGFMT = /bin/msgfmt
+GMSGFMT_015 = /bin/msgfmt
+GNULIBHEADERS_OVERRIDE_CHAR16_T = 0
+GNULIBHEADERS_OVERRIDE_CHAR32_T = 0
 GNULIBHEADERS_OVERRIDE_CHAR8_T = 1
 GNULIBHEADERS_OVERRIDE_WINT_T = 0
 GNULIB_LOCALEDIR = ${datarootdir}/locale
 GNULIB_LOCALEDIR_c = "/usr/local/share/locale"
-GNULIB_LOCALEDIR_c_make = \"$(GNULIB_LOCALEDIR)\"
+GNULIB_LOCALEDIR_c_make = "/usr/local/share/locale"
 GNULIB_TEST_WARN_CFLAGS = 
 GNULIB_WARN_CFLAGS = 
 GREP = /bin/grep
@@ -1873,7 +1873,7 @@ HAVE_ATANL = 1
 HAVE_ATOLL = 1
 HAVE_BLKCNT_T = 1
 HAVE_BLKSIZE_T = 1
-HAVE_BTOWC = 0
+HAVE_BTOWC = 1
 HAVE_C32RTOMB = 0
 HAVE_C99_STDINT_H = 0
 HAVE_CANONICALIZE_FILE_NAME = 1
@@ -1898,16 +1898,16 @@ HAVE_DECL_CEILF = 1
 HAVE_DECL_CEILL = 1
 HAVE_DECL_COPYSIGNF = 1
 HAVE_DECL_COSL = 1
-HAVE_DECL_DIRFD = 1
+HAVE_DECL_DIRFD = 0
 HAVE_DECL_ECVT = 0
-HAVE_DECL_ENVIRON = 0
+HAVE_DECL_ENVIRON = 1
 HAVE_DECL_EXECVPE = 0
 HAVE_DECL_EXP2 = 1
 HAVE_DECL_EXP2F = 1
 HAVE_DECL_EXP2L = 1
 HAVE_DECL_EXPL = 1
 HAVE_DECL_EXPM1L = 1
-HAVE_DECL_FCHDIR = 1
+HAVE_DECL_FCHDIR = 0
 HAVE_DECL_FCLOSEALL = 0
 HAVE_DECL_FCVT = 0
 HAVE_DECL_FDATASYNC = 1
@@ -1925,7 +1925,7 @@ HAVE_DECL_GETLINE = 1
 HAVE_DECL_GETLOADAVG = 1
 HAVE_DECL_GETLOGIN = 1
 HAVE_DECL_GETLOGIN_R = 1
-HAVE_DECL_GETPAGESIZE = 1
+HAVE_DECL_GETPAGESIZE = 0
 HAVE_DECL_GETUSERSHELL = 1
 HAVE_DECL_GETW = 0
 HAVE_DECL_HTONL = 1
@@ -1933,7 +1933,7 @@ HAVE_DECL_HTONS = 1
 HAVE_DECL_IMAXABS = 1
 HAVE_DECL_IMAXDIV = 1
 HAVE_DECL_INET_NTOP = 1
-HAVE_DECL_INET_PTON = 1
+HAVE_DECL_INET_PTON = 0
 HAVE_DECL_INITSTATE = 0
 HAVE_DECL_LDEXPL = 1
 HAVE_DECL_LOCALTIME_R = 1
@@ -1944,7 +1944,7 @@ HAVE_DECL_LOG2L = 1
 HAVE_DECL_LOGB = 1
 HAVE_DECL_LOGL = 1
 HAVE_DECL_MEMMEM = 1
-HAVE_DECL_MEMRCHR = 1
+HAVE_DECL_MEMRCHR = 0
 HAVE_DECL_NTOHL = 1
 HAVE_DECL_NTOHS = 1
 HAVE_DECL_OBSTACK_PRINTF = 1
@@ -1956,18 +1956,18 @@ HAVE_DECL_RINTF = 1
 HAVE_DECL_ROUND = 1
 HAVE_DECL_ROUNDF = 1
 HAVE_DECL_ROUNDL = 1
-HAVE_DECL_SETENV = 1
+HAVE_DECL_SETENV = 0
 HAVE_DECL_SETHOSTNAME = 1
 HAVE_DECL_SETSTATE = 0
 HAVE_DECL_SINL = 1
-HAVE_DECL_SNPRINTF = 1
+HAVE_DECL_SNPRINTF = 0
 HAVE_DECL_SQRTL = 1
-HAVE_DECL_STRDUP = 1
-HAVE_DECL_STRERROR_R = 1
+HAVE_DECL_STRDUP = 0
+HAVE_DECL_STRERROR_R = 0
 HAVE_DECL_STRNDUP = 1
-HAVE_DECL_STRNLEN = 1
+HAVE_DECL_STRNLEN = 0
 HAVE_DECL_STRSIGNAL = 1
-HAVE_DECL_STRTOIMAX = 1
+HAVE_DECL_STRTOIMAX = 0
 HAVE_DECL_STRTOK_R = 1
 HAVE_DECL_STRTOUMAX = 1
 HAVE_DECL_TANL = 1
@@ -1976,7 +1976,7 @@ HAVE_DECL_TRUNCATE = 1
 HAVE_DECL_TRUNCF = 1
 HAVE_DECL_TRUNCL = 1
 HAVE_DECL_TTYNAME_R = 1
-HAVE_DECL_UNSETENV = 1
+HAVE_DECL_UNSETENV = 0
 HAVE_DECL_VSNPRINTF = 1
 HAVE_DECL_WCSDUP = 0
 HAVE_DECL_WCTOB = 0
@@ -1984,8 +1984,8 @@ HAVE_DECL_WCWIDTH = 1
 HAVE_DIRENT_H = 1
 HAVE_DPRINTF = 1
 HAVE_DUP3 = 1
-HAVE_DUPLOCALE = 0
-HAVE_ERROR = 0
+HAVE_DUPLOCALE = 1
+HAVE_ERROR = 1
 HAVE_ERROR_AT_LINE = 0
 HAVE_ERROR_H = 1
 HAVE_EUIDACCESS = 1
@@ -2014,7 +2014,7 @@ HAVE_FMODF = 1
 HAVE_FMODL = 1
 HAVE_FNMATCH = 1
 HAVE_FNMATCH_H = 1
-HAVE_FREELOCALE = 0
+HAVE_FREELOCALE = 1
 HAVE_FREXPF = 1
 HAVE_FSEEKO = 1
 HAVE_FSTATAT = 1
@@ -2022,7 +2022,7 @@ HAVE_FSYNC = 1
 HAVE_FTELLO = 1
 HAVE_FTRUNCATE = 1
 HAVE_FUTIMENS = 1
-HAVE_GETDTABLESIZE = 1
+HAVE_GETDTABLESIZE = 0
 HAVE_GETENTROPY = 1
 HAVE_GETGROUPS = 1
 HAVE_GETHOSTNAME = 1
@@ -2065,8 +2065,8 @@ HAVE_ISPRINT_L = 1
 HAVE_ISPUNCT_L = 1
 HAVE_ISSPACE_L = 1
 HAVE_ISUPPER_L = 1
-HAVE_ISWBLANK = 0
-HAVE_ISWCNTRL = 0
+HAVE_ISWBLANK = 1
+HAVE_ISWCNTRL = 1
 HAVE_ISXDIGIT_L = 1
 HAVE_LANGINFO_ABALTMON = 0
 HAVE_LANGINFO_ALTMON = 0
@@ -2122,9 +2122,9 @@ HAVE_MODFL = 1
 HAVE_MSVC_INVALID_PARAMETER_HANDLER = 0
 HAVE_NANOSLEEP = 1
 HAVE_NETINET_IN_H = 
-HAVE_NEWLOCALE = 0
+HAVE_NEWLOCALE = 1
 HAVE_NL_LANGINFO = 1
-HAVE_OFF64_T = 0
+HAVE_OFF64_T = 1
 HAVE_OPENAT = 1
 HAVE_OPENDIR = 1
 HAVE_OS_H = 0
@@ -2205,11 +2205,11 @@ HAVE_RAISE = 1
 HAVE_RANDOM = 0
 HAVE_RANDOM_H = 0
 HAVE_RANDOM_R = 0
-HAVE_RAWMEMCHR = 0
+HAVE_RAWMEMCHR = 1
 HAVE_READDIR = 1
 HAVE_READLINK = 1
 HAVE_READLINKAT = 1
-HAVE_REALLOCARRAY = 0
+HAVE_REALLOCARRAY = 1
 HAVE_REALPATH = 1
 HAVE_REMAINDER = 1
 HAVE_REMAINDERF = 1
@@ -2221,7 +2221,7 @@ HAVE_RPMATCH = 1
 HAVE_SAME_LONG_DOUBLE_AS_DOUBLE = 1
 HAVE_SA_FAMILY_T = 1
 HAVE_SCANDIR = 1
-HAVE_SCHED_H = 0
+HAVE_SCHED_H = 1
 HAVE_SCHED_YIELD = 0
 HAVE_SECURE_GETENV = 1
 HAVE_SETENV = 1
@@ -2246,11 +2246,11 @@ HAVE_SIGSET_T = 1
 HAVE_SINF = 1
 HAVE_SINHF = 1
 HAVE_SINL = 1
-HAVE_SLEEP = 1
+HAVE_SLEEP = 0
 HAVE_SQRTF = 1
 HAVE_SQRTL = 1
 HAVE_STDINT_H = 1
-HAVE_STPCPY = 0
+HAVE_STPCPY = 1
 HAVE_STPNCPY = 1
 HAVE_STR2SIG = 1
 HAVE_STRCASESTR = 1
@@ -2268,7 +2268,7 @@ HAVE_STRTOLL = 1
 HAVE_STRTOUL = 1
 HAVE_STRTOULL = 1
 HAVE_STRUCT_RANDOM_DATA = 0
-HAVE_STRUCT_SCHED_PARAM = 0
+HAVE_STRUCT_SCHED_PARAM = 1
 HAVE_STRUCT_SIGACTION_SA_SIGACTION = 1
 HAVE_STRUCT_SOCKADDR_STORAGE = 1
 HAVE_STRUCT_SOCKADDR_STORAGE_SS_FAMILY = 1
@@ -2304,7 +2304,7 @@ HAVE_TOTALORDERMAGL = 1
 HAVE_TOUPPER_L = 1
 HAVE_TYPE_VOLATILE_SIG_ATOMIC_T = 1
 HAVE_TZALLOC = 0
-HAVE_UCHAR_H = 0
+HAVE_UCHAR_H = 1
 HAVE_UNISTD_H = 1
 HAVE_UNISTRING_WOE32DLL_H = 0
 HAVE_UNLINKAT = 1
@@ -2371,7 +2371,7 @@ INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
 INT32_MAX_LT_INTMAX_MAX = 1
 INT64_MAX_EQ_LONG_MAX = 0
-INTLLIBS = 
+INTLLIBS = -lintl
 INTL_MACOSX_LIBS = 
 LC_COLLATE_IMPLEMENTED = true
 LC_MONETARY_IMPLEMENTED = true
@@ -2382,7 +2382,7 @@ LIBCSTACK =
 LIBGREPUTILS_LIBDEPS = 
 LIBGREPUTILS_LTLIBDEPS = 
 LIBICONV = 
-LIBINTL = 
+LIBINTL = -lintl
 LIBMULTITHREAD = 
 LIBOBJS = 
 LIBPMULTITHREAD = 
@@ -2421,7 +2421,7 @@ LOCALE_TR_UTF8 = none
 LOCALE_ZH_CN = none
 LTLIBCSTACK = 
 LTLIBICONV = 
-LTLIBINTL = 
+LTLIBINTL = -lintl
 LTLIBMULTITHREAD = 
 LTLIBOBJS = 
 LTLIBSIGSEGV = 
@@ -2429,15 +2429,15 @@ LTLIBTHREAD =
 MAKEINFO = ${SHELL} '/usr/glenda/APExp/sys/src/external/ggrep/build-aux/missing' makeinfo
 MBRTOWC_LIB = 
 MKDIR_P = mkdir -p
-MSGFMT = :
-MSGFMT_015 = :
+MSGFMT = /bin/msgfmt
+MSGFMT_015 = /bin/msgfmt
 MSGMERGE = /bin/msgmerge
 NANOSLEEP_LIB = 
 NETINET_IN_H = 
 NEXT_ARPA_INET_H = <arpa/inet.h>
-NEXT_ASSERT_H = <assert.h>
+NEXT_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_ARPA_INET_H = <arpa/inet.h>
-NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = <assert.h>
+NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_CTYPE_H = <ctype.h>
 NEXT_AS_FIRST_DIRECTIVE_DIRENT_H = <dirent.h>
 NEXT_AS_FIRST_DIRECTIVE_ERRNO_H = <errno.h>
@@ -2510,7 +2510,7 @@ NEXT_WCHAR_H = <wchar.h>
 NEXT_WCTYPE_H = <wctype.h>
 NULLPTR_T_NEEDS_STDDEF = 1
 OBJEXT = o
-OBSTACK_H = obstack.h
+OBSTACK_H = 
 PACKAGE = grep
 PACKAGE_BUGREPORT = bug-grep@gnu.org
 PACKAGE_NAME = GNU grep
@@ -2525,7 +2525,7 @@ PERL = ${SHELL} '/usr/glenda/APExp/sys/src/external/ggrep/build-aux/missing'  pe
 PKG_CONFIG = 
 PKG_CONFIG_LIBDIR = 
 PKG_CONFIG_PATH = 
-POSUB = 
+POSUB = po
 PRAGMA_COLUMNS = 
 PRAGMA_SYSTEM_HEADER = 
 PRIPTR_PREFIX = "l"
@@ -2540,10 +2540,10 @@ REPLACE_ALIGNED_ALLOC = 0
 REPLACE_ASINF = 0
 REPLACE_ATAN2F = 0
 REPLACE_ATANF = 0
-REPLACE_BTOWC = 0
+REPLACE_BTOWC = 1
 REPLACE_C32RTOMB = 0
-REPLACE_CALLOC_FOR_CALLOC_GNU = 0
-REPLACE_CALLOC_FOR_CALLOC_POSIX = 0
+REPLACE_CALLOC_FOR_CALLOC_GNU = 1
+REPLACE_CALLOC_FOR_CALLOC_POSIX = 1
 REPLACE_CANONICALIZE_FILE_NAME = 0
 REPLACE_CBRTF = 0
 REPLACE_CBRTL = 0
@@ -2562,7 +2562,7 @@ REPLACE_CTIME = 0
 REPLACE_DIRFD = 0
 REPLACE_DPRINTF = 0
 REPLACE_DUP = 0
-REPLACE_DUP2 = 1
+REPLACE_DUP2 = 0
 REPLACE_DUP3 = 0
 REPLACE_DUPLOCALE = 0
 REPLACE_ERROR = 0
@@ -2660,10 +2660,10 @@ REPLACE_ISATTY = 0
 REPLACE_ISFINITE = 0
 REPLACE_ISINF = 0
 REPLACE_ISNAN = 0
-REPLACE_ISWBLANK = 1
-REPLACE_ISWCNTRL = 1
+REPLACE_ISWBLANK = 0
+REPLACE_ISWCNTRL = 0
 REPLACE_ISWDIGIT = 1
-REPLACE_ISWPUNCT = 1
+REPLACE_ISWPUNCT = 0
 REPLACE_ISWXDIGIT = 1
 REPLACE_ITOLD = 0
 REPLACE_LCHOWN = 0
@@ -2671,7 +2671,7 @@ REPLACE_LDEXP = 0
 REPLACE_LDEXPL = 0
 REPLACE_LINK = 0
 REPLACE_LINKAT = 0
-REPLACE_LOCALECONV = 1
+REPLACE_LOCALECONV = 0
 REPLACE_LOCALTIME = 0
 REPLACE_LOCALTIME_R = 0
 REPLACE_LOCALTIME_RZ = 0
@@ -2692,8 +2692,8 @@ REPLACE_LOGF = 0
 REPLACE_LOGL = 0
 REPLACE_LSEEK = 1
 REPLACE_LSTAT = 1
-REPLACE_MALLOC_FOR_MALLOC_GNU = 0
-REPLACE_MALLOC_FOR_MALLOC_POSIX = 0
+REPLACE_MALLOC_FOR_MALLOC_GNU = 1
+REPLACE_MALLOC_FOR_MALLOC_POSIX = 1
 REPLACE_MBRLEN = 1
 REPLACE_MBRTOC16 = 0
 REPLACE_MBRTOC32 = 0
@@ -2805,8 +2805,8 @@ REPLACE_READ = 0
 REPLACE_READDIR = 0
 REPLACE_READLINK = 0
 REPLACE_READLINKAT = 0
-REPLACE_REALLOCARRAY = 0
-REPLACE_REALLOC_FOR_REALLOC_POSIX = 0
+REPLACE_REALLOCARRAY = 1
+REPLACE_REALLOC_FOR_REALLOC_POSIX = 1
 REPLACE_REALPATH = 0
 REPLACE_REMAINDER = 0
 REPLACE_REMAINDERF = 0
@@ -2826,11 +2826,11 @@ REPLACE_SETENV = 0
 REPLACE_SETHOSTNAME = 0
 REPLACE_SETLOCALE = 1
 REPLACE_SETSTATE = 0
-REPLACE_SIGNBIT = 1
+REPLACE_SIGNBIT = 0
 REPLACE_SIGNBIT_USING_BUILTINS = 0
 REPLACE_SINF = 0
 REPLACE_SINHF = 0
-REPLACE_SLEEP = 1
+REPLACE_SLEEP = 0
 REPLACE_SNPRINTF = 1
 REPLACE_SPRINTF = 0
 REPLACE_SQRTF = 0
@@ -2863,7 +2863,7 @@ REPLACE_STRTOLL = 1
 REPLACE_STRTOUL = 0
 REPLACE_STRTOULL = 0
 REPLACE_STRTOUMAX = 0
-REPLACE_STRUCT_LCONV = 1
+REPLACE_STRUCT_LCONV = 0
 REPLACE_STRUCT_TIMEVAL = 0
 REPLACE_STRVERSCMP = 0
 REPLACE_SYMLINK = 1
@@ -2881,7 +2881,7 @@ REPLACE_TOTALORDERL = 0
 REPLACE_TOTALORDERMAG = 0
 REPLACE_TOTALORDERMAGF = 0
 REPLACE_TOTALORDERMAGL = 0
-REPLACE_TOWLOWER = 1
+REPLACE_TOWLOWER = 0
 REPLACE_TRUNC = 0
 REPLACE_TRUNCATE = 0
 REPLACE_TRUNCF = 0
@@ -2912,7 +2912,7 @@ REPLACE_WCSWIDTH = 0
 REPLACE_WCTOB = 0
 REPLACE_WCTOMB = 0
 REPLACE_WCTRANS = 0
-REPLACE_WCTYPE = 1
+REPLACE_WCTYPE = 0
 REPLACE_WCWIDTH = 0
 REPLACE_WMEMCMP = 0
 REPLACE_WMEMPCPY = 0
@@ -2948,7 +2948,7 @@ UNISTD_H_DEFINES_STRUCT_TIMESPEC = 0
 UNISTD_H_HAVE_SYS_RANDOM_H = 0
 UNISTD_H_HAVE_WINSOCK2_H = 0
 UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS = 0
-USE_NLS = no
+USE_NLS = yes
 VERSION = 3.12
 WARN_CFLAGS = 
 WCHAR_T_SUFFIX = 
@@ -2959,8 +2959,8 @@ WINDOWS_STAT_INODES = 0
 WINDOWS_STAT_TIMESPEC = 0
 WINDRES = 
 WINT_T_SUFFIX = u
-XGETTEXT = :
-XGETTEXT_015 = :
+XGETTEXT = /bin/xgettext
+XGETTEXT_015 = /bin/xgettext
 XGETTEXT_EXTRA_OPTIONS =  --flag=error:3:c-format --flag=error_at_line:5:c-format
 YIELD_LIB = 
 abs_aux_dir = /usr/glenda/APExp/sys/src/external/ggrep/build-aux
@@ -2978,7 +2978,7 @@ am__untar = $${TAR-tar} xf -
 am__xargs_n = xargs -n
 bindir = ${exec_prefix}/bin
 bindir_c = "/usr/local/bin"
-bindir_c_make = \"$(bindir)\"
+bindir_c_make = "/usr/local/bin"
 build = x86_64-unknown-plan9
 build_alias = 
 build_cpu = x86_64
@@ -2987,25 +2987,25 @@ build_vendor = unknown
 builddir = .
 datadir = ${datarootdir}
 datadir_c = "/usr/local/share"
-datadir_c_make = \"$(datadir)\"
+datadir_c_make = "/usr/local/share"
 datarootdir = ${prefix}/share
 datarootdir_c = "/usr/local/share"
-datarootdir_c_make = \"$(datarootdir)\"
+datarootdir_c_make = "/usr/local/share"
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 docdir_c = "/usr/local/share/doc/grep"
-docdir_c_make = \"$(docdir)\"
+docdir_c_make = "/usr/local/share/doc/grep"
 dvidir = ${docdir}
 dvidir_c = "/usr/local/share/doc/grep"
-dvidir_c_make = \"$(dvidir)\"
+dvidir_c_make = "/usr/local/share/doc/grep"
 exec_prefix = ${prefix}
 exec_prefix_c = "/usr/local"
-exec_prefix_c_make = \"$(exec_prefix)\"
-gl_LIBOBJDEPS =  $(DEPDIR)/fnmatch.Po $(DEPDIR)/fopen.Po $(DEPDIR)/mbsrtoc32s-state.Po $(DEPDIR)/mbsrtowcs-state.Po $(DEPDIR)/strstr.Po
-gl_LIBOBJS =  fnmatch.o fopen.o mbsrtoc32s-state.o mbsrtowcs-state.o strstr.o
-gl_LTLIBOBJS =  fnmatch.lo fopen.lo mbsrtoc32s-state.lo mbsrtowcs-state.lo strstr.lo
-gl_libgreputils_LIBOBJDEPS =  $(DEPDIR)/libgreputils_a-fnmatch.Po $(DEPDIR)/libgreputils_a-fopen.Po $(DEPDIR)/libgreputils_a-mbsrtoc32s-state.Po $(DEPDIR)/libgreputils_a-mbsrtowcs-state.Po $(DEPDIR)/libgreputils_a-strstr.Po
-gl_libgreputils_LIBOBJS =  libgreputils_a-fnmatch.o libgreputils_a-fopen.o libgreputils_a-mbsrtoc32s-state.o libgreputils_a-mbsrtowcs-state.o libgreputils_a-strstr.o
-gl_libgreputils_LTLIBOBJS =  libgreputils_la-fnmatch.lo libgreputils_la-fopen.lo libgreputils_la-mbsrtoc32s-state.lo libgreputils_la-mbsrtowcs-state.lo libgreputils_la-strstr.lo
+exec_prefix_c_make = "/usr/local"
+gl_LIBOBJDEPS =  $(DEPDIR)/calloc.Po $(DEPDIR)/fnmatch.Po $(DEPDIR)/fopen.Po $(DEPDIR)/malloc.Po $(DEPDIR)/mbsrtoc32s-state.Po $(DEPDIR)/mbsrtowcs-state.Po $(DEPDIR)/strstr.Po
+gl_LIBOBJS =  calloc.o fnmatch.o fopen.o malloc.o mbsrtoc32s-state.o mbsrtowcs-state.o strstr.o
+gl_LTLIBOBJS =  calloc.lo fnmatch.lo fopen.lo malloc.lo mbsrtoc32s-state.lo mbsrtowcs-state.lo strstr.lo
+gl_libgreputils_LIBOBJDEPS =  $(DEPDIR)/libgreputils_a-calloc.Po $(DEPDIR)/libgreputils_a-fnmatch.Po $(DEPDIR)/libgreputils_a-fopen.Po $(DEPDIR)/libgreputils_a-malloc.Po $(DEPDIR)/libgreputils_a-mbsrtoc32s-state.Po $(DEPDIR)/libgreputils_a-mbsrtowcs-state.Po $(DEPDIR)/libgreputils_a-strstr.Po
+gl_libgreputils_LIBOBJS =  libgreputils_a-calloc.o libgreputils_a-fnmatch.o libgreputils_a-fopen.o libgreputils_a-malloc.o libgreputils_a-mbsrtoc32s-state.o libgreputils_a-mbsrtowcs-state.o libgreputils_a-strstr.o
+gl_libgreputils_LTLIBOBJS =  libgreputils_la-calloc.lo libgreputils_la-fnmatch.lo libgreputils_la-fopen.lo libgreputils_la-malloc.lo libgreputils_la-mbsrtoc32s-state.lo libgreputils_la-mbsrtowcs-state.lo libgreputils_la-strstr.lo
 gltests_LIBOBJDEPS =  $(DEPDIR)/asnprintf.Po $(DEPDIR)/isnanf.Po $(DEPDIR)/isnanl.Po $(DEPDIR)/printf-args.Po $(DEPDIR)/printf-parse.Po $(DEPDIR)/snprintf.Po $(DEPDIR)/strerror_r.Po $(DEPDIR)/vasnprintf.Po
 gltests_LIBOBJS =  asnprintf.o isnanf.o isnanl.o printf-args.o printf-parse.o snprintf.o strerror_r.o vasnprintf.o
 gltests_LTLIBOBJS =  asnprintf.lo isnanf.lo isnanl.lo printf-args.lo printf-parse.lo snprintf.lo strerror_r.lo vasnprintf.lo
@@ -3020,67 +3020,67 @@ host_os = plan9
 host_vendor = unknown
 htmldir = ${docdir}
 htmldir_c = "/usr/local/share/doc/grep"
-htmldir_c_make = \"$(htmldir)\"
+htmldir_c_make = "/usr/local/share/doc/grep"
 includedir = ${prefix}/include
 includedir_c = "/usr/local/include"
-includedir_c_make = \"$(includedir)\"
+includedir_c_make = "/usr/local/include"
 infodir = ${datarootdir}/info
 infodir_c = "/usr/local/share/info"
-infodir_c_make = \"$(infodir)\"
+infodir_c_make = "/usr/local/share/info"
 install_sh = ${SHELL} /usr/glenda/APExp/sys/src/external/ggrep/build-aux/install-sh
 libdir = ${exec_prefix}/lib
 libdir_c = "/usr/local/lib"
-libdir_c_make = \"$(libdir)\"
+libdir_c_make = "/usr/local/lib"
 libexecdir = ${exec_prefix}/libexec
 libexecdir_c = "/usr/local/libexec"
-libexecdir_c_make = \"$(libexecdir)\"
+libexecdir_c_make = "/usr/local/libexec"
 lispdir = ${datarootdir}/emacs/site-lisp
 lispdir_c = "/usr/local/share/emacs/site-lisp"
-lispdir_c_make = \"$(lispdir)\"
+lispdir_c_make = "/usr/local/share/emacs/site-lisp"
 localedir = ${datarootdir}/locale
 localedir_c = "/usr/local/share/locale"
-localedir_c_make = \"$(localedir)\"
+localedir_c_make = "/usr/local/share/locale"
 localstatedir = ${prefix}/var
 localstatedir_c = "/usr/local/var"
-localstatedir_c_make = \"$(localstatedir)\"
+localstatedir_c_make = "/usr/local/var"
 mandir = ${datarootdir}/man
 mandir_c = "/usr/local/share/man"
-mandir_c_make = \"$(mandir)\"
+mandir_c_make = "/usr/local/share/man"
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
 oldincludedir_c = "/usr/include"
-oldincludedir_c_make = \"$(oldincludedir)\"
+oldincludedir_c_make = "/usr/include"
 pdfdir = ${docdir}
 pdfdir_c = "/usr/local/share/doc/grep"
-pdfdir_c_make = \"$(pdfdir)\"
+pdfdir_c_make = "/usr/local/share/doc/grep"
 pkgdatadir_c = "/usr/local/share/grep"
-pkgdatadir_c_make = \"$(pkgdatadir)\"
+pkgdatadir_c_make = "/usr/local/share/grep"
 pkgincludedir_c = "/usr/local/include/grep"
-pkgincludedir_c_make = \"$(pkgincludedir)\"
+pkgincludedir_c_make = "/usr/local/include/grep"
 pkglibdir_c = "/usr/local/lib/grep"
-pkglibdir_c_make = \"$(pkglibdir)\"
+pkglibdir_c_make = "/usr/local/lib/grep"
 pkglibexecdir_c = "/usr/local/libexec/grep"
-pkglibexecdir_c_make = \"$(pkglibexecdir)\"
+pkglibexecdir_c_make = "/usr/local/libexec/grep"
 prefix = /usr/local
 prefix_c = "/usr/local"
-prefix_c_make = \"$(prefix)\"
+prefix_c_make = "/usr/local"
 program_transform_name = s,x,x,
 psdir = ${docdir}
 psdir_c = "/usr/local/share/doc/grep"
-psdir_c_make = \"$(psdir)\"
+psdir_c_make = "/usr/local/share/doc/grep"
 runstatedir = ${localstatedir}/run
 runstatedir_c = "/usr/local/var/run"
-runstatedir_c_make = \"$(runstatedir)\"
+runstatedir_c_make = "/usr/local/var/run"
 sbindir = ${exec_prefix}/sbin
 sbindir_c = "/usr/local/sbin"
-sbindir_c_make = \"$(sbindir)\"
+sbindir_c_make = "/usr/local/sbin"
 sharedstatedir = ${prefix}/com
 sharedstatedir_c = "/usr/local/com"
-sharedstatedir_c_make = \"$(sharedstatedir)\"
+sharedstatedir_c_make = "/usr/local/com"
 srcdir = .
 sysconfdir = ${prefix}/etc
 sysconfdir_c = "/usr/local/etc"
-sysconfdir_c_make = \"$(sysconfdir)\"
+sysconfdir_c_make = "/usr/local/etc"
 target_alias = 
 top_build_prefix = ../
 top_builddir = ..
@@ -7199,22 +7199,22 @@ alloca.h: $(top_builddir)/config.status
 
 # We need the following in order to create <assert.h> when the system
 # doesn't have one that works with the given compiler.
-assert.h: assert.in.h verify.h $(top_builddir)/config.status
-	$(gl_V_at){ $(SED_HEADER_STDOUT) \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
-	      -e 's|@''PRAGMA_COLUMNS''@||g' \
-	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
-	      < $(srcdir)/assert.in.h && \
-	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
-	      -e 's|_gl_verify|_gl_static_assert|g' \
-	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
-	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL\1|g' \
-	      < $(srcdir)/verify.h; \
-	} > $@-t
-	$(AM_V_at)mv $@-t $@
-#assert.h: $(top_builddir)/config.status
-#	rm -f $@
+#assert.h: assert.in.h verify.h $(top_builddir)/config.status
+#	$(gl_V_at){ $(SED_HEADER_STDOUT) \
+#	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+#	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
+#	      -e 's|@''PRAGMA_COLUMNS''@||g' \
+#	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
+#	      < $(srcdir)/assert.in.h && \
+#	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
+#	      -e 's|_gl_verify|_gl_static_assert|g' \
+#	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
+#	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL\1|g' \
+#	      < $(srcdir)/verify.h; \
+#	} > $@-t
+#	$(AM_V_at)mv $@-t $@
+assert.h: $(top_builddir)/config.status
+	rm -f $@
 
 # Listed in the same order as the GNU makefile conventions, and
 # provided by autoconf 2.59c+ or 2.70.
@@ -7583,14 +7583,14 @@ locale.h: locale.in.h $(top_builddir)/config.status $(CXXDEFS_H) $(ARG_NONNULL_H
 
 # We need the following in order to create <obstack.h> when the system
 # doesn't have one that works with any size object.
-obstack.h: obstack.in.h $(top_builddir)/config.status
-	$(gl_V_at)$(SED_HEADER_STDOUT) \
-	      -e 's|@''REPLACE_OBSTACK''@|$(REPLACE_OBSTACK)|g' \
-	      -e 's|@''SMALL_PTRDIFF_T''@|$(SMALL_PTRDIFF_T)|g' \
-	      $(srcdir)/obstack.in.h > $@-t
-	$(AM_V_at)mv $@-t $@
-#obstack.h: $(top_builddir)/config.status
-#	rm -f $@
+#obstack.h: obstack.in.h $(top_builddir)/config.status
+#	$(gl_V_at)$(SED_HEADER_STDOUT) \
+#	      -e 's|@''REPLACE_OBSTACK''@|$(REPLACE_OBSTACK)|g' \
+#	      -e 's|@''SMALL_PTRDIFF_T''@|$(SMALL_PTRDIFF_T)|g' \
+#	      $(srcdir)/obstack.in.h > $@-t
+#	$(AM_V_at)mv $@-t $@
+obstack.h: $(top_builddir)/config.status
+	rm -f $@
 
 # We need the following in order to create <pthread.h> when the system
 # doesn't have one that works with the given compiler.
@@ -9069,7 +9069,7 @@ mostlyclean-local: mostlyclean-generic
 	:
 distclean-local: distclean-gnulib-libobjs
 distclean-gnulib-libobjs:
-	-rm -f  $(DEPDIR)/libgreputils_a-fnmatch.Po $(DEPDIR)/libgreputils_a-fopen.Po $(DEPDIR)/libgreputils_a-mbsrtoc32s-state.Po $(DEPDIR)/libgreputils_a-mbsrtowcs-state.Po $(DEPDIR)/libgreputils_a-strstr.Po
+	-rm -f  $(DEPDIR)/libgreputils_a-calloc.Po $(DEPDIR)/libgreputils_a-fnmatch.Po $(DEPDIR)/libgreputils_a-fopen.Po $(DEPDIR)/libgreputils_a-malloc.Po $(DEPDIR)/libgreputils_a-mbsrtoc32s-state.Po $(DEPDIR)/libgreputils_a-mbsrtowcs-state.Po $(DEPDIR)/libgreputils_a-strstr.Po
 maintainer-clean-local: distclean-gnulib-libobjs
 colorize.c:
 	$(AM_V_at)echo '#include <$(COLORIZE_SOURCE)>' >$@-t

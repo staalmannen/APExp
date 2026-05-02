@@ -26,7 +26,7 @@ PACKAGE_STRING = bash 5.3-release
 PACKAGE_VERSION = 5.3-release
 
 srcdir = .
-
+VPATH = .
 topdir = ../..
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
 
@@ -37,8 +37,8 @@ BASHINCDIR = ${topdir}/include
 INTL_LIBSRC = ${topdir}/lib/intl
 INTL_LIBDIR = ${LIBBUILD}/intl
 INTL_BUILDDIR = ${LIBBUILD}/intl
-INTL_INC = -I${INTL_LIBSRC} -I${INTL_BUILDDIR}
-LIBINTL_H = ${INTL_BUILDDIR}/libintl.h
+INTL_INC = 
+LIBINTL_H = 
 
 datarootdir = ${prefix}/share
 
@@ -107,7 +107,7 @@ HSOURCES =
 
 # The object files contained in $(LIBRARY_NAME)
 LIBOBJDIR =
-LIBOBJS =  ${LIBOBJDIR}reallocarray$U.o ${LIBOBJDIR}mktime$U.o ${LIBOBJDIR}mbschr$U.o ${LIBOBJDIR}getcwd$U.o
+LIBOBJS =  ${LIBOBJDIR}mktime$U.o ${LIBOBJDIR}mbschr$U.o ${LIBOBJDIR}getcwd$U.o
 OBJECTS = clktck.o clock.o getenv.o oslib.o setlinebuf.o strnlen.o \
 	  itos.o zread.o zwrite.o shtty.o shmatch.o eaccess.o \
 	  netconn.o netopen.o timeval.o makepath.o pathcanon.o \
