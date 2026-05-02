@@ -14,10 +14,10 @@ OFILES=\
 	sigpending.$O\
 	sigprocmask.$O\
 	sigsuspend.$O\
-	sigsegv.$O\
 #	musl\
-	hacks\
+#	hacks\
 	sigaction.$O\
+	sigsegv.$O\
 
 
 <$APEXPROOT/sys/src/cmd/mksyslib

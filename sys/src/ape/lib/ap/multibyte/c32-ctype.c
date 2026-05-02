@@ -1,4 +1,5 @@
 #include <uchar.h>
+#include <wchar.h>
 #include <utf.h>
 
 int c32isalnum(char32_t r) { return isalnumrune(r); }
@@ -13,3 +14,4 @@ int c32ispunct(char32_t r) { return ispunctrune(r); }
 int c32isspace(char32_t r) { return isspacerune(r); }
 int c32isupper(char32_t r) { return isupperrune(r); }
 int c32isxdigit(char32_t r) { return isxdigitrune(r); }
+int c32width(char32_t r) { return wcwidth(r); }

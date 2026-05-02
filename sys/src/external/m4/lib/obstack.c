@@ -339,7 +339,7 @@ _obstack_memory_used (struct obstack *h)
 #  include <libio/iolibio.h>
 # endif
 
-static __attribute_noreturn__ void
+static void
 print_and_abort (void)
 {
   /* Don't change any of these strings.  Yes, it would be possible to add

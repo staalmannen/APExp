@@ -51,9 +51,7 @@ fseterr (FILE *fp)
 #elif defined __MINT__              /* Atari FreeMiNT */
   fp->__error = 1;
 #elif defined EPLAN9                /* Plan9 */
-  if (fp->state != 0 /* CLOSED */)
-    fp->state = 5 /* ERR */;
-#elif 0                             /* unknown  */
+// struct FILE changed in APExp. TODO: properly implement here.
   /* Portable fallback, based on an idea by Rich Felker.
      Wow! 6 system calls for something that is just a bit operation!
      Not activated on any system, because there is no way to repair FP when

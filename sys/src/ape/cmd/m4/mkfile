@@ -23,8 +23,10 @@ LIB_OBJS= \
 		asyncsafe-spin.$O\
 		basename-lgpl.$O\
 		c-ctype.$O\
-#		c-stack.$O\
+		c-stack.$O\
 		c-strcasecmp.$O\
+		canonicalize.$O\
+		canonicalize-lgpl.$O\
 		clean-temp.$O\
 		clean-temp-simple.$O\
 		close-stream.$O\
@@ -32,20 +34,30 @@ LIB_OBJS= \
 		closeout.$O\
 		concat-filename.$O\
 		dup-safer.$O\
+		dup-safer-flag.$O\
 		error.$O\
 		execute.$O\
+		exitfail.$O\
 		fatal-signal.$O\
 		fd-safer.$O\
+		fd-safer-flag.$O\
 		filenamecat.$O\
 		filenamecat-lgpl.$O\
+		file-set.$O\
 		findprog-in.$O\
 		fopen-safer.$O\
 		fpending.$O\
-#		freadahead.$O\
+ 		freadahead.$O\
+		fseterr.$O\
 		getrandom.$O\
 		gl_avltree_oset.$O\
 		gl_linked_list.$O\
 		gl_linkedhash_list.$O\
+		hash.$O\
+		hashcode-named-file.$O\
+		hashcode-string1.$O\
+		hashcode-string2.$O\
+		hashkey-string.$O\
 		mbchar.$O\
 		mbslen.$O\
 		mbsstr.$O\
@@ -54,8 +66,10 @@ LIB_OBJS= \
 		mkdtemp.$O\
 		mkstemp-safer.$O\
 		malloca.$O\
-		obstack.$O\
+		next-prime.$O\
+#		obstack.$O\
 		pipe-safer.$O\
+		pipe2-safer.$O\
 		progname.$O\
 		propername.$O\
 		quotearg.$O\
@@ -64,39 +78,54 @@ LIB_OBJS= \
 		rmdir.$O\
 		secure_getenv.$O\
 		spawn-pipe.$O\
-		spawn_faction_addchdir.$O\
-		spawn_faction_addclose.$O\
-		spawn_faction_adddup2.$O\
-		spawn_faction_addopen.$O\
-		spawn_faction_destroy.$O\
-		spawn_faction_init.$O\
-		spawnattr_destroy.$O\
-		spawnattr_init.$O\
-		spawnattr_setflags.$O\
-		spawnattr_setpgroup.$O\
-		spawnattr_setsigmask.$O\
-		spawnp.$O\
+#		spawn_faction_addchdir.$O\
+#		spawn_faction_addclose.$O\
+#		spawn_faction_adddup2.$O\
+#		spawn_faction_addopen.$O\
+#		spawn_faction_destroy.$O\
+#		spawn_faction_init.$O\
+#		spawnattr_destroy.$O\
+#		spawnattr_init.$O\
+#		spawnattr_setflags.$O\
+#		spawnattr_setpgroup.$O\
+#		spawnattr_setsigmask.$O\
+#		spawnp.$O\
+		string.$O\
 		strnlen1.$O\
 		strsignal.$O\
 		strstr.$O\
 		tempname.$O\
 		tmpdir.$O\
 		trim.$O\
+		vaszprintf.$O\
 #		verror.$O\
 		version-etc.$O\
 		version-etc-fsf.$O\
+		vfzprintf.$O\
+		vzprintf.$O\
 		wait-process.$O\
 		xalloc-die.$O\
 		xasprintf.$O\
 		xmalloc.$O\
 		xmalloca.$O\
+		xmemdup0.$O\
 		xprintf.$O\
 #		xstrndup.$O\
+		xvasprintf.$O\
 # lib/malloc \
 		dynarray_at_failure.$O\
 		dynarray_emplace_enlarge.$O\
 		dynarray_finalize.$O\
-		dynarray_resize.$O
+		dynarray_resize.$O\
+		scratch_buffer_grow.$O\
+		scratch_buffer_grow_preserve.$O\
+# lib/glthread \
+		threadlib.$O\
+		lock.$O\
+		once.$O\
+		spin.$O\
+		tls.$O\
+
 
 
 BIN=$APEXPROOT/$objtype/bin/ape
@@ -128,8 +157,13 @@ CFLAGS=-c -B -I. -I$M4SRC -I$M4SRC/src  -I$M4SRC/lib -DHAVE_CONFIG_H\
 %.$O: $M4SRC/lib/malloc/%.c
 	$CC $CFLAGS $M4SRC/lib/malloc/$stem.c
 
+%.$O: $M4SRC/lib/glthread/%.c
+	$CC $CFLAGS $M4SRC/lib/glthread/$stem.c
+
 libgnu.a$O: $LIB_OBJS
 	ar vu libgnu.a$O $LIB_OBJS
+
+CLEANFILES=libgnu.a$O
 
 
 
