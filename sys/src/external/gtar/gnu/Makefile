@@ -142,7 +142,7 @@
 
 
 
-
+VPATH = .
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -222,19 +222,19 @@ am__append_5 = chown.c
 #am__append_8 = closedir.c
 #am__append_9 = dirfd.c
 #am__append_10 = dup.c
-am__append_11 = dup2.c
+#am__append_11 = dup2.c
 am__append_12 = error.c
 am__append_13 = euidaccess.c
 am__append_14 = faccessat.c
 #am__append_15 = fchdir.c
-am__append_16 = fchmodat.c
+#am__append_16 = fchmodat.c
 am__append_17 = fchownat.c
 am__append_18 = fcntl.c
 am__append_19 = fdopendir.c
 #am__append_20 = fileblocks.c
 #am__append_21 = float.c
 #am__append_22 = itold.c
-am__append_23 = fpending.c
+#am__append_23 = fpending.c
 am__append_24 = free.c
 am__append_25 = fseek.c
 am__append_26 = fseeko.c
@@ -244,24 +244,24 @@ am__append_29 = futimens.c
 am__append_30 = getcwd.c
 am__append_31 = getcwd-lgpl.c
 #am__append_32 = getdelim.c
-#am__append_33 = getdtablesize.c
+am__append_33 = getdtablesize.c
 am__append_34 = getgroups.c
 #am__append_35 = getline.c
 am__append_36 = getopt.c getopt1.c
 #am__append_37 = getpagesize.c
 #am__append_38 = getprogname.c
-am__append_39 = getrandom.c
-#am__append_40 = gettimeofday.c
+#am__append_39 = getrandom.c
+am__append_40 = gettimeofday.c
 am__append_41 = group-member.c
 #am__append_42 = isblank.c
 #am__append_43 = iswblank.c
-#am__append_44 = iswdigit.c
-#am__append_45 = iswxdigit.c
+am__append_44 = iswdigit.c
+am__append_45 = iswxdigit.c
 am__append_46 = lchmod.c
 am__append_47 = lchown.c
 #am__append_48 = link.c
 am__append_49 = linkat.c
-am__append_50 = localeconv.c
+#am__append_50 = localeconv.c
 am__append_51 = lseek.c
 am__append_52 = lstat.c
 am__append_53 = mbrtoc32.c
@@ -271,10 +271,10 @@ am__append_56 = mbsrtowcs.c
 #am__append_57 = mbtowc.c
 #am__append_58 = memchr.c
 #am__append_59 = mempcpy.c
-am__append_60 = memrchr.c
+#am__append_60 = memrchr.c
 am__append_61 = mkdir.c
 #am__append_62 = mkdirat.c
-am__append_63 = mkdtemp.c
+#am__append_63 = mkdtemp.c
 #am__append_64 = mkfifo.c
 am__append_65 = mkfifoat.c
 am__append_66 = mknodat.c
@@ -283,13 +283,13 @@ am__append_67 = mknod.c
 #am__append_69 = msvc-nothrow.c
 am__append_70 = nl_langinfo.c
 #am__append_71 = nl_langinfo-lock.c
-am__append_72 = obstack.c
+#am__append_72 = obstack.c
 #am__append_73 = open.c
 am__append_74 = openat.c
 #am__append_75 = opendir.c
 #am__append_76 = pipe.c
 #am__append_77 = raise.c
-am__append_78 = rawmemchr.c
+#am__append_78 = rawmemchr.c
 #am__append_79 = read.c
 #am__append_80 = readdir.c
 am__append_81 = readlink.c
@@ -308,7 +308,7 @@ am__append_93 = sleep.c
 #am__append_94 = stat.c
 #am__append_95 = stdio-read.c
 #am__append_96 = stdio-write.c
-am__append_97 = stpcpy.c
+#am__append_97 = stpcpy.c
 #am__append_98 = strcasecmp.c
 #am__append_99 = strncasecmp.c
 #am__append_100 = strchrnul.c
@@ -316,13 +316,13 @@ am__append_97 = stpcpy.c
 am__append_102 = strerror.c
 am__append_103 = strerror-override.c
 #am__append_104 = strndup.c
-#am__append_105 = strnlen.c
-#am__append_106 = strtoimax.c
+am__append_105 = strnlen.c
+am__append_106 = strtoimax.c
 am__append_107 = strtol.c
 am__append_108 = strtoll.c
 am__append_109 = strtoul.c
 am__append_110 = strtoull.c
-#am__append_111 = strtoumax.c
+am__append_111 = strtoumax.c
 am__append_112 = symlink.c
 am__append_113 = symlinkat.c
 #am__append_114 = time_r.c
@@ -349,7 +349,7 @@ am__append_133 = unlinkat.c
 #am__append_135 = utime.c
 am__append_136 = utimensat.c
 #am__append_137 = wcrtomb.c
-#am__append_138 = wcwidth.c
+am__append_138 = wcwidth.c
 #am__append_139 = wmemchr.c
 am__append_140 = wmempcpy.c
 #am__append_141 = write.c
@@ -600,15 +600,15 @@ am__objects_5 = libgnu_a-chown.$(OBJEXT)
 #	libgnu_a-closedir.$(OBJEXT)
 #am__objects_9 = libgnu_a-dirfd.$(OBJEXT)
 #am__objects_10 = libgnu_a-dup.$(OBJEXT)
-am__objects_11 = libgnu_a-dup2.$(OBJEXT)
+#am__objects_11 = libgnu_a-dup2.$(OBJEXT)
 am__objects_12 = libgnu_a-error.$(OBJEXT)
 am__objects_13 =  \
 	libgnu_a-euidaccess.$(OBJEXT)
 am__objects_14 =  \
 	libgnu_a-faccessat.$(OBJEXT)
 #am__objects_15 = libgnu_a-fchdir.$(OBJEXT)
-am__objects_16 =  \
-	libgnu_a-fchmodat.$(OBJEXT)
+#am__objects_16 =  \
+#	libgnu_a-fchmodat.$(OBJEXT)
 am__objects_17 =  \
 	libgnu_a-fchownat.$(OBJEXT)
 am__objects_18 = libgnu_a-fcntl.$(OBJEXT)
@@ -618,8 +618,8 @@ am__objects_19 =  \
 #	libgnu_a-fileblocks.$(OBJEXT)
 #am__objects_21 = libgnu_a-float.$(OBJEXT)
 #am__objects_22 = libgnu_a-itold.$(OBJEXT)
-am__objects_23 =  \
-	libgnu_a-fpending.$(OBJEXT)
+#am__objects_23 =  \
+#	libgnu_a-fpending.$(OBJEXT)
 am__objects_24 = libgnu_a-free.$(OBJEXT)
 am__objects_25 = libgnu_a-fseek.$(OBJEXT)
 am__objects_26 = libgnu_a-fseeko.$(OBJEXT)
@@ -632,7 +632,7 @@ am__objects_31 =  \
 	libgnu_a-getcwd-lgpl.$(OBJEXT)
 #am__objects_32 =  \
 #	libgnu_a-getdelim.$(OBJEXT)
-#am__objects_33 = libgnu_a-getdtablesize.$(OBJEXT)
+am__objects_33 = libgnu_a-getdtablesize.$(OBJEXT)
 am__objects_34 =  \
 	libgnu_a-getgroups.$(OBJEXT)
 #am__objects_35 = libgnu_a-getline.$(OBJEXT)
@@ -642,24 +642,24 @@ am__objects_36 = libgnu_a-getopt.$(OBJEXT) \
 #	libgnu_a-getpagesize.$(OBJEXT)
 #am__objects_38 =  \
 #	libgnu_a-getprogname.$(OBJEXT)
-am__objects_39 =  \
-	libgnu_a-getrandom.$(OBJEXT)
-#am__objects_40 = libgnu_a-gettimeofday.$(OBJEXT)
+#am__objects_39 =  \
+#	libgnu_a-getrandom.$(OBJEXT)
+am__objects_40 = libgnu_a-gettimeofday.$(OBJEXT)
 am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_41 = libgnu_a-group-member.$(OBJEXT)
 #am__objects_42 = libgnu_a-isblank.$(OBJEXT)
 #am__objects_43 =  \
 #	libgnu_a-iswblank.$(OBJEXT)
-#am__objects_44 =  \
-#	libgnu_a-iswdigit.$(OBJEXT)
-#am__objects_45 =  \
-#	libgnu_a-iswxdigit.$(OBJEXT)
+am__objects_44 =  \
+	libgnu_a-iswdigit.$(OBJEXT)
+am__objects_45 =  \
+	libgnu_a-iswxdigit.$(OBJEXT)
 am__objects_46 = libgnu_a-lchmod.$(OBJEXT)
 am__objects_47 = libgnu_a-lchown.$(OBJEXT)
 #am__objects_48 = libgnu_a-link.$(OBJEXT)
 am__objects_49 = libgnu_a-linkat.$(OBJEXT)
-am__objects_50 =  \
-	libgnu_a-localeconv.$(OBJEXT)
+#am__objects_50 =  \
+#	libgnu_a-localeconv.$(OBJEXT)
 am__objects_51 = libgnu_a-lseek.$(OBJEXT)
 am__objects_52 = libgnu_a-lstat.$(OBJEXT)
 am__objects_53 =  \
@@ -671,10 +671,10 @@ am__objects_56 =  \
 #am__objects_57 = libgnu_a-mbtowc.$(OBJEXT)
 #am__objects_58 = libgnu_a-memchr.$(OBJEXT)
 #am__objects_59 = libgnu_a-mempcpy.$(OBJEXT)
-am__objects_60 = libgnu_a-memrchr.$(OBJEXT)
+#am__objects_60 = libgnu_a-memrchr.$(OBJEXT)
 am__objects_61 = libgnu_a-mkdir.$(OBJEXT)
 #am__objects_62 = libgnu_a-mkdirat.$(OBJEXT)
-am__objects_63 = libgnu_a-mkdtemp.$(OBJEXT)
+#am__objects_63 = libgnu_a-mkdtemp.$(OBJEXT)
 #am__objects_64 = libgnu_a-mkfifo.$(OBJEXT)
 am__objects_65 =  \
 	libgnu_a-mkfifoat.$(OBJEXT)
@@ -686,14 +686,14 @@ am__objects_67 = libgnu_a-mknod.$(OBJEXT)
 am__objects_70 =  \
 	libgnu_a-nl_langinfo.$(OBJEXT)
 #am__objects_71 = libgnu_a-nl_langinfo-lock.$(OBJEXT)
-am__objects_72 = libgnu_a-obstack.$(OBJEXT)
+#am__objects_72 = libgnu_a-obstack.$(OBJEXT)
 #am__objects_73 = libgnu_a-open.$(OBJEXT)
 am__objects_74 = libgnu_a-openat.$(OBJEXT)
 #am__objects_75 = libgnu_a-opendir.$(OBJEXT)
 #am__objects_76 = libgnu_a-pipe.$(OBJEXT)
 #am__objects_77 = libgnu_a-raise.$(OBJEXT)
-am__objects_78 =  \
-	libgnu_a-rawmemchr.$(OBJEXT)
+#am__objects_78 =  \
+#	libgnu_a-rawmemchr.$(OBJEXT)
 #am__objects_79 = libgnu_a-read.$(OBJEXT)
 #am__objects_80 = libgnu_a-readdir.$(OBJEXT)
 am__objects_81 =  \
@@ -719,7 +719,7 @@ am__objects_93 = libgnu_a-sleep.$(OBJEXT)
 #	libgnu_a-stdio-read.$(OBJEXT)
 #am__objects_96 =  \
 #	libgnu_a-stdio-write.$(OBJEXT)
-am__objects_97 = libgnu_a-stpcpy.$(OBJEXT)
+#am__objects_97 = libgnu_a-stpcpy.$(OBJEXT)
 #am__objects_98 =  \
 #	libgnu_a-strcasecmp.$(OBJEXT)
 #am__objects_99 =  \
@@ -732,10 +732,10 @@ am__objects_102 =  \
 am__objects_103 = libgnu_a-strerror-override.$(OBJEXT)
 #am__objects_104 =  \
 #	libgnu_a-strndup.$(OBJEXT)
-#am__objects_105 =  \
-#	libgnu_a-strnlen.$(OBJEXT)
-#am__objects_106 =  \
-#	libgnu_a-strtoimax.$(OBJEXT)
+am__objects_105 =  \
+	libgnu_a-strnlen.$(OBJEXT)
+am__objects_106 =  \
+	libgnu_a-strtoimax.$(OBJEXT)
 am__objects_107 = libgnu_a-strtol.$(OBJEXT)
 am__objects_108 =  \
 	libgnu_a-strtoll.$(OBJEXT)
@@ -743,8 +743,8 @@ am__objects_109 =  \
 	libgnu_a-strtoul.$(OBJEXT)
 am__objects_110 =  \
 	libgnu_a-strtoull.$(OBJEXT)
-#am__objects_111 =  \
-#	libgnu_a-strtoumax.$(OBJEXT)
+am__objects_111 =  \
+	libgnu_a-strtoumax.$(OBJEXT)
 am__objects_112 =  \
 	libgnu_a-symlink.$(OBJEXT)
 am__objects_113 =  \
@@ -778,8 +778,8 @@ am__objects_136 =  \
 	libgnu_a-utimensat.$(OBJEXT)
 #am__objects_137 =  \
 #	libgnu_a-wcrtomb.$(OBJEXT)
-#am__objects_138 =  \
-#	libgnu_a-wcwidth.$(OBJEXT)
+am__objects_138 =  \
+	libgnu_a-wcwidth.$(OBJEXT)
 #am__objects_139 =  \
 #	libgnu_a-wmemchr.$(OBJEXT)
 am__objects_140 =  \
@@ -1304,7 +1304,7 @@ AM_DEFAULT_VERBOSITY = 0
 APPLE_UNIVERSAL_BUILD = 0
 AR = ar
 ARFLAGS = cr
-ASSERT_H = assert.h
+ASSERT_H = 
 AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/gtar/build-aux/missing' autoconf
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/gtar/build-aux/missing' autoheader
 AUTOM4TE = ${SHELL} '/usr/glenda/APExp/sys/src/external/gtar/build-aux/missing' autom4te
@@ -1884,10 +1884,10 @@ GL_GNULIB_WMEMPCPY = 1
 GL_GNULIB_WMEMSET = 0
 GL_GNULIB_WRITE = 1
 GL_GNULIB__EXIT = 0
-GMSGFMT = :
-GMSGFMT_015 = :
-GNULIBHEADERS_OVERRIDE_CHAR16_T = 1
-GNULIBHEADERS_OVERRIDE_CHAR32_T = 1
+GMSGFMT = /bin/msgfmt
+GMSGFMT_015 = /bin/msgfmt
+GNULIBHEADERS_OVERRIDE_CHAR16_T = 0
+GNULIBHEADERS_OVERRIDE_CHAR32_T = 0
 GNULIBHEADERS_OVERRIDE_CHAR8_T = 1
 GNULIBHEADERS_OVERRIDE_WINT_T = 0
 GNULIB_GETTIMEOFDAY = 0
@@ -1899,70 +1899,70 @@ HAVE_ALIGNED_ALLOC = 1
 HAVE_ALLOCA_H = 1
 HAVE_ALPHASORT = 1
 HAVE_ATOLL = 1
-HAVE_BTOWC = 0
+HAVE_BTOWC = 1
 HAVE_C32RTOMB = 1
 HAVE_C99_STDINT_H = 0
-HAVE_CANONICALIZE_FILE_NAME = 0
+HAVE_CANONICALIZE_FILE_NAME = 1
 HAVE_CHOWN = 1
 HAVE_CLOSEDIR = 1
 HAVE_COPY_FILE_RANGE = 1
 HAVE_CRTDEFS_H = 0
-HAVE_DECL_DIRFD = 1
+HAVE_DECL_DIRFD = 0
 HAVE_DECL_ECVT = 0
-HAVE_DECL_ENVIRON = 0
+HAVE_DECL_ENVIRON = 1
 HAVE_DECL_EXECVPE = 0
-HAVE_DECL_FCHDIR = 1
+HAVE_DECL_FCHDIR = 0
 HAVE_DECL_FCLOSEALL = 0
 HAVE_DECL_FCVT = 0
 HAVE_DECL_FDATASYNC = 1
 HAVE_DECL_FDOPENDIR = 0
 HAVE_DECL_FPURGE = 1
-HAVE_DECL_FSEEKO = 1
+HAVE_DECL_FSEEKO = 0
 HAVE_DECL_FTELLO = 1
 HAVE_DECL_GCVT = 0
-HAVE_DECL_GETDELIM = 1
+HAVE_DECL_GETDELIM = 0
 HAVE_DECL_GETDOMAINNAME = 1
-HAVE_DECL_GETLINE = 1
+HAVE_DECL_GETLINE = 0
 HAVE_DECL_GETLOADAVG = 1
 HAVE_DECL_GETLOGIN = 1
 HAVE_DECL_GETLOGIN_R = 1
-HAVE_DECL_GETPAGESIZE = 1
+HAVE_DECL_GETPAGESIZE = 0
 HAVE_DECL_GETUSERSHELL = 1
 HAVE_DECL_GETW = 0
 HAVE_DECL_IMAXABS = 1
 HAVE_DECL_IMAXDIV = 1
 HAVE_DECL_INITSTATE = 1
-HAVE_DECL_LOCALTIME_R = 1
+HAVE_DECL_LOCALTIME_R = 0
 HAVE_DECL_MEMMEM = 1
-HAVE_DECL_MEMRCHR = 1
+HAVE_DECL_MEMRCHR = 0
 HAVE_DECL_OBSTACK_PRINTF = 1
 HAVE_DECL_PROGRAM_INVOCATION_NAME = 0
 HAVE_DECL_PUTW = 0
-HAVE_DECL_SETENV = 1
+HAVE_DECL_SETENV = 0
 HAVE_DECL_SETHOSTNAME = 1
 HAVE_DECL_SETSTATE = 1
-HAVE_DECL_SNPRINTF = 1
-HAVE_DECL_STRDUP = 1
+HAVE_DECL_SNPRINTF = 0
+HAVE_DECL_STRDUP = 0
 HAVE_DECL_STRERROR_R = 1
-HAVE_DECL_STRNCASECMP = 1
-HAVE_DECL_STRNDUP = 1
-HAVE_DECL_STRNLEN = 1
+HAVE_DECL_STRNCASECMP = 0
+HAVE_DECL_STRNDUP = 0
+HAVE_DECL_STRNLEN = 0
 HAVE_DECL_STRSIGNAL = 1
-HAVE_DECL_STRTOIMAX = 1
+HAVE_DECL_STRTOIMAX = 0
 HAVE_DECL_STRTOK_R = 1
-HAVE_DECL_STRTOUMAX = 1
+HAVE_DECL_STRTOUMAX = 0
 HAVE_DECL_TRUNCATE = 1
 HAVE_DECL_TTYNAME_R = 1
-HAVE_DECL_UNSETENV = 1
-HAVE_DECL_VSNPRINTF = 1
+HAVE_DECL_UNSETENV = 0
+HAVE_DECL_VSNPRINTF = 0
 HAVE_DECL_WCSDUP = 0
 HAVE_DECL_WCTOB = 1
-HAVE_DECL_WCWIDTH = 1
+HAVE_DECL_WCWIDTH = 0
 HAVE_DIRENT_H = 1
 HAVE_DPRINTF = 1
 HAVE_DUP3 = 1
 HAVE_DUPLOCALE = 1
-HAVE_ERROR = 0
+HAVE_ERROR = 1
 HAVE_ERROR_AT_LINE = 0
 HAVE_ERROR_H = 1
 HAVE_EUIDACCESS = 0
@@ -1988,7 +1988,7 @@ HAVE_FSYNC = 1
 HAVE_FTELLO = 1
 HAVE_FTRUNCATE = 1
 HAVE_FUTIMENS = 0
-HAVE_GETDTABLESIZE = 1
+HAVE_GETDTABLESIZE = 0
 HAVE_GETENTROPY = 1
 HAVE_GETGROUPS = 1
 HAVE_GETHOSTNAME = 1
@@ -1997,7 +1997,7 @@ HAVE_GETOPT_H = 1
 HAVE_GETPAGESIZE = 1
 HAVE_GETPASS = 1
 HAVE_GETPROGNAME = 1
-HAVE_GETRANDOM = 0
+HAVE_GETRANDOM = 1
 HAVE_GETSUBOPT = 1
 HAVE_GETTIMEOFDAY = 1
 HAVE_GETUMASK = 1
@@ -2009,8 +2009,8 @@ HAVE_IMAXDIV_T = 1
 HAVE_INITSTATE = 1
 HAVE_INTTYPES_H = 1
 HAVE_ISBLANK = 1
-HAVE_ISWBLANK = 0
-HAVE_ISWCNTRL = 0
+HAVE_ISWBLANK = 1
+HAVE_ISWCNTRL = 1
 HAVE_LANGINFO_ALTMON = 0
 HAVE_LANGINFO_CODESET = 0
 HAVE_LANGINFO_ERA = 0
@@ -2035,10 +2035,10 @@ HAVE_MBTOWC = 1
 HAVE_MEMPCPY = 1
 HAVE_MEMSET_EXPLICIT = 1
 HAVE_MKDIRAT = 1
-HAVE_MKDTEMP = 0
+HAVE_MKDTEMP = 1
 HAVE_MKFIFO = 1
 HAVE_MKFIFOAT = 0
-HAVE_MKNOD = 0
+HAVE_MKNOD = 1
 HAVE_MKNODAT = 0
 HAVE_MKOSTEMP = 1
 HAVE_MKOSTEMPS = 1
@@ -2068,11 +2068,11 @@ HAVE_RAISE = 1
 HAVE_RANDOM = 1
 HAVE_RANDOM_H = 1
 HAVE_RANDOM_R = 1
-HAVE_RAWMEMCHR = 0
+HAVE_RAWMEMCHR = 1
 HAVE_READDIR = 1
 HAVE_READLINK = 1
 HAVE_READLINKAT = 1
-HAVE_REALLOCARRAY = 0
+HAVE_REALLOCARRAY = 1
 HAVE_REALPATH = 1
 HAVE_RENAMEAT = 1
 HAVE_REWINDDIR = 1
@@ -2092,9 +2092,9 @@ HAVE_SIGNED_SIG_ATOMIC_T = 1
 HAVE_SIGNED_WCHAR_T = 0
 HAVE_SIGNED_WINT_T = 0
 HAVE_SIGSET_T = 1
-HAVE_SLEEP = 1
+HAVE_SLEEP = 0
 HAVE_STDINT_H = 1
-HAVE_STPCPY = 0
+HAVE_STPCPY = 1
 HAVE_STPNCPY = 1
 HAVE_STRCASECMP = 1
 HAVE_STRCASESTR = 1
@@ -2122,7 +2122,7 @@ HAVE_SYS_CDEFS_H = 1
 HAVE_SYS_INTTYPES_H = 0
 HAVE_SYS_LOADAVG_H = 0
 HAVE_SYS_PARAM_H = 0
-HAVE_SYS_RANDOM_H = 0
+HAVE_SYS_RANDOM_H = 1
 HAVE_SYS_TIME_H = 1
 HAVE_SYS_TYPES_H = 1
 HAVE_TIMEGM = 1
@@ -2130,7 +2130,7 @@ HAVE_TIMESPEC_GET = 1
 HAVE_TIMESPEC_GETRES = 1
 HAVE_TIMEZONE_T = 0
 HAVE_TYPE_VOLATILE_SIG_ATOMIC_T = 1
-HAVE_UCHAR_H = 0
+HAVE_UCHAR_H = 1
 HAVE_UNISTD_H = 1
 HAVE_UNISTRING_WOE32DLL_H = 0
 HAVE_UNLINKAT = 1
@@ -2238,11 +2238,11 @@ LTLIBOBJS =
 MAKEINFO = ${SHELL} '/usr/glenda/APExp/sys/src/external/gtar/build-aux/missing' makeinfo
 MBRTOWC_LIB = 
 MKDIR_P = .././build-aux/install-sh -c -d
-MSGFMT = :
+MSGFMT = /bin/msgfmt
 MSGMERGE = /bin/msgmerge
 MSGMERGE_FOR_MSGFMT_OPTION = --no-location --quiet
-NEXT_ASSERT_H = <assert.h>
-NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = <assert.h>
+NEXT_ASSERT_H = 
+NEXT_AS_FIRST_DIRECTIVE_ASSERT_H = 
 NEXT_AS_FIRST_DIRECTIVE_CTYPE_H = <ctype.h>
 NEXT_AS_FIRST_DIRECTIVE_DIRENT_H = <dirent.h>
 NEXT_AS_FIRST_DIRECTIVE_ERRNO_H = <errno.h>
@@ -2317,7 +2317,7 @@ PACKAGE_URL = https://www.gnu.org/software/tar/
 PACKAGE_VERSION = 1.35
 PARSE_DATETIME_BISON = :
 PATH_SEPARATOR = :
-POSUB = 
+POSUB = po
 PRAGMA_COLUMNS = 
 PRAGMA_SYSTEM_HEADER = 
 PRIPTR_PREFIX = "l"
@@ -2327,11 +2327,11 @@ PU_RMT_PROG =
 RANLIB = ranlib
 REPLACE_ACCESS = 0
 REPLACE_ALIGNED_ALLOC = 0
-REPLACE_BTOWC = 0
+REPLACE_BTOWC = 1
 REPLACE_C32RTOMB = 0
-REPLACE_CALLOC_FOR_CALLOC_GNU = 0
-REPLACE_CALLOC_FOR_CALLOC_POSIX = 0
-REPLACE_CANONICALIZE_FILE_NAME = 0
+REPLACE_CALLOC_FOR_CALLOC_GNU = 1
+REPLACE_CALLOC_FOR_CALLOC_POSIX = 1
+REPLACE_CANONICALIZE_FILE_NAME = 1
 REPLACE_CHMOD = 0
 REPLACE_CHOWN = 1
 REPLACE_CLOSE = 0
@@ -2342,7 +2342,7 @@ REPLACE_CTIME = GNULIB_PORTCHECK
 REPLACE_DIRFD = 0
 REPLACE_DPRINTF = 0
 REPLACE_DUP = 0
-REPLACE_DUP2 = 1
+REPLACE_DUP2 = 0
 REPLACE_DUP3 = 0
 REPLACE_DUPLOCALE = 0
 REPLACE_ERROR = 0
@@ -2355,7 +2355,7 @@ REPLACE_EXECVE = 0
 REPLACE_EXECVP = 0
 REPLACE_EXECVPE = 0
 REPLACE_FACCESSAT = 1
-REPLACE_FCHMODAT = 1
+REPLACE_FCHMODAT = 0
 REPLACE_FCHOWNAT = 1
 REPLACE_FCLOSE = 1
 REPLACE_FCNTL = 1
@@ -2395,27 +2395,27 @@ REPLACE_GETPASS_FOR_GETPASS_GNU = 0
 REPLACE_GETPROGNAME = 0
 REPLACE_GETRANDOM = 0
 REPLACE_GETSUBOPT = 0
-REPLACE_GETTIMEOFDAY = 0
+REPLACE_GETTIMEOFDAY = 1
 REPLACE_GMTIME = 0
 REPLACE_IMAXABS = 0
 REPLACE_IMAXDIV = 0
 REPLACE_INITSTATE = 0
 REPLACE_ISATTY = 0
-REPLACE_ISWBLANK = 1
-REPLACE_ISWCNTRL = 1
+REPLACE_ISWBLANK = 0
+REPLACE_ISWCNTRL = 0
 REPLACE_ISWDIGIT = 1
 REPLACE_ISWXDIGIT = 1
 REPLACE_ITOLD = 0
 REPLACE_LCHOWN = 0
 REPLACE_LINK = 0
 REPLACE_LINKAT = 1
-REPLACE_LOCALECONV = 1
+REPLACE_LOCALECONV = 0
 REPLACE_LOCALTIME = 0
 REPLACE_LOCALTIME_R = 0
 REPLACE_LSEEK = 1
 REPLACE_LSTAT = 1
-REPLACE_MALLOC_FOR_MALLOC_GNU = 0
-REPLACE_MALLOC_FOR_MALLOC_POSIX = 0
+REPLACE_MALLOC_FOR_MALLOC_GNU = 1
+REPLACE_MALLOC_FOR_MALLOC_POSIX = 1
 REPLACE_MBRLEN = 0
 REPLACE_MBRTOC16 = 0
 REPLACE_MBRTOC32 = 0
@@ -2433,7 +2433,7 @@ REPLACE_MEMPCPY = 0
 REPLACE_MKDIR = 1
 REPLACE_MKFIFO = 0
 REPLACE_MKFIFOAT = 0
-REPLACE_MKNOD = 0
+REPLACE_MKNOD = 1
 REPLACE_MKNODAT = 0
 REPLACE_MKOSTEMP = 0
 REPLACE_MKOSTEMPS = 0
@@ -2467,9 +2467,9 @@ REPLACE_READ = 0
 REPLACE_READDIR = 0
 REPLACE_READLINK = 1
 REPLACE_READLINKAT = 1
-REPLACE_REALLOCARRAY = 0
+REPLACE_REALLOCARRAY = 1
 REPLACE_REALLOC_FOR_REALLOC_GNU = 0
-REPLACE_REALLOC_FOR_REALLOC_POSIX = 0
+REPLACE_REALLOC_FOR_REALLOC_POSIX = 1
 REPLACE_REALPATH = 1
 REPLACE_REMOVE = 0
 REPLACE_RENAME = 1
@@ -2480,7 +2480,7 @@ REPLACE_SETENV = 0
 REPLACE_SETHOSTNAME = 0
 REPLACE_SETLOCALE = 0
 REPLACE_SETSTATE = 0
-REPLACE_SLEEP = 1
+REPLACE_SLEEP = 0
 REPLACE_SNPRINTF = 1
 REPLACE_SPRINTF = 0
 REPLACE_STAT = 0
@@ -2509,15 +2509,15 @@ REPLACE_STRTOLL = 1
 REPLACE_STRTOUL = 1
 REPLACE_STRTOULL = 1
 REPLACE_STRTOUMAX = 0
-REPLACE_STRUCT_LCONV = 1
-REPLACE_STRUCT_TIMEVAL = 0
+REPLACE_STRUCT_LCONV = 0
+REPLACE_STRUCT_TIMEVAL = 1
 REPLACE_SYMLINK = 1
 REPLACE_SYMLINKAT = 1
 REPLACE_TIME = 0
 REPLACE_TIMEGM = 1
 REPLACE_TIMESPEC_GET = GNULIB_PORTCHECK
 REPLACE_TMPFILE = 0
-REPLACE_TOWLOWER = 1
+REPLACE_TOWLOWER = 0
 REPLACE_TRUNCATE = 0
 REPLACE_TTYNAME_R = 0
 REPLACE_TZSET = 0
@@ -2544,7 +2544,7 @@ REPLACE_WCSTOK = 0
 REPLACE_WCSWIDTH = 0
 REPLACE_WCTOB = 0
 REPLACE_WCTOMB = 0
-REPLACE_WCWIDTH = 0
+REPLACE_WCWIDTH = 1
 REPLACE_WMEMCMP = 0
 REPLACE_WMEMPCPY = 0
 REPLACE_WRITE = 0
@@ -2573,11 +2573,11 @@ UINT32_MAX_LT_UINTMAX_MAX = 1
 UINT64_MAX_EQ_ULONG_MAX = 0
 UNDEFINE_STRTOK_R = 0
 UNISTD_H_DEFINES_STRUCT_TIMESPEC = 0
-UNISTD_H_HAVE_SYS_RANDOM_H = 0
+UNISTD_H_HAVE_SYS_RANDOM_H = 1
 UNISTD_H_HAVE_WINSOCK2_H = 0
 UNISTD_H_HAVE_WINSOCK2_H_AND_USE_SOCKETS = 0
 USE_ACL = 0
-USE_NLS = no
+USE_NLS = yes
 VERSION = 1.35
 WARN_CFLAGS = 
 WCHAR_T_SUFFIX = 
@@ -2587,10 +2587,10 @@ WINDOWS_64_BIT_ST_SIZE = 0
 WINDOWS_STAT_INODES = 0
 WINDOWS_STAT_TIMESPEC = 0
 WINT_T_SUFFIX = u
-XGETTEXT = :
-XGETTEXT_015 = :
+XGETTEXT = /bin/xgettext
+XGETTEXT_015 = /bin/xgettext
 XGETTEXT_EXTRA_OPTIONS =  --flag=argp_error:2:c-format --flag=argp_failure:4:c-format --flag=error:3:c-format --flag=error_at_line:5:c-format --flag=asprintf:2:c-format --flag=vasprintf:2:c-format --flag=xasprintf:1:c-format
-YACC = byacc
+YACC = bison -y
 YFLAGS = 
 abs_builddir = /usr/glenda/APExp/sys/src/external/gtar/gnu
 abs_srcdir = /usr/glenda/APExp/sys/src/external/gtar/gnu
@@ -2605,7 +2605,7 @@ am__tar = false
 am__untar = false
 bindir = ${exec_prefix}/bin
 bindir_c = "/usr/local/bin"
-bindir_c_make = \"$(bindir)\"
+bindir_c_make = "/usr/local/bin"
 build = x86_64-unknown-plan9
 build_alias = 
 build_cpu = x86_64
@@ -2614,22 +2614,22 @@ build_vendor = unknown
 builddir = .
 datadir = ${datarootdir}
 datadir_c = "/usr/local/share"
-datadir_c_make = \"$(datadir)\"
+datadir_c_make = "/usr/local/share"
 datarootdir = ${prefix}/share
 datarootdir_c = "/usr/local/share"
-datarootdir_c_make = \"$(datarootdir)\"
+datarootdir_c_make = "/usr/local/share"
 docdir = ${datarootdir}/doc/${PACKAGE_TARNAME}
 docdir_c = "/usr/local/share/doc/tar"
-docdir_c_make = \"$(docdir)\"
+docdir_c_make = "/usr/local/share/doc/tar"
 dvidir = ${docdir}
 dvidir_c = "/usr/local/share/doc/tar"
-dvidir_c_make = \"$(dvidir)\"
+dvidir_c_make = "/usr/local/share/doc/tar"
 exec_prefix = ${prefix}
 exec_prefix_c = "/usr/local"
-exec_prefix_c_make = \"$(exec_prefix)\"
-gl_LIBOBJDEPS =  ./$(DEPDIR)/asnprintf.Po ./$(DEPDIR)/at-func2.Po ./$(DEPDIR)/fnmatch.Po ./$(DEPDIR)/fopen.Po ./$(DEPDIR)/mbsrtowcs-state.Po ./$(DEPDIR)/mktime.Po ./$(DEPDIR)/printf-args.Po ./$(DEPDIR)/printf-parse.Po ./$(DEPDIR)/snprintf.Po ./$(DEPDIR)/vasnprintf.Po ./$(DEPDIR)/vsnprintf.Po
-gl_LIBOBJS =  asnprintf.o at-func2.o fnmatch.o fopen.o mbsrtowcs-state.o mktime.o printf-args.o printf-parse.o snprintf.o vasnprintf.o vsnprintf.o
-gl_LTLIBOBJS =  asnprintf.lo at-func2.lo fnmatch.lo fopen.lo mbsrtowcs-state.lo mktime.lo printf-args.lo printf-parse.lo snprintf.lo vasnprintf.lo vsnprintf.lo
+exec_prefix_c_make = "/usr/local"
+gl_LIBOBJDEPS =  ./$(DEPDIR)/at-func2.Po ./$(DEPDIR)/calloc.Po ./$(DEPDIR)/fnmatch.Po ./$(DEPDIR)/fopen.Po ./$(DEPDIR)/malloc.Po ./$(DEPDIR)/mbsrtowcs-state.Po ./$(DEPDIR)/mktime.Po ./$(DEPDIR)/realloc.Po ./$(DEPDIR)/snprintf.Po ./$(DEPDIR)/vsnprintf.Po
+gl_LIBOBJS =  at-func2.o calloc.o fnmatch.o fopen.o malloc.o mbsrtowcs-state.o mktime.o realloc.o snprintf.o vsnprintf.o
+gl_LTLIBOBJS =  at-func2.lo calloc.lo fnmatch.lo fopen.lo malloc.lo mbsrtowcs-state.lo mktime.lo realloc.lo snprintf.lo vsnprintf.lo
 gltests_LIBOBJDEPS = 
 gltests_LIBOBJS = 
 gltests_LTLIBOBJS = 
@@ -2641,67 +2641,67 @@ host_os = plan9
 host_vendor = unknown
 htmldir = ${docdir}
 htmldir_c = "/usr/local/share/doc/tar"
-htmldir_c_make = \"$(htmldir)\"
+htmldir_c_make = "/usr/local/share/doc/tar"
 includedir = ${prefix}/include
 includedir_c = "/usr/local/include"
-includedir_c_make = \"$(includedir)\"
+includedir_c_make = "/usr/local/include"
 infodir = ${datarootdir}/info
 infodir_c = "/usr/local/share/info"
-infodir_c_make = \"$(infodir)\"
+infodir_c_make = "/usr/local/share/info"
 install_sh = ${SHELL} /usr/glenda/APExp/sys/src/external/gtar/build-aux/install-sh
 libdir = ${exec_prefix}/lib
 libdir_c = "/usr/local/lib"
-libdir_c_make = \"$(libdir)\"
+libdir_c_make = "/usr/local/lib"
 libexecdir = ${exec_prefix}/libexec
 libexecdir_c = "/usr/local/libexec"
-libexecdir_c_make = \"$(libexecdir)\"
+libexecdir_c_make = "/usr/local/libexec"
 lispdir = ${datarootdir}/emacs/site-lisp
 lispdir_c = "/usr/local/share/emacs/site-lisp"
-lispdir_c_make = \"$(lispdir)\"
+lispdir_c_make = "/usr/local/share/emacs/site-lisp"
 localedir = ${datarootdir}/locale
 localedir_c = "/usr/local/share/locale"
-localedir_c_make = \"$(localedir)\"
+localedir_c_make = "/usr/local/share/locale"
 localstatedir = ${prefix}/var
 localstatedir_c = "/usr/local/var"
-localstatedir_c_make = \"$(localstatedir)\"
+localstatedir_c_make = "/usr/local/var"
 mandir = ${datarootdir}/man
 mandir_c = "/usr/local/share/man"
-mandir_c_make = \"$(mandir)\"
+mandir_c_make = "/usr/local/share/man"
 mkdir_p = $(MKDIR_P)
 oldincludedir = /usr/include
 oldincludedir_c = "/usr/include"
-oldincludedir_c_make = \"$(oldincludedir)\"
+oldincludedir_c_make = "/usr/include"
 pdfdir = ${docdir}
 pdfdir_c = "/usr/local/share/doc/tar"
-pdfdir_c_make = \"$(pdfdir)\"
+pdfdir_c_make = "/usr/local/share/doc/tar"
 pkgdatadir_c = "/usr/local/share/tar"
-pkgdatadir_c_make = \"$(pkgdatadir)\"
+pkgdatadir_c_make = "/usr/local/share/tar"
 pkgincludedir_c = "/usr/local/include/tar"
-pkgincludedir_c_make = \"$(pkgincludedir)\"
+pkgincludedir_c_make = "/usr/local/include/tar"
 pkglibdir_c = "/usr/local/lib/tar"
-pkglibdir_c_make = \"$(pkglibdir)\"
+pkglibdir_c_make = "/usr/local/lib/tar"
 pkglibexecdir_c = "/usr/local/libexec/tar"
-pkglibexecdir_c_make = \"$(pkglibexecdir)\"
+pkglibexecdir_c_make = "/usr/local/libexec/tar"
 prefix = /usr/local
 prefix_c = "/usr/local"
-prefix_c_make = \"$(prefix)\"
+prefix_c_make = "/usr/local"
 program_transform_name = s,x,x,
 psdir = ${docdir}
 psdir_c = "/usr/local/share/doc/tar"
-psdir_c_make = \"$(psdir)\"
+psdir_c_make = "/usr/local/share/doc/tar"
 runstatedir = ${localstatedir}/run
 runstatedir_c = "/usr/local/var/run"
-runstatedir_c_make = \"$(runstatedir)\"
+runstatedir_c_make = "/usr/local/var/run"
 sbindir = ${exec_prefix}/sbin
 sbindir_c = "/usr/local/sbin"
-sbindir_c_make = \"$(sbindir)\"
+sbindir_c_make = "/usr/local/sbin"
 sharedstatedir = ${prefix}/com
 sharedstatedir_c = "/usr/local/com"
-sharedstatedir_c_make = \"$(sharedstatedir)\"
+sharedstatedir_c_make = "/usr/local/com"
 srcdir = .
 sysconfdir = ${prefix}/etc
 sysconfdir_c = "/usr/local/etc"
-sysconfdir_c_make = \"$(sysconfdir)\"
+sysconfdir_c_make = "/usr/local/etc"
 target_alias = 
 top_build_prefix = ../
 top_builddir = ..
@@ -8562,22 +8562,22 @@ alloca.h: $(top_builddir)/config.status
 
 # We need the following in order to create <assert.h> when the system
 # doesn't have one that works with the given compiler.
-assert.h: assert.in.h verify.h $(top_builddir)/config.status
-	$(gl_V_at){ $(SED_HEADER_STDOUT) \
-	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
-	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
-	      -e 's|@''PRAGMA_COLUMNS''@||g' \
-	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
-	      < $(srcdir)/assert.in.h && \
-	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
-	      -e 's|_gl_verify|_gl_static_assert|g' \
-	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
-	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL\1|g' \
-	      < $(srcdir)/verify.h; \
-	} > $@-t
-	$(AM_V_at)mv $@-t $@
-#assert.h: $(top_builddir)/config.status
-#	rm -f $@
+#assert.h: assert.in.h verify.h $(top_builddir)/config.status
+#	$(gl_V_at){ $(SED_HEADER_STDOUT) \
+#	      -e 's|@''INCLUDE_NEXT''@|$(INCLUDE_NEXT)|g' \
+#	      -e 's|@''PRAGMA_SYSTEM_HEADER''@||g' \
+#	      -e 's|@''PRAGMA_COLUMNS''@||g' \
+#	      -e 's|@''NEXT_ASSERT_H''@|$(NEXT_ASSERT_H)|g' \
+#	      < $(srcdir)/assert.in.h && \
+#	  sed -e '/@assert.h omit start@/,/@assert.h omit end@/d' \
+#	      -e 's|_gl_verify|_gl_static_assert|g' \
+#	      -e 's|_GL_VERIFY|_GL_STATIC_ASSERT|g' \
+#	      -e 's|_GL\(_STATIC_ASSERT_H\)|_GL\1|g' \
+#	      < $(srcdir)/verify.h; \
+#	} > $@-t
+#	$(AM_V_at)mv $@-t $@
+assert.h: $(top_builddir)/config.status
+	rm -f $@
 
 # Listed in the same order as the GNU makefile conventions, and
 # provided by autoconf 2.59c+ or 2.70.
@@ -10299,7 +10299,7 @@ mostlyclean-local: mostlyclean-generic
 	:
 distclean-local: distclean-gnulib-libobjs
 distclean-gnulib-libobjs:
-	-rm -f  ./$(DEPDIR)/asnprintf.Po ./$(DEPDIR)/at-func2.Po ./$(DEPDIR)/fnmatch.Po ./$(DEPDIR)/fopen.Po ./$(DEPDIR)/mbsrtowcs-state.Po ./$(DEPDIR)/mktime.Po ./$(DEPDIR)/printf-args.Po ./$(DEPDIR)/printf-parse.Po ./$(DEPDIR)/snprintf.Po ./$(DEPDIR)/vasnprintf.Po ./$(DEPDIR)/vsnprintf.Po
+	-rm -f  ./$(DEPDIR)/at-func2.Po ./$(DEPDIR)/calloc.Po ./$(DEPDIR)/fnmatch.Po ./$(DEPDIR)/fopen.Po ./$(DEPDIR)/malloc.Po ./$(DEPDIR)/mbsrtowcs-state.Po ./$(DEPDIR)/mktime.Po ./$(DEPDIR)/realloc.Po ./$(DEPDIR)/snprintf.Po ./$(DEPDIR)/vsnprintf.Po
 maintainer-clean-local: distclean-gnulib-libobjs
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

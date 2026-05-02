@@ -32,4 +32,4 @@
      ../src/update.c \
      ../src/xheader.c \
      ../src/checkpoint.c \
-     ../tests/genfile.c
+     ../tests/genfile.c \
