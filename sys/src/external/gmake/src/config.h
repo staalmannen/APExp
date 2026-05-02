@@ -3,7 +3,7 @@
 
 /* CPU and C ABI indicator */
 #ifndef __i386__
-/* #undef __i386__ */
+#define __i386__ 1
 #endif
 #ifndef __x86_64_x32__
 /* #undef __x86_64_x32__ */
@@ -129,20 +129,20 @@
 /* #undef ENABLE_NLS */
 
 /* Use high resolution file timestamps if nonzero. */
-/* #undef FILE_TIMESTAMP_HI_RES */
+#define FILE_TIMESTAMP_HI_RES 1
 
 /* Define to 1 when the gnulib module getloadavg should be tested. */
-/* #undef GNULIB_TEST_GETLOADAVG */
+#define GNULIB_TEST_GETLOADAVG 1
 
 /* Define to 1 if you have 'alloca' after including <alloca.h>, a header that
    may be supplied by this distribution. */
-/* #undef HAVE_ALLOCA */
+#define HAVE_ALLOCA 1
 
 /* Define to 1 if <alloca.h> works. */
-/* #undef HAVE_ALLOCA_H */
+#define HAVE_ALLOCA_H 1
 
 /* Define to 1 if you have the `atexit' function. */
-/* #undef HAVE_ATEXIT */
+#define HAVE_ATEXIT 1
 
 /* Use case insensitive file names */
 /* #undef HAVE_CASE_INSENSITIVE_FS */
@@ -156,7 +156,7 @@
 /* #undef HAVE_CFPREFERENCESCOPYAPPVALUE */
 
 /* Define to 1 if you have the clock_gettime function. */
-/* #undef HAVE_CLOCK_GETTIME */
+#define HAVE_CLOCK_GETTIME 1
 
 /* Define to 1 if bool, true and false work as per C2023. */
 /* #undef HAVE_C_BOOL */
@@ -167,62 +167,62 @@
 
 /* Define to 1 if you have the declaration of `bsd_signal', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_BSD_SIGNAL */
+#define HAVE_DECL_BSD_SIGNAL 0
 
 /* Define to 1 if you have the declaration of `dlerror', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_DLERROR */
+#define HAVE_DECL_DLERROR 0
 
 /* Define to 1 if you have the declaration of `dlopen', and to 0 if you don't.
    */
-/* #undef HAVE_DECL_DLOPEN */
+#define HAVE_DECL_DLOPEN 0
 
 /* Define to 1 if you have the declaration of `dlsym', and to 0 if you don't.
    */
-/* #undef HAVE_DECL_DLSYM */
+#define HAVE_DECL_DLSYM 0
 
 /* Define to 1 if you have the declaration of 'getloadavg'. */
-/* #undef HAVE_DECL_GETLOADAVG */
+#define HAVE_DECL_GETLOADAVG 0
 
 /* Define to 1 if you have the declaration of `sys_siglist', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_SYS_SIGLIST */
+#define HAVE_DECL_SYS_SIGLIST 0
 
 /* Define to 1 if you have the declaration of `_sys_siglist', and to 0 if you
    don't. */
-/* #undef HAVE_DECL__SYS_SIGLIST */
+#define HAVE_DECL__SYS_SIGLIST 0
 
 /* Define to 1 if you have the declaration of `__sys_siglist', and to 0 if you
    don't. */
-/* #undef HAVE_DECL___SYS_SIGLIST */
+#define HAVE_DECL___SYS_SIGLIST 0
 
 /* Define to 1 if you have the <dirent.h> header file, and it defines `DIR'.
    */
-/* #undef HAVE_DIRENT_H */
+#define HAVE_DIRENT_H 1
 
 /* Support DOS-style pathnames. */
 /* #undef HAVE_DOS_PATHS */
 
 /* Define to 1 if you have the `dup' function. */
-/* #undef HAVE_DUP */
+#define HAVE_DUP 1
 
 /* Define to 1 if you have the `dup2' function. */
-/* #undef HAVE_DUP2 */
+#define HAVE_DUP2 1
 
 /* Define to 1 if you have the <fcntl.h> header file. */
-/* #undef HAVE_FCNTL_H */
+#define HAVE_FCNTL_H 1
 
 /* Define to 1 if you have the `fdopen' function. */
-/* #undef HAVE_FDOPEN */
+#define HAVE_FDOPEN 1
 
 /* Define to 1 if you have the `fork' function. */
-/* #undef HAVE_FORK */
+#define HAVE_FORK 1
 
 /* Define to 1 if you have the `getcwd' function. */
-/* #undef HAVE_GETCWD */
+#define HAVE_GETCWD 1
 
 /* Define to 1 if you have the `getgroups' function. */
-/* #undef HAVE_GETGROUPS */
+#define HAVE_GETGROUPS 1
 
 /* Define to 1 if you have the `gethostbyname' function. */
 /* #undef HAVE_GETHOSTBYNAME */
@@ -237,7 +237,7 @@
 /* #undef HAVE_GETTEXT */
 
 /* Define to 1 if you have a standard gettimeofday function */
-/* #undef HAVE_GETTIMEOFDAY */
+#define HAVE_GETTIMEOFDAY 1
 
 /* Embed GNU Guile support */
 /* #undef HAVE_GUILE */
@@ -246,13 +246,13 @@
 /* #undef HAVE_ICONV */
 
 /* Define to 1 if the system has the type `intmax_t'. */
-/* #undef HAVE_INTMAX_T */
+#define HAVE_INTMAX_T 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-/* #undef HAVE_INTTYPES_H */
+#define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the `isatty' function. */
-/* #undef HAVE_ISATTY */
+#define HAVE_ISATTY 1
 
 /* Define to 1 if you have the `dgc' library (-ldgc). */
 /* #undef HAVE_LIBDGC */
@@ -264,16 +264,16 @@
 /* #undef HAVE_LIBPERFSTAT */
 
 /* Define to 1 if you have the <limits.h> header file. */
-/* #undef HAVE_LIMITS_H */
+#define HAVE_LIMITS_H 1
 
 /* Define to 1 if you have the <locale.h> header file. */
-/* #undef HAVE_LOCALE_H */
+#define HAVE_LOCALE_H 1
 
 /* Define to 1 if the system has the type 'long long int'. */
-/* #undef HAVE_LONG_LONG_INT */
+#define HAVE_LONG_LONG_INT 1
 
 /* Define to 1 if you have the `lstat' function. */
-/* #undef HAVE_LSTAT */
+#define HAVE_LSTAT 1
 
 /* Define to 1 if you have the <mach/mach.h> header file. */
 /* #undef HAVE_MACH_MACH_H */
@@ -282,7 +282,7 @@
 /* #undef HAVE_MEMORY_H */
 
 /* Define to 1 if you have the `mempcpy' function. */
-/* #undef HAVE_MEMPCPY */
+#define HAVE_MEMPCPY 1
 
 /* Define to 1 if you have the `memrchr' function. */
 /* #undef HAVE_MEMRCHR */
@@ -291,13 +291,13 @@
 /* #undef HAVE_MINIX_CONFIG_H */
 
 /* Define to 1 if you have the `mkfifo' function. */
-/* #undef HAVE_MKFIFO */
+#define HAVE_MKFIFO 1
 
 /* Define to 1 if you have the `mkstemp' function. */
-/* #undef HAVE_MKSTEMP */
+#define HAVE_MKSTEMP 1
 
 /* Define to 1 if you have the `mktemp' function. */
-/* #undef HAVE_MKTEMP */
+#define HAVE_MKTEMP 1
 
 /* Define to 1 if you have the <ndir.h> header file, and it defines `DIR'. */
 /* #undef HAVE_NDIR_H */
@@ -306,13 +306,13 @@
 /* #undef HAVE_NLIST_H */
 
 /* Define to 1 if you have the `pipe' function. */
-/* #undef HAVE_PIPE */
+#define HAVE_PIPE 1
 
 /* Define to 1 if you have the `posix_spawn' function. */
-/* #undef HAVE_POSIX_SPAWN */
+#define HAVE_POSIX_SPAWN 1
 
 /* Define to 1 if you have the `posix_spawnattr_setsigmask' function. */
-/* #undef HAVE_POSIX_SPAWNATTR_SETSIGMASK */
+#define HAVE_POSIX_SPAWNATTR_SETSIGMASK 1
 
 /* Define to 1 if you have the `pselect' function. */
 /* #undef HAVE_PSELECT */
@@ -321,13 +321,13 @@
 /* #undef HAVE_PSTAT_GETDYNAMIC */
 
 /* Define to 1 if you have the `readlink' function. */
-/* #undef HAVE_READLINK */
+#define HAVE_READLINK 1
 
 /* Define to 1 if you have the `realpath' function. */
-/* #undef HAVE_REALPATH */
+#define HAVE_REALPATH 1
 
 /* Define to 1 if <signal.h> defines the SA_RESTART constant. */
-/* #undef HAVE_SA_RESTART */
+#define HAVE_SA_RESTART 1
 
 /* Define to 1 if you have the `setegid' function. */
 /* #undef HAVE_SETEGID */
@@ -336,7 +336,7 @@
 /* #undef HAVE_SETEUID */
 
 /* Define to 1 if you have the `setlinebuf' function. */
-/* #undef HAVE_SETLINEBUF */
+#define HAVE_SETLINEBUF 1
 
 /* Define to 1 if you have the `setregid' function. */
 /* #undef HAVE_SETREGID */
@@ -348,16 +348,16 @@
 /* #undef HAVE_SETRLIMIT */
 
 /* Define to 1 if you have the `setvbuf' function. */
-/* #undef HAVE_SETVBUF */
+#define HAVE_SETVBUF 1
 
 /* Define to 1 if you have the `sigaction' function. */
-/* #undef HAVE_SIGACTION */
+#define HAVE_SIGACTION 1
 
 /* Define to 1 if you have the `sigsetmask' function. */
 /* #undef HAVE_SIGSETMASK */
 
 /* Define to 1 if the system has the type `sig_atomic_t'. */
-/* #undef HAVE_SIG_ATOMIC_T */
+#define HAVE_SIG_ATOMIC_T 1
 
 /* Define to 1 if you have the `socket' function. */
 /* #undef HAVE_SOCKET */
@@ -366,65 +366,65 @@
 /* #undef HAVE_SPAWN_H */
 
 /* Define to 1 if you have the <stdbool.h> header file. */
-/* #undef HAVE_STDBOOL_H */
+#define HAVE_STDBOOL_H 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
-/* #undef HAVE_STDINT_H */
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdio.h> header file. */
-/* #undef HAVE_STDIO_H */
+#define HAVE_STDIO_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
-/* #undef HAVE_STDLIB_H */
+#define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the `stpcpy' function. */
 /* #undef HAVE_STPCPY */
 
 /* Define to 1 if you have the `strcasecmp' function. */
-/* #undef HAVE_STRCASECMP */
+#define HAVE_STRCASECMP 1
 
 /* Define to 1 if you have the `strcmpi' function. */
 /* #undef HAVE_STRCMPI */
 
 /* Define to 1 if you have the `strcoll' function and it is properly defined.
    */
-/* #undef HAVE_STRCOLL */
+#define HAVE_STRCOLL 1
 
 /* Define to 1 if you have the `strdup' function. */
-/* #undef HAVE_STRDUP */
+#define HAVE_STRDUP 1
 
 /* Define to 1 if you have the `strerror' function. */
-/* #undef HAVE_STRERROR */
+#define HAVE_STRERROR 1
 
 /* Define to 1 if you have the `stricmp' function. */
 /* #undef HAVE_STRICMP */
 
 /* Define to 1 if you have the <strings.h> header file. */
-/* #undef HAVE_STRINGS_H */
+#define HAVE_STRINGS_H 1
 
 /* Define to 1 if you have the <string.h> header file. */
-/* #undef HAVE_STRING_H */
+#define HAVE_STRING_H 1
 
 /* Define to 1 if you have the `strncasecmp' function. */
-/* #undef HAVE_STRNCASECMP */
+#define HAVE_STRNCASECMP 1
 
 /* Define to 1 if you have the `strncmpi' function. */
 /* #undef HAVE_STRNCMPI */
 
 /* Define to 1 if you have the `strndup' function. */
-/* #undef HAVE_STRNDUP */
+#define HAVE_STRNDUP 1
 
 /* Define to 1 if you have the `strnicmp' function. */
 /* #undef HAVE_STRNICMP */
 
 /* Define to 1 if you have the `strsignal' function. */
-/* #undef HAVE_STRSIGNAL */
+#define HAVE_STRSIGNAL 1
 
 /* Define to 1 if you have the `strtoll' function. */
-/* #undef HAVE_STRTOLL */
+#define HAVE_STRTOLL 1
 
 /* Define to 1 if `d_type' is a member of `struct dirent'. */
-/* #undef HAVE_STRUCT_DIRENT_D_TYPE */
+#define HAVE_STRUCT_DIRENT_D_TYPE 1
 
 /* Define to 1 if `n_un.n_name' is a member of `struct nlist'. */
 /* #undef HAVE_STRUCT_NLIST_N_UN_N_NAME */
@@ -444,46 +444,46 @@
 /* #undef HAVE_SYS_NDIR_H */
 
 /* Define to 1 if you have the <sys/param.h> header file. */
-/* #undef HAVE_SYS_PARAM_H */
+#define HAVE_SYS_PARAM_H 1
 
 /* Define to 1 if you have the <sys/resource.h> header file. */
-/* #undef HAVE_SYS_RESOURCE_H */
+#define HAVE_SYS_RESOURCE_H 1
 
 /* Define to 1 if you have the <sys/select.h> header file. */
-/* #undef HAVE_SYS_SELECT_H */
+#define HAVE_SYS_SELECT_H 1
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
-/* #undef HAVE_SYS_STAT_H */
+#define HAVE_SYS_STAT_H 1
 
 /* Define to 1 if you have the <sys/timeb.h> header file. */
 /* #undef HAVE_SYS_TIMEB_H */
 
 /* Define to 1 if you have the <sys/time.h> header file. */
-/* #undef HAVE_SYS_TIME_H */
+#define HAVE_SYS_TIME_H 1
 
 /* Define to 1 if you have the <sys/types.h> header file. */
-/* #undef HAVE_SYS_TYPES_H */
+#define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <sys/wait.h> header file. */
-/* #undef HAVE_SYS_WAIT_H */
+#define HAVE_SYS_WAIT_H 1
 
 /* Define to 1 if you have the `ttyname' function. */
-/* #undef HAVE_TTYNAME */
+#define HAVE_TTYNAME 1
 
 /* Define to 1 if the system has the type `uintmax_t'. */
-/* #undef HAVE_UINTMAX_T */
+#define HAVE_UINTMAX_T 1
 
 /* Define to 1 if you have the `umask' function. */
-/* #undef HAVE_UMASK */
+#define HAVE_UMASK 1
 
 /* Define to 1 if you have the 'union wait' type in <sys/wait.h>. */
 /* #undef HAVE_UNION_WAIT */
 
 /* Define to 1 if you have the <unistd.h> header file. */
-/* #undef HAVE_UNISTD_H */
+#define HAVE_UNISTD_H 1
 
 /* Define to 1 if the system has the type 'unsigned long long int'. */
-/* #undef HAVE_UNSIGNED_LONG_LONG_INT */
+#define HAVE_UNSIGNED_LONG_LONG_INT 1
 
 /* Define to 1 if you have the `vfork' function. */
 /* #undef HAVE_VFORK */
@@ -492,67 +492,67 @@
 /* #undef HAVE_VFORK_H */
 
 /* Define to 1 if you have the `wait3' function. */
-/* #undef HAVE_WAIT3 */
+#define HAVE_WAIT3 1
 
 /* Define to 1 if you have the `waitpid' function. */
-/* #undef HAVE_WAITPID */
+#define HAVE_WAITPID 1
 
 /* Define to 1 if you have the <wchar.h> header file. */
-/* #undef HAVE_WCHAR_H */
+#define HAVE_WCHAR_H 1
 
 /* Define to 1 if `fork' works. */
-/* #undef HAVE_WORKING_FORK */
+#define HAVE_WORKING_FORK 1
 
 /* Define to 1 if `vfork' works. */
 /* #undef HAVE_WORKING_VFORK */
 
 /* Default C++ compiler. */
-/* #undef MAKE_CXX */
+#define MAKE_CXX "g++"
 
 /* Build host information. */
-/* #undef MAKE_HOST */
+#define MAKE_HOST "x86_64-unknown-plan9"
 
 /* Define to 1 to enable job server support in GNU Make. */
-/* #undef MAKE_JOBSERVER */
+#define MAKE_JOBSERVER 1
 
 /* Define to 1 to enable 'load' support in GNU Make. */
 /* #undef MAKE_LOAD */
 
 /* Define to 1 to enable symbolic link timestamp checking. */
-/* #undef MAKE_SYMLINKS */
+#define MAKE_SYMLINKS 1
 
 /* Define to 1 if config.h is generated by running the configure script. */
-/* #undef MK_CONFIGURE */
+#define MK_CONFIGURE 1
 
 /* Define to 1 if the nlist n_name member is a pointer */
 /* #undef N_NAME_POINTER */
 
 /* Name of package */
-/* #undef PACKAGE */
+#define PACKAGE "make"
 
 /* Define to the address where bug reports for this package should be sent. */
-/* #undef PACKAGE_BUGREPORT */
+#define PACKAGE_BUGREPORT "bug-make@gnu.org"
 
 /* Define to the full name of this package. */
-/* #undef PACKAGE_NAME */
+#define PACKAGE_NAME "GNU Make"
 
 /* Define to the full name and version of this package. */
-/* #undef PACKAGE_STRING */
+#define PACKAGE_STRING "GNU Make 4.4.1"
 
 /* Define to the one symbol short name of this package. */
-/* #undef PACKAGE_TARNAME */
+#define PACKAGE_TARNAME "make"
 
 /* Define to the home page for this package. */
-/* #undef PACKAGE_URL */
+#define PACKAGE_URL "https://www.gnu.org/software/make/"
 
 /* Define to the version of this package. */
-/* #undef PACKAGE_VERSION */
+#define PACKAGE_VERSION "4.4.1"
 
 /* Define to the character that separates directories in PATH. */
-/* #undef PATH_SEPARATOR_CHAR */
+#define PATH_SEPARATOR_CHAR ':'
 
 /* Define to the name of the SCCS 'get' command. */
-/* #undef SCCS_GET */
+#define SCCS_GET "get"
 
 /* Define to 1 if the SCCS 'get' command understands the '-G<file>' option. */
 /* #undef SCCS_GET_MINUS_G */
@@ -571,10 +571,10 @@
 /* Define to 1 if all of the C90 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
    backward compatibility; new code need not use it. */
-/* #undef STDC_HEADERS */
+#define STDC_HEADERS 1
 
 /* Define if struct stat contains a nanoseconds field */
-/* #undef ST_MTIM_NSEC */
+#define ST_MTIM_NSEC st_mtim.tv_nsec
 
 /* Define to 1 on System V Release 4. */
 /* #undef SVR4 */
@@ -591,24 +591,24 @@
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
-/* # undef _ALL_SOURCE */
+# define _ALL_SOURCE 1
 #endif
 /* Enable general extensions on macOS.  */
 #ifndef _DARWIN_C_SOURCE
-/* # undef _DARWIN_C_SOURCE */
+# define _DARWIN_C_SOURCE 1
 #endif
 /* Enable general extensions on Solaris.  */
 #ifndef __EXTENSIONS__
-/* # undef __EXTENSIONS__ */
+# define __EXTENSIONS__ 1
 #endif
 /* Enable GNU extensions on systems that have them.  */
 #ifndef _GNU_SOURCE
-/* # undef _GNU_SOURCE */
+# define _GNU_SOURCE 1
 #endif
 /* Enable X/Open compliant socket functions that do not require linking
    with -lxnet on HP-UX 11.11.  */
 #ifndef _HPUX_ALT_XOPEN_SOCKET_API
-/* # undef _HPUX_ALT_XOPEN_SOCKET_API */
+# define _HPUX_ALT_XOPEN_SOCKET_API 1
 #endif
 /* Identify the host operating system as Minix.
    This macro does not affect the system headers' behavior.
@@ -619,12 +619,12 @@
 /* Enable general extensions on NetBSD.
    Enable NetBSD compatibility extensions on Minix.  */
 #ifndef _NETBSD_SOURCE
-/* # undef _NETBSD_SOURCE */
+# define _NETBSD_SOURCE 1
 #endif
 /* Enable OpenBSD compatibility extensions on NetBSD.
    Oddly enough, this does nothing on OpenBSD.  */
 #ifndef _OPENBSD_SOURCE
-/* # undef _OPENBSD_SOURCE */
+# define _OPENBSD_SOURCE 1
 #endif
 /* Define to 1 if needed for POSIX-compatible behavior.  */
 #ifndef _POSIX_SOURCE
@@ -636,43 +636,43 @@
 #endif
 /* Enable POSIX-compatible threading on Solaris.  */
 #ifndef _POSIX_PTHREAD_SEMANTICS
-/* # undef _POSIX_PTHREAD_SEMANTICS */
+# define _POSIX_PTHREAD_SEMANTICS 1
 #endif
 /* Enable extensions specified by ISO/IEC TS 18661-5:2014.  */
 #ifndef __STDC_WANT_IEC_60559_ATTRIBS_EXT__
-/* # undef __STDC_WANT_IEC_60559_ATTRIBS_EXT__ */
+# define __STDC_WANT_IEC_60559_ATTRIBS_EXT__ 1
 #endif
 /* Enable extensions specified by ISO/IEC TS 18661-1:2014.  */
 #ifndef __STDC_WANT_IEC_60559_BFP_EXT__
-/* # undef __STDC_WANT_IEC_60559_BFP_EXT__ */
+# define __STDC_WANT_IEC_60559_BFP_EXT__ 1
 #endif
 /* Enable extensions specified by ISO/IEC TS 18661-2:2015.  */
 #ifndef __STDC_WANT_IEC_60559_DFP_EXT__
-/* # undef __STDC_WANT_IEC_60559_DFP_EXT__ */
+# define __STDC_WANT_IEC_60559_DFP_EXT__ 1
 #endif
 /* Enable extensions specified by C23 Annex F.  */
 #ifndef __STDC_WANT_IEC_60559_EXT__
-/* # undef __STDC_WANT_IEC_60559_EXT__ */
+# define __STDC_WANT_IEC_60559_EXT__ 1
 #endif
 /* Enable extensions specified by ISO/IEC TS 18661-4:2015.  */
 #ifndef __STDC_WANT_IEC_60559_FUNCS_EXT__
-/* # undef __STDC_WANT_IEC_60559_FUNCS_EXT__ */
+# define __STDC_WANT_IEC_60559_FUNCS_EXT__ 1
 #endif
 /* Enable extensions specified by C23 Annex H and ISO/IEC TS 18661-3:2015.  */
 #ifndef __STDC_WANT_IEC_60559_TYPES_EXT__
-/* # undef __STDC_WANT_IEC_60559_TYPES_EXT__ */
+# define __STDC_WANT_IEC_60559_TYPES_EXT__ 1
 #endif
 /* Enable extensions specified by ISO/IEC TR 24731-2:2010.  */
 #ifndef __STDC_WANT_LIB_EXT2__
-/* # undef __STDC_WANT_LIB_EXT2__ */
+# define __STDC_WANT_LIB_EXT2__ 1
 #endif
 /* Enable extensions specified by ISO/IEC 24747:2009.  */
 #ifndef __STDC_WANT_MATH_SPEC_FUNCS__
-/* # undef __STDC_WANT_MATH_SPEC_FUNCS__ */
+# define __STDC_WANT_MATH_SPEC_FUNCS__ 1
 #endif
 /* Enable extensions on HP NonStop.  */
 #ifndef _TANDEM_SOURCE
-/* # undef _TANDEM_SOURCE */
+# define _TANDEM_SOURCE 1
 #endif
 /* Enable X/Open extensions.  Define to 500 only if necessary
    to make mbstate_t available.  */
@@ -682,7 +682,7 @@
 
 
 /* Version number of package */
-/* #undef VERSION */
+#define VERSION "4.4.1"
 
 /* Build for the WINDOWS32 API. */
 /* #undef WINDOWS32 */
@@ -1249,7 +1249,7 @@
 /* #undef const */
 
 /* Define as 'access' if you don't have the eaccess() function. */
-/* #undef eaccess */
+#define eaccess access
 
 /* Define to `int' if <sys/types.h> doesn't define. */
 /* #undef gid_t */
@@ -1308,7 +1308,7 @@
 /* #undef uintmax_t */
 
 /* Define as `fork' if `vfork' does not work. */
-/* #undef vfork */
+#define vfork fork
 
 #ifndef HAVE_C_BOOL
 # if !defined __cplusplus && !defined __bool_true_false_are_defined
