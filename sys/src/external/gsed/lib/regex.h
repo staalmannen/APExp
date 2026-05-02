@@ -414,27 +414,27 @@ struct re_pattern_buffer
 {
   /* Space that holds the compiled pattern.  The type
      'struct re_dfa_t' is private and is not declared here.  */
-  struct re_dfa_t *buffer;
+  struct re_dfa_t *__REPB_PREFIX(buffer);
 
   /* Number of bytes to which 'buffer' points.  */
-  __re_long_size_t allocated;
+  __re_long_size_t __REPB_PREFIX(allocated);
 
   /* Number of bytes actually used in 'buffer'.  */
-  __re_long_size_t used;
+  __re_long_size_t __REPB_PREFIX(used);
 
   /* Syntax setting with which the pattern was compiled.  */
-  reg_syntax_t syntax;
+  reg_syntax_t __REPB_PREFIX(syntax);
 
   /* Pointer to a fastmap, if any, otherwise zero.  re_search uses the
      fastmap, if there is one, to skip over impossible starting points
      for matches.  */
-  char *fastmap;
+  char *__REPB_PREFIX(fastmap);
 
   /* Either a translate table to apply to all characters before
      comparing them, or zero for no translation.  The translation is
      applied to a pattern when it is compiled and to a string when it
      is matched.  */
-  __RE_TRANSLATE_TYPE translate;
+  __RE_TRANSLATE_TYPE __REPB_PREFIX(translate);
 
   /* Number of subexpressions found by the compiler.  */
   size_t re_nsub;
@@ -443,7 +443,7 @@ struct re_pattern_buffer
      Well, in truth it's used only in 're_search_2', to see whether or
      not we should use the fastmap, so we don't set this absolutely
      perfectly; see 're_compile_fastmap' (the "duplicate" case).  */
-  unsigned can_be_null : 1;
+  unsigned __REPB_PREFIX(can_be_null) : 1;
 
   /* If REGS_UNALLOCATED, allocate space in the 'regs' structure
      for 'max (RE_NREGS, re_nsub + 1)' groups.
@@ -454,25 +454,25 @@ struct re_pattern_buffer
 # define REGS_REALLOCATE 1
 # define REGS_FIXED 2
 #endif
-  unsigned regs_allocated : 2;
+  unsigned __REPB_PREFIX(regs_allocated) : 2;
 
   /* Set to zero when 're_compile_pattern' compiles a pattern; set to
      one by 're_compile_fastmap' if it updates the fastmap.  */
-  unsigned fastmap_accurate : 1;
+  unsigned __REPB_PREFIX(fastmap_accurate) : 1;
 
   /* If set, 're_match_2' does not return information about
      subexpressions.  */
-  unsigned no_sub : 1;
+  unsigned __REPB_PREFIX(no_sub) : 1;
 
   /* If set, a beginning-of-line anchor doesn't match at the beginning
      of the string.  */
-  unsigned not_bol : 1;
+  unsigned __REPB_PREFIX(not_bol) : 1;
 
   /* Similarly for an end-of-line anchor.  */
-  unsigned not_eol : 1;
+  unsigned __REPB_PREFIX(not_eol) : 1;
 
   /* If true, an anchor at a newline matches.  */
-  unsigned newline_anchor : 1;
+  unsigned __REPB_PREFIX(newline_anchor) : 1;
 };
 
 typedef struct re_pattern_buffer regex_t;
@@ -514,7 +514,7 @@ struct re_registers
 /* POSIX specification for registers.  Aside from the different names than
    're_registers', POSIX uses an array of structures, instead of a
    structure of arrays.  */
-typedef struct regmatch_s
+typedef struct
 {
   regoff_t rm_so;  /* Byte offset from string's start to substring's start.  */
   regoff_t rm_eo;  /* Byte offset from string's start to substring's end.  */

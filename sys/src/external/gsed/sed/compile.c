@@ -1269,13 +1269,11 @@ compile_program (struct vector *vector)
 
             if (mb_cur_max > 1)
               {
-                size_t i, j, idx, src_char_num, mbclen;
-                size_t *src_lens;
+                size_t i, j, idx, src_char_num;
+                size_t *src_lens = XCALLOC (len, size_t);
                 char **trans_pairs;
-                mbstate_t cur_stat;
-
-                memset (&cur_stat, 0, sizeof cur_stat);
-                src_lens = (size_t *) XCALLOC (len, sizeof (size_t));
+                size_t mbclen;
+                mbstate_t cur_stat = { 0, };
 
                 /* Enumerate how many character the source buffer has.  */
                 for (i = 0, j = 0; i < len;)
@@ -1298,7 +1296,7 @@ compile_program (struct vector *vector)
                      src(i) : pointer to i-th source character.
                      dest(i) : pointer to i-th destination character.
                      NULL : terminator */
-                trans_pairs = (char **) XCALLOC (2 * src_char_num + 1, sizeof (char *));
+                trans_pairs = XCALLOC (2 * src_char_num + 1, char*);
                 cur_cmd->x.translatemb = trans_pairs;
                 for (i = 0; i < src_char_num; i++)
                   {
@@ -1306,7 +1304,7 @@ compile_program (struct vector *vector)
                       bad_prog (_(Y_CMD_LEN));
 
                     /* Set the i-th source character.  */
-                    trans_pairs[2 * i] = XCALLOC (src_lens[i] + 1, sizeof (char));
+                    trans_pairs[2 * i] = XCALLOC (src_lens[i] + 1, char);
                     memcpy (trans_pairs[2 * i], src_buf, src_lens[i]);
                     trans_pairs[2 * i][src_lens[i]] = '\0';
                     src_buf += src_lens[i]; /* Forward to next character.  */
@@ -1320,7 +1318,7 @@ compile_program (struct vector *vector)
                       mbclen = 1;
 
                     /* Set the i-th destination character.  */
-                    trans_pairs[2 * i + 1] = XCALLOC (mbclen + 1, sizeof (char));
+                    trans_pairs[2 * i + 1] = XCALLOC (mbclen + 1, char);
                     memcpy (trans_pairs[2 * i + 1], dest_buf + idx, mbclen);
                     trans_pairs[2 * i + 1][mbclen] = '\0';
                     idx += mbclen; /* Forward to next character.  */
