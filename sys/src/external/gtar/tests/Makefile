@@ -32,7 +32,7 @@
 
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
+VPATH = .
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -360,7 +360,7 @@ AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/gtar/build-aux/missing' 
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/gtar/build-aux/missing' autoheader
 AUTOM4TE = ${SHELL} '/usr/glenda/APExp/sys/src/external/gtar/build-aux/missing' autom4te
 AUTOMAKE = ${SHELL} '/usr/glenda/APExp/sys/src/external/gtar/build-aux/missing' automake-1.16
-AWK = awk
+AWK = gawk
 BACKUP_LIBEXEC_SCRIPTS = 
 BACKUP_SBIN_SCRIPTS = 
 BACKUP_SED_COND = /^\#ELSE_DATE_FORMAT_OK/,/^\#ENDIF_DATE_FORMAT_OK/d;/^\#IF_DATE_FORMAT_OK/d

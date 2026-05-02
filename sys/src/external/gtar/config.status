@@ -436,7 +436,7 @@ ac_pwd='/usr/glenda/APExp/sys/src/external/gtar'
 srcdir='.'
 INSTALL='/bin/install -c'
 MKDIR_P='./build-aux/install-sh -c -d'
-AWK='awk'
+AWK='gawk'
 test -n "$AWK" || AWK=awk
 # The default lists apply if the user does not specify any file.
 ac_need_defaults=:
@@ -2304,7 +2304,7 @@ S["am__tar"]="false"
 S["AMTAR"]="$${TAR-tar}"
 S["am__leading_dot"]="."
 S["SET_MAKE"]=""
-S["AWK"]="awk"
+S["AWK"]="gawk"
 S["mkdir_p"]="$(MKDIR_P)"
 S["MKDIR_P"]="./build-aux/install-sh -c -d"
 S["INSTALL_STRIP_PROGRAM"]="$(install_sh) -c -s"

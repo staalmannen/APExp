@@ -11,7 +11,7 @@ PCRESRC=../../../external/pcre2
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=8
+CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=32
 
 %.$O: $PCRESRC/src/%.c
 	$CC $CFLAGS $PCRESRC/src/$stem.c

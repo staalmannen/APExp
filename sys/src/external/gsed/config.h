@@ -47,7 +47,7 @@
    d[FLEXIBLE_ARRAY_MEMBER]; };', the struct hack can be used with pre-C99
    compilers. Use 'FLEXSIZEOF (struct s, d, N * sizeof (short))' to calculate
    the size in bytes of such a struct containing an N-element array. */
-#define FLEXIBLE_ARRAY_MEMBER 1
+#define FLEXIBLE_ARRAY_MEMBER /**/
 
 /* Define to 1 if fopen() fails to recognize a trailing slash. */
 /* #undef FOPEN_TRAILING_SLASH_BUG */

@@ -1,7 +1,7 @@
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* Witness that <config.h> has been included.  */
+/* Witness that <config.h> has been included.  STDBOOL*/
 #define _GL_CONFIG_H_INCLUDED 1
 
 
@@ -1621,13 +1621,13 @@
 /* #undef HAVE_STATACL */
 
 /* Define to 1 if you have the <stdbool.h> header file. */
-/* #undef HAVE_STDBOOL_H */
+#define HAVE_STDBOOL_H 1
 
 /* Define to 1 if you have the <stdckdint.h> header file. */
 /* #undef HAVE_STDCKDINT_H */
 
 /* Define to 1 if you have the <stdint.h> header file. */
-/* #undef HAVE_STDINT_H */
+#define HAVE_STDINT_H 1
 
 /* Define if <stdint.h> exists, doesn't clash with <sys/types.h>, and declares
    uintmax_t. */
@@ -1637,10 +1637,10 @@
 /* #undef HAVE_STDIO_EXT_H */
 
 /* Define to 1 if you have the <stdio.h> header file. */
-/* #undef HAVE_STDIO_H */
+#define HAVE_STDIO_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
-/* #undef HAVE_STDLIB_H */
+#define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the `stpcpy' function. */
 /* #undef HAVE_STPCPY */

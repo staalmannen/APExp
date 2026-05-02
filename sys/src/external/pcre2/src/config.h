@@ -348,28 +348,15 @@ surrounded by #ifndef/#endif lines so that the value can be overridden by -D. */
 /* #undef SUPPORT_PCRE2GREP_JIT */
 
 /* Define to any value to enable the 16 bit PCRE2 library. */
-/* #undef SUPPORT_PCRE2_16 */
+// #define SUPPORT_PCRE2_16 1
 
 /* Define to any value to enable the 32 bit PCRE2 library. */
-/* #undef SUPPORT_PCRE2_32 */
+#define SUPPORT_PCRE2_32 1
 
 /* Define to any value to enable the 8 bit PCRE2 library. */
-#define SUPPORT_PCRE2_8 /**/
+// #define SUPPORT_PCRE2_8 1
 
-/* Define to any value to enable support for Unicode and UTF encoding. This
-<<<<<<<<<< sys/src/external/pcre2/src/config.h
-
-========== original
-   will work even in an EBCDIC environment, but it is incompatible with the
-   EBCDIC macro. That is, PCRE2 can support *either* EBCDIC code *or*
-   ASCII/Unicode, but not both at once. */
-/* #undef SUPPORT_UNICODE */
-========== /usr/glenda/APExp/.git/fs/object/35a2a7a4fd69ea5d05279c96b5e6828e1a58930f/tree/sys/src/external/pcre2/src/config.h
-   will work even in an EBCDIC environment, but it is incompatible with the
-   EBCDIC macro. That is, PCRE2 can support *either* EBCDIC code *or*
-   ASCII/Unicode, but not both at once. */
-#define SUPPORT_UNICODE /**/
->>>>>>>>>>
+#define SUPPORT_UNICODE 1
 
 /* Define to any value for valgrind support to find invalid memory reads. */
 /* #undef SUPPORT_VALGRIND */

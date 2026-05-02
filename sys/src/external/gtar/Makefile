@@ -58,7 +58,7 @@
 #  gen_start_date       [optional]  Start ChangeLog from this date. 
 #  changelog_dir        [mandatory] Directory where to create ChangeLog
 #  changelog_amend_file [optional]  Amendment file
-
+VPATH = .
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -414,7 +414,7 @@ AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/gtar/build-aux/missing' 
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/gtar/build-aux/missing' autoheader
 AUTOM4TE = ${SHELL} '/usr/glenda/APExp/sys/src/external/gtar/build-aux/missing' autom4te
 AUTOMAKE = ${SHELL} '/usr/glenda/APExp/sys/src/external/gtar/build-aux/missing' automake-1.16
-AWK = awk
+AWK = gawk
 BACKUP_LIBEXEC_SCRIPTS = 
 BACKUP_SBIN_SCRIPTS = 
 BACKUP_SED_COND = /^\#ELSE_DATE_FORMAT_OK/,/^\#ENDIF_DATE_FORMAT_OK/d;/^\#IF_DATE_FORMAT_OK/d
