@@ -1428,7 +1428,7 @@
 /* #undef HAVE_PTHREAD_ATFORK */
 
 /* Define to 1 if you have the <pthread.h> header file. */
-/* #undef HAVE_PTHREAD_H */
+#define HAVE_PTHREAD_H 1
 
 /* Define if the <pthread.h> defines PTHREAD_MUTEX_RECURSIVE. */
 /* #undef HAVE_PTHREAD_MUTEX_RECURSIVE */
@@ -1492,7 +1492,7 @@
 /* #undef HAVE_SETDTABLESIZE */
 
 /* Define to 1 if you have the 'setenv' function. */
-/* #undef HAVE_SETENV */
+#define HAVE_SETENV 1
 
 /* Define to 1 if you have the 'setlocale' function. */
 /* #undef HAVE_SETLOCALE */

@@ -121,31 +121,25 @@ surrounded by #ifndef/#endif lines so that the value can be overridden by -D. */
 /* #undef HAVE_SECURE_GETENV */
 
 /* Define to 1 if you have the <stdint.h> header file. */
-/* #undef HAVE_STDINT_H */
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdio.h> header file. */
 /* #undef HAVE_STDIO_H */
 
 /* Define to 1 if you have the <stdlib.h> header file. */
-/* #undef HAVE_STDLIB_H */
+#define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the <strings.h> header file. */
 /* #undef HAVE_STRINGS_H */
 
 /* Define to 1 if you have the <string.h> header file. */
-/* #undef HAVE_STRING_H */
+#define HAVE_STRING_H 1
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
-/* #undef HAVE_SYS_STAT_H */
-
-/* Define to 1 if you have the <sys/types.h> header file. */
-/* #undef HAVE_SYS_TYPES_H */
-
-/* Define to 1 if you have the <sys/wait.h> header file. */
-/* #undef HAVE_SYS_WAIT_H */
-
-/* Define to 1 if you have the <unistd.h> header file. */
-/* #undef HAVE_UNISTD_H */
+#define HAVE_SYS_STAT_H 1
+#define HAVE_SYS_TYPES_H 1
+#define HAVE_UNISTD_H 1
+#define HAVE_WCHAR_H 1
 
 /* Define to 1 if the compiler supports GCC compatible visibility
    declarations. */
@@ -346,17 +340,10 @@ surrounded by #ifndef/#endif lines so that the value can be overridden by -D. */
 /* Define to any value to enable JIT support in pcre2grep. Note that this will
    have no effect unless SUPPORT_JIT is also defined. */
 /* #undef SUPPORT_PCRE2GREP_JIT */
-
-/* Define to any value to enable the 16 bit PCRE2 library. */
-/* #undef SUPPORT_PCRE2_16 */
-
-/* Define to any value to enable the 32 bit PCRE2 library. */
-/* #undef SUPPORT_PCRE2_32 */
-
-/* Define to any value to enable the 8 bit PCRE2 library. */
-/* #undef SUPPORT_PCRE2_8 */
-
-/* Define to any value to enable support for Unicode and UTF encoding. This
+#define SUPPORT_PCRE2_8 1
+#define SUPPORT_PCRE2_16 1
+#define SUPPORT_PCRE2_32 1
+#define SUPPORT_UNICODE 1
    will work even in an EBCDIC environment, but it is incompatible with the
    EBCDIC macro. That is, PCRE2 can support *either* EBCDIC code *or*
    ASCII/Unicode, but not both at once. */
