@@ -58,7 +58,7 @@
 #  gen_start_date       [optional]  Start ChangeLog from this date. 
 #  changelog_dir        [mandatory] Directory where to create ChangeLog
 #  changelog_amend_file [optional]  Amendment file
-VPATH = .
+
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \

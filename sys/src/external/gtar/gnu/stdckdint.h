@@ -1,3 +1,4 @@
+/* DO NOT EDIT! GENERATED AUTOMATICALLY! */
 /* stdckdint.h -- checked integer arithmetic
 
    Copyright 2022-2023 Free Software Foundation, Inc.

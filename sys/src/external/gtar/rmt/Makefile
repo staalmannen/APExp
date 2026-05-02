@@ -18,7 +18,7 @@
 
 # Copyright 2022-2023 Free Software Foundation, Inc.
 
-VPATH = .
+
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
