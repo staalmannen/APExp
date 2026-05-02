@@ -24,7 +24,7 @@ typedef long clock_t;
 #endif
 #ifndef _TIME_T
 #define _TIME_T
-typedef long time_t;
+typedef long long time_t;
 #endif
 #ifndef _CLOCKID_T
 #define _CLOCKID_T
