@@ -22,13 +22,13 @@
 /* Template definitions for autoconf */
 
 /* These are set by AC_USE_SYSTEM_EXTENSIONS */
-/* #undef __EXTENSIONS__ */
-/* #undef _ALL_SOURCE */
-/* #undef _GNU_SOURCE */
+#define __EXTENSIONS__ 1
+#define _ALL_SOURCE 1
+#define _GNU_SOURCE 1
 /* #undef _POSIX_SOURCE */
 /* #undef _POSIX_1_SOURCE */
-/* #undef _POSIX_PTHREAD_SEMANTICS */
-/* #undef _TANDEM_SOURCE */
+#define _POSIX_PTHREAD_SEMANTICS 1
+#define _TANDEM_SOURCE 1
 /* #undef _MINIX */
 
 /* Define NO_MULTIBYTE_SUPPORT to not compile in support for multibyte
@@ -52,8 +52,8 @@
 
 /* #undef volatile */
 
-/* #undef PROTOTYPES */
-/* #undef __PROTOTYPES */
+#define PROTOTYPES 1
+#define __PROTOTYPES 1
 
 /* #undef __CHAR_UNSIGNED__ */
 
@@ -64,22 +64,22 @@
 /* #undef HAVE_CHOWN */
 
 /* Define if you have the fcntl function. */
-/* #undef HAVE_FCNTL */
+#define HAVE_FCNTL 1
 
 /* Define if you have the fnmatch function. */
 /* #undef HAVE_FNMATCH */
 
 /* Define if you have the getpwent function. */
-/* #undef HAVE_GETPWENT */
+#define HAVE_GETPWENT 1
 
 /* Define if you have the getpwnam function. */
-/* #undef HAVE_GETPWNAM */
+#define HAVE_GETPWNAM 1
 
 /* Define if you have the getpwuid function. */
-/* #undef HAVE_GETPWUID */
+#define HAVE_GETPWUID 1
 
 /* Define if you have the gettimeofday function. */
-/* #undef HAVE_GETTIMEOFDAY */
+#define HAVE_GETTIMEOFDAY 1
 
 /* Define if you have the isascii function. */
 /* #undef HAVE_ISASCII */
@@ -94,13 +94,13 @@
 /* #undef HAVE_ISWUPPER */
 
 /* Define if you have the isxdigit function. */
-/* #undef HAVE_ISXDIGIT */
+#define HAVE_ISXDIGIT 1
 
 /* Define if you have the kill function. */
-/* #undef HAVE_KILL */
+#define HAVE_KILL 1
 
 /* Define if you have the lstat function. */
-/* #undef HAVE_LSTAT */
+#define HAVE_LSTAT 1
 
 /* Define if you have the mbrlen function. */
 /* #undef HAVE_MBRLEN */
@@ -121,45 +121,45 @@
 /* #undef HAVE_MBSRTOWCS */
 
 /* Define if you have the memmove function. */
-/* #undef HAVE_MEMMOVE */
+#define HAVE_MEMMOVE 1
 
 /* Define if you have the pselect function.  */
 /* #undef HAVE_PSELECT */
 
 /* Define if you have the putenv function.  */
-/* #undef HAVE_PUTENV */
+#define HAVE_PUTENV 1
 
 /* Define if you have the readlink function.  */
-/* #undef HAVE_READLINK */
+#define HAVE_READLINK 1
 
 /* Define if you have the select function.  */
-/* #undef HAVE_SELECT */
+#define HAVE_SELECT 1
 
 /* Define if you have the setenv function.  */
-/* #undef HAVE_SETENV */
+#define HAVE_SETENV 1
 
 /* Define if you have the setitimer function.  */
 /* #undef HAVE_SETITIMER */
 
 /* Define if you have the setlocale function. */
-/* #undef HAVE_SETLOCALE */
+#define HAVE_SETLOCALE 1
 
 /* Define if you have the strcasecmp function.  */
-/* #undef HAVE_STRCASECMP */
+#define HAVE_STRCASECMP 1
 
 /* Define if you have the strcoll function.  */
-/* #undef HAVE_STRCOLL */
+#define HAVE_STRCOLL 1
 
 /* #undef STRCOLL_BROKEN */
 
 /* Define if you have the strpbrk function.  */
-/* #undef HAVE_STRPBRK */
+#define HAVE_STRPBRK 1
 
 /* Define if you have the sysconf function.  */
-/* #undef HAVE_SYSCONF */
+#define HAVE_SYSCONF 1
 
 /* Define if you have the tcgetattr function.  */
-/* #undef HAVE_TCGETATTR */
+#define HAVE_TCGETATTR 1
 
 /* Define if you have the tcgetwinsize function.  */
 /* #undef HAVE_TCGETWINSIZE */
@@ -174,46 +174,46 @@
 /* #undef HAVE_TOWUPPER */
 
 /* Define if you have the vsnprintf function.  */
-/* #undef HAVE_VSNPRINTF */
+#define HAVE_VSNPRINTF 1
 
 /* Define if you have the wcrtomb function.  */
-/* #undef HAVE_WCRTOMB */
+#define HAVE_WCRTOMB 1
 
 /* Define if you have the wcscoll function.  */
-/* #undef HAVE_WCSCOLL */
+#define HAVE_WCSCOLL 1
 
 /* #undef HAVE_WCSLEN */
 /* #undef HAVE_WCSNLEN */
 
 /* Define if you have the wcsnrtombs function.  */
-/* #undef HAVE_WCSNRTOMBS */
+#define HAVE_WCSNRTOMBS 1
 
 /* Define if you have the wctype function.  */
 /* #undef HAVE_WCTYPE */
 
 /* Define if you have the wcwidth function.  */
-/* #undef HAVE_WCWIDTH */
+#define HAVE_WCWIDTH 1
 
 /* and whether it works */
 /* #undef WCWIDTH_BROKEN */
 
 /* Define if you have the <dirent.h> header file.  */
-/* #undef HAVE_DIRENT_H */
+#define HAVE_DIRENT_H 1
 
 /* Define if you have the <fcntl.h> header file.  */
-/* #undef HAVE_FCNTL_H */
+#define HAVE_FCNTL_H 1
 
 /* Define if you have the <langinfo.h> header file.  */
-/* #undef HAVE_LANGINFO_H */
+#define HAVE_LANGINFO_H 1
 
 /* Define if you have the <libaudit.h> header file.  */
 /* #undef HAVE_LIBAUDIT_H */
 
 /* Define if you have the <limits.h> header file.  */
-/* #undef HAVE_LIMITS_H */
+#define HAVE_LIMITS_H 1
 
 /* Define if you have the <locale.h> header file.  */
-/* #undef HAVE_LOCALE_H */
+#define HAVE_LOCALE_H 1
 
 /* Define if you have the <memory.h> header file.  */
 /* #undef HAVE_MEMORY_H */
@@ -225,22 +225,22 @@
 /* #undef HAVE_NCURSES_TERMCAP_H */
 
 /* Define if you have the <pwd.h> header file.  */
-/* #undef HAVE_PWD_H */
+#define HAVE_PWD_H 1
 
 /* Define if you have the <stdarg.h> header file.  */
-/* #undef HAVE_STDARG_H */
+#define HAVE_STDARG_H 1
 
 /* Define if you have the <stdbool.h> header file.  */
-/* #undef HAVE_STDBOOL_H */
+#define HAVE_STDBOOL_H 1
 
 /* Define if you have the <stdlib.h> header file.  */
-/* #undef HAVE_STDLIB_H */
+#define HAVE_STDLIB_H 1
 
 /* Define if you have the <string.h> header file.  */
-/* #undef HAVE_STRING_H */
+#define HAVE_STRING_H 1
 
 /* Define if you have the <strings.h> header file.  */
-/* #undef HAVE_STRINGS_H */
+#define HAVE_STRINGS_H 1
 
 /* Define if you have the <sys/dir.h> header file.  */
 /* #undef HAVE_SYS_DIR_H */
@@ -249,7 +249,7 @@
 /* #undef HAVE_SYS_FILE_H */
 
 /* Define if you have the <sys/ioctl.h> header file.  */
-/* #undef HAVE_SYS_IOCTL_H */
+#define HAVE_SYS_IOCTL_H 1
 
 /* Define if you have the <sys/ndir.h> header file.  */
 /* #undef HAVE_SYS_NDIR_H */
@@ -261,51 +261,51 @@
 /* #undef HAVE_SYS_PTEM_H */
 
 /* Define if you have the <sys/select.h> header file.  */
-/* #undef HAVE_SYS_SELECT_H */
+#define HAVE_SYS_SELECT_H 1
 
 /* Define if you have the <sys/stream.h> header file.  */
 /* #undef HAVE_SYS_STREAM_H */
 
 /* Define if you have the <sys/time.h> header file.  */
-/* #undef HAVE_SYS_TIME_H */
+#define HAVE_SYS_TIME_H 1
 
 /* Define if you have the <termcap.h> header file.  */
-/* #undef HAVE_TERMCAP_H */
+#define HAVE_TERMCAP_H 1
 
 /* Define if you have the <termio.h> header file.  */
 /* #undef HAVE_TERMIO_H */
 
 /* Define if you have the <termios.h> header file.  */
-/* #undef HAVE_TERMIOS_H */
+#define HAVE_TERMIOS_H 1
 
 /* Define if you have the <unistd.h> header file.  */
-/* #undef HAVE_UNISTD_H */
+#define HAVE_UNISTD_H 1
 
 /* Define if you have the <varargs.h> header file.  */
 /* #undef HAVE_VARARGS_H */
 
 /* Define if you have the <wchar.h> header file.  */
-/* #undef HAVE_WCHAR_H */
+#define HAVE_WCHAR_H 1
 
 /* Define if you have the <wctype.h> header file.  */
-/* #undef HAVE_WCTYPE_H */
+#define HAVE_WCTYPE_H 1
 
 /* #undef HAVE_MBSTATE_T */
 
 /* Define if you have wchar_t in <wctype.h>. */
-/* #undef HAVE_WCHAR_T */
+#define HAVE_WCHAR_T 1
 
 /* Define if you have wctype_t in <wctype.h>. */
-/* #undef HAVE_WCTYPE_T */
+#define HAVE_WCTYPE_T 1
 
 /* Define if you have wint_t in <wctype.h>. */  
-/* #undef HAVE_WINT_T */
+#define HAVE_WINT_T 1
 
 /* Define if you have <langinfo.h> and nl_langinfo(CODESET). */
 /* #undef HAVE_LANGINFO_CODESET */
 
 /* Define if you have <linux/audit.h> and it defines AUDIT_USER_TTY */
-/* #undef HAVE_DECL_AUDIT_USER_TTY */
+#define HAVE_DECL_AUDIT_USER_TTY 0
 
 /* Definitions pulled in from aclocal.m4. */
 /* #undef GWINSZ_IN_SYS_IOCTL */
@@ -316,27 +316,27 @@
 
 /* #undef TIOCSTAT_IN_SYS_IOCTL */
 
-/* #undef FIONREAD_IN_SYS_IOCTL */
+#define FIONREAD_IN_SYS_IOCTL 1
 
 /* #undef SPEED_T_IN_SYS_TYPES */
 
-/* #undef HAVE_GETPW_DECLS */
+#define HAVE_GETPW_DECLS 1
 
-/* #undef HAVE_STRUCT_DIRENT_D_INO */
+#define HAVE_STRUCT_DIRENT_D_INO 1
 
 /* #undef HAVE_STRUCT_DIRENT_D_FILENO */
 
 /* #undef HAVE_STRUCT_DIRENT_D_NAMLEN */
 
-/* #undef HAVE_TIMEVAL */
+#define HAVE_TIMEVAL 1
 
 /* #undef HAVE_BSD_SIGNALS */
 
-/* #undef HAVE_POSIX_SIGNALS */
+#define HAVE_POSIX_SIGNALS 1
 
 /* #undef HAVE_USG_SIGHOLD */
 
-/* #undef MUST_REINSTALL_SIGHANDLERS */
+#define MUST_REINSTALL_SIGHANDLERS 1
 
 /* #undef HAVE_POSIX_SIGSETJMP */
 
