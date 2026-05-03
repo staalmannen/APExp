@@ -464,7 +464,7 @@ research(Regexp *rp, char *str, int start,
 
 		rp->pat.not_bol = 0;
 	} else {
-		int match_count = 0;
+		size_t match_count = 0;
 
 		if (need_sub)
 			match_count = rp->mre_pat.re_nsub + 1;
