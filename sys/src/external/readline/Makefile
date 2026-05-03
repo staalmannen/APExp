@@ -29,7 +29,7 @@ PACKAGE_VERSION = 8.3
 PACKAGE_TARNAME = readline
 
 srcdir = .
-VPATH = .
+
 top_srcdir = .
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/readline
 

@@ -3,89 +3,89 @@
 
 /* Define to 1 if you have the declaration of 'pledge', and to 0 if you don't.
    */
-/* #undef HAVE_DECL_PLEDGE */
+#define HAVE_DECL_PLEDGE 0
 
 /* Define to 1 if you have the declaration of 'reallocarray', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_REALLOCARRAY */
+#define HAVE_DECL_REALLOCARRAY 1
 
 /* Define to 1 if you have the declaration of 'strlcat', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_STRLCAT */
+#define HAVE_DECL_STRLCAT 1
 
 /* Define to 1 if you have the declaration of 'strlcpy', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_STRLCPY */
+#define HAVE_DECL_STRLCPY 1
 
 /* Define to 1 if you have the declaration of 'strndup', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_STRNDUP */
+#define HAVE_DECL_STRNDUP 1
 
 /* Define to 1 if you have the declaration of 'unveil', and to 0 if you don't.
    */
-/* #undef HAVE_DECL_UNVEIL */
+#define HAVE_DECL_UNVEIL 0
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
-/* #undef HAVE_DLFCN_H */
+#define HAVE_DLFCN_H 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */
-/* #undef HAVE_INTTYPES_H */
+#define HAVE_INTTYPES_H 1
 
 /* Define to 1 if you have the <stdint.h> header file. */
-/* #undef HAVE_STDINT_H */
+#define HAVE_STDINT_H 1
 
 /* Define to 1 if you have the <stdio.h> header file. */
-/* #undef HAVE_STDIO_H */
+#define HAVE_STDIO_H 1
 
 /* Define to 1 if you have the <stdlib.h> header file. */
-/* #undef HAVE_STDLIB_H */
+#define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the <strings.h> header file. */
-/* #undef HAVE_STRINGS_H */
+#define HAVE_STRINGS_H 1
 
 /* Define to 1 if you have the <string.h> header file. */
-/* #undef HAVE_STRING_H */
+#define HAVE_STRING_H 1
 
 /* Define to 1 if you have the <sys/stat.h> header file. */
-/* #undef HAVE_SYS_STAT_H */
+#define HAVE_SYS_STAT_H 1
 
 /* Define to 1 if you have the <sys/types.h> header file. */
-/* #undef HAVE_SYS_TYPES_H */
+#define HAVE_SYS_TYPES_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
-/* #undef HAVE_UNISTD_H */
+#define HAVE_UNISTD_H 1
 
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
-/* #undef LT_OBJDIR */
+#define LT_OBJDIR ".libs/"
 
 /* Name of package */
-/* #undef PACKAGE */
+#define PACKAGE "pkgconf"
 
 /* Define to the address where bug reports for this package should be sent. */
-/* #undef PACKAGE_BUGREPORT */
+#define PACKAGE_BUGREPORT "https://github.com/pkgconf/pkgconf/issues/new"
 
 /* Define to the full name of this package. */
-/* #undef PACKAGE_NAME */
+#define PACKAGE_NAME "pkgconf"
 
 /* Define to the full name and version of this package. */
-/* #undef PACKAGE_STRING */
+#define PACKAGE_STRING "pkgconf 2.5.1"
 
 /* Define to the one symbol short name of this package. */
-/* #undef PACKAGE_TARNAME */
+#define PACKAGE_TARNAME "pkgconf"
 
 /* Define to the home page for this package. */
-/* #undef PACKAGE_URL */
+#define PACKAGE_URL ""
 
 /* Define to the version of this package. */
-/* #undef PACKAGE_VERSION */
+#define PACKAGE_VERSION "2.5.1"
 
 /* Define to 1 if all of the C89 standard headers exist (not just the ones
    required in a freestanding environment). This macro is provided for
    backward compatibility; new code need not use it. */
-/* #undef STDC_HEADERS */
+#define STDC_HEADERS 1
 
 /* Version number of package */
-/* #undef VERSION */
+#define VERSION "2.5.1"
 
 /* Number of bits in a file offset, on hosts where this is settable. */
 /* #undef _FILE_OFFSET_BITS */

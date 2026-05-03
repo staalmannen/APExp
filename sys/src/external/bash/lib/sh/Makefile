@@ -26,7 +26,7 @@ PACKAGE_STRING = bash 5.3-release
 PACKAGE_VERSION = 5.3-release
 
 srcdir = .
-VPATH = .
+
 topdir = ../..
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
 

@@ -36,7 +36,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA
 #
-VPATH = .
+
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -180,7 +180,7 @@ ECHO_T =
 EGREP = /bin/grep -E
 ETAGS = etags
 EXEEXT = 
-GAWKLIBEXT = 
+GAWKLIBEXT = so
 GETTEXT_MACRO_VERSION = 0.20
 GMSGFMT = /bin/msgfmt
 GMSGFMT_015 = /bin/msgfmt
@@ -238,7 +238,7 @@ abs_top_builddir = /usr/glenda/APExp/sys/src/external/gawk
 abs_top_srcdir = /usr/glenda/APExp/sys/src/external/gawk
 ac_ct_AR = ar
 ac_ct_CC = 
-acl_shlibext = 
+acl_shlibext = so
 am__include = include
 am__leading_dot = .
 am__quote = 

@@ -102,7 +102,7 @@ configure:3905: result: o
 configure:3909: checking whether the compiler supports GNU C
 configure:3929: cc -c   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/readline/conftest.c:14[stdin:15] syntax error, last name: me
-cc: cpp: 6c 114640: error
+cc: cpp: 6c 80938: error
 configure:3929: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -131,12 +131,12 @@ configure:3973: $? = 0
 configure:4020: result: yes
 configure:4040: checking for cc option to enable C11 features
 configure:4055: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:184[stdin:264] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:184[stdin:286] syntax error, last name: __func__$9
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
 cpp: conftest.c:180 #error directive: "Compiler does not advertise C11 conformance"
-cc: 6c: cpp 114673: errors
+cc: 6c: cpp 80971: errors
 configure:4055: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -427,7 +427,7 @@ configure: failed program was:
 | }
 | 
 configure:4055: cc -std=gnu11 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:184[stdin:264] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:184[stdin:286] syntax error, last name: __func__$9
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -439,7 +439,7 @@ cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformanc
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
 cpp: conftest.c:180 #error directive: "Compiler does not advertise C11 conformance"
-cc: 6c: cpp 114687: errors
+cc: 6c: cpp 80985: errors
 configure:4055: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -732,11 +732,11 @@ configure: failed program was:
 configure:4069: result: unsupported
 configure:4089: checking for cc option to enable C99 features
 configure:4104: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 114707: errors
+cc: 6c: cpp 81005: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -967,7 +967,7 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -std=gnu99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -978,7 +978,7 @@ cc: flag -9 ignored
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 114721: errors
+cc: 6c: cpp 81019: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1209,7 +1209,7 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -std=c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -1218,7 +1218,7 @@ cc: flag -9 ignored
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 114735: errors
+cc: 6c: cpp 81033: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1449,13 +1449,13 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -9 ignored
 cc: flag -9 ignored
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 114749: errors
+cc: 6c: cpp 81047: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1686,13 +1686,13 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -qlanglvl=extc1x -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -q ignored
 cc: can't find library for -l
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 114763: errors
+cc: 6c: cpp 81061: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1923,13 +1923,13 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -qlanglvl=extc99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -q ignored
 cc: can't find library for -l
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 114777: errors
+cc: 6c: cpp 81075: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2160,14 +2160,14 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -AC99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -C ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 114791: errors
+cc: 6c: cpp 81089: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2398,11 +2398,11 @@ configure: failed program was:
 | }
 | 
 configure:4104: cc -D_STDC_C99= -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 114805: errors
+cc: 6c: cpp 81103: errors
 configure:4104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2679,9 +2679,10 @@ configure:4197: $? = 0
 configure:4197: result: yes
 configure:4197: checking for minix/config.h
 configure:4197: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: mbs
+<eof> not a function
+<eof> syntax error, last name: exter
 cpp: conftest.c:47 Could not find include file <minix/config.h>
-cc: 6c: cpp 114979: error
+cc: 6c: cpp 81278: error
 configure:4197: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2768,8 +2769,8 @@ configure:4927: checking for size_t
 configure:4927: cc -c -g  conftest.c >&5
 configure:4927: $? = 0
 configure:4927: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:70[stdin:4743] syntax error, last name: size_t
-cc: cpp: 6c 115138: error
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:70[stdin:4918] syntax error, last name: size_t
+cc: cpp: 6c 81437: error
 configure:4927: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2851,8 +2852,8 @@ configure:4938: checking for ssize_t
 configure:4938: cc -c -g  conftest.c >&5
 configure:4938: $? = 0
 configure:4938: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:70[stdin:4743] syntax error, last name: ssize_t
-cc: cpp: 6c 115166: error
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:70[stdin:4918] syntax error, last name: ssize_t
+cc: cpp: 6c 81465: error
 configure:4938: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2934,8 +2935,8 @@ configure:4950: checking for mode_t
 configure:4950: cc -c -g  conftest.c >&5
 configure:4950: $? = 0
 configure:4950: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:70[stdin:4743] syntax error, last name: mode_t
-cc: cpp: 6c 115194: error
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:70[stdin:4918] syntax error, last name: mode_t
+cc: cpp: 6c 81493: error
 configure:4950: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3044,7 +3045,7 @@ configure:5212: result: yes
 configure:5218: checking for pselect
 configure:5218: cc -o conftest -g   conftest.c  >&5
 main: undefined: pselect in main
-cc: 6l: 6l 115327: error
+cc: 6l: 6l 81626: error
 configure:5218: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3133,7 +3134,7 @@ configure:5230: result: yes
 configure:5236: checking for setitimer
 configure:5236: cc -o conftest -g   conftest.c  >&5
 main: undefined: setitimer in main
-cc: 6l: 6l 115380: error
+cc: 6l: 6l 81679: error
 configure:5236: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3252,7 +3253,7 @@ configure:5291: result: yes
 configure:5297: checking for tcgetwinsize
 configure:5297: cc -o conftest -g   conftest.c  >&5
 main: undefined: tcgetwinsize in main
-cc: 6l: 6l 115545: error
+cc: 6l: 6l 81844: error
 configure:5297: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3344,7 +3345,7 @@ configure:5297: result: no
 configure:5303: checking for tcsetwinsize
 configure:5303: cc -o conftest -g   conftest.c  >&5
 main: undefined: tcsetwinsize in main
-cc: 6l: 6l 115566: error
+cc: 6l: 6l 81865: error
 configure:5303: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3440,7 +3441,7 @@ configure:5309: result: yes
 configure:5316: checking for isascii
 configure:5316: cc -o conftest -g   conftest.c  >&5
 main: undefined: isascii in main
-cc: 6l: 6l 115603: error
+cc: 6l: 6l 81902: error
 configure:5316: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3550,8 +3551,8 @@ configure:5349: checking for uid_t
 configure:5349: cc -c -g  conftest.c >&5
 configure:5349: $? = 0
 configure:5349: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:91[stdin:4764] syntax error, last name: uid_t
-cc: cpp: 6c 115694: error
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:91[stdin:4939] syntax error, last name: uid_t
+cc: cpp: 6c 81993: error
 configure:5349: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3654,8 +3655,8 @@ configure:5360: checking for gid_t
 configure:5360: cc -c -g  conftest.c >&5
 configure:5360: $? = 0
 configure:5360: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:91[stdin:4764] syntax error, last name: gid_t
-cc: cpp: 6c 115722: error
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:91[stdin:4939] syntax error, last name: gid_t
+cc: cpp: 6c 82021: error
 configure:5360: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3886,10 +3887,9 @@ configure:5498: checking for stdlib.h
 configure:5498: result: yes
 configure:5504: checking for varargs.h
 configure:5504: cc -c -g  conftest.c >&5
-<eof> not a function
-<eof> syntax error, last name: wc
+<eof> syntax error, last name: wchar_t
 cpp: conftest.c:92 Could not find include file <varargs.h>
-cc: 6c: cpp 115810: error
+cc: 6c: cpp 82109: error
 configure:5504: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4012,9 +4012,9 @@ configure:5546: result: yes
 configure:5552: checking for memory.h
 configure:5552: cc -c -g  conftest.c >&5
 <eof> not a function
-<eof> syntax error, last name: si
+<eof> syntax error, last name: wc
 cpp: conftest.c:99 Could not find include file <memory.h>
-cc: 6c: cpp 115911: error
+cc: 6c: cpp 82210: error
 configure:5552: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4127,8 +4127,9 @@ configure:5564: $? = 0
 configure:5564: result: yes
 configure:5570: checking for termio.h
 configure:5570: cc -c -g  conftest.c >&5
+<eof> syntax error, last name: extern
 cpp: conftest.c:101 Could not find include file <termio.h>
-cc: 6c: cpp 115958: error
+cc: 6c: cpp 82257: error
 configure:5570: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4239,8 +4240,9 @@ configure:5577: $? = 0
 configure:5577: result: yes
 configure:5583: checking for sys/pte.h
 configure:5583: cc -c -g  conftest.c >&5
+<eof> syntax error, last name: extern
 cpp: conftest.c:102 Could not find include file <sys/pte.h>
-cc: 6c: cpp 115991: error
+cc: 6c: cpp 82290: error
 configure:5583: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4348,8 +4350,9 @@ configure: failed program was:
 configure:5583: result: no
 configure:5589: checking for sys/stream.h
 configure:5589: cc -c -g  conftest.c >&5
+<eof> syntax error, last name: extern
 cpp: conftest.c:102 Could not find include file <sys/stream.h>
-cc: 6c: cpp 116010: error
+cc: 6c: cpp 82309: error
 configure:5589: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4470,7 +4473,7 @@ configure:5607: result: yes
 configure:5615: checking for sys/ptem.h
 configure:5615: cc -c -g  conftest.c >&5
 cpp: conftest.c:83 Could not find include file <sys/ptem.h>
-cc: 6c: cpp 116071: error
+cc: 6c: cpp 82370: error
 configure:5615: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4561,8 +4564,8 @@ configure:5635: checking for cc option to enable large file support
 configure:5670: cc -c -g  conftest.c >&5
 configure:5670: $? = 0
 configure:5676: cc -DFTYPE=ino_t -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:86[stdin:217] array size must be a positive constant
-cc: cpp: 6c 116096: error
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:86[stdin:266] array size must be a positive constant
+cc: cpp: 6c 82395: error
 configure:5676: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4661,8 +4664,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:5681: cc -DFTYPE=ino_t -D_FILE_OFFSET_BITS=64 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:86[stdin:217] array size must be a positive constant
-cc: cpp: 6c 116109: error
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:86[stdin:266] array size must be a positive constant
+cc: cpp: 6c 82408: error
 configure:5681: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4775,7 +4778,7 @@ configure:6032: checking for presence of POSIX-style sigsetjmp/siglongjmp
 configure:6102: cc -o conftest -g   conftest.c  >&5
 configure:6102: $? = 0
 configure:6102: ./conftest
-conftest 116170: suicide: sys: trap: fault read addr=0x0 pc=0x20c88f
+conftest 82469: suicide: sys: trap: fault read addr=0x0 pc=0x20c9a1
 configure:6102: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -5039,7 +5042,7 @@ configure:6269: cc -E  conftest.c
 configure:6269: $? = 0
 configure:6285: cc -E  conftest.c
 cpp: conftest.c:79 Could not find include file <ac_nonexistent.h>
-cc: cpp: cpp 116229: error
+cc: cpp: cpp 82528: error
 configure:6285: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5126,7 +5129,7 @@ configure:6328: cc -E  conftest.c
 configure:6328: $? = 0
 configure:6344: cc -E  conftest.c
 cpp: conftest.c:79 Could not find include file <ac_nonexistent.h>
-cc: cpp: cpp 116251: error
+cc: cpp: cpp 82550: error
 configure:6344: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5224,8 +5227,8 @@ configure:6635: $? = 0
 configure:6646: result: yes
 configure:6700: checking for TIOCSTAT in sys/ioctl.h
 configure:6719: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:87[stdin:253] name not declared: TIOCSTAT
-cc: cpp: 6c 116317: error
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:87[stdin:302] name not declared: TIOCSTAT
+cc: cpp: 6c 82617: error
 configure:6719: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5325,8 +5328,8 @@ configure:6757: $? = 0
 configure:6769: result: yes
 configure:6776: checking for speed_t in sys/types.h
 configure:6793: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:86[stdin:219] syntax error, last name: x
-cc: cpp: 6c 116350: error
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:86[stdin:268] syntax error, last name: x
+cc: cpp: 6c 82650: error
 configure:6793: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5424,7 +5427,7 @@ configure:6839: cc -c -g  conftest.c >&5
 configure:6839: $? = 0
 configure:6873: cc -c -g  conftest.c >&5
 cpp: conftest.c:84 Could not find include file <sys/termios.h>
-cc: 6c: cpp 116379: error
+cc: 6c: cpp 82679: error
 configure:6873: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5529,8 +5532,8 @@ configure:6915: $? = 0
 configure:6915: result: yes
 configure:6948: checking for struct dirent.d_fileno
 configure:6948: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:110[stdin:3144] not a member of struct/union: d_fileno
-cc: cpp: 6c 116412: error
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:110[stdin:3307] not a member of struct/union: d_fileno
+cc: cpp: 6c 82712: error
 configure:6948: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5648,8 +5651,8 @@ configure: failed program was:
 |   return 0;
 | }
 configure:6948: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/readline/conftest.c:110[stdin:3144] not a member of struct/union: d_fileno
-cc: cpp: 6c 116426: error
+/usr/glenda/APExp/sys/src/external/readline/conftest.c:110[stdin:3307] not a member of struct/union: d_fileno
+cc: cpp: 6c 82726: error
 configure:6948: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5773,9 +5776,9 @@ configure:7001: $? = 0
 configure:7013: result: yes
 configure:7021: checking for libaudit.h
 configure:7021: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: mb
+<eof> syntax error, last name: size_
 cpp: conftest.c:113 Could not find include file <libaudit.h>
-cc: 6c: cpp 116461: error
+cc: 6c: cpp 82761: error
 configure:7021: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5895,7 +5898,7 @@ configure:7021: result: no
 configure:7028: checking for cc options needed to detect all undeclared functions
 configure:7050: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/readline/conftest.c:89[stdin:90] name not declared: strchr
-cc: cpp: 6c 116479: error
+cc: cpp: 6c 82779: error
 configure:7050: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5993,10 +5996,10 @@ configure: failed program was:
 configure:7077: cc -c -g   conftest.c >&5
 configure:7077: $? = 0
 configure:7097: result: none needed
-configure:7111: checking whether  is declared
+configure:7111: checking whether AUDIT_USER_TTY is declared
 configure:7111: cc -c -g   conftest.c >&5
 cpp: conftest.c:85 Could not find include file <linux/audit.h>
-cc: 6c: cpp 116510: error
+cc: 6c: cpp 82810: error
 configure:7111: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6088,11 +6091,11 @@ configure: failed program was:
 | int
 | main (void)
 | {
-| #ifndef 
+| #ifndef AUDIT_USER_TTY
 | #ifdef __cplusplus
-|   (void) ;
+|   (void) AUDIT_USER_TTY;
 | #else
-|   (void) ;
+|   (void) AUDIT_USER_TTY;
 | #endif
 | #endif
 | 
@@ -6109,7 +6112,7 @@ configure:7404: result: using libc
 configure:7466: checking for nl_langinfo and CODESET
 configure:7483: cc -o conftest -g   conftest.c  >&5
 /sys/include/ape/langinfo.h:16[stdin:167] syntax error, last name: size_t
-cc: cpp: 6c 116549: error
+cc: cpp: 6c 82849: error
 configure:7483: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6218,9 +6221,9 @@ configure:7520: $? = 0
 configure:7520: result: yes
 configure:7528: checking for mbstr.h
 configure:7528: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: wchar_t
+<eof> syntax error, last name: s
 cpp: conftest.c:117 Could not find include file <mbstr.h>
-cc: 6c: cpp 116604: error
+cc: 6c: cpp 82904: error
 configure:7528: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6348,7 +6351,7 @@ configure:7536: result: yes
 configure:7543: checking for mbscasecmp
 configure:7543: cc -o conftest -g   conftest.c  >&5
 main: undefined: mbscasecmp in main
-cc: 6l: 6l 116640: error
+cc: 6l: 6l 82940: error
 configure:7543: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6475,7 +6478,7 @@ configure:7543: result: no
 configure:7550: checking for mbscmp
 configure:7550: cc -o conftest -g   conftest.c  >&5
 main: undefined: mbscmp in main
-cc: 6l: 6l 116661: error
+cc: 6l: 6l 82961: error
 configure:7550: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6602,7 +6605,7 @@ configure:7550: result: no
 configure:7557: checking for mbsncmp
 configure:7557: cc -o conftest -g   conftest.c  >&5
 main: undefined: mbsncmp in main
-cc: 6l: 6l 116682: error
+cc: 6l: 6l 82982: error
 configure:7557: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6737,7 +6740,7 @@ configure:7571: result: yes
 configure:7579: checking for mbschr
 configure:7579: cc -o conftest -g   conftest.c  >&5
 main: undefined: mbschr in main
-cc: 6l: 6l 116735: error
+cc: 6l: 6l 83035: error
 configure:7579: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6906,7 +6909,7 @@ configure:7706: result: yes
 configure:7712: checking for towlower
 configure:7712: cc -o conftest -g   conftest.c  >&5
 main: undefined: towlower in main
-cc: 6l: 6l 116917: error
+cc: 6l: 6l 83217: error
 configure:7712: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7046,7 +7049,7 @@ configure:7712: result: no
 configure:7718: checking for towupper
 configure:7718: cc -o conftest -g   conftest.c  >&5
 main: undefined: towupper in main
-cc: 6l: 6l 116938: error
+cc: 6l: 6l 83238: error
 configure:7718: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7359,14 +7362,14 @@ generated by GNU Autoconf 2.72.  Invocation command line was
 
 on krypton
 
-config.status:837: creating Makefile
-config.status:837: creating doc/Makefile
-config.status:837: creating examples/Makefile
-config.status:837: creating shlib/Makefile
-config.status:837: creating readline.pc
-config.status:837: creating history.pc
-config.status:837: creating config.h
-config.status:1026: executing stamp-h commands
+config.status:942: creating Makefile
+config.status:942: creating doc/Makefile
+config.status:942: creating examples/Makefile
+config.status:942: creating shlib/Makefile
+config.status:942: creating readline.pc
+config.status:942: creating history.pc
+config.status:942: creating config.h
+config.status:1131: executing stamp-h commands
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -7497,7 +7500,7 @@ ac_cv_prog_cc_c89=
 ac_cv_prog_cc_c99=no
 ac_cv_prog_cc_g=yes
 ac_cv_prog_cc_stdc=
-ac_cv_prog_make__set=yes
+ac_cv_prog_make_make_set=yes
 ac_cv_safe_to_define___extensions__=yes
 ac_cv_search_opendir='none required'
 ac_cv_should_define__xopen_source=no

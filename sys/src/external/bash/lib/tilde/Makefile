@@ -20,7 +20,7 @@
 #   along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 srcdir = .
-VPATH = .
+
 topdir = ../..
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
 

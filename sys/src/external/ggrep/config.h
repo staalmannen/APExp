@@ -1,5 +1,5 @@
 /* config.h.  Generated from config.hin by configure.  */
-/* config.hin. Generated from configure.ac by autoheader.  */ 
+/* config.hin.  Generated from configure.ac by autoheader.  */
 
 /* CPU and C ABI indicator */
 #ifndef __i386__
@@ -138,7 +138,7 @@
 #define BITSIZEOF_SIG_ATOMIC_T 32
 
 /* Define to the number of bits in type 'size_t'. */
-#define BITSIZEOF_SIZE_T 32
+#define BITSIZEOF_SIZE_T 64
 
 /* Define to the number of bits in type 'wchar_t'. */
 #define BITSIZEOF_WCHAR_T 16
@@ -160,10 +160,10 @@
 #define DBL_EXPBIT0_WORD 1
 
 /* Define as the bit index in the word where to find the sign of 'double'. */
-#define DBL_SIGNBIT_BIT 31
+/* #undef DBL_SIGNBIT_BIT */
 
 /* Define as the word index where to find the sign of 'double'. */
-#define DBL_SIGNBIT_WORD 1
+/* #undef DBL_SIGNBIT_WORD */
 
 /* the name of the file descriptor member of DIR */
 /* #undef DIR_FD_MEMBER_NAME */
@@ -183,7 +183,7 @@
 
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
-/* #undef ENABLE_NLS */
+#define ENABLE_NLS 1
 
 /* Define this to 1 if F_DUPFD behavior does not match POSIX */
 #define FCNTL_DUPFD_BUGGY 1
@@ -203,10 +203,10 @@
 #define FLT_EXPBIT0_WORD 0
 
 /* Define as the bit index in the word where to find the sign of 'float'. */
-#define FLT_SIGNBIT_BIT 31
+/* #undef FLT_SIGNBIT_BIT */
 
 /* Define as the word index where to find the sign of 'float'. */
-#define FLT_SIGNBIT_WORD 0
+/* #undef FLT_SIGNBIT_WORD */
 
 /* Define to 1 if fopen() fails to recognize a trailing slash. */
 /* #undef FOPEN_TRAILING_SLASH_BUG */
@@ -876,7 +876,7 @@
 /* #undef HAVE_BP_SYM_H */
 
 /* Define to 1 if you have the 'btowc' function. */
-/* #undef HAVE_BTOWC */
+#define HAVE_BTOWC 1
 
 /* Define to 1 if nanosleep mishandles large arguments. */
 #define HAVE_BUG_BIG_NANOSLEEP 1
@@ -911,23 +911,23 @@
 /* #undef HAVE_CRTDEFS_H */
 
 /* Define to 1 if the alignas and alignof keywords work. */
-/* #undef HAVE_C_ALIGNASOF */
+#define HAVE_C_ALIGNASOF 1
 
 /* Define to 1 if bool, true and false work as per C2023. */
 /* #undef HAVE_C_BOOL */
 
 /* Define to 1 if C nullptr is known to work. */
-/* #undef HAVE_C_NULLPTR */
+#define HAVE_C_NULLPTR 1
 
 /* Define to 1 if the static_assert keyword works. */
-/* #undef HAVE_C_STATIC_ASSERT */
+#define HAVE_C_STATIC_ASSERT 1
 
 /* Define to 1 if C supports variable-length arrays. */
 /* #undef HAVE_C_VARARRAYS */
 
 /* Define if the GNU dcgettext() function is already present or preinstalled.
    */
-/* #undef HAVE_DCGETTEXT */
+#define HAVE_DCGETTEXT 1
 
 /* Define to 1 if you have the declaration of 'alarm', and to 0 if you don't.
    */
@@ -955,11 +955,11 @@
 
 /* Define to 1 if you have the declaration of 'ecvt', and to 0 if you don't.
    */
-#define HAVE_DECL_ECVT 0
+#define HAVE_DECL_ECVT 1
 
 /* Define to 1 if you have the declaration of 'execvpe', and to 0 if you
    don't. */
-#define HAVE_DECL_EXECVPE 0
+#define HAVE_DECL_EXECVPE 1
 
 /* Define to 1 if you have the declaration of 'fchdir', and to 0 if you don't.
    */
@@ -971,7 +971,7 @@
 
 /* Define to 1 if you have the declaration of 'fcvt', and to 0 if you don't.
    */
-#define HAVE_DECL_FCVT 0
+#define HAVE_DECL_FCVT 1
 
 /* Define to 1 if you have the declaration of 'fdopendir', and to 0 if you
    don't. */
@@ -979,11 +979,11 @@
 
 /* Define to 1 if you have the declaration of 'feof_unlocked', and to 0 if you
    don't. */
-#define HAVE_DECL_FEOF_UNLOCKED 0
+#define HAVE_DECL_FEOF_UNLOCKED 1
 
 /* Define to 1 if you have the declaration of 'ferror_unlocked', and to 0 if
    you don't. */
-#define HAVE_DECL_FERROR_UNLOCKED 0
+#define HAVE_DECL_FERROR_UNLOCKED 1
 
 /* Define to 1 if you have the declaration of 'fflush_unlocked', and to 0 if
    you don't. */
@@ -1011,7 +1011,7 @@
 
 /* Define to 1 if you have the declaration of 'gcvt', and to 0 if you don't.
    */
-#define HAVE_DECL_GCVT 0
+#define HAVE_DECL_GCVT 1
 
 /* Define to 1 if you have the declaration of 'getchar_unlocked', and to 0 if
    you don't. */
@@ -1019,7 +1019,7 @@
 
 /* Define to 1 if you have the declaration of 'getc_unlocked', and to 0 if you
    don't. */
-#define HAVE_DECL_GETC_UNLOCKED 0
+#define HAVE_DECL_GETC_UNLOCKED 1
 
 /* Define to 1 if you have the declaration of 'getdtablesize', and to 0 if you
    don't. */
@@ -1079,7 +1079,7 @@
 
 /* Define to 1 if you have the declaration of 'putc_unlocked', and to 0 if you
    don't. */
-#define HAVE_DECL_PUTC_UNLOCKED 0
+#define HAVE_DECL_PUTC_UNLOCKED 1
 
 /* Define to 1 if you have the declaration of 'putw', and to 0 if you don't.
    */
@@ -1123,7 +1123,7 @@
 
 /* Define to 1 if you have the declaration of 'towlower', and to 0 if you
    don't. */
-/* #undef HAVE_DECL_TOWLOWER */
+#define HAVE_DECL_TOWLOWER 1
 
 /* Define to 1 if you have the declaration of 'unsetenv', and to 0 if you
    don't. */
@@ -1135,11 +1135,11 @@
 
 /* Define to 1 if you have the declaration of 'wcsdup', and to 0 if you don't.
    */
-#define HAVE_DECL_WCSDUP 0
+#define HAVE_DECL_WCSDUP 1
 
 /* Define to 1 if you have the declaration of 'wctob', and to 0 if you don't.
    */
-/* #undef HAVE_DECL_WCTOB */
+#define HAVE_DECL_WCTOB 1
 
 /* Define to 1 if you have the declaration of '_putenv', and to 0 if you
    don't. */
@@ -1155,7 +1155,7 @@
 
 /* Define to 1 if you have the declaration of '__fpending', and to 0 if you
    don't. */
-/* #undef HAVE_DECL___FPENDING */
+#define HAVE_DECL___FPENDING 1
 
 /* Define to 1 if you have the <dirent.h> header file. */
 #define HAVE_DIRENT_H 1
@@ -1164,13 +1164,13 @@
 #define HAVE_DIRFD 1
 
 /* Define to 1 if you have the `duplocale' function. */
-/* #undef HAVE_DUPLOCALE */
+#define HAVE_DUPLOCALE 1
 
 /* Define if you have the declaration of environ. */
-/* #undef HAVE_ENVIRON_DECL */
+#define HAVE_ENVIRON_DECL 1
 
 /* Define to 1 if you have the `error' function. */
-/* #undef HAVE_ERROR */
+#define HAVE_ERROR 1
 
 /* Define to 1 if you have the <error.h> header file. */
 #define HAVE_ERROR_H 1
@@ -1198,7 +1198,7 @@
 #define HAVE_FNMATCH_H 1
 
 /* Define to 1 if you have the `freelocale' function. */
-/* #undef HAVE_FREELOCALE */
+#define HAVE_FREELOCALE 1
 
 /* Define if the 'free' function is guaranteed to preserve errno. */
 /* #undef HAVE_FREE_POSIX */
@@ -1234,20 +1234,20 @@
 #define HAVE_GETPROGNAME 1
 
 /* Define to 1 if you have the 'getrlimit' function. */
-/* #undef HAVE_GETRLIMIT */
+#define HAVE_GETRLIMIT 1
 
 /* Define if the GNU gettext() function is already present or preinstalled. */
-/* #undef HAVE_GETTEXT */
+#define HAVE_GETTEXT 1
 
 /* Define to 1 if you have the 'gettimeofday' function. */
 #define HAVE_GETTIMEOFDAY 1
 
 /* Define if the uselocale function exists, may be safely called, and returns
    sufficient information. */
-/* #undef HAVE_GOOD_USELOCALE */
+#define HAVE_GOOD_USELOCALE 1
 
 /* Define if you have the iconv() function and it works. */
-/* #undef HAVE_ICONV */
+#define HAVE_ICONV 1
 
 /* Define to 1 if you have the 'inet_pton' function. */
 /* #undef HAVE_INET_PTON */
@@ -1292,10 +1292,10 @@
 /* #undef HAVE_ISNANL_IN_LIBC */
 
 /* Define to 1 if you have the `iswblank' function. */
-/* #undef HAVE_ISWBLANK */
+#define HAVE_ISWBLANK 1
 
 /* Define to 1 if you have the 'iswcntrl' function. */
-/* #undef HAVE_ISWCNTRL */
+#define HAVE_ISWCNTRL 1
 
 /* Define to 1 if you have the 'iswctype' function. */
 #define HAVE_ISWCTYPE 1
@@ -1316,7 +1316,7 @@
 #define HAVE_LIBPCRE 1
 
 /* Define if you have the libsigsegv library. */
-#define HAVE_LIBSIGSEGV 0
+/* #undef HAVE_LIBSIGSEGV */
 
 /* Define to 1 if you have the <limits.h> header file. */
 #define HAVE_LIMITS_H 1
@@ -1338,11 +1338,11 @@
 
 /* Define to 1 if malloc-like functions do not allocate objects larger than
    PTRDIFF_MAX bytes. */
-#define HAVE_MALLOC_PTRDIFF 1
+/* #undef HAVE_MALLOC_PTRDIFF */
 
 /* Define to 1 if mmap()'s MAP_ANONYMOUS flag is available after including
    config.h and <sys/mman.h>. */
-/* #undef HAVE_MAP_ANONYMOUS */
+#define HAVE_MAP_ANONYMOUS 1
 
 /* Define to 1 if you have the <math.h> header file. */
 #define HAVE_MATH_H 1
@@ -1369,7 +1369,7 @@
 #define HAVE_MEMPCPY 1
 
 /* Define to 1 if you have the 'memrchr' function. */
-/* #undef HAVE_MEMRCHR */
+#define HAVE_MEMRCHR 1
 
 /* Define to 1 if you have the <minix/config.h> header file. */
 /* #undef HAVE_MINIX_CONFIG_H */
@@ -1381,7 +1381,7 @@
 #define HAVE_MINMAX_IN_SYS_PARAM_H 1
 
 /* Define to 1 if you have the 'mprotect' function. */
-#define HAVE_MPROTECT 0
+#define HAVE_MPROTECT 1
 
 /* Define to 1 on MSVC platforms that have the "invalid parameter handler"
    concept. */
@@ -1398,7 +1398,7 @@
 #define HAVE_NETINET_IN_H 1
 
 /* Define to 1 if you have the `newlocale' function. */
-/* #undef HAVE_NEWLOCALE */
+#define HAVE_NEWLOCALE 1
 
 /* Define to 1 if you have the `nl_langinfo' function. */
 #define HAVE_NL_LANGINFO 1
@@ -1459,13 +1459,13 @@
 /* #undef HAVE_RANDOM_R */
 
 /* Define to 1 if you have the 'rawmemchr' function. */
-/* #undef HAVE_RAWMEMCHR */
+#define HAVE_RAWMEMCHR 1
 
 /* Define to 1 if you have the 'readdir' function. */
 #define HAVE_READDIR 1
 
 /* Define to 1 if you have the `reallocarray' function. */
-#define HAVE_REALLOCARRAY 0
+#define HAVE_REALLOCARRAY 1
 
 /* Define to 1 if realloc (..., 0) returns nonnull. */
 #define HAVE_REALLOC_0_NONNULL 1
@@ -1477,7 +1477,7 @@
 #define HAVE_SA_FAMILY_T 1
 
 /* Define to 1 if you have the <sched.h> header file. */
-/* #undef HAVE_SCHED_H */
+#define HAVE_SCHED_H 1
 
 /* Define to 1 if you have the <sdkddkver.h> header file. */
 /* #undef HAVE_SDKDDKVER_H */
@@ -1498,7 +1498,7 @@
 #define HAVE_SETLOCALE 1
 
 /* Define to 1 if you have the 'setrlimit' function. */
-/* #undef HAVE_SETRLIMIT */
+#define HAVE_SETRLIMIT 1
 
 /* Define to 1 if you have the `setstate' function. */
 /* #undef HAVE_SETSTATE */
@@ -1507,7 +1507,7 @@
 #define HAVE_SHUTDOWN 1
 
 /* Define to 1 if you have the 'sigaltstack' function. */
-#define HAVE_SIGALTSTACK 0
+/* #undef HAVE_SIGALTSTACK */
 
 /* Define to 1 if 'sig_atomic_t' is a signed integer type. */
 #define HAVE_SIGNED_SIG_ATOMIC_T 1
@@ -1562,7 +1562,7 @@
 #define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the `stpcpy' function. */
-/* #undef HAVE_STPCPY */
+#define HAVE_STPCPY 1
 
 /* Define to 1 if you have the `strerror_r' function. */
 #define HAVE_STRERROR_R 1
@@ -1587,7 +1587,7 @@
 #define HAVE_STRUCT_DIRENT_D_TYPE 1
 
 /* Define to 1 if 'decimal_point' is a member of 'struct lconv'. */
-#define HAVE_STRUCT_LCONV_DECIMAL_POINT 1
+/* #undef HAVE_STRUCT_LCONV_DECIMAL_POINT */
 
 /* Define to 1 if 'int_p_cs_precedes' is a member of 'struct lconv'. */
 /* #undef HAVE_STRUCT_LCONV_INT_P_CS_PRECEDES */
@@ -1686,7 +1686,7 @@
 #define HAVE_TSEARCH 1
 
 /* Define to 1 if you have the <uchar.h> header file. */
-/* #undef HAVE_UCHAR_H */
+#define HAVE_UCHAR_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
@@ -1704,13 +1704,13 @@
 #define HAVE_UNSIGNED_LONG_LONG_INT 1
 
 /* Define to 1 if you have the `uselocale' function. */
-/* #undef HAVE_USELOCALE */
+#define HAVE_USELOCALE 1
 
 /* Define if you have a global __progname variable */
 /* #undef HAVE_VAR___PROGNAME */
 
 /* Define to 1 if you have the 'vasnprintf' function. */
-/* #undef HAVE_VASNPRINTF */
+#define HAVE_VASNPRINTF 1
 
 /* Define to 1 or 0, depending whether the compiler supports simple visibility
    declarations. */
@@ -1723,10 +1723,10 @@
 #define HAVE_WCRTOMB 1
 
 /* Define to 1 if you have the 'wcslen' function. */
-/* #undef HAVE_WCSLEN */
+#define HAVE_WCSLEN 1
 
 /* Define to 1 if you have the 'wctob' function. */
-/* #undef HAVE_WCTOB */
+#define HAVE_WCTOB 1
 
 /* Define to 1 if you have the <wctype.h> header file. */
 #define HAVE_WCTYPE_H 1
@@ -1748,14 +1748,14 @@
 /* #undef HAVE_WMEMPCPY */
 
 /* Define if the c32rtomb function basically works. */
-/* #undef HAVE_WORKING_C32RTOMB */
+#define HAVE_WORKING_C32RTOMB 1
 
 /* Define to 1 if fstatat (..., 0) works. For example, it does not work in AIX
    7.1. */
-/* #undef HAVE_WORKING_FSTATAT_ZERO_FLAG */
+#define HAVE_WORKING_FSTATAT_ZERO_FLAG 1
 
 /* Define if the mbrtoc32 function basically works. */
-/* #undef HAVE_WORKING_MBRTOC32 */
+#define HAVE_WORKING_MBRTOC32 1
 
 /* Define to 1 if O_NOATIME works. */
 #define HAVE_WORKING_O_NOATIME 0
@@ -1767,7 +1767,7 @@
 /* #undef HAVE_WORKING_SIGALTSTACK */
 
 /* Define if the uselocale function exists and may safely be called. */
-/* #undef HAVE_WORKING_USELOCALE */
+#define HAVE_WORKING_USELOCALE 1
 
 /* Define to 1 if you have the <ws2tcpip.h> header file. */
 /* #undef HAVE_WS2TCPIP_H */
@@ -1783,7 +1783,7 @@
 
 /* Define to 1 if the compiler supports __builtin_expect,
    and to 2 if <builtins.h> does.  */
-/* #undef HAVE___BUILTIN_EXPECT */
+#define HAVE___BUILTIN_EXPECT 1
 #ifndef HAVE___BUILTIN_EXPECT
 # define __builtin_expect(e, c) (e)
 #elif HAVE___BUILTIN_EXPECT == 2
@@ -1908,7 +1908,7 @@
 #define HAVE___INLINE 1
 
 /* Define to 1 if you have the '__xpg_strerror_r' function. */
-/* #undef HAVE___XPG_STRERROR_R */
+#define HAVE___XPG_STRERROR_R 1
 
 /* Define as the bit index in the word where to find bit 0 of the exponent of
    'long double'. */
@@ -1919,10 +1919,10 @@
 
 /* Define as the bit index in the word where to find the sign of 'long
    double'. */
-#define LDBL_SIGNBIT_BIT 31
+/* #undef LDBL_SIGNBIT_BIT */
 
 /* Define as the word index where to find the sign of 'long double'. */
-#define LDBL_SIGNBIT_WORD 1
+/* #undef LDBL_SIGNBIT_WORD */
 
 /* Define if localename.c overrides newlocale(), duplocale(), freelocale(). */
 /* #undef LOCALENAME_ENHANCE_LOCALE_FUNCS */
@@ -1939,15 +1939,15 @@
 
 /* Define if the mbrtoc32 function does not return (size_t) -2 for empty
    input. */
-/* #undef MBRTOC32_EMPTY_INPUT_BUG */
+#define MBRTOC32_EMPTY_INPUT_BUG 1
 
 /* Define if the mbrtoc32 function may signal encoding errors in the C locale.
    */
-/* #undef MBRTOC32_IN_C_LOCALE_MAYBE_EILSEQ */
+#define MBRTOC32_IN_C_LOCALE_MAYBE_EILSEQ 1
 
 /* Define if the mbrtoc32 function does not accept the input bytes one-by-one.
    */
-/* #undef MBRTOC32_MULTIBYTE_LOCALE_BUG */
+#define MBRTOC32_MULTIBYTE_LOCALE_BUG 1
 
 /* Define if the mbrtowc function does not return (size_t) -2 for empty input.
    */
@@ -2097,7 +2097,7 @@
 /* #undef REPLACE_STRERROR_0 */
 
 /* Define if vasnprintf exists but is overridden by gnulib. */
-/* #undef REPLACE_VASNPRINTF */
+#define REPLACE_VASNPRINTF 1
 
 /* Define to 1 if setlocale (LC_ALL, NULL) is multithread-safe. */
 #define SETLOCALE_NULL_ALL_MTSAFE 0
@@ -2122,7 +2122,7 @@
 
 /* Define to l, ll, u, ul, ull, etc., as suitable for constants of type
    'size_t'. */
-#define SIZE_T_SUFFIX ul
+#define SIZE_T_SUFFIX ull
 
 /* Define on Solaris 11 and its derivates. */
 /* #undef SOLARIS11 */
@@ -3406,7 +3406,15 @@
      It is here so that we can cope with an older version of unitypes.h
      that does not contain this definition and that is pre-installed among
      the public header files.  */
+  # if defined __restrict \
+       || 2 < __GNUC__ + (95 <= __GNUC_MINOR__) \
+       || __clang_major__ >= 3
+  #  define _UC_RESTRICT __restrict
+  # elif 199901L <= __STDC_VERSION__ || defined restrict
+  #  define _UC_RESTRICT restrict
+  # else
   #  define _UC_RESTRICT
+  # endif
   
 
 /* Define as a macro for copying va_list variables. */

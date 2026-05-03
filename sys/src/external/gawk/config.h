@@ -6,7 +6,7 @@
 
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
-/* #undef ENABLE_NLS */
+#define ENABLE_NLS 1
 
 /* Define to the type of elements in the array set by `getgroups'. Usually
    this is either `int' or `gid_t'. */
@@ -25,7 +25,7 @@
 #define HAVE_ATEXIT 1
 
 /* Define to 1 if you have the `btowc' function. */
-/* #undef HAVE_BTOWC */
+#define HAVE_BTOWC 1
 
 /* Define to 1 if you have the `c32rtomb' function. */
 #define HAVE_C32RTOMB 1
@@ -49,7 +49,7 @@
 
 /* Define if the GNU dcgettext() function is already present or preinstalled.
    */
-/* #undef HAVE_DCGETTEXT */
+#define HAVE_DCGETTEXT 1
 
 /* Define to 1 if you have the declaration of `tzname', and to 0 if you don't.
    */
@@ -80,7 +80,7 @@
 #define HAVE_GETGROUPS 1
 
 /* Define if the GNU gettext() function is already present or preinstalled. */
-/* #undef HAVE_GETTEXT */
+#define HAVE_GETTEXT 1
 
 /* Define to 1 if you have the `gettimeofday' function. */
 #define HAVE_GETTIMEOFDAY 1
@@ -89,7 +89,7 @@
 /* #undef HAVE_GRANTPT */
 
 /* Do we have history_list? */
-/* #undef HAVE_HISTORY_LIST */
+#define HAVE_HISTORY_LIST 1
 
 /* Define if you have the iconv() function and it works. */
 /* #undef HAVE_ICONV */
@@ -113,10 +113,10 @@
 #define HAVE_LC_MESSAGES 1
 
 /* Define to 1 if you have the <libintl.h> header file. */
-/* #undef HAVE_LIBINTL_H */
+#define HAVE_LIBINTL_H 1
 
 /* Define to 1 if you have a fully functional readline library. */
-/* #undef HAVE_LIBREADLINE */
+#define HAVE_LIBREADLINE 1
 
 /* Define to 1 if you have the <locale.h> header file. */
 #define HAVE_LOCALE_H 1
@@ -185,7 +185,7 @@
 #define HAVE_SOCKETS 1
 
 /* Define to 1 if you have the <spawn.h> header file. */
-/* #undef HAVE_SPAWN_H */
+#define HAVE_SPAWN_H 1
 
 /* Define to 1 if you have the <stdbool.h> header file. */
 #define HAVE_STDBOOL_H 1

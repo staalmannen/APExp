@@ -29,7 +29,7 @@
 #
 topdir = ..
 srcdir = .
-VPATH = .
+
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
 
 RM	= rm -f

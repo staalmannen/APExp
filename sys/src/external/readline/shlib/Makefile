@@ -30,7 +30,7 @@ RL_LIBRARY_NAME = readline
 datarootdir = ${prefix}/share
 
 srcdir = .
-VPATH = ....
+VPATH = ..
 topdir = ..
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/readline
 

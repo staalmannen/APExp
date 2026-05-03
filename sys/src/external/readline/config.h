@@ -67,7 +67,7 @@
 #define HAVE_FCNTL 1
 
 /* Define if you have the fnmatch function. */
-/* #undef HAVE_FNMATCH */
+#define HAVE_FNMATCH 1
 
 /* Define if you have the getpwent function. */
 #define HAVE_GETPWENT 1
@@ -85,13 +85,13 @@
 /* #undef HAVE_ISASCII */
 
 /* Define if you have the iswctype function.  */
-/* #undef HAVE_ISWCTYPE */
+#define HAVE_ISWCTYPE 1
 
 /* Define if you have the iswlower function.  */
-/* #undef HAVE_ISWLOWER */
+#define HAVE_ISWLOWER 1
 
 /* Define if you have the iswupper function.  */
-/* #undef HAVE_ISWUPPER */
+#define HAVE_ISWUPPER 1
 
 /* Define if you have the isxdigit function. */
 #define HAVE_ISXDIGIT 1
@@ -103,10 +103,10 @@
 #define HAVE_LSTAT 1
 
 /* Define if you have the mbrlen function. */
-/* #undef HAVE_MBRLEN */
+#define HAVE_MBRLEN 1
 
 /* Define if you have the mbrtowc function. */
-/* #undef HAVE_MBRTOWC */
+#define HAVE_MBRTOWC 1
 
 /* Define if you have the mbscasecmp function. */
 /* #undef HAVE_MBSCASECMP */
@@ -118,7 +118,7 @@
 /* #undef HAVE_MBSNCMP */
 
 /* Define if you have the mbsrtowcs function. */
-/* #undef HAVE_MBSRTOWCS */
+#define HAVE_MBSRTOWCS 1
 
 /* Define if you have the memmove function. */
 #define HAVE_MEMMOVE 1
@@ -189,7 +189,7 @@
 #define HAVE_WCSNRTOMBS 1
 
 /* Define if you have the wctype function.  */
-/* #undef HAVE_WCTYPE */
+#define HAVE_WCTYPE 1
 
 /* Define if you have the wcwidth function.  */
 #define HAVE_WCWIDTH 1
@@ -246,7 +246,7 @@
 /* #undef HAVE_SYS_DIR_H */
 
 /* Define if you have the <sys/file.h> header file.  */
-/* #undef HAVE_SYS_FILE_H */
+#define HAVE_SYS_FILE_H 1
 
 /* Define if you have the <sys/ioctl.h> header file.  */
 #define HAVE_SYS_IOCTL_H 1
@@ -290,7 +290,7 @@
 /* Define if you have the <wctype.h> header file.  */
 #define HAVE_WCTYPE_H 1
 
-/* #undef HAVE_MBSTATE_T */
+#define HAVE_MBSTATE_T 1
 
 /* Define if you have wchar_t in <wctype.h>. */
 #define HAVE_WCHAR_T 1
@@ -310,7 +310,7 @@
 /* Definitions pulled in from aclocal.m4. */
 /* #undef GWINSZ_IN_SYS_IOCTL */
 
-/* #undef STRUCT_WINSIZE_IN_SYS_IOCTL */
+#define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 
 /* #undef STRUCT_WINSIZE_IN_TERMIOS */
 
@@ -336,7 +336,7 @@
 
 /* #undef HAVE_USG_SIGHOLD */
 
-#define MUST_REINSTALL_SIGHANDLERS 1
+/* #undef MUST_REINSTALL_SIGHANDLERS */
 
 /* #undef HAVE_POSIX_SIGSETJMP */
 

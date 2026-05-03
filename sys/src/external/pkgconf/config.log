@@ -99,7 +99,7 @@ configure:3391: result: o
 configure:3395: checking whether the compiler supports GNU C
 configure:3415: cc -c   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:14[stdin:15] syntax error, last name: me
-cc: cpp: 6c 112179: error
+cc: cpp: 6c 78472: error
 configure:3415: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -128,12 +128,12 @@ configure:3459: $? = 0
 configure:3506: result: yes
 configure:3526: checking for cc option to enable C11 features
 configure:3541: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:184[stdin:264] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:184[stdin:286] syntax error, last name: __func__$9
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
 cpp: conftest.c:180 #error directive: "Compiler does not advertise C11 conformance"
-cc: 6c: cpp 112212: errors
+cc: 6c: cpp 78505: errors
 configure:3541: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -424,7 +424,7 @@ configure: failed program was:
 | }
 | 
 configure:3541: cc -std=gnu11 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:184[stdin:264] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:184[stdin:286] syntax error, last name: __func__$9
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -436,7 +436,7 @@ cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformanc
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
 cpp: conftest.c:180 #error directive: "Compiler does not advertise C11 conformance"
-cc: 6c: cpp 112226: errors
+cc: 6c: cpp 78519: errors
 configure:3541: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -729,11 +729,11 @@ configure: failed program was:
 configure:3555: result: unsupported
 configure:3575: checking for cc option to enable C99 features
 configure:3590: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 112246: errors
+cc: 6c: cpp 78539: errors
 configure:3590: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -964,7 +964,7 @@ configure: failed program was:
 | }
 | 
 configure:3590: cc -std=gnu99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -975,7 +975,7 @@ cc: flag -9 ignored
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 112260: errors
+cc: 6c: cpp 78553: errors
 configure:3590: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1206,7 +1206,7 @@ configure: failed program was:
 | }
 | 
 configure:3590: cc -std=c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -1215,7 +1215,7 @@ cc: flag -9 ignored
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 112274: errors
+cc: 6c: cpp 78568: errors
 configure:3590: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1446,13 +1446,13 @@ configure: failed program was:
 | }
 | 
 configure:3590: cc -c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -9 ignored
 cc: flag -9 ignored
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 112288: errors
+cc: 6c: cpp 78582: errors
 configure:3590: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1683,13 +1683,13 @@ configure: failed program was:
 | }
 | 
 configure:3590: cc -qlanglvl=extc1x -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -q ignored
 cc: can't find library for -l
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 112302: errors
+cc: 6c: cpp 78596: errors
 configure:3590: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1920,13 +1920,13 @@ configure: failed program was:
 | }
 | 
 configure:3590: cc -qlanglvl=extc99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -q ignored
 cc: can't find library for -l
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 112316: errors
+cc: 6c: cpp 78610: errors
 configure:3590: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2157,14 +2157,14 @@ configure: failed program was:
 | }
 | 
 configure:3590: cc -AC99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -C ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 112330: errors
+cc: 6c: cpp 78624: errors
 configure:3590: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2395,11 +2395,11 @@ configure: failed program was:
 | }
 | 
 configure:3590: cc -D_STDC_C99= -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:293] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:108 #error directive: "your preprocessor is broken"
 cpp: conftest.c:112 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 112344: errors
+cc: 6c: cpp 78638: errors
 configure:3590: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2685,7 +2685,7 @@ cc: flag -n ignored
 cc: flag -u ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
-cc: cpp: 6c 112459: error
+cc: cpp: 6c 78754: error
 configure:3971: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2717,7 +2717,7 @@ cc: flag -9 ignored
 cc: flag -9 ignored
 configure:3998: $? = 0
 configure:4018: result: none needed
-configure:4032: checking whether  is declared
+configure:4032: checking whether strlcpy is declared
 configure:4032: cc -c -g -Wall -Wextra -Wformat=2 -std=gnu99   conftest.c >&5
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
@@ -2729,36 +2729,9 @@ cc: flag -n ignored
 cc: flag -u ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
-cpp: conftest.c:14 Syntax error in #ifdef/#ifndef
-cc: 6c: cpp 112494: errors
-configure:4032: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "pkgconf"
-| #define PACKAGE_TARNAME "pkgconf"
-| #define PACKAGE_VERSION "2.5.1"
-| #define PACKAGE_STRING "pkgconf 2.5.1"
-| #define PACKAGE_BUGREPORT "https://github.com/pkgconf/pkgconf/issues/new"
-| #define PACKAGE_URL ""
-| /* end confdefs.h.  */
-| #include <string.h>
-| 
-| int
-| main (void)
-| {
-| #ifndef 
-| #ifdef __cplusplus
-|   (void) ;
-| #else
-|   (void) ;
-| #endif
-| #endif
-| 
-|   ;
-|   return 0;
-| }
-configure:4032: result: no
-configure:4042: checking whether  is declared
+configure:4032: $? = 0
+configure:4032: result: yes
+configure:4042: checking whether strlcat is declared
 configure:4042: cc -c -g -Wall -Wextra -Wformat=2 -std=gnu99   conftest.c >&5
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
@@ -2770,37 +2743,9 @@ cc: flag -n ignored
 cc: flag -u ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
-cpp: conftest.c:15 Syntax error in #ifdef/#ifndef
-cc: 6c: cpp 112518: errors
-configure:4042: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "pkgconf"
-| #define PACKAGE_TARNAME "pkgconf"
-| #define PACKAGE_VERSION "2.5.1"
-| #define PACKAGE_STRING "pkgconf 2.5.1"
-| #define PACKAGE_BUGREPORT "https://github.com/pkgconf/pkgconf/issues/new"
-| #define PACKAGE_URL ""
-| #define HAVE_DECL_STRLCPY 0
-| /* end confdefs.h.  */
-| #include <string.h>
-| 
-| int
-| main (void)
-| {
-| #ifndef 
-| #ifdef __cplusplus
-|   (void) ;
-| #else
-|   (void) ;
-| #endif
-| #endif
-| 
-|   ;
-|   return 0;
-| }
-configure:4042: result: no
-configure:4052: checking whether  is declared
+configure:4042: $? = 0
+configure:4042: result: yes
+configure:4052: checking whether strndup is declared
 configure:4052: cc -c -g -Wall -Wextra -Wformat=2 -std=gnu99   conftest.c >&5
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
@@ -2812,39 +2757,11 @@ cc: flag -n ignored
 cc: flag -u ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
-cpp: conftest.c:16 Syntax error in #ifdef/#ifndef
-cc: 6c: cpp 112542: errors
-configure:4052: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "pkgconf"
-| #define PACKAGE_TARNAME "pkgconf"
-| #define PACKAGE_VERSION "2.5.1"
-| #define PACKAGE_STRING "pkgconf 2.5.1"
-| #define PACKAGE_BUGREPORT "https://github.com/pkgconf/pkgconf/issues/new"
-| #define PACKAGE_URL ""
-| #define HAVE_DECL_STRLCPY 0
-| #define HAVE_DECL_STRLCAT 0
-| /* end confdefs.h.  */
-| #include <string.h>
-| 
-| int
-| main (void)
-| {
-| #ifndef 
-| #ifdef __cplusplus
-|   (void) ;
-| #else
-|   (void) ;
-| #endif
-| #endif
-| 
-|   ;
-|   return 0;
-| }
-configure:4052: result: no
-configure:4063: checking whether  is declared
+configure:4052: $? = 0
+configure:4052: result: yes
+configure:4063: checking whether pledge is declared
 configure:4063: cc -c -g -Wall -Wextra -Wformat=2 -std=gnu99   conftest.c >&5
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:21[stdin:762] name not declared: pledge
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
@@ -2855,8 +2772,7 @@ cc: flag -n ignored
 cc: flag -u ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
-cpp: conftest.c:17 Syntax error in #ifdef/#ifndef
-cc: 6c: cpp 112566: errors
+cc: cpp: 6c 78855: error
 configure:4063: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2866,20 +2782,20 @@ configure: failed program was:
 | #define PACKAGE_STRING "pkgconf 2.5.1"
 | #define PACKAGE_BUGREPORT "https://github.com/pkgconf/pkgconf/issues/new"
 | #define PACKAGE_URL ""
-| #define HAVE_DECL_STRLCPY 0
-| #define HAVE_DECL_STRLCAT 0
-| #define HAVE_DECL_STRNDUP 0
+| #define HAVE_DECL_STRLCPY 1
+| #define HAVE_DECL_STRLCAT 1
+| #define HAVE_DECL_STRNDUP 1
 | /* end confdefs.h.  */
 | #include <unistd.h>
 | 
 | int
 | main (void)
 | {
-| #ifndef 
+| #ifndef pledge
 | #ifdef __cplusplus
-|   (void) ;
+|   (void) pledge;
 | #else
-|   (void) ;
+|   (void) pledge;
 | #endif
 | #endif
 | 
@@ -2887,8 +2803,9 @@ configure: failed program was:
 |   return 0;
 | }
 configure:4063: result: no
-configure:4073: checking whether  is declared
+configure:4073: checking whether unveil is declared
 configure:4073: cc -c -g -Wall -Wextra -Wformat=2 -std=gnu99   conftest.c >&5
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:22[stdin:763] name not declared: unveil
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
@@ -2899,8 +2816,7 @@ cc: flag -n ignored
 cc: flag -u ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
-cpp: conftest.c:18 Syntax error in #ifdef/#ifndef
-cc: 6c: cpp 112590: errors
+cc: cpp: 6c 78879: error
 configure:4073: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2910,9 +2826,9 @@ configure: failed program was:
 | #define PACKAGE_STRING "pkgconf 2.5.1"
 | #define PACKAGE_BUGREPORT "https://github.com/pkgconf/pkgconf/issues/new"
 | #define PACKAGE_URL ""
-| #define HAVE_DECL_STRLCPY 0
-| #define HAVE_DECL_STRLCAT 0
-| #define HAVE_DECL_STRNDUP 0
+| #define HAVE_DECL_STRLCPY 1
+| #define HAVE_DECL_STRLCAT 1
+| #define HAVE_DECL_STRNDUP 1
 | #define HAVE_DECL_PLEDGE 0
 | /* end confdefs.h.  */
 | #include <unistd.h>
@@ -2920,11 +2836,11 @@ configure: failed program was:
 | int
 | main (void)
 | {
-| #ifndef 
+| #ifndef unveil
 | #ifdef __cplusplus
-|   (void) ;
+|   (void) unveil;
 | #else
-|   (void) ;
+|   (void) unveil;
 | #endif
 | #endif
 | 
@@ -3058,7 +2974,7 @@ cc: flag -9 ignored
 cc: flag -9 ignored
 configure:4088: $? = 0
 configure:4088: result: yes
-configure:4113: checking whether  is declared
+configure:4113: checking whether reallocarray is declared
 configure:4113: cc -c -g -Wall -Wextra -Wformat=2 -std=gnu99   conftest.c >&5
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
@@ -3070,76 +2986,8 @@ cc: flag -n ignored
 cc: flag -u ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
-cpp: conftest.c:55 Syntax error in #ifdef/#ifndef
-cc: 6c: cpp 112777: errors
-configure:4113: $? = 1
-configure: failed program was:
-| /* confdefs.h */
-| #define PACKAGE_NAME "pkgconf"
-| #define PACKAGE_TARNAME "pkgconf"
-| #define PACKAGE_VERSION "2.5.1"
-| #define PACKAGE_STRING "pkgconf 2.5.1"
-| #define PACKAGE_BUGREPORT "https://github.com/pkgconf/pkgconf/issues/new"
-| #define PACKAGE_URL ""
-| #define HAVE_DECL_STRLCPY 0
-| #define HAVE_DECL_STRLCAT 0
-| #define HAVE_DECL_STRNDUP 0
-| #define HAVE_DECL_PLEDGE 0
-| #define HAVE_DECL_UNVEIL 0
-| #define HAVE_STDIO_H 1
-| #define HAVE_STDLIB_H 1
-| #define HAVE_STRING_H 1
-| #define HAVE_INTTYPES_H 1
-| #define HAVE_STDINT_H 1
-| #define HAVE_STRINGS_H 1
-| #define HAVE_SYS_STAT_H 1
-| #define HAVE_SYS_TYPES_H 1
-| #define HAVE_UNISTD_H 1
-| #define STDC_HEADERS 1
-| /* end confdefs.h.  */
-| #include <stddef.h>
-| #ifdef HAVE_STDIO_H
-| # include <stdio.h>
-| #endif
-| #ifdef HAVE_STDLIB_H
-| # include <stdlib.h>
-| #endif
-| #ifdef HAVE_STRING_H
-| # include <string.h>
-| #endif
-| #ifdef HAVE_INTTYPES_H
-| # include <inttypes.h>
-| #endif
-| #ifdef HAVE_STDINT_H
-| # include <stdint.h>
-| #endif
-| #ifdef HAVE_STRINGS_H
-| # include <strings.h>
-| #endif
-| #ifdef HAVE_SYS_TYPES_H
-| # include <sys/types.h>
-| #endif
-| #ifdef HAVE_SYS_STAT_H
-| # include <sys/stat.h>
-| #endif
-| #ifdef HAVE_UNISTD_H
-| # include <unistd.h>
-| #endif
-| int
-| main (void)
-| {
-| #ifndef 
-| #ifdef __cplusplus
-|   (void) ;
-| #else
-|   (void) ;
-| #endif
-| #endif
-| 
-|   ;
-|   return 0;
-| }
-configure:4113: result: no
+configure:4113: $? = 0
+configure:4113: result: yes
 configure:4123: checking for sys/stat.h
 configure:4123: result: yes
 configure:4147: checking for a BSD-compatible install
@@ -3153,7 +3001,8 @@ configure:4432: result: yes
 configure:4599: checking for a race-free mkdir -p
 configure:4642: result: mkdir -p
 configure:4649: checking for gawk
-configure:4682: result: awk
+configure:4670: found /bin/gawk
+configure:4682: result: gawk
 configure:4693: checking whether make sets $(MAKE)
 configure:4717: result: yes
 configure:4739: checking whether make supports the include directive
@@ -3267,8 +3116,7 @@ cc: flag -9 ignored
 cc: flag -9 ignored
 configure:7460: $? = 0
 configure:7464: /bin/nm conftest.o | /bin/sed -n -e 's/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' | /bin/sed '/ __gnu_lto/d' > conftest.nm
-cannot run /bin/sed -n -e 's/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' | /bin/sed '/ __gnu_lto/d'
-configure:7457: cc -c -g -Wall -Wextra -Wformat=2 -std=gnu99  conftest.c >&5
+configure:7530: cc -o conftest -g -Wall -Wextra -Wformat=2 -std=gnu99   conftest.c conftstm.o >&5
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
@@ -3279,10 +3127,8 @@ cc: flag -n ignored
 cc: flag -u ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
-configure:7460: $? = 0
-configure:7464: /bin/nm conftest.o | /bin/sed -n -e 's/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*_\([_A-Za-z][_A-Za-z0-9]*\)$/\1 _\2 \2/p' | /bin/sed '/ __gnu_lto/d' > conftest.nm
-cannot run /bin/sed -n -e 's/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*_\([_A-Za-z][_A-Za-z0-9]*\)$/\1 _\2 \2/p' | /bin/sed '/ __gnu_lto/d'
-configure:7569: result: failed
+configure:7533: $? = 0
+configure:7572: result: ok
 configure:7619: checking for sysroot
 configure:7653: result: no
 configure:7660: checking for a working dd
@@ -3382,7 +3228,7 @@ cc: flag -9 ignored
 cc: flag -9 ignored
 configure:14015: $? = 0
 configure:14021: cc -DFTYPE=ino_t -c -g -Wall -Wextra -Wformat=2 -std=gnu99  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:39[stdin:170] array size must be a positive constant
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:39[stdin:219] array size must be a positive constant
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
@@ -3393,7 +3239,7 @@ cc: flag -n ignored
 cc: flag -u ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
-cc: cpp: 6c 113406: error
+cc: cpp: 6c 79743: error
 configure:14021: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3403,9 +3249,9 @@ configure: failed program was:
 | #define PACKAGE_STRING "pkgconf 2.5.1"
 | #define PACKAGE_BUGREPORT "https://github.com/pkgconf/pkgconf/issues/new"
 | #define PACKAGE_URL ""
-| #define HAVE_DECL_STRLCPY 0
-| #define HAVE_DECL_STRLCAT 0
-| #define HAVE_DECL_STRNDUP 0
+| #define HAVE_DECL_STRLCPY 1
+| #define HAVE_DECL_STRLCAT 1
+| #define HAVE_DECL_STRNDUP 1
 | #define HAVE_DECL_PLEDGE 0
 | #define HAVE_DECL_UNVEIL 0
 | #define HAVE_STDIO_H 1
@@ -3418,7 +3264,7 @@ configure: failed program was:
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_UNISTD_H 1
 | #define STDC_HEADERS 1
-| #define HAVE_DECL_REALLOCARRAY 0
+| #define HAVE_DECL_REALLOCARRAY 1
 | #define HAVE_SYS_STAT_H 1
 | #define PACKAGE "pkgconf"
 | #define VERSION "2.5.1"
@@ -3445,7 +3291,7 @@ configure: failed program was:
 |   return 0;
 | }
 configure:14026: cc -DFTYPE=ino_t -D_FILE_OFFSET_BITS=64 -c -g -Wall -Wextra -Wformat=2 -std=gnu99  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:39[stdin:170] array size must be a positive constant
+/usr/glenda/APExp/sys/src/external/pkgconf/conftest.c:39[stdin:219] array size must be a positive constant
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
 cc: bad option after -W; ignored
@@ -3456,7 +3302,7 @@ cc: flag -n ignored
 cc: flag -u ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
-cc: cpp: 6c 113419: error
+cc: cpp: 6c 79756: error
 configure:14026: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3466,9 +3312,9 @@ configure: failed program was:
 | #define PACKAGE_STRING "pkgconf 2.5.1"
 | #define PACKAGE_BUGREPORT "https://github.com/pkgconf/pkgconf/issues/new"
 | #define PACKAGE_URL ""
-| #define HAVE_DECL_STRLCPY 0
-| #define HAVE_DECL_STRLCAT 0
-| #define HAVE_DECL_STRNDUP 0
+| #define HAVE_DECL_STRLCPY 1
+| #define HAVE_DECL_STRLCAT 1
+| #define HAVE_DECL_STRNDUP 1
 | #define HAVE_DECL_PLEDGE 0
 | #define HAVE_DECL_UNVEIL 0
 | #define HAVE_STDIO_H 1
@@ -3481,7 +3327,7 @@ configure: failed program was:
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_UNISTD_H 1
 | #define STDC_HEADERS 1
-| #define HAVE_DECL_REALLOCARRAY 0
+| #define HAVE_DECL_REALLOCARRAY 1
 | #define HAVE_SYS_STAT_H 1
 | #define PACKAGE "pkgconf"
 | #define VERSION "2.5.1"
@@ -3513,7 +3359,7 @@ configure:14232: cc -E  conftest.c
 configure:14232: $? = 0
 configure:14248: cc -E  conftest.c
 cpp: conftest.c:30 Could not find include file <ac_nonexistent.h>
-cc: cpp: cpp 113446: error
+cc: cpp: cpp 79783: error
 configure:14248: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3523,9 +3369,9 @@ configure: failed program was:
 | #define PACKAGE_STRING "pkgconf 2.5.1"
 | #define PACKAGE_BUGREPORT "https://github.com/pkgconf/pkgconf/issues/new"
 | #define PACKAGE_URL ""
-| #define HAVE_DECL_STRLCPY 0
-| #define HAVE_DECL_STRLCAT 0
-| #define HAVE_DECL_STRNDUP 0
+| #define HAVE_DECL_STRLCPY 1
+| #define HAVE_DECL_STRLCAT 1
+| #define HAVE_DECL_STRNDUP 1
 | #define HAVE_DECL_PLEDGE 0
 | #define HAVE_DECL_UNVEIL 0
 | #define HAVE_STDIO_H 1
@@ -3538,7 +3384,7 @@ configure: failed program was:
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_UNISTD_H 1
 | #define STDC_HEADERS 1
-| #define HAVE_DECL_REALLOCARRAY 0
+| #define HAVE_DECL_REALLOCARRAY 1
 | #define HAVE_SYS_STAT_H 1
 | #define PACKAGE "pkgconf"
 | #define VERSION "2.5.1"
@@ -3551,7 +3397,7 @@ configure:14291: cc -E  conftest.c
 configure:14291: $? = 0
 configure:14307: cc -E  conftest.c
 cpp: conftest.c:30 Could not find include file <ac_nonexistent.h>
-cc: cpp: cpp 113468: error
+cc: cpp: cpp 79805: error
 configure:14307: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3561,9 +3407,9 @@ configure: failed program was:
 | #define PACKAGE_STRING "pkgconf 2.5.1"
 | #define PACKAGE_BUGREPORT "https://github.com/pkgconf/pkgconf/issues/new"
 | #define PACKAGE_URL ""
-| #define HAVE_DECL_STRLCPY 0
-| #define HAVE_DECL_STRLCAT 0
-| #define HAVE_DECL_STRNDUP 0
+| #define HAVE_DECL_STRLCPY 1
+| #define HAVE_DECL_STRLCAT 1
+| #define HAVE_DECL_STRNDUP 1
 | #define HAVE_DECL_PLEDGE 0
 | #define HAVE_DECL_UNVEIL 0
 | #define HAVE_STDIO_H 1
@@ -3576,7 +3422,7 @@ configure: failed program was:
 | #define HAVE_SYS_TYPES_H 1
 | #define HAVE_UNISTD_H 1
 | #define STDC_HEADERS 1
-| #define HAVE_DECL_REALLOCARRAY 0
+| #define HAVE_DECL_REALLOCARRAY 1
 | #define HAVE_SYS_STAT_H 1
 | #define PACKAGE "pkgconf"
 | #define VERSION "2.5.1"
@@ -3645,16 +3491,17 @@ generated by GNU Autoconf 2.72.  Invocation command line was
 
 on krypton
 
-config.status:1073: creating Makefile
-config.status:1073: creating Kyuafile
-config.status:1073: creating libpkgconf.pc
-config.status:1073: creating tests/Kyuafile
-config.status:1073: creating tests/test_env.sh
-config.status:1073: creating libpkgconf/config.h
-config.status:1302: executing depfiles commands
-config.status:1377: cd .       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
-config.status:1384: $? = 0
-config.status:1302: executing libtool commands
+config.status:1100: creating Makefile
+config.status:1100: creating Kyuafile
+config.status:1100: creating libpkgconf.pc
+config.status:1100: creating tests/Kyuafile
+config.status:1100: creating tests/test_env.sh
+config.status:1100: creating libpkgconf/config.h
+config.status:1329: executing depfiles commands
+config.status:1404: cd .       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+make: Nothing to be done for 'am--depfiles'.
+config.status:1411: $? = 0
+config.status:1329: executing libtool commands
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -3684,10 +3531,10 @@ ac_cv_env_host_alias_value=
 ac_cv_env_target_alias_set=
 ac_cv_env_target_alias_value=
 ac_cv_have_decl_pledge=no
-ac_cv_have_decl_reallocarray=no
-ac_cv_have_decl_strlcat=no
-ac_cv_have_decl_strlcpy=no
-ac_cv_have_decl_strndup=no
+ac_cv_have_decl_reallocarray=yes
+ac_cv_have_decl_strlcat=yes
+ac_cv_have_decl_strlcpy=yes
+ac_cv_have_decl_strndup=yes
 ac_cv_have_decl_unveil=no
 ac_cv_header_dlfcn_h=yes
 ac_cv_header_inttypes_h=yes
@@ -3708,7 +3555,7 @@ ac_cv_path_GREP=/bin/grep
 ac_cv_path_SED=/bin/sed
 ac_cv_path_install='/bin/install -c'
 ac_cv_path_lt_DD=/bin/dd
-ac_cv_prog_AWK=awk
+ac_cv_prog_AWK=gawk
 ac_cv_prog_CC=cc
 ac_cv_prog_CPP='cc -E'
 ac_cv_prog_FILECMD=file
@@ -3720,7 +3567,7 @@ ac_cv_prog_cc_c89=
 ac_cv_prog_cc_c99=no
 ac_cv_prog_cc_g=yes
 ac_cv_prog_cc_stdc=
-ac_cv_prog_make__set=yes
+ac_cv_prog_make_make_set=yes
 ac_cv_sys_largefile_opts='none needed'
 am_cv_CC_dependencies_compiler_type=none
 am_cv_filesystem_timestamp_resolution=2
@@ -3748,10 +3595,10 @@ lt_cv_prog_compiler_pic_works=yes
 lt_cv_prog_compiler_static_works=yes
 lt_cv_prog_gnu_ld=no
 lt_cv_sharedlib_from_linklib_cmd='print -r --'
-lt_cv_sys_global_symbol_pipe=
+lt_cv_sys_global_symbol_pipe='/bin/sed -n -e '\''s/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p'\'' | /bin/sed '\''/ __gnu_lto/d'\'
 lt_cv_sys_global_symbol_to_c_name_address='/bin/sed -n -e '\''s/^: \(.*\) .*$/  {"\1", (void *) 0},/p'\'' -e '\''s/^[BCDEGRST][BCDEGRST]* .* \(.*\)$/  {"\1", (void *) \&\1},/p'\'
 lt_cv_sys_global_symbol_to_c_name_address_lib_prefix='/bin/sed -n -e '\''s/^: \(.*\) .*$/  {"\1", (void *) 0},/p'\'' -e '\''s/^[BCDEGRST][BCDEGRST]* .* \(lib.*\)$/  {"\1", (void *) \&\1},/p'\'' -e '\''s/^[BCDEGRST][BCDEGRST]* .* \(.*\)$/  {"lib\1", (void *) \&\1},/p'\'
-lt_cv_sys_global_symbol_to_cdecl=
+lt_cv_sys_global_symbol_to_cdecl='/bin/sed -n -e '\''s/^T .* \(.*\)$/extern int \1();/p'\'' -e '\''s/^[BCDEGRST][BCDEGRST]* .* \(.*\)$/extern char \1;/p'\'
 lt_cv_sys_global_symbol_to_import=
 lt_cv_sys_max_cmd_len=262144
 lt_cv_to_host_file_cmd=func_convert_file_noop
@@ -3775,7 +3622,7 @@ AR='ar'
 AUTOCONF='${SHELL} '\''/usr/glenda/APExp/sys/src/external/pkgconf/missing'\'' autoconf'
 AUTOHEADER='${SHELL} '\''/usr/glenda/APExp/sys/src/external/pkgconf/missing'\'' autoheader'
 AUTOMAKE='${SHELL} '\''/usr/glenda/APExp/sys/src/external/pkgconf/missing'\'' automake-1.17'
-AWK='awk'
+AWK='gawk'
 CC='cc'
 CCDEPMODE='depmode=none'
 CFLAGS='-g -Wall -Wextra -Wformat=2 -std=gnu99'
@@ -3902,9 +3749,9 @@ target_alias=''
 #define PACKAGE_STRING "pkgconf 2.5.1"
 #define PACKAGE_BUGREPORT "https://github.com/pkgconf/pkgconf/issues/new"
 #define PACKAGE_URL ""
-#define HAVE_DECL_STRLCPY 0
-#define HAVE_DECL_STRLCAT 0
-#define HAVE_DECL_STRNDUP 0
+#define HAVE_DECL_STRLCPY 1
+#define HAVE_DECL_STRLCAT 1
+#define HAVE_DECL_STRNDUP 1
 #define HAVE_DECL_PLEDGE 0
 #define HAVE_DECL_UNVEIL 0
 #define HAVE_STDIO_H 1
@@ -3917,7 +3764,7 @@ target_alias=''
 #define HAVE_SYS_TYPES_H 1
 #define HAVE_UNISTD_H 1
 #define STDC_HEADERS 1
-#define HAVE_DECL_REALLOCARRAY 0
+#define HAVE_DECL_REALLOCARRAY 1
 #define HAVE_SYS_STAT_H 1
 #define PACKAGE "pkgconf"
 #define VERSION "2.5.1"

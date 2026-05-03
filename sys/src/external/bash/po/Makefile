@@ -16,7 +16,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-VPATH = .
+
 
 topdir = ..
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
@@ -128,7 +128,7 @@ POTFILES = \
      ../variables.c \
      ../version.c \
      ../xmalloc.c \
-     ../lib/intl/plural.c \
+     ../lib/intl/plural.c
 
 CATALOGS =  en@quot.gmo en@boldquot.gmo af.gmo bg.gmo ca.gmo cs.gmo da.gmo de.gmo el.gmo eo.gmo es.gmo et.gmo fi.gmo fr.gmo ga.gmo gl.gmo hr.gmo hu.gmo id.gmo it.gmo ja.gmo ka.gmo ko.gmo lt.gmo nb.gmo nl.gmo pl.gmo pt.gmo pt_BR.gmo ro.gmo ru.gmo sk.gmo sl.gmo sq.gmo sr.gmo sv.gmo tr.gmo uk.gmo vi.gmo zh_CN.gmo zh_TW.gmo
 

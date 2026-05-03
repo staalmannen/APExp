@@ -65,7 +65,7 @@ topdir = .
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
 top_builddir = /usr/glenda/APExp/sys/src/external/bash
 srcdir = .
-VPATH = .
+
 
 
 CC = cc

@@ -31,7 +31,7 @@ RM	    = rm -f
 
 topdir = ..
 srcdir = .
-VPATH = .
+
 
 prefix = /usr/local
 exec_prefix = ${prefix}

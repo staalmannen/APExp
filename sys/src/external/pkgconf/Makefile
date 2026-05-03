@@ -17,7 +17,7 @@
 
 
 
-VPATH = .
+
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -290,7 +290,7 @@ AR = ar
 AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/pkgconf/missing' autoconf
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/pkgconf/missing' autoheader
 AUTOMAKE = ${SHELL} '/usr/glenda/APExp/sys/src/external/pkgconf/missing' automake-1.17
-AWK = awk
+AWK = gawk
 CC = cc
 CCDEPMODE = depmode=none
 CFLAGS = -g -Wall -Wextra -Wformat=2 -std=gnu99

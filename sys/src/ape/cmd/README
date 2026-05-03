@@ -1,6 +1,6 @@
 
 Current build status:
 
-- updated sources not ported yet: sed, tar, bash
+- updated sources not ported yet: tar, bash
 - weird build bug: patch
 - used to build but not any more: xz/xzdec (new build bug)

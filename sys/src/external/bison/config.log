@@ -114,7 +114,7 @@ configure:6260: result: o
 configure:6264: checking whether the compiler supports GNU C
 configure:6284: cc -c   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/bison/conftest.c:17[stdin:18] syntax error, last name: me
-cc: cpp: 6c 29936: error
+cc: cpp: 6c 727: error
 configure:6284: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -146,12 +146,12 @@ configure:6326: $? = 0
 configure:6370: result: yes
 configure:6390: checking for cc option to enable C11 features
 configure:6405: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/bison/conftest.c:172[stdin:252] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/bison/conftest.c:172[stdin:274] syntax error, last name: __func__$9
 cpp: conftest.c:64 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:95 #error directive: "your preprocessor is broken"
 cpp: conftest.c:99 #error directive: "your preprocessor is broken"
 cpp: conftest.c:168 #error directive: "Compiler does not advertise C11 conformance"
-cc: 6c: cpp 29969: errors
+cc: 6c: cpp 760: errors
 configure:6405: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -428,7 +428,7 @@ configure: failed program was:
 | }
 | 
 configure:6405: cc -std=gnu11 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/bison/conftest.c:172[stdin:252] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/bison/conftest.c:172[stdin:274] syntax error, last name: __func__$9
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -440,7 +440,7 @@ cpp: conftest.c:64 #error directive: "Compiler does not advertise C99 conformanc
 cpp: conftest.c:95 #error directive: "your preprocessor is broken"
 cpp: conftest.c:99 #error directive: "your preprocessor is broken"
 cpp: conftest.c:168 #error directive: "Compiler does not advertise C11 conformance"
-cc: 6c: cpp 29983: errors
+cc: 6c: cpp 774: errors
 configure:6405: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -719,11 +719,11 @@ configure: failed program was:
 configure:6418: result: unsupported
 configure:6436: checking for cc option to enable C99 features
 configure:6451: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:279] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:301] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cpp: conftest.c:64 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:95 #error directive: "your preprocessor is broken"
 cpp: conftest.c:99 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 30003: errors
+cc: 6c: cpp 794: errors
 configure:6451: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -940,7 +940,7 @@ configure: failed program was:
 | }
 | 
 configure:6451: cc -std=gnu99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:279] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:301] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -951,7 +951,7 @@ cc: flag -9 ignored
 cpp: conftest.c:64 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:95 #error directive: "your preprocessor is broken"
 cpp: conftest.c:99 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 30017: errors
+cc: 6c: cpp 808: errors
 configure:6451: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1168,7 +1168,7 @@ configure: failed program was:
 | }
 | 
 configure:6451: cc -std=c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:279] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:301] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -1177,7 +1177,7 @@ cc: flag -9 ignored
 cpp: conftest.c:64 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:95 #error directive: "your preprocessor is broken"
 cpp: conftest.c:99 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 30031: errors
+cc: 6c: cpp 822: errors
 configure:6451: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1394,13 +1394,13 @@ configure: failed program was:
 | }
 | 
 configure:6451: cc -c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:279] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:301] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -9 ignored
 cc: flag -9 ignored
 cpp: conftest.c:64 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:95 #error directive: "your preprocessor is broken"
 cpp: conftest.c:99 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 30045: errors
+cc: 6c: cpp 836: errors
 configure:6451: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1617,13 +1617,13 @@ configure: failed program was:
 | }
 | 
 configure:6451: cc -qlanglvl=extc1x -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:279] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:301] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -q ignored
 cc: can't find library for -l
 cpp: conftest.c:64 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:95 #error directive: "your preprocessor is broken"
 cpp: conftest.c:99 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 30059: errors
+cc: 6c: cpp 850: errors
 configure:6451: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1840,13 +1840,13 @@ configure: failed program was:
 | }
 | 
 configure:6451: cc -qlanglvl=extc99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:279] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:301] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -q ignored
 cc: can't find library for -l
 cpp: conftest.c:64 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:95 #error directive: "your preprocessor is broken"
 cpp: conftest.c:99 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 30073: errors
+cc: 6c: cpp 864: errors
 configure:6451: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2063,14 +2063,14 @@ configure: failed program was:
 | }
 | 
 configure:6451: cc -AC99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:279] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:301] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -C ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
 cpp: conftest.c:64 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:95 #error directive: "your preprocessor is broken"
 cpp: conftest.c:99 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 30087: errors
+cc: 6c: cpp 878: errors
 configure:6451: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2287,11 +2287,11 @@ configure: failed program was:
 | }
 | 
 configure:6451: cc -D_STDC_C99= -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:279] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/bison/conftest.c:199[stdin:301] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cpp: conftest.c:64 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:95 #error directive: "your preprocessor is broken"
 cpp: conftest.c:99 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 30101: errors
+cc: 6c: cpp 892: errors
 configure:6451: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2923,9 +2923,9 @@ configure:7376: $? = 0
 configure:7376: result: yes
 configure:7376: checking for minix/config.h
 configure:7376: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: __func__$4
+<eof> syntax error, last name: size_t
 cpp: conftest.c:50 Could not find include file <minix/config.h>
-cc: 6c: cpp 30493: error
+cc: 6c: cpp 1450: error
 configure:7376: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2993,9 +2993,10 @@ configure:7376: $? = 0
 configure:7376: result: yes
 configure:7376: checking for stdio_ext.h
 configure:7376: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: mbstate_t
+<eof> not a function
+<eof> syntax error, last name: size
 cpp: conftest.c:53 Could not find include file <stdio_ext.h>
-cc: 6c: cpp 30554: error
+cc: 6c: cpp 1511: error
 configure:7376: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3078,9 +3079,10 @@ configure:7376: $? = 0
 configure:7376: result: yes
 configure:7376: checking for crtdefs.h
 configure:7376: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: mbs
+<eof> not a function
+<eof> syntax error, last name: exter
 cpp: conftest.c:59 Could not find include file <crtdefs.h>
-cc: 6c: cpp 30657: error
+cc: 6c: cpp 1614: error
 configure:7376: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3149,9 +3151,10 @@ configure:7376: $? = 0
 configure:7376: result: yes
 configure:7376: checking for threads.h
 configure:7376: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: mb
+<eof> not a function
+<eof> syntax error, last name: exte
 cpp: conftest.c:60 Could not find include file <threads.h>
-cc: 6c: cpp 30690: error
+cc: 6c: cpp 1647: error
 configure:7376: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3253,9 +3256,9 @@ configure:7376: $? = 0
 configure:7376: result: yes
 configure:7376: checking for xlocale.h
 configure:7376: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: s
+<eof> syntax error, last name: __func__$4
 cpp: conftest.c:69 Could not find include file <xlocale.h>
-cc: 6c: cpp 30835: error
+cc: 6c: cpp 1792: error
 configure:7376: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3345,7 +3348,7 @@ configure:7660: cc -E  conftest.c
 configure:7660: $? = 0
 configure:7675: cc -E  conftest.c
 cpp: conftest.c:58 Could not find include file <ac_nonexistent.h>
-cc: cpp: cpp 30923: error
+cc: cpp: cpp 1880: error
 configure:7675: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3411,7 +3414,7 @@ configure:7716: cc -E  conftest.c
 configure:7716: $? = 0
 configure:7731: cc -E  conftest.c
 cpp: conftest.c:58 Could not find include file <ac_nonexistent.h>
-cc: cpp: cpp 30945: error
+cc: cpp: cpp 1902: error
 configure:7731: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3502,7 +3505,7 @@ configure:9188: checking 32-bit host C ABI
 configure:9255: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/bison/conftest.c:61[stdin:62] not a function
 /usr/glenda/APExp/sys/src/external/bison/conftest.c:61[stdin:62] syntax error, last name: fail
-cc: cpp: 6c 31053: error
+cc: cpp: 6c 2010: error
 configure:9255: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3611,7 +3614,7 @@ configure:10252: result: yes
 configure:10252: checking for _set_invalid_parameter_handler
 configure:10252: cc -o conftest -g   conftest.c  >&5
 main: undefined: _set_invalid_parameter_handler in main
-cc: 6l: 6l 31226: error
+cc: 6l: 6l 2183: error
 configure:10252: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3741,7 +3744,7 @@ configure:10252: result: yes
 configure:10252: checking for microuptime
 configure:10252: cc -o conftest -g   conftest.c  >&5
 main: undefined: microuptime in main
-cc: 6l: 6l 31352: error
+cc: 6l: 6l 2309: error
 configure:10252: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3850,7 +3853,7 @@ configure:10252: result: no
 configure:10252: checking for nanouptime
 configure:10252: cc -o conftest -g   conftest.c  >&5
 main: undefined: nanouptime in main
-cc: 6l: 6l 31373: error
+cc: 6l: 6l 2330: error
 configure:10252: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3963,7 +3966,7 @@ configure:10252: result: yes
 configure:10252: checking for getexecname
 configure:10252: cc -o conftest -g   conftest.c  >&5
 main: undefined: getexecname in main
-cc: 6l: 6l 31409: error
+cc: 6l: 6l 2366: error
 configure:10252: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4097,7 +4100,7 @@ configure:10252: result: yes
 configure:10252: checking for isascii
 configure:10252: cc -o conftest -g   conftest.c  >&5
 main: undefined: isascii in main
-cc: 6l: 6l 31520: error
+cc: 6l: 6l 2477: error
 configure:10252: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4261,7 +4264,7 @@ configure:10252: result: yes
 configure:10252: checking for sigaltstack
 configure:10252: cc -o conftest -g   conftest.c  >&5
 main: undefined: sigaltstack in main
-cc: 6l: 6l 31721: error
+cc: 6l: 6l 2678: error
 configure:10252: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4389,7 +4392,7 @@ configure:10252: result: no
 configure:10252: checking for siginterrupt
 configure:10252: cc -o conftest -g   conftest.c  >&5
 main: undefined: siginterrupt in main
-cc: 6l: 6l 31742: error
+cc: 6l: 6l 2699: error
 configure:10252: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4529,7 +4532,7 @@ configure:10252: result: yes
 configure:10252: checking for fdopendir
 configure:10252: cc -o conftest -g   conftest.c  >&5
 main: undefined: fdopendir in main
-cc: 6l: 6l 31808: error
+cc: 6l: 6l 2765: error
 configure:10252: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4664,7 +4667,7 @@ configure:10252: result: yes
 configure:10252: checking for __fseterr
 configure:10252: cc -o conftest -g   conftest.c  >&5
 main: undefined: __fseterr in main
-cc: 6l: 6l 31844: error
+cc: 6l: 6l 2801: error
 configure:10252: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7782,15 +7785,15 @@ configure:13329: result: flex
 configure:13342: checking whether lex is flex
 configure:13359: flex conftest.l
 configure:13363: $? = 1
-/bin/m4: internal error detected; please report this bug to <bug-m4@gnu.org>configure:13371: result: no: 
-Aborted
+configure:13371: result: no
 configure:13375: checking whether flex supports --header=FILE
 configure:13386: flex --header=conftest.h conftest.l
-flex: error fwlrceioxtn:if nteger srotou.rtl p:wu5rt:i  tfwiianlrgen  iocnuogtn,pf ut-tes s ftoi.plhte
-i follnee xxg.:iy vyee.rncr 
-obfrul tew xrd:ie tfeiarnurglo tro  urwturpliuett i cnfagin l oebu etl pemuxat.t ycfyhi.elcde
-
- lex.yy.c
+/bin/m4: internal error detected; please report this bug to <bug-m4@gnu.org>: Aborted
+flex: ercroonfrfl tewexrs:it t.eilrn:rg5o :ro  uwwtarpriunttii nnfggi, l oe-u stc poounptft tifeoisnlt e.g hil
+vefexln.e yxby:u. tce 
+rdfreloferax u:wl rtei rtrriuonlrge   wocruaitntp iubnteg   fmoiaulttecp huleted x
+f.iylye. cl
+ex.yy.c
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -7936,14 +7939,23 @@ ac_cv_prog_cxx_11=no
 ac_cv_prog_cxx_g=no
 ac_cv_prog_cxx_stdcxx=
 ac_cv_prog_lex_is_flex=no
-ac_cv_prog_make__set=yes
+ac_cv_prog_make_make_set=yes
 ac_cv_safe_to_define___extensions__=yes
 ac_cv_should_define__xopen_source=no
 ac_cv_sys_file_offset_bits=no
 ac_cv_sys_largefile_CC=no
+acl_cv_hardcode_direct=no
+acl_cv_hardcode_libdir_flag_spec=
+acl_cv_hardcode_libdir_separator=
+acl_cv_hardcode_minus_L=no
 acl_cv_libdirstems=lib,lib,lib
+acl_cv_libext=a
+acl_cv_libname_spec='lib$name'
+acl_cv_library_names_spec=
 acl_cv_prog_gnu_ld=no
 acl_cv_rpath=done
+acl_cv_shlibext=so
+acl_cv_wl=
 am_cv_CC_dependencies_compiler_type=none
 am_cv_CXX_dependencies_compiler_type=none
 am_cv_make_support_nested_variables=yes

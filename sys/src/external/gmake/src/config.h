@@ -126,7 +126,7 @@
 
 /* Define to 1 if translation of program messages to the user's native
    language is requested. */
-/* #undef ENABLE_NLS */
+#define ENABLE_NLS 1
 
 /* Use high resolution file timestamps if nonzero. */
 #define FILE_TIMESTAMP_HI_RES 1
@@ -163,7 +163,7 @@
 
 /* Define if the GNU dcgettext() function is already present or preinstalled.
    */
-/* #undef HAVE_DCGETTEXT */
+#define HAVE_DCGETTEXT 1
 
 /* Define to 1 if you have the declaration of `bsd_signal', and to 0 if you
    don't. */
@@ -231,10 +231,10 @@
 /* #undef HAVE_GETHOSTNAME */
 
 /* Define to 1 if you have the `getrlimit' function. */
-/* #undef HAVE_GETRLIMIT */
+#define HAVE_GETRLIMIT 1
 
 /* Define if the GNU gettext() function is already present or preinstalled. */
-/* #undef HAVE_GETTEXT */
+#define HAVE_GETTEXT 1
 
 /* Define to 1 if you have a standard gettimeofday function */
 #define HAVE_GETTIMEOFDAY 1
@@ -243,7 +243,7 @@
 /* #undef HAVE_GUILE */
 
 /* Define if you have the iconv() function and it works. */
-/* #undef HAVE_ICONV */
+#define HAVE_ICONV 1
 
 /* Define to 1 if the system has the type `intmax_t'. */
 #define HAVE_INTMAX_T 1
@@ -285,7 +285,7 @@
 #define HAVE_MEMPCPY 1
 
 /* Define to 1 if you have the `memrchr' function. */
-/* #undef HAVE_MEMRCHR */
+#define HAVE_MEMRCHR 1
 
 /* Define to 1 if you have the <minix/config.h> header file. */
 /* #undef HAVE_MINIX_CONFIG_H */
@@ -345,7 +345,7 @@
 /* #undef HAVE_SETREUID */
 
 /* Define to 1 if you have the `setrlimit' function. */
-/* #undef HAVE_SETRLIMIT */
+#define HAVE_SETRLIMIT 1
 
 /* Define to 1 if you have the `setvbuf' function. */
 #define HAVE_SETVBUF 1
@@ -363,7 +363,7 @@
 /* #undef HAVE_SOCKET */
 
 /* Define to 1 if you have the <spawn.h> header file. */
-/* #undef HAVE_SPAWN_H */
+#define HAVE_SPAWN_H 1
 
 /* Define to 1 if you have the <stdbool.h> header file. */
 #define HAVE_STDBOOL_H 1
@@ -378,7 +378,7 @@
 #define HAVE_STDLIB_H 1
 
 /* Define to 1 if you have the `stpcpy' function. */
-/* #undef HAVE_STPCPY */
+#define HAVE_STPCPY 1
 
 /* Define to 1 if you have the `strcasecmp' function. */
 #define HAVE_STRCASECMP 1
@@ -434,7 +434,7 @@
 /* #undef HAVE_SYS_DIR_H */
 
 /* Define to 1 if you have the <sys/file.h> header file. */
-/* #undef HAVE_SYS_FILE_H */
+#define HAVE_SYS_FILE_H 1
 
 /* Define to 1 if you have the <sys/loadavg.h> header file. */
 /* #undef HAVE_SYS_LOADAVG_H */

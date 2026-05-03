@@ -51,7 +51,8 @@ configure:3165: result: yes
 configure:3324: checking for a race-free mkdir -p
 configure:3368: result: ./build-aux/install-sh -c -d
 configure:3375: checking for gawk
-configure:3407: result: awk
+configure:3396: found /bin/gawk
+configure:3407: result: gawk
 configure:3418: checking whether make sets $(MAKE)
 configure:3441: result: yes
 configure:3471: checking whether make supports nested variables
@@ -121,7 +122,7 @@ configure:4666: result: o
 configure:4670: checking whether the compiler supports GNU C
 configure:4690: cc -c   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:16[stdin:17] syntax error, last name: me
-cc: cpp: 6c 36702: error
+cc: cpp: 6c 29802: error
 configure:4690: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -152,12 +153,12 @@ configure:4732: $? = 0
 configure:4776: result: yes
 configure:4796: checking for cc option to enable C11 features
 configure:4811: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:171[stdin:251] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:171[stdin:273] syntax error, last name: __func__$9
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
 cpp: conftest.c:167 #error directive: "Compiler does not advertise C11 conformance"
-cc: 6c: cpp 36735: errors
+cc: 6c: cpp 29835: errors
 configure:4811: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -433,7 +434,7 @@ configure: failed program was:
 | }
 | 
 configure:4811: cc -std=gnu11 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:171[stdin:251] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:171[stdin:273] syntax error, last name: __func__$9
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -445,7 +446,7 @@ cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformanc
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
 cpp: conftest.c:167 #error directive: "Compiler does not advertise C11 conformance"
-cc: 6c: cpp 36749: errors
+cc: 6c: cpp 29849: errors
 configure:4811: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -723,11 +724,11 @@ configure: failed program was:
 configure:4824: result: unsupported
 configure:4842: checking for cc option to enable C99 features
 configure:4857: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:300] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 36769: errors
+cc: 6c: cpp 29869: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -943,7 +944,7 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -std=gnu99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:300] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -954,7 +955,7 @@ cc: flag -9 ignored
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 36783: errors
+cc: 6c: cpp 29883: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1170,7 +1171,7 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -std=c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:300] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -1179,7 +1180,7 @@ cc: flag -9 ignored
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 36797: errors
+cc: 6c: cpp 29897: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1395,13 +1396,13 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:300] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -9 ignored
 cc: flag -9 ignored
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 36811: errors
+cc: 6c: cpp 29911: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1617,13 +1618,13 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -qlanglvl=extc1x -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:300] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -q ignored
 cc: can't find library for -l
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 36825: errors
+cc: 6c: cpp 29925: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1839,13 +1840,13 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -qlanglvl=extc99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:300] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -q ignored
 cc: can't find library for -l
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 36839: errors
+cc: 6c: cpp 29939: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2061,14 +2062,14 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -AC99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:300] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -C ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 36853: errors
+cc: 6c: cpp 29953: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2284,11 +2285,11 @@ configure: failed program was:
 | }
 | 
 configure:4857: cc -D_STDC_C99= -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:278] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:198[stdin:300] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 36867: errors
+cc: 6c: cpp 29967: errors
 configure:4857: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2558,9 +2559,10 @@ configure:5134: $? = 0
 configure:5134: result: yes
 configure:5134: checking for minix/config.h
 configure:5134: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: int
+<eof> not a function
+<eof> syntax error, last name: wcsft
 cpp: conftest.c:49 Could not find include file <minix/config.h>
-cc: 6c: cpp 37065: error
+cc: 6c: cpp 30273: error
 configure:5134: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2685,7 +2687,7 @@ configure:6454: cc -E  conftest.c
 configure:6454: $? = 0
 configure:6469: cc -E  conftest.c
 cpp: conftest.c:40 Could not find include file <ac_nonexistent.h>
-cc: cpp: cpp 37251: error
+cc: cpp: cpp 30460: error
 configure:6469: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2733,7 +2735,7 @@ configure:6510: cc -E  conftest.c
 configure:6510: $? = 0
 configure:6525: cc -E  conftest.c
 cpp: conftest.c:40 Could not find include file <ac_nonexistent.h>
-cc: cpp: cpp 37273: error
+cc: cpp: cpp 30482: error
 configure:6525: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2781,7 +2783,7 @@ configure:6615: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:50[stdin:48] name not declared: m
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:50[stdin:48] name not declared: m
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:53[stdin:51] syntax error, last name: static
-cc: cpp: 6c 37294: error
+cc: cpp: 6c 30503: error
 configure:6615: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2867,7 +2869,7 @@ configure:6725: cc -E  conftest.c
 configure:6725: $? = 0
 configure:6740: cc -E  conftest.c
 cpp: conftest.c:41 Could not find include file <ac_nonexistent.h>
-cc: cpp: cpp 37323: error
+cc: cpp: cpp 30532: error
 configure:6740: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2968,7 +2970,7 @@ configure:8147: checking 32-bit host C ABI
 configure:8214: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:44[stdin:45] not a function
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:44[stdin:45] syntax error, last name: fail
-cc: cpp: 6c 37601: error
+cc: cpp: 6c 30738: error
 configure:8214: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3025,7 +3027,7 @@ configure:8561: result: lib,lib,lib
 configure:9079: checking for CFPreferencesCopyAppValue
 configure:9098: cc -o conftest -g   conftest.c  -Wl,-framework -Wl,CoreFoundation >&5
 cpp: conftest.c:41 Could not find include file <CoreFoundation/CFPreferences.h>
-cc: 6c: cpp 37647: error
+cc: 6c: cpp 30784: error
 configure:9098: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3080,7 +3082,7 @@ configure:9108: result: no
 configure:9115: checking for CFLocaleCopyPreferredLanguages
 configure:9134: cc -o conftest -g   conftest.c  -Wl,-framework -Wl,CoreFoundation >&5
 cpp: conftest.c:41 Could not find include file <CoreFoundation/CFLocale.h>
-cc: 6c: cpp 37667: error
+cc: 6c: cpp 30804: error
 configure:9134: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3143,7 +3145,7 @@ configure:10141: result: libc
 configure:10200: checking for nl_langinfo and CODESET
 configure:10217: cc -o conftest -g   conftest.c  >&5
 /sys/include/ape/langinfo.h:16[stdin:125] syntax error, last name: size_t
-cc: cpp: 6c 37712: error
+cc: cpp: 6c 30849: error
 configure:10217: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3220,9 +3222,9 @@ configure:10289: $? = 0
 configure:10289: result: yes
 configure:10295: checking for mcheck.h
 configure:10295: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: wchar_t
+<eof> syntax error, last name: siz
 cpp: conftest.c:77 Could not find include file <mcheck.h>
-cc: 6c: cpp 37805: error
+cc: 6c: cpp 30942: error
 configure:10295: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3323,9 +3325,9 @@ configure:10325: $? = 0
 configure:10325: result: yes
 configure:10331: checking for sys/procctl.h
 configure:10331: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: wcha
+<eof> syntax error, last name: wchar_t
 cpp: conftest.c:82 Could not find include file <sys/procctl.h>
-cc: 6c: cpp 37886: error
+cc: 6c: cpp 31023: error
 configure:10331: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3413,9 +3415,9 @@ configure: failed program was:
 configure:10331: result: no
 configure:10337: checking for sys/sysctl.h
 configure:10337: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: wcha
+<eof> syntax error, last name: wchar_t
 cpp: conftest.c:82 Could not find include file <sys/sysctl.h>
-cc: 6c: cpp 37905: error
+cc: 6c: cpp 31042: error
 configure:10337: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3511,9 +3513,9 @@ configure:10349: $? = 0
 configure:10349: result: yes
 configure:10355: checking for sys/personality.h
 configure:10355: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: wc
+<eof> syntax error, last name: wchar
 cpp: conftest.c:84 Could not find include file <sys/personality.h>
-cc: 6c: cpp 37952: error
+cc: 6c: cpp 31089: error
 configure:10355: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3623,9 +3625,9 @@ configure:10391: $? = 0
 configure:10391: result: yes
 configure:10397: checking for stropts.h
 configure:10397: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: co
+<eof> syntax error, last name: wchar_t
 cpp: conftest.c:90 Could not find include file <stropts.h>
-cc: 6c: cpp 38039: error
+cc: 6c: cpp 31176: error
 configure:10397: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3728,7 +3730,7 @@ configure:10409: result: yes
 configure:10419: checking for bool, true, false
 configure:10434: cc -c -g  conftest.c >&5
 cpp: conftest.c:66 #error directive: "true == false"
-cc: 6c: cpp 38078: errors
+cc: 6c: cpp 31215: errors
 configure:10434: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3807,9 +3809,9 @@ configure:10481: $? = 0
 configure:10489: result: yes
 configure:10503: checking for memory.h
 configure:10503: cc -c -g  conftest.c >&5
-<eof> syntax error, last name: char
+<eof> syntax error, last name: wchar_t
 cpp: conftest.c:93 Could not find include file <memory.h>
-cc: 6c: cpp 38111: error
+cc: 6c: cpp 31248: error
 configure:10503: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3910,8 +3912,8 @@ configure:10530: checking for pid_t
 configure:10530: cc -c -g  conftest.c >&5
 configure:10530: $? = 0
 configure:10530: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:97[stdin:4770] syntax error, last name: pid_t
-cc: cpp: 6c 38137: error
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:97[stdin:4945] syntax error, last name: pid_t
+cc: cpp: 6c 31274: error
 configure:10530: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4020,8 +4022,8 @@ configure:10566: checking for size_t
 configure:10566: cc -c -g  conftest.c >&5
 configure:10566: $? = 0
 configure:10566: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:96[stdin:4769] syntax error, last name: size_t
-cc: cpp: 6c 38165: error
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:96[stdin:4944] syntax error, last name: size_t
+cc: cpp: 6c 31302: error
 configure:10566: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4149,8 +4151,8 @@ configure:10822: checking for intmax_t
 configure:10822: cc -c -g  conftest.c >&5
 configure:10822: $? = 0
 configure:10822: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:100[stdin:4773] syntax error, last name: intmax_t
-cc: cpp: 6c 38263: error
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:100[stdin:4948] syntax error, last name: intmax_t
+cc: cpp: 6c 31402: error
 configure:10822: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4262,8 +4264,8 @@ configure:10840: checking for uintmax_t
 configure:10840: cc -c -g  conftest.c >&5
 configure:10840: $? = 0
 configure:10840: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:101[stdin:4774] syntax error, last name: uintmax_t
-cc: cpp: 6c 38292: error
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:101[stdin:4949] syntax error, last name: uintmax_t
+cc: cpp: 6c 31431: error
 configure:10840: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4376,8 +4378,8 @@ configure:10856: checking for ssize_t
 configure:10856: cc -c -g  conftest.c >&5
 configure:10856: $? = 0
 configure:10856: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:102[stdin:4775] syntax error, last name: ssize_t
-cc: cpp: 6c 38321: error
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:102[stdin:4950] syntax error, last name: ssize_t
+cc: cpp: 6c 31460: error
 configure:10856: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4511,8 +4513,8 @@ configure:11021: checking for socklen_t
 configure:11021: cc -c -g  conftest.c >&5
 configure:11021: $? = 0
 configure:11021: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:83[stdin:4595] syntax error, last name: socklen_t
-cc: cpp: 6c 38429: error
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:83[stdin:4758] syntax error, last name: socklen_t
+cc: cpp: 6c 31568: error
 configure:11021: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4614,7 +4616,7 @@ configure:11194: result: none required
 configure:11203: checking for library containing isinf
 configure:11233: cc -o conftest -g   conftest.c  >&5
 main: undefined: isinf in main
-cc: 6l: 6l 38483: error
+cc: 6l: 6l 31623: error
 configure:11233: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4708,7 +4710,7 @@ configure: failed program was:
 | }
 configure:11233: cc -o conftest -g   conftest.c -lm   >&5
 main: undefined: isinf in main
-cc: 6l: 6l 38499: error
+cc: 6l: 6l 31639: error
 configure:11233: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4804,7 +4806,7 @@ configure:11253: result: no
 configure:11262: checking for library containing ismod
 configure:11292: cc -o conftest -g   conftest.c  >&5
 main: undefined: ismod in main
-cc: 6l: 6l 38521: error
+cc: 6l: 6l 31661: error
 configure:11292: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4898,7 +4900,7 @@ configure: failed program was:
 | }
 configure:11292: cc -o conftest -g   conftest.c -lm   >&5
 main: undefined: ismod in main
-cc: 6l: 6l 38537: error
+cc: 6l: 6l 31677: error
 configure:11292: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4994,7 +4996,7 @@ configure:11312: result: no
 configure:11321: checking for library containing isnan
 configure:11351: cc -o conftest -g   conftest.c  >&5
 main: undefined: isnan in main
-cc: 6l: 6l 38559: error
+cc: 6l: 6l 31699: error
 configure:11351: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5088,7 +5090,7 @@ configure: failed program was:
 | }
 configure:11351: cc -o conftest -g   conftest.c -lm   >&5
 main: undefined: isnan in main
-cc: 6l: 6l 38575: error
+cc: 6l: 6l 31715: error
 configure:11351: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5184,7 +5186,7 @@ configure:11371: result: no
 configure:11381: checking for __etoa_l
 configure:11381: cc -o conftest -g   conftest.c  >&5
 main: undefined: __etoa_l in main
-cc: 6l: 6l 38597: error
+cc: 6l: 6l 31737: error
 configure:11381: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5311,7 +5313,7 @@ configure:11399: result: yes
 configure:11405: checking for fwrite_unlocked
 configure:11405: cc -o conftest -g   conftest.c  >&5
 main: undefined: fwrite_unlocked in main
-cc: 6l: 6l 38666: error
+cc: 6l: 6l 31806: error
 configure:11405: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5441,7 +5443,7 @@ configure:11423: result: yes
 configure:11429: checking for grantpt
 configure:11429: cc -o conftest -g   conftest.c  >&5
 main: undefined: grantpt in main
-cc: 6l: 6l 38735: error
+cc: 6l: 6l 31875: error
 configure:11429: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5562,7 +5564,7 @@ configure:11429: result: no
 configure:11435: checking for isascii
 configure:11435: cc -o conftest -g   conftest.c  >&5
 main: undefined: isascii in main
-cc: 6l: 6l 38756: error
+cc: 6l: 6l 31896: error
 configure:11435: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5703,7 +5705,7 @@ configure:11465: result: yes
 configure:11471: checking for _NSGetExecutablePath
 configure:11471: cc -o conftest -g   conftest.c  >&5
 main: undefined: _NSGetExecutablePath in main
-cc: 6l: 6l 38857: error
+cc: 6l: 6l 31997: error
 configure:11471: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5841,7 +5843,7 @@ configure:11489: result: yes
 configure:11495: checking for mtrace
 configure:11495: cc -o conftest -g   conftest.c  >&5
 main: undefined: mtrace in main
-cc: 6l: 6l 38926: error
+cc: 6l: 6l 32066: error
 configure:11495: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5970,7 +5972,7 @@ configure:11495: result: no
 configure:11501: checking for personality
 configure:11501: cc -o conftest -g   conftest.c  >&5
 main: undefined: personality in main
-cc: 6l: 6l 38947: error
+cc: 6l: 6l 32087: error
 configure:11501: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6099,7 +6101,7 @@ configure:11501: result: no
 configure:11507: checking for posix_openpt
 configure:11507: cc -o conftest -g   conftest.c  >&5
 main: undefined: posix_openpt in main
-cc: 6l: 6l 38968: error
+cc: 6l: 6l 32108: error
 configure:11507: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6244,7 +6246,7 @@ configure:11531: result: yes
 configure:11537: checking for procctl
 configure:11537: cc -o conftest -g   conftest.c  >&5
 main: undefined: procctl in main
-cc: 6l: 6l 39053: error
+cc: 6l: 6l 32193: error
 configure:11537: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6377,7 +6379,7 @@ configure:11537: result: no
 configure:11543: checking for sysctl
 configure:11543: cc -o conftest -g   conftest.c  >&5
 main: undefined: sysctl in main
-cc: 6l: 6l 39074: error
+cc: 6l: 6l 32214: error
 configure:11543: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6568,7 +6570,7 @@ configure:11834: result: yes
 configure:11841: checking for library containing dlopen
 configure:11871: cc -o conftest -g   conftest.c  >&5
 main: undefined: dlopen in main
-cc: 6l: 6l 39315: error
+cc: 6l: 6l 32455: error
 configure:11871: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6691,7 +6693,7 @@ configure: failed program was:
 configure:11871: cc -o conftest -g   conftest.c -ldl   >&5
 main: undefined: dlopen in main
 cc: can't find library for -l
-cc: 6l: 6l 39331: error
+cc: 6l: 6l 32471: error
 configure:11871: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6814,7 +6816,7 @@ configure: failed program was:
 configure:11871: cc -o conftest -g   conftest.c -lzrldsrl   >&5
 main: undefined: dlopen in main
 cc: can't find library for -l
-cc: 6l: 6l 39347: error
+cc: 6l: 6l 32487: error
 configure:11871: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6937,8 +6939,8 @@ configure: failed program was:
 configure:11891: result: no
 configure:11938: checking whether getpgrp requires zero arguments
 configure:11956: cc -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/gawk/conftest.c:137[stdin:4810] too many function arguments: getpgrp
-cc: cpp: 6c 39367: error
+/usr/glenda/APExp/sys/src/external/gawk/conftest.c:137[stdin:4985] too many function arguments: getpgrp
+cc: cpp: 6c 32507: error
 configure:11956: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7366,10 +7368,12 @@ configure:12395: $? = 0
 configure:12405: result: yes
 configure:12448: checking whether mpfr via "-lmpfr -lgmp" is present and usable
 configure:12475: cc -o conftest -g   conftest.c  -lmpfr -lgmp >&5
+<eof> not a function
+<eof> syntax error, last name: print
 cc: can't find library for -l
 cc: can't find library for -l
 cpp: conftest.c:113 Could not find include file <mpfr.h>
-cc: 6c: cpp 39502: error
+cc: 6c: cpp 32645: error
 configure:12475: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7522,7 +7526,7 @@ configure:12570: result: time.h
 configure:12578: checking for cc options needed to detect all undeclared functions
 configure:12600: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:117[stdin:118] name not declared: strchr
-cc: cpp: 6c 39576: error
+cc: cpp: 6c 32719: error
 configure:12600: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7663,7 +7667,7 @@ configure:12835: result: yes
 configure:12843: checking for C/C++ restrict keyword
 configure:12873: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:117[stdin:118] syntax error, last name: __restrict__
-cc: cpp: 6c 39643: error
+cc: cpp: 6c 32786: error
 configure:12873: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7798,7 +7802,7 @@ configure: failed program was:
 | }
 configure:12873: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:117[stdin:118] syntax error, last name: __restrict
-cc: cpp: 6c 39658: error
+cc: cpp: 6c 32801: error
 configure:12873: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7933,7 +7937,7 @@ configure: failed program was:
 | }
 configure:12873: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:116[stdin:117] syntax error, last name: ip
-cc: cpp: 6c 39673: error
+cc: cpp: 6c 32816: error
 configure:12873: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8068,7 +8072,7 @@ configure: failed program was:
 | }
 configure:12873: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gawk/conftest.c:117[stdin:118] syntax error, last name: restrict
-cc: cpp: 6c 39688: error
+cc: cpp: 6c 32831: error
 configure:12873: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8227,26 +8231,26 @@ generated by GNU Autoconf 2.71.  Invocation command line was
 
 on krypton
 
-config.status:897: creating Makefile
-config.status:897: creating support/Makefile
-config.status:897: creating awklib/Makefile
-config.status:897: creating doc/Makefile
-config.status:897: creating extras/Makefile
-config.status:897: creating po/Makefile.in
-config.status:897: creating test/Makefile
-config.status:897: creating gawkbug
-config.status:897: creating config.h
-config.status:1126: executing depfiles commands
-config.status:1201: cd .       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1011: creating Makefile
+config.status:1011: creating support/Makefile
+config.status:1011: creating awklib/Makefile
+config.status:1011: creating doc/Makefile
+config.status:1011: creating extras/Makefile
+config.status:1011: creating po/Makefile.in
+config.status:1011: creating test/Makefile
+config.status:1011: creating gawkbug
+config.status:1011: creating config.h
+config.status:1240: executing depfiles commands
+config.status:1315: cd .       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for 'am--depfiles'.
-config.status:1208: $? = 0
-config.status:1201: cd support       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1322: $? = 0
+config.status:1315: cd support       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for 'am--depfiles'.
-config.status:1208: $? = 0
-config.status:1201: cd awklib       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
+config.status:1322: $? = 0
+config.status:1315: cd awklib       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for 'am--depfiles'.
-config.status:1208: $? = 0
-config.status:1126: executing po-directories commands
+config.status:1322: $? = 0
+config.status:1240: executing po-directories commands
 
 ## ---------------- ##
 ## Cache variables. ##
@@ -8376,7 +8380,7 @@ ac_cv_path_MSGFMT=/bin/msgfmt
 ac_cv_path_MSGMERGE=/bin/msgmerge
 ac_cv_path_SED=/bin/sed
 ac_cv_path_XGETTEXT=/bin/xgettext
-ac_cv_prog_AWK=awk
+ac_cv_prog_AWK=gawk
 ac_cv_prog_CC=cc
 ac_cv_prog_CPP='cc -E'
 ac_cv_prog_YACC='bison -y'
@@ -8387,7 +8391,7 @@ ac_cv_prog_cc_c89=
 ac_cv_prog_cc_c99=no
 ac_cv_prog_cc_g=yes
 ac_cv_prog_cc_stdc=
-ac_cv_prog_make__set=yes
+ac_cv_prog_make_make_set=yes
 ac_cv_safe_to_define___extensions__=yes
 ac_cv_search_dlopen=no
 ac_cv_search_fmod='none required'
@@ -8413,9 +8417,18 @@ ac_cv_type_uid_t=yes
 ac_cv_type_uintmax_t=yes
 ac_cv_type_unsigned_long_long_int=yes
 ac_cv_zos_uss=no
+acl_cv_hardcode_direct=no
+acl_cv_hardcode_libdir_flag_spec=
+acl_cv_hardcode_libdir_separator=
+acl_cv_hardcode_minus_L=no
 acl_cv_libdirstems=lib,lib,lib
+acl_cv_libext=a
+acl_cv_libname_spec='lib$name'
+acl_cv_library_names_spec=
 acl_cv_prog_gnu_ld=no
 acl_cv_rpath=done
+acl_cv_shlibext=so
+acl_cv_wl=
 am_cv_CC_dependencies_compiler_type=none
 am_cv_ar_interface=ar
 am_cv_langinfo_codeset=no
@@ -8447,7 +8460,7 @@ AR='ar'
 AUTOCONF='${SHELL} '\''/usr/glenda/APExp/sys/src/external/gawk/build-aux/missing'\'' autoconf'
 AUTOHEADER='${SHELL} '\''/usr/glenda/APExp/sys/src/external/gawk/build-aux/missing'\'' autoheader'
 AUTOMAKE='${SHELL} '\''/usr/glenda/APExp/sys/src/external/gawk/build-aux/missing'\'' automake-1.16'
-AWK='awk'
+AWK='gawk'
 CC='cc'
 CCDEPMODE='depmode=none'
 CFLAGS='-g'
@@ -8466,7 +8479,7 @@ ENABLE_EXTENSIONS_FALSE=''
 ENABLE_EXTENSIONS_TRUE='#'
 ETAGS='etags'
 EXEEXT=''
-GAWKLIBEXT=''
+GAWKLIBEXT='so'
 GETTEXT_MACRO_VERSION='0.20'
 GMSGFMT='/bin/msgfmt'
 GMSGFMT_015='/bin/msgfmt'
@@ -8527,7 +8540,7 @@ YFLAGS=''
 ZOS_FAIL=''
 ac_ct_AR='ar'
 ac_ct_CC=''
-acl_shlibext=''
+acl_shlibext='so'
 am__EXEEXT_FALSE=''
 am__EXEEXT_TRUE='#'
 am__fastdepCC_FALSE=''

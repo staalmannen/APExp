@@ -240,31 +240,31 @@ basic_r_OBJECTS = $(am_basic_r_OBJECTS)
 basic_r_LDADD = $(LDADD)
 am__bison_nr_SOURCES_DIST = no_bison_stub.c bison_nr_scanner.l \
 	bison_nr_parser.y bison_nr_main.c
-am_bison_nr_OBJECTS = no_bison_stub.$(OBJEXT)
-#am_bison_nr_OBJECTS = bison_nr_scanner.$(OBJEXT) \
-#	bison_nr_parser.$(OBJEXT) \
-#	bison_nr_main.$(OBJEXT)
+#am_bison_nr_OBJECTS = no_bison_stub.$(OBJEXT)
+am_bison_nr_OBJECTS = bison_nr_scanner.$(OBJEXT) \
+	bison_nr_parser.$(OBJEXT) \
+	bison_nr_main.$(OBJEXT)
 nodist_bison_nr_OBJECTS =
 bison_nr_OBJECTS = $(am_bison_nr_OBJECTS) $(nodist_bison_nr_OBJECTS)
 bison_nr_LDADD = $(LDADD)
 am__bison_yylloc_SOURCES_DIST = no_bison_stub.c bison_yylloc_scanner.l \
 	bison_yylloc_parser.y bison_yylloc_main.c
-am_bison_yylloc_OBJECTS = no_bison_stub.$(OBJEXT)
-#am_bison_yylloc_OBJECTS =  \
-#	bison_yylloc_scanner.$(OBJEXT) \
-#	bison_yylloc_parser.$(OBJEXT) \
-#	bison_yylloc_main.$(OBJEXT)
+#am_bison_yylloc_OBJECTS = no_bison_stub.$(OBJEXT)
+am_bison_yylloc_OBJECTS =  \
+	bison_yylloc_scanner.$(OBJEXT) \
+	bison_yylloc_parser.$(OBJEXT) \
+	bison_yylloc_main.$(OBJEXT)
 nodist_bison_yylloc_OBJECTS =
 bison_yylloc_OBJECTS = $(am_bison_yylloc_OBJECTS) \
 	$(nodist_bison_yylloc_OBJECTS)
 bison_yylloc_LDADD = $(LDADD)
 am__bison_yylval_SOURCES_DIST = no_bison_stub.c bison_yylval_scanner.l \
 	bison_yylval_parser.y bison_yylval_main.c
-am_bison_yylval_OBJECTS = no_bison_stub.$(OBJEXT)
-#am_bison_yylval_OBJECTS =  \
-#	bison_yylval_scanner.$(OBJEXT) \
-#	bison_yylval_parser.$(OBJEXT) \
-#	bison_yylval_main.$(OBJEXT)
+#am_bison_yylval_OBJECTS = no_bison_stub.$(OBJEXT)
+am_bison_yylval_OBJECTS =  \
+	bison_yylval_scanner.$(OBJEXT) \
+	bison_yylval_parser.$(OBJEXT) \
+	bison_yylval_main.$(OBJEXT)
 nodist_bison_yylval_OBJECTS =
 bison_yylval_OBJECTS = $(am_bison_yylval_OBJECTS) \
 	$(nodist_bison_yylval_OBJECTS)
@@ -1199,7 +1199,7 @@ AR = ar
 AUTOCONF = ${SHELL} /usr/glenda/APExp/sys/src/external/flex/build-aux/missing autoconf
 AUTOHEADER = ${SHELL} /usr/glenda/APExp/sys/src/external/flex/build-aux/missing autoheader
 AUTOMAKE = ${SHELL} /usr/glenda/APExp/sys/src/external/flex/build-aux/missing automake-1.15
-AWK = awk
+AWK = gawk
 BUILD_EXEEXT = 
 BUILD_OBJEXT = 
 CC = cc
@@ -1228,8 +1228,8 @@ EGREP = /bin/grep -E
 EXEEXT = 
 FGREP = /bin/grep -F
 GETTEXT_MACRO_VERSION = 0.18
-GMSGFMT = :
-GMSGFMT_015 = :
+GMSGFMT = /bin/msgfmt
+GMSGFMT_015 = /bin/msgfmt
 GREP = /bin/grep
 HELP2MAN = ${top_srcdir}/build-aux/missing help2man
 INDENT = ${top_srcdir}/build-aux/missing indent
@@ -1238,32 +1238,32 @@ INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PROGRAM = ${INSTALL}
 INSTALL_SCRIPT = ${INSTALL}
 INSTALL_STRIP_PROGRAM = $(install_sh) -c -s
-INTLLIBS = 
+INTLLIBS = -lintl
 INTL_MACOSX_LIBS = 
 LD = pcc
 LDFLAGS = 
 LDFLAGS_FOR_BUILD = 
 LEX = flex
-LEXLIB = -lfl
+LEXLIB = 
 LEX_OUTPUT_ROOT = lex.yy
 LIBICONV = 
-LIBINTL = 
+LIBINTL = -lintl
 LIBOBJS = 
 LIBPTHREAD = -lpthread
 LIBS = -lm 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
-LN_S = ln -s
+LN_S = cp -pR
 LTLIBICONV = 
-LTLIBINTL = 
+LTLIBINTL = -lintl
 LTLIBOBJS = 
 LT_SYS_LIBRARY_PATH = 
 M4 = /bin/m4
 MAKEINFO = ${SHELL} /usr/glenda/APExp/sys/src/external/flex/build-aux/missing makeinfo
 MANIFEST_TOOL = :
 MKDIR_P = ../build-aux/install-sh -c -d
-MSGFMT = :
-MSGFMT_015 = :
+MSGFMT = /bin/msgfmt
+MSGFMT_015 = /bin/msgfmt
 MSGMERGE = /bin/msgmerge
 NM = /bin/nm
 NMEDIT = 
@@ -1279,7 +1279,7 @@ PACKAGE_TARNAME = flex
 PACKAGE_URL = 
 PACKAGE_VERSION = 2.6.4
 PATH_SEPARATOR = :
-POSUB = 
+POSUB = po
 RANLIB = ranlib
 SED = /bin/sed
 SET_MAKE = 
@@ -1287,13 +1287,13 @@ SHARED_VERSION_INFO = 2:0:0
 SHELL = /bin/sh
 STRIP = strip
 TEXI2DVI = ${top_srcdir}/build-aux/missing texi2dvi
-USE_NLS = no
+USE_NLS = yes
 VERSION = 2.6.4
 WARNINGFLAGS = 
-XGETTEXT = :
-XGETTEXT_015 = :
+XGETTEXT = /bin/xgettext
+XGETTEXT_015 = /bin/xgettext
 XGETTEXT_EXTRA_OPTIONS = 
-YACC = ${top_srcdir}/build-aux/missing bison -y
+YACC = bison -y
 YFLAGS = 
 abs_builddir = /usr/glenda/APExp/sys/src/external/flex/tests
 abs_srcdir = /usr/glenda/APExp/sys/src/external/flex/tests
@@ -1444,15 +1444,15 @@ array_nr_SOURCES = array_nr.l
 array_r_SOURCES = array_r.l
 basic_nr_SOURCES = basic_nr.l
 basic_r_SOURCES = basic_r.l
-bison_nr_SOURCES = no_bison_stub.c
-#bison_nr_SOURCES = bison_nr_scanner.l bison_nr_parser.y bison_nr_main.c
-#nodist_bison_nr_SOURCES = bison_nr_parser.h bison_nr_scanner.h
-bison_yylloc_SOURCES = no_bison_stub.c
-#bison_yylloc_SOURCES = bison_yylloc_scanner.l bison_yylloc_parser.y bison_yylloc_main.c
-#nodist_bison_yylloc_SOURCES = bison_yylloc_parser.h bison_yylloc_scanner.h
-bison_yylval_SOURCES = no_bison_stub.c
-#bison_yylval_SOURCES = bison_yylval_scanner.l bison_yylval_parser.y bison_yylval_main.c
-#nodist_bison_yylval_SOURCES = bison_yylval_parser.h bison_yylval_scanner.h
+#bison_nr_SOURCES = no_bison_stub.c
+bison_nr_SOURCES = bison_nr_scanner.l bison_nr_parser.y bison_nr_main.c
+nodist_bison_nr_SOURCES = bison_nr_parser.h bison_nr_scanner.h
+#bison_yylloc_SOURCES = no_bison_stub.c
+bison_yylloc_SOURCES = bison_yylloc_scanner.l bison_yylloc_parser.y bison_yylloc_main.c
+nodist_bison_yylloc_SOURCES = bison_yylloc_parser.h bison_yylloc_scanner.h
+#bison_yylval_SOURCES = no_bison_stub.c
+bison_yylval_SOURCES = bison_yylval_scanner.l bison_yylval_parser.y bison_yylval_main.c
+nodist_bison_yylval_SOURCES = bison_yylval_parser.h bison_yylval_scanner.h
 c_cxx_nr_SOURCES = c_cxx_nr.lll
 c_cxx_r_SOURCES = c_cxx_r.lll
 ccl_SOURCES = ccl.l

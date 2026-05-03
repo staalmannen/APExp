@@ -137,4 +137,4 @@
      ../src/wc.c \
      ../src/who.c \
      ../src/whoami.c \
-     ../src/yes.c \
+     ../src/yes.c

@@ -16,7 +16,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-VPATH = .
+
 
 topdir = ..
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash

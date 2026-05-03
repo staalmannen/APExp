@@ -29,7 +29,7 @@ datarootdir = ${prefix}/share
 bindir = ${exec_prefix}/bin
 srcdir = .
 datadir = ${datarootdir}
-VPATH = .
+
 top_srcdir = ..
 #BUILD_DIR = .
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/readline

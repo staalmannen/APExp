@@ -21,7 +21,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-VPATH = .
+
 
 prefix = /usr/local
 exec_prefix = ${prefix}
@@ -213,7 +213,7 @@ POTFILES = \
      ../src/wc.c \
      ../src/who.c \
      ../src/whoami.c \
-     ../src/yes.c \
+     ../src/yes.c
 
 CATALOGS =  af.gmo ar.gmo be.gmo bg.gmo ca.gmo cs.gmo da.gmo de.gmo el.gmo eo.gmo es.gmo et.gmo eu.gmo fi.gmo fr.gmo ga.gmo gl.gmo hr.gmo hu.gmo ia.gmo id.gmo it.gmo ja.gmo ka.gmo kk.gmo ko.gmo lg.gmo lt.gmo ms.gmo nb.gmo nl.gmo pl.gmo pt.gmo pt_BR.gmo ro.gmo ru.gmo sk.gmo sl.gmo sr.gmo sv.gmo ta.gmo tr.gmo uk.gmo vi.gmo zh_CN.gmo zh_TW.gmo
 

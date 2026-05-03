@@ -19,7 +19,7 @@
 
 
 
-VPATH = .
+
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -925,7 +925,7 @@ AS = as
 AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/pcre2/missing' autoconf
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/pcre2/missing' autoheader
 AUTOMAKE = ${SHELL} '/usr/glenda/APExp/sys/src/external/pcre2/missing' automake-1.16
-AWK = awk
+AWK = gawk
 CC = cc
 CCDEPMODE = depmode=none
 CET_CFLAGS = 

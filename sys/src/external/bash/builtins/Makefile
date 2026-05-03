@@ -36,7 +36,7 @@ EXEEXT =
 prefix = /usr/local
 
 srcdir = .
-VPATH = .
+
 topdir = ..
 
 datarootdir = ${prefix}/share

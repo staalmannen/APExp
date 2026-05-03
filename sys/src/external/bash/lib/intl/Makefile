@@ -23,7 +23,7 @@ SHELL = /bin/sh
 srcdir = .
 top_srcdir = ../..
 top_builddir = /usr/glenda/APExp/sys/src/external/bash
-VPATH = $(srcdir)$(srcdir)
+
 
 prefix = /usr/local
 exec_prefix = ${prefix}

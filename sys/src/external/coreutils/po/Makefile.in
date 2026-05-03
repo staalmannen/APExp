@@ -21,7 +21,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-VPATH = .
+
 
 prefix = /usr/local
 exec_prefix = ${prefix}

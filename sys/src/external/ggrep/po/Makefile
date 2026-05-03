@@ -20,7 +20,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-VPATH = .
+
 
 prefix = /usr/local
 exec_prefix = ${prefix}
@@ -89,7 +89,7 @@ POTFILES = \
      ../lib/xalloc-die.c \
      ../src/dfasearch.c \
      ../src/grep.c \
-     ../src/pcresearch.c \
+     ../src/pcresearch.c
 
 CATALOGS =  af.gmo be.gmo bg.gmo ca.gmo cs.gmo da.gmo de.gmo el.gmo eo.gmo es.gmo et.gmo eu.gmo fi.gmo fr.gmo ga.gmo gl.gmo he.gmo hr.gmo hu.gmo id.gmo it.gmo ja.gmo ka.gmo ko.gmo ky.gmo lt.gmo nb.gmo nl.gmo pa.gmo pl.gmo pt.gmo pt_BR.gmo ro.gmo ru.gmo sk.gmo sl.gmo sr.gmo sv.gmo ta.gmo th.gmo tr.gmo uk.gmo vi.gmo zh_CN.gmo zh_TW.gmo
 

@@ -21,7 +21,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-VPATH = .
+
 
 prefix = /usr/local
 exec_prefix = ${prefix}
@@ -104,7 +104,7 @@ POTFILES = \
      ../src/vmsfunctions.c \
      ../src/vmsjobs.c \
      ../src/vpath.c \
-     ../src/w32/w32os.c \
+     ../src/w32/w32os.c
 
 CATALOGS =  be.gmo bg.gmo cs.gmo da.gmo de.gmo es.gmo fi.gmo fr.gmo ga.gmo gl.gmo he.gmo hr.gmo id.gmo it.gmo ja.gmo ko.gmo lt.gmo nl.gmo pl.gmo pt.gmo pt_BR.gmo ro.gmo ru.gmo sr.gmo sv.gmo tr.gmo uk.gmo vi.gmo zh_CN.gmo zh_TW.gmo
 

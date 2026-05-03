@@ -323,17 +323,17 @@ surrounded by #ifndef/#endif lines so that the value can be overridden by -D. */
 
 /* Define to any value to allow pcre2grep to be linked with libbz2, so that it
    is able to handle .bz2 files. */
-#define SUPPORT_LIBBZ2 1
+/* #undef SUPPORT_LIBBZ2 */
 
 /* Define to any value to allow pcre2test to be linked with libedit. */
 /* #undef SUPPORT_LIBEDIT */
 
 /* Define to any value to allow pcre2test to be linked with libreadline. */
-#define SUPPORT_LIBREADLINE 1
+/* #undef SUPPORT_LIBREADLINE */
 
 /* Define to any value to allow pcre2grep to be linked with libz, so that it
    is able to handle .gz files. */
-#define SUPPORT_LIBZ 1
+/* #undef SUPPORT_LIBZ */
 
 /* Define to any value to enable callout script support in pcre2grep. */
 #define SUPPORT_PCRE2GREP_CALLOUT /**/
@@ -348,15 +348,19 @@ surrounded by #ifndef/#endif lines so that the value can be overridden by -D. */
 /* #undef SUPPORT_PCRE2GREP_JIT */
 
 /* Define to any value to enable the 16 bit PCRE2 library. */
-#define SUPPORT_PCRE2_16 1
+/* #undef SUPPORT_PCRE2_16 */
 
 /* Define to any value to enable the 32 bit PCRE2 library. */
-#define SUPPORT_PCRE2_32 1
+/* #undef SUPPORT_PCRE2_32 */
 
 /* Define to any value to enable the 8 bit PCRE2 library. */
-#define SUPPORT_PCRE2_8 1
+#define SUPPORT_PCRE2_8 /**/
 
-#define SUPPORT_UNICODE 1
+/* Define to any value to enable support for Unicode and UTF encoding. This
+   will work even in an EBCDIC environment, but it is incompatible with the
+   EBCDIC macro. That is, PCRE2 can support *either* EBCDIC code *or*
+   ASCII/Unicode, but not both at once. */
+#define SUPPORT_UNICODE /**/
 
 /* Define to any value for valgrind support to find invalid memory reads. */
 /* #undef SUPPORT_VALGRIND */

@@ -48,4 +48,4 @@
      ../support/regex_internal.c \
      ../support/regexec.c \
      ../symbol.c \
-     ../version.c \
+     ../version.c

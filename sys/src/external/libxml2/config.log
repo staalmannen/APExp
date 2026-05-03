@@ -58,7 +58,8 @@ configure:3249: result: yes
 configure:3420: checking for a race-free mkdir -p
 configure:3463: result: mkdir -p
 configure:3470: checking for gawk
-configure:3503: result: awk
+configure:3491: found /bin/gawk
+configure:3503: result: gawk
 configure:3514: checking whether make sets $(MAKE)
 configure:3538: result: yes
 configure:3564: checking whether make supports nested variables
@@ -89,6 +90,7 @@ configure:3779: tardir=conftest.dir && eval pax -L -x ustar -w "$tardir" >confte
 ./configure: pax: not found
 configure:3782: $? = 127
 configure:3779: tardir=conftest.dir && eval find "$tardir" -print | cpio -o -H ustar -L >conftest.tar
+./configure: find: not found
 ./configure: cpio: not found
 configure:3782: $? = 127
 configure:3779: tardir=conftest.dir && eval false >conftest.tar
@@ -152,7 +154,7 @@ configure:4603: result: o
 configure:4607: checking whether the compiler supports GNU C
 configure:4627: cc -c   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/libxml2/conftest.c:16[stdin:17] syntax error, last name: me
-cc: cpp: 6c 93242: error
+cc: cpp: 6c 74900: error
 configure:4627: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -183,12 +185,12 @@ configure:4671: $? = 0
 configure:4718: result: yes
 configure:4738: checking for cc option to enable C11 features
 configure:4753: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:186[stdin:266] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:186[stdin:288] syntax error, last name: __func__$9
 cpp: conftest.c:76 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:110 #error directive: "your preprocessor is broken"
 cpp: conftest.c:114 #error directive: "your preprocessor is broken"
 cpp: conftest.c:182 #error directive: "Compiler does not advertise C11 conformance"
-cc: 6c: cpp 93275: errors
+cc: 6c: cpp 74933: errors
 configure:4753: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -481,7 +483,7 @@ configure: failed program was:
 | }
 | 
 configure:4753: cc -std=gnu11 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:186[stdin:266] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:186[stdin:288] syntax error, last name: __func__$9
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -493,7 +495,7 @@ cpp: conftest.c:76 #error directive: "Compiler does not advertise C99 conformanc
 cpp: conftest.c:110 #error directive: "your preprocessor is broken"
 cpp: conftest.c:114 #error directive: "your preprocessor is broken"
 cpp: conftest.c:182 #error directive: "Compiler does not advertise C11 conformance"
-cc: 6c: cpp 93289: errors
+cc: 6c: cpp 74947: errors
 configure:4753: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -788,11 +790,11 @@ configure: failed program was:
 configure:4767: result: unsupported
 configure:4787: checking for cc option to enable C99 features
 configure:4802: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:295] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:317] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cpp: conftest.c:76 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:110 #error directive: "your preprocessor is broken"
 cpp: conftest.c:114 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 93309: errors
+cc: 6c: cpp 74967: errors
 configure:4802: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1025,7 +1027,7 @@ configure: failed program was:
 | }
 | 
 configure:4802: cc -std=gnu99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:295] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:317] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -1036,7 +1038,7 @@ cc: flag -9 ignored
 cpp: conftest.c:76 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:110 #error directive: "your preprocessor is broken"
 cpp: conftest.c:114 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 93323: errors
+cc: 6c: cpp 74981: errors
 configure:4802: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1269,7 +1271,7 @@ configure: failed program was:
 | }
 | 
 configure:4802: cc -std=c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:295] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:317] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -1278,7 +1280,7 @@ cc: flag -9 ignored
 cpp: conftest.c:76 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:110 #error directive: "your preprocessor is broken"
 cpp: conftest.c:114 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 93337: errors
+cc: 6c: cpp 74995: errors
 configure:4802: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1511,13 +1513,13 @@ configure: failed program was:
 | }
 | 
 configure:4802: cc -c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:295] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:317] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -9 ignored
 cc: flag -9 ignored
 cpp: conftest.c:76 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:110 #error directive: "your preprocessor is broken"
 cpp: conftest.c:114 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 93351: errors
+cc: 6c: cpp 75009: errors
 configure:4802: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1750,13 +1752,13 @@ configure: failed program was:
 | }
 | 
 configure:4802: cc -qlanglvl=extc1x -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:295] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:317] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -q ignored
 cc: can't find library for -l
 cpp: conftest.c:76 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:110 #error directive: "your preprocessor is broken"
 cpp: conftest.c:114 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 93365: errors
+cc: 6c: cpp 75023: errors
 configure:4802: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1989,13 +1991,13 @@ configure: failed program was:
 | }
 | 
 configure:4802: cc -qlanglvl=extc99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:295] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:317] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -q ignored
 cc: can't find library for -l
 cpp: conftest.c:76 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:110 #error directive: "your preprocessor is broken"
 cpp: conftest.c:114 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 93379: errors
+cc: 6c: cpp 75037: errors
 configure:4802: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2228,14 +2230,14 @@ configure: failed program was:
 | }
 | 
 configure:4802: cc -AC99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:295] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:317] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cc: flag -C ignored
 cc: flag -9 ignored
 cc: flag -9 ignored
 cpp: conftest.c:76 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:110 #error directive: "your preprocessor is broken"
 cpp: conftest.c:114 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 93393: errors
+cc: 6c: cpp 75051: errors
 configure:4802: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2468,11 +2470,11 @@ configure: failed program was:
 | }
 | 
 configure:4802: cc -D_STDC_C99= -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:295] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/libxml2/conftest.c:215[stdin:317] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
 cpp: conftest.c:76 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:110 #error directive: "your preprocessor is broken"
 cpp: conftest.c:114 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 93407: errors
+cc: 6c: cpp 75065: errors
 configure:4802: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2785,14 +2787,14 @@ ac_cv_env_target_alias_value=
 ac_cv_host=x86_64-unknown-plan9
 ac_cv_objext=o
 ac_cv_path_install='/bin/install -c'
-ac_cv_prog_AWK=awk
+ac_cv_prog_AWK=gawk
 ac_cv_prog_CC=cc
 ac_cv_prog_cc_c11=no
 ac_cv_prog_cc_c89=
 ac_cv_prog_cc_c99=no
 ac_cv_prog_cc_g=yes
 ac_cv_prog_cc_stdc=
-ac_cv_prog_make__set=yes
+ac_cv_prog_make_make_set=yes
 am_cv_CC_dependencies_compiler_type=none
 am_cv_filesystem_timestamp_resolution=2
 am_cv_make_support_nested_variables=yes
@@ -2820,7 +2822,7 @@ AR=''
 AUTOCONF='${SHELL} '\''/usr/glenda/APExp/sys/src/external/libxml2/missing'\'' autoconf'
 AUTOHEADER='${SHELL} '\''/usr/glenda/APExp/sys/src/external/libxml2/missing'\'' autoheader'
 AUTOMAKE='${SHELL} '\''/usr/glenda/APExp/sys/src/external/libxml2/missing'\'' automake-1.18'
-AWK='awk'
+AWK='gawk'
 BUILD_SHARED_LIBS=''
 CC='cc'
 CCDEPMODE='depmode=none'

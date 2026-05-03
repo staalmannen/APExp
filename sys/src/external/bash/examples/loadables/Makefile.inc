@@ -40,7 +40,7 @@ headersdir = $(includedir)/$(PACKAGE_NAME)
 topdir = ../..
 BUILD_DIR = /usr/glenda/APExp/sys/src/external/bash
 srcdir = .
-VPATH = .
+
 
 # Support an alternate destination root directory for package building
 DESTDIR =

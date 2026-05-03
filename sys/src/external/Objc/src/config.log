@@ -126,6 +126,7 @@ configure:3749: result: o
 configure:3753: checking whether the compiler supports GNU C
 configure:3773: cc -c   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:14[stdin:15] syntax error, last name: me
+cc: cpp: 6c 85700: error
 configure:3773: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -154,7 +155,12 @@ configure:3817: $? = 0
 configure:3864: result: yes
 configure:3884: checking for cc option to enable C11 features
 configure:3899: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:184[stdin:253] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:184[stdin:286] syntax error, last name: __func__$9
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cpp: conftest.c:180 #error directive: "Compiler does not advertise C11 conformance"
+cc: 6c: cpp 85733: errors
 configure:3899: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -445,7 +451,19 @@ configure: failed program was:
 | }
 | 
 configure:3899: cc -std=gnu11 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:184[stdin:253] syntax error, last name: __func__$9
+/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:184[stdin:286] syntax error, last name: __func__$9
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -n ignored
+cc: flag -u ignored
+cc: flag -1 ignored
+cc: flag -1 ignored
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cpp: conftest.c:180 #error directive: "Compiler does not advertise C11 conformance"
+cc: 6c: cpp 85747: errors
 configure:3899: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -738,7 +756,11 @@ configure: failed program was:
 configure:3913: result: unsupported
 configure:3933: checking for cc option to enable C99 features
 configure:3948: cc  -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 85767: errors
 configure:3948: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -969,7 +991,18 @@ configure: failed program was:
 | }
 | 
 configure:3948: cc -std=gnu99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -n ignored
+cc: flag -u ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 85781: errors
 configure:3948: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1200,7 +1233,16 @@ configure: failed program was:
 | }
 | 
 configure:3948: cc -std=c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -t ignored
+cc: flag -d ignored
+cc: flag -= ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 85795: errors
 configure:3948: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1431,7 +1473,13 @@ configure: failed program was:
 | }
 | 
 configure:3948: cc -c99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 85809: errors
 configure:3948: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1662,7 +1710,13 @@ configure: failed program was:
 | }
 | 
 configure:3948: cc -qlanglvl=extc1x -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -q ignored
+cc: can't find library for -l
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 85823: errors
 configure:3948: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1893,7 +1947,13 @@ configure: failed program was:
 | }
 | 
 configure:3948: cc -qlanglvl=extc99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -q ignored
+cc: can't find library for -l
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 85837: errors
 configure:3948: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2124,7 +2184,14 @@ configure: failed program was:
 | }
 | 
 configure:3948: cc -AC99 -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cc: flag -C ignored
+cc: flag -9 ignored
+cc: flag -9 ignored
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 85851: errors
 configure:3948: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2355,7 +2422,11 @@ configure: failed program was:
 | }
 | 
 configure:3948: cc -D_STDC_C99= -c -g  conftest.c >&5
-/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:282] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+/usr/glenda/APExp/sys/src/external/Objc/src/conftest.c:213[stdin:315] incompatible types: "IND CONST USHORT" and "IND UINT" for op "AS"
+cpp: conftest.c:74 #error directive: "Compiler does not advertise C99 conformance"
+cpp: conftest.c:108 #error directive: "your preprocessor is broken"
+cpp: conftest.c:112 #error directive: "your preprocessor is broken"
+cc: 6c: cpp 85865: errors
 configure:3948: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2594,6 +2665,8 @@ configure:4041: checking how to run the C preprocessor
 configure:4067: cc -E  conftest.c
 configure:4067: $? = 0
 configure:4083: cc -E  conftest.c
+cpp: conftest.c:9 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 85904: error
 configure:4083: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2609,6 +2682,8 @@ configure:4112: result: cc -E
 configure:4126: cc -E  conftest.c
 configure:4126: $? = 0
 configure:4142: cc -E  conftest.c
+cpp: conftest.c:9 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 85926: error
 configure:4142: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2623,7 +2698,7 @@ configure: failed program was:
 configure:4176: checking whether preprocessor processes .m files
 configure:4185: result: no
 configure:4366: checking whether compiler supports -std=gnu17
-cc -std=gnu17 -c ac20085.c
+cc -std=gnu17 -c ac85408.c
 cc: flag -t ignored
 cc: flag -d ignored
 cc: flag -= ignored
@@ -2634,11 +2709,11 @@ cc: flag -7 ignored
  (yes)
 configure:4398: result: yes
 configure:4422: checking testing whether C compiler supports short line tags
-cc -c st20085.i -o st20085.o
+cc -c st85408.i -o st85408.o
 cc: no files to compile or load
 configure:4453: result: no
 configure:4456: checking testing whether C compiler supports long line tags
-cc -c lt20085.i -o lt20085.o
+cc -c lt85408.i -o lt85408.o
 cc: no files to compile or load
 configure:4487: result: no
 configure:4540: checking for rm
@@ -2738,16 +2813,17 @@ configure:5678: cc -o conftest -g   conftest.c  >&5
 configure:5678: $? = 0
 configure:5678: result: yes
 configure:5827: checking whether compiler supports C tentative definitions
-cc x20085.c y20085.c -o x20085
-cc y20085.c x20085.c -o y20085
-check whether x20085 returns '7' (yes)
-check whether y20085 returns '7' (yes)
+cc x85408.c y85408.c -o x85408
+cc y85408.c x85408.c -o y85408
+check whether x85408 returns '7' (yes)
+check whether y85408 returns '7' (yes)
 configure:5886: result: yes
 configure:5928: checking whether to use postlink
 configure:5948: result: no
 configure:5973: checking for _objcInit
 configure:5973: cc -o conftest -g   conftest.c  >&5
 main: undefined: _objcInit in main
+cc: 6l: 6l 86302: error
 configure:5973: $? = 1
 configure: failed program was:
 | /* confdefs.h */

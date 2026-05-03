@@ -20,7 +20,7 @@ SHELL = /bin/sh
 
 srcdir = .
 top_srcdir = ..
-VPATH = .
+
 
 prefix = /usr/local
 exec_prefix = ${prefix}
@@ -125,7 +125,7 @@ POTFILES = \
      ../support/regex_internal.c \
      ../support/regexec.c \
      ../symbol.c \
-     ../version.c \
+     ../version.c
 
 CATALOGS =  ar.gmo bg.gmo de.gmo es.gmo fr.gmo he.gmo id.gmo it.gmo ko.gmo nl.gmo pl.gmo pt.gmo pt_BR.gmo ro.gmo sr.gmo sv.gmo tr.gmo uk.gmo zh_CN.gmo
 

@@ -229,7 +229,7 @@
 #define SIZEOF_CHAR_P 8
 
 /* The number of bytes in a size_t.  */
-#define SIZEOF_SIZE_T 4
+#define SIZEOF_SIZE_T 8
 
 /* The number of bytes in a double (hopefully 8). */
 #define SIZEOF_DOUBLE 8
@@ -388,7 +388,7 @@
 /* Define if you have wint_t in <wctype.h>. */
 #define HAVE_WINT_T 1
 
-#define RLIMTYPE unsigned long
+#define RLIMTYPE rlim_t
 
 /* Define to the type of elements in the array set by `getgroups'.
    Usually this is either `int' or `gid_t'.  */
@@ -443,7 +443,7 @@
 
 /* #undef GWINSZ_IN_SYS_IOCTL */
 
-/* #undef STRUCT_WINSIZE_IN_SYS_IOCTL */
+#define STRUCT_WINSIZE_IN_SYS_IOCTL 1
 
 /* #undef TM_IN_SYS_TIME */
 
@@ -521,17 +521,17 @@
 /* These are checked with BASH_FUNC_UNLOCKED_IO */
 
 #define HAVE_DECL_CLEARERR_UNLOCKED 0
-#define HAVE_DECL_FEOF_UNLOCKED 0
-#define HAVE_DECL_FERROR_UNLOCKED 0
+#define HAVE_DECL_FEOF_UNLOCKED 1
+#define HAVE_DECL_FERROR_UNLOCKED 1
 #define HAVE_DECL_FFLUSH_UNLOCKED 0
 #define HAVE_DECL_FGETS_UNLOCKED 0
 #define HAVE_DECL_FPUTC_UNLOCKED 0
 #define HAVE_DECL_FPUTS_UNLOCKED 0
 #define HAVE_DECL_FREAD_UNLOCKED 0
 #define HAVE_DECL_FWRITE_UNLOCKED 0
-#define HAVE_DECL_GETC_UNLOCKED 0
+#define HAVE_DECL_GETC_UNLOCKED 1
 #define HAVE_DECL_GETCHAR_UNLOCKED 0
-#define HAVE_DECL_PUTC_UNLOCKED 0
+#define HAVE_DECL_PUTC_UNLOCKED 1
 #define HAVE_DECL_PUTCHAR_UNLOCKED 0
 
 /* Characteristics of system calls and C library functions. */
@@ -539,7 +539,7 @@
 /* Define if the `getpgrp' function takes no argument.  */
 #define GETPGRP_VOID 1
 
-#define NAMED_PIPES_MISSING 1
+/* #undef NAMED_PIPES_MISSING */
 
 /* #undef OPENDIR_NOT_ROBUST */
 
@@ -690,10 +690,10 @@
 #define HAVE_GETPWUID 1
 
 /* Define if you have the getrandom function.  */
-/* #undef HAVE_GETRANDOM */
+#define HAVE_GETRANDOM 1
 
 /* Define if you have the getrlimit function.  */
-/* #undef HAVE_GETRLIMIT */
+#define HAVE_GETRLIMIT 1
 
 /* Define if you have the getrusage function.  */
 #define HAVE_GETRUSAGE 1
@@ -711,7 +711,7 @@
 /* #undef HAVE_GETWD */
 
 /* Define if you have the iconv function.  */
-/* #undef HAVE_ICONV */
+#define HAVE_ICONV 1
 
 /* Define if you have the imaxdiv function.  */
 #define HAVE_IMAXDIV 1
@@ -738,10 +738,10 @@
 #define HAVE_ISWCTYPE 1
 
 /* Define if you have the iswlower function.  */
-/* #undef HAVE_ISWLOWER */
+#define HAVE_ISWLOWER 1
 
 /* Define if you have the iswupper function.  */
-/* #undef HAVE_ISWUPPER */
+#define HAVE_ISWUPPER 1
 
 /* Define if you have the isxdigit function.  */
 #define HAVE_ISXDIGIT 1
@@ -777,7 +777,7 @@
 /* #undef HAVE_MBSNCMP */
 
 /* Define if you have the mbsnrtowcs function. */
-/* #undef HAVE_MBSNRTOWCS */
+#define HAVE_MBSNRTOWCS 1
 
 /* Define if you have the mbsrtowcs function. */
 #define HAVE_MBSRTOWCS 1
@@ -792,7 +792,7 @@
 #define HAVE_MEMSET 1
 
 /* Define if you have the mkdtemp function.  */
-/* #undef HAVE_MKDTEMP */
+#define HAVE_MKDTEMP 1
 
 /* Define if you have the mkfifo function.  */
 #define HAVE_MKFIFO 1
@@ -864,7 +864,7 @@
 /* #undef HAVE_DECL_SETRESUID */
 
 /* Define if you have the shm_open function.  */
-/* #undef HAVE_SHM_OPEN */
+#define HAVE_SHM_OPEN 1
 
 /* Define if you have the shm_mkstemp function.  */
 /* #undef HAVE_SHM_MKSTEMP */
@@ -1002,13 +1002,13 @@
 #define HAVE_WCRTOMB 1
 
 /* Define if you have the wcscoll function.  */
-/* #undef HAVE_WCSCOLL */
+#define HAVE_WCSCOLL 1
 
 /* Define if you have the wcsdup function.  */
-/* #undef HAVE_WCSDUP */
+#define HAVE_WCSDUP 1
 
 /* Define if you have the wcsnrtombs function.  */
-/* #undef HAVE_WCSNRTOMBS */
+#define HAVE_WCSNRTOMBS 1
 
 /* Define if you have the wctype function.  */
 #define HAVE_WCTYPE 1
@@ -1020,7 +1020,7 @@
 #define HAVE_WCWIDTH 1
 
 /* and if it works */
-#define WCWIDTH_BROKEN 1
+/* #undef WCWIDTH_BROKEN */
 
 /* Presence of certain system include files. */
 
@@ -1103,7 +1103,7 @@
 /* #undef HAVE_SYS_DIR_H */
 
 /* Define if you have the <sys/file.h> header file.  */
-/* #undef HAVE_SYS_FILE_H */
+#define HAVE_SYS_FILE_H 1
 
 /* Define if you have the <sys/ioctl.h> header file.  */
 #define HAVE_SYS_IOCTL_H 1
@@ -1124,7 +1124,7 @@
 /* #undef HAVE_SYS_PTEM_H */
 
 /* Define if you have the <sys/random.h> header file.  */
-/* #undef HAVE_SYS_RANDOM_H */
+#define HAVE_SYS_RANDOM_H 1
 
 /* Define if you have the <sys/resource.h> header file.  */
 #define HAVE_SYS_RESOURCE_H 1
@@ -1240,7 +1240,7 @@
 
 #define HAVE_VISIBILITY 0
 
-/* #undef HAVE_BUILTIN_EXPECT */
+#define HAVE_BUILTIN_EXPECT 1
 
 /* #undef HAVE_WEAK_SYMBOLS */
 
@@ -1280,13 +1280,13 @@
 /* #undef HAVE_XLOCALE_H */
 
 /* Declarations */
-#define HAVE_DECL_FEOF_UNLOCKED 0
+#define HAVE_DECL_FEOF_UNLOCKED 1
 #define HAVE_DECL_FGETS_UNLOCKED 0
 #define HAVE_DECL__SNPRINTF 0
 #define HAVE_DECL__SNWPRINTF 0
 
 /* Define if you have the `dcgettext' function. */
-/* #undef HAVE_DCGETTEXT */
+#define HAVE_DCGETTEXT 1
 
 #define HAVE_GETUID 1
 #define HAVE_GETEUID 1
@@ -1295,8 +1295,8 @@
 #define HAVE_GETEGID 1
 
 /* #undef HAVE_GETLOCALENAME_L */
-/* #undef HAVE_GOOD_USELOCALE */
-/* #undef HAVE_ICONV */
+#define HAVE_GOOD_USELOCALE 1
+#define HAVE_ICONV 1
 
 /* Define if you have the `localeconv' function. */
 #define HAVE_LOCALECONV 1
@@ -1311,16 +1311,16 @@
 /* #undef HAVE_MMAP */
 
 /* Define if you have the `mremap' function. */
-/* #undef HAVE_MREMAP */
+#define HAVE_MREMAP 1
 
 /* Define if you have the `munmap' function. */
-/* #undef HAVE_MUNMAP */
+#define HAVE_MUNMAP 1
 
 /* Define if you have the `nanosleep' function. */
 #define HAVE_NANOSLEEP 1
 
 /* Define if you have the `newlocale' function. */
-/* #undef HAVE_NEWLOCALE */
+#define HAVE_NEWLOCALE 1
 
 /* Define if you have the `nl_langinfo' function. */
 /* #undef HAVE_NL_LANGINFO */
@@ -1336,7 +1336,7 @@
 /* #undef HAVE_SNPRINTF_TRUNCATION_C99 */
 
 /* Define if you have the `stpcpy' function. */
-/* #undef HAVE_STPCPY */
+#define HAVE_STPCPY 1
 
 /* Define if you have the `strcspn' function. */
 #define HAVE_STRCSPN 1
@@ -1347,11 +1347,11 @@
 #define HAVE_TSEARCH 1
 
 /* Define if you have the `uselocale' function. */
-/* #undef HAVE_USELOCALE */
-/* #undef HAVE_WORKING_USELOCALE */
+#define HAVE_USELOCALE 1
+#define HAVE_WORKING_USELOCALE 1
 
-/* #undef HAVE_WCSLEN */
-/* #undef HAVE_WCSNLEN */
+#define HAVE_WCSLEN 1
+#define HAVE_WCSNLEN 1
 
 /* Define if you have the `wprintf' function. */
 /* #undef HAVE_WPRINTF */

@@ -143,7 +143,7 @@ configure:6240: result: o
 configure:6244: checking whether the compiler supports GNU C
 configure:6264: cc -c   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:16[stdin:17] syntax error, last name: me
-cc: cpp: 6c 13127: error
+cc: cpp: 6c 61453: error
 configure:6264: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -179,7 +179,7 @@ cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformanc
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
 cpp: conftest.c:167 #error directive: "Compiler does not advertise C11 conformance"
-cc: 6c: cpp 13160: errors
+cc: 6c: cpp 61486: errors
 configure:6385: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -467,7 +467,7 @@ cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformanc
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
 cpp: conftest.c:167 #error directive: "Compiler does not advertise C11 conformance"
-cc: 6c: cpp 13174: errors
+cc: 6c: cpp 61500: errors
 configure:6385: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -749,7 +749,7 @@ configure:6431: cc  -c -g  conftest.c >&5
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 13194: errors
+cc: 6c: cpp 61520: errors
 configure:6431: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -976,7 +976,7 @@ cc: flag -9 ignored
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 13208: errors
+cc: 6c: cpp 61534: errors
 configure:6431: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1201,7 +1201,7 @@ cc: flag -9 ignored
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 13222: errors
+cc: 6c: cpp 61548: errors
 configure:6431: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1423,7 +1423,7 @@ cc: flag -9 ignored
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 13236: errors
+cc: 6c: cpp 61562: errors
 configure:6431: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1645,7 +1645,7 @@ cc: can't find library for -l
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 13250: errors
+cc: 6c: cpp 61576: errors
 configure:6431: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -1867,7 +1867,7 @@ cc: can't find library for -l
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 13264: errors
+cc: 6c: cpp 61590: errors
 configure:6431: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2090,7 +2090,7 @@ cc: flag -9 ignored
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 13278: errors
+cc: 6c: cpp 61604: errors
 configure:6431: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2310,7 +2310,7 @@ configure:6431: cc -D_STDC_C99= -c -g  conftest.c >&5
 cpp: conftest.c:63 #error directive: "Compiler does not advertise C99 conformance"
 cpp: conftest.c:94 #error directive: "your preprocessor is broken"
 cpp: conftest.c:98 #error directive: "your preprocessor is broken"
-cc: 6c: cpp 13292: errors
+cc: 6c: cpp 61618: errors
 configure:6431: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2600,7 +2600,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: wcsft
 cpp: conftest.c:49 Could not find include file <minix/config.h>
-cc: 6c: cpp 13637: error
+cc: 6c: cpp 61964: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2662,7 +2662,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: wcsf
 cpp: conftest.c:50 Could not find include file <linux/fd.h>
-cc: 6c: cpp 13670: error
+cc: 6c: cpp 61997: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2721,7 +2721,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: wcsf
 cpp: conftest.c:50 Could not find include file <memory.h>
-cc: 6c: cpp 13689: error
+cc: 6c: cpp 62016: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2780,7 +2780,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: wcsf
 cpp: conftest.c:50 Could not find include file <net/errno.h>
-cc: 6c: cpp 13708: error
+cc: 6c: cpp 62035: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2839,7 +2839,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: wcsf
 cpp: conftest.c:50 Could not find include file <sgtty.h>
-cc: 6c: cpp 13727: error
+cc: 6c: cpp 62054: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2902,7 +2902,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: wcs
 cpp: conftest.c:51 Could not find include file <sys/device.h>
-cc: 6c: cpp 13760: error
+cc: 6c: cpp 62087: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -2962,7 +2962,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: wcs
 cpp: conftest.c:51 Could not find include file <sys/gentape.h>
-cc: 6c: cpp 13779: error
+cc: 6c: cpp 62106: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3022,7 +3022,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: wcs
 cpp: conftest.c:51 Could not find include file <sys/inet.h>
-cc: 6c: cpp 13798: error
+cc: 6c: cpp 62125: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3082,7 +3082,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: wcs
 cpp: conftest.c:51 Could not find include file <sys/io/trioctl.h>
-cc: 6c: cpp 13817: error
+cc: 6c: cpp 62144: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3142,7 +3142,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: wcs
 cpp: conftest.c:51 Could not find include file <sys/mtio.h>
-cc: 6c: cpp 13836: error
+cc: 6c: cpp 62163: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3206,7 +3206,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: wc
 cpp: conftest.c:52 Could not find include file <sys/tprintf.h>
-cc: 6c: cpp 13869: error
+cc: 6c: cpp 62196: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3267,7 +3267,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: wc
 cpp: conftest.c:52 Could not find include file <sys/tape.h>
-cc: 6c: cpp 13888: error
+cc: 6c: cpp 62215: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3335,7 +3335,7 @@ configure:7001: checking for linewrap.h
 configure:7001: cc -c -g  conftest.c >&5
 <eof> syntax error, last name: size_t
 cpp: conftest.c:54 Could not find include file <linewrap.h>
-cc: 6c: cpp 13935: error
+cc: 6c: cpp 62262: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3414,7 +3414,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: siz
 cpp: conftest.c:58 Could not find include file <linux/xattr.h>
-cc: 6c: cpp 14010: error
+cc: 6c: cpp 62337: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3485,7 +3485,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: si
 cpp: conftest.c:59 Could not find include file <stdio_ext.h>
-cc: 6c: cpp 14043: error
+cc: 6c: cpp 62370: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3560,7 +3560,7 @@ configure:7001: checking for threads.h
 configure:7001: cc -c -g  conftest.c >&5
 <eof> syntax error, last name: extern
 cpp: conftest.c:61 Could not find include file <threads.h>
-cc: 6c: cpp 14090: error
+cc: 6c: cpp 62417: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3633,7 +3633,7 @@ configure:7001: checking for crtdefs.h
 configure:7001: cc -c -g  conftest.c >&5
 <eof> syntax error, last name: extern
 cpp: conftest.c:62 Could not find include file <crtdefs.h>
-cc: 6c: cpp 14123: error
+cc: 6c: cpp 62450: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3712,7 +3712,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: exte
 cpp: conftest.c:64 Could not find include file <xlocale.h>
-cc: 6c: cpp 14170: error
+cc: 6c: cpp 62497: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3789,7 +3789,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: ext
 cpp: conftest.c:65 Could not find include file <priv.h>
-cc: 6c: cpp 14203: error
+cc: 6c: cpp 62530: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3863,7 +3863,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: ext
 cpp: conftest.c:65 Could not find include file <malloc.h>
-cc: 6c: cpp 14222: error
+cc: 6c: cpp 62549: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -3937,7 +3937,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: ext
 cpp: conftest.c:65 Could not find include file <selinux/selinux.h>
-cc: 6c: cpp 14241: error
+cc: 6c: cpp 62568: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4015,7 +4015,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: ex
 cpp: conftest.c:66 Could not find include file <stdckdint.h>
-cc: 6c: cpp 14274: error
+cc: 6c: cpp 62601: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4094,7 +4094,7 @@ configure:7001: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: e
 cpp: conftest.c:67 Could not find include file <sysexits.h>
-cc: 6c: cpp 14307: error
+cc: 6c: cpp 62634: error
 configure:7001: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4202,7 +4202,7 @@ configure:7287: cc -E  conftest.c
 configure:7287: $? = 0
 configure:7302: cc -E  conftest.c
 cpp: conftest.c:62 Could not find include file <ac_nonexistent.h>
-cc: cpp: cpp 14466: error
+cc: cpp: cpp 62794: error
 configure:7302: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4272,7 +4272,7 @@ configure:7343: cc -E  conftest.c
 configure:7343: $? = 0
 configure:7358: cc -E  conftest.c
 cpp: conftest.c:62 Could not find include file <ac_nonexistent.h>
-cc: cpp: cpp 14488: error
+cc: cpp: cpp 62816: error
 configure:7358: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4355,7 +4355,7 @@ configure:7914: cc -c -g  conftest.c >&5
 configure:7914: $? = 0
 configure:7920: cc -DFTYPE=ino_t -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:72[stdin:252] array size must be a positive constant
-cc: cpp: 6c 14553: error
+cc: cpp: 6c 62882: error
 configure:7920: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4441,7 +4441,7 @@ configure: failed program was:
 | }
 configure:7925: cc -DFTYPE=ino_t -D_FILE_OFFSET_BITS=64 -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:72[stdin:252] array size must be a positive constant
-cc: cpp: 6c 14566: error
+cc: cpp: 6c 62895: error
 configure:7925: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4537,7 +4537,7 @@ configure:8715: result: none needed
 configure:8764: checking for sys/buf.h
 configure:8764: cc -c -g  conftest.c >&5
 cpp: conftest.c:68 Could not find include file <sys/buf.h>
-cc: 6c: cpp 14613: error
+cc: 6c: cpp 62942: error
 configure:8764: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4613,7 +4613,7 @@ configure:8776: checking for sys/mkdev.h
 configure:8776: cc -c -g  conftest.c >&5
 <eof> syntax error, last name: wchar_t
 cpp: conftest.c:92 Could not find include file <sys/mkdev.h>
-cc: 6c: cpp 14632: error
+cc: 6c: cpp 62961: error
 configure:8776: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4716,7 +4716,7 @@ configure:8785: result: yes
 configure:8796: checking for st_fstype string in struct stat
 configure:8815: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:71[stdin:516] not a member of struct/union: st_fstype
-cc: cpp: 6c 14664: error
+cc: cpp: 6c 62993: error
 configure:8815: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4798,7 +4798,7 @@ configure:8847: checking for sys/acl.h
 configure:8847: cc -c -g  conftest.c >&5
 <eof> syntax error, last name: wchar_t
 cpp: conftest.c:93 Could not find include file <sys/acl.h>
-cc: 6c: cpp 14684: error
+cc: 6c: cpp 63013: error
 configure:8847: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -4900,7 +4900,7 @@ configure:8935: cc -c -g  conftest.c >&5
 configure:8935: $? = 0
 configure:8935: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:96[stdin:4944] syntax error, last name: mode_t
-cc: cpp: 6c 14710: error
+cc: cpp: 6c 63039: error
 configure:8935: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5009,7 +5009,7 @@ configure:8946: cc -c -g  conftest.c >&5
 configure:8946: $? = 0
 configure:8946: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:97[stdin:4945] syntax error, last name: pid_t
-cc: cpp: 6c 14738: error
+cc: cpp: 6c 63067: error
 configure:8946: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5119,7 +5119,7 @@ configure:8982: cc -c -g  conftest.c >&5
 configure:8982: $? = 0
 configure:8982: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:96[stdin:4944] syntax error, last name: off_t
-cc: cpp: 6c 14766: error
+cc: cpp: 6c 63095: error
 configure:8982: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5228,7 +5228,7 @@ configure:9013: result: yes
 configure:9024: checking for major_t
 configure:9024: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:96[stdin:4944] name not declared: major_t
-cc: cpp: 6c 14796: error
+cc: cpp: 6c 63126: error
 configure:9024: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5335,7 +5335,7 @@ configure:9024: result: no
 configure:9034: checking for minor_t
 configure:9034: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:97[stdin:4945] name not declared: minor_t
-cc: cpp: 6c 14816: error
+cc: cpp: 6c 63146: error
 configure:9034: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5445,7 +5445,7 @@ configure:9044: cc -c -g  conftest.c >&5
 configure:9044: $? = 0
 configure:9044: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:98[stdin:4946] syntax error, last name: dev_t
-cc: cpp: 6c 14844: error
+cc: cpp: 6c 63174: error
 configure:9044: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5556,7 +5556,7 @@ configure:9054: cc -c -g  conftest.c >&5
 configure:9054: $? = 0
 configure:9054: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:98[stdin:4946] syntax error, last name: ino_t
-cc: cpp: 6c 14872: error
+cc: cpp: 6c 63202: error
 configure:9054: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5717,7 +5717,7 @@ configure:9186: result: yes
 configure:9186: checking for _set_invalid_parameter_handler
 configure:9186: cc -o conftest -g   conftest.c  >&5
 main: undefined: _set_invalid_parameter_handler in main
-cc: 6l: 6l 15087: error
+cc: 6l: 6l 63417: error
 configure:9186: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5837,7 +5837,7 @@ configure:9186: result: yes
 configure:9186: checking for fdopendir
 configure:9186: cc -o conftest -g   conftest.c  >&5
 main: undefined: fdopendir in main
-cc: 6l: 6l 15123: error
+cc: 6l: 6l 63453: error
 configure:9186: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -5958,7 +5958,7 @@ configure:9186: result: yes
 configure:9186: checking for lchmod
 configure:9186: cc -o conftest -g   conftest.c  >&5
 main: undefined: lchmod in main
-cc: 6l: 6l 15159: error
+cc: 6l: 6l 63489: error
 configure:9186: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6084,7 +6084,7 @@ configure:9186: result: yes
 configure:9186: checking for listxattr
 configure:9186: cc -o conftest -g   conftest.c  >&5
 main: undefined: listxattr in main
-cc: 6l: 6l 15210: error
+cc: 6l: 6l 63540: error
 configure:9186: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6220,7 +6220,7 @@ configure:9186: result: yes
 configure:9186: checking for getexecname
 configure:9186: cc -o conftest -g   conftest.c  >&5
 main: undefined: getexecname in main
-cc: 6l: 6l 15291: error
+cc: 6l: 6l 63621: error
 configure:9186: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6454,7 +6454,7 @@ configure:9677: cc -c -g  conftest.c >&5
 configure:9677: $? = 0
 configure:9677: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:145[stdin:4993] syntax error, last name: size_t
-cc: cpp: 6c 15719: error
+cc: cpp: 6c 64049: error
 configure:9677: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6620,7 +6620,7 @@ configure:9866: result: inline
 configure:9884: checking for C/C++ restrict keyword
 configure:9914: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:118[stdin:119] syntax error, last name: __restrict__
-cc: cpp: 6c 15773: error
+cc: cpp: 6c 64103: error
 configure:9914: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6756,7 +6756,7 @@ configure: failed program was:
 | }
 configure:9914: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:118[stdin:119] syntax error, last name: __restrict
-cc: cpp: 6c 15788: error
+cc: cpp: 6c 64118: error
 configure:9914: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -6892,7 +6892,7 @@ configure: failed program was:
 | }
 configure:9914: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:117[stdin:118] syntax error, last name: ip
-cc: cpp: 6c 15803: error
+cc: cpp: 6c 64133: error
 configure:9914: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7028,7 +7028,7 @@ configure: failed program was:
 | }
 configure:9914: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:118[stdin:119] syntax error, last name: restrict
-cc: cpp: 6c 15818: error
+cc: cpp: 6c 64148: error
 configure:9914: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7166,7 +7166,7 @@ configure:9923: result: no
 configure:9934: checking for cc options needed to detect all undeclared functions
 configure:9956: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:121[stdin:122] name not declared: strchr
-cc: cpp: 6c 15838: error
+cc: cpp: 6c 64168: error
 configure:9956: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7299,7 +7299,7 @@ configure:10000: result: none needed
 configure:10014: checking whether clearerr_unlocked is declared
 configure:10014: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:152[stdin:5000] name not declared: clearerr_unlocked
-cc: cpp: 6c 15868: error
+cc: cpp: 6c 64198: error
 configure:10014: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7472,7 +7472,7 @@ configure:10032: result: yes
 configure:10041: checking whether fflush_unlocked is declared
 configure:10041: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:155[stdin:5003] name not declared: fflush_unlocked
-cc: cpp: 6c 15928: error
+cc: cpp: 6c 64258: error
 configure:10041: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7640,7 +7640,7 @@ configure:10041: result: no
 configure:10050: checking whether fgets_unlocked is declared
 configure:10050: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:156[stdin:5004] name not declared: fgets_unlocked
-cc: cpp: 6c 15952: error
+cc: cpp: 6c 64282: error
 configure:10050: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7809,7 +7809,7 @@ configure:10050: result: no
 configure:10059: checking whether fputc_unlocked is declared
 configure:10059: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:157[stdin:5005] name not declared: fputc_unlocked
-cc: cpp: 6c 15976: error
+cc: cpp: 6c 64306: error
 configure:10059: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -7979,7 +7979,7 @@ configure:10059: result: no
 configure:10068: checking whether fputs_unlocked is declared
 configure:10068: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:158[stdin:5006] name not declared: fputs_unlocked
-cc: cpp: 6c 16000: error
+cc: cpp: 6c 64330: error
 configure:10068: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8150,7 +8150,7 @@ configure:10068: result: no
 configure:10077: checking whether fread_unlocked is declared
 configure:10077: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:159[stdin:5007] name not declared: fread_unlocked
-cc: cpp: 6c 16024: error
+cc: cpp: 6c 64354: error
 configure:10077: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8322,7 +8322,7 @@ configure:10077: result: no
 configure:10086: checking whether fwrite_unlocked is declared
 configure:10086: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:160[stdin:5008] name not declared: fwrite_unlocked
-cc: cpp: 6c 16048: error
+cc: cpp: 6c 64378: error
 configure:10086: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8499,7 +8499,7 @@ configure:10095: result: yes
 configure:10104: checking whether getchar_unlocked is declared
 configure:10104: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:162[stdin:5010] name not declared: getchar_unlocked
-cc: cpp: 6c 16090: error
+cc: cpp: 6c 64420: error
 configure:10104: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8678,7 +8678,7 @@ configure:10113: result: yes
 configure:10122: checking whether putchar_unlocked is declared
 configure:10122: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:164[stdin:5012] name not declared: putchar_unlocked
-cc: cpp: 6c 16132: error
+cc: cpp: 6c 64462: error
 configure:10122: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -8860,7 +8860,7 @@ configure:10154: checking whether strerror_r returns char *
 configure:10179: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:138[stdin:4286] incompatible type: "INT" for op "IND"
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:139[stdin:4287] incompatible types: "IND CHAR" and "INT" for op "AS"
-cc: cpp: 6c 16171: error
+cc: cpp: 6c 64501: error
 configure:10179: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9027,7 +9027,7 @@ configure:10555: result: yes
 configure:10571: checking for nl_langinfo and CODESET
 configure:10588: cc -o conftest -g   conftest.c  >&5
 /sys/include/ape/langinfo.h:16[stdin:215] syntax error, last name: size_t
-cc: cpp: 6c 16256: error
+cc: cpp: 6c 64586: error
 configure:10588: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9179,7 +9179,7 @@ configure:10744: result: none
 configure:11220: checking whether char8_t is correctly defined
 configure:11244: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:139[stdin:4377] sizeof undefined type
-cc: cpp: 6c 16298: error
+cc: cpp: 6c 64628: error
 configure:11244: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -9383,7 +9383,7 @@ configure:12516: checking whether malloc is ptrdiff_t safe
 configure:12553: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:159[stdin:409] syntax error, last name: error
 cpp: conftest.c:158 #error directive: "malloc might not be ptrdiff_t safe"
-cc: 6c: cpp 16487: errors
+cc: 6c: cpp 64817: errors
 configure:12553: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -11016,7 +11016,7 @@ configure:14357: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:152[stdin:1102] external redeclaration of: environ
 	EXTERN STRUCT _4_ /usr/glenda/APExp/sys/src/external/gtar/conftest.c:152[stdin:1102]
 	EXTERN IND IND CHAR /sys/include/ape/unistd.h:200[stdin:879]
-cc: cpp: 6c 16705: error
+cc: cpp: 6c 65034: error
 configure:14357: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -11214,7 +11214,7 @@ configure:15139: result: gid_t
 configure:15146: checking whether ctype.h defines __header_inline
 configure:15160: cc -E  conftest.c
 cpp: conftest.c:150 #error directive: "<ctype.h> does not define __header_inline"
-cc: cpp: cpp 16868: errors
+cc: cpp: cpp 65196: errors
 configure:15160: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -11978,7 +11978,7 @@ configure:16729: cc -c -g  conftest.c >&5
 configure:16729: $? = 0
 configure:16729: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:162[stdin:607] syntax error, last name: nlink_t
-cc: cpp: 6c 17062: error
+cc: cpp: 6c 65389: error
 configure:16729: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -12152,8 +12152,8 @@ configure:16765: checking whether getcwd (NULL, 0) allocates memory for result
 configure:16832: cc -o conftest -g   conftest.c  >&5
 configure:16832: $? = 0
 configure:16832: ./conftest
-conftest 17087: suicide: invalid address 0x0/0 in sys call pc=0x20c6ba
-conftest 17087: suicide: sys: bad address in syscall pc=0x20c6ba
+conftest 65414: suicide: invalid address 0x0/0 in sys call pc=0x20c6ba
+conftest 65414: suicide: sys: bad address in syscall pc=0x20c6ba
 configure:16832: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -12817,7 +12817,7 @@ configure:17465: result: no
 configure:17556: checking whether timespec_get is declared
 configure:17556: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:171[stdin:407] name not declared: timespec_get
-cc: cpp: 6c 17282: error
+cc: cpp: 6c 65609: error
 configure:17556: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -13007,7 +13007,7 @@ configure:17760: result: yes
 configure:17765: checking for wide-enough struct timeval.tv_sec member
 configure:17793: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:174[stdin:445] array size must be a positive constant
-cc: cpp: 6c 17319: error
+cc: cpp: 6c 65646: error
 configure:17793: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -13204,7 +13204,7 @@ configure:17936: checking for pthread_kill in -lpthread
 configure:17959: cc -o conftest -g   conftest.c -lpthread   >&5
 main: undefined: pthread_kill in main
 cc: can't find library for -l
-cc: 6l: 6l 17364: error
+cc: 6l: 6l 65691: error
 configure:17959: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -13393,7 +13393,7 @@ configure:18291: result: guessing no
 configure:18315: checking whether imported symbols can be declared weak
 configure:18339: cc -o conftest -g   conftest.c  >&5
 main: undefined: xyzzy in main
-cc: 6l: 6l 17411: error
+cc: 6l: 6l 65738: error
 configure:18339: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -13575,7 +13575,7 @@ configure:18547: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:170[stdin:309] name not declared: WORD_BIT
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:172[stdin:311] name not declared: BOOL_WIDTH
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:173[stdin:312] name not declared: BOOL_MAX
-cc: cpp: 6c 17430: error
+cc: cpp: 6c 65757: error
 configure:18547: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -13773,7 +13773,7 @@ configure:18663: checking whether the compiler produces multi-arch binaries
 configure:18678: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:167[stdin:168] not a function
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:167[stdin:168] syntax error, last name: a
-cc: cpp: 6c 17476: error
+cc: cpp: 6c 65803: error
 configure:18678: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -13962,7 +13962,7 @@ configure:19015: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:320[stdin:4805] field width must be non-negative constant
 too many errors
 cpp: conftest.c:176 #error directive: "WCHAR_MIN, WCHAR_MAX not defined in <stdint.h>"
-cc: 6c: cpp 17498: errors
+cc: 6c: cpp 65825: errors
 configure:19015: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -14299,7 +14299,7 @@ configure:19221: checking for sys/inttypes.h
 configure:19221: cc -c -g  conftest.c >&5
 <eof> syntax error, last name: wchar_t
 cpp: conftest.c:196 Could not find include file <sys/inttypes.h>
-cc: 6c: cpp 17517: error
+cc: 6c: cpp 65844: error
 configure:19221: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -14503,7 +14503,7 @@ configure:19227: checking for sys/bitypes.h
 configure:19227: cc -c -g  conftest.c >&5
 <eof> syntax error, last name: wchar_t
 cpp: conftest.c:196 Could not find include file <sys/bitypes.h>
-cc: 6c: cpp 17536: error
+cc: 6c: cpp 65863: error
 configure:19227: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -14736,7 +14736,7 @@ configure:19362: result: yes
 configure:19327: checking whether wchar_t is signed
 configure:19351: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:181[stdin:4518] array size must be a positive constant
-cc: cpp: 6c 17666: error
+cc: cpp: 6c 65993: error
 configure:19351: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -14931,7 +14931,7 @@ configure:19362: result: no
 configure:19327: checking whether wint_t is signed
 configure:19351: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:181[stdin:4518] array size must be a positive constant
-cc: cpp: 6c 17687: error
+cc: cpp: 6c 66014: error
 configure:19351: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -15128,7 +15128,7 @@ configure:19425: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:182[stdin:4519] external redeclaration of: foo
 	EXTERN INT /usr/glenda/APExp/sys/src/external/gtar/conftest.c:182[stdin:4519]
 	EXTERN VLONG /usr/glenda/APExp/sys/src/external/gtar/conftest.c:181[stdin:4518]
-cc: cpp: 6c 17708: error
+cc: cpp: 6c 66035: error
 configure:19425: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -15324,7 +15324,7 @@ configure:19425: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:182[stdin:4519] external redeclaration of: foo
 	EXTERN LONG /usr/glenda/APExp/sys/src/external/gtar/conftest.c:182[stdin:4519]
 	EXTERN VLONG /usr/glenda/APExp/sys/src/external/gtar/conftest.c:181[stdin:4518]
-cc: cpp: 6c 17723: error
+cc: cpp: 6c 66050: error
 configure:19425: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -15524,7 +15524,7 @@ configure:19425: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:183[stdin:4520] external redeclaration of: foo
 	EXTERN UINT /usr/glenda/APExp/sys/src/external/gtar/conftest.c:183[stdin:4520]
 	EXTERN UVLONG /usr/glenda/APExp/sys/src/external/gtar/conftest.c:182[stdin:4519]
-cc: cpp: 6c 17754: error
+cc: cpp: 6c 66081: error
 configure:19425: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -15721,7 +15721,7 @@ configure:19425: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:183[stdin:4520] external redeclaration of: foo
 	EXTERN ULONG /usr/glenda/APExp/sys/src/external/gtar/conftest.c:183[stdin:4520]
 	EXTERN UVLONG /usr/glenda/APExp/sys/src/external/gtar/conftest.c:182[stdin:4519]
-cc: cpp: 6c 17769: error
+cc: cpp: 6c 66096: error
 configure:19425: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -15926,7 +15926,7 @@ configure:19493: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:185[stdin:4522] external redeclaration of: foo
 	EXTERN UINT /usr/glenda/APExp/sys/src/external/gtar/conftest.c:185[stdin:4522]
 	EXTERN USHORT /usr/glenda/APExp/sys/src/external/gtar/conftest.c:184[stdin:4521]
-cc: cpp: 6c 17816: error
+cc: cpp: 6c 66143: error
 configure:19493: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -16125,7 +16125,7 @@ configure:19493: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:185[stdin:4522] external redeclaration of: foo
 	EXTERN ULONG /usr/glenda/APExp/sys/src/external/gtar/conftest.c:185[stdin:4522]
 	EXTERN USHORT /usr/glenda/APExp/sys/src/external/gtar/conftest.c:184[stdin:4521]
-cc: cpp: 6c 17831: error
+cc: cpp: 6c 66158: error
 configure:19493: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -16324,7 +16324,7 @@ configure:19493: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:185[stdin:4522] external redeclaration of: foo
 	EXTERN UVLONG /usr/glenda/APExp/sys/src/external/gtar/conftest.c:185[stdin:4522]
 	EXTERN USHORT /usr/glenda/APExp/sys/src/external/gtar/conftest.c:184[stdin:4521]
-cc: cpp: 6c 17846: error
+cc: cpp: 6c 66173: error
 configure:19493: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -16522,7 +16522,7 @@ configure: failed program was:
 configure:19493: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:185[stdin:4522] not a function
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:185[stdin:4522] syntax error, last name: foo
-cc: cpp: 6c 17861: error
+cc: cpp: 6c 66188: error
 configure:19493: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -16731,7 +16731,7 @@ configure:19743: result: yes
 configure:19754: checking whether INT64_MAX == LONG_MAX
 configure:19787: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:195[stdin:584] array size must be a positive constant
-cc: cpp: 6c 17921: error
+cc: cpp: 6c 66248: error
 configure:19787: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -16944,7 +16944,7 @@ configure:19849: result: yes
 configure:19860: checking whether UINT64_MAX == ULONG_MAX
 configure:19893: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:195[stdin:584] array size must be a positive constant
-cc: cpp: 6c 17953: error
+cc: cpp: 6c 66280: error
 configure:19893: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -17159,7 +17159,7 @@ configure:20109: result: yes
 configure:20135: checking for towlower
 configure:20135: cc -o conftest -g   conftest.c  >&5
 main: undefined: towlower in main
-cc: 6l: 6l 17992: error
+cc: 6l: 6l 66319: error
 configure:20135: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -17387,7 +17387,7 @@ configure:20238: result: yes
 configure:20376: checking whether langinfo.h defines CODESET
 configure:20395: cc -c -g  conftest.c >&5
 /sys/include/ape/langinfo.h:16[stdin:261] syntax error, last name: size_t
-cc: cpp: 6c 18056: error
+cc: cpp: 6c 66383: error
 configure:20395: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -17583,7 +17583,7 @@ configure:20404: result: no
 configure:20409: checking whether langinfo.h defines T_FMT_AMPM
 configure:20428: cc -c -g  conftest.c >&5
 /sys/include/ape/langinfo.h:16[stdin:261] syntax error, last name: size_t
-cc: cpp: 6c 18075: error
+cc: cpp: 6c 66402: error
 configure:20428: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -17779,7 +17779,7 @@ configure:20437: result: no
 configure:20442: checking whether langinfo.h defines ALTMON_1
 configure:20461: cc -c -g  conftest.c >&5
 /sys/include/ape/langinfo.h:16[stdin:261] syntax error, last name: size_t
-cc: cpp: 6c 18094: error
+cc: cpp: 6c 66421: error
 configure:20461: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -17975,7 +17975,7 @@ configure:20470: result: no
 configure:20475: checking whether langinfo.h defines ERA
 configure:20494: cc -c -g  conftest.c >&5
 /sys/include/ape/langinfo.h:16[stdin:261] syntax error, last name: size_t
-cc: cpp: 6c 18113: error
+cc: cpp: 6c 66440: error
 configure:20494: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -18171,7 +18171,7 @@ configure:20503: result: no
 configure:20508: checking whether langinfo.h defines YESEXPR
 configure:20527: cc -c -g  conftest.c >&5
 /sys/include/ape/langinfo.h:16[stdin:261] syntax error, last name: size_t
-cc: cpp: 6c 18132: error
+cc: cpp: 6c 66459: error
 configure:20527: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -18376,7 +18376,7 @@ configure:20677: checking for good max_align_t
 configure:20714: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:199[stdin:277] array size must be a positive constant
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:200[stdin:278] array size must be a positive constant
-cc: cpp: 6c 18178: error
+cc: cpp: 6c 66505: error
 configure:20714: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -18595,7 +18595,7 @@ configure:20762: result: yes
 configure:20769: checking for unreachable
 configure:20788: cc -o conftest -g   conftest.c  >&5
 main: undefined: unreachable in main
-cc: 6l: 6l 18212: error
+cc: 6l: 6l 66539: error
 configure:20788: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -18826,7 +18826,7 @@ configure:21611: result: yes
 configure:21624: checking whether <limits.h> defines MIN and MAX
 configure:21642: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:185[stdin:324] initializer is not a constant: x
-cc: cpp: 6c 18351: error
+cc: cpp: 6c 66678: error
 configure:21642: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -19525,7 +19525,7 @@ configure:22288: result: yes
 configure:22362: checking for library containing setfilecon
 configure:22392: cc -o conftest -g   conftest.c  >&5
 main: undefined: setfilecon in main
-cc: 6l: 6l 18500: error
+cc: 6l: 6l 66827: error
 configure:22392: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -19733,7 +19733,7 @@ configure: failed program was:
 configure:22392: cc -o conftest -g   conftest.c -lselinux   >&5
 main: undefined: setfilecon in main
 cc: can't find library for -l
-cc: 6l: 6l 18516: error
+cc: 6l: 6l 66843: error
 configure:22392: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -19958,7 +19958,7 @@ configure:22536: cc -c -g  conftest.c >&5
 configure:22536: $? = 0
 configure:22536: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:203[stdin:1777] syntax error, last name: sigset_t
-cc: cpp: 6c 18596: error
+cc: cpp: 6c 66923: error
 configure:22536: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -20174,7 +20174,7 @@ configure:22634: cc -c -g  conftest.c >&5
 configure:22634: $? = 0
 configure:22634: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:202[stdin:1701] syntax error, last name: sig_atomic_t
-cc: cpp: 6c 18625: error
+cc: cpp: 6c 66952: error
 configure:22634: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -20387,7 +20387,7 @@ configure:22634: result: yes
 configure:22651: checking for sighandler_t
 configure:22651: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:202[stdin:1701] name not declared: sighandler_t
-cc: cpp: 6c 18645: error
+cc: cpp: 6c 66972: error
 configure:22651: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -20824,7 +20824,7 @@ configure:22841: result: yes
 configure:22864: checking whether fcloseall is declared
 configure:22864: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:231[stdin:5079] name not declared: fcloseall
-cc: cpp: 6c 18725: error
+cc: cpp: 6c 67052: error
 configure:22864: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -21068,7 +21068,7 @@ configure:22864: result: no
 configure:22873: checking whether getw is declared
 configure:22873: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:232[stdin:5080] name not declared: getw
-cc: cpp: 6c 18749: error
+cc: cpp: 6c 67076: error
 configure:22873: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -21313,7 +21313,7 @@ configure:22873: result: no
 configure:22882: checking whether putw is declared
 configure:22882: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:233[stdin:5081] name not declared: putw
-cc: cpp: 6c 18773: error
+cc: cpp: 6c 67100: error
 configure:22882: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -21607,7 +21607,7 @@ configure:23644: result: yes
 configure:23838: checking for TIME_UTC in <time.h>
 configure:23856: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:212[stdin:448] name not declared: TIME_UTC
-cc: cpp: 6c 18986: error
+cc: cpp: 6c 67313: error
 configure:23856: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -21837,7 +21837,7 @@ configure:24605: result: yes
 configure:24726: checking whether the utimes function works
 configure:24867: cc -o conftest -g   conftest.c  >&5
 main: undefined: utimes in main
-cc: 6l: 6l 19042: error
+cc: 6l: 6l 67369: error
 configure:24867: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -22263,7 +22263,7 @@ configure:25505: result: yes
 configure:25512: checking whether _snprintf is declared
 configure:25512: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:227[stdin:3073] name not declared: _snprintf
-cc: cpp: 6c 19192: error
+cc: cpp: 6c 67519: error
 configure:25512: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -22523,7 +22523,7 @@ configure:25906: result: no
 configure:25975: checking whether program_invocation_name is declared
 configure:25975: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:235[stdin:339] name not declared: program_invocation_name
-cc: cpp: 6c 19299: error
+cc: cpp: 6c 67626: error
 configure:25975: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -22771,7 +22771,7 @@ configure:25975: result: no
 configure:25993: checking whether program_invocation_short_name is declared
 configure:25993: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:237[stdin:341] name not declared: program_invocation_short_name
-cc: cpp: 6c 19324: error
+cc: cpp: 6c 67651: error
 configure:25993: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -23320,7 +23320,7 @@ configure:27573: result: none required
 configure:27583: checking for clock_getres
 configure:27583: cc -o conftest -g   conftest.c  >&5
 main: undefined: clock_getres in main
-cc: 6l: 6l 19541: error
+cc: 6l: 6l 67868: error
 configure:27583: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -23653,7 +23653,7 @@ configure:28977: result: yes
 configure:29139: checking for euidaccess
 configure:29139: cc -o conftest -g   conftest.c  >&5
 main: undefined: euidaccess in main
-cc: 6l: 6l 19874: error
+cc: 6l: 6l 68202: error
 configure:29139: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -24294,7 +24294,7 @@ configure:29342: result: no
 configure:29364: checking for library containing eaccess
 configure:29394: cc -o conftest -g   conftest.c  >&5
 main: undefined: eaccess in main
-cc: 6l: 6l 19951: error
+cc: 6l: 6l 68279: error
 configure:29394: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -24587,7 +24587,7 @@ configure: failed program was:
 configure:29394: cc -o conftest -g   conftest.c -lgen   >&5
 main: undefined: eaccess in main
 cc: can't find library for -l
-cc: 6l: 6l 19967: error
+cc: 6l: 6l 68295: error
 configure:29394: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -24881,7 +24881,7 @@ configure:29414: result: no
 configure:29424: checking for eaccess
 configure:29424: cc -o conftest -g   conftest.c  >&5
 main: undefined: eaccess in main
-cc: 6l: 6l 19989: error
+cc: 6l: 6l 68317: error
 configure:29424: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -25922,7 +25922,7 @@ configure:30284: result: yes
 configure:30379: checking whether fdopendir is declared
 configure:30379: cc -c -g   conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:300[stdin:813] name not declared: fdopendir
-cc: cpp: 6c 20170: error
+cc: cpp: 6c 68498: error
 configure:30379: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -26255,7 +26255,7 @@ configure:30804: result: yes
 configure:30962: checking for working GNU fnmatch
 configure:31071: cc -o conftest -g   conftest.c  >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:364[stdin:390] name not declared: FNM_EXTMATCH
-cc: cpp: 6c 20261: error
+cc: cpp: 6c 68589: error
 configure:31071: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -27358,7 +27358,7 @@ configure:31478: result: yes
 configure:31507: checking whether free is known to preserve errno
 configure:31531: cc -c -g  conftest.c >&5
 cpp: conftest.c:312 #error directive: "'free' is not known to preserve errno"
-cc: 6c: cpp 20362: errors
+cc: 6c: cpp 68691: errors
 configure:31531: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -27686,7 +27686,7 @@ configure:31773: result: no
 configure:31808: checking for _fseeki64
 configure:31808: cc -o conftest -g   conftest.c  >&5
 main: undefined: _fseeki64 in main
-cc: 6l: 6l 20396: error
+cc: 6l: 6l 68725: error
 configure:31808: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -28036,7 +28036,7 @@ configure:32041: checking for futimens
 configure:32078: checking for futimens
 configure:32078: cc -o conftest -g   conftest.c  >&5
 main: undefined: futimens in main
-cc: 6l: 6l 20441: error
+cc: 6l: 6l 68770: error
 configure:32078: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -29022,7 +29022,7 @@ configure:34380: result: yes
 configure:34443: checking for group_member
 configure:34443: cc -o conftest -g   conftest.c  >&5
 main: undefined: group_member in main
-cc: 6l: 6l 20719: error
+cc: 6l: 6l 69048: error
 configure:34443: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -30224,7 +30224,7 @@ configure:34968: result: no
 configure:35071: checking for lchown
 configure:35071: cc -o conftest -g   conftest.c  >&5
 main: undefined: lchown in main
-cc: 6l: 6l 20827: error
+cc: 6l: 6l 69156: error
 configure:35071: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -30610,7 +30610,7 @@ configure:35265: result: yes
 configure:35311: checking for __xpg4
 configure:35328: cc -o conftest -g   conftest.c  >&5
 fprintf: __xpg4: not defined
-cc: 6l: 6l 20886: error
+cc: 6l: 6l 69215: error
 configure:35328: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -33816,7 +33816,7 @@ configure:38621: checking for mknodat
 configure:38702: checking for mknodat
 configure:38702: cc -o conftest -g   conftest.c  >&5
 main: undefined: mknodat in main
-cc: 6l: 6l 21332: error
+cc: 6l: 6l 69662: error
 configure:38702: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -34230,7 +34230,7 @@ configure:38734: checking for mkfifoat
 configure:38815: checking for mkfifoat
 configure:38815: cc -o conftest -g   conftest.c  >&5
 main: undefined: mkfifoat in main
-cc: 6l: 6l 21357: error
+cc: 6l: 6l 69687: error
 configure:38815: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -35047,7 +35047,7 @@ configure:39051: result: no
 configure:39157: checking for __mktime_internal
 configure:39157: cc -o conftest -g   conftest.c  >&5
 main: undefined: __mktime_internal in main
-cc: 6l: 6l 21409: error
+cc: 6l: 6l 69739: error
 configure:39157: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -35471,7 +35471,7 @@ configure:39282: result: yes
 configure:39302: checking whether YESEXPR works
 configure:39332: cc -o conftest -g   conftest.c  >&5
 /sys/include/ape/langinfo.h:16[stdin:465] syntax error, last name: size_t
-cc: cpp: 6c 21449: error
+cc: cpp: 6c 69779: error
 configure:39332: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -35893,7 +35893,7 @@ configure:39967: result: yes
 configure:40081: checking for getppriv
 configure:40081: cc -o conftest -g   conftest.c  >&5
 main: undefined: getppriv in main
-cc: 6l: 6l 21554: error
+cc: 6l: 6l 69885: error
 configure:40081: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -36784,7 +36784,7 @@ configure:40643: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:413[stdin:1154] external redeclaration of: readlinkat
 	GLOBL FUNC(INT, IND CONST CHAR, IND CHAR, UVLONG) VLONG /usr/glenda/APExp/sys/src/external/gtar/conftest.c:413[stdin:1154]
 	GLOBL FUNC(INT, IND CONST CHAR, IND CHAR, UVLONG) INT /sys/include/ape/unistd.h:182[stdin:837]
-cc: cpp: 6c 21710: error
+cc: cpp: 6c 70041: error
 configure:40643: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -37234,7 +37234,7 @@ configure:41288: cc -o conftest -g   conftest.c  >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:542[stdin:7175] not a member of struct/union: translate
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:543[stdin:7176] incompatible types: "IND CONST CHAR" and "INT" for op "AS"
 too many errors
-cc: cpp: 6c 21771: error
+cc: cpp: 6c 70102: error
 configure:41288: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -38905,7 +38905,7 @@ configure:41774: cc -c -g  conftest.c >&5
 <eof> not a function
 <eof> syntax error, last name: wcswc
 cpp: conftest.c:467 Could not find include file <linux/fs.h>
-cc: 6c: cpp 21943: error
+cc: 6c: cpp 70274: error
 configure:41774: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -39380,7 +39380,7 @@ configure:41789: checking for renameat2
 configure:41826: checking for renameat2
 configure:41826: cc -o conftest -g   conftest.c  >&5
 main: undefined: renameat2 in main
-cc: 6l: 6l 21966: error
+cc: 6l: 6l 70297: error
 configure:41826: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -40393,7 +40393,7 @@ configure:42120: result: no
 configure:42166: checking for rpmatch
 configure:42166: cc -o conftest -g   conftest.c  >&5
 main: undefined: rpmatch in main
-cc: 6l: 6l 22042: error
+cc: 6l: 6l 70373: error
 configure:42166: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -40873,7 +40873,7 @@ configure:42166: result: no
 configure:42194: checking for nl_langinfo and YESEXPR
 configure:42211: cc -o conftest -g   conftest.c  >&5
 /sys/include/ape/langinfo.h:16[stdin:524] syntax error, last name: size_t
-cc: cpp: 6c 22061: error
+cc: cpp: 6c 70392: error
 configure:42211: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -41331,7 +41331,7 @@ configure:42264: checking for selinux/flask.h
 configure:42264: cc -c -g  conftest.c >&5
 <eof> syntax error, last name: wchar_t
 cpp: conftest.c:472 Could not find include file <selinux/flask.h>
-cc: 6c: cpp 22083: error
+cc: 6c: cpp 70414: error
 configure:42264: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -42343,7 +42343,7 @@ configure:43602: result: yes
 configure:43651: checking for struct stat.st_birthtimespec.tv_nsec
 configure:43651: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:465[stdin:910] not a member of struct/union: st_birthtimespec
-cc: cpp: 6c 22278: error
+cc: cpp: 6c 70610: error
 configure:43651: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -42817,7 +42817,7 @@ configure: failed program was:
 | }
 configure:43651: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:465[stdin:910] not a member of struct/union: st_birthtimespec
-cc: cpp: 6c 22292: error
+cc: cpp: 6c 70624: error
 configure:43651: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -43293,7 +43293,7 @@ configure:43651: result: no
 configure:43661: checking for struct stat.st_birthtimensec
 configure:43661: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:465[stdin:910] not a member of struct/union: st_birthtimensec
-cc: cpp: 6c 22312: error
+cc: cpp: 6c 70644: error
 configure:43661: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -43767,7 +43767,7 @@ configure: failed program was:
 | }
 configure:43661: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:465[stdin:910] not a member of struct/union: st_birthtimensec
-cc: cpp: 6c 22326: error
+cc: cpp: 6c 70658: error
 configure:43661: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -44243,7 +44243,7 @@ configure:43661: result: no
 configure:43671: checking for struct stat.st_birthtim.tv_nsec
 configure:43671: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:465[stdin:910] not a member of struct/union: st_birthtim
-cc: cpp: 6c 22346: error
+cc: cpp: 6c 70678: error
 configure:43671: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -44717,7 +44717,7 @@ configure: failed program was:
 | }
 configure:43671: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:465[stdin:910] not a member of struct/union: st_birthtim
-cc: cpp: 6c 22360: error
+cc: cpp: 6c 70692: error
 configure:43671: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -45197,7 +45197,7 @@ configure:43720: result: yes
 configure:43903: checking for bool, true, false
 configure:43918: cc -c -g  conftest.c >&5
 cpp: conftest.c:460 #error directive: "true == false"
-cc: 6c: cpp 22394: errors
+cc: 6c: cpp 70726: errors
 configure:43918: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -48912,7 +48912,7 @@ configure:46677: result: yes
 configure:46685: checking for timezone_t
 configure:46685: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:508[stdin:744] name not declared: timezone_t
-cc: cpp: 6c 22872: error
+cc: cpp: 6c 71204: error
 configure:46685: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -49463,7 +49463,7 @@ configure:48078: result: yes
 configure:48088: checking whether utime handles trailing slashes on files
 configure:48134: cc -o conftest -g   conftest.c  >&5
 /sys/include/ape/utime.h:8[stdin:603] syntax error, last name: time_t
-cc: cpp: 6c 23010: error
+cc: cpp: 6c 71342: error
 configure:48134: $? = 1
 configure: program exited with status 1
 configure: failed program was:
@@ -50003,7 +50003,7 @@ configure:48211: checking for futimes
 configure:48248: checking for futimes
 configure:48248: cc -o conftest -g   conftest.c  >&5
 main: undefined: futimes in main
-cc: 6l: 6l 23033: error
+cc: 6l: 6l 71365: error
 configure:48248: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -50557,7 +50557,7 @@ configure:48279: checking for futimesat
 configure:48316: checking for futimesat
 configure:48316: cc -o conftest -g   conftest.c  >&5
 main: undefined: futimesat in main
-cc: 6l: 6l 23058: error
+cc: 6l: 6l 71390: error
 configure:48316: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -51111,7 +51111,7 @@ configure:48347: checking for lutimes
 configure:48384: checking for lutimes
 configure:48384: cc -o conftest -g   conftest.c  >&5
 main: undefined: lutimes in main
-cc: 6l: 6l 23083: error
+cc: 6l: 6l 71415: error
 configure:48384: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -51667,7 +51667,7 @@ configure:48483: checking for utimensat
 configure:48520: checking for utimensat
 configure:48520: cc -o conftest -g   conftest.c  >&5
 main: undefined: utimensat in main
-cc: 6l: 6l 23113: error
+cc: 6l: 6l 71445: error
 configure:48520: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -52224,7 +52224,7 @@ configure:48900: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:526[stdin:524] name not declared: m
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:526[stdin:524] name not declared: m
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:529[stdin:527] syntax error, last name: static
-cc: cpp: 6c 23145: error
+cc: cpp: 6c 71477: error
 configure:48900: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -52820,7 +52820,7 @@ configure:49759: checking for wmempcpy
 configure:49796: checking for wmempcpy
 configure:49796: cc -o conftest -g   conftest.c  >&5
 main: undefined: wmempcpy in main
-cc: 6l: 6l 23300: error
+cc: 6l: 6l 71632: error
 configure:49796: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -53392,7 +53392,7 @@ configure:50253: checking for sys/mtio.h
 configure:50253: result: no
 configure:50260: checking which ioctl field to test for reversed bytes
 cpp: conftest.c:534 Could not find include file <sys/mtio.h>
-cc: cpp: cpp 23363: error
+cc: cpp: cpp 71695: error
 configure:50281: result: mt_type
 configure:50295: checking whether to build rmt
 configure:50309: result: yes
@@ -53411,7 +53411,7 @@ configure:51180: checking for sys/xattr.h
 configure:51180: cc -c -g  conftest.c >&5
 <eof> syntax error, last name: wc
 cpp: conftest.c:564 Could not find include file <sys/xattr.h>
-cc: 6c: cpp 23418: error
+cc: 6c: cpp 71750: error
 configure:51180: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -53983,7 +53983,7 @@ configure:51196: checking for attr/xattr.h
 configure:51196: cc -c -g  conftest.c >&5
 <eof> syntax error, last name: wc
 cpp: conftest.c:564 Could not find include file <attr/xattr.h>
-cc: 6c: cpp 23437: error
+cc: 6c: cpp 71769: error
 configure:51196: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -54554,7 +54554,7 @@ configure:51196: result: no
 configure:51219: checking for library containing getxattr
 configure:51249: cc -o conftest -g   conftest.c  >&5
 main: undefined: getxattr in main
-cc: 6l: 6l 23460: error
+cc: 6l: 6l 71792: error
 configure:51249: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -55107,7 +55107,7 @@ configure: failed program was:
 configure:51249: cc -o conftest -g   conftest.c -lattr   >&5
 main: undefined: getxattr in main
 cc: can't find library for -l
-cc: 6l: 6l 23476: error
+cc: 6l: 6l 71808: error
 configure:51249: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -55696,7 +55696,7 @@ configure:51832: checking 32-bit host C ABI
 configure:51899: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:556[stdin:557] not a function
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:556[stdin:557] syntax error, last name: fail
-cc: cpp: 6c 23640: error
+cc: cpp: 6c 71972: error
 configure:51899: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -56286,7 +56286,7 @@ configure:53079: cc -c -g  conftest.c >&5
 configure:53079: $? = 0
 configure:53079: cc -c -g  conftest.c >&5
 /usr/glenda/APExp/sys/src/external/gtar/conftest.c:565[stdin:6418] syntax error, last name: iconv_t
-cc: cpp: 6c 23759: error
+cc: cpp: 6c 72091: error
 configure:53079: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -56877,7 +56877,7 @@ configure:53455: result: /bin/msgmerge
 configure:53503: checking for CFPreferencesCopyAppValue
 configure:53522: cc -o conftest -g   conftest.c  -Wl,-framework -Wl,CoreFoundation >&5
 cpp: conftest.c:556 Could not find include file <CoreFoundation/CFPreferences.h>
-cc: 6c: cpp 23840: error
+cc: 6c: cpp 72172: error
 configure:53522: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -57447,7 +57447,7 @@ configure:53532: result: no
 configure:53539: checking for CFLocaleCopyPreferredLanguages
 configure:53558: cc -o conftest -g   conftest.c  -Wl,-framework -Wl,CoreFoundation >&5
 cpp: conftest.c:556 Could not find include file <CoreFoundation/CFLocale.h>
-cc: 6c: cpp 23860: error
+cc: 6c: cpp 72192: error
 configure:53558: $? = 1
 configure: failed program was:
 | /* confdefs.h */
@@ -58052,6 +58052,7 @@ config.status:3051: creating scripts/Makefile
 config.status:3051: creating rmt/Makefile
 config.status:3051: creating src/Makefile
 config.status:3051: creating config.h
+config.status:3232: config.h is unchanged
 config.status:3280: executing depfiles commands
 config.status:3355: cd tests       && sed -e '/# am--include-marker/d' Makefile         | make -f - am--depfiles
 make: Nothing to be done for 'am--depfiles'.

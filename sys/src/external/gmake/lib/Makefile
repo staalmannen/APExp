@@ -57,7 +57,7 @@
 
 
 
-VPATH = .
+
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
     false; \
@@ -300,7 +300,7 @@ ARFLAGS = cr
 AUTOCONF = ${SHELL} '/usr/glenda/APExp/sys/src/external/gmake/build-aux/missing' autoconf
 AUTOHEADER = ${SHELL} '/usr/glenda/APExp/sys/src/external/gmake/build-aux/missing' autoheader
 AUTOMAKE = ${SHELL} '/usr/glenda/APExp/sys/src/external/gmake/build-aux/missing' automake-1.16
-AWK = awk
+AWK = gawk
 CC = cc
 CCDEPMODE = depmode=none
 CFLAGS = -g

@@ -35,12 +35,1922 @@ PATH: .
 ## Core tests. ##
 ## ----------- ##
 
-configure:2546: error: cannot run /bin/sh build-aux/config.sub
+configure:2548: checking build system type
+configure:2562: result: x86_64-unknown-plan9
+configure:2582: checking host system type
+configure:2595: result: x86_64-unknown-plan9
+configure:2636: checking how to print strings
+configure:2665: result: print -r
+configure:2735: checking for gcc
+configure:2765: result: no
+configure:2828: checking for cc
+configure:2849: found /bin/cc
+configure:2872: result: cc
+configure:2991: checking for C compiler version
+configure:3000: cc --version >&5
+cc: flag -- ignored
+cc: flag -e ignored
+cc: flag -r ignored
+cc: flag -i ignored
+cc: no files to compile or load
+configure:3011: $? = 1
+configure:3000: cc -v >&5
+cc: no files to compile or load
+configure:3011: $? = 1
+configure:3000: cc -V >&5
+cc: flag -V ignored
+cc: no files to compile or load
+configure:3011: $? = 1
+configure:3000: cc -qversion >&5
+cc: flag -q ignored
+cc: flag -e ignored
+cc: flag -r ignored
+cc: flag -i ignored
+cc: no files to compile or load
+configure:3011: $? = 1
+configure:3031: checking whether the C compiler works
+configure:3053: cc    conftest.c  >&5
+configure:3057: $? = 0
+configure:3105: result: yes
+configure:3108: checking for C compiler default output file name
+configure:3110: result: a.out
+configure:3116: checking for suffix of executables
+configure:3123: cc -o conftest    conftest.c  >&5
+configure:3127: $? = 0
+configure:3149: result: 
+configure:3171: checking whether we are cross compiling
+configure:3179: cc -o conftest    conftest.c  >&5
+configure:3183: $? = 0
+configure:3190: ./conftest
+configure:3194: $? = 0
+configure:3209: result: no
+configure:3214: checking for suffix of object files
+configure:3236: cc -c   conftest.c >&5
+configure:3240: $? = 0
+configure:3261: result: o
+configure:3265: checking whether we are using the GNU C compiler
+configure:3284: cc -c   conftest.c >&5
+/usr/glenda/APExp/sys/src/external/flex/conftest.c:14[stdin:15] syntax error, last name: me
+cc: cpp: 6c 27009: error
+configure:3284: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| #ifndef __GNUC__
+|        choke me
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:3293: result: no
+configure:3302: checking whether cc accepts -g
+configure:3322: cc -c -g  conftest.c >&5
+configure:3322: $? = 0
+configure:3363: result: yes
+configure:3380: checking for cc option to accept ISO C89
+configure:3443: cc  -c -g  conftest.c >&5
+configure:3443: $? = 0
+configure:3456: result: none needed
+configure:3481: checking whether cc understands -c and -o together
+configure:3503: cc -c conftest.c -o conftest2.o
+configure:3506: $? = 0
+configure:3503: cc -c conftest.c -o conftest2.o
+configure:3506: $? = 0
+configure:3518: result: yes
+configure:3535: checking for a sed that does not truncate output
+configure:3599: result: /bin/sed
+configure:3617: checking for grep that handles long lines and -e
+configure:3675: result: /bin/grep
+configure:3680: checking for egrep
+configure:3742: result: /bin/grep -E
+configure:3747: checking for fgrep
+configure:3809: result: /bin/grep -F
+configure:3877: checking for non-GNU ld
+configure:3911: result: pcc
+configure:3918: checking if the linker (pcc) is GNU ld
+configure:3933: result: no
+configure:3945: checking for BSD- or MS-compatible name lister (nm)
+configure:3999: result: /bin/nm
+configure:4129: checking the name lister (/bin/nm) interface
+configure:4136: cc -c -g  conftest.c >&5
+configure:4139: /bin/nm "conftest.o"
+configure:4142: output
+ D some_variable
+configure:4149: result: BSD nm
+configure:4152: checking whether ln -s works
+configure:4159: result: no, using cp -pR
+configure:4164: checking the maximum length of command line arguments
+configure:4295: result: 262144
+configure:4343: checking how to convert x86_64-unknown-plan9 file names to x86_64-unknown-plan9 format
+configure:4383: result: func_convert_file_noop
+configure:4390: checking how to convert x86_64-unknown-plan9 file names to toolchain format
+configure:4410: result: func_convert_file_noop
+configure:4417: checking for pcc option to reload object files
+configure:4424: result: -r
+configure:4498: checking for objdump
+configure:4528: result: no
+configure:4557: checking how to recognize dependent libraries
+configure:4757: result: unknown
+configure:4842: checking for dlltool
+configure:4872: result: no
+configure:4902: checking how to associate runtime and link libraries
+configure:4929: result: print -r --
+configure:4990: checking for ar
+configure:5006: found /bin/ar
+configure:5017: result: ar
+configure:5054: checking for archiver @FILE support
+configure:5071: cc -c -g  conftest.c >&5
+configure:5071: $? = 0
+configure:5074: ar cru libconftest.a @conftest.lst >&5
+ar: @conftest.lst cannot open
+configure:5077: $? = 0
+configure:5082: ar cru libconftest.a @conftest.lst >&5
+ar: @conftest.lst cannot open
+configure:5085: $? = 0
+configure:5097: result: no
+configure:5155: checking for strip
+configure:5171: found /bin/strip
+configure:5182: result: strip
+configure:5254: checking for ranlib
+configure:5270: found /bin/ranlib
+configure:5281: result: ranlib
+configure:5358: checking for gawk
+configure:5374: found /bin/gawk
+configure:5385: result: gawk
+configure:5425: checking command to parse /bin/nm output from cc object
+configure:5578: cc -c -g  conftest.c >&5
+configure:5581: $? = 0
+configure:5585: /bin/nm conftest.o \| sed -n -e 's/^.*[ ]\([BCDEGRST][BCDEGRST]*\)[ ][ ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p' | sed '/ __gnu_lto/d' \> conftest.nm
+configure:5588: $? = 0
+configure:5654: cc -o conftest -g   conftest.c conftstm.o >&5
+configure:5657: $? = 0
+configure:5695: result: ok
+configure:5742: checking for sysroot
+configure:5772: result: no
+configure:5779: checking for a working dd
+configure:5817: result: /bin/dd
+configure:5821: checking how to truncate binary pipes
+configure:5836: result: /bin/dd bs=4096 count=1
+configure:6165: checking for mt
+configure:6195: result: no
+configure:6215: checking if : is a manifest tool
+configure:6221: : '-?'
+configure:6229: result: no
+configure:6906: checking how to run the C preprocessor
+configure:6937: cc -E  conftest.c
+configure:6937: $? = 0
+configure:6951: cc -E  conftest.c
+cpp: conftest.c:9 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 27170: error
+configure:6951: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| /* end confdefs.h.  */
+| #include <ac_nonexistent.h>
+configure:6976: result: cc -E
+configure:6996: cc -E  conftest.c
+configure:6996: $? = 0
+configure:7010: cc -E  conftest.c
+cpp: conftest.c:9 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 27185: error
+configure:7010: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| /* end confdefs.h.  */
+| #include <ac_nonexistent.h>
+configure:7039: checking for ANSI C header files
+configure:7059: cc -c -g  conftest.c >&5
+configure:7059: $? = 0
+configure:7132: cc -o conftest -g   conftest.c  >&5
+configure:7132: $? = 0
+configure:7132: ./conftest
+configure:7132: $? = 0
+configure:7143: result: yes
+configure:7156: checking for sys/types.h
+configure:7156: cc -c -g  conftest.c >&5
+configure:7156: $? = 0
+configure:7156: result: yes
+configure:7156: checking for sys/stat.h
+configure:7156: cc -c -g  conftest.c >&5
+configure:7156: $? = 0
+configure:7156: result: yes
+configure:7156: checking for stdlib.h
+configure:7156: cc -c -g  conftest.c >&5
+configure:7156: $? = 0
+configure:7156: result: yes
+configure:7156: checking for string.h
+configure:7156: cc -c -g  conftest.c >&5
+configure:7156: $? = 0
+configure:7156: result: yes
+configure:7156: checking for memory.h
+configure:7156: cc -c -g  conftest.c >&5
+<eof> syntax error, last name: const
+cpp: conftest.c:48 Could not find include file <memory.h>
+cc: 6c: cpp 27285: error
+configure:7156: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| /* end confdefs.h.  */
+| #include <stdio.h>
+| #ifdef HAVE_SYS_TYPES_H
+| # include <sys/types.h>
+| #endif
+| #ifdef HAVE_SYS_STAT_H
+| # include <sys/stat.h>
+| #endif
+| #ifdef STDC_HEADERS
+| # include <stdlib.h>
+| # include <stddef.h>
+| #else
+| # ifdef HAVE_STDLIB_H
+| #  include <stdlib.h>
+| # endif
+| #endif
+| #ifdef HAVE_STRING_H
+| # if !defined STDC_HEADERS && defined HAVE_MEMORY_H
+| #  include <memory.h>
+| # endif
+| # include <string.h>
+| #endif
+| #ifdef HAVE_STRINGS_H
+| # include <strings.h>
+| #endif
+| #ifdef HAVE_INTTYPES_H
+| # include <inttypes.h>
+| #endif
+| #ifdef HAVE_STDINT_H
+| # include <stdint.h>
+| #endif
+| #ifdef HAVE_UNISTD_H
+| # include <unistd.h>
+| #endif
+| 
+| #include <memory.h>
+configure:7156: result: no
+configure:7156: checking for strings.h
+configure:7156: cc -c -g  conftest.c >&5
+configure:7156: $? = 0
+configure:7156: result: yes
+configure:7156: checking for inttypes.h
+configure:7156: cc -c -g  conftest.c >&5
+configure:7156: $? = 0
+configure:7156: result: yes
+configure:7156: checking for stdint.h
+configure:7156: cc -c -g  conftest.c >&5
+configure:7156: $? = 0
+configure:7156: result: yes
+configure:7156: checking for unistd.h
+configure:7156: cc -c -g  conftest.c >&5
+configure:7156: $? = 0
+configure:7156: result: yes
+configure:7170: checking for dlfcn.h
+configure:7170: cc -c -g  conftest.c >&5
+configure:7170: $? = 0
+configure:7170: result: yes
+configure:7426: checking for objdir
+configure:7441: result: .libs
+configure:8098: checking for cc option to produce PIC
+configure:8105: result:  -DPIC
+configure:8113: checking if cc PIC flag  -DPIC works
+configure:8131: cc -c -g   -DPIC -DPIC conftest.c >&5
+configure:8135: $? = 0
+configure:8148: result: yes
+configure:8177: checking if cc static flag  works
+configure:8205: result: yes
+configure:8220: checking if cc supports -c -o file.o
+configure:8241: cc -c -g  -o out/conftest2.o conftest.c >&5
+configure:8245: $? = 0
+configure:8267: result: yes
+configure:8275: checking if cc supports -c -o file.o
+configure:8322: result: yes
+configure:8355: checking whether the cc linker (pcc) supports shared libraries
+configure:9618: result: no
+configure:9858: checking dynamic linker characteristics
+configure:10688: result: no
+configure:10810: checking how to hardcode library paths into programs
+configure:10835: result: unsupported
+configure:11383: checking whether stripping libraries is possible
+configure:11405: result: no
+configure:11423: checking if libtool supports shared libraries
+configure:11425: result: no
+configure:11428: checking whether to build shared libraries
+configure:11453: result: no
+configure:11456: checking whether to build static libraries
+configure:11460: result: yes
+configure:11513: checking for a BSD-compatible install
+configure:11581: result: /bin/install -c
+configure:11592: checking whether build environment is sane
+configure:11647: result: yes
+configure:11795: checking for a thread-safe mkdir -p
+configure:11834: result: build-aux/install-sh -c -d
+configure:11837: checking whether make sets $(MAKE)
+configure:11859: result: yes
+configure:11889: checking for style of include used by make
+configure:11917: result: GNU
+configure:11951: checking whether make supports nested variables
+configure:11968: result: yes
+configure:12053: checking dependency style of cc
+configure:12164: result: none
+configure:12239: checking whether NLS is requested
+configure:12248: result: yes
+configure:12289: checking for msgfmt
+configure: trying /bin/msgfmt...
+configure:12321: result: /bin/msgfmt
+configure:12330: checking for gmsgfmt
+configure:12361: result: /bin/msgfmt
+configure:12412: checking for xgettext
+configure: trying /bin/xgettext...
+configure:12444: result: /bin/xgettext
+configure:12490: checking for msgmerge
+configure: trying /bin/msgmerge...
+configure:12521: result: /bin/msgmerge
+configure:12611: checking for non-GNU ld
+configure:12642: result: pcc
+configure:12649: checking if the linker (pcc) is GNU ld
+configure:12662: result: no
+configure:12669: checking for shared library run path origin
+configure:12682: result: done
+configure:13254: checking for CFPreferencesCopyAppValue
+configure:13272: cc -o conftest -g   conftest.c  -Wl,-framework -Wl,CoreFoundation >&5
+cpp: conftest.c:22 Could not find include file <CoreFoundation/CFPreferences.h>
+cc: 6c: cpp 27653: error
+configure:13272: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| /* end confdefs.h.  */
+| #include <CoreFoundation/CFPreferences.h>
+| int
+| main ()
+| {
+| CFPreferencesCopyAppValue(NULL, NULL)
+|   ;
+|   return 0;
+| }
+configure:13281: result: no
+configure:13288: checking for CFLocaleCopyCurrent
+configure:13306: cc -o conftest -g   conftest.c  -Wl,-framework -Wl,CoreFoundation >&5
+cpp: conftest.c:22 Could not find include file <CoreFoundation/CFLocale.h>
+cc: 6c: cpp 27666: error
+configure:13306: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| /* end confdefs.h.  */
+| #include <CoreFoundation/CFLocale.h>
+| int
+| main ()
+| {
+| CFLocaleCopyCurrent();
+|   ;
+|   return 0;
+| }
+configure:13315: result: no
+configure:13364: checking for GNU gettext in libc
+configure:13384: cc -o conftest -g   conftest.c  >&5
+rwakeupall: _nl_msg_cat_cntr: not defined
+rwakeupall: _nl_domain_bindings: not defined
+cc: 6l: 6l 27680: error
+configure:13384: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| /* end confdefs.h.  */
+| #include <libintl.h>
+| 
+| extern int _nl_msg_cat_cntr;
+| extern int *_nl_domain_bindings;
+| int
+| main ()
+| {
+| bindtextdomain ("", "");
+| return * gettext ("") + _nl_msg_cat_cntr + *_nl_domain_bindings
+|   ;
+|   return 0;
+| }
+configure:13393: result: no
+configure:13427: checking for iconv
+configure:13449: cc -o conftest -g   conftest.c  >&5
+configure:13449: $? = 0
+configure:13481: result: yes
+configure:13484: checking for working iconv
+configure:13579: cc -o conftest -g   conftest.c  >&5
+configure:13579: $? = 0
+configure:13579: ./conftest
+configure:13579: $? = 0
+configure:13591: result: yes
+configure:14080: checking for GNU gettext in libintl
+configure:14108: cc -o conftest -g    conftest.c  -lintl >&5
+configure:14108: $? = 0
+configure:14149: result: yes
+configure:14184: checking whether to use NLS
+configure:14186: result: yes
+configure:14189: checking where the gettext function comes from
+configure:14200: result: external libintl
+configure:14208: checking how to link with libintl
+configure:14210: result: -lintl
+configure:14262: checking for bison
+configure:14278: found /bin/bison
+configure:14289: result: bison -y
+configure:14320: checking for flex
+configure:14336: found /bin/flex
+configure:14347: result: flex
+configure:14385: flex conftest.l
+configure:14389: $? = 1
+configure:14391: checking lex output file root
+configure:14405: result: lex.yy
+configure:14410: checking lex library
+/bin/m4: internal error detected; please report this bug to <bug-m4@gnu.org>: Abortedconfigure:14424: cc -o conftest -g   conftest.c   >&5
+_apemain: undefined: main in _apemain
+cc: 6l: 6l 27732: error
+configure:14424: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| /* end confdefs.h.  */
+| 
+configure:14424: cc -o conftest -g   conftest.c -lfl  >&5
+_apemain: undefined: main in _apemain
+cc: 6l: 6l 27747: error
+configure:14424: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| /* end confdefs.h.  */
+| 
+configure:14424: cc -o conftest -g   conftest.c -ll  >&5
+_apemain: undefined: main in _apemain
+cc: 6l: 6l 27762: error
+configure:14424: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| /* end confdefs.h.  */
+| 
+configure:14434: result: none needed
+configure:14440: checking whether yytext is a pointer
+configure:14457: cc -o conftest -g   conftest.c   >&5
+_apemain: undefined: main in _apemain
+cc: 6l: 6l 27777: error
+configure:14457: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| /* end confdefs.h.  */
+| 
+|   #define YYTEXT_POINTER 1
+| 
+configure:14465: result: no
+configure:14782: checking for C compiler version
+configure:14791: cc --version >&5
+cc: flag -- ignored
+cc: flag -e ignored
+cc: flag -r ignored
+cc: flag -i ignored
+cc: no files to compile or load
+configure:14802: $? = 1
+configure:14791: cc -v >&5
+cc: no files to compile or load
+configure:14802: $? = 1
+configure:14791: cc -V >&5
+cc: flag -V ignored
+cc: no files to compile or load
+configure:14802: $? = 1
+configure:14791: cc -qversion >&5
+cc: flag -q ignored
+cc: flag -e ignored
+cc: flag -r ignored
+cc: flag -i ignored
+cc: no files to compile or load
+configure:14802: $? = 1
+configure:14806: checking whether we are using the GNU C compiler
+configure:14834: result: no
+configure:14843: checking whether cc accepts -g
+configure:14904: result: yes
+configure:14921: checking for cc option to accept ISO C89
+configure:14997: result: none needed
+configure:15022: checking whether cc understands -c and -o together
+configure:15059: result: yes
+configure:15132: checking for gcc
+configure:15162: result: no
+configure:15225: checking for cc
+configure:15246: found /bin/cc
+configure:15269: result: cc
+configure:15388: checking for C compiler version
+configure:15397: cc --version >&5
+cc: flag -- ignored
+cc: flag -e ignored
+cc: flag -r ignored
+cc: flag -i ignored
+cc: no files to compile or load
+configure:15408: $? = 1
+configure:15397: cc -v >&5
+cc: no files to compile or load
+configure:15408: $? = 1
+configure:15397: cc -V >&5
+cc: flag -V ignored
+cc: no files to compile or load
+configure:15408: $? = 1
+configure:15397: cc -qversion >&5
+cc: flag -q ignored
+cc: flag -e ignored
+cc: flag -r ignored
+cc: flag -i ignored
+cc: no files to compile or load
+configure:15408: $? = 1
+configure:15412: checking whether we are using the GNU C compiler
+configure:15440: result: no
+configure:15449: checking whether cc accepts -g
+configure:15469: cc -c -g  conftest.c >&5
+configure:15469: $? = 0
+configure:15510: result: yes
+configure:15527: checking for cc option to accept ISO C89
+configure:15603: result: none needed
+configure:15628: checking whether cc understands -c and -o together
+configure:15665: result: yes
+configure:15687: checking how to run the C preprocessor
+configure:15718: cc -E  conftest.c
+configure:15718: $? = 0
+configure:15732: cc -E  conftest.c
+cpp: conftest.c:26 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 27841: error
+configure:15732: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| /* end confdefs.h.  */
+| #include <ac_nonexistent.h>
+configure:15757: result: cc -E
+configure:15777: cc -E  conftest.c
+configure:15777: $? = 0
+configure:15791: cc -E  conftest.c
+cpp: conftest.c:26 Could not find include file <ac_nonexistent.h>
+cc: cpp: cpp 27856: error
+configure:15791: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| /* end confdefs.h.  */
+| #include <ac_nonexistent.h>
+configure:15886: checking for g++
+configure:15916: result: no
+configure:15886: checking for c++
+configure:15916: result: no
+configure:15886: checking for gpp
+configure:15916: result: no
+configure:15886: checking for aCC
+configure:15916: result: no
+configure:15886: checking for CC
+configure:15916: result: no
+configure:15886: checking for cxx
+configure:15916: result: no
+configure:15886: checking for cc++
+configure:15916: result: no
+configure:15886: checking for cl.exe
+configure:15916: result: no
+configure:15886: checking for FCC
+configure:15916: result: no
+configure:15886: checking for KCC
+configure:15916: result: no
+configure:15886: checking for RCC
+configure:15916: result: no
+configure:15886: checking for xlC_r
+configure:15916: result: no
+configure:15886: checking for xlC
+configure:15916: result: no
+configure:15940: checking for C++ compiler version
+configure:15949: g++ --version >&5
+./configure: g++: not found
+configure:15960: $? = 127
+configure:15949: g++ -v >&5
+./configure: g++: not found
+configure:15960: $? = 127
+configure:15949: g++ -V >&5
+./configure: g++: not found
+configure:15960: $? = 127
+configure:15949: g++ -qversion >&5
+./configure: g++: not found
+configure:15960: $? = 127
+configure:15964: checking whether we are using the GNU C++ compiler
+configure:15983: g++ -c   conftest.cpp >&5
+./configure: g++: not found
+configure:15983: $? = 127
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| #ifndef __GNUC__
+|        choke me
+| #endif
+| 
+|   ;
+|   return 0;
+| }
+configure:15992: result: no
+configure:16001: checking whether g++ accepts -g
+configure:16021: g++ -c -g  conftest.cpp >&5
+./configure: g++: not found
+configure:16021: $? = 127
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+|   ;
+|   return 0;
+| }
+configure:16036: g++ -c   conftest.cpp >&5
+./configure: g++: not found
+configure:16036: $? = 127
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+|   ;
+|   return 0;
+| }
+configure:16052: g++ -c -g  conftest.cpp >&5
+./configure: g++: not found
+configure:16052: $? = 127
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| /* end confdefs.h.  */
+| 
+| int
+| main ()
+| {
+| 
+|   ;
+|   return 0;
+| }
+configure:16062: result: no
+configure:19417: checking dependency style of g++
+configure:19528: result: none
+configure:19544: checking whether ln -s works
+configure:19551: result: no, using cp -pR
+configure:19559: checking for gawk
+configure:19586: result: gawk
+configure:19659: checking for help2man
+configure:19690: result: ${top_srcdir}/build-aux/missing help2man
+configure:19699: WARNING: help2man: program not found: building man page will not work
+configure:19708: checking for gtexi2dvi
+configure:19741: result: no
+configure:19708: checking for texi2dvi
+configure:19741: result: no
+configure:19751: WARNING: texi2dvi: program not found: building pdf version of manual will not work
+configure:19758: checking for m4 that supports -P
+configure:19791: result: /bin/m4
+configure:19803: checking for indent
+configure:19834: result: ${top_srcdir}/build-aux/missing indent
+configure:19842: checking if ${top_srcdir}/build-aux/missing indent is GNU indent
+configure:19848: result: no
+configure:19850: WARNING: ${top_srcdir}/build-aux/missing indent does not appear to be GNU indent; 'make indent' may not function properly
+configure:19860: checking regex.h usability
+configure:19860: cc -c -g  conftest.c >&5
+configure:19860: $? = 0
+configure:19860: result: yes
+configure:19860: checking regex.h presence
+configure:19860: cc -E  conftest.c
+configure:19860: $? = 0
+configure:19860: result: yes
+configure:19860: checking for regex.h
+configure:19860: result: yes
+configure:19860: checking for strings.h
+configure:19860: result: yes
+configure:19860: checking for sys/stat.h
+configure:19860: result: yes
+configure:19860: checking sys/wait.h usability
+configure:19860: cc -c -g  conftest.c >&5
+configure:19860: $? = 0
+configure:19860: result: yes
+configure:19860: checking sys/wait.h presence
+configure:19860: cc -E  conftest.c
+configure:19860: $? = 0
+configure:19860: result: yes
+configure:19860: checking for sys/wait.h
+configure:19860: result: yes
+configure:19860: checking for unistd.h
+configure:19860: result: yes
+configure:19876: checking for inttypes.h
+configure:19876: result: yes
+configure:19876: checking libintl.h usability
+configure:19876: cc -c -g  conftest.c >&5
+configure:19876: $? = 0
+configure:19876: result: yes
+configure:19876: checking libintl.h presence
+configure:19876: cc -E  conftest.c
+configure:19876: $? = 0
+configure:19876: result: yes
+configure:19876: checking for libintl.h
+configure:19876: result: yes
+configure:19876: checking limits.h usability
+configure:19876: cc -c -g  conftest.c >&5
+configure:19876: $? = 0
+configure:19876: result: yes
+configure:19876: checking limits.h presence
+configure:19876: cc -E  conftest.c
+configure:19876: $? = 0
+configure:19876: result: yes
+configure:19876: checking for limits.h
+configure:19876: result: yes
+configure:19876: checking locale.h usability
+configure:19876: cc -c -g  conftest.c >&5
+configure:19876: $? = 0
+configure:19876: result: yes
+configure:19876: checking locale.h presence
+configure:19876: cc -E  conftest.c
+configure:19876: $? = 0
+configure:19876: result: yes
+configure:19876: checking for locale.h
+configure:19876: result: yes
+configure:19876: checking malloc.h usability
+configure:19876: cc -c -g  conftest.c >&5
+<eof> syntax error, last name: extern
+cpp: conftest.c:69 Could not find include file <malloc.h>
+cc: 6c: cpp 28122: error
+configure:19876: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| #define M4 "/bin/m4"
+| #define HAVE_REGEX_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_SYS_WAIT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_LIBINTL_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_LOCALE_H 1
+| /* end confdefs.h.  */
+| #include <stdio.h>
+| #ifdef HAVE_SYS_TYPES_H
+| # include <sys/types.h>
+| #endif
+| #ifdef HAVE_SYS_STAT_H
+| # include <sys/stat.h>
+| #endif
+| #ifdef STDC_HEADERS
+| # include <stdlib.h>
+| # include <stddef.h>
+| #else
+| # ifdef HAVE_STDLIB_H
+| #  include <stdlib.h>
+| # endif
+| #endif
+| #ifdef HAVE_STRING_H
+| # if !defined STDC_HEADERS && defined HAVE_MEMORY_H
+| #  include <memory.h>
+| # endif
+| # include <string.h>
+| #endif
+| #ifdef HAVE_STRINGS_H
+| # include <strings.h>
+| #endif
+| #ifdef HAVE_INTTYPES_H
+| # include <inttypes.h>
+| #endif
+| #ifdef HAVE_STDINT_H
+| # include <stdint.h>
+| #endif
+| #ifdef HAVE_UNISTD_H
+| # include <unistd.h>
+| #endif
+| #include <malloc.h>
+configure:19876: result: no
+configure:19876: checking malloc.h presence
+configure:19876: cc -E  conftest.c
+cpp: conftest.c:36 Could not find include file <malloc.h>
+cc: cpp: cpp 28132: error
+configure:19876: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| #define M4 "/bin/m4"
+| #define HAVE_REGEX_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_SYS_WAIT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_LIBINTL_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_LOCALE_H 1
+| /* end confdefs.h.  */
+| #include <malloc.h>
+configure:19876: result: no
+configure:19876: checking for malloc.h
+configure:19876: result: no
+configure:19876: checking netinet/in.h usability
+configure:19876: cc -c -g  conftest.c >&5
+configure:19876: $? = 0
+configure:19876: result: yes
+configure:19876: checking netinet/in.h presence
+configure:19876: cc -E  conftest.c
+configure:19876: $? = 0
+configure:19876: result: yes
+configure:19876: checking for netinet/in.h
+configure:19876: result: yes
+configure:19894: checking for pthread_mutex_lock in -lpthread
+configure:19919: cc -o conftest -g   conftest.c -lpthread   >&5
+cc: can't find library for -l
+configure:19919: $? = 0
+configure:19928: result: yes
+configure:19933: checking pthread.h usability
+configure:19933: cc -c -g  conftest.c >&5
+configure:19933: $? = 0
+configure:19933: result: yes
+configure:19933: checking pthread.h presence
+configure:19933: cc -E  conftest.c
+configure:19933: $? = 0
+configure:19933: result: yes
+configure:19933: checking for pthread.h
+configure:19933: result: yes
+configure:19953: checking for log10 in -lm
+configure:19978: cc -o conftest -g   conftest.c -lm   >&5
+configure:19978: $? = 0
+configure:19987: result: yes
+configure:20001: checking for stdbool.h that conforms to C99
+configure:20068: cc -c -g  conftest.c >&5
+/usr/glenda/APExp/sys/src/external/flex/conftest.c:65[stdin:79] array size must be a positive constant
+cc: cpp: 6c 28199: error
+configure:20068: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| #define M4 "/bin/m4"
+| #define HAVE_REGEX_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_SYS_WAIT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_LIBINTL_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_LOCALE_H 1
+| #define HAVE_NETINET_IN_H 1
+| #define HAVE_PTHREAD_H 1
+| #define HAVE_LIBM 1
+| /* end confdefs.h.  */
+| 
+|              #include <stdbool.h>
+|              #ifndef bool
+|               "error: bool is not defined"
+|              #endif
+|              #ifndef false
+|               "error: false is not defined"
+|              #endif
+|              #if false
+|               "error: false is not 0"
+|              #endif
+|              #ifndef true
+|               "error: true is not defined"
+|              #endif
+|              #if true != 1
+|               "error: true is not 1"
+|              #endif
+|              #ifndef __bool_true_false_are_defined
+|               "error: __bool_true_false_are_defined is not defined"
+|              #endif
+| 
+|              struct s { _Bool s: 1; _Bool t; } s;
+| 
+|              char a[true == 1 ? 1 : -1];
+|              char b[false == 0 ? 1 : -1];
+|              char c[__bool_true_false_are_defined == 1 ? 1 : -1];
+|              char d[(bool) 0.5 == true ? 1 : -1];
+|              /* See body of main program for 'e'.  */
+|              char f[(_Bool) 0.0 == false ? 1 : -1];
+|              char g[true];
+|              char h[sizeof (_Bool)];
+|              char i[sizeof s.t];
+|              enum { j = false, k = true, l = false * true, m = true * 256 };
+|              /* The following fails for
+|                 HP aC++/ANSI C B3910B A.05.55 [Dec 04 2003]. */
+|              _Bool n[m];
+|              char o[sizeof n == m * sizeof n[0] ? 1 : -1];
+|              char p[-1 - (_Bool) 0 < 0 && -1 - (bool) 0 < 0 ? 1 : -1];
+|              /* Catch a bug in an HP-UX C compiler.  See
+|                 http://gcc.gnu.org/ml/gcc-patches/2003-12/msg02303.html
+|                 http://lists.gnu.org/archive/html/bug-coreutils/2005-11/msg00161.html
+|               */
+|              _Bool q = true;
+|              _Bool *pq = &q;
+| 
+| int
+| main ()
+| {
+| 
+|              bool e = &s;
+|              *pq |= q;
+|              *pq |= ! q;
+|              /* Refer to every declared value, to avoid compiler optimizations.  */
+|              return (!a + !b + !c + !d + !e + !f + !g + !h + !i + !!j + !k + !!l
+|                      + !m + !n + !o + !p + !q + !pq);
+| 
+|   ;
+|   return 0;
+| }
+configure:20075: result: no
+configure:20077: checking for _Bool
+configure:20077: cc -c -g  conftest.c >&5
+configure:20077: $? = 0
+configure:20077: cc -c -g  conftest.c >&5
+/usr/glenda/APExp/sys/src/external/flex/conftest.c:75[stdin:4923] syntax error, last name: _Bool
+cc: cpp: 6c 28217: error
+configure:20077: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| #define M4 "/bin/m4"
+| #define HAVE_REGEX_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_SYS_WAIT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_LIBINTL_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_LOCALE_H 1
+| #define HAVE_NETINET_IN_H 1
+| #define HAVE_PTHREAD_H 1
+| #define HAVE_LIBM 1
+| /* end confdefs.h.  */
+| #include <stdio.h>
+| #ifdef HAVE_SYS_TYPES_H
+| # include <sys/types.h>
+| #endif
+| #ifdef HAVE_SYS_STAT_H
+| # include <sys/stat.h>
+| #endif
+| #ifdef STDC_HEADERS
+| # include <stdlib.h>
+| # include <stddef.h>
+| #else
+| # ifdef HAVE_STDLIB_H
+| #  include <stdlib.h>
+| # endif
+| #endif
+| #ifdef HAVE_STRING_H
+| # if !defined STDC_HEADERS && defined HAVE_MEMORY_H
+| #  include <memory.h>
+| # endif
+| # include <string.h>
+| #endif
+| #ifdef HAVE_STRINGS_H
+| # include <strings.h>
+| #endif
+| #ifdef HAVE_INTTYPES_H
+| # include <inttypes.h>
+| #endif
+| #ifdef HAVE_STDINT_H
+| # include <stdint.h>
+| #endif
+| #ifdef HAVE_UNISTD_H
+| # include <unistd.h>
+| #endif
+| int
+| main ()
+| {
+| if (sizeof ((_Bool)))
+| 	    return 0;
+|   ;
+|   return 0;
+| }
+configure:20077: result: yes
+configure:20094: checking for an ANSI C-conforming const
+configure:20160: cc -c -g  conftest.c >&5
+configure:20160: $? = 0
+configure:20167: result: yes
+configure:20175: checking for size_t
+configure:20175: cc -c -g  conftest.c >&5
+configure:20175: $? = 0
+configure:20175: cc -c -g  conftest.c >&5
+/usr/glenda/APExp/sys/src/external/flex/conftest.c:76[stdin:4924] syntax error, last name: size_t
+cc: cpp: 6c 28244: error
+configure:20175: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| #define M4 "/bin/m4"
+| #define HAVE_REGEX_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_SYS_WAIT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_LIBINTL_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_LOCALE_H 1
+| #define HAVE_NETINET_IN_H 1
+| #define HAVE_PTHREAD_H 1
+| #define HAVE_LIBM 1
+| #define HAVE__BOOL 1
+| /* end confdefs.h.  */
+| #include <stdio.h>
+| #ifdef HAVE_SYS_TYPES_H
+| # include <sys/types.h>
+| #endif
+| #ifdef HAVE_SYS_STAT_H
+| # include <sys/stat.h>
+| #endif
+| #ifdef STDC_HEADERS
+| # include <stdlib.h>
+| # include <stddef.h>
+| #else
+| # ifdef HAVE_STDLIB_H
+| #  include <stdlib.h>
+| # endif
+| #endif
+| #ifdef HAVE_STRING_H
+| # if !defined STDC_HEADERS && defined HAVE_MEMORY_H
+| #  include <memory.h>
+| # endif
+| # include <string.h>
+| #endif
+| #ifdef HAVE_STRINGS_H
+| # include <strings.h>
+| #endif
+| #ifdef HAVE_INTTYPES_H
+| # include <inttypes.h>
+| #endif
+| #ifdef HAVE_STDINT_H
+| # include <stdint.h>
+| #endif
+| #ifdef HAVE_UNISTD_H
+| # include <unistd.h>
+| #endif
+| int
+| main ()
+| {
+| if (sizeof ((size_t)))
+| 	    return 0;
+|   ;
+|   return 0;
+| }
+configure:20175: result: yes
+configure:20191: checking for working alloca.h
+configure:20208: cc -o conftest -g   conftest.c -lm  >&5
+configure:20208: $? = 0
+configure:20216: result: yes
+configure:20224: checking for alloca
+configure:20261: cc -o conftest -g   conftest.c -lm  >&5
+configure:20261: $? = 0
+configure:20269: result: yes
+configure:20375: checking for pid_t
+configure:20375: cc -c -g  conftest.c >&5
+configure:20375: $? = 0
+configure:20375: cc -c -g  conftest.c >&5
+/usr/glenda/APExp/sys/src/external/flex/conftest.c:78[stdin:4926] syntax error, last name: pid_t
+cc: cpp: 6c 28281: error
+configure:20375: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| #define M4 "/bin/m4"
+| #define HAVE_REGEX_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_SYS_WAIT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_LIBINTL_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_LOCALE_H 1
+| #define HAVE_NETINET_IN_H 1
+| #define HAVE_PTHREAD_H 1
+| #define HAVE_LIBM 1
+| #define HAVE__BOOL 1
+| #define HAVE_ALLOCA_H 1
+| #define HAVE_ALLOCA 1
+| /* end confdefs.h.  */
+| #include <stdio.h>
+| #ifdef HAVE_SYS_TYPES_H
+| # include <sys/types.h>
+| #endif
+| #ifdef HAVE_SYS_STAT_H
+| # include <sys/stat.h>
+| #endif
+| #ifdef STDC_HEADERS
+| # include <stdlib.h>
+| # include <stddef.h>
+| #else
+| # ifdef HAVE_STDLIB_H
+| #  include <stdlib.h>
+| # endif
+| #endif
+| #ifdef HAVE_STRING_H
+| # if !defined STDC_HEADERS && defined HAVE_MEMORY_H
+| #  include <memory.h>
+| # endif
+| # include <string.h>
+| #endif
+| #ifdef HAVE_STRINGS_H
+| # include <strings.h>
+| #endif
+| #ifdef HAVE_INTTYPES_H
+| # include <inttypes.h>
+| #endif
+| #ifdef HAVE_STDINT_H
+| # include <stdint.h>
+| #endif
+| #ifdef HAVE_UNISTD_H
+| # include <unistd.h>
+| #endif
+| int
+| main ()
+| {
+| if (sizeof ((pid_t)))
+| 	    return 0;
+|   ;
+|   return 0;
+| }
+configure:20375: result: yes
+configure:20388: checking vfork.h usability
+configure:20388: cc -c -g  conftest.c >&5
+<eof> not a function
+<eof> syntax error, last name: e
+cpp: conftest.c:75 Could not find include file <vfork.h>
+cc: 6c: cpp 28295: error
+configure:20388: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| #define M4 "/bin/m4"
+| #define HAVE_REGEX_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_SYS_WAIT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_LIBINTL_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_LOCALE_H 1
+| #define HAVE_NETINET_IN_H 1
+| #define HAVE_PTHREAD_H 1
+| #define HAVE_LIBM 1
+| #define HAVE__BOOL 1
+| #define HAVE_ALLOCA_H 1
+| #define HAVE_ALLOCA 1
+| /* end confdefs.h.  */
+| #include <stdio.h>
+| #ifdef HAVE_SYS_TYPES_H
+| # include <sys/types.h>
+| #endif
+| #ifdef HAVE_SYS_STAT_H
+| # include <sys/stat.h>
+| #endif
+| #ifdef STDC_HEADERS
+| # include <stdlib.h>
+| # include <stddef.h>
+| #else
+| # ifdef HAVE_STDLIB_H
+| #  include <stdlib.h>
+| # endif
+| #endif
+| #ifdef HAVE_STRING_H
+| # if !defined STDC_HEADERS && defined HAVE_MEMORY_H
+| #  include <memory.h>
+| # endif
+| # include <string.h>
+| #endif
+| #ifdef HAVE_STRINGS_H
+| # include <strings.h>
+| #endif
+| #ifdef HAVE_INTTYPES_H
+| # include <inttypes.h>
+| #endif
+| #ifdef HAVE_STDINT_H
+| # include <stdint.h>
+| #endif
+| #ifdef HAVE_UNISTD_H
+| # include <unistd.h>
+| #endif
+| #include <vfork.h>
+configure:20388: result: no
+configure:20388: checking vfork.h presence
+configure:20388: cc -E  conftest.c
+cpp: conftest.c:42 Could not find include file <vfork.h>
+cc: cpp: cpp 28305: error
+configure:20388: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| #define M4 "/bin/m4"
+| #define HAVE_REGEX_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_SYS_WAIT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_LIBINTL_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_LOCALE_H 1
+| #define HAVE_NETINET_IN_H 1
+| #define HAVE_PTHREAD_H 1
+| #define HAVE_LIBM 1
+| #define HAVE__BOOL 1
+| #define HAVE_ALLOCA_H 1
+| #define HAVE_ALLOCA 1
+| /* end confdefs.h.  */
+| #include <vfork.h>
+configure:20388: result: no
+configure:20388: checking for vfork.h
+configure:20388: result: no
+configure:20401: checking for fork
+configure:20401: cc -o conftest -g   conftest.c -lm  >&5
+configure:20401: $? = 0
+configure:20401: result: yes
+configure:20401: checking for vfork
+configure:20401: cc -o conftest -g   conftest.c -lm  >&5
+main: undefined: vfork in main
+cc: 6l: 6l 28337: error
+configure:20401: $? = 1
+configure: failed program was:
+| /* confdefs.h */
+| #define PACKAGE_NAME "the fast lexical analyser generator"
+| #define PACKAGE_TARNAME "flex"
+| #define PACKAGE_VERSION "2.6.4"
+| #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
+| #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
+| #define PACKAGE_URL ""
+| #define STDC_HEADERS 1
+| #define HAVE_SYS_TYPES_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_STDLIB_H 1
+| #define HAVE_STRING_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_STDINT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_DLFCN_H 1
+| #define LT_OBJDIR ".libs/"
+| #define PACKAGE "flex"
+| #define VERSION "2.6.4"
+| #define HAVE_ICONV 1
+| #define ENABLE_NLS 1
+| #define HAVE_GETTEXT 1
+| #define HAVE_DCGETTEXT 1
+| #define M4 "/bin/m4"
+| #define HAVE_REGEX_H 1
+| #define HAVE_STRINGS_H 1
+| #define HAVE_SYS_STAT_H 1
+| #define HAVE_SYS_WAIT_H 1
+| #define HAVE_UNISTD_H 1
+| #define HAVE_INTTYPES_H 1
+| #define HAVE_LIBINTL_H 1
+| #define HAVE_LIMITS_H 1
+| #define HAVE_LOCALE_H 1
+| #define HAVE_NETINET_IN_H 1
+| #define HAVE_PTHREAD_H 1
+| #define HAVE_LIBM 1
+| #define HAVE__BOOL 1
+| #define HAVE_ALLOCA_H 1
+| #define HAVE_ALLOCA 1
+| #define HAVE_FORK 1
+| /* end confdefs.h.  */
+| /* Define vfork to an innocuous variant, in case <limits.h> declares vfork.
+|    For example, HP-UX 11i <limits.h> declares gettimeofday.  */
+| #define vfork innocuous_vfork
+| 
+| /* System header to define __stub macros and hopefully few prototypes,
+|     which can conflict with char vfork (); below.
+|     Prefer <limits.h> to <assert.h> if __STDC__ is defined, since
+|     <limits.h> exists even on freestanding compilers.  */
+| 
+| #ifdef __STDC__
+| # include <limits.h>
+| #else
+| # include <assert.h>
+| #endif
+| 
+| #undef vfork
+| 
+| /* Override any GCC internal prototype to avoid an error.
+|    Use char because int might match the return type of a GCC
+|    builtin and then its argument prototype would still apply.  */
+| #ifdef __cplusplus
+| extern "C"
+| #endif
+| char vfork ();
+| /* The GNU C library defines this for functions which it implements
+|     to always fail with ENOSYS.  Some functions are actually named
+|     something starting with __ and the normal name is an alias.  */
+| #if defined __stub_vfork || defined __stub___vfork
+| choke me
+| #endif
+| 
+| int
+| main ()
+| {
+| return vfork ();
+|   ;
+|   return 0;
+| }
+configure:20401: result: no
+configure:20411: checking for working fork
+configure:20433: cc -o conftest -g   conftest.c -lm  >&5
+configure:20433: $? = 0
+configure:20433: ./conftest
+configure:20433: $? = 0
+configure:20443: result: yes
+configure:20601: checking for stdlib.h
+configure:20601: result: yes
+configure:20611: checking for GNU libc compatible malloc
+configure:20635: cc -o conftest -g   conftest.c -lm  >&5
+configure:20635: $? = 0
+configure:20635: ./conftest
+configure:20635: $? = 0
+configure:20645: result: yes
+configure:20672: checking for stdlib.h
+configure:20672: result: yes
+configure:20682: checking for GNU libc compatible realloc
+configure:20706: cc -o conftest -g   conftest.c -lm  >&5
+configure:20706: $? = 0
+configure:20706: ./conftest
+configure:20706: $? = 0
+configure:20716: result: yes
+configure:20745: checking for dup2
+configure:20745: cc -o conftest -g   conftest.c -lm  >&5
+configure:20745: $? = 0
+configure:20745: result: yes
+configure:20745: checking for memset
+configure:20745: cc -o conftest -g   conftest.c -lm  >&5
+configure:20745: $? = 0
+configure:20745: result: yes
+configure:20745: checking for regcomp
+configure:20745: cc -o conftest -g   conftest.c -lm  >&5
+configure:20745: $? = 0
+configure:20745: result: yes
+configure:20745: checking for strcasecmp
+configure:20745: cc -o conftest -g   conftest.c -lm  >&5
+configure:20745: $? = 0
+configure:20745: result: yes
+configure:20745: checking for strchr
+configure:20745: cc -o conftest -g   conftest.c -lm  >&5
+configure:20745: $? = 0
+configure:20745: result: yes
+configure:20745: checking for strdup
+configure:20745: cc -o conftest -g   conftest.c -lm  >&5
+configure:20745: $? = 0
+configure:20745: result: yes
+configure:20745: checking for strtol
+configure:20745: cc -o conftest -g   conftest.c -lm  >&5
+configure:20745: $? = 0
+configure:20745: result: yes
+configure:20761: checking for pow
+configure:20761: cc -o conftest -g   conftest.c -lm  >&5
+configure:20761: $? = 0
+configure:20761: result: yes
+configure:20761: checking for setlocale
+configure:20761: cc -o conftest -g   conftest.c -lm  >&5
+configure:20761: $? = 0
+configure:20761: result: yes
+configure:20761: checking for reallocarray
+configure:20761: cc -o conftest -g   conftest.c -lm  >&5
+configure:20761: $? = 0
+configure:20761: result: yes
+configure:20883: checking that generated files are newer than configure
+configure:20889: result: done
+configure:20932: creating ./config.status
+
+## ---------------------- ##
+## Running config.status. ##
+## ---------------------- ##
+
+This file was extended by the fast lexical analyser generator config.status 2.6.4, which was
+generated by GNU Autoconf 2.69.  Invocation command line was
+
+  CONFIG_FILES    = 
+  CONFIG_HEADERS  = 
+  CONFIG_LINKS    = 
+  CONFIG_COMMANDS = 
+  $ ./config.status 
+
+on krypton
+
+config.status:1242: creating Makefile
+config.status:1242: creating doc/Makefile
+config.status:1242: creating examples/Makefile
+config.status:1242: creating examples/fastwc/Makefile
+config.status:1242: creating examples/manual/Makefile
+config.status:1242: creating po/Makefile.in
+config.status:1242: creating src/Makefile
+config.status:1242: creating tools/Makefile
+config.status:1242: creating tests/Makefile
+config.status:1242: creating src/config.h
+config.status:1471: executing libtool commands
+config.status:1471: executing depfiles commands
+config.status:1471: executing po-directories commands
 
 ## ---------------- ##
 ## Cache variables. ##
 ## ---------------- ##
 
+ac_cv_build=x86_64-unknown-plan9
+ac_cv_build_prog_CPP='cc -E'
+ac_cv_build_prog_cc_g=yes
+ac_cv_c_compiler_gnu=no
+ac_cv_c_const=yes
+ac_cv_cxx_compiler_gnu=no
 ac_cv_env_CCC_set=
 ac_cv_env_CCC_value=
 ac_cv_env_CC_set=
@@ -73,105 +1983,228 @@ ac_cv_env_host_alias_set=
 ac_cv_env_host_alias_value=
 ac_cv_env_target_alias_set=
 ac_cv_env_target_alias_value=
+ac_cv_func_alloca_works=yes
+ac_cv_func_dup2=yes
+ac_cv_func_fork=yes
+ac_cv_func_fork_works=yes
+ac_cv_func_malloc_0_nonnull=yes
+ac_cv_func_memset=yes
+ac_cv_func_pow=yes
+ac_cv_func_realloc_0_nonnull=yes
+ac_cv_func_reallocarray=yes
+ac_cv_func_regcomp=yes
+ac_cv_func_setlocale=yes
+ac_cv_func_strcasecmp=yes
+ac_cv_func_strchr=yes
+ac_cv_func_strdup=yes
+ac_cv_func_strtol=yes
+ac_cv_func_vfork=no
+ac_cv_func_vfork_works=no
+ac_cv_header_dlfcn_h=yes
+ac_cv_header_inttypes_h=yes
+ac_cv_header_libintl_h=yes
+ac_cv_header_limits_h=yes
+ac_cv_header_locale_h=yes
+ac_cv_header_malloc_h=no
+ac_cv_header_memory_h=no
+ac_cv_header_netinet_in_h=yes
+ac_cv_header_pthread_h=yes
+ac_cv_header_regex_h=yes
+ac_cv_header_stdbool_h=no
+ac_cv_header_stdc=yes
+ac_cv_header_stdint_h=yes
+ac_cv_header_stdlib_h=yes
+ac_cv_header_string_h=yes
+ac_cv_header_strings_h=yes
+ac_cv_header_sys_stat_h=yes
+ac_cv_header_sys_types_h=yes
+ac_cv_header_sys_wait_h=yes
+ac_cv_header_unistd_h=yes
+ac_cv_header_vfork_h=no
+ac_cv_host=x86_64-unknown-plan9
+ac_cv_lib_lex='none needed'
+ac_cv_lib_m_log10=yes
+ac_cv_lib_pthread_pthread_mutex_lock=yes
+ac_cv_objext=o
+ac_cv_path_EGREP='/bin/grep -E'
+ac_cv_path_FGREP='/bin/grep -F'
+ac_cv_path_GMSGFMT=/bin/msgfmt
+ac_cv_path_GREP=/bin/grep
+ac_cv_path_HELP2MAN='${top_srcdir}/build-aux/missing help2man'
+ac_cv_path_INDENT='${top_srcdir}/build-aux/missing indent'
+ac_cv_path_M4=/bin/m4
+ac_cv_path_MSGFMT=/bin/msgfmt
+ac_cv_path_MSGMERGE=/bin/msgmerge
+ac_cv_path_SED=/bin/sed
+ac_cv_path_XGETTEXT=/bin/xgettext
+ac_cv_path_install='/bin/install -c'
+ac_cv_path_lt_DD=/bin/dd
+ac_cv_prog_AWK=gawk
+ac_cv_prog_CC=cc
+ac_cv_prog_CC_FOR_BUILD=cc
+ac_cv_prog_CPP='cc -E'
+ac_cv_prog_LEX=flex
+ac_cv_prog_YACC='bison -y'
+ac_cv_prog_ac_ct_AR=ar
+ac_cv_prog_ac_ct_RANLIB=ranlib
+ac_cv_prog_ac_ct_STRIP=strip
+ac_cv_prog_cc_c89=
+ac_cv_prog_cc_g=yes
+ac_cv_prog_cxx_g=no
+ac_cv_prog_lex_root=lex.yy
+ac_cv_prog_lex_yytext_pointer=no
+ac_cv_prog_make_make_set=yes
+ac_cv_type__Bool=yes
+ac_cv_type_pid_t=yes
+ac_cv_type_size_t=yes
+ac_cv_working_alloca_h=yes
+acl_cv_hardcode_direct=no
+acl_cv_hardcode_libdir_flag_spec=
+acl_cv_hardcode_libdir_separator=
+acl_cv_hardcode_minus_L=no
+acl_cv_libext=a
+acl_cv_libname_spec='lib$name'
+acl_cv_library_names_spec=
+acl_cv_path_LD=pcc
+acl_cv_prog_gnu_ld=no
+acl_cv_rpath=done
+acl_cv_shlibext=so
+acl_cv_wl=
+am_cv_CC_dependencies_compiler_type=none
+am_cv_CXX_dependencies_compiler_type=none
+am_cv_func_iconv=yes
+am_cv_func_iconv_works=yes
+am_cv_lib_iconv=no
+am_cv_make_support_nested_variables=yes
+am_cv_prog_cc_c_o=yes
+gt_cv_func_CFLocaleCopyCurrent=no
+gt_cv_func_CFPreferencesCopyAppValue=no
+gt_cv_func_gnugettext1_libc=no
+gt_cv_func_gnugettext1_libintl=yes
+lt_cv_ar_at_file=no
+lt_cv_deplibs_check_method=unknown
+lt_cv_file_magic_cmd='$MAGIC_CMD'
+lt_cv_file_magic_test_file=
+lt_cv_ld_reload_flag=-r
+lt_cv_nm_interface='BSD nm'
+lt_cv_objdir=.libs
+lt_cv_path_LD=pcc
+lt_cv_path_NM=/bin/nm
+lt_cv_path_mainfest_tool=no
+lt_cv_prog_compiler_c_o=yes
+lt_cv_prog_compiler_pic=' -DPIC'
+lt_cv_prog_compiler_pic_works=yes
+lt_cv_prog_compiler_static_works=yes
+lt_cv_prog_gnu_ld=no
+lt_cv_sharedlib_from_linklib_cmd='print -r --'
+lt_cv_sys_global_symbol_pipe='sed -n -e '\''s/^.*[	 ]\([BCDEGRST][BCDEGRST]*\)[	 ][	 ]*\([_A-Za-z][_A-Za-z0-9]*\)$/\1 \2 \2/p'\'' | sed '\''/ __gnu_lto/d'\'
+lt_cv_sys_global_symbol_to_c_name_address='sed -n -e '\''s/^: \(.*\) .*$/  {"\1", (void *) 0},/p'\'' -e '\''s/^[BCDEGRST][BCDEGRST]* .* \(.*\)$/  {"\1", (void *) \&\1},/p'\'
+lt_cv_sys_global_symbol_to_c_name_address_lib_prefix='sed -n -e '\''s/^: \(.*\) .*$/  {"\1", (void *) 0},/p'\'' -e '\''s/^[BCDEGRST][BCDEGRST]* .* \(lib.*\)$/  {"\1", (void *) \&\1},/p'\'' -e '\''s/^[BCDEGRST][BCDEGRST]* .* \(.*\)$/  {"lib\1", (void *) \&\1},/p'\'
+lt_cv_sys_global_symbol_to_cdecl='sed -n -e '\''s/^T .* \(.*\)$/extern int \1();/p'\'' -e '\''s/^[BCDEGRST][BCDEGRST]* .* \(.*\)$/extern char \1;/p'\'
+lt_cv_sys_global_symbol_to_import=
+lt_cv_sys_max_cmd_len=262144
+lt_cv_to_host_file_cmd=func_convert_file_noop
+lt_cv_to_tool_file_cmd=func_convert_file_noop
+lt_cv_truncate_bin='/bin/dd bs=4096 count=1'
 
 ## ----------------- ##
 ## Output variables. ##
 ## ----------------- ##
 
-ACLOCAL=''
+ACLOCAL='${SHELL} /usr/glenda/APExp/sys/src/external/flex/build-aux/missing aclocal-1.15'
 ALLOCA=''
-AMDEPBACKSLASH=''
-AMDEP_FALSE=''
+AMDEPBACKSLASH='\'
+AMDEP_FALSE='#'
 AMDEP_TRUE=''
-AMTAR=''
-AM_BACKSLASH=''
-AM_DEFAULT_V=''
-AM_DEFAULT_VERBOSITY=''
-AM_V=''
-AR=''
-AUTOCONF=''
-AUTOHEADER=''
-AUTOMAKE=''
-AWK=''
+AMTAR='$${TAR-tar}'
+AM_BACKSLASH='\'
+AM_DEFAULT_V='$(AM_DEFAULT_VERBOSITY)'
+AM_DEFAULT_VERBOSITY='1'
+AM_V='$(V)'
+AR='ar'
+AUTOCONF='${SHELL} /usr/glenda/APExp/sys/src/external/flex/build-aux/missing autoconf'
+AUTOHEADER='${SHELL} /usr/glenda/APExp/sys/src/external/flex/build-aux/missing autoheader'
+AUTOMAKE='${SHELL} /usr/glenda/APExp/sys/src/external/flex/build-aux/missing automake-1.15'
+AWK='gawk'
 BUILD_EXEEXT=''
 BUILD_OBJEXT=''
-CC=''
-CCDEPMODE=''
-CC_FOR_BUILD=''
-CFLAGS=''
-CFLAGS_FOR_BUILD=''
-CPP=''
+CC='cc'
+CCDEPMODE='depmode=none'
+CC_FOR_BUILD='cc'
+CFLAGS='-g'
+CFLAGS_FOR_BUILD='-g'
+CPP='cc -E'
 CPPFLAGS=''
 CPPFLAGS_FOR_BUILD=''
-CPP_FOR_BUILD=''
+CPP_FOR_BUILD='cc -E'
 CROSS_FALSE=''
-CROSS_TRUE=''
-CXX=''
+CROSS_TRUE='#'
+CXX='g++'
 CXXCPP=''
-CXXDEPMODE=''
+CXXDEPMODE='depmode=none'
 CXXFLAGS=''
-CYGPATH_W=''
-DEFS=''
-DEPDIR=''
-DLLTOOL=''
+CYGPATH_W='echo'
+DEFS='-DHAVE_CONFIG_H'
+DEPDIR='.deps'
+DLLTOOL='false'
 DSYMUTIL=''
 DUMPBIN=''
 ECHO_C=''
 ECHO_N='-n'
 ECHO_T=''
-EGREP=''
-ENABLE_BOOTSTRAP_FALSE=''
+EGREP='/bin/grep -E'
+ENABLE_BOOTSTRAP_FALSE='#'
 ENABLE_BOOTSTRAP_TRUE=''
-ENABLE_LIBFL_FALSE=''
+ENABLE_LIBFL_FALSE='#'
 ENABLE_LIBFL_TRUE=''
 EXEEXT=''
-FGREP=''
-GETTEXT_MACRO_VERSION=''
-GMSGFMT=''
-GMSGFMT_015=''
-GREP=''
-HAVE_BISON_FALSE=''
+FGREP='/bin/grep -F'
+GETTEXT_MACRO_VERSION='0.18'
+GMSGFMT='/bin/msgfmt'
+GMSGFMT_015='/bin/msgfmt'
+GREP='/bin/grep'
+HAVE_BISON_FALSE='#'
 HAVE_BISON_TRUE=''
-HELP2MAN=''
-INDENT=''
-INSTALL_DATA=''
-INSTALL_PROGRAM=''
-INSTALL_SCRIPT=''
-INSTALL_STRIP_PROGRAM=''
-INTLLIBS=''
+HELP2MAN='${top_srcdir}/build-aux/missing help2man'
+INDENT='${top_srcdir}/build-aux/missing indent'
+INSTALL_DATA='${INSTALL} -m 644'
+INSTALL_PROGRAM='${INSTALL}'
+INSTALL_SCRIPT='${INSTALL}'
+INSTALL_STRIP_PROGRAM='$(install_sh) -c -s'
+INTLLIBS='-lintl'
 INTL_MACOSX_LIBS=''
 LD='pcc'
 LDFLAGS=''
 LDFLAGS_FOR_BUILD=''
-LEX=''
+LEX='flex'
 LEXLIB=''
-LEX_OUTPUT_ROOT=''
+LEX_OUTPUT_ROOT='lex.yy'
 LIBICONV=''
-LIBINTL=''
+LIBINTL='-lintl'
 LIBOBJS=''
-LIBPTHREAD=''
-LIBS=''
-LIBTOOL=''
+LIBPTHREAD='-lpthread'
+LIBS='-lm '
+LIBTOOL='$(SHELL) $(top_builddir)/libtool'
 LIPO=''
-LN_S=''
+LN_S='cp -pR'
 LTLIBICONV=''
-LTLIBINTL=''
+LTLIBINTL='-lintl'
 LTLIBOBJS=''
 LT_SYS_LIBRARY_PATH=''
-M4=''
-MAKEINFO=''
-MANIFEST_TOOL=''
-MKDIR_P=''
-MSGFMT=''
-MSGFMT_015=''
-MSGMERGE=''
-NM=''
+M4='/bin/m4'
+MAKEINFO='${SHELL} /usr/glenda/APExp/sys/src/external/flex/build-aux/missing makeinfo'
+MANIFEST_TOOL=':'
+MKDIR_P='build-aux/install-sh -c -d'
+MSGFMT='/bin/msgfmt'
+MSGFMT_015='/bin/msgfmt'
+MSGMERGE='/bin/msgmerge'
+NM='/bin/nm'
 NMEDIT=''
-OBJDUMP=''
-OBJEXT=''
+OBJDUMP='false'
+OBJEXT='o'
 OTOOL64=''
 OTOOL=''
-PACKAGE=''
+PACKAGE='flex'
 PACKAGE_BUGREPORT='flex-help@lists.sourceforge.net'
 PACKAGE_NAME='the fast lexical analyser generator'
 PACKAGE_STRING='the fast lexical analyser generator 2.6.4'
@@ -179,69 +2212,69 @@ PACKAGE_TARNAME='flex'
 PACKAGE_URL=''
 PACKAGE_VERSION='2.6.4'
 PATH_SEPARATOR=':'
-POSUB=''
-RANLIB=''
-SED=''
+POSUB='po'
+RANLIB='ranlib'
+SED='/bin/sed'
 SET_MAKE=''
-SHARED_VERSION_INFO=''
+SHARED_VERSION_INFO='2:0:0'
 SHELL='/bin/sh'
-STRIP=''
-TEXI2DVI=''
-USE_NLS=''
-VERSION=''
+STRIP='strip'
+TEXI2DVI='${top_srcdir}/build-aux/missing texi2dvi'
+USE_NLS='yes'
+VERSION='2.6.4'
 WARNINGFLAGS=''
-XGETTEXT=''
-XGETTEXT_015=''
+XGETTEXT='/bin/xgettext'
+XGETTEXT_015='/bin/xgettext'
 XGETTEXT_EXTRA_OPTIONS=''
-YACC=''
+YACC='bison -y'
 YFLAGS=''
-ac_ct_AR=''
+ac_ct_AR='ar'
 ac_ct_CC=''
 ac_ct_CC_FOR_BUILD=''
 ac_ct_CXX=''
 ac_ct_DUMPBIN=''
 am__EXEEXT_FALSE=''
-am__EXEEXT_TRUE=''
+am__EXEEXT_TRUE='#'
 am__fastdepCC_FALSE=''
-am__fastdepCC_TRUE=''
+am__fastdepCC_TRUE='#'
 am__fastdepCXX_FALSE=''
-am__fastdepCXX_TRUE=''
-am__include=''
+am__fastdepCXX_TRUE='#'
+am__include='include'
 am__isrc=''
-am__leading_dot=''
-am__nodep=''
+am__leading_dot='.'
+am__nodep='_no'
 am__quote=''
-am__tar=''
-am__untar=''
+am__tar='$${TAR-tar} chof - "$$tardir"'
+am__untar='$${TAR-tar} xf -'
 bindir='${exec_prefix}/bin'
-build=''
+build='x86_64-unknown-plan9'
 build_alias=''
-build_cpu=''
-build_os=''
-build_vendor=''
+build_cpu='x86_64'
+build_os='plan9'
+build_vendor='unknown'
 datadir='${datarootdir}'
 datarootdir='${prefix}/share'
 docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
 dvidir='${docdir}'
-exec_prefix='NONE'
-host=''
+exec_prefix='${prefix}'
+host='x86_64-unknown-plan9'
 host_alias=''
-host_cpu=''
-host_os=''
-host_vendor=''
+host_cpu='x86_64'
+host_os='plan9'
+host_vendor='unknown'
 htmldir='${docdir}'
 includedir='${prefix}/include'
 infodir='${datarootdir}/info'
-install_sh=''
+install_sh='${SHELL} /usr/glenda/APExp/sys/src/external/flex/build-aux/install-sh'
 libdir='${exec_prefix}/lib'
 libexecdir='${exec_prefix}/libexec'
 localedir='${datarootdir}/locale'
 localstatedir='${prefix}/var'
 mandir='${datarootdir}/man'
-mkdir_p=''
+mkdir_p='$(top_builddir)/build-aux/install-sh -c -d'
 oldincludedir='/usr/include'
 pdfdir='${docdir}'
-prefix='NONE'
+prefix='/usr/local'
 program_transform_name='s,x,x,'
 psdir='${docdir}'
 runstatedir='${localstatedir}/run'
@@ -261,5 +2294,55 @@ target_alias=''
 #define PACKAGE_STRING "the fast lexical analyser generator 2.6.4"
 #define PACKAGE_BUGREPORT "flex-help@lists.sourceforge.net"
 #define PACKAGE_URL ""
+#define STDC_HEADERS 1
+#define HAVE_SYS_TYPES_H 1
+#define HAVE_SYS_STAT_H 1
+#define HAVE_STDLIB_H 1
+#define HAVE_STRING_H 1
+#define HAVE_STRINGS_H 1
+#define HAVE_INTTYPES_H 1
+#define HAVE_STDINT_H 1
+#define HAVE_UNISTD_H 1
+#define HAVE_DLFCN_H 1
+#define LT_OBJDIR ".libs/"
+#define PACKAGE "flex"
+#define VERSION "2.6.4"
+#define HAVE_ICONV 1
+#define ENABLE_NLS 1
+#define HAVE_GETTEXT 1
+#define HAVE_DCGETTEXT 1
+#define M4 "/bin/m4"
+#define HAVE_REGEX_H 1
+#define HAVE_STRINGS_H 1
+#define HAVE_SYS_STAT_H 1
+#define HAVE_SYS_WAIT_H 1
+#define HAVE_UNISTD_H 1
+#define HAVE_INTTYPES_H 1
+#define HAVE_LIBINTL_H 1
+#define HAVE_LIMITS_H 1
+#define HAVE_LOCALE_H 1
+#define HAVE_NETINET_IN_H 1
+#define HAVE_PTHREAD_H 1
+#define HAVE_LIBM 1
+#define HAVE__BOOL 1
+#define HAVE_ALLOCA_H 1
+#define HAVE_ALLOCA 1
+#define HAVE_FORK 1
+#define vfork fork
+#define HAVE_WORKING_FORK 1
+#define HAVE_STDLIB_H 1
+#define HAVE_MALLOC 1
+#define HAVE_STDLIB_H 1
+#define HAVE_REALLOC 1
+#define HAVE_DUP2 1
+#define HAVE_MEMSET 1
+#define HAVE_REGCOMP 1
+#define HAVE_STRCASECMP 1
+#define HAVE_STRCHR 1
+#define HAVE_STRDUP 1
+#define HAVE_STRTOL 1
+#define HAVE_POW 1
+#define HAVE_SETLOCALE 1
+#define HAVE_REALLOCARRAY 1
 
-configure: exit 1
+configure: exit 0

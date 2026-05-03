@@ -20,7 +20,7 @@ PACKAGE_TARNAME = readline
 
 topdir = ..
 srcdir = .
-VPATH = .
+
 
 prefix = /usr/local
 
