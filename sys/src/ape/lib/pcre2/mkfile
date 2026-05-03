@@ -125,7 +125,6 @@ installall:V:
 clean:V:
 	mk -f mkfile.libpcre $target
 	mk -f mkfile.libpcreposix $target
-	rm *.a
 
 nuke:V:
 	mk -f mkfile.libpcre $target

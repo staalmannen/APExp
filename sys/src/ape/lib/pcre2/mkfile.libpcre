@@ -46,7 +46,7 @@ PCRESRC=../../../external/pcre2
 CC=pcc
 LD=pcc
 # Normally are 8, 16 and 32 libraries made.
-CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=32 -DPCRE2_STATIC
+CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=8 -DPCRE2_STATIC
 
 %.$O: $PCRESRC/src/%.c
 	$CC $CFLAGS $PCRESRC/src/$stem.c
@@ -55,7 +55,8 @@ pcre2_chartables.c: $PCRESRC/src/pcre2_chartables.c.dist
 	cp $PCRESRC/src/pcre2_chartables.c.dist pcre2_chartables.c
 
 
+CLEANFILES=$LIB
+
 nuke:V:
 	mk clean
-	rm -f $LIB
 

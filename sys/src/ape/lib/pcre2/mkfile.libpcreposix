@@ -11,13 +11,13 @@ PCRESRC=../../../external/pcre2
 
 CC=pcc
 LD=pcc
-CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=32
+CFLAGS=-c -I. -I$PCRESRC/src -DHAVE_CONFIG_H -DPCRE2_CODE_UNIT_WIDTH=8
 
 %.$O: $PCRESRC/src/%.c
 	$CC $CFLAGS $PCRESRC/src/$stem.c
 
+CLEANFILES=$LIB
+
 nuke:V:
 	mk clean
-	rm -f $LIB
-	rm -f $APEXPROOT/$objtype/lib/ape/libpcreposix.a
 

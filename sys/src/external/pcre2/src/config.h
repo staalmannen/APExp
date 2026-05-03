@@ -323,17 +323,17 @@ surrounded by #ifndef/#endif lines so that the value can be overridden by -D. */
 
 /* Define to any value to allow pcre2grep to be linked with libbz2, so that it
    is able to handle .bz2 files. */
-/* #undef SUPPORT_LIBBZ2 */
+#define SUPPORT_LIBBZ2 1
 
 /* Define to any value to allow pcre2test to be linked with libedit. */
 /* #undef SUPPORT_LIBEDIT */
 
 /* Define to any value to allow pcre2test to be linked with libreadline. */
-/* #undef SUPPORT_LIBREADLINE */
+#define SUPPORT_LIBREADLINE 1
 
 /* Define to any value to allow pcre2grep to be linked with libz, so that it
    is able to handle .gz files. */
-/* #undef SUPPORT_LIBZ */
+#define SUPPORT_LIBZ 1
 
 /* Define to any value to enable callout script support in pcre2grep. */
 #define SUPPORT_PCRE2GREP_CALLOUT /**/
@@ -348,13 +348,13 @@ surrounded by #ifndef/#endif lines so that the value can be overridden by -D. */
 /* #undef SUPPORT_PCRE2GREP_JIT */
 
 /* Define to any value to enable the 16 bit PCRE2 library. */
-// #define SUPPORT_PCRE2_16 1
+#define SUPPORT_PCRE2_16 1
 
 /* Define to any value to enable the 32 bit PCRE2 library. */
 #define SUPPORT_PCRE2_32 1
 
 /* Define to any value to enable the 8 bit PCRE2 library. */
-// #define SUPPORT_PCRE2_8 1
+#define SUPPORT_PCRE2_8 1
 
 #define SUPPORT_UNICODE 1
 

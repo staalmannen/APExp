@@ -575,7 +575,7 @@ extern char *getenv PP((char *));
 # endif
 #endif
 
-Static long starting_time;
+Static time_t starting_time;
 
 Static void openlogfile()
 {
@@ -608,7 +608,7 @@ Static void openlogfile()
 
 void closelogfile()
 {
-    long ending_time;
+    time_t ending_time;
 
     if (logfile) {
 	fprintf(logfile, "\n\n");

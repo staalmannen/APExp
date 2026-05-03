@@ -172,6 +172,8 @@ CFLAGS=-c -I. -I$BISONSRC -I$BISONSRC/lib -I$BISONSRC/src\
 		-B -DHAVE_CONFIG_H\
 		-DLOCALEDIR="/sys/lib/ape/locale"
 
+CLEANFILES=$LIB
+
 bison-%.$O: $BISONSRC/src/%.c
 	$CC $CFLAGS -c $prereq -o $target
 
@@ -204,6 +206,5 @@ install:V:
 		cp $BISONSRC/doc/bison.1 $APEXPROOT/sys/man/1/bison
 		cp $BISONSRC/doc/yacc.1 $APEXPROOT/sys/man/1/yacc
 
-clean:V:
-		rm -f libbison.a$O
+
 
