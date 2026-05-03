@@ -4,7 +4,10 @@
 rfork en
 fn sigterm{}
 HOME=$home
+TCLPATH="/sys/lib/tcl"
+AWKLIB="/sys/lib/ape/awk"
 M4PATH="/sys/lib/ape/m4"
+MANPATH="/sys/man"
 LOCALEDIR="/sys/lib/ape/locale"
 LD=pcc
 test -d /dev/fd || aux/stub -d /dev/fd && bind /fd /dev/fd

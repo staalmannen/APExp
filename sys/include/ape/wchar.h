@@ -61,37 +61,37 @@ extern int wctob(Rune);
 #define wctob(c) ((int)(c))
 
 /* stdio.h */
-extern Rune fgetwc(FILE *);
+extern Rune fgetwc(struct _IO_FILE *);
 #define fgetwc(f) fgetc(f)
-extern Rune fputwc(wchar_t, FILE *);
+extern Rune fputwc(wchar_t, struct _IO_FILE *);
 #define fputwc(c, f) fputc((int)(c), (f))
-extern wchar_t *fgetws(wchar_t *, int, FILE *);
+extern wchar_t *fgetws(wchar_t *, int, struct _IO_FILE *);
 #define fgetws(c, i, f) fgets((char *)(c), (i), (f))
-extern int fputws(const wchar_t *, FILE *);
+extern int fputws(const wchar_t *, struct _IO_FILE *);
 #define fputws(c, f) fputs((const char *)(c), (f))
 
 /* Variadic wide stdio: delegate to narrow counterparts via __VA_ARGS__ */
-extern int fwprintf(FILE *, const wchar_t *, ...);
+extern int fwprintf(struct _IO_FILE *, const wchar_t *, ...);
 #define fwprintf(f, c, ...) fprintf((f), (const char *)(c), __VA_ARGS__)
-extern int fwscanf(FILE *, const wchar_t *, ...);
+extern int fwscanf(struct _IO_FILE *, const wchar_t *, ...);
 #define fwscanf(f, c, ...) fscanf((f), (const char *)(c), __VA_ARGS__)
 extern Rune getwchar(void);
 #define getwchar() getchar()
-extern Rune getwc(FILE *);
+extern Rune getwc(struct _IO_FILE *);
 #define getwc(f) getc(f)
 extern Rune putwchar(Rune);
 #define putwchar(c) putchar((int)(c))
-extern Rune putwc(Rune, FILE *);
+extern Rune putwc(Rune, struct _IO_FILE *);
 #define putwc(r, f) putc((int)(r), (f))
 extern int swprintf(wchar_t *, size_t, const wchar_t *, ...);
 #define swprintf(c, st, wc, ...) snprintf((char *)(c), (st), (const char *)(wc), __VA_ARGS__)
 extern int swscanf(const wchar_t *, const wchar_t *, ...);
 #define swscanf(c1, c2, ...) sscanf((const char *)(c1), (const char *)(c2), __VA_ARGS__)
-extern Rune ungetwc(Rune, FILE *);
+extern Rune ungetwc(Rune, struct _IO_FILE *);
 #define ungetwc(c, f) ungetc((int)(c), (f))
-extern int vfwprintf(FILE *, const wchar_t *, va_list);
+extern int vfwprintf(struct _IO_FILE *, const wchar_t *, va_list);
 #define vfwprintf(f, c, a) vfprintf((f), (const char *)(c), (a))
-extern int vfwscanf(FILE *, const wchar_t *, va_list);
+extern int vfwscanf(struct _IO_FILE *, const wchar_t *, va_list);
 #define vfwscanf(f, c, a) vfscanf((f), (const char *)(c), (a))
 extern int vwprintf(const wchar_t *, va_list);
 #define vwprintf(c, a) vprintf((const char *)(c), (a))
@@ -185,7 +185,7 @@ extern size_t wcsftime(wchar_t *, size_t, const wchar_t *, const struct tm *);
  * ##############################################
  */
 
-int fwide(FILE *, int);
+int fwide(struct _IO_FILE *, int);
 size_t mbrlen(const char *, size_t, mbstate_t *);
 size_t mbrtowc(wchar_t *, const char *, size_t, mbstate_t *);
 int mbsinit(const mbstate_t *);

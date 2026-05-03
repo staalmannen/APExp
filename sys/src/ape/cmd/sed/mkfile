@@ -2,7 +2,7 @@
 APEXPROOT=../../../../..
 
 BIN=$APEXPROOT/$objtype/bin/ape
-TARG=$BIN/sed
+TARG=sed
 
 OFILES=	compile.$O\
 		debug.$O\
@@ -24,7 +24,6 @@ LIB_OBJS=\
 	set-permissions.$O\
 	basename-lgpl.$O\
 	binary-io.$O\
-	btowc.$O\
 	c-ctype.$O\
 	c-strcasecmp.$O\
 	c-strncasecmp.$O\
@@ -37,9 +36,9 @@ LIB_OBJS=\
 	dirname-lgpl.$O\
 	stripslash.$O\
 	dup2.$O\
-	error.$O\
+#	error.$O\
 	exitfail.$O\
-	fcntl.$O\
+#	fcntl.$O\
 	fd-hook.$O\
 	fpending.$O\
 	free.$O\
@@ -91,7 +90,6 @@ LIB_OBJS=\
 	unistd.$O\
 	version-etc.$O\
 	version-etc-fsf.$O\
-	wctob.$O\
 	wctype-h.$O\
 	xmalloc.$O\
 	xalloc-die.$O\

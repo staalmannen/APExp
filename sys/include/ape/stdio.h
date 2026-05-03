@@ -10,7 +10,7 @@
 #include <sys/types.h>
 
 /* Include musl-compatible stdio internal definitions */
-#include "stdio_impl.h"
+#include <stdio_impl.h>
 
 /* FILE is now the musl struct _IO_FILE */
 typedef struct _IO_FILE FILE;

@@ -72,10 +72,10 @@ extern int isxdigitrune(Rune);
 extern size_t utftorunestr(const char *, Rune *);
 extern size_t utfntorunestr(const char *, size_t, Rune *);
 
-extern int fgetrune(Rune *, FILE *);
-extern int efgetrune(Rune *, FILE *, const char *);
-extern int fputrune(const Rune *, FILE *);
-extern int efputrune(const Rune *, FILE *, const char *);
+extern int fgetrune(Rune *, struct _IO_FILE *);
+extern int efgetrune(Rune *, struct _IO_FILE *, const char *);
+extern int fputrune(const Rune *, struct _IO_FILE *);
+extern int efputrune(const Rune *, struct _IO_FILE *, const char *);
 
 
 #if defined(__cplusplus)
