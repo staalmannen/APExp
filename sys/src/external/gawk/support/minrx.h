@@ -96,8 +96,8 @@ int minrx_regcomp(minrx_regex_t *, const char * /* regexp (NUL terminated) */, i
 int minrx_regncomp(minrx_regex_t *, size_t /* nregexp */, const char * /* regexp[nregexp] */, int /* minrx_regcomp_flags_t */);
 
 /* Search for previously-compiled regexp; return minrx_result_t (as integer) */
-int minrx_regexec(minrx_regex_t *, const char * /* string NUL-terminated */, size_t /* nrm */, minrx_regmatch_t * /* rm[nrm] */, int /* minrx_regexec_flags_t */);
-int minrx_regnexec(minrx_regex_t *, size_t /* nstring */, const char * /* string[nstring] */, size_t /* nrm */, minrx_regmatch_t * /* rm[nrm] */, int /* minrx_regexec_flags_t */);
+int minrx_regexec(minrx_regex_t *, const char * /* string NUL-terminated */, unsigned long long /* nrm */, minrx_regmatch_t * /* rm[nrm] */, int /* minrx_regexec_flags_t */);
+int minrx_regnexec(minrx_regex_t *, unsigned long long /* nstring */, const char * /* string[nstring] */, unsigned long long /* nrm */, minrx_regmatch_t * /* rm[nrm] */, int /* minrx_regexec_flags_t */);
 
 size_t minrx_regerror(int /* minrx_result_t */, const minrx_regex_t *, char * /* errbuf[nerrbuf] */, size_t /* nerrbuf */);
 void minrx_regfree(minrx_regex_t *);

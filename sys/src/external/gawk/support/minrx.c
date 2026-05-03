@@ -2341,7 +2341,7 @@ execute_epsclosure(Execute *e, QVec *ncsv, WChar wcnext)
 }
 
 static int
-execute(Execute *e, size_t nm, minrx_regmatch_t *rm)
+execute(Execute *e, unsigned long long nm, minrx_regmatch_t *rm)
 {
 	QVec mcsvs[2];
 	if (!qvec_construct(&mcsvs[0], e->r->nnode) || !qvec_construct(&mcsvs[1], e->r->nnode)) {
@@ -2472,7 +2472,7 @@ minrx_regcomp(minrx_regex_t *rx, const char *s, int flags)
 }
 
 int
-minrx_regexec(minrx_regex_t *rx, const char *s, size_t nm, minrx_regmatch_t *rm, int flags)
+minrx_regexec(minrx_regex_t *rx, const char *s, unsigned long long nm, minrx_regmatch_t *rm, int flags)
 {
 	return minrx_regnexec(rx, strlen(s), s, nm, rm, flags);
 }
@@ -2516,7 +2516,7 @@ minrx_regncomp(minrx_regex_t *rx, size_t ns, const char *s, int flags)
 }
 
 int
-minrx_regnexec(minrx_regex_t *rx, size_t ns, const char *s, size_t nm, minrx_regmatch_t *rm, int flags)
+minrx_regnexec(minrx_regex_t *rx, unsigned long long ns, const char *s, unsigned long long nm, minrx_regmatch_t *rm, int flags)
 {
 	Regexp *r = (Regexp *) rx->re_regexp;
 	Execute e;

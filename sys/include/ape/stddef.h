@@ -20,7 +20,11 @@ typedef _ptrdiff_t ptrdiff_t;
 typedef long max_align_t;
 #ifndef _SIZE_T
 #define _SIZE_T
+#ifdef _BITS64
+typedef unsigned long long size_t;
+#else
 typedef unsigned long size_t;
+#endif
 #endif
 #ifndef _WCHAR_T
 #define _WCHAR_T

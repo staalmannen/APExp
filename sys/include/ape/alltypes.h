@@ -38,7 +38,7 @@ struct winsize { unsigned short ws_row, ws_col, ws_xpixel, ws_ypixel; };
 
 typedef struct { union { int __i[12]; volatile int __vi[12]; void *__p[12*sizeof(int)/sizeof(void*)]; } __u; } cnd_t;
 
-typedef struct { union { int __i[sizeof(long)==8?10:6]; volatile int __vi[sizeof(long)==8?10:6]; volatile void *volatile __p[sizeof(long)==8?5:6]; } __u; } mtx_t;
+typedef struct { union { int __i[defined(_BITS64)?10:6]; volatile int __vi[defined(_BITS64)?10:6]; volatile void *volatile __p[defined(_BITS64)?5:6]; } __u; } mtx_t;
 
 #endif /* ALLTYPES_H */
 

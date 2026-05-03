@@ -13,7 +13,11 @@ extern "C" {
 
 #ifndef _SIZE_T
 #define _SIZE_T
+#ifdef _BITS64
+typedef unsigned long long size_t;
+#else
 typedef unsigned long size_t;
+#endif
 #endif
 
 /* ifndefs because X11 stuff (ugh) */

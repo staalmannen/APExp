@@ -28,7 +28,7 @@
 /* #undef HAVE_BTOWC */
 
 /* Define to 1 if you have the `c32rtomb' function. */
-/* #undef HAVE_C32RTOMB */
+#define HAVE_C32RTOMB 1
 
 /* Define to 1 if you have the Mac OS X function
    CFLocaleCopyPreferredLanguages in the CoreFoundation framework. */
@@ -128,7 +128,7 @@
 #define HAVE_LSTAT 1
 
 /* Define to 1 if you have the `mbrtoc32' function. */
-/* #undef HAVE_MBRTOC32 */
+#define HAVE_MBRTOC32 1
 
 /* Define to 1 if mbrtowc and mbstate_t are properly declared. */
 #define HAVE_MBRTOWC 1
@@ -292,7 +292,7 @@
 /* #undef HAVE_TZNAME */
 
 /* Define to 1 if you have the <uchar.h> header file. */
-/* #undef HAVE_UCHAR_H */
+#define HAVE_UCHAR_H 1
 
 /* Define to 1 if the system has the type `uintmax_t'. */
 #define HAVE_UINTMAX_T 1

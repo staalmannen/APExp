@@ -27,6 +27,7 @@
 #include "awk.h"
 
 #include "localeinfo.h"
+#include "minrx.h"
 
 static reg_syntax_t syn;
 static void check_bracket_exp(char *s, size_t len);
@@ -464,7 +465,7 @@ research(Regexp *rp, char *str, int start,
 
 		rp->pat.not_bol = 0;
 	} else {
-		size_t match_count = 0;
+		unsigned long long match_count = 0;
 
 		if (need_sub)
 			match_count = rp->mre_pat.re_nsub + 1;

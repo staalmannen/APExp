@@ -251,7 +251,7 @@
 #endif
 
 #ifdef Z_SOLO
-#  ifdef _WIN64
+#  ifdef _BITS64
      typedef unsigned long long z_size_t;
 #  else
      typedef unsigned long z_size_t;
@@ -260,11 +260,15 @@
 #  define z_longlong long long
 #  if defined(NO_SIZE_T)
      typedef unsigned NO_SIZE_T z_size_t;
-#  elif defined(STDC)
+#  elif defined(STDC) || defined(Z_HAVE_UNISTD_H)
 #    include <stddef.h>
      typedef size_t z_size_t;
 #  else
-     typedef unsigned long z_size_t;
+#    ifdef _BITS64
+       typedef unsigned long long z_size_t;
+#    else
+       typedef unsigned long z_size_t;
+#    endif
 #  endif
 #  undef z_longlong
 #endif

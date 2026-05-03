@@ -6,13 +6,15 @@
 #define	FD_SETSIZE	96
 #endif
 
+#include <sys/types.h>
+
 struct pollfd {
 	int fd;			/* file descriptor */
 	short events;	/* events to look for */
 	short revents;	/* events returned */
 };
 
-typedef unsigned long nfds_t;
+typedef size_t nfds_t;
 
 #define	POLLIN		0x001
 #define	POLLPRI		0x002
