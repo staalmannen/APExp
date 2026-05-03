@@ -1,6 +1,7 @@
 #ifndef _STDINT_GENERIC_H_
 #define _STDINT_GENERIC_H_ 1
 
+#include <_apetypes.h>
 #include <stdint_arch.h>
 
 /*

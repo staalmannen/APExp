@@ -1,6 +1,7 @@
 #ifndef __TYPES_H
 #define __TYPES_H
 
+#include <_apetypes.h>
 #include <stddef_arch.h>
 
 #pragma lib "/$M/lib/ape/libap.a"

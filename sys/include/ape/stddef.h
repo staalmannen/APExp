@@ -1,6 +1,7 @@
 #ifndef __STDDEF_H
 #define __STDDEF_H
 
+#include <_apetypes.h>
 #include <stddef_arch.h>
 
 #ifndef __STDDEF_ARCH_H

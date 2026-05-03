@@ -55,9 +55,13 @@ typedef struct { unsigned __attr; } pthread_barrierattr_t;
 typedef struct { unsigned __attr[2]; } pthread_rwlockattr_t;
 
 
-typedef struct { union { int __i[defined(_BITS64)?14:8]; volatile int __vi[defined(_BITS64)?14:8]; void *__p[defined(_BITS64)?7:8]; } __u; } pthread_rwlock_t;
-
-typedef struct { union { int __i[defined(_BITS64)?8:5]; volatile int __vi[defined(_BITS64)?8:5]; void *__p[defined(_BITS64)?4:5]; } __u; } pthread_barrier_t;
+#ifdef _BITS64
+typedef struct { union { int __i[14]; volatile int __vi[14]; void *__p[7]; } __u; } pthread_rwlock_t;
+typedef struct { union { int __i[8]; volatile int __vi[8]; void *__p[4]; } __u; } pthread_barrier_t;
+#else
+typedef struct { union { int __i[8]; volatile int __vi[8]; void *__p[8]; } __u; } pthread_rwlock_t;
+typedef struct { union { int __i[5]; volatile int __vi[5]; void *__p[5]; } __u; } pthread_barrier_t;
+#endif
 
 
 #define PTHREAD_ONCE_INIT		{ 0 }
