@@ -4,11 +4,51 @@ APE=$APEXPROOT/sys/src/ape
 
 LIB=$APEXPROOT/$objtype/lib/ape/libzstd.a
 
-OFILES= 
+OFILES=\
+	debug.$O\
+	entropy_common.$O\
+	error_private.$O\
+	fse_decompress.$O\
+	pool.$O\
+	threading.$O\
+	xxhash.$O\
+	zstd_common.$O\
+	fse_compress.$O\
+	hist.$O\
+	huf_compress.$O\
+	zstd_compress.$O\
+	zstd_compress_literals.$O\
+	zstd_compress_sequences.$O\
+	zstd_compress_superblock.$O\
+	zstd_double_fast.$O\
+	zstd_fast.$O\
+	zstd_lazy.$O\
+	zstd_ldm.$O\
+	zstd_opt.$O\
+	zstd_preSplit.$O\
+	zstdmt_compress.$O\
+	huf_decompress.$O\
+	zstd_ddict.$O\
+	zstd_decompress.$O\
+	zstd_decompress_block.$O\
+	cover.$O\
+	divsufsort.$O\
+	fastcover.$O\
+	zdict.$O\
+	zbuff_common.$O\
+	zbuff_compress.$O\
+	zbuff_decompress.$O\
+	zstd_v01.$O\
+	zstd_v02.$O\
+	zstd_v03.$O\
+	zstd_v04.$O\
+	zstd_v05.$O\
+	zstd_v06.$O\
+	zstd_v07.$O\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-ZSOURCE=../../../external/zstd
+ZSTDSOURCE=../../../external/zstd
 
 DEFS=-DZSTD_STATIC_LINKING_ONLY -DZSTD_DISABLE_ASM -DZSTD_NO_INLINE
 
@@ -31,5 +71,5 @@ CFLAGS=-c -I$ZSTDSOURCE/lib -D_POSIX_SOURCE $DEFS $EXCLUDE
 %.$O: $ZSTDSOURCE/lib/dictBuilder/%.c
 	$CC $CFLAGS $ZSTDSOURCE/lib/dictBuilder/$stem.c
 
-
-
+%.$O: $ZSTDSOURCE/lib/deprecated/%.c
+	$CC $CFLAGS $ZSTDSOURCE/lib/deprecated/$stem.c
