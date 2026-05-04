@@ -13,20 +13,26 @@ static void crash_handler(int sig) {
     char buf[16];
     int n = snprintf(buf, sizeof(buf), "SIG%d\n", sig);
     write(2, buf, n);
+#ifdef CFRONT_HAVE_BACKTRACE
     void *bt[32];
     int nb = backtrace(bt, 32);
     backtrace_symbols_fd(bt, nb, 2);
+#endif
     _exit(1);
 }
 
 static void early_init(void) {
+    static int done;
+    if (done)
+        return;
+    done = 1;
     signal(SIGSEGV, crash_handler);
     signal(SIGBUS, crash_handler);
     out_file = stdout;
     in_file = stdin;
 }
 
-void _main(void) { /* no C++ global constructors needed */ }
+void _main(void) { early_init(); }
 
 /* ------------------------------------------------------------------ */
 /* EH runtime: setjmp/longjmp exception handling for cfront            */

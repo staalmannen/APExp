@@ -9,7 +9,10 @@
 #define CFRONT_TRANSLATED_H
 
 #include <stddef.h>
-#include <sys/types.h>
+#ifdef __linux__
+/* APE's <stddef.h> defines ssize_t; the Linux host header does not. */
+typedef long ssize_t;
+#endif
 
 void *__vec_new(void *, int, int, void *);
 void __vec_delete(void *, int, int, void *, int, int);

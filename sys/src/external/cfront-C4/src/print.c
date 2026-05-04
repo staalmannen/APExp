@@ -1178,6 +1178,8 @@ void Eprint__FP4expr(Pexpr __1e) {
     }
 }
 
+void Eprint_FP4expr(Pexpr __1e) { Eprint__FP4expr(__1e); }
+
 extern int fputs(const char *__0s, void *__0stream);
 
 extern void puttok__FUc(TOK);
@@ -2268,6 +2270,8 @@ void print__4exprFv(register struct expr *__0this) {
     }
 }
 
+void print_4exprFv(struct expr *__0this) { print__4exprFv(__0this); }
+
 Pexpr aval__FP4name(Pname __1a);
 
 Pexpr aval__FP4name(Pname __1a) {
@@ -2906,6 +2910,8 @@ void print__4stmtFv(register struct stmt *__0this) {
     if (__0this->s_list__4stmt)
         print__4stmtFv(__0this->s_list__4stmt);
 }
+
+void print_4stmtFv(struct stmt *__0this) { print__4stmtFv(__0this); }
 struct ptbl_rec;
 
 static char *ptbl_name;
@@ -2971,6 +2977,8 @@ void ptbl_init__Fi(int __1flag) {
     }
 }
 
+void ptbl_init_Fi(int __1flag) { ptbl_init__Fi(__1flag); }
+
 extern int sprintf(char *, const char *, ...);
 
 char *ptbl_lookup__FPCc(const char *__1name) {
@@ -3030,6 +3038,10 @@ void ptbl_add_pair__FPCcT1(const char *__1ptbl, const char *__1vtbl) {
     __1p->next__8ptbl_rec = ptbl_rec_pair_head;
 
     ptbl_rec_pair_head = __1p;
+}
+
+void ptbl_add_pair_FPCcT1(const char *__1ptbl, const char *__1vtbl) {
+    ptbl_add_pair__FPCcT1(__1ptbl, __1vtbl);
 }
 
 static struct ea *__ct__2eaFPCv(struct ea *__0this, const void *__2pp) {
