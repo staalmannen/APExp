@@ -1087,6 +1087,18 @@ pkgconf_compare_version(const char *a, const char *b)
 	return 1;
 }
 
+static pkgconf_tuple_t pkg_config_virtual_tuples[] = {
+	{ .key = "pc_path", .value = PKG_DEFAULT_PATH },
+	{ .key = "pc_system_includedirs", .value = SYSTEM_INCLUDEDIR },
+	{ .key = "pc_system_libdirs", .value = SYSTEM_LIBDIR },
+};
+
+static pkgconf_node_t pkg_config_virtual_nodes[] = {
+	{ .next = &pkg_config_virtual_nodes[1], .data = &pkg_config_virtual_tuples[0] },
+	{ .next = &pkg_config_virtual_nodes[2], .data = &pkg_config_virtual_tuples[1] },
+	{ .next = NULL, .data = &pkg_config_virtual_tuples[2] },
+};
+
 static pkgconf_pkg_t pkg_config_virtual = {
 	.id = "pkg-config",
 	.realname = "pkg-config",
@@ -1095,26 +1107,21 @@ static pkgconf_pkg_t pkg_config_virtual = {
 	.version = PACKAGE_VERSION,
 	.flags = PKGCONF_PKG_PROPF_STATIC,
 	.vars = {
-		.head = &(pkgconf_node_t){
-			.next = &(pkgconf_node_t){
-				.next = &(pkgconf_node_t){
-					.data = &(pkgconf_tuple_t){
-						.key = "pc_system_libdirs",
-						.value = SYSTEM_LIBDIR,
-					}
-				},
-				.data = &(pkgconf_tuple_t){
-					.key = "pc_system_includedirs",
-					.value = SYSTEM_INCLUDEDIR,
-				}
-			},
-			.data = &(pkgconf_tuple_t){
-				.key = "pc_path",
-				.value = PKG_DEFAULT_PATH,
-			},
-		},
+		.head = &pkg_config_virtual_nodes[0],
 		.tail = NULL,
 	}
+};
+
+static pkgconf_tuple_t pkgconf_virtual_tuples[] = {
+	{ .key = "pc_path", .value = PKG_DEFAULT_PATH },
+	{ .key = "pc_system_includedirs", .value = SYSTEM_INCLUDEDIR },
+	{ .key = "pc_system_libdirs", .value = SYSTEM_LIBDIR },
+};
+
+static pkgconf_node_t pkgconf_virtual_nodes[] = {
+	{ .next = &pkgconf_virtual_nodes[1], .data = &pkgconf_virtual_tuples[0] },
+	{ .next = &pkgconf_virtual_nodes[2], .data = &pkgconf_virtual_tuples[1] },
+	{ .next = NULL, .data = &pkgconf_virtual_tuples[2] },
 };
 
 static pkgconf_pkg_t pkgconf_virtual = {
@@ -1126,24 +1133,7 @@ static pkgconf_pkg_t pkgconf_virtual = {
 	.license = "ISC",
 	.flags = PKGCONF_PKG_PROPF_STATIC,
 	.vars = {
-		.head = &(pkgconf_node_t){
-			.next = &(pkgconf_node_t){
-				.next = &(pkgconf_node_t){
-					.data = &(pkgconf_tuple_t){
-						.key = "pc_system_libdirs",
-						.value = SYSTEM_LIBDIR,
-					}
-				},
-				.data = &(pkgconf_tuple_t){
-					.key = "pc_system_includedirs",
-					.value = SYSTEM_INCLUDEDIR,
-				}
-			},
-			.data = &(pkgconf_tuple_t){
-				.key = "pc_path",
-				.value = PKG_DEFAULT_PATH,
-			},
-		},
+		.head = &pkgconf_virtual_nodes[0],
 		.tail = NULL,
 	},
 };
