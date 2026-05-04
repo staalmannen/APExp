@@ -1,0 +1,105 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+CXXSRC=$APEXPROOT/sys/src/external/cfront-C4
+
+BIN=$APEXPROOT/$objtype/bin/ape
+TARG= cfront c++filt c++patch munch ptcomp ptlink szal
+
+CFILES=\
+	Bits.$O\
+	_stdio.$O\
+	alloc.$O\
+	block.$O\
+	cfront_stubs.$O\
+	cfront_stubs_asan.$O\
+	dcl.$O\
+	dcl2.$O\
+	dcl3.$O\
+	dcl4.$O\
+	del.$O\
+	discrim.$O\
+	error.$O\
+	expand.$O\
+	expr.$O\
+	expr2.$O\
+	expr3.$O\
+	find.$O\
+	hash.$O\
+	lalex.$O\
+	lex.$O\
+	main.$O\
+	norm.$O\
+	norm2.$O\
+	ns_strip.$O\
+	print.$O\
+	print2.$O\
+	repr.$O\
+	simpl.$O\
+	simpl2.$O\
+	size.$O\
+	table.$O\
+	template.$O\
+	tree_copy.$O\
+	tree_walk.$O\
+	typ.$O\
+	typ2.$O\
+	y.tab.$O\
+
+<$APEXPROOT/sys/src/cmd/mkmany
+
+CFLAGS= -c -B -D_POSIX_SOURCE -D_BSD_EXTENSION -I$CXXSRC/src
+
+%.$O: $CXXSRC/src/%.c
+	$CC $CFLAGS $prereq -o $target
+
+%.$O: $CXXSRC/tools/demangler/%.c
+	$CC $CFLAGS -I$CXXSRC/demangler -DDEM_MAIN $prereq -o $target
+
+patch-%.$O: $CXXSRC/tools/patch/%.c
+	$CC $CFLAGS $prereq -o $target
+
+munch-%.$O: $CXXSRC/tools/munch/%.c
+	$CC $CFLAGS $prereq -o $target
+
+%.$O: $CXXSRC/tools/szal/%.c
+	$CC $CFLAGS $prereq -o $target
+
+%.$O: $CXXSRC/tools/pt/%.c
+	$CC $CFLAGS -I$CXXSRC/demangler $prereq -o $target
+
+$O.cfront: $CFILES
+	$LD $prereq
+
+$O.c++filt: dem.$O
+	$LD $prereq
+
+$O.c++patch: patch-patch.$O patch-dtors.$O patch-_main.$O
+	$LD $prereq
+
+$O.munch: munch-munch.$O munch-dtors.$O munch-_main.$O
+	$LD $prereq
+
+$O.ptcomp: ptcomp.$O ptutil.$O
+	$LD $prereq
+
+$O.ptlink: ptlink.$O ptutil.$O dem.$O
+	$LD $prereq
+
+$O.szal: szal.$O
+	$LD $prereq
+
+$O.sz:V: $O.szal
+	$O.szal | sort > $O.sz
+
+install:V: $O.sz
+	mkdir -p $APEXPROOT/sys/lib/c++
+	cp $O.sz $APEXPROOT/sys/lib/c++
+
+
+
+
+
+
+
