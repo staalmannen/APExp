@@ -160,7 +160,7 @@ any actual or intended publication of such source code.
  */
 #include <stdio.h>
 #include <ctype.h>
-#include "dem.h"
+#include "../demangler/dem.h"
 #include "pt.h"
 #define ATTLC
 

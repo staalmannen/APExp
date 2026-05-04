@@ -5,7 +5,9 @@ APE=$APEXPROOT/sys/src/ape
 CXXSRC=$APEXPROOT/sys/src/external/cfront-C4
 
 BIN=$APEXPROOT/$objtype/bin/ape
-TARG= cfront ns_strip c++filt c++patch munch ptcomp ptlink szal
+TARG= cfront ns_strip c++filt ptcomp ptlink szal
+# c++patch # location of headers?
+# munch # _ctors missing?
 
 CFILES=\
 	Bits.$O\
@@ -67,26 +69,29 @@ munch-%.$O: $CXXSRC/tools/munch/%.c
 %.$O: $CXXSRC/tools/pt/%.c
 	$CC $CFLAGS -I$CXXSRC/demangler $prereq -o $target
 
+pt-dem.$O: $CXXSRC/tools/demangler/dem.c
+	$CC $CFLAGS -I$CXXSRC/demangler $prereq -o $target
+
 $O.cfront: $CFILES
-	$LD $prereq
+	$LD $prereq -o $target
 
 $O.ns_strip: ns_strip.$O
-	$LD $prereq
+	$LD $prereq -o $target
 
 $O.c++filt: dem.$O
-	$LD $prereq
+	$LD $prereq -o $target
 
 $O.c++patch: patch-patch.$O patch-dtors.$O patch-_main.$O
-	$LD $prereq
+	$LD $prereq -o $target
 
 $O.munch: munch-munch.$O munch-dtors.$O munch-_main.$O
-	$LD $prereq
+	$LD $prereq -o $target
 
 $O.ptcomp: ptcomp.$O ptutil.$O
-	$LD $prereq
+	$LD $prereq -o $target
 
-$O.ptlink: ptlink.$O ptutil.$O dem.$O
-	$LD $prereq
+$O.ptlink: ptlink.$O ptutil.$O pt-dem.$O
+	$LD $prereq -o $target
 
 $O.szal: szal.$O
 	$LD $prereq

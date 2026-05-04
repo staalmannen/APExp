@@ -31,7 +31,8 @@ CFLAGS=-FVp -c -I$PCSRC -I$PCSRC/libpkgconf\
 		-DHAVE_CONFIG_H -DPKGCONFIG_IS_STATIC\
 		-DSYSTEM_INCLUDEDIR="/sys/include/ape"\
 		-DSYSTEM_LIBDIR="/$objtype/lib/ape"\
-		-DPKG_DEFAULT_PATH="/bin"
+		-DPKG_DEFAULT_PATH="/bin"\
+		-DPERSONALITY_PATH="/sys/lib/ape/pkgconfig/personality.d"
 
 %.$O: $PCSRC/cli/%.c
 		$CC $CFLAGS $prereq -o $target
@@ -52,6 +53,7 @@ $O.bomtool: bomtool-main.$O getopt_long.$O $LIB
 		$CC -o $target $prereq
 
 # install:
+#		mkdir -p $APEXPROOT/sys/lib/ape/pkgconf/personality.d
 #		cp $PCSRC/pkg.m4 $APEXPROOT/sys/lib/m4
 #		mkdir -p $APEXPROOT/sys/man/1
 #		cp $PCSRC/man/pkgconf.1 $APEXPROOT/sys/man/1/pkgconf

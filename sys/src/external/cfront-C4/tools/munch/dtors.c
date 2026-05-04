@@ -14,6 +14,7 @@ Laboratories, Inc.  The copyright notice above does not evidence
 any actual or intended publication of such source code.
 
 *******************************************************************************/
+
 typedef void (*PFV)();
 
 void __dtors()
@@ -27,3 +28,7 @@ void __dtors()
 		while (_dtors < pf) (**--pf)();
 	}
 }
+
+void _dtors()	{ __dtors(); }
+
+

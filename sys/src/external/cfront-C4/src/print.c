@@ -2,6 +2,7 @@
 /* <<AT&T C++ Language System <3.0.3> 05/05/94>> */
 
 #include "cfront_translated.h"
+#include <sys/types.h>
 
 struct node { /* sizeof node == 3 */
     TOK base__4node;
