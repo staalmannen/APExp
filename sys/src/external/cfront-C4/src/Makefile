@@ -26,7 +26,7 @@ OFILES	=	Bits.o alloc.o block.o dcl.o dcl2.o dcl3.o dcl4.o \
 COMDEP0	= 	szal.result Makefile \
 		Bits.h Block.h cfront.h hash.h node_classes.h overload.h \
 		sdelicense.h sdetoolnum.h size.h template.h token.h \
-		tqueue.h tree_copy.h tree_walk.h typedef.h
+		tqueue.h tree_copy.h tree_walk.h typedef.h cfront_translated.h
 
 COMDEP	=	$(COMDEP0) yystype.h
 

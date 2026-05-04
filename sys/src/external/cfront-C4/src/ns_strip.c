@@ -29,17 +29,19 @@
 /* Namespace name registry                                              */
 /* ------------------------------------------------------------------ */
 
-#define MAX_NS      128
-#define MAX_NS_LEN  256
+#define MAX_NS 128
+#define MAX_NS_LEN 256
 
 static char ns_registry[MAX_NS][MAX_NS_LEN];
-static int  ns_count = 0;
+static int ns_count = 0;
 
 static void ns_register(const char *name) {
     int i;
-    if (!name || !name[0]) return;          /* anonymous namespace */
+    if (!name || !name[0])
+        return; /* anonymous namespace */
     for (i = 0; i < ns_count; i++)
-        if (strcmp(ns_registry[i], name) == 0) return;
+        if (strcmp(ns_registry[i], name) == 0)
+            return;
     if (ns_count < MAX_NS) {
         strncpy(ns_registry[ns_count], name, MAX_NS_LEN - 1);
         ns_registry[ns_count][MAX_NS_LEN - 1] = '\0';
@@ -50,7 +52,8 @@ static void ns_register(const char *name) {
 static int ns_known(const char *name) {
     int i;
     for (i = 0; i < ns_count; i++)
-        if (strcmp(ns_registry[i], name) == 0) return 1;
+        if (strcmp(ns_registry[i], name) == 0)
+            return 1;
     return 0;
 }
 
@@ -58,39 +61,30 @@ static int ns_known(const char *name) {
 /* Input buffer                                                         */
 /* ------------------------------------------------------------------ */
 
-#define BUF_SZ  (8 * 1024 * 1024)   /* 8 MB input buffer */
+#define BUF_SZ (8 * 1024 * 1024) /* 8 MB input buffer */
 
-static char *ibuf  = NULL;
-static int   ilen  = 0;
-static int   ipos  = 0;
+static char *ibuf = NULL;
+static int ilen = 0;
+static int ipos = 0;
 
-static int peek(void) {
-    return (ipos < ilen) ? (unsigned char)ibuf[ipos] : -1;
-}
+static int peek(void) { return (ipos < ilen) ? (unsigned char)ibuf[ipos] : -1; }
 
-static int peek2(void) {
-    return (ipos + 1 < ilen) ? (unsigned char)ibuf[ipos + 1] : -1;
-}
+static int peek2(void) { return (ipos + 1 < ilen) ? (unsigned char)ibuf[ipos + 1] : -1; }
 
-static int getch(void) {
-    return (ipos < ilen) ? (unsigned char)ibuf[ipos++] : -1;
-}
+static int getch(void) { return (ipos < ilen) ? (unsigned char)ibuf[ipos++] : -1; }
 
 static void ungetch(void) {
-    if (ipos > 0) ipos--;
+    if (ipos > 0)
+        ipos--;
 }
 
 /* ------------------------------------------------------------------ */
 /* Output                                                               */
 /* ------------------------------------------------------------------ */
 
-static void outch(int c) {
-    putchar(c);
-}
+static void outch(int c) { putchar(c); }
 
-static void outstr(const char *s) {
-    fputs(s, stdout);
-}
+static void outstr(const char *s) { fputs(s, stdout); }
 
 /* ------------------------------------------------------------------ */
 /* Brace-depth namespace tracking                                       */
@@ -103,12 +97,13 @@ static void outstr(const char *s) {
  * The value is the count of nested namespace blocks at that depth.
  */
 static int ns_at_depth[MAX_DEPTH];
-static int brace_depth = 0;         /* current brace nesting depth */
+static int brace_depth = 0; /* current brace nesting depth */
 
 static int inside_namespace(void) {
     int d;
     for (d = 0; d <= brace_depth; d++)
-        if (ns_at_depth[d]) return 1;
+        if (ns_at_depth[d])
+            return 1;
     return 0;
 }
 
@@ -116,21 +111,19 @@ static int inside_namespace(void) {
 /* Identifier scanning                                                  */
 /* ------------------------------------------------------------------ */
 
-static int is_ident_start(int c) {
-    return isalpha(c) || c == '_';
-}
-static int is_ident_cont(int c) {
-    return isalnum(c) || c == '_';
-}
+static int is_ident_start(int c) { return isalpha(c) || c == '_'; }
+static int is_ident_cont(int c) { return isalnum(c) || c == '_'; }
 
 /* Read an identifier into buf (max len-1 chars), null-terminated.
    Returns length. Assumes first char already consumed (passed as first). */
 static int read_ident_rest(char *buf, int len, int first) {
     int n = 0;
-    if (first > 0 && n < len - 1) buf[n++] = (char)first;
+    if (first > 0 && n < len - 1)
+        buf[n++] = (char)first;
     while (n < len - 1) {
         int c = peek();
-        if (!is_ident_cont(c)) break;
+        if (!is_ident_cont(c))
+            break;
         buf[n++] = (char)getch();
     }
     buf[n] = '\0';
@@ -141,7 +134,8 @@ static int read_ident_rest(char *buf, int len, int first) {
 /* Skip whitespace (not newlines) in input                              */
 /* ------------------------------------------------------------------ */
 static void skip_spaces(void) {
-    while (peek() == ' ' || peek() == '\t') getch();
+    while (peek() == ' ' || peek() == '\t')
+        getch();
 }
 
 /* ------------------------------------------------------------------ */
@@ -150,16 +144,17 @@ static void skip_spaces(void) {
 static void skip_block_comment_content(void) {
     int c;
     while ((c = getch()) != -1) {
-        if (c == '*' && peek() == '/') { getch(); return; }
+        if (c == '*' && peek() == '/') {
+            getch();
+            return;
+        }
     }
 }
-
 
 /* ------------------------------------------------------------------ */
 /* Skip matching braces — used when we want to discard namespace body  */
 /* (We don't actually discard; we re-enter with ns flag set.)          */
 /* ------------------------------------------------------------------ */
-
 
 /* ------------------------------------------------------------------ */
 /* Look-ahead to check for '::' after an identifier to detect          */
@@ -171,11 +166,12 @@ static void skip_block_comment_content(void) {
 static int peek_coloncolon(void) {
     int saved = ipos;
     /* skip optional whitespace */
-    while (peek() == ' ' || peek() == '\t') getch();
+    while (peek() == ' ' || peek() == '\t')
+        getch();
     int a = getch();
     int b = getch();
     int result = (a == ':' && b == ':') ? 1 : 0;
-    ipos = saved;   /* restore position */
+    ipos = saved; /* restore position */
     return result;
 }
 
@@ -194,7 +190,8 @@ static void emit_string(int delim) {
         outch(c);
         if (c == '\\') {
             int esc = getch();
-            if (esc != -1) outch(esc);
+            if (esc != -1)
+                outch(esc);
         } else if (c == delim) {
             break;
         }
@@ -209,10 +206,15 @@ static void emit_hash_line(void) {
     int c;
     while ((c = getch()) != -1) {
         outch(c);
-        if (c == '\n') break;
-        if (c == '\\') {    /* line continuation */
+        if (c == '\n')
+            break;
+        if (c == '\\') { /* line continuation */
             int nc = getch();
-            if (nc != -1) { outch(nc); if (nc != '\n') continue; }
+            if (nc != -1) {
+                outch(nc);
+                if (nc != '\n')
+                    continue;
+            }
             /* nc == '\n': continue reading next line */
         }
     }
@@ -234,10 +236,16 @@ static void process(void) {
         }
 
         /* String literal */
-        if (c == '"') { emit_string('"'); continue; }
+        if (c == '"') {
+            emit_string('"');
+            continue;
+        }
 
         /* Char literal */
-        if (c == '\'') { emit_string('\''); continue; }
+        if (c == '\'') {
+            emit_string('\'');
+            continue;
+        }
 
         /* Line comment: // — pass through unchanged */
         if (c == '/' && peek() == '/') {
@@ -246,7 +254,8 @@ static void process(void) {
             int cc;
             while ((cc = getch()) != -1) {
                 outch(cc);
-                if (cc == '\n') break;
+                if (cc == '\n')
+                    break;
             }
             continue;
         }
@@ -260,7 +269,8 @@ static void process(void) {
             int cc;
             while ((cc = getch()) != -1) {
                 outch(cc);
-                if (prev == '*' && cc == '/') break;
+                if (prev == '*' && cc == '/')
+                    break;
                 prev = cc;
             }
             continue;
@@ -277,15 +287,15 @@ static void process(void) {
 
         /* Closing brace */
         if (c == '}') {
-            if (brace_depth > 0 && brace_depth < MAX_DEPTH
-                    && ns_at_depth[brace_depth]) {
+            if (brace_depth > 0 && brace_depth < MAX_DEPTH && ns_at_depth[brace_depth]) {
                 /* This closes a namespace block — don't emit the '}' */
                 /* Instead emit a comment to preserve line numbering */
                 outstr("/* end namespace */\n");
                 ns_at_depth[brace_depth] = 0;
                 brace_depth--;
             } else {
-                if (brace_depth > 0) brace_depth--;
+                if (brace_depth > 0)
+                    brace_depth--;
                 outch('}');
             }
             continue;
@@ -324,7 +334,8 @@ static void process(void) {
                         /* namespace alias: skip to semicolon, emit comment */
                         getch(); /* consume '=' */
                         int sc;
-                        while ((sc = getch()) != -1 && sc != ';') ;
+                        while ((sc = getch()) != -1 && sc != ';')
+                            ;
                         fprintf(stdout, "/* namespace alias %s */\n", nsname);
                         continue;
                     }
@@ -361,7 +372,8 @@ static void process(void) {
                     if (strcmp(kw, "namespace") == 0) {
                         /* using namespace foo; — strip it */
                         int sc;
-                        while ((sc = getch()) != -1 && sc != ';') ;
+                        while ((sc = getch()) != -1 && sc != ';')
+                            ;
                         outstr("/* using namespace (stripped) */\n");
                         continue;
                     } else {
@@ -371,13 +383,14 @@ static void process(void) {
                         if (peek() == ':' && peek2() == ':') {
                             /* using ns::name; form — strip it */
                             int sc;
-                            while ((sc = getch()) != -1 && sc != ';') ;
+                            while ((sc = getch()) != -1 && sc != ';')
+                                ;
                             fprintf(stdout, "/* using %s::... (stripped) */\n", kw);
                             continue;
                         } else if (peek() == '=') {
                             /* using Alias = Type; — this is a type alias,
                                pass through (cfront handles typedefs) */
-                            ipos = kpos;    /* restore to before kw */
+                            ipos = kpos; /* restore to before kw */
                             outstr("using ");
                             /* fall through to emit rest */
                         } else {
@@ -396,8 +409,9 @@ static void process(void) {
             if (peek_coloncolon() && ns_known(ident)) {
                 /* This is ns::name where ns is a known namespace.
                    Consume the '::' and skip the namespace qualifier. */
-                skip_spaces();  /* consume any space before :: */
-                getch(); getch(); /* consume '::' */
+                skip_spaces(); /* consume any space before :: */
+                getch();
+                getch(); /* consume '::' */
                 /* Output nothing for the namespace prefix — the name
                    that follows will be output on the next iteration. */
                 continue;

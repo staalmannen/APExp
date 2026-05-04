@@ -20,6 +20,5 @@ CFLAGS=-FV
 </sys/src/cmd/mkone
 
 
-$OFILES:	cfront.h token.h typedef.h
-
+$OFILES:	cfront.h token.h typedef.h cfront_translated.h
 
