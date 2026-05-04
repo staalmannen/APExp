@@ -1298,7 +1298,7 @@ open_failure_recover (struct tar_stat_info const *dir)
 char *
 get_directory_entries (struct tar_stat_info *st)
 {
-  while (! (st->dirstream = fdopendir (st->fd)))
+  while (! (st->dirstream = (DIR *) fdopendir (st->fd)))
     if (! open_failure_recover (st))
       return 0;
   return streamsavedir (st->dirstream, savedir_sort_order);

@@ -26,8 +26,6 @@ install:V:
 	rm -f $objtype/lib/ape/*
 	for (i in $_ARCHS)
 		@{ mkdir -p $i/lib/ape/ ; mkdir -p $i/bin/ape }
-	mkdir -p sys/man/1
-	mkdir -p sys/man/3
 	rfork n
 		chmod +x mount-include
 		./mount-include

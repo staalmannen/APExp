@@ -331,7 +331,7 @@ format_checkpoint_string (FILE *fp, size_t len,
 		const char *fmt = arg ? arg : "%c";
 
 		gettimeofday (&tv, NULL);
-		tm = localtime (&tv.tv_sec);
+		tm = localtime ((const time_t *) &tv.tv_sec);
 		len += fprintftime (fp, fmt, tm, 0, tv.tv_usec * 1000);
 	      }
 	      break;
