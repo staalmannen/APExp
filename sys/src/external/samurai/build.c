@@ -159,8 +159,8 @@ buildadd(struct node *n)
 			++e->nblock;
 	}
 	/* all outputs are dirty if any are older than the newest input */
-	generator = edgevar(e, "generator", true);
-	restat = edgevar(e, "restat", true);
+	generator = (bool) edgevar(e, "generator", true);
+	restat = (bool) edgevar(e, "restat", true);
 	for (i = 0; i < e->nout && !(e->flags & FLAG_DIRTY_OUT); ++i) {
 		n = e->out[i];
 		if (isdirty(n, newest, generator, restat)) {
@@ -416,7 +416,7 @@ edgedone(struct edge *e)
 	bool restat;
 	int64_t old;
 
-	restat = edgevar(e, "restat", true);
+	restat = (bool) edgevar(e, "restat", true);
 	for (i = 0; i < e->nout; ++i) {
 		n = e->out[i];
 		old = n->mtime;

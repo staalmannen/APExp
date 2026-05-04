@@ -2,7 +2,7 @@
 struct treenode;
 
 /* free a tree and its children recursively, free keys and values with a function */
-void deltree(struct treenode *, void(void *), void(void *));
+void deltree(struct treenode *, void x(void *), void y(void *));
 /* search a binary tree for a key, return the key's value or NULL */
 void *treefind(struct treenode *, const char *);
 /* insert into a binary tree a key and a value, replace and return the old value if the key already exists */

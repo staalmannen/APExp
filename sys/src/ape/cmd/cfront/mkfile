@@ -45,7 +45,7 @@ CFILES=\
 	tree_walk.$O\
 	typ.$O\
 	typ2.$O\
-	y.tab.$O\
+	pregen-y.tab.$O\
 
 <$APEXPROOT/sys/src/cmd/mkmany
 
@@ -89,13 +89,11 @@ $O.ptlink: ptlink.$O ptutil.$O dem.$O
 
 $O.szal: szal.$O
 	$LD $prereq
-
-$O.sz:V: $O.szal
-	$O.szal | sort > $O.sz
-
-install:V: $O.sz
 	mkdir -p $APEXPROOT/sys/lib/c++
-	cp $O.sz $APEXPROOT/sys/lib/c++
+	./$O.szal | sort > $APEXPROOT/sys/lib/c++/$O.sz
+
+
+
 
 
 

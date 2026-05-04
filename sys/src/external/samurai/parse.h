@@ -17,4 +17,4 @@ enum {
 };
 
 /* execute a function with all default nodes */
-void defaultnodes(void(struct node *));
+void defaultnodes(void x(struct node *));

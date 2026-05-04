@@ -21,11 +21,13 @@ OFILES=\
 	tree.$O\
 	util.$O
 
-LIB=
-
 <$APEXPROOT/sys/src/cmd/mkone
 
 CFLAGS=-FVp -c -I$SAMUSRC
+
+%.$O: $SAMUSRC/%.c
+	$CC $CFLAGS $SAMUSRC/$stem.c
+
 
 install:V:
 	cp $SAMUSRC/samu.1 $APEXPROOT/sys/man/1/samu
