@@ -1,8 +1,7 @@
 
 /* <<AT&T C++ Language System <3.0.3> 05/05/94>> */
 
-typedef long ssize_t;
-typedef unsigned long size_t;
+#include <stddef.h>
 struct exception;
 
 typedef unsigned char __u_char;

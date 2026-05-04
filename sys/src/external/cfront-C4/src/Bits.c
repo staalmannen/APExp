@@ -148,7 +148,7 @@ void transfer__16Block_Bits_chunkFPUlUl(struct Block_Bits_chunk *__0this, Bits_c
 
 void copy__16Block_Bits_chunkFRC16Block_Bits_chunk(register struct Block_Bits_chunk *__0this,
                                                    const struct Block_Bits_chunk *__1b) {
-    __0this->p__16Block_Bits_chunk = (((unsigned long *)__nw__FUl(
+    __0this->p__16Block_Bits_chunk = (((size_t *)__nw__FUl(
         (unsigned long)((sizeof(unsigned long)) * ((*__1b)).n__16Block_Bits_chunk))));
 
     if (__0this->p__16Block_Bits_chunk) {
@@ -175,12 +175,12 @@ size_t grow__16Block_Bits_chunkFUl(register struct Block_Bits_chunk *__0this, si
     {
         Bits_chunk *__1np;
 
-        __1np = (((unsigned long *)__nw__FUl((size_t)((sizeof(unsigned long)) * __1nn))));
+        __1np = (((size_t *)__nw__FUl((size_t)((sizeof(size_t)) * __1nn))));
 
         if (!__1np) {
             __1nn = (__1k + 1);
 
-            __1np = (((unsigned long *)__nw__FUl((size_t)((sizeof(unsigned long)) * __1nn))));
+            __1np = (((size_t *)__nw__FUl((size_t)((sizeof(size_t)) * __1nn))));
         }
 
         move__16Block_Bits_chunkFPUlUl(__0this, __1np, __1nn);

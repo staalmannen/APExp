@@ -5,7 +5,7 @@ APE=$APEXPROOT/sys/src/ape
 CXXSRC=$APEXPROOT/sys/src/external/cfront-C4
 
 BIN=$APEXPROOT/$objtype/bin/ape
-TARG= cfront c++filt c++patch munch ptcomp ptlink szal
+TARG= cfront ns_strip c++filt c++patch munch ptcomp ptlink szal
 
 CFILES=\
 	Bits.$O\
@@ -13,7 +13,6 @@ CFILES=\
 	alloc.$O\
 	block.$O\
 	cfront_stubs.$O\
-	cfront_stubs_asan.$O\
 	dcl.$O\
 	dcl2.$O\
 	dcl3.$O\
@@ -32,7 +31,6 @@ CFILES=\
 	main.$O\
 	norm.$O\
 	norm2.$O\
-	ns_strip.$O\
 	print.$O\
 	print2.$O\
 	repr.$O\
@@ -70,6 +68,9 @@ munch-%.$O: $CXXSRC/tools/munch/%.c
 	$CC $CFLAGS -I$CXXSRC/demangler $prereq -o $target
 
 $O.cfront: $CFILES
+	$LD $prereq
+
+$O.ns_strip: ns_strip.$O
 	$LD $prereq
 
 $O.c++filt: dem.$O

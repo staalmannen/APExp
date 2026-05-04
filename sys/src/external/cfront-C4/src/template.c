@@ -1,8 +1,7 @@
 
 /* <<AT&T C++ Language System <3.0.3> 05/05/94>> pragma*/
 
-typedef long ssize_t;
-typedef unsigned long size_t;
+#include "cfront_translated.h"
 
 typedef void (*Error_Proc)(const char *);
 

@@ -5,6 +5,7 @@ APEXPROOT=../../../..
 _CORE_APPS=\
 # shell\
 	pdksh\
+#	bash\
 # parsing/editing source etc \
 	as\
 	lex\
@@ -16,6 +17,8 @@ _CORE_APPS=\
 	m4\
 	iconv\
 	gettext\
+#	libtool\
+#	pkgconf\
 # core utilities \
 	base\
 	grep\
@@ -32,18 +35,21 @@ _OPTIONAL_APPS=\
 	unrar\
 	xz\
 	xzdec\
-	tar\
+#	tar\
 # languages and transpilers \
 	lua\
 	tclsh\
 	f2c\
 	p2c\
 	objc\
+#	cfront\
+#	basic\
 # dev tools \
 	pcregrep\
 	diff\
-	patch\
+#	patch\
 	mkmk\
+#	samurai\
 
 DIRS=\
 	$_CORE_APPS\
