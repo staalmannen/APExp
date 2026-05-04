@@ -6,6 +6,10 @@
 #define	BYTE_ORDER	BIG_ENDIAN
 #endif
 
+#ifndef _BITS64
+#define _BITS64
+#endif
+
 #ifndef __sparc64__
 #define __sparc64__ 1
 #endif

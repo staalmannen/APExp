@@ -2,7 +2,6 @@
 #define _BITS64
 #endif
 
-#ifndef __arm64__
-#define __arm64__ 1
+#ifndef __powerpc64__
+#define __powerpc64__ 1
 #endif
-
