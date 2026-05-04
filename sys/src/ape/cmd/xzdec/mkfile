@@ -7,7 +7,8 @@ OFILES=\
 	xzdec.$O\
 #	../common\
 	tuklib_progname.$O\
-	tuklib_exit.$O
+	tuklib_exit.$O\
+	tuklib_mbstr_nonprint.$O
 
 LIB=$APEXPROOT/$objtype/lib/ape/liblzma.a $APEXPROOT/$objtype/lib/ape/libap.a
 BIN=$APEXPROOT/$objtype/bin/ape
@@ -19,7 +20,7 @@ LINKS=lzmadec
 
 XZINC=-I$XZSRC -I$XZSRC/lib -I$XZSRC/src/common\
 	-I$XZSRC/src/liblzma -DASSUME_RAM=128\
-	-DSIZE_MAX=UINT64_MAX -DHAVE_CONFIG_H -DHAVE_DECODERS
+	-DHAVE_CONFIG_H -DHAVE_DECODERS
 
 CC=pcc
 LD=pcc
