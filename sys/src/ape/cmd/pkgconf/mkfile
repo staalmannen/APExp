@@ -1,0 +1,61 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+PCSRC=$APEXPROOT/sys/src/external/pkgconf
+
+BIN=$APEXPROOT/$objtype/bin/ape
+TARG= pkgconf bomtool
+
+OFILES=\
+	main.$O\
+	getopt_long.$O\
+	renderer-msvc.$O\
+	bomtool-main.$O
+
+LIBOBJS=\
+	libpkgconf-audit.$O libpkgconf-buffer.$O \
+	libpkgconf-cache.$O libpkgconf-client.$O libpkgconf-pkg.$O \
+	libpkgconf-bsdstubs.$O libpkgconf-fragment.$O \
+	libpkgconf-argvsplit.$O libpkgconf-fileio.$O \
+	libpkgconf-tuple.$O libpkgconf-dependency.$O \
+	libpkgconf-queue.$O libpkgconf-path.$O \
+	libpkgconf-personality.$O libpkgconf-parser.$O
+
+LIB= libpkgconf.a$O
+
+<$APEXPROOT/sys/src/cmd/mkmany
+
+CFLAGS=-FVp -c -I$PCSRC/libpkgconf -I$PCSRC/cli -I$PCSRC/cli/bomtool\
+		-DHAVE_CONFIG_H
+
+%.$O: $PCSRC/cli/%.c
+		$CC $CFLAGS $prereq -o $target
+
+bomtool-%.$O: $PCSRC/cli/bomtool/%.c
+		$CC $CFLAGS $prereq -o $target
+
+libpkgconf-%.$O: $PCSRC/libpkgconf/%.c
+		$CC $CFLAGS $prereq -o $target
+
+libpkgconf.a$O: $LIBOBJS
+		ar vu $target $LIBOBJS
+
+$O.pkgconf: main.$O getopt_long.$O renderer-msvc.$O
+		$CC -o $target $prereq $LIB
+
+$O.bomtool: bomtool-main.$O getopt_long.$O
+		$CC -o $target $prereq $LIB
+
+install:v:
+		cp $PCSRC/pkg.m4 $APEXPROOT/sys/lib/m4
+		mkdir -p $APEXPROOT/sys/man/1
+		cp $PCSRC/man/pkgconf.1 $APEXPROOT/sys/man/1/pkgconf
+		cp $PCSRC/man/bomtool.1 $APEXPROOT/sys/man/1/bomtool
+		mkdir -p $APEXPROOT/sys/man/5
+		cp $PCSRC/man/pkgconf-personality.5 $APEXPROOT/sys/man/5/pkgconf-personality
+		mkdir -p $APEXPROOT/sys/man/7
+		cp $PCSRC/man/pkg.m4.7 $APEXPROOT/sys/man/7/pkg.m4
+
+
+

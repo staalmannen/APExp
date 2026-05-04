@@ -1,0 +1,41 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=
+
+TARG=
+
+
+# I will do it the opposite way this time. I will gradually
+# populate LIBOBJS based on linking errors
+# Many of the proposed objects in "libcoreutils" (gnulib)
+# are overlapping with what I already have in libap.a.
+
+LIBOBJS=\
+
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+<$APEXPROOT/sys/src/cmd/mkmany
+
+CORESRC=../../../external/coreutils
+
+CC=pcc
+LD=pcc
+
+CFLAGS=-c -D_POSIX_SOURCE
+
+
+%.$O: $CORESRC/src/%.c
+		$CC $CFLAGS $prereq -o $target
+
+libcoreutils_a-%.$O: $CORESRC/lib/%.c
+		$CC $CFLAGS $prereq -o $target
+
+
+
+install:V:
+
+
+

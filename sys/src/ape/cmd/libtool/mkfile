@@ -1,0 +1,28 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LTSRC=$APEXPROOT/sys/src/external/slibtool
+
+BIN=$APEXPROOT/$objtype/bin/ape
+TARG=slibtool-static
+
+OFILES=\
+
+
+LIB=
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CFLAGS=-FVp -c -I$LTSRC/include
+
+install:V:
+	cp $LTSRC/m4/sltdl.m4 $APEXPROOT/sys/lib/ape/m4/
+	cp $LTSRC/m4/slibtool.m4 $APEXPROOT/sys/lib/ape/m4/
+	cp $LTSRC/m4/slibtool.m4 $APEXPROOT/sys/lib/ape/m4/libtool.m4
+
+
+
+
+
+

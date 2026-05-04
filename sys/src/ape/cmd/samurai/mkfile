@@ -1,0 +1,35 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+SAMUSRC=$APEXPROOT/sys/src/external/samurai
+
+BIN=$APEXPROOT/$objtype/bin/ape
+TARG=samu
+
+OFILES=\
+	build.$O\
+	deps.$O\
+	env.$O\
+	graph.$O\
+	htab.$O\
+	log.$O\
+	parse.$O\
+	samu.$O\
+	scan.$O\
+	tool.$O\
+	tree.$O\
+	util.$O
+
+LIB=
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+CFLAGS=-FVp -c -I$SAMUSRC
+
+install:V:
+	cp $SAMUSRC/samu.1 $APEXPROOT/sys/man/1/samu
+
+
+
+
