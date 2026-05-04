@@ -7,7 +7,6 @@
 extern void *out_file;
 extern void *in_file;
 
-__attribute__((constructor(101)))
 static void early_init(void) {
     out_file = stdout;
     in_file  = stdin;

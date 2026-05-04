@@ -4,8 +4,6 @@
 
 #pragma lib "ape/libap.a"
 
-#pragma lib "c++/libC.a"
-
 # 1 ""
 void *__vec_new (void *, int , int , void *);
 

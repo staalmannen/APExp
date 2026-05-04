@@ -1,6 +1,6 @@
 # 1 ""
 
-/* <<AT&T C++ Language System <3.0.3> 05/05/94>> */
+/* <<AT&T C++ Language System <3.0.3> 05/05/94>> pragma*/
 
 # 1 ""
 void *__vec_new (void *, int , int , void *);
@@ -1704,9 +1704,6 @@ extern const char *LARGEST_LLONG ;
 extern int F_SENSITIVE ;
 extern int F_OPTIMIZED ;
 
-# 82 "/home/claude/cfront-3/src/size.h"
-enum bool { false = 0, true = 1} ;
-
 # 26 "/home/claude/cfront-3/src/template.h"
 extern Pclass current_instantiation ;
 extern Pfct current_fct_instantiation ;
@@ -2110,8 +2107,6 @@ Pbinding binding__10funct_inst ;
 # 652 "/home/claude/cfront-3/src/cfront.h"
 
 #pragma lib "ape/libap.a"
-
-#pragma lib "c++/libC.a"
 
 # 20 "/home/claude/incl-linux32/generic.h"
 typedef int (*GPT )(int , char *);

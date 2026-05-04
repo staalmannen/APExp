@@ -1,6 +1,6 @@
 # 1 ""
 
-/* <<AT&T C++ Language System <3.0.3> 05/05/94>> */
+/* <<AT&T C++ Language System <3.0.3> 05/05/94>> pragma*/
 
 # 1 ""
 void *__vec_new (void *, int , int , void *);
@@ -1812,7 +1812,6 @@ void (*node_hook__14tree_copy_info )(void *__1info , Pnode *, int , int *, int *
 char *(*malloc_hook__14tree_copy_info )(void *__1info , size_t );
 void *hook_info__14tree_copy_info ;
 };
-enum bool { false = 0, true = 1} ;
 
 # 26 "/home/claude/cfront-3/src/template.h"
 extern Pclass current_instantiation ;
@@ -2212,8 +2211,6 @@ Pbinding binding__10funct_inst ;
 # 652 "/home/claude/cfront-3/src/cfront.h"
 
 #pragma lib "ape/libap.a"
-
-#pragma lib "c++/libC.a"
 
 # 20 "/home/claude/incl-linux32/generic.h"
 typedef int (*GPT )(int , char *);

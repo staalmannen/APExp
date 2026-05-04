@@ -1708,8 +1708,6 @@ extern int F_OPTIMIZED ;
 
 #pragma lib "ape/libap.a"
 
-#pragma lib "c++/libC.a"
-
 # 20 "/home/claude/incl-linux32/generic.h"
 typedef int (*GPT )(int , char *);
 

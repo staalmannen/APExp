@@ -1708,8 +1708,6 @@ extern int F_OPTIMIZED ;
 
 #pragma lib "ape/libap.a"
 
-#pragma lib "c++/libC.a"
-
 # 20 "/home/claude/incl-linux32/generic.h"
 typedef int (*GPT )(int , char *);
 
@@ -1875,7 +1873,6 @@ void copy__9Block_intFRC9Block_int (struct Block_int *__0this , const struct Blo
 
 # 42 "/home/claude/cfront-3/src/overload.h"
 size_t grow__9Block_intFUl (struct Block_int *__0this , size_t );
-enum bool { false = 0, true = 1} ;
 
 # 26 "/home/claude/cfront-3/src/template.h"
 extern Pclass current_instantiation ;

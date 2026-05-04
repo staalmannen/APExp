@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
-#include <execinfo.h>
 #include <unistd.h>
 #include <stdio.h>
 
@@ -20,7 +19,6 @@ static void crash_handler(int sig) {
     _exit(1);
 }
 
-__attribute__((constructor(101)))
 static void early_init(void) {
     signal(SIGSEGV, crash_handler);
     signal(SIGBUS,  crash_handler);

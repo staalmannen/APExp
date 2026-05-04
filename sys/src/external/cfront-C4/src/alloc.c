@@ -1704,9 +1704,6 @@ extern const char *LARGEST_LLONG ;
 extern int F_SENSITIVE ;
 extern int F_OPTIMIZED ;
 
-# 82 "/home/claude/cfront-3/src/size.h"
-enum bool { false = 0, true = 1} ;
-
 # 26 "/home/claude/cfront-3/src/template.h"
 extern Pclass current_instantiation ;
 extern Pfct current_fct_instantiation ;
@@ -2107,12 +2104,6 @@ int friend_refp__10funct_inst ;
 Pbinding binding__10funct_inst ;
 };
 
-# 652 "/home/claude/cfront-3/src/cfront.h"
-
-#pragma lib "ape/libap.a"
-
-#pragma lib "c++/libC.a"
-
 # 20 "/home/claude/incl-linux32/generic.h"
 typedef int (*GPT )(int , char *);
 struct Block_CPchar;
@@ -2248,8 +2239,6 @@ error__FiPCc ( (int )'i' , (const char *)"free store exhausted") ;
 }
 return (void *)__1cp ;
 }
-
-#pragma lib "c++/libC.a"
 
 # 11 "/home/claude/incl-linux32/malloc.h"
 extern void *calloc (size_t , size_t );

@@ -1685,7 +1685,6 @@ extern struct toknode *front ;
 # 43 "/home/claude/cfront-3/src/tqueue.h"
 extern int yychar ;
 extern union YYSTYPE yylval ;
-enum bool { false = 0, true = 1} ;
 
 # 26 "/home/claude/cfront-3/src/template.h"
 extern Pclass current_instantiation ;
@@ -2090,8 +2089,6 @@ Pbinding binding__10funct_inst ;
 # 652 "/home/claude/cfront-3/src/cfront.h"
 
 #pragma lib "ape/libap.a"
-
-#pragma lib "c++/libC.a"
 
 # 20 "/home/claude/incl-linux32/generic.h"
 typedef int (*GPT )(int , char *);
