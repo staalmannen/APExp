@@ -2,9 +2,6 @@
 /* config.hin.  Generated from configure.ac by autoheader.  */ 
 
 /* CPU and C ABI indicator */
-#ifndef __i386__
-#define __i386__ 1
-#endif
 #ifndef __x86_64_x32__
 /* #undef __x86_64_x32__ */
 #endif

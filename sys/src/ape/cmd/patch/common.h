@@ -28,11 +28,6 @@ If not, write to the Free Software Foundation,
 
 /* We must define `volatile' and `const' first (the latter inside config.h),
    so that they're used consistently in all system includes.  */
-#ifndef __STDC__
-# ifndef volatile
-# define volatile
-# endif
-#endif
 
 /* Enable support for fseeko and ftello on hosts
    where it is available but is turned off by default.
