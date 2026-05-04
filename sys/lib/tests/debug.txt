@@ -1,0 +1,18 @@
+SKIP np: int
+SKIP ql: main
+SKIP np: unsigned
+SKIP np: int
+SKIP ql: x
+EXPAND: PNG_KNOWN_CHUNKS hs=0 flag=(main)
+expand(): macro=PNG_KNOWN_CHUNKS hs=0
+  hideset: PNG_CHUNK gets hs=1 (was 0)
+  hideset: iCCP gets hs=1 (was 0)
+EXPAND: PNG_CHUNK hs=1 flag=(main)
+expand(): macro=PNG_CHUNK hs=1
+GLUE: 'CD' ## 'iCCP' -> 'CDiCCP'
+  hideset: CDiCCP gets hs=2 (was 0)
+EXPAND: CDiCCP hs=2 flag=(main)
+expand(): macro=CDiCCP hs=2
+  hideset: LKMin gets hs=3 (was 0)
+EXPAND: LKMin hs=3 flag=(main)
+expand(): macro=LKMin hs=3

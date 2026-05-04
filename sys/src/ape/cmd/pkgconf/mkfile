@@ -26,8 +26,12 @@ LIB= libpkgconf.a$O
 
 <$APEXPROOT/sys/src/cmd/mkmany
 
-CFLAGS=-FVp -c -I$PCSRC/libpkgconf -I$PCSRC/cli -I$PCSRC/cli/bomtool\
-		-DHAVE_CONFIG_H
+CFLAGS=-FVp -c -I$PCSRC -I$PCSRC/libpkgconf\
+		 -I$PCSRC/cli -I$PCSRC/cli/bomtool\
+		-DHAVE_CONFIG_H -DPKGCONFIG_IS_STATIC\
+		-DSYSTEM_INCLUDEDIR="/sys/include/ape"\
+		-DSYSTEM_LIBDIR="/$objtype/lib/ape"\
+		-DPKG_DEFAULT_PATH="/bin"
 
 %.$O: $PCSRC/cli/%.c
 		$CC $CFLAGS $prereq -o $target
@@ -38,24 +42,24 @@ bomtool-%.$O: $PCSRC/cli/bomtool/%.c
 libpkgconf-%.$O: $PCSRC/libpkgconf/%.c
 		$CC $CFLAGS $prereq -o $target
 
-libpkgconf.a$O: $LIBOBJS
+$LIB: $LIBOBJS
 		ar vu $target $LIBOBJS
 
-$O.pkgconf: main.$O getopt_long.$O renderer-msvc.$O
-		$CC -o $target $prereq $LIB
+$O.pkgconf: main.$O getopt_long.$O renderer-msvc.$O $LIB
+		$CC -o $target $prereq
 
-$O.bomtool: bomtool-main.$O getopt_long.$O
-		$CC -o $target $prereq $LIB
+$O.bomtool: bomtool-main.$O getopt_long.$O $LIB
+		$CC -o $target $prereq
 
-install:v:
-		cp $PCSRC/pkg.m4 $APEXPROOT/sys/lib/m4
-		mkdir -p $APEXPROOT/sys/man/1
-		cp $PCSRC/man/pkgconf.1 $APEXPROOT/sys/man/1/pkgconf
-		cp $PCSRC/man/bomtool.1 $APEXPROOT/sys/man/1/bomtool
-		mkdir -p $APEXPROOT/sys/man/5
-		cp $PCSRC/man/pkgconf-personality.5 $APEXPROOT/sys/man/5/pkgconf-personality
-		mkdir -p $APEXPROOT/sys/man/7
-		cp $PCSRC/man/pkg.m4.7 $APEXPROOT/sys/man/7/pkg.m4
+# install:
+#		cp $PCSRC/pkg.m4 $APEXPROOT/sys/lib/m4
+#		mkdir -p $APEXPROOT/sys/man/1
+#		cp $PCSRC/man/pkgconf.1 $APEXPROOT/sys/man/1/pkgconf
+#		cp $PCSRC/man/bomtool.1 $APEXPROOT/sys/man/1/bomtool
+#		mkdir -p $APEXPROOT/sys/man/5
+#		cp $PCSRC/man/pkgconf-personality.5 $APEXPROOT/sys/man/5/pkgconf-personality
+#		mkdir -p $APEXPROOT/sys/man/7
+#		cp $PCSRC/man/pkg.m4.7 $APEXPROOT/sys/man/7/pkg.m4
 
 
 

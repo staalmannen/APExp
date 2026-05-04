@@ -1,0 +1,208 @@
+.TH MKMK 1
+.SH NAME
+mkmk \- create a mkfile for foreign software
+.SH SYNOPSIS
+.B mkmk
+[
+.B -aSA
+] [
+.B -S
+.I file
+] [
+.B -I
+.I incdir
+] [
+.B -L
+.I libdir
+] [
+.B -D
+.I name
+[
+.I =value
+]] [
+.B -U
+.I name
+] [
+.B -w
+.I column
+] [
+.B -C
+.I cflags
+] [
+.B -x
+.I exclude
+] [
+.I file...
+]
+.SH DESCRIPTION
+.I mkmk
+attempts to generate a correct mkfile for
+.I mk(1)
+based on the files given, or if none, those found in the current directory,
+it writes the generated mkfile to its standard output.
+.P
+Though 
+.I mkmk(1)
+makes strenuous attempts to identify the dependency tree and required
+macro definitions it will make mistakes. It is expected that
+.I mkmk(1)
+will usually be invoked from an
+.I rc(1) script, 
+.IR 9port ,
+which will use the various command options to modify the generated mkfile.
+In extreme cases it may even have to use other tools such as
+.I sed(1)
+and
+.I awk(1)
+to massage the generated script.
+One of these scripts would be needed for each package ported using
+.IR mkmk(1) .
+.LP
+Using a script is preferable to hand editing
+the generated mkfile as it allows updates of the package to be
+installed by simply re-running the 
+.I 9port
+script.
+There are a number of options:
+.TP
+.B -o target
+.TP
+.B -m
+.TP
+.B -l target
+.TP
+.B -s target
+.br
+.I mkmk(1)
+is able to generate the four standard mkfile types:
+.B -o
+a single executable file target,
+.B -m
+multiple targets, one per source file,
+.B -l
+a user library, and
+.B -s
+a system library. In each case where a single target is required it's name
+must follow the option letter. If none of these options is specified
+it is assumed the the mkfile is a top level driver and exists only to recursively call
+.I mk(1)
+in subdirectories.
+.TP
+.B -A
+.br
+Autoconf mode, most defines are written to the file
+.I config.h
+in the current directory (provided it doesn't exist), and heuristics
+are used parse Autoconf feature tests and provide correct answers to them.
+.TP
+.B  -a
+.br
+APE mode, target libraries will be placed in /$objtype/lib/ape, binaries in
+/$objtype/bin/ape, manuals in /sys/lib/Xape (where X is the manual section number).
+This infers that the target application or library will only be used from within
+the APE environment.
+.TP
+.B  -S
+.br
+.I mkmk(1)
+normally reads each header file only once, however strange preprocessor
+code can mean a single header file will compile differently depending
+on which source file inludes it. The
+.B -S
+option, (slow but accurate), disables this optimisation at the expense
+of much longer runtimes. 
+.TP
+.B  -I incdir
+.br
+Aditional include directories to be searched by the compiler
+may be given, these are also added to
+the
+.I CFLAGS=
+macro in the generated mkfile. This option make be repeated as required.
+.TP
+.B  -w width
+.br
+text in the generated mkfile is word wrapped, at column 78 by default giving
+wide but short output.
+this column number may be controlled by this
+option; a value of zero will give one object per line style \- narrow but tall
+files, preferred by some users.
+.TP
+.B -D name[=value]
+.br
+C preprocessor macros may be defined using the same syntax as the
+C preprocessor. This option may be repeated as often as required.
+.TP
+.B -U name
+.br
+C preprocessor macros may be undefined using the same syntax as the
+C preprocessor. This option may be repeated as often as required.
+.TP
+.B -B
+This is shorthand for
+.B "-c -B"
+which turns off the warnings about function calls in the absence of prototypes.
+Sadly it owes its existence to the frequency that it is needed.
+.TP
+.B -c flags
+.br
+Arbitary C compiler flags can be added to the CFLAGS variable in
+the generated mkfile using this option, it make be repeated as required.
+.TP
+-a
+.br
+APE mode, controls the installation directories for target files. Libraries are installed
+to /$objtype/lib/ape rather than /$objtype/lib,
+executables to /$objtype/bin/ape rather than /$objtype/bin and manuals to
+/sys/man/apeX rather than /sys/man/X.
+.TP
+-x file
+.br
+Exclude file from processing.
+.I Mkmk(1)
+parses all the files in the current directory, except those specified with
+the
+.B -x
+option. This option can appear as often as necessary.
+.TP
+.B -h flags
+.br
+Aditional libker flags make be specified, these are appended to the LDFLAGS
+variable in the generate mkfile. This option can appear as often as necessary.
+.TP
+.B -H libs
+.br
+User libraries required may be specified, these are appended to
+the LIBS variable in the generate mkfile. System libraries need not be
+listed as
+.B pcc(1)
+knows how to find them.
+.TP
+.B -C file
+Files to be deleted by the
+.I clean
+.B mk(1)
+target may be specified, these are
+appended to the CLEANFILES variable in the generate mkfile.
+This option can appear as often as necessary.
+.SH AUTOCONF
+In autoconf mode
+.I mkmk(1)
+attempts to autodetect features requested in the source code by
+examining the symbols in the plan9 libraries, and by infering which
+plan9 sourcecode control defines are required. A small number of specific
+preprocessor macros are also defined automaticially when they are tested;
+these relate to features that Plan9 has but which automated testing is
+too painful.
+.SH BUGS
+.I mkmk(1)
+needs to have a much better understanding of the APE subsystem.
+It should be able to extract the  prototypes defined in the APE headers and what
+preprocessor macros they are controlled by. Currently this information is compiled
+into the source.
+.SH SOURCE
+.B /sys/src/cmd/mkmk
+.br
+.B /sys/src/cmd/mkmk/9port - example 9port scripts
+.SH SEE ALSO
+.IR mk (1)
