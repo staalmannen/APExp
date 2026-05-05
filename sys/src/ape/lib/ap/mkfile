@@ -24,7 +24,6 @@ DIRS=\
 	network\
 	passwd\
 	plan9\
-	posix\
 	prng\
 	process\
 	regex\

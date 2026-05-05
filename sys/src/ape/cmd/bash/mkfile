@@ -131,10 +131,12 @@ libbuiltins.a$O: $BASHSRC/builtins/Makefile
 			rm $BASHSRC/builtins/psize.aux
 
 install:V:
-			cp $GSEDSRC/doc/bash.1 $APEXPROOT/sys/man/1/bash
+			cp $BASHSRC/doc/bash.1 $APEXPROOT/sys/man/1/bash
 
 clean:V:
 			rm -f *.[$OS] [$OS].out lib*.a*
+
+
 
 
 

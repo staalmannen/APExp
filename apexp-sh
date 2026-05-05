@@ -10,6 +10,7 @@ M4PATH="/sys/lib/ape/m4"
 MANPATH="/sys/man"
 LOCALEDIR="/sys/lib/ape/locale"
 LIBTOOL=slibtool-static
+SHELL=Bash
 CC=pcc
 LD=pcc
 test -d /dev/fd || aux/stub -d /dev/fd && bind /fd /dev/fd
@@ -18,4 +19,4 @@ bind -b $cputype/bin /bin
 bind -b rc/bin /bin
 bind -b rc/bin/ape /bin
 bind -b $cputype/bin/ape /bin
-/bin/sh $*
+/bin/bash $*

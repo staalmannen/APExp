@@ -100,8 +100,7 @@ Install paths have been modified so that libraries and binaries are installed in
 
 ***Utilities***
 
-- The shell is still the original APE pdksh
-- -> TODO: replace with GNU bash (version 5.3)
+- The original APE pdksh shell replaced with GNU bash (version 5.3)
 - APE make has been replaced by a port of GNU make (version 4.4.1)
 - APE sed has been replaced by a port of GNU sed (version 4.9)
 - APE grep has been replaced with GNU grep (version 3.12)
