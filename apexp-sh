@@ -11,7 +11,6 @@ MANPATH="/sys/man"
 LOCALEDIR="/sys/lib/ape/locale"
 LIBTOOL=slibtool-static
 SHELL=Bash
-CC=pcc
 LD=pcc
 test -d /dev/fd || aux/stub -d /dev/fd && bind /fd /dev/fd
 ./mount-include

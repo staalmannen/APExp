@@ -519,7 +519,7 @@ INSTALLED_INCLUDE_HEADERS = posixstat.h ansi_stdlib.h filecntl.h posixdir.h \
 SIGNAMES_H = lsignames.h
 
 # object files chosen based on running of configure
-JOBS_O = jobs.o
+JOBS_O = nojobs.o
 SIGLIST_O = 
 SIGNAMES_O = 
 

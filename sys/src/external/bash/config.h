@@ -28,7 +28,7 @@
 
 /* Define JOB_CONTROL if your operating system supports
    BSD-like job control. */
-#define JOB_CONTROL 1
+/* #undef JOB_CONTROL */
 
 /* Define ALIAS if you want the alias features. */
 #define ALIAS 1
@@ -186,7 +186,7 @@
 /* Define AFS if you are using Transarc's AFS. */
 /* #undef AFS */
 
-#define ENABLE_NLS 1
+/* #undef ENABLE_NLS */
 
 /* End of configuration settings controllable by autoconf. */
 /* Other settable options appear in config-top.h. */
@@ -877,7 +877,7 @@
 /* #undef HAVE_SIGINTERRUPT */
 
 /* Define if you have the POSIX.1-style sigsetjmp function.  */
-/* #undef HAVE_POSIX_SIGSETJMP */
+#define HAVE_POSIX_SIGSETJMP 1
 
 /* Define if you have the snprintf function.  */
 #define HAVE_SNPRINTF 1

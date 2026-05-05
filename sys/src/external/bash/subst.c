@@ -19,7 +19,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+   along with Bash.  If not, see <http://www.gnu.org/licenses/> restore_pipeline.
 */
 
 #include "config.h"
@@ -6869,11 +6869,13 @@ uw_unbind_localvar (void *name)
     makunbound (name, shell_variables);
 }
 
+#if defined (JOB_CONTROL)
 static void
 uw_restore_pipeline (void *discard)
 {
   restore_pipeline ((intptr_t) discard);
 }
+#endif
 
 static void
 uw_restore_errexit (void *eflag)
