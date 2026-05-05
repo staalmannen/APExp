@@ -51,6 +51,7 @@ OFILES=\
 # tilde -force linking \
 	tilde.$O\
 # hack to fix linking errors \
+	pipeline.$O\
 	shmalloc.$O\
 
 BASHSRC=$APEXPROOT/sys/src/external/bash
