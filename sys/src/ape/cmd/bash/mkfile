@@ -83,19 +83,19 @@ CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib $DEFS
 
 
 %.$O: %.c
-	$CC $CFLAGS $stem.c
+			$CC $CFLAGS $stem.c
 
 %.$O: $BASHSRC/%.c
-	$CC $CFLAGS $BASHSRC/$stem.c
+			$CC $CFLAGS $BASHSRC/$stem.c
 
 termcap.$O: $BASHSRC/lib/termcap/termcap.c
-	$CC $CFLAGS $BASHSRC/lib/termcap/termcap.c
+			$CC $CFLAGS $BASHSRC/lib/termcap/termcap.c
 
 tparam.$O: $BASHSRC/lib/termcap/tparam.c
-	$CC $CFLAGS $BASHSRC/lib/termcap/tparam.c
+			$CC $CFLAGS $BASHSRC/lib/termcap/tparam.c
 
 tilde.$O: $BASHSRC/lib/tilde/tilde.c
-	$CC $CFLAGS $BASHSRC/lib/tilde/tilde.c
+			$CC $CFLAGS $BASHSRC/lib/tilde/tilde.c
 
 libsh.a$O: $BASHSRC/lib/sh/Makefile
 			make -C $BASHSRC/lib/sh
@@ -131,11 +131,10 @@ libbuiltins.a$O: $BASHSRC/builtins/Makefile
 			rm $BASHSRC/builtins/psize.aux
 
 install:V:
-		cp $BIN/bash $BIN/sh
-		cp $GSEDSRC/doc/bash.1 $APEXPROOT/sys/man/1/bash
+			cp $GSEDSRC/doc/bash.1 $APEXPROOT/sys/man/1/bash
 
 clean:V:
-	rm -f *.[$OS] [$OS].out lib*.a*
+			rm -f *.[$OS] [$OS].out lib*.a*
 
 
 
