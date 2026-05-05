@@ -50,7 +50,8 @@ OFILES=\
 	tparam.$O\
 # tilde -force linking \
 	tilde.$O\
-
+# hack to fix linking errors \
+	shmalloc.$O\
 
 BASHSRC=$APEXPROOT/sys/src/external/bash
 
