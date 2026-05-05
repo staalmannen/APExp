@@ -22,6 +22,7 @@
 #define _GENERAL_H_
 
 #include "stdc.h"
+#include "command.h"
 
 #include "bashtypes.h"
 #include "chartypes.h"
