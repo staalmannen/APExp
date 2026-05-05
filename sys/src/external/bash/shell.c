@@ -50,6 +50,7 @@
 
 #define NEED_SH_SETLINEBUF_DECL		/* used in externs.h */
 
+
 #include "shell.h"
 #include "parser.h"
 #include "flags.h"

@@ -22,6 +22,10 @@
 
 #include "config.h"
 
+#ifndef UCHAR_MAX
+#define UCHAR_MAX	0xff
+#endif
+
 #if defined (BRACE_EXPANSION)
 
 #if defined (HAVE_UNISTD_H)
@@ -334,7 +338,7 @@ expand_amble (char *text, size_t tlen, int flags)
 	  lr = strvec_len (result);
 	  lp = strvec_len (partial);
 
-	  tresult = strvec_mresize (result, lp + lr + 1);
+	  tresult = (char **) strvec_mresize (result, lp + lr + 1);
 	  if (tresult == 0)
 	    {
 	      internal_error (_("brace expansion: cannot allocate memory for %s"), tem);
@@ -397,7 +401,7 @@ mkseq (intmax_t start, intmax_t end, intmax_t incr, int type, size_t width)
   if (ckd_add (&nelem, prevn / abs_incr, 2))
     return ((char **)NULL);
 
-  result = strvec_mcreate (nelem);
+  result = (char **) strvec_mcreate (nelem);
   if (result == 0)
     {
       internal_error (_("brace expansion: failed to allocate memory for %s elements"), uinttostr (nelem - 1, lbuf, sizeof (lbuf)));
@@ -419,12 +423,12 @@ mkseq (intmax_t start, intmax_t end, intmax_t incr, int type, size_t width)
       QUIT;
 #endif
       if (type == ST_INT)
-	t = itos (n);
+	t = (char *) itos (n);
       else if (type == ST_ZINT)
 	{
 	  size_t tlen;
 
-	  t = itos (n);
+	  t = (char *) itos (n);
 	  tlen = strlen (t);
 	  if (tlen < width)	/* zero-pad the result directly to avoid sprintf */
 	    {
@@ -458,7 +462,7 @@ mkseq (intmax_t start, intmax_t end, intmax_t incr, int type, size_t width)
 
 	  /* Easier to do this than mess around with various intmax_t printf
 	     formats (%ld? %lld? %jd?) and PRIdMAX. */
-	  p = uinttostr (n, lbuf, sizeof (lbuf));
+	  p = (char *) uinttostr (n, lbuf, sizeof (lbuf));
 	  internal_error (_("brace expansion: failed to allocate memory for `%s'"), p);
 	  strvec_dispose (result);
 	  return ((char **)NULL);
@@ -528,8 +532,8 @@ expand_seqterm (char *text, size_t tlen)
     return ((char **)NULL);
 
   lhs_l = t - text;		/* index of start of BRACE_SEQ_SPECIFIER */
-  lhs = substring (text, 0, lhs_l);
-  rhs = substring (text, lhs_l + sizeof(BRACE_SEQ_SPECIFIER) - 1, tlen);
+  lhs = (char *) substring (text, 0, lhs_l);
+  rhs = (char *) substring (text, lhs_l + sizeof(BRACE_SEQ_SPECIFIER) - 1, tlen);
 
   if (lhs[0] == 0 || rhs[0] == 0)
     {

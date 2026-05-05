@@ -29,6 +29,9 @@ typedef struct _COLLSYM {
   CHAR code;
 } __COLLSYM;
 
+#undef L
+#define L(CS) (char *) CS
+
 static __COLLSYM POSIXCOLL [] =
 {
 	{  L("NUL"),			L('\0') },

@@ -966,7 +966,7 @@ printwidestr (char *fmt, wchar_t *wstring, size_t len, int fieldwidth, int preci
   int fw, pr;			/* fieldwidth and precision */
 
   if (wstring == 0)
-    wstring = L"";
+    wstring = (wchar_t *) "";
 
 #if 0
   s = fmt;

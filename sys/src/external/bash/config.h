@@ -150,6 +150,7 @@
 /* Define NO_MULTIBYTE_SUPPORT to not compile in support for multibyte
    characters, even if the OS supports them. */
 /* #undef NO_MULTIBYTE_SUPPORT */
+#define HANDLE_MULTIBYTE 1
 
 /* Define DEBUGGER if you want to compile in some features used only by the 
    bash debugger. */

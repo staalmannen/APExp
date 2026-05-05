@@ -82,8 +82,8 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 #ifdef EXTENDED_GLOB
       /* EXTMATCH () will handle recursively calling GMATCH, so we can
 	 just return what EXTMATCH() returns. */
-      if ((flags & FNM_EXTMATCH) && *p == L('(') &&
-	  (c == L('+') || c == L('*') || c == L('?') || c == L('@') || c == L('!'))) /* ) */
+      if ((flags & FNM_EXTMATCH) && *p == (unsigned char) L('(') &&
+	  (c == (int) L('+') || c == (int) L('*') || c == (int) L('?') || c == (int) L('@') || c == (int) L('!'))) /* ) */
 	{
 	  int lflags;
 	  /* If we're not matching the start of the string, we're not
@@ -95,14 +95,14 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 
       switch (c)
 	{
-	case L('?'):		/* Match single character */
+	case (int) L('?'):		/* Match single character */
 	  if (sc == '\0')
 	    return FNM_NOMATCH;
-	  else if ((flags & FNM_PATHNAME) && sc == L('/'))
+	  else if ((flags & FNM_PATHNAME) && sc == (int) L('/'))
 	    /* If we are matching a pathname, `?' can never match a `/'. */
 	    return FNM_NOMATCH;
-	  else if ((flags & FNM_PERIOD) && sc == L('.') &&
-		   (n == string || ((flags & FNM_PATHNAME) && n[-1] == L('/'))))
+	  else if ((flags & FNM_PERIOD) && sc == (int) L('.') &&
+		   (n == string || ((flags & FNM_PATHNAME) && n[-1] == (int) L('/'))))
 	    /* `?' cannot match a `.' if it is the first character of the
 	       string or if it is the first character following a slash and
 	       we are matching a pathname. */
@@ -113,12 +113,12 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 	     we are matching a pathname. */
 	  if ((flags & FNM_DOTDOT) &&
 	      ((n == string && SDOT_OR_DOTDOT(n)) ||
-	       ((flags & FNM_PATHNAME) && n > string && n[-1] == L('/') && PDOT_OR_DOTDOT(n))))
+	       ((flags & FNM_PATHNAME) && n > string && n[-1] == (unsigned char) L('/') && PDOT_OR_DOTDOT(n))))
 	    return FNM_NOMATCH;
 
 	  break;
 
-	case L('\\'):		/* backslash escape removes special meaning */
+	case (int) L('\\'):		/* backslash escape removes special meaning */
 	  if (p == pe && sc == '\\' && (n+1 == se))
 	    break;
 
@@ -137,7 +137,7 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 	    return FNM_NOMATCH;
 	  break;
 
-	case L('*'):		/* Match zero or more characters */
+	case (int) L('*'):		/* Match zero or more characters */
 	  /* See below for the reason for using this. It avoids backtracking
 	     back to a previous `*'.  Picked up from glibc. */
 	  if (ends != NULL)
@@ -147,8 +147,8 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 	      return (0);
 	    }
 
-	  if ((flags & FNM_PERIOD) && sc == L('.') &&
-	      (n == string || ((flags & FNM_PATHNAME) && n[-1] == L('/'))))
+	  if ((flags & FNM_PERIOD) && sc == (int) L('.') &&
+	      (n == string || ((flags & FNM_PATHNAME) && n[-1] == (unsigned char) L('/'))))
 	    /* `*' cannot match a `.' if it is the first character of the
 	       string or if it is the first character following a slash and
 	       we are matching a pathname. */
@@ -159,7 +159,7 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 	     we are matching a pathname. */
 	  if ((flags & FNM_DOTDOT) &&
 	      ((n == string && SDOT_OR_DOTDOT(n)) ||
-	       ((flags & FNM_PATHNAME) && n > string && n[-1] == L('/') && PDOT_OR_DOTDOT(n))))
+	       ((flags & FNM_PATHNAME) && n > string && n[-1] == (unsigned char) L('/') && PDOT_OR_DOTDOT(n))))
 	    return FNM_NOMATCH;
 
 	  if (p == pe)
@@ -167,13 +167,13 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 
 	  /* Collapse multiple consecutive `*' and `?', but make sure that
 	     one character of the string is consumed for each `?'. */
-	  for (c = *p++; (c == L('?') || c == L('*')); c = *p++)
+	  for (c = *p++; (c == (int) L('?') || c == (int) L('*')); c = *p++)
 	    {
-	      if ((flags & FNM_PATHNAME) && sc == L('/'))
+	      if ((flags & FNM_PATHNAME) && sc == (int) L('/'))
 		/* A slash does not match a wildcard under FNM_PATHNAME. */
 		return FNM_NOMATCH;
 #ifdef EXTENDED_GLOB
-	      else if ((flags & FNM_EXTMATCH) && c == L('?') && *p == L('(')) /* ) */
+	      else if ((flags & FNM_EXTMATCH) && c == (int) L('?') && *p == (unsigned char) L('(')) /* ) */
 		{
 		  CHAR *newn;
 
@@ -190,9 +190,9 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 		  p = newn ? newn : pe;
 		}
 #endif
-	      else if (c == L('?'))
+	      else if (c == (int) L('?'))
 		{
-		  if (sc == L('\0'))
+		  if (sc == (int) L('\0'))
 		    return FNM_NOMATCH;
 		  /* One character of the string is consumed in matching
 		     this ? wildcard, so *??? won't match if there are
@@ -203,7 +203,7 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 
 #ifdef EXTENDED_GLOB
 	      /* Handle ******(patlist) */
-	      if ((flags & FNM_EXTMATCH) && c == L('*') && *p == L('('))  /*)*/
+	      if ((flags & FNM_EXTMATCH) && c == (int) L('*') && *p == (int) L('('))  /*)*/
 		{
 		  CHAR *newn;
 		  /* We need to check whether or not the extended glob
@@ -230,14 +230,14 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 	  /* The wildcards are the last element of the pattern.  The name
 	     cannot match completely if we are looking for a pathname and
 	     it contains another slash, unless FNM_LEADING_DIR is set. */
-	  if (c == L('\0'))
+	  if (c == (int) L('\0'))
 	    {
 	      int r = (flags & FNM_PATHNAME) == 0 ? 0 : FNM_NOMATCH;
 	      if (flags & FNM_PATHNAME)
 		{
 		  if (flags & FNM_LEADING_DIR)
 		    r = 0;
-		  else if (MEMCHR (n, L('/'), se - n) == NULL)
+		  else if (MEMCHR (n, (int) L('/'), se - n) == NULL)
 		    r = 0;
 		}
 	      return r;
@@ -246,18 +246,18 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 	  /* If we've hit the end of the pattern and the last character of
 	     the pattern was handled by the loop above, we've succeeded.
 	     Otherwise, we need to match that last character. */
-	  if (p == pe && (c == L('?') || c == L('*')))
+	  if (p == pe && (c == (int) L('?') || c == (int) L('*')))
 	    return (0);
 
 	  /* If we've hit the end of the string and the rest of the pattern
 	     is something that matches the empty string, we can succeed. */
 #if defined (EXTENDED_GLOB)
-	  if (n == se && ((flags & FNM_EXTMATCH) && (c == L('!') || c == L('?')) && *p == L('(')))
+	  if (n == se && ((flags & FNM_EXTMATCH) && (c == (int) L('!') || c == (int) L('?')) && *p == (unsigned char) L('(')))
 	    {
 	      --p;
 	      if (EXTMATCH (c, n, se, p, pe, flags) == 0)
-		return (c == L('!') ? FNM_NOMATCH : 0);
-	      return (c == L('!') ? 0 : FNM_NOMATCH);
+		return (c == (int) L('!') ? FNM_NOMATCH : 0);
+	      return (c == (int) L('!') ? 0 : FNM_NOMATCH);
 	    }
 #endif
 
@@ -265,11 +265,11 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 	     pathname ([star]/foo), then consume enough of the string to stop
 	     at any slash and then try to match the rest of the pattern.  If
 	     the string doesn't contain a slash, fail */
-	  if (c == L('/') && (flags & FNM_PATHNAME))
+	  if (c == (int) L('/') && (flags & FNM_PATHNAME))
 	    {
-	      while (n < se && *n != L('/'))
+	      while (n < se && *n != (unsigned char) L('/'))
 		++n;
-	      if (n < se && *n == L('/') && (GMATCH (n+1, se, p, pe, NULL, flags) == 0))
+	      if (n < se && *n == (unsigned char) L('/') && (GMATCH (n+1, se, p, pe, NULL, flags) == 0))
 		return 0;
 	      return FNM_NOMATCH;	/* XXX */
 	    }
@@ -281,25 +281,25 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 	    struct STRUCT end;
 
 	    end.pattern = NULL;
-	    endp = MEMCHR (n, (flags & FNM_PATHNAME) ? L('/') : L('\0'), se - n);
+	    endp = MEMCHR (n, (flags & FNM_PATHNAME) ? (int) L('/') : (int) L('\0'), se - n);
 	    if (endp == 0)
 	      endp = se;
 
-	    c1 = ((flags & FNM_NOESCAPE) == 0 && c == L('\\')) ? *p : c;
+	    c1 = ((flags & FNM_NOESCAPE) == 0 && c == (int) L('\\')) ? *p : c;
 	    c1 = FOLD (c1);
 	    for (--p; n < endp; ++n)
 	      {
 		/* Only call strmatch if the first character indicates a
 		   possible match.  We can check the first character if
 		   we're not doing an extended glob match. */
-		if ((flags & FNM_EXTMATCH) == 0 && c != L('[') && FOLD (*n) != c1) /*]*/
+		if ((flags & FNM_EXTMATCH) == 0 && c != (int) L('[') && FOLD (*n) != c1) /*]*/
 		  continue;
 
 		/* If we're doing an extended glob match and the pattern is not
 		   one of the extended glob patterns, we can check the first
 		   character. */
-		if ((flags & FNM_EXTMATCH) && p[1] != L('(') && /*)*/
-		    STRCHR (L("?*+@!"), *p) == 0 && c != L('[') && FOLD (*n) != c1) /*]*/
+		if ((flags & FNM_EXTMATCH) && p[1] != (unsigned char) L('(') && /*)*/
+		    STRCHR (L("?*+@!"), *p) == 0 && c != (int) L('[') && FOLD (*n) != c1) /*]*/
 		  continue;
 
 		/* Otherwise, we just recurse. */
@@ -324,21 +324,21 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 	    return FNM_NOMATCH;
 	  }
 
-	case L('['):
+	case (int) L('['):
 	  {
-	    if (sc == L('\0') || n == se)
+	    if (sc == (int) L('\0') || n == se)
 	      return FNM_NOMATCH;
 
 	    /* A character class cannot match a `.' if it is the first
 	       character of the string or if it is the first character
 	       following a slash and we are matching a pathname. */
-	    if ((flags & FNM_PERIOD) && sc == L('.') &&
-		(n == string || ((flags & FNM_PATHNAME) && n[-1] == L('/'))))
+	    if ((flags & FNM_PERIOD) && sc == (int) L('.') &&
+		(n == string || ((flags & FNM_PATHNAME) && n[-1] == (unsigned char) L('/'))))
 	      return (FNM_NOMATCH);
 
 	    /* If we are matching pathnames, we can't match a slash with a
 	       bracket expression. */
-	    if (sc == L('/') && (flags & FNM_PATHNAME))
+	    if (sc == (int) L('/') && (flags & FNM_PATHNAME))
 	      return (FNM_NOMATCH);
 
 	    /* `?' cannot match `.' or `..' if it is the first character of the
@@ -346,7 +346,7 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
 	       we are matching a pathname. */
 	    if ((flags & FNM_DOTDOT) &&
 		((n == string && SDOT_OR_DOTDOT(n)) ||
-		((flags & FNM_PATHNAME) && n > string && n[-1] == L('/') && PDOT_OR_DOTDOT(n))))
+		((flags & FNM_PATHNAME) && n > string && n[-1] == (unsigned char) L('/') && PDOT_OR_DOTDOT(n))))
 	      return FNM_NOMATCH;
 
 	    p = BRACKMATCH (p, sc, flags);
@@ -366,14 +366,14 @@ fprintf(stderr, "gmatch: pattern = %s; pe = %s\n", pattern, pe);
   if (n == se)
     return (0);
 
-  if ((flags & FNM_LEADING_DIR) && *n == L('/'))
+  if ((flags & FNM_LEADING_DIR) && *n == (unsigned char) L('/'))
     /* The FNM_LEADING_DIR flag says that "foo*" matches "foobar/frobozz".  */
     return 0;
 	  
   return (FNM_NOMATCH);
 }
 
-#define SLASH_PATHNAME(c)	(c == L('/') && (flags & FNM_PATHNAME))
+#define SLASH_PATHNAME(c)	(c == (int) L('/') && (flags & FNM_PATHNAME))
 
 /* Parse a special bracket expression symbol ([.sym.], [=char=], [:cclass:]),
    starting at P, and return the position of the terminating .], =], or :].
@@ -387,8 +387,8 @@ PARSE_SUBBRACKET (CHAR *p, int flags)
   type = *p;
 
   /* POSIX allows a right bracket to appear in a collating symbol. */
-  while (*++p != L('\0') && SLASH_PATHNAME (*p) == 0 && (type != L('.') && *p == L(']')) == 0)
-    if (*p == type && p[1] == L(']'))
+  while (*++p != (unsigned char) L('\0') && SLASH_PATHNAME (*p) == 0 && type != (unsigned char) L('.') && *p == (unsigned char) L(']') == 0)
+    if (*p == type && p[1] == (unsigned char) L(']'))
       return p;
   return NULL;
 }
@@ -414,7 +414,7 @@ BRACKMATCH (CHAR *p, U_CHAR test, int flags)
      circumflex (`^') in its role in a `nonmatching list'.  A bracket
      expression starting with an unquoted circumflex character produces
      unspecified results.  This implementation treats the two identically. */
-  if (not = (*p == L('!') || *p == L('^')))
+  if (not = (*p == (unsigned char) L('!') || *p == (unsigned char) L('^')))
     ++p;
 
   c = *p++;
@@ -428,7 +428,7 @@ BRACKMATCH (CHAR *p, U_CHAR test, int flags)
       /* POSIX.2 equivalence class:  [=c=].  See POSIX.2 2.8.3.2.  Find
 	 the end of the equivalence class, move the pattern pointer past
 	 it, and check for equivalence. */
-      if (c == L('[') && *p == L('=') && (close = PARSE_SUBBRACKET (p, flags)) != NULL)
+      if (c == (int) L('[') && *p == (unsigned char) L('=') && (close = PARSE_SUBBRACKET (p, flags)) != NULL)
 	{
 	  p++;
 	  pc = COLLSYM (p, close - p);
@@ -445,11 +445,11 @@ BRACKMATCH (CHAR *p, U_CHAR test, int flags)
 	  else
 	    {
 	      c = *p++;
-	      if (c == L('\0'))
-		return ((test == L('[')) ? savep : (CHAR *)0); /*]*/
-	      else if (c == L('/') && (flags & FNM_PATHNAME))
-		return ((test == L('[')) ? savep : (CHAR *)0); /*]*/
-	      else if (c == L(']'))
+	      if (c == (int) L('\0'))
+		return ((test == (unsigned char) L('[')) ? savep : (CHAR *)0); /*]*/
+	      else if (c == (int) L('/') && (flags & FNM_PATHNAME))
+		return ((test == (unsigned char) L('[')) ? savep : (CHAR *)0); /*]*/
+	      else if (c == (int) L(']'))
 		break;
 	      c = FOLD (c);
 	      continue;
@@ -457,7 +457,7 @@ BRACKMATCH (CHAR *p, U_CHAR test, int flags)
 	}
 
       /* POSIX.2 character class expression.  See POSIX.2 2.8.3.2. */
-      if (c == L('[') && *p == L(':') && (close = PARSE_SUBBRACKET (p, flags)) != NULL)
+      if (c == (int) L('[') && *p == (unsigned char) L(':') && (close = PARSE_SUBBRACKET (p, flags)) != NULL)
 	{
 	  CHAR *ccname;
 
@@ -467,7 +467,7 @@ BRACKMATCH (CHAR *p, U_CHAR test, int flags)
 	  if (ccname)
 	    {
 	      bcopy (p + 1, ccname, (close - p - 1) * sizeof (CHAR));
-	      *(ccname + (close - p - 1)) = L('\0');
+	      *(ccname + (close - p - 1)) = (unsigned char) L('\0');
 	      /* As a result of a POSIX discussion, char class names are
 		 allowed to be quoted (?) */
 	      DEQUOTE_PATHNAME (ccname);
@@ -501,11 +501,11 @@ BRACKMATCH (CHAR *p, U_CHAR test, int flags)
 	      /* continue the loop here, since this expression can't be
 		 the first part of a range expression. */
 	      c = *p++;
-	      if (c == L('\0'))
-		return ((test == L('[')) ? savep : (CHAR *)0);
-	      else if (c == L('/') && (flags & FNM_PATHNAME))
-		return ((test == L('[')) ? savep : (CHAR *)0); /*]*/
-	      else if (c == L(']'))
+	      if (c == (int) L('\0'))
+		return ((test == (unsigned char) L('[')) ? savep : (CHAR *)0);
+	      else if (c == (int) L('/') && (flags & FNM_PATHNAME))
+		return ((test == (unsigned char) L('[')) ? savep : (CHAR *)0); /*]*/
+	      else if (c == (int) L(']'))
 		break;
 	      c = FOLD (c);
 	      continue;

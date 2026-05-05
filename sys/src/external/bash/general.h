@@ -40,8 +40,6 @@
 #  include <strings.h>
 #endif /* !HAVE_STRING_H */
 
-#undef UCHAR_MAX
-#undef CHAR_MAX
 #if defined (HAVE_LIMITS_H)
 #  include <limits.h>
 #endif
