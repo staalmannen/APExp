@@ -17,7 +17,6 @@ OFILES=\
 	expr.$O\
 	flags.$O\
 	jobs.$O\
-#	nojobs.$O\
 	subst.$O\
 	hashcmd.$O\
 	hashlib.$O\
@@ -37,8 +36,6 @@ OFILES=\
 	bracecomp.$O\
 	bashhist.$O\
 	bashline.$O\
-	sig.$O\
-	siglist.$O\
 	list.$O\
 	stringlib.$O\
 	locale.$O\
@@ -47,10 +44,10 @@ OFILES=\
 	pcomplete.$O\
 	pcomplib.$O\
 	syntax.$O\
-#	xmalloc.$O\
-# termcap - force linking... \
-#	termcap.$O\
-#	tparam.$O\
+	xmalloc.$O\
+# termcap - force linking\
+	termcap.$O\
+	tparam.$O\
 # tilde -force linking \
 	tilde.$O\
 
@@ -70,15 +67,20 @@ BIN=$APEXPROOT/$objtype/bin/ape
 
 CC=pcc
 LD=pcc
+YACC=bison
 
 DEFS= 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale" -D_POSIX_SOURCE\
 		-D_BSD_EXTENSION -DHAVE_LIMITS_H -D_LIMITS_EXTENSION -DPLAN9\
-		-DCONF_OSTYPE="Plan9" -DCONF_MACHTYPE="$objtype-unknown-Plan9" -DPROGRAM="Bash"\
-		-DPACKAGE="Bash" -DPACKAGE_STRING='bash 5.2-release'\
-		-DCONF_VENDOR="unknonw" -DCONF_HOSTTYPE="$objtype"\
+		-DCONF_OSTYPE="Plan9" -DCONF_MACHTYPE="$objtype-apexp-Plan9" -DPROGRAM="Bash"\
+		-DPACKAGE="Bash" -DPACKAGE_STRING='bash 5.3-release'\
+		-DCONF_VENDOR="apexp" -DCONF_HOSTTYPE="$objtype"\
 		-DHAVE_SYS_RESOURCE_H -DTERM=xterm
 
 CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib $DEFS
+
+
+%.$O: %.c
+	$CC $CFLAGS $stem.c
 
 %.$O: $BASHSRC/%.c
 	$CC $CFLAGS $BASHSRC/$stem.c
