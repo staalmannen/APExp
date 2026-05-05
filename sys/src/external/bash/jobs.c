@@ -310,9 +310,10 @@ static int bgp_delete (pid_t);
 static void bgp_clear (void);
 static int bgp_search (pid_t);
 
-static ps_index_t bgp_getindex (void);
-static void bgp_resize (void);      /* XXX */
+static struct pipeline_saver *alloc_pipeline_saver (void);
 
+static ps_index_t bgp_getindex (void);
+static void bgp_resize (void);	/* XXX */
 
 #if defined (ARRAY_VARS)
 static int *pstatuses;		/* list of pipeline statuses */
@@ -470,6 +471,58 @@ discard_last_procsub_child (void)
     discard_pipeline (disposer);
 }
 
+static struct pipeline_saver *
+alloc_pipeline_saver (void)
+{
+  struct pipeline_saver *ret;
+
+  ret = (struct pipeline_saver *)xmalloc (sizeof (struct pipeline_saver));
+  ret->pipeline = 0;
+  ret->already_making_children = 0;
+  ret->next = 0;
+  return ret;
+}
+
+void
+save_pipeline (int clear)
+{
+  sigset_t set, oset;
+  struct pipeline_saver *saver;
+
+  BLOCK_CHILD (set, oset);
+  saver = alloc_pipeline_saver ();
+  saver->pipeline = the_pipeline;
+  saver->already_making_children = already_making_children;
+  saver->next = saved_pipeline;
+  saved_pipeline = saver;
+  if (clear)
+    the_pipeline = (PROCESS *)NULL;
+  UNBLOCK_CHILD (oset);
+}
+
+PROCESS *
+restore_pipeline (int discard)
+{
+  PROCESS *old_pipeline;
+  sigset_t set, oset;
+  struct pipeline_saver *saver;
+
+  BLOCK_CHILD (set, oset);
+  old_pipeline = the_pipeline;
+  the_pipeline = saved_pipeline->pipeline;
+  already_making_children = saved_pipeline->already_making_children;
+  saver = saved_pipeline;
+  saved_pipeline = saved_pipeline->next;
+  free (saver);
+  UNBLOCK_CHILD (oset);
+
+  if (discard && old_pipeline)
+    {
+      discard_pipeline (old_pipeline);
+      return ((PROCESS *)NULL);
+    }
+  return old_pipeline;
+}
 
 /* Start building a pipeline.  */
 void

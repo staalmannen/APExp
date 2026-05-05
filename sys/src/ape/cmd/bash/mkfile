@@ -16,7 +16,7 @@ OFILES=\
 	error.$O\
 	expr.$O\
 	flags.$O\
-	nojobs.$O\
+	jobs.$O\
 	subst.$O\
 	hashcmd.$O\
 	hashlib.$O\
@@ -51,7 +51,6 @@ OFILES=\
 # tilde -force linking \
 	tilde.$O\
 # hack to fix linking errors \
-	pipeline.$O\
 	shmalloc.$O\
 
 BASHSRC=$APEXPROOT/sys/src/external/bash
@@ -77,7 +76,7 @@ DEFS= 	-DHAVE_CONFIG_H -DLOCALEDIR="/sys/lib/ape/locale" -D_POSIX_SOURCE\
 		-DCONF_OSTYPE="Plan9" -DCONF_MACHTYPE="$objtype-apexp-Plan9" -DPROGRAM="Bash"\
 		-DPACKAGE="Bash" -DPACKAGE_STRING='bash 5.3-release'\
 		-DCONF_VENDOR="apexp" -DCONF_HOSTTYPE="$objtype"\
-		-DHAVE_SYS_RESOURCE_H -DTERM=xterm\
+		-DHAVE_SYS_RESOURCE_H -DTERM=xterm -DJOB_CONTROL\
 
 
 CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib $DEFS
