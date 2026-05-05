@@ -7,7 +7,10 @@
 #define MB_LEN_MAX	4
 #endif
 
+#ifndef UCHAR_MAX
 #define UCHAR_MAX	0xff
+#endif
+
 #define USHRT_MAX	0xffff
 #define UINT_MAX	0xffffffffU
 #define ULONG_MAX	0xffffffffUL
@@ -25,7 +28,9 @@
 #define LLONG_WIDTH	64
 #define ULLONG_WIDTH	64
 
+#ifndef CHAR_MAX
 #define CHAR_MAX	SCHAR_MAX
+#endif
 #define SCHAR_MAX	0x7f
 #define SHRT_MAX	0x7fff
 #define INT_MAX		0x7fffffff
