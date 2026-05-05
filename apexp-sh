@@ -18,4 +18,4 @@ bind -b $cputype/bin /bin
 bind -b rc/bin /bin
 bind -b rc/bin/ape /bin
 bind -b $cputype/bin/ape /bin
-/bin/bash $*
+/bin/sh $*
