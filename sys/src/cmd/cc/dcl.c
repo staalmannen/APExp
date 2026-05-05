@@ -34,7 +34,6 @@ compoundlit(Type *t, Node *initnode)
 	Sym  *s;
 	Node *var, *init, *seq, *p, *q;
 	Decl *d;
-	int class;
 
 	/* Unique hidden name; leading '.' follows Plan 9 convention
 	 * (cf. mkvlasym "_vla%ld", fndecls "__func__"). */
@@ -45,14 +44,8 @@ compoundlit(Type *t, Node *initnode)
 	d = push1(s);
 	d->val   = DAUTO;
 
-	/* C99 §6.5.2.5 p5: compound literal occurs outside function body
-	 * has static storage duration. */
-	class = CAUTO;
-	if(autobn == 0)
-		class = CSTATIC;
-
-	/* Assign a stack or data slot; sets s->class, s->block, s->offset, stkoff. */
-	adecl(class, t, s);
+	/* Assign a stack slot; sets s->class, s->block, s->offset, stkoff. */
+	adecl(CAUTO, t, s);
 
 	/* Must come AFTER adecl() — adecl() unconditionally clears s->aused=0
 	 * for CAUTO symbols (dcl.c ~line 1495), so setting aused before the
@@ -67,7 +60,7 @@ compoundlit(Type *t, Node *initnode)
 	var->type    = t;
 	var->etype   = t->etype;
 	var->xoffset = s->offset;
-	var->class   = s->class;
+	var->class   = CAUTO;
 	var->addable = 1;
 
 	/* Generate assignment tree from the already-parsed ilist. */
