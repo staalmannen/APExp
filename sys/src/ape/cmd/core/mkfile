@@ -2,38 +2,116 @@ APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB= libcoreutils.a$O
+LIB=libcoreutils.a$O
+CORESRC=../../../external/coreutils
 
-TARG=
-
+TARG=\
+	base64\
+	basename\
+	cat\
+	chmod\
+	chown\
+	chroot\
+	cksum\
+	comm\
+	cp\
+	csplit\
+	cut\
+	date\
+	dd\
+	df\
+	dir\
+	dircolors\
+	dirname\
+	du\
+	echo\
+	env\
+	expand\
+	expr\
+	factor\
+	false\
+	fmt\
+	fold\
+	head\
+	id\
+	join\
+	link\
+	ln\
+	logname\
+	ls\
+	mkdir\
+	mkfifo\
+	mknod\
+	mktemp\
+	mv\
+	nl\
+	nproc\
+	nohup\
+	numfmt\
+	od\
+	paste\
+	pathchk\
+	pr\
+	printenv\
+	printf\
+	ptx\
+	pwd\
+	readlink\
+	realpath\
+	rm\
+	rmdir\
+	seq\
+	shred\
+	shuf\
+	sleep\
+	sort\
+	split\
+	stat\
+	sum\
+	sync\
+	tac\
+	tail\
+	tee\
+	test\
+	touch\
+	tr\
+	true\
+	truncate\
+	tsort\
+	tty\
+	uname\
+	unexpand\
+	uniq\
+	unlink\
+	wc\
+	whoami\
+	yes\
 
 LIBOBJS=\
-
+	libcoreutils_a-exitfail.$O\
+	libcoreutils_a-xmalloc.$O\
+	libcoreutils_a-getopt.$O\
+	libcoreutils_a-getopt1.$O\
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
 <$APEXPROOT/sys/src/cmd/mkmany
 
-CORESRC=../../../external/coreutils
-
-CC=pcc
-LD=pcc
-
-CFLAGS=-c -D_POSIX_SOURCE
-
+CFLAGS=-c -I$CORESRC/src -I$CORESRC/lib -D_POSIX_SOURCE -DHAVE_CONFIG_H -DLOCALEDIR=\"/sys/lib/ape/locale\"
 
 %.$O: $CORESRC/src/%.c
-		$CC $CFLAGS $prereq -o $target
+	$CC $CFLAGS $prereq -o $target
 
 libcoreutils_a-%.$O: $CORESRC/lib/%.c
-		$CC $CFLAGS $prereq -o $target
+	$CC $CFLAGS $prereq -o $target
 
 libcoreutils.a$O : $LIBOBJS
-		ar vu libcoreutils.a$O $LIBOBJS
+	ar vu libcoreutils.a$O $LIBOBJS
 
+$O.cp: cp.$O cp-hash.$O copy.$O
+	$CC -o cp cp.$O cp-hash.$O copy.$O libcoreutils.a$O
 
-
-install:V:
-
+$O.chown: chown.$O chown-core.$O
+	$CC -o chown chown.$O chown-core.$O libcoreutils.a$O
 
 
