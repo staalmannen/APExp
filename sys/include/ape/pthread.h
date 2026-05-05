@@ -2,6 +2,14 @@
 #define __PTHREAD_H
 #pragma lib "/$M/lib/ape/libap.a"
 
+typedef struct pthread_once pthread_once_t;
+typedef int pthread_attr_t;
+typedef struct pthread_mutex pthread_mutex_t;
+typedef int pthread_mutexattr_t;
+typedef struct pthread_cond pthread_cond_t;
+typedef int pthread_condattr_t;
+typedef struct pthread_key pthread_key_t;
+
 #define _LOCK_EXTENSION
 #define _QLOCK_EXTENSION
 #include <sys/types.h>
@@ -9,14 +17,7 @@
 #include <lock.h>
 #include <qlock.h>
 
-typedef struct pthread_once pthread_once_t;
 typedef pid_t pthread_t;
-typedef int pthread_attr_t;
-typedef struct pthread_mutex pthread_mutex_t;
-typedef int pthread_mutexattr_t;
-typedef struct pthread_cond pthread_cond_t;
-typedef int pthread_condattr_t;
-typedef struct pthread_key pthread_key_t;
 
 enum {
 	PTHREAD_THREADS_MAX = 1000,

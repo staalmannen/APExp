@@ -4,6 +4,26 @@
 
 #include <stddef.h>
 
+#ifndef _TIME_T
+#define _TIME_T
+typedef long long time_t;
+#endif
+
+#ifndef _CLOCK_T
+#define _CLOCK_T
+typedef long clock_t;
+#endif
+
+#ifndef _CLOCKID_T
+#define _CLOCKID_T
+typedef int clockid_t;
+#endif
+
+struct timespec {
+	time_t tv_sec;
+	long tv_nsec;
+};
+
 #define CLOCKS_PER_SEC 1000
 
 /* obsolsecent, but required */
@@ -16,19 +36,6 @@
 #endif
 #ifndef CLOCK_THREAD_CPUTIME_ID
 #define CLOCK_THREAD_CPUTIME_ID  3
-#endif
-
-#ifndef _CLOCK_T
-#define _CLOCK_T
-typedef long clock_t;
-#endif
-#ifndef _TIME_T
-#define _TIME_T
-typedef long long time_t;
-#endif
-#ifndef _CLOCKID_T
-#define _CLOCKID_T
-typedef int clockid_t;
 #endif
 
 /* musl */
@@ -71,10 +78,6 @@ extern time_t timegm(struct tm *);
 
 extern void tzset(void);
 
-struct timespec {
-	time_t tv_sec;
-	long tv_nsec;
-};
 extern int nanosleep(const struct timespec *req, struct timespec *rem);
 
 #ifdef __cplusplus
