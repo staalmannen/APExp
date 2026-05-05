@@ -3,4 +3,4 @@ Current build status:
 
 - updated sources not ported yet: tar, bash
 - weird build bug: patch
-- new ports to build: pkgconf, slibtool, coreutils, cfront
+- new ports to build: coreutils

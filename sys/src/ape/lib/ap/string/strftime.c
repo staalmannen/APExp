@@ -1,5 +1,6 @@
 #include <time.h>
 #include <string.h>
+#include <locale.h>
 
 static char *awday[7] = { "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat" };
 static char *wday[7] = { "Sunday", "Monday", "Tuesday", "Wednesday", "Thursday",
@@ -126,6 +127,12 @@ strftime(char *s, size_t maxsize, const char *format, const struct tm *t)
 	if(sp<se)
 		*sp = 0;
 	return sp-s;
+}
+
+size_t
+strftime_l(char *s, size_t maxsize, const char *format, const struct tm *t, locale_t locale)
+{
+	return strftime(s, maxsize, format, t);
 }
 
 static char *

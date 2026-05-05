@@ -3,7 +3,6 @@ if(! test -e /sys/include/ape/THIS_IS_APExp) {
     bind -b sys/lib /sys/lib
 	bind -b sys/man /sys/man
     bind -b $cputype/include/ape /sys/include/ape
-    bind -b $cputype/bin /bin
     bind -b $cputype/lib/ape /$cputype/lib/ape
     bind -b sys/include/ape /sys/include/ape
     echo "APExp mounted"

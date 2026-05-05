@@ -25,3 +25,10 @@ mkstemp(char *template)
    free(s);
    return -1;
 }
+
+int mkostemp(char *template, int flags)
+{
+	return mkstemp(template);
+}
+
+

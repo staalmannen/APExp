@@ -56,6 +56,7 @@ extern size_t wcstombs(char *, const wchar_t *, size_t);
 
 extern char *mktemp(char *);
 extern int mkstemp(char *template);
+extern int mkostemp(char *template, int);
 
 /* from musl */
 typedef struct { long long quot, rem; } lldiv_t;

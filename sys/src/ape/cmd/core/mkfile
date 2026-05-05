@@ -2,15 +2,10 @@ APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
 
-LIB=
+LIB= libcoreutils.a$O
 
 TARG=
 
-
-# I will do it the opposite way this time. I will gradually
-# populate LIBOBJS based on linking errors
-# Many of the proposed objects in "libcoreutils" (gnulib)
-# are overlapping with what I already have in libap.a.
 
 LIBOBJS=\
 
@@ -32,6 +27,9 @@ CFLAGS=-c -D_POSIX_SOURCE
 
 libcoreutils_a-%.$O: $CORESRC/lib/%.c
 		$CC $CFLAGS $prereq -o $target
+
+libcoreutils.a$O : $LIBOBJS
+		ar vu libcoreutils.a$O $LIBOBJS
 
 
 

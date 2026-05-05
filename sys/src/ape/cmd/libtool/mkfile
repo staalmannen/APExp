@@ -33,7 +33,7 @@ OFILES=\
 	slbt_symlist_ctx.$O\
 	slbt_txtfile_ctx.$O\
 	slbt_version_info.$O\
-	slbt_archive_import_mri.$O\
+#	slbt_archive_import_mri.$O\
 	slbt_host_flavor.$O\
 	slbt_host_params.$O\
 	slibtool_coff_impl.$O\
@@ -94,7 +94,16 @@ LIB=
 
 <$APEXPROOT/sys/src/cmd/mkone
 
-CFLAGS=-FVp -c -I$LTSRC/include -I$LTSRC/src/internal -D_POSIX_SOURCE -D_XOPEN_SOURCE=700 -D_DEFAULT_SOURCE -D_BSD_SOURCE
+CFLAGS=-FVp -c -I$LTSRC/include -I$LTSRC/src/internal -I$LTSRC/build\
+	-D_POSIX_SOURCE -D_XOPEN_SOURCE=700 -D_DEFAULT_SOURCE\
+	-D_BSD_SOURCE -DSLBT_PACKAGE_DATADIR="/sys/lib/ape/libtool"\
+	-DSLBT_PACKAGE_M4DIR="/sys/lib/ape/m4"\
+	-DSLBT_PREFERRED_HOST_AR="/bin/ar"\
+	-DSLBT_PREFERRED_HOST_AS="/bin/as"\
+	-DSLBT_PREFERRED_HOST_NM="/bin/nm"\
+	-DSLBT_PREFERRED_HOST_RANLIB="/bin/ranlib"\
+	-DSLBT_MACHINE="$objtype"\
+	-DESTALE=EDEADLK
 
 %.$O: $LTSRC/src/%.c
 	$CC $CFLAGS $LTSRC/src/$stem.c

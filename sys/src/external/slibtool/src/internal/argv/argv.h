@@ -543,10 +543,10 @@ static void argv_scan(
 					else if (fnext)
 						fval = false;
 					else
-						fval = ch;
+						fval = (char) ch;
 				}
 			} else {
-				if ((ch == &parg[0][1]) && (ch[0] == 'W') && ch[1]) {
+				if (((char *) ch == &parg[0][1]) && (ch[0] == 'W') && ch[1]) {
 					ferr = ARGV_ERROR_VENDOR_OPTION;
 				} else {
 					ferr = ARGV_ERROR_SHORT_OPTION;

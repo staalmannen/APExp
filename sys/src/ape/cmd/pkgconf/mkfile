@@ -52,9 +52,9 @@ $O.pkgconf: main.$O getopt_long.$O renderer-msvc.$O $LIB
 $O.bomtool: bomtool-main.$O getopt_long.$O $LIB
 		$CC -o $target $prereq
 
-# install:
+#install:
 #		mkdir -p $APEXPROOT/sys/lib/ape/pkgconf/personality.d
-#		cp $PCSRC/pkg.m4 $APEXPROOT/sys/lib/m4
+#		cp $PCSRC/pkg.m4 $APEXPROOT/sys/lib/ape/m4/
 #		mkdir -p $APEXPROOT/sys/man/1
 #		cp $PCSRC/man/pkgconf.1 $APEXPROOT/sys/man/1/pkgconf
 #		cp $PCSRC/man/bomtool.1 $APEXPROOT/sys/man/1/bomtool

@@ -115,7 +115,9 @@ Install paths have been modified so that libraries and binaries are installed in
 - the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" *et al.* have been built from suckless sbase [15]
 - steve's mkmk (/n/sources/contrib) imported to APExp
 - copied "which", and "printenv" rc scripts from steve (/n/sources/contrib)
-- samurai for the ninja build system
+- samurai (version 1.9) for the ninja build system
+- pkgconf (version 2.5.1) for pkg-config
+- slibtool (version 0.7.4) for libtool
 
 
 ***Languages***

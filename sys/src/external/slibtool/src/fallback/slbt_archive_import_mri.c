@@ -16,14 +16,14 @@
 #include <sys/wait.h>
 
 #include <slibtool/slibtool.h>
-#include "slibtool_driver_impl.h"
-#include "slibtool_spawn_impl.h"
-#include "slibtool_dprintf_impl.h"
-#include "slibtool_symlink_impl.h"
-#include "slibtool_readlink_impl.h"
-#include "slibtool_realpath_impl.h"
-#include "slibtool_snprintf_impl.h"
-#include "slibtool_errinfo_impl.h"
+#include "../internal/slibtool_driver_impl.h"
+#include "../internal/slibtool_spawn_impl.h"
+#include "../internal/slibtool_dprintf_impl.h"
+#include "../internal/slibtool_symlink_impl.h"
+#include "../internal/slibtool_readlink_impl.h"
+#include "../internal/slibtool_realpath_impl.h"
+#include "../internal/slibtool_snprintf_impl.h"
+#include "../internal/slibtool_errinfo_impl.h"
 
 #define PPRIX64 "%"PRIx64
 
@@ -135,12 +135,12 @@ int slbt_util_import_archive_mri(
 
 	/* fork */
 	if (pipe(fd))
-		return SLBT_SYSTEM_ERROR(dctx,0);
+		return SLBT_SYSTEM_ERROR(dctx);
 
 	if ((pid = slbt_fork()) < 0) {
 		close(fd[0]);
 		close(fd[1]);
-		return SLBT_SYSTEM_ERROR(dctx,0);
+		return SLBT_SYSTEM_ERROR(dctx);
 	}
 
 	/* child */
@@ -159,7 +159,7 @@ int slbt_util_import_archive_mri(
 
 	if (!dst || !src) {
 		close(fd[1]);
-		return SLBT_SYSTEM_ERROR(dctx,0);
+		return SLBT_SYSTEM_ERROR(dctx);
 	}
 
 	fmt = "OPEN %s\n"
@@ -169,7 +169,7 @@ int slbt_util_import_archive_mri(
 
 	if (slbt_dprintf(fd[1],fmt,dst,src) < 0) {
 		close(fd[1]);
-		return SLBT_SYSTEM_ERROR(dctx,0);
+		return SLBT_SYSTEM_ERROR(dctx);
 	}
 
 	close(fd[1]);
