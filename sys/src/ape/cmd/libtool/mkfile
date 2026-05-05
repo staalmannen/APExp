@@ -8,21 +8,134 @@ BIN=$APEXPROOT/$objtype/bin/ape
 TARG=slibtool-static
 
 OFILES=\
-
+	slbt_archive_ctx.$O\
+	slbt_archive_dlsyms.$O\
+	slbt_archive_mapfile.$O\
+	slbt_archive_mapstrv.$O\
+	slbt_archive_merge.$O\
+	slbt_archive_meta.$O\
+	slbt_archive_store.$O\
+	slbt_archive_symfile.$O\
+	slbt_archive_syminfo.$O\
+	slbt_armap_bsd_32.$O\
+	slbt_armap_bsd_64.$O\
+	slbt_armap_sysv_32.$O\
+	slbt_armap_sysv_64.$O\
+	slbt_au_output_arname.$O\
+	slbt_au_output_dlsyms.$O\
+	slbt_au_output_mapfile.$O\
+	slbt_au_output_members.$O\
+	slbt_au_output_symbols.$O\
+	slbt_amain.$O\
+	slbt_driver_ctx.$O\
+	slbt_link_params.$O\
+	slbt_split_argv.$O\
+	slbt_symlist_ctx.$O\
+	slbt_txtfile_ctx.$O\
+	slbt_version_info.$O\
+	slbt_archive_import_mri.$O\
+	slbt_host_flavor.$O\
+	slbt_host_params.$O\
+	slibtool_coff_impl.$O\
+	slibtool_dprintf_impl.$O\
+	slibtool_errinfo_impl.$O\
+	slibtool_lconf_impl.$O\
+	slibtool_libmeta_impl.$O\
+	slibtool_m4fake_impl.$O\
+	slibtool_mapfile_impl.$O\
+	slibtool_mkvars_impl.$O\
+	slibtool_objlist_impl.$O\
+	slibtool_objmeta_impl.$O\
+	slibtool_pecoff_impl.$O\
+	slibtool_realpath_impl.$O\
+	slibtool_snprintf_impl.$O\
+	slibtool_symlink_impl.$O\
+	slibtool_tmpfile_impl.$O\
+	slibtool_txtline_impl.$O\
+	slbt_linkcmd_archive.$O\
+	slbt_linkcmd_argv.$O\
+	slbt_linkcmd_deps.$O\
+	slbt_linkcmd_dsolib.$O\
+	slbt_linkcmd_executable.$O\
+	slbt_linkcmd_host.$O\
+	slbt_linkcmd_implib.$O\
+	slbt_exec_ar.$O\
+	slbt_exec_compile.$O\
+	slbt_exec_ctx.$O\
+	slbt_exec_execute.$O\
+	slbt_exec_install.$O\
+	slbt_exec_link.$O\
+	slbt_exec_stoolie.$O\
+	slbt_exec_uninstall.$O\
+	slbt_output_config.$O\
+	slbt_output_error.$O\
+	slbt_output_exec.$O\
+	slbt_output_fdcwd.$O\
+	slbt_output_features.$O\
+	slbt_output_info.$O\
+	slbt_output_machine.$O\
+	slbt_output_mapfile.$O\
+	slbt_skin_ar.$O\
+	slbt_skin_default.$O\
+	slbt_skin_install.$O\
+	slbt_skin_stoolie.$O\
+	slbt_skin_uninstall.$O\
+	slbt_stoolie_ctx.$O\
+	slbt_archive_import.$O\
+	slbt_copy_file.$O\
+	slbt_create_mapfile.$O\
+	slbt_create_symfile.$O\
+	slbt_dump_machine.$O\
+	slbt_map_input.$O\
+	slbt_realpath.$O\
+	slibtool.$O\
 
 LIB=
 
 <$APEXPROOT/sys/src/cmd/mkone
 
-CFLAGS=-FVp -c -I$LTSRC/include
+CFLAGS=-FVp -c -I$LTSRC/include -I$LTSRC/src/internal -D_POSIX_SOURCE -D_XOPEN_SOURCE=700 -D_DEFAULT_SOURCE -D_BSD_SOURCE
+
+%.$O: $LTSRC/src/%.c
+	$CC $CFLAGS $LTSRC/src/$stem.c
+
+%.$O: $LTSRC/src/arbits/%.c
+	$CC $CFLAGS $LTSRC/src/arbits/$stem.c
+
+%.$O: $LTSRC/src/arbits/output/%.c
+	$CC $CFLAGS $LTSRC/src/arbits/output/$stem.c
+
+%.$O: $LTSRC/src/driver/%.c
+	$CC $CFLAGS $LTSRC/src/driver/$stem.c
+
+%.$O: $LTSRC/src/fallback/%.c
+	$CC $CFLAGS $LTSRC/src/fallback/$stem.c
+
+%.$O: $LTSRC/src/host/%.c
+	$CC $CFLAGS $LTSRC/src/host/$stem.c
+
+%.$O: $LTSRC/src/internal/%.c
+	$CC $CFLAGS $LTSRC/src/internal/$stem.c
+
+%.$O: $LTSRC/src/logic/%.c
+	$CC $CFLAGS $LTSRC/src/logic/$stem.c
+
+%.$O: $LTSRC/src/logic/linkcmd/%.c
+	$CC $CFLAGS $LTSRC/src/logic/linkcmd/$stem.c
+
+%.$O: $LTSRC/src/output/%.c
+	$CC $CFLAGS $LTSRC/src/output/$stem.c
+
+%.$O: $LTSRC/src/skin/%.c
+	$CC $CFLAGS $LTSRC/src/skin/$stem.c
+
+%.$O: $LTSRC/src/stoolie/%.c
+	$CC $CFLAGS $LTSRC/src/stoolie/$stem.c
+
+%.$O: $LTSRC/src/util/%.c
+	$CC $CFLAGS $LTSRC/src/util/$stem.c
 
 install:V:
 	cp $LTSRC/m4/sltdl.m4 $APEXPROOT/sys/lib/ape/m4/
 	cp $LTSRC/m4/slibtool.m4 $APEXPROOT/sys/lib/ape/m4/
 	cp $LTSRC/m4/slibtool.m4 $APEXPROOT/sys/lib/ape/m4/libtool.m4
-
-
-
-
-
-
