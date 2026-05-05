@@ -16,7 +16,7 @@
    GNU General Public License for more details.
 
    You should have received a copy of the GNU General Public License
-   along with Bash.  If not, see <http://www.gnu.org/licenses/>.
+   along with Bash.  If not, see <http://www.gnu.org/licenses/> collsym.
 */
 
 #include <config.h>
@@ -439,7 +439,9 @@ collseqcmp_wc (wint_t c, wint_t equiv)
 #  define _COLLSYM	_collwcsym
 #  define __COLLSYM	__collwcsym
 #  define POSIXCOLL	posix_collwcsyms
+#define Lwide
 #  include "collsyms.h"
+#undef Lwide
 
 static wint_t
 collwcsym (wchar_t *s, int len)
@@ -477,7 +479,7 @@ is_wcclass (wint_t wc, wchar_t *name)
 
   want_word = (wcscmp (name, L"word") == 0);
   if (want_word)
-    name = L"alnum";
+    name = (unsigned short *) L"alnum";
 
   memset (&state, '\0', sizeof (mbstate_t));
   mbs = (char *) malloc (wcslen(name) * MB_CUR_MAX + 1);

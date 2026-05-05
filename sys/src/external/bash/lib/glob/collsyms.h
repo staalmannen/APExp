@@ -30,7 +30,11 @@ typedef struct _COLLSYM {
 } __COLLSYM;
 
 #undef L
+#ifdef Lwide
+#define L(CS) (unsigned short *) CS
+#else
 #define L(CS) (char *) CS
+#endif
 
 static __COLLSYM POSIXCOLL [] =
 {

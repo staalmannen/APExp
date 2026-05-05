@@ -99,7 +99,6 @@ tilde.$O: $BASHSRC/lib/tilde/tilde.c
 libsh.a$O: $BASHSRC/lib/sh/Makefile
 			make -C $BASHSRC/lib/sh
 			mv $BASHSRC/lib/sh/libsh.a libsh.a$O
-			ar d libsh.a$O strtoimax.o # conflict with libap
 			rm $BASHSRC/lib/sh/*.o
 
 libglob.a$O: $BASHSRC/lib/glob/Makefile
