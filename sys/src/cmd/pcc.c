@@ -59,10 +59,6 @@ main(int argc, char *argv[])
 	oname = ot->oname;
 	append(&cpp, "cpp");
 	append(&cpp, "-D__STDC__=1");	/* ANSI says so */
-	append(&cpp, smprint("-D__%s__=1", ot->name));
-	if(strcmp(ot->name, "amd64") == 0 || strcmp(ot->name, "arm64") == 0 ||
-	   strcmp(ot->name, "power64") == 0 || strcmp(ot->name, "sparc64") == 0)
-		append(&cpp, "-D_BITS64");
 	append(&cpp, "-N");		/* turn off standard includes */
 	append(&cc, ot->cc);
 	append(&ld, ot->ld);
