@@ -1,5 +1,6 @@
 #include <config.h>
 #include <bashansi.h>
+#include "command.h"
 #include "jobs.h"
 #include "general.h"
 #include "trap.h"
