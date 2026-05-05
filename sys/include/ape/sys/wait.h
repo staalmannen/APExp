@@ -19,6 +19,7 @@
 #define WTERMSIG(s)	((s) & 0xFF)
 #define WIFSTOPPED(s)	(0)
 #define WSTOPSIG(s)	(0)
+#define WIFCONTINUED(s) (0)
 #endif
 
 #ifdef __cplusplus
