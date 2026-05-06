@@ -2044,6 +2044,7 @@ extern TOK lalex__Fv(void);
 static TOK lookahead__Fv(void);
 
 static int la_decl__Fi(int);
+static int la_range_for__Fv(void);
 
 void check_decl__Fv(void) {
     TOK __1tk2;
@@ -3142,6 +3143,10 @@ gettok:
         case 23:
             ++in_new;
             break;
+        case 16: /* FOR: check for range-for */
+            if (la_range_for__Fv())
+                __1tk = 215; /* RANGE_FOR */
+            break;
         }
     ret:
         lasttk = __1tk;
@@ -3333,6 +3338,51 @@ int la_cast__Fv(void) {
 extern void UNSET_SCOPE__Fv(void);
 
 extern Pname SET_SCOPE__FP4name(Pname);
+
+/* Scan ahead from the current front of token queue to detect
+ * a range-based for: for (T v : range) rather than for (init; cond; incr).
+ * Returns 1 if a bare ':' is found at paren depth 1 before any ';'.
+ * Called after FOR has been consumed, so front -> '(' ... ')'.
+ */
+static int la_range_for__Fv(void) {
+    struct toknode *__1t;
+    int __1depth = 0;
+    int __1quest_at1 = 0; /* saw '?' at depth 1 */
+
+    if (front == 0)
+        add_tokens__Fv();
+
+    for (__1t = front; __1t != 0; __1t = __1t->next__7toknode) {
+        TOK __1tok = __1t->tok__7toknode;
+
+        if (__1tok == 40) {           /* LP ( */
+            ++__1depth;
+        } else if (__1tok == 41) {    /* RP ) */
+            if (--__1depth <= 0)
+                return 0;
+        } else if (__1tok == 68) {    /* QUEST ? */
+            if (__1depth == 1)
+                __1quest_at1 = 1;
+        } else if (__1tok == 69) {    /* COLON : */
+            if (__1depth == 1) {
+                if (__1quest_at1) {
+                    __1quest_at1 = 0; /* ternary ':', not range-for ':' */
+                } else {
+                    return 1;         /* range-for detected */
+                }
+            }
+        } else if (__1tok == 72) {    /* SM ; */
+            if (__1depth <= 1)
+                return 0;             /* traditional for */
+        } else if (__1tok == 0) {     /* EOFTOK */
+            return 0;
+        }
+
+        if (__1t->next__7toknode == 0)
+            add_tokens__Fv();
+    }
+    return 0;
+}
 
 static int la_decl__Fi(int __1arg_decl) {
     ;

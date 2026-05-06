@@ -5460,6 +5460,13 @@ Pstmt simpl__4stmtFv(register struct stmt *__0this) {
         break;
     }
 
+    case 215: /* RANGE_FOR -- simplify range expression and body */
+        if (__0this->__O2__4stmt.e)
+            simpl__4exprFv(__0this->__O2__4stmt.e);
+        if (__0this->s__4stmt)
+            simpl__4stmtFv(__0this->s__4stmt);
+        break;
+
     case 98: /* CATCH stmt -- simplify catch body */
         if (__0this->s__4stmt)
             simpl__4stmtFv(__0this->s__4stmt);

@@ -2960,6 +2960,28 @@ void dcl__4stmtFi(register struct stmt *__0this, int __1forflag) {
                 curr_loop = __2old_loop;
                 break;
 
+            case 215: { /* RANGE_FOR */
+                Pstmt __4old_loop215;
+                __4old_loop215 = curr_loop;
+                curr_loop = __1ss;
+                /* type-check the range expression */
+                if (__1ss->__O2__4stmt.e && __1ss->__O2__4stmt.e != dummy)
+                    __1ss->__O2__4stmt.e = typ__4exprFP5table(__1ss->__O2__4stmt.e, __2tbl);
+                /* declare the loop variable: pretend ARG scope so that
+                 * "uninitializedR"/"uninitialized const" checks are suppressed.
+                 * The actual initialisation is emitted by print.c in the C output. */
+                if (__1ss->__O1__4stmt.d) {
+                    __1ss->__O1__4stmt.d->n_scope__4name = 136; /* ARG */
+                    dcl__4nameFP5tableUc(__1ss->__O1__4stmt.d, __2tbl, (unsigned char)0);
+                    __1ss->__O1__4stmt.d->n_scope__4name = 0;
+                }
+                /* process the body */
+                if (__1ss->s__4stmt)
+                    dcl__4stmtFi(__1ss->s__4stmt, 0);
+                curr_loop = __4old_loop215;
+                break;
+            }
+
             case 118: {
                 int __4non_trivial;
                 int __4count;

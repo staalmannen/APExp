@@ -275,6 +275,7 @@ extern const char* keys[MAXTOK+1];
 #define VEC_DELETE       212
 #define VEC_NEW          213
 #define DUMMY_LAST_NODE  214
+#define RANGE_FOR        215
 
 //-------------------------------------------------------------------------
 // oper values for type::check	

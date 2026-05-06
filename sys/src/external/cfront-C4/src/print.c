@@ -2703,6 +2703,64 @@ void print__4stmtFv(register struct stmt *__0this) {
         }
         break;
 
+    case 215: /* RANGE_FOR: for (T v : range) body
+     * Desugar to C using __typeof__ (gcc/kencc extension).
+     * For array ranges:   uses sizeof(arr)/sizeof(arr[0]).
+     * For other ranges:   assumes .begin()/.end() have been
+     *                     translated to C calls by cfront earlier.
+     */
+    {
+        Pexpr __2rng = __0this->__O2__4stmt.e;
+        Pname __2var = __0this->__O1__4stmt.d;
+        Pstmt __2body = __0this->s__4stmt;
+        Ptype __2rtp = __2rng ? __2rng->__O1__4expr.tp : 0;
+        int __2is_array = __2rtp && (__2rtp->base__4node == 110); /* VEC */
+        static int __2rf_ctr = 0;
+        int __2rfid = ++__2rf_ctr;
+
+        /* Open enclosing block */
+        puttok__FUc((unsigned char)73); /* LC { */
+
+        if (__2is_array) {
+            /* Array: T *__rfb_N = arr; T *__rfe_N = __rfb_N + sizeof(arr)/sizeof(arr[0]); */
+            fprintf(out_file, "__typeof__(*(");
+            print__4exprFv(__2rng);
+            fprintf(out_file, ")) *__rfb%d=(", __2rfid);
+            print__4exprFv(__2rng);
+            fprintf(out_file, "), *__rfe%d=__rfb%d+sizeof(", __2rfid, __2rfid);
+            print__4exprFv(__2rng);
+            fprintf(out_file, ")/sizeof((");
+            print__4exprFv(__2rng);
+            fprintf(out_file, ")[0]);\n");
+        } else {
+            /* Container: store ref, then get begin/end iterators */
+            fprintf(out_file, "__typeof__(");
+            print__4exprFv(__2rng);
+            fprintf(out_file, ") *__rfr%d=&(", __2rfid);
+            print__4exprFv(__2rng);
+            fprintf(out_file, ");\n__typeof__((__rfr%d)->begin()) __rfb%d=(__rfr%d)->begin(), __rfe%d=(__rfr%d)->end();\n",
+                    __2rfid, __2rfid, __2rfid, __2rfid, __2rfid);
+        }
+
+        /* for (; __rfb_N != __rfe_N; ++__rfb_N) { */
+        fprintf(out_file, "for(;__rfb%d!=__rfe%d;++__rfb%d)", __2rfid, __2rfid, __2rfid);
+        puttok__FUc((unsigned char)73); /* { */
+
+        /* Declare loop variable: T v = *__rfb_N; */
+        if (__2var) {
+            print__4nameFUc(__2var, (unsigned char)1);
+            fprintf(out_file, "=*__rfb%d;\n", __2rfid);
+        }
+
+        /* Print body */
+        if (__2body)
+            print__4stmtFv(__2body);
+
+        puttok__FUc((unsigned char)74); /* } */
+        puttok__FUc((unsigned char)74); /* } close enclosing block */
+        break;
+    }
+
     case 100: /* TRY handler -- setjmp/longjmp EH transformation */
     {
         static int __s_eh_ctr = 0;

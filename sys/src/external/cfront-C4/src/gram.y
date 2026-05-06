@@ -623,6 +623,7 @@ ll:
 %token CATCH		98
 %token THROW		99
 %token TRY		100
+%token RANGE_FOR	215
 
 %token TNAME	  123
 %token EMPTY	  124
@@ -679,7 +680,7 @@ ll:
 %type <sl>	handler_list
 %type <ps>	handler
 %type <l>	LC RC SWITCH CASE DEFAULT FOR IF DO WHILE GOTO RETURN DELETE
-		BREAK CONTINUE
+		BREAK CONTINUE RANGE_FOR
 %type <t>	oper ellipsis_opt
 		EQUOP DIVOP SHIFTOP ICOP RELOP GT LT ASOP
 		ANDAND OROR PLUS MINUS MUL ASSIGN OR ER AND
@@ -2375,6 +2376,11 @@ statement	:  simple sm
 			}
 		|  TRY block handler_list
 			{ $$ = new handler( $<ps>2, stmt_unlist($<sl>3) ); }
+		|  RANGE_FOR LP type arg_decl COLON e RP caselab_stmt
+			{
+				stmt_seen=1;
+				$$ = new rangeforstmt($<l>1, Ndata($3,$<pn>4), $<pe>6, $<ps>8);
+			}
 		;
 
 
