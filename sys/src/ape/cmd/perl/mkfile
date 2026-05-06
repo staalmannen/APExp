@@ -1,0 +1,17 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+TARG=perl
+
+OFILES=perlmain.$O
+
+LIB=$APEXPROOT/$objtype/lib/ape/libperl.a $APEXPROOT/$objtype/lib/ape/libap.a
+BIN=$APEXPROOT/$objtype/bin/ape
+
+<$APEXPROOT/sys/src/cmd/mkone
+
+PERLSRC=../../../external/perl
+CFLAGS=-c -I$PERLSRC -D_POSIX_SOURCE -DHAVE_CONFIG_H -D_PLAN9_SOURCE -D_BSD_EXTENSION
+
+%.$O: $PERLSRC/%.c
+	$CC $CFLAGS $prereq -o $target

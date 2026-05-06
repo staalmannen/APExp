@@ -1,0 +1,31 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libperl.a
+PERLSRC=../../../external/perl
+
+OFILES=\
+	av.$O builtin.$O caretx.$O class.$O \
+	deb.$O doio.$O doop.$O dquote.$O \
+	dump.$O globals.$O gv.$O hv.$O \
+	keywords.$O locale.$O mathoms.$O mg.$O \
+	mro_core.$O numeric.$O pad.$O peep.$O \
+	perlio.$O perly.$O pp.$O pp_ctl.$O \
+	pp_hot.$O pp_pack.$O pp_sort.$O pp_sys.$O \
+	reentr.$O regcomp.$O regcomp_debug.$O \
+	regcomp_invlist.$O regcomp_study.$O regcomp_trie.$O \
+	regexec.$O run.$O scope.$O sv.$O \
+	taint.$O time64.$O toke.$O utf8.$O \
+	util.$O \
+	# Generated bootstrap sources
+	opmini.$O \
+	perlmini.$O \
+	universalmini.$O \
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CFLAGS=-c -I$PERLSRC -D_POSIX_SOURCE -DHAVE_CONFIG_H -D_PLAN9_SOURCE -D_BSD_EXTENSION
+
+%.$O: $PERLSRC/%.c
+	$CC $CFLAGS $prereq -o $target
