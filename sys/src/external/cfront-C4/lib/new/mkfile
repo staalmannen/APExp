@@ -13,6 +13,8 @@ CFLAGS=-FV -I.
 CCX=../../src/$O.out
 CC=pcc
 
+CLEANFILES= *.c
+
 %.c: %.cpp
 	$CCX $prereq >%.c
 

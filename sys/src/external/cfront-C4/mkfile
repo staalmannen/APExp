@@ -4,6 +4,7 @@ DIRS=\
 	src\
 	tools\
 	lib\
+	h
 
 none:V:
 	echo mk all, install, installall, clean, or nuke

@@ -5,7 +5,7 @@ OFILES=Bits.$O alloc.$O block.$O dcl.$O dcl2.$O dcl3.$O \
 	expr2.$O expr3.$O find.$O hash.$O lalex.$O lex.$O \
 	main.$O norm2.$O print.$O print2.$O repr.$O \
 	simpl.$O simpl2.$O size.$O table.$O template.$O \
-	tree_copy.$O tree_walk.$O typ.$O typ2.$O norm.$O y-tab.$O \
+	tree_copy.$O tree_walk.$O typ.$O typ2.$O norm.$O pregen-y-tab.$O \
 	cfront_stubs.$O _stdio.$O
 
 TARG=cfront
@@ -23,7 +23,10 @@ CFLAGS=-FV
 
 $OFILES:	cfront.h token.h typedef.h cfront_translated.h
 
-# Parser is built from the pre-generated C translation of gram.y
-y-tab.$O:	pregen-y.tab.c cfront.h token.h typedef.h cfront_translated.h
-	$CC $CFLAGS -c -o y-tab.$O pregen-y.tab.c
+# pregen-y.tab.c is built from the pre-generated C translation of gram.y
+# it is simply a copy of y.tab.c, but with a different name because mk
+# will claim duplicate sources if y.tab.c and a .y file is in the sources
+# the alternative would be to delete y.tab.c and let yacc translate gram.y
+# each time mk is invoked.
+
 

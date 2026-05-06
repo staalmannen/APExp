@@ -13,8 +13,11 @@ NOT_IMPLEMENTED = event.$O
 CFLAGS=-FV -I./task -D_POSIX_SOURCE -D_BSD_EXTENSION
 # if the user is only running mk
 # if cfront is installed: CCX=cfront
+
 CCX=../../src/$O.out
 CC=pcc
+
+CLEANFILES= *.c
 
 %.c: task/%.cpp
 	$CCX $prereq >%.c
