@@ -19,7 +19,7 @@ any actual or intended publication of such source code.
 *    All rights reserved.
 *******************************************************************************/
 
-#ifndef __GNUC__
+#if !defined(__GNUC__) && !defined(__cfront_have_bool)
 enum bool { false, true };
 #endif
 
