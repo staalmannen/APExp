@@ -5,4 +5,3 @@
  * Do not edit!
  */
 
-#define PIPESIZE 144640
