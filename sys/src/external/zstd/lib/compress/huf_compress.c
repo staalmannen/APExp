@@ -763,9 +763,7 @@ HUF_buildCTable_wksp(HUF_CElt* CTable, const unsigned* count, U32 maxSymbolValue
     int nonNullRank;
 
     /* HUF_STATIC_ASSERT(HUF_CTABLE_WORKSPACE_SIZE == sizeof(HUF_buildCTable_wksp_tables)); */
-    #if HUF_CTABLE_WORKSPACE_SIZE != sizeof(HUF_buildCTable_wksp_tables)
-    #  error "HUF_CTABLE_WORKSPACE_SIZE mismatch!"
-    #endif
+    assert(HUF_CTABLE_WORKSPACE_SIZE == sizeof(HUF_buildCTable_wksp_tables));
 
     DEBUGLOG(5, "HUF_buildCTable_wksp (alphabet size = %u)", maxSymbolValue+1);
 
@@ -1347,9 +1345,7 @@ HUF_compress_internal (void* dst, size_t dstSize,
 
     DEBUGLOG(5, "HUF_compress_internal (srcSize=%zu)", srcSize);
     /* HUF_STATIC_ASSERT(sizeof(*table) + HUF_WORKSPACE_MAX_ALIGNMENT <= HUF_WORKSPACE_SIZE); */
-    #if sizeof(*table) + HUF_WORKSPACE_MAX_ALIGNMENT > HUF_WORKSPACE_SIZE
-    #  error "HUF_WORKSPACE_SIZE too small!"
-    #endif
+    assert(sizeof(*table) + HUF_WORKSPACE_MAX_ALIGNMENT <= HUF_WORKSPACE_SIZE);
 
     /* checks & inits */
     if (wkspSize < sizeof(*table)) return ERROR(workSpace_tooSmall);
