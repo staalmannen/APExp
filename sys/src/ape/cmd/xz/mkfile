@@ -1,9 +1,14 @@
 APEXPROOT=../../../../..
 APE=$APEXPROOT/sys/src/ape
 <$APE/config
-TARG=xz
 
-OFILES=\
+TARG=\
+	xz\
+	unxz xzcat lzma unlzma lzcat\
+	xzdec\
+	lzmadec
+
+XZFILES=\
 	args.$O\
 	coder.$O\
 	file_io.$O\
@@ -26,14 +31,21 @@ OFILES=\
 	tuklib_mbstr_wrap.$O\
 	tuklib_mbstr_nonprint.$O\
 
+DECFILES=\
+	xzdec.$O\
+#	../common\
+	tuklib_progname.$O\
+	tuklib_exit.$O\
+	tuklib_mbstr_nonprint.$O
 
-LIB=$APEXPROOT/$objtype/lib/ape/liblzma.a $APEXPROOT/$objtype/lib/ape/libap.a
+
+LIB=$APEXPROOT/$objtype/lib/ape/liblzma.a
 BIN=$APEXPROOT/$objtype/bin/ape
 
-<$APEXPROOT/sys/src/cmd/mkone
+<$APEXPROOT/sys/src/cmd/mkmany
 
 XZSRC=../../../external/xz
-LINKS=unxz xzcat lzma unlzma lzcat
+LINKS=
 
 XZINC=-I$XZSRC -I$XZSRC/lib -I$XZSRC/src/common\
 	-I$XZSRC/src/liblzma -DASSUME_RAM=128\
@@ -46,15 +58,43 @@ CFLAGS= -c -D_POSIX_SOURCE -D_BSD_EXTENSION $XZINC
 %.$O: $XZSRC/src/xz/%.c
     $CC $CFLAGS $XZSRC/src/xz/$stem.c
 
+%.$O: $XZSRC/src/xzdec/%.c
+    $CC $CFLAGS $XZSRC/src/xzdec/$stem.c
+
 %.$O: $XZSRC/src/common/%.c
     $CC $CFLAGS $XZSRC/src/common/$stem.c
 
 %.$O: $XZSRC/lib/%.c
     $CC $CFLAGS $XZSRC/lib/$stem.c
 
-install:V:
-	for (i in $LINKS)
-		@{ cp $BIN/xz $BIN/$i }
+
+$O.xz: $XZFILES
+	$LD $prereq -o $target
+
+$O.unxz: $O.xz
+	cp $prereq $target
+
+$O.xzcat: $O.xz
+	cp $prereq $target
+
+$O.lzma: $O.xz
+	cp $prereq $target
+
+$O.unlzma: $O.xz
+	cp $prereq $target
+
+$O.lzcat: $O.xz
+	cp $prereq $target
+
+$O.xzdec: $DECFILES
+	$LD $prereq -o $target
+
+$O.lzmadec: $O.xzdec
+	cp $prereq $target
+
+
+
+
 
 
 

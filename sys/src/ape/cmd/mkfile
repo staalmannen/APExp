@@ -35,7 +35,7 @@ _OPTIONAL_APPS=\
 	unarj\
 	unrar\
 	xz\
-	xzdec\
+#	zstd\
 #	tar\
 # languages and transpilers \
 	lua\

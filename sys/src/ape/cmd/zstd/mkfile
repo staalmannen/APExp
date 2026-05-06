@@ -1,0 +1,64 @@
+APEXPROOT=../../../../..
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+TARG=\
+	zstd\
+	unzstd\
+	zstdcat\
+	zstdmt\
+	zstdless\
+	zstdgrep\
+
+ZSTDFILES=\
+	zstdcli.$O\
+	fileio.$O\
+	fileio_asyncio.$O\
+	util.$O\
+	timefn.$O\
+	datagen.$O\
+	dibio.$O\
+	benchfn.$O\
+	benchzstd.$O\
+	zstdcli_trace.$O\
+
+LIB=$APEXPROOT/$objtype/lib/ape/libzstd.a\
+	$APEXPROOT/$objtype/lib/ape/libz.a\
+	$APEXPROOT/$objtype/lib/ape/liblzma.a\
+
+BIN=$APEXPROOT/$objtype/bin/ape
+
+<$APEXPROOT/sys/src/cmd/mkmany
+
+ZSTDSRC=../../../external/zstd
+
+ZSTDINC=-I$ZSTDSRC/lib -I$ZSTDSRC/programs
+
+DEFS= -DZSTD_MULTITHREAD -DHAVE_PTHREAD -DZSTD_GZCOMPRESS -DZSTD_GZDECOMPRESS\
+	-DZSTD_LZMACOMPRESS -DZSTD_LZMADECOMPRESS -DZSTD_LEGACY_SUPPORT=1\
+	-DBACKTRACE_ENABLE=0
+
+CFLAGS= -c -D_POSIX_SOURCE -D_BSD_EXTENSION $ZSTDINC $DEFS
+
+%.$O: $ZSTDSRC/programs/%.c
+	$CC $CFLAGS $prereq -o $target
+
+$O.zstd: $ZSTDFILES
+	$LD $prereq -o $target
+
+$O.unzstd: $O.zstd
+	cp $prereq $target
+
+$O.zstdcat: $O.zstd
+	cp $prereq $target
+
+$O.zstdmt: $O.zstd
+	cp $prereq $target
+
+$O.zstdless: $O.zstd
+	cp $prereq $target
+
+$O.zstdgrep: $O.zstd
+	cp $prereq $target
+
+
