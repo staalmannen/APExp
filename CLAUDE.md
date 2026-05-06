@@ -254,7 +254,8 @@ token. Two grammar contexts:
 
 **Done:** `_Static_assert`, `nullptr`, `[[attributes]]`, `#elifdef`/`#elifndef`,
 `_Alignof`/`_Alignas`(query), `_Generic`, `typeof`, `static_assert`, `alignof`,
-anonymous structs/unions, digit separators (all 8 loops), `__builtin_*` swallowing.
+anonymous structs/unions, digit separators (all 8 loops), `__builtin_*` swallowing,
+`auto` type deduction.
 
 **Not yet done (priority order):**
 1. `typeof_unqual` qualifier stripping (currently alias)
@@ -263,7 +264,34 @@ anonymous structs/unions, digit separators (all 8 loops), `__builtin_*` swallowi
 4. `_Generic` is done; `tgmath.h` now exists using it
 5. Digit separators in float exponent (casep loop) — verify
 6. `constexpr` objects (C23)
-7. `auto` type deduction (C23, large effort)
+
+### `auto` Type Deduction (C23 §6.7.10.2)
+
+Location: `sys/src/cmd/cc/cc.y`
+
+**Design:** New `autoadlist` non-terminal entered when LAUTO appears without an
+accompanying explicit type specifier. Avoids the mid-rule action timing problem in
+the existing `adlist` rule by parsing the full declarator and initializer before
+calling `dodecl`.
+
+**How it works:**
+- `auto x = expr;` — `complex(expr)` is called to type-check the initializer, then
+  `auto_deduct_type()` extracts the type and strips top-level const/volatile (§6.7.10.2).
+  `dodecl(adecl, CAUTO, deduced_type, xdecor)` is called with the real type.
+- `auto *p = ptr;` — `dcl_ind_depth()` counts OIND levels in the declarator;
+  that many TIND layers are stripped from the initializer type before `dodecl` wraps
+  them back. Net result: `p` gets the initializer's pointer type.
+- `auto x;` (bare, no init) — backward compat: declares `int` (C89 §6.7.1).
+- `auto x = e1, y = e2;` — multiple deductions in one declaration.
+- `for(auto x = ...; ...)` — supported via `forexpr: LAUTO autoadlist`.
+
+**LALR(1) conflicts:** LAUTO + LNAME/`*`/`(` creates a shift-reduce conflict with
+the existing `ctlist adlist` path (where `LAUTO → cname → ...`). Yacc's default
+shift-preference picks `autoadlist`, which is correct. For `;` after LAUTO, only
+the cname reduce applies (no conflict), so `auto;` still parses normally.
+
+**Limitation:** `auto int x = 5;` (bare auto with explicit type) now causes a parse
+error — this syntax is invalid C23 anyway and was never written in practice.
 
 ---
 

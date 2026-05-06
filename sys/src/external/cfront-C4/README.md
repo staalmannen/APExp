@@ -320,11 +320,10 @@ header causes Plan 9's pcc to auto-link the runtime library.
 2. **`<complex>` header** — add `h/complex.h` wrapping the existing `lib/complex/`
    implementation with a proper `template <class T> class complex` interface.
 
-3. **`auto` type deduction** — cfront does not support C++11 `auto`. This is
-   also a pending item in the APExp C compiler (`apexp_compiler_improvements.md`).
-   Both improvements are linked: once the Plan 9 pcc can deduce types for `auto`
-   declarations in generated C, cfront can be taught to emit `auto`-carrying
-   constructs. See APExp compiler work for status.
+3. **`auto` type deduction** — cfront does not support C++11 `auto`. The APExp
+   C compiler now supports C23 `auto` type deduction (implemented in `cc.y`),
+   so generated C code with explicit types works correctly on APExp pcc. Teaching
+   cfront to emit `auto`-carrying constructs is a future enhancement.
 
 4. **`mutable` and `explicit`** — silently ignore `mutable` (add to the
    attribute-swallow list in `lex.c`); for `explicit`, add a token that is
@@ -350,7 +349,7 @@ Several improvements benefit both the Plan 9 C compiler and cfront-C4:
 | Item | APExp compiler status | cfront status |
 |------|-----------------------|---------------|
 | `bool`/`true`/`false` as keywords | Done (C23) | Done (template.h guarded with `-D__cfront_have_bool`) |
-| `auto` type deduction | Not implemented | Not implemented |
+| `auto` type deduction | Done (C23 §6.7.10.2, `cc.y` autoadlist) | Applicable — cfront emits C with explicit types |
 | `typeof_unqual` | Done | N/A (cfront emits C) |
 | `__VA_OPT__` | Done | N/A |
 | Wide character support | Available (`wchar_t` via Rune mapping, libap) | Usable — cfront-compiled code can call wchar functions |
