@@ -5,9 +5,9 @@
 #undef	ARG_MAX
 #define	ARG_MAX		65536
 #undef	CHILD_MAX
-#define	CHILD_MAX	256
+#define	CHILD_MAX	128
 #undef	OPEN_MAX
-#define	OPEN_MAX	1024
+#define	OPEN_MAX	256
 #undef	LINK_MAX
 #define	LINK_MAX	1
 #undef	NAME_MAX
