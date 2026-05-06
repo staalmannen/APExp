@@ -6,13 +6,11 @@ OFILES=_ctor.$O _dtor.$O pure.$O
 
 </sys/src/cmd/mksyslib
 
+CXXINCL=/sys/include/ape/c++
 CFLAGS=-FV -I.
-# if the user is only running mk
-# if cfront is installed: CCX=cfront
-CCX=../../src/$O.out
 CC=pcc
 
-CLEANFILES = *.c
-
 %.c: %.cpp
-	$CCX $prereq >%.c
+	c++ -F -I$CXXINCL $prereq > $target
+
+CLEANFILES=*.c

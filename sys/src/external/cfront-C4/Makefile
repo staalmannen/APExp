@@ -1,34 +1,36 @@
-#Makefile for cfront
-#	BSD 4.2 or later set CCFLAGS=-DBSD
-#	also set BSD=1
+# Makefile for cfront-C4  (Linux / macOS development builds)
+# For Plan9/APExp, use the mkfile at the repo root instead.
+#
+# Targets:
+#   all      — build cfront binary
+#   libC.a   — build cfront runtime library (requires cfront in PATH or CC set)
+#   demo     — build and run hello/stream/generic demos
+#   clean    — remove build artifacts
 
-MSIZE= #-m32
-CCFLAGS=
-
-BSD=
-PATH:=$(CURDIR):$(PATH)
-
-CC	=	cc
-
+MSIZE =
+CC    = cc
 CCOMP = cc
 
-.PHONY: demo
-all: cfront$(EXEEXT) munch$(EXEEXT) libC.a
+# C++ compiler used to build the runtime library.
+# Override with: make CXX=g++ libC.a
+# or with a cfront wrapper: make CXX="./tools/cfront-cc-wrapper" libC.a
+CXX   = g++
 
-libC.a:	always
-	cd lib/mk && $(MAKE) CC="$(CC)" CCOMP="$(CCOMP)" CCFLAGS="$(CCFLAGS)" MSIZE="$(MSIZE)" BSD=$(BSD)
-	mv lib/mk/libC.a .
+.PHONY: all libC.a demo clean always
 
-munch$(EXEEXT):	tools/_munch/munch.c
-	$(CCOMP) $(MSIZE) -o munch$(EXEEXT) tools/_munch/munch.c
+all: cfront
 
-cfront$(EXEEXT): always
-	$(MAKE)   CCOMP="$(CCOMP)" MSIZE="$(MSIZE)" -C src
+cfront: always
+	$(MAKE) CC="$(CCOMP)" MSIZE="$(MSIZE)" -C src
 
-demo: all
-	$(MAKE)   CCOMP="$(CCOMP)" MSIZE="$(MSIZE)" -C demo/hello
-	$(MAKE)   CCOMP="$(CCOMP)" MSIZE="$(MSIZE)" -C demo/generic
-	$(MAKE)   CCOMP="$(CCOMP)" MSIZE="$(MSIZE)" -C demo/stream
+libC.a: cfront
+	$(MAKE) CC="$(CXX)" CCOMP="$(CCOMP)" MSIZE="$(MSIZE)" -C lib/mk
+	cp lib/mk/libC.a .
+
+demo: cfront
+	$(MAKE) MSIZE="$(MSIZE)" -C demo/hello
+	$(MAKE) MSIZE="$(MSIZE)" -C demo/stream
+	$(MAKE) MSIZE="$(MSIZE)" -C demo/generic
 
 always:
 
@@ -36,5 +38,6 @@ clean:
 	$(MAKE) -C src clean
 	$(MAKE) -C lib/mk clean
 	$(MAKE) -C demo/hello clean
-	-rm -f munch$(EXEEXT) libC.a
-
+	$(MAKE) -C demo/stream clean
+	$(MAKE) -C demo/generic clean
+	-rm -f libC.a

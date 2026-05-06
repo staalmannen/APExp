@@ -1,6 +1,8 @@
-CC=../../CC
+# CC: C++ compiler. Default: g++ for Linux/macOS.
+# For cfront testing: make CC="path/to/cfront-wrapper"
+CC=g++
 LIBS=
-CCFLAGS=-Wall -g -DNO_EXCEPTION -I../../incl  $(MSIZE)
+CCFLAGS=-Wall -g -DNO_EXCEPTION $(MSIZE)
 CCOMP = gcc
 #ISTL=--stl -I../../stl
 G=

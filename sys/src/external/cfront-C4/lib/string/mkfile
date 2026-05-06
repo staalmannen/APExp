@@ -2,19 +2,19 @@
 
 LIB=/$objtype/lib/ape/libc++.a
 
-OFILES=Pool_std.$O std_exc.$O std_find.$O std_in.$O \
-	std_misc.$O std_put.$O std_str.$O std_win.$O \
-	std_wput.$O std_wstr.$O 
+# string.cpp contributes string::npos and the iostream operators for string.
+# The old libSC Pool_std.cpp / std_*.cpp files are not used — the string
+# class itself is now fully inline in h/string.h.
+OFILES=string.$O
 
 </sys/src/cmd/mksyslib
 
+CXXINCL=/sys/include/ape/c++
 CFLAGS=-FV -I.
-# if the user is only running mk
-# if cfront is installed: CCX=cfront
-CCX=../../src/$O.out
 CC=pcc
 
-CLEANFILES= *.c
+# string.cpp is plain C++ that includes h/string.h — compile with driver
+string.c: string.cpp
+	c++ -F -I$CXXINCL $prereq > $target
 
-%.c: %.cpp
-	$CCX $prereq >%.c
+CLEANFILES=*.c

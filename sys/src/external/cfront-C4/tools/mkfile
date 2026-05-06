@@ -1,6 +1,7 @@
 </$objtype/mkfile
 
 DIRS=\
+	CC-driver\
 	patch\
 	munch\
 	pt\

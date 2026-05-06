@@ -14,8 +14,10 @@
 # any actual or intended publication of such source code.
 #
 ###############################################################################
-CCC	?=	../../CC
-CCFLAGS =  $(MSIZE) -O -I../.. -fno-builtin-clog
+# CCC: C++ compiler. Default: g++ for Linux/macOS.
+# For cfront testing: make CCC="path/to/cfront-wrapper"
+CCC	?=	g++
+CCFLAGS =  $(MSIZE) -O -fno-builtin-clog
 
 CCOMP = gcc
 

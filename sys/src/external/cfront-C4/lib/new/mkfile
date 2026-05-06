@@ -3,18 +3,15 @@
 LIB=/$objtype/lib/ape/libc++.a
 
 OFILES=_arr_map.$O _delete.$O _handler.$O _main.$O \
-	_new.$O _vec.$O placenew.$O 
+	_new.$O _vec.$O placenew.$O
 
 </sys/src/cmd/mksyslib
 
+CXXINCL=/sys/include/ape/c++
 CFLAGS=-FV -I.
-# if the user is only running mk
-# if cfront is installed: CCX=cfront
-CCX=../../src/$O.out
 CC=pcc
 
-CLEANFILES= *.c
-
 %.c: %.cpp
-	$CCX $prereq >%.c
+	c++ -F -I$CXXINCL $prereq > $target
 
+CLEANFILES=*.c

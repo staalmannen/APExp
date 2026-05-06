@@ -1,0 +1,10 @@
+</$objtype/mkfile
+
+APEXPROOT=../../../../..
+RCBIN=$APEXPROOT/rc/bin/ape
+
+install:V:
+	mkdir -p $RCBIN
+	cp c++ $RCBIN/c++
+
+clean nuke:V:

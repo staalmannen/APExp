@@ -3,20 +3,15 @@
 LIB=/$objtype/lib/ape/libc++.a
 
 OFILES=abs.$O arg.$O cos.$O error.$O exp.$O io.$O \
-	log.$O oper.$O polar.$O pow.$O sin.$O sqrt.$O 
+	log.$O oper.$O polar.$O pow.$O sin.$O sqrt.$O
 
 </sys/src/cmd/mksyslib
 
+CXXINCL=/sys/include/ape/c++
 CFLAGS=-FV -I./complex
-# if the user is only running mk
-# if cfront is installed: CCX=cfront
-CCX=../../src/$O.out
 CC=pcc
 
-CLEANFILES= *.c
-
 %.c: complex/%.cpp
-	$CCX $prereq >%.c
+	c++ -F -I$CXXINCL -I./complex $prereq > $target
 
-
-
+CLEANFILES=*.c
