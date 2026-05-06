@@ -2,9 +2,9 @@
 CC  =  gcc
 #CC  =  gcc -fsanitize=address
 #CC  =  clang-11-env clang
-#CCFLAGS	= -fpermissive -I../incl -D__HAVE_SIZE_T -g
-#CCFLAGS	= -Wall -I../incl -D__HAVE_SIZE_T -g
-CCFLAGS	= -I../incl -D__HAVE_SIZE_T -g $(MSIZE)
+#CCFLAGS	= -fpermissive -D__HAVE_SIZE_T -g
+#CCFLAGS	= -Wall -D__HAVE_SIZE_T -g
+CCFLAGS	= -D__HAVE_SIZE_T -g $(MSIZE)
 
 CCOMP = gcc
 
