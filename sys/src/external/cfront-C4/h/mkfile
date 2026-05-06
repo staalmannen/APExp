@@ -1,0 +1,29 @@
+</$objtype/mkfile
+
+# Install destination: sys/include/ape/c++/
+# These headers are processed by cfront, not pcc, so they live in a
+# separate directory from the APE C headers (sys/include/ape/).
+
+APEXPROOT=../../../../..
+HDRDIR=$APEXPROOT/sys/include/ape/c++
+
+HEADERS=\
+	algorithm.h\
+	fstream.h\
+	functional.h\
+	iostream.h\
+	iomanip.h\
+	list.h\
+	new.h\
+	stdexcept.h\
+	strstream.h\
+	string.h\
+	utility.h\
+	vector.h\
+
+install:V:
+	mkdir -p $HDRDIR
+	for(h in $HEADERS)
+		cp $h $HDRDIR/$h
+
+clean:V:
