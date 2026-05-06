@@ -690,7 +690,7 @@ unsigned long long ZSTD_findDecompressedSize(const void* src, size_t srcSize)
 unsigned long long ZSTD_getDecompressedSize(const void* src, size_t srcSize)
 {
     unsigned long long const ret = ZSTD_getFrameContentSize(src, srcSize);
-    ZSTD_STATIC_ASSERT(ZSTD_CONTENTSIZE_ERROR < ZSTD_CONTENTSIZE_UNKNOWN);
+    assert(ZSTD_CONTENTSIZE_ERROR < ZSTD_CONTENTSIZE_UNKNOWN);
     return (ret >= ZSTD_CONTENTSIZE_ERROR) ? 0 : ret;
 }
 
@@ -1459,9 +1459,9 @@ ZSTD_loadDEntropy(ZSTD_entropyDTables_t* entropy,
     assert(MEM_readLE32(dict) == ZSTD_MAGIC_DICTIONARY);   /* dict must be valid */
     dictPtr += 8;   /* skip header = magic + dictID */
 
-    ZSTD_STATIC_ASSERT(offsetof(ZSTD_entropyDTables_t, OFTable) == offsetof(ZSTD_entropyDTables_t, LLTable) + sizeof(entropy->LLTable));
-    ZSTD_STATIC_ASSERT(offsetof(ZSTD_entropyDTables_t, MLTable) == offsetof(ZSTD_entropyDTables_t, OFTable) + sizeof(entropy->OFTable));
-    ZSTD_STATIC_ASSERT(sizeof(entropy->LLTable) + sizeof(entropy->OFTable) + sizeof(entropy->MLTable) >= HUF_DECOMPRESS_WORKSPACE_SIZE);
+    assert(offsetof(ZSTD_entropyDTables_t, OFTable) == offsetof(ZSTD_entropyDTables_t, LLTable) + sizeof(entropy->LLTable));
+    assert(offsetof(ZSTD_entropyDTables_t, MLTable) == offsetof(ZSTD_entropyDTables_t, OFTable) + sizeof(entropy->OFTable));
+    assert(sizeof(entropy->LLTable) + sizeof(entropy->OFTable) + sizeof(entropy->MLTable) >= HUF_DECOMPRESS_WORKSPACE_SIZE);
     {   void* const workspace = &entropy->LLTable;   /* use fse tables as temporary workspace; implies fse tables are grouped together */
         size_t const workspaceSize = sizeof(entropy->LLTable) + sizeof(entropy->OFTable) + sizeof(entropy->MLTable);
 #ifdef HUF_FORCE_DECOMPRESS_X1
@@ -1576,7 +1576,7 @@ size_t ZSTD_decompressBegin(ZSTD_DCtx* dctx)
     dctx->dictID = 0;
     dctx->bType = bt_reserved;
     dctx->isFrameDecompression = 1;
-    ZSTD_STATIC_ASSERT(sizeof(dctx->entropy.rep) == sizeof(repStartValue));
+    assert(sizeof(dctx->entropy.rep) == sizeof(repStartValue));
     ZSTD_memcpy(dctx->entropy.rep, repStartValue, sizeof(repStartValue));  /* initial repcodes */
     dctx->LLTptr = dctx->entropy.LLTable;
     dctx->MLTptr = dctx->entropy.MLTable;
@@ -1829,7 +1829,7 @@ ZSTD_bounds ZSTD_dParam_getBounds(ZSTD_dParameter dParam)
         case ZSTD_d_format:
             bounds.lowerBound = (int)ZSTD_f_zstd1;
             bounds.upperBound = (int)ZSTD_f_zstd1_magicless;
-            ZSTD_STATIC_ASSERT(ZSTD_f_zstd1 < ZSTD_f_zstd1_magicless);
+            assert(ZSTD_f_zstd1 < ZSTD_f_zstd1_magicless);
             return bounds;
         case ZSTD_d_stableOutBuffer:
             bounds.lowerBound = (int)ZSTD_bm_buffered;

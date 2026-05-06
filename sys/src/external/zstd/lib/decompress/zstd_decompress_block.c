@@ -1277,10 +1277,10 @@ ZSTD_decodeSequence(seqState_t* seqState, const ZSTD_longOffset_e longOffsets, c
         /* sequence */
         {   size_t offset;
             if (ofBits > 1) {
-                ZSTD_STATIC_ASSERT(ZSTD_lo_isLongOffset == 1);
-                ZSTD_STATIC_ASSERT(LONG_OFFSETS_MAX_EXTRA_BITS_32 == 5);
-                ZSTD_STATIC_ASSERT(STREAM_ACCUMULATOR_MIN_32 > LONG_OFFSETS_MAX_EXTRA_BITS_32);
-                ZSTD_STATIC_ASSERT(STREAM_ACCUMULATOR_MIN_32 - LONG_OFFSETS_MAX_EXTRA_BITS_32 >= MaxMLBits);
+                assert(ZSTD_lo_isLongOffset == 1);
+                assert(LONG_OFFSETS_MAX_EXTRA_BITS_32 == 5);
+                assert(STREAM_ACCUMULATOR_MIN_32 > LONG_OFFSETS_MAX_EXTRA_BITS_32);
+                assert(STREAM_ACCUMULATOR_MIN_32 - LONG_OFFSETS_MAX_EXTRA_BITS_32 >= MaxMLBits);
                 if (MEM_32bits() && longOffsets && (ofBits >= STREAM_ACCUMULATOR_MIN_32)) {
                     /* Always read extra bits, this keeps the logic simple,
                      * avoids branches, and avoids accidentally reading 0 bits.
@@ -1321,7 +1321,7 @@ ZSTD_decodeSequence(seqState_t* seqState, const ZSTD_longOffset_e longOffsets, c
         if (MEM_64bits() && UNLIKELY(totalBits >= STREAM_ACCUMULATOR_MIN_64-(LLFSELog+MLFSELog+OffFSELog)))
             BIT_reloadDStream(&seqState->DStream);
         /* Ensure there are enough bits to read the rest of data in 64-bit mode. */
-        ZSTD_STATIC_ASSERT(16+LLFSELog+MLFSELog+OffFSELog < STREAM_ACCUMULATOR_MIN_64);
+        assert(16+LLFSELog+MLFSELog+OffFSELog < STREAM_ACCUMULATOR_MIN_64);
 
         if (llBits > 0)
             seq.litLength += BIT_readBitsFast(&seqState->DStream, llBits/*>0*/);
@@ -1430,7 +1430,7 @@ ZSTD_decompressSequences_bodySplitLitBuffer( ZSTD_DCtx* dctx,
         ZSTD_initFseState(&seqState.stateML, &seqState.DStream, dctx->MLTptr);
         assert(dst != NULL);
 
-        ZSTD_STATIC_ASSERT(
+        assert(
                 BIT_DStream_unfinished < BIT_DStream_completed &&
                 BIT_DStream_endOfBuffer < BIT_DStream_completed &&
                 BIT_DStream_completed < BIT_DStream_overflow);
@@ -2048,7 +2048,7 @@ static size_t ZSTD_maxShortOffset(void)
         /* We can decode any offset without reloading bits.
          * This might change if the max window size grows.
          */
-        ZSTD_STATIC_ASSERT(ZSTD_WINDOWLOG_MAX <= 31);
+        assert(ZSTD_WINDOWLOG_MAX <= 31);
         return (size_t)-1;
     } else {
         /* The maximum offBase is (1 << (STREAM_ACCUMULATOR_MIN + 1)) - 1.

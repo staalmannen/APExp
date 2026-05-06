@@ -391,10 +391,10 @@ size_t HUF_readDTableX1_wksp(HUF_DTable* DTable, const void* src, size_t srcSize
     HUF_DEltX1* const dt = (HUF_DEltX1*)dtPtr;
     HUF_ReadDTableX1_Workspace* wksp = (HUF_ReadDTableX1_Workspace*)workSpace;
 
-    DEBUG_STATIC_ASSERT(HUF_DECOMPRESS_WORKSPACE_SIZE >= sizeof(*wksp));
+    assert(HUF_DECOMPRESS_WORKSPACE_SIZE >= sizeof(*wksp));
     if (sizeof(*wksp) > wkspSize) return ERROR(tableLog_tooLarge);
 
-    DEBUG_STATIC_ASSERT(sizeof(DTableDesc) == sizeof(HUF_DTable));
+    assert(sizeof(DTableDesc) == sizeof(HUF_DTable));
     /* ZSTD_memset(huffWeight, 0, sizeof(huffWeight)); */   /* is not necessary, even though some analyzer complain ... */
 
     iSize = HUF_readStats_wksp(wksp->huffWeight, HUF_SYMBOLVALUE_MAX + 1, wksp->rankVal, &nbSymbols, &tableLog, src, srcSize, wksp->statsWksp, sizeof(wksp->statsWksp), flags);
@@ -961,10 +961,10 @@ typedef rankValCol_t rankVal_t[HUF_TABLELOG_MAX];
 static U32 HUF_buildDEltX2U32(U32 symbol, U32 nbBits, U32 baseSeq, int level)
 {
     U32 seq;
-    DEBUG_STATIC_ASSERT(offsetof(HUF_DEltX2, sequence) == 0);
-    DEBUG_STATIC_ASSERT(offsetof(HUF_DEltX2, nbBits) == 2);
-    DEBUG_STATIC_ASSERT(offsetof(HUF_DEltX2, length) == 3);
-    DEBUG_STATIC_ASSERT(sizeof(HUF_DEltX2) == sizeof(U32));
+    assert(offsetof(HUF_DEltX2, sequence) == 0);
+    assert(offsetof(HUF_DEltX2, nbBits) == 2);
+    assert(offsetof(HUF_DEltX2, length) == 3);
+    assert(sizeof(HUF_DEltX2) == sizeof(U32));
     if (MEM_isLittleEndian()) {
         seq = level == 1 ? symbol : (baseSeq + (symbol << 8));
         return seq + (nbBits << 16) + ((U32)level << 24);
@@ -981,7 +981,7 @@ static HUF_DEltX2 HUF_buildDEltX2(U32 symbol, U32 nbBits, U32 baseSeq, int level
 {
     HUF_DEltX2 DElt;
     U32 const val = HUF_buildDEltX2U32(symbol, nbBits, baseSeq, level);
-    DEBUG_STATIC_ASSERT(sizeof(DElt) == sizeof(val));
+    assert(sizeof(DElt) == sizeof(val));
     ZSTD_memcpy(&DElt, &val, sizeof(val));
     return DElt;
 }
@@ -1196,7 +1196,7 @@ size_t HUF_readDTableX2_wksp(HUF_DTable* DTable,
     ZSTD_memset(wksp->rankStats, 0, sizeof(wksp->rankStats));
     ZSTD_memset(wksp->rankStart0, 0, sizeof(wksp->rankStart0));
 
-    DEBUG_STATIC_ASSERT(sizeof(HUF_DEltX2) == sizeof(HUF_DTable));   /* if compiler fails here, assertion is wrong */
+    assert(sizeof(HUF_DEltX2) == sizeof(HUF_DTable));   /* if compiler fails here, assertion is wrong */
     if (maxTableLog > HUF_TABLELOG_MAX) return ERROR(tableLog_tooLarge);
     /* ZSTD_memset(weightList, 0, sizeof(weightList)); */  /* is not necessary, even though some analyzer complain ... */
 
