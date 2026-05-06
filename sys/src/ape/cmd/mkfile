@@ -5,7 +5,7 @@ APEXPROOT=../../../..
 _CORE_APPS=\
 # shell\
 	pdksh\
-#	bash\
+	bash\
 # parsing/editing source etc \
 	as\
 	lex\
@@ -17,11 +17,12 @@ _CORE_APPS=\
 	m4\
 	iconv\
 	gettext\
-#	libtool\
+	libtool\
 	pkgconf\
 # core utilities \
 	base\
 	grep\
+#	core\
 
 _OPTIONAL_APPS=\
 # GUI \
