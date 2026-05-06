@@ -1251,7 +1251,7 @@ ZSTD_compressBlock_opt_generic(ZSTD_MatchState_t* ms,
             /* Offset history is not updated during match comparison.
              * Do it here, now that the match is selected and confirmed.
              */
-            ZSTD_STATIC_ASSERT(sizeof(opt[cur].rep) == sizeof(Repcodes_t));
+            assert(sizeof(opt[cur].rep) == sizeof(Repcodes_t));
             assert(cur >= opt[cur].mlen);
             if (opt[cur].litlen == 0) {
                 /* just finished a match => alter offset history */
