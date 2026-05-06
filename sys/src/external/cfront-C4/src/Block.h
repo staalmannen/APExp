@@ -17,7 +17,7 @@ any actual or intended publication of such source code.
 #ifndef BLOCK_H
 #define BLOCK_H 1
 #ifndef GENERICH
-#include <generic.h>
+#include "generic.h"
 #endif
 
 #include "typedef.h"

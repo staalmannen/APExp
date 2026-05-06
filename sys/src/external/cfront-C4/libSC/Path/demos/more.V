@@ -1,1 +1,0 @@
-cat is /bin/cat
