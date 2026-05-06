@@ -98,6 +98,15 @@ $O.szal: szal.$O
 	mkdir -p $APEXPROOT/sys/lib/c++
 	./$O.szal | sort > $APEXPROOT/sys/lib/c++/$O.sz
 
+RCBIN=$APEXPROOT/rc/bin/ape
+
+# Install the c++ rc driver script alongside the compiled tools.
+# mkmany's install:V: handles the binaries in TARG; this rule appends
+# to it (multiple V: rules for the same target all execute in Plan9 mk).
+install installall:V:
+	mkdir -p $RCBIN
+	cp $CXXSRC/tools/CC-driver/c++ $RCBIN/c++
+
 
 
 
