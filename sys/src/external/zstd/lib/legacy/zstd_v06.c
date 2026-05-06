@@ -1957,7 +1957,7 @@ size_t HUFv06_readDTableX2 (U16* DTable, const void* src, size_t srcSize)
     void* const dtPtr = DTable + 1;
     HUFv06_DEltX2* const dt = (HUFv06_DEltX2*)dtPtr;
 
-    HUFv06_STATIC_ASSERT(sizeof(HUFv06_DEltX2) == sizeof(U16));   /* if compilation fails here, assertion is false */
+    assert(sizeof(HUFv06_DEltX2) == sizeof(U16));   /* if compilation fails here, assertion is false */
     /* memset(huffWeight, 0, sizeof(huffWeight)); */   /* is not necessary, even though some analyzer complain ... */
 
     iSize = HUFv06_readStats(huffWeight, HUFv06_MAX_SYMBOL_VALUE + 1, rankVal, &nbSymbols, &tableLog, src, srcSize);
@@ -2282,7 +2282,7 @@ size_t HUFv06_readDTableX4 (U32* DTable, const void* src, size_t srcSize)
     void* dtPtr = DTable;
     HUFv06_DEltX4* const dt = ((HUFv06_DEltX4*)dtPtr) + 1;
 
-    HUFv06_STATIC_ASSERT(sizeof(HUFv06_DEltX4) == sizeof(U32));   /* if compilation fails here, assertion is false */
+    assert(sizeof(HUFv06_DEltX4) == sizeof(U32));   /* if compilation fails here, assertion is false */
     if (memLog > HUFv06_ABSOLUTEMAX_TABLELOG) return ERROR(tableLog_tooLarge);
     /* memset(weightList, 0, sizeof(weightList)); */   /* is not necessary, even though some analyzer complain ... */
 

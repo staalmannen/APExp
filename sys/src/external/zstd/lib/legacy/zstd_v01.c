@@ -933,7 +933,7 @@ static size_t HUF_readDTable (U16* DTable, const void* src, size_t srcSize)
     if (!srcSize) return (size_t)-FSE_ERROR_srcSize_wrong;
     iSize = ip[0];
 
-    FSE_STATIC_ASSERT(sizeof(HUF_DElt) == sizeof(U16));   /* if compilation fails here, assertion is false */
+    assert(sizeof(HUF_DElt) == sizeof(U16));   /* if compilation fails here, assertion is false */
     //memset(huffWeight, 0, sizeof(huffWeight));   /* should not be necessary, but some analyzer complain ... */
     if (iSize >= 128)  /* special header */
     {
