@@ -1,0 +1,21 @@
+# compiled binary
+cfront
+ns_strip
+
+# byacc build artifacts
+src/y.tab.c
+src/y.tab.cpp
+src/y.tab.c.bak
+src/y.tab.h
+src/y.output
+
+# szal tool output
+src/szal.result
+tools/szal/szal
+
+# temporary test files
+src/y_test.cpp
+src/yystype_test.h
+
+# object files
+src/*.o
