@@ -36,7 +36,7 @@
 #Site-specific values:
 
 case "$perladmin" in
-'') perladmin='jens@cx1906.igcdhcp.local' ;;
+'') perladmin='staal1978@gmail.com' ;;
 esac
 
 # Installation prefixes.  Allow a Configure -D override.  You
@@ -45,7 +45,7 @@ esac
 # For an explanation of the installation directories, see the
 # INSTALL file section on "Installation Directories".
 case "$prefix" in
-'') prefix='/usr/local' ;;
+'') prefix='/' ;;
 esac
 
 # By default, the next three are the same as $prefix.  
@@ -54,15 +54,15 @@ esac
 # Use similar logic for $vendorprefix and $installprefix.
 
 case "$siteprefix" in
-'') if test "/usr/local" = "/usr/local"; then
+'') if test "/" = "/"; then
 	siteprefix="$prefix"
     else
-	siteprefix='/usr/local'
+	siteprefix='/'
     fi
     ;;
 esac
 case "$vendorprefix" in
-'') if test "" = "/usr/local"; then
+'') if test "" = "/"; then
 	vendorprefix="$prefix"
     else
 	vendorprefix=''
@@ -72,10 +72,10 @@ esac
 
 # Where installperl puts things.
 case "$installprefix" in
-'') if test "/usr/local" = "/usr/local"; then
+'') if test "/" = "/"; then
 	installprefix="$prefix"
     else
-	installprefix='/usr/local'
+	installprefix='/'
     fi
     ;;
 esac
@@ -90,7 +90,7 @@ esac
 #     need to distinguish between the place where things
 #     get installed and where they finally will reside.  As of 5.005_6x,
 #     this too is handled automatically by Configure based on
-#     /usr/local, so it isn't included here either.
+#     /, so it isn't included here either.
 #
 # Note also that there are three broad hierarchies of installation 
 # directories, as discussed in the INSTALL file under 
@@ -113,10 +113,14 @@ esac
 # version-dependent names, particularly if you reuse this file for
 # different versions of perl.
 
-# bin='/usr/local/bin'
-# scriptdir='/usr/local/bin'
-# privlib='/usr/local/lib/perl5/5.42.2'
-# archlib='/usr/local/lib/perl5/5.42.2/x86_64-linux'
+# Preserving custom bin
+bin='/bin'
+# Preserving custom scriptdir
+scriptdir='/rc/bin/ape'
+# Preserving custom privlib
+privlib='/sys/lib/perl'
+# Preserving custom archlib
+archlib='/amd64/lib/ape'
 # Preserving custom man1dir
 man1dir=' '
 # Preserving custom man3dir
@@ -129,10 +133,14 @@ man3ext='0'
 html1dir=' '
 # Preserving custom html3dir
 html3dir=' '
-# sitebin='/usr/local/bin'
-# sitescript='/usr/local/bin'
-# sitelib='/usr/local/lib/perl5/site_perl/5.42.2'
-# sitearch='/usr/local/lib/perl5/site_perl/5.42.2/x86_64-linux'
+# Preserving custom sitebin
+sitebin='/bin'
+# Preserving custom sitescript
+sitescript='/rc/bin/ape'
+# Preserving custom sitelib
+sitelib='/sys/lib/perl'
+# Preserving custom sitearch
+sitearch='/amd64/lib/ape/'
 # Preserving custom siteman1dir
 siteman1dir=''
 # Preserving custom siteman3dir
@@ -156,7 +164,7 @@ vendorhtml3dir=' '
 #  pager to your local favorite value, uncomment the following line in
 #  the original Policy_sh.SH file and re-run   sh Policy_sh.SH.
 #
-#  pager='/usr/bin/less -R'
+#  pager='/bin/page'
 #
 #  A full Glossary of all the config.sh variables is in the file
 #  Porting/Glossary.

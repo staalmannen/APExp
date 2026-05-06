@@ -20,6 +20,7 @@ _OPTIONAL_LIBS=\
 	lzma\
 	pascal\
 	pcre2\
+#	perl\
 	png\
 	readline\
 	tcl\

@@ -9,7 +9,7 @@
 
 /* Package name      : perl5
  * Source directory  : .
- * Configuration time: Wed May  6 09:57:00 CEST 2026
+ * Configuration time: Wed May  6 10:30:21 CEST 2026
  * Configured by     : jens
  * Target system     : linux cx1906 7.0.1-0-generic #1 smp preempt_dynamic thu apr 23 08:50:13 utc 2026 x86_64 
  */
@@ -1235,8 +1235,8 @@
  *	This symbol contains the ~name expanded version of ARCHLIB, to be used
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
-#define ARCHLIB "/usr/local/lib/perl5/5.42.2/x86_64-linux"		/**/
-#define ARCHLIB_EXP "/usr/local/lib/perl5/5.42.2/x86_64-linux"		/**/
+#define ARCHLIB "/amd64/lib/ape"		/**/
+#define ARCHLIB_EXP "/amd64/lib/ape"		/**/
 
 /* BIN:
  *	This symbol holds the path of the bin directory where the package will
@@ -1250,8 +1250,8 @@
  *	This symbol, if defined, indicates that we'd like to relocate entries
  *	in @INC at run time based on the location of the perl binary.
  */
-#define BIN "/usr/local/bin"	/**/
-#define BIN_EXP "/usr/local/bin"	/**/
+#define BIN "/bin"	/**/
+#define BIN_EXP "/bin"	/**/
 #define PERL_RELOCATABLE_INC "undef"		/**/
 
 /* PERL_INC_VERSION_LIST:
@@ -1289,8 +1289,8 @@
  *	This symbol contains the ~name expanded version of PRIVLIB, to be used
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
-#define PRIVLIB "/usr/local/lib/perl5/5.42.2"		/**/
-#define PRIVLIB_EXP "/usr/local/lib/perl5/5.42.2"		/**/
+#define PRIVLIB "/sys/lib/perl"		/**/
+#define PRIVLIB_EXP "/sys/lib/perl"		/**/
 
 /* SITEARCH:
  *	This symbol contains the name of the private library for this package.
@@ -1307,8 +1307,8 @@
  *	This symbol contains the ~name expanded version of SITEARCH, to be used
  *	in programs that are not prepared to deal with ~ expansion at run-time.
  */
-#define SITEARCH "/usr/local/lib/perl5/site_perl/5.42.2/x86_64-linux"		/**/
-#define SITEARCH_EXP "/usr/local/lib/perl5/site_perl/5.42.2/x86_64-linux"		/**/
+#define SITEARCH "/amd64/lib/ape/"		/**/
+#define SITEARCH_EXP "/amd64/lib/ape/"		/**/
 
 /* SITELIB:
  *	This symbol contains the name of the private library for this package.
@@ -1330,9 +1330,9 @@
  *	removed.  The elements in inc_version_list (inc_version_list.U) can
  *	be tacked onto this variable to generate a list of directories to search.
  */
-#define SITELIB "/usr/local/lib/perl5/site_perl/5.42.2"		/**/
-#define SITELIB_EXP "/usr/local/lib/perl5/site_perl/5.42.2"		/**/
-#define SITELIB_STEM "/usr/local/lib/perl5/site_perl"		/**/
+#define SITELIB "/sys/lib/perl"		/**/
+#define SITELIB_EXP "/sys/lib/perl"		/**/
+#define SITELIB_STEM "/sys/lib/perl"		/**/
 
 /* PERL_VENDORARCH:
  *	If defined, this symbol contains the name of a private library.
@@ -1374,8 +1374,8 @@
  *	by Configure.  You shouldn't rely on it too much; the specific
  *	feature tests from Configure are generally more reliable.
  */
-#define OSNAME "linux"		/**/
-#define OSVERS "7.0.1-0-generic"		/**/
+#define OSNAME "plan9"		/**/
+#define OSVERS "4"		/**/
 
 /* CAT2:
  *	This macro concatenates 2 tokens together.
@@ -2895,7 +2895,7 @@
  *	This symbol, if defined, indicates that the localeconv routine is
  *	available and has the additional members added in POSIX 1003.1-2008.
  */
-#define HAS_LC_MONETARY_2008		/**/
+/*#define HAS_LC_MONETARY_2008		/ **/
 
 /* HAS_LDBL_DIG:
  *	This symbol, if defined, indicates that this system's <float.h>
@@ -3297,7 +3297,7 @@
  *	available and it accepts any input locale name as valid.
  */
 #define HAS_SETLOCALE	/**/
-#define SETLOCALE_ACCEPTS_ANY_LOCALE_NAME	/**/
+/*#define SETLOCALE_ACCEPTS_ANY_LOCALE_NAME	/ **/
 
 /* HAS_SETPROCTITLE:
  *	This symbol, if defined, indicates that the setproctitle routine is
@@ -3651,7 +3651,7 @@
  *	This symbol, if defined, indicates that dynamic loading of
  *	some sort is available.
  */
-#define USE_DYNAMIC_LOADING		/**/
+/*#define USE_DYNAMIC_LOADING		/ **/
 
 /* FFLUSH_NULL:
  *	This symbol, if defined, tells that fflush(NULL) correctly
@@ -4020,7 +4020,7 @@
  */
 #define DOUBLEMANTBITS  52
 #define LONGDBLMANTBITS 64
-#define NVMANTBITS      52
+#define NVMANTBITS      64
 
 /* NEED_VA_COPY:
  *	This symbol, if defined, indicates that the system stores
@@ -4160,7 +4160,7 @@
 #define I64TYPE		long	/**/
 #define U64TYPE		unsigned long	/**/
 #endif
-#define NVTYPE		double		/**/
+#define NVTYPE		long double		/**/
 #define IVSIZE		8		/**/
 #define UVSIZE		8		/**/
 #define I8SIZE		1		/**/
@@ -4173,10 +4173,10 @@
 #define I64SIZE		8	/**/
 #define U64SIZE		8	/**/
 #endif
-#define NVSIZE		8		/**/
-#undef	NV_PRESERVES_UV
-#define NV_PRESERVES_UV_BITS	53
-#define NV_OVERFLOWS_INTEGERS_AT	(256.0*256.0*256.0*256.0*256.0*256.0*2.0*2.0*2.0*2.0*2.0)
+#define NVSIZE		16		/**/
+#define NV_PRESERVES_UV
+#define NV_PRESERVES_UV_BITS	64
+#define NV_OVERFLOWS_INTEGERS_AT	(256.0*256.0*256.0*256.0*256.0*256.0*256.0*2.0*2.0*2.0*2.0*2.0*2.0*2.0*2.0)
 #define NV_ZERO_IS_ALLBITS_ZERO
 #if UVSIZE == 8
 #   ifdef BYTEORDER
@@ -4229,9 +4229,9 @@
 #define UVof		"lo"		/**/
 #define UVxf		"lx"		/**/
 #define UVXf		"lX"		/**/
-#define NVef		"e"		/**/
-#define NVff		"f"		/**/
-#define NVgf		"g"		/**/
+#define NVef		"Le"		/**/
+#define NVff		"Lf"		/**/
+#define NVgf		"Lg"		/**/
 
 /* SELECT_MIN_BITS:
  *	This symbol holds the minimum number of bits operated by select.
@@ -4375,7 +4375,7 @@
  *	be used when available.
  */
 #ifndef USE_LONG_DOUBLE
-/*#define USE_LONG_DOUBLE		/ **/
+#define USE_LONG_DOUBLE		/**/
 #endif
 
 /* USE_MORE_BITS:
@@ -4515,7 +4515,7 @@
  *	where library files may be held under a private library, for
  *	instance.
  */
-#define ARCHNAME "x86_64-linux"		/**/
+#define ARCHNAME "amd64-plan9-ld"		/**/
 
 /* HAS_ASCTIME_R:
  *	This symbol, if defined, indicates that the asctime_r routine
