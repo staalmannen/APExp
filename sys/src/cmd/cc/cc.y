@@ -1,6 +1,8 @@
 %{
 #include "cc.h"
 static Node *generic_select(Node*, Node*);
+static int dcl_ind_depth(Node*);
+static Type *auto_deduct_type(Node*, Node*);
 %}
 %union	{
 	Node*	node;
@@ -36,7 +38,7 @@ static Node *generic_select(Node*, Node*);
 %type	<node>	name block stmnt cexpr expr xuexpr pexpr
 %type	<node>	zelist elist adecl slist uexpr string lstring
 %type	<node>	xdecor xdecor2 labels label ulstmnt
-%type	<node>	adlist edecor tag qual qlist
+%type	<node>	adlist autoadlist edecor tag qual qlist
 %type	<node>	abdecor abdecor1 abdecor2 abdecor3
 %type	<node>	zexpr lexpr init ilist forexpr
 %type	<node>	generic_assoc_list generic_assoc
@@ -179,6 +181,11 @@ adecl:
 	{
 		$$ = $2;
 	}
+|	LAUTO autoadlist ';'
+	{
+		/* C23 auto type deduction: LAUTO without explicit type specifier */
+		$$ = $2;
+	}
 
 adlist:
 	xdecor
@@ -205,6 +212,78 @@ adlist:
 			$$ = $3;
 			if($1 != Z)
 				$$ = new(OLIST, $1, $3);
+		}
+	}
+
+/*
+ * C23 auto type deduction declarator list.
+ * Entered when LAUTO appears without an accompanying type specifier.
+ * The variable type is deduced from the initializer expression.
+ * Backward compat: auto x; (no init) declares an int, as in C89.
+ */
+autoadlist:
+	xdecor
+	{
+		/* auto x; — C89 compat: declare as int, no initializer */
+		dodecl(adecl, CAUTO, types[TINT], $1);
+		$$ = Z;
+	}
+|	xdecor '=' init
+	{
+		/* auto x = expr; — C23 type deduction */
+		Node *initn = $3, *decl;
+		Type *t;
+		long w;
+
+		if(initn == Z || initn->op == OINIT) {
+			diag(Z, "auto: cannot deduce type from braced initializer");
+			t = types[TINT];
+		} else {
+			complex(initn);
+			t = auto_deduct_type(initn, $1);
+		}
+		decl = dodecl(adecl, CAUTO, t, $1);
+		if(decl == Z) {
+			$$ = Z;
+		} else {
+			w = decl->sym->type->width;
+			$$ = doinit(decl->sym, decl->type, 0L, $3);
+			$$ = contig(decl->sym, $$, w);
+		}
+	}
+|	autoadlist ',' xdecor
+	{
+		/* auto x = e, y; — continuation: bare declarator → int */
+		dodecl(adecl, CAUTO, types[TINT], $3);
+		$$ = $1;
+	}
+|	autoadlist ',' xdecor '=' init
+	{
+		/* auto x = e1, y = e2; — multiple deductions */
+		Node *initn = $5, *decl, *rhs;
+		Type *t;
+		long w;
+
+		if(initn == Z || initn->op == OINIT) {
+			diag(Z, "auto: cannot deduce type from braced initializer");
+			t = types[TINT];
+		} else {
+			complex(initn);
+			t = auto_deduct_type(initn, $3);
+		}
+		decl = dodecl(adecl, CAUTO, t, $3);
+		rhs = Z;
+		if(decl != Z) {
+			w = decl->sym->type->width;
+			rhs = doinit(decl->sym, decl->type, 0L, $5);
+			rhs = contig(decl->sym, rhs, w);
+		}
+		$$ = $1;
+		if(rhs != Z) {
+			if($1 != Z)
+				$$ = new(OLIST, $1, rhs);
+			else
+				$$ = rhs;
 		}
 	}
 
@@ -484,6 +563,11 @@ forexpr:
 	zcexpr
 |	ctlist adlist
 	{
+		$$ = $2;
+	}
+|	LAUTO autoadlist
+	{
+		/* C23 auto type deduction in for-loop initializer */
 		$$ = $2;
 	}
 
@@ -1567,4 +1651,67 @@ generic_select(Node *ctrl, Node *list)
 		}
 	}
 	return deflt;
+}
+
+/*
+ * dcl_ind_depth — count OIND (pointer declarator) levels in a declarator tree.
+ *
+ * Used by auto_deduct_type() to compensate for the TIND wrapping that
+ * dodecl() will apply: if the declarator is "*p", dodecl wraps the base
+ * type in one TIND, so we must strip one TIND from the initializer type.
+ */
+static int
+dcl_ind_depth(Node *n)
+{
+	int d = 0;
+	while(n != Z && n->op == OIND) {
+		d++;
+		n = n->left;
+	}
+	return d;
+}
+
+/*
+ * auto_deduct_type — compute the base type to pass to dodecl() for
+ * C23 auto type deduction (§6.7.10.2).
+ *
+ * initn  — initializer expression, already passed through complex()
+ * xdcor  — the declarator tree (e.g., ONAME, or OIND over ONAME for "*p")
+ *
+ * The declarator may have N OIND levels; dodecl() will wrap the base type
+ * with N TIND layers.  We strip N TIND layers from the initializer type so
+ * the reconstructed type matches the initializer.
+ *
+ * Example: auto *p = ptr;  (ptr : int*)
+ *   dcl_ind_depth(*p) = 1
+ *   strip 1 TIND from int* → int
+ *   dodecl wraps int with * → int*  ✓
+ *
+ * Top-level const/volatile qualifiers are stripped per C23 §6.7.10.2.
+ */
+static Type*
+auto_deduct_type(Node *initn, Node *xdcor)
+{
+	Type *t;
+	int depth, i;
+
+	t = (initn->type != T) ? initn->type : types[TINT];
+	/* array decay: T[] → T* (in case complex() left an array type) */
+	if(t->etype == TARRAY)
+		t = typ(TIND, t->link);
+	/* strip top-level const/volatile per C23 §6.7.10.2 */
+	if(t->garb & (GCONSTNT|GVOLATILE)) {
+		t = copytyp(t);
+		t->garb &= ~(GCONSTNT|GVOLATILE);
+	}
+	/* strip TIND layers to match the declarator's pointer depth */
+	depth = dcl_ind_depth(xdcor);
+	for(i = 0; i < depth; i++) {
+		if(t == T || t->etype != TIND) {
+			diag(Z, "auto: pointer declarator depth exceeds initializer type");
+			return types[TINT];
+		}
+		t = t->link;
+	}
+	return t;
 }

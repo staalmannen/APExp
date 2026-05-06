@@ -43,11 +43,11 @@ Sources were taken from:
 |---------|--------|
 | Templates | Simple class/function templates work; SFINAE, partial specialisation, dependent names are unreliable |
 | RTTI (`dynamic_cast`, `typeid`) | Not supported |
-| `bool` as keyword | Requires `-U__GNUC__` flag (works via `enum bool { false, true }`) |
+| `bool` as keyword | On APExp: `bool`/`true`/`false` are C23 keywords in pcc — works transparently. On Linux/gcc: requires `-U__GNUC__` (enables `enum bool { false, true }` in `template.h`). |
 | `mutable`, `explicit` | Silently ignored or require workarounds |
-| `constexpr`, `auto`, lambdas | Not supported (C++11 beyond range-for) |
+| `constexpr`, `auto`, lambdas | Not supported (C++11 beyond range-for); `auto` type deduction is also a pending item in the APExp C compiler |
 | Standard library completeness | AT&T iostream; newer STL idioms may not work |
-| Wide characters | Not supported |
+| Wide characters | Supported via Plan 9 Rune mapping: `wchar_t` = 16-bit, `wint_t` = Rune (32-bit). Wide string functions are in libap; wide format I/O is macro-mapped to narrow UTF-8 equivalents. |
 | `volatile`, `signed` keywords | Not supported |
 
 ---
@@ -151,7 +151,9 @@ were then hand-patched for the issues documented below.
 gcc -E -I$SRC -I$INCL -D__HAVE_SIZE_T -D__cfront__ -D__cplusplus=1 \
     -D__signed__= -D__null=0 -U__GNUC__ $FILE.cpp 2>/dev/null \
   | /path/to/cfront-3 +a1 2>/dev/null > $FILE.c
-# -U__GNUC__ is critical: without it, `enum bool { false, true }` is suppressed
+# -U__GNUC__ is critical for this Linux translation step: without it,
+# template.h's `enum bool { false, true }` is suppressed and cfront
+# dies with "bool is not a type name".
 ```
 
 `y.tab.cpp` (yacc output) was also passed through cfront, not copied raw.
@@ -171,7 +173,10 @@ gcc -E -I$SRC -I$INCL -D__HAVE_SIZE_T -D__cfront__ -D__cplusplus=1 \
 
 3. **FILE\* globals initialised to NULL** — `lex.c` has `void *out_file = 0`
    because cfront could not evaluate `stdout` at translation time. Fixed in
-   `cfront_stubs.c` via `__attribute__((constructor(101)))`.
+   `cfront_stubs.c`: `_main()` (called by cfront's generated startup code
+   before user `main()`) calls `early_init()` which sets `out_file = stdout`
+   and `in_file = stdin`. Note: `__attribute__((constructor))` is NOT used
+   because Plan 9's pcc does not support GCC constructor attributes.
 
 4. **`setbuf` crash in `error_init`** — the old `incl/stdio.h` defined `FILE`
    as `void`, so the struct layout differed from the 64-bit system FILE.
@@ -307,38 +312,47 @@ header causes Plan 9's pcc to auto-link the runtime library.
 
 ## Next Steps (priority order)
 
-1. **C++ driver script for Plan 9** — a proper `c++` rc command that runs the
-   full pipeline: `ns_strip | cfront -I/sys/include/ape/c++ | pcc`. Currently
-   `tools/CC-driver/CC.example` is a reference shell script; an rc equivalent
-   needs to be written and installed under APExp.
-
-2. **Template reliability improvements** — partial specialisation and dependent
+1. **Template reliability improvements** — partial specialisation and dependent
    name resolution are the main gaps. Many STL-style programs that don't use
    these features already work. Filling these gaps would allow more real-world
    C++ code to compile.
 
-3. **`<complex>` header** — add `h/complex.h` wrapping the existing `lib/complex/`
+2. **`<complex>` header** — add `h/complex.h` wrapping the existing `lib/complex/`
    implementation with a proper `template <class T> class complex` interface.
 
-4. **`bool` as a keyword** — currently requires `-U__GNUC__`. Adding `bool`,
-   `true`, `false` as reserved tokens in `lex.c` would make this transparent.
+3. **`auto` type deduction** — cfront does not support C++11 `auto`. The APExp
+   C compiler now supports C23 `auto` type deduction (implemented in `cc.y`),
+   so generated C code with explicit types works correctly on APExp pcc. Teaching
+   cfront to emit `auto`-carrying constructs is a future enhancement.
 
-5. **`mutable` and `explicit`** — silently ignore `mutable` (add to the
+4. **`mutable` and `explicit`** — silently ignore `mutable` (add to the
    attribute-swallow list in `lex.c`); for `explicit`, add a token that is
    accepted by the grammar and dropped.
 
-6. **Better diagnostics** — cfront's error messages are very terse. Improving
+5. **Better diagnostics** — cfront's error messages are very terse. Improving
    the `error()` calls in `dcl.c`, `typ.c`, and `expr.c` to include more
    context would help users debug template and overload errors.
 
-7. **Integration testing** — the bootstrap test (34/34 cfront source files
+6. **Integration testing** — the bootstrap test (34/34 cfront source files
    translate identically) verifies correctness. Adding a suite of real-world
    C++ programs (Boost.Filesystem, a JSON parser, etc.) would catch regressions
    from future changes.
 
-8. **RTTI** (`dynamic_cast`, `typeid`) — substantial effort; requires a type
+7. **RTTI** (`dynamic_cast`, `typeid`) — substantial effort; requires a type
    descriptor table and runtime library support. Low priority unless a specific
    program needs it.
+
+### APExp C compiler / cfront overlap
+
+Several improvements benefit both the Plan 9 C compiler and cfront-C4:
+
+| Item | APExp compiler status | cfront status |
+|------|-----------------------|---------------|
+| `bool`/`true`/`false` as keywords | Done (C23) | Done (template.h guarded with `-D__cfront_have_bool`) |
+| `auto` type deduction | Done (C23 §6.7.10.2, `cc.y` autoadlist) | Applicable — cfront emits C with explicit types |
+| `typeof_unqual` | Done | N/A (cfront emits C) |
+| `__VA_OPT__` | Done | N/A |
+| Wide character support | Available (`wchar_t` via Rune mapping, libap) | Usable — cfront-compiled code can call wchar functions |
 
 ---
 

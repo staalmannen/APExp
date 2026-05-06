@@ -49,7 +49,9 @@ CFILES=\
 
 <$APEXPROOT/sys/src/cmd/mkmany
 
-CFLAGS= -c -B -D_POSIX_SOURCE -D_BSD_EXTENSION -I$CXXSRC/src
+# -D__cfront_have_bool: APExp pcc has bool/true/false as C23 keywords,
+# so suppress cfront's own "enum bool { false, true }" in template.h.
+CFLAGS= -c -B -D_POSIX_SOURCE -D_BSD_EXTENSION -D__cfront_have_bool -I$CXXSRC/src
 
 %.$O: $CXXSRC/src/%.c
 	$CC $CFLAGS $prereq -o $target
