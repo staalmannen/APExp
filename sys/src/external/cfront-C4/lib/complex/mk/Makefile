@@ -17,8 +17,10 @@
 ###############################################################################
 O_COMPLEX	=	abs.o arg.o cos.o error.o exp.o io.o log.o oper.o \
 			polar.o pow.o sin.o sqrt.o
-CC	=	../../../CC
-CCFLAGS	= $(MSIZE) -Wall -DPRAGMATIC -I../../../incl -fno-builtin-clog
+# CC: C++ compiler. Default: g++ for Linux/macOS builds.
+# Override: make CC="path/to/cfront-wrapper" for a cfront-based build.
+CC	=	g++
+CCFLAGS	= $(MSIZE) -Wall -DPRAGMATIC -fno-builtin-clog
 
 CCOMP = gcc
 

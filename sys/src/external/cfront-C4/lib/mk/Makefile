@@ -24,8 +24,11 @@ flt.o strstream.o rawin.o intin.o stdiobuf.o streambuf.o \
 filebuf.o  oldformat.o sbuf.dbp.o swstdio.o ios_compat.o _stdio.o 	# exit.o
 
 OFILES	=	$(O_GENERIC) $(O_NEW) $(O_STATIC) $(O_STREAM)
-CC	=	CC
-override CCFLAGS	= -g -I../../incl -fno-builtin-clog $(MSIZE)
+# CC: C++ compiler for building library sources.
+# Default: g++ (compiles .cpp directly on Linux/macOS).
+# Override: make CC="./tools/cfront-cc-wrapper" for a cfront-based build.
+CC	=	g++
+override CCFLAGS	= -g -fno-builtin-clog $(MSIZE)
 
 CCOMP = gcc
 
@@ -33,8 +36,8 @@ CCOMP = gcc
 # when going from patch to munch
 DEPEND	= Makefile
 
-#MPDIR	= _patch
-MPDIR	= _munch
+#MPDIR	= tools/patch
+MPDIR	= tools/munch
 
 libC.a:	$(OFILES)
 	ar r libC.a $(OFILES)

@@ -14,7 +14,9 @@
 # any actual or intended publication of such source code.
 #
 ###############################################################################
-CCC	?=	../../CC
+# CCC: C++ compiler. Default: g++ for Linux/macOS.
+# For cfront testing: make CCC="path/to/cfront-wrapper"
+CCC	?=	g++
 CCFLAGS=-O  -fno-builtin-clog $(MSIZE)
 L=../..
 LINKOPT=-lcomplex -lm
