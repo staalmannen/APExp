@@ -3,11 +3,11 @@
 */
 
 #undef	ARG_MAX
-#define	ARG_MAX		16384
+#define	ARG_MAX		65536
 #undef	CHILD_MAX
-#define	CHILD_MAX	75
+#define	CHILD_MAX	256
 #undef	OPEN_MAX
-#define	OPEN_MAX	96
+#define	OPEN_MAX	1024
 #undef	LINK_MAX
 #define	LINK_MAX	1
 #undef	NAME_MAX
