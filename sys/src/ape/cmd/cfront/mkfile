@@ -5,10 +5,7 @@ APE=$APEXPROOT/sys/src/ape
 CXXSRC=$APEXPROOT/sys/src/external/cfront-C4
 
 BIN=$APEXPROOT/$objtype/bin/ape
-TARG= cfront ns_strip c++filt ptcomp ptlink
-# szal # complains about undefined struct
-# c++patch # location of headers?
-# munch # _ctors missing?
+TARG= cfront munch ns_strip c++filt ptcomp ptlink szal
 
 CFILES=\
 	Bits.$O\
@@ -60,9 +57,6 @@ CFLAGS= -c -B -D_POSIX_SOURCE -D_BSD_EXTENSION -D__cfront_have_bool -I$CXXSRC/sr
 %.$O: $CXXSRC/tools/demangler/%.c
 	$CC $CFLAGS -I$CXXSRC/demangler -DDEM_MAIN $prereq -o $target
 
-patch-%.$O: $CXXSRC/tools/patch/%.c
-	$CC $CFLAGS $prereq -o $target
-
 munch-%.$O: $CXXSRC/tools/munch/%.c
 	$CC $CFLAGS $prereq -o $target
 
@@ -84,10 +78,7 @@ $O.ns_strip: ns_strip.$O
 $O.c++filt: dem.$O
 	$LD $prereq -o $target
 
-$O.c++patch: patch-patch.$O patch-dtors.$O patch-_main.$O
-	$LD $prereq -o $target
-
-$O.munch: munch-munch.$O munch-dtors.$O munch-_main.$O
+$O.munch: munch-munch.$O munch-dtors.$O munch-_main.$O munch-init.$O
 	$LD $prereq -o $target
 
 $O.ptcomp: ptcomp.$O ptutil.$O
@@ -97,7 +88,7 @@ $O.ptlink: ptlink.$O ptutil.$O pt-dem.$O
 	$LD $prereq -o $target
 
 $O.szal: szal.$O
-	$LD $prereq
+	$LD $prereq -o $target
 	mkdir -p $APEXPROOT/sys/lib/c++
 	./$O.szal | sort > $APEXPROOT/sys/lib/c++/$O.sz
 

@@ -149,7 +149,7 @@ int main()
 		fprintf(stderr,"Cannot handle sizeof(pointer to function) != sizeof(pointer to struct)\n");
 	out("#define DSZ_STRUCT",sizeof(struct st1));
 	out("#define DAL_STRUCT",(size_t)&oo.oo-(size_t)&oo.c8);
-	out("#define DSZ_WORD",sizeof(st5));
+	out("#define DSZ_WORD",sizeof(struct st5));
 	out("#define DSZ_WPTR",sizeof(struct ss *));
 	out("#define DAL_WPTR",(size_t)&oo.p2-(size_t)&oo.c7);
 	out("#define DSZ_BPTR",sizeof(char*));
