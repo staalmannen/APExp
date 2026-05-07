@@ -7,10 +7,10 @@ extern int atexit(void*);
 extern PFV _ctors[];
 extern void __dtors();
 
-void _main()
+void __cfront_pre_main()
 {
     atexit((PFV)__dtors);
-    
+
     PFV* pf=_ctors;
     for (; *pf; pf++) (**pf)();
 }

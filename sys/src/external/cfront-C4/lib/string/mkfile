@@ -10,7 +10,7 @@ OFILES=string.$O
 </sys/src/cmd/mksyslib
 
 CXXINCL=/sys/include/ape/c++
-CFLAGS=-FV -I.
+CFLAGS=-c -B -D_POSIX_SOURCE -D_BSD_EXTENSION
 CC=pcc
 
 # string.cpp is plain C++ that includes h/string.h — compile with driver

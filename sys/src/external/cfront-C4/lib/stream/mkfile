@@ -10,7 +10,7 @@ OFILES=cstreams.$O filebuf.$O flt.$O fstream.$O in.$O \
 </sys/src/cmd/mksyslib
 
 CXXINCL=/sys/include/ape/c++
-CFLAGS=-FV -I.
+CFLAGS=-c -B -D_POSIX_SOURCE -D_BSD_EXTENSION
 CC=pcc
 
 # stream sources include local headers from this directory

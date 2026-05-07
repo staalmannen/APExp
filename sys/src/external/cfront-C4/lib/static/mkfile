@@ -7,7 +7,7 @@ OFILES=_ctor.$O _dtor.$O pure.$O
 </sys/src/cmd/mksyslib
 
 CXXINCL=/sys/include/ape/c++
-CFLAGS=-FV -I.
+CFLAGS=-c -B -D_POSIX_SOURCE -D_BSD_EXTENSION
 CC=pcc
 
 %.c: %.cpp

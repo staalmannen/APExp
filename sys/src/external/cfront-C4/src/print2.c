@@ -4059,7 +4059,7 @@ void print_body__FP3fct(Pfct __1f) {
         }
 
         if (MAIN) {
-            fputs((const char *)"{ extern void _main(); _main(); ", out_file);
+            fputs((const char *)"{ extern void __cfront_pre_main(); __cfront_pre_main(); ", out_file);
             print__4stmtFv((struct stmt *)__1f->body__3fct);
             puttok__FUc((unsigned char)74);
         } else

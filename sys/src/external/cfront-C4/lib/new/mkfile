@@ -8,7 +8,7 @@ OFILES=_arr_map.$O _delete.$O _handler.$O \
 </sys/src/cmd/mksyslib
 
 CXXINCL=/sys/include/ape/c++
-CFLAGS=-FV -I.
+CFLAGS=-c -B -D_POSIX_SOURCE -D_BSD_EXTENSION
 CC=pcc
 
 %.c: %.cpp
