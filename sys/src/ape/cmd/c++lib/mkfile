@@ -1,0 +1,56 @@
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/libc++.a
+
+OFILES=\
+# complex\
+	abs.$O arg.$O cos.$O error.$O exp.$O io.$O \
+	log.$O oper.$O polar.$O pow.$O sin.$O sqrt.$O\
+# generic\
+	generic.$O\
+# new\
+	_arr_map.$O _delete.$O _handler.$O _main.$O \
+	_new.$O _vec.$O placenew.$O\
+# static\
+	_ctor.$O _dtor.$O pure.$O\
+# stream\
+	cstreams.$O filebuf.$O flt.$O fstream.$O in.$O \
+	intin.$O ios_compat.$O manip.$O oldformat.$O \
+	out.$O rawin.$O sbuf.dbp.$O stdiobuf.$O stream.$O \
+	streambuf.$O strstream.$O swstdio.$O
+# string\
+	string.$O\
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+CXXSOURCE=../../../external/cfront-C4/lib
+CXXINCL=/sys/include/ape/c++
+
+CC=pcc
+CFLAGS= -c -FV -I$CXXSOURCE/complex/complex -I$CXXSOURCE/stream
+
+%.c: $CXXSOURCE/complex/complex/%.cpp
+	c++ -F -I$CXXINCL -I$CXXSOURCE/complex/complex $prereq > $target
+
+%.c: $CXXSOURCE/generic/%.cpp
+	c++ -F -I$CXXINCL $prereq > $target
+
+%.c: $CXXSOURCE/new/%.cpp
+	c++ -F -I$CXXINCL $prereq > $target
+
+%.c: $CXXSOURCE/static/%.cpp
+	c++ -F -I$CXXINCL $prereq > $target
+
+%.c: $CXXSOURCE/stream/%.cpp
+	c++ -F -I$CXXINCL -I$CXXSOURCE/stream $prereq > $target
+
+%.c: $CXXSOURCE/string/%.cpp
+	c++ -F -I$CXXINCL $prereq > $target
+
+
+
+CLEANFILES=*.c
+
+
