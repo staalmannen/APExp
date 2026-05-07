@@ -1,6 +1,6 @@
 </$objtype/mkfile
 
-APEXPROOT=../../../../..
+APEXPROOT=../../../../../..
 RCBIN=$APEXPROOT/rc/bin/ape
 
 install:V:
