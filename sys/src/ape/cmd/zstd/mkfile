@@ -21,6 +21,7 @@ ZSTDFILES=\
 	benchfn.$O\
 	benchzstd.$O\
 	zstdcli_trace.$O\
+	lorem.$O
 
 LIB=$APEXPROOT/$objtype/lib/ape/libzstd.a\
 	$APEXPROOT/$objtype/lib/ape/libz.a\
@@ -44,7 +45,7 @@ CFLAGS= -c -D_POSIX_SOURCE -D_BSD_EXTENSION $ZSTDINC $DEFS
 %.$O: $ZSTDSRC/programs/%.c
 	$CC $CFLAGS $prereq -o $target
 
-$O.zstd: $ZSTDFILES
+$O.zstd: $ZSTDFILES $LIB
 	$LD $prereq -o $target
 
 $O.unzstd: $O.zstd
