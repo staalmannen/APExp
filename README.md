@@ -94,6 +94,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - liblzma (from xz version 5.8.3)
 - libz (version 1.3.2)
 - libbz2 (version 1.0.8)
+- lz4 (version 1.10.0)
 - zstd (version 1.5.7)
 - libpng (version 1.6.58)
 
