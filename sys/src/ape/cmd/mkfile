@@ -45,7 +45,8 @@ _OPTIONAL_APPS=\
 	f2c\
 	p2c\
 	objc\
-#	cfront\
+	cfront\
+		c++lib\
 #	basic\
 # dev tools \
 	pcregrep\

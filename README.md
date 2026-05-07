@@ -133,9 +133,10 @@ Install paths have been modified so that libraries and binaries are installed in
 
 C transpilers are fun little proof-of-concept programs, which also open up for more languages. Many will only have very little practical use, however.
 
-- The pascal-to-C transpiler p2c (2.01) is included in APExp
-- The fortran-to-C transpiler f2c (20250303) is included in APExp
-- The portable ObjC-to-C transpiler (3.4.8, bootstrap, TODO: build 3.4.13 with the bootstrapped compiler) is included in APExp
+- The pascal-to-C transpiler p2c (2.01)
+- The fortran-to-C transpiler f2c (20250303)
+- The portable ObjC-to-C transpiler (3.4.8, bootstrap, TODO: build 3.4.13 with the bootstrapped compiler)
+- Cfront (version "C4") C++-to-C transpiler
 
 
 ***(un)archivers***
