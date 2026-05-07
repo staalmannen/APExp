@@ -3,9 +3,9 @@ APE=$APEXPROOT/sys/src/ape
 <$APE/config
 TARG=perl
 
-OFILES=perlmain.$O
+OFILES=perlmain.$O op.$O perl.$O universal.$O
 
-LIB=$APEXPROOT/$objtype/lib/ape/libperl.a $APEXPROOT/$objtype/lib/ape/libap.a
+LIB=$APEXPROOT/$objtype/lib/ape/libperl.a
 BIN=$APEXPROOT/$objtype/bin/ape
 
 <$APEXPROOT/sys/src/cmd/mkone
@@ -13,5 +13,23 @@ BIN=$APEXPROOT/$objtype/bin/ape
 PERLSRC=../../../external/perl
 CFLAGS=-c -I$PERLSRC -D_POSIX_SOURCE -DHAVE_CONFIG_H -D_PLAN9_SOURCE -D_BSD_EXTENSION
 
+CLEANFILES = *.c
+
 %.$O: $PERLSRC/%.c
 	$CC $CFLAGS $prereq -o $target
+
+miniperl: miniperlmain.$O opmini.$O perlmini.$O universalmini.$O
+	$LD $prereq -o $target
+
+opmini.$O: $PERLSRC/op.c
+	$CC $CFLAGS  -DPERL_IS_MINIPERL -DPERL_EXTERNAL_GLOB $PERLSRC/op.c -o $target
+
+perlmini.$O: $PERLSRC/perl.c
+	$CC $CFLAGS -DPERL_IS_MINIPERL -DPERL_EXTERNAL_GLOB $PERLSRC/perl.c -o $target
+
+universalmini.$O: $PERLSRC/universal.c
+	$CC $CFLAGS -DPERL_IS_MINIPERL -DPERL_EXTERNAL_GLOB $PERLSRC/universal.c -o $target
+
+perlmain.c: miniperl $PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib
+	./miniperl -MExtUtils::Miniperl -e 'writemain(\"perlmain.c", @ARGV)' DynaLoader\
+	$PERLSRC/ext/ExtUtils-Miniperl/pm_to_blib
