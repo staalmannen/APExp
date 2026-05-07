@@ -5,7 +5,8 @@ APE=$APEXPROOT/sys/src/ape
 CXXSRC=$APEXPROOT/sys/src/external/cfront-C4
 
 BIN=$APEXPROOT/$objtype/bin/ape
-TARG= cfront ns_strip c++filt ptcomp ptlink szal
+TARG= cfront ns_strip c++filt ptcomp ptlink
+# szal # complains about undefined struct
 # c++patch # location of headers?
 # munch # _ctors missing?
 
@@ -105,9 +106,9 @@ RCBIN=$APEXPROOT/rc/bin/ape
 # Install the c++ rc driver script alongside the compiled tools.
 # mkmany's install:V: handles the binaries in TARG; this rule appends
 # to it (multiple V: rules for the same target all execute in Plan9 mk).
-install installall:V:
-	mkdir -p $RCBIN
-	cp $CXXSRC/tools/CC-driver/c++ $RCBIN/c++
+# install installall:V:
+#	mkdir -p $RCBIN
+#	cp $CXXSRC/tools/CC-driver/c++ $RCBIN/c++
 
 
 

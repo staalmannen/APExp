@@ -1,0 +1,280 @@
+#!/bin/rc
+# c++ — Plan9/APExp C++ compiler driver for cfront-C4
+#
+# Runs the pipeline:
+#   pcc -E  →  ns_strip  →  cfront +a1  →  pcc -c  →  [link]
+#
+# Usage:
+#   c++ [flags] file.cpp ...        compile and link
+#   c++ -c [flags] file.cpp ...     compile to .o, do not link
+#   c++ -E [flags] file.cpp         preprocessed C++ to stdout
+#   c++ -F [flags] file.cpp ...     cfront only: emit C to stdout (for mkfile rules)
+#   c++ -o out [flags] file.cpp ... compile, link, write to out
+#
+# Environment overrides:
+#   CFRONT   path to cfront binary      (default: cfront)
+#   CC       path to C compiler         (default: pcc)
+#   NSSTRIP  path to ns_strip binary    (default: ns_strip; skipped if missing)
+#   CXXINCL  C++ header directory       (default: /sys/include/ape/c++)
+#   CINCL    C header directory         (default: /sys/include/ape)
+#   CXXLIB   C++ runtime library        (default: /$objtype/lib/ape/libc++.a)
+
+rfork e
+
+# ---- locate tools ----
+if(~ $CFRONT '')   CFRONT   = cfront
+if(~ $CC '')       CC       = pcc
+if(~ $CXXINCL '')  CXXINCL  = /sys/include/ape/c++
+if(~ $CINCL '')    CINCL    = /sys/include/ape
+if(~ $CXXLIB '')   CXXLIB   = /$objtype/lib/ape/libc++.a
+
+# locate ns_strip: try NSSTRIP env var, then the built binary next to cfront
+nsstrip = $NSSTRIP
+if(~ $nsstrip '') {
+	if(test -x /bin/ns_strip)       nsstrip = ns_strip
+	if not if(test -x ./ns_strip)   nsstrip = ./ns_strip
+	# else leave empty — namespace stripping is skipped
+}
+
+fn usage {
+	echo 'usage: c++ [-cEFvN] [-o out] [-I dir] [-D sym] [-U sym] [-l lib] [-L dir] file.cpp ...' >[1=2]
+	exit usage
+}
+
+# ---- parse arguments ----
+cflag = ''   # -c: compile only, skip link
+eflag = ''   # -E: preprocess only
+fflag = ''   # -F: cfront only, emit C to stdout
+vflag = ''   # -v: verbose (echo each command)
+nflag = ''   # -N: skip ns_strip even if available
+outfile = '' # -o <file>
+
+iflags  = ()  # -I... (for preprocessor and C compiler)
+dflags  = ()  # -D... -U... (for preprocessor)
+lflags  = ()  # -l... -L... (for linker)
+ccopts  = ()  # -g -O etc passed to pcc
+sources = ()  # .cpp .cxx .cc .C source files
+cfiles  = ()  # .c files (compiled with pcc directly)
+objects = ()  # .o .a files (passed to linker)
+
+# two-pass parse: first sweep handles flags; second sweep collects files
+args = $*
+while(! ~ $#args 0) {
+	a = $args(1)
+	args = $args(2-)
+	switch($a) {
+	case -c
+		cflag = 1
+	case -E
+		eflag = 1
+	case -F
+		fflag = 1
+	case -v
+		vflag = 1
+	case -N
+		nflag = 1
+	case -o
+		if(~ $#args 0) { echo 'c++: -o requires an argument' >[1=2]; exit 1 }
+		outfile = $args(1)
+		args = $args(2-)
+	case -I
+		if(~ $#args 0) { echo 'c++: -I requires an argument' >[1=2]; exit 1 }
+		iflags = ($iflags -I$args(1))
+		args = $args(2-)
+	case -D
+		if(~ $#args 0) { echo 'c++: -D requires an argument' >[1=2]; exit 1 }
+		dflags = ($dflags -D$args(1))
+		args = $args(2-)
+	case -U
+		if(~ $#args 0) { echo 'c++: -U requires an argument' >[1=2]; exit 1 }
+		dflags = ($dflags -U$args(1))
+		args = $args(2-)
+	case -l
+		if(~ $#args 0) { echo 'c++: -l requires an argument' >[1=2]; exit 1 }
+		lflags = ($lflags -l$args(1))
+		args = $args(2-)
+	case -L
+		if(~ $#args 0) { echo 'c++: -L requires an argument' >[1=2]; exit 1 }
+		lflags = ($lflags -L$args(1))
+		args = $args(2-)
+	case -I*
+		iflags = ($iflags $a)
+	case -D*
+		dflags = ($dflags $a)
+	case -U*
+		dflags = ($dflags $a)
+	case -l*
+		lflags = ($lflags $a)
+	case -L*
+		lflags = ($lflags $a)
+	case -o*
+		outfile = `{echo $a | sed 's/^-o//'}
+	case -g -O -O0 -O1 -O2 -O3 -Os -w -Fw -FV
+		ccopts = ($ccopts $a)
+	case *.cpp
+		sources = ($sources $a)
+	case *.cxx
+		sources = ($sources $a)
+	case *.cc
+		sources = ($sources $a)
+	case *.C
+		sources = ($sources $a)
+	case *.c
+		cfiles = ($cfiles $a)
+	case *.o
+		objects = ($objects $a)
+	case *.a
+		objects = ($objects $a)
+	case --
+		# remaining args are all files
+		for(f in $args) {
+			switch($f) {
+			case *.cpp *.cxx *.cc *.C
+				sources = ($sources $f)
+			case *.c
+				cfiles = ($cfiles $f)
+			case *.o *.a
+				objects = ($objects $f)
+			}
+		}
+		args = ()
+	case -*
+		# unknown flag: pass to pcc
+		ccopts = ($ccopts $a)
+	case *
+		# bare word: treat as file
+		switch($a) {
+		case *.cpp *.cxx *.cc *.C
+			sources = ($sources $a)
+		case *.c
+			cfiles = ($cfiles $a)
+		case *.o *.a
+			objects = ($objects $a)
+		case *
+			echo 'c++: ignoring unknown argument: '$a >[1=2]
+		}
+	}
+}
+
+if(~ $#sources 0 && ~ $#cfiles 0 && ~ $#objects 0) usage
+
+# ---- -E: preprocess only ----
+if(! ~ $eflag '') {
+	for(src in $sources) {
+		if(! ~ $vflag '')
+			echo $CC -E -I$CXXINCL $iflags $dflags -D__cplusplus=1 -Dc_plusplus=1 $src >[1=2]
+		$CC -E -I$CXXINCL $iflags $dflags -D__cplusplus=1 -Dc_plusplus=1 $src
+		if(! ~ $status 0) exit $status
+	}
+	exit 0
+}
+
+# ---- set up temp directory ----
+tmpdir = /tmp/cxx.$pid
+mkdir -p $tmpdir
+fn cleanup { rm -rf $tmpdir }
+fn sigint  { cleanup; exit interrupted }
+fn sighup  { cleanup; exit hangup }
+
+# ---- compile each C++ source file ----
+compiled_objects = ()
+
+for(src in $sources) {
+	# derive base name for temp/output files
+	base = `{basename $src | sed 's/\.\(cpp\|cxx\|cc\|C\)$//'}
+
+	pp   = $tmpdir/$base.pp.c     # preprocessed
+	ns   = $tmpdir/$base.ns.c     # after ns_strip
+	cf   = $tmpdir/$base.cf.c     # after cfront (generated C)
+
+	# determine .o path: next to source unless -c -o was given
+	if(~ $cflag '' && ~ $fflag '') {
+		# linking: object goes to tmpdir
+		obj = $tmpdir/$base.o
+	}
+	if not {
+		# -c mode: object goes next to source (or to -o if given and single file)
+		obj = $base.o
+		if(! ~ $outfile '' && ~ $#sources 1 && ~ $#cfiles 0)
+			obj = $outfile
+	}
+
+	# 1. Preprocess
+	if(! ~ $vflag '')
+		echo $CC -E -I$CXXINCL $iflags $dflags -D__cplusplus=1 -Dc_plusplus=1 $src >[1=2]
+	$CC -E -I$CXXINCL $iflags $dflags -D__cplusplus=1 -Dc_plusplus=1 $src > $pp
+	if(! ~ $status 0) { cleanup; exit $status }
+
+	# 2. ns_strip (namespace preprocessor)
+	if(~ $nflag '' && ! ~ $nsstrip '') {
+		if(! ~ $vflag '') echo $nsstrip >[1=2]
+		$nsstrip < $pp > $ns
+		if(! ~ $status 0) { cleanup; exit $status }
+	}
+	if not
+		ns = $pp
+
+	# 3. cfront: C++ → C
+	if(! ~ $vflag '') echo $CFRONT +a1 +f$src >[1=2]
+	$CFRONT +a1 +f$src < $ns > $cf
+	if(! ~ $status 0) { cleanup; exit $status }
+
+	# -F mode: emit C to stdout (or -o file) and stop
+	if(! ~ $fflag '') {
+		if(~ $outfile '') {
+			cat $cf
+		}
+		if not {
+			cp $cf $outfile
+		}
+		continue   # next source file
+	}
+
+	# 4. Compile generated C
+	if(! ~ $vflag '') echo $CC -c -I$CINCL $iflags $ccopts $cf -o $obj >[1=2]
+	$CC -c -I$CINCL $iflags $ccopts $cf -o $obj
+	if(! ~ $status 0) { cleanup; exit $status }
+
+	compiled_objects = ($compiled_objects $obj)
+}
+
+# -F mode done
+if(! ~ $fflag '') { cleanup; exit 0 }
+
+# compile any plain .c files that were passed
+for(src in $cfiles) {
+	base = `{basename $src .c}
+	if(~ $cflag '' ) {
+		obj = $tmpdir/$base.o
+	}
+	if not {
+		obj = $base.o
+		if(! ~ $outfile '' && ~ $#cfiles 1 && ~ $#sources 0 && ~ $#objects 0)
+			obj = $outfile
+	}
+	if(! ~ $vflag '') echo $CC -c -I$CINCL $iflags $ccopts $src -o $obj >[1=2]
+	$CC -c -I$CINCL $iflags $ccopts $src -o $obj
+	if(! ~ $status 0) { cleanup; exit $status }
+	compiled_objects = ($compiled_objects $obj)
+}
+
+# -c mode: done after compilation
+if(! ~ $cflag '') { cleanup; exit 0 }
+
+# ---- link ----
+if(~ $outfile '') outfile = a.out
+
+all_objects = ($compiled_objects $objects)
+
+# include libc++.a if it exists and we compiled any C++ sources
+cxxlib_arg = ()
+if(! ~ $#sources 0 && test -f $CXXLIB)
+	cxxlib_arg = ($CXXLIB)
+
+if(! ~ $vflag '')
+	echo $CC $ccopts $all_objects $cxxlib_arg $lflags -o $outfile >[1=2]
+$CC $ccopts $all_objects $cxxlib_arg $lflags -o $outfile
+if(! ~ $status 0) { cleanup; exit $status }
+
+cleanup
+exit 0
