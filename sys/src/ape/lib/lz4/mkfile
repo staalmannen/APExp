@@ -13,9 +13,9 @@ OFILES=\
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
-$LZ4SOURCE=../../../external/lz4
+LZ4SOURCE=../../../external/lz4
 
-DEFS= -DLZ4F_STATIC_LINKING_ONLY
+# DEFS= -DLZ4F_STATIC_LINKING_ONLY
 
 CFLAGS=-c -I$$LZ4SOURCE/lib -D_POSIX_SOURCE $DEFS
 
