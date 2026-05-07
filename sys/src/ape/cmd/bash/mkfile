@@ -50,8 +50,10 @@ OFILES=\
 	tparam.$O\
 # tilde -force linking \
 	tilde.$O\
-# hack to fix linking errors \
-	shmalloc.$O\
+# hack to fix linking errors without bash malloc\
+#	shmalloc.$O\
+# bash malloc\
+	malloc.$O
 
 BASHSRC=$APEXPROOT/sys/src/external/bash
 
@@ -87,6 +89,9 @@ CFLAGS=	-c -B -I. -I$BASHSRC -I$BASHSRC/include -I$BASHSRC/lib $DEFS
 
 %.$O: $BASHSRC/%.c
 			$CC $CFLAGS $BASHSRC/$stem.c
+
+malloc.$O: $BASHSRC/lib/malloc/malloc.c
+			$CC $CFLAGS $BASHSRC/lib/malloc/malloc.c
 
 termcap.$O: $BASHSRC/lib/termcap/termcap.c
 			$CC $CFLAGS $BASHSRC/lib/termcap/termcap.c

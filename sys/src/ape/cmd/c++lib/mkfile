@@ -11,7 +11,7 @@ OFILES=\
 # generic\
 	generic.$O\
 # new\
-	_arr_map.$O _delete.$O _handler.$O _main.$O \
+	_arr_map.$O _delete.$O _handler.$O \
 	_new.$O _vec.$O placenew.$O\
 # static\
 	_ctor.$O _dtor.$O pure.$O\
@@ -19,7 +19,7 @@ OFILES=\
 	cstreams.$O filebuf.$O flt.$O fstream.$O in.$O \
 	intin.$O ios_compat.$O manip.$O oldformat.$O \
 	out.$O rawin.$O sbuf.dbp.$O stdiobuf.$O stream.$O \
-	streambuf.$O strstream.$O swstdio.$O
+	streambuf.$O strstream.$O swstdio.$O\
 # string\
 	string.$O\
 
@@ -51,6 +51,6 @@ CFLAGS= -c -FV -I$CXXSOURCE/complex/complex -I$CXXSOURCE/stream
 
 
 
-CLEANFILES=*.c
+CLEANFILES= "*.c"
 
 
