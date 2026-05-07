@@ -32,7 +32,7 @@ static void early_init(void) {
     in_file = stdin;
 }
 
-void _main(void) { early_init(); }
+void __cfront_pre_main(void) { early_init(); }
 
 /* ------------------------------------------------------------------ */
 /* EH runtime: setjmp/longjmp exception handling for cfront            */

@@ -173,10 +173,18 @@ gcc -E -I$SRC -I$INCL -D__HAVE_SIZE_T -D__cfront__ -D__cplusplus=1 \
 
 3. **FILE\* globals initialised to NULL** — `lex.c` has `void *out_file = 0`
    because cfront could not evaluate `stdout` at translation time. Fixed in
-   `cfront_stubs.c`: `_main()` (called by cfront's generated startup code
-   before user `main()`) calls `early_init()` which sets `out_file = stdout`
+   `cfront_stubs.c`: `__cfront_pre_main()` (called by cfront's generated startup
+   code before user `main()`) calls `early_init()` which sets `out_file = stdout`
    and `in_file = stdin`. Note: `__attribute__((constructor))` is NOT used
    because Plan 9's pcc does not support GCC constructor attributes.
+
+   **Important:** The function was originally named `_main()` but was renamed to
+   `__cfront_pre_main()` because on Plan 9/APE, `TEXT _main(SB)` in `main9.s`
+   (libap.a) is the **process entry point** — not a C function. Linking a C
+   `_main()` object causes it to override the APE assembly startup, leaving
+   the runtime uninitialised (signal tables, stdio, etc.), so any library call
+   crashes immediately (fault at addr 0x1/0x2). The rename affects four files:
+   `cfront_stubs.c`, `main.c`, `print2.c`, and `tools/munch/_main.c`.
 
 4. **`setbuf` crash in `error_init`** — the old `incl/stdio.h` defined `FILE`
    as `void`, so the struct layout differed from the 64-bit system FILE.
@@ -209,7 +217,7 @@ stdin → lex (lalex.c/lex.c) → parse (y.tab.c / gram.y)
 
 | File | Role |
 |------|------|
-| `cfront_stubs.c` | Runtime shims: `_main`, `__vec_new/delete`, early init. Compile WITHOUT `-I../incl`. |
+| `cfront_stubs.c` | Runtime shims: `__cfront_pre_main`, `__vec_new/delete`, early init. Compile WITHOUT `-I../incl`. |
 | `_stdio.c` | `_get_stdin/stdout/stderr()`. Compile WITHOUT `-I../incl`. |
 | `main.c` | Entry point: `error_init → otbl_init → lex_init → syn_init → typ_init → simpl_init → run`. |
 | `y.tab.c` | Parser (yacc output from `gram.y`). Grammar is the entry point for new features. |

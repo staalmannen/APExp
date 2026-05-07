@@ -3120,8 +3120,8 @@ extern void simpl_init__Fv(void);
 extern int error__FPCc(const char *);
 
 int main(int __1argc, char **__1argv) {
-    extern void _main();
-    _main();
+    extern void __cfront_pre_main(void);
+    __cfront_pre_main();
     {
         char *__1cp;
         const char *__1afile;
