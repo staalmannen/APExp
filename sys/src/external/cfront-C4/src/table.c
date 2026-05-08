@@ -1348,7 +1348,8 @@ Pname insert__5tableFP4nameUc(register struct table *__0this, Pname __1nx, TOK _
         __1n = (__1np[(__1hash[__1i])]);
         if (__1n == 0)
             error__FiPCc((int)'i', (const char *)"hashed lookup");
-        if (strcmp(__1n->__O2__4expr.string, __1s) == 0)
+        if (__1n->__O2__4expr.string != 0 &&
+                strcmp(__1n->__O2__4expr.string, __1s) == 0)
             goto found;
 
         if (__1mx <= (++__1i))
@@ -1447,6 +1448,7 @@ void grow__5tableFi(register struct table *__0this, int __1g) {
         int __2firsti;
 
         __2s = (__1np[__1j])->__O2__4expr.string;
+        if (__2s == 0) continue;    /* skip corrupt null-string entries during rehash */
 
         __2p = __2s;
         __2i = 0;
