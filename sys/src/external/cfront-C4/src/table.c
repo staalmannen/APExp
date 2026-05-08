@@ -1242,7 +1242,7 @@ Pname look__5tableFPCcUc(register struct table *__0this, const char *__1s, TOK _
             if (__1n == 0)
                 error__FiPCc((int)'i', (const char *)"hashed lookup");
             __1p = __1n->__O2__4expr.string;
-            if (__1p == 0 || (unsigned long long)__1p < 0x10000ULL) goto nxt;
+            if ((long long)__1p < 0x200000) goto nxt;
             __1q = __1s;
             while (((*__1p)) && ((*__1q)))
                 if (((*(__1p++))) != ((*(__1q++))))
@@ -1348,8 +1348,7 @@ Pname insert__5tableFP4nameUc(register struct table *__0this, Pname __1nx, TOK _
         __1n = (__1np[(__1hash[__1i])]);
         if (__1n == 0)
             error__FiPCc((int)'i', (const char *)"hashed lookup");
-        if (__1n->__O2__4expr.string != 0 &&
-                (unsigned long long)__1n->__O2__4expr.string >= 0x10000ULL &&
+        if ((long long)__1n->__O2__4expr.string >= 0x200000 &&
                 strcmp(__1n->__O2__4expr.string, __1s) == 0)
             goto found;
 
@@ -1449,7 +1448,7 @@ void grow__5tableFi(register struct table *__0this, int __1g) {
         int __2firsti;
 
         __2s = (__1np[__1j])->__O2__4expr.string;
-        if (__2s == 0 || (unsigned long long)__2s < 0x10000ULL) continue;    /* skip corrupt null-string entries during rehash */
+        if ((long long)__2s < 0x200000) continue;
 
         __2p = __2s;
         __2i = 0;
@@ -1468,7 +1467,7 @@ void grow__5tableFi(register struct table *__0this, int __1g) {
             if (__1n == 0)
                 error__FiPCc((int)'i', (const char *)"hashed lookup");
             __2p = __1n->__O2__4expr.string;
-            if (__2p == 0 || (unsigned long long)__2p < 0x10000ULL) goto nxt;
+            if ((long long)__2p < 0x200000) goto nxt;
             __2q = __2s;
             while (((*__2p)) && ((*__2q)))
                 if (((*(__2p++))) != ((*(__2q++))))
@@ -1605,7 +1604,7 @@ Pname look__6ktableFPCcUc(register struct ktable *__0this, const char *__1s, TOK
                 __2n = __0this->__O1__6ktable.k_n;
 
                 for (; __2n; __2n = __2n->n_tbl_list__4name) {
-                    if (__2n->__O2__4expr.string == 0 || (unsigned long long)__2n->__O2__4expr.string < 0x10000ULL) continue;
+                    if ((long long)__2n->__O2__4expr.string < 0x200000) continue;
                     if ((((((*__2n->__O2__4expr.string)) == ((*__1s)))
                               ? strcmp(__2n->__O2__4expr.string, __1s)
                               : -1) == 0) &&
@@ -1669,8 +1668,8 @@ Pname insert__6ktableFP4nameUc(register struct ktable *__0this, Pname __1nn, TOK
                     __3n = __0this->__O1__6ktable.k_n;
 
                     for (; __3n; __3n = __3n->n_tbl_list__4name) {
-                        if (__3n->__O2__4expr.string == 0 || (unsigned long long)__3n->__O2__4expr.string < 0x10000ULL ||
-                            __1nn->__O2__4expr.string == 0 || (unsigned long long)__1nn->__O2__4expr.string < 0x10000ULL) continue;
+                        if ((long long)__3n->__O2__4expr.string < 0x200000 ||
+                            (long long)__1nn->__O2__4expr.string < 0x200000) continue;
                         if ((((((*__3n->__O2__4expr.string)) == ((*__1nn->__O2__4expr.string)))
                                   ? strcmp(__3n->__O2__4expr.string, __1nn->__O2__4expr.string)
                                   : -1) == 0) &&
