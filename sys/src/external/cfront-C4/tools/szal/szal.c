@@ -56,17 +56,19 @@ struct ss {
 	PF pf;
 } oo;
 struct st5 { char a; int :0; };	/* by definition: a word */
-struct st2 { char :2; };
-struct st3 { int :2; };
-struct st4 { char :2; char :2; };
+/* kencc requires at least one named member to compute sizeof a bitfield struct;
+   adding a dummy name does not change the struct's size or alignment */
+struct st2 { char _x:2; };
+struct st3 { int _x:2; };
+struct st4 { char _x:2; char _y:2; };
 
-struct st6 { char v[3]; char : 2; };	/* fits in 4 bytes */
-struct st7 { char v[3]; int : 2; };	/* might not */
-struct st8 { char v[3]; char : 2; char : 2; };
+struct st6 { char v[3]; char _x: 2; };	/* fits in 4 bytes */
+struct st7 { char v[3]; int _x: 2; };	/* might not */
+struct st8 { char v[3]; char _x: 2; char _y: 2; };
 
-struct st9 { char v[7]; char : 2; };	/* fits in 8 bytes */
-struct st10 { char v[7]; int : 2; };	/* might not */
-struct st11 { char v[7]; char : 2; char : 2; };
+struct st9 { char v[7]; char _x: 2; };	/* fits in 8 bytes */
+struct st10 { char v[7]; int _x: 2; };	/* might not */
+struct st11 { char v[7]; char _x: 2; char _y: 2; };
 
 void out(s,a1) char* s; int a1;
 {

@@ -2,11 +2,16 @@
 
 DIRS=\
 	CC-driver\
-	patch\
 	munch\
 	pt\
 	demangler\
 	szal\
+
+# patch requires COFF binary format headers (<filehdr.h> <ldfcn.h> etc.)
+# which are SVr4-specific and do not exist on Plan 9.  The tool rewrites
+# __link chains in COFF executables, which is inapplicable to Plan 9 a.out.
+# Use munch (nm-output scanning) instead for constructor registration.
+broken=patch
 
 none:V:
 	echo mk all, install, installall, clean, or nuke
