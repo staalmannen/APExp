@@ -133,7 +133,11 @@ main(int argc, char *argv[])
 			suf = utfrrune(s, '.');
 			if(suf) {
 				suf++;
-				if(strcmp(suf, "c") == 0) {
+				if(strcmp(suf, "c") == 0 ||
+					   strcmp(suf, "cpp") == 0 ||
+					   strcmp(suf, "cxx") == 0 ||
+					   strcmp(suf, "cc") == 0 ||
+					   strcmp(suf, "C") == 0) {
 					append(&srcs, s);
 					append(&objs, changeext(s, ot->o));
 				} else if(strcmp(suf, ot->o) == 0 ||

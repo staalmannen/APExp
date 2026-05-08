@@ -161,9 +161,14 @@ if(~ $#sources 0 && ~ $#cfiles 0 && ~ $#objects 0) usage
 # ---- -E: preprocess only ----
 if(! ~ $eflag '') {
 	for(src in $sources) {
+		base = `{basename $src | sed 's/\.\(cpp\|cxx\|cc\|C\)$//'}
+		# pcc only accepts .c extension; copy source to a temp .c file
+		tmpc = /tmp/cxx.$pid.$base.c
+		cp $src $tmpc
 		if(! ~ $vflag '')
 			echo $CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src >/fd/2
-		$CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src
+		$CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $tmpc
+		rm -f $tmpc
 		if(! ~ $status 0) exit $status
 	}
 	exit 0
@@ -200,9 +205,12 @@ for(src in $sources) {
 	}
 
 	# 1. Preprocess
+	# pcc only accepts .c extension; copy source to a temp .c file
+	csrc = $tmpdir/$base.src.c
+	cp $src $csrc
 	if(! ~ $vflag '')
 		echo $CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src >/fd/2
-	$CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src > $pp
+	$CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $csrc > $pp
 	if(! ~ $status 0) { cleanup; exit $status }
 
 	# 2. ns_strip (namespace preprocessor)
