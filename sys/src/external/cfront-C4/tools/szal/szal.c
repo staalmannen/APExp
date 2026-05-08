@@ -113,9 +113,16 @@ int main()
 		long i = 1;
 		while (i) { i<<=1; i&=~1; i2++; }
 	}
+	else if (sizeof(struct st5) == sizeof(long long)) {
+		/* Plan 9 kencc on amd64: int :0 aligns to pointer size (8 bytes),
+		   not sizeof(int) (4 bytes), so sizeof(st5)==8 falls through above */
+		unsigned long long li = 1;
+		while (li) { li<<=1; li&=~1ULL; i2++; }
+	}
 	else {
 		fprintf(stderr,"Warning: Your C compiler probably handles 0 lengths fields wrong\n");
-		i = sizeof(int);
+		/* fall back to int-sized word so DBI_IN_WORD is non-zero */
+		{ int fi = 1; while (fi) { fi<<=1; fi&=~1; i2++; } }
 	}
 
 	out("#define DBI_IN_WORD",i2);
