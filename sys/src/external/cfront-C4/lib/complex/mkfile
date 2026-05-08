@@ -14,4 +14,4 @@ CC=pcc
 %.c: complex/%.cpp
 	c++ -F -I$CXXINCL -I./complex $prereq > $target
 
-CLEANFILES=*.c
+CLEANFILES=${OFILES:.$O=.c}

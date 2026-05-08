@@ -17,4 +17,4 @@ CC=pcc
 %.c: %.cpp
 	c++ -F -I$CXXINCL -I. $prereq > $target
 
-CLEANFILES=*.c
+CLEANFILES=${OFILES:.$O=.c}
