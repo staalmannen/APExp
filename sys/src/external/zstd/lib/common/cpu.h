@@ -34,8 +34,9 @@ MEM_STATIC ZSTD_cpuid_t ZSTD_cpuid(void) {
     U32 f1d = 0;
     U32 f7b = 0;
     U32 f7c = 0;
-#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86)) || defined(Plan9)
-#if !defined(_M_X64) || !defined(__clang__) || __clang_major__ >= 16 || defined(Plan9)
+#if !defined(Plan9)
+#if defined(_MSC_VER) && (defined(_M_X64) || defined(_M_IX86))
+#if !defined(_M_X64) || !defined(__clang__) || __clang_major__ >= 16
     int reg[4];
     __cpuid((int*)reg, 0);
     {
@@ -133,6 +134,7 @@ MEM_STATIC ZSTD_cpuid_t ZSTD_cpuid(void) {
               : "edx");
     }
 #endif
+#endif /* Plan9 */
     {
         ZSTD_cpuid_t cpuid;
         cpuid.f1c = f1c;

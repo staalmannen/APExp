@@ -17,11 +17,7 @@ OFILES=\
 	regcomp_invlist.$O regcomp_study.$O regcomp_trie.$O \
 	regexec.$O run.$O scope.$O sv.$O \
 	taint.$O time64.$O toke.$O utf8.$O \
-	util.$O \
-	# Generated bootstrap sources
-	opmini.$O \
-	perlmini.$O \
-	universalmini.$O \
+	util.$O
 
 <$APEXPROOT/sys/src/cmd/mksyslib
 
@@ -29,3 +25,8 @@ CFLAGS=-c -I$PERLSRC -D_POSIX_SOURCE -DHAVE_CONFIG_H -D_PLAN9_SOURCE -D_BSD_EXTE
 
 %.$O: $PERLSRC/%.c
 	$CC $CFLAGS $prereq -o $target
+
+
+
+
+

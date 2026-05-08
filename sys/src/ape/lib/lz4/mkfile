@@ -1,0 +1,25 @@
+APEXPROOT=../../../../../
+APE=$APEXPROOT/sys/src/ape
+<$APE/config
+
+LIB=$APEXPROOT/$objtype/lib/ape/liblz4.a
+
+OFILES=\
+	lz4.$O\
+	lz4file.$O\
+	lz4frame.$O\
+	lz4hc.$O\
+	xxhash.$O
+
+<$APEXPROOT/sys/src/cmd/mksyslib
+
+LZ4SOURCE=../../../external/lz4
+
+# DEFS= -DLZ4F_STATIC_LINKING_ONLY
+
+CFLAGS=-c -I$$LZ4SOURCE/lib -D_POSIX_SOURCE $DEFS
+
+%.$O: $LZ4SOURCE/lib/%.c
+	$CC $CFLAGS $LZ4SOURCE/lib/$stem.c
+
+

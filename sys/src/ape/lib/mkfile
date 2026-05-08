@@ -17,6 +17,7 @@ _OPTIONAL_LIBS=\
 	curses\
 	fortran\
 	lua\
+	lz4\
 	lzma\
 	pascal\
 	pcre2\

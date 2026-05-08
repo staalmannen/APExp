@@ -24,7 +24,7 @@ $incdir = "/sys/include/ape";
 $libdir = "/$objtype/lib/ape";
 
 $pascalpat = $ENV{"P2CC_PAT"} || "\\.p\$|\\.pas\$";
-$cccommand = $ENV{"P2CC_CC"} || "cc";
+$cccommand = $ENV{"P2CC_CC"} || "pcc";
 $ccopts = $ENV{"P2CC_CCOPTS"} || "";
 $ccopts2 = $ENV{"P2CC_CCOPTS2"} || "";
 $p2clib = $ENV{"P2CC_LIBP2C"};

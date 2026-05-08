@@ -50,18 +50,17 @@ OFILES=\
 	tparam.$O\
 # tilde -force linking \
 	tilde.$O\
-# hack to fix linking errors \
-	shmalloc.$O\
 
 BASHSRC=$APEXPROOT/sys/src/external/bash
 
 BASHLIBS=\
+	libmalloc.a$O\
 	libbuiltins.a$O\
 	libglob.a$O\
-	libsh.a$O
+	libsh.a$O\
+	libhistory.a$O\
 
-LIB= $BASHLIBS $APEXPROOT/$objtype/lib/ape/libreadline.a\
-	$APEXPROOT/$objtype/lib/ape/libcurses.a
+LIB= $BASHLIBS $APEXPROOT/$objtype/lib/ape/libreadline.a
 
 BIN=$APEXPROOT/$objtype/bin/ape
 
@@ -112,9 +111,8 @@ libmalloc.a$O: $BASHSRC/lib/malloc/Makefile
 			mv $BASHSRC/lib/malloc/libmalloc.a libmalloc.a$O
 			rm $BASHSRC/lib/malloc/*.o
 
-libreadline.a$O: $BASHSRC/lib/readline/Makefile
+libhistory.a$O: $BASHSRC/lib/readline/Makefile
 			make -C $BASHSRC/lib/readline libhistory.a
-			mv $BASHSRC/lib/readline/libreadline.a libreadline.a$O
 			mv $BASHSRC/lib/readline/libhistory.a libhistory.a$O
 			rm $BASHSRC/lib/readline/*.o
 

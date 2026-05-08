@@ -56,10 +56,10 @@ the most capable web browser available on Plan9.
 Imported the latest 9front APE sources from git [7] (date: 2024-04-24; rebased 2026-01-29, which included the bitfield patch from @jamoson (bitfield support in kencc) [8]).
 In addition, several patches from @lufia [9, 10] to build libressl and curl
 (introduces pthread, include_next cpp support, etc) has been applied to the
-sources. To get more C99 compatibility, vibe-coded (claude.ai) patches have been introduced (VLA, hex float support, complex support, compound literals, division by 0, dropping keywords, etc). C99 support is *pretty much complete* by now, and we have even started adding some C11/C23 features to the compiler. This served as a base to add ports of third party libraries and utilities to enhance compatibility.
+sources. To get more C99 compatibility, AI-generated patches have been introduced (VLA, hex float support, complex support, compound literals, division by 0, dropping keywords, etc). C99 support is *pretty much complete* by now, and we have even started adding some C11/C23 features to the compiler. This served as a base to add ports of third party libraries and utilities to enhance compatibility.
 
 
-Install paths have been modified so that libraries and binaries are installed in the local directory structure of APExp. A bind script (apexp-sh) in the root of APExp can be used to overlay APExp over the native APE.
+Install paths have been modified so that libraries and binaries are installed in the local directory structure of APExp. A bind script (apexp-sh) in the root of APExp can be used to overlay APExp over the native system.
 
 
 ***Headers***
@@ -79,12 +79,13 @@ Install paths have been modified so that libraries and binaries are installed in
 ***Libraries***
 
 **new libap**
-- libap, lib9, libbsd, libpthreads, libutf, libfmt, libv, libmp and libnet are merged
+- libap, lib9, libbsd, libpthreads, libutf, libfmt, libv, libmp and libnet are merged into libap.a
 - 3rd party libc functions primarily from musl libc, but also some from NetBSD (fts-standalone, libnbcompat)
 - sys/src/ape/lib/ap has been reorganized like the musl src directory
 - imported fenv, math, complex, regex, search and other functions from musl libc
 - migrated from APE stdio to musl stdio (with some major porting, using pthreads)
 - fchown/fchmod stubs introduced
+- minimal (shim and stub) functions for common gnulib functions included
 
 **3rd party**
 - libcurses : PDCursesMod (check out 2026-04-08; built with utf8/wchar)
@@ -94,6 +95,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - liblzma (from xz version 5.8.3)
 - libz (version 1.3.2)
 - libbz2 (version 1.0.8)
+- lz4 (version 1.10.0)
 - zstd (version 1.5.7)
 - libpng (version 1.6.58)
 
@@ -110,7 +112,7 @@ Install paths have been modified so that libraries and binaries are installed in
 - A "musl" iconv utility has been added from Alpine Linux.
 - GNU bison (version 3.8) introduced. Native yacc as "yacc" because it is sometimes needed
 - system lex has been replaced by flex (version 2.6.4) as lex
-- vibe-coded (claude.ai) GAS-compatible "as" front end to native $Oa assemblers.
+- an AI-generated GAS-compatible "as" front end to native $Oa assemblers.
 - the utilities like "cut", "ls", "true", "tsort", "xargs" and "yes" *et al.* have been built from suckless sbase [15]
 - steve's mkmk (/n/sources/contrib) imported to APExp
 - copied "which", and "printenv" rc scripts from steve (/n/sources/contrib)
@@ -133,7 +135,7 @@ C transpilers are fun little proof-of-concept programs, which also open up for m
 
 - The pascal-to-C transpiler p2c (2.01) is included in APExp
 - The fortran-to-C transpiler f2c (20250303) is included in APExp
-- The ObjC-to-C transpiler (3.4.8, bootstrap, TODO: build 3.4.13 with the bootstrapped compiler) is included in APExp
+- The portable ObjC-to-C transpiler (3.4.8, bootstrap, TODO: build 3.4.13 with the bootstrapped compiler) is included in APExp
 
 
 ***(un)archivers***

@@ -21,12 +21,12 @@ set - $OBJCOPT "$@"
 #
 
 objcdir=${OBJCDIR-/}
-libdirname=$objtype/lib/ape
+libdirname=/$objtype/lib/ape
 gcprefix=/
 
 cc=${CC-"pcc"}
 ld=${LD-"pcc"}
-cpp=${CPP-"cc -E"}
+cpp=${CPP-"pcc -E"}
 cppwantsdotc=1
 cpargs="-D__PORTABLE_OBJC__ "
 ocargs="-gnu -noTags"
@@ -325,9 +325,9 @@ done
 # for cross compiles this is not what we want
 #
 
-bindir="$objcdir/bin"
-libdir="$objcdir/$libdirname"
-hdrdir="$objcdir/include"
+bindir="/bin"
+libdir="/$objtype/lib/ape"
+hdrdir="/sys/include/ape"
 objc1=$bindir/objc1
 
 case $verbose in
