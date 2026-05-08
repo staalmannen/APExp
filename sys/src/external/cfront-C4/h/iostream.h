@@ -36,7 +36,7 @@ public:
     enum open_mode  { in=1, out=2, ate=4, app=010, trunc=020,
                       nocreate=040, noreplace=0100 };
     enum seek_dir   { beg=0, cur=1, end=2 };
-    enum            { skipws=01,
+    enum fmt_flags  { skipws=01,
                       left=02, right=04, internal=010,
                       dec=020, oct=040, hex=0100,
                       showbase=0200, showpoint=0400, uppercase=01000,
@@ -100,7 +100,7 @@ public:
     int         skip(int i);
 
 protected:
-    enum        { skipping=01000, tied=02000 };
+    enum priv_flags { skipping=01000, tied=02000 };
     streambuf*  bp;
     void        setstate(int b) {
                     state |= (b&0377);
@@ -355,8 +355,5 @@ extern istream& ws(istream&);
 extern ios&     dec(ios&);
 extern ios&     hex(ios&);
 extern ios&     oct(ios&);
-
-/* Old-style stream compatibility */
-typedef istream istream_withassign;
 
 #endif
