@@ -56,18 +56,20 @@ struct ss {
 	PF pf;
 } oo;
 
-typedef struct { char a; int :0; } st5;	/* by definition: a word */
-typedef struct { char :2; } st2;
-typedef struct { int :2; } st3;
-typedef struct { char :2; char :2; } st4;
+struct st5 { char a; int :0; };	/* by definition: a word */
+/* kencc requires at least one named member to compute sizeof a bitfield struct;
+   adding a dummy name does not change the struct's size or alignment */
+struct st2 { char _x:2; };
+struct st3 { int _x:2; };
+struct st4 { char _x:2; char _y:2; };
 
-typedef struct { char v[3]; char : 2; } st6;	/* fits in 4 bytes */
-typedef struct { char v[3]; int : 2; } st7;	/* might not */
-typedef struct { char v[3]; char : 2; char : 2; } st8;
+struct st6 { char v[3]; char _x: 2; };	/* fits in 4 bytes */
+struct st7 { char v[3]; int _x: 2; };	/* might not */
+struct st8 { char v[3]; char _x: 2; char _y: 2; };
 
-typedef struct { char v[7]; char : 2; } st9;	/* fits in 8 bytes */
-typedef struct { char v[7]; int : 2; } st10;	/* might not */
-typedef struct { char v[7]; char : 2; char : 2; } st11;
+struct st9 { char v[7]; char _x: 2; };	/* fits in 8 bytes */
+struct st10 { char v[7]; int _x: 2; };	/* might not */
+struct st11 { char v[7]; char _x: 2; char _y: 2; };
 
 void out(s,a1) char* s; int a1;
 {
@@ -99,15 +101,15 @@ int main()
 
 	while (c) { c<<=1; c&=~1; i1++; }	/* i1 = #bits in byte */
 
-	if (sizeof(st5) == sizeof(char))	/* i2 = #bits in word  */
+	if (sizeof(struct st5) == sizeof(char))	/* i2 = #bits in word  */
 		i2 = i1;
-	else if (sizeof(st5) == sizeof(short)) {
+	else if (sizeof(struct st5) == sizeof(short)) {
 		short i = 1;
 		while (i) { i<<=1; i&=~1; i2++; }
 	}
-	else if (sizeof(st5) == sizeof(int))
+	else if (sizeof(struct st5) == sizeof(int))
 		while (i) { i<<=1; i&=~1; i2++; }
-	else if (sizeof(st5) == sizeof(long)) {
+	else if (sizeof(struct st5) == sizeof(long)) {
 		long i = 1;
 		while (i) { i<<=1; i&=~1; i2++; }
 	}
@@ -166,16 +168,16 @@ int main()
 	outstr("#define DLARGEST_LLONG",largest);
 	switch (sizeof(struct st1)) {
 	case 1:
-		i1 = sizeof(st2)!=sizeof(st3);
-		i2 = sizeof(st2)==sizeof(st4);
+		i1 = sizeof(struct st2)!=sizeof(struct st3);
+		i2 = sizeof(struct st2)==sizeof(struct st4);
 		break;
 	case 2:
-		i1 = sizeof(st6)!=sizeof(st7);
-		i2 = sizeof(st6)==sizeof(st8);
+		i1 = sizeof(struct st6)!=sizeof(struct st7);
+		i2 = sizeof(struct st6)==sizeof(struct st8);
 		break;
 	case 4:
-		i1 = sizeof(st9)!=sizeof(st10);
-		i2 = sizeof(st9)==sizeof(st11);
+		i1 = sizeof(struct st9)!=sizeof(struct st10);
+		i2 = sizeof(struct st9)==sizeof(struct st11);
 		break;
 	default:
 		fprintf(stderr,"Cannot figure out if field sizes are sensitive to the type of fields\n");

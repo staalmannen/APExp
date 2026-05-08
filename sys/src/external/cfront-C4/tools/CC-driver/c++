@@ -37,7 +37,7 @@ if(~ $nsstrip '') {
 }
 
 fn usage {
-	echo 'usage: c++ [-cEFvN] [-o out] [-I dir] [-D sym] [-U sym] [-l lib] [-L dir] file.cpp ...' >[1=2]
+	echo 'usage: c++ [-cEFvN] [-o out] [-I dir] [-D sym] [-U sym] [-l lib] [-L dir] file.cpp ...' >/fd/2
 	exit usage
 }
 
@@ -74,27 +74,27 @@ while(! ~ $#args 0) {
 	case -N
 		nflag = 1
 	case -o
-		if(~ $#args 0) { echo 'c++: -o requires an argument' >[1=2]; exit 1 }
+		if(~ $#args 0) { echo 'c++: -o requires an argument' >/fd/2; exit 1 }
 		outfile = $args(1)
 		args = $args(2-)
 	case -I
-		if(~ $#args 0) { echo 'c++: -I requires an argument' >[1=2]; exit 1 }
+		if(~ $#args 0) { echo 'c++: -I requires an argument' >/fd/2; exit 1 }
 		iflags = ($iflags -I$args(1))
 		args = $args(2-)
 	case -D
-		if(~ $#args 0) { echo 'c++: -D requires an argument' >[1=2]; exit 1 }
+		if(~ $#args 0) { echo 'c++: -D requires an argument' >/fd/2; exit 1 }
 		dflags = ($dflags -D$args(1))
 		args = $args(2-)
 	case -U
-		if(~ $#args 0) { echo 'c++: -U requires an argument' >[1=2]; exit 1 }
+		if(~ $#args 0) { echo 'c++: -U requires an argument' >/fd/2; exit 1 }
 		dflags = ($dflags -U$args(1))
 		args = $args(2-)
 	case -l
-		if(~ $#args 0) { echo 'c++: -l requires an argument' >[1=2]; exit 1 }
+		if(~ $#args 0) { echo 'c++: -l requires an argument' >/fd/2; exit 1 }
 		lflags = ($lflags -l$args(1))
 		args = $args(2-)
 	case -L
-		if(~ $#args 0) { echo 'c++: -L requires an argument' >[1=2]; exit 1 }
+		if(~ $#args 0) { echo 'c++: -L requires an argument' >/fd/2; exit 1 }
 		lflags = ($lflags -L$args(1))
 		args = $args(2-)
 	case -I*
@@ -151,7 +151,7 @@ while(! ~ $#args 0) {
 		case *.o *.a
 			objects = ($objects $a)
 		case *
-			echo 'c++: ignoring unknown argument: '$a >[1=2]
+			echo 'c++: ignoring unknown argument: '$a >/fd/2
 		}
 	}
 }
@@ -162,8 +162,8 @@ if(~ $#sources 0 && ~ $#cfiles 0 && ~ $#objects 0) usage
 if(! ~ $eflag '') {
 	for(src in $sources) {
 		if(! ~ $vflag '')
-			echo $CC -E -I$CXXINCL $iflags $dflags -D__cplusplus=1 -Dc_plusplus=1 $src >[1=2]
-		$CC -E -I$CXXINCL $iflags $dflags -D__cplusplus=1 -Dc_plusplus=1 $src
+			echo $CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src >/fd/2
+		$CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src
 		if(! ~ $status 0) exit $status
 	}
 	exit 0
@@ -201,13 +201,13 @@ for(src in $sources) {
 
 	# 1. Preprocess
 	if(! ~ $vflag '')
-		echo $CC -E -I$CXXINCL $iflags $dflags -D__cplusplus=1 -Dc_plusplus=1 $src >[1=2]
-	$CC -E -I$CXXINCL $iflags $dflags -D__cplusplus=1 -Dc_plusplus=1 $src > $pp
+		echo $CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src >/fd/2
+	$CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src > $pp
 	if(! ~ $status 0) { cleanup; exit $status }
 
 	# 2. ns_strip (namespace preprocessor)
 	if(~ $nflag '' && ! ~ $nsstrip '') {
-		if(! ~ $vflag '') echo $nsstrip >[1=2]
+		if(! ~ $vflag '') echo $nsstrip >/fd/2
 		$nsstrip < $pp > $ns
 		if(! ~ $status 0) { cleanup; exit $status }
 	}
@@ -215,7 +215,7 @@ for(src in $sources) {
 		ns = $pp
 
 	# 3. cfront: C++ → C
-	if(! ~ $vflag '') echo $CFRONT +a1 +f$src >[1=2]
+	if(! ~ $vflag '') echo $CFRONT +a1 +f$src >/fd/2
 	$CFRONT +a1 +f$src < $ns > $cf
 	if(! ~ $status 0) { cleanup; exit $status }
 
@@ -231,7 +231,7 @@ for(src in $sources) {
 	}
 
 	# 4. Compile generated C
-	if(! ~ $vflag '') echo $CC -c -I$CINCL $iflags $ccopts $cf -o $obj >[1=2]
+	if(! ~ $vflag '') echo $CC -c -I$CINCL $iflags $ccopts $cf -o $obj >/fd/2
 	$CC -c -I$CINCL $iflags $ccopts $cf -o $obj
 	if(! ~ $status 0) { cleanup; exit $status }
 
@@ -252,7 +252,7 @@ for(src in $cfiles) {
 		if(! ~ $outfile '' && ~ $#cfiles 1 && ~ $#sources 0 && ~ $#objects 0)
 			obj = $outfile
 	}
-	if(! ~ $vflag '') echo $CC -c -I$CINCL $iflags $ccopts $src -o $obj >[1=2]
+	if(! ~ $vflag '') echo $CC -c -I$CINCL $iflags $ccopts $src -o $obj >/fd/2
 	$CC -c -I$CINCL $iflags $ccopts $src -o $obj
 	if(! ~ $status 0) { cleanup; exit $status }
 	compiled_objects = ($compiled_objects $obj)
@@ -272,7 +272,7 @@ if(! ~ $#sources 0 && test -f $CXXLIB)
 	cxxlib_arg = ($CXXLIB)
 
 if(! ~ $vflag '')
-	echo $CC $ccopts $all_objects $cxxlib_arg $lflags -o $outfile >[1=2]
+	echo $CC $ccopts $all_objects $cxxlib_arg $lflags -o $outfile >/fd/2
 $CC $ccopts $all_objects $cxxlib_arg $lflags -o $outfile
 if(! ~ $status 0) { cleanup; exit $status }
 

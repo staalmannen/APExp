@@ -1,8 +1,8 @@
 BUILTINS=
 </$objtype/mkfile
 
-broken=task 
-dirs=new generic complex stream
+broken=task
+dirs=static new generic complex stream string
 
 install:V:
 	for(i in $dirs) @{

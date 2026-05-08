@@ -4,8 +4,8 @@ BUILTINS=
 %.$O:	%.c
 	$CC $stem.c
 
-$O.out:	munch.$O dtors.$O _main.$O
-	$LD $prereq 
+$O.out:	munch.$O dtors.$O _main.$O init.$O
+	$LD $prereq
 
 install:V: $O.out
 	mv $O.out /$objtype/bin/c++/munch
