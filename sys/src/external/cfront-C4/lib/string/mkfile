@@ -17,4 +17,4 @@ CC=pcc
 string.c: string.cpp
 	c++ -F -I$CXXINCL $prereq > $target
 
-CLEANFILES=*.c
+CLEANFILES=${OFILES:.$O=.c}
