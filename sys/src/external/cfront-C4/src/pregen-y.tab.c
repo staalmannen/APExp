@@ -4908,7 +4908,7 @@ yyreduce:
         Pname __3n;
 
         __3n = (yystack.l_mark__11YYSTACKDATA[0]).pn__7YYSTYPE;
-        if (__3n && __3n->__O2__4name.n_qualifier) {
+        if (__3n && (long long)__3n->__O2__4name.n_qualifier >= 0x200000) {
             if (__3n->__O2__4name.n_qualifier->n_template_arg__4name != 1)
                 UNSET_SCOPE__Fv();
             if (__3n->__O2__4name.n_qualifier == sta_name)
@@ -4995,7 +4995,7 @@ yyreduce:
                     (struct block *)0, (unsigned char)0);
             }
         }
-        if (err_name && err_name->__O2__4name.n_qualifier) {
+        if (err_name && (long long)err_name->__O2__4name.n_qualifier >= 0x200000) {
             if (err_name->__O2__4name.n_qualifier->n_template_arg__4name != 1)
                 UNSET_SCOPE__Fv();
             if (err_name->__O2__4name.n_qualifier == sta_name)
@@ -5425,7 +5425,7 @@ yyreduce:
         __3n = (yystack.l_mark__11YYSTACKDATA[0]).pn__7YYSTYPE;
         if (__3n) {
             yyval.nl__7YYSTYPE = __ct__5nlistFP4name((struct nlist *)0, __3n);
-            if (__3n->__O2__4name.n_qualifier) {
+            if ((long long)__3n->__O2__4name.n_qualifier >= 0x200000) {
                 if (__3n->__O2__4name.n_qualifier->n_template_arg__4name != 1)
                     UNSET_SCOPE__Fv();
                 if (__3n->__O2__4name.n_qualifier == sta_name)
@@ -5458,7 +5458,7 @@ yyreduce:
             error__FPCc((const char *)"DL syntax");
         }
         if (__3n) {
-            if (__3n->__O2__4name.n_qualifier) {
+            if ((long long)__3n->__O2__4name.n_qualifier >= 0x200000) {
                 if (__3n->__O2__4name.n_qualifier->n_template_arg__4name != 1)
                     UNSET_SCOPE__Fv();
                 if (__3n->__O2__4name.n_qualifier == sta_name)
@@ -6634,7 +6634,7 @@ yyreduce:
     case 135: {
     fct_friend1:
         if (((in_friend && (yystack.l_mark__11YYSTACKDATA[-1]).pn__7YYSTYPE) &&
-             (yystack.l_mark__11YYSTACKDATA[-1]).pn__7YYSTYPE->__O2__4name.n_qualifier) &&
+             ((long long)(yystack.l_mark__11YYSTACKDATA[-1]).pn__7YYSTYPE->__O2__4name.n_qualifier >= 0x200000)) &&
             ((yystack.l_mark__11YYSTACKDATA[-1])
                  .pn__7YYSTYPE->__O2__4name.n_qualifier->n_template_arg__4name != 1))
             UNSET_SCOPE__Fv();
@@ -6649,7 +6649,7 @@ yyreduce:
     case 137: {
     fct_friend2:
         if (((in_friend && (yystack.l_mark__11YYSTACKDATA[0]).pn__7YYSTYPE) &&
-             (yystack.l_mark__11YYSTACKDATA[0]).pn__7YYSTYPE->__O2__4name.n_qualifier) &&
+             ((long long)(yystack.l_mark__11YYSTACKDATA[0]).pn__7YYSTYPE->__O2__4name.n_qualifier >= 0x200000)) &&
             ((yystack.l_mark__11YYSTACKDATA[0])
                  .pn__7YYSTYPE->__O2__4name.n_qualifier->n_template_arg__4name != 1))
             UNSET_SCOPE__Fv();

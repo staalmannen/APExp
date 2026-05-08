@@ -811,7 +811,7 @@ external_def	:  data_dcl
 		|  fct_def
 			{ mod: //SYM -- tn stuff removed
 				Pname n = $<pn>1;
-				if ( n && n->n_qualifier ) {//SYM
+				if ( n && (long long)n->n_qualifier >= 0x200000 ) {//SYM
 					if ( n->n_qualifier->n_template_arg != template_type_formal )
 						UNSET_SCOPE();
 					if ( n->n_qualifier == sta_name )
@@ -856,7 +856,7 @@ fct_dcl		: decl ASSIGN initializer SM
 					error("syntax error:TX for%k%n",t->base,err_name);
 					$$ = Ndata(defa_type,err_name);
 				}
-				if ( err_name && err_name->n_qualifier ) {
+				if ( err_name && (long long)err_name->n_qualifier >= 0x200000 ) {
 					if ( err_name->n_qualifier->n_template_arg != template_type_formal )
 						UNSET_SCOPE();
 					if ( err_name->n_qualifier == sta_name )
@@ -1088,7 +1088,7 @@ decl_list	:  dl
 			{	Pname n = $<pn>1;
 				if (n) {
 				    $<nl>$ = new nlist(n);
-				    if ( n->n_qualifier ) {//SYM
+				    if ( (long long)n->n_qualifier >= 0x200000 ) {//SYM
 					if ( n->n_qualifier->n_template_arg != template_type_formal )
 						UNSET_SCOPE();
 					if ( n->n_qualifier == sta_name )
@@ -1110,7 +1110,7 @@ decl_list	:  dl
 					error("DL syntax");
 				}
 				if ( n ) {
-				    if ( n->n_qualifier ) {//SYM
+				    if ( (long long)n->n_qualifier >= 0x200000 ) {//SYM
 					if ( n->n_qualifier->n_template_arg != template_type_formal )
 						UNSET_SCOPE();
 					if ( n->n_qualifier == sta_name )
@@ -1686,7 +1686,7 @@ cl_mem		:  data_dcl
 				fct_friend1:
 				if (in_friend &&
 				    $<pn>1 &&
-				    $<pn>1->n_qualifier &&
+				    (long long)$<pn>1->n_qualifier >= 0x200000 &&
 				    $<pn>1->n_qualifier->n_template_arg != template_type_formal)
 					UNSET_SCOPE();
 			}
@@ -1699,7 +1699,7 @@ cl_mem		:  data_dcl
 				fct_friend2:
 				if (in_friend &&
 				    $<pn>1 &&
-				    $<pn>1->n_qualifier &&
+				    (long long)$<pn>1->n_qualifier >= 0x200000 &&
 				    $<pn>1->n_qualifier->n_template_arg != template_type_formal)
 					UNSET_SCOPE();
 			}
