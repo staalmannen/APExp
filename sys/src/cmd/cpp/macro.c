@@ -147,24 +147,14 @@ expandrow(Tokenrow *trp, char *flag)
 		setsource(flag, -1, "");
 	for (i = 0; i < rowlen(trp); ) {
 		Token *tp = &trp->bp[i];
-		if (tp->type!=NAME) { i++; continue; }
-		if (quicklook(tp->t[0], tp->len>1?tp->t[1]:0)==0) {
-			fprintf(stderr, "SKIP ql: %.*s\n", tp->len, tp->t);
-			i++; continue;
+		if (tp->type!=NAME
+		 || quicklook(tp->t[0], tp->len>1?tp->t[1]:0)==0
+		 || (np = lookup(tp, 0))==NULL
+		 || (np->flag&(ISDEFINED|ISMAC))==0
+		 || tp->hideset && checkhideset(tp->hideset, np)) {
+			i++;
+			continue;
 		}
-		if ((np = lookup(tp, 0))==NULL) {
-			fprintf(stderr, "SKIP np: %.*s\n", tp->len, tp->t);
-			i++; continue;
-		}
-		if ((np->flag&(ISDEFINED|ISMAC))==0) {
-			fprintf(stderr, "SKIP def: %.*s\n", tp->len, tp->t);
-			i++; continue;
-		}
-		if (tp->hideset && checkhideset(tp->hideset, np)) {
-			fprintf(stderr, "SKIP hs: %.*s hs=%d\n", tp->len, tp->t, tp->hideset);
-			i++; continue;
-		}
-		fprintf(stderr, "EXPAND: %.*s hs=%d flag=%s\n", tp->len, tp->t, tp->hideset, flag?flag:"(main)");
 		trp->tp = tp;
 		if (np->val==KDEFINED) {
 			tp->type = DEFINED;
@@ -218,7 +208,6 @@ expandrow(Tokenrow *trp, char *flag)
 		 * expand() has reset trp->tp to the start of the expansion.
 		 */
 		i = trp->tp - trp->bp;
-		fprintf(stderr, "expandrow: rescan from i=%d (total %d)\n", i, rowlen(trp));
 	}
 	if (flag)
 		unsetsource();
@@ -237,14 +226,11 @@ expand(Tokenrow *trp, Nlist *np)
 	Tokenrow ntr;
 	Token *tp;
 
-	fprintf(stderr, "expand(): macro=%.*s hs=%d vp_len=%d\n", np->len, np->name, trp->tp->hideset, rowlen(np->vp));
 	copytokenrow(&ntr, np->vp);		/* copy macro value */
-	fprintf(stderr, "expand(): after copytokenrow, ntr len=%d\n", rowlen(&ntr));
 	if (np->ap==NULL) {			/* parameterless */
 		ntokc = 1;
 		atr[0] = nil;
 		substargs(np, &ntr, atr, trp->tp->hideset, 0);
-		fprintf(stderr, "expand(): after substargs, ntr len=%d\n", rowlen(&ntr));
 	} else {
 		ntokc = gatherargs(trp, atr, (np->flag&ISVARMAC) ? rowlen(np->ap) : 0, &narg);
 		if (narg<0) {			/* not actually a call (no '(') */
@@ -275,11 +261,8 @@ expand(Tokenrow *trp, Nlist *np)
 	}
 
 	hs = newhideset(trp->tp->hideset, np);
-	fprintf(stderr, "expand(): hs loop: ntr len=%d hs=%d\n", rowlen(&ntr), hs);
 	for (tp=ntr.bp; tp<ntr.lp; tp++) {	/* distribute hidesets */
-		fprintf(stderr, "  tok[%d] type=%d len=%d '%.*s'\n", (int)(tp-ntr.bp), tp->type, tp->len, tp->len, tp->t);
 		if (tp->type==NAME) {
-			fprintf(stderr, "  hideset: %.*s gets hs=%d (was %d)\n", tp->len, tp->t, hs, tp->hideset);
 			if (tp->hideset==0)
 				tp->hideset = hs;
 			else
@@ -289,8 +272,6 @@ expand(Tokenrow *trp, Nlist *np)
 	ntr.tp = ntr.bp;
 	insertrow(trp, ntokc, &ntr);
 	trp->tp -= rowlen(&ntr);
-	fprintf(stderr, "expand(): after insert, trp->tp offset=%d ntokc=%d rowlen(ntr)=%d\n",
-		(int)(trp->tp - trp->bp), ntokc, rowlen(&ntr));
 	free(ntr.bp);
 }	
 
