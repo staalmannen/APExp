@@ -34,8 +34,6 @@
 // Where symbol table data gets mapped into memory.
 #define SYMDATVA 0x99LL<<24
 
-#include <u.h>
-
 /* Go-style types for compatibility */
 typedef unsigned char uint8;
 typedef unsigned short uint16;
@@ -67,15 +65,17 @@ typedef vlong int64;
 #define pathchar go_pathchar
 #define pathtoprefix go_pathtoprefix
 
-typedef struct go_Library go_Library;
-struct go_Library
+typedef struct Reloc Reloc;
+struct Reloc
 {
-	char *objref;	// object where we found the reference
-	char *srcref;	// src file where we found the reference
-	char *file;		// object file
-	char *pkg;	// import path
+	int n;
+	int t;
+	uchar *m;
+	ulong *a;
 };
 
+typedef struct go_Library go_Library;
+...
 // Terrible but standard terminology.
 // A segment describes a block of file to load into memory.
 // A section further describes the pieces of that block for

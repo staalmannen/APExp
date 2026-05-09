@@ -33,21 +33,26 @@
 #include	"lib.h"
 #include	<ar.h>
 
-int go_iconv(Fmt*);
-
-/* Conflicting globals are commented out as they are provided by architecture-specific obj.c */
 /*
-char	symname[]	= SYMDEF;
-char*	libdir[16];
-int	nlibdir = 0;
-int	cout = -1;
-*/
+ * These functions bridge the DWARF code to the native linker's output.
+ * We use the native cput() and cflush() macros defined in l.h.
+ */
 
-//TODO: ifdef GOLANG
-char	go_pkgname[]	= "__.PKGDEF";
-char*	go_goroot;
-char*	go_goarch;
-char*	go_goos;
+void
+lputl(long l)
+{
+	cput(l);
+	cput(l>>8);
+	cput(l>>16);
+	cput(l>>24);
+}
+
+void
+wputl(ushort w)
+{
+	cput(w);
+	cput(w>>8);
+}
 
 void
 vlputl(vlong v)
@@ -55,6 +60,23 @@ vlputl(vlong v)
 	lputl(v);
 	lputl(v>>32);
 }
+
+vlong
+cpos(void)
+{
+	return seek(cout, 0, 1);
+}
+
+/*
+ * Original lib.c contents (renamed to go_ prefixed to avoid collisions)
+ */
+
+int go_iconv(Fmt*);
+
+char	go_pkgname[]	= "__.PKGDEF";
+char*	go_goroot;
+char*	go_goarch;
+char*	go_goos;
 
 void
 go_mywhatsys(void)
@@ -108,12 +130,6 @@ go_unmal(void *v, uint32 n)
 	}
 }
 
-// Copied from ../gc/subr.c:/^pathtoprefix; must stay in sync.
-/*
- * Convert raw string to the prefix that will be used in the symbol table.
- * Invalid bytes turn into %xx.  Right now the only bytes that need
- * escaping are %, ., and ", but we escape all control characters too.
- */
 char*
 go_pathtoprefix(char *s)
 {
@@ -121,17 +137,14 @@ go_pathtoprefix(char *s)
 	char *p, *r, *w;
 	int n;
 
-	// check for chars that need escaping
 	n = 0;
 	for(r=s; *r; r++)
 		if(*r <= ' ' || *r == '.' || *r == '%' || *r == '"')
 			n++;
 
-	// quick exit
 	if(n == 0)
 		return s;
 
-	// escape
 	p = go_mal((r-s)+1+2*n);
 	for(r=s, w=p; *r; r++) {
 		if(*r <= ' ' || *r == '.' || *r == '%' || *r == '"') {
@@ -192,16 +205,10 @@ go_ewrite(int fd, void *buf, int n)
 	}
 }
 
-/* 
- * The following functions are mostly redundant or conflicting with 
- * architecture-specific linkers. They are kept here but might need
- * to be prefixed or removed if they cause linking errors.
- */
-
 void
 go_Lflag(char *arg)
 {
-	if(nlibdir >= 16-1) { // Assuming 16 from commented out libdir[16]
+	if(nlibdir >= 16-1) {
 		print("too many -L's: %d\n", nlibdir);
 		usage();
 	}
@@ -212,12 +219,10 @@ void
 go_libinit(void)
 {
 	fmtinstall('i', go_iconv);
-//TODO: ifdef GOLANG
-	go_mywhatsys();	// get goroot, goarch, goos
+	go_mywhatsys();
 	if(strcmp(go_goarch, thestring) != 0)
 		print("goarch is not known: %s\n", go_goarch);
 
-	// add goroot to the end of the libdir list.
 	libdir[nlibdir++] = smprint("%s/pkg/%s_%s", go_goroot, go_goos, go_goarch);
 
 	unlink(outfile);
@@ -303,7 +308,6 @@ go_addlib(char *src, char *obj)
 	cleanname(name);
 
 	if(search) {
-		// try dot, -L "libdir", and then goroot.
 		for(i=0; i<nlibdir; i++) {
 			snprint(pname, sizeof pname, "%s/%s", libdir[i], name);
 			if(access(pname, AEXIST) >= 0)
@@ -313,7 +317,6 @@ go_addlib(char *src, char *obj)
 		strcpy(pname, name);
 	cleanname(pname);
 
-	/* runtime.a -> runtime */
 	if(strlen(name) > 2 && name[strlen(name)-2] == '.')
 		name[strlen(name)-2] = '\0';
 
@@ -398,7 +401,6 @@ loop:
 	for(s = hash[h]; s != S; s = s->link)
 		if(s->type == SXREF)
 			goto loop;
-
 }
 
 void
@@ -415,7 +417,7 @@ go_objfile(char *file, char *pkg)
 
 	pkg = smprint("%i", pkg);
 
-	if(file[0] == '-' && file[1] == 'l') {	// TODO: fix this
+	if(file[0] == '-' && file[1] == 'l') {
 		if(debug['9'])
 			sprint(name, "/%s/lib/lib", thestring);
 		else
@@ -434,7 +436,6 @@ go_objfile(char *file, char *pkg)
 	}
 	l = Bread(f, magbuf, SARMAG);
 	if(l != SARMAG || strncmp(magbuf, ARMAG, SARMAG)){
-		/* load it as a regular file */
 		l = Bseek(f, 0L, 2);
 		Bseek(f, 0L, 0);
 		go_ldobj(f, pkg, l, file, FileObj);
@@ -459,7 +460,6 @@ go_objfile(char *file, char *pkg)
 		struct ar_hdr pkghdr;
 		int n;
 
-		// Read next ar header to check for package safe bit.
 		Bseek(f, esym+(esym&1), 0);
 		l = Bread(f, &pkghdr, SAR_HDR);
 		if(l != SAR_HDR) {
@@ -474,9 +474,6 @@ go_objfile(char *file, char *pkg)
 		ldpkg(f, pkg, n, file, Pkgdef);
 	}
 
-	/*
-	 * just bang the whole symbol file into memory
-	 */
 	Bseek(f, off, 0);
 	cnt = esym - off;
 	start = go_mal(cnt + 10);
@@ -548,10 +545,6 @@ go_ldobj(Biobuf *f, char *pkg, int64 len, char *pn, int whence)
 
 	eof = Boffset(f) + len;
 
-	// don't load individual object more than once.
-	// happens with import of .6 files because of loop in xresolv.
-	// doesn't happen with .a because SYMDEF is consulted
-	// first to decide whether each individual object file is needed.
 	for(i=0; i<files; i++)
 		if(strcmp(filen[i], pn) == 0)
 			return;
@@ -565,7 +558,6 @@ go_ldobj(Biobuf *f, char *pkg, int64 len, char *pn, int whence)
 	pn = strdup(pn);
 	filen[files++] = pn;
 
-	/* check the header */
 	line = Brdline(f, '\n');
 	if(line == nil) {
 		if(Blinelen(f) > 0) {
@@ -586,9 +578,8 @@ go_ldobj(Biobuf *f, char *pkg, int64 len, char *pn, int whence)
 		return;
 	}
 
-	/* skip over exports and other info -- ends with \n!\n */
 	import0 = Boffset(f);
-	c1 = '\n';	// the last line ended in \n
+	c1 = '\n';
 	c2 = Bgetc(f);
 	c3 = Bgetc(f);
 	while(c1 != '\n' || c2 != '!' || c3 != '\n') {
@@ -601,7 +592,7 @@ go_ldobj(Biobuf *f, char *pkg, int64 len, char *pn, int whence)
 	import1 = Boffset(f);
 
 	Bseek(f, import0, 0);
-	ldpkg(f, pkg, import1 - import0 - 2, pn, whence);	// -2 for !\n
+	ldpkg(f, pkg, import1 - import0 - 2, pn, whence);
 	Bseek(f, import1, 0);
 
 	ldobj1(f, pkg, eof - Boffset(f), pn);
@@ -704,11 +695,6 @@ go_collapsefrog(Sym *s)
 {
 	int i;
 
-	/*
-	 * bad encoding of path components only allows
-	 * MAXHIST components. if there is an overflow,
-	 * first try to collapse xxx/..
-	 */
 	for(i=1; i<histfrogp; i++)
 		if(strcmp(histfrog[i]->name+1, "..") == 0) {
 			memmove(histfrog+i-1, histfrog+i+1,
@@ -717,9 +703,6 @@ go_collapsefrog(Sym *s)
 			goto out;
 		}
 
-	/*
-	 * next try to collapse .
-	 */
 	for(i=0; i<histfrogp; i++)
 		if(strcmp(histfrog[i]->name+1, ".") == 0) {
 			memmove(histfrog+i, histfrog+i+1,
@@ -727,9 +710,6 @@ go_collapsefrog(Sym *s)
 			goto out;
 		}
 
-	/*
-	 * last chance, just truncate from front
-	 */
 	memmove(histfrog+0, histfrog+1,
 		(histfrogp-1)*sizeof(histfrog[0]));
 

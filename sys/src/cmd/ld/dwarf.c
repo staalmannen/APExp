@@ -3,14 +3,35 @@
 // license that can be found in the LICENSE file.
 
 #include	"l.h"
-#include 	"lib.h"
+#include	"lib.h"
 #include	"dwarf.h"
 #include	"dwarf_defs.h"
 
+// Externs for linker structures defined in l.h
+extern Prog *textp;
+extern Prog *curtext;
+extern Sym *hash[NHASH];
+Prog *cursym; // Added this
+
+// Linker-core functions/vars not available in lib.h
+extern void cput(int);
+extern void cflush(void);
+extern void LPUT(long);
+extern void WPUT(ushort);
+extern void VPUT(vlong);
+extern void lputl(long);
+extern void wputl(ushort);
+extern void vlputl(vlong);
+extern vlong cpos(void);
+extern void diag(char*, ...);
+extern void errorexit(void);
+extern void* malloc(long);
+extern void free(void*);
 
 /*
  * Offsets and sizes of the debug_* sections in the cout file.
  */
+...
 
 static vlong abbrevo;
 static vlong abbrevsize;
@@ -505,8 +526,7 @@ checknesting(void)
 	if (includetop >= nelem(includestack)) {
 		diag("nesting too deep");
 		for (i = 0; i < nelem(includestack); i++)
-			diag("\t%s", histfile[includestack[i].file]);
-		errorexit();
+		        diag("%s", histfile[includestack[i].file]);		errorexit();
 	}
 }
 
