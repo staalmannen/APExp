@@ -4,14 +4,14 @@
  *
  * Feel free to modify any of this as the need arises.  Note, however,
  * that running config_h.SH again will wipe out any changes you've made.
- * For a more permanent change edit config.sh and rerun config_h.SH.
+ * For a more permanent change edit config.sh and rerun config_h.SH .
  */
 
 /* Package name      : perl5
  * Source directory  : .
  * Configuration time: Wed May  6 10:30:21 CEST 2026
  * Configured by     : jens
- * Target system     : linux cx1906 7.0.1-0-generic #1 smp preempt_dynamic thu apr 23 08:50:13 utc 2026 x86_64 
+ * Target system     : Plan9 APExp 
  */
 
 #ifndef _config_h_
@@ -20,7 +20,7 @@
 /* LOC_SED:
  *	This symbol holds the complete pathname to the sed program.
  */
-#define LOC_SED 	"/usr/bin/sed"	/**/
+#define LOC_SED 	"/bin/sed"	/**/
 
 /* HAS_ALARM:
  *	This symbol, if defined, indicates that the alarm routine is
@@ -382,7 +382,7 @@
  *	This symbol, if defined, indicates that the entire sem*(2) library is
  *	supported.
  */
-#define HAS_SEM		/**/
+#undef HAS_SEM		/**/
 
 /* HAS_SETEGID:
  *	This symbol, if defined, indicates that the setegid routine is available
@@ -1041,8 +1041,8 @@
  *		static _inline      (older MSVC)
  *		static              (c89 compilers)
  */
-#define HAS_STATIC_INLINE				/**/
-#define PERL_STATIC_INLINE static __inline__	/**/
+#undef HAS_STATIC_INLINE				/**/
+#define PERL_STATIC_INLINE /**/
 
 /* USE_STDIO_PTR:
  *	This symbol is defined if the _ptr and _cnt fields (or similar)
@@ -1619,7 +1619,7 @@
 #define HAS_UNAME		/**/
 /*#define HAS_PHOSTNAME	/ **/
 #ifdef HAS_PHOSTNAME
-#define PHOSTNAME "/usr/bin/hostname"	/* How to get the host name */
+#define PHOSTNAME "/bin/hostname"	/* How to get the host name */
 #endif
 
 /* HAS_GETNETBYADDR:

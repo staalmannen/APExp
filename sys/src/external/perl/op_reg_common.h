@@ -57,9 +57,6 @@ typedef enum {
 /* Manually decorate these functions here with gcc-style attributes just to
  * avoid making the regex_charset typedef global, which it would need to be for
  * proto.h to understand it */
-PERL_STATIC_INLINE void
-set_regex_charset(U32 * const flags, const regex_charset cs)
-    __attribute__nonnull__(1);
 
 PERL_STATIC_INLINE void
 set_regex_charset(U32 * const flags, const regex_charset cs)
@@ -70,10 +67,6 @@ set_regex_charset(U32 * const flags, const regex_charset cs)
     *flags &= ~RXf_PMf_CHARSET;
     *flags |= (cs << _RXf_PMf_CHARSET_SHIFT);
 }
-
-PERL_STATIC_INLINE regex_charset
-get_regex_charset(const U32 flags)
-    __attribute__warn_unused_result__;
 
 PERL_STATIC_INLINE regex_charset
 get_regex_charset(const U32 flags)

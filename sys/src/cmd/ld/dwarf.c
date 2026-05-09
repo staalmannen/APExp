@@ -36,7 +36,7 @@ extern void vlputl(vlong);
 extern vlong cpos(void);
 extern void diag(char*, ...);
 extern void errorexit(void);
-extern void* malloc(long);
+extern void* malloc(ulong);
 extern void free(void*);
 
 
