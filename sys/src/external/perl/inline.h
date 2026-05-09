@@ -52,6 +52,7 @@ S<C<av_top_index(av) + 1>>.
 
 =cut
 */
+
 PERL_STATIC_INLINE Size_t
 Perl_av_count(pTHX_ AV *av)
 {

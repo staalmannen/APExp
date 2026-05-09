@@ -9824,21 +9824,24 @@ Perl_append_utf8_from_native_byte(const U8 byte, U8 **dest);
 # define PERL_ARGS_ASSERT_APPEND_UTF8_FROM_NATIVE_BYTE \
         assert(dest)
 
+#ifndef Perl_av_count
 PERL_STATIC_INLINE Size_t
-Perl_av_count(pTHX_ AV *av)
-        __attribute__warn_unused_result__;
+Perl_av_count(pTHX_ AV *av);
+#endif
 # define PERL_ARGS_ASSERT_AV_COUNT              \
         assert(av); assert(SvTYPE(av) == SVt_PVAV)
 
 PERL_STATIC_INLINE SV **
-Perl_av_fetch_simple(pTHX_ AV *av, SSize_t key, I32 lval)
-        __attribute__warn_unused_result__;
+#ifndef Perl_av_fetch_simple
+Perl_av_fetch_simple(pTHX_ AV *av, SSize_t key, I32 lval);
+#endif
 # define PERL_ARGS_ASSERT_AV_FETCH_SIMPLE       \
         assert(av); assert(SvTYPE(av) == SVt_PVAV)
 
+#ifndef Perl_av_new_alloc
 PERL_STATIC_INLINE AV *
-Perl_av_new_alloc(pTHX_ SSize_t size, bool zeroflag)
-        __attribute__warn_unused_result__;
+Perl_av_new_alloc(pTHX_ SSize_t size, bool zeroflag);
+#endif
 # define PERL_ARGS_ASSERT_AV_NEW_ALLOC
 
 PERL_STATIC_INLINE void
