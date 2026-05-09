@@ -10,20 +10,7 @@
 void dwarfaddfrag(int n, char* frag);
 
 /*
- * Add the dwarf section names to the ELF
- * s[ection]h[eader]str[ing]tab.
- */
-void dwarfaddshstrings(Sym *shstrtab);
-
-/*
  * Emit debug_abbrevs, debug_info and debug_line sections to current
  * offset in cout.
  */
 void dwarfemitdebugsections(void);
-
-/*
- * Add section headers pointing to the sections emitted in
- * dwarfemitdebugsections.
- */
-void dwarfaddelfheaders(void);
-void dwarfaddmachoheaders(void);

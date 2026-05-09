@@ -4,6 +4,8 @@
 #include	"../6c/6.out.h"
 #include	"../cc/compat.h"
 
+#define PtrSize 8
+
 #define	P		((Prog*)0)
 #define	S		((Sym*)0)
 #define	TNAME		(curtext?curtext->from.sym->name:noname)

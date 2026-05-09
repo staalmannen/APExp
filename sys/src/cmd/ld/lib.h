@@ -28,11 +28,47 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#ifndef _LD_LIB_H_
+#define _LD_LIB_H_
+
 // Where symbol table data gets mapped into memory.
 #define SYMDATVA 0x99LL<<24
 
-typedef struct Library Library;
-struct Library
+#include <u.h>
+
+/* Go-style types for compatibility */
+typedef unsigned char uint8;
+typedef unsigned short uint16;
+typedef long uint32;
+typedef uvlong uint64;
+typedef char int8;
+typedef short int16;
+typedef long int32;
+typedef vlong int64;
+
+/* Rename conflicting symbols from standard linkers */
+#define library go_library
+#define libraryp go_libraryp
+#define nlibrary go_nlibrary
+#define Library go_Library
+
+/* I/O macros used by DWARF (little-endian) */
+#define LPUT(v) lputl(v)
+#define WPUT(v) wputl(v)
+#define VPUT(v) vlputl(v)
+
+/* Map names to the renamed versions in lib.c */
+#define mal go_mal
+#define unmal go_unmal
+#define addsection go_addsection
+#define ewrite go_ewrite
+#define mangle go_mangle
+#define mywhatsys go_mywhatsys
+#define pathchar go_pathchar
+#define pathtoprefix go_pathtoprefix
+
+typedef struct go_Library go_Library;
+struct go_Library
 {
 	char *objref;	// object where we found the reference
 	char *srcref;	// src file where we found the reference
@@ -76,9 +112,9 @@ extern	int	cout;
 EXTERN	char*	INITENTRY;
 EXTERN	char	thechar;
 EXTERN	char*	thestring;
-EXTERN	Library*	library;
-EXTERN	int	libraryp;
-EXTERN	int	nlibrary;
+EXTERN	go_Library*	go_library;
+EXTERN	int	go_libraryp;
+EXTERN	int	go_nlibrary;
 EXTERN	Sym*	hash[NHASH];
 EXTERN	Sym*	histfrog[MAXHIST];
 EXTERN	uchar	fnuxi8[8];
@@ -98,39 +134,39 @@ EXTERN	Segment	segdata;
 EXTERN	Segment	segrodata;	// NaCl only
 EXTERN	Segment	segsym;
 
-void	addlib(char *src, char *obj);
-void	addlibpath(char *srcref, char *objref, char *file, char *pkg);
-Section*	addsection(Segment*, char*, int);
-void	copyhistfrog(char *buf, int nbuf);
-void	addhist(int32 line, int type);
-void	asmlc(void);
-void	histtoauto(void);
-void	collapsefrog(Sym *s);
-Sym*	lookup(char *symb, int v);
-void	nuxiinit(void);
-int	find1(int32 l, int c);
-int	find2(int32 l, int c);
-int32	ieeedtof(Ieee *e);
-double	ieeedtod(Ieee *e);
+void	go_addlib(char *src, char *obj);
+void	go_addlibpath(char *srcref, char *objref, char *file, char *pkg);
+Section*	go_addsection(Segment*, char*, int);
+void	go_copyhistfrog(char *buf, int nbuf);
+void	go_addhist(int32 line, int type);
+void	go_asmlc(void);
+void	go_histtoauto(void);
+void	go_collapsefrog(Sym *s);
+Sym*	go_lookup(char *symb, int v);
+void	go_nuxiinit(void);
+int	go_find1(int32 l, int c);
+int	go_find2(int32 l, int c);
+int32	go_ieeedtof(Ieee *e);
+double	go_ieeedtod(Ieee *e);
 void	undefsym(Sym *s);
-void	zerosig(char *sp);
+void	go_zerosig(char *sp);
 void	readundefs(char *f, int t);
-int32	Bget4(Biobuf *f);
-void	loadlib(void);
-void	errorexit(void);
-void	mangle(char*);
-void	objfile(char *file, char *pkg);
-void	libinit(void);
-void	Lflag(char *arg);
+int32	go_Bget4(Biobuf *f);
+void	go_loadlib(void);
+void	go_errorexit(void);
+void	go_mangle(char*);
+void	go_objfile(char *file, char *pkg);
+void	go_libinit(void);
+void	go_Lflag(char *arg);
 void	usage(void);
 void	ldobj1(Biobuf *f, char*, int64 len, char *pn);
-void	ldobj(Biobuf*, char*, int64, char*, int);
+void	go_ldobj(Biobuf*, char*, int64, char*, int);
 void	ldpkg(Biobuf*, char*, int64, char*, int);
 void	mark(Sym *s);
-void	mkfwd(void);
+void	go_mkfwd(void);
 char*	expandpkg(char*, char*);
 void	deadcode(void);
-void	ewrite(int, void*, int);
+void	go_ewrite(int, void*, int);
 Reloc*	addrel(Sym*);
 void	codeblk(int32, int32);
 void	datblk(int32, int32);
@@ -147,15 +183,16 @@ vlong	adduint8(Sym*, uint8);
 vlong	adduint16(Sym*, uint16);
 void	strnput(char*, int);
 
-int	pathchar(void);
-void*	mal(uint32);
-void	unmal(void*, uint32);
-void	mywhatsys(void);
+int	go_pathchar(void);
+void*	go_mal(uint32);
+void	go_unmal(void*, uint32);
+void	go_mywhatsys(void);
+void	vlputl(vlong);
 
 /* set by call to mywhatsys() */
-extern	char*	goroot;
-extern	char*	goarch;
-extern	char*	goos;
+extern	char*	go_goroot;
+extern	char*	go_goarch;
+extern	char*	go_goos;
 
 /* whence for ldpkg */
 enum {
@@ -163,3 +200,5 @@ enum {
 	ArchiveObj,
 	Pkgdef
 };
+
+#endif

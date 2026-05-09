@@ -938,20 +938,3 @@ dwarfemitdebugsections(void)
 	writeinfo();
 }
 
-
-void
-dwarfaddshstrings(Sym *shstrtab)
-{
-	elfstrdbg[ElfStrDebugAbbrev]   = addstring(shstrtab, ".debug_abbrev");
-	elfstrdbg[ElfStrDebugAranges]  = addstring(shstrtab, ".debug_aranges");
-	elfstrdbg[ElfStrDebugFrame]    = addstring(shstrtab, ".debug_frame");
-	elfstrdbg[ElfStrDebugInfo]     = addstring(shstrtab, ".debug_info");
-	elfstrdbg[ElfStrDebugLine]     = addstring(shstrtab, ".debug_line");
-	elfstrdbg[ElfStrDebugLoc]      = addstring(shstrtab, ".debug_loc");
-	elfstrdbg[ElfStrDebugMacinfo]  = addstring(shstrtab, ".debug_macinfo");
-	elfstrdbg[ElfStrDebugPubNames] = addstring(shstrtab, ".debug_pubnames");
-	elfstrdbg[ElfStrDebugPubTypes] = addstring(shstrtab, ".debug_pubtypes");
-	elfstrdbg[ElfStrDebugRanges]   = addstring(shstrtab, ".debug_ranges");
-	elfstrdbg[ElfStrDebugStr]      = addstring(shstrtab, ".debug_str");
-}
-
