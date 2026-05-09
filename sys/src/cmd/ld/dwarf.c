@@ -3,6 +3,7 @@
 // license that can be found in the LICENSE file.
 
 #include	"l.h"
+#include 	"lib.h"
 #include	"dwarf.h"
 #include	"dwarf_defs.h"
 
