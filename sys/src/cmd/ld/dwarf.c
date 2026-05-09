@@ -19,6 +19,8 @@ getspadj(Prog *p)
 // ... in the loop:
 // if ((q->spadj = getspadj(q)) == 0) continue;
 
+#define DWARFREGSP D_SP
+
 // Externs for linker structures defined in l.h
 extern Prog *textp;
 extern Prog *curtext;
@@ -777,9 +779,8 @@ writelines(void)
 		dwinfo->child = newdie(dwinfo->child, DW_ABRV_FUNCTION);
 		newattr(dwinfo->child, DW_AT_name, DW_CLS_STRING, strlen(s->name), s->name);
 		newattr(dwinfo->child, DW_AT_low_pc, DW_CLS_ADDRESS, s->value, 0);
-		epc = s->value + s->size;
+		epc = s->value + 0; // Sym doesn't have a size
 		newattr(dwinfo->child, DW_AT_high_pc, DW_CLS_ADDRESS, epc, 0);
-
 		for(q = s->text; q != P; q = q->link) {
 			lh = searchhist(q->line);
 			if (lh == nil) {
@@ -912,8 +913,7 @@ writeframes(void)
 		LPUT(fdesize);
 		LPUT(0);
 		addrput(p->pc);
-		addrput(s->size);
-
+		addrput(0); // Symbol size is not available in native Sym
 		cflush();
 		seek(cout, fdeo + 4 + fdesize, 0);
 	}
