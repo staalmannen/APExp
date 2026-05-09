@@ -161,10 +161,15 @@ if(~ $#sources 0 && ~ $#cfiles 0 && ~ $#objects 0) usage
 # ---- -E: preprocess only ----
 if(! ~ $eflag '') {
 	for(src in $sources) {
+		base = `{basename $src | sed 's/\.\(cpp\|cxx\|cc\|C\)$//'}
+		# pcc only accepts .c extension; copy source to a temp .c file
+		tmpc = /tmp/cxx.$pid.$base.c
+		cp $src $tmpc
 		if(! ~ $vflag '')
 			echo $CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src >/fd/2
-		$CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src
-		if(! ~ $status 0) exit $status
+		$CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $tmpc
+		rm -f $tmpc
+		if(! ~ $status '') exit $status
 	}
 	exit 0
 }
@@ -200,16 +205,19 @@ for(src in $sources) {
 	}
 
 	# 1. Preprocess
+	# pcc only accepts .c extension; copy source to a temp .c file
+	csrc = $tmpdir/$base.src.c
+	cp $src $csrc
 	if(! ~ $vflag '')
 		echo $CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src >/fd/2
-	$CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $src > $pp
-	if(! ~ $status 0) { cleanup; exit $status }
+	$CC -E -I$CXXINCL $iflags $dflags '-D__cplusplus=1' '-Dc_plusplus=1' $csrc > $pp
+	if(! ~ $status '') { cleanup; exit $status }
 
 	# 2. ns_strip (namespace preprocessor)
 	if(~ $nflag '' && ! ~ $nsstrip '') {
 		if(! ~ $vflag '') echo $nsstrip >/fd/2
 		$nsstrip < $pp > $ns
-		if(! ~ $status 0) { cleanup; exit $status }
+		if(! ~ $status '') { cleanup; exit $status }
 	}
 	if not
 		ns = $pp
@@ -217,7 +225,7 @@ for(src in $sources) {
 	# 3. cfront: C++ → C
 	if(! ~ $vflag '') echo $CFRONT +a1 +f$src >/fd/2
 	$CFRONT +a1 +f$src < $ns > $cf
-	if(! ~ $status 0) { cleanup; exit $status }
+	if(! ~ $status '') { cleanup; exit $status }
 
 	# -F mode: emit C to stdout (or -o file) and stop
 	if(! ~ $fflag '') {
@@ -233,7 +241,7 @@ for(src in $sources) {
 	# 4. Compile generated C
 	if(! ~ $vflag '') echo $CC -c -I$CINCL $iflags $ccopts $cf -o $obj >/fd/2
 	$CC -c -I$CINCL $iflags $ccopts $cf -o $obj
-	if(! ~ $status 0) { cleanup; exit $status }
+	if(! ~ $status '') { cleanup; exit $status }
 
 	compiled_objects = ($compiled_objects $obj)
 }
@@ -254,7 +262,7 @@ for(src in $cfiles) {
 	}
 	if(! ~ $vflag '') echo $CC -c -I$CINCL $iflags $ccopts $src -o $obj >/fd/2
 	$CC -c -I$CINCL $iflags $ccopts $src -o $obj
-	if(! ~ $status 0) { cleanup; exit $status }
+	if(! ~ $status '') { cleanup; exit $status }
 	compiled_objects = ($compiled_objects $obj)
 }
 
@@ -274,7 +282,7 @@ if(! ~ $#sources 0 && test -f $CXXLIB)
 if(! ~ $vflag '')
 	echo $CC $ccopts $all_objects $cxxlib_arg $lflags -o $outfile >/fd/2
 $CC $ccopts $all_objects $cxxlib_arg $lflags -o $outfile
-if(! ~ $status 0) { cleanup; exit $status }
+if(! ~ $status '') { cleanup; exit $status }
 
 cleanup
 exit 0

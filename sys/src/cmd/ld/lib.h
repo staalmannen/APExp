@@ -75,7 +75,7 @@ struct Reloc
 };
 
 typedef struct go_Library go_Library;
-...
+
 // Terrible but standard terminology.
 // A segment describes a block of file to load into memory.
 // A section further describes the pieces of that block for

@@ -25,13 +25,12 @@ extern void vlputl(vlong);
 extern vlong cpos(void);
 extern void diag(char*, ...);
 extern void errorexit(void);
-extern void* malloc(long);
+extern void* malloc(ulong);
 extern void free(void*);
 
 /*
  * Offsets and sizes of the debug_* sections in the cout file.
  */
-...
 
 static vlong abbrevo;
 static vlong abbrevsize;
