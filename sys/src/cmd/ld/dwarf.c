@@ -7,14 +7,25 @@
 #include	"dwarf.h"
 #include	"dwarf_defs.h"
 
+/* Calculate stack adjustment from AADJSP instruction */
+static long
+getspadj(Prog *p)
+{
+	if(p->as == AADJSP)
+		return p->from.offset;
+	return 0;
+}
+
+// ... in the loop:
+// if ((q->spadj = getspadj(q)) == 0) continue;
+
 // Externs for linker structures defined in l.h
 extern Prog *textp;
 extern Prog *curtext;
 extern Sym *hash[NHASH];
-Prog *cursym; // Added this
+Prog *cursym; 
 
 // Linker-core functions/vars not available in lib.h
-extern void cput(int);
 extern void cflush(void);
 extern void LPUT(long);
 extern void WPUT(ushort);
@@ -25,8 +36,9 @@ extern void vlputl(vlong);
 extern vlong cpos(void);
 extern void diag(char*, ...);
 extern void errorexit(void);
-extern void* malloc(ulong);
+extern void* malloc(long);
 extern void free(void*);
+
 
 /*
  * Offsets and sizes of the debug_* sections in the cout file.
@@ -701,9 +713,8 @@ writelines(void)
 	currfile = -1;
 	lineo = cpos();
 
-	for(cursym = textp; cursym != nil; cursym = cursym->next) {
-		s = cursym;
-
+	for(cursym = textp; cursym != P; cursym = cursym->link) {
+	        s = cursym;
 		// Look for history stack.  If we find one,
 		// we're entering a new compilation unit
 		if((unitname = inithist(s->autom)) != 0) {
@@ -865,7 +876,7 @@ writeframes(void)
 	}
 	strnput("", pad);
 
-	for(cursym = textp; cursym != nil; cursym = cursym->next) {
+	for(cursym = textp; cursym != P; cursym = cursym->link) {
 		s = cursym;
 		if (!s->reachable)
 			continue;
@@ -882,14 +893,14 @@ writeframes(void)
 		pc = p->pc;
 
 		for(q = p; q->link != P; q = q->link) {
-			if (q->spadj == 0)
-				continue;
+		        long spadj = getspadj(q);
+		        if (spadj == 0)
+		                continue;
 
-			cfa += q->spadj;
-			putpccfadelta(q->link->pc - pc, cfa);
-			pc = q->link->pc;
+		        cfa += spadj;
+		        putpccfadelta(q->link->pc - pc, cfa);
+		        pc = q->link->pc;
 		}
-
 		fdesize = cpos() - fdeo - 4;	// exclude the length field.
 		pad = rnd(fdesize, PtrSize) - fdesize;
 		strnput("", pad);
