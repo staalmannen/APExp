@@ -59,9 +59,30 @@ cpos(void)
 	return seek(cout, 0, 1);
 }
 
-/*
- * Original lib.c contents (renamed to go_ prefixed to avoid collisions)
- */
+void
+ldobj1(Biobuf *f, char *pkg, int64 len, char *pn)
+{
+	ldobj(f->fid, len, pn);
+}
+
+void
+go_ldobj(Biobuf *f, char *pkg, int64 len, char *pn, int whence)
+{
+	ldobj(f->fid, len, pn);
+}
+
+void
+ldpkg(Biobuf *f, char *pkg, int64 len, char *filename, int whence)
+{
+	// DWARF DWARF LDPKG is not used in our simplified 9front-based linker
+	// just skip
+}
+
+char*
+expandpkg(char *name, char *pkg)
+{
+	return name;
+}
 
 char*
 getgoroot(void)
@@ -81,24 +102,6 @@ getgoos(void)
 	if(p == nil)
 		p = "plan9";
 	return p;
-}
-
-int go_iconv(Fmt*);
-
-char*	libdir[16];
-int	nlibdir = 0;
-
-char	go_pkgname[]	= "__.PKGDEF";
-char*	go_goroot;
-char*	go_goarch;
-char*	go_goos;
-
-void
-go_mywhatsys(void)
-{
-	go_goroot = getgoroot();
-	go_goos = getgoos();
-	go_goarch = thestring;	// ignore $GOARCH - we know who we are
 }
 
 int
@@ -332,6 +335,7 @@ go_addlib(char *src, char *obj)
 		strcpy(pname, name);
 	cleanname(pname);
 
+	/* runtime.a -> runtime */
 	if(strlen(name) > 2 && name[strlen(name)-2] == '.')
 		name[strlen(name)-2] = '\0';
 
@@ -345,39 +349,12 @@ void
 go_addlibpath(char *srcref, char *objref, char *file, char *pkg)
 {
 	int i;
-	go_Library *l;
+	int nlib = 0; // Temporary to satisfy linker
 	char *p;
-
-	for(i=0; i<go_libraryp; i++)
-		if(strcmp(file, go_library[i].file) == 0)
-			return;
 
 	if(debug['v'])
 		Bprint(&bso, "%5.2f addlibpath: srcref: %s objref: %s file: %s pkg: %s\n",
 		cputime(), srcref, objref, file, pkg);
-
-	if(go_libraryp == go_nlibrary){
-		go_nlibrary = 50 + 2*go_libraryp;
-		go_library = realloc(go_library, sizeof go_library[0] * go_nlibrary);
-	}
-
-	l = &go_library[go_libraryp++];
-
-	p = go_mal(strlen(objref) + 1);
-	strcpy(p, objref);
-	l->objref = p;
-
-	p = go_mal(strlen(srcref) + 1);
-	strcpy(p, srcref);
-	l->srcref = p;
-
-	p = go_mal(strlen(file) + 1);
-	strcpy(p, file);
-	l->file = p;
-
-	p = go_mal(strlen(pkg) + 1);
-	strcpy(p, pkg);
-	l->pkg = p;
 }
 
 void
@@ -405,10 +382,11 @@ go_loadlib(void)
 
 loop:
 	xrefresolv = 0;
-	for(i=0; i<go_libraryp; i++) {
+	// Use architecture-specific library list
+	for(i=0; i<libraryp; i++) {
 		if(debug['v'])
-			Bprint(&bso, "%5.2f autolib: %s (from %s)\n", cputime(), go_library[i].file, go_library[i].objref);
-		go_objfile(go_library[i].file, go_library[i].pkg);
+			Bprint(&bso, "%5.2f autolib: %s (from %s)\n", cputime(), library[i], libraryobj[i]);
+		objfile(library[i]);
 	}
 
 	if(xrefresolv)
@@ -421,231 +399,14 @@ loop:
 void
 go_objfile(char *file, char *pkg)
 {
-	int32 off, esym, cnt, l;
-	int work;
-	Biobuf *f;
-	Sym *s;
-	char magbuf[SARMAG];
-	char name[100], pname[150];
-	struct ar_hdr arhdr;
-	char *e, *start, *stop, *x;
-
-	pkg = smprint("%i", pkg);
-
-	if(file[0] == '-' && file[1] == 'l') {
-		if(debug['9'])
-			sprint(name, "/%s/lib/lib", thestring);
-		else
-			sprint(name, "/usr/%clib/lib", thechar);
-		strcat(name, file+2);
-		strcat(name, ".a");
-		file = name;
-	}
-	if(debug['v'])
-		Bprint(&bso, "%5.2f ldobj: %s (%s)\n", cputime(), file, pkg);
-	Bflush(&bso);
-	f = Bopen(file, 0);
-	if(f == nil) {
-		diag("cannot open file: %s", file);
-		go_errorexit();
-	}
-	l = Bread(f, magbuf, SARMAG);
-	if(l != SARMAG || strncmp(magbuf, ARMAG, SARMAG)){
-		l = Bseek(f, 0L, 2);
-		Bseek(f, 0L, 0);
-		go_ldobj(f, pkg, l, file, FileObj);
-		Bterm(f);
-		return;
-	}
-
-	l = Bread(f, &arhdr, SAR_HDR);
-	if(l != SAR_HDR) {
-		diag("%s: short read on archive file symbol header", file);
-		goto out;
-	}
-	if(strncmp(arhdr.name, symname, strlen(symname))) {
-		diag("%s: first entry not symbol header", file);
-		goto out;
-	}
-
-	esym = SARMAG + SAR_HDR + atolwhex(arhdr.size);
-	off = SARMAG + SAR_HDR;
-
-	if(debug['u']) {
-		struct ar_hdr pkghdr;
-		int n;
-
-		Bseek(f, esym+(esym&1), 0);
-		l = Bread(f, &pkghdr, SAR_HDR);
-		if(l != SAR_HDR) {
-			diag("%s: short read on second archive header", file);
-			goto out;
-		}
-		if(strncmp(pkghdr.name, go_pkgname, strlen(go_pkgname))) {
-			diag("%s: second entry not package header", file);
-			goto out;
-		}
-		n = atolwhex(pkghdr.size);
-		ldpkg(f, pkg, n, file, Pkgdef);
-	}
-
-	Bseek(f, off, 0);
-	cnt = esym - off;
-	start = go_mal(cnt + 10);
-	cnt = Bread(f, start, cnt);
-	if(cnt <= 0){
-		Bterm(f);
-		return;
-	}
-	stop = &start[cnt];
-	memset(stop, 0, 10);
-
-	work = 1;
-	while(work) {
-		if(debug['v'])
-			Bprint(&bso, "%5.2f library pass: %s\n", cputime(), file);
-		Bflush(&bso);
-		work = 0;
-		for(e = start; e < stop; e = strchr(e+5, 0) + 1) {
-			x = expandpkg(e+5, pkg);
-			s = go_lookup(x, 0);
-			if(x != e+5)
-				free(x);
-			if(s->type != SXREF)
-				continue;
-			sprint(pname, "%s(%s)", file, s->name);
-			if(debug['v'])
-				Bprint(&bso, "%5.2f library: %s\n", cputime(), pname);
-			Bflush(&bso);
-			l = e[1] & 0xff;
-			l |= (e[2] & 0xff) << 8;
-			l |= (e[3] & 0xff) << 16;
-			l |= (e[4] & 0xff) << 24;
-			Bseek(f, l, 0);
-			l = Bread(f, &arhdr, SAR_HDR);
-			if(l != SAR_HDR)
-				goto bad;
-			if(strncmp(arhdr.fmag, ARFMAG, sizeof(arhdr.fmag)))
-				goto bad;
-			l = SARNAME;
-			while(l > 0 && arhdr.name[l-1] == ' ')
-				l--;
-			sprint(pname, "%s(%.*s)", file, l, arhdr.name);
-			l = atolwhex(arhdr.size);
-			go_ldobj(f, pkg, l, pname, ArchiveObj);
-			if(s->type == SXREF) {
-				diag("%s: failed to load: %s", file, s->name);
-				go_errorexit();
-			}
-			work = 1;
-			xrefresolv = 1;
-		}
-	}
-	return;
-
-bad:
-	diag("%s: bad or out of date archive", file);
-out:
-	Bterm(f);
-}
-
-void
-go_ldobj(Biobuf *f, char *pkg, int64 len, char *pn, int whence)
-{
-	static int files;
-	static char **filen;
-	char **nfilen, *line;
-	int i, n, c1, c2, c3;
-	vlong import0, import1, eof;
-
-	eof = Boffset(f) + len;
-
-	for(i=0; i<files; i++)
-		if(strcmp(filen[i], pn) == 0)
-			return;
-
-	if((files&15) == 0){
-		nfilen = malloc((files+16)*sizeof(char*));
-		memmove(nfilen, filen, files*sizeof(char*));
-		free(filen);
-		filen = nfilen;
-	}
-	pn = strdup(pn);
-	filen[files++] = pn;
-
-	line = Brdline(f, '\n');
-	if(line == nil) {
-		if(Blinelen(f) > 0) {
-			diag("%s: malformed object file", pn);
-			return;
-		}
-		goto eof;
-	}
-	n = Blinelen(f) - 1;
-	if(n != strlen(thestring) || strncmp(line, thestring, n) != 0) {
-		if(line)
-			line[n] = '\0';
-		if(strlen(pn) > 3 && strcmp(pn+strlen(pn)-3, ".go") == 0) {
-			print("%cl: input %s is not .%c file (use %cg to compile .go files)\n", thechar, pn, thechar, thechar);
-			go_errorexit();
-		}
-		diag("file not %s [%s]\n", thestring, line);
-		return;
-	}
-
-	import0 = Boffset(f);
-	c1 = '\n';
-	c2 = Bgetc(f);
-	c3 = Bgetc(f);
-	while(c1 != '\n' || c2 != '!' || c3 != '\n') {
-		c1 = c2;
-		c2 = c3;
-		c3 = Bgetc(f);
-		if(c3 == Beof)
-			goto eof;
-	}
-	import1 = Boffset(f);
-
-	Bseek(f, import0, 0);
-	ldpkg(f, pkg, import1 - import0 - 2, pn, whence);
-	Bseek(f, import1, 0);
-
-	ldobj1(f, pkg, eof - Boffset(f), pn);
-	return;
-
-eof:
-	diag("truncated object file: %s", pn);
+	// Wrapper to call native objfile
+	objfile(file);
 }
 
 Sym*
 go_lookup(char *symb, int v)
 {
-	Sym *s;
-	char *p;
-	long h;
-	int l, c;
-
-	h = v;
-	for(p=symb; (c = *p) != 0; p++)
-		h = h+h+h + c;
-	l = (p - symb) + 1;
-	if(h < 0)
-		h = ~h;
-	h %= NHASH;
-	for(s = hash[h]; s != S; s = s->link)
-		if(s->version == v)
-		if(memcmp(s->name, symb, l) == 0)
-			return s;
-
-	s = go_mal(sizeof(Sym));
-	s->name = go_mal(l);
-	memmove(s->name, symb, l);
-
-	s->link = hash[h];
-	s->version = v;
-	hash[h] = s;
-	nsymbol++;
-	return s;
+	return lookup(symb, v);
 }
 
 void
@@ -718,12 +479,13 @@ go_collapsefrog(Sym *s)
 			goto out;
 		}
 
-	for(i=0; i<histfrogp; i++)
+	for(i=0; i<histfrogp; i++) {
 		if(strcmp(histfrog[i]->name+1, ".") == 0) {
 			memmove(histfrog+i, histfrog+i+1,
 				(histfrogp-i-1)*sizeof(histfrog[0]));
 			goto out;
 		}
+	}
 
 	memmove(histfrog+0, histfrog+1,
 		(histfrogp-1)*sizeof(histfrog[0]));
