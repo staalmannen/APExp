@@ -75,6 +75,13 @@ struct Reloc
 };
 
 typedef struct go_Library go_Library;
+struct go_Library
+{
+	char *objref;	// object where we found the reference
+	char *srcref;	// src file where we found the reference
+	char *file;		// object file
+	char *pkg;	// import path
+};
 
 // Terrible but standard terminology.
 // A segment describes a block of file to load into memory.

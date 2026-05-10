@@ -699,14 +699,14 @@ flushunit(vlong pc, vlong unitstart)
 static void
 writelines(void)
 {
-	Prog *q = P;
-	Sym *s = S;
 	char *unitname;
 	vlong unitstart;
 	vlong pc, epc, lc, llc, lline;
 	int currfile;
 	int i;
 	Linehist *lh;
+	Prog *q;
+	Sym *s;
 
 	unitstart = -1;
 	epc = pc = 0;
@@ -716,7 +716,7 @@ writelines(void)
 	lineo = cpos();
 
 	for(cursym = textp; cursym != P; cursym = cursym->pcond) {
-		s = cursym->from.u1.u1sym;
+		Sym *s = cursym->from.u1.u1sym;
 		// Look for history stack.  If we find one,
 		// we're entering a new compilation unit
 		if((unitname = inithist(cursym->to.u1.u1autom)) != 0) {
@@ -780,9 +780,11 @@ writelines(void)
 		epc = s->value + 0; // Sym doesn't have a size
 		newattr(dwinfo->child, DW_AT_high_pc, DW_CLS_ADDRESS, epc, 0);
 
-		for(q = cursym; q != P; q = q->link) {
-			if(q != cursym && q->as == ATEXT) break;
-			lh = searchhist(q->line);
+		{
+			Prog *q;
+			for(q = cursym; q != P; q = q->link) {
+				if(q != cursym && q->as == ATEXT) break;
+				lh = searchhist(q->line);
 
 			if (lh == nil) {
 				diag("corrupt history or bad absolute line: %P", q);
@@ -848,9 +850,8 @@ putpccfadelta(vlong deltapc, vlong cfa)
 static void
 writeframes(void)
 {
-	Prog *p = P, *q = P;
-	Sym *s = S;
 	vlong fdeo, fdesize, pad, cfa, pc;
+	Prog *p, *q;
 
 	frameo = cpos();
 
@@ -879,8 +880,6 @@ writeframes(void)
 	strnput("", pad);
 
 	for(cursym = textp; cursym != P; cursym = cursym->pcond) {
-		s = cursym->from.u1.u1sym;
-
 		fdeo = cpos();
 		// Emit a FDE, Section 6.4.1, starting wit a placeholder.
 		LPUT(0);	// length, must be multiple of PtrSize
@@ -892,15 +891,18 @@ writeframes(void)
 		p = cursym;
 		pc = p->pc;
 
-		for(q = p; q->link != P; q = q->link) {
-			if(q != p && q->as == ATEXT) break;
-		        long spadj = getspadj(q);
-			if (spadj == 0)
-				continue;
+		{
+			Prog *q;
+			for(q = p; q->link != P; q = q->link) {
+				if(q != p && q->as == ATEXT) break;
+				long spadj = getspadj(q);
+				if (spadj == 0)
+					continue;
 
-			cfa += spadj;
-			putpccfadelta(q->link->pc - pc, cfa);
-			pc = q->link->pc;
+				cfa += spadj;
+				putpccfadelta(q->link->pc - pc, cfa);
+				pc = q->link->pc;
+			}
 		}
 		fdesize = cpos() - fdeo - 4;	// exclude the length field.
 		pad = rnd(fdesize, PtrSize) - fdesize;

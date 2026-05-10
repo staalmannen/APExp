@@ -32,6 +32,14 @@
 #include	"l.h"
 #include	"lib.h"
 #include	<ar.h>
+#include	<ctype.h>
+
+char* getgoroot(void);
+char* getgoos(void);
+
+#ifndef isalpha
+#define isalpha(c) (((c)>='a' && (c)<='z') || ((c)>='A' && (c)<='Z'))
+#endif
 
 /*
  * These functions bridge the DWARF code to the native linker's output.
@@ -54,6 +62,26 @@ cpos(void)
 /*
  * Original lib.c contents (renamed to go_ prefixed to avoid collisions)
  */
+
+char*
+getgoroot(void)
+{
+	char *p;
+	p = getenv("GOROOT");
+	if(p == nil)
+		p = "/usr/local/go";
+	return p;
+}
+
+char*
+getgoos(void)
+{
+	char *p;
+	p = getenv("GOOS");
+	if(p == nil)
+		p = "plan9";
+	return p;
+}
 
 int go_iconv(Fmt*);
 
@@ -212,7 +240,7 @@ go_libinit(void)
 
 	libdir[nlibdir++] = smprint("%s/pkg/%s_%s", go_goroot, go_goos, go_goarch);
 
-	unlink(outfile);
+	remove(outfile);
 	cout = create(outfile, 1, 0775);
 	if(cout < 0) {
 		diag("cannot create %s", outfile);
