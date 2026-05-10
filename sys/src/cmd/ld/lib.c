@@ -406,7 +406,7 @@ go_objfile(char *file, char *pkg)
 Sym*
 go_lookup(char *symb, int v)
 {
-	return lookup(symb, v);
+	return (Sym *) lookup(symb, v);
 }
 
 void

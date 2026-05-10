@@ -133,10 +133,10 @@ Install paths have been modified so that libraries and binaries are installed in
 
 C transpilers are fun little proof-of-concept programs, which also open up for more languages. Many will only have very little practical use, however.
 
-- The pascal-to-C transpiler p2c (2.01)
-- The fortran-to-C transpiler f2c (20250303)
-- The portable ObjC-to-C transpiler (3.4.8, bootstrap, TODO: build 3.4.13 with the bootstrapped compiler)
-- Cfront (version "C4") C++-to-C transpiler
+- pascal-to-C transpiler p2c (2.01)
+- fortran-to-C transpiler f2c (20250303)
+- portable ObjC-to-C transpiler (3.4.8, bootstrap, TODO: build 3.4.13 with the bootstrapped compiler)
+- C++-to-C transpiler Cfront (version "C4") 
 
 
 ***(un)archivers***

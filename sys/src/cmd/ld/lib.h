@@ -45,7 +45,7 @@ typedef long int32;
 typedef vlong int64;
 
 /* Rename conflicting symbols from standard linkers */
-#define library go_library
+// #define library go_library
 #define libraryp go_libraryp
 #define nlibrary go_nlibrary
 #define Library go_Library
@@ -122,6 +122,9 @@ EXTERN	char*	thestring;
 EXTERN	go_Library*	go_library;
 EXTERN	int	go_libraryp;
 EXTERN	int	go_nlibrary;
+EXTERN  void go_errorexit(void);
+EXTERN  void go_addlibpath(char *, char *, char *, char *);
+EXTERN  Sym* go_lookup(char *, int);
 EXTERN	Sym*	hash[NHASH];
 EXTERN	Sym*	histfrog[MAXHIST];
 EXTERN	uchar	fnuxi8[8];
@@ -148,8 +151,6 @@ extern	void	ldobj1(Biobuf *f, char*, int64 len, char *pn);
 
 /* Global linker symbols that are provided by the native linker */
 extern	Prog*	textp;
-extern	int	libraryp;
-extern	char*	library[];
 extern	char*	libraryobj[];
 extern	int	nerrors;
 Reloc*	addrel(Sym*);
