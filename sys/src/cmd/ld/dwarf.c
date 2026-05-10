@@ -559,7 +559,7 @@ inithist(Auto *a)
 	// We have a new history.  They are guaranteed to come completely
 	// at the beginning of the compilation unit.
 	if (a->aoffset != 1) {
-		diag("stray 'z' with offset %d", a->aoffset);
+		diag("stray 'z' with offset %ld", a->aoffset);
 		return 0;
 	}
 
@@ -699,8 +699,8 @@ flushunit(vlong pc, vlong unitstart)
 static void
 writelines(void)
 {
-	Prog *q;
-	Sym *s;
+	Prog *q = P;
+	Sym *s = S;
 	char *unitname;
 	vlong unitstart;
 	vlong pc, epc, lc, llc, lline;
@@ -715,11 +715,11 @@ writelines(void)
 	currfile = -1;
 	lineo = cpos();
 
-	for(cursym = textp; cursym != P; cursym = cursym->link) {
-	        s = cursym;
+	for(cursym = textp; cursym != P; cursym = cursym->pcond) {
+		s = cursym->from.sym;
 		// Look for history stack.  If we find one,
 		// we're entering a new compilation unit
-		if((unitname = inithist(s->autom)) != 0) {
+		if((unitname = inithist(cursym->to.autom)) != 0) {
 			flushunit(epc, unitstart);
 			unitstart = cpos();
 			if(debug['v'] > 1) {
@@ -733,7 +733,7 @@ writelines(void)
 			newattr(dwinfo, DW_AT_name, DW_CLS_STRING, strlen(unitname), unitname);
 			newattr(dwinfo, DW_AT_language, DW_CLS_CONSTANT, guesslang(unitname), 0);
 			newattr(dwinfo, DW_AT_stmt_list, DW_CLS_PTR, unitstart - lineo, 0);
-			newattr(dwinfo, DW_AT_low_pc, DW_CLS_ADDRESS, s->text->pc, 0);
+			newattr(dwinfo, DW_AT_low_pc, DW_CLS_ADDRESS, cursym->pc, 0);
 			// Write .debug_line Line Number Program Header (sec 6.2.4)
 			// Fields marked with (*) must be changed for 64-bit dwarf
 			LPUT(0);   // unit_length (*), will be filled in later.
@@ -758,7 +758,7 @@ writelines(void)
 				// 4 zeros: the string termination + 3 fields.
 			}
 
-			epc = pc = s->text->pc;
+			epc = pc = cursym->pc;
 			currfile = 1;
 			lc = 1;
 			llc = 1;
@@ -768,11 +768,9 @@ writelines(void)
 			cput(DW_LNE_set_address);
 			addrput(pc);
 		}
-		if (!s->reachable)
-			continue;
 
 		if (unitstart < 0) {
-			diag("reachable code before seeing any history: %P", s->text);
+			diag("reachable code before seeing any history: %P", cursym);
 			continue;
 		}
 
@@ -781,8 +779,11 @@ writelines(void)
 		newattr(dwinfo->child, DW_AT_low_pc, DW_CLS_ADDRESS, s->value, 0);
 		epc = s->value + 0; // Sym doesn't have a size
 		newattr(dwinfo->child, DW_AT_high_pc, DW_CLS_ADDRESS, epc, 0);
-		for(q = s->text; q != P; q = q->link) {
+
+		for(q = cursym; q != P; q = q->link) {
+			if(q != cursym && q->as == ATEXT) break;
 			lh = searchhist(q->line);
+
 			if (lh == nil) {
 				diag("corrupt history or bad absolute line: %P", q);
 				continue;
@@ -847,8 +848,8 @@ putpccfadelta(vlong deltapc, vlong cfa)
 static void
 writeframes(void)
 {
-	Prog *p, *q;
-	Sym *s;
+	Prog *p = P, *q = P;
+	Sym *s = S;
 	vlong fdeo, fdesize, pad, cfa, pc;
 
 	frameo = cpos();
@@ -877,10 +878,8 @@ writeframes(void)
 	}
 	strnput("", pad);
 
-	for(cursym = textp; cursym != P; cursym = cursym->link) {
-		s = cursym;
-		if (!s->reachable)
-			continue;
+	for(cursym = textp; cursym != P; cursym = cursym->pcond) {
+		s = cursym->from.sym;
 
 		fdeo = cpos();
 		// Emit a FDE, Section 6.4.1, starting wit a placeholder.
@@ -890,17 +889,18 @@ writeframes(void)
 		addrput(0);	// address range
 
 		cfa = PtrSize;	// CFA starts at sp+PtrSize
-		p = s->text;
+		p = cursym;
 		pc = p->pc;
 
 		for(q = p; q->link != P; q = q->link) {
+			if(q != p && q->as == ATEXT) break;
 		        long spadj = getspadj(q);
-		        if (spadj == 0)
-		                continue;
+			if (spadj == 0)
+				continue;
 
-		        cfa += spadj;
-		        putpccfadelta(q->link->pc - pc, cfa);
-		        pc = q->link->pc;
+			cfa += spadj;
+			putpccfadelta(q->link->pc - pc, cfa);
+			pc = q->link->pc;
 		}
 		fdesize = cpos() - fdeo - 4;	// exclude the length field.
 		pad = rnd(fdesize, PtrSize) - fdesize;
@@ -917,7 +917,6 @@ writeframes(void)
 		cflush();
 		seek(cout, fdeo + 4 + fdesize, 0);
 	}
-
 	cflush();
 	framesize = cpos() - frameo;
 }
