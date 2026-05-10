@@ -559,7 +559,7 @@ inithist(Auto *a)
 	// We have a new history.  They are guaranteed to come completely
 	// at the beginning of the compilation unit.
 	if (a->aoffset != 1) {
-		diag("stray 'z' with offset %ld", a->aoffset);
+		diag("stray 'z' with offset %ld", (long)a->aoffset);
 		return 0;
 	}
 
@@ -716,10 +716,10 @@ writelines(void)
 	lineo = cpos();
 
 	for(cursym = textp; cursym != P; cursym = cursym->pcond) {
-		s = cursym->from.sym;
+		s = cursym->from.u1.u1sym;
 		// Look for history stack.  If we find one,
 		// we're entering a new compilation unit
-		if((unitname = inithist(cursym->to.autom)) != 0) {
+		if((unitname = inithist(cursym->to.u1.u1autom)) != 0) {
 			flushunit(epc, unitstart);
 			unitstart = cpos();
 			if(debug['v'] > 1) {
@@ -879,7 +879,7 @@ writeframes(void)
 	strnput("", pad);
 
 	for(cursym = textp; cursym != P; cursym = cursym->pcond) {
-		s = cursym->from.sym;
+		s = cursym->from.u1.u1sym;
 
 		fdeo = cpos();
 		// Emit a FDE, Section 6.4.1, starting wit a placeholder.

@@ -39,22 +39,6 @@
  */
 
 void
-lputl(long l)
-{
-	cput(l);
-	cput(l>>8);
-	cput(l>>16);
-	cput(l>>24);
-}
-
-void
-wputl(ushort w)
-{
-	cput(w);
-	cput(w>>8);
-}
-
-void
 vlputl(vlong v)
 {
 	lputl(v);
@@ -72,6 +56,9 @@ cpos(void)
  */
 
 int go_iconv(Fmt*);
+
+char*	libdir[16];
+int	nlibdir = 0;
 
 char	go_pkgname[]	= "__.PKGDEF";
 char*	go_goroot;
