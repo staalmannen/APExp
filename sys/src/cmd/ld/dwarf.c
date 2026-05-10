@@ -705,8 +705,6 @@ writelines(void)
 	int currfile;
 	int i;
 	Linehist *lh;
-	Prog *q;
-	Sym *s;
 
 	unitstart = -1;
 	epc = pc = 0;
@@ -720,14 +718,14 @@ writelines(void)
 		// Look for history stack.  If we find one,
 		// we're entering a new compilation unit
 		if((unitname = inithist(cursym->to.u1.u1autom)) != 0) {
+			Linehist* lh1;
 			flushunit(epc, unitstart);
 			unitstart = cpos();
 			if(debug['v'] > 1) {
 				print("dwarf writelines found %s\n", unitname);
-				Linehist* lh;
-				for (lh = linehist; lh; lh = lh->link)
+				for (lh1 = linehist; lh1; lh1 = lh1->link)
 					print("\t%8lld: [%4lld]%s\n",
-					      lh->absline, lh->line, histfile[lh->file]);
+					      lh1->absline, lh1->line, histfile[lh1->file]);
 			}
 			dwinfo = newdie(dwinfo, DW_ABRV_COMPUNIT);
 			newattr(dwinfo, DW_AT_name, DW_CLS_STRING, strlen(unitname), unitname);
@@ -810,8 +808,9 @@ writelines(void)
 			pc  = q->pc;
 			lc  = q->line;
 			llc = lline;
-		}
-	}
+			}
+			}
+			}
 
 	flushunit(epc, unitstart);
 	linesize = cpos() - lineo;
