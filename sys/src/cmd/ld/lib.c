@@ -41,6 +41,13 @@ char* getgoos(void);
 #define isalpha(c) (((c)>='a' && (c)<='z') || ((c)>='A' && (c)<='Z'))
 #endif
 
+/* Global linker symbols */
+char*	libdir[16];
+int	nlibdir = 0;
+int	go_libraryp;
+go_Library*	go_library;
+int	go_nlibrary;
+
 /*
  * These functions bridge the DWARF code to the native linker's output.
  * We use the native cput() and cflush() macros defined in l.h.
@@ -192,6 +199,14 @@ go_iconv(Fmt *fp)
 }
 
 void
+go_mywhatsys(void)
+{
+	go_goroot = getgoroot();
+	go_goos = getgoos();
+	go_goarch = thestring;	// ignore $GOARCH - we know who we are
+}
+
+void
 go_mangle(char *file)
 {
 	fprint(2, "%s: mangled input file\n", file);
@@ -242,6 +257,7 @@ go_libinit(void)
 		print("goarch is not known: %s\n", go_goarch);
 
 	libdir[nlibdir++] = smprint("%s/pkg/%s_%s", go_goroot, go_goos, go_goarch);
+
 
 	remove(outfile);
 	cout = create(outfile, 1, 0775);
