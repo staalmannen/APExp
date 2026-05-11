@@ -77,6 +77,12 @@ void
 scan_input(filename)
 char *filename;
 {
+    /* Reject path traversal sequences in patch-supplied filenames */
+    if (strstr(filename, "../") != NULL || strstr(filename, "/..") != NULL
+        || strcmp(filename, "..") == 0)
+      fatal ("invalid filename `%s' in patch -- potential path traversal",
+             filename);
+
     using_plan_a = ! (debug & 16) && plan_a (filename);
     if (!using_plan_a)
 	plan_b(filename);
