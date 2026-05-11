@@ -3,6 +3,7 @@
 #include	<bio.h>
 #include	"../5c/5.out.h"
 #include	"../cc/compat.h"
+#define PtrSize 4
 
 #define	LIBNAMELEN	300
 

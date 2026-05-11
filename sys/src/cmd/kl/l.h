@@ -3,6 +3,7 @@
 #include	<bio.h>
 #include	"../kc/k.out.h"
 #include	"../cc/compat.h"
+#define PtrSize 4
 
 typedef	struct	Adr	Adr;
 typedef	struct	Sym	Sym;

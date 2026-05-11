@@ -10,6 +10,8 @@ OFILES=\
 	list.$O\
 	enam.$O\
 	compat.$O\
+	dwarf.$O\
+	lib.$O
 
 HFILES=\
 	l.h\
@@ -18,6 +20,14 @@ HFILES=\
 
 APEXPROOT=../../../..
 BIN=$APEXPROOT/$objtype/bin
+CFILES=${OFILES:%.$O=%.c}
+CFILES=${CFILES:enam.c=../2c/enam.c}
+UPDATE=\
+	mkfile\
+	$HFILES\
+	$CFILES\
+	${TARG:%=/386/bin/%}\
+
 <$APEXPROOT/sys/src/cmd/mkone
 
 ../2c/enam.c: ../2c/2.out.h
@@ -25,5 +35,11 @@ BIN=$APEXPROOT/$objtype/bin
 
 enam.$O:	../2c/enam.c
 	$CC $CFLAGS ../2c/enam.c
+
+dwarf.$O:	../ld/dwarf.c
+	$CC $CFLAGS -I../ld ../ld/dwarf.c
+
+lib.$O:	../ld/lib.c
+	$CC $CFLAGS -I../ld ../ld/lib.c
 
 compat.$O:	../cc/compat

@@ -3,6 +3,7 @@
 #include	<bio.h>
 #include	"../9c/9.out.h"
 #include	"../cc/compat.h"
+#define PtrSize 4
 
 #ifndef	EXTERN
 #define	EXTERN	extern

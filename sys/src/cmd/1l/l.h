@@ -3,6 +3,7 @@
 #include	<bio.h>
 #include	"../2c/2.out.h"
 #include	"../cc/compat.h"
+#define PtrSize 4
 
 #define	P		((Prog*)0)
 #define	S		((Sym*)0)

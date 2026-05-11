@@ -3,15 +3,15 @@
 TARG=kl
 OFILES=\
 	asm.$O\
-	list.$O\
-	noop.$O\
-	sched.$O\
 	obj.$O\
 	optab.$O\
 	pass.$O\
 	span.$O\
+	list.$O\
 	enam.$O\
 	compat.$O\
+	dwarf.$O\
+	lib.$O
 
 HFILES=\
 	l.h\
@@ -20,6 +20,14 @@ HFILES=\
 
 APEXPROOT=../../../..
 BIN=$APEXPROOT/$objtype/bin
+CFILES=${OFILES:%.$O=%.c}
+CFILES=${CFILES:enam.c=../kc/enam.c}
+UPDATE=\
+	mkfile\
+	$HFILES\
+	$CFILES\
+	${TARG:%=/386/bin/%}\
+
 <$APEXPROOT/sys/src/cmd/mkone
 
 ../kc/enam.c: ../kc/k.out.h
@@ -28,5 +36,10 @@ BIN=$APEXPROOT/$objtype/bin
 enam.$O:	../kc/enam.c
 	$CC $CFLAGS ../kc/enam.c
 
-compat.$O:	../cc/compat
+dwarf.$O:	../ld/dwarf.c
+	$CC $CFLAGS -I../ld ../ld/dwarf.c
 
+lib.$O:	../ld/lib.c
+	$CC $CFLAGS -I../ld ../ld/lib.c
+
+compat.$O:	../cc/compat

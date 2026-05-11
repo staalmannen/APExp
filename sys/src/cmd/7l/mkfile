@@ -3,19 +3,15 @@
 TARG=7l
 OFILES=\
 	asm.$O\
-	asmout.$O\
-	enam.$O\
-	bits.$O\
-	cnam.$O\
-	compat.$O\
-	dyn.$O\
-	list.$O\
-	noop.$O\
 	obj.$O\
 	optab.$O\
-	span.$O\
 	pass.$O\
-	mod.$O\
+	span.$O\
+	list.$O\
+	enam.$O\
+	compat.$O\
+	dwarf.$O\
+	lib.$O
 
 HFILES=\
 	l.h\
@@ -24,18 +20,26 @@ HFILES=\
 
 APEXPROOT=../../../..
 BIN=$APEXPROOT/$objtype/bin
+CFILES=${OFILES:%.$O=%.c}
+CFILES=${CFILES:enam.c=../7c/enam.c}
+UPDATE=\
+	mkfile\
+	$HFILES\
+	$CFILES\
+	${TARG:%=/386/bin/%}\
+
 <$APEXPROOT/sys/src/cmd/mkone
 
 ../7c/enam.c: ../7c/7.out.h
 	@ { cd ../7c; mk enam.c }
 
-cnam.c:	l.h mkcname
-	rc ./mkcname
-
 enam.$O:	../7c/enam.c
 	$CC $CFLAGS ../7c/enam.c
 
-compat.$O:	../cc/compat
+dwarf.$O:	../ld/dwarf.c
+	$CC $CFLAGS -I../ld ../ld/dwarf.c
 
-x:V:	$O.out
-	$O.out -la -o/dev/null x.7
+lib.$O:	../ld/lib.c
+	$CC $CFLAGS -I../ld ../ld/lib.c
+
+compat.$O:	../cc/compat
